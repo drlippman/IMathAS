@@ -1,0 +1,102 @@
+<?php
+  //IMathAS:  Main config file.  Edit this file!
+  //(c) 2006 David Lippman
+  //In the code and for the database, I use the shorter IMAS instead of IMathAS
+
+  $dbserver = "localhost";
+  
+  //these must match the settings you used in the dbsetup
+  $dbname = "imas";
+  $dbusername = "imasuser";
+  $dbpassword = "K87zpaxAUtcCd62B";
+
+    //For new user, long description of username requirement
+  $longloginprompt = "Enter a username.  Use only numbers, letters, or the _ character.";
+  
+  //short prompt, for login page
+  $loginprompt = "Username";
+  
+  //Require the username to meet a specific format.  Choose one of the following,
+  //or write your own.  
+  $loginformat = '/^\w+$/';  //A-Z, a-z, 0-9, _ are the only allowed characters
+  //$loginformat = '/^\d{9}$/';  //Requires a 9 digit number
+  //$loginformat = '/^\d{3}-\d{2}-\d{4}$/';  //SSN type format: 555-55-5555
+  
+  //If set to true, the system will send an email to newusers when they try
+  //to enroll.  They have to respond to the email before they are allowed to
+  //log in.  
+  $emailconfirmation = false;
+  
+  //the email address to have as the "from" listing on confirmation emails
+  $sendfrom = "imathas@yoursite.com";
+  
+  //web root to imathas:  http://yoursite.com $imasroot
+  //set = "" if installed in web root dir
+  $imasroot = "";
+  
+  //absolute path or full url to Mimetex CGI, for math image fallback
+  //if you do not have a local install, feel free to use:
+  // $mathimgurl = "http://www.imathas.com/cgi-bin/mimetex.cgi"
+  $mathimgurl = "/mimetex/mimetex.exe";
+  
+  //set to true if you have FreeType library installed and are using GD 2.0 or 
+  //higher.  
+  $freetypeinstalled = true;
+  
+  //shift color of icons from green to red as deadline approaches?
+  $colorshift = true;
+  
+  //should non-admins be allowed to create new non-group libraries?
+  //on a single-school install, set to true; for larger installs that plan to
+  //use the Groups features, set to false
+  $allownongrouplibs = false;
+  
+  //should anyone be allowed to import/export questions and libraries from the 
+  //course page?  Intended for easy sharing between systems, but the course page
+  //is cleaner if turned off.
+  $allowcourseimport = false;
+  
+  //allow installation of macro files by admins?  macro files contain a large
+  //security risk.  If you are going to have many admins, and don't trust the
+  //security of their passwords, you should set this to false.  Installing
+  //macros is equivalent in security risk to having FTP access to the IMathAS
+  //server.
+  //For single-admin systems, it is recommended you leave this as false, and
+  //change it when you need to install a macro file.  Do install macro files
+  //using the web system; a help file is automatically generated when you install
+  //through the system
+  $allowmacroinstall = true;
+  
+  //This is used to change the session file path different than the default.
+  //This is usually not necessary unless your site is on a server farm, or
+  //you're on a shared server and want more security of session data.
+  //This may also be needed to allow setting the garbage collection time limit
+  //so that session data isn't removed after 24 minutes.
+  //Make sure this directory has write access by the server process.
+  //$sessionpath = '/tmp/persistent/imathas/sessions';
+  
+  //template user id
+  $templateuser = 10;
+  
+  //no need to change anything from here on
+  /* Connecting, selecting database */
+  if (!isset($dbsetup)) {
+	 $link = mysql_connect($dbserver,$dbusername, $dbpassword) 
+	  or die("<p>Could not connect : " . mysql_error() . "</p></div></body></html>");
+	 mysql_select_db($dbname) 
+	  or die("<p>Could not select database</p></div></body></html>");
+	  
+	  unset($dbserver);
+	  unset($dbusername);
+	  unset($dbpassword);
+  }
+  //clean up post and get if magic quotes aren't on
+  function addslashes_deep($value) {
+	return (is_array($value) ? array_map('addslashes_deep', $value) : addslashes($value));
+  }
+  if (!get_magic_quotes_gpc()) {
+   $_GET    = array_map('addslashes_deep', $_GET);
+   $_POST  = array_map('addslashes_deep', $_POST);
+   $_COOKIE = array_map('addslashes_deep', $_COOKIE);
+  } 
+?>

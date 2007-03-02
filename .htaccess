@@ -1,0 +1,4 @@
+AddType image/svg+xml .svg
+AddType image/svg+xml .svgz
+AddType image/x-icon .ico
+Options -Indexes

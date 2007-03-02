@@ -1,0 +1,189 @@
+<html>
+<head>
+<title>IMathAS</title>
+<style type="text/css">
+ul li {
+	margin-top: .3em;
+}
+ol li {
+	margin-top: .3em;
+}
+h1 {
+	color: #00f;
+}
+h2,h3,h4 {
+	color: #00c;
+}
+</style>
+<body>
+<h1>IMathAS</h1>
+<p>Version: 1.0beta16, released Sept 28, 2006.  See <a href="changelog.html">Change Log</a> for detailed change history.</p>
+
+<h3>What is IMathAS</h3>
+<p>IMathAS is an Internet Mathematics Assessment System.  In essence, it is a very light
+Course Management System (CMS), most similar to (and inspired by) <a href="http://webwork.math.rochester.edu/">WebWork</a> 
+and <a href="http://wims.unice.fr/">WIMS</a>, and similar to publisher-produced systems 
+like iLrn, MathXL, etc.</p>
+
+<p>IMathAS was written by <a href="http://www.pierce.ctc.edu/dlippman">David Lippman</a> (c) 2006, and is distributed under
+the <a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>.  See the license.txt file distributed with IMathAS for more details
+and credits for components attributed to others.</p>
+
+<h3>Features</h3>
+<h4>IMathAS was built on three primary philosophies:</h4>
+<ul>
+<li><b>Math</b>:  The system was designed for Math assessment; no effort was made for the system to be multi-purpose.</li>
+<li><b>Sharing</b>:  The system was setup to encourage sharing of questions within a system and outside.  Questions are grouped into
+    question libraries, and are not tied directly to a specific assessment.  Unless marked Private, questions can be used by
+    anyone on the system, or used as a template for writing new questions.  Assessments and course setups can be copied
+    between users with permission.  Export and Import allows the 
+    sharing of question sets between systems.  Also, macro libraries allow for the expansion of IMathAS's question language.  
+    Users with expertise in a field can develop macro extensions, and share them with other users.</li>
+<li><b>Ease of Install</b>:  The system uses standard PHP and MySQL.  It requires no special compilation options or installation
+    of external programs.</li>
+</ul>
+
+<h4>Core Features include:</h4>
+<ul>
+<li>Display:</li>
+	<ul>
+	<li>Rich Math and Graph display, using standards-based MathML and SVG, powered
+	    by Peter Jipsen's <a href="http://www1.chapman.edu/~jipsen/svg/asciisvg.html">ASCIIsvg</a> and
+	    <a href="http://www1.chapman.edu/~jipsen/mathml/asciimath.html">ASCIIMathML</a>, or using image fallbacks</li>
+	<li>Rich Text Editor with built-in Math and Graph support for text items displayed in a course and forum posts</li>
+	<li>Alternate display options for screenreaders and browsers without needed support</li>
+	</ul>
+<li>Assessment:</li>
+	<ul>
+	<li>Question types including:</li>
+		<ul>
+		<li>Functions, with answers like "sin(x)"</li>
+		<li>Numbers, compared to a given tolerance</li>
+		<li>Calculated Numbers, like 5/3 or 2^5</li>
+		<li>Multiple-Choice</li>
+		<li>Multiple-Answer</li>
+		<li>Matching</li>
+		<li>String</li>
+		<li>Essay (not computer graded)</li>
+		<li>Numerical Matrix</li>
+		<li>Calculated Matrix</li>
+		<li>Multipart</li>
+		</ul>
+	<li>Multiple display options and assessment settings, including an option for practice sets, and
+	    due date exceptions for individual students</li>
+	<li>Algorithmically generated questions, with a relatively simple-to-use question language 
+	    (loosely based on PHP) with many built-in randomizers and display macros</li>
+	<li>Expandable question language, by installing additional macros</li>
+	</ul>
+<li>Other Course Features</li>
+	<ul>
+	<li>Post text items, uploaded files, or web links to the classroom</li>
+	<li>Basic Discussion Forums</li>
+	</ul>
+<li>Administration:</li>
+	<ul>
+	<li>Flexible administration:  IMathAS can be centrally administered, 
+	    or teachers can be given rights to create their own courses</li>
+	<li>Teachers can be grouped by school or other division, with one or more group administrators</li>
+	<li>Courses can have one or more teachers</li>
+	</ul>
+</ul>
+
+<h4>Details</h4>
+For details on how the system works, look over the <a href="help.html">Help File</a>
+
+<h3>Why a new system</h3>
+<p>You may be wondering why another system, when excellent systems already exist, or 
+why this wasn't designed as a BlackBoard Building Block or Moodle Module.  The answers
+are actually pretty simple, and based on pure practicality.</p>
+
+<p>For my purposes, WebWork and WIMS were too difficult to install (since I don't have direct 
+access to my school's webserver).</p>
+
+<p>I didn't write it as a Moodle Module because my school doesn't have Moodle installed.  I
+didn't write it as a BlackBoard Building Block because my school doesn't have the Enterprise
+version of BlackBoard.  Certainly IMathAS could be integrated with Moodle or BlackBoard, and
+I encourage anyone with a development server and the know-how to take it on.</p>
+
+<h3>Installation</h3>
+<ol>
+<li>Download IMathAS, unzip it, and copy the directory to your webserver</li>
+<li>Change permissions (chmod) of the following directories to allow the webserver process
+    to write to the directories:</li>
+    	<ul>
+	<li>assessment/libs</li>
+	<li>admin/import</li>
+	<li>course/files</li>
+	<li>filter/graph/imgs</li>
+	</ul>
+<li>Edit the config.php file.  Change these options to your liking:</li>
+	<ul>
+	<li>$dbserver:  The address of your database server.  Probably www.yoursite.edu or localhost</li>
+	<li>$dbname:  The name of the IMathAS database</li>
+	<li>$dbusername:  The username of the IMathAS database user.</li>
+	<li>$dbpassword:  The password for the IMathAS database user.  Choose something really complicated</li>
+	<li>$longloginprompt:  How you want to prompt new students for a username</li>
+	<li>$loginprompt:  How you want to prompt students for a username</li>
+	<li>$loginformat:  Enforce a format requirement on the username</li>
+	<li>$emailconfirmation:  If set to true, new users will have to respond to an email sent by the system 
+	    before being able to enroll in any classes</li>
+	<li>$sendfrom:  An email address to send confirmation emails from.</li>
+	<li>$imasroot:  The web root of the imathas install (ie, http://yoursite.edu $imasroot)</li>
+	<li>$mathimgurl: An absolute path or full url to a Mimetex CGI installation, for math image fallback</li>
+	<li>$freetypeinstalled: Whether the FreeType extension is installed and GD 2.0+ is used in your php version.</li>
+	<li>$colorshift:  Whether icons should change colors as due date approaches.  I thought this was cute, 
+	    but others might find it annoying</li>
+	<li>$allownongrouplibs:  Whether non-admins should be allowed to create non-group libraries.  
+		On a single-school install, set to true; for larger installs that plan to
+		use the Groups features, set to false</li>
+	<li>$allowcourseimport:  Whether anyone should be able to import/export questions and libraries from the
+	    course page.  Intended for easy sharing between systems, but the course page
+	    is cleaner if turned off.</li>
+	<li>$allowmacroinstall:  Whether admins should be able to install macro files.  Macros files hold a large 
+	    security risk, and should only be installed from trusted sources.  For a single-admin system, it is 
+	    recommended that you leave this as false, and change it when you need to install a macro</li>
+	<li>$sessionpath:  change the session file path different than the default.
+	    This is usually not necessary unless your site is on a server farm, or 
+	    you're on a shared server and want more security of session data</li>
+	</ul>
+<li>Run the dbsetup.php script (access http://yoursite.edu $imasroot/dbsetup.php), or send it 
+    to your system administrator and ask them to run it, if you don't have creation access
+    to the database server.  This script sets up the necessary user, database, and tables for IMathAS.</li>
+<li>Delete the dbsetup.php script, or store it somewhere not on the webserver</li>
+<li>Log into IMathAS.  Access http://yourside.edu $imasroot.  If you didn't change the
+    initial imathas user settings in dbsetup.php, log in as 'root' with password 'root'. 
+    If you did not change the inital imathas user settings, click the "Change Password"
+    link now to change the password to something substantial.  Alternatively, you can
+    go into the Admin page, create a new user with Admin rights, then delete the 'root'
+    admin.</li>
+</ol>
+
+<h3>Answers to IT's questions</h3>
+<h4>Versions</h4>
+The system should work with version 4.2.0 or higher of PHP.  It has been tested
+on PHP5 and PHP4.2.2.  PHP5 does not have MySQL support enabled by default, but
+needs to be enabled for IMathAS.  The system has been tested with MySQL 3.23, but 4+ is recommended.  IMathAS
+uses the mysql_ library of PHP, not the mysqli_ library.
+
+<h4>CPU Use</h4>
+<p>A standard student session consisting of completing a 10 question assessment with a few reattempts 
+then checking the gradebook will use about 2 cpu seconds total.</p>
+
+<h4>Security</h4>
+<p>IMathAS uses a standard databased-stored sessions-based system.  Only the userid is stored
+in the session cookie; rights are always looked up from the database.  If a user does
+not log out, the session is cleared from database after 24 hours.</p>
+
+<p>Questions (written by teachers) are passed through an interpreter that only allows 
+authorized functions to be used.  Student answers are evaluated client-side using
+JavaScript, and are never evaled server-side.</p>
+
+<p>Macro Libraries (PHP function libraries that can be used in writing questions) 
+can only be installed by full Admins in IMathAS.  The option allowing install can be 
+disabled in the config.php file</p>
+
+<p>All user input stored in the database is passed through add_slashes (or magic_quotes is used, if enabled)
+to prevent SQL injection attacks</p>
+
+</body>
+</html>

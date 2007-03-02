@@ -1,0 +1,242 @@
+<html>
+<head>
+<title>Getting Started with IMathAS</title>
+
+
+<script src="../javascript/ASCIIMathML.js" type="text/javascript"></script>
+<script src="../javascript/ASCIIsvg.js" type="text/javascript"></script>
+<script src="../course/editor/plugins/AsciiSvg/ASCIIsvgAddon.js" type="text/javascript"></script>
+<link rel="stylesheet" href="docs.css" type="text/css">
+</head>
+<body>
+<div class=title>
+<h1>Getting Started with IMathAS</h1>
+</div>
+
+
+<h2>Purpose of this document</h2>
+<p>This document will guide you through the process of creating your first IMathAS
+course and setting up a few items and assessments.  This is not a comprehensive
+guide; please refer to the <a href="../help.html">help file</a> for more
+detailed information on any process.</p>
+
+
+<p>This document presumes that you have Limited Course Creator rights.  If you have
+Teacher rights, you will not be able to add a new course to the system yourself;  contact
+your IMathAS admin to setup the course, then start this document at step 2. </p>
+
+
+<h2>1. Adding a New Course</h2>
+<ol>
+<li>After logging in to IMathAS, click on "Go to Admin Page" in the grey control panel box.</li>
+<li>Click the "Add New Course" button.</li>
+<li>Enter your course name and an enrollment key.  The course name is the name that will show
+up in your "Classes You're Teaching" list and in the student's "Classes You're Taking" list.  The
+enrollment key is the password that students must enter to enroll themselves in your course.</li>
+<li>Click "Submit".</li>
+<li>Back at the Admin page, note the Course ID of the course you just created.  Your students
+will need both your Course ID and enrollment key to sign up for your course.</li>
+<li>Click on the Course Name to enter your course.  In the future, the course will show up on your
+Home Page under "Classes You're Teaching".
+</ol>
+
+
+<p><em>Note</em>: If you have Admin or Course Creator rights, you will not automatically be
+registered as instructor for the course.  To do so, click the "Add/Remove Teachers" link, then
+click the "Add as Teacher" link next to your name.</p>
+
+
+<h2>2.  The Course Page</h2>
+<p>When you first access your course, the only thing you will see is two grey control panel
+boxes.  To familiarize yourself with the control options, here are some brief descriptions:</p>
+<ul>
+<li><strong>Add an item</strong>:  Used to add items to your course</li>
+<li><strong>List Students</strong>:  List the students in your course.  This page also provides options for 
+   importing students into your course and for setting testing due date exceptions.</li>
+<li><strong>Show Gradebook</strong>:  Your course gradebook.  From here you can review individual students' 
+   tests, adjust grades, accept overtime tests, and export the gradebook to a file.</li>
+<li><strong>Manage Question Set</strong>:  Search, modify, and add questions to the system question database.</li>
+<li><strong>Manage Libraries</strong>:  Add to or modify the question library structure.</li>
+<li><strong>Copy Course Items</strong>:  Copy items in your course, or copy items from other instructors' courses</li>
+<li><strong>Export/Import Course Items</strong>:  For sharing course items with other IMathAS installations.</li>
+<li><strong>Shift all Course Dates</strong>:  Change all course item dates at one time.</li>
+<li><strong>Mass Change Assessments</strong>:  Change several assessments' settings at once.</li>
+
+
+
+
+</ul>
+<p>Once you add items to the course page, each item will have an icon attached to it.  The icons change
+color based on the due date;  grey when unavailable, and green for 2 weeks or more until due date, changing to yellow
+then red as the due date approaches</p>
+
+
+
+
+<h2>3. Add an Inline Text Item</h2>
+<p>Inline Text items display announcements or other text on the course page.</p>
+<ol>
+<li>Select "Inline Text" from the "Add An Item" pulldown</li>
+<li>Enter a title for the text item, e.g. "Welcome to the Class!"</li>
+<li>Enter the item text.  The editor will allow you to format your text item.  The editor
+  has been extended with support for math and graphs. 
+  <ul>
+  <li>To add math, click the `(sum +)` button.  This will enter a red box with backticks into the editor.  Type
+  in your math using calculator-style notation, for example x^2/5.  Click outside the red box, and the math
+  will render</li>
+  <li>To add a graph, click on the graph button.  Depending on the browser you're using, you'll either 
+  see an empty graph.  In Internet Explorer with AdobeSVG installed, double-click on it.  In other browsers, 
+  click on the graph, then hit the graph button again.  A popup window will come up allowing
+  you to enter equations to graph</li>
+  </ul></li>
+<li>Enter an "Available After" date and time.  Click the calendar icon to pop up a calendar.</li>
+<li>Enter an "Available Until" date and time.  Click the calendar icon to pop up a calendar.</li>
+<li>Click Submit</li>
+<li>You will be returned to the course page, and should see your text item displayed.  You can use the
+  "Modify" link to alter the item.</li>
+</ol>
+
+
+<h2>4. Add a Block</h2>
+<p>Blocks are used to group similar items (by chapter or week, for example).  This allows you to hide
+from students a set of items by date.  Teachers will see non-current blocks collapsed, keeping the course
+page cleaner.</p>
+<ol>
+<li>Select "Block" from the "Add an Item" pulldown</li>
+<li>Enter a title for the block, e.g. "Chapter 1"</li>
+<li>Enter an "Available After" date and time.  Click the calendar icon to pop up a calendar.</li>
+<li>Enter an "Available Until" date and time.  Click the calendar icon to pop up a calendar.</li>
+<li>The "When not available" option allows you to decide whether to hide the block from students outside
+  of the available dates, or whether to show the block condensed.  In a Week structure, you will probably
+  want to hide the blocks from students.  If you're using IMathAS for practice tests, you may want to show the 
+  blocks collapsed so students can access old practice tests.</li>
+<li>Click Submit</li>
+<li>You will be returned to the course page.  If you the block shows an "Expand" button, click it to expand the
+  block</li>
+</ol>
+
+
+<h2>5. Add a Linked Text Item</h2>
+<p>Linked Text items create a link on the course page to a longer text item, an uploaded file, or to an external website.</p>
+<ol>
+<li>Select "Add Linked Text" from the "Add an Item" pulldown inside of the block you created.  This will place the item inside
+  the block.</li>
+<li>Enter a title for the item, e.g. "Syllabus"</li>
+<li>Enter a summary, if desired.  The summary will display on the course page</li>
+<li>Decide on what you want the item to be:
+	<ul>
+	<li>Typed text:  Enter the text in the text box provided</li>
+	<li>Web link:  Enter the link in the text box, starting with "http://".  Example: "http://www.imathas.com"</li>
+	<li>File:  Skip past the text box, and click the "Browse" button to select a file to upload</li>
+	</ul></li>
+<li>Enter an "Available After" date and time.  Click the calendar icon to pop up a calendar.</li>
+<li>Enter an "Available Until" date and time.  Click the calendar icon to pop up a calendar.</li>
+<li>Click Submit</li>
+<li>You will be returned to the course page.  The title and summary for the item will be displayed.  Click on the
+  title to view the item</li>
+</ol>
+
+
+<h2>6. Create an Assessment</h2>
+<p>Assessments are computer-gradable tests or homework sets.</p>
+<ol>
+<li>Select "Add Assessment" from the "Add an Item" pulldown inside of the block you created.</li>
+<li>Enter an Assessment Name.  Example: "Sample test"</li>
+<li>Enter a Summary.  This will display on the course page.  Example: "A sample test"</li>
+<li>Enter an Intro/Instructions.  This will display at the beginning of the assessment.  Example: "Answer all the questions"</li>
+<li>Enter an "Available After" date and time.  Click the calendar icon to pop up a calendar.</li>
+<li>Enter an "Available Until" date and time.  Click the calendar icon to pop up a calendar.</li>
+<li>Select Assessment Options
+	<ul>
+	<li>Time limit:  The number of minutes to allow for the test.  Enter 0 for no time limit</li>
+	<li>Display method:  Select whether to display the full test at once, one question at a time, or allow students to
+	    skip around between questions.</li>
+	<li>Default Points per Problem:  How many points each problem should be worth.  This can be overridden for individual
+	    questions</li>
+	<li>Default Attempts per Problem:  How many tries a student should be allowed at each problem.  This can be overridden for
+	    individual questions</li>
+	<li>Default Penalty per Attempt:  What percent penalty should be applied for missed attempts.  For example, if this is set at
+	    10%, then if a student misses one attempt then completes the problem successfully, they will receive 90% of possible
+	    points.  This can be overridden for individual questions.</li>
+	<li>Feedback method:  How much detail should be provided to students.  This option also can set the test type.  The choices are:
+		<ul>
+		<li>Final Score:  Only show the cumulative score at the end of the test</li>
+		<li>Score on each question at end:  Show the score on each question at the end of the test</li>
+		<li>Score on each as its submitted:  Show the score for a question once it is submitted.  This option only applies
+		to the "one question at a time" and "skip around" display methods.</li>
+		<li>Practice test:  Show the score on each question as it's submitted, allow a student to regenerate the test.  Scores 
+		  are not saved.</li>
+		<li>Homework:  Show the score on each question as it's submitted, allow a student to try a similar problem if they
+		miss one to regain full credit.</li>
+		</ul>
+	<li>Show answers:  Select when to make the answers available to the students.  In testing mode, you can select to make answers
+	available immediately (through the gradebook), or only after the test due date.  For practice tests and homework, you can
+	select to show answers after a number of attempts.</li>
+	<li>Shuffle item order:  Randomize the question order for each student.  Otherwise the test will present questions in the
+	order you specify</li>   
+	<li>All items same random seed:  Rarely needed.  Only needed if you need all questions to generate the same data.</li>
+	</ul>
+	An example set of options for homework might be:
+	<ul>
+		<li>Display method: Skip around</li>
+		<li>Attempts per Problem: 3</li>
+		<li>Penalty per Attempt: 40%</li>
+		<li>Feedback method: Homework</li>
+		<li>Show answers: After 2 attempts</li>
+	</ul>
+	Since the answer is shown after 2 attempts, these settings would allow a student to earn 20% of possible points
+	just for trying the problem.
+	</li>
+<li>Click Submit.  You will be taken to the Add Questions page</li>
+<li>Click the "Select Libraries" button. </li>
+<li>In the libraries pop-up, select the "Examples" Library and click "Use Libraries"</li>
+<li>Click "Search" to list all the items in the library.</li>
+<li>Click "Check/Uncheck All" to select all the problems.  Alternatively, you can use the "Preview" button to preview
+    individual questions, and select the questions you wish to use.</li>
+<li>Click the "Add Selected (using defaults)" button to add the questions to the assessment. </li>
+<li>Click "Done"</li>
+<li>You will be returned to the course page</li>
+</ol>
+<p><em>Note:</em>  While an assessment is available, you will be unable to add or remove questions or change some
+test options.  This is to prevent messing up the scores of students who have already completed the test.  To modify the test
+after its available, you need to change the available dates.</p>
+
+
+<h2>7.  Set up a Discussion Forum</h2>
+<p>Discussion forums allow students to post questions or comments.  The discussion forum system in IMathAS
+is a simple threaded discussion setup, designed primarily to allow question-and-answer postings.</p>
+<ol>
+<li>Select "Add Forum" from the "Add an Item" pulldown</li>
+<li>Enter a Forum Name.  Example:  "Homework Questions"</li>
+<li>Enter a Description.  This will display on the course page.  Example: "Ask homework questions here"</li>
+<li>Enter an "Available After" date and time.  Click the calendar icon to pop up a calendar.</li>
+<li>Enter an "Available Until" date and time.  Click the calendar icon to pop up a calendar.</li>
+<li>Click Submit</li>
+<li>You will be returned to the course page.  Click on the Forum Name</li>
+<li>Click "Add New Thread"</li>
+<li>Enter a Subject for the posting.  Example:  "Welcome"</li>
+<li>Enter a message</li>
+<li>Select a post type.  These options are only available to teachers.
+	<ul>
+	<li>Regular post</li>
+	<li>Displayed at top of list.  Good for announcements or instructions, this moves
+	    the post to the top of the thread list</li>
+	<li>Displayed at top and locked.  Places the post at the top of the thread list, and
+	    does not allow replies to the post</li>
+	</ul>
+	</li>
+<li>Click Submit</li>
+<li>Click on your post Subject to view the message.</li>
+<li>Use the breadcrumbs (location listing at the top of the page) to return to the course page</li>
+</ol>
+
+
+<h2>That's it!</h2>
+<P>That's the basics of creating items in IMathAS.  There is a lot more to IMathAS, such
+as managing the question set or libraries, or writing new questions.</p>
+
+
+<hr/><p>&copy; 2006 David Lippman<br/>This guide was written with development grant support from the WA State Distance Learning Council<br/>
+Last Modified: 10/13/2006</p>
+</body>
+</html>

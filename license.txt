@@ -1,0 +1,71 @@
+*********************************************************
+**   Internet Mathematics Assessment System (IMathAS)  ** 
+**   (c) David Lippman, 2006			       **
+**   Version 1.0beta16, Sept 28, 2006		       **
+*********************************************************
+
+See readme.html for installation information.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful, 
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+General Public License (at http://www.gnu.org/copyleft/gpl.html) 
+for more details.
+
+Questions written using the IMathAS language and macro libraries are 
+NOT derivative works of this software, and therefore are not required 
+to be be licensed under the GPL.  If you wish to distribute question 
+libraries or macro libraries using a license other than public-domain, 
+specify the license in the library description.  Libraries distributed 
+without a license statement will be assumed to be public-domain.  
+
+It is my interpretation of the GPL (in the spirit of free software) that 
+installers should not charge end-users (students) for access to IMathAS 
+beyond reasonable hosting costs.   
+
+IMathAS makes use of several components.  Not all these components are
+under the GPL license.  If you know of (good) alternatives that are
+available under a GPL-compatible license, let me know.
+
+IMathAS makes use of:
+ASCIIMathML and ASCIIsvg 
+(c) Peter Jipsen http://www.chapman.edu/~jipsen
+GPL License
+
+HTMLArea 
+(c) 2002-2004, interactivetools.com, inc.
+(c) 2003-2004 dynarch.com
+HTMLArea License (based on BSD License)
+
+AsciiMath and AsciiSvg Plugins for HTMLArea
+(c) Peter Jipsen and David Lippman
+HTMLArea License (based on BSD License)
+
+CalendarPopup
+(c) Matt Kruse http://www.mattkruse.com/
+Almost public domain, with repost restrictions
+
+Form Validator
+(c) Martin Honnen
+Presumably public domain (no license specified)
+
+Table Sorter
+(c) www.dhtmlgoodies.com, November 2005
+Custom license, allows use (commercial/noncommercial), but
+no for-sale redistribution or repost.
+
+Viewer.class used by plot3d library
+(c) David Lippman, based on code by Evgeny Demidov, presumed public domain
+Code available on request to drlippman@yahoo.com
+
+Documentation Guides
+(c) David Lippman.  Created with development grant support from the 
+WA State Distance Learning Council
+
+
+

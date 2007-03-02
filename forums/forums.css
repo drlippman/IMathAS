@@ -1,0 +1,22 @@
+div.forumgrp {
+	margin-left: 30px;
+}
+
+
+table.forum {
+	border-collapse: collapse;
+	width: 100%;
+}
+table.forum td {
+	padding: 0.2em 0.5em;
+	border:	1px solid #000;
+}
+table.forum tr.sticky {
+	background-color: #dfd;	
+}
+table.forum thead td {
+	border-bottom: 2px solid #00f;
+	text-align: center;
+	padding: 0.1em 0.5em;
+	background-color: #eef;
+}

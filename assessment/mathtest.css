@@ -1,0 +1,169 @@
+a:link {
+	text-decoration: none;
+}
+a:visited {
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+div {
+	padding: 5px;
+}
+div.main {
+	padding: 0px;
+}
+div.breadcrumb {
+	border: 1px solid #000;
+	margin-bottom: 10px;
+	background-color: #ddf;
+}
+
+div.question {
+	background-color: #ddf; 
+	border: 1px solid #00f; 
+	margin-top: 0px;
+	margin-bottom: 5px;
+	width: 100%;
+}
+
+div.review {
+	background-color: #efe;
+	border: 1px solid #00f;
+	margin-top: -4px;
+	margin-bottom: 20px;
+	width: 100%;
+}
+
+div.intro {
+	border: 1px solid #00f; 
+	margin-bottom: 5px;
+}
+
+div.choice {
+	float: left;
+	text-align: center;
+}
+
+div.float {
+	float:left;
+}
+
+div.match {
+	float:left;
+	padding-right: 30px;	
+}
+
+div.spacer {
+	clear: both;
+	height: 1px;
+	padding: 0px;
+}
+
+div.navbar {
+	position: absolute;
+	left: 10px;
+	width:120px;
+	padding:10px;
+	margin-top:10px;
+	background:#efe;
+	border:1px solid #000;
+	color:#000;
+}
+
+div.navbar h4 {
+	margin-top: 0px;
+}
+div.navbar a {
+	color: blue;
+}
+
+span.current {
+	background-color: #ffa;
+}
+span.done {
+	text-decoration: line-through;
+}
+
+div.inset {
+	padding: 0px;
+	margin-left: 155px;
+	margin-top: 10px;
+	margin-right: 10px;
+}
+
+div.right {
+	padding: 0px;
+	text-align: right;	
+}
+
+ul.qlist {list-style-type: none; margin: 0px; padding: 0px;}
+ul.qlist li {margin-top: .2em; margin-left: 10px; padding: 0px;}
+
+ul.nomark {list-style-type: none;}
+ul.nomark li { margin-top: .7em;}
+ol.lalpha {list-style-type: lower-alpha;}
+ol.lalpha li { margin-top: .7em;}
+
+p.centered {
+	text-align: center;
+}
+
+table thead th {
+	font-weight: bold;
+}
+
+table.stats {
+	margin-left: 20px;
+	border-collapse: collapse;
+	background: #eef;
+}
+table.stats td {
+	border: 1px solid #000;
+	padding: 1px 10px;
+}
+table.stats tbody td {
+	text-align: right;
+}
+table td.left {
+	text-align: left;
+}
+table.stats thead th {
+	border: 1px solid #000;
+	padding: 1px 10px;
+	text-align: center;
+	background: #eff;
+	border-bottom: 3px solid #000;
+}
+table.stats tbody th {
+	border: 1px solid #000;
+	padding: 1px 10px;
+	text-align: center;
+	background: #eff;
+	border-right: 3px solid #000;
+}
+span.white {
+	background-color: white;
+	padding: 2px;
+}
+span.aural {
+	display: none;
+}
+
+img.skipnav {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	border: 0px;
+}
+.hidden {
+	display: none;
+} 
+span.shown {
+	display: inline;
+}
+table.scores td {
+	padding-right: 20px;
+}
+
+

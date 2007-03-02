@@ -1,0 +1,77 @@
+function moveitem(from) { 
+	var to = document.getElementById(from).value; 
+	var grp = document.getElementById('group').value; 
+	if (to != from) {
+  		var toopen = addqaddr+'&from=' + from + '&to=' + to + '&grp=' + grp;
+		window.location = toopen; 
+		}
+}
+
+function previewq(formn,loc,qn,docheck,onlychk) {
+   var addr = previewqaddr+'&formn='+formn+'&loc=qo'+loc+'&qsetid='+qn;
+   if (docheck) {
+      addr += '&checked=1';
+   }
+   if (onlychk) {
+      addr += '&onlychk=1';
+   }
+   window.open(addr,'Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20));
+}
+
+function previewsel(formn) {
+	var form = document.getElementById(formn);
+	for (var e = 0; e < form.elements.length; e++) {
+		var el = form.elements[e];
+		if (el.type == 'checkbox' && el.name=='nchecked[]' && el.checked) {
+			previewq(formn,el.id.substring(2),el.value,true,true);
+			return false;
+		}
+	}
+	alert("No questions selected");
+}
+function getnextprev(formn,loc,onlychk) {
+	var onlychk = (onlychk == null) ? false : true;
+	var form = document.getElementById(formn);
+	var prevl = 0; var nextl = 0; var found=false;
+	var prevq = 0; var nextq = 0;
+	for (var e = 0; e < form.elements.length; e++) {
+		var el = form.elements[e];
+		if (typeof el.type == "undefined") {
+			continue;
+		}
+		if (((el.type == 'checkbox' && el.name=='nchecked[]') || (el.type=='hidden' && el.name=='curq[]')) && (!onlychk || el.checked)) {
+			if (found) {
+				nextq = el.value;
+				nextl = el.id;
+				break;
+			} else if (el.id==loc) {
+				found = true;
+			} else {
+				prevq = el.value;
+				prevl = el.id;
+			}
+		}
+	}
+	return ([[prevl,prevq],[nextl,nextq]]);
+}
+
+function chkAll(frm, arr, mark) {
+  for (i = 0; i <= frm.elements.length; i++) {
+   try{
+     if(frm.elements[i].name == arr) {
+       frm.elements[i].checked = mark;
+     }
+   } catch(er) {}
+  }
+}
+
+function libselect() {
+	window.open('libtree2.php?libtree=popup&libs='+curlibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));
+}
+function setlib(libs) {
+	document.getElementById("libs").value = libs;
+	curlibs = libs;
+}
+function setlibnames(libn) {
+	document.getElementById("libnames").innerHTML = libn;
+}

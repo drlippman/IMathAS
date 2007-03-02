@@ -1,0 +1,243 @@
+<html>
+<head>
+<title>Insert Math</title>
+<style type="text/css">
+td.character {
+    font-family: Times,serif;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    background: #FFF;
+    padding: 4px;
+}
+
+td.character-hilite {
+    background: Highlight;
+    color: HighlightText;
+}
+</style>
+<script type="text/javascript" src="../../../popups/popup.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../popups/popup.css" />
+
+<script type="text/javascript">
+// Modified from CharacterMap for ASCIIMathML by Peter Jipsen
+// HTMLSource based on HTMLArea XTD 1.5 (http://mosforge.net/projects/htmlarea3xtd/) modified by Holger Hees
+// Original Author - Bernhard Pfeifer novocaine@gmx.net
+
+HTMLArea = window.opener.HTMLArea;
+window.resizeTo(520, 400);
+// center on parent
+var x = opener.screenX + (opener.outerWidth - window.outerWidth) / 2;
+var y = opener.screenY + (opener.outerHeight - window.outerHeight) / 2;
+window.moveTo(x, y);
+
+function _CloseOnEsc()
+{
+    if ( event.keyCode == 27 )
+    {
+        window.close();
+        return;
+    }
+}
+
+function Init()                // run on page load
+{
+   __dlg_translate('SymbolMap');
+   __dlg_init();
+    document.body.onkeypress = _CloseOnEsc;
+
+    var character = '';       // set default input to empty
+    View( null, character );
+}
+
+var oldView = null;
+function View( td, character )               // preview character
+{
+    if (oldView)
+        oldView.className = oldView.className.replace(/\s+character-hilite/, '');
+
+    if (td) {
+        (oldView = td).className += " character-hilite";
+        td.setAttribute("title",character);  // added by Peter Jipsen
+    }
+}
+
+function Set( string )                // return character
+{
+    var character = string;
+
+    __dlg_close( character );
+}
+
+function onCancel()                   // cancel selection
+{
+    __dlg_close( null );
+
+    return false;
+};
+
+</script>
+</head>
+<body class="dialog" onload="Init();self.focus();">
+Formulas must be surrounded by ` (left-quotes) so start with `New` button then move cursor left
+<table border="0" cellspacing="1" cellpadding="0" width="100%" style="cursor: pointer; background: #ADAD9C; border: 1px inset;">
+<tr>
+<td colspan="2" class="character" onMouseOver="View(this,'``')" onClick="Set('<span class=AM>``</span>')">`New`</td>
+<td colspan="3" class="character" onMouseOver="View(this,'(x+1)/(x-1)')" onClick="Set('(x+1)/(x-1)')">(x+1)/(x-1)</td>
+<td colspan="2" class="character" onMouseOver="View(this,'x^(m+n)')" onClick="Set('x^(m+n)')">x^(m+n)</td>
+<td colspan="2" class="character" onMouseOver="View(this,'x_(mn)')" onClick="Set('x_(mn)')">x_(mn)</td>
+<td colspan="2" class="character" onMouseOver="View(this,'sqrt(x)')" onClick="Set('sqrt(x)')">sqrt(x)</td>
+<td colspan="3" class="character" onMouseOver="View(this,'root(n)(x)')" onClick="Set('root(n)(x)')">root(n)(x)</td>
+<td colspan="2" class="character" onMouseOver="View(this,'&quot;text&quot;')" onClick="Set('&quot;text&quot;')">"text"</td>
+</tr><tr>
+<td colspan="2" class="character" onMouseOver="View(this,'dy/dx')" onClick="Set('dy/dx')">dy/dx</td>
+<td colspan="3" class="character" onMouseOver="View(this,'lim_(x->oo)')" onClick="Set('lim_(x->oo)')">lim_(x->oo)</td>
+<td colspan="3" class="character" onMouseOver="View(this,'sum_(n=1)^oo')" onClick="Set('sum_(n=1)^oo')">sum_(n=1)^oo</td>
+<td colspan="3" class="character" onMouseOver="View(this,'int_a^bf(x)dx')" onClick="Set('int_a^bf(x)dx')">int_a^bf(x)dx</td>
+<td colspan="3" class="character" onMouseOver="View(this,'[[a,b],[c,d]]')" onClick="Set('[[a,b],[c,d]]')">[[a,b],[c,d]]</td>
+<td colspan="2" class="character" onMouseOver="View(this,'((n),(k))')" onClick="Set('((n),(k))')">((n),(k))</td>
+</tr><tr>
+<td class="character" onMouseOver="View(this,'*')" onClick="Set('*')">&middot;</td>
+<td class="character" onMouseOver="View(this,'**')" onClick="Set('**')">*</td>
+<td class="character" onMouseOver="View(this,'//')" onClick="Set('//')">/</td>
+<td class="character" onMouseOver="View(this,'\\\\')" onClick="Set('\\\\')">\</td>
+<td class="character" onMouseOver="View(this,'xx')" onClick="Set('xx')">&times;</td>
+<td class="character" onMouseOver="View(this,'-:')" onClick="Set('-:')">&divide;</td>
+<td class="character" onMouseOver="View(this,'@')" onClick="Set('@')">&deg;</td>
+<td class="character" onMouseOver="View(this,'o+')" onClick="Set('o+')">&oplus;</td>
+<td class="character" onMouseOver="View(this,'ox')" onClick="Set('ox')">ox</td>
+<td class="character" onMouseOver="View(this,'o.')" onClick="Set('o.')">&#x2299;</td>
+<td class="character" onMouseOver="View(this,'sum')" onClick="Set('sum')">&sum;</td>
+<td class="character" onMouseOver="View(this,'prod')" onClick="Set('prod')">&prod;</td>
+<td class="character" onMouseOver="View(this,'^^')" onClick="Set('^^')">&and;</td>
+<td class="character" onMouseOver="View(this,'^^^')" onClick="Set('^^^')"><font size="+1">&and;</font></td>
+<td class="character" onMouseOver="View(this,'vv')" onClick="Set('vv')">&or;</td>
+<td class="character" onMouseOver="View(this,'vvv')" onClick="Set('vvv')"><font size="+1">&and;</font></td>
+</tr><tr>
+<td class="character" onMouseOver="View(this,'!=')" onClick="Set('!=')">&ne;</td>
+<td class="character" onMouseOver="View(this,'&lt;=')" onClick="Set('<=')">&le;</td>
+<td class="character" onMouseOver="View(this,'&gt;=')" onClick="Set('>=')">&ge;</td>
+<td class="character" onMouseOver="View(this,'-&lt;')" onClick="Set('-<')">-&lt;</td>
+<td class="character" onMouseOver="View(this,'&gt;-')" onClick="Set('>-')">&gt;-</td>
+<td class="character" onMouseOver="View(this,'in')" onClick="Set('in')">&isin;</td>
+<td class="character" onMouseOver="View(this,'!in')" onClick="Set('!in')">!&isin;</td>
+<td class="character" onMouseOver="View(this,'sub')" onClick="Set('sub')">&sub;</td>
+<td class="character" onMouseOver="View(this,'sup')" onClick="Set('sup')">&sup;</td>
+<td class="character" onMouseOver="View(this,'sube')" onClick="Set('sube')">&sube;</td>
+<td class="character" onMouseOver="View(this,'supe')" onClick="Set('supe')">&supe;</td>
+<td class="character" onMouseOver="View(this,'O/')" onClick="Set('O/')">&Oslash;</td>
+<td class="character" onMouseOver="View(this,'nn')" onClick="Set('nn')">&cap;</td>
+<td class="character" onMouseOver="View(this,'nnn')" onClick="Set('nnn')"><font size="+1">&cap;</font></td>
+<td class="character" onMouseOver="View(this,'uu')" onClick="Set('uu')">&cup;</td>
+<td class="character" onMouseOver="View(this,'uuu')" onClick="Set('uuu')"><font size="+1">&cup;</font></td>
+</tr><tr>
+<td class="character" onMouseOver="View(this,'and')" onClick="Set('and')">and</td>
+<td class="character" onMouseOver="View(this,'or')" onClick="Set('or')">or</td>
+<td class="character" onMouseOver="View(this,'not')" onClick="Set('not')">&not;</td>
+<td class="character" onMouseOver="View(this,'=&gt')" onClick="Set('=>')">&rArr;</td>
+<td class="character" onMouseOver="View(this,'if')" onClick="Set('if')">if</td>
+<td class="character" onMouseOver="View(this,'&lt;=&gt;')" onClick="Set('<=>')">&hArr;</td>
+<td class="character" onMouseOver="View(this,'AA')" onClick="Set('AA')">&forall;</td>
+<td class="character" onMouseOver="View(this,'EE')" onClick="Set('EE')">&exist;</td>
+<td class="character" onMouseOver="View(this,'_|_')" onClick="Set('_|_')">&perp;</td>
+<td class="character" onMouseOver="View(this,'TT')" onClick="Set('TT')">T</td>
+<td class="character" onMouseOver="View(this,'|--')" onClick="Set('|--')">|-</td>
+<td class="character" onMouseOver="View(this,'|==')" onClick="Set('|==')">|=</td>
+<td class="character" onMouseOver="View(this,'-=')" onClick="Set('-=')">&equiv;</td>
+<td class="character" onMouseOver="View(this,'~=')" onClick="Set('~=')">~=</td>
+<td class="character" onMouseOver="View(this,'~~')" onClick="Set('~~')">&asymp;</td>
+<td class="character" onMouseOver="View(this,'prop')" onClick="Set('prop')">&prop;</td>
+</tr><tr>
+<td class="character" onMouseOver="View(this,'int')" onClick="Set('int')">&int;</td>
+<td class="character" onMouseOver="View(this,'oint')" onClick="Set('oint')">o&int;</td>
+<td class="character" onMouseOver="View(this,'del')" onClick="Set('del')">&part;</td>
+<td class="character" onMouseOver="View(this,'grad')" onClick="Set('grad')">&nabla;</td>
+<td class="character" onMouseOver="View(this,'+-')" onClick="Set('+-')">&plusmn;</td>
+<td class="character" onMouseOver="View(this,'oo')" onClick="Set('oo')">&infin;</td>
+<td class="character" onMouseOver="View(this,'aleph')" onClick="Set('aleph')">alef</td>
+<td class="character" onMouseOver="View(this,'quad')" onClick="Set('quad')">quad</td>
+<td class="character" onMouseOver="View(this,'diamond')" onClick="Set('diamond')">&loz;</td>
+<td class="character" onMouseOver="View(this,'square')" onClick="Set('square')">[]</td>
+<td class="character" onMouseOver="View(this,'|__')" onClick="Set('|__')">|_</td>
+<td class="character" onMouseOver="View(this,'__|')" onClick="Set('__|')">_|</td>
+<td class="character" onMouseOver="View(this,'|~')" onClick="Set('|~')">|~</td>
+<td class="character" onMouseOver="View(this,'~|')" onClick="Set('~|')">~|</td>
+<td class="character" onMouseOver="View(this,'&lt;&lt;x&gt;&gt')" onClick="Set('<< x>>')">&lt;x&gt;</td>
+<td class="character" onMouseOver="View(this,'/_')" onClick="Set('/_')">&ang;</td>
+</tr><tr>
+<td class="character" onMouseOver="View(this,'uarr')" onClick="Set('uarr')">&uarr;</td>
+<td class="character" onMouseOver="View(this,'darr')" onClick="Set('darr')">&darr;</td>
+<td class="character" onMouseOver="View(this,'larr')" onClick="Set('larr')">&larr;</td>
+<td class="character" onMouseOver="View(this,'->')" onClick="Set('->')">&rarr;</td>
+<td class="character" onMouseOver="View(this,'|->')" onClick="Set('|->')">|&rarr;</td>
+<td class="character" onMouseOver="View(this,'harr')" onClick="Set('harr')">&harr;</td>
+<td class="character" onMouseOver="View(this,'lArr')" onClick="Set('lArr')">&lt;=</td>
+<td class="character" onMouseOver="View(this,'rArr')" onClick="Set('rArr')">&rArr;</td>
+<td class="character" onMouseOver="View(this,'hArr')" onClick="Set('hArr')">&hArr;</td>
+<td class="character" onMouseOver="View(this,'hata')" onClick="Set('hata')">&acirc;</td>
+<td class="character" onMouseOver="View(this,'ula')" onClick="Set('ula')"><u>a</u></td>
+<td class="character" onMouseOver="View(this,'dota')" onClick="Set('dota')">&aring;</td>
+<td class="character" onMouseOver="View(this,'ddota')" onClick="Set('ddota')">&auml;</td>
+<td class="character" onMouseOver="View(this,'vec')" onClick="Set('vec')">vec</td>
+<td class="character" onMouseOver="View(this,'bar')" onClick="Set('bar')">bar</td>
+<td class="character" onMouseOver="View(this,':.')" onClick="Set(':.')">&there4;</td>
+</tr><tr>
+<td class="character" onMouseOver="View(this,'NN')" onClick="Set('NN')">N</td>
+<td class="character" onMouseOver="View(this,'ZZ')" onClick="Set('ZZ')">Z</td>
+<td class="character" onMouseOver="View(this,'QQ')" onClick="Set('QQ')">Q</td>
+<td class="character" onMouseOver="View(this,'RR')" onClick="Set('RR')">R</td>
+<td class="character" onMouseOver="View(this,'CC')" onClick="Set('CC')">C</td>
+<td class="character" onMouseOver="View(this,'bb')" onClick="Set('bb')">bb</td>
+<td class="character" onMouseOver="View(this,'bbb')" onClick="Set('bbb')">bbb</td>
+<td class="character" onMouseOver="View(this,'cc')" onClick="Set('cc')">cc</td>
+<td class="character" onMouseOver="View(this,'fr')" onClick="Set('fr')">fr</td>
+<td class="character" onMouseOver="View(this,'sf')" onClick="Set('sf')">sf</td>
+<td class="character" onMouseOver="View(this,'tt')" onClick="Set('tt')">tt</td>
+<td colspan="4" class="character" onMouseOver="View(this,'stackrel(->)(+)')" onClick="Set('stackrel(->)(+)')">stackrel(-&gt;)(+)</td>
+<td class="character" onMouseOver="View(this,'upsilon')" onClick="Set('upsilon')">&upsilon;</td>
+</tr><tr>
+<td class="character" onMouseOver="View(this,'alpha')" onClick="Set('alpha')">&alpha;</td>
+<td class="character" onMouseOver="View(this,'beta')" onClick="Set('beta')">&beta;</td>
+<td class="character" onMouseOver="View(this,'gamma')" onClick="Set('gamma')">&gamma;</td>
+<td class="character" onMouseOver="View(this,'Gamma')" onClick="Set('Gamma')">&Gamma;</td>
+<td class="character" onMouseOver="View(this,'delta')" onClick="Set('delta')">&delta;</td>
+<td class="character" onMouseOver="View(this,'Delta')" onClick="Set('Delta')">&Delta;</td>
+<td class="character" onMouseOver="View(this,'epsi')" onClick="Set('epsi')">&epsilon;</td>
+<td class="character" onMouseOver="View(this,'zeta')" onClick="Set('&zeta')">&zeta;</td>
+<td class="character" onMouseOver="View(this,'eta')" onClick="Set('eta')">&eta;</td>
+<td class="character" onMouseOver="View(this,'theta')" onClick="Set('theta')">&theta;</td>
+<td class="character" onMouseOver="View(this,'Theta')" onClick="Set('Theta')">&Theta;</td>
+<td class="character" onMouseOver="View(this,'iota')" onClick="Set('iota')">&iota;</td>
+<td class="character" onMouseOver="View(this,'kappa')" onClick="Set('kappa')">&kappa;</td>
+<td class="character" onMouseOver="View(this,'lambda')" onClick="Set('lambda')">&lambda;</td>
+<td class="character" onMouseOver="View(this,'Lambda')" onClick="Set('Lambda')">&Lambda;</td>
+<td class="character" onMouseOver="View(this,'mu')" onClick="Set('mu')">&mu;</td>
+</tr><tr>
+<td class="character" onMouseOver="View(this,'nu')" onClick="Set('nu')">&nu;</td>
+<td class="character" onMouseOver="View(this,'pi')" onClick="Set('pi')">&pi;</td>
+<td class="character" onMouseOver="View(this,'Pi')" onClick="Set('Pi')">&Pi;</td>
+<td class="character" onMouseOver="View(this,'rho')" onClick="Set('rho')">&rho;</td>
+<td class="character" onMouseOver="View(this,'sigma')" onClick="Set('sigma')">&sigma;</td>
+<td class="character" onMouseOver="View(this,'Sigma')" onClick="Set('Sigma')">&Sigma;</td>
+<td class="character" onMouseOver="View(this,'tau')" onClick="Set('tau')">&tau;</td>
+<td class="character" onMouseOver="View(this,'xi')" onClick="Set('xi')">&xi;</td>
+<td class="character" onMouseOver="View(this,'Xi')" onClick="Set('Xi')">&Xi;</td>
+<td class="character" onMouseOver="View(this,'phi')" onClick="Set('phi')">&phi;</td>
+<td class="character" onMouseOver="View(this,'Phi')" onClick="Set('Phi')">&Phi;</td>
+<td class="character" onMouseOver="View(this,'chi')" onClick="Set('chi')">&chi;</td>
+<td class="character" onMouseOver="View(this,'psi')" onClick="Set('psi')">&psi;</td>
+<td class="character" onMouseOver="View(this,'Psi')" onClick="Set('Psi')">&Psi;</td>
+<td class="character" onMouseOver="View(this,'omega')" onClick="Set('omega')">&omega;</td>
+<td class="character" onMouseOver="View(this,'Omega')" onClick="Set('Omega')">&Omega;</td>
+</tr>
+</table><center>
+Point at symbol to see keyboard-equivalent, then click to insert</center>
+<center>
+<a href="http://www.chapman.edu/~jipsen/mathml/asciimath.html" target="new">
+ASCIIMathML</a> by 
+<a href="http://www.chapman.edu/~jipsen" target="new">Peter Jipsen</a>, 
+<a href="http://www.chapman.edu" target="new">Chapman University</a>
+</center>
+<form style="text-align: center;"><button type="button" name="cancel" onclick="return onCancel();" class="submitInsertTable">Cancel</button></form>
+</body>
+</html>

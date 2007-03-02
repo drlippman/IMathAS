@@ -1,0 +1,80 @@
+p {
+	padding-left: 20px;
+}
+div.title {
+	background-color: #eef;
+	padding-left: 10px;
+	border: 3px outset #aaf;
+}
+h3 {
+	color: #339;
+}
+#leftcontent {
+	position: absolute;
+	left: 10px;
+	width:200px;
+	margin-top:15px;
+	color:#000;
+}
+a.menu {
+	font-size:150%;
+}
+
+#leftcontent p { 
+	margin-top: 2px;
+}
+#login {
+	background:#efe;
+	border:1px solid #000;
+	margin-bottom: 10px;
+	padding:0px 10px;
+}
+.leftdiv {
+	background:#efe;
+	border:1px solid #000;
+	margin-bottom: 10px;
+	padding:10px;
+}
+#centercontent {
+	margin-left:220px;
+	padding-left:10px;
+	margin-top:10px;
+	margin-right: 20px;
+	background:#fff;
+}
+fieldset { 
+        padding-left: 5px; 
+} 
+div.submit { 
+        margin-top: 10px; 
+        text-align: right; 
+} 
+div.right {
+	margin-top: 10px; 
+        text-align: right; 
+}
+#settings {
+	height: 0px;
+}
+
+ li {
+ 	padding-bottom: 2px;
+	}
+ pre {
+ 	margin-left: 20px;
+	color: blue;
+	}
+	
+table {
+	border-collapse: collapse;
+	margin: 10px;
+}
+
+table td {
+	padding: 8px 5px 8px 5px;
+	border: 1px solid #000;
+}
+
+table.centered td {
+	text-align: center;
+}

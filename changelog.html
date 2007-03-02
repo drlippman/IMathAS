@@ -1,0 +1,651 @@
+<h2>IMathAS Change History</h2>
+
+<h3>Known Issues</h3>
+<ul>
+<li>SVG not printing in IE (resolved?)</li>
+<li>SVG printing problems in FireFox (resolved in FF2.0?)</li>
+<li>parens in calcmatrix/matrix expressions failing mathphp preg</li>
+<li>Mac FF SVG text not showing</li>
+<li>Might be problems if server is set for GMT (no DST)</li>
+</ul>
+
+<h3>Planned For Future Versions</h3>
+<ul>
+<li>New questions review process?</li>
+<li>Javascript answer entry editor</li>
+<li>add "false" to NaN check;  surpress output of divide by zero on testpoints</li>
+<li>User customization of colors, fonts</li>
+<li>Adjust DST issue for timeshift, or add time shift to timeshift</li>
+<li>Add default tolerance option to assessment settings</li>
+<li>Java applet drawing answer entry</li>
+<li>numlist type, or add list support to number type?</li>
+<li>new question testing -- add debugs</li>
+<li>JavaScript question writing guider</li>
+<li>PG/MathQTI/TestGen question importer (when possible)</li>
+<li>cleaner delete question when question is being used</li>
+<li>way in future: AJAX searches / libtree / page reordering to reduce amount reloaded</li>
+<li>JavaScript improvement: lib import/export checking system, DOM innerHTMLs</li>
+</ul>
+
+</h3>Planned for Next Version</h3>
+<ul>
+Important
+<li>Improve mass change dates page (add all items, filter by type, etc - doable but will take awhile)</li>
+<li>Lockdown course on assessment option (easy if lockdown on course, harder if pulling lockdown from assessments (needed for accomodating exceptions))</li>
+<li>Multipart question; submit one part at a time (needs some majorish changes, will only make sense for one-by-one or skip-around)</li>
+ specify in question code, or in question settings?
+ approach 1: add the same question to $questions multiple times
+    each part retains own attempts/score
+    has to be condensed to 1 in questions list/gradebook/etc.
+ approach 2: do ~ list in attempts to match up with scores
+    have to change showtest to reshow same question on submit of first part
+      
+ similar question needs to clear all parts (?)
+ reattempts should only affect one part / penalty should be per-part
+ showanswers should be per-part
+ 
+<li>Written assignments / way to grade essay questions (fairly easy but need some time)</li>
+
+
+<li><b>Gradebook</b></li>
+<li>GPA, edittable and from lookup (need separate way to store GPA, fill stored from lookup when switched)</li>
+
+<li><b>Options</b></li>
+<li>Forum links to internal messaging when allowed (for students)</li>
+<li>Course default Color control (do-able - need to integrate with block color defaults)</li>
+<li>Block colors:  type number (add text boxes, use new colorpicker)</li>
+<li>Ignore case on equation variables (need $variable for it - has to be passed to clientside) </li>
+<li>Add dates/time (instructions?) to mass chg assessment (should be easy - don't need if change dates is done right)</li>
+
+<li><b>Cleanup</b></li>
+<li>finish delete forum post option (error on remove first in thread?) (need to track if child exists, etc)</li>
+<li>fix old user delete to remove more than just userid (NEED to do - simple but messy)</li>
+<li>Rework displayq to pull out multipart options before passing to evaluators (easy, but will take a while)</li>
+
+<li><b>New Features</b></li>
+<li>Student email list (need to add student privacy settings first)</li>
+<li>Copy/Template libraries with structure assessment questions into new location (just messy to implement)</li>
+
+Don’t list potential questions if already added (option?) (find room for the option)
+Listing questions for assessment – have option to list the libraries of the questions that have already been added. (need to find room for it)
+Have practice-first option on assessments. (option for toggling to review mode)
+hints system
+Move action by preview on manageqset (easy)
+
+List questions once when in multiple libraries searched
+Total & % column in GB on left?
+new item flag
+
+
+
+Maybe not / Wait
+Test without saving:  Test, Save, Save As.. (need temp table.. I don't like this idea)
+<li>collapse gradebook by blocks (no easy way to do this)</li>
+<li>Gradebook stats for students (no easy way to do this given current framework)</li>
+<li>file attachements in posts (probably not needed)</li>
+<li>calendar (lots and lots of work - David M on it)</li>
+<li>Image upload in editor (hard to track files so deleted when removed from item)</li>
+Default library for course? (add to courses table, pull if library not specified.  Tricker to add to course settings page)
+Uniform user experience (major re-visioning of user interface needed)
+Tooltips for help (how to do?  David M going to help)
+<li>New items flag for blocks? (can't do without tracking views)</li>
+
+
+</ul>
+<h3>Version 1.2</h3>
+<ul>
+<li>Bug Fix: a couple display issues with image display with ansprompt and ne</li>
+<li>Per assessment groups</li>
+<li>Copy gradebook scheme and course settings in copy items</li>
+<li>Alpha order: Copy options from</li>
+<li>Clear attempts on single problem (on Add Questions page?)</li>
+<li>sort/limit messages by course; show message counts on home page</li>
+<li>Added ignore_commas flag in String type</li>
+<li>Added new array functions</li>
+<li>Restricted Modify Questions page when taken, show on course page</li>
+<li>Search term, libraries searched now associated with course</li>
+<li>Library counts all users</li>
+<li>Order exceptions by alpha</li>
+<li>Bug Fix: fixed for acceptance where student error = tolerance</li>
+<li>New feedback option: Show no scores</li>
+<li>Order items by alpha in gradebbook, and ordering when grouped by category fixed</li>
+<li>Order question listing by id (~added to system date)</li>
+<li>Preview selected questions</li>
+<li>Add keep all on drops, add two textboxes</li>
+<li>Question settings, when already added, allow add extra copies</li>
+<li>Add copy instructions and copy dates on "copy options from"</li>
+<li>Show question category in assessments</li>
+<li>Manage Question set layout updated</li>
+<li>Help for text editor</li>
+</ul>
+ 
+<h3>Version 1.1</h3>
+<i>Released Feb 4, 2007</i>
+<ul>
+<li>Blocks in blocks, blocks as folders</li>
+<li>Students kicked out after due date</li>
+<li>Select questions from preview</li>
+<li>Gradebook:Added offline grades</li>
+<li>Gradebook:Added assign assessments/grades to categories</li>
+<li>Gradebook:Added grading scheme</li>
+<li>Checkboxs with Email/Msg buttons</li>
+<li>Use vertical view for student gradebook</li>
+<li>Allow click on "-" in gradebook to insert scores when student hasn't started assessment</li>
+<li>put category header color coding</li>
+<li>Item analysis: avg number of attempts, preview question button</li>
+<li>filter gradebook by category/totals only</li>
+<li>Add do not include in grade total option (also "count as extra credit"?)</li>
+<li>Click on student's name to just show that student's scores</li>
+<li>Option for totals on left</li>
+<li>Added show current in gradebook</li>
+<li>Link to grades from List Users page</li>
+<li>Email gradebook as attachment</li>
+<li>Retain user default gbmode settings</li>
+<li>List "my" questions only</li>
+<li>Require assessment score is over some value to submit / receive credit</li>
+<li>List all assessments on a page, allow date changes, settings, etc</li>
+<li>Include name (form-letter style) in mass email</li>
+<li>Prevent Average row in gradebook from sorting</li>
+<li>put "this question is being used" warning in modify question</li>
+<li>Added optional section and code number for students</li>
+<li>Added section/code in import students</li>
+<li>Internal messaging system added (student to/from teacher)</li>
+<li>Message from gradebook view of assessment</li>
+<li>Replaced reset pw link in List users with change info link</li>
+<li>Mass chg assessments: allow selection of options to change</li>
+<li>Turn messaging in course off</li>
+<li>bar at top - customizable</li>
+<li>Forums: Restrict student viewing of thread responses</li>
+<li>Forums: Condensed thread view, expand/collapse all</li>
+<li>Forums: link to email for teachers</li>
+<li>Forum: show collapsed by default option</li>
+<li>Forum: disallow modify</li>
+<li>Forum: disallow delete (set up, but not implemented)</li>
+<li>Forum: reply by dates for replies, post by dates new threads</li>
+<li>Forum: Email notification</li>
+<li>Manage qset link on home page</li>
+<li>Improve search - add search all and handle multiple search terms</li>
+<li>set color of blocks</li>
+<li>Convert math/graph to images when sending email</li>
+<li>allow multiple answerformat for calculated type</li>
+<li>check for 10^-5, 314E-3 on nodecimal type for calculated</li>
+<li>add makeprettydisp as default showanswer for numfunc</li>
+<li>Added mark question for use box in question preview</li>
+<li>Added Show message you're replying to in forum response</li>
+<li>Fixed quotes in block titles problem</li>
+<li>Add assessment description to testquestion page</li>
+<li>Add __ attempts of ___ remaining</li>
+<li>Added Assessment password option</li>
+<li>Added reattempts different versions option<li>
+<li>Extended student view</li>
+<li>Added uncheck all in library selection (libtree2)</li>
+<li>Listing multiple libraries - put library names as headers</li> 
+<li>Confirmation popup on remove from assessment</li>
+<li>$variable as alias for $variables</li>
+<li>Add multiple copies of question to assessment</li>
+<li>copy block color from other</li>
+<li>Added unmatched parens notice to calculated and numfunc</li>
+<li>Added password reset</li>
+<li>Show points on add question page</li>
+<li>Bug Fix: problems with sorting of gradebook </li>
+<li>Bug fix: Strip &amp;nbsp; out on gb export</li>
+<li>Bug Fix: disappearing linked text files</li>
+<li>Bug Fix: delete forum views on course delete</li>
+<li>Bug Fix: Multiple Answer Lastanswer problem</li>
+<li>Bug Fix: Unassigned showing everyone's questions on Add Questions page</li>
+</ul>
+ 
+ 
+<h3>Version 1.0</h3>
+<i>Released Dec 6, 2006</i>
+<ul>
+<li>Added nodecimals answerformat to calculated type</li>
+<li>Added file attachement to inline text items</li>
+<li>Added per-course icon settings</li>
+<li>Improved delete linkedtext files on remove </li>
+<li>Changed upload limit to 3MB </li>
+<li>Added available always/ available now options</li>
+<li>Added toggle to student view w/ time adjustment </li>
+<li>Added hide title/icon to inlinetext</li>
+<li>Added submit without regen button to preview question</li>
+<li>Added percent total to gradebook</li>
+<li>Added static image support to question writing</li>
+<li>Changed wording for practice tests from "due" to "available until"</li>
+<li>Added Expanded/Collapsed option for blocks</li>
+<li>Added better syntax error warnings</li>
+<li>Added allowuneroll and course copyrights options</li>
+<li>New option: delete all items in block on delete</li>
+<li>Added all students same first version option</li>
+<li>Bug Fix:  assessment total with grouped questions</li>
+<li>Bug Fix:  delete linkedtext files on course delete</li>
+<li>Bug Fix:  added catch-it for empty assessment</li>
+<li>Bug Fix:  fixed problem with categorization showing blank categories</li>
+</ul>
+
+
+<h3>1.0RC1</h3>
+<i>Released Nov 5, 2006</i>
+<p>Upgrade notes: See upgrade.txt</p>
+<ul>
+<li>Changed breadcrumbs to show course name</li>
+<li>Changed Practice Test behavior to not regenerate on entry</li>
+<li>Improved CSS</li>
+<li>Reduced file size by 75% for popup library selector</li>
+<li>Updated date/time handling for instructor timezone</li>
+<li>Added penalty on last attempt only option</li>
+<li>Added "keep best score", and allow homework to remain open for review after due date</li>
+<li>Added force image-based display options</li>
+<li>Improved messages when test reaccessed after partial completion</li>
+<li>Similar problem added to full test at once, and now working in One at a Time mode.</li>
+<li>Added Create assessment using questions from other assessments</li>
+<li>Improved admin page for full and group admins</li>
+<li>Added Mass change assessment settings</li>
+<li>Added append to title and Add to block in copy course items</li>
+<li>Time input relaxed to allow 4pm instead of requiring 4:00pm</li>
+<li>Changed add assessment to settings are hidden when "copy settings from" is selected</li>
+<li>Updated gradebook to order by due date, and hide not yet available assessments from student's gradebook</li>
+<li>Added question categorization to course item export/import</li>
+<li>Slopefield and start/end marker to ASplot support added to image backup</li>
+<li>Added inequalities graphing macro library</li>
+<li>Added header lock for IE in gradebook</li>
+<li>Bug Fix: DST handling</li>
+<li>Bug Fix: Math filter failing when newlines inside backticks</li>
+<li>Bug Fix: Some browsers (ie Safari) not correctly sniffed</li>
+<li>Bug Fix: Clarified Regen option when current attempts used</li>
+<li>Bug Fix: Regen problems with One at a time mode</li>
+<li>Bug Fix: New threads and replies no longer appear unread by poster</li>
+<li>Bug Fix: Fixed square brackets being not recognized in student answer (still not allowed in instructor answer)</li>
+<li>Bug Fix: fixed NaN recognition.  negative^(decimal power) now always returns NaN and is skipped, unless power is 1/[3-49]</li>
+<li>Bug Fix: Problem with multipart questions in "Show full test" mode</li>
+<li>Bug Fix: Rights setting not showing on template</li>
+<li>Bug Fix: Parens in calcmatrix problem resolved clientside</li>
+<li>Bug Fix: Error with two variables entered side-by-side without explicit multiplication clientside</li>
+<li>Bug Fix: Control panels floats drifting</li>
+<li>Bug Fix: Consecutive not hitting last value in some cases</li>
+<li>Bug Fix: Fixed handling of single quotes inside showasciisvg string</li>
+<li>Bug Fix: showplot not hitting right endpoint of domain</li>
+<li>Bug Fix: e problem in showplot</li>
+<li>Bug Fix: Unenroll problem</li>
+</ul>
+
+<h3>1.0beta16</h3>
+<i>Released Sept 28, 2006</i>
+<p>Upgrade notes: See upgrade.txt</p>
+<ul>
+<li>Added printtest - print version</li>
+<li>Added diagnostic setup for group admins and admins</li>
+<li>Security Fix: lastanswer not properly slashed</li>
+<li>Bug Fix: Fixed issues with initPicture(2+3,5) in fallback</li>
+<li>Bug Fix: graph fallback not showing dots on early GD versions</li>
+<li>Bug Fix: DNE now case insensitive</li>
+<li>Bug Fix: Gradebook no longer shows IP for past-due assessments</li>
+<li>Bug Fix: - sign issues in math tex filter</li>
+<li>Bug Fix: Linked text item attaching file giving header error</li>
+</ul>
+
+<h3>1.0beta15</h3>
+<i>Released Sept 12, 2006</i>
+<p>Upgrade notes: See upgrade.txt</p>
+<ul>
+<li>Added math and graph image fallback support!</li>
+<li>Added mixed number answertype to calculated</li>
+<li>Added essay type questions</li>
+<li>Added point exclusions in showplot</li>
+<li>Improved login with browser setting warning</li>
+<li>Added print layout for generating hard copies</li>
+<li>All question attempts are logged and displayed in instructor's gradebook detail view</li>
+<li>Fixed group admin functions to be MySQL 3.23 compatible</li>
+<li>Added preview library off manage libraries page</li>
+<li>Bug Fix: Template not maintaining library list for non-owner questions</li>
+<li>Bug Fix: If domain in numfunc isn't a subset of actual domain, answer evals as incorrect</li>
+<li>Ignore commas in number and calculated types</li>
+</ul>
+
+<h3>1.0beta14</h3>
+<i>Released Aug 05, 2006</i>
+<p>Upgrade notes: See upgrade.txt</p>
+<ul>
+<li>Added Shift Course Dates</li>
+<li>Added checkboxes in List Students page for unenroll and mass email</li>
+<li>Added Copy Course Items</li>
+<li>Added categorization to assessments, allowing categorical score breakdown.</li>
+<li>Added item analysis to gradebook</li>
+<li>Removed CourseCreator rights level<li>
+<li>Implemented Group admins</li>
+<li>Implemented Group library rights</li>
+<li>Simplified dbsetup.php install</li>
+<li>Bug Fix: Updated "assessment taken" warning to only warn if students have taken the assessment</li>
+<li>Bug Fix: 2-box entry mode not retaining after save and test</li>
+<li>Bug Fix: questions not graded correctly in preview mode</li>
+<li>Bug Fix: $a,$b=... causing problems when $a,$b shows up later in line</li>
+<li>Bug Fix: import course items causing error when no assessments in import</li>
+<li>Bug Fix: inlinetext graphs not displaying</li>
+</ul>
+
+<h3>1.0beta13</h3>
+<i>Released July 8, 2006</i>
+<p>Upgrade notes: See upgrade.txt</p>
+<ul>
+<li>Moved all session data into the database, eliminating the need for the session save path fix for server farms, and resolving
+    the PHP 24 minute inactivity garbage collection default without requiring a separate session save path</li>
+<li>Added javascript confirm when submitting incomplete question (may have accessibility issues)</li>
+<li>Added 2-box entry option in question writing; added resize widgets to entry boxes</li>
+<li>Added mass email tool off List Students</li>
+<li>Bug Fix: showanswer after duedate not looking for due date exceptions</li>
+<li>Bug Fix: dbsetup not updated in last release</li>
+<li>Bug Fix: import and importlib not assigning library item owners</li>
+</ul>
+
+<h3>1.0beta12</h3>
+<i>Released June 14, 2006</i>
+<p>Upgrade notes: See upgrade.txt</p>
+<ul>
+<li>Added multipart grade updating to gradebook</li>
+<li>Added addlabel macro for adding a label to a plot</li>
+<li>Added separate xgrid/ygrid option to showplot</li>
+<li>Added sec,csc,cot</li>
+<li>Allow add to library for nonowners, to allow reclassification of questions, with added ownerid to limit removal</li>
+<li>Added view source (and set libraries) option in question set management and add questions</li>
+<li>Added Spacecurve to plot3d library - needs rework into java class</li>
+<li>Improvements to makepretty</li>
+<li>Removed $q, $k, and $qn from disallowed variables</li>
+<li>Automatic run of $answer in numfunc type through makepretty</li>
+<li>Added "notrig" answerformat option to calculated type</li>
+<li>Improved handling of nonowner adding questions to a library</li>
+<li>Fixed handling of EndScore tests - gradebook detail access now controlled by showanswer setting</li>
+<li>Added password setting to import students</li>
+<li>Bug fix: arctrig functions now display correctly in preview</li>
+<li>Bug fix:  $a1^2 now working OK</li>
+<li>Bug fix:  4^.5 now working OK</li>
+<li>Bug fix: 1* handling in makepretty interfering with eval of  sin^-1.  Still causing problems with display of sin^-1, so 1* in
+    makepretty has been temporary disabled until a better resolution can be found.</li>
+<li>Bug Fix: problems with variables that show up in expressions (like variable r with sqrt).  Mostly fixed</li>
+<li>Bug Fix: multiletter vars returning syntax error by AMhelpers</li>
+<li>Bug Fix: private libs not showing up in library selector</li>
+<li>Bug Fix: assessments showing IP even after finalizing</li>
+<li>Bug Fix: importstu for teachers not enrolling students</li>
+<li>Bug Fix: save and test question error for nonadmins</li>
+<li>Bug Fix: error in interpreter allowing while () { } statements</li>
+<li>Bug Fix: $e misinterpreted as exponential</li>
+<li>Bug Fix: Tablesorter not working</li>
+<li>Bug Fix: multipart containing numfunc types problem</li>
+<li>Bug Fix: showanswer problems</li>
+<li>Bug Fix: template allowed placement into closed/private libraries</li>
+<li>Bug Fix: question settings not importing on importitems</li>
+</ul>
+
+<h3>1.0beta11</h3>
+<i>Released April 17, 2006</i>
+<p>Upgrade notes: See upgrade.txt.  No changes.</p>
+New/Fixed in 1.0beta11:
+<ul>
+<li>Added Course Item export/import</li>
+<li>Added "Homework" assessment type, similar to practice tests, but graded and doesn't regen on entry.</li>
+<li>Added "Try similar question" option in Skip-around practice tests.  Resets attempts on that question</li>
+<li>Added $answerformat = "equation" to numfunc type</li>
+<li>Added "Copy Options from existing" option to assessment settings</li>
+<li>Bug Fix: svg axes labels not showing in Mac FireFox</li>
+<li>Bug Fix: forum giving error on MySQL 4, and not counting pages correctly</li>
+<li>Bug Fix: time limit showing huge, wrong numbers</li>
+<li>Bug Fix: variable interpolation problem in matrix type</li>
+<li>Bug Fix: showasciisvg not working (semicolon problem) - need better fix</li>
+<li>Bug Fix: matrix type losing negative signs</li>
+<li>Bug Fix: multipart not adding to 100% possible</li>
+<li>Bug Fix: error in import</li>
+<li>Bug Fix: scoremethod in multans type</li>
+<li>Bug Fix: gcd errors</li>
+<li>Bug Fix: am/pm error on 12:xx</li>
+<li>Bug Fix: scientific notation problems</li>
+
+</ul>
+
+<h3>1.0beta10</h3>
+<i>Released March 29, 2006</i>
+<p>Upgrade notes: See upgrade.txt</p>
+New/Fixed in 1.0beta10:
+<ul>
+<li>Added Accessibility options</li>
+<li>Cleaned up front page layout</li>
+<li>Added support for guest accounts</li>
+<li>Added Unique questionset and library ids, allowing updating of question/libraries on import</li>
+<li>Added AddDate and LastModDate to questionset and libraries for enhanced update control</li>
+<li>Added Group Question option in assessments</li>
+<li>Added Import Students from File option off admin page and List Users page</li>
+<li>Added lastaccess field to users database, with Delete Old Users admin option</li>
+<li>Added $noshuffle option to matching, multiple-choice, and multiple-answer types</li>
+<li>Fixed forum cleanup on course delete/unenroll all students</li>
+<li>Bug Fix: rrand not stepping.  rrand(-5,5,2) now correctly will return -5,-3,-1,1,3,or 5</li>
+<li>Bug Fix: disappearing + signs in question text</li>
+<li>Bug Fix: remove from assessment was removing from libraries</li>
+<li>Bug Fix: items not deleting properly</li>
+<li>Bug Fix: fixed inefficient diffrands</li>
+<li>Misc other bug fixes</li>
+</ul>
+
+
+<h3>1.0beta9</h3>
+<i>Released March 5, 2006</i>
+<p>Upgrade notes: See upgrade.txt</p>
+
+New/Fixed in 1.0beta9:
+<ul>
+<li>Security Fix: SQL attack was possible with malformed id numbers.  All numbers are now quoted.</li>
+<li>Added simple discussion forums </li>
+<li>Added String question type</li>
+<li>Changed from server-based timezone settings to autodetecting user's local timezone.  Dates are still absolute-time-fixed;  if you
+    set a due date to be 9pm EST, someone in PST would see it being due at 6pm PST.</li>
+<li>Added full show answer support</li>
+<li>Added CSV export to gradebook</li>
+<li>Added display of multipart correct answer points (pts per part).  Reattempt penalty still affects all parts</li>
+<li>Added: choices: $displayformat = "select" option  (won't render MathML)</li> 
+<li>Added: number/calc number:  $answer = "4 or 5", $answer = "[3,5) or (6,8]" </li>
+<li>Improved matching type to allow one-to-many matching</li>
+<li>Improved clear assessment handling/notification</li>
+<li>Improved blocks so they don't close on reorder</li>
+<li>Improved HTML editor loading behavior</li>
+<li>Bug Fix:  problems with editing/displaying with html entities</li>
+<li>Bug Fix:  export lib when child is checked problem</li>
+<li>Bug Fix:  Add/Template allowing adding into closed libraries</li>
+<li>Bug Fix:  Students couldn't reenter test when more attempts allowed if all questions answered</li>
+<li>Bug Fix:  Error (student page) on empty block</li>
+<li>Bug Fix:  calcmatrix w/ answersize not showing pre-calculated matrix</li>
+<li>Bug Fix:  oo and DNE not evaluating correctly in calculated</li>
+</ul>
+
+
+<h3>1.0beta8</h3>
+<i>Released Feb 16, 2006</i>
+<p>Upgrade notes: Moved to upgrade.txt file</p>
+
+New/Fixed in 1.0beta8:
+<ul>
+<li>Major revamp of library system - now tree structured.</li>
+<li>Added blocks in course page  (cookie on rearrange needs more elegant solution)</li>
+<li>Added library tree import/export; needs polishing (selection system)</li>                              
+<li>Added author field to questions (autofills)</li>
+<li>Added super-basic "show correct answer" support for practice tests - needs rework</li>
+<li>Added tutor/ta/proctor user rights</li>
+<li>Included work on alternative front-end for placement testing (not documented yet)</li>
+<li>Added Use as Template option to manageqset</li>
+<li>Added calconarray macro</li>
+<li>Bug Fix:  answers evaluating wrong when randomizer in question control</li>
+<li>Bug Fix:  make exception not working</li>
+<li>Bug Fix:  fraction/reduced fraction not accepting integers.  Changed box tip for 
+    fraction/reducedfraction formats
+<li>Bug Fix:  showplot not returning to defaults</li>
+<li>Bug Fix:  requiretimes not working</li>
+<li>Bug Fix:  Showplots causing errors.  Caused by error in interpreter</li>  
+<li>Bug Fix:  Errors when clicking "do to selected" buttons when nothing selected</li>
+<li>Bug Fix:  variables not defaulting to "x"</li>
+<li>Bug Fix:  Less than and greater than signs not displaying right in question 
+    descriptions</li>
+<li>Bug Partial Fix: less than / greater than not displaying right in question text.  
+    System can now usually identify what is not part of an HTML tag, but something like:
+    "x&lt;4 and x&gt;3" is still misinterpreted.  Use of &amp;lt; and &amp;gt; recommended
+    in these cases</li> 
+<li>Bug Fix:  Gradebook including practice test in grade</li>
+<li>Bug Fix:  Gradebook showing grades for people who haven't taken the test</li>
+</ul>
+
+<h3>1.0beta7</h3>
+<i>Released Feb 2, 2006</i><br>
+Upgrade notes:  
+<ul>
+<li>No Database or config.php changes.</li>
+</ul>
+New in 1.0beta7:
+<ul>
+<li>Added jointrandfrom macro</li>
+<li>Added student gradebook</li>
+<li>Bug Fix: pm dates changing to am dates</li>
+<li>Bug Fix: assessment summary not saved on new assessment</li>
+<li>Bug Fix: math not parsed when using a extension macro functions</li>
+<li>Bug Fix: students could enroll in a course twice</li>
+<li>Bug Fix: gradebook severely broken</li>
+</ul>
+
+<h3>1.0beta6b</h3>
+<i>Released Jan 22, 2006</i><br>
+Bug fix update to 1.0beta6.  Fixes major error where sin,cos,etc. were not
+being allowed in calculations.
+
+<h3>1.0beta6</h3>
+<i>Released Jan 21, 2006</i><br>
+Upgrade notes:  
+<ul>
+<li>Database setup has not changed.</li>
+<li>Config.php has changed - added $TZ option and code to set Timezone</li>
+</ul>
+New in 1.0beta6:
+<ul>
+<li>Added horizshowarrays macro</li>
+<li>Added DOCTYPE headers.  Adjusted CSS for assessments.</li>
+<li>Added setting for server timezone (to adjust for servers set for GMT or hosted in
+    a different timezone)</li>
+<li>Bug fix: Couldn't edit SVG graphs in text items using FireFox.</li>
+<li>Bug fix: Path of config.php not determined properly on some servers</li>
+<li>Bug fix: Added type="image/svg+xml" to ASCIIsvg embeds</li>
+<li>Bug fix: calcmatrix preview not showing in FireFox</li>
+<li>Bug fix: width/height on showasciisvg</li>
+<li>Bug fix: table sorting in FireFox</li>
+<li>Bug fix: add item in FireFox</li>
+</ul>
+
+<h3>New in 1.0beta5</h3>
+<i>Released Jan 16, 2006</i>
+<ul>
+<li>Name change!  Expanded name from IMAS to IMathAS for clarity</li>
+<li>Added newuser email confirmation option</li>
+<li>Add brief ASCIIMath description to help file</li>
+<li>$answeights on multipart type</li>
+<li>Added $answerboxsize option</li>
+<li>Added $hidepreview option</li>
+<li>Added arbitrary precision (real number) randomizers</li>
+<li>Changed diffrand to diffrands and randFrom to randfrom to standardize randomizers</li>
+<li>Added calclisttoarray and listtoarray macros</li>
+<li>Added $answerformat = "fraction", "reducedfraction" to calculated type</li>
+<li>Added support for DNE and Infinity to number and calculated types</li>
+<li>Added sortarray and consecutive macros</li>
+<li>Made makepretty array capable</li>
+<li>Cleaned up top half of addquestions</li>
+<li>Added width and height to showplot</li>
+<li>Moved CalendarPopup into javascript dir</li>
+<li>Login format regex</li>
+<li>Updated help documentation</li>
+<li>misc bug fixes</li>
+</ul>
+
+<h3>New in 1.0beta4</h3>
+<i>Released Jan 11, 2006</i>
+<ul>
+<li>Question numbering starts at 1 for display</li>
+<li>Current question is highlighted in Skip Around</li>
+<li>allow positioning of answer prompt in qtext</li>
+<li>multipart questions - point values, correct/wrong for parts</li>
+<li>replace $choice with $questions</li>
+<li>transfer course ownership option</li>
+<li>misc bug fixes</li>
+</ul>
+
+<h3>New in 1.0beta3</h3>
+<i>Released Jan 8, 2006</i>
+<ul>
+<li>Added question library system</li>
+<li>Help file</li>
+<li>Added owner and userights to questionset: <BR>
+    0-private, 1-use/noderive/nomodify(notImplemented) ,2-use/derive/nomodify(Def), 3-use/modify</li>
+<li>abstolerance option for number/calc/numfunc/matrix types</li>
+<li>$answer="[2,5)" range option for number/calc types</li>
+<li>Clear attempt link in GB detail</li>
+<li>Auto-create new macro help on install</li>
+<li>manageqset setup for teacher use or admin use</li>
+<li>Added group transfer/remove to manageqset</li>
+<li>Fixed quotes handling on search</li>
+<li>import/export for all teachers</li>
+<li>Added Limited Course Creator rights</li>
+</ul>
+
+<h3>New in 1.0beta2</h3>
+<i>Released Jan 3, 2006</i>
+<ul>
+<li>new matrix and calcmatrix types</li>
+<li>new multiple-answer type</li>
+<li>display of ansprompt fixed</li>
+<li>deladmin improved</li>
+<li>newadmin check for existing (chg rights)</li>
+<li>change user settings (email, etc)</li>
+<li>if conditional fixed</li>
+<li>Separated macros into separate file</li>
+<li>new macros: showarrays, showasciisvg</li>
+<li>removed requireformat - expanded requiretimes</li>
+<li>x variable fixed to not mess with exp</li>
+<li>macro libraries can be loaded in questions</li>
+<li>mathphp/mathjs standardized to use arctrig rather than atrig</li>
+<li>Added macro installer</li>
+<li>Expanded showplot macro</li>
+<li>Added in progress designator to gradebook</li>
+<li>Misc bug fixes</li>
+</ul>
+
+<h3>New in 1.0beta1</h3>
+<i>Released Jan 1, 2006</i>
+
+<ul>
+<li>Add summary to assessment</li>
+<li>implement penalty</li>
+<li>add inlinetext type</li>
+<li>add "use as template" to addquestions</li>
+<li>delete assessment</li>
+<li>change time entry</li>
+<li>deep course delete</li>
+<li>retain search param in addquestions</li>
+<li>Add itemorder to assessment</li>
+<li>Add shuffle option to assessment</li>
+<li>adjust itemorder in course and assessment</li>
+<li>Add unenroll for students</li>
+<li>add linkedtext types</li>
+<li>check slashes on newuser POST</li>
+<li>use safepow</li>
+<li>write problem interpreter</li>
+<li>completed time for assessment sessions</li>
+<li>config file with username requirement </li>
+<li>breadcrumbs</li>
+<li>Add teacher controls - list users </li>
+<li>implement timelimit in grades - override timelimit</li>
+<li>exceptions for due dates</li>
+<li>record given answers</li>
+<li>save option on assessments - fulltest only (not needed on others)</li>
+<li>gradebook - detailed view  override grades</li>
+<li>delete/mod from dataset for admins</li>
+<li>use calendar popup</li>
+<li>form validation</li>
+<li>if to interpret</li>
+<li>have addassessment send you to addquestions on new</li>
+<li>new/modify headings in add..</li>
+<li>button confirm on delete item</li>
+<li>fix $points</li>
+<li>multiletter variables - don't quote single letter variables</li>
+<li>dataset export/import</li>
+<li>add use htmlarea</li>
+<li>add email to newadmin</li>
+</ul>
