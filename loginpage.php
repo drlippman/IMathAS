@@ -92,7 +92,6 @@ numerical or algebraic expression answers.
 Web hosting sponsored by the <a href="http://www.transitionmathproject.org">Transition Math Project</a><br/>
 <a href="/info/credits.html">Credits</a></p>
 </div>
-END;
 <?php 
 	require("footer.php");
 ?>

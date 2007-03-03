@@ -274,6 +274,7 @@ function math2ascii(el) {
   var myAM = el.innerHTML;
   if (myAM.indexOf("`") == -1) {
 	myAM = myAM.replace(/.+title=\"(.*?)\".+/g,"`$1`");
+	myAM = myAM.replace(/.+title=\'(.*?)\'.+/g,"`$1`");
 	myAM = myAM.replace(/.+title=([^>]*?)\s.*>.*/g,"`$1`");
 	myAM = myAM.replace(/.+title=(.*?)>.*/g,"`$1`");
     el.innerHTML = myAM;
@@ -285,6 +286,7 @@ function math2ascii(el) {
 function nodeToAM(outnode) {  
   if (HTMLArea.is_ie) {
 	  var str = outnode.innerHTML.replace(/\`/g,"");
+	  str.replace(/\"/,"&quot;");
 	  var newAM = AMparseMath(str);
 	  outnode.innerHTML = newAM.innerHTML;  
   } else {
