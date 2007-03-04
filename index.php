@@ -1,14 +1,13 @@
 <?php
+//IMathAS:  Main page (class list, enrollment form)
+//(c) 2006 David Lippman
    require("validate.php");
    $placeinhead = "<style type=\"text/css\">\nh3 { margin: 2px;}\nul { margin: 5px;}\n</style>\n";
    $nologo = true;
    require("header.php");
-?>
-<h2>Welcome to WAMAP, <?php echo $userfullname; ?></h2>
+   echo "<h2>Welcome to $installname, $userfullname</h2>";
 
-<?php
-//IMathAS:  Main page (class list, enrollment form)
-//(c) 2006 David Lippman
+
 	$newmsgcnt = array();
 	$query = "SELECT courseid,COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND (isread=0 OR isread=4) GROUP BY courseid";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());

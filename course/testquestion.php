@@ -10,8 +10,10 @@
 	require("../assessment/header.php");
 	if (!isset($_POST['seed']) || isset($_POST['regen'])) {
 		$seed = rand(0,10000);
+		$attempt = 0;
 	} else {
 		$seed = $_POST['seed'];
+		$attempt = $_POST['attempt']+1;
 	}
 	if (isset($_GET['onlychk']) && $_GET['onlychk']==1) {
 		$onlychk = 1;
@@ -87,8 +89,9 @@
 	echo "\" onsubmit=\"doonsubmit()\">\n";
 
 	echo "<input type=hidden name=seed value=\"$seed\">\n";
+	echo "<input type=hidden name=attempt value=\"$attempt\">\n";
 	unset($lastanswers);
-	displayq(0,$_GET['qsetid'],$seed,true);
+	displayq(0,$_GET['qsetid'],$seed,true,$attempt);
 	echo "<input type=submit value=\"Submit\"><input type=submit name=\"regen\" value=\"Submit and Regen\">\n";
 	
 	echo "</form>\n";

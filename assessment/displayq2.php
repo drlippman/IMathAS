@@ -6,15 +6,15 @@ $allowedmacros = $mathfuncs;
 require_once("mathphp.php");
 require("interpret.php");
 require("macros.php");
-function displayq($qnidx,$qidx,$seed,$doshowans) {
+function displayq($qnidx,$qidx,$seed,$doshowans,$attemptn) {
 	srand($seed);
 	
-	if (func_num_args()>4 && func_get_arg(4)==true) {
+	if (func_num_args()>5 && func_get_arg(5)==true) {
 		$returnqtxt = true;
 	} else {
 		$returnqtxt = false;
 	}
-	if (func_num_args()>5 && func_get_arg(5)==true) {
+	if (func_num_args()>6 && func_get_arg(6)==true) {
 		$clearla = true;
 	} else {
 		$clearla = false;
@@ -89,6 +89,36 @@ function displayq($qnidx,$qidx,$seed,$doshowans) {
 	
 	if ($returnqtxt) {
 		$toevalqtxt = preg_replace('/\$answerbox(\[\d+\])?/','',$toevalqtxt);
+	}
+	
+	//create hintbuttons
+	if (isset($hints)) {
+		$lastkey = end(array_keys($hints));
+		if ($qdata['qtype']=="multipart" && is_array($hints[$lastkey])) { //individual part hints
+			foreach ($hints as $iidx=>$hintpart) {
+				$lastkey = end(array_keys($hintpart));
+				if ($attemptn>$lastkey) {
+					$usenum = $lastkey;
+				} else {
+					$usenum = $attemptn;
+				}
+				if ($hintpart[$usenum]!='') {
+					$hintloc[$iidx] = "<p><i>Hint:</i> {$hintpart[$usenum]}</p>\n";
+				}
+				
+			}
+		} else { //one hint for question
+			//$lastkey = end(array_keys($hints));
+			if ($attemptn>$lastkey) {
+				$usenum = $lastkey;
+			} else {
+				$usenum = $attemptn;
+			}
+			if ($hints[$usenum]!='') {
+				$hintloc = "<p><i>Hint:</i> {$hints[$usenum]}</p>\n";
+			}
+			
+		}
 	}
 	
 	//echo $toevalqtext;

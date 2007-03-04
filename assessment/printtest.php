@@ -55,7 +55,7 @@
 		
 		$showa = false;
 		echo "<div>#".($i+1)." Points possible: " . getpointspossible($questions[$i],$testsettings['defpoints']) . "</div>";
-		displayq($i,$qsetid,$seeds[$i],$showa);
+		displayq($i,$qsetid,$seeds[$i],$showa,$attempts[$i]);
 		echo "<hr />";	
 		
 	}

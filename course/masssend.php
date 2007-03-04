@@ -182,6 +182,14 @@
 		echo "</span><br class=form />\n";
 		echo "<div class=submit><input type=submit value=\"Send $sendtype\"></div>\n";
 		echo "</form>\n";
+		$tolist = "'".implode("','",$_POST['checked'])."'";
+		$query = "SELECT LastName,FirstName,SID FROM imas_users WHERE id IN ($tolist) ORDER BY LastName,FirstName";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		echo '<p>Unless limited, message will be sent to:<ul>';
+		while ($row = mysql_fetch_row($result)) {
+			echo "<li>{$row[0]}, {$row[1]} ({$row[2]})</li>";
+		}
+		echo '</ul>';
 		require("../footer.php");
 		exit;
 	}

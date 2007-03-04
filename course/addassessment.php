@@ -111,8 +111,11 @@
 		} else {
 			$deffeedback = $_POST['deffeedback'].'-'.$_POST['showans'];
 		}
-		if ($_POST['lastpenalty']==1) {
+		
+		if ($_POST['skippenalty']==10) {
 			$_POST['defpenalty'] = 'L'.$_POST['defpenalty'];
+		} else if ($_POST['skippenalty']>0) {
+			$_POST['defpenalty'] = 'S'.$_POST['skippenalty'].$_POST['defpenalty'];
 		}
 		if ($_POST['copyfrom']!=0) {
 			$query = "SELECT timelimit,displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,showcat,intro,startdate,enddate,reviewdate,isgroup FROM imas_assessments WHERE id='{$_POST['copyfrom']}'";
@@ -245,9 +248,12 @@
 		}
 		if ($line['defpenalty']{0}==='L') {
 			$line['defpenalty'] = substr($line['defpenalty'],1);
-			$lastpenalty = true;
+			$skippenalty==10;
+		} else if ($line['defpenalty']{0}==='S') {
+			$skippenalty = $line['defpenalty']{1};
+			$line['defpenalty'] = substr($line['defpenalty'],2);
 		} else {
-			$lastpenalty = false;
+			$skippenalty = 0;
 		}
 	}
 	$useeditor = "summary,intro";
@@ -372,10 +378,17 @@ at <input type=text size=10 name=rtime value="<?php echo $rtime;?>"></span><BR c
 <span class=form>Default attempts per problem (0 for unlimited): </span><span class=formright><input type=text size=4 name=defattempts value="<?php echo $line['defattempts'];?>" > 
  <input type=checkbox name="reattemptsdiffver" <?php if ($line['shuffle']&8) {echo "CHECKED";} ?> />Reattempts different versions</span><BR class=form>
 
+ <?php echo "skippen: $skippenalty"; ?>
 <span class=form>Default penalty:</span><span class=formright><input type=text size=4 name=defpenalty value="<?php echo $line['defpenalty'];?>" <?php if ($taken) {echo 'disabled=disabled';}?>>% 
-   <select name="lastpenalty" <?php if ($taken) {echo 'disabled=disabled';}?>>
-     <option value="0" <?php if (!$lastpenalty) {echo "selected=1";} ?>>per missed attempt</option>
-     <option value="1" <?php if ($lastpenalty) {echo "selected=1";} ?>>on last possible attempt only</option>
+   <select name="skippenalty" <?php if ($taken) {echo 'disabled=disabled';}?>>
+     <option value="0" <?php if ($skippenalty==0) {echo "selected=1";} ?>>per missed attempt</option>
+     <option value="1" <?php if ($skippenalty==1) {echo "selected=1";} ?>>per missed attempt, after 1</option>
+     <option value="2" <?php if ($skippenalty==2) {echo "selected=1";} ?>>per missed attempt, after 2</option>
+     <option value="3" <?php if ($skippenalty==3) {echo "selected=1";} ?>>per missed attempt, after 3</option>
+     <option value="4" <?php if ($skippenalty==4) {echo "selected=1";} ?>>per missed attempt, after 4</option>
+     <option value="5" <?php if ($skippenalty==5) {echo "selected=1";} ?>>per missed attempt, after 5</option>
+     <option value="6" <?php if ($skippenalty==6) {echo "selected=1";} ?>>per missed attempt, after 6</option>
+     <option value="10" <?php if ($skippenalty==10) {echo "selected=1";} ?>>on last possible attempt only</option>
      </select></span><BR class=form>
 
 <span class=form>Feedback method: </span><span class=formright><select id="deffeedback" name="deffeedback" onChange="chgfb()" >

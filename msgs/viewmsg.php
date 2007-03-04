@@ -61,8 +61,8 @@
 	echo "</div>";
 	
 	if ($type!='sent') {
-		echo "<a href=\"msglist.php?cid=$cid&filtercid=$filtercid&page=$page&add=new&to={$line['msgfrom']}&replyto=$msgid\">Reply</a> ";
-		echo "<a href=\"msglist.php?cid=$cid&filtercid=$filtercid&page=$page&add=new&to={$line['msgfrom']}&toquote=$msgid\">Quote in Reply</a> ";
+		echo "<a href=\"msglist.php?cid=$cid&filtercid=$filtercid&page=$page&add=new&to={$line['msgfrom']}&replyto=$msgid\">Reply</a> | ";
+		echo "<a href=\"msglist.php?cid=$cid&filtercid=$filtercid&page=$page&add=new&to={$line['msgfrom']}&toquote=$msgid\">Quote in Reply</a> | ";
 		echo "<a href=\"msglist.php?cid=$cid&filtercid=$filtercid&page=$page&removeid=$msgid\">Delete</a>";
 	}
 	if ($type!='sent' && ($line['isread']==0 || $line['isread']==4)) {

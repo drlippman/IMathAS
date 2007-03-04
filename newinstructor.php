@@ -44,7 +44,7 @@
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				$headers  = 'MIME-Version: 1.0' . "\r\n";
 				$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-				$headers .= "From: WAMAP <$sendfrom>\r\n";
+				$headers .= "From: $installname <$sendfrom>\r\n";
 				$subject = "New Instructor Account Request";
 				$message = "Name: {$_POST['firstname']} {$_POST['lastname']} <br/>\n";
 				$message .= "Email: {$_POST['email']} <br/>\n";

@@ -14,8 +14,12 @@
 		if ($_POST['points']=="") {$points=9999;} else {$points = $_POST['points'];}
 		if ($_POST['attempts']=="") {$attempts=9999;} else {$attempts = $_POST['attempts'];}
 		if ($_POST['penalty']=="") {$penalty=9999;} else {$penalty = $_POST['penalty'];}
-		if ($_POST['lastpenalty']==1 && $penalty!=9999) {
-			$penalty = 'L'.$penalty;
+		if ($penalty!=9999) {
+			if ($_POST['skippenalty']==10) {
+				$penalty = 'L'.$penalty;
+			} else if ($_POST['skippenalty']>0) {
+				$penalty = 'S'.$_POST['skippenalty'].$penalty;
+			}
 		}
 		if (isset($_GET['id'])) { //already have id - updating
 			$query = "UPDATE imas_questions SET points='$points',attempts='$attempts',penalty='$penalty' ";
@@ -62,11 +66,15 @@
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$line = mysql_fetch_array($result, MYSQL_ASSOC);
 			if ($line['penalty']{0}==='L') {
-				$lastpenalty = 1;
 				$line['penalty'] = substr($line['penalty'],1);
+				$skippenalty==10;
+			} else if ($line['penalty']{0}==='S') {
+				$skippenalty = $line['penalty']{1};
+				$line['penalty'] = substr($line['penalty'],2);
 			} else {
-				$lastpenalty = 0;
+				$skippenalty = 0;
 			}
+			
 			if ($line['points']==9999) {$line['points']='';}
 			if ($line['attempts']==9999) {$line['attempts']='';}
 			if ($line['penalty']==9999) {$line['penalty']='';}
@@ -75,7 +83,7 @@
 			$line['points']="";
 			$line['attempts']="";
 			$line['penalty']="";
-			$lastpenalty = 0;
+			$skippenalty = 0;
 		}
 	}
 ?>
@@ -89,9 +97,15 @@ Leave items blank or set to 9999 to use default values<BR>
 <span class=form>Attempts allowed for this problem (0 for unlimited):</span><span class=formright> <input type=text size=4 name=attempts value="<?php echo $line['attempts'];?>"></span><BR class=form>
 
 <span class=form>Default penalty:</span><span class=formright><input type=text size=4 name=penalty value="<?php echo $line['penalty'];?>">% 
-   <select name="lastpenalty" >
-     <option value="0" <?php if (!$lastpenalty) {echo "selected=1";} ?>>per missed attempt</option>
-     <option value="1" <?php if ($lastpenalty) {echo "selected=1";} ?>>on last possible attempt only</option>
+   <select name="skippenalty" <?php if ($taken) {echo 'disabled=disabled';}?>>
+     <option value="0" <?php if ($skippenalty==0) {echo "selected=1";} ?>>per missed attempt</option>
+     <option value="1" <?php if ($skippenalty==1) {echo "selected=1";} ?>>per missed attempt, after 1</option>
+     <option value="2" <?php if ($skippenalty==2) {echo "selected=1";} ?>>per missed attempt, after 2</option>
+     <option value="3" <?php if ($skippenalty==3) {echo "selected=1";} ?>>per missed attempt, after 3</option>
+     <option value="4" <?php if ($skippenalty==4) {echo "selected=1";} ?>>per missed attempt, after 4</option>
+     <option value="5" <?php if ($skippenalty==5) {echo "selected=1";} ?>>per missed attempt, after 5</option>
+     <option value="6" <?php if ($skippenalty==6) {echo "selected=1";} ?>>per missed attempt, after 6</option>
+     <option value="10" <?php if ($skippenalty==10) {echo "selected=1";} ?>>on last possible attempt only</option>
      </select></span><BR class=form>
 
 <?php

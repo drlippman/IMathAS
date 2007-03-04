@@ -127,7 +127,7 @@
 			} else if (isset($_GET['quoteq'])) {
 				require("../assessment/displayq2.php");
 				$parts = explode('-',$_GET['quoteq']);
-				$message = displayq($parts[0],$parts[1],$parts[2],false,true);
+				$message = displayq($parts[0],$parts[1],$parts[2],false,0,true);
 				$message = preg_replace('/(`[^`]*`)/',"<span class=\"AM\">$1</span>",$message);
 				$message = forcefiltergraph($message);
 				$message = '<p> </p><br/><hr/>'.$message;

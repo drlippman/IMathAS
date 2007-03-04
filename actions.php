@@ -50,8 +50,8 @@
 			$headers  = 'MIME-Version: 1.0' . "\r\n";
 			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 			$headers .= "From: $sendfrom\r\n";
-			$message  = "<h4>This is an automated message from IMathAS.  Do not respond to this email</h4>\r\n";
-			$message .= "<p>To complete your IMathAS registration, please click on the following link, or copy ";
+			$message  = "<h4>This is an automated message from $installname.  Do not respond to this email</h4>\r\n";
+			$message .= "<p>To complete your $installname registration, please click on the following link, or copy ";
 			$message .= "and paste it into your webbrowser:</p>\r\n";
 			$message .= "<a href=\"http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=confirm&id=$id\">";
 			$message .= "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=confirm&id=$id</a>\r\n";
@@ -97,7 +97,7 @@
 				$headers  = 'MIME-Version: 1.0' . "\r\n";
 				$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 				$headers .= "From: $sendfrom\r\n";
-				$message  = "<h4>This is an automated message from WAMAP.  Do not respond to this email</h4>\r\n";
+				$message  = "<h4>This is an automated message from $installname.  Do not respond to this email</h4>\r\n";
 				$message .= "<p>Your username was entered in the Reset Password page.  If you did not do this, you may ignore and delete this message. ";
 				$message .= "If you did request a password reset, click the link below, or copy and paste it into your browser's address bar.  Your ";
 				$message .= "password will then be reset to: password.</p>";

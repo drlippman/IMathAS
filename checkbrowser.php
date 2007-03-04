@@ -7,12 +7,12 @@
 	
 ?>
 
-<h2>WAMAP Browser Check</h2>
-<p>WAMAP requires JavaScript.  Visual Math and Graph display is supported both through image-based display,
+<h2><?php echo $installname;?> Browser Check</h2>
+<p><?php echo $installname;?> requires JavaScript.  Visual Math and Graph display is supported both through image-based display,
 which requires no setup, or browser-based display.  Browser-based display is faster, more accurate, and prettier
 than image-based display.  The rest of this page will guide you through setting up browser-based Math and Graph display.</p>
 
-<p>For browser-based Math and Graph display, IMathAS recommends:<br/>
+<p>For browser-based Math and Graph display, <?php echo $installname;?> recommends:<br/>
 Windows: Internet Explorer 6 or higher + MathPlayer + AdobeSVG, or <a href="http://www.mozilla.com/firefox/">FireFox 1.5 or higher</a><br/>
 Mac: <a href="http://www.mozilla.com/firefox/">FireFox 1.5 or higher</a> or <a href="http://www.caminobrowser.org/">Camino</a></p>
 <p>The rest of this page will guide you through setting up browser-based Math and Graph display.</p>

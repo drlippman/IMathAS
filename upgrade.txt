@@ -4,11 +4,18 @@ Upgrade Notes
 ** IMathAS 1.2     **
 *********************
 
+*** Config.php Changes ***
+
+$installname = "Your install name";
+
 *** Database Changes ***
 Required changes.
 
 ALTER TABLE `imas_assessments` ADD `showcat` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0';
 ALTER TABLE `imas_assessments` ADD `isgroup` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0';
+
+ALTER TABLE `imas_assessments` CHANGE `defpenalty` `defpenalty` VARCHAR( 6 ) NOT NULL DEFAULT '0';
+ALTER TABLE `imas_questions` CHANGE `penalty` `penalty` VARCHAR( 6 ) NOT NULL DEFAULT '9999';
 
 
 *********************

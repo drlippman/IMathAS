@@ -9,7 +9,10 @@
   $dbname = "imas";
   $dbusername = "imasuser";
   $dbpassword = "K87zpaxAUtcCd62B";
-
+  
+  //The name for this installation.  For personalization
+  $installname = "IMathAS";
+  
     //For new user, long description of username requirement
   $longloginprompt = "Enter a username.  Use only numbers, letters, or the _ character.";
   

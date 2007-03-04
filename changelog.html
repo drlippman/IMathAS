@@ -9,91 +9,13 @@
 <li>Might be problems if server is set for GMT (no DST)</li>
 </ul>
 
-<h3>Planned For Future Versions</h3>
-<ul>
-<li>New questions review process?</li>
-<li>Javascript answer entry editor</li>
-<li>add "false" to NaN check;  surpress output of divide by zero on testpoints</li>
-<li>User customization of colors, fonts</li>
-<li>Adjust DST issue for timeshift, or add time shift to timeshift</li>
-<li>Add default tolerance option to assessment settings</li>
-<li>Java applet drawing answer entry</li>
-<li>numlist type, or add list support to number type?</li>
-<li>new question testing -- add debugs</li>
-<li>JavaScript question writing guider</li>
-<li>PG/MathQTI/TestGen question importer (when possible)</li>
-<li>cleaner delete question when question is being used</li>
-<li>way in future: AJAX searches / libtree / page reordering to reduce amount reloaded</li>
-<li>JavaScript improvement: lib import/export checking system, DOM innerHTMLs</li>
-</ul>
-
-</h3>Planned for Next Version</h3>
-<ul>
-Important
-<li>Improve mass change dates page (add all items, filter by type, etc - doable but will take awhile)</li>
-<li>Lockdown course on assessment option (easy if lockdown on course, harder if pulling lockdown from assessments (needed for accomodating exceptions))</li>
-<li>Multipart question; submit one part at a time (needs some majorish changes, will only make sense for one-by-one or skip-around)</li>
- specify in question code, or in question settings?
- approach 1: add the same question to $questions multiple times
-    each part retains own attempts/score
-    has to be condensed to 1 in questions list/gradebook/etc.
- approach 2: do ~ list in attempts to match up with scores
-    have to change showtest to reshow same question on submit of first part
-      
- similar question needs to clear all parts (?)
- reattempts should only affect one part / penalty should be per-part
- showanswers should be per-part
- 
-<li>Written assignments / way to grade essay questions (fairly easy but need some time)</li>
-
-
-<li><b>Gradebook</b></li>
-<li>GPA, edittable and from lookup (need separate way to store GPA, fill stored from lookup when switched)</li>
-
-<li><b>Options</b></li>
-<li>Forum links to internal messaging when allowed (for students)</li>
-<li>Course default Color control (do-able - need to integrate with block color defaults)</li>
-<li>Block colors:  type number (add text boxes, use new colorpicker)</li>
-<li>Ignore case on equation variables (need $variable for it - has to be passed to clientside) </li>
-<li>Add dates/time (instructions?) to mass chg assessment (should be easy - don't need if change dates is done right)</li>
-
-<li><b>Cleanup</b></li>
-<li>finish delete forum post option (error on remove first in thread?) (need to track if child exists, etc)</li>
-<li>fix old user delete to remove more than just userid (NEED to do - simple but messy)</li>
-<li>Rework displayq to pull out multipart options before passing to evaluators (easy, but will take a while)</li>
-
-<li><b>New Features</b></li>
-<li>Student email list (need to add student privacy settings first)</li>
-<li>Copy/Template libraries with structure assessment questions into new location (just messy to implement)</li>
-
-Don’t list potential questions if already added (option?) (find room for the option)
-Listing questions for assessment – have option to list the libraries of the questions that have already been added. (need to find room for it)
-Have practice-first option on assessments. (option for toggling to review mode)
-hints system
-Move action by preview on manageqset (easy)
-
-List questions once when in multiple libraries searched
-Total & % column in GB on left?
-new item flag
-
-
-
-Maybe not / Wait
-Test without saving:  Test, Save, Save As.. (need temp table.. I don't like this idea)
-<li>collapse gradebook by blocks (no easy way to do this)</li>
-<li>Gradebook stats for students (no easy way to do this given current framework)</li>
-<li>file attachements in posts (probably not needed)</li>
-<li>calendar (lots and lots of work - David M on it)</li>
-<li>Image upload in editor (hard to track files so deleted when removed from item)</li>
-Default library for course? (add to courses table, pull if library not specified.  Tricker to add to course settings page)
-Uniform user experience (major re-visioning of user interface needed)
-Tooltips for help (how to do?  David M going to help)
-<li>New items flag for blocks? (can't do without tracking views)</li>
-
 
 </ul>
 <h3>Version 1.2</h3>
 <ul>
+<li>Added support for hints in assessments</li>
+<li>Added ability to being missed attempt penalty after N free attempts</li>
+<li>Added $installname to config.php</li>
 <li>Bug Fix: a couple display issues with image display with ansprompt and ne</li>
 <li>Per assessment groups</li>
 <li>Copy gradebook scheme and course settings in copy items</li>

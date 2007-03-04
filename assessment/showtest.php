@@ -640,7 +640,7 @@
 				echo "<form method=post action=\"showtest.php?action=shownext&score=$toshow\" onsubmit=\"return doonsubmit(this)\">\n";
 				list($qsetid,$cat) = getqsetid($questions[$toshow]);
 				if ($showansduring && $attempts[$toshow]>=$testsettings['showans']) {$showa = true;} else {$showa=false;}
-				displayq($toshow,$qsetid,$seeds[$toshow],$showa,false,(($testsettings['shuffle']&8)==8));
+				displayq($toshow,$qsetid,$seeds[$toshow],$showa,$attempts[$toshow],false,(($testsettings['shuffle']&8)==8));
 				echo "<div class=review>Points possible: " . getpointspossible($questions[$toshow],$testsettings['defpoints']);
 				$allowed = getallowedattempts($questions[$toshow],$testsettings['defattempts']);
 				if ($allowed==0) {
@@ -734,7 +734,7 @@
 					echo "<a name=\"beginquestions\"></a>\n";
 					list($qsetid,$cat) = getqsetid($questions[$next]);
 					if ($showansduring && $attempts[$next]>=$testsettings['showans']) {$showa = true;} else {$showa=false;}
-					displayq($next,$qsetid,$seeds[$next],$showa,false,(($testsettings['shuffle']&8)==8));
+					displayq($next,$qsetid,$seeds[$next],$showa,$attempts[$next],false,(($testsettings['shuffle']&8)==8));
 					echo "<div class=review>Points possible: " . getpointspossible($questions[$next],$testsettings['defpoints']);
 					$allowed = getallowedattempts($questions[$next],$testsettings['defattempts']);
 					if ($allowed==0) {
@@ -820,7 +820,7 @@
 				list($qsetid,$cat) = getqsetid($questions[$i]);
 				if (unans($scores[$i])) {
 					if ($showansduring && $attempts[$i]>=$testsettings['showans']) {$showa = true;} else {$showa=false;}
-					displayq($i,$qsetid,$seeds[$i],$showa,false,(($testsettings['shuffle']&8)==8));
+					displayq($i,$qsetid,$seeds[$i],$showa,$attempts[$i],false,(($testsettings['shuffle']&8)==8));
 					echo "<div class=review>Points possible: " . getpointspossible($questions[$i],$testsettings['defpoints']);
 					if ($allowed[$i]==0) {
 						echo "<br/>Unlimited attempts";
@@ -919,7 +919,7 @@
 				echo "<form method=post action=\"showtest.php?action=shownext&score=$i\" onsubmit=\"return doonsubmit(this)\">\n";
 				list($qsetid,$cat) = getqsetid($questions[$i]);
 				if ($showansduring && $attempts[$i]>=$testsettings['showans']) {$showa = true;} else {$showa=false;}
-				displayq($i,$qsetid,$seeds[$i],$showa,false,(($testsettings['shuffle']&8)==8));
+				displayq($i,$qsetid,$seeds[$i],$showa,$attempts[$i],false,(($testsettings['shuffle']&8)==8));
 				echo "<div class=review>Points possible: " . getpointspossible($questions[$i],$testsettings['defpoints']); 
 				if ($allowed[$i]==0) {
 					echo "<br/>Unlimited attempts";
@@ -989,7 +989,7 @@
 				echo "<a name=\"beginquestions\"></a>\n";
 				list($qsetid,$cat) = getqsetid($questions[$i]);
 				if ($showansduring && $attempts[$i]>=$testsettings['showans']) {$showa = true;} else {$showa=false;}
-				displayq($i,$qsetid,$seeds[$i],$showa,false,(($testsettings['shuffle']&8)==8));
+				displayq($i,$qsetid,$seeds[$i],$showa,$attempts[$i],false,(($testsettings['shuffle']&8)==8));
 				echo "<div class=review>Points possible: " . getpointspossible($questions[$i],$testsettings['defpoints']); 
 				if ($allowed[$i]==0) {
 					echo "<br/>Unlimited attempts";
@@ -1252,29 +1252,42 @@
 		$query = "SELECT points,penalty,attempts FROM imas_questions WHERE id='$qn'";
 		$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
 		$row = mysql_fetch_row($result);
+
 		$points = $row[0];
 		if ($points == 9999) { $points = $testsettings['defpoints'];}
 		$penalty = $row[1];
 		$lastonly = $false;
+		$skipsome = 0;
 		if ($penalty{0}==='L') {
 			$lastonly = true;
 			$penalty = substr($penalty,1);
+		} else if ($penalty{0}==='S') {
+			$skipsome = $penalty{1};
+			$penalty = substr($penalty,2);
 		}
 		if ($penalty == 9999) { 
 			$penalty = $testsettings['defpenalty'];
 			if ($penalty{0}==='L') {
 				$lastonly = true;
 				$penalty = substr($penalty,1);
+			} else if ($penalty{0}==='S') {
+				$skipsome = $penalty{1};
+				$penalty = substr($penalty,2);
 			}
 		}
 		if ($row[2]==9999) {
 			$row[2] = $testsettings['defattempts'];
 		}
-		
+
 		if ($lastonly && $row[2]>0 && $attempts+1<$row[2]) {
 			$penalty = 0;
 		} else if ($lastonly && $row[2]>0) {
 			$attempts = 1;
+		} else if ($skipsome>0) {
+			$attempts = $attempts - $skipsome;
+			if ($attempts<0) {
+				$attempts = 0;
+			}
 		}
 		if ($lastonly && $row[2]==1) { //no penalty if only one attempt is allowed!
 			$penalty = 0;

@@ -562,7 +562,7 @@
 		for ($i=0; $i<count($questions);$i++) {
 			list($qsetid,$cat) = getqsetid($questions[$i]);
 			if ($isteacher || ($testtype=="Practice" && $showans!="N") || ($testtype!="Practice" && (($showans=="I"  && !in_array(-1,$scores))|| ($showans!="N" && time()>$saenddate)))) {$showa=true;} else {$showa=false;}
-			displayq($i,$qsetid,$seeds[$i],$showa);
+			displayq($i,$qsetid,$seeds[$i],$showa,$attempts[$i]);
 			
 			if ($scores[$i]==-1) { $scores[$i]="NA";} else {$total+=getpts($scores[$i]);}
 			echo "<div class=review>Question ".($i+1).": ";
