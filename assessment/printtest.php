@@ -6,7 +6,7 @@
 	}
 	include("displayq2.php");
 	require("header.php");
-	echo "<style type=\"text/css\">p.tips {	display: none;}\n input.btn {display: none;}\n</style>\n";
+	echo "<style type=\"text/css\">p.tips {	display: none;}\n input.btn {display: none;}\n textarea {display: none;}\n</style>\n";
 	
 	function unans($sc) {
 		if (strpos($sc,'~')===false) {

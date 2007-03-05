@@ -275,6 +275,7 @@
 		$allowregen = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework");
 		$showeachscore = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="AsGo" || $testsettings['testtype']=="Homework");
 		$showansduring = (($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework") && $testsettings['showans']!='N');
+		$showansafterlast = ($testsettings['showans']==='F');
 		$noindivscores = ($noindivscores || $testsettings['testtype']=="NoScores");
 		
 		
@@ -696,6 +697,7 @@
 				
 				echo "<div class=inset>\n";
 				echo "<a name=\"beginquestions\"></a>\n";
+				$reattemptsremain = false;
 				if ($showeachscore) {
 					$possible = getpointspossible($questions[$qn],$testsettings['defpoints']);
 					echo "<p>Score on last attempt: ";
@@ -710,6 +712,7 @@
 					if ($attempts[$qn]<$allowed || $allowed==0) {
 						if (getpts($scores[$qn])<getremainingpossible($questions[$qn],$testsettings,$attempts[$qn])) {
 							echo "<p><a href=\"showtest.php?action=skip&to=$qn&reattempt=$qn\">Reattempt last question</a></p>\n";
+							$reattemptsremain = true;
 						} 
 					}
 				}
@@ -717,7 +720,14 @@
 					echo "<p><a href=\"showtest.php?action=skip&to=$qn&regen=$qn\">Try another similar question</a></p>\n";
 				}
 				if ($lefttodo > 0) {
-					echo "Question scored.  <b>Select another question</b>";
+					echo "<p>Question scored.  <b>Select another question</b></p>";
+					if ($reattemptsremain == false && $showeachscore) {
+						echo "<p>This question, with your last answer";
+						if ($showansafterlast) {
+							echo " and correct answer";
+						}
+						echo ", can be viewed by clicking on the question number again.</p>";
+					}
 					echo "<p>or click <a href=\"showtest.php?action=skip&done=true\">here</a> to end and score test now</p>\n";
 				} else {
 					echo "<a href=\"showtest.php?action=skip&done=true\">Click here to finalize and score test</a>\n";
@@ -753,6 +763,7 @@
 					echo "<div class=inset>\n";
 					echo "<a name=\"beginquestions\"></a>\n";
 					echo "You've already done this problem.\n";
+					$reattemptsremain = false;
 					if ($showeachscore) {
 						$possible = getpointspossible($questions[$next],$testsettings['defpoints']);
 						echo "<p>Score on last attempt: ";
@@ -767,6 +778,7 @@
 						if ($attempts[$next]<$allowed || $allowed==0) {
 							if (getpts($scores[$next])<getremainingpossible($questions[$next],$testsettings,$attempts[$next])) {
 								echo "<p><a href=\"showtest.php?action=skip&to=$next&reattempt=$next\">Reattempt this question</a></p>\n";
+								$reattemptsremain = true;
 							} 
 						}
 					}
@@ -775,6 +787,12 @@
 					}
 					if ($lefttodo == 0) {
 						echo "<a href=\"showtest.php?action=skip&done=true\">Click here to finalize and score test</a>\n";
+					}
+					if (!$reattemptsremain && $showeachscore) {
+						echo "<p>Question with last attempt is displayed for your review only</p>";
+						$showa = false;
+						list($qsetid,$cat) = getqsetid($questions[$next]);
+						displayq($next,$qsetid,$seeds[$next],$showansafterlast,$attempts[$next],false,false);
 					}
 					echo "</div>\n";
 				}

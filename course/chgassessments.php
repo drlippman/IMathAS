@@ -51,8 +51,10 @@
 				$turnoffshuffle +=8;
 			}
 		}
-		if ($_POST['lastpenalty']==1) {
+		if ($_POST['skippenalty']==10) {
 			$_POST['defpenalty'] = 'L'.$_POST['defpenalty'];
+		} else if ($_POST['skippenalty']>0) {
+			$_POST['defpenalty'] = 'S'.$_POST['skippenalty'].$_POST['defpenalty'];
 		}
 		if ($_POST['deffeedback']=="Practice" || $_POST['deffeedback']=="Homework") {
 			$deffeedback = $_POST['deffeedback'].'-'.$_POST['showansprac'];
@@ -123,7 +125,7 @@
 		//$line['deffeedback'] = "AsGo";
 		$testtype = "AsGo";
 		$showans = "A";
-		$lastpenalty = false;
+		$skippenalty = 0;
 		$line['defpenalty'] = 10;
 		$line['shuffle'] = 0;
 	}
@@ -201,9 +203,15 @@ Check/Uncheck All: <input type="checkbox" name="ca" value="1" onClick="chkAll(th
 
 
 <tr><td><input type="checkbox" name="chgdefpenalty"/></td><td class="r">Default penalty:</td><td><input type=text size=4 name=defpenalty value="<?php echo $line['defpenalty'];?>" <?php if ($taken) {echo 'disabled=disabled';}?>>% 
-   <select name="lastpenalty" <?php if ($taken) {echo 'disabled=disabled';}?>>
-     <option value="0" <?php if (!$lastpenalty) {echo "selected=1";} ?>>per missed attempt</option>
-     <option value="1" <?php if ($lastpenalty) {echo "selected=1";} ?>>on last possible attempt only</option>
+   <select name="skippenalty" <?php if ($taken) {echo 'disabled=disabled';}?>>
+     <option value="0" <?php if ($skippenalty==0) {echo "selected=1";} ?>>per missed attempt</option>
+     <option value="1" <?php if ($skippenalty==1) {echo "selected=1";} ?>>per missed attempt, after 1</option>
+     <option value="2" <?php if ($skippenalty==2) {echo "selected=1";} ?>>per missed attempt, after 2</option>
+     <option value="3" <?php if ($skippenalty==3) {echo "selected=1";} ?>>per missed attempt, after 3</option>
+     <option value="4" <?php if ($skippenalty==4) {echo "selected=1";} ?>>per missed attempt, after 4</option>
+     <option value="5" <?php if ($skippenalty==5) {echo "selected=1";} ?>>per missed attempt, after 5</option>
+     <option value="6" <?php if ($skippenalty==6) {echo "selected=1";} ?>>per missed attempt, after 6</option>
+     <option value="10" <?php if ($skippenalty==10) {echo "selected=1";} ?>>on last possible attempt only</option>
      </select></td></tr>
 
 
@@ -232,6 +240,7 @@ Check/Uncheck All: <input type="checkbox" name="ca" value="1" onClick="chkAll(th
 <select name="showans">
 	<option value="N" <?php if ($showans=="N") {echo "SELECTED";} ?>>Never</option>
 	<option value="I" <?php if ($showans=="I") {echo "SELECTED";} ?>>Immediately (in gradebook) - don't use if allowing multiple attempts per problem</option>
+	<option value="F" <?php if ($showans=="F") {echo "SELECTED";} ?>>After last attempt (Skip Around only)</option>
 	<option value="A" <?php if ($showans=="A") {echo "SELECTED";} ?>>After due date (in gradebook)</option>
 </select>
 </span>
