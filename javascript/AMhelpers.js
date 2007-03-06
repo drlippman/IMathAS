@@ -266,15 +266,17 @@ var vlist = new Array();
 var pts = new Array();
 var iseqn = new Array();
 
-function doonsubmit(form,type2) {
+function doonsubmit(form,type2,skipconfirm) {
 	if (form!=null) {
-		if (type2) {
-			var reallysubmit = confirmSubmit2(form);
-		} else {
-			var reallysubmit = confirmSubmit(form);
-		}
-		if (!reallysubmit) {
-			return false;
+		if (!skipconfirm) {
+			if (type2) {
+				var reallysubmit = confirmSubmit2(form);
+			} else {
+				var reallysubmit = confirmSubmit(form);
+			}
+			if (!reallysubmit) {
+				return false;
+			}
 		}
 	}
 	for (var i=0; i<calctoproc.length; i++) {

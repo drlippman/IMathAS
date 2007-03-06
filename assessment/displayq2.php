@@ -19,6 +19,11 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$attemptn) {
 	} else {
 		$clearla = false;
 	}
+	if (func_num_args()>7 && func_get_arg(7)==true) {
+		$seqinactive = true;
+	} else {
+		$seqinactive = false;
+	}
 	
 	$query = "SELECT qtype,control,qcontrol,qtext,answer,hasimg FROM imas_questionset WHERE id='$qidx'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -125,6 +130,10 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$attemptn) {
 	eval("\$evaledqtext = \"$toevalqtxt\";");
 	if ($returnqtxt) {
 		$returntxt = $evaledqtext;
+	} if ($seqinactive) {
+		echo "<div>";
+		//$evaledqtext = str_replace('<input','<input disabled="disabled"',$evaledqtext);
+		echo filter($evaledqtext);
 	} else {
 		echo "<div class=question><div>\n";
 		echo filter($evaledqtext);
@@ -134,6 +143,9 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$attemptn) {
 	if (strpos($toevalqtxt,'$answerbox')===false) {
 		if (is_array($answerbox)) {
 			foreach($answerbox as $iidx=>$abox) {
+				if ($seqinactive) {
+					//$abox = str_replace('<input','<input disabled="disabled"',$abox);
+				}
 				if ($returnqtxt) {
 					//$returntxt .= "<p>$abox</p>";
 				} else {
@@ -142,6 +154,9 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$attemptn) {
 				}
 			}
 		} else {  //one question only
+			if ($seqinactive) {
+				//$answerbox = str_replace('<input','<input disabled="disabled"',$answerbox);
+			}
 			if ($returnqtxt) {
 				//$returntxt .= "<p>$answerbox</p>";
 			} else {
@@ -156,7 +171,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$attemptn) {
 	}
 	echo "<div>";
 	foreach($tips as $iidx=>$tip) {
-		if (!isset($hidetips)) {
+		if (!isset($hidetips) && !$seqinactive) {
 			echo "<p class=\"tips\">Box ".($iidx+1).": $tip</p>";
 		}
 		if ($doshowans && (!isset($showanswer) || (is_array($showanswer) && !isset($showanswer[$iidx]))) && $shans[$iidx]!=='') {

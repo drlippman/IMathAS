@@ -18,15 +18,21 @@ if (!isset($sessiondata['mathdisp'])) {
 }
 if ($sessiondata['mathdisp']==1) {
 	echo "<script src=\"$imasroot/javascript/ASCIIMathML.js\" type=\"text/javascript\"></script>\n";
+	echo "<script type=\"text/javascript\">var usingASCIIMath = true;</script>";
 } else if ($sessiondata['mathdisp']==2 && isset($useeditor) && $sessiondata['useed']==1) {
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>'; 
 	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg.js\" type=\"text/javascript\"></script>\n";
+	echo "<script type=\"text/javascript\">var usingASCIIMath = false;</script>";
+} else {
+	echo "<script type=\"text/javascript\">var usingASCIIMath = false;</script>";
 }
 if ($sessiondata['graphdisp']==1) {
 	echo "<script src=\"$imasroot/javascript/ASCIIsvg.js\" type=\"text/javascript\"></script>\n";
+	echo "<script type=\"text/javascript\">var usingASCIISvg = true;</script>";
 	echo "<script src=\"$imasroot/course/editor/plugins/AsciiSvg/ASCIIsvgAddon.js\" type=\"text/javascript\"></script>\n";
 } else if (isset($sessiondata['graphdisp'])) {
 	echo "<script src=\"$imasroot/javascript/mathjs.js\" type=\"text/javascript\"></script>\n";
+	echo "<script type=\"text/javascript\">var usingASCIISvg = false;</script>";
 }
 
 $start_time = microtime(true); 

@@ -24,7 +24,7 @@ div.question {
 	border: 1px solid #00f; 
 	margin-top: 0px;
 	margin-bottom: 5px;
-	width: 100%;
+	width: 99%;
 }
 
 div.review {
@@ -32,7 +32,7 @@ div.review {
 	border: 1px solid #00f;
 	margin-top: -4px;
 	margin-bottom: 20px;
-	width: 100%;
+	width: 99%;
 }
 
 div.intro {

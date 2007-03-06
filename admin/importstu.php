@@ -46,6 +46,8 @@
 						$pw = md5(substr($arr[0],-4));
 					} else if ($_POST['pwtype']==2) {
 						$pw = md5($_POST['defpw']);
+					} else if ($_POST['pwtype']==3) {
+						$pw = md5($arr[6]);
 					}
 				}
 				$query = "INSERT INTO imas_users (SID,FirstName,LastName,email,rights,password) VALUES ('$arr[0]','$arr[1]','$arr[2]','$arr[3]',10,'$pw')";
@@ -137,7 +139,12 @@
 		} else {
 			$sec = 0;
 		}
-		return array($un,$fn,$ln,$email,$code,$sec);
+		if ($_POST['pwtype']==3) {
+			$pw = $data[$_POST['pwcol']-1];
+		} else {
+			$pw = 0;
+		}
+		return array($un,$fn,$ln,$email,$code,$sec,$pw);
 	}
 	
 	
@@ -238,6 +245,7 @@
 <span class=form>Set password to:</span>
 <span class=formright><input type=radio name=pwtype value="0">First 4 characters of username<br/>
 	<input type=radio name=pwtype value="1" CHECKED>Last 4 characters of username<br/>
+	<input type=radio name=pwtype value="3">Use value in column <input type=text name="pwcol" size=4 value="1"/><br/>
 	<input type=radio name=pwtype value="2">Set to: <input type=text name="defpw" value="password"/></span><br class=form>
 
 <span class=form>Assign code number?</span>

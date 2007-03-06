@@ -370,6 +370,7 @@ at <input type=text size=10 name=rtime value="<?php echo $rtime;?>"></span><BR c
 <span class=form>Display method: </span><span class=formright><select name="displaymethod">
 	<option value="AllAtOnce" <?php if ($line['displaymethod']=="AllAtOnce") {echo "SELECTED";} ?>>Full test at once</option>
 	<option value="OneByOne" <?php if ($line['displaymethod']=="OneByOne") {echo "SELECTED";} ?>>One question at a time</option>
+	<option value="Seq" <?php if ($line['displaymethod']=="Seq") {echo "SELECTED";} ?>>Full test, submit one at time</option>
 	<option value="SkipAround" <?php if ($line['displaymethod']=="SkipAround") {echo "SELECTED";} ?>>Skip Around</option>
 </select></span><BR class=form>
 
