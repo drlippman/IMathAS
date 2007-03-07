@@ -205,8 +205,12 @@
 						echo "style=\"background-color:$bicolor;\"";
 					}
 					echo "id=\"block{$items[$i]['id']}\">";
-					showitems($items[$i]['items'],$parent.'-'.$bnum);
-					if (isset($teacherid)) {echo generateadditem($parent.'-'.$bnum);}
+					if ($isopen) {
+						showitems($items[$i]['items'],$parent.'-'.$bnum);
+						if (isset($teacherid)) {echo generateadditem($parent.'-'.$bnum);}
+					} else {
+						echo "Loading content...";
+					}
 					echo "</div>";
 				}
 			} else if (isset($teacherid) || $items[$i]['SH'][0]=='S') { //if "unavailable"
@@ -278,8 +282,12 @@
 						echo "style=\"background-color:$bicolor;\"";
 					}
 					echo "id=\"block{$items[$i]['id']}\">";
-					showitems($items[$i]['items'],$parent.'-'.$bnum);
-					if (isset($teacherid)) {echo generateadditem($parent.'-'.$bnum);}
+					if ($isopen) {
+						showitems($items[$i]['items'],$parent.'-'.$bnum);
+						if (isset($teacherid)) {echo generateadditem($parent.'-'.$bnum);}
+					} else {
+						echo "Loading content...";
+					}
 					echo "</div>";	
 				}
 			}

@@ -26,6 +26,13 @@ div.question {
 	margin-bottom: 5px;
 	width: 99%;
 }
+div.todoquestion {
+	background-color: #eee; 
+	border: 1px solid #aaa; 
+	margin-top: 0px;
+	margin-bottom: 5px;
+	width: 99%;
+}
 
 div.review {
 	background-color: #efe;

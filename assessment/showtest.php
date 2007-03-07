@@ -861,19 +861,23 @@
 					echo "<p><a href=\"showtest.php?action=seq&to=$qn&regen=$qn\">Try another similar question</a></p>\n";
 				}
 				unset($toshow);
-				for ($i=$qn+1;$i<count($questions);$i++) {
-					if (unans($scores[$i])) {
-						$toshow=$i;
-						$done = false;
-						break;
-					}
-				}
-				if (!isset($toshow)) {
-					for ($i=0;$i<$qn;$i++) {
+				if ($reattemptsremain) {
+					$toshow = $qn;
+				} else {
+					for ($i=$qn+1;$i<count($questions);$i++) {
 						if (unans($scores[$i])) {
 							$toshow=$i;
 							$done = false;
 							break;
+						}
+					}
+					if (!isset($toshow)) {
+						for ($i=0;$i<$qn;$i++) {
+							if (unans($scores[$i])) {
+								$toshow=$i;
+								$done = false;
+								break;
+							}
 						}
 					}
 				}
@@ -905,19 +909,28 @@
 				//echo "<div class=intro>{$testsettings['intro']}</div>\n";
 				echo filter("<div id=intro class=hidden>{$testsettings['intro']}</div>\n");
 				
-				echo "<form method=post action=\"showtest.php?action=seq&score=$toshow\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
+				echo "<form method=post action=\"showtest.php?action=seq&score=$toshow#qanc$toshow\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
 				for ($i = 0; $i < count($questions); $i++) {
 					list($qsetid,$cat) = getqsetid($questions[$i]);
 					
 					if ($showansduring && $attempts[$i]>=$testsettings['showans']) {$showa = true;} else {$showa=false;}
 					$allowed = getallowedattempts($questions[$i],$testsettings['defattempts']);
+					$reattemptsremain = false;
+					if ($attempts[$i]<$allowed || $allowed==0) {
+						if (getpts($scores[$i])<getremainingpossible($questions[$i],$testsettings,$attempts[$i])) {
+							$reattemptsremain = true;
+						} 
+					}
+					$qavail = false;
 					if ($i==$toshow) {
 						echo "<span class=current>Question ".($i+1).".</span>  ";
 					} else {
 						if (unans($scores[$i])) {
 							echo "<a href=\"showtest.php?action=seq&to=$i\">Question ". ($i+1) . "</a>.  ";
-						} else if ($attempts[$i]<$allowed) {
+							$qavail = true;
+						} else if ($attempts[$i]<$allowed && $reattemptsremain) {
 							echo "<span class=done><a href=\"showtest.php?action=seq&to=$i\">Question ". ($i+1) . "</a></span>.  ";
+							$qavail = true;
 						} else {
 							echo "<span class=done>Question ". ($i+1) . "</span>.  ";
 						}
@@ -940,21 +953,26 @@
 						echo "  Category: $cat.";
 					}
 					
-					$reattemptsremain = false;
-					if ($attempts[$i]<$allowed || $allowed==0) {
-						if (getpts($scores[$i])<getremainingpossible($questions[$i],$testsettings,$attempts[$i])) {
-							$reattemptsremain = true;
-						} 
-					}
+					
 					if ($reattemptsremain) {
-						displayq($i,$qsetid,$seeds[$i],$showa,$attempts[$i],false,(($testsettings['shuffle']&8)==8),($i!=$toshow));
+						$doshowa = $showa;
 					} else {
-						displayq($i,$qsetid,$seeds[$i],($showansafterlast && $showeachscore),$attempts[$i],false,(($testsettings['shuffle']&8)==8),($i!=$toshow));
+						$doshowa = ($showansafterlast && $showeachscore);
+					}
+					if ($i==$toshow) {
+						displayq($i,$qsetid,$seeds[$i],$doshowa,$attempts[$i],false,(($testsettings['shuffle']&8)==8),false);
+					} else if ($qavail) {
+						echo "<div class=todoquestion>";
+						displayq($i,$qsetid,$seeds[$i],$doshowa,$attempts[$i],false,(($testsettings['shuffle']&8)==8),true);
+						echo "</div>";
+					} else {
+						displayq($i,$qsetid,$seeds[$i],$doshowa,$attempts[$i],false,(($testsettings['shuffle']&8)==8),true);
 					}
 					
 					if ($i==$toshow) {
-						echo "<div><input type=submit class=btn value=Submit></div><p></p>\n";
+						echo "<div><input type=submit class=btn value=\"Submit Question ".($i+1)."\"></div><p></p>\n";
 					}
+					echo "<hr/>";
 				}
 				
 			}
@@ -965,12 +983,14 @@
 		$ptsearned = 0;
 		$perfectscore = false;
 		for ($j=0; $j<count($questions);$j++) {
+			$canimproveq[$j] = false;
 			$ptsearned += getpts($scores[$j]);
 			$allowed[$j] = getallowedattempts($questions[$j],$testsettings['defattempts']);
 			if ($attempts[$j]<$allowed[$j] || $allowed[$j]==0) {
 				$moreattempts = true;
 				if (getpts($scores[$j])<getremainingpossible($questions[$j],$testsettings,$attempts[$j])) {
-					$canimprove = true;	
+					$canimprove = true;
+					$canimproveq[$j] = true;
 				}
 			}
 
@@ -1176,7 +1196,7 @@
 			}
 		} else if ($testsettings['displaymethod'] == "Seq") {
 			for ($i = 0; $i<count($questions);$i++) {
-				if (unans($scores[$i])) {
+				if ($canimproveq[$i]) {
 					break;
 				}
 			}
@@ -1220,16 +1240,27 @@
 					list($qsetid,$cat) = getqsetid($questions[$i]);
 					
 					if ($showansduring && $attempts[$i]>=$testsettings['showans']) {$showa = true;} else {$showa=false;}
+					$qavail = false;
 					if ($i==$curq) {
 						echo "<span class=current>Question ".($i+1).".</span>  ";
 					} else {
 						if (unans($scores[$i])) {
 							echo "<a href=\"showtest.php?action=seq&to=$i\">Question ". ($i+1) . "</a>.  ";
-						} else {
+							$qavail = true;
+						} else if ($attempts[$i]<$allowed[$i] && $canimproveq[$i]) {
 							echo "<span class=done><a href=\"showtest.php?action=seq&to=$i\">Question ". ($i+1) . "</a></span>.  ";
+							$qavail = true;
+						} else {
+							echo "<span class=done>Question ". ($i+1) . "</span>.  ";
 						}
 					}
-					echo "Points possible: " . getpointspossible($questions[$i],$testsettings['defpoints']);
+					if ($showeachscore) {
+						$pts = getpts($bestscores[$i]);
+						if ($pts<0) { $pts = 0;}
+						echo "Points: $pts out of " . getpointspossible($questions[$i],$testsettings['defpoints']) . " possible";
+					} else {
+						echo "Points possible: ". getpointspossible($questions[$i],$testsettings['defpoints']);
+					}
 					if ($allowed[$i]==0) {
 						echo ".  Unlimited attempts";
 					} else {
@@ -1238,11 +1269,25 @@
 					if ($testsettings['showcat']>0 && $cat!='0') {
 						echo "  Category: $cat.";
 					}
-					displayq($i,$qsetid,$seeds[$i],$showa,$attempts[$i],false,(($testsettings['shuffle']&8)==8),($i!=$curq));
 					
-					if ($i==$curq) {
-						echo "<div><input type=submit class=btn value=Submit></div><p></p>\n";
+					if ($canimproveq[$i]) {
+						$doshowa = $showa;
+					} else {
+						$doshowa = ($showansafterlast && $showeachscore);
 					}
+					if ($i==$curq) {
+						displayq($i,$qsetid,$seeds[$i],$doshowa,$attempts[$i],false,(($testsettings['shuffle']&8)==8),false);
+					} else if ($qavail) {
+						echo "<div class=todoquestion>";
+						displayq($i,$qsetid,$seeds[$i],$doshowa,$attempts[$i],false,(($testsettings['shuffle']&8)==8),true);
+						echo "</div>";
+					} else {
+						displayq($i,$qsetid,$seeds[$i],$doshowa,$attempts[$i],false,(($testsettings['shuffle']&8)==8),true);
+					}
+					if ($i==$curq) {
+						echo "<div><input type=submit class=btn value=\"Submit Question ".($i+1)."\"></div><p></p>\n";
+					}
+					echo "<hr/>";
 				}
 			}
 		}
