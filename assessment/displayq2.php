@@ -36,6 +36,17 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$attemptn) {
 			${$row[0]} = "<img src=\"$imasroot/assessment/qimages/{$row[1]}\" alt=\"{$row[2]}\" />";	
 		}
 	}
+	if (isset($GLOBALS['lastanswers'])) {
+		foreach ($GLOBALS['lastanswers'] as $i=>$ar) {
+			$arv = explode('##',$ar);
+			$arv = $arv[count($arv)-1];
+			$arv = explode('&',$arv);
+			if (count($arv)==1) {
+				$arv = $arv[0];
+			}
+			$stuanswers[$i+1] = $arv;
+		}
+	}
 	
 	eval(interpret('control',$qdata['qtype'],$qdata['control']));
 	eval(interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
@@ -204,7 +215,18 @@ function scoreq($qnidx,$qidx,$seed,$givenans) {
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$qdata = mysql_fetch_array($result, MYSQL_ASSOC);
 
-
+	if (isset($GLOBALS['lastanswers'])) {
+		foreach ($GLOBALS['lastanswers'] as $i=>$ar) {
+			$arv = explode('##',$ar);
+			$arv = $arv[count($arv)-1];
+			$arv = explode('&',$arv);
+			if (count($arv)==1) {
+				$arv = $arv[0];
+			}
+			$stuanswers[$i+1] = $arv;
+		}
+	}
+	
 	eval(interpret('control',$qdata['qtype'],$qdata['control']));
 	srand($seed+1);
 	eval(interpret('answer',$qdata['qtype'],$qdata['answer']));

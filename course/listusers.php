@@ -219,10 +219,11 @@
 							$query = "DELETE FROM imas_forum_views WHERE threadid='{$rw2[0]}' AND userid='$uid'";
 							mysql_query($query) or die("Query failed : " . mysql_error());
 						}
-						if ($_GET['uid']=="all") {
+						if ($_GET['uid']=="all" || isset($_POST['delforumposts'])) {
 							$query = "DELETE FROM imas_forum_posts WHERE forumid='{$row[0]}' AND posttype=0";
 							mysql_query($query) or die("Query failed : " . mysql_error());
 						}
+						
 					}
 				 }
 				}
@@ -247,6 +248,11 @@
 						exit;
 					}
 					echo "Are you SURE you want to unenroll the selected students?\n";
+					$query = "SELECT COUNT(id) FROM imas_students WHERE courseid='{$_GET['cid']}'";
+					$result = mysql_query($query) or die("Query failed : " . mysql_error());
+					if (count($_POST['checked']) > floor(mysql_result($result,0,0)/2)) {
+						echo "<p>Also delete <b>ALL</b> forum posts by ALL students (not just the selected ones)? <input type=checkbox name=\"delforumposts\"/></p>";
+					}
 					echo "<input type=hidden name=\"tounenroll\" value=\"".implode(",",$_POST['checked'])."\">\n";
 				} else {
 					$query = "SELECT FirstName,LastName,SID FROM imas_users WHERE id='{$_GET['uid']}'";

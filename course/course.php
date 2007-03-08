@@ -468,7 +468,7 @@
 					}
 					if (isset($teacherid)) { 
 						echo "<br>Showing $availbeh $startdate until $enddate <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a> | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
-						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\">NewFlag</a>";
+						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>NewFlag</a>";
 					
 					}
 					echo "</div></div>";
@@ -490,7 +490,7 @@
 					}
 					if (isset($teacherid)) { 
 						echo "<br>Showing $availbeh $startdate until $enddate <a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>Isolate</a> | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a> | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
-						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\">NewFlag</a>";
+						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>NewFlag</a>";
 					}
 					
 					echo "</div>\n";
@@ -539,7 +539,7 @@
 							$curbeh = "Hidden";
 						}
 						echo "<br><i>Currently $curbeh.  Showing as Folder $startdate until $enddate</i> <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a> | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
-						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\">NewFlag</a>";
+						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>NewFlag</a>";
 					
 					}
 					
@@ -569,7 +569,7 @@
 						}
 						echo "<br><i>Currently $curbeh.  Showing $availbeh $startdate to $enddate</i> <a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>Isolate</a> | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a>";
 						echo " | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
-						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\">NewFlag</a>";
+						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>NewFlag</a>";
 					
 					}
 					echo "</div>\n";

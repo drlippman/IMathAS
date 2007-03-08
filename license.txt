@@ -1,7 +1,7 @@
 *********************************************************
 **   Internet Mathematics Assessment System (IMathAS)  ** 
-**   (c) David Lippman, 2006			       **
-**   Version 1.0beta16, Sept 28, 2006		       **
+**   (c) David Lippman, 2006, 2007		       **
+**   Version 1.1, Feb 4, 2007			       **
 *********************************************************
 
 See readme.html for installation information.
@@ -58,6 +58,11 @@ Table Sorter
 (c) www.dhtmlgoodies.com, November 2005
 Custom license, allows use (commercial/noncommercial), but
 no for-sale redistribution or repost.
+
+Color Picker
+(c) Mark Kahn
+No license specified.  Posted in web article at
+http://www.webreference.com/programming/javascript/mk/column3/index.html
 
 Viewer.class used by plot3d library
 (c) David Lippman, based on code by Evgeny Demidov, presumed public domain

@@ -220,7 +220,23 @@
 		
 	}
 	$pagetitle = "Block Settings";
+	$placeinhead = "<script type=\"text/javascript\">
+	function init() {
+		var inp1 = document.getElementById(\"titlebg\");
+		attachColorPicker(inp1);
+		var inp2 = document.getElementById(\"titletxt\");
+		attachColorPicker(inp2);
+		var inp3 = document.getElementById(\"bi\");
+		attachColorPicker(inp3);
+	}
+	var imgBase = '$imasroot/javascript/cpimages';
+	window.onload = init;
+	</script>";
+	$placeinhead .= "<style type=\"text/css\">img {	behavior:	 url(\"$imasroot/javascript/pngbehavior.htc\");}</style>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/colorpicker.js\"></script>";
+	
 	require("../header.php");
+	
 	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 	if (isset($_GET['id'])) {
 		echo "&gt; Modify Block</div>\n";
@@ -260,39 +276,17 @@ at <input type=text size=10 name=etime value="<?php echo $etime;?>"></span><BR c
 		<input type=radio name=showhide value="H" <?php if ($showhide=='H') {echo "CHECKED";}?> />Hide from Students<br/>
 		<input type=radio name=showhide value="S" <?php if ($showhide=='S') {echo "CHECKED";}?> />Show Collapsed/as folder</span><br class=form />
 
-<SCRIPT LANGUAGE="Javascript" SRC="../javascript/ColorPicker2.js"></SCRIPT>
-<SCRIPT LANGUAGE="JavaScript">
-var cp = new ColorPicker('window'); // Popup window
-var cursel = 0;
-function setcur(num) {
-	cursel = num;
-}
-function pickColor(color) {
-	if (cursel==1) {
-		document.getElementById("ex1").style.background = color;
-		document.getElementById("titlebg").value = color;
-	} else if (cursel==2) {
-		document.getElementById("ex1").style.color = color;
-		document.getElementById("titletxt").value = color;
-	} else if (cursel==3) {
-		document.getElementById("ex2").style.background = color;
-		document.getElementById("bi").value = color;
-	}
-}
-
-</script>
 
 <span class=form>Block colors:</span><span class=formright>
 		<input type=radio name=colors value="def" <?php if ($usedef==1) {echo "CHECKED";}?> />Use defaults<br/>
 		<input type=radio name=colors value="custom" <?php if ($usedef==0) {echo "CHECKED";}?> />Use custom:
 		<table style="display: inline; border-collapse: collapse;"><tr><td id="ex1" style="border: 1px solid #000;background-color:<?php echo $titlebg;?>;color:<?php echo $titletxt;?>;">
 		   Title</td></tr><tr><td id="ex2" style="border: 1px solid #000;background-color:<?php echo $bi;?>;">&nbsp;</td></tr></table>
-		<a href="#" onClick="setcur(1);cp.show('pick');return false;" name="pick" id="pick">Title Background</a>
-		<a href="#" onClick="setcur(2);cp.show('pick2');return false;" name="pick2" id="pick2">Title Text</a>
-		<a href="#" onClick="setcur(3);cp.show('pick3');return false;" name="pick3" id="pick3">Items Background</a>
-		<input type=hidden id="titlebg" name="titlebg" value="<?php echo $titlebg;?>" />
-		<input type=hidden id="titletxt" name="titletxt" value="<?php echo $titletxt;?>" />
-		<input type=hidden id="bi" name="bi" value="<?php echo $bi;?>" /><br/>
+		    <br/><table style=" margin-left: 30px;">
+		<tr><td>Title Background: </td><td><input type=text id="titlebg" name="titlebg" value="<?php echo $titlebg;?>" /></td></tr>
+		<tr><td>Title Text: </td><td><input type=text id="titletxt" name="titletxt" value="<?php echo $titletxt;?>" /></td></tr>
+		<tr><td>Items Background: </td><td><input type=text id="bi" name="bi" value="<?php echo $bi;?>" /></td></tr> </table>
+		<br/>
 		<input type=radio name=colors value="copy" <?php if ($usedef==2) {echo "CHECKED";}?> />Copy colors from block: 
 		<select name="copycolors">
 		<?php
@@ -305,7 +299,7 @@ function pickColor(color) {
 		
 		
 <div class=submit><input type=submit value=Submit></div>
-
+<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
 <?php
 	require("../footer.php");
 ?>

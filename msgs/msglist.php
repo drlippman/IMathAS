@@ -273,8 +273,8 @@ function chgfilter() {
 	<tbody>
 <?php
 	$query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_users.LastName,imas_users.FirstName,imas_msgs.isread,imas_courses.name ";
-	$query .= "FROM imas_msgs,imas_users,imas_courses WHERE imas_courses.id=imas_msgs.courseid AND ";
-	$query .= "imas_users.id=imas_msgs.msgfrom AND imas_msgs.msgto='$userid' AND (imas_msgs.isread<2 OR imas_msgs.isread>3) ";
+	$query .= "FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom LEFT JOIN imas_courses ON imas_courses.id=imas_msgs.courseid WHERE ";
+	$query .= "imas_msgs.msgto='$userid' AND (imas_msgs.isread<2 OR imas_msgs.isread>3) ";
 	if ($filtercid>0) {
 		$query .= "AND imas_msgs.courseid='$filtercid' ";
 	}
@@ -300,7 +300,13 @@ function chgfilter() {
 		if ($line['replied']==1) {
 			echo "Yes";
 		}
+		if ($line['LastName']==null) {
+			$line['LastName'] = "[Deleted]";
+		}
 		echo "</td><td>{$line['LastName']}, {$line['FirstName']}</td>";
+		if ($line['name']==null) {
+			$line['name'] = "[Deleted]";
+		}
 		echo "<td>{$line['name']}</td>";
 		$senddate = tzdate("F j, Y, g:i a",$line['senddate']);
 		echo "<td>$senddate</td></tr>";

@@ -923,13 +923,13 @@
 					}
 					$qavail = false;
 					if ($i==$toshow) {
-						echo "<span class=current>Question ".($i+1).".</span>  ";
+						echo "<span class=current><a name=\"curq\">Question</a> ".($i+1).".</span>  ";
 					} else {
 						if (unans($scores[$i])) {
-							echo "<a href=\"showtest.php?action=seq&to=$i\">Question ". ($i+1) . "</a>.  ";
+							echo "<a href=\"showtest.php?action=seq&to=$i#curq\">Question ". ($i+1) . "</a>.  ";
 							$qavail = true;
 						} else if ($attempts[$i]<$allowed && $reattemptsremain) {
-							echo "<span class=done><a href=\"showtest.php?action=seq&to=$i\">Question ". ($i+1) . "</a></span>.  ";
+							echo "<span class=done><a href=\"showtest.php?action=seq&to=$i#curq\">Question ". ($i+1) . "</a></span>.  ";
 							$qavail = true;
 						} else {
 							echo "<span class=done>Question ". ($i+1) . "</span>.  ";
@@ -1245,10 +1245,10 @@
 						echo "<span class=current>Question ".($i+1).".</span>  ";
 					} else {
 						if (unans($scores[$i])) {
-							echo "<a href=\"showtest.php?action=seq&to=$i\">Question ". ($i+1) . "</a>.  ";
+							echo "<a href=\"showtest.php?action=seq&to=$i#curq\">Question ". ($i+1) . "</a>.  ";
 							$qavail = true;
 						} else if ($attempts[$i]<$allowed[$i] && $canimproveq[$i]) {
-							echo "<span class=done><a href=\"showtest.php?action=seq&to=$i\">Question ". ($i+1) . "</a></span>.  ";
+							echo "<span class=done><a href=\"showtest.php?action=seq&to=$i#curq\">Question ". ($i+1) . "</a></span>.  ";
 							$qavail = true;
 						} else {
 							echo "<span class=done>Question ". ($i+1) . "</span>.  ";
