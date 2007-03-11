@@ -585,7 +585,9 @@
 		   }   
 	   }
    }
-   echo generateadditem($_GET['folder']);
+   if (isset($teacherid)) {
+	   echo generateadditem($_GET['folder']);
+   }
    if ($firstload) {
 	   echo "<script>document.cookie = 'openblocks-$cid=' + oblist;</script>\n";
    }

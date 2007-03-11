@@ -44,7 +44,19 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$attemptn) {
 			if (count($arv)==1) {
 				$arv = $arv[0];
 			}
-			$stuanswers[$i+1] = $arv;
+			if (is_array($arv)) {
+				foreach ($arv as $k=>$arvp) {
+					if (is_numeric($arvp)) {
+						$stuanswers[$i+1][$k] = $arvp;
+					}
+				}
+			} else {
+				if (is_numeric($arv)) {
+					$stuanswers[$i+1] = $arv;
+				}
+			}
+				
+			
 		}
 	}
 	
@@ -223,10 +235,35 @@ function scoreq($qnidx,$qidx,$seed,$givenans) {
 			if (count($arv)==1) {
 				$arv = $arv[0];
 			}
-			$stuanswers[$i+1] = $arv;
+			if (is_array($arv)) {
+				foreach ($arv as $k=>$arvp) {
+					if (is_numeric($arvp)) {
+						$stuanswers[$i+1][$k] = $arvp;
+					}
+				}
+			} else {
+				if (is_numeric($arv)) {
+					$stuanswers[$i+1] = $arv;
+				}
+			}
 		}
 	}
-	
+	if ($qdata['qtype']=="multipart") {
+		for ($kidx=0;$kidx<count($_POST);$kidx++) {
+			$partnum = ($qnidx+1)*1000 + $kidx;
+			if (isset($_POST["qn$partnum"]) && is_numeric($_POST["qn$partnum"])) {
+				$stuanswers[$qnidx+1][$kidx] = floatval($_POST["qn$partnum"]);
+			}
+		}
+		
+	} else {
+		if (isset($_POST["qn$qnidx"]) && is_numeric($_POST["qn$qnidx"])) {
+			$stuanswers[$qnidx+1] = floatval($_POST["qn$qnidx"]);
+		}
+	}
+	$thisq = $qnidx+1;
+		
+		
 	eval(interpret('control',$qdata['qtype'],$qdata['control']));
 	srand($seed+1);
 	eval(interpret('answer',$qdata['qtype'],$qdata['answer']));
@@ -311,13 +348,18 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 	if ($anstype == "number") {
 		if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$qn];} else {$ansprompt = $options['ansprompt'];}}
 		if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$qn];} else {$sz = $options['answerboxsize'];}}
+		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
 		
 		if (!isset($sz)) { $sz = 20;}
 		if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\">";
-		$tip = "Enter your answer as a number.  Examples: 3, -4, 5.5<BR>";
+		if ($answerformat=='list' || $answerformat=='exactlist') {
+			$tip = "Enter your answer as a list of numbers separated with commas: Example: -4, 3, 2.5<br/>";
+		} else {
+			$tip = "Enter your answer as a number.  Examples: 3, -4, 5.5<BR>";
+		}
 		$tip .= "Enter DNE for Does Not Exist, oo for Infinity";
 		if (isset($answer)) {
 			$sa = $answer;
@@ -341,10 +383,16 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		} else {
 			$randkeys = array_rand($questions,count($questions));
 		}
-		if ($displayformat == "select") { $out = "<select name=\"qn$qn\"><option value=\"NA\">Select an answer</option>\n";}
-		if ($displayformat != "select" && $displayformat != "horiz") {
+		if ($displayformat == "select") { 
+			$out = "<select name=\"qn$qn\"><option value=\"NA\">Select an answer</option>\n";
+		} else if ($displayformat == "horiz") {
+			
+		} else if ($displayformat == "inline") {
+			
+		} else {
 			$out .= "<ul class=nomark>";
 		}
+		
 		for ($i=0; $i < count($randkeys); $i++) {
 			if ($displayformat == "horiz") {
 				$out .= "<div class=choice>{$questions[$randkeys[$i]]}<br/><input type=radio name=qn$qn value=$i ";
@@ -354,6 +402,10 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 				$out .= "<option value=$i ";
 				if (($la!='') && ($la!='NA') && ($la == $i)) { $out .= "selected=1";}
 				$out .= ">{$questions[$randkeys[$i]]}</option>\n";
+			} else if ($displayformat == "inline") {
+				$out .= "<input type=radio name=qn$qn value=$i ";
+				if (($la!='') && ($la == $i)) { $out .= "CHECKED";}
+				$out .= ">{$questions[$randkeys[$i]]}";
 			} else {
 				$out .= "<li><input type=radio name=qn$qn value=$i ";
 				if (($la!='') && ($la == $i)) { $out .= "CHECKED";}
@@ -364,6 +416,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$out .= "<div class=spacer>&nbsp;</div>\n";
 		} else if ($displayformat == "select") {
 			$out .= "</select>\n";
+		} else if ($displayformat == "inline") {
+			
 		} else {
 			$out .= "</ul>\n";
 		}
@@ -466,16 +520,23 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\">\n";
 		if (!isset($hidepreview)) {$out .= "<input type=button class=btn value=Preview onclick=\"calculate('tc$qn','p$qn','$answerformat')\"> &nbsp;\n";}
 		$out .= "<span id=p$qn></span> ";
-		$out .= "<script>calctoproc[calctoproc.length] = $qn;</script>\n";
+		$out .= "<script>calctoproc[calctoproc.length] = $qn; calcformat[$qn] = '$answerformat';</script>\n";
 		$ansformats = explode(',',$answerformat);
-		if (in_array('fraction',$ansformats)) {
-			$tip = "Enter your answer as a fraction (like 3/5 or 10/4) or as a whole number (like 4 or -2)";
-		} else if (in_array('reducedfraction',$ansformats)) {
-			$tip = "Enter your answer as a reduced fraction (like 5/3, not 10/6) or as a whole number (like 4 or -2)";
-		} else if (in_array('mixednumber',$ansformats)) {
-			$tip = "Enter your answer as a reduced mixed number or as a whole number.  Example: 2_1/2 = `2 1/2`";
+		if (in_array('list',$ansformats) || in_array('exactlist',$ansformats)) {
+			$tip = "Enter your answer as a list of values separated by commas: Example: -4, 3, 2<br/>";
+			$eword = "each value";
 		} else {
-			$tip = "Enter your answer as a number (like 5, -3, 2.2) or as a calculation (like 5/3, 2^3, 5+4)<BR>";
+			$tip = '';
+			$eword = "your answer";
+		}
+		if (in_array('fraction',$ansformats)) {
+			$tip .= "Enter $eword as a fraction (like 3/5 or 10/4) or as a whole number (like 4 or -2)";
+		} else if (in_array('reducedfraction',$ansformats)) {
+			$tip .= "Enter $eword as a reduced fraction (like 5/3, not 10/6) or as a whole number (like 4 or -2)";
+		} else if (in_array('mixednumber',$ansformats)) {
+			$tip .= "Enter $eword as a reduced mixed number or as a whole number.  Example: 2_1/2 = `2 1/2`";
+		} else {
+			$tip .= "Enter $eword as a number (like 5, -3, 2.2) or as a calculation (like 5/3, 2^3, 5+4)<BR>";
 			$tip .= "Enter DNE for Does Not Exist, oo for Infinity";
 		}
 		if (in_array('nodecimal',$ansformats)) {
@@ -646,38 +707,79 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}
 		if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$qn];} else {$reltolerance = $options['reltolerance'];}}
 		if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$qn];} else {$abstolerance = $options['abstolerance'];}}
+		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = .001;}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$GLOBALS['partlastanswer'] = $givenans;
 		if ($givenans == null) {return 0;}
-		$givenans = str_replace(',','',$givenans);
-		$anss = explode(' or ',$answer);
+		if ($answerformat=='exactlist') {
+			$gaarr = explode(',',$givenans);
+			$anarr = explode(',',$answer);
+		} else if ($answerformat=='list') {
+			$tmp = explode(',',$givenans);
+			sort($tmp);
+			$gaarr = array($tmp[0]);
+			for ($i=1;$i<count($tmp);$i++) {
+				if ($tmp[$i]-$tmp[$i-1]>1E-12) {
+					$gaarr[] = $tmp[$i];
+				}
+			}
+			$tmp = explode(',',$answer);
+			sort($tmp);
+			$anarr = array($tmp[0]);
+			for ($i=1;$i<count($tmp);$i++) {
+				if ($tmp[$i]-$tmp[$i-1]>1E-12) {
+					$anarr[] = $tmp[$i];
+				}
+			}
+		} else {
+			$gaarr = array(str_replace(',','',$givenans));
+			$anarr = array($answer);
+		}
+		$extrapennum = count($gaarr)+count($anarr);
+		
 		$correct = 0;
-		foreach ($anss as $anans) {
-			if (!is_numeric($anans)) {
-				if (preg_match('/(\(|\[)([\d\.]+)\,([\d\.]+)(\)|\])/',$anans,$matches)) {
-					if (($matches[1]=="(" && $givenans>$matches[2]) || ($matches[1]=="[" && $givenans>=$matches[2])) {
-						if (($matches[4]==")" && $givenans<$matches[3]) || ($matches[4]=="]" && $givenans<=$matches[3])) {
-							$correct = 1; 
-							break;
+		foreach($anarr as $i=>$answer) {
+			$foundloc = -1;
+			foreach($gaarr as $j=>$givenans) {
+				$anss = explode(' or ',$answer);
+				foreach ($anss as $anans) {
+					if (!is_numeric($anans)) {
+						if (preg_match('/(\(|\[)([\d\.]+)\,([\d\.]+)(\)|\])/',$anans,$matches)) {
+							if (($matches[1]=="(" && $givenans>$matches[2]) || ($matches[1]=="[" && $givenans>=$matches[2])) {
+								if (($matches[4]==")" && $givenans<$matches[3]) || ($matches[4]=="]" && $givenans<=$matches[3])) {
+									$correct += 1;
+									$foundloc = $j;
+									break 2;
+								} 
+							} 
+						} else	if ($anans=="DNE" && strtoupper($givenans)=="DNE") {
+							$correct += 1; $foundloc = $j; break 2;   
+						} else if ($anans=="oo" && $givenans=="oo") {
+							$correct += 1; $foundloc = $j; break 2;
+						} else if ($anans=="-oo" && $givenans=="-oo") {
+							$correct += 1; $foundloc = $j; break 2;
 						} 
-					} 
-				} else	if ($anans=="DNE" && strtoupper($givenans)=="DNE") {
-					$correct = 1; break;
-				} else if ($anans=="oo" && $givenans=="oo") {
-					$correct = 1; break;
-				} else if ($anans=="-oo" && $givenans=="-oo") {
-					$correct = 1; break;
-				} 
-			} else if (is_numeric($givenans)) {
-				if (isset($abstolerance)) {
-					if (abs($anans-$givenans) < $abstolerance + 1E-12) {$correct = 1; break;} 	
-				} else {
-					if (abs($anans - $givenans)/(abs($anans)+.0001) < $reltolerance+ 1E-12) {$correct = 1; break;} 
+					} else if (is_numeric($givenans)) {
+						if (isset($abstolerance)) {
+							if (abs($anans-$givenans) < $abstolerance + 1E-12) {$correct += 1; $foundloc = $j; break 2;} 	
+						} else {
+							if (abs($anans - $givenans)/(abs($anans)+.0001) < $reltolerance+ 1E-12) {$correct += 1; $foundloc = $j; break 2;} 
+						}
+					}
+				}
+			}
+			if ($foundloc>-1) {
+				array_splice($gaarr,$foundloc,1); //remove from list
+				if (count($gaarr)==0) {
+					break; //stop if no student answers left
 				}
 			}
 		}
-		return $correct;
+		$score = $correct/count($anarr) - count($gaarr)/$extrapennum;  //take off points for extranous stu answers
+		if ($score<0) { $score = 0; }
+		return ($score);
+		
 	} else if ($anstype == "choices") {
 		if (is_array($options['questions'][$qn])) {$questions = $options['questions'][$qn];} else {$questions = $options['questions'];}
 		if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}
@@ -873,80 +975,127 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($givenans == null) {return 0;}
 
 		$ansformats = explode(',',$answerformat);
-		
-		if (in_array("fraction",$ansformats) || in_array("reducedfraction",$ansformats)) {
-			if (!preg_match('/^\s*\-?\d+\s*\/\s*\-?\d+\s*$/',$_POST["tc$qn"]) && !preg_match('/^\s*?\-?\d+\s*$/',$_POST["tc$qn"])) {
-				return 0;
-			} else {
-				if (in_array("reducedfraction",$ansformats) && strpos($_POST["tc$qn"],'/')!==false) {
-					$tmpa = explode("/",$_POST["tc$qn"]);
-					if (gcd(abs($tmpa[0]),abs($tmpa[1]))!=1) {
-						return 0;
-					}
-				}
-			}
-		} 
-		if (in_array("notrig",$ansformats)) {
-			if (preg_match('/(sin|cos|tan|cot|csc|sec)/',$_POST["tc$qn"])) {
-				return 0;
-			}
-		} 
-		if (in_array("mixednumber",$ansformats)) {
-			if (!preg_match('/^\s*\-?\s*\d+\s*_\s*(\d+)\s*\/\s*(\d+)$\s*$/',$_POST["tc$qn"],$mnmatches) && !preg_match('/^\s*?\-?\d+\s*$/',$_POST["tc$qn"]) && !preg_match('/^\s*\-?\d+\s*\/\s*\-?\d+\s*$/',$_POST["tc$qn"])) {
-				return 0;
-			} else {
-				if (preg_match('/^\s*\-?\d+\s*\/\s*\-?\d+\s*$/',$_POST["tc$qn"])) {
-					$tmpa = explode("/",$_POST["tc$qn"]);
-					if ((gcd(abs($tmpa[0]),abs($tmpa[1]))!=1) || $tmpa[0]>=$tmpa[1]) {
-						return 0;
-					}
-				} else	if (!preg_match('/^\s*?\-?\d+\s*$/',$_POST["tc$qn"])) {
-					if ($mnmatches[1]>=$mnmatches[2] || gcd($mnmatches[1],$mnmatches[2])!=1) {
-						return 0;
-					}
-				}
-			}
-		}
-		if (in_array("nodecimal",$ansformats)) {
-			if (strpos($_POST["tc$qn"],'.')!==false) {
-				return 0;
-			}
-			if (strpos($_POST["tc$qn"],'E-')!==false) {
-				return 0;
-			}
-			if (preg_match('/10\^\(?\-/',$_POST["tc$qn"])) {
-				return 0;
-			}
-		}
-		
-		$anss = explode(' or ',$answer);
-		$correct = 0;
-		foreach ($anss as $anans) {
-			if (!is_numeric($anans)) {
-				$givenans = trim($givenans);
-				if (preg_match('/(\(|\[)([\d\.]+)\,([\d\.]+)(\)|\])/',$anans,$matches)) {
-					if (($matches[1]=="(" && $givenans>$matches[2]) || ($matches[1]=="[" && $givenans>=$matches[2])) {
-						if (($matches[4]==")" && $givenans<$matches[3]) || ($matches[4]=="]" && $givenans<=$matches[3])) {
-							$correct = 1; 
-							break;
-						} 
-					} 
-				} else	if ($anans=="DNE" && strtoupper($givenans)=="DNE") {
-					$correct = 1; break;
-				} else if ($anans=="oo" && $givenans=="oo") {
-					$correct = 1; break;
-				} else if ($anans=="-oo" && $givenans=="-oo") {
-					$correct = 1; break;
-				} 
-			} else if (is_numeric($givenans)) {
-				if (isset($abstolerance)) {
-					if (abs($anans-$givenans) < $abstolerance+1E-12) {$correct = 1; break;} 	
+		if (in_array('exactlist',$ansformats)) {
+			$gaarr = explode(',',$givenans);
+			$anarr = explode(',',$answer);
+			$orarr = explode(',',$_POST["tc$qn"]);
+		} else if (in_array('list',$ansformats)) {
+			$tmp = explode(',',$givenans);
+			$tmpor = explode(',',$_POST["tc$qn"]);
+			asort($tmp);
+			$lastval = null;
+			foreach ($tmp as $i=>$v) {
+				if ($lastval===null) {
+					$gaarr[] = $tmp[$i];
+					$orarr[] = $tmpor[$i];
 				} else {
-					if (abs($anans - $givenans)/(abs($anans)+.0001) < $reltolerance+1E-12) {$correct = 1; break;} 
+					if ($v-$lastval>1E-12) {
+						$gaarr[] = $tmp[$i];
+						$orarr[] = $tmpor[$i];
+					}
+				}
+				$lastval = $v;
+			}
+			$tmp = explode(',',$answer);
+			sort($tmp);
+			$anarr = array($tmp[0]);
+			for ($i=1;$i<count($tmp);$i++) {
+				if ($tmp[$i]-$tmp[$i-1]>1E-12) {
+					$anarr[] = $tmp[$i];
+				}
+			}
+		} else {
+			$gaarr = array(str_replace(',','',$givenans));
+			$anarr = array($answer);
+			$orarr = array($_POST["tc$qn"]);
+		}
+		$extrapennum = count($gaarr)+count($anarr);
+		$correct = 0;
+		foreach($anarr as $i=>$answer) {
+			$foundloc = -1;
+			foreach($gaarr as $j=>$givenans) {
+				if (in_array("fraction",$ansformats) || in_array("reducedfraction",$ansformats)) {
+					if (!preg_match('/^\s*\-?\d+\s*\/\s*\-?\d+\s*$/',$orarr[$j]) && !preg_match('/^\s*?\-?\d+\s*$/',$orarr[$j])) {
+						continue;
+					} else {
+						if (in_array("reducedfraction",$ansformats) && strpos($orarr[$j],'/')!==false) {
+							$tmpa = explode("/",$orarr[$j]);
+							if (gcd(abs($tmpa[0]),abs($tmpa[1]))!=1) {
+								continue;
+							}
+						}
+					}
+				} 
+				if (in_array("notrig",$ansformats)) {
+					if (preg_match('/(sin|cos|tan|cot|csc|sec)/',$orarr[$j])) {
+						continue;
+					}
+				} 
+				if (in_array("mixednumber",$ansformats)) {
+					if (!preg_match('/^\s*\-?\s*\d+\s*_\s*(\d+)\s*\/\s*(\d+)$\s*$/',$orarr[$j],$mnmatches) && !preg_match('/^\s*?\-?\d+\s*$/',$orarr[$j]) && !preg_match('/^\s*\-?\d+\s*\/\s*\-?\d+\s*$/',$orarr[$j])) {
+						continue;
+					} else {
+						if (preg_match('/^\s*\-?\d+\s*\/\s*\-?\d+\s*$/',$orarr[$j])) {
+							$tmpa = explode("/",$orarr[$j]);
+							if ((gcd(abs($tmpa[0]),abs($tmpa[1]))!=1) || $tmpa[0]>=$tmpa[1]) {
+								continue;
+							}
+						} else	if (!preg_match('/^\s*?\-?\d+\s*$/',$orarr[$j])) {
+							if ($mnmatches[1]>=$mnmatches[2] || gcd($mnmatches[1],$mnmatches[2])!=1) {
+								continue;
+							}
+						}
+					}
+				}
+				if (in_array("nodecimal",$ansformats)) {
+					if (strpos($orarr[$j],'.')!==false) {
+						continue;
+					}
+					if (strpos($orarr[$j],'E-')!==false) {
+						continue;
+					}
+					if (preg_match('/10\^\(?\-/',$orarr[$j])) {
+						continue;
+					}
+				}
+				
+				$anss = explode(' or ',$answer);
+				foreach ($anss as $anans) {
+					if (!is_numeric($anans)) {
+						$givenans = trim($givenans);
+						if (preg_match('/(\(|\[)([\d\.]+)\,([\d\.]+)(\)|\])/',$anans,$matches)) {
+							if (($matches[1]=="(" && $givenans>$matches[2]) || ($matches[1]=="[" && $givenans>=$matches[2])) {
+								if (($matches[4]==")" && $givenans<$matches[3]) || ($matches[4]=="]" && $givenans<=$matches[3])) {
+									$correct += 1; $foundloc = $j; break 2; 
+								} 
+							} 
+						} else	if ($anans=="DNE" && strtoupper($givenans)=="DNE") {
+							$correct += 1; $foundloc = $j; break 2;
+						} else if ($anans=="oo" && $givenans=="oo") {
+							$correct += 1; $foundloc = $j; break 2;
+						} else if ($anans=="-oo" && $givenans=="-oo") {
+							$correct += 1; $foundloc = $j; break 2;
+						} 
+					} else if (is_numeric($givenans)) {
+						if (isset($abstolerance)) {
+							if (abs($anans-$givenans) < $abstolerance+1E-12) {$correct += 1; $foundloc = $j; break 2;} 	
+						} else {
+							if (abs($anans - $givenans)/(abs($anans)+.0001) < $reltolerance+1E-12) {$correct += 1; $foundloc = $j; break 2;} 
+						}
+					}
+				}
+			}
+			if ($foundloc>-1) {
+				array_splice($gaarr,$foundloc,1); //remove from list
+				array_splice($orarr,$foundloc,1);
+				if (count($gaarr)==0) {
+					break; //stop if no student answers left
 				}
 			}
 		}
-		return $correct;
+		$score = $correct/count($anarr) - count($gaarr)/$extrapennum;  //take off points for extranous stu answers
+		if ($score<0) { $score = 0; }
+		return ($score);
 	} else if ($anstype == "numfunc") {
 		if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}
 		if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$qn];} else {$reltolerance = $options['reltolerance'];}}
@@ -968,7 +1117,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		//if entry used pow or exp, we want to replace them with their asciimath symbols for requiretimes purposes
 		$cleanans = str_replace("pow","^",$cleanans);
 		$cleanans = str_replace("exp","e",$cleanans);
-
+		
+		$answer = preg_replace('/[^\w\*\/\+\=\-\(\)\[\]\{\}\,\.\^\$\!]+/','',$answer);
 
 		if ($answerformat=="equation") {
 			$answer = preg_replace('/(.*)=(.*)/','$1-($2)',$answer);
@@ -1010,11 +1160,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$variables = explode(",",$variables);
 		$vlist = implode("|",$variables);
 		
+		if ($answer == '') {
+			return 0;
+		}
 		$answer = mathphppre($answer);
 		$answer = makepretty($answer);
 		$answer = mathphp($answer,$vlist);
-
-
+		
 	
 		for($i=0; $i < count($variables); $i++) {
 			//$cleanans = str_replace("(".$variables[$i].")",'($tp['.$i.'])',$cleanans);

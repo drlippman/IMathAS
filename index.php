@@ -23,6 +23,7 @@
 		echo "<h4>You are not currently enrolled in any classes as a student</h4>\n";
 		$noclass = true;
 	} else {
+			
 		echo "<div class=block>";
 		echo "<h3>Courses You're Taking</h3>";
 		echo "</div>";
@@ -33,6 +34,7 @@
 			if (isset($newmsgcnt[$line['id']]) && $newmsgcnt[$line['id']]>0) {
 				echo " <span style=\"color:red\">New Messages ({$newmsgcnt[$line['id']]})</span>";
 			}
+			
 			echo "</li>\n";
 		} while ($line = mysql_fetch_array($result, MYSQL_ASSOC));
 		echo "</ul>\n";
@@ -55,6 +57,7 @@
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
 	if ($line != null) {
+		
 		echo "<div class=block>";
 		echo "<h3>Courses You're Teaching</h3>";
 		echo "</div><div class=blockitems>\n";
@@ -64,6 +67,7 @@
 			if (isset($newmsgcnt[$line['id']]) && $newmsgcnt[$line['id']]>0) {
 				echo " <span style=\"color:red\">New Messages ({$newmsgcnt[$line['id']]})</span>";
 			}
+			
 			echo "</li>\n";
 		} while ($line = mysql_fetch_array($result, MYSQL_ASSOC));
 		echo "</ul>\n";

@@ -88,7 +88,7 @@ function interpret($blockname,$anstype,$str)
 								echo "{$funcs[1][$i]} is not an allowed function<BR>\n";
 								return false;
 							}
-							if (!in_array($funcs[1][$i],$mathfuncs) && !preg_match('/[\*\/\^]/',$rsnoquote)) {
+							if (!in_array($funcs[1][$i],$mathfuncs) && !preg_match('/[\*\/\^\!]/',$rsnoquote)) {
 								$ismath = false;
 							}
 						}
@@ -122,30 +122,7 @@ function interpret($blockname,$anstype,$str)
 					
 					$com = str_replace($matches[2],mathphp($matches[2],null),$com);	
 				} else { //right side is quoted
-					if (trim($matches[1])=='$answer') {
-						if ($anstype == "numfunc") {
-							//there's a hole in this section - it doesn't get called if
-							//makepretty or other function is called on answer string
-							//get rid of the quotes
-							
-							$ans = str_replace(array("\"","'"),"",$matches[2]);
-							
-							//remove any non-math junk since this will be eval-ed later
-							$ans = preg_replace('/[^\w\*\/\+\=\-\(\)\[\]\{\}\,\.\^\$\s]+/','',$ans);
-							
-							//replace in original
-							$com = str_replace($matches[2],'"'.$ans.'"',$com);
-						}
-						if ($anstype == "matrix" || $anstype=="calcmatrix") {
-							//moved mathph callback call into displayq (post variable interpolation)
-							//$ans = preg_replace('/[^\w\*\/\+\-\(\)\[\]\{\},\.\^\$]+/','',$matches[2]);
-							
-							//$ans = preg_replace_callback('/([^\[\(\)\]\,]+)/',"preg_mathphp_callback",$ans);
-							
-							//$com = '$answer = "' . $ans . '"';
-							
-						}
-					}
+					//all answer cleaners moved to displayq
 				}
 				
 			} else if (($libs = preg_replace('/.*loadlibrary\(([^\)]*)\).*/',"$1",$com)) != $com) {
@@ -156,6 +133,23 @@ function interpret($blockname,$anstype,$str)
 				return false;
 			}
 			if ($ifcond!='') {
+				$rsnoquote = preg_replace('/"[^"]*"/','""',$ifcond);
+				$rsnoquote = preg_replace('/\'[^\']*\'/','\'\'',$rsnoquote);
+				if (preg_match_all('/([$\w]+)\s*\([^\)]*\)/',$rsnoquote,$funcs)) {
+					$ismath = true;
+					for ($i=0;$i<count($funcs[1]);$i++) {
+						if (strpos($funcs[1][$i],"$")===false) {
+							if (!in_array($funcs[1][$i],$allowedmacros)) {
+								echo "{$funcs[1][$i]} is not an allowed function<BR>\n";
+								return false;
+							}
+						}
+					}
+				}
+				$ifcond = str_replace('!=','#=',$ifcond);
+				$ifcond = mathphp($ifcond,null);
+				$ifcond = str_replace('#=','!=',$ifcond);
+								
 				$out .= "if ($ifcond) { $com; }";
 			} else {
 				$out .= "$com;\n";

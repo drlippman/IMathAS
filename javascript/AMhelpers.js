@@ -3,57 +3,69 @@
 
 //handles preview button for calculated type
 function calculate(inputId,outputId,format) {
-  var str = document.getElementById(inputId).value;
-  str = str.replace(/,/,"")
-  var err = "";
-  if (str.match(/DNE/i)) {
-	  str = str.toUpperCase();
-  } else if (str.match(/oo/)) {
-	  str = "`"+str+"`";
+  var fullstr = document.getElementById(inputId).value;
+  if (format.indexOf('list')!=-1) {
+	  var strarr = fullstr.split(/,/);
   } else {
-	  if (format=='mixednumber') {
-		  str = str.replace(/_/,' ');
-	  }
-	  if (format=='notrig' && str.match(/(sin|cos|tan|cot|sec|csc)/)) {
-		  str = "no trig functions allowed";
-	  } else {
-		  try {
-		    with (Math) var res = eval(mathjs(str));
-		  } catch(e) {
-		    err = "syntax incomplete";
-		  }
-		  if (!isNaN(res) && res!="Infinity") {
-			  if (format=='fraction' || format=='reducedfraction' || format=='mixednumber') {
-				  str = "`"+str+"`";
-			  } else {
-				  str = "`"+str+" =` "+(Math.abs(res)<1e-15?0:res)+err;
-			  }
-		  } else if (str!="") {
-			  var Pdepth = 0; var Bdepth = 0;
-			  for (var i=0; i<str.length; i++) {
-				if (str.charAt(i)=='(') {
-					Pdepth++;
-				} else if (str.charAt(i)==')') {
-					Pdepth--;
-				} else if (str.charAt(i)=='[') {
-					Bdepth++;
-				} else if (str.charAt(i)==']') {
-					Bdepth--;
-				}
-			  }
-			  str = "`"+str+"` = undefined";
-			  if (Pdepth!=0 || Bdepth!=0) {
-				  str += " (unmatched parens)";
-			  }
-		  }
-	  }
+	  var strarr = new Array();
+	  strarr[0] = fullstr;
   }
-  
+  for (var sc=0;sc<strarr.length;sc++) {
+	  str = strarr[sc];
+	  str = str.replace(/,/g,"");
+	  var err = "";
+	  if (str.match(/DNE/i)) {
+		  str = str.toUpperCase();
+	  } else if (str.match(/oo/)) {
+		  str = "`"+str+"`";
+	  } else {
+		  if (format.indexOf('mixednumber')!=-1) {
+			  str = str.replace(/_/,' ');
+		  }
+		  if (format.indexOf('notrig')!=-1 && str.match(/(sin|cos|tan|cot|sec|csc)/)) {
+			  str = "no trig functions allowed";
+		  } else if (format.indexOf('nodecimal')!=-1 && str.indexOf('.')!=-1) {
+			  str = "no decimals allowed";
+		  } else {
+			  try {
+			    with (Math) var res = eval(mathjs(str));
+			  } catch(e) {
+			    err = "syntax incomplete";
+			  }
+			  if (!isNaN(res) && res!="Infinity") {
+				  if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1) {
+					  str = "`"+str+"`";
+				  } else {
+					  str = "`"+str+" =` "+(Math.abs(res)<1e-15?0:res)+err;
+				  }
+			  } else if (str!="") {
+				  var Pdepth = 0; var Bdepth = 0;
+				  for (var i=0; i<str.length; i++) {
+					if (str.charAt(i)=='(') {
+						Pdepth++;
+					} else if (str.charAt(i)==')') {
+						Pdepth--;
+					} else if (str.charAt(i)=='[') {
+						Bdepth++;
+					} else if (str.charAt(i)==']') {
+						Bdepth--;
+					}
+				  }
+				  str = "`"+str+"` = undefined";
+				  if (Pdepth!=0 || Bdepth!=0) {
+					  str += " (unmatched parens)";
+				  }
+			  }
+		  }
+	  }
+	  strarr[sc] = str;
+  }
+  fullstr = strarr.join(', ');
   var outnode = document.getElementById(outputId);
   var n = outnode.childNodes.length;
   for (var i=0; i<n; i++)
     outnode.removeChild(outnode.firstChild);
-  outnode.appendChild(document.createTextNode(str));
+  outnode.appendChild(document.createTextNode(fullstr));
   if (!noMathRender) {
 	  AMprocessNode(outnode);
   }
@@ -259,6 +271,7 @@ function AMmathpreview(inputId,outputId) {
 }
 
 var calctoproc = new Array();
+var calcformat = new Array();
 var functoproc = new Array();
 var matcalctoproc = new Array();
 var matsize = new Array();
@@ -284,20 +297,33 @@ function doonsubmit(form,type2,skipconfirm) {
 		nh.type = "hidden";
 		nh.name = "qn" + calctoproc[i];
 		str = document.getElementById("tc"+calctoproc[i]).value;
-		str = str.replace(/,/,"");
-		str = str.replace(/(\d+)\s*_\s*(\d+\s*\/\s*\d+)/,"($1+$2)");
-		if (str.match(/^\s*$/)) {
-			var res = '';
-		} else if (str.match(/(DNE|oo)/)) {
-			var res = str;
+		if (calcformat[calctoproc[i]].indexOf('list')!=-1) {
+			strarr = str.split(/,/);
 		} else {
-			try {
-				with (Math) var res = eval(mathjs(str));
-			} catch(e) {
-				err = "syntax incomplete";
-			}
+			var strarr = new Array();
+			strarr[0] = str;
 		}
-		nh.value = res;
+		for (var sc=0;sc<strarr.length;sc++) {
+			str = strarr[sc];
+			
+			str = str.replace(/,/g,"");
+			str = str.replace(/(\d+)\s*_\s*(\d+\s*\/\s*\d+)/,"($1+$2)");
+			if (str.match(/^\s*$/)) {
+				var res = '';
+			} else if (str.match(/oo/)) {
+				var res = str;
+			} else if (str.match(/DNE/i)) {
+				var res = str.toUpperCase();
+			} else {
+				try {
+					with (Math) var res = eval(mathjs(str));
+				} catch(e) {
+					err = "syntax incomplete";
+				}
+			}
+			strarr[sc] = res;
+		}
+		nh.value = strarr.join(',');
 		outn = document.getElementById("p"+calctoproc[i]);
 		outn.appendChild(nh);
 	}
