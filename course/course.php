@@ -999,5 +999,26 @@
 	   }
 	   return $color;
    }
+   function makecolor2($stime,$etime,$now) {
+	   if (!$GLOBALS['colorshift']) {
+		   return "#ff0";
+	   }
+	   if ($etime==2000000000) {
+		   return '#0f0';
+	   } else if ($stime==0) {
+		   return makecolor($etime,$now);
+	   }
+	   $r = ($etime-$now)/($etime-$stime);  //0 = etime, 1=stime; 0:#f00, 1:#0f0, .5:#ff0
+	   if ($etime<$now) {
+		   $color = '#ccc';
+	   } else if ($r<.5) {
+		   $color = '#f'.dechex(floor(32*$r)).'0';
+	   } else if ($r<1) {
+		   $color = '#'.dechex(floor(32*(.9999-$r))).'f0';
+	   } else {
+		   $color = '#0f0';
+	   }
+	    return $color;
+   }
 ?>
 

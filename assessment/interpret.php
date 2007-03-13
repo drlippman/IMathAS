@@ -17,6 +17,9 @@ function interpret($blockname,$anstype,$str)
 		$disallowedwords = array("exit","die");
 		$disallowedvar = array('$link','$qidx','$qnidx','$seed','$qdata','$toevalqtxt','$la','$GLOBALS','$laparts','$anstype','$kidx','$iidx','$tips','$options','$partla','$partnum','$score');
 		$str .= ' ';
+		$str = str_replace("\r\n","\n",$str);
+		$str = str_replace("//\n","<br/>",$str);
+		$str = str_replace("/\n"," ",$str);
 		$commands = explode("\n",$str);
 		foreach($commands as $com) {
 			if (substr($com,0,2)=="//") {continue;}

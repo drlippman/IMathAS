@@ -3,6 +3,7 @@
 //(c) 2006 David Lippman
 	require("../validate.php");
 	$isteacher = isset($teacherid);
+	$istutor = isset($tutorid);
 	
 	$cid = $_GET['cid'];
 	//gbmode
@@ -203,7 +204,7 @@
 	}
 	
 	
-	if (!isset($_GET['asid']) && $isteacher && $stu==0) { //not doing grade detail, show full instructor view
+	if (!isset($_GET['asid']) && ($isteacher || $istutor) && $stu==0) { //not doing grade detail, show full instructor view
 		if ((isset($_POST['submit']) && ($_POST['submit']=="E-mail" || $_POST['submit']=="Message"))|| isset($_GET['masssend']))  {
 			$calledfrom='gb';
 			include("masssend.php");
@@ -833,7 +834,7 @@
 	}
 	
 	function gbtable($isdisp) {
-		global $cid,$isteacher,$tutorid,$userid,$gbmode,$nopracticet,$curonly,$catfilter,$stu;
+		global $cid,$isteacher,$istutor,$tutorid,$userid,$gbmode,$nopracticet,$curonly,$catfilter,$stu;
 		if ($isteacher && func_num_args()>1) {
 			$limuser = func_get_arg(1);
 		} else {
@@ -846,7 +847,7 @@
 		}
 		$isdiag = false;
 		$category = array();
-		if ($isteacher) {
+		if ($isteacher || $istutor) {
 			$query = "SELECT sel1name,sel2name FROM imas_diags WHERE cid='$cid'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (mysql_num_rows($result)>0) {

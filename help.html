@@ -1202,7 +1202,7 @@ A question is formed in several parts:
 </div>
 <div class=h2>
 <h2><a name="basiccontrolsyntax">Basic Control Syntax</a></h2>
-
+<p>
 Lines of the common control, question control, and answer sections take the form of variable
 definition.  In IMathAS, variables are identified with a dollarsign ($) prefix.  For example,
 $a is the variable a.  Most lines will take one of these forms:
@@ -1223,10 +1223,10 @@ the variable $ar is an array; the elements can be accessed as $ar[0] and $ar[1] 
 that arrays are zero-indexed).  If you use this approach, enclose the variable reference in
 parenthesis in calculations, like $new = ($ar[0])^2, and in curly brackets inside strings, 
 like $string = "there were {$ar[0]} people".
-<p>
+</p><p>
 You can also literally define an array using the &quot;array&quot; function.  
 Examples:  $ar = array(2,3,4,5), or $ar = array(&quot;red&quot;,&quot;green&quot;,&quot;blue&quot;)
-<p>
+</p><p>
 Note that numbers are not in quotes, and strings are in quotes.  When you use
 the double-quote mark (&quot;) to define a string, you can interpolate variables into
 the string.  Example:
@@ -1236,7 +1236,24 @@ $b = 5
 $str = &quot;What is $a/$b&quot;
 </pre>
 In this example, $str now contains &quot;What is 3/5&quot;.
+</p>
 <p>
+If you have a long command to type, you can put a &quot;/&quot; at the end of a line to specify it continues on the next line.  Example:
+<pre>
+$questions = array("this is choice 1",/
+"this is choice 2")
+</pre>
+If defining a string for display, you can put a &quot;//&quot; at the end of a line to specify it continues on the next line and insert
+an HTML line break.  Example:
+<pre>
+$showanswer = "Do this first. //
+Then do this."
+</pre>
+will be interpreted as:
+<pre>
+$showanswer = "Do this first. &lt;br/&gt;Then do this."
+</pre>
+</p>
 <div class=h4>
 <h4><a name="conditionals">Conditionals</a></h4>
 
@@ -1265,7 +1282,11 @@ Comparison operators available for &quot;if&quot; and &quot;where&quot; statemen
 <li>&gt;= Greater than or equal to</li>
 <li>&lt;= Less than or equal to</li>
 </ul>
-
+To do compound conditionals, use || for &quot;or&quot;, and &amp;&amp; for &quot;and&quot;.  For example:
+<pre>
+$a = nonzerorand(-9,9) where ($a!=1 &amp;&amp; $a!=-1)
+</pre>
+</p>
 </div>
 </div>
 <div class=h2>
@@ -1438,6 +1459,37 @@ $hints[question part number][attempt number] = "hint text"
 Then in question text, place each hint using $hintloc[question part number]
 </p>
 
+<h4>Referencing Student Answers</h4>
+<p>To create multipart questions that are graded on consistency, or to create a set of lab-type problems that rely on student-provided data, you can reference
+students' previous answers in your question code.  You will only be able to reference the student answer to number and calculated type answers</p>
+<ul>
+<li>$stuanswers[N] will refer to the student's answer on question N (not zero-indexed: N=1 is question 1)</li>
+<li>$stuanswers[N][P] will refer to the student's answer on question N, part P (if multipart)</li>
+<li>$stuanswers[$thisq][P] will refer to the student's answer on the current question, part P</li>
+<li>$stuanswers[$thisq-1] will refer to the student's answer on the previous question</li>
+</ul>
+Notes (important!):
+</p>
+<p>
+1) If the student has not answered the question, then $stuanswers[N] == null.  If used in an equation, it will take on the value 0.  To prevent divide-by-zero errors and to prevent students from exploiting this, it is highly recommended that you do something like:
+<pre>
+$a = $stuanswers[$thisq][0]
+$a = rand(1,100) if ($a==null)
+</pre>
+Perhaps also include:
+$warning = "You MUST answer question 1 before this question" if ($a==null), then put $warning in the question text.
+</p>
+<p>
+2) If you use $stuanswers in your $answer, $showanswer will generally not be defined.  If you follow my advice in #1 above, then your 
+$showanswer will reflect the random number assigned to $a.  For this reason, it is highly recommended that you custom define the $showanswer.
+</p>
+<p>
+3) If using the $stuanswers array in a string or in the Question Text, you must enclose it with curly brackets:  
+Your answer was {$stuanswers[0][0]}.  If using it directly in a calculation, enclose it in parentheses just to be safe.
+</p>
+<p>
+4) $stuanswers[$thisq] is only defined for question scoring, not question display, so don't try to use it in question display.
+</p>
 
 </div>
 <div class=h2>
