@@ -17,6 +17,9 @@ ALTER TABLE `imas_assessments` ADD `isgroup` TINYINT( 1 ) UNSIGNED NOT NULL DEFA
 ALTER TABLE `imas_assessments` CHANGE `defpenalty` `defpenalty` VARCHAR( 6 ) NOT NULL DEFAULT '0';
 ALTER TABLE `imas_questions` CHANGE `penalty` `penalty` VARCHAR( 6 ) NOT NULL DEFAULT '9999';
 
+ALTER TABLE `imas_assessments` ADD `showhints` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '1' AFTER `showcat` ;
+
+
 
 *********************
 ** IMathAS 1.1     **

@@ -468,7 +468,8 @@
 <script type="text/javascript">
 function previewq(formn,loc,qn) {
 	var addr = '$imasroot/course/testquestion.php?cid=$cid&checked=0&qsetid='+qn+'&loc=qo'+loc+'&formn='+formn;
-	window.open(addr,'Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20));
+	previewpop = window.open(addr,'Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20));
+	previewpop.focus();
 	//window.open(addr,'Testing','width=400,height=300,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));
 }
 var baseaddr = '$address';

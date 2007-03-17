@@ -17,7 +17,7 @@ if (!isset($_POST['authuser'])) {
 	echo "<span class=formright><input type=text name=authuser></span><br class=form>\n";
 	echo "<span class=form>Password</span>";
 	echo "<span class=formright><input type=password name=authpass></span><br class=form>\n";
-	echo "<span class=form>Have the IMAS database and database user been created already? <sup>*</sup></span>";
+	echo "<span class=form>Have the IMathAS database and database user been created already? <sup>*</sup></span>";
 	echo "<span class=formright><input type=radio name=create value=1 CHECKED>No, create them<br/><input type=radio name=create value=0>Yes, already created</span><br class=form>\n";
 	echo "</fieldset><fieldset><legend>Initial IMathAS User Information</legend>\n";
 	echo "<span class=form>First Name</span>";
@@ -149,6 +149,7 @@ $sql = 'CREATE TABLE `imas_assessments` ('
 	. ' `cntingb` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'1\', '
 	. ' `minscore` SMALLINT(4) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `showcat` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
+	. ' `showhints` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'1\', '
 	. ' `isgroup` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\','
         . ' INDEX (`courseid`), INDEX(`startdate`), INDEX(`enddate`),'
 	. ' INDEX(`cntingb`)'

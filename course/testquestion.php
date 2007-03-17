@@ -91,7 +91,7 @@
 	echo "<input type=hidden name=seed value=\"$seed\">\n";
 	echo "<input type=hidden name=attempt value=\"$attempt\">\n";
 	unset($lastanswers);
-	displayq(0,$_GET['qsetid'],$seed,true,$attempt);
+	displayq(0,$_GET['qsetid'],$seed,true,true,$attempt);
 	echo "<input type=submit value=\"Submit\"><input type=submit name=\"regen\" value=\"Submit and Regen\">\n";
 	
 	echo "</form>\n";
@@ -108,6 +108,14 @@
 	echo "<p>Description: $descr</p><p>Author: $author</p>";
 	$lastmod = date("m/d/y g:i a",mysql_result($result,0,3));
 	echo "<p>Last Modified: $lastmod</p>";
+	$query = "SELECT imas_libraries.name FROM imas_libraries,imas_library_items WHERE imas_libraries.id=imas_library_items.libid AND imas_library_items.qsetid='{$_GET['qsetid']}'";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	echo '<p>Question is in these libraries:';
+	echo '<ul>';
+	while ($row = mysql_fetch_row($result)) {
+		echo '<li>'.$row[0].'</li>';
+	}
+	echo '</ul></p>';
 	require("../footer.php");
 ?>
 	

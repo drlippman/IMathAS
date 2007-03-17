@@ -105,6 +105,11 @@
 		} else {
 			$isgroup = 0;
 		}
+		if (isset($_POST['showhints'])) {
+			$showhints = 1;
+		} else {
+			$showhints = 0;
+		}
 		
 		if ($_POST['deffeedback']=="Practice" || $_POST['deffeedback']=="Homework") {
 			$deffeedback = $_POST['deffeedback'].'-'.$_POST['showansprac'];
@@ -118,9 +123,9 @@
 			$_POST['defpenalty'] = 'S'.$_POST['skippenalty'].$_POST['defpenalty'];
 		}
 		if ($_POST['copyfrom']!=0) {
-			$query = "SELECT timelimit,displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,showcat,intro,startdate,enddate,reviewdate,isgroup FROM imas_assessments WHERE id='{$_POST['copyfrom']}'";
+			$query = "SELECT timelimit,displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,showcat,intro,startdate,enddate,reviewdate,isgroup,showhints FROM imas_assessments WHERE id='{$_POST['copyfrom']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			list($_POST['timelimit'],$_POST['displaymethod'],$_POST['defpoints'],$_POST['defattempts'],$_POST['defpenalty'],$deffeedback,$shuffle,$_POST['gbcat'],$_POST['password'],$_POST['showqcat'],$cpintro,$cpstartdate,$cpenddate,$cpreviewdate,$isgroup) = mysql_fetch_row($result);
+			list($_POST['timelimit'],$_POST['displaymethod'],$_POST['defpoints'],$_POST['defattempts'],$_POST['defpenalty'],$deffeedback,$shuffle,$_POST['gbcat'],$_POST['password'],$_POST['showqcat'],$cpintro,$cpstartdate,$cpenddate,$cpreviewdate,$isgroup,$showhints) = mysql_fetch_row($result);
 			if (isset($_POST['copyinstr'])) {
 				$_POST['intro'] = addslashes($cpintro);
 			}
@@ -132,11 +137,11 @@
 		}
 		if (isset($_GET['id'])) {  //already have id; update
 			if (isset($_POST['defpoints'])) {
-				$query = "UPDATE imas_assessments SET name='{$_POST['name']}',summary='{$_POST['summary']}',intro='{$_POST['intro']}',startdate=$startdate,enddate=$enddate,reviewdate=$reviewdate,timelimit='{$_POST['timelimit']}',minscore='{$_POST['minscore']}',isgroup='$isgroup',";
+				$query = "UPDATE imas_assessments SET name='{$_POST['name']}',summary='{$_POST['summary']}',intro='{$_POST['intro']}',startdate=$startdate,enddate=$enddate,reviewdate=$reviewdate,timelimit='{$_POST['timelimit']}',minscore='{$_POST['minscore']}',isgroup='$isgroup',showhints='$showhints',";
 				$query .= "displaymethod='{$_POST['displaymethod']}',defpoints='{$_POST['defpoints']}',defattempts='{$_POST['defattempts']}',defpenalty='{$_POST['defpenalty']}',deffeedback='$deffeedback',shuffle='$shuffle',gbcategory='{$_POST['gbcat']}',password='{$_POST['password']}',cntingb='{$_POST['cntingb']}',showcat='{$_POST['showqcat']}' ";
 				$query .= "WHERE id='{$_GET['id']}';";
 			} else { //has been taken - not updating "don't change" settings
-				$query = "UPDATE imas_assessments SET name='{$_POST['name']}',summary='{$_POST['summary']}',intro='{$_POST['intro']}',startdate=$startdate,enddate=$enddate,reviewdate=$reviewdate,timelimit='{$_POST['timelimit']}',minscore='{$_POST['minscore']}',isgroup='$isgroup',";
+				$query = "UPDATE imas_assessments SET name='{$_POST['name']}',summary='{$_POST['summary']}',intro='{$_POST['intro']}',startdate=$startdate,enddate=$enddate,reviewdate=$reviewdate,timelimit='{$_POST['timelimit']}',minscore='{$_POST['minscore']}',isgroup='$isgroup',showhints='$showhints',";
 				$query .= "displaymethod='{$_POST['displaymethod']}',defattempts='{$_POST['defattempts']}',deffeedback='$deffeedback',shuffle='$shuffle',gbcategory='{$_POST['gbcat']}',password='{$_POST['password']}',cntingb='{$_POST['cntingb']}',showcat='{$_POST['showqcat']}' ";
 				$query .= "WHERE id='{$_GET['id']}';";
 			}
@@ -146,10 +151,10 @@
 		} else { //add new
 									
 			$query = "INSERT INTO imas_assessments (courseid,name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,";
-			$query .= "displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,showcat,isgroup) VALUES ";
+			$query .= "displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,showcat,isgroup,showhints) VALUES ";
 			$query .= "('$cid','{$_POST['name']}','{$_POST['summary']}','{$_POST['intro']}',$startdate,$enddate,$reviewdate,'{$_POST['timelimit']}','{$_POST['minscore']}',";
 			$query .= "'{$_POST['displaymethod']}','{$_POST['defpoints']}','{$_POST['defattempts']}',";
-			$query .= "'{$_POST['defpenalty']}','$deffeedback','$shuffle','{$_POST['gbcat']}','{$_POST['password']}','{$_POST['cntingb']}','{$_POST['showqcat']}','$isgroup');";
+			$query .= "'{$_POST['defpenalty']}','$deffeedback','$shuffle','{$_POST['gbcat']}','{$_POST['password']}','{$_POST['cntingb']}','{$_POST['showqcat']}','$isgroup','$showhints');";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			
 			$newaid = mysql_insert_id();
@@ -215,6 +220,7 @@
 			$line['shuffle'] = 0;
 			$line['minscore'] = 0;
 			$line['isgroup'] = 0;
+			$line['showhints']=1;
 			$gbcat = 0;
 			$cntingb = 1;
 			$showqcat = 0;
@@ -421,6 +427,7 @@ at <input type=text size=10 name=rtime value="<?php echo $rtime;?>"></span><BR c
 </select>
 </span>
 </span><br class=form>
+<span class=form>Show hints when available?</span><span class=formright><input type="checkbox" name="showhints" <?php if ($line['showhints']==1) { echo "CHECKED";} ?>></span><br class=form>
 <span class=form>Shuffle item order: </span><span class=formright><input type="checkbox" name="shuffle" <?php if ($line['shuffle']&1) {echo "CHECKED";} ?>></span><BR class=form>
 <span class=form>All items same random seed: </span><span class=formright><input type="checkbox" name="sameseed" <?php if ($line['shuffle']&2) {echo "CHECKED";} ?>></span><BR class=form>
 <span class=form>All students same version of questions: </span><span class=formright><input type="checkbox" name="samever" <?php if ($line['shuffle']&4) {echo "CHECKED";} ?>></span><BR class=form>

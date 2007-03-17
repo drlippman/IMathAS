@@ -296,7 +296,7 @@ END;
 	echo "<form method=post action=\"reviewlibrary.php?cid=$cid&source=$source&offset=$offset&lib=$lib\" onsubmit=\"doonsubmit()\">\n";
 	echo "<input type=hidden name=seed value=\"$seed\">\n";
 	unset($lastanswers);
-	displayq(0,$qsetid,$seed,true,0);
+	displayq(0,$qsetid,$seed,true,true,0);
 	echo "<input type=submit value=\"Submit\">\n";
 	echo "</form>\n";
 	

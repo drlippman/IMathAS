@@ -4,6 +4,9 @@
 //(c) 2006 David Lippman
 require_once("mathphp.php");
 array_push($allowedmacros,"loadlibrary","array","where");
+$disallowedwords = array("exit","die");
+$disallowedvar = array('$link','$qidx','$qnidx','$seed','$qdata','$toevalqtxt','$la','$GLOBALS','$laparts','$anstype','$kidx','$iidx','$tips','$options','$partla','$partnum','$score');
+		
 function interpret($blockname,$anstype,$str)
 {
 	if ($blockname=="qtext") {
@@ -14,15 +17,15 @@ function interpret($blockname,$anstype,$str)
 	} else {
 		global $allowedmacros;
 		global $mathfuncs;
-		$disallowedwords = array("exit","die");
-		$disallowedvar = array('$link','$qidx','$qnidx','$seed','$qdata','$toevalqtxt','$la','$GLOBALS','$laparts','$anstype','$kidx','$iidx','$tips','$options','$partla','$partnum','$score');
+		global $disallowedwords,$disallowedvar;
 		$str .= ' ';
 		$str = str_replace("\r\n","\n",$str);
-		$str = str_replace("//\n","<br/>",$str);
-		$str = str_replace("/\n"," ",$str);
+		$str = str_replace("&&\n","<br/>",$str);
+		$str = str_replace("&\n"," ",$str);
 		$commands = explode("\n",$str);
 		foreach($commands as $com) {
 			if (substr($com,0,2)=="//") {continue;}
+			$com = preg_replace('/^(.+)\/\/.+$/',"$1",$com);
 			$com = str_replace($disallowedwords,"",$com);
 			$com = preg_replace('/&(\w+);/',"&$1 exit",$com);
 			//causing problems in showasciisvg, so removed for now

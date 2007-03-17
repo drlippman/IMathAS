@@ -26,10 +26,50 @@
 	$allowmod = ((mysql_result($result,0,2)&2)==2);
 	$allowdel = ((mysql_result($result,0,2)&4)==4);
 	
+	
+	
 	if (!isset($_GET['page']) || $_GET['page']=='') {
 		$page = 1;
 	} else {
 		$page = $_GET['page'];
+	}
+	if (isset($_GET['search']) && trim($_GET['search'])!='') {
+		require("../header.php");
+		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
+		echo "<a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> &gt; Search Results</div>\n";
+	
+		echo "<h2>Forum Search Results</h2>";
+		
+		$safesearch = $_GET['search'];
+		$safesearch = str_replace(' and ', ' ',$safesearch);
+		$searchterms = explode(" ",$safesearch);
+		$searchlikes = "(imas_forum_posts.message LIKE '%".implode("%' AND imas_forum_posts.message LIKE '%",$searchterms)."%')";
+		$searchlikes2 = "(imas_forum_posts.subject LIKE '%".implode("%' AND imas_forum_posts.subject LIKE '%",$searchterms)."%')";
+		if (isset($_GET['allforums'])) {
+			$query = "SELECT imas_forums.id,imas_forum_posts.threadid,imas_forum_posts.subject,imas_forum_posts.message,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate,imas_forums.name FROM imas_forum_posts,imas_forums,imas_users ";
+			$query .= "WHERE imas_forum_posts.forumid=imas_forums.id AND imas_users.id=imas_forum_posts.userid AND imas_forums.courseid='$cid' AND ($searchlikes OR $searchlikes2)";
+		} else {
+			$query = "SELECT imas_forum_posts.forumid,imas_forum_posts.threadid,imas_forum_posts.subject,imas_forum_posts.message,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate ";
+			$query .= "FROM imas_forum_posts,imas_users WHERE imas_forum_posts.forumid='$forumid' AND imas_users.id=imas_forum_posts.userid AND ($searchlikes OR $searchlikes2)";
+		}
+		$query .= " ORDER BY imas_forum_posts.postdate DESC";
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			echo "<div class=block>";
+			echo "<b>{$row[2]}</b>";
+			if (isset($_GET['allforums'])) {
+				echo ' (in '.$row[7].')';
+			}
+			echo "<br/>Posted by: {$row[4]} {$row[5]}, ";
+			echo tzdate("F j, Y, g:i a",$row[6]);
+			
+			echo "</div><div class=blockitems>";
+			echo filter($row[3]);
+			echo "<p><a href=\"posts.php?cid=$cid&forum={$row[0]}&thread={$row[1]}\">Show full thread</a></p>";
+			echo "</div>\n";
+		}
+		require("../footer.php");
+		exit;
 	}
 	
 	if (isset($_GET['modify'])) { //adding or modifying thread
@@ -212,7 +252,7 @@
 	$numpages = ceil(mysql_result($result,0,0)/$threadsperpage);
 	
 	if ($numpages > 1) {
-		echo "<div style=\"padding: 5px;\">Page: ";
+		echo "<div >Page: ";
 		if ($page < $numpages/2) {
 			$min = max(2,$page-4);
 			$max = min($numpages-1,$page+8+$min-$page);
@@ -248,9 +288,19 @@
 		}
 		echo "</div>\n";
 	}
+	echo "<form method=get action=\"thread.php\">";
+	echo "<input type=hidden name=page value=\"$page\"/>";
+	echo "<input type=hidden name=cid value=\"$cid\"/>";
+	echo "<input type=hidden name=forum value=\"$forumid\"/>";
 	
 ?>
-		
+	Search: <input type=text name="search" /> <input type=checkbox name="allforums" />All forums in course? <input type="submit" value="Search"/>
+	</form>
+<?php
+	if ($myrights > 5 && time()<$postby) {
+		echo "<p><a href=\"thread.php?page=$page&cid=$cid&forum=$forumid&modify=new\">Add New Thread</a></p>\n";
+	}
+?>
 	<table class=forum>
 	<thead>
 	<tr><th>Topic</th><th>Replies</th><th>Views (Unique)</th><th>Last Post Date</th></tr>

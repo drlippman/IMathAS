@@ -277,6 +277,7 @@
 		$showansduring = (($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework") && $testsettings['showans']!='N');
 		$showansafterlast = ($testsettings['showans']==='F');
 		$noindivscores = ($noindivscores || $testsettings['testtype']=="NoScores");
+		$showhints = ($testsettings['showhints']==1);
 		
 		
 		if (isset($_GET['reattempt'])) {
@@ -396,7 +397,7 @@
 		$query .= "FROM imas_assessment_sessions WHERE id='$testid'";
 		$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
 		$row = mysql_fetch_row($result);
-		$insrow = "'".implode("','",$row)."'";
+		$insrow = "'".implode("','",addslashes_deep($row))."'";
 		$errcnt = 0;
 		for ($i=1;$i<7;$i++) {
 			if ($_POST['user'.$i]!=0) {
@@ -641,7 +642,7 @@
 				echo "<form method=post action=\"showtest.php?action=shownext&score=$toshow\" onsubmit=\"return doonsubmit(this)\">\n";
 				list($qsetid,$cat) = getqsetid($questions[$toshow]);
 				if ($showansduring && $attempts[$toshow]>=$testsettings['showans']) {$showa = true;} else {$showa=false;}
-				displayq($toshow,$qsetid,$seeds[$toshow],$showa,$attempts[$toshow],false,(($testsettings['shuffle']&8)==8));
+				displayq($toshow,$qsetid,$seeds[$toshow],$showa,$showhints,$attempts[$toshow],false,(($testsettings['shuffle']&8)==8));
 				echo "<div class=review>Points possible: " . getpointspossible($questions[$toshow],$testsettings['defpoints']);
 				$allowed = getallowedattempts($questions[$toshow],$testsettings['defattempts']);
 				if ($allowed==0) {
@@ -744,7 +745,7 @@
 					echo "<a name=\"beginquestions\"></a>\n";
 					list($qsetid,$cat) = getqsetid($questions[$next]);
 					if ($showansduring && $attempts[$next]>=$testsettings['showans']) {$showa = true;} else {$showa=false;}
-					displayq($next,$qsetid,$seeds[$next],$showa,$attempts[$next],false,(($testsettings['shuffle']&8)==8));
+					displayq($next,$qsetid,$seeds[$next],$showa,$showhints,$attempts[$next],false,(($testsettings['shuffle']&8)==8));
 					echo "<div class=review>Points possible: " . getpointspossible($questions[$next],$testsettings['defpoints']);
 					$allowed = getallowedattempts($questions[$next],$testsettings['defattempts']);
 					if ($allowed==0) {
@@ -792,7 +793,7 @@
 						echo "<p>Question with last attempt is displayed for your review only</p>";
 						$showa = false;
 						list($qsetid,$cat) = getqsetid($questions[$next]);
-						displayq($next,$qsetid,$seeds[$next],$showansafterlast,$attempts[$next],false,false);
+						displayq($next,$qsetid,$seeds[$next],$showansafterlast,$showhints,$attempts[$next],false,false);
 					}
 					echo "</div>\n";
 				}
@@ -960,13 +961,13 @@
 						$doshowa = ($showansafterlast && $showeachscore);
 					}
 					if ($i==$toshow) {
-						displayq($i,$qsetid,$seeds[$i],$doshowa,$attempts[$i],false,(($testsettings['shuffle']&8)==8),false);
+						displayq($i,$qsetid,$seeds[$i],$doshowa,$showhints,$attempts[$i],false,(($testsettings['shuffle']&8)==8),false);
 					} else if ($qavail) {
 						echo "<div class=todoquestion>";
-						displayq($i,$qsetid,$seeds[$i],$doshowa,$attempts[$i],false,(($testsettings['shuffle']&8)==8),true);
+						displayq($i,$qsetid,$seeds[$i],$doshowa,$showhints,$attempts[$i],false,(($testsettings['shuffle']&8)==8),true);
 						echo "</div>";
 					} else {
-						displayq($i,$qsetid,$seeds[$i],$doshowa,$attempts[$i],false,(($testsettings['shuffle']&8)==8),true);
+						displayq($i,$qsetid,$seeds[$i],$doshowa,$showhints,$attempts[$i],false,(($testsettings['shuffle']&8)==8),true);
 					}
 					
 					if ($i==$toshow) {
@@ -1010,7 +1011,7 @@
 				list($qsetid,$cat) = getqsetid($questions[$i]);
 				if (unans($scores[$i])) {
 					if ($showansduring && $attempts[$i]>=$testsettings['showans']) {$showa = true;} else {$showa=false;}
-					displayq($i,$qsetid,$seeds[$i],$showa,$attempts[$i],false,(($testsettings['shuffle']&8)==8));
+					displayq($i,$qsetid,$seeds[$i],$showa,$showhints,$attempts[$i],false,(($testsettings['shuffle']&8)==8));
 					echo "<div class=review>Points possible: " . getpointspossible($questions[$i],$testsettings['defpoints']);
 					if ($allowed[$i]==0) {
 						echo "<br/>Unlimited attempts";
@@ -1109,7 +1110,7 @@
 				echo "<form method=post action=\"showtest.php?action=shownext&score=$i\" onsubmit=\"return doonsubmit(this)\">\n";
 				list($qsetid,$cat) = getqsetid($questions[$i]);
 				if ($showansduring && $attempts[$i]>=$testsettings['showans']) {$showa = true;} else {$showa=false;}
-				displayq($i,$qsetid,$seeds[$i],$showa,$attempts[$i],false,(($testsettings['shuffle']&8)==8));
+				displayq($i,$qsetid,$seeds[$i],$showa,$showhints,$attempts[$i],false,(($testsettings['shuffle']&8)==8));
 				echo "<div class=review>Points possible: " . getpointspossible($questions[$i],$testsettings['defpoints']); 
 				if ($allowed[$i]==0) {
 					echo "<br/>Unlimited attempts";
@@ -1179,7 +1180,7 @@
 				echo "<a name=\"beginquestions\"></a>\n";
 				list($qsetid,$cat) = getqsetid($questions[$i]);
 				if ($showansduring && $attempts[$i]>=$testsettings['showans']) {$showa = true;} else {$showa=false;}
-				displayq($i,$qsetid,$seeds[$i],$showa,$attempts[$i],false,(($testsettings['shuffle']&8)==8));
+				displayq($i,$qsetid,$seeds[$i],$showa,$showhints,$attempts[$i],false,(($testsettings['shuffle']&8)==8));
 				echo "<div class=review>Points possible: " . getpointspossible($questions[$i],$testsettings['defpoints']); 
 				if ($allowed[$i]==0) {
 					echo "<br/>Unlimited attempts";
@@ -1276,13 +1277,13 @@
 						$doshowa = ($showansafterlast && $showeachscore);
 					}
 					if ($i==$curq) {
-						displayq($i,$qsetid,$seeds[$i],$doshowa,$attempts[$i],false,(($testsettings['shuffle']&8)==8),false);
+						displayq($i,$qsetid,$seeds[$i],$doshowa,$showhints,$attempts[$i],false,(($testsettings['shuffle']&8)==8),false);
 					} else if ($qavail) {
 						echo "<div class=todoquestion>";
-						displayq($i,$qsetid,$seeds[$i],$doshowa,$attempts[$i],false,(($testsettings['shuffle']&8)==8),true);
+						displayq($i,$qsetid,$seeds[$i],$doshowa,$showhints,$attempts[$i],false,(($testsettings['shuffle']&8)==8),true);
 						echo "</div>";
 					} else {
-						displayq($i,$qsetid,$seeds[$i],$doshowa,$attempts[$i],false,(($testsettings['shuffle']&8)==8),true);
+						displayq($i,$qsetid,$seeds[$i],$doshowa,$showhints,$attempts[$i],false,(($testsettings['shuffle']&8)==8),true);
 					}
 					if ($i==$curq) {
 						echo "<div><input type=submit class=btn value=\"Submit Question ".($i+1)."\"></div><p></p>\n";

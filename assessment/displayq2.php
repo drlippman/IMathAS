@@ -6,10 +6,10 @@ $allowedmacros = $mathfuncs;
 require_once("mathphp.php");
 require("interpret.php");
 require("macros.php");
-function displayq($qnidx,$qidx,$seed,$doshowans,$attemptn) {
+function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false) {
 	srand($seed);
 	
-	if (func_num_args()>5 && func_get_arg(5)==true) {
+	/*if (func_num_args()>5 && func_get_arg(5)==true) {
 		$returnqtxt = true;
 	} else {
 		$returnqtxt = false;
@@ -23,7 +23,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$attemptn) {
 		$seqinactive = true;
 	} else {
 		$seqinactive = false;
-	}
+	}*/
 	
 	$query = "SELECT qtype,control,qcontrol,qtext,answer,hasimg FROM imas_questionset WHERE id='$qidx'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -120,7 +120,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$attemptn) {
 	}
 	
 	//create hintbuttons
-	if (isset($hints)) {
+	if (isset($hints) && $showhints) {
 		$lastkey = end(array_keys($hints));
 		if ($qdata['qtype']=="multipart" && is_array($hints[$lastkey])) { //individual part hints
 			foreach ($hints as $iidx=>$hintpart) {

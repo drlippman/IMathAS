@@ -1238,15 +1238,15 @@ $str = &quot;What is $a/$b&quot;
 In this example, $str now contains &quot;What is 3/5&quot;.
 </p>
 <p>
-If you have a long command to type, you can put a &quot;/&quot; at the end of a line to specify it continues on the next line.  Example:
+If you have a long command to type, you can put a &quot;&amp;&quot; at the end of a line to specify it continues on the next line.  Example:
 <pre>
-$questions = array("this is choice 1",/
+$questions = array("this is choice 1",&amp;
 "this is choice 2")
 </pre>
-If defining a string for display, you can put a &quot;//&quot; at the end of a line to specify it continues on the next line and insert
+If defining a string for display, you can put a &quot;&amp;&amp;&quot; at the end of a line to specify it continues on the next line and insert
 an HTML line break.  Example:
 <pre>
-$showanswer = "Do this first. //
+$showanswer = "Do this first. &amp;&amp;
 Then do this."
 </pre>
 will be interpreted as:

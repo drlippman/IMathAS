@@ -285,6 +285,9 @@ div.right {
 span.right {
 	float:right;	
 }
+.floatright {
+	float:right;
+}
 span.padright {
 	float:right;
 	padding-right: 120px;

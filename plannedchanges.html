@@ -19,15 +19,25 @@
 </h3>Planned for Next Version</h3>
 <ul>
 Important
-<li>Improve mass change dates page (add all items, filter by type, etc - doable but will take awhile)</li>
+<li>Use serialize for lastanswers and bestlastanswers</li>
 <li>Lockdown course on assessment option (easy if lockdown on course, harder if pulling lockdown from assessments (needed for accomodating exceptions))</li>
 <li>Written assignments / way to grade essay questions (fairly easy but need some time)</li>
 <li>Per-part show answers after last policy</li>
+<li>Student groups:</li>
+1) Fix current on-the-fly groups to allow group definition at the beginning, w/ add later ability.  
+   Any changes reflect on all group members.
+   Changes in gradebook reflect on all members unless specified.
+2) Add student_groups table for predefined groups
+   Add ability on assessments to use predefined groups
+   Create group management pages: manage by groups; manage by users
+   User: Add to group, list of groups (on the fly and predefined) w/remove from link
+   Group: Add students, list of students w/ remove from links
+     
 
 <li>Icons on skip around, sequential - needs new question status function for efficient processing</li>
-<li>Forum search</li>
-<li>List libraries in question preview</li>
 <li>Instructor specific library/question listing</li>
+<li>custom $previewloc</li>
+<li>Add thread to top of page</li>
 
 <li><b>Gradebook</b></li>
 <li>GPA, edittable and from lookup (need separate way to store GPA, fill stored from lookup when switched)</li>
@@ -35,8 +45,6 @@ Important
 <li><b>Options</b></li>
 <li>Forum links to internal messaging when allowed (for students)</li>
 <li>Course default Color control (do-able - need to integrate with block color defaults)</li>
-<li>Block colors:  type number (add text boxes, use new colorpicker)</li>
-<li>Ignore case on equation variables (need $variable for it - has to be passed to clientside) </li>
 <li>Add dates/time (instructions?) to mass chg assessment (should be easy - don't need if change dates is done right)</li>
 
 <li><b>Cleanup</b></li>
@@ -60,6 +68,7 @@ new item flag
 
 
 Maybe not / Wait
+<li>Ignore case on equation variables (need $variable for it - has to be passed to clientside) </li>
 Test without saving:  Test, Save, Save As.. (need temp table.. I don't like this idea)
 <li>collapse gradebook by blocks (no easy way to do this)</li>
 <li>Gradebook stats for students (no easy way to do this given current framework)</li>

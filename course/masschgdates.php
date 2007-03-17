@@ -100,6 +100,7 @@
 	echo '<script src="../javascript/CalendarPopup.js"></script>';
 	echo '<SCRIPT LANGUAGE="JavaScript" ID="js1">';
 	echo 'var cal1 = new CalendarPopup();';
+	echo 'cal1.setReturnFunction ("calcallback");';
 	echo 'var basesdates = new Array(); var baseedates = new Array(); var baserdates = new Array();';
 	echo '</SCRIPT>';
 	

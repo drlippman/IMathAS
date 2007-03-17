@@ -481,9 +481,9 @@
 						$astyle = '';
 					}
 					echo ">";
-					echo "<span class=right><input type=button id=\"but{$items[$i]['id']}\" value=\"";
+					echo "<input class=\"floatright\" type=button id=\"but{$items[$i]['id']}\" value=\"";
 					if ($isopen) {echo "Collapse";} else {echo "Expand";}
-					echo "\" onClick=\"toggleblock('{$items[$i]['id']}','$parent-$bnum')\"></span>\n";
+					echo "\" onClick=\"toggleblock('{$items[$i]['id']}','$parent-$bnum')\">\n";
 					echo "<span class=pointer onClick=\"toggleblock('{$items[$i]['id']}','$parent-$bnum')\"><b>{$items[$i]['name']}</b></span> ";
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
 						echo "<span style=\"color:red;\">New</span>";
@@ -553,9 +553,9 @@
 						$astyle = '';
 					}
 					echo ">";
-					echo "<span class=right><input type=button id=\"but{$items[$i]['id']}\" value=\"";
+					echo "<input class=\"floatright\" type=button id=\"but{$items[$i]['id']}\" value=\"";
 					if ($isopen) {echo "Collapse";} else {echo "Expand";}
-					echo "\" onClick=\"toggleblock('{$items[$i]['id']}','$parent-$bnum')\"></span>\n";
+					echo "\" onClick=\"toggleblock('{$items[$i]['id']}','$parent-$bnum')\">\n";
 					echo "<span class=pointer onClick=\"toggleblock('{$items[$i]['id']}','$parent-$bnum')\"><b>";
 					if ($items[$i]['SH'][0]=='S') {echo "{$items[$i]['name']}</b></span> ";} else {echo "<i>{$items[$i]['name']}</i></b></span> ";}
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
@@ -634,7 +634,7 @@
 			   if ($line['startdate']<$now && $line['enddate']>$now) {
 				   echo "<div class=item>\n";
 				   if (($hideicons&1)==0) {
-					   echo "<div class=icon style=\"background-color: " . makecolor($line['enddate'],$now) . ";\">?</div>";
+					   echo "<div class=icon style=\"background-color: " . makecolor2($line['startdate'],$line['enddate'],$now) . ";\">?</div>";
 				   }
 				   if (substr($line['deffeedback'],0,8)=='Practice') {
 					   $endname = "Available until";
@@ -702,7 +702,7 @@
 				   echo "<div class=item>\n";
 				   if ($line['title']!='##hidden##') {
 					   if (($hideicons&2)==0) {
-						   echo "<div class=icon style=\"background-color: " . makecolor($line['enddate'],$now) . ";\">!</div>";
+						   echo "<div class=icon style=\"background-color: " . makecolor2($line['startdate'],$line['enddate'],$now) . ";\">!</div>";
 					   }
 					   echo "<div class=title> <b>{$line['title']}</b>\n";
 					   if (isset($teacherid)) { 
@@ -793,7 +793,7 @@
 			   if ($line['startdate']<$now && $line['enddate']>$now) {
 				   echo "<div class=item>\n";
 				   if (($hideicons&4)==0) {
-					echo "<div class=icon style=\"background-color: " . makecolor($line['enddate'],$now) . ";\">!</div>";
+					echo "<div class=icon style=\"background-color: " . makecolor2($line['startdate'],$line['enddate'],$now) . ";\">!</div>";
 				   }
 				   echo "<div class=title>";
 				   echo "<b><a href=\"$alink\">{$line['title']}</a></b>\n";
@@ -856,7 +856,7 @@
 			   if ($line['startdate']<$now && $line['enddate']>$now) {
 				   echo "<div class=item>\n";
 				   if (($hideicons&8)==0) {
-					   echo "<div class=icon style=\"background-color: " . makecolor($line['enddate'],$now) . ";\">F</div>";
+					   echo "<div class=icon style=\"background-color: " . makecolor2($line['startdate'],$line['enddate'],$now) . ";\">F</div>";
 				   }
 				   echo "<div class=title> ";
 				   echo "<b><a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}\">{$line['name']}</a></b>\n";

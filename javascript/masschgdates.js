@@ -195,6 +195,14 @@ Date.prototype.getWeekDays = function(d) {
 	  var ordertype = document.getElementById("orderby").value;
 	  window.location = orderaddr + '&orderby=' + ordertype;
   }
+  function calcallback(y,m,d) {
+	  globd.setYear(y);
+	  globd.setMonth(m-1);
+	  globd.setDate(d);
+	  var el = window.CP_targetInput;
+	  document.getElementById(el.id.substring(0,2)+el.id.substring(5)).innerHTML = globd.SHORTDAYS[globd.getDay()];
+	  CP_tmpReturnFunction(y,m,d);
+  }
   	//TODO: separately calculate day difference (using daysBetween and getWeekDays) and time difference separately
 	//can use getHours()*60+getMinutes() to get minutes into day, then multiply to get ms for timediff
 	//then use date object, set to basesdate, use addDays or addBizDays to add the days, and setTime(getTime()+d) for time diff.

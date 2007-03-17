@@ -599,6 +599,20 @@ function dispreducedfraction($n,$d) {
 
 //use: calconarray($a,"x^$p")
 function calconarray($array,$todo) {
+	global $disallowedwords,$allowedmacros;
+	$todo = str_replace($disallowedwords,"",$todo);
+	$rsnoquote = preg_replace('/"[^"]*"/','""',$todo);
+	$rsnoquote = preg_replace('/\'[^\']*\'/','\'\'',$rsnoquote);
+	if (preg_match_all('/([$\w]+)\s*\([^\)]*\)/',$rsnoquote,$funcs)) {
+		for ($i=0;$i<count($funcs[1]);$i++) {
+			if (strpos($funcs[1][$i],"$")===false) {
+				if (!in_array($funcs[1][$i],$allowedmacros)) {
+					echo "{$funcs[1][$i]} is not an allowed function<BR>\n";
+					return false;
+				}
+			}
+		}
+	}
 	$todo = mathphp($todo,'x');
 	$todo = str_replace('(x)','($x)',$todo);
 	return array_map(create_function('$x','return('.$todo.');'),$array);	

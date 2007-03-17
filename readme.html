@@ -116,12 +116,13 @@ I encourage anyone with a development server and the know-how to take it on.</p>
 	<li>course/files</li>
 	<li>filter/graph/imgs</li>
 	</ul>
-<li>Edit the config.php file.  Change these options to your liking:</li>
+<li>Copy the config.php.dist to config.php and edit it.  Change these options to your liking:</li>
 	<ul>
 	<li>$dbserver:  The address of your database server.  Probably www.yoursite.edu or localhost</li>
 	<li>$dbname:  The name of the IMathAS database</li>
 	<li>$dbusername:  The username of the IMathAS database user.</li>
 	<li>$dbpassword:  The password for the IMathAS database user.  Choose something really complicated</li>
+	<li>$installname: The name of your installation, for personalization.</li>
 	<li>$longloginprompt:  How you want to prompt new students for a username</li>
 	<li>$loginprompt:  How you want to prompt students for a username</li>
 	<li>$loginformat:  Enforce a format requirement on the username</li>
@@ -148,10 +149,11 @@ I encourage anyone with a development server and the know-how to take it on.</p>
 	</ul>
 <li>Run the dbsetup.php script (access http://yoursite.edu $imasroot/dbsetup.php), or send it 
     to your system administrator and ask them to run it, if you don't have creation access
-    to the database server.  This script sets up the necessary user, database, and tables for IMathAS.</li>
+    to the database server.  Alternatively, have your system administrator create a database and database user,
+    and use these names in the config.php file before running dbsetup.php.  This script sets up the necessary database user, database, and tables for IMathAS.</li>
 <li>Delete the dbsetup.php script, or store it somewhere not on the webserver</li>
 <li>Log into IMathAS.  Access http://yourside.edu $imasroot.  If you didn't change the
-    initial imathas user settings in dbsetup.php, log in as 'root' with password 'root'. 
+    initial imathas user settings when running dbsetup.php, log in as 'root' with password 'root'. 
     If you did not change the inital imathas user settings, click the "Change Password"
     link now to change the password to something substantial.  Alternatively, you can
     go into the Admin page, create a new user with Admin rights, then delete the 'root'

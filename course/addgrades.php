@@ -186,10 +186,37 @@ function onenter(e,field) {
 		return true;
 	}
 }
+function onarrow(e,field) {
+	if (window.event) {
+		var key = window.event.keyCode;
+	} else if (e.which) {
+		var key = e.which;
+	}
+	
+	if (key==40 || key==38) {
+		var i;
+                for (i = 0; i < field.form.elements.length; i++)
+                   if (field == field.form.elements[i])
+                       break;
+		
+	      if (key==38) {
+		      i = i-1;
+		      if (i<0) { i=0;}
+	      } else {
+		      i = (i + 1) % field.form.elements.length;
+	      }
+	      if (field.form.elements[i].type=='text') {
+		      field.form.elements[i].focus();
+	      }
+              return false;
+	} else {
+		return true;
+	}
+}
 
 function doonblur(value) {
 	value = value.replace(/[^\d\.\+\-]/g,'');
-	if (value=='') {return 0;}
+	if (value=='') {return ('');}
 	return (eval(value));
 }
 </script>
@@ -266,7 +293,7 @@ function doonblur(value) {
 			} else {
 				echo "<td><input type=text size=3 name=\"newscore[{$row[0]}]\" value=\"";
 			}
-			echo "\" onkeypress=\"return onenter(event,this)\" onblur=\"this.value = doonblur(this.value);\" /></td></tr>";
+			echo "\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" onblur=\"this.value = doonblur(this.value);\" /></td></tr>";
 		}
 		
 		echo "</tbody></table>";
