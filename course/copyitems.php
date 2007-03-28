@@ -312,32 +312,36 @@ END;
 			$typeid = mysql_result($result,0,1);
 			switch($itemtype) {
 				case ($itemtype==="InlineText"):
-					$query = "SELECT title FROM imas_inlinetext WHERE id=$typeid";
+					$query = "SELECT title,text FROM imas_inlinetext WHERE id=$typeid";
 					break;
 				case ($itemtype==="LinkedText"):
-					$query = "SELECT title FROM imas_linkedtext WHERE id=$typeid";
+					$query = "SELECT title,summary FROM imas_linkedtext WHERE id=$typeid";
 					break;
 				case ($itemtype==="Forum"):
-					$query = "SELECT name FROM imas_forums WHERE id=$typeid";
+					$query = "SELECT name,description FROM imas_forums WHERE id=$typeid";
 					break;
 				case ($itemtype==="Assessment"):
-					$query = "SELECT name FROM imas_assessments WHERE id=$typeid";
+					$query = "SELECT name,summary FROM imas_assessments WHERE id=$typeid";
 					break;
 			}
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$name = mysql_result($result,0,0);
-			return array($itemtype,$name);
+			$summary = mysql_result($result,0,1);
+			return array($itemtype,$name,$summary);
 		}
 		$ids = array();
 		$types = array();
 		$names = array();
+		$sums = array();
 		function getsubinfo($items,$parent,$pre) {
-			global $ids,$types,$names;
+			global $ids,$types,$names,$sums;
+			
 			foreach($items as $k=>$item) {
 				if (is_array($item)) {
 					$ids[] = $parent.'-'.($k+1);
 					$types[] = $pre."Block";
 					$names[] = stripslashes($item['name']);
+					$sums[] = '';
 					if (count($item['items'])>0) {
 						getsubinfo($item['items'],$parent.'-'.($k+1),$pre.'--');
 					}
@@ -349,6 +353,11 @@ END;
 					$arr = getiteminfo($item);
 					$types[] = $pre.$arr[0];
 					$names[] = $arr[1];
+					$arr[2] = strip_tags($arr[2]);
+					if (strlen($arr[2])>100) {
+						$arr[2] = substr($arr[2],0,97).'...';
+					}
+					$sums[] = $arr[2];
 				}
 			}
 		}
@@ -373,13 +382,13 @@ END;
 		
 		
 		echo "<table cellpadding=5 class=gb>\n";
-		echo "<thead><tr><th></th><th>Type</th><th>Title</th></tr></thead><tbody>\n";
+		echo "<thead><tr><th></th><th>Type</th><th>Title</th><th>Summary</th></tr></thead><tbody>\n";
 		$alt=0;
 		for ($i = 0 ; $i<(count($ids)); $i++) {
 			if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 			echo "<td>";
 			echo "<input type=checkbox name='checked[]' value='{$ids[$i]}' checked=checked>";
-			echo "</td><td>{$types[$i]}</td><td>{$names[$i]}</td>\n";
+			echo "</td><td>{$types[$i]}</td><td>{$names[$i]}</td><td>{$sums[$i]}</td>\n";
 			echo "</tr>\n";
 		}
 		echo "</tbody></table>\n";

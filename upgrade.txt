@@ -22,6 +22,9 @@ ALTER TABLE `imas_assessments` ADD `showhints` TINYINT( 1 ) UNSIGNED NOT NULL DE
 ALTER TABLE `imas_forums` ADD `grpaid` INT( 10 ) UNSIGNED NOT NULL DEFAULT '0';
 ALTER TABLE `imas_assessment_sessions` ADD `agroupid` INT( 10 ) UNSIGNED NOT NULL DEFAULT '0';
 
+ALTER TABLE `imas_courses` ADD `available` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0',
+ADD `lockaid` INT( 10 ) UNSIGNED NOT NULL DEFAULT '0';
+
 
 *********************
 ** IMathAS 1.1     **

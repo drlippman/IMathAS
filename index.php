@@ -16,7 +16,8 @@
 	}
 
 	$query = "SELECT imas_courses.name,imas_courses.id FROM imas_students,imas_courses ";
-	$query .= "WHERE imas_students.courseid=imas_courses.id AND imas_students.userid='$userid' ORDER BY imas_courses.name";
+	$query .= "WHERE imas_students.courseid=imas_courses.id AND imas_students.userid='$userid' ";
+	$query .= "AND (available=0 OR available=2) ORDER BY imas_courses.name";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
 	if ($line == null) {
@@ -53,7 +54,8 @@
 		echo "<div class=submit><input type=submit value='Sign Up'></div></form></div>\n";
 	}
 	$query = "SELECT imas_courses.name,imas_courses.id FROM imas_teachers,imas_courses ";
-	$query .= "WHERE imas_teachers.courseid=imas_courses.id AND imas_teachers.userid='$userid' ORDER BY imas_courses.name";
+	$query .= "WHERE imas_teachers.courseid=imas_courses.id AND imas_teachers.userid='$userid' ";
+	$query .= "AND (available=0 OR available=1) ORDER BY imas_courses.name";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
 	if ($line != null) {

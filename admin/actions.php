@@ -112,10 +112,12 @@ switch($_GET['action']) {
 		} else {
 			$topbar[1] = '';
 		}
+		
 		$topbar = implode('|',$topbar);
 			
 		$hideicons = $_POST['HIassess'] + $_POST['HIinline'] + $_POST['HIlinked'] + $_POST['HIforum'] + $_POST['HIblock'];
-		$query = "UPDATE imas_courses SET name='{$_POST['coursename']}',enrollkey='{$_POST['ekey']}',hideicons='$hideicons',";
+		$avail = 3 - $_POST['stuavail'] - $_POST['teachavail'];
+		$query = "UPDATE imas_courses SET name='{$_POST['coursename']}',enrollkey='{$_POST['ekey']}',hideicons='$hideicons',available='$avail',lockaid='{$_POST['lockaid']}',";
 		$query .= "allowunenroll='{$_POST['allowunenroll']}',copyrights='{$_POST['copyrights']}',msgset='{$_POST['msgset']}',topbar='$topbar',cploc='{$_POST['cploc']}' WHERE id='{$_GET['id']}'";
 		if ($myrights==40) { $query .= " AND ownerid='$userid'";}
 		mysql_query($query) or die("Query failed : " . mysql_error());
@@ -135,9 +137,11 @@ switch($_GET['action']) {
 		}
 		$topbar = implode('|',$topbar);
 		$hideicons = $_POST['HIassess'] + $_POST['HIinline'] + $_POST['HIlinked'] + $_POST['HIforum'] + $_POST['HIblock'];
+		$avail = 3 - $_POST['stuavail'] - $_POST['teachavail'];
+		
 		$itemorder = addslashes(serialize(array()));
-		$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,allowunenroll,copyrights,msgset,itemorder,topbar,cploc) VALUES ";
-		$query .= "('{$_POST['coursename']}','$userid','{$_POST['ekey']}','$hideicons','{$_POST['allowunenroll']}','{$_POST['copyrights']}','{$_POST['msgset']}','$itemorder','$topbar','{$_POST['cploc']}');";
+		$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,allowunenroll,copyrights,msgset,itemorder,topbar,cploc,available) VALUES ";
+		$query .= "('{$_POST['coursename']}','$userid','{$_POST['ekey']}','$hideicons','{$_POST['allowunenroll']}','{$_POST['copyrights']}','{$_POST['msgset']}','$itemorder','$topbar','{$_POST['cploc']}','$avail');";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		$cid = mysql_insert_id();
 		//if ($myrights==40) {

@@ -95,7 +95,7 @@ switch($_GET['action']) {
 	case "modify":
 	case "addcourse":
 		if ($_GET['action']=='modify') {
-			$query = "SELECT id,name,enrollkey,hideicons,allowunenroll,copyrights,msgset,topbar,cploc FROM imas_courses WHERE id='{$_GET['id']}'";
+			$query = "SELECT id,name,enrollkey,hideicons,allowunenroll,copyrights,msgset,topbar,cploc,available,lockaid FROM imas_courses WHERE id='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$line = mysql_fetch_array($result, MYSQL_ASSOC);
 			$courseid = $line['id'];
@@ -111,6 +111,8 @@ switch($_GET['action']) {
 			$topbar[1] = explode(',',$topbar[1]);
 			if ($topbar[0][0] == null) {unset($topbar[0][0]);}
 			if ($topbar[1][0] == null) {unset($topbar[1][0]);}
+			$avail = $line['available'];
+			$lockaid = $line['lockaid'];
 		} else {
 			$courseid = "Not yet set";
 			$name = "Enter course name here";
@@ -121,6 +123,8 @@ switch($_GET['action']) {
 			$msgset = 0;
 			$cploc = 0;
 			$topbar = array(array(),array());
+			$avail = 0;
+			$lockaid = 0;
 		}
 		
 		echo "<form method=post action=\"actions.php?action={$_GET['action']}";
@@ -129,6 +133,27 @@ switch($_GET['action']) {
 		echo "<span class=form>Course ID:</span><span class=formright>$courseid</span><br class=form>\n";
 		echo "<span class=form>Enter Course name:</span><input class=form type=text size=80 name=\"coursename\" value=\"$name\"><BR class=form>\n";
 		echo "<span class=form>Enter Enrollment key:</span><input class=form type=text size=30 name=\"ekey\" value=\"$ekey\"><BR class=form>\n";
+		echo '<span class=form>Available?</span><span class=formright>';
+		echo '<input type="checkbox" name="stuavail" value="1" ';
+		if (($avail&1)==0) { echo 'checked="checked"';}
+		echo '/>Available to students<br/><input type="checkbox" name="teachavail" value="2" ';
+		if (($avail&2)==0) { echo 'checked="checked"';}
+		echo '/>Show on instructors\' home page</span><br class="form" />';
+		if ($_GET['action']=="modify") {
+			echo '<span class=form>Lock for assessment:</span><span class=formright><select name="lockaid">';
+			echo '<option value="0" ';
+			if ($lockaid==0) { echo 'selected="1"';}
+			echo '>No lock</option>';
+			$query = "SELECT id,name FROM imas_assessments WHERE courseid='{$_GET['id']}' ORDER BY name";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				echo "<option value=\"{$row[0]}\" ";
+				if ($lockaid==$row[0]) { echo 'selected="1"';}
+				echo ">{$row[1]}</option>";
+			}
+			echo '</select></span><br class="form"/>';
+		}
+			
 		echo "<span class=form>Icons:</span><span class=formright>\n";
 		echo 'Assessments: <input type=radio name="HIassess" value="0" ';
 		if (($hideicons&1)==0) { echo "checked=1";}     

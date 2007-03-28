@@ -827,7 +827,11 @@
 				if (!isset($teacherid)) {
 					$query = "SELECT agroupid FROM imas_assessment_sessions WHERE assessmentid='{$line['grpaid']}' AND userid='$userid'";
 					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-					$agroupid = mysql_result($result,0,0);
+					if (mysql_num_rows($result)>0) {
+						$agroupid = mysql_result($result,0,0);
+					} else {
+						$agroupid=0;
+					}
 					$dofilter = true;
 				} 
 				if ($dofilter) {
