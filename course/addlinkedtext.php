@@ -91,27 +91,33 @@
 			//$uploadfile = $uploaddir . "$cid-" . basename($_FILES['userfile']['name']);
 			$userfilename = preg_replace('/[^\w\.]/','',basename($_FILES['userfile']['name']));
 			$filename = $userfilename;
-			$uploadfile = $uploaddir . $filename;
-			$t=0;
-			while(file_exists($uploadfile)){ //make sure filename is unused
-				$filename = substr($filename,0,strpos($userfilename,"."))."_$t".strstr($userfilename,".");
-				$uploadfile=$uploaddir.$filename;
-				$t++;
-			}
-			
-			if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
-				//echo "<p>File is valid, and was successfully uploaded</p>\n";
+			$extension = strtolower(strrchr($userfilename,"."));
+			$badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");
+			if (in_array($extension,$badextensions)) {
+				echo "<p>File type is not allowed</p>";
 			} else {
-				echo "<p>Error uploading file!</p>\n";
-				echo "<p><a href=\"addlinkedtext.php?cid={$_GET['cid']}";
-				if (isset($_GET['id'])) {
-					echo "id={$_GET['id']}";
+				$uploadfile = $uploaddir . $filename;
+				$t=0;
+				while(file_exists($uploadfile)){ //make sure filename is unused
+					$filename = substr($filename,0,strpos($userfilename,"."))."_$t".strstr($userfilename,".");
+					$uploadfile=$uploaddir.$filename;
+					$t++;
 				}
-				echo "\">Try Again</a></p>\n";
-				exit;
+				
+				if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
+					//echo "<p>File is valid, and was successfully uploaded</p>\n";
+				} else {
+					echo "<p>Error uploading file!</p>\n";
+					echo "<p><a href=\"addlinkedtext.php?cid={$_GET['cid']}";
+					if (isset($_GET['id'])) {
+						echo "id={$_GET['id']}";
+					}
+					echo "\">Try Again</a></p>\n";
+					exit;
+				}
+				//$_POST['text'] = "file:$cid-" . basename($_FILES['userfile']['name']);
+				$_POST['text'] = "file:$filename";
 			}
-			//$_POST['text'] = "file:$cid-" . basename($_FILES['userfile']['name']);
-			$_POST['text'] = "file:$filename";
 			
 		} else if (substr(strip_tags($_POST['text']),0,4)=="http") {
 			$_POST['text'] = trim(strip_tags($_POST['text']));	

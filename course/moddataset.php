@@ -235,8 +235,12 @@
 		
 		if ($_POST['test']=="Save and Test Question") {
 			echo "<script>addr = '$imasroot/course/testquestion.php?cid=$cid&qsetid={$_GET['id']}';";
-
-			echo "window.open(addr,'Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20));</script>\n";	
+			//echo "function previewit() {";
+			echo "previewpop = window.open(addr,'Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20));\n";
+			echo "previewpop.focus();";
+			echo "</script>";
+			//echo "}";
+			//echo "window.onload = previewit;";
 		} else {
 			require("../footer.php");
 			exit;

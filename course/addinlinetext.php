@@ -143,30 +143,37 @@
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			
 		}
-		if ($_FILES['userfile']['name']!='') {
+		if ($_FILES['userfile']['name']!='') { 
 			$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
 			$userfilename = preg_replace('/[^\w\.]/','',basename($_FILES['userfile']['name']));
 			$filename = $userfilename;
-			$uploadfile = $uploaddir . $filename;
-			$t=0;
-			while(file_exists($uploadfile)){
-				$filename = substr($filename,0,strpos($userfilename,"."))."_$t".strstr($userfilename,".");
-				$uploadfile=$uploaddir.$filename;
-				$t++;
-			}
-			
-			if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
-				//echo "<p>File is valid, and was successfully uploaded</p>\n";
-				if (trim($_POST['newfiledescr'])=='') {
-					$_POST['newfiledescr'] = $filename;
-				}
-				$query = "INSERT INTO imas_instr_files (description,filename,itemid) VALUES ('{$_POST['newfiledescr']}','$filename','$newtextid')";
-				mysql_query($query) or die("Query failed :$query " . mysql_error());
-				$addedfile = mysql_insert_id();
-				$_GET['id'] = $newtextid;
+			$extension = strtolower(strrchr($userfilename,"."));
+			echo "Extension: $extension <br/>";
+			$badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");
+			if (in_array($extension,$badextensions)) {
+				echo "<p>File type is not allowed</p>";
 			} else {
-				echo "<p>Error uploading file!</p>\n";
-				exit;
+				$uploadfile = $uploaddir . $filename;
+				$t=0;
+				while(file_exists($uploadfile)){
+					$filename = substr($filename,0,strpos($userfilename,"."))."_$t".strstr($userfilename,".");
+					$uploadfile=$uploaddir.$filename;
+					$t++;
+				}
+				
+				if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
+					//echo "<p>File is valid, and was successfully uploaded</p>\n";
+					if (trim($_POST['newfiledescr'])=='') {
+						$_POST['newfiledescr'] = $filename;
+					}
+					$query = "INSERT INTO imas_instr_files (description,filename,itemid) VALUES ('{$_POST['newfiledescr']}','$filename','$newtextid')";
+					mysql_query($query) or die("Query failed :$query " . mysql_error());
+					$addedfile = mysql_insert_id();
+					$_GET['id'] = $newtextid;
+				} else {
+					echo "<p>Error uploading file!</p>\n";
+					exit;
+				}
 			}
 		}
 		

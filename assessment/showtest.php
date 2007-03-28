@@ -74,20 +74,13 @@
 			}
 		}
 		
-		$query = "SELECT id FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='{$_GET['id']}'";
+		$query = "SELECT id,agroupid FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='{$_GET['id']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$line = mysql_fetch_array($result, MYSQL_ASSOC);
 		
 		if ($line == null) { //starting test
 			//get question set
-			//$query = "SELECT id FROM imas_questions WHERE assessmentid={$_GET['id']};";
-			//$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//while($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 			
-			//if ($adata['enddate']<$now && $adata['reviewdate']<$now && !isset($teacherid)) { //past enddate and reviewdate
-			//	echo "Assessment is closed.";
-			//	exit;
-			//} 
 			if (trim($adata['itemorder'])=='') {
 				echo "No questions in assessment!";
 				exit;
@@ -153,6 +146,7 @@
 			} else {
 				$sessiondata['isteacher']=false;
 			}
+			$sessiondata['groupid'] = 0;
 			$query = "SELECT name FROM imas_courses WHERE id='{$_GET['cid']}'";
 			$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 			$sessiondata['coursename'] = mysql_result($result,0,0);
@@ -160,7 +154,6 @@
 			session_write_close();
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/showtest.php");
 		} else { //returning to test
-			//check if Practice test.  If so, clear existing assessment session
 			
 			if ($isreview) { //past enddate, before reviewdate
 				//clear out test for review.
@@ -182,6 +175,7 @@
 				
 				$query = "UPDATE imas_assessment_sessions SET scores='$scorelist',seeds='$seedlist',attempts='$attemptslist',lastanswers='$lalist' WHERE userid='$userid' AND assessmentid='$aid' LIMIT 1";
 				mysql_query($query) or die("Query failed : $query: " . mysql_error());
+				
 			}
 			$deffeedback = explode('-',$adata['deffeedback']);
 			//removed: $deffeedback[0] == "Practice" || 
@@ -199,6 +193,10 @@
 			} else {
 				$sessiondata['isteacher']=false;
 			}
+			
+			
+			$sessiondata['groupid'] = $line['agroupid'];
+		
 			$query = "SELECT name FROM imas_courses WHERE id='{$_GET['cid']}'";
 			$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 			$sessiondata['coursename'] = mysql_result($result,0,0);
@@ -282,10 +280,10 @@
 		
 		if (isset($_GET['reattempt'])) {
 			if ($_GET['reattempt']=="all") {
-				$allowed = getallallowedattempts($testsettings['id'],$testsettings['defattempts']);
+				list($allowed,$remainingposs) = getallallowedandremainingpossible($questions,$testsettings,$attempts);
 				for ($i = 0; $i<count($questions); $i++) {
-					if ($attempts[$i]<$allowed[$questions[$i]] || $allowed[$questions[$i]]==0) {
-						if ($noindivscores || getpts($scores[$i])<getremainingpossible($questions[$i],$testsettings,$attempts[$i])) {
+					if ($attempts[$i]<$allowed[$i] || $allowed[$i]==0) {
+						if ($noindivscores || getpts($scores[$i])<$remainingposs[$i]) {
 							$scores[$i] = -1;
 							if ($testsettings['shuffle']&8) {
 								$seeds[$i] = rand(1,9999);
@@ -303,10 +301,7 @@
 					}
 				}
 			}
-			$scorelist = implode(",",$scores);
-			$seedlist = implode(",",$seeds);
-			$query = "UPDATE imas_assessment_sessions SET scores='$scorelist',seeds='$seedlist' WHERE id='$testid' LIMIT 1";
-			$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
+			recordtestdata();
 		}
 		if (isset($_GET['regen']) && $allowregen) {
 			srand();
@@ -323,19 +318,15 @@
 			}
 			$newla[] = "ReGen";
 			$lastanswers[$toregen] = implode('##',$newla);
-			$lalist = implode('~',$lastanswers);
-			$seedlist = implode(",",$seeds);
-			$scorelist = implode(",",$scores);
-			$attemptslist = implode(",",$attempts);
-			$lalist = addslashes(stripslashes($lalist));
-			$query = "UPDATE imas_assessment_sessions SET seeds='$seedlist',scores='$scorelist',attempts='$attemptslist',lastanswers='$lalist' WHERE id='$testid' LIMIT 1";
-			mysql_query($query) or die("Query failed : $query:" . mysql_error());
+			
+			recordtestdata();
 		}
 		if (isset($_GET['regenall']) && $allowregen) {
 			srand();
 			if ($_GET['regenall']=="missed") {
+				$pointsposs = getallpointspossible($testsettings['id'],$testsettings['defpoints'],$questions);
 				for ($i = 0; $i<count($questions); $i++) {
-					if (getpts($scores[$i])<getpointspossible($questions[$i],$testsettings['defpoints'])) {
+					if (getpts($scores[$i])<$pointsposs[$questions[$i]]) { 
 						$scores[$i] = -1;
 						$attempts[$i] = 0;
 						$seeds[$i] = rand(1,9999);
@@ -371,13 +362,8 @@
 				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/showtest.php?cid={$testsettings['courseid']}&id={$testsettings['id']}");
 				exit;	
 			}
-			$lalist = implode('~',$lastanswers);
-			$seedlist = implode(",",$seeds);
-			$scorelist = implode(",",$scores);
-			$attemptslist = implode(",",$attempts);
-			$lalist = addslashes(stripslashes($lalist));
-			$query = "UPDATE imas_assessment_sessions SET seeds='$seedlist',scores='$scorelist',attempts='$attemptslist',lastanswers='$lalist' WHERE id='$testid' LIMIT 1";
-			mysql_query($query) or die("Query failed : $query:" . mysql_error());
+			
+			recordtestdata();
 			 	
 		}
 			
@@ -392,68 +378,145 @@
 	header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 	require("header.php");
 	
-	if (isset($_GET['recordgrp'])) {
-		$query = "SELECT assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers ";
-		$query .= "FROM imas_assessment_sessions WHERE id='$testid'";
-		$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
-		$row = mysql_fetch_row($result);
-		$insrow = "'".implode("','",addslashes_deep($row))."'";
-		$errcnt = 0;
-		for ($i=1;$i<7;$i++) {
-			if ($_POST['user'.$i]!=0) {
-				$md5pw = md5($_POST['pw'.$i]);
-				$query = "SELECT password,LastName,FirstName FROM imas_users WHERE id='{$_POST['user'.$i]}'";
-				$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
-				$thisusername = mysql_result($result,0,2) . ' ' . mysql_result($result,0,1);
-				if (mysql_result($result,0,0)!=$md5pw) {
-					echo "<p>$thisusername: password incorrect</p>";
-					$errcnt++;
-				} else {
-					$thisuser = mysql_result($result,0,0);
-					$query = "SELECT id FROM imas_assessment_sessions WHERE userid='{$_POST['user'.$i]}' AND assessmentid={$testsettings['id']}";
-					$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
-					if (mysql_num_rows($result)>0) {
-						echo "<p>$thisusername already has a score for this assessment.  No change made</p>";
-					} else {
-						$query = "INSERT INTO imas_assessment_sessions (userid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers) ";
-						$query .= "VALUES ('{$_POST['user'.$i]}',$insrow)";
-						mysql_query($query) or die("Query failed : $query:" . mysql_error());
-						echo "<p>Score for $thisusername recorded.</p>";
-					}
-				}
-			}
-		}
-		if ($errcnt>0) {
-			$selops = '<option value="0">Select a name..</option>';
-			$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM imas_users,imas_students ";
-			$query .= "WHERE imas_users.id=imas_students.userid AND imas_students.courseid='{$testsettings['courseid']}' ORDER BY imas_users.LastName,imas_users.FirstName";
-			$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
-			while ($row = mysql_fetch_row($result)) {
-				$selops .= "<option value=\"{$row[0]}\">{$row[2]}, {$row[1]}</option>";
-			}
-			echo '<h4>Retry Record grade for other group members</h4>';
-			echo '<p>Each group member (other than the currently logged in student) whose password was incorrect should select their name and enter their password.</p>';
-			echo '<form method=post action="showtest.php?recordgrp=1">';
-			echo 'Username: <select name="user1">'.$selops.'</select> Password: <input type=password name="pw1" /> <br />';
-			echo 'Username: <select name="user2">'.$selops.'</select> Password: <input type=password name="pw2" /> <br />';
-			echo 'Username: <select name="user3">'.$selops.'</select> Password: <input type=password name="pw3" /> <br />';
-			echo 'Username: <select name="user4">'.$selops.'</select> Password: <input type=password name="pw4" /> <br />';
-			echo 'Username: <select name="user5">'.$selops.'</select> Password: <input type=password name="pw5" /> <br />';
-			echo 'Username: <select name="user6">'.$selops.'</select> Password: <input type=password name="pw6" /> <br />';
-			echo '<input type=submit value="Record Grade for group members"/>';
-			echo '</form>';
-			
-		}
-						
-		echo "<p><a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to course page.</a></p>";
-		require("../footer.php");
-		exit;
-	}
-	
 	if (!$isdiag) {
 		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"../course/course.php?cid={$testsettings['courseid']}\">{$sessiondata['coursename']}</a> ";
 	 echo "&gt; Assessment</div>";
 	}
+
+	if (!$sessiondata['isteacher'] && ($testsettings['isgroup']==1 || $testsettings['isgroup']==2) && ($sessiondata['groupid']==0 || isset($_GET['addgrpmem']))) {
+		if (isset($_POST['user1'])) {
+			if ($sessiondata['groupid']==0) {
+				//double check not already added to group by someone else
+				$query = "SELECT agroupid FROM imas_assessment_sessions WHERE id='$testid'";
+				$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
+				$agroupid = mysql_result($result,0,0);
+				if ($agroupid==0) { //really has no group, create group
+					$query = "UPDATE imas_assessment_sessions SET agroupid='$testid' WHERE id='$testid'";
+					mysql_query($query) or die("Query failed : $query:" . mysql_error());
+					$agroupid = $testid;
+				} else {
+					echo "<p>Someone already added you to a group.  Using that group.</p>";
+				}
+				$sessiondata['groupid'] = $agroupid;
+				writesessiondata();
+			} else {
+				$agroupid = $sessiondata['groupid'];
+			}
+			$query = "SELECT assessmentid,agroupid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers ";
+			$query .= "FROM imas_assessment_sessions WHERE id='$testid'";
+			$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
+			$row = mysql_fetch_row($result);
+			$insrow = "'".implode("','",addslashes_deep($row))."'";
+			for ($i=1;$i<7;$i++) {
+				if ($_POST['user'.$i]!=0) {
+					if ($testsettings['isgroup']==1) {
+						$md5pw = md5($_POST['pw'.$i]);
+						$query = "SELECT password,LastName,FirstName FROM imas_users WHERE id='{$_POST['user'.$i]}'";
+						$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
+						$thisusername = mysql_result($result,0,2) . ' ' . mysql_result($result,0,1);
+						if (mysql_result($result,0,0)!=$md5pw) {
+							echo "<p>$thisusername: password incorrect</p>";
+							$errcnt++;
+							continue;
+						} 
+					}
+					$thisuser = $_POST['user'.$i];
+					$query = "SELECT id,agroupid FROM imas_assessment_sessions WHERE userid='{$_POST['user'.$i]}' AND assessmentid={$testsettings['id']}";
+					$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
+					if (mysql_num_rows($result)>0) {
+						$row = mysql_fetch_row($result);
+						if ($row[1]>0) { 
+							echo "<p>$thisusername already has a group.  No change made</p>";
+						} else {
+							$query = "UPDATE imas_assessment_sessions SET agroupid='$agroupid' WHERE id='{$row[0]}'";
+							mysql_query($query) or die("Query failed : $query:" . mysql_error());
+							echo "<p>$thisusername added to group, overwriting existing attempt.</p>";
+						}
+					} else {
+						$query = "INSERT INTO imas_assessment_sessions (userid,assessmentid,agroupid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers) ";
+						$query .= "VALUES ('{$_POST['user'.$i]}',$insrow)";
+						mysql_query($query) or die("Query failed : $query:" . mysql_error());
+						echo "<p>$thisusername added to group.</p>";
+					}
+				}
+			}
+		} else {
+			echo '<h2>Select group members</h2>';
+			
+			if ($sessiondata['groupid']>0) { //adding members to existing grp
+				echo "Current Group Members: <ul>";
+				$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM imas_users,imas_assessment_sessions WHERE ";
+				$query .= "imas_users.id=imas_assessment_sessions.userid AND imas_assessment_sessions.agroupid='{$sessiondata['groupid']}' ORDER BY imas_users.LastName,imas_users.FirstName";
+				$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
+				while ($row = mysql_fetch_row($result)) {
+					$curgrp[] = $row[0];
+					echo "<li>{$row[2]}, {$row[1]}</li>";
+				}
+				echo "</ul>";	
+			} else {
+				$curgrp = array($userid);
+			}
+			$curids = "'".implode("','",$curgrp)."'";
+			$selops = '<option value="0">Select a name..</option>';
+			$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM imas_users,imas_students ";
+			$query .= "WHERE imas_users.id=imas_students.userid AND imas_students.courseid='{$testsettings['courseid']}' ";
+			$query .= "AND imas_users.id NOT IN ($curids) ORDER BY imas_users.LastName,imas_users.FirstName";
+			$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				$selops .= "<option value=\"{$row[0]}\">{$row[2]}, {$row[1]}</option>";
+			}
+			echo '<p>Each group member (other than the currently logged in student) to be added should select their name ';
+			if ($testsettings['isgroup']==1) {
+				echo 'and enter their password ';
+			}
+			echo 'here.</p>';
+			echo '<form method=post action="showtest.php?addgrpmem=true">';
+			echo 'Username: <select name="user1">'.$selops.'</select> ';
+			if ($testsettings['isgroup']==1) {
+				echo 'Password: <input type=password name="pw1" />';
+			}
+			echo '<br />Username: <select name="user2">'.$selops.'</select> ';
+			if ($testsettings['isgroup']==1) {
+				echo 'Password: <input type=password name="pw2" />';
+			}
+			echo '<br />Username: <select name="user3">'.$selops.'</select> ';
+			if ($testsettings['isgroup']==1) {
+				echo 'Password: <input type=password name="pw3" />';
+			}
+			echo '<br />Username: <select name="user4">'.$selops.'</select> ';
+			if ($testsettings['isgroup']==1) {
+				echo 'Password: <input type=password name="pw4" />';
+			}
+			echo '<br />Username: <select name="user5">'.$selops.'</select> ';
+			if ($testsettings['isgroup']==1) {
+				echo 'Password: <input type=password name="pw5" />';
+			}
+			echo '<br />Username: <select name="user6">'.$selops.'</select> ';
+			if ($testsettings['isgroup']==1) {
+				echo 'Password: <input type=password name="pw6" />';
+			}
+			echo '<br /><input type=submit value="Record Group and Continue"/>';
+			echo '</form>';
+			require("../footer.php");
+			exit;
+		}
+	}
+	if (!$sessiondata['isteacher'] && $testsettings['isgroup']==3  && $sessiondata['groupid']==0) {
+		//double check not already added to group by someone else
+		$query = "SELECT agroupid FROM imas_assessment_sessions WHERE id='$testid'";
+		$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
+		$agroupid = mysql_result($result,0,0);
+		if ($agroupid==0) { //really has no group, create group
+			$query = "UPDATE imas_assessment_sessions SET agroupid='$testid' WHERE id='$testid'";
+			mysql_query($query) or die("Query failed : $query:" . mysql_error());
+			$agroupid = $testid;
+		} else {
+			echo "<p>Someone already added you to a group.  Using that group.</p>";
+		}
+		$sessiondata['groupid'] = $agroupid;
+		writesessiondata();
+	}
+	
 	echo "<h2>{$testsettings['name']}</h2>\n";
 	
 	if ($testsettings['testtype']=="Practice" && !$isreview) {
@@ -519,36 +582,18 @@
 			//score test
 			for ($i=0; $i < count($questions); $i++) {
 				if (isset($_POST["qn$i"]) || isset($_POST['qn'.(1000*($i+1))]) || isset($_POST["qn$i-0"]) || isset($_POST['qn'.(1000*($i+1)).'-0'])) {
-					list($qsetid,$cat) = getqsetid($questions[$i]);
-					$scores[$i] = getpointsafterpenalty(scoreq($i,$qsetid,$seeds[$i],$_POST["qn$i"]),$questions[$i],$testsettings,$attempts[$i]);
-					$attempts[$i]++;
-				}
-			}
-			//record scores
-			if (!$isreview) {
-				for ($i=0;$i<count($questions); $i++) {
-					if (getpts($scores[$i])>getpts($bestscores[$i])) {
-						$bestseeds[$i] = $seeds[$i];
-						$bestscores[$i] = $scores[$i];
-						$bestattempts[$i] = $attempts[$i];
-						$bestlastanswers[$i] = $lastanswers[$i];
+					if ($_POST['verattempts'][$i]!=$attempts[$i]) {
+						echo "Question ".($i+1)." has been submittted since you viewed it.  Your answer just submitted was not scored or recorded.<br/>";
+					} else {
+						scorequestion($i);
 					}
 				}
 			}
-			$bestscorelist = implode(',',$bestscores);
-			$bestattemptslist = implode(',',$bestattempts);
-			$bestseedslist = implode(',',$bestseeds);
-			$bestlalist = implode('~',$bestlastanswers);
-			$bestlalist = addslashes(stripslashes($bestlalist));
+			//record scores
 			
-			$scorelist = implode(",",$scores);
-			$attemptslist = implode(",",$attempts);
-			$lalist = implode("~",$lastanswers);
-			$lalist = addslashes(stripslashes($lalist));
 			$now = time();
 			if (isset($_POST['saveforlater'])) {
-				$query = "UPDATE imas_assessment_sessions SET lastanswers='$lalist' WHERE id='$testid' LIMIT 1";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				recordtestdata(true);
 				echo "<p>Answers saved, but not submitted for grading.  You may continue with the test, or ";
 				echo "come back to it later. ";
 				if ($testsettings['timelimit']>0) {echo "The timelimit will continue to count down";}
@@ -559,11 +604,9 @@
 					echo "<a href=\"../diag/index.php?id=$diagid\">Return to Diagnostics Page</a></p>\n";
 				}
 			} else {
-				$query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',lastanswers='$lalist',";
-				$query .= "bestseeds='$bestseedslist',bestattempts='$bestattemptslist',bestscores='$bestscorelist',bestlastanswers='$bestlalist',";
-				$query .= "endtime=$now WHERE id='$testid' LIMIT 1";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				showscores($scores,$bestscores,$questions,$attempts,$testsettings);
+				recordtestdata();
+				
+				showscores($questions,$attempts,$testsettings);
 			
 				endtest($testsettings);
 				if (!$isdiag) {
@@ -575,32 +618,16 @@
 		} else if ($_GET['action']=="shownext") {
 			if (isset($_GET['score'])) {
 				$last = $_GET['score'];
-				list($qsetid,$cat) = getqsetid($questions[$last]);
-				$scores[$last] = getpointsafterpenalty(scoreq($last,$qsetid,$seeds[$last],$_POST["qn$last"]),$questions[$last],$testsettings,$attempts[$last]);
-				$attempts[$last]++;
-				if (getpts($scores[$last])>getpts($bestscores[$last]) && !$isreview) {
-					$bestseeds[$last] = $seeds[$last];
-					$bestscores[$last] = $scores[$last];
-					$bestattempts[$last] = $attempts[$last];
-					$bestlastanswers[$last] = $lastanswers[$last];
-				}
-				//record score
-				$bestscorelist = implode(',',$bestscores);
-				$bestattemptslist = implode(',',$bestattempts);
-				$bestseedslist = implode(',',$bestseeds);
-				$bestlalist = implode('~',$bestlastanswers);
-				$bestlalist = addslashes(stripslashes($bestlalist));
 				
-				$scorelist = implode(",",$scores);
-				$attemptslist = implode(",",$attempts);
-				$lalist = implode("~",$lastanswers);
-				$lalist = addslashes(stripslashes($lalist));
-				$now = time();
-				$query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',lastanswers='$lalist',";
-				$query .= "bestseeds='$bestseedslist',bestattempts='$bestattemptslist',bestscores='$bestscorelist',bestlastanswers='$bestlalist',";
-				$query .= "endtime=$now WHERE id='$testid' LIMIT 1";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			
+				if ($_POST['verattempts']!=$attempts[$last]) {
+					echo "<p>The last question has been submittted since you viewed it, and that grade is shown below.  Your answer just submitted was not scored or recorded.</p>";
+				} else {
+					scorequestion($last);
+					
+					//record score
+					
+					recordtestdata();
+				}
 				if ($showeachscore) {
 					$possible = getpointspossible($questions[$last],$testsettings['defpoints']);
 					echo "<p>Previous Question:<br/>Score on last attempt: ";
@@ -610,9 +637,9 @@
 						printscore($bestscores[$last],$possible);
 					} 
 					echo "</p>\n";
-					$allowed = getallowedattempts($questions[$last],$testsettings['defattempts']);
+					list($allowed,$remainingposs) = getallowedandremainingpossible($questions[$last],$testsettings,$attempts[$last]);
 					if ($attempts[$last]<$allowed || $allowed==0) {
-						if (getpts($scores[$last])<getremainingpossible($questions[$last],$testsettings,$attempts[$last])) {
+						if (getpts($scores[$last])<$remainingposs) {
 							echo "<p><a href=\"showtest.php?action=shownext&to=$last&reattempt=$last\">Reattempt last question</a>.  If you do not reattempt now, you will have another chance once you complete the test.</p>\n";
 						}
 					}
@@ -640,6 +667,8 @@
 			
 			if (!$done) { //can show next
 				echo "<form method=post action=\"showtest.php?action=shownext&score=$toshow\" onsubmit=\"return doonsubmit(this)\">\n";
+				echo "<input type=hidden name=\"verattempts\" value=\"{$attempts[$toshow]}\" />";
+					
 				list($qsetid,$cat) = getqsetid($questions[$toshow]);
 				if ($showansduring && $attempts[$toshow]>=$testsettings['showans']) {$showa = true;} else {$showa=false;}
 				displayq($toshow,$qsetid,$seeds[$toshow],$showa,$showhints,$attempts[$toshow],false,(($testsettings['shuffle']&8)==8));
@@ -656,7 +685,7 @@
 				echo "</div>";
 				echo "<input type=submit class=btn value=Continue>\n";
 			} else { //are all done
-				showscores($scores,$bestscores,$questions,$attempts,$testsettings);
+				showscores($questions,$attempts,$testsettings);
 				endtest($testsettings);
 				if (!$isdiag) {
 					echo "<p><A HREf=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a></p>\n";
@@ -668,32 +697,16 @@
 
 			if (isset($_GET['score'])) { //score a problem
 				$qn = $_GET['score'];
-				list($qsetid,$cat) = getqsetid($questions[$qn]);
-				$scores[$qn] = getpointsafterpenalty(scoreq($qn,$qsetid,$seeds[$qn],$_POST["qn$qn"]),$questions[$qn],$testsettings,$attempts[$qn]);
-				$attempts[$qn]++;
 				
-				if (getpts($scores[$qn])>getpts($bestscores[$qn]) && !$isreview) {
-					$bestseeds[$qn] = $seeds[$qn];
-					$bestscores[$qn] = $scores[$qn];
-					$bestattempts[$qn] = $attempts[$qn];
-					$bestlastanswers[$qn] = $lastanswers[$qn];
+				if ($_POST['verattempts']!=$attempts[$qn]) {
+					echo "<p>This question has been submittted since you viewed it, and that grade is shown below.  Your answer just submitted was not scored or recorded.</p>";
+				} else {
+					scorequestion($qn);
+					
+					//record score
+					
+					recordtestdata();
 				}
-				//record score
-				$bestscorelist = implode(',',$bestscores);
-				$bestattemptslist = implode(',',$bestattempts);
-				$bestseedslist = implode(',',$bestseeds);
-				$bestlalist = implode('~',$bestlastanswers);
-				$bestlalist = addslashes(stripslashes($bestlalist));
-				
-				$scorelist = implode(",",$scores);
-				$attemptslist = implode(",",$attempts);
-				$lalist = implode("~",$lastanswers);
-				$lalist = addslashes(stripslashes($lalist));
-				$now = time();
-				$query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',lastanswers='$lalist',";
-				$query .= "bestseeds='$bestseedslist',bestattempts='$bestattemptslist',bestscores='$bestscorelist',bestlastanswers='$bestlalist',";
-				$query .= "endtime=$now WHERE id='$testid' LIMIT 1";
-				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$lefttodo = shownavbar($questions,$scores,$qn,$testsettings['showcat']);
 				
 				echo "<div class=inset>\n";
@@ -709,9 +722,10 @@
 						printscore($bestscores[$qn],$possible);
 						echo "</p>";
 					} 
-					$allowed = getallowedattempts($questions[$qn],$testsettings['defattempts']);
+					list($allowed,$remainingposs) = getallowedandremainingpossible($questions[$qn],$testsettings,$attempts[$qn]);
+					
 					if ($attempts[$qn]<$allowed || $allowed==0) {
-						if (getpts($scores[$qn])<getremainingpossible($questions[$qn],$testsettings,$attempts[$qn])) {
+						if (getpts($scores[$qn])<$remainingposs) { 
 							echo "<p><a href=\"showtest.php?action=skip&to=$qn&reattempt=$qn\">Reattempt last question</a></p>\n";
 							$reattemptsremain = true;
 						} 
@@ -742,6 +756,7 @@
 				if (unans($scores[$next])) {
 					echo "<div class=inset>\n";
 					echo "<form method=post action=\"showtest.php?action=skip&score=$next\" onsubmit=\"return doonsubmit(this)\">\n";
+					echo "<input type=hidden name=\"verattempts\" value=\"{$attempts[$next]}\" />";
 					echo "<a name=\"beginquestions\"></a>\n";
 					list($qsetid,$cat) = getqsetid($questions[$next]);
 					if ($showansduring && $attempts[$next]>=$testsettings['showans']) {$showa = true;} else {$showa=false;}
@@ -775,9 +790,10 @@
 							printscore($bestscores[$next],$possible);
 							echo "</p>";
 						} 
-						$allowed = getallowedattempts($questions[$next],$testsettings['defattempts']);
+						list($allowed,$remainingposs) = getallowedandremainingpossible($questions[$next],$testsettings,$attempts[$next]);
+					
 						if ($attempts[$next]<$allowed || $allowed==0) {
-							if (getpts($scores[$next])<getremainingpossible($questions[$next],$testsettings,$attempts[$next])) {
+							if (getpts($scores[$next])<$remainingposs) { 
 								echo "<p><a href=\"showtest.php?action=skip&to=$next&reattempt=$next\">Reattempt this question</a></p>\n";
 								$reattemptsremain = true;
 							} 
@@ -799,10 +815,10 @@
 				}
 			} else if (isset($_GET['done'])) { //are all done
 
-				showscores($scores,$bestscores,$questions,$attempts,$testsettings);
+				showscores($questions,$attempts,$testsettings);
 				endtest($testsettings);
 				if (!$isdiag) {
-					echo "<p><A HREf=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a></p>\n";
+					echo "<p><a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a></p>\n";
 				} else {
 					echo "<p><a href=\"../diag/index.php?id=$diagid\">Return to Diagnostics Page</a></p>\n";
 				}
@@ -810,33 +826,15 @@
 		} else if ($_GET['action']=="seq") {
 			if (isset($_GET['score'])) { //score a problem
 				$qn = $_GET['score'];
-				list($qsetid,$cat) = getqsetid($questions[$qn]);
-				$scores[$qn] = getpointsafterpenalty(scoreq($qn,$qsetid,$seeds[$qn],$_POST["qn$qn"]),$questions[$qn],$testsettings,$attempts[$qn]);
-				$attempts[$qn]++;
-				
-				if (getpts($scores[$qn])>getpts($bestscores[$qn]) && !$isreview) {
-					$bestseeds[$qn] = $seeds[$qn];
-					$bestscores[$qn] = $scores[$qn];
-					$bestattempts[$qn] = $attempts[$qn];
-					$bestlastanswers[$qn] = $lastanswers[$qn];
+				if ($_POST['verattempts']!=$attempts[$qn]) {
+					echo "<p>The last question has been submittted since you viewed it, and that score is shown below. Your answer just submitted was not scored or recorded.</p>";
+				} else {
+					scorequestion($qn);
+					
+					//record score
+					
+					recordtestdata();
 				}
-				//record score
-				$bestscorelist = implode(',',$bestscores);
-				$bestattemptslist = implode(',',$bestattempts);
-				$bestseedslist = implode(',',$bestseeds);
-				$bestlalist = implode('~',$bestlastanswers);
-				$bestlalist = addslashes(stripslashes($bestlalist));
-				
-				$scorelist = implode(",",$scores);
-				$attemptslist = implode(",",$attempts);
-				$lalist = implode("~",$lastanswers);
-				$lalist = addslashes(stripslashes($lalist));
-				$now = time();
-				$query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',lastanswers='$lalist',";
-				$query .= "bestseeds='$bestseedslist',bestattempts='$bestattemptslist',bestscores='$bestscorelist',bestlastanswers='$bestlalist',";
-				$query .= "endtime=$now WHERE id='$testid' LIMIT 1";
-				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-				//$lefttodo = shownavbar($questions,$scores,$qn,$testsettings['showcat']);
 				
 				echo "<div>\n";
 				$reattemptsremain = false;
@@ -850,9 +848,10 @@
 						printscore($bestscores[$qn],$possible);
 						echo "</p>";
 					} 
-					$allowed = getallowedattempts($questions[$qn],$testsettings['defattempts']);
+					list($allowed,$remainingposs) = getallowedandremainingpossible($questions[$qn],$testsettings,$attempts[$qn]);
+					
 					if ($attempts[$qn]<$allowed || $allowed==0) {
-						if (getpts($scores[$qn])<getremainingpossible($questions[$qn],$testsettings,$attempts[$qn])) {
+						if (getpts($scores[$qn])<$remainingposs) { 
 							echo "<p><a href=\"showtest.php?action=seq&to=$qn&reattempt=$qn\">Reattempt last question</a></p>\n";
 							$reattemptsremain = true;
 						} 
@@ -899,7 +898,7 @@
 			}
 			if ($done || isset($_GET['done'])) { //are all done
 
-				showscores($scores,$bestscores,$questions,$attempts,$testsettings);
+				showscores($questions,$attempts,$testsettings);
 				endtest($testsettings);
 				if (!$isdiag) {
 					echo "<p><A HREf=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a></p>\n";
@@ -907,51 +906,61 @@
 					echo "<p><a href=\"../diag/index.php?id=$diagid\">Return to Diagnostics Page</a></p>\n";
 				}
 			} else { //show more test 
-				//echo "<div class=intro>{$testsettings['intro']}</div>\n";
 				echo filter("<div id=intro class=hidden>{$testsettings['intro']}</div>\n");
 				
-				echo "<form method=post action=\"showtest.php?action=seq&score=$toshow#qanc$toshow\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
+				echo "<form method=post action=\"showtest.php?action=seq&score=$toshow\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
+				echo "<input type=hidden name=\"verattempts\" value=\"{$attempts[$toshow]}\" />";
+				
+				list($allowed,$remainingposs) = getallallowedandremainingpossible($questions,$testsettings,$attempts);
+				$pointsposs = getallpointspossible($testsettings['id'],$testsettings['defpoints'],$questions);
+				list($qsetids,$cats) = getallqsetid($questions);
 				for ($i = 0; $i < count($questions); $i++) {
-					list($qsetid,$cat) = getqsetid($questions[$i]);
 					
 					if ($showansduring && $attempts[$i]>=$testsettings['showans']) {$showa = true;} else {$showa=false;}
-					$allowed = getallowedattempts($questions[$i],$testsettings['defattempts']);
 					$reattemptsremain = false;
-					if ($attempts[$i]<$allowed || $allowed==0) {
-						if (getpts($scores[$i])<getremainingpossible($questions[$i],$testsettings,$attempts[$i])) {
+					if ($attempts[$i]<$allowed[$i] || $allowed[$i]==0) {
+						if (getpts($scores[$i])<$remainingposs[$i]) {
 							$reattemptsremain = true;
 						} 
 					}
 					$qavail = false;
 					if ($i==$toshow) {
+						if (unans($scores[$i]) && $attempts[$i]==0) {
+							echo "<img src=\"$imasroot/img/q_fullbox.gif\"/> ";
+						} else {
+							echo "<img src=\"$imasroot/img/q_halfbox.gif\"/> ";
+						}
 						echo "<span class=current><a name=\"curq\">Question</a> ".($i+1).".</span>  ";
 					} else {
-						if (unans($scores[$i])) {
+						if (unans($scores[$i]) && $attempts[$i]==0) {
+							echo "<img src=\"$imasroot/img/q_fullbox.gif\"/> ";
 							echo "<a href=\"showtest.php?action=seq&to=$i#curq\">Question ". ($i+1) . "</a>.  ";
 							$qavail = true;
-						} else if ($attempts[$i]<$allowed && $reattemptsremain) {
-							echo "<span class=done><a href=\"showtest.php?action=seq&to=$i#curq\">Question ". ($i+1) . "</a></span>.  ";
+						} else if ($attempts[$i]<$allowed[$i] && $reattemptsremain) {
+							echo "<img src=\"$imasroot/img/q_halfbox.gif\"/> ";
+							echo "<a href=\"showtest.php?action=seq&to=$i#curq\">Question ". ($i+1) . "</a>.  ";
 							$qavail = true;
 						} else {
-							echo "<span class=done>Question ". ($i+1) . "</span>.  ";
+							echo "<img src=\"$imasroot/img/q_emptybox.gif\"/> ";
+							echo "Question ". ($i+1) . ".  ";
 						}
 					}
 					if ($showeachscore) {
 						$pts = getpts($bestscores[$i]);
 						if ($pts<0) { $pts = 0;}
-						echo "Points: $pts out of " . getpointspossible($questions[$i],$testsettings['defpoints']) . " possible";
+						echo "Points: $pts out of " . $pointsposs[$questions[$i]] . " possible";
 					} else {
-						echo "Points possible: ". getpointspossible($questions[$i],$testsettings['defpoints']);
+						echo "Points possible: ". $pointsposs[$questions[$i]];
 					}
 					
 					
 					if ($allowed==0) {
 						echo ".  Unlimited attempts";
 					} else {
-						echo '.  '.($allowed-$attempts[$i])." attempts of ".$allowed." remaining.";
+						echo '.  '.($allowed[$i]-$attempts[$i])." attempts of ".$allowed[$i]." remaining.";
 					}
 					if ($testsettings['showcat']>0 && $cat!='0') {
-						echo "  Category: $cat.";
+						echo "  Category: {$cats[$i]}.";
 					}
 					
 					
@@ -961,13 +970,13 @@
 						$doshowa = ($showansafterlast && $showeachscore);
 					}
 					if ($i==$toshow) {
-						displayq($i,$qsetid,$seeds[$i],$doshowa,$showhints,$attempts[$i],false,(($testsettings['shuffle']&8)==8),false);
+						displayq($i,$qsetids[$i],$seeds[$i],$doshowa,$showhints,$attempts[$i],false,(($testsettings['shuffle']&8)==8),false);
 					} else if ($qavail) {
 						echo "<div class=todoquestion>";
-						displayq($i,$qsetid,$seeds[$i],$doshowa,$showhints,$attempts[$i],false,(($testsettings['shuffle']&8)==8),true);
+						displayq($i,$qsetids[$i],$seeds[$i],$doshowa,$showhints,$attempts[$i],false,(($testsettings['shuffle']&8)==8),true);
 						echo "</div>";
 					} else {
-						displayq($i,$qsetid,$seeds[$i],$doshowa,$showhints,$attempts[$i],false,(($testsettings['shuffle']&8)==8),true);
+						displayq($i,$qsetids[$i],$seeds[$i],$doshowa,$showhints,$attempts[$i],false,(($testsettings['shuffle']&8)==8),true);
 					}
 					
 					if ($i==$toshow) {
@@ -983,21 +992,31 @@
 		$canimprove = false;
 		$ptsearned = 0;
 		$perfectscore = false;
+		
+		list($allowed,$remainingposs) = getallallowedandremainingpossible($questions,$testsettings,$attempts);
 		for ($j=0; $j<count($questions);$j++) {
 			$canimproveq[$j] = false;
 			$ptsearned += getpts($scores[$j]);
-			$allowed[$j] = getallowedattempts($questions[$j],$testsettings['defattempts']);
 			if ($attempts[$j]<$allowed[$j] || $allowed[$j]==0) {
 				$moreattempts = true;
-				if (getpts($scores[$j])<getremainingpossible($questions[$j],$testsettings,$attempts[$j])) {
+				if (getpts($scores[$j])<$remainingposs[$j]) { 
 					$canimprove = true;
 					$canimproveq[$j] = true;
 				}
 			}
 
 		}
-		$testsettings['intro'] .= "<p>Total Points Possible: " . array_sum(getallpointspossible($testsettings['id'],$testsettings['defpoints'],$questions)) . "</p>";
-		if ($ptsearned==array_sum(getallpointspossible($testsettings['id'],$testsettings['defpoints'],$questions))) {
+		$pointsposs = getallpointspossible($testsettings['id'],$testsettings['defpoints'],$questions);
+		$testsettings['intro'] .= "<p>Total Points Possible: " . array_sum($pointsposs) . "</p>";
+		if ($testsettings['isgroup']>0) {
+			$testsettings['intro'] .= "<p><span style=\"color:red;\">This is a group assessment.  Any changes effect all group members.</span><br/>";
+			if ($testsettings['isgroup']==1 || $testsettings['isgroup']==2) {
+				$testsettings['intro'] .= "<a href=\"showtest.php?addgrpmem=true\">Add Group Members</a></p>";
+			} else {
+				$testsettings['intro'] .= '</p>';
+			}
+		}
+		if ($ptsearned==array_sum($pointsposs)) {
 			$perfectscore = true;
 		} 
 		if ($testsettings['displaymethod'] == "AllAtOnce") {
@@ -1007,21 +1026,22 @@
 			echo filter("<div class=intro>{$testsettings['intro']}</div>\n");
 			echo "<form method=post action=\"showtest.php?action=scoreall\" onsubmit=\"return doonsubmit(this,true)\">\n";
 			$numdisplayed = 0;
+			list($qsetids,$cats) = getallqsetid($questions);
 			for ($i = 0; $i < count($questions); $i++) {
-				list($qsetid,$cat) = getqsetid($questions[$i]);
 				if (unans($scores[$i])) {
 					if ($showansduring && $attempts[$i]>=$testsettings['showans']) {$showa = true;} else {$showa=false;}
-					displayq($i,$qsetid,$seeds[$i],$showa,$showhints,$attempts[$i],false,(($testsettings['shuffle']&8)==8));
-					echo "<div class=review>Points possible: " . getpointspossible($questions[$i],$testsettings['defpoints']);
+					displayq($i,$qsetids[$i],$seeds[$i],$showa,$showhints,$attempts[$i],false,(($testsettings['shuffle']&8)==8));
+					echo "<div class=review>Points possible: " . $pointsposs[$questions[$i]];
 					if ($allowed[$i]==0) {
 						echo "<br/>Unlimited attempts";
 					} else {
 						echo '<br/>'.($allowed[$i]-$attempts[$i])." attempts of ".$allowed[$i]." remaining.";
 					}
 					if ($testsettings['showcat']>0 && $cat!='0') {
-						echo "  Category: $cat.";
+						echo "  Category: {$cat[$i]}.";
 					}
 					echo "</div>";
+					echo "<input type=hidden name=\"verattempts[$i]\" value=\"{$attempts[$i]}\" />";
 					$numdisplayed++;
 				}
 			}	
@@ -1108,10 +1128,12 @@
 			} else {
 				echo filter("<div class=intro>{$testsettings['intro']}</div>\n");
 				echo "<form method=post action=\"showtest.php?action=shownext&score=$i\" onsubmit=\"return doonsubmit(this)\">\n";
+				echo "<input type=hidden name=\"verattempts\" value=\"{$attempts[$i]}\" />";
+					
 				list($qsetid,$cat) = getqsetid($questions[$i]);
 				if ($showansduring && $attempts[$i]>=$testsettings['showans']) {$showa = true;} else {$showa=false;}
 				displayq($i,$qsetid,$seeds[$i],$showa,$showhints,$attempts[$i],false,(($testsettings['shuffle']&8)==8));
-				echo "<div class=review>Points possible: " . getpointspossible($questions[$i],$testsettings['defpoints']); 
+				echo "<div class=review>Points possible: " . $pointsposs[$questions[$i]]; 
 				if ($allowed[$i]==0) {
 					echo "<br/>Unlimited attempts";
 				} else {
@@ -1177,11 +1199,12 @@
 			} else {
 				echo "<form method=post action=\"showtest.php?action=skip&score=$i\" onsubmit=\"return doonsubmit(this)\">\n";
 				echo "<div class=inset>\n";
+				echo "<input type=hidden name=\"verattempts\" value=\"{$attempts[$i]}\" />";
 				echo "<a name=\"beginquestions\"></a>\n";
 				list($qsetid,$cat) = getqsetid($questions[$i]);
 				if ($showansduring && $attempts[$i]>=$testsettings['showans']) {$showa = true;} else {$showa=false;}
 				displayq($i,$qsetid,$seeds[$i],$showa,$showhints,$attempts[$i],false,(($testsettings['shuffle']&8)==8));
-				echo "<div class=review>Points possible: " . getpointspossible($questions[$i],$testsettings['defpoints']); 
+				echo "<div class=review>Points possible: " . $pointsposs[$questions[$i]];
 				if ($allowed[$i]==0) {
 					echo "<br/>Unlimited attempts";
 				} else {
@@ -1237,30 +1260,39 @@
 				$curq = $i;
 				echo filter("<div class=intro>{$testsettings['intro']}</div>\n");
 				echo "<form method=post action=\"showtest.php?action=seq&score=$i\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
+				echo "<input type=hidden name=\"verattempts\" value=\"{$attempts[$i]}\" />";
+				list($qsetids,$cats) = getallqsetid($questions);
 				for ($i = 0; $i < count($questions); $i++) {
-					list($qsetid,$cat) = getqsetid($questions[$i]);
 					
 					if ($showansduring && $attempts[$i]>=$testsettings['showans']) {$showa = true;} else {$showa=false;}
 					$qavail = false;
 					if ($i==$curq) {
+						if (unans($scores[$i]) && $attempts[$i]==0) {
+							echo "<img src=\"$imasroot/img/q_fullbox.gif\"/> ";
+						} else {
+							echo "<img src=\"$imasroot/img/q_halfbox.gif\"/> ";
+						}
 						echo "<span class=current>Question ".($i+1).".</span>  ";
 					} else {
-						if (unans($scores[$i])) {
+						if (unans($scores[$i]) && $attempts[$i]==0) {
+							echo "<img src=\"$imasroot/img/q_fullbox.gif\"/> ";
 							echo "<a href=\"showtest.php?action=seq&to=$i#curq\">Question ". ($i+1) . "</a>.  ";
 							$qavail = true;
 						} else if ($attempts[$i]<$allowed[$i] && $canimproveq[$i]) {
-							echo "<span class=done><a href=\"showtest.php?action=seq&to=$i#curq\">Question ". ($i+1) . "</a></span>.  ";
+							echo "<img src=\"$imasroot/img/q_halfbox.gif\"/> ";
+							echo "<a href=\"showtest.php?action=seq&to=$i#curq\">Question ". ($i+1) . "</a>.  ";
 							$qavail = true;
 						} else {
-							echo "<span class=done>Question ". ($i+1) . "</span>.  ";
+							echo "<img src=\"$imasroot/img/q_emptybox.gif\"/> ";
+							echo "Question ". ($i+1) . ".  ";
 						}
 					}
 					if ($showeachscore) {
 						$pts = getpts($bestscores[$i]);
 						if ($pts<0) { $pts = 0;}
-						echo "Points: $pts out of " . getpointspossible($questions[$i],$testsettings['defpoints']) . " possible";
+						echo "Points: $pts out of " . $pointsposs[$questions[$i]] . " possible";
 					} else {
-						echo "Points possible: ". getpointspossible($questions[$i],$testsettings['defpoints']);
+						echo "Points possible: ". $pointsposs[$questions[$i]];
 					}
 					if ($allowed[$i]==0) {
 						echo ".  Unlimited attempts";
@@ -1268,7 +1300,7 @@
 						echo '.  '.($allowed[$i]-$attempts[$i])." attempts of ".$allowed[$i]." remaining.";
 					}
 					if ($testsettings['showcat']>0 && $cat!='0') {
-						echo "  Category: $cat.";
+						echo "  Category: {$cats[$i]}.";
 					}
 					
 					if ($canimproveq[$i]) {
@@ -1277,13 +1309,13 @@
 						$doshowa = ($showansafterlast && $showeachscore);
 					}
 					if ($i==$curq) {
-						displayq($i,$qsetid,$seeds[$i],$doshowa,$showhints,$attempts[$i],false,(($testsettings['shuffle']&8)==8),false);
+						displayq($i,$qsetids[$i],$seeds[$i],$doshowa,$showhints,$attempts[$i],false,(($testsettings['shuffle']&8)==8),false);
 					} else if ($qavail) {
 						echo "<div class=todoquestion>";
-						displayq($i,$qsetid,$seeds[$i],$doshowa,$showhints,$attempts[$i],false,(($testsettings['shuffle']&8)==8),true);
+						displayq($i,$qsetids[$i],$seeds[$i],$doshowa,$showhints,$attempts[$i],false,(($testsettings['shuffle']&8)==8),true);
 						echo "</div>";
 					} else {
-						displayq($i,$qsetid,$seeds[$i],$doshowa,$showhints,$attempts[$i],false,(($testsettings['shuffle']&8)==8),true);
+						displayq($i,$qsetids[$i],$seeds[$i],$doshowa,$showhints,$attempts[$i],false,(($testsettings['shuffle']&8)==8),true);
 					}
 					if ($i==$curq) {
 						echo "<div><input type=submit class=btn value=\"Submit Question ".($i+1)."\"></div><p></p>\n";
@@ -1296,7 +1328,7 @@
 	require("../footer.php");
 	
 	function shownavbar($questions,$scores,$current,$showcat) {
-		global $imasroot,$isdiag;
+		global $imasroot,$isdiag,$testsettings,$attempts;
 		$todo = 0;
 		if ($showcat>1) {
 			$qslist = "'".implode("','",$questions)."'";
@@ -1315,25 +1347,29 @@
 		echo "<div class=navbar>";
 		echo "<h4>Questions</h4>\n";
 		echo "<ul class=qlist>\n";
+		$remainingposs = getallremainingpossible($questions,$testsettings,$attempts);
 		for ($i = 0; $i < count($questions); $i++) {
 			echo "<li>";
 			if ($current == $i) { echo "<span class=current>";}
 			if (unans($scores[$i])) {
 				$todo++;
-				if ($showcat>1 && $cats[$questions[$i]]!='0') {
-					echo "<a href=\"showtest.php?action=skip&to=$i\">". ($i+1) . ") {$cats[$questions[$i]]}</a>";
-				} else {
-					echo "<a href=\"showtest.php?action=skip&to=$i\">Question ". ($i+1) . "</a>";
-				}
-			} else {
-				//echo "Question ". ($i+1);
-				if ($showcat>1 && $cats[$questions[$i]]!='0') {
-					echo "<span class=done><a href=\"showtest.php?action=skip&to=$i\">". ($i+1) . ") {$cats[$questions[$i]]}</a></span>";
-				} else {
-					echo "<span class=done><a href=\"showtest.php?action=skip&to=$i\">Question ". ($i+1) . "</a></span>";
-				}
 			}
+			if (unans($scores[$i]) && $attempts[$i]==0) {
+				echo "<img src=\"$imasroot/img/q_fullbox.gif\"/>";
+			} else if (getpts($scores[$i])<$remainingposs[$i]) {
+				echo "<img src=\"$imasroot/img/q_halfbox.gif\"/>";
+			} else {
+				echo "<img src=\"$imasroot/img/q_emptybox.gif\"/>";
+			}
+			
+			if ($showcat>1 && $cats[$questions[$i]]!='0') {
+				echo "<a href=\"showtest.php?action=skip&to=$i\">". ($i+1) . ") {$cats[$questions[$i]]}</a>";
+			} else {
+				echo "<a href=\"showtest.php?action=skip&to=$i\">Question ". ($i+1) . "</a>";
+			}
+			
 			if ($current == $i) { echo "</span>";}
+			
 			echo "</li>\n";
 		}
 		echo "</ul>";
@@ -1345,8 +1381,8 @@
 		return $todo;
 	}
 	
-	function showscores($scores,$bestscores,$questions,$attempts,$testsettings) {
-		global $isdiag,$allowregen,$isreview,$noindivscores;
+	function showscores($questions,$attempts,$testsettings) {
+		global $isdiag,$allowregen,$isreview,$noindivscores,$scores,$bestscores;
 		if ($isdiag) {
 			global $userid;
 			$query = "SELECT * from imas_users WHERE id='$userid'";
@@ -1399,10 +1435,8 @@
 			echo "</table>";
 		}
 		global $testid;
-		$scorelist = implode(",",$scores);
-		$bestscorelist = implode(",",$bestscores);
-		$query = "UPDATE imas_assessment_sessions SET scores='$scorelist',bestscores='$bestscorelist' WHERE id='$testid' LIMIT 1";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		
+		recordtestdata();
 			
 		if ($testsettings['testtype']!="NoScores") {
 			$total = 0;
@@ -1478,26 +1512,6 @@
 				catscores($questions,$bestscores,$testsettings['defpoints']);
 			}
 		}
-		if ($testsettings['isgroup']==1) {
-			$selops = '<option value="0">Select a name..</option>';
-			$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM imas_users,imas_students ";
-			$query .= "WHERE imas_users.id=imas_students.userid AND imas_students.courseid='{$testsettings['courseid']}' ORDER BY imas_users.LastName,imas_users.FirstName";
-			$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
-			while ($row = mysql_fetch_row($result)) {
-				$selops .= "<option value=\"{$row[0]}\">{$row[2]}, {$row[1]}</option>";
-			}
-			echo '<h4>Record grade for other group members</h4>';
-			echo '<p>Each group member (other than the currently logged in student) should select their name and enter their password once this assessment is complete.</p>';
-			echo '<form method=post action="showtest.php?recordgrp=1">';
-			echo 'Username: <select name="user1">'.$selops.'</select> Password: <input type=password name="pw1" /> <br />';
-			echo 'Username: <select name="user2">'.$selops.'</select> Password: <input type=password name="pw2" /> <br />';
-			echo 'Username: <select name="user3">'.$selops.'</select> Password: <input type=password name="pw3" /> <br />';
-			echo 'Username: <select name="user4">'.$selops.'</select> Password: <input type=password name="pw4" /> <br />';
-			echo 'Username: <select name="user5">'.$selops.'</select> Password: <input type=password name="pw5" /> <br />';
-			echo 'Username: <select name="user6">'.$selops.'</select> Password: <input type=password name="pw6" /> <br />';
-			echo '<input type=submit value="Record Grade for group members"/>';
-			echo '</form>';
-		}
 			
 		
 	}
@@ -1539,10 +1553,13 @@
 		$query = "SELECT points,penalty,attempts FROM imas_questions WHERE id='$qn'";
 		$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
 		$row = mysql_fetch_row($result);
-
-		$points = $row[0];
+		return calcpointsafterpenalty($frac,$row[0],$row[1],$row[2],$testsettings,$attempts);
+	}
+	
+	function calcpointsafterpenalty($frac,$rowpts,$rowpen,$rowatt,$testsettings,$attempts) {
+		$points = $rowpts;
 		if ($points == 9999) { $points = $testsettings['defpoints'];}
-		$penalty = $row[1];
+		$penalty = $rowpen;
 		$lastonly = $false;
 		$skipsome = 0;
 		if ($penalty{0}==='L') {
@@ -1562,90 +1579,88 @@
 				$penalty = substr($penalty,2);
 			}
 		}
-		if ($row[2]==9999) {
-			$row[2] = $testsettings['defattempts'];
+		if ($rowatt==9999) {
+			$rowatt = $testsettings['defattempts'];
 		}
-
-		if ($lastonly && $row[2]>0 && $attempts+1<$row[2]) {
-			$penalty = 0;
-		} else if ($lastonly && $row[2]>0) {
-			$attempts = 1;
-		} else if ($skipsome>0) {
-			$attempts = $attempts - $skipsome;
-			if ($attempts<0) {
-				$attempts = 0;
+		if ($attempts<$rowatt || $rowatt==0) { //has remaining attempts
+			if ($lastonly && $rowatt>0 && $attempts+1<$rowatt) {
+				$penalty = 0;
+			} else if ($lastonly && $rowatt>0) {
+				$attempts = 1;
+			} else if ($skipsome>0) {
+				$attempts = $attempts - $skipsome;
+				if ($attempts<0) {
+					$attempts = 0;
+				}
 			}
-		}
-		if ($lastonly && $row[2]==1) { //no penalty if only one attempt is allowed!
-			$penalty = 0;
-		}
-		if (strpos($frac,'~')===false) {
-			$after = round($frac*$points - $points*$attempts*$penalty/100.0,1);
-			if ($after < 0) { $after = 0;}
-		} else {
-			$fparts = explode('~',$frac);
-			foreach ($fparts as $k=>$fpart) {
-				$after[$k] = round($fpart*$points*(1 - $attempts*$penalty/100.0),2);
-				if ($after[$k]<0) {$after[$k]=0;}
+			if ($lastonly && $rowatt==1) { //no penalty if only one attempt is allowed!
+				$penalty = 0;
 			}
-			$after = implode('~',$after);
-		}
-		return $after;
-	}
-	/*
-	function getremainingpossible($qn,$testsettings,$attempts) {
-		$query = "SELECT points,penalty FROM imas_questions WHERE id='$qn'";
-		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-		$def = $testsettings['defpoints'];
-		while ($row = mysql_fetch_row($result)) {
-			if ($row[1] == 9999) { $pen = $testsettings['defpenalty'];} else {$pen = $row[1];}
-		 	if ($row[0] == 9999) {
-				$possible = round($def - $def*$attempts*$pen/100.0,1);
+			if (strpos($frac,'~')===false) {
+				$after = round($frac*$points - $points*$attempts*$penalty/100.0,1);
+				if ($after < 0) { $after = 0;}
 			} else {
-				$possible = round($row[0] - $row[0]*$attempts*$pen/100.0,1);
+				$fparts = explode('~',$frac);
+				foreach ($fparts as $k=>$fpart) {
+					$after[$k] = round($fpart*$points*(1 - $attempts*$penalty/100.0),2);
+					if ($after[$k]<0) {$after[$k]=0;}
+				}
+				$after = implode('~',$after);
 			}
+			return $after;
+		} else { //no remaining attempts
+			return 0;
 		}
-		if ($possible < 0) { $possible = 0;}
-		return $possible;
 	}
-	*/
+	
 	function getremainingpossible($qn,$testsettings,$attempts) { 
-                $query = "SELECT points,penalty,attempts FROM imas_questions WHERE id='$qn'"; 
-                $result = mysql_query($query) or die("Query failed : $query: " . mysql_error()); 
-                $def = $testsettings['defpoints']; 
-                while ($row = mysql_fetch_row($result)) { 
-                        
-                        $pen = $row[1]; 
-                        $lastonly = $false; 
-                        if ($pen{0}==='L') { 
-                                $lastonly = true; 
-                                $pen= substr($pen,1); 
-                        } 
-                        if ($pen == 9999) { 
-                                $pen = $testsettings['defpenalty']; 
-                                if ($pen{0}==='L') { 
-                                        $lastonly = true; 
-                                        $pen = substr($pen,1); 
-                                } 
-                        } 
-                        if ($row[2]==9999) { 
-                                $row[2] = $testsettings['defattempts']; 
-                        } 
-                        
-                        if ($lastonly) {
-				$pen = 0;
-                        } 
-                        
-                        //if ($row[1] == 9999) { $pen = $testsettings['defpenalty'];} else {$pen = $row[1];} 
-                        if ($row[0] == 9999) { 
-                                $possible = round($def - $def*$attempts*$pen/100.0,1); 
-                        } else { 
-                                $possible = round($row[0] - $row[0]*$attempts*$pen/100.0,1); 
-                        } 
-                } 
+		$possible = getpointsafterpenalty(1,$qn,$testsettings,$attempts);
                 if ($possible < 0) { $possible = 0;} 
                 return $possible; 
         } 
+	
+	function getallowedandremainingpossible($qn,$testsettings,$attempts) {
+		$query = "SELECT points,penalty,attempts FROM imas_questions WHERE id='$qn'";
+		$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
+		$row = mysql_fetch_row($result);
+		$remainingposs =  calcpointsafterpenalty(1,$row[0],$row[1],$row[2],$testsettings,$attempts);
+		if ($row[2]==9999) {
+			$row[2] = $testsettings['defattempts'];
+		}
+		return array($row[2],$remainingposs);
+	}
+	
+	function getallremainingpossible($questions,$testsettings,$attempts) {
+		$ql = "'".implode("','",$questions)."'";
+		$order = array_flip($questions);
+		$query = "SELECT points,penalty,attempts,id FROM imas_questions WHERE id IN ($ql)";
+		$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
+		$rposs = array(); $allowedattempts = array();
+		while ($row = mysql_fetch_row($result)) {
+			$rposs[$order[$row[3]]] = calcpointsafterpenalty(1,$row[0],$row[1],$row[2],$testsettings,$attempts[$order[$row[3]]]);
+			if ($row[2]==9999) {
+				$row[2] = $testsettings['defattempts'];
+			}
+			$allowedattempts[$order[$row[3]]] = $row[2];
+		}
+		return $rposs;
+	}
+	
+	function getallallowedandremainingpossible($questions,$testsettings,$attempts) {
+		$ql = "'".implode("','",$questions)."'";
+		$order = array_flip($questions);
+		$query = "SELECT points,penalty,attempts,id FROM imas_questions WHERE id IN ($ql)";
+		$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
+		$rposs = array(); $allowedattempts = array();
+		while ($row = mysql_fetch_row($result)) {
+			$rposs[$order[$row[3]]] = calcpointsafterpenalty(1,$row[0],$row[1],$row[2],$testsettings,$attempts[$order[$row[3]]]);
+			if ($row[2]==9999) {
+				$row[2] = $testsettings['defattempts'];
+			}
+			$allowedattempts[$order[$row[3]]] = $row[2];
+		}
+		return array($allowedattempts,$rposs);
+	}
 
 
 	function getpoints($frac,$qn,$def) {
@@ -1704,12 +1719,13 @@
 		if (strpos($sc,'~')===false) {
 			return ($sc<0);
 		} else {
-			return (strpos($sc,'-1'));
+			return (strpos($sc,'-1')!==FALSE);
 		}
 	}
 	
 	function printscore($sc,$poss) {
 		if (strpos($sc,'~')===false) {
+			$sc = str_replace('-1','N/A',$sc);
 			echo "$sc out of $poss";
 		} else {
 			$pts = getpts($sc);
@@ -1717,6 +1733,49 @@
 			$sc = str_replace('~',', ',$sc);
 			echo "$pts out of $poss (parts: $sc)";
 		}		
+	}
+	
+	function scorequestion($qn) { //scores a question
+		global $questions,$scores,$seeds,$testsettings,$attempts,$isreview,$bestseeds,$bestscores,$bestattempts,$bestlastanswers;
+		list($qsetid,$cat) = getqsetid($questions[$qn]);
+		$scores[$qn] = getpointsafterpenalty(scoreq($qn,$qsetid,$seeds[$qn],$_POST["qn$qn"]),$questions[$qn],$testsettings,$attempts[$qn]);
+		$attempts[$qn]++;
+		
+		if (getpts($scores[$qn])>getpts($bestscores[$qn]) && !$isreview) {
+			$bestseeds[$qn] = $seeds[$qn];
+			$bestscores[$qn] = $scores[$qn];
+			$bestattempts[$qn] = $attempts[$qn];
+			$bestlastanswers[$qn] = $lastanswers[$qn];
+		}
+	}
+	function recordtestdata($limit=false) { //records everything except $questions
+		global $bestscores,$bestattempts,$bestseeds,$bestlastanswers,$scores,$attempts,$seeds,$lastanswers,$testid,$testsettings,$sessiondata;
+		$bestscorelist = implode(',',$bestscores);
+		$bestattemptslist = implode(',',$bestattempts);
+		$bestseedslist = implode(',',$bestseeds);
+		$bestlalist = implode('~',$bestlastanswers);
+		$bestlalist = addslashes(stripslashes($bestlalist));
+		
+		$scorelist = implode(",",$scores);
+		$attemptslist = implode(",",$attempts);
+		$seedslist = implode(',',$seeds);
+		$lalist = implode("~",$lastanswers);
+		$lalist = addslashes(stripslashes($lalist));
+		$now = time();
+		if ($limit) {
+			$query = "UPDATE imas_assessment_sessions SET lastanswers='$lalist' ";
+		} else {
+			$query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',seeds='$seedslist',lastanswers='$lalist',";
+			$query .= "bestseeds='$bestseedslist',bestattempts='$bestattemptslist',bestscores='$bestscorelist',bestlastanswers='$bestlalist',";
+			$query .= "endtime=$now ";
+		}
+		if ($testsettings['isgroup']>0 && $sessiondata['groupid']>0) {
+			$query .= "WHERE agroupid='{$sessiondata['groupid']}'";
+		} else {
+			$query .= "WHERE id='$testid' LIMIT 1";
+		}
+		
+		mysql_query($query) or die("Query failed : $query " . mysql_error());
 	}
 
 

@@ -117,19 +117,75 @@
 	}
 	if (isset($_GET['clearattempt']) && isset($_GET['asid']) && $isteacher) {
 		if ($_GET['clearattempt']=="confirmed") {
-			$query = "DELETE FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
+			
+			$query = "DELETE FROM imas_assessment_sessions";// WHERE id='{$_GET['asid']}'";
+			$query .= getasidquery($_GET['asid']);
 			mysql_query($query) or die("Query failed : " . mysql_error());
+			
 			unset($_GET['asid']);
+			unset($agroupid);
 		} else {
-			echo "<p>Are you sure you want to clear this student's assessment attempt?  This will make it appear the student never tried the assessment, and the student will receive a new version of the assessment.</p>";
+			$isgroup = isasidgroup($_GET['asid']);
+			if ($isgroup) {
+				$pers = 'group';
+			} else {
+				$pers = 'student';
+			}
+			echo "<p>Are you sure you want to clear this $pers's assessment attempt?  This will make it appear the $pers never tried the assessment, and the $pers will receive a new version of the assessment.</p>";
 			echo "<p><input type=button onclick=\"window.location='gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&clearattempt=confirmed'\" value=\"Really Clear\">\n";
+			echo "<input type=button value=\"Never Mind\" onclick=\"window.location='gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}'\"></p>\n";
+			exit;
+		}
+	}
+	if (isset($_GET['breakfromgroup']) && isset($_GET['asid']) && $isteacher) {
+		if ($_GET['breakfromgroup']=="confirmed") {
+			$query = "SELECT count(id) FROM imas_assessment_sessions WHERE agroupid='{$_GET['asid']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			if (mysql_result($result,0,0)>1) { //was group creator and others in group; need to move to new id
+				$query = "SELECT id,agroupid,userid FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$row = mysql_fetch_row($result);
+				$oldgroupid = $row[1];
+				$thisuserid = $row[2];
+				$query = "SELECT userid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers ";
+				$query .= "FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
+				$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
+				$row = mysql_fetch_row($result);
+				$insrow = "'".implode("','",addslashes_deep($row))."'";
+				$query = "INSERT INTO imas_assessment_sessions (userid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers) ";
+				$query .= "VALUES ($insrow)";
+				mysql_query($query) or die("Query failed : $query:" . mysql_error());
+				$newasid = mysql_insert_id();
+				$query = "DELETE FROM imas_assessment_sessions WHERE id='{$_GET['asid']}' LIMIT 1";
+				mysql_query($query) or die("Query failed : $query:" . mysql_error());
+				$query = "SELECT sessionid,sessiondata FROM imas_sessions WHERE userid='$thisuserid'";
+				$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
+				while ($row = mysql_fetch_row($result)) {
+					$tmpsessdata = unserialize(base64_decode($row[1]));
+					if ($tmpsessdata['sessiontestid']==$_GET['asid']) {
+						$tmpsessdata['sessiontestid'] = $newasid;
+						$tmpsessdata['groupid'] = 0;
+						$tmpsessdata = base64_encode(serialize($tmpsessdata));
+						$query = "UPDATE imas_sessions SET sessiondata='$tmpsessdata' WHERE sessionid='{$row[0]}'";
+						mysql_query($query) or die("Query failed : $query:" . mysql_error());
+					}
+				}
+				$_GET['asid'] = $newasid;
+			} else {
+				$query = "UPDATE imas_assessment_sessions SET agroupid=0 WHERE id='{$_GET['asid']}'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+		} else {
+			echo "<p>Are you sure you want to separate this student from their current group?</p>";
+			echo "<p><input type=button onclick=\"window.location='gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}&breakfromgroup=confirmed'\" value=\"Really Separate\">\n";
 			echo "<input type=button value=\"Never Mind\" onclick=\"window.location='gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}'\"></p>\n";
 			exit;
 		}
 	}
 	if (isset($_GET['clearscores']) && isset($_GET['asid']) && $isteacher) {
 		if ($_GET['clearscores']=="confirmed") {
-			$query = "SELECT seeds FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
+			$whereqry = getasidquery($_GET['asid']);
+			$query = "SELECT seeds FROM imas_assessment_sessions $whereqry";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$seeds = explode(',',mysql_result($result,0,0));
 			
@@ -146,11 +202,17 @@
 			
 			$query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',lastanswers='$lalist',";
 			$query .= "bestscores='$bestscorelist',bestattempts='$bestattemptslist',bestseeds='$bestseedslist',bestlastanswers='$bestlalist' ";
-			$query .= "WHERE id='{$_GET['asid']}'";
+			$query .= $whereqry;//"WHERE id='{$_GET['asid']}'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			unset($_GET['asid']);
 		} else {
-			echo "<p>Are you sure you want to clear this student's scores for this assessment?</p>";
+			$isgroup = isasidgroup($_GET['asid']);
+			if ($isgroup) {
+				$pers = 'group';
+			} else {
+				$pers = 'student';
+			}
+			echo "<p>Are you sure you want to clear this $pers's scores for this assessment?</p>";
 			echo "<p><input type=button onclick=\"window.location='gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&clearscores=confirmed'\" value=\"Really Clear\">\n";
 			echo "<input type=button value=\"Never Mind\" onclick=\"window.location='gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}'\"></p>\n";
 			exit;
@@ -158,7 +220,9 @@
 	}
 	if (isset($_GET['clearq']) && isset($_GET['asid']) && $isteacher) {
 		if ($_GET['confirmed']=="true") {
-			$query = "SELECT attempts,lastanswers,scores,bestscores,bestattempts,bestlastanswers FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
+			$whereqry = getasidquery($_GET['asid']);
+			
+			$query = "SELECT attempts,lastanswers,scores,bestscores,bestattempts,bestlastanswers FROM imas_assessment_sessions $whereqry"; //WHERE id='{$_GET['asid']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$line = mysql_fetch_array($result, MYSQL_ASSOC);
 			
@@ -187,7 +251,7 @@
 				
 				$query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',lastanswers='$lalist',";
 				$query .= "bestscores='$bestscorelist',bestattempts='$bestattemptslist',bestlastanswers='$bestlalist' ";
-				$query .= "WHERE id='{$_GET['asid']}'";
+				$query .= $whereqry; //"WHERE id='{$_GET['asid']}'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			} else {
 				echo "<p>Error.  Try again.</p>";
@@ -196,7 +260,13 @@
 			unset($_GET['clearq']);
 			
 		} else {
-			echo "<p>Are you sure you want to clear this student's scores for this question?</p>";
+			$isgroup = isasidgroup($_GET['asid']);
+			if ($isgroup) {
+				$pers = 'group';
+			} else {
+				$pers = 'student';
+			}
+			echo "<p>Are you sure you want to clear this $pers's scores for this question?</p>";
 			echo "<p><input type=button onclick=\"window.location='gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&clearq={$_GET['clearq']}&confirmed=true'\" value=\"Really Clear\">\n";
 			echo "<input type=button value=\"Never Mind\" onclick=\"window.location='gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}'\"></p>\n";
 			exit;
@@ -228,6 +298,12 @@
 			$placeinhead .= "       var toopen = '$address&catfilter=' + cat;\n";
 			$placeinhead .= "  	window.location = toopen; \n";
 			$placeinhead .= "}\n";
+			$placeinhead .= 'function chgtoggle() { ';
+			$placeinhead .= '	var altgbmode = document.getElementById("toggleview").value; ';
+			$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid&gbmode=";
+			$placeinhead .= "	var toopen = '$address' + altgbmode;\n";
+			$placeinhead .= "  	window.location = toopen; \n";
+			$placeinhead .= "}\n";
 			$placeinhead .= "function chkAll(frm, arr, mark) {
   for (i = 0; i <= frm.elements.length; i++) {
    try{
@@ -248,9 +324,63 @@
 		
 		echo "<span class=\"hdr1\">Grade Book</span>";
 		if ($isteacher) {
-			echo " <input type=\"button\" id=\"lockbtn\" onclick=\"lockcol()\" value=\"Lock headers\"/> (IE only)\n";
+			//echo " <input type=\"button\" id=\"lockbtn\" onclick=\"lockcol()\" value=\"Lock headers\"/> (IE only)\n";
 		}
-		echo "<br/>Check/Uncheck All: <input type=\"checkbox\" name=\"ca\" value=\"1\" onClick=\"chkAll(this.form, 'checked[]', this.checked)\"> \n";
+		if ($isteacher) {
+			echo "<div class=cpmid>";
+			echo "<a href=\"addgrades.php?cid=$cid&gbmode=$gbmode&gbitem=new&grades=all\">Add Offline Grade</a> | ";
+			echo "Export to <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&export=true\">File</a>, ";
+			echo "<a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&emailgb=me\">My Email</a>, or <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&emailgb=ask\">Other Email</a> | ";
+			echo "<a href=\"gbsettings.php?gbmode=$gbmode&cid=$cid\">Gradebook Settings</a> | ";
+			echo "<a href=\"gradebook.php?cid=$cid&gbmode=$gbmode&stu=-1\">Averages</a><br/> ";
+			echo "<input type=\"button\" id=\"lockbtn\" onclick=\"lockcol()\" value=\"Lock headers\"/> (IE) |  \n";
+			echo 'Filter Items: <select id="filtersel" onchange="chgfilter()">';
+			echo '<option value="-1" ';
+			if ($catfilter==-1) {echo "selected=1";}
+			echo '>All</option>';
+			echo '<option value="0" ';
+			if ($catfilter==0) { echo "selected=1";}
+			echo '>Default</option>';
+			$query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				echo '<option value="'.$row[0].'"';
+				if ($catfilter==$row[0]) {echo "selected=1";}
+				echo '>'.$row[1].'</option>';
+			}
+			echo '<option value="-2" ';
+			if ($catfilter==-2) {echo "selected=1";}
+			echo '>Category Totals</option>';
+			echo '</select> | ';
+			
+			echo 'Toggle: <select id="toggleview" onchange="chgtoggle()">';
+			echo '<option value="-1">Select toggle</option>';
+			if ($nopracticet) {
+				$altgbmode = $gbmode+2;
+				echo "<option value=\"$altgbmode\">Practice Test: hidden -> shown</option>";
+			} else {
+				$altgbmode = $gbmode-2;
+				echo "<option value=\"$altgbmode\">Practice Test: shown -> hidden</option>";
+			} 
+			if (($gbmode&1)==1) {
+				$altgbmode = $gbmode-1;
+				echo "<option value=\"$altgbmode\">Links: question breakdown -> edit</option>";
+			} else {
+				$altgbmode = $gbmode+1;
+				echo "<option value=\"$altgbmode\">Links: edit -> question breakdown</option>";
+			}
+			if ($curonly) {
+				$altgbmode = $gbmode-4;
+				echo "<option value=\"$altgbmode\">Items shown: available -> all</option>";
+			} else {
+				$altgbmode = $gbmode+4;
+				echo "<option value=\"$altgbmode\">Items shown: all -> available and past</option>";
+			}
+			echo '</select>';
+			
+			echo "</div>";
+		}
+		echo "Check/Uncheck All: <input type=\"checkbox\" name=\"ca\" value=\"1\" onClick=\"chkAll(this.form, 'checked[]', this.checked)\"> \n";
 		echo "With Selected:  <input type=submit name=submit value=\"E-mail\"> <input type=submit name=submit value=\"Message\">";
 		echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 		echo "<div id=\"tbl-container\">";
@@ -343,7 +473,7 @@
 			}
 		}
 		echo "<div class=clear></div></div>";
-	} else if (!isset($_GET['asid']) && (!$isteacher || $stu>0)) { //showing student view
+	} else if (!isset($_GET['asid']) && (!$isteacher || $stu!=0)) { //showing student view
 		if (!$isteacher) {
 			$stu = $userid;
 		}
@@ -359,15 +489,24 @@
 			echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 			echo "&gt; Gradebook</div>";
 		}
-		echo "<h2>Grade Book Student Detail</h2>\n";
-		list($gb,$cathdr) = gbtable(true,$stu);
+		if ($stu==-1) {
+			echo "<h2>Grade Book Averages</h2>\n";
+		} else {
+			echo "<h2>Grade Book Student Detail</h2>\n";
+		}
+		if ($stu>0) {
+			list($gb,$cathdr) = gbtable(true,$stu);
+		} else {
+			list($gb,$cathdr) = gbtable(true);
+			array_splice($gb,1,count($gb)-2);
+		}
 		echo '<table class=gb>';
 		$gb[1][0] = preg_replace('/<[^>]+>/','',$gb[1][0]);
-		echo "<thead><tr><th>{$gb[0][0]}</th><th>{$gb[1][0]}</th></tr></thead><tbody>";
+		echo "<thead><tr><th>Item</th><th>Possible</th><th>{$gb[1][0]}</th></tr></thead><tbody>";
 		
 		for ($i=1;$i<count($gb[0]);$i++) {
 			//if ($i%2!=0) {
-				echo "<tr class=bordered>"; 
+				echo "<tr class=grid>"; 
 			//} else {
 			//	echo "<tr class=odd onMouseOver=\"this.className='highlight'\" onMouseOut=\"this.className='odd'\">"; 
 			//}
@@ -378,7 +517,14 @@
 			} else {
 				echo ' class="catdf"';
 			}
-			echo '>'.$gb[0][$i].'</td><td>'.$gb[1][$i].'</td></tr>';
+			echo '>';
+			$anpts = explode('<br/>',$gb[0][$i]);
+			if (count($anpts)==1) {
+				$anpts[] = '';
+			}
+			echo $anpts[0];
+			echo '</td><td>'.$anpts[1];
+			echo '</td><td>'.$gb[1][$i].'</td></tr>';
 		}
 		echo '</tbody></table>';
 		
@@ -464,7 +610,12 @@
 				$i++;
 			}
 			$scorelist = implode(",",$scores);
-			$query = "UPDATE imas_assessment_sessions SET bestscores='$scorelist' WHERE id='{$_GET['asid']}'";
+			$query = "UPDATE imas_assessment_sessions SET bestscores='$scorelist'";
+			if (isset($_POST['updategroup'])) {
+				$query .= getasidquery($_GET['asid']);
+			} else {
+				$query .= "WHERE id='{$_GET['asid']}'";
+			}
 
 			mysql_query($query) or die("Query failed : $query " . mysql_error());
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&gbmode=$gbmode&cid={$_GET['cid']}");
@@ -472,7 +623,8 @@
 		}
 		require("../assessment/header.php");
 		if (isset($_GET['starttime']) && $isteacher) {
-			$query = "UPDATE imas_assessment_sessions SET starttime='{$_GET['starttime']}' WHERE id='{$_GET['asid']}'";
+			$query = "UPDATE imas_assessment_sessions SET starttime='{$_GET['starttime']}' ";//WHERE id='{$_GET['asid']}'";
+			$query .= getasidquery($_GET['asid']);
 			mysql_query($query) or die("Query failed : $query " . mysql_error());
 		}
 		
@@ -499,6 +651,12 @@
 			echo "Not Submitted</p>\n";
 		} else {
 			echo "Last change: " . tzdate("F j, Y, g:i a",$line['endtime']) . "</p>\n";
+		}
+		if ($isteacher) {
+			if ($line['agroupid']>0) {
+				echo "<p>This assignment is linked to a group.  Changes will affect the group unless specified. ";
+				echo "<a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}&breakfromgroup=true\">Separate from Group</a></p>";
+			}
 		}
 		
 		if ($isteacher) {echo "<p><a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}&clearattempt=true\">Clear Attempt</a> <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}&clearscores=true\">Clear Scores</a></p>\n";}
@@ -609,8 +767,23 @@
 		}
 		echo "<p></p><div class=review>Total: $total/$totalpossible</div>\n";
 		if ($isteacher && !isset($_GET['lastver'])) {
+			if ($line['agroupid']>0) {
+				echo "<p>Update grade for all group members? <input type=checkbox name=\"updategroup\" checked=\"checked\" /></p>";
+			}
 			echo "<p><input type=submit value=\"Record Changed Grades\"></p>\n";
+			if ($line['agroupid']>0) {
+				$q2 = "SELECT i_u.LastName,i_u.FirstName FROM imas_assessment_sessions AS i_a_s,imas_users AS i_u WHERE ";
+				$q2 .= "i_u.id=i_a_s.userid AND i_a_s.agroupid='{$line['agroupid']}'";
+				$result = mysql_query($q2) or die("Query failed : " . mysql_error());
+				echo "Group members: <ul>";
+				while ($row = mysql_fetch_row($result)) {
+					echo "<li>{$row[0]}, {$row[1]}</li>";
+				}
+				echo "</ul>";
+			}
+				
 		}
+		echo "</form>";
 		
 		echo "<p><a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid\">Return to GradeBook</a></p>\n";
 		
@@ -762,7 +935,11 @@
 		while ($row = mysql_fetch_row($result)) {
 			if ($i%2!=0) {echo "<tr class=even>"; } else {echo "<tr class=odd>";}
 			$avg = round($qtotal[$row[1]]/$qcnt[$row[1]],2);
-			$avg2 = round($qtotal[$row[1]]/($qcnt[$row[1]] - $qincomplete[$row[1]]),2); //avg adjusted for not attempted
+			if ($qcnt[$row[1]] - $qincomplete[$row[1]]>0) {
+				$avg2 = round($qtotal[$row[1]]/($qcnt[$row[1]] - $qincomplete[$row[1]]),2); //avg adjusted for not attempted
+			} else {
+				$avg2 = 0;
+			}
 			$avgscore[$i-1] = $avg;
 			$qs[$i-1] = $row[1];
 			$pts = $row[2];
@@ -773,8 +950,13 @@
 			$pc2 = round(100*$avg2/$pts);
 			$pi = round(100*$qincomplete[$row[1]]/$qcnt[$row[1]],1);
 			
-			$avgatt = round($attempts[$row[1]]/($qcnt[$row[1]] - $qincomplete[$row[1]]),2);
-			$avgreg = round($regens[$row[1]]/($qcnt[$row[1]] - $qincomplete[$row[1]]),2);
+			if ($qcnt[$row[1]] - $qincomplete[$row[1]]>0) {
+				$avgatt = round($attempts[$row[1]]/($qcnt[$row[1]] - $qincomplete[$row[1]]),2);
+				$avgreg = round($regens[$row[1]]/($qcnt[$row[1]] - $qincomplete[$row[1]]),2);
+			} else {
+				$avgatt = 0;
+				$avgreg = 0;
+			}
 			echo "<td>{$row[0]}</td><td>$avg/$pts ($pc%)</td><td>$avg2/$pts ($pc2%)</td><td>$avgatt ($avgreg)</td><td>$pi</td>";
 			echo "<td><input type=button value=\"Preview\" onClick=\"previewq({$row[3]})\"/></td>\n";
 			echo "</tr>\n";
@@ -1147,10 +1329,10 @@
 					}
 				}*/
 				if ($isdisp) {
-					$gb[0][$pos] = "<span class=\"cattothdr\">Total<BR>$overallpts pts</span>";
+					$gb[0][$pos] = "<span class=\"cattothdr\">Total<br/>$overallpts pts</span>";
 					$gb[0][$pos+1] = "<span class=\"cattothdr\">%</span>";
 				} else {
-					$gb[0][$pos] = "Total<BR>$overallpts pts";
+					$gb[0][$pos] = "Total<br/>$overallpts pts";
 					$gb[0][$pos+1] = "%";
 				}
 				
@@ -1280,7 +1462,9 @@
 					} else {
 						$gb[$ln][$pos] = '';
 					}
-					if ($pts[$assessments[$i]]<$minscores[$i]) {
+					if ($assessmenttype[$i]=="NoScores" && $sa[$i]!="I" && $now<$enddate[$i] && !$isteacher) {
+						$gb[$ln][$pos] .= 'N/A';
+					} else if ($pts[$assessments[$i]]<$minscores[$i]) {
 						if ($isteacher) {
 							$gb[$ln][$pos] .= "{$pts[$assessments[$i]]}&nbsp;(NC)";
 						} else {
@@ -1399,7 +1583,8 @@
 			$ln++;
 		}	
 		if ($isdisp && $isteacher) { //calculate averages
-			$gb[$ln][0] = "Average";
+			$gb[$ln][0] = "<a href=\"gradebook.php?cid=$cid&gbmode=$gbmode&stu=-1\">Average</a>";
+			
 			if ($shift>1) {
 				for ($i=1;$i<$shift;$i++) {
 					$gb[$ln][$i] = '';
@@ -1467,5 +1652,25 @@
 			array_splice($cathdr,$shift,0,$tots);
 		}
 		return array($gb,$cathdr);
+	}
+	
+	function getasidquery($asid) {
+		$query = "SELECT agroupid FROM imas_assessment_sessions WHERE id='$asid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$agroupid = mysql_result($result,0,0);
+		if ($agroupid>0) {
+			return (" WHERE agroupid='$agroupid'");
+		} else {
+			return (" WHERE id='$asid' LIMIT 1");
+		}
+	}
+	function isasidgroup($asid) {
+		$query = "SELECT agroupid FROM imas_assessment_sessions WHERE id='$asid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		if (mysql_num_rows($result)>0) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 ?>

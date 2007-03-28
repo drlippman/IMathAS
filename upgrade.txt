@@ -19,6 +19,8 @@ ALTER TABLE `imas_questions` CHANGE `penalty` `penalty` VARCHAR( 6 ) NOT NULL DE
 
 ALTER TABLE `imas_assessments` ADD `showhints` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '1' AFTER `showcat` ;
 
+ALTER TABLE `imas_forums` ADD `grpaid` INT( 10 ) UNSIGNED NOT NULL DEFAULT '0';
+ALTER TABLE `imas_assessment_sessions` ADD `agroupid` INT( 10 ) UNSIGNED NOT NULL DEFAULT '0';
 
 
 *********************

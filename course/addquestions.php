@@ -77,6 +77,7 @@
 	}
 	if (isset($_GET['clearattempts'])) {
 		if ($_GET['clearattempts']=="confirmed") {
+			
 			$query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='$aid'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		} else {

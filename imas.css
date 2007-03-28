@@ -101,6 +101,14 @@ div.cp {
 	padding: 5px;
 	margin-top: 20px;
 }
+div.cpmid {
+	min-height: 1%;
+	border: 1px solid #000;
+	background-color: #eee;
+	padding: 5px;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
 
 span.pointer {
 	cursor:pointer;

@@ -1,4 +1,4 @@
-<h3>Planned For Future Versions</h3>
+<h3>Planned For Eventual Future Versions</h3>
 <ul>
 <li>New questions review process?</li>
 <li>Javascript answer entry editor</li>
@@ -16,28 +16,30 @@
 <li>JavaScript improvement: lib import/export checking system, DOM innerHTMLs</li>
 </ul>
 
-</h3>Planned for Next Version</h3>
+</h3>Planned for Soon Future Versions</h3>
+
 <ul>
 Important
-<li>Use serialize for lastanswers and bestlastanswers</li>
+  
+<li>Use serialize for lastanswers and bestlastanswers</li> 
+{   q1 -> {
+	attempt 1 -> {    (use array even if one part q?)
+		part 1
+		}
+	attempt 2 -> {
+		part 1
+		}
+	}
+}
+   
 <li>Lockdown course on assessment option (easy if lockdown on course, harder if pulling lockdown from assessments (needed for accomodating exceptions))</li>
 <li>Written assignments / way to grade essay questions (fairly easy but need some time)</li>
 <li>Per-part show answers after last policy</li>
-<li>Student groups:</li>
-1) Fix current on-the-fly groups to allow group definition at the beginning, w/ add later ability.  
-   Any changes reflect on all group members.
-   Changes in gradebook reflect on all members unless specified.
-2) Add student_groups table for predefined groups
-   Add ability on assessments to use predefined groups
-   Create group management pages: manage by groups; manage by users
-   User: Add to group, list of groups (on the fly and predefined) w/remove from link
-   Group: Add students, list of students w/ remove from links
-     
 
+<li>Gradebook notes/comments to students</li>
 <li>Icons on skip around, sequential - needs new question status function for efficient processing</li>
 <li>Instructor specific library/question listing</li>
 <li>custom $previewloc</li>
-<li>Add thread to top of page</li>
 
 <li><b>Gradebook</b></li>
 <li>GPA, edittable and from lookup (need separate way to store GPA, fill stored from lookup when switched)</li>
@@ -82,4 +84,18 @@ Tooltips for help (how to do?  David M going to help)
 <li>Multipart question; submit one part at a time (needs some majorish changes, will only make sense for one-by-one or skip-around)</li>
 
 
-
+Changes made for student groups: (for reference)
+Create group if none exists
+Add groups
+Update group scores during assessment
+Link to add new group members
+Clear all attempts (clear groups too, or at least clear from group)
+Unenroll (no changes needed since no tables used)
+Delete assessment (no chg needed)
+Check that grp assess_sess exist when starting test (not needed - not in group w/o i_a_s)
+Update gradebook score reflect on group
+Clear scores/attempt one person (gradebook), [no need 4 all ppl clear attempt on one problem (addquestions)]
+handle submission conflicts
+on break from group, change asid if group creator
+If turn off groups, dissolve all groups
+Create group management page

@@ -19,12 +19,45 @@
 	
 	$cid = $_GET['cid'];
 	$forumid = $_GET['forum'];
-	$query = "SELECT name,postby,settings FROM imas_forums WHERE id='$forumid'";
+	$query = "SELECT name,postby,settings,grpaid FROM imas_forums WHERE id='$forumid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$forumname = mysql_result($result,0,0);
 	$postby = mysql_result($result,0,1);
 	$allowmod = ((mysql_result($result,0,2)&2)==2);
 	$allowdel = ((mysql_result($result,0,2)&4)==4);
+	$grpaid = mysql_result($result,0,3);
+	$dofilter = false;
+	if ($grpaid>0) {
+		if (isset($_GET['ffilter'])) {
+			$sessiondata['ffilter'.$forumid] = $_GET['ffilter'];
+			writesessiondata();
+		}
+		if (!$isteacher) {
+			$query = "SELECT agroupid FROM imas_assessment_sessions WHERE assessmentid='$grpaid' AND userid='$userid'";
+			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			$agroupid = mysql_result($result,0,0);
+			$dofilter = true;
+		} else {
+			if (isset($sessiondata['ffilter'.$forumid]) && $sessiondata['ffilter'.$forumid]>0) {
+				$agroupid = $sessiondata['ffilter'.$forumid];
+				$dofilter = true;
+			}
+		}
+		if ($dofilter) {
+			$query = "SELECT userid FROM imas_assessment_sessions WHERE agroupid='$agroupid'";
+			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			$limids = array();
+			while ($row = mysql_fetch_row($result)) {
+				$limids[] = $row[0];
+			}
+			$query = "SELECT userid FROM imas_teachers WHERE courseid='$cid'";
+			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				$limids[] = $row[0];
+			}
+			$limids = "'".implode("','",$limids)."'";
+		}
+	}
 	
 	
 	
@@ -51,6 +84,9 @@
 		} else {
 			$query = "SELECT imas_forum_posts.forumid,imas_forum_posts.threadid,imas_forum_posts.subject,imas_forum_posts.message,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate ";
 			$query .= "FROM imas_forum_posts,imas_users WHERE imas_forum_posts.forumid='$forumid' AND imas_users.id=imas_forum_posts.userid AND ($searchlikes OR $searchlikes2)";
+		}
+		if ($dofilter) {
+			$query .= " AND imas_forum_posts.userid IN ($limids)";
 		}
 		$query .= " ORDER BY imas_forum_posts.postdate DESC";
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -111,6 +147,9 @@
 				
 				$query = "SELECT iu.email FROM imas_users AS iu,imas_forum_subscriptions AS ifs WHERE ";
 				$query .= "iu.id=ifs.userid AND ifs.forumid='$forumid' AND iu.id<>'$userid'";
+				if ($dofilter) {
+					$query .= " AND iu.id IN ($limids)";
+				}
 				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				if (mysql_num_rows($result)>0) {
 					$headers  = 'MIME-Version: 1.0' . "\r\n";
@@ -248,6 +287,9 @@
 	
 	
 	$query = "SELECT COUNT(id) FROM imas_forum_posts WHERE parent=0 AND forumid='$forumid'";
+	if ($dofilter) {
+		$query .= " AND userid IN ($limids)";
+	}
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$numpages = ceil(mysql_result($result,0,0)/$threadsperpage);
 	
@@ -297,6 +339,28 @@
 	Search: <input type=text name="search" /> <input type=checkbox name="allforums" />All forums in course? <input type="submit" value="Search"/>
 	</form>
 <?php
+	if ($isteacher && $grpaid>0) {
+		$curfilter = $sessiondata['ffilter'.$forumid];
+		$query = "SELECT DISTINCT agroupid FROM imas_assessment_sessions WHERE assessmentid='$grpaid' ORDER BY agroupid";
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		echo "<script type=\"text/javascript\">";
+		echo 'function chgfilter() {';
+		echo '  var ffilter = document.getElementById("ffilter").value;';
+		echo "  window.location = \"thread.php?page=$pages&cid=$cid&forum=$forumid&ffilter=\"+ffilter;";
+		echo '}';
+		echo '</script>';
+		echo '<p>Show posts for group: <select id="ffilter" onChange="chgfilter()"><option value="0" ';
+		if ($curfilter==0) { echo 'selected="1"';}
+		echo '>All groups</option>';
+		$grpcnt = 1;
+		while ($row = mysql_fetch_row($result)) {
+			echo "<option value=\"{$row[0]}\" ";
+			if ($curfilter==$row[0]) { echo 'selected="1"';}
+			echo ">$grpcnt</option>";
+			$grpcnt++;
+		}
+		echo '</select></p>';
+	}
 	if ($myrights > 5 && time()<$postby) {
 		echo "<p><a href=\"thread.php?page=$page&cid=$cid&forum=$forumid&modify=new\">Add New Thread</a></p>\n";
 	}
@@ -310,7 +374,11 @@
 	
 	
 	$query = "SELECT threadid,COUNT(id) AS postcount,MAX(postdate) AS maxdate FROM imas_forum_posts ";
-	$query .= "WHERE forumid='$forumid' GROUP BY threadid";
+	$query .= "WHERE forumid='$forumid' ";
+	if ($dofilter) {
+		$query .= " AND userid IN ($limids) ";
+	}
+	$query .= "GROUP BY threadid";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	while ($row = mysql_fetch_row($result)) {
 		$postcount[$row[0]] = $row[1] -1;
@@ -325,13 +393,21 @@
 	
 	$query = "SELECT imas_forum_posts.id,count(imas_forum_views.userid) FROM imas_forum_views,imas_forum_posts ";
 	$query .= "WHERE imas_forum_views.threadid=imas_forum_posts.id AND imas_forum_posts.parent=0 AND ";
-	$query .= "imas_forum_posts.forumid='$forumid' GROUP BY imas_forum_posts.id";
+	$query .= "imas_forum_posts.forumid='$forumid' ";
+	if ($dofilter) {
+		$query .= "AND imas_forum_posts.userid IN ($limids) ";
+	}
+	$query .= "GROUP BY imas_forum_posts.id";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	while ($row = mysql_fetch_row($result)) {
 		$uniqviews[$row[0]] = $row[1]-1;
 	}
 	
-	$query = "SELECT * FROM imas_forum_posts WHERE parent=0 AND forumid='$forumid' ORDER BY posttype DESC,id DESC ";
+	$query = "SELECT * FROM imas_forum_posts WHERE parent=0 AND forumid='$forumid' ";
+	if ($dofilter) {
+		$query .= "AND userid IN ($limids) ";
+	}
+	$query .= "ORDER BY posttype DESC,id DESC ";
 	$offset = ($page-1)*$threadsperpage;
 	$query .= "LIMIT $offset,$threadsperpage";// OFFSET $offset"; 
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());

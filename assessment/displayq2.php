@@ -1337,6 +1337,24 @@ function getqsetid($questionid) {
 	//return mysql_fetch_row($result);	
 }
 
+function getallqsetid($questions) {
+	$qids = "'".implode("','",$questions)."'";
+	$order = array_flip($questions);
+	$out = array();
+	$query = "SELECT imas_questions.questionsetid,imas_questions.category,imas_libraries.name,imas_questions.id FROM imas_questions LEFT JOIN imas_libraries ";
+	$query .= "ON imas_questions.category=imas_libraries.id WHERE imas_questions.id IN ($qids)";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	while ($row = mysql_fetch_row($result)) {
+		$out[0][$order[$row[3]]] = $row[0];// = array($row[0],$row[1]);
+		if ($row[2]==null) {
+			$out[1][$order[$row[3]]] = $row[1];
+		} else {
+			$out[1][$order[$row[3]]] = $row[2];
+		}
+	}
+	return $out;
+}
+
 function isNaN( $var ) {
      return !preg_match('/^[-]?[0-9]+([\.][0-9]+)?([eE][+\-]?[0-9]+)?$/', $var);
      //possible alternative:

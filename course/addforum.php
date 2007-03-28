@@ -103,13 +103,13 @@
 		
 		if (isset($_GET['id'])) {  //already have id; update
 		$query = "UPDATE imas_forums SET name='{$_POST['name']}',description='{$_POST['description']}',startdate=$startdate,enddate=$enddate,settings=$fsets,";
-		$query .= "defdisplay='{$_POST['defdisplay']}',replyby=$replyby,postby=$postby ";
+		$query .= "defdisplay='{$_POST['defdisplay']}',replyby=$replyby,postby=$postby,grpaid='{$_POST['grpaid']}' ";
 		$query .= "WHERE id='{$_GET['id']}';";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$newforumid = $_GET['id'];
 		} else { //add new
-		$query = "INSERT INTO imas_forums (courseid,name,description,startdate,enddate,settings,defdisplay,replyby,postby) VALUES ";
-		$query .= "('$cid','{$_POST['name']}','{$_POST['description']}',$startdate,$enddate,$fsets,'{$_POST['defdisplay']}',$replyby,$postby);";
+		$query = "INSERT INTO imas_forums (courseid,name,description,startdate,enddate,settings,defdisplay,replyby,postby,grpaid) VALUES ";
+		$query .= "('$cid','{$_POST['name']}','{$_POST['description']}',$startdate,$enddate,$fsets,'{$_POST['defdisplay']}',$replyby,$postby,'{$_POST['grpaid']}');";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		
 		$newforumid = mysql_insert_id();
@@ -169,6 +169,7 @@
 			$defdisplay = $line['defdisplay'];
 			$replyby = $line['replyby'];
 			$postby = $line['postby'];
+			$grpaid = $line['grpaid'];
 		} else {
 			//set defaults
 			$line['name'] = "Enter Forum Name here";
@@ -181,6 +182,7 @@
 			$replyby = 2000000000;
 			$postby = 2000000000;
 			$hassubscrip = false;
+			$grpaid = 0;
 		}   
 		if ($startdate!=0) {
 			$sdate = tzdate("m/d/Y",$startdate);
@@ -249,6 +251,19 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 <A HREF="#" onClick="cal1.select(document.forms[0].edate,'anchor2','MM/dd/yyyy',(document.forms[0].sdate.value=='<?php echo $sdate;?>')?(document.forms[0].edate.value):(document.forms[0].sdate.value)); return false;" NAME="anchor2" ID="anchor2"><img src="../img/cal.gif" alt="Calendar"/></A>
 at <input type=text size=10 name=etime value="<?php echo $etime;?>"></span><BR class=form>
 
+<span class=form>Group linked forum?</span><span class=formright>
+ <select name="grpaid">
+ <option value="0" <?php if ($grpaid==0) {echo 'selected="1"';} ?>>Not group forum</option>
+<?php
+	$query = "SELECT id,name FROM imas_assessments WHERE isgroup>0 AND courseid='$cid'";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	while ($row = mysql_fetch_row($result)) {
+		echo "<option value=\"{$row[0]}\" ";
+		if ($row[0]==$grpaid) { echo 'selected="1"';}
+		echo ">Use groups of {$row[1]}</option>";
+	}
+?>
+</select></span><br class="form"/>
 <span class=form>Allow anonymous posts:</span><span class=formright>
 <input type=checkbox name="allowanon" value="1" <?php if ($allowanon) { echo "checked=1";}?>/></span><br class="form"/>
 

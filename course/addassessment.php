@@ -100,11 +100,8 @@
 		if (isset($_POST['samever'])) { $shuffle += 4;}
 		if (isset($_POST['reattemptsdiffver'])) { $shuffle += 8;}
 		
-		if (isset($_POST['isgroup'])) {
-			$isgroup = 1;
-		} else {
-			$isgroup = 0;
-		}
+		$isgroup = $_POST['isgroup'];
+		
 		if (isset($_POST['showhints'])) {
 			$showhints = 1;
 		} else {
@@ -136,6 +133,12 @@
 			}
 		}
 		if (isset($_GET['id'])) {  //already have id; update
+			$query = "SELECT isgroup FROM imas_assessments WHERE id='{$_GET['id']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			if (mysql_result($result,0,0)>0 && $isgroup==0) {
+				$query = "UPDATE imas_assessment_sessions SET agroupid=0 WHERE assessmentid='{$_GET['id']}'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
 			if (isset($_POST['defpoints'])) {
 				$query = "UPDATE imas_assessments SET name='{$_POST['name']}',summary='{$_POST['summary']}',intro='{$_POST['intro']}',startdate=$startdate,enddate=$enddate,reviewdate=$reviewdate,timelimit='{$_POST['timelimit']}',minscore='{$_POST['minscore']}',isgroup='$isgroup',showhints='$showhints',";
 				$query .= "displaymethod='{$_POST['displaymethod']}',defpoints='{$_POST['defpoints']}',defattempts='{$_POST['defattempts']}',defpenalty='{$_POST['defpenalty']}',deffeedback='$deffeedback',shuffle='$shuffle',gbcategory='{$_POST['gbcat']}',password='{$_POST['password']}',cntingb='{$_POST['cntingb']}',showcat='{$_POST['showqcat']}' ";
@@ -431,7 +434,12 @@ at <input type=text size=10 name=rtime value="<?php echo $rtime;?>"></span><BR c
 <span class=form>Shuffle item order: </span><span class=formright><input type="checkbox" name="shuffle" <?php if ($line['shuffle']&1) {echo "CHECKED";} ?>></span><BR class=form>
 <span class=form>All items same random seed: </span><span class=formright><input type="checkbox" name="sameseed" <?php if ($line['shuffle']&2) {echo "CHECKED";} ?>></span><BR class=form>
 <span class=form>All students same version of questions: </span><span class=formright><input type="checkbox" name="samever" <?php if ($line['shuffle']&4) {echo "CHECKED";} ?>></span><BR class=form>
-<span class=form>Is group assessment?: </span><span class=formright><input type="checkbox" name="isgroup" <?php if ($line['isgroup']==1) { echo 'checked="1"';} ?> /></span><br class="form" />
+<span class=form>Group assessment: </span><span class=formright>
+	<input type="radio" name="isgroup" value="0" <?php if ($line['isgroup']==0) { echo 'checked="1"';} ?> />Not a group assessment<br/>
+	<input type="radio" name="isgroup" value="1" <?php if ($line['isgroup']==1) { echo 'checked="1"';} ?> />Students can add members with login passwords<br/>
+	<input type="radio" name="isgroup" value="2" <?php if ($line['isgroup']==2) { echo 'checked="1"';} ?> />Students can add members without passwords<br/>
+	<input type="radio" name="isgroup" value="3" <?php if ($line['isgroup']==3) { echo 'checked="1"';} ?> />Students cannot add members
+	</span><br class="form" />
 <span class=form>Show question categories:</span><span class=formright>
 	<input name="showqcat" type="radio" value="0" <?php if ($showqcat=="0") {echo 'checked="1"';} ?>>No <br />
 	<input name="showqcat" type="radio" value="1" <?php if ($showqcat=="1") {echo 'checked="1"';} ?>>In Points Possible bar <br />

@@ -77,6 +77,7 @@
 	}
 	if (isset($_GET['clearattempts'])) {
 		if ($_GET['clearattempts']=="confirmed") {
+			
 			$query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='$aid'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		} else {
@@ -107,69 +108,7 @@
 		require("../footer.php");
 		exit;
 	}
-	/*
-	echo "<script type=\"text/javascript\">\n";
-	echo "function moveitem(from) { \n";
-	echo "  var to = document.getElementById(from).value; \n";
-	echo "  var grp = document.getElementById('group').value; \n";
-	$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestionsreview.php?cid=$cid&aid=$aid";
-	echo "  if (to != from) {\n";
-	echo "  	var toopen = '$address&from=' + from + '&to=' + to + '&grp=' + grp;\n";
-	echo "  	window.location = toopen; \n";
-	echo "  }\n";
-	echo "}\n";
-	echo "</script>\n";
-	echo "<script type=\"text/javascript\">\n";
-	echo "function previewq(formn,loc,qn,docheck,onlychk) {\n";
-	echo "   var addr = '$imasroot/course/testquestion.php?cid={$_GET['cid']}&formn='+formn+'&loc=qo'+loc+'&qsetid='+qn;\n";
-	echo "   if (docheck) {\n";
-	echo "      addr += '&checked=1';\n";
-	echo "   }\n";
-	echo "   if (onlychk) {\n";
-	echo "      addr += '&onlychk=1';\n";
-	echo "   }\n";
-	echo "   window.open(addr,'Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20));\n";
-	echo "}\n";
-	echo <<<END
-	function previewsel(formn) {
-		var form = document.getElementById(formn);
-		for (var e = 0; e < form.elements.length; e++) {
-			var el = form.elements[e];
-			if (el.type == 'checkbox' && el.name=='nchecked[]' && el.checked) {
-				previewq(formn,el.id.substring(2),el.value,true,true);
-				return false;
-			}
-		}
-		alert("No questions selected");
-	}
-	function getnextprev(formn,loc,onlychk) {
-		var onlychk = (onlychk == null) ? false : true;
-		var form = document.getElementById(formn);
-		var prevl = 0; var nextl = 0; var found=false;
-		var prevq = 0; var nextq = 0;
-		for (var e = 0; e < form.elements.length; e++) {
-			var el = form.elements[e];
-			if (typeof el.type == "undefined") {
-				continue;
-			}
-			if (((el.type == 'checkbox' && el.name=='nchecked[]') || (el.type=='hidden' && el.name=='curq[]')) && (!onlychk || el.checked)) {
-				if (found) {
-					nextq = el.value;
-					nextl = el.id;
-					break;
-				} else if (el.id==loc) {
-					found = true;
-				} else {
-					prevq = el.value;
-					prevl = el.id;
-				}
-			}
-		}
-		return ([[prevl,prevq],[nextl,nextq]]);
-	}
-END;
-	echo "</script>\n";
-	*/
+	
 	if (isset($_GET['remove'])) {
 		$query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());

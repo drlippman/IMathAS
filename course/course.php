@@ -231,10 +231,12 @@
 		echo "<a href=\"../admin/export.php?cid=$cid\">Export Question Set<br></a>\n";
 		echo "<a href=\"../admin/import.php?cid=$cid\">Import Question Set</p></a>\n";
 		echo "<p><a href=\"managelibs.php?cid=$cid\">Manage Libraries</a><br>";
+		echo "<a href=\"managestugrps.php?cid=$cid\">Student Groups</a><br/>";
 		echo "<a href=\"../admin/exportlib.php?cid=$cid\">Export Libraries<br></a>\n";
 		echo "<a href=\"../admin/importlib.php?cid=$cid\">Import Libraries</p></a>\n";
 	} else {
-		echo "<a href=\"managelibs.php?cid=$cid\">Manage Libraries</a></p>";
+		echo "<a href=\"managelibs.php?cid=$cid\">Manage Libraries</a><br/>";
+		echo "<a href=\"managestugrps.php?cid=$cid\">Student Groups</a></p>";
 		
 	}
 	echo "<p><a href=\"copyitems.php?cid=$cid\">Copy Course Items</a><br/>\n";
@@ -817,12 +819,45 @@
 			   }
 		   } else if ($line['itemtype']=="Forum") {
 			   $typeid = $line['typeid'];
+			   $query = "SELECT id,name,description,startdate,enddate,grpaid FROM imas_forums WHERE id='$typeid'";
+			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
+			   $dofilter = false;
+			   if ($line['grpaid']>0) {
+				if (!isset($teacherid)) {
+					$query = "SELECT agroupid FROM imas_assessment_sessions WHERE assessmentid='{$line['grpaid']}' AND userid='$userid'";
+					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+					$agroupid = mysql_result($result,0,0);
+					$dofilter = true;
+				} 
+				if ($dofilter) {
+					$query = "SELECT userid FROM imas_assessment_sessions WHERE agroupid='$agroupid'";
+					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+					$limids = array();
+					while ($row = mysql_fetch_row($result)) {
+						$limids[] = $row[0];
+					}
+					$query = "SELECT userid FROM imas_teachers WHERE courseid='$cid'";
+					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+					while ($row = mysql_fetch_row($result)) {
+						$limids[] = $row[0];
+					}
+					$limids = "'".implode("','",$limids)."'";
+				}   
+			   }
+			   
 			   $query = "SELECT COUNT( DISTINCT threadid )FROM imas_forum_posts WHERE forumid='$typeid'";
+			   if ($dofilter) {
+				   $query .= " AND userid IN ($limids)";
+			   }
 			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			   $numthread = mysql_result($result,0,0);
 			   $query = "SELECT imas_forum_views.lastview,MAX(imas_forum_posts.postdate) FROM imas_forum_views ";
 			   $query .= "LEFT JOIN imas_forum_posts ON imas_forum_views.threadid=imas_forum_posts.threadid ";
 			   $query .= "WHERE imas_forum_posts.forumid='$typeid' AND imas_forum_views.userid='$userid'";
+			   if ($dofilter) {
+				   $query .= " AND imas_forum_posts.userid IN ($limids) ";
+			   }
 			   $query .= "GROUP BY imas_forum_posts.threadid";
 			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			   $hasnewitems = false;
@@ -836,9 +871,7 @@
 					   }
 				   }
 			   }
-			   $query = "SELECT id,name,description,startdate,enddate FROM imas_forums WHERE id='$typeid'";
-			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
+			  
 			  
 			   if (strpos($line['description'],'<p>')!==0) {
 				   $line['description'] = '<p>'.$line['description'].'</p>';
@@ -909,11 +942,14 @@
 			echo "<a href=\"../admin/export.php?cid=$cid\">Export Question Set<br></a>\n";
 			echo "<a href=\"../admin/import.php?cid=$cid\">Import Question Set</span></a>\n";
 			echo "<span class=column><a href=\"managelibs.php?cid=$cid\">Manage Libraries</a><br>";
-			echo "<a href=\"../admin/exportlib.php?cid=$cid\">Export Libraries<br></a>\n";
+			echo "<a href=\"../admin/exportlib.php?cid=$cid\">Export Libraries</a><br/>\n";
 			echo "<a href=\"../admin/importlib.php?cid=$cid\">Import Libraries</span></a>\n";
+			echo "<span class=column><a href=\"copyitems.php?cid=$cid\">Copy Course Items</a><br/>\n";
+			echo "<a href=\"managestugrps.php?cid=$cid\">Student Groups</a></span>\n";
 		} else {
 			echo "<a href=\"managelibs.php?cid=$cid\">Manage Libraries</a><br>";
 			echo "<a href=\"copyitems.php?cid=$cid\">Copy Course Items</a></span>\n";
+			echo "<span class=column><a href=\"managestugrps.php?cid=$cid\">Student Groups</a></span>\n";
 		}
 		echo "<div class=clear></div></div>\n";
 	   }
