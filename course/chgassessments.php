@@ -89,6 +89,12 @@
 		if (isset($_POST['chggbcat'])) {
 			$sets[] = "gbcategory='{$_POST['gbcat']}'";
 		}
+		if (isset($_POST['chgintro'])) {
+			$query = "SELECT intro FROM imas_assessments WHERE id='{$_POST['intro']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$sets[] = "intro='".addslashes(mysql_result($result,0,0))."'";
+		}
+			
 		if ($turnonshuffle!=0 || $turnoffshuffle!=0) {
 			$shuff = "shuffle = ((shuffle";
 			if ($turnoffshuffle>0) {
@@ -182,12 +188,20 @@ Check/Uncheck All: <input type="checkbox" name="ca" value="1" onClick="chkAll(th
 	}
 	while ($row = mysql_fetch_row($result)) {
 		echo "<li><input type=checkbox name='checked[]' value='{$row[0]}' checked=checked>{$row[1]}</li>\n";
+		$assesses[$row[0]] = $row[1];
 	}		
 ?>
 </ul>
 
 <fieldset><legend>Assessment Options</legend>
 <table class=gb><thead><tr><th>Change?</th><th>Option</th><th>Setting</th></tr></thead><tbody>
+<tr><td><input type="checkbox" name="chgintro"/></td><td class="r">Instructions:</td><td>Copy from: <select name="intro">
+<?php
+foreach($assesses as $k=>$v) {
+	echo "<option value=\"$k\">$v</option>";
+}
+?>
+</select></td></tr>
 <tr><td><input type="checkbox" name="chgtimelimit"/></td><td class="r">Time Limit (minutes, 0 for no time limit): </td><td><input type=text size=4 name=timelimit value="<?php echo $line['timelimit'];?>"></td></tr>
 
 <tr><td><input type="checkbox" name="chgdisplaymethod"/></td><td class="r">Display method: </td><td><select name="displaymethod">

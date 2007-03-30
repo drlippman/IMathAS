@@ -1736,7 +1736,7 @@
 	}
 	
 	function scorequestion($qn) { //scores a question
-		global $questions,$scores,$seeds,$testsettings,$attempts,$isreview,$bestseeds,$bestscores,$bestattempts,$bestlastanswers;
+		global $questions,$scores,$seeds,$testsettings,$attempts,$lastanswers,$isreview,$bestseeds,$bestscores,$bestattempts,$bestlastanswers;
 		list($qsetid,$cat) = getqsetid($questions[$qn]);
 		$scores[$qn] = getpointsafterpenalty(scoreq($qn,$qsetid,$seeds[$qn],$_POST["qn$qn"]),$questions[$qn],$testsettings,$attempts[$qn]);
 		$attempts[$qn]++;
@@ -1753,13 +1753,15 @@
 		$bestscorelist = implode(',',$bestscores);
 		$bestattemptslist = implode(',',$bestattempts);
 		$bestseedslist = implode(',',$bestseeds);
+		$bestlastanswers = str_replace('~','',$bestlastanswers);
 		$bestlalist = implode('~',$bestlastanswers);
 		$bestlalist = addslashes(stripslashes($bestlalist));
 		
-		$scorelist = implode(",",$scores);
-		$attemptslist = implode(",",$attempts);
+		$scorelist = implode(',',$scores);
+		$attemptslist = implode(',',$attempts);
 		$seedslist = implode(',',$seeds);
-		$lalist = implode("~",$lastanswers);
+		$lastanswers = str_replace('~','',$lastanswers);
+		$lalist = implode('~',$lastanswers);
 		$lalist = addslashes(stripslashes($lalist));
 		$now = time();
 		if ($limit) {

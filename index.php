@@ -53,7 +53,7 @@
 		echo "<span class=form><label for=\"ekey\">Enrollment key:</label></span> <input class=form type=text size=10 id=\"ekey\" name=\"ekey\"><BR class=form>\n";
 		echo "<div class=submit><input type=submit value='Sign Up'></div></form></div>\n";
 	}
-	$query = "SELECT imas_courses.name,imas_courses.id FROM imas_teachers,imas_courses ";
+	$query = "SELECT imas_courses.name,imas_courses.id,imas_courses.available,imas_courses.lockaid FROM imas_teachers,imas_courses ";
 	$query .= "WHERE imas_teachers.courseid=imas_courses.id AND imas_teachers.userid='$userid' ";
 	$query .= "AND (available=0 OR available=1) ORDER BY imas_courses.name";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -66,6 +66,12 @@
 		echo "<ul class=nomark>\n";
 		do {
 			echo "<li><A HREF=\"course/course.php?folder=0&cid={$line['id']}\">{$line['name']}</a>";
+			if (($line['available']&1)==1) {
+				echo " <span style=\"color:green;\">Hidden</span>";
+			}
+			if ($line['lockaid']>0) {
+				echo " <span style=\"color:green;\">In Lockdown</span>";
+			}
 			if (isset($newmsgcnt[$line['id']]) && $newmsgcnt[$line['id']]>0) {
 				echo " <span style=\"color:red\">New Messages ({$newmsgcnt[$line['id']]})</span>";
 			}

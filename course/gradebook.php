@@ -332,7 +332,8 @@
 			echo "Export to <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&export=true\">File</a>, ";
 			echo "<a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&emailgb=me\">My Email</a>, or <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&emailgb=ask\">Other Email</a> | ";
 			echo "<a href=\"gbsettings.php?gbmode=$gbmode&cid=$cid\">Gradebook Settings</a> | ";
-			echo "<a href=\"gradebook.php?cid=$cid&gbmode=$gbmode&stu=-1\">Averages</a><br/> ";
+			echo "<a href=\"gradebook.php?cid=$cid&gbmode=$gbmode&stu=-1\">Averages</a> | ";
+			echo "<a href=\"gbcomments.php?cid=$cid&gbmode=$gbmode&stu=0\">Comments</a><br/> ";
 			echo "<input type=\"button\" id=\"lockbtn\" onclick=\"lockcol()\" value=\"Lock headers\"/> (IE) |  \n";
 			echo 'Filter Items: <select id="filtersel" onchange="chgfilter()">';
 			echo '<option value="-1" ';
@@ -496,6 +497,12 @@
 		}
 		if ($stu>0) {
 			list($gb,$cathdr) = gbtable(true,$stu);
+			$query = "SELECT gbcomment FROM imas_students WHERE userid='$stu' AND courseid='{$_GET['cid']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$gbcomment = mysql_result($result,0,0);
+			if (trim($gbcomment)!='') {
+				echo "<div class=\"item\">$gbcomment</div>";
+			}
 		} else {
 			list($gb,$cathdr) = gbtable(true);
 			array_splice($gb,1,count($gb)-2);
@@ -610,7 +617,8 @@
 				$i++;
 			}
 			$scorelist = implode(",",$scores);
-			$query = "UPDATE imas_assessment_sessions SET bestscores='$scorelist'";
+			$feedback = $_POST['feedback'];
+			$query = "UPDATE imas_assessment_sessions SET bestscores='$scorelist',feedback='$feedback'";
 			if (isset($_POST['updategroup'])) {
 				$query .= getasidquery($_GET['asid']);
 			} else {
@@ -767,6 +775,7 @@
 		}
 		echo "<p></p><div class=review>Total: $total/$totalpossible</div>\n";
 		if ($isteacher && !isset($_GET['lastver'])) {
+			echo "<p>Feedback to student:<br/><textarea cols=60 rows=4 name=\"feedback\">{$line['feedback']}</textarea></p>";
 			if ($line['agroupid']>0) {
 				echo "<p>Update grade for all group members? <input type=checkbox name=\"updategroup\" checked=\"checked\" /></p>";
 			}
@@ -782,6 +791,8 @@
 				echo "</ul>";
 			}
 				
+		} else if (trim($line['feedback'])!='') {
+			echo "<p>Instructor Feedback:<div class=\"intro\">{$line['feedback']}</div></p>";
 		}
 		echo "</form>";
 		
@@ -794,7 +805,7 @@
 			catscores($questions,$scores,$line['defpoints']);
 		}
 		
-	} else if ($_GET['asid']!="average" && $isteacher) { //asid (assessment-session id) is set: show grade detail breakdown
+	} else if ($_GET['asid']!="average" && $isteacher) { //asid (assessment-session id) is set: show grade detail question/category breakdown
 		require("../header.php");
 		
 		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";

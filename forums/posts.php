@@ -180,6 +180,15 @@
 	$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
 	require("../header.php");
 	
+	$allowmsg = false;
+	if (!$isteacher) {
+		$query = "SELECT msgset FROM imas_courses WHERE id='$cid'";
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		if (mysql_result($result,0,0)==0) {
+			$allowmsg = true;
+		} 
+	}
+		
 	
 	$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email from imas_forum_posts,imas_users ";
 	$query .= "WHERE imas_forum_posts.userid=imas_users.id AND (imas_forum_posts.id='$threadid' OR imas_forum_posts.threadid='$threadid') ORDER BY imas_forum_posts.id";
@@ -291,7 +300,7 @@
 	$bcnt = 0;
 	$icnt = 0;
 	function printchildren($base) {
-		global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$posttype,$lastview,$bcnt,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$view,$page;
+		global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$posttype,$lastview,$bcnt,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$view,$page,$allowmsg;
 		foreach($children[$base] as $child) {
 			echo "<div class=block> ";
 			if ($view==2) {
@@ -314,9 +323,11 @@
 				echo "<b>{$subject[$child]}</b> Posted by: ";
 				if ($isteacher) {
 					echo "<a href=\"mailto:{$email[$child]}\">";
+				} else if ($allowmsg) {
+					echo "<a href=\"../msgs/msglist.php?cid=$cid&add=new&to={$ownerid[$child]}\">";
 				}
 				echo $poster[$child];
-				if ($isteacher) {
+				if ($isteacher || $allowmsg) {
 					echo "</a>";
 				}
 				echo ', ';
@@ -355,9 +366,11 @@
 				echo "<b>{$subject[$child]}</b><br/>Posted by: ";
 				if ($isteacher) {
 					echo "<a href=\"mailto:{$email[$child]}\">";
+				} else if ($allowmsg) {
+					echo "<a href=\"../msgs/msglist.php?cid=$cid&add=new&to={$ownerid[$child]}\">";
 				}
 				echo $poster[$child];
-				if ($isteacher) {
+				if ($isteacher || $allowmsg) {
 					echo "</a>";
 				}
 				echo ', ';

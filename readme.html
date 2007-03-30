@@ -17,7 +17,7 @@ h2,h3,h4 {
 </style>
 <body>
 <h1>IMathAS</h1>
-<p>Version: 1.0beta16, released Sept 28, 2006.  See <a href="changelog.html">Change Log</a> for detailed change history.</p>
+<p>Version: 1.2.  See <a href="changelog.html">Change Log</a> for detailed change history.</p>
 
 <h3>What is IMathAS</h3>
 <p>IMathAS is an Internet Mathematics Assessment System.  In essence, it is a very light
@@ -73,6 +73,7 @@ and credits for components attributed to others.</p>
 	    due date exceptions for individual students</li>
 	<li>Algorithmically generated questions, with a relatively simple-to-use question language 
 	    (loosely based on PHP) with many built-in randomizers and display macros</li>
+	<li>Group assessments</li>
 	<li>Expandable question language, by installing additional macros</li>
 	</ul>
 <li>Other Course Features</li>
@@ -106,6 +107,9 @@ version of BlackBoard.  Certainly IMathAS could be integrated with Moodle or Bla
 I encourage anyone with a development server and the know-how to take it on.</p>
 
 <h3>Installation</h3>
+Beginning with version 1.2, IMathAS is distributed in the configuration used on WAMAP.org, 
+including information pages.  The loginpage, info pages, and diagnostic front-end will need to 
+be editted to work with your install if you want to use them.
 <ol>
 <li>Download IMathAS, unzip it, and copy the directory to your webserver</li>
 <li>Change permissions (chmod) of the following directories to allow the webserver process
@@ -158,6 +162,8 @@ I encourage anyone with a development server and the know-how to take it on.</p>
     link now to change the password to something substantial.  Alternatively, you can
     go into the Admin page, create a new user with Admin rights, then delete the 'root'
     admin.</li>
+<li>Edit loginpage.php to reflect your installation, edit /diag/index.php to reflect your 
+installation, and delete or edit the files in /info subdirectory.</li>
 </ol>
 
 <h3>Answers to IT's questions</h3>

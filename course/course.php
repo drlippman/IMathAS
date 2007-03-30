@@ -317,7 +317,7 @@
 		echo "<a href=\"../actions.php?action=logout\">Log Out</a>";
 	}
 	echo '<div class=clear></div></div>';
-   } else if (count($topbar[0])>0 || $previewshift>-1) {
+   } else if (!isset($teacherid) && (count($topbar[0])>0 || $previewshift>-1)) {
 	echo '<div class=breadcrumb>';
 	if (in_array(0,$topbar[0]) && $msgset<3) { //messages
 		echo "<a href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a>$newmsgs &nbsp; ";
@@ -1054,7 +1054,7 @@
 	   } else if ($r<.5) {
 		   $color = '#f'.dechex(floor(32*$r)).'0';
 	   } else if ($r<1) {
-		   $color = '#'.dechex(floor(32*(.9999-$r))).'f0';
+		   $color = '#'.dechex(floor(32*(1-$r))).'f0';
 	   } else {
 		   $color = '#0f0';
 	   }

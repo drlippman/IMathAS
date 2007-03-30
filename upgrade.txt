@@ -25,6 +25,8 @@ ALTER TABLE `imas_assessment_sessions` ADD `agroupid` INT( 10 ) UNSIGNED NOT NUL
 ALTER TABLE `imas_courses` ADD `available` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0',
 ADD `lockaid` INT( 10 ) UNSIGNED NOT NULL DEFAULT '0';
 
+ALTER TABLE `imas_assessment_sessions` ADD `feedback` TEXT NOT NULL ;
+ALTER TABLE `imas_students` ADD `gbcomment` TEXT NOT NULL ;
 
 *********************
 ** IMathAS 1.1     **

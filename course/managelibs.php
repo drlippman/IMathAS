@@ -331,11 +331,11 @@ END;
 		if (isset($_POST['name']) && trim($_POST['name'])!='') {
 			if ($_GET['modify']=="new") {
 				$_POST['name'] = str_replace(array(',','\\"','\\\'','~'),"",$_POST['name']);
-				$query = "SELECT * FROM imas_libraries WHERE name='{$_POST['name']}'";
+				$query = "SELECT * FROM imas_libraries WHERE name='{$_POST['name']}' AND parent='{$_POST['libs']}'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				if (mysql_num_rows($result)>0) {
 					require("../header.php");
-					echo "Library already exists by that name.\n";
+					echo "Library already exists by that name with this parent.\n";
 					echo "<p><a href=\"managelibs.php?cid=$cid&modify=new\">Try Again</a></p>\n";
 					require("../footer.php");
 					exit;

@@ -312,7 +312,7 @@
 		$search = stripslashes($safesearch);
 		$search = str_replace('"','&quot;',$search);
 		$sessiondata['lastsearch'.$cid] = str_replace(" ","+",$safesearch);
-		if (isset($_POST['searchall'.$cid])) {
+		if (isset($_POST['searchall'])) {
 			$searchall = 1;
 		} else {
 			$searchall = 0;

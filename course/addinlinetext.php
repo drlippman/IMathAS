@@ -148,7 +148,6 @@
 			$userfilename = preg_replace('/[^\w\.]/','',basename($_FILES['userfile']['name']));
 			$filename = $userfilename;
 			$extension = strtolower(strrchr($userfilename,"."));
-			echo "Extension: $extension <br/>";
 			$badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");
 			if (in_array($extension,$badextensions)) {
 				echo "<p>File type is not allowed</p>";
@@ -316,7 +315,7 @@ if (isset($_GET['id'])) {
 } 
 ?>
 
-<input type="hidden" name="MAX_FILE_SIZE" value="500000" />
+<input type="hidden" name="MAX_FILE_SIZE" value="3000000" />
 New file<sup>*</sup>: <input type="file" name="userfile"/><br/>
 Description: <input type="text" name="newfiledescr"/><br/>
 <input type=submit name="submitbtn" value="Add / Update Files"/>

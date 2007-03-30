@@ -68,11 +68,14 @@
 		echo '</p>';
 	}
 	require("../assessment/displayq2.php");
+	$lastanswers = array('');
 	if (isset($_POST['seed'])) {
 		$score = scoreq(0,$_GET['qsetid'],$_POST['seed'],$_POST['qn0']);
 		echo "<p>Score on last answer: $score/1</p>\n";
 	}
-	
+	if (isset($_POST['regen'])) {
+		$lastanswers = array('');
+	}
 	echo "<form method=post action=\"testquestion.php?cid={$_GET['cid']}&qsetid={$_GET['qsetid']}";
 	if (isset($_POST['usecheck'])) {
 		echo "&checked=".$_GET['usecheck'];
@@ -90,7 +93,7 @@
 
 	echo "<input type=hidden name=seed value=\"$seed\">\n";
 	echo "<input type=hidden name=attempt value=\"$attempt\">\n";
-	unset($lastanswers);
+	//unset($lastanswers);
 	displayq(0,$_GET['qsetid'],$seed,true,true,$attempt);
 	echo "<input type=submit value=\"Submit\"><input type=submit name=\"regen\" value=\"Submit and Regen\">\n";
 	

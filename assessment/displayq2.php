@@ -58,6 +58,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 				
 			
 		}
+		$thisq = $qnidx+1;
 	}
 	
 	eval(interpret('control',$qdata['qtype'],$qdata['control']));
@@ -315,6 +316,8 @@ function scoreq($qnidx,$qidx,$seed,$givenans) {
 			$scores[$kidx] = round(scorepart($anstype,$kidx,$_POST["qn$partnum"],$options,$qnidx+1)*$answeights[$kidx],3);
 			$partla[$kidx] = $GLOBALS['partlastanswer'];
 		}
+		$partla = str_replace('&','',$partla);
+		$partla = preg_replace('/#+/','#',$partla);
 		if ($GLOBALS['lastanswers'][$qnidx]=='') {
 			$GLOBALS['lastanswers'][$qnidx] = implode("&",$partla);
 		} else {
@@ -324,6 +327,8 @@ function scoreq($qnidx,$qidx,$seed,$givenans) {
 		return implode('~',$scores);
 	} else {
 		$score = scorepart($qdata['qtype'],$qnidx,$givenans,$options,0);
+		$GLOBALS['partlastanswer'] = str_replace('&','',$GLOBALS['partlastanswer']);
+		$GLOBALS['partlastanswer'] = preg_replace('/#+/','#',$GLOBALS['partlastanswer']);
 		if ($GLOBALS['lastanswers'][$qnidx]=='') {
 			$GLOBALS['lastanswers'][$qnidx] = $GLOBALS['partlastanswer'];
 		} else {

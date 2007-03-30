@@ -1,5 +1,5 @@
 <?php
-if (!isset($imasroot)) {
+if (!isset($imasroot)) { //don't allow direct access to loginpage.php
 	header("Location: index.php");
 	exit;
 }
