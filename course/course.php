@@ -245,48 +245,15 @@
 	echo "</p><p>";
 	echo "<a href=\"timeshift.php?cid=$cid\">Shift all Course Dates</a><br/>\n";
 	echo "<a href=\"chgassessments.php?cid=$cid\">Mass Change Assessments</a><br/>\n";
-	echo "<a href=\"masschgdates.php?cid=$cid\">Mass Change Dates</a>";
+	echo "<a href=\"masschgdates.php?cid=$cid\">Mass Change Dates</a><br/>";
+	echo "<a href=\"../admin/forms.php?action=modify&id=$cid&cid=$cid\">Course Settings</a>";
 	echo "</p>";   
 	echo "<p><a href=\"$imasroot/help.php?section=coursemanagement\">Help</a><br/>\n";
 	echo "<a href=\"../actions.php?action=logout\">Log Out</a></p>\n";
 	echo "</div>";
 	echo "<div id=\"centercontent\">";
    }
-   /*
-   //work in progress
-   $now = time();
-   $lockeditems = array();
-   $query = "SELECT imas_items.id FROM imas_items JOIN imas_assessments ON imas_items.typeid=imas_assessments.id ";
-   $query .= "WHERE imas_items.courseid='$cid' AND imas_items.itemtype='Assessment' AND imas_assessments.startdate<$now AND imas_assessments.enddate>$now";
-   $result = mysql_query($query) or die("Query failed : " . mysql_error());
-   while ($row = mysql_fetch_row($result)) {
-	   $lockeditems[] = $row[0];
-   }
-   $query = "SELECT imas_items.id FROM imas_items JOIN imas_assessments ON imas_items.typeid=imas_assessments.id LEFT JOIN imas_exceptions ON imas_exceptions.assessmentid=imas_assessments.id ";
-   $query .= "WHERE imas_items.courseid='$cid' AND imas_items.itemtype='Assessment' AND imas_exceptions.startdate<$now AND imas_exceptions.enddate>$now";
-   $result = mysql_query($query) or die("Query failed : " . mysql_error());
-   while ($row = mysql_fetch_row($result)) {
-	   $lockeditems[] = $row[0];
-   }
-   if (count($lockeditems)>0) {
-	//"In lockdown!";
-	$lockeditemorder = array();
-	function getlockedorder($its) {
-		global $lockeditemorder,$lockeditems;
-		for ($i=0;$i<count($its);$i++) {
-			if (is_array($its[$i])) {
-				showlocked($its[$i]['items']);
-			} else if (in_array($its[$i],$lockeditems)){
-				$lockeditemorder[] = $its[$i];
-			}
-		}
-	}
-	getlockedorder($items);
-	showitems($lockeditemorder,'0');  //problems with moveselect, modify, etc
-	require("../footer.php");
-	exit;
-   }
-   */
+   
    if ($previewshift>-1) {
 	echo '<script type="text/javascript">';
 	echo 'function changeshift() {';
@@ -953,7 +920,8 @@
 		} else {
 			echo "<a href=\"managelibs.php?cid=$cid\">Manage Libraries</a><br>";
 			echo "<a href=\"copyitems.php?cid=$cid\">Copy Course Items</a></span>\n";
-			echo "<span class=column><a href=\"managestugrps.php?cid=$cid\">Student Groups</a></span>\n";
+			echo "<span class=column><a href=\"managestugrps.php?cid=$cid\">Student Groups</a><br/>";
+			echo "<a href=\"../admin/forms.php?action=modify&id=$cid&cid=$cid\">Course Settings</a></span>\n";
 		}
 		echo "<div class=clear></div></div>\n";
 	   }

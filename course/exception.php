@@ -1,4 +1,4 @@
-<?
+<?php
 //IMathAS:  Make deadline exceptions for a student
 //(c) 2006 David Lippman
 	require("../validate.php");

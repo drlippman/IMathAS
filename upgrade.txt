@@ -28,6 +28,9 @@ ADD `lockaid` INT( 10 ) UNSIGNED NOT NULL DEFAULT '0';
 ALTER TABLE `imas_assessment_sessions` ADD `feedback` TEXT NOT NULL ;
 ALTER TABLE `imas_students` ADD `gbcomment` TEXT NOT NULL ;
 
+ALTER TABLE `imas_grades` ADD `feedback` TEXT NOT NULL ;
+
+
 *********************
 ** IMathAS 1.1     **
 *********************

@@ -404,7 +404,11 @@ switch($_GET['action']) {
 }
 
 session_write_close();
-header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/admin.php");
+if (isset($_GET['cid'])) {
+	header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid={$_GET['cid']}");
+} else {
+	header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/admin.php");
+}
 exit;
 ?>
 

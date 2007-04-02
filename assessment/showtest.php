@@ -274,7 +274,7 @@
 		$showeachscore = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="AsGo" || $testsettings['testtype']=="Homework");
 		$showansduring = (($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework") && $testsettings['showans']!='N');
 		$showansafterlast = ($testsettings['showans']==='F');
-		$noindivscores = ($noindivscores || $testsettings['testtype']=="NoScores");
+		$noindivscores = ($testsettings['testtype']=="EndScore" || $testsettings['testtype']=="NoScores");
 		$showhints = ($testsettings['showhints']==1);
 		
 		

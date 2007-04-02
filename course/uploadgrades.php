@@ -37,6 +37,7 @@
 				$usercol = $_POST['fullnamecol']-1;
 			}
 			$scorecol = $_POST['gradecol']-1;
+			$feedbackcol = $_POST['feedbackcol']-1;
 			
 			$handle = fopen($_FILES['userfile']['tmp_name'],'r');
 			if ($_POST['hashdr']==1) {
@@ -56,14 +57,20 @@
 					$query .= "0";
 				}
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				if ($feedbackcol==-1) {
+					$feedback = '';
+				} else {
+					$feedback = addslashes($data[$feedbackcol]);
+				}
+				$score = addslashes($data[$scorecol]);
 				if (mysql_num_rows($result)>0) {
 					$cuserid=mysql_result($result,0,0);
 					if (isset($curscores[$cuserid])) {
-						$query = "UPDATE imas_grades SET score='{$data[$scorecol]}' WHERE userid='$cuserid' AND gbitemid='{$_GET['gbitem']}'";
+						$query = "UPDATE imas_grades SET score='$score',feedback='$feedback' WHERE userid='$cuserid' AND gbitemid='{$_GET['gbitem']}'";
 						$successes++;
 					} else {
-						$query = "INSERT INTO imas_grades (gbitemid,userid,score) VALUES ";
-						$query .= "('{$_GET['gbitem']}','$cuserid','{$data[$scorecol]}')";
+						$query = "INSERT INTO imas_grades (gbitemid,userid,score,feedback) VALUES ";
+						$query .= "('{$_GET['gbitem']}','$cuserid','$score','$feedback')";
 						$successes++;
 					}
 					mysql_query($query) or die("Query failed : " . mysql_error());
@@ -100,6 +107,9 @@
 	
 	echo '<span class=form>Grade is in column:</span><span class=formright>';
 	echo '<input type=text size=4 name="gradecol" value="2"/></span><br class="form" />';
+	
+	echo '<span class=form>Feedback is in column (0 if none):</span><span class=formright>';
+	echo '<input type=text size=4 name="feedbackcol" value="3"/></span><br class="form" />';
 	
 	echo '<span class=form>User is identified by:</span><span class=formright>';
 	echo '<input type=radio name="useridtype" value="0" checked=1 />Username (login name) in column <input type=text size=4 name="usernamecol" value="1" /><br/>';

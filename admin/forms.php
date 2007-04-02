@@ -3,7 +3,9 @@
 //(c) 2006 David Lippman
 require("../validate.php");
 require("../header.php");
-echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"admin.php\">Admin</a> &gt; Form</div>\n";
+if (!isset($_GET['cid'])) {
+	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"admin.php\">Admin</a> &gt; Form</div>\n";
+}
 switch($_GET['action']) {
 	case "delete":
 		$query = "SELECT name FROM imas_courses WHERE id='{$_GET['id']}'";
@@ -126,8 +128,15 @@ switch($_GET['action']) {
 			$avail = 0;
 			$lockaid = 0;
 		}
+		if (isset($_GET['cid'])) {
+			$cid = $_GET['cid'];
+			echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Course Settings</div>";
+		} 
 		
 		echo "<form method=post action=\"actions.php?action={$_GET['action']}";
+		if (isset($_GET['cid'])) {
+			echo "&cid=$cid";
+		}
 		if ($_GET['action']=="modify") { echo "&id={$_GET['id']}"; }
 		echo "\">\n";
 		echo "<span class=form>Course ID:</span><span class=formright>$courseid</span><br class=form>\n";

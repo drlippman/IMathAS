@@ -164,6 +164,10 @@
 		$calledfrom='lu';
 		include("masssend.php");
 	}
+	if ((isset($_POST['submit']) && $_POST['submit']=="Make Exception") || isset($_GET['massexception'])) {
+		$calledfrom='lu';
+		include("massexception.php");
+	}
 	if (isset($_POST['submit']) && $_POST['submit']=="Unenroll") {
 		$_GET['action'] = "unenroll";
 		if (isset($_POST['ca'])) {
@@ -318,7 +322,7 @@ END;
 	echo "<form method=post action=\"listusers.php?cid=$cid\">\n";
 	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 	echo "Check/Uncheck All: <input type=\"checkbox\" name=\"ca\" value=\"1\" onClick=\"chkAll(this.form, 'checked[]', this.checked)\"> \n";
-	echo "With Selected:  <input type=submit name=submit value=\"E-mail\"> <input type=submit name=submit value=\"Message\"> <input type=submit name=submit value=\"Unenroll\">\n";
+	echo "With Selected:  <input type=submit name=submit value=\"E-mail\"> <input type=submit name=submit value=\"Message\"> <input type=submit name=submit value=\"Unenroll\"> <input type=submit name=submit value=\"Make Exception\">\n";
 	
 	echo "<table class=gb id=myTable>\n";
 	echo "<thead><tr><th></th>";

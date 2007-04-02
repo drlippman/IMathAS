@@ -204,6 +204,17 @@
 		}
 		$children[$line['parent']][] = $line['id'];
 		$date[$line['id']] = $line['postdate'];
+		$n = 0;
+		while (strpos($line['subject'],'Re: ')===0) {
+			$line['subject'] = substr($line['subject'],4);
+			$n++;
+		}
+		if ($n==1) {
+			$line['subject'] = 'Re: '.$line['subject'];
+		} else if ($n>1) {
+			$line['subject'] = "Re<sup>$n</sup>: ".$line['subject'];
+		}
+			
 		$subject[$line['id']] = $line['subject'];
 		if ($sessiondata['graphdisp']==0) {
 			$line['message'] = preg_replace('/<embed[^>]*alt="([^"]*)"[^>]*>/',"[$1]", $line['message']);

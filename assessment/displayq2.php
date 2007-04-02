@@ -101,6 +101,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if (isset($hidepreview)) {$options['hidepreview'] = $hidepreview;}
 	if (isset($matchlist)) {$options['matchlist'] = $matchlist;}
 	if (isset($noshuffle)) {$options['noshuffle'] = $noshuffle;}
+	if (isset($reqdecimals)) {$options['reqdecimals'] = $reqdecimals;}
 	
 	if ($qdata['qtype']=="multipart") {
 		if (!is_array($anstypes)) {
@@ -275,6 +276,9 @@ function scoreq($qnidx,$qidx,$seed,$givenans) {
 	if (isset($variable) && !isset($variables)) {
 		$variables =& $variable;
 	}
+	if (isset($reqdecimals) && !isset($abstolerance) && !isset($reltolerance)) {
+		$abstolerance = 0.5/(pow(10,$reqdecimals));
+	}
 	srand($seed+2);
 	//pack options from eval
 	if (isset($answer)) {$options['answer'] = $answer;}
@@ -355,6 +359,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$qn];} else {$sz = $options['answerboxsize'];}}
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
+		if (isset($options['reqdecimals'])) {if (is_array($options['reqdecimals'])) {$reqdecimals = $options['reqdecimals'][$qn];} else {$reqdecimals = $options['reqdecimals'];}}
 		
 		if (!isset($sz)) { $sz = 20;}
 		if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
@@ -366,6 +371,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$tip = "Enter your answer as a number.  Examples: 3, -4, 5.5<BR>";
 		}
 		$tip .= "Enter DNE for Does Not Exist, oo for Infinity";
+		if (isset($reqdecimals)) {
+			$tip .= "<br/>Your answer should be accurate to $reqdecimals decimal places.";
+		}
 		if (isset($answer)) {
 			$sa = $answer;
 		}
@@ -517,6 +525,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (isset($options['hidepreview'])) {if (is_array($options['hidepreview'])) {$hidepreview = $options['hidepreview'][$qn];} else {$hidepreview = $options['hidepreview'];}}
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
+		if (isset($options['reqdecimals'])) {if (is_array($options['reqdecimals'])) {$reqdecimals = $options['reqdecimals'][$qn];} else {$reqdecimals = $options['reqdecimals'];}}
 		
 		if (!isset($sz)) { $sz = 20;}
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
@@ -546,7 +555,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		}
 		if (in_array('nodecimal',$ansformats)) {
 			$tip .= "<br/>Decimal values are not allowed";
-		} 
+		} else if (isset($reqdecimals)) {
+			$tip .= "<br/>Your answer should be accurate to $reqdecimals decimal places.";
+		}
 		if (in_array('notrig',$ansformats)) {
 			$tip .= "<br/>Trig functions (sin,cos,etc.) are not allowed";
 		} 

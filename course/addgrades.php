@@ -60,7 +60,7 @@
 					$sc = preg_replace('/[^\d\.\+\-]/','',$sc);
 					$sc = @eval("return ($sc);"); //will set to 0 if error
 				}*/
-				$query = "UPDATE imas_grades SET score='$sc' WHERE userid='$k' AND gbitemid='{$_GET['gbitem']}'";
+				$query = "UPDATE imas_grades SET score='$sc',feedback='{$_POST['feedback'][$k]}' WHERE userid='$k' AND gbitemid='{$_GET['gbitem']}'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 		}
@@ -94,7 +94,8 @@
 	} else {
 		echo "<h3>Modify Offline Grades</h3>";
 	}
-	echo "<form method=post action=\"addgrades.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=$cid&gbitem={$_GET['gbitem']}&grades={$_GET['grades']}\">";
+	
+	echo "<form id=\"mainform\" method=post action=\"addgrades.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=$cid&gbitem={$_GET['gbitem']}&grades={$_GET['grades']}\">";
 	
 	if ($_GET['grades']=='all') {
 		if ($_GET['gbitem']=='new') {
@@ -179,7 +180,7 @@ function onenter(e,field) {
                 for (i = 0; i < field.form.elements.length; i++)
                    if (field == field.form.elements[i])
                        break;
-              i = (i + 1) % field.form.elements.length;
+              i = (i + 2) % field.form.elements.length;
               field.form.elements[i].focus();
               return false;
 	} else {
@@ -200,10 +201,10 @@ function onarrow(e,field) {
                        break;
 		
 	      if (key==38) {
-		      i = i-1;
+		      i = i-2;
 		      if (i<0) { i=0;}
 	      } else {
-		      i = (i + 1) % field.form.elements.length;
+		      i = (i + 2) % field.form.elements.length;
 	      }
 	      if (field.form.elements[i].type=='text') {
 		      field.form.elements[i].focus();
@@ -211,6 +212,24 @@ function onarrow(e,field) {
               return false;
 	} else {
 		return true;
+	}
+}
+function togglefeedback(btn) {
+	var form = document.getElementById("mainform");
+	for (i = 0; i < form.elements.length; i++) {
+		el = form.elements[i];
+		if (el.type == 'textarea') {
+			if (el.rows==1) {
+				el.rows = 4;
+			} else {
+				el.rows = 1;
+			}
+		}
+	}
+	if (btn.value=="Expand Feedback Boxes") {
+		btn.value = "Shrink Feedback Boxes";
+	} else{
+		btn.value = "Expand Feedback Boxes";
 	}
 }
 
@@ -250,23 +269,25 @@ function doonblur(value) {
 				echo "Sort by name</a>.</p>";
 			}
 		}
+		echo '<input type=button value="Expand Feedback Boxes" onClick="togglefeedback(this)"/>';
 		echo "<table><thead><tr><th>Name</th>";
 		if ($hassection) {
 			echo '<th>Section</th>';
 		}
-		echo "<th>Grade</th></tr></thead><tbody>";
+		echo "<th>Grade</th><th>Feedback</th></tr></thead><tbody>";
 		if ($_GET['gbitem']=="new") {
 			$query = "SELECT imas_users.id,imas_users.LastName,imas_users.FirstName,imas_students.section ";
 			$query .= "FROM imas_users,imas_students WHERE ";
 			$query .= "imas_users.id=imas_students.userid AND imas_students.courseid='$cid'";
 		} else {
-			$query = "SELECT userid,score FROM imas_grades WHERE gbitemid='{$_GET['gbitem']}' ";
+			$query = "SELECT userid,score,feedback FROM imas_grades WHERE gbitemid='{$_GET['gbitem']}' ";
 			if ($_GET['grades']!='all') {
 				$query .= "AND userid='{$_GET['grades']}' ";
 			}
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			while ($row = mysql_fetch_row($result)) {
 				$score[$row[0]] = $row[1];
+				$feedback[$row[0]] = $row[2];
 			}
 			$query = "SELECT imas_users.id,imas_users.LastName,imas_users.FirstName,imas_students.section FROM imas_users,imas_students ";
 			if ($_GET['grades']!='all') {
@@ -293,7 +314,9 @@ function doonblur(value) {
 			} else {
 				echo "<td><input type=text size=3 name=\"newscore[{$row[0]}]\" value=\"";
 			}
-			echo "\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" onblur=\"this.value = doonblur(this.value);\" /></td></tr>";
+			echo "\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" onblur=\"this.value = doonblur(this.value);\" /></td>";
+			echo "<td><textarea style=\"display:hidden;\" cols=40 rows=1 name=\"feedback[{$row[0]}]\">{$feedback[$row[0]]}</textarea></td>";
+			echo "</tr>";
 		}
 		
 		echo "</tbody></table>";

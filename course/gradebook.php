@@ -496,20 +496,29 @@
 			echo "<h2>Grade Book Student Detail</h2>\n";
 		}
 		if ($stu>0) {
-			list($gb,$cathdr) = gbtable(true,$stu);
+			list($gb,$cathdr,$feedbacks) = gbtable(true,$stu);
 			$query = "SELECT gbcomment FROM imas_students WHERE userid='$stu' AND courseid='{$_GET['cid']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$gbcomment = mysql_result($result,0,0);
+			if (mysql_num_rows($result)>0) {
+				$gbcomment = mysql_result($result,0,0);
+			} else {
+				$gbcomment = '';
+			}
 			if (trim($gbcomment)!='') {
 				echo "<div class=\"item\">$gbcomment</div>";
 			}
 		} else {
 			list($gb,$cathdr) = gbtable(true);
 			array_splice($gb,1,count($gb)-2);
+			$feedbacks = array();
 		}
 		echo '<table class=gb>';
 		$gb[1][0] = preg_replace('/<[^>]+>/','',$gb[1][0]);
-		echo "<thead><tr><th>Item</th><th>Possible</th><th>{$gb[1][0]}</th></tr></thead><tbody>";
+		echo "<thead><tr><th>Item</th><th>Possible</th><th>{$gb[1][0]}</th>";
+		if ($stu>0) {
+			echo "<th>Feedback</th>";
+		}
+		echo "</tr></thead><tbody>";
 		
 		for ($i=1;$i<count($gb[0]);$i++) {
 			//if ($i%2!=0) {
@@ -531,7 +540,15 @@
 			}
 			echo $anpts[0];
 			echo '</td><td>'.$anpts[1];
-			echo '</td><td>'.$gb[1][$i].'</td></tr>';
+			echo '</td><td>'.$gb[1][$i].'</td>';
+			if ($stu>0) {
+				if (isset($feedbacks[$i])) {
+					echo "<td>{$feedbacks[$i]}</td>";
+				} else {
+					echo "<td></td>";
+				}
+			}
+			echo '</tr>';
 		}
 		echo '</tbody></table>';
 		
@@ -1051,6 +1068,7 @@
 		}
 		$gb = array();
 		$cathdr = array();
+		$feedbacks = array();
 		$atots = array();
 		$ln = 0;
 		if ($isdiag) {
@@ -1408,7 +1426,7 @@
 				$gb[$ln][] = $line['SID'];
 			}
 			//Get assessment scores
-			$query = "SELECT id,assessmentid,bestscores,starttime,endtime FROM imas_assessment_sessions WHERE userid='{$line['id']}'";
+			$query = "SELECT id,assessmentid,bestscores,starttime,endtime,feedback FROM imas_assessment_sessions WHERE userid='{$line['id']}'";
 			$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 			while ($l = mysql_fetch_array($result2, MYSQL_ASSOC)) {
 				$asid[$l['assessmentid']] = $l['id'];
@@ -1419,17 +1437,19 @@
 					//if ($scores[$i]>0) {$total += $scores[$i];}
 				}
 				$timeused[$l['assessmentid']] = $l['endtime']-$l['starttime'];
+				$afeedback[$l['assessmentid']] = $l['feedback'];
 				if (in_array(-1,$scores)) { $IP[$l['assessmentid']]=1;}
 				$pts[$l['assessmentid']] = $total;
 			}
 			//Get other grades
 			unset($gradeid); unset($opts);
-			$query = "SELECT imas_gbitems.id,imas_grades.id,imas_grades.score FROM imas_grades,imas_gbitems WHERE ";
+			$query = "SELECT imas_gbitems.id,imas_grades.id,imas_grades.score,imas_grades.feedback FROM imas_grades,imas_gbitems WHERE ";
 			$query .= "imas_grades.gbitemid=imas_gbitems.id AND imas_grades.userid='{$line['id']}'";
 			$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 			while ($r = mysql_fetch_row($result2)) {
 				$gradeid[$r[0]] = $r[1];
 				$opts[$r[0]] = $r[2];
+				$gfeedback[$r[0]] = $r[3];
 			}
 			
 			//Create student GB row
@@ -1441,14 +1461,19 @@
 					if (isset($gradeid[$grades[$i]])) {
 						if ($isteacher && $isdisp) {
 							$gb[$ln][$pos] .= "<a href=\"addgrades.php?stu=$stu&cid=$cid&gbmode=$gbmode&grades={$line['id']}&gbitem={$grades[$i]}\">";
+						} else if ($isdisp) {
+							$gb[$ln][$pos] .= "<a href=\"viewgrade.php?cid=$cid&gid={$gradeid[$grades[$i]]}\">";
 						}
 						$gb[$ln][$pos] .= 1*$opts[$grades[$i]];
 						$atots[$pos][] = $opts[$grades[$i]];
 						if ($cntingb[$i]>0) {
 							$cattot[$category[$i]][] = $opts[$grades[$i]];
 						}
-						if ($isteacher && $isdisp) {
+						if ($isdisp) {
 							$gb[$ln][$pos] .= '</a>';
+						}
+						if ($limuser>0) {
+							$feedbacks[$pos] = $gfeedback[$grades[$i]];
 						}
 					} else {
 						if ($isteacher && $isdisp) {
@@ -1496,6 +1521,9 @@
 					}
 					if ($isdisp && ($isteacher || $assessmenttype[$i]=="Practice" || $sa[$i]=="I" || ($sa[$i]!="N" && $now>$enddate[$i]))) {
 						$gb[$ln][$pos] .= "</a>";
+					}
+					if ($limuser>0) {
+						$feedbacks[$pos] = $afeedback[$assessments[$i]];
 					}
 				} else {
 					if ($isdisp && $isteacher) {
@@ -1662,7 +1690,11 @@
 			$tots = array_splice($cathdr,$totalspos);
 			array_splice($cathdr,$shift,0,$tots);
 		}
-		return array($gb,$cathdr);
+		if ($limuser>0) {
+			return array($gb,$cathdr,$feedbacks);
+		} else {
+			return array($gb,$cathdr);
+		}
 	}
 	
 	function getasidquery($asid) {

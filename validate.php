@@ -165,6 +165,7 @@ END;
 	$myrights = $line['rights'];
 	$groupid = $line['groupid'];
 	$userfullname = $line['FirstName'] . ' ' . $line['LastName'];
+	$previewshift = -1;
 	if (isset($_GET['cid']) && $_GET['cid']!="admin" && $_GET['cid']>0) {
 		$query = "SELECT id FROM imas_students WHERE userid='$userid' AND courseid='{$_GET['cid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -200,13 +201,13 @@ END;
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		if (mysql_num_rows($result)>0) {
 			$coursename = mysql_result($result,0,0);
-			if (isset($studentid) && (mysql_result($result,0,1)&1)==1) {
+			if (isset($studentid) && $previewshift==-1 && (mysql_result($result,0,1)&1)==1) {
 				echo "This course is not available at this time";
 				exit;
 			}
 			$lockaid = mysql_result($result,0,2);
 			if (isset($studentid) && $lockaid>0) {
-				if (strpos($_SERVER['SCRIPT_NAME'],'showtest.php')===false) {
+				if (strpos(basename($_SERVER['SCRIPT_NAME']),'showtest.php')===false) {
 					header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid={$_GET['cid']}&id=$lockaid");
 					exit;
 				}
