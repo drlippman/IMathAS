@@ -6,6 +6,32 @@
 		echo "This file cannot be called directly";
 		exit;
 	}
+	
+	if (isset($_POST['clears'])) {
+		$clearlist = "'".implode("','",$_POST['clears'])."'";
+		$query = "DELETE FROM imas_exceptions WHERE id IN ($clearlist)";
+		mysql_query($query) or die("Query failed :$query " . mysql_error());	
+	}
+	if (isset($_POST['addexc'])) {
+		require_once("parsedatetime.php");
+		$startdate = parsedatetime($_POST['sdate'],$_POST['stime']);
+		$enddate = parsedatetime($_POST['edate'],$_POST['etime']);
+		
+		foreach(explode(',',$_POST['tolist']) as $stu) {
+			foreach($_POST['addexc'] as $aid) {
+				$query = "SELECT id FROM imas_exceptions WHERE userid='$stu' AND assessmentid='$aid'";
+				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+				if (mysql_num_rows($result)==0) {
+					$query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate) VALUES ";
+					$query .= "('$stu','$aid',$startdate,$enddate)";
+				} else {
+					$eid = mysql_result($result,0,0);
+					$query = "UPDATE imas_exceptions SET startdate=$startdate,enddate=$enddate WHERE id=$eid";
+				}
+				mysql_query($query) or die("Query failed :$query " . mysql_error());		
+			}
+		}
+	}
 
 
 	$pagetitle = "Manage Exceptions";
@@ -17,7 +43,7 @@
 		echo "&gt; <a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; Manage Exceptions</div>\n";
 	}
 	
-	echo "<h3>Manage Exceptions</h3>\n";
+	echo "<h2>Manage Exceptions</h2>\n";
 	if ($calledfrom=='lu') {
 		echo "<form method=post action=\"listusers.php?cid=$cid&massexception=1\">\n";
 	} else if ($calledfrom=='gb') {
@@ -36,7 +62,7 @@
 		echo "<input type=hidden name=\"ca\" value=\"1\"/>";
 	}
 	
-	echo "<h4>Existing Exceptions</h4>";
+	
 	
 	$query = "SELECT ie.id,iu.LastName,iu.FirstName,ia.name,iu.id,ia.id FROM imas_exceptions AS ie,imas_users AS iu,imas_assessments AS ia ";
 	$query .= "WHERE ie.assessmentid=ia.id AND ie.userid=iu.id AND ia.courseid='$cid' AND iu.id IN ($tolist) ";
@@ -46,35 +72,43 @@
 		$query .= "ORDER BY iu.LastName,iu.FirstName,ia.name";
 	}
 	$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-	echo '<ul>';
-	if ($isall) {
-		$lasta = 0;
-		while ($row = mysql_fetch_row($result)) {
-			if ($lasta!=$row[5]) {
-				if ($lasta!=0) {
-					echo "</ul></li>";
+	if (mysql_num_rows($result)>0) {
+		echo "<h4>Existing Exceptions</h4>";
+		echo "Select exceptions to clear";
+		echo '<ul>';
+		if ($isall) {
+			$lasta = 0;
+			while ($row = mysql_fetch_row($result)) {
+				if ($lasta!=$row[5]) {
+					if ($lasta!=0) {
+						echo "</ul></li>";
+					}
+					echo "<li>{$row[3]} <ul>";
+					$lasta = $row[5];
 				}
-				echo "<li>{$row[3]} <ul>";
+				echo "<li><input type=checkbox name=\"clears[]\" value=\"{$row[0]}\" />{$row[1]}, {$row[2]}</li>";
 			}
-			echo "<li><input type=checkbox name=\"clears[]\" value=\"{$row[0]}\" />{$row[1]}, {$row[2]}</li>";
+			echo "</ul></li>";
+		} else {
+			$lasts = 0;
+			while ($row = mysql_fetch_row($result)) {
+				if ($lasts!=$row[4]) {
+					if ($lasts!=0) {
+						echo "</ul></li>";
+					}
+					echo "<li>{$row[1]}, {$row[2]} <ul>";
+					$lasts = $row[4];
+				}
+				echo "<li><input type=checkbox name=\"clears[]\" value=\"{$row[0]}\" />{$row[3]}</li>";
+			}
+			echo "</ul></li>";
 		}
-		echo "</ul></li>";
+		echo '</ul>';
+		
+		echo "<input type=submit value=\"Record Changes\" />";
 	} else {
-		$lasts = 0;
-		while ($row = mysql_fetch_row($result)) {
-			if ($lasts!=$row[4]) {
-				if ($lasts!=0) {
-					echo "</ul></li>";
-				}
-				echo "<li>{$row[1]}, {$row[2]} <ul>";
-			}
-			echo "<li><input type=checkbox name=\"clears[]\" value=\"{$row[0]}\" />{$row[3]}</li>";
-		}
-		echo "</ul></li>";
+		echo "<p>No exceptions currently exist for the selected students.</p>";
 	}
-	echo '</ul>';
-	
-	echo "<input type=submit value=\"Record Changes\" />";
 	
 	echo "<h4>Make New Exception</h4>";
 	
@@ -97,7 +131,7 @@
 	echo "<A HREF=\"#\" onClick=\"cal1.select(document.forms[0].edate,'anchor2','MM/dd/yyyy',(document.forms[0].sdate.value=='$sdate')?(document.forms[0].edate.value):(document.forms[0].sdate.value)); return false;\" NAME=\"anchor2\" ID=\"anchor2\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></A>\n";
 	echo "at <input type=text size=10 name=etime value=\"$etime\"></span><BR class=form>\n";
 	
-	echo "Set Exception for:";
+	echo "Set Exception for assessments:";
 	echo "<ul>";
 	$query = "SELECT id,name FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
 	$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
