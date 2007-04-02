@@ -3,7 +3,7 @@
 //(c) 2006 David Lippman
 
 
-array_push($allowedmacros,"sec","csc","cot","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count");
+array_push($allowedmacros,"sec","csc","cot","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp");
 
 
 
@@ -239,6 +239,20 @@ function clean($exp) {
 	return $exp;
 }
 
+function polyclean($exp) {
+	$exp = clean($exp);
+	$exp = preg_replace('/^1\s*\*?([a-zA-Z])/',"$1",$exp);
+	$exp = preg_replace('/([^\d\^\.])1\s*\*?([a-zA-Z\(])/',"$1$2",$exp);
+	$exp = preg_replace('/^0\s*\*?[^\+\-]*\+?/','',$exp);
+	$exp = preg_replace('/[\+\-]\s*0\s*\*?[^\+\-]*/','',$exp);
+	$exp = str_replace('^1','',$exp);
+	$exp = preg_replace('/\*?([a-zA-Z])\^0/','',$exp);
+	$exp = clean($exp);
+	if ($exp{0}=='+') {
+		$exp = substr($exp,1);
+	}
+	return $exp;
+}
 
 function makepretty($exp) {
 	if (is_array($exp)) {
@@ -251,6 +265,16 @@ function makepretty($exp) {
 	return $exp;
 }
 
+function polymakepretty($exp) {
+	if (is_array($exp)) {
+		for ($i=0;$i<count($exp);$i++) {
+			$exp[$i]=polyclean($exp[$i]);
+		}
+	} else {
+		$exp = polyclean($exp);
+	}
+	return $exp;
+}
 
 
 
@@ -261,6 +285,17 @@ function makeprettydisp($exp) {
 		}
 	} else {
 		$exp = "`".clean($exp)."`";
+	}
+	return $exp;
+}
+
+function polymakeprettydisp($exp) {
+	if (is_array($exp)) {
+		for ($i=0;$i<count($exp);$i++) {
+			$exp[$i]="`".polyclean($exp[$i])."`";
+		}
+	} else {
+		$exp = "`".polyclean($exp)."`";
 	}
 	return $exp;
 }
