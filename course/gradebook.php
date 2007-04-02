@@ -279,6 +279,10 @@
 			$calledfrom='gb';
 			include("masssend.php");
 		}
+		if ((isset($_POST['submit']) && $_POST['submit']=="Make Exception") || isset($_GET['massexception'])) {
+			$calledfrom='gb';
+			include("massexception.php");
+		}
 		$pagetitle = "Gradebook";
 		if ($isteacher) {
 			$placeinhead = "<script type=\"text/javascript\">function lockcol() { \n";
@@ -320,7 +324,7 @@
 		require("../header.php");
 		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 		echo "&gt; Gradebook</div>";
-		echo "<form method=post action=\"gradebook.php?cid=$cid\">";
+		echo "<form method=post action=\"gradebook.php?cid=$cid&gbmode=$gbmode\">";
 		
 		echo "<span class=\"hdr1\">Grade Book</span>";
 		if ($isteacher) {
@@ -382,7 +386,7 @@
 			echo "</div>";
 		}
 		echo "Check/Uncheck All: <input type=\"checkbox\" name=\"ca\" value=\"1\" onClick=\"chkAll(this.form, 'checked[]', this.checked)\"> \n";
-		echo "With Selected:  <input type=submit name=submit value=\"E-mail\"> <input type=submit name=submit value=\"Message\">";
+		echo "With Selected:  <input type=submit name=submit value=\"E-mail\"> <input type=submit name=submit value=\"Message\"> <input type=submit name=submit value=\"Make Exception\">";
 		echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 		echo "<div id=\"tbl-container\">";
 		echo "<table class=gb id=myTable><thead><tr>"; //<tr><td>Name</td>\n";

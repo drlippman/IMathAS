@@ -40,14 +40,14 @@
 	if ($calledfrom=='lu') {
 		echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Manage Exceptions</div>\n";
 	} else if ($calledfrom=='gb') {
-		echo "&gt; <a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; Manage Exceptions</div>\n";
+		echo "&gt; <a href=\"gradebook.php?cid=$cid&gbmode={$_GET['gbmode']}\">Gradebook</a> &gt; Manage Exceptions</div>\n";
 	}
 	
 	echo "<h2>Manage Exceptions</h2>\n";
 	if ($calledfrom=='lu') {
 		echo "<form method=post action=\"listusers.php?cid=$cid&massexception=1\">\n";
 	} else if ($calledfrom=='gb') {
-		echo "<form method=post action=\"gradebook.php?cid=$cid&massexception=1\">\n";
+		echo "<form method=post action=\"gradebook.php?cid=$cid&gbmode={$_GET['gbmode']}&massexception=1\">\n";
 	}
 	
 	if (isset($_POST['tolist'])) {

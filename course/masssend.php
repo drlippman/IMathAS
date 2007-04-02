@@ -138,14 +138,14 @@
 		if ($calledfrom=='lu') {
 			echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Send Mass $sendtype</div>\n";
 		} else if ($calledfrom=='gb') {
-			echo "&gt; <a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; Send Mass $sendtype</div>\n";
+			echo "&gt; <a href=\"gradebook.php?cid=$cid&gbmode={$_GET['gbmode']}\">Gradebook</a> &gt; Send Mass $sendtype</div>\n";
 		}
 		if (count($_POST['checked'])==0) {
 			echo "No users selected.  ";
 			if ($calledfrom=='lu') {
 				echo "<a href=\"listusers.php?cid=$cid\">Try again</a>\n";
 			} else if ($calledfrom=='gb') {
-				echo "<a href=\"gradebook.php?cid=$cid\">Try again</a>\n";
+				echo "<a href=\"gradebook.php?cid=$cid&gbmode={$_GET['gbmode']}\">Try again</a>\n";
 			}
 			require("../footer.php");
 			exit;
@@ -154,7 +154,7 @@
 		if ($calledfrom=='lu') {
 			echo "<form method=post action=\"listusers.php?cid=$cid&masssend=$sendtype\">\n";
 		} else if ($calledfrom=='gb') {
-			echo "<form method=post action=\"gradebook.php?cid=$cid&masssend=$sendtype\">\n";
+			echo "<form method=post action=\"gradebook.php?cid=$cid&gbmode={$_GET['gbmode']}&masssend=$sendtype\">\n";
 		}
 		echo "<span class=form><label for=\"subject\">Subject:</label></span>";
 		echo "<span class=formright><input type=text size=50 name=subject id=subject value=\"{$line['subject']}\"></span><br class=form>\n";
