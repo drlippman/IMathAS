@@ -411,11 +411,12 @@
 		$uniqviews[$row[0]] = $row[1]-1;
 	}
 	
-	$query = "SELECT * FROM imas_forum_posts WHERE parent=0 AND forumid='$forumid' ";
+	$query = "SELECT imas_forum_posts.*,imas_users.LastName,imas_users.FirstName FROM imas_forum_posts,imas_users WHERE ";
+	$query .= "imas_forum_posts.userid=imas_users.id AND imas_forum_posts.parent=0 AND imas_forum_posts.forumid='$forumid' ";
 	if ($dofilter) {
-		$query .= "AND userid IN ($limids) ";
+		$query .= "AND imas_forum_posts.userid IN ($limids) ";
 	}
-	$query .= "ORDER BY posttype DESC,id DESC ";
+	$query .= "ORDER BY imas_forum_posts.posttype DESC,imas_forum_posts.id DESC ";
 	$offset = ($page-1)*$threadsperpage;
 	$query .= "LIMIT $offset,$threadsperpage";// OFFSET $offset"; 
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -441,7 +442,7 @@
 		}
 		echo "</span>\n";
 		
-		echo "<b><a href=\"posts.php?cid=$cid&forum=$forumid&thread={$line['id']}&page=$page\">{$line['subject']}</a></b>";
+		echo "<b><a href=\"posts.php?cid=$cid&forum=$forumid&thread={$line['id']}&page=$page\">{$line['subject']}</a></b>: {$line['LastName']}, {$line['FirstName']}";
 		
 		echo "</td>\n";
 		
