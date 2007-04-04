@@ -3,7 +3,7 @@
 //(c) 2006 David Lippman
 
 
-array_push($allowedmacros,"sec","csc","cot","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp");
+array_push($allowedmacros,"sec","csc","cot","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp");
 
 
 
@@ -239,19 +239,124 @@ function clean($exp) {
 	return $exp;
 }
 
-function polyclean($exp) {
+function xclean($exp) {
 	$exp = clean($exp);
-	$exp = preg_replace('/^1\s*\*?([a-zA-Z])/',"$1",$exp);
-	$exp = preg_replace('/([^\d\^\.])1\s*\*?([a-zA-Z\(])/',"$1$2",$exp);
+	$exp = preg_replace('/^([a-zA-Z])\^0/','1',$exp);
+	$exp = preg_replace('/(\d)\*?([a-zA-Z])\^0$/',"$1",$exp);
+	$exp = preg_replace('/(\d)\*?([a-zA-Z])\^0([^\d\.])/',"$1$3",$exp);
+	$exp = preg_replace('/([^\d])\*?([a-zA-Z])\^0$/',"$1 1",$exp);
+	$exp = preg_replace('/([^\d])\*?([a-zA-Z])\^0([^\d\.])/',"$1 1 $3",$exp);
 	$exp = preg_replace('/^0\s*\*?[^\+\-]*\+?/','',$exp);
 	$exp = preg_replace('/[\+\-]\s*0\s*\*?[^\+\-]*/','',$exp);
-	$exp = str_replace('^1','',$exp);
-	$exp = preg_replace('/\*?([a-zA-Z])\^0/','',$exp);
+	$exp = preg_replace('/^1\s*\*?([a-zA-Z])/',"$1",$exp);
+	$exp = preg_replace('/([^\d\^\.])1\s*\*?([a-zA-Z\(])/',"$1$2",$exp);
+	$exp = preg_replace('/\^1([^\d])/',"$1",$exp);
+	$exp = preg_replace('/\^1$/','',$exp);
 	$exp = clean($exp);
 	if ($exp{0}=='+') {
 		$exp = substr($exp,1);
 	}
 	return $exp;
+}
+
+function polyclean($exp) {
+	$exp = clean($exp);
+	
+//	$exp = preg_replace('/^([a-zA-Z])\^0/','1',$exp);
+//	$exp = preg_replace('/(\d)\*?([a-zA-Z])\^0$/',"$1",$exp);
+//	$exp = preg_replace('/(\d)\*?([a-zA-Z])\^0([^\d\.])/',"$1$3",$exp);
+//	$exp = preg_replace('/([^\d])\*?([a-zA-Z])\^0$/',"$1 1",$exp);
+//	$exp = preg_replace('/([^\d])\*?([a-zA-Z])\^0([^\d\.])/',"$1 1 $3",$exp);
+//	$exp = preg_replace('/^0\s*\*?[^\+\-]*\+?/','',$exp);
+//	$exp = preg_replace('/[\+\-]\s*0\s*\*?[^\+\-]*/','',$exp);
+//	$exp = preg_replace('/^1\s*\*?([a-zA-Z])/',"$1",$exp);
+//	$exp = preg_replace('/([^\d\^\.])1\s*\*?([a-zA-Z\(])/',"$1$2",$exp);
+//	$exp = preg_replace('/\^1([^\d])/',"$1",$exp);
+//	$exp = preg_replace('/\^1$/','',$exp);
+	
+	$i = 0;
+	$outstr = '';
+	$p = 0;
+	$parr = array('','','');
+	$onpow = false;
+	$lastsign = '+';
+	$exp .= '+';
+	while ($i<strlen($exp)) {
+		$c = $exp{$i};
+		if (($c >='0' && $c<='9') || $c=='.' || $c=='/' || $c=='(' || $c==')') {
+			if ($onpow) {
+				$parr[2] .= $c;
+			} else {
+				$parr[0] .= $c;
+			}
+		} else if (($c<='z' && $c>='a') || ($c<='Z' && $c>='A')) {
+			$parr[1] .= $c;
+		} else if ($c=='^') {
+			$onpow = true;
+		} else if ($c == '+' || $c == '-') {
+			if ($i+1<strlen($exp) && $parr[2]=='' && $onpow) {
+				$n = $exp{$i+1};
+				if ($c=='-' && (($n>= '0' && $n<='9') || $n=='.')) {
+					$parr[2] .= '-';
+					$i++;
+					continue;
+				}
+			}
+			if ($parr[0]=='0') {
+				$parr = array('','','');
+				$onpow = false;
+				$i++;
+				$lastsign = $c;
+				continue;
+			} else {
+				if ($outstr!='' || $lastsign=='-') {
+					$outstr .= $lastsign;
+				}
+				
+			}
+			if ($parr[2]=='0' || ($parr[2]=='' && $parr[1]=='')) {
+				if ($parr[1]=='') {
+					$outstr .= $parr[0]; // n
+				} else {
+					if ($parr[0] == '') {
+						$outstr .= 1; // x^0
+					} else {
+						$outstr .= $parr[0]; //n x^0
+					}
+				}
+			} else if ($parr[2]=='') {
+				if ($parr[0]=='1') {
+					$outstr .= $parr[1];
+				} else {
+					$outstr .= $parr[0].' '.$parr[1];
+				}
+			} else if ($parr[2]=='1') {
+				if ($parr[0]==1) {
+					$outstr .= $parr[1];
+				} else {
+					$outstr .= $parr[0] . ' ' . $parr[1]; //n x^1
+				}
+			} else {
+				if ($parr[0]==1) {
+					$outstr = $parr[1] . '^' . $parr[2]; // 1 x^m
+				} else {
+					$outstr .= $parr[0] . ' ' . $parr[1] . '^' . $parr[2]; // n x^m
+				}
+			}
+			$lastsign = $c;
+			$parr = array('','','');
+			$onpow = false;
+		}
+		$i++;
+	}
+	return $outstr;
+	/*
+	$exp = clean($exp);
+	if ($exp{0}=='+') {
+		$exp = substr($exp,1);
+	}
+	return $exp;
+	*/
 }
 
 function makepretty($exp) {
@@ -261,6 +366,17 @@ function makepretty($exp) {
 		}
 	} else {
 		$exp = clean($exp);
+	}
+	return $exp;
+}
+
+function makexpretty($exp) {
+	if (is_array($exp)) {
+		for ($i=0;$i<count($exp);$i++) {
+			$exp[$i]=xclean($exp[$i]);
+		}
+	} else {
+		$exp = xclean($exp);
 	}
 	return $exp;
 }
@@ -285,6 +401,17 @@ function makeprettydisp($exp) {
 		}
 	} else {
 		$exp = "`".clean($exp)."`";
+	}
+	return $exp;
+}
+
+function makexprettydisp($exp) {
+	if (is_array($exp)) {
+		for ($i=0;$i<count($exp);$i++) {
+			$exp[$i]="`".xclean($exp[$i])."`";
+		}
+	} else {
+		$exp = "`".xclean($exp)."`";
 	}
 	return $exp;
 }

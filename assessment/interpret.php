@@ -25,7 +25,10 @@ function interpret($blockname,$anstype,$str)
 		$commands = explode("\n",$str);
 		foreach($commands as $com) {
 			if (substr($com,0,2)=="//") {continue;}
+			$com = preg_replace('/(\'[^\']*)\/\/([^\']*\')/',"$1~~$2",$com);
+			$com = preg_replace('/("[^"]*)\/\/([^"]*")/',"$1~~$2",$com);
 			$com = preg_replace('/^(.+)\/\/.+$/',"$1",$com);
+			$com = str_replace('~~','//',$com);
 			$com = str_replace($disallowedwords,"",$com);
 			$com = preg_replace('/&(\w+);/',"&$1 exit",$com);
 			//causing problems in showasciisvg, so removed for now

@@ -1687,12 +1687,23 @@
 			$cathdr = array_merge(array_slice($cathdr,0,$shift),array_slice($cathdr,$totalspos));
 		}
 		if (($gbmode&8)==8) {  //if totals on left
+			if ($limuser>0) {
+				for ($i=0;$i<count($gb[0]);$i++) {
+					if (!isset($feedbacks[$i])) {
+						$feedbacks[$i] = '';
+					}
+				}
+				ksort($feedbacks);
+				$tots = array_splice($feedbacks,$totalspos);
+				array_splice($feedbacks,$shift,0,$tots);
+			}
 			for ($i=0;$i<$ln;$i++) {
 				$tots = array_splice($gb[$i],$totalspos);
 				array_splice($gb[$i],$shift,0,$tots);
 			}
 			$tots = array_splice($cathdr,$totalspos);
 			array_splice($cathdr,$shift,0,$tots);
+			
 		}
 		if ($limuser>0) {
 			return array($gb,$cathdr,$feedbacks);

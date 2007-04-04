@@ -365,8 +365,12 @@
 		}
 		echo '</select></p>';
 	}
-	if ($myrights > 5 && time()<$postby) {
-		echo "<p><a href=\"thread.php?page=$page&cid=$cid&forum=$forumid&modify=new\">Add New Thread</a></p>\n";
+	if (($myrights > 5 && time()<$postby) || $isteacher) {
+		echo "<p><a href=\"thread.php?page=$page&cid=$cid&forum=$forumid&modify=new\">Add New Thread</a>\n";
+		if ($isteacher) {
+			echo " | <a href=\"postsbyname.php?page=$page&cid=$cid&forum=$forumid\">List Posts by Name</a>";
+		}
+		echo "</p>";
 	}
 ?>
 	<table class=forum>
@@ -451,7 +455,7 @@
 	</tbody>
 	</table>
 <?php
-	if ($myrights > 5 && time()<$postby) {
+	if (($myrights > 5 && time()<$postby) || $isteacher) {
 		echo "<p><a href=\"thread.php?page=$page&cid=$cid&forum=$forumid&modify=new\">Add New Thread</a></p>\n";
 	}
 	

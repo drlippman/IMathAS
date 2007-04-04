@@ -64,7 +64,7 @@
 	
 	
 	
-	$query = "SELECT ie.id,iu.LastName,iu.FirstName,ia.name,iu.id,ia.id FROM imas_exceptions AS ie,imas_users AS iu,imas_assessments AS ia ";
+	$query = "SELECT ie.id,iu.LastName,iu.FirstName,ia.name,iu.id,ia.id,ie.startdate,ie.enddate FROM imas_exceptions AS ie,imas_users AS iu,imas_assessments AS ia ";
 	$query .= "WHERE ie.assessmentid=ia.id AND ie.userid=iu.id AND ia.courseid='$cid' AND iu.id IN ($tolist) ";
 	if ($isall) {
 		$query .= "ORDER BY ia.name,iu.LastName,iu.FirstName";
@@ -79,6 +79,8 @@
 		if ($isall) {
 			$lasta = 0;
 			while ($row = mysql_fetch_row($result)) {
+				$sdate = tzdate("m/d/y g:i a", $row[6]);
+				$edate = tzdate("m/d/y g:i a", $row[7]);
 				if ($lasta!=$row[5]) {
 					if ($lasta!=0) {
 						echo "</ul></li>";
@@ -86,12 +88,14 @@
 					echo "<li>{$row[3]} <ul>";
 					$lasta = $row[5];
 				}
-				echo "<li><input type=checkbox name=\"clears[]\" value=\"{$row[0]}\" />{$row[1]}, {$row[2]}</li>";
+				echo "<li><input type=checkbox name=\"clears[]\" value=\"{$row[0]}\" />{$row[1]}, {$row[2]} ($sdate - $edate)</li>";
 			}
 			echo "</ul></li>";
 		} else {
 			$lasts = 0;
 			while ($row = mysql_fetch_row($result)) {
+				$sdate = date("m/d/y g:i a", $row[6]);
+				$edate = date("m/d/y g:i a", $row[7]);
 				if ($lasts!=$row[4]) {
 					if ($lasts!=0) {
 						echo "</ul></li>";
@@ -99,7 +103,7 @@
 					echo "<li>{$row[1]}, {$row[2]} <ul>";
 					$lasts = $row[4];
 				}
-				echo "<li><input type=checkbox name=\"clears[]\" value=\"{$row[0]}\" />{$row[3]}</li>";
+				echo "<li><input type=checkbox name=\"clears[]\" value=\"{$row[0]}\" />{$row[3]} ($sdate - $edate)</li>";
 			}
 			echo "</ul></li>";
 		}

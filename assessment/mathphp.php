@@ -23,8 +23,10 @@ function mathphp($st,$varlist) {
   //slice and concat new formula string
   
   //parenthesize variables with number endings, ie $c2^3 => ($c2)^3
-  $st = preg_replace('/(\$[a-zA-Z]+\d+)([^\[])/',"($1)$2",$st);
-  $st = preg_replace('/(\$[a-zA-Z]+\d+)$/',"($1)",$st);
+  //$st = preg_replace('/(\$[a-zA-Z\d]+)$/',"($1)",$st);
+  $st .= ' ';
+  $st = preg_replace('/(\$[a-zA-Z\d]+)([^\[])/',"($1)$2",$st);
+  
   
   //parenthesizes the function variables
   if ($varlist != null) {

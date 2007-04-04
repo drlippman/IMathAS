@@ -75,6 +75,61 @@
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestionsreview.php?cid=$cid&aid=$aid");
 		exit;
 	}
+	if (isset($teacherid) && isset($_GET['removeset'])) {
+		if (!isset($_POST['checked'])) {
+			echo "No questions selected.  <a href=\"addquestions.php?cid=$cid&aid=$aid\">Go back</a>\n";
+			require("../footer.php");
+			exit;
+		}
+		$query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$itemlist = mysql_result($result,0,0);
+		$items = explode(",",$itemlist);
+		
+		foreach($_POST['checked'] as $qloc) {
+			
+			list($i,$j) = explode('-',$qloc);
+			if (strpos($items[$i],'~')!==false) {
+				$sub = explode('~',$items[$i]);
+				$rem = $sub[$j];
+				$sub[$j]=0;
+				$items[$i] = implode('~',$sub);
+			} else {
+				$rem = $items[$i];
+				$items[$i] = 0;
+			}
+			
+			$query = "DELETE FROM imas_questions WHERE id='$rem'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			
+			
+		}
+		//update itemorder
+		$itemo = array();
+		foreach($items as $k=>$v) {
+			if (strpos($v,'~')!==false) {
+				$sub = explode('~',$v);
+				$subo = array();
+				foreach($sub as $j=>$sb) {
+					if ($sb>0) {
+						$subo[] = $sb;
+					}
+				}
+				if (count($subo)>1) {
+					$itemo[] = implode('~',$subo);
+				} else if (count($subo)==1) {
+					$itemo[] = $subo[0];
+				}
+			} else {
+				if ($v>0) {
+					$itemo[] = $v;
+				}
+			}
+		}
+		$itemlist = implode(',',$itemo);
+		$query = "UPDATE imas_assessments SET itemorder='$itemlist' WHERE id='$aid'";
+		mysql_query($query) or die("Query failed : " . mysql_error());
+	}
 	if (isset($_GET['clearattempts'])) {
 		if ($_GET['clearattempts']=="confirmed") {
 			
@@ -164,13 +219,14 @@
 		} else {
 			$grp = 0;
 		}
-		echo "<form id=\"curq\">";
+		echo "<form id=\"curq\" method=post action=\"addquestionsreview.php?cid=$cid&aid=$aid&removeset=true\"  onsubmit=\"return confirm('Are you SURE you want to remove these questions?');\">\n";
 		echo "Use select boxes to <select name=group id=group><option value=\"0\" ";
 		if ($grp==0) { echo "SELECTED";}
 		echo ">Rearrange questions</option>";
 		echo "<option value=\"1\" ";
 		if ($grp==1) { echo "SELECTED";}
-		echo ">Group questions</option</select>\n";
+		echo ">Group questions</option></select>\n";
+		echo " With Selected: <input type=submit value=\"Remove\">";
 		echo "<table cellpadding=5 class=gb>\n";
 		echo "<thead><tr><th>Order</th><th>Description</th><th>Preview</th><th>Type</th><th>Points</th><th>Settings</th><th>Source</th><th>Template</th><th>Remove from Assessment</th></tr></thead><tbody>\n";
 		$items = explode(",",$itemorder);
@@ -214,7 +270,7 @@
 					echo "<td class=c><a href=\"moddataset.php?id={$line['questionsetid']}&aid=$aid&cid=$cid\">Edit</a></td>\n";
 				} else { echo "<td class=c><a href=\"viewsource.php?id={$line['questionsetid']}&aid=$aid&cid=$cid\">View</a></td>";}
 				echo "<td class=c><a href=\"moddataset.php?id={$line['questionsetid']}&aid={$_GET['aid']}&cid={$_GET['cid']}&template=true\">Template</a></td>\n";
-				echo "<td class=c><a href=\"addquestionsreview.php?remove=$i-$j&aid=$aid&cid=$cid\" onclick=\"return confirm('Are you sure you want to remove this question?')\">Remove</a></td>\n";
+				echo "<td class=c><a href=\"addquestionsreview.php?remove=$i-$j&aid=$aid&cid=$cid\" onclick=\"return confirm('Are you sure you want to remove this question?')\">Remove</a> <input type=checkbox name=\"checked[]\" value=\"$i-$j\"/></td>\n";
 				echo "</tr>\n";
 				$ln++;
 			}

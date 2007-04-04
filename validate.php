@@ -195,6 +195,8 @@ END;
 				} else {
 					$tutorid = $line['id'];
 				}
+			} else if ($myrights==100) {
+				$teacherid = $userid;
 			}
 		}
 		$query = "SELECT name,available,lockaid FROM imas_courses WHERE id='{$_GET['cid']}'";
