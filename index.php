@@ -98,7 +98,7 @@
 		echo "<A HREF=\"admin/admin.php\">Go to Admin page</a><BR>\n";
 	}
 	if ($myrights > 10) {
-		echo "<a href=\"docs/docs.html\">Documentation</a><br/>\n";
+		echo "<a href=\"docs/docs.php\">Documentation</a><br/>\n";
 	} else if ($myrights > 9) {
 		echo "<a href=\"help.php?section=usingimas\">Help Using IMathAS</a><br/>\n";
 	}

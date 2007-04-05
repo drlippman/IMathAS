@@ -121,7 +121,14 @@ be editted to work with your install if you want to use them.
 	<li>course/files</li>
 	<li>filter/graph/imgs</li>
 	</ul>
-<li>Copy the config.php.dist to config.php and edit it.  Change these options to your liking:</li>
+<li>Rename (in the main directory):
+	<ul>
+	<li>config.php.dist to config.php</li>
+	<li>infoheader.php.dist to infoheader.php</li>
+	<li>loginpage.php.dist to loginpage.php</li>
+	<li>newinstructor.php.dist to newinstructor.php</li>
+	</ul></li>
+<li>Edit config.php.  Change these options to your liking:</li>
 	<ul>
 	<li>$dbserver:  The address of your database server.  Probably www.yoursite.edu or localhost</li>
 	<li>$dbname:  The name of the IMathAS database</li>
@@ -139,6 +146,8 @@ be editted to work with your install if you want to use them.
 	<li>$freetypeinstalled: Whether the FreeType extension is installed and GD 2.0+ is used in your php version.</li>
 	<li>$colorshift:  Whether icons should change colors as due date approaches.  I thought this was cute, 
 	    but others might find it annoying</li>
+	<li>$smallheaderlogo: Text or an HTML image tag for a small (120 x 80) logo to display at the top right of
+	    course pages</li>
 	<li>$allownongrouplibs:  Whether non-admins should be allowed to create non-group libraries.  
 		On a single-school install, set to true; for larger installs that plan to
 		use the Groups features, set to false</li>
@@ -163,8 +172,8 @@ be editted to work with your install if you want to use them.
     link now to change the password to something substantial.  Alternatively, you can
     go into the Admin page, create a new user with Admin rights, then delete the 'root'
     admin.</li>
-<li>Edit loginpage.php to reflect your installation, edit /diag/index.php to reflect your 
-installation, and delete or edit the files in /info subdirectory.</li>
+<li>Edit loginpage.php and infoheader.php if desired.</li>
+<li>If you plan to use the new instructor account request page, edit newinstructor.php</li>
 </ol>
 
 <h3>Answers to IT's questions</h3>

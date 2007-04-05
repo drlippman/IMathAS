@@ -7,6 +7,7 @@ Upgrade Notes
 *** Config.php Changes ***
 
 $installname = "Your install name";
+$smallheaderlogo = "Text or image tag";
 
 *** Database Changes ***
 Required changes.

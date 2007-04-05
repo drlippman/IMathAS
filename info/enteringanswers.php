@@ -1,8 +1,12 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<?php
+	$dbsetup = true; //prevents connection to database
+	include("../config.php");
+?>
 <html>
 <head>
-<title>WAMAP.org</title>
-<link rel="stylesheet" href="/wamaphome.css" type="text/css">
+<title><?php echo $installname; ?></title>
+<link rel="stylesheet" href="<?php echo $imasroot;?>/infopages.css" type="text/css">
 <style type="text/css">
 img {
 	vertical-align: middle;
@@ -10,30 +14,19 @@ img {
 </style>
 </head>
 <body>
-<div id="logo">
-<img src="/img/wamaptxt.gif" alt="WAMAP.org: Washington Mathematics Assessment and Placement"/>
-</div>
+<?php
+	$pagetitle = "Entering Answers";
+	require("../infoheader.php");
+?>
 
-<ul id="navlist">
-<li><a href="/index.php">About Us</a></li>
-<li><a href="/info/classroom.html">Classroom</a></li>
-<li><a href="/diag/index.php">Diagnostics</a></li>
-<li><a href="/info/news.html">News</a></li>
-</ul>
-
-<div id="header">
-<img class="floatright" src="/img/graph.gif" alt="graph image" />
-<div class="vcenter">Entering Answers</div>
-</div>
-
-<img class="floatleft" src="/img/typing.jpg"/>
+<img class="floatleft" src="<?php echo $imasroot;?>/img/typing.jpg"/>
 
 <div class="content">
 <h4>Answer Types</h4>
 <p class="ind">
 Each question requests a specific type of answer.  Usually a question will display a hint
 at the end of the question as to what type of answer is expected.  In addition to 
-multiple choice questions and other standard types, WAMAP also features several mathematical
+multiple choice questions and other standard types, this system also features several mathematical
 answer types.  Read on for suggestions on entering answers for these types.</p>
 
 <h4>Numerical Answers</h4>

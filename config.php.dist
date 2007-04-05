@@ -31,6 +31,8 @@
   $emailconfirmation = false;
   
   //the email address to have as the "from" listing on confirmation emails
+  //also the address new instructor requests (if you use that page) will be
+  //sent to
   $sendfrom = "imathas@yoursite.com";
   
   //web root to imathas:  http://yoursite.com $imasroot
@@ -48,6 +50,11 @@
   
   //shift color of icons from green to red as deadline approaches?
   $colorshift = true;
+  
+  //A small logo to display on the upper right of course pages
+  //set = '<img src="/path/to/img.gif">' or = 'Some Text'
+  //Image should be about 120 x 80px
+  $smallheaderlogo = $installname;
   
   //should non-admins be allowed to create new non-group libraries?
   //on a single-school install, set to true; for larger installs that plan to

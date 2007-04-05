@@ -109,7 +109,8 @@ require("$curdir/filter/filter.php");
 //CUSTOMIZE:  put a small (max 120px wide) logo on upper right of course pages
 if (!isset($nologo)) {
 	//echo '<img id="headerlogo" style="position: absolute; right: 5px; top: 5px;" src="/img/state_logo.gif" alt="logo"/>';
-	echo '<img id="headerlogo" style="position: absolute; right: 5px; top: 12px;" src="/img/wamaplogosmall.gif" alt="logo"/>';
+	//echo '<img id="headerlogo" style="position: absolute; right: 5px; top: 12px;" src="/img/wamaplogosmall.gif" alt="logo"/>';
+	echo '<span style="position: absolute; right:5px; top: 12px;">'.$smallheaderlogo.'</span>';
 }
 ?>
 

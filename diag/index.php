@@ -10,25 +10,13 @@
 		$query = "SELECT id,name FROM imas_diags WHERE public=3 OR public=7";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//echo "<html><body><h1>Diagnostics</h1><ul>";
-		$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/wamaphome.css\" type=\"text/css\">\n";
+		$nologo = true;
+		$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/infopages.css\" type=\"text/css\">\n";
 		require("../header.php");
+		$pagetitle = "Diagnostics";
+		require("../infoheader.php");
 		echo <<<END
-<div id="logo">
-<img src="/img/wamaptxt.gif" alt="WAMAP.org: Washington Mathematics Assessment and Placement"/>
-</div>
-
-<ul id="navlist">
-<li><a href="/index.php">About Us</a></li>
-<li><a href="/info/classroom.html">Classroom</a></li>
-<li><a href="/diag/index.php">Diagnostics</a></li>
-<li><a href="/info/news.html">News</a></li>
-</ul>
-
-<div id="header">
-<img class="floatright" src="/img/graph.gif" alt="graph image" />
-<div class="vcenter">Diagnostics</div>
-</div>
-<img class="floatleft" src="/img/ruler.jpg"/>
+<img class="floatleft" src="$imasroot/img/ruler.jpg"/>
 <div class="content">
 <h2>Available Diagnostics</h2>
 <ul class="nomark">

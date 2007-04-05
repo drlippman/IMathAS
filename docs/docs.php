@@ -1,26 +1,19 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<?php
+	$dbsetup = true; //prevents connection to database
+	include("../config.php");
+?>
 <html>
 <head>
-<title>WAMAP.org</title>
-<link rel="stylesheet" href="/wamaphome.css" type="text/css">
+<title><?php echo $installname; ?></title>
+<link rel="stylesheet" href="<?php echo $imasroot;?>/infopages.css" type="text/css">
 <link rel="shortcut icon" href="/favicon.ico" >
 </head>
 <body>
-<div id="logo">
-<img src="/img/wamaptxt.gif" alt="WAMAP.org: Washington Mathematics Assessment and Placement"/>
-</div>
-
-<ul id="navlist">
-<li><a href="/index.php">About Us</a></li>
-<li><a href="/info/classroom.html">Classroom</a></li>
-<li><a href="/diag/index.php">Diagnostics</a></li>
-<li><a href="/info/news.html">News</a></li>
-</ul>
-
-<div id="header">
-<img class="floatright" src="/img/graph.gif" alt="graph image" />
-<div class="vcenter">Documentation</div>
-</div>
+<?php
+	$pagetitle = "Documentation";
+	require("../infoheader.php");
+?>
 
 
 <h2>Guides</h2>

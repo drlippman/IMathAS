@@ -11,6 +11,13 @@ function mathphppre($st) {
   }
   return $st;
 }
+function parenvarifneeded($matches) {
+	  if ($matches[2]=='[') {
+		  return $matches[0];
+	  } else {
+		  return ('('.$matches[1].')'.$matches[2]);
+	  }
+  }
 //varlist should be | separated, like "x|y"
 function mathphp($st,$varlist) {
   //translate a math formula to php function notation
@@ -25,7 +32,9 @@ function mathphp($st,$varlist) {
   //parenthesize variables with number endings, ie $c2^3 => ($c2)^3
   //$st = preg_replace('/(\$[a-zA-Z\d]+)$/',"($1)",$st);
   $st .= ' ';
-  $st = preg_replace('/(\$[a-zA-Z\d]+)([^\[])/',"($1)$2",$st);
+  
+  //$st = preg_replace('/(\$[a-zA-Z\d_]+)([^\[])/',"($1)$2",$st);
+  $st = preg_replace_callback('/(\$[a-zA-Z\d_]+)(.)/','parenvarifneeded',$st);
   
   
   //parenthesizes the function variables

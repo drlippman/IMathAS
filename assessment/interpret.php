@@ -124,12 +124,20 @@ function interpret($blockname,$anstype,$str)
 							$com = '$count=0; do{'.$left.'; $count++;} while (!('.$cond.')&&($count<10)); if ($count==10) {echo "where not met in 10 iterations";}';
 						}
 					} else if ($ismath) {
-						$com = str_replace($matches[2],mathphp($matches[2],null),$com);
+						//$com = str_replace($matches[2],mathphp($matches[2],null),$com);
+						$eqpos = strpos($com,'=');
+						$lhs = substr($com,0,$eqpos);
+						$rhs = substr($com,$eqpos);
+						$rhs = mathphp($rhs,null);	
+						$com = $lhs . $rhs;
 					}
 				} else if (strpos($matches[2],'"')===false && strpos($matches[2],"'")===false) { //if right side is not quoted and no macros, mathphp it 
 					//do mathphp on right side
-					
-					$com = str_replace($matches[2],mathphp($matches[2],null),$com);	
+					$eqpos = strpos($com,'=');
+					$lhs = substr($com,0,$eqpos);
+					$rhs = substr($com,$eqpos);
+					$rhs = mathphp($rhs,null);	
+					$com = $lhs . $rhs;
 				} else { //right side is quoted
 					//all answer cleaners moved to displayq
 				}

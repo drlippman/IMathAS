@@ -1,6 +1,10 @@
 <html
 <head>
-<title>IMathAS Help</title>
+<?php
+	$dbsetup = true; //prevents connection to database
+	include("config.php");
+?>
+<title><?php echo $installname;?> Help</title>
 <style type="text/css">
 table td {
 	padding: 1px 10px;
@@ -40,9 +44,10 @@ h2,h3,h4 {
 	}
 	echo "</head><body>\n";
 	if (isset($_GET['section'])) {
-		echo "<h1>WAMAP Help</h1>\n";
+		echo "<h1>$installname Help</h1>\n";
 	}
-
+
+
 	$indiv = false;
 	$intoc = false;
 	$ndiv = 0;
@@ -107,4 +112,5 @@ h2,h3,h4 {
 	}
 	echo "</body></html>\n";
 ?>
-
+
+
