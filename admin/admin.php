@@ -31,17 +31,9 @@
 
  if ($myrights < 40) { exit("You don't have authority to view this page.");}
  echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; Admin</div>\n";
-?>
+ echo "<h2>$installname Administration</h2>";
+ echo "<b>Hello $username</b>";
 
-<h2>IMathAS Administration</h2>
-<b>Hello 
-<?php
-echo $username . '</b>'; 
-
-//if ($myrights>=75 && $showcourses==1) {
-//	echo "<h3>Group Courses</h3>";
-//} else if ($myrights==100 && $showcourses==2) {
-//	echo "<h3>All Courses</h3>";
 
 ?> 
 <h3>Courses</h3>
