@@ -490,7 +490,7 @@ mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 
 $md5pw = md5($password);
 $now = time();
-$sql = "INSERT INTO imas_users VALUES (1,'$username','$md5pw',100,'$firstname','$lastname','$email',$now,0)";
+$sql = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email) VALUES ('$username','$md5pw',100,'$firstname','$lastname','$email')";
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 
 
