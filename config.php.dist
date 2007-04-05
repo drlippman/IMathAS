@@ -1,14 +1,12 @@
 <?php
   //IMathAS:  Main config file.  Edit this file!
   //(c) 2006 David Lippman
-  //In the code and for the database, I use the shorter IMAS instead of IMathAS
 
-  $dbserver = "localhost";
-  
-  //these must match the settings you used in the dbsetup
-  $dbname = "imas";
-  $dbusername = "imasuser";
-  $dbpassword = "K87zpaxAUtcCd62B";
+  //these settings must be editted before running dbsetup.php
+  $dbserver = "localhost";  		//database server
+  $dbname = "imas";			//database name
+  $dbusername = "imasuser";		//database user
+  $dbpassword = "K87zpaxAUtcCd62B";	//database user's password
   
   //The name for this installation.  For personalization
   $installname = "IMathAS";
