@@ -423,7 +423,7 @@
 			echo "lockcol();";	
 		}
 		echo "</script>\n";
-		echo "Meanings:  IP-In Progress, OT-overtime, PT-practice test, EC-extra credit, NC-no credit\n";
+		echo "Meanings:  IP-In Progress, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sup>*</sup> Has feedback\n";
 		if ($isteacher) {
 			echo "<div class=cp>";
 			echo "<a href=\"addgrades.php?cid=$cid&gbmode=$gbmode&gbitem=new&grades=all\">Add Offline Grade</a><br/>";
@@ -1051,6 +1051,8 @@
 		global $cid,$isteacher,$istutor,$tutorid,$userid,$gbmode,$nopracticet,$curonly,$catfilter,$stu;
 		if ($isteacher && func_num_args()>1) {
 			$limuser = func_get_arg(1);
+		} else if (!$isteacher && !$istutor) {
+			$limuser = $userid;
 		} else {
 			$limuser = 0;
 		}
@@ -1386,7 +1388,7 @@
 		$query = "SELECT imas_users.id,imas_users.SID,imas_users.FirstName,imas_users.LastName,imas_users.SID,imas_users.email,imas_students.section,imas_students.code ";
 		$query .= "FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid AND imas_students.courseid='$cid' ";
 		//$query .= "FROM imas_users,imas_teachers WHERE imas_users.id=imas_teachers.userid AND imas_teachers.courseid='$cid' ";
-		if (!$isteacher && !isset($tutorid)) {$query .= "AND imas_users.id='$userid' ";}
+		//if (!$isteacher && !isset($tutorid)) {$query .= "AND imas_users.id='$userid' ";}
 		if ($limuser>0) { $query .= "AND imas_users.id='$limuser' ";}
 		if ($isdiag) {
 			$query .= "ORDER BY imas_users.email,imas_users.LastName,imas_users.FirstName";
@@ -1476,6 +1478,9 @@
 						if ($isdisp) {
 							$gb[$ln][$pos] .= '</a>';
 						}
+						if ($isteacher && $isdisp && $gfeedback[$grades[$i]]!='') {
+							$gb[$ln][$pos] .= '<sup>*</sup>';
+						}
 						if ($limuser>0) {
 							$feedbacks[$pos] = $gfeedback[$grades[$i]];
 						}
@@ -1522,6 +1527,9 @@
 							$cattot[$category[$i]][] = $pts[$assessments[$i]];
 						}
 						$atots[$pos][] = $pts[$assessments[$i]];
+					}
+					if ($isteacher && $isdisp && $afeedback[$assessments[$i]]!='') {
+						$gb[$ln][$pos] .= '<sup>*</sup>';
 					}
 					if ($isdisp && ($isteacher || $assessmenttype[$i]=="Practice" || $sa[$i]=="I" || ($sa[$i]!="N" && $now>$enddate[$i]))) {
 						$gb[$ln][$pos] .= "</a>";

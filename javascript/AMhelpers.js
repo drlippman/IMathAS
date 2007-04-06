@@ -251,6 +251,12 @@ function AMpreview(inputId,outputId) {
 	}
   }
   outnode.appendChild(document.createTextNode(" " + err));
+  //clear out variables that have been defined
+  var toclear = ''; 
+  for (var j=0; j<vl.length; j++) {
+	toclear += vars[j] + "=NaN;"; 
+  }
+  eval(toclear);
 }
 
 //preview for matrix type

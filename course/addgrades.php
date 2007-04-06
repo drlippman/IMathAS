@@ -68,8 +68,8 @@
 	if (isset($_POST['newscore'])) {
 		foreach($_POST['newscore'] as $k=>$sc) {
 			if ($sc!='') {
-				$query = "INSERT INTO imas_grades (gbitemid,userid,score) VALUES ";
-				$query .= "('{$_GET['gbitem']}','$k','$sc')";
+				$query = "INSERT INTO imas_grades (gbitemid,userid,score,feedback) VALUES ";
+				$query .= "('{$_GET['gbitem']}','$k','$sc','{$_POST['feedback'][$k]}')";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 		}
@@ -291,7 +291,7 @@ function doonblur(value) {
 			}
 			$query = "SELECT imas_users.id,imas_users.LastName,imas_users.FirstName,imas_students.section FROM imas_users,imas_students ";
 			if ($_GET['grades']!='all') {
-				$query .= "WHERE imas_users.id=imas_students.userid AND imas_users.id='{$_GET['grades']}' ";
+				$query .= "WHERE imas_users.id=imas_students.userid AND imas_users.id='{$_GET['grades']}' AND imas_students.courseid='$cid'";
 			} else {
 				$query .= "WHERE imas_users.id=imas_students.userid AND imas_students.courseid='$cid'";
 			}
