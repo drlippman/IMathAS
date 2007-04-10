@@ -63,19 +63,23 @@ frequency(array,start,classwidth)
 <BR> start: first lower class limit
 <BR> classwidth: width of the classes
 <BR><h3><a name="histogram">histogram</a></h3>
-histogram(array,label,start,classwidth)
+histogram(array,label,start,classwidth,[labelstart,upper])
 <BR>display macro.  Creates a histogram from a data set
 <BR> array: array of data values
 <BR> label: name of data values
 <BR> start: first lower class limit
 <BR> classwidth: width of the classes
+<BR> labelstart (optional): value to start axis labeling at.  Defaults to start
+<BR> upper (optional): first upper class limit.  Defaults to start+classwidth
 <BR><h3><a name="fdhistogram">fdhistogram</a></h3>
-fdhistogram(freqarray,$label,$start,$cw)
+fdhistogram(freqarray,label,start,cw,[labelstart,upper])
 <BR>display macro.  Creates a histogram from frequency array
 <BR> freqarray: array of frequencies
 <BR> label: name of data values
 <BR> start: first lower class limit
 <BR> classwidth: width of the classes
+<BR> labelstart (optional): value to start axis labeling at.  Defaults to start
+<BR> upper (optional): first upper class limit.  Defaults to start+classwidth
 <BR><h3><a name="normrand">normrand</a></h3>
 normrand(mu,sigma,n)
 <BR>returns an array of n random numbers that are normally distributed with given

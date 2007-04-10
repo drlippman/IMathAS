@@ -5,6 +5,7 @@
  require_once("$curdir/config.php");
  if (isset($sessionpath)) { session_save_path($sessionpath);}
  ini_set('session.gc_maxlifetime',86400);
+ ini_set('auto_detect_line_endings',true);
  session_start();
  $sessionid = session_id();
  $sessiondata = array();

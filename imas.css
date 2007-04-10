@@ -313,6 +313,10 @@ span.link {
 	cursor: pointer;
 }
 
+.small {
+	font-size: 70%;
+}
+
 #leftcontent {
 		position: absolute;
 		left: 10px;

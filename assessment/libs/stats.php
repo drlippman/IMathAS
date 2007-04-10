@@ -1,9 +1,11 @@
 <?php
-//A library of Stats functions.  Version 1.4, March 28, 2006
-
+//A library of Stats functions.  Version 1.5, April 9, 2007
+
+
 global $allowedmacros;
 array_push($allowedmacros,"nCr","nPr","mean","stdev","percentile","quartile","median","freqdist","frequency","histogram","fdhistogram","normrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","linreg");
-
+
+
 //nCr(n,r)
 //The Choose function
 function nCr($n,$r){
@@ -17,7 +19,8 @@ function nCr($n,$r){
    }
    return $return;
 }
-
+
+
 //nPr(n,r)
 //The Permutations function
 function nPr($n,$r){
@@ -32,30 +35,35 @@ function nPr($n,$r){
    }
    return $return;
 }
-
+
+
 //mean(array)
 //Finds the mean of an array of numbers
 function mean($a) {
 	return (array_sum($a)/count($a));	
 }
-
+
+
 //variance(array)
 //the (sample) variance of an array of numbers
 function variance($a) {
-	$v = 0;
+	$v = 0;
+
 	$mean = mean($a);
 	foreach ($a as $x) {
 		$v += pow($x-$mean,2);
 	}
 	return ($v/(count($a)-1));
 }
-
+
+
 //stdev(array)
 //the (sample) standard deviation of an array of numbers
 function stdev($a) {
 	return sqrt(variance($a));
 }
-
+
+
 //percentile(array,percentile)
 //example: percentile($a,30) would find the 30th percentile of the data
 //method based on Triola
@@ -73,20 +81,23 @@ function percentile($a,$p) {
 		return ($a[ceil($l)-1]);
 	}
 }
-
+
+
 //quartile(array,quartile)
 //finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
 //array of numbers.  Calculates using percentiles.
 function quartile($a,$q) {
 	return percentile($a,$q*25);	
 }
-
+
+
 //median(array)
 //returns the median of an array of numbers
 function median($a) {
 	return percentile($a,50);	
 }
-
+
+
 //freqdist(array,label,start,classwidth)
 //display macro.  Returns an HTML table that is a frequency distribution of
 //the data
@@ -113,7 +124,8 @@ function freqdist($a,$label,$start,$cw) {
 	$out .= "</tbody></table>\n";
 	return $out;
 }
-
+
+
 //frequency(array,start,classwidth)
 //Returns an array of frequencies for the data grouped into classes
 // array: array of data values
@@ -134,23 +146,33 @@ function frequency($a,$start,$cw) {
 	}
 	return $out;
 }
-
-//histogram(array,label,start,classwidth)
+
+
+//histogram(array,label,start,classwidth,[labelstart,upper])
 //display macro.  Creates a histogram from a data set
 // array: array of data values
 // label: name of data values
 // start: first lower class limit
 // classwidth: width of the classes
-function histogram($a,$label,$start,$cw) {
+// labelstart (optional): value to start axis labeling at.  Defaults to start
+// upper (optional): first upper class limit.  Defaults to start+classwidth
+function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false) {
 	sort($a, SORT_NUMERIC);
 	$x = $start;
 	$curr = 0;
 	$alt = "Histogram for $label <table class=stats><thead><tr><th>Label on left of box</th><th>Frequency</th></tr></thead>\n<tbody>\n";
 	$maxfreq = 0;
+	if ($upper===false) {
+		$dx = $cw;
+		$dxdiff = 0;
+	} else {
+		$dx = $upper - $start;
+		$dxdiff = $cw-$dx;
+	}
 	while ($x <= $a[count($a)-1]) {
 		$alt .= "<tr><td>$x</td>";
 		$st .= "rect([$x,0],";
-		$x += $cw;
+		$x += $dx;
 		$st .= "[$x,";
 		$i = $curr;
 		while (($a[$i] < $x) && ($i < count($a))) {
@@ -160,34 +182,58 @@ function histogram($a,$label,$start,$cw) {
 		$alt .= "<td>" . ($i-$curr) . "</td></tr>\n";
 		$st .= ($i-$curr) . "]);";
 		$curr = $i;
+		$x += $dxdiff;
 	}
 	$alt .= "</tbody></table>\n";
 	if ($GLOBALS['sessiondata']['graphdisp']==0) {
 		return $alt;
 	}
 	$outst = "setBorder(10);  initPicture(". ($start-.1*($x-$start)) .",$x,". (-.1*$maxfreq) .",$maxfreq);";
-	if ($maxfreq>100) {$step = 20;} else if ($maxfreq > 50) { $step = 10; } else if ($maxfreq > 20) { $step = 5;} else {$step=1;}
-	$outst .= "axes($cw,$step,1,1000,$step); fill=\"blue\"; text([". ($start + .5*($x-$start))  .",". (-.1*$maxfreq) . "],\"$label\");";
+	if ($maxfreq>100) {$step = 20;} else if ($maxfreq > 50) { $step = 10; } else if ($maxfreq > 20) { $step = 5;} else if ($maxfreq>10) { $step = 2; } else {$step=1;}
+	if ($startlabel===false) {
+		$outst .= "axes($cw,$step,1,1000,$step); fill=\"blue\"; text([". ($start + .5*($x-$start))  .",". (-.1*$maxfreq) . "],\"$label\");";
+	} else {
+		$outst .= "axes(1000,$step,1,1000,$step); fill=\"blue\"; text([". ($start + .5*($x-$start))  .",". (-.1*$maxfreq) . "],\"$label\");";
+		$x = $startlabel;
+		$tm = -.02*$maxfreq;
+		$tx = .02*$maxfreq;
+		while ($x <= $a[count($a)-1]) {
+			$outst .= "line([$x,$tm],[$x,$tx]); text([$x,0],\"$x\",\"below\");";
+			$x+= $cw;
+		}
+		
+	}
 	$outst .= $st;
 	return showasciisvg($outst,300,200);
 }
-
-//fdhistogram(freqarray,$label,$start,$cw)
+
+
+//fdhistogram(freqarray,label,start,cw,[labelstart,upper])
 //display macro.  Creates a histogram from frequency array
 // freqarray: array of frequencies
 // label: name of data values
 // start: first lower class limit
 // classwidth: width of the classes
-function fdhistogram($freq,$label,$start,$cw) {
+// labelstart (optional): value to start axis labeling at.  Defaults to start
+// upper (optional): first upper class limit.  Defaults to start+classwidth
+function fdhistogram($freq,$label,$start,$cw,$startlabel=false,$upper=false) {
 	$x = $start;
 	$alt = "Histogram for $label <table class=stats><thead><tr><th>Label on left of box</th><th>Frequency</th></tr></thead>\n<tbody>\n";
 	$maxfreq = 0;
+	if ($upper===false) {
+		$dx = $cw;
+		$dxdiff = 0;
+	} else {
+		$dx = $upper - $start;
+		$dxdiff = $cw-$dx;
+	}
 	for ($curr=0; $curr<count($freq); $curr++) {
 		$alt .= "<tr><td>$x</td><td>{$freq[$curr]}</td></tr>";
 		$st .= "rect([$x,0],";
-		$x += $cw;
+		$x += $dx;
 		$st .= "[$x,{$freq[$curr]}]);";
 		if ($freq[$curr]>$maxfreq) { $maxfreq = $freq[$curr];}
+		$x += $dxdiff;
 	}
 	$alt .= "</tbody></table>\n";
 	if ($GLOBALS['sessiondata']['graphdisp']==0) {
@@ -195,11 +241,24 @@ function fdhistogram($freq,$label,$start,$cw) {
 	}
 	$outst = "setBorder(10);  initPicture(". ($start-.1*($x-$start)) .",$x,". (-.1*$maxfreq) .",$maxfreq);";
 	if ($maxfreq>100) {$step = 20;} else if ($maxfreq > 50) { $step = 10; } else if ($maxfreq > 20) { $step = 5;} else {$step=1;}
-	$outst .= "axes($cw,$step,1,1000,$step); fill=\"blue\"; text([". ($start + .5*($x-$start))  .",". (-.1*$maxfreq) . "],\"$label\");";
+	if ($startlabel===false) {
+		$outst .= "axes($cw,$step,1,1000,$step); fill=\"blue\"; text([". ($start + .5*($x-$start))  .",". (-.1*$maxfreq) . "],\"$label\");";
+	} else {
+		$outst .= "axes(1000,$step,1,1000,$step); fill=\"blue\"; text([". ($start + .5*($x-$start))  .",". (-.1*$maxfreq) . "],\"$label\");";
+		$x = $startlabel;
+		$tm = -.02*$maxfreq;
+		$tx = .02*$maxfreq;
+		for ($curr=0; $curr<count($freq); $curr++) {
+			$outst .= "line([$x,$tm],[$x,$tx]); text([$x,0],\"$x\",\"below\");";
+			$x+=$cw;
+		}
+	}
+	//$outst .= "axes($cw,$step,1,1000,$step); fill=\"blue\"; text([". ($start + .5*($x-$start))  .",". (-.1*$maxfreq) . "],\"$label\");";
 	$outst .= $st;
 	return showasciisvg($outst,300,200);
 }
-
+
+
 //normrand(mu,sigma,n)
 //returns an array of n random numbers that are normally distributed with given
 //mean mu and standard deviation sigma.  Uses the Box-Muller transform.
@@ -221,7 +280,8 @@ function normrand($mu,$sig,$n) {
 		return (array_slice($z,0,count($z)-1));
 	}
 }
-
+
+
 //boxplot(array,axislabel,[datalabel])
 //draws a boxplot based on the data in array, with given axislabel
 //and optionally a datalabel (to topleft of boxplot)
@@ -263,7 +323,8 @@ function boxplot($arr,$label) {
 		return $alt;
 	}
 	$outst = "setBorder(15); initPicture($bigmin,$bigmax,-3,".(5*$multi).");";
-	$dw = $bigmax-$bigmin;
+	$dw = $bigmax-$bigmin;
+
 	if ($dw>100) {$step = 20;} else if ($dw > 50) { $step = 10; } else if ($dw > 20) { $step = 5;} else {$step=1;}
 	$outst .= "axes($step,100,1);";
 	$outst .= "text([". ($bigmin+.5*$dw) . ",-3],\"$label\");";
@@ -276,7 +337,8 @@ function boxplot($arr,$label) {
 	$outst .= $st;
 	return showasciisvg($outst,400,50+50*$multi);
 }
-
+
+
 //normalcdf(z)
 //calculates the area under the standard normal distribution to the left of the
 //z-value z, to 4 decimals 
@@ -311,7 +373,8 @@ function normalcdf($ztest) {
 	}
 	return $pval;
 }
-
+
+
 //tcdf(t,df)
 //calculates the area under the t-distribution with "df" degrees of freedom
 //to the left of the t-value t
@@ -347,7 +410,8 @@ function tcdf($ttest,$df) {
 	} else {
 		$pval = round(1-$y,4);
 	}
-
+
+
 	if ($pval > .9999) {
 		$pval = 0.9999;
 	} else if ($pval < .0001) {
@@ -356,8 +420,10 @@ function tcdf($ttest,$df) {
 	return $pval;
 	} else {return false;}
 }
-
-
+
+
+
+
 //invnormalcdf(p)
 //Inverse Normal CDF
 //finds the z-value with a left-tail area of p
@@ -376,7 +442,8 @@ function invnormalcdf($p) {
       $q4 =  0.38560700634e-2;
       
    if ($p < 0.5) { $pp = $p; }  else  {$pp = 1 - $p; }
-
+
+
    if ($pp < 1E-12) {
       $xp = 99;
    } else {
@@ -420,7 +487,8 @@ function invtcdf($p,$ndf) {
 	    $x = invnormalcdf($p);
 	    $y = pow($x,2);
 	    if ($ndf < 5) { $c = $c + 0.3 * ($ndf - 4.5) * ($x + 0.6);}
-	    $c = (((0.05 * $d * $x - 5) * $x - 7) * $x - 2) * $x + $b+ $c;
+	    $c = (((0.05 * $d * $x - 5) * $x - 7) * $x - 2) * $x + $b+ $c;
+
 	    $y = (((((0.4*$y + 6.3) * $y + 36) * $y + 94.5) / $c - $y - 3) / $b + 1) * $x;
 	    $y = $a * pow($y,2);
 	    if ($y > 0.002) {
@@ -436,7 +504,8 @@ function invtcdf($p,$ndf) {
 	$fn_val = round( sqrt($ndf * $y) , 4);
 	if ($p<.5) {return (-1*$fn_val);} else { return $fn_val;}
 }
-
+
+
 //linreg(xarray,yarray)
 //Computes the linear correlation coefficient, and slope and intercept of
 //regression line, based on array/list of x-values and array/list of y-values
@@ -462,5 +531,6 @@ function linreg($xarr,$yarr) {
 	$b = ($sy - $sx*$m)/$n;
 	return array($r,$m,$b);
 }
-
+
+
 ?>

@@ -270,7 +270,7 @@
 			} else {
 				echo " <a href=\"addquestions.php?aid={$ids[$i]}&cid=$cid\">Q</a>";
 			}
-			echo " <a href=\"addassessment.php?id={$ids[$i]}&cid=$cid\">S</a>\n";
+			echo " <a href=\"addassessment.php?id={$ids[$i]}&cid=$cid&from=mcd\">S</a>\n";
 		}
 		echo "</td>";
 				  

@@ -691,13 +691,13 @@ END;
 			echo "<br/>(Delete and Transfer only apply to group's questions)\n";
 		}
 		echo "<table id=myTable class=gb><thead>\n";
-		echo "<tr><th>&nbsp;</th><th>Description</th><th>&nbsp;</th><th>Type</th><th>Times Used</th><th>Last Mod</th>";
+		echo "<tr><th>&nbsp;</th><th>Description</th><th>&nbsp;</th><th>Action</th><th>Type</th><th>Times Used</th><th>Last Mod</th>";
 		if ($isadmin || $isgrpadmin) { echo "<th>Owner</th>";} else {echo "<th>Mine</th>";}
 		if ($searchall==1) {
 			echo "<th>Library</th>";
 		}
 		//echo "<th>Source</th><th>&nbsp;</th><th>&nbsp;</th><th>&nbsp;</th></tr>\n";
-		echo "<th>Action</th></tr>\n";
+		echo "</tr>\n";
 		echo "</thead><tbody>\n";
 		$alt = 0;
 		$lastlib = -1;
@@ -719,7 +719,18 @@ END;
 			echo "<td><input type=checkbox name='nchecked[]' id='qo$ln' value='{$line['id']}'></td>\n";
 			echo "<td>{$line['description']}</td>";
 			echo "<td><input type=button value=\"Preview\" onClick=\"previewq('selform',$ln,{$line['id']})\"/></td>\n";
-			
+			echo "<td><select onchange=\"doaction(this.value,{$line['id']})\"><option value=\"0\">Action..</option>";
+			if ($isadmin || ($isgrpadmin && $line['groupid']==$groupid) || $line['ownerid']==$userid || $line['userights']>2) {
+				echo '<option value="mod">Modify Code</option>';
+			} else {
+				echo '<option value="mod">View Code</option>';
+			}
+			echo '<option value="temp">Template</option>';
+			if ($isadmin || ($isgrpadmin && $line['groupid']==$groupid) || $line['ownerid']==$userid) {
+				echo '<option value="del">Delete</option>';
+				echo '<option value="tr">Transfer</option>';
+			} 
+			echo '</select></td>';
 			echo "<td>{$line['qtype']}</td><td class=c>$times</td>\n";
 			$lastmod = date("m/d/y",$line['lastmoddate']);
 			echo "<td>$lastmod</td>";
@@ -751,28 +762,17 @@ END;
 				echo "<td></td>\n";
 			}
 			*/
-			echo "<td><select onchange=\"doaction(this.value,{$line['id']})\"><option value=\"0\">Action..</option>";
-			if ($isadmin || ($isgrpadmin && $line['groupid']==$groupid) || $line['ownerid']==$userid || $line['userights']>2) {
-				echo '<option value="mod">Modify Code</option>';
-			} else {
-				echo '<option value="mod">View Code</option>';
-			}
-			echo '<option value="temp">Template</option>';
-			if ($isadmin || ($isgrpadmin && $line['groupid']==$groupid) || $line['ownerid']==$userid) {
-				echo '<option value="del">Delete</option>';
-				echo '<option value="tr">Transfer</option>';
-			} 
-			echo '</select></td>';
+			
 			echo "</tr>\n";
 			$ln++;
 		}
 		echo "</tbody></table>\n";
 		echo "<script type=\"text/javascript\">\n";
-		echo "initSortTable('myTable',Array(false,'S',false,'S','N','D',";
+		echo "initSortTable('myTable',Array(false,'S',false,false,'S','N','D'";
 		//if ($isadmin) { echo "'N',";} else {echo "'S',";}
-		echo "'S',";
+		echo ",'S'";
 		//echo "false,false,false,false),true);\n";
-		echo "false),true);\n";
+		echo "),true);\n";
 		echo "</script>\n";
 		echo "</form>\n";
 		echo "<p></p>\n";

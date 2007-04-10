@@ -1279,6 +1279,13 @@
 						}
 					}
 					if ($assessmenttype[$k]=="Practice") {$gb[0][$pos] .= " (PT)";}
+					if ($isteacher && $isdisp) {
+						if (isset($assessments[$k])) {
+							$gb[0][$pos] .= "<br/><a class=small href=\"addassessment.php?id={$assessments[$k]}&cid=$cid&from=gb\">[Settings]</a>";
+						} else if (isset($grades[$k])) {
+							$gb[0][$pos] .= "<br/><a class=small href=\"addgrades.php?stu=$stu&cid=$cid&gbmode=$gbmode&grades=all&gbitem={$grades[$k]}\">[Settings]</a>";
+						}
+					}
 					$pos++;
 				}
 			}
@@ -1303,7 +1310,13 @@
 					}
 				}
 				if ($assessmenttype[$k]=="Practice") {$gb[0][$pos] .= " (PT)";}
-				
+				if ($isteacher && $isdisp) {
+					if (isset($assessments[$k])) {
+						$gb[0][$pos] .= "<br/><a class=small href=\"addassessment.php?id={$assessments[$k]}&cid=$cid&from=gb\">[Settings]</a>";
+					} else if (isset($grades[$k])) {
+						$gb[0][$pos] .= "<br/><a class=small href=\"addgrades.php?stu=$stu&cid=$cid&gbmode=$gbmode&grades=all&gbitem={$grades[$k]}\">[Settings]</a>";
+					}
+				}
 				$pos++;
 			}
 		} 

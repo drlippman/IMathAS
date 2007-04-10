@@ -155,6 +155,7 @@
    $openblocks = Array(0);
    if (isset($_COOKIE['openblocks-'.$cid]) && $_COOKIE['openblocks-'.$cid]!='') {$openblocks = explode(',',$_COOKIE['openblocks-'.$cid]); $firstload=false;} else {$firstload=true;}
    $oblist = implode(',',$openblocks);
+   
    echo "<script>\n";
    echo "var getbiaddr = 'getblockitems.php?cid=$cid&folder=';\n";
    echo "var oblist = '$oblist';\n";

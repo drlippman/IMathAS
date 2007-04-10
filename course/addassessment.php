@@ -13,6 +13,11 @@
 	
 	$cid = $_GET['cid'];
 	$block = $_GET['block'];
+	if (isset($_GET['from'])) {
+		$from = $_GET['from'];
+	} else {
+		$from = 'cp';
+	}
 	
 	if (isset($_GET['remove'])) {
 		if ($_GET['remove']=="really") {
@@ -46,6 +51,7 @@
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
+			
 			exit;
 		} else {
 			require("../header.php");
@@ -108,6 +114,8 @@
 			$showhints = 0;
 		}
 		
+		$timelimit = $_POST['timelimit'];
+		
 		if ($_POST['deffeedback']=="Practice" || $_POST['deffeedback']=="Homework") {
 			$deffeedback = $_POST['deffeedback'].'-'.$_POST['showansprac'];
 		} else {
@@ -122,7 +130,7 @@
 		if ($_POST['copyfrom']!=0) {
 			$query = "SELECT timelimit,displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,showcat,intro,startdate,enddate,reviewdate,isgroup,showhints FROM imas_assessments WHERE id='{$_POST['copyfrom']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			list($_POST['timelimit'],$_POST['displaymethod'],$_POST['defpoints'],$_POST['defattempts'],$_POST['defpenalty'],$deffeedback,$shuffle,$_POST['gbcat'],$_POST['password'],$_POST['showqcat'],$cpintro,$cpstartdate,$cpenddate,$cpreviewdate,$isgroup,$showhints) = mysql_fetch_row($result);
+			list($timelimit,$_POST['displaymethod'],$_POST['defpoints'],$_POST['defattempts'],$_POST['defpenalty'],$deffeedback,$shuffle,$_POST['gbcat'],$_POST['password'],$_POST['showqcat'],$cpintro,$cpstartdate,$cpenddate,$cpreviewdate,$isgroup,$showhints) = mysql_fetch_row($result);
 			if (isset($_POST['copyinstr'])) {
 				$_POST['intro'] = addslashes($cpintro);
 			}
@@ -140,22 +148,28 @@
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 			if (isset($_POST['defpoints'])) {
-				$query = "UPDATE imas_assessments SET name='{$_POST['name']}',summary='{$_POST['summary']}',intro='{$_POST['intro']}',startdate=$startdate,enddate=$enddate,reviewdate=$reviewdate,timelimit='{$_POST['timelimit']}',minscore='{$_POST['minscore']}',isgroup='$isgroup',showhints='$showhints',";
+				$query = "UPDATE imas_assessments SET name='{$_POST['name']}',summary='{$_POST['summary']}',intro='{$_POST['intro']}',startdate=$startdate,enddate=$enddate,reviewdate=$reviewdate,timelimit='$timelimit',minscore='{$_POST['minscore']}',isgroup='$isgroup',showhints='$showhints',";
 				$query .= "displaymethod='{$_POST['displaymethod']}',defpoints='{$_POST['defpoints']}',defattempts='{$_POST['defattempts']}',defpenalty='{$_POST['defpenalty']}',deffeedback='$deffeedback',shuffle='$shuffle',gbcategory='{$_POST['gbcat']}',password='{$_POST['password']}',cntingb='{$_POST['cntingb']}',showcat='{$_POST['showqcat']}' ";
 				$query .= "WHERE id='{$_GET['id']}';";
 			} else { //has been taken - not updating "don't change" settings
-				$query = "UPDATE imas_assessments SET name='{$_POST['name']}',summary='{$_POST['summary']}',intro='{$_POST['intro']}',startdate=$startdate,enddate=$enddate,reviewdate=$reviewdate,timelimit='{$_POST['timelimit']}',minscore='{$_POST['minscore']}',isgroup='$isgroup',showhints='$showhints',";
+				$query = "UPDATE imas_assessments SET name='{$_POST['name']}',summary='{$_POST['summary']}',intro='{$_POST['intro']}',startdate=$startdate,enddate=$enddate,reviewdate=$reviewdate,timelimit='$timelimit',minscore='{$_POST['minscore']}',isgroup='$isgroup',showhints='$showhints',";
 				$query .= "displaymethod='{$_POST['displaymethod']}',defattempts='{$_POST['defattempts']}',deffeedback='$deffeedback',shuffle='$shuffle',gbcategory='{$_POST['gbcat']}',password='{$_POST['password']}',cntingb='{$_POST['cntingb']}',showcat='{$_POST['showqcat']}' ";
 				$query .= "WHERE id='{$_GET['id']}';";
 			}
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
+			if ($from=='gb') {
+				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid={$_GET['cid']}");
+			} else if ($from=='mcd') {
+				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/masschgdates.php?cid={$_GET['cid']}");
+			} else {
+				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
+			}
 			exit;
 		} else { //add new
 									
 			$query = "INSERT INTO imas_assessments (courseid,name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,";
 			$query .= "displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,showcat,isgroup,showhints) VALUES ";
-			$query .= "('$cid','{$_POST['name']}','{$_POST['summary']}','{$_POST['intro']}',$startdate,$enddate,$reviewdate,'{$_POST['timelimit']}','{$_POST['minscore']}',";
+			$query .= "('$cid','{$_POST['name']}','{$_POST['summary']}','{$_POST['intro']}',$startdate,$enddate,$reviewdate,'$timelimit','{$_POST['minscore']}',";
 			$query .= "'{$_POST['displaymethod']}','{$_POST['defpoints']}','{$_POST['defattempts']}',";
 			$query .= "'{$_POST['defpenalty']}','$deffeedback','$shuffle','{$_POST['gbcat']}','{$_POST['password']}','{$_POST['cntingb']}','{$_POST['showqcat']}','$isgroup','$showhints');";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -203,6 +217,7 @@
 			$gbcat = $line['gbcategory'];
 			$cntingb = $line['cntingb'];
 			$showqcat = $line['showcat'];
+			$timelimit = $line['timelimit'];
 		} else {
 			//set defaults
 			$line['name'] = "Enter assessment name";
@@ -211,7 +226,7 @@
 			$startdate = time()+60*60;
 			$enddate = time() + 7*24*60*60;
 			$line['reviewdate'] = 0;
-			$line['timelimit'] = 0;
+			$timelimit = 0;
 			$line['displaymethod']= "SkipAround";
 			$line['defpoints'] = 10;
 			$line['defattempts'] = 1;
@@ -269,6 +284,12 @@
 	$pagetitle = "Assessment Settings";
 	require("../header.php");
 	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+	if ($from=='gb') {
+		echo "&gt; <a href=\"gradebook.php?cid=$cid\">Gradebook</a> ";
+	} else if ($from=='mcd') {
+		echo "&gt; <a href=\"masschgdates.php?cid=$cid\">Mass Change Dates</a> ";
+	} 
+	
 	if (isset($_GET['id'])) {
 		echo "&gt; Modify Assessment</div>\n";
 		echo "<h2>Modify Assessment <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h2>\n";
@@ -311,7 +332,7 @@ function chgcopyfrom() {
 	}
 }
 </script>
-<form method=post action="addassessment.php?block=<?php echo $block;?>&cid=<?php echo $cid; if (isset($_GET['id'])) {echo "&id={$_GET['id']}";}?>&folder=<?php echo $_GET['folder'];?>">
+<form method=post action="addassessment.php?block=<?php echo $block;?>&cid=<?php echo $cid; if (isset($_GET['id'])) {echo "&id={$_GET['id']}";}?>&folder=<?php echo $_GET['folder'];?>&from=<?php echo $_GET['from'];?>">
 <span class=form>Assessment Name:</span><span class=formright><input type=text size=30 name=name value="<?php echo $line['name'];?>"></span><BR class=form>
 
 Summary:<BR>
@@ -374,7 +395,7 @@ at <input type=text size=10 name=rtime value="<?php echo $rtime;?>"></span><BR c
 
 <span class=form>Minimum score to receive credit: </span><span class=formright><input type=text size=4 name=minscore value="<?php echo $line['minscore'];?>"></span><BR class=form>
 
-<span class=form>Time Limit (minutes, 0 for no time limit): </span><span class=formright><input type=text size=4 name=timelimit value="<?php echo $line['timelimit'];?>"></span><BR class=form>
+<span class=form>Time Limit (minutes, 0 for no time limit): </span><span class=formright><input type=text size=4 name=timelimit value="<?php echo $timelimit;?>"></span><BR class=form>
 
 <span class=form>Display method: </span><span class=formright><select name="displaymethod">
 	<option value="AllAtOnce" <?php if ($line['displaymethod']=="AllAtOnce") {echo "SELECTED";} ?>>Full test at once</option>

@@ -50,6 +50,7 @@
    $openblocks = Array(0);
    if (isset($_COOKIE['openblocks-'.$cid]) && $_COOKIE['openblocks-'.$cid]!='') {$openblocks = explode(',',$_COOKIE['openblocks-'.$cid]); $firstload=false;} else {$firstload=true;}
    $oblist = implode(',',$openblocks);
+   $firstload = true;
    echo "<script>\n";
    echo "  oblist += ',$oblist';\n";
    echo "</script>\n";

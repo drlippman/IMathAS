@@ -379,6 +379,9 @@ END;
 				}
 			} else {
 				echo "<h3>Add Library</h3>\n";
+				if (isset($_GET['parent'])) {
+					$parent = $_GET['parent'];
+				}
 			}
 			if (!isset($name)) { $name = '';}
 			if (!isset($rights)) {
@@ -579,9 +582,10 @@ END;
 						//}
 						echo "<span class=op>";
 						if ($ownerids[$child]==$userid || ($isgrpadmin && $groupids[$child]==$groupid) || $isadmin) {
-							echo "<a href=\"managelibs.php?cid=$cid&modify=$child\">Modify</a> ";
-							echo "<a href=\"managelibs.php?cid=$cid&remove=$child\">Delete</a> ";
-							echo "<a href=\"managelibs.php?cid=$cid&transfer=$child\">Transfer</a> ";
+							echo "<a href=\"managelibs.php?cid=$cid&modify=$child\">Modify</a> | ";
+							echo "<a href=\"managelibs.php?cid=$cid&remove=$child\">Delete</a> | ";
+							echo "<a href=\"managelibs.php?cid=$cid&transfer=$child\">Transfer</a> | ";
+							echo "<a href=\"managelibs.php?cid=$cid&modify=new&parent=$child\">Add Sub</a> ";
 						}
 						echo "<ul class=hide id=$child>\n";
 						echo "</span>";
@@ -597,9 +601,9 @@ END;
 						//}
 						echo "<span class=op>";
 						if ($ownerids[$child]==$userid || ($isgrpadmin && $groupids[$child]==$groupid) || $isadmin) {
-							echo "<a href=\"managelibs.php?cid=$cid&modify=$child\">Modify</a> ";
-							echo "<a href=\"managelibs.php?cid=$cid&remove=$child\">Delete</a> ";
-							echo "<a href=\"managelibs.php?cid=$cid&transfer=$child\">Transfer</a> ";
+							echo "<a href=\"managelibs.php?cid=$cid&modify=$child\">Modify</a> | ";
+							echo "<a href=\"managelibs.php?cid=$cid&remove=$child\">Delete</a> | ";
+							echo "<a href=\"managelibs.php?cid=$cid&transfer=$child\">Transfer</a> | ";
 						}
 						echo "<a href=\"reviewlibrary.php?cid=$cid&lib=$child\">Preview</a>";
 						echo "</span>";
