@@ -572,7 +572,7 @@
 		   }
 		   if ($line['itemtype']=="Assessment") {
 			   $typeid = $line['typeid'];
-			   $query = "SELECT name,summary,startdate,enddate,reviewdate,deffeedback FROM imas_assessments WHERE id='$typeid'";
+			   $query = "SELECT name,summary,startdate,enddate,reviewdate,deffeedback,reqscore,reqscoreaid FROM imas_assessments WHERE id='$typeid'";
 			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			  
@@ -600,8 +600,20 @@
 			   } else {
 				   $reviewdate = tzdate("M j, Y, g:i a",$line['reviewdate']);
 			   }
-			   
-			   if ($line['startdate']<$now && $line['enddate']>$now) {
+			   $nothidden = true;
+			   if ($line['reqscore']>0 && $line['reqscoreaid']>0 && !isset($teacherid)) {
+				   $query = "SELECT scores FROM imas_assessment_sessions WHERE assessmentid='{$line['reqscoreaid']}' AND userid='$userid'";
+				   $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				   if (mysql_num_rows($result)==0) {
+					   $nothidden = false;
+				   } else {
+					   $scores = mysql_result($result,0,0);
+					   if (getpts($scores)<$line['reqscore']) {
+						   $nothidden = false;
+					   }
+				   }
+			   }
+			   if ($line['startdate']<$now && $line['enddate']>$now && $nothidden) {
 				   echo "<div class=item>\n";
 				   if (($hideicons&1)==0) {
 					   echo "<div class=icon style=\"background-color: " . makecolor2($line['startdate'],$line['enddate'],$now) . ";\">?</div>";
@@ -620,7 +632,7 @@
 				   }
 				   echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
 				   echo "</div>\n";
-			   } else if ($line['startdate']<$now && $line['reviewdate']>$now) {
+			   } else if ($line['startdate']<$now && $line['reviewdate']>$now && $nothidden) {
 				   echo "<div class=item>\n";
 				   if (($hideicons&1)==0) {
 					   echo "<div class=icon style=\"background-color: #99f;\">R</div>";
@@ -1028,6 +1040,24 @@
 		   $color = '#0f0';
 	   }
 	    return $color;
+   }
+   function getpts($scs) {
+	   $tot = 0;
+	   foreach(explode(',',$scs) as $sc) {
+		if (strpos($sc,'~')===false) {
+			if ($sc>0) { 
+				$tot += $sc;
+			} 
+		} else {
+			$sc = explode('~',$sc);
+			foreach ($sc as $s) {
+				if ($s>0) { 
+					$tot+=$s;
+				}
+			}
+		}
+	   }
+	   return $tot;
    }
 ?>
 

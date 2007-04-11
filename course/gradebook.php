@@ -690,8 +690,8 @@
 		
 		if ($isteacher) {echo "<p><a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}&clearattempt=true\">Clear Attempt</a> <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}&clearscores=true\">Clear Scores</a></p>\n";}
 		
-		if (($line['timelimit']>0) && ($line['endtime'] - $line['starttime'] > $line['timelimit']*60)) {
-			$over = $line['endtime']-$line['starttime'] - $line['timelimit']*60;
+		if (($line['timelimit']>0) && ($line['endtime'] - $line['starttime'] > $line['timelimit'])) {
+			$over = $line['endtime']-$line['starttime'] - $line['timelimit'];
 			echo "<p>Time limit exceeded by ";
 			if ($over > 60) {
 				$overmin = floor($over/60);
@@ -699,7 +699,7 @@
 				$over = $over - $overmin*60;
 			}
 			echo "$over seconds.<BR>\n";
-			$reset = $line['endtime']-$line['timelimit']*60;
+			$reset = $line['endtime']-$line['timelimit'];
 			if ($isteacher) {
 				echo "<a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&starttime=$reset&asid={$_GET['asid']}&cid=$cid&uid={$_GET['uid']}\">Clear overtime and accept grade</a></p>\n";
 			}
@@ -1530,7 +1530,7 @@
 						}
 					} else 	if ($IP[$assessments[$i]]==1 && $enddate[$i]>$now) {
 						$gb[$ln][$pos] .= "{$pts[$assessments[$i]]}&nbsp;(IP)";
-					} else	if (($timelimits[$i]>0) &&($timeused[$assessments[$i]] > $timelimits[$i]*60)) {
+					} else	if (($timelimits[$i]>0) &&($timeused[$assessments[$i]] > $timelimits[$i])) {
 						$gb[$ln][$pos] .= "{$pts[$assessments[$i]]}&nbsp;(OT)";
 					} else if ($assessmenttype[$i]=="Practice") {
 						$gb[$ln][$pos] .= "{$pts[$assessments[$i]]}&nbsp;(PT)";
@@ -1716,13 +1716,41 @@
 				}
 				ksort($feedbacks);
 				$tots = array_splice($feedbacks,$totalspos);
+				if ($catfilter<0) { //move total totals to far left
+					if ($useweights==0) { //two totals cols
+						$tottots = array_splice($tots,-2);
+						array_splice($tots,0,0,$tottots);
+					} else if ($useweights==1) {
+						$tottots = array_splice($tots,-1);
+						array_splice($tots,0,0,$tottots);
+					}
+				}
+						
 				array_splice($feedbacks,$shift,0,$tots);
 			}
 			for ($i=0;$i<$ln;$i++) {
 				$tots = array_splice($gb[$i],$totalspos);
+				if ($catfilter<0) { //move total totals to far left
+					if ($useweights==0) { //two totals cols
+						$tottots = array_splice($tots,-2);
+						array_splice($tots,0,0,$tottots);
+					} else if ($useweights==1) {
+						$tottots = array_splice($tots,-1);
+						array_splice($tots,0,0,$tottots);
+					}
+				}
 				array_splice($gb[$i],$shift,0,$tots);
 			}
 			$tots = array_splice($cathdr,$totalspos);
+			if ($catfilter<0) { //move total totals to far left
+				if ($useweights==0) { //two totals cols
+					$tottots = array_splice($tots,-2);
+					array_splice($tots,0,0,$tottots);
+				} else if ($useweights==1) {
+					$tottots = array_splice($tots,-1);
+					array_splice($tots,0,0,$tottots);
+				}
+			}
 			array_splice($cathdr,$shift,0,$tots);
 			
 		}

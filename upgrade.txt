@@ -1,6 +1,42 @@
 Upgrade Notes
 
 *********************
+** IMathAS 1.3     **
+*********************
+
+NOT YET IMPLEMENTED
+imas_written
+id		int 10
+courseid	int 10
+name		varchar 254
+summary		text
+instructions	text
+startdate	int 10
+enddate		int 10
+lastmoddate	int 10
+points		smallint 4
+gbcat		int 10
+cntingb		tinyint 1
+isgroup		tinyint 1
+
+imas_written_grades
+id		int 10
+writtenid	int 10
+userid		int 10
+score		decimal(5,1)
+feedback	text
+answer		text
+file		varchar 254
+agroupid	int 10
+
+#Current
+ALTER TABLE `imas_assessments` ADD `reqscoreaid` INT( 10 ) UNSIGNED NOT NULL DEFAULT '0',
+ADD `reqscore` SMALLINT( 4 ) UNSIGNED NOT NULL DEFAULT '0';
+
+UPDATE imas_assessments SET timelimit = timelimit*60 WHERE timelimit>0
+
+
+*********************
 ** IMathAS 1.2     **
 *********************
 

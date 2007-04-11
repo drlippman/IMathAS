@@ -114,7 +114,7 @@
 			$showhints = 0;
 		}
 		
-		$timelimit = $_POST['timelimit'];
+		$timelimit = $_POST['timelimit']*60;
 		
 		if ($_POST['deffeedback']=="Practice" || $_POST['deffeedback']=="Homework") {
 			$deffeedback = $_POST['deffeedback'].'-'.$_POST['showansprac'];
@@ -128,9 +128,9 @@
 			$_POST['defpenalty'] = 'S'.$_POST['skippenalty'].$_POST['defpenalty'];
 		}
 		if ($_POST['copyfrom']!=0) {
-			$query = "SELECT timelimit,displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,showcat,intro,startdate,enddate,reviewdate,isgroup,showhints FROM imas_assessments WHERE id='{$_POST['copyfrom']}'";
+			$query = "SELECT timelimit,displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,showcat,intro,startdate,enddate,reviewdate,isgroup,showhints,reqscore,reqscoreaid FROM imas_assessments WHERE id='{$_POST['copyfrom']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			list($timelimit,$_POST['displaymethod'],$_POST['defpoints'],$_POST['defattempts'],$_POST['defpenalty'],$deffeedback,$shuffle,$_POST['gbcat'],$_POST['password'],$_POST['showqcat'],$cpintro,$cpstartdate,$cpenddate,$cpreviewdate,$isgroup,$showhints) = mysql_fetch_row($result);
+			list($timelimit,$_POST['displaymethod'],$_POST['defpoints'],$_POST['defattempts'],$_POST['defpenalty'],$deffeedback,$shuffle,$_POST['gbcat'],$_POST['password'],$_POST['showqcat'],$cpintro,$cpstartdate,$cpenddate,$cpreviewdate,$isgroup,$showhints,$_POST['reqscore'],$_POST['reqscoreaid']) = mysql_fetch_row($result);
 			if (isset($_POST['copyinstr'])) {
 				$_POST['intro'] = addslashes($cpintro);
 			}
@@ -149,11 +149,11 @@
 			}
 			if (isset($_POST['defpoints'])) {
 				$query = "UPDATE imas_assessments SET name='{$_POST['name']}',summary='{$_POST['summary']}',intro='{$_POST['intro']}',startdate=$startdate,enddate=$enddate,reviewdate=$reviewdate,timelimit='$timelimit',minscore='{$_POST['minscore']}',isgroup='$isgroup',showhints='$showhints',";
-				$query .= "displaymethod='{$_POST['displaymethod']}',defpoints='{$_POST['defpoints']}',defattempts='{$_POST['defattempts']}',defpenalty='{$_POST['defpenalty']}',deffeedback='$deffeedback',shuffle='$shuffle',gbcategory='{$_POST['gbcat']}',password='{$_POST['password']}',cntingb='{$_POST['cntingb']}',showcat='{$_POST['showqcat']}' ";
+				$query .= "displaymethod='{$_POST['displaymethod']}',defpoints='{$_POST['defpoints']}',defattempts='{$_POST['defattempts']}',defpenalty='{$_POST['defpenalty']}',deffeedback='$deffeedback',shuffle='$shuffle',gbcategory='{$_POST['gbcat']}',password='{$_POST['password']}',cntingb='{$_POST['cntingb']}',showcat='{$_POST['showqcat']}',reqscore='{$_POST['reqscore']}',reqscoreaid='{$_POST['reqscoreaid']}' ";
 				$query .= "WHERE id='{$_GET['id']}';";
 			} else { //has been taken - not updating "don't change" settings
 				$query = "UPDATE imas_assessments SET name='{$_POST['name']}',summary='{$_POST['summary']}',intro='{$_POST['intro']}',startdate=$startdate,enddate=$enddate,reviewdate=$reviewdate,timelimit='$timelimit',minscore='{$_POST['minscore']}',isgroup='$isgroup',showhints='$showhints',";
-				$query .= "displaymethod='{$_POST['displaymethod']}',defattempts='{$_POST['defattempts']}',deffeedback='$deffeedback',shuffle='$shuffle',gbcategory='{$_POST['gbcat']}',password='{$_POST['password']}',cntingb='{$_POST['cntingb']}',showcat='{$_POST['showqcat']}' ";
+				$query .= "displaymethod='{$_POST['displaymethod']}',defattempts='{$_POST['defattempts']}',deffeedback='$deffeedback',shuffle='$shuffle',gbcategory='{$_POST['gbcat']}',password='{$_POST['password']}',cntingb='{$_POST['cntingb']}',showcat='{$_POST['showqcat']}',reqscore='{$_POST['reqscore']}',reqscoreaid='{$_POST['reqscoreaid']}' ";
 				$query .= "WHERE id='{$_GET['id']}';";
 			}
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -168,10 +168,10 @@
 		} else { //add new
 									
 			$query = "INSERT INTO imas_assessments (courseid,name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,";
-			$query .= "displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,showcat,isgroup,showhints) VALUES ";
+			$query .= "displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,showcat,isgroup,showhints,reqscore,reqscoreaid) VALUES ";
 			$query .= "('$cid','{$_POST['name']}','{$_POST['summary']}','{$_POST['intro']}',$startdate,$enddate,$reviewdate,'$timelimit','{$_POST['minscore']}',";
 			$query .= "'{$_POST['displaymethod']}','{$_POST['defpoints']}','{$_POST['defattempts']}',";
-			$query .= "'{$_POST['defpenalty']}','$deffeedback','$shuffle','{$_POST['gbcat']}','{$_POST['password']}','{$_POST['cntingb']}','{$_POST['showqcat']}','$isgroup','$showhints');";
+			$query .= "'{$_POST['defpenalty']}','$deffeedback','$shuffle','{$_POST['gbcat']}','{$_POST['password']}','{$_POST['cntingb']}','{$_POST['showqcat']}','$isgroup','$showhints','{$_POST['reqscore']}','{$_POST['reqscoreaid']}');";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			
 			$newaid = mysql_insert_id();
@@ -217,7 +217,7 @@
 			$gbcat = $line['gbcategory'];
 			$cntingb = $line['cntingb'];
 			$showqcat = $line['showcat'];
-			$timelimit = $line['timelimit'];
+			$timelimit = $line['timelimit']/60;
 		} else {
 			//set defaults
 			$line['name'] = "Enter assessment name";
@@ -239,6 +239,8 @@
 			$line['minscore'] = 0;
 			$line['isgroup'] = 0;
 			$line['showhints']=1;
+			$line['reqscore'] = 0;
+			$line['reqscoreaid'] = 0;
 			$gbcat = 0;
 			$cntingb = 1;
 			$showqcat = 0;
@@ -377,13 +379,16 @@ at <input type=text size=10 name=rtime value="<?php echo $rtime;?>"></span><BR c
 <?php
 	$query = "SELECT id,name FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$aidarr = array();
 	if (mysql_num_rows($result)>0) {
 		echo "<span class=form>Copy Options from:</span><span class=formright><select name=copyfrom id=copyfrom onChange=\"chgcopyfrom()\">\n";
 		echo "<option value=\"0\">None - use settings below</option>\n";
 		while ($row = mysql_fetch_row($result)) {
 			echo "<option value=\"{$row[0]}\">{$row[1]}</option>\n";
+			$aidarr[$row[0]] = $row[1];
 		}
 		echo "</select></span><br class=form>\n";
+		
 	}	
 ?>
 <div id="copyfromoptions" class="hidden">
@@ -394,6 +399,25 @@ at <input type=text size=10 name=rtime value="<?php echo $rtime;?>"></span><BR c
 <span class=form>Require Password (blank for none):</span><span class=formright><input type=text name=password value="<?php echo $line['password'];?>"></span><br class=form />
 
 <span class=form>Minimum score to receive credit: </span><span class=formright><input type=text size=4 name=minscore value="<?php echo $line['minscore'];?>"></span><BR class=form>
+
+<span class=form>Show based on another assessment: </span><span class=formright>Show only after a score of <input type=text size=4 name=reqscore value="<?php echo $line['reqscore'];?>">
+   points is obtained on <select name=reqscoreaid>
+<?php
+	echo '<option value=0 ';
+	if ($line['reqscoreaid']==0) {echo 'selected="1"';}
+	echo '>Don\'t Use</option>';
+	if (count($aidarr)>0) {
+		foreach($aidarr as $id=>$name) {
+			echo "<option value=\"$id\" ";
+			if ($line['reqscoreaid']==$id) {
+				echo 'selected="1"';
+			}
+			echo ">$name</option>";
+		}
+	}
+?>
+</select></span><br class=form>
+	
 
 <span class=form>Time Limit (minutes, 0 for no time limit): </span><span class=formright><input type=text size=4 name=timelimit value="<?php echo $timelimit;?>"></span><BR class=form>
 

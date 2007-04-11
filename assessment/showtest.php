@@ -524,16 +524,27 @@
 	}
 	if ($testsettings['timelimit']>0 && !$isreview) {
 		$now = time();
-		$remaining = $testsettings['timelimit']*60-($now - $starttime);
-		if ($testsettings['timelimit']>60) {
-			$tlhrs = floor($testsettings['timelimit']/60);
-			$tlmin = $testsettings['timelimit'] % 60;
+		$remaining = $testsettings['timelimit']-($now - $starttime);
+		if ($testsettings['timelimit']>3600) {
+			$tlhrs = floor($testsettings['timelimit']/3600);
+			$tlrem = $testsettings['timelimit'] % 3600;
+			$tlmin = floor($tlrem/60);
+			$tlsec = $tlrem % 60;
 			$tlwrds = "$tlhrs hour";
 			if ($tlhrs > 1) { $tlwrds .= "s";}
 			if ($tlmin > 0) { $tlwrds .= ", $tlmin minute";}
 			if ($tlmin > 1) { $tlwrds .= "s";}
+			if ($tlsec > 0) { $tlwrds .= ", $tlsec second";}
+			if ($tlsec > 1) { $tlwrds .= "s";}
+		} else if ($testsettings['timelimit']>60) {
+			$tlmin = floor($testsettings['timelimit']/60);
+			$tlsec = $testsettings['timelimit'] % 60;
+			$tlwrds = "$tlmin minute";
+			if ($tlmin > 1) { $tlwrds .= "s";}
+			if ($tlsec > 0) { $tlwrds .= ", $tlsec second";}
+			if ($tlsec > 1) { $tlwrds .= "s";}
 		} else {
-			$tlwrds = $testsettings['timelimit'] . " minute(s)";
+			$tlwrds = $testsettings['timelimit'] . " second(s)";
 		}
 		if ($remaining < 0) {
 			echo "<div class=right>Timelimit: $tlwrds.  Time Expired</div>\n";
@@ -560,6 +571,8 @@
 		echo "	  if (hours > 0) { str += hours + ':';}\n";
 		echo "    if (hours > 0 && minutes <10) { str += '0';}\n";
 		echo "	  if (minutes >0) {str += minutes + ':';}\n";
+		echo "	    else if (hours>0) {str += '0:';}\n";
+		echo "      else {str += ':';}\n";
 		echo "    if (seconds<10) { str += '0';}\n";
 		echo "	  str += seconds + '';\n";
 		echo "	  document.getElementById('timeremaining').innerHTML = str;\n";
@@ -1469,8 +1482,8 @@
 		
 		//if timelimit is exceeded
 		$now = time();
-		if (($testsettings['timelimit']>0) && (($now-$GLOBALS['starttime'])/60 > $testsettings['timelimit'])) {
-			$over = $now-$GLOBALS['starttime'] - $testsettings['timelimit']*60;
+		if (($testsettings['timelimit']>0) && (($now-$GLOBALS['starttime']) > $testsettings['timelimit'])) {
+			$over = $now-$GLOBALS['starttime'] - $testsettings['timelimit'];
 			echo "<p>Time limit exceeded by ";
 			if ($over > 60) {
 				$overmin = floor($over/60);

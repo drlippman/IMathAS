@@ -69,7 +69,8 @@
 		}*/
 		$sets = array();
 		if (isset($_POST['chgtimelimit'])) {
-			$sets[] = "timelimit='{$_POST['timelimit']}'";
+			$timelimit = $_POST['timelimit']*60;
+			$sets[] = "timelimit='$timelimit'";
 		}
 		if (isset($_POST['chgdisplaymethod'])) {
 			$sets[] = "displaymethod='{$_POST['displaymethod']}'";
@@ -202,7 +203,7 @@ foreach($assesses as $k=>$v) {
 }
 ?>
 </select></td></tr>
-<tr><td><input type="checkbox" name="chgtimelimit"/></td><td class="r">Time Limit (minutes, 0 for no time limit): </td><td><input type=text size=4 name=timelimit value="<?php echo $line['timelimit'];?>"></td></tr>
+<tr><td><input type="checkbox" name="chgtimelimit"/></td><td class="r">Time Limit (minutes, 0 for no time limit): </td><td><input type=text size=4 name=timelimit value="<?php echo $line['timelimit']/60;?>"></td></tr>
 
 <tr><td><input type="checkbox" name="chgdisplaymethod"/></td><td class="r">Display method: </td><td><select name="displaymethod">
 	<option value="AllAtOnce" <?php if ($line['displaymethod']=="AllAtOnce") {echo "SELECTED";} ?>>Full test at once</option>
