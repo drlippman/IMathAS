@@ -488,6 +488,64 @@ $sql = 'CREATE TABLE `imas_gbcats` ('
         . ' COMMENT = \'Gradebook Categories\';';
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 
+$sql = 'CREATE TABLE `imas_written` ('
+        . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
+        . ' `courseid` INT(10) UNSIGNED NOT NULL, '
+        . ' `name` VARCHAR(254) NOT NULL, '
+        . ' `summary` TEXT NOT NULL, '
+        . ' `instructions` TEXT NOT NULL, '
+	. ' `fileorder` TEXT NOT NULL, '
+        . ' `qlink` INT(10) UNSIGNED NOT NULL DEFAULT \'0\', '
+        . ' `startdate` INT(10) UNSIGNED NOT NULL, '
+        . ' `enddate` INT(10) UNSIGNED NOT NULL, '
+        . ' `points` SMALLINT(4) NOT NULL, '
+        . ' `gbcat` INT(10) UNSIGNED NOT NULL DEFAULT \'0\', '
+        . ' `cntingb` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'1\', '
+        . ' `isgroup` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\','
+        . ' INDEX (`courseid`)'
+        . ' )'
+        . ' TYPE = innodb'
+        . ' COMMENT = \'Written Assignments\';';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+
+$sql = 'CREATE TABLE `imas_written_grades` ('
+        . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
+        . ' `writtenid` INT(10) UNSIGNED NOT NULL, '
+        . ' `userid` INT(10) UNSIGNED NOT NULL, '
+        . ' `score` DECIMAL(5,1) UNSIGNED NOT NULL, '
+	. ' `lastmoddate` INT(10) UNSIGNED NOT NULL, '
+	. ' `qseed` SMALLINT(4) NOT NULL, '
+        . ' `feedback` TEXT NOT NULL, '
+        . ' `answer` TEXT NOT NULL, '
+        . ' `agroupid` INT(10) NOT NULL,'
+        . ' INDEX (`writtenid`), INDEX (`userid`), INDEX(`agroupid`)'
+        . ' )'
+        . ' TYPE = innodb'
+        . ' COMMENT = \'Written Assignment Grades\';';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+
+$sql = 'CREATE TABLE `imas_written_stufiles` ('
+        . ' `int` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
+        . ' `wgradeid` INT(10) UNSIGNED NOT NULL, '
+        . ' `file` VARCHAR(100) NOT NULL, '
+        . ' `description` VARCHAR(254) NOT NULL,'
+        . ' INDEX (`wgradeid`)'
+        . ' )'
+        . ' TYPE = innodb'
+        . ' COMMENT = \'Written Assignment Student Files\';';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+
+$sql = 'CREATE TABLE `imas_written_instrfiles` ('
+        . ' `int` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
+        . ' `writtenid` INT(10) UNSIGNED NOT NULL, '
+        . ' `file` VARCHAR(100) NOT NULL, '
+        . ' `description` VARCHAR(254) NOT NULL,'
+        . ' INDEX (`writtenid`)'
+        . ' )'
+        . ' TYPE = innodb'
+        . ' COMMENT = \'Written Assignment Instructor Files\';';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+
 $md5pw = md5($password);
 $now = time();
 $sql = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email) VALUES ('$username','$md5pw',100,'$firstname','$lastname','$email')";

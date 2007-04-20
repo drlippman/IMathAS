@@ -1,6 +1,6 @@
 <html><body>
 <h1>Macro Library stats</h1>
-A library of Stats functions.  Version 1.4, March 28, 2006
+A library of Stats functions.  Version 1.6, April 15, 2007
 <BR><ul>
 <li><a href="#nCr">nCr</a></li>
 <li><a href="#nPr">nPr</a></li>
@@ -12,6 +12,7 @@ A library of Stats functions.  Version 1.4, March 28, 2006
 <li><a href="#median">median</a></li>
 <li><a href="#freqdist">freqdist</a></li>
 <li><a href="#frequency">frequency</a></li>
+<li><a href="#countif">countif</a></li>
 <li><a href="#histogram">histogram</a></li>
 <li><a href="#fdhistogram">fdhistogram</a></li>
 <li><a href="#normrand">normrand</a></li>
@@ -62,6 +63,12 @@ frequency(array,start,classwidth)
 <BR> array: array of data values
 <BR> start: first lower class limit
 <BR> classwidth: width of the classes
+<BR><h3><a name="countif">countif</a></h3>
+countif(array,condition)
+<BR>Returns count of items in array that meet condition
+<BR> array: array of data values
+<BR> condition: a condition, using x for data values
+<BR>Example: countif($a,"x<3 && x>2")
 <BR><h3><a name="histogram">histogram</a></h3>
 histogram(array,label,start,classwidth,[labelstart,upper])
 <BR>display macro.  Creates a histogram from a data set

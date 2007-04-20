@@ -71,6 +71,60 @@ function calculate(inputId,outputId,format) {
   }
 }
 
+//preview for calcinterval type - NOT ANYWHERE NEAR DONE - need to do onsubmit too
+function intcalculate(inputId,outputId) {
+  var fullstr = document.getElementById(inputId).value;
+  fullstr = fullstr.replace(/\s+/g,'');
+  if (fullstr.match(/DNE/i)) {
+	  fullstr = fullstr.toUpperCase();
+  } else {
+	  var calcvals = new Array();
+	  var calcstrarr = new Array();
+	  strarr = fullstr.split(/U/);
+	  for (i=0; i<strarr.length; i++) {
+		  str = strarr[i];
+		  sm = str.charAt(0);
+		  em = str.charAt(str.length-1);
+		  vals = str.substring(1,str.length-1);
+		  vals = vals.split(/,/);
+		  for (j=0; j<2; j++) {	
+			  if (vals[j].match(/oo/)) {
+				  calcvals[j] = vals[j];
+			  } else {
+				  var err = "";
+				  
+				  try {
+				    with (Math) var res = eval(mathjs(vals[j]));
+				  } catch(e) {
+				    err = "syntax incomplete";
+				  }
+				  if (!isNaN(res) && res!="Infinity") {
+					 // if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1) {
+						  vals[j] = vals[j];
+						  calcvals[j] = (Math.abs(res)<1e-15?0:res)+err;
+					  //} else {
+						//  str = "`"+str+" =` "+(Math.abs(res)<1e-15?0:res)+err;
+					  //}
+				  } 	
+			  }
+		  }
+		  strarr[i] = sm + vals[0] + ',' + vals[1] + em;
+		  calcstrarr[i] = sm + calcvals[0] + ',' + calcvals[1] + em;
+	 }
+  }
+  fullstr = '`'+strarr.join('uu') + '` = ' + calcstrarr.join(' U ');
+  
+  var outnode = document.getElementById(outputId);
+  var n = outnode.childNodes.length;
+  for (var i=0; i<n; i++)
+    outnode.removeChild(outnode.firstChild);
+  outnode.appendChild(document.createTextNode(fullstr));
+  if (!noMathRender) {
+	  AMprocessNode(outnode);
+  }
+	
+}
+
 function matrixcalc(inputId,outputId,rows,cols) {
 	
 	function calced(estr) {
@@ -189,23 +243,30 @@ function AMpreview(inputId,outputId) {
   
   //the following does a quick syntax check of the formula
   
-  var totest = '';
+  
   ptlist = pts[qn].split(",");
-  testvals = ptlist[0].split("~");
-  for (var j=0; j<vl.length; j++) {
-	totest += vars[j] + "="+testvals[j]+";"; 
-  }
+  var tstpt = 0; res = NaN;
   if (iseqn[qn]==1) {
 	str = str.replace(/(.*)=(.*)/,"$1-($2)");
   }
-  totest += mathjs(str,vl);
- 
-  var err="syntax ok";
-  try {
-    with (Math) var res = eval(totest);
-  } catch(e) {
-    err = "syntax error";
+  var totesteqn = mathjs(str,vl);
+  while (tstpt<ptlist.length && (isNaN(res) || res=="Infinity")) {
+	  var totest = '';
+	  testvals = ptlist[tstpt].split("~");
+	  for (var j=0; j<vl.length; j++) {
+		totest += vars[j] + "="+testvals[j]+";"; 
+	  }
+	  totest += totesteqn;
+	 
+	  var err="syntax ok";
+	  try {
+	    with (Math) var res = eval(totest);
+	  } catch(e) {
+	    err = "syntax error";
+	  }
+	  tstpt++;
   }
+
   if (isNaN(res) || res=="Infinity") {
 	  trg = str.match(/(sin|cos|tan|sec|csc|cot)\^/);
 	  reg = new RegExp("(sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs)("+vl+"|\\d)");
@@ -277,6 +338,7 @@ function AMmathpreview(inputId,outputId) {
 }
 
 var calctoproc = new Array();
+var intcalctoproc = new Array();
 var calcformat = new Array();
 var functoproc = new Array();
 var matcalctoproc = new Array();
@@ -297,6 +359,45 @@ function doonsubmit(form,type2,skipconfirm) {
 				return false;
 			}
 		}
+	}
+	for (var i=0; i<intcalctoproc.length; i++) {
+		var nh = document.createElement("INPUT");
+		nh.type = "hidden";
+		nh.name = "qn" + intcalctoproc[i];
+		fullstr = document.getElementById("tc"+intcalctoproc[i]).value;
+		fullstr = fullstr.replace(/\s+/g,'');
+		if (fullstr.match(/DNE/i)) {
+			  fullstr = fullstr.toUpperCase();
+		  } else {
+			  strarr = fullstr.split(/U/);
+			  for (k=0; k<strarr.length; k++) {
+				  str = strarr[k];
+				  if (str.length>0 && str.match(/,/)) {
+					  sm = str.charAt(0);
+					  em = str.charAt(str.length-1);
+					  vals = str.substring(1,str.length-1);
+					  vals = vals.split(/,/);
+					  for (j=0; j<2; j++) {	  
+						  if (!vals[j].match(/oo/)) {
+							  var err = "";
+							  
+							  try {
+							    with (Math) var res = eval(mathjs(vals[j]));
+							  } catch(e) {
+							    err = "syntax incomplete";
+							  }
+							  if (!isNaN(res) && res!="Infinity") {
+									  vals[j] = (Math.abs(res)<1e-15?0:res)+err;
+							  } 	
+						  }
+					  }
+					  strarr[k] = sm + vals[0] + ',' + vals[1] + em;
+				  }
+			 }
+		  }
+		  nh.value = strarr.join('U');
+		  outn = document.getElementById("p"+intcalctoproc[i]);
+		  outn.appendChild(nh);
 	}
 	for (var i=0; i<calctoproc.length; i++) {
 		var nh = document.createElement("INPUT");

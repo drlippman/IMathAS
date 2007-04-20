@@ -35,6 +35,26 @@
 	echo "       butn.value = '-';\n";
 	echo "   }\n";
 	echo "}\n";
+	echo "function toggleshowall() {\n";
+	echo "  for (var i=0; i<bcnt; i++) {";
+	echo "    var node = document.getElementById('m'+i);\n";
+	echo "    var butn = document.getElementById('butn'+i);\n";
+	echo "    node.className = 'blockitems';\n";
+	echo "    butn.value = '-';\n";
+	echo "  }\n";
+	echo "  document.getElementById(\"toggleall\").value = 'Collapse All';";
+	echo "  document.getElementById(\"toggleall\").onclick = togglecollapseall;";
+	echo "}\n";
+	echo "function togglecollapseall() {\n";
+	echo "  for (var i=0; i<bcnt; i++) {";
+	echo "    var node = document.getElementById('m'+i);\n";
+	echo "    var butn = document.getElementById('butn'+i);\n";
+	echo "    node.className = 'hidden';\n";
+	echo "    butn.value = '+';\n";
+	echo "  }\n";
+	echo "  document.getElementById(\"toggleall\").value = 'Expand All';";
+	echo "  document.getElementById(\"toggleall\").onclick = toggleshowall;";
+	echo "}\n";
 	echo "</script>";
 	
 	$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email from imas_forum_posts,imas_users ";
@@ -43,6 +63,7 @@
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$laststu = -1;
 	$cnt = 0;
+	echo "<input type=\"button\" value=\"Expand All\" onclick=\"toggleshowall()\" id=\"toggleall\"/><br/>";
 	while ($line =  mysql_fetch_array($result, MYSQL_ASSOC)) {
 		if ($line['userid']!=$laststu) {
 			if ($laststu!=-1) {
@@ -68,6 +89,7 @@
 		$cnt++;
 	}
 	echo '</div>';
+	echo "<script>var bcnt = $cnt;</script>";
 	
 	echo "<p>Color code<br/>Black: New thread</br><span style=\"color:green;\">Green: Reply</span></p>";
 	

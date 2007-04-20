@@ -221,13 +221,15 @@
 		}
 		$message[$line['id']] = $line['message'];
 		$posttype[$line['id']] = $line['posttype'];
+		$ownerid[$line['id']] = $line['userid'];
 		if ($line['isanon']==1) {
-			$poster[$line['id']] = "Anonymous";	
+			$poster[$line['id']] = "Anonymous";
+			$ownerid[$line['id']] = 0;
 		} else {
 			$poster[$line['id']] = $line['FirstName'] . ' ' . $line['LastName'];
 			$email[$line['id']] = $line['email'];
 		}
-		$ownerid[$line['id']] = $line['userid'];
+		
 	}
 	//update view count
 	$query = "UPDATE imas_forum_posts SET views='$newviews' WHERE id='$threadid'";
@@ -332,13 +334,13 @@
 					echo "<input type=button id=\"butb$bcnt\" value=\"-\" onClick=\"toggleshow($bcnt)\">\n";
 				}
 				echo "<b>{$subject[$child]}</b> Posted by: ";
-				if ($isteacher) {
+				if ($isteacher && $ownerid[$child]!=0) {
 					echo "<a href=\"mailto:{$email[$child]}\">";
-				} else if ($allowmsg) {
+				} else if ($allowmsg && $ownerid[$child]!=0) {
 					echo "<a href=\"../msgs/msglist.php?cid=$cid&add=new&to={$ownerid[$child]}\">";
 				}
 				echo $poster[$child];
-				if ($isteacher || $allowmsg) {
+				if (($isteacher || $allowmsg) && $ownerid[$child]!=0) {
 					echo "</a>";
 				}
 				echo ', ';
@@ -375,13 +377,13 @@
 				}
 				echo "</span>\n";
 				echo "<b>{$subject[$child]}</b><br/>Posted by: ";
-				if ($isteacher) {
+				if ($isteacher && $ownerid[$child]!=0) {
 					echo "<a href=\"mailto:{$email[$child]}\">";
-				} else if ($allowmsg) {
+				} else if ($allowmsg && $ownerid[$child]!=0) {
 					echo "<a href=\"../msgs/msglist.php?cid=$cid&add=new&to={$ownerid[$child]}\">";
 				}
 				echo $poster[$child];
-				if ($isteacher || $allowmsg) {
+				if (($isteacher || $allowmsg) && $ownerid[$child]!=0) {
 					echo "</a>";
 				}
 				echo ', ';

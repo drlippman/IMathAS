@@ -157,6 +157,8 @@ dd {
 		<li><a href="#essay">Essay</a></li>
 		<li><a href="#numericalmatrix">Numerical Matrix</a></li>
 		<li><a href="#calculatedmatrix">Calculated Matrix</a></li>
+		<li><a href="#interval">Interval</a></li>
+		<li><a href="#calcinterval">Calculated Interval</a></li>
 		<li><a href="#multipart">Multipart</a></li>
 		</ul>
 	</ul>
@@ -196,21 +198,28 @@ Create a new course by clicking the &quot;Add New Course&quot; button.
 
 <p>When you add a new course or click the &quot;Modify&quot; link next to a course name,
 enter the course name and an enrollment key.  The enrollment key should be
-given to students, and will be required for them to enroll in this course.</p>
+given to students, and will be required for them to enroll in this course, along with the Course ID, which for new
+courses will display when you return to the Admin page.</p>
 
-<p>You will also be given an opportunity to set whether to display icons next
-to different course items.</p>
-
-<p>You can also set whether students can unenroll themselves from your course (usually NO is 
-the best choice, so students can't accidentally delete their scores), and which other instructors
-can copy your course items without needing your enrollment key.</p>
-
-<p>Another option allows you set whether other instructors should be allowed to copy
+<p>Other option:
+<ul>
+<li><b>Available</b>:  Whether course is available to students, and whether it should display on the instructor's
+  home page</li>
+<li><b>Lock for Assessment</b>:  Shuts down access to the course except for the specified assessment.  Intended for
+  in-class testing situations.</li>
+<li><b>Icons:</b>  Whether to display icons next to different course items.</li>
+<li><b>Allow self un-enroll</b>:  Whether students should be able to unenroll themselves from your course (usually NO is 
+the best choice, so students can't accidentally delete their scores)</li>
+<li><b>Allow other instructors to copy</b>:  Whether other instructors should be allowed to copy
 course items without needing an enrollment key.  You can limit this ability to instructors in your
-own group.</p>
-
-<p>Message system options allows you decide which features of the internal messaging system you
-want to enable.  This allows you restrict who, if anyone, the student can send messages to.</p>
+own group.</li>
+<li><b>Message System</b>: allows you decide which features of the internal messaging system you
+want to enable.  This allows you restrict who, if anyone, the student can send messages to.</li>
+<li><b>Student Quick-Pick Top Bar</b>: What items, if any, to have in a bar at the top of the student's course page</li>
+<li><b>Instructor Quick-Pick Top Bar</b>:  What items, if any, to have in a bar at the top of the instructor's course page</li>
+<li><b>Instructor Course Management Links</b>:  Whether to have course management links at the bottom or along the
+  left side of the instructor's course page</li>
+</ul>
 
 </div>
 <div class=h3>
@@ -625,6 +634,8 @@ For Forum items, you will asked to provide:
 <li><b>Description</b>:  A description of the forum (displays on course page)</li>
 <li><b>Available after</b>:  The first date for the item to display to students</li>
 <li><b>Available until</b>:  The last date for the item to display to students</li>
+<li><b>Group linked</b>:  If you have a group assessment, you can link the forum to the groups of that assessment.  If you do this,
+   students viewing the forum will only see posts from their group members and instructors</li>
 <li><b>Allow anonymous posts</b>:  Whether you want to allow students to post anonymously</li>
 <li><b>Allow students to modify posts</b>:  Whether you want students to be able to modify their posts</li>
 <li><b>Email notify</b>:  Whether you want to receive an email whenever a new post is made on the forum</li>
@@ -644,6 +655,9 @@ For Forum items, you will asked to provide:
 </ul>
 You can use the middle two options to, for example, post discussion instructions.  You can use the last option to post a question in 
 class, and have students respond without seeing other students' replies.</p>
+
+<p>When viewing the forum thread list as an instructor, there is a "List Posts by Name" link which will list
+all posts in the forum, grouped by student name.  New threads are colored in black, replies in green</p>
 
 </div>
 <div class=h3>
@@ -675,12 +689,17 @@ assessment in the course page.
     until this date.  Review mode defaults to Skip Around display, unlimited attempts, answers shown always.  Scores are not
     saved in Review mode.</li>
 <li><b>Count</b>:  Whether the assessment score should be counted in the gradebook, not counted in the grade total, or counted as extra credit.</li>
+<li><b>Copy Options From</b>:  If you have other assessments in your course already, you can select to copy the assessment settings
+   from another assessment.</li>
 <li><b>Password</b>:  If specified, requires student to enter this password to access the assessment.  Leave blank to require no password.</li>
-<li><b>Time Limit</b>:  The time limit for the test (0 for none).  If the student exceeds the 
+<li><b>Time Limit</b>:  The time limit, in minutes, for the test (0 for none).  If the student exceeds the 
    time limit, their test will be recorded, and you can decide whether or not
-   to accept it in the gradebook detail</li>
+   to accept it in the gradebook detail.  Partial minutes are possible using decimal values.</li>
 <li><b>Minimum Score for Credit</b>:  A minimum score which must be acheived to receive credit for the assessment.  Set to 0 to accept all scores.
    If set and score is not met, gradebook will display "NC" (No Credit).</li>
+<li><b>Show based on another assessment</b>:  Use this to hide this assessment until a specific score is acheived on another
+  assessment.  Provide a point value and select an assessment to use this feature.  Set the assessment to "Don't Use" to not use
+  this feature</li>
 <li><b>Display method</b>:</li>
 	<ul>
 	<li><b>Full test at once</b>:  All questions are displayed on one page</li>
@@ -734,6 +753,7 @@ assessment in the course page.
 	    reenter the test (since more attempts are allowed) and put in the correct answers.  Also be aware that if an assessment
 	    is set to allow review mode, that answers will be available to students in review mode.</li>
 	</ul>
+<li><b>Show hints when available</b>:  Whether or not to show hints if the question has them defined</li>
 <li><b>Shuffle item order</b>:  Randomizes the order in which questions are presented</li>
 <li><b>All questions same random seed</b>: Usually not needed.  This is only need for a set of questions designed to work together using the same random values</li>
 <li><b>All students receive same version of questions</b>:  All students receive the same first version of questions.  If in practice test or homework mode, when 
@@ -781,8 +801,15 @@ Once added to the assessment you can:
     penalty per attempt, if desired</li>
 <li><b>Modify Question or View Source</b>:  Change or view the question code</li>
 <li><b>Remove from assessment</b>:  Remove the question from the assessment.  This does not
-    delete the question from the Question Set</li>
+    delete the question from the Question Set.  You can also use the checkboxes and the "With selected, Remove"
+    button to remove multiple questions at once.</li>
 </ul>
+
+<p>If students have taken the assessment, you will not be allowed to make as many changes to the assessment, as it
+will mess up existing student attempts.  If you need to change the assessment a lot, you can clear all student attempts.
+Otherwise you can change individual question settings (be careful!) or edit the question if it's yours.  If there is a problem with
+the question, you modify it, and want to give students another chance on that question, you can clear all attempts on a single question
+by clicking the "Clear Attempts" link here</p>
 
 </div>
 <div class=h4>
@@ -993,7 +1020,9 @@ to all students</p>
 <h3><a name="exceptions">Exceptions</a></h3>
 
 Click the &quot;Make Exception&quot; link to change the Start or End date of an assessment
-for a single student.
+for a single student.  If you need to make exceptions for multiple students at once, or want to make
+exceptions for multiple assessments at once, use the "Make Exception" button in connection with the checkboxes
+in the Gradebook.
 
 </div>
 <div class=h3>
@@ -1040,9 +1069,13 @@ must be numeric, up to 4 digits.</p>
 
 <p>Click the &quot;Gradebook&quot; link to show the gradebook.  The gradebook shows each student's
 score on each assessment and any offline grades you've entered.  Click on a student's assessment score to show detail on their
-assessment attempt, or on a student's offline grade to change their grade.  Click on an assessment's average score to view an breakdown showing
-the average score on each question.  Click on an offline grade's average score to change the settings for that item or modify all students' grades
+assessment attempt, or on a student's offline grade to change their grade.  Click the Settings link in the table header
+if you need to change an assessment's settings.  Click on an assessment's average score to view an breakdown showing
+the average score on each question.  Click on an offline grade's average score or the Settings link in the table header to change the settings for that item or modify all students' grades
 at once.</p>
+
+<p>By using checkboxes next to student's names, you can send messages or emails to multiple students, or make
+due date exceptions for multiple students at once</p>
 
 <div class=h3>
 <h3><a name="gradebooksettings">Gradebook Settings and Categories</a></h3>
@@ -1089,7 +1122,8 @@ To add an offline grade, click the "Add Offline Grade" link on the gradebook pag
 </ul>
 <p>You can then enter grades for each student.  If you leave a grade blank, no grade will be recorded for that student. 
 You can edit these settings or edit all students' grades at a later time by clicking the "Average" in the gradebook for this item. 
-You can edit an individual student's grade by clicking on their score in the gradebook for this item</p>
+You can edit an individual student's grade by clicking on their score in the gradebook for this item.  You can leave feedback for
+students about their grade using the boxes provided.</p>
 
 </div>
 <div class=h3>
@@ -1099,7 +1133,8 @@ You can edit an individual student's grade by clicking on their score in the gra
 assessment that they received and the last answer they provided, as well as their
 score on each question and the attempts used.  You can override the scores they
 received on this page.  You can also send a student a message about a question, quoting
-their version of the question in the message.</p>
+their version of the question in the message.  At the bottom of the page is a box to leave the student
+feedback about the assessment.</p>
 <p>If you wish to give a student another chance to take an assessment, click
 the "Clear Attempt" or "Clear Scores" link.  <b>Note</b>: This will clear their current scores,
 answers, and attempts used.  The "Clear Attempt" link will make it appear the student never started
@@ -1331,6 +1366,10 @@ The following macros help with display:
 <ul>
 <li><b>makepretty(string or array of strings)</b>: Changes double add/subtract signs to a single sign.</li>
 <li><b>makeprettydisp(string or array of strings)</b>:  Does makepretty (see above) and backquotes the string for math display</li>
+<li><b>polymakepretty and polymakeprettydisp</b>:  Like makepretty, but for polynomials.  Cleans up 0*, 1*, ^1, and ^0 to make the polynomial look nicer.  
+   This function can do weird things for equations that are not simple polynomials, so test well</li>
+<li><b>makexpretty and makexprettydisp</b>:  Like makepretty, but the X-tra version - attempts to clean up things like 1*, 0*, etc.  This function
+   will often cause weird things to happen, so test well</li>
 <li><b>dispreducedfraction(numerator,denominator)</b>:  Takes two numbers as numerator and denominator of a fraction, returning a display form of the fraction,
     reduced to lowest terms.  Suitable for $showanswer</li>
 <li><b>showarrays(string,array,[string,array]...)</b>:  Creates a tabular display of the data in the array(s) as column(s), with the strings
@@ -1386,6 +1425,9 @@ These macros are fairly general purpose:
 <li><b>calconarray(array,calculation)</b>:  Returns an array, performing the given calculation on each element of the given array.  Use
     "x" as the variable to represent each element of the array.  Example: $b = calconarray($a,"x^2") will create an array that is the
     square each element of the array $a.</li>
+<li><b>calconarray(array,calculation,ifcondition)</b>:  Like calconarray, but allows you to specify a condition for each element for whether to
+    do the calculation.  Example:  $b = calconarray($a,"x+.1","floor(x)==x") will add .1 to add whole numbers in the array, and leave the 
+    other elements unchanged.</li>
 <li><b>joinarray(array,symbol)</b>:  Convert an array to a string, joining elements with the given symbol</li>
 <li><b>mergearrays(array,array)</b>:  Combines two arrays into one long array</li>
 <li><b>unionarrays(array,array)</b>:  Unions two arrays, preventing duplicates, into a new array</li>
@@ -1520,6 +1562,10 @@ The answer is compared to a given tolerance.  Can also accept DNE, oo (Infinity)
 	used by default.</dd>
 <dt>$abstolerance = a number (In Answer)</dt>
 	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
+<dt>$reqdecimals = a number (In Answer)</dt>
+	<dd>Defines the decimal accuracy required (ie 2 for two decimal places).  This will put a message in the answer tips stating the
+	decimals required.  If neither $abstolerance or $reltolerance is set, this will set the tolerance, otherwise the provided tolerance
+	will be used (even if it doesn't agree with the $reqdecimal setting).</dd>
 <dt>$answerformat = "list" or "exactlist"</dt
 	<dd>Specifies that a list of answers is expected.  If $answerformat="list", then duplicate values are ignored.  If $answerformat="exactlist",
 	then duplicate values are not ignored.</dd>
@@ -1566,6 +1612,15 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 	used by default.</dd>
 <dt>$abstolerance = a number (In Answer)</dt>
 	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
+<dt>$reqdecimals = a number (In Answer)</dt>
+	<dd>Defines the decimal accuracy required (ie 2 for two decimal places).  This will put a message in the answer tips stating the
+	decimals required.  If neither $abstolerance or $reltolerance is set, this will set the tolerance, otherwise the provided tolerance
+	will be used (even if it doesn't agree with the $reqdecimal setting).</dd>
+<dt>$requiretimes = a list, like "^,=3,cos,&lt;2" (In Answer)</dt>
+	<dd>Adds format checking to the student's answer.  The list can include multiple checks, which come in pairs.  The
+	first is the symbol to look for.  The second describes what is acceptable.  For example, in the string shown above,
+	the symbol "^" would be required to show up exactly 3 times, and "cos" would be required to show up less than 2 times.  You can
+	use "#" in the symbol location to match any number (including decimal values); 3.2^5 would match twice.</dd>
 <dt>$ansprompt = string (In Question Control)</dt>
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="y="</dd>
 <dt>$answerboxsize = number (In Question Control)</dt>
@@ -1578,6 +1633,8 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 <dt>$showanswer (In Answer)</dt>
 	<dd>The answer to show to students (if option if available).  Defaults to $answer.  Use this to give a detailed answer,
 	or a rounded off answer.</dd>
+<dt>$previewloc (In Question Text)</dt>
+	<dd>Where you want the preview button to be located.  Defaults to after the entry box if not placed in question text.</dd>
 <dt>$hidetips = true (In Question Control)</dt>
 	<dd>Hides the question entry tips that display by default</dd>
 </dl>
@@ -1733,6 +1790,8 @@ A student is asked to enter a function
 	<dd>Using the variable $answerbox in the Question Text will place the question input box in that location</dd>
 <dt>$showanswer (In Answer)</dt>
 	<dd>The answer to show to students (if option if available).  Defaults to makeprettydisp($answer).  </dd>
+<dt>$previewloc (In Question Text)</dt>
+	<dd>Where you want the preview button to be located.  Defaults to after the entry box if not placed in question text.</dd>
 <dt>$hidetips = true (In Question Control)</dt>
 	<dd>Hides the question entry tips that display by default</dd>
 </dl>
@@ -1875,11 +1934,92 @@ The entries are compared to a given tolerance.
 <dt>$showanswer (In Answer)</dt>
 	<dd>The answer to show to students (if option if available).  Defaults to $answer.  
 	Use this to substitute a detailed answer.</dd>
+<dt>$previewloc (In Question Text)</dt>
+	<dd>Where you want the preview button to be located.  Defaults to after the entry box if not placed in question text.</dd>
 <dt>$hidetips = true (In Question Control)</dt>
 	<dd>Hides the question entry tips that display by default</dd>
 </dl>
 </p>
 	
+</div>
+<div class=h3>
+<h3><a name="interval">Interval</a></h3>
+
+A student is asked to enter an interval notation answer. Example: (2,5]U(7,oo)
+
+<p><b>Required Variables</b><BR>
+<dl>
+<dt>$answer = a string with the answer in interval notation (In Answer)</dt>
+	<dd>Defines the answer.  Join multiple intervals with U for union.  Example: $answer = "(-oo,4]U(3,oo)".  Use
+	DNE for empty set</dd>
+</dl>
+</p>
+<p><b>Optional Variables</b><BR>
+<dl>
+<dt>$reltolerance = a decimal value (In Answer)</dt>
+	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
+	used by default.</dd>
+<dt>$abstolerance = a number (In Answer)</dt>
+	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
+<dt>$reqdecimals = a number (In Answer)</dt>
+	<dd>Defines the decimal accuracy required (ie 2 for two decimal places).  This will put a message in the answer tips stating the
+	decimals required.  If neither $abstolerance or $reltolerance is set, this will set the tolerance, otherwise the provided tolerance
+	will be used (even if it doesn't agree with the $reqdecimal setting).</dd>
+<dt>$ansprompt = string (In Question Control)</dt>
+	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="`x in`"</dd>
+<dt>$answerboxsize = number (In Question Control)</dt>
+	<dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.</dd>
+<dt>$answerbox (In Question Text)</dt>
+	<dd>Using the variable $answerbox in the Question Text will place the entry box in that location</dd>
+<dt>$showanswer (In Answer)</dt>
+	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
+	Use this to substitute a detailed answer.</dd>
+<dt>$hidetips = true (In Question Control)</dt>
+	<dd>Hides the question entry tips that display by default</dd>
+</dl>
+</p>
+
+</div>
+<div class=h3>
+<h3><a name="calcinterval">Calculated Interval</a></h3>
+
+A student is asked to enter an interval notation answer. Example: (2,5]U(7,oo).  Values can be entered as calculations
+rather than numbers, like [2/5,sqrt(8)].
+
+<p><b>Required Variables</b><BR>
+<dl>
+<dt>$answer = a string with the answer in interval notation (In Answer)</dt>
+	<dd>Defines the answer.  Join multiple intervals with U for union.  Example: $answer = "(-oo,4]U(3,oo)".  Use
+	DNE for empty set</dd>
+</dl>
+</p>
+<p><b>Optional Variables</b><BR>
+<dl>
+<dt>$reltolerance = a decimal value (In Answer)</dt>
+	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
+	used by default.</dd>
+<dt>$abstolerance = a number (In Answer)</dt>
+	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
+<dt>$reqdecimals = a number (In Answer)</dt>
+	<dd>Defines the decimal accuracy required (ie 2 for two decimal places).  This will put a message in the answer tips stating the
+	decimals required.  If neither $abstolerance or $reltolerance is set, this will set the tolerance, otherwise the provided tolerance
+	will be used (even if it doesn't agree with the $reqdecimal setting).</dd>
+<dt>$ansprompt = string (In Question Control)</dt>
+	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="`x in`"</dd>
+<dt>$answerboxsize = number (In Question Control)</dt>
+	<dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.</dd>
+<dt>$answerbox (In Question Text)</dt>
+	<dd>Using the variable $answerbox in the Question Text will place the entry box in that location</dd>
+<dt>$showanswer (In Answer)</dt>
+	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
+	Use this to substitute a detailed answer.</dd>
+<dt>$previewloc (In Question Text)</dt>
+	<dd>Where you want the preview button to be located.  Defaults to after the entry box if not placed in question text.</dd>
+<dt>$hidetips = true (In Question Control)</dt>
+	<dd>Hides the question entry tips that display by default</dd>
+</dl>
+</p>
+
 </div>
 <div class=h3>
 <h3><a name="multipart">Multipart</a></h3>
@@ -1890,7 +2030,7 @@ This type of question can contain multiple parts, where each part is one of the 
 <dl>
 <dt>$anstypes = an array or list of answer types (In Answer)</dt>
 	<dd>Defines the answer type for each part.  Example: 
-	$anstypes = array("number","calculated","choices","multans","matching","numfunc","matrix","calcmatrix")<BR>
+	$anstypes = array("number","calculated","choices","multans","matching","numfunc","matrix","calcmatrix","interval","calcinterval")<BR>
 	Refer to this list for the short names of each question type</dd>
 <dt>Question part variables</dt>
 	<dd>For each question part, you will need to define the variables (like $answer, $questions, etc.) you would normally
@@ -1998,6 +2138,7 @@ When you take an assessment, it will be displayed to you in one of three ways:
 <ul>
 <li><b>Full Test</b>:  You may see the entire test at once</li>
 <li><b>One at a time</b>:  You may have to answer one question before proceeding to the next</li>
+<li><b>Full test, submit one at a time</b>:  The full test is displayed, but only question is available for answer entry at a time</li>
 <li><b>Skip Around</b>:  You may see a green box on the left.  This will contain a list of questions.  You can
     skip around between questions by clicking on these links, and answer the questions in any order.</li>
 </ul>

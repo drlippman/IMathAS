@@ -499,11 +499,19 @@
 		} else {
 			echo "<h2>Grade Book Student Detail</h2>\n";
 		}
-		if ($stu>0) {
+		if ($stu>0) { //doing a student
 			list($gb,$cathdr,$feedbacks) = gbtable(true,$stu);
-			$query = "SELECT gbcomment FROM imas_students WHERE userid='$stu' AND courseid='{$_GET['cid']}'";
+			echo '<h3>' . strip_tags($gb[1][0]) . '</h3>';
+			$query = "SELECT imas_students.gbcomment,imas_users.email FROM imas_students,imas_users WHERE ";
+			$query .= "imas_students.userid=imas_users.id AND imas_users.id='$stu' AND imas_students.courseid='{$_GET['cid']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (mysql_num_rows($result)>0) {
+				if ($isteacher) {
+					echo '<a href="mailto:'.mysql_result($result,0,1).'">Email</a> | ';
+					echo "<a href=\"$imasroot/msgs/msglist.php?cid={$_GET['cid']}&add=new&to=$stu\">Message</a> | ";
+					echo "<a href=\"exception.php?cid={$_GET['cid']}&uid=$stu\">Make Exception</a> | ";
+					echo "<a href=\"listusers.php?cid={$_GET['cid']}&chgstuinfo=true&uid=$stu\">Change Info</a>";
+				}
 				$gbcomment = mysql_result($result,0,0);
 			} else {
 				$gbcomment = '';
@@ -511,7 +519,7 @@
 			if (trim($gbcomment)!='') {
 				echo "<div class=\"item\">$gbcomment</div>";
 			}
-		} else {
+		} else { //doing averages
 			list($gb,$cathdr) = gbtable(true);
 			array_splice($gb,1,count($gb)-2);
 			$feedbacks = array();
@@ -521,6 +529,8 @@
 		echo "<thead><tr><th>Item</th><th>Possible</th><th>{$gb[1][0]}</th>";
 		if ($stu>0) {
 			echo "<th>Feedback</th>";
+		} else {
+			echo "<th>Percent</th>";
 		}
 		echo "</tr></thead><tbody>";
 		
@@ -551,6 +561,14 @@
 				} else {
 					echo "<td></td>";
 				}
+			} else {
+				$poss = substr($anpts[1],0,strpos($anpts[1],'pt'));
+				if ($poss>0) {
+					$apct = round(100*floatval(strip_tags($gb[1][$i]))/floatval($poss),1) . '%';
+				} else {
+					$apct = '-';
+				}
+				echo "<td>$apct</td>";
 			}
 			echo '</tr>';
 		}
@@ -651,6 +669,7 @@
 			exit;
 		}
 		require("../assessment/header.php");
+		echo "<style type=\"text/css\">p.tips {	display: none;}\n</style>\n";
 		if (isset($_GET['starttime']) && $isteacher) {
 			$query = "UPDATE imas_assessment_sessions SET starttime='{$_GET['starttime']}' ";//WHERE id='{$_GET['asid']}'";
 			$query .= getasidquery($_GET['asid']);
@@ -744,13 +763,41 @@
 		}
 		
 		require("../assessment/displayq2.php");
-		
-		echo "<form method=post action=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&update=true\">\n";
+		echo '<script type="text/javascript">';
+		echo 'function hidecorrect() {';
+		echo '   var butn = document.getElementById("hctoggle");';
+		echo '   if (butn.value=="Hide Correct Questions") {';
+		echo '      butn.value = "Show Correct Questions";';
+		echo '      var setdispto = "block";';
+		echo '   } else { ';
+		echo '      butn.value = "Hide Correct Questions";';
+		echo '      var setdispto = "none";';
+		echo '   }';
+		echo '   var divs = document.getElementsByTagName("div");';
+		echo '   for (var i=0;i<divs.length;i++) {';
+		echo '     if (divs[i].className=="iscorrect") { ';
+		echo '         if (divs[i].style.display=="none") {';
+		echo '               divs[i].style.display = "block";';
+		echo '         } else { divs[i].style.display = "none"; }';
+		echo '     }';
+		echo '    }';
+		echo '}';
+		echo '</script>';
+		echo '<input type=button id="hctoggle" value="Hide Correct Questions" onclick="hidecorrect()" />';
+		echo "<form id=\"mainform\" method=post action=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&update=true\">\n";
 		$total = 0;
 		for ($i=0; $i<count($questions);$i++) {
+			echo "<div ";
+			if (getpts($scores[$i])==$pts[$questions[$i]]) {
+				echo 'class="iscorrect"';	
+			} else {
+				echo 'class="iswrong"';
+			}
+			echo '>';
 			list($qsetid,$cat) = getqsetid($questions[$i]);
 			if ($isteacher || ($testtype=="Practice" && $showans!="N") || ($testtype!="Practice" && (($showans=="I"  && !in_array(-1,$scores))|| ($showans!="N" && time()>$saenddate)))) {$showa=true;} else {$showa=false;}
 			displayq($i,$qsetid,$seeds[$i],$showa,false,$attempts[$i]);
+			echo '</div>';
 			
 			if ($scores[$i]==-1) { $scores[$i]="NA";} else {$total+=getpts($scores[$i]);}
 			echo "<div class=review>Question ".($i+1).": ";
@@ -793,6 +840,7 @@
 				echo " &nbsp; <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&clearq=$i\">Clear Score</a>";
 			}
 			echo "</div>\n";
+			
 		}
 		echo "<p></p><div class=review>Total: $total/$totalpossible</div>\n";
 		if ($isteacher && !isset($_GET['lastver'])) {

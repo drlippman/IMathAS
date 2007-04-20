@@ -53,14 +53,14 @@
 		}
 	}
 	if (isset($_POST['score'])) {
+		
 		foreach($_POST['score'] as $k=>$sc) {
+			$sc = trim($sc);
 			if ($sc!='') {
-				/* //moved to javascript
-				if (strpos($sc,'+')!==false || strpos($sc,'-')!==false) {
-					$sc = preg_replace('/[^\d\.\+\-]/','',$sc);
-					$sc = @eval("return ($sc);"); //will set to 0 if error
-				}*/
 				$query = "UPDATE imas_grades SET score='$sc',feedback='{$_POST['feedback'][$k]}' WHERE userid='$k' AND gbitemid='{$_GET['gbitem']}'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			} else {
+				$query = "DELETE FROM imas_grades WHERE gbitemid='{$_GET['gbitem']}' AND userid='$k'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 		}
@@ -71,7 +71,7 @@
 				$query = "INSERT INTO imas_grades (gbitemid,userid,score,feedback) VALUES ";
 				$query .= "('{$_GET['gbitem']}','$k','$sc','{$_POST['feedback'][$k]}')";
 				mysql_query($query) or die("Query failed : " . mysql_error());
-			}
+			} 
 		}
 	}
 	if (isset($_POST['score']) || isset($_POST['newscore']) || isset($_POST['name'])) {

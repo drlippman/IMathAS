@@ -1,9 +1,9 @@
 <?php
-//A library of Stats functions.  Version 1.5, April 9, 2007
+//A library of Stats functions.  Version 1.6, April 15, 2007
 
 
 global $allowedmacros;
-array_push($allowedmacros,"nCr","nPr","mean","stdev","percentile","quartile","median","freqdist","frequency","histogram","fdhistogram","normrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","linreg");
+array_push($allowedmacros,"nCr","nPr","mean","stdev","percentile","quartile","median","freqdist","frequency","histogram","fdhistogram","normrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","linreg","countif");
 
 
 //nCr(n,r)
@@ -147,6 +147,39 @@ function frequency($a,$start,$cw) {
 	return $out;
 }
 
+//countif(array,condition)
+//Returns count of items in array that meet condition
+// array: array of data values
+// condition: a condition, using x for data values
+//Example: countif($a,"x<3 && x>2")
+function countif($a,$ifcond) {
+	$rsnoquote = preg_replace('/"[^"]*"/','""',$ifcond);
+	$rsnoquote = preg_replace('/\'[^\']*\'/','\'\'',$rsnoquote);
+	if (preg_match_all('/([$\w]+)\s*\([^\)]*\)/',$rsnoquote,$funcs)) {
+		$ismath = true;
+		for ($i=0;$i<count($funcs[1]);$i++) {
+			if (strpos($funcs[1][$i],"$")===false) {
+				if (!in_array($funcs[1][$i],$allowedmacros)) {
+					echo "{$funcs[1][$i]} is not an allowed function<BR>\n";
+					return false;
+				}
+			}
+		}
+	}
+	$ifcond = str_replace('!=','#=',$ifcond);
+	$ifcond = mathphp($ifcond,'x');
+	$ifcond = str_replace('#=','!=',$ifcond);
+	$ifcond = str_replace('(x)','($x)',$ifcond);
+	$iffunc = create_function('$x','return('.$ifcond.');');
+	
+	$cnt = 0;
+	foreach ($a as $v) {
+		if ($iffunc($v)) {
+			$cnt++;
+		}
+	}
+	return $cnt;
+}
 
 //histogram(array,label,start,classwidth,[labelstart,upper])
 //display macro.  Creates a histogram from a data set

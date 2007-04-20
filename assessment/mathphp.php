@@ -192,7 +192,11 @@ function safepow($base,$power) {
 		}
 		return sqrt(-1);
 	}
-	$result = exp($power*log(abs($base)));
+	if (floor($base)==$base && floor($power)==$power && $power>0) { //whole # exponents
+		$result = pow(abs($base),$power);
+	} else { //fractional & negative exponents (pow can't handle?)
+		$result = exp($power*log(abs($base)));
+	}
 	if (($base < 0) && ($power % 2 != 0)) {
 		$result = -($result);
 	}

@@ -110,10 +110,10 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 
 		$laparts = explode("&",$la);
 		foreach ($anstypes as $kidx=>$anstype) {
-			list($answerbox[$kidx],$tips[$kidx],$shans[$kidx]) = makeanswerbox($anstype,$kidx,$laparts[$kidx],$options,$qnidx+1);
+			list($answerbox[$kidx],$tips[$kidx],$shans[$kidx],$previewloc[$kidx]) = makeanswerbox($anstype,$kidx,$laparts[$kidx],$options,$qnidx+1);
 		}
 	} else {
-		list($answerbox,$tips[0],$shans[0]) = makeanswerbox($qdata['qtype'],$qnidx,$la,$options,0);
+		list($answerbox,$tips[0],$shans[0],$previewloc) = makeanswerbox($qdata['qtype'],$qnidx,$la,$options,0);
 	}
 	
 	
@@ -150,6 +150,17 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			
 		}
 	}
+	if (is_array($answerbox)) {
+		foreach($answerbox as $iidx=>$abox) {
+			if (strpos($toevalqtxt,"\$previewloc[$iidx]")===false) {
+				$answerbox[$iidx] .= $previewloc[$iidx];
+			}
+		}
+	} else {
+		if (strpos($toevalqtxt,'$previewloc')===false) {
+			$answerbox .= $previewloc;
+		}
+	}
 	
 	//echo $toevalqtext;
 	eval("\$evaledqtext = \"$toevalqtxt\";");
@@ -165,7 +176,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		echo "</div>\n";
 	}
 	
-	if (strpos($toevalqtxt,'$answerbox')===false) {
+	if (strpos($toevalqtxt,'$answerbox')===false) {  
 		if (is_array($answerbox)) {
 			foreach($answerbox as $iidx=>$abox) {
 				if ($seqinactive) {
@@ -187,9 +198,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			} else {
 				echo filter("<div>$answerbox</div>\n");
 			}
-		}
-		
-		
+		}	
 	} 
 	if ($returnqtxt) {
 		return $returntxt;
@@ -353,6 +362,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 	$out = '';
 	$tip = '';
 	$sa = '';
+	$preview = '';
 	$la = str_replace('"','&quot;',$la);
 	if ($anstype == "number") {
 		if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$qn];} else {$ansprompt = $options['ansprompt'];}}
@@ -522,7 +532,6 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$qn];} else {$ansprompt = $options['ansprompt'];}}
 		if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$qn];} else {$sz = $options['answerboxsize'];}}
 		if (isset($options['hidepreview'])) {if (is_array($options['hidepreview'])) {$hidepreview = $options['hidepreview'][$qn];} else {$hidepreview = $options['hidepreview'];}}
-		if (isset($options['hidepreview'])) {if (is_array($options['hidepreview'])) {$hidepreview = $options['hidepreview'][$qn];} else {$hidepreview = $options['hidepreview'];}}
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
 		if (isset($options['reqdecimals'])) {if (is_array($options['reqdecimals'])) {$reqdecimals = $options['reqdecimals'][$qn];} else {$reqdecimals = $options['reqdecimals'];}}
@@ -532,8 +541,10 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (!isset($answerformat)) { $answerformat = '';}
 		if (isset($ansprompt)) {$out .= "<label for=\"tc$qn\">$ansprompt</label>";}
 		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\">\n";
-		if (!isset($hidepreview)) {$out .= "<input type=button class=btn value=Preview onclick=\"calculate('tc$qn','p$qn','$answerformat')\"> &nbsp;\n";}
-		$out .= "<span id=p$qn></span> ";
+		if (!isset($hidepreview)) {
+			$preview .= "<input type=button class=btn value=Preview onclick=\"calculate('tc$qn','p$qn','$answerformat')\"> &nbsp;\n";
+		}
+		$preview .= "<span id=p$qn></span> ";
 		$out .= "<script>calctoproc[calctoproc.length] = $qn; calcformat[$qn] = '$answerformat';</script>\n";
 		$ansformats = explode(',',$answerformat);
 		if (in_array('list',$ansformats) || in_array('exactlist',$ansformats)) {
@@ -624,8 +635,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 				$out .= "</tr>";
 			}
 			$out .= "</table>\n";
-			if (!isset($hidepreview)) {$out .= "<input type=button class=btn value=Preview onclick=\"matrixcalc('qn$qn','p$qn',{$answersize[0]},{$answersize[1]})\"> &nbsp;\n";}
-			$out .= "<span id=p$qn></span>\n";
+			if (!isset($hidepreview)) {$preview .= "<input type=button class=btn value=Preview onclick=\"matrixcalc('qn$qn','p$qn',{$answersize[0]},{$answersize[1]})\"> &nbsp;\n";}
+			$preview .= "<span id=p$qn></span>\n";
 			$out .= "<script>matcalctoproc[matcalctoproc.length] = $qn; matsize[$qn]='{$answersize[0]},{$answersize[1]}';</script>\n";
 			$tip = "Enter each element of the matrix as  number (like 5, -3, 2.2) or as a calculation (like 5/3, 2^3, 5+4)";
 		} else {
@@ -651,8 +662,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		if (isset($ansprompt)) {$out .= "<label for=\"tc$qn\">$ansprompt</label>";}
 		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\">\n";
-		if (!isset($hidepreview)) {$out .= "<input type=button class=btn value=Preview onclick=\"AMpreview('tc$qn','p$qn')\"> &nbsp;\n";}
-		$out .= "<span id=p$qn></span>\n";
+		if (!isset($hidepreview)) {$preview .= "<input type=button class=btn value=Preview onclick=\"AMpreview('tc$qn','p$qn')\"> &nbsp;\n";}
+		$preview .= "<span id=p$qn></span>\n";
 		
 		if (!isset($variables)) { $variables = "x";}
 		$variables = explode(",",$variables);
@@ -709,10 +720,56 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		$out .= "<textarea rows=\"$rows\" cols=\"$cols\" name=\"qn$qn\" id=\"qn$qn\">$la</textarea>\n";
 		$tip .= "Enter your answer as text.  This question is not automatically graded.";
 		$sa .= $answer;
+	} else if ($anstype == 'interval') {
+		if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$qn];} else {$ansprompt = $options['ansprompt'];}}
+		if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$qn];} else {$sz = $options['answerboxsize'];}}
+		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
+		if (isset($options['reqdecimals'])) {if (is_array($options['reqdecimals'])) {$reqdecimals = $options['reqdecimals'][$qn];} else {$reqdecimals = $options['reqdecimals'];}}
+		
+		if (!isset($sz)) { $sz = 20;}
+		if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
+		if ($multi>0) { $qn = $multi*1000+$qn;} 
+		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\">";
+		$tip = "Enter your answer using interval notation.  Example: [2.1,5.6) <br/>";
+		$tip .= "Use U for union to combine intervals.  Example: (-oo,2] U [4,oo)<br/>";
+		$tip .= "Enter DNE for an empty set, oo for Infinity";
+		if (isset($reqdecimals)) {
+			$tip .= "<br/>Your numbers should be accurate to $reqdecimals decimal places.";
+		}
+		if (isset($answer)) {
+			$sa = $answer;
+		}
+	} else if ($anstype == 'calcinterval') {
+		if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$qn];} else {$ansprompt = $options['ansprompt'];}}
+		if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$qn];} else {$sz = $options['answerboxsize'];}}
+		if (isset($options['hidepreview'])) {if (is_array($options['hidepreview'])) {$hidepreview = $options['hidepreview'][$qn];} else {$hidepreview = $options['hidepreview'];}}
+		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
+		if (isset($options['reqdecimals'])) {if (is_array($options['reqdecimals'])) {$reqdecimals = $options['reqdecimals'][$qn];} else {$reqdecimals = $options['reqdecimals'];}}
+		
+		if (!isset($sz)) { $sz = 20;}
+		if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
+		if ($multi>0) { $qn = $multi*1000+$qn;} 
+		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\">\n";
+		if (!isset($hidepreview)) {
+			$preview .= "<input type=button class=btn value=Preview onclick=\"intcalculate('tc$qn','p$qn')\"> &nbsp;\n";
+		}
+		$preview .= "<span id=p$qn></span> ";
+		$out .= "<script>intcalctoproc[intcalctoproc.length] = $qn;</script>\n";
+		$tip = "Enter your answer using interval notation.  Example: [2.1,5.6) <br/>";
+		$tip .= "Use U for union to combine intervals.  Example: (-oo,2] U [4,oo)<br/>";
+		$tip .= "Enter values as numbers (like 5, -3, 2.2) or as calculations (like 5/3, 2^3, 5+4)<br/>";
+		$tip .= "Enter DNE for an empty set, oo for Infinity";
+		if (isset($reqdecimals)) {
+			$tip .= "<br/>Your numbers should be accurate to $reqdecimals decimal places.";
+		}
+		if (isset($answer)) {
+			$sa = $answer;
+		}
+		
 	}
 
 
-	return array($out,$tip,$sa);
+	return array($out,$tip,$sa,$preview);
 }
 
 
@@ -985,11 +1042,45 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$qn];} else {$reltolerance = $options['reltolerance'];}}
 		if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$qn];} else {$abstolerance = $options['abstolerance'];}}
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
+		if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$qn];} else {$requiretimes = $options['requiretimes'];}}
+		
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = .001;}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$GLOBALS['partlastanswer'] = $_POST["tc$qn"];
 		if ($givenans == null) {return 0;}
-
+		
+		$cleanans = preg_replace('/[^\w\*\/\+\-\(\)\[\],\.\^]+/','',$_POST["tc$qn"]);
+		//if entry used pow or exp, we want to replace them with their asciimath symbols for requiretimes purposes
+		$cleanans = str_replace("pow","^",$cleanans);
+		$cleanans = str_replace("exp","e",$cleanans);
+		if ($requiretimes != '') {
+			$list = explode(",",$requiretimes);
+			for ($i=0;$i < count($list);$i+=2) {
+				$comp = substr($list[$i+1],0,1);
+				$num = intval(substr($list[$i+1],1));
+				
+				if ($list[$i]=='#') {
+					$nummatch = preg_match_all('/[\d\.]+/',$cleanans,$m);
+				} else {
+					$nummatch = substr_count($cleanans,$list[$i]);
+				}
+				
+				if ($comp == "=") {
+					if ($nummatch!=$num) {
+						return 0;
+					}
+				} else if ($comp == "<") {
+					if ($nummatch>=$num) {
+						return 0;
+					}
+				} else if ($comp == ">") {
+					if ($nummatch<=$num) {
+						return 0;
+					}
+				}
+			}
+		}
+		
 		$ansformats = explode(',',$answerformat);
 		if (in_array('exactlist',$ansformats)) {
 			$gaarr = explode(',',$givenans);
@@ -1335,6 +1426,75 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 	} else if ($anstype == "essay") {
 		$GLOBALS['partlastanswer'] = $givenans;
 		return 0;
+	} else if ($anstype == 'interval' || $anstype == 'calcinterval') {
+		if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}
+		if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$qn];} else {$reltolerance = $options['reltolerance'];}}
+		if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$qn];} else {$abstolerance = $options['abstolerance'];}}
+		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = .001;}
+		if ($multi>0) { $qn = $multi*1000+$qn;}
+		if ($anstype == 'interval') {
+			$GLOBALS['partlastanswer'] = $givenans;
+		} else if ($anstype == 'calcinterval') {
+			$GLOBALS['partlastanswer'] = $_POST["tc$qn"];
+		}
+		if ($givenans == null) {return 0;}
+		$correct = 0;
+		$answer = str_replace(' ','',$answer);
+		$givenans = str_replace(' ','',$givenans);
+		if ($answer==='DNE') {
+			if ($givenans==='DNE') {
+				return 1;
+			} else {
+				return 0;
+			}
+		}
+		$aarr = explode('U',$answer);
+		$gaarr = explode('U',$givenans);
+		if (count($aarr)!=count($gaarr)) {
+			return 0;
+		}
+		
+		foreach ($aarr as $ansint) {
+			$anssm = substr($ansint,0,1);
+			$ansem = substr($ansint,-1);
+			$ansint = substr($ansint,1,strlen($ansint)-2);
+			list($anssn,$ansen) = explode(',',$ansint);
+			$foundloc = -1;
+			foreach ($gaarr as $k=>$gansint) {
+				$ganssm = substr($gansint,0,1);
+				$gansem = substr($gansint,-1);
+				$gansint = substr($gansint,1,strlen($gansint)-2);
+				list($ganssn,$gansen) = explode(',',$gansint);
+				if ($anssm!=$ganssm || $ansem!=$gansem) {
+					continue;
+				}
+				if (strpos($anssn,'oo')) {
+					if ($anssn===$ganssn) {} else {continue;}
+				} else if (isset($abstolerance)) {
+					if (abs($anssn-$ganssn) < $abstolerance + 1E-12) {} else {continue;} 	
+				} else {
+					if (abs($anssn - $ganssn)/(abs($anssn)+.0001) < $reltolerance+ 1E-12) {} else {continue;}
+				}
+				if (strpos($anssn,'oo')) {
+					if ($ansen===$gansen) {} else {continue;}
+				} else if (isset($abstolerance)) {
+					if (abs($ansen-$gansen) < $abstolerance + 1E-12) {} else {continue;} 	
+				} else {
+					if (abs($ansen - $gansen)/(abs($ansen)+.0001) < $reltolerance+ 1E-12) {} else {continue;}
+				}
+				$foundloc = $k;
+				break;
+			}
+			if ($foundloc>-1) {
+				array_splice($gaarr,$foundloc,1);
+			} else {
+				return 0;
+			}
+		}
+		if (count($gaarr)>0) { //extraneous student intervals?
+			return 0;
+		}
+		return 1;
 	}
 	
 }

@@ -123,7 +123,7 @@ switch($_GET['action']) {
 			$allowunenroll = 0;
 			$copyrights = 0;
 			$msgset = 0;
-			$cploc = 0;
+			$cploc = 1;
 			$topbar = array(array(),array());
 			$avail = 0;
 			$lockaid = 0;

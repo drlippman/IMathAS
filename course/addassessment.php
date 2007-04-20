@@ -369,11 +369,7 @@ at <input type=text size=10 name=etime value="<?php echo $etime;?>"></span><BR c
 <A HREF="#" onClick="cal1.select(document.forms[0].rdate,'anchor3','MM/dd/yyyy',(document.forms[0].rdate.value=='<?php echo $rdate;?>')?(document.forms[0].rdate.value):(document.forms[0].rdate.value)); return false;" NAME="anchor3" ID="anchor3"><img src="../img/cal.gif" alt="Calendar"/></A>
 at <input type=text size=10 name=rtime value="<?php echo $rtime;?>"></span><BR class=form>
 
-<span class=form>Count: </span><span class=formright>
-<input type=radio name="cntingb" value="1" <?php if ($cntingb==1) { echo "checked=1";} ?> /> Count in Gradebook<br/>
-<input type=radio name="cntingb" value="0" <?php if ($cntingb==0) { echo "checked=1";} ?> /> Don't count in grade total<br/>
-<input type=radio name="cntingb" value="2" <?php if ($cntingb==2) {echo "checked=1";} ?> /> Count as Extra Credit</span><br class=form />
-		
+
 
 <fieldset><legend>Assessment Options</legend>
 <?php
@@ -396,28 +392,9 @@ at <input type=text size=10 name=rtime value="<?php echo $rtime;?>"></span><BR c
       <input type=checkbox name="copydates" /> Dates</span><br class=form />
 </div>
 <div id="customoptions" class="show">
+
+<fieldset><legend>Core Options</legend>
 <span class=form>Require Password (blank for none):</span><span class=formright><input type=text name=password value="<?php echo $line['password'];?>"></span><br class=form />
-
-<span class=form>Minimum score to receive credit: </span><span class=formright><input type=text size=4 name=minscore value="<?php echo $line['minscore'];?>"></span><BR class=form>
-
-<span class=form>Show based on another assessment: </span><span class=formright>Show only after a score of <input type=text size=4 name=reqscore value="<?php echo $line['reqscore'];?>">
-   points is obtained on <select name=reqscoreaid>
-<?php
-	echo '<option value=0 ';
-	if ($line['reqscoreaid']==0) {echo 'selected="1"';}
-	echo '>Don\'t Use</option>';
-	if (count($aidarr)>0) {
-		foreach($aidarr as $id=>$name) {
-			echo "<option value=\"$id\" ";
-			if ($line['reqscoreaid']==$id) {
-				echo 'selected="1"';
-			}
-			echo ">$name</option>";
-		}
-	}
-?>
-</select></span><br class=form>
-	
 
 <span class=form>Time Limit (minutes, 0 for no time limit): </span><span class=formright><input type=text size=4 name=timelimit value="<?php echo $timelimit;?>"></span><BR class=form>
 
@@ -477,18 +454,6 @@ at <input type=text size=10 name=rtime value="<?php echo $rtime;?>"></span><BR c
 </span><br class=form>
 <span class=form>Show hints when available?</span><span class=formright><input type="checkbox" name="showhints" <?php if ($line['showhints']==1) { echo "CHECKED";} ?>></span><br class=form>
 <span class=form>Shuffle item order: </span><span class=formright><input type="checkbox" name="shuffle" <?php if ($line['shuffle']&1) {echo "CHECKED";} ?>></span><BR class=form>
-<span class=form>All items same random seed: </span><span class=formright><input type="checkbox" name="sameseed" <?php if ($line['shuffle']&2) {echo "CHECKED";} ?>></span><BR class=form>
-<span class=form>All students same version of questions: </span><span class=formright><input type="checkbox" name="samever" <?php if ($line['shuffle']&4) {echo "CHECKED";} ?>></span><BR class=form>
-<span class=form>Group assessment: </span><span class=formright>
-	<input type="radio" name="isgroup" value="0" <?php if ($line['isgroup']==0) { echo 'checked="1"';} ?> />Not a group assessment<br/>
-	<input type="radio" name="isgroup" value="1" <?php if ($line['isgroup']==1) { echo 'checked="1"';} ?> />Students can add members with login passwords<br/>
-	<input type="radio" name="isgroup" value="2" <?php if ($line['isgroup']==2) { echo 'checked="1"';} ?> />Students can add members without passwords<br/>
-	<input type="radio" name="isgroup" value="3" <?php if ($line['isgroup']==3) { echo 'checked="1"';} ?> />Students cannot add members
-	</span><br class="form" />
-<span class=form>Show question categories:</span><span class=formright>
-	<input name="showqcat" type="radio" value="0" <?php if ($showqcat=="0") {echo 'checked="1"';} ?>>No <br />
-	<input name="showqcat" type="radio" value="1" <?php if ($showqcat=="1") {echo 'checked="1"';} ?>>In Points Possible bar <br />
-	<input name="showqcat" type="radio" value="2" <?php if ($showqcat=="2") {echo 'checked="1"';} ?>>In navigation bar (Skip-Around only)</span><br class="form" />
 <?php
 	$query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -511,6 +476,47 @@ at <input type=text size=10 name=rtime value="<?php echo $rtime;?>"></span><BR c
 	}	
 	echo "</select></span><br class=form>\n";
 ?>
+<span class=form>Count: </span><span class=formright>
+<input type=radio name="cntingb" value="1" <?php if ($cntingb==1) { echo "checked=1";} ?> /> Count in Gradebook<br/>
+<input type=radio name="cntingb" value="0" <?php if ($cntingb==0) { echo "checked=1";} ?> /> Don't count in grade total<br/>
+<input type=radio name="cntingb" value="2" <?php if ($cntingb==2) {echo "checked=1";} ?> /> Count as Extra Credit</span><br class=form />
+
+</fieldset>
+<fieldset><legend>Advanced Options</legend>
+<span class=form>Minimum score to receive credit: </span><span class=formright><input type=text size=4 name=minscore value="<?php echo $line['minscore'];?>"></span><BR class=form>
+
+<span class=form>Show based on another assessment: </span><span class=formright>Show only after a score of <input type=text size=4 name=reqscore value="<?php echo $line['reqscore'];?>">
+   points is obtained on <select name=reqscoreaid>
+<?php
+	echo '<option value=0 ';
+	if ($line['reqscoreaid']==0) {echo 'selected="1"';}
+	echo '>Don\'t Use</option>';
+	if (count($aidarr)>0) {
+		foreach($aidarr as $id=>$name) {
+			echo "<option value=\"$id\" ";
+			if ($line['reqscoreaid']==$id) {
+				echo 'selected="1"';
+			}
+			echo ">$name</option>";
+		}
+	}
+?>
+</select></span><br class=form>
+<span class=form>All items same random seed: </span><span class=formright><input type="checkbox" name="sameseed" <?php if ($line['shuffle']&2) {echo "CHECKED";} ?>></span><BR class=form>
+<span class=form>All students same version of questions: </span><span class=formright><input type="checkbox" name="samever" <?php if ($line['shuffle']&4) {echo "CHECKED";} ?>></span><BR class=form>
+<span class=form>Group assessment: </span><span class=formright>
+	<input type="radio" name="isgroup" value="0" <?php if ($line['isgroup']==0) { echo 'checked="1"';} ?> />Not a group assessment<br/>
+	<input type="radio" name="isgroup" value="1" <?php if ($line['isgroup']==1) { echo 'checked="1"';} ?> />Students can add members with login passwords<br/>
+	<input type="radio" name="isgroup" value="2" <?php if ($line['isgroup']==2) { echo 'checked="1"';} ?> />Students can add members without passwords<br/>
+	<input type="radio" name="isgroup" value="3" <?php if ($line['isgroup']==3) { echo 'checked="1"';} ?> />Students cannot add members
+	</span><br class="form" />
+<span class=form>Show question categories:</span><span class=formright>
+	<input name="showqcat" type="radio" value="0" <?php if ($showqcat=="0") {echo 'checked="1"';} ?>>No <br />
+	<input name="showqcat" type="radio" value="1" <?php if ($showqcat=="1") {echo 'checked="1"';} ?>>In Points Possible bar <br />
+	<input name="showqcat" type="radio" value="2" <?php if ($showqcat=="2") {echo 'checked="1"';} ?>>In navigation bar (Skip-Around only)</span><br class="form" />
+
+</fieldset>
+
 </div>
 </fieldset>
 <div class=submit><input type=submit value=Submit></div>

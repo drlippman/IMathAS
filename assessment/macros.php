@@ -3,11 +3,7 @@
 //(c) 2006 David Lippman
 
 
-array_push($allowedmacros,"sec","csc","cot","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp");
-
-
-
-
+array_push($allowedmacros,"sec","csc","cot","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif");
 
 function mergearrays($a,$b) {
 	return array_merge($a,$b);
@@ -180,7 +176,6 @@ function addlabel($plot,$x,$y,$lbl) {
 	}
 	return $plot;
 }
-
 
 function showasciisvg($script) {
 	if (func_num_args()>2) {
@@ -733,15 +728,15 @@ function consecutive($min,$max) {
 
 
 function gcd($n,$m){ //greatest common divisor
-	$m = abs($m);
-	$n = abs($n);
+	$m = round(abs($m));
+	$n = round(abs($n));
 	if(!$m)return$n;
 	if(!$n)return$m;
 	return $m<$n?gcd($m,$n%$m):gcd($n,$m%$n);
 }
 function lcm($n, $m) //least common multiple 
 { 
-   return $m*($n/gcd($n,$m)); 
+   return round($m*($n/gcd($n,$m))); 
 } 
 
 function dispreducedfraction($n,$d) {
@@ -780,6 +775,52 @@ function calconarray($array,$todo) {
 	return array_map(create_function('$x','return('.$todo.');'),$array);	
 }
 
+//use: calconarray($a,"x + .01","floor(x)==x")
+function calconarrayif($array,$todo,$ifcond) {
+	global $disallowedwords,$allowedmacros;
+	$todo = str_replace($disallowedwords,"",$todo);
+	$rsnoquote = preg_replace('/"[^"]*"/','""',$todo);
+	$rsnoquote = preg_replace('/\'[^\']*\'/','\'\'',$rsnoquote);
+	if (preg_match_all('/([$\w]+)\s*\([^\)]*\)/',$rsnoquote,$funcs)) {
+		for ($i=0;$i<count($funcs[1]);$i++) {
+			if (strpos($funcs[1][$i],"$")===false) {
+				if (!in_array($funcs[1][$i],$allowedmacros)) {
+					echo "{$funcs[1][$i]} is not an allowed function<BR>\n";
+					return false;
+				}
+			}
+		}
+	}
+	$todo = mathphp($todo,'x');
+	$todo = str_replace('(x)','($x)',$todo);
+	
+	$rsnoquote = preg_replace('/"[^"]*"/','""',$ifcond);
+	$rsnoquote = preg_replace('/\'[^\']*\'/','\'\'',$rsnoquote);
+	if (preg_match_all('/([$\w]+)\s*\([^\)]*\)/',$rsnoquote,$funcs)) {
+		$ismath = true;
+		for ($i=0;$i<count($funcs[1]);$i++) {
+			if (strpos($funcs[1][$i],"$")===false) {
+				if (!in_array($funcs[1][$i],$allowedmacros)) {
+					echo "{$funcs[1][$i]} is not an allowed function<BR>\n";
+					return false;
+				}
+			}
+		}
+	}
+	$ifcond = str_replace('!=','#=',$ifcond);
+	$ifcond = mathphp($ifcond,'x');
+	$ifcond = str_replace('#=','!=',$ifcond);
+	$ifcond = str_replace('(x)','($x)',$ifcond);
+	$iffunc = create_function('$x','return('.$ifcond.');');
+	
+	$tmpfunc = create_function('$x','return('.$todo.');');
+	foreach($array as $k=>$x) {
+		if ($iffunc($x)) {
+			$array[$k] = $tmpfunc($x);
+		}
+	}
+	return $array;	
+}
 
 function sumarray($array) {
 	return array_sum($array);

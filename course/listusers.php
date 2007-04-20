@@ -354,9 +354,9 @@ END;
 		echo "<td>{$line['SID']}</td>\n";
 		echo "<td>$lastaccess</td>\n";
 		echo "<td><a href=\"gradebook.php?cid=$cid&stu={$line['userid']}&from=listusers\">Grades</a></td>\n";
-		echo "<td><a href=\"exception.php?cid=$cid&uid={$line['userid']}\">Make Exception</a></td>\n";
+		echo "<td><a href=\"exception.php?cid=$cid&uid={$line['userid']}\">Exception</a></td>\n";
 		//echo "<td><a href=\"listusers.php?cid=$cid&action=resetpw&uid={$line['userid']}\">Reset Password</a></td>\n";
-		echo "<td><a href=\"listusers.php?cid=$cid&chgstuinfo=true&uid={$line['userid']}\">Chg Info</a></td>\n";
+		echo "<td><a href=\"listusers.php?cid=$cid&chgstuinfo=true&uid={$line['userid']}\">Chg</a></td>\n";
 		echo "<td><a href=\"listusers.php?cid=$cid&action=unenroll&uid={$line['userid']}\">Unenroll</a></td>\n";
 		echo "</tr>\n\n";
 	}

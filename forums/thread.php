@@ -113,6 +113,20 @@
 		exit;
 	}
 	
+	if (isset($_GET['markallread'])) {
+		$query = "SELECT DISTINCT threadid FROM imas_forum_posts WHERE forumid='$forumid'";
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$now = time();
+		while ($row = mysql_fetch_row($result)) {
+			$query = "UPDATE imas_forum_views SET lastview=$now WHERE userid='$userid' AND threadid='{$row[0]}'";
+			mysql_query($query) or die("Query failed : $query " . mysql_error());
+			if (mysql_affected_rows()==0) {
+				$query = "INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES ('$userid','{$row[0]}',$now)";
+				mysql_query($query) or die("Query failed : $query " . mysql_error());
+			}
+		}
+	}
+	
 	if (isset($_GET['modify'])) { //adding or modifying thread
 		if (isset($_POST['subject'])) {  //form submitted
 			if ($isteacher) {
@@ -371,6 +385,7 @@
 		if ($isteacher) {
 			echo " | <a href=\"postsbyname.php?page=$page&cid=$cid&forum=$forumid\">List Posts by Name</a>";
 		}
+		echo " | <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid&markallread=true\">Mark all Read</a>";
 		echo "</p>";
 	}
 ?>
