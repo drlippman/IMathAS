@@ -323,6 +323,13 @@ function chgfb() {
 		document.getElementById("showanspracspan").className = "hidden";
 		document.getElementById("showansspan").className = "show";
 	}
+	if (document.getElementById("deffeedback").value=="Practice") {
+		document.getElementById("stdcntingb").className = "hidden";
+		document.getElementById("praccntingb").className = "formright";
+	} else {
+		document.getElementById("stdcntingb").className = "formright";
+		document.getElementById("praccntingb").className = "hidden";
+	}
 }
 function chgcopyfrom() {
 	if (document.getElementById('copyfrom').value==0) {
@@ -476,10 +483,13 @@ at <input type=text size=10 name=rtime value="<?php echo $rtime;?>"></span><BR c
 	}	
 	echo "</select></span><br class=form>\n";
 ?>
-<span class=form>Count: </span><span class=formright>
+<span class=form>Count: </span><span <?php if ($testtype=="Practice") {echo "class=hidden";} else {echo "class=formright";} ?> id="stdcntingb">
 <input type=radio name="cntingb" value="1" <?php if ($cntingb==1) { echo "checked=1";} ?> /> Count in Gradebook<br/>
 <input type=radio name="cntingb" value="0" <?php if ($cntingb==0) { echo "checked=1";} ?> /> Don't count in grade total<br/>
-<input type=radio name="cntingb" value="2" <?php if ($cntingb==2) {echo "checked=1";} ?> /> Count as Extra Credit</span><br class=form />
+<input type=radio name="cntingb" value="2" <?php if ($cntingb==2) {echo "checked=1";} ?> /> Count as Extra Credit</span>
+<span <?php if ($testtype!="Practice") {echo "class=hidden";} else {echo "class=formright";} ?> id="praccntingb">
+<input type=hidden name="cntingb" value="1"/>Practice tests aren't counted in grade total</span>
+<br class=form />
 
 </fieldset>
 <fieldset><legend>Advanced Options</legend>

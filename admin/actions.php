@@ -359,6 +359,24 @@ switch($_GET['action']) {
 		$old = time() - 60*60*24*30*$_POST['months'];
 		$who = $_POST['who'];
 		if ($who=="students") {
+			$query = "SELECT id FROM imas_users WHERE  lastaccess<$old AND (rights=0 OR rights=10)";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				$uid = $row[0];
+				$query = "DELETE FROM imas_assessment_sessions WHERE userid='$uid'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+				$query = "DELETE FROM imas_exceptions WHERE userid='$uid'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+				$query = "DELETE FROM imas_grades WHERE userid='$uid'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+				$query = "DELETE FROM imas_forum_views WHERE userid='$uid'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+				$query = "DELETE FROM imas_students WHERE userid='$uid'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+				//these could break parent structure for forums!
+				//$query = "DELETE FROM imas_forum_posts WHERE forumid='{$row[0]}' AND posttype=0";
+				//mysql_query($query) or die("Query failed : " . mysql_error());	
+			}
 			$query = "DELETE FROM imas_users WHERE lastaccess<$old AND (rights=0 OR rights=10)";
 		} else if ($who=="all") {
 			$query = "DELETE FROM imas_users WHERE lastaccess<$old AND rights<100";

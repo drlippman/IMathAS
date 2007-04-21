@@ -6,6 +6,7 @@ Upgrade Notes
 
 *** Database Changes ***
 
+#R37
 CREATE TABLE `imas_written` (
 `id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 `courseid` INT( 10 ) UNSIGNED NOT NULL ,

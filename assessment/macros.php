@@ -843,7 +843,4 @@ function unionarrays($a1,$a2) {
 	return array_values($a1);
 }
 
-
-
-
 ?>

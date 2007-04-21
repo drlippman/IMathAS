@@ -64,7 +64,7 @@
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 		}
-		$defgbmode = $_POST['gbmode1'] + $_POST['gbmode2'] + $_POST['gbmode4'] + $_POST['gbmode8'];
+		$defgbmode = $_POST['gbmode1'] + $_POST['gbmode2'] + $_POST['gbmode4'] + $_POST['gbmode8'] + $_POST['gbmode16'];
 		$query = "UPDATE imas_gbscheme SET useweights='$useweights',orderby='$orderby',defaultcat='$defaultcat',defgbmode='$defgbmode' WHERE courseid='$cid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid={$_GET['cid']}");
@@ -126,6 +126,11 @@
 	echo '/>All Items <br/><input type=radio name="gbmode4" value="4" ';
 	if (($defgbmode&4)==4) {echo 'checked=1';}
 	echo '/>Past and Available Items only</span><br class=form>';
+	echo '<span class=form>Not Counted items: </span><span class=formright><input type=radio name="gbmode16" value="0" ';
+	if (($defgbmode&16)==0) { echo 'checked=1';}
+	echo '/>Show <br/><input type=radio name="gbmode16" value="16" ';
+	if (($defgbmode&16)==16) {echo 'checked=1';}
+	echo '/>Hide</span><br class=form>';
 	echo '<span class=form>Totals columns show on:</span><span class=formright><input type=radio name="gbmode8" value="0" ';
 	if (($defgbmode&8)==0) { echo 'checked=1';}
 	echo '/>Right <br/><input type=radio name="gbmode8" value="8" ';

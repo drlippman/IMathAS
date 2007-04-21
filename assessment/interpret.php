@@ -121,7 +121,7 @@ function interpret($blockname,$anstype,$str)
 						if ($wherepos>0) {
 							$left = substr($com,0,$wherepos);
 							$cond = substr($com,$wherepos+5);
-							$com = '$count=0; do{'.$left.'; $count++;} while (!('.$cond.')&&($count<10)); if ($count==10) {echo "where not met in 10 iterations";}';
+							$com = '$count=0; do{'.$left.'; $count++;} while (!('.$cond.')&&($count<20)); if ($count==20) {echo "where not met in 20 iterations";}';
 						}
 					} else if ($ismath) {
 						//$com = str_replace($matches[2],mathphp($matches[2],null),$com);

@@ -252,6 +252,14 @@
 						exit;
 					}
 					echo "Are you SURE you want to unenroll the selected students?\n";
+					echo '<ul>';
+					$ulist = "'".implode("','",$_POST['checked'])."'";
+					$query = "SELECT LastName,FirstName,SID FROM imas_users WHERE id IN ($ulist)";
+					$result = mysql_query($query) or die("Query failed : " . mysql_error());
+					while ($row = mysql_fetch_row($result)) {
+						echo "<li>{$row[0]}, {$row[1]} ({$row[2]})</li>";
+					}
+					echo '</ul>';
 					$query = "SELECT COUNT(id) FROM imas_students WHERE courseid='{$_GET['cid']}'";
 					$result = mysql_query($query) or die("Query failed : " . mysql_error());
 					if (count($_POST['checked']) > floor(mysql_result($result,0,0)/2)) {

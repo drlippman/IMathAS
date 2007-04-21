@@ -10,6 +10,8 @@
 	//links: 0 reg, 1 cat totals
 	//PT's: 0 none, 2 show
 	//dates: 0 all, 4 current (instructor only)
+	//totals side: 0 right, 8 left
+	//don'tcount: 0 show, 16 hide
 	if (isset($_GET['gbmode'])) {
 		$gbmode = $_GET['gbmode'];
 	} else {
@@ -19,6 +21,7 @@
 	}
 	$nopracticet = (($gbmode&2)==0);
 	$curonly = (($gbmode&4)==4);
+	$hidenc = (($gbmode&16)==16);
 	if (isset($_GET['catfilter'])) {
 		$catfilter = $_GET['catfilter'];
 		$sessiondata[$cid.'catfilter'] = $catfilter;
@@ -381,6 +384,13 @@
 				$altgbmode = $gbmode+4;
 				echo "<option value=\"$altgbmode\">Items shown: all -> available and past</option>";
 			}
+			if ($hidenc) {
+				$altgbmode = $gbmode-16;
+				echo "<option value=\"$altgbmode\">Items shown: counted -> all</option>";
+			} else {
+				$altgbmode = $gbmode+16;
+				echo "<option value=\"$altgbmode\">Items shown: all -> counted</option>";
+			}
 			echo '</select>';
 			
 			echo "</div>";
@@ -476,6 +486,13 @@
 				$altgbmode = $gbmode+4;
 				echo "<br/>Showing all items.  <a href=\"gradebook.php?stu=$stu&gbmode=$altgbmode&cid=$cid\">Show Past and Available items only</a>\n";
 			}
+			if ($hidenc) {
+				$altgbmode = $gbmode-16;
+				echo "<br/>Showing Counted Items only.  <a href=\"gradebook.php?stu=$stu&gbmode=$altgbmode&cid=$cid\">Show all items</a>\n";
+			} else {
+				$altgbmode = $gbmode+16;
+				echo "<br/>Showing all items.  <a href=\"gradebook.php?stu=$stu&gbmode=$altgbmode&cid=$cid\">Hide Not Counted items</a>\n";
+			}
 		}
 		echo "<div class=clear></div></div>";
 	} else if (!isset($_GET['asid']) && (!$isteacher || $stu!=0)) { //showing student view
@@ -526,12 +543,10 @@
 		}
 		echo '<table class=gb>';
 		$gb[1][0] = preg_replace('/<[^>]+>/','',$gb[1][0]);
-		echo "<thead><tr><th>Item</th><th>Possible</th><th>{$gb[1][0]}</th>";
+		echo "<thead><tr><th>Item</th><th>Possible</th><th>Grade</th><th>Percent</th>";
 		if ($stu>0) {
 			echo "<th>Feedback</th>";
-		} else {
-			echo "<th>Percent</th>";
-		}
+		} 
 		echo "</tr></thead><tbody>";
 		
 		for ($i=1;$i<count($gb[0]);$i++) {
@@ -552,24 +567,22 @@
 			if (count($anpts)==1) {
 				$anpts[] = '';
 			}
+			$poss = substr($anpts[1],0,strpos($anpts[1],'pt'));
+				if ($poss>0) {
+					$apct = round(100*floatval(strip_tags($gb[1][$i]))/floatval($poss),1) . '%';
+				} else {
+					$apct = '';
+				}
 			echo $anpts[0];
 			echo '</td><td>'.$anpts[1];
-			echo '</td><td>'.$gb[1][$i].'</td>';
+			echo '</td><td>'.$gb[1][$i].'</td><td>'.$apct.'</td>';
 			if ($stu>0) {
 				if (isset($feedbacks[$i])) {
 					echo "<td>{$feedbacks[$i]}</td>";
 				} else {
 					echo "<td></td>";
 				}
-			} else {
-				$poss = substr($anpts[1],0,strpos($anpts[1],'pt'));
-				if ($poss>0) {
-					$apct = round(100*floatval(strip_tags($gb[1][$i]))/floatval($poss),1) . '%';
-				} else {
-					$apct = '-';
-				}
-				echo "<td>$apct</td>";
-			}
+			} 
 			echo '</tr>';
 		}
 		echo '</tbody></table>';
@@ -1096,7 +1109,7 @@
 	}
 	
 	function gbtable($isdisp) {
-		global $cid,$isteacher,$istutor,$tutorid,$userid,$gbmode,$nopracticet,$curonly,$catfilter,$stu;
+		global $cid,$isteacher,$istutor,$tutorid,$userid,$gbmode,$nopracticet,$curonly,$hidenc,$catfilter,$stu;
 		if ($isteacher && func_num_args()>1) {
 			$limuser = func_get_arg(1);
 		} else if (!$isteacher && !$istutor) {
@@ -1166,7 +1179,10 @@
 		}
 		//Pull Assessment Info
 		$now = time();
-		$query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,enddate,itemorder,gbcategory,cntingb FROM imas_assessments WHERE courseid='$cid' AND cntingb>0 ";
+		$query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,enddate,itemorder,gbcategory,cntingb FROM imas_assessments WHERE courseid='$cid' ";
+		if (!$isteacher || $hidenc) {
+			$query .= "AND cntingb>0 ";
+		}
 		if (!$isteacher || $curonly) {
 			$query .= "AND startdate<$now ";
 		}
@@ -1238,7 +1254,7 @@
 		if (!$isteacher || $curonly) {
 			$query .= "AND showdate<$now ";
 		}
-		if (!$isteacher) {
+		if (!$isteacher || $hidenc) {
 			$query .= "AND cntingb>0 ";
 		}
 		if ($catfilter>-1) {

@@ -42,10 +42,17 @@
 				$qid = mysql_insert_id();
 				
 				//add to itemorder
-				if ($itemorder=='') {
-					$itemorder = $qid;
+				if (isset($_GET['id'])) { //am adding copies of existing  
+					$itemarr = explode(',',$itemorder);
+					$key = array_search($_GET['id'],$itemarr);
+					array_splice($itemarr,$key+1,0,$qid);
+					$itemorder = implode(',',$itemarr);
 				} else {
-					$itemorder = $itemorder . ",$qid";	
+					if ($itemorder=='') {
+						$itemorder = $qid;
+					} else {
+						$itemorder = $itemorder . ",$qid";	
+					}
 				}
 			}
 			$query = "UPDATE imas_assessments SET itemorder='$itemorder' WHERE id='{$_GET['aid']}'";

@@ -1295,7 +1295,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				}
 			}
 		}
-		
+		$cntnan = 0;
 		for ($i = 0; $i < 20; $i++) {
 			for($j=0; $j < count($variables); $j++) {
 
@@ -1311,7 +1311,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			
 			$realans = eval("return ($answer);");
 			
-			if (isNaN($realans)) {continue;} //avoid NaN problems
+			if (isNaN($realans)) {$cntnan++; continue;} //avoid NaN problems
 			if ($answerformat=="equation") {  //if equation, store ratios
 				if (abs($realans)>.000001) {
 					$ratios[] = $myans[$i]/$realans;
@@ -1326,6 +1326,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					if ((abs($myans[$i]-$realans)/(abs($realans)+.0001) > $reltolerance-1E-12)) {$correct = false; break;}
 				}
 			}
+		}
+		if ($cntnan==20 && isset($GLOBALS['teacherid'])) {
+			echo "<p>Debug info: function evaled to Not-a-number at all test points.  Check \$domain</p>";
 		}
 		if ($answerformat=="equation") {
 			if (count($ratios)>0) {
