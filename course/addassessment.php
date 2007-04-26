@@ -140,6 +140,9 @@
 				$reviewdate = $cpreviewdate;
 			}
 		}
+		if ($_POST['deffeedback']=="Practice") {
+			$_POST['cntingb'] = 1;
+		}
 		if (isset($_GET['id'])) {  //already have id; update
 			$query = "SELECT isgroup FROM imas_assessments WHERE id='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -488,7 +491,7 @@ at <input type=text size=10 name=rtime value="<?php echo $rtime;?>"></span><BR c
 <input type=radio name="cntingb" value="0" <?php if ($cntingb==0) { echo "checked=1";} ?> /> Don't count in grade total<br/>
 <input type=radio name="cntingb" value="2" <?php if ($cntingb==2) {echo "checked=1";} ?> /> Count as Extra Credit</span>
 <span <?php if ($testtype!="Practice") {echo "class=hidden";} else {echo "class=formright";} ?> id="praccntingb">
-<input type=hidden name="cntingb" value="1"/>Practice tests aren't counted in grade total</span>
+Practice tests aren't counted in grade total</span>
 <br class=form />
 
 </fieldset>

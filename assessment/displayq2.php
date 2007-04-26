@@ -467,7 +467,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		$labits = explode('|',$la);
 		$out .= "<ul class=nomark>";
 		for ($i=0; $i < count($randkeys); $i++) {
-			$out .= "<li><input type=checkbox radio name=\"qn$qn"."[$i]\" value=$i ";
+			$out .= "<li><input type=checkbox name=\"qn$qn"."[$i]\" value=$i ";
 			if (($labits[$i]!='') && ($labits[$i] == $i)) { $out .= "CHECKED";}
 			$out .= ">{$questions[$randkeys[$i]]}</li> \n";
 		}

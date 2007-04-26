@@ -29,11 +29,12 @@ function interpret($blockname,$anstype,$str)
 			$com = preg_replace('/("[^"]*)\/\/([^"]*")/',"$1~~$2",$com);
 			$com = preg_replace('/^(.+)\/\/.+$/',"$1",$com);
 			$com = str_replace('~~','//',$com);
-			$com = str_replace($disallowedwords,"",$com);
-			$com = preg_replace('/&(\w+);/',"&$1 exit",$com);
+			//causing problems
+			//$com = str_replace($disallowedwords,"",$com);
+			//$com = preg_replace('/&(\w+);/',"&$1 exit",$com);
 			//causing problems in showasciisvg, so removed for now
 			//$com = str_replace(';','',$com);
-			$com = str_replace(' exit',';',$com);
+			//$com = str_replace(' exit',';',$com);
 			if (trim($com) == "") { continue;}
 			//check for "if" conditional
 			$ifcond = '';
@@ -121,7 +122,7 @@ function interpret($blockname,$anstype,$str)
 						if ($wherepos>0) {
 							$left = substr($com,0,$wherepos);
 							$cond = substr($com,$wherepos+5);
-							$com = '$count=0; do{'.$left.'; $count++;} while (!('.$cond.')&&($count<20)); if ($count==20) {echo "where not met in 20 iterations";}';
+							$com = '$count=0; do{'.$left.'; $count++;} while (!('.$cond.')&&($count<200)); if ($count==200) {echo "where not met in 200 iterations";}';
 						}
 					} else if ($ismath) {
 						//$com = str_replace($matches[2],mathphp($matches[2],null),$com);

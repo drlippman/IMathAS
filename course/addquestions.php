@@ -398,6 +398,9 @@
 	} else {
 		$searchterms = explode(" ",$safesearch);
 		$searchlikes = "(imas_questionset.description LIKE '%".implode("%' AND imas_questionset.description LIKE '%",$searchterms)."%') AND ";
+		if (substr($safesearch,0,3)=='id=') {
+			$searchlikes = "imas_questionset.id='".substr($safesearch,3)."' AND ";
+		}
 	}
 	
 	if (isset($_POST['libs'])) {

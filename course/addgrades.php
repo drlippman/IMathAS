@@ -164,7 +164,7 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 		if ($_GET['gbitem']!='new') {
 			echo "<span class=form></span><span class=formright><a href=\"addgrades.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=$cid&del={$_GET['gbitem']}\">Delete Item</a></span><br class=form />";
 		} else {
-			echo "<span class=form>Upload grades?</span><span class=formright><input type=checkbox name=\"doupload\" /></span><br class=form />";
+			echo "<span class=form>Upload grades?</span><span class=formright><input type=checkbox name=\"doupload\" /> <input type=submit value=\"Submit\"/></span><br class=form />";
 		}
 	} else {
 		$query = "SELECT name FROM imas_gbitems WHERE id='{$_GET['gbitem']}'";

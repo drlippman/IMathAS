@@ -12,7 +12,7 @@
 	//dates: 0 all, 4 current (instructor only)
 	//totals side: 0 right, 8 left
 	//don'tcount: 0 show, 16 hide
-	if (isset($_GET['gbmode'])) {
+	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
 		$gbmode = $_GET['gbmode'];
 	} else {
 		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
@@ -311,15 +311,7 @@
 			$placeinhead .= "	var toopen = '$address' + altgbmode;\n";
 			$placeinhead .= "  	window.location = toopen; \n";
 			$placeinhead .= "}\n";
-			$placeinhead .= "function chkAll(frm, arr, mark) {
-  for (i = 0; i <= frm.elements.length; i++) {
-   try{
-     if(frm.elements[i].name == arr) {
-       frm.elements[i].checked = mark;
-     }
-   } catch(er) {}
-  }
-}";
+			$placeinhead .= "function chkAll(frm, arr, mark) {  for (i = 0; i <= frm.elements.length; i++) {   try{     if(frm.elements[i].name == arr) {  frm.elements[i].checked = mark;     }   } catch(er) {}  }}";
 			$placeinhead .= "</script>\n";
 			$placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } </style>";
 		
@@ -779,11 +771,11 @@
 		echo '<script type="text/javascript">';
 		echo 'function hidecorrect() {';
 		echo '   var butn = document.getElementById("hctoggle");';
-		echo '   if (butn.value=="Hide Correct Questions") {';
-		echo '      butn.value = "Show Correct Questions";';
+		echo '   if (butn.value=="Hide Perfect Score Questions") {';
+		echo '      butn.value = "Show Perfect Score Questions";';
 		echo '      var setdispto = "block";';
 		echo '   } else { ';
-		echo '      butn.value = "Hide Correct Questions";';
+		echo '      butn.value = "Hide Perfect Score Questions";';
 		echo '      var setdispto = "none";';
 		echo '   }';
 		echo '   var divs = document.getElementsByTagName("div");';
@@ -796,7 +788,7 @@
 		echo '    }';
 		echo '}';
 		echo '</script>';
-		echo '<input type=button id="hctoggle" value="Hide Correct Questions" onclick="hidecorrect()" />';
+		echo '<input type=button id="hctoggle" value="Hide Perfect Score Questions" onclick="hidecorrect()" />';
 		echo "<form id=\"mainform\" method=post action=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&update=true\">\n";
 		$total = 0;
 		for ($i=0; $i<count($questions);$i++) {
@@ -1007,7 +999,7 @@
 		}
 		echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 		echo "<table class=gb id=myTable><thead>"; //<tr><td>Name</td>\n";
-		echo "<tr><th scope=\"col\">Question</th><th scope=\"col\">Average Score<br/>All</th>";
+		echo "<tr><th scope=\"col\">Question</th><th>Grade</th><th scope=\"col\">Average Score<br/>All</th>";
 		echo "<th scope=\"col\">Average Score<br/>Attempted</th><th scope=\"col\">Average Attempts<br/>(Regens)</th><th scope=\"col\">% Incomplete</th><th scope=\"col\">Preview</th></tr></thead>\n";
 		echo "<tbody>";
 		
@@ -1050,8 +1042,11 @@
 				$avgatt = 0;
 				$avgreg = 0;
 			}
-			echo "<td>{$row[0]}</td><td>$avg/$pts ($pc%)</td><td>$avg2/$pts ($pc2%)</td><td>$avgatt ($avgreg)</td><td>$pi</td>";
+			echo "<td>{$row[0]}</td>";
+			echo "<td><a href=\"gradeallq.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid=average&aid=$aid&qid={$row[1]}\">Grade</a></td>";
+			echo "<td>$avg/$pts ($pc%)</td><td>$avg2/$pts ($pc2%)</td><td>$avgatt ($avgreg)</td><td>$pi</td>";
 			echo "<td><input type=button value=\"Preview\" onClick=\"previewq({$row[3]})\"/></td>\n";
+			
 			echo "</tr>\n";
 			$i++;
 		}
@@ -1330,6 +1325,8 @@
 			foreach ($catkeys as $k) {
 				if ($assessmenttype[$k]!="Practice" && $cntingb[$k]==1) {
 					$catposs[$cat][] = $possible[$k]; //create category totals
+				} else if ($cntingb[$k]==2) {
+					$catposs[$cat][] = 0;
 				}
 				if (($orderby&1)==1) {  //display item header if displaying by category
 					$cathdr[$pos] = $cats[$cat][6];

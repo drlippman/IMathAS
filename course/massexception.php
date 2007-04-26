@@ -53,6 +53,16 @@
 	if (isset($_POST['tolist'])) {
 		$_POST['checked'] = explode(',',$_POST['tolist']);
 	}
+	if (count($_POST['checked'])==0) {
+		echo "<p>No students selected.</p>";
+		if ($calledfrom=='lu') {
+			echo "<a href=\"listusers.php?cid=$cid\">Try Again</a>\n";
+		} else if ($calledfrom=='gb') {
+			echo "<a href=\"gradebook.php?cid=$cid&gbmode={$_GET['gbmode']}\">Try Again</a>\n";
+		}
+		require("../footer.php");
+		exit;
+	}
 	echo "<input type=hidden name=\"tolist\" value=\"" . implode(',',$_POST['checked']) . "\">\n";
 	$tolist = "'".implode("','",$_POST['checked'])."'";
 	

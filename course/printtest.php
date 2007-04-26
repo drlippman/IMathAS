@@ -31,8 +31,8 @@
 		echo "</ul>";
 		echo "<h4>Print Margin Setup</h4>\n";
 		echo "Please check Page Setup under the File menu of your browser, and look up your print margin settings.<br/>\n";
-		echo "Left + Right:  <input type=text name=horiz size=5 value=\"1.5\"> inches<br/>\n";
-		echo "Top+Bottom:  <input type=text name=vert size=5 value=\"1.5\"> inches<br/>\n";
+		echo "Left + Right:  <input type=text name=horiz size=5 value=\"1.0\"> inches<br/>\n";
+		echo "Top + Bottom:  <input type=text name=vert size=5 value=\"1.0\"> inches<br/>\n";
 		echo "<p>Browser: <input type=radio name=browser value=0 checked=1>Internet Explorer <input type=radio name=browser value=1>FireFox<sup>*</sup></p>\n"; 
 		echo "<h4>Print Layout</h4>\n";
 		echo "<p>On the next page, you will see alternating blue and green rectangles indicating the size of pages.  Use the resizing ";

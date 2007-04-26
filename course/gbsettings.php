@@ -11,7 +11,7 @@
 	}
 	$cid = $_GET['cid'];
 	
-	if (isset($_GET['addnew'])) {
+	if (isset($_POST['addnew'])) {
 		$query = "INSERT INTO imas_gbcats (courseid) VALUES ('$cid')";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 	}
@@ -23,7 +23,7 @@
 		$query = "DELETE FROM imas_gbcats WHERE id='{$_GET['remove']}'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 	}
-	if (isset($_POST['submit'])) {
+	if (isset($_POST['submit']) || isset($_POST['addnew'])) {
 		//WORK ON ME
 		$useweights = $_POST['useweights'];
 		$orderby = $_POST['orderby'];
@@ -67,8 +67,10 @@
 		$defgbmode = $_POST['gbmode1'] + $_POST['gbmode2'] + $_POST['gbmode4'] + $_POST['gbmode8'] + $_POST['gbmode16'];
 		$query = "UPDATE imas_gbscheme SET useweights='$useweights',orderby='$orderby',defaultcat='$defaultcat',defgbmode='$defgbmode' WHERE courseid='$cid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid={$_GET['cid']}");
-		exit;
+		if (isset($_POST['submit'])) {
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid={$_GET['cid']}");
+			exit;
+		}
 	}
 	
 	$sc = "<script type=\"text/javascript\">";
@@ -159,9 +161,11 @@
 	}
 	
 	echo "</tbody></table>";
-	echo "<input type=submit name=submit value=\"Update\"/>";
+	echo "<p><input type=submit name=addnew value=\"Add New Category\"/></p>";
+	echo "<p><input type=submit name=submit value=\"Update\"/></p>";
 	echo "</form>";
-	echo "<p><a href=\"gbsettings.php?cid=$cid&addnew=1\">Add New Category</a></p>";
+	//echo "<p><a href=\"gbsettings.php?cid=$cid&addnew=1\">Add New Category</a></p>";
+	
 	
 	function disprow($id,$row) {
 		global $cid;

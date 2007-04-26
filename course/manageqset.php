@@ -239,14 +239,14 @@
 							mysql_query($query) or die("Query failed :$query " . mysql_error());
 						} 
 					} 
-					if (count($newlibs)==0) {
+					//if (count($newlibs)==0) {
 						$query = "SELECT id FROM imas_library_items WHERE qsetid='$qsetid'";
 						$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 						if (mysql_num_rows($result)==0) {
 							$query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES (0,'$qsetid','$userid')";
 							mysql_query($query) or die("Query failed :$query " . mysql_error());
 						}
-					}
+					//}
 					
 				}
 				
@@ -550,6 +550,9 @@ END;
 		} else {
 			$searchterms = explode(" ",$safesearch);
 			$searchlikes = "(imas_questionset.description LIKE '%".implode("%' AND imas_questionset.description LIKE '%",$searchterms)."%') AND ";
+			if (substr($safesearch,0,3)=='id=') {
+				$searchlikes = "imas_questionset.id='".substr($safesearch,3)."' AND ";
+			}
 		}
 		
 		if (isset($_POST['libs'])) {
@@ -648,6 +651,7 @@ END;
 		$query .= "imas_questionset.qtype,imas_users.firstName,imas_users.lastName,imas_users.groupid,imas_library_items.libid ";
 		$query .= "FROM imas_questionset,imas_library_items,imas_users WHERE $searchlikes ";
 		$query .= "imas_library_items.qsetid=imas_questionset.id AND imas_questionset.ownerid=imas_users.id ";
+		
 			
 		if ($isadmin) {
 			if ($searchall==0) {

@@ -314,7 +314,7 @@ END;
 			$headerleft .= mysql_result($result,0,0);
 			if (isset($_POST['iname'])) { $headerleft .= ' - ';}
 		}
-		if (isset($_POST['cname'])) {
+		if (isset($_POST['iname'])) {
 			$query = "SELECT LastName FROM imas_users WHERE id=$userid";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$headerleft .= mysql_result($result,0,0);

@@ -225,7 +225,8 @@ function horizshowarrays() {
 
 
 function clean($exp) {
-	$exp = str_replace(" ", "", $exp);
+	$exp = preg_replace('/(\+|\-)\s+(\+|\-)/',"$1$2",$exp);
+	//$exp = str_replace(" ", "", $exp);  //caused problems with "x > -3"
 	$exp = str_replace("+-","-",$exp);
 	$exp = str_replace("-+","-",$exp);
 	$exp = str_replace("--","+",$exp);
@@ -333,7 +334,7 @@ function polyclean($exp) {
 				}
 			} else {
 				if ($parr[0]==1) {
-					$outstr = $parr[1] . '^' . $parr[2]; // 1 x^m
+					$outstr .= $parr[1] . '^' . $parr[2]; // 1 x^m
 				} else {
 					$outstr .= $parr[0] . ' ' . $parr[1] . '^' . $parr[2]; // n x^m
 				}
