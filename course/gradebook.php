@@ -673,6 +673,7 @@
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&gbmode=$gbmode&cid={$_GET['cid']}");
 			exit;
 		}
+		$useeditor='review';
 		require("../assessment/header.php");
 		echo "<style type=\"text/css\">p.tips {	display: none;}\n</style>\n";
 		if (isset($_GET['starttime']) && $isteacher) {
@@ -834,7 +835,7 @@
 						if ($laarr[$k]=="ReGen") {
 							echo ' ReGen ';
 						} else {
-							echo "  <b>$cnt:</b> " . $laarr[$k];
+							echo "  <b>$cnt:</b> " . strip_tags($laarr[$k]);
 							$cnt++;
 						}
 					}
@@ -1835,10 +1836,6 @@
 	function isasidgroup($asid) {
 		$query = "SELECT agroupid FROM imas_assessment_sessions WHERE id='$asid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		if (mysql_num_rows($result)>0) {
-			return true;
-		} else {
-			return false;
-		}
+		return (mysql_result($result,0,0)==$asid);
 	}
 ?>

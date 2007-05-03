@@ -705,6 +705,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		$sa .= $answer;
 	} else if ($anstype == "essay") {
 		if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$qn];} else {$sz = $options['answerboxsize'];}}
+		if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$qn];} else {$displayformat = $options['displayformat'];}}
 		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		if (!isset($sz)) { 
@@ -716,8 +717,30 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$cols = 50;
 			$rows = $sz;
 		}
-		
-		$out .= "<textarea rows=\"$rows\" cols=\"$cols\" name=\"qn$qn\" id=\"qn$qn\">$la</textarea>\n";
+		if ($displayformat=='editor') {
+			$rows += 5;
+		}
+		if ($GLOBALS['useeditor']=='review') {
+			$la = str_replace('&quot;','"',$la);
+			$la = preg_replace('/%(\w+;)/',"&$1",$la);
+			//$la = str_replace('nbsp;','&nbsp;',$la);
+			$out .= "<div class=intro>".filter($la)."</div>";
+		} else {
+			if ($displayformat=='editor' && $GLOBALS['useeditor']==1) {
+				$la = str_replace('&quot;','"',$la);
+				$la = preg_replace('/%(\w+;)/',"&$1",$la);
+			}
+			$out .= "<textarea rows=\"$rows\" name=\"qn$qn\" id=\"qn$qn\" ";
+			if ($displayformat=='editor' && $GLOBALS['useeditor']==1) {
+				$out .= "style=\"width:98%;\" ";
+			} else {
+				$out .= "cols=\"$cols\" ";
+			}
+			$out .= ">$la</textarea>\n";
+			if ($displayformat=='editor' && $GLOBALS['useeditor']==1) {
+				$out .= "<script>editornames[editornames.length] = \"qn$qn\";</script>";
+			}
+		} 
 		$tip .= "Enter your answer as text.  This question is not automatically graded.";
 		$sa .= $answer;
 	} else if ($anstype == 'interval') {
@@ -1427,6 +1450,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 		return $correct;
 	} else if ($anstype == "essay") {
+		$givenans = preg_replace('/&(\w+;)/',"%$1",$givenans);
 		$GLOBALS['partlastanswer'] = $givenans;
 		return 0;
 	} else if ($anstype == 'interval' || $anstype == 'calcinterval') {

@@ -41,6 +41,57 @@ if ($sessiondata['graphdisp']==1) {
 ?>
 <script src="<?php echo $imasroot . "/javascript/AMhelpers.js";?>" type="text/javascript"></script>
 <script src="<?php echo $imasroot . "/javascript/confirmsubmit.js";?>" type="text/javascript"></script>
+<?php
+if ($useeditor==1 && $sessiondata['useed']==1) {
+	echo <<<END
+	<script type="text/javascript">
+	  _editor_url = "$imasroot/course/editor";
+	  _imasroot = "$imasroot/";
+	  _editor_lang = "en";
+	</script>
+	<script type="text/javascript" src="$imasroot/course/editor/htmlarea.js"></script>
+	<script type="text/javascript">
+END;
+	if (!isset($sessiondata['mathdisp']) || $sessiondata['mathdisp']==1 || $sessiondata['mathdisp']==2) {
+	 echo 'HTMLArea.loadPlugin("AsciiMath");';
+	} 
+	if (!isset($sessiondata['graphdisp']) || $sessiondata['graphdisp']==1) {
+	 echo 'HTMLArea.loadPlugin("AsciiSvg");';
+	 echo 'var svgimgbackup = false;';
+	} else if ($sessiondata['graphdisp']==2) {
+	 echo 'HTMLArea.loadPlugin("AsciiSvg");';
+	 echo 'var svgimgbackup = true;';
+	}
+	 echo 'var AScgiloc ="'.$imasroot.'/filter/graph/svgimg.php";'; 
+	echo <<<END
+	</script>
+	
+	<script type="text/javascript">
+	var editor = new Array();
+	var editornames = new Array();
+	function initEditor() {
+		for (i=0;i<editornames.length;i++) {
+			editor[i] = new HTMLArea(editornames[i]);
+			editor[i].config.hideSomeButtons(" popupeditor lefttoright righttoleft htmlmode ");
+END;
+	if (!isset($sessiondata['mathdisp']) || $sessiondata['mathdisp']==1 || $sessiondata['mathdisp']==2) {
+		echo "editor[i].registerPlugin(AsciiMath);\n";
+		//surrounds AsciiMath in red box while editting.  Change to your liking
+		echo "editor[i].config.pageStyle = \"span.AMedit {border:solid 1px #ff0000}\";\n";
+		echo "editor[i].config.toolbar[1].push(\"separator\",\"insertnewmath\",\"insertmath\",\"swapmathmode\");\n";
+	}
+	if (!isset($sessiondata['graphdisp']) || $sessiondata['graphdisp']==1 || $sessiondata['graphdisp']==2) {
+		echo "editor[i].registerPlugin(AsciiSvg);\n";
+		echo "editor[i].config.toolbar[1].push(\"separator\",\"insertsvg\");\n";
+	}
+	echo "editor[i].generate();\n";
+	echo "}";
+	echo "return false; }; </script>";
+} else {
+	echo "<script>var editornames = new Array(); function initEditor() { };</script>";
+}
+?>
+
 </head>
 <body>
 <div class=main>

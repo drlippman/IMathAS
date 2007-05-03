@@ -376,6 +376,7 @@
 
 	header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
 	header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
+	$useeditor = 1;
 	require("header.php");
 	
 	if (!$isdiag) {
@@ -824,7 +825,7 @@
 						echo "<p>Question with last attempt is displayed for your review only</p>";
 						$showa = false;
 						list($qsetid,$cat) = getqsetid($questions[$next]);
-						displayq($next,$qsetid,$seeds[$next],$showansafterlast,$showhints,$attempts[$next],false,false);
+						displayq($next,$qsetid,$seeds[$next],$showansafterlast,false,$attempts[$next],false,false);
 					}
 					echo "</div>\n";
 				}
@@ -951,7 +952,7 @@
 							echo "<img src=\"$imasroot/img/q_fullbox.gif\"/> ";
 							echo "<a href=\"showtest.php?action=seq&to=$i#curq\">Question ". ($i+1) . "</a>.  ";
 							$qavail = true;
-						} else if ($attempts[$i]<$allowed[$i] && $reattemptsremain) {
+						} else if (($attempts[$i]<$allowed[$i] || $allowed[$i]==0) && $reattemptsremain) {
 							echo "<img src=\"$imasroot/img/q_halfbox.gif\"/> ";
 							echo "<a href=\"showtest.php?action=seq&to=$i#curq\">Question ". ($i+1) . "</a>.  ";
 							$qavail = true;
@@ -988,10 +989,10 @@
 						displayq($i,$qsetids[$i],$seeds[$i],$doshowa,$showhints,$attempts[$i],false,(($testsettings['shuffle']&8)==8),false);
 					} else if ($qavail) {
 						echo "<div class=todoquestion>";
-						displayq($i,$qsetids[$i],$seeds[$i],$doshowa,$showhints,$attempts[$i],false,(($testsettings['shuffle']&8)==8),true);
+						displayq($i,$qsetids[$i],$seeds[$i],$doshowa,false,$attempts[$i],false,(($testsettings['shuffle']&8)==8),true);
 						echo "</div>";
 					} else {
-						displayq($i,$qsetids[$i],$seeds[$i],$doshowa,$showhints,$attempts[$i],false,(($testsettings['shuffle']&8)==8),true);
+						displayq($i,$qsetids[$i],$seeds[$i],$doshowa,false,$attempts[$i],false,(($testsettings['shuffle']&8)==8),true);
 					}
 					
 					if ($i==$toshow) {
@@ -1025,19 +1026,22 @@
 		$testsettings['intro'] .= "<p>Total Points Possible: " . array_sum($pointsposs) . "</p>";
 		if ($testsettings['isgroup']>0) {
 			$testsettings['intro'] .= "<p><span style=\"color:red;\">This is a group assessment.  Any changes effect all group members.</span><br/>";
-			$testsettings['intro'] .= "Group Members: <ul>";
-			$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM imas_users,imas_assessment_sessions WHERE ";
-			$query .= "imas_users.id=imas_assessment_sessions.userid AND imas_assessment_sessions.agroupid='{$sessiondata['groupid']}' ORDER BY imas_users.LastName,imas_users.FirstName";
-			$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
-			while ($row = mysql_fetch_row($result)) {
-				$curgrp[] = $row[0];
-				$testsettings['intro'] .= "<li>{$row[2]}, {$row[1]}</li>";
-			}
-			$testsettings['intro'] .= "</ul>";	
-			if ($testsettings['isgroup']==1 || $testsettings['isgroup']==2) {
-				$testsettings['intro'] .= "<a href=\"showtest.php?addgrpmem=true\">Add Group Members</a></p>";
-			} else {
-				$testsettings['intro'] .= '</p>';
+			if (!$isteacher) {
+				$testsettings['intro'] .= "Group Members: <ul>";
+				$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM imas_users,imas_assessment_sessions WHERE ";
+				$query .= "imas_users.id=imas_assessment_sessions.userid AND imas_assessment_sessions.agroupid='{$sessiondata['groupid']}' ORDER BY imas_users.LastName,imas_users.FirstName";
+				$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
+				while ($row = mysql_fetch_row($result)) {
+					$curgrp[] = $row[0];
+					$testsettings['intro'] .= "<li>{$row[2]}, {$row[1]}</li>";
+				}
+				$testsettings['intro'] .= "</ul>";
+			
+				if ($testsettings['isgroup']==1 || $testsettings['isgroup']==2) {
+					$testsettings['intro'] .= "<a href=\"showtest.php?addgrpmem=true\">Add Group Members</a></p>";
+				} else {
+					$testsettings['intro'] .= '</p>';
+				}
 			}
 		}
 		if ($ptsearned==array_sum($pointsposs)) {
@@ -1302,7 +1306,7 @@
 							echo "<img src=\"$imasroot/img/q_fullbox.gif\"/> ";
 							echo "<a href=\"showtest.php?action=seq&to=$i#curq\">Question ". ($i+1) . "</a>.  ";
 							$qavail = true;
-						} else if ($attempts[$i]<$allowed[$i] && $canimproveq[$i]) {
+						} else if (($attempts[$i]<$allowed[$i] || $allowed[$i]==0) && $canimproveq[$i]) {
 							echo "<img src=\"$imasroot/img/q_halfbox.gif\"/> ";
 							echo "<a href=\"showtest.php?action=seq&to=$i#curq\">Question ". ($i+1) . "</a>.  ";
 							$qavail = true;
@@ -1336,10 +1340,10 @@
 						displayq($i,$qsetids[$i],$seeds[$i],$doshowa,$showhints,$attempts[$i],false,(($testsettings['shuffle']&8)==8),false);
 					} else if ($qavail) {
 						echo "<div class=todoquestion>";
-						displayq($i,$qsetids[$i],$seeds[$i],$doshowa,$showhints,$attempts[$i],false,(($testsettings['shuffle']&8)==8),true);
+						displayq($i,$qsetids[$i],$seeds[$i],$doshowa,false,$attempts[$i],false,(($testsettings['shuffle']&8)==8),true);
 						echo "</div>";
 					} else {
-						displayq($i,$qsetids[$i],$seeds[$i],$doshowa,$showhints,$attempts[$i],false,(($testsettings['shuffle']&8)==8),true);
+						displayq($i,$qsetids[$i],$seeds[$i],$doshowa,false,$attempts[$i],false,(($testsettings['shuffle']&8)==8),true);
 					}
 					if ($i==$curq) {
 						echo "<div><input type=submit class=btn value=\"Submit Question ".($i+1)."\"></div><p></p>\n";
@@ -1540,6 +1544,11 @@
 		
 	}
 	
+	function endtest($testsettings) {
+		
+		//unset($sessiondata['sessiontestid']);
+	}
+	
 	function getallpointspossible($aid,$def,$qarr) {
 		$qlist = "'".implode("','",$qarr)."'";
 		$query = "SELECT id,points FROM imas_questions WHERE assessmentid='$aid' AND id IN ($qlist)" ;
@@ -1568,10 +1577,10 @@
 		return $possible;
 	}
 	
-	function endtest($testsettings) {
+	
+	
+	
 		
-		//unset($sessiondata['sessiontestid']);
-	}
 	
 	function getpointsafterpenalty($frac,$qn,$testsettings,$attempts) {
 		$query = "SELECT points,penalty,attempts FROM imas_questions WHERE id='$qn'";

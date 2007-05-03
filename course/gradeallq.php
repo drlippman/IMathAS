@@ -26,9 +26,17 @@
 				if ($kp[0]=='ud') {
 					$locs[$kp[1]] = $kp[2];
 					if (count($kp)==3) {
-						$allscores[$kp[1]] = $v;
+						if ($v=='N/A') {
+							$allscores[$kp[1]] = -1;
+						} else {
+							$allscores[$kp[1]] = $v;
+						}
 					} else {
-						$allscores[$kp[1]][] = $v;
+						if ($v=='N/A') {
+							$allscores[$kp[1]][$kp[3]] = -1;
+						} else {
+							$allscores[$kp[1]][$kp[3]] = $v;
+						}
 					}
 				}
 			}
@@ -72,7 +80,7 @@
 	if ($points==9999) {
 		$points = $defpoints;
 	}
-
+	$useeditor = 'review';
 	require("../assessment/header.php");
 	echo "<style type=\"text/css\">p.tips {	display: none;}\n</style>\n";
 	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
@@ -105,8 +113,8 @@
 	echo '<input type=button id="hctoggle" value="Hide Perfect Score Questions" onclick="hidecorrect()" />';
 	echo "<form id=\"mainform\" method=post action=\"gradeallq.php?stu=$stu&gbmode=$gbmode&cid=$cid&aid=$aid&qid=$qid&update=true\">\n";
 	
-	$query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions ";
-	$query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_assessment_sessions.assessmentid='$aid' ";
+	$query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions,imas_students ";
+	$query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_students.userid=imas_users.id AND imas_students.courseid='$cid' AND imas_assessment_sessions.assessmentid='$aid' ";
 	$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
 	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 	$cnt = 0;
@@ -132,12 +140,18 @@
 		echo "<div class=review>".$line['LastName'].', '.$line['FirstName'].': ';
 		list($pt,$parts) = printscore($scores[$loc]);
 		if ($parts=='') { 
+			if ($pt==-1) {
+				$pt = 'N/A';
+			}
 			echo "<input type=text size=4 name=\"ud-{$line['id']}-$loc\" value=\"$pt\">";
 		} 
 		if ($parts!='') {
 			echo " Parts: ";
 			$prts = explode(', ',$parts);
 			for ($j=0;$j<count($prts);$j++) {
+				if ($prts[$j]==-1) {
+					$prts[$j] = 'N/A';
+				}
 				echo "<input type=text size=2 name=\"ud-{$line['id']}-$loc-$j\" value=\"{$prts[$j]}\"> ";
 			}
 		}

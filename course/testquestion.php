@@ -7,6 +7,7 @@
 		require("../footer.php");
 		exit;
 	}
+	$useeditor = 1;
 	require("../assessment/header.php");
 	if (!isset($_POST['seed']) || isset($_POST['regen'])) {
 		$seed = rand(0,10000);

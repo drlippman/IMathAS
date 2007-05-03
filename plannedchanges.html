@@ -1,6 +1,5 @@
 <h3>Planned For Eventual Future Versions</h3>
 <ul>
-<li>New questions review process?</li>
 <li>Javascript answer entry editor</li>
 <li>add "false" to NaN check;  surpress output of divide by zero on testpoints</li>
 <li>User customization of colors, fonts</li>
@@ -23,8 +22,8 @@
 Important
 <li>Add mass change dates/assessments to help file</li>
 <li>Add Student Groups page to help file</li>
-<li>Written assignments / way to grade essay questions (fairly easy but need some time)</li>
 <li>Per-part show answers after last policy</li>
+<li>Per-question new version on reattempt</li>
 <li>attach notes/comments to libraries, questions</li>
 <li>Instructor specific library/question listing</li>
 <li>Rework question import/export to handle questions with images</li>
@@ -36,6 +35,7 @@ extensions penalty (needs db entry, lookup in gb)
 add link to modify code / report error in gradebook assessment edit
 adapt "equation" to work with inequalities (check if left-right is pos/neg, check that lt/lte matches)
 all email links, mailto->masssend?
+link to grades for assessments on course page
 
 button that clears all groups
 Randomly assign students to groups of N
@@ -60,7 +60,6 @@ Listing questions for assessment – have option to list the libraries of the ques
 Have practice-first option on assessments. (option for toggling to review mode)
 
 List questions once when in multiple libraries searched (have to work out list lib link)
-new item flag (hmmm)
 signature for emails/msgs (need field and page (chg user info?))
 points per problem - decimal/fraction, or point total for whole assessment 
    (maybe scale assessment to __ pts, but would be weird from student perspective (pt values don't mean what they say)
@@ -70,12 +69,14 @@ extra credit inside assessment (put on question itself - if set, calculate point
 photos of students
 link to student info chg on gradebook page?
 specify settings (# of copies) on Add Selected button
-
+One at a time, requiring correct answer before moving on
+Don't show hints if question answer is correct (on later views)
 
 Admin feature: identify duplicate questions (equivalent code blocks)
 
 
 Maybe not / Wait
+new item flag (hmmm)
 <li>Ignore case on equation variables (need $variable for it - has to be passed to clientside) </li>
 Test without saving:  Test, Save, Save As.. (need temp table.. )
 <li>collapse gradebook by blocks (no easy way to do this)</li>
@@ -114,3 +115,12 @@ handle submission conflicts
 on break from group, change asid if group creator
 If turn off groups, dissolve all groups
 Create group management page
+
+BIG PICTURE CHANGES
+New questions review process
+Support IMS Common Course Cartridge, QTI, IMS Enterprise XML (student info system integration)
+Definable rights, grant rights on single question library
+Parent/tutor rights for single student?
+Inline question (towards interactive ebooks).  How to handle gradebook for these things?
+Expand guided / conditional items.  How to handle gradebook?
+Rework backtrack method to track itself
