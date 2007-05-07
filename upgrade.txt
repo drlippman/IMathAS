@@ -6,6 +6,9 @@ Upgrade Notes
 
 *** Database Changes ***
 
+ALTER TABLE `imas_questions` ADD `regen` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0';
+ALTER TABLE `imas_questions` ADD `showans` VARCHAR( 1 ) NOT NULL DEFAULT '0';
+
 #R36
 ALTER TABLE `imas_assessments` ADD `reqscoreaid` INT( 10 ) UNSIGNED NOT NULL DEFAULT '0',
 ADD `reqscore` SMALLINT( 4 ) UNSIGNED NOT NULL DEFAULT '0';

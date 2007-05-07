@@ -21,8 +21,10 @@
 				$penalty = 'S'.$_POST['skippenalty'].$penalty;
 			}
 		}
+		$regen = $_POST['regen'];
+		$showans = $_POST['showans'];
 		if (isset($_GET['id'])) { //already have id - updating
-			$query = "UPDATE imas_questions SET points='$points',attempts='$attempts',penalty='$penalty' ";
+			$query = "UPDATE imas_questions SET points='$points',attempts='$attempts',penalty='$penalty',regen='$regen',showans='$showans' ";
 			$query .= "WHERE id='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			if ($_POST['copies']>0) {
@@ -36,8 +38,8 @@
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$itemorder = mysql_result($result,0,0);
 			for ($i=0;$i<$_POST['copies'];$i++) {
-				$query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,questionsetid) ";
-				$query .= "VALUES ('{$_GET['aid']}','$points','$attempts','$penalty','{$_GET['qsetid']}')";
+				$query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,regen,showans,questionsetid) ";
+				$query .= "VALUES ('{$_GET['aid']}','$points','$attempts','$penalty','$regen','$showans','{$_GET['qsetid']}')";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				$qid = mysql_insert_id();
 				
@@ -69,7 +71,7 @@
 		
 		echo "Modify Question Settings</div>\n";
 		if (isset($_GET['id'])) {
-			$query = "SELECT points,attempts,penalty FROM imas_questions WHERE id='{$_GET['id']}'";
+			$query = "SELECT points,attempts,penalty,regen,showans FROM imas_questions WHERE id='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$line = mysql_fetch_array($result, MYSQL_ASSOC);
 			if ($line['penalty']{0}==='L') {
@@ -91,6 +93,8 @@
 			$line['attempts']="";
 			$line['penalty']="";
 			$skippenalty = 0;
+			$line['regen']=0;
+			$line['showans']='0';
 		}
 	}
 ?>
@@ -114,6 +118,20 @@ Leave items blank or set to 9999 to use default values<BR>
      <option value="6" <?php if ($skippenalty==6) {echo "selected=1";} ?>>per missed attempt, after 6</option>
      <option value="10" <?php if ($skippenalty==10) {echo "selected=1";} ?>>on last possible attempt only</option>
      </select></span><BR class=form>
+
+<span class=form>New version on reattempt?</span><span class=formright>
+    <select name="regen">
+     <option value="0" <?php if ($line['regen']==0) { echo 'selected="1"';}?>>Use Default</option>
+     <option value="1" <?php if ($line['regen']==1) { echo 'selected="1"';}?>>Yes, new version on reattempt</option>
+     <option value="2" <?php if ($line['regen']==2) { echo 'selected="1"';}?>>No, same version on reattempt</option>
+    </select></span><br class="form"/>
+    
+<span class=form>Show Answers</span><span class=formright>
+    <select name="showans">
+     <option value="0" <?php if ($line['showans']=='0') { echo 'selected="1"';}?>>Use Default</option>
+     <option value="N" <?php if ($line['showans']=='N') { echo 'selected="1"';}?>>Never during assessment</option>
+     <option value="F" <?php if ($line['showans']=='F') { echo 'selected="1"';}?>>Show answer after last attempt</option>
+    </select></span><br class="form"/>
 
 <?php
 if (isset($_GET['qsetid'])) { //adding new question

@@ -19,6 +19,8 @@
 <h2>Guides</h2>
 <h4>Use Guides</h4>
 <ul>
+<li><a href="GettingStarted.pdf">Getting Started in WAMAP</a> (PDF file).  A walkthrough of creating a course in WAMAP, with screenshots.  This
+   version is specific to the WAMAP installation of IMathAS, but applies to any installation.</li>
 <li><a href="gettingstarted.html">Getting Started in IMathAS</a>.  A walkthrough of creating
    your first IMathAS course.</li>
 <li><a href="commontasks.html">Common Tasks in IMathAS</a>.  A walkthrough of common instructor activities.</li>

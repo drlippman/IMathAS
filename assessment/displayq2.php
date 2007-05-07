@@ -724,6 +724,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$la = str_replace('&quot;','"',$la);
 			$la = preg_replace('/%(\w+;)/',"&$1",$la);
 			//$la = str_replace('nbsp;','&nbsp;',$la);
+			if ($displayformat!='editor') {
+				$la = preg_replace('/\n/','<br/>',$la);
+			} 
 			$out .= "<div class=intro>".filter($la)."</div>";
 		} else {
 			if ($displayformat=='editor' && $GLOBALS['useeditor']==1) {

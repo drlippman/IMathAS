@@ -445,6 +445,7 @@ at <input type=text size=10 name=rtime value="<?php echo $rtime;?>"></span><BR c
 <span id="showanspracspan" class="<?php if ($testtype=="Practice" || $testtype=="Homework") {echo "show";} else {echo "hidden";} ?>">
 <select name="showansprac">
 	<option value="N" <?php if ($showans=="N") {echo "SELECTED";} ?>>Never</option>
+	<option value="F" <?php if ($showans=="F") {echo "SELECTED";} ?>>After last attempt (Skip Around only)</option>
 	<option value="0" <?php if ($showans=="0") {echo "SELECTED";} ?>>Always</option>
 	<option value="1" <?php if ($showans=="1") {echo "SELECTED";} ?>>After 1 attempt</option>
 	<option value="2" <?php if ($showans=="2") {echo "SELECTED";} ?>>After 2 attempts</option>

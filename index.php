@@ -14,6 +14,17 @@
 	while ($row = mysql_fetch_row($result)) {
 		$newmsgcnt[$row[0]] = $row[1];
 	}
+	$newpostscnt = array();
+	$query = "SELECT courseid,count(*) FROM ";
+	$query .= "(SELECT imas_forums.courseid,imas_forum_posts.threadid,max(imas_forum_posts.postdate),mfv.lastview FROM imas_forum_posts ";
+	$query .= "JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id LEFT JOIN (SELECT * FROM imas_forum_views WHERE userid='$userid') AS mfv ";
+	$query .= "ON mfv.threadid=imas_forum_posts.threadid WHERE imas_forums.courseid IN (SELECT courseid FROM imas_students WHERE userid='$userid') ";
+	$query .= "GROUP BY imas_forum_posts.threadid HAVING ((max(imas_forum_posts.postdate)>mfv.lastview) OR (mfv.lastview IS NULL))) AS newitems ";
+	$query .= "GROUP BY courseid";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	while ($row = mysql_fetch_row($result)) {
+		$newpostscnt[$row[0]] = $row[1];
+	}
 
 	$query = "SELECT imas_courses.name,imas_courses.id FROM imas_students,imas_courses ";
 	$query .= "WHERE imas_students.courseid=imas_courses.id AND imas_students.userid='$userid' ";
@@ -35,7 +46,9 @@
 			if (isset($newmsgcnt[$line['id']]) && $newmsgcnt[$line['id']]>0) {
 				echo " <span style=\"color:red\">New Messages ({$newmsgcnt[$line['id']]})</span>";
 			}
-			
+			if (isset($newpostscnt[$line['id']]) && $newpostscnt[$line['id']]>0) {
+				echo " <span style=\"color:red\">New Posts</span>";
+			}
 			echo "</li>\n";
 		} while ($line = mysql_fetch_array($result, MYSQL_ASSOC));
 		echo "</ul>\n";
@@ -52,6 +65,17 @@
 		echo "<span class=form><label for=\"cid\">Course id:</label></span> <input class=form type=text size=6 id=cid name=cid><BR class=form>\n";
 		echo "<span class=form><label for=\"ekey\">Enrollment key:</label></span> <input class=form type=text size=10 id=\"ekey\" name=\"ekey\"><BR class=form>\n";
 		echo "<div class=submit><input type=submit value='Sign Up'></div></form></div>\n";
+	}
+	
+	$query = "SELECT courseid,count(*) FROM ";
+	$query .= "(SELECT imas_forums.courseid,imas_forum_posts.threadid,max(imas_forum_posts.postdate),mfv.lastview FROM imas_forum_posts ";
+	$query .= "JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id LEFT JOIN (SELECT * FROM imas_forum_views WHERE userid='$userid') AS mfv ";
+	$query .= "ON mfv.threadid=imas_forum_posts.threadid WHERE imas_forums.courseid IN (SELECT courseid FROM imas_teachers WHERE userid='$userid') ";
+	$query .= "GROUP BY imas_forum_posts.threadid HAVING ((max(imas_forum_posts.postdate)>mfv.lastview) OR (mfv.lastview IS NULL))) AS newitems ";
+	$query .= "GROUP BY courseid";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	while ($row = mysql_fetch_row($result)) {
+		$newpostscnt[$row[0]] = $row[1];
 	}
 	$query = "SELECT imas_courses.name,imas_courses.id,imas_courses.available,imas_courses.lockaid FROM imas_teachers,imas_courses ";
 	$query .= "WHERE imas_teachers.courseid=imas_courses.id AND imas_teachers.userid='$userid' ";
@@ -74,6 +98,9 @@
 			}
 			if (isset($newmsgcnt[$line['id']]) && $newmsgcnt[$line['id']]>0) {
 				echo " <span style=\"color:red\">New Messages ({$newmsgcnt[$line['id']]})</span>";
+			}
+			if (isset($newpostscnt[$line['id']]) && $newpostscnt[$line['id']]>0) {
+				echo " <span style=\"color:red\">New Posts</span>";
 			}
 			
 			echo "</li>\n";

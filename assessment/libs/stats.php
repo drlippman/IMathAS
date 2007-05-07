@@ -372,37 +372,40 @@ function boxplot($arr,$label) {
 }
 
 
-//normalcdf(z)
+//normalcdf(z,[dec])
 //calculates the area under the standard normal distribution to the left of the
-//z-value z, to 4 decimals 
+//z-value z, to dec decimals (defaults to 4) 
 //based on someone else's code - can't remember whose!
-function normalcdf($ztest) {
+function normalcdf($ztest,$dec=4) {
+	$eps = pow(.1,$dec);
+	$eps2 = pow(.1,$dec+2);
+	
 	$ds = 1;
 	$s = 0;
 	$i = 0;
 	$z = abs($ztest);
 	$fact = 1;
-	while (abs($ds)>.000001) {
+	while (abs($ds)>$eps2) {
 		$ds = pow(-1,$i)*pow($z,2.0*$i+1.0)/(pow(2.0,$i)*$fact*(2.0*$i+1.0));
 		$s += $ds;
 		$i++;
 		$fact *= $i;
-		if (abs($s)<0.0001) {
+		if (abs($s)<$eps) {
 			break;
 		}
 	}
 	
 	$s *= 0.39894228;
-	$s = round($s,4);
+	$s = round($s,$dec);
 	if ($ztest > 0) {
 		$pval = .5 + $s;
 	} else {
 		$pval = .5 - $s;
 	}
-	if ($pval < .0001) {
-		$pval = .0001;
-	} else if ($pval > .9999) {
-		$pval = .9999;
+	if ($pval < $eps) {
+		$pval = $eps;
+	} else if ($pval > (1-$eps)) {
+		$pval = round(1-$eps,$dec);
 	}
 	return $pval;
 }
