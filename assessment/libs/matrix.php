@@ -1,8 +1,8 @@
 <?
-//Matrix functions.  Version 1.1, Oct 3, 2006
+//Matrix functions.  Version 1.2, May 15 2007
 
 global $allowedmacros;
-array_push($allowedmacros,"matrix","matrixformat","matrixsum","matrixdiff","matrixscalar","matrixprod","matrixaugment","matrixrowscale","matrixrowswap","matrixrowcombine","matrixrowcombine3","matrixidentity");
+array_push($allowedmacros,"matrix","matrixformat","matrixsum","matrixdiff","matrixscalar","matrixprod","matrixaugment","matrixrowscale","matrixrowswap","matrixrowcombine","matrixrowcombine3","matrixidentity","matrixtranspose","matrixrandinvertible");
 
 //matrix(vals,rows,cols)
 //Creates a new matrix item.  
@@ -179,6 +179,37 @@ function matrixidentity($n) {
 	return $m;
 }
 
+//matrixtranspose(m)
+//Calculates the transpose of the matrix m
+function matrixtranspose($m) {
+	$n = array();
+	for ($c=0; $c<count($m[0]); $c++) {
+		$n[$c] = array();
+		for ($r=0; $r<count($m); $r++) {
+			$n[$c][$r] = $m[$r][$c];
+		}
+	}
+	return $n;	
+}
+
+//randinvertible(n)
+//Creates a random n x n invertible matrix by applying random row combinations to an identity matrix
+//returns an array of two matrices:  M and M^-1
+function matrixrandinvertible($n) {
+	$m = matrixidentity($n);
+	$mi = matrixidentity($n);
+	$ops = array();
+	$mult = nonzerodiffrands(-3,3,5);
+	for ($i=0; $i<5; $i++) {
+		list($sr,$er) = diffrands(0,$n-1,2);
+		$ops[$i] = array($sr,$er);
+		$m = matrixrowcombine($m,$sr,$mult[$i],$er,1,$er);
+	}
+	for ($i=4; $i>-1; $i--) {
+		$mi = matrixrowcombine($mi,$ops[$i][0],-1*$mult[$i],$ops[$i][1],1,$ops[$i][1]);	
+	}
+	return array($m,$mi);
+}
 
 ?>
 

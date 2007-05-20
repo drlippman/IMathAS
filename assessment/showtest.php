@@ -816,7 +816,7 @@
 					recordtestdata();
 				}
 				
-				echo "<div>\n";
+				echo "<div class=review style=\"margin-top:5px;\">\n";
 				$reattemptsremain = false;
 				if ($showeachscore) {
 					$possible = $qi[$questions[$qn]]['points'];
@@ -862,11 +862,13 @@
 				} 
 				if (!$done) {
 					echo "<p>Question scored. Continue with assessment, or click <a href=\"showtest.php?action=seq&done=true\">here</a> to end and score test now</p>\n";
+					echo "</div>\n";
 					echo "<hr/>";
 				} else {
+					echo "</div>\n";
 					//echo "<a href=\"showtest.php?action=skip&done=true\">Click here to finalize and score test</a>\n";
 				}
-				echo "</div>\n";
+				
 				
 			}
 			if (isset($_GET['to'])) { //jump to a problem

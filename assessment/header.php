@@ -7,8 +7,18 @@
 $start_time = microtime(true); 
 //load filter
 $curdir = rtrim(dirname(__FILE__), '/\\');
+$loadgraphfilter = true;
 require("$curdir/../filter/filter.php");
 ?>
+<script type="text/javascript">
+function init() {
+	for (var i=0; i<initstack.length; i++) {
+		var foo = initstack[i]();
+	}
+}
+initstack = new Array();
+window.onload = init;
+</script>
 <link rel="stylesheet" href="<?php echo $imasroot . "/assessment/mathtest.css";?>" type="text/css"/>
 <?php
 if ($isdiag) {
@@ -41,7 +51,10 @@ if ($sessiondata['graphdisp']==1) {
 ?>
 <script src="<?php echo $imasroot . "/javascript/AMhelpers.js";?>" type="text/javascript"></script>
 <script src="<?php echo $imasroot . "/javascript/confirmsubmit.js";?>" type="text/javascript"></script>
+<!--[if IE]><script type="text/javascript" src="<?php echo $imasroot;?>/javascript/excanvas.js"></script><![endif]-->
+<script src="<?php echo $imasroot;?>/javascript/drawing.js"></script>
 <?php
+echo "<script type=\"text/javascript\">imasroot = '$imasroot';</script>";
 if ($useeditor==1 && $sessiondata['useed']==1) {
 	echo <<<END
 	<script type="text/javascript">

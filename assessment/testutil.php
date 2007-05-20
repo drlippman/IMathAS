@@ -93,8 +93,10 @@ function calcpointsafterpenalty($frac,$qi,$testsettings,$attempts) {
 //Get total of points possible
 function totalpointspossible($qi) {
 	$poss = 0;
-	foreach($qi as $qii) {
-		$poss += $qii['points'];
+	if (is_array($qi)) {
+		foreach($qi as $qii) {
+			$poss += $qii['points'];
+		}
 	}
 	return $poss;
 }

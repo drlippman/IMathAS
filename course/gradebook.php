@@ -509,6 +509,11 @@
 			echo "<h2>Grade Book Student Detail</h2>\n";
 		}
 		if ($stu>0) { //doing a student
+			if (isset($_POST['usrcomments'])) {
+				$query = "UPDATE imas_students SET gbcomment='{$_POST['usrcomments']}' WHERE userid='$stu'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+				echo "<p>Comment Updated</p>";
+			}
 			list($gb,$cathdr,$feedbacks) = gbtable(true,$stu);
 			echo '<h3>' . strip_tags($gb[1][0]) . '</h3>';
 			$query = "SELECT imas_students.gbcomment,imas_users.email FROM imas_students,imas_users WHERE ";
@@ -525,8 +530,15 @@
 			} else {
 				$gbcomment = '';
 			}
-			if (trim($gbcomment)!='') {
-				echo "<div class=\"item\">$gbcomment</div>";
+			if (trim($gbcomment)!='' || $isteacher) {
+				if ($isteacher) {
+					echo "<form method=post action=\"gradebook.php?{$_SERVER['QUERY_STRING']}\">";
+					echo "<textarea name=\"usrcomments\" rows=3 cols=60>$gbcomment</textarea><br/>";
+					echo "<input type=submit value=\"Update Comment\">";
+					echo "</form>";
+				} else {
+					echo "<div class=\"item\">$gbcomment</div>";
+				}
 			}
 		} else { //doing averages
 			list($gb,$cathdr) = gbtable(true);
@@ -962,7 +974,7 @@
 		require("../header.php");
 		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 		echo "&gt; <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid\">Gradebook</a> &gt; Item Analysis</div>";
-		echo "<h2>Grade Book Item Analysis</h2>\n";
+		echo "<h2>Item Analysis: \n";
 		$aid = $_GET['aid'];
 		$qtotal = array();
 		$qcnt = array();
@@ -970,6 +982,11 @@
 		$timetaken = array();
 		$attempts = array();
 		$regens = array();
+		
+		$query = "SELECT defpoints,name FROM imas_assessments WHERE id='$aid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$defpoints = mysql_result($result,0,0);
+		echo mysql_result($result,0,1).'</h2>';
 		
 		$query = "SELECT ias.questions,ias.bestscores,ias.bestattempts,ias.bestlastanswers,ias.starttime,ias.endtime FROM imas_assessment_sessions AS ias,imas_students ";
 		$query .= "WHERE ias.userid=imas_students.userid AND imas_students.courseid='$cid' AND ias.assessmentid='$aid'";
@@ -1003,10 +1020,6 @@
 		echo "<tr><th scope=\"col\">Question</th><th>Grade</th><th scope=\"col\">Average Score<br/>All</th>";
 		echo "<th scope=\"col\">Average Score<br/>Attempted</th><th scope=\"col\">Average Attempts<br/>(Regens)</th><th scope=\"col\">% Incomplete</th><th scope=\"col\">Preview</th></tr></thead>\n";
 		echo "<tbody>";
-		
-		$query = "SELECT defpoints FROM imas_assessments WHERE id='$aid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$defpoints = mysql_result($result,0,0);
 		
 		$i = 1;
 		$qs = array_keys($qtotal);

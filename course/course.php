@@ -628,7 +628,8 @@
 					   echo "<BR> $endname $enddate \n";
 				   }
 				   if (isset($teacherid)) { 
-					echo " <i><a href=\"addquestions.php?aid=$typeid&cid=$cid\">Modify Questions</a></i> | <a href=\"addassessment.php?id=$typeid&block=$parent&cid=$cid\">Modify Settings</a></i> \n"; 
+					echo " <i><a href=\"addquestions.php?aid=$typeid&cid=$cid\">Questions</a></i> | <a href=\"addassessment.php?id=$typeid&block=$parent&cid=$cid\">Settings</a></i> \n";
+					echo " | <a href=\"gradebook.php?cid=$cid&asid=average&aid=$typeid\">Grades</a>";
 				   }
 				   echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
 				   echo "</div>\n";
@@ -641,7 +642,10 @@
 				   if ($line['reviewdate']!=2000000000) { 
 					   echo " until $reviewdate \n";
 				   }
-				   if (isset($teacherid)) { echo "<i><a href=\"addquestions.php?aid=$typeid&cid=$cid\">Modify Questions</a></i> | <a href=\"addassessment.php?id=$typeid&block=$parent&cid=$cid\">Modify Settings</a>\n"; }
+				   if (isset($teacherid)) { 
+				   	echo "<i><a href=\"addquestions.php?aid=$typeid&cid=$cid\">Questions</a></i> | <a href=\"addassessment.php?id=$typeid&block=$parent&cid=$cid\">Settings</a>\n";
+					echo " | <a href=\"gradebook.php?cid=$cid&asid=average&aid=$typeid\">Grades</a>";
+				   }
 				   echo filter("<br/><i>This assessment is in review mode - no scores will be saved</i></div><div class=itemsum>{$line['summary']}</div>\n");
 				   echo "</div>\n";
 			   } else if (isset($teacherid)) {
@@ -654,8 +658,9 @@
 					   echo ", Review until $reviewdate";
 				   }
 				   echo "</i> \n";
-				   echo "<a href=\"addquestions.php?aid=$typeid&cid=$cid\">Modify Questions</a> | <a href=\"addassessment.php?id=$typeid&cid=$cid\">Modify Settings</a> | \n";
+				   echo "<a href=\"addquestions.php?aid=$typeid&cid=$cid\">Questions</a> | <a href=\"addassessment.php?id=$typeid&cid=$cid\">Settings</a> | \n";
 				   echo "<a href=\"addassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
+				   echo " | <a href=\"gradebook.php?cid=$cid&asid=average&aid=$typeid\">Grades</a>";
 				   echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
 				   echo "</div>\n";
 			   }

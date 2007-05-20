@@ -64,6 +64,9 @@
 		echo "<a href=\"msglist.php?cid=$cid&filtercid=$filtercid&page=$page&add=new&to={$line['msgfrom']}&replyto=$msgid\">Reply</a> | ";
 		echo "<a href=\"msglist.php?cid=$cid&filtercid=$filtercid&page=$page&add=new&to={$line['msgfrom']}&toquote=$msgid\">Quote in Reply</a> | ";
 		echo "<a href=\"msglist.php?cid=$cid&filtercid=$filtercid&page=$page&removeid=$msgid\">Delete</a>";
+		if ($isteacher && $line['courseid']==$cid) {
+			echo " | <a href=\"$imasroot/course/gradebook.php?cid={$line['courseid']}&stu={$line['msgfrom']}\">Gradebook</a>";
+		}
 	}
 	if ($type!='sent' && ($line['isread']==0 || $line['isread']==4)) {
 		$query = "UPDATE imas_msgs SET isread=isread+1 WHERE id='$msgid'";

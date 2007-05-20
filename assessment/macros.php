@@ -3,7 +3,7 @@
 //(c) 2006 David Lippman
 
 
-array_push($allowedmacros,"sec","csc","cot","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif");
+array_push($allowedmacros,"sec","csc","cot","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif","in_array","prettyint","prettyreal","arraystodots");
 
 function mergearrays($a,$b) {
 	return array_merge($a,$b);
@@ -48,6 +48,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	}
 		
 	foreach ($funcs as $function) {
+		if ($function=='') { continue;}
 		$alt .= "Start Graph";
 		$function = explode(",",$function);
 		//correct for parametric
@@ -109,17 +110,20 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		} else {
 			$dx = ($xmax - $xmin)/100;
 			$stopat = 101;
+			if ($xmax==$xmin) {
+				$stopat = 1;
+			}
 		}
 		$lasty = 0;
 		$lastl = 0;
 		for ($i = 0; $i<$stopat;$i++) {
 			if ($isparametric) {
-				$t = $xmin + $dx*$i;
+				$t = $xmin + $dx*$i+1E-10;
 				if (in_array($t,$avoid)) { continue;}
 				$x = round(eval("return ($xfunc);"),3);
 				$y = round(eval("return ($yfunc);"),3);
 			} else {
-				$x = $xmin + $dx*$i;
+				$x = $xmin + $dx*$i + 1E-10;
 				if (in_array($x,$avoid)) { continue;}
 				$y = round(eval("return ($func);"),3);
 			}
@@ -842,6 +846,21 @@ function unionarrays($a1,$a2) {
 		}
 	}
 	return array_values($a1);
+}
+
+function prettyint($n) {
+	return number_format($n);
+}
+function prettyreal($n,$d) {
+	return number_format($n,$d);
+}
+
+function arraystodots($x,$y) {
+	$out = array();
+	for ($i=0;$i<count($x);$i++)  {
+		$out[] = $x[$i].','.$y[$i];	
+	}
+	return $out;
 }
 
 ?>

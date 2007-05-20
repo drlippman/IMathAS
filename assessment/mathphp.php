@@ -74,6 +74,9 @@ function mathphp($st,$varlist) {
   $st= preg_replace('/([0-9])\*E([\-0-9])/',"\\1E\\2",$st);
   
   $st= preg_replace("/\)([\(0-9a-zA-Z])/",")*$1",$st);
+  
+  //fix PHP's 1/-2*5 order of ops bug
+  $st = preg_replace('/\/(\-[\d\.E]+)(\*|\/)/',"/($1)$2",$st);
  
   while ($i=strpos($st,"^")) {
     //find left argument

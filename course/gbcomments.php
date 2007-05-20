@@ -110,10 +110,10 @@
 		$query = "SELECT id FROM imas_students WHERE courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
-			if ($_POST[$row[0]]!='') {
+			//if ($_POST[$row[0]]!='') {
 				$query = "UPDATE imas_students SET gbcomment='{$_POST[$row[0]]}' WHERE id='{$row[0]}'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
-			}
+			//}
 		}
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=$cid");
 		exit;

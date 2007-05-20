@@ -155,6 +155,7 @@ dd {
 		<li><a href="#function">Function</a></li>
 		<li><a href="#string">String</a></li>
 		<li><a href="#essay">Essay</a></li>
+		<li><a href="#draw">Drawing</a></li>
 		<li><a href="#numericalmatrix">Numerical Matrix</a></li>
 		<li><a href="#calculatedmatrix">Calculated Matrix</a></li>
 		<li><a href="#interval">Interval</a></li>
@@ -1370,6 +1371,10 @@ The following macros help with display:
    This function can do weird things for equations that are not simple polynomials, so test well</li>
 <li><b>makexpretty and makexprettydisp</b>:  Like makepretty, but the X-tra version - attempts to clean up things like 1*, 0*, etc.  This function
    will often cause weird things to happen, so test well</li>
+<li><b>prettyint(number)</b>:  Adds commas in thousands spaces of integers.  Example: prettyint(1234) will return "1,234".  The result is a string, which
+   can only be used for display, not in calculations</li>
+<li><b>prettyreal(number,decimals)</b>:  Adds commas in thousands spaces of number, and rounds decimal to decimals places.  Example: prettyreal(1234.567,2) will return "1,234.57".  The result is a string, which
+   can only be used for display, not in calculations</li> 
 <li><b>dispreducedfraction(numerator,denominator)</b>:  Takes two numbers as numerator and denominator of a fraction, returning a display form of the fraction,
     reduced to lowest terms.  Suitable for $showanswer</li>
 <li><b>showarrays(string,array,[string,array]...)</b>:  Creates a tabular display of the data in the array(s) as column(s), with the strings
@@ -1435,6 +1440,7 @@ These macros are fairly general purpose:
 <li><b>diffarrays(array1,array2)</b>: Returns all elements in array1 that are not also in array2</li>
 <li><b>count(array)</b>:  Counts the number of entries in the array</li>
 <li><b>sumarray(array)</b>: Adds the entries in an array</li>
+<li><b>in_array(needle,haystack)</b>:  Checks if value needle is in array haystack.  Returns true or false</li>
 </ul>
 </div>
 <div class=h2>
@@ -1863,6 +1869,47 @@ None - the essay type is not computer graded.
 
 </div>
 <div class=h3>
+<h3><a name="draw">Drawing</a></h3>
+
+Drawing question require the student to draw one or more lines/curves or dots.  
+Dots are graded right/wrong.  Lines/curves are graded based on the deviation of the 
+drawn line from the correct line.
+
+<p><b>Required Variables</b><BR>
+<dl>
+<dt>$answers = a string or array of strings describing the points or curves to be drawn (In Answer)</dt>
+	<dd>Curves:  "f(x)" or "f(x),xmin,xmax", like "x^2+3" or "x,-3,2"<br/>
+	    Dots:  "x,y" for closed dots, "x,y,open" for open dots, like "2,3"</dd>
+</dl>
+</p>
+<p><b>Optional Variables</b><BR>
+<dl>
+<dt>$grid = "xmin,xmax,ymin,ymax,xscl,yscl,imagewidth,imageheight" (In Common Control)</dt>
+	<dd>Defines the grid to be drawn on.  Defaults to "-5,5,-5,5,1,1,300,300".  You can set all or just some of the
+	    values.  For example, to just set the window, you could use "0,10,0,10"</dd>
+<dt>$background = equation or array of equations, using the showplot macro format (In Common Control)</dt>
+	<dd>Define a graph to display in the background, to be drawn on top of.  Example:  $background = "x^2,red"</dd>
+<dt>$answerformat = "line,dot,opendot" (In Question Control)</dt>
+	<dd>Limits the drawing tools available to students.  Defaults to "line,dot,opendot".  Define to limit the options.
+	    Example: $answerformat = "line"</dd>
+<dt>$partweights = array or list of weights (In Answer)</dt>
+	<dd>Defines grading weight for each line or dot in $answers.  Example: $partweights = ".5,.25,.25".  Defaults
+	    to equal weights on each line or dot.</dd>
+<dt>$reltolerance = tolerance scaling factor</dt>
+	<dd>Scales the grading tolerance.  Defaults to 1.  Set $reltolerance = 2 to make the grading twice as tolerant;
+	    $reltolerance = 0.5 to make grading half as forgiving</dd>
+<dt>$answerbox (In Question Text)</dt>
+	<dd>Using the variable $answerbox in the Question Text will place the question input drawing tool in that location</dd>
+<dt>$showanswer (In Answer)</dt>
+	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
+	Use this to substitute a detailed answer.</dd>
+<dt>$hidetips = true (In Question Control)</dt>
+	<dd>Hides the question entry tips that display by default</dd>
+</dl>
+</p>
+
+</div>
+<div class=h3>
 <h3><a name="numericalmatrix">Numerical Matrix</a></h3>
 
 The student is asked to enter a matrix of numbers (integer, decimal, or scientific notation).
@@ -1953,7 +2000,7 @@ A student is asked to enter an interval notation answer. Example: (2,5]U(7,oo)
 <dl>
 <dt>$answer = a string with the answer in interval notation (In Answer)</dt>
 	<dd>Defines the answer.  Join multiple intervals with U for union.  Example: $answer = "(-oo,4]U(3,oo)".  Use
-	DNE for empty set</dd>
+	DNE for empty set.   Multiple acceptable answers can be entered using "or".  Example: $answer = "(3,3) or [3,3]"</dd>
 </dl>
 </p>
 <p><b>Optional Variables</b><BR>
@@ -1992,7 +2039,7 @@ rather than numbers, like [2/5,sqrt(8)].
 <dl>
 <dt>$answer = a string with the answer in interval notation (In Answer)</dt>
 	<dd>Defines the answer.  Join multiple intervals with U for union.  Example: $answer = "(-oo,4]U(3,oo)".  Use
-	DNE for empty set</dd>
+	DNE for empty set.   Multiple acceptable answers can be entered using "or".  Example: $answer = "(3,3) or [3,3]"</dd>
 </dl>
 </p>
 <p><b>Optional Variables</b><BR>
@@ -2032,7 +2079,7 @@ This type of question can contain multiple parts, where each part is one of the 
 <dl>
 <dt>$anstypes = an array or list of answer types (In Answer)</dt>
 	<dd>Defines the answer type for each part.  Example: 
-	$anstypes = array("number","calculated","choices","multans","matching","numfunc","matrix","calcmatrix","interval","calcinterval")<BR>
+	$anstypes = array("number","calculated","choices","multans","matching","numfunc","draw","essay","matrix","calcmatrix","interval","calcinterval")<BR>
 	Refer to this list for the short names of each question type</dd>
 <dt>Question part variables</dt>
 	<dd>For each question part, you will need to define the variables (like $answer, $questions, etc.) you would normally

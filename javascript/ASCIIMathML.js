@@ -889,7 +889,9 @@ if (isIE) { // avoid adding MathPlayer info explicitly to each webpage
   document.write("<?import namespace=\"m\" implementation=\"#mathplayer\"?>");
 }
 
-
+if (typeof(initstack)!='undefined') {
+	initstack.push(translate);
+} else {
 // GO1.1 Generic onload by Brothercake 
 // http://www.brothercake.com/
 //onload function (replaces the onload="translate()" in the <body> tag)
@@ -936,6 +938,7 @@ else
     //setup onload function
     window.onload = generic;
   }
+}
 }
 
 if (checkForMathML) {

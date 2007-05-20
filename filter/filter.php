@@ -91,8 +91,12 @@
 			$str = preg_replace_callback('/<\s*embed.*?sscr=(.)(.+?)\1.*?>/','svgfiltersscrcallback',$str);
 			$str = preg_replace_callback('/<\s*embed.*?script=(.)(.+?)\1.*?>/','svgfilterscriptcallback',$str);
 		}
-	
 		return $str;
+	}
+	function getgraphfilename($str) {
+		$str = forcefiltergraph($str);
+		preg_match('/(\w+\.png)/',$str,$matches);
+		return ($matches[1]);
 	}
 		
 ?>
