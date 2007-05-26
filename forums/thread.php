@@ -304,50 +304,81 @@
 	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Forum Topics</div>\n";
 	echo "<h3>Forum - $forumname</h3>\n";
 	
-	
-	$query = "SELECT COUNT(id) FROM imas_forum_posts WHERE parent=0 AND forumid='$forumid'";
+	$query = "SELECT threadid,COUNT(id) AS postcount,MAX(postdate) AS maxdate FROM imas_forum_posts ";
+	$query .= "WHERE forumid='$forumid' ";
 	if ($dofilter) {
-		$query .= " AND userid IN ($limids)";
+		$query .= " AND userid IN ($limids) ";
 	}
+	$query .= "GROUP BY threadid";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	$numpages = ceil(mysql_result($result,0,0)/$threadsperpage);
+	while ($row = mysql_fetch_row($result)) {
+		$postcount[$row[0]] = $row[1] -1;
+		$maxdate[$row[0]] = $row[2];
+	}
 	
-	if ($numpages > 1) {
-		echo "<div >Page: ";
-		if ($page < $numpages/2) {
-			$min = max(2,$page-4);
-			$max = min($numpages-1,$page+8+$min-$page);
-		} else {
-			$max = min($numpages-1,$page+4);
-			$min = max(2,$page-8+$max-$page);
+	$query = "SELECT threadid,lastview FROM imas_forum_views WHERE userid='$userid'";
+	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	while ($row = mysql_fetch_row($result)) {
+		$lastview[$row[0]] = $row[1];
+	}
+	
+	//make new list
+	$newpost = array();
+	foreach (array_keys($maxdate) as $tid) {
+		if (!isset($lastview[$tid]) || $lastview[$tid]<$maxdate[$tid]) {
+			$newpost[] = $tid;
 		}
-		if ($page==1) {
-			echo "<b>1</b> ";
-		} else {
-			echo "<a href=\"thread.php?page=1&cid=$cid&forum=$forumid\">1</a> ";
+	}
+	$newpostlist = implode(',',$newpost);
+	if ($page==-1 && count($newpost)==0) {
+		$page = 1;
+	}
+	
+	if ($page>0) {
+		$query = "SELECT COUNT(id) FROM imas_forum_posts WHERE parent=0 AND forumid='$forumid'";
+		if ($dofilter) {
+			$query .= " AND userid IN ($limids)";
 		}
-		if ($min!=2) { echo " ... ";}
-		for ($i = $min; $i<=$max; $i++) {
-			if ($page == $i) {
-				echo "<b>$i</b> ";
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$numpages = ceil(mysql_result($result,0,0)/$threadsperpage);
+		
+		if ($numpages > 1) {
+			echo "<div >Page: ";
+			if ($page < $numpages/2) {
+				$min = max(2,$page-4);
+				$max = min($numpages-1,$page+8+$min-$page);
 			} else {
-				echo "<a href=\"thread.php?page=$i&cid=$cid&forum=$forumid\">$i</a> ";
+				$max = min($numpages-1,$page+4);
+				$min = max(2,$page-8+$max-$page);
 			}
+			if ($page==1) {
+				echo "<b>1</b> ";
+			} else {
+				echo "<a href=\"thread.php?page=1&cid=$cid&forum=$forumid\">1</a> ";
+			}
+			if ($min!=2) { echo " ... ";}
+			for ($i = $min; $i<=$max; $i++) {
+				if ($page == $i) {
+					echo "<b>$i</b> ";
+				} else {
+					echo "<a href=\"thread.php?page=$i&cid=$cid&forum=$forumid\">$i</a> ";
+				}
+			}
+			if ($max!=$numpages-1) { echo " ... ";}
+			if ($page == $numpages) {
+				echo "<b>$numpages</b> ";
+			} else {
+				echo "<a href=\"thread.php?page=$numpages&cid=$cid&forum=$forumid\">$numpages</a> ";
+			}
+			echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+			if ($page>1) {
+				echo "<a href=\"thread.php?page=".($page-1)."&cid=$cid&forum=$forumid\">Previous</a> ";
+			}
+			if ($page < $numpages) {
+				echo "<a href=\"thread.php?page=".($page+1)."&cid=$cid&forum=$forumid\">Next</a> ";
+			}
+			echo "</div>\n";
 		}
-		if ($max!=$numpages-1) { echo " ... ";}
-		if ($page == $numpages) {
-			echo "<b>$numpages</b> ";
-		} else {
-			echo "<a href=\"thread.php?page=$numpages&cid=$cid&forum=$forumid\">$numpages</a> ";
-		}
-		echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-		if ($page>1) {
-			echo "<a href=\"thread.php?page=".($page-1)."&cid=$cid&forum=$forumid\">Previous</a> ";
-		}
-		if ($page < $numpages) {
-			echo "<a href=\"thread.php?page=".($page+1)."&cid=$cid&forum=$forumid\">Next</a> ";
-		}
-		echo "</div>\n";
 	}
 	echo "<form method=get action=\"thread.php\">";
 	echo "<input type=hidden name=page value=\"$page\"/>";
@@ -380,14 +411,23 @@
 		}
 		echo '</select></p>';
 	}
+	echo '<p>';
 	if (($myrights > 5 && time()<$postby) || $isteacher) {
-		echo "<p><a href=\"thread.php?page=$page&cid=$cid&forum=$forumid&modify=new\">Add New Thread</a>\n";
-		if ($isteacher) {
-			echo " | <a href=\"postsbyname.php?page=$page&cid=$cid&forum=$forumid\">List Posts by Name</a>";
-		}
-		echo " | <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid&markallread=true\">Mark all Read</a>";
-		echo "</p>";
+		echo "<a href=\"thread.php?page=$page&cid=$cid&forum=$forumid&modify=new\">Add New Thread</a>\n";
 	}
+	if ($isteacher) {
+		echo " | <a href=\"postsbyname.php?page=$page&cid=$cid&forum=$forumid\">List Posts by Name</a>";
+	}
+	if (count($newpost)>0) {
+		if ($page==-1) {
+			echo " | <a href=\"thread.php?cid=$cid&forum=$forumid&page=1\">Show All</a>";
+		} else {
+			echo " | <a href=\"thread.php?cid=$cid&forum=$forumid&page=-1\">Limit to New</a>";
+		} 
+		echo " | <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid&markallread=true\">Mark all Read</a>";
+	}
+	echo "</p>";
+	
 ?>
 	<table class=forum>
 	<thead>
@@ -397,29 +437,14 @@
 <?php
 	
 	
-	$query = "SELECT threadid,COUNT(id) AS postcount,MAX(postdate) AS maxdate FROM imas_forum_posts ";
-	$query .= "WHERE forumid='$forumid' ";
-	if ($dofilter) {
-		$query .= " AND userid IN ($limids) ";
-	}
-	$query .= "GROUP BY threadid";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	while ($row = mysql_fetch_row($result)) {
-		$postcount[$row[0]] = $row[1] -1;
-		$maxdate[$row[0]] = $row[2];
-	}
-	
-	$query = "SELECT threadid,lastview FROM imas_forum_views WHERE userid='$userid'";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	while ($row = mysql_fetch_row($result)) {
-		$lastview[$row[0]] = $row[1];
-	}
-	
 	$query = "SELECT imas_forum_posts.id,count(imas_forum_views.userid) FROM imas_forum_views,imas_forum_posts ";
 	$query .= "WHERE imas_forum_views.threadid=imas_forum_posts.id AND imas_forum_posts.parent=0 AND ";
 	$query .= "imas_forum_posts.forumid='$forumid' ";
 	if ($dofilter) {
 		$query .= "AND imas_forum_posts.userid IN ($limids) ";
+	}
+	if ($page==-1) {
+		$query .= "AND imas_forum_posts.threadid IN ($newpostlist) ";
 	}
 	$query .= "GROUP BY imas_forum_posts.id";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -432,9 +457,14 @@
 	if ($dofilter) {
 		$query .= "AND imas_forum_posts.userid IN ($limids) ";
 	}
+	if ($page==-1) {
+		$query .= "AND imas_forum_posts.threadid IN ($newpostlist) ";
+	}
 	$query .= "ORDER BY imas_forum_posts.posttype DESC,imas_forum_posts.id DESC ";
 	$offset = ($page-1)*$threadsperpage;
-	$query .= "LIMIT $offset,$threadsperpage";// OFFSET $offset"; 
+	if ($page!=-1) {
+		$query .= "LIMIT $offset,$threadsperpage";// OFFSET $offset";
+	}
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 		if (isset($postcount[$line['id']])) {

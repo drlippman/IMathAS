@@ -186,8 +186,10 @@ AsciiMath.prototype.buttonPress = function(editor,dopopup) {
 //backtick behaves the same as pressing the add new math button
 
 AsciiMath.prototype.onKeyPress = function(ev,editor) {
-  var key = String.fromCharCode(
-    HTMLArea.is_ie ? ev.keyCode : ev.charCode);//.toLowerCase();
+ if (ev.type == "keypress") {
+  //var key = String.fromCharCode(
+    //HTMLArea.is_ie ? ev.keyCode : ev.charCode);//.toLowerCase();
+  var key = String.fromCharCode(ev.charCode || ev.keyCode);
   if (key=='`') {
    if (lastAMnode==null) { //only do this if we're not currently in an AM node.  Otherwise, do nothing
     //gets existing text
@@ -211,6 +213,7 @@ AsciiMath.prototype.onKeyPress = function(ev,editor) {
     }
    }
   }
+ }
 }
 
 //added by David Lippman

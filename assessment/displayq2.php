@@ -1646,6 +1646,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			if (isset($options['partweights'])) {$partweights = $options['partweights'];}
 		}
 		if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$qn];} else {$reltolerance = $options['reltolerance'];}}
+		if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$qn];} else {$abstolerance = $options['abstolerance'];}}
 		if (!isset($reltolerance)) { $reltolerance = 1; }
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$GLOBALS['partlastanswer'] = $givenans;
@@ -1825,7 +1826,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		//time to grade!
 		$percentunmatcheddrawn = 0; //counts extra drawn points: percent of drawn that are extras
 		if ($totinterp>0) {
-			$percentunmatcheddrawn = max(($totinterp-$linepts)/$totinterp-.05,0);
+			$percentunmatcheddrawn = max(($totinterp-$linepts)/$totinterp-.05*$reltolerance,0);
 		}
 		//divide up over all the lines
 		$percentunmatcheddrawn = $percentunmatcheddrawn;
@@ -1837,7 +1838,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 			$stdevpen = max(8*($stdevs[$key]-5)/($settings[7]),0);
 			$percentunmatchedans = max((count($answerline)-$stcnts[$key])/(count($answerline)),0);
-			if ($percentunmatchedans<.05) {
+			if ($percentunmatchedans<.05*$reltolerance) {
 				$percentunmatchedans = 0;
 			}
 			$scores[$key] = 1-($stdevpen + $percentunmatcheddrawn + $percentunmatchedans)/$reltolerance;
@@ -1886,7 +1887,15 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		foreach ($scores as $key=>$score) {
 			$totscore += $score*$partweights[$key];
 		}
-		return $totscore;
+		if (isset($abstolerance)) {
+			if ($totscore<$abstolerance) {
+				return 0;
+			} else {
+				return 1;
+			}
+		} else {
+			return $totscore;
+		}
 			
 	}
 	

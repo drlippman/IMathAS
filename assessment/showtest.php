@@ -789,9 +789,9 @@
 					}
 					if (!$reattemptsremain && $showeachscore) {
 						echo "<p>Question with last attempt is displayed for your review only</p>";
-						$showa = false;
-						$qshowansafterlast = (($showansafterlast && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='F');
-						displayq($next,$qi[$questions[$next]]['questionsetid'],$seeds[$next],$qshowansafterlast,false,$attempts[$next],false,false);
+						$qshowans = ((($showansafterlast && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='F') || ($showansduring && $qi[$questions[$next]]['showans']=='0' && $attempts[$next]>=$testsettings['showans']));
+						
+						displayq($next,$qi[$questions[$next]]['questionsetid'],$seeds[$next],$qshowans,false,$attempts[$next],false,false);
 					}
 					echo "</div>\n";
 				}

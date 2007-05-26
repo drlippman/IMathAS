@@ -9,9 +9,25 @@
 	   require("../footer.php");
 	   exit;
 	}
+	if (isset($teacherid)) {
+		$isteacher = true;	
+	} else {
+		$isteacher = false;
+	}
 	
 	$forumid = $_GET['forum'];
 	$cid = $_GET['cid'];
+	
+	$query = "SELECT settings,replyby,defdisplay,name FROM imas_forums WHERE id='$forumid'";
+	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$forumsettings = mysql_result($result,0,0);
+	$allowreply = ($isteacher || (time()<mysql_result($result,0,1)));
+	$allowanon = (($forumsettings&1)==1);
+	$allowmod = ($isteacher || (($forumsettings&2)==2));
+	$allowdel = ($isteacher || (($forumsettings&4)==4));
+	
+	$caller = "byname";
+	include("posthandler.php");
 	
 	$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
 	require("../header.php");
@@ -57,8 +73,9 @@
 	echo "}\n";
 	echo "</script>";
 	
-	$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email from imas_forum_posts,imas_users ";
-	$query .= "WHERE imas_forum_posts.userid=imas_users.id AND imas_forum_posts.forumid='$forumid' ORDER BY ";
+	$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,ifv.lastview from imas_forum_posts JOIN imas_users ";
+	$query .= "ON imas_forum_posts.userid=imas_users.id LEFT JOIN (SELECT threadid,lastview FROM imas_forum_views WHERE userid='$userid') AS ifv ON ";
+	$query .= "ifv.threadid=imas_forum_posts.threadid WHERE imas_forum_posts.forumid='$forumid' ORDER BY ";
 	$query .= "imas_users.LastName,imas_users.FirstName,imas_forum_posts.postdate DESC";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$laststu = -1;
@@ -77,6 +94,19 @@
 		if ($line['parent']!=0) {
 			echo '<span style="color:green;">';
 		}
+		
+		echo '<span class="right">';
+		echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread={$line['threadid']}\">Thread</a> ";
+		if ($isteacher || ($line['ownerid']==$userid && $allowmod)) {
+			echo "<a href=\"postsbyname.php?cid=$cid&forum=$forumid&thread={$line['threadid']}&modify={$line['id']}\">Modify</a> \n";
+		}
+		if ($isteacher || ($allowdel && $line['ownerid']==$userid)) {
+			echo "<a href=\"postsbyname.php?cid=$cid&forum=$forumid&thread={$line['threadid']}&remove={$line['id']}\">Remove</a> \n";
+		}
+		if ($line['posttype']!=2 && $myrights > 5 && $allowreply) {
+			echo "<a href=\"postsbyname.php?cid=$cid&forum=$forumid&thread={$line['threadid']}&modify=reply&replyto={$line['id']}\">Reply</a>";
+		}
+		echo '</span>';
 		echo "<input type=\"button\" value=\"+\" onclick=\"toggleshow($cnt)\" id=\"butn$cnt\" />";
 		echo '<b>'.$line['subject'].'</b>';
 		if ($line['parent']!=0) {
@@ -84,6 +114,9 @@
 		}
 		$dt = tzdate("F j, Y, g:i a",$line['postdate']);
 		echo ', Posted: '.$dt;
+		if ($line['lastview']==null || $line['postdate']>$line['lastview']) {
+			echo " <span style=\"color:red;\">New</span>\n";
+		}
 		echo '</div>';
 		echo "<div id=\"m$cnt\" class=\"hidden\">".filter($line['message']).'</div>';
 		$cnt++;

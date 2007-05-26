@@ -1,9 +1,9 @@
 <?php
-//A library of Stats functions.  Version 1.6, April 15, 2007
+//A library of Stats functions.  Version 1.71, May 24, 2007
 
 
 global $allowedmacros;
-array_push($allowedmacros,"nCr","nPr","mean","stdev","percentile","quartile","median","freqdist","frequency","histogram","fdhistogram","normrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","linreg","countif");
+array_push($allowedmacros,"nCr","nPr","mean","stdev","percentile","quartile","median","freqdist","frequency","histogram","fdhistogram","normrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","linreg","countif","binomialpdf","binomialcdf");
 
 
 //nCr(n,r)
@@ -411,11 +411,14 @@ function normalcdf($ztest,$dec=4) {
 }
 
 
-//tcdf(t,df)
+//tcdf(t,df,[dec])
 //calculates the area under the t-distribution with "df" degrees of freedom
 //to the left of the t-value t
 //based on someone else's code - can't remember whose!
-function tcdf($ttest,$df) {
+function tcdf($ttest,$df,$dec=4) {
+	$eps = pow(.1,$dec);
+	$eps2 = pow(.1,$dec+2);
+	
 	$t = abs($ttest);
 	if ($df > 0) {
 	$k3 = 0;
@@ -423,7 +426,7 @@ function tcdf($ttest,$df) {
 	$a3 = $t/sqrt($df);
 	$b3 = 1+pow($a3,2);
 	$y = 0.5;
-	if (abs(floor($df/2)*2 - $df) < .0001) { 
+	if (abs(floor($df/2)*2 - $df) < $eps) { 
 		$c3 = $a3/(2*pow($b3,0.5));
 		$k3 = 0;
 	} else {
@@ -442,16 +445,16 @@ function tcdf($ttest,$df) {
 		}
 	}
 	if ($ttest > 0) {
-		$pval = round($y,4);
+		$pval = round($y,$dec);
 	} else {
-		$pval = round(1-$y,4);
+		$pval = round(1-$y,$dec);
 	}
 
 
-	if ($pval > .9999) {
-		$pval = 0.9999;
-	} else if ($pval < .0001) {
-		$pval = .0001;
+	if ($pval > (1-$eps)) {
+		$pval = round(1-$eps,$dec);
+	} else if ($pval < $eps) {
+		$pval = $eps;
 	}
 	return $pval;
 	} else {return false;}
@@ -566,6 +569,24 @@ function linreg($xarr,$yarr) {
 	$m = ($n*$sxy - $sx*$sy)/($n*$sxx - $sx*$sx);
 	$b = ($sy - $sx*$m)/$n;
 	return array($r,$m,$b);
+}
+
+//binomialpdf(N,p,x)
+//Computes the probability of x successes out of N trials
+//where each trial has probability p of success
+function binomialpdf($N,$p,$x) {
+	return (nCr($N,$x)*pow($p,$x)*pow(1-$p,$N-$x));
+}
+
+//binomialcdf(N,p,x)
+//Computes the probably of &lt;=x successes out of N trials
+//where each trial has probability p of success
+function binomialcdf($N,$p,$x) {
+	$out = 0;
+	for ($i=0;$i<=$x;$i++) {
+		$out += binomialpdf($N,$p,$i);
+	}
+	return $out;
 }
 
 

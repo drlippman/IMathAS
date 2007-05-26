@@ -47,7 +47,7 @@
 				echo " <span style=\"color:red\">New Messages ({$newmsgcnt[$line['id']]})</span>";
 			}
 			if (isset($newpostscnt[$line['id']]) && $newpostscnt[$line['id']]>0) {
-				echo " <span style=\"color:red\">New Posts</span>";
+				echo " <a href=\"forums/newthreads.php?cid={$line['id']}\" style=\"color:red\">New Posts</a>";
 			}
 			echo "</li>\n";
 		} while ($line = mysql_fetch_array($result, MYSQL_ASSOC));
@@ -100,7 +100,7 @@
 				echo " <span style=\"color:red\">New Messages ({$newmsgcnt[$line['id']]})</span>";
 			}
 			if (isset($newpostscnt[$line['id']]) && $newpostscnt[$line['id']]>0) {
-				echo " <span style=\"color:red\">New Posts</span>";
+				echo " <a href=\"forums/newthreads.php?cid={$line['id']}\" style=\"color:red\">New Posts</a>";
 			}
 			
 			echo "</li>\n";

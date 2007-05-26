@@ -149,42 +149,18 @@ function drawMouseDown(ev) {
 		//are we inside target region?
 		if (mouseOff.x>-1 && mouseOff.x<targets[curTarget].width && mouseOff.y>-1 && mouseOff.y<targets[curTarget].height) {
 			//see if current point
-			var foundpt = null;
-			if (targets[curTarget].mode==0) { //if in line mode
-				for (var i=0;i<lines[curTarget].length;i++) { //check lines
-					for (var j=lines[curTarget][i].length-1; j>=0;j--) {
-						var dist = Math.pow(lines[curTarget][i][j][0]-mouseOff.x,2) + Math.pow(lines[curTarget][i][j][1]-mouseOff.y,2);
-						if (dist<25) {
-							foundpt = [0,i,j];
-							break;
-						}
-					}
-					if (foundpt!=null) {
-						break;
-					}
-				}
-			} else if (targets[curTarget].mode==1) {
-				for (var i=0; i<dots[curTarget].length;i++) { //check dots
-					if (Math.pow(dots[curTarget][i][0]-mouseOff.x,2) + Math.pow(dots[curTarget][i][1]-mouseOff.y,2)<25) {
-						foundpt = [1,i];
-						break;
-					}
-				}
-			} else if (targets[curTarget].mode==2) {
-				for (var i=0; i<odots[curTarget].length;i++) { //check opendots
-					if (Math.pow(odots[curTarget][i][0]-mouseOff.x,2) + Math.pow(odots[curTarget][i][1]-mouseOff.y,2)<25) {
-						foundpt = [2,i];
-						break;
-					}
-				}
-			} 
+			
+			var foundpt = findnearpoint(curTarget,mouseOff);
 			if (foundpt==null) { //not a current point
+				targets[curTarget].el.style.cursor = 'url('+imasroot+'/img/pendown.cur), default';
 				if (targets[curTarget].mode==1) {//if in dot mode
 					dots[curTarget].push([mouseOff.x,mouseOff.y]);
 					dragObj = {mode: 1, num: dots[curTarget].length-1};
+					//targets[curTarget].el.style.cursor = 'move';
 				} else if (targets[curTarget].mode==2) {//if in open dot mode
 					odots[curTarget].push([mouseOff.x,mouseOff.y]);
 					dragObj = {mode: 2, num: odots[curTarget].length-1};
+					//targets[curTarget].el.style.cursor = 'move';
 				} else if (targets[curTarget].mode==0) { //in line mode
 					if (curLine==null) { //start new line
 						lines[curTarget].push([[mouseOff.x,mouseOff.y]]);
@@ -196,6 +172,7 @@ function drawMouseDown(ev) {
 			} else { //clicked on current point
 				if (foundpt[0]==0) { //if point is on line
 					if (curLine==null) {//not current in line
+						targets[curTarget].el.style.cursor = 'move';
 						//start dragging
 						dragObj = {mode: 0, num: foundpt[1], subnum: foundpt[2]};
 						oldpointpos = lines[curTarget][foundpt[1]][foundpt[2]];
@@ -216,13 +193,16 @@ function drawMouseDown(ev) {
 							curLine = null;
 						} else {
 							//if (foundpt[1]!=curLine) { //so long as point is not on current line, add it
+								targets[curTarget].el.style.cursor = 'url('+imasroot+'/img/pendown.cur), default';
 								lines[curTarget][curLine].push([mouseOff.x,mouseOff.y]);
 							//}
 						}
 					}
 				} else if (foundpt[0]==1) { //if point is a dot
+					targets[curTarget].el.style.cursor = 'move';
 					dragObj = {mode: 1, num: foundpt[1]};
 				} else if (foundpt[0]==2) { //if point is a open dot
+					targets[curTarget].el.style.cursor = 'move';
 					dragObj = {mode: 2, num: foundpt[1]};
 				}
 				
@@ -233,8 +213,10 @@ function drawMouseDown(ev) {
 				if (lines[curTarget][curLine].length<2) {
 					lines[curTarget].splice(curLine,1);
 				}
+				targets[curTarget].el.style.cursor = 'url('+imasroot+'/img/pen.cur), default';
 			}
 			curLine = null;
+			dragObj = null;
 			drawTarget();
 			curTarget = null;
 			
@@ -242,9 +224,55 @@ function drawMouseDown(ev) {
 	}		
 }
 
+function findnearpoint(thetarget,mouseOff) {
+	if (targets[thetarget].mode==0) { //if in line mode
+		for (var i=0;i<lines[thetarget].length;i++) { //check lines
+			for (var j=lines[thetarget][i].length-1; j>=0;j--) {
+				var dist = Math.pow(lines[thetarget][i][j][0]-mouseOff.x,2) + Math.pow(lines[thetarget][i][j][1]-mouseOff.y,2);
+				if (dist<25) {
+					return [0,i,j];
+				}
+			}
+		}
+	} else if (targets[thetarget].mode==1) {
+		for (var i=0; i<dots[thetarget].length;i++) { //check dots
+			if (Math.pow(dots[thetarget][i][0]-mouseOff.x,2) + Math.pow(dots[thetarget][i][1]-mouseOff.y,2)<25) {
+				return [1,i];
+			}
+		}
+	} else if (targets[thetarget].mode==2) {
+		for (var i=0; i<odots[thetarget].length;i++) { //check opendots
+			if (Math.pow(odots[thetarget][i][0]-mouseOff.x,2) + Math.pow(odots[thetarget][i][1]-mouseOff.y,2)<25) {
+				return [2,i];
+			}
+		}
+	} 
+	return null;	
+}
+
+var lastdrawmouseup = null;
 function drawMouseUp(ev) {
 	var mousePos = mouseCoords(ev);
 	mouseisdown = false;
+	if (curTarget!=null) {
+		if (lastdrawmouseup!=null && mousePos.x==lastdrawmouseup.x && mousePos.y==lastdrawmouseup.y) {
+			//basically a double-click which IE can handle
+			if (curLine!=null && dragObj==null) {
+				if (lines[curTarget][curLine].length<2) {
+					lines[curTarget].splice(curLine,1);
+				}
+				curLine = null;
+				dragObj = null;
+				drawTarget();
+			}
+		}
+		if (curLine==null) {
+			targets[curTarget].el.style.cursor = 'move';
+		} else {
+			targets[curTarget].el.style.cursor = 'url('+imasroot+'/img/pen.cur), default';
+		}
+	}
+	lastdrawmouseup = mousePos;
 	if (curTarget!=null && dragObj!=null) { //is a target currectly in action, and dragging
 		var tarelpos = getPosition(targets[curTarget].el);
 		var mouseOff = {x:(mousePos.x - tarelpos.x), y: (mousePos.y-tarelpos.y)};
@@ -266,8 +294,35 @@ function drawMouseUp(ev) {
 }
 
 function drawMouseMove(ev) {
+	var tempTarget = null;
+	var mousePos = mouseCoords(ev);
+	
+	if (curTarget==null) {
+		for (i in targets) {
+			var tarelpos = getPosition(targets[i].el);
+			if (tarelpos.x<mousePos.x && (tarelpos.x+targets[i].width>mousePos.x) && tarelpos.y<mousePos.y && (tarelpos.y+targets[i].height>mousePos.y)) {
+				tempTarget = i;
+				break;
+			}
+		}
+	}
+	if (tempTarget!=null) {
+		var tarelpos = getPosition(targets[tempTarget].el);
+		var mouseOff = {x:(mousePos.x - tarelpos.x), y: (mousePos.y-tarelpos.y)};
+		if (mouseOff.x>-1 && mouseOff.x<targets[tempTarget].width && mouseOff.y>-1 && mouseOff.y<targets[tempTarget].height) {
+			if (dragObj==null) {
+				if (curLine==null) {
+					var foundpt = findnearpoint(tempTarget,mouseOff);
+					if (foundpt==null) {
+						targets[tempTarget].el.style.cursor = 'url('+imasroot+'/img/pen.cur), default';
+					} else {
+						targets[tempTarget].el.style.cursor = 'move';
+					}
+				}
+			}
+		}
+	}
 	if (curTarget!=null) {
-		var mousePos = mouseCoords(ev);
 		var tarelpos = getPosition(targets[curTarget].el);
 		var mouseOff = {x:(mousePos.x - tarelpos.x), y: (mousePos.y-tarelpos.y)};
 		//are we inside target region?
@@ -288,8 +343,16 @@ function drawMouseMove(ev) {
 						//draw temp line
 						drawTarget(mouseOff.x,mouseOff.y);
 					}
+				} else { //see if we're near a point
+					var foundpt = findnearpoint(curTarget,mouseOff);
+					if (foundpt==null) {
+						targets[curTarget].el.style.cursor = 'url('+imasroot+'/img/pen.cur), default';
+					} else {
+						targets[curTarget].el.style.cursor = 'move';
+					}
 				}
 			} else { //dragging
+				targets[curTarget].el.style.cursor = 'move';
 				if (dragObj.mode==0) {
 					lines[curTarget][dragObj.num][dragObj.subnum] = [mouseOff.x,mouseOff.y];
 				} else if (dragObj.mode==1) {

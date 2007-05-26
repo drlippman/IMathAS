@@ -221,9 +221,18 @@ function AMpreview(inputId,outputId) {
   //quote out multiletter variables
   var varstoquote = new Array();
   for (var i=0; i<vars.length; i++) {
-	if (vars[i].length>1)
-		varstoquote.push(vars[i]);
-	
+	  if (vars[i].length>1) {
+		  var isgreek = false;
+		  for (var j=0; j<greekletters.length;j++) {
+			  if (vars[i]==greekletters[j]) {
+				isgreek = true; 
+				break;
+			  }
+		  }
+		  if (!isgreek) {
+			  varstoquote.push(vars[i]);
+		  }
+	  }
   }
   if (varstoquote.length>0) {
 	  vltq = varstoquote.join("|");
@@ -337,6 +346,7 @@ function AMmathpreview(inputId,outputId) {
  
 }
 
+var greekletters = ['alpha','beta','delta','gamma','phi','psi','sigma','rho','theta'];
 var calctoproc = new Array();
 var intcalctoproc = new Array();
 var calcformat = new Array();

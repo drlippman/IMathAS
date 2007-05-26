@@ -883,7 +883,7 @@
 				   echo "<div class=title> ";
 				   echo "<b><a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}\">{$line['name']}</a></b>\n";
 				   if ($hasnewitems) {
-					   echo " <span style=\"color:red\">New Posts</span>";
+					   echo " <a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}&page=-1\" style=\"color:red\">New Posts</a>";
 				   }
 				   if (isset($teacherid)) { 
 					   echo "<BR>Showing until: $enddate "; 

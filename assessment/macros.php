@@ -3,7 +3,7 @@
 //(c) 2006 David Lippman
 
 
-array_push($allowedmacros,"sec","csc","cot","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif","in_array","prettyint","prettyreal","arraystodots");
+array_push($allowedmacros,"sec","csc","cot","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif","in_array","prettyint","prettyreal","arraystodots","subarray","showdataarray");
 
 function mergearrays($a,$b) {
 	return array_merge($a,$b);
@@ -26,6 +26,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	$commands = "setBorder(5); initPicture({$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]});";
 	$alt = "Graph, window x {$settings[0]} to {$settings[1]}, y {$settings[2]} to {$settings[3]}.";
 	if (strpos($settings[4],':')) {
+		$settings[4] = str_replace(array('(',')'),'',$settings[4]);
 		$lbl = explode(':',$settings[4]);
 	}
 	if (is_numeric($settings[4]) && $settings[4]>0) {
@@ -37,6 +38,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	}
 	
 	if (strpos($settings[5],':')) {
+		$settings[5] = str_replace(array('(',')'),'',$settings[5]);
 		$grid = explode(':',$settings[5]);
 	}
 	if (is_numeric($settings[5]) && $settings[5]>0) { 
@@ -863,4 +865,45 @@ function arraystodots($x,$y) {
 	return $out;
 }
 
+function subarray($a) {
+	if (is_array(func_get_arg(1))) {
+		$args = func_get_arg(1);
+	} else {
+		$args = func_get_args();
+		array_shift($args);
+	}
+	if (count($args)<2) {return array();}
+	$out = array();
+	for ($i=0;$i<count($args);$i++) {
+		if (strpos($args[$i],':')!==false) {
+			$p = explode(':',$args[$i]);
+			array_splice($out,count($out),0,array_slice($a,$p[0],$p[1]-$p[0]+1));
+		} else {
+			$out[] = $a[$args[$i]];
+		}
+	}
+	return $out;
+}
+
+function showdataarray($a,$n=1) {
+	if (!is_array($a)) {
+		return '';
+	}
+	$out = '<table class=stats><tbody>';
+	$cnt = 0;
+	while ($cnt<count($a)) {
+		$out .= '<tr>';
+		for ($i=0;$i<$n;$i++) {
+			if (isset($a[$cnt])) {
+				$out .= '<td>'.$a[$cnt].'</td>';
+			} else {
+				$out .= '<td></td>';
+			}
+			$cnt++;
+		}
+		$out .= '</tr>';
+	}
+	$out .= '</tbody></table>';
+	return $out;
+}
 ?>
