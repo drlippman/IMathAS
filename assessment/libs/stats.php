@@ -1,10 +1,8 @@
 <?php
-//A library of Stats functions.  Version 1.71, May 24, 2007
-
+//A library of Stats functions.  Version 1.8, June 20, 2007
 
 global $allowedmacros;
-array_push($allowedmacros,"nCr","nPr","mean","stdev","percentile","quartile","median","freqdist","frequency","histogram","fdhistogram","normrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","linreg","countif","binomialpdf","binomialcdf");
-
+array_push($allowedmacros,"nCr","nPr","mean","stdev","percentile","quartile","median","freqdist","frequency","histogram","fdhistogram","normrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","countif","binomialpdf","binomialcdf","chi2cdf","invchi2cdf");
 
 //nCr(n,r)
 //The Choose function
@@ -19,7 +17,6 @@ function nCr($n,$r){
    }
    return $return;
 }
-
 
 //nPr(n,r)
 //The Permutations function
@@ -36,19 +33,16 @@ function nPr($n,$r){
    return $return;
 }
 
-
 //mean(array)
 //Finds the mean of an array of numbers
 function mean($a) {
 	return (array_sum($a)/count($a));	
 }
 
-
 //variance(array)
 //the (sample) variance of an array of numbers
 function variance($a) {
 	$v = 0;
-
 	$mean = mean($a);
 	foreach ($a as $x) {
 		$v += pow($x-$mean,2);
@@ -56,13 +50,11 @@ function variance($a) {
 	return ($v/(count($a)-1));
 }
 
-
 //stdev(array)
 //the (sample) standard deviation of an array of numbers
 function stdev($a) {
 	return sqrt(variance($a));
 }
-
 
 //percentile(array,percentile)
 //example: percentile($a,30) would find the 30th percentile of the data
@@ -74,6 +66,7 @@ function percentile($a,$p) {
 	} else if ($p==100) {
 		return $a[count($a)-1];
 	}
+
 	$l = $p*count($a)/100;
 	if (floor($l)==$l) {
 		return (($a[$l-1]+$a[$l])/2);
@@ -82,7 +75,6 @@ function percentile($a,$p) {
 	}
 }
 
-
 //quartile(array,quartile)
 //finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
 //array of numbers.  Calculates using percentiles.
@@ -90,13 +82,11 @@ function quartile($a,$q) {
 	return percentile($a,$q*25);	
 }
 
-
 //median(array)
 //returns the median of an array of numbers
 function median($a) {
 	return percentile($a,50);	
 }
-
 
 //freqdist(array,label,start,classwidth)
 //display macro.  Returns an HTML table that is a frequency distribution of
@@ -124,7 +114,6 @@ function freqdist($a,$label,$start,$cw) {
 	$out .= "</tbody></table>\n";
 	return $out;
 }
-
 
 //frequency(array,start,classwidth)
 //Returns an array of frequencies for the data grouped into classes
@@ -202,6 +191,7 @@ function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false) {
 		$dx = $upper - $start;
 		$dxdiff = $cw-$dx;
 	}
+
 	while ($x <= $a[count($a)-1]) {
 		$alt .= "<tr><td>$x</td>";
 		$st .= "rect([$x,0],";
@@ -234,12 +224,11 @@ function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false) {
 			$outst .= "line([$x,$tm],[$x,$tx]); text([$x,0],\"$x\",\"below\");";
 			$x+= $cw;
 		}
-		
+
 	}
 	$outst .= $st;
 	return showasciisvg($outst,300,200);
 }
-
 
 //fdhistogram(freqarray,label,start,cw,[labelstart,upper])
 //display macro.  Creates a histogram from frequency array
@@ -291,7 +280,6 @@ function fdhistogram($freq,$label,$start,$cw,$startlabel=false,$upper=false) {
 	return showasciisvg($outst,300,200);
 }
 
-
 //normrand(mu,sigma,n)
 //returns an array of n random numbers that are normally distributed with given
 //mean mu and standard deviation sigma.  Uses the Box-Muller transform.
@@ -313,7 +301,6 @@ function normrand($mu,$sig,$n) {
 		return (array_slice($z,0,count($z)-1));
 	}
 }
-
 
 //boxplot(array,axislabel,[datalabel])
 //draws a boxplot based on the data in array, with given axislabel
@@ -371,7 +358,6 @@ function boxplot($arr,$label) {
 	return showasciisvg($outst,400,50+50*$multi);
 }
 
-
 //normalcdf(z,[dec])
 //calculates the area under the standard normal distribution to the left of the
 //z-value z, to dec decimals (defaults to 4) 
@@ -409,7 +395,6 @@ function normalcdf($ztest,$dec=4) {
 	}
 	return $pval;
 }
-
 
 //tcdf(t,df,[dec])
 //calculates the area under the t-distribution with "df" degrees of freedom
@@ -460,14 +445,11 @@ function tcdf($ttest,$df,$dec=4) {
 	} else {return false;}
 }
 
-
-
-
-//invnormalcdf(p)
+//invnormalcdf(p,[dec])
 //Inverse Normal CDF
-//finds the z-value with a left-tail area of p
+//finds the z-value with a left-tail area of p, to dec decimals (default 5)
 // from Odeh & Evans. 1974. AS 70. Applied Statistics. 23: 96-97
-function invnormalcdf($p) {
+function invnormalcdf($p,$dec=5) {
    
       $p0 = -0.322232431088;
       $p1 = -1.0;
@@ -489,18 +471,21 @@ function invnormalcdf($p) {
       $y = sqrt(log(1/($pp*$pp)));
       $xp = $y + (((($y * $p4 + $p3) * $y + $p2) * $y + $p1) * $y + $p0) / (((($y * $q4 + $q3) * $y + $q2) * $y + $q1) * $y + $q0);
    }
-   $xp = round($xp,5);
+   $xp = round($xp,$dec);
    if ($p < 0.5) { return (-1*$xp); }  else { return  $xp; }
 }
    
-   
-//invtcdf(p,df)
+//invtcdf(p,df,[dec])
 //the inverse Student's t-distribution 
 //computes the t-value with a left-tail probability of p, with df degrees of freedom
+//to dec decimal places (default 4)
 // from Algorithm 396: Student's t-quantiles by G.W. Hill  Comm. A.C.M., vol.13(10), 619-620, October 1970
-function invtcdf($p,$ndf) {
+function invtcdf($p,$ndf,$dec=4) {
 	$half_pi = M_PI/2;
-	$eps = 1e-5;
+	$eps = 1e-12;
+	$origp = $p;
+	if ($p > 0.5)  {$p = 1 - $p; }
+	$p = $p*2;
 	
 	if ($ndf < 1 || $p > 1 || $p <= 0) {
 	  echo "error in params";
@@ -508,12 +493,12 @@ function invtcdf($p,$ndf) {
 	}
 	
 	if ( abs($ndf - 2) < $eps ) {
-	  $fn_val = SQRT(2 / ( 2*$p * (2 - 2*$p) ) - 2);
-	  if ($p<.5) {return (-1*$fn_val);} else { return $fn_val;}
+	  $fn_val = SQRT(2 / ( $p * (2 - $p) ) - 2);
+	  if ($origp<.5) {return (-1*$fn_val);} else { return $fn_val;}
 	} else if ($ndf < 1+$eps) {
-	  $prob = 2*$p * $half_pi;
+	  $prob = $p * $half_pi;
 	  $fn_val = cos($prob) / sin($prob);
-	  if ($p<.5) {return (-1*$fn_val);} else { return $fn_val;}
+	  if ($origp<.5) {return (-1*$fn_val);} else { return $fn_val;}
 	} else {
 	  $a = 1/ ($ndf - 0.5);
 	  $b = 48/ pow($a,2);
@@ -523,7 +508,7 @@ function invtcdf($p,$ndf) {
 	  $y = pow($x,(2/ $ndf));
 	  
 	  if ($y > 0.05 + $a) {
-	    $x = invnormalcdf($p);
+	    $x = invnormalcdf($origp);
 	    $y = pow($x,2);
 	    if ($ndf < 5) { $c = $c + 0.3 * ($ndf - 4.5) * ($x + 0.6);}
 	    $c = (((0.05 * $d * $x - 5) * $x - 7) * $x - 2) * $x + $b+ $c;
@@ -540,10 +525,9 @@ function invtcdf($p,$ndf) {
 	    $y = ((1 / ((($ndf + 6) / ($ndf * $y) - 0.089 * $d - 0.822) * ($ndf + 2) * 3) + 0.5 / ($ndf + 4)) * $y - 1) * ($ndf + 1) / ($ndf + 2) + 1 / $y;
 	  }
 	}
-	$fn_val = round( sqrt($ndf * $y) , 4);
-	if ($p<.5) {return (-1*$fn_val);} else { return $fn_val;}
+	$fn_val = round( sqrt($ndf * $y) , $dec);
+	if ($origp<.5) {return (-1*$fn_val);} else { return $fn_val;}
 }
-
 
 //linreg(xarray,yarray)
 //Computes the linear correlation coefficient, and slope and intercept of
@@ -578,6 +562,7 @@ function binomialpdf($N,$p,$x) {
 	return (nCr($N,$x)*pow($p,$x)*pow(1-$p,$N-$x));
 }
 
+
 //binomialcdf(N,p,x)
 //Computes the probably of &lt;=x successes out of N trials
 //where each trial has probability p of success
@@ -589,5 +574,341 @@ function binomialcdf($N,$p,$x) {
 	return $out;
 }
 
+//chi2cdf(x,df)
+//Computes the area to the left of x under the chi-squared disribution
+//with df degrees of freedom
+function chi2cdf($x,$a) {
+	return gamma_cdf(0.5*$x,0.0,1.0,0.5*$a);
+}
+
+//invchi2cdf(p,df)
+//Compuates the x value with left-tail probability p under the 
+//chi-squared distribution with df degrees of freedom
+function invchi2cdf($cdf,$a) {
+	$aa = 0.6931471806;
+  $c1 = 0.01;
+  $c2 = 0.222222;
+  $c3 = 0.32;
+  $c4 = 0.4;
+  $c5 = 1.24;
+  $c6 = 2.2;
+  $c7 = 4.67;
+  $c8 = 6.66;
+  $c9 = 6.73;
+  $c10 = 13.32;
+  $c11 = 60.0;
+  $c12 = 70.0;
+  $c13 = 84.0;
+  $c14 = 105.0;
+  $c15 = 120.0;
+  $c16 = 127.0;
+  $c17 = 140.0;
+  $c18 = 175.0;
+  $c19 = 210.0;
+  $c20 = 252.0;
+  $c21 = 264.0;
+  $c22 = 294.0;
+  $c23 = 346.0;
+  $c24 = 420.0;
+  $c25 = 462.0;
+  $c26 = 606.0;
+  $c27 = 672.0;
+  $c28 = 707.0;
+  $c29 = 735.0;
+  $c30 = 889.0;
+  $c31 = 932.0;
+  $c32 = 966.0;
+  $c33 = 1141.0;
+  $c34 = 1182.0;
+  $c35 = 1278.0;
+  $c36 = 1740.0;
+  $c37 = 2520.0;
+  $c38 = 5040.0;
+  $cdf_max = 0.999998;
+  $cdf_min = 0.000002;
+  $e = 0.0000005;
+
+  $it_max = 20;
+  if ($cdf < $cdf_min) {
+	  echo "p < min - can't do it!";
+	  return 0;
+  }
+  if ($cdf_max < $cdf) {
+	  echo "p > max - can't do it";
+	  return 0;
+  }
+  $xx = 0.5*$a;
+  $c = $xx-1.0;
+  $g = gamma_log($a/2.0);
+  if ($a < -$c5*log($cdf)) {
+	  $ch = pow(($cdf*$xx*exp($g+$xx*$aa)),(1.0/$xx));
+	  if ($ch < $e) {
+		  $x = $ch;
+		  return $x;
+	  }
+  } else if ($a <= $c3) {
+	  $ch = $c4;
+	  $a2 = log(1.0 - $cdf);
+	  while (1) {
+		  $q = $ch;
+		  $p1 = 1.0+$ch*($c7 + $ch);
+		  $p2 = $ch*($c9 + $ch*($c8+$ch));
+		  $t = -0.5+($c7 + 2.0*$ch)/$p1 - ($c9 + $ch*($c10 + 3.0*$ch)) / $p2;
+		  $ch = $ch - (1.0 - exp($a2 + $g + 0.5*$ch + $c*$aa)*$p2/$p1)/$t;
+		  if (abs($q/$ch - 1.0) <= $c1) {
+			  break;
+		  }
+	  }
+  } else {
+	  $x2 = invnormalcdf($cdf);
+	  $p1 = $c2/$a;
+	  $ch = $a*pow(($x2*sqrt($p1) + 1.0 - $p1),3);
+	  if ($c6*$a + 6.0 < $ch) {
+		  $ch = -2.0*(log(1.0 - $cdf) - $c*log(0.5*$ch)+$g);
+	  }
+  }
+  for ($i=1;$i<=$it_max;$i++) {
+	  $q = $ch;
+	  $p1 = 0.5*$ch;
+	  $p2 = $cdf - gamma_inc($xx,$p1);
+	  $t = $p2*exp($xx*$aa + $g + $p1 - $c*log($ch));
+	  $b = $t/$ch;
+	  $a2 = 0.5*$t - $b*$c;
+	  $s1 = ($c19 + $a2 * ($c17 + $a2 * ($c14 + $a2 *($c13 + $a2 * ($c12 + $a2 * $c11))))) / $c24;
+	  $s2 = ($c24 + $a2 * ($c29 + $a2 * ($c32 + $a2 *($c33 + $a2 * $c35)))) / $c37;
+	  $s3 = ($c19 + $a2 * ($c25 + $a2 * ($c28 + $a2 * $c31)))/$c37;
+	  $s4 = ($c20 + $a2 * ($c27 + $a2 * $c34) + $c * ($c22 + $a2 * ($c30 + $a2 *$c36)))/$c38;
+	  $s5 = ($c13 + $c21 + $a2 + $c * ($c18 + $c26 * $a2))/$c37;
+	  $s6 = ($c16 + $c*($c23 + $c16*$c))/$c38;
+	  $ch = $ch + $t*(1.0 + 0.5*$t*$s1 - $b*$c * ($s1-$b*($s2-$b*($s3-$b*($s4-$b*($s5-$b*$s6))))));
+	  if ($e < abs($q/$ch - 1.0)) {
+		  $x = $ch;
+		  return ($x);
+	  }
+  }
+  $x = $ch;
+  echo "Convergence not reached in invchisquare";
+  return $x;
+}
+
+function gamma_cdf($x,$a,$b,$c) {
+	return gamma_inc($c,($x-$a)/$b);
+}
+function gamma_inc($p,$x,$dec=4) {
+	$exp_arg_min = -88.0;
+	$overflow = 1e37;
+	$plimit = 1000;
+	$tol = 1e-7;
+	$xbig = 1e8;
+	$value = 0.0;
+	
+	if ($plimit<$p) {
+		$pn1 = 3.0*sqrt($p)*(pow($x/$p,1.0/3.0) + 1.0/(9.0*$p)-1.0);
+		$value = normalcdf($pn1,$dec);
+		return $value;
+	}
+	if ($xbig<$x) {
+		return 1.0;
+	}
+	if ($x<=1.0 || $x<$p) {
+		$arg = $p*log($x) - $x - gamma_log($p+1.0);
+		$c = 1.0;
+		$value = 1.0;
+		$a = $p;
+		while ($c>$tol) {
+			$a += 1.0;
+			$c = $c*$x/$a;
+			$value += $c;
+		}
+		$arg += log($value);
+		if ($exp_arg_min <= $arg) {
+			$value = exp($arg);
+		} else {
+			$value = 0.0;
+		}
+	} else {
+		$arg = $p*log($x)-$x-gamma_log($p);
+		$a = 1.0 - $p;
+		$b = $a+$x+1.0;
+		$c = 0.0;
+		$pn1 = 1.0;
+		$pn2 = $x;
+		$pn3 = $x+1.0;
+		$pn4 = $x*$b;
+		$value = $pn3/$pn4;
+		while (1) {
+			$a += 1.0;
+			$b += 2.0;
+			$c += 1.0;
+			$pn5 = $b*$pn3 - $a*$c*$pn1;
+			$pn6 = $b*$pn4 - $a*$c*$pn2;
+			
+			if (0 < abs($pn6)) {
+				$rn = $pn5/$pn6;
+				if (abs($value-$rn) <= min($tol,$tol*$rn)) {
+					$arg += log($value);
+					if ($exp_arg_min <= $arg) {
+						$value = 1.0 - exp($arg);
+					} else {
+						$value = 1.0;
+					}
+					return $value;
+				}
+				$value = $rn;
+			}
+			$pn1 = $pn3;
+			$pn2 = $pn4;
+			$pn3 = $pn5;
+			$pn4 = $pn6;
+			if ($overflow <= abs($pn5)) {
+				$pn1 = $pn1/$overflow;
+				$pn2 = $pn2/$overflow;
+				$pn3 = $pn3/$overflow;
+				$pn4 = $pn4/$overflow;
+			}
+		}
+	}
+	return $value;
+}
+
+function gamma_log($x) {
+ $c = array(
+    -1.910444077728E-03, 
+     8.4171387781295E-04, 
+    -5.952379913043012E-04, 
+     7.93650793500350248E-04, 
+    -2.777777777777681622553E-03, 
+     8.333333333333333331554247E-02, 
+     5.7083835261E-03 );
+  $d1 = - 5.772156649015328605195174E-01;
+  $d2 =   4.227843350984671393993777E-01;
+  $d4 =   1.791759469228055000094023;
+  $frtbig = 1.42E+09;
+  $p1 = array(
+    4.945235359296727046734888, 
+    2.018112620856775083915565E+02, 
+    2.290838373831346393026739E+03, 
+    1.131967205903380828685045E+04, 
+    2.855724635671635335736389E+04, 
+    3.848496228443793359990269E+04, 
+    2.637748787624195437963534E+04, 
+    7.225813979700288197698961E+03 );
+  $p2 = array(
+    4.974607845568932035012064, 
+    5.424138599891070494101986E+02, 
+    1.550693864978364947665077E+04, 
+    1.847932904445632425417223E+05, 
+    1.088204769468828767498470E+06, 
+    3.338152967987029735917223E+06, 
+    5.106661678927352456275255E+06, 
+    3.074109054850539556250927E+06 );
+   $p4 = array(
+    1.474502166059939948905062E+04, 
+    2.426813369486704502836312E+06, 
+    1.214755574045093227939592E+08, 
+    2.663432449630976949898078E+09, 
+    2.940378956634553899906876E+010,
+    1.702665737765398868392998E+011,
+    4.926125793377430887588120E+011, 
+    5.606251856223951465078242E+011 );
+  $pnt68 = 0.6796875;
+  $q1 = array(
+    6.748212550303777196073036E+01, 
+    1.113332393857199323513008E+03, 
+    7.738757056935398733233834E+03, 
+    2.763987074403340708898585E+04, 
+    5.499310206226157329794414E+04, 
+    6.161122180066002127833352E+04, 
+    3.635127591501940507276287E+04, 
+    8.785536302431013170870835E+03 );
+  $q2 = array(
+    1.830328399370592604055942E+02, 
+    7.765049321445005871323047E+03, 
+    1.331903827966074194402448E+05, 
+    1.136705821321969608938755E+06, 
+    5.267964117437946917577538E+06, 
+    1.346701454311101692290052E+07, 
+    1.782736530353274213975932E+07, 
+    9.533095591844353613395747E+06 );
+  $q4 = array(
+    2.690530175870899333379843E+03, 
+    6.393885654300092398984238E+05, 
+    4.135599930241388052042842E+07, 
+    1.120872109616147941376570E+09, 
+    1.488613728678813811542398E+010, 
+    1.016803586272438228077304E+011, 
+    3.417476345507377132798597E+011, 
+    4.463158187419713286462081E+011 );
+  $sqrtpi = 0.9189385332046727417803297;
+  $xbig = 4.08E+36;
+  
+  if ($x<=0 || $xbig < $x) {
+	  return 1e10;
+  }
+  if ($x <= 1e-10) {
+	  $res = -log($x);
+  } else if ($x<=1.5) {
+	  if ($x<$pnt68) {
+		  $corr = -log($x);
+		  $xm1 = $x;
+	  } else {
+		  $corr = 0.0;
+		  $xm1 = ($x-0.5) - 0.5;
+	  }
+	  if ($x<0.5 || $pnt68 <= $x) {
+		  $xden = 1.0;
+		  $xnum = 0.0;
+		  for ($i=0; $i<8; $i++) {
+			  $xnum = $xnum*$xm1 + $p1[$i];
+			  $xden = $xden*$xm1 + $q1[$i];
+		  }
+		  $res = $corr + ($xm1*($d1 + $xm1*($xnum/$xden)));
+	  } else {
+		  $xm2 = ($x-0.5)-0.5;
+		  $xden = 1.0;
+		  $xnum = 0.0;
+		  for ($i=0; $i<8; $i++) {
+			  $xnum = $xnum*$xm2 + $p2[$i];
+			  $xden = $xden*$xm2 + $q2[$i];
+		  }
+		  $res = $corr + ($xm2*($d2 + $xm2*($xnum/$xden)));
+	  }
+  } else if ($x<=4.0) {
+	  $xm2 = $x-2.0;
+	  $xden = 1.0;
+	  $xnum = 0.0;
+	  for ($i=0; $i<8; $i++) {
+		  $xnum = $xnum*$xm2 + $p2[$i];
+		  $xden = $xden*$xm2 + $q2[$i];
+	  }
+	  $res = $xm2*($d2 + $xm2*($xnum/$xden));
+  } else if ($x <= 12.0) {
+	  $xm4 = $x - 4.0;
+	  $xden = -1.0;
+	  $xnum = 0.0;
+	  for ($i=0; $i<8; $i++) {
+		  $xnum = $xnum*$xm4 + $p4[$i];
+		  $xden = $xden*$xm4 + $q4[$i];
+	  }
+	  $res = $d4 + $xm4*($xnum/$xden);
+  } else {
+	  $res = 0.0;
+	  if ($x<= $frtbig) {
+		  $res = $c[6];
+		  $xsq = $x*$x;
+		  for ($i=0;$i<6;$i++) {
+			  $res = $res/$xsq + $c[$i];
+		  }
+	  }
+	  $res = $res/$x;
+	  $corr = log($x);
+	  $res = $res + $sqrtpi - 0.5*$corr;
+	  $res = $res + $x*($corr - 1.0);
+  }
+  return $res;
+}
+
+
 
 ?>
+

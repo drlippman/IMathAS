@@ -152,10 +152,10 @@
 				$query = "SELECT name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,gbcategory,password,cntingb,showcat,showhints,isgroup FROM imas_assessments WHERE id='$typeid'";
 				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 				$row = mysql_fetch_row($result);
-				if (isset($gbcats[$row[13]])) {
-					$row[13] = $gbcats[$row[13]];
+				if (isset($gbcats[$row[14]])) {
+					$row[14] = $gbcats[$row[14]];
 				} else if ($_POST['ctc']!=$cid) {
-					$row[13] = 0;
+					$row[14] = 0;
 				}
 				$row[0] .= stripslashes($_POST['append']);
 				$row = "'".implode("','",addslashes_deep($row))."'";
