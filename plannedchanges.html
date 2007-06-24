@@ -1,129 +1,131 @@
-<h3>Planned For Eventual Future Versions</h3>
-<ul>
-<li>Javascript answer entry editor</li>
-<li>add "false" to NaN check;  surpress output of divide by zero on testpoints</li>
-<li>User customization of colors, fonts</li>
-<li>Adjust DST issue for timeshift, or add time shift to timeshift</li>
-<li>Add default tolerance option to assessment settings</li>
-<li>Java applet drawing answer entry</li>
-<li>new question testing -- add debugs</li>
-<li>JavaScript question writing guider</li>
-<li>PG/MathQTI/TestGen question importer (when possible)</li>
-<li>cleaner delete question when question is being used</li>
-<li>way in future: AJAX searches / libtree / page reordering to reduce amount reloaded</li>
-<li>JavaScript improvement: lib import/export checking system, DOM innerHTMLs</li>
-<li>Replace SVG use with Canvas?</li>
-<li>Student generated review</li>
-</ul>
+Planned Changes
 
-</h3>Planned for Soon Future Versions</h3>
+Misc
+Incoporate mozilla font warning somewhere
+Zip files a/o files and specs on course item export
+Rework mass change dates to handle always/never dates
+extensions penalty (needs db entry, lookup in gb) - either on non-completed questions, or on whole (in GB)
+all email links, mailto->masssend?  
+Student email list (need to add student privacy settings first)
+photos of students
 
+Documentation
+Add mass change dates/assessments to help file
+Add Student Groups page to help file
+Add arraystodoteqns to help file
 
-***COMPARE macros and stats files with server versions***
-
-<ul>
-Important
-<li>Incoporate mozilla font warning somewhere</li>
-<li>Add mass change dates/assessments to help file</li>
-<li>Add Student Groups page to help file</li>
-<li>Force completion of question before moving on: oneattime and seq mode</li>
-<li>attach notes/comments to libraries, questions</li>
-<li>Instructor specific library/question listing</li>
-<li>Rework question import/export to handle questions with images</li>
-<li>Zip files a/o files and specs on course item export</li> 
-
-separate count in gradebook from showing in gradebook
+Assessment Options
+Force completion of question before moving on: oneattime and seq mode
 add reattempt whole assessment option (keep best of all full attempts)
-handle html tags in editors better
-allow students to control totals at top/bottom
-calconarray with 2 arrays
 Must get all questions right to submit
+Ability to pull n questions from question grouping.
+grid version of add question for multiple questions      
+Don’t list potential questions if already added (option?) (find room for the option)
+Listing questions for assessment – have option to list the libraries of the questions that have already been added. (need to find room for it)
+Have practice-first option on assessments. (option for toggling to review mode)
+List questions once when in multiple libraries searched (have to work out list lib link)
+points per problem - decimal/fraction, or point total for whole assessment 
+   (maybe scale assessment to __ pts, but would be weird from student perspective (pt values don't mean what they say)
+extra credit inside assessment (put on question itself - if set, calculate points possible without it, but give it points in i_a_s.  That part's easy;
+   getting the display right in showtest will be tricky.)
+specify settings (# of copies) on Add Selected button
+Add default tolerance option to assessment settings
+
+Editor
+handle html tags in editors better
+
+Gradebook
+separate count in gradebook from showing in gradebook
+don't include extra credit items in "to drop" list
+fix br in grade export
+add link to modify code / report error in gradebook assessment edit
+pagated gradebook?
+csv export: pts value in separate row?
+GPA, edittable and from lookup (need separate way to store GPA, fill stored from lookup when switched)
+gradebook filter by section (where to put?)
+customizable grade reports (select items to report)
+
+Groups
+button that clears all groups
+Randomly assign students to groups of N
+
+Forums
+next/prev thread links
+poster name on forum subscription email
+finish delete forum post option (error on remove first in thread?) (need to track if child exists, etc)
+
+Message System
+messages links at top
+threaded messages?
+signature for emails/msgs (need field and page (chg user info?))
+
+Library/Question System
+attach notes/comments to libraries, questions
+Instructor specific library/question listing
+Rework question import/export to handle questions with images
 Assign libraries in preview
 New behavior to assign to libraries (popup?)
 Select from Assessment in question management (for assignment to libraries)
+Copy/Template libraries with structure assessment questions into new location (just messy to implement)
+
+Question Language
+calconarray with 2 arrays
 Points (x,y) type answer
-Add arraystodoteqns to help file
+adapt "equation" to work with inequalities (check if left-right is pos/neg, check that lt/lte matches)
+fix interpret: no mathphp inside quotes
+check equation answerformat - fail on extraneous vars? (???)
+if number answer is rounded, check if rounded correctly
+add "false" to NaN check;  surpress output of divide by zero on testpoints
+new question testing -- add debugs
+
+Student User Interface
+allow students to control totals at top/bottom
+
+Instructor Interface
 Links to modify course settings on home page
 Change names on left bar
 0 default on upload grades (for comments)
 Keep submit button at top on upload grades
-don't include extra credit items in "to drop" list
-fix br in grade export
+Course default Color control (do-able - need to integrate with block color defaults)
 
-next/prev thread links
-Ability to pull n questions from question grouping.
-Rework mass change dates to handle always/never dates
-extensions penalty (needs db entry, lookup in gb) - either on non-completed questions, or on whole (in GB)
-add link to modify code / report error in gradebook assessment edit
-adapt "equation" to work with inequalities (check if left-right is pos/neg, check that lt/lte matches)
-all email links, mailto->masssend?
-grid version of add question for multiple questions
-
-fix interpret: no mathphp inside quotes
-check equation answerformat - fail on extraneous vars? (???)
-poster name on forum subscription email
-messages links at top
-threaded messages?
-pagated gradebook?
-if number answer is rounded, check if rounded correctly
-
-csv export: pts value in separate row?
-
-button that clears all groups
-Randomly assign students to groups of N
-
-<li><b>Gradebook</b></li>
-<li>GPA, edittable and from lookup (need separate way to store GPA, fill stored from lookup when switched)</li>
-
-<li><b>Options</b></li>
-<li>Course default Color control (do-able - need to integrate with block color defaults)</li>
-
-<li><b>Cleanup</b></li>
-<li>finish delete forum post option (error on remove first in thread?) (need to track if child exists, etc)</li>
-<li>fix old user delete to remove more than just userid (NEED to do - simple but messy)</li>
-<li>Rework displayq to pull out multipart options before passing to evaluators (easy, but will take a while)</li>
-
-<li><b>New Features</b></li>
-<li>Student email list (need to add student privacy settings first)</li>
-<li>Copy/Template libraries with structure assessment questions into new location (just messy to implement)</li>
-
-Don’t list potential questions if already added (option?) (find room for the option)
-Listing questions for assessment – have option to list the libraries of the questions that have already been added. (need to find room for it)
-Have practice-first option on assessments. (option for toggling to review mode)
-
-List questions once when in multiple libraries searched (have to work out list lib link)
-signature for emails/msgs (need field and page (chg user info?))
-points per problem - decimal/fraction, or point total for whole assessment 
-   (maybe scale assessment to __ pts, but would be weird from student perspective (pt values don't mean what they say)
-gradebook filter by section (where to put?)
-extra credit inside assessment (put on question itself - if set, calculate points possible without it, but give it points in i_a_s.  That part's easy;
-   getting the display right in showtest will be tricky.)
-photos of students
-specify settings (# of copies) on Add Selected button
-One at a time, requiring correct answer before moving on
-
-
+Admin
+fix old user delete to remove more than just userid (NEED to do - simple but messy)
 Admin feature: identify duplicate questions (equivalent code blocks)
 restores students/course
 
-customizable grade reports (select items to report)
-
-
-Maybe not / Wait
-new item flag (hmmm)
-<li>Ignore case on equation variables (need $variable for it - has to be passed to clientside) </li>
-Test without saving:  Test, Save, Save As.. (need temp table.. )
-<li>collapse gradebook by blocks (no easy way to do this)</li>
-<li>Gradebook stats for students (no easy way to do this given current framework)</li>
-<li>file attachements in posts (probably not needed)</li>
-<li>calendar (lots and lots of work - David M on it)</li>
-<li>Image upload in editor (hard to track files so deleted when removed from item)</li>
-Default library for course? (add to courses table, pull if library not specified.  Tricker to add to course settings page)
+Possibilities
+Javascript answer entry editor
+User customization of colors, fonts
+JavaScript question writing guider
+way in future: AJAX searches / libtree / page reordering to reduce amount reloaded
+JavaScript improvement: lib import/export checking system
+Replace SVG use with Canvas?
+Student generated review
+New questions review process
+Support IMS Common Course Cartridge, QTI, IMS Enterprise XML (student info system integration)
+Definable rights, grant rights on single question library
+Parent/tutor rights for single student?
+Inline question (towards interactive ebooks).  How to handle gradebook for these things?
+Expand guided / conditional items.  How to handle gradebook?
+Rework backtrack method to track itself
+Move unenroll/delete course to backup table for __ days
+Student portal/home page 
+Course Calendar 
+Image upload in editor (hard to track files so deleted when removed from item)
 Uniform user experience (major re-visioning of user interface needed)
 Tooltips for help (how to do?  David M going to help)
-<li>New items flag for blocks? (can't do without tracking views)</li>
-<li>Multipart question; submit one part at a time (needs some majorish changes, will only make sense for one-by-one or skip-around)</li>
-<li>Use serialize for lastanswers and bestlastanswers</li> 
+file attachements in posts (probably not needed)
+Track views / post dates / etc.
+
+Wait??
+new item flag (hmmm)
+Ignore case on equation variables (need $variable for it - has to be passed to clientside) 
+Test without saving:  Test, Save, Save As.. (need temp table.. )
+collapse gradebook by blocks (no easy way to do this)
+Gradebook stats for students (no easy way to do this given current framework)
+Default library for course? (add to courses table, pull if library not specified.  Tricker to add to course settings page)
+Multipart question; submit one part at a time (needs some majorish changes, will only make sense for one-by-one or skip-around)
+Use serialize for lastanswers and bestlastanswers
 {   q1 -> {
 	attempt 1 -> {    (use array even if one part q?)
 		part 1
@@ -133,29 +135,3 @@ Tooltips for help (how to do?  David M going to help)
 		}
 	}
 }
-
-Changes made for student groups: (for reference)
-Create group if none exists
-Add groups
-Update group scores during assessment
-Link to add new group members
-Clear all attempts (clear groups too, or at least clear from group)
-Unenroll (no changes needed since no tables used)
-Delete assessment (no chg needed)
-Check that grp assess_sess exist when starting test (not needed - not in group w/o i_a_s)
-Update gradebook score reflect on group
-Clear scores/attempt one person (gradebook), [no need 4 all ppl clear attempt on one problem (addquestions)]
-handle submission conflicts
-on break from group, change asid if group creator
-If turn off groups, dissolve all groups
-Create group management page
-
-BIG PICTURE CHANGES
-New questions review process
-Support IMS Common Course Cartridge, QTI, IMS Enterprise XML (student info system integration)
-Definable rights, grant rights on single question library
-Parent/tutor rights for single student?
-Inline question (towards interactive ebooks).  How to handle gradebook for these things?
-Expand guided / conditional items.  How to handle gradebook?
-Rework backtrack method to track itself
-Move unenroll/delete course to backup table for __ days
