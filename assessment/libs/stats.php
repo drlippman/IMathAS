@@ -2,7 +2,7 @@
 //A library of Stats functions.  Version 1.8, June 20, 2007
 
 global $allowedmacros;
-array_push($allowedmacros,"nCr","nPr","mean","stdev","percentile","quartile","median","freqdist","frequency","histogram","fdhistogram","normrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","countif","binomialpdf","binomialcdf","chi2cdf","invchi2cdf");
+array_push($allowedmacros,"nCr","nPr","mean","stdev","percentile","quartile","median","freqdist","frequency","histogram","fdhistogram","normrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","countif","binomialpdf","binomialcdf","chi2cdf","invchi2cdf","fcdf","invfcdf");
 
 //nCr(n,r)
 //The Choose function
@@ -908,7 +908,93 @@ function gamma_log($x) {
   return $res;
 }
 
+//fcdf(f,df1,df2)
+//Returns the area to right of the F-value f for the f-distribution
+//with df1 and df2 degrees of freedom (techinically it's 1-CDF)
+//Algorithm is accurate to approximately 4-5 decimals
+function fcdf($x,$df1,$df2) {
+	$p1 = fcall(fspin($x,$df1,$df2));
+	return $p1;
+}
 
+function fcall($x) {
+	if ($x>=0) {
+		$x += 0.0000005;
+	} else {
+		$x -= 0.0000005;
+	}
+	return $x;
+}
+function fspin($f,$df1,$df2) {
+	$pj2 = M_PI/2;
+	$pj4 = M_PI/4;
+	$px2 = 2*M_PI;
+	$exx = 1.10517091807564;
+	$dgr = 180/M_PI;
+	
+	$x = $df2/($df1*$f+$df2);
+	if (($df1%2)==0) {
+		return (LJspin(1-$x,$df2,$df1+$df2-4,$df2-2)*pow($x,$df2/2));
+	} else if (($df2%2)==0) {
+		return (1-LJspin($x,$df1,$df1+$df2-4,$df1-2)*pow(1-$x,$df1/2));
+	}
+	$tan = atan(sqrt($df1*$f/$df2));
+	$a = $tan/$pj2;
+	$sat = sin($tan);
+	$cot = cos($tan);
+	if ($df2>1) {
+		$a = $a+$sat*$cot*LJspin($cot*$cot,2,$df2-3,-1)/$pj2;
+	}
+	if ($df1==1) { 
+		return (1-$a);
+	}
+	$c = 4*LJspin($sat*$sat,$df2+1,$df1+$df2-4,$df2-2)*$sat*pow($cot,$df2)/M_PI;
+	if ($df2==1) {
+		return (1-$a+$c/2);
+	}
+	$k = 2;
+	while ($k<=($df2-1)/2) {
+		$c = $c*$k/($k-0.5);
+		$k++;
+	}
+	return (1-$a+$c);
+}
 
+function LJspin($q,$i,$j,$b) {
+	$zz = 1;
+	$z = $zz;
+	$k = $i;
+	while ($k<=$j) {
+		$zz = $zz*$q*$k/($k-$b);
+		$z = $z+$zz;
+		$k += 2;
+	}
+	return $z;
+}
+
+//invfcdf(p,df1,df2)
+//Computes the f-value with probability of p to the right
+//with degrees of freedom df1 and df2
+//Algorithm is accurate to approximately 2-4 decimal places
+//Less accurate for smaller p-values
+function invfcdf($p,$df1,$df2) {
+	$v = 0.5;
+	$dv = 0.5;
+	$f = 0;
+	$cnt = 0;
+	while ($dv>1e-10) {
+		$f = 1/$v-1;
+		$dv = $dv/2;
+		if (fcdf($f,$df1,$df2)>$p) {
+			$v = $v-$dv;
+		} else {
+			$v = $v+$dv;
+		}
+		$cnt++;
+	}
+	echo $cnt;
+	return $f;
+	
+}
 ?>
 

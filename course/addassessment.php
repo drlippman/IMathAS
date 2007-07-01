@@ -489,7 +489,8 @@ at <input type=text size=10 name=rtime value="<?php echo $rtime;?>"></span><BR c
 ?>
 <span class=form>Count: </span><span <?php if ($testtype=="Practice") {echo "class=hidden";} else {echo "class=formright";} ?> id="stdcntingb">
 <input type=radio name="cntingb" value="1" <?php if ($cntingb==1) { echo "checked=1";} ?> /> Count in Gradebook<br/>
-<input type=radio name="cntingb" value="0" <?php if ($cntingb==0) { echo "checked=1";} ?> /> Don't count in grade total<br/>
+<input type=radio name="cntingb" value="0" <?php if ($cntingb==0) { echo "checked=1";} ?> /> Don't count in grade total and hide from students<br/>
+<input type=radio name="cntingb" value="3" <?php if ($cntingb==3) { echo "checked=1";} ?> /> Don't count in grade total<br/>
 <input type=radio name="cntingb" value="2" <?php if ($cntingb==2) {echo "checked=1";} ?> /> Count as Extra Credit</span>
 <span <?php if ($testtype!="Practice") {echo "class=hidden";} else {echo "class=formright";} ?> id="praccntingb">
 Practice tests aren't counted in grade total</span>

@@ -311,6 +311,8 @@
 	}
 	$query .= "GROUP BY threadid";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$postcount = array();
+	$maxdate = array();
 	while ($row = mysql_fetch_row($result)) {
 		$postcount[$row[0]] = $row[1] -1;
 		$maxdate[$row[0]] = $row[2];
@@ -318,6 +320,7 @@
 	
 	$query = "SELECT threadid,lastview FROM imas_forum_views WHERE userid='$userid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$lastview = array();
 	while ($row = mysql_fetch_row($result)) {
 		$lastview[$row[0]] = $row[1];
 	}

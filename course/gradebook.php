@@ -47,7 +47,7 @@
 				 # remove any windows new lines, as they interfere with the parsing at the other end 
 				  $val = str_replace("\r\n", "\n", $val); 
 				  $val = str_replace("\n", " ", $val);
-				  $val = str_replace("<BR>", " ",$val);
+				  $val = str_replace(array("<BR>",'<br>','<br/>'), ' ',$val);
 				  $val = str_replace("&nbsp;"," ",$val);
 			
 				  # if a deliminator char, a double quote char or a newline are in the field, add quotes 
@@ -1020,58 +1020,61 @@
 		echo "<tr><th scope=\"col\">Question</th><th>Grade</th><th scope=\"col\">Average Score<br/>All</th>";
 		echo "<th scope=\"col\">Average Score<br/>Attempted</th><th scope=\"col\">Average Attempts<br/>(Regens)</th><th scope=\"col\">% Incomplete</th><th scope=\"col\">Preview</th></tr></thead>\n";
 		echo "<tbody>";
-		
-		$i = 1;
-		$qs = array_keys($qtotal);
-		$qslist = implode(',',$qs);
-		$query = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questionset.id ";
-		$query .= "FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
-		$query .= " AND imas_questions.id IN ($qslist)";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$avgscore = array();
-		$qs = array();
-		
-		while ($row = mysql_fetch_row($result)) {
-			if ($i%2!=0) {echo "<tr class=even>"; } else {echo "<tr class=odd>";}
-			$avg = round($qtotal[$row[1]]/$qcnt[$row[1]],2);
-			if ($qcnt[$row[1]] - $qincomplete[$row[1]]>0) {
-				$avg2 = round($qtotal[$row[1]]/($qcnt[$row[1]] - $qincomplete[$row[1]]),2); //avg adjusted for not attempted
-			} else {
-				$avg2 = 0;
-			}
-			$avgscore[$i-1] = $avg;
-			$qs[$i-1] = $row[1];
-			$pts = $row[2];
-			if ($pts==9999) {
-				$pts = $defpoints;
-			}
-			$pc = round(100*$avg/$pts);
-			$pc2 = round(100*$avg2/$pts);
-			$pi = round(100*$qincomplete[$row[1]]/$qcnt[$row[1]],1);
+		if (count($qtotal)>0) {
+			$i = 1;
+			$qs = array_keys($qtotal);
+			$qslist = implode(',',$qs);
+			$query = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questionset.id ";
+			$query .= "FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
+			$query .= " AND imas_questions.id IN ($qslist)";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$avgscore = array();
+			$qs = array();
 			
-			if ($qcnt[$row[1]] - $qincomplete[$row[1]]>0) {
-				$avgatt = round($attempts[$row[1]]/($qcnt[$row[1]] - $qincomplete[$row[1]]),2);
-				$avgreg = round($regens[$row[1]]/($qcnt[$row[1]] - $qincomplete[$row[1]]),2);
-			} else {
-				$avgatt = 0;
-				$avgreg = 0;
+			while ($row = mysql_fetch_row($result)) {
+				if ($i%2!=0) {echo "<tr class=even>"; } else {echo "<tr class=odd>";}
+				$avg = round($qtotal[$row[1]]/$qcnt[$row[1]],2);
+				if ($qcnt[$row[1]] - $qincomplete[$row[1]]>0) {
+					$avg2 = round($qtotal[$row[1]]/($qcnt[$row[1]] - $qincomplete[$row[1]]),2); //avg adjusted for not attempted
+				} else {
+					$avg2 = 0;
+				}
+				$avgscore[$i-1] = $avg;
+				$qs[$i-1] = $row[1];
+				$pts = $row[2];
+				if ($pts==9999) {
+					$pts = $defpoints;
+				}
+				$pc = round(100*$avg/$pts);
+				$pc2 = round(100*$avg2/$pts);
+				$pi = round(100*$qincomplete[$row[1]]/$qcnt[$row[1]],1);
+				
+				if ($qcnt[$row[1]] - $qincomplete[$row[1]]>0) {
+					$avgatt = round($attempts[$row[1]]/($qcnt[$row[1]] - $qincomplete[$row[1]]),2);
+					$avgreg = round($regens[$row[1]]/($qcnt[$row[1]] - $qincomplete[$row[1]]),2);
+				} else {
+					$avgatt = 0;
+					$avgreg = 0;
+				}
+				echo "<td>{$row[0]}</td>";
+				echo "<td><a href=\"gradeallq.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid=average&aid=$aid&qid={$row[1]}\">Grade</a></td>";
+				echo "<td>$avg/$pts ($pc%)</td><td>$avg2/$pts ($pc2%)</td><td>$avgatt ($avgreg)</td><td>$pi</td>";
+				echo "<td><input type=button value=\"Preview\" onClick=\"previewq({$row[3]})\"/></td>\n";
+				
+				echo "</tr>\n";
+				$i++;
 			}
-			echo "<td>{$row[0]}</td>";
-			echo "<td><a href=\"gradeallq.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid=average&aid=$aid&qid={$row[1]}\">Grade</a></td>";
-			echo "<td>$avg/$pts ($pc%)</td><td>$avg2/$pts ($pc2%)</td><td>$avgatt ($avgreg)</td><td>$pi</td>";
-			echo "<td><input type=button value=\"Preview\" onClick=\"previewq({$row[3]})\"/></td>\n";
-			
-			echo "</tr>\n";
-			$i++;
+		
+			echo "</tbody></table>\n";
+			echo "<script type=\"text/javascript\">\n";		
+			echo "initSortTable('myTable',Array('S','N','N'),true);\n";
+			echo "</script>\n";
+			echo "<p>Average time taken on this assessment: ";
+			echo round(array_sum($timetaken)/count($timetaken)/60,1);
+			echo " minutes</p>\n";
+		} else {
+			echo '</tbody></table>';
 		}
-		echo "</tbody></table>\n";
-		echo "<script type=\"text/javascript\">\n";		
-		echo "initSortTable('myTable',Array('S','N','N'),true);\n";
-		echo "</script>\n";
-		echo "<p>Average time taken on this assessment: ";
-		echo round(array_sum($timetaken)/count($timetaken)/60,1);
-		echo " minutes</p>\n";
-		
 		echo "<p><a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid\">Return to GradeBook</a></p>\n";
 		
 		echo "<p>Note: Average Attempts and Regens only counts those who attempted the problem</p>";
@@ -1189,8 +1192,11 @@
 		//Pull Assessment Info
 		$now = time();
 		$query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,enddate,itemorder,gbcategory,cntingb FROM imas_assessments WHERE courseid='$cid' ";
-		if (!$isteacher || $hidenc) {
+		if (!$isteacher) {
 			$query .= "AND cntingb>0 ";
+		}
+		if ($hidenc) {
+			$query .= "AND (cntingb=1 OR cntingb=2)";
 		}
 		if (!$isteacher || $curonly) {
 			$query .= "AND startdate<$now ";
@@ -1227,7 +1233,7 @@
 			$enddate[$kcnt] = $line['enddate'];
 			$category[$kcnt] = $line['gbcategory'];
 			$name[$kcnt] = $line['name'];
-			$cntingb[$kcnt] = $line['cntingb']; //0: ignore, 1: count, 2: extra credit
+			$cntingb[$kcnt] = $line['cntingb']; //0: ignore, 1: count, 2: extra credit, 3: no count but show
 			
 			$aitems = explode(',',$line['itemorder']);
 			foreach ($aitems as $k=>$v) {
@@ -1263,8 +1269,11 @@
 		if (!$isteacher || $curonly) {
 			$query .= "AND showdate<$now ";
 		}
-		if (!$isteacher || $hidenc) {
+		if (!$isteacher) {
 			$query .= "AND cntingb>0 ";
+		}
+		if ($hidenc) {
+			$query .= "AND (cntingb=1 OR cntingb=2)";
 		}
 		if ($catfilter>-1) {
 			$query .= "AND gbcategory='$catfilter' ";
@@ -1315,6 +1324,7 @@
 		//create item headers
 		$pos = $shift;
 		$catposs = array();
+		$catpossec = array();
 		$itemorder = array();
 		if ($orderby==1) { //order $category by enddate
 			asort($enddate,SORT_NUMERIC);
@@ -1340,13 +1350,13 @@
 				if ($assessmenttype[$k]!="Practice" && $cntingb[$k]==1) {
 					$catposs[$cat][] = $possible[$k]; //create category totals
 				} else if ($cntingb[$k]==2) {
-					$catposs[$cat][] = 0;
+					$catpossec[$cat][] = 0;
 				}
 				if (($orderby&1)==1) {  //display item header if displaying by category
 					$cathdr[$pos] = $cats[$cat][6];
 		
-					if ($cntingb[$k]==0) {
-						$gb[0][$pos] = $name[$k].'<br/>(Not Counted)';
+					if ($cntingb[$k]==0 || $cntingb[$k]==3) {
+						$gb[0][$pos] = $name[$k].'<br/>'.$possible[$k].'(Not Counted)';
 					} else {
 						$gb[0][$pos] = $name[$k].'<br/>'.$possible[$k].'&nbsp;pts';
 						if ($cntingb[$k]==2) {
@@ -1376,8 +1386,8 @@
 			foreach ($itemorder as $k) {
 				$cathdr[$pos] = $cats[$category[$k]][6];
 				
-				if ($cntingb[$k]==0) {
-					$gb[0][$pos] = $name[$k].'<br/>(Not Counted)';
+				if ($cntingb[$k]==0 || $cntingb[$k]==3) {
+					$gb[0][$pos] = $name[$k].'<br/>'.$possible[$k].'(Not Counted)';
 				} else {
 					$gb[0][$pos] = $name[$k].'<br/>'.$possible[$k].'&nbsp;pts';
 					if ($cntingb[$k]==2) {
@@ -1409,7 +1419,7 @@
 				continue;
 			}
 			//cats: name,scale,scaletype,chop,drop,weight
-			$catitemcnt[$cat] = count($catposs[$cat]);
+			$catitemcnt[$cat] = count($catposs[$cat]) + count($catpossec[$cat]);
 			if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($catposs[$cat])) { //if drop is set and have enough items
 				asort($catposs,SORT_NUMERIC);
 				$catposs[$cat] = array_slice($catposs[$cat],$cats[$cat][4]);
@@ -1560,7 +1570,7 @@
 						}
 						$gb[$ln][$pos] .= 1*$opts[$grades[$i]];
 						$atots[$pos][] = $opts[$grades[$i]];
-						if ($cntingb[$i]>0) {
+						if ($cntingb[$i] == 1 || $cntingb[$i]==2) {
 							$cattot[$category[$i]][] = $opts[$grades[$i]];
 						}
 						if ($isdisp) {
@@ -1611,7 +1621,7 @@
 						$gb[$ln][$pos] .= "{$pts[$assessments[$i]]}&nbsp;(PT)";
 					} else {
 						$gb[$ln][$pos] .= "{$pts[$assessments[$i]]}";
-						if ($cntingb[$i]>0) {
+						if ($cntingb[$i] == 1 || $cntingb[$i]==2) {
 							$cattot[$category[$i]][] = $pts[$assessments[$i]];
 						}
 						$atots[$pos][] = $pts[$assessments[$i]];

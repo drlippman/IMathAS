@@ -161,10 +161,20 @@
 				//clear out test for review.
 				$questions = explode(",",$adata['itemorder']);
 				if ($line['shuffle']&2) {
-					$seeds = array_fill(0,count($questions),rand(1,9999));	
+					if ($adata['shuffle']&4) { //all students same seed
+						$seeds = array_fill(0,count($questions),$aid+100);
+					} else {
+						$seeds = array_fill(0,count($questions),rand(1,9999));
+					}
 				} else {
-					for ($i = 0; $i<count($questions);$i++) {
-						$seeds[] = rand(1,9999);
+					if ($adata['shuffle']&4) { //all students same seed
+						for ($i = 0; $i<count($questions);$i++) {
+							$seeds[] = $aid + $i + 100;
+						}
+					} else {
+						for ($i = 0; $i<count($questions);$i++) {
+							$seeds[] = rand(1,9999);
+						}
 					}
 				}
 				$scores = array_fill(0,count($questions),-1);
@@ -269,7 +279,7 @@
 		}
 	}
 	if ($isreview) {
-		$testsettings['displaymethod'] = "SkipAround";
+		//$testsettings['displaymethod'] = "SkipAround";
 		$testsettings['testtype']="Practice";
 		$testsettings['defattempts'] = 0;
 		$testsettings['defpenalty'] = 0;

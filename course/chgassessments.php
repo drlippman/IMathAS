@@ -85,7 +85,7 @@
 			$sets[] = "defpenalty='{$_POST['defpenalty']}'";
 		}
 		if (isset($_POST['chgfeedback'])) {
-			$sets[] = "deffeedback='{$_POST['deffeedback']}'";
+			$sets[] = "deffeedback='$deffeedback'";
 		}
 		if (isset($_POST['chggbcat'])) {
 			$sets[] = "gbcategory='{$_POST['gbcat']}'";

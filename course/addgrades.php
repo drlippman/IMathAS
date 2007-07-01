@@ -157,6 +157,8 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 		if ($cntingb==1) { echo "checked=1";}
 		echo ' /> Count in Gradebook<br/><input type=radio name="cntingb" value="0" ';
 		if ($cntingb==0) { echo "checked=1";}
+		echo ' /> Don\'t count in grade total and hide from students<br/><input type=radio name="cntingb" value="3" ';
+		if ($cntingb==3) { echo "checked=1";}
 		echo ' /> Don\'t count in grade total<br/><input type=radio name="cntingb" value="2" ';
 		if ($cntingb==2) {echo "checked=1";}
 		echo ' /> Count as Extra Credit</span><br class=form />';

@@ -9,6 +9,8 @@
 		require("../footer.php");
 		exit;
 	}
+	$cid = $_GET['cid'];
+	$aid = $_GET['aid'];
 	
 	if ($_GET['process']== true) {
 		if ($_POST['points']=="") {$points=9999;} else {$points = $_POST['points'];}
@@ -27,19 +29,19 @@
 			$query = "UPDATE imas_questions SET points='$points',attempts='$attempts',penalty='$penalty',regen='$regen',showans='$showans' ";
 			$query .= "WHERE id='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			if ($_POST['copies']>0) {
+			if (isset($_POST['copies']) && $_POST['copies']>0) {
 				$query = "SELECT questionsetid FROM imas_questions WHERE id='{$_GET['id']}'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				$_GET['qsetid'] = mysql_result($result,0,0);
 			}
 		} 
 		if (isset($_GET['qsetid'])) { //new - adding
-			$query = "SELECT itemorder FROM imas_assessments WHERE id='{$_GET['aid']}'";
+			$query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$itemorder = mysql_result($result,0,0);
 			for ($i=0;$i<$_POST['copies'];$i++) {
 				$query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,regen,showans,questionsetid) ";
-				$query .= "VALUES ('{$_GET['aid']}','$points','$attempts','$penalty','$regen','$showans','{$_GET['qsetid']}')";
+				$query .= "VALUES ('$aid','$points','$attempts','$penalty','$regen','$showans','{$_GET['qsetid']}')";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				$qid = mysql_insert_id();
 				
@@ -57,17 +59,17 @@
 					}
 				}
 			}
-			$query = "UPDATE imas_assessments SET itemorder='$itemorder' WHERE id='{$_GET['aid']}'";
+			$query = "UPDATE imas_assessments SET itemorder='$itemorder' WHERE id='$aid'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		}
 		
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid={$_GET['cid']}&aid={$_GET['aid']}");
+		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
 		exit;
 	} else {
 		$pagetitle = "Question Settings";
 		require("../header.php");
-		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-		echo "&gt; <a href=\"addquestions.php?aid={$_GET['aid']}&cid={$_GET['cid']}\">Add/Remove Questions</a> &gt; ";
+		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=$cid\">$coursename</a> ";
+		echo "&gt; <a href=\"addquestions.php?aid=$aid&cid=$cid\">Add/Remove Questions</a> &gt; ";
 		
 		echo "Modify Question Settings</div>\n";
 		if (isset($_GET['id'])) {
@@ -97,10 +99,22 @@
 			$line['showans']='0';
 		}
 	}
+	$query = "SELECT ias.id FROM imas_assessment_sessions AS ias,imas_students WHERE ";
+	$query .= "ias.assessmentid='$aid' AND ias.userid=imas_students.userid AND imas_students.courseid='$cid'";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	if (mysql_num_rows($result) > 0) {
+		echo "<h3>Warning</h3>\n";
+		echo "<p>This assessment has already been taken.  Altering the points or penalty will not change the scores of students who already completed this question. ";
+		echo "If you want to make these changes, or add additional copies of this question, you should clear all existing assessment attempts</p> ";
+		echo "<p><input type=button value=\"Clear Assessment Attempts\" onclick=\"window.location='addquestions.php?cid=$cid&aid=$aid&clearattempts=ask'\"></p>\n";
+		$beentaken = true;
+	} else {
+		$beentaken = false;
+	}
 ?>
 
 <h2>Modify Question</h2> 
-<form method=post action="modquestion.php?process=true&<?php echo "cid={$_GET['cid']}&aid={$_GET['aid']}"; if (isset($_GET['id'])) {echo "&id={$_GET['id']}";} if (isset($_GET['qsetid'])) {echo "&qsetid={$_GET['qsetid']}";}?>">
+<form method=post action="modquestion.php?process=true&<?php echo "cid=$cid&aid=$aid"; if (isset($_GET['id'])) {echo "&id={$_GET['id']}";} if (isset($_GET['qsetid'])) {echo "&qsetid={$_GET['qsetid']}";}?>">
 Leave items blank or set to 9999 to use default values<BR>
 
 <span class=form>Points for this problem:</span><span class=formright> <input type=text size=4 name=points value="<?php echo $line['points'];?>"></span><BR class=form>
@@ -136,14 +150,13 @@ Leave items blank or set to 9999 to use default values<BR>
 <?php
 if (isset($_GET['qsetid'])) { //adding new question
 	echo "<span class=form>Number of copies of question to add:</span><span class=formright><input type=text size=4 name=copies value=\"1\"/></span><br class=form />";
-} else {
+} else if (!$beentaken) {
 	echo "<span class=form>Number, if any, of additional copies to add to assessment:</span><span class=formright><input type=text size=4 name=copies value=\"0\"/></span><br class=form />";
 }
 ?>
 
 <div class=submit><input type=submit value=Submit></div>
 
-<p><b>Warning</b>: If this assessment has been taken, altering the points or penalty will not change the scores of students who already completed this question.</p> 
 <?php
 	require("../footer.php");
 ?>
