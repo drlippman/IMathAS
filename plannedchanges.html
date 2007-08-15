@@ -1,39 +1,38 @@
 Planned Changes
 
 Misc
-Incoporate mozilla font warning somewhere
+Incoporate mozilla font warning somewhere (set perm cookie for prefs?)
 Zip files a/o files and specs on course item export
-Rework mass change dates to handle always/never dates
+*Rework mass change dates to handle always/never dates
 extensions penalty (needs db entry, lookup in gb) - either on non-completed questions, or on whole (in GB)
 all email links, mailto->masssend?  
 Student email list (need to add student privacy settings first)
 photos of students
 
-Documentation
+*Documentation
 Add mass change dates/assessments to help file
 Add Student Groups page to help file
 Add arraystodoteqns to help file
 
 Assessment Options
-Force completion of question before moving on: oneattime and seq mode
+*Force completion of question before moving on: oneattime and seq mode
 add reattempt whole assessment option (keep best of all full attempts)
 Must get all questions right to submit
-Ability to pull n questions from question grouping.
-grid version of add question for multiple questions      
+*Ability to pull n questions from question grouping.
+*grid version of add question for multiple questions      
 Don’t list potential questions if already added (option?) (find room for the option)
 Listing questions for assessment – have option to list the libraries of the questions that have already been added. (need to find room for it)
 Have practice-first option on assessments. (option for toggling to review mode)
 List questions once when in multiple libraries searched (have to work out list lib link)
-points per problem - decimal/fraction, or point total for whole assessment 
+*points per problem - decimal/fraction, or point total for whole assessment 
    (maybe scale assessment to __ pts, but would be weird from student perspective (pt values don't mean what they say)
 extra credit inside assessment (put on question itself - if set, calculate points possible without it, but give it points in i_a_s.  That part's easy;
    getting the display right in showtest will be tricky.)
-specify settings (# of copies) on Add Selected button
+*specify settings (# of copies) on Add Selected button
 Add default tolerance option to assessment settings
-Prevent adding additional copies of questions when assessment has been started.
 
 Editor
-handle html tags in editors better
+*handle html tags in editors better
 
 Gradebook
 add link to modify code / report error in gradebook assessment edit
@@ -44,20 +43,21 @@ gradebook filter by section (where to put?)
 customizable grade reports (select items to report)
 
 Groups
-button that clears all groups
+*button that clears all groups
 Randomly assign students to groups of N
 
 Forums
-next/prev thread links
-poster name on forum subscription email
+*next/prev thread links
+*poster name on forum subscription email
 finish delete forum post option (error on remove first in thread?) (need to track if child exists, etc)
+*new forum posts:  link to regular listing, mark all as read
 
 Message System
-messages links at top
+*messages links at top
 threaded messages?
 signature for emails/msgs (need field and page (chg user info?))
 
-Library/Question System
+*Library/Question System
 attach notes/comments to libraries, questions
 Instructor specific library/question listing
 Rework question import/export to handle questions with images
@@ -65,26 +65,32 @@ Assign libraries in preview
 New behavior to assign to libraries (popup?)
 Select from Assessment in question management (for assignment to libraries)
 Copy/Template libraries with structure assessment questions into new location (just messy to implement)
+*Mark/color private questions
+*default question rights to private (overridable by user setting?)
+*Check question description is unique in library
+**Make assessment version of library questions modifyable.
 
 Question Language
-calconarray with 2 arrays
-Points (x,y) type answer
+*calconarray with 2 arrays
+*Points (x,y) type answer
 adapt "equation" to work with inequalities (check if left-right is pos/neg, check that lt/lte matches)
 fix interpret: no mathphp inside quotes
 check equation answerformat - fail on extraneous vars? (???)
 if number answer is rounded, check if rounded correctly
 add "false" to NaN check;  surpress output of divide by zero on testpoints
 new question testing -- add debugs
+*question input box size
 
 Student User Interface
 allow students to control totals at top/bottom
 
 Instructor Interface
-Links to modify course settings on home page
-Change names on left bar
-0 default on upload grades (for comments)
-Keep submit button at top on upload grades
+*Links to modify course settings on home page
+*Change names on left bar
+*0 default on upload grades (for comments)
+*Keep submit button at top on upload grades
 Course default Color control (do-able - need to integrate with block color defaults)
+*Add Copy Dates to mass chg assessment
 
 Admin
 fix old user delete to remove more than just userid (NEED to do - simple but messy)
