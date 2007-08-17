@@ -533,7 +533,7 @@ Switch to:
 Common Control: <span class=pointer onclick="incboxsize('control')">[+]</span><span class=pointer onclick="decboxsize('control')">[-]</span>
 <input type=submit value="Save">
 <input type=submit name=test value="Save and Test Question"><BR>
-<textarea style="width: 100%" cols=60 rows=<?php if ($twobx) {echo "20";} else {echo "10";}?> id=control name=control <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $line['control'];?></textarea>
+<textarea style="width: 100%" cols=60 rows=<?php if ($twobx) {echo min(35,max(20,substr_count($line['control'],"\n")+1));} else {echo "10";}?> id=control name=control <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $line['control'];?></textarea>
 </div>
 <div id=qcbox <?php if ($twobx) {echo "style=\"display: none;\"";}?>>
 Question Control: <span class=pointer onclick="incboxsize('qcontrol')">[+]</span><span class=pointer onclick="decboxsize('qcontrol')">[-]</span>
@@ -545,7 +545,7 @@ Question Control: <span class=pointer onclick="incboxsize('qcontrol')">[+]</span
 Question Text: <span class=pointer onclick="incboxsize('qtext')">[+]</span><span class=pointer onclick="decboxsize('qtext')">[-]</span>
 <input type=submit value="Save">
 <input type=submit name=test value="Save and Test Question"><BR>
-<textarea style="width: 100%" cols=60 rows=10 id=qtext name=qtext <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $line['qtext'];?></textarea>
+<textarea style="width: 100%" cols=60 rows=<?php echo min(35,max(10,substr_count($line['qtext'],"\n")+1));?> id=qtext name=qtext <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $line['qtext'];?></textarea>
 </div>
 <div id=abox <?php if ($twobx) {echo "style=\"display: none;\"";}?>>
 Answer: <span class=pointer onclick="incboxsize('answer')">[+]</span><span class=pointer onclick="decboxsize('answer')">[-]</span>

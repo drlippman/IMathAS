@@ -142,6 +142,7 @@
 		
 	}
 	
+		
 	if (isset($_GET['breakfromgrp']) && isset($_GET['asid'])) {
 		$query = "SELECT count(id) FROM imas_assessment_sessions WHERE agroupid='{$_GET['asid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -173,11 +174,29 @@
 	if (isset($_GET['aid'])) {
 		//Assessment selected - list groups in assessment
 		$aid = $_GET['aid'];
+		
+		if (isset($_GET['cleargrps'])) {
+			if ($_GET['cleargrps']=='true') {
+				$query = "UPDATE imas_assessment_sessions SET agroupid=0 WHERE assessmentid='$aid'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			} else {
+				require("../header.php");
+				echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=$cid\">$coursename</a> &gt; ";
+				echo "<a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&aid=$aid\">Assessment Groups</a>";
+				echo "&gt; Clear Groups</div>";
+				echo "<p>Are you sure you want to clear all groups?</p>";
+				echo "<p><input type=button value=\"Yes, Clear\" onClick=\"window.location='managestugrps.php?cid=$cid&aid=$aid&cleargrps=true'\">\n";
+				echo "<input type=button value=\"Nevermind\" onClick=\"window.location='managestugrps.php?cid=$cid&aid=$aid'\"></p>\n";
+				require("../footer.php");
+				exit;
+			}
+		}
 		$pagetitle = "Manage Assessment Groups";
 		require("../header.php");
 		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=$cid\">$coursename</a> &gt; ";
 		echo "<a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; Assessment Groups</div>";
 		echo '<h2>Manage Assessment Groups</h2>';
+		echo "<p><a href=\"managestugrps.php?cid=$cid&aid=$aid&cleargrps=ask\">Clear All Groups</a></p>";
 		$query = "SELECT name FROM imas_assessments WHERE id='$aid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		echo '<h3>Managing groups for '.mysql_result($result,0,0).'</h3>';

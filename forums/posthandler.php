@@ -35,6 +35,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				$message  = "<h4>This is an automated message.  Do not respond to this email</h4>\r\n";
 				$message .= "<p>A new post has been started in forum $forumname in course $coursename</p>\r\n";
 				$message .= "<p>Subject:".stripslashes($_POST['subject'])."</p>";
+				$message .= "<p>Poster: $userfullname</p>";
 				$message .= "<a href=\"http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/$returnurl\">";
 				$message .= "View Posting</a>\r\n";
 			}

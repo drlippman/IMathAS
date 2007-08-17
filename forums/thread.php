@@ -177,6 +177,7 @@
 					$message  = "<h4>This is an automated message.  Do not respond to this email</h4>\r\n";
 					$message .= "<p>A new thread has been started in forum $forumname in course $coursename</p>\r\n";
 					$message .= "<p>Subject:".stripslashes($_POST['subject'])."</p>";
+					$message .= "<p>Poster: $userfullname</p>";
 					$message .= "<a href=\"http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/posts.php?cid=$cid&forum=$forumid&thread=$threadid\">";
 					$message .= "View Posting</a>\r\n";
 				}

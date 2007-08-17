@@ -18,6 +18,20 @@
 	$forumid = $_GET['forum'];
 	$cid = $_GET['cid'];
 	
+	if (isset($_GET['markallread'])) {
+		$query = "SELECT DISTINCT threadid FROM imas_forum_posts WHERE forumid='$forumid'";
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$now = time();
+		while ($row = mysql_fetch_row($result)) {
+			$query = "UPDATE imas_forum_views SET lastview=$now WHERE userid='$userid' AND threadid='{$row[0]}'";
+			mysql_query($query) or die("Query failed : $query " . mysql_error());
+			if (mysql_affected_rows()==0) {
+				$query = "INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES ('$userid','{$row[0]}',$now)";
+				mysql_query($query) or die("Query failed : $query " . mysql_error());
+			}
+		}
+	}
+	
 	$query = "SELECT settings,replyby,defdisplay,name FROM imas_forums WHERE id='$forumid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$forumsettings = mysql_result($result,0,0);
@@ -80,7 +94,8 @@
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$laststu = -1;
 	$cnt = 0;
-	echo "<input type=\"button\" value=\"Expand All\" onclick=\"toggleshowall()\" id=\"toggleall\"/><br/>";
+	echo "<input type=\"button\" value=\"Expand All\" onclick=\"toggleshowall()\" id=\"toggleall\"/> ";
+	echo "<a href=\"postsbyname.php?cid=$cid&forum=$forumid&markallread=true\">Mark all Read</a><br/>";
 	while ($line =  mysql_fetch_array($result, MYSQL_ASSOC)) {
 		if ($line['userid']!=$laststu) {
 			if ($laststu!=-1) {

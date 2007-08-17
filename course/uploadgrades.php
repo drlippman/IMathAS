@@ -109,7 +109,7 @@
 	echo '<input type=text size=4 name="gradecol" value="2"/></span><br class="form" />';
 	
 	echo '<span class=form>Feedback is in column (0 if none):</span><span class=formright>';
-	echo '<input type=text size=4 name="feedbackcol" value="3"/></span><br class="form" />';
+	echo '<input type=text size=4 name="feedbackcol" value="0"/></span><br class="form" />';
 	
 	echo '<span class=form>User is identified by:</span><span class=formright>';
 	echo '<input type=radio name="useridtype" value="0" checked=1 />Username (login name) in column <input type=text size=4 name="usernamecol" value="1" /><br/>';

@@ -187,7 +187,7 @@
 	$numpages = ceil(mysql_result($result,0,0)/$threadsperpage);
 	
 	if ($numpages > 1) {
-		echo "<div style=\"padding: 5px;\">Page: ";
+		echo "<span class=\"right\" style=\"padding: 5px;\">Page: ";
 		if ($page < $numpages/2) {
 			$min = max(2,$page-4);
 			$max = min($numpages-1,$page+8+$min-$page);
@@ -221,10 +221,21 @@
 		if ($page < $numpages) {
 			echo "<a href=\"msglist.php?page=".($page+1)."&cid=$cid&filtercid=$filtercid\">Next</a> ";
 		}
-		echo "</div>\n";
+		echo "</span>\n";
 	}
 	$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/msglist.php?cid=$cid&filtercid=";
-			
+	
+	if ($myrights > 5 && $cid>0) {
+		$query = "SELECT msgset FROM imas_courses WHERE id='$cid'";
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$msgset = mysql_result($result,0,0);
+		if ($msgset<2 || $isteacher) {
+			$cansendmsgs = true;
+		}
+	}	
+	if ($cansendmsgs) {
+		echo "<a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid&add=new\">Send New Message</a>\n";
+	}
 ?>
 <script type="text/javascript">
 function chkAll(frm, arr, mark) {
@@ -316,13 +327,8 @@ function chgfilter() {
 	</table>
 	</form>
 <?php
-	if ($myrights > 5 && $cid>0) {
-		$query = "SELECT msgset FROM imas_courses WHERE id='$cid'";
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		$msgset = mysql_result($result,0,0);
-		if ($msgset<2 || $isteacher) {
-			echo "<p><a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid&add=new\">Send New Message</a></p>\n";
-		}
+	if ($cansendmsgs) {
+		echo "<p><a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid&add=new\">Send New Message</a></p>\n";
 	}
 	echo "<p><a href=\"sentlist.php?cid=$cid\">Sent Messages</a></p>";
 	
