@@ -95,6 +95,12 @@
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$sets[] = "intro='".addslashes(mysql_result($result,0,0))."'";
 		}
+		if (isset($_POST['chgdates'])) {
+			$query = "SELECT startdate,enddate,reviewdate FROM imas_assessments WHERE id='{$_POST['intro']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$row = mysql_fetch_row($result);
+			$sets[] = "startdate='{$row[0]}',enddate='{$row[1]}',reviewdate='{$row[2]}'";
+		}
 			
 		if ($turnonshuffle!=0 || $turnoffshuffle!=0) {
 			$shuff = "shuffle = ((shuffle";
@@ -203,6 +209,15 @@ foreach($assesses as $k=>$v) {
 }
 ?>
 </select></td></tr>
+
+<tr><td><input type="checkbox" name="chgdates"/></td><td class="r">Dates:</td><td>Copy from: <select name="dates">
+<?php
+foreach($assesses as $k=>$v) {
+	echo "<option value=\"$k\">$v</option>";
+}
+?>
+</select></td></tr>
+
 <tr><td><input type="checkbox" name="chgtimelimit"/></td><td class="r">Time Limit (minutes, 0 for no time limit): </td><td><input type=text size=4 name=timelimit value="<?php echo $line['timelimit']/60;?>"></td></tr>
 
 <tr><td><input type="checkbox" name="chgdisplaymethod"/></td><td class="r">Display method: </td><td><select name="displaymethod">

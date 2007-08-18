@@ -229,7 +229,12 @@
 		} else {
 			$msgnot = 0;
 		}
-		$query = "UPDATE imas_users SET FirstName='{$_POST['firstname']}',LastName='{$_POST['lastname']}',email='{$_POST['email']}',msgnotify=$msgnot ";
+		if (isset($_POST['qrd']) || $myrights<20) {
+			$qrightsdef = 0;
+		} else {
+			$qrightsdef = 2;
+		}
+		$query = "UPDATE imas_users SET FirstName='{$_POST['firstname']}',LastName='{$_POST['lastname']}',email='{$_POST['email']}',msgnotify=$msgnot,qrightsdef=$qrightsdef ";
 		$query .= "WHERE id='$userid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 	} 

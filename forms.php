@@ -42,6 +42,11 @@ switch($_GET['action']) {
 		echo "<span class=form><label for=\"msgnot\">Notify me by email when I receive a new message:</label></span><span class=formright><input type=checkbox id=msgnot name=msgnot ";
 		if ($line['msgnotify']==1) {echo "checked=1";}
 		echo " /></span><BR class=form>\n";
+		if ($myrights>19) {
+			echo "<span class=form><label for=\"qrd\">Make new questions private by default?<br/>(recommended for new users):</label></span><span class=formright><input type=checkbox id=qrd name=qrd ";
+			if ($line['qrightsdef']==0) {echo "checked=1";}
+			echo " /></span><BR class=form>\n";	
+		}
 		echo "<div class=submit><input type=submit value='Update Info'></div>\n";
 		echo "</form>\n";
 		break;

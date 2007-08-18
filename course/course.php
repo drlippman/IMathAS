@@ -223,30 +223,30 @@
    if ($useleftbar && isset($teacherid)) {
 	echo "<div id=\"leftcontent\">";
 	echo "<p>".generateadditem($_GET['folder']). '</p>';
-	echo "<p><a href=\"$imasroot/msgs/msglist.php?cid=$cid&folder={$_GET['folder']}\">Messages</a>$newmsgs</p>";
-	echo "<p><a href=\"listusers.php?cid=$cid\">List Students</a><br/>\n";
-	echo "<a href=\"gradebook.php?cid=$cid\">Show Gradebook</a><br/>\n";
+	echo "<p><b>Show:</b><br/>";
+	echo "<a href=\"$imasroot/msgs/msglist.php?cid=$cid&folder={$_GET['folder']}\">Messages</a>$newmsgs<br/>";
+	echo "<a href=\"listusers.php?cid=$cid\">Students</a><br/>\n";
+	echo "<a href=\"gradebook.php?cid=$cid\">Gradebook</a><br/>\n";
 	echo "<a href=\"course.php?cid=$cid&stuview=0\">Student View</a></p>\n";
-	echo "<p><a href=\"manageqset.php?cid=$cid\">Manage Question Set</a><br>\n";
+	echo "<p><b>Manage:</b><br/>";
+	echo "<a href=\"manageqset.php?cid=$cid\">Question Set</a><br>\n";
+	echo "<a href=\"managelibs.php?cid=$cid\">Libraries</a><br/>";
+	echo "<a href=\"managestugrps.php?cid=$cid\">Groups</a></p>";
 	if ($allowcourseimport) {
-		echo "<a href=\"../admin/export.php?cid=$cid\">Export Question Set<br></a>\n";
-		echo "<a href=\"../admin/import.php?cid=$cid\">Import Question Set</p></a>\n";
-		echo "<p><a href=\"managelibs.php?cid=$cid\">Manage Libraries</a><br>";
-		echo "<a href=\"managestugrps.php?cid=$cid\">Student Groups</a><br/>";
-		echo "<a href=\"../admin/exportlib.php?cid=$cid\">Export Libraries<br></a>\n";
+		echo "<p><b>Export/Import:</b><br/>";
+		echo "<a href=\"../admin/export.php?cid=$cid\">Export Question Set<br/></a>\n";
+		echo "<a href=\"../admin/import.php?cid=$cid\">Import Question Set<br/></a>\n";
+		echo "<a href=\"../admin/exportlib.php?cid=$cid\">Export Libraries<br/></a>\n";
 		echo "<a href=\"../admin/importlib.php?cid=$cid\">Import Libraries</p></a>\n";
-	} else {
-		echo "<a href=\"managelibs.php?cid=$cid\">Manage Libraries</a><br/>";
-		echo "<a href=\"managestugrps.php?cid=$cid\">Student Groups</a></p>";
-		
-	}
-	echo "<p><a href=\"copyitems.php?cid=$cid\">Copy Course Items</a><br/>\n";
-	echo "<a href=\"../admin/exportitems.php?cid=$cid\">Export Course Items</a><br/>\n";
-	echo "<a href=\"../admin/importitems.php?cid=$cid\">Import Course Items</a>\n";
-	echo "</p><p>";
-	echo "<a href=\"timeshift.php?cid=$cid\">Shift all Course Dates</a><br/>\n";
-	echo "<a href=\"chgassessments.php?cid=$cid\">Mass Change Assessments</a><br/>\n";
-	echo "<a href=\"masschgdates.php?cid=$cid\">Mass Change Dates</a><br/>";
+	} 
+	echo "<p><b>Course Items:</b><br/>";
+	echo "<a href=\"copyitems.php?cid=$cid\">Copy</a><br/>\n";
+	echo "<a href=\"../admin/exportitems.php?cid=$cid\">Export</a><br/>\n";
+	echo "<a href=\"../admin/importitems.php?cid=$cid\">Import</a></p>\n";
+	echo "<p><b>Change:</b><br/>";
+	//echo "<a href=\"timeshift.php?cid=$cid\">Shift all Course Dates</a><br/>\n";
+	echo "<a href=\"chgassessments.php?cid=$cid\">Assessments</a><br/>\n";
+	echo "<a href=\"masschgdates.php?cid=$cid\">Dates</a><br/>";
 	echo "<a href=\"../admin/forms.php?action=modify&id=$cid&cid=$cid\">Course Settings</a>";
 	echo "</p>";   
 	echo "<p><a href=\"$imasroot/help.php?section=coursemanagement\">Help</a><br/>\n";

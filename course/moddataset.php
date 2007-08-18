@@ -356,7 +356,10 @@
 			$myq = true;
 			$twobx = true;
 			$line['description'] = "Enter description here";
-			$line['userights'] = 2;
+			$query = "SELECT qrightsdef FROM imas_users WHERE id='$userid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$line['userights'] = mysql_result($result,0,0);
+			
 			$line['qtype'] = "number";
 			$line['control'] = '';
 			$line['qcontrol'] = '';

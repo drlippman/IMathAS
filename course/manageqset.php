@@ -742,7 +742,15 @@ END;
 				$ownername = $line['lastName'] . ',' . substr($line['firstName'],0,1);
 				echo "<td class=c>$ownername</td>\n";
 			} else {
-				if ($line['ownerid']==$userid) { echo "<td>Yes</td>";} else {echo "<td></td>";}
+				if ($line['ownerid']==$userid) { 
+					if ($line['userights']==0) {
+						echo "<td>Private</td>";
+					} else {
+						echo "<td>Yes</td>";
+					}
+				} else {
+					echo "<td></td>";
+				}
 			}
 			if ($searchall==1) {
 				echo "<td><a href=\"manageqset.php?cid=$cid&listlib={$line['libid']}\">List lib</a></td>";

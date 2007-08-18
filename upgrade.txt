@@ -6,6 +6,8 @@ Upgrade Notes
 
 *** Database Changes ***
 
+ALTER TABLE `imas_users` ADD `qrightsdef` TINYINT( 1 ) NOT NULL DEFAULT '0';
+
 #R41
 ALTER TABLE `imas_questions` ADD `regen` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0';
 ALTER TABLE `imas_questions` ADD `showans` VARCHAR( 1 ) NOT NULL DEFAULT '0';

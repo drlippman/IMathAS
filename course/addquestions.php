@@ -48,32 +48,37 @@
 		exit;
 	}
 	if (isset($teacherid) && isset($_GET['addset'])) {
-		if (!isset($_POST['nchecked'])) {
+		if (!isset($_POST['nchecked']) && !isset($_POST['qsetids'])) {
 				echo "No questions selected.  <a href=\"addquestions.php?cid=$cid&aid=$aid\">Go back</a>\n";
 				require("../footer.php");
 				exit;
-			}
-		$checked = $_POST['nchecked'];
-		foreach ($checked as $qsetid) {
-			$query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,questionsetid) ";
-			$query .= "VALUES ('$aid',9999,9999,9999,'$qsetid');";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$qids[] = mysql_insert_id();
 		}
-		//add to itemorder
-		$query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$row = mysql_fetch_row($result);
-		if ($row[0]=='') {
-			$itemorder = implode(",",$qids);
+		if (isset($_POST['add'])) {
+			include("modquestiongrid.php");
 		} else {
-			$itemorder  = $row[0] . "," . implode(",",$qids);	
+
+			$checked = $_POST['nchecked'];
+			foreach ($checked as $qsetid) {
+				$query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,questionsetid) ";
+				$query .= "VALUES ('$aid',9999,9999,9999,'$qsetid');";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$qids[] = mysql_insert_id();
+			}
+			//add to itemorder
+			$query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$row = mysql_fetch_row($result);
+			if ($row[0]=='') {
+				$itemorder = implode(",",$qids);
+			} else {
+				$itemorder  = $row[0] . "," . implode(",",$qids);	
+			}
+		
+			$query = "UPDATE imas_assessments SET itemorder='$itemorder' WHERE id='$aid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
+			exit;
 		}
-	
-		$query = "UPDATE imas_assessments SET itemorder='$itemorder' WHERE id='$aid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
-		exit;
 	}
 	if (isset($teacherid) && isset($_GET['removeset'])) {
 		if (!isset($_POST['checked'])) {
@@ -501,7 +506,8 @@ var curlibs = '<?php echo $searchlibs;?>';
 			echo "<form id=\"selq\" method=post action=\"addquestions.php?cid=$cid&aid=$aid&addset=true\">\n";
 			echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 			echo "Check/Uncheck All: <input type=\"checkbox\" name=\"ca2\" value=\"1\" onClick=\"chkAll(this.form, 'nchecked[]', this.checked)\">\n";
-			echo "<input type=submit value=\"Add Selected (using defaults)\">\n";
+			echo "<input name=\"add\" type=submit value=\"Add\" />\n";
+			echo "<input name=\"addquick\" type=submit value=\"Add (using defaults)\">\n";
 			echo "<input type=button value=\"Preview Selected\" onclick=\"previewsel('selq')\" />\n";
 			echo "<table cellpadding=5 id=myTable class=gb>\n";
 			echo "<thead><tr><th></th><th>Description</th><th>Preview</th><th>Type</th>";
@@ -535,7 +541,15 @@ var curlibs = '<?php echo $searchlibs;?>';
 				$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 				$times = mysql_result($result2,0,0);
 				echo "<td class=c>$times</td>";
-				if ($line['ownerid']==$userid) { echo "<td>Yes</td>";} else {echo "<td></td>";}
+				if ($line['ownerid']==$userid) { 
+					if ($line['userights']==0) {
+						echo "<td>Private</td>";
+					} else {
+						echo "<td>Yes</td>";
+					}
+				} else {
+					echo "<td></td>";
+				}
 				echo "<td class=c><a href=\"modquestion.php?qsetid={$line['id']}&aid=$aid&cid=$cid\">Add</a></td>\n";
 				if ($line['userights']>2 || $line['ownerid']==$userid) {
 					echo "<td class=c><a href=\"moddataset.php?id={$line['id']}&aid=$aid&cid=$cid&frompot=1\">Edit</a></td>\n";
