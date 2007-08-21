@@ -98,17 +98,21 @@
 			if ($adata['shuffle']&2) { //all questions same random seed
 				if ($adata['shuffle']&4) { //all students same seed
 					$seeds = array_fill(0,count($questions),$aid);
+					$reviewseeds = array_fill(0,count($questions),$aid+100);
 				} else {
 					$seeds = array_fill(0,count($questions),rand(1,9999));
+					$reviewseeds = array_fill(0,count($questions),rand(1,9999));
 				}
 			} else {
 				if ($adata['shuffle']&4) { //all students same seed
 					for ($i = 0; $i<count($questions);$i++) {
 						$seeds[] = $aid + $i;
+						$reviewseeds[] = $aid + $i + 100;
 					}
 				} else {
 					for ($i = 0; $i<count($questions);$i++) {
 						$seeds[] = rand(1,9999);
+						$reviewseeds[] = rand(1,9999);
 					}
 				}
 			}
@@ -137,8 +141,10 @@
 			$bestseedslist = implode(',',$seeds);
 			$bestlalist = implode('~',$lastanswers);
 			
-			$query = "INSERT INTO imas_assessment_sessions (userid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers) ";
-			$query .= "VALUES ('$userid','{$_GET['id']}','$qlist','$seedlist','$scorelist','$attemptslist','$lalist',$starttime,'$bestscorelist','$bestattemptslist','$bestseedslist','$bestlalist');";
+			$reviewseedlist = implode(",",$reviewseeds);
+			
+			$query = "INSERT INTO imas_assessment_sessions (userid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers,reviewscores,reviewattempts,reviewseeds,reviewlastanswers) ";
+			$query .= "VALUES ('$userid','{$_GET['id']}','$qlist','$seedlist','$scorelist','$attemptslist','$lalist',$starttime,'$bestscorelist','$bestattemptslist','$bestseedslist','$bestlalist','$scorelist','$attemptslist','$reviewseedlist','$lalist');";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$sessiondata['sessiontestid'] = mysql_insert_id();
 			$sessiondata['isreview'] = $isreview;
@@ -156,7 +162,7 @@
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/showtest.php");
 			exit;
 		} else { //returning to test
-			
+			/* removed: now retains test info between review sessions
 			if ($isreview) { //past enddate, before reviewdate
 				//clear out test for review.
 				$questions = explode(",",$adata['itemorder']);
@@ -185,10 +191,11 @@
 				$attemptslist = implode(",",$attempts);
 				$lalist = implode("~",$lastanswers);
 				
-				$query = "UPDATE imas_assessment_sessions SET scores='$scorelist',seeds='$seedlist',attempts='$attemptslist',lastanswers='$lalist' WHERE userid='$userid' AND assessmentid='$aid' LIMIT 1";
+				$query = "UPDATE imas_assessment_sessions SET reviewscores='$scorelist',reviewseeds='$seedlist',reviewattempts='$attemptslist',reviewlastanswers='$lalist' WHERE userid='$userid' AND assessmentid='$aid' LIMIT 1";
 				mysql_query($query) or die("Query failed : $query: " . mysql_error());
 				
 			}
+			*/
 			$deffeedback = explode('-',$adata['deffeedback']);
 			//removed: $deffeedback[0] == "Practice" || 
 			if ($myrights<6 || isset($teacherid)) {  // is teacher or guest - delete out out assessment session
@@ -230,10 +237,12 @@
 	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
 	$questions = explode(",",$line['questions']);
+
 	$seeds = explode(",",$line['seeds']);
 	$scores = explode(",",$line['scores']);
 	$attempts = explode(",",$line['attempts']);
 	$lastanswers = explode("~",$line['lastanswers']);
+
 	$bestseeds = explode(",",$line['bestseeds']);
 	$bestscores = explode(",",$line['bestscores']);
 	$bestattempts = explode(",",$line['bestattempts']);
@@ -284,6 +293,11 @@
 		$testsettings['defattempts'] = 0;
 		$testsettings['defpenalty'] = 0;
 		$testsettings['showans'] = '0';
+		
+		$seeds = explode(",",$line['reviewseeds']);
+		$scores = explode(",",$line['reviewscores']);
+		$attempts = explode(",",$line['reviewattempts']);
+		$lastanswers = explode("~",$line['reviewlastanswers']);
 	}
 	$allowregen = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework");
 	$showeachscore = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="AsGo" || $testsettings['testtype']=="Homework");

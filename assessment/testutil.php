@@ -172,7 +172,7 @@ function scorequestion($qn) {
 	$scores[$qn] = calcpointsafterpenalty(scoreq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$_POST["qn$qn"]),$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
 	$attempts[$qn]++;
 	
-	if (getpts($scores[$qn])>getpts($bestscores[$qn]) && !$isreview) {
+	if (getpts($scores[$qn])>=getpts($bestscores[$qn]) && !$isreview) {
 		$bestseeds[$qn] = $seeds[$qn];
 		$bestscores[$qn] = $scores[$qn];
 		$bestattempts[$qn] = $attempts[$qn];
@@ -183,7 +183,7 @@ function scorequestion($qn) {
 //records everything but questions array
 //if limit=true, only records lastanswers
 function recordtestdata($limit=false) { 
-	global $bestscores,$bestattempts,$bestseeds,$bestlastanswers,$scores,$attempts,$seeds,$lastanswers,$testid,$testsettings,$sessiondata;
+	global $isreview,$bestscores,$bestattempts,$bestseeds,$bestlastanswers,$scores,$attempts,$seeds,$lastanswers,$testid,$testsettings,$sessiondata;
 	$bestscorelist = implode(',',$bestscores);
 	$bestattemptslist = implode(',',$bestattempts);
 	$bestseedslist = implode(',',$bestseeds);
@@ -198,12 +198,21 @@ function recordtestdata($limit=false) {
 	$lalist = implode('~',$lastanswers);
 	$lalist = addslashes(stripslashes($lalist));
 	$now = time();
-	if ($limit) {
-		$query = "UPDATE imas_assessment_sessions SET lastanswers='$lalist' ";
+	if ($isreview) {
+		if ($limit) {
+			$query = "UPDATE imas_assessment_sessions SET reviewlastanswers='$lalist' ";
+		} else {
+			$query = "UPDATE imas_assessment_sessions SET reviewscores='$scorelist',reviewattempts='$attemptslist',reviewseeds='$seedslist',reviewlastanswers='$lalist',";
+			$query .= "endtime=$now ";
+		}
 	} else {
-		$query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',seeds='$seedslist',lastanswers='$lalist',";
-		$query .= "bestseeds='$bestseedslist',bestattempts='$bestattemptslist',bestscores='$bestscorelist',bestlastanswers='$bestlalist',";
-		$query .= "endtime=$now ";
+		if ($limit) {
+			$query = "UPDATE imas_assessment_sessions SET lastanswers='$lalist' ";
+		} else {
+			$query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',seeds='$seedslist',lastanswers='$lalist',";
+			$query .= "bestseeds='$bestseedslist',bestattempts='$bestattemptslist',bestscores='$bestscorelist',bestlastanswers='$bestlalist',";
+			$query .= "endtime=$now ";
+		}
 	}
 	if ($testsettings['isgroup']>0 && $sessiondata['groupid']>0) {
 		$query .= "WHERE agroupid='{$sessiondata['groupid']}'";

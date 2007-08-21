@@ -267,8 +267,11 @@
 				}
 				echo "<td class=c><a href=\"modquestion.php?id={$subs[$j]}&aid=$aid&cid=$cid\">Change</a></td>\n";
 				if ($line['userights']>2 || $line['ownerid']==$userid) {
-					echo "<td class=c><a href=\"moddataset.php?id={$line['questionsetid']}&aid=$aid&cid=$cid\">Edit</a></td>\n";
-				} else { echo "<td class=c><a href=\"viewsource.php?id={$line['questionsetid']}&aid=$aid&cid=$cid\">View</a></td>";}
+					echo "<td class=c><a href=\"moddataset.php?id={$line['questionsetid']}&aid=$aid&cid=$cid&qid={$subs[$j]}\">Edit</a></td>\n";
+				} else { 
+					echo "<td class=c><a href=\"moddataset.php?id={$line['questionsetid']}&aid=$aid&cid=$cid&template=true&makelocal={$subs[$j]}\">Edit</a></td>\n";
+					//echo "<td class=c><a href=\"viewsource.php?id={$line['questionsetid']}&aid=$aid&cid=$cid\">View</a></td>";
+				}
 				echo "<td class=c><a href=\"moddataset.php?id={$line['questionsetid']}&aid={$_GET['aid']}&cid={$_GET['cid']}&template=true\">Template</a></td>\n";
 				echo "<td class=c><a href=\"addquestionsreview.php?remove=$i-$j&aid=$aid&cid=$cid\" onclick=\"return confirm('Are you sure you want to remove this question?')\">Remove</a> <input type=checkbox name=\"checked[]\" value=\"$i-$j\"/></td>\n";
 				echo "</tr>\n";

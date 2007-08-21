@@ -779,6 +779,7 @@ function calconarray($array,$todo) {
 	}
 	$todo = mathphp($todo,'x');
 	$todo = str_replace('(x)','($x)',$todo);
+	echo $todo;
 	return array_map(create_function('$x','return('.$todo.');'),$array);	
 }
 

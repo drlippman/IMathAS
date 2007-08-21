@@ -36,6 +36,12 @@ function interpret($blockname,$anstype,$str)
 			//$com = str_replace(';','',$com);
 			//$com = str_replace(' exit',';',$com);
 			if (trim($com) == "") { continue;}
+			//check for "for" loop
+			$forcond = array();
+			if (preg_match('/^for\s*\(\s*(\$\w+)\s*\=\s*(\d+|\$\w+)\s*\.\.\s*(\d+|\$\w+)\s*\)\s*\{(.+)\}\s*$/',$com,$matches)) {
+				$forcond = array_slice($matches,1,3);
+				$com = $matches[4];
+			}
 			//check for "if" conditional
 			$ifcond = '';
 			if (($l=strpos($com," if "))!==false) {
@@ -168,10 +174,12 @@ function interpret($blockname,$anstype,$str)
 				$ifcond = mathphp($ifcond,null);
 				$ifcond = str_replace('#=','!=',$ifcond);
 								
-				$out .= "if ($ifcond) { $com; }";
-			} else {
-				$out .= "$com;\n";
+				$com = "if ($ifcond) { $com; }";
+			} 
+			if (count($forcond)==3) {
+				$com = "for ({$forcond[0]}=intval({$forcond[1]});{$forcond[0]}<=round(floatval({$forcond[2]}),0);{$forcond[0]}++) { $com; }";
 			}
+			$out .= "$com;\n";
 		}
 		return $out;
 	}

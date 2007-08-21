@@ -611,17 +611,21 @@
 		if ($adata['shuffle']&2) { //all questions same random seed
 			if ($adata['shuffle']&4) { //all students same seed
 				$seeds = array_fill(0,count($questions),$aid);
+				$reviewseeds = array_fill(0,count($questions),$aid+100);
 			} else {
 				$seeds = array_fill(0,count($questions),rand(1,9999));
+				$reviewseeds = array_fill(0,count($questions),rand(1,9999));
 			}
 		} else {
 			if ($adata['shuffle']&4) { //all students same seed
 				for ($i = 0; $i<count($questions);$i++) {
 					$seeds[] = $aid + $i;
+					$reviewseeds[] = $aid + $i;
 				}
 			} else {
 				for ($i = 0; $i<count($questions);$i++) {
 					$seeds[] = rand(1,9999);
+					$reviewseeds[] = rand(1,9999);
 				}
 			}
 		}
@@ -637,9 +641,10 @@
 		$scorelist = implode(',',$scores);
 		$attemptslist = implode(',',$attempts);
 		$lalist = implode('~',$lastanswers);
+		$reviewseedlist = implode(',',$reviewseeds);
 		
-		$query = "INSERT INTO imas_assessment_sessions (userid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers) ";
-		$query .= "VALUES ('{$_GET['uid']}','$aid','$qlist','$seedlist','$scorelist','$attemptslist','$lalist',$starttime,'$scorelist','$attemptslist','$seedlist','$lalist');";
+		$query = "INSERT INTO imas_assessment_sessions (userid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers,reviewscores,reviewattempts,reviewseeds,reviewlastanswers) ";
+		$query .= "VALUES ('{$_GET['uid']}','$aid','$qlist','$seedlist','$scorelist','$attemptslist','$lalist',$starttime,'$scorelist','$attemptslist','$seedlist','$lalist','$scorelist','$attemptslist','$reviewseedlist','$lalist');";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		$asid = mysql_insert_id();
 															
@@ -725,7 +730,7 @@
 			}
 		}
 		
-		if ($isteacher) {echo "<p><a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}&clearattempt=true\">Clear Attempt</a> <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}&clearscores=true\">Clear Scores</a></p>\n";}
+		if ($isteacher) {echo "<p><a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}&clearattempt=true\">Clear Attempt</a> | <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}&clearscores=true\">Clear Scores</a></p>\n";}
 		
 		if (($line['timelimit']>0) && ($line['endtime'] - $line['starttime'] > $line['timelimit'])) {
 			$over = $line['endtime']-$line['starttime'] - $line['timelimit'];
@@ -760,13 +765,30 @@
 			$scores = explode(",",$line['scores']);
 			$attempts = explode(",",$line['attempts']);
 			$lastanswers = explode("~",$line['lastanswers']);
-			echo "<p><b>Showing Last Attempts.</b>  <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&asid={$_GET['asid']}&cid=$cid&uid={$_GET['uid']}\">Show Scored Attempts</a></p>";
-		} else {
+			echo "<p>";
+			echo "<a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&asid={$_GET['asid']}&cid=$cid&uid={$_GET['uid']}\">Show Scored Attempts</a> | ";
+			echo "<b>Showing Last Attempts</b> | ";
+			echo "<a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&asid={$_GET['asid']}&cid=$cid&uid={$_GET['uid']}&reviewver=1\">Show Review Attempts</a>";
+			echo "</p>";
+		} else if (isset($_GET['reviewver'])) {
+			$seeds = explode(",",$line['reviewseeds']);
+			$scores = explode(",",$line['reviewscores']);
+			$attempts = explode(",",$line['reviewattempts']);
+			$lastanswers = explode("~",$line['reviewlastanswers']);
+			echo "<p>";
+			echo "<a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&asid={$_GET['asid']}&cid=$cid&uid={$_GET['uid']}\">Show Scored Attempts</a> | ";
+			echo "<a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&asid={$_GET['asid']}&cid=$cid&uid={$_GET['uid']}&lastver=1\">Show Last Graded Attempts</a> | ";
+			echo "<b>Showing Review Attempts</b>";
+			echo "</p>";
+		}else {
 			$seeds = explode(",",$line['bestseeds']);
 			$scores = explode(",",$line['bestscores']);
 			$attempts = explode(",",$line['bestattempts']);
 			$lastanswers = explode("~",$line['bestlastanswers']);
-			echo "<p><b>Showing Scored Attempts.</b>  <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&asid={$_GET['asid']}&cid=$cid&uid={$_GET['uid']}&lastver=1\">Show Last Attempts</a></p>";
+			echo "<p><b>Showing Scored Attempts</b> | ";
+			echo "<a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&asid={$_GET['asid']}&cid=$cid&uid={$_GET['uid']}&lastver=1\">Show Last Attempts</a> | ";
+			echo "<a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&asid={$_GET['asid']}&cid=$cid&uid={$_GET['uid']}&reviewver=1\">Show Review Attempts</a>";
+			echo "</p>";
 		}
 		$saenddate = $line['enddate'];
 		if (!$isteacher) {
@@ -861,7 +883,7 @@
 			
 		}
 		echo "<p></p><div class=review>Total: $total/$totalpossible</div>\n";
-		if ($isteacher && !isset($_GET['lastver'])) {
+		if ($isteacher && !isset($_GET['lastver']) && !isset($_GET['reviewver'])) {
 			echo "<p>Feedback to student:<br/><textarea cols=60 rows=4 name=\"feedback\">{$line['feedback']}</textarea></p>";
 			if ($line['agroupid']>0) {
 				echo "<p>Update grade for all group members? <input type=checkbox name=\"updategroup\" checked=\"checked\" /></p>";

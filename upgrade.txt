@@ -6,6 +6,14 @@ Upgrade Notes
 
 *** Database Changes ***
 
+ALTER TABLE `imas_assessment_sessions` ADD `reviewseeds` TEXT NOT NULL ,
+ADD `reviewattempts` TEXT NOT NULL ,
+ADD `reviewscores` TEXT NOT NULL ,
+ADD `reviewlastanswers` TEXT NOT NULL ;
+
+UPDATE imas_assessment_sessions SET reviewseeds=seeds,reviewattempts=attempts,reviewscores=scores,reviewlastanswers=lastanswers
+
+#R51
 ALTER TABLE `imas_users` ADD `qrightsdef` TINYINT( 1 ) NOT NULL DEFAULT '0';
 
 #R41

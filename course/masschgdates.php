@@ -273,22 +273,24 @@
 			echo " <a href=\"addassessment.php?id={$ids[$i]}&cid=$cid&from=mcd\">S</a>\n";
 		}
 		echo "</td>";
-				  
+		
+		
 		if ($startdates[$i]==0) {
 			echo "<td><input type=hidden id=\"sdate$cnt\" name=\"sdate$cnt\" value=\"0\"/>Always</td>";
 		} else {
 			echo "<td><input type=text size=10 id=\"sdate$cnt\" name=\"sdate$cnt\" value=\"$sdate\" onblur=\"ob(this)\"/>(";
 			echo "<span id=\"sd$cnt\">".getshortday($startdates[$i]).'</span>';
 			echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].sdate$cnt,'anchor$cnt','MM/dd/yyyy',document.forms[0].sdate$cnt.value); return false;\" NAME=\"anchor$cnt\" ID=\"anchor$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
-			echo " at <input type=text size=10 id=\"stime$cnt\" name=\"stime$cnt\" value=\"$stime\"></td>";
+			echo " at <input type=text size=8 id=\"stime$cnt\" name=\"stime$cnt\" value=\"$stime\"></td>";
 		}
+		
 		if ($enddates[$i]==2000000000) {
 			echo "<td><input type=hidden id=\"edate$cnt\" name=\"edate$cnt\" value=\"2000000000\"/>Always</td>";
 		} else {
 			echo "<td><input type=text size=10 id=\"edate$cnt\" name=\"edate$cnt\" value=\"$edate\" onblur=\"ob(this)\"/>(";
 			echo "<span id=\"ed$cnt\">".getshortday($enddates[$i]).'</span>';
 			echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].edate$cnt,'anchor2$cnt','MM/dd/yyyy',document.forms[0].edate$cnt.value); return false;\" NAME=\"anchor2$cnt\" ID=\"anchor2$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
-			echo " at <input type=text size=10 id=\"etime$cnt\" name=\"etime$cnt\" value=\"$etime\"></td>";
+			echo " at <input type=text size=8 id=\"etime$cnt\" name=\"etime$cnt\" value=\"$etime\"></td>";
 		}
 		if ($reviewdates[$i]==0) {
 			echo "<td><input type=hidden id=\"rdate$cnt\" name=\"rdate$cnt\" value=\"0\"/>Never</td>";
@@ -298,7 +300,7 @@
 			echo "<td><input type=text size=10 id=\"rdate$cnt\" name=\"rdate$cnt\" value=\"$rdate\" onblur=\"ob(this)\"/>(";
 			echo "<span id=\"rd$cnt\">".getshortday($reviewdates[$i]).'</span>';
 			echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].rdate$cnt,'anchor3$cnt','MM/dd/yyyy',document.forms[0].rdate$cnt.value); return false;\" NAME=\"anchor3$cnt\" ID=\"anchor3$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
-			echo " at <input type=text size=10 id=\"rtime$cnt\" name=\"rtime$cnt\" value=\"$rtime\"></td>";
+			echo " at <input type=text size=8 id=\"rtime$cnt\" name=\"rtime$cnt\" value=\"$rtime\"></td>";
 		}
 		echo "<td><input type=button value=\"Send Down List\" onclick=\"senddown($cnt)\"/></td>";
 		echo "</tr>";

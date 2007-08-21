@@ -119,7 +119,7 @@
 			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 			$qsetid = mysql_insert_id();
 			$_GET['id'] = $qsetid;			
-			echo "Question Added to QuestionSet. ";
+			
 			if (isset($_GET['templateid'])) {
 				$query = "SELECT var,filename,alttext FROM imas_qimages WHERE qsetid='{$_GET['templateid']}'";
 				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
@@ -128,7 +128,17 @@
 					mysql_query($query) or die("Query failed :$query " . mysql_error());
 				}
 			}
-			$frompot = 1;
+			
+			if (isset($_GET['makelocal'])) {
+				$query = "UPDATE imas_questions SET questionsetid='$qsetid' WHERE id='{$_GET['makelocal']}'";
+				mysql_query($query) or die("Query failed :$query " . mysql_error());
+				echo " Local copy of Question Created ";
+				$frompot = 0;
+			} else {
+				echo " Question Added to QuestionSet. ";
+				$frompot = 1;
+			}
+			
 		}
 		if (!isset($_GET['aid'])) {
 			echo "<a href=\"manageqset.php?cid=$cid\">Return to Question Set Management</a>\n";
@@ -286,16 +296,19 @@
 				}
 			}
 			if (isset($_GET['template'])) {
-				$query = "SELECT imas_libraries.id,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.groupid ";
-				$query .= "FROM imas_libraries,imas_library_items WHERE imas_library_items.libid=imas_libraries.id ";
-				$query .= "AND imas_library_items.qsetid='{$_GET['id']}'";
-				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-				while ($row = mysql_fetch_row($result)) {
-					if ($row[2] == 8 || ($row[3]==$groupid && ($row[2]%3==2)) || $row[1]==$userid) {
-						$inlibs[] = $row[0];
+				if (isset($_GET['makelocal'])) {
+					$inlibs[] = 0;
+				} else {
+					$query = "SELECT imas_libraries.id,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.groupid ";
+					$query .= "FROM imas_libraries,imas_library_items WHERE imas_library_items.libid=imas_libraries.id ";
+					$query .= "AND imas_library_items.qsetid='{$_GET['id']}'";
+					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+					while ($row = mysql_fetch_row($result)) {
+						if ($row[2] == 8 || ($row[3]==$groupid && ($row[2]%3==2)) || $row[1]==$userid) {
+							$inlibs[] = $row[0];
+						}
 					}
 				}
-				
 				/*$query = "SELECT imas_library_items.libid FROM imas_library_items,imas_libraries WHERE ";
 				$query .= "imas_library_items.libid=imas_libraries.id AND (imas_libraries.ownerid=$userid OR imas_libraries.userights=2) ";
 				$query .= "AND qsetid='{$_GET['id']}'";
@@ -416,6 +429,9 @@
 			echo 'one assessment that is not yours.  ';
 		}
 		echo 'In consideration of the other users, if you want to make changes other than minor fixes to this question, consider creating a new version of this question instead.  </p>';
+		if (isset($_GET['qid'])) {
+			echo "<p><a href=\"moddataset.php?id={$_GET['id']}&cid=$cid&aid={$_GET['aid']}&template=true&makelocal={$_GET['qid']}\">Template this question</a> for use in this assessment</p>";
+		}
 	}
 	if (!$myq) {
 		echo "<p>This question is not set to allow you to modify the code.  You can only view the code and make additional library assignments</p>";
@@ -433,6 +449,9 @@
 	}
 	if (isset($_GET['template'])) {
 		echo "&templateid={$_GET['id']}";
+	}
+	if (isset($_GET['makelocal'])) {
+		echo "&makelocal={$_GET['makelocal']}";
 	}
 	if ($frompot==1) {
 		echo "&frompot=1";
