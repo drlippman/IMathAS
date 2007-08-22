@@ -6,6 +6,7 @@ Upgrade Notes
 
 *** Database Changes ***
 
+#R56
 ALTER TABLE `imas_assessment_sessions` ADD `reviewseeds` TEXT NOT NULL ,
 ADD `reviewattempts` TEXT NOT NULL ,
 ADD `reviewscores` TEXT NOT NULL ,
