@@ -374,12 +374,24 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
 		if (isset($options['reqdecimals'])) {if (is_array($options['reqdecimals'])) {$reqdecimals = $options['reqdecimals'][$qn];} else {$reqdecimals = $options['reqdecimals'];}}
+		if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$qn];} else {$displayformat = $options['displayformat'];}}
 		
 		if (!isset($sz)) { $sz = 20;}
 		if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
-		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\">";
-		if ($answerformat=='list' || $answerformat=='exactlist') {
+		
+		if ($displayformat=="point") {
+			$leftb = "(";
+			$rightb = ")";
+		} else if ($displayformat=="vector") {
+			$leftb = "&lt;";
+			$rightb = "&gt;";
+		} else {
+			$leftb = '';
+			$rightb = '';
+		}
+		$out .= "$leftb<input class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\">$rightb";
+		if ($answerformat=='list' || $answerformat=='exactlist' ||  $answerformat=='orderedlist') {
 			$tip = "Enter your answer as a list of numbers separated with commas: Example: -4, 3, 2.5<br/>";
 		} else {
 			$tip = "Enter your answer as a number.  Examples: 3, -4, 5.5<BR>";
@@ -539,19 +551,30 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
 		if (isset($options['reqdecimals'])) {if (is_array($options['reqdecimals'])) {$reqdecimals = $options['reqdecimals'][$qn];} else {$reqdecimals = $options['reqdecimals'];}}
+		if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$qn];} else {$displayformat = $options['displayformat'];}}
 		
 		if (!isset($sz)) { $sz = 20;}
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		if (!isset($answerformat)) { $answerformat = '';}
 		if (isset($ansprompt)) {$out .= "<label for=\"tc$qn\">$ansprompt</label>";}
-		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\">\n";
+		if ($displayformat=="point") {
+			$leftb = "(";
+			$rightb = ")";
+		} else if ($displayformat=="vector") {
+			$leftb = "&lt;";
+			$rightb = "&gt;";
+		} else {
+			$leftb = '';
+			$rightb = '';
+		}
+		$out .= "$leftb<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\">$rightb\n";
 		if (!isset($hidepreview)) {
 			$preview .= "<input type=button class=btn value=Preview onclick=\"calculate('tc$qn','p$qn','$answerformat')\"> &nbsp;\n";
 		}
-		$preview .= "<span id=p$qn></span> ";
+		$preview .= "$leftb<span id=p$qn></span>$rightb ";
 		$out .= "<script>calctoproc[calctoproc.length] = $qn; calcformat[$qn] = '$answerformat';</script>\n";
 		$ansformats = explode(',',$answerformat);
-		if (in_array('list',$ansformats) || in_array('exactlist',$ansformats)) {
+		if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
 			$tip = "Enter your answer as a list of values separated by commas: Example: -4, 3, 2<br/>";
 			$eword = "each value";
 		} else {
@@ -915,6 +938,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($answerformat=='exactlist') {
 			$gaarr = explode(',',$givenans);
 			$anarr = explode(',',$answer);
+		} else if ($answerformat=='orderedlist') {
+			$gamasterarr = explode(',',$givenans);
+			$gaarr = $gamasterarr;
+			$anarr = explode(',',$answer);
 		} else if ($answerformat=='list') {
 			$tmp = explode(',',$givenans);
 			sort($tmp);
@@ -938,9 +965,19 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 		$extrapennum = count($gaarr)+count($anarr);
 		
+		if ($answerformat=='orderedlist') {
+			if (count($gamasterarr)!=count($anarr)) {
+				return 0;
+			}
+		}
+		
 		$correct = 0;
 		foreach($anarr as $i=>$answer) {
 			$foundloc = -1;
+			if ($answerformat=='orderedlist') {
+				$gaarr = array($gamasterarr[$i]);
+			}
+			
 			foreach($gaarr as $j=>$givenans) {
 				$givenans = trim($givenans);
 				$anss = explode(' or ',$answer);
@@ -974,12 +1011,16 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 			if ($foundloc>-1) {
 				array_splice($gaarr,$foundloc,1); //remove from list
-				if (count($gaarr)==0) {
+				if (count($gaarr)==0 && $answerformat!='orderedlist') {
 					break; //stop if no student answers left
 				}
 			}
 		}
-		$score = $correct/count($anarr) - count($gaarr)/$extrapennum;  //take off points for extranous stu answers
+		if ($answerformat!='orderedlist') {
+			$score = $correct/count($anarr) - count($gaarr)/$extrapennum;  //take off points for extranous stu answers
+		} else {
+			$score = $correct/count($anarr);
+		}
 		if ($score<0) { $score = 0; }
 		return ($score);
 		
@@ -1216,6 +1257,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$gaarr = explode(',',$givenans);
 			$anarr = explode(',',$answer);
 			$orarr = explode(',',$_POST["tc$qn"]);
+		} else if (in_array('orderedlist',$ansformats)) {
+			$gamasterarr = explode(',',$givenans);
+			$gaarr = $gamasterarr;
+			$anarr = explode(',',$answer);
+			$orarr = explode(',',$_POST["tc$qn"]);
 		} else if (in_array('list',$ansformats)) {
 			$tmp = explode(',',$givenans);
 			$tmpor = explode(',',$_POST["tc$qn"]);
@@ -1247,9 +1293,19 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$orarr = array($_POST["tc$qn"]);
 		}
 		$extrapennum = count($gaarr)+count($anarr);
+		
+		if (in_array('orderedlist',$ansformats)) {
+			if (count($gamasterarr)!=count($anarr)) {
+				return 0;
+			}
+		}
+		
 		$correct = 0;
 		foreach($anarr as $i=>$answer) {
 			$foundloc = -1;
+			if (in_array('orderedlist',$ansformats)) {
+				$gaarr = array($gamasterarr[$i]);
+			}
 			foreach($gaarr as $j=>$givenans) {
 				if (in_array("fraction",$ansformats) || in_array("reducedfraction",$ansformats)) {
 					if (!preg_match('/^\s*\-?\(?\d+\s*\/\s*\-?\d+\)?\s*$/',$orarr[$j]) && !preg_match('/^\s*?\-?\d+\s*$/',$orarr[$j])) {
@@ -1326,12 +1382,16 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			if ($foundloc>-1) {
 				array_splice($gaarr,$foundloc,1); //remove from list
 				array_splice($orarr,$foundloc,1);
-				if (count($gaarr)==0) {
+				if (count($gaarr)==0 && !in_array('orderedlist',$ansformats)) {
 					break; //stop if no student answers left
 				}
 			}
 		}
-		$score = $correct/count($anarr) - count($gaarr)/$extrapennum;  //take off points for extranous stu answers
+		if (in_array('orderedlist',$ansformats)) {
+			$score = $correct/count($anarr);
+		} else {
+			$score = $correct/count($anarr) - count($gaarr)/$extrapennum;  //take off points for extranous stu answers
+		}
 		if ($score<0) { $score = 0; }
 		return ($score);
 	} else if ($anstype == "numfunc") {

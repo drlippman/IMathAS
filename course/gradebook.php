@@ -603,7 +603,27 @@
 		foreach($questions as $k=>$q) {
 			if (strpos($q,'~')!==false) {
 				$sub = explode('~',$q);
-				$questions[$k] = $sub[array_rand($sub,1)];
+				if (strpos($sub[0],'|')===false) { //backwards compat
+					$questions[$k] = $sub[array_rand($sub,1)];
+				} else {
+					$grpqs = array();
+					$grpparts = explode('|',$sub[0]);
+					array_shift($sub);
+					if ($grpparts[1]==1) { // With replacement
+						for ($i=0; $i<$grpparts[0]; $i++) {
+							$grpqs[] = $sub[array_rand($sub,1)];
+						}
+					} else if ($grpparts[1]==0) { //Without replacement
+						shuffle($sub);
+						$grpqs = array_slice($sub,0,min($grpparts[0],count($sub)));
+						if ($grpparts[0]>count($sub)) {
+							for ($i=count($sub); $i<$grpparts[0]; $i++) {
+								$grpqs[] = $sub[array_rand($sub,1)];
+							}
+						}
+					}
+					array_splice($questions,$k,1,$grpqs);
+				}
 			}
 		}
 		if ($adata['shuffle']&1) {shuffle($questions);}

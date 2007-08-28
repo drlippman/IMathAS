@@ -10,6 +10,10 @@
 		$query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$itemorder = mysql_result($result,0,0);
+		$newitemorder = '';
+		if (isset($_POST['addasgroup'])) {
+			$newitemorder = '1|0';
+		}
 		foreach (explode(',',$_POST['qsetids']) as $qsetid) {
 			for ($i=0; $i<$_POST['copies'.$qsetid];$i++) {
 				$points = $_POST['points'.$qsetid];
@@ -20,12 +24,21 @@
 				$query .= "VALUES ('$aid','$points','$attempts',9999,0,0,'$qsetid')";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				$qid = mysql_insert_id();
-				if ($itemorder=='') {
-					$itemorder = $qid;
+				if ($newitemorder=='') {
+					$newitemorder = $qid;
 				} else {
-					$itemorder = $itemorder . ",$qid";	
+					if (isset($_POST['addasgroup'])) {
+						$newitemorder = $newitemorder . "~$qid";
+					} else {
+						$newitemorder = $newitemorder . ",$qid";
+					}
 				}
 			}
+		}
+		if ($itemorder == '') {
+			$itemorder = $newitemorder;
+		} else {
+			$itemorder .= ','.$newitemorder;
 		}
 		
 		$query = "UPDATE imas_assessments SET itemorder='$itemorder' WHERE id='$aid'";
@@ -62,7 +75,7 @@ Leave items blank or set to 9999 to use default values<BR>
 		echo '<input type=hidden name="qsetids" value="'.implode(',',$_POST['nchecked']).'" />';
 		echo '<input type=hidden name="add" value="true" />';
 		
-		
+		echo '<p><input type=checkbox name="addasgroup" value="1" /> Add as group?</p>';
 		echo '<div class=submit><input type=submit value=Submit></div>';
 		echo '</form>';
 		require("../footer.php");

@@ -129,9 +129,11 @@ dd {
 		<li><a href="#offlinegrades">Offline Grades</a></li>
 		<li><a href="#gradebookdetail">Gradebook Detail</a></li>
 		</ul>
+	<li><a href="#stugroups">Student Groups</a></li>
 	<li><a href="#messages">Messages</a></li>
 	<li><a href="#copycourseitems">Copy Course Items</a></li>
-	<li><a href="#shiftdates">Shift Course Dates</a></li>
+	<li><a href="#masschgdates">Change Dates</a></li>
+	<li><a href="#masschgassessments">Change Assessments</a></li>
 	<li><a href="#importexportitems">Import/Export Course Items</a></li>
 	</ul>
 	
@@ -800,7 +802,7 @@ Once added to the assessment you can:
     select one question from the group to display to the student</li>
 <li><b>Change Settings</b>:  Override the default settings for points, attempts allowed, and 
     penalty per attempt, if desired</li>
-<li><b>Modify Question or View Source</b>:  Change or view the question code</li>
+<li><b>Edit Source</b>:  Change the question code or wording</li>
 <li><b>Remove from assessment</b>:  Remove the question from the assessment.  This does not
     delete the question from the Question Set.  You can also use the checkboxes and the "With selected, Remove"
     button to remove multiple questions at once.</li>
@@ -1149,6 +1151,23 @@ breakdown at the bottom of the details page</p>
 </div>
 </div>
 <div class=h2>
+<h2><a name="stugroups">Student Groups</a></h2>
+<p>The Student Groups page allows you to manipulate student groups associated with assessments that you have designated as group
+assessments.  When you first access this page, you will be presented with a list of group assessments.  Select the assessment you
+want to modify groups for</p>
+
+<p>You will be presented with a list of groups (the group number is arbitrary) with the students in each group.  To separate a
+student from the group, click the "Break from Group" link.</p>
+
+<p>At the bottom of the page is a list of students not assigned to a group.  If you wish to assign students to groups, click the 
+checkboxes next to the students' names.  In the "add to group: " pulldown, select the group you want to add the students to, or select
+"New Group", and click Add</p>
+
+<p>When students are broken from the group, they retain the version of the assessment and progress the group had acheived before you
+broke them from the group.  If a student is added to a group, any work they've already done is lost and replaced with the group's
+version and progress.  Any changes to an assessment made by one group member affects all group members.</p>
+</div>
+<div class=h2>
 <h2><a name="messages">Messages</a></h2>
 <p>The message system allows you to send a message to students in the class.  This is an internal message system; it is not emailed
 unless the student has requested email notification.  </p>
@@ -1177,13 +1196,24 @@ do not export the block, the item will be exported as an item on the main course
 
 </div>
 <div class=h2>
-<h2><a name="shiftdates">Shift Course Dates</a></h2>
-<p>Shift Course Dates allows you to change ALL of a courses' Available After and Available Until dates at one time.  This
-can be useful at the end of a term, to prepare the course for a new set of students.</p>
+<h2><a name="masschgdates">Change Dates</a></h2>
+<p>The Change Dates page allows you to change the dates for all your course items on one page.  On this page you will see a list
+of your course items, with inputs for start date, end date, and review date (for assessments).  You can filter the list to only
+show one item type using the Filter selection at the top of the page, and you can change the sort order to sort by start date, end
+date, or name.</p>
 
-<p>The date shift is done based on changing one assessment's dates.  Choose the assessment to base the date shift on, then 
-select whether you want to specify the new Available After date or Available Until date.  Enter a new date for the assessment
-and press submit.  ALL course items will have their dates changed to match the shift specified.</p>
+<p>If you change dates on any line and click the "Send down list" button on that line, the date change will be made to all items below
+that item in the list.  For example, if you add one day to an item and click "Send down list", one day will be added to all items
+lower in the list.  By default the system only allows Monday-Friday dates; you can switch to a 7-day week by unchecking the "Shift
+by weekdays only" checkbox</p>
+</div>
+<div class=h2>
+<h2><a name="masschgassessments">Change Assessments</a></h2>
+<p>The Change Assessments page allows you to change assessment settings for many assessments at the same time.  Begin by selecting
+all the assessments you want to change settings for using the checkboxes next to each assessment's name</p>
+
+<p>Select which options you want to change by clicking the checkbox in the "Change?" column, then adjust the setting in the "Option"
+column.  When you are done, click "Submit"</p>
 
 </div>
 <div class=h2>
@@ -1324,6 +1354,29 @@ $a = nonzerorand(-9,9) where ($a!=1 &amp;&amp; $a!=-1)
 </pre>
 </p>
 </div>
+<div class=h4>
+<h4><a name="loops">Loops</a></h4>
+<p>There are several looping macros (such as calconarray) that can meet most needs.  For more general use
+there is a "for" loop:</p>
+
+<pre>for ($i=a..b) { action }</pre>
+
+<p>Examples:
+<pre>
+$f = 0
+for ($i=1..5) { $f = $f + $i }
+
+$a = rands(1,5,5)
+$b = rands(1,5,5)
+for ($i=0..4) {$c[$i] = $a[$i]*$b[$i] }
+</pre></p>
+
+<p>Conditions can be used <i>inside</i> a for loop, but not outside.  
+<pre>for ($i=1..5) {$a = $a+$i if ($i>2) }     WORKS
+for ($i=1..5) {$a = $a+$i} if ($a>2)     DOES NOT WORK
+</pre>
+</p>
+</div>
 </div>
 <div class=h2>
 <h2><a name="randomizers">Randomizers</a></h2>
@@ -1451,6 +1504,8 @@ These macros are fairly general purpose:
 <li><b>count(array)</b>:  Counts the number of entries in the array</li>
 <li><b>sumarray(array)</b>: Adds the entries in an array</li>
 <li><b>in_array(needle,haystack)</b>:  Checks if value needle is in array haystack.  Returns true or false</li>
+<li><b>arraystodoteqns(xarray,yarray,[color])</b>:  Converts an array of x-values and y-values into a form that can be used in
+  showplot, or in the Drawing answer type</li>
 </ul>
 </div>
 <div class=h2>
@@ -1582,11 +1637,13 @@ The answer is compared to a given tolerance.  Can also accept DNE, oo (Infinity)
 	<dd>Defines the decimal accuracy required (ie 2 for two decimal places).  This will put a message in the answer tips stating the
 	decimals required.  If neither $abstolerance or $reltolerance is set, this will set the tolerance, otherwise the provided tolerance
 	will be used (even if it doesn't agree with the $reqdecimal setting).</dd>
-<dt>$answerformat = "list" or "exactlist"</dt
+<dt>$answerformat = "list", "exactlist", or "orderedlist"</dt
 	<dd>Specifies that a list of answers is expected.  If $answerformat="list", then duplicate values are ignored.  If $answerformat="exactlist",
-	then duplicate values are not ignored.</dd>
+	then duplicate values are not ignored.  If $answerformat="orderedlist", the list must be in the same order and contain identical counts of values.</dd>
 <dt>$ansprompt = string (In Question Control)</dt>
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="y="</dd>
+<dt>$displayformat = "point" or "vector" (In Question Control)</dt>
+	<dd>Used in conjunction with $answerformat = "orderedlist"; surrounds the input box with parens (for point) or angle brackets (for vector).</dd>
 <dt>$answerboxsize = number (In Question Control)</dt>
 	<dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.</dd>
 <dt>$answerbox (In Question Text)</dt>
@@ -1616,12 +1673,13 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 </p>
 <p><b>Optional Variables</b><BR>
 <dl>
-<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "nodecimal", "notrig", "list" or "exactlist" (In Common Control)</dt>
+<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "nodecimal", "notrig", "list", "exactlist", or "orderedlist" (In Common Control)</dt>
 	<dd>Requires the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), an answer
 	without decimals (also disallows 10^-2 and 3E-2), or 
 	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
-	If $answerformat includes "list" or "exactlist", then a list of answers is expected. An $answerformat of "list" ignores then duplicate values.
-	An $answerformat of "exactlist" does not ignore duplicates.</dd>
+	If $answerformat includes "list", "exactlist", or "orderedlist", then a list of answers is expected. An $answerformat of "list" ignores then duplicate values.
+	An $answerformat of "exactlist" does not ignore duplicates. If $answerformat="orderedlist", the list must be in the same order and contain identical counts of 
+	values.</dd>
 	</dd>
 <dt>$reltolerance = a decimal value (In Answer)</dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
@@ -1639,6 +1697,8 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 	use "#" in the symbol location to match any number (including decimal values); 3.2^5 would match twice.</dd>
 <dt>$ansprompt = string (In Question Control)</dt>
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="y="</dd>
+<dt>$displayformat = "point" or "vector" (In Question Control)</dt>
+	<dd>Used in conjunction with $answerformat = "orderedlist"; surrounds the input box with parens (for point) or angle brackets (for vector).</dd>
 <dt>$answerboxsize = number (In Question Control)</dt>
 	<dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.</dd>
 <dt>$hidepreview = true (In Question Control)</dt>
