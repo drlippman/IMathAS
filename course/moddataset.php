@@ -318,6 +318,11 @@
 				}*/
 				$locklibs = array();
 				$addmod = "Add";
+				
+				$query = "SELECT qrightsdef FROM imas_users WHERE id='$userid'";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$line['userights'] = mysql_result($result,0,0);
+			
 			} else {
 				if ($isgrpadmin) {
 					$query = "SELECT ili.libid FROM imas_library_items AS ili,imas_users WHERE ili.ownerid=imas_users.id ";

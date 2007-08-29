@@ -214,7 +214,7 @@ function generateTable() {
 				html += "<td>"+curitems[j][4]+"</td>";
 				curpt = curitems[j][4];
 			}
-			html += "<td class=c><a href=\"modquestions.php?id="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\">Change</a></td>"; //settings
+			html += "<td class=c><a href=\"modquestion.php?id="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\">Change</a></td>"; //settings
 			if (curitems[j][5]) {
 				html += "<td class=c><a href=\"moddataset.php?id="+curitems[j][1]+"&qid="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\">Edit</a></td>"; //edit
 			} else {
