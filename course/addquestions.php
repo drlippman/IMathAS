@@ -218,7 +218,7 @@
 					$jsarr .= ',';
 				} 
 				//output item array
-				$jsarr .= '['.$subs[$j].','.$line['questionsetid'].',"'.addslashes($line['description']).'","'.$line['qtype'].'",'.$line['points'].',';
+				$jsarr .= '['.$subs[$j].','.$line['questionsetid'].',"'.addslashes(str_replace("\n"," ",$line['description'])).'","'.$line['qtype'].'",'.$line['points'].',';
 				if ($line['userights']>2 || $line['ownerid']==$userid) {
 					$jsarr .= '1';
 				} else {

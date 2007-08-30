@@ -134,7 +134,7 @@ if (isset($_POST['SID'])) {
 	$eclass = $sel1[$_POST['course']] . '@' . $_POST['teachers'];
 	
 	$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, lastaccess) ";
-	$query .= "VALUES ('{$_POST['SID']}d$diagqtr','none',10,'{$_POST['firstname']}','{$_POST['lastname']}','$eclass',$now);";
+	$query .= "VALUES ('{$_POST['SID']}~$diagqtr','none',10,'{$_POST['firstname']}','{$_POST['lastname']}','$eclass',$now);";
 	mysql_query($query) or die("Query failed : " . mysql_error());
 	$userid = mysql_insert_id();
 	$query = "INSERT INTO imas_students (userid,courseid) VALUES ('$userid','$pcid');";
@@ -164,9 +164,7 @@ if (isset($_POST['SID'])) {
 @import url("../imas.css");
 -->
 </style>
-<script src="<?php echo $imasroot;?>/javascript/ASCIIMathML.js" type="text/javascript"></script>
-<script src="<?php echo $imasroot;?>/javascript/ASCIIsvg.js" type="text/javascript"></script>
-<script src="<?php echo $imasroot;?>/course/editor/plugins/AsciiSvg/ASCIIsvgAddon.js" type="text/javascript"></script>
+<script src="<?php echo $imasroot;?>/javascript/mathgraphcheck.js" type="text/javascript"></script>
 </head>
 <body>
 <h2><?php echo $line['name']; ?></h2>
@@ -233,18 +231,22 @@ for ($i=0;$i<count($sel1);$i++) {
 <input type=hidden name="graphdisp" id="graphdisp" value="2" />
 </form>
 
-<div id="bsetup">This computer is not set up to display this test ideally, but you can continue with image-based display</div>
+<div id="bsetup">Using image-based display</div>
 
 <script type="text/javascript">
-if (!AMnoMathML && !ASnoSVG) {
-	document.getElementById("bsetup").innerHTML = "Browser setup OK";
+function determinesetup() {
+	if (!AMnoMathML && !ASnoSVG) {
+		document.getElementById("bsetup").innerHTML = "Browser setup OK";
+	}
+	if (!AMnoMathML) {
+		document.getElementById("mathdisp").value = "1";
+	} 
+	if (!ASnoSVG) {
+		document.getElementById("graphdisp").value = "1";
+	}
 }
-if (!AMnoMathML) {
-	document.getElementById("mathdisp").value = "1";
-} 
-if (!ASnoSVG) {
-	document.getElementById("graphdisp").value = "1";
-}
+var existingonload = window.onload;
+window.onload = function() {existingonload(); determinesetup();}
 </script>
 <hr/><div class=right style="font-size:70%;">Built on <a href="http://imathas.sourceforge.net">IMathAS</a> &copy; 2006 David Lippman</div>
 	

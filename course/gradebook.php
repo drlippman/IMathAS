@@ -1555,7 +1555,7 @@
 				$gb[$ln][0] .= '</a>';
 			}
 			if ($isdiag) {
-				$selparts = explode('d',$line['SID']);
+				$selparts = explode('~',$line['SID']);
 				$gb[$ln][1] = $selparts[0];
 				$gb[$ln][2] = $selparts[1];
 				$selparts =  explode('@',$line['email']);

@@ -27,6 +27,9 @@
 			 $sessiondata['mathdisp'] = $_POST['mathdisp'];
 			 $sessiondata['graphdisp'] = $_POST['graphdisp'];
 			 $sessiondata['useed'] = 1;
+			 if (isset($_POST['savesettings'])) {
+				 setcookie('mathgraphprefs',$_POST['mathdisp'].'-'.$_POST['graphdisp'],2000000000);
+			 }
 			 $enc = base64_encode(serialize($sessiondata));
 			 $query = "UPDATE imas_sessions SET sessiondata='$enc' WHERE sessionid='$sessionid'";
 			 mysql_query($query) or die("Query failed : " . mysql_error());
@@ -43,37 +46,53 @@
 			 echo "<div id=settings></div>";
 			 echo <<<END
 <script type="text/javascript"> 
-	setnode = document.getElementById("settings");
-	var html = "";
-	html += '<h4>Math Display</h4>';
-	if (AMnoMathML) {
-		html += '<p><input type=hidden name="mathdisp" value="2">It appears you do not have browser-based Math display support.';
-		html += 'Browser based Math display is faster and prettier than using image-based math display.  To install browser-based ';
-		html += 'math display:</p>';
-		html += '<p>Windows Internet Explorer users: <a href="http://www.dessci.com/en/dl/MathPlayerSetup.asp">Install MathPlayer plugin</a></p>';
-		html += '<p>Mac users or non-IE windows users: <a href="http://www.mozilla.com/firefox/">Install Firefox 1.5+</a> or ';
-		html += '<a href="http://www.caminobrowser.org/">Camino</a>.  With either of these browsers, if you find formulas not displaying ';
-		html += 'correctly you may need to <a href="http://www.mozilla.org/projects/mathml/fonts/">install Math fonts</a></p>';
-	} else {
-		html += '<p><input type=hidden name="mathdisp" value="1">Your browser is set up for browser-based math display.</p>';
+	function preparenotices() {
+		setnode = document.getElementById("settings");
+		var html = "";
+		html += '<h4>Math Display</h4>';
+		if (AMnoMathML) {
+			if (AMisGecko && AMnoTeX) {
+				html += '<p><input type=hidden name="mathdisp" value="2">It appears you are using a Mozilla-based browser (FireFox, Camino, etc) ';
+				html += 'but do not have the necessary math fonts installed.  Browser based Math display is faster and prettier than using image-based math display. ';
+				html += 'To enable browser based Math display, <a href="http://www.mozilla.org/projects/mathml/fonts/">download math fonts</a></p>';
+			} else {
+				html += '<p><input type=hidden name="mathdisp" value="2">It appears you do not have browser-based Math display support.';
+				html += 'Browser based Math display is faster and prettier than using image-based math display.  To install browser-based ';
+				html += 'math display:</p>';
+				html += '<p>Windows Internet Explorer users: <a href="http://www.dessci.com/en/dl/MathPlayerSetup.asp">Install MathPlayer plugin</a></p>';
+				html += '<p>Mac users or non-IE windows users: <a href="http://www.mozilla.com/firefox/">Install Firefox 1.5+</a> or ';
+				html += '<a href="http://www.caminobrowser.org/">Camino</a>.  With either of these browsers, if you find formulas not displaying ';
+				html += 'correctly you may need to <a href="http://www.mozilla.org/projects/mathml/fonts/">install Math fonts</a></p>';
+			}
+		} else {
+			html += '<p><input type=hidden name="mathdisp" value="1">Your browser is set up for browser-based math display.</p>';
+		}
+		html += '<h4>Graph Display</h4>';
+		if (ASnoSVG) {
+			html += '<p><input type=hidden name="graphdisp" value="2">It appears you do not have browser-based Graph display support. ';
+			html += 'Browser based Graph display is faster and prettier than using image-based graph display.  To install browser-based ';
+			html += 'graph display:</p>';
+			html += '<p>Windows Internet Explorer users: <a href="http://download.adobe.com/pub/adobe/magic/svgviewer/win/3.x/3.03/en/SVGView.exe">Install AdobeSVGPlugin plugin</a></p>';
+			html += '<p>Mac users or non-IE windows users: <a href="http://www.mozilla.com/firefox/">Install Firefox 1.5+</a> or <a href="http://www.caminobrowser.org/">Camino</a></p>';
+		} else {
+			html += '<p><input type=hidden name="graphdisp" value="1">Your browser is set up for browser-based graph display.</p>';
+		}
+		html += '<p><input type="checkbox" name="savesettings" checked="1"> Don\'t show me this screen again on this computer and browser.  If you update your browser, you can get back to this page by selecting Visual Display when you login.</p>';
+		if (AMnoMathML || ASnoSVG) {
+			html += '<p><input type=submit name=recheck value="Recheck Setup"><input type=submit name=skip value="Continue with image-based display"></p>';
+		} else {
+			html += '<p><input type=submit name=isok value="Browser setup OK - Continue"></p>';
+		}
+			
+		setnode.innerHTML = html;
 	}
-	html += '<h4>Graph Display</h4>';
-	if (ASnoSVG) {
-		html += '<p><input type=hidden name="graphdisp" value="2">It appears you do not have browser-based Graph display support. ';
-		html += 'Browser based Graph display is faster and prettier than using image-based graph display.  To install browser-based ';
-		html += 'graph display:</p>';
-		html += '<p>Windows Internet Explorer users: <a href="http://download.adobe.com/pub/adobe/magic/svgviewer/win/3.x/3.03/en/SVGView.exe">Install AdobeSVGPlugin plugin</a></p>';
-		html += '<p>Mac users or non-IE windows users: <a href="http://www.mozilla.com/firefox/">Install Firefox 1.5+</a> or <a href="http://www.caminobrowser.org/">Camino</a></p>';
+	var existingonload = window.onload;
+	if (existingonload) {
+		window.onload = function() {existingonload(); preparenotices();}
 	} else {
-		html += '<p><input type=hidden name="graphdisp" value="1">Your browser is set up for browser-based graph display.</p>';
+		window.onload = preparenotices;
 	}
-	if (AMnoMathML || ASnoSVG) {
-		html += '<p><input type=submit name=recheck value="Recheck Setup"><input type=submit name=skip value="Continue with image-based display"></p>';
-	} else {
-		html += '<p><input type=submit name=isok value="Browser setup OK - Continue"></p>';
-	}
-		
-	setnode.innerHTML = html;
+	
 </script>
 END;
 			 echo "</form>\n";
@@ -117,17 +136,22 @@ END;
 		 //$sessiondata['mathdisp'] = $_POST['mathdisp'];
 		 //$sessiondata['graphdisp'] = $_POST['graphdisp'];
 		 //$sessiondata['useed'] = $_POST['useed'];
-		 if ($_POST['access']==1) {
+		 if ($_POST['access']==1) { //text-based
 			 $sessiondata['mathdisp'] = $_POST['mathdisp'];
 			 $sessiondata['graphdisp'] = 0;
 			 $sessiondata['useed'] = 0; 
 			 $enc = base64_encode(serialize($sessiondata));
-		 } else if ($_POST['access']==2) {
+		 } else if ($_POST['access']==2) { //img graphs
 			 $sessiondata['mathdisp'] = $_POST['mathdisp'];
 			 $sessiondata['graphdisp'] = 2;
 			 $sessiondata['useed'] = 1; 
 			 $enc = base64_encode(serialize($sessiondata));
-		 } else if ($_POST['access']==3) {
+		 } else if ($_POST['access']==4) { //img math
+			 $sessiondata['mathdisp'] = 2;
+			 $sessiondata['graphdisp'] = $_POST['graphdisp'];
+			 $sessiondata['useed'] = 1; 
+			 $enc = base64_encode(serialize($sessiondata));
+		 } else if ($_POST['access']==3) { //img all
 			 $sessiondata['mathdisp'] = 2;  
 			 $sessiondata['graphdisp'] = 2;
 			 $sessiondata['useed'] = 1; 
@@ -138,7 +162,7 @@ END;
 			 $sessiondata['useed'] = 1; 
 			 $enc = base64_encode(serialize($sessiondata));
 		 } else {
-			 $enc = 0;
+			 $enc = 0; //give warning
 		 }
 		 
 		 $query = "INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,sessiondata) VALUES ('$sessionid','$userid',$now,'{$_POST['tzoffset']}','$enc')";
