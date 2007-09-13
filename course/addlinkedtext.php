@@ -119,9 +119,9 @@
 				$_POST['text'] = "file:$filename";
 			}
 			
-		} else if (substr(strip_tags($_POST['text']),0,4)=="http") {
+		} else if (substr(trim(strip_tags($_POST['text'])),0,4)=="http") {
 			$_POST['text'] = trim(strip_tags($_POST['text']));	
-		}
+		} 
 		$_POST['text'] = trim($_POST['text']);
 		if (isset($_GET['id'])) {  //already have id; update
 			$query = "SELECT text FROM imas_linkedtext WHERE id='{$_GET['id']}'";

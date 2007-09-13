@@ -99,7 +99,8 @@ function removeSelected() {
 		for (var e = form.elements.length-1; e >-1 ; e--) {
 			var el = form.elements[e];
 			if (el.type == 'checkbox' && el.checked) {
-				doremoveitem(el.value); 
+				val = el.value.split(":");
+				doremoveitem(val[0]); 
 			}
 		}
 		submitChanges();
@@ -205,7 +206,7 @@ function generateTable() {
 				html += "</td>";
 			}
 			html += "<td><input type=hidden name=\"curq[]\" id=\"qo"+ln+"\" value=\""+curitems[j][1]+"\"/>"+curitems[j][2]+"</td>"; //description
-			html += "<td><input type=button value='Preview' onClick=\"previewq('curq',"+ln+","+curitems[j][1]+",false,false)\"/></td>"; //Preview
+			html += "<td><input type=button value='Preview' onClick=\"previewq('curqform',"+ln+","+curitems[j][1]+",false,false)\"/></td>"; //Preview
 			html += "<td>"+curitems[j][3]+"</td>"; //question type
 			if (curitems[j][4]==9999) { //points
 				html += "<td>"+defpoints+"</td>";
@@ -224,7 +225,7 @@ function generateTable() {
 				html += "<td><a href=\"addquestions.php?aid="+curaid+"&cid="+curcid+"&clearqattempts="+curitems[j][0]+"\">Clear Attempts</a></td>"; //add link	
 			} else {
 				html += "<td class=c><a href=\"moddataset.php?id="+curitems[j][1]+"&template=true&aid="+curaid+"&cid="+curcid+"\">Template</a></td>"; //add link
-				html += "<td class=c><a href=\"#\" onclick=\"return removeitem("+(curisgroup?"'"+i+'-'+j+"'":"'"+i+"'")+");\">Remove</a> <input type=checkbox name=\"checked[]\" value=\""+(curisgroup?i+'-'+j:i)+"\"/></td>"; //add link and checkbox
+				html += "<td class=c><a href=\"#\" onclick=\"return removeitem("+(curisgroup?"'"+i+'-'+j+"'":"'"+i+"'")+");\">Remove</a> <input type=checkbox name=\"checked[]\" value=\""+(curisgroup?i+'-'+j:i)+":"+curitems[j][0]+"\"/></td>"; //add link and checkbox
 			}
 			html += "</tr>";
 			ln++;

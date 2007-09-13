@@ -12,7 +12,7 @@ ADD `reviewattempts` TEXT NOT NULL ,
 ADD `reviewscores` TEXT NOT NULL ,
 ADD `reviewlastanswers` TEXT NOT NULL ;
 
-UPDATE imas_assessment_sessions SET reviewseeds=seeds,reviewattempts=attempts,reviewscores=scores,reviewlastanswers=lastanswers
+UPDATE imas_assessment_sessions SET reviewseeds=seeds,reviewattempts=attempts,reviewscores=scores,reviewlastanswers=lastanswers;
 
 #R51
 ALTER TABLE `imas_users` ADD `qrightsdef` TINYINT( 1 ) NOT NULL DEFAULT '0';
@@ -25,7 +25,7 @@ ALTER TABLE `imas_questions` ADD `showans` VARCHAR( 1 ) NOT NULL DEFAULT '0';
 ALTER TABLE `imas_assessments` ADD `reqscoreaid` INT( 10 ) UNSIGNED NOT NULL DEFAULT '0',
 ADD `reqscore` SMALLINT( 4 ) UNSIGNED NOT NULL DEFAULT '0';
 
-UPDATE imas_assessments SET timelimit = timelimit*60 WHERE timelimit>0
+UPDATE imas_assessments SET timelimit = timelimit*60 WHERE timelimit>0;
 
 
 *********************

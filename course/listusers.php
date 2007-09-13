@@ -231,6 +231,10 @@
 					}
 				 }
 				}
+				if ($_GET['uid']=="all" && isset($_POST['removeoffline'])) {
+					$query = "DELETE from imas_gbitems WHERE courseid='$cid'";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+				}
 			}
 			
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
@@ -244,6 +248,7 @@
 				if ($_GET['uid']=="all") {
 					echo "Are you SURE you want to unenroll ALL students?\n";
 					echo "<p>This will also clear all regular posts from all class forums</p>\n";
+					echo "<p>Also remove all offline grade items from gradebook? <input type=checkbox name=\"removeoffline\" value=\"1\" /></p>";
 				} else if ($_GET['uid']=="selected") {
 					if (count($_POST['checked'])==0) {
 						echo "No users selected.  <a href=\"listusers.php?cid=$cid\">Try again</a>\n";

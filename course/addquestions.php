@@ -20,7 +20,7 @@
 			writesessiondata();
 		}
 	}
-	if (isset($teacherid) && isset($_GET['addset'])) {
+	if (isset($_GET['addset'])) {
 		if (!isset($_POST['nchecked']) && !isset($_POST['qsetids'])) {
 				echo "No questions selected.  <a href=\"addquestions.php?cid=$cid&aid=$aid\">Go back</a>\n";
 				require("../footer.php");
@@ -52,6 +52,9 @@
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
 			exit;
 		}
+	}
+	if (isset($_GET['modqs'])) {
+		include("modquestiongrid.php");
 	}
 	
 	if (isset($_GET['clearattempts'])) {
@@ -170,7 +173,7 @@
 	if ($itemorder == '') {
 		echo "<p>No Questions currently in assessment</p>\n";
 	} else {
-		echo "<form id=\"curqform\">";
+		echo "<form id=\"curqform\" method=post action=\"addquestions.php?cid=$cid&aid=$aid&modqs=true\">";
 		//echo "method=post action=\"addquestions.php?cid=$cid&aid=$aid&removeset=true\" onsubmit=\"return confirm('Are you SURE you want to remove these questions?');\">\n";
 		if (isset($sessiondata['groupopt'.$aid])) {
 			$grp = $sessiondata['groupopt'.$aid];
@@ -186,6 +189,7 @@
 			echo ">Group questions</option></select>\n";
 		}
 		echo " With Selected: <input type=button value=\"Remove\" onclick=\"removeSelected()\" />";
+		echo " <input type=submit value=\"Change Settings\" />";
 		echo " <span id=\"submitnotice\" style=\"color:red;\"></span>";
 		echo "<div id=\"curqtbl\"></div>";
 		$jsarr = '[';
@@ -218,7 +222,7 @@
 					$jsarr .= ',';
 				} 
 				//output item array
-				$jsarr .= '['.$subs[$j].','.$line['questionsetid'].',"'.addslashes(str_replace("\n"," ",$line['description'])).'","'.$line['qtype'].'",'.$line['points'].',';
+				$jsarr .= '['.$subs[$j].','.$line['questionsetid'].',"'.addslashes(str_replace(array("\r\n", "\n", "\r")," ",$line['description'])).'","'.$line['qtype'].'",'.$line['points'].',';
 				if ($line['userights']>2 || $line['ownerid']==$userid) {
 					$jsarr .= '1';
 				} else {

@@ -80,7 +80,7 @@ switch($_GET['action']) {
 			echo "<span class=form>Assign to group: </span>";
 			echo "<span class=formright><select name=\"group\" id=\"group\">";
 			echo "<option value=0>Default</option>\n";
-			$query = "SELECT id,name FROM imas_groups";
+			$query = "SELECT id,name FROM imas_groups ORDER BY name";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			while ($row = mysql_fetch_row($result)) {
 				echo "<option value=\"{$row[0]}\" ";
@@ -330,7 +330,7 @@ switch($_GET['action']) {
 	case "listgroups":
 		echo "<h3>Modify Groups</h3>\n";
 		echo "<table><tr><th>Group Name</th><th>Modify</th><th>Delete</th></tr>\n";
-		$query = "SELECT id,name FROM imas_groups";
+		$query = "SELECT id,name FROM imas_groups ORDER BY name";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
 			echo "<tr><td>{$row[1]}</td>";

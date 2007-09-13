@@ -139,6 +139,10 @@
 				$enddate = $cpenddate;
 				$reviewdate = $cpreviewdate;
 			}
+			if (isset($_POST['removeperq'])) {
+				$query = "UPDATE imas_questions SET points=9999,attempts=9999,penalty=9999,regen=0,showans=0 WHERE assessmentid='{$_GET['id']}'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
 		}
 		if ($_POST['deffeedback']=="Practice") {
 			$_POST['cntingb'] = 1;
@@ -400,6 +404,7 @@ at <input type=text size=10 name=rtime value="<?php echo $rtime;?>"></span><BR c
 <div id="copyfromoptions" class="hidden">
 <span class=form>Also copy:</span><span class=formright><input type=checkbox name="copyinstr" /> Instructions<br/>
       <input type=checkbox name="copydates" /> Dates</span><br class=form />
+<span class=form>Remove any existing per-question settings?</span><span class=formright><input type=checkbox name="removeperq" /></span><br class=form />
 </div>
 <div id="customoptions" class="show">
 
