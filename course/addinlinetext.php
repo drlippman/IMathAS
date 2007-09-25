@@ -261,7 +261,7 @@
 ?>
 
 <form enctype="multipart/form-data" method=post action="addinlinetext.php?block=<?php echo $block;?>&cid=<?php echo $cid; if (isset($_GET['id'])) {echo "&id={$_GET['id']}";}?>&folder=<?php echo $_GET['folder'];?>">
-<span class=form>Title: </span><span class=formright><input type=text size=60 name=title value="<?php echo $line['title'];?>">
+<span class=form>Title: </span><span class=formright><input type=text size=60 name=title value="<?php echo str_replace('"','&quot;',$line['title']);?>">
 <br/><input type="checkbox" name="hidetitle" value="1" <?php if ($hidetitle==true) {echo "checked=1";} ?>/> Hide title and icon
 
 </span><BR class=form>

@@ -518,8 +518,25 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		$out .= "<p class=centered>$questiontitle</p>\n";
 		$out .= "<ul class=nomark>\n";
 		$las = explode("|",$la);
+		$letters = array_slice(explode(',','a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z'),0,count($answers));
+		
 		for ($i=0;$i<count($randqkeys);$i++) {
-			$out .= "<li><input class=\"text\" type=\"text\"  size=3 name=\"qn$qn-$i\" value=\"{$las[$i]}\"> {$questions[$randqkeys[$i]]}</li>\n";
+			//$out .= "<li><input class=\"text\" type=\"text\"  size=3 name=\"qn$qn-$i\" value=\"{$las[$i]}\"> {$questions[$randqkeys[$i]]}</li>\n";
+			$out .= '<li>';
+			$out .= "<select name=\"qn$qn-$i\">";
+			$out .= '<option value="-" ';
+			if ($las[$i]=='-' || $las[$i]=='') {
+				$out .= 'selected="1"';
+			}
+			$out .= '>-</option>';
+			foreach ($letters as $v) {
+				$out .= "<option value=\"$v\" ";
+				if ($las[$i]==$v) {
+					$out .= 'selected="1"';
+				}
+				$out .= ">$v</option>";
+			}
+			$out .= "</select> {$questions[$randqkeys[$i]]}</li>\n";
 		}
 		$out .= "</ul>\n";
 		$out .= "</div><div class=match>\n";
@@ -534,7 +551,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$out .= "<li>{$answers[$randakeys[$i]]}</li>\n";
 		}
 		$out .= "</ol><input type=hidden name=\"qn$qn\" value=\"done\"></div><div class=spacer>&nbsp;</div>";
-		$tip = "In each box provided, type the letter (a, b, c, etc.) of the matching answer in the right-hand column";
+		//$tip = "In each box provided, type the letter (a, b, c, etc.) of the matching answer in the right-hand column";
+		$tip = "In each pull-down on the left, select the letter (a, b, c, etc.) of the matching answer in the right-hand column";
 		for ($i=0; $i<count($randqkeys);$i++) {
 			if (isset($matchlist)) {
 				$akey = array_search($matchlist[$randqkeys[$i]],$randakeys);
@@ -719,6 +737,66 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (isset($answer)) {
 			$sa = makeprettydisp($answer);
 		}
+	} else if ($anstype == "ntuple") {
+		if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$qn];} else {$sz = $options['answerboxsize'];}}
+		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
+		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
+		if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$qn];} else {$displayformat = $options['displayformat'];}}
+		
+		if (!isset($sz)) { $sz = 20;}
+		if ($multi>0) { $qn = $multi*1000+$qn;} 
+		
+		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\">";
+		
+		if ($displayformat == 'point') {
+			$tip = "Enter your answer as a point.  Example: (2,5.5)<br/>";
+		} else if ($displayformat == 'pointlist') {
+			$tip = "Enter your answer a list of points separated with commas.  Example: (1,2), (3.5,5)<br/>";
+		} else if ($displayformat == 'vector') {
+			$tip = "Enter your answer as a vector.  Example: <2,5.5><br/>";
+		} else if ($displayformat == 'vectorlist') {
+			$tip = "Enter your answer a list of vectors separated with commas.  Example: <1,2>, <3.5,5><br/>";
+		} else if ($displayformat == 'list') {
+			$tip = "Enter your answer as a list of n-tuples of numbers separated with commas: Example: (1,2),(3.5,4)<br/>";
+		} else {
+			$tip = "Enter your answer as an n-tuple of numbers.  Example: (2,5.5)<BR>";
+		}
+		$tip .= "Enter DNE for Does Not Exist";
+		if (isset($answer)) {
+			$sa = $answer;
+		}
+	} else if ($anstype == "calcntuple") {
+		if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$qn];} else {$sz = $options['answerboxsize'];}}
+		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
+		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
+		if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$qn];} else {$displayformat = $options['displayformat'];}}
+		
+		if (!isset($sz)) { $sz = 20;}
+		if ($multi>0) { $qn = $multi*1000+$qn;} 
+		
+		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\">";
+		if (!isset($hidepreview)) {
+			$preview .= "<input type=button class=btn value=Preview onclick=\"ntuplecalc('tc$qn','p$qn')\"> &nbsp;\n";
+		}
+		$preview .= "<span id=p$qn></span> ";
+		$out .= "<script>ntupletoproc[ntupletoproc.length] = $qn;</script>\n";
+		if ($displayformat == 'point') {
+			$tip = "Enter your answer as a point.  Example: (2,5.5)<br/>";
+		} else if ($displayformat == 'pointlist') {
+			$tip = "Enter your answer a list of points separated with commas.  Example: (1,2), (3.5,5)<br/>";
+		} else if ($displayformat == 'vector') {
+			$tip = "Enter your answer as a vector.  Example: <2,5.5><br/>";
+		} else if ($displayformat == 'vectorlist') {
+			$tip = "Enter your answer a list of vectors separated with commas.  Example: <1,2>, <3.5,5><br/>";
+		} else if ($displayformat == 'list') {
+			$tip = "Enter your answer as a list of n-tuples of numbers separated with commas: Example: (1,2),(3.5,4)<br/>";
+		} else {
+			$tip = "Enter your answer as an n-tuple of numbers.  Example: (2,5.5)<BR>";
+		}
+		$tip .= "Enter DNE for Does Not Exist";
+		if (isset($answer)) {
+			$sa = $answer;
+		}
 	} else if ($anstype == "string") {
 		if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$qn];} else {$ansprompt = $options['ansprompt'];}}
 		if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$qn];} else {$sz = $options['answerboxsize'];}}
@@ -848,7 +926,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			}
 		}
 		if (!isset($backg)) { $backg = '';}
-		$plot = showplot($backg,$settings[0],$settings[1],$settings[2],$settings[3],$settings[4],$settings[5],$settings[6],$settings[7]);
+		$scling = $settings[4].':'.$settings[5];
+		$plot = showplot($backg,$settings[0],$settings[1],$settings[2],$settings[3],$scling,$scling,$settings[6],$settings[7]);
 		$bg = getgraphfilename($plot);
 		if (!isset($answerformat)) {
 			$answerformat = array('line','dot','opendot');
@@ -915,7 +994,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 				}
 				$saarr = array_merge($saarr,$backg);
 			}
-			$sa = showplot($saarr,$settings[0],$settings[1],$settings[2],$settings[3],$settings[4],$settings[5],$settings[6],$settings[7]);
+			$sa = showplot($saarr,$settings[0],$settings[1],$settings[2],$settings[3],$scling,$scling,$settings[6],$settings[7]);
 		}
 	}
 	
@@ -963,6 +1042,16 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$gaarr = array(str_replace(',','',$givenans));
 			$anarr = array($answer);
 		}
+		/*  should students get an answer right by leaving it blank?
+		if ($answerformat=='exactlist' || $answerformat=='orderedlist' || $answerformat=='list') {
+			if (trim($answer)=='') {
+				if (trim($givenans)=='') {
+					return 1;
+				} else {
+					return 0;
+				}
+			}
+		}*/
 		$extrapennum = count($gaarr)+count($anarr);
 		
 		if ($answerformat=='orderedlist') {
@@ -1139,8 +1228,15 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$correct = true;
 		
-		$answer = preg_replace_callback('/([^\[\(\)\]\,]+)/',"preg_mathphp_callback",$answer);
-		$answerlist = explode(",",preg_replace('/[^\d\.,\-]/','',$answer));
+		$ansr = substr($answer,2,-2);
+		$ansr = preg_replace('/\)\s*\,\s*\(/',',',$ansr);
+		$answerlist = explode(',',$ansr);
+		foreach ($answerlist as $k=>$v) {
+			$v = eval('return ('.mathphp($v,null).');');
+			$answerlist[$k] = preg_replace('/[^\d\.,\-E]/','',$v);
+		}
+		//$answer = preg_replace_callback('/([^\[\(\)\]\,]+)/',"preg_mathphp_callback",$answer);
+		//$answerlist = explode(",",preg_replace('/[^\d\.,\-]/','',$answer));
 		
 		if (isset($answersize)) {
 			for ($i=0; $i<count($answerlist); $i++) {
@@ -1179,8 +1275,15 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($options['answersize'])) {if (is_array($options['answersize'])) {$answersize = $options['answersize'][$qn];} else {$answersize = $options['answersize'];}}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$correct = true;
-		$answer = preg_replace_callback('/([^\[\(\)\]\,]+)/',"preg_mathphp_callback",$answer);
-		$answerlist = explode(",",preg_replace('/[^\d\.,\-E]/','',$answer));
+		$ansr = substr($answer,2,-2);
+		$ansr = preg_replace('/\)\s*\,\s*\(/',',',$ansr);
+		$answerlist = explode(',',$ansr);
+		foreach ($answerlist as $k=>$v) {
+			$v = eval('return ('.mathphp($v,null).');');
+			$answerlist[$k] = preg_replace('/[^\d\.,\-E]/','',$v);
+		}
+		//$answer = preg_replace_callback('/([^\[\(\)\]\,]+)/',"preg_mathphp_callback",$answer);
+		//$answerlist = explode(",",preg_replace('/[^\d\.,\-E]/','',$answer));
 		if (isset($answersize)) {
 			for ($i=0; $i<count($answerlist); $i++) {
 				$givenanslist[$i] = $_POST["qn$qn-$i"];
@@ -1208,6 +1311,69 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 		}
 		if ($correct) {return 1;} else {return 0;}
+	} else if ($anstype == "ntuple" || $anstype== 'calcntuple') {
+		if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}
+		if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$qn];} else {$reltolerance = $options['reltolerance'];}}
+		if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$qn];} else {$abstolerance = $options['abstolerance'];}}
+		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
+		
+		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = .001;}
+		if ($multi>0) { $qn = $multi*1000+$qn;}
+		if ($anstype=='ntuple') {
+			$GLOBALS['partlastanswer'] = $givenans;
+		} else if ($anstype=='calcntuple') {
+			$GLOBALS['partlastanswer'] = $_POST["tc$qn"];
+		}
+		if ($givenans == null) {return 0;}
+		$answer = str_replace(' ','',$answer);
+		$givenans = str_replace(' ','',$givenans);
+		
+		if ($answer=='DNE' && strtoupper($givenans)=='DNE') {
+			return 1;
+		}
+		preg_match_all('/([\(\[\<\{])(.*?)([\)\]\>\}])/', $givenans, $gaarr, PREG_SET_ORDER);
+		preg_match_all('/([\(\[\<\{])(.*?)([\)\]\>\}])/', $answer, $anarr, PREG_SET_ORDER);
+		if (count($gaarr)==0) {
+			return 0;
+		}
+		$extrapennum = count($gaarr)+count($anarr);
+		
+		$correct = 0;
+		foreach ($anarr as $i=>$answer) {
+			$foundloc = -1;
+			foreach ($gaarr as $j=>$givenans) {
+				if ($answer[1]!=$givenans[1] || $answer[3]!=$givenans[3]) {
+					break;
+				}
+				$ansparts = explode(',',$answer[2]);
+				$gaparts = explode(',',$givenans[2]);
+				if (count($ansparts)!=count($gaparts)) {
+					break;
+				}
+				for ($i=0; $i<count($ansparts); $i++) {
+					if (is_numeric($ansparts[$i]) && is_numeric($gaparts[$i])) {
+						if (isset($abstolerance)) {
+							if (abs($ansparts[$i]-$gaparts[$i]) >= $abstolerance + 1E-12) {break;} 	
+						} else {
+							if (abs($ansparts[$i]-$gaparts[$i])/(abs($ansparts[$i])+.0001) >= $reltolerance+ 1E-12) {break;} 
+						}
+					}
+				}
+				if ($i==count($ansparts)) {
+					$correct += 1; $foundloc = $j; break;
+				}
+			}
+			if ($foundloc>-1) {
+				array_splice($gaarr,$foundloc,1); // remove from list
+				if (count($gaarr)==0) {
+					break;
+				}
+			}
+		}
+		$score = $correct/count($anarr) - count($gaarr)/$extrapennum;
+		if ($score<0) { $score = 0; }
+		return ($score);
+		
 	} else if ($anstype == "calculated") {
 		if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}
 		if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$qn];} else {$reltolerance = $options['reltolerance'];}}
@@ -1652,12 +1818,14 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 			
 			foreach ($aarr as $ansint) {
+				$ansint = trim($ansint);
 				$anssm = substr($ansint,0,1);
 				$ansem = substr($ansint,-1);
 				$ansint = substr($ansint,1,strlen($ansint)-2);
 				list($anssn,$ansen) = explode(',',$ansint);
 				$foundloc = -1;
 				foreach ($gaarr as $k=>$gansint) {
+					$gansint = trim($gansint);
 					$ganssm = substr($gansint,0,1);
 					$gansem = substr($gansint,-1);
 					$gansint = substr($gansint,1,strlen($gansint)-2);

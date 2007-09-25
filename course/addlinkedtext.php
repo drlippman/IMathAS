@@ -220,7 +220,7 @@
 ?>
 
 <form enctype="multipart/form-data" method=post action="addlinkedtext.php?block=<?php echo $block;?>&cid=<?php echo $cid; if (isset($_GET['id'])) {echo "&id={$_GET['id']}";}?>&folder=<?php echo $_GET['folder'];?>">
-<span class=form>Title: </span><span class=formright><input type=text size=60 name=title value="<?php echo $line['title'];?>"></span><BR class=form>
+<span class=form>Title: </span><span class=formright><input type=text size=60 name=title value="<?php echo str_replace('"','&quot;',$line['title']);?>"></span><BR class=form>
 
 Summary<BR>
 <div class=editor>

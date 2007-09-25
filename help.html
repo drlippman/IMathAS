@@ -158,6 +158,8 @@ dd {
 		<li><a href="#string">String</a></li>
 		<li><a href="#essay">Essay</a></li>
 		<li><a href="#draw">Drawing</a></li>
+		<li><a href="#ntuple">N-Tuple</a></li>
+		<li><a href="#calcntuple">Calculated N-Tuple</a></li>
 		<li><a href="#numericalmatrix">Numerical Matrix</a></li>
 		<li><a href="#calculatedmatrix">Calculated Matrix</a></li>
 		<li><a href="#interval">Interval</a></li>
@@ -1505,7 +1507,8 @@ These macros are fairly general purpose:
 <li><b>sumarray(array)</b>: Adds the entries in an array</li>
 <li><b>in_array(needle,haystack)</b>:  Checks if value needle is in array haystack.  Returns true or false</li>
 <li><b>arraystodoteqns(xarray,yarray,[color])</b>:  Converts an array of x-values and y-values into a form that can be used in
-  showplot, or in the Drawing answer type</li>
+  showplot.</li>
+<li><b>arraystodots(xarray,yarray)</b>: Converts an array of x-values and y-values into a form that can be used in the Drawing answer type</li>
 </ul>
 </div>
 <div class=h2>
@@ -1941,7 +1944,7 @@ None - the essay type is not computer graded.
 <div class=h3>
 <h3><a name="draw">Drawing</a></h3>
 
-Drawing question require the student to draw one or more lines/curves or dots.  
+Drawing questions require the student to draw one or more lines/curves or dots.  
 Dots are graded right/wrong.  Lines/curves are graded based on the deviation of the 
 drawn line from the correct line.
 
@@ -1965,6 +1968,85 @@ drawn line from the correct line.
 <dt>$partweights = array or list of weights (In Answer)</dt>
 	<dd>Defines grading weight for each line or dot in $answers.  Example: $partweights = ".5,.25,.25".  Defaults
 	    to equal weights on each line or dot.</dd>
+<dt>$reltolerance = tolerance scaling factor</dt>
+	<dd>Scales the grading tolerance.  Defaults to 1.  Set $reltolerance = 2 to make the grading twice as tolerant;
+	    $reltolerance = 0.5 to make grading half as forgiving</dd>
+<dt>$abstolerance = grading cutoff</dt>
+	<dd>Sets all-or-nothing grading.  If score &lt; $abstolerance, the student receives 0 for the question (note: score is 
+	between 0 and 1).  Otherwise
+	the student will receive full credit.  Not set by default.</dd>
+<dt>$answerbox (In Question Text)</dt>
+	<dd>Using the variable $answerbox in the Question Text will place the question input drawing tool in that location</dd>
+<dt>$showanswer (In Answer)</dt>
+	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
+	Use this to substitute a detailed answer.</dd>
+<dt>$hidetips = true (In Question Control)</dt>
+	<dd>Hides the question entry tips that display by default</dd>
+</dl>
+</p>
+
+</div>
+<div class=h3>
+<h3><a name="ntuple">N-Tuple</a></h3>
+
+N-Tuple questions require the student to enter an n-tuple or list of n-tuples.
+This can be used for coordinate points, vectors, or any other n-tuple of numbers.
+Drawing question require the student to draw one or more lines/curves or dots.  
+
+<p><b>Required Variables</b><BR>
+<dl>
+<dt>$answers = a string containing an n-tuple or list of n-tuples (In Answer)</dt>
+	<dd>Defines the answer n-tuple or list of n-tuples.  N-tuples can be any dimension,
+	but must be surrounded by any of: (), [], {}, &lt;&gt;.  Examples: $answer = "(1,2)",
+	$answer = "&lt;2,3,4&gt;,&lt;1,5,7&gt;".</dd>
+</dl>
+</p>
+<p><b>Optional Variables</b><BR>
+<dl>
+<dt>$displayformat = "point", "pointlist", "vector", "vectorlist", "list" (In Question Control)</dt>
+	<dd>Changes the answer entry tips (does NOT change how the question is graded).  For points,
+	entry like (2,3) is specified.  For vectors, entry like &lt;2,3&gt; is specified.</dd>
+<dt>$reltolerance = tolerance scaling factor</dt>
+	<dd>Scales the grading tolerance.  Defaults to 1.  Set $reltolerance = 2 to make the grading twice as tolerant;
+	    $reltolerance = 0.5 to make grading half as forgiving</dd>
+<dt>$abstolerance = grading cutoff</dt>
+	<dd>Sets all-or-nothing grading.  If score &lt; $abstolerance, the student receives 0 for the question (note: score is 
+	between 0 and 1).  Otherwise
+	the student will receive full credit.  Not set by default.</dd>
+<dt>$answerbox (In Question Text)</dt>
+	<dd>Using the variable $answerbox in the Question Text will place the question input drawing tool in that location</dd>
+<dt>$showanswer (In Answer)</dt>
+	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
+	Use this to substitute a detailed answer.</dd>
+<dt>$hidetips = true (In Question Control)</dt>
+	<dd>Hides the question entry tips that display by default</dd>
+</dl>
+</p>
+
+</div>
+<div class=h3>
+<h3><a name="calcntuple">Calculated N-Tuple</a></h3>
+
+Calculated N-Tuple questions require the student to enter an n-tuple or list of n-tuples.
+This can be used for coordinate points, vectors, or any other n-tuple of numbers.
+Drawing question require the student to draw one or more lines/curves or dots.  This
+is identical the the N-tuple answer type, but allows students to enter mathematical expressions
+rather than just numbers, such as (5/3, 2/3).
+
+<p><b>Required Variables</b><BR>
+<dl>
+<dt>$answers = a string containing an n-tuple or list of n-tuples (In Answer)</dt>
+	<dd>Defines the answer n-tuple or list of n-tuples.  N-tuples can be any dimension,
+	but must be surrounded by any of: (), [], {}, &lt;&gt;.  Examples: $answer = "(1,2)",
+	$answer = "&lt;2,3,4&gt;,&lt;1,5,7&gt;".  Note that the instructor specified $answer needs
+	to be n-tuples of numbers, not calculations.</dd>
+</dl>
+</p>
+<p><b>Optional Variables</b><BR>
+<dl>
+<dt>$displayformat = "point", "pointlist", "vector", "vectorlist", "list" (In Question Control)</dt>
+	<dd>Changes the answer entry tips (does NOT change how the question is graded).  For points,
+	entry like (2,3) is specified.  For vectors, entry like &lt;2,3&gt; is specified.</dd>
 <dt>$reltolerance = tolerance scaling factor</dt>
 	<dd>Scales the grading tolerance.  Defaults to 1.  Set $reltolerance = 2 to make the grading twice as tolerant;
 	    $reltolerance = 0.5 to make grading half as forgiving</dd>
@@ -2153,7 +2235,7 @@ This type of question can contain multiple parts, where each part is one of the 
 <dl>
 <dt>$anstypes = an array or list of answer types (In Answer)</dt>
 	<dd>Defines the answer type for each part.  Example: 
-	$anstypes = array("number","calculated","choices","multans","matching","numfunc","draw","essay","matrix","calcmatrix","interval","calcinterval")<BR>
+	$anstypes = array("number","calculated","choices","multans","matching","numfunc","draw","ntuple","calcntuple","essay","matrix","calcmatrix","interval","calcinterval")<BR>
 	Refer to this list for the short names of each question type</dd>
 <dt>Question part variables</dt>
 	<dd>For each question part, you will need to define the variables (like $answer, $questions, etc.) you would normally

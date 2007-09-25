@@ -246,7 +246,11 @@ function determinesetup() {
 	}
 }
 var existingonload = window.onload;
-window.onload = function() {existingonload(); determinesetup();}
+if (existingonload) {
+	window.onload = function() {existingonload(); determinesetup();}
+} else {
+	window.onload = determinesetup;
+}
 </script>
 <hr/><div class=right style="font-size:70%;">Built on <a href="http://imathas.sourceforge.net">IMathAS</a> &copy; 2006 David Lippman</div>
 	

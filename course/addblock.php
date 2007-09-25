@@ -248,7 +248,7 @@
 ?>
 
 <form method=post action="addblock.php?cid=<?php echo $cid; if (isset($_GET['id'])) {echo "&id={$_GET['id']}";} if (isset($_GET['block'])) {echo "&block={$_GET['block']}";}?>&folder=<?php echo $_GET['folder'];?>">
-<span class=form>Title: </span><span class=formright><input type=text size=60 name=title value="<?php echo $title;?>"></span><BR class=form>
+<span class=form>Title: </span><span class=formright><input type=text size=60 name=title value="<?php echo str_replace('"','&quot;',$title);?>"></span><BR class=form>
 
 <script src="../javascript/CalendarPopup.js"></script>
 <SCRIPT LANGUAGE="JavaScript" ID="js1">
@@ -291,7 +291,7 @@ at <input type=text size=10 name=etime value="<?php echo $etime;?>"></span><BR c
 		<select name="copycolors">
 		<?php
 		foreach ($existblocks as $k=>$name) {
-			echo "<option value=\"$k\">$name</option>";
+			echo "<option value=\"$k\">".stripslashes($name)."</option>";
 		}
 		?>
 		</select>

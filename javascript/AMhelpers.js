@@ -71,7 +71,7 @@ function calculate(inputId,outputId,format) {
   }
 }
 
-//preview for calcinterval type - NOT ANYWHERE NEAR DONE - need to do onsubmit too
+//preview for calcinterval type 
 function intcalculate(inputId,outputId) {
   var fullstr = document.getElementById(inputId).value;
   fullstr = fullstr.replace(/\s+/g,'');
@@ -123,6 +123,62 @@ function intcalculate(inputId,outputId) {
 	  AMprocessNode(outnode);
   }
 	
+}
+
+function ntuplecalc(inputId,outputId) {
+	var fullstr = document.getElementById(inputId).value;
+	fullstr = fullstr.replace(/\s+/g,'');
+	if (fullstr.match(/DNE/i)) {
+		fullstr = fullstr.toUpperCase();
+		outcalced = 'DNE';
+		outstr = 'DNE';
+	} else {
+		var outcalced = '';
+		var NCdepth = 0;
+		var lastcut = 0;
+		for (var i=0; i<fullstr.length; i++) {
+			dec = false;
+			if (NCdepth==0) {
+				outcalced += fullstr.charAt(i);
+				lastcut = i+1;
+			} 
+			if (fullstr.charAt(i).match(/[\(\[\<\{]/)) {
+				NCdepth++;		
+			} else if (fullstr.charAt(i).match(/[\)\]\>\}]/)) {
+				NCdepth--;	
+				dec = true;
+			}	
+			
+			if ((NCdepth==0 && dec) || (NCdepth==1 && fullstr.charAt(i)==',')) {
+				sub = fullstr.substring(lastcut,i);
+				try {
+				    with (Math) var res = eval(mathjs(sub));
+				} catch(e) {
+				    err = "syntax incomplete";
+				}
+				if (!isNaN(res) && res!="Infinity") {
+					outcalced += res;
+				} else {
+					outcalced += err;
+				}
+				outcalced += fullstr.charAt(i);
+				lastcut = i+1;
+			}
+		}
+		outstr = '`'+fullstr+'` = '+outcalced;
+	}
+	if (outputId != null) {
+		 var outnode = document.getElementById(outputId);
+		 var n = outnode.childNodes.length;
+		 for (var i=0; i<n; i++) {
+		    outnode.removeChild(outnode.firstChild);
+		 }
+		 outnode.appendChild(document.createTextNode(outstr));
+		 if (!noMathRender) {
+			  AMprocessNode(outnode);
+		 }
+	}
+	 return outcalced;
 }
 
 function matrixcalc(inputId,outputId,rows,cols) {
@@ -352,6 +408,7 @@ var intcalctoproc = new Array();
 var calcformat = new Array();
 var functoproc = new Array();
 var matcalctoproc = new Array();
+var ntupletoproc = new Array();
 var matsize = new Array();
 var vlist = new Array();
 var pts = new Array();
@@ -456,6 +513,15 @@ function doonsubmit(form,type2,skipconfirm) {
 		}
 		nh.value = str;
 		outn = document.getElementById("p"+matcalctoproc[i]);
+		outn.appendChild(nh);
+	}
+	for (var i=0; i<ntupletoproc.length; i++) {
+		var nh = document.createElement("INPUT");
+		nh.type = "hidden";
+		nh.name = "qn" + ntupletoproc[i];
+		str = ntuplecalc("tc"+ntupletoproc[i],null);
+		nh.value = str;
+		outn = document.getElementById("p"+ntupletoproc[i]);
 		outn.appendChild(nh);
 	}
 	for (var i=0; i<functoproc.length; i++) {

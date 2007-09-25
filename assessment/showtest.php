@@ -754,6 +754,7 @@
 					
 					recordtestdata();
 				}
+				echo filter("<div id=intro class=hidden>{$testsettings['intro']}</div>\n");
 				$lefttodo = shownavbar($questions,$scores,$qn,$testsettings['showcat']);
 				
 				echo "<div class=inset>\n";

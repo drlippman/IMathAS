@@ -349,7 +349,7 @@ function chgcopyfrom() {
 }
 </script>
 <form method=post action="addassessment.php?block=<?php echo $block;?>&cid=<?php echo $cid; if (isset($_GET['id'])) {echo "&id={$_GET['id']}";}?>&folder=<?php echo $_GET['folder'];?>&from=<?php echo $_GET['from'];?>">
-<span class=form>Assessment Name:</span><span class=formright><input type=text size=30 name=name value="<?php echo $line['name'];?>"></span><BR class=form>
+<span class=form>Assessment Name:</span><span class=formright><input type=text size=30 name=name value="<?php echo str_replace('"','&quot;',$line['name']);?>"></span><BR class=form>
 
 Summary:<BR>
 <div class=editor><textarea cols=50 rows=15 id=summary name=summary style="width: 100%"><?php echo $line['summary'];?></textarea></div>
@@ -383,7 +383,7 @@ at <input type=text size=10 name=etime value="<?php echo $etime;?>"></span><BR c
 <A HREF="#" onClick="cal1.select(document.forms[0].rdate,'anchor3','MM/dd/yyyy',(document.forms[0].rdate.value=='<?php echo $rdate;?>')?(document.forms[0].rdate.value):(document.forms[0].rdate.value)); return false;" NAME="anchor3" ID="anchor3"><img src="../img/cal.gif" alt="Calendar"/></A>
 at <input type=text size=10 name=rtime value="<?php echo $rtime;?>"></span><BR class=form>
 
-
+<span class=form></span><span class=formright><input type=submit value="Submit Now"> or continue below for Assessment Options</span><BR class=form>
 
 <fieldset><legend>Assessment Options</legend>
 <?php

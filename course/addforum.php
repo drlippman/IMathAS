@@ -227,7 +227,7 @@
 ?>
 
 <form method=post action="addforum.php?block=<?php echo $block;?>&cid=<?php echo $cid; if (isset($_GET['id'])) {echo "&id={$_GET['id']}";}?>&folder=<?php echo $_GET['folder'];?>">
-<span class=form>Name: </span><span class=formright><input type=text size=60 name=name value="<?php echo $line['name'];?>"></span><BR class=form>
+<span class=form>Name: </span><span class=formright><input type=text size=60 name=name value="<?php echo str_replace('"','&quot;',$line['name']);?>"></span><BR class=form>
 
 Description:<BR>
 <div class=editor>

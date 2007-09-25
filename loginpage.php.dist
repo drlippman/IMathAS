@@ -85,7 +85,7 @@ if (!isset($imasroot)) { //don't allow direct access to loginpage.php
 	if (existingonload) {
 		window.onload = function() {existingonload(); updateloginarea();}
 	} else {
-		window.onload = updateloginarea();
+		window.onload = updateloginarea;
 	}
 </script>
 </form>

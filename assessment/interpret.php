@@ -152,6 +152,13 @@ function interpret($blockname,$anstype,$str)
 			} else if (($libs = preg_replace('/.*loadlibrary\(([^\)]*)\).*/',"$1",$com)) != $com) {
 				loadlibrary($libs);
 				$com = '';
+			} else if (($ns = preg_replace('/.*setseed\(([^\)]*)\).*/',"$1",$com)) != $com) {
+				if ($ns=="userid") {
+					srand($GLOBALS['userid']);
+				} else {
+					srand($ns);
+				}
+				$com = '';
 			} else {
 				echo "Line {$matches[0]} invalid: $com<BR>\n";
 				return false;

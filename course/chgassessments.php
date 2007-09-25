@@ -96,7 +96,7 @@
 			$sets[] = "intro='".addslashes(mysql_result($result,0,0))."'";
 		}
 		if (isset($_POST['chgdates'])) {
-			$query = "SELECT startdate,enddate,reviewdate FROM imas_assessments WHERE id='{$_POST['intro']}'";
+			$query = "SELECT startdate,enddate,reviewdate FROM imas_assessments WHERE id='{$_POST['dates']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$row = mysql_fetch_row($result);
 			$sets[] = "startdate='{$row[0]}',enddate='{$row[1]}',reviewdate='{$row[2]}'";
