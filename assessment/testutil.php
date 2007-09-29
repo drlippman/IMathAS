@@ -271,9 +271,14 @@ function showqinfobar($qn,$inreview,$single) {
 	if ($inreview) {
 		echo '<div class="review">';
 	}
-	echo 'Points possible: ' . $qi[$questions[$qn]]['points'];
+	$pointsremaining = getremainingpossible($qi[$questions[$qn]],$testsettings,$attempts[$qn]);
+	if ($pointsremaining == $qi[$questions[$qn]]['points']) {
+		echo 'Points possible: ' . $qi[$questions[$qn]]['points'];
+	} else {
+		echo 'Points available on this attempt: '.$pointsremaining.' of original '.$qi[$questions[$qn]]['points'];
+	}
 	if ($qi[$questions[$qn]]['attempts']==0) {
-		echo "<br/>Unlimited attempts";
+		echo "<br/>Unlimited attempts while score can be improved";
 	} else {
 		echo '<br/>'.($qi[$questions[$qn]]['attempts']-$attempts[$qn])." attempts of ".$qi[$questions[$qn]]['attempts']." remaining.";
 	}

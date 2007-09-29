@@ -28,6 +28,7 @@
 		echo "</ul>\n";
 		echo "<h4>Settings</h4>\n";
 		echo "<ul><li><input type=checkbox name=points checked=1>Show point values</li>\n";
+		echo "<li><input type=checkbox name=hidetxtboxes >Hide text entry lines</li>\n";
 		echo "</ul>";
 		echo "<h4>Print Margin Setup</h4>\n";
 		echo "Please check Page Setup under the File menu of your browser, and look up your print margin settings.<br/>\n";
@@ -63,6 +64,9 @@
 		}
 		if (isset($_POST['sname'])) {
 			echo "<input type=hidden name=sname value=1>\n";
+		}
+		if (isset($_POST['hidetxtboxes'])) {
+			echo "<input type=hidden name=hidetxtboxes value=1>\n";
 		}
 		if (isset($_POST['otherheader'])) {
 			echo "<input type=hidden name=otherheader value=1>\n";

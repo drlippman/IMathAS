@@ -21,7 +21,7 @@
 	 } else if (isset($_COOKIE['showusers'])) {
 		 $showusers = $_COOKIE['showusers'];
 	 } else {
-		 $showusers = 0; //0: group, 1: non-students, 2: all, 3: pending
+		 $showusers = 0;
 	 }
  } else {
 	 $showusers = 0;
@@ -99,7 +99,11 @@ if ($myrights>=75) {
 	}
 	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 	while ($row = mysql_fetch_row($result)) {
-		echo "<option value=\"{$row[0]}\">{$row[1]}, {$row[2]}</option>";
+		echo "<option value=\"{$row[0]}\" ";
+		if ($showcourses==$row[0]) {
+			echo "selected=1";
+		}
+		echo ">{$row[1]}, {$row[2]}</option>";
 	}
 	echo '</select>';
 }
@@ -186,26 +190,29 @@ if ($myrights < 100 || $showusers==0) {
 <div class=item>
 <table class=gb width="90%" id="myTable">
 <thead>
-<tr><th>Name</th><th>Username</th><th>Rights</th><th>Last Login</th><th>&nbsp;</th><th>&nbsp;</th><th>&nbsp;</th></tr>
+<tr><th>Name</th><th>Username</th><th>Email</th><th>Rights</th><th>Last Login</th><th>Rights</th><th>Password</th><th>Delete</th></tr>
 </thead>
 <tbody>
 <?php 
-if ($myrights < 100 || $showusers==0) {
+if ($myrights < 100) {
 	$query = "SELECT id,SID,FirstName,LastName,rights,lastaccess FROM imas_users WHERE rights > 10 AND groupid='$groupid' ORDER BY LastName";
 } else {
-	if ($showusers==2) {
-		$query = "SELECT id,SID,FirstName,LastName,rights,lastaccess FROM imas_users ORDER BY LastName";
-	} else if ($showusers==3) {
-		$query = "SELECT id,SID,FirstName,LastName,rights,lastaccess FROM imas_users WHERE rights=0 ORDER BY LastName";
-	} else if ($showusers==1) {
-		$query = "SELECT id,SID,FirstName,LastName,rights,lastaccess FROM imas_users WHERE rights > 10 ORDER BY LastName";
+	if (is_numeric($showusers) && $showusers==0) {
+		$showusers = $groupid;
+	}
+	if (is_numeric($showusers)) {
+		$query = "SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE rights > 10 AND groupid='$showusers' ORDER BY LastName";
+	} else if ($showusers==-1) {
+		$query = "SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE rights=0 ORDER BY LastName";
+	} else {
+		$query = "SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE substring(LastName,1,1)='$showusers' ORDER BY LastName";
 	}
 }
 $result = mysql_query($query) or die("Query failed : " . mysql_error());
 $alt = 0;
 while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 	if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
-	echo "<td>{$line['LastName']}, {$line['FirstName']}</td><td>{$line['SID']}</td>\n";
+	echo "<td>{$line['LastName']}, {$line['FirstName']}</td><td>{$line['SID']}</td><td>{$line['email']}</td>\n";
 	echo "<td>";
 	switch ($line['rights']) {
 		case 5: echo "Guest"; break;
@@ -223,8 +230,8 @@ while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 		$lastaccess = "never";
 	}
 	echo "<td>$lastaccess</td>\n";
-	echo "<td><a href=\"forms.php?action=chgrights&id={$line['id']}\">Change Rights</a></td> \n";
-	echo "<td><a href=\"actions.php?action=resetpwd&id={$line['id']}\">Reset Password to 'password'</a></td> \n";
+	echo "<td><a href=\"forms.php?action=chgrights&id={$line['id']}\">Change</a></td> \n";
+	echo "<td><a href=\"actions.php?action=resetpwd&id={$line['id']}\">Reset</a></td> \n";
 	echo "<td><a href=\"forms.php?action=deladmin&id={$line['id']}\">Delete</a></td></tr>\n";
 }
 ?>
@@ -237,22 +244,39 @@ initSortTable('myTable',Array('S','S','S','S',false,false,false),true);
 <input type=button value="Add New User" onclick="window.location='forms.php?action=newadmin'">
 <?php
 if ($myrights == 100) {
+	echo "<script>function showgroupusers() { ";
+	echo "  var grpid=document.getElementById(\"selgrpid\").value; ";
+	echo "  window.location='admin.php?showusers='+grpid;";
+	echo "}</script>";
+	
 	echo " Show: ";
-	if ($showusers!=0) {
-		echo "<input type=button value=\"Group Users\" onclick=\"window.location='admin.php?showusers=0'\">\n";
+	echo "<select id=\"selgrpid\" onchange=\"showgroupusers()\">";
+	echo '<option value="-1" ';
+	if ($showusers==-1) {
+		echo "selected=1";
 	}
-	if ($showusers!=1) {
-		echo "<input type=button value=\"All Non-Students\" onclick=\"window.location='admin.php?showusers=1'\">\n";
+	echo '>Pending</option>';
+	$query = "SELECT id,name from imas_groups ORDER BY name";
+	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+	while ($row = mysql_fetch_row($result)) {
+		echo "<option value=\"{$row[0]}\" ";
+		if ($row[0] == $showusers) {
+			echo "selected=1";
+		}
+		echo ">{$row[1]}</option>";
 	}
-	if ($showusers!=2) {
-		echo "<input type=button value=\"All Users\" onclick=\"window.location='admin.php?showusers=2'\">\n";
+	for ($i=ord("A");$i<=ord("Z");$i++) {
+		echo "<option value=\"".chr($i)."\" ";
+		if (chr($i) == $showusers) {
+			echo "selected=1";
+		}
+		echo ">".chr($i)."</option>";
 	}
-	if ($showusers!=3) {
-		echo "<input type=button value=\"Pending\" onclick=\"window.location='admin.php?showusers=3'\">\n";
-	}
+	echo "</select>";
 	
 }
 ?>
+<p>*Passwords will be reset to <i>Password</i></p>
 </div>
 
 <?php

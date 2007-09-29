@@ -200,4 +200,16 @@ table.scores td {
 	margin-bottom: 5px;
 }
 
+table.longdiv {
+  border-collapse: collapse;
+  border: 0px; 
+}
+table.longdiv td {
+  padding: 3px;
+}
+td.barslefttop {
+  border-left: 1px solid #000;
+  border-top: 1px solid #000;
+}
+
 

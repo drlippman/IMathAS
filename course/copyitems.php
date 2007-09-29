@@ -208,65 +208,65 @@
 			mysql_query($query) or die("Query failed :$query " . mysql_error());
 			return (mysql_insert_id());	
 		}
-		
-		$checked = $_POST['checked'];
-		$query = "SELECT blockcnt FROM imas_courses WHERE id='$cid'";
-		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-		$blockcnt = mysql_result($result,0,0);
-		
-		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_POST['ctc']}'";
-		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-		$items = unserialize(mysql_result($result,0,0));
-		$newitems = array();
-		function copysub($items,$parent,&$addtoarr,$gbcats) {
-			global $checked,$blockcnt;
-			foreach ($items as $k=>$item) {
-				if (is_array($item)) {
-					if (array_search($parent.'-'.($k+1),$checked)!==FALSE) { //copy block
-						$newblock = array();
-						$newblock['name'] = $item['name'].stripslashes($_POST['append']);
-						$newblock['id'] = $blockcnt;
-						$blockcnt++;
-						$newblock['startdate'] = $item['startdate'];
-						$newblock['enddate'] = $item['enddate'];
-						$newblock['SH'] = $item['SH'];
-						$newblock['colors'] = $item['colors'];
-						$newblock['items'] = array();
-						if (count($item['items'])>0) {
-							copysub($item['items'],$parent.'-'.($k+1),$newblock['items'],$gbcats);
+		if (isset($_POST['checked'])) {
+			$checked = $_POST['checked'];
+			$query = "SELECT blockcnt FROM imas_courses WHERE id='$cid'";
+			$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+			$blockcnt = mysql_result($result,0,0);
+			
+			$query = "SELECT itemorder FROM imas_courses WHERE id='{$_POST['ctc']}'";
+			$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+			$items = unserialize(mysql_result($result,0,0));
+			$newitems = array();
+			function copysub($items,$parent,&$addtoarr,$gbcats) {
+				global $checked,$blockcnt;
+				foreach ($items as $k=>$item) {
+					if (is_array($item)) {
+						if (array_search($parent.'-'.($k+1),$checked)!==FALSE) { //copy block
+							$newblock = array();
+							$newblock['name'] = $item['name'].stripslashes($_POST['append']);
+							$newblock['id'] = $blockcnt;
+							$blockcnt++;
+							$newblock['startdate'] = $item['startdate'];
+							$newblock['enddate'] = $item['enddate'];
+							$newblock['SH'] = $item['SH'];
+							$newblock['colors'] = $item['colors'];
+							$newblock['items'] = array();
+							if (count($item['items'])>0) {
+								copysub($item['items'],$parent.'-'.($k+1),$newblock['items'],$gbcats);
+							}
+							$addtoarr[] = $newblock;
+						} else {
+							if (count($item['items'])>0) {
+								copysub($item['items'],$parent.'-'.($k+1),$addtoarr,$gbcats);
+							}
 						}
-						$addtoarr[] = $newblock;
 					} else {
-						if (count($item['items'])>0) {
-							copysub($item['items'],$parent.'-'.($k+1),$addtoarr,$gbcats);
+						if (array_search($item,$checked)!==FALSE) {
+							$addtoarr[] = copyitem($item,$gbcats);
 						}
-					}
-				} else {
-					if (array_search($item,$checked)!==FALSE) {
-						$addtoarr[] = copyitem($item,$gbcats);
 					}
 				}
 			}
-		}
-		copysub($items,'0',$newitems,$gbcats);
-		
-		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-		$items = unserialize(mysql_result($result,0,0));
-		if ($_POST['addto']=="none") {
-			array_splice($items,count($items),0,$newitems);
-		} else {
-			$blocktree = explode('-',$_POST['addto']);
-			$sub =& $items;
-			for ($i=1;$i<count($blocktree);$i++) {
-				$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
+			copysub($items,'0',$newitems,$gbcats);
+			
+			$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+			$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+			$items = unserialize(mysql_result($result,0,0));
+			if ($_POST['addto']=="none") {
+				array_splice($items,count($items),0,$newitems);
+			} else {
+				$blocktree = explode('-',$_POST['addto']);
+				$sub =& $items;
+				for ($i=1;$i<count($blocktree);$i++) {
+					$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
+				}
+				array_splice($sub,count($sub),0,$newitems);
 			}
-			array_splice($sub,count($sub),0,$newitems);
-		}
-		$itemorder = addslashes(serialize($items));
-		$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt' WHERE id='$cid'";
-		mysql_query($query) or die("Query failed : $query" . mysql_error());
-		
+			$itemorder = addslashes(serialize($items));
+			$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt' WHERE id='$cid'";
+			mysql_query($query) or die("Query failed : $query" . mysql_error());
+		}	
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
 
 		exit;	

@@ -113,6 +113,9 @@ END;
 			if ($_POST['browser']==1) {$pt -= .4;}
 		}
 	}
+	if (isset($_POST['hidetxtboxes'])) {
+		echo "input.text { display: none; }\n";
+	}
 	echo <<<END
 div.floatl {
 	float: left;
@@ -413,6 +416,9 @@ END;
 		}
 		if (isset($_POST['sname'])) {
 			echo "<input type=hidden name=sname value=1>\n";
+		}
+		if (isset($_POST['hidetxtboxes'])) {
+			echo "<input type=hidden name=hidetxtboxes value=1>\n";
 		}
 		if (isset($_POST['otherheader'])) {
 			echo "<input type=hidden name=otherheader value=1>\n";

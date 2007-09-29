@@ -49,6 +49,9 @@
 <ul>
 <li><a href="../help.html">Help file</a>.  Detailed documentation of all of IMathAS's features and
    question language</li>
+<li><a href="AccessingOnlineHomeworkinWAMAP.doc">Getting enrolled for students</a>.  Not so much documentation, but
+   a word document containing instructions for students to sign up and enroll in your course.  Suitable for including
+   in your syllabus or handing out to students</li>
 <li><a href="asciimathref.html">ASCIIMath syntax reference</a>.  A reference sheet for ASCIIMath symbol entry.</li>
 <li><a href="../readme.html">Installation</a>.  Step-by-step installation instructions, part of the system's
    readme file.  This is only needed for server installation - teachers should not need this</li>

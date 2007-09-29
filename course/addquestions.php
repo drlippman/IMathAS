@@ -28,6 +28,10 @@
 		}
 		if (isset($_POST['add'])) {
 			include("modquestiongrid.php");
+			if (isset($_GET['process'])) {
+				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
+				exit;
+			}
 		} else {
 
 			$checked = $_POST['nchecked'];
@@ -55,6 +59,10 @@
 	}
 	if (isset($_GET['modqs'])) {
 		include("modquestiongrid.php");
+		if (isset($_GET['process'])) {
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
+			exit;
+		}
 	}
 	
 	if (isset($_GET['clearattempts'])) {

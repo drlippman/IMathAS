@@ -743,6 +743,24 @@
 		} else {
 			echo "Last change: " . tzdate("F j, Y, g:i a",$line['endtime']) . "</p>\n";
 		}
+		$saenddate = $line['enddate'];
+		unset($exped);
+		$query = "SELECT enddate FROM imas_exceptions WHERE userid='{$_GET['uid']}' AND assessmentid='{$line['assessmentid']}'";
+		$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+		if (mysql_num_rows($r2)>0) {
+			$exped = mysql_result($r2,0,0);
+			if ($exped>$saenddate) {
+				$saenddate = $exped;
+			}
+		}
+		
+		if ($isteacher) {
+			echo "<p>Due Date: ". tzdate("F j, Y, g:i a",$line['enddate']);
+			if (isset($exped) && $exped!=$line['enddate']) {
+				echo "<br/>Has exception, with due date: ".tzdate("F j, Y, g:i a",$exped);
+			}
+			echo "</p>";
+		}
 		if ($isteacher) {
 			if ($line['agroupid']>0) {
 				echo "<p>This assignment is linked to a group.  Changes will affect the group unless specified. ";
@@ -810,17 +828,7 @@
 			echo "<a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&asid={$_GET['asid']}&cid=$cid&uid={$_GET['uid']}&reviewver=1\">Show Review Attempts</a>";
 			echo "</p>";
 		}
-		$saenddate = $line['enddate'];
-		if (!$isteacher) {
-			$query = "SELECT enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='{$line['assessmentid']}'";
-			$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-			if (mysql_num_rows($r2)>0) {
-				$exped = mysql_result($r2,0,0);
-				if ($exped>$saenddate) {
-					$saenddate = $exped;
-				}
-			}
-		}
+		
 		
 		require("../assessment/displayq2.php");
 		echo '<script type="text/javascript">';
@@ -1087,8 +1095,13 @@
 				if ($pts==9999) {
 					$pts = $defpoints;
 				}
-				$pc = round(100*$avg/$pts);
-				$pc2 = round(100*$avg2/$pts);
+				if ($pts>0) {
+					$pc = round(100*$avg/$pts);
+					$pc2 = round(100*$avg2/$pts);
+				} else {
+					$pc = 'N/A';
+					$pc2 = 'N/A';
+				}
 				$pi = round(100*$qincomplete[$row[1]]/$qcnt[$row[1]],1);
 				
 				if ($qcnt[$row[1]] - $qincomplete[$row[1]]>0) {
