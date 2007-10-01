@@ -703,6 +703,10 @@
 					echo "</p>\n";
 					if (canimprove($last)) {
 						echo "<p><a href=\"showtest.php?action=shownext&to=$last&reattempt=$last\">Reattempt last question</a>.  If you do not reattempt now, you will have another chance once you complete the test.</p>\n";
+					} else if ($attempts[$last]<$qi[$questions[$last]]['attempts'] || $qi[$questions[$last]]['attempts']==0) {
+						echo "<p>Cannot improve score with reattempts</p>";
+					} else {
+						echo "<p>No attempts remaining.</p>";
 					}
 				}
 				//working now page not cached
@@ -774,6 +778,10 @@
 					if (canimprove($qn)) {
 						echo "<p><a href=\"showtest.php?action=skip&to=$qn&reattempt=$qn\">Reattempt last question</a></p>\n";
 						$reattemptsremain = true;
+					} else if ($attempts[$qn]<$qi[$questions[$qn]]['attempts'] || $qi[$questions[$qn]]['attempts']==0) {
+						echo "<p>Cannot improve score with reattempts</p>";
+					} else {
+						echo "<p>No attempts remaining.</p>";
 					}
 				}
 				if ($allowregen) {
@@ -825,6 +833,10 @@
 						if (canimprove($next)) {
 							echo "<p><a href=\"showtest.php?action=skip&to=$next&reattempt=$next\">Reattempt this question</a></p>\n";
 							$reattemptsremain = true;
+						} else if ($attempts[$next]<$qi[$questions[$next]]['attempts'] || $qi[$questions[$next]]['attempts']==0) {
+							echo "<p>Cannot improve score with reattempts</p>";
+						} else {
+							echo "<p>No attempts remaining.</p>";
 						}
 					}
 					if ($allowregen) {
@@ -877,6 +889,10 @@
 					if (canimprove($qn)) {
 						echo "<p><a href=\"showtest.php?action=seq&to=$qn&reattempt=$qn\">Reattempt last question</a></p>\n";
 						$reattemptsremain = true; 
+					} else if ($attempts[$qn]<$qi[$questions[$qn]]['attempts'] || $qi[$questions[$qn]]['attempts']==0) {
+						echo "<p>Cannot improve score with reattempts</p>";
+					} else {
+						echo "<p>No attempts remaining.</p>";
 					}
 				}
 				if ($allowregen) {
@@ -998,13 +1014,20 @@
 		}
 	} else { //starting test display  
 		$canimprove = false;
+		$canimproveq = array();
+		$canreattempt = false;
+		$canreattemptq = array();
 		$ptsearned = 0;
 		$perfectscore = false;
 		
 		for ($j=0; $j<count($questions);$j++) {
 			$canimproveq[$j] = canimprove($j);
+			$canreattemptq[$j] = hasreattempts($j);
 			if ($canimproveq[$j]) {
 				$canimprove = true;
+			}
+			if ($canreattemptq[$j]) {
+				$canreattempt = true;
 			}
 			$ptsearned += getpts($scores[$j]);
 		}
@@ -1062,7 +1085,7 @@
 						if ($allowregen) {
 							echo "<p><a href=\"showtest.php?regenall=all\">Try similar problems</a> for all questions.</p>";
 						}
-					} else if ($canimprove) { //no more attempts
+					} else if (!$canreattempt) { //no more attempts
 						if ($allowregen) {
 							echo "<p>No attempts left on current versions of questions.</p>\n";
 							echo "<p><a href=\"showtest.php?regenall=missed\">Try similar problems</a> for all questions with less than perfect scores.</p>";
@@ -1106,7 +1129,7 @@
 						if ($allowregen) {
 							echo "<p><a href=\"showtest.php?regenall=all\">Try similar problems</a> for all questions.</p>";
 						}
-					} else if ($canimprove) { //no more attempts
+					} else if (!$canreattempt) { //no more attempts
 						echo "<p>No attempts left on this test</p>\n";	
 					}  else { //more attempts, but can't be improved
 						if ($allowregen) {
@@ -1138,7 +1161,7 @@
 				}
 			}
 			shownavbar($questions,$scores,$i,$testsettings['showcat']);
-			if ($i == count($questions)) {
+			if ($i == count($questions)) { //all questions answered
 				if ($canimprove) {
 					echo "<div class=inset><br>\n";
 					echo "<a name=\"beginquestions\"></a>\n";
@@ -1158,7 +1181,7 @@
 					if ($perfectscore) {
 						echo "<p>Assessment is complete with perfect score.</p>";
 						echo "<p>To try a similar problem, select a question.</p>";
-					} else if ($canimprove) { //no more attempts
+					} else if (!$canreattempt) { //no more attempts
 						if ($allowregen) {
 							echo "<p>No attempts left on current versions of questions.</p>\n";
 							echo "<p>To try a similar problem, select a question.</p>";
@@ -1196,7 +1219,7 @@
 					break;
 				}
 			}
-			if ($i == count($questions)) {
+			if ($i == count($questions)) { //no questions have canimproveq
 				if ($canimprove) {
 					if ($noindivscores) {
 						echo "<p><a href=\"showtest.php?reattempt=all\">Reattempt test</a> on questions allowed (note: all scores, correct and incorrect, will be cleared)</p>";
@@ -1212,7 +1235,7 @@
 						if ($allowregen) {
 							echo "<p><a href=\"showtest.php?regenall=all\">Try similar problems</a> for all questions.</p>";
 						}
-					} else if ($canimprove) { //no more attempts
+					} else if (!$canreattempt) { //no more attempts
 						echo "<p>No attempts left on this test</p>\n";	
 					}  else { //more attempts, but can't be improved
 						if ($allowregen) {

@@ -227,10 +227,19 @@ function recordtestdata($limit=false) {
 function canimprove($qn) {
 	global $qi,$scores,$attempts,$questions,$testsettings;	
 	$remainingposs = getremainingpossible($qi[$questions[$qn]],$testsettings,$attempts[$qn]);
-	if ($attempts[$qn]<$qi[$questions[$qn]]['attempts'] || $qi[$questions[$qn]]['attempts']==0) {
+	if (hasreattempts($qn)) {
 		if (getpts($scores[$qn])<$remainingposs) {
 			return true;
 		} 
+	}
+	return false;
+}
+
+//do more attempts remain?
+function hasreattempts($qn) {
+	global $qi,$attempts,$questions,$testsettings;	
+	if ($attempts[$qn]<$qi[$questions[$qn]]['attempts'] || $qi[$questions[$qn]]['attempts']==0) {
+		return true;
 	}
 	return false;
 }
@@ -280,7 +289,8 @@ function showqinfobar($qn,$inreview,$single) {
 	if ($qi[$questions[$qn]]['attempts']==0) {
 		echo "<br/>Unlimited attempts while score can be improved";
 	} else {
-		echo '<br/>'.($qi[$questions[$qn]]['attempts']-$attempts[$qn])." attempts of ".$qi[$questions[$qn]]['attempts']." remaining.";
+		//echo '<br/>'.($qi[$questions[$qn]]['attempts']-$attempts[$qn])." attempts of ".$qi[$questions[$qn]]['attempts']." remaining.";
+		echo "<br/>This is attempt ".($attempts[$qn]+1)." of " . $qi[$questions[$qn]]['attempts'] . " available while score can be improved";
 	}
 	if ($testsettings['showcat']>0 && $qi[$questions[$qn]]['category']!='0') {
 		echo "  Category: {$qi[$questions[$qn]]['category']}.";
