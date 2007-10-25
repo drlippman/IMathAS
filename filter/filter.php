@@ -32,7 +32,7 @@
 			$AS->processShortScript($arr[2]);
 			$AS->outputimage($filterdir.'/graph/imgs/'.$fn.'.png');
 		}
-		return ('<img src="http://'.$_SERVER['SERVER_NAME'].$imasroot.'/filter/graph/imgs/'.$fn.'.png" style="'.$sty.'" alt="Graphs"/>');
+		return ('<img src="'.$imasroot.'/filter/graph/imgs/'.$fn.'.png" style="'.$sty.'" alt="Graphs"/>');
 	}
 	function svgfilterscriptcallback($arr) {
 		global $filterdir, $AS, $imasroot;
