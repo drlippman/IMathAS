@@ -4,7 +4,7 @@
 
 
 array_push($allowedmacros,"sec","csc","cot","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif","in_array","prettyint","prettyreal","arraystodots","subarray","showdataarray","arraystodoteqns","array_flip","arrayfindindex");
-
+array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","prettytime");
 function mergearrays($a,$b) {
 	return array_merge($a,$b);
 }
@@ -917,4 +917,183 @@ function showdataarray($a,$n=1) {
 	$out .= '</tbody></table>';
 	return $out;
 }
+
+$ones = array( "", " one", " two", " three", " four", " five", " six", " seven", " eight", " nine", " ten", " eleven", " twelve", " thirteen", " fourteen", " fifteen", " sixteen", " seventeen", " eighteen", " nineteen");
+$tens = array( "", "", " twenty", " thirty", " forty", " fifty", " sixty", " seventy", " eighty", " ninety");
+$triplets = array( "", " thousand", " million", " billion", " trillion", " quadrillion", " quintillion", " sextillion", " septillion", " octillion", " nonillion");
+$placevals = array( "", "tenth", "hundredth", "thousandth", "ten-thousandth", "hundred-thousandth", "millionth", "ten-millionth", "hundred-millionth", "billionth");
+ // recursive fn, converts three digits per pass
+function convertTri($num, $tri) {
+  global $ones, $tens, $triplets;
+
+  // chunk the number, ...rxyy
+  $r = (int) ($num / 1000);
+  $x = ($num / 100) % 10;
+  $y = $num % 100;
+
+  // init the output string
+  $str = "";
+
+  // do hundreds
+  if ($x > 0)
+   $str = $ones[$x] . " hundred";
+
+  // do ones and tens
+  if ($y < 20)
+   $str .= $ones[$y];
+  else
+   $str .= $tens[(int) ($y / 10)] . $ones[$y % 10];
+
+  // add triplet modifier only if there
+  // is some output to be modified...
+  if ($str != "")
+   $str .= $triplets[$tri];
+
+  // continue recursing?
+  if ($r > 0)
+   return convertTri($r, $tri+1).$str;
+  else
+   return $str;
+ }
+
+function numtowords($num) {
+	global $placevals;
+	
+	if ($num==0) {
+		return "zero";
+	}
+	$int = floor($num);
+	$dec = 	$num-$int;
+	$out = '';
+	if ($int>0) {
+		$out .= convertTri($int,0);
+		if ($dec>0) {
+			$out .= " and ";
+		}
+	}
+	if ($dec>0) {
+		$cnt = 0;
+		while (($dec-round($dec))>1e-9 && $cnt<9) {
+			$dec *= 10;
+			$cnt++;
+		}
+		$dec = round($dec);
+		$out .= convertTri($dec,0);
+		$out .= ' '.$placevals[$cnt];
+		if ($dec!=1) {
+			$out .= 's';
+		}
+	}
+	return $out;	
+}
+
+$namearray[0] = explode(',',"Aaron,Ahmed,Aidan,Alan,Alex,Alfonso,Andres,Andrew,Antonio,Armando,Arturo,Austin,Ben,Bill,Blake,Bradley,Brayden,Brendan,Brian,Bryce,Caleb,Cameron,Carlos,Casey,Cesar,Chad,Chance,Chase,Chris,Cody,Collin,Colton,Conner,Corey,Dakota,Damien,Danny,Darius,David,Deandre,Demetrius,Derek,Devante,Devin,Devonte,Diego,Donald,Dustin,Dylan,Eduardo,Emanuel,Enrique,Erik,Ethan,Evan,Francisco,Frank,Gabriel,Garrett,Gerardo,Gregory,Ian,Isaac,Jacob,Jaime,Jake,Jamal,James,Jared,Jason,Jeff,Jeremy,Jesse,John,Jordan,Jose,Joseph,Josh,Juan,Julian,Julio,Justin,Juwan,Keegan,Ken,Kevin,Kyle,Landon,Levi,Logan,Lucas,Luis,Malik,Manuel,Marcus,Mark,Matt,Micah,Michael,Miguel,Nate,Nick,Noah,Omar,Paul,Quinn,Randall,Ricardo,Ricky,Roberto,Roy,Russell,Ryan,Salvador,Sam,Santos,Scott,Sergio,Shane,Shaun,Skyler,Spencer,Stephen,Taylor,Tevin,Todd,Tom,Tony,Travis,Trent,Trevor,Trey,Tristan,Tyler,Wade,Warren,Wyatt,Zach");
+$namearray[1] = explode(',',"Adriana,Adrianna,Alejandra,Alexandra,Alexis,Alice,Alicia,Alma,Amanda,Amber,Amy,Andrea,Angela,Anna,April,Ariana,Ashley,Ashton,Autumn,Bianca,Bria,Brianna,Brittany,Brooke,Caitlyn,Carissa,Carolyn,Carrie,Cassandra,Catherine,Chasity,Chelsea,Chloe,Christy,Ciara,Claudia,Colleen,Courtney,Cristina,Crystal,Dana,Danielle,Delaney,Destiny,Diana,Elizabeth,Emily,Emma,Erica,Erin,Esmeralda,Gabrielle,Guadalupe,Haley,Hanna,Heather,Hillary,Holly,Jacqueline,Jamie,Jane,Jasmine,Jenna,Jennifer,Jessica,Julia,Karen,Karina,Karissa,Karla,Kathryn,Katie,Kayla,Kelly,Kelsey,Kendra,Kimberly,Kori,Kristen,Kristina,Krystal,Kylie,Laura,Lauren,Leah,Linda,Lindsey,Mackenzie,Madison,Maggie,Mariah,Marissa,Megan,Melissa,Meredith,Michelle,Mikayla,Miranda,Molly,Monique,Morgan,Naomi,Natalie,Natasha,Nicole,Nina,Noelle,Paige,Patricia,Rachael,Raquel,Rebecca,Renee,Riley,Rosa,Samantha,Sarah,Savannah,Shannon,Shantel,Sierra,Sonya,Sophia,Stacy,Stephanie,Summer,Sydney,Tatiana,Taylor,Tiana,Tiffany,Valerie,Vanessa,Victoria,Vivian,Wendy,Whitney,Zoe");
+
+function randnames($n=1,$gender=2) { 
+	global $namearray;
+	if ($n==1) { 
+		if ($gender==2) { 
+			$gender = rand(0,1); 
+		} 
+		return $namearray[$gender][rand(0,137)]; 
+	} else { 
+		$out = array(); 
+		$locs = diffrands(0,137,$n); 
+		for ($i=0; $i<$n;$i++) { 
+			if ($gender==2) { 
+				$gender = rand(0,1); 
+			}       
+			$out[] = $namearray[$gender][$locs[$i]]; 
+		} 
+		return $out;
+	} 
+} 
+
+function randmalenames($n=1) { 
+	return randnames($n,0); 
+} 
+function randfemalenames($n=1) { 
+        return randnames($n,1); 
+} 
+function randname() {
+	return randnames(1,2);
+}
+function randmalename() {
+	return randnames(1,0);
+}
+function randfemalename() {
+	return randnames(1,1);
+}
+
+function prettytime($time,$in,$out) {
+	if ($in=='m') {
+		$time *= 60;
+	} else if ($in=='h') {
+		$time *= 60*60;
+	}
+	$hrs = $time/3600;
+	$min = $time/60;
+	$outst = '';
+	if (strpos($out,'clock')!==false) { //clock time
+		$ampm = ($hrs<12?"am":"pm");
+		$hrs = floor($hrs);
+		if ($out=='sclock') {
+			$min = floor($min -60*$hrs);
+			$sec = round($time - 60*$min - 3600*$hrs);
+			if ($min<10) {	$min = '0'.$min;}
+			if ($sec<10) {	$sec = '0'.$sec;}
+			$outst = "$hrs:$min:$sec $ampm";	
+		} else {
+			$min = round($min -60*$hrs);
+			if ($min<10) {	$min = '0'.$min;}
+			$outst = "$hrs:$min $ampm";
+		}
+		return $outst;
+		
+	}
+	if (strpos($out,'h')!==false) { //has hrs
+		if (strpos($out,'m')!==false) { //has min
+			$hrs = floor($hrs);
+			if (strpos($out,'s')!==false) {  //hrs min sec
+				$min = floor($min-60*$hrs);
+				$sec = round($time - 60*$min - 3600*$hrs,4);
+				$outst = "$hrs hour" . ($hrs>1 ? 's':'');
+				$outst .= ", $min minute" . ($min>1 ? 's':'');
+				$outst .= ", and $sec second" . ($sec!=1 ? 's':'');
+			} else { //hrs min
+				$min = round($min - 60*$hrs,4);
+				$outst = "$hrs hour" . ($hrs>1 ? 's':'');
+				$outst .= " and $min minute" . ($min!=1 ? 's':'');
+			}
+		} else { //no min
+			if (strpos($out,'s')!==false) {  //hrs sec
+				$hrs = floor($hrs);
+				$sec = round($time - 3600*$hrs,4);
+				$outst = "$hrs hour" . ($hrs>1 ? 's':'');
+				$outst .= " and $sec second" . ($sec!=1 ? 's':'');
+			} else {//just hrs
+				$hrs = round($hrs,4);
+				$outst = "$hrs hours" . ($hrs!=1 ? 's':'');
+			}
+		}
+	} else { //no hours
+		if (strpos($out,'m')!==false) { //
+			if (strpos($out,'s')!==false) {  //min sec
+				$min = floor($min);
+				$sec = round($time - 60*$min,4);
+				$outst = "$min minute" . ($min>1 ? 's':'');
+				$outst .= " and $sec second" . ($sec!=1 ? 's':'');
+			} else { //min only
+				$min = round($min,4);
+				$outst = "$min minute" . ($min!=1 ? 's':'');
+			}
+		} else if (strpos($out,'s')!==false) {  //sec
+			$time = round($time,4);
+			$outst = "$time second". ($sec!=1 ? 's':'');
+		}
+	}
+	return $outst;
+}
+
 ?>

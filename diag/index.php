@@ -100,7 +100,7 @@ if (isset($_POST['SID'])) {
 	$cnt = 0;
 	$now = time();
 	$_POST['SID'] = str_replace('-','',$_POST['SID']);
-	$query = "SELECT id FROM imas_users WHERE SID='{$_POST['SID']}d$diagqtr'";
+	$query = "SELECT id FROM imas_users WHERE SID='{$_POST['SID']}~$diagqtr'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	if (mysql_num_rows($result)>0) {
 		$allowreentry = ($line['public']&4);

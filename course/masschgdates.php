@@ -21,23 +21,26 @@
 		$blockchg = 0;
 		for ($i=0; $i<$cnt; $i++) {
 			require_once("parsedatetime.php");
-			if ($_POST['sdate'.$i]=='0') {
+			if ($_POST['sdatetype'.$i]=='0') {
 				$startdate = 0;
 			} else {
 				$startdate = parsedatetime($_POST['sdate'.$i],$_POST['stime'.$i]);
 			}
-			if ($_POST['edate'.$i]=='2000000000') {
+			
+			if ($_POST['edatetype'.$i]=='0') {
 				$enddate = 2000000000;
 			} else {
 				$enddate = parsedatetime($_POST['edate'.$i],$_POST['etime'.$i]);
 			}
-			if ($_POST['rdate'.$i]=='0') {
-				$reviewdate = 0;
-			} else if ($_POST['rdate'.$i]=='2000000000') {
-				$reviewdate = 2000000000;
-			} else {
-				$reviewdate = parsedatetime($_POST['rdate'.$i],$_POST['rtime'.$i]);	
+			
+			if (isset($_POST['rdatetype'.$i])) {
+				if ($_POST['rdatetype'.$i]=='0') {
+					$reviewdate = $_POST['rdatean'.$i];
+				} else {
+					$reviewdate = parsedatetime($_POST['rdate'.$i],$_POST['rtime'.$i]);
+				}
 			}
+			
 			$type = $_POST['type'.$i];
 			$id = $_POST['id'.$i];
 			if ($type=='Assessment') {
@@ -93,6 +96,7 @@
 	
 	$pagetitle = "Mass Change Dates";
 	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/masschgdates.js\"></script>";
+	$placeinhead .= "<style>.show {display:inline;} \n .hide {display:none;} img {cursor:pointer;}\n</style>";
 	require("../header.php");
 	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=$cid\">$coursename</a> ";	
 	echo "&gt; Mass Change Dates</div>\n";
@@ -153,6 +157,11 @@
 	echo '</p>';
 	
 	echo "<p><input type=checkbox id=\"onlyweekdays\" checked=\"checked\"> Shift by weekdays only</p>";
+	
+	echo "<p>Once changing dates in one row, you can click <i>Send Down List</i> to send the date change ";
+	echo "difference to all rows below.  Click the <img src=\"$imasroot/img/swap.gif\"> icon in each cell to swap from ";
+	echo "Always/Never to Dates.  Swaps to/from Always/Never cannot be sent down the list.</p>";
+	
 	echo "<form method=post action=\"masschgdates.php?cid=$cid\">";
 	echo '<table class=gb><thead><tr><th>Name</th><th>Type</th><th>Start Date</th><th>End Date</th><th>Review Date</th><th>Send Date Chg Down List</th></thead><tbody>';
 	
@@ -247,12 +256,6 @@
 		$keys = array_keys($names);
 	}
 	foreach ($keys as $i) {
-		$sdate = tzdate("m/d/Y",$startdates[$i]);
-		$stime = tzdate("g:i a",$startdates[$i]);
-		$edate = tzdate("m/d/Y",$enddates[$i]);
-		$etime = tzdate("g:i a",$enddates[$i]);
-		$rdate = tzdate("m/d/Y",$reviewdates[$i]);
-		$rtime = tzdate("g:i a",$reviewdates[$i]);
 		echo '<tr class=grid>';
 		echo "<td>{$names[$i]}<input type=hidden name=\"id$cnt\" value=\"{$ids[$i]}\"/>";
 		echo "<script> basesdates[$cnt] = ";
@@ -275,33 +278,102 @@
 		echo "</td>";
 		
 		
+		echo "<td><img src=\"$imasroot/img/swap.gif\" onclick=\"MCDtoggle('s',$cnt)\"/>";
 		if ($startdates[$i]==0) {
-			echo "<td><input type=hidden id=\"sdate$cnt\" name=\"sdate$cnt\" value=\"0\"/>Always</td>";
+			echo "<input type=hidden id=\"sdatetype$cnt\" name=\"sdatetype$cnt\" value=\"0\"/>";
 		} else {
-			echo "<td><input type=text size=10 id=\"sdate$cnt\" name=\"sdate$cnt\" value=\"$sdate\" onblur=\"ob(this)\"/>(";
-			echo "<span id=\"sd$cnt\">".getshortday($startdates[$i]).'</span>';
-			echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].sdate$cnt,'anchor$cnt','MM/dd/yyyy',document.forms[0].sdate$cnt.value); return false;\" NAME=\"anchor$cnt\" ID=\"anchor$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
-			echo " at <input type=text size=8 id=\"stime$cnt\" name=\"stime$cnt\" value=\"$stime\"></td>";
+			echo "<input type=hidden id=\"sdatetype$cnt\" name=\"sdatetype$cnt\" value=\"1\"/>";
 		}
+		if ($startdates[$i]==0) {
+			echo "<span id=\"sspan0$cnt\" class=\"show\">Always</span>";
+		} else {
+			echo "<span id=\"sspan0$cnt\" class=\"hide\">Always</span>";
+		}
+		if ($startdates[$i]==0) {
+			echo "<span id=\"sspan1$cnt\" class=\"hide\">";
+		} else {
+			echo "<span id=\"sspan1$cnt\" class=\"show\">";
+		}
+		if ($startdates[$i]==0) {
+			$startdates[$i] = time();
+		}
+		$sdate = tzdate("m/d/Y",$startdates[$i]);
+		$stime = tzdate("g:i a",$startdates[$i]);
 		
+		echo "<input type=text size=10 id=\"sdate$cnt\" name=\"sdate$cnt\" value=\"$sdate\" onblur=\"ob(this)\"/>(";
+		echo "<span id=\"sd$cnt\">".getshortday($startdates[$i]).'</span>';
+		echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].sdate$cnt,'anchor$cnt','MM/dd/yyyy',document.forms[0].sdate$cnt.value); return false;\" NAME=\"anchor$cnt\" ID=\"anchor$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
+		echo " at <input type=text size=8 id=\"stime$cnt\" name=\"stime$cnt\" value=\"$stime\">";
+		echo '</span></td>';
+		
+		echo "<td><img src=\"$imasroot/img/swap.gif\"  onclick=\"MCDtoggle('e',$cnt)\"/>";
 		if ($enddates[$i]==2000000000) {
-			echo "<td><input type=hidden id=\"edate$cnt\" name=\"edate$cnt\" value=\"2000000000\"/>Always</td>";
+			echo "<input type=hidden id=\"edatetype$cnt\" name=\"edatetype$cnt\" value=\"0\"/>";
 		} else {
-			echo "<td><input type=text size=10 id=\"edate$cnt\" name=\"edate$cnt\" value=\"$edate\" onblur=\"ob(this)\"/>(";
-			echo "<span id=\"ed$cnt\">".getshortday($enddates[$i]).'</span>';
-			echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].edate$cnt,'anchor2$cnt','MM/dd/yyyy',document.forms[0].edate$cnt.value); return false;\" NAME=\"anchor2$cnt\" ID=\"anchor2$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
-			echo " at <input type=text size=8 id=\"etime$cnt\" name=\"etime$cnt\" value=\"$etime\"></td>";
+			echo "<input type=hidden id=\"edatetype$cnt\" name=\"edatetype$cnt\" value=\"1\"/>";
 		}
-		if ($reviewdates[$i]==0) {
-			echo "<td><input type=hidden id=\"rdate$cnt\" name=\"rdate$cnt\" value=\"0\"/>Never</td>";
-		} else if ($reviewdates[$i]==2000000000) {
-			echo "<td><input type=hidden id=\"rdate$cnt\" name=\"rdate$cnt\" value=\"2000000000\"/>Always</td>";
+		if ($enddates[$i]==2000000000) {
+			echo "<span id=\"espan0$cnt\" class=\"show\">Always</span>";
 		} else {
-			echo "<td><input type=text size=10 id=\"rdate$cnt\" name=\"rdate$cnt\" value=\"$rdate\" onblur=\"ob(this)\"/>(";
+			echo "<span id=\"espan0$cnt\" class=\"hide\">Always</span>";
+		}
+		if ($enddates[$i]==2000000000) {
+			echo "<span id=\"espan1$cnt\" class=\"hide\">";
+		} else {
+			echo "<span id=\"espan1$cnt\" class=\"show\">";
+		}
+		if ($enddates[$i]==2000000000) {
+			$enddates[$i]  = $startdates[$i] + 7*24*60*60;
+		}
+		$edate = tzdate("m/d/Y",$enddates[$i]);
+		$etime = tzdate("g:i a",$enddates[$i]);
+		
+		echo "<input type=text size=10 id=\"edate$cnt\" name=\"edate$cnt\" value=\"$edate\" onblur=\"ob(this)\"/>(";
+		echo "<span id=\"ed$cnt\">".getshortday($enddates[$i]).'</span>';
+		echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].edate$cnt,'anchor2$cnt','MM/dd/yyyy',document.forms[0].edate$cnt.value); return false;\" NAME=\"anchor2$cnt\" ID=\"anchor2$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
+		echo " at <input type=text size=8 id=\"etime$cnt\" name=\"etime$cnt\" value=\"$etime\">";
+		echo '</span></td>';
+				
+		echo "<td>";
+		if ($types[$i]=='Assessment') {
+			echo "<img src=\"$imasroot/img/swap.gif\"  onclick=\"MCDtoggle('r',$cnt)\"/>";
+			if ($reviewdates[$i]==0 || $reviewdates[$i]==2000000000) {
+				echo "<input type=hidden id=\"rdatetype$cnt\" name=\"rdatetype$cnt\" value=\"0\"/>";
+			} else {
+				echo "<input type=hidden id=\"rdatetype$cnt\" name=\"rdatetype$cnt\" value=\"1\"/>";
+			}
+			if ($reviewdates[$i]==0 || $reviewdates[$i]==2000000000) {
+				echo "<span id=\"rspan0$cnt\" class=\"show\">";
+			} else {
+				echo "<span id=\"rspan0$cnt\" class=\"hide\">";
+			}
+			echo "<input type=radio name=\"rdatean$cnt\" value=\"0\" ";
+			if ($reviewdates[$i]!=2000000000) {
+				echo 'checked=1';
+			} 
+			echo " />Never <input type=radio name=\"rdatean$cnt\" value=\"2000000000\" ";
+			if ($reviewdates[$i]==2000000000) {
+				echo 'checked=1';
+			} 
+			echo " />Always</span>";
+			
+			if ($reviewdates[$i]==0 || $reviewdates[$i]==2000000000) {
+				echo "<span id=\"rspan1$cnt\" class=\"hide\">";
+			} else {
+				echo "<span id=\"rspan1$cnt\" class=\"show\">";
+			}
+			if ($reviewdates[$i]==0 || $reviewdates[$i]==2000000000) {
+				$reviewdates[$i] = $enddates[$i] + 7*24*60*60;
+			}
+			$rdate = tzdate("m/d/Y",$reviewdates[$i]);
+			$rtime = tzdate("g:i a",$reviewdates[$i]);
+		
+			echo "<input type=text size=10 id=\"rdate$cnt\" name=\"rdate$cnt\" value=\"$rdate\" onblur=\"ob(this)\"/>(";
 			echo "<span id=\"rd$cnt\">".getshortday($reviewdates[$i]).'</span>';
 			echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].rdate$cnt,'anchor3$cnt','MM/dd/yyyy',document.forms[0].rdate$cnt.value); return false;\" NAME=\"anchor3$cnt\" ID=\"anchor3$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
-			echo " at <input type=text size=8 id=\"rtime$cnt\" name=\"rtime$cnt\" value=\"$rtime\"></td>";
+			echo " at <input type=text size=8 id=\"rtime$cnt\" name=\"rtime$cnt\" value=\"$rtime\"></span>";
 		}
+		echo '</td>';
 		echo "<td><input type=button value=\"Send Down List\" onclick=\"senddown($cnt)\"/></td>";
 		echo "</tr>";
 		$cnt++;

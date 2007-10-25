@@ -169,7 +169,9 @@ function printscore($sc,$poss) {
 function scorequestion($qn) { 
 	global $questions,$scores,$seeds,$testsettings,$qi,$attempts,$lastanswers,$isreview,$bestseeds,$bestscores,$bestattempts,$bestlastanswers;
 	//list($qsetid,$cat) = getqsetid($questions[$qn]);
-	$scores[$qn] = calcpointsafterpenalty(scoreq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$_POST["qn$qn"]),$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
+	$rawscore = scoreq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$_POST["qn$qn"]);
+	$scores[$qn] = calcpointsafterpenalty($rawscore,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
+	$rawscore = calcpointsafterpenalty($rawscore,$qi[$questions[$qn]],$testsettings,0);
 	$attempts[$qn]++;
 	
 	if (getpts($scores[$qn])>=getpts($bestscores[$qn]) && !$isreview) {
@@ -178,6 +180,7 @@ function scorequestion($qn) {
 		$bestattempts[$qn] = $attempts[$qn];
 		$bestlastanswers[$qn] = $lastanswers[$qn];
 	}
+	return $rawscore;
 }
 
 //records everything but questions array
@@ -235,11 +238,34 @@ function canimprove($qn) {
 	return false;
 }
 
+//can improve question bestscore?
+function canimprovebest($qn) {
+	global $qi,$bestscores,$scores,$attempts,$questions,$testsettings;	
+	$remainingposs = getremainingpossible($qi[$questions[$qn]],$testsettings,$attempts[$qn]);
+	if (hasreattempts($qn)) {
+		if (getpts($bestscores[$qn])<$remainingposs) {
+			return true;
+		} 
+	}
+	return false;
+}
+
 //do more attempts remain?
 function hasreattempts($qn) {
 	global $qi,$attempts,$questions,$testsettings;	
 	if ($attempts[$qn]<$qi[$questions[$qn]]['attempts'] || $qi[$questions[$qn]]['attempts']==0) {
 		return true;
+	}
+	return false;
+}
+
+//do any questions have attempts remaining?
+function hasreattemptsany() {
+	global $questions;
+	for ($i=0;$i<count($questions);$i++) {
+		if (hasreattempts($i)) {
+			return true;
+		}
 	}
 	return false;
 }
@@ -287,10 +313,10 @@ function showqinfobar($qn,$inreview,$single) {
 		echo 'Points available on this attempt: '.$pointsremaining.' of original '.$qi[$questions[$qn]]['points'];
 	}
 	if ($qi[$questions[$qn]]['attempts']==0) {
-		echo "<br/>Unlimited attempts while score can be improved";
+		echo "<br/>Unlimited attempts.";
 	} else {
 		//echo '<br/>'.($qi[$questions[$qn]]['attempts']-$attempts[$qn])." attempts of ".$qi[$questions[$qn]]['attempts']." remaining.";
-		echo "<br/>This is attempt ".($attempts[$qn]+1)." of " . $qi[$questions[$qn]]['attempts'] . " available while score can be improved";
+		echo "<br/>This is attempt ".($attempts[$qn]+1)." of " . $qi[$questions[$qn]]['attempts'] . ".";
 	}
 	if ($testsettings['showcat']>0 && $qi[$questions[$qn]]['category']!='0') {
 		echo "  Category: {$qi[$questions[$qn]]['category']}.";
@@ -302,6 +328,29 @@ function showqinfobar($qn,$inreview,$single) {
 	}
 	if ($inreview) {
 		echo '</div>';
+	}
+}
+
+//shows start of test message if no reattempts
+function startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$noscores) {
+	if ($perfectscore && !$noscores) {
+		echo "<p>Assessment is complete with perfect score.</p>";
+	}
+	if ($hasreattempts) {
+		if ($noindivscores) {
+			echo "<p><a href=\"showtest.php?reattempt=all\">Reattempt test</a> on questions allowed (note: all scores, correct and incorrect, will be cleared)</p>";
+		} else {
+			echo "<p><a href=\"showtest.php?reattempt=all\">Reattempt test</a> on questions missed where allowed</p>";
+		}
+	} else {
+		echo "<p>No attempts left on current versions of questions.</p>\n";
+	}
+	if ($allowregen) {
+		if ($perfectscore) {
+			echo "<p><a href=\"showtest.php?regenall=all\">Try similar problems</a> for all questions.</p>";
+		} else {
+			echo "<p><a href=\"showtest.php?regenall=missed\">Try similar problems</a> for all questions with less than perfect scores.</p>";
+		}
 	}
 }
 ?>

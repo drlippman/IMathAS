@@ -729,6 +729,8 @@
 		$row = mysql_fetch_row($result);
 		echo "<h3>{$row[1]}, {$row[0]}</h3>\n";
 		
+		$teacherreview = $_GET['uid'];
+		
 		$query = "SELECT imas_assessments.name,imas_assessments.timelimit,imas_assessments.defpoints,";
 		$query .= "imas_assessments.deffeedback,imas_assessments.enddate,imas_assessment_sessions.* ";
 		$query .= "FROM imas_assessments,imas_assessment_sessions ";
@@ -1291,10 +1293,20 @@
 			$cntingb[$kcnt] = $line['cntingb']; //0: ignore, 1: count, 2: extra credit, 3: no count but show
 			
 			$aitems = explode(',',$line['itemorder']);
+			$aitemcnt = array();
 			foreach ($aitems as $k=>$v) {
 				if (strpos($v,'~')!==FALSE) {
 					$sub = explode('~',$v);
-					$aitems[$k] = $sub[0];
+					if (strpos($sub[0],'|')===false) { //backwards compat
+						$aitems[$k] = $sub[0];
+						$aitemcnt[$k] = 1;
+					} else {
+						$grpparts = explode('|',$sub[0]);
+						$aitems[$k] = $sub[1];
+						$aitemcnt[$k] = $grpparts[0];
+					}
+				} else {
+					$aitemcnt[$k] = 1;
 				}
 			}
 			
@@ -1302,11 +1314,12 @@
 			$result2 = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 			$totalpossible = 0;
 			while ($r = mysql_fetch_row($result2)) {
-				if (in_array($r[1],$aitems)) { //only use first item from grouped questions for total pts
+				if (in_array($r[1],$aitems)) {
+					$k = array_search($r[1],$aitems);
 					if ($r[0]==9999) {
-						$totalpossible += $line['defpoints']; //use defpoints
+						$totalpossible += $aitemcnt[$k]*$line['defpoints']; //use defpoints
 					} else {
-						$totalpossible += $r[0]; //use points from question
+						$totalpossible += $aitemcnt[$k]*$r[0]; //use points from question
 					}
 				}
 			}
@@ -1343,6 +1356,27 @@
 			$possible[$kcnt] = $line['points'];
 			$name[$kcnt] = $line['name'];
 			$cntingb[$kcnt] = $line['cntingb'];
+			$kcnt++;
+		}
+		
+		//Pull Discussion Grade info
+		$query = "SELECT id,name,gbcategory,enddate,points FROM imas_forums WHERE courseid='$cid' AND points>0 ";
+		if (!$isteacher || $curonly) {
+			$query .= "AND startdate<$now ";
+		}
+		if ($catfilter>-1) {
+			$query .= "AND gbcategory='$catfilter' ";
+		}
+		$query .= "ORDER BY enddate";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+			$discuss[$kcnt] = $line['id'];
+			$assessmenttype[$kcnt] = "Discussion";
+			$category[$kcnt] = $line['gbcategory'];
+			$enddate[$kcnt] = $line['enddate'];
+			$possible[$kcnt] = $line['points'];
+			$name[$kcnt] = $line['name'];
+			$cntingb[$kcnt] = 1;
 			$kcnt++;
 		}
 		
@@ -1424,6 +1458,8 @@
 							$gb[0][$pos] .= "<br/><a class=small href=\"addassessment.php?id={$assessments[$k]}&cid=$cid&from=gb\">[Settings]</a>";
 						} else if (isset($grades[$k])) {
 							$gb[0][$pos] .= "<br/><a class=small href=\"addgrades.php?stu=$stu&cid=$cid&gbmode=$gbmode&grades=all&gbitem={$grades[$k]}\">[Settings]</a>";
+						} else if (isset($discuss[$k])) {
+							$gb[0][$pos] .= "<br/><a class=small href=\"addforum.php?id={$discuss[$k]}&cid=$cid&from=gb\">[Settings]</a>";
 						}
 					}
 					$pos++;
@@ -1610,6 +1646,13 @@
 				$opts[$r[0]] = $r[2];
 				$gfeedback[$r[0]] = $r[3];
 			}
+			//Get discussion grades
+			unset($discusspts);
+			$query = "SELECT forumid,SUM(points) FROM imas_forum_posts WHERE userid='{$line['id']}' GROUP BY forumid ";
+			$result2 = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			while ($r = mysql_fetch_row($result2)) {
+				$discusspts[$r[0]] = $r[1];
+			}
 			
 			//Create student GB row
 			unset($cattot);
@@ -1643,6 +1686,14 @@
 						} else {
 							$gb[$ln][$pos] = '-';
 						}
+					}
+				} else if ($assessmenttype[$i]=='Discussion') { //is discussion grade
+					if (isset($discusspts[$discuss[$i]])) {
+						$gb[$ln][$pos] = $discusspts[$discuss[$i]];
+						$atots[$pos][] = $discusspts[$discuss[$i]];
+						$cattot[$category[$i]][] = $discusspts[$discuss[$i]];
+					} else {
+						$gb[$ln][$pos] = '-';
 					}
 				} else if (isset($asid[$assessments[$i]])) {
 					if (!$isteacher) {

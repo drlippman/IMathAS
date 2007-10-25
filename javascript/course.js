@@ -41,7 +41,8 @@ var loadedblocks = new Array();
 
 function toggleblock(bnum,folder) {
       var node = document.getElementById('block'+bnum);
-      var butn = document.getElementById('but'+bnum);
+      //var butn = document.getElementById('but'+bnum);
+      var img = document.getElementById('img'+bnum);
       oblist = oblist.split(',');
       var loc = arraysearch(bnum,oblist);
       if (node.className == 'blockitems') {
@@ -49,14 +50,20 @@ function toggleblock(bnum,folder) {
 	  	loadedblocks.push(bnum);
 	  }
           node.className = 'hidden';
-          butn.value = 'Expand';
+          //butn.value = 'Expand';
+	  if (img != null) {
+		  img.src = imasroot+'/img/expand.gif';
+	  }
           if (loc>-1) {oblist.splice(loc,1);}
       } else { 
           if (arraysearch(bnum,loadedblocks)==-1) {
 	  	ahah(getbiaddr+folder,'block'+bnum);
 	  }
           node.className = 'blockitems';
-          butn.value = 'Collapse';
+          //butn.value = 'Collapse';
+	  if (img != null) {
+		  img.src = imasroot+'/img/collapse.gif';
+	  }
           if (loc==-1) {oblist.push(bnum);} 
       }
       oblist = oblist.join(',');

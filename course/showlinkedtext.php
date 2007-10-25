@@ -2,7 +2,7 @@
 //IMathAS:  Displays a linked text item
 //(c) 2006 David Lippman
 	require("../validate.php");
-	if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
+	if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($guestid)) {
 	   require("../header.php");
 	   echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
 	   require("../footer.php");

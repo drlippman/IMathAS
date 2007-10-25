@@ -188,7 +188,7 @@ switch($_GET['action']) {
 		if (($hideicons&8)==8) { echo "checked=1";}
 		echo '/> Hide<br/>';
 		
-		echo 'Folders: <input type=radio name="HIblock" value="0" ';
+		echo 'Blocks: <input type=radio name="HIblock" value="0" ';
 		if (($hideicons&16)==0) { echo "checked=1";}     
 		echo '/> Show <input type=radio name="HIblock" value="16" ';
 		if (($hideicons&16)==16) { echo "checked=1";}
@@ -283,7 +283,7 @@ switch($_GET['action']) {
 			if ($used[$line['id']]!=true) {
 				if ($line['rights']<20) { $type = "Tutor/TA/Proctor";} else {$type = "Teacher";}
 				echo "<tr><td>{$line['LastName']}, {$line['FirstName']} </td> ";
-				echo "<td><A href=\"actions.php?action=addteacher&cid={$_GET['id']}&tid={$line['id']}\">Add as $type</a></td></tr>\n";
+				echo "<td><a href=\"actions.php?action=addteacher&cid={$_GET['id']}&tid={$line['id']}\">Add as $type</a></td></tr>\n";
 			}
 		}
 		echo "</table>\n";
@@ -307,6 +307,7 @@ switch($_GET['action']) {
 		if ($myrights < 100) {
 			$query .= " AND groupid='$groupid'";
 		}
+		$query .= " ORDER BY LastName";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
 			echo "<option value=\"$row[0]\">$row[2], $row[1]</option>\n";

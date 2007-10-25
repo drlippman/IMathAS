@@ -19,6 +19,25 @@
 	
 	$cid = $_GET['cid'];
 	$forumid = $_GET['forum'];
+	if (!isset($_GET['page']) || $_GET['page']=='') {
+		$page = 1;
+	} else {
+		$page = $_GET['page'];
+	}
+	
+	if ($isteacher && isset($_POST['score'])) {
+		foreach($_POST['score'] as $k=>$v) {
+			if (is_numeric($v)) {
+				$query = "UPDATE imas_forum_posts SET points='$v' WHERE id='$k'";
+				mysql_query($query) or die("Query failed : $query " . mysql_error());
+			} else {
+				$query = "UPDATE imas_forum_posts SET points=NULL WHERE id='$k'";
+				mysql_query($query) or die("Query failed : $query " . mysql_error());
+			}
+		}
+		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
+		exit;	
+	}
 	$query = "SELECT name,postby,settings,grpaid FROM imas_forums WHERE id='$forumid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$forumname = mysql_result($result,0,0);
@@ -65,11 +84,7 @@
 	
 	
 	
-	if (!isset($_GET['page']) || $_GET['page']=='') {
-		$page = 1;
-	} else {
-		$page = $_GET['page'];
-	}
+	
 	if (isset($_GET['search']) && trim($_GET['search'])!='') {
 		require("../header.php");
 		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
@@ -299,6 +314,8 @@
 	
 	$pagetitle = "Threads";
 	$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/thread.js\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = 'http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savetagged.php?cid=$cid';</script>";
 	require("../header.php");
 	
 	
@@ -314,18 +331,23 @@
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$postcount = array();
 	$maxdate = array();
+	
 	while ($row = mysql_fetch_row($result)) {
 		$postcount[$row[0]] = $row[1] -1;
 		$maxdate[$row[0]] = $row[2];
 	}
 	
-	$query = "SELECT threadid,lastview FROM imas_forum_views WHERE userid='$userid'";
+	$query = "SELECT threadid,lastview,tagged FROM imas_forum_views WHERE userid='$userid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$lastview = array();
+	$tags = array();
 	while ($row = mysql_fetch_row($result)) {
 		$lastview[$row[0]] = $row[1];
+		if ($row[2]==1) {
+			$tags[$row[0]] = 1;
+		}
 	}
-	
+	$taggedlist = implode(',',array_keys($tags));
 	//make new list
 	$newpost = array();
 	foreach (array_keys($maxdate) as $tid) {
@@ -335,6 +357,8 @@
 	}
 	$newpostlist = implode(',',$newpost);
 	if ($page==-1 && count($newpost)==0) {
+		$page = 1;
+	} else if ($page==-2 && count($tags)==0) {
 		$page = 1;
 	}
 	
@@ -422,14 +446,19 @@
 	if ($isteacher) {
 		echo " | <a href=\"postsbyname.php?page=$page&cid=$cid&forum=$forumid\">List Posts by Name</a>";
 	}
-	if (count($newpost)>0) {
-		if ($page==-1) {
-			echo " | <a href=\"thread.php?cid=$cid&forum=$forumid&page=1\">Show All</a>";
-		} else {
+	
+	if ($page<0) {
+		echo " | <a href=\"thread.php?cid=$cid&forum=$forumid&page=1\">Show All</a>";
+	} else {
+		if (count($newpost)>0) {
 			echo " | <a href=\"thread.php?cid=$cid&forum=$forumid&page=-1\">Limit to New</a>";
-		} 
+		}
+		echo " | <a href=\"thread.php?cid=$cid&forum=$forumid&page=-2\">Limit to Flagged</a>";
+	} 
+	if (count($newpost)>0) {
 		echo " | <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid&markallread=true\">Mark all Read</a>";
 	}
+	
 	echo "</p>";
 	
 ?>
@@ -449,6 +478,8 @@
 	}
 	if ($page==-1) {
 		$query .= "AND imas_forum_posts.threadid IN ($newpostlist) ";
+	} else if ($page==-2) {
+		$query .= "AND imas_forum_posts.threadid IN ($taggedlist) ";
 	}
 	$query .= "GROUP BY imas_forum_posts.id";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -463,10 +494,12 @@
 	}
 	if ($page==-1) {
 		$query .= "AND imas_forum_posts.threadid IN ($newpostlist) ";
+	} else if ($page==-2) {
+		$query .= "AND imas_forum_posts.threadid IN ($taggedlist) ";
 	}
 	$query .= "ORDER BY imas_forum_posts.posttype DESC,imas_forum_posts.id DESC ";
 	$offset = ($page-1)*$threadsperpage;
-	if ($page!=-1) {
+	if ($page>0) {
 		$query .= "LIMIT $offset,$threadsperpage";// OFFSET $offset";
 	}
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -478,12 +511,21 @@
 			$posts = 0;
 			$lastpost = '';
 		}
-		echo "<tr ";
+		echo "<tr id=\"tr{$line['id']}\"";
 		if ($line['posttype']>0) {
 			echo "class=sticky";
+		} else if (isset($tags[$line['id']])) {
+			echo "class=tagged";
 		}
 		echo "><td>";
 		echo "<span class=right>\n";
+		if ($line['posttype']==0) {
+			if (isset($tags[$line['id']])) {
+				echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged({$line['id']});return false;\" />";
+			} else {
+				echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggletagged({$line['id']});return false;\" />";
+			}
+		}
 		if ($isteacher || ($line['userid']==$userid && $allowmod)) {
 			echo "<a href=\"thread.php?page=$page&cid=$cid&forum=$forumid&modify={$line['id']}\">Modify</a> ";
 		} 

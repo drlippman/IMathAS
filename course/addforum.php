@@ -100,16 +100,19 @@
 			$postby = parsedatetime($_POST['postbydate'],$_POST['postbytime']);
 		}
 			
+		if ($_POST['cntingb']==0) {
+			$_POST['points'] = 0;
+		}
 		
 		if (isset($_GET['id'])) {  //already have id; update
 		$query = "UPDATE imas_forums SET name='{$_POST['name']}',description='{$_POST['description']}',startdate=$startdate,enddate=$enddate,settings=$fsets,";
-		$query .= "defdisplay='{$_POST['defdisplay']}',replyby=$replyby,postby=$postby,grpaid='{$_POST['grpaid']}' ";
+		$query .= "defdisplay='{$_POST['defdisplay']}',replyby=$replyby,postby=$postby,grpaid='{$_POST['grpaid']}',points='{$_POST['points']}',gbcategory='{$_POST['gbcat']}' ";
 		$query .= "WHERE id='{$_GET['id']}';";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$newforumid = $_GET['id'];
 		} else { //add new
-		$query = "INSERT INTO imas_forums (courseid,name,description,startdate,enddate,settings,defdisplay,replyby,postby,grpaid) VALUES ";
-		$query .= "('$cid','{$_POST['name']}','{$_POST['description']}',$startdate,$enddate,$fsets,'{$_POST['defdisplay']}',$replyby,$postby,'{$_POST['grpaid']}');";
+		$query = "INSERT INTO imas_forums (courseid,name,description,startdate,enddate,settings,defdisplay,replyby,postby,grpaid,points,gbcategory) VALUES ";
+		$query .= "('$cid','{$_POST['name']}','{$_POST['description']}',$startdate,$enddate,$fsets,'{$_POST['defdisplay']}',$replyby,$postby,'{$_POST['grpaid']}','{$_POST['points']}','{$_POST['gbcat']}');";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		
 		$newforumid = mysql_insert_id();
@@ -170,6 +173,8 @@
 			$replyby = $line['replyby'];
 			$postby = $line['postby'];
 			$grpaid = $line['grpaid'];
+			$points = $line['points'];
+			$gbcat = $line['gbcategory'];
 		} else {
 			//set defaults
 			$line['name'] = "Enter Forum Name here";
@@ -183,6 +188,8 @@
 			$postby = 2000000000;
 			$hassubscrip = false;
 			$grpaid = 0;
+			$points = 0;
+			$gbcat = 0;
 		}   
 		if ($startdate!=0) {
 			$sdate = tzdate("m/d/Y",$startdate);
@@ -300,6 +307,35 @@ at <input type=text size=10 name=replybytime value="<?php echo $replybytime;?>">
 <input type=text size=10 name=postbydate value="<?php echo $postbydate;?>">
 <A HREF="#" onClick="cal1.select(document.forms[0].postbydate,'anchor4','MM/dd/yyyy',(document.forms[0].postbydate.value=='<?php echo $postbydate;?>')?(document.forms[0].postby.value):(document.forms[0].postby.value)); return false;" NAME="anchor4" ID="anchor4"><img src="../img/cal.gif" alt="Calendar"/></A>
 at <input type=text size=10 name=postbytime value="<?php echo $postbytime;?>"></span><br class="form"/>
+
+<span class="form">Count in gradebook?</span>
+	<span class="formright">
+		<input type=radio name="cntingb" value="0" <?php if ($points==0) { echo 'checked=1';}?>/>No<br/>
+		<input type=radio name="cntingb" value="1" <?php if ($points!=0) { echo 'checked=1';}?>/>Yes, <input type=text size=4 name="points" value="<?php echo $points;?>"/> points
+	</span><br class="form"/>
+
+<?php
+	$query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid'";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	echo "<span class=form>Gradebook Category:</span><span class=formright><select name=gbcat id=gbcat>\n";
+	echo "<option value=\"0\" ";
+	if ($gbcat==0) {
+		echo "selected=1 ";
+	}
+	echo ">Default</option>\n";
+	if (mysql_num_rows($result)>0) {
+		
+		while ($row = mysql_fetch_row($result)) {
+			echo "<option value=\"{$row[0]}\" ";
+			if ($gbcat==$row[0]) {
+				echo "selected=1 ";
+			}
+			echo ">{$row[1]}</option>\n";
+		}
+		
+	}	
+	echo "</select></span><br class=form>\n";
+?>
 
 <div class=submit><input type=submit value=Submit></div>
 

@@ -31,6 +31,9 @@
 		while (($data = fgetcsv($handle,2096))!==false) {
 			$arr = parsecsv($data);
 			addslashes_deep($arr);
+			if (trim($arr[0])=='' || trim($arr[0])=='_') {
+				continue;
+			}
 			$query = "SELECT id FROM imas_users WHERE SID='$arr[0]'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (mysql_num_rows($result)>0) {
@@ -47,6 +50,10 @@
 					} else if ($_POST['pwtype']==2) {
 						$pw = md5($_POST['defpw']);
 					} else if ($_POST['pwtype']==3) {
+						if (trim($arr[6])) {
+							echo "Password for {$arr[0]} is blank; skipping import<br/>";
+							continue;
+						}
 						$pw = md5($arr[6]);
 					}
 				}

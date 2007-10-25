@@ -24,11 +24,11 @@ function clearcanvas(tarnum) {
 	dragObj = null;
 }
 
-function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,defmode) {
+function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,defmode,dotline) {
 	var tarel = document.getElementById(target);
 	var tarpos = getPosition(tarel);
 	
-	targets[tarnum] = {el: tarel, left: tarpos.x, top: tarpos.y, width: tarel.offsetWidth, height: tarel.offsetHeight, xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax, imgborder: imgborder, mode: defmode};
+	targets[tarnum] = {el: tarel, left: tarpos.x, top: tarpos.y, width: tarel.offsetWidth, height: tarel.offsetHeight, xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax, imgborder: imgborder, mode: defmode, dotline: dotline};
 	targetOuts[tarnum] = document.getElementById(formel);
 	if (lines[tarnum]==null) {lines[tarnum] = new Array();}
 	if (dots[tarnum]==null) {dots[tarnum] = new Array();}
@@ -54,6 +54,9 @@ function settool(curel,tarnum,mode) {
 }
 function setDrawMode(tarnum,mode) {
 	targets[tarnum].mode = mode;
+}
+function setDotLine(tarnum,onoff) {
+	targets[tarnum].dotline = onoff;
 }
 
 function drawTarget(x,y) {
@@ -94,6 +97,20 @@ function drawTarget(x,y) {
 		ctx.arc(dots[curTarget][i][0],dots[curTarget][i][1],5,0,Math.PI*2,true);
 	}
 	ctx.fill();
+	if (targets[curTarget].dotline==true) {
+		ctx.beginPath();
+		for (var i=0;i<lines[curTarget].length; i++) {
+			for (var j=0;j<lines[curTarget][i].length; j++) {
+				if ((i==0 && j==0) || Math.pow((lines[curTarget][i][j][0] - lines[curTarget][i][0][0]),2)+Math.pow((lines[curTarget][i][j][1] - lines[curTarget][i][0][1]),2)>25) {
+					ctx.moveTo(lines[curTarget][i][j][0]+5,lines[curTarget][i][j][1]);
+					ctx.arc(lines[curTarget][i][j][0],lines[curTarget][i][j][1],5,0,Math.PI*2,true);
+				}
+			}
+		}
+		ctx.fill();
+	}
+	//ctx.beginPath();
+	
 	
 	encodeDraw();
 	//targetOuts[curTarget].value =  php_serialize(lines[curTarget]) + ';;'+php_serialize(dots[curTarget])+ ';;'+php_serialize(odots[curTarget]);
@@ -429,7 +446,7 @@ function initCanvases() {
 			dots[canvases[i][0]] = drawla[i][1];
 			odots[canvases[i][0]] = drawla[i][2];
 		}
-		addTarget(canvases[i][0],'canvas'+canvases[i][0],imasroot+'/filter/graph/imgs/'+canvases[i][1],'qn'+canvases[i][0],canvases[i][2],canvases[i][3],canvases[i][4],canvases[i][5],canvases[i][6],canvases[i][7]);
+		addTarget(canvases[i][0],'canvas'+canvases[i][0],imasroot+'/filter/graph/imgs/'+canvases[i][1],'qn'+canvases[i][0],canvases[i][2],canvases[i][3],canvases[i][4],canvases[i][5],canvases[i][6],canvases[i][7],canvases[i][8]);
 	}
 }
 

@@ -32,13 +32,14 @@
 		}
 	}
 	
-	$query = "SELECT settings,replyby,defdisplay,name FROM imas_forums WHERE id='$forumid'";
+	$query = "SELECT settings,replyby,defdisplay,name,points FROM imas_forums WHERE id='$forumid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$forumsettings = mysql_result($result,0,0);
 	$allowreply = ($isteacher || (time()<mysql_result($result,0,1)));
 	$allowanon = (($forumsettings&1)==1);
 	$allowmod = ($isteacher || (($forumsettings&2)==2));
 	$allowdel = ($isteacher || (($forumsettings&4)==4));
+	$haspoints = (mysql_result($result,0,4)>0);
 	
 	$caller = "byname";
 	include("posthandler.php");
@@ -96,6 +97,11 @@
 	$cnt = 0;
 	echo "<input type=\"button\" value=\"Expand All\" onclick=\"toggleshowall()\" id=\"toggleall\"/> ";
 	echo "<a href=\"postsbyname.php?cid=$cid&forum=$forumid&markallread=true\">Mark all Read</a><br/>";
+	
+	if ($isteacher && $haspoints) {
+		echo "<form method=post action=\"thread.php?cid=$cid&forum=$forumid&page=$page&score=true\">";
+	}
+	
 	while ($line =  mysql_fetch_array($result, MYSQL_ASSOC)) {
 		if ($line['userid']!=$laststu) {
 			if ($laststu!=-1) {
@@ -111,6 +117,17 @@
 		}
 		
 		echo '<span class="right">';
+		if ($haspoints) {
+			if ($isteacher) {
+				echo "<input type=text size=2 name=\"score[{$line['id']}]\" value=\"";
+				if ($line['points']!=null) {
+					echo $line['points'];
+				}
+				echo "\"/> Pts. ";
+			} else if ($line['ownerid']==$userid && $line['points']!=null) {
+				echo "<span class=red>{$points[$child]}</span> ";
+			}
+		}
 		echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread={$line['threadid']}\">Thread</a> ";
 		if ($isteacher || ($line['ownerid']==$userid && $allowmod)) {
 			echo "<a href=\"postsbyname.php?cid=$cid&forum=$forumid&thread={$line['threadid']}&modify={$line['id']}\">Modify</a> \n";
@@ -138,6 +155,10 @@
 	}
 	echo '</div>';
 	echo "<script>var bcnt = $cnt;</script>";
+	if ($isteacher && $haspoints) {
+		echo "<div><input type=submit value=\"Save Grades\" /></div>";
+		echo "</form>";
+	}
 	
 	echo "<p>Color code<br/>Black: New thread</br><span style=\"color:green;\">Green: Reply</span></p>";
 	

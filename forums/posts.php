@@ -20,7 +20,7 @@
 	$threadid = $_GET['thread'];
 	$page = $_GET['page'];
 	
-	$query = "SELECT settings,replyby,defdisplay,name FROM imas_forums WHERE id='$forumid'";
+	$query = "SELECT settings,replyby,defdisplay,name,points FROM imas_forums WHERE id='$forumid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$forumsettings = mysql_result($result,0,0);
 	$allowreply = ($isteacher || (time()<mysql_result($result,0,1)));
@@ -28,6 +28,7 @@
 	$allowanon = (($forumsettings&1)==1);
 	$allowmod = ($isteacher || (($forumsettings&2)==2));
 	$allowdel = ($isteacher || (($forumsettings&4)==4));
+	$haspoints = (mysql_result($result,0,4) > 0);
 	$forumname = mysql_result($result,0,3);
 	
 		
@@ -86,6 +87,7 @@
 		$message[$line['id']] = $line['message'];
 		$posttype[$line['id']] = $line['posttype'];
 		$ownerid[$line['id']] = $line['userid'];
+		$points[$line['id']] = $line['points'];
 		if ($line['isanon']==1) {
 			$poster[$line['id']] = "Anonymous";
 			$ownerid[$line['id']] = 0;
@@ -183,11 +185,22 @@
 	$bcnt = 0;
 	$icnt = 0;
 	function printchildren($base) {
-		global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$posttype,$lastview,$bcnt,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$view,$page,$allowmsg;
+		global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points,$posttype,$lastview,$bcnt,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$view,$page,$allowmsg,$haspoints;
 		foreach($children[$base] as $child) {
 			echo "<div class=block> ";
 			if ($view==2) {
 				echo "<span class=right>";
+				if ($haspoints) {
+					if ($isteacher) {
+						echo "<input type=text size=2 name=\"score[$child]\" value=\"";
+						if ($points[$child]!=null) {
+							echo $points[$child];
+						}
+						echo "\"/> Pts. ";
+					} else if ($ownerid[$child]==$userid && $points[$child]!=null) {
+						echo "<span class=red>{$points[$child]} points</span> ";
+					}
+				}
 				echo "<input type=button id=\"buti$icnt\" value=\"Show\" onClick=\"toggleitem($icnt)\">\n";
 				
 				if ($isteacher || ($ownerid[$child]==$userid && $allowmod)) {
@@ -218,6 +231,7 @@
 				if ($date[$child]>$lastview) {
 					echo " <span style=\"color:red;\">New</span>\n";
 				}
+				
 				echo "</div>\n";
 				echo "<div class=hidden id=\"item$icnt\">";
 				
@@ -233,6 +247,17 @@
 				}
 			} else {
 				echo "<span class=right>";
+				if ($haspoints) {
+					if ($isteacher) {
+						echo "<input type=text size=2 name=\"score[$child]\" value=\"";
+						if ($points[$child]!=null) {
+							echo $points[$child];
+						}
+						echo "\"/> Pts. ";
+					} else if ($ownerid[$child]==$userid && $points[$child]!=null) {
+						echo "<span class=red>{$points[$child]} points</span> ";
+					}
+				}
 				if (isset($children[$child])) {
 					echo "<input type=button id=\"butb$bcnt\" value=\"Collapse\" onClick=\"toggleshow($bcnt)\">\n";
 				}
@@ -261,6 +286,7 @@
 				if ($date[$child]>$lastview) {
 					echo " <span style=\"color:red;\">New</span>\n";
 				}
+				
 				echo "</div>\n";
 				echo "<div class=blockitems>";
 				echo filter($message[$child]);
@@ -280,7 +306,14 @@
 			}
 		}
 	}
+	if ($isteacher && $haspoints) {
+		echo "<form method=post action=\"thread.php?cid=$cid&forum=$forumid&page=$page&score=true\">";
+	}
 	printchildren(0);
+	if ($isteacher && $haspoints) {
+		echo "<div><input type=submit value=\"Save Grades\" /></div>";
+		echo "</form>";
+	}
 	echo "<script type=\"text/javascript\">";
 	echo "var bcnt =".$bcnt.";\n";
 	echo "</script>";

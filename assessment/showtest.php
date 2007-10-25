@@ -3,6 +3,9 @@
 //(c) 2006 David Lippman
 
 	require("../validate.php");
+	if (isset($guestid)) {
+		$teacherid=$guestid;
+	}
 	if (!isset($sessiondata['sessiontestid']) && !isset($teacherid) && !isset($studentid)) {
 		echo "<html><body>";
 
@@ -12,6 +15,7 @@
 	}
 	include("displayq2.php");
 	include("testutil.php");
+	include("asidutil.php");
 	//error_reporting(0);  //prevents output of error messages
 	
 	//check to see if test starting test or returning to test
@@ -86,83 +90,21 @@
 				echo "No questions in assessment!";
 				exit;
 			}
-			$questions = explode(",",$adata['itemorder']);
 			
-			foreach($questions as $k=>$q) {
-				if (strpos($q,'~')!==false) {
-					$sub = explode('~',$q);
-					if (strpos($sub[0],'|')===false) { //backwards compat
-						$questions[$k] = $sub[array_rand($sub,1)];
-					} else {
-						$grpqs = array();
-						$grpparts = explode('|',$sub[0]);
-						array_shift($sub);
-						if ($grpparts[1]==1) { // With replacement
-							for ($i=0; $i<$grpparts[0]; $i++) {
-								$grpqs[] = $sub[array_rand($sub,1)];
-							}
-						} else if ($grpparts[1]==0) { //Without replacement
-							shuffle($sub);
-							$grpqs = array_slice($sub,0,min($grpparts[0],count($sub)));
-							if ($grpparts[0]>count($sub)) { //fix stupid inputs
-								for ($i=count($sub); $i<$grpparts[0]; $i++) {
-									$grpqs[] = $sub[array_rand($sub,1)];
-								}
-							}
-						}
-						array_splice($questions,$k,1,$grpqs);
-					}
-				}
-			}
-			if ($adata['shuffle']&1) {shuffle($questions);}
+			list($qlist,$seedlist,$reviewseedlist,$scorelist,$attemptslist,$lalist) = generateAssessmentData($adata['itemorder'],$adata['shuffle'],$aid);
 			
-			if ($adata['shuffle']&2) { //all questions same random seed
-				if ($adata['shuffle']&4) { //all students same seed
-					$seeds = array_fill(0,count($questions),$aid);
-					$reviewseeds = array_fill(0,count($questions),$aid+100);
-				} else {
-					$seeds = array_fill(0,count($questions),rand(1,9999));
-					$reviewseeds = array_fill(0,count($questions),rand(1,9999));
-				}
-			} else {
-				if ($adata['shuffle']&4) { //all students same seed
-					for ($i = 0; $i<count($questions);$i++) {
-						$seeds[] = $aid + $i;
-						$reviewseeds[] = $aid + $i + 100;
-					}
-				} else {
-					for ($i = 0; $i<count($questions);$i++) {
-						$seeds[] = rand(1,9999);
-						$reviewseeds[] = rand(1,9999);
-					}
-				}
-			}
-
-
-			$scores = array_fill(0,count($questions),-1);
-			$attempts = array_fill(0,count($questions),0);
-			$lastanswers = array_fill(0,count($questions),'');
-			
-			$starttime = time();
-			
-			if (!isset($questions)) {  //assessment has no questions!
+			if ($qlist=='') {  //assessment has no questions!
 				echo "<html><body>Assessment has no questions!";
 				echo "</body></html>\n";
 				exit;
 			} 
 			
-			$qlist = implode(",",$questions);
-			$seedlist = implode(",",$seeds);
-			$scorelist = implode(",",$scores);
-			$attemptslist = implode(",",$attempts);
-			$lalist = implode("~",$lastanswers);
+			$bestscorelist = $scorelist;
+			$bestattemptslist = $attemptslist;
+			$bestseedslist = $seedlist;
+			$bestlalist = $lalist;
 			
-			$bestscorelist = implode(',',$scores);
-			$bestattemptslist = implode(',',$attempts);
-			$bestseedslist = implode(',',$seeds);
-			$bestlalist = implode('~',$lastanswers);
-			
-			$reviewseedlist = implode(",",$reviewseeds);
+			$starttime = time();
 			
 			$query = "INSERT INTO imas_assessment_sessions (userid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers,reviewscores,reviewattempts,reviewseeds,reviewlastanswers) ";
 			$query .= "VALUES ('$userid','{$_GET['id']}','$qlist','$seedlist','$scorelist','$attemptslist','$lalist',$starttime,'$bestscorelist','$bestattemptslist','$bestseedslist','$bestlalist','$scorelist','$attemptslist','$reviewseedlist','$lalist');";
@@ -183,40 +125,7 @@
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/showtest.php");
 			exit;
 		} else { //returning to test
-			/* removed: now retains test info between review sessions
-			if ($isreview) { //past enddate, before reviewdate
-				//clear out test for review.
-				$questions = explode(",",$adata['itemorder']);
-				if ($line['shuffle']&2) {
-					if ($adata['shuffle']&4) { //all students same seed
-						$seeds = array_fill(0,count($questions),$aid+100);
-					} else {
-						$seeds = array_fill(0,count($questions),rand(1,9999));
-					}
-				} else {
-					if ($adata['shuffle']&4) { //all students same seed
-						for ($i = 0; $i<count($questions);$i++) {
-							$seeds[] = $aid + $i + 100;
-						}
-					} else {
-						for ($i = 0; $i<count($questions);$i++) {
-							$seeds[] = rand(1,9999);
-						}
-					}
-				}
-				$scores = array_fill(0,count($questions),-1);
-				$attempts = array_fill(0,count($questions),0);
-				$lastanswers = array_fill(0,count($questions),'');
-				$seedlist = implode(",",$seeds);
-				$scorelist = implode(",",$scores);
-				$attemptslist = implode(",",$attempts);
-				$lalist = implode("~",$lastanswers);
-				
-				$query = "UPDATE imas_assessment_sessions SET reviewscores='$scorelist',reviewseeds='$seedlist',reviewattempts='$attemptslist',reviewlastanswers='$lalist' WHERE userid='$userid' AND assessmentid='$aid' LIMIT 1";
-				mysql_query($query) or die("Query failed : $query: " . mysql_error());
-				
-			}
-			*/
+			
 			$deffeedback = explode('-',$adata['deffeedback']);
 			//removed: $deffeedback[0] == "Practice" || 
 			if ($myrights<6 || isset($teacherid)) {  // is teacher or guest - delete out out assessment session
@@ -330,6 +239,15 @@
 	
 	if (isset($_GET['reattempt'])) {
 		if ($_GET['reattempt']=="all") {
+			for ($i = 0; $i<count($questions); $i++) {
+				if ($attempts[$i]<$qi[$questions[$i]]['attempts'] || $qi[$questions[$i]]['attempts']==0) {
+					$scores[$i] = -1;
+					if (($regenonreattempt && $qi[$questions[$i]]['regen']==0) || $qi[$questions[$i]]['regen']==1) {
+						$seeds[$i] = rand(1,9999);
+					}
+				}
+			}
+		} else if ($_GET['reattempt']=="canimprove") {
 			$remainingposs = getallremainingpossible($qi,$questions,$testsettings,$attempts);
 			for ($i = 0; $i<count($questions); $i++) {
 				if ($attempts[$i]<$qi[$questions[$i]]['attempts'] || $qi[$questions[$i]]['attempts']==0) {
@@ -425,6 +343,9 @@
 	header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 	$useeditor = 1;
 	require("header.php");
+	if ($testsettings['noprint'] == 1) {
+		echo '<style type="text/css" media="print"> body { display: none;} </style>';
+	}
 	
 	if (!$isdiag) {
 		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"../course/course.php?cid={$testsettings['courseid']}\">{$sessiondata['coursename']}</a> ";
@@ -522,29 +443,11 @@
 			}
 			echo 'here.</p>';
 			echo '<form method=post action="showtest.php?addgrpmem=true">';
-			echo 'Username: <select name="user1">'.$selops.'</select> ';
-			if ($testsettings['isgroup']==1) {
-				echo 'Password: <input type=password name="pw1" />';
-			}
-			echo '<br />Username: <select name="user2">'.$selops.'</select> ';
-			if ($testsettings['isgroup']==1) {
-				echo 'Password: <input type=password name="pw2" />';
-			}
-			echo '<br />Username: <select name="user3">'.$selops.'</select> ';
-			if ($testsettings['isgroup']==1) {
-				echo 'Password: <input type=password name="pw3" />';
-			}
-			echo '<br />Username: <select name="user4">'.$selops.'</select> ';
-			if ($testsettings['isgroup']==1) {
-				echo 'Password: <input type=password name="pw4" />';
-			}
-			echo '<br />Username: <select name="user5">'.$selops.'</select> ';
-			if ($testsettings['isgroup']==1) {
-				echo 'Password: <input type=password name="pw5" />';
-			}
-			echo '<br />Username: <select name="user6">'.$selops.'</select> ';
-			if ($testsettings['isgroup']==1) {
-				echo 'Password: <input type=password name="pw6" />';
+			for ($i=1;$i<7;$i++) {
+				echo '<br />Username: <select name="user'.$i.'">'.$selops.'</select> ';
+				if ($testsettings['isgroup']==1) {
+					echo 'Password: <input type=password name="pw'.$i.'" />'."\n";
+				}
 			}
 			echo '<br /><input type=submit value="Record Group and Continue"/>';
 			echo '</form>';
@@ -686,7 +589,7 @@
 				if ($_POST['verattempts']!=$attempts[$last]) {
 					echo "<p>The last question has been submittted since you viewed it, and that grade is shown below.  Your answer just submitted was not scored or recorded.</p>";
 				} else {
-					scorequestion($last);
+					$rawscore = scorequestion($last);
 					
 					//record score
 					
@@ -694,22 +597,22 @@
 				}
 				if ($showeachscore) {
 					$possible = $qi[$questions[$last]]['points'];
-					echo "<p>Previous Question:<br/>Score on last attempt: ";
+					echo "<p>Previous Question:<br/>";
+					if (getpts($rawscore)!=getpts($scores[$last])) {
+						echo "<p>Score before penalty on last attempt: ";
+						echo printscore($rawscore,$possible);
+						echo "</p>";
+					}
+					echo "Score on last attempt: ";
 					echo printscore($scores[$last],$possible);
-					if ($allowregen && !$isreview) {
-						echo "<br/>Score in gradebook: ";
-						echo printscore($bestscores[$last],$possible);
-					} 
+					echo "<br/>Score in gradebook: ";
+					echo printscore($bestscores[$last],$possible);
+					 
 					echo "</p>\n";
-					if (canimprove($last)) {
+					if (hasreattempts($last)) {
 						echo "<p><a href=\"showtest.php?action=shownext&to=$last&reattempt=$last\">Reattempt last question</a>.  If you do not reattempt now, you will have another chance once you complete the test.</p>\n";
-					} else if ($attempts[$last]<$qi[$questions[$last]]['attempts'] || $qi[$questions[$last]]['attempts']==0) {
-						echo "<p>Cannot improve score with reattempts</p>";
-					} else {
-						echo "<p>No attempts remaining.</p>";
 					}
 				}
-				//working now page not cached
 				if ($allowregen) {
 					echo "<p><a href=\"showtest.php?action=shownext&to=$last&regen=$last\">Try another similar question</a></p>\n";
 				}
@@ -752,7 +655,7 @@
 				if ($_POST['verattempts']!=$attempts[$qn]) {
 					echo "<p>This question has been submittted since you viewed it, and that grade is shown below.  Your answer just submitted was not scored or recorded.</p>";
 				} else {
-					scorequestion($qn);
+					$rawscore = scorequestion($qn);
 					
 					//record score
 					
@@ -766,22 +669,22 @@
 				$reattemptsremain = false;
 				if ($showeachscore) {
 					$possible = $qi[$questions[$qn]]['points'];
-					echo "<p>Score on last attempt: ";
+					if (getpts($rawscore)!=getpts($scores[$qn])) {
+						echo "<p>Score before penalty on last attempt: ";
+						echo printscore($rawscore,$possible);
+						echo "</p>";
+					}
+					echo "<p>";
+					echo "Score on last attempt: ";
 					echo printscore($scores[$qn],$possible);
 					echo "</p>\n";
-					if ($allowregen && !$isreview) {
-						echo "<p>Score in gradebook: ";
-						echo printscore($bestscores[$qn],$possible);
-						echo "</p>";
-					} 
-					
-					if (canimprove($qn)) {
+					echo "<p>Score in gradebook: ";
+					echo printscore($bestscores[$qn],$possible);
+					echo "</p>";
+										
+					if (hasreattempts($qn)) {
 						echo "<p><a href=\"showtest.php?action=skip&to=$qn&reattempt=$qn\">Reattempt last question</a></p>\n";
 						$reattemptsremain = true;
-					} else if ($attempts[$qn]<$qi[$questions[$qn]]['attempts'] || $qi[$questions[$qn]]['attempts']==0) {
-						echo "<p>Cannot improve score with reattempts</p>";
-					} else {
-						echo "<p>No attempts remaining.</p>";
 					}
 				}
 				if ($allowregen) {
@@ -792,6 +695,8 @@
 					if ($reattemptsremain == false && $showeachscore) {
 						echo "<p>This question, with your last answer";
 						if (($showansafterlast && $qi[$questions[$qn]]['showans']=='0') || $qi[$questions[$qn]]['showans']=='F') {
+							echo " and correct answer";
+						} else if ($showansduring && $qi[$questions[$qn]]['showans']=='0' && $qi[$questions[$qn]]['showans']=='0' && $testsettings['showans']==$attempts[$qn]) {
 							echo " and correct answer";
 						}
 						echo ", can be viewed by clicking on the question number again.</p>";
@@ -825,18 +730,13 @@
 						echo "<p>Score on last attempt: ";
 						echo printscore($scores[$next],$possible);
 						echo "</p>\n";
-						if ($isreview || $allowregen) {
-							echo "<p>Score in gradebook: ";
-							echo printscore($bestscores[$next],$possible);
-							echo "</p>";
-						} 
-						if (canimprove($next)) {
+						echo "<p>Score in gradebook: ";
+						echo printscore($bestscores[$next],$possible);
+						echo "</p>";
+						
+						if (hasreattempts($next)) {
 							echo "<p><a href=\"showtest.php?action=skip&to=$next&reattempt=$next\">Reattempt this question</a></p>\n";
 							$reattemptsremain = true;
-						} else if ($attempts[$next]<$qi[$questions[$next]]['attempts'] || $qi[$questions[$next]]['attempts']==0) {
-							echo "<p>Cannot improve score with reattempts</p>";
-						} else {
-							echo "<p>No attempts remaining.</p>";
 						}
 					}
 					if ($allowregen) {
@@ -869,7 +769,7 @@
 				if ($_POST['verattempts']!=$attempts[$qn]) {
 					echo "<p>The last question has been submittted since you viewed it, and that score is shown below. Your answer just submitted was not scored or recorded.</p>";
 				} else {
-					scorequestion($qn);
+					$rawscore = scorequestion($qn);
 					//record score
 					recordtestdata();
 				}
@@ -878,28 +778,30 @@
 				$reattemptsremain = false;
 				if ($showeachscore) {
 					$possible = $qi[$questions[$qn]]['points'];
+					if (getpts($rawscore)!=getpts($scores[$qn])) {
+						echo "<p>Score before penalty on last attempt: ";
+						echo printscore($rawscore,$possible);
+						echo "</p>";
+					}
+					echo "<p>";
+					echo "Score on last attempt: ";
 					echo "<p>Score on last attempt: ";
 					echo printscore($scores[$qn],$possible);
 					echo "</p>\n";
-					if ($allowregen && !$isreview) {
-						echo "<p>Score in gradebook: ";
-						echo printscore($bestscores[$qn],$possible);
-						echo "</p>";
-					} 
-					if (canimprove($qn)) {
+					echo "<p>Score in gradebook: ";
+					echo printscore($bestscores[$qn],$possible);
+					echo "</p>";
+					 
+					if (hasreattempts($qn)) {
 						echo "<p><a href=\"showtest.php?action=seq&to=$qn&reattempt=$qn\">Reattempt last question</a></p>\n";
 						$reattemptsremain = true; 
-					} else if ($attempts[$qn]<$qi[$questions[$qn]]['attempts'] || $qi[$questions[$qn]]['attempts']==0) {
-						echo "<p>Cannot improve score with reattempts</p>";
-					} else {
-						echo "<p>No attempts remaining.</p>";
 					}
 				}
 				if ($allowregen) {
 					echo "<p><a href=\"showtest.php?action=seq&to=$qn&regen=$qn\">Try another similar question</a></p>\n";
 				}
 				unset($toshow);
-				if ($reattemptsremain) {
+				if (canimprove($qn)) {
 					$toshow = $qn;
 				} else {
 					for ($i=$qn+1;$i<count($questions);$i++) {
@@ -953,7 +855,8 @@
 				
 				for ($i = 0; $i < count($questions); $i++) {
 					
-					$reattemptsremain = canimprove($i);
+					$reattemptsremain = hasreattempts($i);
+					$pointsremaining = getremainingpossible($qi[$questions[$i]],$testsettings,$attempts[$qn]);
 					$qavail = false;
 					if ($i==$toshow) {
 						if (unans($scores[$i]) && $attempts[$i]==0) {
@@ -967,10 +870,13 @@
 							echo "<img src=\"$imasroot/img/q_fullbox.gif\"/> ";
 							echo "<a href=\"showtest.php?action=seq&to=$i#curq\">Question ". ($i+1) . "</a>.  ";
 							$qavail = true;
-						} else if (($attempts[$i]<$qi[$questions[$i]]['attempts'] || $qi[$questions[$i]]['attempts']==0) && $reattemptsremain) {
+						} else if (canimprove($i)) {
 							echo "<img src=\"$imasroot/img/q_halfbox.gif\"/> ";
 							echo "<a href=\"showtest.php?action=seq&to=$i#curq\">Question ". ($i+1) . "</a>.  ";
 							$qavail = true;
+						} else if ($reattemptsremain) {
+							echo "<img src=\"$imasroot/img/q_emptybox.gif\"/> ";
+							echo "<a href=\"showtest.php?action=seq&to=$i#curq\">Question ". ($i+1) . "</a>.  ";
 						} else {
 							echo "<img src=\"$imasroot/img/q_emptybox.gif\"/> ";
 							echo "Question ". ($i+1) . ".  ";
@@ -979,16 +885,25 @@
 					if ($showeachscore) {
 						$pts = getpts($bestscores[$i]);
 						if ($pts<0) { $pts = 0;}
-						echo "Points: $pts out of " . $qi[$questions[$i]]['points'] . " possible";
+						echo "Points: $pts out of " . $qi[$questions[$i]]['points'] . " possible.  ";
+						if ($i==$toshow) {
+							echo "$pointsremaining available on this attempt.";
+						}
 					} else {
-						echo "Points possible: ". $qi[$questions[$i]]['points'];
+						if ($pointsremaining == $qi[$questions[$i]]['points']) {
+							echo "Points possible: ". $qi[$questions[$i]]['points'];
+						} else {
+							echo 'Points available on this attempt: '.$pointsremaining.' of original '.$qi[$questions[$i]]['points'];
+						}
+						
 					}
 					
-					
-					if ($qi[$questions[$i]]['attempts']==0) {
-						echo ".  Unlimited attempts";
-					} else {
-						echo '.  '.($qi[$questions[$i]]['attempts']-$attempts[$i])." attempts of ".$qi[$questions[$i]]['attempts']." remaining.";
+					if ($i==$toshow && $attempts[$i]<$qi[$questions[$i]]['attempts']) {
+						if ($qi[$questions[$i]]['attempts']==0) {
+							echo ".  Unlimited attempts";
+						} else {
+							echo '.  This is attempt '.($attempts[$i]+1)." of ".$qi[$questions[$i]]['attempts'].".";
+						}
 					}
 					if ($testsettings['showcat']>0 && $qi[$questions[$i]]['category']!='0') {
 						echo "  Category: {$qi[$questions[$i]]['category']}.";
@@ -1014,20 +929,18 @@
 		}
 	} else { //starting test display  
 		$canimprove = false;
-		$canimproveq = array();
-		$canreattempt = false;
-		$canreattemptq = array();
+		$hasreattempts = false;
 		$ptsearned = 0;
 		$perfectscore = false;
 		
 		for ($j=0; $j<count($questions);$j++) {
 			$canimproveq[$j] = canimprove($j);
-			$canreattemptq[$j] = hasreattempts($j);
+			$hasreattemptsq[$j] = hasreattempts($j);
 			if ($canimproveq[$j]) {
 				$canimprove = true;
 			}
-			if ($canreattemptq[$j]) {
-				$canreattempt = true;
+			if ($hasreattemptsq[$j]) {
+				$hasreattempts = true;
 			}
 			$ptsearned += getpts($scores[$j]);
 		}
@@ -1070,42 +983,13 @@
 				echo "<BR><input type=submit class=btn value=Submit>\n";
 				echo "<input type=submit class=btn name=\"saveforlater\" value=\"Save answers\">\n";
 			} else {
-				if ($canimprove) {
-					if ($noindivscores) {
-						echo "<p><a href=\"showtest.php?reattempt=all\">Reattempt test</a> on questions allowed (note: all scores, correct and incorrect, will be cleared)</p>";
-					} else {
-						echo "<p><a href=\"showtest.php?reattempt=all\">Reattempt test</a> on questions missed where allowed</p>";
-					}
-					if ($allowregen) {
-						echo "<p><a href=\"showtest.php?regenall=missed\">Try similar problems</a> for all questions with less than perfect scores.</p>";
-					}
+				startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testsettings['testtype']=="NoScores");
+				if (!$isdiag) {
+					echo "<a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a>\n";
 				} else {
-					if ($perfectscore) {
-						echo "<p>Assessment is complete with perfect score.</p>";
-						if ($allowregen) {
-							echo "<p><a href=\"showtest.php?regenall=all\">Try similar problems</a> for all questions.</p>";
-						}
-					} else if (!$canreattempt) { //no more attempts
-						if ($allowregen) {
-							echo "<p>No attempts left on current versions of questions.</p>\n";
-							echo "<p><a href=\"showtest.php?regenall=missed\">Try similar problems</a> for all questions with less than perfect scores.</p>";
-						} else {
-							echo "<p>No attempts left on this test</p>\n";
-						}
-					} else { //more attempts, but can't be improved.
-						if ($allowregen) {
-							echo "<p>Assessment cannot be improved with current versions of questions.</p>\n";
-							echo "<p><a href=\"showtest.php?regenall=missed\">Try similar problems</a> for all questions with less than perfect scores.</p>";
-						} else {
-							echo "<p>Assessment is complete, and cannot be improved with reattempts.</p>\n";
-						}
-					}
-					if (!$isdiag) {
-						echo "<a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a>\n";
-					} else {
-						echo "<a href=\"../diag/index.php?id=$diagid\">Return to Diagnostics Page</a>\n";
-					}
+					echo "<a href=\"../diag/index.php?id=$diagid\">Return to Diagnostics Page</a>\n";
 				}
+				
 			}
 		} else if ($testsettings['displaymethod'] == "OneByOne") {
 			for ($i = 0; $i<count($questions);$i++) {
@@ -1114,37 +998,14 @@
 				}
 			}
 			if ($i == count($questions)) {
-				if ($canimprove) {
-					if ($noindivscores) {
-						echo "<p><a href=\"showtest.php?reattempt=all\">Reattempt test</a> on questions allowed (note: all scores, correct and incorrect, will be cleared)</p>";
-					} else {
-						echo "<p><a href=\"showtest.php?reattempt=all\">Reattempt test</a> on questions missed where allowed</p>";
-					}
-					if ($allowregen) {
-						echo "<p><a href=\"showtest.php?regenall=missed\">Try similar problems</a> for all questions with less than perfect scores.</p>";
-					}
+				startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testsettings['testtype']=="NoScores");
+			
+				if (!$isdiag) {
+					echo "<a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a>\n";
 				} else {
-					if ($perfectscore) {
-						echo "<p>Assessment is complete with perfect score.</p>";
-						if ($allowregen) {
-							echo "<p><a href=\"showtest.php?regenall=all\">Try similar problems</a> for all questions.</p>";
-						}
-					} else if (!$canreattempt) { //no more attempts
-						echo "<p>No attempts left on this test</p>\n";	
-					}  else { //more attempts, but can't be improved
-						if ($allowregen) {
-							echo "<p>Assessment cannot be improved with current versions of questions.</p>\n";
-							echo "<p><a href=\"showtest.php?regenall=missed\">Try similar problems</a> for all questions with less than perfect scores.</p>";
-						} else {
-							echo "<p>Assessment is complete, and cannot be improved with reattempts.</p>\n";
-						}
-					}
-					if (!$isdiag) {
-						echo "<a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a>\n";
-					} else {
-						echo "<a href=\"../diag/index.php?id=$diagid\">Return to Diagnostics Page</a>\n";
-					}
+					echo "<a href=\"../diag/index.php?id=$diagid\">Return to Diagnostics Page</a>\n";
 				}
+				
 			} else {
 				echo filter("<div class=intro>{$testsettings['intro']}</div>\n");
 				echo "<form method=post action=\"showtest.php?action=shownext&score=$i\" onsubmit=\"return doonsubmit(this)\">\n";
@@ -1161,48 +1022,18 @@
 				}
 			}
 			shownavbar($questions,$scores,$i,$testsettings['showcat']);
-			if ($i == count($questions)) { //all questions answered
-				if ($canimprove) {
-					echo "<div class=inset><br>\n";
-					echo "<a name=\"beginquestions\"></a>\n";
-					if ($noindivscores) {
-						echo "<p><a href=\"showtest.php?reattempt=all\">Reattempt test</a> on questions allowed (note: all scores, correct and incorrect, will be cleared)</p>";
-					} else {
-						echo "<p><a href=\"showtest.php?reattempt=all\">Reattempt test</a> on questions missed where allowed</p>";
-					}
-					if ($allowregen) {
-						echo "<p>To try a similar problem, select a question</p>";	
-					}
-					echo "</div>\n";
+			if ($i == count($questions)) {
+				echo "<div class=inset><br>\n";
+				echo "<a name=\"beginquestions\"></a>\n";
+				
+				startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testsettings['testtype']=="NoScores");
+				
+				if (!$isdiag) {
+					echo "<a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a></div>\n";
 				} else {
-					echo "<div class=inset>";
-					echo "<a name=\"beginquestions\"></a>\n";
-					
-					if ($perfectscore) {
-						echo "<p>Assessment is complete with perfect score.</p>";
-						echo "<p>To try a similar problem, select a question.</p>";
-					} else if (!$canreattempt) { //no more attempts
-						if ($allowregen) {
-							echo "<p>No attempts left on current versions of questions.</p>\n";
-							echo "<p>To try a similar problem, select a question.</p>";
-						} else {
-							echo "<p>No attempts left on this test.</p>\n";
-						}
-					} else { //more attempts, but cannot be improved
-						if ($allowregen) {
-							echo "<p>Assessment cannot be improved with current versions of questions.</p>\n";
-							echo "<p>To try a similar problem, select a question.</p>";
-						} else {
-							echo "<p>Assessment is complete, and cannot be improved with reattempts.</p>\n";
-						}
-					}
-					
-					if (!$isdiag) {
-						echo "<a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a></div>\n";
-					} else {
-						echo "<a href=\"../diag/index.php?id=$diagid\">Return to Diagnostics Page</a></div>\n";
-					}
+					echo "<a href=\"../diag/index.php?id=$diagid\">Return to Diagnostics Page</a></div>\n";
 				}
+				
 			} else {
 				echo "<form method=post action=\"showtest.php?action=skip&score=$i\" onsubmit=\"return doonsubmit(this)\">\n";
 				echo "<div class=inset>\n";
@@ -1219,51 +1050,31 @@
 					break;
 				}
 			}
-			if ($i == count($questions)) { //no questions have canimproveq
-				if ($canimprove) {
-					if ($noindivscores) {
-						echo "<p><a href=\"showtest.php?reattempt=all\">Reattempt test</a> on questions allowed (note: all scores, correct and incorrect, will be cleared)</p>";
-					} else {
-						echo "<p><a href=\"showtest.php?reattempt=all\">Reattempt test</a> on questions missed where allowed</p>";
-					}
-					if ($allowregen) {
-						echo "<p><a href=\"showtest.php?regenall=missed\">Try similar problems</a> for all questions with less than perfect scores.</p>";
-					}
+			if ($i == count($questions)) {
+				startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testsettings['testtype']=="NoScores");
+				
+				if (!$isdiag) {
+					echo "<a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a>\n";
 				} else {
-					if ($perfectscore) {
-						echo "<p>Assessment is complete with perfect score.</p>";
-						if ($allowregen) {
-							echo "<p><a href=\"showtest.php?regenall=all\">Try similar problems</a> for all questions.</p>";
-						}
-					} else if (!$canreattempt) { //no more attempts
-						echo "<p>No attempts left on this test</p>\n";	
-					}  else { //more attempts, but can't be improved
-						if ($allowregen) {
-							echo "<p>Assessment cannot be improved with current versions of questions.</p>\n";
-							echo "<p><a href=\"showtest.php?regenall=missed\">Try similar problems</a> for all questions with less than perfect scores.</p>";
-						} else {
-							echo "<p>Assessment is complete, and cannot be improved with reattempts.</p>\n";
-						}
-					}
-					if (!$isdiag) {
-						echo "<a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a>\n";
-					} else {
-						echo "<a href=\"../diag/index.php?id=$diagid\">Return to Diagnostics Page</a>\n";
-					}
+					echo "<a href=\"../diag/index.php?id=$diagid\">Return to Diagnostics Page</a>\n";
 				}
+				
 			} else {
 				$curq = $i;
 				echo filter("<div class=intro>{$testsettings['intro']}</div>\n");
 				echo "<form method=post action=\"showtest.php?action=seq&score=$i\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
 				echo "<input type=hidden name=\"verattempts\" value=\"{$attempts[$i]}\" />";
 				for ($i = 0; $i < count($questions); $i++) {
-					
+					$reattemptsremain = hasreattempts($i);
+					$pointsremaining = getremainingpossible($qi[$questions[$i]],$testsettings,$attempts[$qn]);
 					$qavail = false;
 					if ($i==$curq) {
 						if (unans($scores[$i]) && $attempts[$i]==0) {
 							echo "<img src=\"$imasroot/img/q_fullbox.gif\"/> ";
-						} else {
+						} else if (canimprove($i)) {
 							echo "<img src=\"$imasroot/img/q_halfbox.gif\"/> ";
+						} else {
+							echo "<img src=\"$imasroot/img/q_emptybox.gif\"/> ";
 						}
 						echo "<span class=current>Question ".($i+1).".</span>  ";
 					} else {
@@ -1271,8 +1082,12 @@
 							echo "<img src=\"$imasroot/img/q_fullbox.gif\"/> ";
 							echo "<a href=\"showtest.php?action=seq&to=$i#curq\">Question ". ($i+1) . "</a>.  ";
 							$qavail = true;
-						} else if (($attempts[$i]<$qi[$questions[$i]]['attempts'] || $qi[$questions[$i]]['attempts']==0) && $canimproveq[$i]) {
+						} else if (canimprove($i)) {
 							echo "<img src=\"$imasroot/img/q_halfbox.gif\"/> ";
+							echo "<a href=\"showtest.php?action=seq&to=$i#curq\">Question ". ($i+1) . "</a>.  ";
+							$qavail = true;
+						} else if ($reattemptsremain) {
+							echo "<img src=\"$imasroot/img/q_emptybox.gif\"/> ";
 							echo "<a href=\"showtest.php?action=seq&to=$i#curq\">Question ". ($i+1) . "</a>.  ";
 							$qavail = true;
 						} else {
@@ -1283,14 +1098,25 @@
 					if ($showeachscore) {
 						$pts = getpts($bestscores[$i]);
 						if ($pts<0) { $pts = 0;}
-						echo "Points: $pts out of " . $qi[$questions[$i]]['points'] . " possible";
+						echo "Points: $pts out of " . $qi[$questions[$i]]['points'] . " possible.  ";
+						if ($i==$curq) {
+							echo "$pointsremaining available on this attempt.";
+						}
 					} else {
-						echo "Points possible: ". $qi[$questions[$i]]['points'];
+						if ($pointsremaining == $qi[$questions[$i]]['points']) {
+							echo "Points possible: ". $qi[$questions[$i]]['points'];
+						} else {
+							echo 'Points available on this attempt: '.$pointsremaining.' of original '.$qi[$questions[$i]]['points'];
+						}
+						
 					}
-					if ($qi[$questions[$i]]['attempts']==0) {
-						echo ".  Unlimited attempts";
-					} else {
-						echo '.  '.($qi[$questions[$i]]['attempts']-$attempts[$i])." attempts of ".$qi[$questions[$i]]['attempts']." remaining.";
+					
+					if ($i==$curq && $attempts[$i]<$qi[$questions[$i]]['attempts']) {
+						if ($qi[$questions[$i]]['attempts']==0) {
+							echo ".  Unlimited attempts";
+						} else {
+							echo '.  This is attempt '.($attempts[$i]+1)." of ".$qi[$questions[$i]]['attempts'].".";
+						}
 					}
 					if ($testsettings['showcat']>0 && $qi[$questions[$i]]['category']!='0') {
 						echo "  Category: {$qi[$questions[$i]]['category']}.";
@@ -1316,9 +1142,10 @@
 	require("../footer.php");
 	
 	function shownavbar($questions,$scores,$current,$showcat) {
-		global $imasroot,$isdiag,$testsettings,$attempts,$qi;
+		global $imasroot,$isdiag,$testsettings,$attempts,$qi,$allowregen,$bestscores,$isreview,$noindivscores;
 		$todo = 0;
-		
+		$earned = 0;
+		$poss = 0;
 		echo "<a href=\"#beginquestions\"><img class=skipnav src=\"$imasroot/img/blank.gif\" alt=\"Skip Navigation\" /></a>\n";
 		echo "<div class=navbar>";
 		echo "<h4>Questions</h4>\n";
@@ -1329,18 +1156,67 @@
 			if (unans($scores[$i])) {
 				$todo++;
 			}
-			if (unans($scores[$i]) && $attempts[$i]==0) {
-				echo "<img src=\"$imasroot/img/q_fullbox.gif\"/>";
-			} else if (canimprove($i)) {
-				echo "<img src=\"$imasroot/img/q_halfbox.gif\"/>";
+			/*
+			$icon = '';
+			if ($attempts[$i]==0) {
+				$icon = "full";
+			} else if (hasreattempts($i)) {
+				$icon = "half";
 			} else {
-				echo "<img src=\"$imasroot/img/q_emptybox.gif\"/>";
+				$icon = "empty";
+			}
+			echo "<img src=\"$imasroot/img/aicon/left$icon.gif\"/>";
+			$icon = '';
+			if (unans($bestscores[$i]) || getpts($bestscores[$i])==0) {
+				$icon .= "empty";
+			} else if (getpts($bestscores[$i]) == $qi[$questions[$i]]['points']) {
+				$icon .= "full";
+			} else {
+				$icon .= "half";
+			}
+			if (!canimprovebest($i) && !$allowregen && $icon!='full') {
+				$icon .= "ci";
+			}
+			echo "<img src=\"$imasroot/img/aicon/right$icon.gif\"/>";
+			*/	
+			
+			if (unans($scores[$i]) && $attempts[$i]==0) {
+				echo "<img src=\"$imasroot/img/q_fullbox.gif\"/> ";
+			} else if (canimprove($i)) {
+				echo "<img src=\"$imasroot/img/q_halfbox.gif\"/> ";
+			} else {
+				echo "<img src=\"$imasroot/img/q_emptybox.gif\"/> ";
 			}
 			
 			if ($showcat>1 && $qi[$questions[$i]]['category']!='0') {
 				echo "<a href=\"showtest.php?action=skip&to=$i\">". ($i+1) . ") {$qi[$questions[$i]]['category']}</a>";
 			} else {
-				echo "<a href=\"showtest.php?action=skip&to=$i\">Question ". ($i+1) . "</a>";
+				echo "<a href=\"showtest.php?action=skip&to=$i\">Q ". ($i+1) . "</a>";
+			}
+			if (!$noindivscores) {
+				if (($isreview && canimprove($i)) || (!$isreview && canimprovebest($i))) {
+					echo ' (';
+				} else {
+					echo ' [';
+				}
+				if ($isreview) {
+					$thisscore = getpts($scores[$i]);
+				} else {
+					$thisscore = getpts($bestscores[$i]);
+				}
+				if ($thisscore<0) {
+					echo '0';
+				} else {
+					echo $thisscore;
+					$earned += $thisscore;
+				}
+				echo '/'.$qi[$questions[$i]]['points'];
+				$poss += $qi[$questions[$i]]['points'];
+				if (($isreview && canimprove($i)) || (!$isreview && canimprovebest($i))) {
+					echo ')';
+				} else {
+					echo ']';
+				}
 			}
 			
 			if ($current == $i) { echo "</span>";}
@@ -1348,7 +1224,15 @@
 			echo "</li>\n";
 		}
 		echo "</ul>";
-		if (!$isdiag) {
+		if (!$noindivscores) {
+			if ($isreview) {
+				echo "<p>Review: ";
+			} else {
+				echo "<p>Grade: ";
+			}
+			echo "$earned/$poss</p>";
+		}
+		if (!$isdiag && $testsettings['noprint']==0) {
 			echo "<p><a href=\"#\" onclick=\"window.open('$imasroot/assessment/printtest.php','printver','width=400,height=300,menubar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420))\">Print Version</a></p> ";
 		}
 
@@ -1380,29 +1264,25 @@
 				if ($scores[$i] == -1) {
 					$scores[$i] = 0;
 					echo 'Question '. ($i+1) . ': </td><td>';
-					if ($isreview || $allowregen) {
-						echo "Last attempt: ";
-					}
+					echo "Last attempt: ";
+					
 					echo "Not answered";
 					echo "</td>";
-					if ($isreview || $allowregen) {
-						echo "<td>  Score in gradebook: ";
-						echo printscore($bestscores[$i],$qi[$questions[$i]]['points']);
-						echo "</td>";
-					}
+					echo "<td>  Score in gradebook: ";
+					echo printscore($bestscores[$i],$qi[$questions[$i]]['points']);
+					echo "</td>";
+					
 					echo "</tr>\n";
 				} else {
 					echo 'Question '. ($i+1) . ': </td><td>';
-					if ($isreview || $allowregen) {
-						echo "Last attempt: ";
-					}
+					echo "Last attempt: ";
+					
 					echo printscore($scores[$i],$qi[$questions[$i]]['points']);
 					echo "</td>";
-					if ($isreview || $allowregen) {
-						echo "<td>  Score in Gradebook: ";
-						echo printscore($bestscores[$i],$qi[$questions[$i]]['points']);
-						echo "</td>";
-					}
+					echo "<td>  Score in Gradebook: ";
+					echo printscore($bestscores[$i],$qi[$questions[$i]]['points']);
+					echo "</td>";
+					
 					echo "</tr>\n";
 				}
 			}
@@ -1421,10 +1301,8 @@
 			}
 			$totpossible = totalpointspossible($qi);
 			
-			if ($allowregen || $isreview) {
-				echo "<p>Total Points on Last Attempts:  $lastattempttotal out of $totpossible possible</p>\n";
-			}
-			
+			echo "<p>Total Points on Last Attempts:  $lastattempttotal out of $totpossible possible</p>\n";
+						
 			if ($total<$testsettings['minscore']) {
 				echo "<p><b>Total Points Earned:  $total out of $totpossible possible: ";	
 			} else {
@@ -1457,13 +1335,17 @@
 		
 		
 		if ($total < $totpossible) {
-			if (canimproveany()) {
-				if ($noindivscores) {
-					echo "<p><a href=\"showtest.php?reattempt=all\">Reattempt test</a> on questions allowed (note: where reattempts are allowed, all scores, correct and incorrect, will be cleared)</p>";
-				} else {
-					echo "<p><a href=\"showtest.php?reattempt=all\">Reattempt test</a> on questions missed where allowed</p>";
+			if ($noindivscores) {
+				echo "<p><a href=\"showtest.php?reattempt=all\">Reattempt test</a> on questions allowed (note: where reattempts are allowed, all scores, correct and incorrect, will be cleared)</p>";
+			} else {
+				if (canimproveany()) {
+					echo "<p><a href=\"showtest.php?reattempt=canimprove\">Reattempt test</a> on questions that can be improved where allowed</p>";
+				} 
+				if (hasreattemptsany()) {
+					echo "<p><a href=\"showtest.php?reattempt=all\">Reattempt test</a> on all questions where allowed</p>";
 				}
 			}
+			
 			if ($allowregen) {
 				echo "<p><a href=\"showtest.php?regenall=missed\">Try similar problems</a> for all questions with less than perfect scores.</p>";
 				echo "<p><a href=\"showtest.php?regenall=all\">Try similar problems</a> for all questions.</p>";

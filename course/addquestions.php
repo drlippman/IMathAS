@@ -554,15 +554,21 @@
 			echo "<input type=button value=\"Select From Libraries\" onClick=\"window.location='addquestions.php?cid=$cid&aid=$aid&selfrom=lib'\">";
 			
 			echo "<table cellpadding=5 id=myTable class=gb>\n";
-			echo "<thead><tr><th></th><th>Assessment</th></tr></thead>\n";
+			echo "<thead><tr><th></th><th>Assessment</th><th>Summary</th></tr></thead>\n";
 			echo "<tbody>\n";
-			$query = "SELECT id,name FROM imas_assessments WHERE courseid='$cid' AND id<>'$aid' ORDER BY enddate,name";
+			$query = "SELECT id,name,summary FROM imas_assessments WHERE courseid='$cid' AND id<>'$aid' ORDER BY enddate,name";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$alt=0;
 			while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 				if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 				echo "<td><input type=checkbox name='achecked[]' value='{$line['id']}' checked=1></td>\n";
-				echo "<td>{$line['name']}</td></tr>\n";
+				echo "<td>{$line['name']}</td>";
+				$line['summary'] = strip_tags($line['summary']);
+				if (strlen($line['summary'])>100) {
+					$line['summary'] = substr($line['summary'],0,97).'...';
+				}
+				echo '<td>'.$line['summary'].'</td>';
+				echo "</tr>\n";
 			}
 			echo "</tbody></table>\n";
 			echo "<script type=\"text/javascript\">\n";

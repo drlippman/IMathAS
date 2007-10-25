@@ -20,3 +20,11 @@ table.forum thead td {
 	padding: 0.1em 0.5em;
 	background-color: #eef;
 }
+
+table.forum tr.tagged {
+	background-color: #dff;
+}
+
+img.pointer {
+	cursor: pointer;
+}

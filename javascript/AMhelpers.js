@@ -55,10 +55,19 @@ function calculate(inputId,outputId,format) {
 				  if (Pdepth!=0 || Bdepth!=0) {
 					  str += " (unmatched parens)";
 				  }
+				  trg = str.match(/(sin|cos|tan|sec|csc|cot)\^/);
+				  reg = new RegExp("(sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs)([^\(])");
+				  errstuff = str.match(reg)
+				  if (trg!=null) {
+					  trg = trg[1];
+					  str += " [use ("+trg+"(x))^2 instead of "+trg+"^2(x)]";
+				  } else if (errstuff!=null) {  
+					  str += " [use function notation - "+errstuff[1]+"("+errstuff[2]+"), not "+errstuff[0]+"]";
+				  }
 			  }
 		  }
 	  }
-	  strarr[sc] = str;
+	  strarr[sc] = str+" ";
   }
   fullstr = strarr.join(', ');
   var outnode = document.getElementById(outputId);
@@ -315,14 +324,15 @@ function AMpreview(inputId,outputId) {
 	str = str.replace(/(.*)=(.*)/,"$1-($2)");
   }
   var totesteqn = mathjs(str,vl);
+  
   while (tstpt<ptlist.length && (isNaN(res) || res=="Infinity")) {
 	  var totest = '';
 	  testvals = ptlist[tstpt].split("~");
-	  for (var j=0; j<vl.length; j++) {
+	  for (var j=0; j<vars.length; j++) {
 		totest += vars[j] + "="+testvals[j]+";"; 
 	  }
 	  totest += totesteqn;
-	 
+
 	  var err="syntax ok";
 	  try {
 	    with (Math) var res = eval(totest);

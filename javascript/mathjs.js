@@ -102,7 +102,8 @@ function mathjs(st,varlist) {
     st = st.replace(/coth\^-1/g,"arccoth");
   }
   
-  st = st.replace(/E/g,"(EE)");
+  //st = st.replace(/E/g,"(EE)");
+  st = st.replace(/([0-9])E([\-0-9])/g,"$1(EE)$2");
   st = st.replace(/^e$/g,"(E)");
   st = st.replace(/pi/g,"(pi)");
   st = st.replace(/^e([^a-zA-Z])/g,"(E)$1");
@@ -110,11 +111,10 @@ function mathjs(st,varlist) {
   
   st = st.replace(/([^a-zA-Z])e([^a-zA-Z])/g,"$1(E)$2");
   st = st.replace(/([0-9])([\(a-zA-Z])/g,"$1*$2");
+  st = st.replace(/(!)([0-9\(])/g,"$1*$2");
   //want to keep scientific notation
   st= st.replace(/([0-9])\*\(EE\)([\-0-9])/,"$1e$2");
 
-
-  
   
   st = st.replace(/\)([\(0-9a-zA-Z])/g,"\)*$1");
   

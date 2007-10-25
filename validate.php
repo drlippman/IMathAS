@@ -224,7 +224,8 @@ END;
 				$teacherid = $userid;
 			}
 		}
-		$query = "SELECT name,available,lockaid FROM imas_courses WHERE id='{$_GET['cid']}'";
+		$query = "SELECT imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid ";
+		$query .= "FROM imas_courses,imas_users WHERE imas_courses.id='{$_GET['cid']}' AND imas_users.id=imas_courses.ownerid";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		if (mysql_num_rows($result)>0) {
 			$coursename = mysql_result($result,0,0);
@@ -240,6 +241,13 @@ END;
 				}
 			}
 			unset($lockaid);
+			if ($myrights>19 && !isset($teacherid) && $previewshift==-1) {
+				if (mysql_result($result,0,3)==2) {
+					$guestid = $userid;
+				} else if (mysql_result($result,0,3)==1 && mysql_result($result,0,4)==$groupid) {
+					$guestid = $userid;
+				}
+			}
 		}
 	}
 	$verified = true;

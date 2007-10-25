@@ -502,6 +502,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (isset($options['answertitle'])) {if (is_array($options['answertitle'])) {$answertitle = $options['answertitle'][$qn];} else {$answertitle = $options['answertitle'];}}
 		if (isset($options['matchlist'])) {if (is_array($options['matchlist'])) {$matchlist = $options['matchlist'][$qn];} else {$matchlist = $options['matchlist'];}}
 		if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$qn];} else {$noshuffle = $options['noshuffle'];}}
+		if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$qn];} else {$displayformat = $options['displayformat'];}}
 		
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		if (!is_array($questions) || !is_array($answers)) {
@@ -513,6 +514,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$randqkeys = array_keys($questions);
 		} else {
 			$randqkeys = array_rand($questions,count($questions));
+		}
+		if ($noshuffle=="answers") {
+			$randakeys = array_keys($answers);
+		} else {
+			$randakeys = array_rand($answers,count($answers));
 		}
 		$out .= "<div class=match>\n";
 		$out .= "<p class=centered>$questiontitle</p>\n";
@@ -529,37 +535,57 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 				$out .= 'selected="1"';
 			}
 			$out .= '>-</option>';
-			foreach ($letters as $v) {
-				$out .= "<option value=\"$v\" ";
-				if ($las[$i]==$v) {
-					$out .= 'selected="1"';
+			if ($displayformat=="select") {
+				for ($j=0;$j<count($randakeys);$j++) {
+					$out .= "<option value=\"".$letters[$j]."\" ";
+					if (is_numeric($las[$i]) && $las[$i]==$j) {
+						$out .= 'selected="1"';
+					}
+					$out .= ">{$answers[$randakeys[$j]]}</option>\n";
 				}
-				$out .= ">$v</option>";
+			} else {
+				foreach ($letters as $v) {
+					$out .= "<option value=\"$v\" ";
+					if ($las[$i]==$v) {
+						$out .= 'selected="1"';
+					}
+					$out .= ">$v</option>";
+				}
 			}
 			$out .= "</select> {$questions[$randqkeys[$i]]}</li>\n";
 		}
 		$out .= "</ul>\n";
-		$out .= "</div><div class=match>\n";
-		$out .= "<p class=centered>$answertitle</p>\n";
-		if ($noshuffle=="answers") {
-			$randakeys = array_keys($answers);
-		} else {
-			$randakeys = array_rand($answers,count($answers));
+		$out .= "</div>";
+		
+		if (!isset($displayformat) || $displayformat!="select") {
+			$out .= "<div class=match>\n";
+			$out .= "<p class=centered>$answertitle</p>\n";
+			
+			$out .= "<ol class=lalpha>\n";
+			for ($i=0;$i<count($randakeys);$i++) {
+				$out .= "<li>{$answers[$randakeys[$i]]}</li>\n";
+			}
+			$out .= "</ol>";
+			$out .= "</div>";
 		}
-		$out .= "<ol class=lalpha>\n";
-		for ($i=0;$i<count($randakeys);$i++) {
-			$out .= "<li>{$answers[$randakeys[$i]]}</li>\n";
-		}
-		$out .= "</ol><input type=hidden name=\"qn$qn\" value=\"done\"></div><div class=spacer>&nbsp;</div>";
+		$out .= "<input type=hidden name=\"qn$qn\" value=\"done\"><div class=spacer>&nbsp;</div>";
 		//$tip = "In each box provided, type the letter (a, b, c, etc.) of the matching answer in the right-hand column";
-		$tip = "In each pull-down on the left, select the letter (a, b, c, etc.) of the matching answer in the right-hand column";
+		if ($displayformat=="select") {
+			$tip = "In each pull-down, select the item that matches with the displayed item";
+		} else {
+			$tip = "In each pull-down on the left, select the letter (a, b, c, etc.) of the matching answer in the right-hand column";
+		}
 		for ($i=0; $i<count($randqkeys);$i++) {
 			if (isset($matchlist)) {
 				$akey = array_search($matchlist[$randqkeys[$i]],$randakeys);
 			} else {
 				$akey = array_search($randqkeys[$i],$randakeys);
 			}
-			$sa .= chr($akey+97)." ";
+			if ($displayformat == "select") {
+				$sa .= $answers[$randakeys[$akey]].' ';	
+			} else {
+				$sa .= chr($akey+97)." ";
+			}
 
 		}
 	} else if ($anstype == "calculated") {
@@ -958,9 +984,10 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		} else if ($answerformat[0]=='opendot') {
 			$def = 2;
 		}
+		$dotline = false;
 		$out .= '</span></div>';
 		$out .= "<input type=\"hidden\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" />";
-		$out .= "<script>canvases[canvases.length] = [$qn,'$bg',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,$def];";
+		$out .= "<script>canvases[canvases.length] = [$qn,'$bg',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,$def,$dotline];";
 		
 		$la = str_replace(array('(',')'),array('[',']'),$la);
 		$la = explode(';;',$la);
@@ -1200,7 +1227,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		for ($i=0;$i<count($questions);$i++) {
 			if ($i>0) {$GLOBALS['partlastanswer'] .= "|";} else {$GLOBALS['partlastanswer']='';}
 			$GLOBALS['partlastanswer'] .= $_POST["qn$qn-$i"];
-			if ($_POST["qn$qn-$i"]!="") {
+			if ($_POST["qn$qn-$i"]!="" && $_POST["qn$qn-$i"]!="-") {
 				$qa = ord($_POST["qn$qn-$i"]);
 				if ($qa<97) { //if uppercase answer
 					$qa -= 65;  //shift A to 0

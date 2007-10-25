@@ -154,7 +154,11 @@ function interpret($blockname,$anstype,$str)
 				$com = '';
 			} else if (($ns = preg_replace('/.*setseed\(([^\)]*)\).*/',"$1",$com)) != $com) {
 				if ($ns=="userid") {
-					srand($GLOBALS['userid']);
+					if (isset($GLOBALS['teacherid']) && isset($GLOBALS['teacherreview'])) { //reviewing in gradebook
+						srand($GLOBALS['teacherreview']);	
+					} else { //in assessment
+						srand($GLOBALS['userid']); 
+					}
 				} else {
 					srand($ns);
 				}
@@ -177,9 +181,11 @@ function interpret($blockname,$anstype,$str)
 						}
 					}
 				}
-				$ifcond = str_replace('!=','#=',$ifcond);
-				$ifcond = mathphp($ifcond,null);
-				$ifcond = str_replace('#=','!=',$ifcond);
+				if (strpos($ifcond,'"')===false && strpos($ifcond,"'")===false) { //if not quoted, mathphp it 
+					$ifcond = str_replace('!=','#=',$ifcond);
+					$ifcond = mathphp($ifcond,null);
+					$ifcond = str_replace('#=','!=',$ifcond);
+				}
 								
 				$com = "if ($ifcond) { $com; }";
 			} 

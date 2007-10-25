@@ -151,33 +151,37 @@ Date.prototype.getWeekDays = function(d) {
   function senddownsub(type,basearr,st,usebusdays) {  //type: s,e,r
 	  var d = new Date();
 	  var db = new Date();
-	  var newstartdate = document.getElementById(type+"date"+st).value;
-	  if (newstartdate!=0 && newstartdate!=2000000000) {
-		  var newstarttime = document.getElementById(type+"time"+st).value;
-		  d.setTime(Date.parse(newstartdate + ' ' + newstarttime.replace(/^\s*(\d+)\s*(am|pm)/,"$1:00 $2")));
-		  db.setTime(basearr[st]*1000); 
-		  if (usebusdays) {
-			  var daydiff = db.getWeekDays(d); //days
-		  } else {
-			  var daydiff = db.daysBetween(d); //days
-		  }
-		  var timediff = (d.getHours()*60+d.getMinutes()) - (db.getHours()*60+db.getMinutes()); //minutes
-		  for (var i=st+1;i<basearr.length;i++) {
-			 curdate = document.getElementById(type+"date"+i).value;
-			 if (curdate!=0 && curdate!=2000000000) {
-				 d.setTime(basearr[i]*1000);
-				 d.setTime(d.getTime()+timediff*60000);
-				 if (usebusdays) {
-					 d.addBizDays(daydiff);
-				 } else {
-					 d.addDays(daydiff);
-				 }
-				 nicedate = leadingZero(d.getMonth()+1)+'/'+leadingZero(d.getDate())+'/'+d.getFullYear();
-				 document.getElementById(type+"date"+i).value = nicedate;
-				 document.getElementById(type+"d"+i).innerHTML = d.SHORTDAYS[d.getDay()];
-				 nicetime = makenicetime(d);
-				 document.getElementById(type+"time"+i).value = nicetime;
-			 }
+	  if (document.getElementById(type+"datetype"+st).value==1) {
+		  var newstartdate = document.getElementById(type+"date"+st).value;
+		  if (newstartdate!=0 && newstartdate!=2000000000 && basearr[st]!="NA") {
+			  var newstarttime = document.getElementById(type+"time"+st).value;
+			  d.setTime(Date.parse(newstartdate + ' ' + newstarttime.replace(/^\s*(\d+)\s*(am|pm)/,"$1:00 $2")));
+			  db.setTime(basearr[st]*1000); 
+			  if (usebusdays) {
+				  var daydiff = db.getWeekDays(d); //days
+			  } else {
+				  var daydiff = db.daysBetween(d); //days
+			  }
+			  var timediff = (d.getHours()*60+d.getMinutes()) - (db.getHours()*60+db.getMinutes()); //minutes
+			  for (var i=st+1;i<basearr.length;i++) {
+				  if (basearr[i]!="NA" && document.getElementById(type+"datetype"+i).value==1) {
+					 curdate = document.getElementById(type+"date"+i).value;
+					 if (curdate!=0 && curdate!=2000000000) {
+						 d.setTime(basearr[i]*1000);
+						 d.setTime(d.getTime()+timediff*60000);
+						 if (usebusdays) {
+							 d.addBizDays(daydiff);
+						 } else {
+							 d.addDays(daydiff);
+						 }
+						 nicedate = leadingZero(d.getMonth()+1)+'/'+leadingZero(d.getDate())+'/'+d.getFullYear();
+						 document.getElementById(type+"date"+i).value = nicedate;
+						 document.getElementById(type+"d"+i).innerHTML = d.SHORTDAYS[d.getDay()];
+						 nicetime = makenicetime(d);
+						 document.getElementById(type+"time"+i).value = nicetime;
+					 }
+				  }
+			  }
 		  }
 	  }
   }
@@ -185,7 +189,9 @@ Date.prototype.getWeekDays = function(d) {
 	  var usebusdays = document.getElementById("onlyweekdays").checked
 	  senddownsub('s',basesdates,st,usebusdays);
 	  senddownsub('e',baseedates,st,usebusdays);
-	  senddownsub('r',baserdates,st,usebusdays);
+	  if (baserdates[st]!="NA") {
+		  senddownsub('r',baserdates,st,usebusdays);
+	  }
   }
   function filteritems() {
 	  var filtertype = document.getElementById("filter").value;
@@ -203,6 +209,22 @@ Date.prototype.getWeekDays = function(d) {
 	  document.getElementById(el.id.substring(0,2)+el.id.substring(5)).innerHTML = globd.SHORTDAYS[globd.getDay()];
 	  CP_tmpReturnFunction(y,m,d);
   }
+
+  function MCDtoggle(type,cnt) {
+	var typeinput = document.getElementById(type+"datetype"+cnt);
+	if (typeinput.value==0) { //swap from A/N to date
+		document.getElementById(type+"span0"+cnt).className="hide";
+		document.getElementById(type+"span1"+cnt).className="show";
+		typeinput.value = 1;
+	} else { //swap from date to A/N
+		document.getElementById(type+"span0"+cnt).className="show";
+		document.getElementById(type+"span1"+cnt).className="hide";
+		typeinput.value = 0;
+	}
+	  
+  }
+  
+  
   	//TODO: separately calculate day difference (using daysBetween and getWeekDays) and time difference separately
 	//can use getHours()*60+getMinutes() to get minutes into day, then multiply to get ms for timediff
 	//then use date object, set to basesdate, use addDays or addBizDays to add the days, and setTime(getTime()+d) for time diff.

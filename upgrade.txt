@@ -1,6 +1,20 @@
 Upgrade Notes
 
 *********************
+** IMathAS 1.4     **
+*********************
+
+*** Database Changes ***
+
+ALTER TABLE `imas_assessments` ADD `noprint` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0';
+ALTER TABLE `imas_forum_views` ADD `tagged` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0';
+
+ALTER TABLE `imas_forum_posts` ADD `points` SMALLINT ( 5 ) NULL ;
+ALTER TABLE `imas_forums` ADD `points` SMALLINT( 5 ) NOT NULL DEFAULT '0',
+ADD `gbcategory` INT( 10 ) UNSIGNED NOT NULL DEFAULT '0';
+
+
+*********************
 ** IMathAS 1.3     **
 *********************
 

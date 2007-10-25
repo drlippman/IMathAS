@@ -81,28 +81,28 @@ isread:
 		if ($page==1) {
 			echo "<b>1</b> ";
 		} else {
-			echo "<a href=\"msglist.php?page=1&cid=$cid\">1</a> ";
+			echo "<a href=\"sentlist.php?page=1&cid=$cid\">1</a> ";
 		}
 		if ($min!=2) { echo " ... ";}
 		for ($i = $min; $i<=$max; $i++) {
 			if ($page == $i) {
 				echo "<b>$i</b> ";
 			} else {
-				echo "<a href=\"msglist.php?page=$i&cid=$cid\">$i</a> ";
+				echo "<a href=\"sentlist.php?page=$i&cid=$cid\">$i</a> ";
 			}
 		}
 		if ($max!=$numpages-1) { echo " ... ";}
 		if ($page == $numpages) {
 			echo "<b>$numpages</b> ";
 		} else {
-			echo "<a href=\"msglist.php?page=$numpages&cid=$cid\">$numpages</a> ";
+			echo "<a href=\"sentlist.php?page=$numpages&cid=$cid\">$numpages</a> ";
 		}
 		echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 		if ($page>1) {
-			echo "<a href=\"msglist.php?page=".($page-1)."&cid=$cid\">Previous</a> ";
+			echo "<a href=\"sentlist.php?page=".($page-1)."&cid=$cid\">Previous</a> ";
 		}
 		if ($page < $numpages) {
-			echo "<a href=\"msglist.php?page=".($page+1)."&cid=$cid\">Next</a> ";
+			echo "<a href=\"sentlist.php?page=".($page+1)."&cid=$cid\">Next</a> ";
 		}
 		echo "</div>\n";
 	}

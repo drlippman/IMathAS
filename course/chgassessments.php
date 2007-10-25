@@ -188,7 +188,7 @@ function chkAll(frm, arr, mark) {
 Check/Uncheck All: <input type="checkbox" name="ca" value="1" onClick="chkAll(this.form, 'checked[]', this.checked)" checked=checked>
 <ul class=nomark>
 <?php
-	$query = "SELECT id,name FROM imas_assessments WHERE courseid='$cid'";
+	$query = "SELECT id,name FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	if (mysql_num_rows($result)==0) {
 		echo "<li>No Assessments to change</li>";

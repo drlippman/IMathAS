@@ -638,12 +638,15 @@ function AMTparseExpr($str,$rightbracket) {
 					array_push($pos,0);
 					$matrix = true;
 					$mxnestingd = 0;
+					$addedlast = true;
 					for ($i=1; $i<$len-1;$i++) {
 						if ($newFrag{$i}==$left) { $mxnestingd++;}
 						if ($newFrag{$i}==$right) {
 							$mxnestingd--;
 							if ($mxnestingd==0 && $newFrag{$i+2}==',' && $newFrag{$i+3}=='{') {
 									array_push($pos,$i+2);
+							} else if ($mxnestingd==0 && $i+2<$len) {
+								$matrix = false;
 							}
 						}
 					}

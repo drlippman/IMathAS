@@ -21,7 +21,7 @@
 	 } else if (isset($_COOKIE['showusers'])) {
 		 $showusers = $_COOKIE['showusers'];
 	 } else {
-		 $showusers = 0;
+		 $showusers = $groupid;
 	 }
  } else {
 	 $showusers = 0;
@@ -39,7 +39,7 @@
 <h3>Courses</h3>
 <div class=item>
 <table class=gb border=0 width="90%">
-<thead><tr><th>Name</th><th>Course ID</th><th>Owner</th><th>&nbsp;</th><th>&nbsp;</th><th>&nbsp;</th><th>&nbsp;</th></tr></thead>
+<thead><tr><th>Name</th><th>Course ID</th><th>Owner</th><th>Modify</th><th>Teachers</th><th>Transfer</th><th>Delete</th></tr></thead>
 <tbody>
 <?php
 $query = "SELECT imas_courses.id,imas_courses.ownerid,imas_courses.name,imas_users.FirstName,imas_users.LastName FROM imas_courses,imas_users ";
@@ -59,18 +59,18 @@ while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 	if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 	echo "<td><a href=\"../course/course.php?cid={$line['id']}\">{$line['name']}</a></td><td class=c>{$line['id']}</td>\n";
 	echo "<td>{$line['LastName']}, {$line['FirstName']}</td>\n";
-	echo "<td><a href=\"forms.php?action=modify&id={$line['id']}\">Modify</a></td>\n";
+	echo "<td class=c><a href=\"forms.php?action=modify&id={$line['id']}\">Modify</a></td>\n";
 	if ($myrights<75) { 
 		echo "<td></td>"; 
 	} else {
-		echo "<td><a href=\"forms.php?action=chgteachers&id={$line['id']}\">Add/Remove Teachers</a></td>\n";
+		echo "<td class=c><a href=\"forms.php?action=chgteachers&id={$line['id']}\">Add/Remove</a></td>\n";
 	}
 	if ($line['ownerid']!=$userid && $myrights <75) {
 		echo "<td></td>";
 	} else {
-		echo "<td><a href=\"forms.php?action=transfer&id={$line['id']}\">Transfer</a></td>\n";
+		echo "<td class=c><a href=\"forms.php?action=transfer&id={$line['id']}\">Transfer</a></td>\n";
 	}
-	echo "<td><a href=\"forms.php?action=delete&id={$line['id']}\">Delete</a></td>\n";
+	echo "<td class=c><a href=\"forms.php?action=delete&id={$line['id']}\">Delete</a></td>\n";
 	echo "</tr>\n";
 }
 ?>
@@ -197,13 +197,10 @@ if ($myrights < 100 || $showusers==0) {
 if ($myrights < 100) {
 	$query = "SELECT id,SID,FirstName,LastName,rights,lastaccess FROM imas_users WHERE rights > 10 AND groupid='$groupid' ORDER BY LastName";
 } else {
-	if (is_numeric($showusers) && $showusers==0) {
-		$showusers = $groupid;
-	}
-	if (is_numeric($showusers)) {
-		$query = "SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE rights > 10 AND groupid='$showusers' ORDER BY LastName";
-	} else if ($showusers==-1) {
+	if ($showusers==-1) {
 		$query = "SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE rights=0 ORDER BY LastName";
+	} else if (is_numeric($showusers)) {
+		$query = "SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE rights > 10 AND groupid='$showusers' ORDER BY LastName";
 	} else {
 		$query = "SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE substring(LastName,1,1)='$showusers' ORDER BY LastName";
 	}
@@ -256,6 +253,11 @@ if ($myrights == 100) {
 		echo "selected=1";
 	}
 	echo '>Pending</option>';
+	echo '<option value="0" ';
+	if (is_numeric($showusers) && $showusers==0) {
+		echo "selected=1";
+	}
+	echo '>Default</option>';
 	$query = "SELECT id,name from imas_groups ORDER BY name";
 	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 	while ($row = mysql_fetch_row($result)) {

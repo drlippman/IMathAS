@@ -2,6 +2,12 @@
 //IMathAS:  Add an assessment/ change settings
 //(c) 2006 David Lippman
 	require("../validate.php");
+	if (!(isset($teacherid))) {
+		require("../header.php");
+		echo "You need to log in as a teacher to access this page";
+		require("../footer.php");
+		exit;
+	}
 	$cid = $_GET['cid'];
 	
 	if (isset($_GET['action'])) {
@@ -448,8 +454,13 @@ END;
 				echo "<ul class=hide id=\"{$line['userid']}\">";
 				$lastteacher = $line['userid'];
 			}
-			echo "<li><span class=dd>-</span><input type=radio name=ctc value=\"{$line['id']}\">{$line['name']} ";
-			if ($line['copyrights']<1) {echo '&copy;'; }
+			echo "<li><span class=dd>-</span><input type=radio name=ctc value=\"{$line['id']}\">{$line['name']}";
+			
+			if ($line['copyrights']<1) {
+				echo '&copy;'; 
+			} else {
+				echo " <a href=\"course.php?cid={$line['id']}\" target=\"_blank\">Preview</a>";
+			}
 			echo "</li>\n";
 		}
 		echo "</ul></li>\n"; 
@@ -501,8 +512,13 @@ END;
 				echo "<ul class=hide id=\"{$line['userid']}\">";
 				$lastteacher = $line['userid'];
 			}
-			echo "<li><span class=dd>-</span><input type=radio name=ctc value=\"{$line['id']}\">{$line['name']} ";
-			if ($line['copyrights']<2) {echo '&copy;';}
+			echo "<li><span class=dd>-</span><input type=radio name=ctc value=\"{$line['id']}\">{$line['name']}";
+			
+			if ($line['copyrights']<2) {
+				echo '&copy;';
+			} else {
+				echo " <a href=\"course.php?cid={$line['id']}\" target=\"_blank\">Preview</a>";
+			}
 			echo "</li>\n";
 		}
 		echo "</ul></li>\n";
@@ -521,7 +537,11 @@ END;
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
 			echo "<li><span class=dd>-</span><input type=radio name=ctc value=\"{$row[0]}\">{$row[1]} ";
-			if ($row[2]<2) {echo '&copy;'; }
+			if ($row[2]<2) {
+				echo '&copy;';
+			} else {
+				echo " <a href=\"course.php?cid={$row[0]}\" target=\"_blank\">Preview</a>";
+			}
 			echo "</li>\n";
 		}
 		echo "</ul></li>\n";

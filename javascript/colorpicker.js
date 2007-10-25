@@ -353,9 +353,10 @@
 		// fired when mouse moves over the color slider
 		if(cp.SliderMouseDown){
 			cpSliderClick(ev);
+			return false;
 		}
 
-		return false;
+		//return false;
 	}
 
 	function cpSliderSetColor(y){
