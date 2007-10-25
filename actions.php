@@ -234,7 +234,17 @@
 		} else {
 			$qrightsdef = 2;
 		}
-		$query = "UPDATE imas_users SET FirstName='{$_POST['firstname']}',LastName='{$_POST['lastname']}',email='{$_POST['email']}',msgnotify=$msgnot,qrightsdef=$qrightsdef ";
+		if (isset($_POST['usedeflib'])) {
+			$usedeflib = 1;
+		} else {
+			$usedeflib = 0;
+		}
+		if ($myrights<20) {
+			$deflib = 0;
+		} else {
+			$deflib = $_POST['libs'];
+		}
+		$query = "UPDATE imas_users SET FirstName='{$_POST['firstname']}',LastName='{$_POST['lastname']}',email='{$_POST['email']}',msgnotify=$msgnot,qrightsdef=$qrightsdef,deflib='$deflib',usedeflib='$usedeflib' ";
 		$query .= "WHERE id='$userid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 	} 

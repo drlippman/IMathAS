@@ -183,12 +183,13 @@ END;
  if ($hasusername) {
 	//check validity, if desired
 	//$username = $_COOKIE['username'];
-	$query = "SELECT SID,rights,groupid,LastName,FirstName FROM imas_users WHERE id='$userid'"; 
+	$query = "SELECT SID,rights,groupid,LastName,FirstName,deflib FROM imas_users WHERE id='$userid'"; 
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
 	$username = $line['SID'];
 	$myrights = $line['rights'];
 	$groupid = $line['groupid'];
+	$userdeflib = $line['deflib'];
 	$userfullname = $line['FirstName'] . ' ' . $line['LastName'];
 	$previewshift = -1;
 	if (isset($_GET['cid']) && $_GET['cid']!="admin" && $_GET['cid']>0) {

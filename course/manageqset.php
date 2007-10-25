@@ -557,7 +557,7 @@ END;
 		
 		if (isset($_POST['libs'])) {
 			if ($_POST['libs']=='') {
-				$_POST['libs'] = '0';
+				$_POST['libs'] = "$userdeflib";
 			}
 			$searchlibs = $_POST['libs'];
 			//$sessiondata['lastsearchlibs'] = implode(",",$searchlibs);
@@ -573,7 +573,7 @@ END;
 			//$searchlibs = explode(",",$sessiondata['lastsearchlibs']);
 			$searchlibs = $sessiondata['lastsearchlibs'.$cid];
 		} else {
-			$searchlibs = '0';
+			$searchlibs = "$userdeflib";
 		}
 		
 		$llist = "'".implode("','",explode(',',$searchlibs))."'";
@@ -721,7 +721,11 @@ END;
 			$times = mysql_result($result2,0,0);
 			if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 			echo "<td><input type=checkbox name='nchecked[]' id='qo$ln' value='{$line['id']}'></td>\n";
-			echo "<td>{$line['description']}</td>";
+			if ($line['userights']==0) {
+				echo "<td><span class='red'>{$line['description']}</span></td>";
+			} else {
+				echo "<td>{$line['description']}</td>";
+			}
 			echo "<td><input type=button value=\"Preview\" onClick=\"previewq('selform',$ln,{$line['id']})\"/></td>\n";
 			echo "<td><select onchange=\"doaction(this.value,{$line['id']})\"><option value=\"0\">Action..</option>";
 			if ($isadmin || ($isgrpadmin && $line['groupid']==$groupid) || $line['ownerid']==$userid || $line['userights']>2) {

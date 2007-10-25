@@ -296,16 +296,24 @@
 				}
 			}
 			if (isset($_GET['template'])) {
+				$query = "SELECT deflib,usedeflib FROM imas_users WHERE id='$userid'";
+				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				list($deflib,$usedeflib) = mysql_fetch_row($result);
+				
 				if (isset($_GET['makelocal'])) {
-					$inlibs[] = 0;
+					$inlibs[] = $deflib;
 				} else {
-					$query = "SELECT imas_libraries.id,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.groupid ";
-					$query .= "FROM imas_libraries,imas_library_items WHERE imas_library_items.libid=imas_libraries.id ";
-					$query .= "AND imas_library_items.qsetid='{$_GET['id']}'";
-					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-					while ($row = mysql_fetch_row($result)) {
-						if ($row[2] == 8 || ($row[3]==$groupid && ($row[2]%3==2)) || $row[1]==$userid) {
-							$inlibs[] = $row[0];
+					if ($usedeflib==1) {
+						$inlibs[] = $deflib;
+					} else {
+						$query = "SELECT imas_libraries.id,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.groupid ";
+						$query .= "FROM imas_libraries,imas_library_items WHERE imas_library_items.libid=imas_libraries.id ";
+						$query .= "AND imas_library_items.qsetid='{$_GET['id']}'";
+						$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+						while ($row = mysql_fetch_row($result)) {
+							if ($row[2] == 8 || ($row[3]==$groupid && ($row[2]%3==2)) || $row[1]==$userid) {
+								$inlibs[] = $row[0];
+							}
 						}
 					}
 				}

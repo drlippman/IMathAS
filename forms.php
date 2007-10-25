@@ -45,9 +45,43 @@ switch($_GET['action']) {
 		if ($myrights>19) {
 			echo "<span class=form><label for=\"qrd\">Make new questions private by default?<br/>(recommended for new users):</label></span><span class=formright><input type=checkbox id=qrd name=qrd ";
 			if ($line['qrightsdef']==0) {echo "checked=1";}
-			echo " /></span><BR class=form>\n";	
+			echo " /></span><BR class=form>\n";
+			if ($line['deflib']==0) {
+				$lname = "Unassigned";
+			} else {
+				$query = "SELECT name FROM imas_libraries WHERE id='{$line['deflib']}'";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$lname = mysql_result($result,0,0);
+			}
+			
+			echo "<script type=\"text/javascript\">";
+			echo "var curlibs = '{$line['deflib']}';";
+			echo "function libselect() {";
+			echo "  window.open('$imasroot/course/libtree2.php?libtree=popup&type=radio&libs='+curlibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));";
+			echo " }";
+			echo "function setlib(libs) {";
+			echo "  document.getElementById(\"libs\").value = libs;";
+			echo "  curlibs = libs;";
+			echo "}";
+			echo "function setlibnames(libn) {";
+			echo "  document.getElementById(\"libnames\").innerHTML = libn;";
+			echo "}";
+			echo "</script>";
+			echo "<span class=form>Default question library:</span><span class=formright> <span id=\"libnames\">$lname</span><input type=hidden name=\"libs\" id=\"libs\"  value=\"{$line['deflib']}\">\n";
+			echo " <input type=button value=\"Select Library\" onClick=\"libselect()\"></span><br class=form> ";
+			
+			echo "<span class=form>Use default question library for all templated questions?</span>";
+			echo "<span class=formright><input type=checkbox name=\"usedeflib\"";
+			if ($line['usedeflib']==1) {echo "checked=1";}
+			echo "></span><br class=form>";
+			
 		}
 		echo "<div class=submit><input type=submit value='Update Info'></div>\n";
+		if ($myrights>19) {
+			echo "<p>Default question library is used for all local (assessment-only) copies of questions created when you ";
+			echo "edit a question (that's not yours) in an assessment.  You can elect to have all templated questions ";
+			echo "be assigned to this library.</p>";
+		}
 		echo "</form>\n";
 		break;
 	case "unenroll":
