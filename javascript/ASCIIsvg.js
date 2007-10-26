@@ -797,6 +797,10 @@ function safepow(base,power) {
 	}
 }
 
+function matchtolower(match) {
+	return match.toLowerCase();
+}
+
 function mathjs(st,varlist) {
   //translate a math formula to js function notation
   // a^b --> pow(a,b)
@@ -827,6 +831,8 @@ function mathjs(st,varlist) {
   }
   st = st.replace(/\s/g,"");
   st = st.replace(/log/g,"logten");
+  st = st.replace(/(Sin|Cos|Tan|Sec|Csc|Cot|Arc|Abs|Log|Ln)/g, matchtolower);
+  
   if (st.indexOf("^-1")!=-1) {
     st = st.replace(/sin\^-1/g,"arcsin");
     st = st.replace(/cos\^-1/g,"arccos");

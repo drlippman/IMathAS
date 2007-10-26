@@ -41,6 +41,10 @@ function C(x,k) {
   return res;
 }
 
+function matchtolower(match) {
+	return match.toLowerCase();
+}
+
 function safepow(base,power) {
 	if (base<0 && Math.floor(power)!=power) {
 		for (var j=3; j<50; j+=2) {
@@ -87,6 +91,7 @@ function mathjs(st,varlist) {
   }
   st = st.replace(/\s/g,"");
   st = st.replace(/log/g,"logten");
+  st = st.replace(/(Sin|Cos|Tan|Sec|Csc|Cot|Arc|Abs|Log|Ln)/g, matchtolower);
   if (st.indexOf("^-1")!=-1) {
     st = st.replace(/sin\^-1/g,"arcsin");
     st = st.replace(/cos\^-1/g,"arccos");
