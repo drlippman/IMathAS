@@ -187,7 +187,7 @@
 	$qi = getquestioninfo($questions,$testsettings);
 	$now = time();
 	//check for dates - kick out student if after due date
-	if (!$isteacher) {
+	//if (!$isteacher) {
 		if ($now < $testsettings['startdate'] || $testsettings['enddate']<$now) { //outside normal range for test
 			$query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='{$line['assessmentid']}'";
 			$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -197,7 +197,7 @@
 					if ($now > $testsettings['startdate'] && $now<$testsettings['reviewdate']) {
 						$isreview = true;
 					} else {
-						if (!isset($teacherid)) {
+						if (!$isteacher) {
 							echo "Assessment is closed";
 							echo "<br/><a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to course page</a>";
 							exit;
@@ -208,7 +208,7 @@
 				if ($now > $testsettings['startdate'] && $now<$testsettings['reviewdate']) {
 					$isreview = true;
 				} else {
-					if (!isset($teacherid)) {
+					if (!$isteacher) {
 						echo "Assessment is closed";
 						echo "<br/><a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to course page</a>";
 						exit;
@@ -216,7 +216,7 @@
 				}
 			}
 		}
-	}
+	//}
 	if ($isreview) {
 		//$testsettings['displaymethod'] = "SkipAround";
 		$testsettings['testtype']="Practice";

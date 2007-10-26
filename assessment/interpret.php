@@ -1,4 +1,4 @@
-<?
+<?php
 //IMathAS:  IMathAS question interpreter.  Defines how the IMathAS question
 //language works.
 //(c) 2006 David Lippman
