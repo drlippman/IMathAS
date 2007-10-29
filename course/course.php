@@ -353,8 +353,15 @@
 	   }
 	   	   
 	   showitems($items,$_GET['folder']);
+	   
    }
-   
+   if (isset($backtrack)) {
+	   if (count($backtrack)==1) {
+		   echo "<span class=right><a href=\"course.php?cid=$cid&folder=0\">Back</a></span>";
+	   } else {
+		   echo "<span class=right><a href=\"course.php?cid=$cid&folder=".$backtrack[count($backtrack)-2][1]."\">Back</a></span>";
+	   }
+   }
    
    if ($useleftbar && isset($teacherid)) {
 	   echo "</div>";

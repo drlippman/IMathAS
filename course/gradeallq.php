@@ -16,6 +16,11 @@
 	$gbmode = $_GET['gbmode'];
 	$aid = $_GET['aid'];
 	$qid = $_GET['qid'];
+	if (isset($_GET['ver'])) {
+		$ver = $_GET['ver'];
+	} else {
+		$ver = 'graded';
+	}
 	
 	if (isset($_GET['update'])) {
 		$allscores = array();
@@ -80,7 +85,7 @@
 	if ($points==9999) {
 		$points = $defpoints;
 	}
-	$useeditor = 'review';
+	
 	require("../assessment/header.php");
 	echo "<style type=\"text/css\">p.tips {	display: none;}\n</style>\n";
 	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
@@ -88,7 +93,8 @@
 	echo "&gt; <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&aid=$aid&asid=average\">Item Analysis</a> ";
 	echo "&gt; Grading a Question</div>";
 	echo "<h2>Grading a Question in $aname</h2>";
-	echo "Note: Feedback is for whole assessment, not the individual question.";
+	echo "<p><b>Warning</b>: This page may not work correctly if the question selected is part of a group of questions</p>";
+	echo "<p>Note: Feedback is for whole assessment, not the individual question.</p>";
 	
 	echo '<script type="text/javascript">';
 	echo 'function hidecorrect() {';
@@ -112,7 +118,16 @@
 	echo '</script>';
 	echo '<input type=button id="hctoggle" value="Hide Perfect Score Questions" onclick="hidecorrect()" />';
 	echo "<form id=\"mainform\" method=post action=\"gradeallq.php?stu=$stu&gbmode=$gbmode&cid=$cid&aid=$aid&qid=$qid&update=true\">\n";
-	
+	echo "<p>";
+	if ($ver=='graded') {
+		echo "Showing Graded Attempts.  ";
+		echo "<a href=\"gradeallq.php?stu=$stu&gbmode=$gbmode&cid=$cid&aid=$aid&qid=$qid&ver=last\">Show Last Attempts</a>";
+	} else if ($ver=='last') {
+		echo "<a href=\"gradeallq.php?stu=$stu&gbmode=$gbmode&cid=$cid&aid=$aid&qid=$qid&ver=graded\">Show Graded Attempts</a>.  ";
+		echo "Showing Last Attempts.  ";
+		echo "<br/><b>Note:</b> Grades and number of attempt used are for the Graded Attempt";
+	}
+	echo "</p>";
 	$query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions,imas_students ";
 	$query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_students.userid=imas_users.id AND imas_students.courseid='$cid' AND imas_assessment_sessions.assessmentid='$aid' ";
 	$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
@@ -120,10 +135,15 @@
 	$cnt = 0;
 	while($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 		$questions = explode(',',$line['questions']);
-		$seeds = explode(",",$line['bestseeds']);
 		$scores = explode(",",$line['bestscores']);
 		$attempts = explode(",",$line['bestattempts']);
-		$la = explode("~",$line['bestlastanswers']);
+		if ($ver=='graded') {
+			$seeds = explode(",",$line['bestseeds']);
+			$la = explode("~",$line['bestlastanswers']);
+		} else if ($ver=='last') {
+			$seeds = explode(",",$line['seeds']);
+			$la = explode("~",$line['lastanswers']);
+		}
 		$loc = array_search($qid,$questions);
 		echo "<h4>".$line['LastName'].', '.$line['FirstName']."</h4>";
 		echo "<div ";
@@ -156,21 +176,21 @@
 			}
 		}
 		echo " out of $points in {$attempts[$loc]} attempt(s)\n";
-		if ($isteacher) {
-			$laarr = explode('##',$lastanswers[$loc]);
-			if (count($laarr)>1) {
-				echo "<br/>Previous Attempts:";
-				$cntb =1;
-				for ($k=0;$k<count($laarr)-1;$k++) {
-					if ($laarr[$k]=="ReGen") {
-						echo ' ReGen ';
-					} else {
-						echo "  <b>$cntb:</b> " . $laarr[$k];
-						$cntb++;
-					}
+		
+		$laarr = explode('##',$la[$loc]);
+		if (count($laarr)>1) {
+			echo "<br/>Previous Attempts:";
+			$cntb =1;
+			for ($k=0;$k<count($laarr)-1;$k++) {
+				if ($laarr[$k]=="ReGen") {
+					echo ' ReGen ';
+				} else {
+					echo "  <b>$cntb:</b> " . $laarr[$k];
+					$cntb++;
 				}
 			}
 		}
+		
 		
 		//echo " <a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid=$cid&add=new&quoteq=$i-$qsetid-{$seeds[$i]}&to={$_GET['uid']}\">Use in Msg</a>";
 		//echo " &nbsp; <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$line['id']}&clearq=$i\">Clear Score</a>";

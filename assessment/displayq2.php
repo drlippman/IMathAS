@@ -1828,6 +1828,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$correct = 0;
 		$ansar = explode(' or ',$answer);
 		$givenans = str_replace(' ','',$givenans);
+		
 		foreach($ansar as $anans) {
 			$answer = str_replace(' ','',$anans);
 			
@@ -1867,13 +1868,14 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					} else {
 						if (abs($anssn - $ganssn)/(abs($anssn)+.0001) < $reltolerance+ 1E-12) {} else {continue;}
 					}
-					if (strpos($anssn,'oo')) {
+					if (strpos($ansen,'oo')) {
 						if ($ansen===$gansen) {} else {continue;}
 					} else if (isset($abstolerance)) {
 						if (abs($ansen-$gansen) < $abstolerance + 1E-12) {} else {continue;} 	
 					} else {
 						if (abs($ansen - $gansen)/(abs($ansen)+.0001) < $reltolerance+ 1E-12) {} else {continue;}
 					}
+					
 					$foundloc = $k;
 					break;
 				}
