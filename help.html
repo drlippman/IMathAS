@@ -1391,6 +1391,7 @@ Single result randomizers:
 <li><b>nonzerorand(min,max)</b>:  Returns a nonzero integer between min and max</li>
 <li><b>nonzerorrand(min,max,p)</b>:  Returns a nonzero real number between min and max with precision p</li>
 <li><b>randfrom(list or array)</b>: Return an element of the list/array.  Examples of lists: &quot;2,4,6,8&quot;, or &quot;red,green,blue&quot;</li>
+<li><b>randname(),randmalename(),randfemalename()</b>:  Returns a random first name</li>
 </ul>
 
 Array randomizers (return multiple results):
@@ -1412,6 +1413,7 @@ Array randomizers (return multiple results):
     elements of list/array2 will be returned.</li>
 <li><b>singleshuffle(list/array,[n])</b>:  returns a shuffled version of a list/array.  If n is provided, 
     it behaves identically to diffrandsfrom</li>
+<li><b>randnames(n),randmalenames(n),randfemalenames(n)</b>:  Returns n random first names</li>
 </ul>
 
 </div>
@@ -1426,10 +1428,14 @@ The following macros help with display:
    This function can do weird things for equations that are not simple polynomials, so test well</li>
 <li><b>makexpretty and makexprettydisp</b>:  Like makepretty, but the X-tra version - attempts to clean up things like 1*, 0*, etc.  This function
    will often cause weird things to happen, so test well</li>
+<li><b>numtowords(number)</b>:  Creates a string containing number written out in words</li>
 <li><b>prettyint(number)</b>:  Adds commas in thousands spaces of integers.  Example: prettyint(1234) will return "1,234".  The result is a string, which
    can only be used for display, not in calculations</li>
 <li><b>prettyreal(number,decimals)</b>:  Adds commas in thousands spaces of number, and rounds decimal to decimals places.  Example: prettyreal(1234.567,2) will return "1,234.57".  The result is a string, which
    can only be used for display, not in calculations</li> 
+<li><b>prettytime(value,informat,outformat)</b>:  Creates a nice representation of a time.  Informat can be 'h', 'm', or 's' designating whether
+    value is hours, minutes, or seconds.  Outformat can be any combination of these to specify output.  For example, 'hm' will return "__ hours and __ minutes".  Outformat
+    can also be 'clock' which returns 3:42pm, or 'sclock' which returns 3:42:15pm</li>
 <li><b>dispreducedfraction(numerator,denominator)</b>:  Takes two numbers as numerator and denominator of a fraction, returning a display form of the fraction,
     reduced to lowest terms.  Suitable for $showanswer</li>
 <li><b>showarrays(string,array,[string,array]...)</b>:  Creates a tabular display of the data in the array(s) as column(s), with the strings
@@ -1678,8 +1684,8 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 </p>
 <p><b>Optional Variables</b><BR>
 <dl>
-<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "nodecimal", "notrig", "list", "exactlist", or "orderedlist" (In Common Control)</dt>
-	<dd>Requires the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), an answer
+<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "fracordec", "nodecimal", "notrig", "list", "exactlist", or "orderedlist" (In Common Control)</dt>
+	<dd>Requires the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), a single fraction or decimal, an answer
 	without decimals (also disallows 10^-2 and 3E-2), or 
 	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
 	If $answerformat includes "list", "exactlist", or "orderedlist", then a list of answers is expected. An $answerformat of "list" ignores then duplicate values.
@@ -1813,6 +1819,9 @@ A student is asked to match answers with questions
 	<dd>Displays a title above the list of answers</dd>
 <dt>$noshuffle = "questions" or "answers"</dt>
 	<dd>Retains original order of questions or answers, and only shuffles the other.  By default, both lists are shuffled</dd>
+<dt>$displayformat = "select"</dt>
+	<dd>Only displays the $answers, with select boxes next to each containing the $questions.  This should only be used with
+	pure text $questions.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place matching questions and answers in that location</dd>
 <dt>$showanswer (In Answer)</dt>
