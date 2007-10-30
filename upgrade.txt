@@ -6,6 +6,8 @@ Upgrade Notes
 
 *** Database Changes ***
 
+ALTER TABLE `imas_diags` ADD `entryformat` VARCHAR( 2 ) NOT NULL DEFAULT 'C0';
+
 ALTER TABLE `imas_users` ADD `deflib` INT( 10 ) UNSIGNED NOT NULL DEFAULT '0',
 ADD `usedeflib` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0';
 
