@@ -24,11 +24,15 @@
 		$aid = $_GET['id'];
 		$isreview = false;
 		
-		$query = "SELECT deffeedback,startdate,enddate,reviewdate,shuffle,itemorder,password FROM imas_assessments WHERE id='$aid'";
+		$query = "SELECT deffeedback,startdate,enddate,reviewdate,shuffle,itemorder,password,avail FROM imas_assessments WHERE id='$aid'";
 		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 		$adata = mysql_fetch_array($result, MYSQL_ASSOC);
 		$now = time();
 		
+		if ($adata['avail']==0 && !isset($teacherid)) {
+			echo "Assessment is closed";
+			exit;
+		}
 		if ($now < $adata['startdate'] || $adata['enddate']<$now) { //outside normal range for test
 			$query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid'";
 			$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -188,23 +192,17 @@
 	$now = time();
 	//check for dates - kick out student if after due date
 	//if (!$isteacher) {
-		if ($now < $testsettings['startdate'] || $testsettings['enddate']<$now) { //outside normal range for test
-			$query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='{$line['assessmentid']}'";
-			$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
-			$row = mysql_fetch_row($result2);
-			if ($row!=null) {
-				if ($now<$row[0] || $row[1]<$now) { //outside exception dates
-					if ($now > $testsettings['startdate'] && $now<$testsettings['reviewdate']) {
-						$isreview = true;
-					} else {
-						if (!$isteacher) {
-							echo "Assessment is closed";
-							echo "<br/><a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to course page</a>";
-							exit;
-						}
-					}
-				}
-			} else { //no exception
+	if ($testsettings['avail']==0 && !$isteacher) {
+		echo "Assessment is Closed";
+		echo "<br/><a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to course page</a>";
+		exit;
+	}
+	if ($now < $testsettings['startdate'] || $testsettings['enddate']<$now) { //outside normal range for test
+		$query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='{$line['assessmentid']}'";
+		$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
+		$row = mysql_fetch_row($result2);
+		if ($row!=null) {
+			if ($now<$row[0] || $row[1]<$now) { //outside exception dates
 				if ($now > $testsettings['startdate'] && $now<$testsettings['reviewdate']) {
 					$isreview = true;
 				} else {
@@ -215,7 +213,18 @@
 					}
 				}
 			}
+		} else { //no exception
+			if ($now > $testsettings['startdate'] && $now<$testsettings['reviewdate']) {
+				$isreview = true;
+			} else {
+				if (!$isteacher) {
+					echo "Assessment is closed";
+					echo "<br/><a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to course page</a>";
+					exit;
+				}
+			}
 		}
+	}
 	//}
 	if ($isreview) {
 		//$testsettings['displaymethod'] = "SkipAround";

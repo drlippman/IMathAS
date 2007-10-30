@@ -1,26 +1,31 @@
 <?php
-//IMathAS:  Mass change assessment settings
+//IMathAS:  Main admin page
 //(c) 2006 David Lippman
-	require("../validate.php");
-	
-	if (!(isset($teacherid))) {
-		require("../header.php");
-		echo "You need to log in as a teacher to access this page";
-		require("../footer.php");
-		exit;
-	}
-	
+
+/*** master php includes *******/
+require("../validate.php");
+require("../includes/htmlutil.php");
+
+/*** pre-html data manipulation, including function code *******/
+
+ //set some page specific variables and counters
+$overwriteBody = 0;
+$body = "";
+$pagetitle = "Mass Change Assessment Settings";
+
+$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; Mass Change Assessment Settings";
+
+	// SECURITY CHECK DATA PROCESSING
+if (!(isset($teacherid))) {
+	$overwriteBody = 1;
+	$body = "You need to log in as a teacher to access this page";
+} else {
 	$cid = $_GET['cid'];
 	
 	if (isset($_POST['checked'])) { //if the form has been submitted
 		$checked = $_POST['checked'];
 		$checkedlist = "'".implode("','",$checked)."'";
-		/*
-		if (isset($_POST['shuffle'])) { $shuffle = 1;} else {$shuffle = 0;}
-		if (isset($_POST['sameseed'])) { $shuffle += 2;}
-		if (isset($_POST['samever'])) { $shuffle += 4;}
-		if (isset($_POST['reattemptsdiffver'])) { $shuffle += 8;}
-		*/
+
 		$turnonshuffle = 0;
 		$turnoffshuffle = 0;
 		if (isset($_POST['chgshuffle'])) {
@@ -61,12 +66,7 @@
 		} else {
 			$deffeedback = $_POST['deffeedback'].'-'.$_POST['showans'];
 		}
-		/*
-		if ($_POST['copyfrom']!=0) {
-			$query = "SELECT timelimit,displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle FROM imas_assessments WHERE id='{$_POST['copyfrom']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			list($_POST['timelimit'],$_POST['displaymethod'],$_POST['defpoints'],$_POST['defattempts'],$_POST['defpenalty'],$deffeedback,$shuffle) = mysql_fetch_row($result);
-		}*/
+
 		$sets = array();
 		if (isset($_POST['chgtimelimit'])) {
 			$timelimit = $_POST['timelimit']*60;
@@ -121,16 +121,12 @@
 			$query = "UPDATE imas_assessments SET $setslist WHERE id IN ($checkedlist);";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		}
-		/*
-		$query = "UPDATE imas_assessments SET timelimit='{$_POST['timelimit']}',";
-		$query .= "displaymethod='{$_POST['displaymethod']}',defpoints='{$_POST['defpoints']}',defattempts='{$_POST['defattempts']}',defpenalty='{$_POST['defpenalty']}',deffeedback='$deffeedback',shuffle='$shuffle' ";
-		$query .= "WHERE id IN ($checkedlist);";
-		*/
+
 		
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
 		exit;
 		 
-	} else {
+	} else { //DATA MANIPULATION FOR INITIAL LOAD
 		$line['timelimit'] = 0;
 		$line['displaymethod']= "SkipAround";
 		$line['defpoints'] = 10;
@@ -141,17 +137,45 @@
 		$skippenalty = 0;
 		$line['defpenalty'] = 10;
 		$line['shuffle'] = 0;
+		
+		$query = "SELECT id,name FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		if (mysql_num_rows($result)==0) {
+			$page_assessListMsg = "<li>No Assessments to change</li>\n";
+		} else {
+			$page_assessListMsg = "";
+			$i=0;
+			$page_assessSelect = array();
+			while ($row = mysql_fetch_row($result)) {
+				$page_assessSelect['val'][$i] = $row[0];
+				$page_assessSelect['label'][$i] = $row[1];
+				$i++;
+			}
+		}	
+		
+		$query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$i=0;
+		$page_gbcatSelect = array();
+		if (mysql_num_rows($result)>0) {
+			while ($row = mysql_fetch_row($result)) {
+				$page_gbcatSelect['val'][$i] = $row[0];
+				$page_gbcatSelect['label'][$i] = $row[1];
+				$i++;
+			}
+		}	
+
+		
 	}
+}
 	
-	$pagetitle = "Mass Change Assessment Settings";
-	require("../header.php");
-	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";	
-	echo "&gt; Mass Change Assessment Settings</div>\n";
-	echo "<h2>Mass Change Assessment Settings <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h2>\n";
-	
+/******* begin html output ********/
+ require("../header.php");
+
+if ($overwriteBody==1) {
+	echo $body;
+} else {
 ?>
-<p>This form will allow you to change the assessment settings for several or all assessments at once.  <b>Beware</b> that changing default points or 
-penalty after an assessment has been taken will not change the scores of students who have already completed the assessment.</p>
 <style type="text/css">
 span.hidden {
 	display: none;
@@ -182,121 +206,178 @@ function chkAll(frm, arr, mark) {
 }
 
 </script>
-<form method=post action="chgassessments.php?cid=<?php echo $cid; ?>">
-<h3>Assessments to Change</h3>
 
-Check/Uncheck All: <input type="checkbox" name="ca" value="1" onClick="chkAll(this.form, 'checked[]', this.checked)" checked=checked>
-<ul class=nomark>
+	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
+	<h2>Mass Change Assessment Settings 
+		<img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
+	</h2>
+
+	<p>This form will allow you to change the assessment settings for several or all assessments at once.
+	 <b>Beware</b> that changing default points or penalty after an assessment has been 
+	 taken will not change the scores of students who have already completed the assessment.</p>
+
+	<form method=post action="chgassessments.php?cid=<?php echo $cid; ?>">
+		<h3>Assessments to Change</h3>
+
+		Check/Uncheck All: 
+		<input type="checkbox" name="ca" value="1" onClick="chkAll(this.form, 'checked[]', this.checked)" checked=checked>
+		<ul class=nomark>
 <?php
-	$query = "SELECT id,name FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	if (mysql_num_rows($result)==0) {
-		echo "<li>No Assessments to change</li>";
+	echo $page_assessListMsg;
+	for ($i=0;$i<count($page_assessSelect['val']);$i++) {
+?>
+			<li><input type=checkbox name='checked[]' value='<?php echo $page_assessSelect['val'][$i] ?>' checked=checked><?php echo $page_assessSelect['label'][$i] ?></li>
+<?php
 	}
-	while ($row = mysql_fetch_row($result)) {
-		echo "<li><input type=checkbox name='checked[]' value='{$row[0]}' checked=checked>{$row[1]}</li>\n";
-		$assesses[$row[0]] = $row[1];
-	}		
 ?>
-</ul>
+		</ul>
 
-<fieldset><legend>Assessment Options</legend>
-<table class=gb><thead><tr><th>Change?</th><th>Option</th><th>Setting</th></tr></thead><tbody>
-<tr><td><input type="checkbox" name="chgintro"/></td><td class="r">Instructions:</td><td>Copy from: <select name="intro">
+		<fieldset>
+		<legend>Assessment Options</legend>
+		<table class=gb>
+			<thead>
+			<tr><th>Change?</th><th>Option</th><th>Setting</th></tr>
+			</thead>
+			<tbody>
+			<tr>
+				<td><input type="checkbox" name="chgintro"/></td>
+				<td class="r">Instructions:</td>
+				<td>Copy from: 
 <?php
-foreach($assesses as $k=>$v) {
-	echo "<option value=\"$k\">$v</option>";
+	writeHtmlSelect("intro",$page_assessSelect['val'],$page_assessSelect['label']);
+?>
+
+				</td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" name="chgdates"/></td>
+				<td class="r">Dates:</td>
+				<td>Copy from:
+<?php
+	writeHtmlSelect("dates",$page_assessSelect['val'],$page_assessSelect['label']);
+?>
+				</td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" name="chgtimelimit"/></td>
+				<td class="r">Time Limit (minutes, 0 for no time limit): </td>
+				<td><input type=text size=4 name=timelimit value="<?php echo $line['timelimit']/60;?>"></td>
+			</tr>
+
+			<tr>
+				<td><input type="checkbox" name="chgdisplaymethod"/></td>
+				<td class="r">Display method: </td>
+				<td>
+				<select name="displaymethod">
+					<option value="AllAtOnce">Full test at once</option>
+					<option value="OneByOne">One question at a time</option>
+					<option value="Seq">Full test, submit one at time</option>
+					<option value="SkipAround" SELECTED>Skip Around</option>
+				</select>
+				</td>
+			</tr>
+
+			<tr>
+				<td><input type="checkbox" name="chgdefpoints"/></td>
+				<td class="r">Default points per problem: </td>
+				<td><input type=text size=4 name=defpoints value="<?php echo $line['defpoints'];?>" ></td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" name="chgdefattempts"/></td>
+				<td class="r">Default attempts per problem (0 for unlimited): </td>
+				<td>
+					<input type=text size=4 name=defattempts value="<?php echo $line['defattempts'];?>" >
+ 					<input type=checkbox name="reattemptsdiffver" />
+						Reattempts different versions
+				</td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" name="chgdefpenalty"/></td>
+				<td class="r">Default penalty:</td>
+				<td><input type=text size=4 name=defpenalty value="<?php echo $line['defpenalty'];?>" <?php if ($taken) {echo 'disabled=disabled';}?>>% 
+   					<select name="skippenalty" <?php if ($taken) {echo 'disabled=disabled';}?>>
+						<option value="0">per missed attempt</option>
+						<option value="1">per missed attempt, after 1</option>
+					    <option value="2">per missed attempt, after 2</option>
+					    <option value="3">per missed attempt, after 3</option>
+					    <option value="4">per missed attempt, after 4</option>
+					    <option value="5">per missed attempt, after 5</option>
+					    <option value="6">per missed attempt, after 6</option>
+					    <option value="10">on last possible attempt only</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" name="chgfeedback"/></td>
+				<td class="r">Feedback method: </td>
+				<td>
+					<select id="deffeedback" name="deffeedback" onChange="chgfb()" >
+						<option value="NoScores">No scores shown (use with 1 attempt per problem)</option>
+						<option value="EndScore" >Just show final score (total points & average) - only whole test can be reattemped</option>
+						<option value="EachAtEnd">Show score on each question at the end of the test </option>
+						<option value="AsGo" SELECTED >Show score on each question as it's submitted (does not apply to Full test at once display)</option>
+						<option value="Practice">Practice test: Show score on each question as it's submitted & can restart test; scores not saved</option>
+						<option value="Homework">Homework: Show score on each question as it's submitted & allow similar question to replace missed question</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td class="r">and Show Answers: </td>
+				<td>
+					<span id="showanspracspan" class="<?php echo ($testtype=="Practice" || $testtype=="Homework") ? "show" : "hidden"; ?>">
+					<select name="showansprac">
+						<option value="N">Never</option>
+						<option value="F">After last attempt (Skip Around only)</option>
+						<option value="0" >Always</option>
+						<option value="1" >After 1 attempt</option>
+						<option value="2" >After 2 attempts</option>
+						<option value="3" >After 3 attempts</option>
+						<option value="4" >After 4 attempts</option>
+						<option value="5" >After 5 attempts</option>
+					</select>
+					</span>
+					<span id="showansspan" class="<?php echo ($testtype!="Practice" && $testtype!="Homework") ? "show" : "hidden"; ?>">
+					<select name="showans">
+						<option value="N" >Never</option>
+						<option value="I">Immediately (in gradebook) - don't use if allowing multiple attempts per problem</option>
+						<option value="F" >After last attempt (Skip Around only)</option>
+						<option value="A" SELECTED>After due date (in gradebook)</option>
+					</select>
+					</span>
+				</td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" name="chgshuffle"/></td>
+				<td class="r">Shuffle item order: </td>
+				<td><input type="checkbox" name="shuffle"></td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" name="chgsameseed"/></td>
+				<td class="r">All items same random seed: </td>
+				<td><input type="checkbox" name="sameseed"></td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" name="chgsamever"/></td>
+				<td class="r">All students same version of questions: </td>
+				<td><input type="checkbox" name="samever"></td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" name="chggbcat"/></td>
+				<td class="r">Gradebook category: </td>
+				<td>
+<?php 
+writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],null,"Default",0," id=gbcat");
+?>
+
+				</td>
+			</tr>
+		</tbody>
+		</table>
+	</fieldset>
+	<div class=submit><input type=submit value=Submit></div>
+
+<?php
 }
-?>
-</select></td></tr>
-
-<tr><td><input type="checkbox" name="chgdates"/></td><td class="r">Dates:</td><td>Copy from: <select name="dates">
-<?php
-foreach($assesses as $k=>$v) {
-	echo "<option value=\"$k\">$v</option>";
-}
-?>
-</select></td></tr>
-
-<tr><td><input type="checkbox" name="chgtimelimit"/></td><td class="r">Time Limit (minutes, 0 for no time limit): </td><td><input type=text size=4 name=timelimit value="<?php echo $line['timelimit']/60;?>"></td></tr>
-
-<tr><td><input type="checkbox" name="chgdisplaymethod"/></td><td class="r">Display method: </td><td><select name="displaymethod">
-	<option value="AllAtOnce" <?php if ($line['displaymethod']=="AllAtOnce") {echo "SELECTED";} ?>>Full test at once</option>
-	<option value="OneByOne" <?php if ($line['displaymethod']=="OneByOne") {echo "SELECTED";} ?>>One question at a time</option>
-	<option value="SkipAround" <?php if ($line['displaymethod']=="SkipAround") {echo "SELECTED";} ?>>Skip Around</option>
-</select></td></tr>
-
-<tr><td><input type="checkbox" name="chgdefpoints"/></td><td class="r">Default points per problem: </td><td><input type=text size=4 name=defpoints value="<?php echo $line['defpoints'];?>" ></td></tr>
-
-<tr><td><input type="checkbox" name="chgdefattempts"/></td><td class="r">Default attempts per problem (0 for unlimited): </td><td><input type=text size=4 name=defattempts value="<?php echo $line['defattempts'];?>" >
- <input type=checkbox name="reattemptsdiffver" <?php if ($line['shuffle']&8) {echo "CHECKED";} ?> />Reattempts different versions</td></tr>
-
-
-<tr><td><input type="checkbox" name="chgdefpenalty"/></td><td class="r">Default penalty:</td><td><input type=text size=4 name=defpenalty value="<?php echo $line['defpenalty'];?>" <?php if ($taken) {echo 'disabled=disabled';}?>>% 
-   <select name="skippenalty" <?php if ($taken) {echo 'disabled=disabled';}?>>
-     <option value="0" <?php if ($skippenalty==0) {echo "selected=1";} ?>>per missed attempt</option>
-     <option value="1" <?php if ($skippenalty==1) {echo "selected=1";} ?>>per missed attempt, after 1</option>
-     <option value="2" <?php if ($skippenalty==2) {echo "selected=1";} ?>>per missed attempt, after 2</option>
-     <option value="3" <?php if ($skippenalty==3) {echo "selected=1";} ?>>per missed attempt, after 3</option>
-     <option value="4" <?php if ($skippenalty==4) {echo "selected=1";} ?>>per missed attempt, after 4</option>
-     <option value="5" <?php if ($skippenalty==5) {echo "selected=1";} ?>>per missed attempt, after 5</option>
-     <option value="6" <?php if ($skippenalty==6) {echo "selected=1";} ?>>per missed attempt, after 6</option>
-     <option value="10" <?php if ($skippenalty==10) {echo "selected=1";} ?>>on last possible attempt only</option>
-     </select></td></tr>
-
-
-<tr><td><input type="checkbox" name="chgfeedback"/></td><td class="r">Feedback method: </td><td><select id="deffeedback" name="deffeedback" onChange="chgfb()" >
-	<option value="NoScores" <?php if ($testtype=="NoScores") {echo "SELECTED";} ?>>No scores shown (use with 1 attempt per problem)</option>
-	<option value="EndScore" <?php if ($testtype=="EndScore") {echo "SELECTED";} ?>>Just show final score (total points & average) - only whole test can be reattemped</option>
-	<option value="EachAtEnd" <?php if ($testtype=="EachAtEnd") {echo "SELECTED";} ?>>Show score on each question at the end of the test </option>
-	<option value="AsGo" <?php if ($testtype=="AsGo") {echo "SELECTED";} ?>>Show score on each question as it's submitted (does not apply to Full test at once display)</option>
-	<option value="Practice" <?php if ($testtype=="Practice") {echo "SELECTED";} ?>>Practice test: Show score on each question as it's submitted & can restart test; scores not saved</option>
-	<option value="Homework" <?php if ($testtype=="Homework") {echo "SELECTED";} ?>>Homework: Show score on each question as it's submitted & allow similar question to replace missed question</option>
-</select></td></tr>
-
-<tr><td></td><td class="r">and Show Answers: </td><td>
-<span id="showanspracspan" class="<?php if ($testtype=="Practice" || $testtype=="Homework") {echo "show";} else {echo "hidden";} ?>">
-<select name="showansprac">
-	<option value="N" <?php if ($showans=="N") {echo "SELECTED";} ?>>Never</option>
-	<option value="0" <?php if ($showans=="0") {echo "SELECTED";} ?>>Always</option>
-	<option value="1" <?php if ($showans=="1") {echo "SELECTED";} ?>>After 1 attempt</option>
-	<option value="2" <?php if ($showans=="2") {echo "SELECTED";} ?>>After 2 attempts</option>
-	<option value="3" <?php if ($showans=="3") {echo "SELECTED";} ?>>After 3 attempts</option>
-	<option value="4" <?php if ($showans=="4") {echo "SELECTED";} ?>>After 4 attempts</option>
-	<option value="5" <?php if ($showans=="5") {echo "SELECTED";} ?>>After 5 attempts</option>
-</select>
-</span>
-<span id="showansspan" class="<?php if ($testtype!="Practice" && $testtype!="Homework") {echo "show";} else {echo "hidden";} ?>">
-<select name="showans">
-	<option value="N" <?php if ($showans=="N") {echo "SELECTED";} ?>>Never</option>
-	<option value="I" <?php if ($showans=="I") {echo "SELECTED";} ?>>Immediately (in gradebook) - don't use if allowing multiple attempts per problem</option>
-	<option value="F" <?php if ($showans=="F") {echo "SELECTED";} ?>>After last attempt (Skip Around only)</option>
-	<option value="A" <?php if ($showans=="A") {echo "SELECTED";} ?>>After due date (in gradebook)</option>
-</select>
-</span>
-</td></tr>
-<tr><td><input type="checkbox" name="chgshuffle"/></td><td class="r">Shuffle item order: </td><td><input type="checkbox" name="shuffle" <?php if ($line['shuffle']&1) {echo "CHECKED";} ?>></td></tr>
-<tr><td><input type="checkbox" name="chgsameseed"/></td><td class="r">All items same random seed: </td><td><input type="checkbox" name="sameseed" <?php if ($line['shuffle']&2) {echo "CHECKED";} ?>></td></tr>
-<tr><td><input type="checkbox" name="chgsamever"/></td><td class="r">All students same version of questions: </td><td><input type="checkbox" name="samever" <?php if ($line['shuffle']&4) {echo "CHECKED";} ?>></td></tr>
-<tr><td><input type="checkbox" name="chggbcat"/></td><td class="r">Gradebook category: </td><td>
-<?php
-	$query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	echo "<select name=gbcat id=gbcat>\n";
-	echo "<option value=\"0\">Default</option>\n";
-	if (mysql_num_rows($result)>0) {
-		while ($row = mysql_fetch_row($result)) {
-			echo "<option value=\"{$row[0]}\">{$row[1]}</option>\n";
-		}
-	}	
-	echo "</select>\n";
-?>
-</td></tr>
-</tbody></table>
-</fieldset>
-<div class=submit><input type=submit value=Submit></div>
-
-<?php
-
-	require("../footer.php");
+require("../footer.php");
 ?>

@@ -1,4 +1,4 @@
-<?
+<?php
 //IMathAS:  Display gradebook (main view and detailed view)
 //(c) 2006 David Lippman
 	require("../validate.php");
@@ -286,6 +286,15 @@
 			$calledfrom='gb';
 			include("massexception.php");
 		}
+		if ((isset($_POST['submit']) && $_POST['submit']=="Unenroll") || (isset($_GET['action']) && $_GET['action']=="unenroll" )) {
+			$calledfrom='gb';
+			$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+			$curBreadcrumb .= "&gt; <a href=\"gradebook.php?cid=$cid&gbmode={$_GET['gbmode']}\">Gradebook</a> &gt; Confirm Change";
+			$pagetitle = "Unenroll Students";
+			include("unenroll.php");
+			include("../footer.php");
+			exit;
+		}
 		$pagetitle = "Gradebook";
 		if ($isteacher) {
 			$placeinhead = "<script type=\"text/javascript\">function lockcol() { \n";
@@ -388,7 +397,7 @@
 			echo "</div>";
 		}
 		echo "Check/Uncheck All: <input type=\"checkbox\" name=\"ca\" value=\"1\" onClick=\"chkAll(this.form, 'checked[]', this.checked)\"> \n";
-		echo "With Selected:  <input type=submit name=submit value=\"E-mail\"> <input type=submit name=submit value=\"Message\"> <input type=submit name=submit value=\"Make Exception\">";
+		echo "With Selected:  <input type=submit name=submit value=\"E-mail\"> <input type=submit name=submit value=\"Message\"> <input type=submit name=submit value=\"Unenroll\"> <input type=submit name=submit value=\"Make Exception\"> ";
 		echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 		echo "<div id=\"tbl-container\">";
 		echo "<table class=gb id=myTable><thead><tr>"; //<tr><td>Name</td>\n";

@@ -1,197 +1,31 @@
 <?php
-//IMathAS:  Course/Courseitem import
+//IMathAS:  Main admin page
 //(c) 2006 David Lippman
-	require("../validate.php");
-	if (!(isset($teacherid))) {
-		require("../header.php");
-		echo "You need to log in as a teacher to access this page";
-		require("../footer.php");
-		exit;
-	}
-		
-	$cid = $_GET['cid'];
-	
-	if (isset($_POST['process'])) {
-		$filename = rtrim(dirname(__FILE__), '/\\') .'/import/' . $_POST['filename'];
-		list ($desc,$itemlist,$item,$questions,$qset) = parsefile($filename);
-		
-		$userights = $_POST['userights'];
-		$newlibs = explode(",",$_POST['libs']);
-		$item = array_map('addslashes_deep', $item);
-		$questions = array_map('addslashes_deep', $questions);
-		$qset = array_map('addslashes_deep', $qset);
-		
-		$checked = $_POST['checked'];
-		$query = "SELECT blockcnt,itemorder FROM imas_courses WHERE id='$cid'";
-		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-		$blockcnt = mysql_result($result,0,0);
-		$ciditemorder = unserialize(mysql_result($result,0,1));
-		
-		$items = unserialize($itemlist);
-		
-		$newitems = array();
-		function copysub($items,$parent,&$addtoarr) {
-			global $checked,$blockcnt,$item,$questions,$qset;
-			foreach ($items as $k=>$anitem) {
-				if (is_array($anitem)) {
-					if (array_search($parent.'-'.($k+1),$checked)!==FALSE) { //copy block
-						$newblock = array();
-						$newblock['name'] = $anitem['name'];
-						$newblock['id'] = $blockcnt;
-						$blockcnt++;
-						$newblock['startdate'] = $anitem['startdate'];
-						$newblock['enddate'] = $anitem['enddate'];
-						$newblock['SH'] = $anitem['SH'];
-						$newblock['colors'] = $anitem['colors'];
-						$newblock['items'] = array();
-						copysub($anitem['items'],$parent.'-'.($k+1),$newblock['items']);
-						$addtoarr[] = $newblock;
-					} else {
-						copysub($anitem['items'],$parent.'-'.($k+1),$addtoarr);
-					}
-				} else {
-					if (array_search($anitem,$checked)!==FALSE) {
-						$addtoarr[] = additem($anitem,$item,$questions,$qset);
-					}
-				}
-			}
-		}
-		copysub($items,'0',$newitems);
-		
-		array_splice($ciditemorder,count($ciditemorder),0,$newitems);
-		$itemorder = addslashes(serialize($ciditemorder));
-		$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt' WHERE id='$cid'";
-		mysql_query($query) or die("Query failed : $query" . mysql_error());
-		
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
 
-		exit;	
-	}
-	require("../header.php");
-?>
-<script type="text/javascript">
-function chkAll(frm, arr, mark) {
-  for (i = 0; i <= frm.elements.length; i++) {
-   try{
-     if(frm.elements[i].name == arr) {
-       frm.elements[i].checked = mark;
-     }
-   } catch(er) {}
-  }
-}
-</script>
+/*** master php includes *******/
+require("../validate.php");
 
-<?php
-	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Import Course Items</div>\n";
-	echo "<h3>Import Course Items</h3>\n";
-	echo "<form enctype=\"multipart/form-data\" method=post action=\"importitems.php?cid=$cid\">\n";
-	
-	if ($_FILES['userfile']['name']=='') {
-		echo "<input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"300000\" />\n";
-		echo "<span class=form>Import file: </span><span class=formright><input name=\"userfile\" type=\"file\" /></span><br class=form>\n";
-		echo "<div class=submit><input type=submit value=\"Submit\"></div>\n";
-	} else {
-		$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/import/';
-		$uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
-		if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
-			echo "<input type=hidden name=\"filename\" value=\"".basename($uploadfile)."\" />\n";
+/*** pre-html data manipulation, including function code *******/
+function getsubinfo($items,$parent,$pre) {
+	global $ids,$types,$names,$item;
+	foreach($items as $k=>$anitem) {
+		if (is_array($anitem)) {
+			$ids[] = $parent.'-'.($k+1);
+			$types[] = $pre."Block";
+			$names[] = stripslashes($anitem['name']);
+			getsubinfo($anitem['items'],$parent.'-'.($k+1),$pre.'--');
 		} else {
-			echo "<p>Error uploading file!</p>\n";
-			echo "</form>\n";
-			require("../footer.php");
-			exit;
-		}
-		list ($desc,$itemlist,$item,$questions,$qset) = parsefile($uploadfile);
-
-		if (!isset($desc)) {
-			echo "This does not appear to be a course items file.  It may be ";
-			echo "a question or library export.\n";
-			require("../footer.php");
-			exit;
-		}
-		echo "<h3>Package Description</h3>";
-		echo $desc;
-		
-		$items = unserialize($itemlist);
-		$ids = array();
-		$types = array();
-		$names = array();
-		function getsubinfo($items,$parent,$pre) {
-			global $ids,$types,$names,$item;
-			foreach($items as $k=>$anitem) {
-				if (is_array($anitem)) {
-					$ids[] = $parent.'-'.($k+1);
-					$types[] = $pre."Block";
-					$names[] = stripslashes($anitem['name']);
-					getsubinfo($anitem['items'],$parent.'-'.($k+1),$pre.'--');
-				} else {
-					$ids[] = $anitem;
-					$types[] = $pre.$item[$anitem]['type'];
-					if (isset($item[$anitem]['name'])) {
-						$names[] = $item[$anitem]['name'];
-					} else {
-						$names[] = $item[$anitem]['title'];
-					}
-				}
+			$ids[] = $anitem;
+			$types[] = $pre.$item[$anitem]['type'];
+			if (isset($item[$anitem]['name'])) {
+				$names[] = $item[$anitem]['name'];
+			} else {
+				$names[] = $item[$anitem]['title'];
 			}
 		}
-		getsubinfo($items,'0','');
-		
-		
-		echo "<p>Some questions (possibly older or different versions) may already exist on the system.  With these questions, do you want to:<br/>\n";
-		echo "<input type=radio name=merge value=\"1\" CHECKED>Update existing questions, <input type=radio name=merge value=\"0\">Add as new question, <input type=radio name=merge value=\"-1\">Keep existing questions</p>\n";
-		echo "<p>\n";
-		echo "For Added Questions, Set Question Use Rights to <select name=userights>\n";
-		echo "<option value=\"0\">Private</option>\n";
-		echo "<option value=\"2\" SELECTED>Allow use, use as template, no modifications</option>\n";
-		echo "<option value=\"3\">Allow use and modifications</option>\n";
-		echo "</select>\n";
-		echo "</p><p>\n";
-		
-		echo <<<END
-<script>
-var curlibs = '0';
-function libselect() {
-	window.open('../course/libtree.php?libtree=popup&selectrights=1&libs='+curlibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));
-}
-function setlib(libs) {
-	if (libs.charAt(0)=='0' && libs.indexOf(',')>-1) {
-		libs = libs.substring(2);
 	}
-	document.getElementById("libs").value = libs;
-	curlibs = libs;
 }
-function setlibnames(libn) {
-	if (libn.indexOf('Unassigned')>-1 && libn.indexOf(',')>-1) {
-		libn = libn.substring(11);
-	}
-	document.getElementById("libnames").innerHTML = libn;
-}
-</script>
-END;
-		
-		echo "Assign Added Questions to library: <span id=\"libnames\">Unassigned</span><input type=hidden name=\"libs\" id=\"libs\"  value=\"0\">\n";
-		echo "<input type=button value=\"Select Libraries\" onClick=\"libselect()\"><br> "; 
-		
-		echo "Check/Uncheck All: <input type=\"checkbox\" name=\"ca\" value=\"1\" onClick=\"chkAll(this.form, 'checked[]', this.checked)\" checked=checked>\n";
-		
-		echo "<table cellpadding=5 class=gb>\n";
-		echo "<thead><tr><th></th><th>Type</th><th>Title</th></tr></thead><tbody>\n";
-		$alt=0;
-		for ($i = 0 ; $i<(count($ids)); $i++) {
-			if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
-			echo "<td>";
-			echo "<input type=checkbox name='checked[]' value='{$ids[$i]}' checked=checked>";
-			echo "</td><td>{$types[$i]}</td><td>{$names[$i]}</td>\n";
-			echo "</tr>\n";
-		}
-		echo "</tbody></table>\n";
-		
-		echo "<p><input type=submit name=\"process\" value=\"Import Items\"></p>\n";
-	}
-	echo "</form>\n";
-	require("../footer.php");
-	
+
 function additem($itemtoadd,$item,$questions,$qset) {
 	
 	global $newlibs;
@@ -427,4 +261,229 @@ function parsefile($file) {
 	return array($desc,$itemlist,$item,$questions,$qset);
 }
 
+function copysub($items,$parent,&$addtoarr) {
+	global $checked,$blockcnt,$item,$questions,$qset;
+	foreach ($items as $k=>$anitem) {
+		if (is_array($anitem)) {
+			if (array_search($parent.'-'.($k+1),$checked)!==FALSE) { //copy block
+				$newblock = array();
+				$newblock['name'] = $anitem['name'];
+				$newblock['id'] = $blockcnt;
+				$blockcnt++;
+				$newblock['startdate'] = $anitem['startdate'];
+				$newblock['enddate'] = $anitem['enddate'];
+				$newblock['SH'] = $anitem['SH'];
+				$newblock['colors'] = $anitem['colors'];
+				$newblock['items'] = array();
+				copysub($anitem['items'],$parent.'-'.($k+1),$newblock['items']);
+				$addtoarr[] = $newblock;
+			} else {
+				copysub($anitem['items'],$parent.'-'.($k+1),$addtoarr);
+			}
+		} else {
+			if (array_search($anitem,$checked)!==FALSE) {
+				$addtoarr[] = additem($anitem,$item,$questions,$qset);
+			}
+		}
+	}
+}
+
+
+ //set some page specific variables and counters
+$overwriteBody = 0;
+$body = "";
+$pagetitle = $installname . " Import Course Items";
+$curBreadcrumb = "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Import Course Items</div>\n";
+ 
+//data manipulation here
+
+	//CHECK PERMISSIONS AND SET FLAGS
+if (!(isset($teacherid))) {
+ 	$overwriteBody = 1;
+	$body = "You need to log in as a teacher to access this page";	
+} elseif (!(isset($_GET['cid']))) {
+ 	$overwriteBody = 1;
+	$body = "You need to access this page from a menu link";	
+} else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
+	
+	$cid = $_GET['cid'];
+
+	
+	//FORM HAS BEEN POSTED, STEP 3 DATA MANIPULATION
+	if (isset($_POST['process'])) {
+		$filename = rtrim(dirname(__FILE__), '/\\') .'/import/' . $_POST['filename'];
+		list ($desc,$itemlist,$item,$questions,$qset) = parsefile($filename);
+		
+		$userights = $_POST['userights'];
+		$newlibs = explode(",",$_POST['libs']);
+		$item = array_map('addslashes_deep', $item);
+		$questions = array_map('addslashes_deep', $questions);
+		$qset = array_map('addslashes_deep', $qset);
+		
+		$checked = $_POST['checked'];
+		$query = "SELECT blockcnt,itemorder FROM imas_courses WHERE id='$cid'";
+		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+		$blockcnt = mysql_result($result,0,0);
+		$ciditemorder = unserialize(mysql_result($result,0,1));
+		$items = unserialize($itemlist);
+		$newitems = array();
+
+		copysub($items,'0',$newitems);
+		
+		array_splice($ciditemorder,count($ciditemorder),0,$newitems);
+		$itemorder = addslashes(serialize($ciditemorder));
+		$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt' WHERE id='$cid'";
+		mysql_query($query) or die("Query failed : $query" . mysql_error());
+		
+		header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
+		exit;	
+	} elseif ($_FILES['userfile']['name']!='') { //STEP 2 DATA MANIPULATION
+		$page_fileErrorMsg = "";
+		$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/import/';
+		$uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
+		if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
+			$page_fileHiddenInput = "<input type=hidden name=\"filename\" value=\"".basename($uploadfile)."\" />\n";
+		} else {
+			$page_fileErrorMsg .= "<p>Error uploading file!</p>\n";
+		}
+		list ($desc,$itemlist,$item,$questions,$qset) = parsefile($uploadfile);
+
+		if (!isset($desc)) {
+			$page_fileErrorMsg .=  "This does not appear to be a course items file.  It may be ";
+			$page_fileErrorMsg .=  "a question or library export.\n";
+		}
+
+		$items = unserialize($itemlist);
+		$ids = array();
+		$types = array();
+		$names = array();
+
+		getsubinfo($items,'0','');
+		
+	}
+}	
+	
+/******* begin html output ********/
+require("../header.php");
+
+if ($overwriteBody==1) {
+	echo $body;
+} else {
+?>
+<script type="text/javascript">
+function chkAll(frm, arr, mark) {
+  for (i = 0; i <= frm.elements.length; i++) {
+   try{
+     if(frm.elements[i].name == arr) {
+       frm.elements[i].checked = mark;
+     }
+   } catch(er) {}
+  }
+}
+
+var curlibs = '0';
+function libselect() {
+	window.open('../course/libtree.php?libtree=popup&selectrights=1&libs='+curlibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));
+}
+function setlib(libs) {
+	if (libs.charAt(0)=='0' && libs.indexOf(',')>-1) {
+		libs = libs.substring(2);
+	}
+	document.getElementById("libs").value = libs;
+	curlibs = libs;
+}
+function setlibnames(libn) {
+	if (libn.indexOf('Unassigned')>-1 && libn.indexOf(',')>-1) {
+		libn = libn.substring(11);
+	}
+	document.getElementById("libnames").innerHTML = libn;
+}
+</script>
+
+<?php echo $curBreadcrumb; ?>
+	<h3>Import Course Items</h3>
+	<form enctype="multipart/form-data" method=post action="importitems.php?cid=<?php echo $cid ?>">
+
+<?php	
+	if ($_FILES['userfile']['name']=='') {
+?>	
+		<input type="hidden" name="MAX_FILE_SIZE" value="300000" />
+		<span class=form>Import file: </span>
+		<span class=formright><input name="userfile" type="file" /></span><br class=form>
+		<div class=submit><input type=submit value="Submit"></div>
+
+<?php
+	} else {
+	
+		if (strlen($page_fileErrorMsg)>1) {
+			echo $page_fileErrorMsg;
+		} else { 
+			echo $page_fileHiddenInput;
+?>
+		<h3>Package Description</h3>
+		<?php echo $desc; ?>
+			
+			
+		<p>Some questions (possibly older or different versions) may already exist on the system.  
+		With these questions, do you want to:<br/>
+			<input type=radio name=merge value="1" CHECKED>Update existing questions, 
+			<input type=radio name=merge value="0">Add as new question, 
+			<input type=radio name=merge value="-1">Keep existing questions
+		</p>
+		<p>
+			For Added Questions, Set Question Use Rights to 
+			<select name=userights>
+				<option value="0">Private</option>
+				<option value="2" SELECTED>Allow use, use as template, no modifications</option>
+				<option value="3">Allow use and modifications</option>
+			</select>
+		</p>
+		<p>
+			
+		Assign Added Questions to library: 
+		<span id=\"libnames\">Unassigned</span>
+		<input type=hidden name="libs" id="libs"  value="0">
+		<input type=button value="Select Libraries" onClick="libselect()"><br> 
+			
+		Check/Uncheck All: 
+		<input type="checkbox" name="ca" value="1" onClick="chkAll(this.form, 'checked[]', this.checked)" checked=checked>
+			
+
+<?php		
+			if (count($ids)>0) {
+?>
+		<table cellpadding=5 class=gb>
+		<thead>
+			<tr><th></th><th>Type</th><th>Title</th></tr>
+		</thead>
+		<tbody>
+<?php			
+				$alt=0;
+				for ($i = 0 ; $i<(count($ids)); $i++) {
+					if ($alt==0) {echo "			<tr class=even>"; $alt=1;} else {echo "			<tr class=odd>"; $alt=0;}
+?>				
+				<td>
+				<input type=checkbox name='checked[]' value='<?php echo $ids[$i] ?>' checked=checked>
+				</td>
+				<td><?php echo $types[$i] ?></td>
+				<td><?php echo $names[$i] ?></td>
+			</tr>
+
+<?php
+				}
+?>			
+		</tbody>
+		</table>
+		<p><input type=submit name="process" value="Import Items"></p>
+<?php
+			}
+		}
+?>
+
+<?php
+	}
+	echo "</form>\n";
+}
+require("../footer.php");
+	
 ?>

@@ -1,23 +1,23 @@
 <?php
-//IMathAS:  Upload offline grade
+//IMathAS:  Main admin page
 //(c) 2006 David Lippman
-	require("../validate.php");
-	if (!(isset($teacherid))) {
-		require("../header.php");
-		echo "You need to log in as a teacher to access this page";
-		require("../footer.php");
-		exit;
-	}
+
+/*** master php includes *******/
+require("../validate.php");
+
+	
+ //set some page specific variables and counters
+$overwriteBody = 0;
+$body = "";
+$pagetitle = "Upload Grades";
+	
+	//CHECK PERMISSIONS AND SET FLAGS
+if (!(isset($teacherid))) {
+ 	$overwriteBody = 1;
+	$body = "You need to log in as a teacher to access this page";
+} else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION	
 	
 	$cid = $_GET['cid'];
-	
-	require("../header.php");
-	
-	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-	echo "&gt; <a href=\"gradebook.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid\">Gradebook</a> ";
-	echo "&gt; <a href=\"addgrades.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid&gbitem={$_GET['gbitem']}&grades=all\">Offline Grades</a> &gt; Upload Grades</div>";
-	
-	echo "<h3>Upload Grades</h3>";
 	
 	if (isset($_FILES['userfile']['name']) && $_FILES['userfile']['name']!='') {
 		if (is_uploaded_file($_FILES['userfile']['tmp_name'])) {
@@ -79,47 +79,69 @@
 				}
 			}
 			
-			echo "<p>Grades uploaded.  $successes records.</p> ";
+			$overwriteBody = 1;
+			$body = "<p>Grades uploaded.  $successes records.</p> ";
 			if (count($failures)>0) {
-				echo "<p>Grade upload failure on: <br/>";
-				echo implode('<br/>',$failures);
-				echo '</p>';
+				$body .= "<p>Grade upload failure on: <br/>";
+				$body .= implode('<br/>',$failures);
+				$body .= '</p>';
 			}
 			if ($successes>0) {
-				echo "<a href=\"addgrades.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid&gbitem={$_GET['gbitem']}&grades=all\">Return to grade list</a></p>";
-				require("../footer.php");
-				exit;
+				$body .= "<a href=\"addgrades.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid&gbitem={$_GET['gbitem']}&grades=all\">Return to grade list</a></p>";
 			}
 			
-			//unlink($_FILES['userfile']['tmp_name']);
 		} else {
-			echo "File Upload error";
+			$overwriteBody = 1;
+			$body = "File Upload error";
 		}
+	} else { //DEFAULT DATA MANIPULATION
+		$curBreadcrumb ="<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+		$curBreadcrumb .=" &gt; <a href=\"gradebook.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid\">Gradebook</a> ";
+		$curBreadcrumb .=" &gt; <a href=\"addgrades.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid&gbitem={$_GET['gbitem']}&grades=all\">Offline Grades</a> &gt; Upload Grades";
 	}
-	
-	echo "<form enctype=\"multipart/form-data\" method=post action=\"uploadgrades.php?cid=$cid&gbmode={$_GET['gbmode']}&gbitem={$_GET['gbitem']}\">\n";
-	
-	echo "<input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"3000000\" />\n";
-	echo "<span class=form>Grade file (CSV): </span><span class=formright><input name=\"userfile\" type=\"file\" /></span><br class=form>\n";
-	echo '<span class=form>File has header row?</span><span class=formright>';
-	echo ' <input type=radio name="hashdr" value="0" checked=1 />No header<br/>';
-	echo ' <input type=radio name="hashdr" value="1" />Has header</span><br class="form" />';
-	
-	echo '<span class=form>Grade is in column:</span><span class=formright>';
-	echo '<input type=text size=4 name="gradecol" value="2"/></span><br class="form" />';
-	
-	echo '<span class=form>Feedback is in column (0 if none):</span><span class=formright>';
-	echo '<input type=text size=4 name="feedbackcol" value="0"/></span><br class="form" />';
-	
-	echo '<span class=form>User is identified by:</span><span class=formright>';
-	echo '<input type=radio name="useridtype" value="0" checked=1 />Username (login name) in column <input type=text size=4 name="usernamecol" value="1" /><br/>';
-	echo '<input type=radio name="useridtype" value="1" />Lastname, Firstname in column <input type=text size=4 name="fullnamecol" value="1" />';
-	echo '</span><br class="form" />';
-	
-	echo "<div class=submit><input type=submit value=\"Submit\"></div>\n";
+}
 
-	echo "</form>";
+/******* begin html output ********/
+require("../header.php");
+
+if ($overwriteBody==1) {
+	echo $body;
+} else {			
+?>
 	
-	require("../footer.php");
+	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
+	
+	<h3><?php echo $pagetitle ?></h3>
+	
+	
+	<form enctype="multipart/form-data" method=post action="uploadgrades.php?cid=<?php echo $cid ?>&gbmode=<?php echo $_GET['gbmode'] ?>&gbitem=<?php echo $_GET['gbitem'] ?>">
+		<input type="hidden" name="MAX_FILE_SIZE" value="3000000" />
+		<span class=form>Grade file (CSV): </span>
+		<span class=formright><input name="userfile" type="file" /></span><br class=form>
+		<span class=form>File has header row?</span>
+		<span class=formright>
+			<input type=radio name="hashdr" value="0" checked=1 />No header<br/>
+			<input type=radio name="hashdr" value="1" />Has header
+		</span><br class="form" />
+		<span class=form>Grade is in column:</span>
+		<span class=formright><input type=text size=4 name="gradecol" value="2"/></span><br class="form" />
+		<span class=form>Feedback is in column (0 if none):</span>
+		<span class=formright><input type=text size=4 name="feedbackcol" value="0"/></span><br class="form" />
+		<span class=form>User is identified by:</span>
+		<span class=formright>
+			<input type=radio name="useridtype" value="0" checked=1 />Username (login name) in column 
+			<input type=text size=4 name="usernamecol" value="1" /><br/>
+			<input type=radio name="useridtype" value="1" />Lastname, Firstname in column 
+			<input type=text size=4 name="fullnamecol" value="1" />
+		</span><br class="form" />
+	
+		<div class=submit><input type=submit value="Submit"></div>
+
+	</form>
+	
+<?php	
+}
+	
+require("../footer.php");
 	
 ?>

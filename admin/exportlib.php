@@ -1,32 +1,43 @@
 <?php
-//IMathAS:  Library tree export
+//IMathAS:  Main admin page
 //(c) 2006 David Lippman
-	require("../validate.php");
-	if (!(isset($teacherid)) && $myrights<75) {
-		require("../header.php");
-		echo "You need to log in as a teacher to access this page";
-		require("../footer.php");
-		exit;
+
+/*** master php includes *******/
+require("../validate.php");
+
+/*** pre-html data manipulation, including function code *******/
+ 
+ //set some page specific variables and counters
+$overwriteBody = 0;
+$body = "";
+$pagetitle = $installname . " Library Export";
+
+ 
+//data manipulation here
+$isadmin = false;
+$isgrpadmin = false; 
+
+	//CHECK PERMISSIONS AND SET FLAGS
+if (!(isset($teacherid)) && $myrights<75) {
+ 	$overwriteBody = 1;
+	$body = "You need to log in as a teacher to access this page";
+} elseif (isset($_GET['cid']) && $_GET['cid']=="admin" && $myrights <75) {
+ 	$overwriteBody = 1;
+	$body = "You need to log in as an admin to access this page";
+} elseif (!(isset($_GET['cid'])) && $myrights < 75) {
+ 	$overwriteBody = 1;
+	$body = "Please access this page from the menu links only.";		
+} else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
+	
+	$cid = (isset($_GET['cid'])) ? $_GET['cid'] : "admin" ;
+
+	if ($myrights < 100) {
+		$isgrpadmin = true;
+	} else if ($myrights == 100) {
+		$isadmin = true;
 	}
-	$isadmin = false;
-	$isgrpadmin = false;
-	if (isset($_GET['cid']) && $_GET['cid']=="admin") {
-		if ($myrights <75) {
-			require("../header.php");
-			echo "You need to log in as an admin to access this page";
-			require("../footer.php");
-			exit;
-		} else if ($myrights < 100) {
-			$isgrpadmin = true;
-		} else if ($myrights == 100) {
-			$isadmin = true;
-		}
-	} 
-	
-	$cid = $_GET['cid'];
-	
 		
-	if (isset($_POST['packdescription'])) {
+	if (isset($_POST['packdescription'])) { //STEP 2 DATA MANIPULATION
 		header('Content-type: text/imas');
 		header("Content-Disposition: attachment; filename=\"imasexport.imas\"");
 		echo "PACKAGE DESCRIPTION\n";
@@ -156,29 +167,47 @@
 			echo rtrim($line['answer']) . "\n";
 		}
 		exit;
+	} else {  //STEP 1 DATA MANIPULATION
+		
+		if ($isadmin || $isgrpadmin) {
+			$curBreadcrumb =  "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"admin.php\">Admin</a> &gt; Export libraries</div>\n";
+		} else {
+			$curBreadcrumb =  "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Export Libraries</div>\n";
+		}
 	}
+}
 	
-	require("../header.php");
-	if ($isadmin || $isgrpadmin) {
-		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"admin.php\">Admin</a> &gt; Export Question Set</div>\n";
-	} else {
-		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Export Libraries</div>\n";
-	}
+/******* begin html output ********/
+require("../header.php");
+
+if ($overwriteBody==1) {
+	echo $body;
+} else {	
+
+	echo $curBreadcrumb
+?>
+	<form method=post action="exportlib.php?cid=$cid">
+		
+		<h3>Library Export</h3>
+		<p>Note:  If a parent library is selected, it's children libraries are included in the export, 
+		and heirarchy will be maintained.  If libraries from different trees are selected, the topmost 
+		libraries in each branch selected will be exported at the same level.</p>
 	
-	echo "<form method=post action=\"exportlib.php?cid=$cid\">\n";
-	
-	echo "<h3>Library Export</h3>\n";
-	echo "<p>Note:  If a parent library is selected, it's children libraries are included in the export, and heirarchy will ";
-	echo "be maintained.  If libraries from different trees are selected, the topmost libraries in each branch selected will ";
-	echo "be exported at the same level.</p>\n";
-	
+<?php	
 	$select = "all";
 	include("../course/libtree.php");
-	
-	echo "<span class=form>Package Description</span><span class=formright><textarea name=\"packdescription\" rows=4 cols=60></textarea></span><br class=form>\n";
+?>
 		
-	echo "<input type=submit value=\"Export\">\n";
-	echo "</form>";
-	echo "<p>Note: Export of questions with static image files is not yet supported</p>";
-	require("../footer.php");
+		<span class=form>Package Description</span>
+		<span class=formright>
+			<textarea name="packdescription" rows=4 cols=60></textarea>
+		</span><br class=form>
+			
+		<input type=submit value="Export">
+	</form>
+	<p>Note: Export of questions with static image files is not yet supported</p>
+
+<?php
+}	
+require("../footer.php");
 ?>

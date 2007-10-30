@@ -1,30 +1,122 @@
 <?php
-//IMathAS:  Question library import
+//IMathAS:  Main admin page
 //(c) 2006 David Lippman
-	require("../validate.php");
-	if (!(isset($teacherid)) && $myrights<75) {
-		require("../header.php");
-		echo "You need to log in as a teacher to access this page";
-		require("../footer.php");
-		exit;
-	}
-	$isadmin = false;
-	$isgrpadmin = false;
-	if (isset($_GET['cid']) && $_GET['cid']=="admin") {
-		if ($myrights <75) {
-			require("../header.php");
-			echo "You need to log in as an admin to access this page";
-			require("../footer.php");
-			exit;
-		} else if ($myrights < 100) {
-			$isgrpadmin = true;
-		} else if ($myrights == 100) {
-			$isadmin = true;
+
+/*** master php includes *******/
+require("../validate.php");
+
+/*** pre-html data manipulation, including function code *******/
+function parsefile($file) {
+	//$lines = file($file);
+	$handle = fopen($file,"r");
+	$qnum = -1;
+	$part = '';
+	while (!feof($handle)) {
+	//foreach ($lines as $line) {
+		//$line = rtrim($line);
+		$line = rtrim(fgets($handle, 4096));
+		if ($line == "LIBRARY DESCRIPTION") {
+			$part = "libdesc";
+			continue;
+		} else if ($line=="PACKAGE DESCRIPTION") {
+			$qdata['pack'] = 'set';
+			continue;
+		} else if ($line == "START QUESTION") {
+			$part = '';
+			if ($qnum>-1) {
+				foreach($qdata[$qnum] as $k=>$val) {
+					$qdata[$qnum][$k] = rtrim($val);
+				}
+			}
+			$qnum++;
+			continue;
+		} else if ($line == "UQID") {
+			$part = 'uqid';
+			continue;
+		} else if ($line == "LASTMOD") {
+			$part = 'lastmod';
+			continue;
+		} else if ($line == "DESCRIPTION") {
+			$part = 'description';
+			continue;
+		} else if ($line == "AUTHOR") {
+			$part = 'author';
+			continue;
+		} else if ($line == "CONTROL") {
+			$part = 'control';
+			continue;
+		} else if ($line == "QCONTROL") {
+			$part = 'qcontrol';
+			continue;
+		} else if ($line == "QTEXT") {
+			$part = 'qtext';
+			continue;
+		} else if ($line == "QTYPE") {
+			$part = 'qtype';
+			continue;
+		} else if ($line == "ANSWER") {
+			$part = 'answer';
+			continue;
+		} else {
+			if ($part=="libdesc") {
+				$qdata['libdesc'] .= $line . "\n";
+			} else if ($part=="qtype") {
+				if ($qnum>-1) {
+					$qdata[$qnum]['qtype'] .= $line;
+				}
+			} else {
+				if ($qnum>-1) {
+					$qdata[$qnum][$part] .= $line . "\n";
+				}
+			}
 		}
-	} 
+	}
+	fclose($handle);
+	if ($qnum > -1) {
+		foreach($qdata[$qnum] as $k=>$val) {
+			$qdata[$qnum][$k] = rtrim($val);
+		}
+	}
+	return $qdata;
+}
+
+ //set some page specific variables and counters
+$overwriteBody = 0;
+$body = "";
+$pagetitle = $installname . " Import Questions";
+
+ 
+//data manipulation here
+$isadmin = false;
+$isgrpadmin = false; 
+
+	//CHECK PERMISSIONS AND SET FLAGS
+if (!(isset($teacherid)) && $myrights<75) {
+ 	$overwriteBody = 1;
+	$body = "You need to log in as a teacher to access this page";
+} elseif (isset($_GET['cid']) && $_GET['cid']=="admin" && $myrights <75) {
+ 	$overwriteBody = 1;
+	$body = "You need to log in as an admin to access this page";
+} elseif (!(isset($_GET['cid'])) && $myrights < 75) {
+ 	$overwriteBody = 1;
+	$body = "Please access this page from the menu links only.";		
+} else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
 	
-	$cid = $_GET['cid'];
+	$cid = (isset($_GET['cid'])) ? $_GET['cid'] : "admin" ;
+
+	if ($myrights < 100) {
+		$isgrpadmin = true;
+	} else if ($myrights == 100) {
+		$isadmin = true;
+	}
+
+	if ($isadmin || $isgrpadmin) {
+		$curBreadcrumb = "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"admin.php\">Admin</a> &gt; Import Question Set</div>\n";
+	} else {
+		$curBreadcrumb = "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Import Question Set</div>\n";
+	}
 	
+	//FORM HAS BEEN POSTED, STEP 3 DATA MANIPULATION
 	if (isset($_POST['process'])) {
 		$filename = rtrim(dirname(__FILE__), '/\\') .'/import/' . $_POST['filename'];
 		$qdata = parsefile($filename);
@@ -123,63 +215,28 @@
 			}
 		}
 		unlink($filename);
-		echo "Import Successful.<br>";
-		echo "New Questions: $newq.<br>";
-		echo "Updated Questions: $updateq.<br>";
-		echo "New Library items: $newli.<br>";
+
 		if ($isadmin || $isgrpadmin) {
-			echo "<a href=\"http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/admin.php\">Return to Admin page</a>";
-			//header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/admin.php");
+			$page_importSuccessMsg = "<a href=\"http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/admin.php\">Return to Admin page</a>";
 		} else {
-			echo "<a href=\" http://" . $_SERVER['HTTP_HOST']  . $imasroot . "/course/course.php?cid=$cid\">Return to Course page</a>";
-			//header("Location: http://" . $_SERVER['HTTP_HOST']  . $imasroot . "/course/course.php?cid=$cid");
+			$page_importSuccessMsg = "<a href=\" http://" . $_SERVER['HTTP_HOST']  . $imasroot . "/course/course.php?cid=$cid\">Return to Course page</a>";
 		}
-		exit;
-	}
-	
-	require("../header.php");
-?>
-<script type="text/javascript">
-function chkAll(frm, arr, mark) {
-  for (i = 0; i <= frm.elements.length; i++) {
-   try{
-     if(frm.elements[i].name == arr) {
-       frm.elements[i].checked = mark;
-     }
-   } catch(er) {}
-  }
-}
-</script>
-<?php
-	if ($isadmin || $isgrpadmin) {
-		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"admin.php\">Admin</a> &gt; Import Question Set</div>\n";
-	} else {
-		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Import Question Set</div>\n";
-	}
-	echo "<h3>Import Question Set</h3>\n";
-	echo "<form enctype=\"multipart/form-data\" method=post action=\"import.php?cid=$cid\">\n";
-	
-	if ($_FILES['userfile']['name']=='') {
-		echo "<input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"3000000\" />\n";
-		echo "<span class=form>Import file: </span><span class=formright><input name=\"userfile\" type=\"file\" /></span><br class=form>\n";
-		echo "<div class=submit><input type=submit value=\"Submit\"></div>\n";
-	} else {
+	} elseif ($_FILES['userfile']['name']!='') { //FILE POSTED, STEP 2 DATA MANIPULATION
+		
 		$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/import/';
 		$uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
+		$page_fileErrorMsg = "";
+		$page_fileNoticeMsg = "";
+		
 		if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
-			echo "<input type=hidden name=\"filename\" value=\"".basename($uploadfile)."\" />\n";
+			$page_fileHiddenInput = "<input type=hidden name=\"filename\" value=\"".basename($uploadfile)."\" />\n";
 		} else {
-			echo "<p>Error uploading file!</p>\n";
-			echo "</form>\n";
-			require("../footer.php");
-			exit;
+			$page_fileErrorMsg .= "<p>Error uploading file!</p>\n";
 		}
 		$qdata = parsefile($uploadfile);
 
 		if (!isset($qdata['pack']) && !isset($qdata['libdesc'])) {
-			echo "This does not appear to be a valid IMathAS file. <a href=\"import.php?cid=$cid\">Try Again</a>";
-			require("../footer.php");
-			exit;
+			$page_fileErrorMsg .= "This does not appear to be a valid IMathAS file. <a href=\"import.php?cid=$cid\">Try Again</a>";
 		}
 		foreach ($qdata as $qnd) {
 			if (is_numeric($qnd['uqid'])) {
@@ -191,147 +248,150 @@ function chkAll(frm, arr, mark) {
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		if (mysql_num_rows($result)>0) {
 			$existing = true;
+			$page_existingMsg = "<p>This file contains questions with uniqueids that already exist on this system.  With these questions, do you want to:<br/>\n";
+			$page_existingMsg .= "<input type=radio name=merge value=\"1\" CHECKED>Update existing questions, <input type=radio name=merge value=\"0\">Add as new question, or <input type=radio name=merge value=\"-1\">Keep existing question</p>\n";
 		} else {
 			$existing = false;
+			$page_existingMsg = "";
 		}
 		
 		if (isset($qdata['pack'])) {
-			echo "<p>This file contains a library structure as well as questions.  Continue to use this form ";
-			echo "if you with to import individual questions.  Use the <a href=\"importlib.php?cid=$cid\">Import Libraries</a> ";
-			echo "page to import the libraries with structure</p>\n";
-		}
-		echo $qdata['libdesc'];
-		
-		if ($existing) {
-			echo "<p>This file contains questions with uniqueids that already exist on this system.  With these questions, do you want to:<br/>\n";
-			echo "<input type=radio name=merge value=\"1\" CHECKED>Update existing questions, <input type=radio name=merge value=\"0\">Add as new question</p>, or <input type=radio name=merge value=\"-1\">Keep existing question</p>\n";
+			$page_fileNoticeMsg .=  "<p>This file contains a library structure as well as questions.  Continue to use this form ";
+			$page_fileNoticeMsg .=  "if you with to import individual questions.<br />  Use the <a href=\"importlib.php?cid=$cid\">Import Libraries</a> ";
+			$page_fileNoticeMsg .=  "page to import the libraries with structure</p>\n";
 		}
 		
-		echo "<h3>Select Questions to import</h3>\n";
-		
-		echo "<p>\n";
-		echo "Set Question Use Rights to <select name=userights>\n";
-		echo "<option value=\"0\">Private</option>\n";
-		echo "<option value=\"2\" SELECTED>Allow use, use as template, no modifications</option>\n";
-		echo "<option value=\"3\">Allow use and modifications</option>\n";
-		echo "</select>\n";
-		echo "</p><p>\n";
-		
-		echo <<<END
-<script>
-var curlibs = '0';
-function libselect() {
-	window.open('../course/libtree.php?cid=$cid&libtree=popup&selectrights=1&libs='+curlibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));
-}
-function setlib(libs) {
-	if (libs.charAt(0)=='0' && libs.indexOf(',')>-1) {
-		libs = libs.substring(2);
+	} else {
+		//STEP 1 DATA MANIPULATION
 	}
-	document.getElementById("libs").value = libs;
-	curlibs = libs;
 }
-function setlibnames(libn) {
-	if (libn.indexOf('Unassigned')>-1 && libn.indexOf(',')>-1) {
-		libn = libn.substring(11);
+
+
+/******* begin html output ********/
+require("../header.php");
+
+if ($overwriteBody==1) {
+	echo $body;
+} else {
+?>
+	<script type="text/javascript">
+	function chkAll(frm, arr, mark) {
+	  for (i = 0; i <= frm.elements.length; i++) {
+	   try{
+	     if(frm.elements[i].name == arr) {
+	       frm.elements[i].checked = mark;
+	     }
+	   } catch(er) {}
+	  }
 	}
-	document.getElementById("libnames").innerHTML = libn;
-}
-</script>
-END;
-		
-		echo "Assign to library: <span id=\"libnames\">Unassigned</span><input type=hidden name=\"libs\" id=\"libs\"  value=\"0\">\n";
-		echo "<input type=button value=\"Select Libraries\" onClick=\"libselect()\"><br> "; 
-		
-		echo "Check/Uncheck All: <input type=\"checkbox\" name=\"ca\" value=\"1\" onClick=\"chkAll(this.form, 'checked[]', this.checked)\" checked=checked>\n";
-		
-		echo "<table cellpadding=5 class=gb>\n";
-		echo "<thead><tr><th></th><th>Description</th><th>Type</th></tr></thead><tbody>\n";
-		$alt=0;
-		for ($i = 0 ; $i<(count($qdata)-1); $i++) {
-			if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
-			echo "<td>";
-			echo "<input type=checkbox name='checked[]' value='$i' checked=checked>";
-			echo "</td><td>{$qdata[$i]['description']}</td><td>{$qdata[$i]['qtype']}</td>\n";
-			echo "</tr>\n";
+
+	var curlibs = '0';
+	function libselect() {
+		window.open('../course/libtree.php?cid=<?php echo $cid ?>&libtree=popup&selectrights=1&libs='+curlibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));
+	}
+	function setlib(libs) {
+		if (libs.charAt(0)=='0' && libs.indexOf(',')>-1) {
+			libs = libs.substring(2);
 		}
-		echo "</tbody></table>\n";
-		echo "<BR><input type=submit name=\"process\" value=\"Import Questions\">\n";
+		document.getElementById("libs").value = libs;
+		curlibs = libs;
 	}
+	function setlibnames(libn) {
+		if (libn.indexOf('Unassigned')>-1 && libn.indexOf(',')>-1) {
+			libn = libn.substring(11);
+		}
+		document.getElementById("libnames").innerHTML = libn;
+	}
+	</script>
 	
-	echo "</form>\n";
-	require("../footer.php");
-	function parsefile($file) {
-		//$lines = file($file);
-		$handle = fopen($file,"r");
-		$qnum = -1;
-		$part = '';
-		while (!feof($handle)) {
-		//foreach ($lines as $line) {
-			//$line = rtrim($line);
-			$line = rtrim(fgets($handle, 4096));
-			if ($line == "LIBRARY DESCRIPTION") {
-				$part = "libdesc";
-				continue;
-			} else if ($line=="PACKAGE DESCRIPTION") {
-				$qdata['pack'] = 'set';
-				continue;
-			} else if ($line == "START QUESTION") {
-				$part = '';
-				if ($qnum>-1) {
-					foreach($qdata[$qnum] as $k=>$val) {
-						$qdata[$qnum][$k] = rtrim($val);
-					}
+	
+	
+<?php
+	echo $curBreadcrumb;
+	
+	//FORM HAS BEEN POSTED WITH GOOD FILE, STEP 3 DISPLAY
+	if (isset($_POST['process'])) {
+?>	
+		Import Successful.<br>
+		New Questions: <?php echo $newq ?>.<br>
+		Updated Questions: <?php echo $updateq ?>.<br>
+		New Library items: <?php echo $newli ?>.<br>
+		<?php echo $page_importSuccessMsg; ?>
+
+<?php
+	} else { 
+		echo $page_fileNoticeMsg;
+?>
+
+		<h3>Import Question Set</h3>
+		<form enctype="multipart/form-data" method=post action="import.php?cid=<?php echo $cid ?>">	
+
+<?php	 
+		if ($_FILES['userfile']['name']=='') { //INITIAL LOAD, STEP 1 DISPLAY
+?>
+			<input type="hidden" name="MAX_FILE_SIZE" value="3000000" />
+			<span class=form>Import file: </span>
+			<span class=formright><input name="userfile" type="file" /></span><br class=form>
+			<div class=submit><input type=submit value="Submit"></div>
+
+<?php
+		} else { //FORM POSTED WITH LOCAL FILE, STEP 2 DISPLAY
+		
+			if (strlen($page_fileErrorMsg)>1) { //If there was an upload or parse error display message
+				echo $page_fileErrorMsg;
+			} else { //file uploaded OK, proceed with import details
+				echo $page_fileHiddenInput;
+				echo $qdata['libdesc'];
+				echo $page_existingMsg;
+?>	
+				<h3>Select Questions to import</h3>
+				
+				<p>
+				Set Question Use Rights to <select name=userights>
+				<option value="0">Private</option>
+				<option value="2" SELECTED>Allow use, use as template, no modifications</option>
+				<option value="3">Allow use and modifications</option>
+				</select>
+				</p>
+				
+				<p>				
+					Assign to library: <span id="libnames">Unassigned</span>
+					<input type=hidden name="libs" id="libs"  value="0">
+					<input type=button value="Select Libraries" onClick="libselect()"><br> 
+				
+					Check/Uncheck All: <input type="checkbox" name="ca" value="1" onClick="chkAll(this.form, 'checked[]', this.checked)" checked=checked>
+				</p>
+								
+				<table cellpadding=5 class=gb>
+					<thead>
+					<tr><th></th><th>Description</th><th>Type</th></tr>
+					</thead>
+					<tbody>
+<?php
+				$alt=0;
+				for ($i = 0 ; $i<(count($qdata)-1); $i++) {
+					if ($alt==0) {echo "						<tr class=even>"; $alt=1;} else {echo "						<tr class=odd>"; $alt=0;}
+?>					
+							<td>
+								<input type=checkbox name='checked[]' value='<?php echo $i ?>' checked=checked>
+							</td>
+							<td><?php echo $qdata[$i]['description'] ?></td>
+							<td><?php echo $qdata[$i]['qtype'] ?></td>
+						</tr>
+<?php
 				}
-				$qnum++;
-				continue;
-			} else if ($line == "UQID") {
-				$part = 'uqid';
-				continue;
-			} else if ($line == "LASTMOD") {
-				$part = 'lastmod';
-				continue;
-			} else if ($line == "DESCRIPTION") {
-				$part = 'description';
-				continue;
-			} else if ($line == "AUTHOR") {
-				$part = 'author';
-				continue;
-			} else if ($line == "CONTROL") {
-				$part = 'control';
-				continue;
-			} else if ($line == "QCONTROL") {
-				$part = 'qcontrol';
-				continue;
-			} else if ($line == "QTEXT") {
-				$part = 'qtext';
-				continue;
-			} else if ($line == "QTYPE") {
-				$part = 'qtype';
-				continue;
-			} else if ($line == "ANSWER") {
-				$part = 'answer';
-				continue;
-			} else {
-				if ($part=="libdesc") {
-					$qdata['libdesc'] .= $line . "\n";
-				} else if ($part=="qtype") {
-					if ($qnum>-1) {
-						$qdata[$qnum]['qtype'] .= $line;
-					}
-				} else {
-					if ($qnum>-1) {
-						$qdata[$qnum][$part] .= $line . "\n";
-					}
-				}
+?>				
+					</tbody>
+				</table><BR>
+				<input type=submit name="process" value="Import Questions">
+<?php
 			}
 		}
-		fclose($handle);
-		if ($qnum > -1) {
-			foreach($qdata[$qnum] as $k=>$val) {
-				$qdata[$qnum][$k] = rtrim($val);
-			}
-		}
-		return $qdata;
-	}
+?>		
+			</form>
+<?php
+	}	
+}		
+require("../footer.php");
 ?>
 	

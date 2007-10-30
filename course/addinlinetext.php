@@ -1,79 +1,55 @@
 <?php
-//IMathAS:  Add/modify inline text items
+//IMathAS:  Add/modify blocks of items on course page
 //(c) 2006 David Lippman
-	require("../validate.php");
-	
-	if (!(isset($teacherid))) {
-		require("../header.php");
-		echo "You need to log in as a teacher to access this page";
-		require("../footer.php");
-		exit;
+
+/*** master php includes *******/
+require("../validate.php");
+require("../includes/htmlutil.php");
+require("../includes/parsedatetime.php");
+
+/*** pre-html data manipulation, including function code *******/
+
+function generatemoveselect($count,$num) {
+	$num = $num+1;  //adjust indexing
+	$html = "<select id=\"ms-$num\" onchange=\"movefile($num)\">\n";
+	for ($i = 1; $i <= $count; $i++) {
+		$html .= "<option value=\"$i\" ";
+		if ($i==$num) { $html .= "selected=1";}
+		$html .= ">$i</option>\n";
 	}
+	$html .= "</select>\n";
+	return $html;
+}
+
+//set some page specific variables and counters
+$overwriteBody = 0;
+$body = "";
+$useeditor = "text";
+
+
+$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+if (isset($_GET['id'])) {
+	$curBreadcrumb .= "&gt; Modify Inline Text\n";
+	$pagetitle = "Modify Inline Text";
+} else {
+	$curBreadcrumb .= "&gt; Add Inline Text\n";
+	$pagetitle = "Add Inline Text";
+}	
+
+
+if (!(isset($teacherid))) { // loaded by a NON-teacher
+	$overwriteBody=1;
+	$body = "You need to log in as a teacher to access this page";
+} elseif (!(isset($_GET['cid']))) {
+	$overwriteBody=1;
+	$body = "You need to access this page from the course page menu";
+} else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$cid = $_GET['cid'];
-	$block = $_GET['block'];
-	
-	if (isset($_GET['remove'])) {
-		if ($_GET['remove']=="really") {
-			$textid = $_GET['id'];
-			
-			$query = "SELECT id FROM imas_items WHERE typeid='$textid' AND itemtype='InlineText'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$itemid = mysql_result($result,0,0);
-			
-			$query = "DELETE FROM imas_items WHERE id='$itemid'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-			
-			$query = "DELETE FROM imas_inlinetext WHERE id='$textid'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-			
-			$query = "SELECT filename FROM imas_instr_files WHERE itemid='$textid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
-			while ($row = mysql_fetch_row($result)) {
-				$safefn = addslashes($row[0]);
-				$query = "SELECT id FROM imas_instr_files WHERE filename='$safefn'";
-				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-				if (mysql_num_rows($r2)==1) {
-					unlink($uploaddir . $row[0]);
-				}
-			}
-			$query = "DELETE FROM imas_instr_files WHERE itemid='$textid'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-						
-			$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$items = unserialize(mysql_result($result,0,0));
-			
-			$blocktree = explode('-',$block);
-			$sub =& $items;
-			for ($i=1;$i<count($blocktree);$i++) {
-				$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
-			}
-			$key = array_search($itemid,$sub);
-			array_splice($sub,$key,1);
-			$itemorder = addslashes(serialize($items));
-			$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-			
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
-			
-			exit;
-		} else {
-			require("../header.php");
-			echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=$cid\">$coursename</a> ";
-			echo "&gt; Modify Inline Text</div>\n";
-			echo "Are you SURE you want to delete this text item?";
-			echo "<p><input type=button value=\"Yes, Remove\" onClick=\"window.location='addinlinetext.php?cid=$cid&block=$block&id={$_GET['id']}&remove=really'\">\n";
-			echo "<input type=button value=\"Nevermind\" onClick=\"window.location='course.php?cid=$cid'\"></p>\n";
-			require("../footer.php");
-			exit;
-		}
-	}
-	
-	
-	
+	$block = $_GET['block'];	
+	$page_formActionTag = "addinlinetext.php?block=$block&cid=$cid&folder=" . $_GET['folder'];
+	$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . $_GET['id'] : "";
+
 	if ($_POST['title']!= null || $_POST['text']!=null || $_POST['sdate']!=null) { //if the form has been submitted
-		require_once("parsedatetime.php");
 		if ($_POST['sdatetype']=='0') {
 			$startdate = 0;
 		} else {
@@ -90,7 +66,7 @@
 		
 		$filestoremove = array();
 		if (isset($_GET['id'])) {  //already have id; update
-			$query = "UPDATE imas_inlinetext SET title='{$_POST['title']}',text='{$_POST['text']}',startdate=$startdate,enddate=$enddate ";
+			$query = "UPDATE imas_inlinetext SET title='{$_POST['title']}',text='{$_POST['text']}',startdate=$startdate,enddate=$enddate,avail='{$_POST['avail']}' ";
 			$query .= "WHERE id='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//update attached files
@@ -115,8 +91,8 @@
 			$newtextid = $_GET['id'];
 		} else { //add new
 			
-			$query = "INSERT INTO imas_inlinetext (courseid,title,text,startdate,enddate) VALUES ";
-			$query .= "('$cid','{$_POST['title']}','{$_POST['text']}',$startdate,$enddate);";
+			$query = "INSERT INTO imas_inlinetext (courseid,title,text,startdate,enddate,avail) VALUES ";
+			$query .= "('$cid','{$_POST['title']}','{$_POST['text']}',$startdate,$enddate,'{$_POST['avail']}');";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			
 			$newtextid = mysql_insert_id();
@@ -150,7 +126,8 @@
 			$extension = strtolower(strrchr($userfilename,"."));
 			$badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");
 			if (in_array($extension,$badextensions)) {
-				echo "<p>File type is not allowed</p>";
+				$overwriteBody = 1;
+				$body = "<p>File type is not allowed</p>";
 			} else {
 				$uploadfile = $uploaddir . $filename;
 				$t=0;
@@ -170,14 +147,13 @@
 					$addedfile = mysql_insert_id();
 					$_GET['id'] = $newtextid;
 				} else {
-					echo "<p>Error uploading file!</p>\n";
-					exit;
+					$overwriteBody = 1;
+					$body = "<p>Error uploading file!</p>\n";
 				}
 			}
 		}
-		
-		
 	} 
+
 	if (isset($addedfile) || count($filestoremove)>0 || isset($_GET['movefile'])) {
 		$query = "SELECT fileorder FROM imas_inlinetext WHERE id='{$_GET['id']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -209,9 +185,9 @@
 	}
 	if ($_POST['submitbtn']=='Submit') {
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
-		
 		exit;
 	}
+	
 	if (isset($_GET['id'])) {
 		$query = "SELECT * FROM imas_inlinetext WHERE id='{$_GET['id']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -227,6 +203,7 @@
 		//set defaults
 		$line['title'] = "Enter title here";
 		$line['text'] = "<p>Enter text here</p>";
+		$line['avail'] = 1;
 		$startdate = time();
 		$enddate = time() + 7*24*60*60;
 		$hidetitle = false;
@@ -247,99 +224,131 @@
 		$etime = tzdate("g:i a",time()+7*24*60*60);
 	}    
 	
-	$useeditor = "text";
-	$pagetitle = "Inline Text Settings";
-	require("../header.php");
-	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 	if (isset($_GET['id'])) {
-		echo "&gt; Modify Inline Text</div>\n";
-		echo "<h2>Modify Inline Text <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=inlinetextitems','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h2>\n";
-	} else {
-		echo "&gt; Add Inline Text</div>\n";
-		echo "<h2>Add Inline Text <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=inlinetextitems','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h2>\n";
-	}
-?>
-
-<form enctype="multipart/form-data" method=post action="addinlinetext.php?block=<?php echo $block;?>&cid=<?php echo $cid; if (isset($_GET['id'])) {echo "&id={$_GET['id']}";}?>&folder=<?php echo $_GET['folder'];?>">
-<span class=form>Title: </span><span class=formright><input type=text size=60 name=title value="<?php echo str_replace('"','&quot;',$line['title']);?>">
-<br/><input type="checkbox" name="hidetitle" value="1" <?php if ($hidetitle==true) {echo "checked=1";} ?>/> Hide title and icon
-
-</span><BR class=form>
-
-Text:<BR>
-<div class=editor>
-<textarea cols=60 rows=20 id=text name=text style="width: 100%"><?php echo $line['text'];?></textarea>
-</div>
-
-<span class=form>
-Attached Files:</span><span class=wideformright>
-
-<?php
-echo "<script type=\"text/javascript\">\n";
-echo "function movefile(from) { \n";
-echo "  var to = document.getElementById('ms-'+from).value; \n";
-$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addinlinetext.php?cid=$cid&block=$block&id={$_GET['id']}";
-echo "  if (to != from) {\n";
-echo "  	var toopen = '$address&movefile=' + from + '&movefileto=' + to;\n";
-echo "  	window.location = toopen; \n";
-echo "  }\n";
-echo "}\n";
-echo "</script>\n";
-
-function generatemoveselect($count,$num) {
-	$num = $num+1;  //adjust indexing
-	$html = "<select id=\"ms-$num\" onchange=\"movefile($num)\">\n";
-	for ($i = 1; $i <= $count; $i++) {
-		$html .= "<option value=\"$i\" ";
-		if ($i==$num) { $html .= "selected=1";}
-		$html .= ">$i</option>\n";
-	}
-	$html .= "</select>\n";
-	return $html;
-}
-   
-if (isset($_GET['id'])) {
 	$query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='{$_GET['id']}'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$page_fileorderCount = count($fileorder);
+	$i = 0;
+	$page_FileLinks = array();
 	if (mysql_num_rows($result)>0) {
 		while ($row = mysql_fetch_row($result)) {
 			$filedescr[$row[0]] = $row[1];
 			$filenames[$row[0]] = rawurlencode($row[2]);
 		}
 		foreach ($fileorder as $k=>$fid) {
-			echo generatemoveselect(count($fileorder),$k);
-			echo "<a href=\"$imasroot/course/files/{$filenames[$fid]}\" target=\"_blank\">View</a> ";
-			echo "<input type=\"text\" name=\"filedescr-$fid\" value=\"{$filedescr[$fid]}\"/> Delete? <input type=checkbox name=\"delfile-$fid\"/><br/>";	
+			$page_FileLinks[$k]['link'] = $filenames[$fid];
+			$page_FileLinks[$k]['desc'] = $filedescr[$fid];
+			$page_FileLinks[$k]['fid'] = $fid;
+
+			//echo generatemoveselect(count($fileorder),$k);
+			//echo "<a href=\"$imasroot/course/files/{$filenames[$fid]}\" target=\"_blank\">View</a> ";
+			//echo "<input type=\"text\" name=\"filedescr-$fid\" value=\"{$filedescr[$fid]}\"/> Delete? <input type=checkbox name=\"delfile-$fid\"/><br/>";	
 		}
 	}
 } 
-?>
+	
+	
+}
+	
+	
+ /******* begin html output ********/
+ require("../header.php");
 
-<input type="hidden" name="MAX_FILE_SIZE" value="3000000" />
-New file<sup>*</sup>: <input type="file" name="userfile"/><br/>
-Description: <input type="text" name="newfiledescr"/><br/>
-<input type=submit name="submitbtn" value="Add / Update Files"/>
-</span><br class=form>
-<div>
+if ($overwriteBody==1) {
+	echo $body;
+} else {
+?> 	
+<script type="text/javascript">
+function movefile(from) {
+	var to = document.getElementById('ms-'+from).value; 
+	var address = "http://<?php echo $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addinlinetext.php?cid=$cid&block=$block&id=" . $_GET['id'] ?>";
+	
+	if (to != from) {
+ 	var toopen = address + '&movefile=' + from + '&movefileto=' + to;
+  	window.location = toopen;
+  }
+}
+</script>
 <script src="../javascript/CalendarPopup.js"></script>
 <SCRIPT LANGUAGE="JavaScript" ID="js1">
 var cal1 = new CalendarPopup();
 </SCRIPT>
 
-<span class=form>Available After:</span><span class=formright><input type=radio name="sdatetype" value="0" <?php if ($startdate=='0') {echo "checked=1";}?>/> Always until end date<br/>
-<input type=radio name="sdatetype" value="sdate" <?php if ($startdate!='0') {echo "checked=1";}?>/><input type=text size=10 name=sdate value="<?php echo $sdate;?>"> 
-<A HREF="#" onClick="cal1.select(document.forms[0].sdate,'anchor1','MM/dd/yyyy',document.forms[0].sdate.value); return false;" NAME="anchor1" ID="anchor1"><img src="../img/cal.gif" alt="Calendar"/></A>
-at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR class=form>
+	<div class=breadcrumb><?php echo $curBreadcrumb  ?></div>
+	<h2><?php echo $pagetitle ?><img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=inlinetextitems','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/></h2>
 
-<span class=form>Available Until:</span><span class=formright>
-<input type=radio name="edatetype" value="2000000000" <?php if ($enddate=='2000000000') {echo "checked=1";}?>/> Always after start date<br/>
-<input type=radio name="edatetype" value="edate"  <?php if ($enddate!='2000000000') {echo "checked=1";}?>/>
-<input type=text size=10 name=edate value="<?php echo $edate;?>"> 
-<A HREF="#" onClick="cal1.select(document.forms[0].edate,'anchor2','MM/dd/yyyy',(document.forms[0].sdate.value=='<?php echo $sdate;?>')?(document.forms[0].edate.value):(document.forms[0].sdate.value)); return false;" NAME="anchor2" ID="anchor2"><img src="../img/cal.gif" alt="Calendar"/></A>
-at <input type=text size=10 name=etime value="<?php echo $etime;?>"></span><BR class=form>
-</div>
-<div class=submit><input type=submit name="submitbtn" value="Submit"></div>
-<p><sup>*</sup>Avoid quotes in the filename</p>
+	<form enctype="multipart/form-data" method=post action="<?php echo $page_formActionTag ?>">
+	<span class=form>Title: </span>
+	<span class=formright>
+		<input type=text size=60 name=title value="<?php echo str_replace('"','&quot;',$line['title']);?>"><br/>
+		<input type="checkbox" name="hidetitle" value="1" <?php writeHtmlChecked($hidetitle,true) ?>/>
+		Hide title and icon
+	</span><BR class=form>
+	
+	Text:<BR>
+	<div class=editor>
+		<textarea cols=60 rows=20 id=text name=text style="width: 100%">
+		<?php echo $line['text'];?>
+		</textarea>
+	</div>
+	
+	<span class=form>
+	Attached Files:</span>
+	<span class=wideformright>
+
 <?php
+	if (isset($_GET['id'])) {
+		foreach ($page_FileLinks as $k=>$arr) {
+			echo generatemoveselect($page_fileorderCount,$k);
+?>			
+		<a href="<?php echo $imasroot ?>/course/files/<?php echo $arr['link'] ?>" target="_blank">
+		View</a>
+		<input type="text" name="filedescr-<?php echo $arr['fid'] ?>" value="<?php echo $arr['desc'] ?>"/>
+		Delete? <input type=checkbox name="delfile-<?php echo $arr['fid'] ?>"/><br/>	
+<?php			
+		}
+	} 
+?>
+
+		<input type="hidden" name="MAX_FILE_SIZE" value="3000000" />
+		New file<sup>*</sup>: <input type="file" name="userfile"/><br/>
+		Description: <input type="text" name="newfiledescr"/><br/>
+		<input type=submit name="submitbtn" value="Add / Update Files"/>
+	</span><br class=form>
+	
+	<div>
+		<span class=form>Show:</span>
+		<span class=formright>
+			<input type=radio name="avail" value="0" <?php writeHtmlChecked($line['avail'],0);?>/>Hide<br/>
+			<input type=radio name="avail" value="1" <?php writeHtmlChecked($line['avail'],1);?>/>Show by Dates<br/>
+			<input type=radio name="avail" value="2" <?php writeHtmlChecked($line['avail'],2);?>/>Show Always<br/>
+		</span><br class="form"/>
+		<span class=form>Available After:</span>
+		<span class=formright>
+			<input type=radio name="sdatetype" value="0" <?php writeHtmlChecked($startdate,'0',0) ?>/>
+			 Always until end date<br/>
+			<input type=radio name="sdatetype" value="sdate" <?php writeHtmlChecked($startdate,'0',1) ?>/>
+			<input type=text size=10 name=sdate value="<?php echo $sdate;?>"> 
+			<A HREF="#" onClick="cal1.select(document.forms[0].sdate,'anchor1','MM/dd/yyyy',document.forms[0].sdate.value); return false;" NAME="anchor1" ID="anchor1">
+			<img src="../img/cal.gif" alt="Calendar"/></A>
+			at <input type=text size=10 name=stime value="<?php echo $stime;?>">
+		</span><BR class=form>
+	
+		<span class=form>Available Until:</span>
+		<span class=formright>
+			<input type=radio name="edatetype" value="2000000000" <?php writeHtmlChecked($enddate,'2000000000',0) ?>/> 
+			Always after start date<br/>
+			<input type=radio name="edatetype" value="edate" <?php writeHtmlChecked($enddate,'2000000000',1) ?>/>
+			<input type=text size=10 name=edate value="<?php echo $edate;?>"> 
+			<A HREF="#" onClick="cal1.select(document.forms[0].edate,'anchor2','MM/dd/yyyy',(document.forms[0].sdate.value=='<?php echo $sdate;?>')?(document.forms[0].edate.value):(document.forms[0].sdate.value)); return false;" NAME="anchor2" ID="anchor2">
+			<img src="../img/cal.gif" alt="Calendar"/></A>
+			at <input type=text size=10 name=etime value="<?php echo $etime;?>">
+		</span><BR class=form>
+	</div>
+	<div class=submit><input type=submit name="submitbtn" value="Submit"></div>
+	</form>
+	<p><sup>*</sup>Avoid quotes in the filename</p>
+<?php
+}
 	require("../footer.php");
 ?>

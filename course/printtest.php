@@ -1,17 +1,32 @@
 <?php
-//IMathAS:  Handle options for print layout
+//IMathAS:  Main admin page
 //(c) 2006 David Lippman
-	require("../validate.php");
-	$pagetitle = "Print Test";
-	require("../header.php");
+
+/*** master php includes *******/
+require("../validate.php");
+
+
 	
-	if (!(isset($teacherid))) {
-		echo "You need to log in as a teacher to access this page";
-		require("../footer.php");
-		exit;
-	}
+ //set some page specific variables and counters
+$overwriteBody = 0;
+$body = "";
+$pagetitle = "Print Test";
+	
+	//CHECK PERMISSIONS AND SET FLAGS
+if (!(isset($teacherid))) {
+ 	$overwriteBody = 1;
+	$body = "You need to log in as a teacher to access this page";
+} else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION	
 	$cid = $_GET['cid'];
 	$aid = $_GET['aid'];
+}
+
+/******* begin html output ********/
+require("../header.php");
+
+if ($overwriteBody==1) {
+	echo $body;
+} else {	
 	
 	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=$cid\">$coursename</a> ";
 	echo "&gt; Print Test</div>\n";
@@ -79,7 +94,7 @@
 		echo "your browser and select Page Setup to change the default headers and footers printed by your browser</p>\n";
 		echo "<p><input type=submit value=\"Continue\"></p>\n";
 	}
-	
+}
 	
 	require("../footer.php");
 ?>

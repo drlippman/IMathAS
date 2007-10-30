@@ -1,7 +1,21 @@
 <?php 
 //IMathAS:  Main admin page
 //(c) 2006 David Lippman
- require("../validate.php");  //checks for session.  If not, gives login page
+
+/*** master php includes *******/
+require("../validate.php");
+require("../includes/htmlutil.php");
+
+/*** pre-html data manipulation, including function code *******/
+ 
+ //set some page specific variables and counters
+$overwriteBody = 0;
+$body = "";
+$pagetitle = $installname . "Administration";
+
+$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; Admin\n";
+ 
+ 
  if ($myrights>=75) {
 	 if (isset($_GET['showcourses'])) {
 		 setcookie('showcourses',$_GET['showcourses']);
@@ -21,267 +35,311 @@
 	 } else if (isset($_COOKIE['showusers'])) {
 		 $showusers = $_COOKIE['showusers'];
 	 } else {
-		 $showusers = $groupid;
+		 $showusers = $groupid; 
 	 }
  } else {
 	 $showusers = 0;
  }
- require("../header.php");
- echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
-
- if ($myrights < 40) { exit("You don't have authority to view this page.");}
- echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; Admin</div>\n";
- echo "<h2>$installname Administration</h2>";
- echo "<b>Hello $username</b>";
-
-
-?> 
-<h3>Courses</h3>
-<div class=item>
-<table class=gb border=0 width="90%">
-<thead><tr><th>Name</th><th>Course ID</th><th>Owner</th><th>Modify</th><th>Teachers</th><th>Transfer</th><th>Delete</th></tr></thead>
-<tbody>
-<?php
-$query = "SELECT imas_courses.id,imas_courses.ownerid,imas_courses.name,imas_users.FirstName,imas_users.LastName FROM imas_courses,imas_users ";
-$query .= "WHERE imas_courses.ownerid=imas_users.id";
-if ($myrights == 40 || $showcourses==0) { $query .= " AND imas_courses.ownerid='$userid'";}
-//if ($myrights == 75 || $showcourses==1) { $query .= " AND imas_users.groupid='$groupid'";}
-if ($myrights >= 75 && $showcourses>0) {
-	$query .= " AND imas_courses.ownerid='$showcourses'";
-	$query .= " ORDER BY imas_users.LastName,imas_courses.name";
+ 
+if ($myrights < 40) { 
+ 	$overwriteBody = 1;
+	$body = "You don't have authority to view this page.";
 } else {
-	$query .= " ORDER BY imas_courses.name";
-}
-
-$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-$alt = 0;
-while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
-	if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
-	echo "<td><a href=\"../course/course.php?cid={$line['id']}\">{$line['name']}</a></td><td class=c>{$line['id']}</td>\n";
-	echo "<td>{$line['LastName']}, {$line['FirstName']}</td>\n";
-	echo "<td class=c><a href=\"forms.php?action=modify&id={$line['id']}\">Modify</a></td>\n";
-	if ($myrights<75) { 
-		echo "<td></td>"; 
+ //data manipulation here
+ //data processing for COURSES block 
+	$query = "SELECT imas_courses.id,imas_courses.ownerid,imas_courses.name,imas_users.FirstName,imas_users.LastName FROM imas_courses,imas_users ";
+	$query .= "WHERE imas_courses.ownerid=imas_users.id";
+	if ($myrights == 40 || $showcourses==0) { $query .= " AND imas_courses.ownerid='$userid'";}
+	if ($myrights >= 75 && $showcourses>0) {
+		$query .= " AND imas_courses.ownerid='$showcourses'";
+		$query .= " ORDER BY imas_users.LastName,imas_courses.name";
 	} else {
-		echo "<td class=c><a href=\"forms.php?action=chgteachers&id={$line['id']}\">Add/Remove</a></td>\n";
+		$query .= " ORDER BY imas_courses.name";
 	}
-	if ($line['ownerid']!=$userid && $myrights <75) {
-		echo "<td></td>";
-	} else {
-		echo "<td class=c><a href=\"forms.php?action=transfer&id={$line['id']}\">Transfer</a></td>\n";
-	}
-	echo "<td class=c><a href=\"forms.php?action=delete&id={$line['id']}\">Delete</a></td>\n";
-	echo "</tr>\n";
-}
-?>
-</tbody>
-</table>
-<input type=button value="Add New Course" onclick="window.location='forms.php?action=addcourse'" /> 
-<?php
-if ($myrights>=75) {
-	//echo " Show: ";
-	//if ($showcourses == 0 || $showcourses == 2) {
-	//	echo "<input type=button value=\"Show Group Courses\" onclick=\"window.location='admin.php?showcourses=1'\" />";
-	//} else {
-	if ($showcourses>0) {
-		echo "<input type=button value=\"Show My Courses\" onclick=\"window.location='admin.php?showcourses=0'\" />";
-	}
-	echo "<script>function showcourses() { ";
-	echo "  var uid=document.getElementById(\"seluid\").value; ";
-	echo "  if (uid>0) {window.location='admin.php?showcourses='+uid;}";
-	echo "}</script>";
-	echo " Show courses of: <select id=\"seluid\" onchange=\"showcourses()\">";
-	echo '<option value="0">Select a user..</option>';
+	
+	$result = mysql_query($query) or die("Query failed : $query" . mysql_error()); 
+	$page_courseList = array();
+	$i=0;
+	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+		$page_courseList[$i]['id'] = $line['id']; 
+		$page_courseList[$i]['name'] = $line['name']; 
+		$page_courseList[$i]['LastName'] = $line['LastName']; 
+		$page_courseList[$i]['FirstName'] = $line['FirstName']; 
+		$page_courseList[$i]['ownerid'] = $line['ownerid']; 
+		$page_courseList[$i]['addRemove'] = ($myrights<75) ? "" : "<a href=\"forms.php?action=chgteachers&id={$line['id']}\">Add/Remove</a>";
+		$page_courseList[$i]['transfer'] = ($line['ownerid']!=$userid && $myrights <75) ? "" : "<a href=\"forms.php?action=transfer&id={$line['id']}\">Transfer</a>";
+		$i++;
+	} 
+	
+	//get list of teachers for the select box
 	if ($myrights==75) {
 		$query = "SELECT id,LastName,FirstName FROM imas_users WHERE rights>10 AND groupid='$groupid' ORDER BY LastName,FirstName";
 	} else if ($myrights==100) {
 		$query = "SELECT id,LastName,FirstName FROM imas_users WHERE rights>10 ORDER BY LastName,FirstName";
 	}
 	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+	$i=0;
 	while ($row = mysql_fetch_row($result)) {
-		echo "<option value=\"{$row[0]}\" ";
-		if ($showcourses==$row[0]) {
-			echo "selected=1";
-		}
-		echo ">{$row[1]}, {$row[2]}</option>";
+		$page_teacherSelectVal[$i] = $row[0];
+		$page_teacherSelectLabel[$i] = $row[1] . ", " . $row[2];
+		$i++;
 	}
-	echo '</select>';
-}
-/*if ($myrights==100) {
-	if ($showcourses == 0 || $showcourses == 1) {
-		echo "<input type=button value=\"Show All Courses\" onclick=\"window.location='admin.php?showcourses=2'\" />";
-	} else {
-		echo "<input type=button value=\"Show My Courses\" onclick=\"window.location='admin.php?showcourses=0'\" />";
-	}
-}
-*/
-?>
-</div>
-
-<h3>Administration</h3>
-<div class=cp>
-<A HREF="forms.php?action=chgpwd">Change my password</a><BR>
-<A HREF="../help.php?section=administration">Help</a><BR>
-<A HREF="actions.php?action=logout">Log Out</a><BR>
-</div>
-<?php if($myrights < 75) {require("../footer.php");  exit;} ?>
-<div class=cp>
-<span class=column>
-<a href="../course/manageqset.php?cid=admin">Manage Question Set</a><BR>
-<a href="export.php?cid=admin">Export Question Set</a><BR>
-<a href="import.php?cid=admin">Import Question Set</a><BR>
-</span>
-<span class=column>
-<a href="../course/managelibs.php?cid=admin">Manage Libraries</a><br>
-<a href="exportlib.php?cid=admin">Export Libraries</a><BR>
-<a href="importlib.php?cid=admin">Import Libraries</a></span>
-<?php if ($myrights == 100) {
-echo "<span class=column>";
-if ($allowmacroinstall) { echo "<a href=\"forms.php?action=importmacros\">Install Macro File</a><br/>\n";}
-echo <<<END
-<a href="forms.php?action=deloldusers">Delete Old Users</a><br/>
-<a href="importstu.php?cid=admin">Import Students from File</a><br/>
-</span>
-<span class=column>
-<a href="forms.php?action=listgroups">Edit Groups</a><br/>
-</span>
-END;
-} ?>
-<div class=clear></div>
-</div>
-
-<h4>Diagnostics</h4>
-<div class=item>
-<table class=gb width="90%" id="diagTable">
-<thead>
-<tr><th>Name</th><th>Available</th><th>Public</th><th>&nbsp;</th><th>&nbsp;</th></tr>
-</thead>
-<tbody>
-<?php
-$query = "SELECT id,name,public FROM imas_diags WHERE ownerid='$groupid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-while ($row = mysql_fetch_row($result)) {
-	echo "<tr><td><a href=\"$imasroot/diag/index.php?id={$row[0]}\">{$row[1]}</a></td><td class=c>";
-	if ($row[2]&1) {echo 'Yes';} else {echo 'No';}
-	echo '</td><td class=c>';
-	if ($row[2]&2) {echo 'Yes';} else {echo 'No';}
-	echo "</td><td><a href=\"diagsetup.php?id={$row[0]}\">Modify</a></td>";
-	echo "<td><a href=\"forms.php?action=removediag&id={$row[0]}\">Remove</a></td></tr>\n";
-}
-?>
-</tbody>
-</table>
-<input type=button value="Add New Diagnostic" onclick="window.location='<?php echo $imasroot;?>/admin/diagsetup.php'">
-</div>
-
-<?
-if ($myrights < 100 || $showusers==0) {
-	echo "<h4>Group Non Students</h4>\n";
-} else {
-	if ($showusers==2) {
-		echo "<h4>All Users</h4>\n";
-	} else if ($showusers==3) {
-		echo "<h4>Pending Users</h4>\n";
-	} else if ($showusers == 1) { 
-		echo "<h4>All Non Students</h4>\n";
-	} 
-}	
-?>
-<div class=item>
-<table class=gb width="90%" id="myTable">
-<thead>
-<tr><th>Name</th><th>Username</th><th>Email</th><th>Rights</th><th>Last Login</th><th>Rights</th><th>Password</th><th>Delete</th></tr>
-</thead>
-<tbody>
-<?php 
-if ($myrights < 100) {
-	$query = "SELECT id,SID,FirstName,LastName,rights,lastaccess FROM imas_users WHERE rights > 10 AND groupid='$groupid' ORDER BY LastName";
-} else {
-	if ($showusers==-1) {
-		$query = "SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE rights=0 ORDER BY LastName";
-	} else if (is_numeric($showusers)) {
-		$query = "SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE rights > 10 AND groupid='$showusers' ORDER BY LastName";
-	} else {
-		$query = "SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE substring(LastName,1,1)='$showusers' ORDER BY LastName";
-	}
-}
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-$alt = 0;
-while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
-	if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
-	echo "<td>{$line['LastName']}, {$line['FirstName']}</td><td>{$line['SID']}</td><td>{$line['email']}</td>\n";
-	echo "<td>";
-	switch ($line['rights']) {
-		case 5: echo "Guest"; break;
-		case 10: echo "Student"; break;
-		case 15: echo "Tutor/TA/Proctor"; break;
-		case 20: echo "Teacher"; break;
-		case 40: echo "LimCourseCreator"; break;
-		case 75: echo "GroupAdmin"; break;
-		case 100: echo "Admin"; break;
-	}
-	echo "</td>\n";
-	if ($line['lastaccess']>0) {
-		$lastaccess = date("n/j/y g:i a",$line['lastaccess']);
-	} else {
-		$lastaccess = "never";
-	}
-	echo "<td>$lastaccess</td>\n";
-	echo "<td><a href=\"forms.php?action=chgrights&id={$line['id']}\">Change</a></td> \n";
-	echo "<td><a href=\"actions.php?action=resetpwd&id={$line['id']}\">Reset</a></td> \n";
-	echo "<td><a href=\"forms.php?action=deladmin&id={$line['id']}\">Delete</a></td></tr>\n";
-}
-?>
-</tbody>
-</table>
-<script type="text/javascript">
-initSortTable('myTable',Array('S','S','S','S',false,false,false),true);
-</script>
-
-<input type=button value="Add New User" onclick="window.location='forms.php?action=newadmin'">
-<?php
-if ($myrights == 100) {
-	echo "<script>function showgroupusers() { ";
-	echo "  var grpid=document.getElementById(\"selgrpid\").value; ";
-	echo "  window.location='admin.php?showusers='+grpid;";
-	echo "}</script>";
 	
-	echo " Show: ";
-	echo "<select id=\"selgrpid\" onchange=\"showgroupusers()\">";
-	echo '<option value="-1" ';
-	if ($showusers==-1) {
-		echo "selected=1";
+	//data processing for diagnostics block
+	$query = "SELECT id,name,public FROM imas_diags WHERE ownerid='$groupid'";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$i=0;
+	while ($row = mysql_fetch_row($result)) {
+		$page_diagnosticsId[$i] = $row[0];
+		$page_diagnosticsName[$i] = $row[1];
+		$page_diagnosticsAvailable[$i] = ($row[2]&1) ? "Yes" : "No";
+		$page_diagnosticsPublic[$i] = ($row[2]&2) ? "Yes" : "No";
+		$i++;		
 	}
-	echo '>Pending</option>';
-	echo '<option value="0" ';
-	if (is_numeric($showusers) && $showusers==0) {
-		echo "selected=1";
+	
+	//DATA PROCESSING FOR USERS BLOCK
+	if ($myrights < 100) {
+		$page_userBlockTitle = "Group - Non Students";
+		$query = "SELECT id,SID,FirstName,LastName,rights,lastaccess FROM imas_users WHERE rights > 10 AND groupid='$groupid' ORDER BY LastName";
+	} else {
+		if ($showusers==-1) {
+			$page_userBlockTitle = "Pending Users";
+			$query = "SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE rights=0 ORDER BY LastName";
+		} else if (is_numeric($showusers)) {
+			$page_userBlockTitle = "Group Users";
+			$query = "SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE rights > 10 AND groupid='$showusers' ORDER BY LastName";
+		} else {
+			$page_userBlockTitle = "All Users - $showusers";
+			$query = "SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE substring(LastName,1,1)='$showusers' ORDER BY LastName";
+		}
 	}
-	echo '>Default</option>';
+	
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	
+	$i=0;
+	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+		$page_userDataId[$i] = $line['id'];
+		$page_userDataSid[$i] = $line['SID'];
+		$page_userDataEmail[$i] = $line['email'];
+		$page_userDataLastName[$i] = $line['LastName'];
+		$page_userDataFirstName[$i] = $line['FirstName'];
+		switch ($line['rights']) {
+			case 5: $page_userDataType[$i] = "Guest"; break;
+			case 10:$page_userDataType[$i] = "Student"; break;
+			case 15: $page_userDataType[$i] = "Tutor/TA/Proctor"; break;
+			case 20: $page_userDataType[$i] = "Teacher"; break;
+			case 40: $page_userDataType[$i] = "LimCourseCreator"; break;
+			case 75: $page_userDataType[$i] = "GroupAdmin"; break;
+			case 100: $page_userDataType[$i] = "Admin"; break;
+		}
+		$page_userDataLastAccess[$i] = ($line['lastaccess']>0) ? date("n/j/y g:i a",$line['lastaccess']) : "never" ;
+		$i++;
+	}
+	
+	//prepare user select
+	$page_userSelectVal[0] = -1;
+	$page_userSelectLabel[0] = "Pending";
+	$page_userSelectVal[1] = 0;
+	$page_userSelectLabel[1] = "Default";
+	$i=2;
 	$query = "SELECT id,name from imas_groups ORDER BY name";
 	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 	while ($row = mysql_fetch_row($result)) {
-		echo "<option value=\"{$row[0]}\" ";
-		if ($row[0] == $showusers) {
-			echo "selected=1";
-		}
-		echo ">{$row[1]}</option>";
+		$page_userSelectVal[$i] = $row[0];
+		$page_userSelectLabel[$i] = $row[1];
+		$i++;
 	}
-	for ($i=ord("A");$i<=ord("Z");$i++) {
-		echo "<option value=\"".chr($i)."\" ";
-		if (chr($i) == $showusers) {
-			echo "selected=1";
-		}
-		echo ">".chr($i)."</option>";
+	for ($let=ord("A");$let<=ord("Z");$let++) {
+		$page_userSelectVal[$i] = chr($let);
+		$page_userSelectLabel[$i] = chr($let);
+		$i++;
 	}
-	echo "</select>";
 	
-}
+	
+} 
+
+$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
+$placeinhead .= "<script>\nfunction showcourses() { \n";
+$placeinhead .= "  var uid=document.getElementById(\"seluid\").value; \n";
+$placeinhead .= "  if (uid>0) {window.location='admin.php?showcourses='+uid;} \n";
+$placeinhead .= "}\n";
+$placeinhead .= "function showgroupusers() { ";
+$placeinhead .= "  var grpid=document.getElementById(\"selgrpid\").value; ";
+$placeinhead .= "  window.location='admin.php?showusers='+grpid;";
+$placeinhead .= "}</script>";
+ 
+ /******* begin html output ********/
+ require("../header.php");
+
+ if ($overwriteBody==1) {
+	echo $body;
+} else {	
+
+?> 
+	<div class=breadcrumb><?php echo $curBreadcrumb  ?></div>
+	<h2><?php echo $installname ?> Administration</h2>
+	<b>Hello <?php echo $username ?></b>
+
+<?php //WRITE OUT COURSES BLOCK ?>	
+	<h3>Courses</h3>
+	<div class=item>
+	<table class=gb border=0 width="90%">
+		<thead>
+			<tr><th>Name</th><th>Course ID</th><th>Owner</th><th>Modify</th><th>Teachers</th><th>Transfer</th><th>Delete</th>
+			</tr>
+		</thead>
+		<tbody>
+<?php
+
+	$alt = 0;
+	for ($i=0;$i<count($page_courseList);$i++) {
+		if ($alt==0) {echo "	<tr class=even>"; $alt=1;} else {echo "	<tr class=odd>"; $alt=0;}
+?>		
+				<td><a href="../course/course.php?cid=<?php echo $page_courseList[$i]['id'] ?>">
+				<?php echo $page_courseList[$i]['name'] ?></a>
+				</td>
+				<td class=c><?php echo $page_courseList[$i]['id'] ?></td>
+				<td><?php echo $page_courseList[$i]['LastName'] ?>, <?php echo $page_courseList[$i]['FirstName'] ?></td>
+				<td class=c><a href="forms.php?action=modify&id=<?php echo $page_courseList[$i]['id'] ?>">Modify</a></td>
+				<td class=c><?php echo $page_courseList[$i]['addRemove'] ?></td> 
+				<td class=c><?php echo $page_courseList[$i]['transfer'] ?></td>
+				<td class=c><a href="forms.php?action=delete&id=<?php echo $page_courseList[$i]['id'] ?>">Delete</a></td>
+			</tr>
+<?php
+	}
 ?>
-<p>*Passwords will be reset to <i>Password</i></p>
-</div>
+			</tbody>
+		</table>
+	<input type=button value="Add New Course" onclick="window.location='forms.php?action=addcourse'" /> 
+<?php
+	if ($myrights>=75) {
+		if ($showcourses>0) {
+			echo "<input type=button value=\"Show My Courses\" onclick=\"window.location='admin.php?showcourses=0'\" />";
+		}
+
+		echo " Show courses of: ";
+		writeHtmlSelect ("seluid",$page_teacherSelectVal,$page_teacherSelectLabel,null,"Select a user..",0,"onchange=\"showcourses()\"");	
+	}
+?>
+	</div>
+
+<?php //END COURSE BLOCK, BEGIN ADMINISTRATION BLOCK ?>
+	
+	<h3>Administration</h3>
+	<div class=cp>
+		<A HREF="forms.php?action=chgpwd">Change my password</a><BR>
+		<A HREF="../help.php?section=administration">Help</a><BR>
+		<A HREF="actions.php?action=logout">Log Out</a><BR>
+	</div>
+<?php 
+	if($myrights >= 75) { 
+?>
+	<div class=cp>
+	<span class=column>
+	<a href="../course/manageqset.php?cid=admin">Manage Question Set</a><BR>
+	<a href="export.php?cid=admin">Export Question Set</a><BR>
+	<a href="import.php?cid=admin">Import Question Set</a><BR>
+	</span>
+	<span class=column>
+	<a href="../course/managelibs.php?cid=admin">Manage Libraries</a><br>
+	<a href="exportlib.php?cid=admin">Export Libraries</a><BR>
+	<a href="importlib.php?cid=admin">Import Libraries</a></span>
+<?php 
+		if ($myrights == 100) {
+?>	
+	<span class=column>
+	<?php echo ($allowmacroinstall) ? "<a href=\"forms.php?action=importmacros\">Install Macro File</a><br/>\n" : "" ; ?>
+	<a href="forms.php?action=deloldusers">Delete Old Users</a><br/>
+	<a href="importstu.php?cid=admin">Import Students from File</a><br/>
+	</span>
+	<span class=column>
+	<a href="forms.php?action=listgroups">Edit Groups</a><br/>
+	</span>
+<?php
+		} 
+?>
+	<div class=clear></div>
+	</div>
+<?php
+	}
+// END OF ADMINISTRATION BLOCK, BEGIN DIAGNOSTICS BLOCK
+	if($myrights >= 75) {
+?>	
+	<h4>Diagnostics</h4>
+	<div class=item>
+	<table class=gb width="90%" id="diagTable">
+		<thead>
+		<tr><th>Name</th><th>Available</th><th>Public</th><th>&nbsp;</th><th>&nbsp;</th></tr>
+		</thead>
+		<tbody>
+<?php
+	for ($i=0;$i<count($page_diagnosticsId);$i++) {
+?>	
+			<tr>
+				<td><a href="<?php echo $imasroot;?>/diag/index.php?id=<?php echo $page_diagnosticsId[$i] ?>">
+				<?php echo $page_diagnosticsName[$i] ?></a></td>
+				<td class=c><?php echo $page_diagnosticsAvailable[$i] ?></td>
+				<td class=c><?php echo $page_diagnosticsPublic[$i] ?></td>
+				<td><a href="diagsetup.php?id=<?php echo $page_diagnosticsId[$i] ?>">Modify</a></td>
+				<td><a href="forms.php?action=removediag&id=<?php echo $page_diagnosticsId[$i] ?>">Remove</a></td>
+			</tr>
+<?php
+	}
+?>
+		</tbody>
+	</table>
+	<input type=button value="Add New Diagnostic" onclick="window.location='<?php echo $imasroot;?>/admin/diagsetup.php'">
+	</div>
 
 <?php
+	}
+	
+	//END DIAGNOSITICS BLOCK, BEGIN USERS BLOCK
+	
+	if($myrights >= 75) {
+?>
+	<h4><?php echo $page_userBlockTitle ?></h4>
+	<div class=item>
+		<table class=gb width="90%" id="myTable">
+		<thead>
+			<tr><th>Name</th><th>Username</th><th>Email</th><th>Rights</th><th>Last Login</th><th>Rights</th><th>Password</th><th>Delete</th></tr>
+		</thead>
+		<tbody>
+<?php 
+		for ($i=0;$i<count($page_userDataId);$i++) {
+			if ($alt==0) {echo "	<tr class=even>"; $alt=1;} else {echo "	<tr class=odd>"; $alt=0;}
+?>
+				<td><?php echo $page_userDataLastName[$i] . ", " . $page_userDataFirstName[$i] ?></td>
+				<td><?php echo $page_userDataSid[$i] ?></td>
+				<td><?php echo $page_userDataEmail[$i] ?></td>
+				<td><?php echo $page_userDataType[$i] ?></td>
+				<td><?php echo $page_userDataLastAccess[$i] ?></td>
+				<td class=c><a href="forms.php?action=chgrights&id=<?php echo $page_userDataId[$i] ?>">Change</a></td>
+				<td class=c><a href="actions.php?action=resetpwd&id=<?php echo $page_userDataId[$i] ?>">Reset</a></td>
+				<td class=c><a href="forms.php?action=deladmin&id=<?php echo $page_userDataId[$i] ?>">Delete</a></td>
+			</tr>
+<?php
+		}
+?>
+		</tbody>
+		</table>
+		<script type="text/javascript">
+		initSortTable('myTable',Array('S','S','S','S',false,false,false),true);
+		</script>
+		
+		<input type=button value="Add New User" onclick="window.location='forms.php?action=newadmin'">
+
+<?php 
+		if ($myrights==100) {
+			writeHtmlSelect ("selgrpid",$page_userSelectVal,$page_userSelectLabel,$showusers,null,null,"onchange=\"showgroupusers()\"");	
+		}
+	}
+?>
+	<p>Passwords reset to: password</p>
+	</div>
+
+<?php
+}
  require("../footer.php");
 ?>
 

@@ -1,16 +1,27 @@
 <?php
-//IMathAS:  Modify a question's settings in an assessment
+//IMathAS:  Main admin page
 //(c) 2006 David Lippman
-	require("../validate.php");
+
+/*** master php includes *******/
+require("../validate.php");
+
+ //set some page specific variables and counters
+$overwriteBody = 0;
+$body = "";
+$pagetitle = "Question Settings";
+
 	
-	if (!(isset($teacherid))) {
-		require("../header.php");
-		echo "You need to log in as a teacher to access this page";
-		require("../footer.php");
-		exit;
-	}
+	//CHECK PERMISSIONS AND SET FLAGS
+if (!(isset($teacherid))) {
+ 	$overwriteBody = 1;
+	$body = "You need to log in as a teacher to access this page";
+} else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION	
+	
 	$cid = $_GET['cid'];
 	$aid = $_GET['aid'];
+	$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=$cid\">$coursename</a> ";
+	$curBreadcrumb .= "&gt; <a href=\"addquestions.php?aid=$aid&cid=$cid\">Add/Remove Questions</a> &gt; ";
+	$curBreadcrumb .= "Modify Question Settings";
 	
 	if ($_GET['process']== true) {
 		if ($_POST['points']=="") {$points=9999;} else {$points = $_POST['points'];}
@@ -65,13 +76,8 @@
 		
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
 		exit;
-	} else {
-		$pagetitle = "Question Settings";
-		require("../header.php");
-		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=$cid\">$coursename</a> ";
-		echo "&gt; <a href=\"addquestions.php?aid=$aid&cid=$cid\">Add/Remove Questions</a> &gt; ";
-		
-		echo "Modify Question Settings</div>\n";
+	} else { //DEFAULT DATA MANIPULATION
+
 		if (isset($_GET['id'])) {
 			$query = "SELECT points,attempts,penalty,regen,showans FROM imas_questions WHERE id='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -98,20 +104,33 @@
 			$line['regen']=0;
 			$line['showans']='0';
 		}
+		
+		$query = "SELECT ias.id FROM imas_assessment_sessions AS ias,imas_students WHERE ";
+		$query .= "ias.assessmentid='$aid' AND ias.userid=imas_students.userid AND imas_students.courseid='$cid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		if (mysql_num_rows($result) > 0) {
+			$page_beenTakenMsg = "<h3>Warning</h3>\n";
+			$page_beenTakenMsg .= "<p>This assessment has already been taken.  Altering the points or penalty will not change the scores of students who already completed this question. ";
+			$page_beenTakenMsg .= "If you want to make these changes, or add additional copies of this question, you should clear all existing assessment attempts</p> ";
+			$page_beenTakenMsg .= "<p><input type=button value=\"Clear Assessment Attempts\" onclick=\"window.location='addquestions.php?cid=$cid&aid=$aid&clearattempts=ask'\"></p>\n";
+			$beentaken = true;
+		} else {
+			$beentaken = false;
+		}
+
 	}
-	$query = "SELECT ias.id FROM imas_assessment_sessions AS ias,imas_students WHERE ";
-	$query .= "ias.assessmentid='$aid' AND ias.userid=imas_students.userid AND imas_students.courseid='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	if (mysql_num_rows($result) > 0) {
-		echo "<h3>Warning</h3>\n";
-		echo "<p>This assessment has already been taken.  Altering the points or penalty will not change the scores of students who already completed this question. ";
-		echo "If you want to make these changes, or add additional copies of this question, you should clear all existing assessment attempts</p> ";
-		echo "<p><input type=button value=\"Clear Assessment Attempts\" onclick=\"window.location='addquestions.php?cid=$cid&aid=$aid&clearattempts=ask'\"></p>\n";
-		$beentaken = true;
-	} else {
-		$beentaken = false;
-	}
+}
+
+/******* begin html output ********/
+require("../header.php");
+
+if ($overwriteBody==1) {
+	echo $body;
+} else {		
 ?>
+	<div class="breadcrumb"><?php echo $curBreadcrumb; ?></div> 
+	<?php echo $page_beenTakenMsg; ?>		
+
 
 <h2>Modify Question</h2> 
 <form method=post action="modquestion.php?process=true&<?php echo "cid=$cid&aid=$aid"; if (isset($_GET['id'])) {echo "&id={$_GET['id']}";} if (isset($_GET['qsetid'])) {echo "&qsetid={$_GET['qsetid']}";}?>">
@@ -148,15 +167,17 @@ Leave items blank or set to 9999 to use default values<BR>
     </select></span><br class="form"/>
 
 <?php
-if (isset($_GET['qsetid'])) { //adding new question
-	echo "<span class=form>Number of copies of question to add:</span><span class=formright><input type=text size=4 name=copies value=\"1\"/></span><br class=form />";
-} else if (!$beentaken) {
-	echo "<span class=form>Number, if any, of additional copies to add to assessment:</span><span class=formright><input type=text size=4 name=copies value=\"0\"/></span><br class=form />";
-}
+	if (isset($_GET['qsetid'])) { //adding new question
+		echo "<span class=form>Number of copies of question to add:</span><span class=formright><input type=text size=4 name=copies value=\"1\"/></span><br class=form />";
+	} else if (!$beentaken) {
+		echo "<span class=form>Number, if any, of additional copies to add to assessment:</span><span class=formright><input type=text size=4 name=copies value=\"0\"/></span><br class=form />";
+	}
 ?>
 
 <div class=submit><input type=submit value=Submit></div>
 
 <?php
-	require("../footer.php");
+}
+
+require("../footer.php");
 ?>

@@ -1,18 +1,37 @@
 <?php
-//IMathAS:  Handle options for print layout
+//IMathAS:  Main admin page
 //(c) 2006 David Lippman
-	require("../validate.php");
-	$pagetitle = "Print Layout";
-	$placeinhead = "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/assessment/mathtest.css\"/>\n";
-	$placeinhead .= "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/assessment/print.css\"/>\n";
-	$placeinhead .= "<script src=\"$imasroot/javascript/AMhelpers.js\" type=\"text/javascript\"></script>\n";
-	require("../header.php");
 
-	if (!(isset($teacherid))) {
-		echo "You need to log in as a teacher to access this page";
-		require("../footer.php");
-		exit;
-	}
+/*** master php includes *******/
+require("../validate.php");
+
+
+	
+ //set some page specific variables and counters
+$overwriteBody = 0;
+$body = "";
+$pagetitle = "Print Layout";
+
+	
+	//CHECK PERMISSIONS AND SET FLAGS
+if (!(isset($teacherid))) {
+ 	$overwriteBody = 1;
+	$body = "You need to log in as a teacher to access this page";
+} else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION	
+
+}
+
+/******* begin html output ********/
+$placeinhead = "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/assessment/mathtest.css\"/>\n";
+$placeinhead .= "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/assessment/print.css\"/>\n";
+$placeinhead .= "<script src=\"$imasroot/javascript/AMhelpers.js\" type=\"text/javascript\"></script>\n";
+
+require("../header.php");
+
+if ($overwriteBody==1) {
+	echo $body;
+} else {		
+	
 	$cid = $_GET['cid'];
 	$aid = $_GET['aid'];
 	if (isset($_POST['vert'])) {
@@ -59,9 +78,6 @@
 			}
 		}
 	}
-	//if ($line['shuffle']&1) {shuffle($questions);}
-	
-	
 	
 	$points = array();
 	$qn = array();
@@ -82,23 +98,23 @@
 	$phs = $ph-0.6;
 	$pws = $pw-0.5;
 	$pwss = $pw-0.6;
-	echo <<<END
-<style type="text/css">
-div.a,div.b {
-  position: absolute;
-  left: 0px;
-  border: 1px solid;
-  width: {$pwss}in;
-  height: {$phs}in;
-}
-div.a {
-  border: 3px double #33f;
-}
-div.b {
-  border: 3px double #0c0;
-}
+?>
+	<style type="text/css">
+		div.a,div.b {
+		  position: absolute;
+		  left: 0px;
+		  border: 1px solid;
+		  width: <?php echo $pwss ?>in;
+		  height: <?php echo $phs ?>in;
+		}
+		div.a {
+		  border: 3px double #33f;
+		}
+		div.b {
+		  border: 3px double #0c0;
+		}
 
-END;
+<?php
 	if ($isfinal) {
 		$heights = explode(',',$_POST['heights']);
 		for ($i=0;$i<count($heights);$i++) {
@@ -116,88 +132,89 @@ END;
 	if (isset($_POST['hidetxtboxes'])) {
 		echo "input.text { display: none; }\n";
 	}
-	echo <<<END
-div.floatl {
-	float: left;
-}
-div.qnum {
-	float: left;
-	text-align: right;
-	padding-right: 5px;
-}
-div#headerleft {
-	float: left;
-}
-div#headerright {
-	float: right;
-	text-align: right;
-}
-div#intro {
-	clear: both;
-	padding-top: 5px;
-	padding-bottom: 5px;
-}
-div.q {
-	clear: both;
-	padding: 0px;
-	margin: 0px;
-}
-div.m {
-	float: left;
-	width: {$pws}in;
-	border-bottom: 1px dashed #aaa;
-	padding: 0px;
-	overflow: hidden;
-}
+?>
 
-div.cbutn {
-	float: left;
-	padding-left: 5px;
-}
-body {
-	padding: 0px;
-	margin: 0px;
-}
-form {
-	padding: 0px;
-	margin: 0px;
-}
-div.maintest {
-	position: absolute;
-	top: 0px;
-	left: 0px;
-}
-.pageb {
-		clear: both;
-		padding: 0px;
-		margin: 0px;
-		page-break-after: always;
-		border-bottom: 1px dashed #aaa;
-	}
-div.mainbody {
-	margin: 0px;
-	padding: 0px;
-}
-</style>
-<style type="text/css" media="print">
-
-	div.a,div.b {
-		display: none;
-	}
-	div.m {
-		width: {$pw}in;
-		border: 0px;
-	}
-	div.cbutn {
-		display: none;
-	}
-	.pageb {
-		border: 0px;
-	}
+		div.floatl {
+			float: left;
+		}
+		div.qnum {
+			float: left;
+			text-align: right;
+			padding-right: 5px;
+		}
+		div#headerleft {
+			float: left;
+		}
+		div#headerright {
+			float: right;
+			text-align: right;
+		}
+		div#intro {
+			clear: both;
+			padding-top: 5px;
+			padding-bottom: 5px;
+		}
+		div.q {
+			clear: both;
+			padding: 0px;
+			margin: 0px;
+		}
+		div.m {
+			float: left;
+			width: <?php echo $pws ?>in;
+			border-bottom: 1px dashed #aaa;
+			padding: 0px;
+			overflow: hidden;
+		}
+		
+		div.cbutn {
+			float: left;
+			padding-left: 5px;
+		}
+		body {
+			padding: 0px;
+			margin: 0px;
+		}
+		form {
+			padding: 0px;
+			margin: 0px;
+		}
+		div.maintest {
+			position: absolute;
+			top: 0px;
+			left: 0px;
+		}
+		.pageb {
+				clear: both;
+				padding: 0px;
+				margin: 0px;
+				page-break-after: always;
+				border-bottom: 1px dashed #aaa;
+			}
+		div.mainbody {
+			margin: 0px;
+			padding: 0px;
+		}
+	</style>
+	<style type="text/css" media="print">
 	
-</style>
+		div.a,div.b {
+			display: none;
+		}
+		div.m {
+			width: <?php echo $pw ?>in;
+			border: 0px;
+		}
+		div.cbutn {
+			display: none;
+		}
+		.pageb {
+			border: 0px;
+		}
+		
+	</style>
 
-END;
+<?php
 	if (!$isfinal) {
 		for ($i=0;$i<ceil($numq/3)+1;$i++) { //print page layout divs
 			echo "<div id=\"pg$i\" ";
@@ -210,98 +227,7 @@ END;
 		}
 	}
 	include("../assessment/displayq2.php");
-	function printq($qn,$qsetid,$seed,$pts) {
-		global $isfinal;
-		srand($seed);
 	
-		$query = "SELECT qtype,control,qcontrol,qtext,answer FROM imas_questionset WHERE id='$qsetid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$qdata = mysql_fetch_array($result, MYSQL_ASSOC);
-		
-		eval(interpret('control',$qdata['qtype'],$qdata['control']));
-		eval(interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
-		$toevalqtxt = interpret('qtext',$qdata['qtype'],$qdata['qtext']);
-		srand($seed+1);
-		eval(interpret('answer',$qdata['qtype'],$qdata['answer']));
-		srand($seed+2);
-		$la = '';
-		
-		//pack options
-		if (isset($ansprompt)) {$options['ansprompt'] = $ansprompt;}
-		if (isset($displayformat)) {$options['displayformat'] = $displayformat;}
-		if (isset($answerformat)) {$options['answerformat'] = $answerformat;}
-		if (isset($questions)) {$options['questions'] = $questions;}
-		if (isset($answers)) {$options['answers'] = $answers;}
-		if (isset($answer)) {$options['answer'] = $answer;}
-		if (isset($questiontitle)) {$options['questiontitle'] = $questiontitle;}
-		if (isset($answertitle)) {$options['answertitle'] = $answertitle;}
-		if (isset($answersize)) {$options['answersize'] = $answersize;}
-		if (isset($variables)) {$options['variables'] = $variables;}
-		if (isset($domain)) {$options['domain'] = $domain;}	
-		if (isset($answerboxsize)) {$options['answerboxsize'] = $answerboxsize;}
-		if (isset($hidepreview)) {$options['hidepreview'] = $hidepreview;}
-		if (isset($matchlist)) {$options['matchlist'] = $matchlist;}
-		if (isset($noshuffle)) {$options['noshuffle'] = $noshuffle;}
-		
-		if ($qdata['qtype']=="multipart") {
-			if (!is_array($anstypes)) {
-				$anstypes = explode(",",$anstypes);
-			}
-			$laparts = explode("&",$la);
-			foreach ($anstypes as $kidx=>$anstype) {
-				list($answerbox[$kidx],$tips[$kidx],$shans[$kidx]) = makeanswerbox($anstype,$kidx,$laparts[$kidx],$options,$qn+1);
-			}
-		} else {
-			list($answerbox,$tips[0],$shans[0]) = makeanswerbox($qdata['qtype'],$qn,$la,$options,0);
-		}
-		
-		echo "<div class=q>";
-		if ($isfinal) {
-			echo "<div class=\"trq$qn\">\n";
-		} else {
-			echo "<div class=m id=\"trq$qn\">\n";
-		}
-		echo "<div class=qnum>".($qn+1).") ";
-		if (isset($_POST['points'])) {
-			echo '<br/>'.$pts.'pts';
-		}
-		echo "</div>\n";//end qnum div
-		echo "<div class=floatl><div>\n";
-		//echo $toevalqtext;
-		eval("\$evaledqtext = \"$toevalqtxt\";");
-		echo filter($evaledqtext);
-		echo "</div>\n"; //end question div
-		
-		if (strpos($toevalqtxt,'$answerbox')===false) {
-			if (is_array($answerbox)) {
-				foreach($answerbox as $iidx=>$abox) {
-					echo "<div>$abox</div>\n";
-					echo "<div class=spacer>&nbsp;</div>\n";
-				}
-			} else {  //one question only
-				echo "<div>$answerbox</div>\n";
-			}
-			
-			
-		} 
-		
-		echo "</div>\n"; //end floatl div
-		
-		echo "</div>";//end m div
-		if (!$isfinal) {
-			echo "<div class=cbutn>\n";  
-			echo "<p><input type=button value=\"+1\" onclick=\"incspace($qn,1)\"><input type=button value=\"+.5\" onclick=\"incspace($qn,.5)\"><input type=button value=\"+.25\" onclick=\"incspace($qn,.25)\"><input type=button value=\"+.1\" onclick=\"incspace($qn,.1)\"><br/>";
-			echo "<input type=button value=\"-1\" onclick=\"incspace($qn,-1)\"><input type=button value=\"-.5\" onclick=\"incspace($qn,-.5)\"><input type=button value=\"-.25\" onclick=\"incspace($qn,-.25)\"><input type=button value=\"-.1\" onclick=\"incspace($qn,-.1)\"></p>";
-			echo "</div>\n"; //end cbutn div
-		}
-		echo "&nbsp;";
-		echo "</div>\n"; //end q div
-		if (!isset($showanswer)) {
-			return $shans;
-		} else {
-			return $showanswer;
-		}
-	}
 	
 	//echo "<div class=maintest>\n";
 	echo "<form method=post action=\"printtest.php?cid=$cid&aid=$aid\" onSubmit=\"return packheights()\">\n";
@@ -377,28 +303,28 @@ END;
 	}
 	//echo "</table>\n";
 	if (!$isfinal) {
-		echo <<<END
-<script type="text/javascript">
-var heights = new Array();
-for (var i=0; i<$numq; i++) {
-	heights[i] = 2.5;
-	document.getElementById("trq"+i).style.height = "2.5in";
-}
-function incspace(id,sp) {
-	if (heights[id]+sp>.5) {
-		heights[id] += sp;
-		document.getElementById("trq"+id).style.height = heights[id]+"in";
-	} 
-	
-}
-function packheights() {
-	document.getElementById("heights").value = heights.join(",");
-	return true;
-}
-</script>
-END;
-	
-	
+?>
+
+	<script type="text/javascript">
+		var heights = new Array();
+		for (var i=0; i<<?php echo $numq ?>; i++) {
+			heights[i] = 2.5;
+			document.getElementById("trq"+i).style.height = "2.5in";
+		}
+		function incspace(id,sp) {
+			if (heights[id]+sp>.5) {
+				heights[id] += sp;
+				document.getElementById("trq"+id).style.height = heights[id]+"in";
+			} 
+			
+		}
+		function packheights() {
+			document.getElementById("heights").value = heights.join(",");
+			return true;
+		}
+	</script>
+
+<?php
 		echo "<input type=hidden id=heights name=heights value=\"\">\n";
 		echo "<input type=hidden name=pw value=\"$pw\">\n";
 		echo "<input type=hidden name=ph value=\"$ph\">\n";
@@ -448,6 +374,102 @@ END;
 		echo "<div class=cbutn><a href=\"course.php?cid=$cid\">Return to course page</a></div>\n";
 	}
 	echo "</form>\n";
-	//echo "</div>\n"; //end maintest div
-	require("../footer.php");
+
+
+}	
+
+require("../footer.php");
+
+function printq($qn,$qsetid,$seed,$pts) {
+	global $isfinal;
+	srand($seed);
+
+	$query = "SELECT qtype,control,qcontrol,qtext,answer FROM imas_questionset WHERE id='$qsetid'";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$qdata = mysql_fetch_array($result, MYSQL_ASSOC);
+	
+	eval(interpret('control',$qdata['qtype'],$qdata['control']));
+	eval(interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
+	$toevalqtxt = interpret('qtext',$qdata['qtype'],$qdata['qtext']);
+	srand($seed+1);
+	eval(interpret('answer',$qdata['qtype'],$qdata['answer']));
+	srand($seed+2);
+	$la = '';
+	
+	//pack options
+	if (isset($ansprompt)) {$options['ansprompt'] = $ansprompt;}
+	if (isset($displayformat)) {$options['displayformat'] = $displayformat;}
+	if (isset($answerformat)) {$options['answerformat'] = $answerformat;}
+	if (isset($questions)) {$options['questions'] = $questions;}
+	if (isset($answers)) {$options['answers'] = $answers;}
+	if (isset($answer)) {$options['answer'] = $answer;}
+	if (isset($questiontitle)) {$options['questiontitle'] = $questiontitle;}
+	if (isset($answertitle)) {$options['answertitle'] = $answertitle;}
+	if (isset($answersize)) {$options['answersize'] = $answersize;}
+	if (isset($variables)) {$options['variables'] = $variables;}
+	if (isset($domain)) {$options['domain'] = $domain;}	
+	if (isset($answerboxsize)) {$options['answerboxsize'] = $answerboxsize;}
+	if (isset($hidepreview)) {$options['hidepreview'] = $hidepreview;}
+	if (isset($matchlist)) {$options['matchlist'] = $matchlist;}
+	if (isset($noshuffle)) {$options['noshuffle'] = $noshuffle;}
+	
+	if ($qdata['qtype']=="multipart") {
+		if (!is_array($anstypes)) {
+			$anstypes = explode(",",$anstypes);
+		}
+		$laparts = explode("&",$la);
+		foreach ($anstypes as $kidx=>$anstype) {
+			list($answerbox[$kidx],$tips[$kidx],$shans[$kidx]) = makeanswerbox($anstype,$kidx,$laparts[$kidx],$options,$qn+1);
+		}
+	} else {
+		list($answerbox,$tips[0],$shans[0]) = makeanswerbox($qdata['qtype'],$qn,$la,$options,0);
+	}
+	
+	echo "<div class=q>";
+	if ($isfinal) {
+		echo "<div class=\"trq$qn\">\n";
+	} else {
+		echo "<div class=m id=\"trq$qn\">\n";
+	}
+	echo "<div class=qnum>".($qn+1).") ";
+	if (isset($_POST['points'])) {
+		echo '<br/>'.$pts.'pts';
+	}
+	echo "</div>\n";//end qnum div
+	echo "<div class=floatl><div>\n";
+	//echo $toevalqtext;
+	eval("\$evaledqtext = \"$toevalqtxt\";");
+	echo filter($evaledqtext);
+	echo "</div>\n"; //end question div
+	
+	if (strpos($toevalqtxt,'$answerbox')===false) {
+		if (is_array($answerbox)) {
+			foreach($answerbox as $iidx=>$abox) {
+				echo "<div>$abox</div>\n";
+				echo "<div class=spacer>&nbsp;</div>\n";
+			}
+		} else {  //one question only
+			echo "<div>$answerbox</div>\n";
+		}
+		
+		
+	} 
+	
+	echo "</div>\n"; //end floatl div
+	
+	echo "</div>";//end m div
+	if (!$isfinal) {
+		echo "<div class=cbutn>\n";  
+		echo "<p><input type=button value=\"+1\" onclick=\"incspace($qn,1)\"><input type=button value=\"+.5\" onclick=\"incspace($qn,.5)\"><input type=button value=\"+.25\" onclick=\"incspace($qn,.25)\"><input type=button value=\"+.1\" onclick=\"incspace($qn,.1)\"><br/>";
+		echo "<input type=button value=\"-1\" onclick=\"incspace($qn,-1)\"><input type=button value=\"-.5\" onclick=\"incspace($qn,-.5)\"><input type=button value=\"-.25\" onclick=\"incspace($qn,-.25)\"><input type=button value=\"-.1\" onclick=\"incspace($qn,-.1)\"></p>";
+		echo "</div>\n"; //end cbutn div
+	}
+	echo "&nbsp;";
+	echo "</div>\n"; //end q div
+	if (!isset($showanswer)) {
+		return $shans;
+	} else {
+		return $showanswer;
+	}
+}
 ?>

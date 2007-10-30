@@ -35,5 +35,17 @@ function writeHtmlChecked ($var,$test,$notEqual=null) {
 	}		
 }
 
+//writeHtmlSelected is used for selecting the appropriate entry in a select item
+function writeHtmlSelected ($var,$test,$notEqual=null) {
+	if ((isset($notEqual)) && ($notEqual==1)) {
+	 	if ($var!=$test) {
+			echo 'selected="selected"';
+		}
+	} else {
+		if ($var==$test) {
+			echo 'selected="selected"';
+		}	
+	}		
+}
 
 ?>

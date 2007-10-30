@@ -1,79 +1,44 @@
 <?php
-//IMathAS:  Add/modify linked text items.
+//IMathAS:  Add/modify blocks of items on course page
 //(c) 2006 David Lippman
-	require("../validate.php");
-	
-	if (!(isset($teacherid))) {
-		require("../header.php");
-		echo "You need to log in as a teacher to access this page";
-		require("../footer.php");
-		exit;
-	}
-	
+
+/*** master php includes *******/
+require("../validate.php");
+require("../includes/htmlutil.php");
+require("../includes/parsedatetime.php");
+
+/*** pre-html data manipulation, including function code *******/
+
+//set some page specific variables and counters
+$overwriteBody = 0;
+$body = "";
+$useeditor = "text,summary";
+
+
+$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+if (isset($_GET['id'])) {
+	$curBreadcrumb .= "&gt; Modify Linked Text\n";
+	$pagetitle = "Modify Linked Text";
+} else {
+	$curBreadcrumb .= "&gt; Add Linked Text\n";
+	$pagetitle = "Add Linked Text";
+}	
+
+
+if (!(isset($teacherid))) { // loaded by a NON-teacher
+	$overwriteBody=1;
+	$body = "You need to log in as a teacher to access this page";
+} elseif (!(isset($_GET['cid']))) {
+	$overwriteBody=1;
+	$body = "You need to access this page from the course page menu";
+} else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$cid = $_GET['cid'];
-	$block = $_GET['block'];
-	
-	if (isset($_GET['remove'])) {
-		if ($_GET['remove']=="really") {
-			$textid = $_GET['id'];
-			
-			$query = "SELECT id FROM imas_items WHERE typeid='$textid' AND itemtype='LinkedText'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$itemid = mysql_result($result,0,0);
-			
-			$query = "DELETE FROM imas_items WHERE id='$itemid'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-			
-			$query = "SELECT text FROM imas_linkedtext WHERE id='$textid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$text = trim(mysql_result($result,0,0));
-			if (substr($text,0,5)=='file:') { //delete file if not used
-				$safetext = addslashes($text);
-				$query = "SELECT id FROM imas_linkedtext WHERE text='$safetext'"; //any others using file?
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				if (mysql_num_rows($result)==1) { 
-					$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
-					$filename = substr($text,5);
-					unlink($uploaddir . $filename);
-				}
-			}
-			
-			$query = "DELETE FROM imas_linkedtext WHERE id='$textid'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-						
-			$query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$items = unserialize(mysql_result($result,0,0));
-			
-			$blocktree = explode('-',$block);
-			$sub =& $items;
-			for ($i=1;$i<count($blocktree);$i++) {
-				$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
-			}
-			$key = array_search($itemid,$sub);
-			array_splice($sub,$key,1);
-			$itemorder = addslashes(serialize($items));
-			$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-			
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
-		
-			exit;
-		} else {
-			require("../header.php");
-			echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-			echo "&gt; Modify Linked Text</div>\n";
-			echo "Are you SURE you want to delete this text item?";
-			echo "<p><input type=button value=\"Yes, Remove\" onClick=\"window.location='addlinkedtext.php?cid={$_GET['cid']}&block=$block&id={$_GET['id']}&remove=really'\">\n";
-			echo "<input type=button value=\"Nevermind\" onClick=\"window.location='course.php?cid={$_GET['cid']}'\"></p>\n";
-			require("../footer.php");
-			exit;
-		}
-	}
-	
+	$block = $_GET['block'];	
+	$page_formActionTag = "addlinkedtext.php?block=$block&cid=$cid&folder=" . $_GET['folder'];
+	$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . $_GET['id'] : "";
+
 	
 	if ($_POST['title']!= null) { //if the form has been submitted
-		require_once("parsedatetime.php");
 		if ($_POST['sdatetype']=='0') {
 			$startdate = 0;
 		} else if ($_POST['sdatetype']=='now') {
@@ -94,7 +59,8 @@
 			$extension = strtolower(strrchr($userfilename,"."));
 			$badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");
 			if (in_array($extension,$badextensions)) {
-				echo "<p>File type is not allowed</p>";
+				$overwriteBody = 1;
+				$body = "<p>File type is not allowed</p>";
 			} else {
 				$uploadfile = $uploaddir . $filename;
 				$t=0;
@@ -107,13 +73,13 @@
 				if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
 					//echo "<p>File is valid, and was successfully uploaded</p>\n";
 				} else {
-					echo "<p>Error uploading file!</p>\n";
-					echo "<p><a href=\"addlinkedtext.php?cid={$_GET['cid']}";
+					$overwriteBody = 1;
+					$body = "<p>Error uploading file!</p>\n";
+					$body .= "<p><a href=\"addlinkedtext.php?cid={$_GET['cid']}";
 					if (isset($_GET['id'])) {
-						echo "id={$_GET['id']}";
+						$body .= "id={$_GET['id']}";
 					}
-					echo "\">Try Again</a></p>\n";
-					exit;
+					$body .= "\">Try Again</a></p>\n";
 				}
 				//$_POST['text'] = "file:$cid-" . basename($_FILES['userfile']['name']);
 				$_POST['text'] = "file:$filename";
@@ -121,7 +87,7 @@
 			
 		} else if (substr(trim(strip_tags($_POST['text'])),0,4)=="http") {
 			$_POST['text'] = trim(strip_tags($_POST['text']));	
-		} 
+		}
 		$_POST['text'] = trim($_POST['text']);
 		if (isset($_GET['id'])) {  //already have id; update
 			$query = "SELECT text FROM imas_linkedtext WHERE id='{$_GET['id']}'";
@@ -140,12 +106,12 @@
 				}
 			}
 			
-			$query = "UPDATE imas_linkedtext SET title='{$_POST['title']}',summary='{$_POST['summary']}',text='{$_POST['text']}',startdate=$startdate,enddate=$enddate ";
+			$query = "UPDATE imas_linkedtext SET title='{$_POST['title']}',summary='{$_POST['summary']}',text='{$_POST['text']}',startdate=$startdate,enddate=$enddate,avail='{$_POST['avail']}' ";
 			$query .= "WHERE id='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		} else { //add new
-		$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate) VALUES ";
-		$query .= "('$cid','{$_POST['title']}','{$_POST['summary']}','{$_POST['text']}',$startdate,$enddate);";
+		$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate,avail) VALUES ";
+		$query .= "('$cid','{$_POST['title']}','{$_POST['summary']}','{$_POST['text']}',$startdate,$enddate,'{$_POST['avail']}');";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		
 		$newtextid = mysql_insert_id();
@@ -188,6 +154,7 @@
 			$line['title'] = "Enter title here";
 			$line['summary'] = "<p>Enter summary here (displays on course page)</p>";
 			$line['text'] = "<p>Enter text here</p>";
+			$line['avail'] = 1;
 			$startdate = time();
 			$enddate = time() + 7*24*60*60;
 		}   
@@ -206,54 +173,77 @@
 			$etime = tzdate("g:i a",time()+7*24*60*60);
 		}     
 	}
-	$useeditor = "text,summary";
-	$pagetitle = "Linked Text Settings";
-	require("../header.php");
-	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-	if (isset($_GET['id'])) {
-		echo "&gt; Modify Linked Text</div>\n";
-		echo "<h2>Modify Linked Text <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=linkedtextitems','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h2>\n";
-	} else {
-		echo "&gt; Add Linked Text</div>\n";
-		echo "<h2>Add Linked Text <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=linkedtextitems','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h2>\n";
-	}
-?>
+}
+	
+/******* begin html output ********/
+ require("../header.php");
 
-<form enctype="multipart/form-data" method=post action="addlinkedtext.php?block=<?php echo $block;?>&cid=<?php echo $cid; if (isset($_GET['id'])) {echo "&id={$_GET['id']}";}?>&folder=<?php echo $_GET['folder'];?>">
-<span class=form>Title: </span><span class=formright><input type=text size=60 name=title value="<?php echo str_replace('"','&quot;',$line['title']);?>"></span><BR class=form>
+if ($overwriteBody==1) {
+	echo $body;
+} else {
+?> 	
+	<script src="../javascript/CalendarPopup.js"></script>
+	<SCRIPT LANGUAGE="JavaScript" ID="js1">
+	var cal1 = new CalendarPopup();
+	</SCRIPT>
+	
+	<div class=breadcrumb><?php echo $curBreadcrumb  ?></div>
+	<h2><?php echo $pagetitle ?></h2>
 
-Summary<BR>
-<div class=editor>
-<textarea cols=60 rows=10 id=summary name=summary style="width: 100%"><?php echo $line['summary'];?></textarea>
-</div>
-<BR>
-Text or weblink (start with http://)<BR>
-<div class=editor>
-<textarea cols=80 rows=20 id=text name=text style="width: 100%"><?php echo $line['text'];?></textarea>
-</div>
-<BR>
-<input type="hidden" name="MAX_FILE_SIZE" value="3000000" />
-<span class=form>Or attach file (Max 3MB)<sup>*</sup>: </span><span class=formright><input name="userfile" type="file" /></span><br class=form>
 
-<script src="../javascript/CalendarPopup.js"></script>
-<SCRIPT LANGUAGE="JavaScript" ID="js1">
-var cal1 = new CalendarPopup();
-</SCRIPT>
+	<form enctype="multipart/form-data" method=post action="<?php echo $page_formActionTag ?>">
+		<span class=form>Title: </span>
+		<span class=formright><input type=text size=60 name=title value="<?php echo str_replace('"','&quot;',$line['title']);?>">
+		</span><BR class=form>
+		
+		Summary<BR>
+		<div class=editor>
+			<textarea cols=60 rows=10 id=summary name=summary style="width: 100%">
+			<?php echo $line['summary'];?></textarea>
+		</div>
+		<BR>
+		Text or weblink (start with http://)<BR>
+		<div class=editor>
+			<textarea cols=80 rows=20 id=text name=text style="width: 100%">
+			<?php echo $line['text'];?></textarea>
+		</div>
+		<BR>
+		<input type="hidden" name="MAX_FILE_SIZE" value="3000000" />
+		<span class=form>Or attach file (Max 3MB)<sup>*</sup>: </span>
+		<span class=formright><input name="userfile" type="file" /></span><br class=form>
+		
 
-<span class=form>Available After:</span><span class=formright><input type=radio name="sdatetype" value="0" <?php if ($startdate=='0') {echo "checked=1";}?>/> Always until end date<br/>
-<input type=radio name="sdatetype" value="sdate" <?php if ($startdate!='0') {echo "checked=1";}?>/><input type=text size=10 name=sdate value="<?php echo $sdate;?>"> 
-<A HREF="#" onClick="cal1.select(document.forms[0].sdate,'anchor1','MM/dd/yyyy',document.forms[0].sdate.value); return false;" NAME="anchor1" ID="anchor1"><img src="../img/cal.gif" alt="Calendar"/></A>
-at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR class=form>
-
-<span class=form>Available Until:</span><span class=formright>
-<input type=radio name="edatetype" value="2000000000" <?php if ($enddate=='2000000000') {echo "checked=1";}?>/> Always after start date<br/>
-<input type=radio name="edatetype" value="edate"  <?php if ($enddate!='2000000000') {echo "checked=1";}?>/>
-<input type=text size=10 name=edate value="<?php echo $edate;?>"> 
-<A HREF="#" onClick="cal1.select(document.forms[0].edate,'anchor2','MM/dd/yyyy',(document.forms[0].sdate.value=='<?php echo $sdate;?>')?(document.forms[0].edate.value):(document.forms[0].sdate.value)); return false;" NAME="anchor2" ID="anchor2"><img src="../img/cal.gif" alt="Calendar"/></A>
-at <input type=text size=10 name=etime value="<?php echo $etime;?>"></span><BR class=form>
-
-<div class=submit><input type=submit value=Submit></div>
-<p><sup>*</sup>Avoid quotes in the filename</p>
+		<span class=form>Show:</span>
+		<span class=formright>
+			<input type=radio name="avail" value="0" <?php writeHtmlChecked($line['avail'],0);?>/>Hide<br/>
+			<input type=radio name="avail" value="1" <?php writeHtmlChecked($line['avail'],1);?>/>Show by Dates<br/>
+			<input type=radio name="avail" value="2" <?php writeHtmlChecked($line['avail'],2);?>/>Show Always<br/>
+		</span><br class="form"/>
+		<span class=form>Available After:</span>
+		<span class=formright>
+			<input type=radio name="sdatetype" value="0" <?php writeHtmlChecked($startdate,'0',0) ?>/> 
+			Always until end date<br/>
+			<input type=radio name="sdatetype" value="sdate" <?php writeHtmlChecked($startdate,'0',1) ?>/>
+			<input type=text size=10 name=sdate value="<?php echo $sdate;?>"> 
+			<A HREF="#" onClick="cal1.select(document.forms[0].sdate,'anchor1','MM/dd/yyyy',document.forms[0].sdate.value); return false;" NAME="anchor1" ID="anchor1">
+			<img src="../img/cal.gif" alt="Calendar"/></A>
+			at <input type=text size=10 name=stime value="<?php echo $stime;?>">
+		</span><BR class=form>
+		
+		<span class=form>Available Until:</span><span class=formright>
+			<input type=radio name="edatetype" value="2000000000" <?php writeHtmlChecked($enddate,'2000000000',0) ?>/> Always after start date<br/>
+			<input type=radio name="edatetype" value="edate"  <?php writeHtmlChecked($enddate,'2000000000',1) ?>/>
+			<input type=text size=10 name=edate value="<?php echo $edate;?>"> 
+			<A HREF="#" onClick="cal1.select(document.forms[0].edate,'anchor2','MM/dd/yyyy',(document.forms[0].sdate.value=='<?php echo $sdate;?>')?(document.forms[0].edate.value):(document.forms[0].sdate.value)); return false;" NAME="anchor2" ID="anchor2">
+			<img src="../img/cal.gif" alt="Calendar"/></A>
+			at <input type=text size=10 name=etime value="<?php echo $etime;?>">
+		</span><BR class=form>
+		
+		<div class=submit><input type=submit value=Submit></div>	
+	</form>
+	
+	<p><sup>*</sup>Avoid quotes in the filename</p>
 <?php
+}
 	require("../footer.php");
 ?>

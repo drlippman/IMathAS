@@ -69,3 +69,4 @@ function toggleblock(bnum,folder) {
       oblist = oblist.join(',');
       document.cookie = 'openblocks-' +cid+'='+ oblist;
    }
+   

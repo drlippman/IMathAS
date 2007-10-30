@@ -81,10 +81,42 @@ END;
 	}
 
 if (isset($_POST['SID'])) {
+	$_POST['SID'] = trim(str_replace('-','',$_POST['SID']));
 	if (trim($_POST['SID'])=='' || trim($_POST['firstname'])=='' || trim($_POST['lastname'])=='') {
-		echo "<html><body>Please enter your SID number, first name, and lastname.  <a href=\"index.php?id=$diagid\">Try Again</a>\n";
+		echo "<html><body>Please enter your ID, first name, and lastname.  <a href=\"index.php?id=$diagid\">Try Again</a>\n";
 			exit; 
 	}
+	$query = "SELECT entryformat from imas_diags WHERE id='$diagid'";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$entryformat = mysql_result($result,0,0);
+	$entrytype = $entryformat{0};
+	$entrydig = $entryformat{1};
+	$pattern = '/^';
+	if ($entrytype=='C') {
+		$pattern .= '\w';
+	} else if ($entrytype=='D') {
+		$pattern .= '\d';
+	}
+	if ($entrydig==0) {
+		$pattern .= '+';
+	} else {
+		$pattern .= '{'.$entrydig.'}';
+	}
+	$pattern .= '$/';
+	if (!preg_match($pattern,$_POST['SID'])) {
+		echo "<html><body>Your ID is not valid.  It should contain ";
+		if ($entrydig>0) {
+			echo $entrydig.' ';
+		}
+		if ($entrytype=='C') {
+			echo 'letters or numbers';
+		} else if ($entrytype=='D') {
+			echo 'numbers';
+		}
+		echo " <a href=\"index.php?id=$diagid\">Try Again</a>\n";
+		exit;
+	}
+	
 	if ($_POST['course']==-1) {
 		echo "<html><body>Please select a {$line['sel1name']} and {$line['sel2name']}.  <a href=\"index.php?id=$diagid\">Try Again</a>\n";
 			exit; 
@@ -99,7 +131,6 @@ if (isset($_POST['SID'])) {
 	}
 	$cnt = 0;
 	$now = time();
-	$_POST['SID'] = str_replace('-','',$_POST['SID']);
 	$query = "SELECT id FROM imas_users WHERE SID='{$_POST['SID']}~$diagqtr'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	if (mysql_num_rows($result)>0) {

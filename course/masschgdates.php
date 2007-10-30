@@ -1,14 +1,23 @@
 <?php
-//IMathAS:  Mass Change Assessment Dates
+//IMathAS:  Add/modify blocks of items on course page
 //(c) 2006 David Lippman
-	require("../validate.php");
-	
-	if (!(isset($teacherid))) {
-		require("../header.php");
-		echo "You need to log in as a teacher to access this page";
-		require("../footer.php");
-		exit;
-	}
+
+/*** master php includes *******/
+require("../validate.php");
+
+/*** pre-html data manipulation, including function code *******/
+
+//set some page specific variables and counters
+$overwriteBody = 0;
+$body = "";
+//$pagetitle = "Manage Student Groups";
+//$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=" . $_GET['cid'] . "\">$coursename</a> ";
+
+
+if (!(isset($teacherid))) { // loaded by a NON-teacher
+	$overwriteBody=1;
+	$body = "You need to log in as a teacher to access this page";
+} else {
 	
 	$cid = $_GET['cid'];
 	
@@ -87,17 +96,28 @@
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
 			
 		exit;
+	} else { //DEFAULT DATA MANIPULATION
+		$pagetitle = "Mass Change Dates";
+		$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/masschgdates.js\"></script>";
+		$placeinhead .= "<style>.show {display:inline;} \n .hide {display:none;} img {cursor:pointer;}\n</style>";
 	}
+}	
+
+
+/******* begin html output ********/
+require("../header.php");
+
+if ($overwriteBody==1) {
+	echo $body;
+} else {		
+	
 	$shortdays = array("Su","M","Tu","W","Th","F","Sa");
 	function getshortday($atime) {
 		global $shortdays;
 		return $shortdays[date('w',$atime)];
 	}
 	
-	$pagetitle = "Mass Change Dates";
-	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/masschgdates.js\"></script>";
-	$placeinhead .= "<style>.show {display:inline;} \n .hide {display:none;} img {cursor:pointer;}\n</style>";
-	require("../header.php");
+
 	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=$cid\">$coursename</a> ";	
 	echo "&gt; Mass Change Dates</div>\n";
 	echo "<h2>Mass Change Dates</h2>";
@@ -157,10 +177,10 @@
 	echo '</p>';
 	
 	echo "<p><input type=checkbox id=\"onlyweekdays\" checked=\"checked\"> Shift by weekdays only</p>";
-	
 	echo "<p>Once changing dates in one row, you can click <i>Send Down List</i> to send the date change ";
 	echo "difference to all rows below.  Click the <img src=\"$imasroot/img/swap.gif\"> icon in each cell to swap from ";
 	echo "Always/Never to Dates.  Swaps to/from Always/Never cannot be sent down the list.</p>";
+	
 	
 	echo "<form method=post action=\"masschgdates.php?cid=$cid\">";
 	echo '<table class=gb><thead><tr><th>Name</th><th>Type</th><th>Start Date</th><th>End Date</th><th>Review Date</th><th>Send Date Chg Down List</th></thead><tbody>';
@@ -383,7 +403,8 @@
 	echo '<input type=submit value="Save Changes"/>';
 	echo '</form>';
 	//echo "<script>var acnt = $cnt;</script>";
+}
 	
-	require("../footer.php");
+require("../footer.php");
 
 ?>

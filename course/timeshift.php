@@ -1,13 +1,57 @@
 <?
-//IMathAS:  Adjust all course dates
+//IMathAS:  Main admin page
 //(c) 2006 David Lippman
-	require("../validate.php");
-	if (!(isset($teacherid))) {
-		require("../header.php");
-		echo "You need to log in as a teacher to access this page";
-		require("../footer.php");
-		exit;
+
+/*** master php includes *******/
+require("../validate.php");
+
+function writeHtmlSelect ($name,$valList,$labelList,$selectedVal=null,$defaultLabel=null,$defaultVal=null,$actions=null) {
+	//$name is the html name for the select list
+	//$valList is an array of strings for the html value tag
+	//$labelList is an array of strings that are displayed as the select list
+	//$selectVal is optional, if passed the item in $valList that matches will be output as selected
+
+	echo "<select name=\"$name\" ";
+	echo (isset($actions)) ? $actions : "" ;
+	echo ">\n";
+	if (isset($defaultLabel) && isset($defaultVal)) {
+		echo "		<option value=\"$defaultVal\" selected>$defaultLabel</option>\n";
 	}
+	for ($i=0;$i<count($valList);$i++) {
+		if ((isset($selectedVal)) && ($valList[$i]==$selectedVal)) {
+			echo "		<option value=\"$valList[$i]\" selected>$labelList[$i]</option>\n";
+		} else {
+			echo "		<option value=\"$valList[$i]\">$labelList[$i]</option>\n";
+		}
+	}
+	echo "</select>\n";	
+	
+} 
+
+function shiftsub(&$itema) {
+	global $shift;
+	foreach ($itema as $k=>$item) {
+		if (is_array($item)) {
+			$itema[$k]['startdate'] += $shift;
+			$itema[$k]['enddate'] += $shift;
+			shiftsub($itema[$k]['items']);
+		}
+	}
+}
+	
+	
+ //set some page specific variables and counters
+$overwriteBody = 0;
+$body = "";
+$pagetitle = "Shift Course Dates";
+
+	
+	//CHECK PERMISSIONS AND SET FLAGS
+if (!(isset($teacherid))) {
+ 	$overwriteBody = 1;
+	$body = "You need to log in as a teacher to access this page";
+} else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION	
+
 	$cid = $_GET['cid'];
 	
 	if (isset($_POST['sdate'])) {
@@ -22,16 +66,7 @@
 		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 		$items = unserialize(mysql_result($result,0,0));
-		function shiftsub(&$itema) {
-			global $shift;
-			foreach ($itema as $k=>$item) {
-				if (is_array($item)) {
-					$itema[$k]['startdate'] += $shift;
-					$itema[$k]['enddate'] += $shift;
-					shiftsub($itema[$k]['items']);
-				}
-			}
-		}
+
 		shiftsub($items);
 		$itemorder = addslashes(serialize($items));
 		$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
@@ -57,37 +92,65 @@
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
 
 		exit;
-	}
+	} else { //DEFAULT DATA MANIPULATION
+		$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=$cid\">$coursename</a>";
+		$curBreadcrumb .= " &gt; Shift Course Dates ";
 	
-	$sdate = tzdate("m/d/Y",time());
-	require("../header.php");
-	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=$cid\">$coursename</a> ";
-	echo "&gt; Shift Course Dates</div>\n";	
-	echo "<h3>Shift Course Dates</h3>\n";
-	echo "<p>This page will change <b>ALL</b> course available dates and due dates based on changing one item.  This is intended ";
-	echo "to allow you to reset all course item dates for a new term in one action.</p>\n";
-	echo "<form method=post action=\"timeshift.php?cid=$cid\">\n";
-	echo "<span class=form>Select an assessment to base the change on</span><span class=formright>\n";
-	echo "<select id=aid name=aid>";
-	$query = "SELECT id,name from imas_assessments WHERE courseid='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
-		echo "<option value=\"{$line['id']}\">{$line['name']}</option>\n";
+		$sdate = tzdate("m/d/Y",time());
+	
+		$query = "SELECT id,name from imas_assessments WHERE courseid='$cid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$i=0;
+		while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+			$page_assessmentList['val'][$i] = $line['id'];
+			$page_assessmentList['label'][$i] = $line['name'];
+			$i++;
+		}
+	
 	}
-	echo "</select></span><br class=form>\n";
-	echo "<span class=form>Change dates based on this assessment's:</span>";
-	echo "<span class=formright><input type=radio id=base name=base value=0 >Available After date<br/>\n";
-	echo "<input type=radio id=base name=base value=1 checked=1>Available Until date (Due date) <br/></span><br class=form>\n";
-	echo "<script src=\"../javascript/CalendarPopup.js\"></script>\n";
-	echo "<SCRIPT LANGUAGE=\"JavaScript\" ID=\"js1\">\n";
-	echo "var cal1 = new CalendarPopup();\n";
-	echo "</SCRIPT>\n";
-	echo "<span class=form>Change date to:</span><span class=formright><input type=text size=10 name=sdate value=\"$sdate\">\n"; 
-	echo "<A HREF=\"#\" onClick=\"cal1.select(document.forms[0].sdate,'anchor1','MM/dd/yyyy',document.forms[0].sdate.value); return false;\" NAME=\"anchor1\" ID=\"anchor1\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></A>\n";
-	echo "</span><br class=form>\n";
-	echo "<div class=submit><input type=submit value=\"Change Dates\"></div>\n";
-	echo "</form>\n";
-	require("../footer.php");
+}
+	
+/******* begin html output ********/
+require("../header.php");
+
+if ($overwriteBody==1) {
+	echo $body;
+} else {		
+?>
+	<script src="../javascript/CalendarPopup.js"></script>
+	<SCRIPT LANGUAGE="JavaScript" ID="js1">
+	var cal1 = new CalendarPopup();
+	</SCRIPT>
+	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>	
+	<h3>Shift Course Dates</h3>
+	<p>
+		This page will change <b>ALL</b> course available dates and due dates based on 
+		changing one item.  This is intended to allow you to reset all course item 
+		dates for a new term in one action.
+	</p>
+	<form method=post action="timeshift.php?cid=<?php echo $cid ?>">
+		<span class=form>Select an assessment to base the change on</span>
+		<span class=formright>
+			<?php writeHtmlSelect ("aid",$page_assessmentList['val'],$page_assessmentList['label'],null,null,null,$actions=" id=aid "); ?>
+		</span><br class=form>
+		<span class=form>Change dates based on this assessment's:</span>
+		<span class=formright>
+			<input type=radio id=base name=base value=0 >Available After date<br/>
+			<input type=radio id=base name=base value=1 checked=1>Available Until date (Due date) <br/>
+		</span><br class=form>
+		<span class=form>Change date to:</span>
+		<span class=formright>
+			<input type=text size=10 name=sdate value="<?php echo $sdate ?>"> 
+			<A HREF="#" onClick="cal1.select(document.forms[0].sdate,'anchor1','MM/dd/yyyy',document.forms[0].sdate.value); return false;" NAME="anchor1" ID="anchor1">
+				<img src="../img/cal.gif" alt="Calendar"/>
+			</A>
+		</span><br class=form>
+		<div class=submit><input type=submit value="Change Dates"></div>
+	</form>
+<?php
+}
+	
+require("../footer.php");
 	
 	
 ?>

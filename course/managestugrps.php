@@ -1,30 +1,40 @@
 <?php
-//IMathAS:  Manage Student Groups
+//IMathAS:  Add/modify blocks of items on course page
 //(c) 2006 David Lippman
-	require("../validate.php");
-	
-	if (!(isset($teacherid))) {
-		require("../header.php");
-		echo "You need to log in as a teacher to access this page";
-		require("../footer.php");
-		exit;
-	}
-	$cid = $_GET['cid'];
-	
-	function updatesessdata($uid,$oldasid,$newasid) {
-		$query = "SELECT sessionid,sessiondata FROM imas_sessions WHERE userid='$uid'";
-		$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
-			$tmpsessdata = unserialize(base64_decode($row[1]));
-			if ($tmpsessdata['sessiontestid']==$oldasid) {
-				$tmpsessdata['sessiontestid'] = $newasid;
-				$tmpsessdata['groupid'] = 0;
-				$tmpsessdata = base64_encode(serialize($tmpsessdata));
-				$query = "UPDATE imas_sessions SET sessiondata='$tmpsessdata' WHERE sessionid='{$row[0]}'";
-				mysql_query($query) or die("Query failed : $query:" . mysql_error());
-			}
+
+/*** master php includes *******/
+require("../validate.php");
+require("../includes/htmlutil.php");
+
+/*** pre-html data manipulation, including function code *******/
+function updatesessdata($uid,$oldasid,$newasid) {
+	$query = "SELECT sessionid,sessiondata FROM imas_sessions WHERE userid='$uid'";
+	$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
+	while ($row = mysql_fetch_row($result)) {
+		$tmpsessdata = unserialize(base64_decode($row[1]));
+		if ($tmpsessdata['sessiontestid']==$oldasid) {
+			$tmpsessdata['sessiontestid'] = $newasid;
+			$tmpsessdata['groupid'] = 0;
+			$tmpsessdata = base64_encode(serialize($tmpsessdata));
+			$query = "UPDATE imas_sessions SET sessiondata='$tmpsessdata' WHERE sessionid='{$row[0]}'";
+			mysql_query($query) or die("Query failed : $query:" . mysql_error());
 		}
 	}
+}
+
+//set some page specific variables and counters
+$overwriteBody = 0;
+$body = "";
+$pagetitle = "Manage Student Groups";
+$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=" . $_GET['cid'] . "\">$coursename</a> ";
+
+
+if (!(isset($teacherid))) { // loaded by a NON-teacher
+	$overwriteBody=1;
+	$body = "You need to log in as a teacher to access this page";
+} else {
+
+	$cid = $_GET['cid'];
 	
 	if (isset($_GET['addtogrp']) && isset($_POST['grpid']) && count($_POST['stutoadd'])>0 && isset($_GET['aid'])) {
 		$aid = $_GET['aid'];
@@ -189,37 +199,28 @@
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		}
 	}
-	
-	
-	if (isset($_GET['aid'])) {
+
+	if (isset($_GET['aid']) && isset($_GET['cleargrps'])) {
 		//Assessment selected - list groups in assessment
 		$aid = $_GET['aid'];
 		
-		if (isset($_GET['cleargrps'])) {
-			if ($_GET['cleargrps']=='true') {
-				$query = "UPDATE imas_assessment_sessions SET agroupid=0 WHERE assessmentid='$aid'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
-			} else {
-				require("../header.php");
-				echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=$cid\">$coursename</a> &gt; ";
-				echo "<a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&aid=$aid\">Assessment Groups</a>";
-				echo "&gt; Clear Groups</div>";
-				echo "<p>Are you sure you want to clear all groups?</p>";
-				echo "<p><input type=button value=\"Yes, Clear\" onClick=\"window.location='managestugrps.php?cid=$cid&aid=$aid&cleargrps=true'\">\n";
-				echo "<input type=button value=\"Nevermind\" onClick=\"window.location='managestugrps.php?cid=$cid&aid=$aid'\"></p>\n";
-				require("../footer.php");
-				exit;
-			}
+		if ($_GET['cleargrps']=='true') {
+			$query = "UPDATE imas_assessment_sessions SET agroupid=0 WHERE assessmentid='$aid'";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid");
+			exit();
+		} else {
+			$pagetitle = "Clear Groups";
+			$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&aid=$aid\">Assessment Groups</a>";
+			$curBreadcrumb .= "&gt; Clear Groups";
 		}
-		$pagetitle = "Manage Assessment Groups";
-		require("../header.php");
-		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=$cid\">$coursename</a> &gt; ";
-		echo "<a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; Assessment Groups</div>";
-		echo '<h2>Manage Assessment Groups</h2>';
-		echo "<p><a href=\"managestugrps.php?cid=$cid&aid=$aid&cleargrps=ask\">Clear All Groups</a></p>";
+	} elseif (isset($_GET['aid'])) {
+		$aid = $_GET['aid'];
+		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; Assessment Groups";
+		
 		$query = "SELECT name FROM imas_assessments WHERE id='$aid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		echo '<h3>Managing groups for '.mysql_result($result,0,0).'</h3>';
+		$page_curAssessmentName = mysql_result($result,0,0);
 		
 		$query = "SELECT userid FROM imas_students WHERE courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -232,67 +233,124 @@
 		$query .= "ias.userid=iu.id AND ias.assessmentid='$aid' AND ias.agroupid>0 ORDER BY agroupid,iu.LastName,iu.FirstName";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$lastgroup = -1; $grpcnt = 1; $grpstus = array(); $groupids = array();
+		$page_ulList = "";
 		while ($row = mysql_fetch_row($result)) {
 			if ($row[0]!=$lastgroup) {
 				if ($lastgroup!=-1) {
-					echo '</ul>';
+					$page_ulList .= "		</ul>\n";
 				}
-				echo "<h4>Group $grpcnt</h4>";
-				echo '<ul>';
+				$page_ulList .=  "	<h4>Group $grpcnt</h4>\n";
+				$page_ulList .=  "		<ul>\n";
 				$groupids[$grpcnt] = $row[0];
 				$grpcnt++;
 				$lastgroup = $row[0];
 			}
-			echo "<li>{$row[2]}, {$row[3]} ";
-			echo "<a href=\"managestugrps.php?cid=$cid&aid=$aid&asid={$row[1]}&breakfromgrp=true\" onClick=\"return confirm('Are you sure you want to remove this student from this group?');\">Break from Group</a>";
-			echo "</li>";
+			$page_ulList .= "			<li>{$row[2]}, {$row[3]} ";
+			$page_ulList .= "<a href=\"managestugrps.php?cid=$cid&aid=$aid&asid={$row[1]}&breakfromgrp=true\" onClick=\"return confirm('Are you sure you want to remove this student from this group?');\">Break from Group</a>";
+			$page_ulList .=  "			</li>\n";
 			$grpstus[] = $row[4];
 		}
 		if ($lastgroup!=-1) {
-			echo '</ul>';
+			$page_ulList .=  "		</ul>\n";
 		}
 		$ungrpstus = array_diff($stus,$grpstus);
 		
 		if (count($ungrpstus)>0) {
-			echo '<h4>Students not in a group</h4>';
-			echo "<form method=post action=\"managestugrps.php?cid=$cid&aid=$aid&addtogrp=true\">";
-			echo "<p>With selected, add to group ";
-			echo '<select name="grpid"><option value="new">New Group</option>';
+
+			$page_ungrpSudents = array();
 			for ($i=1;$i<$grpcnt;$i++) {
-				echo "<option value=\"{$groupids[$i]}\">$i</option>";
+				$page_ungrpStudents['val'][$i-1] .= $groupids[$i];
+				$page_ungrpStudents['label'][$i-1] .= $i;
 			}
-			echo '</select> <input type="submit" value="Add"/></p>';
+			
 			$idlist = "'".implode("','",$ungrpstus)."'";
 			$query = "SELECT id,LastName,FirstName FROM imas_users WHERE id IN ($idlist) ORDER BY LastName,FirstName";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			echo '<ul class=nomark>';
+
+			$page_liList = "";	
 			while ($row = mysql_fetch_row($result)) {
-				echo "<li><input type=checkbox name=\"stutoadd[]\" value=\"{$row[0]}\" />{$row[1]}, {$row[2]}</li>";
+				$page_liList .= "			<li><input type=checkbox name=\"stutoadd[]\" value=\"{$row[0]}\" />{$row[1]}, {$row[2]}</li>\n";
 			}
-			echo '</ul>';
-			echo '</form>';
+
 		}
-		require("../footer.php");
-		exit;
+
+	} else { //DEFAULT DATA MANIPULATION
+		$curBreadcrumb .= " &gt; Manage Student Groups";
+		
+		$query = "SELECT id,name FROM imas_assessments AS ia WHERE ia.courseid='$cid' AND ia.isgroup>0 ORDER BY ia.name";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$page_liList2 = "";
+		while ($row = mysql_fetch_row($result)) {
+			$page_liList2 .= "<li><a href=\"managestugrps.php?cid=$cid&aid={$row[0]}\">{$row[1]}</li>\n";
+		}
+		$page_noGroupsMsg = (mysql_num_rows($result)==0) ? "<li>No assessments with groups</li>\n" : "";
+		
 	}
-	
-	//Pick a group to manage
-	$pagetitle = "Manage Student Groups";
-	require("../header.php");
-	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=$cid\">$coursename</a> &gt; Manage Student Groups</div>";
-	echo '<h2>Manage Student Groups</h2>';
-	echo '<h4>Assessment Groups</h4>';
-	echo '<p>Group assessments are listed below.  Select an assessment to edit the groups of.</p>';
-	echo '<ul>';
-	$query = "SELECT id,name FROM imas_assessments AS ia WHERE ia.courseid='$cid' AND ia.isgroup>0 ORDER BY ia.name";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($row = mysql_fetch_row($result)) {
-		echo "<li><a href=\"managestugrps.php?cid=$cid&aid={$row[0]}\">{$row[1]}</li>";
-	}
-	if (mysql_num_rows($result)==0) {
-		echo '<li>No assessments with groups</li>';
-	}
-	echo '</ul>';
-	require("../footer.php");
+}
+
+/******* begin html output ********/
+require("../header.php");
+
+/**** post-html data manipulation ******/
+// this page has no post-html data manipulation
+
+/***** page body *****/
+/***** php display blocks are interspersed throughout the html as needed ****/
+if ($overwriteBody==1) {
+	echo $body;
+} else {	
+?>
+	<div class="breadcrumb"><?php echo $curBreadcrumb ?></div>
+	<h3><?php echo $pagetitle ?></h3>
+
+<?php
+	if (isset($_GET['aid']) &&  isset($_GET['cleargrps']) && $_GET['cleargrps']!='true') {
+		//Assessment selected - list groups in assessment
+		$aid = $_GET['aid'];
+?>		
+		<p>Are you sure you want to clear all groups?</p>
+		<p><input type=button value="Yes, Clear" onClick="window.location='managestugrps.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&cleargrps=true'">
+		<input type=button value="Nevermind" onClick="window.location='managestugrps.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'"></p>
+<?php
+	} elseif (isset($_GET['aid'])) {
+		$aid = $_GET['aid'];
+?>		
+		<p><a href="managestugrps.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&cleargrps=ask">Clear All Groups</a></p>
+		<h3>Managing groups for <?php echo $page_curAssessmentName ?></h3>
+		<?php echo $page_ulList ?>
+		
+<?php		
+		if (count($ungrpstus)>0) {
+?>
+		<h4>Students not in a group</h4>
+		<form method=post action="managestugrps.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&addtogrp=true">
+			<p>
+				With selected, add to group
+				<?php writeHtmlSelect("grpid",$page_ungrpStudents['val'],$page_ungrpStudents['label'],null,"New Group","new",null); ?>
+				<input type="submit" value="Add"/>
+			</p>
+
+			<ul class=nomark>
+			<?php echo $page_liList ?>
+			</ul>
+		</form>
+<?php
+		}
+
+	} else {
+?>	
+		
+		<h4>Assessment Groups</h4>
+		<p>Group assessments are listed below.  Select an assessment to edit the groups of.</p>
+		<ul>
+		<?php echo $page_liList2 ?>
+		<?php echo $page_noGroupsMsg ?>
+		</ul>
+
+<?php
+	}	
+}	
+
+require("../footer.php");
 ?>
 	

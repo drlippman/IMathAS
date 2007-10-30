@@ -11,6 +11,7 @@
 			   $blocklist[] = $i+1;
 		   }
 	   }
+	   
 	   for ($i=0;$i<count($items);$i++) {
 		   if (is_array($items[$i])) { //if is a block
 			$items[$i]['name'] = stripslashes($items[$i]['name']);
@@ -42,10 +43,18 @@
 			} else {
 				list($titlebg,$titletxt,$bicolor) = explode(',',$items[$i]['colors']);
 			}
-			if (($items[$i]['startdate']<$now && $items[$i]['enddate']>$now)) { //if "available"
+			if (!isset($items[$i]['avail'])) { //backwards compat
+				$items[$i]['avail'] = 1;
+			}
+			if ($items[$i]['avail']==2 || ($items[$i]['avail']==1 && $items[$i]['startdate']<$now && $items[$i]['enddate']>$now)) { //if "available"
 				if ($firstload && (strlen($items[$i]['SH'])==1 || $items[$i]['SH'][1]=='O')) {
 					echo "<script> oblist = oblist + ',".$items[$i]['id']."';</script>\n";
 					$isopen = true;
+				}
+				if ($items[$i]['avail']==2) {
+					$show = "Showing $availbeh Always";
+				} else {
+					$show = "Showing $availbeh $startdate until $enddate";
 				}
 				if (strlen($items[$i]['SH'])>1 && $items[$i]['SH'][1]=='F') { //show as folder
 					echo "<div class=block ";
@@ -66,7 +75,7 @@
 						echo "<span style=\"color:red;\">New</span>";
 					}
 					if (isset($teacherid)) { 
-						echo "<br>Showing $availbeh $startdate until $enddate <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a> | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
+						echo "<br>$show <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
 						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>NewFlag</a>";
 					
 					}
@@ -102,7 +111,7 @@
 						echo "<span style=\"color:red;\">New</span>";
 					}
 					if (isset($teacherid)) { 
-						echo "<br>Showing $availbeh $startdate until $enddate <a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>Isolate</a> | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a> | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
+						echo "<br>$show <a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>Isolate</a> | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
 						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>NewFlag</a>";
 					}
 					if (($hideicons&16)==0) {
@@ -128,7 +137,21 @@
 					
 					echo "</div>";
 				}
-			} else if (isset($teacherid) || $items[$i]['SH'][0]=='S') { //if "unavailable"
+			} else if (isset($teacherid) || ($items[$i]['SH'][0]=='S' && $items[$i]['avail']>0)) { //if "unavailable"
+				if ($items[$i]['avail']==0) {
+					$show = "Hidden";
+				} else if ($items[$i]['SH'][0] == 'S') {
+					$show = "Currenly Showing";
+					if (strlen($items[$i]['SH'])>1 && $items[$i]['SH'][1]=='F') {
+						$show .= " as Folder. ";
+					} else {
+						$show .= " Collapsed. ";
+					}
+					$show .= "Showing $availbeh $startdate to $enddate";
+				} else { //currently hidden, using dates
+					$show = "Currenly Hidden. ";
+					$show .= "Showing $availbeh $startdate to $enddate";
+				}
 				if (strlen($items[$i]['SH'])>1 && $items[$i]['SH'][1]=='F') { //show as folder
 					echo "<div class=block ";
 					if ($titlebg!='') {
@@ -149,12 +172,7 @@
 						echo " <span style=\"color:red;\">New</span>";
 					}
 					if (isset($teacherid)) { 
-						if ($items[$i]['SH'][0] == 'S') {
-							$curbeh = "Showing";
-						} else {
-							$curbeh = "Hidden";
-						}
-						echo "<br><i>Currently $curbeh.  Showing as Folder $startdate until $enddate</i> <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a> | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
+						echo "<br><i>$show</i> <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
 						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>NewFlag</a>";
 					
 					}
@@ -196,13 +214,8 @@
 						echo "<span style=\"color:red;\">New</span>";
 					}
 					if (isset($teacherid)) {
-						if ($items[$i]['SH'][0] == 'S') {
-							$curbeh = "Showing Collapsed";
-						} else {
-							$curbeh = "Hidden";
-						}
-						echo "<br><i>Currently $curbeh.  Showing $availbeh $startdate to $enddate</i> <a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>Isolate</a> | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a>";
-						echo " | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
+						echo "<br><i>$show</i> <a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>Isolate</a> | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a>";
+						echo " | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
 						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>NewFlag</a>";
 					
 					}
@@ -239,7 +252,7 @@
 		   }
 		   if ($line['itemtype']=="Assessment") {
 			   $typeid = $line['typeid'];
-			   $query = "SELECT name,summary,startdate,enddate,reviewdate,deffeedback,reqscore,reqscoreaid FROM imas_assessments WHERE id='$typeid'";
+			   $query = "SELECT name,summary,startdate,enddate,reviewdate,deffeedback,reqscore,reqscoreaid,avail FROM imas_assessments WHERE id='$typeid'";
 			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			  
@@ -280,7 +293,7 @@
 					   }
 				   }
 			   }
-			   if ($line['startdate']<$now && $line['enddate']>$now && $nothidden) {
+			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now && $nothidden) { //regular show
 				   echo "<div class=item>\n";
 				   if (($hideicons&1)==0) {
 					   echo "<div class=icon style=\"background-color: " . makecolor2($line['startdate'],$line['enddate'],$now) . ";\">?</div>";
@@ -300,7 +313,7 @@
 				   }
 				   echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
 				   echo "</div>\n";
-			   } else if ($line['startdate']<$now && $line['reviewdate']>$now && $nothidden) {
+			   } else if ($line['avail']==1 && $line['startdate']<$now && $line['reviewdate']>$now && $nothidden) { //review show
 				   echo "<div class=item>\n";
 				   if (($hideicons&1)==0) {
 					   echo "<div class=icon style=\"background-color: #99f;\">R</div>";
@@ -316,17 +329,21 @@
 				   echo filter("<br/><i>This assessment is in review mode - no scores will be saved</i></div><div class=itemsum>{$line['summary']}</div>\n");
 				   echo "</div>\n";
 			   } else if (isset($teacherid)) {
+				   if ($line['avail']==0) {
+					   $show = "Hidden";
+				   } else {
+					   $show = "Available $startdate until $enddate";
+					   if ($line['reviewdate']>0 && $line['enddate']!=2000000000) {
+						   $show .= ", Review until $reviewdate";
+					   }
+				   }
 				   echo "<div class=item>\n";
 				   if (($hideicons&1)==0) {
 					   echo "<div class=icon style=\"background-color: #ccc;\">?</div>";
 				   }
-				   echo "<div class=title><i> <a href=\"../assessment/showtest.php?id=$typeid&cid=$cid\">{$line['name']}</a><BR> Available $startdate until $enddate";
-				   if ($line['reviewdate']>0 && $line['enddate']!=2000000000) {
-					   echo ", Review until $reviewdate";
-				   }
-				   echo "</i> \n";
+				   echo "<div class=title><i> <a href=\"../assessment/showtest.php?id=$typeid&cid=$cid\">{$line['name']}</a><BR>$show</i>\n";
 				   echo "<a href=\"addquestions.php?aid=$typeid&cid=$cid\">Questions</a> | <a href=\"addassessment.php?id=$typeid&cid=$cid\">Settings</a> | \n";
-				   echo "<a href=\"addassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
+				   echo "<a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
 				   echo " | <a href=\"gradebook.php?cid=$cid&asid=average&aid=$typeid\">Grades</a>";
 				   echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
 				   echo "</div>\n";
@@ -335,8 +352,8 @@
 		   } else if ($line['itemtype']=="InlineText") {
 		
 			   $typeid = $line['typeid'];
-			   $query = "SELECT title,text,startdate,enddate,fileorder FROM imas_inlinetext WHERE id='$typeid'";
-			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			   $query = "SELECT title,text,startdate,enddate,fileorder,avail FROM imas_inlinetext WHERE id='$typeid'";
+			   $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			
 			   if (strpos($line['text'],'<p>')!==0) {
@@ -352,24 +369,31 @@
 			   } else {
 				   $enddate = formatdate($line['enddate']);
 			   }
-			   if ($line['startdate']<$now && $line['enddate']>$now) {
+			   if ($line['avail']==2 || ($line['startdate']<$now && $line['enddate']>$now && $line['avail']==1)) {
+				   if ($line['avail']==2) {
+					   $show = "Showing Always ";
+					   $color = '#0f0';
+				   } else {
+					   $show = "Showing until: $enddate ";
+					   $color = makecolor2($line['startdate'],$line['enddate'],$now);
+				   }
 				   echo "<div class=item>\n";
 				   if ($line['title']!='##hidden##') {
 					   if (($hideicons&2)==0) {
-						   echo "<div class=icon style=\"background-color: " . makecolor2($line['startdate'],$line['enddate'],$now) . ";\">!</div>";
+						   echo "<div class=icon style=\"background-color: $color;\">!</div>";
 					   }
 					   echo "<div class=title> <b>{$line['title']}</b>\n";
 					   if (isset($teacherid)) { 
-						   echo "<BR>Showing until: $enddate "; 
+						   echo "<BR>$show "; 
 						   echo "<a href=\"addinlinetext.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
-						   echo "<a href=\"addinlinetext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
+						   echo "<a href=\"deleteinlinetext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
 					   }
 					   echo "</div>";
 				   } else {
 					   if (isset($teacherid)) { 
-						   echo "Showing until: $enddate "; 
+						   echo "$show "; 
 						   echo "<a href=\"addinlinetext.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
-						   echo "<a href=\"addinlinetext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a><br/>\n";
+						   echo "<a href=\"deleteinlinetext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a><br/>\n";
 					   } 
 					   
 				   }
@@ -393,6 +417,11 @@
 				   echo "</div>";
 				   echo "</div>\n";
 			   } else if (isset($teacherid)) {
+				   if ($line['avail']==0) {
+					   $show = "Hidden";
+				   } else {
+					   $show = "Showing $startdate until $enddate";
+				   }
 				   echo "<div class=item>\n";
 				   if ($line['title']!='##hidden##') {
 					   echo "<div class=icon style=\"background-color: #ccc;\">";
@@ -400,9 +429,9 @@
 				   } else {
 					   echo "<div class=title><i>";
 				   }
-				   echo "Showing $startdate until $enddate</i> \n";
+				   echo "$show</i> \n";
 				   echo "<a href=\"addinlinetext.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
-				   echo "<a href=\"addinlinetext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
+				   echo "<a href=\"deleteinlinetext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
 				   echo filter("</div><div class=itemsum>{$line['text']}\n");
 				   $query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='$typeid'";
 				   $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -418,7 +447,7 @@
 			   }
 		   } else if ($line['itemtype']=="LinkedText") {
 			   $typeid = $line['typeid'];
-			   $query = "SELECT title,summary,text,startdate,enddate FROM imas_linkedtext WHERE id='$typeid'";
+			   $query = "SELECT title,summary,text,startdate,enddate,avail FROM imas_linkedtext WHERE id='$typeid'";
 			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			  
@@ -444,34 +473,46 @@
 				   $alink = "showlinkedtext.php?cid=$cid&id=$typeid";
 			   }
 			   
-			   if ($line['startdate']<$now && $line['enddate']>$now) {
+			   if ($line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
+				   if ($line['avail']==2) {
+					   $show = "Showing Always ";
+					   $color = '#0f0';
+				   } else {
+					   $show = "Showing until: $enddate ";
+					   $color = makecolor2($line['startdate'],$line['enddate'],$now);
+				   }
 				   echo "<div class=item>\n";
 				   if (($hideicons&4)==0) {
-					echo "<div class=icon style=\"background-color: " . makecolor2($line['startdate'],$line['enddate'],$now) . ";\">!</div>";
+					echo "<div class=icon style=\"background-color: $color;\">!</div>";
 				   }
 				   echo "<div class=title>";
 				   echo "<b><a href=\"$alink\">{$line['title']}</a></b>\n";
 				   if (isset($teacherid)) { 
-					   echo "<BR>Showing until: $enddate "; 
+					   echo "<BR>$show "; 
 					   echo "<a href=\"addlinkedtext.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
-					   echo "<a href=\"addlinkedtext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
+					   echo "<a href=\"deletelinkedtext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
 				   }
 				   echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
 				   echo "</div>\n";
 			   } else if (isset($teacherid)) {
+				   if ($line['avail']==0) {
+					   $show = "Hidden";
+				   } else {
+					   $show = "Showing $startdate until $enddate";
+				   }
 				   echo "<div class=item>\n";
 				   echo "<div class=icon style=\"background-color: #ccc;\">";
 				   echo "!</div><div class=title>";
 				   echo "<i> <b><a href=\"$alink\">{$line['title']}</a></b> ";
-				   echo "<BR>Showing $startdate until $enddate</i> \n";
+				   echo "<BR>$show</i> \n";
 				   echo "<a href=\"addlinkedtext.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
-				   echo "<a href=\"addlinkedtext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
+				   echo "<a href=\"deletelinkedtext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
 				   echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
 				   echo "</div>\n";
 			   }
 		   } else if ($line['itemtype']=="Forum") {
 			   $typeid = $line['typeid'];
-			   $query = "SELECT id,name,description,startdate,enddate,grpaid FROM imas_forums WHERE id='$typeid'";
+			   $query = "SELECT id,name,description,startdate,enddate,grpaid,avail FROM imas_forums WHERE id='$typeid'";
 			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			   $dofilter = false;
@@ -542,10 +583,17 @@
 			   } else {
 				   $enddate = formatdate($line['enddate']);
 			   }
-			   if ($line['startdate']<$now && $line['enddate']>$now) {
+			   if ($line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
+				   if ($line['avail']==2) {
+					   $show = "Showing Always ";
+					   $color = '#0f0';
+				   } else {
+					   $show = "Showing until: $enddate ";
+					   $color = makecolor2($line['startdate'],$line['enddate'],$now);
+				   }
 				   echo "<div class=item>\n";
 				   if (($hideicons&8)==0) {
-					   echo "<div class=icon style=\"background-color: " . makecolor2($line['startdate'],$line['enddate'],$now) . ";\">F</div>";
+					   echo "<div class=icon style=\"background-color: $color;\">F</div>";
 				   }
 				   echo "<div class=title> ";
 				   echo "<b><a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}\">{$line['name']}</a></b>\n";
@@ -553,21 +601,26 @@
 					   echo " <a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}&page=-1\" style=\"color:red\">New Posts</a>";
 				   }
 				   if (isset($teacherid)) { 
-					   echo "<BR>Showing until: $enddate "; 
+					   echo "<BR>$show "; 
 					   echo "<a href=\"addforum.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
-					   echo "<a href=\"addforum.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
+					   echo "<a href=\"deleteforum.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
 				   }
 				   echo filter("</div><div class=itemsum>{$line['description']}</div>\n");
 				   echo "</div>\n";
 			   } else if (isset($teacherid)) {
+				   if ($line['avail']==0) {
+					   $show = "Hidden";
+				   } else {
+					   $show = "Showing $startdate until $enddate";
+				   }
 				   echo "<div class=item>\n";
 				   echo "<div class=icon style=\"background-color: #ccc;\">";
-				   echo "F</div><div class=title><i> <b><a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}\">{$line['name']}</a></b> <BR>Showing $startdate until $enddate</i> \n";
+				   echo "F</div><div class=title><i> <b><a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}\">{$line['name']}</a></b> <BR>$show</i> \n";
 				   if ($hasnewitems) {
 					   echo " <span style=\"color:red\">New Posts</span>";
 				   }
 				   echo "<a href=\"addforum.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
-				   echo "<a href=\"addforum.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
+				   echo "<a href=\"deleteforum.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
 				   echo filter("</div><div class=itemsum>{$line['description']}</div>\n");
 				   echo "</div>\n";
 			   }
