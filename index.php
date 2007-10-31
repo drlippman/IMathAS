@@ -214,7 +214,7 @@ if ($myrights > 5) {
 ?>
 			</a>
 		<BR>
-		<form method=post action=\"actions.php?action=enroll\">
+		<form method=post action="actions.php?action=enroll">
 		<span class=form><label for="cid">Course id:</label></span> 
 		<input class=form type=text size=6 id=cid name=cid><BR class=form>
 		<span class=form><label for="ekey">Enrollment key:</label></span> 

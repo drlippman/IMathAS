@@ -97,7 +97,7 @@ switch($_GET['action']) {
 	case "modify":
 	case "addcourse":
 		if ($_GET['action']=='modify') {
-			$query = "SELECT id,name,enrollkey,hideicons,allowunenroll,copyrights,msgset,topbar,cploc,available,lockaid FROM imas_courses WHERE id='{$_GET['id']}'";
+			$query = "SELECT id,name,enrollkey,hideicons,allowunenroll,copyrights,msgset,topbar,cploc,available,lockaid,theme FROM imas_courses WHERE id='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$line = mysql_fetch_array($result, MYSQL_ASSOC);
 			$courseid = $line['id'];
@@ -108,6 +108,7 @@ switch($_GET['action']) {
 			$copyrights = $line['copyrights'];
 			$msgset = $line['msgset'];
 			$cploc = $line['cploc'];
+			$theme = $line['theme'];
 			$topbar = explode('|',$line['topbar']);
 			$topbar[0] = explode(',',$topbar[0]);
 			$topbar[1] = explode(',',$topbar[1]);
@@ -127,6 +128,7 @@ switch($_GET['action']) {
 			$topbar = array(array(),array());
 			$avail = 0;
 			$lockaid = 0;
+			$theme = "default.css";
 		}
 		if (isset($_GET['cid'])) {
 			$cid = $_GET['cid'];
@@ -162,7 +164,19 @@ switch($_GET['action']) {
 			}
 			echo '</select></span><br class="form"/>';
 		}
-			
+		
+		echo "<span class=form>Theme:</span><span class=formright>";
+		echo " <select name=\"theme\">";
+		$handle = opendir("../themes/");
+		while (false !== ($file = readdir($handle))) {
+			if ($file != "." && $file != "..") {
+				echo "<option value=\"$file\" ";
+				if ($file==$theme) { echo 'selected="selected"';}
+				echo '>'.substr($file,0,strpos($file,'.')).'</option>';
+			}
+		}
+		echo " </select></span><br class=\"form\" />";
+		
 		echo "<span class=form>Icons:</span><span class=formright>\n";
 		echo 'Assessments: <input type=radio name="HIassess" value="0" ';
 		if (($hideicons&1)==0) { echo "checked=1";}     
@@ -211,14 +225,17 @@ switch($_GET['action']) {
 		echo '/>No key required from anyone</span><br class=form />';
 		
 		echo "<span class=form>Message System:</span><span class=formright>";
+		//0 on, 1 to instr, 2 to stu, 3 nosend, 4 off
 		echo '<input type=radio name="msgset" value="0" ';
 		if ($msgset==0) { echo "checked=1";}
 		echo '/> On for send and receive<br/> <input type=radio name="msgset" value="1" ';
 		if ($msgset==1) { echo "checked=1";}
 		echo '/> On for receive, students can only send to instructor<br/> <input type=radio name="msgset" value="2" ';
 		if ($msgset==2) { echo "checked=1";}
-		echo '/> On for receive, students cannot send<br/> <input type=radio name="msgset" value="3" ';
+		echo '/> On for receive, students can only send to students<br/> <input type=radio name="msgset" value="3" ';
 		if ($msgset==3) { echo "checked=1";}
+		echo '/> On for receive, students cannot send<br/> <input type=radio name="msgset" value="4" ';
+		if ($msgset==4) { echo "checked=1";}
 		echo '/> Off</span><br class=form />';
 		
 		echo "<span class=form>Student Quick Pick Top Bar items:</span><span class=formright>";

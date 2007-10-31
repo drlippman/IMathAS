@@ -350,7 +350,9 @@ if ($overwriteBody==1) {
 		<tbody>	
 <?php		
 		$alt = 0;
+		$numstu = 0;
 		while ($line=mysql_fetch_array($resultDefaultUserList, MYSQL_ASSOC)) {
+			$numstu++;
 			$lastaccess = ($line['lastaccess']>0) ? date("n/j/y g:ia",$line['lastaccess']) : "never";
 			$hasSectionData = ($hassection) ? "<td>{$line['section']}</td>" : "";
 			$hasCodeData = ($hascode) ? "<td>{$line['code']}</td>" : "";
@@ -375,7 +377,9 @@ if ($overwriteBody==1) {
 
 			</tbody>
 		</table>
-		
+<?php
+		echo "Number of students: $numstu<br/>";
+?>
 		<script type="text/javascript">
 			initSortTable('myTable',Array(false,<?php echo $hasSectionSortTable ?><?php echo $hasCodeSortTable ?>'S','S','S','S','D',false,false,false),true);
 		</script>

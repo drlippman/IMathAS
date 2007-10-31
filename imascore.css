@@ -1,0 +1,211 @@
+html {
+	height: 100%;
+}
+body {
+	height: 100%;
+	margin: 10px;
+	padding: 0px;
+}
+div.item {
+	margin-bottom: 10px;
+	padding: 5px;
+}
+div.signup {
+	border: 1px solid #000;
+	margin-bottom: 10px;
+	margin-top: 10px;
+	padding: 5px;
+}
+div.itemsum {
+	margin-left: 45px;
+	margin-top: -.5em;
+	margin-bottom: -.5em;
+}
+span.iteminfo {
+	margin-left: 30px;	
+}
+div.title {
+	/*display: inline;*/
+	margin-left: 30px;
+}
+div.block, div.blockitems div.blockitems div.block {
+	padding: 5px;
+	margin-bottom: 10px;
+}
+div.blockitems, div.blockitems div.blockitems div.blockitems {
+	padding: 10px;
+	margin-top: -10px;
+	margin-bottom: 10px;
+}
+div.hidden {
+	display:none;
+}
+div.icon {
+	float: left;
+	padding-left: 5px;
+	padding-right: 5px;
+	margin-right: 5px;
+}
+div.breadcrumb {
+	margin-bottom: 10px;
+	padding: 5px;	
+}
+div.cp {
+	min-height: 1%;
+	padding: 5px;
+	margin-top: 20px;
+}
+div.cpmid {
+	min-height: 1%;
+	padding: 5px;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+span.pointer {
+	cursor:pointer;
+}
+ul.nomark {
+	list-style-type: none;
+	margin-left: 15px;
+	padding-left: 0px;
+}
+ul.nomark li {
+	margin-left: 0px;
+	padding-left: 0px;
+}
+div#tbl-container {
+	position: relative;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	width:99.5%;
+	height:auto;
+	
+}
+table.gb {
+	border-collapse: collapse;
+	margin-left: 10px;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+table.gbl {
+	border-collapse: collapse;
+	margin: 0px;
+}
+
+table.gb thead th, table.gbl thead th, table.gbl thead th.locked {
+	position: relative;
+	text-align: center;
+	padding: 0.1em 0.5em;
+}
+table.gbl thead th {
+	top: expression(document.getElementById("tbl-container").scrollTop-2); /* IE5+ only */
+	z-index: 20;
+}
+table.gbl thead th.locked {z-index: 30;}
+table.gb td, table.gbl td {
+	padding: 2px 5px 2px 5px;
+}
+table.gbl td.locked, table.gbl th.locked {
+	left: expression(parentNode.parentNode.parentNode.parentNode.scrollLeft); /* IE5+ only */
+	position: relative;
+	z-index: 10;
+}
+td.c {
+	text-align: center;
+}
+td.r {
+	text-align: right;
+}
+span.form {
+	display: block;
+	width: 200px;
+	float: left;
+	margin-bottom: 10px;
+	text-align: right;
+	padding-right: 20px;
+}
+span.formright {
+	display: block;
+	width: 500px;
+	float: left;
+	margin-bottom: 10px;
+	text-align: left;
+}
+
+span.wideformright {
+	display: block;
+	float: left;
+	margin-bottom: 10px;
+	text-align: left;
+}
+
+span.column {
+	display: block;
+	width: 200px;
+	float: left;
+	padding-right: 20px;
+}
+
+span.left {
+	float: left;
+}
+
+input.form {
+	display: block;
+	width: 200px;
+	float: left;
+	margin-bottom: 10px;
+}
+
+div.submit {
+	width: 400px;
+	text-align: right;
+}
+
+br.form {
+	clear: left;
+}
+img {
+	border: 0;
+}
+div.right {
+	text-align: right;	
+}
+span.right {
+	float:right;	
+}
+.floatright {
+	float:right;
+}
+span.padright {
+	float:right;
+	padding-right: 120px;
+}
+.clear {
+	clear: both;
+}
+span.hdr1 {
+	font-size: 120%;
+	font-weight: bold;
+}
+.small {
+	font-size: 70%;
+}
+#leftcontent {
+		position: absolute;
+		left: 10px;
+		width:170px;
+		padding:5px;
+		margin-top:10px;
+}
+
+#centercontent {
+		margin-left:180px;
+		padding-left:10px;
+		margin-top:10px;
+		margin-right: 10px;
+}
+
+.red {
+	color: red;
+}

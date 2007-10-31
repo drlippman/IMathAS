@@ -6,6 +6,10 @@ Upgrade Notes
 
 *** Database Changes ***
 
+ALTER TABLE `imas_courses` ADD `theme` VARCHAR( 32 ) NOT NULL DEFAULT 'default.css';
+
+UPDATE imas_courses SET msgset=msgset+1 WHERE msgset>1;
+
 ALTER TABLE `imas_questions` ADD `withdrawn` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0';
 
 ALTER TABLE `imas_inlinetext` ADD `avail` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '1';

@@ -3,7 +3,8 @@
 <head>
 <title><?php echo $installname; if (isset($pagetitle)) { echo " - $pagetitle";}?></title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-<link rel="stylesheet" href="<?php echo $imasroot . "/imas.css";?>" type="text/css" />
+<link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css";?>" type="text/css" />
+<link rel="stylesheet" href="<?php echo $imasroot . "/themes/$coursetheme";?>" type="text/css" />
 <link rel="shortcut icon" href="/favicon.ico" />
 <style type="text/css" media="print">
 div.breadcrumb { display:none;}

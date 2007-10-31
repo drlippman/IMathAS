@@ -192,6 +192,7 @@ END;
 	$userdeflib = $line['deflib'];
 	$userfullname = $line['FirstName'] . ' ' . $line['LastName'];
 	$previewshift = -1;
+	$coursetheme = "default.css";
 	if (isset($_GET['cid']) && $_GET['cid']!="admin" && $_GET['cid']>0) {
 		$query = "SELECT id FROM imas_students WHERE userid='$userid' AND courseid='{$_GET['cid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -225,11 +226,12 @@ END;
 				$teacherid = $userid;
 			}
 		}
-		$query = "SELECT imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid ";
+		$query = "SELECT imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme ";
 		$query .= "FROM imas_courses,imas_users WHERE imas_courses.id='{$_GET['cid']}' AND imas_users.id=imas_courses.ownerid";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		if (mysql_num_rows($result)>0) {
 			$coursename = mysql_result($result,0,0);
+			$coursetheme = mysql_result($result,0,5);
 			if (isset($studentid) && $previewshift==-1 && (mysql_result($result,0,1)&1)==1) {
 				echo "This course is not available at this time";
 				exit;

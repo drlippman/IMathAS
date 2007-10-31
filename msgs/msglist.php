@@ -95,14 +95,16 @@
 				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$msgset = mysql_result($result,0,0);
 				echo "<select name=\"to\">";
-				$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM ";
-				$query .= "imas_users,imas_teachers WHERE imas_users.id=imas_teachers.userid AND ";
-				$query .= "imas_teachers.courseid='$cid' ORDER BY imas_users.LastName";
-				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-				while ($row = mysql_fetch_row($result)) {
-					echo "<option value=\"{$row[0]}\">{$row[2]}, {$row[1]}</option>";
+				if ($isteacher || $msgset<2) {
+					$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM ";
+					$query .= "imas_users,imas_teachers WHERE imas_users.id=imas_teachers.userid AND ";
+					$query .= "imas_teachers.courseid='$cid' ORDER BY imas_users.LastName";
+					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+					while ($row = mysql_fetch_row($result)) {
+						echo "<option value=\"{$row[0]}\">{$row[2]}, {$row[1]}</option>";
+					}
 				}
-				if ($isteacher || $msgset<1) {
+				if ($isteacher || $msgset==0 || $msgset==2) {
 					$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM ";
 					$query .= "imas_users,imas_students WHERE imas_users.id=imas_students.userid AND ";
 					$query .= "imas_students.courseid='$cid' ORDER BY imas_users.LastName";
@@ -229,7 +231,7 @@
 		$query = "SELECT msgset FROM imas_courses WHERE id='$cid'";
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$msgset = mysql_result($result,0,0);
-		if ($msgset<2 || $isteacher) {
+		if ($msgset<3 || $isteacher) {
 			$cansendmsgs = true;
 		}
 	}	

@@ -169,9 +169,9 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		}
 		$curname = $backtrack[count($backtrack)-1][0];
 		if (count($backtrack)==1) {
-			$backlink =  "<span class=right><a href=\"course.php?cid=$cid&folder=0\">Back</a></span>";
+			$backlink =  "<span class=right><a href=\"course.php?cid=$cid&folder=0\">Back</a></span><br class=\"form\" />";
 		} else {
-			$backlink = "<span class=right><a href=\"course.php?cid=$cid&folder=".$backtrack[count($backtrack)-2][1]."\">Back</a></span>";
+			$backlink = "<span class=right><a href=\"course.php?cid=$cid&folder=".$backtrack[count($backtrack)-2][1]."\">Back</a></span><br class=\"form\" />";
 		}
 	} else {
 		$curBreadcrumb .= $coursename;
