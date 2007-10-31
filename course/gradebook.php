@@ -862,14 +862,35 @@
 		echo '     }';
 		echo '    }';
 		echo '}';
+		echo 'function hideNA() {';
+		echo '   var butn = document.getElementById("hnatoggle");';
+		echo '   if (butn.value=="Hide Not Answered Questions") {';
+		echo '      butn.value = "Show Not Answered Questions";';
+		echo '      var setdispto = "block";';
+		echo '   } else { ';
+		echo '      butn.value = "Hide Not Answered Questions";';
+		echo '      var setdispto = "none";';
+		echo '   }';
+		echo '   var divs = document.getElementsByTagName("div");';
+		echo '   for (var i=0;i<divs.length;i++) {';
+		echo '     if (divs[i].className=="notanswered") { ';
+		echo '         if (divs[i].style.display=="none") {';
+		echo '               divs[i].style.display = "block";';
+		echo '         } else { divs[i].style.display = "none"; }';
+		echo '     }';
+		echo '    }';
+		echo '}';
 		echo '</script>';
 		echo '<input type=button id="hctoggle" value="Hide Perfect Score Questions" onclick="hidecorrect()" />';
+		echo ' <input type=button id="hnatoggle" value="Hide Not Answered Questions" onclick="hideNA()" />';
 		echo "<form id=\"mainform\" method=post action=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&update=true\">\n";
 		$total = 0;
 		for ($i=0; $i<count($questions);$i++) {
 			echo "<div ";
 			if (getpts($scores[$i])==$pts[$questions[$i]]) {
 				echo 'class="iscorrect"';	
+			} else if ($scores[$i]==-1) {
+				echo 'class="notanswered"';	
 			} else {
 				echo 'class="iswrong"';
 			}

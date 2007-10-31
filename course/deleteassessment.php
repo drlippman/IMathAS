@@ -20,6 +20,9 @@ if (!(isset($teacherid))) {
 	$overwriteBody = 1;
 	$body = "You need to access this page from the link on the course page";
 } elseif (isset($_GET['remove'])) { // a valid delete request loaded the page
+	$cid = $_GET['cid'];
+	$block = $_GET['block'];
+	
 	if ($_GET['remove']=="really") {
 		$aid = $_GET['id'];
 		$query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='$aid'";

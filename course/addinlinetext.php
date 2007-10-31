@@ -47,7 +47,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$cid = $_GET['cid'];
 	$block = $_GET['block'];	
 	$page_formActionTag = "addinlinetext.php?block=$block&cid=$cid&folder=" . $_GET['folder'];
-	$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . $_GET['id'] : "";
 
 	if ($_POST['title']!= null || $_POST['text']!=null || $_POST['sdate']!=null) { //if the form has been submitted
 		if ($_POST['sdatetype']=='0') {
@@ -247,7 +246,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
 } 
 	
-	
+$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . $_GET['id'] : "";	
 }
 	
 	
