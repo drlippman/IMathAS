@@ -11,7 +11,7 @@ function getquestioninfo($qns,$testsettings) {
 		$qns = array($qns);
 	} 
 	$qnlist = "'".implode("','",$qns)."'";	
-	$query = "SELECT iq.id,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,il.name FROM imas_questions AS iq LEFT JOIN imas_libraries as il ";
+	$query = "SELECT iq.id,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,iq.withdrawn,il.name FROM imas_questions AS iq LEFT JOIN imas_libraries as il ";
 	$query .= "ON iq.category=il.id WHERE iq.id IN ($qnlist)";
 	$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
 	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
@@ -293,6 +293,7 @@ function basicshowq($qn,$seqinactive=false) {
 		$showa = ($qshowansafterlast && $showeachscore);	
 	}
 	$regen = (($regenonreattempt && $qi[$questions[$qn]]['regen']==0) || $qi[$questions[$qn]]['regen']==1);
+	
 	if (!$seqinactive) {
 		displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$showa,$showhints,$attempts[$qn],false,$regen,$seqinactive);
 	} else {
@@ -306,12 +307,16 @@ function showqinfobar($qn,$inreview,$single) {
 	if ($inreview) {
 		echo '<div class="review">';
 	}
+	if ($qi[$questions[$qn]]['withdrawn']==1) {
+		echo '<span class="red">Question Withdrawn</span> ';
+	}
 	$pointsremaining = getremainingpossible($qi[$questions[$qn]],$testsettings,$attempts[$qn]);
 	if ($pointsremaining == $qi[$questions[$qn]]['points']) {
 		echo 'Points possible: ' . $qi[$questions[$qn]]['points'];
 	} else {
 		echo 'Points available on this attempt: '.$pointsremaining.' of original '.$qi[$questions[$qn]]['points'];
 	}
+	
 	if ($qi[$questions[$qn]]['attempts']==0) {
 		echo "<br/>Unlimited attempts.";
 	} else {
@@ -329,6 +334,73 @@ function showqinfobar($qn,$inreview,$single) {
 	if ($inreview) {
 		echo '</div>';
 	}
+}
+
+//shows top info bar for seq mode
+function seqshowqinfobar($qn,$toshow) {
+	global $qi,$questions,$attempts,$testsettings,$scores;
+	$reattemptsremain = hasreattempts($qn);
+	$pointsremaining = getremainingpossible($qi[$questions[$qn]],$testsettings,$attempts[$qn]);
+	$qavail = false;
+	if ($qi[$questions[$qn]]['withdrawn']==1) {
+		$qlinktxt = "<span class=\"withdrawn\">Question ".($qn+1)."</span>";
+	} else {
+		$qlinktxt = "Question ".($qn+1);
+	}
+	if ($qn==$toshow) {
+		if (unans($scores[$qn]) && $attempts[$qn]==0) {
+			echo "<img src=\"$qnmasroot/img/q_fullbox.gif\"/> ";
+		} else {
+			echo "<img src=\"$qnmasroot/img/q_halfbox.gif\"/> ";
+		}
+		echo "<span class=current><a name=\"curq\">$qlinktxt</a></span>  ";
+	} else {
+		if (unans($scores[$qn]) && $attempts[$qn]==0) {
+			echo "<img src=\"$qnmasroot/img/q_fullbox.gif\"/> ";
+			echo "<a href=\"showtest.php?action=seq&to=$qn#curq\">$qlinktxt</a>.  ";
+			$qavail = true;
+		} else if (canimprove($qn)) {
+			echo "<img src=\"$qnmasroot/img/q_halfbox.gif\"/> ";
+			echo "<a href=\"showtest.php?action=seq&to=$qn#curq\">$qlinktxt</a>.  ";
+			$qavail = true;
+		} else if ($reattemptsremain) {
+			echo "<img src=\"$qnmasroot/img/q_emptybox.gif\"/> ";
+			echo "<a href=\"showtest.php?action=seq&to=$qn#curq\">$qlinktxt</a>.  ";
+		} else {
+			echo "<img src=\"$qnmasroot/img/q_emptybox.gif\"/> ";
+			echo "$qlinktxt.  ";
+		}
+	}
+	if ($qi[$questions[$qn]]['withdrawn']==1) {
+		echo "<span class=\"red\">Question Withdrawn</span> ";
+	}
+	if ($showeachscore) {
+		$pts = getpts($bestscores[$qn]);
+		if ($pts<0) { $pts = 0;}
+		echo "Points: $pts out of " . $qi[$questions[$qn]]['points'] . " possible.  ";
+		if ($qn==$toshow) {
+			echo "$pointsremaining available on this attempt.";
+		}
+	} else {
+		if ($pointsremaining == $qi[$questions[$qn]]['points']) {
+			echo "Points possible: ". $qi[$questions[$qn]]['points'];
+		} else {
+			echo 'Points available on this attempt: '.$pointsremaining.' of original '.$qi[$questions[$qn]]['points'];
+		}
+		
+	}
+	
+	if ($qn==$toshow && $attempts[$qn]<$qi[$questions[$qn]]['attempts']) {
+		if ($qi[$questions[$qn]]['attempts']==0) {
+			echo ".  Unlimited attempts";
+		} else {
+			echo '.  This is attempt '.($attempts[$qn]+1)." of ".$qi[$questions[$qn]]['attempts'].".";
+		}
+	}
+	if ($testsettings['showcat']>0 && $qi[$questions[$qn]]['category']!='0') {
+		echo "  Category: {$qi[$questions[$qn]]['category']}.";
+	}
+	return $qavail;
 }
 
 //shows start of test message if no reattempts

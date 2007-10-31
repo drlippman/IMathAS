@@ -3,7 +3,7 @@
 //Must be predefined:
 //beentaken, defpoints
 //itemarray: array
-//	item: array ( questionid, questionsetid, description, type, points, canedit )
+//	item: array ( questionid, questionsetid, description, type, points, canedit ,withdrawn )
 //	group: array (pick n, without (0) or with (1) replacement, array of items)
 
 //output submitted via AHAH is new assessment itemorder in form:
@@ -152,7 +152,7 @@ function generateTable() {
 	html += "<table cellpadding=5 class=gb><thead><tr>";
 	html += "<th>Order</th><th>Description</th><th>Preview</th><th>Type</th><th>Points</th><th>Settings</th><th>Source</th>";
 	if (beentaken) {
-		html += "<th>Clear Attempts</th>";
+		html += "<th>Clear Attempts</th><th>Withdraw</th>";
 	} else {
 		html += "<th>Template</th><th>Remove</th>";
 	}
@@ -222,7 +222,12 @@ function generateTable() {
 				html += "<td class=c><a href=\"moddataset.php?id="+curitems[j][1]+"&template=true&makelocal="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\">Edit</a></td>"; //edit makelocal
 			}
 			if (beentaken) {
-				html += "<td><a href=\"addquestions.php?aid="+curaid+"&cid="+curcid+"&clearqattempts="+curitems[j][0]+"\">Clear Attempts</a></td>"; //add link	
+				html += "<td><a href=\"addquestions.php?aid="+curaid+"&cid="+curcid+"&clearqattempts="+curitems[j][0]+"\">Clear Attempts</a></td>"; //add link
+				if (curitems[j][6]==1) {
+					html += "<td><span class='red'>Withdrawn</span></td>";
+				} else {
+					html += "<td><a href=\"addquestions.php?aid="+curaid+"&cid="+curcid+"&withdraw="+(curisgroup?i+'-'+j:i)+"\">Withdraw</a></td>";
+				}
 			} else {
 				html += "<td class=c><a href=\"moddataset.php?id="+curitems[j][1]+"&template=true&aid="+curaid+"&cid="+curcid+"\">Template</a></td>"; //add link
 				html += "<td class=c><a href=\"#\" onclick=\"return removeitem("+(curisgroup?"'"+i+'-'+j+"'":"'"+i+"'")+");\">Remove</a> <input type=checkbox name=\"checked[]\" value=\""+(curisgroup?i+'-'+j:i)+":"+curitems[j][0]+"\"/></td>"; //add link and checkbox

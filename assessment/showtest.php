@@ -189,6 +189,12 @@
 	list($testsettings['testtype'],$testsettings['showans']) = explode('-',$testsettings['deffeedback']);
 	
 	$qi = getquestioninfo($questions,$testsettings);
+	//check for withdrawn
+	for ($i=0; $i<count($questions); $i++) {
+		if ($qi[$questions[$i]]['withdrawn']==1 && $qi[$questions[$i]]['points']>0) {
+			$bestscores[$i] = $qi[$questions[$i]]['points'];
+		}
+	}
 	$now = time();
 	//check for dates - kick out student if after due date
 	//if (!$isteacher) {
@@ -864,59 +870,7 @@
 				
 				for ($i = 0; $i < count($questions); $i++) {
 					
-					$reattemptsremain = hasreattempts($i);
-					$pointsremaining = getremainingpossible($qi[$questions[$i]],$testsettings,$attempts[$qn]);
-					$qavail = false;
-					if ($i==$toshow) {
-						if (unans($scores[$i]) && $attempts[$i]==0) {
-							echo "<img src=\"$imasroot/img/q_fullbox.gif\"/> ";
-						} else {
-							echo "<img src=\"$imasroot/img/q_halfbox.gif\"/> ";
-						}
-						echo "<span class=current><a name=\"curq\">Question</a> ".($i+1).".</span>  ";
-					} else {
-						if (unans($scores[$i]) && $attempts[$i]==0) {
-							echo "<img src=\"$imasroot/img/q_fullbox.gif\"/> ";
-							echo "<a href=\"showtest.php?action=seq&to=$i#curq\">Question ". ($i+1) . "</a>.  ";
-							$qavail = true;
-						} else if (canimprove($i)) {
-							echo "<img src=\"$imasroot/img/q_halfbox.gif\"/> ";
-							echo "<a href=\"showtest.php?action=seq&to=$i#curq\">Question ". ($i+1) . "</a>.  ";
-							$qavail = true;
-						} else if ($reattemptsremain) {
-							echo "<img src=\"$imasroot/img/q_emptybox.gif\"/> ";
-							echo "<a href=\"showtest.php?action=seq&to=$i#curq\">Question ". ($i+1) . "</a>.  ";
-						} else {
-							echo "<img src=\"$imasroot/img/q_emptybox.gif\"/> ";
-							echo "Question ". ($i+1) . ".  ";
-						}
-					}
-					if ($showeachscore) {
-						$pts = getpts($bestscores[$i]);
-						if ($pts<0) { $pts = 0;}
-						echo "Points: $pts out of " . $qi[$questions[$i]]['points'] . " possible.  ";
-						if ($i==$toshow) {
-							echo "$pointsremaining available on this attempt.";
-						}
-					} else {
-						if ($pointsremaining == $qi[$questions[$i]]['points']) {
-							echo "Points possible: ". $qi[$questions[$i]]['points'];
-						} else {
-							echo 'Points available on this attempt: '.$pointsremaining.' of original '.$qi[$questions[$i]]['points'];
-						}
-						
-					}
-					
-					if ($i==$toshow && $attempts[$i]<$qi[$questions[$i]]['attempts']) {
-						if ($qi[$questions[$i]]['attempts']==0) {
-							echo ".  Unlimited attempts";
-						} else {
-							echo '.  This is attempt '.($attempts[$i]+1)." of ".$qi[$questions[$i]]['attempts'].".";
-						}
-					}
-					if ($testsettings['showcat']>0 && $qi[$questions[$i]]['category']!='0') {
-						echo "  Category: {$qi[$questions[$i]]['category']}.";
-					}
+					$qavail = seqshowqinfobar($i,$toshow);
 					
 					if ($i==$toshow) {
 						basicshowq($i,false);
@@ -1074,62 +1028,7 @@
 				echo "<form method=post action=\"showtest.php?action=seq&score=$i\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
 				echo "<input type=hidden name=\"verattempts\" value=\"{$attempts[$i]}\" />";
 				for ($i = 0; $i < count($questions); $i++) {
-					$reattemptsremain = hasreattempts($i);
-					$pointsremaining = getremainingpossible($qi[$questions[$i]],$testsettings,$attempts[$qn]);
-					$qavail = false;
-					if ($i==$curq) {
-						if (unans($scores[$i]) && $attempts[$i]==0) {
-							echo "<img src=\"$imasroot/img/q_fullbox.gif\"/> ";
-						} else if (canimprove($i)) {
-							echo "<img src=\"$imasroot/img/q_halfbox.gif\"/> ";
-						} else {
-							echo "<img src=\"$imasroot/img/q_emptybox.gif\"/> ";
-						}
-						echo "<span class=current>Question ".($i+1).".</span>  ";
-					} else {
-						if (unans($scores[$i]) && $attempts[$i]==0) {
-							echo "<img src=\"$imasroot/img/q_fullbox.gif\"/> ";
-							echo "<a href=\"showtest.php?action=seq&to=$i#curq\">Question ". ($i+1) . "</a>.  ";
-							$qavail = true;
-						} else if (canimprove($i)) {
-							echo "<img src=\"$imasroot/img/q_halfbox.gif\"/> ";
-							echo "<a href=\"showtest.php?action=seq&to=$i#curq\">Question ". ($i+1) . "</a>.  ";
-							$qavail = true;
-						} else if ($reattemptsremain) {
-							echo "<img src=\"$imasroot/img/q_emptybox.gif\"/> ";
-							echo "<a href=\"showtest.php?action=seq&to=$i#curq\">Question ". ($i+1) . "</a>.  ";
-							$qavail = true;
-						} else {
-							echo "<img src=\"$imasroot/img/q_emptybox.gif\"/> ";
-							echo "Question ". ($i+1) . ".  ";
-						}
-					}
-					if ($showeachscore) {
-						$pts = getpts($bestscores[$i]);
-						if ($pts<0) { $pts = 0;}
-						echo "Points: $pts out of " . $qi[$questions[$i]]['points'] . " possible.  ";
-						if ($i==$curq) {
-							echo "$pointsremaining available on this attempt.";
-						}
-					} else {
-						if ($pointsremaining == $qi[$questions[$i]]['points']) {
-							echo "Points possible: ". $qi[$questions[$i]]['points'];
-						} else {
-							echo 'Points available on this attempt: '.$pointsremaining.' of original '.$qi[$questions[$i]]['points'];
-						}
-						
-					}
-					
-					if ($i==$curq && $attempts[$i]<$qi[$questions[$i]]['attempts']) {
-						if ($qi[$questions[$i]]['attempts']==0) {
-							echo ".  Unlimited attempts";
-						} else {
-							echo '.  This is attempt '.($attempts[$i]+1)." of ".$qi[$questions[$i]]['attempts'].".";
-						}
-					}
-					if ($testsettings['showcat']>0 && $qi[$questions[$i]]['category']!='0') {
-						echo "  Category: {$qi[$questions[$i]]['category']}.";
-					}
+					$qavail = seqshowqinfobar($i,$curq);
 					
 					if ($i==$curq) {
 						basicshowq($i,false);
@@ -1197,10 +1096,19 @@
 				echo "<img src=\"$imasroot/img/q_emptybox.gif\"/> ";
 			}
 			
+				
 			if ($showcat>1 && $qi[$questions[$i]]['category']!='0') {
-				echo "<a href=\"showtest.php?action=skip&to=$i\">". ($i+1) . ") {$qi[$questions[$i]]['category']}</a>";
+				if ($qi[$questions[$i]]['withdrawn']==1) {
+					echo "<a href=\"showtest.php?action=skip&to=$i\"><span class=\"withdrawn\">". ($i+1) . ") {$qi[$questions[$i]]['category']}</span></a>";
+				} else {
+					echo "<a href=\"showtest.php?action=skip&to=$i\">". ($i+1) . ") {$qi[$questions[$i]]['category']}</a>";
+				}
 			} else {
-				echo "<a href=\"showtest.php?action=skip&to=$i\">Q ". ($i+1) . "</a>";
+				if ($qi[$questions[$i]]['withdrawn']==1) {
+					echo "<a href=\"showtest.php?action=skip&to=$i\"><span class=\"withdrawn\">Q ". ($i+1) . "</span></a>";
+				} else {
+					echo "<a href=\"showtest.php?action=skip&to=$i\">Q ". ($i+1) . "</a>";
+				}
 			}
 			if (!$noindivscores) {
 				if (($isreview && canimprove($i)) || (!$isreview && canimprovebest($i))) {

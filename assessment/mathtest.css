@@ -211,5 +211,11 @@ td.barslefttop {
   border-left: 1px solid #000;
   border-top: 1px solid #000;
 }
-
+span.red {
+	color: red;
+}
+span.withdrawn {
+	color: red;
+	text-decoration: line-through;
+}
 

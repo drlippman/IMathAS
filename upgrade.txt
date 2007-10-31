@@ -5,6 +5,9 @@ Upgrade Notes
 *********************
 
 *** Database Changes ***
+
+ALTER TABLE `imas_questions` ADD `withdrawn` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0';
+
 ALTER TABLE `imas_inlinetext` ADD `avail` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '1';
 ALTER TABLE `imas_assessments` ADD `avail` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '1';
 ALTER TABLE `imas_forums` ADD `avail` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '1';

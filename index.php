@@ -65,30 +65,31 @@ if ($debug==1) {
 
 //check for new posts
 $newpostscnt = array();
-$query = "SELECT courseid,count(*) FROM ";
-$query .= "(SELECT imas_forums.courseid,imas_forum_posts.threadid,max(imas_forum_posts.postdate),mfv.lastview FROM imas_forum_posts ";
-$query .= "JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id LEFT JOIN (SELECT * FROM imas_forum_views WHERE userid='$userid') AS mfv ";
-$query .= "ON mfv.threadid=imas_forum_posts.threadid WHERE imas_forums.courseid IN (";
-$i=0;
-foreach ($page_currentUserCourseIds as $val) {
-	$query .= ($i>0) ? ", " : "";
-	$query .= "'$val'";
-	$i++;
+if (count($page_currentUserCourseIds)>0) {
+	$query = "SELECT courseid,count(*) FROM ";
+	$query .= "(SELECT imas_forums.courseid,imas_forum_posts.threadid,max(imas_forum_posts.postdate),mfv.lastview FROM imas_forum_posts ";
+	$query .= "JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id LEFT JOIN (SELECT * FROM imas_forum_views WHERE userid='$userid') AS mfv ";
+	$query .= "ON mfv.threadid=imas_forum_posts.threadid WHERE imas_forums.courseid IN (";
+	$i=0;
+	foreach ($page_currentUserCourseIds as $val) {
+		$query .= ($i>0) ? ", " : "";
+		$query .= "'$val'";
+		$i++;
+	}
+	
+	$query .= ") GROUP BY imas_forum_posts.threadid HAVING ((max(imas_forum_posts.postdate)>mfv.lastview) OR (mfv.lastview IS NULL))) AS newitems ";
+	$query .= "GROUP BY courseid";
+	
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	while ($row = mysql_fetch_row($result)) {
+		$newpostscnt[$row[0]] = $row[1];
+	}
+	
+	if ($debug==1) {
+		echo $query . "<br>\n";
+		var_dump($newpostscnt);
+	}
 }
-
-$query .= ") GROUP BY imas_forum_posts.threadid HAVING ((max(imas_forum_posts.postdate)>mfv.lastview) OR (mfv.lastview IS NULL))) AS newitems ";
-$query .= "GROUP BY courseid";
-
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-while ($row = mysql_fetch_row($result)) {
-	$newpostscnt[$row[0]] = $row[1];
-}
-
-if ($debug==1) {
-	echo $query . "<br>\n";
-	var_dump($newpostscnt);
-}
-  
 //check for new messages    
 $newmsgcnt = array();
 $query = "SELECT courseid,COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND (isread=0 OR isread=4) GROUP BY courseid";
@@ -204,7 +205,13 @@ if ($myrights > 5) {
 			</span>
 			<span style="margin-left: 250px;">&nbsp;</span>
 			<a href="" onclick="document.getElementById('signup').className='hidden';document.getElementById('enrollButton').style.display='';javascript:return false;">
+<?php
+			if (!($noclass && $myrights<15)) {
+?>
 			<span style="text-decoration: none;background-color: #ddf;padding: 3px; border: 1px solid #000;font-size: 70%;">X</span><span style="text-decoration: none; background-color: #ddf;padding: 3px; border: 1px solid #000;font-size: 70%;">Close Form</span>
+<?php
+			}
+?>
 			</a>
 		<BR>
 		<form method=post action=\"actions.php?action=enroll\">

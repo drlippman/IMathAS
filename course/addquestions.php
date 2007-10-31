@@ -14,8 +14,8 @@ $body = "";
 $pagetitle = "Add/Remove Questions";
 
 $curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=" . $_GET['cid'] . "\">$coursename</a> ";
-if (isset($_GET['clearattempts']) || isset($_GET['clearqattempts'])) {
-	$curBreadcrumb .= "&gt; <a href=\"addquestions.php?cid=" . $_GET['cid'] . "&aid=" . $_GET['aid'] . "\">Add/Remove Questions</a> &gt; Clear Attempts\n";
+if (isset($_GET['clearattempts']) || isset($_GET['clearqattempts']) || isset($_GET['withdraw'])) {
+	$curBreadcrumb .= "&gt; <a href=\"addquestions.php?cid=" . $_GET['cid'] . "&aid=" . $_GET['aid'] . "\">Add/Remove Questions</a> &gt; Confirm\n";
 	//$pagetitle = "Modify Inline Text";
 } else {
 	$curBreadcrumb .= "&gt; Add/Remove Questions\n";
@@ -88,12 +88,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if ($_GET['clearattempts']=="confirmed") {
 			$query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='$aid'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
+			$query = "UPDATE imas_questions SET withdrawn=0 WHERE assessmentid='$aid'";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
+			exit;
 		} else {
 			$overwriteBody = 1;
 			$body = "<div class=breadcrumb>$curBreadcrumb</div>\n";
 			$body .= "Are you SURE you want to delete all attempts (grades) for this assessment?";
 			$body .= "<p><input type=button value=\"Yes, Clear\" onClick=\"window.location='addquestions.php?cid=$cid&aid=$aid&clearattempts=confirmed'\">\n";
-			$body .= "<input type=button value=\"Nevermind\" onClick=\"window.location='addquestions.php?cid=$cid&aid=$aid'\"></p>\n";
+			$body .= "<input type=button value=\"Nevermind\" onClick=\"window.location='addquestions.php?cid=$cid&aid=$aid';\"></p>\n";
 		}
 	}
 	if (isset($_GET['clearqattempts'])) {
@@ -134,6 +138,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						mysql_query($query) or die("Query failed : " . mysql_error());
 					} 
 				}
+				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
+				exit;
 			} else {
 				$overwriteBody = 1;
 				$body = "<p>Error with question id.  Try again.</p>";
@@ -148,7 +154,109 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$body .= "<input type=button value=\"Nevermind\" onClick=\"window.location='addquestions.php?cid=$cid&aid=$aid'\"></p>\n";
 		}
 	}
-	
+	if (isset($_GET['withdraw'])) {
+		if (isset($_GET['confirmed'])) {
+			if (strpos($_GET['withdraw'],'-')!==false) {
+				$isingroup = true;
+				$loc = explode('-',$_GET['withdraw']);
+				$toremove = $loc[0];
+			} else {
+				$isingroup = false;
+				$toremove = $_GET['withdraw'];
+			}
+			$query = "SELECT itemorder,defpoints FROM imas_assessments WHERE id='$aid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$itemorder = explode(',',mysql_result($result,0,0));
+			$defpoints = mysql_result($result,0,1);
+			
+			$qids = array();
+			if ($isingroup && $_POST['withdrawtype']!='full') { //is group remove
+				$qids = explode('~',$itemorder[$toremove]);
+				if (strpos($qids[0],'|')!==false) { //pop off nCr
+					array_shift($qids);
+				}
+			} else if ($isingroup) { //is single remove from group
+				$sub = explode('~',$itemorder[$toremove]);
+				if (strpos($sub[0],'|')!==false) { //pop off nCr
+					array_shift($sub);
+				}
+				$qids = array($sub[$loc[1]]);
+			} else { //is regular item remove
+				$qids = array($itemorder[$toremove]);
+			}
+			$qidlist = implode(',',$qids);
+			//withdraw question
+			$query = "UPDATE imas_questions SET withdrawn=1";
+			if ($_POST['withdrawtype']=='zero' || $_POST['withdrawtype']=='groupzero') {
+				$query .= ',points=0';
+			}
+			$query .= " WHERE id IN ($qidlist)"; 
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			
+			//get possible points if needed
+			if ($_POST['withdrawtype']=='full' || $_POST['withdrawtype']=='groupfull') {
+				$poss = array();
+				$query = "SELECT id,points FROM imas_questions WHERE id IN ($qidlist)";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				while ($row = mysql_fetch_row($result)) {
+					if ($row[1]==9999) {
+						$poss[$row[0]] = $defpoints;
+					} else {
+						$poss[$row[0]] = $row[1];
+					}
+				}
+			}
+			
+			//update assessment sessions
+			$query = "SELECT id,questions,bestscores FROM imas_assessment_sessions WHERE assessmentid='$aid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				$qarr = explode(',',$row[1]);
+				$sarr = explode(',',$row[2]);
+				for ($i=0; $i<count($qarr); $i++) {
+					if (in_array($qarr[$i],$qids)) {
+						if ($_POST['withdrawtype']=='zero' || $_POST['withdrawtype']=='groupzero') {
+							$sarr[$i] = 0;
+						} else if ($_POST['withdrawtype']=='full' || $_POST['withdrawtype']=='groupfull') {
+							$sarr[$i] = $poss[$qarr[$i]];
+						}
+					}
+				}
+				$slist = implode(',',$sarr);
+				$query = "UPDATE imas_assessment_sessions SET bestscores='$slist' WHERE id='{$row[0]}'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+			
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
+			exit;
+			
+		} else {
+			if (strpos($_GET['withdraw'],'-')!==false) {
+				$isingroup = true;
+			} else {
+				$isingroup = false;
+			}
+			$overwriteBody = 1;
+			$body = "<div class=breadcrumb>$curBreadcrumb</div>\n";
+			$body .= "<h3>Withdraw Question</h3>";
+			$body .= "<form method=post action=\"addquestions.php?cid=$cid&aid=$aid&withdraw={$_GET['withdraw']}&confirmed=true\">";
+			if ($isingroup) {
+				$body .= '<p><b>This question is part of a group of questions</b>.  </p>';
+				$body .= '<input type=radio name="withdrawtype" value="groupzero" > Set points possible and all student scores to zero <b>for all questions in group</b><br/>';
+				$body .= '<input type=radio name="withdrawtype" value="groupfull" checked="1"> Set all student scores to points possible <b>for all questions in group</b><br/>';
+				$body .= '<input type=radio name="withdrawtype" value="full" > Set all student scores to points possible <b>for this question only</b>';
+			} else {
+				$body .= '<input type=radio name="withdrawtype" value="zero" > Set points possible and all student scores to zero<br/>';
+				$body .= '<input type=radio name="withdrawtype" value="full" checked="1"> Set all student scores to points possible';
+			}
+			$body .= '<p>This action can <b>not</b> be undone.</p>';
+			$body .= '<p><input type=submit value="Withdraw Question">';
+			$body .= "<input type=button value=\"Nevermind\" onClick=\"window.location='addquestions.php?cid=$cid&aid=$aid'\"></p>\n";
+			
+			$body .= '</form>';
+		}
+		
+	}
 	
 	$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid";
 	
@@ -208,7 +316,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 		} 
 		for ($j=0;$j<count($subs);$j++) {
-			$query = "SELECT imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points FROM imas_questions,imas_questionset ";
+			$query = "SELECT imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn FROM imas_questions,imas_questionset ";
 			$query .= "WHERE imas_questions.id='{$subs[$j]}' AND imas_questionset.id=imas_questions.questionsetid";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$line = mysql_fetch_array($result, MYSQL_ASSOC);
@@ -222,6 +330,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else {
 				$jsarr .= '0';
 			}
+			$jsarr .= ','.$line['withdrawn'];
 			$jsarr .= ']';
 		}
 		if (count($subs)>1) {
@@ -611,7 +720,7 @@ if ($overwriteBody==1) {
 				</tr>
 			</thead>
 			<tbody>
-<?					
+<?php					
 					$alt=0;
 					for ($i=0;$i<count($page_questionTable); $i++) {
 						if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}

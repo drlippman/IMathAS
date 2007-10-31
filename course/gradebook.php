@@ -796,7 +796,7 @@
 			}
 		}
 		
-		$query = "SELECT id,points FROM imas_questions WHERE assessmentid='{$line['assessmentid']}'";
+		$query = "SELECT id,points,withdrawn FROM imas_questions WHERE assessmentid='{$line['assessmentid']}'";
 		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 		$totalpossible = 0;
 		while ($r = mysql_fetch_row($result)) {
@@ -806,6 +806,7 @@
 				$pts[$r[0]] = $r[1]; //use points from question
 			}
 			$totalpossible += $pts[$r[0]];
+			$withdrawn[$r[0]] = $r[2];
 		}
 		
 		$questions = explode(",",$line['questions']);
@@ -880,6 +881,9 @@
 			
 			if ($scores[$i]==-1) { $scores[$i]="NA";} else {$total+=getpts($scores[$i]);}
 			echo "<div class=review>Question ".($i+1).": ";
+			if ($withdrawn[$questions[$i]]==1) {
+				echo "<span class=\"red\">Question Withdrawn</span> ";
+			}
 			list($pt,$parts) = printscore($scores[$i]);
 			if ($isteacher && $parts=='') { 
 				echo "<input type=text size=4 name=\"$i\" value=\"$pt\">";
@@ -996,7 +1000,7 @@
 		
 		echo "<h4>Question Breakdown</h4>\n";
 		echo "<table cellpadding=5 class=gb><thead><tr><th>Question</th><th>Points / Possible</th></tr></thead><tbody>\n";
-		$query = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
+		$query = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questions.withdrawn FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
 		$query .= " AND imas_questions.id IN ({$line['questions']})";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$i=1;
@@ -1004,7 +1008,12 @@
 		$totposs = 0;
 		while ($row = mysql_fetch_row($result)) {
 			if ($i%2!=0) {echo "<tr class=even>"; } else {echo "<tr class=odd>";}
-			echo "<td>{$row[0]}</td><td>{$scores[$row[1]]} / ";
+			echo '<td>';
+			if ($row[3]==1) {
+				echo '<span class="red">Withdrawn</span> ';
+			}
+			echo $row[0];
+			echo "</td><td>{$scores[$row[1]]} / ";
 			if ($row[2]==9999) {
 				$poss= $line['defpoints'];
 			} else {
@@ -1085,7 +1094,7 @@
 			$i = 1;
 			$qs = array_keys($qtotal);
 			$qslist = implode(',',$qs);
-			$query = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questionset.id ";
+			$query = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questionset.id,imas_questions.withdrawn ";
 			$query .= "FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
 			$query .= " AND imas_questions.id IN ($qslist)";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -1122,7 +1131,11 @@
 					$avgatt = 0;
 					$avgreg = 0;
 				}
-				echo "<td>{$row[0]}</td>";
+				echo "<td>";
+				if ($row[4]==1) {
+					echo '<span class="red">Withdrawn</span> ';
+				}
+				echo "{$row[0]}</td>";
 				echo "<td><a href=\"gradeallq.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid=average&aid=$aid&qid={$row[1]}\">Grade</a></td>";
 				echo "<td>$avg/$pts ($pc%)</td><td>$avg2/$pts ($pc2%)</td><td>$avgatt ($avgreg)</td><td>$pi</td>";
 				echo "<td><input type=button value=\"Preview\" onClick=\"previewq({$row[3]})\"/></td>\n";
