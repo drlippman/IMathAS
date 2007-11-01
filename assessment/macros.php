@@ -4,7 +4,7 @@
 
 
 array_push($allowedmacros,"sec","csc","cot","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif","in_array","prettyint","prettyreal","arraystodots","subarray","showdataarray","arraystodoteqns","array_flip","arrayfindindex");
-array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","prettytime");
+array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","prettytime","definefunc","evalfunc","safepow");
 function mergearrays($a,$b) {
 	return array_merge($a,$b);
 }
@@ -1094,6 +1094,80 @@ function prettytime($time,$in,$out) {
 		}
 	}
 	return $outst;
+}
+
+function definefunc($func,$varlist) {
+	return array($func,$varlist);
+}
+
+function evalfunc($farr) {
+	$args = func_get_args();
+	array_shift($args);
+	list($func,$varlist) = $farr;
+	$vars = explode(',',$varlist);
+	if (count($vars)!=count($args)) {
+		echo "Number of inputs to function doesn't match number of variables";
+	}
+	$isnum = true;
+	for ($i=0;$i<count($args);$i++) {
+		if (!is_numeric($args[$i])) {
+			$isnum = false;
+		}
+	}
+	$toparen = implode('|',$vars);
+	if ($toparen != '') {
+		$reg = "/(" . $toparen . ")(" . $toparen . ')$/';
+		  $func= preg_replace($reg,"($1)($2)",$func);	
+		  $reg = "/(" . $toparen . ")(sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs)/";
+		  $func= preg_replace($reg,"($1)$2",$func);	
+		  $reg = "/(" . $toparen . ")(" . $toparen . ')([^a-df-zA-Z\(])/';
+		  $func= preg_replace($reg,"($1)($2)$3",$func);	
+		  $reg = "/([^a-zA-Z])(" . $toparen . ")([^a-zA-Z])/";
+		  $func= preg_replace($reg,"$1($2)$3",$func);	
+		  //need second run through to catch x*x
+		  $func= preg_replace($reg,"$1($2)$3",$func);	
+		  $reg = "/^(" . $toparen . ")([^a-zA-Z])/";
+		  $func= preg_replace($reg,"($1)$2",$func);
+		  $reg = "/([^a-zA-Z])(" . $toparen . ")$/";
+		  $func= preg_replace($reg,"$1($2)",$func);
+		  $reg = "/^(" . $toparen . ")$/";
+		  $func= preg_replace($reg,"($1)",$func);
+		  
+		  $reg = "/\(\((" . $toparen . ")\)\)/";
+		  $func= preg_replace($reg,"($1)",$func);
+		  $func= preg_replace($reg,"($1)",$func);  
+	}
+	if ($isnum) {
+		$func = mathphp($func,$toparen);
+		$toeval = '';
+		foreach ($vars as $i=>$var) {
+			$func = str_replace("($var)","(\$$var)",$func);
+			$toeval .= "\$$var = {$args[$i]}\n";
+		}
+		$toeval .= "\$out = $func\n";
+		eval(interpret("control","calculated",$toeval));
+		return $out;
+	} else { //just replacing
+		foreach ($vars as $i=>$var) {
+			$func = str_replace("($var)","({$args[$i]})",$func);
+		}
+		$reg = '/^\((\d*?\.?\d*?)\)([^\d\.])/';
+		$func= preg_replace($reg,"$1$2",$func);
+		$reg = '/^\(([a-zA-Z])\)([^a-zA-Z])/';
+		$func= preg_replace($reg,"$1$2",$func);
+		
+		$reg = '/([^\d\.])\((\d*?\.?\d*?)\)$/';
+		$func= preg_replace($reg,"$1$2",$func);
+		$reg = '/([^a-zA-Z])\(([a-zA-Z])\)$/';
+		$func= preg_replace($reg,"$1$2",$func);
+		
+		$reg = '/([^\d\.])\((\d*?\.?\d*?)\)([^\d\.])/';
+		$func= preg_replace($reg,"$1$2$3",$func);
+		$reg = '/([^a-zA-Z])\(([a-zA-Z])\)([^a-zA-Z])/';
+		$func= preg_replace($reg,"$1$2$3",$func);
+		
+		return $func;
+	}
 }
 
 ?>

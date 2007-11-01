@@ -279,6 +279,7 @@ function mathjsformat(inputId,outputId) {
 function AMpreview(inputId,outputId) {
   var qn = inputId.slice(2);
   var vl = vlist[qn];
+  var fl = flist[qn];
   vars = vl.split("|");
   
   var str = document.getElementById(inputId).value;
@@ -323,6 +324,12 @@ function AMpreview(inputId,outputId) {
   if (iseqn[qn]==1) {
 	str = str.replace(/(.*)=(.*)/,"$1-($2)");
   }
+  if (fl!='') {
+	  reg = new RegExp("("+fl+")\\(","g");
+	  str = str.replace(reg,"$1*sin(");
+	  vl = vl+'|'+fl;
+  }
+  vars = vl.split('|');
   var totesteqn = mathjs(str,vl);
   
   while (tstpt<ptlist.length && (isNaN(res) || res=="Infinity")) {
@@ -421,6 +428,7 @@ var matcalctoproc = new Array();
 var ntupletoproc = new Array();
 var matsize = new Array();
 var vlist = new Array();
+var flist = new Array();
 var pts = new Array();
 var iseqn = new Array();
 
@@ -542,7 +550,13 @@ function doonsubmit(form,type2,skipconfirm) {
 		if (iseqn[functoproc[i]]==1) {
 			str = str.replace(/(.*)=(.*)/,"$1-($2)");
 		}
+		fl = flist[functoproc[i]];
 		varlist = vlist[functoproc[i]];
+		if (fl!='') {
+			reg = new RegExp("("+fl+")\\(","g");
+			str = str.replace(reg,"$1*sin(");
+			varlist = varlist+'|'+fl;
+		}
 		vars = varlist.split("|");
 		nh.value = mathjs(str,varlist);
 

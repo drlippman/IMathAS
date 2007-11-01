@@ -740,8 +740,23 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		
 		if (!isset($variables)) { $variables = "x";}
 		$variables = explode(",",$variables);
-		$vlist = implode("|",$variables);
-		$out .= "<script>functoproc[functoproc.length] = $qn; vlist[$qn]=\"$vlist\";</script>\n";
+		$ovar = array();
+		$ofunc = array();
+		for ($i = 0; $i < count($variables); $i++) {
+			if (strpos($variables[$i],'(')===false) {
+				$ovar[] = $variables[$i];
+			} else {
+				$ofunc[] = substr($variables[$i],0,strpos($variables[$i],'('));
+				$variables[$i] = substr($variables[$i],0,strpos($variables[$i],'('));
+			}
+		}
+		
+		if (count($ovar)==0) {
+			$ovar[] = "x";
+		}
+		$vlist = implode("|",$ovar);
+		$flist = implode('|',$ofunc);
+		$out .= "<script>functoproc[functoproc.length] = $qn; vlist[$qn]=\"$vlist\"; flist[$qn]=\"$flist\";</script>\n";
 		if (isset($domain)) {$fromto = explode(",",$domain);} else {$fromto[0]=-10; $fromto[1]=10;}
 		
 		for ($i = 0; $i < 20; $i++) {
@@ -1656,6 +1671,17 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 		if (!isset($variables)) { $variables = "x";}
 		$variables = explode(",",$variables);
+		$ofunc = array();
+		for ($i = 0; $i < count($variables); $i++) {
+			if (strpos($variables[$i],'(')!==false) {
+				$ofunc[] = substr($variables[$i],0,strpos($variables[$i],'('));
+				$variables[$i] = substr($variables[$i],0,strpos($variables[$i],'('));
+			}
+		}
+		if (count($ofunc)>0) {
+			$flist = implode("|",$ofunc);
+			$answer = preg_replace('/('.$flist.')\(/',"$1*sin(",$answer);
+		}
 		$vlist = implode("|",$variables);
 		
 		if ($answer == '') {
@@ -1665,14 +1691,12 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$answer = makepretty($answer);
 		$answer = mathphp($answer,$vlist);
 		
-	
 		for($i=0; $i < count($variables); $i++) {
 			//$cleanans = str_replace("(".$variables[$i].")",'($tp['.$i.'])',$cleanans);
 			$answer = str_replace("(".$variables[$i].")",'($tp['.$i.'])',$answer);
 		}
 
 		$myans = explode(",",$_POST["qn$qn-vals"]);
-
 
 		if (isset($domain)) {$fromto = explode(",",$domain);} else {$fromto[0]=-10; $fromto[1]=10;}
 		
@@ -1700,7 +1724,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 			
 			$realans = eval("return ($answer);");
-			
+	
 			if (isNaN($realans)) {$cntnan++; continue;} //avoid NaN problems
 			if ($answerformat=="equation") {  //if equation, store ratios
 				if (abs($realans)>.000001) {
