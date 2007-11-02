@@ -1681,7 +1681,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 		if (count($ofunc)>0) {
 			$flist = implode("|",$ofunc);
-			$answer = preg_replace('/('.$flist.')\(/',"$1*sin(",$answer);
+			$answer = preg_replace('/('.$flist.')\(/',"$1*sin($1+",$answer);
 		}
 		$vlist = implode("|",$variables);
 		

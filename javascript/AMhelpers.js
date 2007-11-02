@@ -326,7 +326,7 @@ function AMpreview(inputId,outputId) {
   }
   if (fl!='') {
 	  reg = new RegExp("("+fl+")\\(","g");
-	  str = str.replace(reg,"$1*sin(");
+	  str = str.replace(reg,"$1*sin($1+");
 	  vl = vl+'|'+fl;
   }
   vars = vl.split('|');
@@ -554,7 +554,7 @@ function doonsubmit(form,type2,skipconfirm) {
 		varlist = vlist[functoproc[i]];
 		if (fl!='') {
 			reg = new RegExp("("+fl+")\\(","g");
-			str = str.replace(reg,"$1*sin(");
+			str = str.replace(reg,"$1*sin($1+");
 			varlist = varlist+'|'+fl;
 		}
 		vars = varlist.split("|");
