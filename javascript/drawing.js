@@ -24,11 +24,11 @@ function clearcanvas(tarnum) {
 	dragObj = null;
 }
 
-function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,defmode,dotline) {
+function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,imgwidth,imgheight,defmode,dotline) {
 	var tarel = document.getElementById(target);
 	var tarpos = getPosition(tarel);
 	
-	targets[tarnum] = {el: tarel, left: tarpos.x, top: tarpos.y, width: tarel.offsetWidth, height: tarel.offsetHeight, xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax, imgborder: imgborder, mode: defmode, dotline: dotline};
+	targets[tarnum] = {el: tarel, left: tarpos.x, top: tarpos.y, width: tarel.offsetWidth, height: tarel.offsetHeight, xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax, imgborder: imgborder, imgwidth: imgwidth, imgheight: imgheight, mode: defmode, dotline: dotline};
 	targetOuts[tarnum] = document.getElementById(formel);
 	if (lines[tarnum]==null) {lines[tarnum] = new Array();}
 	if (dots[tarnum]==null) {dots[tarnum] = new Array();}
@@ -71,7 +71,8 @@ function drawTarget(x,y) {
 	ctx.fillStyle = "rgb(0,0,255)";
 	ctx.lineWidth = 2;
 	ctx.strokeStyle = "rgb(0,0,255)";
-	ctx.clearRect(0,0,300,300);
+	ctx.clearRect(0,0,targets[curTarget].imgwidth,targets[curTarget].imgheight);
+
 	ctx.drawImage(imgs[curTarget],0,0);
 	ctx.beginPath();
 	for (var i=0;i<lines[curTarget].length; i++) {
@@ -446,7 +447,7 @@ function initCanvases() {
 			dots[canvases[i][0]] = drawla[i][1];
 			odots[canvases[i][0]] = drawla[i][2];
 		}
-		addTarget(canvases[i][0],'canvas'+canvases[i][0],imasroot+'/filter/graph/imgs/'+canvases[i][1],'qn'+canvases[i][0],canvases[i][2],canvases[i][3],canvases[i][4],canvases[i][5],canvases[i][6],canvases[i][7],canvases[i][8]);
+		addTarget(canvases[i][0],'canvas'+canvases[i][0],imasroot+'/filter/graph/imgs/'+canvases[i][1],'qn'+canvases[i][0],canvases[i][2],canvases[i][3],canvases[i][4],canvases[i][5],canvases[i][6],canvases[i][7],canvases[i][8],canvases[i][9],canvases[i][10]);
 	}
 }
 

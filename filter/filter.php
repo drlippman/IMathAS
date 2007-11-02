@@ -46,7 +46,7 @@
 		} else {
 			$sty = "vertical-align: middle;";
 		}
-		$fn = md5($arr[2]);
+		$fn = md5($arr[2].$w.$h);
 		if (!file_exists($filterdir.'/graph/imgs/'.$fn.'.png')) {
 			$AS->AStoIMG($w+0,$h+0);
 			$AS->processScript($arr[2]);

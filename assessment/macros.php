@@ -1103,7 +1103,12 @@ function definefunc($func,$varlist) {
 function evalfunc($farr) {
 	$args = func_get_args();
 	array_shift($args);
-	list($func,$varlist) = $farr;
+	if (is_array($farr)) {
+		list($func,$varlist) = $farr;
+	} else {
+		$func = $farr;
+		$varlist = array_shift($args);
+	}
 	$vars = explode(',',$varlist);
 	if (count($vars)!=count($args)) {
 		echo "Number of inputs to function doesn't match number of variables";

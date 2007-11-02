@@ -971,6 +971,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (!isset($backg)) { $backg = '';}
 		$scling = $settings[4].':'.$settings[5];
 		$plot = showplot($backg,$settings[0],$settings[1],$settings[2],$settings[3],$scling,$scling,$settings[6],$settings[7]);
+		
 		$bg = getgraphfilename($plot);
 		if (!isset($answerformat)) {
 			$answerformat = array('line','dot','opendot');
@@ -1001,10 +1002,10 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		} else if ($answerformat[0]=='opendot') {
 			$def = 2;
 		}
-		$dotline = false;
+		$dotline = 0;
 		$out .= '</span></div>';
 		$out .= "<input type=\"hidden\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" />";
-		$out .= "<script>canvases[canvases.length] = [$qn,'$bg',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,$def,$dotline];";
+		$out .= "<script>canvases[canvases.length] = [$qn,'$bg',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline];";
 		
 		$la = str_replace(array('(',')'),array('[',']'),$la);
 		$la = explode(';;',$la);
