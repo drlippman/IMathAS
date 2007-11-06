@@ -470,7 +470,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						} 
 						$page_questionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . $line['id'] . "' id='qo$ln'>";
 						$page_questionTable[$i]['desc'] = $line['description'];
-						$page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selq',$ln,{$line['id']},true,false)\"/>";
+						$page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selq','qo$ln',{$line['id']},true,false)\"/>";
 						$page_questionTable[$i]['type'] = $line['qtype'];
 						if ($searchall==1) 
 							$page_questionTable[$i]['lib'] = "<a href=\"addquestions.php?cid=$cid&aid=$aid&listlib={$line['libid']}\">List lib</a>";
@@ -559,7 +559,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				foreach($aiditems[$aidq] as $qid) {
 					$page_assessmentQuestions[$x]['checkbox'][$y] = "<input type=checkbox name='nchecked[]' id='qo$ln' value='" . $qsetid[$qid] . "'>";
 					$page_assessmentQuestions[$x]['desc'][$y] = $descr[$qid];
-					$page_assessmentQuestions[$x]['preview'][$y] = "<input type=button value=\"Preview\" onClick=\"previewq('selq',$ln,$qsetid[$qid],true)\"/>";
+					$page_assessmentQuestions[$x]['preview'][$y] = "<input type=button value=\"Preview\" onClick=\"previewq('selq','qo$ln',$qsetid[$qid],true)\"/>";
 					$page_assessmentQuestions[$x]['type'][$y] = $qtypes[$qid];
 					$page_assessmentQuestions[$x]['times'][$y] = $times[$qid];
 					$page_assessmentQuestions[$x]['mine'][$y] = ($owner[$qid]==$userid) ? "Yes" : "" ;

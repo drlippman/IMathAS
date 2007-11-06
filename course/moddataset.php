@@ -302,7 +302,9 @@
 				
 				if (isset($_GET['makelocal'])) {
 					$inlibs[] = $deflib;
+					$line['description'] .= " (local for $userfullname)";
 				} else {
+					$line['description'] .= " (copy by $userfullname)";
 					if ($usedeflib==1) {
 						$inlibs[] = $deflib;
 					} else {
