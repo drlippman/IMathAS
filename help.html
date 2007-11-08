@@ -144,6 +144,7 @@ dd {
 	<li><a href="#randomizers">Randomizers</a></li>
 	<li><a href="#displaymacros">Display Macros</a></li>
 	<li><a href="#generalmacros">General Macros</a></li>
+	<li><a href="#mathmacros">Math Macros</a></li>
 	<li><a href="#usingothermacros">Using Other Macros</a></li>
 	<li><a href="#mathentry">Math Entry</li>
 	<li><a href="#writingcommon">Options Common to All Types</a></li>
@@ -1517,6 +1518,20 @@ These macros are fairly general purpose:
 <li><b>arraystodoteqns(xarray,yarray,[color])</b>:  Converts an array of x-values and y-values into a form that can be used in
   showplot.</li>
 <li><b>arraystodots(xarray,yarray)</b>: Converts an array of x-values and y-values into a form that can be used in the Drawing answer type</li>
+</ul>
+</div>
+<div class=h2>
+<h2><a name="mathmacros">Math Macros</a></h2>
+These macros are used for mathematical calculations:
+<ul>
+<li><b>sin(t), cos(t), tan(t), sec(t), csc(t), cot(t)</b>: The usual trig functions</li>
+<li><b>arcsin(v), arccos(v), arctan(v)</b>: The inverse trig functions</li>
+<li><b>abs(v)</b>: Absolute value</li>
+<li><b>gcd(a,b)</b>: Greatest common divisor of a and b</li>
+<li><b>lcm(a,b)</b>: Least common multiple of a and b</li>
+<li><b>v!</b>: Factorial, like $a = $b!</li>
+<li><b>evalfunc(func,vars,val1,val2,..)</b>: Evaluates a function given the variables and values for each variable.
+  for example evalfunc("x^2*y","x,y",2,3) will evaluate x^2*y with x=2, y=3</li>
 </ul>
 </div>
 <div class=h2>

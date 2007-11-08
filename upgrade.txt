@@ -6,6 +6,8 @@ Upgrade Notes
 
 *** Database Changes ***
 
+ALTER TABLE `imas_assessments` ADD `groupmax` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '6';
+
 ALTER TABLE `imas_courses` ADD `theme` VARCHAR( 32 ) NOT NULL DEFAULT 'default.css';
 
 UPDATE imas_courses SET msgset=msgset+1 WHERE msgset>1;

@@ -369,7 +369,7 @@
 	
 
 	if (!$sessiondata['isteacher'] && ($testsettings['isgroup']==1 || $testsettings['isgroup']==2) && ($sessiondata['groupid']==0 || isset($_GET['addgrpmem']))) {
-		if (isset($_POST['user1'])) {
+		if (isset($_POST['grpsubmit'])) {
 			if ($sessiondata['groupid']==0) {
 				//double check not already added to group by someone else
 				$query = "SELECT agroupid FROM imas_assessment_sessions WHERE id='$testid'";
@@ -392,8 +392,8 @@
 			$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
 			$row = mysql_fetch_row($result);
 			$insrow = "'".implode("','",addslashes_deep($row))."'";
-			for ($i=1;$i<7;$i++) {
-				if ($_POST['user'.$i]!=0) {
+			for ($i=1;$i<$testsettings['groupmax'];$i++) {
+				if (isset($_POST['user'.$i]) && $_POST['user'.$i]!=0) {
 					$query = "SELECT password,LastName,FirstName FROM imas_users WHERE id='{$_POST['user'.$i]}'";
 					$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
 					$thisusername = mysql_result($result,0,2) . ' ' . mysql_result($result,0,1);	
@@ -458,13 +458,13 @@
 			}
 			echo 'here.</p>';
 			echo '<form method=post action="showtest.php?addgrpmem=true">';
-			for ($i=1;$i<7;$i++) {
+			for ($i=1;$i<$testsettings['groupmax']-count($curgrp)+1;$i++) {
 				echo '<br />Username: <select name="user'.$i.'">'.$selops.'</select> ';
 				if ($testsettings['isgroup']==1) {
 					echo 'Password: <input type=password name="pw'.$i.'" />'."\n";
 				}
 			}
-			echo '<br /><input type=submit value="Record Group and Continue"/>';
+			echo '<p><input type=submit name="grpsubmit" value="Record Group and Continue"/></p>';
 			echo '</form>';
 			require("../footer.php");
 			exit;
@@ -922,7 +922,11 @@
 				$testsettings['intro'] .= "</ul>";
 			
 				if ($testsettings['isgroup']==1 || $testsettings['isgroup']==2) {
-					$testsettings['intro'] .= "<a href=\"showtest.php?addgrpmem=true\">Add Group Members</a></p>";
+					if (count($curgrp)<$testsettings['groupmax']) {
+						$testsettings['intro'] .= "<a href=\"showtest.php?addgrpmem=true\">Add Group Members</a></p>";
+					} else {
+						$testsettings['intro'] .= '</p>';
+					}
 				} else {
 					$testsettings['intro'] .= '</p>';
 				}
