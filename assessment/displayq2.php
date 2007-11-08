@@ -466,7 +466,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		}
 	} else if ($anstype == "multans") {
 		if (is_array($options['questions'][$qn])) {$questions = $options['questions'][$qn];} else {$questions = $options['questions'];}
-		if (isset($options['answers'])) {if (is_array($options['answers'][$qn])) {$answers = $options['answers'][$qn];} else {$answers = $options['answers'];}}
+		if (isset($options['answers'])) {if (is_array($options['answers'])) {$answers = $options['answers'][$qn];} else {$answers = $options['answers'];}}
 		if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$qn];} else {$noshuffle = $options['noshuffle'];}}
 		
 		if (!is_array($questions)) {
@@ -1179,7 +1179,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 		if ($givenans == null) {return 0;}
 
-
+		if ($givenans=='NA') { return 0; }
 		if ($randkeys[$givenans] == $answer) {return 1;} else { return 0;}
 	} else if ($anstype == "multans") {
 		if (is_array($options['questions'][$qn])) {$questions = $options['questions'][$qn];} else {$questions = $options['questions'];}

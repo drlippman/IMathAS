@@ -748,6 +748,18 @@
 		$line=mysql_fetch_array($result, MYSQL_ASSOC);
 		list($testtype,$showans) = explode('-',$line['deffeedback']);
 		echo "<h4>{$line['name']}</h4>\n";
+		if ($isteacher && !isset($_GET['lastver']) && !isset($_GET['reviewver'])) {
+			if ($line['agroupid']>0) {
+				$q2 = "SELECT i_u.LastName,i_u.FirstName FROM imas_assessment_sessions AS i_a_s,imas_users AS i_u WHERE ";
+				$q2 .= "i_u.id=i_a_s.userid AND i_a_s.agroupid='{$line['agroupid']}'";
+				$result = mysql_query($q2) or die("Query failed : " . mysql_error());
+				echo "<p>Group members: <ul>";
+				while ($row = mysql_fetch_row($result)) {
+					echo "<li>{$row[0]}, {$row[1]}</li>";
+				}
+				echo "</ul></p>";
+			}	
+		}
 		echo "<p>Started: " . tzdate("F j, Y, g:i a",$line['starttime']) ."<BR>\n";
 		if ($line['endtime']==0) { 
 			echo "Not Submitted</p>\n";
@@ -779,7 +791,11 @@
 			}
 		}
 		
-		if ($isteacher) {echo "<p><a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}&clearattempt=true\">Clear Attempt</a> | <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}&clearscores=true\">Clear Scores</a></p>\n";}
+		if ($isteacher) {
+			echo "<p><a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}&clearattempt=true\">Clear Attempt</a> | ";
+			echo "<a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}&clearscores=true\">Clear Scores</a> | ";
+			echo "<a href=\"$imasroot/assessment/printtest.php?cid=$cid&asid={$_GET['asid']}\" target=\"_blank\">Print Version</a></p>\n";
+		}
 		
 		if (($line['timelimit']>0) && ($line['endtime'] - $line['starttime'] > $line['timelimit'])) {
 			$over = $line['endtime']-$line['starttime'] - $line['timelimit'];
@@ -953,6 +969,7 @@
 				echo "<p>Update grade for all group members? <input type=checkbox name=\"updategroup\" checked=\"checked\" /></p>";
 			}
 			echo "<p><input type=submit value=\"Record Changed Grades\"></p>\n";
+			/*
 			if ($line['agroupid']>0) {
 				$q2 = "SELECT i_u.LastName,i_u.FirstName FROM imas_assessment_sessions AS i_a_s,imas_users AS i_u WHERE ";
 				$q2 .= "i_u.id=i_a_s.userid AND i_a_s.agroupid='{$line['agroupid']}'";
@@ -963,6 +980,7 @@
 				}
 				echo "</ul>";
 			}
+			*/
 				
 		} else if (trim($line['feedback'])!='') {
 			echo "<p>Instructor Feedback:<div class=\"intro\">{$line['feedback']}</div></p>";

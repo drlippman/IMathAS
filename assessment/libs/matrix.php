@@ -2,7 +2,7 @@
 //Matrix functions.  Version 1.2, May 15 2007
 
 global $allowedmacros;
-array_push($allowedmacros,"matrix","matrixformat","matrixsum","matrixdiff","matrixscalar","matrixprod","matrixaugment","matrixrowscale","matrixrowswap","matrixrowcombine","matrixrowcombine3","matrixidentity","matrixtranspose","matrixrandinvertible");
+array_push($allowedmacros,"matrix","matrixformat","matrixsum","matrixdiff","matrixscalar","matrixprod","matrixaugment","matrixrowscale","matrixrowswap","matrixrowcombine","matrixrowcombine3","matrixidentity","matrixtranspose","matrixrandinvertible","matrixrandunreduce");
 
 //matrix(vals,rows,cols)
 //Creates a new matrix item.  
@@ -209,6 +209,21 @@ function matrixrandinvertible($n) {
 		$mi = matrixrowcombine($mi,$ops[$i][0],-1*$mult[$i],$ops[$i][1],1,$ops[$i][1]);	
 	}
 	return array($m,$mi);
+}
+
+//matrixrandunreduce(m,n)
+//Randomizes the matrix m by applying n random row combinations
+function matrixrandunreduce($m,$c) {
+	$n = count($m);
+	for ($i=0;$i<$c; $i++) {
+		$r = diffrands(0,$n-1,3);
+		$m = matrixrowcombine3($m,$r[0],-1,$r[1],1,$r[2],2,$r[0]);
+	}
+	for ($i=0; $i<$c; $i++) {
+		list($sr,$er) = diffrands(0,$n-1,2);
+		$m = matrixrowswap($m,$sr,$er);
+	}
+	return $m;
 }
 
 ?>
