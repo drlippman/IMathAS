@@ -1,9 +1,9 @@
-<?
-//Polynomial functions.  Version 1.0, Jan 11, 2007
+<?php
+//Polynomial functions.  Version 1.1, Nov 11, 2007
 
 
 global $allowedmacros;
-array_push($allowedmacros,"formpoly","writepoly","addpolys","subtpolys","multpolys","quadroot","getcoef","polypower");
+array_push($allowedmacros,"formpoly","formpolyfromroots","writepoly","addpolys","subtpolys","multpolys","scalepoly","quadroot","getcoef","polypower");
 
 
 //formpoly(coefficients,powers or degree)
@@ -36,6 +36,28 @@ function formpoly($coef,$deg) {
 	return $poly;
 }
 
+//formpolyfromroots(stretch,roots,[multiplicities])
+//create a polynomial object from roots
+//use writepoly to create a display form of the polynomial
+//stretch:  a stretch factor; the A in A*(x-root)(x-root)...
+//roots: an array of the roots (zeros, x-intercepts) of the polynomial
+//multiplicites (optional): an array of multiplicites of the roots.  Assumed to 
+//  be all 1 if not provided
+function formpolyfromroots($a,$roots,$mult=1) {
+	for($i=0; $i<count($roots); $i++) {
+		$newpoly = formpoly(array(1,-1*$roots[$i]),1);
+		if (is_array($mult) && $mult[$i]>1) {
+			$newpoly = polypower($newpoly,$mult[$i]);
+		}
+		if ($i==0) {
+			$outpoly = $newpoly;
+		} else {
+			$outpoly = multpolys($outpoly,$newpoly);
+		}
+	}
+	$outpoly = scalepoly($outpoly,$a);
+	return $outpoly;	
+}
 
 //writepoly(poly,[var,showzeros])
 //Creates a display form for polynomial object
@@ -148,6 +170,15 @@ function multpolys($p1,$p2) {
 		$i++;
 	}
 	return $po;
+}
+
+//scalepoly(poly,c)
+//Multiplies each term of poly by constant c
+function scalepoly($poly,$c) {
+	for ($i=0; $i<count($poly); $i++) {
+		$poly[$i][0] *= $c;
+	}
+	return $poly;
 }
 
 //polypower(poly,power)

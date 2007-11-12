@@ -2,7 +2,7 @@
 //A library of Stats functions.  Version 1.8, June 20, 2007
 
 global $allowedmacros;
-array_push($allowedmacros,"nCr","nPr","mean","stdev","percentile","quartile","median","freqdist","frequency","histogram","fdhistogram","normrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","countif","binomialpdf","binomialcdf","chi2cdf","invchi2cdf","fcdf","invfcdf");
+array_push($allowedmacros,"nCr","nPr","mean","stdev","percentile","quartile","median","freqdist","frequency","histogram","fdhistogram","fdbargraph","normrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","countif","binomialpdf","binomialcdf","chi2cdf","invchi2cdf","fcdf","invfcdf");
 
 //nCr(n,r)
 //The Choose function
@@ -278,6 +278,40 @@ function fdhistogram($freq,$label,$start,$cw,$startlabel=false,$upper=false) {
 	//$outst .= "axes($cw,$step,1,1000,$step); fill=\"blue\"; text([". ($start + .5*($x-$start))  .",". (-.1*$maxfreq) . "],\"$label\");";
 	$outst .= $st;
 	return showasciisvg($outst,300,200);
+}
+
+//fdbargraph(barlabels,freqarray,label,[width,height])
+//barlabels: array of labels for the bars
+//freqarray: array of frequencies/heights for the bars
+//label: general label for bars
+//width,height (optional): width and height for graph
+function fdbargraph($bl,$freq,$label,$width=300,$height=200) {
+	$alt = "Histogram for $label <table class=stats><thead><tr><th>Bar Label</th><th>Frequency/Height</th></tr></thead>\n<tbody>\n";
+	$start = 0;
+	$x = $start+1;
+	$maxfreq = 0;
+	for ($curr=0; $curr<count($bl); $curr++) {
+		$alt .= "<tr><td>{$bl[$curr]}</td><td>{$freq[$curr]}</td></tr>";
+		$st .= "rect([$x,0],";
+		$x += 2;
+		$st .= "[$x,{$freq[$curr]}]);";
+		$x -= 1;
+		$st .= "text([$x,0],\"{$bl[$curr]}\",\"below\");";
+		$x += 1;
+		if ($freq[$curr]>$maxfreq) { $maxfreq = $freq[$curr];}
+	}
+	$alt .= "</tbody></table>\n";
+	if ($GLOBALS['sessiondata']['graphdisp']==0) {
+		return $alt;
+	}
+	$x++;
+	$outst = "setBorder(10);  initPicture(". ($start-.1*($x-$start)) .",$x,". (-.1*$maxfreq) .",$maxfreq);";
+	if ($maxfreq>100) {$step = 20;} else if ($maxfreq > 50) { $step = 10; } else if ($maxfreq > 20) { $step = 5;} else {$step=1;}
+	$outst .= "axes(1000,$step,1,1000,$step); fill=\"blue\"; text([". ($start + .5*($x-$start))  .",". (-.12*$maxfreq) . "],\"$label\");";
+	
+	//$outst .= "axes($cw,$step,1,1000,$step); fill=\"blue\"; text([". ($start + .5*($x-$start))  .",". (-.1*$maxfreq) . "],\"$label\");";
+	$outst .= $st;
+	return showasciisvg($outst,$width,$height);
 }
 
 //normrand(mu,sigma,n)

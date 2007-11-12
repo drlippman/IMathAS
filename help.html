@@ -1513,7 +1513,8 @@ These macros are fairly general purpose:
 <li><b>count(array)</b>:  Counts the number of entries in the array</li>
 <li><b>sumarray(array)</b>: Adds the entries in an array</li>
 <li><b>in_array(needle,haystack)</b>:  Checks if value needle is in array haystack.  Returns true or false</li>
-<li><b>arrayfindindex(needle,haystack)</b>: Returns the index in the array haystack of the value needle</li>
+<li><b>arrayfindindex(needle,haystack)</b>: Returns the index in the array haystack of the value needle.  If there are multiple matches, it only returns the first.</li>
+<li><b>arrayfindindices(needle,haystack)</b>: Returns an array of indices in the array haystack of the value needle.</li>
 <li><b>array_flip(array)</b>:  Reverses a one-to-one array, so indexes become values and values become indexes</li>
 <li><b>arraystodoteqns(xarray,yarray,[color])</b>:  Converts an array of x-values and y-values into a form that can be used in
   showplot.</li>

@@ -313,7 +313,7 @@ if ($overwriteBody==1) {
 	<script type="text/javascript">
 		function changeshift() {
 			var shift = document.getElementById("pshift").value;
-			var toopen = '</php echo $jsAddress1 ?>&stuview='+shift;
+			var toopen = '<?php echo $jsAddress1 ?>&stuview='+shift;
 			window.location = toopen; 
 		}
 	</script>
@@ -420,7 +420,7 @@ if ($overwriteBody==1) {
 	</span>
 	<span class=column>
 		<a href="masschgdates.php?cid=<?php echo $cid ?>">Mass Change Dates</a>
-	</span>";
+	</span>
 <?php		
 		}
 		echo "<div class=clear></div></div>\n";
