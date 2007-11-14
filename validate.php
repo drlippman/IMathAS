@@ -244,7 +244,7 @@ END;
 				}
 			}
 			unset($lockaid);
-			if ($myrights>19 && !isset($teacherid) && $previewshift==-1) {
+			if ($myrights>19 && !isset($teacherid) && !isset($studentid) && $previewshift==-1) {
 				if (mysql_result($result,0,3)==2) {
 					$guestid = $userid;
 				} else if (mysql_result($result,0,3)==1 && mysql_result($result,0,4)==$groupid) {

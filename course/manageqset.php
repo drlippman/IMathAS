@@ -308,6 +308,7 @@ if ($myrights<20) {
 				$query = "SELECT description,userights,qtype,control,qcontrol,qtext,answer,hasimg FROM imas_questionset WHERE id='$qid'";
 				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 				$row = mysql_fetch_row($result);
+				$row[0] .= " (copy by $userfullname)";
 				$mt = microtime();
 				$uqid = substr($mt,11).substr($mt,2,3).$k;
 				$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,ownerid,author,description,userights,qtype,control,qcontrol,qtext,answer,hasimg) VALUES ";
@@ -787,7 +788,11 @@ function getnextprev(formn,loc) {
 			$times = mysql_result($result2,0,0);
 			if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 			echo "<td><input type=checkbox name='nchecked[]' id='qo$ln' value='{$line['id']}'></td>\n";
-			echo "<td>{$line['description']}</td>";
+			if ($line['userights']==0) {
+				echo "<td><span class=red>{$line['description']}</span></td>";
+			} else {
+				echo "<td>{$line['description']}</td>";
+			}
 			echo "<td><input type=button value=\"Preview\" onClick=\"previewq('selform',$ln,{$line['id']})\"/></td>\n";
 			echo "<td><select onchange=\"doaction(this.value,{$line['id']})\"><option value=\"0\">Action..</option>";
 			if ($isadmin || ($isgrpadmin && $line['groupid']==$groupid) || $line['ownerid']==$userid || $line['userights']>2) {
@@ -804,11 +809,23 @@ function getnextprev(formn,loc) {
 			echo "<td>{$line['qtype']}</td><td class=c>$times</td>\n";
 			$lastmod = date("m/d/y",$line['lastmoddate']);
 			echo "<td>$lastmod</td>";
-			if ($isadmin) {
+			if ($isadmin || $isgrpadmin) {
 				$ownername = $line['lastName'] . ',' . substr($line['firstName'],0,1);
-				echo "<td class=c>$ownername</td>\n";
+				echo "<td class=c>$ownername";
+				if ($line['userights']==0) {
+					echo " <i>Priv</i>";
+				}
+				echo "</td>\n";
 			} else {
-				if ($line['ownerid']==$userid) { echo "<td>Yes</td>";} else {echo "<td></td>";}
+				if ($line['ownerid']==$userid) { 
+					if ($line['userights']==0) {
+						echo "<i>Priv</i>";
+					} else {
+						echo "<td>Yes</td>";
+					}
+				} else {
+					echo "<td></td>";
+				}
 			}
 			if ($searchall==1) {
 				echo "<td><a href=\"manageqset.php?cid=$cid&listlib={$line['libid']}\">List lib</a></td>";

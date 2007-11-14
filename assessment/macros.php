@@ -4,7 +4,7 @@
 
 
 array_push($allowedmacros,"sec","csc","cot","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif","in_array","prettyint","prettyreal","arraystodots","subarray","showdataarray","arraystodoteqns","array_flip","arrayfindindex");
-array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","prettytime","definefunc","evalfunc","safepow","arrayfindindices");
+array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower");
 function mergearrays($a,$b) {
 	return array_merge($a,$b);
 }
@@ -14,6 +14,13 @@ function arrayfindindex($n,$h) {
 function arrayfindindices($n,$h) {
 	return array_keys($h,$n);	
 }
+function stringtoarray($str) {
+        $str_array=array();
+        $len=strlen($str);
+        for($i=0;$i<$len;$i++) {$str_array[]=$str{$i};}
+        return $str_array;
+}
+       
 
 //$funcs can be a string or an array of strings.  Each string should have format:
 //"function,color,xmin,xmax,startmarker,endmarker,strokewidth,strokedash"
@@ -1112,6 +1119,7 @@ function evalfunc($farr) {
 		$func = $farr;
 		$varlist = array_shift($args);
 	}
+	$func = makepretty($func);
 	$vars = explode(',',$varlist);
 	if (count($vars)!=count($args)) {
 		echo "Number of inputs to function doesn't match number of variables";

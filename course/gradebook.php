@@ -1092,10 +1092,28 @@
 		$attempts = array();
 		$regens = array();
 		
-		$query = "SELECT defpoints,name FROM imas_assessments WHERE id='$aid'";
+		$query = "SELECT defpoints,name,itemorder FROM imas_assessments WHERE id='$aid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$defpoints = mysql_result($result,0,0);
 		echo mysql_result($result,0,1).'</h2>';
+		$itemorder = mysql_result($result,0,2);
+		$itemarr = array();
+		$itemnum = array();
+		foreach (explode(',',$itemorder) as $k=>$itel) {
+			if (strpos($itel,'~')!==false) {
+				$sub = explode('~',$itel);
+				if (strpos($sub[0],'|')!==false) {
+					array_shift($sub);
+				}
+				foreach ($sub as $j=>$itsub) {
+					$itemarr[] = $itsub;
+					$itemnum[$itsub] = ($k+1).'-'.($j+1);
+				}
+			} else {
+				$itemarr[] = $itel;
+				$itemnum[$itel] = ($k+1);
+			}
+		}
 		
 		$query = "SELECT ias.questions,ias.bestscores,ias.bestattempts,ias.bestlastanswers,ias.starttime,ias.endtime FROM imas_assessment_sessions AS ias,imas_students ";
 		$query .= "WHERE ias.userid=imas_students.userid AND imas_students.courseid='$cid' AND ias.assessmentid='$aid'";
@@ -1126,58 +1144,79 @@
 		}
 		echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 		echo "<table class=gb id=myTable><thead>"; //<tr><td>Name</td>\n";
-		echo "<tr><th scope=\"col\">Question</th><th>Grade</th><th scope=\"col\">Average Score<br/>All</th>";
+		echo "<tr><th>#</th><th scope=\"col\">Question</th><th>Grade</th><th scope=\"col\">Average Score<br/>All</th>";
 		echo "<th scope=\"col\">Average Score<br/>Attempted</th><th scope=\"col\">Average Attempts<br/>(Regens)</th><th scope=\"col\">% Incomplete</th><th scope=\"col\">Preview</th></tr></thead>\n";
 		echo "<tbody>";
 		if (count($qtotal)>0) {
 			$i = 1;
-			$qs = array_keys($qtotal);
-			$qslist = implode(',',$qs);
+			//$qs = array_keys($qtotal);
+			$qslist = implode(',',$itemarr);
 			$query = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questionset.id,imas_questions.withdrawn ";
 			$query .= "FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
 			$query .= " AND imas_questions.id IN ($qslist)";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$descrips = array();
+			$points = array();
+			$withdrawn = array();
+			$qsetids = array();
+			while ($row = mysql_fetch_row($result)) {
+				$descrips[$row[1]] = $row[0];
+				$points[$row[1]] = $row[2];
+				$qsetids[$row[1]] = $row[3];
+				$withdrawn[$row[1]] = $row[4];
+			}
+			
 			$avgscore = array();
 			$qs = array();
 			
-			while ($row = mysql_fetch_row($result)) {
+			foreach ($itemarr as $qid) {
 				if ($i%2!=0) {echo "<tr class=even>"; } else {echo "<tr class=odd>";}
-				$avg = round($qtotal[$row[1]]/$qcnt[$row[1]],2);
-				if ($qcnt[$row[1]] - $qincomplete[$row[1]]>0) {
-					$avg2 = round($qtotal[$row[1]]/($qcnt[$row[1]] - $qincomplete[$row[1]]),2); //avg adjusted for not attempted
-				} else {
-					$avg2 = 0;
-				}
-				$avgscore[$i-1] = $avg;
-				$qs[$i-1] = $row[1];
-				$pts = $row[2];
+				$pts = $points[$qid];
 				if ($pts==9999) {
 					$pts = $defpoints;
 				}
-				if ($pts>0) {
-					$pc = round(100*$avg/$pts);
-					$pc2 = round(100*$avg2/$pts);
+				if ($qcnt[$qid]>0) {
+					$avg = round($qtotal[$qid]/$qcnt[$qid],2);
+					if ($qcnt[$qid] - $qincomplete[$qid]>0) {
+						$avg2 = round($qtotal[$qid]/($qcnt[$qid] - $qincomplete[$qid]),2); //avg adjusted for not attempted
+					} else {
+						$avg2 = 0;
+					}
+					$avgscore[$i-1] = $avg;
+					$qs[$i-1] = $qid;
+					
+					if ($pts>0) {
+						$pc = round(100*$avg/$pts);
+						$pc2 = round(100*$avg2/$pts);
+					} else {
+						$pc = 'N/A';
+						$pc2 = 'N/A';
+					}
+					$pi = round(100*$qincomplete[$qid]/$qcnt[$qid],1);
+					
+					if ($qcnt[$qid] - $qincomplete[$qid]>0) {
+						$avgatt = round($attempts[$qid]/($qcnt[$qid] - $qincomplete[$qid]),2);
+						$avgreg = round($regens[$qid]/($qcnt[$qid] - $qincomplete[$qid]),2);
+					} else {
+						$avgatt = 0;
+						$avgreg = 0;
+					}
 				} else {
-					$pc = 'N/A';
-					$pc2 = 'N/A';
+					$avg = "NA";
+					$avg2 = "NA";
+					$avgatt = "NA";
+					$avgreg = "NA";
+					$pc = 0; $pc2 = 0; $pi = "NA";
 				}
-				$pi = round(100*$qincomplete[$row[1]]/$qcnt[$row[1]],1);
-				
-				if ($qcnt[$row[1]] - $qincomplete[$row[1]]>0) {
-					$avgatt = round($attempts[$row[1]]/($qcnt[$row[1]] - $qincomplete[$row[1]]),2);
-					$avgreg = round($regens[$row[1]]/($qcnt[$row[1]] - $qincomplete[$row[1]]),2);
-				} else {
-					$avgatt = 0;
-					$avgreg = 0;
-				}
-				echo "<td>";
-				if ($row[4]==1) {
+					
+				echo "<td>{$itemnum[$qid]}</td><td>";
+				if ($withdrawn[$qid]==1) {
 					echo '<span class="red">Withdrawn</span> ';
 				}
-				echo "{$row[0]}</td>";
-				echo "<td><a href=\"gradeallq.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid=average&aid=$aid&qid={$row[1]}\">Grade</a></td>";
+				echo "{$descrips[$qid]}</td>";
+				echo "<td><a href=\"gradeallq.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid=average&aid=$aid&qid=$qid\">Grade</a></td>";
 				echo "<td>$avg/$pts ($pc%)</td><td>$avg2/$pts ($pc2%)</td><td>$avgatt ($avgreg)</td><td>$pi</td>";
-				echo "<td><input type=button value=\"Preview\" onClick=\"previewq({$row[3]})\"/></td>\n";
+				echo "<td><input type=button value=\"Preview\" onClick=\"previewq({$qsetids[$qid]})\"/></td>\n";
 				
 				echo "</tr>\n";
 				$i++;
@@ -1958,8 +1997,9 @@
 				$gb[$i] = array_merge(array_slice($gb[$i],0,$shift),array_slice($gb[$i],$totalspos));
 			}
 			$cathdr = array_merge(array_slice($cathdr,0,$shift),array_slice($cathdr,$totalspos));
+			$totalspos = $shift;
 		}
-		if (($gbmode&8)==8) {  //if totals on left
+		if (($gbmode&8)==8 && $limuser<=0) {  //if totals on left
 			if ($limuser>0) {
 				for ($i=0;$i<count($gb[0]);$i++) {
 					if (!isset($feedbacks[$i])) {
