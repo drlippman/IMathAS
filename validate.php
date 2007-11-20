@@ -258,8 +258,10 @@ END;
  }
  
  if (!$verified) {
-	require("loginpage.php");
-	exit;
+	if (strpos(basename($_SERVER['SCRIPT_NAME']),'directaccess.php')===false) {
+		require("loginpage.php");
+		exit;
+	} 
  }
  
  function tzdate($string,$time) {

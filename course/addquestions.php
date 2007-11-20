@@ -78,10 +78,15 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}	
 	}
 	if (isset($_GET['modqs'])) {
-		include("modquestiongrid.php");
-		if (isset($_GET['process'])) {
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
-			exit;
+		if (!isset($_POST['checked']) && !isset($_POST['qids'])) {
+			$overwriteBody = 1;
+			$body = "No questions selected.  <a href=\"addquestions.php?cid=$cid&aid=$aid\">Go back</a>\n";
+		} else {
+			include("modquestiongrid.php");
+			if (isset($_GET['process'])) {
+				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
+				exit;
+			}
 		}
 	}
 	if (isset($_GET['clearattempts'])) {

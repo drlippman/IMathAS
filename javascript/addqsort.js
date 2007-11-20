@@ -96,14 +96,18 @@ function doremoveitem(loc) {
 function removeSelected() {
 	if (confirm("Are you sure you want to remove these questions?")) {
 		var form = document.getElementById("curqform");
+		var chgcnt = 0;
 		for (var e = form.elements.length-1; e >-1 ; e--) {
 			var el = form.elements[e];
 			if (el.type == 'checkbox' && el.checked) {
 				val = el.value.split(":");
 				doremoveitem(val[0]); 
+				chgcnt++;
 			}
 		}
-		submitChanges();
+		if (chgcnt>0) {
+			submitChanges();
+		}
 	}
 }
 

@@ -34,13 +34,14 @@
    if ($topbar[1][0] == null) {unset($topbar[1][0]);}
    
    
-   if ($_GET['folder']!='0') {
+   //if ($_GET['folder']!='0') {
+   if (strpos($_GET['folder'],'-')!==false) {
 	   $now = time() + $previewshift;
 	   $blocktree = explode('-',$_GET['folder']);
 	   $backtrack = array();
 	   for ($i=1;$i<count($blocktree);$i++) {
 		$backtrack[] = array($items[$blocktree[$i]-1]['name'],implode('-',array_slice($blocktree,0,$i+1)));
-		if (!isset($teacherid) && $items[$blocktree[$i]-1]['SH'][0]!='S' &&($now<$items[$blocktree[$i]-1]['startdate'] || $now>$items[$blocktree[$i]-1]['enddate'])) {
+		if (!isset($teacherid) && $items[$blocktree[$i]-1]['avail']<2 && $items[$blocktree[$i]-1]['SH'][0]!='S' &&($now<$items[$blocktree[$i]-1]['startdate'] || $now>$items[$blocktree[$i]-1]['enddate'] || $items[$blocktree[$i]-1]['avail']=='0')) {
 			$_GET['folder'] = 0;
 			$items = unserialize($line['itemorder']);
 			unset($backtrack);

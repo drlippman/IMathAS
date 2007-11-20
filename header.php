@@ -4,7 +4,9 @@
 <title><?php echo $installname; if (isset($pagetitle)) { echo " - $pagetitle";}?></title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css";?>" type="text/css" />
+<?php if (isset($coursetheme)) { ?>
 <link rel="stylesheet" href="<?php echo $imasroot . "/themes/$coursetheme";?>" type="text/css" />
+<?php } ?>
 <link rel="shortcut icon" href="/favicon.ico" />
 <style type="text/css" media="print">
 div.breadcrumb { display:none;}

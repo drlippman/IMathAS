@@ -819,7 +819,7 @@ function getnextprev(formn,loc) {
 			} else {
 				if ($line['ownerid']==$userid) { 
 					if ($line['userights']==0) {
-						echo "<i>Priv</i>";
+						echo "<td><i>Priv</i></td>";
 					} else {
 						echo "<td>Yes</td>";
 					}
