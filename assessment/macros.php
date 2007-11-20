@@ -35,8 +35,30 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	}
 	$ymin = $settings[2];
 	$ymax = $settings[3];
-	$commands = "setBorder(5); initPicture({$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]});";
-	$alt = "Graph, window x {$settings[0]} to {$settings[1]}, y {$settings[2]} to {$settings[3]}.";
+	$yminauto = false;
+	$yminauto = false;
+	if (substr($ymin,0,4)=='auto') {
+		$yminauto = true;
+		if (strpos($ymin,':')!==false) {
+			$ypts = explode(':',$ymin);
+			$ymin = $ypts[1];
+		} else {
+			$ymin = -5;
+		}
+	}
+	if (substr($ymax,0,4)=='auto') {
+		$ymaxauto = true;
+		if (strpos($ymax,':')!==false) {
+			$ypts = explode(':',$ymax);
+			$ymax = $ypts[1];
+		} else {
+			$ymax = 5;
+		}
+	}
+	//$commands = "setBorder(5); initPicture({$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]});";
+	//$alt = "Graph, window x {$settings[0]} to {$settings[1]}, y {$settings[2]} to {$settings[3]}.";
+	$commands = '';
+	$alt = '';
 	if (strpos($settings[4],':')) {
 		$settings[4] = str_replace(array('(',')'),'',$settings[4]);
 		$lbl = explode(':',$settings[4]);
@@ -60,7 +82,8 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	} else {
 		$commands .= ');';
 	}
-		
+	$absymin = 1E10;
+	$absymax = -1E10;	
 	foreach ($funcs as $function) {
 		if ($function=='') { continue;}
 		$alt .= "Start Graph";
@@ -151,6 +174,12 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				$path .= "[$x,$y]";
 				$lasty = $y;
 				$lastl++;
+				if ($y<$absymin) {
+					$absymin = $y;
+				}
+				if ($y>$absymax) {
+					$absymax = $y;
+				}
 			}
 		}
 		if ($lastl > 0) {$path .= "]);";}
@@ -164,14 +193,35 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		}
 		if ($function[4]=='open') {
 			$x = $xmin; $y = round(eval("return ($func);"),4); $path .= "dot([$x,$y],\"open\");";
+			if ($y<$absymin) {
+				$absymin = $y;
+			}
+			if ($y>$absymax) {
+				$absymax = $y;
+			}
 			$alt .= "Open dot at $x,$y";
 		} else if ($function[4]=='closed') {
 			$x = $xmin; $y = round(eval("return ($func);"),4); $path .= "dot([$x,$y],\"closed\");";
+			if ($y<$absymin) {
+				$absymin = $y;
+			}
+			if ($y>$absymax) {
+				$absymax = $y;
+			}
 			$alt .= "Closed dot at $x,$y";
 		}
 		
 		$commands .= $path;
 	}
+	if ($yminauto) {
+		$settings[2] = max($absymin,$ymin);
+	}
+	if ($ymaxauto) {
+		$settings[3] = min($absymax,$ymax);
+	}
+	$commands = "setBorder(5); initPicture({$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]});".$commands;
+	$alt = "Graph, window x {$settings[0]} to {$settings[1]}, y {$settings[2]} to {$settings[3]}.".$alt;
+	
 	if ($GLOBALS['sessiondata']['graphdisp']==0) {
 		return $alt;
 	} else {
