@@ -4,7 +4,7 @@
 
 
 array_push($allowedmacros,"sec","csc","cot","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif","in_array","prettyint","prettyreal","arraystodots","subarray","showdataarray","arraystodoteqns","array_flip","arrayfindindex");
-array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower");
+array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst");
 function mergearrays($a,$b) {
 	return array_merge($a,$b);
 }
@@ -192,7 +192,14 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			$alt .= "Closed dot at $x,$y";
 		}
 		if ($function[4]=='open') {
-			$x = $xmin; $y = round(eval("return ($func);"),4); $path .= "dot([$x,$y],\"open\");";
+			if ($isparametric) {
+				$t = $xmin;
+				$x = round(eval("return ($xfunc);"),3);
+				$y = round(eval("return ($yfunc);"),3);
+			} else {
+				$x = $xmin; $y = round(eval("return ($func);"),4); 
+			}
+			$path .= "dot([$x,$y],\"open\");";
 			if ($y<$absymin) {
 				$absymin = $y;
 			}
@@ -201,7 +208,14 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			}
 			$alt .= "Open dot at $x,$y";
 		} else if ($function[4]=='closed') {
-			$x = $xmin; $y = round(eval("return ($func);"),4); $path .= "dot([$x,$y],\"closed\");";
+			if ($isparametric) {
+				$t = $xmin;
+				$x = round(eval("return ($xfunc);"),3);
+				$y = round(eval("return ($yfunc);"),3);
+			} else {
+				$x = $xmin; $y = round(eval("return ($func);"),4); 
+			}
+			$path .= "dot([$x,$y],\"closed\");";
 			if ($y<$absymin) {
 				$absymin = $y;
 			}
@@ -979,12 +993,13 @@ function showdataarray($a,$n=1) {
 }
 
 $ones = array( "", " one", " two", " three", " four", " five", " six", " seven", " eight", " nine", " ten", " eleven", " twelve", " thirteen", " fourteen", " fifteen", " sixteen", " seventeen", " eighteen", " nineteen");
+$onesth = array(""," first"," second", " third", " fourth", " fifth", " sixth", " seventh", " eighth", " ninth", " eleventh", " twelfth", " thirteenth", " fourteenth"," fifteenth", " sixteenth", " seventeenth", " eighteenth"," nineteenth"); 
 $tens = array( "", "", " twenty", " thirty", " forty", " fifty", " sixty", " seventy", " eighty", " ninety");
 $triplets = array( "", " thousand", " million", " billion", " trillion", " quadrillion", " quintillion", " sextillion", " septillion", " octillion", " nonillion");
 $placevals = array( "", "tenth", "hundredth", "thousandth", "ten-thousandth", "hundred-thousandth", "millionth", "ten-millionth", "hundred-millionth", "billionth");
  // recursive fn, converts three digits per pass
-function convertTri($num, $tri) {
-  global $ones, $tens, $triplets;
+function convertTri($num, $tri, $doth=false) {
+  global $ones, $onesth, $tens, $triplets;
 
   // chunk the number, ...rxyy
   $r = (int) ($num / 1000);
@@ -999,11 +1014,19 @@ function convertTri($num, $tri) {
    $str = $ones[$x] . " hundred";
 
   // do ones and tens
-  if ($y < 20)
-   $str .= $ones[$y];
-  else
-   $str .= $tens[(int) ($y / 10)] . $ones[$y % 10];
-
+  if ($y < 20) {
+	  if ($doth && $tri==0) {
+		  $str .= $onesth[$y];
+	  } else {
+		  $str .= $ones[$y];
+	  }
+  } else {
+	  if ($doth && $tri==0) {
+		  $str .= $tens[(int) ($y / 10)] . $onesth[$y % 10];
+	  } else {
+		 $str .= $tens[(int) ($y / 10)] . $ones[$y % 10];
+	  }
+  }
   // add triplet modifier only if there
   // is some output to be modified...
   if ($str != "")
@@ -1016,7 +1039,7 @@ function convertTri($num, $tri) {
    return $str;
  }
 
-function numtowords($num) {
+function numtowords($num,$doth=false) {
 	global $placevals;
 	
 	if ($num==0) {
@@ -1026,7 +1049,7 @@ function numtowords($num) {
 	$dec = 	$num-$int;
 	$out = '';
 	if ($int>0) {
-		$out .= convertTri($int,0);
+		$out .= convertTri($int,0,$doth);
 		if ($dec>0) {
 			$out .= " and ";
 		}
@@ -1044,7 +1067,7 @@ function numtowords($num) {
 			$out .= 's';
 		}
 	}
-	return $out;	
+	return trim($out);	
 }
 
 $namearray[0] = explode(',',"Aaron,Ahmed,Aidan,Alan,Alex,Alfonso,Andres,Andrew,Antonio,Armando,Arturo,Austin,Ben,Bill,Blake,Bradley,Brayden,Brendan,Brian,Bryce,Caleb,Cameron,Carlos,Casey,Cesar,Chad,Chance,Chase,Chris,Cody,Collin,Colton,Conner,Corey,Dakota,Damien,Danny,Darius,David,Deandre,Demetrius,Derek,Devante,Devin,Devonte,Diego,Donald,Dustin,Dylan,Eduardo,Emanuel,Enrique,Erik,Ethan,Evan,Francisco,Frank,Gabriel,Garrett,Gerardo,Gregory,Ian,Isaac,Jacob,Jaime,Jake,Jamal,James,Jared,Jason,Jeff,Jeremy,Jesse,John,Jordan,Jose,Joseph,Josh,Juan,Julian,Julio,Justin,Juwan,Keegan,Ken,Kevin,Kyle,Landon,Levi,Logan,Lucas,Luis,Malik,Manuel,Marcus,Mark,Matt,Micah,Michael,Miguel,Nate,Nick,Noah,Omar,Paul,Quinn,Randall,Ricardo,Ricky,Roberto,Roy,Russell,Ryan,Salvador,Sam,Santos,Scott,Sergio,Shane,Shaun,Skyler,Spencer,Stephen,Taylor,Tevin,Todd,Tom,Tony,Travis,Trent,Trevor,Trey,Tristan,Tyler,Wade,Warren,Wyatt,Zach");

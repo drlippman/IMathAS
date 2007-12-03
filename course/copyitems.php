@@ -424,7 +424,7 @@ if (!(isset($teacherid))) {
 		}	
 		
 		$query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu WHERE ";
-		$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid='$groupid' AND iu.id<>'$userid' ORDER BY iu.LastName,ic.name";
+		$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid='$groupid' AND iu.id<>'$userid' ORDER BY iu.LastName,iu.FirstName,ic.name";
 		$courseTreeResult = mysql_query($query) or die("Query failed : " . mysql_error());
 		$lastteacher = 0;
 		
@@ -439,9 +439,9 @@ if (!(isset($teacherid))) {
 			}
 		}	
 		
-		$query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid,iu.groupid FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu WHERE ";
-		$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid<>'$groupid' AND iu.id<>'$userid' ORDER BY iu.groupid,iu.LastName,ic.name";
-		$courseGroupResults = mysql_query($query) or die("Query failed : " . mysql_error());
+		$query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid,iu.groupid FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu,imas_groups WHERE ";
+		$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid=imas_groups.id AND iu.groupid<>'$groupid' AND iu.id<>'$userid' ORDER BY imas_groups.name,iu.LastName,iu.FirstName,ic.name";
+		$courseGroupResults = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 		
 		$query = "SELECT ic.id,ic.name,ic.copyrights FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$templateuser' ORDER BY ic.name";
 		$courseTemplateResults = mysql_query($query) or die("Query failed : " . mysql_error());
