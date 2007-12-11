@@ -197,7 +197,10 @@
 					$message .= "View Posting</a>\r\n";
 				}
 				while ($row = mysql_fetch_row($result)) {
-					mail($row[0],'New forum post notification',$message,$headers);
+					$row[0] = trim($row[0]);
+					if ($row[0]!='' && $row[0]!='none@none.com') {
+						mail($row[0],'New forum post notification',$message,$headers);
+					}
 				}
 			} else {
 				$query = "UPDATE imas_forum_posts SET subject='{$_POST['subject']}',message='{$_POST['message']}',posttype='$type',replyby=$replyby,isanon='$isanon' ";

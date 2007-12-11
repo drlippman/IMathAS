@@ -1481,9 +1481,9 @@
 		}
 		
 		//Pull Gradebook Scheme info
-		$query = "SELECT useweights,orderby,defaultcat FROM imas_gbscheme WHERE courseid='$cid'";
+		$query = "SELECT useweights,orderby,defaultcat,usersort FROM imas_gbscheme WHERE courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		list($useweights,$orderby,$defaultcat) = mysql_fetch_row($result);
+		list($useweights,$orderby,$defaultcat,$usersort) = mysql_fetch_row($result);
 		
 		$cats = array();
 		$catcolcnt = 0;
@@ -1681,7 +1681,7 @@
 		if ($limuser>0) { $query .= "AND imas_users.id='$limuser' ";}
 		if ($isdiag) {
 			$query .= "ORDER BY imas_users.email,imas_users.LastName,imas_users.FirstName";
-		} else if ($hassection) {
+		} else if ($hassection && $usersort==0) {
 			$query .= "ORDER BY imas_students.section,imas_users.LastName,imas_users.FirstName";
 		} else {
 			$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
@@ -1711,15 +1711,16 @@
 				$gb[$ln][3] = $selparts[0];
 				$gb[$ln][4] = $selparts[1];
 			}
+			if (!$isdisp) {
+				$gb[$ln][] = $line['SID'];
+			}
 			if ($hassection) {
 				$gb[$ln][] = $line['section'];
 			}
 			if ($hascode) {
 				$gb[$ln][] = $line['code'];
 			}
-			if (!$isdisp) {
-				$gb[$ln][] = $line['SID'];
-			}
+			
 			//Get assessment scores
 			$query = "SELECT id,assessmentid,bestscores,starttime,endtime,feedback FROM imas_assessment_sessions WHERE userid='{$line['id']}'";
 			$result2 = mysql_query($query) or die("Query failed : " . mysql_error());

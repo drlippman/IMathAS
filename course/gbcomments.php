@@ -123,11 +123,26 @@
 	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 	echo "&gt; <a href=\"gradebook.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid\">Gradebook</a> &gt; Gradebook Comments</div>";
 	
+	echo '<script type="text/javascript">function sendtoall(type) {'."\n";
+	echo '  var form=document.getElementById("mainform");'."\n";
+	echo '  for (var e = 0; e<form.elements.length; e++) {'."\n";
+	echo '      var el = form.elements[e];'."\n";
+	echo '      if (el.type=="textarea" && el.id!="toall") {'."\n";
+	echo '		if (type==0) { el.value = document.getElementById("toall").value + el.value;}'."\n";
+	echo '		else if (type==1) { el.value = el.value+document.getElementById("toall").value;}'."\n";
+	echo '		else if (type==2) { el.value = document.getElementById("toall").value;}'."\n";
+	echo '      }'."\n";
+	echo '   }'."\n";
+	echo ' } </script>'."\n";
+	
 	echo '<h2>Modify Gradebook Comments</h2>';
 	echo "<p>These comments will display at the top of the student's gradebook score list.</p>";
 	echo "<p><a href=\"gbcomments.php?cid=$cid&stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&upload=true\">Upload comments</a></p>";
 	
-	echo "<form method=post action=\"gbcomments.php?cid=$cid&stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&record=true\">";
+	echo "<form id=\"mainform\" method=post action=\"gbcomments.php?cid=$cid&stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&record=true\">";
+	echo "<span class=form>Add/Replace to all:</span><span class=formright><textarea cols=50 rows=3 id=\"toall\" ></textarea>";
+	
+	echo '<br/><input type=button value="Prepend" onClick="sendtoall(0);"/> <input type=button value="Append" onclick="sendtoall(1)"/> <input type=button value="Replace" onclick="sendtoall(2)"/></span><br class="form"/>';
 	$query = "SELECT i_s.id,iu.LastName,iu.FirstName,i_s.gbcomment FROM imas_students AS i_s, imas_users as iu ";
 	$query .= "WHERE i_s.userid=iu.id AND i_s.courseid='$cid' ORDER BY iu.LastName,iu.FirstName";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());

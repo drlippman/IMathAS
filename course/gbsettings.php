@@ -27,6 +27,7 @@
 		//WORK ON ME
 		$useweights = $_POST['useweights'];
 		$orderby = $_POST['orderby'];
+		$usersort = $_POST['usersort'];
 		//name,scale,scaletype,chop,drop,weight
 		
 		$ids = array_keys($_POST['weight']);
@@ -65,7 +66,7 @@
 			}
 		}
 		$defgbmode = $_POST['gbmode1'] + $_POST['gbmode2'] + $_POST['gbmode4'] + $_POST['gbmode8'] + $_POST['gbmode16'];
-		$query = "UPDATE imas_gbscheme SET useweights='$useweights',orderby='$orderby',defaultcat='$defaultcat',defgbmode='$defgbmode' WHERE courseid='$cid'";
+		$query = "UPDATE imas_gbscheme SET useweights='$useweights',orderby='$orderby',usersort='$usersort',defaultcat='$defaultcat',defgbmode='$defgbmode' WHERE courseid='$cid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		if (isset($_POST['submit'])) {
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid={$_GET['cid']}");
@@ -90,9 +91,9 @@
 	echo "<h2>Grade Book Settings <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=gradebooksettings','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h2>\n";
 		
 	
-	$query = "SELECT useweights,orderby,defaultcat,defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
+	$query = "SELECT useweights,orderby,defaultcat,defgbmode,usersort FROM imas_gbscheme WHERE courseid='$cid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	list($useweights,$orderby,$defaultcat,$defgbmode) = mysql_fetch_row($result);
+	list($useweights,$orderby,$defaultcat,$defgbmode,$usersort) = mysql_fetch_row($result);
 	
 	echo "<form method=post action=\"gbsettings.php?gbmode={$_GET['gbmode']}&cid=$cid\">";
 	
@@ -111,6 +112,12 @@
 	echo "/> Order by alphabetically<br/> <input type=radio name=orderby value=\"3\" ";
 	if ($orderby==3) {echo "checked=1";}
 	echo "/> Group by category, then order alphabetically</span><br class=form />";
+	
+	echo "<span class=form>Default user order:</span><span class=formright><input type=radio name=usersort value=\"0\" ";
+	if ($usersort==0) {echo "checked=1";}
+	echo "/> Order by section (if used), then Last name<br/> <input type=radio name=usersort value=\"1\" ";
+	if ($usersort==1) {echo "checked=1";}
+	echo "/> Order by Last name</span><br class=form />";
 	
 	echo "<p>Default gradebook view:</p>";
 	echo '<span class=form>Links show:</span><span class=formright><input type=radio name="gbmode1" value="0" ';

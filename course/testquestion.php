@@ -69,13 +69,14 @@ if ($myrights<20) {
 		$page_formAction .=  "&onlychk=".$_GET['onlychk'];
 	}
 	
-	$query = "SELECT imas_users.email,imas_questionset.author,imas_questionset.description,imas_questionset.lastmoddate ";
+	$query = "SELECT imas_users.email,imas_questionset.author,imas_questionset.description,imas_questionset.lastmoddate,imas_questionset.ancestors ";
 	$query .= "FROM imas_users,imas_questionset WHERE imas_users.id=imas_questionset.ownerid AND imas_questionset.id='{$_GET['qsetid']}'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$email = mysql_result($result,0,0);
 	$author = mysql_result($result,0,1);
 	$descr = mysql_result($result,0,2);
 	$lastmod = date("m/d/y g:i a",mysql_result($result,0,3));
+	$ancestors = mysql_result($result,0,4);
 
 	
 	$query = "SELECT imas_libraries.name FROM imas_libraries,imas_library_items WHERE imas_libraries.id=imas_library_items.libid AND imas_library_items.qsetid='{$_GET['qsetid']}'";
@@ -139,7 +140,9 @@ if ($overwriteBody==1) {
 		echo '<li>'.$row[0].'</li>';
 	}
 	echo '</ul></p>';
-
+	if ($ancestors!='') {
+		echo "<p>Derived from: $ancestors</p>";
+	}
 }
 require("../footer.php");
 	

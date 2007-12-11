@@ -104,7 +104,10 @@
 				$teacheraddys[] = $self;
 			}
 			foreach ($emailaddys as $k=>$addy) {
-				mail($addy,$subject,str_replace(array('LastName','FirstName'),array($lastnames[$k],$firstnames[$k]),$message),$headers);
+				$addy = trim($addy);
+				if ($addy!='' && $addy!='none@none.com') {
+					mail($addy,$subject,str_replace(array('LastName','FirstName'),array($lastnames[$k],$firstnames[$k]),$message),$headers);
+				}
 			}
 			$message .= "<p>Instructor note: Email sent to these students from course $coursename: <br/> $sentto </p>\n";
 			if ($_POST['self']=="allt") {

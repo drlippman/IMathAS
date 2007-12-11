@@ -255,18 +255,23 @@ function doonblur(value) {
 		} else {
 			$hassection = false;
 		}
-		if (isset($_GET['sortorder'])) {
-			$sortorder = $_GET['sortorder'];
-		} else {
-			if ($hassection) {
+		
+		if ($hassection) {
+			$query = "SELECT usersort FROM imas_gbscheme WHERE courseid='$cid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			if (mysql_result($result,0,0)==0) {
 				$sortorder = "sec";
 			} else {
 				$sortorder = "name";
 			}
+		} else {
+			$sortorder = "name";
 		}
+		
 		if ($_GET['grades']=='all' && $_GET['gbitem']!='new') {
 			echo "<p><a href=\"uploadgrades.php?gbmode={$_GET['gbmode']}&cid=$cid&gbitem={$_GET['gbitem']}\">Upload Grades</a></p>";
 		}
+		/*
 		if ($hassection && ($_GET['gbitem']=='new' || $_GET['grades']=='all')) {
 			if ($sortorder=="name") {
 				echo "<p>Sorted by name.  <a href=\"addgrades.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=$cid&gbitem={$_GET['gbitem']}&grades={$_GET['grades']}&sortorder=sec\">";
@@ -276,8 +281,12 @@ function doonblur(value) {
 				echo "Sort by name</a>.</p>";
 			}
 		}
+		*/
 		echo '<input type=button value="Expand Feedback Boxes" onClick="togglefeedback(this)"/>';
-		echo "<table><thead><tr><th>Name</th>";
+		if ($hassection) {
+			echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
+		}
+		echo "<table id=myTable><thead><tr><th>Name</th>";
 		if ($hassection) {
 			echo '<th>Section</th>';
 		}
@@ -327,6 +336,9 @@ function doonblur(value) {
 		}
 		
 		echo "</tbody></table>";
+		if ($hassection) {
+			echo "<script> initSortTable('myTable',Array('S','S',false,false),false);</script>";
+		} 
 
 	
 ?>

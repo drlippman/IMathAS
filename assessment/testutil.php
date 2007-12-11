@@ -163,6 +163,20 @@ function printscore($sc,$poss) {
 	return $out;	
 }
 
+//creates display of score  (chg from previous: does not echo self)
+function printscore2($sc) {
+	if (strpos($sc,'~')===false) {
+		$sc = str_replace('-1','N/A',$sc);
+		$out =  "$sc";
+	} else {
+		$pts = getpts($sc);
+		$sc = str_replace('-1','N/A',$sc);
+		$sc = str_replace('~',', ',$sc);
+		$out =  "$pts (parts: $sc)";
+	}	
+	return $out;	
+}
+
 //scores a question
 //qn: question index in questions array
 //qi: getquestioninfo[qid]
@@ -303,7 +317,7 @@ function basicshowq($qn,$seqinactive=false) {
 
 //shows basic points possible, attempts remaining bar
 function showqinfobar($qn,$inreview,$single) {
-	global $qi,$questions,$attempts,$testsettings;
+	global $qi,$questions,$attempts,$testsettings,$noindivscores,$scores,$bestscores;
 	if ($inreview) {
 		echo '<div class="review">';
 	}
@@ -325,6 +339,9 @@ function showqinfobar($qn,$inreview,$single) {
 	}
 	if ($testsettings['showcat']>0 && $qi[$questions[$qn]]['category']!='0') {
 		echo "  Category: {$qi[$questions[$qn]]['category']}.";
+	}
+	if (!$noindivscores) {
+		echo "<br/>Score in gradebook: ".printscore2($bestscores[$qn]).".";
 	}
 	if ($single) {
 		echo "<input type=hidden name=\"verattempts\" value=\"{$attempts[$qn]}\" />";

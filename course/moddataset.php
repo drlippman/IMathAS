@@ -113,9 +113,20 @@
 			$_POST['description'] = str_replace(array("<",">"),array("&lt;","&gt;"),$_POST['description']);
 			$mt = microtime();
 			$uqid = substr($mt,11).substr($mt,2,6);
-			$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,description,ownerid,author,userights,qtype,control,qcontrol,qtext,answer,hasimg) VALUES ";
+			$ancestors = '';
+			if (isset($_GET['templateid'])) {
+				$query = "SELECT ancestors FROM imas_questionset WHERE id='{$_GET['templateid']}'";
+				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+				$ancestors = mysql_result($result,0,0);
+				if ($ancestors!='') {
+					$ancestors = $_GET['templateid'] . ','. $ancestors;
+				} else {
+					$ancestors = $_GET['templateid'];
+				}
+			}
+			$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,description,ownerid,author,userights,qtype,control,qcontrol,qtext,answer,hasimg,ancestors) VALUES ";
 			$query .= "($uqid,$now,$now,'{$_POST['description']}','$userid','{$_POST['author']}','{$_POST['userights']}','{$_POST['qtype']}','{$_POST['control']}',";
-			$query .= "'{$_POST['qcontrol']}','{$_POST['qtext']}','{$_POST['answer']}','{$_POST['hasimg']}');";
+			$query .= "'{$_POST['qcontrol']}','{$_POST['qtext']}','{$_POST['answer']}','{$_POST['hasimg']}','$ancestors');";
 			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 			$qsetid = mysql_insert_id();
 			$_GET['id'] = $qsetid;			
