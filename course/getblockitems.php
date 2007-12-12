@@ -67,12 +67,19 @@
 	   $query = "SELECT items.id,ex.startdate,ex.enddate FROM ";
 	   $query .= "imas_exceptions AS ex,imas_items as items,imas_assessments as i_a WHERE ex.userid='$userid' AND ";
 	   $query .= "ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment') ";
-	   $query .= "AND (($now<i_a.startdate AND ex.startdate<$now) OR ($now>i_a.enddate AND $now<ex.enddate))";
+	  // $query .= "AND (($now<i_a.startdate AND ex.startdate<$now) OR ($now>i_a.enddate AND $now<ex.enddate))";
+	   $query .= "AND (ex.startdate<$now AND $now<ex.enddate)";
 	   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	   while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 		   $exceptions[$line['id']] = array($line['startdate'],$line['enddate']);
 	   }
    }
+   //get latepasses
+   if (!isset($teacherid)) {
+	   $query = "SELECT latepass FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
+	   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	   $latepasses = mysql_result($result,0,0);
+	}
    
    if (count($items)>0) {
 	   //update block start/end dates to show blocks containing items with exceptions

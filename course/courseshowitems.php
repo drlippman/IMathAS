@@ -3,7 +3,7 @@
 //(c) 2007 David Lippman
 
   function showitems($items,$parent) {
-	   global $teacherid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$hideicons,$exceptions;
+	   global $teacherid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$hideicons,$exceptions,$latepasses;
 	   $now = time() + $previewshift;
 	   $blocklist = array();
 	   for ($i=0;$i<count($items);$i++) {
@@ -252,7 +252,7 @@
 		   }
 		   if ($line['itemtype']=="Assessment") {
 			   $typeid = $line['typeid'];
-			   $query = "SELECT name,summary,startdate,enddate,reviewdate,deffeedback,reqscore,reqscoreaid,avail FROM imas_assessments WHERE id='$typeid'";
+			   $query = "SELECT name,summary,startdate,enddate,reviewdate,deffeedback,reqscore,reqscoreaid,avail,allowlate FROM imas_assessments WHERE id='$typeid'";
 			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			  
@@ -310,6 +310,8 @@
 				   if (isset($teacherid)) { 
 					echo " <i><a href=\"addquestions.php?aid=$typeid&cid=$cid\">Questions</a></i> | <a href=\"addassessment.php?id=$typeid&block=$parent&cid=$cid\">Settings</a></i> \n";
 					echo " | <a href=\"gradebook.php?cid=$cid&asid=average&aid=$typeid\">Grades</a>";
+				   } else if ($line['allowlate']==1 && $latepasses>0) {
+					echo " <a href=\"redeemlatepass.php?cid=$cid&aid=$typeid\">Use LatePass</a>";
 				   }
 				   echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
 				   echo "</div>\n";
@@ -325,10 +327,10 @@
 				   if (isset($teacherid)) { 
 				   	echo " <i><a href=\"addquestions.php?aid=$typeid&cid=$cid\">Questions</a></i> | <a href=\"addassessment.php?id=$typeid&block=$parent&cid=$cid\">Settings</a>\n";
 					echo " | <a href=\"gradebook.php?cid=$cid&asid=average&aid=$typeid\">Grades</a>";
-				   }
+				   } 
 				   echo filter("<br/><i>This assessment is in review mode - no scores will be saved</i></div><div class=itemsum>{$line['summary']}</div>\n");
 				   echo "</div>\n";
-			   } else if (isset($teacherid)) {
+			   } else if (isset($teacherid)) { //not avail to stu
 				   if ($line['avail']==0) {
 					   $show = "Hidden";
 				   } else {

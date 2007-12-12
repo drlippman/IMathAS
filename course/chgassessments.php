@@ -56,6 +56,13 @@ if (!(isset($teacherid))) {
 				$turnoffshuffle +=8;
 			}
 		}
+		if (isset($_POST['chgallowlate'])) {
+			if (isset($_POST['allowlate'])) {
+				$allowlate = 1;
+			} else {
+				$allowlate = 0;
+			}
+		}
 		if ($_POST['skippenalty']==10) {
 			$_POST['defpenalty'] = 'L'.$_POST['defpenalty'];
 		} else if ($_POST['skippenalty']>0) {
@@ -89,6 +96,9 @@ if (!(isset($teacherid))) {
 		}
 		if (isset($_POST['chggbcat'])) {
 			$sets[] = "gbcategory='{$_POST['gbcat']}'";
+		}
+		if (isset($_POST['chgallowlate'])) {
+			$sets[] = "allowlate='$allowlate'";
 		}
 		if (isset($_POST['chgintro'])) {
 			$query = "SELECT intro FROM imas_assessments WHERE id='{$_POST['intro']}'";
@@ -361,6 +371,11 @@ function chkAll(frm, arr, mark) {
 				<td><input type="checkbox" name="chgsamever"/></td>
 				<td class="r">All students same version of questions: </td>
 				<td><input type="checkbox" name="samever"></td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" name="chgallowlate"/></td>
+				<td class="r">Allow use of LatePasses?: </td>
+				<td><input type="checkbox" name="allowlate" checked="1"></td>
 			</tr>
 			<tr>
 				<td><input type="checkbox" name="chggbcat"/></td>

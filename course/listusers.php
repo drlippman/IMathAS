@@ -391,7 +391,8 @@ if ($overwriteBody==1) {
 		Import Students from File</a><br/>
 		<a href="listusers.php?cid=<?php echo $cid ?>&enroll=student">Enroll Student with known username</a><br/>
 		<a href="listusers.php?cid=<?php echo $cid ?>&newstu=new">Create and Enroll new student</a><br/>
-		<a href="listusers.php?cid=<?php echo $cid ?>&assigncode=1">Assign Sections and/or Codes</a>
+		<a href="listusers.php?cid=<?php echo $cid ?>&assigncode=1">Assign Sections and/or Codes</a><br/>
+		<a href="latepasses.php?cid=<?php echo $cid ?>">Manage LatePasses</a>
 	</div>
 		
 <?php

@@ -6,6 +6,9 @@ Upgrade Notes
 
 *** Database Changes ***
 
+ALTER TABLE `imas_students` ADD `latepass` TINYINT( 2 ) UNSIGNED NOT NULL DEFAULT '0';
+ALTER TABLE `imas_assessments` ADD `allowlate` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '1';
+
 ALTER TABLE `imas_questionset` ADD `ancestors` TEXT NOT NULL ;
 ALTER TABLE `imas_gbscheme` ADD `usersort` TINYINT( 1 ) NOT NULL DEFAULT '0';
 
