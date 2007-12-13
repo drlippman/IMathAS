@@ -422,7 +422,7 @@
 <?php
 	if ($isteacher && $grpaid>0) {
 		$curfilter = $sessiondata['ffilter'.$forumid];
-		$query = "SELECT DISTINCT agroupid FROM imas_assessment_sessions WHERE assessmentid='$grpaid' ORDER BY agroupid";
+		$query = "SELECT agroupid,userid FROM imas_assessment_sessions WHERE assessmentid='$grpaid' ORDER BY agroupid";
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		echo "<script type=\"text/javascript\">";
 		echo 'function chgfilter() {';
@@ -434,11 +434,17 @@
 		if ($curfilter==0) { echo 'selected="1"';}
 		echo '>All groups</option>';
 		$grpcnt = 1;
+		$groupnums = array();
+		$lastagroupid = -1;
 		while ($row = mysql_fetch_row($result)) {
-			echo "<option value=\"{$row[0]}\" ";
-			if ($curfilter==$row[0]) { echo 'selected="1"';}
-			echo ">$grpcnt</option>";
-			$grpcnt++;
+			if ($row[0]!=$lastagroupid) {
+				echo "<option value=\"{$row[0]}\" ";
+				if ($curfilter==$row[0]) { echo 'selected="1"';}
+				echo ">$grpcnt</option>";
+				$grpcnt++;
+				$lastagroupid = $row[0];
+			}
+			$groupnums[$row[1]] = $grpcnt-1;
 		}
 		echo '</select></p>';
 	}
@@ -467,7 +473,13 @@
 ?>
 	<table class=forum>
 	<thead>
-	<tr><th>Topic</th><th>Replies</th><th>Views (Unique)</th><th>Last Post Date</th></tr>
+	<tr><th>Topic</th>
+<?php
+	if ($isteacher && $grpaid>0 && !$dofilter) {
+		echo '<th>Group</th>';
+	}
+?>
+	<th>Replies</th><th>Views (Unique)</th><th>Last Post Date</th></tr>
 	</thead>
 	<tbody>
 <?php
@@ -540,6 +552,9 @@
 		echo "<b><a href=\"posts.php?cid=$cid&forum=$forumid&thread={$line['id']}&page=$page\">{$line['subject']}</a></b>: {$line['LastName']}, {$line['FirstName']}";
 		
 		echo "</td>\n";
+		if ($isteacher && $grpaid>0 && !$dofilter) {
+			echo '<td class=c>'.$groupnums[$line['userid']].'</td>';
+		}
 		
 		echo "<td class=c>$posts</td><td class=c>{$line['views']} ({$uniqviews[$line['id']]})</td><td class=c>$lastpost ";
 		if ($lastpost=='' || $maxdate[$line['id']]>$lastview[$line['id']]) {

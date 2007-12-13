@@ -730,7 +730,11 @@
 		
 		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 		echo "&gt; <a href=\"gradebook.php?stu=0&gbmode=$gbmode&cid=$cid\">Gradebook</a> ";
-		if ($stu>0) {echo "&gt; <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid\">Student Detail</a> ";}
+		if ($stu>0) {
+			echo "&gt; <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid\">Student Detail</a> ";
+		} else if ($_GET['from']=="isolate") {
+			echo "&gt; <a href=\"isolateassessgrade.php?gbmode=$gbmode&cid=$cid&aid={$_GET['aid']}\">View Scores</a> ";	
+		}
 		echo "&gt; Detail</div>";
 		echo "<h2>Grade Book Detail</h2>\n";
 		$query = "SELECT FirstName,LastName FROM imas_users WHERE id='{$_GET['uid']}'";
@@ -1556,6 +1560,7 @@
 					if ($isteacher && $isdisp) {
 						if (isset($assessments[$k])) {
 							$gb[0][$pos] .= "<br/><a class=small href=\"addassessment.php?id={$assessments[$k]}&cid=$cid&from=gb\">[Settings]</a>";
+							$gb[0][$pos] .= "<br/><a class=small href=\"isolateassessgrade.php?cid=$cid&gbmode=$gbmode&aid={$assessments[$k]}\">[Isolate]</a>";
 						} else if (isset($grades[$k])) {
 							$gb[0][$pos] .= "<br/><a class=small href=\"addgrades.php?stu=$stu&cid=$cid&gbmode=$gbmode&grades=all&gbitem={$grades[$k]}\">[Settings]</a>";
 						} else if (isset($discuss[$k])) {

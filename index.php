@@ -77,7 +77,7 @@ if (count($page_currentUserCourseIds)>0) {
 		$i++;
 	}
 	
-	$query .= ") GROUP BY imas_forum_posts.threadid HAVING ((max(imas_forum_posts.postdate)>mfv.lastview) OR (mfv.lastview IS NULL))) AS newitems ";
+	$query .= ") AND imas_forums.grpaid=0 GROUP BY imas_forum_posts.threadid HAVING ((max(imas_forum_posts.postdate)>mfv.lastview) OR (mfv.lastview IS NULL))) AS newitems ";
 	$query .= "GROUP BY courseid";
 	
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
