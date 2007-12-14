@@ -5,7 +5,13 @@
 	require("../validate.php");
 	$cid = $_GET['cid'];
 	$aid = $_GET['aid'];
+	
+	$query = "SELECT latepasshrs FROM imas_courses WHERE id='$cid'";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$hours = mysql_result($result,0,0);
+		
 	if (isset($_GET['confirm'])) {
+		$addtime = $hours*60*60;
 		$query = "SELECT allowlate,enddate,startdate FROM imas_assessments WHERE id='$aid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		list($allowlate,$enddate,$startdate) =mysql_fetch_row($result);
@@ -16,10 +22,10 @@
 				$query = "SELECT enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				if (mysql_num_rows($result)>0) { //already have exception
-					$query = "UPDATE imas_exceptions SET enddate=enddate+86400 WHERE userid='$userid' AND assessmentid='$aid'";
+					$query = "UPDATE imas_exceptions SET enddate=enddate+$addtime WHERE userid='$userid' AND assessmentid='$aid'";
 					mysql_query($query) or die("Query failed : " . mysql_error());
 				} else {
-					$enddate = $enddate + 86400;
+					$enddate = $enddate + $addtime;
 					$query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate) VALUES ('$userid','$aid','$startdate','$enddate')";
 					mysql_query($query) or die("Query failed : " . mysql_error());
 				}
@@ -41,7 +47,7 @@
 		} else {
 			echo "<h3>Redeem LatePass</h3>";
 			echo "<form method=post action=\"redeemlatepass.php?cid=$cid&aid=$aid&confirm=true\">";
-			echo "<p>You have $numlatepass LatePass(es) remaining.  You can redeem one LatePass for a one-day ";
+			echo "<p>You have $numlatepass LatePass(es) remaining.  You can redeem one LatePass for a $hours hour ";
 			echo "extension on this assessment.  Are you sure you want to redeem a LatePass?</p>";
 			echo "<input type=submit value=\"Yes, Redeem LatePass\"/>";
 			echo "<input type=button value=\"Nevermind\" onclick=\"window.location='course.php?cid=$cid'\"/>";

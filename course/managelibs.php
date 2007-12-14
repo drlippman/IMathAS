@@ -656,8 +656,8 @@ function printlist($parent) {
 					echo "<a href=\"managelibs.php?cid=$cid&modify=$child\">Modify</a> | ";
 					echo "<a href=\"managelibs.php?cid=$cid&remove=$child\">Delete</a> | ";
 					echo "<a href=\"managelibs.php?cid=$cid&transfer=$child\">Transfer</a> | ";
-					echo "<a href=\"managelibs.php?cid=$cid&modify=new&parent=$child\">Add Sub</a> ";
 				}
+				echo "<a href=\"managelibs.php?cid=$cid&modify=new&parent=$child\">Add Sub</a> ";
 				echo "<ul class=hide id=$child>\n";
 				echo "</span>";
 				$count++;
@@ -676,7 +676,11 @@ function printlist($parent) {
 					echo "<a href=\"managelibs.php?cid=$cid&remove=$child\">Delete</a> | ";
 					echo "<a href=\"managelibs.php?cid=$cid&transfer=$child\">Transfer</a> | ";
 				}
-				echo "<a href=\"reviewlibrary.php?cid=$cid&lib=$child\">Preview</a>";
+				if ($qcount[$child]==0) {
+					echo "<a href=\"managelibs.php?cid=$cid&modify=new&parent=$child\">Add Sub</a> ";
+				} else {
+					echo "<a href=\"reviewlibrary.php?cid=$cid&lib=$child\">Preview</a>";
+				}
 				echo "</span>";
 				echo "</li>\n";
 				

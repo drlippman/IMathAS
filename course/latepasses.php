@@ -17,6 +17,8 @@
 			$query = "UPDATE imas_students SET latepass='$lp' WHERE userid='$uid' AND courseid='$cid'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		}
+		$query = "UPDATE imas_courses SET latepasshrs='{$_POST['hours']}' WHERE id='$cid'";
+		mysql_query($query) or die("Query failed : " . mysql_error());
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
 		exit;
 	}
@@ -88,7 +90,7 @@ function sendtoall(type) {
 	  var form=document.getElementById("mainform");
 	  for (var e = 0; e<form.elements.length; e++) {
 	      var el = form.elements[e];
-	      if (el.type=="text" && el.id!="toall") {
+	      if (el.type=="text" && el.id!="toall" && el.id!="hours") {
 		      if (type==0) {
 			       el.value = parseInt(el.value) + parseInt(document.getElementById("toall").value);
 		      } else if (type==1) {
@@ -123,6 +125,10 @@ function sendtoall(type) {
 		if ($hassection) {
 			echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 		}
+		$query = "SELECT latepasshrs FROM imas_courses WHERE id='$cid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$hours = mysql_result($result,0,0);
+		echo "<p>Late Passes extend the due date by <input type=text size=3 name=\"hours\" id=\"hours\" value=\"$hours\"/> hours</p>";
 		echo "<p>To all:  <input type=\"text\" value=\"1\" id=\"toall\"/> ";
 		echo '<input type=button value="Add" onClick="sendtoall(0);"/> <input type=button value="Replace" onclick="sendtoall(1)"/><p>';
 		echo "<table id=myTable><thead><tr><th>Name</th>";
