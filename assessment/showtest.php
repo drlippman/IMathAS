@@ -16,6 +16,7 @@
 	include("displayq2.php");
 	include("testutil.php");
 	include("asidutil.php");
+	$inexception = false;
 	//error_reporting(0);  //prevents output of error messages
 	
 	//check to see if test starting test or returning to test
@@ -46,6 +47,10 @@
 							echo "Assessment is closed";
 							exit;
 						}
+					}
+				} else { //in exception
+					if ($adata['enddate']<$now) { //exception is for past-due-date
+						$inexception = true;	
 					}
 				}
 			} else { //no exception
@@ -217,6 +222,10 @@
 						echo "<br/><a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to course page</a>";
 						exit;
 					}
+				}
+			} else { //in exception
+				if ($adata['enddate']<$now) { //exception is for past-due-date
+					$inexception = true;	
 				}
 			}
 		} else { //no exception

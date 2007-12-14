@@ -100,6 +100,9 @@ if (!(isset($teacherid))) {
 		if (isset($_POST['chgallowlate'])) {
 			$sets[] = "allowlate='$allowlate'";
 		}
+		if (isset($_POST['chgexcpen'])) {
+			$sets[] = "exceptionpenalty='{$_POST['exceptionpenalty']}'";
+		}
 		if (isset($_POST['chgintro'])) {
 			$query = "SELECT intro FROM imas_assessments WHERE id='{$_POST['intro']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -377,6 +380,12 @@ function chkAll(frm, arr, mark) {
 				<td class="r">Allow use of LatePasses?: </td>
 				<td><input type="checkbox" name="allowlate" checked="1"></td>
 			</tr>
+			<tr>
+				<td><input type="checkbox" name="chgexcpen"/></td>
+				<td class="r">Penalty for questions done while in exception/LatePass: </td>
+				<td><input type="text" name="exceptionpenalty" size=4 value="0"></td>
+			</tr>
+			
 			<tr>
 				<td><input type="checkbox" name="chggbcat"/></td>
 				<td class="r">Gradebook category: </td>

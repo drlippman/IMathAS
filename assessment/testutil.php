@@ -36,7 +36,11 @@ function getquestioninfo($qns,$testsettings) {
 //attempts: scalar attempts on question
 //testsettings: assoc array of assessment settings
 function calcpointsafterpenalty($frac,$qi,$testsettings,$attempts) {
+	global $inexception;
 	$points = $qi['points'];
+	if ($inexception) {
+		$points = $points*(1-$testsettings['exceptionpenalty']/100);
+	}
 	$penalty = $qi['penalty'];
 	$lastonly = $false;
 	$skipsome = 0;

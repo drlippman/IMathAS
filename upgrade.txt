@@ -6,6 +6,8 @@ Upgrade Notes
 
 *** Database Changes ***
 
+ALTER TABLE `imas_assessments` ADD `exceptionpenalty` TINYINT( 2 ) NOT NULL DEFAULT '0';
+
 ALTER TABLE `imas_courses` ADD `latepasshrs` SMALLINT( 4 ) UNSIGNED NOT NULL DEFAULT '24';
 
 ALTER TABLE `imas_students` ADD `latepass` TINYINT( 2 ) UNSIGNED NOT NULL DEFAULT '0';
