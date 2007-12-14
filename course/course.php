@@ -204,10 +204,12 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		}
 	}
 	//get latepasses
-	if (!isset($teacherid)) {
+	if (!isset($teacherid) && $previewshift==-1) {
 	   $query = "SELECT latepass FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
 	   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	   $latepasses = mysql_result($result,0,0);
+	} else {
+		$latepasses = 0;
 	}
 }
   
