@@ -36,6 +36,16 @@
 	} else {
 		$stu = 0;
 	}
+	if (isset($_GET['secfilter'])) {
+		$secfilter = $_GET['secfilter'];
+		$sessiondata[$cid.'secfilter'] = $secfilter;
+		writesessiondata();
+	} else if (isset($sessiondata[$cid.'secfilter'])) {
+		$secfilter = $sessiondata[$cid.'secfilter'];
+	} else {
+		$secfilter = -1;
+	}
+	
 		
 	if (isset($_GET['export']) && $_GET['export']=="true") {
 		list($gb) = gbtable(false);
@@ -312,6 +322,13 @@
 			$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid&gbmode=$gbmode";
 			
 			$placeinhead .= "       var toopen = '$address&catfilter=' + cat;\n";
+			$placeinhead .= "  	window.location = toopen; \n";
+			$placeinhead .= "}\n";
+			$placeinhead .= 'function chgsecfilter() { ';
+			$placeinhead .= '       var sec = document.getElementById("secfiltersel").value; ';
+			$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid&gbmode=$gbmode";
+			
+			$placeinhead .= "       var toopen = '$address&secfilter=' + sec;\n";
 			$placeinhead .= "  	window.location = toopen; \n";
 			$placeinhead .= "}\n";
 			$placeinhead .= 'function chgtoggle() { ';
@@ -1282,7 +1299,7 @@
 	}
 	
 	function gbtable($isdisp) {
-		global $cid,$isteacher,$istutor,$tutorid,$userid,$gbmode,$nopracticet,$curonly,$hidenc,$catfilter,$stu;
+		global $cid,$isteacher,$istutor,$tutorid,$userid,$gbmode,$nopracticet,$curonly,$hidenc,$catfilter,$stu,$secfilter;
 		if ($isteacher && func_num_args()>1) {
 			$limuser = func_get_arg(1);
 		} else if (!$isteacher && !$istutor) {
@@ -1343,7 +1360,20 @@
 			$hascode = false;
 		}
 		if ($hassection) {
-			$gb[0][] = "Section";
+			$val = "<select id=\"secfiltersel\" onchange=\"chgsecfilter()\"><option value=\"-1\" ";
+			if ($secfilter==-1) { $val .= 'selected=1';}
+			$val .= '>All</option>';
+			$query = "SELECT DISTINCT section FROM imas_students WHERE courseid='$cid' ORDER BY section";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				$val .= "<option value=\"{$row[0]}\" ";
+				if ($row[0]==$secfilter) {
+					$val .= 'selected=1';
+				}
+				$val .= ">{$row[0]}</option>";
+			}
+			$val .= "</select>";
+			$gb[0][] = "Section<br/>$val";
 			$shift++;
 		}
 		if ($hascode) {
@@ -1596,6 +1626,8 @@
 						$gb[0][$pos] .= "<br/><a class=small href=\"addassessment.php?id={$assessments[$k]}&cid=$cid&from=gb\">[Settings]</a>";
 					} else if (isset($grades[$k])) {
 						$gb[0][$pos] .= "<br/><a class=small href=\"addgrades.php?stu=$stu&cid=$cid&gbmode=$gbmode&grades=all&gbitem={$grades[$k]}\">[Settings]</a>";
+					} else if (isset($discuss[$k])) {
+						$gb[0][$pos] .= "<br/><a class=small href=\"addforum.php?id={$discuss[$k]}&cid=$cid&from=gb\">[Settings]</a>";
 					}
 				}
 				$pos++;
@@ -1684,6 +1716,9 @@
 		//$query .= "FROM imas_users,imas_teachers WHERE imas_users.id=imas_teachers.userid AND imas_teachers.courseid='$cid' ";
 		//if (!$isteacher && !isset($tutorid)) {$query .= "AND imas_users.id='$userid' ";}
 		if ($limuser>0) { $query .= "AND imas_users.id='$limuser' ";}
+		if ($secfilter!=-1) {
+			$query .= "AND imas_students.section='$secfilter' ";
+		}
 		if ($isdiag) {
 			$query .= "ORDER BY imas_users.email,imas_users.LastName,imas_users.FirstName";
 		} else if ($hassection && $usersort==0) {

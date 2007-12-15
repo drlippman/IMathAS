@@ -50,6 +50,7 @@ function settool(curel,tarnum,mode) {
 		mycel[i].className = '';
 	}
 	curel.className = "sel";
+	
 	setDrawMode(tarnum,mode);
 }
 function setDrawMode(tarnum,mode) {
@@ -102,7 +103,7 @@ function drawTarget(x,y) {
 		ctx.beginPath();
 		for (var i=0;i<lines[curTarget].length; i++) {
 			for (var j=0;j<lines[curTarget][i].length; j++) {
-				if ((i==0 && j==0) || Math.pow((lines[curTarget][i][j][0] - lines[curTarget][i][0][0]),2)+Math.pow((lines[curTarget][i][j][1] - lines[curTarget][i][0][1]),2)>25) {
+				if ((j==0) || Math.pow((lines[curTarget][i][j][0] - lines[curTarget][i][0][0]),2)+Math.pow((lines[curTarget][i][j][1] - lines[curTarget][i][0][1]),2)>25) {
 					ctx.moveTo(lines[curTarget][i][j][0]+5,lines[curTarget][i][j][1]);
 					ctx.arc(lines[curTarget][i][j][0],lines[curTarget][i][j][1],5,0,Math.PI*2,true);
 				}

@@ -468,6 +468,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (is_array($options['questions'][$qn])) {$questions = $options['questions'][$qn];} else {$questions = $options['questions'];}
 		if (isset($options['answers'])) {if (is_array($options['answers'])) {$answers = $options['answers'][$qn];} else {$answers = $options['answers'];}}
 		if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$qn];} else {$noshuffle = $options['noshuffle'];}}
+		if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$qn];} else {$displayformat = $options['displayformat'];}}
 		
 		if (!is_array($questions)) {
 			echo "Eeek!  \$questions is not defined or needs to be an array";
@@ -481,13 +482,36 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$randkeys = array_rand($questions,count($questions));
 		}
 		$labits = explode('|',$la);
-		$out .= "<ul class=nomark>";
-		for ($i=0; $i < count($randkeys); $i++) {
-			$out .= "<li><input type=checkbox name=\"qn$qn"."[$i]\" value=$i ";
-			if (($labits[$i]!='') && ($labits[$i] == $i)) { $out .= "CHECKED";}
-			$out .= ">{$questions[$randkeys[$i]]}</li> \n";
+		if ($displayformat == "horiz") {
+			
+		} else if ($displayformat == "inline") {
+			
+		} else {
+			$out .= "<ul class=nomark>";
 		}
-		$out .= "</ul>";
+		for ($i=0; $i < count($randkeys); $i++) {
+			if ($displayformat == "horiz") {
+				$out .= "<div class=choice>{$questions[$randkeys[$i]]}<br/>";
+				$out .= "<input type=checkbox name=\"qn$qn"."[$i]\" value=$i ";
+				if (($labits[$i]!='') && ($labits[$i] == $i)) { $out .= "CHECKED";}
+				$out .= "></div> \n";
+			} else if ($displayformat == "inline") {
+				$out .= "<input type=checkbox name=\"qn$qn"."[$i]\" value=$i ";
+				if (($labits[$i]!='') && ($labits[$i] == $i)) { $out .= "CHECKED";}
+				$out .= ">{$questions[$randkeys[$i]]} ";
+			} else {
+				$out .= "<li><input type=checkbox name=\"qn$qn"."[$i]\" value=$i ";
+				if (($labits[$i]!='') && ($labits[$i] == $i)) { $out .= "CHECKED";}
+				$out .= ">{$questions[$randkeys[$i]]}</li> \n";
+			}
+		}
+		if ($displayformat == "horiz") {
+			$out .= "<div class=spacer>&nbsp;</div>\n";
+		} else if ($displayformat == "inline") {
+			
+		} else {
+			$out .= "</ul>\n";
+		}
 		$tip = "Select all correct answers";
 		if (isset($answers)) {
 			$akeys = explode(',',$answers);
@@ -978,6 +1002,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		} else if (!is_array($answerformat)) {
 			$answerformat = explode(',',$answerformat);
 		}
+		$dotline = 0;
 		$out .= "<canvas class=\"drawcanvas\" id=\"canvas$qn\" width=\"{$settings[6]}\" height=\"{$settings[7]}\"></canvas>";
 		$out .= "<div><span id=\"drawtools$qn\" class=\"drawtools\">";
 		$out .= "<span onclick=\"clearcanvas($qn)\">Clear All</span> Draw: ";
@@ -993,7 +1018,10 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 				$out .= "onclick=\"settool(this,$qn,1)\">Dot</span>";
 			} else if ($answerformat[$i]=='opendot') {
 				$out .= "onclick=\"settool(this,$qn,2)\">Open Dot</span>";
-			}
+			} else if ($answerformat[$i]=='polygon') {
+				$out .= "onclick=\"settool(this,$qn,0)\">Polygon</span>";
+				$dotline = 1;
+			} 
 		}
 		if ($answerformat[0]=='line') {
 			$def = 0;
@@ -1001,8 +1029,10 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$def = 1;
 		} else if ($answerformat[0]=='opendot') {
 			$def = 2;
+		} else if ($answerformat[0]=='polygon') {
+			$def = 0;
 		}
-		$dotline = 0;
+		
 		$out .= '</span></div>';
 		$out .= "<input type=\"hidden\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" />";
 		$out .= "<script>canvases[canvases.length] = [$qn,'$bg',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline];";
@@ -1031,7 +1061,13 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 						$saarr[$k] .= ','.$function[1].','.$function[2];
 					}
 				}
-			
+			}
+			if ($answerformat[0]=="polygon") {
+				for($i=0;$i<count($answers)-1;$i++) {
+					$pt1 = explode(',',$answers[$i]);
+					$pt2 = explode(',',$answers[$i+1]);
+					$saarr[] = "[{$pt1[0]}+t*({$pt2[0]}-({$pt1[0]})),{$pt1[1]}+t*({$pt2[1]}-({$pt1[1]}))],blue,0,1";
+				}
 			}
 			if ($backg!='') {
 				if (!is_array($backg)) {
@@ -1361,6 +1397,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$qn];} else {$reltolerance = $options['reltolerance'];}}
 		if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$qn];} else {$abstolerance = $options['abstolerance'];}}
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
+		if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$qn];} else {$requiretimes = $options['requiretimes'];}}
 		
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = .001;}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
@@ -1368,6 +1405,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$GLOBALS['partlastanswer'] = $givenans;
 		} else if ($anstype=='calcntuple') {
 			$GLOBALS['partlastanswer'] = $_POST["tc$qn"];
+			//test for correct format, if specified
+			if (checkreqtimes($_POST["tc$qn"],$requiretimes)==0) {
+				return 0;
+			}
 		}
 		if ($givenans == null) {return 0;}
 		$answer = str_replace(' ','',$answer);
@@ -1431,36 +1472,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$GLOBALS['partlastanswer'] = $_POST["tc$qn"];
 		if ($givenans == null) {return 0;}
 		
-		$cleanans = preg_replace('/[^\w\*\/\+\-\(\)\[\],\.\^]+/','',$_POST["tc$qn"]);
-		//if entry used pow or exp, we want to replace them with their asciimath symbols for requiretimes purposes
-		$cleanans = str_replace("pow","^",$cleanans);
-		$cleanans = str_replace("exp","e",$cleanans);
-		if ($requiretimes != '') {
-			$list = explode(",",$requiretimes);
-			for ($i=0;$i < count($list);$i+=2) {
-				$comp = substr($list[$i+1],0,1);
-				$num = intval(substr($list[$i+1],1));
-				
-				if ($list[$i]=='#') {
-					$nummatch = preg_match_all('/[\d\.]+/',$cleanans,$m);
-				} else {
-					$nummatch = substr_count($cleanans,$list[$i]);
-				}
-				
-				if ($comp == "=") {
-					if ($nummatch!=$num) {
-						return 0;
-					}
-				} else if ($comp == "<") {
-					if ($nummatch>=$num) {
-						return 0;
-					}
-				} else if ($comp == ">") {
-					if ($nummatch<=$num) {
-						return 0;
-					}
-				}
-			}
+		if (checkreqtimes($_POST["tc$qn"],$requiretimes)==0) {
+			return 0;
 		}
 		
 		$ansformats = explode(',',$answerformat);
@@ -1626,12 +1639,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$GLOBALS['partlastanswer'] = $_POST["tc$qn"];
 		$correct = true;
 		
-		//clean out any non-math junk
-		$cleanans = preg_replace('/[^\w\*\/\+\-\(\)\[\],\.\^]+/','',$_POST["tc$qn"]);
-		//if entry used pow or exp, we want to replace them with their asciimath symbols for requiretimes purposes
-		$cleanans = str_replace("pow","^",$cleanans);
-		$cleanans = str_replace("exp","e",$cleanans);
-		
+		//test for correct format, if specified
+		if (checkreqtimes($_POST["tc$qn"],$requiretimes)==0) {
+			return 0;
+		}
 		$answer = preg_replace('/[^\w\*\/\+\=\-\(\)\[\]\{\}\,\.\^\$\!]+/','',$answer);
 
 		if ($answerformat=="equation") {
@@ -1640,36 +1651,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		} else if ($answerformat=="toconst") {
 			unset($diffs);
 		}
-
-
-		//test for correct format, if specified
-		if ($requiretimes != '') {
-			$list = explode(",",$requiretimes);
-			for ($i=0;$i < count($list);$i+=2) {
-				$comp = substr($list[$i+1],0,1);
-				$num = intval(substr($list[$i+1],1));
-				
-				if ($list[$i]=='#') {
-					$nummatch = preg_match_all('/[\d\.]+/',$cleanans,$m);
-				} else {
-					$nummatch = substr_count($cleanans,$list[$i]);
-				}
-				
-				if ($comp == "=") {
-					if ($nummatch!=$num) {
-						$correct = false;
-					}
-				} else if ($comp == "<") {
-					if ($nummatch>=$num) {
-						$correct = false;
-					}
-				} else if ($comp == ">") {
-					if ($nummatch<=$num) {
-						$correct = false;
-					}
-				}
-			}
-		}
+		
 		if (!isset($variables)) { $variables = "x";}
 		$variables = explode(",",$variables);
 		$ofunc = array();
@@ -1693,7 +1675,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$answer = mathphp($answer,$vlist);
 		
 		for($i=0; $i < count($variables); $i++) {
-			//$cleanans = str_replace("(".$variables[$i].")",'($tp['.$i.'])',$cleanans);
 			$answer = str_replace("(".$variables[$i].")",'($tp['.$i.'])',$answer);
 		}
 
@@ -1849,12 +1830,17 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}
 		if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$qn];} else {$reltolerance = $options['reltolerance'];}}
 		if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$qn];} else {$abstolerance = $options['abstolerance'];}}
+		if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$qn];} else {$requiretimes = $options['requiretimes'];}}
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = .001;}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		if ($anstype == 'interval') {
 			$GLOBALS['partlastanswer'] = $givenans;
 		} else if ($anstype == 'calcinterval') {
 			$GLOBALS['partlastanswer'] = $_POST["tc$qn"];
+			//test for correct format, if specified
+			if (checkreqtimes($_POST["tc$qn"],$requiretimes)==0) {
+				return 0;
+			}
 		}
 		if ($givenans == null) {return 0;}
 		$correct = 0;
@@ -1936,6 +1922,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 		if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$qn];} else {$reltolerance = $options['reltolerance'];}}
 		if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$qn];} else {$abstolerance = $options['abstolerance'];}}
+		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if (!isset($reltolerance)) { $reltolerance = 1; }
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$GLOBALS['partlastanswer'] = $givenans;
@@ -1962,6 +1949,94 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (!is_array($answers)) {
 			settype($answers,"array");
 		}
+		if ($answerformat=="polygon") {
+			foreach ($answers as $key=>$function) {
+				$function = explode(',',$function);
+				$pixx = ($function[0] - $settings[0])*$pixelsperx + $imgborder;
+				$pixy = $settings[7] - ($function[1]-$settings[2])*$pixelspery - $imgborder;	
+				$ansdots[$key] = array($pixx,$pixy);
+			}
+			$isclosed = false;
+			if (abs($ansdots[0][0]-$ansdots[count($ansdots)-1][0])<.01 && abs($ansdots[0][1]-$ansdots[count($ansdots)-1][1])<.01) {
+				$isclosed = true;
+				array_pop($ansdots);
+			}
+			list($lines,$dots,$odots) = explode(';;',$givenans);
+			if ($lines=='') {
+				$line = array();
+			} else {
+				$lines = explode(';',$lines);
+				$line = $lines[0]; //only use first line
+				$line = explode('),(',substr($line,1,strlen($line)-2));
+				foreach ($line as $j=>$pt) {
+					$line[$j] = explode(',',$pt);
+				}
+				if ($isclosed && ($line[0][0]-$line[count($line)-1][0])*($line[0][0]-$line[count($line)-1][0]) + ($line[0][1]-$line[count($line)-1][1])*($line[0][1]-$line[count($line)-1][1]) <=25) {
+					array_pop($line);
+				}
+			}
+			
+			
+			$matchstu = array();
+			for ($i=0; $i<count($ansdots); $i++) {
+				for ($j=0;$j<count($line);$j++) {
+					if (($ansdots[$i][0]-$line[$j][0])*($ansdots[$i][0]-$line[$j][0]) + ($ansdots[$i][1]-$line[$j][1])*($ansdots[$i][1]-$line[$j][1]) <=25) {
+						$matchstu[$i] = $j;
+					}
+				}
+			}
+			if ($isclosed && isset($matchstu[0])) {
+				$matchstu[count($ansdots)] = $matchstu[0];
+			}
+			
+			$totaladj = 0;  $correctadj = 0;
+			for ($i =0;$i<count($ansdots) - ($isclosed?0:1);$i++) {
+				$totaladj++;
+				/*if ($i==count($ansdots)-1) {
+					if (!isset($matchstu[$i]) || !isset($matchstu[0])) {
+						$diff = -1;
+					} else {
+						$diff = abs($matchstu[0]-$matchstu[$i]);
+					}
+				} else {
+				*/
+					if (!isset($matchstu[$i]) || !isset($matchstu[$i+1])) {
+						$diff = -1;
+					} else {
+						$diff = abs($matchstu[$i]-$matchstu[$i+1]);
+					}
+					
+				//}
+				if ($diff==1 || ($isclosed && $diff == count($matchstu)-2 && count($matchstu)!=0)) {
+					$correctadj++;
+				}
+			}
+			//echo "Total adjacencies: $totaladj.  Correct: $correctadj <br/>";
+			
+			if ($isclosed && isset($matchstu[0])) {
+				$vals = (count($matchstu)-1)/max(count($line),count($ansdots));
+			} else {
+				$vals = (count($matchstu))/max(count($line),count($ansdots));
+			}
+
+			$adjv = $correctadj/$totaladj;
+			
+			$totscore = ($vals+$adjv)/2;
+			//echo "Vals score: $vals, adj score: $adjv. </p>";
+
+			if (isset($abstolerance)) {
+				if ($totscore<$abstolerance) {
+					return 0;
+				} else {
+					return 1;
+				}
+			} else {
+				return $totscore;
+			}
+			
+		}
+		//not polygon, continue
+		
 		//evaluate all the functions in $answers
 		foreach ($answers as $key=>$function) {
 			if ($function=='') { continue; }
@@ -2228,4 +2303,38 @@ function isNaN( $var ) {
      //return ($var!==$var || $var*2==$var);
 }
 
+function checkreqtimes($tocheck,$rtimes) {
+	$cleanans = preg_replace('/[^\w\*\/\+\-\(\)\[\],\.\^]+/','',$tocheck);
+	//if entry used pow or exp, we want to replace them with their asciimath symbols for requiretimes purposes
+	$cleanans = str_replace("pow","^",$cleanans);
+	$cleanans = str_replace("exp","e",$cleanans);
+	if ($rtimes != '') {
+		$list = explode(",",$rtimes);
+		for ($i=0;$i < count($list);$i+=2) {
+			$comp = substr($list[$i+1],0,1);
+			$num = intval(substr($list[$i+1],1));
+			
+			if ($list[$i]=='#') {
+				$nummatch = preg_match_all('/[\d\.]+/',$cleanans,$m);
+			} else {
+				$nummatch = substr_count($cleanans,$list[$i]);
+			}
+			
+			if ($comp == "=") {
+				if ($nummatch!=$num) {
+					return 0;
+				}
+			} else if ($comp == "<") {
+				if ($nummatch>=$num) {
+					return 0;
+				}
+			} else if ($comp == ">") {
+				if ($nummatch<=$num) {
+					return 0;
+				}
+			}
+		}
+	}
+	return 1;
+}
 ?>

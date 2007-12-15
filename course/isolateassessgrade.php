@@ -56,7 +56,7 @@
 	
 	$query = "SELECT iu.LastName,iu.FirstName,istu.section,";
 	$query .= "ias.id,ias.userid,ias.bestscores,ias.starttime,ias.endtime FROM imas_assessment_sessions AS ias,imas_users AS iu,imas_students AS istu ";
-	$query .= "WHERE iu.id = istu.userid AND iu.id=ias.userid AND ias.assessmentid='$aid'";
+	$query .= "WHERE iu.id = istu.userid AND istu.courseid='$cid' AND iu.id=ias.userid AND ias.assessmentid='$aid'";
 	if ($hassection && $sortorder=="sec") {
 		 $query .= " ORDER BY istu.section,iu.LastName,iu.FirstName";
 	} else {

@@ -344,9 +344,9 @@ function showqinfobar($qn,$inreview,$single) {
 	if ($testsettings['showcat']>0 && $qi[$questions[$qn]]['category']!='0') {
 		echo "  Category: {$qi[$questions[$qn]]['category']}.";
 	}
-	if (!$noindivscores) {
-		echo "<br/>Score in gradebook: ".printscore2($bestscores[$qn]).".";
-	}
+	//if (!$noindivscores) {
+	//	echo "<br/>Score in gradebook: ".printscore2($bestscores[$qn]).".";
+	//}
 	if ($single) {
 		echo "<input type=hidden name=\"verattempts\" value=\"{$attempts[$qn]}\" />";
 	} else {
