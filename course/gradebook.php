@@ -1387,7 +1387,7 @@
 			$query .= "AND cntingb>0 ";
 		}
 		if ($hidenc) {
-			$query .= "AND (cntingb=1 OR cntingb=2)";
+			$query .= "AND (cntingb=1 OR cntingb=2) ";
 		}
 		if (!$isteacher || $curonly) {
 			$query .= "AND startdate<$now ";
@@ -1475,7 +1475,7 @@
 			$query .= "AND cntingb>0 ";
 		}
 		if ($hidenc) {
-			$query .= "AND (cntingb=1 OR cntingb=2)";
+			$query .= "AND (cntingb=1 OR cntingb=2) ";
 		}
 		if ($catfilter>-1) {
 			$query .= "AND gbcategory='$catfilter' ";
