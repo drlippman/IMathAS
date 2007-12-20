@@ -1,13 +1,8 @@
 <?php
+//IMathAS: gradebook table generating function
+//(c) 2007 David Lippman
 
-require("../validate.php");
-$cid = 264;
-$isteacher = true;
-$gbt = gbtable();
-print_r($gbt);
-
-
-//this function is used by gbtable - currently already in gradebook.php
+//used by gbtable
 function getpts($sc) {
 	if (strpos($sc,'~')===false) {
 		if ($sc>0) { 
@@ -85,8 +80,8 @@ row[1][1][2][0] = score
 
 row[1][2] category totals
 row[1][2][0][0] = cat total past
-row[1][2][0][0] = cat total past/current
-row[1][2][0][0] = cat total future
+row[1][2][0][1] = cat total past/current
+row[1][2][0][2] = cat total future
 
 row[1][3] total totals
 row[1][3][0] = total possible past
@@ -102,8 +97,8 @@ row[1][4][0] = userid
 
 function gbtable() {
 	global $cid,$isteacher,$istutor,$tutorid,$userid,$catfilter,$secfilter;
-	if ($isteacher && func_num_args()>1) {
-		$limuser = func_get_arg(1);
+	if ($isteacher && func_num_args()>0) {
+		$limuser = func_get_arg(0);
 	} else if (!$isteacher && !$istutor) {
 		$limuser = $userid;
 	} else {
@@ -174,6 +169,7 @@ function gbtable() {
 	$kcnt = 0;
 	$assessments = array();
 	$grades = array();
+	$discuss = array();
 	$timelimits = array();
 	$minscores = array();
 	$assessmenttype = array();
@@ -325,6 +321,9 @@ function gbtable() {
 	$catposscurec = array();
 	$catpossfuture = array();
 	$catpossfutureec = array();
+	$cattotpast = array();
+	$cattotcur = array();
+	$cattotfuture = array();
 	$itemorder = array();
 	$assesscol = array();
 	$gradecol = array();
@@ -345,7 +344,8 @@ function gbtable() {
 		$category = $newcategory;
 	}
 	foreach(array_keys($cats) as $cat) {//foreach category
-		$catposs[$cat] = array();
+		$catposspast[$cat] = array();
+		$catposscur[$cat] =array();
 		$catpossfuture[$cat] = array();
 		$catkeys = array_keys($category,$cat); //pull items in that category
 		if (($orderby&1)==1) { //order by category
@@ -376,7 +376,7 @@ function gbtable() {
 			if (($orderby&1)==1) {  //display item header if displaying by category
 				//$cathdr[$pos] = $cats[$cat][6];
 				$gb[0][1][$pos][0] = $name[$k]; //item name
-				$gb[0][1][$pos][1] = $cats[$cat][0]; //item category name
+				$gb[0][1][$pos][1] = $cats[$cat][6]; //item category number
 				$gb[0][1][$pos][2] = $possible[$k]; //points possible
 				$gb[0][1][$pos][3] = $avail[$k]; //0 past, 1 current, 2 future
 				$gb[0][1][$pos][4] = $cntingb[$k]; //0 no count and hide, 1 count, 2 EC, 3 no count
@@ -414,7 +414,7 @@ function gbtable() {
 		}
 		foreach ($itemorder as $k) {
 			$gb[0][1][$pos][0] = $name[$k]; //item name
-			$gb[0][1][$pos][1] = $cats[$cat][0]; //item category name
+			$gb[0][1][$pos][1] = $cats[$cat][6]; //item category name
 			$gb[0][1][$pos][2] = $possible[$k]; //points possible
 			$gb[0][1][$pos][3] = $avail[$k]; //0 past, 1 current, 2 future
 			$gb[0][1][$pos][4] = $cntingb[$k]; //0 no count and hide, 1 count, 2 EC, 3 no count
@@ -468,13 +468,13 @@ function gbtable() {
 		
 		
 		$gb[0][2][$pos][0] = $cats[$cat][0];
-		$gb[0][2][$pos][1] = $cats[$cat][0];
+		$gb[0][2][$pos][1] = $cats[$cat][6];
 		if ($catposspast[$cat]>0) {
 			$gb[0][2][$pos][2] = 0; //scores in past
 		} else if ($catposscur[$cat]>0) {
-			$gb[0][2][$pos][2] = 1; //scores past/cur
+			$gb[0][2][$pos][2] = 1; //scores in cur 
 		} else if ($catpossfuture[$cat]>0) {
-			$gb[0][2][$pos][2] = 2; //scores online in future
+			$gb[0][2][$pos][2] = 2; //scores in future
 		} else {
 			$gb[0][2][$pos][2] = 3; //no items
 		}
@@ -523,6 +523,9 @@ function gbtable() {
 	//$query .= "FROM imas_users,imas_teachers WHERE imas_users.id=imas_teachers.userid AND imas_teachers.courseid='$cid' ";
 	//if (!$isteacher && !isset($tutorid)) {$query .= "AND imas_users.id='$userid' ";}
 	if ($limuser>0) { $query .= "AND imas_users.id='$limuser' ";}
+	if ($secfilter!=-1) {
+		$query .= "AND imas_students.section='$secfilter' ";
+	}
 	if ($isdiag) {
 		$query .= "ORDER BY imas_users.email,imas_users.LastName,imas_users.FirstName";
 	} else if ($hassection && $usersort==0) {
@@ -530,11 +533,15 @@ function gbtable() {
 	} else {
 		$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
 	}
+	
 	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 	$alt = 0;
 	$sturow = array();
 	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) { //foreach student
 		unset($asid); unset($pts); unset($IP); unset($timeused);
+		$cattotpast[$ln] = array();
+		$cattotcur[$ln] = array();
+		$cattotfuture[$ln] = array();
 		//Student ID info
 		$gb[$ln][0][0] = "{$line['LastName']},&nbsp;{$line['FirstName']}";
 		$gb[$ln][4][0] = $line['id'];
@@ -563,6 +570,7 @@ function gbtable() {
 	$assessidx = array_flip($assessments);
 	$query = "SELECT ias.id,ias.assessmentid,ias.bestscores,ias.starttime,ias.endtime,ias.feedback,ias.userid FROM imas_assessment_sessions AS ias,imas_assessments AS ia ";
 	$query .= "WHERE ia.id=ias.assessmentid AND ia.courseid='$cid'";
+	if ($limuser>0) { $query .= " AND ias.userid='$limuser' ";}
 	$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 	while ($l = mysql_fetch_array($result2, MYSQL_ASSOC)) {
 		if (!isset($assessidx[$l['assessmentid']]) || !isset($sturow[$l['userid']]) || !isset($assesscol[$l['assessmentid']])) {
@@ -577,15 +585,20 @@ function gbtable() {
 		
 		$scores = explode(",",$l['bestscores']);
 		$pts = 0;
-		for ($i=0;$i<count($scores);$i++) {
-			$pts += getpts($scores[$i]);
+		for ($j=0;$j<count($scores);$j++) {
+			$pts += getpts($scores[$j]);
 			//if ($scores[$i]>0) {$total += $scores[$i];}
 		}
 		$timeused = $l['endtime']-$l['starttime'];
-		if (in_array(-1,$scores)) { $IP=1;}
+		if (in_array(-1,$scores)) { 
+			$IP=1; 
+		} else {
+			$IP=0;
+		}
 		
 		$thised = $enddate[$i];
 		//GET EXCEPTIONS
+		
 		
 		if ($isteacher || $assessmenttype[$i]=="Practice" || $sa[$i]=="I" || ($sa[$i]!="N" && $now>$thised)) {
 			$gb[$row][1][$col][2] = 1; //show link
@@ -618,14 +631,15 @@ function gbtable() {
 			if ($cntingb[$i] == 1 || $cntingb[$i]==2) {
 				if ($gb[0][1][$col][3]<1) { //past
 					$cattotpast[$row][$category[$i]][] = $pts;
-				} else if ($gb[0][1][$col][3]<2) { //past or cur
+				} 
+				if ($gb[0][1][$col][3]<2) { //past or cur
 					$cattotcur[$row][$category[$i]][] = $pts;
 				}
 				$cattotfuture[$row][$category[$i]][] = $pts;
 				
 			}
 		}
-		if ($isteacher && $l['feedback']!='') {
+		if ($limuser==0 && $l['feedback']!='') {
 			$gb[$row][1][$col][1] = 1; //has comment
 		} else if ($limuser>0) {
 			$gb[$row][1][$col][1] = $l['feedback']; //the feedback
@@ -639,7 +653,7 @@ function gbtable() {
 	unset($gradeid); unset($opts);
 	$query = "SELECT imas_grades.gbitemid,imas_grades.id,imas_grades.score,imas_grades.feedback,imas_grades.userid FROM imas_grades,imas_gbitems WHERE ";
 	$query .= "imas_grades.gbitemid=imas_gbitems.id AND imas_gbitems.courseid='$cid'";
-	//##ADD LIMUSER RESTRICTIONS TO QUERIES
+	if ($limuser>0) { $query .= " AND imas_grades.userid='$limuser' ";}
 	$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 	while ($l = mysql_fetch_array($result2, MYSQL_ASSOC)) {
 		if (!isset($gradeidx[$l['gbitemid']]) || !isset($sturow[$l['userid']]) || !isset($gradecol[$l['gbitemid']])) {
@@ -652,7 +666,7 @@ function gbtable() {
 		$gb[$row][1][$col][2] = $l['id'];
 		
 		$gb[$row][1][$col][0] = 1*$l['score'];
-		if ($isteacher && $l['feedback']!='') { //feedback
+		if ($limuser==0 && $l['feedback']!='') { //feedback
 			$gb[$row][1][$col][1] = 1; //yes it has it (for teachers)
 		} else if ($limuser>0) {
 			$gb[$row][1][$col][1] =  $l['feedback']; //the feedback (for students)
@@ -663,7 +677,8 @@ function gbtable() {
 		if ($cntingb[$i] == 1 || $cntingb[$i]==2) {
 			if ($gb[0][1][$col][3]<1) { //past
 				$cattotpast[$row][$category[$i]][] = 1*$l['score'];
-			} else if ($gb[0][1][$col][3]<2) { //past or cur
+			} 
+			if ($gb[0][1][$col][3]<2) { //past or cur
 				$cattotcur[$row][$category[$i]][] = 1*$l['score'];
 			}
 			$cattotfuture[$row][$category[$i]][] = 1*$l['score'];		
@@ -674,7 +689,9 @@ function gbtable() {
 	unset($discusspts);
 	$discussidx = array_flip($discuss);
 	$query = "SELECT imas_forum_posts.userid,imas_forum_posts.forumid,SUM(imas_forum_posts.points) FROM imas_forum_posts,imas_forums WHERE imas_forum_posts.forumid=imas_forums.id AND imas_forums.courseid='$cid' ";
+	if ($limuser>0) { $query .= " AND imas_forum_posts.userid='$limuser' ";}
 	$query .= "GROUP BY imas_forum_posts.forumid,imas_forum_posts.userid ";
+	
 	$result2 = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	while ($r = mysql_fetch_row($result2)) {
 		if (!isset($discussidx[$r[1]]) || !isset($sturow[$r[0]]) || !isset($discusscol[$r[1]])) {
@@ -684,6 +701,14 @@ function gbtable() {
 		$row = $sturow[$r[0]];
 		$col = $discusscol[$r[1]];
 		$gb[$row][1][$col][0] = $r[2];
+		$gb[$row][1][$col][3] = 0; //is counted
+		if ($gb[0][1][$col][3]<1) { //past
+			$cattotpast[$row][$category[$i]][] = $r[2];
+		} 
+		if ($gb[0][1][$col][3]<2) { //past or cur
+			$cattotcur[$row][$category[$i]][] = $r[2];
+		}
+		$cattotfuture[$row][$category[$i]][] = $r[2];
 	}
 	
 	//create category totals
@@ -832,19 +857,19 @@ function gbtable() {
 			$gb[$ln][3][1] = $totcur;
 			$gb[$ln][3][2] = $totfuture;
 			if ($overallptspast>0) {
-				$gb[$ln][3][3] = round(100*$totpast/$overallptspast,1).'%';
+				$gb[$ln][3][3] = round(100*$totpast/$overallptspast,1);
 			} else {
-				$gb[$ln][3][3] = '0%';
+				$gb[$ln][3][3] = 0;
 			}
 			if ($overallptscur>0) {
-				$gb[$ln][3][4] = round(100*$totcur/$overallptscur,1).'%';
+				$gb[$ln][3][4] = round(100*$totcur/$overallptscur,1);
 			} else {
-				$gb[$ln][3][4] = '0%';
+				$gb[$ln][3][4] = 0;
 			}
 			if ($overallptsfuture>0) {
-				$gb[$ln][3][5] = round(100*$totfuture/$overallptsfuture,1).'%';
+				$gb[$ln][3][5] = round(100*$totfuture/$overallptsfuture,1);
 			} else {
-				$gb[$ln][3][5] = '0%';
+				$gb[$ln][3][5] = 0;
 			}
 		} else if ($useweights==1) { //use weights (%) grading method
 			//already calculated $tot
@@ -876,9 +901,63 @@ function gbtable() {
 			
 		}
 	}
-		
-		
-	
+	//create averages
+	$gb[$ln][0][0] = "Averages";
+	$avgs = array();
+	for ($j=0;$j<count($gb[0][1]);$j++) { //foreach assessment
+		$avgs[$j] = array();
+		for ($i=1;$i<$ln;$i++) { //foreach student
+			if (isset($gb[$i][1][$j][0])) {
+				if ($gb[$i][1][$j][3]==0 && is_numeric($gb[$i][1][$j][0])) {
+					$avgs[$j][] = $gb[$i][1][$j][0];
+				}
+			}
+		}
+	}
+
+	//cat avgs
+	$catavgs = array();
+	for ($j=0;$j<count($gb[0][2]);$j++) { //category headers
+		$catavgs[$j][0] = array();
+		$catavgs[$j][1] = array();
+		$catavgs[$j][2] = array();
+		for ($i=1;$i<$ln;$i++) { //foreach student
+			$catavgs[$j][0][] = $gb[$i][2][$j][0];
+			$catavgs[$j][1][] = $gb[$i][2][$j][1];
+			$catavgs[$j][2][] = $gb[$i][2][$j][2];
+		}
+	}
+	//tot avgs
+	$totavgs = array();
+	for ($j=0;$j<count($gb[1][3]);$j++) {
+		$totavgs[$j] = array();
+		for ($i=1;$i<$ln;$i++) { //foreach student
+			$totavgs[$j][] = $gb[$i][3][$j];
+		}
+	}
+	foreach ($avgs as $j=>$avg) {
+		if (count($avg)>0) {
+			$gb[$ln][1][$j][0] = round(array_sum($avg)/count($avg),1);
+			$gb[$ln][1][$j][4] = 'average';
+		}
+	}
+	foreach ($catavgs as $j=>$avg) {
+		if (count($avg[0])>0) {
+			for ($m=0;$m<3;$m++) {
+				$gb[$ln][2][$j][$m] = round(array_sum($avg[$m])/count($avg[$m]),1);
+			}
+		}
+	}
+	foreach ($totavgs as $j=>$avg) {
+		if (count($avg)>0) {
+			$gb[$ln][3][$j] = round(array_sum($avg)/count($avg),1);
+		}
+	}
+	$gb[$ln][4][0] = -1;
+
+	if ($limuser==-1) {
+		$gb[1] = $gb[$ln];
+	}
 	return $gb;
 }
 ?>
