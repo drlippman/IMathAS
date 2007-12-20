@@ -75,6 +75,8 @@ row[1][1][0][4] = asid, or 'new'
 row[1][1][1] = offline
 row[1][1][1][0] = score
 row[1][1][1][1] = 0 no comment, 1 has comment - is comment in stu view
+row[1][1][1][2] = gradeid
+
 row[1][1][2] - discussion
 row[1][1][2][0] = score
 
@@ -197,7 +199,9 @@ function gbtable() {
 		$category[$kcnt] = $line['gbcategory'];
 		$name[$kcnt] = $line['name'];
 		$cntingb[$kcnt] = $line['cntingb']; //0: ignore, 1: count, 2: extra credit, 3: no count but show
-		
+		if ($deffeedback[0]=='Practice') { //set practice as no count in gb
+			$cntingb[$kcnt] = 3;
+		}
 		$aitems = explode(',',$line['itemorder']);
 		foreach ($aitems as $k=>$v) {
 			if (strpos($v,'~')!==FALSE) {
@@ -566,6 +570,15 @@ function gbtable() {
 		$ln++;
 	}
 	
+	//pull exceptions
+	$exceptions = array();
+	$query = "SELECT imas_exceptions.assessmentid,imas_exceptions.userid,imas_exceptions.enddate FROM imas_exceptions,imas_assessments WHERE ";
+	$query .= "imas_exceptions.assessmentid=imas_assessments.id AND imas_assessments.courseid='$cid'";
+	$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
+	while ($r = mysql_fetch_row($result2)) {
+		$exceptions[$r[0]][$r[1]] = $r[2];	
+		
+	}
 	//Get assessment scores
 	$assessidx = array_flip($assessments);
 	$query = "SELECT ias.id,ias.assessmentid,ias.bestscores,ias.starttime,ias.endtime,ias.feedback,ias.userid FROM imas_assessment_sessions AS ias,imas_assessments AS ia ";
@@ -595,11 +608,14 @@ function gbtable() {
 		} else {
 			$IP=0;
 		}
-		
-		$thised = $enddate[$i];
-		//GET EXCEPTIONS
-		
-		
+		if (isset($exceptions[$l['assessmentid']][$l['userid']]) && $now>$enddate[$i] && $now<$exceptions[$l['assessmentid']][$l['userid']]) {
+			$thised = $exceptions[$l['assessmentid']][$l['userid']];
+			$inexception = true;
+		} else {
+			$thised = $enddate[$i];
+			$inexception = false;
+		}
+				
 		if ($isteacher || $assessmenttype[$i]=="Practice" || $sa[$i]=="I" || ($sa[$i]!="N" && $now>$thised)) {
 			$gb[$row][1][$col][2] = 1; //show link
 		} else {

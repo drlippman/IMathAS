@@ -96,8 +96,9 @@
 	}
 	
 	echo "<form id=\"mainform\" method=post action=\"addgrades.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=$cid&gbitem={$_GET['gbitem']}&grades={$_GET['grades']}\">";
-	
+     
 	if ($_GET['grades']=='all') {
+	    if (!isset($_GET['isolate'])) {
 		if ($_GET['gbitem']=='new') {
 			$name = '';
 			$points = 0;
@@ -169,6 +170,7 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 		} else {
 			echo "<span class=form>Upload grades?</span><span class=formright><input type=checkbox name=\"doupload\" /> <input type=submit value=\"Submit\"/></span><br class=form />";
 		}
+	    }
 	} else {
 		$query = "SELECT name FROM imas_gbitems WHERE id='{$_GET['gbitem']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());

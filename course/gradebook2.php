@@ -1,12 +1,26 @@
 <?php
+//IMathAS:  Main gradebook views (instructor & student)
+//(c) 2007 David Lippman
+// DONE:
+//   Instructor Main view
+//   Student Main view
+//   Export/Email GB (gb-export.php)
+//   Item Analysis (gb-itemanalysis.php)
+//   New asid
+//   View/Edit Assessment
+//   Question/Category breakdown
+//   email, message, unenroll, etc
+//   stu view links
+
+// TODO:
+//   exceptions
+
 
 require("../validate.php");
 $cid = $_GET['cid'];
 if (isset($teacherid)) {
 	$isteacher = true;
-} else {
-	echo "not available";
-}
+} 
 if ($isteacher) {
 	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
 		$gbmode = $_GET['gbmode'];
@@ -48,6 +62,8 @@ if ($isteacher) {
 	$links = floor($gbmode/100)%10; //0: view/edit, 1 q breakdown
 	$hidenc = floor($gbmode/10)%10; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
 	$availshow = $gbmode%10; //0: past, 1 past&cur, 2 all
+	
+	//
 
 } else {
 	$secfilter = -1;
@@ -64,6 +80,30 @@ if ($isteacher && isset($_GET['stu'])) {
 	$stu = 0;
 }
 
+//HANDLE ANY POSTS
+if ($isteacher) {
+	if ((isset($_POST['submit']) && ($_POST['submit']=="E-mail" || $_POST['submit']=="Message"))|| isset($_GET['masssend']))  {
+		$calledfrom='gb';
+		include("masssend.php");
+	}
+	if ((isset($_POST['submit']) && $_POST['submit']=="Make Exception") || isset($_GET['massexception'])) {
+		$calledfrom='gb';
+		include("massexception.php");
+	}
+	if ((isset($_POST['submit']) && $_POST['submit']=="Unenroll") || (isset($_GET['action']) && $_GET['action']=="unenroll" )) {
+		$calledfrom='gb';
+		$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+		$curBreadcrumb .= "&gt; <a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; Confirm Change";
+		$pagetitle = "Unenroll Students";
+		include("unenroll.php");
+		include("../footer.php");
+		exit;
+	}	
+}
+
+
+
+//DISPLAY
 require("gbtable2.php");
 require("../includes/htmlutil.php");
 
@@ -78,7 +118,7 @@ if (!$isteacher || $stu!=0) { //show student view
 		echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt Student Grade Detail</div>\n";
 	} else if ($isteacher) {
 		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-		echo "&gt; <a href=\"gradebook.php?stu=0&gbmode=$gbmode&cid=$cid\">Gradebook</a> &gt; Student Detail</div>";
+		echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; Student Detail</div>";
 	} else {
 		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 		echo "&gt; Gradebook</div>";
@@ -106,14 +146,14 @@ if (!$isteacher || $stu!=0) { //show student view
 	$placeinhead .= "} ";
 	$placeinhead .= 'function chgfilter() { ';
 	$placeinhead .= '       var cat = document.getElementById("filtersel").value; ';
-	$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook2.php?stu=$stu&cid=$cid&gbmode=$gbmode";
+	$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook2.php?stu=$stu&cid=$cid";
 	
 	$placeinhead .= "       var toopen = '$address&catfilter=' + cat;\n";
 	$placeinhead .= "  	window.location = toopen; \n";
 	$placeinhead .= "}\n";
 	$placeinhead .= 'function chgsecfilter() { ';
 	$placeinhead .= '       var sec = document.getElementById("secfiltersel").value; ';
-	$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook2.php?stu=$stu&cid=$cid&gbmode=$gbmode";
+	$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook2.php?stu=$stu&cid=$cid";
 	
 	$placeinhead .= "       var toopen = '$address&secfilter=' + sec;\n";
 	$placeinhead .= "  	window.location = toopen; \n";
@@ -131,16 +171,16 @@ if (!$isteacher || $stu!=0) { //show student view
 	require("../header.php");
 	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 	echo "&gt; Gradebook</div>";
-	echo "<form method=post action=\"gradebook.php?cid=$cid&gbmode=$gbmode\">";
+	echo "<form method=post action=\"gradebook.php?cid=$cid\">";
 	
 	echo "<span class=\"hdr1\">Grade Book DRAFT</span>";
 	echo "<div class=cpmid>";
-	echo "<a href=\"addgrades.php?cid=$cid&gbmode=$gbmode&gbitem=new&grades=all\">Add Offline Grade</a> | ";
-	echo "Export to <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&export=true\">File</a>, ";
-	echo "<a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&emailgb=me\">My Email</a>, or <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&emailgb=ask\">Other Email</a> | ";
-	echo "<a href=\"gbsettings.php?gbmode=$gbmode&cid=$cid\">GB Settings</a> | ";
-	echo "<a href=\"gradebook.php?cid=$cid&gbmode=$gbmode&stu=-1\">Averages</a> | ";
-	echo "<a href=\"gbcomments.php?cid=$cid&gbmode=$gbmode&stu=0\">Comments</a> | ";
+	echo "<a href=\"addgrades.php?cid=$cid&gbitem=new&grades=all\">Add Offline Grade</a> | ";
+	echo "Export to <a href=\"gb-export.php?stu=$stu&cid=$cid&export=true\">File</a>, ";
+	echo "<a href=\"gb-export.php?stu=$stu&cid=$cid&emailgb=me\">My Email</a>, or <a href=\"gb-export.php?stu=$stu&cid=$cid&emailgb=ask\">Other Email</a> | ";
+	echo "<a href=\"gbsettings.php?cid=$cid\">GB Settings</a> | ";
+	echo "<a href=\"gradebook.php?cid=$cid&stu=-1\">Averages</a> | ";
+	echo "<a href=\"gbcomments.php?cid=$cid&stu=0\">Comments</a> | ";
 	echo "<input type=\"button\" id=\"lockbtn\" onclick=\"lockcol()\" value=\"Lock headers\"/> (IE)<br/>\n";
 	echo 'Category: <select id="filtersel" onchange="chgfilter()">';
 	echo '<option value="-1" ';
@@ -217,16 +257,16 @@ if (!$isteacher || $stu!=0) { //show student view
 	echo "Meanings:  IP-In Progress, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sup>*</sup> Has feedback\n";
 	if ($isteacher) {
 		echo "<div class=cp>";
-		echo "<a href=\"addgrades.php?cid=$cid&gbmode=$gbmode&gbitem=new&grades=all\">Add Offline Grade</a><br/>";
-		echo "<a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&export=true\">Export Gradebook</a><br/>";
-		echo "Email gradebook to <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&emailgb=me\">Me</a> or <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&emailgb=ask\">to another address</a><br/>";
-		echo "<a href=\"gbsettings.php?gbmode=$gbmode&cid=$cid\">Gradebook Settings</a>";
+		echo "<a href=\"addgrades.php?cid=$cid&gbitem=new&grades=all\">Add Offline Grade</a><br/>";
+		echo "<a href=\"gradebook.php?stu=$stu&cid=$cid&export=true\">Export Gradebook</a><br/>";
+		echo "Email gradebook to <a href=\"gradebook.php?stu=$stu&cid=$cid&emailgb=me\">Me</a> or <a href=\"gradebook.php?stu=$stu&cid=$cid&emailgb=ask\">to another address</a><br/>";
+		echo "<a href=\"gbsettings.php?cid=$cid\">Gradebook Settings</a>";
 		echo "<div class=clear></div></div>";
 	}
 }
 
 function gbstudisp($stu) {
-	global $hidenc,$nopt,$cid,$gbmode,$availshow,$isdiag,$isteacher;
+	global $hidenc,$cid,$gbmode,$availshow,$isdiag,$isteacher;
 
 	$gbt = gbtable($stu);
 	
@@ -236,7 +276,7 @@ function gbstudisp($stu) {
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			echo "<p>Comment Updated</p>";
 		}
-		echo '<h3>' . strip_tags($gb[1][0][0]) . '</h3>';
+		echo '<h3>' . strip_tags($gbt[1][0][0]) . '</h3>';
 		$query = "SELECT imas_students.gbcomment,imas_users.email FROM imas_students,imas_users WHERE ";
 		$query .= "imas_students.userid=imas_users.id AND imas_users.id='$stu' AND imas_students.courseid='{$_GET['cid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -285,6 +325,7 @@ function gbstudisp($stu) {
 		echo '<tr class="grid">';
 		echo '<td class="cat'.$gbt[0][1][$i][1].'">'.$gbt[0][1][$i][0].'</td>';
 		echo '<td>';
+		
 		if ($gbt[0][1][$i][4]==0 || $gbt[0][1][$i][4]==3) {
 			echo $gbt[0][1][$i][2].' (Not Counted)';
 		} else {
@@ -296,7 +337,21 @@ function gbstudisp($stu) {
 		if ($gbt[0][1][$i][5]==1) {
 			echo ' (PT)';
 		}
+		
 		echo '</td><td>';
+		if ($isteacher || $gbt[1][1][$i][2]==1) { //show link
+			if ($gbt[0][1][$i][6]==0) {//online
+				if (isset($gbt[1][1][$i][0])) { //has score
+					echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid={$gbt[1][1][$i][4]}&uid={$gbt[1][4][0]}\">";
+				} else if ($isteacher) {
+					echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid=new&uid={$gbt[1][4][0]}\">";
+				}
+			} else if ($gbt[0][1][$i][6]==1) {//offline
+				if ($isteacher) {
+					echo "<a href=\"addgrades.php?stu=$stu&cid=$cid&grades={$gbt[1][4][0]}&gbitem={$gbt[0][1][$i][7]}\">";
+				} 
+			}
+		}
 		if (isset($gbt[1][1][$i][0])) {
 			echo $gbt[1][1][$i][0];
 			if ($gbt[1][1][$i][3]==1) {
@@ -310,6 +365,9 @@ function gbstudisp($stu) {
 			}
 		} else {
 			echo '-';
+		}
+		if (($isteacher || $gbt[1][1][$i][2]==1) && ($gbt[0][1][$i][6]==0 || ($gbt[0][1][$i][6]==1 && $isteacher))) { //show link
+			echo '</a>';
 		}
 		echo '</td><td>';
 		if (isset($gbt[1][1][$i][0])) {
@@ -379,7 +437,7 @@ function gbstudisp($stu) {
 }
 
 function gbinstrdisp() {
-	global $hidenc,$nopt,$isteacher,$cid,$gbmode,$stu,$availshow,$isdiag,$catfilter,$secfilter,$totonleft;
+	global $hidenc,$isteacher,$cid,$gbmode,$stu,$availshow,$isdiag,$catfilter,$secfilter,$totonleft;
 	$gbt = gbtable();
 	//print_r($gbt);
 	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
@@ -468,9 +526,10 @@ function gbinstrdisp() {
 			//links
 			if ($gbt[0][1][$i][6]==0) { //online
 				echo "<br/><a class=small href=\"addassessment.php?id={$gbt[0][1][$i][7]}&cid=$cid&from=gb\">[Settings]</a>";
-				echo "<br/><a class=small href=\"isolateassessgrade.php?cid=$cid&gbmode=$gbmode&aid={$gbt[0][1][$i][7]}\">[Isolate]</a>";
+				echo "<br/><a class=small href=\"isolateassessgrade.php?cid=$cid&aid={$gbt[0][1][$i][7]}\">[Isolate]</a>";
 			} else if ($gbt[0][1][$i][6]==1) { //offline
-				echo "<br/><a class=small href=\"addgrades.php?stu=$stu&cid=$cid&gbmode=$gbmode&grades=all&gbitem={$gbt[0][1][$i][7]}\">[Settings]</a>";
+				echo "<br/><a class=small href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$i][7]}\">[Settings]</a>";
+				echo "<br/><a class=small href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$i][7]}&isolate=true\">[Isolate]</a>";
 			} else if ($gbt[0][1][$i][6]==2) { //discussion
 				echo "<br/><a class=small href=\"addforum.php?id={$gbt[0][1][$i][7]}&cid=$cid&from=gb\">[Settings]</a>";
 			}
@@ -514,7 +573,7 @@ function gbinstrdisp() {
 		}
 		echo '<td class="locked" scope="row">';
 		echo "<input type=\"checkbox\" name='checked[]' value='{$gbt[$i][4][0]}' />&nbsp;";
-		echo "<a href=\"gradebook2.php?cid=$cid&gbmode=$gbmode&stu={$gbt[$i][4][0]}\">";
+		echo "<a href=\"gradebook2.php?cid=$cid&stu={$gbt[$i][4][0]}\">";
 		echo $gbt[$i][0][0];
 		echo '</a></td>';
 		for ($j=2;$j<count($gbt[0][0]);$j++) {
@@ -560,9 +619,9 @@ function gbinstrdisp() {
 				if ($gbt[0][1][$j][6]==0) {//online
 					if (isset($gbt[$i][1][$j][0])) {
 						if ($gbt[$i][1][$j][4]=='average') {
-							echo "<a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$gbt[$i][1][$j][4]}&aid={$gbt[0][1][$j][7]}\">";
+							echo "<a href=\"gb-itemanalysis.php?stu=$stu&cid=$cid&asid={$gbt[$i][1][$j][4]}&aid={$gbt[0][1][$j][7]}\">";
 						} else {
-							echo "<a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$gbt[$i][1][$j][4]}&uid={$gbt[$i][4][0]}\">";
+							echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid={$gbt[$i][1][$j][4]}&uid={$gbt[$i][4][0]}\">";
 						}
 						echo $gbt[$i][1][$j][0];
 						if ($gbt[$i][1][$j][3]==1) {
@@ -579,13 +638,13 @@ function gbinstrdisp() {
 							echo '<sup>*</sup>';
 						}
 					} else { //no score
-						echo "<a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid=new&uid={$gbt[$i][4][0]}\">-</a>";
+						echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid=new&uid={$gbt[$i][4][0]}\">-</a>";
 					}
 				} else if ($gbt[0][1][$j][6]==1) { //offline
 					if ($gbt[$i][1][$j][4]=='average') {
-						echo "<a href=\"addgrades.php?stu=$stu&cid=$cid&gbmode=$gbmode&grades=all&gbitem={$gbt[0][1][$j][7]}\">";
+						echo "<a href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$j][7]}\">";
 					} else {
-						echo "<a href=\"addgrades.php?stu=$stu&cid=$cid&gbmode=$gbmode&grades={$gbt[$i][4][0]}&gbitem={$gbt[0][1][$j][7]}\">";
+						echo "<a href=\"addgrades.php?stu=$stu&cid=$cid&grades={$gbt[$i][4][0]}&gbitem={$gbt[0][1][$j][7]}\">";
 					}
 					if (isset($gbt[$i][1][$j][0])) {
 						echo $gbt[$i][1][$j][0];
