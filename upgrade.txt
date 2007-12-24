@@ -6,6 +6,9 @@ Upgrade Notes
 
 *** Database Changes ***
 
+ALTER TABLE `imas_gbscheme` CHANGE `defgbmode` `defgbmode` SMALLINT( 4 ) UNSIGNED NOT NULL DEFAULT '21' ;
+UPDATE `imas_assessments` SET cntingb =3 WHERE deffeedback LIKE 'Practice%';
+
 ALTER TABLE `imas_assessments` ADD `exceptionpenalty` TINYINT( 2 ) NOT NULL DEFAULT '0';
 
 ALTER TABLE `imas_courses` ADD `latepasshrs` SMALLINT( 4 ) UNSIGNED NOT NULL DEFAULT '24';
@@ -29,6 +32,23 @@ ALTER TABLE `imas_inlinetext` ADD `avail` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT
 ALTER TABLE `imas_assessments` ADD `avail` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '1';
 ALTER TABLE `imas_forums` ADD `avail` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '1';
 ALTER TABLE `imas_linkedtext` ADD `avail` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '1';
+
+*** Run PHP code after Database Changes ***
+<?php
+require("validate.php");
+$query = "SELECT id,defgbmode FROM imas_gbscheme";
+$result = mysql_query($query) or die("Query failed : " . mysql_error());
+while (list($id,$gbmodet) = mysql_fetch_row($result)) {
+	$gbmode = 2;
+	if (($gbmodet&8)==8) { $gbmode += 1000;}
+	if (($gbmodet&16)==16) {$gbmode += 20;}
+	if (($gbmodet&4)==4) {$gbmode -= 1;}
+	if (($gbmodet&1)==1) {$gbmode += 100;}
+	$query = "UPDATE imas_gbscheme SET defgbmode='$gbmode' WHERE id='$id'";
+	mysql_query($query) or die("Query failed : " . mysql_error());
+}
+echo "DONE";
+?>
 
 *********************
 ** IMathAS 1.4     **

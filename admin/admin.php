@@ -23,7 +23,7 @@ $curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; Admin\n";
 	 } else if (isset($_COOKIE['showcourses'])) {
 		 $showcourses = $_COOKIE['showcourses'];
 	 } else {
-		 $showcourses = 0; //0: mine, 1: groups, 2: all
+		 $showcourses = 0; //0: mine, #: userid
 	 }
  } else {
 	 $showcourses = 0;
@@ -218,7 +218,7 @@ $placeinhead .= "}</script>";
 		}
 
 		echo " Show courses of: ";
-		writeHtmlSelect ("seluid",$page_teacherSelectVal,$page_teacherSelectLabel,null,"Select a user..",0,"onchange=\"showcourses()\"");	
+		writeHtmlSelect ("seluid",$page_teacherSelectVal,$page_teacherSelectLabel,$showcourses,"Select a user..",0,"onchange=\"showcourses()\"");	
 	}
 ?>
 	</div>

@@ -85,8 +85,12 @@
 	
 	require("../header.php");
 	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-	echo "&gt; <a href=\"gradebook.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid\">Gradebook</a> ";
-	if ($_GET['stu']>0) {echo "&gt; <a href=\"gradebook.php?stu={$_GET['stu']}&gbmode=$gbmode&cid=$cid\">Student Detail</a> ";}
+	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
+	if ($_GET['stu']>0) {
+		echo "&gt; <a href=\"gradebook.php?stu={$_GET['stu']}&cid=$cid\">Student Detail</a> ";
+	} else if ($_GET['stu']==-1) {
+		echo "&gt; <a href=\"gradebook.php?stu={$_GET['stu']}&cid=$cid\">Averages</a> ";
+	}
 	echo "&gt; Offline Grades</div>";
 	
 	if ($_GET['gbitem']=='new') {

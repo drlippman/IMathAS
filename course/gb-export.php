@@ -13,13 +13,7 @@
 	} else {
 		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$gbmodet = mysql_result($result,0,0);
-		$gbmode = 2;
-		if (($gbmodet&8)==8) { $gbmode += 1000;}
-		if (($gbmodet&16)==16) {$gbmode += 20;}
-		if (($gbmodet&4)==4) {$gbmode -= 1;}
-		if (($gbmodet&1)==1) {$gbmode += 100;}
-		
+		$gbmode = mysql_result($result,0,0);
 	}
 	if (isset($_GET['stu']) && $_GET['stu']!='') {
 		$stu = $_GET['stu'];

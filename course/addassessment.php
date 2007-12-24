@@ -132,7 +132,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 		}
 		if ($_POST['deffeedback']=="Practice") {
-			$_POST['cntingb'] = 1;
+			$_POST['cntingb'] = $_POST['pcntingb'];
 		}
 		if (isset($_GET['id'])) {  //already have id; update
 			$query = "SELECT isgroup FROM imas_assessments WHERE id='{$_GET['id']}'";
@@ -212,7 +212,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$startdate = $line['startdate'];
 			$enddate = $line['enddate'];
 			$gbcat = $line['gbcategory'];
-			$cntingb = $line['cntingb'];
+			if ($testtype=='Practice') {
+				$pcntingb = $line['cntingb'];
+				$cntingb = 1;
+			} else {
+				$cntingb = $line['cntingb'];
+				$pcntingb = 3;
+			}
 			$showqcat = $line['showcat'];
 			$timelimit = $line['timelimit']/60;
 		} else {  //INITIAL LOAD IN ADD MODE
@@ -247,6 +253,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$line['exceptionpenalty'] = 0;
 			$gbcat = 0;
 			$cntingb = 1;
+			$pcntingb = 3;
 			$showqcat = 0;
 		}
 		// ALL BELOW IS COMMON TO MODIFY OR ADD MODE
@@ -576,7 +583,8 @@ if ($overwriteBody==1) {
 				<input type=radio name="cntingb" value="2" <?php writeHtmlChecked($cntingb,2,0); ?> /> Count as Extra Credit
 			</span>
 			<span <?php if ($testtype!="Practice") {echo "class=hidden";} else {echo "class=formright";} ?> id="praccntingb">
-				Practice tests aren't counted in grade total
+				<input type=radio name="pcntingb" value="0" <?php writeHtmlChecked($pcntingb,0,0); ?> /> Don't count in grade total and hide from students<br/>
+				<input type=radio name="pcntingb" value="3" <?php writeHtmlChecked($pcntingb,3,0); ?> /> Don't count in grade total<br/>
 			</span><br class=form />
 			</fieldset>
 			

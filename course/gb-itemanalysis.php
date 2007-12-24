@@ -13,13 +13,7 @@
 	} else {
 		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$gbmodet = mysql_result($result,0,0);
-		$gbmode = 2;
-		if (($gbmodet&8)==8) { $gbmode += 1000;}
-		if (($gbmodet&16)==16) {$gbmode += 20;}
-		if (($gbmodet&4)==4) {$gbmode -= 1;}
-		if (($gbmodet&1)==1) {$gbmode += 100;}
-		
+		$gbmode = mysql_result($result,0,0);
 	}
 	if (isset($_GET['stu']) && $_GET['stu']!='') {
 		$stu = $_GET['stu'];
@@ -44,7 +38,11 @@
 	$placeinhead .= "}\n</script>";
 	require("../header.php");
 	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-	echo "&gt; <a href=\"gradebook.php?stu=$stu&cid=$cid\">Gradebook</a> &gt; Item Analysis</div>";
+	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
+	if ($stu==-1) {
+		echo "&gt; <a href=\"gradebook.php?stu=$stu&cid=$cid\">Averages</a> ";
+	}
+	echo "&gt; Item Analysis</div>";
 	echo "<h2>Item Analysis: \n";
 	$aid = $_GET['aid'];
 	$qtotal = array();

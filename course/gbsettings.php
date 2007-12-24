@@ -2,6 +2,7 @@
 //IMathAS:  Add/modify gradebook categories
 //(c) 2006 David Lippman
 	require("../validate.php");
+	require("../includes/htmlutil.php");
 	
 	if (!(isset($teacherid))) {
 		require("../header.php");
@@ -65,11 +66,11 @@
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 		}
-		$defgbmode = $_POST['gbmode1'] + $_POST['gbmode2'] + $_POST['gbmode4'] + $_POST['gbmode8'] + $_POST['gbmode16'];
+		$defgbmode = $_POST['gbmode1'] + 10*$_POST['gbmode10'] + 100*$_POST['gbmode100'] + 1000*$_POST['gbmode1000'];
 		$query = "UPDATE imas_gbscheme SET useweights='$useweights',orderby='$orderby',usersort='$usersort',defaultcat='$defaultcat',defgbmode='$defgbmode' WHERE courseid='$cid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		if (isset($_POST['submit'])) {
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid={$_GET['cid']}");
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid={$_GET['cid']}&gbmode=$defgbmode");
 			exit;
 		}
 	}
@@ -94,59 +95,61 @@
 	$query = "SELECT useweights,orderby,defaultcat,defgbmode,usersort FROM imas_gbscheme WHERE courseid='$cid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	list($useweights,$orderby,$defaultcat,$defgbmode,$usersort) = mysql_fetch_row($result);
+	$totonleft = floor($defgbmode/1000)%10 ; //0 right, 1 left
+	$links = floor($defgbmode/100)%10; //0: view/edit, 1 q breakdown
+	$hidenc = floor($defgbmode/10)%10; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
+	$availshow = $defgbmode%10; //0: past, 1 past&cur, 2 all
+?>
+	<form method=post action="gbsettings.php?cid=<?php echo $cid;?>">
 	
-	echo "<form method=post action=\"gbsettings.php?gbmode={$_GET['gbmode']}&cid=$cid\">";
+	<span class=form>Calculate total using:</span>
+	<span class=formright>
+		<input type=radio name=useweights value="0" <?php writeHtmlChecked($useweights,0);?> onclick="swapweighthdr(0)"/> points earned / possible<br/>
+		<input type=radio name=useweights value="1" <?php writeHtmlChecked($useweights,1);?> onclick="swapweighthdr(1)"/> category weights
+	</span><br class=form />
 	
-	echo "<span class=form>Calculate total using:</span><span class=formright><input type=radio name=useweights value=\"0\" ";
-	if ($useweights==0) {echo "checked=1";}
-	echo " onclick=\"swapweighthdr(0)\"/> points earned / possible<br/><input type=radio name=useweights value=\"1\" ";
-	if ($useweights==1) {echo "checked=1";}
-	echo " onclick=\"swapweighthdr(1)\"/> category weights</span><br class=form />";
+	<span class=form>Gradebook display:</span>
+	<span class=formright>
+		<input type=radio name=orderby value="0" <?php writeHtmlChecked($orderby,0);?>/> Order by date<br/> 
+		<input type=radio name=orderby value="1" <?php writeHtmlChecked($orderby,1);?>/> Group by category, then by order by date<br/> 
+		<input type=radio name=orderby value="2" <?php writeHtmlChecked($orderby,2);?>/> Order by alphabetically<br/> 
+		<input type=radio name=orderby value="3" <?php writeHtmlChecked($orderby,3);?>/> Group by category, then order alphabetically
+	</span><br class=form />
 	
-	echo "<span class=form>Gradebook display:</span><span class=formright><input type=radio name=orderby value=\"0\" ";
-	if ($orderby==0) {echo "checked=1";}
-	echo "/> Order by date<br/> <input type=radio name=orderby value=\"1\" ";
-	if ($orderby==1) {echo "checked=1";}
-	echo "/> Group by category, then by order by date<br/> <input type=radio name=orderby value=\"2\" ";
-	if ($orderby==2) {echo "checked=1";}
-	echo "/> Order by alphabetically<br/> <input type=radio name=orderby value=\"3\" ";
-	if ($orderby==3) {echo "checked=1";}
-	echo "/> Group by category, then order alphabetically</span><br class=form />";
+	<span class=form>Default user order:</span>
+	<span class=formright>
+		<input type=radio name=usersort value="0" <?php writeHtmlChecked($usersort,0);?>/> Order by section (if used), then Last name<br/> 
+		<input type=radio name=usersort value="1" <?php writeHtmlChecked($usersort,1);?>/>Order by Last name
+	</span><br class=form />
 	
-	echo "<span class=form>Default user order:</span><span class=formright><input type=radio name=usersort value=\"0\" ";
-	if ($usersort==0) {echo "checked=1";}
-	echo "/> Order by section (if used), then Last name<br/> <input type=radio name=usersort value=\"1\" ";
-	if ($usersort==1) {echo "checked=1";}
-	echo "/> Order by Last name</span><br class=form />";
+	<p>Default gradebook view:</p>
+	<span class=form>Links show:</span>
+	<span class=formright>
+		<input type=radio name="gbmode100" value="0"  <?php writeHtmlChecked($links,0);?>/> Full Test <br/>
+		<input type=radio name="gbmode100" value="1"  <?php writeHtmlChecked($links,1);?>/> Question Breakdown
+	</span><br class=form />
 	
-	echo "<p>Default gradebook view:</p>";
-	echo '<span class=form>Links show:</span><span class=formright><input type=radio name="gbmode1" value="0" ';
-	if (($defgbmode&1)==0) { echo 'checked=1';}
-	echo '/>Full Test <br/><input type=radio name="gbmode1" value="1" ';
-	if (($defgbmode&1)==1) {echo 'checked=1';}
-	echo '/>Question Breakdown</span><br class=form />';
-	echo '<span class=form>Practice Tests: </span><span class=formright><input type=radio name="gbmode2" value="0" ';
-	if (($defgbmode&2)==0) { echo 'checked=1';}
-	echo '/>Hidden <br/><input type=radio name="gbmode2" value="2" ';
-	if (($defgbmode&2)==2) {echo 'checked=1';}
-	echo '/>Show</span><br class=form />';
-	echo '<span class=form>Show items: </span><span class=formright><input type=radio name="gbmode4" value="0" ';
-	if (($defgbmode&4)==0) { echo 'checked=1';}
-	echo '/>All Items <br/><input type=radio name="gbmode4" value="4" ';
-	if (($defgbmode&4)==4) {echo 'checked=1';}
-	echo '/>Past and Available Items only</span><br class=form>';
-	echo '<span class=form>Not Counted items: </span><span class=formright><input type=radio name="gbmode16" value="0" ';
-	if (($defgbmode&16)==0) { echo 'checked=1';}
-	echo '/>Show <br/><input type=radio name="gbmode16" value="16" ';
-	if (($defgbmode&16)==16) {echo 'checked=1';}
-	echo '/>Hide</span><br class=form>';
-	echo '<span class=form>Totals columns show on:</span><span class=formright><input type=radio name="gbmode8" value="0" ';
-	if (($defgbmode&8)==0) { echo 'checked=1';}
-	echo '/>Right <br/><input type=radio name="gbmode8" value="8" ';
-	if (($defgbmode&8)==8) {echo 'checked=1';}
-	echo '/>Left</span><br class=form />';
+	<span class=form>Show items: </span>
+	<span class=formright>
+		<input type=radio name="gbmode1" value="0" <?php writeHtmlChecked($availshow,0);?>/> Past Due Items <br/>
+		<input type=radio name="gbmode1" value="1" <?php writeHtmlChecked($availshow,1);?>/> Past &amp; Current Items <br/>
+		<input type=radio name="gbmode1" value="2" <?php writeHtmlChecked($availshow,2);?>/> All Items 
+	</span><br class=form>
 	
+	<span class=form>Not Counted items: </span>
+	<span class=formright>
+		<input type=radio name="gbmode10" value="0" <?php writeHtmlChecked($hidenc,0);?>/> Show All<br/>
+		<input type=radio name="gbmode10" value="1" <?php writeHtmlChecked($hidenc,1);?>/> Show NC Items not hidden from students<br/>
+		<input type=radio name="gbmode10" value="2" <?php writeHtmlChecked($hidenc,2);?>/> Hide All
+	</span><br class=form>
 	
+	<span class=form>Totals columns show on:</span>
+	<span class=formright>
+		<input type=radio name="gbmode1000" value="0" <?php writeHtmlChecked($totonleft,0);?>/> Right<br/>
+		<input type=radio name="gbmode1000" value="1" <?php writeHtmlChecked($totonleft,1);?>/> Left
+	</span><br class=form />
+	
+<?php	
 	$row = explode(',',$defaultcat);
 	array_unshift($row,"Default");
 	echo "Categories";

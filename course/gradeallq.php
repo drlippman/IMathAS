@@ -89,8 +89,8 @@
 	require("../assessment/header.php");
 	echo "<style type=\"text/css\">p.tips {	display: none;}\n</style>\n";
 	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-	echo "&gt; <a href=\"gradebook.php?stu=0&gbmode=$gbmode&cid=$cid\">Gradebook</a> ";
-	echo "&gt; <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&aid=$aid&asid=average\">Item Analysis</a> ";
+	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
+	echo "&gt; <a href=\"gb-itemanalysis.php?stu=$stu&cid=$cid&aid=$aid\">Item Analysis</a> ";
 	echo "&gt; Grading a Question</div>";
 	echo "<h2>Grading a Question in $aname</h2>";
 	echo "<p><b>Warning</b>: This page may not work correctly if the question selected is part of a group of questions</p>";
