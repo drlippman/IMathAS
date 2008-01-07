@@ -1879,14 +1879,14 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					if ($anssm!=$ganssm || $ansem!=$gansem) {
 						continue;
 					}
-					if (strpos($anssn,'oo')) {
+					if (strpos($anssn,'oo')!==false) {
 						if ($anssn===$ganssn) {} else {continue;}
 					} else if (isset($abstolerance)) {
 						if (abs($anssn-$ganssn) < $abstolerance + 1E-12) {} else {continue;} 	
 					} else {
 						if (abs($anssn - $ganssn)/(abs($anssn)+.0001) < $reltolerance+ 1E-12) {} else {continue;}
 					}
-					if (strpos($ansen,'oo')) {
+					if (strpos($ansen,'oo')!==false) {
 						if ($ansen===$gansen) {} else {continue;}
 					} else if (isset($abstolerance)) {
 						if (abs($ansen-$gansen) < $abstolerance + 1E-12) {} else {continue;} 	

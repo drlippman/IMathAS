@@ -47,7 +47,7 @@ if ($myrights < 40) {
 } else {
  //data manipulation here
  //data processing for COURSES block 
-	$query = "SELECT imas_courses.id,imas_courses.ownerid,imas_courses.name,imas_users.FirstName,imas_users.LastName FROM imas_courses,imas_users ";
+	$query = "SELECT imas_courses.id,imas_courses.ownerid,imas_courses.name,imas_courses.available,imas_users.FirstName,imas_users.LastName FROM imas_courses,imas_users ";
 	$query .= "WHERE imas_courses.ownerid=imas_users.id";
 	if ($myrights == 40 || $showcourses==0) { $query .= " AND imas_courses.ownerid='$userid'";}
 	if ($myrights >= 75 && $showcourses>0) {
@@ -65,7 +65,8 @@ if ($myrights < 40) {
 		$page_courseList[$i]['name'] = $line['name']; 
 		$page_courseList[$i]['LastName'] = $line['LastName']; 
 		$page_courseList[$i]['FirstName'] = $line['FirstName']; 
-		$page_courseList[$i]['ownerid'] = $line['ownerid']; 
+		$page_courseList[$i]['ownerid'] = $line['ownerid'];
+		$page_courseList[$i]['available'] = $line['available'];
 		$page_courseList[$i]['addRemove'] = ($myrights<75) ? "" : "<a href=\"forms.php?action=chgteachers&id={$line['id']}\">Add/Remove</a>";
 		$page_courseList[$i]['transfer'] = ($line['ownerid']!=$userid && $myrights <75) ? "" : "<a href=\"forms.php?action=transfer&id={$line['id']}\">Transfer</a>";
 		$i++;
@@ -196,7 +197,25 @@ $placeinhead .= "}</script>";
 		if ($alt==0) {echo "	<tr class=even>"; $alt=1;} else {echo "	<tr class=odd>"; $alt=0;}
 ?>		
 				<td><a href="../course/course.php?cid=<?php echo $page_courseList[$i]['id'] ?>">
-				<?php echo $page_courseList[$i]['name'] ?></a>
+				<?php 
+				if (($page_courseList[$i]['available']&1)==1) {
+					echo '<i>';
+				}
+				if (($page_courseList[$i]['available']&2)==2) {
+					echo '<span style="color:#aaf;">';
+				}
+					
+				echo $page_courseList[$i]['name'];
+				
+				if (($page_courseList[$i]['available']&1)==1) {
+					echo '</i>';
+				}
+				if (($page_courseList[$i]['available']&2)==2) {
+					echo '</span>';
+				}
+					
+				?>
+				</a>
 				</td>
 				<td class=c><?php echo $page_courseList[$i]['id'] ?></td>
 				<td><?php echo $page_courseList[$i]['LastName'] ?>, <?php echo $page_courseList[$i]['FirstName'] ?></td>

@@ -1063,7 +1063,7 @@
 	require("../footer.php");
 	
 	function shownavbar($questions,$scores,$current,$showcat) {
-		global $imasroot,$isdiag,$testsettings,$attempts,$qi,$allowregen,$bestscores,$isreview,$noindivscores;
+		global $imasroot,$isdiag,$testsettings,$attempts,$qi,$allowregen,$bestscores,$isreview,$showeachscore;
 		$todo = 0;
 		$earned = 0;
 		$poss = 0;
@@ -1123,7 +1123,7 @@
 					echo "<a href=\"showtest.php?action=skip&to=$i\">Q ". ($i+1) . "</a>";
 				}
 			}
-			if (!$noindivscores) {
+			if ($showeachscore) {
 				if (($isreview && canimprove($i)) || (!$isreview && canimprovebest($i))) {
 					echo ' (';
 				} else {
@@ -1154,7 +1154,7 @@
 			echo "</li>\n";
 		}
 		echo "</ul>";
-		if (!$noindivscores) {
+		if ($showeachscore) {
 			if ($isreview) {
 				echo "<p>Review: ";
 			} else {

@@ -170,7 +170,7 @@ function countif($a,$ifcond) {
 	return $cnt;
 }
 
-//histogram(array,label,start,classwidth,[labelstart,upper])
+//histogram(array,label,start,classwidth,[labelstart,upper,width,height])
 //display macro.  Creates a histogram from a data set
 // array: array of data values
 // label: name of data values
@@ -178,7 +178,8 @@ function countif($a,$ifcond) {
 // classwidth: width of the classes
 // labelstart (optional): value to start axis labeling at.  Defaults to start
 // upper (optional): first upper class limit.  Defaults to start+classwidth
-function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false) {
+// width,height (optional): width and height in pixels of graph
+function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false,$width=300,$height=200) {
 	sort($a, SORT_NUMERIC);
 	$x = $start;
 	$curr = 0;
@@ -227,10 +228,10 @@ function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false) {
 
 	}
 	$outst .= $st;
-	return showasciisvg($outst,300,200);
+	return showasciisvg($outst,$width,$height);
 }
 
-//fdhistogram(freqarray,label,start,cw,[labelstart,upper])
+//fdhistogram(freqarray,label,start,cw,[labelstart,upper,width,height])
 //display macro.  Creates a histogram from frequency array
 // freqarray: array of frequencies
 // label: name of data values
@@ -238,7 +239,8 @@ function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false) {
 // classwidth: width of the classes
 // labelstart (optional): value to start axis labeling at.  Defaults to start
 // upper (optional): first upper class limit.  Defaults to start+classwidth
-function fdhistogram($freq,$label,$start,$cw,$startlabel=false,$upper=false) {
+// width,height (optional): width and height in pixels of graph
+function fdhistogram($freq,$label,$start,$cw,$startlabel=false,$upper=false,$width=300,$height=200) {
 	$x = $start;
 	$alt = "Histogram for $label <table class=stats><thead><tr><th>Label on left of box</th><th>Frequency</th></tr></thead>\n<tbody>\n";
 	$maxfreq = 0;
@@ -277,7 +279,7 @@ function fdhistogram($freq,$label,$start,$cw,$startlabel=false,$upper=false) {
 	}
 	//$outst .= "axes($cw,$step,1,1000,$step); fill=\"blue\"; text([". ($start + .5*($x-$start))  .",". (-.1*$maxfreq) . "],\"$label\");";
 	$outst .= $st;
-	return showasciisvg($outst,300,200);
+	return showasciisvg($outst,$width,$height);
 }
 
 //fdbargraph(barlabels,freqarray,label,[width,height])
