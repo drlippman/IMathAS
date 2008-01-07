@@ -520,7 +520,7 @@ function gbinstrdisp() {
 		
 		$n++;
 	}
-	if ($totonleft && !$hidpast) {
+	if ($totonleft && !$hidepast) {
 		//total totals
 		if ($catfilter<0) {
 			if (isset($gbt[0][3][0])) { //using points based

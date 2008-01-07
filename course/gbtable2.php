@@ -889,27 +889,27 @@ function gbtable() {
 			}
 		} else if ($useweights==1) { //use weights (%) grading method
 			//already calculated $tot
-			if ($overallptspast>0) {
-				$totpast = 100*($totpast/$overallptspast);
-			} else {
-				$totpast = 0;
-			}
+			//if ($overallptspast>0) {
+			//	$totpast = 100*($totpast/$overallptspast);
+			//} else {
+			//	$totpast = 0;
+			//}
 			$gb[$ln][3][0] = round(100*$totpast,1);
 			$gb[$ln][3][3] = null;
 			
-			if ($overallptscur>0) {
-				$totcur = 100*($totcur/$overallptscur);
-			} else {
-				$totcur = 0;
-			}
+			//if ($overallptscur>0) {
+			//	$totcur = 100*($totcur/$overallptscur);
+			//} else {
+			//	$totcur = 0;
+			//}
 			$gb[$ln][3][1] = round(100*$totcur,1);
 			$gb[$ln][3][4] = null;
 			
-			if ($overallptsfuture>0) {
-				$totfuture = 100*($totfuture/$overallptsfuture);
-			} else {
-				$totfuture = 0;
-			}
+			//if ($overallptsfuture>0) {
+			//	$totfuture = 100*($totfuture/$overallptsfuture);
+			//} else {
+			//	$totfuture = 0;
+			//}
 			$gb[$ln][3][2] = round(100*$totfuture,1);
 			$gb[$ln][3][5] = null;
 			
