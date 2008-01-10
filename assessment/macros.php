@@ -4,7 +4,7 @@
 
 
 array_push($allowedmacros,"sec","csc","cot","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif","in_array","prettyint","prettyreal","arraystodots","subarray","showdataarray","arraystodoteqns","array_flip","arrayfindindex");
-array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst");
+array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","stringappend","stringprepend");
 function mergearrays($a,$b) {
 	return array_merge($a,$b);
 }
@@ -837,6 +837,21 @@ function dispreducedfraction($n,$d) {
 	}
 }
 
+function makereducedfraction($n,$d) {
+	$g = gcd($n,$d);
+	$n = $n/$g;
+	$d = $d/$g;	
+	if ($d<0) {
+		$n = $n*-1;
+		$d = $d*-1;
+	}
+	if ($d==1) {
+		return "$n";
+	} else {
+		return "$n/$d";
+	}
+}
+
 //use: calconarray($a,"x^$p")
 function calconarray($array,$todo) {
 	global $disallowedwords,$allowedmacros;
@@ -931,6 +946,27 @@ function prettyint($n) {
 }
 function prettyreal($n,$d) {
 	return number_format($n,$d);
+}
+
+function stringappend($v,$s) {
+	if (is_array($v)) {
+		foreach($v as $k=>$y) {
+			$v[$k] = $v[$k].$s;
+		}
+	} else {
+		$v = $v.$s;
+	}
+	return $v;
+}
+function stringprepend($v,$s) {
+	if (is_array($v)) {
+		foreach($v as $k=>$y) {
+			$v[$k] = $s.$v[$k];
+		}
+	} else {
+		$v = $s.$v;
+	}
+	return $v;
 }
 
 function arraystodots($x,$y) {
