@@ -120,14 +120,15 @@ if ($overwriteBody==1) {
 	}
 
 	echo $page_scoreMsg;
-	
+	echo '<script type="text/javascript"> function whiteout() { e=document.getElementsByTagName("div");';
+	echo 'for (i=0;i<e.length;i++) { if (e[i].className=="question") {e[i].style.backgroundColor="#fff";}}}</script>';
 	echo "<form method=post action=\"$page_formAction\" onsubmit=\"doonsubmit()\">\n";
 	echo "<input type=hidden name=seed value=\"$seed\">\n";
 	echo "<input type=hidden name=attempt value=\"$attempt\">\n";
 
 	displayq(0,$_GET['qsetid'],$seed,true,true,$attempt);
 	echo "<input type=submit value=\"Submit\"><input type=submit name=\"regen\" value=\"Submit and Regen\">\n";
-	
+	echo "<input type=button value=\"White Background\" onClick=\"whiteout()\"/>";
 	echo "</form>\n";
 	
 	echo "<p>Question id: {$_GET['qsetid']}.  <a href=\"mailto:$email\">E-mail owner</a> to report problems</p>";
