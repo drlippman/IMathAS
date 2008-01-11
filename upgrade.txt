@@ -6,6 +6,9 @@ Upgrade Notes
 
 *** Database Changes ***
 
+ALTER TABLE `imas_students` ADD `lastaccess` INT( 10 ) UNSIGNED NOT NULL ;
+UPDATE imas_students,imas_users SET imas_students.lastaccess=imas_users.lastaccess WHERE imas_students.userid=imas_users.id;
+
 ALTER TABLE `imas_gbscheme` CHANGE `defgbmode` `defgbmode` SMALLINT( 4 ) UNSIGNED NOT NULL DEFAULT '21' ;
 UPDATE `imas_assessments` SET cntingb =3 WHERE deffeedback LIKE 'Practice%';
 

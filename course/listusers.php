@@ -176,7 +176,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$hascode = false;
 		}	
 		
-		$query = "SELECT imas_students.id,imas_students.userid,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.SID,imas_users.lastaccess,imas_students.section,imas_students.code ";
+		$query = "SELECT imas_students.id,imas_students.userid,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.SID,imas_students.lastaccess,imas_students.section,imas_students.code ";
 		$query .= "FROM imas_students,imas_users WHERE imas_students.courseid='$cid' AND imas_students.userid=imas_users.id ";
 		if ($hassection) {
 			$query .= "ORDER BY imas_students.section,imas_users.LastName,imas_users.FirstName";
@@ -340,7 +340,7 @@ if ($overwriteBody==1) {
 			<th>First</th>
 			<th>Email</th>
 			<th><?php echo $loginprompt ?></th>
-			<th>Last Login</th>
+			<th>Last Access</th>
 			<th>Grades</th>
 			<th>Due Dates</th>
 			<th>Chg Info</th>

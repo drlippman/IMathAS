@@ -128,7 +128,14 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		$_GET['folder'] = $sessiondata['folder'.$cid];
 	}
 	
-	
+	if (!isset($sessiondata['lastaccess'.$cid]) && !isset($teacherid)) {
+		$now = time();
+		$query = "UPDATE imas_students SET lastaccess='$now' WHERE userid='$userid' AND courseid='$cid'";
+		mysql_query($query) or die("Query failed : " . mysql_error());
+		$sessiondata['lastaccess'.$cid] = $now;
+		writesessiondata();
+	}
+		
 	if ($_GET['folder']!='0') {
 		$now = time() + $previewshift;
 		$blocktree = explode('-',$_GET['folder']);
