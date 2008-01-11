@@ -7,6 +7,7 @@ require_once("mathphp.php");
 require("interpret.php");
 require("macros.php");
 function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false) {
+	global $imasroot;
 	srand($seed);
 	
 	/*if (func_num_args()>5 && func_get_arg(5)==true) {

@@ -381,13 +381,20 @@ if ($overwriteBody==1) {
 require("../footer.php");
 
 function printq($qn,$qsetid,$seed,$pts) {
-	global $isfinal;
+	global $isfinal,$imasroot;
 	srand($seed);
 
-	$query = "SELECT qtype,control,qcontrol,qtext,answer FROM imas_questionset WHERE id='$qsetid'";
+	$query = "SELECT qtype,control,qcontrol,qtext,answer,hasimg FROM imas_questionset WHERE id='$qsetid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$qdata = mysql_fetch_array($result, MYSQL_ASSOC);
 	
+	if ($qdata['hasimg']>0) {
+		$query = "SELECT var,filename,alttext FROM imas_qimages WHERE qsetid='$qsetid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			${$row[0]} = "<img src=\"$imasroot/assessment/qimages/{$row[1]}\" alt=\"{$row[2]}\" />";	
+		}
+	}
 	eval(interpret('control',$qdata['qtype'],$qdata['control']));
 	eval(interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
 	$toevalqtxt = interpret('qtext',$qdata['qtype'],$qdata['qtext']);
@@ -395,6 +402,13 @@ function printq($qn,$qsetid,$seed,$pts) {
 	eval(interpret('answer',$qdata['qtype'],$qdata['answer']));
 	srand($seed+2);
 	$la = '';
+	
+	if (isset($choices) && !isset($questions)) {
+		$questions =& $choices;
+	}
+	if (isset($variable) && !isset($variables)) {
+		$variables =& $variable;
+	}
 	
 	//pack options
 	if (isset($ansprompt)) {$options['ansprompt'] = $ansprompt;}
