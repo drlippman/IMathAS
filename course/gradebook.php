@@ -419,7 +419,11 @@ function gbstudisp($stu) {
 				echo '<td class="cat'.$gbt[0][2][$i][1].'"><stpan class="cattothdr">'.$gbt[0][2][$i][0].'</span></td>';
 				echo '<td>'.$gbt[0][2][$i][3+$availshow].'&nbsp;pts</td>';
 				echo '<td>'.$gbt[1][2][$i][$availshow].'</td>';
-				echo '<td>'.round(100*$gbt[1][2][$i][$availshow]/$gbt[0][2][$i][3+$availshow],1).'%</td>';
+				if ($gbt[0][2][$i][3+$availshow]>0) {
+					echo '<td>'.round(100*$gbt[1][2][$i][$availshow]/$gbt[0][2][$i][3+$availshow],1).'%</td>';
+				} else {
+					echo '<td>0%</td>';
+				}
 				if ($stu>0) {
 					echo '<td></td>';
 				}

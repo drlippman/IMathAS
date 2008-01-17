@@ -336,6 +336,7 @@ switch($_GET['action']) {
 		}
 	case "transfer":
 		if ($myrights < 40) { echo "You don't have the authority for this action"; break;}
+		$exec = false;
 		$query = "UPDATE imas_courses SET ownerid='{$_POST['newowner']}' WHERE id='{$_GET['id']}'";
 		if ($myrights < 75) {
 			$query .= " AND ownerid='$userid'";
@@ -346,10 +347,22 @@ switch($_GET['action']) {
 			if (mysql_num_rows($result)>0) {
 				$query = "UPDATE imas_courses SET ownerid='{$_POST['newowner']}' WHERE id='{$_GET['id']}'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
+				$exec = true;
 			}
 			//$query = "UPDATE imas_courses,imas_users SET imas_courses.ownerid='{$_POST['newowner']}' WHERE ";
 			//$query .= "imas_courses.id='{$_GET['id']}' AND imas_courses.ownerid=imas_users.id AND imas_users.groupid='$groupid'";
 		} else {
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			$exec = true;
+		}
+		if ($exec && mysql_affected_rows()>0) {
+			$query = "SELECT id FROM imas_teachers WHERE courseid='{$_GET['id']}' AND userid='{$_POST['newowner']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			if (mysql_num_rows($result)==0) {
+				$query = "INSERT INTO imas_teachers (userid,courseid) VALUES ('{$_POST['newowner']}','{$_GET['id']}')";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+			$query = "DELETE FROM imas_teachers WHERE courseid='{$_GET['id']}' AND userid='$userid'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		}
 		

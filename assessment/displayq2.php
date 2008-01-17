@@ -1642,8 +1642,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		
 		//test for correct format, if specified
 		if (checkreqtimes($_POST["tc$qn"],$requiretimes)==0) {
-			return 0;
+			$correct = false;
 		}
+		
 		$answer = preg_replace('/[^\w\*\/\+\=\-\(\)\[\]\{\}\,\.\^\$\!]+/','',$answer);
 
 		if ($answerformat=="equation") {
@@ -1716,6 +1717,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			} else if ($answerformat=="toconst") {
 				$diffs[] = $myans[$i] - $realans;
 			} else { //otherwise, compare points
+				
 				if (isset($abstolerance)) {
 					
 					if (abs($myans[$i]-$realans) > $abstolerance-1E-12) {$correct = false; break;}	

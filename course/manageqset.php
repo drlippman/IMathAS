@@ -442,6 +442,11 @@ if ($myrights<20) {
 			} else {
 				$searchall = 0;
 			}
+			if ($searchall==1 && trim($search)=='') {
+				$overwriteBody = 1;
+				$body = "Must provide a search term when searching all libraries <a href=\"manageqset.php\">Try again</a>";
+				$searchall = 0;
+			} 
 			$sessiondata['searchall'.$cid] = $searchall;
 			if (isset($_POST['searchmine'])) {
 				$searchmine = 1;
@@ -507,11 +512,12 @@ if ($myrights<20) {
 			$lnames = implode(", ",$lnamesarr);
 		} else {$lnames = '';}
 		
+		/*
 		if ($searchall==1 && trim($search)=='') {
 			$overwriteBody = 1;
 			$body = "Must provide a search term when searching all libraries";
 		}
-		
+		*/
 		
 		$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.ownerid,imas_questionset.description,imas_questionset.userights,imas_questionset.lastmoddate,";
 		$query .= "imas_questionset.qtype,imas_users.firstName,imas_users.lastName,imas_users.groupid,imas_library_items.libid ";
