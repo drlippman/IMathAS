@@ -359,7 +359,7 @@ function gbstudisp($stu) {
 							echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid={$gbt[1][1][$i][4]}&uid={$gbt[1][4][0]}\">";
 							$haslink = true;
 						} else if ($isteacher) {
-							echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid=new&uid={$gbt[1][4][0]}\">";
+							echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid=new&aid={$gbt[0][1][$i][7]}&uid={$gbt[1][4][0]}\">";
 							$haslink = true;
 						}
 					}
@@ -702,7 +702,7 @@ function gbinstrdisp() {
 						if ($gbt[$i][0][0]=='Averages') {
 							echo '-';
 						} else {
-							echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid=new&uid={$gbt[$i][4][0]}\">-</a>";
+							echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid=new&aid={$gbt[0][1][$j][7]}&uid={$gbt[$i][4][0]}\">-</a>";
 						}
 					}
 				} else if ($gbt[0][1][$j][6]==1) { //offline
