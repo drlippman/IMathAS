@@ -473,7 +473,7 @@ function gbstudisp($stu) {
 				echo '<td>'.$gbt[1][3][0].'</td>';
 				echo '<td>'.$gbt[1][3][3] .'%</td>';
 			} else {
-				echo '<td>Weighted Total Due %</td>'; 
+				echo '<td>Weighted Total Past Due %</td>'; 
 				echo '<td></td>';
 				echo '<td>'.$gbt[1][3][0].'%</td>';
 				echo '<td></td>';
@@ -655,7 +655,11 @@ function gbinstrdisp() {
 					} else if ($availshow==2 && $gbt[0][2][$j][2]==3) {
 						continue;
 					}
-					echo '<td class="c">'.$gbt[$i][2][$j][$availshow].'</td>';
+					if ($catfilter!=-1 && $gbt[0][2][$j][$availshow+3]>0) {
+						echo '<td class="c">'.$gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)</td>';
+					} else {
+						echo '<td class="c">'.$gbt[$i][2][$j][$availshow].'</td>';
+					}
 				}
 			}
 		}
@@ -742,7 +746,11 @@ function gbinstrdisp() {
 					} else if ($availshow==2 && $gbt[0][2][$j][2]==3) {
 						continue;
 					}
-					echo '<td class="c">'.$gbt[$i][2][$j][$availshow].'</td>';
+					if ($catfilter!=-1 && $gbt[0][2][$j][$availshow+3]>0) {
+						echo '<td class="c">'.$gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)</td>';
+					} else {
+						echo '<td class="c">'.$gbt[$i][2][$j][$availshow].'</td>';
+					}
 				}
 			}
 			

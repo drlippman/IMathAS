@@ -309,7 +309,7 @@
 				   }
 				   if (isset($teacherid)) { 
 					echo " <i><a href=\"addquestions.php?aid=$typeid&cid=$cid\">Questions</a></i> | <a href=\"addassessment.php?id=$typeid&block=$parent&cid=$cid\">Settings</a></i> \n";
-					echo " | <a href=\"gradebook.php?cid=$cid&asid=average&aid=$typeid\">Grades</a>";
+					echo " | <a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=$typeid\">Grades</a>";
 				   } else if ($line['allowlate']==1 && $latepasses>0) {
 					echo " <a href=\"redeemlatepass.php?cid=$cid&aid=$typeid\">Use LatePass</a>";
 				   }
@@ -326,7 +326,7 @@
 				   }
 				   if (isset($teacherid)) { 
 				   	echo " <i><a href=\"addquestions.php?aid=$typeid&cid=$cid\">Questions</a></i> | <a href=\"addassessment.php?id=$typeid&block=$parent&cid=$cid\">Settings</a>\n";
-					echo " | <a href=\"gradebook.php?cid=$cid&asid=average&aid=$typeid\">Grades</a>";
+					echo " | <a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=$typeid\">Grades</a>";
 				   } 
 				   echo filter("<br/><i>This assessment is in review mode - no scores will be saved</i></div><div class=itemsum>{$line['summary']}</div>\n");
 				   echo "</div>\n";
@@ -346,7 +346,7 @@
 				   echo "<div class=title><i> <a href=\"../assessment/showtest.php?id=$typeid&cid=$cid\">{$line['name']}</a><BR>$show</i>\n";
 				   echo "<a href=\"addquestions.php?aid=$typeid&cid=$cid\">Questions</a> | <a href=\"addassessment.php?id=$typeid&cid=$cid\">Settings</a> | \n";
 				   echo "<a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
-				   echo " | <a href=\"gradebook.php?cid=$cid&asid=average&aid=$typeid\">Grades</a>";
+				   echo " | <a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=$typeid\">Grades</a>";
 				   echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
 				   echo "</div>\n";
 			   }

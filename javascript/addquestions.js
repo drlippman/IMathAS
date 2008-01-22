@@ -40,7 +40,7 @@ function getnextprev(formn,loc,onlychk) {
 		if (typeof el.type == "undefined") {
 			continue;
 		}
-		if (((el.type == 'checkbox' && el.name=='nchecked[]') || (el.type=='checkbox' && el.name=='checked[]')) && (!onlychk || el.checked)) {
+		if (((el.type == 'checkbox' && el.name=='nchecked[]') || ((el.type=='checkbox' || el.type=='hidden') && el.name=='checked[]')) && (!onlychk || el.checked)) {
 			if (found) {
 				nextq = el.value;
 				nextl = el.id;

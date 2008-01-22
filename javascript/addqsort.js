@@ -99,7 +99,7 @@ function removeSelected() {
 		var chgcnt = 0;
 		for (var e = form.elements.length-1; e >-1 ; e--) {
 			var el = form.elements[e];
-			if (el.type == 'checkbox' && el.checked) {
+			if (el.type == 'checkbox' && el.checked && el.value!='ignore') {
 				val = el.value.split(":");
 				doremoveitem(val[0]); 
 				chgcnt++;
@@ -181,10 +181,12 @@ function generateTable() {
 			html += "<tr class='"+curclass+"'>";
 			if (beentaken) {
 				if (curisgroup) {
-					html += "<td>"+(i+1)+'-'+(j+1)+"</td>";
+					html += "<td>"+(i+1)+'-'+(j+1);
 				} else {
-					html += "<td>"+(i+1)+"</td>";
+					html += "<td>"+(i+1);
 				}
+				html += "<input type=hidden id=\"qc"+ln+"\" name=\"checked[]\" value=\""+(curisgroup?i+'-'+j:i)+":"+curitems[j][0]+"\"/>";
+				html += "</td>";
 			} else {
 				html += "<td>";
 				if (j==0) {
@@ -210,7 +212,11 @@ function generateTable() {
 				html += "</td>";
 			}
 			html += "<td><input type=hidden name=\"curq[]\" id=\"oqc"+ln+"\" value=\""+curitems[j][1]+"\"/>"+curitems[j][2]+"</td>"; //description
-			html += "<td><input type=button value='Preview' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",true,false)\"/></td>"; //Preview
+			if (beentaken) {
+				html += "<td><input type=button value='Preview' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",false,false)\"/></td>"; //Preview
+			} else {
+				html += "<td><input type=button value='Preview' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",true,false)\"/></td>"; //Preview
+			}
 			html += "<td>"+curitems[j][3]+"</td>"; //question type
 			if (curitems[j][4]==9999) { //points
 				html += "<td>"+defpoints+"</td>";

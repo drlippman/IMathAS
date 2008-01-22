@@ -657,7 +657,7 @@ if ($overwriteBody==1) {
 <?php			
 		}
 ?>
-		
+		Check/Uncheck All: <input type="checkbox" name="ca1" value="ignore" onClick="chkAll(this.form, 'checked[]', this.checked)">
 		<span id="submitnotice" style="color:red;"></span>
 		<div id="curqtbl"></div>
 

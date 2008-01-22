@@ -447,6 +447,9 @@ function gbtable() {
 	$overallptspast = 0;
 	$overallptscur = 0;
 	$overallptsfuture = 0;
+	$cattotweightpast = 0;
+	$cattotweightcur = 0;
+	$cattotweightfuture = 0;
 	$pos = 0;
 	foreach($catorder as $cat) {//foreach category
 		
@@ -475,10 +478,16 @@ function gbtable() {
 		$gb[0][2][$pos][1] = $cats[$cat][6];
 		if ($catposspast[$cat]>0) {
 			$gb[0][2][$pos][2] = 0; //scores in past
+			$cattotweightpast += $cats[$cat][5];
+			$cattotweightcur += $cats[$cat][5];
+			$cattotweightfuture += $cats[$cat][5];
 		} else if ($catposscur[$cat]>0) {
 			$gb[0][2][$pos][2] = 1; //scores in cur 
+			$cattotweightcur += $cats[$cat][5];
+			$cattotweightfuture += $cats[$cat][5];
 		} else if ($catpossfuture[$cat]>0) {
 			$gb[0][2][$pos][2] = 2; //scores in future
+			$cattotweightfuture += $cats[$cat][5];
 		} else {
 			$gb[0][2][$pos][2] = 3; //no items
 		}
@@ -510,7 +519,6 @@ function gbtable() {
 		$overallptsfuture += $gb[0][2][$pos][5];
 		$pos++;
 	}
-	
 	
 	//find total possible points
 	if ($useweights==0) { //use points grading method
@@ -894,7 +902,7 @@ function gbtable() {
 			//} else {
 			//	$totpast = 0;
 			//}
-			$gb[$ln][3][0] = round(100*$totpast,1);
+			$gb[$ln][3][0] = round(10000*$totpast/$cattotweightpast,1);
 			$gb[$ln][3][3] = null;
 			
 			//if ($overallptscur>0) {
@@ -902,7 +910,7 @@ function gbtable() {
 			//} else {
 			//	$totcur = 0;
 			//}
-			$gb[$ln][3][1] = round(100*$totcur,1);
+			$gb[$ln][3][1] = round(10000*$totcur/$cattotweightcur,1);
 			$gb[$ln][3][4] = null;
 			
 			//if ($overallptsfuture>0) {
@@ -910,7 +918,7 @@ function gbtable() {
 			//} else {
 			//	$totfuture = 0;
 			//}
-			$gb[$ln][3][2] = round(100*$totfuture,1);
+			$gb[$ln][3][2] = round(10000*$totfuture/$cattotweightfuture,1);
 			$gb[$ln][3][5] = null;
 			
 			
