@@ -1430,6 +1430,8 @@ The following macros help with display:
 <li><b>makexpretty and makexprettydisp</b>:  Like makepretty, but the X-tra version - attempts to clean up things like 1*, 0*, etc.  This function
    will often cause weird things to happen, so test well</li>
 <li><b>numtowords(number)</b>:  Creates a string containing number written out in words</li>
+<li><b>stringappend(value,string)</b>: Appends string to value.  If value is an array, string is appended to each element of the array</li>
+<li><b>stringprepend(value,string)</b>:  Same as stringappend, but prepends string to value</li>
 <li><b>prettyint(number)</b>:  Adds commas in thousands spaces of integers.  Example: prettyint(1234) will return "1,234".  The result is a string, which
    can only be used for display, not in calculations</li>
 <li><b>prettyreal(number,decimals)</b>:  Adds commas in thousands spaces of number, and rounds decimal to decimals places.  Example: prettyreal(1234.567,2) will return "1,234.57".  The result is a string, which
@@ -1439,6 +1441,7 @@ The following macros help with display:
     can also be 'clock' which returns 3:42pm, or 'sclock' which returns 3:42:15pm</li>
 <li><b>dispreducedfraction(numerator,denominator)</b>:  Takes two numbers as numerator and denominator of a fraction, returning a display form of the fraction,
     reduced to lowest terms.  Suitable for $showanswer</li>
+<li><b>makereducedfraction(numerator,denominator)</b>:  Same as dispreducefraction, but not already in display form</li>
 <li><b>showarrays(string,array,[string,array]...)</b>:  Creates a tabular display of the data in the array(s) as column(s), with the strings
     as column headers</li>
 <li><b>showdataarray(array,[columns])</b>:  Creates a tabular display of the data in the array with no headers.  Data is presented

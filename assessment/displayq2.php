@@ -169,7 +169,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	eval("\$evaledqtext = \"$toevalqtxt\";");
 	if ($returnqtxt) {
 		$returntxt = $evaledqtext;
-	} if ($seqinactive) {
+	} else if ($seqinactive) {
 		echo "<div>";
 		//$evaledqtext = str_replace('<input','<input disabled="disabled"',$evaledqtext);
 		echo filter($evaledqtext);

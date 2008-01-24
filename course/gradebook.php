@@ -396,7 +396,9 @@ function gbstudisp($stu) {
 			}
 			echo '</td><td>';
 			if (isset($gbt[1][1][$i][0])) {
-				echo round(100*$gbt[1][1][$i][0]/$gbt[0][1][$i][2],1).'%';
+				if ($gbt[0][1][$i][2]>0) {
+					echo round(100*$gbt[1][1][$i][0]/$gbt[0][1][$i][2],1).'%';
+				}
 			} else {
 				echo '0%';
 			}
