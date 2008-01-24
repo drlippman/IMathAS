@@ -1164,7 +1164,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 							} 
 						} else	if ($anans=="DNE" && strtoupper($givenans)=="DNE") {
 							$correct += 1; $foundloc = $j; break 2;   
-						} else if ($anans=="oo" && $givenans=="oo") {
+						} else if (($anans=="+oo" || $anans=="oo") && ($givenans=="+oo" || $givenans=="oo")) {
 							$correct += 1; $foundloc = $j; break 2;
 						} else if ($anans=="-oo" && $givenans=="-oo") {
 							$correct += 1; $foundloc = $j; break 2;
@@ -1595,7 +1595,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 							} 
 						} else	if ($anans=="DNE" && strtoupper($givenans)=="DNE") {
 							$correct += 1; $foundloc = $j; break 2;
-						} else if ($anans=="oo" && $givenans=="oo") {
+						} else if (($anans=="+oo" || $anans=="oo") && ($givenans=="+oo" || $givenans=="oo")) {
 							$correct += 1; $foundloc = $j; break 2;
 						} else if ($anans=="-oo" && $givenans=="-oo") {
 							$correct += 1; $foundloc = $j; break 2;
@@ -1795,13 +1795,25 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($flags['remove_whitespace']===true) {
 			$givenans = trim(preg_replace('/\s+/','',$givenans));
 		}
+		$specialor = false;
+		if ($flags['special_or']===true) {
+			$specialor = true;
+		}
 		
 		if ($flags['ignore_case']===true) {
 			$givenans = strtoupper($givenans);
 			$answer = strtoupper($answer);
-			$anss = explode(' OR ',$answer);
+			if ($specialor) {
+				$anss = explode(' *OR* ',$answer);
+			} else {
+				$anss = explode(' OR ',$answer);
+			}
 		} else {
-			$anss = explode(' or ',$answer);
+			if ($specialor) {
+				$anss = explode(' *or* ',$answer);
+			} else {
+				$anss = explode(' or ',$answer);
+			}
 		}
 				
 		$correct = 0;
@@ -1883,14 +1895,28 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						continue;
 					}
 					if (strpos($anssn,'oo')!==false) {
-						if ($anssn===$ganssn) {} else {continue;}
+						if (($anssn=='oo' || $anssn=='+oo') && ($ganssn=='oo' || $ganssn=='+oo')) {
+							
+						} else if ($anssn=='-oo' && $ganssn=='-oo') {
+							
+						} else {
+							continue;
+						}
+						//if ($anssn===$ganssn) {} else {continue;}
 					} else if (isset($abstolerance)) {
 						if (abs($anssn-$ganssn) < $abstolerance + 1E-12) {} else {continue;} 	
 					} else {
 						if (abs($anssn - $ganssn)/(abs($anssn)+.0001) < $reltolerance+ 1E-12) {} else {continue;}
 					}
 					if (strpos($ansen,'oo')!==false) {
-						if ($ansen===$gansen) {} else {continue;}
+						if (($ansen=='oo' || $ansen=='+oo') && ($gansen=='oo' || $gansen=='+oo')) {
+							
+						} else if ($ansen=='-oo' && $gansen=='-oo') {
+							
+						} else {
+							continue;
+						}
+						//if ($ansen===$gansen) {} else {continue;}
 					} else if (isset($abstolerance)) {
 						if (abs($ansen-$gansen) < $abstolerance + 1E-12) {} else {continue;} 	
 					} else {

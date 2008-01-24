@@ -93,7 +93,7 @@
 		}
 		$timeused = $line['endtime']-$line['starttime'];
 		
-		echo "<td><a href=\"gradebook.php?gbmode=$gbmode&cid=$cid&asid={$line['id']}&uid={$line['userid']}&from=isolate&aid=$aid\">";
+		echo "<td><a href=\"gb-viewasid.php?gbmode=$gbmode&cid=$cid&asid={$line['id']}&uid={$line['userid']}&from=isolate&aid=$aid\">";
 		if ($total<$minscore) {
 			echo "{$total}&nbsp;(NC)";
 		} else 	if ($IP==1 && $enddate>$now) {

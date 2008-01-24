@@ -69,6 +69,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			$query = "SELECT subject FROM imas_forum_posts WHERE id='{$_GET['replyto']}'";
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			$sub = mysql_result($result,0,0);
+			$sub = str_replace('"','&quot;',$sub);
 			$line['subject'] = "Re: $sub";
 			$line['message'] = "";
 			echo "<h3>Post Reply</h3>\n";

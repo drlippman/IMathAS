@@ -222,6 +222,7 @@
 				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$line = mysql_fetch_array($result, MYSQL_ASSOC);
 				echo "<h3>Modify Thread - \n";
+				$line['subject'] = str_replace('"','&quot;',$line['subject']);
 				$replyby = $line['replyby'];
 			} else {
 				echo "Add Thread</div>\n";

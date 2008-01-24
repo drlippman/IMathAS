@@ -118,7 +118,7 @@
 			if (isset($_GET['toquote']) || isset($_GET['replyto'])) {
 				$query = "SELECT title,message,courseid FROM imas_msgs WHERE id='$replyto'";
 				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-				$title = "Re: ".mysql_result($result,0,0);
+				$title = "Re: ".str_replace('"','&quot;',mysql_result($result,0,0));
 				if (isset($_GET['toquote'])) {
 					$message = mysql_result($result,0,1);
 					$message = '<p> </p><br/><hr/>In reply to:<br/>'.$message;

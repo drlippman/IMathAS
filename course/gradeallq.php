@@ -29,18 +29,18 @@
 			if (strpos($k,'-')!==false) {
 				$kp = explode('-',$k);
 				if ($kp[0]=='ud') {
-					$locs[$kp[1]] = $kp[2];
+					//$locs[$kp[1]] = $kp[2];
 					if (count($kp)==3) {
 						if ($v=='N/A') {
-							$allscores[$kp[1]] = -1;
+							$allscores[$kp[1]][$kp[2]] = -1;
 						} else {
-							$allscores[$kp[1]] = $v;
+							$allscores[$kp[1]][$kp[2]] = $v;
 						}
 					} else {
 						if ($v=='N/A') {
-							$allscores[$kp[1]][$kp[3]] = -1;
+							$allscores[$kp[1]][$kp[2]][$kp[3]] = -1;
 						} else {
-							$allscores[$kp[1]][$kp[3]] = $v;
+							$allscores[$kp[1]][$kp[2]][$kp[3]] = $v;
 						}
 					}
 				}
@@ -53,12 +53,14 @@
 		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 		$cnt = 0;
 		while($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
-			if (isset($locs[$line['id']])) {
+			if (isset($allscores[$line['id']])) {//if (isset($locs[$line['id']])) {
 				$scores = explode(",",$line['bestscores']);
-				if (is_array($allscores[$line['id']])) {
-					$scores[$locs[$line['id']]] = implode('~',$allscores[$line['id']]);
-				} else {
-					$scores[$locs[$line['id']]] = $allscores[$line['id']];
+				foreach ($allscores[$line['id']] as $loc=>$sv) {
+					if (is_array($sv)) {
+						$scores[$loc] = implode('~',$sv);
+					} else {
+						$scores[$loc] = $sv;
+					}
 				}
 				$scorelist = implode(",",$scores);
 				$feedback = $_POST['feedback-'.$line['id']];
@@ -66,7 +68,7 @@
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
 			}
 		}
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid&gbmode=$gbmode&aid=$aid&asid=average");
+		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-itemanalysis.php?stu=$stu&cid=$cid&aid=$aid&asid=average");
 		exit;
 	}
 	
@@ -163,67 +165,71 @@
 			$seeds = explode(",",$line['seeds']);
 			$la = explode("~",$line['lastanswers']);
 		}
-		$loc = array_search($qid,$questions);
-		echo "<h4>".$line['LastName'].', '.$line['FirstName']."</h4>";
-		echo "<div ";
-		if (getpts($scores[$loc])==$points) {
-			echo 'class="iscorrect"';	
-		} else if ($scores[$loc]==-1) {
-			echo 'class="notanswered"';
-		} else {
-			echo 'class="iswrong"';
-		}
-		echo '>';
-		$lastanswers[$cnt] = $la[$loc];
-		displayq($cnt,$qsetid,$seeds[$loc],true,false,$attempts[$loc]);
-		echo '</div>';
+		//$loc = array_search($qid,$questions);
+		$lockeys = array_keys($questions,$qid);
+		foreach ($lockeys as $loc) {
 		
-		echo "<div class=review>".$line['LastName'].', '.$line['FirstName'].': ';
-		list($pt,$parts) = printscore($scores[$loc]);
-		if ($parts=='') { 
-			if ($pt==-1) {
-				$pt = 'N/A';
+			echo "<h4>".$line['LastName'].', '.$line['FirstName']."</h4>";
+			echo "<div ";
+			if (getpts($scores[$loc])==$points) {
+				echo 'class="iscorrect"';	
+			} else if ($scores[$loc]==-1) {
+				echo 'class="notanswered"';
+			} else {
+				echo 'class="iswrong"';
 			}
-			echo "<input type=text size=4 name=\"ud-{$line['id']}-$loc\" value=\"$pt\">";
-		} 
-		if ($parts!='') {
-			echo " Parts: ";
-			$prts = explode(', ',$parts);
-			for ($j=0;$j<count($prts);$j++) {
-				if ($prts[$j]==-1) {
-					$prts[$j] = 'N/A';
+			echo '>';
+			$lastanswers[$cnt] = $la[$loc];
+			displayq($cnt,$qsetid,$seeds[$loc],true,false,$attempts[$loc]);
+			echo '</div>';
+			
+			echo "<div class=review>".$line['LastName'].', '.$line['FirstName'].': ';
+			list($pt,$parts) = printscore($scores[$loc]);
+			if ($parts=='') { 
+				if ($pt==-1) {
+					$pt = 'N/A';
 				}
-				echo "<input type=text size=2 name=\"ud-{$line['id']}-$loc-$j\" value=\"{$prts[$j]}\"> ";
-			}
-		}
-		echo " out of $points in {$attempts[$loc]} attempt(s)\n";
-		
-		$laarr = explode('##',$la[$loc]);
-		if (count($laarr)>1) {
-			echo "<br/>Previous Attempts:";
-			$cntb =1;
-			for ($k=0;$k<count($laarr)-1;$k++) {
-				if ($laarr[$k]=="ReGen") {
-					echo ' ReGen ';
-				} else {
-					echo "  <b>$cntb:</b> " . $laarr[$k];
-					$cntb++;
+				echo "<input type=text size=4 name=\"ud-{$line['id']}-$loc\" value=\"$pt\">";
+			} 
+			if ($parts!='') {
+				echo " Parts: ";
+				$prts = explode(', ',$parts);
+				for ($j=0;$j<count($prts);$j++) {
+					if ($prts[$j]==-1) {
+						$prts[$j] = 'N/A';
+					}
+					echo "<input type=text size=2 name=\"ud-{$line['id']}-$loc-$j\" value=\"{$prts[$j]}\"> ";
 				}
 			}
+			echo " out of $points in {$attempts[$loc]} attempt(s)\n";
+			
+			$laarr = explode('##',$la[$loc]);
+			if (count($laarr)>1) {
+				echo "<br/>Previous Attempts:";
+				$cntb =1;
+				for ($k=0;$k<count($laarr)-1;$k++) {
+					if ($laarr[$k]=="ReGen") {
+						echo ' ReGen ';
+					} else {
+						echo "  <b>$cntb:</b> " . $laarr[$k];
+						$cntb++;
+					}
+				}
+			}
+			
+			//echo " <a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid=$cid&add=new&quoteq=$i-$qsetid-{$seeds[$i]}&to={$_GET['uid']}\">Use in Msg</a>";
+			//echo " &nbsp; <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$line['id']}&clearq=$i\">Clear Score</a>";
+			echo "<br/>Feedback: <textarea cols=50 rows=1 name=\"feedback-{$line['id']}\">{$line['feedback']}</textarea>";
+			echo "</div>\n";
+			$cnt++;
 		}
-		
-		//echo " <a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid=$cid&add=new&quoteq=$i-$qsetid-{$seeds[$i]}&to={$_GET['uid']}\">Use in Msg</a>";
-		//echo " &nbsp; <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$line['id']}&clearq=$i\">Clear Score</a>";
-		echo "<br/>Feedback: <textarea cols=50 rows=1 name=\"feedback-{$line['id']}\">{$line['feedback']}</textarea>";
-		echo "</div>\n";
-		$cnt++;
 	}
 	echo "<input type=submit value=\"Save Changes\"/>";
 	echo "</form>";
 
 	
 
-	echo "<a href=\"gradebook.php?stu=$stu&cid=$cid&gbmode=$gbmode&aid=$aid&asid=average\">Back to Gradebook</a>";
+	echo "<a href=\"gb-itemanalysis.php?stu=$stu&cid=$cid&aid=$aid&asid=average\">Back to Gradebook Item Analysis</a>";
 
 	require("../footer.php");
 	function getpts($sc) {
