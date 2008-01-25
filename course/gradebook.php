@@ -698,7 +698,7 @@ function gbinstrdisp() {
 						} else if ($gbt[$i][1][$j][3]==3) {
 							echo ' (OT)';
 						} else if ($gbt[$i][1][$j][3]==4) {
-							echo ' {PT)';
+							echo ' (PT)';
 						} 
 						echo '</a>';
 						if ($gbt[$i][1][$j][1]==1) {
@@ -770,7 +770,7 @@ function gbinstrdisp() {
 		
 	echo "</thead><tbody>";
 	echo "</tbody></table>";
-	$sarr = implode(",",array_fill(0,$n,"'S'"));
+	$sarr = implode(",",array_fill(0,$n,"'N'"));
 	echo "<script>initSortTable('myTable',Array($sarr),true,false);</script>\n";
 		
 	

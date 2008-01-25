@@ -19,7 +19,20 @@ function calculate(inputId,outputId,format) {
 	  } else if (str.match(/oo/)) {
 		  str = "`"+str+"`";
 	  } else {
-		  if (format.indexOf('mixednumber')!=-1) {
+		  if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1) {
+			  str = str.replace(/\s/,'');
+			  if (!str.match(/^\s*\-?\(?\d+\s*\/\s*\-?\d+\)?\s*$/) && !str.match(/^\s*?\-?\d+\s*$/)) {
+				err += "not a valid fraction";  
+			  }
+		  } else if (format.indexOf('fracordec')!=-1) {
+			  str = str.replace(/\s/,'');
+			  if (!str.match(/^\s*\-?\(?\d+\s*\/\s*\-?\d+\)?\s*$/) && !str.match(/^\s*?\-?\d+\s*$/) && !str.match(/^\s*\-?\d+\.?(\d+)?\d*$/)) {
+				err += " invalid entry format";  
+			  }
+		  } else if (format.indexOf('mixednumber')!=-1) {
+			  if (!str.match(/^\s*\-?\s*\d+\s*_\s*\d+\s*\/\s*\d+\s*$/) && !str.match(/^\s*?\-?\d+\s*$/) && !str.match(/^\s*\-?\d+\s*\/\s*\-?\d+\s*$/)) {
+				err += "not a valid mixed number";
+			  }
 			  str = str.replace(/_/,' ');
 		  }
 		  if (format.indexOf('notrig')!=-1 && str.match(/(sin|cos|tan|cot|sec|csc)/)) {
@@ -34,7 +47,7 @@ function calculate(inputId,outputId,format) {
 			  }
 			  if (!isNaN(res) && res!="Infinity") {
 				  if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1) {
-					  str = "`"+str+"`";
+					  str = "`"+str+"` " + err;
 				  } else {
 					  str = "`"+str+" =` "+(Math.abs(res)<1e-15?0:res)+err;
 				  }

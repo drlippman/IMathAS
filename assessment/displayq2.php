@@ -1556,7 +1556,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					}
 				}
 				if (in_array("mixednumber",$ansformats)) {
-					if (!preg_match('/^\s*\-?\s*\d+\s*_\s*(\d+)\s*\/\s*(\d+)$\s*$/',$orarr[$j],$mnmatches) && !preg_match('/^\s*?\-?\d+\s*$/',$orarr[$j]) && !preg_match('/^\s*\-?\d+\s*\/\s*\-?\d+\s*$/',$orarr[$j])) {
+					if (!preg_match('/^\s*\-?\s*\d+\s*_\s*(\d+)\s*\/\s*(\d+)\s*$/',$orarr[$j],$mnmatches) && !preg_match('/^\s*?\-?\d+\s*$/',$orarr[$j]) && !preg_match('/^\s*\-?\d+\s*\/\s*\-?\d+\s*$/',$orarr[$j])) {
 						continue;
 					} else {
 						if (preg_match('/^\s*\-?\d+\s*\/\s*\-?\d+\s*$/',$orarr[$j])) {
