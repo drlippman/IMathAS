@@ -44,6 +44,9 @@ function C(x,k) {
 function matchtolower(match) {
 	return match.toLowerCase();
 }
+function nthroot(n,base) {
+	return safepow(base,1/n);
+}
 
 function safepow(base,power) {
 	if (base<0 && Math.floor(power)!=power) {
@@ -107,6 +110,7 @@ function mathjs(st,varlist) {
     st = st.replace(/coth\^-1/g,"arccoth");
   }
   
+  st = st.replace(/root\((\d+)\)\(/,"nthroot($1,");
   //st = st.replace(/E/g,"(EE)");
   st = st.replace(/([0-9])E([\-0-9])/g,"$1(EE)$2");
   st = st.replace(/^e$/g,"(E)");
@@ -158,14 +162,16 @@ function mathjs(st,varlist) {
     if (i==st.length-1) return "Error: missing argument";
     k = i+1;
     ch = st.charAt(k);
-    if (ch>="0" && ch<="9" || ch=="-" || ch==".") {// look for signed (decimal) number
+    nch = st.charAt(k+1);
+    if (ch>="0" && ch<="9" || (ch=="-" && nch!="(") || ch==".") {// look for signed (decimal) number
       k++;
       while (k<st.length && (ch=st.charAt(k))>="0" && ch<="9") k++;
       if (ch==".") {
         k++;
         while (k<st.length && (ch=st.charAt(k))>="0" && ch<="9") k++;
       }
-    } else if (ch=="(") {// look for matching closing bracket and function name
+    } else if (ch=="(" || (ch=="-" && nch=="(")) {// look for matching closing bracket and function name
+      if (ch=="-") { k++;}
       nested = 1;
       k++;
       while (k<st.length && nested>0) {

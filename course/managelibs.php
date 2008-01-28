@@ -611,7 +611,7 @@ if ($overwriteBody==1) {
 		</p>
 	
 	</form>
-<?	
+<?php	
 	}
 
 

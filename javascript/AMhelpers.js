@@ -16,7 +16,7 @@ function calculate(inputId,outputId,format) {
 	  var err = "";
 	  if (str.match(/DNE/i)) {
 		  str = str.toUpperCase();
-	  } else if (str.match(/oo/)) {
+	  } else if (str.match(/oo$/) || str.match(/oo\W/)) {
 		  str = "`"+str+"`";
 	  } else {
 		  if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1) {
@@ -110,7 +110,7 @@ function intcalculate(inputId,outputId) {
 		  vals = str.substring(1,str.length-1);
 		  vals = vals.split(/,/);
 		  for (j=0; j<2; j++) {	
-			  if (vals[j].match(/oo/)) {
+			  if (vals[j].match(/oo$/) || vals[j].match(/oo\W/)) {
 				  calcvals[j] = vals[j];
 			  } else {
 				  var err = "";
@@ -476,7 +476,7 @@ function doonsubmit(form,type2,skipconfirm) {
 					  vals = str.substring(1,str.length-1);
 					  vals = vals.split(/,/);
 					  for (j=0; j<2; j++) {	  
-						  if (!vals[j].match(/oo/)) {
+						  if (!vals[j].match(/oo$/) && !vals[j].match(/oo\W/)) {//(!vals[j].match(/oo/)) {
 							  var err = "";
 							  
 							  try {
@@ -515,7 +515,7 @@ function doonsubmit(form,type2,skipconfirm) {
 			str = str.replace(/(\d+)\s*_\s*(\d+\s*\/\s*\d+)/,"($1+$2)");
 			if (str.match(/^\s*$/)) {
 				var res = '';
-			} else if (str.match(/oo/)) {
+			} else if (str.match(/oo$/) || str.match(/oo\W/)) {
 				var res = str;
 			} else if (str.match(/DNE/i)) {
 				var res = str.toUpperCase();
