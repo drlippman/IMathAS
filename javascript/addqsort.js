@@ -181,7 +181,16 @@ function generateTable() {
 			html += "<tr class='"+curclass+"'>";
 			if (beentaken) {
 				if (curisgroup) {
-					html += "<td>"+(i+1)+'-'+(j+1);
+					if (j==0) {
+						html += "<td>"+(i+1)+"</td><td><b>Group</b>, choosing "+itemarray[i][0];
+						if (itemarray[i][1]==0) { 
+							html += " without";
+						} else if (itemarray[i][1]==1) { 
+							html += " with";
+						}
+						html += " replacement</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr class="+curclass+">";
+					}
+					html += "<td>&nbsp;"+(i+1)+'-'+(j+1);
 				} else {
 					html += "<td>"+(i+1);
 				}

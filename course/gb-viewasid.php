@@ -413,7 +413,7 @@
 			} else {
 				$pts[$r[0]] = $r[1]; //use points from question
 			}
-			$totalpossible += $pts[$r[0]];
+			//$totalpossible += $pts[$r[0]];  do later
 			$withdrawn[$r[0]] = $r[2];
 		}
 		
@@ -502,6 +502,7 @@
 			} else {
 				echo 'class="iswrong"';
 			}
+			$totalpossible += $pts[$questions[$i]];
 			echo '>';
 			list($qsetid,$cat) = getqsetid($questions[$i]);
 			if ($isteacher || ($testtype=="Practice" && $showans!="N") || ($testtype!="Practice" && (($showans=="I"  && !in_array(-1,$scores))|| ($showans!="N" && time()>$saenddate)))) {$showa=true;} else {$showa=false;}

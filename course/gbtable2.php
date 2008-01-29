@@ -209,6 +209,7 @@ function gbtable() {
 				if (strpos($sub[0],'|')===false) { //backwards compat
 					$aitems[$k] = $sub[0];
 					$aitemcnt[$k] = 1;
+					
 				} else {
 					$grpparts = explode('|',$sub[0]);
 					$aitems[$k] = $sub[1];
@@ -223,7 +224,7 @@ function gbtable() {
 		$result2 = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 		$totalpossible = 0;
 		while ($r = mysql_fetch_row($result2)) {
-			if (in_array($r[1],$aitems)) { //only use first item from grouped questions for total pts
+			if (($k = array_search($r[1],$aitems))!==false) { //only use first item from grouped questions for total pts	
 				if ($r[0]==9999) {
 					$totalpossible += $aitemcnt[$k]*$line['defpoints']; //use defpoints
 				} else {
