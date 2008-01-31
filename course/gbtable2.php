@@ -459,15 +459,15 @@ function gbtable() {
 		$catitemcntcur[$cat] = count($catposscur[$cat]) + count($catposscurec[$cat]);
 		$catitemcntfuture[$cat] = count($catpossfuture[$cat]) + count($catpossfutureec[$cat]);
 		if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($catposspast[$cat])) { //if drop is set and have enough items
-			asort($catposspast,SORT_NUMERIC);
+			asort($catposspast[$cat],SORT_NUMERIC);
 			$catposspast[$cat] = array_slice($catposspast[$cat],$cats[$cat][4]);
 		}
 		if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($catposscur[$cat])) { //same for past&current
-			asort($catposscur,SORT_NUMERIC);
+			asort($catposscur[$cat],SORT_NUMERIC);
 			$catposscur[$cat] = array_slice($catposscur[$cat],$cats[$cat][4]);
 		}
 		if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($catpossfuture[$cat])) { //same for all items
-			asort($catpossfuture,SORT_NUMERIC);
+			asort($catpossfuture[$cat],SORT_NUMERIC);
 			$catpossfuture[$cat] = array_slice($catpossfuture[$cat],$cats[$cat][4]);
 		}
 		$catposspast[$cat] = array_sum($catposspast[$cat]);
@@ -655,12 +655,12 @@ function gbtable() {
 			$gb[$row][1][$col][3] = 0;  //no other info
 			if ($cntingb[$i] == 1 || $cntingb[$i]==2) {
 				if ($gb[0][1][$col][3]<1) { //past
-					$cattotpast[$row][$category[$i]][] = $pts;
+					$cattotpast[$row][$category[$i]][$col] = $pts;
 				} 
 				if ($gb[0][1][$col][3]<2) { //past or cur
-					$cattotcur[$row][$category[$i]][] = $pts;
+					$cattotcur[$row][$category[$i]][$col] = $pts;
 				}
-				$cattotfuture[$row][$category[$i]][] = $pts;
+				$cattotfuture[$row][$category[$i]][$col] = $pts;
 				
 			}
 		}
@@ -701,12 +701,12 @@ function gbtable() {
 		
 		if ($cntingb[$i] == 1 || $cntingb[$i]==2) {
 			if ($gb[0][1][$col][3]<1) { //past
-				$cattotpast[$row][$category[$i]][] = 1*$l['score'];
+				$cattotpast[$row][$category[$i]][$col] = 1*$l['score'];
 			} 
 			if ($gb[0][1][$col][3]<2) { //past or cur
-				$cattotcur[$row][$category[$i]][] = 1*$l['score'];
+				$cattotcur[$row][$category[$i]][$col] = 1*$l['score'];
 			}
-			$cattotfuture[$row][$category[$i]][] = 1*$l['score'];		
+			$cattotfuture[$row][$category[$i]][$col] = 1*$l['score'];		
 		}
 	}
 	
@@ -728,12 +728,12 @@ function gbtable() {
 		$gb[$row][1][$col][0] = $r[2];
 		$gb[$row][1][$col][3] = 0; //is counted
 		if ($gb[0][1][$col][3]<1) { //past
-			$cattotpast[$row][$category[$i]][] = $r[2];
+			$cattotpast[$row][$category[$i]][$col] = $r[2];
 		} 
 		if ($gb[0][1][$col][3]<2) { //past or cur
-			$cattotcur[$row][$category[$i]][] = $r[2];
+			$cattotcur[$row][$category[$i]][$col] = $r[2];
 		}
-		$cattotfuture[$row][$category[$i]][] = $r[2];
+		$cattotfuture[$row][$category[$i]][$col] = $r[2];
 	}
 	
 	//create category totals
@@ -747,13 +747,18 @@ function gbtable() {
 			if (isset($cattotpast[$ln][$cat])) {  //past items
 				//cats: name,scale,scaletype,chop,drop,weight
 				if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotpast[$ln][$cat])) { //if drop is set and have enough items
+					foreach($cattotpast[$ln][$cat] as $col=>$v) {
+						$cattotpast[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	
+					}
 					asort($cattotpast[$ln][$cat],SORT_NUMERIC);
 					while (count($cattotpast[$ln][$cat])<$catitemcnt[$cat]) {
 						array_unshift($cattotpast[$ln][$cat],0);
 					}
 					$cattotpast[$ln][$cat] = array_slice($cattotpast[$ln][$cat],$cats[$cat][4]);
+					$cattotpast[$ln][$cat] = $catposspast[$cat]*array_sum($cattotpast[$ln][$cat])/count($cattotpast[$ln][$cat]);
+				} else {
+					$cattotpast[$ln][$cat] = array_sum($cattotpast[$ln][$cat]);
 				}
-				$cattotpast[$ln][$cat] = array_sum($cattotpast[$ln][$cat]); 
 				if ($cats[$cat][1]!=0) { //scale is set
 					if ($cats[$cat][2]==0) { //pts scale
 						$cattotpast[$ln][$cat] = round($catposspast[$cat]*($cattotpast[$ln][$cat]/$cats[$cat][1]),1);
@@ -785,13 +790,18 @@ function gbtable() {
 			if (isset($cattotcur[$ln][$cat])) {  //cur items
 				//cats: name,scale,scaletype,chop,drop,weight
 				if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotcur[$ln][$cat])) { //if drop is set and have enough items
+					foreach($cattotcur[$ln][$cat] as $col=>$v) {
+						$cattotcur[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	
+					}
 					asort($cattotcur[$ln][$cat],SORT_NUMERIC);
 					while (count($cattotcur[$ln][$cat])<$catitemcnt[$cat]) {
 						array_unshift($cattotcur[$ln][$cat],0);
 					}
 					$cattotcur[$ln][$cat] = array_slice($cattotcur[$ln][$cat],$cats[$cat][4]);
+					$cattotcur[$ln][$cat] = $catposscur[$cat]*array_sum($cattotcur[$ln][$cat])/count($cattotcur[$ln][$cat]);
+				} else {
+					$cattotcur[$ln][$cat] = array_sum($cattotcur[$ln][$cat]);
 				}
-				$cattotcur[$ln][$cat] = array_sum($cattotcur[$ln][$cat]); 
 				if ($cats[$cat][1]!=0) { //scale is set
 					if ($cats[$cat][2]==0) { //pts scale
 						$cattotcur[$ln][$cat] = round($catposscur[$cat]*($cattotcur[$ln][$cat]/$cats[$cat][1]),1);
@@ -823,13 +833,18 @@ function gbtable() {
 			if (isset($cattotfuture[$ln][$cat])) {  //future items
 				//cats: name,scale,scaletype,chop,drop,weight
 				if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotfuture[$ln][$cat])) { //if drop is set and have enough items
+					foreach($cattotfuture[$ln][$cat] as $col=>$v) {
+						$cattotfuture[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	
+					}
 					asort($cattotfuture[$ln][$cat],SORT_NUMERIC);
 					while (count($cattotfuture[$ln][$cat])<$catitemcnt[$cat]) {
 						array_unshift($cattotfuture[$ln][$cat],0);
 					}
 					$cattotfuture[$ln][$cat] = array_slice($cattotfuture[$ln][$cat],$cats[$cat][4]);
+					$cattotfuture[$ln][$cat] = $catpossfuture[$cat]*array_sum($cattotfuture[$ln][$cat])/count($cattotfuture[$ln][$cat]);
+				} else {
+					$cattotfuture[$ln][$cat] = array_sum($cattotfuture[$ln][$cat]);
 				}
-				$cattotfuture[$ln][$cat] = array_sum($cattotfuture[$ln][$cat]); 
 				if ($cats[$cat][1]!=0) { //scale is set
 					if ($cats[$cat][2]==0) { //pts scale
 						$cattotfuture[$ln][$cat] = round($catpossfuture[$cat]*($cattotfuture[$ln][$cat]/$cats[$cat][1]),1);

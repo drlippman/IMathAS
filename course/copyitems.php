@@ -106,7 +106,7 @@ function copyitem($itemid,$gbcats) {
 			$aitems = explode(',',mysql_result($result,0,0));
 			$newaitems = array();
 			foreach ($aitems as $k=>$aitem) {
-				if (strpos($aitem,'~')==FALSE) {
+				if (strpos($aitem,'~')===FALSE) {
 					///$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category) ";
 					///$query .= "SELECT '$newtypeid',questionsetid,points,attempts,penalty,category FROM imas_questions WHERE id='$aitem'";
 					//mysql_query($query) or die("Query failed :$query " . mysql_error());
@@ -120,6 +120,9 @@ function copyitem($itemid,$gbcats) {
 				} else {
 					$sub = explode('~',$aitem);
 					$newsub = array();
+					if (strpos($sub[0],'|')!==false) { //true except for bwards compat 
+						$newsub[] = array_shift($sub);
+					}
 					foreach ($sub as $subi) {
 						//$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category) ";
 						//$query .= "SELECT '$newtypeid',questionsetid,points,attempts,penalty,category FROM imas_questions WHERE id='$subi'";
