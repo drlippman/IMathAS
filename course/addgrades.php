@@ -55,23 +55,31 @@
 	if (isset($_POST['score'])) {
 		
 		foreach($_POST['score'] as $k=>$sc) {
+			if (trim($k)=='') { continue;}
 			$sc = trim($sc);
 			if ($sc!='') {
 				$query = "UPDATE imas_grades SET score='$sc',feedback='{$_POST['feedback'][$k]}' WHERE userid='$k' AND gbitemid='{$_GET['gbitem']}'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			} else {
-				$query = "DELETE FROM imas_grades WHERE gbitemid='{$_GET['gbitem']}' AND userid='$k'";
+				$query = "UPDATE imas_grades SET score=NULL,feedback='{$_POST['feedback'][$k]}' WHERE userid='$k' AND gbitemid='{$_GET['gbitem']}'";
+				//$query = "DELETE FROM imas_grades WHERE gbitemid='{$_GET['gbitem']}' AND userid='$k'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 		}
 	}
+	
 	if (isset($_POST['newscore'])) {
 		foreach($_POST['newscore'] as $k=>$sc) {
+			if (trim($k)=='') {continue;}			
 			if ($sc!='') {
 				$query = "INSERT INTO imas_grades (gbitemid,userid,score,feedback) VALUES ";
 				$query .= "('{$_GET['gbitem']}','$k','$sc','{$_POST['feedback'][$k]}')";
 				mysql_query($query) or die("Query failed : " . mysql_error());
-			} 
+			} else if (trim($_POST['feedback'][$k])!='') {
+				$query = "INSERT INTO imas_grades (gbitemid,userid,score,feedback) VALUES ";
+				$query .= "('{$_GET['gbitem']}','$k',NULL,'{$_POST['feedback'][$k]}')";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
 		}
 	}
 	if (isset($_POST['score']) || isset($_POST['newscore']) || isset($_POST['name'])) {
@@ -308,7 +316,11 @@ function doonblur(value) {
 			}
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			while ($row = mysql_fetch_row($result)) {
-				$score[$row[0]] = $row[1];
+				if ($row[1]!=null) {
+					$score[$row[0]] = $row[1];
+				} else {
+					$score[$row[0]] = '';
+				}
 				$feedback[$row[0]] = $row[2];
 			}
 			$query = "SELECT imas_users.id,imas_users.LastName,imas_users.FirstName,imas_students.section FROM imas_users,imas_students ";

@@ -149,7 +149,7 @@ if ($line == null) {
 			$page_teacherCourseData[$i]['courseDisplayTag'] .= " <span style=\"color:green;\">In Lockdown</span>";
 		}
 		if (isset($newmsgcnt[$page_teacherCourseData[$i]['id']]) && $newmsgcnt[$page_teacherCourseData[$i]['id']]>0) {
-			$page_teacherCourseData[$i]['courseDisplayTag'] .= " <span style=\"color:red\">New Messages ({$newmsgcnt[$page_teacherCourseData[$i]['id']]})</span>";
+			$page_teacherCourseData[$i]['courseDisplayTag'] .= " <a href=\"msgs/msglist.php?cid={$page_teacherCourseData[$i]['id']}\" style=\"color:red\">New Messages ({$newmsgcnt[$page_teacherCourseData[$i]['id']]})</a>";
 		}
 		if (isset($newpostscnt[$page_teacherCourseData[$i]['id']]) && $newpostscnt[$page_teacherCourseData[$i]['id']]>0) {
 			$page_teacherCourseData[$i]['courseDisplayTag'] .= " <a href=\"forums/newthreads.php?cid={$page_teacherCourseData[$i]['id']}\" style=\"color:red\">New Posts</a>";

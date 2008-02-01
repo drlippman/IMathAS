@@ -672,9 +672,10 @@ if ($overwriteBody==1) {
 	}
 ?>	
 	<p>
-		<input type=button value="Done" onClick="window.location='course.php?cid=<?php echo $cid ?>'"> or 
-		<input type=button value="Categorize Questions" onClick="window.location='categorize.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'"> or
-		<input type=button value="Create Print Version" onClick="window.location='printtest.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'">
+		<input type=button value="Done" onClick="window.location='course.php?cid=<?php echo $cid ?>'"> 
+		<input type=button value="Categorize Questions" onClick="window.location='categorize.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'"> 
+		<input type=button value="Create Print Version" onClick="window.location='printtest.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'"> 
+		<input type=button value="Preview" onClick="window.open('<?php echo $imasroot;?>/assessment/showtest.php?cid=<?php echo $cid ?>&id=<?php echo $aid ?>','Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20))"> 
 	</p>
 		
 <?php	

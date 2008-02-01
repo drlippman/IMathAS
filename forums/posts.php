@@ -49,7 +49,7 @@
 	if (!$isteacher) {
 		$query = "SELECT msgset FROM imas_courses WHERE id='$cid'";
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		if (mysql_result($result,0,0)==0) {
+		if ((mysql_result($result,0,0)%5)==0) {
 			$allowmsg = true;
 		} 
 	}

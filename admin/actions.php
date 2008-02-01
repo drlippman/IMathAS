@@ -117,6 +117,9 @@ switch($_GET['action']) {
 			
 		$hideicons = $_POST['HIassess'] + $_POST['HIinline'] + $_POST['HIlinked'] + $_POST['HIforum'] + $_POST['HIblock'];
 		$avail = 3 - $_POST['stuavail'] - $_POST['teachavail'];
+		if (isset($_POST['msgmonitor'])) {
+			$_POST['msgset'] += 5;
+		}
 		$query = "UPDATE imas_courses SET name='{$_POST['coursename']}',enrollkey='{$_POST['ekey']}',hideicons='$hideicons',available='$avail',lockaid='{$_POST['lockaid']}',";
 		$query .= "allowunenroll='{$_POST['allowunenroll']}',copyrights='{$_POST['copyrights']}',msgset='{$_POST['msgset']}',topbar='$topbar',cploc='{$_POST['cploc']}',theme='{$_POST['theme']}' WHERE id='{$_GET['id']}'";
 		if ($myrights==40) { $query .= " AND ownerid='$userid'";}
@@ -138,7 +141,9 @@ switch($_GET['action']) {
 		$topbar = implode('|',$topbar);
 		$hideicons = $_POST['HIassess'] + $_POST['HIinline'] + $_POST['HIlinked'] + $_POST['HIforum'] + $_POST['HIblock'];
 		$avail = 3 - $_POST['stuavail'] - $_POST['teachavail'];
-		
+		if (isset($_POST['msgmonitor'])) {
+			$_POST['msgset'] += 5;
+		}
 		$itemorder = addslashes(serialize(array()));
 		$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,allowunenroll,copyrights,msgset,itemorder,topbar,cploc,available,theme) VALUES ";
 		$query .= "('{$_POST['coursename']}','$userid','{$_POST['ekey']}','$hideicons','{$_POST['allowunenroll']}','{$_POST['copyrights']}','{$_POST['msgset']}','$itemorder','$topbar','{$_POST['cploc']}','$avail','{$_POST['theme']}');";

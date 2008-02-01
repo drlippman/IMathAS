@@ -82,6 +82,12 @@
 			} else {
 				$replyto = 0;
 			}
+			$query = "SELECT msgset FROM imas_courses WHERE id='$cid'";
+			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			$msgset = mysql_result($result,0,0);
+			$msgmonitor = floor($msgset/5);
+			$msgset = $msgset%5;
+				
 			echo "<form method=post action=\"msglist.php?page=$page&cid=$cid&add={$_GET['add']}&replyto=$replyto\">\n";
 			echo "<span class=form>To:</span><span class=formright>\n";
 			if (isset($_GET['to'])) {
@@ -91,9 +97,6 @@
 				echo $row[0].', '.$row[1];
 				echo "<input type=hidden name=to value=\"{$_GET['to']}\"/>";
 			} else {
-				$query = "SELECT msgset FROM imas_courses WHERE id='$cid'";
-				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-				$msgset = mysql_result($result,0,0);
 				echo "<select name=\"to\">";
 				if ($isteacher || $msgset<2) {
 					$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM ";
@@ -148,6 +151,9 @@
 			echo "<span class=left><div class=editor><textarea id=message name=message style=\"width: 100%;\" rows=20 cols=70>$message</textarea></div></span><br class=form>\n";
 			
 			echo "<div class=submit><input type=submit value='Submit'></div>\n";
+			if ($msgmonitor==1) {
+				echo "<p><span class=red>Note</span>: Student-to-student messages may be monitored by your instructor</p>";
+			}
 			require("../footer.php");
 			exit;
 		}
@@ -231,6 +237,8 @@
 		$query = "SELECT msgset FROM imas_courses WHERE id='$cid'";
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$msgset = mysql_result($result,0,0);
+		$msgmonitor = floor($msgset/5);
+		$msgset = $msgset%5;
 		if ($msgset<3 || $isteacher) {
 			$cansendmsgs = true;
 		}
@@ -333,6 +341,10 @@ function chgfilter() {
 		echo "<p><a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid&add=new\">Send New Message</a></p>\n";
 	}
 	echo "<p><a href=\"sentlist.php?cid=$cid\">Sent Messages</a></p>";
+	
+	if ($isteacher && $cid>0 && $msgmonitor==1) {
+		echo "<p><a href=\"allstumsglist.php?cid=$cid\">Student Messages</a></p>";
+	}
 	
 	require("../footer.php");
 ?>

@@ -689,8 +689,9 @@ function gbtable() {
 		$col = $gradecol[$l['gbitemid']];
 		
 		$gb[$row][1][$col][2] = $l['id'];
-		
-		$gb[$row][1][$col][0] = 1*$l['score'];
+		if ($l['score']!=null) {
+			$gb[$row][1][$col][0] = 1*$l['score'];
+		}
 		if ($limuser==0 && $l['feedback']!='') { //feedback
 			$gb[$row][1][$col][1] = 1; //yes it has it (for teachers)
 		} else if ($limuser>0) {

@@ -106,7 +106,8 @@ switch($_GET['action']) {
 			$hideicons = $line['hideicons'];
 			$allowunenroll = $line['allowunenroll'];
 			$copyrights = $line['copyrights'];
-			$msgset = $line['msgset'];
+			$msgset = $line['msgset']%5;
+			$msgmonitor = floor($line['msgset']/5);
 			$cploc = $line['cploc'];
 			$theme = $line['theme'];
 			$topbar = explode('|',$line['topbar']);
@@ -236,7 +237,9 @@ switch($_GET['action']) {
 		if ($msgset==3) { echo "checked=1";}
 		echo '/> On for receive, students cannot send<br/> <input type=radio name="msgset" value="4" ';
 		if ($msgset==4) { echo "checked=1";}
-		echo '/> Off</span><br class=form />';
+		echo '/> Off <br/> <input type=checkbox name="msgmonitor" value="1" ';
+		if ($msgmonitor==1) { echo "checked=1";}
+		echo '/> Enable monitoring of student-to-student messages</span><br class=form />';
 		
 		echo "<span class=form>Student Quick Pick Top Bar items:</span><span class=formright>";
 		echo '<input type=checkbox name="stutopbar[]" value="0" ';

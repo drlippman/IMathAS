@@ -85,7 +85,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	$hideicons = $line['hideicons'];
 	$pagetitle = $line['name'];
 	$items = unserialize($line['itemorder']);
-	$msgset = $line['msgset'];
+	$msgset = $line['msgset']%5;
 	$useleftbar = ($line['cploc']==1);
 	$topbar = explode('|',$line['topbar']);
 	$topbar[0] = explode(',',$topbar[0]);
