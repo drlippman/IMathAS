@@ -5,7 +5,7 @@
 	$isteacher = isset($teacherid);
 	$cid = $_GET['cid'];
 	
-	if ($isteacher) {
+		if ($isteacher) {
 		if (isset($sessiondata[$cid.'gbmode'])) {
 			$gbmode =  $sessiondata[$cid.'gbmode'];
 		} else {
@@ -18,6 +18,11 @@
 		} else {
 			$stu = 0;
 		}
+		if (isset($_GET['from'])) {
+			$from = $_GET['from'];
+		} else {
+			$from = 'gb';
+		}
 		//Gbmode : Links NC Dates
 		$totonleft = floor($gbmode/1000)%10 ; //0 right, 1 left
 		$links = floor($gbmode/100)%10; //0: view/edit, 1 q breakdown
@@ -26,6 +31,7 @@
 	} else {
 		$links = 0;
 		$stu = 0;
+		$from = 'gb';
 	}
 	
 	
@@ -125,8 +131,8 @@
 				$pers = 'student';
 			}
 			echo "<p>Are you sure you want to clear this $pers's assessment attempt?  This will make it appear the $pers never tried the assessment, and the $pers will receive a new version of the assessment.</p>";
-			echo "<p><input type=button onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&clearattempt=confirmed'\" value=\"Really Clear\">\n";
-			echo "<input type=button value=\"Never Mind\" onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}'\"></p>\n";
+			echo "<p><input type=button onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&from=$from&clearattempt=confirmed'\" value=\"Really Clear\">\n";
+			echo "<input type=button value=\"Never Mind\" onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&from=$from&asid={$_GET['asid']}&uid={$_GET['uid']}'\"></p>\n";
 			exit;
 		}
 	}
@@ -170,8 +176,8 @@
 			}
 		} else {
 			echo "<p>Are you sure you want to separate this student from their current group?</p>";
-			echo "<p><input type=button onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}&breakfromgroup=confirmed'\" value=\"Really Separate\">\n";
-			echo "<input type=button value=\"Never Mind\" onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}'\"></p>\n";
+			echo "<p><input type=button onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&from=$from&asid={$_GET['asid']}&uid={$_GET['uid']}&breakfromgroup=confirmed'\" value=\"Really Separate\">\n";
+			echo "<input type=button value=\"Never Mind\" onclick=\"window.location='gb-viewasid.php?stu=$stu&from=$from&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}'\"></p>\n";
 			exit;
 		}
 	}
@@ -206,8 +212,8 @@
 				$pers = 'student';
 			}
 			echo "<p>Are you sure you want to clear this $pers's scores for this assessment?</p>";
-			echo "<p><input type=button onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&clearscores=confirmed'\" value=\"Really Clear\">\n";
-			echo "<input type=button value=\"Never Mind\" onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}'\"></p>\n";
+			echo "<p><input type=button onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&from=$from&cid=$cid&asid={$_GET['asid']}&clearscores=confirmed'\" value=\"Really Clear\">\n";
+			echo "<input type=button value=\"Never Mind\" onclick=\"window.location='gb-viewasid.php?stu=$stu&from=$from&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}'\"></p>\n";
 			exit;
 		}
 	}
@@ -260,8 +266,8 @@
 				$pers = 'student';
 			}
 			echo "<p>Are you sure you want to clear this $pers's scores for this question?</p>";
-			echo "<p><input type=button onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&clearq={$_GET['clearq']}&confirmed=true'\" value=\"Really Clear\">\n";
-			echo "<input type=button value=\"Never Mind\" onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}'\"></p>\n";
+			echo "<p><input type=button onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&from=$from&asid={$_GET['asid']}&clearq={$_GET['clearq']}&confirmed=true'\" value=\"Really Clear\">\n";
+			echo "<input type=button value=\"Never Mind\" onclick=\"window.location='gb-viewasid.php?stu=$stu&from=$from&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}'\"></p>\n";
 			exit;
 		}
 	}
@@ -304,7 +310,14 @@
 			}
 
 			mysql_query($query) or die("Query failed : $query " . mysql_error());
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid={$_GET['cid']}");
+			if ($from=='isolate') {
+				$query = "SELECT assessmentid FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
+				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				$aid = mysql_result($result,0,0);
+				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/isolateassessgrade.php?stu=$stu&cid={$_GET['cid']}&aid=$aid&gbmode=$gbmode");
+			} else {
+				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid={$_GET['cid']}&gbmode=$gbmode");
+			}
 			exit;
 		}
 		$useeditor='review';
@@ -379,13 +392,13 @@
 		if ($isteacher) {
 			if ($line['agroupid']>0) {
 				echo "<p>This assignment is linked to a group.  Changes will affect the group unless specified. ";
-				echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}&breakfromgroup=true\">Separate from Group</a></p>";
+				echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid={$_GET['asid']}&from=$from&uid={$_GET['uid']}&breakfromgroup=true\">Separate from Group</a></p>";
 			}
 		}
 		
 		if ($isteacher) {
-			echo "<p><a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}&clearattempt=true\">Clear Attempt</a> | ";
-			echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}&clearscores=true\">Clear Scores</a> | ";
+			echo "<p><a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid={$_GET['asid']}&from=$from&uid={$_GET['uid']}&clearattempt=true\">Clear Attempt</a> | ";
+			echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid={$_GET['asid']}&from=$from&uid={$_GET['uid']}&clearscores=true\">Clear Scores</a> | ";
 			echo "<a href=\"$imasroot/assessment/printtest.php?cid=$cid&asid={$_GET['asid']}\" target=\"_blank\">Print Version</a></p>\n";
 		}
 		
@@ -400,7 +413,7 @@
 			echo "$over seconds.<BR>\n";
 			$reset = $line['endtime']-$line['timelimit'];
 			if ($isteacher) {
-				echo "<a href=\"gb-viewasid.php?stu=$stu&starttime=$reset&asid={$_GET['asid']}&cid=$cid&uid={$_GET['uid']}\">Clear overtime and accept grade</a></p>\n";
+				echo "<a href=\"gb-viewasid.php?stu=$stu&starttime=$reset&asid={$_GET['asid']}&from=$from&cid=$cid&uid={$_GET['uid']}\">Clear overtime and accept grade</a></p>\n";
 			}
 		}
 		
@@ -424,9 +437,9 @@
 			$attempts = explode(",",$line['attempts']);
 			$lastanswers = explode("~",$line['lastanswers']);
 			echo "<p>";
-			echo "<a href=\"gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&cid=$cid&uid={$_GET['uid']}\">Show Scored Attempts</a> | ";
+			echo "<a href=\"gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&from=$from&cid=$cid&uid={$_GET['uid']}\">Show Scored Attempts</a> | ";
 			echo "<b>Showing Last Attempts</b> | ";
-			echo "<a href=\"gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&cid=$cid&uid={$_GET['uid']}&reviewver=1\">Show Review Attempts</a>";
+			echo "<a href=\"gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&from=$from&cid=$cid&uid={$_GET['uid']}&reviewver=1\">Show Review Attempts</a>";
 			echo "</p>";
 		} else if (isset($_GET['reviewver'])) {
 			$seeds = explode(",",$line['reviewseeds']);
@@ -434,8 +447,8 @@
 			$attempts = explode(",",$line['reviewattempts']);
 			$lastanswers = explode("~",$line['reviewlastanswers']);
 			echo "<p>";
-			echo "<a href=\"gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&cid=$cid&uid={$_GET['uid']}\">Show Scored Attempts</a> | ";
-			echo "<a href=\"gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&cid=$cid&uid={$_GET['uid']}&lastver=1\">Show Last Graded Attempts</a> | ";
+			echo "<a href=\"gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&from=$from&cid=$cid&uid={$_GET['uid']}\">Show Scored Attempts</a> | ";
+			echo "<a href=\"gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&from=$from&cid=$cid&uid={$_GET['uid']}&lastver=1\">Show Last Graded Attempts</a> | ";
 			echo "<b>Showing Review Attempts</b>";
 			echo "</p>";
 		}else {
@@ -444,8 +457,8 @@
 			$attempts = explode(",",$line['bestattempts']);
 			$lastanswers = explode("~",$line['bestlastanswers']);
 			echo "<p><b>Showing Scored Attempts</b> | ";
-			echo "<a href=\"gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&cid=$cid&uid={$_GET['uid']}&lastver=1\">Show Last Attempts</a> | ";
-			echo "<a href=\"gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&cid=$cid&uid={$_GET['uid']}&reviewver=1\">Show Review Attempts</a>";
+			echo "<a href=\"gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&cid=$cid&from=$from&uid={$_GET['uid']}&lastver=1\">Show Last Attempts</a> | ";
+			echo "<a href=\"gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&cid=$cid&from=$from&uid={$_GET['uid']}&reviewver=1\">Show Review Attempts</a>";
 			echo "</p>";
 		}
 		
@@ -491,7 +504,7 @@
 		echo '</script>';
 		echo '<input type=button id="hctoggle" value="Hide Perfect Score Questions" onclick="hidecorrect()" />';
 		echo ' <input type=button id="hnatoggle" value="Hide Not Answered Questions" onclick="hideNA()" />';
-		echo "<form id=\"mainform\" method=post action=\"gb-viewasid.php?stu=$stu&cid=$cid&asid={$_GET['asid']}&update=true\">\n";
+		echo "<form id=\"mainform\" method=post action=\"gb-viewasid.php?stu=$stu&cid=$cid&from=$from&asid={$_GET['asid']}&update=true\">\n";
 		$total = 0;
 		for ($i=0; $i<count($questions);$i++) {
 			echo "<div ";
@@ -550,7 +563,7 @@
 			}
 			if ($isteacher) {
 				echo " <a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid=$cid&add=new&quoteq=$i-$qsetid-{$seeds[$i]}&to={$_GET['uid']}\">Use in Msg</a>";
-				echo " &nbsp; <a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid={$_GET['asid']}&clearq=$i\">Clear Score</a>";
+				echo " &nbsp; <a href=\"gb-viewasid.php?stu=$stu&cid=$cid&from=$from&asid={$_GET['asid']}&clearq=$i\">Clear Score</a>";
 			}
 			echo "</div>\n";
 			

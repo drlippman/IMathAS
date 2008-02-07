@@ -264,7 +264,7 @@ if (!$isteacher || $stu!=0) { //show student view
 }
 
 function gbstudisp($stu) {
-	global $hidenc,$cid,$gbmode,$availshow,$isdiag,$isteacher,$catfilter;
+	global $hidenc,$cid,$gbmode,$availshow,$isdiag,$isteacher,$catfilter,$imasroot;
 	if ($availshow==3) {
 		$availshow=1;
 		$hidepast = true;
@@ -490,7 +490,7 @@ function gbstudisp($stu) {
 }
 
 function gbinstrdisp() {
-	global $hidenc,$isteacher,$cid,$gbmode,$stu,$availshow,$isdiag,$catfilter,$secfilter,$totonleft;
+	global $hidenc,$isteacher,$cid,$gbmode,$stu,$availshow,$isdiag,$catfilter,$secfilter,$totonleft,$imasroot;
 	if ($availshow==3) {
 		$availshow=1;
 		$hidepast = true;

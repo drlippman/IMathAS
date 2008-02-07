@@ -279,6 +279,7 @@ var AMsymbols = [
 {input:"Ln",   tag:"mo", output:"ln",  tex:null, ttype:UNARY, func:true},
 {input:"Abs",   tag:"mo", output:"abs",  tex:null, ttype:UNARY, func:true},
 {input:"det",  tag:"mo", output:"det", tex:null, ttype:UNARY, func:true},
+{input:"exp",  tag:"mo", output:"exp", tex:null, ttype:UNARY, func:true},
 {input:"dim",  tag:"mo", output:"dim", tex:null, ttype:CONST},
 {input:"mod",  tag:"mo", output:"mod", tex:null, ttype:CONST},
 {input:"gcd",  tag:"mo", output:"gcd", tex:null, ttype:UNARY, func:true},

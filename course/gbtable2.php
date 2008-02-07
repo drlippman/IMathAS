@@ -455,9 +455,9 @@ function gbtable() {
 	foreach($catorder as $cat) {//foreach category
 		
 		//cats: name,scale,scaletype,chop,drop,weight
-		$catitemcntpast[$cat] = count($catposspast[$cat]) + count($catposspastec[$cat]);
-		$catitemcntcur[$cat] = count($catposscur[$cat]) + count($catposscurec[$cat]);
-		$catitemcntfuture[$cat] = count($catpossfuture[$cat]) + count($catpossfutureec[$cat]);
+		$catitemcntpast[$cat] = count($catposspast[$cat]);// + count($catposspastec[$cat]);
+		$catitemcntcur[$cat] = count($catposscur[$cat]);// + count($catposscurec[$cat]);
+		$catitemcntfuture[$cat] = count($catpossfuture[$cat]);// + count($catpossfutureec[$cat]);
 		if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($catposspast[$cat])) { //if drop is set and have enough items
 			asort($catposspast[$cat],SORT_NUMERIC);
 			$catposspast[$cat] = array_slice($catposspast[$cat],$cats[$cat][4]);
@@ -752,11 +752,12 @@ function gbtable() {
 						$cattotpast[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	
 					}
 					asort($cattotpast[$ln][$cat],SORT_NUMERIC);
-					while (count($cattotpast[$ln][$cat])<$catitemcnt[$cat]) {
+					while (count($cattotpast[$ln][$cat])<$catitemcntpast[$cat]) {
 						array_unshift($cattotpast[$ln][$cat],0);
 					}
 					$cattotpast[$ln][$cat] = array_slice($cattotpast[$ln][$cat],$cats[$cat][4]);
-					$cattotpast[$ln][$cat] = $catposspast[$cat]*array_sum($cattotpast[$ln][$cat])/count($cattotpast[$ln][$cat]);
+					$tokeep = ($cats[$cat][4]<0)? abs($cats[$cat][4]) : ($catitemcntpast[$cat] - $cats[$cat][4]);
+					$cattotpast[$ln][$cat] = $catposspast[$cat]*array_sum($cattotpast[$ln][$cat])/($tokeep);
 				} else {
 					$cattotpast[$ln][$cat] = array_sum($cattotpast[$ln][$cat]);
 				}
@@ -794,12 +795,15 @@ function gbtable() {
 					foreach($cattotcur[$ln][$cat] as $col=>$v) {
 						$cattotcur[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	
 					}
-					asort($cattotcur[$ln][$cat],SORT_NUMERIC);
-					while (count($cattotcur[$ln][$cat])<$catitemcnt[$cat]) {
+					sort($cattotcur[$ln][$cat],SORT_NUMERIC);
+					
+					while (count($cattotcur[$ln][$cat])<$catitemcntcur[$cat]) {
 						array_unshift($cattotcur[$ln][$cat],0);
 					}
+					
 					$cattotcur[$ln][$cat] = array_slice($cattotcur[$ln][$cat],$cats[$cat][4]);
-					$cattotcur[$ln][$cat] = $catposscur[$cat]*array_sum($cattotcur[$ln][$cat])/count($cattotcur[$ln][$cat]);
+					$tokeep = ($cats[$cat][4]<0)? abs($cats[$cat][4]) : ($catitemcntcur[$cat] - $cats[$cat][4]);
+					$cattotcur[$ln][$cat] = $catposscur[$cat]*array_sum($cattotcur[$ln][$cat])/($tokeep);
 				} else {
 					$cattotcur[$ln][$cat] = array_sum($cattotcur[$ln][$cat]);
 				}
@@ -838,11 +842,12 @@ function gbtable() {
 						$cattotfuture[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	
 					}
 					asort($cattotfuture[$ln][$cat],SORT_NUMERIC);
-					while (count($cattotfuture[$ln][$cat])<$catitemcnt[$cat]) {
+					while (count($cattotfuture[$ln][$cat])<$catitemcntfuture[$cat]) {
 						array_unshift($cattotfuture[$ln][$cat],0);
 					}
 					$cattotfuture[$ln][$cat] = array_slice($cattotfuture[$ln][$cat],$cats[$cat][4]);
-					$cattotfuture[$ln][$cat] = $catpossfuture[$cat]*array_sum($cattotfuture[$ln][$cat])/count($cattotfuture[$ln][$cat]);
+					$tokeep = ($cats[$cat][4]<0)? abs($cats[$cat][4]) : ($catitemcntfuture[$cat] - $cats[$cat][4]);
+					$cattotfuture[$ln][$cat] = $catpossfuture[$cat]*array_sum($cattotfuture[$ln][$cat])/($tokeep);
 				} else {
 					$cattotfuture[$ln][$cat] = array_sum($cattotfuture[$ln][$cat]);
 				}
