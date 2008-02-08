@@ -6,6 +6,9 @@ Upgrade Notes
 
 *** Database Changes ***
 
+ALTER TABLE `imas_sessions` ADD INDEX ( `time` ) ;
+ALTER TABLE `imas_users` ADD INDEX ( `rights` ); 
+
 ALTER TABLE `imas_grades` CHANGE `score` `score` DECIMAL( 6, 1 ) UNSIGNED NULL DEFAULT '0.0';
 
 ALTER TABLE `imas_students` ADD `lastaccess` INT( 10 ) UNSIGNED NOT NULL ;

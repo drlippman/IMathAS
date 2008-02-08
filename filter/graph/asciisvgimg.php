@@ -771,9 +771,9 @@ function parseargs($str) {
 function outputimage() {
 	if (func_num_args()>0) {
 		$filename = func_get_arg(0);
-		imagepng($this->img,$filename,75);
+		imagepng($this->img,$filename,8);
 	} else {
-		imagepng($this->img,null,75);
+		imagepng($this->img,null,8);
 	}
 }
 function evalifneeded($str) {

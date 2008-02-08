@@ -47,6 +47,7 @@ $nologo = true;
 
 //create courseid list, this is in prep for creating a course id array as an object property
 //or session variable
+/*
 $page_currentUserCourseIds = array();
 $query = "SELECT DISTINCT imas_students.courseid, imas_teachers.courseid ";
 $query .= "FROM imas_students, imas_teachers ";
@@ -90,6 +91,32 @@ if (count($page_currentUserCourseIds)>0) {
 		var_dump($newpostscnt);
 	}
 }
+*/
+$newpostscnt = array();
+$query = "SELECT courseid,count(*) FROM ";
+$query .= "(SELECT imas_forums.courseid,imas_forum_posts.threadid,max(imas_forum_posts.postdate),mfv.lastview FROM imas_forum_posts ";
+$query .= "JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id LEFT JOIN (SELECT * FROM imas_forum_views WHERE userid='$userid') AS mfv ";
+$query .= "ON mfv.threadid=imas_forum_posts.threadid WHERE imas_forums.courseid IN (SELECT courseid FROM imas_students WHERE userid='$userid') ";
+$query .= "GROUP BY imas_forum_posts.threadid HAVING ((max(imas_forum_posts.postdate)>mfv.lastview) OR (mfv.lastview IS NULL))) AS newitems ";
+$query .= "GROUP BY courseid";
+$result = mysql_query($query) or die("Query failed : " . mysql_error());
+while ($row = mysql_fetch_row($result)) {
+	$newpostscnt[$row[0]] = $row[1];
+}
+
+if ($myrights>10) {
+	$query = "SELECT courseid,count(*) FROM ";
+	$query .= "(SELECT imas_forums.courseid,imas_forum_posts.threadid,max(imas_forum_posts.postdate),mfv.lastview FROM imas_forum_posts ";
+	$query .= "JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id LEFT JOIN (SELECT * FROM imas_forum_views WHERE userid='$userid') AS mfv ";
+	$query .= "ON mfv.threadid=imas_forum_posts.threadid WHERE imas_forums.courseid IN (SELECT courseid FROM imas_teachers WHERE userid='$userid') ";
+	$query .= "GROUP BY imas_forum_posts.threadid HAVING ((max(imas_forum_posts.postdate)>mfv.lastview) OR (mfv.lastview IS NULL))) AS newitems ";
+	$query .= "GROUP BY courseid";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	while ($row = mysql_fetch_row($result)) {
+		$newpostscnt[$row[0]] = $row[1];
+	}
+}
+
 //check for new messages    
 $newmsgcnt = array();
 $query = "SELECT courseid,COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND (isread=0 OR isread=4) GROUP BY courseid";
