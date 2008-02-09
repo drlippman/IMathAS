@@ -512,24 +512,7 @@ function makeTopMenu() {
 	}
 }
 
-function getpts($scs) {
-	$tot = 0;
-  	foreach(explode(',',$scs) as $sc) {
-		if (strpos($sc,'~')===false) {
-			if ($sc>0) { 
-				$tot += $sc;
-			} 
-		} else {
-			$sc = explode('~',$sc);
-			foreach ($sc as $s) {
-				if ($s>0) { 
-					$tot+=$s;
-				}
-			}
-		}
-	}
-	return $tot;
-}
+
 
 
 ?>

@@ -282,7 +282,7 @@
 			   }
 			   $nothidden = true;
 			   if ($line['reqscore']>0 && $line['reqscoreaid']>0 && !isset($teacherid)) {
-				   $query = "SELECT scores FROM imas_assessment_sessions WHERE assessmentid='{$line['reqscoreaid']}' AND userid='$userid'";
+				   $query = "SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid='{$line['reqscoreaid']}' AND userid='$userid'";
 				   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				   if (mysql_num_rows($result)==0) {
 					   $nothidden = false;
@@ -733,5 +733,24 @@
 		   return false;
 	   }
    }
+   function getpts($scs) {
+	$tot = 0;
+  	foreach(explode(',',$scs) as $sc) {
+		if (strpos($sc,'~')===false) {
+			if ($sc>0) { 
+				$tot += $sc;
+			} 
+		} else {
+			$sc = explode('~',$sc);
+			foreach ($sc as $s) {
+				if ($s>0) { 
+					$tot+=$s;
+				}
+			}
+		}
+	}
+	return $tot;
+   }
+   
    
 ?>
