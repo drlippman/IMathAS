@@ -42,7 +42,8 @@ if ($overwriteBody==1) {
 		echo "<li><input type=checkbox name=otherheader>Other student entry: <input type=text name=otherheadertext size=20></li>\n";
 		echo "</ul>\n";
 		echo "<h4>Settings</h4>\n";
-		echo "<ul><li><input type=checkbox name=points checked=1>Show point values</li>\n";
+		echo "<ul>";
+		echo "<li><input type=checkbox name=points checked=1>Show point values</li>\n";
 		echo "<li><input type=checkbox name=hidetxtboxes >Hide text entry lines</li>\n";
 		echo "</ul>";
 		echo "<h4>Print Margin Setup</h4>\n";

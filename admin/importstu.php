@@ -37,6 +37,7 @@ function parsecsv($data) {
 		$un = strtolower($fn.'_'.$ln);
 	} else {
 		$un = $data[$_POST['unloc']-1];
+		$un = preg_replace('/\W/','',$un);
 	}
 	if ($_POST['emailloc']>0) {
 		$email = $data[$_POST['emailloc']-1];

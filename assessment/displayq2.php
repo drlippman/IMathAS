@@ -90,7 +90,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	//pack options
 	if (isset($ansprompt)) {$options['ansprompt'] = $ansprompt;}
 	if (isset($displayformat)) {$options['displayformat'] = $displayformat;}
-	if (isset($answerformat)) {$options['answerformat'] = $answerformat;}
+	if (isset($answerformat)) {$answerformat = str_replace(' ','',$answerformat); $options['answerformat'] = $answerformat;}
 	if (isset($questions)) {$options['questions'] = $questions;}
 	if (isset($answers)) {$options['answers'] = $answers;}
 	if (isset($answer)) {$options['answer'] = $answer;}
@@ -297,7 +297,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans) {
 	if (isset($answer)) {$options['answer'] = $answer;}
 	if (isset($reltolerance)) {$options['reltolerance'] = $reltolerance;} 
 	if (isset($abstolerance)) {$options['abstolerance'] = $abstolerance;}
-	if (isset($answerformat)) {$options['answerformat'] = $answerformat;}
+	if (isset($answerformat)) {$answerformat = str_replace(' ','',$answerformat); $options['answerformat'] = $answerformat;}
 	if (isset($questions)) {$options['questions'] = $questions;}
 	if (isset($answers)) {$options['answers'] = $answers;}
 	if (isset($answersize)) {$options['answersize'] = $answersize;}

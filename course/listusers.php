@@ -114,14 +114,37 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$pagetitle = "Change Student Info";
 		
 		if (isset($_POST['firstname'])) {
+			$un = preg_replace('/\W/','',$_POST['username']);
+			$updateusername = true;
+			$query = "SELECT id FROM imas_users WHERE SID='$un'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			if (mysql_num_rows($result)>0) {
+				$updateusername = false;
+			}
 			$query = "UPDATE imas_users SET FirstName='{$_POST['firstname']}',LastName='{$_POST['lastname']}',email='{$_POST['email']}'";
+			if ($updateusername) {
+				$query .= ",SID='$un'";
+			}
 			if (isset($_POST['doresetpw'])) {
 				$newpw = md5($_POST['password']);
 				$query .= ",password='$newpw'";
 			}
 			$query .= " WHERE id='{$_GET['uid']}'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
+			require("../header.php");
+			echo "<p>User info updated. ";
+			if ($updateusername) {
+				echo "User login changed to $un.";
+			} else {
+				echo "User login left unchanged.";
+			}
+			if (isset($_POST['doresetpw'])) {
+				echo "  Password changed.";
+			}
+			echo "</p><p><a href=\"listusers.php?cid=$cid\">OK</a></p>";
+			require("../footer.php");
+			
+			//header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
 			exit;
 		} else {
 			$query = "SELECT * FROM imas_users WHERE id='{$_GET['uid']}'";
@@ -274,6 +297,8 @@ if ($overwriteBody==1) {
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
 	<h3><?php echo $pagetitle ?></h3>
 		<form method=post action="listusers.php?cid=<?php echo $cid ?>&chgstuinfo=true&uid=<?php echo $_GET['uid'] ?>">
+			<span class=form><label for="username">Enter User Name (login name):</label></span>
+			<input class=form type=text size=20 id=username name=username value="<?php echo $lineStudent['SID'] ?>"><BR class=form>
 			<span class=form><label for="firstname">Enter First Name:</label></span>
 			<input class=form type=text size=20 id=firstname name=firstname value="<?php echo $lineStudent['FirstName'] ?>"><BR class=form>
 			<span class=form><label for="lastname">Enter Last Name:</label></span>

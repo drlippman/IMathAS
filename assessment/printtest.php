@@ -93,6 +93,7 @@
 	$showeachscore = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="AsGo" || $testsettings['testtype']=="Homework");
 	$showansduring = (($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework") && $testsettings['showans']!='N');
 	echo "<div class=breadcrumb>Print Ready Version</div>";
+	echo '<div class=intro>'.$testsettings['intro'].'</div>';
 	for ($i = 0; $i < count($questions); $i++) {
 		list($qsetid,$cat) = getqsetid($questions[$i]);
 		
