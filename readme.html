@@ -17,7 +17,7 @@ h2,h3,h4 {
 </style>
 <body>
 <h1>IMathAS</h1>
-<p>Version: 1.4.  See <a href="changelog.html">Change Log</a> for detailed change history.</p>
+<p>Version: 1.5.  See <a href="changelog.html">Change Log</a> for detailed change history.</p>
 
 <h3>What is IMathAS</h3>
 <p>IMathAS is an Internet Mathematics Assessment System.  In essence, it is a very light
@@ -25,7 +25,7 @@ Course Management System (CMS), most similar to (and inspired by) <a href="http:
 and <a href="http://wims.unice.fr/">WIMS</a>, and similar to publisher-produced systems 
 like iLrn, MathXL, etc.</p>
 
-<p>IMathAS was written by <a href="http://www.pierce.ctc.edu/dlippman">David Lippman</a> (c) 2006, and is distributed under
+<p>IMathAS was written by <a href="http://www.pierce.ctc.edu/dlippman">David Lippman</a> (c) 2006-2008, and is distributed under
 the <a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>.  See the license.txt file distributed with IMathAS for more details
 and credits for components attributed to others.</p>
 
@@ -69,6 +69,8 @@ and credits for components attributed to others.</p>
 		<li>Calculated Matrix</li>
 		<li>Interval</li>
 		<li>Calculated Interval</li>
+		<li>N-tuples</li>
+		<li>Drawing / Graphing</li>
 		<li>Multipart</li>
 		</ul>
 	<li>Multiple display options and assessment settings, including an option for practice sets, and
@@ -81,7 +83,8 @@ and credits for components attributed to others.</p>
 <li>Other Course Features</li>
 	<ul>
 	<li>Post text items, uploaded files, or web links to the classroom</li>
-	<li>Basic Discussion Forums</li>
+	<li>Discussion Forums, optionally gradable </li>
+	<li>Full gradebook with support for online and offline grades and flexible grading schemes</li>
 	</ul>
 <li>Administration:</li>
 	<ul>
@@ -187,7 +190,8 @@ uses the mysql_ library of PHP, not the mysqli_ library.
 
 <h4>CPU Use</h4>
 <p>A standard student session consisting of completing a 10 question assessment with a few reattempts 
-then checking the gradebook will use about 2 cpu seconds total.</p>
+then checking the gradebook will use about 2 cpu seconds total.  An installation serving 2500+ students 
+with 80+ concurrent users has operated well on a commercial shared web server.</p>
 
 <h4>Security</h4>
 <p>IMathAS uses a standard databased-stored sessions-based system.  Only the userid is stored
