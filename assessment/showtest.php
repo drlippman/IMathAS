@@ -376,7 +376,6 @@
 	 echo "&gt; Assessment</div>";
 	}
 	
-
 	if (!$sessiondata['isteacher'] && ($testsettings['isgroup']==1 || $testsettings['isgroup']==2) && ($sessiondata['groupid']==0 || isset($_GET['addgrpmem']))) {
 		if (isset($_POST['grpsubmit'])) {
 			if ($sessiondata['groupid']==0) {
@@ -399,8 +398,9 @@
 			$query = "SELECT assessmentid,agroupid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers ";
 			$query .= "FROM imas_assessment_sessions WHERE id='$testid'";
 			$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
-			$row = mysql_fetch_row($result);
-			$insrow = "'".implode("','",addslashes_deep($row))."'";
+			$rowgrptest = mysql_fetch_row($result);
+			$rowgrptest = addslashes_deep($rowgrptest);
+			$insrow = "'".implode("','",$rowgrptest)."'";
 			for ($i=1;$i<$testsettings['groupmax'];$i++) {
 				if (isset($_POST['user'.$i]) && $_POST['user'.$i]!=0) {
 					$query = "SELECT password,LastName,FirstName FROM imas_users WHERE id='{$_POST['user'.$i]}'";
@@ -423,7 +423,11 @@
 						if ($row[1]>0) { 
 							echo "<p>$thisusername already has a group.  No change made</p>";
 						} else {
-							$query = "UPDATE imas_assessment_sessions SET agroupid='$agroupid' WHERE id='{$row[0]}'";
+							$query = "UPDATE imas_assessment_sessions SET assessmentid='{$rowgrptest[0]}',agroupid='{$rowgrptest[1]}',questions='{$rowgrptest[2]}'";
+							$query .= ",seeds='{$rowgrptest[3]}',scores='{$rowgrptest[4]}',attempts='{$rowgrptest[5]}',lastanswers='{$rowgrptest[6]}',";
+							$query .= "starttime='{$rowgrptest[7]}',endtime='{$rowgrptest[8]}',bestseeds='{$rowgrptest[9]}',bestattempts='{$rowgrptest[10]}',";
+							$query .= "bestscores='{$rowgrptest[11]}',bestlastanswers='{$rowgrptest[12]}'  WHERE id='{$row[0]}'";
+							//$query = "UPDATE imas_assessment_sessions SET agroupid='$agroupid' WHERE id='{$row[0]}'";
 							mysql_query($query) or die("Query failed : $query:" . mysql_error());
 							echo "<p>$thisusername added to group, overwriting existing attempt.</p>";
 						}
@@ -494,6 +498,8 @@
 		$sessiondata['groupid'] = $agroupid;
 		writesessiondata();
 	}
+	
+	//if was added to existing group, need to reload $questions, etc
 	
 	echo "<h2>{$testsettings['name']}</h2>\n";
 	
