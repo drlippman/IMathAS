@@ -653,6 +653,7 @@ if ($overwriteBody==1) {
 			<option value="1"<?php echo $grp1Selected ?>>Group questions</option>
 		</select>
 		With Selected: <input type=button value="Remove" onclick="removeSelected()" />
+				<input type=button value="Group" onclick="groupSelected()" />
 			  	<input type="submit" value="Change Settings" />
 <?php			
 		}

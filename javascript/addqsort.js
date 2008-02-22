@@ -111,6 +111,52 @@ function removeSelected() {
 	}
 }
 
+function groupSelected() {
+	var grplist = new Array;
+	var form = document.getElementById("curqform");
+	for (var e = form.elements.length-1; e >-1 ; e--) {
+		var el = form.elements[e];
+		if (el.type == 'checkbox' && el.checked && el.value!='ignore') {
+			val = el.value.split(":")[0];
+			if (val.indexOf("-")>-1) { //is group
+				val = val.split("-")[0];
+			} else {
+				
+			}
+			isnew = true;
+			for (i=0;i<grplist.length;i++) {
+				if (grplist[i]==val) {
+					isnew = false;
+				}
+			}
+			if (isnew) {
+				grplist.push(val);
+			}
+		}
+	}
+	if (grplist.length<2) {
+		return;
+	}
+	var to = grplist[grplist.length-1];
+	if (itemarray[to].length==3) {  //moving to existing group
+		
+	} else {
+		var existing = itemarray[to];
+		itemarray[to] = [1,0,[existing]];
+	}
+	for (i=0; i<grplist.length-1; i++) { //going from last in current to first in current
+		tomove = itemarray.splice(grplist[i],1);
+		if (tomove[0].length==3) { //if grouping a group
+			for (var j=0; j<tomove[0][2].length; j++) {
+				itemarray[to][2].push(tomove[0][2][j]);
+			}
+		} else {
+			itemarray[to][2].push(tomove[0]);
+		}	
+	}
+	submitChanges();
+}
+
 function updateGrpN(num) {
 	
 	if (document.getElementById("grpn"+num).value != itemarray[num][0]) {
