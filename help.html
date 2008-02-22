@@ -649,6 +649,8 @@ For Forum items, you will asked to provide:
     Users can change the display once they view the thread</li>
 <li><b>Students can reply by</b>:  Optionally set date restrictions for students replying to posts.  Can be overridden in individual threads.</li>
 <li><b>Students can create new threads by</b>:  Optionally set date restrictions for students creating new threads</li>
+<li><b>Count in gradebook</b>:  Whether you want the forum to count in the gradebook for points.  You will be able to assign points for individual posts made.</li>
+<li><b>Gradebook category</b>:  Category for the gradebook, if assigning points to the forum.
 </ul>
 
 <p>When you as a teacher start a new thread, you are given the option to have it be:
@@ -701,11 +703,6 @@ assessment in the course page.
 <li><b>Time Limit</b>:  The time limit, in minutes, for the test (0 for none).  If the student exceeds the 
    time limit, their test will be recorded, and you can decide whether or not
    to accept it in the gradebook detail.  Partial minutes are possible using decimal values.</li>
-<li><b>Minimum Score for Credit</b>:  A minimum score which must be acheived to receive credit for the assessment.  Set to 0 to accept all scores.
-   If set and score is not met, gradebook will display "NC" (No Credit).</li>
-<li><b>Show based on another assessment</b>:  Use this to hide this assessment until a specific score is acheived on another
-  assessment.  Provide a point value and select an assessment to use this feature.  Set the assessment to "Don't Use" to not use
-  this feature</li>
 <li><b>Display method</b>:</li>
 	<ul>
 	<li><b>Full test at once</b>:  All questions are displayed on one page</li>
@@ -760,14 +757,23 @@ assessment in the course page.
 	    is set to allow review mode, that answers will be available to students in review mode.</li>
 	</ul>
 <li><b>Show hints when available</b>:  Whether or not to show hints if the question has them defined</li>
+<li><b>Allow use of LatePasses</b>:  If you have granted LatePasses to students, this will allow use of them on this assessment</li>
+<li><b>Make hard to print</b>:  Makes the assessment harder to print, for in-class tests</li>
 <li><b>Shuffle item order</b>:  Randomizes the order in which questions are presented</li>
+<li><b>Gradebook Category</b>:  If you have created gradebook categories, you can assign the assessment to one of those categories.</li>
+<li><b>Count</b>:  Whether to count the assessment in the gradebook</li>
+<li><b>Minimum Score for Credit</b>:  A minimum score which must be acheived to receive credit for the assessment.  Set to 0 to accept all scores.
+   If set and score is not met, gradebook will display "NC" (No Credit).</li>
+<li><b>Show based on another assessment</b>:  Use this to hide this assessment until a specific score is acheived on another
+  assessment.  Provide a point value and select an assessment to use this feature.  Set the assessment to "Don't Use" to not use
+  this feature</li>
 <li><b>All questions same random seed</b>: Usually not needed.  This is only need for a set of questions designed to work together using the same random values</li>
 <li><b>All students receive same version of questions</b>:  All students receive the same first version of questions.  If in practice test or homework mode, when 
 students request a similar problem, different students will receive different versions of the questions.</li>
+<li><b>Penalty for questions done while in exception/LatePass</b>:  A percent penalty to take on all questions submitted after the original assignment due date while under a due date exception.</li>
 <li><b>Is group assessment?</b>: Allows students to specify group members for the assignment.  All group members will receive the same score for the assignment</li>
 <li><b>Show question categories?</b>:  If you plan to categorize questions and would like the categories displayed while the student is taking the test, you can
  select that option here</li>
-<li><b>Gradebook Category</b>:  If you have created gradebook categories, you can assign the assessment to one of those categories.</li>
 </ul>
 
 </div>
@@ -1929,6 +1935,7 @@ A student is asked to enter a string (a word or list of letters).
 		<li>remove_whitespace: removes all whitespace (spaces)</li>
 		<li>ignore_order: treats ABC and CBA as equivalent</li>
 		<li>ignore_commas: removes commas</li>
+		<li>special_or: use <b>*or*</b> for separating answers rather than <b>or</b>.</li>
 		</ul>
 		By default, compress_whitespace and ignore_case are On.</dd>
 <dt>$ansprompt = string (In Question Control)</dt>
@@ -1992,9 +1999,10 @@ drawn line from the correct line.
 	    values.  For example, to just set the window, you could use "0,10,0,10"</dd>
 <dt>$background = equation or array of equations, using the showplot macro format (In Common Control)</dt>
 	<dd>Define a graph to display in the background, to be drawn on top of.  Example:  $background = "x^2,red"</dd>
-<dt>$answerformat = "line,dot,opendot" (In Question Control)</dt>
+<dt>$answerformat = "line,dot,opendot" or "polygon" (In Question Control)</dt>
 	<dd>Limits the drawing tools available to students.  Defaults to "line,dot,opendot".  Define to limit the options.
-	    Example: $answerformat = "line"</dd>
+	    Example: $answerformat = "line", or $answerformat = "line,dot"<br/>
+	    Can use $answerformat = "polygon" for a single polygon; give $answer as array of points in order joined with edges.</dd>
 <dt>$partweights = array or list of weights (In Answer)</dt>
 	<dd>Defines grading weight for each line or dot in $answers.  Example: $partweights = ".5,.25,.25".  Defaults
 	    to equal weights on each line or dot.</dd>
