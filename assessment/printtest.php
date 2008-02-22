@@ -42,6 +42,9 @@
 	$scores = explode(",",$line['scores']);
 	$attempts = explode(",",$line['attempts']);
 	$lastanswers = explode("~",$line['lastanswers']);
+	if ($isteacher) {
+		$userid= $line['userid'];
+	}
 	
 	$query = "SELECT * FROM imas_assessments WHERE id='{$line['assessmentid']}'";
 	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());

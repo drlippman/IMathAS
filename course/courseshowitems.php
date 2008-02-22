@@ -76,7 +76,7 @@
 					}
 					if (isset($teacherid)) { 
 						echo "<br>$show <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
-						echo " | <a href=\"copyoneitem?cid=$cid&cid=$cid&copyid=$parent-$bnum\">";
+						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">Copy</a>";
 						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>NewFlag</a>";
 					
 					}
@@ -113,7 +113,7 @@
 					}
 					if (isset($teacherid)) { 
 						echo "<br>$show <a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>Isolate</a> | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
-						echo " | <a href=\"copyoneitem?cid=$cid&cid=$cid&copyid=$parent-$bnum\">";
+						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">Copy</a>";
 						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>NewFlag</a>";
 					}
 					if (($hideicons&16)==0) {
@@ -175,7 +175,7 @@
 					}
 					if (isset($teacherid)) { 
 						echo "<br><i>$show</i> <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
-						echo " | <a href=\"copyoneitem?cid=$cid&cid=$cid&copyid=$parent-$bnum\">";
+						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">Copy</a>";
 						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>NewFlag</a>";
 					
 					}
@@ -219,7 +219,7 @@
 					if (isset($teacherid)) {
 						echo "<br><i>$show</i> <a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>Isolate</a> | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a>";
 						echo " | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
-						echo " | <a href=\"copyoneitem?cid=$cid&cid=$cid&copyid=$parent-$bnum\">";
+						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">Copy</a>";
 						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>NewFlag</a>";
 					
 					}

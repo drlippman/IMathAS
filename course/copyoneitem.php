@@ -18,11 +18,11 @@ $tocopy = $_GET['copyid'];
 $_POST['append'] = " (Copy)";
 $_POST['ctc'] = $cid;
 
-function copysubone(&$items,$parent) {
+function copysubone(&$items,$parent,$copyinside,&$addtoarr) {
 	global $blockcnt,$tocopy;
 	foreach ($items as $k=>$item) {
 		if (is_array($item)) {
-			if ($parent.'-'.($k+1)==$tocopy) { //copy block
+			if (($parent.'-'.($k+1)==$tocopy) || $copyinside) { //copy block
 				$newblock = array();
 				$newblock['name'] = $item['name'].stripslashes($_POST['append']);
 				$newblock['id'] = $blockcnt;
@@ -33,21 +33,29 @@ function copysubone(&$items,$parent) {
 				$newblock['colors'] = $item['colors'];
 				$newblock['items'] = array();
 				if (count($item['items'])>0) {
-					copysubone($item['items'],$parent.'-'.($k+1));
+					copysubone($items[$k]['items'],$parent.'-'.($k+1),true,$newblock['items']);
 				}
-				array_splice($items,$k,0,$newblock);
-				break;
-				//$addtoarr[] = $newblock;
+				if (!$copyinside) {
+					array_splice($items,$k+1,0,array($newblock));
+					return 0;
+				} else {
+					$addtoarr[] = $newblock;
+				}
 			} else {
 				if (count($item['items'])>0) {
-					copysubone($item['items'],$parent.'-'.($k+1));
+					$nothin = array();
+					copysubone($items[$k]['items'],$parent.'-'.($k+1),false,$nothin);
 				}
 			}
 		} else {
-			if ($item==$tocopy) {
-				array_splice($items,$k,0,copyitem($item,false));
-				break;
-				//$addtoarr[] = copyitem($item,false); //gbcats?
+			if ($item==$tocopy || $copyinside) {
+				$newitem = copyitem($item,false);
+				if (!$copyinside) {
+					array_splice($items,$k+1,0,$newitem);
+					return 0;
+				} else {
+					$addtoarr[] = $newitem;
+				}
 			}
 		}
 	}
@@ -58,7 +66,8 @@ $result = mysql_query($query) or die("Query failed : " . mysql_error());
 $blockcnt = mysql_result($result,0,0);
 $items = unserialize(mysql_result($result,0,1));
 
-copysubone($items,'0');
+$notimportant = array();
+copysubone($items,'0',false,$notimportant);
 
 $itemorder = addslashes(serialize($items));
 $query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt' WHERE id='$cid'";

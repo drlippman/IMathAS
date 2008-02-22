@@ -42,7 +42,7 @@ function calcpointsafterpenalty($frac,$qi,$testsettings,$attempts) {
 		$points = $points*(1-$testsettings['exceptionpenalty']/100);
 	}
 	$penalty = $qi['penalty'];
-	$lastonly = $false;
+	$lastonly = false;
 	$skipsome = 0;
 	if ($penalty{0}==='L') {
 		$lastonly = true;
