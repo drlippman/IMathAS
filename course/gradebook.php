@@ -103,43 +103,9 @@ if ($isteacher) {
 require("gbtable2.php");
 require("../includes/htmlutil.php");
 
-if (!$isteacher || $stu!=0) { //show student view
-	if (!$isteacher) {
-		$stu = $userid;
-	}
-	$pagetitle = "Gradebook";
-	require("../header.php");
-	if (isset($_GET['from']) && $_GET['from']=="listusers") {
-		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-		echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt Student Grade Detail</div>\n";
-	} else if ($isteacher) {
-		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-		echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; Student Detail</div>";
-	} else {
-		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-		echo "&gt; Gradebook</div>";
-	}
-	if ($stu==-1) {
-		echo "<h2>Grade Book Averages </h2>\n";
-	} else {
-		echo "<h2>Grade Book Student Detail </h2>\n";
-	}
-	
-	gbstudisp($stu);
-	require("../footer.php");
-	
-} else { //show instructor view
-	
-	$placeinhead = "<script type=\"text/javascript\">function lockcol() { \n";
-	$placeinhead .= " var cont = document.getElementById(\"tbl-container\");\n";
-	$placeinhead .= " if (cont.style.overflow == \"auto\") {\n";
-	$placeinhead .= "   cont.style.height = \"auto\"; cont.style.overflow = \"visible\"; cont.style.border = \"0px\";";
-	$placeinhead .= "document.getElementById(\"myTable\").className = \"gb\"; document.cookie = 'gblhdr-$cid=0';";
-	$placeinhead .= "  document.getElementById(\"lockbtn\").value = \"Lock headers\"; } else {";
-	$placeinhead .= " cont.style.height = \"75%\"; cont.style.overflow = \"auto\"; cont.style.border = \"1px solid #000\";\n";
-	$placeinhead .= "document.getElementById(\"myTable\").className = \"gbl\"; document.cookie = 'gblhdr-$cid=1'; ";
-	$placeinhead .= "  document.getElementById(\"lockbtn\").value = \"Unlock headers\"; }";
-	$placeinhead .= "} ";
+$placeinhead = '';
+if ($isteacher) {
+	$placeinhead .= "<script type=\"text/javascript\">";
 	$placeinhead .= 'function chgfilter() { ';
 	$placeinhead .= '       var cat = document.getElementById("filtersel").value; ';
 	$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid";
@@ -160,6 +126,83 @@ if (!$isteacher || $stu!=0) { //show student view
 	$placeinhead .= "	var toopen = '$address' + altgbmode;\n";
 	$placeinhead .= "  	window.location = toopen; \n";
 	$placeinhead .= "}\n";
+	$placeinhead .= "</script>";
+}
+
+if (!$isteacher || $stu!=0) { //show student view
+	if (!$isteacher) {
+		$stu = $userid;
+	}
+	$pagetitle = "Gradebook";
+	require("../header.php");
+	
+	if (isset($_GET['from']) && $_GET['from']=="listusers") {
+		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+		echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt Student Grade Detail</div>\n";
+	} else if ($isteacher) {
+		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+		echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; Student Detail</div>";
+	} else {
+		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+		echo "&gt; Gradebook</div>";
+	}
+	if ($stu==-1) {
+		echo "<h2>Grade Book Averages </h2>\n";
+	} else {
+		echo "<h2>Grade Book Student Detail </h2>\n";
+	}
+	if ($isteacher) {
+		echo "<div class=cpmid>";
+		echo 'Category: <select id="filtersel" onchange="chgfilter()">';
+		echo '<option value="-1" ';
+		if ($catfilter==-1) {echo "selected=1";}
+		echo '>All</option>';
+		echo '<option value="0" ';
+		if ($catfilter==0) { echo "selected=1";}
+		echo '>Default</option>';
+		$query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			echo '<option value="'.$row[0].'"';
+			if ($catfilter==$row[0]) {echo "selected=1";}
+			echo '>'.$row[1].'</option>';
+		}
+		echo '<option value="-2" ';
+		if ($catfilter==-2) {echo "selected=1";}
+		echo '>Category Totals</option>';
+		echo '</select> | ';
+		echo "Not Counted: <select id=\"toggle2\" onchange=\"chgtoggle()\">";
+		echo "<option value=0 "; writeHtmlSelected($hidenc,0); echo ">Show all</option>";
+		echo "<option value=1 "; writeHtmlSelected($hidenc,1); echo ">Show stu view</option>";
+		echo "<option value=2 "; writeHtmlSelected($hidenc,2); echo ">Hide all</option>";
+		echo "</select>";
+		echo " | Show: <select id=\"toggle3\" onchange=\"chgtoggle()\">";
+		echo "<option value=0 "; writeHtmlSelected($availshow,0); echo ">Past due</option>";
+		echo "<option value=3 "; writeHtmlSelected($availshow,3); echo ">Current</option>";
+		echo "<option value=1 "; writeHtmlSelected($availshow,1); echo ">Past & Current</option>";
+		echo "<option value=2 "; writeHtmlSelected($availshow,2); echo ">All</option></select>";
+		echo " | Links: <select id=\"toggle1\" onchange=\"chgtoggle()\">";
+		echo "<option value=0 "; writeHtmlSelected($links,0); echo ">View/Edit</option>";
+		echo "<option value=1 "; writeHtmlSelected($links,1); echo ">Scores</option></select>";
+		echo "</div>";
+	}
+	
+	gbstudisp($stu);
+	require("../footer.php");
+	
+} else { //show instructor view
+	
+	$placeinhead .= "<script type=\"text/javascript\">function lockcol() { \n";
+	$placeinhead .= " var cont = document.getElementById(\"tbl-container\");\n";
+	$placeinhead .= " if (cont.style.overflow == \"auto\") {\n";
+	$placeinhead .= "   cont.style.height = \"auto\"; cont.style.overflow = \"visible\"; cont.style.border = \"0px\";";
+	$placeinhead .= "document.getElementById(\"myTable\").className = \"gb\"; document.cookie = 'gblhdr-$cid=0';";
+	$placeinhead .= "  document.getElementById(\"lockbtn\").value = \"Lock headers\"; } else {";
+	$placeinhead .= " cont.style.height = \"75%\"; cont.style.overflow = \"auto\"; cont.style.border = \"1px solid #000\";\n";
+	$placeinhead .= "document.getElementById(\"myTable\").className = \"gbl\"; document.cookie = 'gblhdr-$cid=1'; ";
+	$placeinhead .= "  document.getElementById(\"lockbtn\").value = \"Unlock headers\"; }";
+	$placeinhead .= "} ";
+	
 	$placeinhead .= "function chkAll(frm, arr, mark) {  for (i = 0; i <= frm.elements.length; i++) {   try{     if(frm.elements[i].name == arr) {  frm.elements[i].checked = mark;     }   } catch(er) {}  }}";
 	$placeinhead .= "</script>\n";
 	$placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } </style>";
