@@ -851,9 +851,11 @@
 				echo " $show";
 			}
 			if ($showlinks) {
+				echo '<span class="links">';
 				echo " <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\">Modify</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\">Delete</a>";
 				echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">Copy</a>";
 				echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\">NewFlag</a>";
+				echo '</span>';
 			}
 			echo '<ul class=qview>';
 			quickview($items[$i]['items'],$parent.'-'.$bnum,$showdats,$showlinks);
@@ -902,10 +904,12 @@
 				   echo $show;
 			   }
 			   if ($showlinks) {
+				   echo '<span class="links">';
 				    echo " <a href=\"addquestions.php?aid=$typeid&cid=$cid\">Questions</a> | <a href=\"addassessment.php?id=$typeid&cid=$cid\">Settings</a> | \n";
 				   echo "<a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
 				   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
 				   echo " | <a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=$typeid\">Grades</a>";
+				   echo '</span>';
 			   }
 			   echo "</li>";
 			  
@@ -942,9 +946,11 @@
 				   }
 			   }
 			   if ($showlinks) {
+				   echo '<span class="links">';
 				   echo " <a href=\"addinlinetext.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
 				  echo "<a href=\"deleteinlinetext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
 				  echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+				  echo '</span>';
 			   }
 			   echo '</li>';
 		   } else if ($itemtypes[$items[$i]][0] == 'LinkedText') {
@@ -980,9 +986,11 @@
 				   }
 			   }
 			   if ($showlinks) {
+				   echo '<span class="links">';
 				   echo " <a href=\"addlinkedtext.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
 				  echo "<a href=\"deletelinkedtext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
 				  echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+				  echo '</span>';
 			   }
 			   echo '</li>';
 		   } else if ($itemtypes[$items[$i]][0] == 'Forum') {
@@ -1018,9 +1026,11 @@
 				   }
 			   }
 			   if ($showlinks) {
+				   echo '<span class="links">';
 				   echo " <a href=\"addforum.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
 				  echo "<a href=\"deleteforum.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
 				  echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+				  echo '</span>';
 			   }
 			   echo '</li>';
 		   }

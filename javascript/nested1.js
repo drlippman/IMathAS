@@ -272,6 +272,7 @@ window.onDomReady(function() {
 		},
 		onFirstChange: function(el) {
 			document.getElementById('recchg').disabled = false;
+			setlinksdisp("none");
 		}
 	});
 });
@@ -311,6 +312,8 @@ function ahahDone(url, target) {
 	    if (req.responseText=='OK') {
 		    document.getElementById(target).innerHTML='';
 		    document.getElementById('recchg').disabled = true;
+		    setlinksdisp("");
+		    sortIt.haschanged = false;
 	    } else {
 		    document.getElementById(target).innerHTML=req.responseText;
 	    }
@@ -318,4 +321,13 @@ function ahahDone(url, target) {
 	    document.getElementById(target).innerHTML=" Couldn't save changes:\n"+ req.status + "\n" +req.statusText; 
     } 
   } 
+}
+
+function setlinksdisp(disp) {
+	el = document.getElementsByTagName("span");
+	for (var i=0; i<el.length; i++) {
+		if (el[i].className=='links') {
+			el[i].style.display = disp;
+		}
+	}
 }
