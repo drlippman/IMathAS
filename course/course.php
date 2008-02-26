@@ -346,6 +346,9 @@ if ($overwriteBody==1) {
 	   }
 	   	   
 	   showitems($items,$_GET['folder']);
+	   //echo '<ul class=nomark>';
+	   //quickview($items,$_GET['folder']);
+	   //echo '</ul>';
    }
    if (isset($backlink)) {
 	   echo $backlink;

@@ -703,8 +703,11 @@
 	   } else if ($stime==0) {
 		   return makecolor($etime,$now);
 	   }
+	   if ($etime==$stime) {
+		   return '#ccc';
+	   }
 	   $r = ($etime-$now)/($etime-$stime);  //0 = etime, 1=stime; 0:#f00, 1:#0f0, .5:#ff0
-	   if ($etime<$now) {
+	   if ($etime<$now || $stime>$now) {
 		   $color = '#ccc';
 	   } else if ($r<.5) {
 		   $color = '#f'.dechex(floor(32*$r)).'0';
@@ -768,5 +771,226 @@
 	return $tot;
    }
    
+   //instructor-only tree-based quick view of full course
+   function quickview($items,$parent,$showtype="all") { 
+	   global $teacherid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$hideicons,$exceptions,$latepasses;
+	   $itemtypes = array();  $iteminfo = array();
+	   $query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid='$cid'";
+	   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	   while ($row = mysql_fetch_row($result)) {
+		   $itemtypes[$row[0]] = array($row[1],$row[2]);
+	   }
+	   $query = "SELECT id,name,startdate,enddate,reviewdate,avail FROM imas_assessments WHERE courseid='$cid'";
+	   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	   while ($row = mysql_fetch_row($result)) {
+		   $id = array_shift($row);
+		   $iteminfo['Assessment'][$id] = $row;
+	   }
+	   $query = "SELECT id,title,startdate,enddate,avail FROM imas_inlinetext WHERE courseid='$cid'";
+	   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	   while ($row = mysql_fetch_row($result)) {
+		   $id = array_shift($row);
+		   $iteminfo['InlineText'][$id] = $row;
+	   }
+	   $query = "SELECT id,title,startdate,enddate,avail FROM imas_linkedtext WHERE courseid='$cid'";
+	   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	   while ($row = mysql_fetch_row($result)) {
+		   $id = array_shift($row);
+		   $iteminfo['LinkedText'][$id] = $row;
+	   }
+	   $query = "SELECT id,name,startdate,enddate,avail FROM imas_forums WHERE courseid='$cid'";
+	   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	   while ($row = mysql_fetch_row($result)) {
+		   $id = array_shift($row);
+		   $iteminfo['Forum'][$id] = $row;
+	   }
+	   $now = time() + $previewshift;
+	   for ($i=0;$i<count($items); $i++) {
+		   if (is_array($items[$i])) { //is a block
+			$items[$i]['name'] = stripslashes($items[$i]['name']);
+			if ($items[$i]['startdate']==0) {
+				$startdate = "Always";
+			} else {
+				$startdate = formatdate($items[$i]['startdate']);
+			}
+			if ($items[$i]['enddate']==2000000000) {
+				$enddate = "Always";
+			} else {
+				$enddate = formatdate($items[$i]['enddate']);
+			}
+			$bnum = $i+1;
+			if (strlen($items[$i]['SH'])==1 || $items[$i]['SH'][1]=='O') {
+				$availbeh = "Expanded";
+			} else if ($items[$i]['SH'][1]=='F') {
+				$availbeh = "as Folder";
+			} else {
+				$availbeh = "Collapsed";
+			}
+			if ($items[$i]['avail']==2) {
+				$show = "Showing $availbeh Always";
+			} else if ($items[$i]['avail']==0) {
+				$show = "Hidden";
+			} else {
+				$show = "Showing $availbeh $startdate until $enddate";
+			}
+			if ($items[$i]['avail']==2) {
+				$color = '#0f0';
+			} else if ($items[$i]['avail']==0) {
+				$color = '#ccc';
+			} else {
+				$color = makecolor2($items[$i]['startdate'],$items[$i]['enddate'],$now);
+			}
+			echo '<li><span class=icon style="background-color:'.$color.'">B</span>';
+			if ($items[$i]['avail']==2 || ($items[$i]['avail']==1 && $items[$i]['startdate']<$now && $items[$i]['enddate']>$now)) {
+				echo '<b>'.$items[$i]['name'].'</b>';
+			} else {
+				echo '<i><b>'.$items[$i]['name'].'</b></i>';
+			}
+			echo " $show <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\">Modify</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\">Delete</a>";
+			echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">Copy</a>";
+			echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\">NewFlag</a>";
+			echo '<ul class=nomark>';
+			quickview($items[$i]['items'],$parent.'-'.$bnum,$showtype);
+			echo '</ul>';
+			echo '</li>';
+		   } else if ($itemtypes[$items[$i]][0] == 'Assessment') {
+			   $typeid = $itemtypes[$items[$i]][1];
+			   list($line['name'],$line['startdate'],$line['enddate'],$line['reviewdate'],$line['avail']) = $iteminfo['Assessment'][$typeid];
+			   if ($line['startdate']==0) {
+				   $startdate = "Always";
+			   } else {
+				   $startdate = formatdate($line['startdate']);
+			   }
+			   if ($line['enddate']==2000000000) {
+				   $enddate = "Always";
+			   } else {
+				   $enddate =formatdate($line['enddate']);
+			   }
+			   if ($line['reviewdate']==2000000000) {
+				   $reviewdate = "Always";
+			   } else {
+				   $reviewdate = formatdate($line['reviewdate']);
+			   }
+			   if ($line['avail']==2) {
+					$color = '#0f0';
+			   } else if ($line['avail']==0) {
+				   $color = '#ccc';
+			   } else {
+					$color = makecolor2($line['startdate'],$line['enddate'],$now);
+			   }
+			echo '<li><span class=icon style="background-color:'.$color.'">?</span>';
+			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
+				   $show = "Available until $enddate";
+				   echo '<b>'.$line['name'].'</b> '.$show;
+			   } else if ($line['avail']==1 && $line['startdate']<$now && $line['reviewdate']>$now) {
+				   $show = "Review until $reviewdate";
+				   echo '<b>'.$line['name'].'</b> '.$show;
+			   } else {
+				   $show = "Available $startdate to $enddate";
+				   if ($line['reviewdate']>0 && $line['enddate']!=2000000000) {
+					   $show .= ", review until $reviewdate";
+				   }
+				   echo '<i><b>'.$line['name'].'</b></i> '.$show;
+			   }
+			    echo " <a href=\"addquestions.php?aid=$typeid&cid=$cid\">Questions</a> | <a href=\"addassessment.php?id=$typeid&cid=$cid\">Settings</a> | \n";
+			   echo "<a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
+			   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+			   echo " | <a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=$typeid\">Grades</a>";
+			   echo "</li>";
+			  
+		   } else if ($itemtypes[$items[$i]][0] == 'InlineText') {
+			   $typeid = $itemtypes[$items[$i]][1];
+			   list($line['name'],$line['startdate'],$line['enddate'],$line['avail']) = $iteminfo['InlineText'][$typeid];
+			   if ($line['startdate']==0) {
+				   $startdate = "Always";
+			   } else {
+				   $startdate = formatdate($line['startdate']);
+			   }
+			   if ($line['enddate']==2000000000) {
+				   $enddate = "Always";
+			   } else {
+				   $enddate =formatdate($line['enddate']);
+			   }
+			   if ($line['avail']==2) {
+					$color = '#0f0';
+				} else if ($line['avail']==0) {
+				   $color = '#ccc';
+			   } else {
+					$color = makecolor2($line['startdate'],$line['enddate'],$now);
+				}
+			   echo '<li><span class=icon style="background-color:'.$color.'">!</span>';
+			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
+				   echo '<b>'.$line['name']. "</b> showing until $enddate";
+			   } else {
+				   echo '<i><b>'.$line['name']. "</b></i> showing $startdate until $enddate";
+			   }
+			   echo " <a href=\"addinlinetext.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
+			  echo "<a href=\"deleteinlinetext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
+			  echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+			   echo '</li>';
+		   } else if ($itemtypes[$items[$i]][0] == 'LinkedText') {
+			   $typeid = $itemtypes[$items[$i]][1];
+			   list($line['name'],$line['startdate'],$line['enddate'],$line['avail']) = $iteminfo['LinkedText'][$typeid];
+			   if ($line['startdate']==0) {
+				   $startdate = "Always";
+			   } else {
+				   $startdate = formatdate($line['startdate']);
+			   }
+			   if ($line['enddate']==2000000000) {
+				   $enddate = "Always";
+			   } else {
+				   $enddate =formatdate($line['enddate']);
+			   }
+			   if ($line['avail']==2) {
+					$color = '#0f0';
+				} else if ($line['avail']==0) {
+				   $color = '#ccc';
+			   } else {
+					$color = makecolor2($line['startdate'],$line['enddate'],$now);
+				}
+			   echo '<li><span class=icon style="background-color:'.$color.'">!</span>';
+			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
+				   echo '<b>'.$line['name']. "</b> showing until $enddate";
+			   } else {
+				   echo '<i><b>'.$line['name']. "</b></i> showing $startdate until $enddate";
+			   }
+			   echo " <a href=\"addlinkedtext.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
+			  echo "<a href=\"deletelinkedtext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
+			  echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+			   echo '</li>';
+		   } else if ($itemtypes[$items[$i]][0] == 'Forum') {
+			   $typeid = $itemtypes[$items[$i]][1];
+			   list($line['name'],$line['startdate'],$line['enddate'],$line['avail']) = $iteminfo['Forum'][$typeid];
+			   if ($line['startdate']==0) {
+				   $startdate = "Always";
+			   } else {
+				   $startdate = formatdate($line['startdate']);
+			   }
+			   if ($line['enddate']==2000000000) {
+				   $enddate = "Always";
+			   } else {
+				   $enddate =formatdate($line['enddate']);
+			   }
+			   if ($line['avail']==2) {
+					$color = '#0f0';
+				} else if ($line['avail']==0) {
+				   $color = '#ccc';
+			   } else {
+					$color = makecolor2($line['startdate'],$line['enddate'],$now);
+				}
+			   echo '<li><span class=icon style="background-color:'.$color.'">F</span>';
+			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
+				   echo '<b>'.$line['name']. "</b> showing until $enddate";
+			   } else {
+				   echo '<i><b>'.$line['name']. "</b></i> showing $startdate until $enddate";
+			   }
+			   echo " <a href=\"addforum.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
+			  echo "<a href=\"deleteforum.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
+			  echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+			   echo '</li>';
+		   }
+	   
+	   }
+  }
    
 ?>
