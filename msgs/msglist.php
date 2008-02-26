@@ -14,7 +14,7 @@
 	} else {
 		$isteacher = false;
 	}
-	
+	$cansendmsgs = false;
 	$threadsperpage = 20;
 	
 	$cid = $_GET['cid'];
@@ -82,11 +82,13 @@
 			} else {
 				$replyto = 0;
 			}
-			$query = "SELECT msgset FROM imas_courses WHERE id='$cid'";
-			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-			$msgset = mysql_result($result,0,0);
-			$msgmonitor = floor($msgset/5);
-			$msgset = $msgset%5;
+			if ($cid>0) {
+				$query = "SELECT msgset FROM imas_courses WHERE id='$cid'";
+				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				$msgset = mysql_result($result,0,0);
+				$msgmonitor = floor($msgset/5);
+				$msgset = $msgset%5;
+			}
 				
 			echo "<form method=post action=\"msglist.php?page=$page&cid=$cid&add={$_GET['add']}&replyto=$replyto\">\n";
 			echo "<span class=form>To:</span><span class=formright>\n";

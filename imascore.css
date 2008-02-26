@@ -80,6 +80,18 @@ ul.nomark li {
 	margin-left: 0px;
 	padding-left: 0px;
 }
+
+ul.qview {
+	list-style-type: none;
+	margin-left: 20px;
+	padding-left: 0px;
+	margin-bottom: 6px;
+}
+ul.qview li {
+	margin-left: 0px;
+	padding-left: 0px;
+	margin-top: 2px;
+}
 div#tbl-container {
 	position: relative;
 	margin-top: 10px;

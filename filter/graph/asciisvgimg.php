@@ -53,7 +53,7 @@ var $white,$black,$red,$orange,$yellow,$green,$blue,$cyan,$purple,$gray;
 var $stroke = 'black', $fill = 'none', $curdash='', $isdashed=false, $marker='none';
 var $markerfill = 'green', $gridcolor = 'gray', $axescolor = 'black';
 var $strokewidth = 1, $xunitlength, $yunitlength, $dotradius=8, $ticklength=4;
-var $fontsize = 16, $fontfile;
+var $fontsize = 16, $fontfile, $fontfill='';
 
 var $AScom; 
 function AStoIMG($w=200, $h=200) {
@@ -127,7 +127,7 @@ function processScript($script) {
 	$xmin = -5; $xmax = 5; $ymin = -5; $ymax = 5; $border = 5;
 	$stroke = 'black'; $fill = 'none'; $curdash=''; $isdashed=false; $marker='none';
         $markerfill = 'green'; $gridcolor = 'gray'; $axescolor = 'black';
-	$strokewidth = 1; $dotradius=8; $ticklength=4; $fontsize = 16;
+	$strokewidth = 1; $dotradius=8; $ticklength=4; $fontsize = 16; $fontfill = '';
 	$this->AScom =  explode(';',$script);
 	foreach ($this->AScom as $com) {
 		if (preg_match('/\s*(\w+)\s*=(.+)/',$com,$matches)) { //is assignment operator
@@ -141,6 +141,7 @@ function processScript($script) {
 				case 'ymax':
 				case 'fill':
 				case 'marker':
+				case 'fontfill':
 					$this->$matches[1] = $matches[2];
 					break;
 				case 'stroke':
@@ -275,7 +276,11 @@ function AStext($arg) {
 		if ($pos=='right' || $pos=='aboveright' || $pos=='belowright') {
 			$p[0] = $p[0] + .5*($bb[2]-$bb[0])- .5*($bb[7]-$bb[1]);
 		}
-		$color = $this->stroke;
+		if ($this->fontfill != '') {
+			$color = $this->fontfill;
+		} else {
+			$color = $this->stroke;
+		}
 		imagettftext($this->img,$this->fontsize,0,$p[0],$p[1],$this->$color,$this->fontfile,$st);
 	} else {
 		if ($this->fontsize<9) {
@@ -300,7 +305,11 @@ function AStext($arg) {
 		if ($pos=='right' || $pos=='aboveright' || $pos=='belowright') {
 			$p[0] = $p[0] + .5*$bb[0]+ .5*$bb[1];
 		}
-		$color = $this->stroke;
+		if ($this->fontfill != '') {
+			$color = $this->fontfill;
+		} else {
+			$color = $this->stroke;
+		}
 		imagestring($this->img,$fs,$p[0],$p[1],$st,$this->$color);
 	}
 }

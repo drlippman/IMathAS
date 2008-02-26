@@ -127,6 +127,15 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	} else if ((!isset($_GET['folder']) || $_GET['folder']=='') && isset($sessiondata['folder'.$cid])) {
 		$_GET['folder'] = $sessiondata['folder'.$cid];
 	}
+	if (!isset($_GET['quickview']) && !isset($sessiondata['quickview'.$cid])) {
+		$quickview = false;
+	} else if (isset($_GET['quickview'])) {
+		$quickview = $_GET['quickview'];
+		$sessiondata['quickview'.$cid] = $quickview;
+		writesessiondata();
+	} else if (isset($sessiondata['quickview'.$cid])) {
+		$quickview = $sessiondata['quickview'.$cid];
+	}
 	
 	if (!isset($sessiondata['lastaccess'.$cid]) && !isset($teacherid)) {
 		$now = time();
@@ -286,11 +295,12 @@ if ($overwriteBody==1) {
 			<a href="listusers.php?cid=<?php echo $cid ?>">Students</a><br/>
 			<a href="gradebook.php?cid=<?php echo $cid ?>">Gradebook</a><br/>
 			<a href="course.php?cid=<?php echo $cid ?>&stuview=0">Student View</a><br/>
+			<a href="course.php?cid=<?php echo $cid ?>&quickview=on">Quick View</a>
 		</p>
 		<p><b>Manage:</b><br/>
 			<a href="manageqset.php?cid=<?php echo $cid ?>">Question Set</a><br/>
 			<a href="managelibs.php?cid=<?php echo $cid ?>">Libraries</a><br/>
-			<a href="managestugrps.php?cid=<?php echo $cid ?>">Groups</a><br/>
+			<a href="managestugrps.php?cid=<?php echo $cid ?>">Groups</a>
 		</p>
 <?php			
 		if ($allowcourseimport) {
@@ -345,10 +355,24 @@ if ($overwriteBody==1) {
 		   upsendexceptions($items);
 	   }
 	   	   
-	   showitems($items,$_GET['folder']);
-	   //echo '<ul class=nomark>';
-	   //quickview($items,$_GET['folder']);
-	   //echo '</ul>';
+	   if ($quickview=='on' && isset($teacherid)) {
+		   echo '<style type="text/css">.drag {color:red; background-color:#fcc;} .icon {cursor: pointer;}</style>';
+		   echo "<script>var AHAHsaveurl = '$imasroot/course/savequickreorder.php?cid=$cid';</script>";
+		   echo "<script src=\"$imasroot/javascript/mootools.js\"></script>";
+		   echo "<script src=\"$imasroot/javascript/nested1.js\"></script>";
+		   //echo '<input type="button" id="recchg" disabled="disabled" value="Record Order" onclick="submitChanges()"/>';
+		   //echo '<span id="submitnotice" style="color:red;"></span>';
+		   echo '<ul id=qviewtree class=qview>';
+		   quickview($items,$_GET['folder']);
+		   echo '</ul>';
+		   echo '<p>&nbsp;</p>';
+	   } else {
+		   showitems($items,$_GET['folder']);
+	   }
+	    
+	 
+	  
+	
    }
    if (isset($backlink)) {
 	   echo $backlink;
@@ -376,7 +400,8 @@ if ($overwriteBody==1) {
 			<?php echo generateadditem($_GET['folder']) ?>
 			<a href="listusers.php?cid=<?php echo $cid ?>">List Students</a><br/>
 			<a href="gradebook.php?cid=<?php echo $cid ?>">Show Gradebook</a><br/>
-			<a href="course.php?cid=<?php echo $cid ?>&stuview=0">Student View</a></span>
+			<a href="course.php?cid=<?php echo $cid ?>&stuview=0">Student View</a><br/>
+			<a href="course.php?cid=<?php echo $cid ?>&quickview=on">Quick View</a></span>
 			<span class=column>
 				<a href="manageqset.php?cid=<?php echo $cid ?>">Manage Question Set<br></a>
 <?php		
@@ -459,9 +484,16 @@ function makeTopMenu() {
 	global $imasroot;
 	global $cid;
 	global $newmsgs;
-	
+	global $quickview;
 
-	if (isset($teacherid) && count($topbar[1])>0) {
+	if (isset($teacherid) && $quickview=='on') {
+		echo "<div class=breadcrumb>";
+		echo "Quick View. <a href=\"course.php?cid=$cid&quickview=off\">Back to regular view</a>. ";
+		 echo 'Use colored boxes to drag-and-drop order.  <input type="button" id="recchg" disabled="disabled" value="Record Order" onclick="submitChanges()"/>';
+		 echo '<span id="submitnotice" style="color:red;"></span>';
+		 echo '</div>';
+		
+	} else if (isset($teacherid) && count($topbar[1])>0) {
 		echo '<div class=breadcrumb>';
 		if (in_array(0,$topbar[1]) && $msgset<3) { //messages
 			echo "<a href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a>$newmsgs &nbsp; ";
