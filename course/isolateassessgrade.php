@@ -98,7 +98,7 @@
 			echo "{$total}&nbsp;(NC)";
 		} else 	if ($IP==1 && $enddate>$now) {
 			echo "{$total}&nbsp;(IP)";
-		} else	if (($timelimit>0) &&($timeused > $timelimit1)) {
+		} else	if (($timelimit>0) &&($timeused > $timelimit)) {
 			echo "{$total}&nbsp;(OT)";
 		} else if ($assessmenttype=="Practice") {
 			echo "{$total}&nbsp;(PT)";
