@@ -254,7 +254,14 @@
 		   if (isset($teacherid)) {
 			   echo generatemoveselect($i,count($items),$parent,$blocklist);
 		   }
-		   if ($line['itemtype']=="Assessment") {
+		   if ($line['itemtype']=="Calendar") {
+			   echo "<div class=item>\n";
+			   if (isset($teacherid)) {
+				   echo "<a href=\"addcalendar.php?id={$items[$i]}&block=$parent&cid=$cid&remove=true\">Delete</a>";
+			   }
+			   showcalendar();
+			   echo "</div>";
+		   } else if ($line['itemtype']=="Assessment") {
 			   $typeid = $line['typeid'];
 			   $query = "SELECT name,summary,startdate,enddate,reviewdate,deffeedback,reqscore,reqscoreaid,avail,allowlate FROM imas_assessments WHERE id='$typeid'";
 			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -654,6 +661,7 @@
 	$html .= "<option value=\"linkedtext\">Add Linked Text</option>\n";
 	$html .= "<option value=\"forum\">Add Forum</option>\n";
 	$html .= "<option value=\"block\">Add Block</option>\n";
+	$html .= "<option value=\"calendar\">Add Calendar</option>\n";
 	$html .= "</select><BR>\n";
 	return $html;
    }

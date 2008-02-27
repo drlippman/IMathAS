@@ -6,6 +6,7 @@
 require("../validate.php");
 require("courseshowitems.php");
 require("../includes/htmlutil.php");
+require("../includes/calendardisp.php");
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -493,7 +494,8 @@ function makeTopMenu() {
 		 echo '<span id="submitnotice" style="color:red;"></span>';
 		 echo '</div>';
 		
-	} else if (isset($teacherid) && count($topbar[1])>0) {
+	}
+	if (isset($teacherid) && count($topbar[1])>0) {
 		echo '<div class=breadcrumb>';
 		if (in_array(0,$topbar[1]) && $msgset<3) { //messages
 			echo "<a href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a>$newmsgs &nbsp; ";

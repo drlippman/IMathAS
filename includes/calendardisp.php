@@ -1,53 +1,13 @@
 <?php
-	require("../validate.php");
-	
-	$cid = $_GET['cid'];
-?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<html>
-<head>
-<style type="text/css">
-table.cal {
-	border-collapse: collapse;
-	width: 100%;
-}
-table.cal thead th {
-	text-align: center;
-	background-color: #ddf;
-	border: 1px solid #000;
-}
-table.cal td {
-	border: 1px solid #000;
-	width: 14%;
-	height: 2.5em;
-}
-.day {
-	font-size: 80%;
-	background-color: #ddf;
-}
-.today {
-	background-color: #fdd;
-}
-.contents {
-	text-align: center;
-}
-div.td {
-	width: 100%;
-	height: 100%;
-	overflow: hidden;
-}
+function showcalendar() {
 
+global $imasroot,$cid;
 
-
-</style>
-</head>
-<body>
-<?php
-
-$today = time();
-if (isset($_GET['pageshift'])) {
-	$pageshift = $_GET['pageshift'];
+$now= time();
+$today = $now;
+if (isset($_GET['calpageshift'])) {
+	$pageshift = $_GET['calpageshift'];
 } else {
 	$pageshift = 0;
 }
@@ -88,6 +48,7 @@ for ($i=0;$i<$dayofweek;$i++) {
 			$ids[0][$i] = $curmonum.'-'.$curday;
 		}
 	}
+	$dates[$ids[0][$i]] = date('l F j, Y',$today - ($dayofweek - $i)*24*60*60);
 }
 
 for ($i=$dayofweek;$i<28;$i++) {
@@ -105,19 +66,41 @@ for ($i=$dayofweek;$i<28;$i++) {
 		$hdrs[$row][$col] = $curday;
 		$ids[$row][$col] = $curmonum.'-'.$curday;
 	}
+	$dates[$ids[$row][$col]] = date('l F j, Y',$today + ($i-$dayofweek)*24*60*60);
 }
+
 ?>
-<script> 
+<script type="text/javascript"> 
 function showcontents(el) {
 	html = '';
 	if (caleventsarr[el.id]!=null) {
-		for (var i=0; i<caleventsarr[el.id].length; i++) {
-			html += '<span class=icon style="background-color: #f66">?</span> <a href="../assessment/showtest.php?cid='+cid+'&id='+caleventsarr[el.id][i].id+'">';
-			html += caleventsarr[el.id][i].name + '</a>';
-			html += ' Due '+caleventsarr[el.id][i].time;
-			html += '<br/>';
+		html += '<div style="background-color:#ddf;">'+caleventsarr[el.id].date + '</div>';
+		if (caleventsarr[el.id].data!=null) {
+			html += '<ul class=qview style="margin-top: 2px;">';
+			for (var i=0; i<caleventsarr[el.id].data.length; i++) {
+				if (caleventsarr[el.id].data[i].type=='A') {
+					html += '<li><span style="background-color: #f66; padding: 0px 5px 0px 5px;">?</span> <a href="../assessment/showtest.php?cid='+cid+'&id='+caleventsarr[el.id].data[i].id+'">';
+					html += caleventsarr[el.id].data[i].name + '</a>';
+					html += ' Due '+caleventsarr[el.id].data[i].time;
+					html += '</li>';
+				} else if (caleventsarr[el.id].data[i].type=='I') {
+					html += '<li><span style="background-color: #f66; padding: 0px 5px 0px 5px;">!</span> ';
+					html += caleventsarr[el.id].data[i].name;
+					html += '</li>';
+				} else if (caleventsarr[el.id].data[i].type=='L') {
+					html += '<li><span style="background-color: #f66; padding: 0px 5px 0px 5px;">!</span> ';
+					if (caleventsarr[el.id].data[i].link=='') {
+						html += '<a href="../course/showlinkedtext.php?cid='+cid+'&id='+caleventsarr[el.id].data[i].id+'">';
+					} else {
+						html += '<a href="'+caleventsarr[el.id].data[i].link+'">';
+					}
+					html += caleventsarr[el.id].data[i].name + '</a>';
+					html += '</li>';
+				}
+			}
 		}
 	}
+	html += '</ul>';
 	document.getElementById('step').innerHTML = html;	
 	var alltd = document.getElementsByTagName("td");
 	for (var i=0;i<alltd.length;i++) {
@@ -128,30 +111,59 @@ function showcontents(el) {
 </script>
 
 <?php
-echo '<p><a href="calendardisp.php?pageshift='.($pageshift-1).'">&lt; &lt;</a> ';
-echo '<a href="calendardisp.php?pageshift=0">Now</a> ';
-echo '<a href="calendardisp.php?pageshift='.($pageshift+1).'">&gt; &gt;</a> </p>';
+echo '<div class=center><a href="course.php?calpageshift='.($pageshift-1).'&cid='.$cid.'">&lt; &lt;</a> ';
+if ($pageshift==0) {
+	echo "Now ";
+} else {
+	echo '<a href="course.php?calpageshift=0&cid='.$cid.'">Now</a> ';
+}
+echo '<a href="course.php?calpageshift='.($pageshift+1).'&cid='.$cid.'">&gt; &gt;</a></div> ';
 echo "<table class=\"cal\" >";  //onmouseout=\"makenorm()\"
 
-$lowertime = mktime(0,0,0,$curmonum,$dayofmo - $dayofweek,$curyr);
+$lowertime = max($now,mktime(0,0,0,$curmonum,$dayofmo - $dayofweek,$curyr));
 $uppertime = mktime(0,0,0,$curmonum,$dayofmo - $dayofweek + 28,$curyr);
 
-//check for startdate
-$query = "SELECT id,name,enddate FROM imas_assessments WHERE enddate>$lowertime AND enddate<$uppertime AND avail>0 AND courseid='$cid'";
+$assess = array();
+$query = "SELECT id,name,enddate FROM imas_assessments WHERE enddate>$lowertime AND enddate<$uppertime AND startdate<$now AND avail=1 AND courseid='$cid'";
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 while ($row = mysql_fetch_row($result)) {
 	list($moday,$time) = explode('~',date('n-j~g:i a',$row[2]));
 	$row[1] = str_replace('"','\"',$row[1]);
-	$assess[$moday][] = "{time:\"$time\", id:\"$row[0]\", name:\"$row[1]\"}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
+	$assess[$moday][] = "{type:\"A\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\"}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
+}
+$query = "SELECT id,title,enddate FROM imas_inlinetext WHERE enddate>$lowertime AND enddate<$uppertime AND startdate<$now AND avail=1 AND courseid='$cid'";
+$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+while ($row = mysql_fetch_row($result)) {
+	list($moday,$time) = explode('~',date('n-j~g:i a',$row[2]));
+	$row[1] = str_replace('"','\"',$row[1]);
+	$assess[$moday][] = "{type:\"I\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\"}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
+}
+$query = "SELECT id,title,enddate,text FROM imas_linkedtext WHERE enddate>$lowertime AND enddate<$uppertime AND startdate<$now AND avail=1 AND courseid='$cid'";
+$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+while ($row = mysql_fetch_row($result)) {
+	list($moday,$time) = explode('~',date('n-j~g:i a',$row[2]));
+	$row[1] = str_replace('"','\"',$row[1]);
+	 if ((substr($row[3],0,4)=="http") && (strpos($row[3]," ")===false)) { //is a web link
+		   $alink = trim($row[3]);
+	   } else if (substr($row[3],0,5)=="file:") {
+		   $filename = substr($row[3],5);
+		   $alink = $imasroot . "/course/files/".$filename;
+	   } else {
+		   $alink = '';
+	   }
+	$assess[$moday][] = "{type:\"L\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", link:\"$alink\"}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
 }
 
-
 $jsarr = '{';
-foreach ($assess as $moday=>$val) {
+foreach ($dates as $moday=>$val) {
 	if ($jsarr!='{') {
 		$jsarr .= ',';
 	}
-	$jsarr .= '"'.$moday.'":['.implode(',',$assess[$moday]).']';
+	if (isset($assess[$moday])) {
+		$jsarr .= '"'.$moday.'":{date:"'.$dates[$moday].'",data:['.implode(',',$assess[$moday]).']}';
+	} else {
+		$jsarr .= '"'.$moday.'":{date:"'.$dates[$moday].'"}';
+	}
 }
 $jsarr .= '}';
 		
@@ -165,15 +177,19 @@ for ($i=0;$i<count($hdrs);$i++) {
 	echo "<tr>";
 	for ($j=0; $j<count($hdrs[$i]);$j++) {
 		if ($i==0 && $j==$dayofweek && $pageshift==0) { //onmouseover="makebig(this)"
-			echo '<td id="'.$ids[$i][$j].'" onclick="showcontents(this)" class="today"><div class="td"><span class=day>'.$hdrs[$i][$j]."</span><div class=contents>";
+			echo '<td id="'.$ids[$i][$j].'" onclick="showcontents(this)" class="today"><div class="td"><span class=day>'.$hdrs[$i][$j]."</span><div class=center>";
 		
 		} else {
-			echo '<td id="'.$ids[$i][$j].'" onclick="showcontents(this)" ><div class="td"><span class=day>'.$hdrs[$i][$j]."</span><div class=contents>";
+			echo '<td id="'.$ids[$i][$j].'" onclick="showcontents(this)" ><div class="td"><span class=day>'.$hdrs[$i][$j]."</span><div class=center>";
 		}
 		if (isset($assess[$ids[$i][$j]])) {
 			for ($k=0;$k<count($assess[$ids[$i][$j]]);$k++) {
 				//echo $assess[$ids[$i][$j]][$k];
-				echo "<span class=icon style=\"background-color:#f66\">?</span> ";
+				if (strpos($assess[$ids[$i][$j]][$k],'type:"A"')!==false) {
+					echo "<span style=\"background-color:#f66;padding: 0px 3px 0px 3px;\">?</span> ";
+				} else {
+					echo "<span style=\"background-color:#f66;padding: 0px 3px 0px 3px;\">!</span> ";
+				}
 			}
 		}
 		echo "</div></div></td>";
@@ -182,8 +198,10 @@ for ($i=0;$i<count($hdrs);$i++) {
 }
 echo "</tbody></table>";
 
-echo "<div id=step style=\"margin: 10px; padding:10px; border:2px solid #000;\"></div>";
+echo "<div id=step style=\"margin-top: 10px; padding:10px; border:1px solid #000;\"></div>";
+if ($pageshift==0) {
+	echo "<script>showcontents(document.getElementById('{$ids[0][$dayofweek]}'));</script>";
+}
+
+}
 ?>
-	
-</body>
-</html>
