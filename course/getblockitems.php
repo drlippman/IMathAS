@@ -3,6 +3,7 @@
 //(c) 2006 David Lippman
    require("../validate.php");
    require("courseshowitems.php");
+   require("../includes/calendardisp.php");
    if (isset($guestid)) {
 	   $teacherid = $guestid;
    }

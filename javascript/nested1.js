@@ -21,6 +21,7 @@ var Nested = new Class({
 	},
 
 	initialize: function(list, options) {
+		
 		this.setOptions(this.getOptions(), options);
 		if (!this.options.expandKey.match(/^(control|shift)$/)) {
 			this.options.expandKey = 'shift';
@@ -187,7 +188,8 @@ var Nested = new Class({
 				dest = check.getLast();
 				check = $E(this.options.parentTag, dest);
 			}
-			if (!check && event.page.x > dest.getLeft()+this.options.childStep && dest.parentNode.parentNode.tagName == 'LI'&& dest.className=="blockli") {
+			if (!check && event.page.x > dest.getLeft()+this.options.childStep && dest.tagName == 'LI' && dest.className=="blockli") {
+				//document.getElementById("submitnotice").innerHTML = dest.parentNode.tagName + ',' + dest.parentNode.parentNode.tagName;
 				move = 'inside';
 			}
 			
@@ -214,7 +216,10 @@ var Nested = new Class({
 			sub = (sub > 0) ? sub-over.getTop() : over.offsetHeight;
 			abort += (event.page.y < (sub-el.offsetHeight)+over.getTop());
 			if (!abort) {
-				if (move == 'inside') dest = new Element(this.options.parentTag).injectInside(dest);
+				if (move == 'inside') {
+					dest = new Element(this.options.parentTag).injectInside(dest);
+					dest.className = "qview";
+				}
 				$(el).inject(dest, move);
 				el.moved = true;
 				if (!prevParent.getFirst()) prevParent.remove();
@@ -293,6 +298,9 @@ function toSimpleJSON(a) {
 function submitChanges() { 
   url = AHAHsaveurl + '&order='+toSimpleJSON(sortIt.serialize());
   var target = "submitnotice";
+  //document.getElementById(target).innerHTML = url;
+  //return;
+  
   document.getElementById(target).innerHTML = ' Saving Changes... ';
   if (window.XMLHttpRequest) { 
     req = new XMLHttpRequest(); 
@@ -300,13 +308,13 @@ function submitChanges() {
     req = new ActiveXObject("Microsoft.XMLHTTP"); 
   } 
   if (req != undefined) { 
-    req.onreadystatechange = function() {ahahDone(url, target);}; 
+    req.onreadystatechange = function() {NestedahahDone(url, target);}; 
     req.open("GET", url, true); 
     req.send(""); 
   } 
 }  
 
-function ahahDone(url, target) { 
+function NestedahahDone(url, target) { 
   if (req.readyState == 4) { // only if req is "loaded" 
     if (req.status == 200) { // only if "OK" 
 	    if (req.responseText=='OK') {

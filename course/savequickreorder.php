@@ -41,8 +41,12 @@
 	 foreach ($listarr as $it) {
 		 if (strpos($it,'-')!==false) { //is block
 			 $pos = strpos($it,':');
-			 $pts[0] = substr($it,0,$pos);
-			 $pts[1] = substr($it,$pos+1);
+			 if ($pos===false) {
+				 $pts[0] = $it;
+			 } else {
+				 $pts[0] = substr($it,0,$pos);
+				 $pts[1] = substr($it,$pos+1);
+			 }
 			 
 			 $blocktree = explode('-',$pts[0]);
 			 $sub = $items;
@@ -51,8 +55,12 @@
 			 }
 			 $block = $sub[$blocktree[count($blocktree)-1]-1];
 			 unset($block['items']);
-			 $subarr = additems($pts[1]);
-			 $block['items'] = $subarr;
+			 if ($pos===false) {
+				 $block['items'] = array();
+			 } else {
+				 $subarr = additems($pts[1]);
+				 $block['items'] = $subarr;
+			 }
 			 $outarr[] = $block;
 		 } else { //regular item
 			 $outarr[] = $it;

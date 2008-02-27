@@ -794,7 +794,7 @@
 		   $id = array_shift($row);
 		   $iteminfo['Assessment'][$id] = $row;
 	   }
-	   $query = "SELECT id,title,startdate,enddate,avail FROM imas_inlinetext WHERE courseid='$cid'";
+	   $query = "SELECT id,title,text,startdate,enddate,avail FROM imas_inlinetext WHERE courseid='$cid'";
 	   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	   while ($row = mysql_fetch_row($result)) {
 		   $id = array_shift($row);
@@ -865,11 +865,16 @@
 				echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\">NewFlag</a>";
 				echo '</span>';
 			}
-			echo '<ul class=qview>';
-			quickview($items[$i]['items'],$parent.'-'.$bnum,$showdats,$showlinks);
-			echo '</ul>';
+			if (count($items[$i]['items'])>0) {
+				echo '<ul class=qview>';
+				quickview($items[$i]['items'],$parent.'-'.$bnum,$showdats,$showlinks);
+				echo '</ul>';
+			}
 			echo '</li>';
-		   } else if ($itemtypes[$items[$i]][0] == 'Assessment') {
+		   } else if ($itemtypes[$items[$i]][0] == 'Calendar') {
+			echo '<li id="'.$items[$i].'"><span class=icon style="background-color:#0f0;">C</span>Calendar</li>';
+			   
+	   	   } else if ($itemtypes[$items[$i]][0] == 'Assessment') {
 			   $typeid = $itemtypes[$items[$i]][1];
 			   list($line['name'],$line['startdate'],$line['enddate'],$line['reviewdate'],$line['avail']) = $iteminfo['Assessment'][$typeid];
 			   if ($line['startdate']==0) {
@@ -923,7 +928,10 @@
 			  
 		   } else if ($itemtypes[$items[$i]][0] == 'InlineText') {
 			   $typeid = $itemtypes[$items[$i]][1];
-			   list($line['name'],$line['startdate'],$line['enddate'],$line['avail']) = $iteminfo['InlineText'][$typeid];
+			   list($line['name'],$line['text'],$line['startdate'],$line['enddate'],$line['avail']) = $iteminfo['InlineText'][$typeid];
+			   if ($line['name'] == '##hidden##') {
+				   $line['name'] = strip_tags($line['text']);
+			   }
 			   if ($line['startdate']==0) {
 				   $startdate = "Always";
 			   } else {
@@ -943,6 +951,7 @@
 				}
 			   echo '<li id="'.$items[$i].'"><span class=icon style="background-color:'.$color.'">!</span>';
 			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
+				   //echo '<b><span id="I'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
 				   echo '<b>'.$line['name']. "</b>";
 				   if ($showdates) {
 					   echo " showing until $enddate";
