@@ -2,7 +2,7 @@
 
 function showcalendar() {
 
-global $imasroot,$cid;
+global $imasroot,$cid,$userid,$teacherid;
 
 $now= time();
 $today = $now;
@@ -79,16 +79,33 @@ if ($pageshift==0) {
 } else {
 	echo '<a href="course.php?calpageshift=0&cid='.$cid.'">Now</a> ';
 }
-echo '<a href="course.php?calpageshift='.($pageshift+1).'&cid='.$cid.'">&gt; &gt;</a></div> ';
+echo '<a href="course.php?calpageshift='.($pageshift+1).'&cid='.$cid.'">&gt; &gt;</a> ';
+echo '</div> ';
 echo "<table class=\"cal\" >";  //onmouseout=\"makenorm()\"
 
 $lowertime = max($now,mktime(0,0,0,$curmonum,$dayofmo - $dayofweek,$curyr));
 $uppertime = mktime(0,0,0,$curmonum,$dayofmo - $dayofweek + 28,$curyr);
 
+$exceptions = array();
+if (!isset($teacherid)) {
+	$query = "SELECT assessmentid,startdate,enddate FROM imas_exceptions WHERE userid='$userid'";
+	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+	while ($row = mysql_fetch_row($result)) {
+		$exceptions[$row[0]] = array($row[1],$row[2]);
+	}
+}
+
 $assess = array();
 $query = "SELECT id,name,enddate FROM imas_assessments WHERE enddate>$lowertime AND enddate<$uppertime AND startdate<$now AND avail=1 AND courseid='$cid'";
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 while ($row = mysql_fetch_row($result)) {
+	if (isset($exceptions[$row[0]])) {
+		if ($exceptions[$row[0]][0]>$now) { //startdate is in future, skip item
+			continue; 	
+		} else { //overwrite enddate
+			$row[2] = $exceptions[$row[0]][1];
+		}
+	}
 	list($moday,$time) = explode('~',date('n-j~g:i a',$row[2]));
 	$row[1] = str_replace('"','\"',$row[1]);
 	$assess[$moday][] = "{type:\"A\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\"}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
@@ -174,7 +191,10 @@ for ($i=0;$i<count($hdrs);$i++) {
 }
 echo "</tbody></table>";
 
-echo "<div id=step style=\"margin-top: 10px; padding:10px; border:1px solid #000;\"></div>";
+echo "<div style=\"margin-top: 10px; padding:10px; border:1px solid #000;\">";
+echo '<span class=right><a href="#" onclick="showcalcontents('.(1000*($today - $dayofweek*24*60*60)).'); return false;"/>Show all on page</a></span>';
+
+echo "<div id=\"caleventslist\"></div></div>";
 if ($pageshift==0) {
 	echo "<script>showcalcontents(document.getElementById('{$ids[0][$dayofweek]}'));</script>";
 }

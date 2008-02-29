@@ -75,51 +75,72 @@ function toggleblock(bnum,folder) {
    }
    
 function showcalcontents(el) {
-	html = '';
-	if (caleventsarr[el.id]!=null) {
-		html += '<div style="background-color:#ddf;">'+caleventsarr[el.id].date + '</div>';
-		if (caleventsarr[el.id].data!=null) {
-			html += '<ul class=qview style="margin-top: 2px;">';
-			for (var i=0; i<caleventsarr[el.id].data.length; i++) {
-				if (caleventsarr[el.id].data[i].type=='A') {
-					html += '<li><span style="background-color: #f66; padding: 0px 5px 0px 5px;">?</span> <a href="../assessment/showtest.php?cid='+cid+'&id='+caleventsarr[el.id].data[i].id+'">';
-					html += caleventsarr[el.id].data[i].name + '</a>';
-					html += ' Due '+caleventsarr[el.id].data[i].time;
-					html += '</li>';
-				} else if (caleventsarr[el.id].data[i].type=='I') {
-					html += '<li><span style="background-color: #f66; padding: 0px 5px 0px 5px;">!</span> ';
-					html += caleventsarr[el.id].data[i].name;
-					html += '</li>';
-				} else if (caleventsarr[el.id].data[i].type=='L') {
-					html += '<li><span style="background-color: #f66; padding: 0px 5px 0px 5px;">!</span> ';
-					if (caleventsarr[el.id].data[i].link=='') {
-						html += '<a href="../course/showlinkedtext.php?cid='+cid+'&id='+caleventsarr[el.id].data[i].id+'">';
-					} else {
-						html += '<a href="'+caleventsarr[el.id].data[i].link+'">';
-					}
-					html += caleventsarr[el.id].data[i].name + '</a>';
-					html += '</li>';
-				} else if (caleventsarr[el.id].data[i].type=='FP') {
-					html += '<li><span style="background-color: #f66; padding: 0px 5px 0px 5px;">F</span> <a href="../forums/thread.php?cid='+cid+'&forum='+caleventsarr[el.id].data[i].id+'">';
-					html += caleventsarr[el.id].data[i].name + '</a>';
-					html += ' New Threads Due '+caleventsarr[el.id].data[i].time;
-					html += '</li>';
-				} else if (caleventsarr[el.id].data[i].type=='FR') {
-					html += '<li><span style="background-color: #f66; padding: 0px 5px 0px 5px;">F</span> <a href="../forums/thread.php?cid='+cid+'&forum='+caleventsarr[el.id].data[i].id+'">';
-					html += caleventsarr[el.id].data[i].name + '</a>';
-					html += ' Replies Due '+caleventsarr[el.id].data[i].time;
-					html += '</li>';
-				}
+	var html = '';
+	if (typeof el == 'number') {
+		var calwalk = new Date();
+		calwalk.setTime(el);
+		for (var j=0; j<28; j++) {
+			moday = (calwalk.getMonth()+1) + '-' + (calwalk.getDate());
+			if (caleventsarr[moday].data!=null) {
+				html += '<div style="background-color:#ddf;">'+caleventsarr[moday].date + '</div>';
+				html += showcalcontentsid(moday);
 			}
+			calwalk.setDate(calwalk.getDate()+1);
 		}
-	}
-	html += '</ul>';
-	document.getElementById('step').innerHTML = html;	
+		
+	} else if (caleventsarr[el.id]!=null) {
+		html += '<div style="background-color:#ddf;">'+caleventsarr[el.id].date + '</div>';
+		html += showcalcontentsid(el.id);
+	} 
+	
+	document.getElementById('caleventslist').innerHTML = html;	
 	var alltd = document.getElementsByTagName("td");
 	for (var i=0;i<alltd.length;i++) {
 		alltd[i].style.backgroundColor = '#fff';
 	}
-	el.style.backgroundColor = '#fdd';
+	if (typeof el != 'number') {
+		el.style.backgroundColor = '#fdd';
+	}
+}
+
+function showcalcontentsid(elid) {
+	var html = '';
+	if (caleventsarr[elid].data!=null) {
+		html += '<ul class=qview style="margin-top: 2px;">';
+		for (var i=0; i<caleventsarr[elid].data.length; i++) {
+			if (caleventsarr[elid].data[i].type=='A') {
+				html += '<li><span style="background-color: #f66; padding: 0px 5px 0px 5px;">?</span> <a href="../assessment/showtest.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">';
+				html += caleventsarr[elid].data[i].name + '</a>';
+				html += ' Due '+caleventsarr[elid].data[i].time;
+				html += '</li>';
+			} else if (caleventsarr[elid].data[i].type=='I') {
+				html += '<li><span style="background-color: #f66; padding: 0px 5px 0px 5px;">!</span> ';
+				html += caleventsarr[elid].data[i].name;
+				html += '</li>';
+			} else if (caleventsarr[elid].data[i].type=='L') {
+				html += '<li><span style="background-color: #f66; padding: 0px 5px 0px 5px;">!</span> ';
+				if (caleventsarr[elid].data[i].link=='') {
+					html += '<a href="../course/showlinkedtext.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">';
+				} else {
+					html += '<a href="'+caleventsarr[elid].data[i].link+'">';
+				}
+				html += caleventsarr[elid].data[i].name + '</a>';
+				html += '</li>';
+			} else if (caleventsarr[elid].data[i].type=='FP') {
+				html += '<li><span style="background-color: #f66; padding: 0px 5px 0px 5px;">F</span> <a href="../forums/thread.php?cid='+cid+'&forum='+caleventsarr[elid].data[i].id+'">';
+				html += caleventsarr[elid].data[i].name + '</a>';
+				html += ' New Threads Due '+caleventsarr[elid].data[i].time;
+				html += '</li>';
+			} else if (caleventsarr[elid].data[i].type=='FR') {
+				html += '<li><span style="background-color: #f66; padding: 0px 5px 0px 5px;">F</span> <a href="../forums/thread.php?cid='+cid+'&forum='+caleventsarr[elid].data[i].id+'">';
+				html += caleventsarr[elid].data[i].name + '</a>';
+				html += ' Replies Due '+caleventsarr[elid].data[i].time;
+				html += '</li>';
+			}
+		}
+		html += '</ul>';
+	}
+	return html;
 }
 
 function editinplace(el) {
