@@ -924,7 +924,11 @@ function gbtable() {
 			//} else {
 			//	$totpast = 0;
 			//}
-			$gb[$ln][3][0] = round(10000*$totpast/$cattotweightpast,1);
+			if ($cattotweightpast==0) {
+				$gb[$ln][3][0] = 0;
+			} else {
+				$gb[$ln][3][0] = round(10000*$totpast/$cattotweightpast,1);
+			}
 			$gb[$ln][3][3] = null;
 			
 			//if ($overallptscur>0) {
@@ -932,7 +936,11 @@ function gbtable() {
 			//} else {
 			//	$totcur = 0;
 			//}
-			$gb[$ln][3][1] = round(10000*$totcur/$cattotweightcur,1);
+			if ($cattotweightcur==0) {
+				$gb[$ln][3][1] = 0;
+			} else {
+				$gb[$ln][3][1] = round(10000*$totcur/$cattotweightcur,1);
+			}
 			$gb[$ln][3][4] = null;
 			
 			//if ($overallptsfuture>0) {
@@ -940,7 +948,11 @@ function gbtable() {
 			//} else {
 			//	$totfuture = 0;
 			//}
-			$gb[$ln][3][2] = round(10000*$totfuture/$cattotweightfuture,1);
+			if ($cattotweightfuture==0) {
+				$gb[$ln][3][2] = 0;
+			} else {
+				$gb[$ln][3][2] = round(10000*$totfuture/$cattotweightfuture,1);
+			}
 			$gb[$ln][3][5] = null;
 			
 			
