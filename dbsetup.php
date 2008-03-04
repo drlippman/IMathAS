@@ -135,7 +135,7 @@ $sql = 'CREATE TABLE `imas_courses` ('
 	. ' `lockaid` INT(10) UNSIGNED NOT NULL DEFAULT \'0\','
 	. ' `theme` VARCHAR(32) NOT NULL DEFAULT \'default.css\', '
 	. ' `latepasshrs` SMALLINT(4) UNSIGNED NOT NULL DEFAULT \'24\', '
-	. ' INDEX(`ownerid`)'
+	. ' INDEX(`ownerid`), INDEX(`name`), INDEX(`available`)'
         . ' )'
         . ' TYPE = innodb'
         . ' COMMENT = \'Course list\';';

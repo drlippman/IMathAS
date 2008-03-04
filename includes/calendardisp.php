@@ -96,21 +96,31 @@ if (!isset($teacherid)) {
 }
 
 $assess = array();
-$query = "SELECT id,name,enddate FROM imas_assessments WHERE enddate>$lowertime AND enddate<$uppertime AND startdate<$now AND avail=1 AND courseid='$cid'";
+$colors = array();
+$k = 0;
+$query = "SELECT id,name,startdate,enddate,reviewdate FROM imas_assessments WHERE avail=1 AND courseid='$cid'";
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 while ($row = mysql_fetch_row($result)) {
 	if (isset($exceptions[$row[0]])) {
-		if ($exceptions[$row[0]][0]>$now) { //startdate is in future, skip item
-			continue; 	
-		} else { //overwrite enddate
-			$row[2] = $exceptions[$row[0]][1];
-		}
+		$row[2] = $exceptions[$row[0]][0];
+		$row[3] = $exceptions[$row[0]][1];
 	}
-	list($moday,$time) = explode('~',date('n-j~g:i a',$row[2]));
-	$row[1] = str_replace('"','\"',$row[1]);
-	$assess[$moday][] = "{type:\"A\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\"}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
+	if ($row[2]>$now || ($now>$row[3] && $row[4]==0) || ($row[4]>0 && $now>$row[4])) {
+		continue;
+	}
+	if ($now<$row[3]) {
+		list($moday,$time) = explode('~',date('n-j~g:i a',$row[3]));
+		$row[1] = str_replace('"','\"',$row[1]);
+		$colors[$k] = makecolor2($row[2],$row[3],$now);
+		$assess[$moday][$k] = "{type:\"A\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors[$k]."\"}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
+	} else { //in review
+		list($moday,$time) = explode('~',date('n-j~g:i a',$row[4]));
+		$row[1] = str_replace('"','\"',$row[1]);
+		$assess[$moday][$k] = "{type:\"AR\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\"}";
+	}
+	$k++;
 }
-$query = "SELECT id,title,enddate,text FROM imas_inlinetext WHERE enddate>$lowertime AND enddate<$uppertime AND startdate<$now AND avail=1 AND courseid='$cid'";
+$query = "SELECT id,title,enddate,text,startdate FROM imas_inlinetext WHERE enddate>$lowertime AND enddate<$uppertime AND startdate<$now AND avail=1 AND courseid='$cid'";
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 while ($row = mysql_fetch_row($result)) {
 	if ($row[1]=='##hidden##') {
@@ -118,9 +128,11 @@ while ($row = mysql_fetch_row($result)) {
 	}
 	list($moday,$time) = explode('~',date('n-j~g:i a',$row[2]));
 	$row[1] = str_replace('"','\"',$row[1]);
-	$assess[$moday][] = "{type:\"I\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\"}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
+	$colors[$k] = makecolor2($row[4],$row[2],$now);
+	$assess[$moday][$k] = "{type:\"I\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors[$k]."\"}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
+	$k++;
 }
-$query = "SELECT id,title,enddate,text FROM imas_linkedtext WHERE enddate>$lowertime AND enddate<$uppertime AND startdate<$now AND avail=1 AND courseid='$cid'";
+$query = "SELECT id,title,enddate,text,startdate FROM imas_linkedtext WHERE enddate>$lowertime AND enddate<$uppertime AND startdate<$now AND avail=1 AND courseid='$cid'";
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 while ($row = mysql_fetch_row($result)) {
 	list($moday,$time) = explode('~',date('n-j~g:i a',$row[2]));
@@ -133,16 +145,23 @@ while ($row = mysql_fetch_row($result)) {
 	   } else {
 		   $alink = '';
 	   }
-	$assess[$moday][] = "{type:\"L\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", link:\"$alink\"}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
+	$colors[$k] = makecolor2($row[4],$row[2],$now);
+	$assess[$moday][$k] = "{type:\"L\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", link:\"$alink\", color:\"".$colors[$k]."\"}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
+	$k++;
 }
-$query = "SELECT id,name,postby,replyby FROM imas_forums WHERE enddate>$lowertime AND ((postby>$lowertime AND postby<$uppertime) OR (replyby>$lowertime AND replyby<$uppertime)) AND startdate<$now AND avail>0 AND courseid='$cid'";
+$query = "SELECT id,name,postby,replyby,startdate FROM imas_forums WHERE enddate>$lowertime AND ((postby>$now AND postby<$uppertime) OR (replyby>$now AND replyby<$uppertime)) AND startdate<$now AND avail>0 AND courseid='$cid'";
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 while ($row = mysql_fetch_row($result)) {
 	list($moday,$time) = explode('~',date('n-j~g:i a',$row[2]));
 	$row[1] = str_replace('"','\"',$row[1]);
-	$assess[$moday][] = "{type:\"FP\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\"}";
+	$colors[$k] = makecolor2($row[4],$row[2],$now);
+	echo "start: {$row[4]}, end {$row[2]} ";
+	$assess[$moday][$k] = "{type:\"FP\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors[$k]."\"}";
+	$k++;
 	list($moday,$time) = explode('~',date('n-j~g:i a',$row[3]));
-	$assess[$moday][] = "{type:\"FR\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\"}";	
+	$colors[$k] = makecolor2($row[4],$row[3],$now);
+	$assess[$moday][$k] = "{type:\"FR\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors[$k]."\"}";
+	$k++;	
 }
 
 $jsarr = '{';
@@ -174,14 +193,16 @@ for ($i=0;$i<count($hdrs);$i++) {
 			echo '<td id="'.$ids[$i][$j].'" onclick="showcalcontents(this)" ><div class="td"><span class=day>'.$hdrs[$i][$j]."</span><div class=center>";
 		}
 		if (isset($assess[$ids[$i][$j]])) {
-			for ($k=0;$k<count($assess[$ids[$i][$j]]);$k++) {
+			foreach ($assess[$ids[$i][$j]] as $k=>$info) {
 				//echo $assess[$ids[$i][$j]][$k];
-				if (strpos($assess[$ids[$i][$j]][$k],'type:"A"')!==false) {
-					echo "<span style=\"background-color:#f66;padding: 0px 3px 0px 3px;\">?</span> ";
-				} else if (strpos($assess[$ids[$i][$j]][$k],'type:"F')!==false) { 
-					echo "<span style=\"background-color:#f66;padding: 0px 3px 0px 3px;\">F</span> ";
-				} else {
-					echo "<span style=\"background-color:#f66;padding: 0px 3px 0px 3px;\">!</span> ";
+				if (strpos($info,'type:"AR"')!==false) {
+					echo "<span style=\"background-color:#99f;padding: 0px 3px 0px 3px;\">R</span> ";
+				} else if (strpos($info,'type:"A"')!==false) {
+					echo "<span style=\"background-color:".$colors[$k].";padding: 0px 3px 0px 3px;\">?</span> ";
+				} else if (strpos($info,'type:"F')!==false) { 
+					echo "<span style=\"background-color:".$colors[$k].";padding: 0px 3px 0px 3px;\">F</span> ";
+				} else { //textitems
+					echo "<span style=\"background-color:".$colors[$k].";padding: 0px 3px 0px 3px;\">!</span> ";
 				}
 			}
 		}

@@ -1,6 +1,29 @@
 Upgrade Notes
 
 *********************
+** IMathAS 1.6     **
+*********************
+
+*** Database Changes ***
+
+ALTER TABLE `imas_courses` ADD INDEX ( `name` );
+ALTER TABLE `imas_courses` ADD INDEX ( `available` );
+ALTER TABLE `imas_assessments` ADD INDEX ( `avail` );
+ALTER TABLE `imas_assessments` ADD INDEX ( `reviewdate` ) ;
+ALTER TABLE `imas_inlinetext` ADD INDEX ( `avail` ) ;
+ALTER TABLE `imas_inlinetext` ADD INDEX ( `startdate` ) ;
+ALTER TABLE `imas_inlinetext` ADD INDEX ( `enddate` ) ;
+ALTER TABLE `imas_linkedtext` ADD INDEX ( `avail` ) ;
+ALTER TABLE `imas_linkedtext` ADD INDEX ( `startdate` );
+ALTER TABLE `imas_linkedtext` ADD INDEX ( `enddate` ) ;
+ALTER TABLE `imas_forums` ADD INDEX ( `avail` ) ;
+ALTER TABLE `imas_forums` ADD INDEX ( `startdate` ) ;
+ALTER TABLE `imas_forums` ADD INDEX ( `enddate` ) ;
+ALTER TABLE `imas_forums` ADD INDEX ( `replyby` ) ;
+ALTER TABLE `imas_forums` ADD INDEX ( `postby` ) ;
+
+
+*********************
 ** IMathAS 1.5     **
 *********************
 

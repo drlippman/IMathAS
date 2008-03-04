@@ -128,7 +128,7 @@ while ($row = mysql_fetch_row($result)) {
 // check to see if the user is enrolled as a student
 $query = "SELECT imas_courses.name,imas_courses.id FROM imas_students,imas_courses ";
 $query .= "WHERE imas_students.courseid=imas_courses.id AND imas_students.userid='$userid' ";
-$query .= "AND (available=0 OR available=2) ORDER BY imas_courses.name";
+$query .= "AND (imas_courses.available=0 OR imas_courses.available=2) ORDER BY imas_courses.name";
 $result = mysql_query($query) or die("Query failed : " . mysql_error());
 $line = mysql_fetch_array($result, MYSQL_ASSOC);
 
@@ -156,7 +156,7 @@ if ($line == null) {
 //check for classes the current user is teaching
 $query = "SELECT imas_courses.name,imas_courses.id,imas_courses.available,imas_courses.lockaid FROM imas_teachers,imas_courses ";
 $query .= "WHERE imas_teachers.courseid=imas_courses.id AND imas_teachers.userid='$userid' ";
-$query .= "AND (available=0 OR available=1) ORDER BY imas_courses.name";
+$query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY imas_courses.name";
 $result = mysql_query($query) or die("Query failed : " . mysql_error());
 $line = mysql_fetch_array($result, MYSQL_ASSOC);
 

@@ -109,16 +109,21 @@ function showcalcontentsid(elid) {
 		html += '<ul class=qview style="margin-top: 2px;">';
 		for (var i=0; i<caleventsarr[elid].data.length; i++) {
 			if (caleventsarr[elid].data[i].type=='A') {
-				html += '<li><span style="background-color: #f66; padding: 0px 5px 0px 5px;">?</span> <a href="../assessment/showtest.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">';
+				html += '<li><span style="background-color:'+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">?</span> <a href="../assessment/showtest.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">';
 				html += caleventsarr[elid].data[i].name + '</a>';
 				html += ' Due '+caleventsarr[elid].data[i].time;
 				html += '</li>';
+			} else if (caleventsarr[elid].data[i].type=='AR') {
+				html += '<li><span style="background-color: #99f; padding: 0px 5px 0px 5px;">R</span> <a href="../assessment/showtest.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">';
+				html += caleventsarr[elid].data[i].name + '</a>';
+				html += ' Review until '+caleventsarr[elid].data[i].time;
+				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type=='I') {
-				html += '<li><span style="background-color: #f66; padding: 0px 5px 0px 5px;">!</span> ';
+				html += '<li><span style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">!</span> ';
 				html += caleventsarr[elid].data[i].name;
 				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type=='L') {
-				html += '<li><span style="background-color: #f66; padding: 0px 5px 0px 5px;">!</span> ';
+				html += '<li><span style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">!</span> ';
 				if (caleventsarr[elid].data[i].link=='') {
 					html += '<a href="../course/showlinkedtext.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">';
 				} else {
@@ -127,12 +132,12 @@ function showcalcontentsid(elid) {
 				html += caleventsarr[elid].data[i].name + '</a>';
 				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type=='FP') {
-				html += '<li><span style="background-color: #f66; padding: 0px 5px 0px 5px;">F</span> <a href="../forums/thread.php?cid='+cid+'&forum='+caleventsarr[elid].data[i].id+'">';
+				html += '<li><span style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">F</span> <a href="../forums/thread.php?cid='+cid+'&forum='+caleventsarr[elid].data[i].id+'">';
 				html += caleventsarr[elid].data[i].name + '</a>';
 				html += ' New Threads Due '+caleventsarr[elid].data[i].time;
 				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type=='FR') {
-				html += '<li><span style="background-color: #f66; padding: 0px 5px 0px 5px;">F</span> <a href="../forums/thread.php?cid='+cid+'&forum='+caleventsarr[elid].data[i].id+'">';
+				html += '<li><span style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">F</span> <a href="../forums/thread.php?cid='+cid+'&forum='+caleventsarr[elid].data[i].id+'">';
 				html += caleventsarr[elid].data[i].name + '</a>';
 				html += ' Replies Due '+caleventsarr[elid].data[i].time;
 				html += '</li>';
