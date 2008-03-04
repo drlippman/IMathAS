@@ -263,7 +263,7 @@
 			   echo "</div>";
 		   } else if ($line['itemtype']=="Assessment") {
 			   $typeid = $line['typeid'];
-			   $query = "SELECT name,summary,startdate,enddate,reviewdate,deffeedback,reqscore,reqscoreaid,avail,allowlate FROM imas_assessments WHERE id='$typeid'";
+			   $query = "SELECT name,summary,startdate,enddate,reviewdate,deffeedback,reqscore,reqscoreaid,avail,allowlate,timelimit FROM imas_assessments WHERE id='$typeid'";
 			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			  
@@ -314,7 +314,36 @@
 				   } else {
 					   $endname = "Due";
 				   }
-				   echo "<div class=title><b><a href=\"../assessment/showtest.php?id=$typeid&cid=$cid\">{$line['name']}</a></b>";
+				   if ($line['timelimit']>0) {
+					   if ($line['timelimit']>3600) {
+						$tlhrs = floor($line['timelimit']/3600);
+						$tlrem = $line['timelimit'] % 3600;
+						$tlmin = floor($tlrem/60);
+						$tlsec = $tlrem % 60;
+						$tlwrds = "$tlhrs hour";
+						if ($tlhrs > 1) { $tlwrds .= "s";}
+						if ($tlmin > 0) { $tlwrds .= ", $tlmin minute";}
+						if ($tlmin > 1) { $tlwrds .= "s";}
+						if ($tlsec > 0) { $tlwrds .= ", $tlsec second";}
+						if ($tlsec > 1) { $tlwrds .= "s";}
+					} else if ($line['timelimit']>60) {
+						$tlmin = floor($line['timelimit']/60);
+						$tlsec = $line['timelimit'] % 60;
+						$tlwrds = "$tlmin minute";
+						if ($tlmin > 1) { $tlwrds .= "s";}
+						if ($tlsec > 0) { $tlwrds .= ", $tlsec second";}
+						if ($tlsec > 1) { $tlwrds .= "s";}
+					} else {
+						$tlwrds = $line['timelimit'] . " second(s)";
+					}
+				   } else {
+					   $tlwrds = '';
+				   }
+				   echo "<div class=title><b><a href=\"../assessment/showtest.php?id=$typeid&cid=$cid\" ";
+				   if ($tlwrds != '') {
+					   echo "onclick='return confirm(\"This assessment has a time limit of $tlwrds.  Click OK to start or continue working on the assessment.\")' ";
+				   }
+				   echo ">{$line['name']}</a></b>";
 				   if ($line['enddate']!=2000000000) {
 					   echo "<BR> $endname $enddate \n";
 				   }

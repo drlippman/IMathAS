@@ -28,13 +28,12 @@ $nextmonum = date('n',$today + ($daysinmo-$dayofmo+2)*24*60*60);
 $hdrs = array();
 $ids = array();
 
-
 for ($i=0;$i<$dayofweek;$i++) {
 	$curday = $dayofmo - $dayofweek + $i;
 	if ($curday<1) {
 		if ($i==0) {
-			$hdrs[0][$i] = $lastmo . " " . $daysinlastmo;
-			$ids[0][$i] = $lastmonum.'-'.$daysinlastmo;
+			$hdrs[0][$i] = $lastmo . " " . ($daysinlastmo+$curday);
+			$ids[0][$i] = $lastmonum.'-'.($daysinlastmo + $curday);
 		} else {
 			$hdrs[0][$i] = ($daysinlastmo + $curday);
 			$ids[0][$i] = $lastmonum.'-'.($daysinlastmo + $curday);
@@ -155,7 +154,6 @@ while ($row = mysql_fetch_row($result)) {
 	list($moday,$time) = explode('~',date('n-j~g:i a',$row[2]));
 	$row[1] = str_replace('"','\"',$row[1]);
 	$colors[$k] = makecolor2($row[4],$row[2],$now);
-	echo "start: {$row[4]}, end {$row[2]} ";
 	$assess[$moday][$k] = "{type:\"FP\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors[$k]."\"}";
 	$k++;
 	list($moday,$time) = explode('~',date('n-j~g:i a',$row[3]));
@@ -213,7 +211,7 @@ for ($i=0;$i<count($hdrs);$i++) {
 echo "</tbody></table>";
 
 echo "<div style=\"margin-top: 10px; padding:10px; border:1px solid #000;\">";
-echo '<span class=right><a href="#" onclick="showcalcontents('.(1000*($today - $dayofweek*24*60*60)).'); return false;"/>Show all on page</a></span>';
+echo '<span class=right><a href="#" onclick="showcalcontents('.(1000*($today - $dayofweek*24*60*60)).'); return false;"/>Show all</a></span>';
 
 echo "<div id=\"caleventslist\"></div></div>";
 if ($pageshift==0) {
