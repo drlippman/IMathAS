@@ -120,7 +120,7 @@ switch($_GET['action']) {
 		if (isset($_POST['msgmonitor'])) {
 			$_POST['msgset'] += 5;
 		}
-		$query = "UPDATE imas_courses SET name='{$_POST['coursename']}',enrollkey='{$_POST['ekey']}',hideicons='$hideicons',available='$avail',lockaid='{$_POST['lockaid']}',";
+		$query = "UPDATE imas_courses SET name='{$_POST['coursename']}',enrollkey='{$_POST['ekey']}',hideicons='$hideicons',available='$avail',lockaid='{$_POST['lockaid']}',picicons='{$_POST['picicons']}',";
 		$query .= "allowunenroll='{$_POST['allowunenroll']}',copyrights='{$_POST['copyrights']}',msgset='{$_POST['msgset']}',topbar='$topbar',cploc='{$_POST['cploc']}',theme='{$_POST['theme']}' WHERE id='{$_GET['id']}'";
 		if ($myrights==40) { $query .= " AND ownerid='$userid'";}
 		mysql_query($query) or die("Query failed : " . mysql_error());
@@ -145,8 +145,8 @@ switch($_GET['action']) {
 			$_POST['msgset'] += 5;
 		}
 		$itemorder = addslashes(serialize(array()));
-		$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,allowunenroll,copyrights,msgset,itemorder,topbar,cploc,available,theme) VALUES ";
-		$query .= "('{$_POST['coursename']}','$userid','{$_POST['ekey']}','$hideicons','{$_POST['allowunenroll']}','{$_POST['copyrights']}','{$_POST['msgset']}','$itemorder','$topbar','{$_POST['cploc']}','$avail','{$_POST['theme']}');";
+		$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,itemorder,topbar,cploc,available,theme) VALUES ";
+		$query .= "('{$_POST['coursename']}','$userid','{$_POST['ekey']}','$hideicons','{$_POST['picicons']}','{$_POST['allowunenroll']}','{$_POST['copyrights']}','{$_POST['msgset']}','$itemorder','$topbar','{$_POST['cploc']}','$avail','{$_POST['theme']}');";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		$cid = mysql_insert_id();
 		//if ($myrights==40) {

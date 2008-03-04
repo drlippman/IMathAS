@@ -97,13 +97,14 @@ switch($_GET['action']) {
 	case "modify":
 	case "addcourse":
 		if ($_GET['action']=='modify') {
-			$query = "SELECT id,name,enrollkey,hideicons,allowunenroll,copyrights,msgset,topbar,cploc,available,lockaid,theme FROM imas_courses WHERE id='{$_GET['id']}'";
+			$query = "SELECT id,name,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,topbar,cploc,available,lockaid,theme FROM imas_courses WHERE id='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$line = mysql_fetch_array($result, MYSQL_ASSOC);
 			$courseid = $line['id'];
 			$name = $line['name'];
 			$ekey = $line['enrollkey'];
 			$hideicons = $line['hideicons'];
+			$picicons = $line['picicons'];
 			$allowunenroll = $line['allowunenroll'];
 			$copyrights = $line['copyrights'];
 			$msgset = $line['msgset']%5;
@@ -122,6 +123,7 @@ switch($_GET['action']) {
 			$name = "Enter course name here";
 			$ekey = "Enter enrollment key here";
 			$hideicons = 0;
+			$picicons = 0;
 			$allowunenroll = 0;
 			$copyrights = 0;
 			$msgset = 0;
@@ -179,6 +181,12 @@ switch($_GET['action']) {
 		echo " </select></span><br class=\"form\" />";
 		
 		echo "<span class=form>Icons:</span><span class=formright>\n";
+		echo 'Icon Style: <input type=radio name="picicons" value="0" ';
+		if ($picicons==0) { echo "checked=1";} 
+		echo '/> Text-based <input type=radio name="picicons" value="1" ';
+		if ($picicons==1) { echo "checked=1";}
+		echo '/> Images<br/>';
+		
 		echo 'Assessments: <input type=radio name="HIassess" value="0" ';
 		if (($hideicons&1)==0) { echo "checked=1";}     
 		echo '/> Show <input type=radio name="HIassess" value="1" ';

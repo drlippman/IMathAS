@@ -63,6 +63,10 @@ Color Picker
 No license specified.  Posted in web article at
 http://www.webreference.com/programming/javascript/mk/column3/index.html
 
+Crystal Icons
+LGPL license
+http://www.everaldo.com/crystal/
+
 Viewer.class used by plot3d library
 (c) David Lippman, based on code by Evgeny Demidov, presumed public domain
 Code available on request to drlippman@yahoo.com

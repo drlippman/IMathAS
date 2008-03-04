@@ -196,6 +196,9 @@ span.right {
 .floatright {
 	float:right;
 }
+.floatleft {
+	float:left;
+}
 span.padright {
 	float:right;
 	padding-right: 120px;

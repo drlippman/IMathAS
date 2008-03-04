@@ -3,7 +3,8 @@
 //(c) 2007 David Lippman
 
   function showitems($items,$parent) {
-	   global $teacherid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$hideicons,$exceptions,$latepasses;
+	   global $teacherid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$hideicons,$exceptions,$latepasses,$graphicalicons;
+	
 	   $now = time() + $previewshift;
 	   $blocklist = array();
 	   for ($i=0;$i<count($items);$i++) {
@@ -67,7 +68,11 @@
 					echo ">";
 					if (($hideicons&16)==0) {
 						echo "<span class=left><a href=\"course.php?cid=$cid&folder=$parent-$bnum\" border=0>";
-						echo "<img src=\"$imasroot/img/folder.gif\"></a></span>";
+						if ($graphicalicons) {
+							echo "<img src=\"$imasroot/img/folder.png\"></a></span>";
+						} else {
+							echo "<img src=\"$imasroot/img/folder.gif\"></a></span>";
+						}
 						echo "<div class=title>";
 					}
 					echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle><b>{$items[$i]['name']}</b></a> ";
@@ -76,7 +81,7 @@
 					}
 					if (isset($teacherid)) { 
 						echo "<br>$show <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
-						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">Copy</a>";
+						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\" $astyle>Copy</a>";
 						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>NewFlag</a>";
 					
 					}
@@ -113,7 +118,7 @@
 					}
 					if (isset($teacherid)) { 
 						echo "<br>$show <a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>Isolate</a> | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
-						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">Copy</a>";
+						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\" $astyle>Copy</a>";
 						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>NewFlag</a>";
 					}
 					if (($hideicons&16)==0) {
@@ -165,7 +170,11 @@
 					echo ">";
 					if (($hideicons&16)==0) {
 						echo "<span class=left><a href=\"course.php?cid=$cid&folder=$parent-$bnum\" border=0>";
-						echo "<img src=\"$imasroot/img/folder.gif\"></a></span>";
+						if ($graphicalicons) {
+							echo "<img src=\"$imasroot/img/folder.png\"></a></span>";
+						} else {
+							echo "<img src=\"$imasroot/img/folder.gif\"></a></span>";
+						}
 						echo "<div class=title>";
 					}
 					echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle><b>";
@@ -307,7 +316,11 @@
 			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now && $nothidden) { //regular show
 				   echo "<div class=item>\n";
 				   if (($hideicons&1)==0) {
-					   echo "<div class=icon style=\"background-color: " . makecolor2($line['startdate'],$line['enddate'],$now) . ";\">?</div>";
+					   if ($graphicalicons) {
+						   echo "<img class=\"floatleft\" src=\"$imasroot/img/assess.png\" />";
+					   } else {
+						  echo "<div class=icon style=\"background-color: " . makecolor2($line['startdate'],$line['enddate'],$now) . ";\">?</div>";
+					   }
 				   }
 				   if (substr($line['deffeedback'],0,8)=='Practice') {
 					   $endname = "Available until";
@@ -360,7 +373,11 @@
 			   } else if ($line['avail']==1 && $line['startdate']<$now && $line['reviewdate']>$now && $nothidden) { //review show
 				   echo "<div class=item>\n";
 				   if (($hideicons&1)==0) {
-					   echo "<div class=icon style=\"background-color: #99f;\">R</div>";
+					   if ($graphicalicons) {
+						   echo "<img class=\"floatleft\" src=\"$imasroot/img/assess.png\" />";
+					   } else {
+						  echo "<div class=icon style=\"background-color: #99f;\">?</div>";
+					   }
 				   }
 				   echo "<div class=title><b><a href=\"../assessment/showtest.php?id=$typeid&cid=$cid\">{$line['name']}</a></b><BR> Past Due Date.  Showing as Review";
 				   if ($line['reviewdate']!=2000000000) { 
@@ -385,7 +402,12 @@
 				   }
 				   echo "<div class=item>\n";
 				   if (($hideicons&1)==0) {
-					   echo "<div class=icon style=\"background-color: #ccc;\">?</div>";
+					   
+					   if ($graphicalicons) {
+						   echo "<img class=\"floatleft\" src=\"$imasroot/img/assess.png\" />";
+					   } else {
+						   echo "<div class=icon style=\"background-color: #ccc;\">?</div>";
+					   }
 				   }
 				   echo "<div class=title><i> <a href=\"../assessment/showtest.php?id=$typeid&cid=$cid\">{$line['name']}</a><BR>$show</i>\n";
 				   echo "<a href=\"addquestions.php?aid=$typeid&cid=$cid\">Questions</a> | <a href=\"addassessment.php?id=$typeid&cid=$cid\">Settings</a> | \n";
@@ -426,8 +448,12 @@
 				   }
 				   echo "<div class=item>\n";
 				   if ($line['title']!='##hidden##') {
-					   if (($hideicons&2)==0) {
-						   echo "<div class=icon style=\"background-color: $color;\">!</div>";
+					   if (($hideicons&2)==0) {			   
+						   if ($graphicalicons) {
+							   echo "<img class=\"floatleft\" src=\"$imasroot/img/inline.png\" />";
+						   } else {
+							   echo "<div class=icon style=\"background-color: $color;\">!</div>";
+						   }
 					   }
 					   echo "<div class=title> <b>{$line['title']}</b>\n";
 					   if (isset($teacherid)) { 
@@ -473,8 +499,12 @@
 				   }
 				   echo "<div class=item>\n";
 				   if ($line['title']!='##hidden##') {
-					   echo "<div class=icon style=\"background-color: #ccc;\">";
-					   echo "!</div><div class=title><i> <b>{$line['title']}</b> <BR>";
+					   if ($graphicalicons) {
+						   echo "<img class=\"floatleft\" src=\"$imasroot/img/inline.png\" />";
+					   } else {
+						   echo "<div class=icon style=\"background-color: #ccc;\">!</div>";
+					   }
+					   echo "<div class=title><i> <b>{$line['title']}</b> <BR>";
 				   } else {
 					   echo "<div class=title><i>";
 				   }
@@ -533,7 +563,15 @@
 				   }
 				   echo "<div class=item>\n";
 				   if (($hideicons&4)==0) {
-					echo "<div class=icon style=\"background-color: $color;\">!</div>";
+					   if ($graphicalicons) {
+						   if ((substr($line['text'],0,4)=="http") && (strpos($line['text']," ")===false)) {
+							   echo "<img class=\"floatleft\" src=\"$imasroot/img/web.png\" />";
+						   } else {
+							   echo "<img class=\"floatleft\" src=\"$imasroot/img/doc.png\" />";
+						   }
+					   } else {
+						   echo "<div class=icon style=\"background-color: $color;\">!</div>";
+					   }
 				   }
 				   echo "<div class=title>";
 				   echo "<b><a href=\"$alink\">{$line['title']}</a></b>\n";
@@ -552,8 +590,16 @@
 					   $show = "Showing $startdate until $enddate";
 				   }
 				   echo "<div class=item>\n";
-				   echo "<div class=icon style=\"background-color: #ccc;\">";
-				   echo "!</div><div class=title>";
+				   if ($graphicalicons) {
+					   if ((substr($line['text'],0,4)=="http") && (strpos($line['text']," ")===false)) {
+						   echo "<img class=\"floatleft\" src=\"$imasroot/img/web.png\" />";
+					   } else {
+						   echo "<img class=\"floatleft\" src=\"$imasroot/img/doc.png\" />";
+					   }
+				   } else {
+					   echo "<div class=icon style=\"background-color: #ccc;\">!</div>";
+				   }
+				   echo "<div class=title>";
 				   echo "<i> <b><a href=\"$alink\">{$line['title']}</a></b> ";
 				   echo "<BR>$show</i> \n";
 				   echo "<a href=\"addlinkedtext.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
@@ -645,7 +691,11 @@
 				   }
 				   echo "<div class=item>\n";
 				   if (($hideicons&8)==0) {
-					   echo "<div class=icon style=\"background-color: $color;\">F</div>";
+					   if ($graphicalicons) {
+						   echo "<img class=\"floatleft\" src=\"$imasroot/img/forum.png\" />";
+					   } else {
+						   echo "<div class=icon style=\"background-color: $color;\">F</div>";
+					   }
 				   }
 				   echo "<div class=title> ";
 				   echo "<b><a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}\">{$line['name']}</a></b>\n";
@@ -667,8 +717,12 @@
 					   $show = "Showing $startdate until $enddate";
 				   }
 				   echo "<div class=item>\n";
-				   echo "<div class=icon style=\"background-color: #ccc;\">";
-				   echo "F</div><div class=title><i> <b><a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}\">{$line['name']}</a></b> <BR>$show</i> \n";
+				   if ($graphicalicons) {
+					   echo "<img class=\"floatleft\" src=\"$imasroot/img/forum.png\" />";
+				   } else {
+					   echo "<div class=icon style=\"background-color: #ccc;\">F</div>";
+				   }   
+				   echo "<div class=title><i> <b><a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}\">{$line['name']}</a></b> <BR>$show</i> \n";
 				   if ($hasnewitems) {
 					   echo " <span style=\"color:red\">New Posts</span>";
 				   }

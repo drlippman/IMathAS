@@ -74,7 +74,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
 	}
 		
-	$query = "SELECT name,itemorder,hideicons,allowunenroll,msgset,topbar,cploc FROM imas_courses WHERE id='$cid'";
+	$query = "SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,topbar,cploc FROM imas_courses WHERE id='$cid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
 	if ($line == null) {
@@ -84,6 +84,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	
 	$allowunenroll = $line['allowunenroll'];
 	$hideicons = $line['hideicons'];
+	$graphicalicons = ($line['picicons']==1);
 	$pagetitle = $line['name'];
 	$items = unserialize($line['itemorder']);
 	$msgset = $line['msgset']%5;

@@ -15,7 +15,7 @@
    }
    $cid = $_GET['cid'];
    require("../filter/filter.php");
-   $query = "SELECT name,itemorder,hideicons,allowunenroll,msgset,topbar,cploc FROM imas_courses WHERE id='$cid'";
+   $query = "SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,topbar,cploc FROM imas_courses WHERE id='$cid'";
    $result = mysql_query($query) or die("Query failed : " . mysql_error());
    $line = mysql_fetch_array($result, MYSQL_ASSOC);
    if ($line == null) {
@@ -24,6 +24,7 @@
    }
    $allowunenroll = $line['allowunenroll'];
    $hideicons = $line['hideicons'];
+   $graphicalicons = ($line['picicons']==1);
    $pagetitle = $line['name'];
    $items = unserialize($line['itemorder']);
    $msgset = $line['msgset']%5;
@@ -55,11 +56,11 @@
   
    $openblocks = Array(0);
    if (isset($_COOKIE['openblocks-'.$cid]) && $_COOKIE['openblocks-'.$cid]!='') {$openblocks = explode(',',$_COOKIE['openblocks-'.$cid]); $firstload=false;} else {$firstload=true;}
-   $oblist = implode(',',$openblocks);
+   //$oblist = implode(',',$openblocks);
    $firstload = true;
-   echo "<script>\n";
-   echo "  oblist += ',$oblist';\n";
-   echo "</script>\n";
+   //echo "<script>\n";
+   //echo "  oblist += ',$oblist';\n";
+   //echo "</script>\n";
    
    //get exceptions
    $now = time() + $previewshift;

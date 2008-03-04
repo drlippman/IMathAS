@@ -6,6 +6,8 @@ Upgrade Notes
 
 *** Database Changes ***
 
+ALTER TABLE `imas_courses` ADD `picicons` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0';
+
 ALTER TABLE `imas_courses` ADD INDEX ( `name` );
 ALTER TABLE `imas_courses` ADD INDEX ( `available` );
 ALTER TABLE `imas_assessments` ADD INDEX ( `avail` );
