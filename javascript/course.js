@@ -48,6 +48,7 @@ function toggleblock(bnum,folder) {
       //var butn = document.getElementById('but'+bnum);
       var img = document.getElementById('img'+bnum);
       oblist = oblist.split(',');
+      plblist = plblist.split(',');
       var loc = arraysearch(bnum,oblist);
       if (node.className == 'blockitems') {
           if (arraysearch(bnum,loadedblocks)==-1) {
@@ -62,6 +63,9 @@ function toggleblock(bnum,folder) {
       } else { 
           if (arraysearch(bnum,loadedblocks)==-1) {
 	  	ahah(getbiaddr+folder,'block'+bnum);
+		if (arraysearch(folder,plblist)==-1) {
+			plblist.push(folder);	
+		}
 	  }
           node.className = 'blockitems';
           //butn.value = 'Collapse';
@@ -71,7 +75,9 @@ function toggleblock(bnum,folder) {
           if (loc==-1) {oblist.push(bnum);} 
       }
       oblist = oblist.join(',');
+      plblist = plblist.join(',');
       document.cookie = 'openblocks-' +cid+'='+ oblist;
+      document.cookie = 'prevloadedblocks-'+cid+'='+plblist;
    }
    
 function showcalcontents(el) {
