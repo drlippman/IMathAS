@@ -69,7 +69,7 @@
 					if (($hideicons&16)==0) {
 						echo "<span class=left><a href=\"course.php?cid=$cid&folder=$parent-$bnum\" border=0>";
 						if ($graphicalicons) {
-							echo "<img src=\"$imasroot/img/folder.png\"></a></span>";
+							echo "<img src=\"$imasroot/img/folder2.gif\"></a></span>";
 						} else {
 							echo "<img src=\"$imasroot/img/folder.gif\"></a></span>";
 						}
@@ -171,7 +171,7 @@
 					if (($hideicons&16)==0) {
 						echo "<span class=left><a href=\"course.php?cid=$cid&folder=$parent-$bnum\" border=0>";
 						if ($graphicalicons) {
-							echo "<img src=\"$imasroot/img/folder.png\"></a></span>";
+							echo "<img src=\"$imasroot/img/folder2.gif\"></a></span>";
 						} else {
 							echo "<img src=\"$imasroot/img/folder.gif\"></a></span>";
 						}
@@ -267,6 +267,7 @@
 			   echo "<div class=item>\n";
 			   if (isset($teacherid)) {
 				   echo "<a href=\"addcalendar.php?id={$items[$i]}&block=$parent&cid=$cid&remove=true\">Delete</a>";
+				   echo " | <a href=\"managecalitems.php?cid=$cid\">Manage Events</a>";
 			   }
 			   showcalendar();
 			   echo "</div>";

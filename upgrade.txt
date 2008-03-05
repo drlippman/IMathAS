@@ -6,6 +6,16 @@ Upgrade Notes
 
 *** Database Changes ***
 
+CREATE TABLE `imas_calitems` (
+`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`courseid` INT( 10 ) UNSIGNED NOT NULL ,
+`date` INT( 10 ) UNSIGNED NOT NULL ,
+`title` VARCHAR( 254 ) NOT NULL ,
+`tag` CHAR( 1 ) NOT NULL ,
+INDEX ( `courseid` ), INDEX(`date`) 
+) TYPE = innodb COMMENT = 'Calendar Items';
+
+
 ALTER TABLE `imas_courses` ADD `picicons` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0';
 
 ALTER TABLE `imas_courses` ADD INDEX ( `name` );

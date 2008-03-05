@@ -548,6 +548,18 @@ $sql = 'CREATE TABLE `imas_gbcats` ('
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 echo 'imas_gbcats created<br/>';
 
+$sql = 'CREATE TABLE `imas_calitems` ('
+        . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
+        . ' `courseid` INT(10) UNSIGNED NOT NULL, '
+        . ' `date` INT(10) UNSIGNED NOT NULL, '
+        . ' `title` VARCHAR(254) NOT NULL, '
+        . ' `tag` CHAR(1) NOT NULL,'
+        . ' INDEX (`courseid`), INDEX(`date`)'
+        . ' )'
+        . ' TYPE = innodb'
+        . ' COMMENT = \'Calendar Items\';';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+echo 'imas_calitems created<br/>';
 
 $md5pw = md5($password);
 $now = time();

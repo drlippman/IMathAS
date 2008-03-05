@@ -82,7 +82,8 @@ echo '<a href="course.php?calpageshift='.($pageshift+1).'&cid='.$cid.'">&gt; &gt
 echo '</div> ';
 echo "<table class=\"cal\" >";  //onmouseout=\"makenorm()\"
 
-$lowertime = max($now,mktime(0,0,0,$curmonum,$dayofmo - $dayofweek,$curyr));
+$exlowertime = mktime(0,0,0,$curmonum,$dayofmo - $dayofweek,$curyr);
+$lowertime = max($now,$exlowertime);
 $uppertime = mktime(0,0,0,$curmonum,$dayofmo - $dayofweek + 28,$curyr);
 
 $exceptions = array();
@@ -94,10 +95,23 @@ if (!isset($teacherid)) {
 	}
 }
 
+/*
+$gbcats = array();
+$query = "SELECT id,UPPER(SUBSTRING(name,1,1)) FROM imas_gbcats WHERE courseid='$cid'";
+$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+while ($row = mysql_fetch_row($result)) {
+	if ($row[1]==strtolower($row[1])) {
+		continue;
+	} else {
+		$gbcats[$row[0]] = $row[1];
+	}
+}
+*/
 $assess = array();
 $colors = array();
+$tags = array();
 $k = 0;
-$query = "SELECT id,name,startdate,enddate,reviewdate FROM imas_assessments WHERE avail=1 AND courseid='$cid'";
+$query = "SELECT id,name,startdate,enddate,reviewdate,gbcategory FROM imas_assessments WHERE avail=1 AND courseid='$cid'";
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 while ($row = mysql_fetch_row($result)) {
 	if (isset($exceptions[$row[0]])) {
@@ -108,10 +122,16 @@ while ($row = mysql_fetch_row($result)) {
 		continue;
 	}
 	if ($now<$row[3]) {
+		if (isset($gbcats[$row[5]])) {
+			$tag = $gbcats[$row[5]];
+		} else {
+			$tag = '?';
+		}
+		$tags[$k] = $tag;
 		list($moday,$time) = explode('~',date('n-j~g:i a',$row[3]));
 		$row[1] = str_replace('"','\"',$row[1]);
 		$colors[$k] = makecolor2($row[2],$row[3],$now);
-		$assess[$moday][$k] = "{type:\"A\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors[$k]."\"}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
+		$assess[$moday][$k] = "{type:\"A\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors[$k]."\", tag:\"$tag\"}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
 	} else { //in review
 		list($moday,$time) = explode('~',date('n-j~g:i a',$row[4]));
 		$row[1] = str_replace('"','\"',$row[1]);
@@ -162,6 +182,17 @@ while ($row = mysql_fetch_row($result)) {
 	$k++;	
 }
 
+$query = "SELECT title,tag,date FROM imas_calitems WHERE date>$exlowertime AND date<$uppertime and courseid='$cid'";
+$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+while ($row = mysql_fetch_row($result)) {
+	echo $row[0];
+	list($moday,$time) = explode('~',date('n-j~g:i a',$row[2]));
+	$row[0] = str_replace('"','\"',$row[0]);
+	$assess[$moday][$k] = "{type:\"C\", time:\"$time\", tag:\"$row[1]\", name:\"$row[0]\"}";
+	$tags[$k] = $row[1];
+	$k++;
+}
+
 $jsarr = '{';
 foreach ($dates as $moday=>$val) {
 	if ($jsarr!='{') {
@@ -196,9 +227,11 @@ for ($i=0;$i<count($hdrs);$i++) {
 				if (strpos($info,'type:"AR"')!==false) {
 					echo "<span style=\"background-color:#99f;padding: 0px 3px 0px 3px;\">R</span> ";
 				} else if (strpos($info,'type:"A"')!==false) {
-					echo "<span style=\"background-color:".$colors[$k].";padding: 0px 3px 0px 3px;\">?</span> ";
+					echo "<span style=\"background-color:".$colors[$k].";padding: 0px 3px 0px 3px;\">{$tags[$k]}</span> ";
 				} else if (strpos($info,'type:"F')!==false) { 
 					echo "<span style=\"background-color:".$colors[$k].";padding: 0px 3px 0px 3px;\">F</span> ";
+				} else if (strpos($info,'type:"C')!==false) { 
+					echo "<span style=\"background-color: #0ff;padding: 0px 3px 0px 3px;\">{$tags[$k]}</span> ";
 				} else { //textitems
 					echo "<span style=\"background-color:".$colors[$k].";padding: 0px 3px 0px 3px;\">!</span> ";
 				}

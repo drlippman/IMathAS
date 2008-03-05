@@ -115,7 +115,7 @@ function showcalcontentsid(elid) {
 		html += '<ul class=qview style="margin-top: 2px;">';
 		for (var i=0; i<caleventsarr[elid].data.length; i++) {
 			if (caleventsarr[elid].data[i].type=='A') {
-				html += '<li><span style="background-color:'+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">?</span> <a href="../assessment/showtest.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">';
+				html += '<li><span style="background-color:'+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+caleventsarr[elid].data[i].tag+'</span> <a href="../assessment/showtest.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">';
 				html += caleventsarr[elid].data[i].name + '</a>';
 				html += ' Due '+caleventsarr[elid].data[i].time;
 				html += '</li>';
@@ -147,7 +147,11 @@ function showcalcontentsid(elid) {
 				html += caleventsarr[elid].data[i].name + '</a>';
 				html += ' Replies Due '+caleventsarr[elid].data[i].time;
 				html += '</li>';
-			}
+			} else if (caleventsarr[elid].data[i].type=='C') {
+				html += '<li><span style="background-color: #0ff; padding: 0px 5px 0px 5px;">'+ caleventsarr[elid].data[i].tag+'</span> ';
+				html += caleventsarr[elid].data[i].name;
+				html += '</li>';
+			} 
 		}
 		html += '</ul>';
 	}
