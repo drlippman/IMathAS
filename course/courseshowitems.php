@@ -546,11 +546,33 @@
 			   }
 			   if ((substr($line['text'],0,4)=="http") && (strpos($line['text']," ")===false)) { //is a web link
 				   $alink = trim($line['text']);
+				   $icon = 'web';
 			   } else if (substr($line['text'],0,5)=="file:") {
 				   $filename = substr($line['text'],5);
 				   $alink = $imasroot . "/course/files/".$filename;
+				   $ext = substr($filename,strpos($filename,'.')+1);
+				   switch($ext) {
+				   	  case 'xls': $icon = 'xls'; break;
+					  case 'pdf': $icon = 'pdf'; break;
+					  case 'html': $icon = 'html'; break;
+					  case 'ppt': $icon = 'ppt'; break;
+					  case 'zip': $icon = 'zip'; break;
+					  case 'png':
+					  case 'gif':
+					  case 'jpg':
+					  case 'bmp': $icon = 'image'; break;
+					  case 'mp3':
+					  case 'wav':
+					  case 'wma': $icon = 'sound'; break;
+					  case 'swf':
+					  case 'avi':
+					  case 'mpg': $icon = 'video'; break;
+					  default : $icon = 'doc'; break;
+				   }
+						   	   
 			   } else {
 				   $alink = "showlinkedtext.php?cid=$cid&id=$typeid";
+				   $icon = 'html';
 			   }
 			   
 			   if ($line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
@@ -564,11 +586,7 @@
 				   echo "<div class=item>\n";
 				   if (($hideicons&4)==0) {
 					   if ($graphicalicons) {
-						   if ((substr($line['text'],0,4)=="http") && (strpos($line['text']," ")===false)) {
-							   echo "<img class=\"floatleft\" src=\"$imasroot/img/web.png\" />";
-						   } else {
-							   echo "<img class=\"floatleft\" src=\"$imasroot/img/doc.png\" />";
-						   }
+						  echo "<img class=\"floatleft\" src=\"$imasroot/img/$icon.png\" />";
 					   } else {
 						   echo "<div class=icon style=\"background-color: $color;\">!</div>";
 					   }
@@ -590,13 +608,9 @@
 					   $show = "Showing $startdate until $enddate";
 				   }
 				   echo "<div class=item>\n";
-				   if ($graphicalicons) {
-					   if ((substr($line['text'],0,4)=="http") && (strpos($line['text']," ")===false)) {
-						   echo "<img class=\"floatleft\" src=\"$imasroot/img/web.png\" />";
-					   } else {
-						   echo "<img class=\"floatleft\" src=\"$imasroot/img/doc.png\" />";
-					   }
-				   } else {
+				  if ($graphicalicons) {
+					  echo "<img class=\"floatleft\" src=\"$imasroot/img/$icon.png\" />";
+				  } else {
 					   echo "<div class=icon style=\"background-color: #ccc;\">!</div>";
 				   }
 				   echo "<div class=title>";
