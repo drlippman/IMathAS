@@ -185,7 +185,6 @@ while ($row = mysql_fetch_row($result)) {
 $query = "SELECT title,tag,date FROM imas_calitems WHERE date>$exlowertime AND date<$uppertime and courseid='$cid'";
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 while ($row = mysql_fetch_row($result)) {
-	echo $row[0];
 	list($moday,$time) = explode('~',date('n-j~g:i a',$row[2]));
 	$row[0] = str_replace('"','\"',$row[0]);
 	$assess[$moday][$k] = "{type:\"C\", time:\"$time\", tag:\"$row[1]\", name:\"$row[0]\"}";
