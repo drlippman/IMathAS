@@ -125,11 +125,11 @@ function showcalcontentsid(elid) {
 				html += ' Review until '+caleventsarr[elid].data[i].time;
 				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type=='I') {
-				html += '<li><span style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">!</span> ';
+				html += '<li><span style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+ caleventsarr[elid].data[i].tag+'</span> ';
 				html += caleventsarr[elid].data[i].name;
 				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type=='L') {
-				html += '<li><span style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">!</span> ';
+				html += '<li><span style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+ caleventsarr[elid].data[i].tag+'</span> ';
 				if (caleventsarr[elid].data[i].link=='') {
 					html += '<a href="../course/showlinkedtext.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">';
 				} else {

@@ -74,7 +74,7 @@ while ($row = mysql_fetch_row($result)) {
 	echo "<a href=\"#\" onClick=\"cal1.select(document.forms[0].date{$row[0]},'anchor2$cnt','MM/dd/yyyy',document.forms[0].date{$row[0]}.value); return false;\" NAME=\"anchor2$cnt\" ID=\"anchor2$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a></td>";
 	$cnt++;
 	echo '<td><input name="tag['.$row[0].']" type=text size=1 maxlength=1 value="'.$row[3].'" /></td>';
-	echo '<td><input name="txt['.$row[0].']" type=text size=80 value="'.$row[2].'" /></td>';
+	echo '<td><input name="txt['.$row[0].']" type=text size=80 value="'.str_replace('"','&quot;',$row[2]).'" /></td>';
 	echo '<tr/>';
 }
 $now = time();

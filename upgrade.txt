@@ -6,6 +6,14 @@ Upgrade Notes
 
 *** Database Changes ***
 
+ALTER TABLE `imas_inlinetext` ADD `oncal` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0',
+ADD `caltag` CHAR( 1 ) NOT NULL DEFAULT '!';
+ALTER TABLE `imas_inlinetext` ADD INDEX ( `oncal` ) ;
+
+ALTER TABLE `imas_linkedtext` ADD `oncal` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0',
+ADD `caltag` CHAR( 1 ) NOT NULL DEFAULT '!';
+ALTER TABLE `imas_linkedtext` ADD INDEX ( `oncal` ) ;
+
 CREATE TABLE `imas_calitems` (
 `id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 `courseid` INT( 10 ) UNSIGNED NOT NULL ,

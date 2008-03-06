@@ -12,17 +12,20 @@
 		echo "<html><body>No item specified. <a href=\"course.php?cid={$_GET['cid']}\">Try again</a></body></html>\n";
 		exit;
 	}
-	$query = "SELECT text FROM imas_linkedtext WHERE id='{$_GET['id']}'";
+	$query = "SELECT text,title FROM imas_linkedtext WHERE id='{$_GET['id']}'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$text = mysql_result($result, 0,0);
+	$title = mysql_result($result,0,1);
+	$titlesimp = strip_tags($title);
 
 	require("../header.php");
 	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-	echo "&gt; Linked Text</div>";
-	
+	echo "&gt; $titlesimp</div>";
+	echo '<div style="padding-left:10px; padding-right: 10px;">';
 	echo filter($text);
+	echo '</div>';
 	
-	echo "<p><a href=\"course.php?cid={$_GET['cid']}\">Return to Course Page</a></p>\n";
+	echo "<div class=right><a href=\"course.php?cid={$_GET['cid']}\">Return to Course Page</a></div>\n";
 	require("../footer.php");	
 
 ?>

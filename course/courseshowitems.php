@@ -568,6 +568,9 @@
 					  case 'swf':
 					  case 'avi':
 					  case 'mpg': $icon = 'video'; break;
+					  case 'nb': $icon = 'mathnb'; break;
+					  case 'mws':
+					  case 'mw': $icon = 'maple'; break;
 					  default : $icon = 'doc'; break;
 				   }
 						   	   

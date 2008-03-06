@@ -106,12 +106,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				}
 			}
 			
-			$query = "UPDATE imas_linkedtext SET title='{$_POST['title']}',summary='{$_POST['summary']}',text='{$_POST['text']}',startdate=$startdate,enddate=$enddate,avail='{$_POST['avail']}' ";
+			$query = "UPDATE imas_linkedtext SET title='{$_POST['title']}',summary='{$_POST['summary']}',text='{$_POST['text']}',startdate=$startdate,enddate=$enddate,avail='{$_POST['avail']}',oncal='{$_POST['oncal']}',caltag='{$_POST['caltag']}' ";
 			$query .= "WHERE id='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		} else { //add new
-		$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate,avail) VALUES ";
-		$query .= "('$cid','{$_POST['title']}','{$_POST['summary']}','{$_POST['text']}',$startdate,$enddate,'{$_POST['avail']}');";
+		$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate,avail,oncal,caltag) VALUES ";
+		$query .= "('$cid','{$_POST['title']}','{$_POST['summary']}','{$_POST['text']}',$startdate,$enddate,'{$_POST['avail']}','{$_POST['oncal']}','{$_POST['caltag']}');";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		
 		$newtextid = mysql_insert_id();
@@ -155,6 +155,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$line['summary'] = "<p>Enter summary here (displays on course page)</p>";
 			$line['text'] = "<p>Enter text here</p>";
 			$line['avail'] = 1;
+			$line['oncal'] = 0;
+			$line['caltag'] = '!';
 			$startdate = time();
 			$enddate = time() + 7*24*60*60;
 		}   
@@ -238,6 +240,13 @@ if ($overwriteBody==1) {
 			<img src="../img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=etime value="<?php echo $etime;?>">
 		</span><BR class=form>
+		<span class=form>Place on Calendar?</span>
+		<span class=formright>
+			<input type=radio name="oncal" value=0 <?php writeHtmlChecked($line['oncal'],0); ?> /> No<br/>
+			<input type=radio name="oncal" value=1 <?php writeHtmlChecked($line['oncal'],1); ?> /> Yes, on Available after date (will only show after that date)<br/>
+			<input type=radio name="oncal" value=2 <?php writeHtmlChecked($line['oncal'],2); ?> /> Yes, on Available until date<br/>
+			With tag: <input name="caltag" type=text size=1 maxlength=1 value="<?php echo $line['caltag'];?>"/>
+		</span><br class="form" />
 		
 		<div class=submit><input type=submit value=Submit></div>	
 	</form>

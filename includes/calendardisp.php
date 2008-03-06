@@ -139,22 +139,31 @@ while ($row = mysql_fetch_row($result)) {
 	}
 	$k++;
 }
-$query = "SELECT id,title,enddate,text,startdate FROM imas_inlinetext WHERE enddate>$lowertime AND enddate<$uppertime AND startdate<$now AND avail=1 AND courseid='$cid'";
+$query = "SELECT id,title,enddate,text,startdate,oncal,caltag FROM imas_inlinetext WHERE ((oncal=2 AND enddate>$lowertime AND enddate<$uppertime AND startdate<$now) OR (oncal=1 AND startdate<$now AND startdate>$exlowertime)) AND avail=1 AND courseid='$cid'";
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 while ($row = mysql_fetch_row($result)) {
 	if ($row[1]=='##hidden##') {
 		$row[1] = strip_tags( $row[3]);
 	}
-	list($moday,$time) = explode('~',date('n-j~g:i a',$row[2]));
+	if ($row[5]==1) {
+		list($moday,$time) = explode('~',date('n-j~g:i a',$row[4]));
+	} else {
+		list($moday,$time) = explode('~',date('n-j~g:i a',$row[2]));
+	}
 	$row[1] = str_replace('"','\"',$row[1]);
 	$colors[$k] = makecolor2($row[4],$row[2],$now);
-	$assess[$moday][$k] = "{type:\"I\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors[$k]."\"}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
+	$assess[$moday][$k] = "{type:\"I\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors[$k]."\", tag:\"{$row[6]}\"}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
+	$tags[$k] = $row[6];
 	$k++;
 }
-$query = "SELECT id,title,enddate,text,startdate FROM imas_linkedtext WHERE enddate>$lowertime AND enddate<$uppertime AND startdate<$now AND avail=1 AND courseid='$cid'";
+$query = "SELECT id,title,enddate,text,startdate,oncal,caltag FROM imas_linkedtext WHERE ((oncal=2 AND enddate>$lowertime AND enddate<$uppertime AND startdate<$now) OR (oncal=1 AND startdate<$now AND startdate>$exlowertime)) AND avail=1 AND courseid='$cid'";
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 while ($row = mysql_fetch_row($result)) {
-	list($moday,$time) = explode('~',date('n-j~g:i a',$row[2]));
+	if ($row[5]==1) {
+		list($moday,$time) = explode('~',date('n-j~g:i a',$row[4]));
+	} else {
+		list($moday,$time) = explode('~',date('n-j~g:i a',$row[2]));
+	}
 	$row[1] = str_replace('"','\"',$row[1]);
 	 if ((substr($row[3],0,4)=="http") && (strpos($row[3]," ")===false)) { //is a web link
 		   $alink = trim($row[3]);
@@ -165,7 +174,8 @@ while ($row = mysql_fetch_row($result)) {
 		   $alink = '';
 	   }
 	$colors[$k] = makecolor2($row[4],$row[2],$now);
-	$assess[$moday][$k] = "{type:\"L\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", link:\"$alink\", color:\"".$colors[$k]."\"}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
+	$assess[$moday][$k] = "{type:\"L\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", link:\"$alink\", color:\"".$colors[$k]."\", tag:\"{$row[6]}\"}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
+	$tags[$k] = $row[6];
 	$k++;
 }
 $query = "SELECT id,name,postby,replyby,startdate FROM imas_forums WHERE enddate>$lowertime AND ((postby>$now AND postby<$uppertime) OR (replyby>$now AND replyby<$uppertime)) AND startdate<$now AND avail>0 AND courseid='$cid'";
@@ -232,7 +242,11 @@ for ($i=0;$i<count($hdrs);$i++) {
 				} else if (strpos($info,'type:"C')!==false) { 
 					echo "<span style=\"background-color: #0ff;padding: 0px 3px 0px 3px;\">{$tags[$k]}</span> ";
 				} else { //textitems
-					echo "<span style=\"background-color:".$colors[$k].";padding: 0px 3px 0px 3px;\">!</span> ";
+					if (isset($tags[$k])) {
+						echo "<span style=\"background-color:".$colors[$k].";padding: 0px 3px 0px 3px;\">{$tags[$k]}</span> ";
+					} else {
+						echo "<span style=\"background-color:".$colors[$k].";padding: 0px 3px 0px 3px;\">!</span> ";
+					}
 				}
 			}
 		}
