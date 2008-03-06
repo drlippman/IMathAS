@@ -405,12 +405,12 @@
 				   if (($hideicons&1)==0) {
 					   
 					   if ($graphicalicons) {
-						   echo "<img class=\"floatleft\" src=\"$imasroot/img/assess.png\" />";
+						   echo "<img class=\"floatleft faded\" src=\"$imasroot/img/assess.png\" />";
 					   } else {
 						   echo "<div class=icon style=\"background-color: #ccc;\">?</div>";
 					   }
 				   }
-				   echo "<div class=title><i> <a href=\"../assessment/showtest.php?id=$typeid&cid=$cid\">{$line['name']}</a><BR>$show</i>\n";
+				   echo "<div class=title><i> <a href=\"../assessment/showtest.php?id=$typeid&cid=$cid\" >{$line['name']}</a><BR>$show</i>\n";
 				   echo "<a href=\"addquestions.php?aid=$typeid&cid=$cid\">Questions</a> | <a href=\"addassessment.php?id=$typeid&cid=$cid\">Settings</a> | \n";
 				   echo "<a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
 				   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
@@ -501,7 +501,7 @@
 				   echo "<div class=item>\n";
 				   if ($line['title']!='##hidden##') {
 					   if ($graphicalicons) {
-						   echo "<img class=\"floatleft\" src=\"$imasroot/img/inline.png\" />";
+						   echo "<img class=\"floatleft faded\" src=\"$imasroot/img/inline.png\" />";
 					   } else {
 						   echo "<div class=icon style=\"background-color: #ccc;\">!</div>";
 					   }
@@ -610,7 +610,7 @@
 				   }
 				   echo "<div class=item>\n";
 				  if ($graphicalicons) {
-					  echo "<img class=\"floatleft\" src=\"$imasroot/img/$icon.png\" />";
+					  echo "<img class=\"floatleft faded\" src=\"$imasroot/img/$icon.png\" />";
 				  } else {
 					   echo "<div class=icon style=\"background-color: #ccc;\">!</div>";
 				   }
@@ -733,7 +733,7 @@
 				   }
 				   echo "<div class=item>\n";
 				   if ($graphicalicons) {
-					   echo "<img class=\"floatleft\" src=\"$imasroot/img/forum.png\" />";
+					   echo "<img class=\"floatleft faded\" src=\"$imasroot/img/forum.png\" />";
 				   } else {
 					   echo "<div class=icon style=\"background-color: #ccc;\">F</div>";
 				   }   

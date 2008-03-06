@@ -261,3 +261,10 @@ div.td {
 	height: 100%;
 	overflow: hidden;
 }
+img.faded {
+	filter: alpha(opacity: 30);
+	KHTMLOpacity: .3;
+	MozOpacity: .3;
+	opacity: .3;
+}
+
