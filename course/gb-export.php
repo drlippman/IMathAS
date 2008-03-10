@@ -208,6 +208,15 @@ function gbinstrexport() {
 			}
 		}
 	}
+	$gbo[0][$n] = "Comment";
+	
+	//get gb comments;
+	$gbcomments = array();
+	$query = "SELECT userid,gbcomment FROM imas_students WHERE courseid='$cid'";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	while ($row = mysql_fetch_row($result)) {
+		$gbcomments[$row[0]] = $row[1];
+	}
 	//create student rows
 	for ($i=1;$i<count($gbt);$i++) {
 		$n=0;
@@ -318,6 +327,11 @@ function gbinstrexport() {
 				}
 			}
 			
+		}
+		if (isset($gbcomments[$gbt[$i][4][0]])) {
+			$gbo[$i][$n] = $gbcomments[$gbt[$i][4][0]];
+		} else {
+			$gbo[$i][$n] = '';
 		}
 	}
 	return $gbo;

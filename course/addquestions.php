@@ -275,7 +275,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	
 	//DEFAULT LOAD PROCESSING GOES HERE
 	$query = "SELECT ias.id FROM imas_assessment_sessions AS ias,imas_students WHERE ";
-	$query .= "ias.assessmentid='$aid' AND ias.userid=imas_students.userid AND imas_students.courseid='$cid'";
+	$query .= "ias.assessmentid='$aid' AND ias.userid=imas_students.userid AND imas_students.courseid='$cid' LIMIT 1";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	if (mysql_num_rows($result) > 0) {
 		$beentaken = true;

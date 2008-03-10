@@ -258,6 +258,8 @@ switch($_GET['action']) {
 		$query = "DELETE FROM imas_gbcats WHERE courseid='{$_GET['id']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		
+		$query = "DELETE FROM imas_calitems WHERE courseid='{$_GET['id']}'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		
 		break;
 	case "remteacher":
