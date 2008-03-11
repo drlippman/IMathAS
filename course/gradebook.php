@@ -667,6 +667,7 @@ function gbinstrdisp() {
 			}
 		}
 	}
+	echo '</tr></thead><tbody>';
 	//create student rows
 	for ($i=1;$i<count($gbt);$i++) {
 		if ($i%2!=0) {
@@ -810,8 +811,6 @@ function gbinstrdisp() {
 			}
 		}
 	}
-		
-	echo "</thead><tbody>";
 	echo "</tbody></table>";
 	$sarr = implode(",",array_fill(0,$n,"'N'"));
 	echo "<script>initSortTable('myTable',Array($sarr),true,false);</script>\n";

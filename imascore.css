@@ -267,4 +267,10 @@ img.faded {
 	MozOpacity: .3;
 	opacity: .3;
 }
+div.ddmenu {
+	position: absolute;
+	visibility: hidden;
+	margin: 0px;
+	z-index: 100;
+}
 
