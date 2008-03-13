@@ -461,7 +461,7 @@ function gbstudisp($stu) {
 					continue;
 				}
 				echo '<tr class="grid">';
-				echo '<td class="cat'.$gbt[0][2][$i][1].'"><stpan class="cattothdr">'.$gbt[0][2][$i][0].'</span></td>';
+				echo '<td class="cat'.$gbt[0][2][$i][1].'"><span class="cattothdr">'.$gbt[0][2][$i][0].'</span></td>';
 				echo '<td>'.$gbt[0][2][$i][3+$availshow].'&nbsp;pts</td>';
 				echo '<td>'.$gbt[1][2][$i][$availshow].'</td>';
 				if ($gbt[0][2][$i][3+$availshow]>0) {

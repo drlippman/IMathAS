@@ -269,8 +269,14 @@ img.faded {
 }
 div.ddmenu {
 	position: absolute;
+	right: 10px;
 	visibility: hidden;
 	margin: 0px;
 	z-index: 100;
+	padding: 5px;
+	background: #eeffee;
+}
+.nowrap {
+	white-space: nowrap;
 }
 

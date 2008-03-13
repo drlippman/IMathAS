@@ -138,6 +138,8 @@ function copyitem($itemid,$gbcats) {
 			$query = "UPDATE imas_assessments SET itemorder='$newitemorder' WHERE id='$newtypeid'";
 			mysql_query($query) or die("Query failed : $query" . mysql_error());
 		}
+	} else if ($itemtype == "Calendar") {
+		$newtypeid = 0;	
 	}
 	$query = "INSERT INTO imas_items (courseid,itemtype,typeid) ";
 	$query .= "VALUES ('$cid','$itemtype',$newtypeid)";
@@ -185,6 +187,9 @@ function getiteminfo($itemid) {
 	}
 	$itemtype = mysql_result($result,0,0);
 	$typeid = mysql_result($result,0,1);
+	if ($itemtype==='Calendar') {
+		return array($itemtype,'Calendar','');
+	}
 	switch($itemtype) {
 		case ($itemtype==="InlineText"):
 			$query = "SELECT title,text FROM imas_inlinetext WHERE id=$typeid";
@@ -215,7 +220,7 @@ function getsubinfo($items,$parent,$pre) {
 			$names[] = stripslashes($item['name']);
 			$sums[] = '';
 			if (count($item['items'])>0) {
-				getsubinfo($item['items'],$parent.'-'.($k+1),$pre.'--');
+				getsubinfo($item['items'],$parent.'-'.($k+1),$pre.'-&nbsp;');
 			}
 		} else {
 			if ($item==null || $item=='') {

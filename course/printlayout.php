@@ -26,6 +26,7 @@ $placeinhead = "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/asse
 $placeinhead .= "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/assessment/print.css\"/>\n";
 $placeinhead .= "<script src=\"$imasroot/javascript/AMhelpers.js\" type=\"text/javascript\"></script>\n";
 
+$nologo = true;
 require("../header.php");
 
 if ($overwriteBody==1) {

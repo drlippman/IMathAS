@@ -115,25 +115,26 @@ if (!isset($nologo)) {
 	//echo '<img id="headerlogo" style="position: absolute; right: 5px; top: 5px;" src="/img/state_logo.gif" alt="logo"/>';
 	//echo '<img id="headerlogo" style="position: absolute; right: 5px; top: 12px;" src="/img/wamaplogosmall.gif" alt="logo"/>';
 	echo '<span style="position: absolute; right:5px; top: 12px;" ';
-	if (isset($teacherid)) {
+	if ($myrights>10) {
 		echo 'onmouseover="mopen(\'homemenu\')" onmouseout="mclosetime()"';
 	}
 	echo '>'.$smallheaderlogo.'</span>';
-} else {
-	if (isset($teacherid)) {
-		echo '<span class="right" onmouseover="mopen(\'homemenu\')" onmouseout="mclosetime()">Switch</span>';
+	if ($myrights>10) {
+		echo '<div id="homemenu" class="ddmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()"><b>Switch to:</b><ul class="nomark">';
+		$query = "SELECT imas_courses.name,imas_courses.id FROM imas_teachers,imas_courses ";
+		$query .= "WHERE imas_teachers.courseid=imas_courses.id AND imas_teachers.userid='$userid' ";
+		$query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ";
+		$query .= "UNION SELECT imas_courses.name,imas_courses.id FROM imas_students,imas_courses ";
+		$query .= "WHERE imas_students.courseid=imas_courses.id AND imas_students.userid='$userid' ";
+		$query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ";
+		$query .= "ORDER BY name";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			echo "<li><a href=\"$imasroot/course/course.php?cid={$row[1]}\">{$row[0]}</a></li>";
+		}
+		echo "<li><a href=\"$imasroot/actions.php?action=logout\">Log Out</a></li>";
+		echo '</ul></div>';
 	}
-}
-if (isset($teacherid)) {
-	echo '<div id="homemenu" class="ddmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()"><b>Switch to:</b><ul class="nomark">';
-	$query = "SELECT imas_courses.name,imas_courses.id FROM imas_teachers,imas_courses ";
-	$query .= "WHERE imas_teachers.courseid=imas_courses.id AND imas_teachers.userid='$userid' ";
-	$query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY imas_courses.name";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($row = mysql_fetch_row($result)) {
-		echo "<li><a href=\"$imasroot/course/course.php?cid=".$row[1].'">'.$row[0].'</a></li>';
-	}
-	echo '</ul></div>';
 }
 
 ?>

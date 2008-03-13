@@ -176,18 +176,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	$oblist = implode(',',$openblocks);
 	
 	$curBreadcrumb = '<a href="../index.php">Home</a>';
-	/*if (isset($teacherid)) {
-		$curBreadcrumb .= '<div id="homemenu" class="ddmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">Switch:<ul class="nomark">';
-		$query = "SELECT imas_courses.name,imas_courses.id FROM imas_teachers,imas_courses ";
-		$query .= "WHERE imas_teachers.courseid=imas_courses.id AND imas_teachers.userid='$userid' ";
-		$query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY imas_courses.name";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
-			$curBreadcrumb .= '<li><a href="course.php?cid='.$row[1].'">'.$row[0].'</a></li>';
-		}
-		$curBreadcrumb .= '</ul></div>';
-	}
-	*/
+	
 	$curBreadcrumb .= "&gt; ";
 	if (isset($backtrack) && count($backtrack)>0) {
 		$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder=0\">$coursename</a> ";

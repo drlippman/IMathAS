@@ -243,7 +243,7 @@ if ($overwriteBody==1) {
 			<td>
 			<input type=checkbox name='checked[]' value='<?php echo $ids[$i];?>' checked=checked>
 			</td>
-			<td><?php echo $types[$i] ?></td>
+			<td class="nowrap"><?php echo $types[$i] ?></td>
 			<td><?php echo $names[$i] ?></td>
 			<td><?php echo $sums[$i] ?></td>
 		</tr>

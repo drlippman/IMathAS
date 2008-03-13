@@ -88,6 +88,7 @@
 		$points = $defpoints;
 	}
 	
+	$useeditor='review';
 	require("../assessment/header.php");
 	echo "<style type=\"text/css\">p.tips {	display: none;}\n</style>\n";
 	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
