@@ -448,7 +448,7 @@ if ($overwriteBody==1) {
 ?>
 	<a href="../actions.php?action=logout">Log Out</a><BR>
 	<a href="gradebook.php?cid=<?php echo $cid ?>">Show Gradebook</a><br/>   
-	<a href="<?php echo $imasroot ?>/help.php?section=usingimas">Help Using IMathAS</a><br/> 
+	<a href="<?php echo $imasroot ?>/help.php?section=usingimas">Help Using <?php echo $installname;?></a><br/> 
 <?php		  
 			if ($myrights > 5 && $allowunenroll==1) {
 				echo "<p><a href=\"../forms.php?action=unenroll&cid=$cid\">Unenroll From Course</a></p>\n";

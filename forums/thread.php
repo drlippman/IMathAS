@@ -519,6 +519,9 @@
 		$query .= "LIMIT $offset,$threadsperpage";// OFFSET $offset";
 	}
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	if (mysql_num_rows($result)==0) {
+		echo '<tr><td colspan='.(($isteacher && $grpaid>0 && !$dofilter)?5:4).'>No posts have been made yet.  Click Add New Thread to start a new discussion</td></tr>';
+	}
 	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 		if (isset($postcount[$line['id']])) {
 			$posts = $postcount[$line['id']];
