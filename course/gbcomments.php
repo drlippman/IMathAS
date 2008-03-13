@@ -11,15 +11,24 @@
 		exit;
 	}
 	$cid = $_GET['cid'];
+	if (isset($_GET['comtype'])) {
+		$comtype = $_GET['comtype'];
+	} else {
+		$comtype = 'stu';
+	}
 	
 	if (isset($_GET['upload'])) {
 		require("../header.php");
 	
 		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 		echo "&gt; <a href=\"gradebook.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid\">Gradebook</a> ";
-		echo "&gt; <a href=\"gbcomments.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid\">Gradebook Comments</a> &gt; Upload Comments</div>";
+		echo "&gt; <a href=\"gbcomments.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid&comtype=$comtype\">Gradebook Comments</a> &gt; Upload Comments</div>";
 		
-		echo "<h3>Upload Grades</h3>";
+		if ($comtype=='stu') {
+			echo "<h3>Upload Student Comments</h3>";
+		} else if ($comtype=='instr') {
+			echo "<h3>Upload Instructor Notes</h3>";
+		}
 		
 		if (isset($_FILES['userfile']['name']) && $_FILES['userfile']['name']!='') {
 			if (is_uploaded_file($_FILES['userfile']['tmp_name'])) {
@@ -54,7 +63,11 @@
 					$result = mysql_query($query) or die("Query failed : " . mysql_error());
 					if (mysql_num_rows($result)>0) {
 						$cuserid=mysql_result($result,0,0);
-						$query = "UPDATE imas_students SET gbcomment='{$data[$scorecol]}' WHERE userid='$cuserid' AND courseid='$cid'";
+						if ($comtype=='stu') {
+							$query = "UPDATE imas_students SET gbcomment='{$data[$scorecol]}' WHERE userid='$cuserid' AND courseid='$cid'";
+						} else if ($comtype=='instr') {
+							$query = "UPDATE imas_students SET gbinstrcomment='{$data[$scorecol]}' WHERE userid='$cuserid' AND courseid='$cid'";
+						}
 						mysql_query($query) or die("Query failed : " . mysql_error());
 						$successes++;
 					} else {
@@ -69,7 +82,7 @@
 					echo '</p>';
 				}
 				if ($successes>0) {
-					echo "<a href=\"gbcomments.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid\">Return to comments list</a></p>";
+					echo "<a href=\"gbcomments.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid&comtype=$comtype\">Return to comments list</a></p>";
 					require("../footer.php");
 					exit;
 				}
@@ -80,7 +93,7 @@
 			}
 		}
 		
-		echo "<form enctype=\"multipart/form-data\" method=post action=\"gbcomments.php?cid=$cid&gbmode={$_GET['gbmode']}&upload=true\">\n";
+		echo "<form enctype=\"multipart/form-data\" method=post action=\"gbcomments.php?cid=$cid&gbmode={$_GET['gbmode']}&comtype=$comtype&upload=true\">\n";
 		
 		echo "<input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"3000000\" />\n";
 		echo "<span class=form>Grade file (CSV): </span><span class=formright><input name=\"userfile\" type=\"file\" /></span><br class=form>\n";
@@ -111,7 +124,11 @@
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
 			//if ($_POST[$row[0]]!='') {
-				$query = "UPDATE imas_students SET gbcomment='{$_POST[$row[0]]}' WHERE id='{$row[0]}'";
+				if ($comtype=='stu') {
+					$query = "UPDATE imas_students SET gbcomment='{$_POST[$row[0]]}' WHERE id='{$row[0]}'";
+				} else if ($comtype=='instr') {
+					$query = "UPDATE imas_students SET gbinstrcomment='{$_POST[$row[0]]}' WHERE id='{$row[0]}'";
+				}
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			//}
 		}
@@ -135,15 +152,26 @@
 	echo '   }'."\n";
 	echo ' } </script>'."\n";
 	
-	echo '<h2>Modify Gradebook Comments</h2>';
-	echo "<p>These comments will display at the top of the student's gradebook score list.</p>";
-	echo "<p><a href=\"gbcomments.php?cid=$cid&stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&upload=true\">Upload comments</a></p>";
+	if ($comtype=='stu') {
+		echo '<h2>Modify Gradebook Comments</h2>';
+		echo "<p>These comments will display at the top of the student's gradebook score list.<br/>";
+		echo "<a href=\"gbcomments.php?cid=$cid&stu={$_GET['stu']}&comtype=instr\">View/Edit Instructor notes</a></p>";
+	} else if ($comtype=='instr') {
+		echo '<h2>Modify Instructor Notes</h2>';
+		echo "<p>These notes will only display on this page and gradebook exports.<br/>";
+		echo "<a href=\"gbcomments.php?cid=$cid&stu={$_GET['stu']}&comtype=stu\">View/Edit Student comments</a></p>";
+	}
+	echo "<p><a href=\"gbcomments.php?cid=$cid&stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&upload=true&comtype=$comtype\">Upload comments</a></p>";
 	
-	echo "<form id=\"mainform\" method=post action=\"gbcomments.php?cid=$cid&stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&record=true\">";
+	echo "<form id=\"mainform\" method=post action=\"gbcomments.php?cid=$cid&stu={$_GET['stu']}&comtype=$comtype&record=true\">";
 	echo "<span class=form>Add/Replace to all:</span><span class=formright><textarea cols=50 rows=3 id=\"toall\" ></textarea>";
 	
 	echo '<br/><input type=button value="Prepend" onClick="sendtoall(0);"/> <input type=button value="Append" onclick="sendtoall(1)"/> <input type=button value="Replace" onclick="sendtoall(2)"/></span><br class="form"/>';
-	$query = "SELECT i_s.id,iu.LastName,iu.FirstName,i_s.gbcomment FROM imas_students AS i_s, imas_users as iu ";
+	if ($comtype=='stu') {
+		$query = "SELECT i_s.id,iu.LastName,iu.FirstName,i_s.gbcomment FROM imas_students AS i_s, imas_users as iu ";
+	} else if ($comtype=='instr') {
+		$query = "SELECT i_s.id,iu.LastName,iu.FirstName,i_s.gbinstrcomment FROM imas_students AS i_s, imas_users as iu ";
+	}
 	$query .= "WHERE i_s.userid=iu.id AND i_s.courseid='$cid' ORDER BY iu.LastName,iu.FirstName";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	while ($row = mysql_fetch_row($result)) {

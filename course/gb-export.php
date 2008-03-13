@@ -209,13 +209,14 @@ function gbinstrexport() {
 		}
 	}
 	$gbo[0][$n] = "Comment";
+	$gbo[0][$n+1] = "Instructor Note";
 	
 	//get gb comments;
 	$gbcomments = array();
-	$query = "SELECT userid,gbcomment FROM imas_students WHERE courseid='$cid'";
+	$query = "SELECT userid,gbcomment,gbinstrcomment FROM imas_students WHERE courseid='$cid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	while ($row = mysql_fetch_row($result)) {
-		$gbcomments[$row[0]] = $row[1];
+		$gbcomments[$row[0]] = array($row[1],$row[2]);
 	}
 	//create student rows
 	for ($i=1;$i<count($gbt);$i++) {
@@ -329,9 +330,11 @@ function gbinstrexport() {
 			
 		}
 		if (isset($gbcomments[$gbt[$i][4][0]])) {
-			$gbo[$i][$n] = $gbcomments[$gbt[$i][4][0]];
+			$gbo[$i][$n] = $gbcomments[$gbt[$i][4][0]][0];
+			$gbo[$i][$n+1] = $gbcomments[$gbt[$i][4][0]][1];
 		} else {
 			$gbo[$i][$n] = '';
+			$gbo[$i][$n+1] = '';
 		}
 	}
 	return $gbo;

@@ -6,6 +6,11 @@ Upgrade Notes
 
 *** Database Changes ***
 
+ALTER TABLE `imas_students` ADD `gbinstrcomment` TEXT NOT NULL ;
+
+ALTER TABLE `imas_forums` ADD INDEX ( `grpaid` );
+ALTER TABLE `imas_forum_posts` ADD INDEX ( `postdate` );
+
 ALTER TABLE `imas_inlinetext` ADD `oncal` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0',
 ADD `caltag` CHAR( 1 ) NOT NULL DEFAULT '!';
 ALTER TABLE `imas_inlinetext` ADD INDEX ( `oncal` ) ;

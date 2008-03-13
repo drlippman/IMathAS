@@ -92,6 +92,9 @@ if (count($page_currentUserCourseIds)>0) {
 	}
 }
 */
+
+
+//check for new posts
 $newpostscnt = array();
 $query = "SELECT courseid,count(*) FROM ";
 $query .= "(SELECT imas_forums.courseid,imas_forum_posts.threadid,max(imas_forum_posts.postdate),mfv.lastview FROM imas_forum_posts ";
@@ -116,6 +119,7 @@ if ($myrights>10) {
 		$newpostscnt[$row[0]] = $row[1];
 	}
 }
+
 
 //check for new messages    
 $newmsgcnt = array();
