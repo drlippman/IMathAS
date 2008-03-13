@@ -121,8 +121,15 @@
 			$query .= getasidquery($_GET['asid']);
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			
-			unset($_GET['asid']);
-			unset($agroupid);
+			if ($from=='isolate') {
+				$query = "SELECT assessmentid FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
+				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				$aid = mysql_result($result,0,0);
+				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/isolateassessgrade.php?stu=$stu&cid={$_GET['cid']}&aid=$aid&gbmode=$gbmode");
+			} else {
+				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid={$_GET['cid']}&gbmode=$gbmode");
+			}
+			exit;
 		} else {
 			$isgroup = isasidgroup($_GET['asid']);
 			if ($isgroup) {
@@ -203,7 +210,7 @@
 			$query .= "bestscores='$bestscorelist',bestattempts='$bestattemptslist',bestseeds='$bestseedslist',bestlastanswers='$bestlalist' ";
 			$query .= $whereqry;//"WHERE id='{$_GET['asid']}'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
-			unset($_GET['asid']);
+			//unset($_GET['asid']);
 		} else {
 			$isgroup = isasidgroup($_GET['asid']);
 			if ($isgroup) {
@@ -212,7 +219,7 @@
 				$pers = 'student';
 			}
 			echo "<p>Are you sure you want to clear this $pers's scores for this assessment?</p>";
-			echo "<p><input type=button onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&from=$from&cid=$cid&asid={$_GET['asid']}&clearscores=confirmed'\" value=\"Really Clear\">\n";
+			echo "<p><input type=button onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&from=$from&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}&clearscores=confirmed'\" value=\"Really Clear\">\n";
 			echo "<input type=button value=\"Never Mind\" onclick=\"window.location='gb-viewasid.php?stu=$stu&from=$from&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}'\"></p>\n";
 			exit;
 		}

@@ -111,15 +111,29 @@ $assess = array();
 $colors = array();
 $tags = array();
 $k = 0;
-$query = "SELECT id,name,startdate,enddate,reviewdate,gbcategory FROM imas_assessments WHERE avail=1 AND courseid='$cid'";
+$query = "SELECT id,name,startdate,enddate,reviewdate,gbcategory,reqscore,reqscoreaid FROM imas_assessments WHERE avail=1 AND courseid='$cid'";
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 while ($row = mysql_fetch_row($result)) {
 	if (isset($exceptions[$row[0]])) {
 		$row[2] = $exceptions[$row[0]][0];
 		$row[3] = $exceptions[$row[0]][1];
 	}
+	
 	if ($row[2]>$now || ($now>$row[3] && $row[4]==0) || ($row[4]>0 && $now>$row[4])) {
 		continue;
+	}
+	
+	if (!isset($teacherid) && $row[6]>0) {
+		$query = "SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid='{$row[7]}' AND userid='$userid'";
+		   $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+		   if (mysql_num_rows($r2)==0) {
+			   continue;
+		   } else {
+			   $scores = mysql_result($r2,0,0);
+			   if (getpts($scores)<$row[6]) {
+				   continue;
+			   }
+		   }
 	}
 	if ($now<$row[3]) {
 		if (isset($gbcats[$row[5]])) {
