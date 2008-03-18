@@ -308,10 +308,12 @@ switch($_GET['action']) {
 							$comments .= substr($buffer,2) .  "<BR>";
 						} else if (strpos($buffer,"function")===0) {
 							$func = substr($buffer,9,strpos($buffer,"(")-9);
-							$outlines .= "<h3><a name=\"$func\">$func</a></h3>\n";
-							$funcs[] = $func;
-							$outlines .= $comments;
-							$comments = '';
+							if ($comments!='') {
+								$outlines .= "<h3><a name=\"$func\">$func</a></h3>\n";
+								$funcs[] = $func;
+								$outlines .= $comments;
+								$comments = '';
+							}
 						} else if ($atstart && trim($buffer)=='') {
 							$startcomments = $comments;
 							$atstart = false;

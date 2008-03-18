@@ -1875,7 +1875,8 @@ A student is asked to enter a function
 <dt>$domain = "inputmin,inputmax" (In Common Control)</dt>
 	<dd>Defines the domain on which to compare the given answer and correct answer functions.  The same domain
 	applies to all variables.  An option third list element "integers" can be given, which limits the domain to integer
-	values.  The domain defaults to real numbers from -10 to 10</dd>	
+	values.  The domain defaults to real numbers from -10 to 10.  If using multiple variables, can extend domain to 
+	define domain for each variable separately.  Example: $variables = "x,y"; $domain = "0,5,20,25"</dd>	
 <dt>$requiretimes = a list, like "^,=3,cos,&lt;2" (In Answer)</dt>
 	<dd>Adds format checking to the student's answer.  The list can include multiple checks, which come in pairs.  The
 	first is the symbol to look for.  The second describes what is acceptable.  For example, in the string shown above,

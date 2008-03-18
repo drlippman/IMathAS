@@ -73,7 +73,7 @@ if ($overwriteBody==1) {
 ?>
 
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	Are you SURE you want to delete this assessment and all associated student attempts?
+	Are you <b>SURE</b> you want to delete this assessment and all associated student attempts?
 	<p>
 	<input type=button value="Yes, Remove" onClick="window.location='deleteassessment.php?cid=<?php echo $_GET['cid'] ?>&block=<?php echo $block ?>&id=<?php echo $_GET['id'] ?>&remove=really'">
 	<input type=button value="Nevermind" onClick="window.location='course.php?cid=<?php echo $_GET['cid'] ?>'">

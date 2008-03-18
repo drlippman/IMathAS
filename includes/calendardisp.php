@@ -111,7 +111,7 @@ $assess = array();
 $colors = array();
 $tags = array();
 $k = 0;
-$query = "SELECT id,name,startdate,enddate,reviewdate,gbcategory,reqscore,reqscoreaid FROM imas_assessments WHERE avail=1 AND courseid='$cid'";
+$query = "SELECT id,name,startdate,enddate,reviewdate,gbcategory,reqscore,reqscoreaid,timelimit FROM imas_assessments WHERE avail=1 AND courseid='$cid' AND enddate<2000000000";
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 while ($row = mysql_fetch_row($result)) {
 	if (isset($exceptions[$row[0]])) {
@@ -145,8 +145,8 @@ while ($row = mysql_fetch_row($result)) {
 		list($moday,$time) = explode('~',date('n-j~g:i a',$row[3]));
 		$row[1] = str_replace('"','\"',$row[1]);
 		$colors[$k] = makecolor2($row[2],$row[3],$now);
-		$assess[$moday][$k] = "{type:\"A\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors[$k]."\", tag:\"$tag\"}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
-	} else { //in review
+		$assess[$moday][$k] = "{type:\"A\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors[$k]."\", tag:\"$tag\"".(($row[8]>0)?", timelimit:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
+	} else if ($row[4]<2000000000) { //in review
 		list($moday,$time) = explode('~',date('n-j~g:i a',$row[4]));
 		$row[1] = str_replace('"','\"',$row[1]);
 		$assess[$moday][$k] = "{type:\"AR\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\"}";

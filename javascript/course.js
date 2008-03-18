@@ -108,7 +108,11 @@ function showcalcontentsid(elid) {
 		html += '<ul class=qview style="margin-top: 2px;">';
 		for (var i=0; i<caleventsarr[elid].data.length; i++) {
 			if (caleventsarr[elid].data[i].type=='A') {
-				html += '<li><span style="background-color:'+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+caleventsarr[elid].data[i].tag+'</span> <a href="../assessment/showtest.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">';
+				html += '<li><span style="background-color:'+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+caleventsarr[elid].data[i].tag+'</span> <a href="../assessment/showtest.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'"';
+				if (caleventsarr[elid].data[i].timelimit!=null) {
+					html += 'onclick="return confirm(\'This assessment has a time limit. Click OK to start or continue working on the assessment.\')" ';
+				}
+				html += '>';
 				html += caleventsarr[elid].data[i].name + '</a>';
 				html += ' Due '+caleventsarr[elid].data[i].time;
 				html += '</li>';

@@ -175,9 +175,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	$plblist = implode(',',$prevloadedblocks);
 	$oblist = implode(',',$openblocks);
 	
-	$curBreadcrumb = '<a href="../index.php">Home</a>';
-	
-	$curBreadcrumb .= "&gt; ";
+	$curBreadcrumb = '<a href="../index.php">Home</a> &gt; ';
 	if (isset($backtrack) && count($backtrack)>0) {
 		$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder=0\">$coursename</a> ";
 		for ($i=0;$i<count($backtrack);$i++) {

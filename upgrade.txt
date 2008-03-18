@@ -67,8 +67,6 @@ UPDATE `imas_assessments` SET cntingb =3 WHERE deffeedback LIKE 'Practice%';
 
 ALTER TABLE `imas_assessments` ADD `exceptionpenalty` TINYINT( 2 ) NOT NULL DEFAULT '0';
 
-ALTER TABLE `imas_courses` ADD `latepasshrs` SMALLINT( 4 ) UNSIGNED NOT NULL DEFAULT '24';
-
 ALTER TABLE `imas_students` ADD `latepass` TINYINT( 2 ) UNSIGNED NOT NULL DEFAULT '0';
 ALTER TABLE `imas_assessments` ADD `allowlate` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '1';
 ALTER TABLE `imas_courses` ADD `latepasshrs` SMALLINT( 4 ) UNSIGNED NOT NULL DEFAULT '24';

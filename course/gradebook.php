@@ -429,7 +429,7 @@ function gbstudisp($stu) {
 				} else if ($gbt[1][1][$i][3]==3) {
 					echo ' (OT)';
 				} else if ($gbt[1][1][$i][3]==4) {
-					echo ' {PT)';
+					echo ' (PT)';
 				}
 			} else {
 				echo '-';

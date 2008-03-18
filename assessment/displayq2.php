@@ -789,6 +789,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			for($j=0; $j < count($variables); $j++) {
 				if (isset($fromto[2]) && $fromto[2]=="integers") {
 					$tp[$j] = rand($fromto[0],$fromto[1]);
+				} else if (isset($fromto[2*$j+1])) {
+					$tp[$j] = $fromto[2*$j] + ($fromto[2*$j+1]-$fromto[2*$j])*rand(0,32000)/32000.0;
 				} else {
 					$tp[$j] = $fromto[0] + ($fromto[1]-$fromto[0])*rand(0,32000)/32000.0;
 				}
@@ -1689,6 +1691,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			for($j=0; $j < count($variables); $j++) {
 				if (isset($fromto[2]) && $fromto[2]=="integers") {
 					$tps[$i][$j] = rand($fromto[0],$fromto[1]);
+				} else if (isset($fromto[2*$j+1])) {
+					$tps[$i][$j] = $fromto[2*$j] + ($fromto[2*$j+1]-$fromto[2*$j])*rand(0,32000)/32000.0;
 				} else {
 					$tps[$i][$j] = $fromto[0] + ($fromto[1]-$fromto[0])*rand(0,32000)/32000.0;
 				}
