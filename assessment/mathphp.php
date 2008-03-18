@@ -36,7 +36,6 @@ function mathphp($st,$varlist) {
   //$st = preg_replace('/(\$[a-zA-Z\d_]+)([^\[])/',"($1)$2",$st);
   $st = preg_replace_callback('/(\$[a-zA-Z\d_]+)(.)/','parenvarifneeded',$st);
   
-  
   //parenthesizes the function variables
   if ($varlist != null) {
 	  $reg = "/([^a-zA-Z])(" . $varlist . ")([^a-zA-Z])/";
@@ -66,7 +65,11 @@ function mathphp($st,$varlist) {
   $st= preg_replace('/([^a-zA-Z$])e$/',"$1(exp(1))",$st);
   
   $st= preg_replace('/([^a-zA-Z$])e([^a-zA-Z])/',"$1(exp(1))$2",$st);
-  $st= preg_replace("/([0-9])([\(a-zA-Z])/","$1*$2",$st);
+  //$st= preg_replace("/([0-9])([\(a-zA-Z])/","$1*$2",$st);
+  $st= preg_replace("/([0-9])([\(])/","$1*$2",$st);
+  if ($varlist != null) {
+	  $st= preg_replace("/([0-9])(".$varlist.")/","$1*$2",$st);
+  }
   //want 4E2 to be scientific notation
 
   $st= preg_replace('/([0-9])\*\(exp\(1\)\)([0-9])/',"\\1E\\2",$st);
@@ -177,7 +180,7 @@ function mathphp($st,$varlist) {
   $st= preg_replace("/^ln([^a-zA-Z])/","log$1",$st);
   $st= preg_replace('/([^a-zA-Z])ln$/',"\\1log",$st);
   $st= preg_replace("/([^a-zA-Z])ln([^a-zA-Z])/","\\1log$2",$st);
-    //echo "st: $st<br/>";
+//echo "st: $st<br/>";
   return $st;
 }
 

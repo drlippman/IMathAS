@@ -2,7 +2,7 @@
 //A library of Stats functions.  Version 1.8, June 20, 2007
 
 global $allowedmacros;
-array_push($allowedmacros,"nCr","nPr","mean","stdev","percentile","quartile","median","freqdist","frequency","histogram","fdhistogram","fdbargraph","normrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","countif","binomialpdf","binomialcdf","chi2cdf","invchi2cdf","fcdf","invfcdf");
+array_push($allowedmacros,"nCr","nPr","mean","stdev","percentile","quartile","median","freqdist","frequency","histogram","fdhistogram","fdbargraph","normrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","countif","binomialpdf","binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf");
 
 //nCr(n,r)
 //The Choose function
@@ -528,12 +528,16 @@ function invtcdf($p,$ndf,$dec=4) {
 	  return false;
 	}
 	
-	if ( abs($ndf - 2) < $eps ) {
-	  $fn_val = SQRT(2 / ( $p * (2 - $p) ) - 2);
+	if ( abs($ndf - 2) < $eps ) {  //special case ndf=2
+	  $fn_val = round(SQRT(2 / ( $p * (2 - $p) ) - 2),$dec);
 	  if ($origp<.5) {return (-1*$fn_val);} else { return $fn_val;}
-	} else if ($ndf < 1+$eps) {
+	} else if (abs($ndf-4) < $eps) {  //special case ndf=4
+	  $v = 4/sqrt($p*(2-$p))*cos(1/3*acos(sqrt($p*(2-$p))));
+	  $fn_val = round(sqrt($v-4),$dec);	
+	  if ($origp<.5) {return (-1*$fn_val);} else { return $fn_val;}	
+	} else if ($ndf < 1+$eps) { //special case ndf=1
 	  $prob = $p * $half_pi;
-	  $fn_val = cos($prob) / sin($prob);
+	  $fn_val = round(cos($prob) / sin($prob),$dec);
 	  if ($origp<.5) {return (-1*$fn_val);} else { return $fn_val;}
 	} else {
 	  $a = 1/ ($ndf - 0.5);
@@ -544,7 +548,7 @@ function invtcdf($p,$ndf,$dec=4) {
 	  $y = pow($x,(2/ $ndf));
 	  
 	  if ($y > 0.05 + $a) {
-	    $x = invnormalcdf($origp);
+	    $x = invnormalcdf($origp,$dec+3);
 	    $y = pow($x,2);
 	    if ($ndf < 5) { $c = $c + 0.3 * ($ndf - 4.5) * ($x + 0.6);}
 	    $c = (((0.05 * $d * $x - 5) * $x - 7) * $x - 2) * $x + $b+ $c;
@@ -561,8 +565,29 @@ function invtcdf($p,$ndf,$dec=4) {
 	    $y = ((1 / ((($ndf + 6) / ($ndf * $y) - 0.089 * $d - 0.822) * ($ndf + 2) * 3) + 0.5 / ($ndf + 4)) * $y - 1) * ($ndf + 1) / ($ndf + 2) + 1 / $y;
 	  }
 	}
-	$fn_val = round( sqrt($ndf * $y) , $dec);
+	if ($dec>3) {
+		$fn_val = invtrefine(sqrt($ndf*$y),1-$p/2,$ndf,$dec);
+		//echo "orig: ".sqrt($ndf*$y).", refined: $fn_val <br/>";
+	} else {
+		$fn_val = round( sqrt($ndf * $y) , $dec);
+	}
 	if ($origp<.5) {return (-1*$fn_val);} else { return $fn_val;}
+}
+
+function invtrefine($t,$p,$ndf,$dec) {
+	$dv = 0.001;
+	$cnt = 0;
+	$eps = pow(.1,$dec+1);
+	while ($dv>$eps) {
+		$dv = $dv/2;
+		if (tcdf($t,$ndf,$dec+4)>$p) {
+			$t = $t-$dv;
+		} else {
+			$t = $t+$dv;
+		}
+		$cnt++;
+	}
+	return round($t,$dec);
 }
 
 //linreg(xarray,yarray)
@@ -615,6 +640,14 @@ function binomialcdf($N,$p,$x) {
 //with df degrees of freedom
 function chi2cdf($x,$a) {
 	return gamma_cdf(0.5*$x,0.0,1.0,0.5*$a);
+}
+
+function chicdf($x,$a) {
+	return gamma_cdf(0.5*$x,0.0,1.0,0.5*$a);
+}
+
+function invchicdf($cdf,$a) {
+	return invchi2cdf($cdf,$a);
 }
 
 //invchi2cdf(p,df)
@@ -1028,7 +1061,6 @@ function invfcdf($p,$df1,$df2) {
 		}
 		$cnt++;
 	}
-	echo $cnt;
 	return $f;
 	
 }
