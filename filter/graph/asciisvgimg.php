@@ -53,7 +53,7 @@ var $white,$black,$red,$orange,$yellow,$green,$blue,$cyan,$purple,$gray;
 var $stroke = 'black', $fill = 'none', $curdash='', $isdashed=false, $marker='none';
 var $markerfill = 'green', $gridcolor = 'gray', $axescolor = 'black';
 var $strokewidth = 1, $xunitlength, $yunitlength, $dotradius=8, $ticklength=4;
-var $fontsize = 16, $fontfile, $fontfill='';
+var $fontsize = 12, $fontfile, $fontfill='';
 
 var $AScom; 
 function AStoIMG($w=200, $h=200) {
@@ -82,7 +82,7 @@ function processShortScript($script) {
 	$xmin = -5; $xmax = 5; $ymin = -5; $ymax = 5; $border = 5;
 	$stroke = 'black'; $fill = 'none'; $curdash=''; $isdashed=false; $marker='none';
         $markerfill = 'green'; $gridcolor = 'gray'; $axescolor = 'black';
-	$strokewidth = 1; $dotradius=8; $ticklength=4; $fontsize = 16;
+	$strokewidth = 1; $dotradius=8; $ticklength=4; $fontsize = 12;
 	
 	$sa = explode(',',$script);
 	if (count($sa)>10) {
@@ -127,7 +127,7 @@ function processScript($script) {
 	$xmin = -5; $xmax = 5; $ymin = -5; $ymax = 5; $border = 5;
 	$stroke = 'black'; $fill = 'none'; $curdash=''; $isdashed=false; $marker='none';
         $markerfill = 'green'; $gridcolor = 'gray'; $axescolor = 'black';
-	$strokewidth = 1; $dotradius=8; $ticklength=4; $fontsize = 16; $fontfill = '';
+	$strokewidth = 1; $dotradius=8; $ticklength=4; $fontfill = ''; $fontsize = 12;
 	$this->AScom =  explode(';',$script);
 	foreach ($this->AScom as $com) {
 		if (preg_match('/\s*(\w+)\s*=(.+)/',$com,$matches)) { //is assignment operator
@@ -371,7 +371,7 @@ function ASaxes($arg) {
 	} else {
 		$yscl *= $this->yunitlength;
 	}
-	$this->fontsize = min($xscl/2,$yscl/2,16);
+	$this->fontsize = min($xscl/2,$yscl/2,12);
 	$this->ticklength = $this->fontsize/4;
 	if ($this->usettf) {
 		imagesetthickness($this->img,1);

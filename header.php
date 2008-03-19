@@ -10,7 +10,7 @@
 <link rel="shortcut icon" href="/favicon.ico" />
 <style type="text/css" media="print">
 div.breadcrumb { display:none;}
-img#headerlogo { display:none;}
+#headerlogo { display:none;}
 </style>
 <script type="text/javascript">
 var imasroot = '<?php echo $imasroot; ?>';
@@ -114,7 +114,7 @@ require("$curdir/filter/filter.php");
 if (!isset($nologo)) {
 	//echo '<img id="headerlogo" style="position: absolute; right: 5px; top: 5px;" src="/img/state_logo.gif" alt="logo"/>';
 	//echo '<img id="headerlogo" style="position: absolute; right: 5px; top: 12px;" src="/img/wamaplogosmall.gif" alt="logo"/>';
-	echo '<span style="position: absolute; right:5px; top: 12px; cursor: pointer;" ';
+	echo '<span id="headerlogo" style="position: absolute; right:5px; top: 12px; cursor: pointer;" ';
 	if ($myrights>10) {
 		echo 'onclick="mopen(\'homemenu\')" onmouseout="mclosetime()"';
 	}

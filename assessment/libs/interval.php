@@ -42,6 +42,7 @@ function linegraph($intvs) {
 	$commands .= 'axes('.$settings[2].',1,1); stroke="blue"; strokewidth=2;';
 	foreach ($intvs as $intv) {
 		$commands .= 'line([';
+		$intv = str_replace(' ','',$intv);
 		$parts = explode(',',$intv);
 		$ssym = $parts[0]{0};
 		$min = substr($parts[0],1);
@@ -53,7 +54,7 @@ function linegraph($intvs) {
 			$commands .= $min;
 		}
 		$commands .= ',0],[';
-		if ($max=='oo' || $max>$settings[1]) {
+		if ($max=='oo' || $max=='+oo' || $max>$settings[1]) {
 			$commands .= $settings[1];
 		} else {
 			$commands .= $max;
@@ -76,7 +77,7 @@ function linegraph($intvs) {
 			}
 			$commands .= ');';
 		}
-		if ($max=='oo' || $max>$settings[1]) {
+		if ($max=='oo' || $max=='+oo' || $max>$settings[1]) {
 			$offlitt = $settings[1] - .1;
 			$commands .= 'marker="arrow";';
 			$commands .= "line([$offlitt,0],[{$settings[1]},0]);";
