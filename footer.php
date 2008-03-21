@@ -1,7 +1,7 @@
 </div>
 <?php
 if (isset($useeditor) && $sessiondata['useed']==1) {
-	echo "<script>initEditor();</script>\n";
+	echo "<script type=\"text/javascript\">initEditor();</script>\n";
 }
 
 ?>

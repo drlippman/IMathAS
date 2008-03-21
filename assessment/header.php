@@ -29,7 +29,7 @@ if ($isdiag) {
 }
 
 if ($sessiondata['mathdisp']==1) {
-	echo "<script src=\"$imasroot/javascript/ASCIIMathML.js\" type=\"text/javascript\"></script>\n";
+	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/ASCIIMathML.js\"></script>\n";
 } else if ($sessiondata['mathdisp']==2) {
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>'; 
 	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg.js\" type=\"text/javascript\"></script>\n";
@@ -53,7 +53,7 @@ if ($sessiondata['graphdisp']==1) {
 <script src="<?php echo $imasroot . "/javascript/AMhelpers.js";?>" type="text/javascript"></script>
 <script src="<?php echo $imasroot . "/javascript/confirmsubmit.js";?>" type="text/javascript"></script>
 <!--[if IE]><script type="text/javascript" src="<?php echo $imasroot;?>/javascript/excanvas.js"></script><![endif]-->
-<script src="<?php echo $imasroot;?>/javascript/drawing.js"></script>
+<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/drawing.js"></script>
 <?php
 echo "<script type=\"text/javascript\">imasroot = '$imasroot';</script>";
 if ($useeditor==1 && $sessiondata['useed']==1) {

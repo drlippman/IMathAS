@@ -26,7 +26,7 @@ for more details.*/
 
 
 var ASnoSVG = false;
-var checkIfSVGavailable = true;
+var checkIfSVGavailable = false;
 var notifyIfNoSVG = true;
 var alertIfNoSVG = false;
 var xunitlength = 20;  // pixels

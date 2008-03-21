@@ -3,7 +3,10 @@ var ASnoSVG = true;
 var AMisGecko = false;
 function AMisMathMLavailable() {
     if (navigator.product && navigator.product=='Gecko') {
-	   var rv = navigator.userAgent.toLowerCase().match(/rv:\s*([\d\.]+)/)[1].split('.');
+	   var rv = navigator.userAgent.toLowerCase().match(/rv:\s*([\d\.]+)/);
+	   if (rv!=null) {
+		rv = rv[1].split('.');
+	   }
 	   if (rv!=null && 10000*rv[0]+100*rv[1]+1*rv[2]>=10100) {
 		   AMisGecko = true;
 		   return null;
@@ -53,8 +56,21 @@ if (!AMnoMathML && AMisGecko) {
 }
 
 function isSVGavailable() {
+//Safari 3 can do SVG, but still has issues
+//  if ((ver = navigator.userAgent.toLowerCase().match(/safari\/(\d+)/))!=null) {
+//		if (ver[1]>524) {
+//			return null;
+//		}
+//Opera can do SVG, but not very pretty, so skip it 
+// } else if ((ver = navigator.userAgent.toLowerCase().match(/opera\/([\d\.]+)/))!=null) {
+//		if (ver[1]>9.1) {
+//			return null;
+//		}
   if (navigator.product && navigator.product=='Gecko') {
-	   var rv = navigator.userAgent.toLowerCase().match(/rv:\s*([\d\.]+)/)[1].split('.');
+	   var rv = navigator.userAgent.toLowerCase().match(/rv:\s*([\d\.]+)/);
+	   if (rv!=null) {
+		rv = rv[1].split('.');
+	   }
 	   if (rv!=null && 10000*rv[0]+100*rv[1]+1*rv[2]>=10800) return null;
 	   else return 1;
   }

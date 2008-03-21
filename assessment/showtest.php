@@ -79,7 +79,7 @@
 				require("../header.php");
 				echo $out;
 				echo "<p>Password required for access.</p>";
-				echo "<form method=post action=\"showtest.php?cid={$_GET['cid']}&id={$_GET['id']}\">";
+				echo "<form method=post action=\"showtest.php?cid={$_GET['cid']}&amp;id={$_GET['id']}\">";
 				echo "<p>Password: <input type=text name=\"password\" /></p>";
 				echo "<input type=submit value=\"Submit\" />";
 				echo "</form>";
@@ -607,7 +607,7 @@
 			
 				endtest($testsettings);
 				if (!$isdiag) {
-					echo "<p><A href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a></p>\n";
+					echo "<p><a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a></p>\n";
 				} else {
 					echo "<p><a href=\"../diag/index.php?id=$diagid\">Return to Diagnostics Page</a></p>\n";
 				}
@@ -640,11 +640,11 @@
 					 
 					echo "</p>\n";
 					if (hasreattempts($last)) {
-						echo "<p><a href=\"showtest.php?action=shownext&to=$last&reattempt=$last\">Reattempt last question</a>.  If you do not reattempt now, you will have another chance once you complete the test.</p>\n";
+						echo "<p><a href=\"showtest.php?action=shownext&to=$last&amp;reattempt=$last\">Reattempt last question</a>.  If you do not reattempt now, you will have another chance once you complete the test.</p>\n";
 					}
 				}
 				if ($allowregen) {
-					echo "<p><a href=\"showtest.php?action=shownext&to=$last&regen=$last\">Try another similar question</a></p>\n";
+					echo "<p><a href=\"showtest.php?action=shownext&to=$last&amp;regen=$last\">Try another similar question</a></p>\n";
 				}
 				//show next
 				unset($toshow);
@@ -664,15 +664,15 @@
 			}
 			
 			if (!$done) { //can show next
-				echo "<form method=post action=\"showtest.php?action=shownext&score=$toshow\" onsubmit=\"return doonsubmit(this)\">\n";
+				echo "<form method=post action=\"showtest.php?action=shownext&amp;score=$toshow\" onsubmit=\"return doonsubmit(this)\">\n";
 				basicshowq($toshow);
 				showqinfobar($toshow,true,true);
-				echo "<input type=submit class=btn value=Continue>\n";
+				echo '<input type="submit" class="btn" value="Continue" />';
 			} else { //are all done
 				showscores($questions,$attempts,$testsettings);
 				endtest($testsettings);
 				if (!$isdiag) {
-					echo "<p><A HREf=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a></p>\n";
+					echo "<p><a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a></p>\n";
 				} else {
 					echo "<p><a href=\"../diag/index.php?id=$diagid\">Return to Diagnostics Page</a></p>\n";
 				}
@@ -713,12 +713,12 @@
 					echo "</p>";
 										
 					if (hasreattempts($qn)) {
-						echo "<p><a href=\"showtest.php?action=skip&to=$qn&reattempt=$qn\">Reattempt last question</a></p>\n";
+						echo "<p><a href=\"showtest.php?action=skip&amp;to=$qn&amp;reattempt=$qn\">Reattempt last question</a></p>\n";
 						$reattemptsremain = true;
 					}
 				}
 				if ($allowregen) {
-					echo "<p><a href=\"showtest.php?action=skip&to=$qn&regen=$qn\">Try another similar question</a></p>\n";
+					echo "<p><a href=\"showtest.php?action=skip&amp;to=$qn&amp;regen=$qn\">Try another similar question</a></p>\n";
 				}
 				if ($lefttodo > 0) {
 					echo "<p>Question scored.  <b>Select another question</b></p>";
@@ -731,9 +731,9 @@
 						}
 						echo ", can be viewed by clicking on the question number again.</p>";
 					}
-					echo "<p>or click <a href=\"showtest.php?action=skip&done=true\">here</a> to end and score test now</p>\n";
+					echo "<p>or click <a href=\"showtest.php?action=skip&amp;done=true\">here</a> to end and score test now</p>\n";
 				} else {
-					echo "<a href=\"showtest.php?action=skip&done=true\">Click here to finalize and score test</a>\n";
+					echo "<a href=\"showtest.php?action=skip&amp;done=true\">Click here to finalize and score test</a>\n";
 				}
 				echo "</div>\n";
 			} else if (isset($_GET['to'])) { //jump to a problem
@@ -743,13 +743,13 @@
 				$lefttodo = shownavbar($questions,$scores,$next,$testsettings['showcat']);
 				if (unans($scores[$next])) {
 					echo "<div class=inset>\n";
-					echo "<form method=post action=\"showtest.php?action=skip&score=$next\" onsubmit=\"return doonsubmit(this)\">\n";
+					echo "<form method=post action=\"showtest.php?action=skip&amp;score=$next\" onsubmit=\"return doonsubmit(this)\">\n";
 					echo "<a name=\"beginquestions\"></a>\n";
 					basicshowq($next);
 					showqinfobar($next,true,true);
-					echo "<input type=submit class=btn value=Submit>\n";
-					echo "</div>\n";
+					echo '<input type="submit" class="btn" value="Submit" />';
 					echo "</form>\n";
+					echo "</div>\n";
 				} else {
 					echo "<div class=inset>\n";
 					echo "<a name=\"beginquestions\"></a>\n";
@@ -765,15 +765,15 @@
 						echo "</p>";
 						
 						if (hasreattempts($next)) {
-							echo "<p><a href=\"showtest.php?action=skip&to=$next&reattempt=$next\">Reattempt this question</a></p>\n";
+							echo "<p><a href=\"showtest.php?action=skip&amp;to=$next&amp;reattempt=$next\">Reattempt this question</a></p>\n";
 							$reattemptsremain = true;
 						}
 					}
 					if ($allowregen) {
-						echo "<p><a href=\"showtest.php?action=skip&to=$next&regen=$next\">Try another similar question</a></p>\n";
+						echo "<p><a href=\"showtest.php?action=skip&amp;to=$next&amp;regen=$next\">Try another similar question</a></p>\n";
 					}
 					if ($lefttodo == 0) {
-						echo "<a href=\"showtest.php?action=skip&done=true\">Click here to finalize and score test</a>\n";
+						echo "<a href=\"showtest.php?action=skip&amp;done=true\">Click here to finalize and score test</a>\n";
 					}
 					if (!$reattemptsremain && $showeachscore) {
 						echo "<p>Question with last attempt is displayed for your review only</p>";
@@ -823,12 +823,12 @@
 					echo "</p>";
 					 
 					if (hasreattempts($qn)) {
-						echo "<p><a href=\"showtest.php?action=seq&to=$qn&reattempt=$qn\">Reattempt last question</a></p>\n";
+						echo "<p><a href=\"showtest.php?action=seq&amp;to=$qn&amp;reattempt=$qn\">Reattempt last question</a></p>\n";
 						$reattemptsremain = true; 
 					}
 				}
 				if ($allowregen) {
-					echo "<p><a href=\"showtest.php?action=seq&to=$qn&regen=$qn\">Try another similar question</a></p>\n";
+					echo "<p><a href=\"showtest.php?action=seq&amp;to=$qn&amp;regen=$qn\">Try another similar question</a></p>\n";
 				}
 				unset($toshow);
 				if (canimprove($qn)) {
@@ -855,7 +855,7 @@
 					$done = true;
 				} 
 				if (!$done) {
-					echo "<p>Question scored. Continue with assessment, or click <a href=\"showtest.php?action=seq&done=true\">here</a> to end and score test now</p>\n";
+					echo "<p>Question scored. Continue with assessment, or click <a href=\"showtest.php?action=seq&amp;done=true\">here</a> to end and score test now</p>\n";
 					echo "</div>\n";
 					echo "<hr/>";
 				} else {
@@ -873,14 +873,14 @@
 				showscores($questions,$attempts,$testsettings);
 				endtest($testsettings);
 				if (!$isdiag) {
-					echo "<p><A HREf=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a></p>\n";
+					echo "<p><a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a></p>\n";
 				} else {
 					echo "<p><a href=\"../diag/index.php?id=$diagid\">Return to Diagnostics Page</a></p>\n";
 				}
 			} else { //show more test 
 				echo filter("<div id=intro class=hidden>{$testsettings['intro']}</div>\n");
 				
-				echo "<form method=post action=\"showtest.php?action=seq&score=$toshow\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
+				echo "<form method=post action=\"showtest.php?action=seq&amp;score=$toshow\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
 				echo "<input type=hidden name=\"verattempts\" value=\"{$attempts[$toshow]}\" />";
 				
 				for ($i = 0; $i < count($questions); $i++) {
@@ -898,7 +898,7 @@
 					}
 					
 					if ($i==$toshow) {
-						echo "<div><input type=submit class=btn value=\"Submit Question ".($i+1)."\"></div><p></p>\n";
+						echo "<div><input type=\"submit\" class=\"btn\" value=\"Submit Question ".($i+1)."\" /></div><p></p>\n";
 					}
 					echo "<hr/>";
 				}
@@ -962,8 +962,8 @@
 				}
 			}
 			if ($numdisplayed > 0) {
-				echo "<BR><input type=submit class=btn value=Submit>\n";
-				echo "<input type=submit class=btn name=\"saveforlater\" value=\"Save answers\">\n";
+				echo '<br/><input type="submit" class="btn" value="Submit" />';
+				echo '<input type="submit" class="btn" name="saveforlater" value="Save answers" />';
 			} else {
 				startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testsettings['testtype']=="NoScores");
 				if (!$isdiag) {
@@ -990,10 +990,10 @@
 				
 			} else {
 				echo filter("<div class=intro>{$testsettings['intro']}</div>\n");
-				echo "<form method=post action=\"showtest.php?action=shownext&score=$i\" onsubmit=\"return doonsubmit(this)\">\n";
+				echo "<form method=post action=\"showtest.php?action=shownext&amp;score=$i\" onsubmit=\"return doonsubmit(this)\">\n";
 				basicshowq($i);
 				showqinfobar($i,true,true);
-				echo "<input type=submit class=btn value=Next>\n";
+				echo '<input type="submit" class="btn" value="Next" />';
 			}
 		} else if ($testsettings['displaymethod'] == "SkipAround") {
 			echo filter("<div class=intro>{$testsettings['intro']}</div>\n");
@@ -1005,7 +1005,7 @@
 			}
 			shownavbar($questions,$scores,$i,$testsettings['showcat']);
 			if ($i == count($questions)) {
-				echo "<div class=inset><br>\n";
+				echo "<div class=inset><br/>\n";
 				echo "<a name=\"beginquestions\"></a>\n";
 				
 				startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testsettings['testtype']=="NoScores");
@@ -1017,14 +1017,15 @@
 				}
 				
 			} else {
-				echo "<form method=post action=\"showtest.php?action=skip&score=$i\" onsubmit=\"return doonsubmit(this)\">\n";
 				echo "<div class=inset>\n";
+				echo "<form method=post action=\"showtest.php?action=skip&amp;score=$i\" onsubmit=\"return doonsubmit(this)\">\n";
 				echo "<a name=\"beginquestions\"></a>\n";
 				basicshowq($i);
 				showqinfobar($i,true,true);
-				echo "<input type=submit class=btn value=Submit>\n";
-				echo "</div>\n";
+				echo '<input type="submit" class="btn" value="Submit" />';
 				echo "</form>\n";
+				echo "</div>\n";
+				
 			}
 		} else if ($testsettings['displaymethod'] == "Seq") {
 			for ($i = 0; $i<count($questions);$i++) {
@@ -1044,8 +1045,8 @@
 			} else {
 				$curq = $i;
 				echo filter("<div class=intro>{$testsettings['intro']}</div>\n");
-				echo "<form method=post action=\"showtest.php?action=seq&score=$i\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
-				echo "<input type=hidden name=\"verattempts\" value=\"{$attempts[$i]}\" />";
+				echo "<form method=post action=\"showtest.php?action=seq&amp;score=$i\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
+				echo "<input type=\"hidden\" name=\"verattempts\" value=\"{$attempts[$i]}\" />";
 				for ($i = 0; $i < count($questions); $i++) {
 					$qavail = seqshowqinfobar($i,$curq);
 					
@@ -1059,7 +1060,7 @@
 						basicshowq($i,true);
 					}
 					if ($i==$curq) {
-						echo "<div><input type=submit class=btn value=\"Submit Question ".($i+1)."\"></div><p></p>\n";
+						echo "<div><input type=\"submit\" class=\"btn\" value=\"Submit Question ".($i+1)."\" /></div><p></p>\n";
 					}
 					echo "<hr/>";
 				}
@@ -1118,15 +1119,15 @@
 				
 			if ($showcat>1 && $qi[$questions[$i]]['category']!='0') {
 				if ($qi[$questions[$i]]['withdrawn']==1) {
-					echo "<a href=\"showtest.php?action=skip&to=$i\"><span class=\"withdrawn\">". ($i+1) . ") {$qi[$questions[$i]]['category']}</span></a>";
+					echo "<a href=\"showtest.php?action=skip&amp;to=$i\"><span class=\"withdrawn\">". ($i+1) . ") {$qi[$questions[$i]]['category']}</span></a>";
 				} else {
-					echo "<a href=\"showtest.php?action=skip&to=$i\">". ($i+1) . ") {$qi[$questions[$i]]['category']}</a>";
+					echo "<a href=\"showtest.php?action=skip&amp;to=$i\">". ($i+1) . ") {$qi[$questions[$i]]['category']}</a>";
 				}
 			} else {
 				if ($qi[$questions[$i]]['withdrawn']==1) {
-					echo "<a href=\"showtest.php?action=skip&to=$i\"><span class=\"withdrawn\">Q ". ($i+1) . "</span></a>";
+					echo "<a href=\"showtest.php?action=skip&amp;to=$i\"><span class=\"withdrawn\">Q ". ($i+1) . "</span></a>";
 				} else {
-					echo "<a href=\"showtest.php?action=skip&to=$i\">Q ". ($i+1) . "</a>";
+					echo "<a href=\"showtest.php?action=skip&amp;to=$i\">Q ". ($i+1) . "</a>";
 				}
 			}
 			if ($showeachscore) {
@@ -1265,7 +1266,7 @@
 				echo "$overmin minutes, ";
 				$over = $over - $overmin*60;
 			}
-			echo "$over seconds.<BR>\n";
+			echo "$over seconds.<br/>\n";
 			echo "Grade is subject to acceptance by the instructor</p>\n";
 		}
 		

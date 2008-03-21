@@ -289,9 +289,7 @@ var cal1 = new CalendarPopup();
 	
 	Text:<BR>
 	<div class=editor>
-		<textarea cols=60 rows=20 id=text name=text style="width: 100%">
-		<?php echo $line['text'];?>
-		</textarea>
+		<textarea cols=60 rows=20 id=text name=text style="width: 100%"><?php echo $line['text'];?></textarea>
 	</div>
 	
 	<span class=form>

@@ -172,7 +172,6 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		$returntxt = $evaledqtext;
 	} else if ($seqinactive) {
 		echo "<div>";
-		//$evaledqtext = str_replace('<input','<input disabled="disabled"',$evaledqtext);
 		echo filter($evaledqtext);
 	} else {
 		echo "<div class=question><div>\n";
@@ -214,11 +213,11 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		}
 		if ($doshowans && (!isset($showanswer) || (is_array($showanswer) && !isset($showanswer[$iidx]))) && $shans[$iidx]!=='') {
 
-			echo "<div><input type=button value=\"Show Answer\" onClick='javascript:document.getElementById(\"ans$qnidx-$iidx\").className=\"shown\";'>"; //AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
+			echo "<div><input type=button value=\"Show Answer\" onClick='javascript:document.getElementById(\"ans$qnidx-$iidx\").className=\"shown\";' />"; //AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
 			echo filter(" <span id=\"ans$qnidx-$iidx\" class=\"hidden\">{$shans[$iidx]}</span></div>\n");
 		} else if ($doshowans && isset($showanswer) && is_array($showanswer)) { //use part specific showanswer
 			if (isset($showanswer[$iidx])) {
-				echo "<div><input type=button value=\"Show Answer\" onClick='javascript:document.getElementById(\"ans$qnidx-$iidx\").className=\"shown\";'>";// AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
+				echo "<div><input type=button value=\"Show Answer\" onClick='javascript:document.getElementById(\"ans$qnidx-$iidx\").className=\"shown\";' />";// AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
 				echo filter(" <span id=\"ans$qnidx-$iidx\" class=\"hidden\">{$showanswer[$iidx]}</span></div>\n");
 			}
 		}
@@ -226,7 +225,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	echo "</div>\n";
 	
 	if ($doshowans && isset($showanswer) && !is_array($showanswer)) {  //single showanswer defined
-		echo "<div><input type=button value=\"Show Answer\" onClick='javascript:document.getElementById(\"ans$qnidx\").className=\"shown\"; AMprocessNode(document.getElementById(\"ans$qnidx\"));'>";
+		echo "<div><input type=button value=\"Show Answer\" onClick='javascript:document.getElementById(\"ans$qnidx\").className=\"shown\"; AMprocessNode(document.getElementById(\"ans$qnidx\"));' />";
 		echo filter(" <span id=\"ans$qnidx\" class=\"hidden\">$showanswer </span></div>\n");
 	}
 	echo "</div>\n";
@@ -392,11 +391,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$leftb = '';
 			$rightb = '';
 		}
-		$out .= "$leftb<input class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\">$rightb";
+		$out .= "$leftb<input class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" />$rightb";
 		if ($answerformat=='list' || $answerformat=='exactlist' ||  $answerformat=='orderedlist') {
 			$tip = "Enter your answer as a list of numbers separated with commas: Example: -4, 3, 2.5<br/>";
 		} else {
-			$tip = "Enter your answer as a number.  Examples: 3, -4, 5.5<BR>";
+			$tip = "Enter your answer as a number.  Examples: 3, -4, 5.5<br/>";
 		}
 		$tip .= "Enter DNE for Does Not Exist, oo for Infinity";
 		if (isset($reqdecimals)) {
@@ -438,7 +437,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			if ($displayformat == "horiz") {
 				$out .= "<div class=choice>{$questions[$randkeys[$i]]}<br/><input type=radio name=qn$qn value=$i ";
 				if (($la!='') && ($la == $i)) { $out .= "CHECKED";}
-				$out .= "></div>\n";
+				$out .= " /></div>\n";
 			} else if ($displayformat == "select") {
 				$out .= "<option value=$i ";
 				if (($la!='') && ($la!='NA') && ($la == $i)) { $out .= "selected=1";}
@@ -446,11 +445,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			} else if ($displayformat == "inline") {
 				$out .= "<input type=radio name=qn$qn value=$i ";
 				if (($la!='') && ($la == $i)) { $out .= "CHECKED";}
-				$out .= ">{$questions[$randkeys[$i]]}";
+				$out .= " />{$questions[$randkeys[$i]]}";
 			} else {
 				$out .= "<li><input type=radio name=qn$qn value=$i ";
 				if (($la!='') && ($la == $i)) { $out .= "CHECKED";}
-				$out .= ">{$questions[$randkeys[$i]]}</li> \n";
+				$out .= " />{$questions[$randkeys[$i]]}</li> \n";
 			}
 		}
 		if ($displayformat == "horiz") {
@@ -496,15 +495,15 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 				$out .= "<div class=choice>{$questions[$randkeys[$i]]}<br/>";
 				$out .= "<input type=checkbox name=\"qn$qn"."[$i]\" value=$i ";
 				if (($labits[$i]!='') && ($labits[$i] == $i)) { $out .= "CHECKED";}
-				$out .= "></div> \n";
+				$out .= " /></div> \n";
 			} else if ($displayformat == "inline") {
 				$out .= "<input type=checkbox name=\"qn$qn"."[$i]\" value=$i ";
 				if (($labits[$i]!='') && ($labits[$i] == $i)) { $out .= "CHECKED";}
-				$out .= ">{$questions[$randkeys[$i]]} ";
+				$out .= " />{$questions[$randkeys[$i]]} ";
 			} else {
 				$out .= "<li><input type=checkbox name=\"qn$qn"."[$i]\" value=$i ";
 				if (($labits[$i]!='') && ($labits[$i] == $i)) { $out .= "CHECKED";}
-				$out .= ">{$questions[$randkeys[$i]]}</li> \n";
+				$out .= " />{$questions[$randkeys[$i]]}</li> \n";
 			}
 		}
 		if ($displayformat == "horiz") {
@@ -553,7 +552,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		$letters = array_slice(explode(',','a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z'),0,count($answers));
 		
 		for ($i=0;$i<count($randqkeys);$i++) {
-			//$out .= "<li><input class=\"text\" type=\"text\"  size=3 name=\"qn$qn-$i\" value=\"{$las[$i]}\"> {$questions[$randqkeys[$i]]}</li>\n";
+			//$out .= "<li><input class=\"text\" type=\"text\"  size=3 name=\"qn$qn-$i\" value=\"{$las[$i]}\" /> {$questions[$randqkeys[$i]]}</li>\n";
 			$out .= '<li>';
 			$out .= "<select name=\"qn$qn-$i\">";
 			$out .= '<option value="-" ';
@@ -594,7 +593,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$out .= "</ol>";
 			$out .= "</div>";
 		}
-		$out .= "<input type=hidden name=\"qn$qn\" value=\"done\"><div class=spacer>&nbsp;</div>";
+		$out .= "<input type=hidden name=\"qn$qn\" value=\"done\" /><div class=spacer>&nbsp;</div>";
 		//$tip = "In each box provided, type the letter (a, b, c, etc.) of the matching answer in the right-hand column";
 		if ($displayformat=="select") {
 			$tip = "In each pull-down, select the item that matches with the displayed item";
@@ -637,12 +636,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$leftb = '';
 			$rightb = '';
 		}
-		$out .= "$leftb<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\">$rightb\n";
+		$out .= "$leftb<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" />$rightb\n";
 		if (!isset($hidepreview)) {
-			$preview .= "<input type=button class=btn value=Preview onclick=\"calculate('tc$qn','p$qn','$answerformat')\"> &nbsp;\n";
+			$preview .= "<input type=button class=btn value=Preview onclick=\"calculate('tc$qn','p$qn','$answerformat')\" /> &nbsp;\n";
 		}
 		$preview .= "$leftb<span id=p$qn></span>$rightb ";
-		$out .= "<script>calctoproc[calctoproc.length] = $qn; calcformat[$qn] = '$answerformat';</script>\n";
+		$out .= "<script type=\"text/javascript\">calctoproc[calctoproc.length] = $qn; calcformat[$qn] = '$answerformat';</script>\n";
 		$ansformats = explode(',',$answerformat);
 		if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
 			$tip = "Enter your answer as a list of values separated by commas: Example: -4, 3, 2<br/>";
@@ -660,7 +659,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		} else if (in_array('fracordec',$ansformats)) {
 			$tip .= "Enter $eword as a fraction (like 3/5 or 10/4), a whole number (like 4 or -2), or exact decimal (like 0.5 or 1.25)";
 		} else {
-			$tip .= "Enter $eword as a number (like 5, -3, 2.2) or as a calculation (like 5/3, 2^3, 5+4)<BR>";
+			$tip .= "Enter $eword as a number (like 5, -3, 2.2) or as a calculation (like 5/3, 2^3, 5+4)<br/>";
 			$tip .= "Enter DNE for Does Not Exist, oo for Infinity";
 		}
 		if (in_array('nodecimal',$ansformats)) {
@@ -692,7 +691,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			for ($row=0; $row<$answersize[0]; $row++) {
 				$out .= "<tr>";
 				for ($col=0; $col<$answersize[1]; $col++) {
-					$out .= "<td><input class=\"text\" type=\"text\"  size=3 name=\"qn$qn-$count\" value=\"{$las[$count]}\"></td>\n";
+					$out .= "<td><input class=\"text\" type=\"text\"  size=3 name=\"qn$qn-$count\" value=\"{$las[$count]}\" /></td>\n";
 					$count++;
 				}
 				$out .= "</tr>";
@@ -700,8 +699,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$out .= "</table></p>\n";
 			$tip = "Enter each element of the matrix as  number (like 5, -3, 2.2)";
 		} else {
-			$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\">\n";
-			$out .= "<input type=button class=btn value=Preview onclick=\"AMmathpreview('qn$qn','p$qn')\"> &nbsp;\n";
+			$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" />\n";
+			$out .= "<input type=button class=btn value=Preview onclick=\"AMmathpreview('qn$qn','p$qn')\" /> &nbsp;\n";
 			$out .= "<span id=p$qn></span> ";
 			$tip = "Enter your answer as a matrix filled with numbers, like ((2,3,4),(3,4,5))";
 		}
@@ -728,21 +727,21 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			for ($row=0; $row<$answersize[0]; $row++) {
 				$out .= "<tr>";
 				for ($col=0; $col<$answersize[1]; $col++) {
-					$out .= "<td><input class=\"text\" type=\"text\"  size=3 name=\"qn$qn-$count\" id=\"qn$qn-$count\" value=\"{$las[$count]}\"></td>\n";
+					$out .= "<td><input class=\"text\" type=\"text\"  size=3 name=\"qn$qn-$count\" id=\"qn$qn-$count\" value=\"{$las[$count]}\" /></td>\n";
 					$count++;
 				}
 				$out .= "</tr>";
 			}
 			$out .= "</table>\n";
-			if (!isset($hidepreview)) {$preview .= "<input type=button class=btn value=Preview onclick=\"matrixcalc('qn$qn','p$qn',{$answersize[0]},{$answersize[1]})\"> &nbsp;\n";}
+			if (!isset($hidepreview)) {$preview .= "<input type=button class=btn value=Preview onclick=\"matrixcalc('qn$qn','p$qn',{$answersize[0]},{$answersize[1]})\" /> &nbsp;\n";}
 			$preview .= "<span id=p$qn></span>\n";
-			$out .= "<script>matcalctoproc[matcalctoproc.length] = $qn; matsize[$qn]='{$answersize[0]},{$answersize[1]}';</script>\n";
+			$out .= "<script type=\"text/javascript\">matcalctoproc[matcalctoproc.length] = $qn; matsize[$qn]='{$answersize[0]},{$answersize[1]}';</script>\n";
 			$tip = "Enter each element of the matrix as  number (like 5, -3, 2.2) or as a calculation (like 5/3, 2^3, 5+4)";
 		} else {
-			$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\">\n";
-			$out .= "<input type=button value=Preview onclick=\"matrixcalc('tc$qn','p$qn')\"> &nbsp;\n";
+			$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" />\n";
+			$out .= "<input type=button value=Preview onclick=\"matrixcalc('tc$qn','p$qn')\" /> &nbsp;\n";
 			$out .= "<span id=p$qn></span> \n";
-			$out .= "<script>matcalctoproc[matcalctoproc.length] = $qn;</script>\n";
+			$out .= "<script type=\"text/javascript\">matcalctoproc[matcalctoproc.length] = $qn;</script>\n";
 			$tip = "Enter your answer as a matrix filled with numbers or calculations, like ((2,3,4/5),(3^2,4,5))";
 		}
 		if (isset($answer)) {
@@ -760,8 +759,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (!isset($sz)) { $sz = 20;}
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		if (isset($ansprompt)) {$out .= "<label for=\"tc$qn\">$ansprompt</label>";}
-		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\">\n";
-		if (!isset($hidepreview)) {$preview .= "<input type=button class=btn value=Preview onclick=\"AMpreview('tc$qn','p$qn')\"> &nbsp;\n";}
+		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" />\n";
+		if (!isset($hidepreview)) {$preview .= "<input type=button class=btn value=Preview onclick=\"AMpreview('tc$qn','p$qn')\" /> &nbsp;\n";}
 		$preview .= "<span id=p$qn></span>\n";
 		
 		if (!isset($variables)) { $variables = "x";}
@@ -782,7 +781,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		}
 		$vlist = implode("|",$ovar);
 		$flist = implode('|',$ofunc);
-		$out .= "<script>functoproc[functoproc.length] = $qn; vlist[$qn]=\"$vlist\"; flist[$qn]=\"$flist\";</script>\n";
+		$out .= "<script type=\"text/javascript\">functoproc[functoproc.length] = $qn; vlist[$qn]=\"$vlist\"; flist[$qn]=\"$flist\";</script>\n";
 		if (isset($domain)) {$fromto = explode(",",$domain);} else {$fromto[0]=-10; $fromto[1]=10;}
 		
 		for ($i = 0; $i < 20; $i++) {
@@ -798,12 +797,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$pts[$i] = implode("~",$tp);
 		}
 		$points = implode(",",$pts);
-		$out .= "<script>pts[$qn]=\"$points\";</script>\n";
+		$out .= "<script type=\"text/javascript\">pts[$qn]=\"$points\";</script>\n";
 		if ($answerformat=="equation") {
-			$out .= "<script>iseqn[$qn] = 1;</script>\n";
-			$tip = "Enter your answer as an equation.  Example: y=3x^2+1, 2+x+y=3\n<br>Be sure your variables match those in the question";
+			$out .= "<script type=\"text/javascript\">iseqn[$qn] = 1;</script>\n";
+			$tip = "Enter your answer as an equation.  Example: y=3x^2+1, 2+x+y=3\n<br/>Be sure your variables match those in the question";
 		} else {
-			$tip = "Enter your answer as an expression.  Example: 3x^2+1, x/5, (a+b)/c\n<br>Be sure your variables match those in the question";
+			$tip = "Enter your answer as an expression.  Example: 3x^2+1, x/5, (a+b)/c\n<br/>Be sure your variables match those in the question";
 		}
 		if (isset($answer)) {
 			$sa = makeprettydisp($answer);
@@ -817,7 +816,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (!isset($sz)) { $sz = 20;}
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		
-		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\">";
+		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" />";
 		
 		if ($displayformat == 'point') {
 			$tip = "Enter your answer as a point.  Example: (2,5.5)<br/>";
@@ -830,7 +829,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		} else if ($displayformat == 'list') {
 			$tip = "Enter your answer as a list of n-tuples of numbers separated with commas: Example: (1,2),(3.5,4)<br/>";
 		} else {
-			$tip = "Enter your answer as an n-tuple of numbers.  Example: (2,5.5)<BR>";
+			$tip = "Enter your answer as an n-tuple of numbers.  Example: (2,5.5)<br/>";
 		}
 		$tip .= "Enter DNE for Does Not Exist";
 		if (isset($answer)) {
@@ -845,12 +844,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (!isset($sz)) { $sz = 20;}
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		
-		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\">";
+		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" />";
 		if (!isset($hidepreview)) {
-			$preview .= "<input type=button class=btn value=Preview onclick=\"ntuplecalc('tc$qn','p$qn')\"> &nbsp;\n";
+			$preview .= "<input type=button class=btn value=Preview onclick=\"ntuplecalc('tc$qn','p$qn')\" /> &nbsp;\n";
 		}
 		$preview .= "<span id=p$qn></span> ";
-		$out .= "<script>ntupletoproc[ntupletoproc.length] = $qn;</script>\n";
+		$out .= "<script type=\"text/javascript\">ntupletoproc[ntupletoproc.length] = $qn;</script>\n";
 		if ($displayformat == 'point') {
 			$tip = "Enter your answer as a point.  Example: (2,5.5)<br/>";
 		} else if ($displayformat == 'pointlist') {
@@ -862,7 +861,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		} else if ($displayformat == 'list') {
 			$tip = "Enter your answer as a list of n-tuples of numbers separated with commas: Example: (1,2),(3.5,4)<br/>";
 		} else {
-			$tip = "Enter your answer as an n-tuple of numbers.  Example: (2,5.5)<BR>";
+			$tip = "Enter your answer as an n-tuple of numbers.  Example: (2,5.5)<br/>";
 		}
 		$tip .= "Enter DNE for Does Not Exist";
 		if (isset($answer)) {
@@ -876,7 +875,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (!isset($sz)) { $sz = 20;}
 		if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
 		
-		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\">\n";
+		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" />\n";
 		$tip .= "Enter your answer as letters.  Examples: A B C, linear, a cat";
 		$sa .= $answer;
 	} else if ($anstype == "essay") {
@@ -917,7 +916,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			}
 			$out .= ">$la</textarea>\n";
 			if ($displayformat=='editor' && $GLOBALS['useeditor']==1) {
-				$out .= "<script>editornames[editornames.length] = \"qn$qn\";</script>";
+				$out .= "<script type=\"text/javascript\">editornames[editornames.length] = \"qn$qn\";</script>";
 			}
 		} 
 		$tip .= "Enter your answer as text.  This question is not automatically graded.";
@@ -931,7 +930,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (!isset($sz)) { $sz = 20;}
 		if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
-		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\">";
+		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" />";
 		$tip = "Enter your answer using interval notation.  Example: [2.1,5.6) <br/>";
 		$tip .= "Use U for union to combine intervals.  Example: (-oo,2] U [4,oo)<br/>";
 		$tip .= "Enter DNE for an empty set, oo for Infinity";
@@ -951,12 +950,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (!isset($sz)) { $sz = 20;}
 		if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
-		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\">\n";
+		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" />\n";
 		if (!isset($hidepreview)) {
-			$preview .= "<input type=button class=btn value=Preview onclick=\"intcalculate('tc$qn','p$qn')\"> &nbsp;\n";
+			$preview .= "<input type=button class=btn value=Preview onclick=\"intcalculate('tc$qn','p$qn')\" /> &nbsp;\n";
 		}
 		$preview .= "<span id=p$qn></span> ";
-		$out .= "<script>intcalctoproc[intcalctoproc.length] = $qn;</script>\n";
+		$out .= "<script type=\"text/javascript\">intcalctoproc[intcalctoproc.length] = $qn;</script>\n";
 		$tip = "Enter your answer using interval notation.  Example: [2.1,5.6) <br/>";
 		$tip .= "Use U for union to combine intervals.  Example: (-oo,2] U [4,oo)<br/>";
 		$tip .= "Enter values as numbers (like 5, -3, 2.2) or as calculations (like 5/3, 2^3, 5+4)<br/>";
@@ -1039,7 +1038,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		
 		$out .= '</span></div>';
 		$out .= "<input type=\"hidden\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" />";
-		$out .= "<script>canvases[canvases.length] = [$qn,'$bg',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline];";
+		$out .= "<script type=\"text/javascript\">canvases[canvases.length] = [$qn,'$bg',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline];";
 		
 		$la = str_replace(array('(',')'),array('[',']'),$la);
 		$la = explode(';;',$la);

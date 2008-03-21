@@ -12,7 +12,7 @@ function interpret($blockname,$anstype,$str)
 	if ($blockname=="qtext") {
 		$str = str_replace('"','\"',$str);
 		$str = str_replace("\r\n","\n",$str);
-		$str = str_replace("\n\n","<p></p>\n",$str);
+		$str = str_replace("\n\n","<br/><br/>\n",$str);
 		return $str;
 	} else {
 		global $allowedmacros;
