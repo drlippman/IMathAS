@@ -438,7 +438,6 @@ function normalcdf($ztest,$dec=4) {
 //based on someone else's code - can't remember whose!
 function tcdf($ttest,$df,$dec=4) {
 	$eps = pow(.1,$dec);
-	$eps2 = pow(.1,$dec+2);
 	
 	$t = abs($ttest);
 	if ($df > 0) {
@@ -548,7 +547,7 @@ function invtcdf($p,$ndf,$dec=4) {
 	  $y = pow($x,(2/ $ndf));
 	  
 	  if ($y > 0.05 + $a) {
-	    $x = invnormalcdf($origp,$dec+3);
+	    $x = invnormalcdf($origp,$dec+10);
 	    $y = pow($x,2);
 	    if ($ndf < 5) { $c = $c + 0.3 * ($ndf - 4.5) * ($x + 0.6);}
 	    $c = (((0.05 * $d * $x - 5) * $x - 7) * $x - 2) * $x + $b+ $c;
@@ -575,17 +574,15 @@ function invtcdf($p,$ndf,$dec=4) {
 }
 
 function invtrefine($t,$p,$ndf,$dec) {
-	$dv = 0.001;
-	$cnt = 0;
+	$dv = .001;
 	$eps = pow(.1,$dec+1);
 	while ($dv>$eps) {
 		$dv = $dv/2;
-		if (tcdf($t,$ndf,$dec+4)>$p) {
+		if (tcdf($t,$ndf,$dec+10)>$p) {
 			$t = $t-$dv;
 		} else {
 			$t = $t+$dv;
 		}
-		$cnt++;
 	}
 	return round($t,$dec);
 }

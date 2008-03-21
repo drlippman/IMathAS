@@ -4,7 +4,7 @@
 
 
 array_push($allowedmacros,"exp","sec","csc","cot","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif","in_array","prettyint","prettyreal","arraystodots","subarray","showdataarray","arraystodoteqns","array_flip","arrayfindindex");
-array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","stringappend","stringprepend");
+array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","stringappend","stringprepend","textonimage");
 function mergearrays($a,$b) {
 	return array_merge($a,$b);
 }
@@ -1293,6 +1293,22 @@ function evalfunc($farr) {
 		
 		return $func;
 	}
+}
+
+function textonimage() {
+	$args = func_get_args();
+	$img = array_shift($args);
+	$img = preg_replace('/^.*src="(.*?)".*$/',"$1",$img);
+	$out = '<div style="position: relative;">';
+	$out .= '<img src="'.$img.'" style="position: relative; top: 0px; left: 0px;" />';
+	while (count($args)>2) {
+		$text = array_shift($args);
+		$left = array_shift($args);
+		$top = array_shift($args);
+		$out .= "<div style=\"position: absolute; top: {$top}px; left: {$left}px;\">$text</div>";
+	}
+	$out .= '</div>';
+	return $out;
 }
 
 ?>
