@@ -32,7 +32,7 @@ var alertIfNoSVG = false;
 var xunitlength = 20;  // pixels
 var yunitlength = 20;  // pixels
 var origin = [0,0];   // in pixels (default is bottom left corner)
-var defaultwidth = 300; defaultheight = 200; defaultborder = 0;
+var defaultwidth = 300; defaultheight = 200; defaultborder = [0,0,0,0];
 var border = defaultborder;
 var strokewidth, strokedasharray, stroke, fill;
 var fontstyle, fontfamily, fontsize, fontweight, fontstroke, fontfill;
@@ -283,7 +283,13 @@ function nobutton() { //do nothing
 }
 
 
-function setBorder(x) { border = x }
+function setBorder(l,b,r,t) { 
+	if (t==null) {
+		border = new Array(l,l,l,l);
+	} else {
+		border = new Array(l,b,r,t);
+	}
+}
 
 
 function initPicture(x_min,x_max,y_min,y_max) {
@@ -318,18 +324,22 @@ function initPicture(x_min,x_max,y_min,y_max) {
   if (height==null) height = picture.getAttribute("height");
   else picture.setAttribute("height",height);
   if (height==null || height=="") height=defaultheight;
-  xunitlength = (width-2*border)/(xmax-xmin);
+  xunitlength = (width-border[0]-border[2])/(xmax-xmin);
   yunitlength = xunitlength;
 //alert(xmin+" "+xmax+" "+ymin+" "+ymax)
   if (ymin==null) {
-    origin = [-xmin*xunitlength+border,height/2];
-    ymin = -(height-2*border)/(2*yunitlength);
+    origin = [-xmin*xunitlength+border[0],height/2];
+    ymin = -(height-border[1]-border[3])/(2*yunitlength);
     ymax = -ymin;
   } else {
-    if (ymax!=null) yunitlength = (height-2*border)/(ymax-ymin);
-    else ymax = (height-2*border)/yunitlength + ymin;
-    origin = [-xmin*xunitlength+border,-ymin*yunitlength+border];
+    if (ymax!=null) yunitlength = (height-border[1]-border[3])/(ymax-ymin);
+    else ymax = (height-border[1]-border[3])/yunitlength + ymin;
+    origin = [-xmin*xunitlength+border[0],-ymin*yunitlength+border[1]];
   }
+  winxmin = border[0];
+  winxmax = width-border[2];
+  winymin = border[3];
+  winymax = height-border[1];
 //  if (true ||picture.nodeName == "EMBED" || picture.nodeName == "embed") {
     if (isIE) {
       svgpicture = picture.getSVGDocument().getElementById("root");
@@ -728,14 +738,14 @@ function axes(dx,dy,labels,gdx,gdy) {
     gdy = (gdy==null?dy:gdy*yunitlength);
     pnode = myCreateElementSVG("path");
     st="";
-    for (x = origin[0]; x<width; x = x+gdx)
-      st += " M"+x+",0"+" "+x+","+height;
-    for (x = origin[0]-gdx; x>0; x = x-gdx)
-      st += " M"+x+",0"+" "+x+","+height;
-    for (y = height-origin[1]; y<height; y = y+gdy)
-      st += " M0,"+y+" "+width+","+y;
-    for (y = height-origin[1]-gdy; y>0; y = y-gdy)
-      st += " M0,"+y+" "+width+","+y;
+    for (x = origin[0]; x<=winxmax; x = x+gdx)
+      st += " M"+x+","+winymin+" "+x+","+winymax;
+    for (x = origin[0]-gdx; x>=winxmin; x = x-gdx)
+      st += " M"+x+","+winymin+" "+x+","+winymax;
+    for (y = height-origin[1]; y<=winymax; y = y+gdy)
+      st += " M"+winxmin+","+y+" "+winxmax+","+y;
+    for (y = height-origin[1]-gdy; y>=winymin; y = y-gdy)
+      st += " M"+winxmin+","+y+" "+winxmax+","+y;
     pnode.setAttribute("d",st);
     pnode.setAttribute("stroke-width", .5);
     pnode.setAttribute("stroke", gridstroke);
@@ -743,17 +753,17 @@ function axes(dx,dy,labels,gdx,gdy) {
     svgpicture.appendChild(pnode);
   }
   pnode = myCreateElementSVG("path");
-  st="M0,"+(height-origin[1])+" "+width+","+
-    (height-origin[1])+" M"+origin[0]+",0 "+origin[0]+","+height;
-  for (x = origin[0]+dx; x<width; x = x+dx)
+  st="M"+winxmin+","+(height-origin[1])+" "+winxmax+","+
+    (height-origin[1])+" M"+origin[0]+","+winymin+" "+origin[0]+","+winymax;
+  for (x = origin[0]+dx; x<winxmax; x = x+dx)
     st += " M"+x+","+(height-origin[1]+ticklength)+" "+x+","+
            (height-origin[1]-ticklength);
-  for (x = origin[0]-dx; x>0; x = x-dx)
+  for (x = origin[0]-dx; x>winxmin; x = x-dx)
     st += " M"+x+","+(height-origin[1]+ticklength)+" "+x+","+
            (height-origin[1]-ticklength);
-  for (y = height-origin[1]+dy; y<height; y = y+dy)
+  for (y = height-origin[1]+dy; y<winymax; y = y+dy)
     st += " M"+(origin[0]+ticklength)+","+y+" "+(origin[0]-ticklength)+","+y;
-  for (y = height-origin[1]-dy; y>0; y = y-dy)
+  for (y = height-origin[1]-dy; y>winymin; y = y-dy)
     st += " M"+(origin[0]+ticklength)+","+y+" "+(origin[0]-ticklength)+","+y;
   if (labels!=null) with (Math) {
     ldx = dx/xunitlength;

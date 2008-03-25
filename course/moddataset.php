@@ -409,7 +409,7 @@
 				//$searchlibs = explode(",",$sessiondata['lastsearchlibs']);
 				$inlibs = $sessiondata['lastsearchlibs'.$cid];
 			} else {
-				$inlibs = '0';
+				$inlibs = $userdeflib;
 			}
 			$locklibs='';
 			$images = array();
