@@ -119,7 +119,7 @@ while ($row = mysql_fetch_row($result)) {
 		$row[3] = $exceptions[$row[0]][1];
 	}
 	
-	if ($row[2]>$now || ($now>$row[3] && $row[4]==0) || ($row[4]>0 && $now>$row[4])) {
+	if (($row[2]>$now && !isset($teacherid)) || ($now>$row[3] && $row[4]==0) || ($row[4]>0 && $now>$row[4])) {
 		continue;
 	}
 	
@@ -145,11 +145,11 @@ while ($row = mysql_fetch_row($result)) {
 		list($moday,$time) = explode('~',date('n-j~g:i a',$row[3]));
 		$row[1] = str_replace('"','\"',$row[1]);
 		$colors[$k] = makecolor2($row[2],$row[3],$now);
-		$assess[$moday][$k] = "{type:\"A\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors[$k]."\", tag:\"$tag\"".(($row[8]>0)?", timelimit:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
+		$assess[$moday][$k] = "{type:\"A\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors[$k]."\", tag:\"$tag\"".(($row[8]>0)?", timelimit:true":"").((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
 	} else if ($row[4]<2000000000) { //in review
 		list($moday,$time) = explode('~',date('n-j~g:i a',$row[4]));
 		$row[1] = str_replace('"','\"',$row[1]);
-		$assess[$moday][$k] = "{type:\"AR\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\"}";
+		$assess[$moday][$k] = "{type:\"AR\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\"".((isset($teacherid))?", editlink:true":"")."}";
 	}
 	$k++;
 }

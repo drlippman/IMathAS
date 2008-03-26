@@ -257,17 +257,20 @@ for ($i=0;$i<count($sel1);$i++) {
   var thedate = new Date();  
   document.getElementById("tzoffset").value = thedate.getTimezoneOffset();  
 </script>	
-<div class=submit><input type=submit value='Access Diagnostic'></div>
+<div id="submit" class="submit" style="display:none"><input type=submit value='Access Diagnostic'></div>
 <input type=hidden name="mathdisp" id="mathdisp" value="2" />
 <input type=hidden name="graphdisp" id="graphdisp" value="2" />
 </form>
 
-<div id="bsetup">Using image-based display</div>
+<div id="bsetup">JavaScript is not enabled. JavaScript is required for <?php echo $installname; ?>. Please enable JavaScript and reload this page</div>
 
 <script type="text/javascript">
 function determinesetup() {
+	document.getElementById("submit").style.display = "block";
 	if (!AMnoMathML && !ASnoSVG) {
 		document.getElementById("bsetup").innerHTML = "Browser setup OK";
+	} else {
+		document.getElementById("bsetup").innerHTML = "Using image-based display";
 	}
 	if (!AMnoMathML) {
 		document.getElementById("mathdisp").value = "1";

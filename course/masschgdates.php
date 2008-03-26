@@ -130,11 +130,19 @@ if ($overwriteBody==1) {
 	
 	if (isset($_GET['orderby'])) {
 		$orderby = $_GET['orderby'];
+		$sessiondata['mcdorderby'.$cid] = $orderby;
+		writesessiondata();
+	} else if (isset($sessiondata['mcdorderby'.$cid])) {
+		$orderby = $sessiondata['mcdorderby'.$cid];
 	} else {
 		$orderby = 0;
 	}
 	if (isset($_GET['filter'])) {
 		$filter = $_GET['filter'];
+		$sessiondata['mcdfilter'.$cid] = $filter;
+		writesessiondata();
+	} else if (isset($sessiondata['mcdfilter'.$cid])) {
+		$filter = $sessiondata['mcdfilter'.$cid];
 	} else {
 		$filter = "all";
 	}

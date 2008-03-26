@@ -90,6 +90,10 @@ function showcalcontents(el) {
 	} else if (caleventsarr[el.id]!=null) {
 		html += '<div style="background-color:#ddf;">'+caleventsarr[el.id].date + '</div>';
 		html += showcalcontentsid(el.id);
+		var mlink = document.getElementById("mcelink");
+		if (mlink!=null) {
+			mlink.href = "managecalitems.php?cid="+cid+"&addto="+(Date.parse(caleventsarr[el.id].date)/1000);
+		}
 	} 
 	
 	document.getElementById('caleventslist').innerHTML = html;	
@@ -115,11 +119,17 @@ function showcalcontentsid(elid) {
 				html += '>';
 				html += caleventsarr[elid].data[i].name + '</a>';
 				html += ' Due '+caleventsarr[elid].data[i].time;
+				if (caleventsarr[elid].data[i].editlink!=null) {
+					html += ' <a href="addassessment.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Settings</a>';
+				}
 				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type=='AR') {
 				html += '<li><span style="background-color: #99f; padding: 0px 5px 0px 5px;">R</span> <a href="../assessment/showtest.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">';
 				html += caleventsarr[elid].data[i].name + '</a>';
 				html += ' Review until '+caleventsarr[elid].data[i].time;
+				if (caleventsarr[elid].data[i].editlink!=null) {
+					html += ' <a href="addassessment.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Settings</a>';
+				}
 				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type=='I') {
 				html += '<li><span style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+ caleventsarr[elid].data[i].tag+'</span> ';

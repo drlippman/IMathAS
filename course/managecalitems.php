@@ -4,6 +4,10 @@
 
 /*** master php includes *******/
 require("../validate.php");
+if (!isset($teacherid)) {
+	echo "You must be a teacher to access this page";
+	exit;
+}
 
 $cid = $_GET['cid'];
 
@@ -80,7 +84,11 @@ while ($row = mysql_fetch_row($result)) {
 $now = time();
 echo '<tr>';
 echo '<td></td>';
-$date = tzdate("m/d/Y",$now);
+if (isset($_GET['addto'])) {
+	$date = tzdate("m/d/Y",$_GET['addto']); 
+} else {
+	$date = tzdate("m/d/Y",$now);
+}
 echo "<td><input type=text size=10 id=\"datenew\" name=\"datenew\" value=\"$date\"/> ";	
 echo "<a href=\"#\" onClick=\"cal1.select(document.forms[0].datenew,'anchor2$cnt','MM/dd/yyyy',document.forms[0].datenew.value); return false;\" NAME=\"anchor2$cnt\" ID=\"anchor2$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a></td>";
 $cnt++;

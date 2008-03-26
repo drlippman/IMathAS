@@ -267,7 +267,7 @@
 			   echo "<div class=item>\n";
 			   if (isset($teacherid)) {
 				   echo "<a href=\"addcalendar.php?id={$items[$i]}&block=$parent&cid=$cid&remove=true\">Delete</a>";
-				   echo " | <a href=\"managecalitems.php?cid=$cid\">Manage Events</a>";
+				   echo " | <a id=\"mcelink\" href=\"managecalitems.php?cid=$cid\">Manage Events</a>";
 			   }
 			   showcalendar();
 			   echo "</div>";

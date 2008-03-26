@@ -18,7 +18,7 @@ function copyitem($itemid,$gbcats) {
 		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$row = mysql_fetch_row($result);
 		$row[0] .= stripslashes($_POST['append']);
-		$fileorder = $row[4];
+		$fileorder = $row[5];
 		array_pop($row);
 		$row = "'".implode("','",addslashes_deep($row))."'";
 		$query = "INSERT INTO imas_inlinetext (courseid,title,text,startdate,enddate,avail) ";
