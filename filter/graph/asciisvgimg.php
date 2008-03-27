@@ -200,6 +200,9 @@ function processScript($script) {
 				case 'text':
 					$this->AStext($argarr);
 					break;
+				case 'textabs':
+					$this->AStextAbs($argarr);
+					break;
 				case 'dot':
 					$this->ASdot2($argarr);
 					break;
@@ -265,7 +268,57 @@ function AStext($arg) {
 		if (isset($arg[3])) {
 			$angle = $arg[3];
 		}		
-	}/*else {
+	}
+	$this->AStextInternal($p,$st,$pos,$angle);
+}
+function AStextAbs($arg) {
+	$pos = '';  $angle = 0;
+	if (func_num_args()>1) {
+		$pt = $arg;
+		$st = func_get_arg(1);
+		if (func_num_args()>2) {
+			$pos = func_get_arg(2);
+		}
+		if (func_num_args()>3) {
+			$angle = func_get_arg(3);
+		}
+	} else {
+		$pt = $arg[0];
+		$st = $arg[1];
+		if (isset($arg[2])) {
+			$pos = $arg[2];
+		}
+		if (isset($arg[3])) {
+			$angle = $arg[3];
+		}		
+	}
+	$pt = str_replace(array('[',']'),'',$pt);
+	$pt = explode(',',$pt);
+	$pt[1] = $this->height - $pt[1];
+	$this->AStextInternal($pt,$st,$pos,$angle);
+}
+function AStextInternal($p,$st,$pos,$angle) {
+	
+	/*if (func_num_args()>1) {
+		$p = $this->pt2arr($arg);
+		$st = func_get_arg(1);
+		if (func_num_args()>2) {
+			$pos = func_get_arg(2);
+		}
+		if (func_num_args()>3) {
+			$angle = func_get_arg(3);
+		}
+	} else {
+		$p = $this->pt2arr($arg[0]);
+		$st = $arg[1];
+		if (isset($arg[2])) {
+			$pos = $arg[2];
+		}
+		if (isset($arg[3])) {
+			$angle = $arg[3];
+		}		
+	}*/
+	/*else {
 		if (preg_match('/\s*\[(.*?)\]\s*,\s*[\'"](.*?)[\'"]\s*,([^,]*)/',$arg,$m)) {
 			$p = $this->pt2arr($m[1]);
 			$st = $m[2];
@@ -346,13 +399,16 @@ function AStext($arg) {
 }
 
 function ASinitPicture($arg) {
-
+	
 	//$arg = explode(',',$arg);
 	if (isset($arg[0]) && $arg[0]!='') { $this->xmin = $this->evalifneeded($arg[0]);}
 	if (isset($arg[1])) { $this->xmax = $this->evalifneeded($arg[1]);}
 	if (isset($arg[2])) { $this->ymin = $this->evalifneeded($arg[2]);}
 	if (isset($arg[3])) { $this->ymax = $this->evalifneeded($arg[3]);}
 	
+	if ($this->xmin == $this->xmax) {
+		$this->xmax = $this->xmin + .000001;
+	}
 	if (!is_array($this->border)) {
 		$this->border = array($this->border,$this->border,$this->border,$this->border);
 	} else if (count($this->border<4)) {
@@ -436,35 +492,58 @@ function ASaxes($arg) {
 		$gc = $this->gridcolor;
 	
 		for ($x=$this->origin[0]+$xgrid; $x<=$this->winxmax; $x += $xgrid) {
-			imageline($this->img,$x,$this->winymin,$x,$this->winymax,$this->$gc);
+			if ($x>=$this->winxmin) {
+				imageline($this->img,$x,$this->winymin,$x,$this->winymax,$this->$gc);
+			}
 		}
 		for ($x=$this->origin[0]-$xgrid; $x>=$this->winxmin; $x -= $xgrid) {
-			imageline($this->img,$x,$this->winymin,$x,$this->winymax,$this->$gc);
+			if ($x<=$this->winxmax) {
+				imageline($this->img,$x,$this->winymin,$x,$this->winymax,$this->$gc);
+			}
 		}
 		for ($y=$this->height - $this->origin[1]+$ygrid; $y<=$this->winymax; $y += $ygrid) {
-			imageline($this->img,$this->winxmin,$y,$this->winxmax,$y,$this->$gc);
+			if ($y>=$this->winymin) {
+				imageline($this->img,$this->winxmin,$y,$this->winxmax,$y,$this->$gc);
+			}
 		}
 		for ($y=$this->height - $this->origin[1]-$ygrid; $y>$this->winymin; $y -= $ygrid) {
-			imageline($this->img,$this->winxmin,$y,$this->winxmax,$y,$this->$gc);
+			if ($y<=$this->winymax) {
+				imageline($this->img,$this->winxmin,$y,$this->winxmax,$y,$this->$gc);
+			}
 		}
 	}
 	
 	$ac = $this->axescolor;
-	imageline($this->img,$this->origin[0],$this->winymin,$this->origin[0],$this->winymax,$this->$ac);
-	imageline($this->img,$this->winxmin,$this->height-$this->origin[1],$this->winxmax,$this->height-$this->origin[1],$this->$ac);
+	if ($this->origin[0]>=$this->winxmin && $this->origin[0]<=$this->winxmax) {
+		imageline($this->img,$this->origin[0],$this->winymin,$this->origin[0],$this->winymax,$this->$ac);
+		//ticks
+		for ($y=$this->height - $this->origin[1]+$yscl; $y<=$this->winymax; $y += $yscl) {
+			if ($y>=$this->winymin) {
+				imageline($this->img,$this->origin[0]-$this->ticklength,$y,$this->origin[0]+$this->ticklength,$y,$this->$ac);
+			}
+		}
+		for ($y=$this->height - $this->origin[1]-$yscl; $y>=$this->winymin; $y -= $yscl) {
+			if ($y<=$this->winymax) {
+				imageline($this->img,$this->origin[0]-$this->ticklength,$y,$this->origin[0]+$this->ticklength,$y,$this->$ac);
+			}
+		}
+	}
+	if ($this->origin[1]>=$this->winymin && $this->origin[1]<=$this->winymax) {
+		imageline($this->img,$this->winxmin,$this->height-$this->origin[1],$this->winxmax,$this->height-$this->origin[1],$this->$ac);
+		//ticks
+		for ($x=$this->origin[0]+$xscl; $x<=$this->winxmax; $x += $xscl) {
+			if ($x>=$this->winxmin) {
+					imageline($this->img,$x,$this->height- $this->origin[1] -$this->ticklength,$x,$this->height- $this->origin[1] +$this->ticklength,$this->$ac);
+			}
+		}
+		for ($x=$this->origin[0]-$xscl; $x>=$this->winxmin; $x -= $xscl) {
+			if ($x<=$this->winxmax) {
+				imageline($this->img,$x,$this->height-$this->origin[1]-$this->ticklength,$x,$this->height-$this->origin[1]+$this->ticklength,$this->$ac);
+			}
+		}
+	}
 	
-	for ($x=$this->origin[0]+$xscl; $x<=$this->winxmax; $x += $xscl) {
-		imageline($this->img,$x,$this->height- $this->origin[1] -$this->ticklength,$x,$this->height- $this->origin[1] +$this->ticklength,$this->$ac);
-	}
-	for ($x=$this->origin[0]-$xscl; $x>=$this->winxmin; $x -= $xscl) {
-		imageline($this->img,$x,$this->height-$this->origin[1]-$this->ticklength,$x,$this->height-$this->origin[1]+$this->ticklength,$this->$ac);
-	}
-	for ($y=$this->height - $this->origin[1]+$yscl; $y<=$this->winymax; $y += $yscl) {
-		imageline($this->img,$this->origin[0]-$this->ticklength,$y,$this->origin[0]+$this->ticklength,$y,$this->$ac);
-	}
-	for ($y=$this->height - $this->origin[1]-$yscl; $y>=$this->winymin; $y -= $yscl) {
-		imageline($this->img,$this->origin[0]-$this->ticklength,$y,$this->origin[0]+$this->ticklength,$y,$this->$ac);
-	}
+	
 	if ($dolabels) {
 		$ldx = $xscl/$this->xunitlength;
 		$ldy = $yscl/$this->yunitlength;
@@ -486,17 +565,25 @@ function ASaxes($arg) {
 		$backupstroke = $this->stroke;
 		$this->stroke = 'black';
 		for ($x=$ldx;$x<=$this->xmax; $x += $ldx) {
-			$this->AStext("[$x,$ly]",$x,$lxp);
+			if ($x>=$this->xmin) {
+				$this->AStext("[$x,$ly]",$x,$lxp);
+			}
 		}
 		for ($x=-$ldx;$this->xmin<=$x; $x -= $ldx) {
-			$this->AStext("[$x,$ly]",$x,$lxp);
+			if ($x<=$this->xmax) {
+				$this->AStext("[$x,$ly]",$x,$lxp);
+			}
 		}
 		for ($y=$ldy;$y<=$this->ymax; $y += $ldy) {
-			$this->AStext("[$lx,$y]",$y,$lyp);
+			if ($y>=$this->ymin) {
+				$this->AStext("[$lx,$y]",$y,$lyp);
+			}
 		}
 		
 		for ($y=-$ldy;$this->ymin<=$y; $y -= $ldy) {
-			$this->AStext("[$lx,$y]",$y,$lyp);
+			if ($y<=$this->ymax) {
+				$this->AStext("[$lx,$y]",$y,$lyp);
+			}
 		}
 		$this->stroke = $backupstroke;
 	}

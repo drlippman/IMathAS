@@ -4,7 +4,7 @@
 
 
 array_push($allowedmacros,"exp","sec","csc","cot","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif","in_array","prettyint","prettyreal","arraystodots","subarray","showdataarray","arraystodoteqns","array_flip","arrayfindindex");
-array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","stringappend","stringprepend","textonimage","addplotborder");
+array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","stringappend","stringprepend","textonimage","addplotborder","addlabelabs");
 function mergearrays($a,$b) {
 	return array_merge($a,$b);
 }
@@ -145,28 +145,69 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			$alt .= "<table class=stats><thead><tr><th>x</th><th>y</th></thead></tr><tbody>";
 			$stopat = ($xmax-$xmin)+1;
 		} else {
-			$dx = ($xmax - $xmin)/100;
-			$stopat = 101;
+			$dx = ($xmax - $xmin + 10*($xmax-$xmin)/$settings[6] )/100;
+			$stopat = 102;
 			if ($xmax==$xmin) {
 				$stopat = 1;
 			}
 		}
 		$lasty = 0;
 		$lastl = 0;
+		$px = null;
+		$py = null;
 		for ($i = 0; $i<$stopat;$i++) {
 			if ($isparametric) {
-				$t = $xmin + $dx*$i+1E-10;
+				$t = $xmin + $dx*$i - 1E-10;
 				if (in_array($t,$avoid)) { continue;}
 				$x = round(eval("return ($xfunc);"),3);
 				$y = round(eval("return ($yfunc);"),3);
+				$alt .= "<tr><td>$x</td><td>$y</td></tr>";
 			} else {
-				$x = $xmin + $dx*$i + 1E-10;
+				$x = $xmin + $dx*$i - 1E-10 - 5*($xmax-$xmin)/$settings[6];
 				if (in_array($x,$avoid)) { continue;}
 				$y = round(eval("return ($func);"),3);
+				$alt .= "<tr><td>".($xmin + $dx*$i)."</td><td>$y</td></tr>";
 			}
-			$alt .= "<tr><td>$x</td><td>$y</td></tr>";
 			
-			if (abs($y-$lasty) > ($ymax-$ymin)) {
+			
+			if ($py==null) { //starting line
+				
+			} else if ($y>$ymax || $y<$ymin) { //going or still out of bounds
+				if ($py <= $ymax && $py >= $ymin) { //going out
+					if ($y>$ymax) { //going up
+						$iy = $ymax + 5*($ymax-$ymin)/$settings[7];
+					} else { //going down
+						$iy = $ymin - 5*($ymax-$ymin)/$settings[7];
+					}
+					$ix = ($x-$px)*($iy - $py)/($y-$py) + $px;
+					if ($lastl == 0) {$path .= "path([";} else { $path .= ",";}
+					$path .= "[$px,$py],[$ix,$iy]]);";
+					$lastl = 0;
+				} else { //still out
+					
+				}
+			} else if ($py>$ymax || $py<$ymin) { //coming or staying in bounds?
+				if ($y <= $ymax && $y >= $ymin) { //coming in
+					if ($py>$ymax) { //going up
+						$iy = $ymax + 5*($ymax-$ymin)/$settings[7];
+					} else { //going down
+						$iy = $ymin - 5*($ymax-$ymin)/$settings[7];
+					}
+					$ix = ($x-$px)*($iy - $py)/($y-$py) + $px;
+					if ($lastl == 0) {$path .= "path([";} else { $path .= ",";}
+					$path .= "[$ix,$iy]";
+					$lastl++;
+				} else { //still out
+					
+				}
+			} else {//all in
+				if ($lastl == 0) {$path .= "path([";} else { $path .= ",";}
+				$path .= "[$px,$py]";
+				$lastl++;
+			}
+			$px = $x;
+			$py = $y;
+			/*if (abs($y-$lasty) > ($ymax-$ymin)) {
 				if ($lastl > 1) { $path .= ']);'; $lastl = 0;}
 				$lasty = $y;
 			} else {
@@ -181,6 +222,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 					$absymax = $y;
 				}
 			}
+			*/
 		}
 		if ($lastl > 0) {$path .= "]);";}
 		$alt .= "</tbody></table>\n";
@@ -252,13 +294,35 @@ function addlabel($plot,$x,$y,$lbl) {
 	if (func_num_args()>4) {
 		$color = func_get_arg(4);
 	} else {
-		$color = black;
+		$color = "black";
 	}
-	if (func_num_args()>5) {
+	if (func_num_args()>6) {
+		$loc = func_get_arg(5);
+		$angle = func_get_arg(6);
+		$plot = str_replace("' />","fontfill=\"$color\";text([$x,$y],\"$lbl\",\"$loc\",\"$angle\");' />",$plot);
+	} elseif (func_num_args()>5) {
 		$loc = func_get_arg(5);
 		$plot = str_replace("' />","fontfill=\"$color\";text([$x,$y],\"$lbl\",\"$loc\");' />",$plot);
 	} else {
 		$plot = str_replace("' />","fontfill=\"$color\";text([$x,$y],\"$lbl\");' />",$plot);
+	}
+	return $plot;
+}
+function addlabelabs($plot,$x,$y,$lbl) {
+	if (func_num_args()>4) {
+		$color = func_get_arg(4);
+	} else {
+		$color = "black";
+	}
+	if (func_num_args()>6) {
+		$loc = func_get_arg(5);
+		$angle = func_get_arg(6);
+		$plot = str_replace("' />","fontfill=\"$color\";textabs([$x,$y],\"$lbl\",\"$loc\",\"$angle\");' />",$plot);
+	} elseif (func_num_args()>5) {
+		$loc = func_get_arg(5);
+		$plot = str_replace("' />","fontfill=\"$color\";textabs([$x,$y],\"$lbl\",\"$loc\");' />",$plot);
+	} else {
+		$plot = str_replace("' />","fontfill=\"$color\";textabs([$x,$y],\"$lbl\");' />",$plot);
 	}
 	return $plot;
 }

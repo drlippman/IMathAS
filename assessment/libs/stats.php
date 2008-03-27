@@ -180,6 +180,7 @@ function countif($a,$ifcond) {
 // upper (optional): first upper class limit.  Defaults to start+classwidth
 // width,height (optional): width and height in pixels of graph
 function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false,$width=300,$height=200) {
+	//if ($start>0) {$start = $start - $cw;}
 	sort($a, SORT_NUMERIC);
 	$x = $start;
 	$curr = 0;
@@ -212,10 +213,10 @@ function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false,$width=30
 	if ($GLOBALS['sessiondata']['graphdisp']==0) {
 		return $alt;
 	}
-	$outst = "setBorder(10);  initPicture(". ($start-.1*($x-$start)) .",$x,". (-.1*$maxfreq) .",$maxfreq);";
+	$outst = "setBorder(40,40,10,5);  initPicture(".($start>0?($start-.9*$cw):$start).",$x,0,$maxfreq);";
 	if ($maxfreq>100) {$step = 20;} else if ($maxfreq > 50) { $step = 10; } else if ($maxfreq > 20) { $step = 5;} else if ($maxfreq>10) { $step = 2; } else {$step=1;}
 	if ($startlabel===false) {
-		$outst .= "axes($cw,$step,1,1000,$step); fill=\"blue\"; text([". ($start + .5*($x-$start))  .",". (-.1*$maxfreq) . "],\"$label\");";
+		$outst .= "axes($cw,$step,1,1000,$step); fill=\"blue\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
 	} else {
 		$outst .= "axes(1000,$step,1,1000,$step); fill=\"blue\"; text([". ($start + .5*($x-$start))  .",". (-.1*$maxfreq) . "],\"$label\");";
 		$x = $startlabel;
