@@ -50,8 +50,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if ($_GET['clearattempts']=="confirmed") {
 			$query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='{$_GET['id']}'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
-			$query = "UPDATE imas_questions SET withdrawn=0 WHERE assessmentid='$aid'";
+			$query = "UPDATE imas_questions SET withdrawn=0 WHERE assessmentid='{$_GET['id']}'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addassessment.php?cid={$_GET['cid']}&aid={$_GET['id']}");
+			exit;
 		} else {
 			$overwriteBody = 1;
 			$body = "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";

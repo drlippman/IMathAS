@@ -96,6 +96,7 @@ function median($a) {
 // start: first lower class limit
 // classwidth: width of the classes
 function freqdist($a,$label,$start,$cw) {
+	if ($cw<0) { $cw *= -1;} else if ($cw==0) { echo "Error - classwidth cannot be 0"; return 0;}
 	sort($a, SORT_NUMERIC);
 	$x = $start;
 	$curr = 0;
@@ -121,6 +122,7 @@ function freqdist($a,$label,$start,$cw) {
 // start: first lower class limit
 // classwidth: width of the classes
 function frequency($a,$start,$cw) {
+	if ($cw<0) { $cw *= -1;} else if ($cw==0) { echo "Error - classwidth cannot be 0"; return 0;}
 	sort($a, SORT_NUMERIC);
 	$x = $start;
 	$curr = 0;
@@ -180,7 +182,7 @@ function countif($a,$ifcond) {
 // upper (optional): first upper class limit.  Defaults to start+classwidth
 // width,height (optional): width and height in pixels of graph
 function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false,$width=300,$height=200) {
-	//if ($start>0) {$start = $start - $cw;}
+	if ($cw<0) { $cw *= -1;} else if ($cw==0) { echo "Error - classwidth cannot be 0"; return 0;}
 	sort($a, SORT_NUMERIC);
 	$x = $start;
 	$curr = 0;
@@ -213,21 +215,27 @@ function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false,$width=30
 	if ($GLOBALS['sessiondata']['graphdisp']==0) {
 		return $alt;
 	}
-	$outst = "setBorder(40,40,10,5);  initPicture(".($start>0?($start-.9*$cw):$start).",$x,0,$maxfreq);";
-	if ($maxfreq>100) {$step = 20;} else if ($maxfreq > 50) { $step = 10; } else if ($maxfreq > 20) { $step = 5;} else if ($maxfreq>10) { $step = 2; } else {$step=1;}
+	$outst = "setBorder(".(40+7*strlen($maxfreq)).",40,10,5);  initPicture(".($start>0?(max($start-.9*$cw,0)):$start).",$x,0,$maxfreq);";
+	
+	$power = floor(log10($maxfreq))-1;
+	$base = $maxfreq/pow(10,$power);
+	if ($base>75) {$step = 20*pow(10,$power);} else if ($base>40) { $step = 10*pow(10,$power);} else if ($base>20) {$step = 5*pow(10,$power);} else if ($base>9) {$step = 2*pow(10,$power);} else {$step = pow(10,$power);}
+	
+	//if ($maxfreq>100) {$step = 20;} else if ($maxfreq > 50) { $step = 10; } else if ($maxfreq > 20) { $step = 5;} else if ($maxfreq>9) { $step = 2; } else {$step=1;}
 	if ($startlabel===false) {
-		$outst .= "axes($cw,$step,1,1000,$step); fill=\"blue\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
-	} else {
-		$outst .= "axes(1000,$step,1,1000,$step); fill=\"blue\"; text([". ($start + .5*($x-$start))  .",". (-.1*$maxfreq) . "],\"$label\");";
+		//$outst .= "axes($cw,$step,1,1000,$step); fill=\"blue\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
+		$startlabel = $start;
+	} //else {
+		$outst .= "axes(1000,$step,1,1000,$step); fill=\"blue\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
 		$x = $startlabel;
 		$tm = -.02*$maxfreq;
 		$tx = .02*$maxfreq;
-		while ($x <= $a[count($a)-1]) {
+		while ($x <= $a[count($a)-1]+1) {
 			$outst .= "line([$x,$tm],[$x,$tx]); text([$x,0],\"$x\",\"below\");";
 			$x+= $cw;
 		}
-
-	}
+	//}
+	$outst .= "textabs([0,". ($height/2+15)  ."],\"Frequency\",\"right\",90);";
 	$outst .= $st;
 	return showasciisvg($outst,$width,$height);
 }
@@ -242,6 +250,7 @@ function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false,$width=30
 // upper (optional): first upper class limit.  Defaults to start+classwidth
 // width,height (optional): width and height in pixels of graph
 function fdhistogram($freq,$label,$start,$cw,$startlabel=false,$upper=false,$width=300,$height=200) {
+	if ($cw<0) { $cw *= -1;} else if ($cw==0) { echo "Error - classwidth cannot be 0"; return 0;}
 	$x = $start;
 	$alt = "Histogram for $label <table class=stats><thead><tr><th>Label on left of box</th><th>Frequency</th></tr></thead>\n<tbody>\n";
 	$maxfreq = 0;
@@ -264,21 +273,28 @@ function fdhistogram($freq,$label,$start,$cw,$startlabel=false,$upper=false,$wid
 	if ($GLOBALS['sessiondata']['graphdisp']==0) {
 		return $alt;
 	}
-	$outst = "setBorder(10);  initPicture(". ($start-.1*($x-$start)) .",$x,". (-.1*$maxfreq) .",$maxfreq);";
-	if ($maxfreq>100) {$step = 20;} else if ($maxfreq > 50) { $step = 10; } else if ($maxfreq > 20) { $step = 5;} else {$step=1;}
+	$outst = "setBorder(".(40+7*strlen($maxfreq)).",40,10,5);  initPicture(".($start>0?(max($start-.9*$cw,0)):$start).",$x,0,$maxfreq);";
+	//$outst = "setBorder(10);  initPicture(". ($start-.1*($x-$start)) .",$x,". (-.1*$maxfreq) .",$maxfreq);";
+	$power = floor(log10($maxfreq))-1;
+	$base = $maxfreq/pow(10,$power);
+	if ($base>75) {$step = 20*pow(10,$power);} else if ($base>40) { $step = 10*pow(10,$power);} else if ($base>20) {$step = 5*pow(10,$power);} else if ($base>9) {$step = 2*pow(10,$power);} else {$step = pow(10,$power);}
+	//if ($maxfreq>100) {$step = 20;} else if ($maxfreq > 50) { $step = 10; } else if ($maxfreq > 20) { $step = 5;} else if ($maxfreq>9) {$step = 2;} else {$step=1;}
 	if ($startlabel===false) {
-		$outst .= "axes($cw,$step,1,1000,$step); fill=\"blue\"; text([". ($start + .5*($x-$start))  .",". (-.1*$maxfreq) . "],\"$label\");";
-	} else {
-		$outst .= "axes(1000,$step,1,1000,$step); fill=\"blue\"; text([". ($start + .5*($x-$start))  .",". (-.1*$maxfreq) . "],\"$label\");";
+		//$outst .= "axes($cw,$step,1,1000,$step); fill=\"blue\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
+		$startlabel = $start;
+	} //else {
+		$outst .= "axes(1000,$step,1,1000,$step); fill=\"blue\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
 		$x = $startlabel;
 		$tm = -.02*$maxfreq;
 		$tx = .02*$maxfreq;
-		for ($curr=0; $curr<count($freq); $curr++) {
+		for ($curr=0; $curr<count($freq)+1; $curr++) {
 			$outst .= "line([$x,$tm],[$x,$tx]); text([$x,0],\"$x\",\"below\");";
 			$x+=$cw;
 		}
-	}
+	//}
+	//$outst .= "text([".($start-.1*($x-$start)).",".(.5*$maxfreq)."],\"Freq\",,90)";
 	//$outst .= "axes($cw,$step,1,1000,$step); fill=\"blue\"; text([". ($start + .5*($x-$start))  .",". (-.1*$maxfreq) . "],\"$label\");";
+	$outst .= "textabs([0,". ($height/2+15)  ."],\"Frequency\",\"right\",90);";
 	$outst .= $st;
 	return showasciisvg($outst,$width,$height);
 }
@@ -289,6 +305,8 @@ function fdhistogram($freq,$label,$start,$cw,$startlabel=false,$upper=false,$wid
 //label: general label for bars
 //width,height (optional): width and height for graph
 function fdbargraph($bl,$freq,$label,$width=300,$height=200) {
+	if (!is_array($bl) || !is_array($freq)) {echo "barlabels and freqarray must be arrays"; return 0;}
+	if (count($bl) != count($freq)) { echo "barlabels and freqarray must have same length"; return 0;}
 	$alt = "Histogram for $label <table class=stats><thead><tr><th>Bar Label</th><th>Frequency/Height</th></tr></thead>\n<tbody>\n";
 	$start = 0;
 	$x = $start+1;
@@ -308,9 +326,16 @@ function fdbargraph($bl,$freq,$label,$width=300,$height=200) {
 		return $alt;
 	}
 	$x++;
-	$outst = "setBorder(10);  initPicture(". ($start-.1*($x-$start)) .",$x,". (-.1*$maxfreq) .",$maxfreq);";
-	if ($maxfreq>100) {$step = 20;} else if ($maxfreq > 50) { $step = 10; } else if ($maxfreq > 20) { $step = 5;} else {$step=1;}
-	$outst .= "axes(1000,$step,1,1000,$step); fill=\"blue\"; text([". ($start + .5*($x-$start))  .",". (-.12*$maxfreq) . "],\"$label\");";
+	//$outst = "setBorder(10);  initPicture(". ($start-.1*($x-$start)) .",$x,". (-.1*$maxfreq) .",$maxfreq);";
+	$outst = "setBorder(45,40,10,5);  initPicture(".($start>0?(max($start-.9*$cw,0)):$start).",$x,0,$maxfreq);";
+	
+	$power = floor(log10($maxfreq))-1;
+	$base = $maxfreq/pow(10,$power);
+	
+	if ($base>75) {$step = 20*pow(10,$power);} else if ($base>40) { $step = 10*pow(10,$power);} else if ($base>20) {$step = 5*pow(10,$power);} else if ($base>9) {$step = 2*pow(10,$power);} else {$step = pow(10,$power);}
+	
+	//if ($maxfreq>100) {$step = 20;} else if ($maxfreq > 50) { $step = 10; } else if ($maxfreq > 20) { $step = 5;} else {$step=1;}
+	$outst .= "axes(1000,$step,1,1000,$step); fill=\"blue\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
 	
 	//$outst .= "axes($cw,$step,1,1000,$step); fill=\"blue\"; text([". ($start + .5*($x-$start))  .",". (-.1*$maxfreq) . "],\"$label\");";
 	$outst .= $st;
@@ -383,7 +408,7 @@ function boxplot($arr,$label) {
 	$dw = $bigmax-$bigmin;
 
 	if ($dw>100) {$step = 20;} else if ($dw > 50) { $step = 10; } else if ($dw > 20) { $step = 5;} else {$step=1;}
-	$outst .= "axes($step,100,1);";
+	$outst .= "axes($step,100,1,0,0,1,'off');";
 	$outst .= "text([". ($bigmin+.5*$dw) . ",-3],\"$label\");";
 	if (isset($dlbls)) {
 		for ($i=0;$i<$multi;$i++) {

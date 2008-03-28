@@ -32,14 +32,14 @@ function linegraph($intvs) {
 	if (!is_array($intvs)) {
 		settype($intvs,"array");
 	}
-	$settings = array(-5,5,1,300,100);
+	$settings = array(-5,5,1,300,70);
 	for ($i = 1; $i < func_num_args(); $i++) {
 		$settings[$i-1] = func_get_arg($i);
 	}
 	
 	$commands = "setBorder(5); initPicture({$settings[0]},{$settings[1]},-.5,.5);";
 	$alt = "Line Graph, x {$settings[0]} to {$settings[1]}.";
-	$commands .= 'axes('.$settings[2].',1,1); stroke="blue"; strokewidth=2;';
+	$commands .= 'axes('.$settings[2].',1,1,0,0,1,"off"); stroke="blue"; strokewidth=2;';
 	foreach ($intvs as $intv) {
 		$commands .= 'line([';
 		$intv = str_replace(' ','',$intv);

@@ -50,6 +50,7 @@
 		if (!file_exists($filterdir.'/graph/imgs/'.$fn.'.png')) {
 			$AS->AStoIMG($w+0,$h+0);
 			$AS->processScript($arr[2]);
+			//echo $arr[2];
 			$AS->outputimage($filterdir.'/graph/imgs/'.$fn.'.png');
 		}
 		return ('<img src="'.$imasroot.'/filter/graph/imgs/'.$fn.'.png" style="'.$sty.'" alt="Graphs"/>');

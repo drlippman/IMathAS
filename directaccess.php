@@ -161,10 +161,8 @@
 		var html = ""; 
 		html += '<span class=form>Accessibility:</span><span class=formright> ';
 		//html += "<a href='#' onClick=\"window.open('<?php echo $imasroot;?>/help.php?section=loggingin','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\">Help</a>";
-		html += '<input type="radio" name="access" value="0" <?php if ($pref==0) {echo "checked=1";} ?> />Use visual display<br/>';
-		html += '<input type="radio" name="access" value="2" <?php if ($pref==2) {echo "checked=1";} ?> />Force image-based graphs<br/>';
-		html += '<input type="radio" name="access" value="4" <?php if ($pref==4) {echo "checked=1";} ?> />Force image-based math<br/>';
-		html += '<input type="radio" name="access" value="3" <?php if ($pref==3) {echo "checked=1";} ?> />Force image based display<br/>';
+		html += '<input type="radio" name="access" value="0" <?php if ($pref==0 || $pref==2) {echo "checked=1";} ?> />Use visual display<br/>';
+		html += '<input type="radio" name="access" value="4" <?php if ($pref==4 || $pref==3) {echo "checked=1";} ?> />Force image-based math<br/>';
 		html += '<input type="radio" name="access" value="1">Use text-based display</span><br class=form>';
 		
 		if (AMnoMathML) {
@@ -172,12 +170,7 @@
 		} else {
 			html += '<input type=hidden name="mathdisp" value="1">';
 		}
-		if (ASnoSVG) {
-			html += '<input type=hidden name="graphdisp" value="0">';
-		} else {
-			html += '<input type=hidden name="graphdisp" value="1">';
-		}
-		if (!AMnoMathML && !ASnoSVG) {
+		if (!AMnoMathML) {
 			html += '<input type=hidden name="isok" value=1>';
 		} 
 		html += '<div class=submit><input name="submit" type="submit" value="Login"></div>';
