@@ -25,7 +25,7 @@
 		 }
 		 if (isset($_POST['skip']) || isset($_POST['isok'])) {
 			 $sessiondata['mathdisp'] = $_POST['mathdisp'];
-			 $sessiondata['graphdisp'] = 1; //force image-based graphs $_POST['graphdisp'];
+			 $sessiondata['graphdisp'] = $_POST['graphdisp'];
 			 $sessiondata['useed'] = 1;
 			 if (isset($_POST['savesettings'])) {
 				 setcookie('mathgraphprefs',$_POST['mathdisp'].'-'.$_POST['graphdisp'],2000000000);
@@ -39,8 +39,8 @@
 		 } else {
 			 require("header.php");
 			 echo "<h2>Browser check</h2>\n";
-			 echo "<p>For fastest, most accurate, and prettiest math display, this system recommends:";
-			 echo "<ul><li>Windows: Internet Explorer 6+ with MathPlayer, or Firefox 1.5+</li>\n";
+			 echo "<p>For fastest, most accurate, and prettiest math and graph display, this system recommends:";
+			 echo "<ul><li>Windows: Internet Explorer 6+ with MathPlayer and AdobeSVGViewer, or Firefox 1.5+</li>\n";
 			 echo "<li>Mac: Firefox 1.5+ or Camino 1.0+</li></ul>\n";
 			 echo "<form method=post action=\"{$_SERVER['PHP_SELF']}$querys\">\n";
 			 echo "<div id=settings></div>";
@@ -67,9 +67,19 @@
 		} else {
 			html += '<p><input type=hidden name="mathdisp" value="1">Your browser is set up for browser-based math display.</p>';
 		}
+		html += '<h4>Graph Display</h4>';
+		if (ASnoSVG) {
+			html += '<p><input type=hidden name="graphdisp" value="2">It appears you do not have browser-based Graph display support. ';
+			html += 'Browser based Graph display is faster and prettier than using image-based graph display.  To install browser-based ';
+			html += 'graph display:</p>';
+			html += '<p>Windows Internet Explorer users: <a href="http://download.adobe.com/pub/adobe/magic/svgviewer/win/3.x/3.03/en/SVGView.exe">Install AdobeSVGPlugin plugin</a></p>';
+			html += '<p>Mac users or non-IE windows users: <a href="http://www.mozilla.com/firefox/">Install Firefox 1.5+</a> or <a href="http://www.caminobrowser.org/">Camino</a></p>';
+		} else {
+			html += '<p><input type=hidden name="graphdisp" value="1">Your browser is set up for browser-based graph display.</p>';
+		}
 		
 		html += '<p><input type="checkbox" name="savesettings" checked="1"> Don\'t show me this screen again on this computer and browser.  If you update your browser, you can get back to this page by selecting Visual Display when you login.</p>';
-		if (AMnoMathML) {
+		if (AMnoMathML || ASnoSVG) {
 			html += '<p><input type=submit name=recheck value="Recheck Setup"><input type=submit name=skip value="Continue with image-based display"></p>';
 		} else {
 			html += '<p><input type=submit name=isok value="Browser setup OK - Continue"></p>';
@@ -86,21 +96,6 @@
 	
 </script>
 END;
-/*  this was removed from above to switch to forced image-based graphs
-html += '<h4>Graph Display</h4>';
-		if (ASnoSVG) {
-			html += '<p><input type=hidden name="graphdisp" value="2">It appears you do not have browser-based Graph display support. ';
-			html += 'Browser based Graph display is faster and prettier than using image-based graph display.  To install browser-based ';
-			html += 'graph display:</p>';
-			html += '<p>Windows Internet Explorer users: <a href="http://download.adobe.com/pub/adobe/magic/svgviewer/win/3.x/3.03/en/SVGView.exe">Install AdobeSVGPlugin plugin</a></p>';
-			html += '<p>Mac users or non-IE windows users: <a href="http://www.mozilla.com/firefox/">Install Firefox 1.5+</a> or <a href="http://www.caminobrowser.org/">Camino</a></p>';
-		} else {
-			html += '<p><input type=hidden name="graphdisp" value="1">Your browser is set up for browser-based graph display.</p>';
-		}
-		html += '<p><input type="checkbox" name="savesettings" checked="1"> Don\'t show me this screen again on this computer and browser.  If you update your browser, you can get back to this page by selecting Visual Display when you login.</p>';
-		if (AMnoMathML || ASnoSVG) {
-	*/
-	
 			 echo "</form>\n";
 			 require("footer.php");
 			 exit;
@@ -148,13 +143,13 @@ html += '<h4>Graph Display</h4>';
 			 $sessiondata['useed'] = 0; 
 			 $enc = base64_encode(serialize($sessiondata));
 		 } else if ($_POST['access']==2) { //img graphs
-			 $sessiondata['mathdisp'] = 2 - $_POST['mathdisp'];
+			 $sessiondata['mathdisp'] = 2-$_POST['mathdisp'];
 			 $sessiondata['graphdisp'] = 2;
 			 $sessiondata['useed'] = 1; 
 			 $enc = base64_encode(serialize($sessiondata));
 		 } else if ($_POST['access']==4) { //img math
 			 $sessiondata['mathdisp'] = 2;
-			 $sessiondata['graphdisp'] = 2; //force img-based graphs $_POST['graphdisp'];
+			 $sessiondata['graphdisp'] = $_POST['graphdisp'];
 			 $sessiondata['useed'] = 1; 
 			 $enc = base64_encode(serialize($sessiondata));
 		 } else if ($_POST['access']==3) { //img all
@@ -164,7 +159,7 @@ html += '<h4>Graph Display</h4>';
 			 $enc = base64_encode(serialize($sessiondata));
 		 } else if ($_POST['isok']) {
 			 $sessiondata['mathdisp'] = 1;  
-			 $sessiondata['graphdisp'] = 1; //force img-based graphs;
+			 $sessiondata['graphdisp'] = 1;
 			 $sessiondata['useed'] = 1; 
 			 $enc = base64_encode(serialize($sessiondata));
 		 } else {

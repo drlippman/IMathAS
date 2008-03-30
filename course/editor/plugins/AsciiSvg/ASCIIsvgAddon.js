@@ -48,8 +48,9 @@ function parseShortScript(sscript,gw,gh) {
 		   commands += 'stroke="' + sa[inx+7] + '";';
 		   commands += 'strokewidth="' + sa[inx+8] + '";'
 		   //commands += 'strokedasharray="' + sa[inx+9] + '";'	
-		   if (sa[inx+9] != "")
-			   commands += 'strokedasharray="' + sa[inx+9] + '";'
+		   if (sa[inx+9] != "") {
+			   commands += 'strokedasharray="' + sa[inx+9].replace(/\s+/g,',') + '";';
+		   }
 		   if (sa[inx]=="slope") {
 			   eqnlist += "dy/dx="+sa[inx+1] + "; ";
 			commands += 'slopefield("' + sa[inx+1] + '",' + sa[inx+2] + ',' + sa[inx+2] + ');'; 

@@ -70,6 +70,7 @@ function mathphp($st,$varlist) {
   if ($varlist != null) {
 	  $st= preg_replace("/([0-9])(".$varlist.")/","$1*$2",$st);
   }
+  $st = preg_replace("/([0-9])(sin|cos|tan|sec|csc|cot|ln|log|exp|asin|acos|atan|sqrt|abs)/","$1*$2",$st);
   //want 4E2 to be scientific notation
 
   $st= preg_replace('/([0-9])\*\(exp\(1\)\)([0-9])/',"\\1E\\2",$st);
