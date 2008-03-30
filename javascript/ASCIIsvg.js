@@ -336,10 +336,10 @@ function initPicture(x_min,x_max,y_min,y_max) {
     else ymax = (height-border[1]-border[3])/yunitlength + ymin;
     origin = [-xmin*xunitlength+border[0],-ymin*yunitlength+border[1]];
   }
-  winxmin = border[0];
-  winxmax = width-border[2];
-  winymin = border[3];
-  winymax = height-border[1];
+  winxmin = Math.max(border[0]-5,0);
+  winxmax = Math.min(width-border[2]+5,width);
+  winymin = Math.max(border[3]-5,0);
+  winymax = Math.min(height-border[1]+5,height);
 //  if (true ||picture.nodeName == "EMBED" || picture.nodeName == "embed") {
     if (isIE) {
       svgpicture = picture.getSVGDocument().getElementById("root");
@@ -581,22 +581,66 @@ function rect(p,q,id,rx,ry) { // opposite corners in units, rounded by radii
   node.setAttribute("fill", fill);
 }
 
+function text(p,st,pos,angle) {
+	p[0] = p[0]*xunitlength+origin[0];
+	p[1] = p[1]*yunitlength+origin[1];
+	textabs(p,st,pos,angle);
+}
 
-function text(p,st,pos,id,fontsty) {
-  var textanchor = "middle";
-  var dx = 0; var dy = fontsize/3;
-  if (pos!=null) {
-    if (pos.slice(0,5)=="above") dy = -fontsize/2;
-    if (pos.slice(0,5)=="below") dy = fontsize-0;
-    if (pos.slice(0,5)=="right" || pos.slice(5,10)=="right") {
-      textanchor = "start";
-      dx = fontsize/2;
-    }
-    if (pos.slice(0,4)=="left" || pos.slice(5,9)=="left") {
-      textanchor = "end";
-      dx = -fontsize/2;
-    }
+function textabs(p,st,pos,angle,id,fontsty) {
+  if (angle==null) {
+	  angle = 0;
+  } else {
+	  angle = (360 - angle)%360;
   }
+  var textanchor = "middle";
+  var dx=0; var dy=0;
+  if (angle==270) {
+	  var dy = 0; var dx = fontsize/3;
+	  if (pos!=null) {
+	    if (pos.match(/left/)) {dx = -fontsize/2;}
+	    if (pos.match(/right/)) {dx = fontsize-0;}
+	    if (pos.match(/above/)) {
+	      textanchor = "start";
+	      dy = -fontsize/2;
+	    }
+	    if (pos.match(/below/)) {
+	      textanchor = "end";
+	      dy = fontsize/2;
+	    }
+	  }
+  } 
+  if (angle==90) {
+	  var dy = 0; var dx = -fontsize/3;
+	  if (pos!=null) {
+	    if (pos.match(/left/)) dx = -fontsize-0;
+	    if (pos.match(/right/)) dx = fontsize/2;
+	    if (pos.match(/above/)) {
+	      textanchor = "end";
+	      dy = -fontsize/2;
+	    }
+	    if (pos.match(/below/)) {
+	      textanchor = "start";
+	      dy = fontsize/2;
+	    }
+	  }
+  }
+  if (angle==0) {
+	  var dx = 0; var dy = fontsize/3;
+	  if (pos!=null) {
+	    if (pos.match(/above/)) { dy = -fontsize/2; }
+	    if (pos.match(/below/)) { dy = fontsize-0; }
+	    if (pos.match(/right/)) {
+	      textanchor = "start";
+	      dx = fontsize/2;
+	    }
+	    if (pos.match(/left/)) {
+	      textanchor = "end";
+	      dx = -fontsize/2;
+	    }
+	  }
+  }
+ 
   var node;
   if (id!=null) node = doc.getElementById(id);
   if (node==null) {
@@ -606,8 +650,11 @@ function text(p,st,pos,id,fontsty) {
     node.appendChild(doc.createTextNode(st));
   }
   node.lastChild.nodeValue = st;
-  node.setAttribute("x",p[0]*xunitlength+origin[0]+dx);
-  node.setAttribute("y",height-p[1]*yunitlength-origin[1]+dy);
+  node.setAttribute("x",p[0]+dx);
+  node.setAttribute("y",height-p[1]+dy);
+  if (angle != 0) {
+	  node.setAttribute("transform","rotate("+angle+" "+(p[0]+dx)+" "+(height-p[1]+dy)+")");
+  }
   node.setAttribute("font-style",(fontsty!=null?fontsty:fontstyle));
   node.setAttribute("font-family",fontfamily);
   node.setAttribute("font-size",fontsize);
@@ -716,7 +763,7 @@ function noaxes() {
 }
 
 
-function axes(dx,dy,labels,gdx,gdy) {
+function axes(dx,dy,labels,gdx,gdy,dox,doy) {
 //xscl=x is equivalent to xtick=x; xgrid=x; labels=true;
   var x, y, ldx, ldy, lx, ly, lxp, lyp, pnode, st;
   if (!initialized) initPicture();
@@ -726,10 +773,14 @@ function axes(dx,dy,labels,gdx,gdy) {
   if (yscl!=null) {dy = yscl; gdy = yscl}
   if (xtick!=null) {dx = xtick}
   if (ytick!=null) {dy = ytick}
+  if (dox==null) {dox = true;}
+  if (doy==null) {doy = true;}
+  if (dox=="off" || dox==0) { dox = false;} else {dox = true;}
+  if (doy=="off" || doy==0) { doy = false;} else {doy = true;}
 //alert(null)
   dx = (dx==null?xunitlength:dx*xunitlength);
   dy = (dy==null?dx:dy*yunitlength);
-  fontsize = Math.min(dx/1.5,dy/1.5,16);//alert(fontsize)
+  fontsize = Math.floor(Math.min(dx/1.5,dy/1.5,16));//alert(fontsize)
   ticklength = fontsize/4;
   if (xgrid!=null) gdx = xgrid;
   if (ygrid!=null) gdy = ygrid;
@@ -738,14 +789,18 @@ function axes(dx,dy,labels,gdx,gdy) {
     gdy = (gdy==null?dy:gdy*yunitlength);
     pnode = myCreateElementSVG("path");
     st="";
-    for (x = origin[0]; x<=winxmax; x = x+gdx)
-      st += " M"+x+","+winymin+" "+x+","+winymax;
-    for (x = origin[0]-gdx; x>=winxmin; x = x-gdx)
-      st += " M"+x+","+winymin+" "+x+","+winymax;
-    for (y = height-origin[1]; y<=winymax; y = y+gdy)
-      st += " M"+winxmin+","+y+" "+winxmax+","+y;
-    for (y = height-origin[1]-gdy; y>=winymin; y = y-gdy)
-      st += " M"+winxmin+","+y+" "+winxmax+","+y;
+    if (dox && gdx>0) {
+	    for (x = origin[0]; x<=winxmax; x = x+gdx)
+	      if (x>=winxmin) st += " M"+x+","+winymin+" "+x+","+winymax;
+	    for (x = origin[0]-gdx; x>=winxmin; x = x-gdx)
+	      if (x<=winxmax) st += " M"+x+","+winymin+" "+x+","+winymax;
+    }
+    if (doy && gdy>0) {
+	    for (y = height-origin[1]; y<=winymax; y = y+gdy)
+	      if (y>=winymin) st += " M"+winxmin+","+y+" "+winxmax+","+y;
+	    for (y = height-origin[1]-gdy; y>=winymin; y = y-gdy)
+	      if (y<=winymax) st += " M"+winxmin+","+y+" "+winxmax+","+y;
+    }
     pnode.setAttribute("d",st);
     pnode.setAttribute("stroke-width", .5);
     pnode.setAttribute("stroke", gridstroke);
@@ -753,18 +808,27 @@ function axes(dx,dy,labels,gdx,gdy) {
     svgpicture.appendChild(pnode);
   }
   pnode = myCreateElementSVG("path");
-  st="M"+winxmin+","+(height-origin[1])+" "+winxmax+","+
-    (height-origin[1])+" M"+origin[0]+","+winymin+" "+origin[0]+","+winymax;
-  for (x = origin[0]+dx; x<winxmax; x = x+dx)
-    st += " M"+x+","+(height-origin[1]+ticklength)+" "+x+","+
-           (height-origin[1]-ticklength);
-  for (x = origin[0]-dx; x>winxmin; x = x-dx)
-    st += " M"+x+","+(height-origin[1]+ticklength)+" "+x+","+
-           (height-origin[1]-ticklength);
-  for (y = height-origin[1]+dy; y<winymax; y = y+dy)
-    st += " M"+(origin[0]+ticklength)+","+y+" "+(origin[0]-ticklength)+","+y;
-  for (y = height-origin[1]-dy; y>winymin; y = y-dy)
-    st += " M"+(origin[0]+ticklength)+","+y+" "+(origin[0]-ticklength)+","+y;
+  if (dox) {
+	  st="M"+winxmin+","+(height-origin[1])+" "+winxmax+","+
+    (height-origin[1]);
+  }
+  if (doy) {
+	  st += " M"+origin[0]+","+winymin+" "+origin[0]+","+winymax;
+  }
+  if (dox) {
+	  for (x = origin[0]; x<winxmax; x = x+dx)
+	    if (x>=winymin) st += " M"+x+","+(height-origin[1]+ticklength)+" "+x+","+
+		   (height-origin[1]-ticklength);
+	  for (x = origin[0]-dx; x>winxmin; x = x-dx)
+	   if (x<=winxmax) st += " M"+x+","+(height-origin[1]+ticklength)+" "+x+","+
+		   (height-origin[1]-ticklength);
+  }
+  if (doy) {
+	  for (y = height-origin[1]; y<winymax; y = y+dy)
+	    if (y>=winymin) st += " M"+(origin[0]+ticklength)+","+y+" "+(origin[0]-ticklength)+","+y;
+	  for (y = height-origin[1]-dy; y>winymin; y = y-dy)
+	    if (y<=winymax) st += " M"+(origin[0]+ticklength)+","+y+" "+(origin[0]-ticklength)+","+y;
+  }
   if (labels!=null) with (Math) {
     ldx = dx/xunitlength;
     ldy = dy/yunitlength;
@@ -774,14 +838,18 @@ function axes(dx,dy,labels,gdx,gdy) {
     lyp = (lx==0?"left":"right");
     var ddx = floor(1.1-log(ldx)/log(10))+1;
     var ddy = floor(1.1-log(ldy)/log(10))+1;
-    for (x = ldx; x<=xmax; x = x+ldx)
-      text([x,ly],chopZ(x.toFixed(ddx)),lxp);
-    for (x = -ldx; xmin<=x; x = x-ldx)
-      text([x,ly],chopZ(x.toFixed(ddx)),lxp);
-    for (y = ldy; y<=ymax; y = y+ldy)
-      text([lx,y],chopZ(y.toFixed(ddy)),lyp);
-    for (y = -ldy; ymin<=y; y = y-ldy)
-      text([lx,y],chopZ(y.toFixed(ddy)),lyp);
+    if (dox) {
+	    for (x = (doy?ldx:0); x<=xmax; x = x+ldx)
+	      if (x>=xmin) text([x,ly],chopZ(x.toFixed(ddx)),lxp);
+	    for (x = -ldx; xmin<=x; x = x-ldx)
+	      if (x<=xmax) text([x,ly],chopZ(x.toFixed(ddx)),lxp);
+    }
+    if (doy) {
+	    for (y = (dox?ldy:0); y<=ymax; y = y+ldy)
+	      if (y>=ymin) text([lx,y],chopZ(y.toFixed(ddy)),lyp);
+	    for (y = -ldy; ymin<=y; y = y-ldy)
+	      if (y<=ymax) text([lx,y],chopZ(y.toFixed(ddy)),lyp);
+    }
   }
   pnode.setAttribute("d",st);
   pnode.setAttribute("stroke-width", .5);

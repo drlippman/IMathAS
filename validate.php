@@ -25,7 +25,7 @@
 		 }
 		 if (isset($_POST['skip']) || isset($_POST['isok'])) {
 			 $sessiondata['mathdisp'] = $_POST['mathdisp'];
-			 $sessiondata['graphdisp'] = 2; //force image-based graphs $_POST['graphdisp'];
+			 $sessiondata['graphdisp'] = 1; //force image-based graphs $_POST['graphdisp'];
 			 $sessiondata['useed'] = 1;
 			 if (isset($_POST['savesettings'])) {
 				 setcookie('mathgraphprefs',$_POST['mathdisp'].'-'.$_POST['graphdisp'],2000000000);
@@ -164,7 +164,7 @@ html += '<h4>Graph Display</h4>';
 			 $enc = base64_encode(serialize($sessiondata));
 		 } else if ($_POST['isok']) {
 			 $sessiondata['mathdisp'] = 1;  
-			 $sessiondata['graphdisp'] = 2; //force img-based graphs;
+			 $sessiondata['graphdisp'] = 1; //force img-based graphs;
 			 $sessiondata['useed'] = 1; 
 			 $enc = base64_encode(serialize($sessiondata));
 		 } else {

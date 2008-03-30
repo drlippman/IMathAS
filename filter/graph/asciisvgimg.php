@@ -6,7 +6,7 @@ require_once("$graphfilterdir/../../assessment/mathphp.php");
 // Generates an image based on an ASCIIsvg script
 // as a backup for ASCIIsvg.js SVG generator script
 //
-// Revised 3/08 to add angle to text - not compatible with ASCIIsvg
+// Revised 3/08 to add angle to text
 //
 // Based on ASCIIsvg.js (c) Peter Jipsen
 // http://www.chapman.edu/~jipsen/svg/asciisvg.html
@@ -826,7 +826,6 @@ function ASslopefield($arg) {
 }
 
 function ASplot($function) {
-	
 	$funcstr = implode(',',$function);
 	preg_match_all('/[a-zA-Z]+/',$funcstr,$matches,PREG_PATTERN_ORDER);
 	$okfunc = array('sin','cos','tan','sec','csc','cot','arcsin','arccos','arctan','x','t','log','ln','e','pi','abs','sqrt','safepow');

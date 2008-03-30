@@ -2,7 +2,7 @@
 //A library of Stats functions.  Version 1.8, June 20, 2007
 
 global $allowedmacros;
-array_push($allowedmacros,"nCr","nPr","mean","stdev","percentile","quartile","median","freqdist","frequency","histogram","fdhistogram","fdbargraph","normrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","countif","binomialpdf","binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf");
+array_push($allowedmacros,"nCr","nPr","mean","stdev","percentile","quartile","median","freqdist","frequency","histogram","fdhistogram","fdbargraph","normrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","countif","binomialpdf","binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart");
 
 //nCr(n,r)
 //The Choose function
@@ -340,6 +340,20 @@ function fdbargraph($bl,$freq,$label,$width=300,$height=200) {
 	//$outst .= "axes($cw,$step,1,1000,$step); fill=\"blue\"; text([". ($start + .5*($x-$start))  .",". (-.1*$maxfreq) . "],\"$label\");";
 	$outst .= $st;
 	return showasciisvg($outst,$width,$height);
+}
+
+//piechart(percents, labels, {width, height})
+//create a piechart
+//percents: array of pie percents (should total 100%)
+//labels: array of labels for each pie piece
+//uses Google Charts API
+function piechart($pcts,$labels,$w=350,$h=150) {
+	$out = "<img src=\"http://chart.apis.google.com/chart?cht=p&amp;chd=t:";
+	$out .= implode(',',$pcts);
+	$out .= "&amp;chs={$w}x{$h}&amp;chl=";
+	$out .= implode('|',$labels);
+	$out .= '" alt="Pie Chart" />';
+	return $out;
 }
 
 //normrand(mu,sigma,n)
