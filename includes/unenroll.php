@@ -51,16 +51,18 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false) {
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 		}
-		if ($delforum) {
-			foreach ($forums as $fid) {
-				$query = "DELETE FROM imas_forum_posts WHERE forumid='$fid' AND posttype=0";
-				mysql_query($query) or die("Query failed : " . mysql_error());
-			}
-		}
-		if ($deloffline) {
-		 	$query = "DELETE from imas_gbitems WHERE courseid='$cid'";
+		
+		
+	}
+	if ($delforum) {
+		foreach ($forums as $fid) {
+			$query = "DELETE FROM imas_forum_posts WHERE forumid='$fid' AND posttype=0";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		}
+	}
+	if ($deloffline) {
+		$query = "DELETE from imas_gbitems WHERE courseid='$cid'";
+		mysql_query($query) or die("Query failed : " . mysql_error());
 	}
 		 
 }
