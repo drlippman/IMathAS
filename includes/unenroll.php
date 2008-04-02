@@ -4,33 +4,36 @@
 //$cid = courseid
 //$tounenroll = array of userids
 //$delforum = delete all forum posts
-//$delforum = delete offline items from gradebook
-function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false) {
-
-	if (count($tounenroll)>0) {
-		$assesses = array();
-		$query = "SELECT id FROM imas_assessments WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
-			$assesses[] = $row[0];
+//$deloffline = delete offline items from gradebook
+//$unwithdraw = unset any withdrawn questions
+function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$unwithdraw=false) {
+	$forums = array();
+	$threads = array();
+	$query = "SELECT id FROM imas_forums WHERE courseid='$cid'";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	while ($row = mysql_fetch_row($result)) {
+		$forums[] = $row[0];
+		$q2 = "SELECT threadid FROM imas_forum_posts WHERE forumid='{$row[0]}'";
+		$r2 = mysql_query($q2) or die("Query failed : " . mysql_error());
+		while ($rw2 = mysql_fetch_row($r2)) {
+			$threads[] = $rw2[0];
 		}
+	}
+	
+	$assesses = array();
+	$query = "SELECT id FROM imas_assessments WHERE courseid='$cid'";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	while ($row = mysql_fetch_row($result)) {
+		$assesses[] = $row[0];
+	}
+	
+	if (count($tounenroll)>0) {
+		
 		$gbitems = array();
 		$query = "SELECT id FROM imas_gbitems WHERE courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
 			$gbitems[] = $row[0];
-		}
-		$forums = array();
-		$threads = array();
-		$query = "SELECT id FROM imas_forums WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
-			$forums[] = $row[0];
-			$q2 = "SELECT threadid FROM imas_forum_posts WHERE forumid='{$row[0]}'";
-			$r2 = mysql_query($q2) or die("Query failed : " . mysql_error());
-			while ($rw2 = mysql_fetch_row($r2)) {
-				$threads[] = $rw2[0];
-			}
 		}
 		foreach ($tounenroll as $uid) {
 			$query = "DELETE FROM imas_students WHERE userid='$uid' AND courseid='$cid'";
@@ -63,6 +66,12 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false) {
 	if ($deloffline) {
 		$query = "DELETE from imas_gbitems WHERE courseid='$cid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
+	}
+	if ($unwithdraw) {
+		foreach ($assesses as $aid) {
+			$query = "UPDATE imas_questions SET withdrawn=0 WHERE assessmentid='$aid'";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+		}
 	}
 		 
 }

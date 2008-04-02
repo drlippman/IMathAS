@@ -21,16 +21,9 @@
 		}
 		
 		require_once("../includes/unenroll.php");
-		unenrollstu($cid,$tounenroll,($_GET['uid']=="all" || isset($_POST['delforumposts'])),($_GET['uid']=="all" && isset($_POST['removeoffline'])));
+		unenrollstu($cid,$tounenroll,($_GET['uid']=="all" || isset($_POST['delforumposts'])),($_GET['uid']=="all" && isset($_POST['removeoffline'])),($_GET['uid']=="all"));
 		
-		if ($_GET['uid']=="all") {
-			$query = "SELECT id FROM imas_assessments WHERE courseid='$cid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			while ($row = mysql_fetch_row($result)) {
-				$query = "UPDATE imas_questions SET withdrawn=0 WHERE assessmentid='{$row[0]}'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
-			}
-		}
+		
 		if ($calledfrom=='lu') {
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
 			exit;
