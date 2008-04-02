@@ -139,14 +139,19 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			$xmax = $xmaxarr[0];
 			$avoid = array_slice($xmaxarr,1);
 		} else {$xmax = $settings[1];}
+		if ($function[2]!='' || $function[3]!='') {
+			$domainlimited = true;
+		} else {
+			$domainlimited = false;
+		}
 		
 		if ($GLOBALS['sessiondata']['graphdisp']==0) {
 			$dx = 1;
 			$alt .= "<table class=stats><thead><tr><th>x</th><th>y</th></thead></tr><tbody>";
 			$stopat = ($xmax-$xmin)+1;
 		} else {
-			$dx = ($xmax - $xmin + 10*($xmax-$xmin)/$settings[6] )/100;
-			$stopat = 102;
+			$dx = ($xmax - $xmin + ($domainlimited?0:10*($xmax-$xmin)/$settings[6]) )/100;
+			$stopat = ($domainlimited?101:102);
 			if ($xmax==$xmin) {
 				$stopat = 1;
 			}
@@ -157,13 +162,13 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		$py = null;
 		for ($i = 0; $i<$stopat;$i++) {
 			if ($isparametric) {
-				$t = $xmin + $dx*$i - 1E-10;
+				$t = $xmin + $dx*$i + 1E-10;
 				if (in_array($t,$avoid)) { continue;}
 				$x = round(eval("return ($xfunc);"),3);
 				$y = round(eval("return ($yfunc);"),3);
 				$alt .= "<tr><td>$x</td><td>$y</td></tr>";
 			} else {
-				$x = $xmin + $dx*$i - 1E-10 - 5*($xmax-$xmin)/$settings[6];
+				$x = $xmin + $dx*$i + 1E-10 - ($domainlimited?0:5*($xmax-$xmin)/$settings[6]);
 				if (in_array($x,$avoid)) { continue;}
 				$y = round(eval("return ($func);"),3);
 				$alt .= "<tr><td>".($xmin + $dx*$i)."</td><td>$y</td></tr>";
