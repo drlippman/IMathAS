@@ -15,7 +15,7 @@
 	} 
 	function mathfiltercallback($arr) {
 		global $AMT,$mathimgurl;
-		$arr[1] = str_replace(array('&ne;','&quot;'),array('ne','"'),$arr[1]);
+		$arr[1] = str_replace(array('&ne;','&quot;','&lt;','&gt;','&le;','&ge;'),array('ne','"','lt','gt','le','ge'),$arr[1]);
 		return ('<img style="vertical-align: middle;" src="'.$mathimgurl.'?'.rawurlencode($AMT->convert($arr[1])).'" alt="'.str_replace('"','&quot;',$arr[0]).'">');
 	}
 	function svgfiltersscrcallback($arr) {
