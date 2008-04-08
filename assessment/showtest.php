@@ -1170,7 +1170,7 @@
 			echo "$earned/$poss</p>";
 		}
 		if (!$isdiag && $testsettings['noprint']==0) {
-			echo "<p><a href=\"#\" onclick=\"window.open('$imasroot/assessment/printtest.php','printver','width=400,height=300,menubar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420))\">Print Version</a></p> ";
+			echo "<p><a href=\"#\" onclick=\"window.open('$imasroot/assessment/printtest.php','printver','width=400,height=300,toolbar=1,menubar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));return false;\">Print Version</a></p> ";
 		}
 
 		echo "</div>\n";

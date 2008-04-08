@@ -226,5 +226,14 @@ function csc($x) {
 function cot($x) {
 	return (1/tan($x));
 }
+function sech($x) {
+	return (1/cosh($x));
+}
+function csch($x) {
+	return (1/sinh($x));
+}
+function coth($x) {
+	return (1/tanh($x));
+}
 
 ?>
