@@ -175,7 +175,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			}
 			
 			
-			if ($py==null) { //starting line
+			if ($py===null) { //starting line
 				
 			} else if ($y>$ymax || $y<$ymin) { //going or still out of bounds
 				if ($py <= $ymax && $py >= $ymin) { //going out
