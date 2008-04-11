@@ -296,19 +296,23 @@ function AMpreview(inputId,outputId) {
   vars = vl.split("|");
   
   var str = document.getElementById(inputId).value;
+   var dispstr = str;
+   
   for (var i=0; i<vars.length; i++) {
 	  if (vars[i].charCodeAt(0)>96) { //lowercase
 		  if (arraysearch(vars[i].toUpperCase(),vars)==-1) {
+			vars[i] = vars[i].toLowerCase();
 			str = str.replace(new RegExp(vars[i],"gi"),vars[i]);	  
 		  }
 	  } else {
 		   if (arraysearch(vars[i].toLowerCase(),vars)==-1) {
+			vars[i] = vars[i].toLowerCase();
 			str = str.replace(new RegExp(vars[i],"gi"),vars[i]);	  
 		  }
 	  }
   }
+  vl = vars.join("|");
  
-  var dispstr = str;
   //quote out multiletter variables
   var varstoquote = new Array();
   for (var i=0; i<vars.length; i++) {
@@ -581,14 +585,17 @@ function doonsubmit(form,type2,skipconfirm) {
 		for (var j=0; j<vars.length; j++) {
 			  if (vars[j].charCodeAt(0)>96) { //lowercase
 				  if (arraysearch(vars[j].toUpperCase(),vars)==-1) {
-					str = str.replace(new RegExp(vars[j],"gi"),vars[j]);	  
+					  vars[j] = vars[j].toLowerCase();
+					  str = str.replace(new RegExp(vars[j],"gi"),vars[j]);	  
 				  }
 			  } else {
 				   if (arraysearch(vars[j].toLowerCase(),vars)==-1) {
+					vars[j] = vars[j].toLowerCase();
 					str = str.replace(new RegExp(vars[j],"gi"),vars[j]);	  
 				  }
 			  }
 		  }
+		varlist = vars.join("|");
 		
 		if (fl!='') {
 			reg = new RegExp("("+fl+")\\(","g");
