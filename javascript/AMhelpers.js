@@ -296,6 +296,18 @@ function AMpreview(inputId,outputId) {
   vars = vl.split("|");
   
   var str = document.getElementById(inputId).value;
+  for (var i=0; i<vars.length; i++) {
+	  if (vars[i].charCodeAt(0)>96) { //lowercase
+		  if (arraysearch(vars[i].toUpperCase(),vars)==-1) {
+			str = str.replace(new RegExp(vars[i],"gi"),vars[i]);	  
+		  }
+	  } else {
+		   if (arraysearch(vars[i].toLowerCase(),vars)==-1) {
+			str = str.replace(new RegExp(vars[i],"gi"),vars[i]);	  
+		  }
+	  }
+  }
+ 
   var dispstr = str;
   //quote out multiletter variables
   var varstoquote = new Array();
@@ -565,6 +577,19 @@ function doonsubmit(form,type2,skipconfirm) {
 		}
 		fl = flist[functoproc[i]];
 		varlist = vlist[functoproc[i]];
+		vars = varlist.split("|");
+		for (var j=0; j<vars.length; j++) {
+			  if (vars[j].charCodeAt(0)>96) { //lowercase
+				  if (arraysearch(vars[j].toUpperCase(),vars)==-1) {
+					str = str.replace(new RegExp(vars[j],"gi"),vars[j]);	  
+				  }
+			  } else {
+				   if (arraysearch(vars[j].toLowerCase(),vars)==-1) {
+					str = str.replace(new RegExp(vars[j],"gi"),vars[j]);	  
+				  }
+			  }
+		  }
+		
 		if (fl!='') {
 			reg = new RegExp("("+fl+")\\(","g");
 			str = str.replace(reg,"$1*sin($1+");
@@ -601,3 +626,12 @@ function doonsubmit(form,type2,skipconfirm) {
 	}
 	return true;
 }
+
+function arraysearch(needle,hay) {
+      for (var i=0; i<hay.length;i++) {
+            if (hay[i]==needle) {
+                  return i;
+            }
+      }
+      return -1;
+   }

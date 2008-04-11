@@ -229,7 +229,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stus[] = $row[0];
 		}
 		
-		$query = "SELECT ias.agroupid,ias.id,iu.LastName,iu.FirstName,ias.userid FROM imas_users AS iu, imas_assessment_sessions as ias WHERE ";
+		$query = "SELECT ias.agroupid,ias.id,iu.LastName,iu.FirstName,ias.userid,ias.bestscores,ias.userid FROM imas_users AS iu, imas_assessment_sessions as ias WHERE ";
 		$query .= "ias.userid=iu.id AND ias.assessmentid='$aid' AND ias.agroupid>0 ORDER BY agroupid,iu.LastName,iu.FirstName";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$lastgroup = -1; $grpcnt = 1; $grpstus = array(); $groupids = array();
@@ -239,7 +239,17 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				if ($lastgroup!=-1) {
 					$page_ulList .= "		</ul>\n";
 				}
-				$page_ulList .=  "	<h4>Group $grpcnt</h4>\n";
+				$scores = explode(",",$row[5]);
+				$pts = 0;
+				for ($j=0;$j<count($scores);$j++) {
+					$pts += getpts($scores[$j]);
+					//if ($scores[$i]>0) {$total += $scores[$i];}
+				}
+				$page_ulList .=  "	<b>Group $grpcnt</b> \n";
+				$page_ulList .= "<a href=\"gb-viewasid.php?cid=$cid&aid=$aid&asid={$row[1]}&uid={$row[6]}&from=stugrp\">$pts pts</a>";
+				if (in_array(-1,$scores)) {
+					$page_ulList .= " (IP)";
+				}
 				$page_ulList .=  "		<ul>\n";
 				$groupids[$grpcnt] = $row[0];
 				$grpcnt++;
@@ -352,5 +362,24 @@ if ($overwriteBody==1) {
 }	
 
 require("../footer.php");
+
+function getpts($sc) {
+	if (strpos($sc,'~')===false) {
+		if ($sc>0) { 
+			return $sc;
+		} else {
+			return 0;
+		}
+	} else {
+		$sc = explode('~',$sc);
+		$tot = 0;
+		foreach ($sc as $s) {
+			if ($s>0) { 
+				$tot+=$s;
+			}
+		}
+		return round($tot,1);
+	}
+}
 ?>
 	

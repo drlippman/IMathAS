@@ -337,11 +337,14 @@
 		}
 		
 		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-		echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 		if ($stu>0) {
+			echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 			echo "&gt; <a href=\"gradebook.php?stu=$stu&cid=$cid\">Student Detail</a> ";
 		} else if ($_GET['from']=="isolate") {
+			echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 			echo "&gt; <a href=\"isolateassessgrade.php?cid=$cid&aid={$_GET['aid']}\">View Scores</a> ";	
+		} else if ($_GET['from']=='stugrp') {
+			echo "&gt; <a href=\"managestugrps.php?cid=$cid&aid={$_GET['aid']}\">Student Groups</a> ";	
 		}
 		echo "&gt; Detail</div>";
 		echo "<h2>Grade Book Detail</h2>\n";

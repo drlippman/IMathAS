@@ -812,7 +812,10 @@ function gbinstrdisp() {
 		}
 	}
 	echo "</tbody></table>";
-	$sarr = implode(",",array_fill(0,$n,"'N'"));
+	$sarr = array_fill(0,$n-1,"'N'");
+	array_unshift($sarr,"'S'");
+	
+	$sarr = implode(",",$sarr);
 	echo "<script>initSortTable('myTable',Array($sarr),true,false);</script>\n";
 		
 	
