@@ -173,6 +173,16 @@
 			echo "</html></body>\n";
 			exit;
 		} else {
+			$query = "SELECT * FROM imas_teachers WHERE userid='$userid' AND courseid='{$_POST['cid']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			if (mysql_num_rows($result)>0) {
+				echo "<html><body>\n";
+				echo "You are a teacher for this course, and can't enroll as a student.  Use Student View to see ";
+				echo "the class from a student's perspective, or create a dummy student account.  ";
+				echo "Click on the course name on the <a href=\"index.php\">main page</a> to access the course\n";
+				echo "</html></body>\n";
+				exit;
+			}
 			$query = "SELECT * FROM imas_students WHERE userid='$userid' AND courseid='{$_POST['cid']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (mysql_num_rows($result)>0) {

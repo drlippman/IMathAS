@@ -70,15 +70,19 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				$body = "Error, username doesn't exist. <a href=\"listusers.php?cid=$cid&enroll=student\">Try again</a>\n";
 			} else {
 				$id = mysql_result($result,0,0);
-				$vals = "$id,$cid";
+				if ($id==$userid) {
+					echo "Instructors can't enroll themselves as students.  Use Student View.";
+					exit;
+				}
+				$vals = "$id,'$cid'";
 				$query = "INSERT INTO imas_students (userid,courseid";
 				if (trim($_POST['section'])!='') {
 					$query .= ",section";
-					$vals .= ",".$_POST['section'];
+					$vals .= ",'".$_POST['section']."'";
 				}
 				if (trim($_POST['code'])!='') {
 					$query .= ",code";
-					$vals .= ",".$_POST['code'];
+					$vals .= ",'".$_POST['code']."'";
 				}
 				$query .= ") VALUES ($vals)";
 				mysql_query($query) or die("Query failed : " . mysql_error());
@@ -103,7 +107,18 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				$query .= "VALUES ('{$_POST['SID']}','$md5pw',10,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',0);";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				$newuserid = mysql_insert_id();
-				$query = "INSERT INTO imas_students (userid,courseid) VALUES ($newuserid,'$cid')";
+				//$query = "INSERT INTO imas_students (userid,courseid) VALUES ($newuserid,'$cid')";
+				$vals = "$newuserid,'$cid'";
+				$query = "INSERT INTO imas_students (userid,courseid";
+				if (trim($_POST['section'])!='') {
+					$query .= ",section";
+					$vals .= ",'".$_POST['section']."'";
+				}
+				if (trim($_POST['code'])!='') {
+					$query .= ",code";
+					$vals .= ",'".$_POST['code']."'";
+				}
+				$query .= ") VALUES ($vals)";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
 				exit;
@@ -131,6 +146,21 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			}
 			$query .= " WHERE id='{$_GET['uid']}'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
+			
+			
+			$code = "'{$_POST['code']}'";
+			$section = "'{$_POST['section']}'";
+			if (trim($_POST['section'])==='') {
+				$section = "NULL";
+			}
+			if (trim($_POST['code'])==='') {
+				$code = "NULL";
+			}
+			$query = "UPDATE imas_students SET code=$code,section=$section WHERE userid='{$_GET['uid']}'";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+		
+			
+			
 			require("../header.php");
 			echo "<p>User info updated. ";
 			if ($updateusername) {
@@ -147,7 +177,8 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			//header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
 			exit;
 		} else {
-			$query = "SELECT * FROM imas_users WHERE id='{$_GET['uid']}'";
+			$query = "SELECT imas_users.*,imas_students.code,imas_students.section FROM imas_users,imas_students ";
+			$query .= "WHERE imas_users.id=imas_students.userid AND imas_users.id='{$_GET['uid']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$lineStudent = mysql_fetch_array($result, MYSQL_ASSOC);
 			
@@ -288,6 +319,10 @@ if ($overwriteBody==1) {
 	<span class=form><label for="firstname">Enter First Name:</label></span> <input class=form type=text size=20 id=firstnam name=firstname><BR class=form>
 	<span class=form><label for="lastname">Enter Last Name:</label></span> <input class=form type=text size=20 id=lastname name=lastname><BR class=form>
 	<span class=form><label for="email">Enter E-mail address:</label></span>  <input class=form type=text size=60 id=email name=email><BR class=form>
+	<span class=form>Section (optional):</span>
+		<span class=formright><input type="text" name="section"></span><br class=form>
+	<span class=form>Code (optional):</span>
+		<span class=formright><input type="text" name="code"></span><br class=form>
 	<div class=submit><input type=submit value="Create and Enroll"></div>
 	</form>
 
@@ -305,6 +340,10 @@ if ($overwriteBody==1) {
 			<input class=form type=text size=20 id=lastname name=lastname value="<?php echo $lineStudent['LastName'] ?>"><BR class=form>
 			<span class=form><label for="email">Enter E-mail address:</label></span>
 			<input class=form type=text size=60 id=email name=email value="<?php echo $lineStudent['email'] ?>"><BR class=form>
+			<span class=form>Section (optional):</span>
+			<span class=formright><input type="text" name="section" value="<?php echo $lineStudent['section'] ?>"></span><br class=form>
+			<span class=form>Code (optional):</span>
+			<span class=formright><input type="text" name="code" value="<?php echo $lineStudent['code'] ?>"></span><br class=form>
 			<span class=form>Reset password?</span>
 			<span class=formright>
 				<input type=checkbox name="doresetpw" value="1" /> Reset to: 

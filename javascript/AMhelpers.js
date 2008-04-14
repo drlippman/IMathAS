@@ -380,7 +380,7 @@ function AMpreview(inputId,outputId) {
 
   if (isNaN(res) || res=="Infinity") {
 	  trg = str.match(/(sin|cos|tan|sec|csc|cot)\^/);
-	  reg = new RegExp("(sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs)("+vl+"|\\d)");
+	  reg = new RegExp("(sqrt|ln|log|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs)("+vl+"|\\d)");
 	  errstuff = str.match(reg)
 	  if (trg!=null) {
 		  trg = trg[1];
@@ -404,9 +404,10 @@ function AMpreview(inputId,outputId) {
 			  err += ": unmatched parens";
 		  } else {
 			 //catch (cos)(x)
-			reg = new RegExp("(sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs)[^\(]");
-			errstuff = str.match(reg);
-			if (errstuff!=null) {
+			 reg = new RegExp("(sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs)([^\(])");
+			 errstuff = str.match(reg);
+			 
+			if (errstuff!=null && errstuff[2]!='h') {
 				err = "syntax error: use function notation - "+errstuff[1]+"(x)";
 			} else {
 				err = "syntax error";
@@ -415,8 +416,7 @@ function AMpreview(inputId,outputId) {
 		  //err = "syntax error";
 	  }
   } else {
-	  
-	reg = new RegExp("(sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs)\\s*("+vl+")");
+	reg = new RegExp("(sqrt|ln|log|sinh|cosh|tanh|sech|csch|tanh|sin|cos|tan|sec|csc|cot|abs)\\s*("+vl+")");
 	errstuff = str.match(reg);
 	if (errstuff!=null) {
 		err += ": warning: use "+errstuff[1]+"("+errstuff[2]+") rather than "+errstuff[0];
