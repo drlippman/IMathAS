@@ -1,8 +1,8 @@
-<?
-//Matrix functions.  Version 1.3, March 30, 2008
+<?php
+//Matrix functions.  Version 1.3.1, April 16, 2008
 
 global $allowedmacros;
-array_push($allowedmacros,"matrix","matrixformat","matrixsum","matrixdiff","matrixscalar","matrixprod","matrixaugment","matrixrowscale","matrixrowswap","matrixrowcombine","matrixrowcombine3","matrixidentity","matrixtranspose","matrixrandinvertible","matrixrandunreduce","matrixinverse","matrixsolve","polyregression");
+array_push($allowedmacros,"matrix","matrixformat","matrixsystemdisp","matrixsum","matrixdiff","matrixscalar","matrixprod","matrixaugment","matrixrowscale","matrixrowswap","matrixrowcombine","matrixrowcombine3","matrixidentity","matrixtranspose","matrixrandinvertible","matrixrandunreduce","matrixinverse","matrixsolve","polyregression");
 
 //matrix(vals,rows,cols)
 //Creates a new matrix item.  
@@ -47,6 +47,49 @@ function matrixformat($m) {
 		$out .= ')';
 	}
 	$out .= ']';
+	return $out;
+}
+
+//matrixsystemdisp(matrix,[variables])
+//Writes out a matrix as an equivalent system of equations
+//variables is optional array of variables to use
+function matrixsystemdisp($m,$v=array('x','y','z','w','v')) {
+	$out = '{';
+	for ($i=0; $i<count($m); $i++) {
+		if ($i!=0) {
+			$out .= ',';
+		}
+		$out .= '(';
+		$firstout = false;
+		for ($j=0; $j<count($m[0]); $j++) {
+			if ($j!=0) {
+				$out .= ',';
+			}
+			if ($j==count($m[0])-1) {
+				$out .= '=,'.$m[$i][$j];
+				break;
+			}
+			if ($m[$i][$j]==0) {
+				$out .= ",";
+			} else if ($m[$i][$j]<0) {
+				$out .= "-,";
+			} else if ($firstout) {
+				$out .= "+,";
+			} else {
+				$out .= ',';
+			}
+			if ($m[$i][$j]!=0 && abs($m[$i][$j])!=1) {
+				$out .= abs($m[$i][$j]);
+			}
+			if ($m[$i][$j]!=0 && $j<count($m[0])-1) {
+				$firstout = true;
+				$out .= $v[$j];
+			}
+			
+		}
+		$out .= ')';
+	}
+	$out .= ':}';
 	return $out;
 }
 
