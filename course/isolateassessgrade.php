@@ -55,7 +55,7 @@
 	echo "<h3>Grades for $name</h3>";
 	
 	$query = "SELECT iu.LastName,iu.FirstName,istu.section,";
-	$query .= "ias.id,ias.userid,ias.bestscores,ias.starttime,ias.endtime FROM imas_assessment_sessions AS ias,imas_users AS iu,imas_students AS istu ";
+	$query .= "ias.id,ias.userid,ias.bestscores,ias.starttime,ias.endtime,ias.feedback FROM imas_assessment_sessions AS ias,imas_users AS iu,imas_students AS istu ";
 	$query .= "WHERE iu.id = istu.userid AND istu.courseid='$cid' AND iu.id=ias.userid AND ias.assessmentid='$aid'";
 	if ($hassection && $sortorder=="sec") {
 		 $query .= " ORDER BY istu.section,iu.LastName,iu.FirstName";
@@ -71,7 +71,7 @@
 	if ($hassection) {
 		echo '<th>Section</th>';
 	}
-	echo "<th>Grade</th></tr></thead><tbody>";
+	echo "<th>Grade</th><th>Feedback</th></tr></thead><tbody>";
 	$now = time();
 	$lc = 1;
 	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
@@ -106,7 +106,9 @@
 			echo "{$total}";
 		}
 
-		echo "</a></td></tr>";
+		echo "</a></td>";
+		echo "<td>{$line['feedback']}</td>";
+		echo "</tr>";
 	}
 	
 	echo "</tbody></table>";
