@@ -76,6 +76,7 @@ function mathjs(st,varlist) {
   //parenthesizes the function variables
   st = st.replace("[","(");
   st = st.replace("]",")");
+  st = st.replace(/arc(sin|cos|tan)/g,"arc $1");
   if (varlist != null) {
 	  var reg = new RegExp("("+varlist+")("+varlist+")$","g");
 	  st = st.replace(reg,"($1)($2)");
@@ -92,6 +93,7 @@ function mathjs(st,varlist) {
 	  var reg = new RegExp("([^a-df-zA-Z])("+varlist+")$","g");
 	  st = st.replace(reg,"$1($2)");
   }
+  st = st.replace(/arc\s+(sin|cos|tan)/g,"arc$1");
   st = st.replace(/\s/g,"");
   st = st.replace(/log/g,"logten");
   st = st.replace(/(Sin|Cos|Tan|Sec|Csc|Cot|Arc|Abs|Log|Ln)/g, matchtolower);

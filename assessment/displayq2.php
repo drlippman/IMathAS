@@ -288,8 +288,14 @@ function scoreq($qnidx,$qidx,$seed,$givenans) {
 	if (isset($variable) && !isset($variables)) {
 		$variables =& $variable;
 	}
-	if (isset($reqdecimals) && !isset($abstolerance) && !isset($reltolerance)) {
+	if (isset($reqdecimals) && !is_array($reqdecimals) && !isset($abstolerance) && !isset($reltolerance)) {
 		$abstolerance = 0.5/(pow(10,$reqdecimals));
+	} else if (isset($reqdecimals) && is_array($reqdecimals)) {
+		foreach ($reqdecimals as $k=>$v) {
+			if (!isset($abstolerance[$k]) && !isset($reltolerance[$k])) {
+				$abstolerance[$k] = 0.5/(pow(10,$v));
+			}
+		}
 	}
 	srand($seed+2);
 	//pack options from eval
@@ -1630,6 +1636,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}
 		if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$qn];} else {$reltolerance = $options['reltolerance'];}}
 		if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$qn];} else {$abstolerance = $options['abstolerance'];}}
+		
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = .001;}
 		if (is_array($options['variables'])) {$variables = $options['variables'][$qn];} else {$variables = $options['variables'];}
 
@@ -1712,7 +1719,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 			
 			$realans = eval("return ($answer);");
-	
+			//echo "real: $realans, my: {$myans[$i]},rel: ". (abs($myans[$i]-$realans)/abs($realans))  ."<br/>";
 			if (isNaN($realans)) {$cntnan++; continue;} //avoid NaN problems
 			if ($answerformat=="equation") {  //if equation, store ratios
 				if (abs($realans)>.000001) {

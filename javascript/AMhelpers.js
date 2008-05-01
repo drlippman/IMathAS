@@ -359,8 +359,8 @@ function AMpreview(inputId,outputId) {
 	  vl = vl+'|'+fl;
   }
   vars = vl.split('|');
-  var totesteqn = mathjs(str,vl);
-  
+  var totesteqn = mathjs(str,vl); 
+
   while (tstpt<ptlist.length && (isNaN(res) || res=="Infinity")) {
 	  var totest = '';
 	  testvals = ptlist[tstpt].split("~");
@@ -581,6 +581,7 @@ function doonsubmit(form,type2,skipconfirm) {
 		}
 		fl = flist[functoproc[i]];
 		varlist = vlist[functoproc[i]];
+		
 		vars = varlist.split("|");
 		for (var j=0; j<vars.length; j++) {
 			  if (vars[j].charCodeAt(0)>96) { //lowercase
