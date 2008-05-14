@@ -12,7 +12,7 @@
 			   $blocklist[] = $i+1;
 		   }
 	   }
-	   
+	   if (isset($teacherid)) {echo generateadditem($parent,'t');}
 	   for ($i=0;$i<count($items);$i++) {
 		   if (is_array($items[$i])) { //if is a block
 			$items[$i]['name'] = stripslashes($items[$i]['name']);
@@ -136,9 +136,9 @@
 					}
 					echo "id=\"block{$items[$i]['id']}\">";
 					if ($isopen) {
-						if (isset($teacherid)) {echo generateadditem($parent.'-'.$bnum,'t');}
+						//if (isset($teacherid)) {echo generateadditem($parent.'-'.$bnum,'t');}
 						showitems($items[$i]['items'],$parent.'-'.$bnum);
-						if (isset($teacherid) && count($items[$i]['items'])>0) {echo generateadditem($parent.'-'.$bnum,'b');}
+						//if (isset($teacherid) && count($items[$i]['items'])>0) {echo generateadditem($parent.'-'.$bnum,'b');}
 					} else {
 						echo "Loading content...";
 					}
@@ -247,10 +247,10 @@
 					}
 					echo "id=\"block{$items[$i]['id']}\">";
 					if ($isopen) {
-						if (isset($teacherid)) {echo generateadditem($parent.'-'.$bnum,'t');}
+						//if (isset($teacherid)) {echo generateadditem($parent.'-'.$bnum,'t');}
 						showitems($items[$i]['items'],$parent.'-'.$bnum);
 						
-						if (isset($teacherid) && count($items[$i]['items'])>0) {echo generateadditem($parent.'-'.$bnum,'b');}
+						//if (isset($teacherid) && count($items[$i]['items'])>0) {echo generateadditem($parent.'-'.$bnum,'b');}
 					} else {
 						echo "Loading content...";
 					}
@@ -757,6 +757,9 @@
 			   }
 		   }   
 	   }
+	   if (count($items)>0) {
+		   if (isset($teacherid)) {echo generateadditem($parent,'b');}
+	   }
    }
    
    function generateadditem($blk,$tb) {
@@ -765,7 +768,7 @@
 		$html .= 'style="margin-bottom:5px;"';
 	}
 	$html .= ">\n";
-	$html .= "<option value=\"\">Add An Item</option>\n";
+	$html .= "<option value=\"\">Add An Item...</option>\n";
 	$html .= "<option value=\"assessment\">Add Assessment</option>\n";
 	$html .= "<option value=\"inlinetext\">Add Inline Text</option>\n";
 	$html .= "<option value=\"linkedtext\">Add Linked Text</option>\n";

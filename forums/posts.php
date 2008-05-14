@@ -119,10 +119,11 @@
 	if ($page==-2) {
 		echo "<a href=\"newthreads.php?cid=$cid\">New Threads</a> ";
 	} else {
-		echo "<a href=\"thread.php?cid=$cid&forum=$forumid&page=$page\">Forum Topics</a> ";
+		echo "<a href=\"thread.php?cid=$cid&forum=$forumid&page=$page\">$forumname</a> ";
 	}
 	echo "&gt; Posts</div>\n";
-	echo "<h3>Posts - {$subject[$threadid]}</h3>\n";
+	echo "<p><b style=\"font-size: 120%\">Post: {$subject[$threadid]}</b><br/>\n";
+	echo "<b style=\"font-size: 100%\">Forum: $forumname</b></p>";
 	echo "<input type=button value=\"Expand All\" onclick=\"showall()\"/>";
 	echo "<input type=button value=\"Collapse All\" onclick=\"collapseall()\"/>";
 	if ($view==2) {

@@ -262,6 +262,7 @@ if ($overwriteBody==1) {
 		
 		function additem(blk,tb) {
 			var type = document.getElementById('addtype'+blk+'-'+tb).value;
+			if (tb=='BB' || tb=='LB') { tb = 'b';}
 			if (type!='') {
 				var toopen = '<?php echo $jsAddress2 ?>/add' + type + '.php?block='+blk+'&tb='+tb+'&cid=<?php echo $_GET['cid'] ?>';
 				window.location = toopen;
@@ -294,7 +295,7 @@ if ($overwriteBody==1) {
 	if ($useleftbar && isset($teacherid)) {
 ?>	
 	<div id="leftcontent">
-		<p><?php echo generateadditem($_GET['folder'],'b') ?></p>
+		<p><?php echo generateadditem($_GET['folder'],'LB') ?></p>
 		<p><b>Show:</b><br/>
 			<a href="<?php echo $imasroot ?>/msgs/msglist.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>">
 			Messages</a> <?php echo $newmsgs ?> <br/>
@@ -379,6 +380,8 @@ if ($overwriteBody==1) {
 	 
 	  
 	
+   } else {
+	   if (isset($teacherid)) {echo generateadditem($_GET['folder'],'t');}
    }
    if (isset($backlink)) {
 	   echo $backlink;
@@ -403,7 +406,7 @@ if ($overwriteBody==1) {
 ?>
 	<div class=cp>
 		<span class=column>
-			<?php echo generateadditem($_GET['folder']) ?>
+			<?php echo generateadditem($_GET['folder'], 'BB') ?>
 			<a href="listusers.php?cid=<?php echo $cid ?>">List Students</a><br/>
 			<a href="gradebook.php?cid=<?php echo $cid ?>">Show Gradebook</a><br/>
 			<a href="course.php?cid=<?php echo $cid ?>&stuview=0">Student View</a><br/>
