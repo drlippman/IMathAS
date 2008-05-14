@@ -36,35 +36,51 @@
 
 	$pagetitle = "Manage Exceptions";
 	require("../header.php");
+	
+	
 	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 	if ($calledfrom=='lu') {
 		echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Manage Exceptions</div>\n";
 	} else if ($calledfrom=='gb') {
-		echo "&gt; <a href=\"gradebook.php?cid=$cid&gbmode={$_GET['gbmode']}\">Gradebook</a> &gt; Manage Exceptions</div>\n";
+		echo "&gt; <a href=\"gradebook.php?cid=$cid";
+		if (isset($_GET['uid'])) {
+			echo "&stu={$_GET['uid']}";
+		}
+		echo "\">Gradebook</a> &gt; Manage Exceptions</div>\n";
 	}
 	
 	echo "<h2>Manage Exceptions</h2>\n";
 	if ($calledfrom=='lu') {
 		echo "<form method=post action=\"listusers.php?cid=$cid&massexception=1\">\n";
 	} else if ($calledfrom=='gb') {
-		echo "<form method=post action=\"gradebook.php?cid=$cid&gbmode={$_GET['gbmode']}&massexception=1\">\n";
+		echo "<form method=post action=\"gradebook.php?cid=$cid&massexception=1";
+		if (isset($_GET['uid'])) {
+			echo "&uid={$_GET['uid']}";
+		}
+		echo "\">\n";
 	}
 	
 	if (isset($_POST['tolist'])) {
 		$_POST['checked'] = explode(',',$_POST['tolist']);
 	}
-	if (count($_POST['checked'])==0) {
-		echo "<p>No students selected.</p>";
-		if ($calledfrom=='lu') {
-			echo "<a href=\"listusers.php?cid=$cid\">Try Again</a>\n";
-		} else if ($calledfrom=='gb') {
-			echo "<a href=\"gradebook.php?cid=$cid&gbmode={$_GET['gbmode']}\">Try Again</a>\n";
+	if (isset($_GET['uid'])) {
+		$tolist = "'{$_GET['uid']}'";
+		echo "<input type=hidden name=\"tolist\" value=\"{$_GET['uid']}\">\n";
+	} else {
+		if (count($_POST['checked'])==0) {
+			echo "<p>No students selected.</p>";
+			if ($calledfrom=='lu') {
+				echo "<a href=\"listusers.php?cid=$cid\">Try Again</a>\n";
+			} else if ($calledfrom=='gb') {
+				echo "<a href=\"gradebook.php?cid=$cid\">Try Again</a>\n";
+			}
+			require("../footer.php");
+			exit;
 		}
-		require("../footer.php");
-		exit;
+		echo "<input type=hidden name=\"tolist\" value=\"" . implode(',',$_POST['checked']) . "\">\n";
+		$tolist = "'".implode("','",$_POST['checked'])."'";
 	}
-	echo "<input type=hidden name=\"tolist\" value=\"" . implode(',',$_POST['checked']) . "\">\n";
-	$tolist = "'".implode("','",$_POST['checked'])."'";
+	
 	
 	$isall = false;
 	if (isset($_POST['ca'])) {
@@ -73,6 +89,12 @@
 	}
 	
 	
+	if (isset($_GET['uid']) || count($_POST['checked'])==1) {
+		$query = "SELECT LastName,FirstName FROM imas_users WHERE id=$tolist";
+		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+		$row = mysql_fetch_row($result);
+		echo "<h2>{$row[0]}, {$row[1]}</h2>";
+	}
 	
 	$query = "SELECT ie.id,iu.LastName,iu.FirstName,ia.name,iu.id,ia.id,ie.startdate,ie.enddate FROM imas_exceptions AS ie,imas_users AS iu,imas_assessments AS ia ";
 	$query .= "WHERE ie.assessmentid=ia.id AND ie.userid=iu.id AND ia.courseid='$cid' AND iu.id IN ($tolist) ";
@@ -155,14 +177,16 @@
 	echo '</ul>';
 	echo "<input type=submit value=\"Record Changes\" />";
 	
-	echo "<h4>Students Selected</h4>";
-	$query = "SELECT LastName,FirstName FROM imas_users WHERE id IN ($tolist) ORDER BY LastName,FirstName";
-	$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-	echo "<ul>";
-	while ($row = mysql_fetch_row($result)) {
-		echo "<li>{$row[0]}, {$row[1]}</li>";
+	if (!isset($_GET['uid']) && count($_POST['checked'])>1) {
+		echo "<h4>Students Selected</h4>";
+		$query = "SELECT LastName,FirstName FROM imas_users WHERE id IN ($tolist) ORDER BY LastName,FirstName";
+		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+		echo "<ul>";
+		while ($row = mysql_fetch_row($result)) {
+			echo "<li>{$row[0]}, {$row[1]}</li>";
+		}
+		echo '</ul>';
 	}
-	echo '</ul>';
 	echo '</form>';
 	require("../footer.php");
 	exit;

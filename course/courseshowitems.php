@@ -136,8 +136,9 @@
 					}
 					echo "id=\"block{$items[$i]['id']}\">";
 					if ($isopen) {
+						if (isset($teacherid)) {echo generateadditem($parent.'-'.$bnum,'t');}
 						showitems($items[$i]['items'],$parent.'-'.$bnum);
-						if (isset($teacherid)) {echo generateadditem($parent.'-'.$bnum);}
+						if (isset($teacherid) && count($items[$i]['items'])>0) {echo generateadditem($parent.'-'.$bnum,'b');}
 					} else {
 						echo "Loading content...";
 					}
@@ -246,8 +247,10 @@
 					}
 					echo "id=\"block{$items[$i]['id']}\">";
 					if ($isopen) {
+						if (isset($teacherid)) {echo generateadditem($parent.'-'.$bnum,'t');}
 						showitems($items[$i]['items'],$parent.'-'.$bnum);
-						if (isset($teacherid)) {echo generateadditem($parent.'-'.$bnum);}
+						
+						if (isset($teacherid) && count($items[$i]['items'])>0) {echo generateadditem($parent.'-'.$bnum,'b');}
 					} else {
 						echo "Loading content...";
 					}
@@ -269,7 +272,7 @@
 				   echo "<a href=\"addcalendar.php?id={$items[$i]}&block=$parent&cid=$cid&remove=true\">Delete</a>";
 				   echo " | <a id=\"mcelink\" href=\"managecalitems.php?cid=$cid\">Manage Events</a>";
 			   }
-			   showcalendar();
+			   showcalendar("course");
 			   echo "</div>";
 		   } else if ($line['itemtype']=="Assessment") {
 			   $typeid = $line['typeid'];
@@ -756,8 +759,12 @@
 	   }
    }
    
-   function generateadditem($blk) {
-	$html = "<select name=addtype id=addtype$blk onchange=\"additem('$blk')\">\n";
+   function generateadditem($blk,$tb) {
+	$html = "<select name=addtype id=\"addtype$blk-$tb\" onchange=\"additem('$blk','$tb')\" ";
+	if ($tb=='t') {
+		$html .= 'style="margin-bottom:5px;"';
+	}
+	$html .= ">\n";
 	$html .= "<option value=\"\">Add An Item</option>\n";
 	$html .= "<option value=\"assessment\">Add Assessment</option>\n";
 	$html .= "<option value=\"inlinetext\">Add Inline Text</option>\n";

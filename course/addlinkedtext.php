@@ -23,7 +23,11 @@ if (isset($_GET['id'])) {
 	$curBreadcrumb .= "&gt; Add Linked Text\n";
 	$pagetitle = "Add Linked Text";
 }	
-
+if (isset($_GET['tb'])) {
+	$totb = $_GET['tb'];
+} else {
+	$totb = 'b';
+}
 
 if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
@@ -36,7 +40,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$block = $_GET['block'];	
 	$page_formActionTag = "addlinkedtext.php?block=$block&cid=$cid&folder=" . $_GET['folder'];
 	$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . $_GET['id'] : "";
-
+	$page_formActionTag .= "&tb=$totb";
 	
 	if ($_POST['title']!= null) { //if the form has been submitted
 		if ($_POST['sdatetype']=='0') {
@@ -132,7 +136,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		for ($i=1;$i<count($blocktree);$i++) {
 			$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 		}
-		$sub[] = $itemid;
+		if ($totb=='b') {
+			$sub[] = $itemid;
+		} else if ($totb=='t') {
+			array_unshift($sub,$itemid);
+		}
 		$itemorder = addslashes(serialize($items));
 		
 		$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";

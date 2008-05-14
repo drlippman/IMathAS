@@ -44,6 +44,11 @@ if (isset($_GET['id'])) {
 } else {
 	$formTitle = "<h2>Add Block <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=blocks','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h2>\n";
 }
+if (isset($_GET['tb'])) {
+	$totb = $_GET['tb'];
+} else {
+	$totb = 'b';
+}
 
 
 $cid = $_GET['cid'];
@@ -124,7 +129,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$blockitems['SH'] = $_POST['showhide'] . $_POST['availbeh'];
 		$blockitems['colors'] = $colors;
 		$blockitems['items'] = array();
-		array_push($sub,$blockitems);
+		if ($totb=='b') {
+			array_push($sub,$blockitems);
+		} else if ($totb=='t') {
+			array_unshift($sub,$blockitems);
+		}
+		
 		$blockcnt++;
 	}
 	$itemorder = addslashes(serialize($items));
@@ -255,7 +265,7 @@ if ($overwriteBody==1) {
 
 <?php echo $formTitle; ?>	
 
-<form method=post action="addblock.php?cid=<?php echo $cid; if (isset($_GET['id'])) {echo "&id={$_GET['id']}";} if (isset($_GET['block'])) {echo "&block={$_GET['block']}";}?>&folder=<?php echo $_GET['folder'];?>">
+<form method=post action="addblock.php?cid=<?php echo $cid; if (isset($_GET['id'])) {echo "&id={$_GET['id']}";} if (isset($_GET['block'])) {echo "&block={$_GET['block']}";}?>&folder=<?php echo $_GET['folder'];?>&tb=<?php echo $totb;?>">
 	<span class=form>Title: </span>
 	<span class=formright><input type=text size=60 name=title value="<?php echo str_replace('"','&quot;',$title);?>"></span>
 	<BR class=form>

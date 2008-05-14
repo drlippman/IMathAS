@@ -431,7 +431,7 @@ if ($overwriteBody==1) {
 				<td><?php echo $line['SID'] ?></td>
 				<td><?php echo $lastaccess ?></td>
 				<td><a href="gradebook.php?cid=<?php echo $cid ?>&stu=<?php echo $line['userid'] ?>&from=listusers">Grades</a></td>
-				<td><a href="exception.php?cid=<?php echo $cid ?>&uid=<?php echo $line['userid'] ?>">Exception</a></td>
+				<td><a href="listusers.php?cid=<?php echo $cid ?>&uid=<?php echo $line['userid'] ?>&massexception=1">Exception</a></td>
 				<td><a href="listusers.php?cid=<?php echo $cid ?>&chgstuinfo=true&uid=<?php echo $line['userid'] ?>">Chg</a></td>
 				<td><a href="listusers.php?cid=<?php echo $cid ?>&action=unenroll&uid=<?php echo $line['userid'] ?>">Unenroll</a></td>
 			</tr>

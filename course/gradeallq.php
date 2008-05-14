@@ -181,6 +181,7 @@
 			}
 			echo '>';
 			$lastanswers[$cnt] = $la[$loc];
+			$teacherreview = $line['userid'];
 			displayq($cnt,$qsetid,$seeds[$loc],true,false,$attempts[$loc]);
 			echo '</div>';
 			

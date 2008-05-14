@@ -20,6 +20,11 @@ if (isset($_GET['from'])) {
 } else {
 	$from = 'cp';
 }
+if (isset($_GET['tb'])) {
+	$totb = $_GET['tb'];
+} else {
+	$totb = 'b';
+}
 
 $curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 if ($from=='gb') {
@@ -191,7 +196,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			for ($i=1;$i<count($blocktree);$i++) {
 				$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 			}
-			$sub[] = $itemid;
+			if ($totb=='b') {
+				$sub[] = $itemid;
+			} else if ($totb=='t') {
+				array_unshift($sub,$itemid);
+			}
+				
 			$itemorder = addslashes(serialize($items));
 			
 			$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid';";
@@ -314,6 +324,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$page_formActionTag .= "&id=" . $_GET['id'];
 		}
 		$page_formActionTag .= "&folder=" . $_GET['folder'] . "&from=" . $_GET['from'];
+		$page_formActionTag .= "&tb=$totb";
 		
 		$query = "SELECT id,name FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());

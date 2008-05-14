@@ -23,7 +23,11 @@ if (isset($_GET['id'])) {
 	$curBreadcrumb .= "&gt; Add Forum</div>\n";
 	$pagetitle = "Add Forum";
 } 
-
+if (isset($_GET['tb'])) {
+	$totb = $_GET['tb'];
+} else {
+	$totb = 'b';
+}
 
 if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
@@ -106,7 +110,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		for ($i=1;$i<count($blocktree);$i++) {
 			$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 		}
-		$sub[] = $itemid;
+		if ($totb=='b') {
+			$sub[] = $itemid;
+		} else if ($totb=='t') {
+			array_unshift($sub,$itemid);
+		}
 		$itemorder = addslashes(serialize($items));
 		$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid';";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -168,7 +176,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		
 		$page_formActionTag = "?block=$block&cid=$cid&folder=" . $_GET['folder'];
 		$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . $_GET['id'] : "";
-
+		$page_formActionTag .= "&tb=$totb";
 		
 		if ($startdate!=0) {
 			$sdate = tzdate("m/d/Y",$startdate);

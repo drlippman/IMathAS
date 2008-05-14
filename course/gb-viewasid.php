@@ -345,6 +345,8 @@
 			echo "&gt; <a href=\"isolateassessgrade.php?cid=$cid&aid={$_GET['aid']}\">View Scores</a> ";	
 		} else if ($_GET['from']=='stugrp') {
 			echo "&gt; <a href=\"managestugrps.php?cid=$cid&aid={$_GET['aid']}\">Student Groups</a> ";	
+		} else {
+			echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 		}
 		echo "&gt; Detail</div>";
 		echo "<h2>Grade Book Detail</h2>\n";
@@ -394,6 +396,7 @@
 		
 		if ($isteacher) {
 			echo "<p>Due Date: ". tzdate("F j, Y, g:i a",$line['enddate']);
+			echo " | <a href=\"exception.php?cid=$cid&aid={$line['assessmentid']}&uid={$_GET['uid']}&asid={$_GET['asid']}\">Make/Edit Exception</a>";
 			if (isset($exped) && $exped!=$line['enddate']) {
 				echo "<br/>Has exception, with due date: ".tzdate("F j, Y, g:i a",$exped);
 			}

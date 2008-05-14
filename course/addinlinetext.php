@@ -35,7 +35,11 @@ if (isset($_GET['id'])) {
 	$curBreadcrumb .= "&gt; Add Inline Text\n";
 	$pagetitle = "Add Inline Text";
 }	
-
+if (isset($_GET['tb'])) {
+	$totb = $_GET['tb'];
+} else {
+	$totb = 'b';
+}
 
 if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
@@ -47,7 +51,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$cid = $_GET['cid'];
 	$block = $_GET['block'];	
 	$page_formActionTag = "addinlinetext.php?block=$block&cid=$cid&folder=" . $_GET['folder'];
-
+	$page_formActionTag .= "&tb=$totb";
+	
 	if ($_POST['title']!= null || $_POST['text']!=null || $_POST['sdate']!=null) { //if the form has been submitted
 		if ($_POST['sdatetype']=='0') {
 			$startdate = 0;
@@ -113,7 +118,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			for ($i=1;$i<count($blocktree);$i++) {
 				$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 			}
-			$sub[] = $itemid;
+			if ($totb=='b') {
+				$sub[] = $itemid;
+			} else if ($totb=='t') {
+				array_unshift($sub,$itemid);
+			}
 			$itemorder = addslashes(serialize($items));
 			$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());

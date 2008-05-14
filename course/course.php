@@ -260,10 +260,10 @@ if ($overwriteBody==1) {
 			}
 		}
 		
-		function additem(blk) {
-			var type = document.getElementById('addtype'+blk).value;
+		function additem(blk,tb) {
+			var type = document.getElementById('addtype'+blk+'-'+tb).value;
 			if (type!='') {
-				var toopen = '<?php echo $jsAddress2 ?>/add' + type + '.php?block='+blk+'&cid=<?php echo $_GET['cid'] ?>';
+				var toopen = '<?php echo $jsAddress2 ?>/add' + type + '.php?block='+blk+'&tb='+tb+'&cid=<?php echo $_GET['cid'] ?>';
 				window.location = toopen;
 			}
 		}
@@ -294,7 +294,7 @@ if ($overwriteBody==1) {
 	if ($useleftbar && isset($teacherid)) {
 ?>	
 	<div id="leftcontent">
-		<p><?php echo generateadditem($_GET['folder']) ?></p>
+		<p><?php echo generateadditem($_GET['folder'],'b') ?></p>
 		<p><b>Show:</b><br/>
 			<a href="<?php echo $imasroot ?>/msgs/msglist.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>">
 			Messages</a> <?php echo $newmsgs ?> <br/>

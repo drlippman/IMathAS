@@ -26,6 +26,7 @@
 		reRowText = /(\< *[^\>]*\>|\&nbsp\;|\,|[^\d\.\/])/g;
 		a = a.replace(reRowText,"");
 		b = b.replace(reRowText,"");
+		
 		//a = a.replace(/,/,'.');
 		//b = b.replace(/,/,'.');
 		//a = a.replace(/[^\d\.\/]/g,'');
@@ -34,6 +35,7 @@
 		if(b.indexOf('/')>=0) b = eval(b);
 		if (isNaN(a)) { a=0; }
 		if (isNaN(b)) { b=0; }
+		
 		return a/1 - b/1;
 		} catch(e) {
 			return 0;
@@ -128,7 +130,6 @@
 		}else{
 			cellArray = cellArray.sort(sortString);
 		}
-		
 		
 		if(direction=='descending'){
 			for(var no=cellArray.length;no>=0;no--){

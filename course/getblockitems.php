@@ -87,6 +87,9 @@
 		$latepasses = 0;
 	}
    
+   if (isset($teacherid)) {
+	   echo generateadditem($_GET['folder'],'t');
+   }
    if (count($items)>0) {
 	   //update block start/end dates to show blocks containing items with exceptions
 	  
@@ -95,11 +98,12 @@
 	   }
 	   	   
 	   showitems($items,$_GET['folder']);
+	   if (isset($teacherid)) {
+		   echo generateadditem($_GET['folder'],'b');
+	   }
    }
 
-   if (isset($teacherid)) {
-	   echo generateadditem($_GET['folder']);
-   }
+   
    if ($firstload) {
 	   echo "<script>document.cookie = 'openblocks-$cid=' + oblist;</script>\n";
    }

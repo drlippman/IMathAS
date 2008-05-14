@@ -14,9 +14,12 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = "Make Exception";
 $cid = $_GET['cid'];
+$asid = $_GET['asid'];
+$aid = $_GET['aid'];
+$uid = $_GET['uid'];
 
 $curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a>";
-$curBreadcrumb .= "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt Make Exception\n";
+$curBreadcrumb .= "&gt; <a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; <a href=\"gb-viewasid.php?cid=$cid&asid=$asid&uid=$uid\">Assessment Detail</a> &gt Make Exception\n";
 
 if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
@@ -43,12 +46,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query .= "('{$_GET['uid']}','{$_GET['aid']}',$startdate,$enddate)";
 			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		}
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
+		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-viewasid.php?cid=$cid&asid=$asid&uid=$uid");
 		
 	} else if (isset($_GET['clear'])) {
 		$query = "DELETE FROM imas_exceptions WHERE id='{$_GET['clear']}'";
 		mysql_query($query) or die("Query failed :$query " . mysql_error());
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
+		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-viewasid.php?cid=$cid&asid=$asid&uid=$uid");
 	} elseif (isset($_GET['aid']) && $_GET['aid']!='') {
 		$query = "SELECT startdate,enddate FROM imas_assessments WHERE id='{$_GET['aid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -64,7 +67,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$erow = mysql_fetch_row($result);
 		$page_isExceptionMsg = "";
 		if ($erow != null) {
-			$page_isExceptionMsg = "<p>Exception exists.  <a href=\"exception.php?cid=$cid&aid={$_GET['aid']}&uid={$_GET['uid']}&clear={$erow[0]}\">Clear Exception</a></p>\n";
+			$page_isExceptionMsg = "<p>Exception exists.  <a href=\"exception.php?cid=$cid&aid={$_GET['aid']}&uid={$_GET['uid']}&clear={$erow[0]}&asid=$asid\">Clear Exception</a></p>\n";
 			$sdate = tzdate("m/d/Y",$erow[1]);
 			$edate = tzdate("m/d/Y",$erow[2]);
 			$stime = tzdate("g:i a",$erow[1]);
@@ -72,7 +75,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}	
 	} 
 	//DEFAULT LOAD DATA MANIPULATION
-	$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/exception.php?cid={$_GET['cid']}&uid={$_GET['uid']}";
+	$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/exception.php?cid={$_GET['cid']}&uid={$_GET['uid']}&asid=$asid";
 
 	$query = "SELECT id,name from imas_assessments WHERE courseid='$cid' ORDER BY name";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -114,7 +117,7 @@ if ($overwriteBody==1) {
 	if (isset($_GET['aid']) && $_GET['aid']!='') {
 		echo $page_isExceptionMsg;
 ?>		
-	<form method=post action="exception.php?cid=<?php echo $cid ?>&aid=<?php echo $_GET['aid'] ?>&uid=<?php echo $_GET['uid'] ?>">
+	<form method=post action="exception.php?cid=<?php echo $cid ?>&aid=<?php echo $_GET['aid'] ?>&uid=<?php echo $_GET['uid'] ?>&asid=<?php echo $asid;?>">
 		<span class=form>For this student:</span><br class=form>
 		<span class=form>Available After:</span>
 		<span class=formright>

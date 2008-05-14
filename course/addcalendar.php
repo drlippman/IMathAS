@@ -10,6 +10,11 @@ require("../validate.php");
 //set some page specific variables and counters
 $overwriteBody = 0;
 $body = "";
+if (isset($_GET['tb'])) {
+	$totb = $_GET['tb'];
+} else {
+	$totb = 'b';
+}
 
 if (!(isset($teacherid))) {  
 	$overwriteBody = 1;
@@ -59,7 +64,12 @@ if (!(isset($teacherid))) {
 	for ($i=1;$i<count($blocktree);$i++) {
 		$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 	}
-	$sub[] = $itemid;
+	if ($totb=='b') {
+		$sub[] = $itemid;
+	} else if ($totb=='t') {
+		array_unshift($sub,$itemid);
+	}
+	
 	$itemorder = addslashes(serialize($items));
 	$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());

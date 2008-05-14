@@ -87,15 +87,20 @@ if ($myrights < 40) {
 	}
 	
 	//data processing for diagnostics block
-	$query = "SELECT id,name,public FROM imas_diags WHERE ownerid='$groupid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$i=0;
-	while ($row = mysql_fetch_row($result)) {
-		$page_diagnosticsId[$i] = $row[0];
-		$page_diagnosticsName[$i] = $row[1];
-		$page_diagnosticsAvailable[$i] = ($row[2]&1) ? "Yes" : "No";
-		$page_diagnosticsPublic[$i] = ($row[2]&2) ? "Yes" : "No";
-		$i++;		
+	if ($myrights>=75) {
+		$query = "SELECT id,name,public FROM imas_diags";
+		if ($myrights==75) {
+			$query .= " WHERE ownerid='$groupid'";
+		}
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$i=0;
+		while ($row = mysql_fetch_row($result)) {
+			$page_diagnosticsId[$i] = $row[0];
+			$page_diagnosticsName[$i] = $row[1];
+			$page_diagnosticsAvailable[$i] = ($row[2]&1) ? "Yes" : "No";
+			$page_diagnosticsPublic[$i] = ($row[2]&2) ? "Yes" : "No";
+			$i++;		
+		}
 	}
 	
 	//DATA PROCESSING FOR USERS BLOCK
@@ -352,12 +357,13 @@ $placeinhead .= "}</script>";
 		if ($myrights==100) {
 			writeHtmlSelect ("selgrpid",$page_userSelectVal,$page_userSelectLabel,$showusers,null,null,"onchange=\"showgroupusers()\"");	
 		}
-	}
+	
 ?>
-	<p>Passwords reset to: password</p>
+		<p>Passwords reset to: password</p>
 	</div>
 
 <?php
+	}
 }
  require("../footer.php");
 ?>

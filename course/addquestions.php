@@ -641,6 +641,35 @@ if ($overwriteBody==1) {
 <?php	
 	if ($itemorder == '') {
 		echo "<p>No Questions currently in assessment</p>\n";
+		
+		echo '<a href="#" onclick="this.style.display=\'none\';document.getElementById(\'helpwithadding\').style.display=\'block\';return false;">';
+		echo "<img src=\"$imasroot/img/help.gif\" /> ";
+		echo 'How do I find questions to add?</a>';
+		echo '<div id="helpwithadding" style="display:none">';
+		if ($sessiondata['selfrom'.$aid]=='lib') {
+			echo "<p>You are current set to select questions from the question libraries.  If you would like to select questions from ";
+			echo "assessments you've already created, click the <b>Select From Assessments</b> button below</p>";
+			echo "<p>To find questions to add from the question libraries:";
+			echo "<ol><li>Click the <b>Select Libraries</b> button below to pop open the library selector</li>";
+			echo " <li>In the library selector, open up the topics of interest, and click the checkbox to select libraries to use</li>";
+			echo " <li>Scroll down in the library selector, and click the <b>Use Libraries</b> button</li> ";
+			echo " <li>On this page, click the <b>Search</b> button to list the questions in the libraries selected.<br/>  You can limit the listing by entering a sepecific search term in the box provided first, or leave it blank to view all questions in the chosen libraries</li>";
+			echo "</ol>";
+		} else if ($sessiondata['selfrom'.$aid]=='assm') {
+			echo "<p>You are current set to select questions existing assessments.  If you would like to select questions from ";
+			echo "the question libraries, click the <b>Select From Libraries</b> button below</p>";
+			echo "<p>To find questions to add from existing assessments:";
+			echo "<ol><li>Use the checkboxes to select the assessments you want to pull questions from</li>";
+			echo " <li>Click <b>Use these Assessments</b> button to list the questions in the assessments selected</li>";
+			echo "</ol>";
+		}
+		echo "<p>To select questions and add them:</p><ul>";
+		echo " <li>Click the <b>Preview</b> button after the question description to view an example of the question</li>";
+		echo " <li>Use the checkboxes to mark the questions you want to use</li>";
+		echo " <li>Click the <b>Add</b> button above the question list to add the questions to your assessment</li> ";
+		echo "  </ul>";
+		echo '</div>';
+			
 	} else {
 ?>	
 	<form id="curqform" method="post" action="addquestions.php?modqs=true&aid=<?php echo $aid ?>&cid=<?php echo $cid ?>">

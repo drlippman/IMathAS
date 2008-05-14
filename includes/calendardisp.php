@@ -1,6 +1,6 @@
 <?php
 
-function showcalendar() {
+function showcalendar($refpage) {
 
 global $imasroot,$cid,$userid,$teacherid;
 
@@ -72,13 +72,13 @@ for ($i=$dayofweek;$i<28;$i++) {
 
 
 <?php
-echo '<div class=center><a href="course.php?calpageshift='.($pageshift-1).'&cid='.$cid.'">&lt; &lt;</a> ';
+echo '<div class=center><a href="'.$refpage.'.php?calpageshift='.($pageshift-1).'&cid='.$cid.'">&lt; &lt;</a> ';
 if ($pageshift==0) {
 	echo "Now ";
 } else {
 	echo '<a href="course.php?calpageshift=0&cid='.$cid.'">Now</a> ';
 }
-echo '<a href="course.php?calpageshift='.($pageshift+1).'&cid='.$cid.'">&gt; &gt;</a> ';
+echo '<a href="'.$refpage.'.php?calpageshift='.($pageshift+1).'&cid='.$cid.'">&gt; &gt;</a> ';
 echo '</div> ';
 echo "<table class=\"cal\" >";  //onmouseout=\"makenorm()\"
 
