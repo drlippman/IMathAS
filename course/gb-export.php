@@ -21,6 +21,40 @@
 		$stu = 0;
 	}
 	
+	if (!isset($_POST['commentloc'])) {
+		require("../header.php");
+		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=$cid\">$coursename</a> ";
+		echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; Export Gradebook</div>";
+		
+		echo "<form method=post action=\"gb-export.php?cid=$cid&stu=$stu&gbmode=$gbmode";
+		if (isset($_GET['export'])) {
+			echo "&export={$_GET['export']}";
+		} else if (isset($_GET['emailgb'])) {
+			echo "&emailgb={$_GET['emailgb']}";
+		}
+		echo '">';
+		if ($_GET['emailgb']=="ask") {
+			echo "Email Gradebook To: <input type=text name=\"email\" /> <br/>";
+		}
+		
+		echo 'Separate header line for points possible?  <input type="radio" name="pointsln" value="0" checked="checked"> No <input type="radio" name="pointsln" value="1"> Yes<br/>';
+		echo 'Assessment comments:  <input type="radio" name="commentloc" value="1" checked="checked"> Separate columns at end <input type="radio" name="commentloc" value="0"> After scores<br/>';
+		
+		echo '<input type=submit value="Go" />';
+		echo '</form>';
+		require("../footer.php");
+		exit;
+	}
+	
+	if (isset($_POST['email'])) {
+		$_GET['emailgb'] = $_POST['email'];
+	}
+	
+	
+	$commentloc = $_POST['commentloc'];  //0: interleve, 1: at end
+	$pointsln = $_POST['pointsln']; //0: on main, 1: separate line
+	
+	
 	$catfilter = -1;
 	$secfilter = -1;
 	
@@ -31,6 +65,7 @@
 	$availshow = $gbmode%10; //0: past, 1 past&cur, 2 all
 
 	require("gbtable2.php");
+	$includecomments = true;
 	$gb = gbinstrexport();
 	if (isset($_GET['export']) && $_GET['export']=="true") {
 		header('Content-type: text/csv');
@@ -58,16 +93,7 @@
 		exit;
 	} 
 	if (isset($_GET['emailgb'])) {
-		if ($_GET['emailgb']=="ask") {
-			if (isset($_POST['email'])) {
-				$_GET['emailgb'] = $_POST['email'];
-			} else {
-				echo "<html><body><form method=post action=\"gb-export.php?stu=$stu&cid=$cid&emailgb=ask\">";
-				echo "Email Gradebook To: <input type=text name=\"email\" /> <input type=submit value=\"Email\"/>";
-				echo "</form></body></html>";
-				exit;
-			}
-		}
+		
 		$line = '';
 		foreach ($gb as $gbline) {
 			
@@ -119,7 +145,7 @@
 	
 	
 function gbinstrexport() {
-	global $hidenc,$nopt,$isteacher,$cid,$gbmode,$stu,$availshow,$isdiag,$catfilter,$secfilter,$totonleft;
+	global $hidenc,$nopt,$isteacher,$cid,$gbmode,$stu,$availshow,$isdiag,$catfilter,$secfilter,$totonleft,$commentloc,$pointsln;
 	$gbt = gbtable();
 	$gbo = array();
 	//print_r($gbt);
@@ -181,6 +207,10 @@ function gbinstrexport() {
 				$gbo[0][$n] .= ' (PT)';
 			}
 			$n++;
+			if ($commentloc==0) {
+				$gbo[0][$n] = $gbt[0][1][$i][0].': Comments';
+				$n++;
+			}
 		}
 	}
 	if (!$totonleft) {
@@ -210,6 +240,27 @@ function gbinstrexport() {
 	}
 	$gbo[0][$n] = "Comment";
 	$gbo[0][$n+1] = "Instructor Note";
+	$n+=2;
+	if ($commentloc == 1) {
+		if ($catfilter>-2) {
+			for ($i=0;$i<count($gbt[0][1]);$i++) { //assessment comment headers
+				if (!$isteacher && $gbt[0][1][$i][4]==0) { //skip if hidden 
+					continue;
+				}
+				if ($hidenc==1 && $gbt[0][1][$i][4]==0) { //skip NC
+					continue;
+				} else if ($hidenc==2 && ($gbt[0][1][$i][4]==0 || $gbt[0][1][$i][4]==3)) {//skip all NC
+					continue;
+				}
+				if ($gbt[0][1][$i][3]>$availshow) {
+					continue;
+				}
+				//name and points
+				$gbo[0][$n] = $gbt[0][1][$i][0].': Comments';
+				$n++;
+			}
+		}
+	}
 	
 	//get gb comments;
 	$gbcomments = array();
@@ -300,6 +351,14 @@ function gbinstrexport() {
 					}
 				}
 				$n++;
+				if ($commentloc==0) {
+					if (isset($gbt[$i][1][$j][1])) {
+						$gbo[$i][$n] = $gbt[$i][1][$j][1];
+					} else {
+						$gbo[$i][$n] = '';
+					}
+					$n++;
+				}
 			}
 		}
 		if (!$totonleft) {
@@ -336,6 +395,43 @@ function gbinstrexport() {
 			$gbo[$i][$n] = '';
 			$gbo[$i][$n+1] = '';
 		}
+		$n+=2;
+		if ($commentloc == 1) {
+			if ($catfilter>-2) {
+				for ($j=0;$j<count($gbt[0][1]);$j++) {
+					if (!$isteacher && $gbt[0][1][$j][4]==0) { //skip if hidden 
+						continue;
+					}
+					if ($hidenc==1 && $gbt[0][1][$j][4]==0) { //skip NC
+						continue;
+					} else if ($hidenc==2 && ($gbt[0][1][$j][4]==0 || $gbt[0][1][$j][4]==3)) {//skip all NC
+						continue;
+					}
+					if ($gbt[0][1][$j][3]>$availshow) {
+						continue;
+					}
+					if (isset($gbt[$i][1][$j][1])) {
+						$gbo[$i][$n] = $gbt[$i][1][$j][1];
+					} else {
+						$gbo[$i][$n] = '';
+					}
+					$n++;
+				}
+			}
+		}
+	}
+	if ($pointsln==1) {
+		$ins = array();
+		
+		for ($i=0; $i<count($gbo[0]);$i++) {
+			if (preg_match('/([\d\.]+)(\s*|&nbsp;)pts.*/',$gbo[0][$i],$matches)) {
+				$ins[$i] = $matches[1];	
+			} else {
+				$ins[$i] = '';
+			}
+		}
+		$ins[0] = "Points Possible";
+		array_splice($gbo,1,0,array($ins));
 	}
 	return $gbo;
 }

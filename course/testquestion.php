@@ -69,6 +69,7 @@ if ($myrights<20) {
 		$page_formAction .=  "&onlychk=".$_GET['onlychk'];
 	}
 	
+	
 	$query = "SELECT imas_users.email,imas_questionset.author,imas_questionset.description,imas_questionset.lastmoddate,imas_questionset.ancestors ";
 	$query .= "FROM imas_users,imas_questionset WHERE imas_users.id=imas_questionset.ownerid AND imas_questionset.id='{$_GET['qsetid']}'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -93,6 +94,7 @@ if ($overwriteBody==1) {
 
 	if (isset($_GET['formn']) && isset($_GET['loc'])) {
 		echo "<script type=\"text/javascript\">";
+		echo "var numchked = -1;";
 		echo "if (window.opener && !window.opener.closed) {";
 		echo $page_onlyChkMsg;
 		echo "	  if (prevnext[0][1]>0){
@@ -105,17 +107,34 @@ if ($overwriteBody==1) {
 			  } else {
 				  document.write('Next ');
 			  }
+			  if (prevnext[2]!=null) {
+			  	document.write(' <span id=\"numchked\">'+prevnext[2]+'</span> checked');
+				numchked = prevnext[2];
+			  }
+			  if (prevnext[3]!=null) {
+			  	document.write(' '+prevnext[3]+' remaining');
+			  }
 			}
 			</script>";
 	}
 
 	if (isset($_GET['checked'])) {
-		echo "<p><input type=\"checkbox\" name=\"usecheck\" id=\"usecheck\" value=\"Mark Question for Use\" onclick=\"parentcbox.checked=this.checked\" ";
+		echo "<p><input type=\"checkbox\" name=\"usecheck\" id=\"usecheck\" value=\"Mark Question for Use\" onclick=\"parentcbox.checked=this.checked;togglechk(this.checked)\" ";
 		echo "/> Mark Question for Use</p>";
 		echo "
 		  <script type=\"text/javascript\">
 		  var parentcbox = opener.document.getElementById(\"{$_GET['loc']}\");
 		  document.getElementById(\"usecheck\").checked = parentcbox.checked;
+		  function togglechk(ischk) {
+			  if (numchked!=-1) {
+				if (ischk) {
+					numchked++;	
+				} else {
+					numchked--;
+				}
+				document.getElementById(\"numchked\").innerHTML = numchked;
+			  }
+		  }
 		  </script>";
 	}
 

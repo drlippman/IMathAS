@@ -299,6 +299,9 @@
 
 			$query = "DELETE FROM imas_forum_posts WHERE threadid='{$_GET['remove']}'";
 			mysql_query($query) or die("Query failed : $query " . mysql_error());
+			
+			$query = "DELETE FROM imas_forum_views WHERE threadid='{$_GET['remove']}'";
+			mysql_query($query) or die("Query failed : $query " . mysql_error());
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
 			exit;
 		} else {

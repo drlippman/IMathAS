@@ -547,7 +547,10 @@
 		echo " hours = $hours; minutes = $minutes; seconds = $seconds; done=false;\n";
 		echo " function updatetime() {\n";
 		echo "	  seconds--;\n";
-		echo "    if (seconds==0 && minutes==0 && hours==0) {done=true; alert(\"Time Limit has elapsed\");}\n";
+		echo "    if (seconds==0 && minutes==0 && hours==0) {done=true; ";
+		//kickout:  need to rework to send to "done" page  
+		//echo "		if (doonsubmit(document.getElementById(\"qform\"),true,true)) { document.getElementById(\"qform\").submit();}} \n";
+		echo "		alert(\"Time Limit has elapsed\");}\n";
 		echo "    if (seconds==0 && minutes==5 && hours==0) {document.getElementById('timeremaining').style.color=\"#f00\";}\n";
 		echo "    if (seconds < 0) { seconds=59; minutes--; }\n";
 		echo "    if (minutes < 0) { minutes=59; hours--;}\n";
@@ -664,7 +667,7 @@
 			}
 			
 			if (!$done) { //can show next
-				echo "<form method=post action=\"showtest.php?action=shownext&amp;score=$toshow\" onsubmit=\"return doonsubmit(this)\">\n";
+				echo "<form id=\"qform\" method=post action=\"showtest.php?action=shownext&amp;score=$toshow\" onsubmit=\"return doonsubmit(this)\">\n";
 				basicshowq($toshow);
 				showqinfobar($toshow,true,true);
 				echo '<input type="submit" class="btn" value="Continue" />';
@@ -743,7 +746,7 @@
 				$lefttodo = shownavbar($questions,$scores,$next,$testsettings['showcat']);
 				if (unans($scores[$next])) {
 					echo "<div class=inset>\n";
-					echo "<form method=post action=\"showtest.php?action=skip&amp;score=$next\" onsubmit=\"return doonsubmit(this)\">\n";
+					echo "<form id=\"qform\" method=post action=\"showtest.php?action=skip&amp;score=$next\" onsubmit=\"return doonsubmit(this)\">\n";
 					echo "<a name=\"beginquestions\"></a>\n";
 					basicshowq($next);
 					showqinfobar($next,true,true);
@@ -880,7 +883,7 @@
 			} else { //show more test 
 				echo filter("<div id=intro class=hidden>{$testsettings['intro']}</div>\n");
 				
-				echo "<form method=post action=\"showtest.php?action=seq&amp;score=$toshow\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
+				echo "<form id=\"qform\" method=post action=\"showtest.php?action=seq&amp;score=$toshow\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
 				echo "<input type=hidden name=\"verattempts\" value=\"{$attempts[$toshow]}\" />";
 				
 				for ($i = 0; $i < count($questions); $i++) {
@@ -952,7 +955,7 @@
 		} 
 		if ($testsettings['displaymethod'] == "AllAtOnce") {
 			echo filter("<div class=intro>{$testsettings['intro']}</div>\n");
-			echo "<form method=post action=\"showtest.php?action=scoreall\" onsubmit=\"return doonsubmit(this,true)\">\n";
+			echo "<form id=\"qform\" method=post action=\"showtest.php?action=scoreall\" onsubmit=\"return doonsubmit(this,true)\">\n";
 			$numdisplayed = 0;
 			for ($i = 0; $i < count($questions); $i++) {
 				if (unans($scores[$i])) {
@@ -990,7 +993,7 @@
 				
 			} else {
 				echo filter("<div class=intro>{$testsettings['intro']}</div>\n");
-				echo "<form method=post action=\"showtest.php?action=shownext&amp;score=$i\" onsubmit=\"return doonsubmit(this)\">\n";
+				echo "<form id=\"qform\" method=post action=\"showtest.php?action=shownext&amp;score=$i\" onsubmit=\"return doonsubmit(this)\">\n";
 				basicshowq($i);
 				showqinfobar($i,true,true);
 				echo '<input type="submit" class="btn" value="Next" />';
@@ -1018,7 +1021,7 @@
 				
 			} else {
 				echo "<div class=inset>\n";
-				echo "<form method=post action=\"showtest.php?action=skip&amp;score=$i\" onsubmit=\"return doonsubmit(this)\">\n";
+				echo "<form id=\"qform\" method=post action=\"showtest.php?action=skip&amp;score=$i\" onsubmit=\"return doonsubmit(this)\">\n";
 				echo "<a name=\"beginquestions\"></a>\n";
 				basicshowq($i);
 				showqinfobar($i,true,true);
@@ -1045,7 +1048,7 @@
 			} else {
 				$curq = $i;
 				echo filter("<div class=intro>{$testsettings['intro']}</div>\n");
-				echo "<form method=post action=\"showtest.php?action=seq&amp;score=$i\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
+				echo "<form id=\"qform\" method=post action=\"showtest.php?action=seq&amp;score=$i\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
 				echo "<input type=\"hidden\" name=\"verattempts\" value=\"{$attempts[$i]}\" />";
 				for ($i = 0; $i < count($questions); $i++) {
 					$qavail = seqshowqinfobar($i,$curq);

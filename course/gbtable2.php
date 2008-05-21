@@ -664,10 +664,10 @@ function gbtable() {
 				
 			}
 		}
-		if ($limuser==0 && $l['feedback']!='') {
-			$gb[$row][1][$col][1] = 1; //has comment
-		} else if ($limuser>0) {
+		if ($limuser>0 || (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments'])) {
 			$gb[$row][1][$col][1] = $l['feedback']; //the feedback
+		} else if ($limuser==0 && $l['feedback']!='') {
+			$gb[$row][1][$col][1] = 1; //has comment
 		} else {
 			$gb[$row][1][$col][1] = 0; //no comment
 		}
@@ -692,10 +692,10 @@ function gbtable() {
 		if ($l['score']!=null) {
 			$gb[$row][1][$col][0] = 1*$l['score'];
 		}
-		if ($limuser==0 && $l['feedback']!='') { //feedback
-			$gb[$row][1][$col][1] = 1; //yes it has it (for teachers)
-		} else if ($limuser>0) {
+		if ($limuser>0 || (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments'])) {
 			$gb[$row][1][$col][1] =  $l['feedback']; //the feedback (for students)
+		} else if ($limuser==0 && $l['feedback']!='') { //feedback
+			$gb[$row][1][$col][1] = 1; //yes it has it (for teachers)
 		} else {
 			$gb[$row][1][$col][1] = 0; //no feedback
 		}

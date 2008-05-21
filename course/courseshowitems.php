@@ -149,7 +149,7 @@
 				if ($items[$i]['avail']==0) {
 					$show = "Hidden";
 				} else if ($items[$i]['SH'][0] == 'S') {
-					$show = "Currenly Showing";
+					$show = "Currently Showing";
 					if (strlen($items[$i]['SH'])>1 && $items[$i]['SH'][1]=='F') {
 						$show .= " as Folder. ";
 					} else {
@@ -157,7 +157,7 @@
 					}
 					$show .= "Showing $availbeh $startdate to $enddate";
 				} else { //currently hidden, using dates
-					$show = "Currenly Hidden. ";
+					$show = "Currently Hidden. ";
 					$show .= "Showing $availbeh $startdate to $enddate";
 				}
 				if (strlen($items[$i]['SH'])>1 && $items[$i]['SH'][1]=='F') { //show as folder

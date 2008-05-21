@@ -135,7 +135,18 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		
 		$query = "UPDATE imas_forum_posts SET parent='$parent' WHERE parent='{$_GET['remove']}'";
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/$returnurl");
+		
+		$lastpost = false;
+		if ($parent==0 && mysql_affected_rows()==0) { //no parent and no children - only post
+			$query = "DELETE FROM imas_forum_views WHERE threadid='{$_GET['remove']}'";
+			mysql_query($query) or die("Query failed : $query " . mysql_error());
+			$lastpost = true;
+		}
+		if ($caller == "posts" && $lastpost) {
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
+		} else {
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/$returnurl");
+		}
 		exit;
 	} else {
 		$pagetitle = "Remove Post";

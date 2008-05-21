@@ -15,6 +15,7 @@ function previewq(formn,loc,qn,docheck,onlychk) {
    if (onlychk) {
       addr += '&onlychk=1';
    }
+  
    previewpop = window.open(addr,'Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20));
    previewpop.focus();
 }
@@ -35,21 +36,31 @@ function getnextprev(formn,loc,onlychk) {
 	var form = document.getElementById(formn);
 	var prevl = 0; var nextl = 0; var found=false;
 	var prevq = 0; var nextq = 0;
+	var cntchecked = 0;  var remaining = 0;
+	var looking = true;
 	for (var e = 0; e < form.elements.length; e++) {
 		var el = form.elements[e];
 		if (typeof el.type == "undefined") {
 			continue;
 		}
 		if (((el.type == 'checkbox' && el.name=='nchecked[]') || ((el.type=='checkbox' || el.type=='hidden') && el.name=='checked[]')) && (!onlychk || el.checked)) {
-			if (found) {
-				nextq = el.value;
-				nextl = el.id;
-				break;
-			} else if (el.id==loc) {
-				found = true;
+			if (el.checked) {
+				cntchecked++;
+			}
+			if (looking) {
+				if (found) {
+					nextq = el.value;
+					nextl = el.id;
+					remaining++;
+					looking=false;//break;
+				} else if (el.id==loc) {
+					found = true;
+				} else {
+					prevq = el.value;
+					prevl = el.id;
+				}
 			} else {
-				prevq = el.value;
-				prevl = el.id;
+				remaining++;
 			}
 		}
 	}
@@ -61,7 +72,7 @@ function getnextprev(formn,loc,onlychk) {
 			nextq = document.getElementById('o'+nextl).value;
 		}
 	}
-	return ([[prevl,prevq],[nextl,nextq]]);
+	return ([[prevl,prevq],[nextl,nextq],cntchecked,remaining]);
 }
 
 function chkAll(frm, arr, mark) {

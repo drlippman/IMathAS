@@ -257,8 +257,32 @@ function togglefeedback(btn) {
 function doonblur(value) {
 	value = value.replace(/[^\d\.\+\-]/g,'');
 	if (value=='') {return ('');}
-	return (eval(value));
+	try {
+		return (eval(value));
+	} catch (e) {
+		return '';
+	}
 }
+
+function sendtoall(type) {
+	var form=document.getElementById("mainform");
+	for (var e = 0; e<form.elements.length; e++) {
+		 var el = form.elements[e];
+		if (el.type=="textarea" && el.id!="toallfeedback") {
+			if (type==0) { el.value = document.getElementById("toallfeedback").value + el.value;}
+			else if (type==1) { el.value = el.value+document.getElementById("toallfeedback").value;}
+			else if (type==2) { el.value = document.getElementById("toallfeedback").value;}
+		}
+		if (document.getElementById("toallgrade").value.match(/\d/)) {
+			if (el.type=="text" && el.id.match(/score/)) {
+				if (type==0 || type==1) { el.value = doonblur(el.value+'+'+document.getElementById("toallgrade").value);}
+				else if (type==2) { el.value = document.getElementById("toallgrade").value;}
+			}
+		}
+	}
+	document.getElementById("toallfeedback").value = '';
+	document.getElementById("toallgrade").value = '';
+} 
 </script>
 <?php
 		$query = "SELECT COUNT(imas_users.id) FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid ";
@@ -300,6 +324,10 @@ function doonblur(value) {
 		if ($hassection) {
 			echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 		}
+		
+		echo "<br/><span class=form>Add/Replace to all:</span><span class=formright>Grade: <input type=text size=3 id=\"toallgrade\" /> Feedback: <input type=text size=40 id=\"toallfeedback\"/>";
+		echo '<br/><input type=button value="Prepend" onClick="sendtoall(0);"/> <input type=button value="Append" onclick="sendtoall(1)"/> <input type=button value="Replace" onclick="sendtoall(2)"/></span><br class="form"/>';
+	
 		echo "<table id=myTable><thead><tr><th>Name</th>";
 		if ($hassection) {
 			echo '<th>Section</th>';
@@ -343,10 +371,10 @@ function doonblur(value) {
 				echo "<td>{$row[3]}</td>";
 			}
 			if (isset($score[$row[0]])) {
-				echo "<td><input type=text size=3 name=\"score[{$row[0]}]\" value=\"";
+				echo "<td><input type=text size=3 name=\"score[{$row[0]}]\" id=\"score{$row[0]}\" value=\"";
 				echo $score[$row[0]];
 			} else {
-				echo "<td><input type=text size=3 name=\"newscore[{$row[0]}]\" value=\"";
+				echo "<td><input type=text size=3 name=\"newscore[{$row[0]}]\" id=\"score{$row[0]}\" value=\"";
 			}
 			echo "\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" onblur=\"this.value = doonblur(this.value);\" /></td>";
 			echo "<td><textarea style=\"display:hidden;\" cols=40 rows=1 name=\"feedback[{$row[0]}]\">{$feedback[$row[0]]}</textarea></td>";
