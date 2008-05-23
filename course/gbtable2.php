@@ -903,19 +903,19 @@ function gbtable() {
 			$gb[$ln][3][1] = $totcur;
 			$gb[$ln][3][2] = $totfuture;
 			if ($overallptspast>0) {
-				$gb[$ln][3][3] = round(100*$totpast/$overallptspast,1);
+				$gb[$ln][3][3] = sprintf("%01.1f", 100*$totpast/$overallptspast);
 			} else {
-				$gb[$ln][3][3] = 0;
+				$gb[$ln][3][3] = '0.0';
 			}
 			if ($overallptscur>0) {
-				$gb[$ln][3][4] = round(100*$totcur/$overallptscur,1);
+				$gb[$ln][3][4] = sprintf("%01.1f", 100*$totcur/$overallptscur);
 			} else {
-				$gb[$ln][3][4] = 0;
+				$gb[$ln][3][4] = '0.0';
 			}
 			if ($overallptsfuture>0) {
-				$gb[$ln][3][5] = round(100*$totfuture/$overallptsfuture,1);
+				$gb[$ln][3][5] = sprintf("%01.1f", 100*$totfuture/$overallptsfuture);
 			} else {
-				$gb[$ln][3][5] = 0;
+				$gb[$ln][3][5] = '0.0';
 			}
 		} else if ($useweights==1) { //use weights (%) grading method
 			//already calculated $tot
@@ -925,9 +925,9 @@ function gbtable() {
 			//	$totpast = 0;
 			//}
 			if ($cattotweightpast==0) {
-				$gb[$ln][3][0] = 0;
+				$gb[$ln][3][0] = '0.0';
 			} else {
-				$gb[$ln][3][0] = round(10000*$totpast/$cattotweightpast,1);
+				$gb[$ln][3][0] = sprintf("%01.1f", 10000*$totpast/$cattotweightpast);
 			}
 			$gb[$ln][3][3] = null;
 			
@@ -937,9 +937,9 @@ function gbtable() {
 			//	$totcur = 0;
 			//}
 			if ($cattotweightcur==0) {
-				$gb[$ln][3][1] = 0;
+				$gb[$ln][3][1] = '0.0';
 			} else {
-				$gb[$ln][3][1] = round(10000*$totcur/$cattotweightcur,1);
+				$gb[$ln][3][1] = sprintf("%01.1f", 10000*$totcur/$cattotweightcur);
 			}
 			$gb[$ln][3][4] = null;
 			
@@ -949,9 +949,9 @@ function gbtable() {
 			//	$totfuture = 0;
 			//}
 			if ($cattotweightfuture==0) {
-				$gb[$ln][3][2] = 0;
+				$gb[$ln][3][2] = '0.0';
 			} else {
-				$gb[$ln][3][2] = round(10000*$totfuture/$cattotweightfuture,1);
+				$gb[$ln][3][2] = sprintf("%01.1f", 10000*$totfuture/$cattotweightfuture);
 			}
 			$gb[$ln][3][5] = null;
 			

@@ -23,16 +23,20 @@
 	
 	function sortNumeric(a,b){
 		try {
-		reRowText = /(\< *[^\>]*\>|\&nbsp\;|\,|[^\d\.\/])/g;
-		a = a.replace(reRowText,"");
-		b = b.replace(reRowText,"");
+		//reRowText = /(\< *[^\>]*\>|\&nbsp\;|\,|[^\d\.\/])/g;
+		//a = a.replace(reRowText,"");
+		//b = b.replace(reRowText,"");
 		
 		//a = a.replace(/,/,'.');
 		//b = b.replace(/,/,'.');
 		//a = a.replace(/[^\d\.\/]/g,'');
 		//b = b.replace(/[^\d\.\/]/g,'');
-		if(a.indexOf('/')>=0) a = eval(a);
-		if(b.indexOf('/')>=0) b = eval(b);
+		//if(a.indexOf('/')>=0) a = eval(a);
+		//if(b.indexOf('/')>=0) b = eval(b);
+		
+		a = parseFloat(a.match(/[\d\.]+/));
+		b = parseFloat(b.match(/[\d\.]+/));
+		
 		if (isNaN(a)) { a=0; }
 		if (isNaN(b)) { b=0; }
 		
