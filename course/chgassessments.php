@@ -103,6 +103,20 @@ if (!(isset($teacherid))) {
 		if (isset($_POST['chgexcpen'])) {
 			$sets[] = "exceptionpenalty='{$_POST['exceptionpenalty']}'";
 		}
+		if (isset($_POST['chgpassword'])) {
+			$sets[] = "password='{$_POST['password']}'";
+		}
+		if (isset($_POST['chghints'])) {
+			$sets[] = "showhints='{$_POST['showhints']}'";
+		}
+		if (isset($_POST['chgisgroup'])) {
+			$sets[] = "isgroup='{$_POST['isgroup']}'";
+		}
+		if (isset($_POST['chggroupmax'])) {
+			$sets[] = "groupmax='{$_POST['groupmax']}'";
+		}
+		
+		
 		if (isset($_POST['chgintro'])) {
 			$query = "SELECT intro FROM imas_assessments WHERE id='{$_POST['intro']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -272,6 +286,11 @@ function chkAll(frm, arr, mark) {
 				</td>
 			</tr>
 			<tr>
+				<td><input type="checkbox" name="chgpassword"/></td>
+				<td class="r">Require Password (blank for none):</td>
+				<td><input type=text name=password value=""></td>
+			</tr>
+			<tr>
 				<td><input type="checkbox" name="chgtimelimit"/></td>
 				<td class="r">Time Limit (minutes, 0 for no time limit): </td>
 				<td><input type=text size=4 name=timelimit value="<?php echo $line['timelimit']/60;?>"></td>
@@ -361,6 +380,11 @@ function chkAll(frm, arr, mark) {
 				</td>
 			</tr>
 			<tr>
+				<td><input type="checkbox" name="chghints"/></td>
+				<td class="r">Show hints when available? </td>
+				<td><input type="checkbox" name="showhints" checked="checked"></td>
+			</tr>
+			<tr>
 				<td><input type="checkbox" name="chgshuffle"/></td>
 				<td class="r">Shuffle item order: </td>
 				<td><input type="checkbox" name="shuffle"></td>
@@ -395,6 +419,21 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 ?>
 
 				</td>
+			</tr>
+			
+			<tr>
+				<td><input type="checkbox" name="chgisgroup"/></td>
+				<td class="r">Group assessment: </td>
+				<td><input type="radio" name="isgroup" value="0" checked="checked" />Not a group assessment<br/>
+				<input type="radio" name="isgroup" value="1"  />Students can add members with login passwords<br/>
+				<input type="radio" name="isgroup" value="2"  />Students can add members without passwords<br/>
+				<input type="radio" name="isgroup" value="3"  />Students cannot add members</td>
+			</tr>
+			
+			<tr>
+				<td><input type="checkbox" name="chggroupmax"/></td>
+				<td class="r">Max group members (if group assessment):</td>
+				<td><input type=text name=groupmax value="6"></td>
 			</tr>
 		</tbody>
 		</table>

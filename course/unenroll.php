@@ -33,7 +33,7 @@
 		}
 	} else { //get confirm
 		if (isset($_POST['submit']) && $_POST['submit']=="Unenroll") {
-			if (isset($_POST['ca'])) {
+			if (isset($_POST['ca']) && $secfilter==-1) {
 				$_GET['uid'] = "all";
 			} else {
 				$_GET['uid'] = "selected";

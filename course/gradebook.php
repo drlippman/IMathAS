@@ -676,7 +676,9 @@ function gbinstrdisp() {
 			echo "<tr class=odd onMouseOver=\"this.className='highlight'\" onMouseOut=\"this.className='odd'\">"; 
 		}
 		echo '<td class="locked" scope="row">';
-		echo "<input type=\"checkbox\" name='checked[]' value='{$gbt[$i][4][0]}' />&nbsp;";
+		if ($gbt[$i][0][0]!="Averages") {
+			echo "<input type=\"checkbox\" name='checked[]' value='{$gbt[$i][4][0]}' />&nbsp;";
+		}
 		echo "<a href=\"gradebook.php?cid=$cid&stu={$gbt[$i][4][0]}\">";
 		echo $gbt[$i][0][0];
 		echo '</a></td>';

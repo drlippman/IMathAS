@@ -254,7 +254,9 @@ switch($_GET['action']) {
 		if (in_array(0,$topbar[0])) { echo 'checked=1'; }
 		echo ' /> Messages <br /><input type=checkbox name="stutopbar[]" value="1" ';
 		if (in_array(1,$topbar[0])) { echo 'checked=1'; }
-		echo ' /> Gradebook <br /><input type=checkbox name="stutopbar[]" value="9" ';
+		echo ' /> Gradebook <br /><input type=checkbox name="stutopbar[]" value="2" ';
+		if (in_array(2,$topbar[0])) { echo 'checked=1'; }
+		echo ' /> Calendar <br /><input type=checkbox name="stutopbar[]" value="9" ';
 		if (in_array(9,$topbar[0])) { echo 'checked=1'; }
 		echo ' /> Log Out</span><br class=form />';
 		
@@ -267,7 +269,9 @@ switch($_GET['action']) {
 		if (in_array(2,$topbar[1])) { echo 'checked=1'; }
 		echo ' /> Gradebook<br /><input type=checkbox name="insttopbar[]" value="3" ';
 		if (in_array(3,$topbar[1])) { echo 'checked=1'; }
-		echo ' /> List Students<br /><input type=checkbox name="insttopbar[]" value="9" ';
+		echo ' /> List Students<br /><input type=checkbox name="insttopbar[]" value="4" ';
+		if (in_array(4,$topbar[1])) { echo 'checked=1'; }
+		echo ' /> Calendar<br /><input type=checkbox name="insttopbar[]" value="9" ';
 		if (in_array(9,$topbar[1])) { echo 'checked=1'; }
 		echo ' /> Log Out</span><br class=form />';
 		

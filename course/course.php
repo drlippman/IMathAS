@@ -302,7 +302,8 @@ if ($overwriteBody==1) {
 			<a href="listusers.php?cid=<?php echo $cid ?>">Students</a><br/>
 			<a href="gradebook.php?cid=<?php echo $cid ?>">Gradebook</a><br/>
 			<a href="course.php?cid=<?php echo $cid ?>&stuview=0">Student View</a><br/>
-			<a href="course.php?cid=<?php echo $cid ?>&quickview=on">Quick View</a>
+			<a href="course.php?cid=<?php echo $cid ?>&quickview=on">Quick View</a><br/>
+			<a href="showcalendar.php?cid=<?php echo $cid ?>">Calendar</a>
 		</p>
 		<p><b>Manage:</b><br/>
 			<a href="manageqset.php?cid=<?php echo $cid ?>">Question Set</a><br/>
@@ -426,13 +427,15 @@ if ($overwriteBody==1) {
 			</span>
 			<span class=column>
 				<a href="copyitems.php?cid=<?php echo $cid ?>">Copy Course Items</a><br/>
-				<a href="managestugrps.php?cid=<?php echo $cid ?>">Student Groups</a>
+				<a href="managestugrps.php?cid=<?php echo $cid ?>">Student Groups</a><br/>
+				<a href="showcalendar.php?cid=<?php echo $cid ?>">Calendar</a>
 			</span>
 <?php
 			} else {
 ?>
 			<a href="managelibs.php?cid=<?php echo $cid ?>">Manage Libraries</a><br>
-			<a href="copyitems.php?cid=<?php echo $cid ?>">Copy Course Items</a>
+			<a href="copyitems.php?cid=<?php echo $cid ?>">Copy Course Items</a><br/>
+			<a href="showcalendar.php?cid=<?php echo $cid ?>">Calendar</a>
 		</span>
 		<span class=column>
 			<a href="managestugrps.php?cid=<?php echo $cid ?>">Student Groups</a><br/>
@@ -447,8 +450,9 @@ if ($overwriteBody==1) {
 	   
 	   if (!isset($teacherid)) {
 ?>
-	<a href="../actions.php?action=logout">Log Out</a><BR>
-	<a href="gradebook.php?cid=<?php echo $cid ?>">Show Gradebook</a><br/>   
+	<a href="showcalendar.php?cid=<?php echo $cid ?>">Calendar</a><br />
+	<a href="gradebook.php?cid=<?php echo $cid ?>">Gradebook</a><br/>
+	<a href="../actions.php?action=logout">Log Out</a><br/>   
 	<a href="<?php echo $imasroot ?>/help.php?section=usingimas">Help Using <?php echo $installname;?></a><br/> 
 <?php		  
 			if ($myrights > 5 && $allowunenroll==1) {
@@ -518,6 +522,9 @@ function makeTopMenu() {
 		if (in_array(3,$topbar[1])) { //List stu
 			echo "<a href=\"listusers.php?cid=$cid\">List Students</a> &nbsp; \n";
 		}
+		if (in_array(4,$topbar[1])) { //Calendar
+			echo "<a href=\"showcalendar.php?cid=$cid\">Calendar</a> &nbsp; \n";
+		}
 		if (in_array(9,$topbar[1])) { //Log out
 			echo "<a href=\"../actions.php?action=logout\">Log Out</a>";
 		}
@@ -529,6 +536,9 @@ function makeTopMenu() {
 		}
 		if (in_array(1,$topbar[0])) { //Gradebook
 			echo "<a href=\"gradebook.php?cid=$cid\">Show Gradebook</a> &nbsp; ";
+		}
+		if (in_array(2,$topbar[0])) { //Calendar
+			echo "<a href=\"showcalendar.php?cid=$cid\">Calendar</a> &nbsp; \n";
 		}
 		if (in_array(9,$topbar[0])) { //Log out
 			echo "<a href=\"../actions.php?action=logout\">Log Out</a>";

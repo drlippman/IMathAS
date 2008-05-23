@@ -11,6 +11,15 @@ require("../validate.php");
 
 //set some page specific variables and counters
 $cid = $_GET['cid'];
+if (isset($_GET['secfilter'])) {
+	$secfilter = $_GET['secfilter'];
+	$sessiondata[$cid.'secfilter'] = $secfilter;
+	writesessiondata();
+} else if (isset($sessiondata[$cid.'secfilter'])) {
+	$secfilter = $sessiondata[$cid.'secfilter'];
+} else {
+	$secfilter = -1;
+}
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "";
@@ -54,7 +63,8 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 	
 		} else {
 			$query = "SELECT imas_students.id,imas_users.FirstName,imas_users.LastName,imas_students.section,imas_students.code ";
-			$query .= "FROM imas_students,imas_users WHERE imas_students.courseid='$cid' AND imas_students.userid=imas_users.id ORDER BY imas_users.LastName,imas_users.FirstName";
+			$query .= "FROM imas_students,imas_users WHERE imas_students.courseid='$cid' AND imas_students.userid=imas_users.id ";
+			$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
 			$resultStudentList = mysql_query($query) or die("Query failed : " . mysql_error());
 		}
 	} elseif (isset($_GET['enroll'])) {
@@ -215,10 +225,21 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$curBreadcrumb .= " &gt; List Students\n";
 		$pagetitle = "Students";
 		
-		$query = "SELECT count(id) FROM imas_students WHERE imas_students.courseid='$cid' AND imas_students.section IS NOT NULL";
+		$query = "SELECT DISTINCT section FROM imas_students WHERE imas_students.courseid='$cid' AND imas_students.section IS NOT NULL ORDER BY section";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		if (mysql_result($result,0,0)>0) {
+		if (mysql_num_rows($result)>0) {
 			$hassection = true;
+			$sectionselect = "<br/><select id=\"secfiltersel\" onchange=\"chgsecfilter()\"><option value=\"-1\" ";
+			if ($secfilter==-1) {$sectionselect .= 'selected=1';}
+			$sectionselect .=  '>All</option>';
+			while ($row = mysql_fetch_row($result)) {
+				$sectionselect .=  "<option value=\"{$row[0]}\" ";
+				if ($row[0]==$secfilter) {
+					$sectionselect .=  'selected=1';
+				}
+				$sectionselect .=  ">{$row[0]}</option>";
+			}
+			$sectionselect .=  "</select>";
 		} else {
 			$hassection = false;
 		}
@@ -232,13 +253,16 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		
 		$query = "SELECT imas_students.id,imas_students.userid,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.SID,imas_students.lastaccess,imas_students.section,imas_students.code ";
 		$query .= "FROM imas_students,imas_users WHERE imas_students.courseid='$cid' AND imas_students.userid=imas_users.id ";
+		if ($secfilter>-1) {
+			$query .= "AND imas_students.section='$secfilter' ";			
+		}
 		if ($hassection) {
 			$query .= "ORDER BY imas_students.section,imas_users.LastName,imas_users.FirstName";
 		} else {
 			$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
 		}
 		$resultDefaultUserList = mysql_query($query) or die("Query failed : " . mysql_error());
-		$hasSectionRowHeader = ($hassection)? "<th>Section</th>" : "";
+		$hasSectionRowHeader = ($hassection)? "<th>Section$sectionselect</th>" : "";
 		$hasCodeRowHeader = ($hascode) ? "<th>Code</th>" : "";
 		$hasSectionSortTable = ($hassection) ? "'S'," : "";
 		$hasCodeSortTable = ($hascode) ? "'N'," : "";
@@ -250,6 +274,16 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 
 /******* begin html output ********/
 if ($fileToInclude==null || $fileToInclude=="") {
+
+$placeinhead .= "<script type=\"text/javascript\">";
+$placeinhead .= 'function chgsecfilter() { ';
+$placeinhead .= '       var sec = document.getElementById("secfiltersel").value; ';
+$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid";
+$placeinhead .= "       var toopen = '$address&secfilter=' + sec;\n";
+$placeinhead .= "  	window.location = toopen; \n";
+$placeinhead .= "}\n";
+$placeinhead .= "</script>";
+
 require("../header.php");
 }
 /**** post-html data manipulation ******/
