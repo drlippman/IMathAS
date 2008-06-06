@@ -107,6 +107,13 @@ var Nested = new Class({
 		event.stop();
 	},
 	
+	collapseall: function() {
+		$$('.blockli').each(function(el){
+				el.setStyle('display', 'none');
+				el.addClass(sortIt.options.collapseClass);
+		});	
+	},
+	
 	stop: function(event) {
 		event.stop();
 		return false;
