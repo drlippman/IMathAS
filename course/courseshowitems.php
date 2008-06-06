@@ -964,9 +964,11 @@
 			}
 			echo '<li class="blockli" id="'."$parent-$bnum".'"><span class=icon style="background-color:'.$color.'">B</span>';
 			if ($items[$i]['avail']==2 || ($items[$i]['avail']==1 && $items[$i]['startdate']<$now && $items[$i]['enddate']>$now)) {
-				echo '<b>'.$items[$i]['name'].'</b>';
+				echo '<b><span id="B'.$parent.'-'.$bnum.'" onclick="editinplace(this)">'.$items[$i]['name']. "</span></b>";
+				//echo '<b>'.$items[$i]['name'].'</b>';
 			} else {
-				echo '<i><b>'.$items[$i]['name'].'</b></i>';
+				echo '<i><b><span id="B'.$parent.'-'.$bnum.'" onclick="editinplace(this)">'.$items[$i]['name']. "</span></b></i>";
+				//echo '<i><b>'.$items[$i]['name'].'</b></i>';
 			}
 			if ($showdates) {
 				echo " $show";
@@ -1015,16 +1017,19 @@
 			echo '<li id="'.$items[$i].'"><span class=icon style="background-color:'.$color.'">?</span>';
 			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
 				   $show = "Available until $enddate";
-				   echo '<b>'.$line['name'].'</b> ';
+				   echo '<b><span id="A'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
+				   //echo '<b>'.$line['name'].'</b> ';
 			   } else if ($line['avail']==1 && $line['startdate']<$now && $line['reviewdate']>$now) {
 				   $show = "Review until $reviewdate";
-				   echo '<b>'.$line['name'].'</b> ';
+				   //echo '<b>'.$line['name'].'</b> ';
+				   echo '<b><span id="A'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
 			   } else {
 				   $show = "Available $startdate to $enddate";
 				   if ($line['reviewdate']>0 && $line['enddate']!=2000000000) {
 					   $show .= ", review until $reviewdate";
 				   }
-				   echo '<i><b>'.$line['name'].'</b></i> ';
+				   //echo '<i><b>'.$line['name'].'</b></i> ';
+				   echo '<i><b><span id="A'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b></i>";
 			   }
 			   if ($showdates) {
 				   echo $show;
@@ -1064,13 +1069,14 @@
 				}
 			   echo '<li id="'.$items[$i].'"><span class=icon style="background-color:'.$color.'">!</span>';
 			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
-				   //echo '<b><span id="I'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
-				   echo '<b>'.$line['name']. "</b>";
+				   echo '<b><span id="I'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
+				  // echo '<b>'.$line['name']. "</b>";
 				   if ($showdates) {
 					   echo " showing until $enddate";
 				   }
 			   } else {
-				   echo '<i><b>'.$line['name']. "</b></i>";
+				   //echo '<i><b>'.$line['name']. "</b></i>";
+				   echo '<i><b><span id="I'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b></i>";
 				   if ($showdates) {
 					   echo " showing $startdate until $enddate";
 				   }
@@ -1105,12 +1111,14 @@
 				}
 			   echo '<li id="'.$items[$i].'"><span class=icon style="background-color:'.$color.'">!</span>';
 			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
-				   echo '<b>'.$line['name']. "</b>";
+				   //echo '<b>'.$line['name']. "</b>";
+				   echo '<b><span id="L'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
 				   if ($showdates) {
 					   echo " showing until $enddate";
 				   }
 			   } else {
-				   echo '<i><b>'.$line['name']. "</b></i>";
+				   //echo '<i><b>'.$line['name']. "</b></i>";
+				   echo '<i><b><span id="L'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b></i>";
 				   if ($showdates) {
 					   echo " showing $startdate until $enddate";
 				   }
@@ -1145,12 +1153,14 @@
 				}
 			   echo '<li id="'.$items[$i].'"><span class=icon style="background-color:'.$color.'">F</span>';
 			  if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
-				   echo '<b>'.$line['name']. "</b>";
+				   //echo '<b>'.$line['name']. "</b>";
+				   echo '<b><span id="F'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
 				   if ($showdates) {
 					   echo " showing until $enddate";
 				   }
 			   } else {
-				   echo '<i><b>'.$line['name']. "</b></i>";
+				   echo '<i><b><span id="F'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b></i>";
+				   //echo '<i><b>'.$line['name']. "</b></i>";
 				   if ($showdates) {
 					   echo " showing $startdate until $enddate";
 				   }

@@ -255,7 +255,7 @@ function togglefeedback(btn) {
 }
 
 function doonblur(value) {
-	value = value.replace(/[^\d\.\+\-]/g,'');
+	value = value.replace(/[^\d\.\+\-\*\/]/g,'');
 	if (value=='') {return ('');}
 	try {
 		return (eval(value));
@@ -269,13 +269,14 @@ function sendtoall(type) {
 	for (var e = 0; e<form.elements.length; e++) {
 		 var el = form.elements[e];
 		if (el.type=="textarea" && el.id!="toallfeedback") {
-			if (type==0) { el.value = document.getElementById("toallfeedback").value + el.value;}
-			else if (type==1) { el.value = el.value+document.getElementById("toallfeedback").value;}
+			if (type==1) { el.value = document.getElementById("toallfeedback").value + el.value;}
+			else if (type==0) { el.value = el.value+document.getElementById("toallfeedback").value;}
 			else if (type==2) { el.value = document.getElementById("toallfeedback").value;}
 		}
 		if (document.getElementById("toallgrade").value.match(/\d/)) {
 			if (el.type=="text" && el.id.match(/score/)) {
-				if (type==0 || type==1) { el.value = doonblur(el.value+'+'+document.getElementById("toallgrade").value);}
+				if (type==0) { el.value = doonblur(el.value+'+'+document.getElementById("toallgrade").value);}
+				else if (type==1) { el.value = doonblur(el.value+'*'+document.getElementById("toallgrade").value);}
 				else if (type==2) { el.value = document.getElementById("toallgrade").value;}
 			}
 		}
@@ -324,9 +325,10 @@ function sendtoall(type) {
 		if ($hassection) {
 			echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 		}
-		
-		echo "<br/><span class=form>Add/Replace to all:</span><span class=formright>Grade: <input type=text size=3 id=\"toallgrade\" /> Feedback: <input type=text size=40 id=\"toallfeedback\"/>";
-		echo '<br/><input type=button value="Prepend" onClick="sendtoall(0);"/> <input type=button value="Append" onclick="sendtoall(1)"/> <input type=button value="Replace" onclick="sendtoall(2)"/></span><br class="form"/>';
+		if ($_GET['grades']=='all') {
+			echo "<br/><span class=form>Add/Replace to all:</span><span class=formright>Grade: <input type=text size=3 id=\"toallgrade\" onblur=\"this.value = doonblur(this.value);\"/> Feedback: <input type=text size=40 id=\"toallfeedback\"/>";
+			echo '<br/><input type=button value="Add / Append" onClick="sendtoall(0);"/> <input type=button value="Multiply / Prepend" onclick="sendtoall(1)"/> <input type=button value="Replace" onclick="sendtoall(2)"/></span><br class="form"/>';
+		}
 	
 		echo "<table id=myTable><thead><tr><th>Name</th>";
 		if ($hassection) {

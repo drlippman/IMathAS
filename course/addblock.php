@@ -113,7 +113,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 	}
 	if (isset($existingid)) {  //already have id; update
-		$sub[$existingid]['name'] = $_POST['title'];
+		$sub[$existingid]['name'] = stripslashes($_POST['title']);
 		$sub[$existingid]['startdate'] = $startdate;
 		$sub[$existingid]['enddate'] = $enddate;
 		$sub[$existingid]['avail'] = $_POST['avail'];
@@ -121,7 +121,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$sub[$existingid]['colors'] = $colors;
 	} else { //add new
 		$blockitems = array();
-		$blockitems['name'] = $_POST['title'];
+		$blockitems['name'] = stripslashes($_POST['title']);
 		$blockitems['id'] = $blockcnt;
 		$blockitems['startdate'] = $startdate;
 		$blockitems['enddate'] = $enddate;

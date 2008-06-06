@@ -138,6 +138,9 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	} else if (isset($sessiondata['quickview'.$cid])) {
 		$quickview = $sessiondata['quickview'.$cid];
 	}
+	if ($quickview=="on") {
+		$_GET['folder'] = '0';
+	}
 	
 	if (!isset($sessiondata['lastaccess'.$cid]) && !isset($teacherid)) {
 		$now = time();
@@ -183,7 +186,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 			if ($i!=count($backtrack)-1) {
 				$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">";
 			}
-			$curBreadcrumb .= $backtrack[$i][0];
+			$curBreadcrumb .= stripslashes($backtrack[$i][0]);
 			if ($i!=count($backtrack)-1) {
 				$curBreadcrumb .= "</a>";
 			}
@@ -371,7 +374,7 @@ if ($overwriteBody==1) {
 		   //echo '<input type="button" id="recchg" disabled="disabled" value="Record Order" onclick="submitChanges()"/>';
 		   //echo '<span id="submitnotice" style="color:red;"></span>';
 		   echo '<ul id=qviewtree class=qview>';
-		   quickview($items,$_GET['folder']);
+		   quickview($items,0);
 		   echo '</ul>';
 		   echo '<p>&nbsp;</p>';
 	   } else {
@@ -503,7 +506,7 @@ function makeTopMenu() {
 	if (isset($teacherid) && $quickview=='on') {
 		echo "<div class=breadcrumb>";
 		echo "Quick View. <a href=\"course.php?cid=$cid&quickview=off\">Back to regular view</a>. ";
-		 echo 'Use colored boxes to drag-and-drop order.  <input type="button" id="recchg" disabled="disabled" value="Record Order" onclick="submitChanges()"/>';
+		 echo 'Use colored boxes to drag-and-drop order.  <input type="button" id="recchg" disabled="disabled" value="Record Changes" onclick="submitChanges()"/>';
 		 echo '<span id="submitnotice" style="color:red;"></span>';
 		 echo '</div>';
 		

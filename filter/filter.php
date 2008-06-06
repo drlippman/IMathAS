@@ -102,5 +102,13 @@
 		preg_match('/(\w+\.png)/',$str,$matches);
 		return ($matches[1]);
 	}
+	function printfilter($str) {
+		$str = preg_replace('/<script.*?\/script>/','',$str);  //strip scripts
+		$str = preg_replace('/<input[^>]*Preview[^>]*>/','',$str); //strip preview buttons
+		$str = preg_replace('/<input[^>]*text[^>]*>/','__________________',$str);
+		$str = preg_replace('/<select.*?\/select>/','____',$str);
+		$str = preg_replace('/<input[^>]*hidden[^>]*>/','',$str); //strip hidden fields
+		return $str;
+	}
 		
 ?>

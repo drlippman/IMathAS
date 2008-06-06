@@ -7,12 +7,12 @@
 	 echo "Must be a teacher to access this page";
 	 exit;
  }
- if (!isset($_GET['order']) || !isset($_GET['cid'])) {
+ if (!isset($_POST['order']) || !isset($_GET['cid'])) {
 	 echo "Cannot access this page directly";
 	 exit;
  }
  $cid = $_GET['cid'];
- $order = $_GET['order'];
+ $order = $_POST['order'];
  
  $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
  $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -20,6 +20,43 @@
  
  $newitems = array();
 
+ $newitems = additems($order);
+ $itemlist = addslashes(serialize($newitems));
+ $query = "UPDATE imas_courses SET itemorder='$itemlist' WHERE id='$cid'";
+ mysql_query($query) or die("Query failed : " . mysql_error());
+ 
+ foreach ($_POST as $id=>$val) {
+	 if ($id=="order") { continue;}
+	 $type = $id{0};
+	 $typeid = substr($id,1);
+	 if ($type=="I") {
+		 $query = "UPDATE imas_inlinetext SET title='$val' WHERE id='$typeid'";
+	 } else if ($type=="L") {
+		 $query = "UPDATE imas_linkedtext SET title='$val' WHERE id='$typeid'";
+	 } else if ($type=="A") {
+		 $query = "UPDATE imas_assessments SET name='$val' WHERE id='$typeid'";
+	 } else if ($type=="F") {
+		 $query = "UPDATE imas_forums SET name='$val' WHERE id='$typeid'";
+	 } else if ($type=="B") {
+		 $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+		 $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		 $itemsforblock = unserialize(mysql_result($result,0,0));
+		$blocktree = explode('-',$typeid);
+		$existingid = array_pop($blocktree) - 1; //-1 adjust for 1-index
+		$sub =& $itemsforblock;
+		if (count($blocktree)>1) {
+			for ($i=1;$i<count($blocktree);$i++) {
+				$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
+			}
+		}
+		$sub[$existingid]['name'] = stripslashes($val);
+		$itemorder = addslashes(serialize($itemsforblock));
+		$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid';";
+	 }
+	 mysql_query($query) or die("Query failed : " . mysql_error());
+ }
+ 
+ 
  function additems($list) {
 	 global $items;
 	 $outarr = array();
@@ -70,9 +107,8 @@
 	 return $outarr;
  }
  
- $newitems = additems($order);
- $itemlist = addslashes(serialize($newitems));
- $query = "UPDATE imas_courses SET itemorder='$itemlist' WHERE id='$cid'";
- mysql_query($query) or die("Query failed : " . mysql_error());
+ 
+ 
+ 
  echo "OK"; 
 ?>

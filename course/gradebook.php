@@ -188,6 +188,8 @@ if (!$isteacher || $stu!=0) { //show student view
 	}
 	
 	gbstudisp($stu);
+	echo "<p>Meanings:  IP-In Progress, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sub>d</sub> Dropped score</p>\n";
+	
 	require("../footer.php");
 	
 } else { //show instructor view
@@ -294,7 +296,7 @@ if (!$isteacher || $stu!=0) { //show student view
 	echo "</form>";
 	echo "</div>";
 	require("../footer.php");
-	echo "Meanings:  IP-In Progress, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sup>*</sup> Has feedback\n";
+	echo "Meanings:  IP-In Progress, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sup>*</sup> Has feedback, <sub>d</sub> Dropped score\n";
 	/*if ($isteacher) {
 		echo "<div class=cp>";
 		echo "<a href=\"addgrades.php?cid=$cid&gbitem=new&grades=all\">Add Offline Grade</a><br/>";
@@ -436,6 +438,9 @@ function gbstudisp($stu) {
 			}
 			if ($haslink) { //show link
 				echo '</a>';
+			}
+			if (isset($gbt[1][1][$i][5])) {
+				echo '<sub>d</sub>';
 			}
 			echo '</td><td>';
 			if (isset($gbt[1][1][$i][0])) {
@@ -636,6 +641,7 @@ function gbinstrdisp() {
 			} else if ($gbt[0][1][$i][6]==2) { //discussion
 				echo "<br/><a class=small href=\"addforum.php?id={$gbt[0][1][$i][7]}&cid=$cid&from=gb\">[Settings]</a>";
 			}
+			
 			echo '</th>';
 			$n++;
 		}
@@ -729,6 +735,9 @@ function gbinstrdisp() {
 					continue;
 				}
 				echo '<td class="c">';
+				if (isset($gbt[$i][1][$j][5])) {
+					echo '<span style="font-style:italic">';
+				}
 				if ($gbt[0][1][$j][6]==0) {//online
 					if (isset($gbt[$i][1][$j][0])) {
 						if ($gbt[$i][1][$j][4]=='average') {
@@ -781,6 +790,9 @@ function gbinstrdisp() {
 					} else {
 						echo '-';
 					}
+				}
+				if (isset($gbt[$i][1][$j][5])) {
+					echo '<sub>d</sub></span>';
 				}
 				echo '</td>';
 			}

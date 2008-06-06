@@ -752,6 +752,21 @@ function gbtable() {
 						$cattotpast[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	
 					}
 					asort($cattotpast[$ln][$cat],SORT_NUMERIC);
+					if ($cats[$cat][4]<0) {  //doing keep n
+						$ntodrop = count($cattotpast[$ln][$cat])+$cats[$cat][4];
+					} else {  //doing drop n
+						$ntodrop = $cats[$cat][4] - ($catitemcntpast[$cat]-count($cattotpast[$ln][$cat]));
+					}
+					
+					if ($ntodrop>0) {
+						$ndropcnt = 0;
+						foreach ($cattotpast[$ln][$cat] as $col=>$v) {
+							$gb[$ln][1][$col][5] = 1; //mark as dropped
+							$ndropcnt++;
+							if ($ndropcnt==$ntodrop) { break;}
+						}
+					}
+					
 					while (count($cattotpast[$ln][$cat])<$catitemcntpast[$cat]) {
 						array_unshift($cattotpast[$ln][$cat],0);
 					}

@@ -26,31 +26,6 @@ function mcancelclosetime() {
 	}
 }
 
-function editinplace(el) {
-	input = document.getElementById(el.id+'input');
-	if (input==null) {
-		var input = document.createElement("input");
-		input.id = el.id+'input';
-		input.type = "text";
-		input.setAttribute("onBlur","editinplaceun('"+el.id+"')");
-		el.parentNode.insertBefore(input,el);	
-	} else {
-		input.type="text";
-	}
-	input.value = el.innerHTML;
-	el.style.visibility = "hidden";
-	input.focus();
-}
-
-function editinplaceun(id) {
-	el = document.getElementById(id);
-	input = document.getElementById(id + 'input');
-	el.innerHTML = input.value;
-	//input.parentNode.removeChild(input);
-	input.type = "hidden";
-	el.style.visibility = '';
-}
-
 function arraysearch(needle,hay) {
       for (var i=0; i<hay.length;i++) {
             if (hay[i]==needle) {

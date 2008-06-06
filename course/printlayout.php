@@ -415,6 +415,9 @@ function printq($qn,$qsetid,$seed,$pts) {
 	if (isset($variable) && !isset($variables)) {
 		$variables =& $variable;
 	}
+	if ($displayformat=="select") {
+		unset($displayformat);
+	}
 	
 	//pack options
 	if (isset($ansprompt)) {$options['ansprompt'] = $ansprompt;}
@@ -432,6 +435,9 @@ function printq($qn,$qsetid,$seed,$pts) {
 	if (isset($hidepreview)) {$options['hidepreview'] = $hidepreview;}
 	if (isset($matchlist)) {$options['matchlist'] = $matchlist;}
 	if (isset($noshuffle)) {$options['noshuffle'] = $noshuffle;}
+	if (isset($reqdecimals)) {$options['reqdecimals'] = $reqdecimals;}
+	if (isset($grid)) {$options['grid'] = $grid;}
+	if (isset($background)) {$options['background'] = $background;}
 	
 	if ($qdata['qtype']=="multipart") {
 		if (!is_array($anstypes)) {
@@ -459,17 +465,17 @@ function printq($qn,$qsetid,$seed,$pts) {
 	echo "<div class=floatl><div>\n";
 	//echo $toevalqtext;
 	eval("\$evaledqtext = \"$toevalqtxt\";");
-	echo filter($evaledqtext);
+	echo printfilter(filter($evaledqtext));
 	echo "</div>\n"; //end question div
 	
 	if (strpos($toevalqtxt,'$answerbox')===false) {
 		if (is_array($answerbox)) {
 			foreach($answerbox as $iidx=>$abox) {
-				echo filter("<div>$abox</div>\n");
+				echo printfilter(filter("<div>$abox</div>\n"));
 				echo "<div class=spacer>&nbsp;</div>\n";
 			}
 		} else {  //one question only
-			echo filter("<div>$answerbox</div>\n");
+			echo printfilter(filter("<div>$answerbox</div>\n"));
 		}
 		
 		

@@ -29,8 +29,8 @@
 			while ($row = mysql_fetch_row($result)) {
 				if (!in_array($row[2],$toignore)) {
 					$fullnames[$row[2]] = $row[1]. ', '.$row[0];
-					$firstnames[$row[2]] = $row[0];
-					$lastnames[$row[2]] = $row[1];
+					$firstnames[$row[2]] = addslashes($row[0]);
+					$lastnames[$row[2]] = addslashes($row[1]);
 				}
 			}
 			
@@ -55,8 +55,8 @@
 					$tolist[] = $row[0];
 				}
 			}
-			$sentto = implode('<br/>',$fullnames);
-			$message = $_POST['message'] . "<p>Instructor note: Message sent to these students from course $coursename: <br/> $sentto </p>\n";
+			$sentto = addimplode('<br/>',$fullnames);
+			$message = $_POST['message'] . addslashes("<p>Instructor note: Message sent to these students from course $coursename: <br/> $sentto </p>\n");
 			
 			foreach ($tolist as $msgto) {
 				$query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";

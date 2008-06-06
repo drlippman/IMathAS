@@ -121,10 +121,10 @@ END;
 		 $userid = $line['id'];
 		 $groupid = $line['groupid'];
 		 //for upgrades times:
-		 /*if ($line['rights']<100) {
-			 echo "The system is currently down.  Please try again later";
-			 exit;
-		 }*/
+		// if ($line['rights']<100) {
+		//	 echo "The system is currently down for maintenence.  Please try again later.";
+		//	 exit;
+		// }
 		 //
 		 if ($line['rights']==0) {
 			require("header.php");

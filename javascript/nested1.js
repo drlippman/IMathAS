@@ -296,11 +296,19 @@ function toSimpleJSON(a) {
 }
 
 function submitChanges() { 
-  url = AHAHsaveurl + '&order='+toSimpleJSON(sortIt.serialize());
+  var params = 'order='+toSimpleJSON(sortIt.serialize());
+  url = AHAHsaveurl;
+  els = document.getElementsByTagName("input");
+  for (var i=0; i<els.length; i++) {
+	  if (els[i].type=="hidden") {
+		  params += '&'+els[i].id.substring(5) + '=' + escape(els[i].value);
+	  }
+  }
+
   var target = "submitnotice";
   //document.getElementById(target).innerHTML = url;
   //return;
-  
+
   document.getElementById(target).innerHTML = ' Saving Changes... ';
   if (window.XMLHttpRequest) { 
     req = new XMLHttpRequest(); 
@@ -308,9 +316,12 @@ function submitChanges() {
     req = new ActiveXObject("Microsoft.XMLHTTP"); 
   } 
   if (req != undefined) { 
-    req.onreadystatechange = function() {NestedahahDone(url, target);}; 
-    req.open("GET", url, true); 
-    req.send(""); 
+	req.open("POST", url, true);
+	req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	req.setRequestHeader("Content-length", params.length);
+	req.setRequestHeader("Connection", "close");
+	req.onreadystatechange = function() {NestedahahDone(url, target);}; 
+	req.send(params); 
   } 
 }  
 
@@ -338,4 +349,37 @@ function setlinksdisp(disp) {
 			el[i].style.display = disp;
 		}
 	}
+}
+
+function editinplace(el) {
+	inputh = document.getElementById('input'+el.id);
+	if (inputh==null) {
+		var inputh = document.createElement("input");
+		inputh.id = 'input'+el.id;
+		inputh.type = "hidden";
+		el.parentNode.insertBefore(inputh,el);	
+		var inputt  = document.createElement("input");
+		inputt.id = 'inputt'+el.id;
+		inputt.type = "text";
+		inputt.onblur = editinplaceun;
+		el.parentNode.insertBefore(inputt,el);	
+	} else {
+		inputt = document.getElementById('inputt'+el.id);
+		inputt.style.display = "inline";
+	}
+	inputt.value = el.innerHTML;
+	el.style.display = "none";
+	inputt.focus();
+}
+
+function editinplaceun() {
+	el = document.getElementById(this.id.substring(6));
+	input =  document.getElementById('input'+this.id.substring(6));
+	el.innerHTML = this.value;
+	//input.parentNode.removeChild(input);
+	input.value = this.value;
+	el.style.display = 'inline';
+	this.style.display = "none";
+	
+	document.getElementById('recchg').disabled = false;
 }
