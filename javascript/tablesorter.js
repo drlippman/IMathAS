@@ -33,7 +33,8 @@
 		//b = b.replace(/[^\d\.\/]/g,'');
 		//if(a.indexOf('/')>=0) a = eval(a);
 		//if(b.indexOf('/')>=0) b = eval(b);
-		
+		a = a.replace(/\<\s*[^\>]*\>/g,'');
+		b = b.replace(/\<\s*[^\>]*\>/g,'');
 		a = parseFloat(a.match(/[\d\.]+/));
 		b = parseFloat(b.match(/[\d\.]+/));
 		
