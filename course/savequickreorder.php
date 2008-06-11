@@ -14,18 +14,7 @@
  $cid = $_GET['cid'];
  $order = $_POST['order'];
  
- $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
- $result = mysql_query($query) or die("Query failed : " . mysql_error());
- $items = unserialize(mysql_result($result,0,0));
- 
- $newitems = array();
-
- $newitems = additems($order);
- $itemlist = addslashes(serialize($newitems));
- $query = "UPDATE imas_courses SET itemorder='$itemlist' WHERE id='$cid'";
- mysql_query($query) or die("Query failed : " . mysql_error());
- 
- foreach ($_POST as $id=>$val) {
+  foreach ($_POST as $id=>$val) {
 	 if ($id=="order") { continue;}
 	 $type = $id{0};
 	 $typeid = substr($id,1);
@@ -56,6 +45,19 @@
 	 mysql_query($query) or die("Query failed : " . mysql_error());
  }
  
+ $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+ $result = mysql_query($query) or die("Query failed : " . mysql_error());
+ $items = unserialize(mysql_result($result,0,0));
+ 
+ $newitems = array();
+
+ $newitems = additems($order);
+ $itemlist = addslashes(serialize($newitems));
+ $query = "UPDATE imas_courses SET itemorder='$itemlist' WHERE id='$cid'";
+ mysql_query($query) or die("Query failed : " . mysql_error());
+ 
+
+ 
  
  function additems($list) {
 	 global $items;
@@ -84,14 +86,13 @@
 				 $pts[0] = substr($it,0,$pos);
 				 $pts[1] = substr($it,$pos+1);
 			 }
-			 
 			 $blocktree = explode('-',$pts[0]);
 			 $sub = $items;
 			 for ($i=1;$i<count($blocktree)-1;$i++) {
 				 $sub = $sub[$blocktree[$i]-1]['items'];
 			 }
 			 $block = $sub[$blocktree[count($blocktree)-1]-1];
-			 unset($block['items']);
+			 
 			 if ($pos===false) {
 				 $block['items'] = array();
 			 } else {
@@ -106,9 +107,7 @@
 	 }
 	 return $outarr;
  }
- 
- 
- 
- 
  echo "OK"; 
+ require("courseshowitems.php");
+ quickview($newitems,0);
 ?>

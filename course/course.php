@@ -371,9 +371,6 @@ if ($overwriteBody==1) {
 		   echo "<script>var AHAHsaveurl = '$imasroot/course/savequickreorder.php?cid=$cid';</script>";
 		   echo "<script src=\"$imasroot/javascript/mootools.js\"></script>";
 		   echo "<script src=\"$imasroot/javascript/nested1.js\"></script>";
-		   //echo '<input type="button" id="recchg" disabled="disabled" value="Record Order" onclick="submitChanges()"/>';
-		   //echo '<span id="submitnotice" style="color:red;"></span>';
-		   //echo '<input type=button value="Collapse All" onclick="sortIt.collapseall()"/>';
 		   echo '<ul id=qviewtree class=qview>';
 		   quickview($items,0);
 		   echo '</ul>';

@@ -67,7 +67,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (isset($_POST['hidetitle'])) {
 			$_POST['title']='##hidden##';
 		}
-		
+
+		require_once("../includes/htmLawed.php");
+		$htmlawedconfig = array('clean_ms_char'=>1, 'elements'=>'*-script');
+		$_POST['text'] = addslashes(htmLawed(stripslashes($_POST['text']),$htmlawedconfig));
+
 		$filestoremove = array();
 		if (isset($_GET['id'])) {  //already have id; update
 			$query = "UPDATE imas_inlinetext SET title='{$_POST['title']}',text='{$_POST['text']}',startdate=$startdate,enddate=$enddate,avail='{$_POST['avail']}',";

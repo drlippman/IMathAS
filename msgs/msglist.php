@@ -33,6 +33,11 @@
 	
 	if (isset($_GET['add'])) {
 		if (isset($_POST['subject'])) {
+			require_once("../includes/htmLawed.php");
+			$htmlawedconfig = array('clean_ms_char'=>1, 'elements'=>'*-script');
+			$_POST['message'] = addslashes(htmLawed(stripslashes($_POST['message']),$htmlawedconfig));
+			$_POST['subject'] = strip_tags($_POST['subject']);
+			
 			$query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
 			$now = time();
 			$query .= "('{$_POST['subject']}','{$_POST['message']}','{$_POST['to']}','$userid',$now,0,'{$_POST['courseid']}')";

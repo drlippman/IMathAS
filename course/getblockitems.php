@@ -101,6 +101,8 @@
 	   if (isset($teacherid)) {
 		   //echo generateadditem($_GET['folder'],'b');
 	   }
+   } else {
+	 echo generateadditem($_GET['folder'],'b');  
    }
 
    

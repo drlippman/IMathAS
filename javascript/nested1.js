@@ -107,13 +107,6 @@ var Nested = new Class({
 		event.stop();
 	},
 	
-	collapseall: function() {
-		$$('.blockli').each(function(el){
-				el.setStyle('display', 'none');
-				el.addClass(sortIt.options.collapseClass);
-		});	
-	},
-	
 	stop: function(event) {
 		event.stop();
 		return false;
@@ -335,11 +328,13 @@ function submitChanges() {
 function NestedahahDone(url, target) { 
   if (req.readyState == 4) { // only if req is "loaded" 
     if (req.status == 200) { // only if "OK" 
-	    if (req.responseText=='OK') {
+	    if (req.responseText.substring(0,2)=='OK') {
 		    document.getElementById(target).innerHTML='';
 		    document.getElementById('recchg').disabled = true;
 		    setlinksdisp("");
+		    document.getElementById("qviewtree").innerHTML = req.responseText.substring(2);
 		    sortIt.haschanged = false;
+		      
 	    } else {
 		    document.getElementById(target).innerHTML=req.responseText;
 	    }

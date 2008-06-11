@@ -67,6 +67,11 @@ Crystal Icons
 LGPL license
 http://www.everaldo.com/crystal/
 
+htmLawed
+(c) Santosh Patnaik
+http://www.bioinformatics.org/phplabware/internal_utilities/htmLawed/
+GPL License
+
 Viewer.class used by plot3d library
 (c) David Lippman, based on code by Evgeny Demidov, presumed public domain
 Code available on request to drlippman@yahoo.com

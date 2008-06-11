@@ -1849,6 +1849,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 		return $correct;
 	} else if ($anstype == "essay") {
+		require_once("../includes/htmLawed.php");
+		$htmlawedconfig = array('clean_ms_char'=>1, 'elements'=>'*-script');
+		$givenans = addslashes(htmLawed(stripslashes($givenans),$htmlawedconfig));
 		$givenans = preg_replace('/&(\w+;)/',"%$1",$givenans);
 		$GLOBALS['partlastanswer'] = $givenans;
 		return 0;

@@ -80,6 +80,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if ($_POST['cntingb']==0) {
 			$_POST['points'] = 0;
 		}
+		
+		require_once("../includes/htmLawed.php");
+		$htmlawedconfig = array('clean_ms_char'=>1, 'elements'=>'*-script');
+		$_POST['description'] = addslashes(htmLawed(stripslashes($_POST['description']),$htmlawedconfig));
 				
 		if (isset($_GET['id'])) {  //already have id; update
 		$query = "UPDATE imas_forums SET name='{$_POST['name']}',description='{$_POST['description']}',startdate=$startdate,enddate=$enddate,settings=$fsets,";

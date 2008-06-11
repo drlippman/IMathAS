@@ -167,6 +167,10 @@
 				require_once("../course/parsedatetime.php");
 				$replyby = parsedatetime($_POST['replybydate'],$_POST['replybytime']);
 			}
+			require_once("../includes/htmLawed.php");
+			$htmlawedconfig = array('clean_ms_char'=>1, 'elements'=>'*-script');
+			$_POST['message'] = addslashes(htmLawed(stripslashes($_POST['message']),$htmlawedconfig));
+			$_POST['subject'] = strip_tags($_POST['subject']);
 			
 			if ($_GET['modify']=="new") {	
 				$now = time();

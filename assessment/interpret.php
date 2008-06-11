@@ -18,6 +18,7 @@ function interpret($blockname,$anstype,$str)
 		global $allowedmacros;
 		global $mathfuncs;
 		global $disallowedwords,$disallowedvar;
+		$str = str_replace('\\frac','\\\\frac',$str);
 		$str .= ' ';
 		$str = str_replace("\r\n","\n",$str);
 		$str = str_replace("&&\n","<br/>",$str);
