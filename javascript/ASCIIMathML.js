@@ -58,6 +58,8 @@ function AMisMathMLavailable() {
     //else return AMnoMathMLNote();
     if (navigator.product && navigator.product=='Gecko') {
 	   var rv = navigator.userAgent.toLowerCase().match(/rv:\s*([\d\.]+)/)[1].split('.');
+	   if (rv.length<3) { rv[2] = 0;}
+	   if (rv.length<2) { rv[1] = 0;}
 	   if (10000*rv[0]+100*rv[1]+1*rv[2]>=10100) return null;
 	   else return AMnoMathMLNote();
     }

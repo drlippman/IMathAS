@@ -46,6 +46,9 @@
 				$handle = fopen($_FILES['userfile']['tmp_name'],'r');
 				if ($_POST['hashdr']==1) {
 					$data = fgetcsv($handle,4096,',');
+				} else if ($_POST['hashdr']==2) {
+					$data = fgetcsv($handle,4096,',');
+					$data = fgetcsv($handle,4096,',');
 				}
 				while (($data = fgetcsv($handle, 4096, ",")) !== FALSE) {
 					$query = "SELECT imas_users.id FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid AND imas_students.courseid='$cid' AND ";
@@ -99,13 +102,14 @@
 		echo "<span class=form>Grade file (CSV): </span><span class=formright><input name=\"userfile\" type=\"file\" /></span><br class=form>\n";
 		echo '<span class=form>File has header row?</span><span class=formright>';
 		echo ' <input type=radio name="hashdr" value="0" checked=1 />No header<br/>';
-		echo ' <input type=radio name="hashdr" value="1" />Has header</span><br class="form" />';
+		echo ' <input type=radio name="hashdr" value="1" />Has 1 row header<br/>';
+		echo ' <input type=radio name="hashdr" value="2" />Has 2 row header</span><br class="form" />';
 		
 		echo '<span class=form>Comments are in column:</span><span class=formright>';
 		echo '<input type=text size=4 name="gradecol" value="2"/></span><br class="form" />';
 		
 		echo '<span class=form>User is identified by:</span><span class=formright>';
-		echo '<input type=radio name="useridtype" value="0" checked=1 />Username (login name) in column <input type=text size=4 name="usernamecol" value="1" /><br/>';
+		echo '<input type=radio name="useridtype" value="0" checked=1 />Username (login name) in column <input type=text size=4 name="usernamecol" value="2" /><br/>';
 		echo '<input type=radio name="useridtype" value="1" />Lastname, Firstname in column <input type=text size=4 name="fullnamecol" value="1" />';
 		echo '</span><br class="form" />';
 		

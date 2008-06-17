@@ -59,7 +59,7 @@
 					$tolist[] = $row[0];
 				}
 			}
-			$sentto = addimplode('<br/>',$fullnames);
+			$sentto = implode('<br/>',$fullnames);
 			$message = $_POST['message'] . addslashes("<p>Instructor note: Message sent to these students from course $coursename: <br/> $sentto </p>\n");
 			
 			foreach ($tolist as $msgto) {

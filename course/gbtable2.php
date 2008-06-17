@@ -736,7 +736,54 @@ function gbtable() {
 		}
 		$cattotfuture[$row][$category[$i]][$col] = $r[2];
 	}
-	
+	//fill out cattot's with zeros
+	for ($ln=1; $ln<count($sturow)+1; $ln++) {
+		foreach($assessidx as $aid=>$i) {
+			$col = $assesscol[$aid];
+			if (!isset($gb[$ln][1][$col][0])) {
+				if ($cntingb[$i] == 1 || $cntingb[$i]==2) {
+					if ($gb[0][1][$col][3]<1) { //past
+						$cattotpast[$ln][$category[$i]][$col] = 0;
+					} 
+					if ($gb[0][1][$col][3]<2) { //past or cur
+						$cattotcur[$ln][$category[$i]][$col] = 0;
+					}
+					$cattotfuture[$ln][$category[$i]][$col] = 0;
+					
+				}
+			}
+		}
+		foreach($gradeidx as $aid=>$i) {
+			$col = $gradecol[$aid];
+			if (!isset($gb[$ln][1][$col][0])) {
+				if ($cntingb[$i] == 1 || $cntingb[$i]==2) {
+					if ($gb[0][1][$col][3]<1) { //past
+						$cattotpast[$ln][$category[$i]][$col] = 0;
+					} 
+					if ($gb[0][1][$col][3]<2) { //past or cur
+						$cattotcur[$ln][$category[$i]][$col] = 0;
+					}
+					$cattotfuture[$ln][$category[$i]][$col] = 0;
+					
+				}
+			}
+		}
+		foreach($discussidx as $aid=>$i) {
+			$col = $discusscol[$aid];
+			if (!isset($gb[$ln][1][$col][0])) {
+				if ($cntingb[$i] == 1 || $cntingb[$i]==2) {
+					if ($gb[0][1][$col][3]<1) { //past
+						$cattotpast[$ln][$category[$i]][$col] = 0;
+					} 
+					if ($gb[0][1][$col][3]<2) { //past or cur
+						$cattotcur[$ln][$category[$i]][$col] = 0;
+					}
+					$cattotfuture[$ln][$category[$i]][$col] = 0;
+					
+				}
+			}
+		}
+	}
 	//create category totals
 	
 	for ($ln = 1; $ln<count($sturow)+1;$ln++) { //foreach student calculate category totals and total totals

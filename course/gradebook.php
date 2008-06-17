@@ -826,7 +826,11 @@ function gbinstrdisp() {
 		}
 	}
 	echo "</tbody></table>";
-	$sarr = array_fill(0,$n-1,"'N'");
+	if ($n>0) {
+		$sarr = array_fill(0,$n-1,"'N'");
+	} else {
+		$sarr = array();
+	}
 	array_unshift($sarr,"'S'");
 	
 	$sarr = implode(",",$sarr);

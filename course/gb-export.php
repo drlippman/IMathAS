@@ -34,13 +34,21 @@
 		}
 		echo '">';
 		if ($_GET['emailgb']=="ask") {
-			echo "Email Gradebook To: <input type=text name=\"email\" /> <br/>";
+			echo "<span class=\"form\">Email Gradebook To:</span><span class=\"formright\"> <input type=text name=\"email\" size=\"30\"/></span> <br class=\"form\" />";
 		}
 		
-		echo 'Separate header line for points possible?  <input type="radio" name="pointsln" value="0" checked="checked"> No <input type="radio" name="pointsln" value="1"> Yes<br/>';
-		echo 'Assessment comments:  <input type="radio" name="commentloc" value="1" checked="checked"> Separate columns at end <input type="radio" name="commentloc" value="0"> After scores<br/>';
+		echo '<span class="form">Separate header line for points possible?</span><span class="formright"><input type="radio" name="pointsln" value="0" checked="checked"> No <br/><input type="radio" name="pointsln" value="1"> Yes</span><br class="form" />';
+		echo '<span class="form">Assessment comments:</span><span class="formright"> <input type="radio" name="commentloc" value="-1" checked="checked"> Don\'t include <br/>  <input type="radio" name="commentloc" value="1"> Separate columns at end <br/><input type="radio" name="commentloc" value="0"> After scores</span><br class="form" />';
 		
-		echo '<input type=submit value="Go" />';
+		if (isset($_GET['export'])) {
+			echo '<div class="submit"><input type=submit value="Download Gradebook" /></div>';
+			echo '<p>When you click the <b>Download Gradebook</b> button, your browser will probably ask if you want to save or ';
+			echo 'open the file.  Click <b>Save</b> to save the file to your computer, or <b>Open</b> to open the gradebook in Excel ';
+			echo 'or whatever program your computer has set to open .csv spreadsheet files</p>';
+			echo "<p><a href=\"gradebook.php?cid=$cid\">Return to gradebook</a></p>";
+		} else {
+			echo '<div class="submit"><input type=submit value="Email Gradebook" /></div>';
+		}
 		echo '</form>';
 		require("../footer.php");
 		exit;
@@ -424,7 +432,7 @@ function gbinstrexport() {
 		$ins = array();
 		
 		for ($i=0; $i<count($gbo[0]);$i++) {
-			if (preg_match('/([\d\.]+)(\s*|&nbsp;)pts.*/',$gbo[0][$i],$matches)) {
+			if (preg_match('/(-?[\d\.]+)(\s*|&nbsp;)pts.*/',$gbo[0][$i],$matches)) {
 				$ins[$i] = $matches[1];	
 			} else {
 				$ins[$i] = '';

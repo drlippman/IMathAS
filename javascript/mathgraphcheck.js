@@ -6,6 +6,8 @@ function AMisMathMLavailable() {
 	   var rv = navigator.userAgent.toLowerCase().match(/rv:\s*([\d\.]+)/);
 	   if (rv!=null) {
 		rv = rv[1].split('.');
+		if (rv.length<3) { rv[2] = 0;}
+		if (rv.length<2) { rv[1] = 0;}
 	   }
 	   if (rv!=null && 10000*rv[0]+100*rv[1]+1*rv[2]>=10100) {
 		   AMisGecko = true;
@@ -37,7 +39,7 @@ function AMcheckTeX() {
 	hiddendiv.style.visibility = "hidden";
 	hiddendiv.id = "hidden";
 	document.body.appendChild(hiddendiv);
-	wh = AMBBoxFor('<span style="font-family: cmex10, serif">&#xEFE8;</span>');
+	wh = AMBBoxFor('<span style="font-family: STIXgeneral, cmex10, serif">&#xEFE8;</span>');
 	wh2 = AMBBoxFor('<span style="font-family: serif">&#xEFE8;</span>');
 	nofonts = (wh.w==wh2.w && wh.h==wh2.h);
 	if (nofonts) {
@@ -70,6 +72,8 @@ function isSVGavailable() {
 	   var rv = navigator.userAgent.toLowerCase().match(/rv:\s*([\d\.]+)/);
 	   if (rv!=null) {
 		rv = rv[1].split('.');
+		if (rv.length<3) { rv[2] = 0;}
+		if (rv.length<2) { rv[1] = 0;}
 	   }
 	   if (rv!=null && 10000*rv[0]+100*rv[1]+1*rv[2]>=10800) return null;
 	   else return 1;
