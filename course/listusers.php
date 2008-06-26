@@ -139,7 +139,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$pagetitle = "Change Student Info";
 		
 		if (isset($_POST['firstname'])) {
-			$un = preg_replace('/\W/','',$_POST['username']);
+			$un = preg_replace('/[^\w\.@]*/','',$_POST['username']);
 			$updateusername = true;
 			$query = "SELECT id FROM imas_users WHERE SID='$un'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());

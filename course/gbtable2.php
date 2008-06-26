@@ -154,7 +154,7 @@ function gbtable() {
 	}
 	//Pull Assessment Info
 	$now = time();
-	$query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb FROM imas_assessments WHERE courseid='$cid' ";
+	$query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail FROM imas_assessments WHERE courseid='$cid' ";
 	if (!$isteacher) {
 		$query .= "AND cntingb>0 ";
 	}
@@ -188,6 +188,10 @@ function gbtable() {
 		$deffeedback = explode('-',$line['deffeedback']);
 		$assessmenttype[$kcnt] = $deffeedback[0];
 		$sa[$kcnt] = $deffeedback[1];
+		if ($line['avail']==2) {
+			$line['startdate'] = 0;
+			$line['enddate'] = 2000000000;
+		}
 		$enddate[$kcnt] = $line['enddate'];
 		if ($now<$line['startdate']) {
 			$avail[$kcnt] = 2;
@@ -266,7 +270,7 @@ function gbtable() {
 	}
 	
 	//Pull Discussion Grade info
-	$query = "SELECT id,name,gbcategory,enddate,points FROM imas_forums WHERE courseid='$cid' AND points>0 ";
+	$query = "SELECT id,name,gbcategory,startdate,enddate,replyby,postby,points,avail FROM imas_forums WHERE courseid='$cid' AND points>0 ";
 	if (!$isteacher) {
 		$query .= "AND startdate<$now ";
 	}
@@ -279,9 +283,30 @@ function gbtable() {
 		$discuss[$kcnt] = $line['id'];
 		$assessmenttype[$kcnt] = "Discussion";
 		$category[$kcnt] = $line['gbcategory'];
+		if ($line['avail']==2) {
+			$line['startdate'] = 0;
+			$line['enddate'] = 2000000000;
+		}
 		$enddate[$kcnt] = $line['enddate'];
-		if ($now < $line['showdate']) {
+		if ($now < $line['startdate']) {
 			$avail[$kcnt] = 2;
+		} else if ($now < $line['enddate']) {
+			$avail[$kcnt] = 1;
+			if ($line['replyby'] > 0 && $line['replyby'] < 2000000000) {
+				if ($line['postby'] > 0 && $line['postby'] < 2000000000) {
+					if ($now>$line['replyby'] && $now>$line['postby']) {
+						$avail[$kcnt] = 0;
+					}
+				} else {
+					if ($now>$line['replyby']) {
+						$avail[$kcnt] = 0;
+					}
+				}
+			} else if ($line['postby'] > 0 && $line['postby'] < 2000000000) {
+				if ($now>$line['postby']) {
+					$avail[$kcnt] = 0;
+				}
+			}
 		} else {
 			$avail[$kcnt] = 0;
 		}

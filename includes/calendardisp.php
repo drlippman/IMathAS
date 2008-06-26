@@ -2,10 +2,14 @@
 
 function showcalendar($refpage) {
 
-global $imasroot,$cid,$userid,$teacherid;
+global $imasroot,$cid,$userid,$teacherid,$previewshift;
 
 $now= time();
+if ($previewshift!=-1) {
+	$now = $now + $previewshift;
+}
 $today = $now;
+
 if (isset($_GET['calpageshift'])) {
 	$pageshift = $_GET['calpageshift'];
 } else {
@@ -192,18 +196,25 @@ while ($row = mysql_fetch_row($result)) {
 	$tags[$k] = $row[6];
 	$k++;
 }
-$query = "SELECT id,name,postby,replyby,startdate FROM imas_forums WHERE enddate>$lowertime AND ((postby>$now AND postby<$uppertime) OR (replyby>$now AND replyby<$uppertime)) AND startdate<$now AND avail>0 AND courseid='$cid'";
+$query = "SELECT id,name,postby,replyby,startdate FROM imas_forums WHERE enddate>$lowertime AND ((postby>$now AND postby<$uppertime) OR (replyby>$now AND replyby<$uppertime)) AND avail>0 AND courseid='$cid'";
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 while ($row = mysql_fetch_row($result)) {
-	list($moday,$time) = explode('~',date('n-j~g:i a',$row[2]));
-	$row[1] = str_replace('"','\"',$row[1]);
-	$colors[$k] = makecolor2($row[4],$row[2],$now);
-	$assess[$moday][$k] = "{type:\"FP\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors[$k]."\"}";
-	$k++;
-	list($moday,$time) = explode('~',date('n-j~g:i a',$row[3]));
-	$colors[$k] = makecolor2($row[4],$row[3],$now);
-	$assess[$moday][$k] = "{type:\"FR\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors[$k]."\"}";
-	$k++;	
+	if (($row[4]>$now && !isset($teacherid))) {
+		continue;
+	}
+	if ($row[2]>$now) {
+		list($moday,$time) = explode('~',date('n-j~g:i a',$row[2]));
+		$row[1] = str_replace('"','\"',$row[1]);
+		$colors[$k] = makecolor2($row[4],$row[2],$now);
+		$assess[$moday][$k] = "{type:\"FP\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors[$k]."\"}";
+		$k++;
+	}
+	if ($row[3]>$now) {
+		list($moday,$time) = explode('~',date('n-j~g:i a',$row[3]));
+		$colors[$k] = makecolor2($row[4],$row[3],$now);
+		$assess[$moday][$k] = "{type:\"FR\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors[$k]."\"}";
+		$k++;	
+	}
 }
 
 $query = "SELECT title,tag,date FROM imas_calitems WHERE date>$exlowertime AND date<$uppertime and courseid='$cid'";
