@@ -142,7 +142,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$_POST['cntingb'] = $_POST['pcntingb'];
 		}
 		require_once("../includes/htmLawed.php");
-		$htmlawedconfig = array('clean_ms_char'=>1, 'elements'=>'*-script');
+		$htmlawedconfig = array('elements'=>'*-script');
 		$_POST['summary'] = addslashes(htmLawed(stripslashes($_POST['summary']),$htmlawedconfig));
 		$_POST['intro'] = addslashes(htmLawed(stripslashes($_POST['intro']),$htmlawedconfig));
 		if (isset($_GET['id'])) {  //already have id; update

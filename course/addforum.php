@@ -82,7 +82,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		
 		require_once("../includes/htmLawed.php");
-		$htmlawedconfig = array('clean_ms_char'=>1, 'elements'=>'*-script');
+		$htmlawedconfig = array('elements'=>'*-script');
 		$_POST['description'] = addslashes(htmLawed(stripslashes($_POST['description']),$htmlawedconfig));
 				
 		if (isset($_GET['id'])) {  //already have id; update

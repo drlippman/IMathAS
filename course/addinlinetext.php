@@ -69,7 +69,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 
 		require_once("../includes/htmLawed.php");
-		$htmlawedconfig = array('clean_ms_char'=>1, 'elements'=>'*-script');
+		$htmlawedconfig = array('elements'=>'*-script');
 		$_POST['text'] = addslashes(htmLawed(stripslashes($_POST['text']),$htmlawedconfig));
 
 		$filestoremove = array();

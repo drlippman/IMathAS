@@ -7,7 +7,7 @@ require_once("mathphp.php");
 require("interpret.php");
 require("macros.php");
 function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false) {
-	global $imasroot;
+	global $imasroot, $myrights;
 	srand($seed);
 	
 	/*if (func_num_args()>5 && func_get_arg(5)==true) {
@@ -61,7 +61,6 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		}
 		$thisq = $qnidx+1;
 	}
-	
 	eval(interpret('control',$qdata['qtype'],$qdata['control']));
 	eval(interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
 	$toevalqtxt = interpret('qtext',$qdata['qtype'],$qdata['qtext']);
@@ -88,6 +87,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	}
 	
 	//pack options
+	
 	if (isset($ansprompt)) {$options['ansprompt'] = $ansprompt;}
 	if (isset($displayformat)) {$options['displayformat'] = $displayformat;}
 	if (isset($answerformat)) {$answerformat = str_replace(' ','',$answerformat); $options['answerformat'] = $answerformat;}
@@ -370,6 +370,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans) {
 
 
 function makeanswerbox($anstype, $qn, $la, $options,$multi) {
+	global $myrights;
 	$out = '';
 	$tip = '';
 	$sa = '';
@@ -483,7 +484,10 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		}
 		
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
-		if (isset($noshuffle)) {
+		if ($noshuffle == "last") {
+			$randkeys = array_rand(array_slice($questions,0,count($questions)-1),count($questions)-1);
+			array_push($randkeys,count($questions)-1);
+		} else if (isset($noshuffle)) {
 			$randkeys = array_keys($questions);
 		} else {
 			$randkeys = array_rand($questions,count($questions));
@@ -759,9 +763,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (isset($options['domain'])) {if (is_array($options['domain'])) {$domain = $options['domain'][$qn];} else {$domain = $options['domain'];}}
 		if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$qn];} else {$sz = $options['answerboxsize'];}}
 		if (isset($options['hidepreview'])) {if (is_array($options['hidepreview'])) {$hidepreview = $options['hidepreview'][$qn];} else {$hidepreview = $options['hidepreview'];}}
-		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
+		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}	
 		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
-		
 		if (!isset($sz)) { $sz = 20;}
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		if (isset($ansprompt)) {$out .= "<label for=\"tc$qn\">$ansprompt</label>";}
@@ -1239,7 +1242,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$score = 1.0;
-		if (isset($noshuffle)) {
+		if ($noshuffle == "last") {
+			$randqkeys = array_rand(array_slice($questions,0,count($questions)-1),count($questions)-1);
+			array_push($randqkeys,count($questions)-1);
+		} else if (isset($noshuffle)) {
 			$randqkeys = array_keys($questions);
 		} else {
 			$randqkeys = array_rand($questions,count($questions));
@@ -1850,7 +1856,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		return $correct;
 	} else if ($anstype == "essay") {
 		require_once("../includes/htmLawed.php");
-		$htmlawedconfig = array('clean_ms_char'=>1, 'elements'=>'*-script');
+		$htmlawedconfig = array('elements'=>'*-script');
 		$givenans = addslashes(htmLawed(stripslashes($givenans),$htmlawedconfig));
 		$givenans = preg_replace('/&(\w+;)/',"%$1",$givenans);
 		$GLOBALS['partlastanswer'] = $givenans;

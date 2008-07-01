@@ -34,7 +34,7 @@
 	if (isset($_GET['add'])) {
 		if (isset($_POST['subject'])) {
 			require_once("../includes/htmLawed.php");
-			$htmlawedconfig = array('clean_ms_char'=>1, 'elements'=>'*-script');
+			$htmlawedconfig = array('elements'=>'*-script');
 			$_POST['message'] = addslashes(htmLawed(stripslashes($_POST['message']),$htmlawedconfig));
 			$_POST['subject'] = strip_tags($_POST['subject']);
 			

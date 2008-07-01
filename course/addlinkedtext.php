@@ -93,11 +93,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$_POST['text'] = trim(strip_tags($_POST['text']));	
 		} else {
 			require_once("../includes/htmLawed.php");
-			$htmlawedconfig = array('clean_ms_char'=>1, 'elements'=>'*-script');
+			$htmlawedconfig = array('elements'=>'*-script');
 			$_POST['text'] = addslashes(htmLawed(stripslashes($_POST['text']),$htmlawedconfig));	
 		}
 		require_once("../includes/htmLawed.php");
-		$htmlawedconfig = array('clean_ms_char'=>1, 'elements'=>'*-script' );
+		$htmlawedconfig = array('elements'=>'*-script' );
 		$_POST['summary'] = addslashes(htmLawed(stripslashes($_POST['summary']),$htmlawedconfig));
 		$_POST['text'] = trim($_POST['text']);
 		if (isset($_GET['id'])) {  //already have id; update
