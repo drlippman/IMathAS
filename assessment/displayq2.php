@@ -668,6 +668,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$tip .= "Enter $eword as a reduced mixed number or as a whole number.  Example: 2_1/2 = `2 1/2`";
 		} else if (in_array('fracordec',$ansformats)) {
 			$tip .= "Enter $eword as a fraction (like 3/5 or 10/4), a whole number (like 4 or -2), or exact decimal (like 0.5 or 1.25)";
+		} else if (in_array('scinot',$ansformats)) {
+			$tip .= "Enter $eword as in scientific notation.  Example: 3*10^2 = `3*10^2`";
 		} else {
 			$tip .= "Enter $eword as a number (like 5, -3, 2.2) or as a calculation (like 5/3, 2^3, 5+4)<br/>";
 			$tip .= "Enter DNE for Does Not Exist, oo for Infinity";
@@ -1569,6 +1571,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						continue;
 					}
 				}
+				if (in_array("scinot",$ansformats)) {
+					$totest = str_replace(' ','',$orarr[$j]);
+					if (!preg_match('/^\-?\d\.?\d*?\*10\^(\-?\d+)$/',$totest)) {
+						continue;
+					} 
+				}
+						
 				if (in_array("mixednumber",$ansformats)) {
 					if (!preg_match('/^\s*\-?\s*\d+\s*_\s*(\d+)\s*\/\s*(\d+)\s*$/',$orarr[$j],$mnmatches) && !preg_match('/^\s*?\-?\d+\s*$/',$orarr[$j]) && !preg_match('/^\s*\-?\d+\s*\/\s*\-?\d+\s*$/',$orarr[$j])) {
 						continue;

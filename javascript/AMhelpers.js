@@ -34,6 +34,11 @@ function calculate(inputId,outputId,format) {
 				err += "not a valid mixed number";
 			  }
 			  str = str.replace(/_/,' ');
+		  } else if (format.indexOf('scinot')!=-1) {
+			  str = str.replace(/\s/,'');
+			  if (!str.match(/^\-?\d\.?\d*?\*10\^(\-?\d+)$/)) {
+				err += "not valid scientific notation";  
+			  }
 		  }
 		  if (format.indexOf('notrig')!=-1 && str.match(/(sin|cos|tan|cot|sec|csc)/)) {
 			  str = "no trig functions allowed";
@@ -46,7 +51,7 @@ function calculate(inputId,outputId,format) {
 			    err = "syntax incomplete";
 			  }
 			  if (!isNaN(res) && res!="Infinity") {
-				  if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1) {
+				  if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1 || format.indexOf('scinot')!=-1) {
 					  str = "`"+str+"` " + err;
 				  } else {
 					  str = "`"+str+" =` "+(Math.abs(res)<1e-15?0:res)+err;

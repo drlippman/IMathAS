@@ -1442,6 +1442,7 @@ The following macros help with display:
    can only be used for display, not in calculations</li>
 <li><b>prettyreal(number,decimals)</b>:  Adds commas in thousands spaces of number, and rounds decimal to decimals places.  Example: prettyreal(1234.567,2) will return "1,234.57".  The result is a string, which
    can only be used for display, not in calculations</li> 
+<li><b>makescinot(number,[decimals,format])</b>:  Converts number to scientific notation.  If provided, rounds mantissa to decimals places.  Can specify format: "*" "E" as alternative to default cross.</li>
 <li><b>prettytime(value,informat,outformat)</b>:  Creates a nice representation of a time.  Informat can be 'h', 'm', or 's' designating whether
     value is hours, minutes, or seconds.  Outformat can be any combination of these to specify output.  For example, 'hm' will return "__ hours and __ minutes".  Outformat
     can also be 'clock' which returns 3:42pm, or 'sclock' which returns 3:42:15pm</li>
@@ -1530,6 +1531,7 @@ These macros are fairly general purpose:
 <li><b>arraystodoteqns(xarray,yarray,[color])</b>:  Converts an array of x-values and y-values into a form that can be used in
   showplot.</li>
 <li><b>arraystodots(xarray,yarray)</b>: Converts an array of x-values and y-values into a form that can be used in the Drawing answer type</li>
+<li><b>today([string])</b>: Returns today's date, like "July 3, 2008".  Can change format using string (see http://us2.php.net/manual/en/function.date.php for formats)</li>
 </ul>
 </div>
 <div class=h2>
@@ -1711,8 +1713,8 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 </p>
 <p><b>Optional Variables</b><BR>
 <dl>
-<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "fracordec", "nodecimal", "notrig", "list", "exactlist", or "orderedlist" (In Common Control)</dt>
-	<dd>Requires the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), a single fraction or decimal, an answer
+<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", "notrig", "list", "exactlist", or "orderedlist" (In Common Control)</dt>
+	<dd>Requires the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
 	without decimals (also disallows 10^-2 and 3E-2), or 
 	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
 	If $answerformat includes "list", "exactlist", or "orderedlist", then a list of answers is expected. An $answerformat of "list" ignores then duplicate values.
