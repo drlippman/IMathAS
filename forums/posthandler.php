@@ -7,12 +7,17 @@ if (!isset($caller)) {
 if ($caller=="posts") {
 	$returnurl = "posts.php?view=$view&cid=$cid&page=$page&forum=$forumid&thread=$threadid";
 	$returnname = "Posts";
-} else if ($caller="byname") {
-	$returnurl = "postsbyname.php?cid=$cid&forum=$forumid";
-	$returnname = "Posts by Name";
+} else if ($caller=="byname") {
 	$threadid = $_GET['thread'];
+	$returnurl = "postsbyname.php?cid=$cid&forum=$forumid&thread=$threadid";
+	$returnname = "Posts by Name";
+	
 }
+
 if (isset($_GET['modify'])) { //adding or modifying post
+	if ($threadid==0) {
+		echo "I don't know what thread you're replying to.  Please go back and try again.";
+	}
 	if (isset($_POST['subject'])) {  //form submitted
 		if (isset($_POST['postanon']) && $_POST['postanon']==1) {
 			$isanon = 1;
