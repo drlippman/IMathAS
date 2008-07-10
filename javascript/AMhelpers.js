@@ -138,8 +138,9 @@ function intcalculate(inputId,outputId) {
 		  strarr[i] = sm + vals[0] + ',' + vals[1] + em;
 		  calcstrarr[i] = sm + calcvals[0] + ',' + calcvals[1] + em;
 	 }
+	 fullstr = '`'+strarr.join('uu') + '` = ' + calcstrarr.join(' U ');
   }
-  fullstr = '`'+strarr.join('uu') + '` = ' + calcstrarr.join(' U ');
+  
   
   var outnode = document.getElementById(outputId);
   var n = outnode.childNodes.length;
@@ -513,8 +514,9 @@ function doonsubmit(form,type2,skipconfirm) {
 					  strarr[k] = sm + vals[0] + ',' + vals[1] + em;
 				  }
 			 }
+			 fullstr = strarr.join('U');
 		  }
-		  nh.value = strarr.join('U');
+		  nh.value = fullstr;
 		  outn = document.getElementById("p"+intcalctoproc[i]);
 		  outn.appendChild(nh);
 	}

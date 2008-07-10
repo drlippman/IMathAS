@@ -122,6 +122,29 @@
 				exit;
 			}
 		}
+	} else if ($_GET['action']=="lookupusername") {
+		require_once("config.php");
+		$query = "SELECT SID,lastaccess FROM imas_users WHERE email='{$_POST['email']}'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		if (mysql_num_rows($result)>0) {
+			echo mysql_num_rows($result);
+			echo " usernames match this email address and were emailed.  <a href=\"index.php\">Return to login page</a>";
+			$headers  = 'MIME-Version: 1.0' . "\r\n";
+			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+			$headers .= "From: $sendfrom\r\n";
+			$message  = "<h4>This is an automated message from $installname.  Do not respond to this email</h4>\r\n";
+			$message .= "<p>Your email was entered in the Username Lookup page.  If you did not do this, you may ignore and delete this message.  ";
+			$message .= "All usernames using this email address are listed below</p><p>";
+			while ($row = mysql_fetch_row($result)) {
+				$message .= "Username: <b>{$row[0]}</b>.  Last logged in:  ".date("n/j/y g:ia",$row[1])."<br/>";
+			}
+			$message .= "</p><p>If you forgot your password, use the Lost Password link at the login page.</p>";
+			mail($_POST['email'],"$installname Username Request",$message,$headers);
+			exit;
+		} else {
+			echo "No usernames match this email address.  <a href=\"index.php\">Return to login page</a>";
+			exit;
+		}
 	}
 	
 	require("validate.php");

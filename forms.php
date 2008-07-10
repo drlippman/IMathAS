@@ -2,7 +2,7 @@
 //IMathAS:  Basic forms
 //(c) 2006 David Lippman
 require("config.php");
-if ($_GET['action']!="newuser" && $_GET['action']!="resetpw") {
+if ($_GET['action']!="newuser" && $_GET['action']!="resetpw" && $_GET['action']!="lookupusername") {
 	require("validate.php");
 }
 require("header.php");	
@@ -97,6 +97,13 @@ switch($_GET['action']) {
 		echo "<p>Enter your User Name below and click Submit.  An email will be sent to your email address on file.  A link in that email will ";
 		echo "reset your password.</p>";
 		echo "<p>User Name: <input type=text name=\"username\"/></p>";
+		echo "<p><input type=submit value=\"Submit\" /></p></form>";
+		break;
+	case "lookupusername":
+		echo "<h3>Lookup Username</h3>\n";
+		echo "<form method=post action=\"actions.php?action=lookupusername\">\n"; 
+		echo "If you can't remember your username, enter your email address below.  An email will be sent to your email address with your username. ";
+		echo "<p>Email: <input type=text name=\"email\"/></p>";
 		echo "<p><input type=submit value=\"Submit\" /></p></form>";
 		break;
 		

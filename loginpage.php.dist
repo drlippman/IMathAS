@@ -43,7 +43,8 @@ if (!isset($imasroot)) { //don't allow direct access to loginpage.php
 </table>
 <div id="settings">JavaScript is not enabled.  JavaScript is required for <?php echo $installname; ?>.  Please enable JavaScript and reload this page</div>
 <div class="textright"><a href="<?php echo $imasroot; ?>/forms.php?action=newuser">Register as a new student</a></div>
-<div class="textright"><a href="<?php echo $imasroot; ?>/forms.php?action=resetpw">Forgot Password</a></div>
+<div class="textright"><a href="<?php echo $imasroot; ?>/forms.php?action=resetpw">Forgot Password</a><br/>
+<a href="<?php echo $imasroot; ?>/forms.php?action=lookupusername">Forgot Username</a></div>
 <div class="textright"><a href="<?php echo $imasroot; ?>/checkbrowser.php">Browser check</a></div>
 <input type="hidden" id="tzoffset" name="tzoffset" value=""> 
 <script type="text/javascript">        
