@@ -39,6 +39,12 @@ if ($myrights<75) {
 	$pwlist = implode(',',$pws);
 	$public = 1*$_POST['avail'] + 2*$_POST['public'] + 4*$_POST['reentry'];
 	
+	if ($_POST['termtype']=='mo') {
+		$_POST['term'] = '*mo*';
+	} else if ($_POST['termtype']=='day') {
+		$_POST['term'] = '*day*';
+	}
+	
 	$sel2 = array();
 	if (isset($_POST['id'])) {
 		$query = "SELECT sel1list,sel2name,sel2list,aidlist FROM imas_diags WHERE id='{$_POST['id']}'";
@@ -287,7 +293,9 @@ if ($overwriteBody==1) { //NO AUTHORITY
 	<p>Diagnostic Name: 
 	<input type=text size=50 name="diagname" value="<?php echo $diagname; ?>"/></p>
 
-	<p>Term designator (e.g. F06):  <input type=text size=7 name="term" value="<?php echo $term; ?>"/></p>
+	<p>Term designator (e.g. F06):  <input type=radio name="termtype" value="mo" <?php if ($term=="*mo*") {echo 'checked="checked"';}?>>Use Month 
+				<input type=radio name="termtype" value="day" <?php if ($term=="*day*") {echo 'checked="checked"';}?>>Use Day 
+				<input type=radio name="termtype" value="cu" <?php if ($term!="*mo*" && $term!="*day*"  ) {echo 'checked="checked"';}?>>Use: <input type=text size=7 name="term" value="<?php if ($term!="*mo*" && $term!="*day*" ) {echo $term; }?>"/></p>
 
 	<p>Linked with course: 
 	<?php writeHtmlSelect ("cid",$page_courseSelectList['val'],$page_courseSelectList['label'],$page_courseSelected); ?>

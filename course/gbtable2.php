@@ -98,7 +98,7 @@ row[1][4][0] = userid
 ****/
 
 function gbtable() {
-	global $cid,$isteacher,$istutor,$tutorid,$userid,$catfilter,$secfilter;
+	global $cid,$isteacher,$istutor,$tutorid,$userid,$catfilter,$secfilter,$timefilter,$lnfilter;
 	if ($isteacher && func_num_args()>0) {
 		$limuser = func_get_arg(0);
 	} else if (!$isteacher && !$istutor) {
@@ -106,7 +106,7 @@ function gbtable() {
 	} else {
 		$limuser = 0;
 	}
-	
+
 	$isdiag = false;
 	$category = array();
 	if ($isteacher || $istutor) {
@@ -563,6 +563,13 @@ function gbtable() {
 	if ($limuser>0) { $query .= "AND imas_users.id='$limuser' ";}
 	if ($secfilter!=-1) {
 		$query .= "AND imas_students.section='$secfilter' ";
+	}
+	if (isset($timefilter)) {
+		$tf = time() - 60*60*$timefilter;
+		$query .= "AND imas_users.lastaccess>$tf ";
+	}
+	if (isset($lnfilter) && $lnfilter!='') {
+		$query .= "AND imas_users.LastName LIKE '$lnfilter%' ";
 	}
 	if ($isdiag) {
 		$query .= "ORDER BY imas_users.email,imas_users.LastName,imas_users.FirstName";

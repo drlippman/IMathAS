@@ -38,7 +38,13 @@ END;
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
 	$pcid = $line['cid'];
 	$diagid = $line['id'];
-	$diagqtr = $line['term'];
+	if ($line['term']=='*mo*') {
+		$diagqtr = date("M y");
+	} else if ($line['term']=='*day*') {
+		$diagqtr = date("M j y");
+	} else {
+		$diagqtr = $line['term'];
+	}
 	$sel1 = explode(',',$line['sel1list']);
 	
 	if (!($line['public']&1)) {
@@ -131,7 +137,7 @@ if (isset($_POST['SID'])) {
 	}
 	$cnt = 0;
 	$now = time();
-	$query = "SELECT id FROM imas_users WHERE SID='{$_POST['SID']}~$diagqtr'";
+	$query = "SELECT id FROM imas_users WHERE SID='{$_POST['SID']}~$diagqtr~$pcid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	if (mysql_num_rows($result)>0) {
 		$allowreentry = ($line['public']&4);
@@ -165,7 +171,7 @@ if (isset($_POST['SID'])) {
 	$eclass = $sel1[$_POST['course']] . '@' . $_POST['teachers'];
 	
 	$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, lastaccess) ";
-	$query .= "VALUES ('{$_POST['SID']}~$diagqtr','none',10,'{$_POST['firstname']}','{$_POST['lastname']}','$eclass',$now);";
+	$query .= "VALUES ('{$_POST['SID']}~$diagqtr~$pcid','none',10,'{$_POST['firstname']}','{$_POST['lastname']}','$eclass',$now);";
 	mysql_query($query) or die("Query failed : " . mysql_error());
 	$userid = mysql_insert_id();
 	$query = "INSERT INTO imas_students (userid,courseid) VALUES ('$userid','$pcid');";

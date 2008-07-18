@@ -550,7 +550,7 @@ function gbinstrdisp() {
 	echo "<table class=gb id=myTable><thead><tr>";
 	$n=0;
 	for ($i=0;$i<count($gbt[0][0]);$i++) { //biographical headers
-		if ($i==1) { continue;}
+		if ($i==1 && $gbt[0][0][1]!='ID') { continue;}
 		echo '<th>'.$gbt[0][0][$i];
 		if ($gbt[0][0][$i]=='Section') {
 			echo "<br/><select id=\"secfiltersel\" onchange=\"chgsecfilter()\"><option value=\"-1\" ";
@@ -688,7 +688,7 @@ function gbinstrdisp() {
 		echo "<a href=\"gradebook.php?cid=$cid&stu={$gbt[$i][4][0]}\">";
 		echo $gbt[$i][0][0];
 		echo '</a></td>';
-		for ($j=2;$j<count($gbt[0][0]);$j++) {
+		for ($j=($gbt[0][0][1]=='ID'?1:2);$j<count($gbt[0][0]);$j++) {
 			echo '<td class="c">'.$gbt[$i][0][$j].'</td>';	
 		}
 		if ($totonleft && !$hidepast) {
