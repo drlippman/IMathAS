@@ -133,9 +133,13 @@
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$now = time();
 		while ($row = mysql_fetch_row($result)) {
-			$query = "UPDATE imas_forum_views SET lastview=$now WHERE userid='$userid' AND threadid='{$row[0]}'";
-			mysql_query($query) or die("Query failed : $query " . mysql_error());
-			if (mysql_affected_rows()==0) {
+			$query = "SELECT id FROM imas_forum_views WHERE userid='$userid' AND threadid='{$row[0]}'";
+			$r2 = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			if (mysql_num_rows($r2)>0) {
+				$r2id = mysql_result($r2,0,0);
+				$query = "UPDATE imas_forum_views SET lastview=$now WHERE id='$r2id'";
+				mysql_query($query) or die("Query failed : $query " . mysql_error());
+			} else{
 				$query = "INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES ('$userid','{$row[0]}',$now)";
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
 			}

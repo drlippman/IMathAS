@@ -633,7 +633,7 @@
 			   }
 		   } else if ($line['itemtype']=="Forum") {
 			   $typeid = $line['typeid'];
-			   $query = "SELECT id,name,description,startdate,enddate,grpaid,avail FROM imas_forums WHERE id='$typeid'";
+			   $query = "SELECT id,name,description,startdate,enddate,grpaid,avail,postby,replyby FROM imas_forums WHERE id='$typeid'";
 			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			   $dofilter = false;
@@ -712,6 +712,13 @@
 					   $show = "Showing until: $enddate ";
 					   $color = makecolor2($line['startdate'],$line['enddate'],$now);
 				   }
+				   $duedates = "";
+				   if ($line['postby']>$now && $line['postby']!=2000000000) {
+					   $duedates .= "New Threads due ". formatdate($line['postby']) . ". ";
+				   }
+				   if ($line['replyby']>$now && $line['replyby']!=2000000000) {
+					   $duedates .= "Replies due ". formatdate($line['replyby']) . ". ";
+				   }
 				   echo "<div class=item>\n";
 				   if (($hideicons&8)==0) {
 					   if ($graphicalicons) {
@@ -731,6 +738,7 @@
 					   echo "<a href=\"deleteforum.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
 					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
 				   }
+				   if ($duedates!='') {echo "<br/>$duedates";}
 				   echo filter("</div><div class=itemsum>{$line['description']}</div>\n");
 				   echo "</div>\n";
 			   } else if (isset($teacherid)) {

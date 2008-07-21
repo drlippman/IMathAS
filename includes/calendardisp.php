@@ -122,7 +122,13 @@ while ($row = mysql_fetch_row($result)) {
 		$row[2] = $exceptions[$row[0]][0];
 		$row[3] = $exceptions[$row[0]][1];
 	}
-	
+	if ($row[3]>$uppertime && ($row[4]==0 || $row[4]>$uppertime || $row[4]<$row[3])) {
+		continue;
+	}
+	if ($row[3]<$now && $row[4]>$uppertime) { 
+		continue;
+	}
+	//echo "{$row[1]}, {$row[3]}, $uppertime, {$row[4]}<br/>";
 	if (($row[2]>$now && !isset($teacherid)) || ($now>$row[3] && $row[4]==0) || ($row[4]>0 && $now>$row[4])) {
 		continue;
 	}

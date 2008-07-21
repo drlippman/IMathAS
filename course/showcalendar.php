@@ -51,6 +51,23 @@
 	   }
 	    return $color;
 	 }
+	 
+	 function makecolor($etime,$now) {
+	   if (!$GLOBALS['colorshift']) {
+		   return "#ff0";
+	   }
+	   //$now = time();
+	   if ($etime<$now) {
+		   $color = "#ccc";
+	   } else if ($etime-$now < 605800) {  //due within a week
+		   $color = "#f".dechex(floor(16*($etime-$now)/605801))."0";
+	   } else if ($etime-$now < 1211600) { //due within two weeks
+		   $color = "#". dechex(floor(16*(1-($etime-$now-605800)/605801))) . "f0";
+	   } else {
+		   $color = "#0f0";
+	   }
+	   return $color;
+   }
 	 function formatdate($date) {
 	return tzdate("D n/j/y, g:i a",$date);   
 		//return tzdate("M j, Y, g:i a",$date);   
