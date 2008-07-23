@@ -318,11 +318,13 @@ function initPicture(x_min,x_max,y_min,y_max) {
           typeof y_max != "number" || y_min >= y_max))
    alert("initPicture(xmin,xmax,ymin,ymax) requires numbers ymin < ymax");
  else {
-  if (width==null) width = picture.getAttribute("width");
-  else picture.setAttribute("width",width);
+  //if (width==null) 
+  width = picture.getAttribute("width");
+  //else picture.setAttribute("width",width);
   if (width==null || width=="") width=defaultwidth;
-  if (height==null) height = picture.getAttribute("height");
-  else picture.setAttribute("height",height);
+  //if (height==null) 
+  height = picture.getAttribute("height");
+  //else picture.setAttribute("height",height);
   if (height==null || height=="") height=defaultheight;
   xunitlength = (width-border[0]-border[2])/(xmax-xmin);
   yunitlength = xunitlength;
@@ -838,6 +840,8 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy) {
     lyp = (lx==0?"left":"right");
     var ddx = floor(1.1-log(ldx)/log(10))+1;
     var ddy = floor(1.1-log(ldy)/log(10))+1;
+    if (ddy<0) { ddy = 0;}
+    if (ddx<0) { ddx = 0;}
     if (dox) {
 	    for (x = (doy?ldx:0); x<=xmax; x = x+ldx)
 	      if (x>=xmin) text([x,ly],chopZ(x.toFixed(ddx)),lxp);

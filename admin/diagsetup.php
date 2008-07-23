@@ -153,8 +153,8 @@ if ($myrights<75) {
 		$term = '';
 		$entryformat = 'C0';
 	}
-	$entrytype = $entryformat{0};
-	$entrydig = $entryformat{1};
+	$entrytype = substr($entryformat,0,1); //$entryformat{0};
+	$entrydig = substr($entryformat,1); //$entryformat{1};
 	
 	$query = "SELECT imas_courses.id,imas_courses.name FROM imas_courses,imas_users,imas_teachers WHERE imas_courses.id=imas_teachers.courseid ";
 	$query .= "AND imas_users.id=imas_teachers.userid AND imas_users.id=$userid";
@@ -172,7 +172,7 @@ if ($myrights<75) {
 	}
 	
 	$page_entryNums = array();
-	for ($j=0;$j<10;$j++) {
+	for ($j=0;$j<15;$j++) {
 		$page_entryNums['val'][$j] = $j;
 		if ($j==0) {
 			$page_entryNums['label'][$j] = "Any number";

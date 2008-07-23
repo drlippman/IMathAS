@@ -95,8 +95,8 @@ if (isset($_POST['SID'])) {
 	$query = "SELECT entryformat from imas_diags WHERE id='$diagid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$entryformat = mysql_result($result,0,0);
-	$entrytype = $entryformat{0};
-	$entrydig = $entryformat{1};
+	$entrytype = substr($entryformat,0,1); //$entryformat{0};
+	$entrydig = substr($entryformat,1); //$entryformat{1};
 	$pattern = '/^';
 	if ($entrytype=='C') {
 		$pattern .= '\w';
@@ -191,7 +191,7 @@ if (isset($_POST['SID'])) {
 	exit;
 }
 
-?>
+/*
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
@@ -204,7 +204,14 @@ if (isset($_POST['SID'])) {
 <script src="<?php echo $imasroot;?>/javascript/mathgraphcheck.js" type="text/javascript"></script>
 </head>
 <body>
-<h2><?php echo $line['name']; ?></h2>
+*/
+$nologo = true;
+$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/infopages.css\" type=\"text/css\">\n";
+require("../header.php");
+$pagetitle =$line['name'];
+require("../infoheader.php");
+?>
+<div style="margin-left: 30px">
 <form method=post action="index.php?id=<?php echo $diagid; ?>">
 <span class=form><?php echo $line['idprompt']; ?></span> <input class=form type=text size=12 name=SID><BR class=form>
 <span class=form>Enter First Name:</span> <input class=form type=text size=20 name=firstname><BR class=form>
@@ -293,6 +300,6 @@ if (existingonload) {
 }
 </script>
 <hr/><div class=right style="font-size:70%;">Built on <a href="http://imathas.sourceforge.net">IMathAS</a> &copy; 2006 David Lippman</div>
-	
+</div>
 </body>
 </html>

@@ -43,6 +43,12 @@
 	$attempts = explode(",",$line['attempts']);
 	$lastanswers = explode("~",$line['lastanswers']);
 	if ($isteacher) {
+		if ($line['userid']!=$userid) {
+			$query = "SELECT LastName,FirstName FROM imas_users WHERE id='{$line['userid']}'";
+			$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+			$row = mysql_fetch_row($result);
+			$userfullname = $row[1]." ".$row[0];
+		}
 		$userid= $line['userid'];
 	}
 	

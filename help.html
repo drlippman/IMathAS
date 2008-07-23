@@ -1435,7 +1435,8 @@ The following macros help with display:
    This function can do weird things for equations that are not simple polynomials, so test well</li>
 <li><b>makexpretty and makexprettydisp</b>:  Like makepretty, but the X-tra version - attempts to clean up things like 1*, 0*, etc.  This function
    will often cause weird things to happen, so test well</li>
-<li><b>numtowords(number)</b>:  Creates a string containing number written out in words</li>
+<li><b>numtowords(number,[addth])</b>:  Creates a string containing number written out in words.  Add true as second parameter
+    to change five to fifth.</li>
 <li><b>stringappend(value,string)</b>: Appends string to value.  If value is an array, string is appended to each element of the array</li>
 <li><b>stringprepend(value,string)</b>:  Same as stringappend, but prepends string to value</li>
 <li><b>prettyint(number)</b>:  Adds commas in thousands spaces of integers.  Example: prettyint(1234) will return "1,234".  The result is a string, which
@@ -1474,7 +1475,7 @@ The following macros help with display:
 	<li><b>grid</b>: spacing of grid lines.  Defaults to 1.  Set to "off" or 0 for none.  Use "xgrid:ygrid" for different spacing on each axis.</li>
 	<li><b>width,height</b>:  The width and height (in pixels) of the graph.  Defaults to 200x200</li>
 	</ul>
-<li><b>addlabel(plot,x,y,label,[color,loc])</b>: Adds a label to a plot created with showplot. 
+<li><b>addlabel(plot,x,y,label,[color,loc,angle])</b>: Adds a label to a plot created with showplot. 
 	<ul>
 	<li><b>plot</b>: The plot created with showplot</li>
 	<li><b>x,y</b>: The coordinates for the label</li>
@@ -1482,8 +1483,13 @@ The following macros help with display:
 	<li><b>color</b>: Label color.  Defaults to black.</li>
 	<li><b>loc</b>:  By default, the label is centered at the x,y coordinates.  Use "left" to display the string to the left of the
 	point, "right" to the right, "below" for below the point, "above" for above the point.</li>
+	<li><b>angle</b>: Angle to rotate text.</li>
 	</ul>
 	</li>
+<li><b>addlabelabs(plot,x,y,label,[color,loc,angle])</b>: Adds a label to a plot created with showplot. Parameters are the same as with
+     addlabel, except x and y here are pixel values on the picture rather than values relative to the axes.</li>
+<li><b>addplotborder(plot,left,[bottom,right,top])</b>:  Changes the pixel width of border (default 5) around a plot.  Labels
+    will show within the border.  Typically used to add room for labels to show.</li>
 <li><b>showasciisvg(string,[width,height])</b>:  If you know the ASCIIsvg language, this will set up an svg with "string" as the script.
     optionally you can specify the width and height (in pixels) for the svg.</li>
 <li><b>textonimage(img,text,top,left,[text,top,left,...])</b>:  Overlays text over an image.  Image can be a URL or the variable for an uploaded
@@ -1499,6 +1505,7 @@ These macros are fairly general purpose:
 <li><b>arraytolist(array)</b>:  Converts an array to a list</li>
 <li><b>calclisttoarray(list)</b>:  Converts a list of calculations, like "2^2,3^5,7/2" to an array, evaluating the calculations 
     along the way.</li>
+<li><b>stringtoarray(string)</b>: Converts a text string to an array of characters</li>
 <li><b>sortarray(list/array,[dir])</b>:  Sorts an array from lowest to highest value.  To sort in reverse order, give the option
     second parameter as "rev"</li>
 <li><b>consecutive(min,max,[step])</b>:  Creates an array of consecutive numbers, starting at min and ending at max, in increments of

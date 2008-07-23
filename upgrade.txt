@@ -6,6 +6,8 @@ Upgrade Notes
 
 *** Database Changes ***
 
+ALTER TABLE `imas_diags` CHANGE `entryformat` `entryformat` CHAR( 3 ) NOT NULL DEFAULT 'C0' ;
+
 ALTER TABLE `imas_students` ADD `gbinstrcomment` TEXT NOT NULL ;
 
 ALTER TABLE `imas_forums` ADD INDEX ( `grpaid` );
