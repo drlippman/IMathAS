@@ -1699,7 +1699,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$answer = mathphppre($answer);
 		$answer = makepretty($answer);
 		$answer = mathphp($answer,$vlist);
-		
+		//echo $answer;
 		for($i=0; $i < count($variables); $i++) {
 			$answer = str_replace("(".$variables[$i].")",'($tp['.$i.'])',$answer);
 		}

@@ -48,6 +48,10 @@ function nthroot(n,base) {
 	return safepow(base,1/n);
 }
 
+function nthlogten(n,v) {
+	return ((Math.log(v))/(Math.log(n)));
+}
+
 function safepow(base,power) {
 	if (base<0 && Math.floor(power)!=power) {
 		for (var j=3; j<50; j+=2) {
@@ -95,8 +99,9 @@ function mathjs(st,varlist) {
   }
   st = st.replace(/arc\s+(sin|cos|tan)/g,"arc$1");
   st = st.replace(/\s/g,"");
-  st = st.replace(/log/g,"logten");
   st = st.replace(/(Sin|Cos|Tan|Sec|Csc|Cot|Arc|Abs|Log|Ln)/g, matchtolower);
+  st = st.replace(/log_(\d+)\(/,"nthlog($1,");
+  st = st.replace(/log/g,"logten");
   if (st.indexOf("^-1")!=-1) {
     st = st.replace(/sin\^-1/g,"arcsin");
     st = st.replace(/cos\^-1/g,"arccos");

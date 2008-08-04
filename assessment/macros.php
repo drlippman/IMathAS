@@ -901,7 +901,7 @@ function lcm($n, $m) //least common multiple
    return round($m*($n/gcd($n,$m))); 
 } 
 
-function dispreducedfraction($n,$d) {
+function dispreducedfraction($n,$d,$dblslash=false) {
 	$g = gcd($n,$d);
 	$n = $n/$g;
 	$d = $d/$g;	
@@ -912,11 +912,15 @@ function dispreducedfraction($n,$d) {
 	if ($d==1) {
 		return "`$n`";
 	} else {
-		return "`$n/$d`";
+		if ($dblslash) {
+			return "`$n//$d`";
+		} else {
+			return "`$n/$d`";
+		}
 	}
 }
 
-function makereducedfraction($n,$d) {
+function makereducedfraction($n,$d,$dblslash=false) {
 	$g = gcd($n,$d);
 	$n = $n/$g;
 	$d = $d/$g;	
@@ -927,7 +931,11 @@ function makereducedfraction($n,$d) {
 	if ($d==1) {
 		return "$n";
 	} else {
-		return "$n/$d";
+		if ($dblslash) {
+			return "$n//$d";
+		} else {
+			return "$n/$d";
+		}
 	}
 }
 

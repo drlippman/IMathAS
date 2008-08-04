@@ -47,7 +47,7 @@ if ($myrights<75) {
 	
 	$sel2 = array();
 	if (isset($_POST['id'])) {
-		$query = "SELECT sel1list,sel2name,sel2list,aidlist FROM imas_diags WHERE id='{$_POST['id']}'";
+		$query = "SELECT sel1list,sel2name,sel2list,aidlist,forceregen FROM imas_diags WHERE id='{$_POST['id']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$row = mysql_fetch_row($result);
 		$s1l = explode(',',$row[0]);
@@ -58,10 +58,12 @@ if ($myrights<75) {
 		$sel2name = $row[1];
 		$aids = explode(',',$row[3]);
 		$page_updateId = $_POST['id'];
+		$forceregen = $row[4];
 	} else {
 		$sel2name = "instructor";
 		$aids = array();
 		$page_updateId = 0;
+		$forceregen = 0;
 	}
 
 	foreach($sel1 as $k=>$s1) {
@@ -90,8 +92,12 @@ if ($myrights<75) {
 } elseif (isset($_GET['step']) && $_GET['step']==3) {  //STEP 3 DATA PROCESSING
 	$sel1 = explode(',',$_POST['sel1list']);
 	$aids = array();
+	$forceregen = 0;
 	for ($i=0;$i<count($sel1);$i++) {
 		$aids[$i] = $_POST['aid'.$i];
+		if (isset($_POST['reg'.$i]) && $_POST['reg'.$i]==1) {
+			$forceregen = $forceregen ^ (1<<$i);
+		}
 	}
 	$aidlist = implode(',',$aids);
 	$sel2 = array();
@@ -110,15 +116,15 @@ if ($myrights<75) {
 		$query = "UPDATE imas_diags SET ";
 		$query .= "ownerid='$groupid',name='{$_POST['diagname']}',cid='{$_POST['cid']}',term='{$_POST['term']}',public='{$_POST['public']}',";
 		$query .= "ips='{$_POST['iplist']}',pws='{$_POST['pwlist']}',idprompt='{$_POST['idprompt']}',sel1name='{$_POST['sel1name']}',";
-		$query .= "sel1list='{$_POST['sel1list']}',aidlist='$aidlist',sel2name='{$_POST['sel2name']}',sel2list='$sel2list',entryformat='{$_POST['entryformat']}' ";
+		$query .= "sel1list='{$_POST['sel1list']}',aidlist='$aidlist',sel2name='{$_POST['sel2name']}',sel2list='$sel2list',entryformat='{$_POST['entryformat']}',forceregen='$forceregen' ";
 		$query .= " WHERE id='{$_POST['id']}'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		$id = $_POST['id'];
 		$page_successMsg = "<p>Diagnostic Updated</p>\n";
 	} else {
-		$query = "INSERT INTO imas_diags (ownerid,name,cid,term,public,ips,pws,idprompt,sel1name,sel1list,aidlist,sel2name,sel2list,entryformat) VALUES ";
+		$query = "INSERT INTO imas_diags (ownerid,name,cid,term,public,ips,pws,idprompt,sel1name,sel1list,aidlist,sel2name,sel2list,entryformat,forceregen) VALUES ";
 		$query .= "('$groupid','{$_POST['diagname']}','{$_POST['cid']}','{$_POST['term']}','{$_POST['public']}','{$_POST['iplist']}',";
-		$query .= "'{$_POST['pwlist']}','{$_POST['idprompt']}','{$_POST['sel1name']}','{$_POST['sel1list']}','$aidlist','{$_POST['sel2name']}','$sel2list','{$_POST['entryformat']}')";
+		$query .= "'{$_POST['pwlist']}','{$_POST['idprompt']}','{$_POST['sel1name']}','{$_POST['sel1list']}','$aidlist','{$_POST['sel2name']}','$sel2list','{$_POST['entryformat']}','$forceregen')";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		$id = mysql_insert_id();
 		$page_successMsg = "<p>Diagnostic Added</p>\n";
@@ -128,7 +134,7 @@ if ($myrights<75) {
 
 } else {  //STEP 1 DATA PROCESSING, MODIFY MODE
 	if (isset($_GET['id'])) { 
-		$query = "SELECT name,term,cid,public,idprompt,ips,pws,sel1name,sel1list,entryformat FROM imas_diags WHERE id='{$_GET['id']}'";
+		$query = "SELECT name,term,cid,public,idprompt,ips,pws,sel1name,sel1list,entryformat,forceregen FROM imas_diags WHERE id='{$_GET['id']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$line = mysql_fetch_array($result, MYSQL_ASSOC);
 		$diagname = $line['name'];
@@ -141,6 +147,7 @@ if ($myrights<75) {
 		$sel1list=  $line['sel1list'];
 		$term = $line['term'];
 		$entryformat = $line['entryformat'];
+		$forceregen = $line['forceregen'];
 	} else {  //STEP 1, ADD MODE
 		$diagname = '';
 		$cid = 0;
@@ -152,6 +159,7 @@ if ($myrights<75) {
 		$sel1list = '';
 		$term = '';
 		$entryformat = 'C0';
+		$forceregen = 0;
 	}
 	$entrytype = substr($entryformat,0,1); //$entryformat{0};
 	$entrydig = substr($entryformat,1); //$entryformat{1};
@@ -236,7 +244,8 @@ if ($overwriteBody==1) { //NO AUTHORITY
 <?php			
 			writeHtmlSelect ($page_selectName[$k],$page_selectValList[$k],$page_selectLabelList[$k],$page_selectedOption[$k]);
 ?>
-			
+			<br/>
+			Force regen on reentry (if allowed)? <input type=checkbox name="reg<?php echo $k; ?>" value="1" <?php if (($forceregen & (1<<$k)) > 0) {echo 'checked="checked"';}?> />
 			</p>
 			<p>Add selector value: 
 			<input type=text id="in<?php echo $k ?>"  onkeypress="return onenter(event,'in<?php echo $k ?>','out<?php echo $k ?>')"/>

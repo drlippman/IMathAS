@@ -5,7 +5,7 @@ Upgrade Notes
 *********************
 
 *** Database Changes ***
-
+ALTER TABLE `imas_diags` ADD `forceregen` INT( 10 ) UNSIGNED NOT NULL DEFAULT '0';
 ALTER TABLE `imas_diags` CHANGE `entryformat` `entryformat` CHAR( 3 ) NOT NULL DEFAULT 'C0' ;
 
 ALTER TABLE `imas_students` ADD `gbinstrcomment` TEXT NOT NULL ;

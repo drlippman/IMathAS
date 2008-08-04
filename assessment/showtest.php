@@ -601,7 +601,7 @@
 				if (!$isdiag) {
 					echo "<a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a></p>\n";
 				} else {
-					echo "<a href=\"../diag/index.php?id=$diagid\">Return to Diagnostics Page</a></p>\n";
+					echo "<a href=\"../diag/index.php?id=$diagid\">Exit Assessment</a></p>\n";
 				}
 			} else {
 				recordtestdata();
@@ -612,7 +612,7 @@
 				if (!$isdiag) {
 					echo "<p><a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a></p>\n";
 				} else {
-					echo "<p><a href=\"../diag/index.php?id=$diagid\">Return to Diagnostics Page</a></p>\n";
+					echo "<p><a href=\"../diag/index.php?id=$diagid\">Exit Assessment</a></p>\n";
 				}
 			}
 		} else if ($_GET['action']=="shownext") {
@@ -677,7 +677,7 @@
 				if (!$isdiag) {
 					echo "<p><a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a></p>\n";
 				} else {
-					echo "<p><a href=\"../diag/index.php?id=$diagid\">Return to Diagnostics Page</a></p>\n";
+					echo "<p><a href=\"../diag/index.php?id=$diagid\">Exit Assessment</a></p>\n";
 				}
 			}
 		} else if ($_GET['action']=="skip") {
@@ -793,7 +793,7 @@
 				if (!$isdiag) {
 					echo "<p><a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a></p>\n";
 				} else {
-					echo "<p><a href=\"../diag/index.php?id=$diagid\">Return to Diagnostics Page</a></p>\n";
+					echo "<p><a href=\"../diag/index.php?id=$diagid\">Exit Assessment</a></p>\n";
 				}
 			}
 		} else if ($_GET['action']=="seq") {
@@ -878,7 +878,7 @@
 				if (!$isdiag) {
 					echo "<p><a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a></p>\n";
 				} else {
-					echo "<p><a href=\"../diag/index.php?id=$diagid\">Return to Diagnostics Page</a></p>\n";
+					echo "<p><a href=\"../diag/index.php?id=$diagid\">Exit Assessment</a></p>\n";
 				}
 			} else { //show more test 
 				echo filter("<div id=intro class=hidden>{$testsettings['intro']}</div>\n");
@@ -972,7 +972,7 @@
 				if (!$isdiag) {
 					echo "<a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a>\n";
 				} else {
-					echo "<a href=\"../diag/index.php?id=$diagid\">Return to Diagnostics Page</a>\n";
+					echo "<a href=\"../diag/index.php?id=$diagid\">Exit Assessment</a>\n";
 				}
 				
 			}
@@ -988,7 +988,7 @@
 				if (!$isdiag) {
 					echo "<a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a>\n";
 				} else {
-					echo "<a href=\"../diag/index.php?id=$diagid\">Return to Diagnostics Page</a>\n";
+					echo "<a href=\"../diag/index.php?id=$diagid\">Exit Assessment</a>\n";
 				}
 				
 			} else {
@@ -1016,7 +1016,7 @@
 				if (!$isdiag) {
 					echo "<a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a></div>\n";
 				} else {
-					echo "<a href=\"../diag/index.php?id=$diagid\">Return to Diagnostics Page</a></div>\n";
+					echo "<a href=\"../diag/index.php?id=$diagid\">Exit Assessment</a></div>\n";
 				}
 				
 			} else {
@@ -1042,7 +1042,7 @@
 				if (!$isdiag) {
 					echo "<a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a>\n";
 				} else {
-					echo "<a href=\"../diag/index.php?id=$diagid\">Return to Diagnostics Page</a>\n";
+					echo "<a href=\"../diag/index.php?id=$diagid\">Exit Assessment</a>\n";
 				}
 				
 			} else {

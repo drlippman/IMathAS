@@ -154,7 +154,10 @@ if (isset($_POST['SID'])) {
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$aids = explode(',',$line['aidlist']);
 			$paid = $aids[$_POST['course']];
-			
+			if ((intval($line['forceregen']) & (1<<intval($_POST['course'])))>0) {
+				$query = "DELETE FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='$paid' LIMIT 1";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
 
 			$query = "UPDATE imas_users SET lastaccess=$now WHERE id=$userid";
 		 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -205,6 +208,9 @@ if (isset($_POST['SID'])) {
 </head>
 <body>
 */
+if (file_exists("diag$diagid.php")) {
+	require("diag$diagid.php");
+} else {
 $nologo = true;
 $placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/infopages.css\" type=\"text/css\">\n";
 require("../header.php");
@@ -303,3 +309,6 @@ if (existingonload) {
 </div>
 </body>
 </html>
+<?php
+}
+?>
