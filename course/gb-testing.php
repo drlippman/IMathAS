@@ -126,14 +126,12 @@ echo "<input type=button value=\"Filter by name\" onclick=\"chglnfilter()\" />";
 
 echo "</div>";
 
-echo "Check/Uncheck All: <input type=\"checkbox\" name=\"ca\" value=\"1\" onClick=\"chkAll(this.form, 'checked[]', this.checked)\"> \n";
-echo "With Selected:  <input type=submit name=submit value=\"E-mail\"> <input type=submit name=submit value=\"Message\"> <input type=submit name=submit value=\"Unenroll\"> <input type=submit name=submit value=\"Make Exception\"> ";
-
 $gbt = gbinstrdisp();
 echo "</form>";
 echo "</div>";
 require("../footer.php");
-echo "Meanings:  IP-In Progress, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sup>*</sup> Has feedback, <sub>d</sub> Dropped score\n";
+//echo "Meanings:  IP-In Progress, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sup>*</sup> Has feedback, <sub>d</sub> Dropped score\n";
+echo "Meanings:   NC-no credit";
 /*if ($isteacher) {
 	echo "<div class=cp>";
 	echo "<a href=\"addgrades.php?cid=$cid&gbitem=new&grades=all\">Add Offline Grade</a><br/>";
@@ -232,9 +230,7 @@ function gbinstrdisp() {
 			echo "<tr class=odd onMouseOver=\"this.className='highlight'\" onMouseOut=\"this.className='odd'\">"; 
 		}
 		echo '<td class="locked" scope="row">';
-		if ($gbt[$i][0][0]!="Averages") {
-			echo "<input type=\"checkbox\" name='checked[]' value='{$gbt[$i][4][0]}' />&nbsp;";
-		}
+		
 		echo "<a href=\"gradebook.php?cid=$cid&stu={$gbt[$i][4][0]}\">";
 		echo $gbt[$i][0][0];
 		echo '</a></td>';
@@ -270,13 +266,14 @@ function gbinstrdisp() {
 					echo $gbt[$i][1][$j][0];
 					if ($gbt[$i][1][$j][3]==1) {
 						echo ' (NC)';
-					} else if ($gbt[$i][1][$j][3]==2) {
+					} 
+					/*else if ($gbt[$i][1][$j][3]==2) {
 						echo ' (IP)';
 					} else if ($gbt[$i][1][$j][3]==3) {
 						echo ' (OT)';
 					} else if ($gbt[$i][1][$j][3]==4) {
 						echo ' (PT)';
-					} 
+					} */
 					echo '</a>';
 					if ($gbt[$i][1][$j][1]==1) {
 						echo '<sup>*</sup>';

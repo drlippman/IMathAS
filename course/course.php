@@ -212,6 +212,18 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		   $newmsgs = '';
 	   }
 	}
+	$query = "SELECT count(*) FROM ";
+	$query .= "(SELECT imas_forum_posts.threadid,max(imas_forum_posts.postdate),mfv.lastview FROM imas_forum_posts ";
+	$query .= "JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id LEFT JOIN (SELECT * FROM imas_forum_views WHERE userid='$userid') AS mfv ";
+	$query .= "ON mfv.threadid=imas_forum_posts.threadid WHERE imas_forums.courseid='$cid' ";
+	$query .= "GROUP BY imas_forum_posts.threadid HAVING ((max(imas_forum_posts.postdate)>mfv.lastview) OR (mfv.lastview IS NULL))) AS newitems ";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$row = mysql_fetch_row($result);
+	if ($row[0]>0) {
+		$newpostscnt = " <a href=\"$imasroot/forums/newthreads.php?cid=$cid\" style=\"color:red\">New Posts</a>";
+	} else {
+		$newpostscnt = '';	
+	}
    
 	//get exceptions
 	$now = time() + $previewshift;
@@ -302,6 +314,8 @@ if ($overwriteBody==1) {
 		<p><b>Show:</b><br/>
 			<a href="<?php echo $imasroot ?>/msgs/msglist.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>">
 			Messages</a> <?php echo $newmsgs ?> <br/>
+			<a href="<?php echo $imasroot ?>/forums/forums.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>">
+			Forums</a> <?php echo $newpostscnt ?><br/>
 			<a href="listusers.php?cid=<?php echo $cid ?>">Students</a><br/>
 			<a href="gradebook.php?cid=<?php echo $cid ?>">Gradebook</a><br/>
 			<a href="course.php?cid=<?php echo $cid ?>&stuview=0">Student View</a><br/>
@@ -397,7 +411,9 @@ if ($overwriteBody==1) {
 	<div class=cp>
 		<span class=column>
 			<a href="<?php echo $imasroot ?>/msgs/msglist.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>">
-			Messages</a><?php echo $newmsgs ?>
+			Messages</a><?php echo $newmsgs ?> <br/>
+			<a href="<?php echo $imasroot ?>/forums/forums.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>">
+			Forums</a> <?php echo $newpostscnt ?>
 		</span>
 		<div class=clear></div>
 	</div>
@@ -500,7 +516,8 @@ function makeTopMenu() {
 	global $cid;
 	global $newmsgs;
 	global $quickview;
-
+	global $newpostscnt;
+	
 	if (isset($teacherid) && $quickview=='on') {
 		echo "<div class=breadcrumb>";
 		echo "Quick View. <a href=\"course.php?cid=$cid&quickview=off\">Back to regular view</a>. ";
@@ -534,6 +551,9 @@ function makeTopMenu() {
 		echo '<div class=breadcrumb>';
 		if (in_array(0,$topbar[0]) && $msgset<3) { //messages
 			echo "<a href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a>$newmsgs &nbsp; ";
+		}
+		if (in_array(3,$topbar[0]) && $msgset<3) { //messages
+			echo "<a href=\"$imasroot/forums/forums.php?cid=$cid\">Forums</a>$newpostscnt &nbsp; ";
 		}
 		if (in_array(1,$topbar[0])) { //Gradebook
 			echo "<a href=\"gradebook.php?cid=$cid\">Show Gradebook</a> &nbsp; ";

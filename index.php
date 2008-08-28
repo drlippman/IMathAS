@@ -148,7 +148,7 @@ if ($line == null) {
 			$page_studentCourseData[$i]['courseDisplayTag'] = " <span style=\"color:red\">New Messages ({$newmsgcnt[$page_studentCourseData[$i]['id']]})</span>";
 		}
 		if (isset($newpostscnt[$page_studentCourseData[$i]['id']]) && $newpostscnt[$page_studentCourseData[$i]['id']]>0) {
-			$page_studentCourseData[$i]['courseDisplayTag'] .= " <a href=\"forums/newthreads.php?cid={$page_studentCourseData[$i]['id']}\" style=\"color:red\">New Posts</a>";
+			$page_studentCourseData[$i]['courseDisplayTag'] .= " <a href=\"forums/newthreads.php?cid={$page_studentCourseData[$i]['id']}\" style=\"color:red\">New Posts (". $newpostscnt[$page_studentCourseData[$i]['id']] .")</a>";
 		}
 		
 		
@@ -183,7 +183,7 @@ if ($line == null) {
 			$page_teacherCourseData[$i]['courseDisplayTag'] .= " <a href=\"msgs/msglist.php?cid={$page_teacherCourseData[$i]['id']}\" style=\"color:red\">New Messages ({$newmsgcnt[$page_teacherCourseData[$i]['id']]})</a>";
 		}
 		if (isset($newpostscnt[$page_teacherCourseData[$i]['id']]) && $newpostscnt[$page_teacherCourseData[$i]['id']]>0) {
-			$page_teacherCourseData[$i]['courseDisplayTag'] .= " <a href=\"forums/newthreads.php?cid={$page_teacherCourseData[$i]['id']}\" style=\"color:red\">New Posts</a>";
+			$page_teacherCourseData[$i]['courseDisplayTag'] .= " <a href=\"forums/newthreads.php?cid={$page_teacherCourseData[$i]['id']}\" style=\"color:red\">New Posts (". $newpostscnt[$page_teacherCourseData[$i]['id']] .")</a>";
 		}
 		
 		$i++;
@@ -284,10 +284,9 @@ if ($isTeaching == true) {
 	<div class=cp>
 		<span class=column>
 		<a href="<?php echo $imasroot ?>/msgs/msglist.php?cid=0">Messages</a>
-		</span>
-		<span>
 		<?php echo (count($newmsgcnt)>0) ? " <span style=\"color:red\">New Messages (" . array_sum($newmsgcnt) . ")</span>" : ""; ?>
-		</span> 
+		</span>
+		
 		<div class=clear></div>
 	</div>
 

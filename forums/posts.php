@@ -122,6 +122,25 @@
 		echo "<a href=\"thread.php?cid=$cid&forum=$forumid&page=$page\">$forumname</a> ";
 	}
 	echo "&gt; Posts</div>\n";
+	
+	$query = "SELECT id FROM imas_forum_posts WHERE forumid='$forumid' AND threadid<'$threadid' AND parent=0 ORDER BY threadid DESC LIMIT 1";
+	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	if (mysql_num_rows($result)>0) {
+		$nextth = mysql_result($result,0,0);
+		echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=$nextth\">Prev</a> ";
+	} else {
+		echo "Prev ";
+	}
+	
+	$query = "SELECT id FROM imas_forum_posts WHERE forumid='$forumid' AND threadid>'$threadid' AND parent=0 ORDER BY threadid LIMIT 1";
+	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	if (mysql_num_rows($result)>0) {
+		$nextth = mysql_result($result,0,0);
+		echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=$nextth\">Next</a>";
+	} else {
+		echo "Next";
+	}
+	
 	echo "<p><b style=\"font-size: 120%\">Post: {$subject[$threadid]}</b><br/>\n";
 	echo "<b style=\"font-size: 100%\">Forum: $forumname</b></p>";
 	echo "<input type=button value=\"Expand All\" onclick=\"showall()\"/>";
