@@ -213,11 +213,11 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		}
 		if ($doshowans && (!isset($showanswer) || (is_array($showanswer) && !isset($showanswer[$iidx]))) && $shans[$iidx]!=='') {
 
-			echo "<div><input type=button value=\"Show Answer\" onClick='javascript:document.getElementById(\"ans$qnidx-$iidx\").className=\"shown\";' />"; //AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
+			echo "<div><input class=\"sabtn\" type=button value=\"Show Answer\" onClick='javascript:document.getElementById(\"ans$qnidx-$iidx\").className=\"shown\";' />"; //AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
 			echo filter(" <span id=\"ans$qnidx-$iidx\" class=\"hidden\">{$shans[$iidx]}</span></div>\n");
 		} else if ($doshowans && isset($showanswer) && is_array($showanswer)) { //use part specific showanswer
 			if (isset($showanswer[$iidx])) {
-				echo "<div><input type=button value=\"Show Answer\" onClick='javascript:document.getElementById(\"ans$qnidx-$iidx\").className=\"shown\";' />";// AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
+				echo "<div><input class=\"sabtn\" type=button value=\"Show Answer\" onClick='javascript:document.getElementById(\"ans$qnidx-$iidx\").className=\"shown\";' />";// AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
 				echo filter(" <span id=\"ans$qnidx-$iidx\" class=\"hidden\">{$showanswer[$iidx]}</span></div>\n");
 			}
 		}
@@ -225,7 +225,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	echo "</div>\n";
 	
 	if ($doshowans && isset($showanswer) && !is_array($showanswer)) {  //single showanswer defined
-		echo "<div><input type=button value=\"Show Answer\" onClick='javascript:document.getElementById(\"ans$qnidx\").className=\"shown\"; AMprocessNode(document.getElementById(\"ans$qnidx\"));' />";
+		echo "<div><input class=\"sabtn\" type=button value=\"Show Answer\" onClick='javascript:document.getElementById(\"ans$qnidx\").className=\"shown\"; AMprocessNode(document.getElementById(\"ans$qnidx\"));' />";
 		echo filter(" <span id=\"ans$qnidx\" class=\"hidden\">$showanswer </span></div>\n");
 	}
 	echo "</div>\n";
@@ -696,6 +696,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		if (isset($ansprompt)) {$out .= $ansprompt;}
 		if (isset($answersize)) {
+			$out .= '<table><tr><td class="matrixleft">&nbsp;</td><td>';
 			$answersize = explode(",",$answersize);
 			$out .= "<table>";
 			$count = 0;
@@ -708,7 +709,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 				}
 				$out .= "</tr>";
 			}
-			$out .= "</table></p>\n";
+			$out .= "</table>\n";
+			$out .= '</td><td class="matrixright">&nbsp;</td></tr></table>';
 			$tip = "Enter each element of the matrix as  number (like 5, -3, 2.2)";
 		} else {
 			$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" />\n";
@@ -733,6 +735,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (isset($ansprompt)) {$out .= $ansprompt;}
 		if (isset($answersize)) {
 			$answersize = explode(",",$answersize);
+			$out .= '<table><tr><td class="matrixleft">&nbsp;</td><td>';
 			$out .= "<table>";
 			$count = 0;
 			$las = explode("|",$la);
@@ -745,6 +748,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 				$out .= "</tr>";
 			}
 			$out .= "</table>\n";
+			$out .= '</td><td class="matrixright">&nbsp;</td></tr></table>';
 			if (!isset($hidepreview)) {$preview .= "<input type=button class=btn value=Preview onclick=\"matrixcalc('qn$qn','p$qn',{$answersize[0]},{$answersize[1]})\" /> &nbsp;\n";}
 			$preview .= "<span id=p$qn></span>\n";
 			$out .= "<script type=\"text/javascript\">matcalctoproc[matcalctoproc.length] = $qn; matsize[$qn]='{$answersize[0]},{$answersize[1]}';</script>\n";
@@ -995,7 +999,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		}
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		
-		$settings = array(-5,5,-5,5,1,1,300,300);
+		$settings = array(-5,5,-5,5,1,1,300,300,"","");
 		if (isset($grid)) {
 			if (!is_array($grid)) {
 				$grid = explode(',',$grid);
@@ -1009,7 +1013,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (!isset($backg)) { $backg = '';}
 		$scling = $settings[4].':'.$settings[5];
 		$plot = showplot($backg,$settings[0],$settings[1],$settings[2],$settings[3],$scling,$scling,$settings[6],$settings[7]);
-		
+		if ($settings[8]!="") {
+		}
 		$bg = getgraphfilename($plot);
 		if (!isset($answerformat)) {
 			$answerformat = array('line','dot','opendot');

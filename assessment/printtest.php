@@ -8,8 +8,16 @@
 	
 	include("displayq2.php");
 	require("header.php");
-	echo "<style type=\"text/css\">p.tips {	display: none;}\n input.btn {display: none;}\n textarea {display: none;}\n</style>\n";
-	
+	echo "<style type=\"text/css\">p.tips {	display: none;}\n input.btn {display: none;}\n textarea {display: none;}\n input.sabtn {display: none;}</style>\n";
+	echo '<script type="text/javascript">function rendersa() { ';
+	echo '  el = document.getElementsByTagName("span"); ';
+	echo '   for (var i=0;i<el.length;i++) {';
+	echo '     if (el[i].className=="hidden") { ';
+	echo '         el[i].className = "shown";';
+	//echo '		 AMprocessNode(el)';
+	echo '     }';
+	echo '    }';
+	echo '} </script>';
 	function unans($sc) {
 		if (strpos($sc,'~')===false) {
 			return ($sc<0);
@@ -103,10 +111,13 @@
 	$showansduring = (($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework") && $testsettings['showans']!='N');
 	echo "<div class=breadcrumb>Print Ready Version</div>";
 	echo '<div class=intro>'.$testsettings['intro'].'</div>';
+	if ($isteacher) {
+		echo '<input type="button" onclick="rendersa()" value="Show Answers" />';
+	}
 	for ($i = 0; $i < count($questions); $i++) {
 		list($qsetid,$cat) = getqsetid($questions[$i]);
 		
-		$showa = false;
+		$showa = $isteacher;
 		echo "<div>#".($i+1)." Points possible: " . getpointspossible($questions[$i],$testsettings['defpoints']) . "</div>";
 		displayq($i,$qsetid,$seeds[$i],$showa,($testsettings['showhints']==1),$attempts[$i]);
 		echo "<hr />";	

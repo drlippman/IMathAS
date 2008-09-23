@@ -218,4 +218,16 @@ span.withdrawn {
 	color: red;
 	text-decoration: line-through;
 }
+td.matrixleft { 
+	border: 1px solid #000;
+	border-width: 1px 0px 1px 1px;
+	margin: 0px;
+	padding: 0px;
+} 
+td.matrixright {
+	border: 1px solid #000;
+	border-width: 1px 1px 1px 0px;
+	margin: 0px;
+	padding: 0px;
+}
 
