@@ -925,13 +925,13 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			}
 			$out .= "<textarea rows=\"$rows\" name=\"qn$qn\" id=\"qn$qn\" ";
 			if ($displayformat=='editor' && $GLOBALS['useeditor']==1) {
-				$out .= "style=\"width:98%;\" ";
+				$out .= "style=\"width:98%;\" class=\"mceEditor\" ";
 			} else {
 				$out .= "cols=\"$cols\" ";
 			}
 			$out .= ">$la</textarea>\n";
 			if ($displayformat=='editor' && $GLOBALS['useeditor']==1) {
-				$out .= "<script type=\"text/javascript\">editornames[editornames.length] = \"qn$qn\";</script>";
+				//$out .= "<script type=\"text/javascript\">editornames[editornames.length] = \"qn$qn\";</script>";
 			}
 		} 
 		$tip .= "Enter your answer as text.  This question is not automatically graded.";

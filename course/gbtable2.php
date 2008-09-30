@@ -154,7 +154,7 @@ function gbtable() {
 	}
 	//Pull Assessment Info
 	$now = time();
-	$query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail FROM imas_assessments WHERE courseid='$cid' ";
+	$query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail FROM imas_assessments WHERE courseid='$cid' AND avail>0 ";
 	if (!$isteacher) {
 		$query .= "AND cntingb>0 ";
 	}
@@ -270,7 +270,7 @@ function gbtable() {
 	}
 	
 	//Pull Discussion Grade info
-	$query = "SELECT id,name,gbcategory,startdate,enddate,replyby,postby,points,avail FROM imas_forums WHERE courseid='$cid' AND points>0 ";
+	$query = "SELECT id,name,gbcategory,startdate,enddate,replyby,postby,points,avail FROM imas_forums WHERE courseid='$cid' AND points>0 AND avail>0 ";
 	if (!$isteacher) {
 		$query .= "AND startdate<$now ";
 	}

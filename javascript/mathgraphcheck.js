@@ -1,6 +1,6 @@
 var AMnoMathML = true;
 var ASnoSVG = true;
-var AMisGecko = false;
+var AMisGecko = 0;
 function AMisMathMLavailable() {
     if (navigator.product && navigator.product=='Gecko') {
 	   var rv = navigator.userAgent.toLowerCase().match(/rv:\s*([\d\.]+)/);
@@ -10,7 +10,7 @@ function AMisMathMLavailable() {
 		if (rv.length<2) { rv[1] = 0;}
 	   }
 	   if (rv!=null && 10000*rv[0]+100*rv[1]+1*rv[2]>=10100) {
-		   AMisGecko = true;
+		   AMisGecko = 10000*rv[0]+100*rv[1]+1*rv[2];
 		   return null;
 	   } else {
 		   return 1;
@@ -39,7 +39,11 @@ function AMcheckTeX() {
 	hiddendiv.style.visibility = "hidden";
 	hiddendiv.id = "hidden";
 	document.body.appendChild(hiddendiv);
-	wh = AMBBoxFor('<span style="font-family: STIXgeneral, cmex10, serif">&#xEFE8;</span>');
+	if (AMisGecko<10900) { //Mozilla 1.8 could use cmex fonts; Mozilla 1.9 only works well with STIX
+		wh = AMBBoxFor('<span style="font-family: STIXgeneral, cmex10, serif">&#xEFE8;</span>');
+	} else {
+		wh = AMBBoxFor('<span style="font-family: STIXgeneral, serif">&#xEFE8;</span>');
+	}
 	wh2 = AMBBoxFor('<span style="font-family: serif">&#xEFE8;</span>');
 	nofonts = (wh.w==wh2.w && wh.h==wh2.h);
 	if (nofonts) {
@@ -53,7 +57,7 @@ function AMcheckTeX() {
 AMnoTeX = false;
 AMnoMathML = (AMisMathMLavailable() != null);
 
-if (!AMnoMathML && AMisGecko) {
+if (!AMnoMathML && (AMisGecko>0)) {
 	window.onload = AMcheckTeX;	
 }
 

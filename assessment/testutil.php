@@ -188,8 +188,25 @@ function scorequestion($qn) {
 	global $questions,$scores,$seeds,$testsettings,$qi,$attempts,$lastanswers,$isreview,$bestseeds,$bestscores,$bestattempts,$bestlastanswers;
 	//list($qsetid,$cat) = getqsetid($questions[$qn]);
 	$rawscore = scoreq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$_POST["qn$qn"]);
-	$scores[$qn] = calcpointsafterpenalty($rawscore,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
-	$rawscore = calcpointsafterpenalty($rawscore,$qi[$questions[$qn]],$testsettings,0);
+	$afterpenalty = calcpointsafterpenalty($rawscore,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
+	
+	/*
+	This doesn't work yet - don't want bestscores, want lastscore, but we cleared those for reattempt 
+	if ($bestscores[$qn]!=-1 && strpos($afterpenalty,'~')!==false) {
+		$appts = explode('~',$afterpenalty);
+		$curs = explode('~',$bestscores[$qn]);
+		for ($k=0;$k<count($curs);$k++) {
+			if ($appts[$k]>$curs[$k]) {
+				$curs[$k] = $appts[$k];
+			}
+		}
+		$scores[$qn] = implode('~',$curs);
+	} else {
+		$scores[$qn] = $afterpenalty;
+	}
+	*/
+	$scores[$qn] = $afterpenalty;
+	$rawscore = calcpointsafterpenalty($rawscore,$qi[$questions[$qn]],$testsettings,0); //possible
 	$attempts[$qn]++;
 	
 	if (getpts($scores[$qn])>=getpts($bestscores[$qn]) && !$isreview) {

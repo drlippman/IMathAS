@@ -152,8 +152,8 @@ var AMsymbols = [
 //{input:"||", tag:"mo", output:"||", tex:null, ttype:LEFTRIGHT},
 {input:"(:", tag:"mo", output:"\u2329", tex:"langle", ttype:LEFTBRACKET},
 {input:":)", tag:"mo", output:"\u232A", tex:"rangle", ttype:RIGHTBRACKET},
-{input:"<<", tag:"mo", output:"\u2329", tex:null, ttype:LEFTBRACKET},
-{input:">>", tag:"mo", output:"\u232A", tex:null, ttype:RIGHTBRACKET},
+{input:"<<", tag:"mo", output:"\u2329", tex:"langle", ttype:LEFTBRACKET},
+{input:">>", tag:"mo", output:"\u232A", tex:"rangle", ttype:RIGHTBRACKET},
 {input:"{:", tag:"mo", output:"{:", tex:null, ttype:LEFTBRACKET, invisible:true},
 {input:":}", tag:"mo", output:":}", tex:null, ttype:RIGHTBRACKET, invisible:true},
 
@@ -194,6 +194,10 @@ var AMsymbols = [
 {input:"ZZ",  tag:"mo", output:"\u2124", tex:"mathbb{Z}", ttype:CONST, notexcopy:true},
 {input:"f",   tag:"mi", output:"f",      tex:null, ttype:UNARY, func:true, val:true},
 {input:"g",   tag:"mi", output:"g",      tex:null, ttype:UNARY, func:true, val:true},
+{input:"''", tag:"mo", output:"''", tex:null, val:true},
+{input:"'''", tag:"mo", output:"'''", tex:null, val:true},
+{input:"''''", tag:"mo", output:"''''", tex:null, val:true},
+
 
 //standard functions
 {input:"lim",  tag:"mo", output:"lim", tex:null, ttype:UNDEROVER},
@@ -695,7 +699,9 @@ function AMTparseExpr(str,rightbracket) {
 
 function AMTparseAMtoTeX(str) {
  AMnestingDepth = 0;
-  
+  str = str.replace(/&nbsp;/g,"");
+  str = str.replace(/&gt;/g,">");
+  str = str.replace(/&lt;/g,"<");
   return AMTparseExpr(str.replace(/^\s+/g,""),false)[0];
 }
 
@@ -727,6 +733,10 @@ function AMparseMath(str) {
   var snode = document.createElement("span");
   snode.appendChild(node); //chg
   return snode;
+}
+//alias to align with wFallback function
+function AMTparseMath(str) {
+	return AMparseMath(str);
 }
 
 function AMstrarr2docFrag(arr, linebreaks) {

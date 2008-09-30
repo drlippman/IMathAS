@@ -57,6 +57,7 @@ if ($sessiondata['graphdisp']==1) {
 <?php
 echo "<script type=\"text/javascript\">imasroot = '$imasroot';</script>";
 if ($useeditor==1 && $sessiondata['useed']==1) {
+	/*
 	echo <<<END
 	<script type="text/javascript">
 	  _editor_url = "$imasroot/course/editor";
@@ -103,6 +104,31 @@ END;
 	echo "return false; }; </script>";
 } else {
 	echo "<script>var editornames = new Array(); function initEditor() { };</script>";
+	*/
+echo <<<END
+<script type="text/javascript" src="$imasroot/editor/tiny_mce.js"></script>
+
+<script type="text/javascript">
+tinyMCE.init({
+    mode : "textareas",
+    editor_selector : "mceEditor",
+    theme : "advanced",
+    theme_advanced_buttons1 : "fontselect,fontsizeselect,formatselect,bold,italic,underline,strikethrough,separator,sub,sup,separator,cut,copy,paste,undo,redo",
+    theme_advanced_buttons2 : "justifyleft,justifycenter,justifyright,justifyfull,separator,numlist,bullist,outdent,indent,separator,forecolor,backcolor,separator,hr,link,unlink,image,table,code,separator,asciimath,asciimathcharmap,asciisvg",
+    theme_advanced_buttons3 : "",
+    theme_advanced_fonts : "Arial=arial,helvetica,sans-serif,Courier New=courier new,courier,monospace,Georgia=georgia,times new roman,times,serif,Tahoma=tahoma,arial,helvetica,sans-serif,Times=times new roman,times,serif,Verdana=verdana,arial,helvetica,sans-serif",
+    theme_advanced_toolbar_location : "top",
+    theme_advanced_toolbar_align : "left",
+    theme_advanced_statusbar_location : "bottom",
+    plugins : 'safari,asciimath,asciisvg,table,inlinepopups',
+    theme_advanced_resizing : true,
+    AScgiloc : '$imasroot/filter/graph/svgimg.php',
+    ASdloc : '$imasroot/javascript/d.svg'
+});
+</script>
+
+END;
+	
 }
 ?>
 

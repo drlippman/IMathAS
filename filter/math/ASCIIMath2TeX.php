@@ -97,6 +97,7 @@ array( 'input'=>'nnn', 'tex'=>'bigcap', 'underover'=>TRUE),
 array( 'input'=>'uu', 'tex'=>'cup'),
 array( 'input'=>'uuu', 'tex'=>'bigcup', 'underover'=>TRUE),
 
+
 // Binary relation symbols
 array( 'input'=>'!=', 'tex'=>'ne'),
 array( 'input'=>':=' ), 			
@@ -223,6 +224,10 @@ array( 'input'=>'min', 'underover'=>TRUE),
 array( 'input'=>'max', 'underover'=>TRUE), 
 array( 'input'=>'f', 'output'=>'f', 'unary'=>TRUE, 'func'=>TRUE,'val'=>TRUE),
 array( 'input'=>'g', 'output'=>'g', 'unary'=>TRUE, 'func'=>TRUE,'val'=>TRUE),
+
+array( 'input'=>"''", 'output'=>"''", 'val'=>TRUE),
+array( 'input'=>"'''", 'output'=>"'''", 'val'=>TRUE),
+array( 'input'=>"''''", 'output'=>"''''", 'val'=>TRUE),
 
 // Arrows
 array( 'input'=>'uarr', 'tex'=>'uparrow'),

@@ -5,7 +5,7 @@ Licensed under GNU General Public License (at http://www.gnu.org/copyleft/gpl.ht
 */
 
 var checkForMathML = true;   // check if browser can display MathML
-var notifyIfNoMathML = true; // display note if no MathML capability
+var notifyIfNoMathML = false; // display note if no MathML capability
 var alertIfNoMathML = false;  // show alert box if no MathML capability
 var mathcolor = "";       // change it to "" (to inherit) or any other color
 var mathfontfamily = "serif"; // change to "" to inherit (works in IE) 
@@ -181,6 +181,7 @@ var AMsymbols = [
 {input:"~~",  tag:"mo", output:"\u2248", tex:"approx", ttype:CONST},
 {input:"prop", tag:"mo", output:"\u221D", tex:"propto", ttype:CONST},
 
+
 //logical symbols
 {input:"and", tag:"mtext", output:"and", tex:null, ttype:SPACE},
 {input:"or",  tag:"mtext", output:"or",  tex:null, ttype:SPACE},
@@ -246,6 +247,7 @@ var AMsymbols = [
 {input:"ZZ",  tag:"mo", output:"\u2124", tex:null, ttype:CONST},
 {input:"f",   tag:"mi", output:"f",      tex:null, ttype:UNARY, func:true},
 {input:"g",   tag:"mi", output:"g",      tex:null, ttype:UNARY, func:true},
+{input:"'",  tag:"mo", output:"\u2032", tex:"prime", ttype:CONST}, 
 
 //standard functions
 {input:"lim",  tag:"mo", output:"lim", tex:null, ttype:UNDEROVER},
@@ -899,11 +901,12 @@ var AMnoMathML = false, AMtranslated = false;
 function translate(spanclassAM) {
   if (!AMtranslated) { // run this only once
     AMtranslated = true;
-    AMinitSymbols();
     AMbody = document.getElementsByTagName("body")[0];
     AMprocessNode(AMbody, false, spanclassAM);
   }
 }
+
+AMinitSymbols();
 
 if (isIE) { // avoid adding MathPlayer info explicitly to each webpage
   document.write("<object id=\"mathplayer\"\

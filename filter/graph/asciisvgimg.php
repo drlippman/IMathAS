@@ -885,10 +885,12 @@ function ASplot($function) {
 			if (in_array($t,$avoid)) { continue;}
 			$x = $exfunc($t);
 			$y = $eyfunc($t);
+			if (is_nan($x) || is_nan($y)) { continue; }
 		} else {
 			$x = $xmin + $dx*$i;
 			if (in_array($x,$avoid)) { continue;}
 			$y = $efunc($x);
+			if (is_nan($y)) { continue;}
 		}
 		if ($i<2 || $i==$stopat-2) {
 			$fx[$i] = $x;

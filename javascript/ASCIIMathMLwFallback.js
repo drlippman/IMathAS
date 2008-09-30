@@ -18,8 +18,8 @@ ASCIIMathML, Version 1.4.7 Aug 30, 2005, (c) Peter Jipsen http://www.chapman.edu
 Modified with TeX conversion for IMG fallback Sept 6, 2006 (c) David Lippman http://www.pierce.ctc.edu/dlippman
 
 This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or (at
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at
 your option) any later version.
 
 This program is distributed in the hope that it will be useful, 
@@ -29,13 +29,14 @@ General Public License (at http://www.gnu.org/copyleft/gpl.html)
 for more details.
 */
 
-var AMTcgiloc = "http://www.imathas.com/cgi-bin/mimetex.cgi"; //path to CGI script that
+//var AMTcgiloc = "http://www.imathas.com/cgi-bin/mimetex.cgi"; //path to CGI script that
 						     //can render a TeX strin
+var AMTcgiloc = null;
 var checkForMathML = true;   // check if browser can display MathML
 var notifyIfNoMathML = true; // display note if no MathML capability
 var alertIfNoMathML = false;  // show alert box if no MathML capability
 var mathcolor = "";       // change it to "" (to inherit) or any other color
-var mathfontfamily = "serif"; // change to "" to inherit (works in IE) 
+var mathfontfamily = "Serif"; // change to "" to inherit (works in IE) 
                               // or another family (e.g. "arial")
 var displaystyle = true;      // puts limits above and below large operators
 var showasciiformulaonhover = true; // helps students learn ASCIIMath
@@ -91,6 +92,7 @@ function AMisMathMLavailable() {
 		if (rv.length<2) { rv[1] = 0;}
 	   }
 	   if (rv!=null && 10000*rv[0]+100*rv[1]+1*rv[2]>=10100) {
+		   AMisGecko = 10000*rv[0]+100*rv[1]+1*rv[2];
 		   return null;
 	   } else {
 		   return AMnoMathMLNote();
@@ -243,8 +245,8 @@ var AMsymbols = [
 //{input:"||", tag:"mo", output:"||", tex:null, ttype:LEFTRIGHT},
 {input:"(:", tag:"mo", output:"\u2329", tex:"langle", ttype:LEFTBRACKET},
 {input:":)", tag:"mo", output:"\u232A", tex:"rangle", ttype:RIGHTBRACKET},
-{input:"<<", tag:"mo", output:"\u2329", tex:null, ttype:LEFTBRACKET},
-{input:">>", tag:"mo", output:"\u232A", tex:null, ttype:RIGHTBRACKET},
+{input:"<<", tag:"mo", output:"\u2329", tex:"langle", ttype:LEFTBRACKET},
+{input:">>", tag:"mo", output:"\u232A", tex:"rangle", ttype:RIGHTBRACKET},
 {input:"{:", tag:"mo", output:"{:", tex:null, ttype:LEFTBRACKET, invisible:true},
 {input:":}", tag:"mo", output:":}", tex:null, ttype:RIGHTBRACKET, invisible:true},
 
@@ -285,6 +287,10 @@ var AMsymbols = [
 {input:"ZZ",  tag:"mo", output:"\u2124", tex:"mathbb{Z}", ttype:CONST, notexcopy:true},
 {input:"f",   tag:"mi", output:"f",      tex:null, ttype:UNARY, func:true, val:true},
 {input:"g",   tag:"mi", output:"g",      tex:null, ttype:UNARY, func:true, val:true},
+{input:"'",  tag:"mo", output:"\u2032", tex:null, ttype:CONST, notexcopy:true, val:true}, 
+{input:"''",  tag:"mo", output:"\u2032\u2032", tex:null, ttype:CONST, notexcopy:true, val:true},
+{input:"'''",  tag:"mo", output:"\u2032\u2032\u2032", tex:null, ttype:CONST, notexcopy:true, val:true},
+{input:"''''",  tag:"mo", output:"\u2032\u2032\u2032\u2032", tex:null, ttype:CONST, notexcopy:true, val:true},
 
 //standard functions
 {input:"lim",  tag:"mo", output:"lim", tex:null, ttype:UNDEROVER},
@@ -806,7 +812,9 @@ function AMTparseAMtoTeX(str) {
 }
 
 function AMTparseMath(str) {
-  
+  str = str.replace(/&nbsp;/g,"");
+  str = str.replace(/&gt;/g,">");
+  str = str.replace(/&lt;/g,"<");
   var texstring = AMTparseAMtoTeX(str);
   if (mathcolor!="") {
 	  texstring = "\\"+mathcolor + texstring;
@@ -1255,16 +1263,17 @@ function AMprocessNode(n, linebreaks, spanclassAM) {
 
 var AMbody;
 var AMnoMathML = false, AMtranslated = false;
+var AMisGecko = 0; var AMnoFonts = false;
 
 function translate(spanclassAM) {
   if (!AMtranslated) { // run this only once
     AMtranslated = true;
-    AMinitSymbols();
+    //AMinitSymbols();
     AMbody = document.getElementsByTagName("body")[0];
     AMprocessNode(AMbody, false, spanclassAM);
   }
 }
-
+AMinitSymbols();
 if (isIE) { // avoid adding MathPlayer info explicitly to each webpage
   document.write("<object id=\"mathplayer\"\
   classid=\"clsid:32F66A20-7614-11D4-BD11-00104BD3F987\"></object>");
@@ -1272,14 +1281,48 @@ if (isIE) { // avoid adding MathPlayer info explicitly to each webpage
 }
 
 
-
+function AMBBoxFor(s) {
+	document.getElementById("hidden").innerHTML = 
+      '<nobr><span class="typeset"><span class="scale">'+s+'</span></span></nobr>';
+      var bbox = {w: document.getElementById("hidden").offsetWidth, h: document.getElementById("hidden").offsetHeight};
+      document.getElementById("hidden").innerHTML = '';
+      return bbox;
+}
+//check for TeX font based on approach from jsMath
+function AMcheckTeX() {
+	hiddendiv = document.createElement("div");
+	hiddendiv.style.visibility = "hidden";
+	hiddendiv.id = "hidden";
+	document.body.appendChild(hiddendiv);
+	if (AMisGecko<10900) { //Mozilla 1.8 could use cmex fonts; Mozilla 1.9 only works well with STIX
+		wh = AMBBoxFor('<span style="font-family: STIXgeneral, cmex10, serif">&#xEFE8;</span>');
+	} else {
+		wh = AMBBoxFor('<span style="font-family: STIXgeneral, serif">&#xEFE8;</span>');
+	}
+	wh2 = AMBBoxFor('<span style="font-family: serif">&#xEFE8;</span>');
+	nofonts = (wh.w==wh2.w && wh.h==wh2.h);
+	if (nofonts) {
+		AMnoMathML = true;
+		AMnoFonts = true;
+	} else {
+		AMnoMathML = false;
+		AMnoFonts = false;
+	}
+}
 
 // GO1.1 Generic onload by Brothercake 
 // http://www.brothercake.com/
 //onload function (replaces the onload="translate()" in the <body> tag)
 function generic()
 {
-  translate();
+	if (AMnoMathML && typeof waitforAMTcgiloc != 'undefined' && AMTcgiloc==null) {
+		setTimeout("generic()",50);
+	} else {
+		if (!AMnoMathML && AMisGecko>0) {
+			AMcheckTeX();
+		}
+		translate();
+	}
 };
 //setup onload function
 if(typeof window.addEventListener != 'undefined')

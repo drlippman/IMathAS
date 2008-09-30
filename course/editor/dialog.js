@@ -57,6 +57,7 @@ Dialog._geckoOpenModal = function(url, action, init) {
 		HTMLArea._removeEvent(w, "focus", Dialog._parentEvent);
 	};
 	capwin(window);
+	/*
 	// capture other frames
 	for (var i = 0; i < window.frames.length; capwin(window.frames[i++]));
 	// make up a function to be called when the Dialog ends.
@@ -69,4 +70,21 @@ Dialog._geckoOpenModal = function(url, action, init) {
 		for (var i = 0; i < window.frames.length; relwin(window.frames[i++]));
 		Dialog._modal = null;
 	};
+	*/
+	if(document.all) {
+		for (var i = 0; i < window.frames.length; capwin(window.frames[i++]));
+	} 
+	    // make up a function to be called when the Dialog ends.
+	    Dialog._return = function (val) {
+		relwin(window);
+		// capture other frames
+		if(document.all) {
+		    for (var i = 0; i < window.frames.length; relwin(window.frames[i++]));
+		}
+		if (val && action) {
+		    action(val);
+		}
+		Dialog._modal = null;
+	    };
+	   
 };

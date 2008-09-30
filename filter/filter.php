@@ -5,6 +5,7 @@
 	
 	//load in filters as needed
 	$filterdir = rtrim(dirname(__FILE__), '/\\');
+	include("$filterdir/simplelti/simplelti.php");
 	if ($sessiondata['mathdisp']==2) { //use image fallback for math
 		include("$filterdir/math/ASCIIMath2TeX.php");
 		$AMT = new AMtoTeX;
@@ -76,6 +77,17 @@
 				$str = preg_replace_callback('/<\s*embed.*?sscr=(.)(.+?)\1.*?>/s','svgfiltersscrcallback',$str);
 				$str = preg_replace_callback('/<\s*embed.*?script=(.)(.+?)\1.*?>/s','svgfilterscriptcallback',$str);
 			}
+		}
+		
+		$search = '/\[LTI:\s*url=(.*),\s*secret=([^\]]*)\]/';
+		
+		if (preg_match($search, $str, $res)){
+			$secret = $res[2];
+			$url = $res[1];
+			$params = simplelti_get_request_params($secret);
+			$response = simplelti_request($url, $secret,$params);
+			$replamnt = simplelti_print_response($response);
+			$str = preg_replace('/\[LTI:[^\]]*\]/', $replamnt, $str);
 		}
 		return $str;
 	}

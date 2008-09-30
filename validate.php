@@ -119,7 +119,7 @@ END;
 	 $line = mysql_fetch_array($result, MYSQL_ASSOC);
 	 
 	// if (($line != null) && ($line['password'] == md5($_POST['password']))) {
-	 if (($line != null) && (md5($line['password'].$_SESSION['challenge']) == $_POST['password'])) {
+	 if (($line != null) && ((md5($line['password'].$_SESSION['challenge']) == $_POST['password']) ||($line['password'] == md5($_POST['password'])) )) {
 		 unset($_SESSION['challenge']); //challenge is used up - forget it.
 		 $userid = $line['id'];
 		 $groupid = $line['groupid'];
