@@ -17,8 +17,8 @@
 			}
 			foreach (explode(',',$_POST['qsetids']) as $qsetid) {
 				for ($i=0; $i<$_POST['copies'.$qsetid];$i++) {
-					$points = $_POST['points'.$qsetid];
-					$attempts = $_POST['attempts'.$qsetid];
+					$points = trim($_POST['points'.$qsetid]);
+					$attempts = trim($_POST['attempts'.$qsetid]);
 					if ($points=='') { $points = 9999;}
 					if ($attempts=='') {$attempts = 9999;}
 					$query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,regen,showans,questionsetid) ";
@@ -46,8 +46,8 @@
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		} else if (isset($_POST['mod'])) { //modifying existing
 			foreach(explode(',',$_POST['qids']) as $qid) {
-				$points = $_POST['points'.$qid];
-				$attempts = $_POST['attempts'.$qid];
+				$points = trim($_POST['points'.$qid]);
+				$attempts = trim($_POST['attempts'.$qid]);
 				if ($points=='') { $points = 9999;}
 				if ($attempts=='') {$attempts = 9999;}
 				$query = "UPDATE imas_questions SET points='$points',attempts='$attempts' WHERE id='$qid'";

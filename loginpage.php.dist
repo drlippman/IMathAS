@@ -5,12 +5,21 @@ if (!isset($imasroot)) { //don't allow direct access to loginpage.php
 }
 //any extra CSS, javascript, etc needed for login page
 	$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/infopages.css\" type=\"text/css\" />\n";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/md5.js\" ></script>";
+	
 	$nologo = true;
 	require("header.php");
 	if (isset($_SERVER['QUERY_STRING'])) {
 		 $querys = '?'.$_SERVER['QUERY_STRING'];
 	 } else {
 		 $querys = '';
+	 }
+	 if (isset($_SESSION['challenge'])) {
+		 $challenge = $_SESSION['challenge'];
+	 } else {
+		 //use of microtime guarantees no challenge used twice
+		 $challenge = base64_encode(microtime() . rand(0,9999));
+		 $_SESSION['challenge'] = $challenge;
 	 }
 	 $pagetitle = "About Us";
 	 include("infoheader.php");
@@ -32,7 +41,7 @@ if (!isset($imasroot)) { //don't allow direct access to loginpage.php
 
 
 <div id="loginbox">
-<form method="post" action="<?php echo $_SERVER['PHP_SELF'].$querys;?>">
+<form method="post" action="<?php echo $_SERVER['PHP_SELF'].$querys;?>" onsubmit="hashpw()">
 <?php
 	if ($haslogin) {echo "<p>Login Error.  Try Again</p>\n";}
 ?>
@@ -47,6 +56,8 @@ if (!isset($imasroot)) { //don't allow direct access to loginpage.php
 <a href="<?php echo $imasroot; ?>/forms.php?action=lookupusername">Forgot Username</a></div>
 <div class="textright"><a href="<?php echo $imasroot; ?>/checkbrowser.php">Browser check</a></div>
 <input type="hidden" id="tzoffset" name="tzoffset" value=""> 
+<input type="hidden" id="challenge" name="challenge" value="<?php echo $challenge; ?>" />
+
 <script type="text/javascript">        
         var thedate = new Date();  
         document.getElementById("tzoffset").value = thedate.getTimezoneOffset();  

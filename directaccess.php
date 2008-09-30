@@ -128,14 +128,21 @@
 		$coursename = mysql_result($result,0,0);
 		
 		$placeinhead = "<style type=\"text/css\">div#header {clear: both;height: 75px;background-color: #9C6;margin: 0px;padding: 0px;border-left: 10px solid #036;border-bottom: 5px solid #036;} \n.vcenter {font-family: sans-serif;font-size: 28px;margin: 0px;margin-left: 30px;padding-top: 25px;color: #fff;}</style>";
+		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/md5.js\" ></script>";
 		$pagetitle = $coursename;
+		 if (isset($_SESSION['challenge'])) {
+			 $challenge = $_SESSION['challenge'];
+		 } else {
+			 $challenge = base64_encode(microtime() . rand(0,9999));
+			 $_SESSION['challenge'] = $challenge;
+		 }
 		require("header.php");
 		echo "<div class=\"breadcrumb\"><a href=\"index.php\">Home</a> &gt; $coursename Access</div>";
 		echo "<div id=\"header\"><div class=\"vcenter\">$coursename</div></div>";
 		//echo '<span style="float:right;margin-top:10px;">'.$smallheaderlogo.'</span>';
 		
 ?>
-<form method="post" action="<?php echo $_SERVER['PHP_SELF'].$querys;?>">
+<form method="post" action="<?php echo $_SERVER['PHP_SELF'].$querys;?>" onsubmit="hashpw()">
 
 <h3 style="color:#036;">Already have an account?</h3>
 <p><b>Login</b>.  If you have an account but are not enrolled in this course, you will be able to enroll in this course.</p>
@@ -149,6 +156,7 @@
 <div id="settings">JavaScript is not enabled.  JavaScript is required for <?php echo $installname; ?>.  Please enable JavaScript and reload this page</div>
 
 <input type="hidden" id="tzoffset" name="tzoffset" value=""> 
+<input type="hidden" id="challenge" name="challenge" value="<?php echo $challenge; ?>" />
 <script type="text/javascript">        
         var thedate = new Date();  
         document.getElementById("tzoffset").value = thedate.getTimezoneOffset();  

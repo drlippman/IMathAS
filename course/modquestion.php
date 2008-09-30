@@ -24,9 +24,9 @@ if (!(isset($teacherid))) {
 	$curBreadcrumb .= "Modify Question Settings";
 	
 	if ($_GET['process']== true) {
-		if ($_POST['points']=="") {$points=9999;} else {$points = $_POST['points'];}
-		if ($_POST['attempts']=="") {$attempts=9999;} else {$attempts = $_POST['attempts'];}
-		if ($_POST['penalty']=="") {$penalty=9999;} else {$penalty = $_POST['penalty'];}
+		if (trim($_POST['points'])=="") {$points=9999;} else {$points = intval($_POST['points']);}
+		if (trim($_POST['attempts'])=="") {$attempts=9999;} else {$attempts = intval($_POST['attempts']);}
+		if (trim($_POST['penalty'])=="") {$penalty=9999;} else {$penalty = intval($_POST['penalty']);}
 		if ($penalty!=9999) {
 			if ($_POST['skippenalty']==10) {
 				$penalty = 'L'.$penalty;

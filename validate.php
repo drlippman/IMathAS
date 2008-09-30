@@ -117,7 +117,10 @@ END;
 	 $query = "SELECT id,password,rights,groupid FROM imas_users WHERE SID = '{$_POST['username']}'";
 	 $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	 $line = mysql_fetch_array($result, MYSQL_ASSOC);
-	 if (($line != null) && ($line['password'] == md5($_POST['password']))) {
+	 
+	// if (($line != null) && ($line['password'] == md5($_POST['password']))) {
+	 if (($line != null) && (md5($line['password'].$_SESSION['challenge']) == $_POST['password'])) {
+		 unset($_SESSION['challenge']); //challenge is used up - forget it.
 		 $userid = $line['id'];
 		 $groupid = $line['groupid'];
 		 //for upgrades times:
