@@ -5,8 +5,17 @@
 include("config.php");
 
 function reporterror($err) {
-	//TODO: format proper XML response
-	echo $err;
+	 // Do status 400
+	if ( $_REQUEST['action'] == 'launchresolve' ) {
+	      print "<launchResponse>\n";
+	      print "<status>fail</status>\n";
+	      print "<code>BadPasswordDigest</code>\n";
+	      print "<description>$err</description>\n";
+	      print "</launchResponse>\n";
+	 } else {
+	      print "Error in the launch POST data:\n";
+	      print $err;
+	 }
 	exit;	
 }
 
@@ -60,7 +69,7 @@ if (empty($_REQUEST['sec_created'])) {
 $now = time();
 
 if ($itemtype==0) { //accessing single assessment
-	$query = "SELECT courseid,startdate,enddate,avail,ltisecret WHERE id='$aid'";
+	$query = "SELECT courseid,startdate,enddate,avail,ltisecret FROM imas_assessments WHERE id='$aid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
 	$cid = $line['courseid'];
@@ -69,7 +78,7 @@ if ($itemtype==0) { //accessing single assessment
 	}
 	$secret = $line['ltisecret'];
 } else if ($itemtype==1) { //accessing whole course
-	$query = "SELECT avail,ltisecret WHERE id='$cid'";
+	$query = "SELECT avail,ltisecret FROM imas_courses WHERE id='$cid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
 	if (!($line['avail']==0 || $line['avail']==2)) {
@@ -77,17 +86,20 @@ if ($itemtype==0) { //accessing single assessment
 	}
 	$secret = $line['ltisecret'];
 }
+if ($secret=='') {
+	reporterror("No valid secret exists");
+}
 
 //check created by time
 $createdtime = strtotime($created);
 if (abs($now-$created)>60) {
-	reporterror("Expired");
+	//debug reporterror("Expired");
 }
 //check nonce unique
 $query = "SELECT id FROM imas_ltinonces WHERE nonce='$nonce'";
 $result = mysql_query($query) or die("Query failed : " . mysql_error());
 if (mysql_num_rows($result)>0) {
-	reporterror("Duplicate nonce");
+	//debug reporterror("Duplicate nonce");
 } else {
 	//record nonce to prevent reruns
 	$query = "INSERT INTO imas_ltinonces (nonce,time) VALUES ('$nonce','$now')";
@@ -104,9 +116,40 @@ $result = mysql_query($query) or die("Query failed : " . mysql_error());
 if (mysql_num_rows($result) > 0) { //yup, we know them
 	$userid = mysql_result($result,0,0);
 } else {
-	//TODO: create new account. use directory info if provided
-	
+	$query = "INSERT INTO imas_ltiusers (org,ltiuserid) VALUES ('$ltiorg','$ltiuserid')";
+	mysql_query($query) or die("Query failed : " . mysql_error());
+	$localltiuser = mysql_insert_id();
+	if (!empty($_REQUEST['user_email'])) {
+		$email = $_REQUEST['user_email'];
+	} else {
+		$email = "none@none.com";
+	}
+	if (!empty($_REQUEST['user_firstname'])) {
+		$firstname = $_REQUEST['user_firstname'];
+	} else {
+		$firstname = "unknown";
+	}
+	if (!empty($_REQUEST['user_lastname'])) {
+		$lastname = $_REQUEST['user_lastname'];
+	} else {
+		$lastname = "unknown";
+	}
+	if (!empty($_REQUEST['user_eid'])) {
+		$sid = $_REQUEST['user_eid'];
+		$query = "SELECT userid FROM imas_users WHERE SID='$sid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		if (mysql_num_rows($result)>0) { //eid already used as username; oh well
+			$sid = "lti-".$localltiuser;
+		}
+	} else {
+		$sid = "lti-".$localltiuser;
+	}
+	$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email) VALUES ";
+	$query .= "('$sid','none',10,'$firstname','$lastname','$email')";
+	mysql_query($query) or die("Query failed : " . mysql_error());
 	$userid = mysql_insert_id();	
+	$query = "UPDATE imas_ltiusers SET userid='$userid' WHERE id='$localltiuser'";
+	mysql_query($query) or die("Query failed : " . mysql_error());
 }
 	
 //see if student is enrolled
@@ -123,7 +166,7 @@ $pass = '';
 for ($i=0;$i<10;$i++) {
 	$pass .= substr($chars,rand(0,61),1);
 }
-$query = "INSERT INTO imas_ltiaccess (password,userid,itemid,itemtype,time) VALUES ";
+$query = "INSERT INTO imas_ltiaccess (password,userid,itemid,itemtype,created) VALUES ";
 if ($itemtype==0) { //is aid
 	$query .= "('$pass','$userid','$aid',0,$now)";
 } else if ($itemtype==1) { // is cid
@@ -136,7 +179,7 @@ $accessid = mysql_insert_id();
 $old = $now - 900; //old stuff - 15 min
 $query = "DELETE FROM imas_ltinonces WHERE time<$old";
 mysql_query($query) or die("Query failed : " . mysql_error());
-$query = "DELETE FROM imas_access WHERE time<$old";
+$query = "DELETE FROM imas_ltiaccess WHERE created<$old";
 mysql_query($query) or die("Query failed : " . mysql_error());
 
 //we're done!  send back the launchresponse

@@ -13,7 +13,7 @@ CREATE TABLE `imas_ltiaccess` (
 `userid` INT( 10 ) UNSIGNED NOT NULL ,
 `itemid` INT( 10 ) UNSIGNED NOT NULL ,
 `itemtype` TINYINT( 1 ) UNSIGNED NOT NULL ,
-`time` INT( 10 ) UNSIGNED NOT NULL 
+`created` INT( 10 ) UNSIGNED NOT NULL 
 ) TYPE = innodb;
 
 CREATE TABLE `imas_ltinonces` (

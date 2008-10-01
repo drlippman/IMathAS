@@ -4,6 +4,9 @@ Upgrade Notes
 ** IMathAS 1.6     **
 *********************
 
+*** Loginpage Changes ***
+Reference loginpage.php.dist for changes. 
+	
 *** Database Changes ***
 ALTER TABLE `imas_diags` ADD `forceregen` INT( 10 ) UNSIGNED NOT NULL DEFAULT '0';
 ALTER TABLE `imas_diags` CHANGE `entryformat` `entryformat` CHAR( 3 ) NOT NULL DEFAULT 'C0' ;
