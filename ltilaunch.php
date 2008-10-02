@@ -56,7 +56,7 @@ if (isset($_GET['launch'])) {
 		 $sessiondata['graphdisp'] = 2;
 		 $sessiondata['useed'] = 1; 
 	 } else {
-		 $sessiondata['mathdisp'] = $_POST['mathdisp']; 
+		 $sessiondata['mathdisp'] = 2-$_POST['mathdisp']; 
 		 $sessiondata['graphdisp'] = $_POST['graphdisp'];
 		 $sessiondata['useed'] = 1; 
 	 }
@@ -140,7 +140,7 @@ mysql_query($query) or die("Query failed : " . mysql_error());
 //have we already established a session for this person?
 $query = "SELECT userid,sessiondata FROM imas_sessions WHERE sessionid='$sessionid'";
 $result = mysql_query($query) or die("Query failed : " . mysql_error());
-if (mysql_num_rows($result)>0 && mysql_result($result,0,0)==$userid) {
+if (mysql_num_rows($result)>0) {
 	//ready have session.  Don't need to 	
 	$sessiondata = unserialize(base64_decode(mysql_result($result,0,1)));
 	$createnewsession = false;

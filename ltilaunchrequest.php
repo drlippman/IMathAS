@@ -78,7 +78,7 @@ if ($itemtype==0) { //accessing single assessment
 	}
 	$secret = $line['ltisecret'];
 } else if ($itemtype==1) { //accessing whole course
-	$query = "SELECT avail,ltisecret FROM imas_courses WHERE id='$cid'";
+	$query = "SELECT available,ltisecret FROM imas_courses WHERE id='$cid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
 	if (!($line['avail']==0 || $line['avail']==2)) {
@@ -106,7 +106,7 @@ if (mysql_num_rows($result)>0) {
 	mysql_query($query) or die("Query failed : " . mysql_error());
 }
 //check sec digest
-if (base64_encode(sha1($nonce.$created.$secret, TRUE)) != $digest) {
+if (base64_encode(pack("H*", sha1($nonce.$created.$secret))) != $digest) {
 	reporterror("Bad secret - digest mismatch");
 }
 
@@ -116,6 +116,8 @@ $result = mysql_query($query) or die("Query failed : " . mysql_error());
 if (mysql_num_rows($result) > 0) { //yup, we know them
 	$userid = mysql_result($result,0,0);
 } else {
+	echo "student not known?  id $ltiuserid, org $ltiorg";
+	
 	$query = "INSERT INTO imas_ltiusers (org,ltiuserid) VALUES ('$ltiorg','$ltiuserid')";
 	mysql_query($query) or die("Query failed : " . mysql_error());
 	$localltiuser = mysql_insert_id();
