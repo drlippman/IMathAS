@@ -126,6 +126,18 @@ if ($isteacher) {
 	$placeinhead .= "	var toopen = '$address' + altgbmode;\n";
 	$placeinhead .= "  	window.location = toopen; \n";
 	$placeinhead .= "}\n";
+	$placeinhead .= 'function chgexport() { ';
+	$placeinhead .= "	var type = document.getElementById(\"exportsel\").value; ";
+	$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-export.php?stu=$stu&cid=$cid&";
+	$placeinhead .= "	var toopen = '$address';";
+	$placeinhead .= "	if (type==1) { toopen = toopen+'export=true';}\n";
+	$placeinhead .= "	if (type==2) { toopen = toopen+'emailgb=me';}\n";
+	$placeinhead .= "	if (type==3) { toopen = toopen+'emailgb=ask';}\n";
+	$placeinhead .= "	if (type==0) { return false;}\n";
+	$placeinhead .= "  	window.location = toopen; \n";
+	$placeinhead .= "}\n";
+	
+	
 	$placeinhead .= "</script>";
 }
 
@@ -216,9 +228,15 @@ if (!$isteacher || $stu!=0) { //show student view
 	
 	echo "<span class=\"hdr1\">Grade Book </span>";
 	echo "<div class=cpmid>";
-	echo "<a href=\"addgrades.php?cid=$cid&gbitem=new&grades=all\">Add Offline Grade</a> | ";
-	echo "Export to <a href=\"gb-export.php?stu=$stu&cid=$cid&export=true\">File</a>, ";
-	echo "<a href=\"gb-export.php?stu=$stu&cid=$cid&emailgb=me\">My Email</a>, or <a href=\"gb-export.php?stu=$stu&cid=$cid&emailgb=ask\">Other Email</a> | ";
+	echo "Offline Grades: <a href=\"addgrades.php?cid=$cid&gbitem=new&grades=all\">Add</a>, ";
+	echo "<a href=\"chgoffline.php?cid=$cid\">Manage</a> | ";
+	echo '<select id="exportsel" onchange="chgexport()">';
+	echo '<option value="0">Export to...</option>';
+	echo '<option value="1">... file</option>';
+	echo '<option value="2">... my email</option>';
+	echo '<option value="3">... other email</option></select> | ';
+	//echo "Export to <a href=\"gb-export.php?stu=$stu&cid=$cid&export=true\">File</a>, ";
+	//echo "<a href=\"gb-export.php?stu=$stu&cid=$cid&emailgb=me\">My Email</a>, or <a href=\"gb-export.php?stu=$stu&cid=$cid&emailgb=ask\">Other Email</a> | ";
 	echo "<a href=\"gbsettings.php?cid=$cid\">GB Settings</a> | ";
 	echo "<a href=\"gradebook.php?cid=$cid&stu=-1\">Averages</a> | ";
 	echo "<a href=\"gbcomments.php?cid=$cid&stu=0\">Comments</a> | ";

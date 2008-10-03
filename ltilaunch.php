@@ -91,7 +91,30 @@ $now = time();
 $query = "SELECT userid,itemid,itemtype,created FROM imas_ltiaccess WHERE id='$id' AND password='$code'";
 $result = mysql_query($query) or die("Query failed : " . mysql_error());
 if (mysql_num_rows($result)==0) {
-	reporterror("Bad id or code, or being rerun");
+	//no entry. Either no/pw or rerun
+	//if rerun, check if session exists - might be cache-caused rerun
+	$query = "SELECT userid,sessiondata FROM imas_sessions WHERE sessionid='$sessionid'";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	if (mysql_num_rows($result)>0) {
+		$sessiondata = unserialize(base64_decode(mysql_result($result,0,1)));
+		if (empty($sessiondata['ltiitemid'])) {
+			reporterror("Bad id or code");
+		}
+		if ($sessiondata['ltiitemtype']==0) { //is aid
+			$aid = $sessiondata['ltiitemid'];
+			$query = "SELECT courseid FROM imas_assessments WHERE id='$aid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$cid = mysql_result($result,0,0);
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id=$aid");
+		} else if ($sessiondata['ltiitemtype']==1) { //is cid
+			$cid = $sessiondata['ltiitemid'];
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
+		}
+		exit;	
+	} else {
+		//no session, must be bad
+		reporterror("Bad id or code, or being rerun");
+	}
 } else {
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
 	if (abs($line['created'] - $now)>900) {
@@ -203,7 +226,7 @@ Please enable JavaScript and reload this page</div>
 		var html = ""; 
 		html += 'Accessibility: ';
 		html += "<a href='#' onClick=\"window.open('<?php echo $imasroot;?>/help.php?section=loggingin','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\">Help<\/a>";
-		html += '<br/><input type="radio" name="access" value="0" <?php if ($pref==0) {echo "checked=1";} ?> />Detech my settings<br/>';
+		html += '<br/><input type="radio" name="access" value="0" <?php if ($pref==0) {echo "checked=1";} ?> />Detect my settings<br/>';
 		html += '<input type="radio" name="access" value="2" <?php if ($pref==2) {echo "checked=1";} ?> />Force image-based graphs<br/>';
 		html += '<input type="radio" name="access" value="4" <?php if ($pref==4) {echo "checked=1";} ?> />Force image-based math<br/>';
 		html += '<input type="radio" name="access" value="3" <?php if ($pref==3) {echo "checked=1";} ?> />Force image based display<br/>';
