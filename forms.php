@@ -106,7 +106,36 @@ switch($_GET['action']) {
 		echo "<p>Email: <input type=text name=\"email\"/></p>";
 		echo "<p><input type=submit value=\"Submit\" /></p></form>";
 		break;
+	case "googlegadget":
+		$query = "SELECT remoteaccess FROM imas_users WHERE id='$userid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$code = mysql_result($result,0,0);
+		if ($code=='' || isset($_GET['regen'])) {
+			$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+			do {
+				$pass = '';
+				for ($i=0;$i<10;$i++) {
+					$pass .= substr($chars,rand(0,61),1);
+				}	
+				$query = "SELECT id FROM imas_users WHERE remoteaccess='$pass'";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			} while (mysql_num_rows($result)>0);
+			$query = "UPDATE imas_users SET remoteaccess='$pass' WHERE id='$userid'";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			$code = $pass;
+		}
+		echo "<h3>Google Gadget Access Code</h3>";
+		echo "<p>The $installname Google Gadget allow you to view a list of new forum posts ";
+		echo "and messages from your iGoogle page.  To install, click the link below to add ";
+		echo "the gadget to your iGoogle page, then use the Access key below in the settings ";
+		echo "to gain access to your data</p>";
 		
+		echo '<p>Add to iGoogle: <a href="http://fusion.google.com/add?source=atgs&moduleurl=http%3A//'.$_SERVER['HTTP_HOST'].$imasroot.'/wamap-postreader.xml"><img src="http://gmodules.com/ig/images/plus_google.gif" border="0" alt="Add to Google"></a></p>';
+		echo "<p>Access Code: $code</p>";
+		echo "<p><a href=\"forms.php?action=googlegadget&regen=true\">Generate a new Access code<a/><br/>";
+		echo "<p><a href=\"actions.php?action=googlegadget&clear=true\">Clear Access code</a></p>";
+		echo "<p>Note: This access code only allows Google to access a list of new posts and messages, and does not provide access to grades or any other data stored at $installname.  Be aware that this form of access is insecure and could be compromised by a third party</p>";
+		break;
 }
 	require("footer.php");
 ?>

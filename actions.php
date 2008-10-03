@@ -280,7 +280,12 @@
 		$query = "UPDATE imas_users SET FirstName='{$_POST['firstname']}',LastName='{$_POST['lastname']}',email='{$_POST['email']}',msgnotify=$msgnot,qrightsdef=$qrightsdef,deflib='$deflib',usedeflib='$usedeflib' ";
 		$query .= "WHERE id='$userid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
-	} 
+	} else if ($_GET['action']=="googlegadget") {
+		if (isset($_GET['clear'])) {
+			$query = "UPDATE imas_users SET remoteaccess='' WHERE id='$userid'";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+		}
+	}
 	header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php");
 	
 ?>
