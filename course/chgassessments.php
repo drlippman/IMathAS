@@ -115,7 +115,15 @@ if (!(isset($teacherid))) {
 		if (isset($_POST['chggroupmax'])) {
 			$sets[] = "groupmax='{$_POST['groupmax']}'";
 		}
-		
+		if (isset($_POST['chgcntingb'])) {
+			$sets[] = "cntingb='{$_POST['cntingb']}'";
+		}
+		if (isset($_POST['chgminscore'])) {
+			$sets[] = "minscore='{$_POST['minscore']}'";
+		}
+		if (isset($_POST['chgshowqcat'])) {
+			$sets[] = "showcat='{$_POST['showqcat']}'";
+		}
 		
 		if (isset($_POST['chgintro'])) {
 			$query = "SELECT intro FROM imas_assessments WHERE id='{$_POST['intro']}'";
@@ -385,30 +393,16 @@ function chkAll(frm, arr, mark) {
 				<td><input type="checkbox" name="showhints" checked="checked"></td>
 			</tr>
 			<tr>
-				<td><input type="checkbox" name="chgshuffle"/></td>
-				<td class="r">Shuffle item order: </td>
-				<td><input type="checkbox" name="shuffle"></td>
-			</tr>
-			<tr>
-				<td><input type="checkbox" name="chgsameseed"/></td>
-				<td class="r">All items same random seed: </td>
-				<td><input type="checkbox" name="sameseed"></td>
-			</tr>
-			<tr>
-				<td><input type="checkbox" name="chgsamever"/></td>
-				<td class="r">All students same version of questions: </td>
-				<td><input type="checkbox" name="samever"></td>
-			</tr>
-			<tr>
 				<td><input type="checkbox" name="chgallowlate"/></td>
 				<td class="r">Allow use of LatePasses?: </td>
 				<td><input type="checkbox" name="allowlate" checked="1"></td>
 			</tr>
 			<tr>
-				<td><input type="checkbox" name="chgexcpen"/></td>
-				<td class="r">Penalty for questions done while in exception/LatePass: </td>
-				<td><input type="text" name="exceptionpenalty" size=4 value="0"></td>
+				<td><input type="checkbox" name="chgshuffle"/></td>
+				<td class="r">Shuffle item order: </td>
+				<td><input type="checkbox" name="shuffle"></td>
 			</tr>
+			
 			
 			<tr>
 				<td><input type="checkbox" name="chggbcat"/></td>
@@ -420,7 +414,36 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 
 				</td>
 			</tr>
+			<tr>
+				<td style="border-bottom: 1px solid #000"><input type="checkbox" name="chgcntingb"/></td>
+				<td class="r" style="border-bottom: 1px solid #000">Count: </td>
+				<td style="border-bottom: 1px solid #000"><input name="cntingb" value="1" checked="checked" type="radio"> Count in Gradebook<br>
+				<input name="cntingb" value="0" type="radio"> Don't count in grade total and hide from students<br>
+				<input name="cntingb" value="3" type="radio"> Don't count in grade total<br>
+				<input name="cntingb" value="2" type="radio"> Count as Extra Credit
+				</td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" name="chgminscore"/></td>
+				<td class="r">Minimum score to receive credit: </td>
+				<td><input type="text" name="minscore" size=4 value="0"> % </td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" name="chgsameseed"/></td>
+				<td class="r">All items same random seed: </td>
+				<td><input type="checkbox" name="sameseed"></td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" name="chgsamever"/></td>
+				<td class="r">All students same version of questions: </td>
+				<td><input type="checkbox" name="samever"></td>
+			</tr>
 			
+			<tr>
+				<td><input type="checkbox" name="chgexcpen"/></td>
+				<td class="r">Penalty for questions done while in exception/LatePass: </td>
+				<td><input type="text" name="exceptionpenalty" size=4 value="0"> % </td>
+			</tr>
 			<tr>
 				<td><input type="checkbox" name="chgisgroup"/></td>
 				<td class="r">Group assessment: </td>
@@ -434,6 +457,14 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 				<td><input type="checkbox" name="chggroupmax"/></td>
 				<td class="r">Max group members (if group assessment):</td>
 				<td><input type=text name=groupmax value="6"></td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" name="chgshowqcat"/></td>
+				<td class="r">Show question categories: </td>
+				<td><input name="showqcat" value="0" checked="checked" type="radio">No <br/>
+				<input name="showqcat" value="1" type="radio">In Points Possible bar <br/>
+				<input name="showqcat" value="2" type="radio">In navigation bar (Skip-Around only)
+				</td>
 			</tr>
 		</tbody>
 		</table>

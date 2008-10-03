@@ -153,6 +153,11 @@ function unans($sc) {
 	}
 }
 
+function amreattempting($n) {
+	global $reattempting;
+	return in_array($n,$reattempting);
+}
+
 //creates display of score  (chg from previous: does not echo self)
 function printscore($sc,$poss) {
 	if (strpos($sc,'~')===false) {
@@ -185,18 +190,22 @@ function printscore2($sc) {
 //qn: question index in questions array
 //qi: getquestioninfo[qid]
 function scorequestion($qn) { 
-	global $questions,$scores,$seeds,$testsettings,$qi,$attempts,$lastanswers,$isreview,$bestseeds,$bestscores,$bestattempts,$bestlastanswers;
+	global $questions,$scores,$seeds,$testsettings,$qi,$attempts,$lastanswers,$isreview,$bestseeds,$bestscores,$bestattempts,$bestlastanswers, $reattempting;
+	global $regenonreattempt;
 	//list($qsetid,$cat) = getqsetid($questions[$qn]);
 	$rawscore = scoreq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$_POST["qn$qn"]);
 	$afterpenalty = calcpointsafterpenalty($rawscore,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
 	
-	/*
-	This doesn't work yet - don't want bestscores, want lastscore, but we cleared those for reattempt 
-	if ($bestscores[$qn]!=-1 && strpos($afterpenalty,'~')!==false) {
+	//work in progress
+	if (!$regenonreattempt && amreattempting($qn) && strpos($afterpenalty,'~')!==false) {
 		$appts = explode('~',$afterpenalty);
-		$curs = explode('~',$bestscores[$qn]);
+		$prepts = explode('~',$rawscore);
+		$curs = explode('~',$scores[$qn]);
 		for ($k=0;$k<count($curs);$k++) {
-			if ($appts[$k]>$curs[$k]) {
+			if ($appts[$k]>$curs[$k]) { //part after penalty better than orig, replace
+				$curs[$k] = $appts[$k];
+			}
+			if ($prepts[$k]<$curs[$k]) { //changed correct to incorrect, take away pts
 				$curs[$k] = $appts[$k];
 			}
 		}
@@ -204,10 +213,15 @@ function scorequestion($qn) {
 	} else {
 		$scores[$qn] = $afterpenalty;
 	}
-	*/
-	$scores[$qn] = $afterpenalty;
+	
+	//$scores[$qn] = $afterpenalty;
 	$rawscore = calcpointsafterpenalty($rawscore,$qi[$questions[$qn]],$testsettings,0); //possible
 	$attempts[$qn]++;
+	
+	$loc = array_search($qn,$reattempting);
+	if ($loc!==false) {
+		array_splice($reattempting,$loc,1);
+	}
 	
 	if (getpts($scores[$qn])>=getpts($bestscores[$qn]) && !$isreview) {
 		$bestseeds[$qn] = $seeds[$qn];
@@ -221,7 +235,7 @@ function scorequestion($qn) {
 //records everything but questions array
 //if limit=true, only records lastanswers
 function recordtestdata($limit=false) { 
-	global $isreview,$bestscores,$bestattempts,$bestseeds,$bestlastanswers,$scores,$attempts,$seeds,$lastanswers,$testid,$testsettings,$sessiondata;
+	global $isreview,$bestscores,$bestattempts,$bestseeds,$bestlastanswers,$scores,$attempts,$seeds,$lastanswers,$testid,$testsettings,$sessiondata, $reattempting;
 	$bestscorelist = implode(',',$bestscores);
 	$bestattemptslist = implode(',',$bestattempts);
 	$bestseedslist = implode(',',$bestseeds);
@@ -235,13 +249,16 @@ function recordtestdata($limit=false) {
 	$lastanswers = str_replace('~','',$lastanswers);
 	$lalist = implode('~',$lastanswers);
 	$lalist = addslashes(stripslashes($lalist));
+	
+	$reattemptinglist = implode(',',$reattempting);
+	
 	$now = time();
 	if ($isreview) {
 		if ($limit) {
 			$query = "UPDATE imas_assessment_sessions SET reviewlastanswers='$lalist' ";
 		} else {
 			$query = "UPDATE imas_assessment_sessions SET reviewscores='$scorelist',reviewattempts='$attemptslist',reviewseeds='$seedslist',reviewlastanswers='$lalist',";
-			$query .= "endtime=$now ";
+			$query .= "endtime=$now,tempreviewscores='$reattemptinglist' ";
 		}
 	} else {
 		if ($limit) {
@@ -249,7 +266,7 @@ function recordtestdata($limit=false) {
 		} else {
 			$query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',seeds='$seedslist',lastanswers='$lalist',";
 			$query .= "bestseeds='$bestseedslist',bestattempts='$bestattemptslist',bestscores='$bestscorelist',bestlastanswers='$bestlalist',";
-			$query .= "endtime=$now ";
+			$query .= "endtime=$now,tempscores='$reattemptinglist' ";
 		}
 	}
 	if ($testsettings['isgroup']>0 && $sessiondata['groupid']>0) {

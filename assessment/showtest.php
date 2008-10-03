@@ -181,6 +181,8 @@
 	$scores = explode(",",$line['scores']);
 	$attempts = explode(",",$line['attempts']);
 	$lastanswers = explode("~",$line['lastanswers']);
+	
+	$reattempting = explode(",",$line['tempscores']);
 
 	$bestseeds = explode(",",$line['bestseeds']);
 	$bestscores = explode(",",$line['bestscores']);
@@ -252,6 +254,8 @@
 		$scores = explode(",",$line['reviewscores']);
 		$attempts = explode(",",$line['reviewattempts']);
 		$lastanswers = explode("~",$line['reviewlastanswers']);
+		
+		$reattempting = explode(",",$line['tempreviewscores']);
 	}
 	$allowregen = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework");
 	$showeachscore = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="AsGo" || $testsettings['testtype']=="Homework");
@@ -265,7 +269,10 @@
 		if ($_GET['reattempt']=="all") {
 			for ($i = 0; $i<count($questions); $i++) {
 				if ($attempts[$i]<$qi[$questions[$i]]['attempts'] || $qi[$questions[$i]]['attempts']==0) {
-					$scores[$i] = -1;
+					//$scores[$i] = -1;
+					if (!in_array($toclear,$reattempting)) {
+						$reattempting[] = $toclear;
+					}
 					if (($regenonreattempt && $qi[$questions[$i]]['regen']==0) || $qi[$questions[$i]]['regen']==1) {
 						$seeds[$i] = rand(1,9999);
 					}
@@ -276,7 +283,10 @@
 			for ($i = 0; $i<count($questions); $i++) {
 				if ($attempts[$i]<$qi[$questions[$i]]['attempts'] || $qi[$questions[$i]]['attempts']==0) {
 					if ($noindivscores || getpts($scores[$i])<$remainingposs[$i]) {
-						$scores[$i] = -1;
+						//$scores[$i] = -1;
+						if (!in_array($toclear,$reattempting)) {
+							$reattempting[] = $toclear;
+						}
 						if (($regenonreattempt && $qi[$questions[$i]]['regen']==0) || $qi[$questions[$i]]['regen']==1) {
 							$seeds[$i] = rand(1,9999);
 						}
@@ -286,7 +296,10 @@
 		} else {
 			$toclear = $_GET['reattempt'];
 			if ($attempts[$toclear]<$qi[$questions[$toclear]]['attempts'] || $qi[$questions[$toclear]]['attempts']==0) {
-				$scores[$toclear] = -1;	
+				//$scores[$toclear] = -1;
+				if (!in_array($toclear,$reattempting)) {
+					$reattempting[] = $toclear;
+				}
 				if (($regenonreattempt && $qi[$questions[$toclear]]['regen']==0) || $qi[$questions[$toclear]]['regen']==1) {
 					$seeds[$toclear] = rand(1,9999);
 				}
@@ -309,7 +322,10 @@
 		}
 		$newla[] = "ReGen";
 		$lastanswers[$toregen] = implode('##',$newla);
-		
+		$loc = array_search($toregen,$reattempting);
+		if ($loc!==false) {
+			array_splice($reattempting,$loc,1);
+		}
 		recordtestdata();
 	}
 	if (isset($_GET['regenall']) && $allowregen) {
@@ -329,6 +345,10 @@
 					}
 					$newla[] = "ReGen";
 					$lastanswers[$i] = implode('##',$newla);
+					$loc = array_search($i,$reattempting);
+					if ($loc!==false) {
+						array_splice($reattempting,$loc,1);
+					}
 				}
 			}
 		} else if ($_GET['regenall']=="all") {
@@ -344,7 +364,8 @@
 					}
 				}
 				$newla[] = "ReGen";
-				$lastanswers[$i] = implode('##',$newla);	
+				$lastanswers[$i] = implode('##',$newla);
+				$reattempting = array();
 			}
 		} else if ($_GET['regenall']=="fromscratch" && $testsettings['testtype']=="Practice" && !$isreview) {
 			$query = "DELETE FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='{$testsettings['id']}' LIMIT 1";
@@ -652,7 +673,7 @@
 				//show next
 				unset($toshow);
 				for ($i=$last+1;$i<count($questions);$i++) {
-					if (unans($scores[$i])) {
+					if (unans($scores[$i]) || amreattempting($i)) {
 						$toshow=$i;
 						$done = false;
 						break;
@@ -744,7 +765,7 @@
 				echo filter("<div id=intro class=hidden>{$testsettings['intro']}</div>\n");
 				
 				$lefttodo = shownavbar($questions,$scores,$next,$testsettings['showcat']);
-				if (unans($scores[$next])) {
+				if (unans($scores[$next]) || amreattempting($next)) {
 					echo "<div class=inset>\n";
 					echo "<form id=\"qform\" method=post action=\"showtest.php?action=skip&amp;score=$next\" onsubmit=\"return doonsubmit(this)\">\n";
 					echo "<a name=\"beginquestions\"></a>\n";
@@ -838,7 +859,7 @@
 					$toshow = $qn;
 				} else {
 					for ($i=$qn+1;$i<count($questions);$i++) {
-						if (unans($scores[$i])) {
+						if (unans($scores[$i]) || amreattempting($i)) {
 							$toshow=$i;
 							$done = false;
 							break;
@@ -846,7 +867,7 @@
 					}
 					if (!isset($toshow)) {
 						for ($i=0;$i<$qn;$i++) {
-							if (unans($scores[$i])) {
+							if (unans($scores[$i]) || amreattempting($i)) {
 								$toshow=$i;
 								$done = false;
 								break;
@@ -958,7 +979,7 @@
 			echo "<form id=\"qform\" method=post action=\"showtest.php?action=scoreall\" onsubmit=\"return doonsubmit(this,true)\">\n";
 			$numdisplayed = 0;
 			for ($i = 0; $i < count($questions); $i++) {
-				if (unans($scores[$i])) {
+				if (unans($scores[$i]) || amreattempting($i)) {
 					basicshowq($i);
 					showqinfobar($i,true,false);
 					$numdisplayed++;
@@ -978,7 +999,7 @@
 			}
 		} else if ($testsettings['displaymethod'] == "OneByOne") {
 			for ($i = 0; $i<count($questions);$i++) {
-				if (unans($scores[$i])) {
+				if (unans($scores[$i]) || amreattempting($i)) {
 					break;
 				}
 			}
@@ -1002,7 +1023,7 @@
 			echo filter("<div class=intro>{$testsettings['intro']}</div>\n");
 			
 			for ($i = 0; $i<count($questions);$i++) {
-				if (unans($scores[$i])) {
+				if (unans($scores[$i]) || amreattempting($i)) {
 					break;
 				}
 			}
@@ -1084,7 +1105,7 @@
 		for ($i = 0; $i < count($questions); $i++) {
 			echo "<li>";
 			if ($current == $i) { echo "<span class=current>";}
-			if (unans($scores[$i])) {
+			if (unans($scores[$i]) || amreattempting($i)) {
 				$todo++;
 			}
 			/*
