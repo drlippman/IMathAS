@@ -11,7 +11,7 @@ function copysub($items,$parent,&$addtoarr) {
 	global $checked;
 	foreach ($items as $k=>$item) {
 		if (is_array($item)) {
-			if (array_search($parent.'-'.($k+1),$checked)!=FALSE) { //copy block
+			if (array_search($parent.'-'.($k+1),$checked)!==FALSE) { //copy block
 				$newblock = array();
 				$newblock['name'] = $item['name'];
 				$newblock['startdate'] = $item['startdate'];
@@ -25,7 +25,7 @@ function copysub($items,$parent,&$addtoarr) {
 				copysub($item['items'],$parent.'-'.($k+1),$addtoarr);
 			}
 		} else {
-			if (array_search($item,$checked)!=FALSE) {
+			if (array_search($item,$checked)!==FALSE) {
 				$toexport[$itemcnt] = $item;
 				$addtoarr[] = $itemcnt;
 				$itemcnt++;
@@ -100,9 +100,11 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	$qcnt = 0;
 	$items = unserialize(mysql_result($result,0,0));
 	$newitems = array();
-
-	copysub($items,'0',$newitems);
+	$qtoexport = array();
+	$qsettoexport = array();
 	
+	copysub($items,'0',$newitems);
+	print_r($newitems);
 	echo "EXPORT DESCRIPTION\n";
 	echo $_POST['description']."\n";
 	echo "ITEM LIST\n";

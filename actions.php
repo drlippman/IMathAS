@@ -42,6 +42,27 @@
 		} else {
 			$msgnot = 0;
 		}
+		if (!isset($_GET['confirmed'])) {
+			$query = "SELECT SID FROM imas_users WHERE email='{$_POST['email']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			if (mysql_num_rows($result)>0) {
+				require("header.php");
+				echo '<form method="post" action="actions.php?action=newuser&amp;confirmed=true">';
+				echo '<input type="hidden" name="SID" value="'.stripslashes($_POST['SID']).'" />';
+				echo '<input type="hidden" name="firstname" value="'.stripslashes($_POST['firstname']).'" />';
+				echo '<input type="hidden" name="lastname" value="'.stripslashes($_POST['lastname']).'" />';
+				echo '<input type="hidden" name="email" value="'.stripslashes($_POST['email']).'" />';
+				echo '<input type="hidden" name="pw1" value="'.stripslashes($_POST['pw1']).'" />';
+				echo '<input type="hidden" name="pw2" value="'.stripslashes($_POST['pw2']).'" />';
+				echo '<p>It appears an account already exists with the same email address you just entered. ';
+				echo 'If you are creating an account because you forgot your username, you can ';
+				echo '<a href="forms.php?action=lookupusername">look up your username</a> instead.</p>';
+				echo '<input type="submit" value="Create new account anyways"/>';
+				echo '</form>';
+				require("footer.php");
+				exit;
+			}
+		}
 		$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, msgnotify) ";
 		$query .= "VALUES ('{$_POST['SID']}','$md5pw',$initialrights,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot);";
 		mysql_query($query) or die("Query failed : " . mysql_error());

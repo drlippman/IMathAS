@@ -32,10 +32,14 @@ function getquestioninfo($qns,$testsettings) {
 				$p = strpos($line['control'],"\n",$p);
 				$line['answeights'] = getansweights($line['id'],substr($line['control'],0,$p));
 			} else {
-				preg_match('/anstypes\s*=\s*("|\')([\w\,\s]+)/',$line['control'],$match);
-				$n = substr_count($match[2],',')+1;
-				$line['answeights'] = array_fill(0,$n-1,round(1/$n,3));
-				$line['answeights'][] = 1-array_sum($line['answeights']);
+				preg_match('/anstypes(.*)/',$line['control'],$match);
+				$n = substr_count($match[1],',')+1;
+				if ($n>1) {
+					$line['answeights'] = array_fill(0,$n-1,round(1/$n,3));
+					$line['answeights'][] = 1-array_sum($line['answeights']);
+				} else {
+					$line['answeights'] = array(1);
+				}
 			}
 		}
 		unset($line['qtype']);
@@ -52,7 +56,11 @@ function getansweights($qi,$code) {
 	$i = array_search($qi,$questions);
 	srand($seeds[$i]);
 	eval(interpret('control','multipart',$code));
-	return explode(',',$answeights);
+	if (is_array($answeights)) {
+		return $answeights;
+	} else {
+		return explode(',',$answeights);
+	}
 }
 
 //calculates points after penalty

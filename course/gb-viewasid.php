@@ -204,7 +204,7 @@
 			} else {
 				echo "<p>Error.  Try again.</p>";
 			}
-			unset($_GET['asid']);
+			//unset($_GET['asid']);
 			unset($_GET['clearq']);
 			
 		} else {
@@ -215,7 +215,7 @@
 				$pers = 'student';
 			}
 			echo "<p>Are you sure you want to clear this $pers's scores for this question?</p>";
-			echo "<p><input type=button onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&from=$from&asid={$_GET['asid']}&clearq={$_GET['clearq']}&confirmed=true'\" value=\"Really Clear\">\n";
+			echo "<p><input type=button onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&from=$from&asid={$_GET['asid']}&clearq={$_GET['clearq']}&uid={$_GET['uid']}&confirmed=true'\" value=\"Really Clear\">\n";
 			echo "<input type=button value=\"Never Mind\" onclick=\"window.location='gb-viewasid.php?stu=$stu&from=$from&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}'\"></p>\n";
 			exit;
 		}
@@ -433,10 +433,14 @@
 					$p = strpos($r[4],"\n",$p);
 					$answeights[$r[0]] = getansweights($r[0],substr($r[4],0,$p));
 				} else {
-					preg_match('/anstypes\s*=\s*("|\')([\w\,\s]+)/',$r[4],$match);
-					$n = substr_count($match[2],',')+1;
-					$answeights[$r[0]] = array_fill(0,$n-1,round(1/$n,3));
-					$answeights[$r[0]][] = 1-array_sum($answeights[$r[0]]);
+					preg_match('/anstypes(.*)/',$r[4],$match);
+					$n = substr_count($match[1],',')+1;
+					if ($n>1) {
+						$answeights[$r[0]] = array_fill(0,$n-1,round(1/$n,3));
+						$answeights[$r[0]][] = 1-array_sum($answeights[$r[0]]);
+					} else {
+						$answeights[$r[0]] = array(1);
+					}
 				}
 				for ($i=0; $i<count($answeights[$r[0]])-1; $i++) {
 					$answeights[$r[0]][$i] = round($answeights[$r[0]][$i]*$pts[$r[0]],2);
@@ -553,7 +557,7 @@
 			}
 			if ($isteacher) {
 				echo " <a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid=$cid&add=new&quoteq=$i-$qsetid-{$seeds[$i]}&to={$_GET['uid']}\">Use in Msg</a>";
-				echo " &nbsp; <a href=\"gb-viewasid.php?stu=$stu&cid=$cid&from=$from&asid={$_GET['asid']}&clearq=$i\">Clear Score</a>";
+				echo " &nbsp; <a href=\"gb-viewasid.php?stu=$stu&cid=$cid&from=$from&asid={$_GET['asid']}&uid={$_GET['uid']}&clearq=$i\">Clear Score</a>";
 			}
 			echo "</div>\n";
 			
@@ -715,11 +719,17 @@ function printscore($sc) {
 		return array($pts,$sc);
 	}		
 }
+//evals a portion of the control section to extract the $answeights
+//which might be randomizer determined, hence the seed
 function getansweights($qi,$code) {
 	global $seeds,$questions;	
 	$i = array_search($qi,$questions);
 	srand($seeds[$i]);
 	eval(interpret('control','multipart',$code));
-	return explode(',',$answeights);
+	if (is_array($answeights)) {
+		return $answeights;
+	} else {
+		return explode(',',$answeights);
+	}
 }
 ?>
