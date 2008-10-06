@@ -66,7 +66,10 @@
 				$message .= "<p>You're received a new message</p><p>From: $from<br />Course: $cname.</p>\r\n";
 				$message .= "<p>Subject:".stripslashes($_POST['subject'])."</p>";
 				$message .= "<a href=\"http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewmsg.php?cid=0&msgid=$msgid\">";
-				$message .= "View Message</a>\r\n";
+				$message .= "View Message</a></p>\r\n";
+				$message .= "<p>If you do not wish to receive email notification of new messages, please ";
+				$message .= "<a href=\"http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/forms.php?action=chguserinfo\">click here to change your ";
+				$message .= "user preferences</a></p>\r\n";
 				mail($email,'New message notification',$message,$headers);
 			}
 		} else {

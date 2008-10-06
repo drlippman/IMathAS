@@ -132,6 +132,9 @@ function interpret($blockname,$anstype,$str)
 						if ($wherepos>0) {
 							$left = substr($com,0,$wherepos);
 							$cond = substr($com,$wherepos+5);
+							$cond = str_replace('!=','#=',$cond);
+							$cond = mathphp($cond,null);
+							$cond = str_replace('#=','!=',$cond);
 							$com = '$count=0; do{'.$left.'; $count++;} while (!('.$cond.')&&($count<200)); if ($count==200) {echo "where not met in 200 iterations";}';
 						}
 					} else if ($ismath) {

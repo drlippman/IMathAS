@@ -129,10 +129,12 @@ function displayInfo() {
 
 		// Display HTML string in <div>
 		_gel('content_div').innerHTML = html;   		 
-	 }, { refreshInterval: 10 });	   
+	 }, { refreshInterval: 10 });
+	 setTimeout("displayInfo()",300000); //recheck every 5 minutes
   }
 
   _IG_RegisterOnloadHandler(displayInfo);
+  
   </script>
 
   ]]> 

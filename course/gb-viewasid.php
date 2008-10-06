@@ -2,6 +2,7 @@
 //IMathAS:  View/Edit and Question breakdown views
 //(c) 2007 David Lippman
 	require("../validate.php");
+		
 	$isteacher = isset($teacherid);
 	$istutor = isset($tutorid);
 	$cid = $_GET['cid'];
@@ -222,6 +223,7 @@
 	
 	//OUTPUTS
 	if ($links==0) { //View/Edit full assessment
+		require("../assessment/displayq2.php");
 		if (isset($_GET['update']) && $isteacher) {
 			$scores = array();
 			$i = 0;
@@ -378,18 +380,7 @@
 			}
 		}
 		
-		$query = "SELECT id,points,withdrawn FROM imas_questions WHERE assessmentid='{$line['assessmentid']}'";
-		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-		$totalpossible = 0;
-		while ($r = mysql_fetch_row($result)) {
-			if ($r[1]==9999) {
-				$pts[$r[0]] = $line['defpoints'];  //use defpoints
-			} else {
-				$pts[$r[0]] = $r[1]; //use points from question
-			}
-			//$totalpossible += $pts[$r[0]];  do later
-			$withdrawn[$r[0]] = $r[2];
-		}
+		
 		
 		$questions = explode(",",$line['questions']);
 		if (isset($_GET['lastver'])) {
@@ -423,8 +414,42 @@
 			echo "</p>";
 		}
 		
+		$query = "SELECT iq.id,iq.points,iq.withdrawn,iqs.qtype,iqs.control ";
+		$query .= "FROM imas_questions AS iq, imas_questionset AS iqs ";
+		$query .= "WHERE iq.questionsetid=iqs.id AND iq.assessmentid='{$line['assessmentid']}'";
+		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+		$totalpossible = 0;
+		while ($r = mysql_fetch_row($result)) {
+			if ($r[1]==9999) {
+				$pts[$r[0]] = $line['defpoints'];  //use defpoints
+			} else {
+				$pts[$r[0]] = $r[1]; //use points from question
+			}
+			//$totalpossible += $pts[$r[0]];  do later
+			$withdrawn[$r[0]] = $r[2];
+			if ($r[3]=='multipart') {
+				//if (preg_match('/answeights\s*=\s*("|\')([\d\.\,\s]+)/',$line['control'],$match)) {
+				if (($p = strpos($r[4],'answeights'))!==false) {
+					$p = strpos($r[4],"\n",$p);
+					$answeights[$r[0]] = getansweights($r[0],substr($r[4],0,$p));
+				} else {
+					preg_match('/anstypes\s*=\s*("|\')([\w\,\s]+)/',$r[4],$match);
+					$n = substr_count($match[2],',')+1;
+					$answeights[$r[0]] = array_fill(0,$n-1,round(1/$n,3));
+					$answeights[$r[0]][] = 1-array_sum($answeights[$r[0]]);
+				}
+				for ($i=0; $i<count($answeights[$r[0]])-1; $i++) {
+					$answeights[$r[0]][$i] = round($answeights[$r[0]][$i]*$pts[$r[0]],2);
+				}
+				//adjust for rounding
+				$diff = $pts[$r[0]] - array_sum($answeights[$r[0]]);
+				$answeights[$r[0]][count($answeights[$r[0]])-1] += $diff;
+				$answeights[$r[0]] = implode(', ',$answeights[$r[0]]);
+			}
+		}
 		
-		require("../assessment/displayq2.php");
+		
+		
 		echo '<script type="text/javascript">';
 		echo 'function hidecorrect() {';
 		echo '   var butn = document.getElementById("hctoggle");';
@@ -506,7 +531,11 @@
 					echo " (parts: $parts)";
 				}
 			}
-			echo " out of {$pts[$questions[$i]]} in {$attempts[$i]} attempt(s)\n";
+			echo " out of {$pts[$questions[$i]]} ";
+			if ($parts!='') {
+				echo "(parts: {$answeights[$questions[$i]]}) ";
+			}
+			echo "in {$attempts[$i]} attempt(s)\n";
 			if ($isteacher) {
 				$laarr = explode('##',$lastanswers[$i]);
 				if (count($laarr)>1) {
@@ -685,5 +714,12 @@ function printscore($sc) {
 		$sc = str_replace('~',', ',$sc);
 		return array($pts,$sc);
 	}		
+}
+function getansweights($qi,$code) {
+	global $seeds,$questions;	
+	$i = array_search($qi,$questions);
+	srand($seeds[$i]);
+	eval(interpret('control','multipart',$code));
+	return explode(',',$answeights);
 }
 ?>

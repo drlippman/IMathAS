@@ -182,7 +182,11 @@
 	$attempts = explode(",",$line['attempts']);
 	$lastanswers = explode("~",$line['lastanswers']);
 	
-	$reattempting = explode(",",$line['tempscores']);
+	if (trim($line['reattempting'])=='') {
+		$reattempting = array();
+	} else {
+		$reattempting = explode(",",$line['reattempting']);
+	}
 
 	$bestseeds = explode(",",$line['bestseeds']);
 	$bestscores = explode(",",$line['bestscores']);
@@ -195,13 +199,7 @@
 	$testsettings = mysql_fetch_array($result, MYSQL_ASSOC);
 	list($testsettings['testtype'],$testsettings['showans']) = explode('-',$testsettings['deffeedback']);
 	
-	$qi = getquestioninfo($questions,$testsettings);
-	//check for withdrawn
-	for ($i=0; $i<count($questions); $i++) {
-		if ($qi[$questions[$i]]['withdrawn']==1 && $qi[$questions[$i]]['points']>0) {
-			$bestscores[$i] = $qi[$questions[$i]]['points'];
-		}
-	}
+	
 	$now = time();
 	//check for dates - kick out student if after due date
 	//if (!$isteacher) {
@@ -254,9 +252,21 @@
 		$scores = explode(",",$line['reviewscores']);
 		$attempts = explode(",",$line['reviewattempts']);
 		$lastanswers = explode("~",$line['reviewlastanswers']);
-		
-		$reattempting = explode(",",$line['tempreviewscores']);
+		if (trim($line['reviewreattempting'])=='') {
+			$reattempting = array();
+		} else {
+			$reattempting = explode(",",$line['reviewreattempting']);
+		}
 	}
+	
+	$qi = getquestioninfo($questions,$testsettings);
+	//check for withdrawn
+	for ($i=0; $i<count($questions); $i++) {
+		if ($qi[$questions[$i]]['withdrawn']==1 && $qi[$questions[$i]]['points']>0) {
+			$bestscores[$i] = $qi[$questions[$i]]['points'];
+		}
+	}
+	
 	$allowregen = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework");
 	$showeachscore = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="AsGo" || $testsettings['testtype']=="Homework");
 	$showansduring = (($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework") && $testsettings['showans']!='N' && $testsettings['showans']!='F');
@@ -265,16 +275,20 @@
 	$showhints = ($testsettings['showhints']==1);
 	$regenonreattempt = (($testsettings['shuffle']&8)==8);
 	
+	$reloadqi = false;
 	if (isset($_GET['reattempt'])) {
 		if ($_GET['reattempt']=="all") {
 			for ($i = 0; $i<count($questions); $i++) {
 				if ($attempts[$i]<$qi[$questions[$i]]['attempts'] || $qi[$questions[$i]]['attempts']==0) {
 					//$scores[$i] = -1;
-					if (!in_array($toclear,$reattempting)) {
-						$reattempting[] = $toclear;
+					if (!in_array($i,$reattempting)) {
+						$reattempting[] = $i;
 					}
 					if (($regenonreattempt && $qi[$questions[$i]]['regen']==0) || $qi[$questions[$i]]['regen']==1) {
 						$seeds[$i] = rand(1,9999);
+						if (isset($qi[$questions[$i]]['answeights'])) {
+							$reloadqi = true;
+						}
 					}
 				}
 			}
@@ -284,11 +298,14 @@
 				if ($attempts[$i]<$qi[$questions[$i]]['attempts'] || $qi[$questions[$i]]['attempts']==0) {
 					if ($noindivscores || getpts($scores[$i])<$remainingposs[$i]) {
 						//$scores[$i] = -1;
-						if (!in_array($toclear,$reattempting)) {
-							$reattempting[] = $toclear;
+						if (!in_array($i,$reattempting)) {
+							$reattempting[] = $i;
 						}
 						if (($regenonreattempt && $qi[$questions[$i]]['regen']==0) || $qi[$questions[$i]]['regen']==1) {
 							$seeds[$i] = rand(1,9999);
+							if (isset($qi[$questions[$i]]['answeights'])) {
+								$reloadqi = true;
+							}
 						}
 					}
 				}
@@ -302,6 +319,9 @@
 				}
 				if (($regenonreattempt && $qi[$questions[$toclear]]['regen']==0) || $qi[$questions[$toclear]]['regen']==1) {
 					$seeds[$toclear] = rand(1,9999);
+					if (isset($qi[$questions[$toclear]]['answeights'])) {
+						$reloadqi = true;
+					}
 				}
 			}
 		}
@@ -326,6 +346,9 @@
 		if ($loc!==false) {
 			array_splice($reattempting,$loc,1);
 		}
+		if (isset($qi[$questions[$toregen]]['answeights'])) {
+			$reloadqi = true;
+		}
 		recordtestdata();
 	}
 	if (isset($_GET['regenall']) && $allowregen) {
@@ -349,6 +372,9 @@
 					if ($loc!==false) {
 						array_splice($reattempting,$loc,1);
 					}
+					if (isset($qi[$questions[$i]]['answeights'])) {
+						$reloadqi = true;
+					}
 				}
 			}
 		} else if ($_GET['regenall']=="all") {
@@ -366,6 +392,9 @@
 				$newla[] = "ReGen";
 				$lastanswers[$i] = implode('##',$newla);
 				$reattempting = array();
+				if (isset($qi[$questions[$i]]['answeights'])) {
+					$reloadqi = true;
+				}
 			}
 		} else if ($_GET['regenall']=="fromscratch" && $testsettings['testtype']=="Practice" && !$isreview) {
 			$query = "DELETE FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='{$testsettings['id']}' LIMIT 1";
@@ -377,7 +406,10 @@
 		recordtestdata();
 			
 	}
-			
+	if ($reloadqi) {
+		$qi = getquestioninfo($questions,$testsettings);
+	}
+	
 	
 	$isdiag = isset($sessiondata['isdiag']);
 	if ($isdiag) {
@@ -654,13 +686,13 @@
 					echo "<p>Previous Question:<br/>";
 					if (getpts($rawscore)!=getpts($scores[$last])) {
 						echo "<p>Score before penalty on last attempt: ";
-						echo printscore($rawscore,$possible);
+						echo printscore($rawscore,$last);
 						echo "</p>";
 					}
 					echo "Score on last attempt: ";
-					echo printscore($scores[$last],$possible);
+					echo printscore($scores[$last],$last);
 					echo "<br/>Score in gradebook: ";
-					echo printscore($bestscores[$last],$possible);
+					echo printscore($bestscores[$last],$last);
 					 
 					echo "</p>\n";
 					if (hasreattempts($last)) {
@@ -725,15 +757,15 @@
 					$possible = $qi[$questions[$qn]]['points'];
 					if (getpts($rawscore)!=getpts($scores[$qn])) {
 						echo "<p>Score before penalty on last attempt: ";
-						echo printscore($rawscore,$possible);
+						echo printscore($rawscore,$qn);
 						echo "</p>";
 					}
 					echo "<p>";
 					echo "Score on last attempt: ";
-					echo printscore($scores[$qn],$possible);
+					echo printscore($scores[$qn],$qn);
 					echo "</p>\n";
 					echo "<p>Score in gradebook: ";
-					echo printscore($bestscores[$qn],$possible);
+					echo printscore($bestscores[$qn],$qn);
 					echo "</p>";
 										
 					if (hasreattempts($qn)) {
@@ -782,10 +814,10 @@
 					if ($showeachscore) {
 						$possible = $qi[$questions[$next]]['points'];
 						echo "<p>Score on last attempt: ";
-						echo printscore($scores[$next],$possible);
+						echo printscore($scores[$next],$next);
 						echo "</p>\n";
 						echo "<p>Score in gradebook: ";
-						echo printscore($bestscores[$next],$possible);
+						echo printscore($bestscores[$next],$next);
 						echo "</p>";
 						
 						if (hasreattempts($next)) {
@@ -821,7 +853,7 @@
 			if (isset($_GET['score'])) { //score a problem
 				$qn = $_GET['score'];
 				if ($_POST['verattempts']!=$attempts[$qn]) {
-					echo "<p>The last question has been submittted since you viewed it, and that score is shown below. Your answer just submitted was not scored or recorded.</p>";
+					echo "<p>The last question has been submitted since you viewed it, and that score is shown below. Your answer just submitted was not scored or recorded.</p>";
 				} else {
 					$rawscore = scorequestion($qn);
 					//record score
@@ -834,16 +866,16 @@
 					$possible = $qi[$questions[$qn]]['points'];
 					if (getpts($rawscore)!=getpts($scores[$qn])) {
 						echo "<p>Score before penalty on last attempt: ";
-						echo printscore($rawscore,$possible);
+						echo printscore($rawscore,$qn);
 						echo "</p>";
 					}
 					echo "<p>";
 					echo "Score on last attempt: ";
 					echo "<p>Score on last attempt: ";
-					echo printscore($scores[$qn],$possible);
+					echo printscore($scores[$qn],$qn);
 					echo "</p>\n";
 					echo "<p>Score in gradebook: ";
-					echo printscore($bestscores[$qn],$possible);
+					echo printscore($bestscores[$qn],$qn);
 					echo "</p>";
 					 
 					if (hasreattempts($qn)) {
@@ -1230,7 +1262,7 @@
 					echo "Not answered";
 					echo "</td>";
 					echo "<td>  Score in gradebook: ";
-					echo printscore($bestscores[$i],$qi[$questions[$i]]['points']);
+					echo printscore($bestscores[$i],$i);
 					echo "</td>";
 					
 					echo "</tr>\n";
@@ -1238,10 +1270,10 @@
 					echo 'Question '. ($i+1) . ': </td><td>';
 					echo "Last attempt: ";
 					
-					echo printscore($scores[$i],$qi[$questions[$i]]['points']);
+					echo printscore($scores[$i],$i);
 					echo "</td>";
 					echo "<td>  Score in Gradebook: ";
-					echo printscore($bestscores[$i],$qi[$questions[$i]]['points']);
+					echo printscore($bestscores[$i],$i);
 					echo "</td>";
 					
 					echo "</tr>\n";

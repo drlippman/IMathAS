@@ -8,8 +8,8 @@ Upgrade Notes
 Reference loginpage.php.dist for changes. 
 	
 *** Database Changes ***
-ALTER TABLE `imas_assessment_sessions` ADD `tempscores` TEXT NOT NULL ,
-ADD `tempreviewscores` TEXT NOT NULL ;
+ALTER TABLE `imas_assessment_sessions` ADD `reattempting` TEXT NOT NULL ;
+ALTER TABLE `imas_assessment_sessions` ADD `reviewreattempting` TEXT NOT NULL ;
 
 ALTER TABLE `imas_users` ADD `remoteaccess` VARCHAR( 10 ) NOT NULL ;
 

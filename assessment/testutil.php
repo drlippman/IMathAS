@@ -11,7 +11,8 @@ function getquestioninfo($qns,$testsettings) {
 		$qns = array($qns);
 	} 
 	$qnlist = "'".implode("','",$qns)."'";	
-	$query = "SELECT iq.id,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,iq.withdrawn,il.name FROM imas_questions AS iq LEFT JOIN imas_libraries as il ";
+	$query = "SELECT iq.id,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,iq.withdrawn,il.name,iqs.qtype,iqs.control ";
+	$query .= "FROM (imas_questions AS iq JOIN imas_questionset AS iqs ON iq.questionsetid=iqs.id) LEFT JOIN imas_libraries as il ";
 	$query .= "ON iq.category=il.id WHERE iq.id IN ($qnlist)";
 	$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
 	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
@@ -25,9 +26,33 @@ function getquestioninfo($qns,$testsettings) {
 		if ($line['attempts']==9999) {
 			$line['attempts'] = $testsettings['defattempts'];
 		}
+		if ($line['qtype']=='multipart') {
+			//if (preg_match('/answeights\s*=\s*("|\')([\d\.\,\s]+)/',$line['control'],$match)) {
+			if (($p = strpos($line['control'],'answeights'))!==false) {
+				$p = strpos($line['control'],"\n",$p);
+				$line['answeights'] = getansweights($line['id'],substr($line['control'],0,$p));
+			} else {
+				preg_match('/anstypes\s*=\s*("|\')([\w\,\s]+)/',$line['control'],$match);
+				$n = substr_count($match[2],',')+1;
+				$line['answeights'] = array_fill(0,$n-1,round(1/$n,3));
+				$line['answeights'][] = 1-array_sum($line['answeights']);
+			}
+		}
+		unset($line['qtype']);
+		unset($line['control']);
 		$out[$line['id']] = $line;
 	}
 	return $out;
+}
+
+//evals a portion of the control section to extract the $answeights
+//which might be randomizer determined, hence the seed
+function getansweights($qi,$code) {
+	global $seeds,$questions;	
+	$i = array_search($qi,$questions);
+	srand($seeds[$i]);
+	eval(interpret('control','multipart',$code));
+	return explode(',',$answeights);
 }
 
 //calculates points after penalty
@@ -108,8 +133,24 @@ function totalpointspossible($qi) {
 //qi:  getquestioninfo[qid]
 //attempts: scalar attempts on question
 //testsettings: assoc array of assessment settings
-function getremainingpossible($qi,$testsettings,$attempts) {
-	$possible = calcpointsafterpenalty(1,$qi,$testsettings,$attempts);
+function getremainingpossible($qn,$qi,$testsettings,$attempts) {
+	global $scores;
+	if (isset($qi['answeights']) && $scores[$qn]!=-1) {
+		$possible = calcpointsafterpenalty(implode('~',$qi['answeights']),$qi,$testsettings,$attempts);
+		$appts = explode('~',$possible);
+		$curs = explode('~',$scores[$qn]);
+		for ($k=0;$k<count($curs);$k++) {
+			if ($appts[$k]>$curs[$k]) { //part after penalty better than orig, replace
+				$curs[$k] = $appts[$k];
+			}
+			if ($curs[$k]<0) {
+				$curs[$k] = 0;
+			}
+		}
+		$possible = round(array_sum($curs),1);
+	} else {
+		$possible = calcpointsafterpenalty(1,$qi,$testsettings,$attempts);
+	}
 	if ($possible<0) { $possible = 0;}
 	return $possible;
 }
@@ -123,7 +164,8 @@ function getremainingpossible($qi,$testsettings,$attempts) {
 function getallremainingpossible($qi,$questions,$testsettings,$attempts) {
 	$rposs = array();
 	foreach($questions as $k=>$qid) {
-		$rposs[$k] = calcpointsafterpenalty(1,$qi[$qid],$testsettings,$attempts[$k]);
+		//$rposs[$k] = calcpointsafterpenalty(1,$qi[$qid],$testsettings,$attempts[$k]);
+		$rposs[$k] = getremainingpossible($k,$qi[$qid],$testsettings,$attempts[$k]);
 	}
 	return $rposs;
 }
@@ -159,15 +201,26 @@ function amreattempting($n) {
 }
 
 //creates display of score  (chg from previous: does not echo self)
-function printscore($sc,$poss) {
+function printscore($sc,$qn) {
+	global $qi,$questions;
+	$poss = $qi[$questions[$qn]]['points'];
 	if (strpos($sc,'~')===false) {
 		$sc = str_replace('-1','N/A',$sc);
 		$out =  "$sc out of $poss";
 	} else {
+		$ptposs = $qi[$questions[$qn]]['answeights'];
+		for ($i=0; $i<count($ptposs)-1; $i++) {
+			$ptposs[$i] = round($ptposs[$i]*$poss,2);
+		}
+		//adjust for rounding
+		$diff = $poss - array_sum($ptposs);
+		$ptposs[count($ptposs)-1] += $diff;
+		$ptposs = implode(', ',$ptposs); 
+		
 		$pts = getpts($sc);
 		$sc = str_replace('-1','N/A',$sc);
 		$sc = str_replace('~',', ',$sc);
-		$out =  "$pts out of $poss (parts: $sc)";
+		$out =  "$pts out of $poss (parts: $sc out of $ptposs)";
 	}	
 	return $out;	
 }
@@ -196,8 +249,11 @@ function scorequestion($qn) {
 	$rawscore = scoreq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$_POST["qn$qn"]);
 	$afterpenalty = calcpointsafterpenalty($rawscore,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
 	
+	$rawscore = calcpointsafterpenalty($rawscore,$qi[$questions[$qn]],$testsettings,0); //possible
+	
 	//work in progress
-	if (!$regenonreattempt && amreattempting($qn) && strpos($afterpenalty,'~')!==false) {
+	//need to rework canimprove
+	if (!$regenonreattempt && $attempts[$qn]>0 && strpos($afterpenalty,'~')!==false) {
 		$appts = explode('~',$afterpenalty);
 		$prepts = explode('~',$rawscore);
 		$curs = explode('~',$scores[$qn]);
@@ -215,7 +271,6 @@ function scorequestion($qn) {
 	}
 	
 	//$scores[$qn] = $afterpenalty;
-	$rawscore = calcpointsafterpenalty($rawscore,$qi[$questions[$qn]],$testsettings,0); //possible
 	$attempts[$qn]++;
 	
 	$loc = array_search($qn,$reattempting);
@@ -258,7 +313,7 @@ function recordtestdata($limit=false) {
 			$query = "UPDATE imas_assessment_sessions SET reviewlastanswers='$lalist' ";
 		} else {
 			$query = "UPDATE imas_assessment_sessions SET reviewscores='$scorelist',reviewattempts='$attemptslist',reviewseeds='$seedslist',reviewlastanswers='$lalist',";
-			$query .= "endtime=$now,tempreviewscores='$reattemptinglist' ";
+			$query .= "endtime=$now,reviewreattempting='$reattemptinglist' ";
 		}
 	} else {
 		if ($limit) {
@@ -266,7 +321,7 @@ function recordtestdata($limit=false) {
 		} else {
 			$query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',seeds='$seedslist',lastanswers='$lalist',";
 			$query .= "bestseeds='$bestseedslist',bestattempts='$bestattemptslist',bestscores='$bestscorelist',bestlastanswers='$bestlalist',";
-			$query .= "endtime=$now,tempscores='$reattemptinglist' ";
+			$query .= "endtime=$now,reattempting='$reattemptinglist' ";
 		}
 	}
 	if ($testsettings['isgroup']>0 && $sessiondata['groupid']>0) {
@@ -281,7 +336,7 @@ function recordtestdata($limit=false) {
 //can improve question score?
 function canimprove($qn) {
 	global $qi,$scores,$attempts,$questions,$testsettings;	
-	$remainingposs = getremainingpossible($qi[$questions[$qn]],$testsettings,$attempts[$qn]);
+	$remainingposs = getremainingpossible($qn,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
 	if (hasreattempts($qn)) {
 		if (getpts($scores[$qn])<$remainingposs) {
 			return true;
@@ -293,7 +348,7 @@ function canimprove($qn) {
 //can improve question bestscore?
 function canimprovebest($qn) {
 	global $qi,$bestscores,$scores,$attempts,$questions,$testsettings;	
-	$remainingposs = getremainingpossible($qi[$questions[$qn]],$testsettings,$attempts[$qn]);
+	$remainingposs = getremainingpossible($qn,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
 	if (hasreattempts($qn)) {
 		if (getpts($bestscores[$qn])<$remainingposs) {
 			return true;
@@ -345,7 +400,6 @@ function basicshowq($qn,$seqinactive=false) {
 		$showa = ($qshowansafterlast && $showeachscore);	
 	}
 	$regen = (($regenonreattempt && $qi[$questions[$qn]]['regen']==0) || $qi[$questions[$qn]]['regen']==1);
-	
 	if (!$seqinactive) {
 		displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$showa,$showhints,$attempts[$qn],false,$regen,$seqinactive);
 	} else {
@@ -362,7 +416,7 @@ function showqinfobar($qn,$inreview,$single) {
 	if ($qi[$questions[$qn]]['withdrawn']==1) {
 		echo '<span class="red">Question Withdrawn</span> ';
 	}
-	$pointsremaining = getremainingpossible($qi[$questions[$qn]],$testsettings,$attempts[$qn]);
+	$pointsremaining = getremainingpossible($qn,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
 	if ($pointsremaining == $qi[$questions[$qn]]['points']) {
 		echo 'Points possible: ' . $qi[$questions[$qn]]['points'];
 	} else {
@@ -377,6 +431,23 @@ function showqinfobar($qn,$inreview,$single) {
 	}
 	if ($testsettings['showcat']>0 && $qi[$questions[$qn]]['category']!='0') {
 		echo "  Category: {$qi[$questions[$qn]]['category']}.";
+	}
+	if ($attempts[$qn]>0) {
+		if (strpos($scores[$qn],'~')===false) {
+			echo "<br/>Score on last attempt: {$scores[$qn]}.  Score in gradebook: {$bestscores[$qn]}";
+		} else {
+			echo "<br/>Score on last attempt: (" . str_replace('~', ', ',$scores[$qn]) . '), ';
+			echo "Score in gradebook: (" . str_replace('~', ', ',$bestscores[$qn]) . '), ';
+			$ptposs = $qi[$questions[$qn]]['answeights'];
+			for ($i=0; $i<count($ptposs)-1; $i++) {
+				$ptposs[$i] = round($ptposs[$i]*$qi[$questions[$qn]]['points'],2);
+			}
+			//adjust for rounding
+			$diff = $qi[$questions[$qn]]['points'] - array_sum($ptposs);
+			$ptposs[count($ptposs)-1] += $diff;
+			$ptposs = implode(', ',$ptposs); 
+			echo "Out of: ($ptposs)";
+		}
 	}
 	//if (!$noindivscores) {
 	//	echo "<br/>Score in gradebook: ".printscore2($bestscores[$qn]).".";
@@ -395,7 +466,7 @@ function showqinfobar($qn,$inreview,$single) {
 function seqshowqinfobar($qn,$toshow) {
 	global $qi,$questions,$attempts,$testsettings,$scores;
 	$reattemptsremain = hasreattempts($qn);
-	$pointsremaining = getremainingpossible($qi[$questions[$qn]],$testsettings,$attempts[$qn]);
+	$pointsremaining = getremainingpossible($qn,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
 	$qavail = false;
 	if ($qi[$questions[$qn]]['withdrawn']==1) {
 		$qlinktxt = "<span class=\"withdrawn\">Question ".($qn+1)."</span>";
