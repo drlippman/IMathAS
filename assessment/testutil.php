@@ -343,6 +343,8 @@ function recordtestdata($limit=false) {
 
 //can improve question score?
 function canimprove($qn) {
+	global $superdone;
+	if ($superdone) { return false;}
 	global $qi,$scores,$attempts,$questions,$testsettings;	
 	$remainingposs = getremainingpossible($qn,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
 	if (hasreattempts($qn)) {
@@ -355,6 +357,8 @@ function canimprove($qn) {
 
 //can improve question bestscore?
 function canimprovebest($qn) {
+	global $superdone;
+	if ($superdone) { return false;}
 	global $qi,$bestscores,$scores,$attempts,$questions,$testsettings;	
 	$remainingposs = getremainingpossible($qn,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
 	if (hasreattempts($qn)) {
@@ -367,6 +371,8 @@ function canimprovebest($qn) {
 
 //do more attempts remain?
 function hasreattempts($qn) {
+	global $superdone;
+	if ($superdone) { return false;}
 	global $qi,$attempts,$questions,$testsettings;	
 	if ($attempts[$qn]<$qi[$questions[$qn]]['attempts'] || $qi[$questions[$qn]]['attempts']==0) {
 		return true;
@@ -376,6 +382,8 @@ function hasreattempts($qn) {
 
 //do any questions have attempts remaining?
 function hasreattemptsany() {
+	global $superdone;
+	if ($superdone) { return false;}
 	global $questions;
 	for ($i=0;$i<count($questions);$i++) {
 		if (hasreattempts($i)) {
@@ -387,6 +395,8 @@ function hasreattemptsany() {
 
 //can improve any question?
 function canimproveany() {
+	global $superdone;
+	if ($superdone) { return false;}
 	global $questions;
 	for ($i=0;$i<count($questions);$i++) {
 		if (canimprove($i)) {

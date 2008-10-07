@@ -81,9 +81,11 @@
 	$aname = mysql_result($result,0,0);
 	$defpoints = mysql_result($result,0,1);
 	
-	$query = "SELECT points FROM imas_questions WHERE id='$qid'";
+	$query = "SELECT imas_questions.points,imas_questionset.control FROM imas_questions,imas_questionset ";
+	$query .= "WHERE imas_questions.questionsetid=imas_questionset.id AND imas_questions.id='$qid'";
 	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 	$points = mysql_result($result,0,0);
+	$qcontrol = mysql_result($result,0,1);
 	if ($points==9999) {
 		$points = $defpoints;
 	}
@@ -147,7 +149,7 @@
 	} else if ($ver=='last') {
 		echo "<a href=\"gradeallq.php?stu=$stu&gbmode=$gbmode&cid=$cid&aid=$aid&qid=$qid&ver=graded\">Show Graded Attempts</a>.  ";
 		echo "Showing Last Attempts.  ";
-		echo "<br/><b>Note:</b> Grades and number of attempt used are for the Graded Attempt";
+		echo "<br/><b>Note:</b> Grades and number of attempt used are for the Graded Attempt.  Part points might be inaccurate.";
 	}
 	echo "</p>";
 	$query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions,imas_students ";
@@ -203,7 +205,32 @@
 					echo "<input type=text size=2 name=\"ud-{$line['id']}-$loc-$j\" value=\"{$prts[$j]}\"> ";
 				}
 			}
-			echo " out of $points in {$attempts[$loc]} attempt(s)\n";
+			echo " out of $points ";
+			if ($parts!='') {
+				if (($p = strpos($qcontrol,'answeights'))!==false) {
+					$p = strpos($qcontrol,"\n",$p);
+					$answeights = getansweights($loc,substr($qcontrol,0,$p));
+				} else {
+					preg_match('/anstypes(.*)/',$qcontrol,$match);
+					$n = substr_count($match[1],',')+1;
+					if ($n>1) {
+						$answeights = array_fill(0,$n-1,round(1/$n,3));
+						$answeights[] = 1-array_sum($answeights);
+					} else {
+						$answeights = array(1);
+					}
+				}
+				for ($i=0; $i<count($answeights)-1; $i++) {
+					$answeights[$i] = round($answeights[$i]*$points,2);
+				}
+				//adjust for rounding
+				$diff = $points - array_sum($answeights);
+				$answeights[count($answeights)-1] += $diff;
+				$answeights = implode(', ',$answeights);
+				
+				echo "(parts: $answeights) ";
+			}
+			echo "in {$attempts[$loc]} attempt(s)\n";
 			
 			$laarr = explode('##',$la[$loc]);
 			if (count($laarr)>1) {
@@ -263,6 +290,17 @@
 			return array($pts,$sc);
 		}		
 	}
+function getansweights($qi,$code) {
+	global $seeds,$questions;	
+	$i = array_search($qi,$questions);
+	srand($seeds[$i]);
+	eval(interpret('control','multipart',$code));
+	if (is_array($answeights)) {
+		return $answeights;
+	} else {
+		return explode(',',$answeights);
+	}
+}
 ?>
 
 

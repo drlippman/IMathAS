@@ -172,7 +172,7 @@ switch($_GET['action']) {
 		echo " <select name=\"theme\">";
 		$handle = opendir("../themes/");
 		while (false !== ($file = readdir($handle))) {
-			if ($file != "." && $file != "..") {
+			if (substr($file,strpos($file,'.'))=='.css') {
 				echo "<option value=\"$file\" ";
 				if ($file==$theme) { echo 'selected="selected"';}
 				echo '>'.substr($file,0,strpos($file,'.')).'</option>';

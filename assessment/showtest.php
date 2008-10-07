@@ -197,6 +197,8 @@
 	$query = "SELECT * FROM imas_assessments WHERE id='{$line['assessmentid']}'";
 	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 	$testsettings = mysql_fetch_array($result, MYSQL_ASSOC);
+	$timelimitkickout = ($testsettings['timelimit']<0);
+	$testsettings['timelimit'] = abs($testsettings['timelimit']);
 	list($testsettings['testtype'],$testsettings['showans']) = explode('-',$testsettings['deffeedback']);
 	
 	
@@ -241,6 +243,7 @@
 		}
 	}
 	//}
+	$superdone = false;
 	if ($isreview) {
 		//$testsettings['displaymethod'] = "SkipAround";
 		$testsettings['testtype']="Practice";
@@ -257,6 +260,23 @@
 		} else {
 			$reattempting = explode(",",$line['reviewreattempting']);
 		}
+	} else if ($timelimitkickout) {
+		$now = time();
+		$timelimitremaining = $testsettings['timelimit']-($now - $starttime);
+		//check if past timelimit
+		if ($timelimitremaining<1 || isset($_GET['superdone'])) {
+			$superdone = true;
+			$_GET['done']=true;
+		}
+		//check for past time limit, with some leniency for javascript timing.
+		//want to reject if javascript was bypassed
+		if ($timelimitremaining < -1*max(0.05*$testsettings['timelimit'],5)) {
+			echo "Time limit has expired.  Submission rejected";
+			echo "<br/><a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to course page</a>";
+			exit;
+		}
+		
+		
 	}
 	
 	$qi = getquestioninfo($questions,$testsettings);
@@ -267,7 +287,7 @@
 		}
 	}
 	
-	$allowregen = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework");
+	$allowregen = (!$superdone && ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework"));
 	$showeachscore = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="AsGo" || $testsettings['testtype']=="Homework");
 	$showansduring = (($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework") && $testsettings['showans']!='N' && $testsettings['showans']!='F');
 	$showansafterlast = ($testsettings['showans']==='F');
@@ -559,7 +579,7 @@
 	if ($testsettings['testtype']=="Practice" && !$isreview) {
 		echo "<div class=right><span style=\"color:#f00\">Practice Test.</span>  <a href=\"showtest.php?regenall=fromscratch\">Create new version.</a></div>";
 	}
-	if ($testsettings['timelimit']>0 && !$isreview) {
+	if ($testsettings['timelimit']>0 && !$isreview && !$superdone) {
 		$now = time();
 		$remaining = $testsettings['timelimit']-($now - $starttime);
 		if ($testsettings['timelimit']>3600) {
@@ -595,16 +615,38 @@
 			$remaining = $remaining - 60*$minutes;
 		} else {$minutes=0;}
 		$seconds = $remaining;
-		echo "<div class=right>Timelimit: $tlwrds. <span id=timeremaining>$hours:$minutes:$seconds</span> remaining</div>\n";
+		echo "<div class=right id=timelimitholder>Timelimit: $tlwrds. <span id=timeremaining ";
+		if ($remaining<300) {
+			echo 'style="color:#f00;" ';
+		}
+		echo ">$hours:$minutes:$seconds</span> remaining</div>\n";
 		echo "<script type=\"text/javascript\">\n";
-		echo " hours = $hours; minutes = $minutes; seconds = $seconds; done=false;\n";
+		echo " hours = $hours; minutes = $minutes; seconds = $seconds; done=false;\n";	
 		echo " function updatetime() {\n";
 		echo "	  seconds--;\n";
 		echo "    if (seconds==0 && minutes==0 && hours==0) {done=true; ";
 		//kickout:  need to rework to send to "done" page  
 		//echo "		if (doonsubmit(document.getElementById(\"qform\"),true,true)) { document.getElementById(\"qform\").submit();}} \n";
-		echo "		alert(\"Time Limit has elapsed\");}\n";
+		if ($timelimitkickout) {
+			echo "		document.getElementById('timelimitholder').className = \"\";";
+			echo "		document.getElementById('timelimitholder').style.color = \"#f00\";";
+			echo "		document.getElementById('timelimitholder').innerHTML = \"Time limit expired - submitting now\";";
+			echo " 		document.getElementById('timelimitholder').style.fontSize=\"300%\";";
+			//echo "		alert(\"Time Limit has elapsed.  Finalizing test.\");\n";
+			echo "		if (document.getElementById(\"qform\") == null) { ";
+			echo "			setTimeout(\"window.location.pathname='$imasroot/assessment/showtest.php?action=skip&superdone=true'\",2000); return;";
+			echo "		} else {";
+			echo "		var theform = document.getElementById(\"qform\");";
+			echo " 		var action = theform.getAttribute(\"action\");";
+			echo "		theform.setAttribute(\"action\",action+'&superdone=true');";
+			echo "		if (doonsubmit(theform,true,true)) { setTimeout('document.getElementById(\"qform\").submit()',2000);}} \n";
+			echo "      }";
+			
+		} else {
+			echo "		alert(\"Time Limit has elapsed\");}\n";
+		}
 		echo "    if (seconds==0 && minutes==5 && hours==0) {document.getElementById('timeremaining').style.color=\"#f00\";}\n";
+		echo "    if (seconds==5 && minutes==0 && hours==0) {document.getElementById('timeremaining').style.fontSize=\"150%\";}\n";
 		echo "    if (seconds < 0) { seconds=59; minutes--; }\n";
 		echo "    if (minutes < 0) { minutes=59; hours--;}\n";
 		echo "	  str = '';\n";
@@ -623,6 +665,8 @@
 		}
 	} else if ($isreview) {
 		echo "<div class=right style=\"color:#f00\">In Review Mode - no scores will be saved<br/><a href=\"showtest.php?regenall=all\">Create new versions of all questions.</a></div>\n";	
+	} else if ($superdone) {
+		echo "<div class=right>Time limit expired</div>";
 	} else {
 		echo "<div class=right>No time limit</div>\n";
 	}
@@ -747,6 +791,7 @@
 					
 					recordtestdata();
 				}
+			   if (!$superdone) {
 				echo filter("<div id=intro class=hidden>{$testsettings['intro']}</div>\n");
 				$lefttodo = shownavbar($questions,$scores,$qn,$testsettings['showcat']);
 				
@@ -792,6 +837,7 @@
 					echo "<a href=\"showtest.php?action=skip&amp;done=true\">Click here to finalize and score test</a>\n";
 				}
 				echo "</div>\n";
+			    }
 			} else if (isset($_GET['to'])) { //jump to a problem
 				$next = $_GET['to'];
 				echo filter("<div id=intro class=hidden>{$testsettings['intro']}</div>\n");
@@ -839,7 +885,8 @@
 					}
 					echo "</div>\n";
 				}
-			} else if (isset($_GET['done'])) { //are all done
+			} 
+			if (isset($_GET['done'])) { //are all done
 
 				showscores($questions,$attempts,$testsettings);
 				endtest($testsettings);
@@ -1234,7 +1281,7 @@
 	}
 	
 	function showscores($questions,$attempts,$testsettings) {
-		global $isdiag,$allowregen,$isreview,$noindivscores,$scores,$bestscores,$qi;
+		global $isdiag,$allowregen,$isreview,$noindivscores,$scores,$bestscores,$qi,$superdone,$timelimitkickout;
 		if ($isdiag) {
 			global $userid;
 			$query = "SELECT * from imas_users WHERE id='$userid'";
@@ -1314,7 +1361,7 @@
 		
 		//if timelimit is exceeded
 		$now = time();
-		if (($testsettings['timelimit']>0) && (($now-$GLOBALS['starttime']) > $testsettings['timelimit'])) {
+		if (!$timelimitkickout && ($testsettings['timelimit']>0) && (($now-$GLOBALS['starttime']) > $testsettings['timelimit'])) {
 			$over = $now-$GLOBALS['starttime'] - $testsettings['timelimit'];
 			echo "<p>Time limit exceeded by ";
 			if ($over > 60) {
@@ -1327,7 +1374,7 @@
 		}
 		
 		
-		if ($total < $totpossible) {
+		if ($total < $totpossible && !$superdone) {
 			if ($noindivscores) {
 				echo "<p><a href=\"showtest.php?reattempt=all\">Reattempt test</a> on questions allowed (note: where reattempts are allowed, all scores, correct and incorrect, will be cleared)</p>";
 			} else {

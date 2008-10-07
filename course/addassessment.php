@@ -109,6 +109,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		
 		$timelimit = $_POST['timelimit']*60;
+		if (isset($_POST['timelimitkickout'])) {
+			$timelimit = -1*$timelimit;
+		}
 		
 		if ($_POST['deffeedback']=="Practice" || $_POST['deffeedback']=="Homework") {
 			$deffeedback = $_POST['deffeedback'].'-'.$_POST['showansprac'];
@@ -496,7 +499,8 @@ if ($overwriteBody==1) {
 			<span class=form>Require Password (blank for none):</span>
 			<span class=formright><input type=text name=password value="<?php echo $line['password'];?>"></span><br class=form />
 			<span class=form>Time Limit (minutes, 0 for no time limit): </span>
-			<span class=formright><input type=text size=4 name=timelimit value="<?php echo $timelimit;?>"></span><BR class=form>
+			<span class=formright><input type=text size=4 name=timelimit value="<?php echo abs($timelimit);?>">
+				<input type="checkbox" name="timelimitkickout" <?php if ($timelimit<0) echo 'checked="checked"';?> /> Kick student out at timelimit</span><BR class=form>
 			<span class=form>Display method: </span>
 			<span class=formright>
 				<select name="displaymethod">

@@ -55,71 +55,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query = "SELECT * FROM imas_assessments WHERE id='$aid'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$adata = mysql_fetch_array($result, MYSQL_ASSOC);
-			$questions = explode(",",$adata['itemorder']);
-			foreach($questions as $k=>$q) {
-				if (strpos($q,'~')!==false) {
-					$sub = explode('~',$q);
-					if (strpos($sub[0],'|')===false) { //backwards compat
-						$questions[$k] = $sub[array_rand($sub,1)];
-					} else {
-						$grpqs = array();
-						$grpparts = explode('|',$sub[0]);
-						array_shift($sub);
-						if ($grpparts[1]==1) { // With replacement
-							for ($i=0; $i<$grpparts[0]; $i++) {
-								$grpqs[] = $sub[array_rand($sub,1)];
-							}
-						} else if ($grpparts[1]==0) { //Without replacement
-							shuffle($sub);
-							$grpqs = array_slice($sub,0,min($grpparts[0],count($sub)));
-							if ($grpparts[0]>count($sub)) {
-								for ($i=count($sub); $i<$grpparts[0]; $i++) {
-									$grpqs[] = $sub[array_rand($sub,1)];
-								}
-							}
-						}
-						array_splice($questions,$k,1,$grpqs);
-					}
-				}
-			}
-			if ($adata['shuffle']&1) {shuffle($questions);}
 			
-			if ($adata['shuffle']&2) { //all questions same random seed
-				if ($adata['shuffle']&4) { //all students same seed
-					$seeds = array_fill(0,count($questions),$aid);
-				} else {
-					$seeds = array_fill(0,count($questions),rand(1,9999));
-				}
-			} else {
-				if ($adata['shuffle']&4) { //all students same seed
-					for ($i = 0; $i<count($questions);$i++) {
-						$seeds[] = $aid + $i;
-					}
-				} else {
-					for ($i = 0; $i<count($questions);$i++) {
-						$seeds[] = rand(1,9999);
-					}
-				}
-			}
-	
-			$scores = array_fill(0,count($questions),-1);
-			$attempts = array_fill(0,count($questions),0);
-			$lastanswers = array_fill(0,count($questions),'');
-			
+			require("../assessment/asidutil.php");
+			list($qlist,$seedlist,$reviewseedlist,$scorelist,$attemptslist,$lalist) = generateAssessmentData($adata['itemorder'],$adata['shuffle'],$aid);
 			$starttime = time();
-			
-			$qlist = implode(',',$questions);
-			$seedlist = implode(',',$seeds);
-			$scorelist = implode(',',$scores);
-			$attemptslist = implode(',',$attempts);
-			$lalist = implode('~',$lastanswers);
-			
 			$agroupid = 0;
 			foreach ($_POST['stutoadd'] as $uid) {
 				//check for existing asid (perhaps started, but separated from group)
 				$query = "SELECT id FROM imas_assessment_sessions WHERE userid='$uid' AND assessmentid='$aid'";
 				$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
-				if (mysql_num_rows($result)>0) {
+								if (mysql_num_rows($result)>0) {
 					$oldasid = mysql_result($result,0,0);
 				} else {
 					$oldasid = 0;
@@ -142,7 +87,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			
 		} else {
-			$query = "SELECT assessmentid,agroupid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers ";
+			$query = "SELECT assessmentid,agroupid,questions,seeds,scores,attempts,lastanswers,reattempting,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers ";
 			$query .= "FROM imas_assessment_sessions WHERE agroupid='{$_POST['grpid']}' LIMIT 1";
 			$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
 			$row = mysql_fetch_row($result);
@@ -157,7 +102,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$oldasid = 0;
 				}
 				//add session info
-				$query = "INSERT INTO imas_assessment_sessions (userid,assessmentid,agroupid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers) ";
+				$query = "INSERT INTO imas_assessment_sessions (userid,assessmentid,agroupid,questions,seeds,scores,attempts,lastanswers,reattempting,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers) ";
 				$query .= "VALUES ('$uid',$insrow)";
 				mysql_query($query) or die("Query failed : $query:" . mysql_error());
 				$newasid = mysql_insert_id();
@@ -182,12 +127,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$row = mysql_fetch_row($result);
 			$oldgroupid = $row[1];
 			$thisuserid = $row[2];
-			$query = "SELECT userid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers ";
+			$query = "SELECT userid,assessmentid,questions,seeds,scores,attempts,lastanswers,reattempting,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers ";
 			$query .= "FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
 			$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
 			$row = mysql_fetch_row($result);
 			$insrow = "'".implode("','",addslashes_deep($row))."'";
-			$query = "INSERT INTO imas_assessment_sessions (userid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers) ";
+			$query = "INSERT INTO imas_assessment_sessions (userid,assessmentid,questions,seeds,scores,attempts,lastanswers,reattempting,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers) ";
 			$query .= "VALUES ($insrow)";
 			mysql_query($query) or die("Query failed : $query:" . mysql_error());
 			$newasid = mysql_insert_id();

@@ -148,7 +148,7 @@
 			$bestseedslist = implode(',',$seeds);
 			$bestlalist = implode('~',$lastanswers);
 			
-			$query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',lastanswers='$lalist',";
+			$query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',lastanswers='$lalist',reattempting='',";
 			$query .= "bestscores='$bestscorelist',bestattempts='$bestattemptslist',bestseeds='$bestseedslist',bestlastanswers='$bestlalist' ";
 			$query .= $whereqry;//"WHERE id='{$_GET['asid']}'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
@@ -170,13 +170,14 @@
 		if ($_GET['confirmed']=="true") {
 			$whereqry = getasidquery($_GET['asid']);
 			
-			$query = "SELECT attempts,lastanswers,scores,bestscores,bestattempts,bestlastanswers FROM imas_assessment_sessions $whereqry"; //WHERE id='{$_GET['asid']}'";
+			$query = "SELECT attempts,lastanswers,reattempting,scores,bestscores,bestattempts,bestlastanswers FROM imas_assessment_sessions $whereqry"; //WHERE id='{$_GET['asid']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$line = mysql_fetch_array($result, MYSQL_ASSOC);
 			
 			$scores = explode(",",$line['scores']);
 			$attempts = explode(",",$line['attempts']);
 			$lastanswers = explode("~",$line['lastanswers']);
+			$reattempting = explode(',',$line['reattempting']);
 			$bestscores = explode(",",$line['bestscores']);
 			$bestattempts = explode(",",$line['bestattempts']);
 			$bestlastanswers = explode("~",$line['bestlastanswers']);
@@ -189,6 +190,10 @@
 				$bestscores[$clearid] = -1;
 				$bestattempts[$clearid] = 0;
 				$bestlastanswers[$clearid] = '';
+				$loc = array_search($clearid,$reattempting);
+				if ($loc!==false) {
+					array_splice($reattempting,$loc,1);
+				}
 				
 				$scorelist = implode(",",$scores);
 				$attemptslist = implode(",",$attempts);
@@ -196,9 +201,10 @@
 				$bestscorelist = implode(',',$scores);
 				$bestattemptslist = implode(',',$attempts);
 				$bestlalist = addslashes(implode('~',$lastanswers));
+				$reattemptinglist = implode(',',$reattempting);
 				
 				$query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',lastanswers='$lalist',";
-				$query .= "bestscores='$bestscorelist',bestattempts='$bestattemptslist',bestlastanswers='$bestlalist' ";
+				$query .= "bestscores='$bestscorelist',bestattempts='$bestattemptslist',bestlastanswers='$bestlalist',reattempting='$reattemptinglist' ";
 				$query .= $whereqry; //"WHERE id='{$_GET['asid']}'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			} else {

@@ -19,7 +19,7 @@ function parenvarifneeded($matches) {
 	  }
   }
 //varlist should be | separated, like "x|y"
-function mathphp($st,$varlist) {
+function mathphp($st,$varlist,$skipfactorial=false) {
   //translate a math formula to php function notation
   // a^b --> pow(a,b)
   // na --> n*a
@@ -33,6 +33,10 @@ function mathphp($st,$varlist) {
   //$st = preg_replace('/(\$[a-zA-Z\d]+)$/',"($1)",$st);
   $st .= ' ';
   
+  preg_match_all('/(\'|").*?(\\1)/',$st,$strmatches,PREG_SET_ORDER);
+  foreach ($strmatches as $k=>$match) {
+	 $st =  str_replace($match[0],"(#$k#)",$st);
+  }
   //$st = preg_replace('/(\$[a-zA-Z\d_]+)([^\[])/',"($1)$2",$st);
   $st = preg_replace_callback('/(\$[a-zA-Z\d_]+)(.)/','parenvarifneeded',$st);
   
@@ -81,7 +85,7 @@ function mathphp($st,$varlist) {
   
   //fix PHP's 1/-2*5 order of ops bug
   $st = preg_replace('/\/(\-[\d\.E]+)(\*|\/)/',"/($1)$2",$st);
- 
+   
   while ($i=strpos($st,"^")) {
     //find left argument
     if ($i==0) return "Error: missing argument";
@@ -143,7 +147,7 @@ function mathphp($st,$varlist) {
     //$st= st.slice(0,$j+1)+"pow("+st.slice($j+1,i)+","+st.slice(i+1,$k)+")"+ st.slice($k);
   }
   
-  while ($i=strpos($st,"!")) {
+  while (!$skipfactorial && ($i=strpos($st,"!"))) {
     //find left argument
     if ($i==0) return "Error: missing argument";
     $j = $i-1;
@@ -181,6 +185,10 @@ function mathphp($st,$varlist) {
   $st= preg_replace("/^ln([^a-zA-Z])/","log$1",$st);
   $st= preg_replace('/([^a-zA-Z])ln$/',"\\1log",$st);
   $st= preg_replace("/([^a-zA-Z])ln([^a-zA-Z])/","\\1log$2",$st);
+  
+  foreach ($strmatches as $k=>$match) {
+	 $st =  str_replace("(#$k#)",$match[0],$st);
+  }
 //echo "st: $st<br/>";
   return $st;
 }

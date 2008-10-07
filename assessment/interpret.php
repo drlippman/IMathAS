@@ -131,9 +131,17 @@ function interpret($blockname,$anstype,$str)
 						}
 						if ($wherepos>0) {
 							$left = substr($com,0,$wherepos);
+							if ($ismath) {
+								//$com = str_replace($matches[2],mathphp($matches[2],null),$com);
+								$eqpos = strpos($left,'=');
+								$lhs = substr($left,0,$eqpos);
+								$rhs = substr($left,$eqpos);
+								$rhs = mathphp($rhs,null);	
+								$left = $lhs . $rhs;
+							}
 							$cond = substr($com,$wherepos+5);
 							$cond = str_replace('!=','#=',$cond);
-							$cond = mathphp($cond,null);
+							$cond = mathphp($cond,null,true);
 							$cond = str_replace('#=','!=',$cond);
 							$com = '$count=0; do{'.$left.'; $count++;} while (!('.$cond.')&&($count<200)); if ($count==200) {echo "where not met in 200 iterations";}';
 						}
@@ -145,14 +153,15 @@ function interpret($blockname,$anstype,$str)
 						$rhs = mathphp($rhs,null);	
 						$com = $lhs . $rhs;
 					}
-				} else if (strpos($matches[2],'"')===false && strpos($matches[2],"'")===false) { //if right side is not quoted and no macros, mathphp it 
+				} else{ //if (strpos($matches[2],'"')===false && strpos($matches[2],"'")===false) { //if right side is not quoted and no macros, mathphp it 
 					//do mathphp on right side
 					$eqpos = strpos($com,'=');
 					$lhs = substr($com,0,$eqpos);
 					$rhs = substr($com,$eqpos);
 					$rhs = mathphp($rhs,null);	
 					$com = $lhs . $rhs;
-				} else { //right side is quoted
+				//} else { //right side is quoted
+					
 					//all answer cleaners moved to displayq
 				}
 				
@@ -190,7 +199,7 @@ function interpret($blockname,$anstype,$str)
 				}
 				if (strpos($ifcond,'"')===false && strpos($ifcond,"'")===false) { //if not quoted, mathphp it 
 					$ifcond = str_replace('!=','#=',$ifcond);
-					$ifcond = mathphp($ifcond,null);
+					$ifcond = mathphp($ifcond,null,true);
 					$ifcond = str_replace('#=','!=',$ifcond);
 				}
 								
