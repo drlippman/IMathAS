@@ -293,7 +293,7 @@ function copysub($items,$parent,&$addtoarr) {
 $overwriteBody = 0;
 $body = "";
 $pagetitle = $installname . " Import Course Items";
-$curBreadcrumb = "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Import Course Items</div>\n";
+$curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Import Course Items</div>\n";
  
 //data manipulation here
 

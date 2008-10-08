@@ -87,7 +87,7 @@
 	
 	if (isset($_GET['search']) && trim($_GET['search'])!='') {
 		require("../header.php");
-		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
 		echo "<a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> &gt; Search Results</div>\n";
 	
 		echo "<h2>Forum Search Results</h2>";
@@ -222,7 +222,7 @@
 			$pagetitle = "Add/Modify Thread";
 			$useeditor = "message";
 			require("../header.php");
-			echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
+			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
 			echo "&gt; <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> &gt;";
 			if ($_GET['modify']!="new") {
 				echo "Modify Thread</div>\n";
@@ -315,7 +315,7 @@
 		} else {
 			$pagetitle = "Remove Thread";
 			require("../header.php");
-			echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
+			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
 			echo "&gt; <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> &gt; Remove Thread</div>";
 			echo "<h3>Remove Thread</h3>\n";
 			echo "<p>Are you SURE you want to remove this Thread and all enclosed posts?</p>\n";
@@ -334,7 +334,7 @@
 	require("../header.php");
 	
 	
-	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Forum Topics</div>\n";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Forum Topics</div>\n";
 	echo "<h3>Forum - $forumname</h3>\n";
 	
 	$query = "SELECT threadid,COUNT(id) AS postcount,MAX(postdate) AS maxdate FROM imas_forum_posts ";

@@ -28,7 +28,7 @@ if ($overwriteBody==1) {
 	echo $body;
 } else {	
 	
-	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=$cid\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
 	echo "&gt; Print Test</div>\n";
 	echo "<h2>Print Test</h2>\n";
 	

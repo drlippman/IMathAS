@@ -18,7 +18,7 @@ $asid = $_GET['asid'];
 $aid = $_GET['aid'];
 $uid = $_GET['uid'];
 
-$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a>";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a>";
 $curBreadcrumb .= "&gt; <a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; <a href=\"gb-viewasid.php?cid=$cid&asid=$asid&uid=$uid\">Assessment Detail</a> &gt Make Exception\n";
 
 if (!(isset($teacherid))) { // loaded by a NON-teacher

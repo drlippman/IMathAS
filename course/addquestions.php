@@ -13,7 +13,7 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = "Add/Remove Questions";
 
-$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=" . $_GET['cid'] . "\">$coursename</a> ";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=" . $_GET['cid'] . "\">$coursename</a> ";
 if (isset($_GET['clearattempts']) || isset($_GET['clearqattempts']) || isset($_GET['withdraw'])) {
 	$curBreadcrumb .= "&gt; <a href=\"addquestions.php?cid=" . $_GET['cid'] . "&aid=" . $_GET['aid'] . "\">Add/Remove Questions</a> &gt; Confirm\n";
 	//$pagetitle = "Modify Inline Text";

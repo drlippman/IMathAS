@@ -14,7 +14,7 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = "Copy Course Items";
 
-$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=" . $_GET['cid'] . "\">$coursename</a> &gt; Copy Course Items";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=" . $_GET['cid'] . "\">$coursename</a> &gt; Copy Course Items";
 
 	// SECURITY CHECK DATA PROCESSING
 if (!(isset($teacherid))) {

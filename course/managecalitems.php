@@ -53,7 +53,7 @@ echo '<script src="../javascript/CalendarPopup.js"></script>';
 echo '<SCRIPT LANGUAGE="JavaScript" ID="js1">';
 echo 'var cal1 = new CalendarPopup();</script>';
 
-echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=$cid\">$coursename</a> ";	
+echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";	
 echo "&gt; Manage Calendar Items</div>\n";
 echo "<h2>Manage Calendar Items</h2>";
 echo "<p>This page allows you to add items only to the calendar.  Course items automatically place themselves on the calendar</p>";

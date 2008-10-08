@@ -30,7 +30,7 @@ if ($myrights<20) {
 	}
 	
 	if ($_GET['cid']==="admin") {
-		$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"../admin/admin.php\">Admin</a>";
+		$curBreadcrumb = "$breadcrumbbase <a href=\"../admin/admin.php\">Admin</a>";
 		$curBreadcrumb .= "&gt; <a href=\"managelibs.php?cid=admin\">Manage Libraries</a> &gt; Review Library";
 		if ($myrights == 100) {
 			$isadmin = true;
@@ -41,7 +41,7 @@ if ($myrights<20) {
 		$curBreadcrumb = "<a href=\"../index.php\">Home</a> ";
 		$curBreadcrumb .= "&gt; <a href=\"managelibs.php?cid=$cid\">Manage Libraries</a> &gt; Review Library";
 	} else {
-		$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=$cid\">$coursename</a>";
+		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a>";
 		$curBreadcrumb .= "&gt; <a href=\"managelibs.php?cid=$cid\">Manage Libraries</a> &gt; Review Library";
 	}
 		

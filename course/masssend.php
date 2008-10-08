@@ -141,7 +141,7 @@
 		$useeditor = "message";
 		$pagetitle = "Send Mass $sendtype";
 		require("../header.php");
-		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 		if ($calledfrom=='lu') {
 			echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Send Mass $sendtype</div>\n";
 		} else if ($calledfrom=='gb') {

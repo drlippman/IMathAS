@@ -4,7 +4,7 @@
 require("../validate.php");
 require("../header.php");
 if (!isset($_GET['cid'])) {
-	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"admin.php\">Admin</a> &gt; Form</div>\n";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"admin.php\">Admin</a> &gt; Form</div>\n";
 }
 switch($_GET['action']) {
 	case "delete":
@@ -135,7 +135,7 @@ switch($_GET['action']) {
 		}
 		if (isset($_GET['cid'])) {
 			$cid = $_GET['cid'];
-			echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Course Settings</div>";
+			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Course Settings</div>";
 		} 
 		
 		echo "<form method=post action=\"actions.php?action={$_GET['action']}";

@@ -111,9 +111,9 @@ if (!(isset($teacherid)) && $myrights<75) {
 	}
 
 	if ($isadmin || $isgrpadmin) {
-		$curBreadcrumb = "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"admin.php\">Admin</a> &gt; Import Question Set</div>\n";
+		$curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"admin.php\">Admin</a> &gt; Import Question Set</div>\n";
 	} else {
-		$curBreadcrumb = "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Import Question Set</div>\n";
+		$curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Import Question Set</div>\n";
 	}
 	
 	//FORM HAS BEEN POSTED, STEP 3 DATA MANIPULATION

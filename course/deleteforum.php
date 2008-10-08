@@ -11,7 +11,7 @@ require("../validate.php");
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Delete Forum";
-$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; Remove Forum";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; Remove Forum";
 $useeditor = "description";
 	
 if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missing go back to the index page

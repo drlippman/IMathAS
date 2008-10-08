@@ -11,7 +11,7 @@ require("../validate.php");
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Delete Inline Text";
-$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=$cid\">$coursename</a> ";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
 $curBreadcrumb .= " &gt; Modify Inline Text\n";
 
 if (!(isset($teacherid))) {  

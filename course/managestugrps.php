@@ -26,7 +26,7 @@ function updatesessdata($uid,$oldasid,$newasid) {
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Manage Student Groups";
-$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=" . $_GET['cid'] . "\">$coursename</a> ";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=" . $_GET['cid'] . "\">$coursename</a> ";
 
 
 if (!(isset($teacherid))) { // loaded by a NON-teacher

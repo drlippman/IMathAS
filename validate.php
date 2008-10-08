@@ -199,20 +199,23 @@ END;
 	$coursetheme = "default.css";
 	if (isset($sessiondata['ltiitemtype'])) {
 		if ($sessiondata['ltiitemtype']==1) {
-			if (strpos(basename($_SERVER['SCRIPT_NAME']),'showtest.php')===false && $sessiondata['ltiitemid']!=$_GET['cid']) {
+			if (strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false && isset($_GET['cid']) && $sessiondata['ltiitemid']!=$_GET['cid']) {
 				echo "You do not have access to this page";
 				echo "<a href=\"$imasroot/course/course.php?cid={$sessiondata['ltiitemid']}\">Return to course page</a>";
 				exit;
 			}
 		} else if ($sessiondata['ltiitemtype']==0) {
-			if (strpos(basename($_SERVER['SCRIPT_NAME']),'showtest.php')===false) {
-				$query = "SELECT courseid FROM imas_assessments WHERE id='{$sessiondata['ltiitemtype']}'";
+			if (strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) {
+				$query = "SELECT courseid FROM imas_assessments WHERE id='{$sessiondata['ltiitemid']}'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				$cid = mysql_result($result,0,0);
 				header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}");
 				exit;
 			}
 		}
+		$breadcrumbbase = "";
+	} else {
+		$breadcrumbbase = "<a href=\"$imasroot/index.php\">Home</a> &gt; ";
 	}
 	if (isset($_GET['cid']) && $_GET['cid']!="admin" && $_GET['cid']>0) {
 		$query = "SELECT id FROM imas_students WHERE userid='$userid' AND courseid='{$_GET['cid']}'";
@@ -259,7 +262,7 @@ END;
 			}
 			$lockaid = mysql_result($result,0,2);
 			if (isset($studentid) && $lockaid>0) {
-				if (strpos(basename($_SERVER['SCRIPT_NAME']),'showtest.php')===false) {
+				if (strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) {
 					header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid={$_GET['cid']}&id=$lockaid");
 					exit;
 				}

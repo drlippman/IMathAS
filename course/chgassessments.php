@@ -13,7 +13,7 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = "Mass Change Assessment Settings";
 
-$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; Mass Change Assessment Settings";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; Mass Change Assessment Settings";
 
 	// SECURITY CHECK DATA PROCESSING
 if (!(isset($teacherid))) {

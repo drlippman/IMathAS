@@ -88,7 +88,7 @@ if ($isteacher) {
 	}
 	if ((isset($_POST['submit']) && $_POST['submit']=="Unenroll") || (isset($_GET['action']) && $_GET['action']=="unenroll" )) {
 		$calledfrom='gb';
-		$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 		$curBreadcrumb .= "&gt; <a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; Confirm Change";
 		$pagetitle = "Unenroll Students";
 		include("unenroll.php");
@@ -149,13 +149,13 @@ if (!$isteacher || $stu!=0) { //show student view
 	require("../header.php");
 	
 	if (isset($_GET['from']) && $_GET['from']=="listusers") {
-		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 		echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt Student Grade Detail</div>\n";
 	} else if ($isteacher) {
-		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 		echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; Student Detail</div>";
 	} else {
-		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 		echo "&gt; Gradebook</div>";
 	}
 	if ($stu==-1) {
@@ -222,7 +222,7 @@ if (!$isteacher || $stu!=0) { //show student view
 	$placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } </style>";
 	
 	require("../header.php");
-	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 	echo "&gt; Gradebook</div>";
 	echo "<form method=post action=\"gradebook.php?cid=$cid\">";
 	

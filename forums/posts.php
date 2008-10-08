@@ -115,7 +115,7 @@
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
 	}
 	
-	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
 	if ($page==-2) {
 		echo "<a href=\"newthreads.php?cid=$cid\">New Threads</a> ";
 	} else {

@@ -13,7 +13,7 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = "Diagnostic Setup";
 
-$curBreadcrumb = "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"$imasroot/admin/admin.php\">Admin</a> &gt; Diagnostic Setup</div>\n";
+$curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"$imasroot/admin/admin.php\">Admin</a> &gt; Diagnostic Setup</div>\n";
 
 	// SECURITY CHECK DATA PROCESSING
 if ($myrights<75) {

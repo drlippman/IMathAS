@@ -19,7 +19,7 @@ if (!(isset($teacherid))) {
 	
 	$cid = $_GET['cid'];
 	$aid = $_GET['aid'];
-	$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=$cid\">$coursename</a> ";
+	$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
 	$curBreadcrumb .= "&gt; <a href=\"addquestions.php?aid=$aid&cid=$cid\">Add/Remove Questions</a> &gt; ";
 	$curBreadcrumb .= "Modify Question Settings";
 	

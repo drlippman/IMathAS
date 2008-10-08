@@ -15,7 +15,7 @@
 	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/course.js\"></script>";
 	
 	require("../header.php");
-	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=$cid\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
 	echo "&gt; Calendar</div>";
 	
 	 if (isset($teacherid)) {

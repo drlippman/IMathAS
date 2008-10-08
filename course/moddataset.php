@@ -13,7 +13,7 @@
 	$isadmin = false;
 	if (!isset($_GET['aid'])) {
 		if ($_GET['cid']=="admin") {
-			echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"../admin/admin.php\">Admin</a>";
+			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../admin/admin.php\">Admin</a>";
 			echo "&gt; <a href=\"manageqset.php?cid=admin\">Manage Question Set</a> &gt; Modify Question</div>\n";
 			if ($myrights == 100) {
 				$isadmin = true;

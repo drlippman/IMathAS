@@ -12,16 +12,16 @@
 	$isadmin = false;
 	if (!isset($_GET['aid'])) {
 		if ($_GET['cid']=="admin") {
-			echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"../admin/admin.php\">Admin</a>";
+			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../admin/admin.php\">Admin</a>";
 			echo "&gt; <a href=\"manageqset.php?cid=admin\">Manage Question Set</a> &gt; View Source</div>\n";
 			$isadmin = true;
 		} else {
-			echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a>";
+			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a>";
 			echo "&gt; <a href=\"manageqset.php?cid={$_GET['cid']}\">Manage Question Set</a> &gt; View Source</div>\n";
 		}
 		
 	} else {
-		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 		echo "&gt; <a href=\"addquestions.php?aid={$_GET['aid']}&cid={$_GET['cid']}\">Add/Remove Questions</a> &gt; View Source</div>";
 	}
 	

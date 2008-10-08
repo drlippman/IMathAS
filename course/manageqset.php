@@ -38,11 +38,11 @@ if ($myrights<20) {
 	}
 			
 	if ($isadmin || $isgrpadmin) {
-		$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"../admin/admin.php\">Admin</a> ";
+		$curBreadcrumb = "$breadcrumbbase <a href=\"../admin/admin.php\">Admin</a> ";
 	} else if ($cid==0) {
 		$curBreadcrumb = "<a href=\"../index.php\">Home</a> ";
 	} else {
-		$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=$cid\">$coursename</a> ";
+		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
 	}	
 		
 		

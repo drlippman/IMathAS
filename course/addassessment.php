@@ -26,7 +26,7 @@ if (isset($_GET['tb'])) {
 	$totb = 'b';
 }
 
-$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 if ($from=='gb') {
 	$curBreadcrumb .= "&gt; <a href=\"gradebook.php?cid=$cid\">Gradebook</a> ";
 } else if ($from=='mcd') {
@@ -61,7 +61,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			exit;
 		} else {
 			$overwriteBody = 1;
-			$body = "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+			$body = "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 			$body .= "&gt; <a href=\"addassessment.php?cid={$_GET['cid']}&id={$_GET['id']}\">Modify Assessment</a> &gt; Clear Attempts</div>\n";
 			$body .= "Are you SURE you want to delete all attempts (grades) for this assessment?";
 			$body .= "<p><input type=button value=\"Yes, Clear\" onClick=\"window.location='addassessment.php?cid={$_GET['cid']}&id={$_GET['id']}&clearattempts=confirmed'\">\n";

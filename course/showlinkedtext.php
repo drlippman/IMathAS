@@ -19,7 +19,7 @@
 	$titlesimp = strip_tags($title);
 
 	require("../header.php");
-	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 	echo "&gt; $titlesimp</div>";
 	echo '<div style="padding-left:10px; padding-right: 10px;">';
 	echo filter($text);

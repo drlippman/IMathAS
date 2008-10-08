@@ -60,7 +60,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		$pagetitle = "Add/Modify Post";
 		$useeditor = "message";
 		require("../header.php");
-		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
 		echo "&gt; <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> &gt; ";
 		echo "<a href=\"$returnurl\">$returnname</a> &gt; ";
 		if ($_GET['modify']!="reply") {
@@ -156,7 +156,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 	} else {
 		$pagetitle = "Remove Post";
 		require("../header.php");
-		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
 		echo "&gt; <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> &gt; ";
 		echo "<a href=\"$returnurl\">$returnname</a> &gt; Remove Post</div>";
 		

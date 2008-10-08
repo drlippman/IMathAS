@@ -110,7 +110,7 @@ function chkAll(frm, arr, mark) {
 var cal1 = new CalendarPopup();
 </script>
 <?php
-echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 echo "&gt; Manage Offline Grades</div>";
 echo '<h3>Manage Offline Grades</h3>';

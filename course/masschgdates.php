@@ -11,7 +11,7 @@ require("../validate.php");
 $overwriteBody = 0;
 $body = "";
 //$pagetitle = "Manage Student Groups";
-//$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=" . $_GET['cid'] . "\">$coursename</a> ";
+//$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=" . $_GET['cid'] . "\">$coursename</a> ";
 
 
 if (!(isset($teacherid))) { // loaded by a NON-teacher
@@ -118,7 +118,7 @@ if ($overwriteBody==1) {
 	}
 	
 
-	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=$cid\">$coursename</a> ";	
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";	
 	echo "&gt; Mass Change Dates</div>\n";
 	echo "<h2>Mass Change Dates</h2>";
 	echo '<script src="../javascript/CalendarPopup.js"></script>';

@@ -34,7 +34,7 @@
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
 	} else {
 		require("../header.php");
-		$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=$cid\"> $coursename</a>\n";
+		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n";
 		$curBreadcrumb .= " &gt; Redeem LatePass\n";
 		echo "<div class=\"breadcrumb\">$curBreadcrumb</div>";
 		

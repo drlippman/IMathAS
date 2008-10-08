@@ -20,7 +20,7 @@
 	if (isset($_GET['upload'])) {
 		require("../header.php");
 	
-		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 		echo "&gt; <a href=\"gradebook.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid\">Gradebook</a> ";
 		echo "&gt; <a href=\"gbcomments.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid&comtype=$comtype\">Gradebook Comments</a> &gt; Upload Comments</div>";
 		
@@ -141,7 +141,7 @@
 	}
 	
 	require("../header.php");
-	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 	echo "&gt; <a href=\"gradebook.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid\">Gradebook</a> &gt; Gradebook Comments</div>";
 	
 	echo '<script type="text/javascript">function sendtoall(type) {'."\n";

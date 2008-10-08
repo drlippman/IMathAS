@@ -11,7 +11,7 @@ require("../validate.php");
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Delete Course Block";
-$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; Remove Block";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; Remove Block";
 
 if (!(isset($_GET['cid']))) { //if the cid is missing go back to the index page
 	$overwriteBody = 1;

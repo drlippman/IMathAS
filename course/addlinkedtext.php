@@ -15,7 +15,7 @@ $body = "";
 $useeditor = "text,summary";
 
 
-$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 if (isset($_GET['id'])) {
 	$curBreadcrumb .= "&gt; Modify Linked Text\n";
 	$pagetitle = "Modify Linked Text";

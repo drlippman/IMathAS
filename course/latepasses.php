@@ -24,7 +24,7 @@
 	}
 	
 	require("../header.php");
-	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 	echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> ";
 	echo "&gt; Manage LatePasses</div>";
 	

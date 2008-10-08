@@ -93,7 +93,7 @@ if (!(isset($teacherid))) {
 
 		exit;
 	} else { //DEFAULT DATA MANIPULATION
-		$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=$cid\">$coursename</a>";
+		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a>";
 		$curBreadcrumb .= " &gt; Shift Course Dates ";
 	
 		$sdate = tzdate("m/d/Y",time());

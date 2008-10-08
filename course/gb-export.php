@@ -23,7 +23,7 @@
 	
 	if (!isset($_POST['commentloc'])) {
 		require("../header.php");
-		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=$cid\">$coursename</a> ";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
 		echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; Export Gradebook</div>";
 		
 		echo "<form method=post action=\"gb-export.php?cid=$cid&stu=$stu&gbmode=$gbmode";

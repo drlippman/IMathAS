@@ -36,7 +36,7 @@ function buildExistBlocksArray($items,$parent) {
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Block Settings";
-$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a>";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a>";
 $curBreadcrumb .= (isset($_GET['id'])) ? "&gt; Modify Block\n" : "&gt; Add Block\n";
 
 if (isset($_GET['id'])) {

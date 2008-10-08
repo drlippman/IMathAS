@@ -24,7 +24,7 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = "";
 $hasInclude = 0;
-$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=$cid\"> $coursename</a>\n";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n";
 
 if (!isset($teacherid)) { // loaded by a NON-teacher
 	$overwriteBody=1;
@@ -208,12 +208,12 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$query = "UPDATE imas_users SET password='$newpw' WHERE id='{$_GET['uid']}'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		} else {
-			$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=$cid\"> $coursename</a>\n"; 
+			$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n"; 
 			$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Confirm Change\n";
 			$pagetitle = "Confirm Change";
 		}
 	} elseif (isset($_GET['action']) && $_GET['action']=="unenroll" ) {
-		$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid=$cid\"> $coursename</a>\n"; 
+		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n"; 
 		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Confirm Change\n";
 		$pagetitle = "Unenroll Students";		
 		$calledfrom='lu';

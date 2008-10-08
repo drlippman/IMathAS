@@ -98,7 +98,7 @@ if (!(isset($teacherid))) {
 			$body = "File Upload error";
 		}
 	} else { //DEFAULT DATA MANIPULATION
-		$curBreadcrumb ="<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+		$curBreadcrumb ="$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 		$curBreadcrumb .=" &gt; <a href=\"gradebook.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid\">Gradebook</a> ";
 		$curBreadcrumb .=" &gt; <a href=\"addgrades.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid&gbitem={$_GET['gbitem']}&grades=all\">Offline Grades</a> &gt; Upload Grades";
 	}

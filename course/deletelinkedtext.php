@@ -11,7 +11,7 @@ require("../validate.php");
 $overwriteBody = 0;
 $body = "";
 
-$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 $curBreadcrumb .= "&gt; Modify Linked Text\n";
 $pagetitle = "Delete Linked Text";
 

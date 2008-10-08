@@ -13,7 +13,7 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = $installname . "Administration";
 
-$curBreadcrumb = "<a href=\"../index.php\">Home</a> &gt; Admin\n";
+$curBreadcrumb = "$breadcrumbbase Admin\n";
  
  
  if ($myrights>=75) {

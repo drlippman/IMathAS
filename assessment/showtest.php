@@ -446,7 +446,7 @@
 	}
 	
 	if (!$isdiag && !$isltilimited) {
-		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"../course/course.php?cid={$testsettings['courseid']}\">{$sessiondata['coursename']}</a> ";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid={$testsettings['courseid']}\">{$sessiondata['coursename']}</a> ";
 	 echo "&gt; Assessment</div>";
 	}
 	

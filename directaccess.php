@@ -137,7 +137,7 @@
 			 $_SESSION['challenge'] = $challenge;
 		 }
 		require("header.php");
-		echo "<div class=\"breadcrumb\"><a href=\"index.php\">Home</a> &gt; $coursename Access</div>";
+		echo "<div class=\"breadcrumb\">$breadcrumbbase $coursename Access</div>";
 		echo "<div id=\"header\"><div class=\"vcenter\">$coursename</div></div>";
 		//echo '<span style="float:right;margin-top:10px;">'.$smallheaderlogo.'</span>';
 		
