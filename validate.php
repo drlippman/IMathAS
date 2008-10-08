@@ -197,6 +197,23 @@ END;
 	$userfullname = $line['FirstName'] . ' ' . $line['LastName'];
 	$previewshift = -1;
 	$coursetheme = "default.css";
+	if (isset($sessiondata['ltiitemtype'])) {
+		if ($sessiondata['ltiitemtype']==1) {
+			if (strpos(basename($_SERVER['SCRIPT_NAME']),'showtest.php')===false && $sessiondata['ltiitemid']!=$_GET['cid']) {
+				echo "You do not have access to this page";
+				echo "<a href=\"$imasroot/course/course.php?cid={$sessiondata['ltiitemid']}\">Return to course page</a>";
+				exit;
+			}
+		} else if ($sessiondata['ltiitemtype']==0) {
+			if (strpos(basename($_SERVER['SCRIPT_NAME']),'showtest.php')===false) {
+				$query = "SELECT courseid FROM imas_assessments WHERE id='{$sessiondata['ltiitemtype']}'";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$cid = mysql_result($result,0,0);
+				header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}");
+				exit;
+			}
+		}
+	}
 	if (isset($_GET['cid']) && $_GET['cid']!="admin" && $_GET['cid']>0) {
 		$query = "SELECT id FROM imas_students WHERE userid='$userid' AND courseid='{$_GET['cid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());

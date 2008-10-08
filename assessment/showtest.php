@@ -207,7 +207,7 @@
 	//if (!$isteacher) {
 	if ($testsettings['avail']==0 && !$isteacher) {
 		echo "Assessment is Closed";
-		echo "<br/><a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to course page</a>";
+		leavetestmsg();
 		exit;
 	}
 	if ($now < $testsettings['startdate'] || $testsettings['enddate']<$now) { //outside normal range for test
@@ -221,7 +221,7 @@
 				} else {
 					if (!$isteacher) {
 						echo "Assessment is closed";
-						echo "<br/><a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to course page</a>";
+						leavetestmsg();
 						exit;
 					}
 				}
@@ -236,7 +236,7 @@
 			} else {
 				if (!$isteacher) {
 					echo "Assessment is closed";
-					echo "<br/><a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to course page</a>";
+					leavetestmsg();
 					exit;
 				}
 			}
@@ -272,7 +272,7 @@
 		//want to reject if javascript was bypassed
 		if ($timelimitremaining < -1*max(0.05*$testsettings['timelimit'],5)) {
 			echo "Time limit has expired.  Submission rejected";
-			echo "<br/><a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to course page</a>";
+			leavetestmsg();
 			exit;
 		}
 		
@@ -435,6 +435,7 @@
 	if ($isdiag) {
 		$diagid = $sessiondata['isdiag'];
 	}
+	$isltilimited = (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0);
 
 	header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
 	header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
@@ -444,7 +445,7 @@
 		echo '<style type="text/css" media="print"> body { display: none;} </style>';
 	}
 	
-	if (!$isdiag) {
+	if (!$isdiag && !$isltilimited) {
 		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> &gt; <a href=\"../course/course.php?cid={$testsettings['courseid']}\">{$sessiondata['coursename']}</a> ";
 	 echo "&gt; Assessment</div>";
 	}
@@ -695,22 +696,15 @@
 				echo "come back to it later. ";
 				if ($testsettings['timelimit']>0) {echo "The timelimit will continue to count down";}
 				echo "</p><p><a href=\"showtest.php\">Return to test</a> or ";
-				if (!$isdiag) {
-					echo "<a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a></p>\n";
-				} else {
-					echo "<a href=\"../diag/index.php?id=$diagid\">Exit Assessment</a></p>\n";
-				}
+				leavetestmsg();
+				
 			} else {
 				recordtestdata();
 				
 				showscores($questions,$attempts,$testsettings);
 			
 				endtest($testsettings);
-				if (!$isdiag) {
-					echo "<p><a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a></p>\n";
-				} else {
-					echo "<p><a href=\"../diag/index.php?id=$diagid\">Exit Assessment</a></p>\n";
-				}
+				leavetestmsg();
 			}
 		} else if ($_GET['action']=="shownext") {
 			if (isset($_GET['score'])) {
@@ -771,11 +765,7 @@
 			} else { //are all done
 				showscores($questions,$attempts,$testsettings);
 				endtest($testsettings);
-				if (!$isdiag) {
-					echo "<p><a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a></p>\n";
-				} else {
-					echo "<p><a href=\"../diag/index.php?id=$diagid\">Exit Assessment</a></p>\n";
-				}
+				leavetestmsg();
 			}
 		} else if ($_GET['action']=="skip") {
 
@@ -890,11 +880,7 @@
 
 				showscores($questions,$attempts,$testsettings);
 				endtest($testsettings);
-				if (!$isdiag) {
-					echo "<p><a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a></p>\n";
-				} else {
-					echo "<p><a href=\"../diag/index.php?id=$diagid\">Exit Assessment</a></p>\n";
-				}
+				leavetestmsg();
 			}
 		} else if ($_GET['action']=="seq") {
 			if (isset($_GET['score'])) { //score a problem
@@ -975,11 +961,7 @@
 
 				showscores($questions,$attempts,$testsettings);
 				endtest($testsettings);
-				if (!$isdiag) {
-					echo "<p><a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a></p>\n";
-				} else {
-					echo "<p><a href=\"../diag/index.php?id=$diagid\">Exit Assessment</a></p>\n";
-				}
+				leavetestmsg();
 			} else { //show more test 
 				echo filter("<div id=intro class=hidden>{$testsettings['intro']}</div>\n");
 				
@@ -1069,11 +1051,8 @@
 				echo '<input type="submit" class="btn" name="saveforlater" value="Save answers" />';
 			} else {
 				startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testsettings['testtype']=="NoScores");
-				if (!$isdiag) {
-					echo "<a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a>\n";
-				} else {
-					echo "<a href=\"../diag/index.php?id=$diagid\">Exit Assessment</a>\n";
-				}
+				
+				leavetestmsg();
 				
 			}
 		} else if ($testsettings['displaymethod'] == "OneByOne") {
@@ -1085,11 +1064,7 @@
 			if ($i == count($questions)) {
 				startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testsettings['testtype']=="NoScores");
 			
-				if (!$isdiag) {
-					echo "<a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a>\n";
-				} else {
-					echo "<a href=\"../diag/index.php?id=$diagid\">Exit Assessment</a>\n";
-				}
+				leavetestmsg();
 				
 			} else {
 				echo filter("<div class=intro>{$testsettings['intro']}</div>\n");
@@ -1113,11 +1088,7 @@
 				
 				startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testsettings['testtype']=="NoScores");
 				
-				if (!$isdiag) {
-					echo "<a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a></div>\n";
-				} else {
-					echo "<a href=\"../diag/index.php?id=$diagid\">Exit Assessment</a></div>\n";
-				}
+				leavetestmsg();
 				
 			} else {
 				echo "<div class=inset>\n";
@@ -1139,11 +1110,7 @@
 			if ($i == count($questions)) {
 				startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testsettings['testtype']=="NoScores");
 				
-				if (!$isdiag) {
-					echo "<a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a>\n";
-				} else {
-					echo "<a href=\"../diag/index.php?id=$diagid\">Exit Assessment</a>\n";
-				}
+				leavetestmsg();
 				
 			} else {
 				$curq = $i;
@@ -1412,5 +1379,14 @@
 		
 		//unset($sessiondata['sessiontestid']);
 	}
-
+	function leavetestmsg() {
+		global $isdiag, $diagid, $isltilimited, $testsettings;
+		if ($isdiag) {
+			echo "<a href=\"../diag/index.php?id=$diagid\">Exit Assessment</a></p>\n";
+		} else if ($isltilimited) {
+			
+		} else {
+			echo "<a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a></p>\n";
+		}
+	}
 ?>

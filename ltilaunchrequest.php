@@ -116,7 +116,7 @@ $result = mysql_query($query) or die("Query failed : " . mysql_error());
 if (mysql_num_rows($result) > 0) { //yup, we know them
 	$userid = mysql_result($result,0,0);
 } else {
-	echo "student not known?  id $ltiuserid, org $ltiorg";
+	//echo "student not known?  id $ltiuserid, org $ltiorg";
 	
 	$query = "INSERT INTO imas_ltiusers (org,ltiuserid) VALUES ('$ltiorg','$ltiuserid')";
 	mysql_query($query) or die("Query failed : " . mysql_error());
@@ -194,7 +194,7 @@ if ( $_REQUEST['action'] == 'launchresolve' ) {
     echo "<launchResponse>\n";
     echo "   <status>success</status>\n";
     echo "   <type>iframe</type>\n";
-    echo "   <launchUrl>$theurl</launchUrl>\n";
+    echo "   <launchUrl>".htmlspecialchars($theurl)."</launchUrl>\n";
     echo"</launchResponse>\n";
 } else if ( ! headers_sent() && $_REQUEST['action'] == 'direct' ) {
     header("Location: $theurl");

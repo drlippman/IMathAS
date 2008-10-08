@@ -3,7 +3,7 @@
 //Called from iframe using URL produced during LTIlaunchrequest.php negotiation
 
 /*
-//TODO: Add something to validate to prevent change of URL from what was 
+//TODO: Add something to validate.php to prevent change of URL from what was 
 // authorized by lti code
 if ($sessiondata['itemtype']==0) {
 	if (script being accessed is showtest) {
