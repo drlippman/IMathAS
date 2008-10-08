@@ -158,6 +158,7 @@
 	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 	$cnt = 0;
 	while($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+		$asid = $line['id'];
 		$questions = explode(',',$line['questions']);
 		$scores = explode(",",$line['bestscores']);
 		$attempts = explode(",",$line['bestattempts']);

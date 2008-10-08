@@ -1096,7 +1096,28 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			}
 			$sa = showplot($saarr,$settings[0],$settings[1],$settings[2],$settings[3],$scling,$scling,$settings[6],$settings[7]);
 		}
-	}
+	} /*else if ($anstype == "file") {
+		if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$qn];} else {$ansprompt = $options['ansprompt'];}}
+		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
+		if ($multi>0) { $qn = $multi*1000+$qn;}
+		if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
+		
+		$out .= "<input type=\"file\" name=\"qn$qn\" id=\"qn$qn\" />\n";
+		if ($la!='') {
+			if (isset($GLOBALS['asid'])) {
+				$s3asid = $GLOBALS['asid'];
+			} else {
+				$s3asid = 0;
+			}
+			$s3object = "/adata/$s3asid/$qn";
+			$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+			$url = $s3->queryStringGet($GLOBALS['AWSkbucket'],$s3object,7200);
+			$out .= "<br/>Last file uploaded: <a href=\"$url\">$la</a>";
+				
+		}
+		$tip .= "Select a file to upload";
+		$sa .= $answer;
+	}*/
 	
 	return array($out,$tip,$sa,$preview);
 }
@@ -2324,7 +2345,42 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			return $totscore;
 		}
 			
-	}
+	}/* else if ($anstype == "file") {
+		if ($multi>0) { $qn = $multi*1000+$qn;}
+		$uploaddir = $GLOBALS['basephysicaldir'] .'/admin/import/';
+		$filename = basename($_FILES["qn$qn"]['name']);
+		$filename = str_replace(array('..','/'),'',$filename);
+		$extension = strtolower(strrchr($filename,"."));
+		$badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p",".exe");
+		if (in_array($extension,$badextensions)) {
+			$GLOBALS['partlastanswer'] = "Error - Invalid file type";
+			return 0;
+		}
+		$uploadfile = $uploaddir . $GLOBALS['userid'] .$filename;
+		if (move_uploaded_file($_FILES["qn$qn"]['tmp_name'], $uploadfile)) {
+			require_once("../includes/S3.php");
+			if (isset($GLOBALS['asid'])) {
+				$s3asid = $GLOBALS['asid'];
+			} else {
+				$s3asid = 0;
+			}
+			$s3object = "/adata/$s3asid/$qn";
+			$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+			if ($s3->putObjectFile($uploadfile,$GLOBALS['AWSbucket'],$s3object,S3::ACL_PRIVATE)) {
+				$GLOBALS['partlastanswer'] = $filename;
+			} else {
+				//echo "Error storing file";
+				$GLOBALS['partlastanswer'] = "Error storing file";
+				
+			}
+			unlink($uploadfile);
+			return 0;
+		} else {
+			//echo "Error uploading file";
+			$GLOBALS['partlastanswer'] = "Error uploading file";
+			return 0;
+		}
+	}*/
 	
 }
 

@@ -177,7 +177,7 @@ $enc = base64_encode(serialize($sessiondata));
 if ($createnewsession) {
 	$query = "INSERT INTO imas_sessions (sessionid,userid,sessiondata,time) VALUES ('$sessionid','$userid','$enc',$now)";
 } else {
-	$query = "UPDATE imas_sessions SET sessiondata='$enc' WHERE sessionid='$sessionid'";
+	$query = "UPDATE imas_sessions SET sessiondata='$enc',userid='$userid' WHERE sessionid='$sessionid'";
 }
 mysql_query($query) or die("Query failed : " . mysql_error());
 if (!$createnewsession && !($itemtype==0 && $tlwrds != '')) { 

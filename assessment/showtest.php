@@ -79,7 +79,7 @@
 				require("../header.php");
 				echo $out;
 				echo "<p>Password required for access.</p>";
-				echo "<form method=post action=\"showtest.php?cid={$_GET['cid']}&amp;id={$_GET['id']}\">";
+				echo "<form method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?cid={$_GET['cid']}&amp;id={$_GET['id']}\">";
 				echo "<p>Password: <input type=text name=\"password\" /></p>";
 				echo "<input type=submit value=\"Submit\" />";
 				echo "</form>";
@@ -171,6 +171,7 @@
 		exit;
 	}
 	$testid = addslashes($sessiondata['sessiontestid']);
+	$asid = $testid;
 	$isteacher = $sessiondata['isteacher'];
 	$query = "SELECT * FROM imas_assessment_sessions WHERE id='$testid'";
 	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
@@ -544,7 +545,7 @@
 				echo 'and enter their password ';
 			}
 			echo 'here.</p>';
-			echo '<form method=post action="showtest.php?addgrpmem=true">';
+			echo '<form method="post" enctype="multipart/form-data" action="showtest.php?addgrpmem=true">';
 			for ($i=1;$i<$testsettings['groupmax']-count($curgrp)+1;$i++) {
 				echo '<br />Username: <select name="user'.$i.'">'.$selops.'</select> ';
 				if ($testsettings['isgroup']==1) {
@@ -758,7 +759,7 @@
 			}
 			
 			if (!$done) { //can show next
-				echo "<form id=\"qform\" method=post action=\"showtest.php?action=shownext&amp;score=$toshow\" onsubmit=\"return doonsubmit(this)\">\n";
+				echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=shownext&amp;score=$toshow\" onsubmit=\"return doonsubmit(this)\">\n";
 				basicshowq($toshow);
 				showqinfobar($toshow,true,true);
 				echo '<input type="submit" class="btn" value="Continue" />';
@@ -835,7 +836,7 @@
 				$lefttodo = shownavbar($questions,$scores,$next,$testsettings['showcat']);
 				if (unans($scores[$next]) || amreattempting($next)) {
 					echo "<div class=inset>\n";
-					echo "<form id=\"qform\" method=post action=\"showtest.php?action=skip&amp;score=$next\" onsubmit=\"return doonsubmit(this)\">\n";
+					echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=skip&amp;score=$next\" onsubmit=\"return doonsubmit(this)\">\n";
 					echo "<a name=\"beginquestions\"></a>\n";
 					basicshowq($next);
 					showqinfobar($next,true,true);
@@ -965,7 +966,7 @@
 			} else { //show more test 
 				echo filter("<div id=intro class=hidden>{$testsettings['intro']}</div>\n");
 				
-				echo "<form id=\"qform\" method=post action=\"showtest.php?action=seq&amp;score=$toshow\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
+				echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=seq&amp;score=$toshow\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
 				echo "<input type=hidden name=\"verattempts\" value=\"{$attempts[$toshow]}\" />";
 				
 				for ($i = 0; $i < count($questions); $i++) {
@@ -1037,7 +1038,7 @@
 		} 
 		if ($testsettings['displaymethod'] == "AllAtOnce") {
 			echo filter("<div class=intro>{$testsettings['intro']}</div>\n");
-			echo "<form id=\"qform\" method=post action=\"showtest.php?action=scoreall\" onsubmit=\"return doonsubmit(this,true)\">\n";
+			echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=scoreall\" onsubmit=\"return doonsubmit(this,true)\">\n";
 			$numdisplayed = 0;
 			for ($i = 0; $i < count($questions); $i++) {
 				if (unans($scores[$i]) || amreattempting($i)) {
@@ -1068,7 +1069,7 @@
 				
 			} else {
 				echo filter("<div class=intro>{$testsettings['intro']}</div>\n");
-				echo "<form id=\"qform\" method=post action=\"showtest.php?action=shownext&amp;score=$i\" onsubmit=\"return doonsubmit(this)\">\n";
+				echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=shownext&amp;score=$i\" onsubmit=\"return doonsubmit(this)\">\n";
 				basicshowq($i);
 				showqinfobar($i,true,true);
 				echo '<input type="submit" class="btn" value="Next" />';
@@ -1092,7 +1093,7 @@
 				
 			} else {
 				echo "<div class=inset>\n";
-				echo "<form id=\"qform\" method=post action=\"showtest.php?action=skip&amp;score=$i\" onsubmit=\"return doonsubmit(this)\">\n";
+				echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=skip&amp;score=$i\" onsubmit=\"return doonsubmit(this)\">\n";
 				echo "<a name=\"beginquestions\"></a>\n";
 				basicshowq($i);
 				showqinfobar($i,true,true);
@@ -1115,7 +1116,7 @@
 			} else {
 				$curq = $i;
 				echo filter("<div class=intro>{$testsettings['intro']}</div>\n");
-				echo "<form id=\"qform\" method=post action=\"showtest.php?action=seq&amp;score=$i\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
+				echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=seq&amp;score=$i\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
 				echo "<input type=\"hidden\" name=\"verattempts\" value=\"{$attempts[$i]}\" />";
 				for ($i = 0; $i < count($questions); $i++) {
 					$qavail = seqshowqinfobar($i,$curq);

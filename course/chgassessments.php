@@ -77,6 +77,9 @@ if (!(isset($teacherid))) {
 		$sets = array();
 		if (isset($_POST['chgtimelimit'])) {
 			$timelimit = $_POST['timelimit']*60;
+			if (isset($_POST['timelimitkickout'])) {
+				$timelimit = -1*$timelimit;
+			}
 			$sets[] = "timelimit='$timelimit'";
 		}
 		if (isset($_POST['chgdisplaymethod'])) {
@@ -301,7 +304,9 @@ function chkAll(frm, arr, mark) {
 			<tr>
 				<td><input type="checkbox" name="chgtimelimit"/></td>
 				<td class="r">Time Limit (minutes, 0 for no time limit): </td>
-				<td><input type=text size=4 name=timelimit value="<?php echo $line['timelimit']/60;?>"></td>
+				<td><input type=text size=4 name="timelimit" value="0" />
+				   <input type="checkbox" name="timelimitkickout" /> Kick student out at timelimit
+				   </td>
 			</tr>
 
 			<tr>

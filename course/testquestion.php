@@ -141,7 +141,7 @@ if ($overwriteBody==1) {
 	echo $page_scoreMsg;
 	echo '<script type="text/javascript"> function whiteout() { e=document.getElementsByTagName("div");';
 	echo 'for (i=0;i<e.length;i++) { if (e[i].className=="question") {e[i].style.backgroundColor="#fff";}}}</script>';
-	echo "<form method=post action=\"$page_formAction\" onsubmit=\"doonsubmit()\">\n";
+	echo "<form method=post enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit()\">\n";
 	echo "<input type=hidden name=seed value=\"$seed\">\n";
 	echo "<input type=hidden name=attempt value=\"$attempt\">\n";
 

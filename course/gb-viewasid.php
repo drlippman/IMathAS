@@ -6,8 +6,9 @@
 	$isteacher = isset($teacherid);
 	$istutor = isset($tutorid);
 	$cid = $_GET['cid'];
+	$asid = $_GET['asid'];
 	
-		if ($isteacher) {
+	if ($isteacher) {
 		if (isset($sessiondata[$cid.'gbmode'])) {
 			$gbmode =  $sessiondata[$cid.'gbmode'];
 		} else {
