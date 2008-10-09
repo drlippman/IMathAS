@@ -140,7 +140,7 @@ class S3 {
 			foreach ($response->body->Contents as $c) {
 				$results[(string)$c->Key] = array(
 					'name' => (string)$c->Key,
-					'time' => strtotime((string)$c->LastModified),
+					'time' => strtotime(str_replace('TO',' ',(string)$c->LastModified)),
 					'size' => (int)$c->Size,
 					'hash' => substr((string)$c->ETag, 1, -1)
 				);

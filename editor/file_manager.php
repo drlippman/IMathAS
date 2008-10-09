@@ -6,8 +6,8 @@ set_time_limit(0);
 ini_set("max_input_time", "600");
 ini_set("max_execution_time", "600");
 ini_set("memory_limit", "104857600");
-ini_set("upload_max_filesize", "104857600");
-ini_set("post_max_size", "104857600");
+ini_set("upload_max_filesize", "10485760");
+ini_set("post_max_size", "10485760");
 //which language file to use
 include("file_manager/lang/lang_eng.php");
 
@@ -109,7 +109,7 @@ foreach ($files as $k=>$v) {
 	<form method="post" enctype="multipart/form-data" onSubmit="return switchDivs();">
 		<?php echo $strings["upload_file"]; ?>
 		<input type="hidden" name="action" value="upload_file">
-		<input type="hidden" name="MAX_FILE_SIZE" value="104857600" /> <!-- ~100mb -->
+		<input type="hidden" name="MAX_FILE_SIZE" value="10485760" /> <!-- ~10mb -->
 		<input type="file" name="uploaded_file" id="uploaded_file">
 		<input type="submit" value="<?php echo $strings["upload_file_submit"]; ?>">
 	</form>
