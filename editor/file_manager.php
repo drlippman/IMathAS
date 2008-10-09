@@ -69,7 +69,7 @@ if ($type=="img") {
 	
 	extension = ['.png','.gif','.jpg','.jpeg'];
 	isok = false;
-	var thisext = fieldvalue.substr(fieldvalue.lastIndexOf('.'));
+	var thisext = fieldvalue.substr(fieldvalue.lastIndexOf('.')).toLowerCase();
 	for(var i = 0; i < extension.length; i++) {
 		if(thisext == extension[i]) { isok = true; }
 	}
