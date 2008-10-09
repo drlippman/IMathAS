@@ -2,6 +2,10 @@
 //SimpleLTI producer launch negotiation
 
 //TODO:  do we need to check launch_targets?
+
+//in debugmode, accepts duplicate nonces, ignores time diffs
+$debugmode = true;
+
 include("config.php");
 
 function reporterror($err) {
@@ -19,9 +23,24 @@ function reporterror($err) {
 	exit;	
 }
 
-function returnstudentnotice($not) {
+function returnstudentnotice($err) {
 	//need to create url that will deliver this notice?
-	echo $not;
+	//echo $not;
+	$host = $_SERVER['HTTP_HOST'];
+	$uri = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
+	$theurl = "http://$host$uri/ltilaunch.php?stuerr=".urlencode($nerr);
+	
+	if ( $_REQUEST['action'] == 'launchresolve' ) {
+	    echo "<launchResponse>\n";
+	    echo "   <status>success</status>\n";
+	    echo "   <type>iframe</type>\n";
+	    echo "   <launchUrl>".htmlspecialchars($theurl)."</launchUrl>\n";
+	    echo"</launchResponse>\n";
+	} else {
+	   echo '<html><head><title>Error</title></head><body>';
+	   echo $err;
+	   echo '</body></html>';
+	}
 	exit;
 }
 
@@ -86,22 +105,26 @@ if ($itemtype==0) { //accessing single assessment
 	}
 	$secret = $line['ltisecret'];
 }
-if ($secret=='') {
+if (trim($secret)=='') {
 	reporterror("No valid secret exists");
 }
 
 //check created by time
 $createdtime = strtotime($created);
 if (abs($now-$created)>60) {
-	//debug reporterror("Expired");
+	if (!$debugmode) {
+		reporterror("Expired");
+	}
 }
-//check nonce unique
+//check nonce unique 
 $query = "SELECT id FROM imas_ltinonces WHERE nonce='$nonce'";
 $result = mysql_query($query) or die("Query failed : " . mysql_error());
 if (mysql_num_rows($result)>0) {
-	//debug reporterror("Duplicate nonce");
+	if (!$debugmode) {
+		reporterror("Duplicate nonce");
+	}
 } else {
-	//record nonce to prevent reruns
+	//record nonce to prevent reruns - we'll hold for 15 min
 	$query = "INSERT INTO imas_ltinonces (nonce,time) VALUES ('$nonce','$now')";
 	mysql_query($query) or die("Query failed : " . mysql_error());
 }

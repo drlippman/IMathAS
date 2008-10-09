@@ -256,7 +256,9 @@
 			echo "<span class=form><label for=\"subject\">Subject:</label></span>";
 			echo "<span class=formright><input type=text size=50 name=subject id=subject value=\"{$line['subject']}\"></span><br class=form>\n";
 			echo "<span class=form><label for=\"message\">Message:</label></span>";
-			echo "<span class=left><div class=editor><textarea id=message name=message style=\"width: 100%;\" rows=20 cols=70>{$line['message']}</textarea></div></span><br class=form>\n";
+			echo "<span class=left><div class=editor><textarea id=message name=message style=\"width: 100%;\" rows=20 cols=70>";
+			echo htmlentities($line['message']);
+			echo "</textarea></div></span><br class=form>\n";
 			if ($isteacher) {
 				echo "<span class=form>Post Type:</span><span class=formright>\n";
 				echo "<input type=radio name=type value=0 ";

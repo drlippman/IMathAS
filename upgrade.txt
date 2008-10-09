@@ -8,6 +8,31 @@ Upgrade Notes
 Reference loginpage.php.dist for changes. 
 	
 *** Database Changes ***
+ALTER TABLE `imas_assessments` ADD `ltisecret` VARCHAR( 10 ) NOT NULL ;
+ALTER TABLE `imas_courses` ADD `ltisecret` VARCHAR( 10 ) NOT NULL ;
+
+CREATE TABLE `imas_ltiusers` (
+`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`org` VARCHAR( 32 ) NOT NULL ,
+`ltiuserid` VARCHAR( 32 ) NOT NULL ,
+`userid` INT( 10 ) UNSIGNED NOT NULL 
+) TYPE = innodb;
+
+CREATE TABLE `imas_ltiaccess` (
+`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`password` VARCHAR( 32 ) NOT NULL ,
+`userid` INT( 10 ) UNSIGNED NOT NULL ,
+`itemid` INT( 10 ) UNSIGNED NOT NULL ,
+`itemtype` TINYINT( 1 ) UNSIGNED NOT NULL ,
+`created` INT( 10 ) UNSIGNED NOT NULL 
+) TYPE = innodb;
+
+CREATE TABLE `imas_ltinonces` (
+`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`nonce` TEXT NOT NULL ,
+`time` INT( 10 ) UNSIGNED NOT NULL 
+) TYPE = innodb;
+
 ALTER TABLE `imas_assessments` CHANGE `timelimit` `timelimit` INT( 10 ) NOT NULL DEFAULT '0' ;
 ALTER TABLE `imas_assessment_sessions` ADD `reattempting` VARCHAR( 255 ) NOT NULL ;
 ALTER TABLE `imas_assessment_sessions` ADD `reviewreattempting` VARCHAR( 255 ) NOT NULL ;

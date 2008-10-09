@@ -243,8 +243,10 @@
 				myAM = myAM.replace(/.+title=\'(.*?)\'.+/g,"`$1`");
 				myAM = myAM.replace(/.+title=([^>]*?)\s.*>.*/g,"`$1`");
 				myAM = myAM.replace(/.+title=(.*?)>.*/g,"`$1`");
-				myAM = myAM.replace(/&gt;/g,">");
-				myAM = myAM.replace(/&lt;/g,"<");
+				//myAM = myAM.replace(/&gt;/g,">");
+				//myAM = myAM.replace(/&lt;/g,"<");
+				myAM = myAM.replace(/>/g,"&gt;");
+				myAM = myAM.replace(/</g,"&lt;");
 				el.innerHTML = myAM;
 			}
 		},

@@ -215,12 +215,12 @@ if ($overwriteBody==1) {
 		
 		Summary<BR>
 		<div class=editor>
-			<textarea cols=60 rows=10 id=summary name=summary style="width: 100%"><?php echo $line['summary'];?></textarea>
+			<textarea cols=60 rows=10 id=summary name=summary style="width: 100%"><?php echo htmlentities($line['summary']);?></textarea>
 		</div>
 		<BR>
 		Text or weblink (start with http://)<BR>
 		<div class=editor>
-			<textarea cols=80 rows=20 id=text name=text style="width: 100%"><?php echo $line['text'];?></textarea>
+			<textarea cols=80 rows=20 id=text name=text style="width: 100%"><?php echo htmlentities($line['text']);?></textarea>
 		</div>
 		<BR>
 		<input type="hidden" name="MAX_FILE_SIZE" value="3000000" />

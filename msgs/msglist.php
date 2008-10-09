@@ -158,7 +158,9 @@
 			echo "<span class=form><label for=\"subject\">Subject:</label></span>";
 			echo "<span class=formright><input type=text size=50 name=subject id=subject value=\"$title\"></span><br class=form>\n";
 			echo "<span class=form><label for=\"message\">Message:</label></span>";
-			echo "<span class=left><div class=editor><textarea id=message name=message style=\"width: 100%;\" rows=20 cols=70>$message</textarea></div></span><br class=form>\n";
+			echo "<span class=left><div class=editor><textarea id=message name=message style=\"width: 100%;\" rows=20 cols=70>";
+			echo htmlentities($message);
+			echo "</textarea></div></span><br class=form>\n";
 			
 			echo "<div class=submit><input type=submit value='Submit'></div>\n";
 			if ($msgmonitor==1) {

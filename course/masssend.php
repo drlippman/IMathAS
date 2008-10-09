@@ -166,7 +166,7 @@
 		echo "<span class=form><label for=\"subject\">Subject:</label></span>";
 		echo "<span class=formright><input type=text size=50 name=subject id=subject value=\"{$line['subject']}\"></span><br class=form>\n";
 		echo "<span class=form><label for=\"message\">Message:</label></span>";
-		echo "<span class=left><div class=editor><textarea id=message name=message style=\"width: 100%;\" rows=20 cols=70>{$line['message']}</textarea></div></span><br class=form>\n";
+		echo "<span class=left><div class=editor><textarea id=message name=message style=\"width: 100%;\" rows=20 cols=70> </textarea></div></span><br class=form>\n";
 		echo "<p><i>Note:</i> <b>FirstName</b> and <b>LastName</b> can be used as form-mail fields that will autofill with each students' first/last name</p>";
 		echo "<span class=form><label for=\"self\">Send copy to:</label></span>";
 		echo "<span class=formright><input type=radio name=self id=self value=\"none\">Only Students<br/> ";

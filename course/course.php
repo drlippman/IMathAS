@@ -203,7 +203,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	}
 	
 	
-	if ($msgset<3) {
+	if ($msgset<4) {
 	   $query = "SELECT COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND (isread=0 OR isread=4)";
 	   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	   if (mysql_result($result,0,0)>0) {
@@ -406,19 +406,21 @@ if ($overwriteBody==1) {
    if ($useleftbar && isset($teacherid)) {
 	   echo "</div>";
    } else {
-	   if ($msgset<3) {
+	  
 ?>	   
 	<div class=cp>
 		<span class=column>
+<?php		 if ($msgset<4) {  ?>
 			<a href="<?php echo $imasroot ?>/msgs/msglist.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>">
 			Messages</a><?php echo $newmsgs ?> <br/>
+<?php		 } ?>
 			<a href="<?php echo $imasroot ?>/forums/forums.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>">
 			Forums</a> <?php echo $newpostscnt ?>
 		</span>
 		<div class=clear></div>
 	</div>
 <?php
-	   }
+	   
 	   
 	   if (isset($teacherid)) {
 ?>
@@ -528,7 +530,7 @@ function makeTopMenu() {
 	}
 	if (isset($teacherid) && count($topbar[1])>0) {
 		echo '<div class=breadcrumb>';
-		if (in_array(0,$topbar[1]) && $msgset<3) { //messages
+		if (in_array(0,$topbar[1]) && $msgset<4) { //messages
 			echo "<a href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a>$newmsgs &nbsp; ";
 		}
 		if (in_array(1,$topbar[1])) { //Stu view
@@ -549,10 +551,10 @@ function makeTopMenu() {
 		echo '<div class=clear></div></div>';
 	} else if (!isset($teacherid) && (count($topbar[0])>0 || $previewshift>-1)) {
 		echo '<div class=breadcrumb>';
-		if (in_array(0,$topbar[0]) && $msgset<3) { //messages
+		if (in_array(0,$topbar[0]) && $msgset<4) { //messages
 			echo "<a href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a>$newmsgs &nbsp; ";
 		}
-		if (in_array(3,$topbar[0]) && $msgset<3) { //messages
+		if (in_array(3,$topbar[0])) { //forums
 			echo "<a href=\"$imasroot/forums/forums.php?cid=$cid\">Forums</a>$newpostscnt &nbsp; ";
 		}
 		if (in_array(1,$topbar[0])) { //Gradebook

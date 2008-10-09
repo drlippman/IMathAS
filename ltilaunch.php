@@ -2,26 +2,12 @@
 //LTI Launch
 //Called from iframe using URL produced during LTIlaunchrequest.php negotiation
 
-/*
-//TODO: Add something to validate.php to prevent change of URL from what was 
-// authorized by lti code
-if ($sessiondata['itemtype']==0) {
-	if (script being accessed is showtest) {
-		if (isset($sessiondata['sessiontestid']) || $_GET['id'] = $sessiondata['itemid']) {
-			we're good
-		} else {
-			die
-		}
-	} else {
-		die
-	}
-} if itemtype==1 {
-	if isset $_GET['cid'] and $sessiondata['itemid']!=$_GET['cid'] {
-		die
-	}
+if (isset($_GET['stuerr'])) {
+	echo '<html><head><title>Error</title></head><body>';
+	echo $_GET['stuerr'];
+	echo '</body></html>';
+	exit;
 }
-*/
-
 require("config.php");
 if (isset($sessionpath)) { session_save_path($sessionpath);}
 ini_set('session.gc_maxlifetime',86400);

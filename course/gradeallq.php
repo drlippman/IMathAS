@@ -157,9 +157,14 @@
 	$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
 	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 	$cnt = 0;
-	//require_once("../includes/filehandler.php");
+	require_once("../includes/filehandler.php");
 	while($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 		$asid = $line['id'];
+		if ($line['agroupid']>0) {
+			$s3asid = $line['agroupid'];
+		} else {
+			$s3asid = $asid;
+		}
 		$questions = explode(',',$line['questions']);
 		$scores = explode(",",$line['bestscores']);
 		$attempts = explode(",",$line['bestattempts']);
@@ -243,12 +248,12 @@
 						echo ' ReGen ';
 					} else {
 						echo "  <b>$cntb:</b> " ;
-						/*if (preg_match('/@FILE:(.+?)@/',$laarr[$k],$match)) {
-							$url = getasidfileurl($asid,$match[1]);
-							echo "<a href=\"$url\">{$match[1]}</a>";
-						} else {*/
+						if (preg_match('/@FILE:(.+?)@/',$laarr[$k],$match)) {
+							$url = getasidfileurl($s3asid,$match[1]);
+							echo "<a href=\"$url\" target=\"_new\">{$match[1]}</a>";
+						} else {
 							echo str_replace('&','; ',strip_tags($laarr[$k]));
-						//}
+						}
 						$cntb++;
 					}
 				}

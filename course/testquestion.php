@@ -10,7 +10,7 @@ require("../assessment/displayq2.php");
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Test Question";
-
+$asid = 0;
  
 	//CHECK PERMISSIONS AND SET FLAGS
 if ($myrights<20) {

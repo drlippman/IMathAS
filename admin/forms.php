@@ -97,7 +97,7 @@ switch($_GET['action']) {
 	case "modify":
 	case "addcourse":
 		if ($_GET['action']=='modify') {
-			$query = "SELECT id,name,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,topbar,cploc,available,lockaid,theme FROM imas_courses WHERE id='{$_GET['id']}'";
+			$query = "SELECT * FROM imas_courses WHERE id='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$line = mysql_fetch_array($result, MYSQL_ASSOC);
 			$courseid = $line['id'];
@@ -118,6 +118,7 @@ switch($_GET['action']) {
 			if ($topbar[1][0] == null) {unset($topbar[1][0]);}
 			$avail = $line['available'];
 			$lockaid = $line['lockaid'];
+			$ltisecret = $line['ltisecret'];
 		} else {
 			$courseid = "Not yet set";
 			$name = "Enter course name here";
@@ -132,6 +133,7 @@ switch($_GET['action']) {
 			$avail = 0;
 			$lockaid = 0;
 			$theme = "default.css";
+			$ltisecret = "";
 		}
 		if (isset($_GET['cid'])) {
 			$cid = $_GET['cid'];
@@ -283,6 +285,9 @@ switch($_GET['action']) {
 		echo ' /> Bottom of page<br /><input type=radio name="cploc" value="1" ';
 		if ($cploc==1) {echo "checked=1";}
 		echo ' /> Left side bar</span><br class=form />';
+		echo '<span class="form">LTI access secret (max 10 chars; blank to not use)</span>';
+		echo '<span class="formright"><input name="ltisecret" type="text" value="'.$ltisecret.'" />';
+		echo '</span><br class="form" />';
 		
 		echo "<div class=submit><input type=submit value=Submit></div></form>\n";
 		break;

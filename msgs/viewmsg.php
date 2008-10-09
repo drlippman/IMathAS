@@ -71,8 +71,37 @@
 	echo "</div>";
 	
 	if ($type!='sent' && $type!='allstu') {
-		echo "<a href=\"msglist.php?cid=$cid&filtercid=$filtercid&page=$page&add=new&to={$line['msgfrom']}&replyto=$msgid\">Reply</a> | ";
-		echo "<a href=\"msglist.php?cid=$cid&filtercid=$filtercid&page=$page&add=new&to={$line['msgfrom']}&toquote=$msgid\">Quote in Reply</a> | ";
+		if ($line['courseid']>0) {
+			$query = "SELECT msgset FROM imas_courses WHERE id='{$line['courseid']}'";
+			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			$msgset = mysql_result($result,0,0);
+			$msgmonitor = floor($msgset/5);
+			$msgset = $msgset%5;
+			if ($msgset<3 || $isteacher) {
+				$cansendmsgs = true;
+				if ($msgset==1 && !$isteacher) { //check if sending to teacher 
+					$query = "SELECT id FROM imas_teachers WHERE userid='{$line['msgfrom']}' and courseid='{$line['courseid']}'";
+					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+					if (mysql_num_rows($result)==0) {
+						$cansendmsgs = false;
+					}
+				} else if ($msgset==2 && !$isteacher) { //check if sending to stu
+					$query = "SELECT id FROM imas_students WHERE userid='{$line['msgfrom']}' and courseid='{$line['courseid']}'";
+					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+					if (mysql_num_rows($result)==0) {
+						$cansendmsgs = false;
+					}
+				} 
+			} else {
+				$cansendmsgs = false;
+			}
+		} else {
+			$cansendmsgs = true;
+		}
+		if ($cansendmsgs) {
+			echo "<a href=\"msglist.php?cid=$cid&filtercid=$filtercid&page=$page&add=new&to={$line['msgfrom']}&replyto=$msgid\">Reply</a> | ";
+			echo "<a href=\"msglist.php?cid=$cid&filtercid=$filtercid&page=$page&add=new&to={$line['msgfrom']}&toquote=$msgid\">Quote in Reply</a> | ";
+		}
 		echo "<a href=\"msglist.php?cid=$cid&filtercid=$filtercid&page=$page&removeid=$msgid\">Delete</a>";
 		if ($isteacher && $line['courseid']==$cid) {
 			echo " | <a href=\"$imasroot/course/gradebook.php?cid={$line['courseid']}&stu={$line['msgfrom']}\">Gradebook</a>";

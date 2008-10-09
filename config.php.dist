@@ -90,6 +90,17 @@
   //template
   //$templateuser = 10;
   
+  //For text editor file/image uploads and assessment file uploads, we can use
+  //Amazon S3 service to hold these files.  If using this option, provide your
+  //Amazon S3 key and secret below.  You'll also need to create a bucket and
+  //specify it below.
+  //Note that as of ver. 1.6, local storage of these files has not yet been 
+  //implemented.  
+  //$AWSkey = "";
+  //$AWSsecret = "";
+  //$AWSbucket = "";
+  
+  
   //no need to change anything from here on
   /* Connecting, selecting database */
   if (!isset($dbsetup)) {

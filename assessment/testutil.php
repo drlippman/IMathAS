@@ -290,6 +290,7 @@ function scorequestion($qn) {
 		$bestseeds[$qn] = $seeds[$qn];
 		$bestscores[$qn] = $scores[$qn];
 		$bestattempts[$qn] = $attempts[$qn];
+		deletefilesifnotused($bestlastanswers[$qn],$lastanswers[$qn]);
 		$bestlastanswers[$qn] = $lastanswers[$qn];
 	}
 	return $rawscore;
@@ -339,6 +340,25 @@ function recordtestdata($limit=false) {
 	}
 	
 	mysql_query($query) or die("Query failed : $query " . mysql_error());
+}
+
+function deletefilesifnotused($delfrom,$ifnothere) {
+	global $testsettings,$sessiondata, $testid;
+	if ($testsettings['isgroup']>0 && $sessiondata['groupid']>0) {
+		$s3asid = $sessiondata['groupid'];
+	} else {
+		$s3asid = $testid;
+	}
+	$outstr = '';
+	preg_match_all('/@FILE:(.+?)@/',$delfrom,$matches);
+	foreach($matches[0] as $match) {
+		if (strpos($ifnothere,$match)===false) {
+			$outstr .= $match;
+		}
+	}
+	require_once("../includes/filehandler.php");
+	deleteasidfilesfromstring($outstr,$s3asid);
+	
 }
 
 //can improve question score?

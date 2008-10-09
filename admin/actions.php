@@ -114,14 +114,16 @@ switch($_GET['action']) {
 		}
 		
 		$topbar = implode('|',$topbar);
-			
+		
 		$hideicons = $_POST['HIassess'] + $_POST['HIinline'] + $_POST['HIlinked'] + $_POST['HIforum'] + $_POST['HIblock'];
 		$avail = 3 - $_POST['stuavail'] - $_POST['teachavail'];
 		if (isset($_POST['msgmonitor'])) {
 			$_POST['msgset'] += 5;
 		}
+		$_POST['ltisecret'] = trim($_POST['ltisecret']);
+		
 		$query = "UPDATE imas_courses SET name='{$_POST['coursename']}',enrollkey='{$_POST['ekey']}',hideicons='$hideicons',available='$avail',lockaid='{$_POST['lockaid']}',picicons='{$_POST['picicons']}',";
-		$query .= "allowunenroll='{$_POST['allowunenroll']}',copyrights='{$_POST['copyrights']}',msgset='{$_POST['msgset']}',topbar='$topbar',cploc='{$_POST['cploc']}',theme='{$_POST['theme']}' WHERE id='{$_GET['id']}'";
+		$query .= "allowunenroll='{$_POST['allowunenroll']}',copyrights='{$_POST['copyrights']}',msgset='{$_POST['msgset']}',topbar='$topbar',cploc='{$_POST['cploc']}',theme='{$_POST['theme']}',ltisecret='{$_POST['ltisecret']}' WHERE id='{$_GET['id']}'";
 		if ($myrights==40) { $query .= " AND ownerid='$userid'";}
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		break;
@@ -144,9 +146,10 @@ switch($_GET['action']) {
 		if (isset($_POST['msgmonitor'])) {
 			$_POST['msgset'] += 5;
 		}
+		$_POST['ltisecret'] = trim($_POST['ltisecret']);
 		$itemorder = addslashes(serialize(array()));
-		$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,itemorder,topbar,cploc,available,theme) VALUES ";
-		$query .= "('{$_POST['coursename']}','$userid','{$_POST['ekey']}','$hideicons','{$_POST['picicons']}','{$_POST['allowunenroll']}','{$_POST['copyrights']}','{$_POST['msgset']}','$itemorder','$topbar','{$_POST['cploc']}','$avail','{$_POST['theme']}');";
+		$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,itemorder,topbar,cploc,available,theme,ltisecret) VALUES ";
+		$query .= "('{$_POST['coursename']}','$userid','{$_POST['ekey']}','$hideicons','{$_POST['picicons']}','{$_POST['allowunenroll']}','{$_POST['copyrights']}','{$_POST['msgset']}','$itemorder','$topbar','{$_POST['cploc']}','$avail','{$_POST['theme']}','{$_POST['ltisecret']}');";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		$cid = mysql_insert_id();
 		//if ($myrights==40) {
@@ -175,6 +178,19 @@ switch($_GET['action']) {
 		$query = "SELECT id FROM imas_assessments WHERE courseid='{$_GET['id']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($line = mysql_fetch_row($result)) {
+			/* work on fileupload
+			$query = "SELECT lastanswers,bestlastanswers,reviewlastanswers FROM imas_assessment_sessions WHERE assessmentid='{$line[0]}'";
+			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			while (mysql_fetch_row($result)) {
+				preg_match_all("/@FILE:([^@]+)@/",$row[0].$row[1].$row[2],$matches);
+				if (count($matches)>0) {
+					foreach($matches[1] as $file) {
+						$s3object = '/adata/'.$_GET['asid'].'/'.$file;
+						$s3->delete($s3object);
+					}
+				}
+			}
+			*/
 			$query = "DELETE FROM imas_questions WHERE assessmentid='{$line[0]}'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			$query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='{$line[0]}'";

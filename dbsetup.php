@@ -142,6 +142,7 @@ $sql = 'CREATE TABLE `imas_courses` ('
 	. ' `theme` VARCHAR(32) NOT NULL DEFAULT \'default.css\', '
 	. ' `latepasshrs` SMALLINT(4) UNSIGNED NOT NULL DEFAULT \'24\', '
 	. ' `picicons` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\','
+	. ' `ltisecret` VARCHAR(10) NOT NULL, '
 	. ' INDEX(`ownerid`), INDEX(`name`), INDEX(`available`)'
         . ' )'
         . ' TYPE = innodb'
@@ -180,6 +181,7 @@ $sql = 'CREATE TABLE `imas_assessments` ('
 	. ' `groupmax` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'6\','
 	. ' `allowlate` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'1\','
 	. ' `exceptionpenalty` TINYINT(2) UNSIGNED NOT NULL DEFAULT \'0\','
+	. ' `ltisecret` VARCHAR(10) NOT NULL, '
         . ' INDEX (`courseid`), INDEX(`startdate`), INDEX(`enddate`),'
 	. ' INDEX(`cntingb`), INDEX(`reviewdate`), INDEX(`avail`)'
         . ' )'
@@ -576,6 +578,38 @@ $sql = 'CREATE TABLE `imas_calitems` ('
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 echo 'imas_calitems created<br/>';
 
+$sql = 'CREATE TABLE `imas_ltiusers` ('
+        . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
+        . ' `org` VARCHAR(32) NOT NULL, '
+        . ' `ltiuserid` VARCHAR(32) NOT NULL, '
+        . ' `userid` INT(10) NOT NULL'
+        . ' )'
+        . ' TYPE = innodb;';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+echo 'imas_ltiusers created<br/>';
+
+$sql = 'CREATE TABLE `imas_ltiaccess` ('
+        . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
+        . ' `password` VARCHAR(32) NOT NULL, '
+        . ' `userid` INT(10) UNSIGNED NOT NULL, '
+        . ' `itemid` INT(10) UNSIGNED NOT NULL, '
+        . ' `itemtype` TINYINT(1) UNSIGNED NOT NULL, '
+        . ' `created` INT(10) UNSIGNED NOT NULL'
+        . ' )'
+        . ' TYPE = innodb;';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+echo 'imas_ltiaccess created<br/>';
+
+$sql = 'CREATE TABLE `imas_ltinonces` ('
+        . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
+        . ' `nonce` TEXT NOT NULL, '
+        . ' `time` INT(10) UNSIGNED NOT NULL'
+        . ' )'
+        . ' TYPE = innodb;';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+echo 'imas_ltinonces created<br/>';
+
+echo '
 $md5pw = md5($password);
 $now = time();
 $sql = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email) VALUES ('$username','$md5pw',100,'$firstname','$lastname','$email')";

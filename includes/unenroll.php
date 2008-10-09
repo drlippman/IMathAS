@@ -28,7 +28,8 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$unwithd
 	}
 	
 	if (count($tounenroll)>0) {
-		
+		$curdir = rtrim(dirname(__FILE__), '/\\');
+		require_once("$curdir/filehandler.php");
 		$gbitems = array();
 		$query = "SELECT id FROM imas_gbitems WHERE courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -39,6 +40,8 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$unwithd
 			$query = "DELETE FROM imas_students WHERE userid='$uid' AND courseid='$cid'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			foreach ($assesses as $aid) {
+				deleteasidfilesbyquery(array('assessmentid'=>$aid, 'userid'=>$uid));
+				
 				$query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='$aid' AND userid='$uid'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				$query = "DELETE FROM imas_exceptions WHERE assessmentid='$aid' AND userid='$uid'";

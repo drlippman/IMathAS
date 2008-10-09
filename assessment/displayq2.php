@@ -919,9 +919,13 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			} 
 			$out .= "<div class=intro>".filter($la)."</div>";
 		} else {
+			$la = stripslashes($la);
+			$la = preg_replace('/%(\w+;)/',"&$1",$la);
 			if ($displayformat=='editor' && $GLOBALS['useeditor']==1) {
-				$la = str_replace('&quot;','"',$la);
-				$la = preg_replace('/%(\w+;)/',"&$1",$la);
+				//$la = str_replace('&quot;','"',$la);
+				
+				//$la = preg_replace('/%(\w+;)/',"&$1",$la);
+				$la = htmlentities($la);
 			}
 			$out .= "<textarea rows=\"$rows\" name=\"qn$qn\" id=\"qn$qn\" ";
 			if ($displayformat=='editor' && $GLOBALS['useeditor']==1) {
@@ -1096,7 +1100,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			}
 			$sa = showplot($saarr,$settings[0],$settings[1],$settings[2],$settings[3],$scling,$scling,$settings[6],$settings[7]);
 		}
-	} /*else if ($anstype == "file") {
+	} else if ($anstype == "file") {
 		if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$qn];} else {$ansprompt = $options['ansprompt'];}}
 		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
@@ -1104,18 +1108,21 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		
 		$out .= "<input type=\"file\" name=\"qn$qn\" id=\"qn$qn\" />\n";
 		if ($la!='') {
-			if (isset($GLOBALS['asid'])) {
-				require_once("../includes/filehandler.php");
+			if (isset($GLOBALS['testsettings']) && isset($GLOBALS['sessiondata']['groupid']) && $GLOBALS['testsettings']>0 && $GLOBALS['sessiondata']['groupid']>0) {
+				$s3asid = $GLOBALS['sessiondata']['groupid'];
+			} else if (isset($GLOBALS['asid'])) {
 				$s3asid = $GLOBALS['asid'];
+			} 
+			if (!empty($s3asid)) {
+				require_once("../includes/filehandler.php");
 				$file = preg_replace('/@FILE:(.+?)@/',"$1",$la);
 				$url = getasidfileurl($s3asid,$file);
-				$out .= "<br/>Last file uploaded: <a href=\"$url\">$file</a>";
-			}
-				
+				$out .= "<br/>Last file uploaded: <a href=\"$url\" target=\"_new\">$file</a>";
+			}	
 		}
 		$tip .= "Select a file to upload";
 		$sa .= $answer;
-	}*/
+	}
 	
 	return array($out,$tip,$sa,$preview);
 }
@@ -2343,7 +2350,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			return $totscore;
 		}
 			
-	} /*else if ($anstype == "file") {
+	} else if ($anstype == "file") {
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$filename = basename($_FILES["qn$qn"]['name']);
 		$filename = preg_replace('/[^\w\.]/','',$filename);
@@ -2353,17 +2360,24 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$GLOBALS['partlastanswer'] = "Error - Invalid file type";
 			return 0;
 		}
+		if (isset($GLOBALS['testsettings']) && isset($GLOBALS['sessiondata']['groupid']) && $GLOBALS['testsettings']>0 && $GLOBALS['sessiondata']['groupid']>0) {
+			$s3asid = $GLOBALS['sessiondata']['groupid'];
+		} else if (isset($GLOBALS['asid'])) {
+			$s3asid = $GLOBALS['asid'];
+		} else {
+			$GLOBALS['partlastanswer'] = "Error - no asid";
+			return 0;
+		}
+		if ($s3asid==0) {
+			$GLOBALS['partlastanswer'] = "File not uploaded in preview";
+			return 0;
+		}
 		if (isset($GLOBALS['isreview']) && $GLOBALS['isreview']==true) {
 			$filename = 'rev-'.$filename;
 		}
 		if (is_uploaded_file($_FILES["qn$qn"]['tmp_name'])) {
 			require_once("../includes/filehandler.php");
-			if (isset($GLOBALS['asid'])) {
-				$s3asid = $GLOBALS['asid'];
-			} else {
-				$GLOBALS['partlastanswer'] = "Error - no asid";
-				return 0;
-			}
+
 			$s3object = "adata/$s3asid/$filename";
 			if (storeuploadedfile("qn$qn",$s3object)) {
 				$GLOBALS['partlastanswer'] = "@FILE:$filename@";
@@ -2378,7 +2392,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$GLOBALS['partlastanswer'] = "Error uploading file";
 			return 0;
 		}
-	}*/
+	}
 	
 }
 

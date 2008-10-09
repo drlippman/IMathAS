@@ -261,7 +261,7 @@ if ($overwriteBody==1) {
 		Description:<BR>
 		<div class=editor>
 		<textarea cols=60 rows=20 id=description name=description style="width: 100%">
-		<?php echo $line['description'];?></textarea>
+		<?php echo htmlentities($line['description']);?></textarea>
 		</div>
 		
 		<span class=form>Show:</span>

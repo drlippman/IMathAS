@@ -302,7 +302,7 @@ var cal1 = new CalendarPopup();
 	
 	Text:<BR>
 	<div class=editor>
-		<textarea cols=60 rows=20 id=text name=text style="width: 100%"><?php echo str_replace('&','&amp;',$line['text']);?></textarea>
+		<textarea cols=60 rows=20 id=text name=text style="width: 100%"><?php echo htmlentities($line['text']);?></textarea>
 	</div>
 	
 	<span class=form>

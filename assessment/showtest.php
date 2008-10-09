@@ -138,6 +138,8 @@
 			$deffeedback = explode('-',$adata['deffeedback']);
 			//removed: $deffeedback[0] == "Practice" || 
 			if ($myrights<6 || isset($teacherid)) {  // is teacher or guest - delete out out assessment session
+				require_once("../includes/filehandler.php");
+				deleteasidfilesbyquery(array('userid'=>$userid,'assessmentid'=>$aid),1);
 				$query = "DELETE FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='$aid' LIMIT 1";
 				$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/showtest.php?cid={$_GET['cid']}&id=$aid");
@@ -355,6 +357,7 @@
 		$scores[$toregen] = -1;
 		$attempts[$toregen] = 0;
 		$newla = array();
+		deletefilesifnotused($lastanswers[$toregen],$bestlastanswers[$toregen]);
 		$laarr = explode('##',$lastanswers[$toregen]);
 		foreach ($laarr as $lael) {
 			if ($lael=="ReGen") {
@@ -381,6 +384,7 @@
 					$attempts[$i] = 0;
 					$seeds[$i] = rand(1,9999);
 					$newla = array();
+					deletefilesifnotused($lastanswers[$i],$bestlastanswers[$i]);
 					$laarr = explode('##',$lastanswers[$i]);
 					foreach ($laarr as $lael) {
 						if ($lael=="ReGen") {
@@ -404,6 +408,7 @@
 				$attempts[$i] = 0;
 				$seeds[$i] = rand(1,9999);
 				$newla = array();
+				deletefilesifnotused($lastanswers[$i],$bestlastanswers[$i]);
 				$laarr = explode('##',$lastanswers[$i]);
 				foreach ($laarr as $lael) {
 					if ($lael=="ReGen") {
@@ -418,6 +423,8 @@
 				}
 			}
 		} else if ($_GET['regenall']=="fromscratch" && $testsettings['testtype']=="Practice" && !$isreview) {
+			require_once("../includes/filehandler.php");
+			deleteasidfilesbyquery(array('userid'=>$userid,'assessmentid'=>$testsettings['id']),1);
 			$query = "DELETE FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='{$testsettings['id']}' LIMIT 1";
 			$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/showtest.php?cid={$testsettings['courseid']}&id={$testsettings['id']}");

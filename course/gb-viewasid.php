@@ -2,7 +2,7 @@
 //IMathAS:  View/Edit and Question breakdown views
 //(c) 2007 David Lippman
 	require("../validate.php");
-	//require_once("../includes/filehandler.php");
+	require_once("../includes/filehandler.php");
 		
 	$isteacher = isset($teacherid);
 	$istutor = isset($tutorid);
@@ -60,9 +60,12 @@
 	//PROCESS ANY TODOS
 	if (isset($_GET['clearattempt']) && isset($_GET['asid']) && $isteacher) {
 		if ($_GET['clearattempt']=="confirmed") {
-			//deleteasidfilesbyquery(array('id'=>$_GET['asid']));
+			$qp = getasidquery($_GET['asid']);
+			deleteasidfilesbyquery(array($qp[0]=>$qp[1]),1);
+			
 			$query = "DELETE FROM imas_assessment_sessions";// WHERE id='{$_GET['asid']}'";
-			$query .= getasidquery($_GET['asid']);
+			$query .= " WHERE {$qp[0]}='{$qp[1]}'";
+			//$query .= getasidquery($_GET['asid']);
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			
 			if ($from=='isolate') {
@@ -134,13 +137,15 @@
 	}
 	if (isset($_GET['clearscores']) && isset($_GET['asid']) && $isteacher) {
 		if ($_GET['clearscores']=="confirmed") {
-			//deleteasidfilesbyquery(array('id'=>$_GET['asid']));
 			
-			$whereqry = getasidquery($_GET['asid']);
-			$query = "SELECT seeds FROM imas_assessment_sessions $whereqry";
+			//$whereqry = getasidquery($_GET['asid']);
+			$qp = getasidquery($_GET['asid']);
+			deleteasidfilesbyquery(array($qp[0]=>$qp[1]),1);
+			$whereqry = " WHERE {$qp[0]}='{$qp[1]}'";
+			$query = "SELECT seeds,lastanswers,bestlastanswers FROM imas_assessment_sessions $whereqry";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$seeds = explode(',',mysql_result($result,0,0));
-			
+				
 			$scores = array_fill(0,count($seeds),-1);
 			$attempts = array_fill(0,count($seeds),0);
 			$lastanswers = array_fill(0,count($seeds),'');
@@ -172,7 +177,9 @@
 	}
 	if (isset($_GET['clearq']) && isset($_GET['asid']) && $isteacher) {
 		if ($_GET['confirmed']=="true") {
-			$whereqry = getasidquery($_GET['asid']);
+			$qp = getasidquery($_GET['asid']);
+			$whereqry = " WHERE {$qp[0]}='{$qp[1]}'";
+			//$whereqry = getasidquery($_GET['asid']);
 			
 			$query = "SELECT attempts,lastanswers,reattempting,scores,bestscores,bestattempts,bestlastanswers FROM imas_assessment_sessions $whereqry"; //WHERE id='{$_GET['asid']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -188,7 +195,7 @@
 			
 			$clearid = $_GET['clearq'];
 			if ($clearid!=='' && is_numeric($clearid) && isset($scores[$clearid])) {
-				//deleteasidfilesfromstring($lastanswers[$clearid].$bestlastanswers[$clearid],$_GET['asid']);
+				deleteasidfilesfromstring($lastanswers[$clearid].$bestlastanswers[$clearid],$qp[1]);
 				$scores[$clearid] = -1;
 				$attempts[$clearid] = 0;
 				$lastanswers[$clearid] = '';
@@ -265,7 +272,9 @@
 			$feedback = $_POST['feedback'];
 			$query = "UPDATE imas_assessment_sessions SET bestscores='$scorelist',feedback='$feedback'";
 			if (isset($_POST['updategroup'])) {
-				$query .= getasidquery($_GET['asid']);
+				$qp = getasidquery($_GET['asid']);
+				$query .=  " WHERE {$qp[0]}='{$qp[1]}'";
+				//$query .= getasidquery($_GET['asid']);
 			} else {
 				$query .= "WHERE id='{$_GET['asid']}'";
 			}
@@ -286,7 +295,9 @@
 		echo "<style type=\"text/css\">p.tips {	display: none;}\n</style>\n";
 		if (isset($_GET['starttime']) && $isteacher) {
 			$query = "UPDATE imas_assessment_sessions SET starttime='{$_GET['starttime']}' ";//WHERE id='{$_GET['asid']}'";
-			$query .= getasidquery($_GET['asid']);
+			//$query .= getasidquery($_GET['asid']);
+			$qp = getasidquery($_GET['asid']);
+			$query .=  " WHERE {$qp[0]}='{$qp[1]}'";
 			mysql_query($query) or die("Query failed : $query " . mysql_error());
 		}
 		
@@ -337,6 +348,11 @@
 				}
 				echo "</ul></p>";
 			}	
+		}
+		if ($line['agroupid']>0) {
+			$s3asid = $line['agroupid'];
+		} else {
+			$s3asid = $asid;
 		}
 		echo "<p>Started: " . tzdate("F j, Y, g:i a",$line['starttime']) ."<BR>\n";
 		if ($line['endtime']==0) { 
@@ -561,12 +577,12 @@
 							echo ' ReGen ';
 						} else {
 							echo "  <b>$cnt:</b> " ;
-							/*if (preg_match('/@FILE:(.+?)@/',$laarr[$k],$match)) {
-								$url = getasidfileurl($asid,$match[1]);
-								echo "<a href=\"$url\">{$match[1]}</a>";
-							} else {*/
+							if (preg_match('/@FILE:(.+?)@/',$laarr[$k],$match)) {
+								$url = getasidfileurl($s3asid,$match[1]);
+								echo "<a href=\"$url\" target=\"_new\">{$match[1]}</a>";
+							} else {
 								echo str_replace('&','; ',strip_tags($laarr[$k]));
-							//}
+							}
 							$cnt++;
 						}
 					}
@@ -715,9 +731,11 @@ function getasidquery($asid) {
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$agroupid = mysql_result($result,0,0);
 	if ($agroupid>0) {
-		return (" WHERE agroupid='$agroupid'");
+		return array('agroupid',$agroupid);
+		//return (" WHERE agroupid='$agroupid'");
 	} else {
-		return (" WHERE id='$asid' LIMIT 1");
+		return array('id',$asid);
+		//return (" WHERE id='$asid' LIMIT 1");
 	}
 }
 function isasidgroup($asid) {

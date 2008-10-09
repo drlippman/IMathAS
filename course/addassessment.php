@@ -53,6 +53,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	
 	if (isset($_GET['clearattempts'])) { //FORM POSTED WITH CLEAR ATTEMPTS FLAG
 		if ($_GET['clearattempts']=="confirmed") {
+			require_once('../includes/filehandler.php');
+			deleteasidfilesbyquery(array('assessmentid'=>$_GET['id']));
+			
 			$query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='{$_GET['id']}'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			$query = "UPDATE imas_questions SET withdrawn=0 WHERE assessmentid='{$_GET['id']}'";
@@ -144,6 +147,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if ($_POST['deffeedback']=="Practice") {
 			$_POST['cntingb'] = $_POST['pcntingb'];
 		}
+		$_POST['ltisecret'] = trim($_POST['ltisecret']);
 		require_once("../includes/htmLawed.php");
 		$htmlawedconfig = array('elements'=>'*-script');
 		$_POST['summary'] = addslashes(htmLawed(stripslashes($_POST['summary']),$htmlawedconfig));
@@ -158,12 +162,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			if (isset($_POST['defpoints'])) {
 				$query = "UPDATE imas_assessments SET name='{$_POST['name']}',summary='{$_POST['summary']}',intro='{$_POST['intro']}',startdate=$startdate,enddate=$enddate,reviewdate=$reviewdate,timelimit='$timelimit',minscore='{$_POST['minscore']}',isgroup='$isgroup',showhints='$showhints',";
 				$query .= "displaymethod='{$_POST['displaymethod']}',defpoints='{$_POST['defpoints']}',defattempts='{$_POST['defattempts']}',defpenalty='{$_POST['defpenalty']}',deffeedback='$deffeedback',shuffle='$shuffle',gbcategory='{$_POST['gbcat']}',password='{$_POST['password']}',";
-				$query .= "cntingb='{$_POST['cntingb']}',showcat='{$_POST['showqcat']}',reqscore='{$_POST['reqscore']}',reqscoreaid='{$_POST['reqscoreaid']}',noprint='{$_POST['noprint']}',avail='{$_POST['avail']}',groupmax='{$_POST['groupmax']}',allowlate='{$_POST['allowlate']}',exceptionpenalty='{$_POST['exceptionpenalty']}' ";
+				$query .= "cntingb='{$_POST['cntingb']}',showcat='{$_POST['showqcat']}',reqscore='{$_POST['reqscore']}',reqscoreaid='{$_POST['reqscoreaid']}',noprint='{$_POST['noprint']}',avail='{$_POST['avail']}',groupmax='{$_POST['groupmax']}',allowlate='{$_POST['allowlate']}',exceptionpenalty='{$_POST['exceptionpenalty']}',ltisecret='{$_POST['ltisecret']}' ";
 				$query .= "WHERE id='{$_GET['id']}';";
 			} else { //has been taken - not updating "don't change" settings
 				$query = "UPDATE imas_assessments SET name='{$_POST['name']}',summary='{$_POST['summary']}',intro='{$_POST['intro']}',startdate=$startdate,enddate=$enddate,reviewdate=$reviewdate,timelimit='$timelimit',minscore='{$_POST['minscore']}',isgroup='$isgroup',showhints='$showhints',";
 				$query .= "displaymethod='{$_POST['displaymethod']}',defattempts='{$_POST['defattempts']}',deffeedback='$deffeedback',shuffle='$shuffle',gbcategory='{$_POST['gbcat']}',password='{$_POST['password']}',cntingb='{$_POST['cntingb']}',showcat='{$_POST['showqcat']}',";
-				$query .= "reqscore='{$_POST['reqscore']}',reqscoreaid='{$_POST['reqscoreaid']}',noprint='{$_POST['noprint']}',avail='{$_POST['avail']}',groupmax='{$_POST['groupmax']}',allowlate='{$_POST['allowlate']}',exceptionpenalty='{$_POST['exceptionpenalty']}' ";
+				$query .= "reqscore='{$_POST['reqscore']}',reqscoreaid='{$_POST['reqscoreaid']}',noprint='{$_POST['noprint']}',avail='{$_POST['avail']}',groupmax='{$_POST['groupmax']}',allowlate='{$_POST['allowlate']}',exceptionpenalty='{$_POST['exceptionpenalty']}',ltisecret='{$_POST['ltisecret']}' ";
 				$query .= "WHERE id='{$_GET['id']}';";
 			}
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -178,11 +182,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else { //add new
 									
 			$query = "INSERT INTO imas_assessments (courseid,name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,";
-			$query .= "displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,showcat,isgroup,groupmax,showhints,reqscore,reqscoreaid,noprint,avail,allowlate,exceptionpenalty) VALUES ";
+			$query .= "displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,showcat,isgroup,groupmax,showhints,reqscore,reqscoreaid,noprint,avail,allowlate,exceptionpenalty,ltisecret) VALUES ";
 			$query .= "('$cid','{$_POST['name']}','{$_POST['summary']}','{$_POST['intro']}',$startdate,$enddate,$reviewdate,'$timelimit','{$_POST['minscore']}',";
 			$query .= "'{$_POST['displaymethod']}','{$_POST['defpoints']}','{$_POST['defattempts']}',";
 			$query .= "'{$_POST['defpenalty']}','$deffeedback','$shuffle','{$_POST['gbcat']}','{$_POST['password']}','{$_POST['cntingb']}','{$_POST['showqcat']}',";
-			$query .= "'$isgroup','{$_POST['groupmax']}','$showhints','{$_POST['reqscore']}','{$_POST['reqscoreaid']}','{$_POST['noprint']}','{$_POST['avail']}','{$_POST['allowlate']}','{$_POST['exceptionpenalty']}');";
+			$query .= "'$isgroup','{$_POST['groupmax']}','$showhints','{$_POST['reqscore']}','{$_POST['reqscoreaid']}','{$_POST['noprint']}','{$_POST['avail']}','{$_POST['allowlate']}','{$_POST['exceptionpenalty']}','{$_POST['ltisecret']}');";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			
 			$newaid = mysql_insert_id();
@@ -270,6 +274,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$line['groupmax'] = 6;
 			$line['allowlate'] = 1;
 			$line['exceptionpenalty'] = 0;
+			$line['ltisecret'] = '';
 			$gbcat = 0;
 			$cntingb = 1;
 			$pcntingb = 3;
@@ -421,11 +426,11 @@ if ($overwriteBody==1) {
 	
 		Summary:<BR>
 		<div class=editor>
-			<textarea cols=50 rows=15 id=summary name=summary style="width: 100%"><?php echo $line['summary'];?></textarea>
+			<textarea cols=50 rows=15 id=summary name=summary style="width: 100%"><?php echo htmlentities($line['summary']);?></textarea>
 		</div><BR>
 		Intro/Instructions:<BR>
 		<div class=editor>
-			<textarea cols=50 rows=20 id=intro name=intro style="width: 100%"><?php echo $line['intro'];?></textarea>
+			<textarea cols=50 rows=20 id=intro name=intro style="width: 100%"><?php echo htmlentities($line['intro']);?></textarea>
 		</div><BR>
 	
 		<span class=form>Show:</span>
@@ -653,6 +658,10 @@ if ($overwriteBody==1) {
 				<input name="showqcat" type="radio" value="0" <?php writeHtmlChecked($showqcat,"0"); ?>>No <br />
 				<input name="showqcat" type="radio" value="1" <?php writeHtmlChecked($showqcat,"1"); ?>>In Points Possible bar <br />
 				<input name="showqcat" type="radio" value="2" <?php writeHtmlChecked($showqcat,"2"); ?>>In navigation bar (Skip-Around only)
+			</span><br class="form" />
+			<span class="form">LTI access secret (max 10 chars; blank to not use)</span>
+			<span class="formright">
+				<input name="ltisecret" type="text" value="<?php echo $line['ltisecret'];?>" />
 			</span><br class="form" />
 			
 			</fieldset>
