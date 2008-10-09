@@ -57,54 +57,6 @@ if ($sessiondata['graphdisp']==1) {
 <?php
 echo "<script type=\"text/javascript\">imasroot = '$imasroot';</script>";
 if ($useeditor==1 && $sessiondata['useed']==1) {
-	/*
-	echo <<<END
-	<script type="text/javascript">
-	  _editor_url = "$imasroot/course/editor";
-	  _imasroot = "$imasroot/";
-	  _editor_lang = "en";
-	</script>
-	<script type="text/javascript" src="$imasroot/course/editor/htmlarea.js"></script>
-	<script type="text/javascript">
-END;
-	if (!isset($sessiondata['mathdisp']) || $sessiondata['mathdisp']==1 || $sessiondata['mathdisp']==2) {
-	 echo 'HTMLArea.loadPlugin("AsciiMath");';
-	} 
-	if (!isset($sessiondata['graphdisp']) || $sessiondata['graphdisp']==1) {
-	 echo 'HTMLArea.loadPlugin("AsciiSvg");';
-	 echo 'var svgimgbackup = false;';
-	} else if ($sessiondata['graphdisp']==2) {
-	 echo 'HTMLArea.loadPlugin("AsciiSvg");';
-	 echo 'var svgimgbackup = true;';
-	}
-	 echo 'var AScgiloc ="'.$imasroot.'/filter/graph/svgimg.php";'; 
-	echo <<<END
-	</script>
-	
-	<script type="text/javascript">
-	var editor = new Array();
-	var editornames = new Array();
-	function initEditor() {
-		for (i=0;i<editornames.length;i++) {
-			editor[i] = new HTMLArea(editornames[i]);
-			editor[i].config.hideSomeButtons(" popupeditor lefttoright righttoleft htmlmode ");
-END;
-	if (!isset($sessiondata['mathdisp']) || $sessiondata['mathdisp']==1 || $sessiondata['mathdisp']==2) {
-		echo "editor[i].registerPlugin(AsciiMath);\n";
-		//surrounds AsciiMath in red box while editting.  Change to your liking
-		echo "editor[i].config.pageStyle = \"span.AMedit {border:solid 1px #ff0000}\";\n";
-		echo "editor[i].config.toolbar[1].push(\"separator\",\"insertnewmath\",\"insertmath\",\"swapmathmode\");\n";
-	}
-	if (!isset($sessiondata['graphdisp']) || $sessiondata['graphdisp']==1 || $sessiondata['graphdisp']==2) {
-		echo "editor[i].registerPlugin(AsciiSvg);\n";
-		echo "editor[i].config.toolbar[1].push(\"separator\",\"insertsvg\");\n";
-	}
-	echo "editor[i].generate();\n";
-	echo "}";
-	echo "return false; }; </script>";
-} else {
-	echo "<script>var editornames = new Array(); function initEditor() { };</script>";
-	*/
 echo <<<END
 <script type="text/javascript" src="$imasroot/editor/tiny_mce.js"></script>
 
@@ -124,11 +76,41 @@ tinyMCE.init({
     theme_advanced_resizing : true,
     AScgiloc : '$imasroot/filter/graph/svgimg.php',
     ASdloc : '$imasroot/javascript/d.svg'
+END;
+if (isset($AWSkey)) {
+echo <<<END
+    ,file_browser_callback : "fileBrowserCallBack"
 });
+function fileBrowserCallBack(field_name, url, type, win) {
+	var connector = "$imasroot/editor/file_manager.php";
+	my_field = field_name;
+	my_win = win;
+	switch (type) {
+		case "image":
+			connector += "?type=img";
+			break;
+		case "media":
+			connector += "?type=media";
+			break;
+		case "file":
+			connector += "?type=files";
+			break;
+	}
+	window.open(connector, "file_manager", "modal,width=450,height=440,scrollbars=1");
+}
+END;
+} else {
+	echo "});";
+}
+echo <<<END
 </script>
+<!-- /TinyMCE -->
+
+</head>
+<body>
 
 END;
-	
+
 }
 ?>
 

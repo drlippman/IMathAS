@@ -2,6 +2,7 @@
 //IMathAS:  View/Edit and Question breakdown views
 //(c) 2007 David Lippman
 	require("../validate.php");
+	//require_once("../includes/filehandler.php");
 		
 	$isteacher = isset($teacherid);
 	$istutor = isset($tutorid);
@@ -59,7 +60,7 @@
 	//PROCESS ANY TODOS
 	if (isset($_GET['clearattempt']) && isset($_GET['asid']) && $isteacher) {
 		if ($_GET['clearattempt']=="confirmed") {
-			
+			//deleteasidfilesbyquery(array('id'=>$_GET['asid']));
 			$query = "DELETE FROM imas_assessment_sessions";// WHERE id='{$_GET['asid']}'";
 			$query .= getasidquery($_GET['asid']);
 			mysql_query($query) or die("Query failed : " . mysql_error());
@@ -133,6 +134,8 @@
 	}
 	if (isset($_GET['clearscores']) && isset($_GET['asid']) && $isteacher) {
 		if ($_GET['clearscores']=="confirmed") {
+			//deleteasidfilesbyquery(array('id'=>$_GET['asid']));
+			
 			$whereqry = getasidquery($_GET['asid']);
 			$query = "SELECT seeds FROM imas_assessment_sessions $whereqry";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -185,6 +188,7 @@
 			
 			$clearid = $_GET['clearq'];
 			if ($clearid!=='' && is_numeric($clearid) && isset($scores[$clearid])) {
+				//deleteasidfilesfromstring($lastanswers[$clearid].$bestlastanswers[$clearid],$_GET['asid']);
 				$scores[$clearid] = -1;
 				$attempts[$clearid] = 0;
 				$lastanswers[$clearid] = '';
@@ -556,7 +560,13 @@
 						if ($laarr[$k]=="ReGen") {
 							echo ' ReGen ';
 						} else {
-							echo "  <b>$cnt:</b> " . strip_tags($laarr[$k]);
+							echo "  <b>$cnt:</b> " ;
+							/*if (preg_match('/@FILE:(.+?)@/',$laarr[$k],$match)) {
+								$url = getasidfileurl($asid,$match[1]);
+								echo "<a href=\"$url\">{$match[1]}</a>";
+							} else {*/
+								echo str_replace('&','; ',strip_tags($laarr[$k]));
+							//}
 							$cnt++;
 						}
 					}

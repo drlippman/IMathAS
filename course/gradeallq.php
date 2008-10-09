@@ -157,6 +157,7 @@
 	$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
 	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 	$cnt = 0;
+	//require_once("../includes/filehandler.php");
 	while($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 		$asid = $line['id'];
 		$questions = explode(',',$line['questions']);
@@ -241,7 +242,13 @@
 					if ($laarr[$k]=="ReGen") {
 						echo ' ReGen ';
 					} else {
-						echo "  <b>$cntb:</b> " . $laarr[$k];
+						echo "  <b>$cntb:</b> " ;
+						/*if (preg_match('/@FILE:(.+?)@/',$laarr[$k],$match)) {
+							$url = getasidfileurl($asid,$match[1]);
+							echo "<a href=\"$url\">{$match[1]}</a>";
+						} else {*/
+							echo str_replace('&','; ',strip_tags($laarr[$k]));
+						//}
 						$cntb++;
 					}
 				}
