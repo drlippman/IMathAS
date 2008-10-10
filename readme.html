@@ -17,13 +17,20 @@ h2,h3,h4 {
 </style>
 <body>
 <h1>IMathAS</h1>
-<p>Version: 1.5.  See <a href="changelog.html">Change Log</a> for detailed change history.</p>
+<p>Version: 1.6.   Released   2008 <br/>
+See <a href="changelog.html">Change Log</a> for detailed change history.</p>
 
 <h3>What is IMathAS</h3>
-<p>IMathAS is an Internet Mathematics Assessment System.  In essence, it is a very light
-Course Management System (CMS), most similar to (and inspired by) <a href="http://webwork.math.rochester.edu/">WebWork</a> 
-and <a href="http://wims.unice.fr/">WIMS</a>, and similar to publisher-produced systems 
-like iLrn, MathXL, etc.</p>
+<p>IMathAS is an Internet Mathematics Assessment System. It is primarily a 
+web-based math assessment tool for delivery and automatic grading of math homework 
+and tests. Questions are algorithmically generated and numerical and math expression
+answers can be computer graded. Beyond that, IMathAS includes learning management tools, 
+including posting of announcements, text files, and attachments, as well as discussion 
+forums and a full gradebook. In postings and assessments, IMathAS allows accurate display 
+of math and graphs, with simple calculator-style math entry and point-and-click graph 
+creation.   It is most similar to (and inspired by) <a href="http://webwork.math.rochester.edu/">WebWork</a> 
+and <a href="http://wims.unice.fr/">WIMS</a>, and similar to commercial and publisher-produced systems 
+like iLrn, MathXL, WebAssign, etc.</p>
 
 <p>IMathAS was written by <a href="http://www.pierce.ctc.edu/dlippman">David Lippman</a> (c) 2006-2008, and is distributed under
 the <a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>.  See the license.txt file distributed with IMathAS for more details
@@ -80,7 +87,7 @@ and credits for components attributed to others.</p>
 	<li>Group assessments</li>
 	<li>Expandable question language, by installing additional macros</li>
 	</ul>
-<li>Other Course Features</li>
+<li>Other Course Features:</li>
 	<ul>
 	<li>Post text items, uploaded files, or web links to the classroom</li>
 	<li>Discussion Forums, optionally gradable </li>
@@ -93,28 +100,28 @@ and credits for components attributed to others.</p>
 	<li>Teachers can be grouped by school or other division, with one or more group administrators</li>
 	<li>Courses can have one or more teachers</li>
 	</ul>
+<li>Mash-ups:</li>
+	<ul>
+	<li>Experimental support for <a href="http://simplelti.appspot.com/">SimpleLTI</a>, both as a consumer and producer</li>
+	<li>Experimental Google gadget for listing messages and forum posts</li>
+	<li>
+	</ul>
 </ul>
 
 <h4>Details</h4>
-For details on how the system works, look over the <a href="help.html">Help File</a>
+For details on how the system works, look over the <a href="help.html">Help File</a> or view
+<a href="http://www.imathas.com/support.html">training and support</a> resources.
 
 <h3>Why a new system</h3>
-<p>You may be wondering why another system, when excellent systems already exist, or 
-why this wasn't designed as a BlackBoard Building Block or Moodle Module.  The answers
-are actually pretty simple, and based on pure practicality.</p>
+<p>You may be wondering why another system, when excellent systems already exist.</p>
 
 <p>For my purposes, WebWork and WIMS were too difficult to install (since I don't have direct 
-access to my school's webserver).</p>
+access to my school's webserver).  I didn't want to use commercial or publisher produced systems
+because I don't want students with used books to incur additional cost.</p>
 
-<p>I didn't write it as a Moodle Module because my school doesn't have Moodle installed.  I
-didn't write it as a BlackBoard Building Block because my school doesn't have the Enterprise
-version of BlackBoard.  Certainly IMathAS could be integrated with Moodle or BlackBoard, and
-I encourage anyone with a development server and the know-how to take it on.</p>
 
 <h3>Installation</h3>
-Beginning with version 1.2, IMathAS is distributed in the configuration including a fancier 
-login page and some information pages. The loginpage and info header will need to be editted 
-to work with your install if you want to use them. 
+
 <ol>
 <li>Download IMathAS, unzip it, and copy the directory to your webserver</li>
 <li>Change permissions (chmod) of the following directories to allow the webserver process
@@ -181,12 +188,10 @@ to work with your install if you want to use them.
 <li>If you plan to use the new instructor account request page, edit newinstructor.php</li>
 </ol>
 
-<h3>Answers to IT's questions</h3>
+<h3>System Requirements</h3>
 <h4>Versions</h4>
-The system should work with version 4.2.0 or higher of PHP.  It has been tested
-on PHP5 and PHP4.2.2.  PHP5 does not have MySQL support enabled by default, but
-needs to be enabled for IMathAS.  The system has been tested with MySQL 3.23, but 4+ is recommended.  IMathAS
-uses the mysql_ library of PHP, not the mysqli_ library.
+PHP 5 and MySQL 4+ are recommended.  Most of the system will work with PHP 4.2+
+and MySQL 3.23, but future compatibility is not guaranteed.
 
 <h4>CPU Use</h4>
 <p>A standard student session consisting of completing a 10 question assessment with a few reattempts 
@@ -194,8 +199,7 @@ then checking the gradebook will use about 2 cpu seconds total.  An installation
 with 80+ concurrent users has operated well on a commercial shared web server.</p>
 
 <h4>Security</h4>
-<p>IMathAS uses a standard databased-stored sessions-based system.  Only the userid is stored
-in the session cookie; rights are always looked up from the database.  If a user does
+<p>IMathAS uses a standard databased-stored sessions-based system.  If a user does
 not log out, the session is cleared from database after 24 hours.</p>
 
 <p>Questions (written by teachers) are passed through an interpreter that only allows 
@@ -205,9 +209,5 @@ JavaScript, and are never evaled server-side.</p>
 <p>Macro Libraries (PHP function libraries that can be used in writing questions) 
 can only be installed by full Admins in IMathAS.  The option allowing install can be 
 disabled in the config.php file</p>
-
-<p>All user input stored in the database is passed through add_slashes (or magic_quotes is used, if enabled)
-to prevent SQL injection attacks</p>
-
 </body>
 </html>

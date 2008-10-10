@@ -1,6 +1,12 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
-<Module>
-  <ModulePrefs title="WAMAP.org Messages and Posts" scrolling="true"/>
+<?php
+header('content-type: text/xml'); 
+echo '<?xml version="1.0" encoding="UTF-8" ?>'."\n";
+echo '<Module>';
+$dbsetup = true;
+include("config.php");
+?>
+
+  <ModulePrefs title="<?php echo $installname?> Messages and Posts" scrolling="true"/>
   <UserPref name="showlimit" 
      display_name="Show from courses I "
      datatype="enum"
@@ -27,7 +33,7 @@ function displayInfo() {
 	  if (key=='') {
 	     _gel("content_div").innerHTML = "<i>Edit settings and supply an Access Key.</i>";
 	  }
-          var url = 'http://www.wamap.org/getxml.php?key=' + key + '&limit=' + showlimit;
+          var url = 'http://<?php echo $_SERVER['HTTP_HOST'].$imasroot?>/getxml.php?key=' + key + '&limit=' + showlimit;
 	  
       _IG_FetchXmlContent(url, function (response) {
          if (response == null || typeof(response) != "object" || response.firstChild == null) {
@@ -40,7 +46,7 @@ function displayInfo() {
 	// Set the style for the title>.
 	
 	//html +="<div style='text-align:center; font-size: 90%; color: black; font-weight: 700;'>";     
-	//html += "WAMAP messages and posts</div>";
+	//html += "<?php echo $installname;?> messages and posts</div>";
 	
 	// Set style for msg notice.
 	html += "<div style='text-align:left;font-size:80%;background-color: #ff9;'>";     

@@ -82,6 +82,7 @@ switch($_GET['action']) {
 			echo "edit a question (that's not yours) in an assessment.  You can elect to have all templated questions ";
 			echo "be assigned to this library.</p>";
 		}
+		echo '<p><a href="forms.php?action=googlegadget">Get Google Gadget</a> to monitor your messages and forum posts</p>';
 		echo "</form>\n";
 		break;
 	case "unenroll":
@@ -130,11 +131,11 @@ switch($_GET['action']) {
 		echo "the gadget to your iGoogle page, then use the Access key below in the settings ";
 		echo "to gain access to your data</p>";
 		
-		echo '<p>Add to iGoogle: <a href="http://fusion.google.com/add?source=atgs&moduleurl=http%3A//'.$_SERVER['HTTP_HOST'].$imasroot.'/wamap-postreader.xml"><img src="http://gmodules.com/ig/images/plus_google.gif" border="0" alt="Add to Google"></a></p>';
+		echo '<p>Add to iGoogle: <a href="http://fusion.google.com/add?source=atgs&moduleurl=http%3A//'.$_SERVER['HTTP_HOST'].$imasroot.'/google-postreader.php"><img src="http://gmodules.com/ig/images/plus_google.gif" border="0" alt="Add to Google"></a></p>';
 		echo "<p>Access Code: $code</p>";
 		echo "<p><a href=\"forms.php?action=googlegadget&regen=true\">Generate a new Access code<a/><br/>";
 		echo "<p><a href=\"actions.php?action=googlegadget&clear=true\">Clear Access code</a></p>";
-		echo "<p>Note: This access code only allows Google to access a list of new posts and messages, and does not provide access to grades or any other data stored at $installname.  Be aware that this form of access is insecure and could be compromised by a third party</p>";
+		echo "<p>Note: This access code only allows Google to access a list of new posts and messages, and does not provide access to grades or any other data stored at $installname.  Be aware that this form of access is insecure and could be intercepted by a third party.</p>";
 		break;
 }
 	require("footer.php");

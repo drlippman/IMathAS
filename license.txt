@@ -1,7 +1,7 @@
 *********************************************************
 **   Internet Mathematics Assessment System (IMathAS)  ** 
 **   (c) David Lippman, 2006-2008		       **
-**   Version 1.5, Feb 21, 2008		       	       **
+**   Version 1.6,        , 2008		       	       **
 *********************************************************
 
 See readme.html for installation information.
@@ -27,23 +27,19 @@ It is my interpretation of the GPL (in the spirit of free software) that
 installers should not charge end-users (students) for access to IMathAS 
 beyond reasonable hosting costs.   
 
-IMathAS makes use of several components.  Not all these components are
-under the GPL license.  If you know of (good) alternatives that are
-available under a GPL-compatible license, let me know.
-
 IMathAS makes use of:
 ASCIIMathML and ASCIIsvg 
 (c) Peter Jipsen http://www.chapman.edu/~jipsen
 GPL License
 
-HTMLArea 
-(c) 2002-2004, interactivetools.com, inc.
-(c) 2003-2004 dynarch.com
-HTMLArea License (based on BSD License)
+TinyMCE
+(c) 2003-2008 Moxiecode Systems AB
+LGPL License
 
-AsciiMath and AsciiSvg Plugins for HTMLArea
-(c) Peter Jipsen and David Lippman
-HTMLArea License (based on BSD License)
+AsciiMath and AsciiSvg Plugins for TinyMCE
+(c) David Lippman
+Based on code by David Lippman and Peter Jipsen
+LGPL License
 
 CalendarPopup
 (c) Matt Kruse http://www.mattkruse.com/
@@ -78,7 +74,7 @@ Code available on request to drlippman@yahoo.com
 
 Documentation Guides
 (c) David Lippman.  Created with development grant support from the 
-WA State Distance Learning Council
+WA State Distance Learning Council and the Transition Math Project
 
 
 
