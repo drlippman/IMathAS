@@ -419,18 +419,6 @@ function xclean($exp) {
 function polyclean($exp) {
 	$exp = clean($exp);
 	
-//	$exp = preg_replace('/^([a-zA-Z])\^0/','1',$exp);
-//	$exp = preg_replace('/(\d)\*?([a-zA-Z])\^0$/',"$1",$exp);
-//	$exp = preg_replace('/(\d)\*?([a-zA-Z])\^0([^\d\.])/',"$1$3",$exp);
-//	$exp = preg_replace('/([^\d])\*?([a-zA-Z])\^0$/',"$1 1",$exp);
-//	$exp = preg_replace('/([^\d])\*?([a-zA-Z])\^0([^\d\.])/',"$1 1 $3",$exp);
-//	$exp = preg_replace('/^0\s*\*?[^\+\-]*\+?/','',$exp);
-//	$exp = preg_replace('/[\+\-]\s*0\s*\*?[^\+\-]*/','',$exp);
-//	$exp = preg_replace('/^1\s*\*?([a-zA-Z])/',"$1",$exp);
-//	$exp = preg_replace('/([^\d\^\.])1\s*\*?([a-zA-Z\(])/',"$1$2",$exp);
-//	$exp = preg_replace('/\^1([^\d])/',"$1",$exp);
-//	$exp = preg_replace('/\^1$/','',$exp);
-	
 	$i = 0;
 	$outstr = '';
 	$p = 0;
@@ -877,11 +865,7 @@ function sortarray($a) {
 }
 
 
-function consecutive($min,$max) {
-	if (func_num_args()>2) {
-		$step = func_get_arg(2);
-	} else {$step = 1;}
-	
+function consecutive($min,$max,$step=1) {
 	for ($i=$min;$i<$max+$step/100.0;$i+=$step) {
 		$a[] = $i;
 	}
@@ -902,22 +886,7 @@ function lcm($n, $m) //least common multiple
 } 
 
 function dispreducedfraction($n,$d,$dblslash=false) {
-	$g = gcd($n,$d);
-	$n = $n/$g;
-	$d = $d/$g;	
-	if ($d<0) {
-		$n = $n*-1;
-		$d = $d*-1;
-	}
-	if ($d==1) {
-		return "`$n`";
-	} else {
-		if ($dblslash) {
-			return "`$n//$d`";
-		} else {
-			return "`$n/$d`";
-		}
-	}
+	return '`'.makereducedfraction($n,$d,$dblslash).'`';
 }
 
 function makereducedfraction($n,$d,$dblslash=false) {

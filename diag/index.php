@@ -208,6 +208,7 @@ if (isset($_POST['SID'])) {
 </head>
 <body>
 */
+//allow custom login page for specific diagnostics
 if (file_exists("diag$diagid.php")) {
 	require("diag$diagid.php");
 } else {

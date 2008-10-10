@@ -203,9 +203,9 @@ Create a new course by clicking the &quot;Add New Course&quot; button.
 <h3><a name="coursecreationsettings">Course Creation Settings</a></h3>
 
 <p>When you add a new course or click the &quot;Modify&quot; link next to a course name,
-enter the course name and an enrollment key.  The enrollment key should be
-given to students, and will be required for them to enroll in this course, along with the Course ID, which for new
-courses will display when you return to the Admin page.</p>
+enter the course name and an enrollment key.  If you are allowing students to self-enroll then the enrollment key should be
+given to students, and will be required for them to enroll in this course, along with the Course ID.  
+For new courses, the course ID will display when you return to the Admin page.</p>
 
 <p>Other option:
 <ul>
@@ -213,6 +213,7 @@ courses will display when you return to the Admin page.</p>
   home page</li>
 <li><b>Lock for Assessment</b>:  Shuts down access to the course except for the specified assessment.  Intended for
   in-class testing situations.</li>
+<li><b>Theme</b>:  Change the look and feel of your course</li>
 <li><b>Icons:</b>  Whether to display icons next to different course items.</li>
 <li><b>Allow self un-enroll</b>:  Whether students should be able to unenroll themselves from your course (usually NO is 
 the best choice, so students can't accidentally delete their scores)</li>
@@ -225,6 +226,7 @@ want to enable.  This allows you restrict who, if anyone, the student can send m
 <li><b>Instructor Quick-Pick Top Bar</b>:  What items, if any, to have in a bar at the top of the instructor's course page</li>
 <li><b>Instructor Course Management Links</b>:  Whether to have course management links at the bottom or along the
   left side of the instructor's course page</li>
+<li><b>LTI access secret</b>:  A secret code to allow placement of your course into a SimpleLTI consumer.</li>
 </ul>
 
 </div>
@@ -232,7 +234,8 @@ want to enable.  This allows you restrict who, if anyone, the student can send m
 <h3><a name="addingteachers">Adding Teachers</a></h3>
 
 After creating a course, click the &quot;Add/Remove Teachers&quot; link after the course
-name.  Here you can add or remove users authorized as a teacher for this course.
+name.  Here you can add or remove users authorized as a teacher for this course.  Only Group and
+full Admins have rights to add/remove teachers.
 
 </div>
 <div class=h3>
@@ -641,7 +644,8 @@ For Forum items, you will asked to provide:
 <li><b>Available after</b>:  The first date for the item to display to students</li>
 <li><b>Available until</b>:  The last date for the item to display to students</li>
 <li><b>Group linked</b>:  If you have a group assessment, you can link the forum to the groups of that assessment.  If you do this,
-   students viewing the forum will only see posts from their group members and instructors</li>
+   students viewing the forum will only see posts from their group members and instructors. Be aware that posts to group linked
+   forums often won't trigger the red "New Posts" flag on the home page.</li>
 <li><b>Allow anonymous posts</b>:  Whether you want to allow students to post anonymously</li>
 <li><b>Allow students to modify posts</b>:  Whether you want students to be able to modify their posts</li>
 <li><b>Email notify</b>:  Whether you want to receive an email whenever a new post is made on the forum</li>
@@ -702,7 +706,9 @@ assessment in the course page.
 <li><b>Password</b>:  If specified, requires student to enter this password to access the assessment.  Leave blank to require no password.</li>
 <li><b>Time Limit</b>:  The time limit, in minutes, for the test (0 for none).  If the student exceeds the 
    time limit, their test will be recorded, and you can decide whether or not
-   to accept it in the gradebook detail.  Partial minutes are possible using decimal values.</li>
+   to accept it in the gradebook detail.  Partial minutes are possible using decimal values.  If you check the 
+   "Kick student out at timelimit" box, then the assessment will automatically finalize at the timelimit, and submission
+   attempts after the timelimit will be rejected.</li>
 <li><b>Display method</b>:</li>
 	<ul>
 	<li><b>Full test at once</b>:  All questions are displayed on one page</li>
@@ -774,6 +780,7 @@ students request a similar problem, different students will receive different ve
 <li><b>Is group assessment?</b>: Allows students to specify group members for the assignment.  All group members will receive the same score for the assignment</li>
 <li><b>Show question categories?</b>:  If you plan to categorize questions and would like the categories displayed while the student is taking the test, you can
  select that option here</li>
+<li><b>LTI access secret</b>:  An access code to place this assessment in a SimpleLTI-compliant consumer.</li>
 </ul>
 
 </div>
@@ -1136,6 +1143,10 @@ To add an offline grade, click the "Add Offline Grade" link on the gradebook pag
 You can edit these settings or edit all students' grades at a later time by clicking the "Average" in the gradebook for this item. 
 You can edit an individual student's grade by clicking on their score in the gradebook for this item.  You can leave feedback for
 students about their grade using the boxes provided.</p>
+
+<p>You can manage offline grades by clicking the "Offline Grades: Manage" link on the gradebook page.  This page
+allows you to delete, change the availability, or change the gradebook assignment of a set of
+offline grade items.</p>
 
 </div>
 <div class=h3>
@@ -1513,7 +1524,7 @@ These macros are fairly general purpose:
 <li><b>calconarray(array,calculation)</b>:  Returns an array, performing the given calculation on each element of the given array.  Use
     "x" as the variable to represent each element of the array.  Example: $b = calconarray($a,"x^2") will create an array that is the
     square each element of the array $a.</li>
-<li><b>calconarray(array,calculation,ifcondition)</b>:  Like calconarray, but allows you to specify a condition for each element for whether to
+<li><b>calconarrayif(array,calculation,ifcondition)</b>:  Like calconarray, but allows you to specify a condition for each element for whether to
     do the calculation.  Example:  $b = calconarray($a,"x+.1","floor(x)==x") will add .1 to add whole numbers in the array, and leave the 
     other elements unchanged.</li>
 <li><b>subarray(array,params)</b>:  Creates a new array as a subset of the specified array.  The params can take several forms:

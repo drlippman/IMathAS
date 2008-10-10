@@ -19,6 +19,14 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	$body = "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$cid = $_GET['cid'];
+	
+	if (isset($teacherid) && isset($sessiondata['sessiontestid'])) {
+		//clean up coming out of an assessment
+		require_once("../includes/filehandler.php");
+		deleteasidfilesbyquery(array('id'=>$sessiondata['sessiontestid']),1);
+		$query = "DELETE FROM imas_assessment_sessions WHERE id='{$sessiondata['sessiontestid']}' LIMIT 1";
+		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());		
+	}
    
 	if (isset($teacherid) && isset($_GET['from']) && isset($_GET['to'])) {
 		$from = $_GET['from'];
