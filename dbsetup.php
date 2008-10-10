@@ -609,7 +609,6 @@ $sql = 'CREATE TABLE `imas_ltinonces` ('
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 echo 'imas_ltinonces created<br/>';
 
-echo '
 $md5pw = md5($password);
 $now = time();
 $sql = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email) VALUES ('$username','$md5pw',100,'$firstname','$lastname','$email')";
