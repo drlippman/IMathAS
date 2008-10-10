@@ -33,7 +33,7 @@ function mathphp($st,$varlist,$skipfactorial=false) {
   //$st = preg_replace('/(\$[a-zA-Z\d]+)$/',"($1)",$st);
   $st .= ' ';
   
-  preg_match_all('/(\'|").*?(\\1)/',$st,$strmatches,PREG_SET_ORDER);
+  preg_match_all('/(\'|").*?[^\\\\](\\1)/',$st,$strmatches,PREG_SET_ORDER);
   foreach ($strmatches as $k=>$match) {
 	 $st =  str_replace($match[0],"(#$k#)",$st);
   }

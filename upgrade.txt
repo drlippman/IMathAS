@@ -3,6 +3,9 @@ Upgrade Notes
 *********************
 ** IMathAS 1.6     **
 *********************
+*** config.php changes ***
+$freetypeinstalled no longer needed - autodetected
+NEED TO ADD $enablesimplelti
 
 *** Loginpage Changes ***
 Reference loginpage.php.dist for changes. 

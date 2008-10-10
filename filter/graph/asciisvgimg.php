@@ -41,7 +41,7 @@ require_once("$graphfilterdir/../../assessment/mathphp.php");
 class AStoIMG 
 {
 
-var $usettf; 
+var $usegd2, $usettf; 
 var $xmin = -5; 
 var $xmax = 5; 
 var $ymin = -5; 
@@ -69,7 +69,8 @@ function AStoIMG($w=200, $h=200) {
 	if ($w<=0) {$w=200;}
 	if ($h<=0) {$h=200;}
 	$this->img = imagecreate($w,$h);
-	$this->usettf = $GLOBALS['freetypeinstalled'];
+	$this->usegd2 = function_exists('imagesetthickness');
+	$this->usettf = function_exists('imagettftext');
 	$this->fontfile =  $GLOBALS['graphfilterdir'].'/FreeSerifItalic.ttf';
 	$this->width = $w;
 	$this->height = $h;
@@ -105,7 +106,7 @@ function processShortScript($script) {
 		while (count($sa) > $inx+9) {
 			$this->stroke = $sa[$inx+7];
 			$this->strokewidth = $sa[$inx+8];
-			if ($this->usettf) {
+			if ($this->usegd2) {
 				imagesetthickness($this->img,$this->strokewidth);
 			}
 			if ($sa[$inx+9] != "") {
@@ -166,7 +167,7 @@ function processScript($script) {
 					break;
 				case 'strokewidth':
 					$this->strokewidth = $matches[2];
-					if ($this->usettf) {
+					if ($this->usegd2) {
 						imagesetthickness($this->img,$this->strokewidth);
 					}
 					break;
@@ -507,7 +508,7 @@ function ASaxes($arg) {
 	}
 	$this->fontsize = min($xscl/2,$yscl/2,12);
 	$this->ticklength = $this->fontsize/4;
-	if ($this->usettf) {
+	if ($this->usegd2) {
 		imagesetthickness($this->img,1);
 	}
 	if ($dogrid) {
@@ -629,7 +630,7 @@ function ASaxes($arg) {
 		}
 		$this->stroke = $backupstroke;
 	}
-	if ($this->usettf) {
+	if ($this->usegd2) {
 		imagesetthickness($this->img,$this->strokewidth);
 	}
 }
@@ -688,7 +689,7 @@ function ASellipse($arg) {
 	$arg[2] *= $this->yunitlength;
 	if ($this->fill != 'none') {
 		$color = $this->fill;
-		if ($this->usettf) {
+		if ($this->usegd2) {
 			imagefilledellipse($this->img,$p[0],$p[1],$arg[1]*2,$arg[2]*2,$this->$color);
 		}
 	}
@@ -721,7 +722,7 @@ function ASrect($arg) {
 function ASdot($pt,$r) {
 	if ($this->markerfill!='none') {
 		$color = $this->markerfill;
-		if ($this->usettf) {
+		if ($this->usegd2) {
 			imagefilledellipse($this->img,$pt[0],$pt[1],$r,$r,$this->$color);
 		} else {
 			imagefilledpolygon($this->img,array($pt[0]-$r,$pt[1],$pt[0],$pt[1]+$r,$pt[0]+$r,$pt[1],$pt[0],$pt[1]-$r),4,$this->$color);
@@ -734,14 +735,14 @@ function ASdot2($arg) {
 	$pt = $this->pt2arr($arg[0]);
 	$color = $this->stroke;
 	if (isset($arg[1]) && $arg[1]=='closed') {
-		if ($this->usettf) {
+		if ($this->usegd2) {
 			imagefilledellipse($this->img,$pt[0],$pt[1],$this->dotradius,$this->dotradius,$this->$color);
 		} else {
 			$r = $this->dotradius;
 			imagefilledpolygon($this->img,array($pt[0]-$r,$pt[1],$pt[0],$pt[1]+$r,$pt[0]+$r,$pt[1],$pt[0],$pt[1]-$r),4,$this->$color);
 		}
 	} else {
-		if ($this->usettf) {
+		if ($this->usegd2) {
 			imagefilledellipse($this->img,$pt[0],$pt[1],$this->dotradius,$this->dotradius,$this->white);
 		} else {
 			$r = $this->dotradius;

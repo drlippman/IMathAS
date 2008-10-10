@@ -42,10 +42,6 @@
   // $mathimgurl = "http://www.imathas.com/cgi-bin/mimetex.cgi"
   $mathimgurl = "/cgi-bin/mimetex.cgi";
   
-  //set to true if you have FreeType library installed and are using GD 2.0 or 
-  //higher.  
-  $freetypeinstalled = true;
-  
   //shift color of icons from green to red as deadline approaches?
   $colorshift = true;
   
