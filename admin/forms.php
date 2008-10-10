@@ -286,8 +286,15 @@ switch($_GET['action']) {
 		if ($cploc==1) {echo "checked=1";}
 		echo ' /> Left side bar</span><br class=form />';
 		echo '<span class="form">LTI access secret (max 10 chars; blank to not use)</span>';
-		echo '<span class="formright"><input name="ltisecret" type="text" value="'.$ltisecret.'" />';
-		echo '</span><br class="form" />';
+		echo '<span class="formright"><input name="ltisecret" type="text" value="'.$ltisecret.'" /> ';
+		echo '<a href="#" onclick="document.getElementById(\'ltiurl\').style.display=\'\'; return false;">LTI url?</a>';
+		echo '<span id="ltiurl" style="display:none;">';
+		if (isset($_GET['id'])) {
+			echo 'http://'. $_SERVER['HTTP_HOST'].$imasroot.'/ltilaunchrequest.php?cid='.$_GET['id'];
+		} else {
+			echo 'Course ID not yet set.';
+		}		
+		echo '</span></span><br class="form" />';
 		
 		echo "<div class=submit><input type=submit value=Submit></div></form>\n";
 		break;

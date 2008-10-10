@@ -662,6 +662,16 @@ if ($overwriteBody==1) {
 			<span class="form">LTI access secret (max 10 chars; blank to not use)</span>
 			<span class="formright">
 				<input name="ltisecret" type="text" value="<?php echo $line['ltisecret'];?>" />
+				<a href="#" onclick="document.getElementById('ltiurl').style.display=''; return false;">LTI url?</a>
+				<span id="ltiurl" style="display:none;">
+				<?php
+				if (isset($_GET['id'])) {
+					echo 'http://'. $_SERVER['HTTP_HOST'].$imasroot.'/ltilaunchrequest.php?aid='.$_GET['id'];
+				} else {
+					echo 'Assessment ID not yet set.  Come back after submitting';
+				}
+				?>
+				</span>
 			</span><br class="form" />
 			
 			</fieldset>
