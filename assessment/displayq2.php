@@ -1768,7 +1768,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			//echo "real: $realans, my: {$myans[$i]},rel: ". (abs($myans[$i]-$realans)/abs($realans))  ."<br/>";
 			if (isNaN($realans)) {$cntnan++; continue;} //avoid NaN problems
 			if ($answerformat=="equation") {  //if equation, store ratios
-				if (abs($realans)>.000001) {
+				if (abs($realans)>.000001 && is_numeric($myans[$i])) {
 					$ratios[] = $myans[$i]/$realans;
 				}
 			} else if ($answerformat=="toconst") {
@@ -1796,6 +1796,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						if ((abs($ratios[$i]-$meanratio)/(abs($meanratio)+.0001) > $reltolerance-1E-12)) {$correct = false; break;}
 					}
 				}
+			} else {
+				$correct = false;
 			}
 		} else if ($answerformat=="toconst") {
 			$meandiff = array_sum($diffs)/count($diffs);

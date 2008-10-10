@@ -147,11 +147,15 @@ $query = "DELETE FROM imas_ltiaccess WHERE id='$id' AND password='$code'";
 mysql_query($query) or die("Query failed : " . mysql_error());
 
 //have we already established a session for this person?
+$promptforsettings = false;
 $query = "SELECT userid,sessiondata FROM imas_sessions WHERE sessionid='$sessionid'";
 $result = mysql_query($query) or die("Query failed : " . mysql_error());
 if (mysql_num_rows($result)>0) {
-	//ready have session.  Don't need to 	
+	//already have session.  Don't need to 	
 	$sessiondata = unserialize(base64_decode(mysql_result($result,0,1)));
+	if (!isset($sessiondata['mathdisp'])) {
+		$promptforsettings = true;
+	}
 	$createnewsession = false;
 } else {
 	$sessiondata = array();
@@ -166,7 +170,7 @@ if ($createnewsession) {
 	$query = "UPDATE imas_sessions SET sessiondata='$enc',userid='$userid' WHERE sessionid='$sessionid'";
 }
 mysql_query($query) or die("Query failed : " . mysql_error());
-if (!$createnewsession && !($itemtype==0 && $tlwrds != '')) { 
+if (!$promptforsettings && !$createnewsession && !($itemtype==0 && $tlwrds != '')) { 
 	//redirect now if already have session and no timelimit
 	$now = time();
 	$query = "UPDATE imas_users SET lastaccess='$now' WHERE id='$userid'";
