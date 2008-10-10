@@ -21,15 +21,6 @@ $dir_width 		= "96px";
 $file_width 	= "96px";
 $pics_per_row 	= 2;
 
-?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title><?php echo $strings["title"]; ?></title>
-
-<link href="file_manager/styles.css" rel="stylesheet" type="text/css">
-<?php
 if (isset($_REQUEST["type"])) {
 	$type = $_REQUEST["type"];
 }
@@ -37,7 +28,7 @@ else {
 	$type = -2;
 }
 
-if (isSet($_REQUEST["action"]))
+if (isset($_REQUEST["action"]))
 {
 	if ($_REQUEST["action"] == "upload_file")
 	{
@@ -48,15 +39,39 @@ if (isSet($_REQUEST["action"]))
 		deleteuserfile($userid,$_REQUEST["item_name"]);
 	}
 }
+
 ?>
-<script>
-function fileSelected(filename) {
-	//let our opener know what we want
-	window.top.opener.my_win.document.getElementById(window.top.opener.my_field).value = filename;
-	window.top.opener.my_win.document.getElementById(window.top.opener.my_field).onchange();
-	//we close ourself, cause we don't need us anymore ;)
-	window.close();
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title><?php echo $strings["title"]; ?></title>
+
+
+<script language="javascript" type="text/javascript" src="<?php echo $imasroot?>/editor/tiny_mce_popup.js"></script>
+<link href="file_manager/styles.css" rel="stylesheet" type="text/css">
+<script type="text/javascript">
+var FileBrowserDialogue = {
+    init : function () {
+        // Here goes your code for setting your custom things onLoad.
+    },
+    mySubmit : function (filename) {
+        var win = tinyMCEPopup.getWindowArg("window");
+
+        // insert information now
+        win.document.getElementById(tinyMCEPopup.getWindowArg("input")).value = filename;
+
+        // for image browsers: update image dimensions
+        if (win.ImageDialog.getImageData) win.ImageDialog.getImageData();
+        if (win.ImageDialog.showPreviewImage) win.ImageDialog.showPreviewImage(URL);
+
+        // close popup window
+        tinyMCEPopup.close();
+    }
 }
+
+tinyMCEPopup.onInit.add(FileBrowserDialogue.init, FileBrowserDialogue);
+
 function switchDivs() {
 	var fieldvalue = document.getElementById("uploaded_file").value;
 	if (fieldvalue=='') {
@@ -89,7 +104,7 @@ if ($type=="img") {
 </head>
 <body>
 <div class="td_close">
-<a class="close" href="javascript: window.close();"><?php echo $strings["close"]; ?></a>
+<a class="close" href="javascript: tinyMCEPopup.close();"><?php echo $strings["close"]; ?></a>
 </div>
 <div class="td_main">
 <?php
@@ -98,7 +113,7 @@ foreach ($files as $k=>$v) {
 	echo "<a href='#' onClick='delete_file(\"" . basename($v['name']) . "\")'>";
 	echo "<img border=0 src='" . $delete_image . "'></a> ";
 	echo "<img src='" . $file_small_image . "'> ";
-	echo "<a class='file' href='#' onClick='fileSelected(\"" . getuserfileurl($v['name']) . "\");'>" . basename($v['name']) . "</a><br>\n";
+	echo "<a class='file' href='#' onClick='FileBrowserDialogue.mySubmit(\"" . getuserfileurl($v['name']) . "\");'>" . basename($v['name']) . "</a><br>\n";
 
 }
 ?>

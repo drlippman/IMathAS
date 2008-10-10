@@ -85,7 +85,20 @@ function fileBrowserCallBack(field_name, url, type, win) {
 			connector += "?type=files";
 			break;
 	}
-	window.open(connector, "file_manager", "modal,width=450,height=440,scrollbars=1");
+	tinyMCE.activeEditor.windowManager.open({
+		file : connector,
+		title : 'File Manager',
+		width : 350,  // Your dimensions may differ - toy around with them!
+		height : 450,
+		resizable : "yes",
+		inline : "yes",  // This parameter only has an effect if you use the inlinepopups plugin!
+		close_previous : "no"
+	    }, {
+		window : win,
+		input : field_name
+	    });
+
+	//window.open(connector, "file_manager", "modal,width=450,height=440,scrollbars=1");
 }
 END;
 } else {
