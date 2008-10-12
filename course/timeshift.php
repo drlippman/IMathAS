@@ -1,5 +1,5 @@
 <?
-//IMathAS:  Main admin page
+//IMathAS:  Shift Course dates; made obsolete by mass change dates 
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
@@ -111,16 +111,14 @@ if (!(isset($teacherid))) {
 }
 	
 /******* begin html output ********/
+$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+
 require("../header.php");
 
 if ($overwriteBody==1) {
 	echo $body;
 } else {		
 ?>
-	<script src="../javascript/CalendarPopup.js"></script>
-	<SCRIPT LANGUAGE="JavaScript" ID="js1">
-	var cal1 = new CalendarPopup();
-	</SCRIPT>
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>	
 	<h3>Shift Course Dates</h3>
 	<p>
@@ -140,10 +138,10 @@ if ($overwriteBody==1) {
 		</span><br class=form>
 		<span class=form>Change date to:</span>
 		<span class=formright>
-			<input type=text size=10 name=sdate value="<?php echo $sdate ?>"> 
-			<A HREF="#" onClick="cal1.select(document.forms[0].sdate,'anchor1','MM/dd/yyyy',document.forms[0].sdate.value); return false;" NAME="anchor1" ID="anchor1">
-				<img src="../img/cal.gif" alt="Calendar"/>
-			</A>
+			<input type=text size=10 name="sdate" value="<?php echo $sdate ?>"> 
+			<a href="#" onClick="displayDatePicker('sdate', this); return false">
+			<img src="../img/cal.gif" alt="Calendar"/>
+			</a>
 		</span><br class=form>
 		<div class=submit><input type=submit value="Change Dates"></div>
 	</form>

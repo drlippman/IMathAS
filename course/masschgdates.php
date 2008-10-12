@@ -105,6 +105,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 
 /******* begin html output ********/
+$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
 require("../header.php");
 
 if ($overwriteBody==1) {
@@ -121,12 +122,9 @@ if ($overwriteBody==1) {
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";	
 	echo "&gt; Mass Change Dates</div>\n";
 	echo "<h2>Mass Change Dates</h2>";
-	echo '<script src="../javascript/CalendarPopup.js"></script>';
-	echo '<SCRIPT LANGUAGE="JavaScript" ID="js1">';
-	echo 'var cal1 = new CalendarPopup();';
-	echo 'cal1.setReturnFunction ("calcallback");';
+	echo '<script type="text/javascript">';
 	echo 'var basesdates = new Array(); var baseedates = new Array(); var baserdates = new Array();';
-	echo '</SCRIPT>';
+	echo '</script>';
 	
 	if (isset($_GET['orderby'])) {
 		$orderby = $_GET['orderby'];
@@ -330,7 +328,9 @@ if ($overwriteBody==1) {
 		
 		echo "<input type=text size=10 id=\"sdate$cnt\" name=\"sdate$cnt\" value=\"$sdate\" onblur=\"ob(this)\"/>(";
 		echo "<span id=\"sd$cnt\">".getshortday($startdates[$i]).'</span>';
-		echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].sdate$cnt,'anchor$cnt','MM/dd/yyyy',document.forms[0].sdate$cnt.value); return false;\" NAME=\"anchor$cnt\" ID=\"anchor$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
+		//echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].sdate$cnt,'anchor$cnt','MM/dd/yyyy',document.forms[0].sdate$cnt.value); return false;\" NAME=\"anchor$cnt\" ID=\"anchor$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
+		echo ") <a href=\"#\" onClick=\"displayDatePicker('sdate$cnt', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
+		
 		echo " at <input type=text size=8 id=\"stime$cnt\" name=\"stime$cnt\" value=\"$stime\">";
 		echo '</span></td>';
 		
@@ -358,7 +358,9 @@ if ($overwriteBody==1) {
 		
 		echo "<input type=text size=10 id=\"edate$cnt\" name=\"edate$cnt\" value=\"$edate\" onblur=\"ob(this)\"/>(";
 		echo "<span id=\"ed$cnt\">".getshortday($enddates[$i]).'</span>';
-		echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].edate$cnt,'anchor2$cnt','MM/dd/yyyy',document.forms[0].edate$cnt.value); return false;\" NAME=\"anchor2$cnt\" ID=\"anchor2$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
+		//echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].edate$cnt,'anchor2$cnt','MM/dd/yyyy',document.forms[0].edate$cnt.value); return false;\" NAME=\"anchor2$cnt\" ID=\"anchor2$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
+		echo ") <a href=\"#\" onClick=\"displayDatePicker('edate$cnt', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
+		
 		echo " at <input type=text size=8 id=\"etime$cnt\" name=\"etime$cnt\" value=\"$etime\">";
 		echo '</span></td>';
 				
@@ -398,7 +400,9 @@ if ($overwriteBody==1) {
 		
 			echo "<input type=text size=10 id=\"rdate$cnt\" name=\"rdate$cnt\" value=\"$rdate\" onblur=\"ob(this)\"/>(";
 			echo "<span id=\"rd$cnt\">".getshortday($reviewdates[$i]).'</span>';
-			echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].rdate$cnt,'anchor3$cnt','MM/dd/yyyy',document.forms[0].rdate$cnt.value); return false;\" NAME=\"anchor3$cnt\" ID=\"anchor3$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
+			//echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].rdate$cnt,'anchor3$cnt','MM/dd/yyyy',document.forms[0].rdate$cnt.value); return false;\" NAME=\"anchor3$cnt\" ID=\"anchor3$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
+			echo ") <a href=\"#\" onClick=\"displayDatePicker('rdate$cnt', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
+		
 			echo " at <input type=text size=8 id=\"rtime$cnt\" name=\"rtime$cnt\" value=\"$rtime\"></span>";
 		}
 		echo '</td>';

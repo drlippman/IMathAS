@@ -279,4 +279,42 @@ div.ddmenu {
 .nowrap {
 	white-space: nowrap;
 }
-
+.dpTable {
+	font-size: 90%;
+	text-align: center;
+	color: #505050;
+	background-color: #ece9d8;
+	border: 1px solid #AAAAAA;
+	}
+.dpTD {
+	border: 1px solid #ece9d8;
+	}
+.dpDayHighlightTD {
+	background-color: #CCCCCC;
+	border: 1px solid #AAAAAA;
+	}
+.dpTDHover {
+	background-color: #aca998;
+	border: 1px solid #888888;
+	cursor: pointer;
+	color: red;
+	}
+.dpDayTD {
+	background-color: #CCCCCC;
+	border: 1px solid #AAAAAA;
+	color: white;
+	}
+.dpTitleText {
+	font-weight: bold;
+	}
+.dpDayHighlight {
+	color: #4060ff;
+	font-weight: bold;
+	}
+.dpButton, .dpTodayButton {
+	font-size: 90%;
+	color: gray;
+	background: #d8e8ff;
+	font-weight: bold;
+	padding: 0px;
+	}

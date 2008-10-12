@@ -750,7 +750,7 @@ class S3 {
 		pack('H*', sha1((str_pad(self::$__secretKey, 64, chr(0x00)) ^
 		(str_repeat(chr(0x36), 64))) . $string)))));
 	}
-	
+	//added
 	public function queryStringGet($bucket, $key, $expires){
 		$expires = time() + $expires;
 		$stringToSign = "GET\n\n\n$expires\n/$bucket/$key";

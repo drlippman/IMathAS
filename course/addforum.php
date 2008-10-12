@@ -238,6 +238,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 //BEGIN DISPLAY BLOCK
 
  /******* begin html output ********/
+ $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
  require("../header.php");
 
 if ($overwriteBody==1) {
@@ -245,10 +246,6 @@ if ($overwriteBody==1) {
 } else {  //ONLY INITIAL LOAD HAS DISPLAY 	
 
 ?>
-	<script src="../javascript/CalendarPopup.js"></script>
-	<SCRIPT LANGUAGE="JavaScript" ID="js1">
-	var cal1 = new CalendarPopup();
-	</SCRIPT>
 	
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
 	<h2><?php echo $pagetitle ?><img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=forumitems','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/></h2>
@@ -276,7 +273,7 @@ if ($overwriteBody==1) {
 			Always until end date<br/>
 			<input type=radio name="sdatetype" value="sdate" <?php  writeHtmlChecked($startdate,'0',1) ?>/>
 			<input type=text size=10 name=sdate value="<?php echo $sdate;?>"> 
-			<A HREF="#" onClick="cal1.select(document.forms[0].sdate,'anchor1','MM/dd/yyyy',document.forms[0].sdate.value); return false;" NAME="anchor1" ID="anchor1">
+			<a href="#" onClick="displayDatePicker('sdate', this); return false">
 			<img src="../img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=stime value="<?php echo $stime;?>">
 		</span><BR class=form>
@@ -287,7 +284,7 @@ if ($overwriteBody==1) {
 			 Always after start date<br/>
 			<input type=radio name="edatetype" value="edate"  <?php writeHtmlChecked($enddate,'2000000000',1) ?>/>
 			<input type=text size=10 name=edate value="<?php echo $edate;?>"> 
-			<A HREF="#" onClick="cal1.select(document.forms[0].edate,'anchor2','MM/dd/yyyy',(document.forms[0].sdate.value=='<?php echo $sdate;?>')?(document.forms[0].edate.value):(document.forms[0].sdate.value)); return false;" NAME="anchor2" ID="anchor2">
+			<a href="#" onClick="displayDatePicker('edate', this); return false">
 			<img src="../img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=etime value="<?php echo $etime;?>">
 		</span><BR class=form>
@@ -328,8 +325,8 @@ if ($overwriteBody==1) {
 			<input type=radio name="replyby" value="Always" <?php if ($replyby==2000000000) { echo "checked=1";}?>/>Always<br/>
 			<input type=radio name="replyby" value="Never" <?php if ($replyby==0) { echo "checked=1";}?>/>Never<br/>
 			<input type=radio name="replyby" value="Date" <?php if ($replyby<2000000000 && $replyby>0) { echo "checked=1";}?>/>Before: 
-			<input type=text size=10 name=replybydate value="<?php echo $replybydate;?>">
-			<A HREF="#" onClick="cal1.select(document.forms[0].replybydate,'anchor3','MM/dd/yyyy',(document.forms[0].replybydate.value=='<?php echo $replybydate;?>')?(document.forms[0].replyby.value):(document.forms[0].replyby.value)); return false;" NAME="anchor3" ID="anchor3">
+			<input type=text size=10 name="replybydate" value="<?php echo $replybydate;?>">
+			<a href="#" onClick="displayDatePicker('replybydate', this); return false">
 			<img src="../img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=replybytime value="<?php echo $replybytime;?>">
 		</span><br class="form" />
@@ -339,8 +336,8 @@ if ($overwriteBody==1) {
 			<input type=radio name="postby" value="Always" <?php if ($postby==2000000000) { echo "checked=1";}?>/>Always<br/>
 			<input type=radio name="postby" value="Never" <?php if ($postby==0) { echo "checked=1";}?>/>Never<br/>
 			<input type=radio name="postby" value="Date" <?php if ($postby<2000000000 && $postby>0) { echo "checked=1";}?>/>Before: 
-			<input type=text size=10 name=postbydate value="<?php echo $postbydate;?>">
-			<A HREF="#" onClick="cal1.select(document.forms[0].postbydate,'anchor4','MM/dd/yyyy',(document.forms[0].postbydate.value=='<?php echo $postbydate;?>')?(document.forms[0].postby.value):(document.forms[0].postby.value)); return false;" NAME="anchor4" ID="anchor4">
+			<input type=text size=10 name="postbydate" value="<?php echo $postbydate;?>">
+			<a href="#" onClick="displayDatePicker('postbydate', this); return false">
 			<img src="../img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=postbytime value="<?php echo $postbytime;?>">
 		</span><br class="form"/>

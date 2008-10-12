@@ -41,9 +41,12 @@ AsciiMath and AsciiSvg Plugins for TinyMCE
 Based on code by David Lippman and Peter Jipsen
 LGPL License
 
+TinyMCE File manager
+source unknown - no copyright or license included in package
+
 CalendarPopup
-(c) Matt Kruse http://www.mattkruse.com/
-Almost public domain, with repost restrictions
+(c) 2005 Julian Robichaux -- http://www.nsftools.com
+"it's free"
 
 Form Validator
 (c) Martin Honnen
@@ -76,5 +79,21 @@ Documentation Guides
 (c) David Lippman.  Created with development grant support from the 
 WA State Distance Learning Council and the Transition Math Project
 
+S3 library 
+(c) 2007-2008, Donovan Schonknecht
+Attribution license - see includes/S3.php
 
+MD5 Javascript code
+(C) Paul Johnston 1999 - 2002.
+BSD license
 
+Nested tree drag-and-drop
+(c) 2007 CrazyDave http://www.clanccc.co.uk/moo/nested.html
+
+Mootools
+(c) 2006 Valerio Proietti
+MIT Style License
+
+excanvas
+(c) 2006 Google inc
+Apache License, Version 2.0

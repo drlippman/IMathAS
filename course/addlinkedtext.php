@@ -193,16 +193,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 }
 	
 /******* begin html output ********/
+$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+
  require("../header.php");
 
 if ($overwriteBody==1) {
 	echo $body;
 } else {
 ?> 	
-	<script src="../javascript/CalendarPopup.js"></script>
-	<SCRIPT LANGUAGE="JavaScript" ID="js1">
-	var cal1 = new CalendarPopup();
-	</SCRIPT>
 	
 	<div class=breadcrumb><?php echo $curBreadcrumb  ?></div>
 	<h2><?php echo $pagetitle ?></h2>
@@ -240,8 +238,8 @@ if ($overwriteBody==1) {
 			Always until end date<br/>
 			<input type=radio name="sdatetype" value="sdate" <?php writeHtmlChecked($startdate,'0',1) ?>/>
 			<input type=text size=10 name=sdate value="<?php echo $sdate;?>"> 
-			<A HREF="#" onClick="cal1.select(document.forms[0].sdate,'anchor1','MM/dd/yyyy',document.forms[0].sdate.value); return false;" NAME="anchor1" ID="anchor1">
-			<img src="../img/cal.gif" alt="Calendar"/></A>
+			<a href="#" onClick="displayDatePicker('sdate', this); return false">
+			<img src="../img/cal.gif" alt="Calendar"/></a>
 			at <input type=text size=10 name=stime value="<?php echo $stime;?>">
 		</span><BR class=form>
 		
@@ -249,8 +247,8 @@ if ($overwriteBody==1) {
 			<input type=radio name="edatetype" value="2000000000" <?php writeHtmlChecked($enddate,'2000000000',0) ?>/> Always after start date<br/>
 			<input type=radio name="edatetype" value="edate"  <?php writeHtmlChecked($enddate,'2000000000',1) ?>/>
 			<input type=text size=10 name=edate value="<?php echo $edate;?>"> 
-			<A HREF="#" onClick="cal1.select(document.forms[0].edate,'anchor2','MM/dd/yyyy',(document.forms[0].sdate.value=='<?php echo $sdate;?>')?(document.forms[0].edate.value):(document.forms[0].sdate.value)); return false;" NAME="anchor2" ID="anchor2">
-			<img src="../img/cal.gif" alt="Calendar"/></A>
+			<a href="#" onClick="displayDatePicker('edate', this); return false">
+			<img src="../img/cal.gif" alt="Calendar"/></a>
 			at <input type=text size=10 name=etime value="<?php echo $etime;?>">
 		</span><BR class=form>
 		<span class=form>Place on Calendar?</span>

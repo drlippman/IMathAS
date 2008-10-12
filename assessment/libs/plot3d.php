@@ -87,8 +87,20 @@ function plot3d($func,$umin,$umax,$vmin,$vmax) {
 			  $count++;
 		  }
 	  }
-	  
-	  $html = "<applet codebase=\"{$GLOBALS['imasroot']}/assessment/libs\" code=\"Viewer.class\" width=$width height=$height>\n";
+	  /*
+	 $r = rand(1,10000);
+	  $html .= "<div id=\"3d$r\">";
+	  $html .= '<p><a href="http://www.adobe.com/go/getflashplayer"><img src="http://www.adobe.com/images/shared/download_buttons/get_flash_player.gif" alt="Get Adobe Flash player" /></a></p>';
+	  $html .= '</div>';
+	  $html .= '<script type="text/javascript">';
+	  $html .= 'var FlashVars = {';
+	  $html .= '  verts: "'.$verts.'",';
+	  $html .= '  faces: "'.$faces.'",';
+	  $html .= "  width: $width, height: $height };";
+	  $html .= "  swfobject.embedSWF(\"$imasroot/assessment/libs/viewer3d.swf\", \"3d$r\", \"$width\", \"$height\", \"9.0.0\", \"$imasroot/assessment/libs/expressInstall.swf\",FlashVars);";
+	  $html .= '</script>';
+	  */
+	  $html .= "<applet codebase=\"{$GLOBALS['imasroot']}/assessment/libs\" code=\"Viewer.class\" width=$width height=$height>\n";
 	  $html .= "<param name=\"verts\" value=\"$verts\">\n";
 	  $html .= "<param name=\"faces\" value=\"$faces\">\n";
 	  if ($axes==1) {
@@ -100,6 +112,7 @@ function plot3d($func,$umin,$umax,$vmin,$vmax) {
 		  $html .= "<param name=\"bounds\" value=\"" . implode(',',$bounds) . "\">\n";
 	  }
 	  $html .= "</applet>\n";
+	  
 	  return $html;
 	
 }

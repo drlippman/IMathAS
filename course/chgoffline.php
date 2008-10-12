@@ -92,6 +92,7 @@ $sdate = tzdate("m/d/Y",time());
 $stime = tzdate("g:i a",time());
 
 //HTML output
+$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
 require("../header.php");
 ?>
 <script type="text/javascript">
@@ -105,10 +106,7 @@ function chkAll(frm, arr, mark) {
   }
 }
 </script>
-<script src="../javascript/CalendarPopup.js"></script>
-<script type="text/javascript" id="js1">
-var cal1 = new CalendarPopup();
-</script>
+
 <?php
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
@@ -153,7 +151,8 @@ With selected, <input type="submit" name="submit" value="Delete"/> or make chang
 	<td>  
 <input type=radio name="sdatetype" value="0" /> Always<br/>
 <input type=radio name="sdatetype" value="sdate" checked="checked"/><input type=text size=10 name=sdate value="<?php echo $sdate;?>"> 
-<a href="#" onClick="cal1.select(document.forms[0].sdate,'anchor1','MM/dd/yyyy',document.forms[0].sdate.value); return false;" name="anchor1" id="anchor1"><img src="../img/cal.gif" alt="Calendar"/></a>
+<a href="#" onClick="displayDatePicker('sdate', this); return false">
+<img src="../img/cal.gif" alt="Calendar"/></a>
 at <input type=text size=10 name=stime value="<?php echo $stime;?>">	
 	</td>
 </tr>

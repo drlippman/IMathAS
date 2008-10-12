@@ -369,6 +369,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 //BEGIN DISPLAY BLOCK
 
  /******* begin html output ********/
+ $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
  require("../header.php");
 
 if ($overwriteBody==1) {
@@ -412,10 +413,7 @@ if ($overwriteBody==1) {
 		}
 	}
 	</script>
-	<script src="../javascript/CalendarPopup.js"></script>
-	<SCRIPT LANGUAGE="JavaScript" ID="js1">
-	var cal1 = new CalendarPopup();
-	</SCRIPT>
+	
 	<div class=breadcrumb><?php echo $curBreadcrumb  ?></div>
 	<?php echo $formTitle ?>
 	<?php echo $page_isTakenMsg ?>
@@ -443,8 +441,9 @@ if ($overwriteBody==1) {
 			<input type=radio name="sdatetype" value="0" <?php writeHtmlChecked($startdate,"0",0); ?>/> 
 			Always until end date<br/>
 			<input type=radio name="sdatetype" value="sdate" <?php writeHtmlChecked($startdate,"0",1); ?>/>
-			<input type=text size=10 name=sdate value="<?php echo $sdate;?>"> 
-			<A HREF="#" onClick="cal1.select(document.forms[0].sdate,'anchor1','MM/dd/yyyy',document.forms[0].sdate.value); return false;" NAME="anchor1" ID="anchor1"><img src="../img/cal.gif" alt="Calendar"/></A>
+			<input type=text size=10 name="sdate" value="<?php echo $sdate;?>"> 
+			<a href="#" onClick="displayDatePicker('sdate', this); return false">
+			<img src="../img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=stime value="<?php echo $stime;?>">
 		</span><BR class=form>
 	
@@ -453,8 +452,9 @@ if ($overwriteBody==1) {
 			<input type=radio name="edatetype" value="2000000000" <?php writeHtmlChecked($enddate,"2000000000",0); ?>/>
 			 Always after start date<br/>
 			<input type=radio name="edatetype" value="edate"  <?php writeHtmlChecked($enddate,"2000000000",1); ?>/>
-			<input type=text size=10 name=edate value="<?php echo $edate;?>"> 
-			<A HREF="#" onClick="cal1.select(document.forms[0].edate,'anchor2','MM/dd/yyyy',(document.forms[0].sdate.value=='<?php echo $sdate;?>')?(document.forms[0].edate.value):(document.forms[0].sdate.value)); return false;" NAME="anchor2" ID="anchor2"><img src="../img/cal.gif" alt="Calendar"/></A>
+			<input type=text size=10 name="edate" value="<?php echo $edate;?>"> 
+			<a href="#" onClick="displayDatePicker('edate', this); return false">
+			<img src="../img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=etime value="<?php echo $etime;?>">
 		</span><BR class=form>
 		<span class=form>Keep open as review:</span>
@@ -463,7 +463,8 @@ if ($overwriteBody==1) {
 			<input type=radio name="doreview" value="2000000000" <?php writeHtmlChecked($line['reviewdate'],2000000000,0); ?>> Always after due date<br/>
 			<input type=radio name="doreview" value="rdate" <?php if ($line['reviewdate']>0 && $line['reviewdate']<2000000000) { echo "checked=1";} ?>> Until: 
 			<input type=text size=10 name=rdate value="<?php echo $rdate;?>"> 
-			<A HREF="#" onClick="cal1.select(document.forms[0].rdate,'anchor3','MM/dd/yyyy',(document.forms[0].rdate.value=='<?php echo $rdate;?>')?(document.forms[0].rdate.value):(document.forms[0].rdate.value)); return false;" NAME="anchor3" ID="anchor3"><img src="../img/cal.gif" alt="Calendar"/></A>
+			<a href="#" onClick="displayDatePicker('rdate', this); return false">
+			<img src="../img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=rtime value="<?php echo $rtime;?>">
 		</span><BR class=form>
 		

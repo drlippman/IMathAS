@@ -90,6 +90,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 }
 
 /******* begin html output ********/
+$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
  require("../header.php");
 
 if ($overwriteBody==1) {
@@ -103,10 +104,7 @@ if ($overwriteBody==1) {
 	   window.location = togo;
 	}
 	</script>
-	<script src="../javascript/CalendarPopup.js"></script>
-	<SCRIPT LANGUAGE="JavaScript" ID="js1">
-		var cal1 = new CalendarPopup();
-	</SCRIPT>
+	
 
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>	
 	<h3>Make Start/Due Date Exception</h3>
@@ -122,14 +120,14 @@ if ($overwriteBody==1) {
 		<span class=form>Available After:</span>
 		<span class=formright>
 			<input type=text size=10 name=sdate value="<?php echo $sdate ?>"> 
-			<A HREF="#" onClick="cal1.select(document.forms[0].sdate,'anchor1','MM/dd/yyyy',document.forms[0].sdate.value); return false;" NAME="anchor1" ID="anchor1">
+			<a href="#" onClick="displayDatePicker('sdate', this); return false">
 			<img src="../img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=stime value="<?php echo $stime ?>">
 		</span><BR class=form>
 		<span class=form>Available Until:</span>
 		<span class=formright>
 			<input type=text size=10 name=edate value="<?php echo $edate ?>"> 
-			<A HREF="#" onClick="cal1.select(document.forms[0].edate,'anchor2','MM/dd/yyyy',(document.forms[0].sdate.value=='<?php echo $sdate ?>')?(document.forms[0].edate.value):(document.forms[0].sdate.value)); return false;" NAME="anchor2" ID="anchor2">
+			<a href="#" onClick="displayDatePicker('edate', this); return false">
 			<img src="../img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=etime value="<?php echo $etime ?>">
 		</span><BR class=form>

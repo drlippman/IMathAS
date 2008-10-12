@@ -267,7 +267,8 @@ $page_formActionTag .= (isset($_GET['id'])) ? "&id=" . $_GET['id'] : "";
 	
 	
  /******* begin html output ********/
- require("../header.php");
+ $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+require("../header.php");
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -284,10 +285,7 @@ function movefile(from) {
   }
 }
 </script>
-<script src="../javascript/CalendarPopup.js"></script>
-<SCRIPT LANGUAGE="JavaScript" ID="js1">
-var cal1 = new CalendarPopup();
-</SCRIPT>
+
 
 	<div class=breadcrumb><?php echo $curBreadcrumb  ?></div>
 	<h2><?php echo $pagetitle ?><img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=inlinetextitems','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/></h2>
@@ -342,8 +340,8 @@ var cal1 = new CalendarPopup();
 			 Always until end date<br/>
 			<input type=radio name="sdatetype" value="sdate" <?php writeHtmlChecked($startdate,'0',1) ?>/>
 			<input type=text size=10 name=sdate value="<?php echo $sdate;?>"> 
-			<A HREF="#" onClick="cal1.select(document.forms[0].sdate,'anchor1','MM/dd/yyyy',document.forms[0].sdate.value); return false;" NAME="anchor1" ID="anchor1">
-			<img src="../img/cal.gif" alt="Calendar"/></A>
+			<a href="#" onClick="displayDatePicker('sdate', this); return false">
+			<img src="../img/cal.gif" alt="Calendar"/></a>
 			at <input type=text size=10 name=stime value="<?php echo $stime;?>">
 		</span><BR class=form>
 	
@@ -353,8 +351,8 @@ var cal1 = new CalendarPopup();
 			Always after start date<br/>
 			<input type=radio name="edatetype" value="edate" <?php writeHtmlChecked($enddate,'2000000000',1) ?>/>
 			<input type=text size=10 name=edate value="<?php echo $edate;?>"> 
-			<A HREF="#" onClick="cal1.select(document.forms[0].edate,'anchor2','MM/dd/yyyy',(document.forms[0].sdate.value=='<?php echo $sdate;?>')?(document.forms[0].edate.value):(document.forms[0].sdate.value)); return false;" NAME="anchor2" ID="anchor2">
-			<img src="../img/cal.gif" alt="Calendar"/></A>
+			<a href="#" onClick="displayDatePicker('edate', this); return false">
+			<img src="../img/cal.gif" alt="Calendar"/></a>
 			at <input type=text size=10 name=etime value="<?php echo $etime;?>">
 		</span><BR class=form>
 		<span class=form>Place on Calendar?</span>

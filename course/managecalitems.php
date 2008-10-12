@@ -48,10 +48,8 @@ if (isset($_POST['submit'])) {
 
 
 //HTML output
+$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
 require("../header.php");
-echo '<script src="../javascript/CalendarPopup.js"></script>';
-echo '<SCRIPT LANGUAGE="JavaScript" ID="js1">';
-echo 'var cal1 = new CalendarPopup();</script>';
 
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";	
 echo "&gt; Manage Calendar Items</div>\n";
@@ -75,7 +73,7 @@ while ($row = mysql_fetch_row($result)) {
 	echo '<td><input type=checkbox name="del['.$row[0].']" /></td>';
 	$date = tzdate("m/d/Y",$row[1]);
 	echo "<td><input type=text size=10 id=\"date{$row[0]}\" name=\"date{$row[0]}\" value=\"$date\"/> ";	
-	echo "<a href=\"#\" onClick=\"cal1.select(document.forms[0].date{$row[0]},'anchor2$cnt','MM/dd/yyyy',document.forms[0].date{$row[0]}.value); return false;\" NAME=\"anchor2$cnt\" ID=\"anchor2$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a></td>";
+	echo "<a href=\"#\" onClick=\"displayDatePicker('date{$row[0]}', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a></td>";
 	$cnt++;
 	echo '<td><input name="tag['.$row[0].']" type=text size=1 maxlength=1 value="'.$row[3].'" /></td>';
 	echo '<td><input name="txt['.$row[0].']" type=text size=80 value="'.str_replace('"','&quot;',$row[2]).'" /></td>';
@@ -90,7 +88,7 @@ if (isset($_GET['addto'])) {
 	$date = tzdate("m/d/Y",$now);
 }
 echo "<td><input type=text size=10 id=\"datenew\" name=\"datenew\" value=\"$date\"/> ";	
-echo "<a href=\"#\" onClick=\"cal1.select(document.forms[0].datenew,'anchor2$cnt','MM/dd/yyyy',document.forms[0].datenew.value); return false;\" NAME=\"anchor2$cnt\" ID=\"anchor2$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a></td>";
+echo "<a href=\"#\" onClick=\"displayDatePicker('datenew', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a></td>";
 $cnt++;
 echo '<td><input name="tagnew" type=text size=1 maxlength=1 value="!" /></td>';
 echo '<td><input name="txtnew" type=text size=80 value="" /></td>';

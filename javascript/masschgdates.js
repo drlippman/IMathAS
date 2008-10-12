@@ -209,7 +209,11 @@ Date.prototype.getWeekDays = function(d) {
 	  document.getElementById(el.id.substring(0,2)+el.id.substring(5)).innerHTML = globd.SHORTDAYS[globd.getDay()];
 	  CP_tmpReturnFunction(y,m,d);
   }
-
+  function datePickerClosed(dateField) {
+	  var globd = getFieldDate(dateField.value);
+	  document.getElementById(dateField.id.substring(0,2)+dateField.id.substring(5)).innerHTML = globd.SHORTDAYS[globd.getDay()];
+  }
+	  
   function MCDtoggle(type,cnt) {
 	var typeinput = document.getElementById(type+"datetype"+cnt);
 	if (typeinput.value==0) { //swap from A/N to date

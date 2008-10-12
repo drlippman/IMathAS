@@ -221,6 +221,8 @@
 		} else { //display mod
 			$pagetitle = "Add/Modify Thread";
 			$useeditor = "message";
+			$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+
 			require("../header.php");
 			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
 			echo "&gt; <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> &gt;";
@@ -288,7 +290,9 @@
 				if ($line['replyby']<2000000000 && $line['replyby']>0) { echo "checked=1";}
 				echo "/>Before: "; 
 				echo "<input type=text size=10 name=replybydate value=\"$replybydate\"/>";
-				echo "<A HREF=\"#\" onClick=\"cal1.select(document.forms[0].replybydate,'anchor3','MM/dd/yyyy',(document.forms[0].replybydate.value==$replybydate')?(document.forms[0].replyby.value):(document.forms[0].replyby.value)); return false;\" NAME=\"anchor3\" ID=\"anchor3\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></A>";
+				echo '<a href="#" onClick="displayDatePicker(\'replybydate\', this); return false">';
+				//echo "<A HREF=\"#\" onClick=\"cal1.select(document.forms[0].replybydate,'anchor3','MM/dd/yyyy',(document.forms[0].replybydate.value==$replybydate')?(document.forms[0].replyby.value):(document.forms[0].replyby.value)); return false;\" NAME=\"anchor3\" ID=\"anchor3\">
+				echo "<img src=\"../img/cal.gif\" alt=\"Calendar\"/></A>";
 				echo "at <input type=text size=10 name=replybytime value=\"$replybytime\"></span><br class=\"form\" />";
 			} else {
 				if ($allowanon==1) {
@@ -299,6 +303,7 @@
 				}
 			}
 			echo "<div class=submit><input type=submit value='Submit'></div>\n";
+			echo '</form><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>';
 			require("../footer.php");
 			exit;
 		}

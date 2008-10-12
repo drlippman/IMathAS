@@ -35,6 +35,8 @@
 
 
 	$pagetitle = "Manage Exceptions";
+	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+
 	require("../header.php");
 	
 	
@@ -148,11 +150,6 @@
 	
 	echo "<h4>Make New Exception</h4>";
 	
-	echo "<script src=\"../javascript/CalendarPopup.js\"></script>\n";
-	echo "<SCRIPT LANGUAGE=\"JavaScript\" ID=\"js1\">\n";
-	echo "var cal1 = new CalendarPopup();\n";
-	echo "</SCRIPT>\n";
-	
 	$now = time();
 	$wk = $now + 7*24*60*60;
 	$sdate = tzdate("m/d/Y",$now);
@@ -160,11 +157,11 @@
 	$stime = tzdate("g:i a",$now);
 	$etime = tzdate("g:i a",$wk);
 	echo "<span class=form>Available After:</span><span class=formright><input type=text size=10 name=sdate value=\"$sdate\">\n"; 
-	echo "<A HREF=\"#\" onClick=\"cal1.select(document.forms[0].sdate,'anchor1','MM/dd/yyyy',document.forms[0].sdate.value); return false;\" NAME=\"anchor1\" ID=\"anchor1\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></A>\n";
+	echo "<a href=\"#\" onClick=\"displayDatePicker('sdate', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></A>\n";
 	echo "at <input type=text size=10 name=stime value=\"$stime\"></span><BR class=form>\n";
 
 	echo "<span class=form>Available Until:</span><span class=formright><input type=text size=10 name=edate value=\"$edate\">\n"; 
-	echo "<A HREF=\"#\" onClick=\"cal1.select(document.forms[0].edate,'anchor2','MM/dd/yyyy',(document.forms[0].sdate.value=='$sdate')?(document.forms[0].edate.value):(document.forms[0].sdate.value)); return false;\" NAME=\"anchor2\" ID=\"anchor2\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></A>\n";
+	echo "<a href=\"#\" onClick=\"displayDatePicker('edate', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></A>\n";
 	echo "at <input type=text size=10 name=etime value=\"$etime\"></span><BR class=form>\n";
 	
 	echo "Set Exception for assessments:";
