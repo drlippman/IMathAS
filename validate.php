@@ -198,6 +198,9 @@ END;
 	$previewshift = -1;
 	$coursetheme = "default.css";
 	$basephysicaldir = rtrim(dirname(__FILE__), '/\\');
+	if (isset($sessiondata['isdiag']) && strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) {
+		header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php");
+	}
 	if (isset($sessiondata['ltiitemtype'])) {
 		if ($sessiondata['ltiitemtype']==1) {
 			if (strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false && isset($_GET['cid']) && $sessiondata['ltiitemid']!=$_GET['cid']) {
