@@ -211,6 +211,9 @@ td.barslefttop {
   border-left: 1px solid #000;
   border-top: 1px solid #000;
 }
+span.overbar {
+	border-top: 1px solid #000;
+}
 span.red {
 	color: red;
 }

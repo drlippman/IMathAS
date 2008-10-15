@@ -442,9 +442,10 @@ function gbtable() {
 			asort($name);
 			$itemorder = array_keys($name);
 		}
+		
 		foreach ($itemorder as $k) {
 			$gb[0][1][$pos][0] = $name[$k]; //item name
-			$gb[0][1][$pos][1] = $cats[$cat][6]; //item category name
+			$gb[0][1][$pos][1] = $cats[$category[$k]][6]; //item category name
 			$gb[0][1][$pos][2] = $possible[$k]; //points possible
 			$gb[0][1][$pos][3] = $avail[$k]; //0 past, 1 current, 2 future
 			$gb[0][1][$pos][4] = $cntingb[$k]; //0 no count and hide, 1 count, 2 EC, 3 no count
