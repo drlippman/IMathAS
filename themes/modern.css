@@ -65,12 +65,12 @@ div.breadcrumb {
 
 /*Control panels*/
 div.cp {
-	border: 1px solid #000;
-	background-color: #eee;
+	/*border: 1px solid #000;*/
+	background-color: #ddd;
 }
 div.cpmid {
 	/*border: 1px solid #000;*/
-	background-color: #eee;
+	background-color: #ddd;
 }
 
 

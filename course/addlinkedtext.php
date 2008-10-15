@@ -91,6 +91,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			
 		} else if (substr(trim(strip_tags($_POST['text'])),0,4)=="http") {
 			$_POST['text'] = trim(strip_tags($_POST['text']));	
+		} else if (substr(trim(strip_tags($_POST['text'])),0,5)=="file:") {
+			$_POST['text'] = trim(strip_tags($_POST['text']));	
 		} else {
 			require_once("../includes/htmLawed.php");
 			$htmlawedconfig = array('elements'=>'*-script');

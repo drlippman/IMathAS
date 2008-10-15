@@ -27,7 +27,6 @@ if ($isdiag) {
 } else {
 	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/assessment/print.css\" media=\"print\"/>\n";
 }
-
 if ($sessiondata['mathdisp']==1) {
 	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/ASCIIMathML.js\"></script>\n";
 } else if ($sessiondata['mathdisp']==2) {

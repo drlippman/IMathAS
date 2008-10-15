@@ -553,8 +553,8 @@
 			   if ((substr($line['text'],0,4)=="http") && (strpos($line['text']," ")===false)) { //is a web link
 				   $alink = trim($line['text']);
 				   $icon = 'web';
-			   } else if (substr($line['text'],0,5)=="file:") {
-				   $filename = substr($line['text'],5);
+			   } else if (substr(strip_tags($line['text']),0,5)=="file:") {
+				   $filename = substr(strip_tags($line['text']),5);
 				   $alink = $imasroot . "/course/files/".$filename;
 				   $ext = substr($filename,strpos($filename,'.')+1);
 				   switch($ext) {
