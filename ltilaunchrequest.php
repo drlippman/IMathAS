@@ -8,6 +8,11 @@ $debugmode = true;
 
 include("config.php");
 
+if ($enablesimplelti!=true) {
+	echo "LTI not enabled";
+	exit;
+}
+
 function reporterror($err) {
 	 // Do status 400
 	if ( $_REQUEST['action'] == 'launchresolve' ) {

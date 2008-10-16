@@ -3,10 +3,10 @@ Upgrade Notes
 *********************
 ** IMathAS 1.6     **
 *********************
-*** config.php changes ***
+*** config.php changes - Reference config.php.dist for changes. ***
 $freetypeinstalled no longer needed - autodetected
-NEED TO ADD $enablesimplelti
-$mathchaturl
+Added $enablesimplelti
+Added $mathchaturl
 
 *** Loginpage Changes ***
 Reference loginpage.php.dist for changes. 

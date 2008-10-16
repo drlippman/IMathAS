@@ -9,6 +9,10 @@ if (isset($_GET['stuerr'])) {
 	exit;
 }
 require("config.php");
+if ($enablesimplelti!=true) {
+	echo "LTI not enabled";
+	exit;
+}
 if (isset($sessionpath)) { session_save_path($sessionpath);}
 ini_set('session.gc_maxlifetime',86400);
 ini_set('auto_detect_line_endings',true);

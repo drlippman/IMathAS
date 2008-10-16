@@ -1,26 +1,7 @@
 <?php
   //MathChat
   //(c) 2008 David Lippman
-/*
-CREATE TABLE `mc_sessions` (
-`userid` INT( 10 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-`sessionid` VARCHAR( 32 ) NOT NULL ,
-`name` VARCHAR( 254 ) NOT NULL ,
-`room` INT( 10 ) NOT NULL ,
-`lastping` INT( 10 ) UNSIGNED NOT NULL,
-`mathdisp` TINYINT( 1 ) NOT NULL ,
-`graphdisp` TINYINT( 1 ) NOT NULL,
-INDEX ( `sessionid` ), INDEX( `room` ), INDEX( `lastping` )
-) TYPE = innodb;
 
-CREATE TABLE `mc_msgs` (
-`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-`userid` INT( 10 ) UNSIGNED NOT NULL ,
-`msg` TEXT NOT NULL ,
-`time` INT( 10 ) UNSIGNED NOT NULL ,
-INDEX ( `userid` ), INDEX ( `time` )
-) TYPE = innodb;
-*/
 require("../config.php");
 $svgimgurl = "$imasroot/filter/graph/svgimg.php";
 $svgdloc = "$imasroot/javascript/d.svg";

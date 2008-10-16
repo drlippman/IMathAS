@@ -79,6 +79,17 @@
   //Make sure this directory has write access by the server process.
   //$sessionpath = '/tmp/persistent/imathas/sessions';
   
+  //math live chat server - comment out to not use
+  //Chat uses its own database tables, and draws user info from the 
+  //query string rather than from the IMathAS user tables, so you
+  //can use the chat server on a different IMathAS install
+  //to reduce the server load on the main install. 
+  //use this URL to use the local server:
+  $mathchaturl = "$imasroot/mathchat/index.php";
+  
+  //enables use of IMathAS as a SimpleLTI producer.
+  $enablesimplelti = true;
+  
   //template user id
   //Generally not needed.  Use if you want a list of Template courses in the
   //copy course items page.  Set = to a user's ID who will serve as the 
