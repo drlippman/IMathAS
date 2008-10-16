@@ -281,7 +281,6 @@
 		
 		
 	}
-	
 	$qi = getquestioninfo($questions,$testsettings);
 	//check for withdrawn
 	for ($i=0; $i<count($questions); $i++) {

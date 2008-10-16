@@ -82,7 +82,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
 	}
 		
-	$query = "SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,topbar,cploc FROM imas_courses WHERE id='$cid'";
+	$query = "SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,chatset,topbar,cploc FROM imas_courses WHERE id='$cid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
 	if ($line == null) {
@@ -96,6 +96,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	$pagetitle = $line['name'];
 	$items = unserialize($line['itemorder']);
 	$msgset = $line['msgset']%5;
+	$chatset = $line['chatset'];
 	$useleftbar = ($line['cploc']==1);
 	$topbar = explode('|',$line['topbar']);
 	$topbar[0] = explode(',',$topbar[0]);
@@ -329,6 +330,11 @@ if ($overwriteBody==1) {
 			<a href="course.php?cid=<?php echo $cid ?>&stuview=0">Student View</a><br/>
 			<a href="course.php?cid=<?php echo $cid ?>&quickview=on">Quick View</a><br/>
 			<a href="showcalendar.php?cid=<?php echo $cid ?>">Calendar</a>
+		<?php 
+		if (isset($mathchaturl) &&  $chatset==1) {
+			echo "<br/><a href=\"$mathchaturl?uname=".urlencode($userfullname)."&amp;room=$cid&amp;roomname=".urlencode($coursename)."\" target=\"chat\">Chat</a>";
+		}
+		?>
 		</p>
 		<p><b>Manage:</b><br/>
 			<a href="manageqset.php?cid=<?php echo $cid ?>">Question Set</a><br/>
@@ -424,6 +430,10 @@ if ($overwriteBody==1) {
 <?php		 } ?>
 			<a href="<?php echo $imasroot ?>/forums/forums.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>">
 			Forums</a> <?php echo $newpostscnt ?>
+	<?php if (isset($mathchaturl) && $chatset==1) {
+			echo "<br/><a href=\"$mathchaturl?uname=".urlencode($userfullname)."&amp;room=$cid&amp;roomname=".urlencode($coursename)."\"  target=\"chat\">Chat</a>";
+		}
+	?>
 		</span>
 		<div class=clear></div>
 	</div>

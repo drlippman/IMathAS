@@ -135,6 +135,7 @@ $sql = 'CREATE TABLE `imas_courses` ('
 	. ' `copyrights` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `blockcnt` INT(10) UNSIGNED NOT NULL DEFAULT \'1\', '
 	. ' `msgset` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
+	. ' `chatset` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `topbar` VARCHAR(32) NOT NULL DEFAULT \'|\', '
 	. ' `cploc` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\','
 	. ' `available` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\','
@@ -608,6 +609,30 @@ $sql = 'CREATE TABLE `imas_ltinonces` ('
         . ' TYPE = innodb;';
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 echo 'imas_ltinonces created<br/>';
+
+$sql = 'CREATE TABLE `mc_sessions` ('
+        . ' `userid` INT( 10 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,'
+        . ' `sessionid` VARCHAR( 32 ) NOT NULL ,'
+        . ' `name` VARCHAR( 254 ) NOT NULL ,'
+        . ' `room` INT( 10 ) NOT NULL ,'
+        . ' `lastping` INT( 10 ) UNSIGNED NOT NULL,'
+        . ' `mathdisp` TINYINT( 1 ) NOT NULL ,'
+        . ' `graphdisp` TINYINT( 1 ) NOT NULL,'
+        . ' INDEX ( `sessionid` ), INDEX( `room` ), INDEX( `lastping` )'
+        . ' ) TYPE = innodb;';
+	
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+echo 'mc_sessions created<br/>';
+
+$sql = 'CREATE TABLE `mc_msgs` ('
+        . ' `id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,'
+        . ' `userid` INT( 10 ) UNSIGNED NOT NULL ,'
+        . ' `msg` TEXT NOT NULL ,'
+        . ' `time` INT( 10 ) UNSIGNED NOT NULL ,'
+        . ' INDEX ( `userid` ), INDEX ( `time` )'
+        . ' ) TYPE = innodb;';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+echo 'mc_msgs created<br/>';
 
 $md5pw = md5($password);
 $now = time();

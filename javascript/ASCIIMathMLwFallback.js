@@ -33,7 +33,7 @@ for more details.
 						     //can render a TeX strin
 var AMTcgiloc = null;
 var checkForMathML = true;   // check if browser can display MathML
-var notifyIfNoMathML = true; // display note if no MathML capability
+var notifyIfNoMathML = false; // display note if no MathML capability
 var alertIfNoMathML = false;  // show alert box if no MathML capability
 var mathcolor = "";       // change it to "" (to inherit) or any other color
 var mathfontfamily = "Serif"; // change to "" to inherit (works in IE) 

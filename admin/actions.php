@@ -113,6 +113,11 @@ switch($_GET['action']) {
 			$topbar[1] = '';
 		}
 		
+		if (isset($_POST['chatset'])) {
+			$chatset = 1;
+		} else {
+			$chatset = 0;
+		}
 		$topbar = implode('|',$topbar);
 		
 		$hideicons = $_POST['HIassess'] + $_POST['HIinline'] + $_POST['HIlinked'] + $_POST['HIforum'] + $_POST['HIblock'];
@@ -122,7 +127,7 @@ switch($_GET['action']) {
 		}
 		$_POST['ltisecret'] = trim($_POST['ltisecret']);
 		
-		$query = "UPDATE imas_courses SET name='{$_POST['coursename']}',enrollkey='{$_POST['ekey']}',hideicons='$hideicons',available='$avail',lockaid='{$_POST['lockaid']}',picicons='{$_POST['picicons']}',";
+		$query = "UPDATE imas_courses SET name='{$_POST['coursename']}',enrollkey='{$_POST['ekey']}',hideicons='$hideicons',available='$avail',lockaid='{$_POST['lockaid']}',picicons='{$_POST['picicons']}',chatset=$chatset,";
 		$query .= "allowunenroll='{$_POST['allowunenroll']}',copyrights='{$_POST['copyrights']}',msgset='{$_POST['msgset']}',topbar='$topbar',cploc='{$_POST['cploc']}',theme='{$_POST['theme']}',ltisecret='{$_POST['ltisecret']}' WHERE id='{$_GET['id']}'";
 		if ($myrights==40) { $query .= " AND ownerid='$userid'";}
 		mysql_query($query) or die("Query failed : " . mysql_error());
@@ -140,6 +145,11 @@ switch($_GET['action']) {
 		} else {
 			$topbar[1] = '';
 		}
+		if (isset($_POST['chatset'])) {
+			$chatset = 1;
+		} else {
+			$chatset = 0;
+		}
 		$topbar = implode('|',$topbar);
 		$hideicons = $_POST['HIassess'] + $_POST['HIinline'] + $_POST['HIlinked'] + $_POST['HIforum'] + $_POST['HIblock'];
 		$avail = 3 - $_POST['stuavail'] - $_POST['teachavail'];
@@ -148,8 +158,8 @@ switch($_GET['action']) {
 		}
 		$_POST['ltisecret'] = trim($_POST['ltisecret']);
 		$itemorder = addslashes(serialize(array()));
-		$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,itemorder,topbar,cploc,available,theme,ltisecret) VALUES ";
-		$query .= "('{$_POST['coursename']}','$userid','{$_POST['ekey']}','$hideicons','{$_POST['picicons']}','{$_POST['allowunenroll']}','{$_POST['copyrights']}','{$_POST['msgset']}','$itemorder','$topbar','{$_POST['cploc']}','$avail','{$_POST['theme']}','{$_POST['ltisecret']}');";
+		$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,chatset,itemorder,topbar,cploc,available,theme,ltisecret) VALUES ";
+		$query .= "('{$_POST['coursename']}','$userid','{$_POST['ekey']}','$hideicons','{$_POST['picicons']}','{$_POST['allowunenroll']}','{$_POST['copyrights']}','{$_POST['msgset']}',$chatset,'$itemorder','$topbar','{$_POST['cploc']}','$avail','{$_POST['theme']}','{$_POST['ltisecret']}');";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		$cid = mysql_insert_id();
 		//if ($myrights==40) {

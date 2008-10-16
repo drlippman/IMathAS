@@ -119,6 +119,7 @@ switch($_GET['action']) {
 			$avail = $line['available'];
 			$lockaid = $line['lockaid'];
 			$ltisecret = $line['ltisecret'];
+			$chatset = $line['chatset'];
 		} else {
 			$courseid = "Not yet set";
 			$name = "Enter course name here";
@@ -134,6 +135,7 @@ switch($_GET['action']) {
 			$lockaid = 0;
 			$theme = "default.css";
 			$ltisecret = "";
+			$chatset = 0;
 		}
 		if (isset($_GET['cid'])) {
 			$cid = $_GET['cid'];
@@ -250,6 +252,11 @@ switch($_GET['action']) {
 		echo '/> Off <br/> <input type=checkbox name="msgmonitor" value="1" ';
 		if ($msgmonitor==1) { echo "checked=1";}
 		echo '/> Enable monitoring of student-to-student messages</span><br class=form />';
+		
+		echo '<span class="form">Enable live chat:</span><span class="formright">';
+		echo '<input type=checkbox name="chatset" value="1" ';
+		if ($chatset==1) {echo 'checked="checked"';};
+		echo ' /></span><br class="form" />';
 		
 		echo "<span class=form>Student Quick Pick Top Bar items:</span><span class=formright>";
 		echo '<input type=checkbox name="stutopbar[]" value="0" ';

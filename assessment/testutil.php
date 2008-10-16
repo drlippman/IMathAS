@@ -54,7 +54,11 @@ function getquestioninfo($qns,$testsettings) {
 function getansweights($qi,$code) {
 	global $seeds,$questions;	
 	$i = array_search($qi,$questions);
-	srand($seeds[$i]);
+	return sandboxgetweights($code,$seeds[$i]);
+}
+
+function sandboxgetweights($code,$seed) {
+	srand($seed);
 	eval(interpret('control','multipart',$code));
 	if (is_array($answeights)) {
 		return $answeights;

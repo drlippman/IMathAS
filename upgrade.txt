@@ -6,11 +6,33 @@ Upgrade Notes
 *** config.php changes ***
 $freetypeinstalled no longer needed - autodetected
 NEED TO ADD $enablesimplelti
+$mathchaturl
 
 *** Loginpage Changes ***
 Reference loginpage.php.dist for changes. 
 	
 *** Database Changes ***
+CREATE TABLE `mc_sessions` (
+`userid` INT( 10 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`sessionid` VARCHAR( 32 ) NOT NULL ,
+`name` VARCHAR( 254 ) NOT NULL ,
+`room` INT( 10 ) NOT NULL ,
+`lastping` INT( 10 ) UNSIGNED NOT NULL,
+`mathdisp` TINYINT( 1 ) NOT NULL ,
+`graphdisp` TINYINT( 1 ) NOT NULL,
+INDEX ( `sessionid` ), INDEX( `room` ), INDEX( `lastping` )
+) TYPE = innodb;
+
+CREATE TABLE `mc_msgs` (
+`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`userid` INT( 10 ) UNSIGNED NOT NULL ,
+`msg` TEXT NOT NULL ,
+`time` INT( 10 ) UNSIGNED NOT NULL ,
+INDEX ( `userid` ), INDEX ( `time` )
+) TYPE = innodb;
+
+ALTER TABLE `imas_courses` ADD `chatset` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0';
+
 ALTER TABLE `imas_assessments` ADD `ltisecret` VARCHAR( 10 ) NOT NULL ;
 ALTER TABLE `imas_courses` ADD `ltisecret` VARCHAR( 10 ) NOT NULL ;
 
