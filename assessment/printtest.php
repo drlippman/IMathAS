@@ -112,15 +112,23 @@
 	echo "<div class=breadcrumb>Print Ready Version</div>";
 	echo '<div class=intro>'.$testsettings['intro'].'</div>';
 	if ($isteacher) {
-		echo '<input type="button" onclick="rendersa()" value="Show Answers" />';
+		echo '<input type="button" class="btn" onclick="rendersa()" value="Show Answers" />';
 	}
 	for ($i = 0; $i < count($questions); $i++) {
 		list($qsetid,$cat) = getqsetid($questions[$i]);
 		
 		$showa = $isteacher;
-		echo "<div>#".($i+1)." Points possible: " . getpointspossible($questions[$i],$testsettings['defpoints']) . "</div>";
+		echo '<div class="nobreak">';
+		if (isset($_GET['descr'])) {
+			$query = "SELECT description FROM imas_questionset WHERE id='$qsetid'";
+			$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+			echo '<div>ID:'.$qsetid.', '.mysql_result($result,0,0).'</div>';
+		} else {
+			echo "<div>#".($i+1)." Points possible: " . getpointspossible($questions[$i],$testsettings['defpoints'])."</div>";
+		}
 		displayq($i,$qsetid,$seeds[$i],$showa,($testsettings['showhints']==1),$attempts[$i]);
 		echo "<hr />";	
+		echo '</div>';
 		
 	}
 ?>

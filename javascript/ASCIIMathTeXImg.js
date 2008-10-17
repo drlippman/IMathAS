@@ -825,6 +825,6 @@ function AMprocessNode(n, linebreaks, spanclassAM) {
 
 var AMbody;
 var AMtranslated = false;
-
+var AMnoMathML = true;
 
 AMinitSymbols();

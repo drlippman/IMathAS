@@ -633,14 +633,11 @@
 		echo " function updatetime() {\n";
 		echo "	  seconds--;\n";
 		echo "    if (seconds==0 && minutes==0 && hours==0) {done=true; ";
-		//kickout:  need to rework to send to "done" page  
-		//echo "		if (doonsubmit(document.getElementById(\"qform\"),true,true)) { document.getElementById(\"qform\").submit();}} \n";
 		if ($timelimitkickout) {
 			echo "		document.getElementById('timelimitholder').className = \"\";";
 			echo "		document.getElementById('timelimitholder').style.color = \"#f00\";";
 			echo "		document.getElementById('timelimitholder').innerHTML = \"Time limit expired - submitting now\";";
 			echo " 		document.getElementById('timelimitholder').style.fontSize=\"300%\";";
-			//echo "		alert(\"Time Limit has elapsed.  Finalizing test.\");\n";
 			echo "		if (document.getElementById(\"qform\") == null) { ";
 			echo "			setTimeout(\"window.location.pathname='$imasroot/assessment/showtest.php?action=skip&superdone=true'\",2000); return;";
 			echo "		} else {";
@@ -648,6 +645,7 @@
 			echo " 		var action = theform.getAttribute(\"action\");";
 			echo "		theform.setAttribute(\"action\",action+'&superdone=true');";
 			echo "		if (doonsubmit(theform,true,true)) { setTimeout('document.getElementById(\"qform\").submit()',2000);}} \n";
+			echo "		return 0;";
 			echo "      }";
 			
 		} else {

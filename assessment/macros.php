@@ -1395,7 +1395,11 @@ function today($str = "F j, Y") {
 }
 
 function numtoroman($n,$uc=true) {
-	$lookup = array('M'=>1000,'CM'=>900,'D'=>500,'CD'=>400,'C'=>100,'XC'=>90,'L'=>50,'XL'=>40,'X'=>10,'IX'=>9,'V'=>5,'IV'=>4,'I'=>1,'<span class="overbar">SS</span>'=>0.5);
+	if ($uc) {
+		$lookup = array('M'=>1000,'CM'=>900,'D'=>500,'CD'=>400,'C'=>100,'XC'=>90,'L'=>50,'XL'=>40,'X'=>10,'IX'=>9,'V'=>5,'IV'=>4,'I'=>1,'<span style="border-top:1px solid;">SS</span>'=>0.5);
+	} else {
+		$lookup = array('m'=>1000,'cm'=>900,'d'=>500,'cd'=>400,'c'=>100,'xc'=>90,'l'=>50,'xl'=>40,'x'=>10,'ix'=>9,'v'=>5,'iv'=>4,'i'=>1,'<span style="border-top:1px solid;">ss</span>'=>0.5);
+	}
 	$roman = '';
 	foreach($lookup as $r=>$v) {
 		while($n >= $v) {
@@ -1403,11 +1407,7 @@ function numtoroman($n,$uc=true) {
 			$n -= $v;
 		}
 	}
-	if ($uc) {
-		return $roman;
-	} else {
-		return strtolower($roman);
-	}
+	return $roman;
 }
 
 ?>
