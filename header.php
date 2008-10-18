@@ -54,15 +54,17 @@ tinyMCE.init({
     mode : "exact",
     elements : "$useeditor",
     theme : "advanced",
-    theme_advanced_buttons1 : "fontselect,fontsizeselect,formatselect,bold,italic,underline,strikethrough,separator,sub,sup,separator,cut,copy,paste,undo,redo",
+    theme_advanced_buttons1 : "fontselect,fontsizeselect,formatselect,bold,italic,underline,strikethrough,separator,sub,sup,separator,cut,copy,paste,pasteword,undo,redo",
     theme_advanced_buttons2 : "justifyleft,justifycenter,justifyright,justifyfull,separator,numlist,bullist,outdent,indent,separator,forecolor,backcolor,separator,hr,link,unlink,image,table,code,separator,asciimath,asciimathcharmap,asciisvg",
     theme_advanced_buttons3 : "",
     theme_advanced_fonts : "Arial=arial,helvetica,sans-serif,Courier New=courier new,courier,monospace,Georgia=georgia,times new roman,times,serif,Tahoma=tahoma,arial,helvetica,sans-serif,Times=times new roman,times,serif,Verdana=verdana,arial,helvetica,sans-serif",
     theme_advanced_toolbar_location : "top",
     theme_advanced_toolbar_align : "left",
     theme_advanced_statusbar_location : "bottom",
-    plugins : 'safari,asciimath,asciisvg,table,inlinepopups',
+    plugins : 'safari,asciimath,asciisvg,table,inlinepopups,paste',
     theme_advanced_resizing : true,
+    cleanup_callback : "imascleanup",
+    content_css : '$imasroot/themes/$coursetheme',
     AScgiloc : '$imasroot/filter/graph/svgimg.php',
     ASdloc : '$imasroot/javascript/d.svg'
 END;
@@ -78,9 +80,6 @@ function fileBrowserCallBack(field_name, url, type, win) {
 		case "image":
 			connector += "?type=img";
 			break;
-		case "media":
-			connector += "?type=media";
-			break;
 		case "file":
 			connector += "?type=files";
 			break;
@@ -88,10 +87,10 @@ function fileBrowserCallBack(field_name, url, type, win) {
 	tinyMCE.activeEditor.windowManager.open({
 		file : connector,
 		title : 'File Manager',
-		width : 350,  // Your dimensions may differ - toy around with them!
+		width : 350,  
 		height : 450,
 		resizable : "yes",
-		inline : "yes",  // This parameter only has an effect if you use the inlinepopups plugin!
+		inline : "yes",  
 		close_previous : "no"
 	    }, {
 		window : win,
@@ -100,6 +99,18 @@ function fileBrowserCallBack(field_name, url, type, win) {
 
 	//window.open(connector, "file_manager", "modal,width=450,height=440,scrollbars=1");
 }
+function imascleanup(type, value) {
+	if (type=="get_from_editor") {
+		var rl = '\u2122,<sup>TM</sup>,\u2026,...,\x93|\x94|\u201c|\u201d,",\u2018|\u2019,\',\u2013|\u2014|\u2015|\u2212,-'.split(',');
+		for (var i=0; i<rl.length; i+=2)
+			value = value.replace(new RegExp(rl[i], 'gi'), rl[i+1]);
+		value = value.replace(/<!--([\s\S]*?)-->|&lt;!--([\s\S]*?)--&gt;|<style>[\s\S]*?<\/style>/g, "");  // Word comments
+		value = value.replace(/class="?Mso\w+"?/g,'');
+		value = value.replace(/<p\s*>\s*<\\/p>/gi,'');
+	}
+	return value;
+}
+
 END;
 } else {
 	echo "});";
