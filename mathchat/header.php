@@ -5,6 +5,19 @@
 <title>Math Chat</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <link rel="stylesheet" href="mathchat.css" type="text/css" />
+<!--[if lt IE 7]>
+<script type="text/javascript">
+function resizechat() {
+	winW = document.body.offsetWidth;
+	winH = document.body.offsetHeight;
+	document.getElementById("msgbody").style.height = (winH - 200) + 'px';
+	document.getElementById("users").style.height = (winH - 200) + 'px';
+	document.getElementById("msgbody").style.width = (winW - 200) + 'px';
+	window.onresize = resizechat;
+	}
+window.onload = resizechat;
+</script>
+<![endif]-->
 <script type="text/javascript" src="mathchat.js"></script>
 <script type="text/javascript" src="../javascript/ASCIIMathMLwFallback.js"></script>
 <script type="text/javascript" src="../javascript/ASCIIsvg.js"></script>

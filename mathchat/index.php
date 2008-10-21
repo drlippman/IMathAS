@@ -43,7 +43,7 @@ if (mysql_num_rows($result)==0) {
 	exit;
 } else {
 	if (!empty($_REQUEST['uname']) && !empty($_REQUEST['room'])) {
-		$query = "UPDATE mc_sessions SET name='{$_REQUEST['uname']}',room='{$_REQUEST['room']}'";
+		$query = "UPDATE mc_sessions SET name='{$_REQUEST['uname']}',room='{$_REQUEST['room']}'  WHERE sessionid='$sessionid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		$_SESSION['roomname'] = $_REQUEST['roomname'];
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF']);

@@ -63,6 +63,7 @@ tinyMCE.init({
     theme_advanced_toolbar_align : "left",
     theme_advanced_statusbar_location : "bottom",
     plugins : 'safari,asciimath,asciisvg,table,inlinepopups,paste',
+    content_css : '$imasroot/themes/$coursetheme',
     theme_advanced_resizing : true,
     cleanup_callback : "imascleanup",
     content_css : '$imasroot/themes/$coursetheme',

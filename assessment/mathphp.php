@@ -19,7 +19,7 @@ function parenvarifneeded($matches) {
 	  }
   }
 //varlist should be | separated, like "x|y"
-function mathphp($st,$varlist,$skipfactorial=false) {
+function mathphp($st,$varlist,$skipfactorial=false,$ignorestrings=true) {
   //translate a math formula to php function notation
   // a^b --> pow(a,b)
   // na --> n*a
@@ -33,9 +33,11 @@ function mathphp($st,$varlist,$skipfactorial=false) {
   //$st = preg_replace('/(\$[a-zA-Z\d]+)$/',"($1)",$st);
   $st .= ' ';
   
-  preg_match_all('/(\'|").*?[^\\\\](\\1)/',$st,$strmatches,PREG_SET_ORDER);
-  foreach ($strmatches as $k=>$match) {
-	 $st =  str_replace($match[0],"(#$k#)",$st);
+  if ($ignorestrings) {
+	  preg_match_all('/(\'|").*?[^\\\\](\\1)/',$st,$strmatches,PREG_SET_ORDER);
+	  foreach ($strmatches as $k=>$match) {
+		 $st =  str_replace($match[0],"(#$k#)",$st);
+	  }
   }
   //$st = preg_replace('/(\$[a-zA-Z\d_]+)([^\[])/',"($1)$2",$st);
   $st = preg_replace_callback('/(\$[a-zA-Z\d_]+)(.)/','parenvarifneeded',$st);
@@ -186,8 +188,10 @@ function mathphp($st,$varlist,$skipfactorial=false) {
   $st= preg_replace('/([^a-zA-Z])ln$/',"\\1log",$st);
   $st= preg_replace("/([^a-zA-Z])ln([^a-zA-Z])/","\\1log$2",$st);
   
-  foreach ($strmatches as $k=>$match) {
-	 $st =  str_replace("(#$k#)",$match[0],$st);
+  if ($ignorestrings) {
+	  foreach ($strmatches as $k=>$match) {
+		 $st =  str_replace("(#$k#)",$match[0],$st);
+	  }
   }
 //echo "st: $st<br/>";
   return $st;

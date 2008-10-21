@@ -1448,6 +1448,8 @@ The following macros help with display:
    will often cause weird things to happen, so test well</li>
 <li><b>numtowords(number,[addth])</b>:  Creates a string containing number written out in words.  Add true as second parameter
     to change five to fifth.</li>
+<li><b>numtoroman(number,[uppercase])</b>:  Converts a number 0.5-3999.5 to a roman numeral string.  Defaults to uppercase; set second parameter to false to
+    produce lowercase</li>
 <li><b>stringappend(value,string)</b>: Appends string to value.  If value is an array, string is appended to each element of the array</li>
 <li><b>stringprepend(value,string)</b>:  Same as stringappend, but prepends string to value</li>
 <li><b>prettyint(number)</b>:  Adds commas in thousands spaces of integers.  Example: prettyint(1234) will return "1,234".  The result is a string, which

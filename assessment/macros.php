@@ -925,7 +925,7 @@ function calconarray($array,$todo) {
 			}
 		}
 	}
-	$todo = mathphp($todo,'x');
+	$todo = mathphp($todo,'x',false,false);
 	$todo = str_replace('(x)','($x)',$todo);
 	return array_map(create_function('$x','return('.$todo.');'),$array);	
 }
@@ -948,7 +948,7 @@ function calconarrayif($array,$todo,$ifcond) {
 			}
 		}
 	}
-	$todo = mathphp($todo,'x');
+	$todo = mathphp($todo,'x',false,false);
 	$todo = str_replace('(x)','($x)',$todo);
 	
 	$rsnoquote = preg_replace('/"[^"]*"/','""',$ifcond);
@@ -965,7 +965,7 @@ function calconarrayif($array,$todo,$ifcond) {
 		}
 	}
 	$ifcond = str_replace('!=','#=',$ifcond);
-	$ifcond = mathphp($ifcond,'x');
+	$ifcond = mathphp($ifcond,'x',false,false);
 	$ifcond = str_replace('#=','!=',$ifcond);
 	$ifcond = str_replace('(x)','($x)',$ifcond);
 	$iffunc = create_function('$x','return('.$ifcond.');');
