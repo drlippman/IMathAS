@@ -12,6 +12,10 @@ Added $mathchaturl
 Reference loginpage.php.dist for changes. 
 	
 *** Database Changes ***
+ALTER TABLE `imas_msgs` ADD `parent` INT( 10 ) UNSIGNED NOT NULL DEFAULT '0' ,
+ADD `baseid` INT( 10 ) UNSIGNED NOT NULL DEFAULT '0' ;
+ALTER TABLE `imas_msgs` ADD INDEX ( `baseid` ) ;
+
 CREATE TABLE `mc_sessions` (
 `userid` INT( 10 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 `sessionid` VARCHAR( 32 ) NOT NULL ,

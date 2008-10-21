@@ -46,6 +46,7 @@ if (isset($placeinhead)) {
 	echo $placeinhead;
 }
 if (isset($useeditor) && $sessiondata['useed']==1) {
+	//cleanup_callback : "imascleanup",
 echo <<<END
 <script type="text/javascript" src="$imasroot/editor/tiny_mce.js"></script>
 
@@ -101,9 +102,11 @@ function fileBrowserCallBack(field_name, url, type, win) {
 }
 function imascleanup(type, value) {
 	if (type=="get_from_editor") {
-		var rl = '\u2122,<sup>TM</sup>,\u2026,...,\x93|\x94|\u201c|\u201d,",\u2018|\u2019,\',\u2013|\u2014|\u2015|\u2212,-'.split(',');
-		for (var i=0; i<rl.length; i+=2)
+		value = value.replace(/[\x84\x93\x94]/g,'"');
+		var rl = '\u2122,<sup>TM</sup>,\u2026,...,\u201c|\u201d,",\u2018|\u2019,\',\u2013|\u2014|\u2015|\u2212,-'.split(',');
+		for (var i=0; i<rl.length; i+=2) {
 			value = value.replace(new RegExp(rl[i], 'gi'), rl[i+1]);
+		}
 		value = value.replace(/<!--([\s\S]*?)-->|&lt;!--([\s\S]*?)--&gt;|<style>[\s\S]*?<\/style>/g, "");  // Word comments
 		value = value.replace(/class="?Mso\w+"?/g,'');
 		value = value.replace(/<p\s*>\s*<\\/p>/gi,'');

@@ -47,7 +47,15 @@
 			if ($_GET['replyto']>0) {
 				$query = "UPDATE imas_msgs SET replied=1 WHERE id='{$_GET['replyto']}'";
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
-			}
+				$query = "SELECT baseid FROM imas_msgs WHERE id='{$_GET['replyto']}'";
+				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				$baseid = mysql_result($result,0,0);
+				if ($baseid==0) {
+					$baseid = $_GET['replyto'];
+				}
+				$query = "UPDATE imas_msgs SET baseid='$baseid',parent='{$_GET['replyto']}' WHERE id='$msgid'";
+				mysql_query($query) or die("Query failed : $query " . mysql_error());
+			} 
 			$query = "SELECT name FROM imas_courses WHERE id='{$_POST['courseid']}'";
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			$cname = mysql_result($result,0,0);

@@ -1144,7 +1144,10 @@ function parseShortScript(sscript,gw,gh) {
 		
 		try {
 			eval(commands);
-		} catch (e) {alert("Graph not ready");}
+		} catch (e) {
+			setTimeout(function() {parseShortScript(sscript,gw,gh)},100);
+			//alert("Graph not ready");
+		}
 		
 		picture.setAttribute("alt",eqnlist);
 		//picture.setAttribute("width", sa[9]);
