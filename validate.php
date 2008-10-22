@@ -1,6 +1,7 @@
 <?php
 //IMathAS:  Checks user's login - prompts if none. 
 //(c) 2006 David Lippman
+ header('P3P: CP="ALL CUR ADM OUR"');
  $curdir = rtrim(dirname(__FILE__), '/\\');
  require_once("$curdir/config.php");
  if (isset($sessionpath)) { session_save_path($sessionpath);}
@@ -181,6 +182,22 @@ END;
 			 $querys = '';
 		 }
 		 header("Location: http://" . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . $querys);	 
+	 } else {
+		 if (empty($_SESSION['challenge'])) {
+			 $badsession = true;
+		 }
+		 if ($line==null) {
+			 $err = "Bad SID";
+		 } else if ($_SESSION['challenge']!=$_POST['challenge']) {
+			 $err = "Bad Challenge (post:{$_POST['challenge']}, sess: ".addslashes($_SESSION['challenge']).")";	 
+		 } else {
+			 $err = "Bad PW";
+		 }
+		 $err .= ','.addslashes($_SERVER['HTTP_USER_AGENT']);
+		 $query = "INSERT INTO imas_failures (SID,challenge,sent,type) VALUES ";
+		 $query .= "('{$_POST['username']}','{$_SESSION['challenge']}','{$_POST['password']}','$err')";
+		 mysql_query($query) or die("Query failed : " . mysql_error());
+		 
 	 }
 	
  }

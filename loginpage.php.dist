@@ -14,7 +14,7 @@ if (!isset($imasroot)) { //don't allow direct access to loginpage.php
 	 } else {
 		 $querys = '';
 	 }
-	 if (isset($_SESSION['challenge'])) {
+	 if (!empty($_SESSION['challenge'])) {
 		 $challenge = $_SESSION['challenge'];
 	 } else {
 		 //use of microtime guarantees no challenge used twice
@@ -43,7 +43,13 @@ if (!isset($imasroot)) { //don't allow direct access to loginpage.php
 <div id="loginbox">
 <form method="post" action="<?php echo $_SERVER['PHP_SELF'].$querys;?>" onsubmit="hashpw()">
 <?php
-	if ($haslogin) {echo "<p>Login Error.  Try Again</p>\n";}
+	if ($haslogin) {
+		if ($badsession) {
+			echo '<p>Unable to establish a session.  Check that your browser is set to allow session cookies</p>';
+		} else {
+			echo "<p>Login Error.  Try Again</p>\n";
+		}
+	}
 ?>
 <b>Login</b>
 <table>

@@ -842,6 +842,7 @@ function gbinstrdisp() {
 				}
 			}
 		}
+		echo '</tr>';
 	}
 	echo "</tbody></table>";
 	if ($n>0) {
