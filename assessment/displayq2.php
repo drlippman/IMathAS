@@ -1703,6 +1703,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$answer = preg_replace('/[^\w\*\/\+\=\-\(\)\[\]\{\}\,\.\^\$\!]+/','',$answer);
 
 		if ($answerformat=="equation") {
+			if (strpos($_POST["tc$qn"],'=')===false) {
+				return 0;
+			}
 			$answer = preg_replace('/(.*)=(.*)/','$1-($2)',$answer);
 			unset($ratios);
 		} else if ($answerformat=="toconst") {
@@ -1751,6 +1754,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 		}
 		$cntnan = 0;
+		$cntzero = 0;
 		for ($i = 0; $i < 20; $i++) {
 			for($j=0; $j < count($variables); $j++) {
 
@@ -1770,6 +1774,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			if ($answerformat=="equation") {  //if equation, store ratios
 				if (abs($realans)>.000001 && is_numeric($myans[$i])) {
 					$ratios[] = $myans[$i]/$realans;
+					if ($myans[$i]==0 && $realans!=0) {
+						$cntzero++;
+					}
 				}
 			} else if ($answerformat=="toconst") {
 				$diffs[] = $myans[$i] - $realans;
@@ -1788,12 +1795,16 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 		if ($answerformat=="equation") {
 			if (count($ratios)>0) {
-				$meanratio = array_sum($ratios)/count($ratios);
-				for ($i=0; $i<count($ratios); $i++) {
-					if (isset($abstolerance)) {
-						if (abs($ratios[$i]-$meanratio) > $abstolerance-1E-12) {$correct = false; break;}	
-					} else {
-						if ((abs($ratios[$i]-$meanratio)/(abs($meanratio)+.0001) > $reltolerance-1E-12)) {$correct = false; break;}
+				if (count($ratios)==$cntzero) {
+					$correct = false;
+				} else {
+					$meanratio = array_sum($ratios)/count($ratios);
+					for ($i=0; $i<count($ratios); $i++) {
+						if (isset($abstolerance)) {
+							if (abs($ratios[$i]-$meanratio) > $abstolerance-1E-12) {$correct = false; break;}	
+						} else {
+							if ((abs($ratios[$i]-$meanratio)/(abs($meanratio)+.0001) > $reltolerance-1E-12)) {$correct = false; break;}
+						}
 					}
 				}
 			} else {
