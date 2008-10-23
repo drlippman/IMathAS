@@ -186,6 +186,7 @@ END;
 		 if (empty($_SESSION['challenge'])) {
 			 $badsession = true;
 		 }
+		 /*  For login error tracking - requires add'l table
 		 if ($line==null) {
 			 $err = "Bad SID";
 		 } else if ($_SESSION['challenge']!=$_POST['challenge']) {
@@ -197,6 +198,7 @@ END;
 		 $query = "INSERT INTO imas_failures (SID,challenge,sent,type) VALUES ";
 		 $query .= "('{$_POST['username']}','{$_SESSION['challenge']}','{$_POST['password']}','$err')";
 		 mysql_query($query) or die("Query failed : " . mysql_error());
+		 */
 		 
 	 }
 	
