@@ -205,17 +205,30 @@ if (!$isteacher || $stu!=0) { //show student view
 	require("../footer.php");
 	
 } else { //show instructor view
-	
-	$placeinhead .= "<script type=\"text/javascript\">function lockcol() { \n";
-	$placeinhead .= " var cont = document.getElementById(\"tbl-container\");\n";
-	$placeinhead .= " if (cont.style.overflow == \"auto\") {\n";
-	$placeinhead .= "   cont.style.height = \"auto\"; cont.style.overflow = \"visible\"; cont.style.border = \"0px\";";
-	$placeinhead .= "document.getElementById(\"myTable\").className = \"gb\"; document.cookie = 'gblhdr-$cid=0';";
-	$placeinhead .= "  document.getElementById(\"lockbtn\").value = \"Lock headers\"; } else {";
-	$placeinhead .= " cont.style.height = \"75%\"; cont.style.overflow = \"auto\"; cont.style.border = \"1px solid #000\";\n";
-	$placeinhead .= "document.getElementById(\"myTable\").className = \"gbl\"; document.cookie = 'gblhdr-$cid=1'; ";
-	$placeinhead .= "  document.getElementById(\"lockbtn\").value = \"Unlock headers\"; }";
-	$placeinhead .= "} ";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablescroller.js\"></script>\n";
+	$placeinhead .= "<script type=\"text/javascript\">\n";
+	$placeinhead .= 'var ts = new tablescroller("myTable",';
+	if (isset($_COOKIE["gblhdr-$cid"]) && $_COOKIE["gblhdr-$cid"]==1) {
+		$placeinhead .= 'false);';
+	} else {
+		$placeinhead .= 'false);';
+	}
+	$placeinhead .= "\nfunction lockcol() { \n";
+	$placeinhead .= "var tog = ts.toggle(); ";
+	$placeinhead .= "if (tog==1) { "; //going to locked
+	$placeinhead .= "document.cookie = 'gblhdr-$cid=1';\n document.getElementById(\"lockbtn\").value = \"Unlock headers\"; ";
+	$placeinhead .= "} else {";
+	$placeinhead .= "document.cookie = 'gblhdr-$cid=0';\n document.getElementById(\"lockbtn\").value = \"Lock headers\"; ";
+	//$placeinhead .= " var cont = document.getElementById(\"tbl-container\");\n";
+	//$placeinhead .= " if (cont.style.overflow == \"auto\") {\n";
+	//$placeinhead .= "   cont.style.height = \"auto\"; cont.style.overflow = \"visible\"; cont.style.border = \"0px\";";
+	//$placeinhead .= "document.getElementById(\"myTable\").className = \"gb\"; document.cookie = 'gblhdr-$cid=0';";
+	//$placeinhead .= "  document.getElementById(\"lockbtn\").value = \"Lock headers\"; } else {";
+	//$placeinhead .= " cont.style.height = \"75%\"; cont.style.overflow = \"auto\"; cont.style.border = \"1px solid #000\";\n";
+	//$placeinhead .= "document.getElementById(\"myTable\").className = \"gbl\"; document.cookie = 'gblhdr-$cid=1'; ";
+	//$placeinhead .= "  document.getElementById(\"lockbtn\").value = \"Unlock headers\"; }";
+	$placeinhead .= "}}\n ";
 	
 	$placeinhead .= "function chkAll(frm, arr, mark) {  for (i = 0; i <= frm.elements.length; i++) {   try{     if(frm.elements[i].name == arr) {  frm.elements[i].checked = mark;     }   } catch(er) {}  }}";
 	$placeinhead .= "</script>\n";
@@ -240,7 +253,13 @@ if (!$isteacher || $stu!=0) { //show student view
 	echo "<a href=\"gbsettings.php?cid=$cid\">GB Settings</a> | ";
 	echo "<a href=\"gradebook.php?cid=$cid&stu=-1\">Averages</a> | ";
 	echo "<a href=\"gbcomments.php?cid=$cid&stu=0\">Comments</a> | ";
-	echo "<input type=\"button\" id=\"lockbtn\" onclick=\"lockcol()\" value=\"Lock headers\"/><br/>\n";
+	echo "<input type=\"button\" id=\"lockbtn\" onclick=\"lockcol()\" value=\"";
+	//if (isset($_COOKIE["gblhdr-$cid"]) && $_COOKIE["gblhdr-$cid"]==1) {
+	//	echo "Unlock headers";
+	//} else {
+		echo "Lock headers";
+	//}
+	echo "\"/><br/>\n";
 	echo 'Category: <select id="filtersel" onchange="chgfilter()">';
 	echo '<option value="-1" ';
 	if ($catfilter==-1) {echo "selected=1";}
@@ -563,9 +582,9 @@ function gbinstrdisp() {
 	}
 	$gbt = gbtable();
 	//print_r($gbt);
-	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
+	//echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n"; in placeinhead
 	echo "<div id=\"tbl-container\">";
-	echo "<table class=gb id=myTable><thead><tr>";
+	echo '<table class="gb" id="myTable"><thead><tr>';
 	$n=0;
 	for ($i=0;$i<count($gbt[0][0]);$i++) { //biographical headers
 		if ($i==1 && $gbt[0][0][1]!='ID') { continue;}

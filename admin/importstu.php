@@ -45,7 +45,7 @@ function parsecsv($data) {
 			$email = 'none@none.com';
 		}
 	} else {
-		$email = 'setme@none.com';
+		$email = 'none@none.com';
 	}
 	if ($_POST['codetype']==1) {
 		$code = $data[$_POST['code']-1];	
@@ -105,6 +105,9 @@ if (!(isset($teacherid)) && $myrights<100) {
 		
 		while (($data = fgetcsv($handle,2096))!==false) {
 			$arr = parsecsv($data);
+			for ($i=0;$i<count($arr);$i++) {
+				$arr[$i] = trim($arr[$i]);
+			}
 			addslashes_deep($arr);
 			if (trim($arr[0])=='' || trim($arr[0])=='_') {
 				continue;

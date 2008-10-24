@@ -5,7 +5,11 @@ function hashpw() {
 	val=val.replace(/\'/g,'\\\'');
 	val=val.replace(/\"/g,'\\"');
 	val=val.replace(/\0/g,'\\0');
-	pwel.value = hex_md5(hex_md5(val) + document.getElementById("challenge").value);	
+	try {
+		pwel.value = hex_md5(hex_md5(val) + document.getElementById("challenge").value);
+	} catch(e) {
+		pwel.value = val;
+	}
 }
 
 /*
