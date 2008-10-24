@@ -210,7 +210,7 @@ if (!$isteacher || $stu!=0) { //show student view
 	$placeinhead .= "<script type=\"text/javascript\">\n";
 	$placeinhead .= 'var ts = new tablescroller("myTable",';
 	if (isset($_COOKIE["gblhdr-$cid"]) && $_COOKIE["gblhdr-$cid"]==1) {
-		$placeinhead .= 'false);';
+		$placeinhead .= 'true);';
 	} else {
 		$placeinhead .= 'false);';
 	}
@@ -254,11 +254,11 @@ if (!$isteacher || $stu!=0) { //show student view
 	echo "<a href=\"gradebook.php?cid=$cid&stu=-1\">Averages</a> | ";
 	echo "<a href=\"gbcomments.php?cid=$cid&stu=0\">Comments</a> | ";
 	echo "<input type=\"button\" id=\"lockbtn\" onclick=\"lockcol()\" value=\"";
-	//if (isset($_COOKIE["gblhdr-$cid"]) && $_COOKIE["gblhdr-$cid"]==1) {
-	//	echo "Unlock headers";
-	//} else {
+	if (isset($_COOKIE["gblhdr-$cid"]) && $_COOKIE["gblhdr-$cid"]==1) {
+		echo "Unlock headers";
+	} else {
 		echo "Lock headers";
-	//}
+	}
 	echo "\"/><br/>\n";
 	echo 'Category: <select id="filtersel" onchange="chgfilter()">';
 	echo '<option value="-1" ';

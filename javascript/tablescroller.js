@@ -1,3 +1,34 @@
+/*** 
+Table row / column header locker
+(c) David Lippman, 2008.  http://www.pierce.ctc.edu/dlippman
+
+v0.1 10/23/08
+
+This script allows you to lock the header row and column of an html table.
+Assumes table has one header <tr> in <thead>, and multiple <tr> in <tbody>.
+
+useage:
+var ts = new tablescroller(tableid,lockonload);
+
+tableid is the ID of your table; lockonload is true/false of whether you want
+the table to autolock the headers on page load.
+
+Public functions:
+ts.lock()		Locks the headers
+ts.unlock()		Unlocks the headers
+ts.toggle()		Toggles locked/unlocked. Returns corresponding 1 or 0.
+
+This library is free software; you can redistribute it and/or modify it 
+under the terms of the GNU Lesser General Public License as published by the 
+Free Software Foundation; either version 2.1 of the License, or (at your option)
+any later version.
+
+This library is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
+***/
+
+//from http://www.webreference.com/programming/javascript/onloads/
 function addLoadEvent(func) { 
 	  var oldonload = window.onload; 
 	  if (typeof window.onload != 'function') { 
@@ -11,6 +42,16 @@ function addLoadEvent(func) {
 	    } 
 	  } 
 	} 
+function findPos(obj) { //from quirksmode.org
+	var curleft = curtop = 0;
+	if (obj.offsetParent) {
+		do {
+			curleft += obj.offsetLeft;
+			curtop += obj.offsetTop;
+		} while (obj = obj.offsetParent);
+	}
+	return [curleft,curtop];
+}
 
 function tablescroller(id,lockonload) {
 	var thetable;
@@ -29,9 +70,14 @@ function tablescroller(id,lockonload) {
 	var toggletracker = 0;
 	var locktds = new Array();
 	
-
+//preinit is called onload
+//fixes column widths and heights by injecting div's 
+//into first and second rows and columns, locking in non-scrolling layout
 this.preinit = function() {
 	thetable = document.getElementById(tblid);
+	if (!(thetable.addEventListener || thetable.attachEvent)) {
+		return;
+	}
 	tblcont = document.createElement("div");
 	tblcont.style.margin = 0;
 	tblcont.style.padding = 0;
@@ -83,6 +129,9 @@ this.preinit = function() {
 	}
 	//fix row heights by injecting fixed-height divs in first columns, 
 	//and adding a new column of fixed-height divs
+	var nnb = document.createElement("div");
+	nnb.style.display = "table-cell";
+	nnb.style.verticalAlign = "middle";
 	for (var i=0;i<trs.length;i++) {
 		var nodes = trs[i].getElementsByTagName((i==0?"th":"td"));
 		
@@ -92,18 +141,16 @@ this.preinit = function() {
 		} else {
 			locktds.push(nodes[0]);
 		}
-		var nn = document.createElement("div");
+		var nn = nnb.cloneNode(true);
 		nn.style.height= max +"px";
-		nn.style.display = "table-cell";
-		nn.style.verticalAlign = "middle";
 		nn.innerHTML = nodes[0].innerHTML;
 		nodes[0].innerHTML = "";
 		nodes[0].appendChild(nn);
-		var nn = document.createElement("div");
+		var nn = nnb.cloneNode(true);
 		nn.style.height= max +"px";
-		nn.style.display = "table-cell";
-		nn.style.verticalAlign = "middle";
 		var ntd = document.createElement((i==0?"th":"td"));
+		ntd.style.paddingLeft = "0px";
+		ntd.style.paddingRight = "0px";
 		ntd.appendChild(nn);
 		trs[i].insertBefore(ntd,nodes[1]);
 	}
@@ -128,8 +175,8 @@ this.preinit = function() {
 	}
 
 }
-
-this.scrollhandler = function(e) {
+//handles adjusing headers during scrolling
+scrollhandler = function(e) {
 	if (e.target.nodeName=="DIV") {
 		var el = e.target;	
 		if (tblbrowser=='gecko') {
@@ -144,7 +191,8 @@ this.scrollhandler = function(e) {
 		}
 	}
 }
-this.resettoplocs = function() {
+//this is called to reset left column positions after table sorting
+resettoplocs = function() {
 	var trs = document.getElementsByTagName("tr");
 	locktds.length = 0;
 	for (var i=1;i<trs.length;i++) {
@@ -162,7 +210,8 @@ this.resettoplocs = function() {
 		locktds[i].style.top = (parseInt(locktds[i].getAttribute("origtop")) - tblcont.scrollTop + vertadj ) + "px";
 	}
 }
-this.ierelock = function() {
+//called after sort to reset in IE
+ierelock = function() {
 	 var trs = document.getElementsByTagName("tr");
 	  var theads = trs[0].getElementsByTagName("th");
 	  for (var i=0; i<theads.length; i++) {	  
@@ -175,7 +224,9 @@ this.ierelock = function() {
 	  }	
 	
 }
-
+//locks the header row and column
+//adjust the winw and winh calculations to adjust sizing - currently handles
+//IE and non-IE separately
 this.lock = function() {
 	toggletracker = 1;
 	if (tblbrowser == 'ie') {
@@ -197,6 +248,10 @@ this.lock = function() {
 		  tblcont.style.border = "1px solid #000";
 		  var trs = document.getElementsByTagName("tr");
 		  var theads = trs[0].getElementsByTagName("th");
+		  //For IE, we'll use IE-specific techniques from
+		  //http://home.tampabay.rr.com/bmerkey/examples/locked-column-csv.html
+		  theads[0].style.setExpression("left",'parentNode.parentNode.parentNode.parentNode.scrollLeft');
+		  theads[0].style.zIndex = 40;
 		  for (var i=0; i<theads.length; i++) {	  
 			  theads[i].style.setExpression("top",'document.getElementById("'+tblcont.id+'").scrollTop-2');
 		  }
@@ -205,86 +260,102 @@ this.lock = function() {
 			  nodes[0].style.position = "relative";
 			  nodes[0].style.setExpression("left",'parentNode.parentNode.parentNode.parentNode.scrollLeft');
 		  }
-		  trs[0].attachEvent('onclick', this.ierelock); 
+		  trs[0].attachEvent('onclick', ierelock); 
 	} else {
-	
-	winh = Math.round(.9*window.innerHeight);
-	winw = Math.round(.95*window.innerWidth);
-	
-	//Approach:  Start with table layed out without scrolling
-	//fix column widths and heights by injecting div's into first and 
-	//second rows and columns.  Then when we restrict the container to
-	//create scroll, we don't have to worry about different wrapping.
-	var trs = document.getElementsByTagName("tr");
-	var theads = trs[0].getElementsByTagName("th");
-	leftth = theads[0];
-	var firstthcontent = theads[0].innerHTML;
-	
-	for (var i=0; i<locktds.length; i++) {
-		locktds[i].setAttribute("origtop",locktds[i].offsetTop);
-	}
-	for (var i=0; i<locktds.length; i++) {
-		locktds[i].style.position = "absolute";
-		locktds[i].style.left = "0px";
-	}
-	margleft = locktds[0].offsetWidth;
-	margtop = leftth.offsetHeight;
-	bigcont.style.width = winw+"px";
-	bigcont.style.height = winh+"px";
-	bigcont.style.position = "relative";
-	bigcont.style.overflow = "hidden";
-	tblcont.style.marginLeft = margleft+"px";
-	tblcont.style.marginTop = margtop+"px";
-	tblcont.style.width = (winw-margleft)+"px";
-	tblcont.style.height = (winh-margtop)+"px";
-	tblcont.style.overflow = "auto";
-	
-	thr = trs[0];
-	thr.style.position = "absolute";
-	thr.style.top = "0px";
-	
-	
-	if (tblbrowser=='gecko') {
-		thr.style.left = margleft + "px";
-		leftth.style.position = "absolute";
-		leftth.style.zIndex = 40;
-		leftth.style.left = -margleft + "px";
-	} else {
-		thr.style.left = "0px";
-		upleftdiv.style.height= (margtop) +"px";
-		upleftdiv.style.width= margleft +"px";
-		upleftdiv.style.visibility = "visible";
-	}
-	///thr.addEventListener('click', this.resettoplocs , false); //
-	tblcont.addEventListener('scroll', this.scrollhandler, false);
+		if (window.innerHeight<600) {
+			winh = Math.min(Math.round(.9*window.innerHeight),thetable.offsetHeight+30);	
+		} else {
+			winh = Math.min(Math.round(window.innerHeight - findPos(thetable)[1]-10),thetable.offsetHeight+30);
+		}
+		winw = Math.round(.95*window.innerWidth);
+		
+		//Approach:  Start with table layed out without scrolling
+		//fix column widths and heights by injecting div's into first and 
+		//second rows and columns.  Then when we restrict the container to
+		//create scroll, we don't have to worry about different wrapping.
+		var trs = document.getElementsByTagName("tr");
+		var theads = trs[0].getElementsByTagName("th");
+		leftth = theads[0];
+		var firstthcontent = theads[0].innerHTML;
+		//record current top of row headers
+		for (var i=0; i<locktds.length; i++) {
+			locktds[i].setAttribute("origtop",locktds[i].offsetTop);
+		}
+		//set row headers out of document flow - we'll adjust the
+		//position onscroll
+		for (var i=0; i<locktds.length; i++) {
+			locktds[i].style.position = "absolute";
+			locktds[i].style.left = "0px";
+		}
+		margleft = locktds[0].offsetWidth;
+		margtop = leftth.offsetHeight;
+		//constrain size.  bigcont is the injected outsize div
+		//tblcont holds the table, and is shifted right to allow room
+		//for the out-of-flow row headers
+		bigcont.style.width = winw+"px";
+		bigcont.style.height = winh+"px";
+		bigcont.style.position = "relative";
+		bigcont.style.overflow = "hidden";
+		bigcont.style.border = "1px solid #000";
+		tblcont.style.marginLeft = margleft+"px";
+		tblcont.style.marginTop = margtop+"px";
+		tblcont.style.width = (winw-margleft)+"px";
+		tblcont.style.height = (winh-margtop)+"px";
+		tblcont.style.overflow = "auto";
+		thetable.style.margin = "0px";
+		
+		thr = trs[0];
+		thr.style.position = "absolute";
+		thr.style.top = "0px";
+		
+		//gecko lets us take the top-left cell and remove it
+		//independently from the flow.  Safari doesn't, so we put
+		//a div over the top-left cell to cover it.
+		if (tblbrowser=='gecko') {
+			thr.style.left = margleft + "px";
+			leftth.style.position = "absolute";
+			leftth.style.zIndex = 40;
+			leftth.style.left = -margleft + "px";
+		} else {
+			thr.style.left = "0px";
+			upleftdiv.style.height= (margtop) +"px";
+			upleftdiv.style.width= margleft +"px";
+			upleftdiv.style.visibility = "visible";
+		}
+		//onclick is to reset heights after table sorting clicks
+		thr.addEventListener('click', resettoplocs , false); //
+		tblcont.addEventListener('scroll', scrollhandler, false);
 	}
 }
+//unlocks headers - undoes this.lock
 this.unlock = function() {
 	toggletracker = 0;
 	if (tblbrowser == 'ie') {
-		  tblcont.style.width = "auto";
-		  tblcont.style.height = "auto";
+		  //these should be auto, but something's not working right
+		  //take advantage of IE's expanding of divs by
+		  //clearing overflow hidden
+		  //tblcont.style.width = "auto";
+		  //tblcont.style.height = "auto";
 		  tblcont.style.position = "relative";
 		  tblcont.style.overflow = "";
 		  tblcont.style.border = "0px";
 		  var trs = document.getElementsByTagName("tr");
 		  var theads = trs[0].getElementsByTagName("th");
-		  for (var i=0; i<theads.length; i++) {	  
+		  theads[0].style.removeExpression("left");
+		  theads[0].style.left = "0px";
+		  for (var i=0; i<theads.length; i++) {	
 			  theads[i].style.removeExpression("top");
+			  theads[i].style.top = "0px";
 		  }
 		  for (var i=1;i<trs.length;i++) {
 			  var nodes = trs[i].getElementsByTagName("td");
 			  nodes[0].style.position = "";
 			  nodes[0].style.removeExpression("left");
 		  }
-		  trs[0].detachEvent('onclick',this.ierelock); 
-		  
+		  trs[0].detachEvent('onclick',ierelock); 
+		 
 	} else {
 	
-	//Approach:  Start with table layed out without scrolling
-	//fix column widths and heights by injecting div's into first and 
-	//second rows and columns.  Then when we restrict the container to
-	//create scroll, we don't have to worry about different wrapping.
 	var trs = document.getElementsByTagName("tr");
 	var theads = trs[0].getElementsByTagName("th");
 	leftth = theads[0];
@@ -293,6 +364,7 @@ this.unlock = function() {
 	bigcont.style.width = "auto";
 	bigcont.style.height = "auto";
 	bigcont.style.overflow = "";
+	bigcont.style.border = "0px";
 	tblcont.style.marginLeft = "0px";
 	tblcont.style.marginTop = "0px";
 	tblcont.style.width = "auto";
@@ -303,7 +375,7 @@ this.unlock = function() {
 	}
 	thr = trs[0];   
 	thr.style.position = "";
-	thr.removeEventListener('click', this.resettoplocs,false);
+	thr.removeEventListener('click', resettoplocs,false);
 	if (tblbrowser=='gecko') {
 		leftth.style.position = "";
 	} else {
@@ -315,12 +387,14 @@ this.unlock = function() {
 			var nodes = trs[i].getElementsByTagName("td");
 			locktds.push(nodes[0]);
 		}
+		thetable = tblcont.getElementsByTagName("table")[0];
 	}
 	
-	tblcont.removeEventListener('scroll', this.scrollhandler, false);
+	tblcont.removeEventListener('scroll', scrollhandler, false);
 	
 	}
 }
+//toggles locked/unlocked
 this.toggle = function() {
 	if (toggletracker==0) {
 		this.lock();
@@ -333,6 +407,6 @@ this.toggle = function() {
 }
 	addLoadEvent(this.preinit);
 	if(lockonload) {
-		//addLoadEvent(this.lock);
+		addLoadEvent(this.lock);
 	}
 }
