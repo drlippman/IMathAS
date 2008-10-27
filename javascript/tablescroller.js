@@ -164,10 +164,18 @@ this.preinit = function() {
 		upleftdiv.style.position = "absolute";
 		upleftdiv.style.visibility = "hidden";
 		upleftdiv.style.zIndex = 40;
-		upleftdiv.style.textAlign = "center";
+		upleftdiv.style.display = "table";
 		upleftdiv.style.backgroundColor = "#fff";
-		upleftdiv.style.verticalAlign = "middle";
-		upleftdiv.innerHTML = firstthcontent ;
+		upleftdiv.style.overflow = "hidden";
+		ndivt = document.createElement("div");
+		ndivt.className = theads[0].className;
+		ndivt.style.display = "table-cell";
+		ndivt.style.verticalAlign = "middle";
+		ndiv = document.createElement("div");
+		ndiv.style.textAlign = "center";
+		ndiv.innerHTML = firstthcontent;
+		ndivt.appendChild(ndiv);
+		upleftdiv.appendChild(ndivt);
 		bigcont.appendChild(upleftdiv);
 	}
 		
@@ -289,6 +297,7 @@ this.lock = function() {
 		}
 		margleft = locktds[0].offsetWidth;
 		margtop = leftth.offsetHeight;
+		
 		//constrain size.  bigcont is the injected outsize div
 		//tblcont holds the table, and is shifted right to allow room
 		//for the out-of-flow row headers
@@ -322,6 +331,7 @@ this.lock = function() {
 			upleftdiv.style.width= margleft +"px";
 			upleftdiv.style.visibility = "visible";
 		}
+		
 		//onclick is to reset heights after table sorting clicks
 		thr.addEventListener('click', resettoplocs , false); //
 		tblcont.addEventListener('scroll', scrollhandler, false);
@@ -372,6 +382,7 @@ this.unlock = function() {
 	tblcont.style.overflow = "";
 	for (var i=0; i<locktds.length; i++) {
 		locktds[i].style.position = "";
+		locktds[i].style.width= "";
 	}
 	thr = trs[0];   
 	thr.style.position = "";

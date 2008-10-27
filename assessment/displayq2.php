@@ -1115,10 +1115,17 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			} 
 			if (!empty($s3asid)) {
 				require_once("../includes/filehandler.php");
-				$file = preg_replace('/@FILE:(.+?)@/',"$1",$la);
-				$url = getasidfileurl($s3asid,$file);
-				$out .= "<br/>Last file uploaded: <a href=\"$url\" target=\"_new\">$file</a>";
-			}	
+				
+				if (substr($la,0,5)=="Error") {
+					$out .= "<br/>$la";
+				} else {
+					$file = preg_replace('/@FILE:(.+?)@/',"$1",$la);
+					$url = getasidfileurl($s3asid,$file);
+					$out .= "<br/>Last file uploaded: <a href=\"$url\" target=\"_new\">$file</a>";
+				}
+			} else {
+				$out .= "<br/>$la";
+			}
 		}
 		$tip .= "Select a file to upload";
 		$sa .= $answer;
@@ -2382,7 +2389,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			return 0;
 		}
 		if ($s3asid==0) {
-			$GLOBALS['partlastanswer'] = "File not uploaded in preview";
+			$GLOBALS['partlastanswer'] = "Error - File not uploaded in preview";
 			return 0;
 		}
 		if (isset($GLOBALS['isreview']) && $GLOBALS['isreview']==true) {
