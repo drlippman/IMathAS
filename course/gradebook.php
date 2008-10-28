@@ -864,7 +864,7 @@ function gbinstrdisp() {
 		echo '</tr>';
 	}
 	echo "</tbody></table>";
-	if ($n>0) {
+	if ($n>1) {
 		$sarr = array_fill(0,$n-1,"'N'");
 	} else {
 		$sarr = array();

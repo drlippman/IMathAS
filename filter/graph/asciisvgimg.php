@@ -804,6 +804,11 @@ function ASslopefield($arg) {
 	} else {
 		$dy = 1;
 	}
+	preg_match_all('/[a-zA-Z]+/',$func,$matches,PREG_PATTERN_ORDER);
+	$okfunc = array('sin','cos','tan','sec','csc','cot','arcsin','arccos','arctan','x','y','log','ln','e','pi','abs','sqrt','safepow');
+	foreach ($matches[0] as $m) {
+		if (!in_array($m,$okfunc)) { echo "$m"; return;}
+	}
 	$func = mathphp($func,"x|y");
 	$func = str_replace(array('x','y'),array('$x','$y'),$func);
 	$efunc = create_function('$x,$y','return ('.$func.');');

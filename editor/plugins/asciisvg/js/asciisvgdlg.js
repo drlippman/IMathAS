@@ -113,7 +113,7 @@ var AsciisvgDialog = {
 		var graphs = document.getElementById("graphs");
 		if (graphs.selectedIndex >= 0) {
 			graphs.options[graphs.selectedIndex] = null;
-			if (graphs.options.length > 0) {loadeqn();}
+			if (graphs.options.length > 0) {this.loadeqn();}
 		}
 		this.graphit();
 	},
