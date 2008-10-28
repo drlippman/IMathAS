@@ -132,6 +132,54 @@ if ($myrights<20) {
 				$hasChildWarning = (count($_POST['nchecked'])>count($oktorem)) ? "<p>Warning:  Some libraries selected have children, and cannot be deleted.</p>\n": "";
 			}
 		}
+	} else if (isset($_POST['chgrights'])) {
+		if (isset($_POST['newrights'])) {
+			if ($_POST['newrights']!='') {
+				$llist = "'".implode("','",explode(',',$_POST['chgrights']))."'";
+				$query = "UPDATE imas_libraries SET userights='{$_POST['newrights']}',lastmoddate=$now WHERE id IN ($llist)";
+				if (!$isadmin) {
+					$query .= " AND groupid='$groupid'";
+				}
+				if (!$isadmin && !$isgrpadmin) {
+					$query .= " AND ownerid='$userid'";
+				}
+				mysql_query($query) or die("Query failed : $query " . mysql_error());
+			}
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
+			
+			exit;
+			
+		} else {
+			$pagetitle = "Change Library Rights";
+			$curBreadcrumb .= " &gt; <a href=\"managelibs.php?cid=$cid\">Manage Libraries</a> &gt; Change Library Rights ";
+			if (!isset($_POST['nchecked'])) {
+				$overwriteBody = 1;
+				$body = "No libraries selected.  <a href=\"managelibs.php?cid=$cid\">Go back</a>\n";
+			} else {
+				$tlist = implode(",",$_POST['nchecked']);
+				$page_libRights = array();
+				$page_libRights['val'][0] = 0;
+				$page_libRights['val'][1] = 1;
+				$page_libRights['val'][2] = 2;
+				
+				$page_libRights['label'][0] = "Private";
+				$page_libRights['label'][1] = "Closed to group, private to others";
+				$page_libRights['label'][2] = "Open to group, private to others";
+				
+				if ($isadmin || $isgrpadmin || $allownongrouplibs) {
+					$page_libRights['label'][3] = "Closed to all";
+					$page_libRights['label'][4] = "Open to group, closed to others";
+					$page_libRights['label'][5] = "Open to all";
+					$page_libRights['val'][3] = 4;
+					$page_libRights['val'][4] = 5;
+					$page_libRights['val'][5] = 8;
+				}
+			}	
+			
+		}
+		
+		
+		
 	} else if (isset($_POST['transfer'])) {
 		if (isset($_POST['newowner'])) {
 			if ($_POST['transfer']!='') {
@@ -483,7 +531,21 @@ if ($overwriteBody==1) {
 		</p>
 	</form>
 <?php			
-	} else if (isset($_POST['setparent'])) {
+	} else if (isset($_POST['chgrights'])) {
+?>		
+	<form method=post action="managelibs.php?cid=<?php echo $cid ?>">
+		<input type=hidden name=chgrights value="<?php echo $tlist ?>">
+		<span class=form>Rights: </span>
+		<span class=formright>
+			<?php writeHtmlSelect ("newrights",$page_libRights['val'],$page_libRights['label'],$rights,$defaultLabel=null,$defaultVal=null,$actions=null) ?>
+		</span><br class=form>
+		<p>
+			<input type=submit value="Change Rights">
+			<input type=button value="Never Mind" onclick="window.location='managelibs.php?cid=<?php echo $cid ?>'">
+		</p>
+	</form>
+<?php			
+	}else if (isset($_POST['setparent'])) {
 ?>
 	<form method=post action="managelibs.php?cid=<?php echo $cid ?>">
 		<input type=hidden name=setparent value="<?php echo $tlist ?>">
@@ -584,6 +646,7 @@ if ($overwriteBody==1) {
 			With Selected: <input type=submit name="transfer" value="Transfer">
 			<input type=submit name="remove" value="Delete">
 			<input type=submit name="setparent" value="Change Parent">
+			<input type=submit name="chgrights" value="Change Rights">
 			<?php echo $page_appliesToMsg ?>
 		
 		</div>

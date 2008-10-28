@@ -328,7 +328,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans) {
 			}
 		} else {
 			if (count($anstypes)>1) {
-				$answeights = array_fill(0,count($anstypes)-1,round(1/count($anstypes),3));
+				$answeights = array_fill(0,count($anstypes)-1,round(1/count($anstypes),5));
 				$answeights[] = 1-array_sum($answeights);
 			} else {
 				$answeights = array(1);
