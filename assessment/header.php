@@ -102,6 +102,12 @@ function fileBrowserCallBack(field_name, url, type, win) {
 
 	//window.open(connector, "file_manager", "modal,width=450,height=440,scrollbars=1");
 }
+
+END;
+} else {
+	echo "});";
+}
+echo <<<END
 function imascleanup(type, value) {
 	if (type=="get_from_editor") {
 		value = value.replace(/[\x84\x93\x94]/g,'"');
@@ -115,11 +121,6 @@ function imascleanup(type, value) {
 	}
 	return value;
 }
-END;
-} else {
-	echo "});";
-}
-echo <<<END
 </script>
 <!-- /TinyMCE -->
 
