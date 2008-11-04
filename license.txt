@@ -1,7 +1,7 @@
 *********************************************************
 **   Internet Mathematics Assessment System (IMathAS)  ** 
 **   (c) David Lippman, 2006-2008		       **
-**   Version 1.6,        , 2008		       	       **
+**   Version 1.6, November 4, 2008	       	       **
 *********************************************************
 
 See readme.html for installation information.

@@ -135,6 +135,7 @@ dd {
 	<li><a href="#masschgdates">Change Dates</a></li>
 	<li><a href="#masschgassessments">Change Assessments</a></li>
 	<li><a href="#importexportitems">Import/Export Course Items</a></li>
+	<li><a href="#mashups">Mashups: SimpleLTI and Google Gadgets</a></li>
 	</ul>
 	
 <li><a href="#writingquestions">Writing Questions</a></li>
@@ -1251,6 +1252,26 @@ already exist on your system, they will be added to the system.  Select the libr
 these questions should be imported.  If a question already exists, you can select whether to update
 the existing question with the import question (if it is newer), or create a new copy of the question in
 the designated library.  Select the items to import, and click "Import Items".</p>
+
+</div>
+<div class=h2>
+<h2><a name="mashups">Mashups: SimpleLTI and Google Gadget</a></h2>
+<p>IMathAS has experimental support for two mashups: SimpleLTI, both as a producer and
+consumer, and Google Gadgets</p>
+
+<p>There is a Google Gadget which users can add to their iGoogle account available through
+a link on the Change User Info page, accessible from the users' home page.  The gadget
+will tell the user how many new messages and forum posts they have.</p>
+
+<p>IMathAS can be used as a consumer by inserting into the body of Inline or Linked text items a line 
+of the form:</p>
+<p><b>[LTI: url=http://theurl.com/to/call, secret=thesecret]</b></p>
+
+<p>IMathAS can be used as a producer using two instructor-initiated placement methods: course level, or
+assessment level.  A course level placement will provide access to an entire IMathAS course;  an assessment
+level placement will allow you to provide access to a single assessment via LTI.  You can set the LTI
+access secret through the Course Settings and Assessment Settings.  The URL to use is also provided on those
+pages.  Follow the instructions in your LTI consumer to make the placement using the URL and secret.</p>
 
 </div>
 </div>
