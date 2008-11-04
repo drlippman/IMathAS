@@ -936,7 +936,22 @@ function gbtable() {
 					foreach($cattotcur[$ln][$cat] as $col=>$v) {
 						$cattotcur[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	
 					}
-					sort($cattotcur[$ln][$cat],SORT_NUMERIC);
+					asort($cattotcur[$ln][$cat],SORT_NUMERIC);
+					
+					if ($cats[$cat][4]<0) {  //doing keep n
+						$ntodrop = count($cattotcur[$ln][$cat])+$cats[$cat][4];
+					} else {  //doing drop n
+						$ntodrop = $cats[$cat][4] - ($catitemcntcur[$cat]-count($cattotcur[$ln][$cat]));
+					}
+					
+					if ($ntodrop>0) {
+						$ndropcnt = 0;
+						foreach ($cattotcur[$ln][$cat] as $col=>$v) {
+							$gb[$ln][1][$col][5] += 2; //mark as dropped
+							$ndropcnt++;
+							if ($ndropcnt==$ntodrop) { break;}
+						}
+					}
 					
 					while (count($cattotcur[$ln][$cat])<$catitemcntcur[$cat]) {
 						array_unshift($cattotcur[$ln][$cat],0);
@@ -987,6 +1002,22 @@ function gbtable() {
 						$cattotfuture[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	
 					}
 					asort($cattotfuture[$ln][$cat],SORT_NUMERIC);
+					
+					if ($cats[$cat][4]<0) {  //doing keep n
+						$ntodrop = count($cattotfuture[$ln][$cat])+$cats[$cat][4];
+					} else {  //doing drop n
+						$ntodrop = $cats[$cat][4] - ($catitemcntfuture[$cat]-count($cattotfuture[$ln][$cat]));
+					}
+					
+					if ($ntodrop>0) {
+						$ndropcnt = 0;
+						foreach ($cattotfuture[$ln][$cat] as $col=>$v) {
+							$gb[$ln][1][$col][5] += 4; //mark as dropped
+							$ndropcnt++;
+							if ($ndropcnt==$ntodrop) { break;}
+						}
+					}
+					
 					while (count($cattotfuture[$ln][$cat])<$catitemcntfuture[$cat]) {
 						array_unshift($cattotfuture[$ln][$cat],0);
 					}

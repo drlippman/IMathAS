@@ -476,7 +476,7 @@ function gbstudisp($stu) {
 			if ($haslink) { //show link
 				echo '</a>';
 			}
-			if (isset($gbt[1][1][$i][5])) {
+			if (isset($gbt[1][1][$i][5]) && ($gbt[1][1][$i][5]&(1<<$availshow)) && !$hidepast) {
 				echo '<sub>d</sub>';
 			}
 			echo '</td><td>';
@@ -772,7 +772,7 @@ function gbinstrdisp() {
 					continue;
 				}
 				echo '<td class="c">';
-				if (isset($gbt[$i][1][$j][5])) {
+				if (isset($gbt[$i][1][$j][5]) && ($gbt[$i][1][$j][5]&(1<<$availshow)) && !$hidepast) {
 					echo '<span style="font-style:italic">';
 				}
 				if ($gbt[0][1][$j][6]==0) {//online
@@ -828,7 +828,7 @@ function gbinstrdisp() {
 						echo '-';
 					}
 				}
-				if (isset($gbt[$i][1][$j][5])) {
+				if (isset($gbt[$i][1][$j][5]) && ($gbt[$i][1][$j][5]&(1<<$availshow)) && !$hidepast) {
 					echo '<sub>d</sub></span>';
 				}
 				echo '</td>';
