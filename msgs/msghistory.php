@@ -3,7 +3,7 @@
 	//(c) 2006 David Lippman
 	
 	require("../validate.php");
-	if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
+	if ($cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 	   require("../header.php");
 	   echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
 	   require("../footer.php");
@@ -19,6 +19,13 @@
 	} else {
 		$view = 0;  //0: expanded, 1: collapsed, 2: condensed
 	}
+	if (isset($_GET['filtercid'])) {
+		$filtercid = $_GET['filtercid'];
+	} else if ($cid!='admin' && $cid>0) {
+		$filtercid = $cid;
+	} else {
+		$filtercid = 0;
+	}
 	
 	$cid = $_GET['cid'];
 	$msgid = $_GET['msgid'];
@@ -30,13 +37,7 @@
 	require("../header.php");
 	
 	$allowmsg = false;
-	if (!$isteacher) {
-		$query = "SELECT msgset FROM imas_courses WHERE id='$cid'";
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		if ((mysql_result($result,0,0)%5)==0) {
-			$allowmsg = true;
-		} 
-	}
+	
 	$query = "SELECT baseid FROM imas_msgs WHERE id='$msgid'";
 	if ($type!='allstu' || !$isteacher) {
 		$query .= " AND (msgto='$userid' OR msgfrom='$userid')";
@@ -78,15 +79,18 @@
 		$email[$line['id']] = $line['email'];
 		
 	}
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
+	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> ";
+	if ($cid>0) {
+		echo "&gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
+	}
 	if ($type=='sent') {
-		echo "&gt; <a href=\"sentlist.php?page=$page&cid=$cid\">Sent Message List</a> &gt; ";
+		echo "&gt; <a href=\"sentlist.php?page=$page&cid=$cid&filtercid=$filtercid\">Sent Message List</a> &gt; ";
 	} else if ($type=='allstu') {
 		echo "&gt; <a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid\">Message List</a> &gt; <a href=\"allstumsglist.php?page=$page&cid=$cid&filterstu=$filterstu\">Student Messages</a> &gt; ";
 	} else {
 		echo "&gt; <a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid\">Message List</a> &gt; ";
 	}
-	echo "<a href=\"viewmsg.php?page=$page&cid=$cid&msgid=$msgid\">Message</a> &gt; Message History</div>\n";
+	echo "<a href=\"viewmsg.php?page=$page&cid=$cid&msgid=$msgid&type=$type&filtercid=$filtercid\">Message</a> &gt; Message Conversation</div>\n";
 	
 	
 	echo "<p><b style=\"font-size: 120%\">Message: {$subject[$msgid]}</b></p>\n";

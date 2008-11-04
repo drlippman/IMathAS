@@ -36,7 +36,7 @@
 		echo "&gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
 	}
 	if ($type=='sent') {
-		echo "&gt; <a href=\"sentlist.php?page=$page&cid=$cid\">Sent Message List</a> &gt; Message</div>";
+		echo "&gt; <a href=\"sentlist.php?page=$page&cid=$cid&filtercid=$filtercid\">Sent Message List</a> &gt; Message</div>";
 	} else if ($type=='allstu') {
 		echo "&gt; <a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid\">Message List</a> &gt; <a href=\"allstumsglist.php?page=$page&cid=$cid&filterstu=$filterstu\">Student Messages</a> &gt; Message</div>";
 	} else {
@@ -102,10 +102,14 @@
 			echo "<a href=\"msglist.php?cid=$cid&filtercid=$filtercid&page=$page&add=new&to={$line['msgfrom']}&replyto=$msgid\">Reply</a> | ";
 			echo "<a href=\"msglist.php?cid=$cid&filtercid=$filtercid&page=$page&add=new&to={$line['msgfrom']}&toquote=$msgid\">Quote in Reply</a> | ";
 		}
+		echo "<a href=\"msghistory.php?cid=$cid&filtercid=$filtercid&page=$page&msgid=$msgid&type=$type\">View Conversation</a> | ";
 		echo "<a href=\"msglist.php?cid=$cid&filtercid=$filtercid&page=$page&removeid=$msgid\">Delete</a>";
 		if ($isteacher && $line['courseid']==$cid) {
 			echo " | <a href=\"$imasroot/course/gradebook.php?cid={$line['courseid']}&stu={$line['msgfrom']}\">Gradebook</a>";
 		}
+	} else if ($type=='sent' && $type!='allstu') {
+		echo "<a href=\"msghistory.php?cid=$cid&filtercid=$filtercid&page=$page&msgid=$msgid&type=$type\">View Conversation</a>";
+		
 	}
 	if ($type!='sent' && $type!='allstu' && ($line['isread']==0 || $line['isread']==4)) {
 		$query = "UPDATE imas_msgs SET isread=isread+1 WHERE id='$msgid'";
