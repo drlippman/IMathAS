@@ -1,15 +1,17 @@
 function hashpw() {
-	pwel = document.getElementById("password");
+	pwel = document.getElementById("passwordentry");
 	val = pwel.value
 	val=val.replace(/\\/g,'\\\\');
 	val=val.replace(/\'/g,'\\\'');
 	val=val.replace(/\"/g,'\\"');
 	val=val.replace(/\0/g,'\\0');
+	pwsend = document.getElementById("password");
 	try {
-		pwel.value = hex_md5(hex_md5(val) + document.getElementById("challenge").value);
+		pwsend.value = hex_md5(hex_md5(val) + document.getElementById("challenge").value);
 	} catch(e) {
-		pwel.value = val;
+		pwsend.value = val;
 	}
+	pwel.value = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".substr(0,val.length);
 }
 
 /*

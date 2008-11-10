@@ -53,8 +53,8 @@ if (!isset($imasroot)) { //don't allow direct access to loginpage.php
 ?>
 <b>Login</b>
 <table>
-<tr><td><?php echo $loginprompt;?>:</td><td><input type="text" size="15" id="username" name="username"></td></tr>
-<tr><td>Password:</td><td><input type="password" size="15" id="password" name="password"></td></tr>
+<tr><td><?php echo $loginprompt;?>:</td><td><input type="text" size="15" id="username" name="username" /></td></tr>
+<tr><td>Password:</td><td><input type="password" size="15" id="passwordentry" /></td></tr>
 </table>
 <div id="settings">JavaScript is not enabled.  JavaScript is required for <?php echo $installname; ?>.  Please enable JavaScript and reload this page</div>
 <div class="textright"><a href="<?php echo $imasroot; ?>/forms.php?action=newuser">Register as a new student</a></div>
@@ -63,7 +63,7 @@ if (!isset($imasroot)) { //don't allow direct access to loginpage.php
 <div class="textright"><a href="<?php echo $imasroot; ?>/checkbrowser.php">Browser check</a></div>
 <input type="hidden" id="tzoffset" name="tzoffset" value=""> 
 <input type="hidden" id="challenge" name="challenge" value="<?php echo $challenge; ?>" />
-
+<input type="hidden" id="password" name="password" value="" />
 <script type="text/javascript">        
         var thedate = new Date();  
         document.getElementById("tzoffset").value = thedate.getTimezoneOffset();  
