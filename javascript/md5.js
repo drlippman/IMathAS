@@ -11,7 +11,6 @@ function hashpw() {
 	} catch(e) {
 		pwsend.value = val;
 	}
-	pwel.value = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".substr(0,val.length);
 }
 
 /*
