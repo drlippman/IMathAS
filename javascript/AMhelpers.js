@@ -302,6 +302,7 @@ function AMpreview(inputId,outputId) {
   vars = vl.split("|");
   
   var str = document.getElementById(inputId).value;
+  str = str.replace(/,/g,"");
    var dispstr = str;
    
   for (var i=0; i<vars.length; i++) {
@@ -583,6 +584,7 @@ function doonsubmit(form,type2,skipconfirm) {
 		nh.type = "hidden";
 		nh.name = "qn" + functoproc[i];
 		str = document.getElementById("tc"+functoproc[i]).value;
+		str = str.replace(/,/g,"");
 		if (iseqn[functoproc[i]]==1) {
 			str = str.replace(/(.*)=(.*)/,"$1-($2)");
 		}

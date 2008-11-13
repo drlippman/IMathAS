@@ -72,6 +72,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
 	
 		exit;
+	} else {
+		$query = "SELECT title FROM imas_linkedtext WHERE id='{$_GET['id']}'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$itemname = mysql_result($result,0,0);
 	}
 }
 	
@@ -87,6 +91,7 @@ if ($overwriteBody==1) {
 ?>
 
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
+	<h3><?php echo $itemname; ?></h3>
 	Are you SURE you want to delete this text item?
 	<p><input type=button value="Yes, Remove" onClick="window.location='deletelinkedtext.php?cid=<?php echo $_GET['cid'] ?>&block=<?php echo $block ?>&id=<?php echo $_GET['id'] ?>&remove=really'">
 	<input type=button value="Nevermind" onClick="window.location='course.php?cid=<?php echo $_GET['cid'] ?>'"></p>

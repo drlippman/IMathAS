@@ -101,9 +101,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
 			exit;
 		} else {
-			$overwriteBody = 1;
+			$overwriteBody = 1; 
+			$query = "SELECT name FROM imas_assessments WHERE id={$_GET['aid']}";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$assessmentname = mysql_result($result,0,0);
 			$body = "<div class=breadcrumb>$curBreadcrumb</div>\n";
-			$body .= "Are you SURE you want to delete all attempts (grades) for this assessment?";
+			$body .= "<h3>$assessmentname</h3>";
+			$body .= "<p>Are you SURE you want to delete all attempts (grades) for this assessment?</p>";
 			$body .= "<p><input type=button value=\"Yes, Clear\" onClick=\"window.location='addquestions.php?cid=$cid&aid=$aid&clearattempts=confirmed'\">\n";
 			$body .= "<input type=button value=\"Nevermind\" onClick=\"window.location='addquestions.php?cid=$cid&aid=$aid';\"></p>\n";
 		}

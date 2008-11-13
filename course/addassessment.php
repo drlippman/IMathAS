@@ -64,9 +64,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			exit;
 		} else {
 			$overwriteBody = 1;
+			$query = "SELECT name FROM imas_assessments WHERE id={$_GET['id']}";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$assessmentname = mysql_result($result,0,0);
 			$body = "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 			$body .= "&gt; <a href=\"addassessment.php?cid={$_GET['cid']}&id={$_GET['id']}\">Modify Assessment</a> &gt; Clear Attempts</div>\n";
-			$body .= "Are you SURE you want to delete all attempts (grades) for this assessment?";
+			$body .= "<h3>$assessmentname</h3>";
+			$body .= "<p>Are you SURE you want to delete all attempts (grades) for this assessment?</p>";
 			$body .= "<p><input type=button value=\"Yes, Clear\" onClick=\"window.location='addassessment.php?cid={$_GET['cid']}&id={$_GET['id']}&clearattempts=confirmed'\">\n";
 			$body .= "<input type=button value=\"Nevermind\" onClick=\"window.location='addassessment.php?cid={$_GET['cid']}&id={$_GET['id']}'\"></p>\n";
 		}

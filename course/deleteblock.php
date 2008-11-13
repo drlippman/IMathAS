@@ -57,6 +57,20 @@ if (!(isset($_GET['cid']))) { //if the cid is missing go back to the index page
 		setcookie('openblocks-'.$_GET['cid'],implode(',',$obarr));
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
 			
+	} else {
+		$blocktree = explode('-',$_GET['id']);
+		$blockid = array_pop($blocktree) - 1; //-1 adjust for 1-index
+			
+		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$items = unserialize(mysql_result($result,0,0));
+		$sub =& $items;
+		if (count($blocktree)>1) {
+			for ($i=1;$i<count($blocktree);$i++) {
+				$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
+			}
+		}
+		$itemname =  $sub[$blockid]['name'];
 	}
 
 }
@@ -73,6 +87,7 @@ if ($overwriteBody==1) {
 } else {
 ?>
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
+	<h3><?php echo $itemname; ?></h3>
 	<form method=post action="deleteblock.php?cid=<?php echo $_GET['cid'] ?>&id=<?php echo $_GET['id'] ?>&remove=really">
 	<p>Are you SURE you want to delete this Block?</p>
 	<p><input type=radio name="delcontents" value="0" checked="checked"/>Move all items out of block<br/>

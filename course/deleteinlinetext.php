@@ -8,6 +8,7 @@ require("../validate.php");
 /*** pre-html data manipulation, including function code *******/
 
 //set some page specific variables and counters
+$cid = $_GET['cid'];
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Delete Inline Text";
@@ -67,8 +68,12 @@ if (!(isset($teacherid))) {
 		
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
 		exit;
-	} 
-}
+	} else {
+		$query = "SELECT title FROM imas_inlinetext WHERE id='{$_GET['id']}'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$itemname = mysql_result($result,0,0);
+	}
+} 
 
 /******* begin html output ********/
 require("../header.php");
@@ -84,7 +89,8 @@ if ($overwriteBody==1) {
 ?>
 	
 <div class=breadcrumb><?php echo $curBreadcrumb; ?></div>
-	Are you SURE you want to delete this text item?
+<h3><?php echo $itemname; ?></h3>
+Are you SURE you want to delete this text item?
 	<p><input type=button value="Yes, Remove" onClick="window.location='deleteinlinetext.php?cid=<?php echo $cid ?>&block=<?php echo $block ?>&id=<?php echo $_GET['id'] ?>&remove=really'">
 	<input type=button value="Nevermind" onClick="window.location='course.php?cid=<?php echo $cid ?>'"></p>
 

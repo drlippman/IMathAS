@@ -1102,4 +1102,3 @@ function invfcdf($p,$df1,$df2) {
 	
 }
 ?>
-

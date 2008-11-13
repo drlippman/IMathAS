@@ -59,7 +59,11 @@ if (!(isset($teacherid))) {
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
 		
 		exit;
-	} 
+	} else {
+		$query = "SELECT name FROM imas_assessments WHERE id='{$_GET['id']}'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$itemname = mysql_result($result,0,0);
+	}
 }
 
 /******* begin html output ********/
@@ -76,6 +80,7 @@ if ($overwriteBody==1) {
 ?>
 
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
+	<h3><?php echo $itemname; ?></h3>
 	Are you <b>SURE</b> you want to delete this assessment and all associated student attempts?
 	<p>
 	<input type=button value="Yes, Remove" onClick="window.location='deleteassessment.php?cid=<?php echo $_GET['cid'] ?>&block=<?php echo $block ?>&id=<?php echo $_GET['id'] ?>&remove=really'">

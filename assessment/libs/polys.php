@@ -229,5 +229,3 @@ function getcoef($p,$deg) {
 
 
 ?>
-
-

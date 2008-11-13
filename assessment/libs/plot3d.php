@@ -206,3 +206,4 @@ function spacecurve($func,$tmin,$tmax) {
 	  return $html;
 	
 }
+?>

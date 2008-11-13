@@ -61,6 +61,10 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
 		
 		exit;
+	} else {
+		$query = "SELECT name FROM imas_forums WHERE id='{$_GET['id']}'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$itemname = mysql_result($result,0,0);
 	}	
 }
 
@@ -77,7 +81,7 @@ if ($overwriteBody==1) {
 } else {
 ?>
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-
+		<h3><?php echo $itemname; ?></h3>
 		Are you SURE you want to delete this forum and all associated postings?
 		<p><input type=button value="Yes, Remove" onClick="window.location='deleteforum.php?cid=<?php echo $_GET['cid'] ?>&block=<?php echo $block ?>&id=<?php echo $_GET['id'] ?>&remove=really'">
 		<input type=button value="Nevermind" onClick="window.location='course.php?cid=<?php echo $_GET['cid'] ?>'">

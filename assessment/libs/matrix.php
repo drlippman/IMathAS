@@ -355,5 +355,3 @@ function polyregression($x,$y,$n) {
 }
 
 ?>
-
-

@@ -81,4 +81,4 @@ function vecprod($a,$c) {
 	}
 	return $prod;
 }
-
+?>

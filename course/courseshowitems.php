@@ -2,6 +2,21 @@
 //IMathAS:  show items function for main course page
 //(c) 2007 David Lippman
 
+function beginitem() {
+	global $teacherid;
+	 if (isset($teacherid)) {
+		echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
+	 }
+	 echo "<div class=item>\n";
+}
+function enditem() {
+	global $teacherid;
+	echo "</div>\n";
+	if (isset($teacherid)) {
+		echo '</div>'; //itemwrapper
+	}
+}
+
   function showitems($items,$parent) {
 	   global $teacherid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$hideicons,$exceptions,$latepasses,$graphicalicons;
 	
@@ -58,6 +73,9 @@
 					$show = "Showing $availbeh $startdate until $enddate";
 				}
 				if (strlen($items[$i]['SH'])>1 && $items[$i]['SH'][1]=='F') { //show as folder
+					if (isset($teacherid)) {
+						echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
+					}
 					echo "<div class=block ";
 					if ($titlebg!='') {
 						echo "style=\"background-color:$titlebg;color:$titletxt;\"";
@@ -66,6 +84,7 @@
 						$astyle = '';
 					}
 					echo ">";
+					
 					if (($hideicons&16)==0) {
 						echo "<span class=left><a href=\"course.php?cid=$cid&folder=$parent-$bnum\" border=0>";
 						if ($graphicalicons) {
@@ -80,16 +99,27 @@
 						echo "<span style=\"color:red;\">New</span>";
 					}
 					if (isset($teacherid)) { 
-						echo "<br>$show <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
+						echo '<span class="instrdates">';
+						echo "<br>$show ";
+						echo '</span>';
+						echo '<span class="instronly">';
+						echo "<a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
 						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\" $astyle>Copy</a>";
 						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>NewFlag</a>";
-					
+						echo '</span>';
 					}
 					if (($hideicons&16)==0) {
 						echo "</div>";
 					}
+					
 					echo "</div>";
+					if (isset($teacherid)) {
+						echo '</div>'; //itemwrapper
+					}
 				} else {
+					if (isset($teacherid)) {
+						echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
+					}
 					echo "<div class=block ";
 					if ($titlebg!='') {
 						echo "style=\"background-color:$titlebg;color:$titletxt;\"";
@@ -117,15 +147,22 @@
 						echo "<span style=\"color:red;\">New</span>";
 					}
 					if (isset($teacherid)) { 
-						echo "<br>$show <a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>Isolate</a> | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
+						echo '<span class="instrdates">';
+						echo "<br>$show ";
+						echo '</span>';
+						echo '<span class="instronly">';
+						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>Isolate</a> | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
 						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\" $astyle>Copy</a>";
 						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>NewFlag</a>";
+						echo '</span>';
 					}
 					if (($hideicons&16)==0) {
 						echo "</div>";
 					}
 					echo "</div>\n";
-					
+					if (isset($teacherid)) {
+						echo '</div>'; //itemwrapper
+					}
 					if ($isopen) {
 						echo "<div class=blockitems ";
 					} else {
@@ -161,6 +198,9 @@
 					$show .= "Showing $availbeh $startdate to $enddate";
 				}
 				if (strlen($items[$i]['SH'])>1 && $items[$i]['SH'][1]=='F') { //show as folder
+					if (isset($teacherid)) {
+						echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
+					}
 					echo "<div class=block ";
 					if ($titlebg!='') {
 						echo "style=\"background-color:$titlebg;color:$titletxt;\"";
@@ -184,17 +224,27 @@
 						echo " <span style=\"color:red;\">New</span>";
 					}
 					if (isset($teacherid)) { 
-						echo "<br><i>$show</i> <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
+						echo '<span class="instrdates">';
+						echo "<br><i>$show</i> ";
+						echo '</span>';
+						echo '<span class="instronly">';
+						echo "<a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
 						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">Copy</a>";
 						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>NewFlag</a>";
-					
+						echo '</span>';
 					}
 					
 					if (($hideicons&16)==0) {
 						echo "</div>";
 					}
 					echo "</div>";
+					if (isset($teacherid)) {
+						echo '</div>'; //itemwrapper
+					}
 				} else {
+					if (isset($teacherid)) {
+						echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
+					}
 					echo "<div class=block ";
 					if ($titlebg!='') {
 						echo "style=\"background-color:$titlebg;color:$titletxt;\"";
@@ -227,16 +277,23 @@
 						echo "<span style=\"color:red;\">New</span>";
 					}
 					if (isset($teacherid)) {
-						echo "<br><i>$show</i> <a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>Isolate</a> | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a>";
+						echo '<span class="instrdates">';
+						echo "<br><i>$show</i> ";
+						echo '</span>';
+						echo '<span class="instronly">';
+						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>Isolate</a> | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a>";
 						echo " | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
 						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">Copy</a>";
 						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>NewFlag</a>";
-					
+						echo '</span>';
 					}
 					if (($hideicons&16)==0) {
 						echo "</div>";
 					}
 					echo "</div>\n";
+					if (isset($teacherid)) {
+						echo '</div>'; //itemwrapper
+					}
 					if ($isopen) {
 						echo "<div class=blockitems ";
 					} else {
@@ -267,13 +324,16 @@
 			   echo generatemoveselect($i,count($items),$parent,$blocklist);
 		   }
 		   if ($line['itemtype']=="Calendar") {
-			   echo "<div class=item>\n";
+			   //echo "<div class=item>\n";
+			   beginitem();
 			   if (isset($teacherid)) {
+				   echo '<span class="instronly">';
 				   echo "<a href=\"addcalendar.php?id={$items[$i]}&block=$parent&cid=$cid&remove=true\">Delete</a>";
 				   echo " | <a id=\"mcelink\" href=\"managecalitems.php?cid=$cid\">Manage Events</a>";
+				   echo '</span>';
 			   }
 			   showcalendar("course");
-			   echo "</div>";
+			   enditem();// echo "</div>";
 		   } else if ($line['itemtype']=="Assessment") {
 			   $typeid = $line['typeid'];
 			   $query = "SELECT name,summary,startdate,enddate,reviewdate,deffeedback,reqscore,reqscoreaid,avail,allowlate,timelimit FROM imas_assessments WHERE id='$typeid'";
@@ -318,7 +378,7 @@
 				   }
 			   }
 			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now && $nothidden) { //regular show
-				   echo "<div class=item>\n";
+				   beginitem(); //echo "<div class=item>\n";
 				   if (($hideicons&1)==0) {
 					   if ($graphicalicons) {
 						   echo "<img class=\"floatleft\" src=\"$imasroot/img/assess.png\" />";
@@ -365,18 +425,21 @@
 					   echo "<BR> $endname $enddate \n";
 				   }
 				   if (isset($teacherid)) { 
+				        echo '<span class="instronly">';
 					echo " <i><a href=\"addquestions.php?aid=$typeid&cid=$cid\">Questions</a></i> | <a href=\"addassessment.php?id=$typeid&block=$parent&cid=$cid\">Settings</a></i> \n";
 					echo " | <a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
 					echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
 					echo " | <a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=$typeid\">Grades</a>";
+					echo '</span>';
 					
 				   } else if ($line['allowlate']==1 && $latepasses>0) {
 					echo " <a href=\"redeemlatepass.php?cid=$cid&aid=$typeid\">Use LatePass</a>";
 				   }
 				   echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
-				   echo "</div>\n";
+				   enditem(); //echo "</div>\n";
+				  
 			   } else if ($line['avail']==1 && $line['startdate']<$now && $line['reviewdate']>$now && $nothidden) { //review show
-				   echo "<div class=item>\n";
+				   beginitem(); //echo "<div class=item>\n";
 				   if (($hideicons&1)==0) {
 					   if ($graphicalicons) {
 						   echo "<img class=\"floatleft\" src=\"$imasroot/img/assess.png\" />";
@@ -389,14 +452,16 @@
 					   echo " until $reviewdate \n";
 				   }
 				   if (isset($teacherid)) { 
+					echo '<span class="instronly">';   
 				   	echo " <i><a href=\"addquestions.php?aid=$typeid&cid=$cid\">Questions</a></i> | <a href=\"addassessment.php?id=$typeid&block=$parent&cid=$cid\">Settings</a>\n";
 					echo " | <a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
 					echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
 					echo " | <a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=$typeid\">Grades</a>";
+					echo '</span>';
 					
 				   } 
 				   echo filter("<br/><i>This assessment is in review mode - no scores will be saved</i></div><div class=itemsum>{$line['summary']}</div>\n");
-				   echo "</div>\n";
+				   enditem(); //echo "</div>\n";
 			   } else if (isset($teacherid)) { //not avail to stu
 				   if ($line['avail']==0) {
 					   $show = "Hidden";
@@ -406,7 +471,7 @@
 						   $show .= ", Review until $reviewdate";
 					   }
 				   }
-				   echo "<div class=item>\n";
+				   beginitem(); //echo "<div class=item>\n";
 				   if (($hideicons&1)==0) {
 					   
 					   if ($graphicalicons) {
@@ -415,13 +480,18 @@
 						   echo "<div class=icon style=\"background-color: #ccc;\">?</div>";
 					   }
 				   }
-				   echo "<div class=title><i> <a href=\"../assessment/showtest.php?id=$typeid&cid=$cid\" >{$line['name']}</a><BR>$show</i>\n";
+				   echo "<div class=title><i> <a href=\"../assessment/showtest.php?id=$typeid&cid=$cid\" >{$line['name']}</a></i>";
+				   echo '<span class="instrdates">';
+				   echo "<br/><i>$show</i>\n";
+				   echo '</span>';
+				   echo '<span class="instronly">';
 				   echo "<a href=\"addquestions.php?aid=$typeid&cid=$cid\">Questions</a> | <a href=\"addassessment.php?id=$typeid&cid=$cid\">Settings</a> | \n";
 				   echo "<a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
 				   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
 				   echo " | <a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=$typeid\">Grades</a>";
+				   echo '</span>';
 				   echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
-				   echo "</div>\n";
+				   enditem(); // echo "</div>\n";
 			   }
 			   
 		   } else if ($line['itemtype']=="InlineText") {
@@ -452,7 +522,7 @@
 					   $show = "Showing until: $enddate ";
 					   $color = makecolor2($line['startdate'],$line['enddate'],$now);
 				   }
-				   echo "<div class=item>\n";
+				   beginitem();// echo "<div class=item>\n";
 				   if ($line['title']!='##hidden##') {
 					   if (($hideicons&2)==0) {			   
 						   if ($graphicalicons) {
@@ -463,18 +533,26 @@
 					   }
 					   echo "<div class=title> <b>{$line['title']}</b>\n";
 					   if (isset($teacherid)) { 
-						   echo "<BR>$show "; 
+						   echo '<span class="instrdates">';
+						   echo "<br/>$show ";
+						   echo '</span>';
+						   echo '<span class="instronly">';
 						   echo "<a href=\"addinlinetext.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
 						   echo "<a href=\"deleteinlinetext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
 						   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+						   echo '</span>';
 					   }
 					   echo "</div>";
 				   } else {
 					   if (isset($teacherid)) { 
-						   echo "$show "; 
+						  echo '<span class="instrdates">';
+						   echo "<br/>$show ";
+						   echo '</span>';
+						   echo '<span class="instronly">';
 						   echo "<a href=\"addinlinetext.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
 						   echo "<a href=\"deleteinlinetext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
 						   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+						   echo '</span>';
 					   } 
 					   
 				   }
@@ -496,14 +574,14 @@
 					   echo "</ul>";
 				   }
 				   echo "</div>";
-				   echo "</div>\n";
+				   enditem(); //echo "</div>\n";
 			   } else if (isset($teacherid)) {
 				   if ($line['avail']==0) {
 					   $show = "Hidden";
 				   } else {
 					   $show = "Showing $startdate until $enddate";
 				   }
-				   echo "<div class=item>\n";
+				   beginitem(); //echo "<div class=item>\n";
 				   if ($line['title']!='##hidden##') {
 					   if ($graphicalicons) {
 						   echo "<img class=\"floatleft faded\" src=\"$imasroot/img/inline.png\" />";
@@ -512,12 +590,16 @@
 					   }
 					   echo "<div class=title><i> <b>{$line['title']}</b> <BR>";
 				   } else {
-					   echo "<div class=title><i>";
+					   echo "<div class=title>";
 				   }
-				   echo "$show</i> \n";
+				   echo '<span class="instrdates">';
+				   echo "<i>$show</i> ";
+				   echo '</span>';
+				   echo '<span class="instronly">';
 				   echo "<a href=\"addinlinetext.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
 				   echo "<a href=\"deleteinlinetext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
 				   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+				   echo '</span>';
 				   echo filter("</div><div class=itemsum>{$line['text']}\n");
 				   $query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='$typeid'";
 				   $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -529,7 +611,7 @@
 					   echo "</ul>";
 				   }
 				   echo "</div>";
-				   echo "</div>\n";
+				   enditem(); //echo "</div>\n";
 			   }
 		   } else if ($line['itemtype']=="LinkedText") {
 			   $typeid = $line['typeid'];
@@ -592,7 +674,7 @@
 					   $show = "Showing until: $enddate ";
 					   $color = makecolor2($line['startdate'],$line['enddate'],$now);
 				   }
-				   echo "<div class=item>\n";
+				   beginitem(); //echo "<div class=item>\n";
 				   if (($hideicons&4)==0) {
 					   if ($graphicalicons) {
 						  echo "<img class=\"floatleft\" src=\"$imasroot/img/$icon.png\" />";
@@ -603,33 +685,41 @@
 				   echo "<div class=title>";
 				   echo "<b><a href=\"$alink\">{$line['title']}</a></b>\n";
 				   if (isset($teacherid)) { 
-					   echo "<BR>$show "; 
+					   echo '<span class="instrdates">';
+					   echo "<br/>$show ";
+					   echo '</span>'; 
+					   echo '<span class="instronly">';
 					   echo "<a href=\"addlinkedtext.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
 					   echo "<a href=\"deletelinkedtext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
 					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+					   echo '</span>';
 				   }
 				   echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
-				   echo "</div>\n";
+				   enditem(); //echo "</div>\n";
 			   } else if (isset($teacherid)) {
 				   if ($line['avail']==0) {
 					   $show = "Hidden";
 				   } else {
 					   $show = "Showing $startdate until $enddate";
 				   }
-				   echo "<div class=item>\n";
+				   beginitem(); //echo "<div class=item>\n";
 				  if ($graphicalicons) {
 					  echo "<img class=\"floatleft faded\" src=\"$imasroot/img/$icon.png\" />";
 				  } else {
 					   echo "<div class=icon style=\"background-color: #ccc;\">!</div>";
 				   }
 				   echo "<div class=title>";
-				   echo "<i> <b><a href=\"$alink\">{$line['title']}</a></b> ";
-				   echo "<BR>$show</i> \n";
+				   echo "<i> <b><a href=\"$alink\">{$line['title']}</a></b> </i>";
+				   echo '<span class="instrdates">';
+				   echo "<br/><i>$show</i> ";
+				   echo '</span>';
+				   echo '<span class="instronly">';
 				   echo "<a href=\"addlinkedtext.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
 				   echo "<a href=\"deletelinkedtext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
 				   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+				   echo '</span>';
 				   echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
-				   echo "</div>\n";
+				   enditem(); // echo "</div>\n";
 			   }
 		   } else if ($line['itemtype']=="Forum") {
 			   $typeid = $line['typeid'];
@@ -719,7 +809,7 @@
 				   if ($line['replyby']>$now && $line['replyby']!=2000000000) {
 					   $duedates .= "Replies due ". formatdate($line['replyby']) . ". ";
 				   }
-				   echo "<div class=item>\n";
+				   beginitem(); //echo "<div class=item>\n";
 				   if (($hideicons&8)==0) {
 					   if ($graphicalicons) {
 						   echo "<img class=\"floatleft\" src=\"$imasroot/img/forum.png\" />";
@@ -733,35 +823,45 @@
 					   echo " <a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}&page=-1\" style=\"color:red\">New Posts</a>";
 				   }
 				   if (isset($teacherid)) { 
-					   echo "<BR>$show "; 
+					   echo '<span class="instrdates">';
+					   echo "<br/>$show ";
+					   echo '</span>';
+					   echo '<span class="instronly">';
 					   echo "<a href=\"addforum.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
 					   echo "<a href=\"deleteforum.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
 					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+					   echo '</span>';
 				   }
 				   if ($duedates!='') {echo "<br/>$duedates";}
 				   echo filter("</div><div class=itemsum>{$line['description']}</div>\n");
-				   echo "</div>\n";
+				   enditem(); //echo "</div>\n";
 			   } else if (isset($teacherid)) {
 				   if ($line['avail']==0) {
 					   $show = "Hidden";
 				   } else {
 					   $show = "Showing $startdate until $enddate";
 				   }
-				   echo "<div class=item>\n";
+				   beginitem(); //echo "<div class=item>\n";
 				   if ($graphicalicons) {
 					   echo "<img class=\"floatleft faded\" src=\"$imasroot/img/forum.png\" />";
 				   } else {
 					   echo "<div class=icon style=\"background-color: #ccc;\">F</div>";
 				   }   
-				   echo "<div class=title><i> <b><a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}\">{$line['name']}</a></b> <BR>$show</i> \n";
+				   echo "<div class=title><i> <b><a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}\">{$line['name']}</a></b></i> ";
+				   
+				   echo '<span class="instrdates">';
+				   echo "<br/><i>$show </i>";
+				   echo '</span>';
 				   if ($hasnewitems) {
 					   echo " <span style=\"color:red\">New Posts</span>";
 				   }
+				    echo '<span class="instronly">';
 				   echo "<a href=\"addforum.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
 				   echo "<a href=\"deleteforum.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
 				   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+				   echo '</span>';
 				   echo filter("</div><div class=itemsum>{$line['description']}</div>\n");
-				   echo "</div>\n";
+				   enditem(); //echo "</div>\n";
 			   }
 		   }   
 	   }
@@ -789,7 +889,7 @@
    
    function generatemoveselect($num,$count,$blk,$blocklist) {
 	$num = $num+1;  //adjust indexing
-	$html = "<select id=\"$blk-$num\" onchange=\"moveitem($num,'$blk')\">\n";
+	$html = "<select class=\"mvsel\" id=\"$blk-$num\" onchange=\"moveitem($num,'$blk')\">\n";
 	for ($i = 1; $i <= $count; $i++) {
 		$html .= "<option value=\"$i\" ";
 		if ($i==$num) { $html .= "SELECTED";}

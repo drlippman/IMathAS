@@ -309,3 +309,9 @@ div.ddmenu {
 	font-weight: bold;
 	padding: 0px;
 	}
+	
+div.inactivewrapper, div.activewrapper {
+	margin: 0px;
+	padding: 0px;
+}
+
