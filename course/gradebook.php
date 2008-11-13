@@ -146,6 +146,8 @@ if (!$isteacher || $stu!=0) { //show student view
 		$stu = $userid;
 	}
 	$pagetitle = "Gradebook";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
+	
 	require("../header.php");
 	
 	if (isset($_GET['from']) && $_GET['from']=="listusers") {
@@ -387,7 +389,7 @@ function gbstudisp($stu) {
 		}
 	}
 	
-	echo '<table class=gb>';
+	echo '<table id="myTable" class=gb>';
 	echo '<thead><tr><th>Item</th><th>Possible</th><th>Grade</th><th>Percent</th>';
 	if ($stu>0) {
 		echo '<th>Feedback</th>';
@@ -572,6 +574,17 @@ function gbstudisp($stu) {
 		}
 	}
 	echo '</tbody></table>';	
+	$sarr = "'S','N','N','N'";
+	if ($stu>0) {
+		$sarr .= ",'S'";
+	}
+	if ($hidepast) {
+		echo "<script>initSortTable('myTable',Array($sarr),false);</script>\n";
+	} else if ($availshow==2) {
+		echo "<script>initSortTable('myTable',Array($sarr),false,-3);</script>\n";
+	} else {
+		echo "<script>initSortTable('myTable',Array($sarr),false,-2);</script>\n";
+	}
 }
 
 function gbinstrdisp() {

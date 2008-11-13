@@ -20,6 +20,7 @@
 	var activeColumn = new Array();
 	var evenodd = false;
 	var dosortlast = true;
+	var skiplast = 0;
 	
 	function sortNumeric(a,b){
 		try {
@@ -122,10 +123,14 @@
 		
 		var cellArray = new Array();
 		var cellObjArray = new Array();
-		for(var no=1;no<tableObj.rows.length;no++){
+		var cellEndObjArray = new Array();
+		for(var no=1;no<tableObj.rows.length-skiplast;no++){
 			var content= tableObj.rows[no].cells[indexThis].innerHTML+'';
 			cellArray.push(content);
 			cellObjArray.push(tableObj.rows[no].cells[indexThis]);
+		}
+		for (var no=tableObj.rows.length-skiplast; no<tableObj.rows.length; no++) {
+			cellEndObjArray.push(tableObj.rows[no].cells[indexThis]);
 		}
 		
 		if(sortMethod=='N'){
@@ -138,7 +143,7 @@
 		
 		if(direction=='descending'){
 			for(var no=cellArray.length;no>=0;no--){
-				for(var no2=0;no2<cellObjArray.length-(dosortlast?0:1);no2++){
+				for(var no2=0;no2<cellObjArray.length;no2++){
 					if(cellObjArray[no2].innerHTML == cellArray[no] && !cellObjArray[no2].getAttribute('allreadySorted')){
 						cellObjArray[no2].setAttribute('allreadySorted','1');	
 						tBody.appendChild(cellObjArray[no2].parentNode);				
@@ -147,7 +152,7 @@
 			}
 		}else{
 			for(var no=0;no<cellArray.length;no++){
-				for(var no2=0;no2<cellObjArray.length-(dosortlast?0:1);no2++){
+				for(var no2=0;no2<cellObjArray.length;no2++){
 					if(cellObjArray[no2].innerHTML == cellArray[no] && !cellObjArray[no2].getAttribute('allreadySorted')){
 						cellObjArray[no2].setAttribute('allreadySorted','1');
 						tBody.appendChild(cellObjArray[no2].parentNode);				
@@ -155,9 +160,10 @@
 				}			
 			}				
 		}
-		if (!dosortlast) {
-			cellObjArray[cellObjArray.length-1].setAttribute('allreadySorted','1');
-			tBody.appendChild(cellObjArray[cellObjArray.length-1].parentNode);
+		if (skiplast>0) {
+			for (var no=0; no<skiplast; no++) {
+				tBody.appendChild(cellEndObjArray[no].parentNode);
+			}
 		}
 		
 		
@@ -180,6 +186,8 @@
 		
 		
 	}
+	//sortlast:  true to sort last, false to not sort last, -n to not
+	//sort last n rows.  undef sorts all
 	function initSortTable(objId,sortArray,switchit,sortlast)
 	{
 		var obj = document.getElementById(objId);
@@ -207,6 +215,11 @@
 		}
 		if (sortlast==false) {
 			dosortlast = false;
+			skiplast = 1;
+		} else if (sortlast==true) {
+			skiplast = 0;
+		} else if (sortlast<0) {
+			skiplast = -1*sortlast;
 		}
 	}
 
