@@ -38,7 +38,7 @@ with with partial support from the
 <a href="http://www.sbctc.ctc.edu/College/_g-elchome.aspx">WA State E-Learning Council</a>, the 
 <a href="http://www.transitionmathproject.org/">Transition Math Project</a>, and 
 <a href="http://www.pierce.ctc.edu">Pierce College</a>.  It is distributed under
-the <a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>.  See the license.txt file distributed with IMathAS for more details
+the <a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>.  See the <a href="license.txt">license.txt</a> file distributed with IMathAS for more details
 and credits for components attributed to others.</p>
 
 <h3>Features</h3>
@@ -126,9 +126,58 @@ because I don't want students with used books to incur additional cost.</p>
 
 
 <h3>Installation</h3>
-
+<p>
 <ol>
-<li>Download IMathAS, unzip it, and copy the directory to your webserver</li>
+<li>Download IMathAS, extract it, and copy the files to your webserver.</li>
+<li>If your web host requires that you create databases through the web panel, create a database
+    and database user for IMathAS now.  If you have a username/password with database
+    creation priviledges, you can wait and use it later in the install process.</li>
+<li>Open a browser and access install.php.  This script will write the config.php file, change directory
+    permissions, copy distribution files, and set up the database.  At the end of the install you
+    will be given the opportunity to install a small set of example questions.</li>
+<li>Log into IMathAS.  If you didn't change the
+    initial imathas user settings when running install.php, log in as 'root' with password 'root'. 
+    If you did not change the inital imathas user settings, click the "Change Password"
+    link now to change the password to something substantial.  Alternatively, you can
+    go into the Admin page, create a new user with Admin rights, then delete the 'root'
+    admin.</li>
+<li>Edit loginpage.php and infoheader.php if desired.  If you plan to use the new instructor account 
+    request page, edit newinstructor.php</li>
+</ol>
+</p>
+<h3>Upgrading</h3>
+<p>If you are upgrading from IMathAS 1.6, access update.php to install any new database changes
+and learn about any other changes necessary.  If you are upgrading from a version earlier
+than 1.6, you'll need to manually apply changes from the upgrade.txt file.
+</p>
+
+<h3>System Requirements</h3>
+<h4>Versions</h4>
+<p>PHP 5 and MySQL 4+ are recommended.  Most of the system will work with PHP 4.2+
+and MySQL 3.23, but future compatibility is not guaranteed.</p>
+<p>PHP with GD2 and Treetype are recommended for best image-based graph support</p> 
+
+<h4>Server Requirements</h4>
+<p>An installation serving 2500+ students 
+with 80+ concurrent users has operated well on a commercial shared web server.</p>
+
+<h4>Security</h4>
+<p>IMathAS uses a standard databased-stored sessions-based system.  If a user does
+not log out, the session is cleared from database after 24 hours.</p>
+
+<p>Questions (written by teachers) are passed through an interpreter that only allows 
+authorized functions to be used.  Student answers are evaluated client-side using
+JavaScript, and are never evaled server-side.</p>
+
+<p>Macro Libraries (PHP function libraries that can be used in writing questions) 
+can only be installed by full Admins in IMathAS.  The option allowing install can be 
+disabled in the config.php file</p>
+
+<h3>Install Notes</h3>
+<p>
+The install.php script automatically handles the following install steps.  They're 
+listed here in case anything goes wrong:
+<ul>
 <li>Change permissions (chmod) of the following directories to allow the webserver process
     to write to the directories:</li>
     	<ul>
@@ -188,37 +237,8 @@ because I don't want students with used books to incur additional cost.</p>
     to your system administrator and ask them to run it, if you don't have creation access
     to the database server.  Alternatively, have your system administrator create a database and database user,
     and use these names in the config.php file before running dbsetup.php.  This script sets up the necessary database user, database, and tables for IMathAS.</li>
-<li>Delete the dbsetup.php script, or store it somewhere not on the webserver</li>
-<li>Log into IMathAS.  Access http://yourside.edu $imasroot.  If you didn't change the
-    initial imathas user settings when running dbsetup.php, log in as 'root' with password 'root'. 
-    If you did not change the inital imathas user settings, click the "Change Password"
-    link now to change the password to something substantial.  Alternatively, you can
-    go into the Admin page, create a new user with Admin rights, then delete the 'root'
-    admin.</li>
-<li>Edit loginpage.php and infoheader.php if desired.</li>
-<li>If you plan to use the new instructor account request page, edit newinstructor.php</li>
-</ol>
 
-<h3>System Requirements</h3>
-<h4>Versions</h4>
-<p>PHP 5 and MySQL 4+ are recommended.  Most of the system will work with PHP 4.2+
-and MySQL 3.23, but future compatibility is not guaranteed.</p>
-<p>PHP with GD2 and Treetype are recommended for best image-based graph support</p> 
-
-<h4>Server Requirements</h4>
-<p>An installation serving 2500+ students 
-with 80+ concurrent users has operated well on a commercial shared web server.</p>
-
-<h4>Security</h4>
-<p>IMathAS uses a standard databased-stored sessions-based system.  If a user does
-not log out, the session is cleared from database after 24 hours.</p>
-
-<p>Questions (written by teachers) are passed through an interpreter that only allows 
-authorized functions to be used.  Student answers are evaluated client-side using
-JavaScript, and are never evaled server-side.</p>
-
-<p>Macro Libraries (PHP function libraries that can be used in writing questions) 
-can only be installed by full Admins in IMathAS.  The option allowing install can be 
-disabled in the config.php file</p>
+</ul>
+</p>
 </body>
 </html>
