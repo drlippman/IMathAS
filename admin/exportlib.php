@@ -37,7 +37,11 @@ if (!(isset($teacherid)) && $myrights<75) {
 		$isadmin = true;
 	}
 		
-	if (isset($_POST['packdescription'])) { //STEP 2 DATA MANIPULATION
+	if (isset($_POST['submit']) && $_POST['submit']=='Export') { //STEP 2 DATA MANIPULATION
+		if (count($_POST['libs'])==0) {
+			echo "No libraries selected";
+			exit;
+		}
 		header('Content-type: text/imas');
 		header("Content-Disposition: attachment; filename=\"imasexport.imas\"");
 		echo "PACKAGE DESCRIPTION\n";
@@ -54,11 +58,15 @@ if (!(isset($teacherid)) && $myrights<75) {
 		$libs = Array();
 		$parents = Array();
 		$names = Array();
+		$nonpriv = isset($_POST['nonpriv']);
 		//$libs is systemid=>newid
 		//$parents is childnewid=>parentnewid
 		
 		//get root lib names
 		$query = "SELECT id,name,parent,uniqueid,lastmoddate FROM imas_libraries WHERE id IN ($rootlist)";
+		if ($nonpriv) {
+			$query .= " AND userights>0";
+		}
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
 			if (!in_array($row[2],$rootlibs)) { //don't export children here
@@ -81,8 +89,11 @@ if (!(isset($teacherid)) && $myrights<75) {
 		
 		//lists child libraries
 		function getchildlibs($lib) {
-			global $libs,$libcnt;
+			global $libs,$libcnt,$nonpriv;
 			$query = "SELECT id,name,uniqueid,lastmoddate FROM imas_libraries WHERE parent='$lib'";
+			if ($nonpriv) {
+				$query .= " AND userights>0";
+			}
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (mysql_num_rows($result)>0) {
 				while ($row = mysql_fetch_row($result)) {
@@ -119,7 +130,12 @@ if (!(isset($teacherid)) && $myrights<75) {
 		//set question id array
 		//$qassoc is systemqsetid=>newqsetid
 		//$libitems is newlibid=>newqsetid
-		$query = "SELECT qsetid,libid FROM imas_library_items WHERE libid IN ($liblist)";
+		$query = "SELECT imas_library_items.qsetid,imas_library_items.libid FROM imas_library_items ";
+		$query .= "JOIN imas_questionset ON imas_library_items.qsetid=imas_questionset.id ";
+		$query .= "WHERE imas_library_items.libid IN ($liblist) ";
+		if ($nonpriv) {
+			$query .= " AND imas_questionset.userights>0";
+		}
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$qassoc = Array();
 		$libitems = Array();
@@ -140,8 +156,12 @@ if (!(isset($teacherid)) && $myrights<75) {
 			}
 		}
 		
+		$imgfiles = array();
 		$query = "SELECT imas_questionset.* FROM imas_questionset,imas_library_items ";
 		$query .= "WHERE imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid IN ($liblist)";
+		if ($nonpriv) {
+			$query .= " AND imas_questionset.userights>0";
+		}
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 			echo "\nSTART QUESTION\n";
@@ -171,9 +191,19 @@ if (!(isset($teacherid)) && $myrights<75) {
 				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 				while ($row = mysql_fetch_row($r2)) {
 					echo $row[0].','.$row[1]. "\n";
+					$imgfiles[] = realpath("../assessment/qimages/").$row[1];
 				}
 			}
 		}
+		// need to work on
+		include("../includes/tar.class.php");
+		if (file_exists("qimages.tar.gz")) {
+			unlink("qimages.tar.gz");
+		}
+		$tar = new tar();
+		$tar->addFiles($imgfiles);
+		$tar->toTar("qimages.tar.gz",TRUE);
+		
 		exit;
 	} else {  //STEP 1 DATA MANIPULATION
 		
@@ -194,7 +224,7 @@ if ($overwriteBody==1) {
 
 	echo $curBreadcrumb
 ?>
-	<form method=post action="exportlib.php?cid=$cid">
+	<form method=post action="exportlib.php?cid=<?php echo $cid ?>">
 		
 		<h3>Library Export</h3>
 		<p>Note:  If a parent library is selected, it's children libraries are included in the export, 
@@ -205,13 +235,17 @@ if ($overwriteBody==1) {
 	$select = "all";
 	include("../course/libtree.php");
 ?>
-		
+		<span class="form">Limit to non-private questions and libs?</span>
+		<span class="formright">
+			<input type="checkbox" name="nonpriv" checked="checked" />
+		</span><br class="form" />
 		<span class=form>Package Description</span>
 		<span class=formright>
 			<textarea name="packdescription" rows=4 cols=60></textarea>
 		</span><br class=form>
 			
-		<input type=submit value="Export">
+		<input type=submit name="submit" value="Export"><br/>
+		Once exported, <a href="qimages.tar.gz">download image files</a>.
 	</form>
 	<p>Note: Export of questions with static image files is not yet supported</p>
 

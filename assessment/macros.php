@@ -935,7 +935,7 @@ function calconarrayif($array,$todo,$ifcond) {
 	global $disallowedwords,$allowedmacros;
 	$todo = str_replace($disallowedwords,"",$todo);
 	$todo = clean($todo);
-	$ifcond = clean($todo);
+	$ifcond = clean($ifcond);
 	$rsnoquote = preg_replace('/"[^"]*"/','""',$todo);
 	$rsnoquote = preg_replace('/\'[^\']*\'/','\'\'',$rsnoquote);
 	if (preg_match_all('/([$\w]+)\s*\([^\)]*\)/',$rsnoquote,$funcs)) {

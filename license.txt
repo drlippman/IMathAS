@@ -102,3 +102,7 @@ MIT Style License
 excanvas
 (c) 2006 Google inc
 Apache License, Version 2.0
+
+tar class
+Copyright (C) 2002  Josh Barger
+LGPL
