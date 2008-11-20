@@ -2,6 +2,10 @@
 //IMathAS:  Main admin page
 //(c) 2006 David Lippman
 
+//boost operation time
+@set_time_limit(0);
+ini_set("max_execution_time", "600");
+
 /*** master php includes *******/
 require("../validate.php");
 
@@ -106,10 +110,20 @@ function parseqs($file,$touse,$rights) {
 	$touse = explode(',',$touse);
 	$qnum = -1;
 	$part = '';
-	$handle = fopen($file,"r");
+	if (!function_exists('gzopen')) {
+		$handle = fopen($file,"r");
+		$nogz = true;
+	} else {
+		$nogz = false;
+		$handle = gzopen($file,"r");
+	}
 	$line = '';
-	while (!feof($handle)) {
-		$line = rtrim(fgets($handle, 4096));
+	while ((!$nogz || !feof($handle)) && ($nogz || !gzeof($handle))) {
+		if ($nogz) {
+			$line = rtrim(fgets($handle, 4096));
+		} else {
+			$line = rtrim(gzgets($handle, 4096));
+		}
 		if ($line == "START QUESTION") {
 			$part = '';
 			if ($qnum>-1) {
@@ -167,7 +181,11 @@ function parseqs($file,$touse,$rights) {
 			}
 		}
 	}
-	fclose($handle);
+	if ($nogz) {
+		fclose($handle);
+	} else {
+		gzclose($handle);
+	}
 	foreach($qdata as $k=>$val) {
 		$qdata[$k] = rtrim($val);
 	}
@@ -181,14 +199,24 @@ function parseqs($file,$touse,$rights) {
 }
 
 function parselibs($file) {
-	$handle = fopen($file,"r");
+	if (!function_exists('gzopen')) {
+		$handle = fopen($file,"r");
+		$nogz = true;
+	} else {
+		$nogz = false;
+		$handle = gzopen($file,"r");
+	}
 	if (!$handle) {
 		echo "eek!  handle doesn't exist";
 		exit;
 	}
 	$line = '';
-	while (!feof($handle) && $line!="START QUESTION") {
-		$line = rtrim(fgets($handle, 4096));
+	while (((!$nogz || !feof($handle)) && ($nogz || !gzeof($handle))) && $line!="START QUESTION") {
+		if ($nogz) {
+			$line = rtrim(fgets($handle, 4096));
+		} else {
+			$line = rtrim(gzgets($handle, 4096));
+		}
 		if ($line=="PACKAGE DESCRIPTION") {
 			$dopackd = true;
 			$packname = rtrim(fgets($handle, 4096));
@@ -221,7 +249,11 @@ function parselibs($file) {
 			$packname .= rtrim($line);
 		}
 	}
-	fclose($handle);
+	if ($nogz) {
+		fclose($handle);
+	} else {
+		gzclose($handle);
+	}
 	return array($packname,$names,$parents,$libitems,$unique,$lastmoddate);
 }
 
@@ -451,7 +483,7 @@ if ($overwriteBody==1) {
 <?php
 		if ($_FILES['userfile']['name']=='') { //STEP 1 DISPLAY
 ?>
-			<input type="hidden" name="MAX_FILE_SIZE" value="3000000" />
+			<input type="hidden" name="MAX_FILE_SIZE" value="9000000" />
 			<span class=form>Import file: </span>
 			<span class=formright><input name="userfile" type="file" /></span><br class=form>
 			<div class=submit><input type=submit value="Submit"></div>

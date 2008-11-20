@@ -6,8 +6,7 @@ if (file_exists("config.php")) {
 }
 if (isset($_POST['dbserver'])) {
 	
-	$contents = "
-<?php
+	$contents = "<?php
 //IMathAS Math Config File.  Adjust settings here!
 
 //database access settings
@@ -187,7 +186,7 @@ p.imp {
 <p>This page will help you configure IMathAS.  The database settings <b>must</b> be
 changed.  The rest of the settings autopopulate to reasonable defaults but can be
 changed to allow for customization.</p>
-<form method="post" action="configwriter.php?submit=true">
+<form method="post" action="install.php?submit=true">
 <h3>Database Settings</h3>
 <p class="imp">
 Database server.  Could be localhost or mysql.yoursite.edu<br/>

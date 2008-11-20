@@ -679,7 +679,7 @@ mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 echo "user $username created<br/>";
 
 
-echo "<p><b>Database setup complete</b>.  You should now delete the dbsetup.php file off the webserver.  <a href=\"index.php\">Go to IMathAS login page</a></p>";
+echo "<p><b>Database setup complete</b>.  <a href=\"index.php\">Go to IMathAS login page</a>, or <a href=\"installexamples.php\">install a library of example questions</a> (will ask you to log in)</p>";
 ?>
 </body>
 </html>
