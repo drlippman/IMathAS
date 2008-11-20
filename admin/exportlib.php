@@ -191,7 +191,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 				while ($row = mysql_fetch_row($r2)) {
 					echo $row[0].','.$row[1]. "\n";
-					$imgfiles[] = realpath("../assessment/qimages/").$row[1];
+					$imgfiles[] = realpath("../assessment/qimages").DIRECTORY_SEPARATOR.$row[1];
 				}
 			}
 		}
@@ -245,9 +245,9 @@ if ($overwriteBody==1) {
 		</span><br class=form>
 			
 		<input type=submit name="submit" value="Export"><br/>
-		Once exported, <a href="qimages.tar.gz">download image files</a>.
+		Once exported, <a href="qimages.tar.gz">download image files</a> to be put in assessment/qimages
 	</form>
-	<p>Note: Export of questions with static image files is not yet supported</p>
+	
 
 <?php
 }	

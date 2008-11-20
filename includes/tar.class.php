@@ -445,11 +445,10 @@ class tar {
 	function addFile($filename) {
 		// Make sure the file we are adding exists!
 		if(!file_exists($filename)) {
-			echo "No file: $filename<br/>";
 			return false;
 		}
 		// Make sure there are no other files in the archive that have this same filename
-		if($this->containsFile($filename))
+		if($this->containsFile(basename($filename)))
 			return false;
 
 		// Get file information
@@ -463,7 +462,7 @@ class tar {
 		// Add file to processed data
 		$this->numFiles++;
 		$activeFile			= &$this->files[];
-		$activeFile["name"]		= $filename;
+		$activeFile["name"]		= basename($filename);
 		$activeFile["mode"]		= $file_information["mode"];
 		$activeFile["user_id"]		= $file_information["uid"];
 		$activeFile["group_id"]		= $file_information["gid"];
