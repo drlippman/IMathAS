@@ -165,6 +165,14 @@ if (!(isset($teacherid)) && $myrights<75) {
 			echo rtrim($line['qtext']) . "\n";
 			echo "\nANSWER\n";
 			echo rtrim($line['answer']) . "\n";
+			if ($line['hasimg']==1) {
+				echo "\nQIMGS\n";
+				$query = "SELECT var,filename FROM imas_qimages WHERE qsetid='{$line['id']}'";
+				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+				while ($row = mysql_fetch_row($r2)) {
+					echo $row[0].','.$row[1]. "\n";
+				}
+			}
 		}
 		exit;
 	} else {  //STEP 1 DATA MANIPULATION

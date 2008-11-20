@@ -3,6 +3,9 @@
 //(c) 2006 David Lippman
  header('P3P: CP="ALL CUR ADM OUR"');
  $curdir = rtrim(dirname(__FILE__), '/\\');
+ if (!file_exists("$curdir/config.php")) {
+	 header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/install.php");
+ }
  require_once("$curdir/config.php");
  if (isset($sessionpath)) { session_save_path($sessionpath);}
  ini_set('session.gc_maxlifetime',86400);

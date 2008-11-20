@@ -8,7 +8,42 @@ $dbsetup = true;
 include("config.php");
 //IMathAS Database Setup
 //(c) 2006 David Lippman
-if (!isset($_POST['authuser'])) {
+if (isset($_POST['dbsetupmethod'])) { //called from install script
+	if ($_POST['dbsetupmethod']>0) {
+		$docreate = 1;
+	} else {
+		$docreate = 0;
+	}
+	echo "<h3>This step will set up the database required for IMathAS</h3>\n";
+	echo "<form method=post action=\"dbsetup.php\">\n";
+	echo "<input type=\"hidden\" name=\"create\" value=\"$docreate\" />";
+	echo '<input type="hidden" name="authuser" value="';
+	if ($_POST['dbsetupmethod']==2) {
+		echo $_POST['dbauthuser'];
+	} 
+	echo '" />';
+	echo '<input type="hidden" name="authpass" value="';
+	if ($_POST['dbsetupmethod']==2) {
+		echo $_POST['dbauthpass'];
+	} 
+	echo '" />';
+	echo "<fieldset><legend>Initial IMathAS User Information</legend>\n";
+	echo "<span class=form>First Name</span>";
+	echo "<span class=formright><input type=type name=firstname value=\"root\"></span><br class=form>\n";
+	echo "<span class=form>Last Name</span>";
+	echo "<span class=formright><input type=type name=lastname value=\"root\"></span><br class=form>\n";
+	echo "<span class=form>Username</span>";
+	echo "<span class=formright><input type=type name=username value=\"root\"></span><br class=form>\n";
+	echo "<span class=form>Password</span>";
+	echo "<span class=formright><input type=type name=password value=\"root\"></span><br class=form>\n";
+	echo "<span class=form>Email</span>";
+	echo "<span class=formright><input type=type name=email value=\"root@$dbserver\"></span><br class=form>\n";
+	echo "</fieldset>\n";
+	echo "<div class=submit><input type=submit value=\"Set up database\"></div>\n";
+	echo "</form>\n";
+	echo "</body></html>\n";
+	exit;
+} else if (!isset($_POST['authuser'])) {
 	echo "<form method=post action=\"dbsetup.php\">\n";
 	echo "<h3>This script will set up the database required for IMathAS</h3>\n";
 	echo "<p><b>Before submitting this form</b> be sure you have edited the config.php file to match the settings for your server</p>\n";
@@ -397,7 +432,8 @@ $sql = 'CREATE TABLE `imas_forums` ('
 	. ' `courseid` INT(10) UNSIGNED NOT NULL, '
         . ' `startdate` INT(10) UNSIGNED NOT NULL, '
 	. ' `enddate` INT(10) UNSIGNED NOT NULL, '
-	. ' `settings` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
+	. ' `settings` TINYINT(2) UNSIGNED NOT NULL DEFAULT \'0\', '
+	. ' `sortby` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `defdisplay` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `replyby` INT(10) UNSIGNED NOT NULL DEFAULT \'2000000000\', '
 	. ' `postby` INT(10) UNSIGNED NOT NULL DEFAULT \'2000000000\', '

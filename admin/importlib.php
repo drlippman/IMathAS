@@ -65,6 +65,17 @@ function parseqs($file,$touse,$rights) {
 				mysql_query($query) or die("error on: $query: " . mysql_error());
 				if (mysql_affected_rows()>0) {
 					$updateq++;
+					if (!empty($qd['qimgs'])) {
+						//not efficient, but sufficient :)
+						$query = "DELETE FROM imas_qimages WHERE qsetid='$qsetid'";
+						mysql_query($query) or die("Import failed on $query: " . mysql_error());
+						$qimgs = explode("\n",$qd['qimgs']);
+						foreach($qimgs as $qimg) {
+							$p = explode(',',$qimg);
+							$query = "INSERT INTO imas_qimages (qsetid,var,filename) VALUES ($qsetid,'{$p[0]}','{$p[1]}')";
+							mysql_query($query) or die("Import failed on $query: " . mysql_error());
+						}
+					}
 				}
 			} 
 			return $qsetid;
@@ -80,7 +91,16 @@ function parseqs($file,$touse,$rights) {
 			$query .= "'{$qd['qtext']}','{$qd['answer']}')";
 			mysql_query($query) or die("Import failed on $query: " . mysql_error());
 			$newq++;
-			return mysql_insert_id();
+			$qsetid = mysql_insert_id();
+			if (!empty($qd['qimgs'])) {
+				$qimgs = explode("\n",$qd['qimgs']);
+				foreach($qimgs as $qimg) {
+					$p = explode(',',$qimg);
+					$query = "INSERT INTO imas_qimages (qsetid,var,filename) VALUES ($qsetid,'{$p[0]}','{$p[1]}')";
+					mysql_query($query) or die("Import failed on $query: " . mysql_error());
+				}
+			}
+			return $qsetid;
 		}
 	}
 	$touse = explode(',',$touse);
@@ -135,6 +155,9 @@ function parseqs($file,$touse,$rights) {
 			continue;
 		} else if ($line == "ANSWER") {
 			$part = 'answer';
+			continue;
+		} else if ($line == "QIMGS") {
+			$part = 'qimgs';
 			continue;
 		} else {
 			if ($part=="qtype") {

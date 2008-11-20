@@ -73,6 +73,11 @@
 				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$aid = mysql_result($result,0,0);
 				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/isolateassessgrade.php?stu=$stu&cid={$_GET['cid']}&aid=$aid&gbmode=$gbmode");
+			} else if ($from=='stugrp') {
+				$query = "SELECT assessmentid FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
+				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				$aid = mysql_result($result,0,0);
+				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid={$_GET['cid']}&aid=$aid");
 			} else {
 				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid={$_GET['cid']}&gbmode=$gbmode");
 			}
@@ -292,6 +297,11 @@
 				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$aid = mysql_result($result,0,0);
 				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/isolateassessgrade.php?stu=$stu&cid={$_GET['cid']}&aid=$aid&gbmode=$gbmode");
+			} else if ($from=='stugrp') {
+				$query = "SELECT assessmentid FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
+				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				$aid = mysql_result($result,0,0);
+				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid={$_GET['cid']}&aid=$aid");
 			} else {
 				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid={$_GET['cid']}&gbmode=$gbmode");
 			}
@@ -308,27 +318,6 @@
 			mysql_query($query) or die("Query failed : $query " . mysql_error());
 		}
 		
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-		if ($stu>0) {
-			echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
-			echo "&gt; <a href=\"gradebook.php?stu=$stu&cid=$cid\">Student Detail</a> ";
-		} else if ($_GET['from']=="isolate") {
-			echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
-			echo "&gt; <a href=\"isolateassessgrade.php?cid=$cid&aid={$_GET['aid']}\">View Scores</a> ";	
-		} else if ($_GET['from']=='stugrp') {
-			echo "&gt; <a href=\"managestugrps.php?cid=$cid&aid={$_GET['aid']}\">Student Groups</a> ";	
-		} else {
-			echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
-		}
-		echo "&gt; Detail</div>";
-		echo "<h2>Grade Book Detail</h2>\n";
-		$query = "SELECT FirstName,LastName FROM imas_users WHERE id='{$_GET['uid']}'";
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		$row = mysql_fetch_row($result);
-		echo "<h3>{$row[1]}, {$row[0]}</h3>\n";
-		
-		$teacherreview = $_GET['uid'];
-		
 		$query = "SELECT imas_assessments.name,imas_assessments.timelimit,imas_assessments.defpoints,";
 		$query .= "imas_assessments.deffeedback,imas_assessments.enddate,imas_assessment_sessions.* ";
 		$query .= "FROM imas_assessments,imas_assessment_sessions ";
@@ -342,6 +331,29 @@
 			exit;
 		}
 		$line=mysql_fetch_array($result, MYSQL_ASSOC);
+		
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+		if ($stu>0) {
+			echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
+			echo "&gt; <a href=\"gradebook.php?stu=$stu&cid=$cid\">Student Detail</a> ";
+		} else if ($_GET['from']=="isolate") {
+			echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
+			echo "&gt; <a href=\"isolateassessgrade.php?cid=$cid&aid={$line['assessmentid']}\">View Scores</a> ";	
+		} else if ($_GET['from']=='stugrp') {
+			echo "&gt; <a href=\"managestugrps.php?cid=$cid&aid={$line['assessmentid']}\">Student Groups</a> ";	
+		} else {
+			echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
+		}
+		echo "&gt; Detail</div>";
+		echo "<h2>Grade Book Detail</h2>\n";
+		$query = "SELECT FirstName,LastName FROM imas_users WHERE id='{$_GET['uid']}'";
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$row = mysql_fetch_row($result);
+		echo "<h3>{$row[1]}, {$row[0]}</h3>\n";
+		
+		$teacherreview = $_GET['uid'];
+		
+		
 		list($testtype,$showans) = explode('-',$line['deffeedback']);
 		echo "<h4>{$line['name']}</h4>\n";
 		if ($isteacher && !isset($_GET['lastver']) && !isset($_GET['reviewver'])) {

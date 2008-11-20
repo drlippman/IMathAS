@@ -1,6 +1,17 @@
 Upgrade Notes
 
 *********************
+** IMathAS 1.7     **
+*********************
+
+*** Database Changes ***
+
+ALTER TABLE `imas_forums` CHANGE `settings` `settings` TINYINT( 2 ) UNSIGNED NOT NULL DEFAULT '0';
+ALTER TABLE `imas_forums` ADD `sortby` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0';
+
+
+
+*********************
 ** IMathAS 1.6     **
 *********************
 *** config.php changes - Reference config.php.dist for changes. ***

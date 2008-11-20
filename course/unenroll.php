@@ -40,6 +40,13 @@
 			}
 		}
 		if ($_GET['uid']=="all") {
+			$query = "SELECT COUNT(id) FROM imas_students WHERE courseid='{$_GET['cid']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			if (count($_POST['checked']) < mysql_result($result,0,0)) {
+				$_GET['uid'] = 'selected';
+			}
+		}
+		if ($_GET['uid']=="all") {
 
 		} else if ($_GET['uid']=="selected") {
 

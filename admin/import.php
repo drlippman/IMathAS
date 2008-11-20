@@ -57,6 +57,9 @@ function parsefile($file) {
 		} else if ($line == "ANSWER") {
 			$part = 'answer';
 			continue;
+		} else if ($line == "QIMGS") {
+			$part = 'qimgs';
+			continue;
 		} else {
 			if ($part=="libdesc") {
 				$qdata['libdesc'] .= $line . "\n";
@@ -188,6 +191,17 @@ if (!(isset($teacherid)) && $myrights<75) {
 					mysql_query($query) or die("Import failed on {$qdata['description']}: " . mysql_error());
 					if (mysql_affected_rows()>0) {
 						$updateq++;
+						if (!empty($qd['qimgs'])) {
+							//not efficient, but sufficient :)
+							$query = "DELETE FROM imas_qimages WHERE qsetid='$qsetid'";
+							mysql_query($query) or die("Import failed on $query: " . mysql_error());
+							$qimgs = explode("\n",$qdata[$qn]['qimgs']);
+							foreach($qimgs as $qimg) {
+								$p = explode(',',$qimg);
+								$query = "INSERT INTO imas_qimages (qsetid,var,filename) VALUES ($qsetid,'{$p[0]}','{$p[1]}')";
+								mysql_query($query) or die("Import failed on $query: " . mysql_error());
+							}
+						}
 					} else {
 						continue;
 					}
@@ -203,6 +217,14 @@ if (!(isset($teacherid)) && $myrights<75) {
 				$query .= "'{$qdata[$qn]['qtext']}','{$qdata[$qn]['answer']}')";
 				mysql_query($query) or die("Import failed on {$qdata['description']}: " . mysql_error());
 				$qsetid = mysql_insert_id();
+				if (!empty($qd['qimgs'])) {
+					$qimgs = explode("\n",$qdata[$qn]['qimgs']);
+					foreach($qimgs as $qimg) {
+						$p = explode(',',$qimg);
+						$query = "INSERT INTO imas_qimages (qsetid,var,filename) VALUES ($qsetid,'{$p[0]}','{$p[1]}')";
+						mysql_query($query) or die("Import failed on $query: " . mysql_error());
+					}
+				}
 				$newq++;
 			}
 			
