@@ -12,7 +12,7 @@ if (isset($_POST['dbserver'])) {
 //database access settings
 \$dbserver = \"{$_POST['dbserver']}\";
 \$dbname = \"{$_POST['dbname']}\";
-\$dbsusername = \"{$_POST['dbusername']}\";
+\$dbusername = \"{$_POST['dbusername']}\";
 \$dbpassword = \"{$_POST['dbpassword']}\";
 
 //install name

@@ -6,9 +6,8 @@ Upgrade Notes
 
 *** Database Changes ***
 
-ALTER TABLE `imas_forums` CHANGE `settings` `settings` TINYINT( 2 ) UNSIGNED NOT NULL DEFAULT '0';
-ALTER TABLE `imas_forums` ADD `sortby` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0';
-
+All database changes are now in upgrade.php.  Run that file to apply updates
+to the database.  
 
 
 *********************
