@@ -14,7 +14,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 	
 	$handle = @fopen("updatecounter.txt",'r');
 	if ($handle===false) {
-		$last = $latest;
+		$last = 0;
 	} else {
 		$last = intval(trim(fgets($handle)));
 		fclose($handle);

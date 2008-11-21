@@ -6,6 +6,17 @@ body {
 	margin: 10px;
 	padding: 0px;
 }
+div {
+	margin: 0px;
+	padding: 0px;
+}
+p {
+	margin: 0;
+	padding: .5em 0;
+}
+br {
+	line-height: 1em;
+}
 div.item {
 	margin-bottom: 10px;
 	padding: 5px;
@@ -18,8 +29,8 @@ div.signup {
 }
 div.itemsum {
 	margin-left: 45px;
-	margin-top: -.5em;
-	margin-bottom: -.5em;
+	/*margin-top: -.5em;
+	margin-bottom: -.5em;*/
 }
 span.iteminfo {
 	margin-left: 30px;	
