@@ -67,11 +67,15 @@
 			}
 		}
 		if ($dofilter) {
-			$query = "SELECT userid FROM imas_assessment_sessions WHERE agroupid='$agroupid'";
-			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-			$limids = array();
-			while ($row = mysql_fetch_row($result)) {
-				$limids[] = $row[0];
+			if ($agroupid>0) {
+				$query = "SELECT userid FROM imas_assessment_sessions WHERE agroupid='$agroupid'";
+				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				$limids = array();
+				while ($row = mysql_fetch_row($result)) {
+					$limids[] = $row[0];
+				}
+			} else if (!$isteacher) {
+				$limids[] = $userid;
 			}
 			$query = "SELECT userid FROM imas_teachers WHERE courseid='$cid'";
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());

@@ -275,7 +275,7 @@ if ($overwriteBody==1) {
 			</tbody>
 			</table>
 
-<?
+<?php
 		foreach($_POST as $k=>$v) {
 			echo "<input type=hidden name=\"$k\" value=\"$v\">\n";
 		}

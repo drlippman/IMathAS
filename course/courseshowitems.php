@@ -588,7 +588,7 @@ function enditem() {
 					   } else {
 						   echo "<div class=icon style=\"background-color: #ccc;\">!</div>";
 					   }
-					   echo "<div class=title><i> <b>{$line['title']}</b> <BR>";
+					   echo "<div class=title><i> <b>{$line['title']}</b> </i><br/>";
 				   } else {
 					   echo "<div class=title>";
 				   }
