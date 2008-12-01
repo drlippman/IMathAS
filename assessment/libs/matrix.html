@@ -1,10 +1,14 @@
 <html><body>
 <h1>Macro Library matrix</h1>
-Matrix functions.  Version 1.3.1, April 16, 2008
+Matrix functions.  Version 1.4, Nov 22, 2008
 <BR><ul>
 <li><a href="#matrix">matrix</a></li>
 <li><a href="#matrixformat">matrixformat</a></li>
 <li><a href="#matrixsystemdisp">matrixsystemdisp</a></li>
+<li><a href="#matrixgetentry">matrixgetentry</a></li>
+<li><a href="#matrixgetrow">matrixgetrow</a></li>
+<li><a href="#matrixgetcol">matrixgetcol</a></li>
+<li><a href="#matrixgetsubmatrix">matrixgetsubmatrix</a></li>
 <li><a href="#matrixsum">matrixsum</a></li>
 <li><a href="#matrixdiff">matrixdiff</a></li>
 <li><a href="#matrixscalar">matrixscalar</a></li>
@@ -37,6 +41,22 @@ matrixformat(matrix)
 matrixsystemdisp(matrix,[variables])
 <BR>Writes out a matrix as an equivalent system of equations
 <BR>variables is optional array of variables to use
+<BR><h3><a name="matrixgetentry">matrixgetentry</a></h3>
+matrixgetentry(matrix,row,col)
+<BR>get entry from a matrix at given row and col
+<BR>rows and cols are 0 indexed (first row is row 0)
+<BR><h3><a name="matrixgetrow">matrixgetrow</a></h3>
+matrixgetrow(matrix,row)
+<BR>get row of a matrix as a new 1xm matrix
+<BR>rows and cols are 0 indexed (first row is row 0)
+<BR><h3><a name="matrixgetcol">matrixgetcol</a></h3>
+matrixgetcol(matrix,col)
+<BR>get col of a matrix as a new nx1 matrix
+<BR>rows and cols are 0 indexed (first row is row 0)
+<BR><h3><a name="matrixgetsubmatrix">matrixgetsubmatrix</a></h3>
+matrixgetsubmatrix(matrix,rowselector,colselector)
+<BR>gets submatrix.  rowselector and colselector are strings
+<BR>with format:  "start:end".  ":" to select all 
 <BR><h3><a name="matrixsum">matrixsum</a></h3>
 matrixsum(matrix,matrix)
 <BR>Adds two matrices

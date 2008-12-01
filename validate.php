@@ -12,6 +12,12 @@
  ini_set('auto_detect_line_endings',true);
  session_start();
  $sessionid = session_id();
+ //check for bad sessionids
+ if (strlen($sessionid)<32) {
+	 if (function_exists('session_regenerate_id')) { session_regenerate_id(); }
+	echo "Error.  Please <a href=\"$imasroot/index.php\">Home</a>try again</a>";
+	exit;	 
+ }
  $sessiondata = array();
  $query = "SELECT userid,tzoffset,sessiondata FROM imas_sessions WHERE sessionid='$sessionid'";
  $result = mysql_query($query) or die("Query failed : " . mysql_error());

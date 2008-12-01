@@ -452,7 +452,7 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 ?>			
 				<li>
 					<span class=dd>-</span>
-					<input type=radio name=ctc value="<? echo $row[0] ?>">
+					<input type=radio name=ctc value="<?php echo $row[0] ?>">
 					<?php echo $row[1] ?>
 					<?php 
 						if ($row[2]<2) {

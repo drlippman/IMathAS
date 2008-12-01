@@ -1,8 +1,8 @@
 <?php
-//Matrix functions.  Version 1.3.1, April 16, 2008
+//Matrix functions.  Version 1.4, Nov 22, 2008
 
 global $allowedmacros;
-array_push($allowedmacros,"matrix","matrixformat","matrixsystemdisp","matrixsum","matrixdiff","matrixscalar","matrixprod","matrixaugment","matrixrowscale","matrixrowswap","matrixrowcombine","matrixrowcombine3","matrixidentity","matrixtranspose","matrixrandinvertible","matrixrandunreduce","matrixinverse","matrixsolve","polyregression");
+array_push($allowedmacros,"matrix","matrixformat","matrixsystemdisp","matrixsum","matrixdiff","matrixscalar","matrixprod","matrixaugment","matrixrowscale","matrixrowswap","matrixrowcombine","matrixrowcombine3","matrixidentity","matrixtranspose","matrixrandinvertible","matrixrandunreduce","matrixinverse","matrixsolve","polyregression","matrixgetentry","matrixgetrow","matrixgetcol","matrixgetsubmatrix");
 
 //matrix(vals,rows,cols)
 //Creates a new matrix item.  
@@ -91,6 +91,88 @@ function matrixsystemdisp($m,$v=array('x','y','z','w','v')) {
 	}
 	$out .= ':}';
 	return $out;
+}
+
+//matrixgetentry(matrix,row,col)
+//get entry from a matrix at given row and col
+//rows and cols are 0 indexed (first row is row 0)
+function matrixgetentry($m,$r,$c) {
+	if ($r<0 || $c<0 || $r>=count($m) || $c>=count($m[0])) {
+		echo 'invalid row or column';
+		return 0;
+	} else {
+		return $m[$r][$c];
+	}
+}
+
+//matrixgetrow(matrix,row)
+//get row of a matrix as a new 1xm matrix
+//rows and cols are 0 indexed (first row is row 0)
+function matrixgetrow($m,$r) {
+	if ($r<0 || $r>=count($m)) {
+		echo 'invalid row';
+	} else {
+		return array($m[$r]);
+	}
+}
+
+//matrixgetcol(matrix,col)
+//get col of a matrix as a new nx1 matrix
+//rows and cols are 0 indexed (first row is row 0)
+function matrixgetcol($m,$c) {
+	if ($c<0 || $c>=count($m[0])) {
+		echo 'invalid col';
+	} else {
+		$o = array();
+		foreach ($m as $r=>$row) {
+			$o[$r] = array($row[$c]);
+		}
+		return $o;
+	}
+}
+
+//matrixgetsubmatrix(matrix,rowselector,colselector)
+//gets submatrix.  rowselector and colselector are strings
+//with format:  "start:end".  ":" to select all 
+function matrixgetsubmatrix($m,$rs,$cs) {
+	$rsp = explode(':',$rs);
+	if (count($rsp)<2) {
+		$rstart = 0;  $rend = count($m)-1;
+	} else {
+		if ($rsp[0]!='') {
+			$rstart = intval($rsp[0]);
+		} else {
+			$rstart = 0;
+		}
+		if ($rsp[1]!='') {
+			$rend = intval($rsp[1]);
+		} else {
+			$rend = count($m)-1;
+		}
+	}
+	$csp = explode(':',$cs);
+	if (count($csp)<2) {
+		$cstart = 0;  $cend = count($m[0])-1;
+	} else {
+		if ($csp[0]!='') {
+			$cstart = intval($csp[0]);
+		} else {
+			$cstart = 0;
+		}
+		if ($csp[1]!='') {
+			$cend = intval($csp[1]);
+		} else {
+			$cend = count($m[0])-1;
+		}
+	}
+	$o = array();
+	for ($i=$rstart; $i<=$rend; $i++) {
+		$o[$i-$rstart] = array();
+		for ($j=$cstart; $j<=$cend; $j++) {
+			$o[$i-$rstart][$j-$cstart] = $m[$i][$j];
+		}
+	}
+	return $o;
 }
 
 //matrixsum(matrix,matrix)
@@ -353,5 +435,7 @@ function polyregression($x,$y,$n) {
 	$m = matrixtranspose($m);
 	return $m[0];
 }
+
+
 
 ?>

@@ -1,4 +1,4 @@
-<?
+<?php
 //IMathAS:  Shift Course dates; made obsolete by mass change dates 
 //(c) 2006 David Lippman
 

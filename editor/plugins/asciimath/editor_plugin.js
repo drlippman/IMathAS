@@ -31,6 +31,7 @@
 					if (existing.indexOf('class=AM')==-1) { //existing does not contain an AM node, so turn it into one
 					       //strip out all existing html tags.
 					       existing = existing.replace(/<([^>]*)>/g,"");
+					       existing = existing.replace(/&(.*?);/g,"$1");
 					       if (val) {
 						       existing = val;
 					       }
@@ -177,6 +178,9 @@
 				} else {
 					p = ed.dom.getParent(e,t.testAMclass);
 				}
+				cm.setDisabled('charmap', p!=null);
+				cm.setDisabled('sub', p!=null);
+				cm.setDisabled('sup', p!=null);
 				if (p != null) {
 					if (t.lastAMnode == p) {
 						doprocessnode = false;
