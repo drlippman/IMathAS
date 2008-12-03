@@ -221,13 +221,19 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		   $newmsgs = '';
 	   }
 	}
-	
+	/*
 	$query = "SELECT count(*) FROM ";
 	$query .= "(SELECT imas_forum_posts.threadid,max(imas_forum_posts.postdate),mfv.lastview FROM imas_forum_posts ";
 	$query .= "JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id LEFT JOIN imas_forum_views AS mfv ";
 	$query .= "ON mfv.threadid=imas_forum_posts.threadid AND mfv.userid='$userid' WHERE imas_forums.courseid='$cid' ";
 	$query .= "GROUP BY imas_forum_posts.threadid HAVING ((max(imas_forum_posts.postdate)>mfv.lastview) OR (mfv.lastview IS NULL))) AS newitems ";
-		
+	*/	
+	$query = "SELECT count(*) FROM ";
+	$query .= "(SELECT imas_forum_threads.id FROM imas_forum_threads ";
+	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id LEFT JOIN imas_forum_views AS mfv ";
+	$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' WHERE imas_forums.courseid='$cid' ";
+	$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL))) AS newitems ";
+	
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$row = mysql_fetch_row($result);
 	if ($row[0]>0) {

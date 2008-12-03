@@ -42,7 +42,7 @@ var displaystyle = true;      // puts limits above and below large operators
 var showasciiformulaonhover = true; // helps students learn ASCIIMath
 var decimalsign = ".";        // change to "," if you like, beware of `(1,2)`!
 var AMdelimiter1 = "`", AMescape1 = "\\\\`"; // can use other characters
-var AMusedelimiter2 = true; 		//whether to use second delimiter below
+var AMusedelimiter2 = false; 		//whether to use second delimiter below
 var AMdelimiter2 = "$", AMescape2 = "\\\\\\$", AMdelimiter2regexp = "\\$";
 var doubleblankmathdelimiter = false; // if true,  x+1  is equal to `x+1`
                                       // for IE this works only in <!--   -->

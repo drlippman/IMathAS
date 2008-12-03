@@ -43,6 +43,9 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 		$query = "DELETE FROM imas_forum_posts WHERE forumid='$forumid'";
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
 		
+		$query = "DELETE FROM imas_forum_threads WHERE forumid='$forumid'";
+		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		
 		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$items = unserialize(mysql_result($result,0,0));

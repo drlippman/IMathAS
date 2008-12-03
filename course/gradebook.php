@@ -202,7 +202,7 @@ if (!$isteacher || $stu!=0) { //show student view
 	}
 	
 	gbstudisp($stu);
-	echo "<p>Meanings:  IP-In Progress, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sub>d</sub> Dropped score</p>\n";
+	echo "<p>Meanings:  IP-In Progress, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sub>d</sub> Dropped score.  </p>\n";
 	
 	require("../footer.php");
 	
@@ -335,7 +335,7 @@ if (!$isteacher || $stu!=0) { //show student view
 	echo "</form>";
 	echo "</div>";
 	require("../footer.php");
-	echo "Meanings:  IP-In Progress, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sup>*</sup> Has feedback, <sub>d</sub> Dropped score\n";
+	echo "Meanings:  IP-In Progress, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sup>*</sup> Has feedback, <sub>d</sub> Dropped score, <sup>e</sup> Has exception/latepass\n";
 	/*if ($isteacher) {
 		echo "<div class=cp>";
 		echo "<a href=\"addgrades.php?cid=$cid&gbitem=new&grades=all\">Add Offline Grade</a><br/>";
@@ -477,6 +477,9 @@ function gbstudisp($stu) {
 			}
 			if ($haslink) { //show link
 				echo '</a>';
+			}
+			if ($isteacher && isset($gbt[1][1][$i][6]) ) {
+				echo '<sup>e</sup></span>';
 			}
 			if (isset($gbt[1][1][$i][5]) && ($gbt[1][1][$i][5]&(1<<$availshow)) && !$hidepast) {
 				echo '<sub>d</sub>';
@@ -808,6 +811,9 @@ function gbinstrdisp() {
 						echo '</a>';
 						if ($gbt[$i][1][$j][1]==1) {
 							echo '<sup>*</sup>';
+						}
+						if (isset($gbt[$i][1][$j][6]) ) {
+							echo '<sup>e</sup></span>';
 						}
 					} else { //no score
 						if ($gbt[$i][0][0]=='Averages') {

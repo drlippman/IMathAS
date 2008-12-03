@@ -761,8 +761,8 @@ function enditem() {
 			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			   $numthread = mysql_result($result,0,0);
 			   $query = "SELECT imas_forum_views.lastview,MAX(imas_forum_posts.postdate) FROM imas_forum_views ";
-			   $query .= "LEFT JOIN imas_forum_posts ON imas_forum_views.threadid=imas_forum_posts.threadid ";
-			   $query .= "WHERE imas_forum_posts.forumid='$typeid' AND imas_forum_views.userid='$userid'";
+			   $query .= "LEFT JOIN imas_forum_posts ON imas_forum_views.threadid=imas_forum_posts.threadid AND imas_forum_views.userid='$userid' ";
+			   $query .= "WHERE imas_forum_posts.forumid='$typeid' ";
 			   if ($dofilter) {
 				   $query .= " AND imas_forum_posts.userid IN ($limids) ";
 			   }

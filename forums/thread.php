@@ -38,13 +38,14 @@
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
 		exit;	
 	}
-	$query = "SELECT name,postby,settings,grpaid FROM imas_forums WHERE id='$forumid'";
+	$query = "SELECT name,postby,settings,grpaid,sortby FROM imas_forums WHERE id='$forumid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$forumname = mysql_result($result,0,0);
 	$postby = mysql_result($result,0,1);
 	$allowmod = ((mysql_result($result,0,2)&2)==2);
 	$allowdel = ((mysql_result($result,0,2)&4)==4);
 	$grpaid = mysql_result($result,0,3);
+	$sortby = mysql_result($result,0,4);
 	$dofilter = false;
 	if ($grpaid>0) {
 		if (isset($_GET['ffilter'])) {
@@ -188,6 +189,10 @@
 				$threadid = mysql_insert_id();
 				$query = "UPDATE imas_forum_posts SET threadid='$threadid' WHERE id='$threadid'";
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
+				
+				$query = "INSERT INTO imas_forum_threads (id,forumid,lastposttime,lastpostuser) VALUES ('$threadid','$forumid',$now,'$userid')";
+				mysql_query($query) or die("Query failed : $query " . mysql_error());
+				
 				$query = "INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES ('$userid','$threadid',$now)";
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
 				
@@ -314,6 +319,9 @@
 	} else if (isset($_GET['remove']) && $isteacher) { //removing thread
 		if (isset($_GET['confirm'])) {
 			$query = "DELETE FROM imas_forum_posts WHERE id='{$_GET['remove']}'";
+			mysql_query($query) or die("Query failed : $query " . mysql_error());
+			
+			$query = "DELETE FROM imas_forum_threads WHERE id='{$_GET['remove']}'";
 			mysql_query($query) or die("Query failed : $query " . mysql_error());
 
 			$query = "DELETE FROM imas_forum_posts WHERE threadid='{$_GET['remove']}'";
@@ -525,8 +533,8 @@
 		$uniqviews[$row[0]] = $row[1]-1;
 	}
 	
-	$query = "SELECT imas_forum_posts.*,imas_users.LastName,imas_users.FirstName FROM imas_forum_posts,imas_users WHERE ";
-	$query .= "imas_forum_posts.userid=imas_users.id AND imas_forum_posts.parent=0 AND imas_forum_posts.forumid='$forumid' ";
+	$query = "SELECT imas_forum_posts.*,imas_forum_threads.views as tviews,imas_users.LastName,imas_users.FirstName FROM imas_forum_posts,imas_users,imas_forum_threads WHERE ";
+	$query .= "imas_forum_posts.userid=imas_users.id AND imas_forum_posts.threadid=imas_forum_threads.id AND imas_forum_posts.parent=0 AND imas_forum_posts.forumid='$forumid' ";
 	if ($dofilter) {
 		$query .= "AND imas_forum_posts.userid IN ($limids) ";
 	}
@@ -535,7 +543,11 @@
 	} else if ($page==-2) {
 		$query .= "AND imas_forum_posts.threadid IN ($taggedlist) ";
 	}
-	$query .= "ORDER BY imas_forum_posts.posttype DESC,imas_forum_posts.id DESC ";
+	if ($sortby==0) {
+		$query .= "ORDER BY imas_forum_posts.posttype DESC,imas_forum_posts.id DESC ";
+	} else if ($sortby==1) {
+		$query .= "ORDER BY imas_forum_threads.lastposttime DESC,imas_forum_posts.id DESC ";
+	}
 	$offset = ($page-1)*$threadsperpage;
 	if ($page>0) {
 		$query .= "LIMIT $offset,$threadsperpage";// OFFSET $offset";
@@ -582,7 +594,7 @@
 			echo '<td class=c>'.$groupnums[$line['userid']].'</td>';
 		}
 		
-		echo "<td class=c>$posts</td><td class=c>{$line['views']} ({$uniqviews[$line['id']]})</td><td class=c>$lastpost ";
+		echo "<td class=c>$posts</td><td class=c>{$line['tviews']} ({$uniqviews[$line['id']]})</td><td class=c>$lastpost ";
 		if ($lastpost=='' || $maxdate[$line['id']]>$lastview[$line['id']]) {
 			echo "<span style=\"color: red;\">New</span>";
 		}

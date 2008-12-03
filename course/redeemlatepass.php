@@ -22,11 +22,11 @@
 				$query = "SELECT enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				if (mysql_num_rows($result)>0) { //already have exception
-					$query = "UPDATE imas_exceptions SET enddate=enddate+$addtime WHERE userid='$userid' AND assessmentid='$aid'";
+					$query = "UPDATE imas_exceptions SET enddate=enddate+$addtime,islatepass=islatepass+1 WHERE userid='$userid' AND assessmentid='$aid'";
 					mysql_query($query) or die("Query failed : " . mysql_error());
 				} else {
 					$enddate = $enddate + $addtime;
-					$query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate) VALUES ('$userid','$aid','$startdate','$enddate')";
+					$query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,islatepass) VALUES ('$userid','$aid','$startdate','$enddate',1)";
 					mysql_query($query) or die("Query failed : " . mysql_error());
 				}
 			}

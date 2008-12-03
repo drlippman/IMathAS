@@ -555,6 +555,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$query = "SELECT imas_questions.id,imas_questionset.id,imas_questionset.description,imas_questionset.qtype,imas_questionset.ownerid,imas_questionset.userights FROM imas_questionset,imas_questions";
 				$query .= " WHERE imas_questionset.id=imas_questions.questionsetid AND imas_questions.assessmentid='$aidq'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				if (mysql_num_rows($result)==0) { //maybe defunct aid; if no questions in it, skip it
+					continue;
+				}
 				while ($row = mysql_fetch_row($result)) {
 					$qsetid[$row[0]] = $row[1];
 					$descr[$row[0]] = $row[2];

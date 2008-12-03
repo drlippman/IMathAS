@@ -220,6 +220,9 @@ switch($_GET['action']) {
 			}
 			$query = "DELETE FROM imas_forum_posts WHERE forumid='{$row[0]}'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
+			
+			$query = "DELETE FROM imas_forum_threads WHERE forumid='{$row[0]}'";
+			mysql_query($query) or die("Query failed : " . mysql_error());
 		}
 		$query = "DELETE FROM imas_forums WHERE courseid='{$_GET['id']}'";
 		mysql_query($query) or die("Query failed : " . mysql_error());

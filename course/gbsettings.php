@@ -40,7 +40,7 @@
 			}
 			$st = $_POST['st'][$id];
 			if (isset($_POST['chop'][$id])) {
-				$chop = 1;
+				$chop = round($_POST['chopto'][$id]/100,2);
 			} else {
 				$chop = 0;
 			}
@@ -202,10 +202,16 @@
 		}
 		echo "/>percent)<br/>to perfect score<br/>";
 		echo "<input type=checkbox name=\"chop[$id]\" value=1 ";
-		if ($row[3]==1) {
+		if ($row[3]>0) {
 			echo "checked=1 ";
 		}
-		echo "/> no scores over 100%</td>";
+		echo "/> no total over <input type=text size=3 name=\"chopto[$id]\" value=\"";
+		if ($row[3]>0) {
+			echo round($row[3]*100);
+		} else {
+			echo "100";
+		}
+		echo "\"/>%</td>";
 		echo "<td><input type=radio name=\"droptype[$id]\" value=0 ";
 		if ($row[4]==0) {
 			echo "checked=1 ";

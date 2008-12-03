@@ -101,6 +101,9 @@
 	$query = "UPDATE imas_forum_posts SET views='$newviews' WHERE id='$threadid'";
 	mysql_query($query) or die("Query failed : $query " . mysql_error());
 	
+	$query = "UPDATE imas_forum_threads SET views=views+1 WHERE id='$threadid'";
+	mysql_query($query) or die("Query failed : $query " . mysql_error());
+	
 	//mark as read
 	$query = "SELECT lastview FROM imas_forum_views WHERE userid='$userid' AND threadid='$threadid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());

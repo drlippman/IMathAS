@@ -30,6 +30,9 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			$query .= "('$forumid','$threadid','{$_POST['subject']}','{$_POST['message']}','$userid',$now,'{$_GET['replyto']}',0,'$isanon')";
 			mysql_query($query) or die("Query failed : $query " . mysql_error());
 			
+			$query = "UPDATE imas_forum_threads SET lastposttime=$now,lastpostuser='$userid' WHERE id='$threadid'";
+			mysql_query($query) or die("Query failed : $query " . mysql_error());
+			
 			$query = "SELECT iu.email FROM imas_users AS iu,imas_forum_subscriptions AS ifs WHERE ";
 			$query .= "iu.id=ifs.userid AND ifs.forumid='$forumid' AND iu.id<>'$userid'";
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -136,19 +139,26 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		$query = "SELECT parent FROM imas_forum_posts WHERE id='{$_GET['remove']}'";
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$parent = mysql_result($result,0,0);
-		
-		$query = "DELETE FROM imas_forum_posts WHERE id='{$_GET['remove']}'";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
-		
-		$query = "UPDATE imas_forum_posts SET parent='$parent' WHERE parent='{$_GET['remove']}'";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
-		
-		$lastpost = false;
-		if ($parent==0 && mysql_affected_rows()==0) { //no parent and no children - only post
+		if ($parent==0) {
+			$query = "DELETE FROM imas_forum_posts WHERE threadid='{$_GET['remove']}'";
+			mysql_query($query) or die("Query failed : $query " . mysql_error());
+			
+			$query = "DELETE FROM imas_forum_threads WHERE id='{$_GET['remove']}'";
+			mysql_query($query) or die("Query failed : $query " . mysql_error());
+			
 			$query = "DELETE FROM imas_forum_views WHERE threadid='{$_GET['remove']}'";
 			mysql_query($query) or die("Query failed : $query " . mysql_error());
 			$lastpost = true;
+		} else {
+			$query = "DELETE FROM imas_forum_posts WHERE id='{$_GET['remove']}'";
+			mysql_query($query) or die("Query failed : $query " . mysql_error());
+			
+			$query = "UPDATE imas_forum_posts SET parent='$parent' WHERE parent='{$_GET['remove']}'";
+			mysql_query($query) or die("Query failed : $query " . mysql_error());
+			$lastpost = false;	
 		}
+		
+		
 		if ($caller == "posts" && $lastpost) {
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
 		} else {
@@ -157,13 +167,21 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		exit;
 	} else {
 		$pagetitle = "Remove Post";
+		$query = "SELECT parent FROM imas_forum_posts WHERE id='{$_GET['remove']}'";
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$parent = mysql_result($result,0,0);
 		require("../header.php");
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
 		echo "&gt; <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> &gt; ";
 		echo "<a href=\"$returnurl\">$returnname</a> &gt; Remove Post</div>";
 		
 		echo "<h3>Remove Post</h3>\n";
-		echo "<p>Are you SURE you want to remove this post?</p>\n";
+		if ($parent==0) {
+			echo "<p>Are you SURE you want to remove this thread and all replies?</p>\n";
+		} else {
+			echo "<p>Are you SURE you want to remove this post?</p>\n";
+		}
+		
 		echo "<p><input type=button value=\"Yes, Remove\" onClick=\"window.location='$returnurl&remove={$_GET['remove']}&confirm=true'\">\n";
 		echo "<input type=button value=\"Nevermind\" onClick=\"window.location='$returnurl'\"></p>\n";
 		require("../footer.php");

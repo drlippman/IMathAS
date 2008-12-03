@@ -64,6 +64,9 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$unwithd
 		foreach ($forums as $fid) {
 			$query = "DELETE FROM imas_forum_posts WHERE forumid='$fid' AND posttype=0";
 			mysql_query($query) or die("Query failed : " . mysql_error());
+			
+			$query = "DELETE imas_forum_threads FROM imas_forum_posts JOIN imas_forum_threads ON imas_forum_posts.threadid=imas_forum_threads.id AND imas_forum_posts.posttype=0 WHERE imas_forum_threads.forumid='$fid'";
+			mysql_query($query) or die("Query failed : " . mysql_error());
 		}
 	}
 	if ($deloffline) {

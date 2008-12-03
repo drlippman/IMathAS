@@ -388,7 +388,8 @@ $sql = 'CREATE TABLE `imas_exceptions` ('
         . ' `userid` INT(10) UNSIGNED NOT NULL, '
         . ' `assessmentid` INT(10) UNSIGNED NOT NULL, '
         . ' `startdate` INT(10) UNSIGNED NOT NULL, '
-        . ' `enddate` INT(10) UNSIGNED NOT NULL,'
+        . ' `enddate` INT(10) UNSIGNED NOT NULL, '
+	. ' `islatepass` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
         . ' INDEX (`userid`), INDEX(`assessmentid`)'
         . ' )'
         . ' TYPE = innodb'
@@ -449,6 +450,18 @@ $sql = 'CREATE TABLE `imas_forums` ('
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());	
 echo 'imas_forums created<br/>';
 
+$sql = 'CREATE TABLE `imas_forum_threads` (';
+	. '`id` INT(10) UNSIGNED NOT NULL, ',
+	. '`forumid` INT(10) UNSIGNED NOT NULL, ';
+	. '`lastposttime` INT(10) UNSIGNED NOT NULL, ';
+	. '`lastpostuser` INT(10) UNSIGNED NOT NULL, ';
+	. '`views` INT(10) UNSIGNED NOT NULL, ';
+	. ' PRIMARY KEY (`id`), INDEX (`forumid`), INDEX(`lastposttime`) ) ';
+	. ' TYPE = InnoDB ';
+	. ' COMMENT = \'Forum threads\'';	
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());	
+echo 'imas_forum_threads created<br/>';	
+			
 $sql = 'CREATE TABLE `imas_forum_posts` ('
         . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
         . ' `forumid` INT(10) UNSIGNED NOT NULL, '
@@ -594,7 +607,7 @@ $sql = 'CREATE TABLE `imas_gbcats` ('
         . ' `courseid` INT(10) UNSIGNED NOT NULL, '
         . ' `scale` SMALLINT(4) UNSIGNED NOT NULL DEFAULT \'0\', '
         . ' `scaletype` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
-        . ' `chop` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'1\', '
+        . ' `chop` DECIMAL(3, 2) UNSIGNED NOT NULL DEFAULT \'1\', '
         . ' `dropn` TINYINT(2) NOT NULL DEFAULT \'0\', '
         . ' `weight` SMALLINT(4) NOT NULL DEFAULT \'-1\','
         . ' INDEX (`courseid`)'

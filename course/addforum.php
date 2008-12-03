@@ -87,13 +87,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				
 		if (isset($_GET['id'])) {  //already have id; update
 		$query = "UPDATE imas_forums SET name='{$_POST['name']}',description='{$_POST['description']}',startdate=$startdate,enddate=$enddate,settings=$fsets,";
-		$query .= "defdisplay='{$_POST['defdisplay']}',replyby=$replyby,postby=$postby,grpaid='{$_POST['grpaid']}',points='{$_POST['points']}',gbcategory='{$_POST['gbcat']}',avail='{$_POST['avail']}' ";
+		$query .= "defdisplay='{$_POST['defdisplay']}',replyby=$replyby,postby=$postby,grpaid='{$_POST['grpaid']}',points='{$_POST['points']}',gbcategory='{$_POST['gbcat']}',avail='{$_POST['avail']}',sortby='{$_POST['sortby']}' ";
 		$query .= "WHERE id='{$_GET['id']}';";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$newforumid = $_GET['id'];
 		} else { //add new
-		$query = "INSERT INTO imas_forums (courseid,name,description,startdate,enddate,settings,defdisplay,replyby,postby,grpaid,points,gbcategory,avail) VALUES ";
-		$query .= "('$cid','{$_POST['name']}','{$_POST['description']}',$startdate,$enddate,$fsets,'{$_POST['defdisplay']}',$replyby,$postby,'{$_POST['grpaid']}','{$_POST['points']}','{$_POST['gbcat']}','{$_POST['avail']}');";
+		$query = "INSERT INTO imas_forums (courseid,name,description,startdate,enddate,settings,defdisplay,replyby,postby,grpaid,points,gbcategory,avail,sortby) VALUES ";
+		$query .= "('$cid','{$_POST['name']}','{$_POST['description']}',$startdate,$enddate,$fsets,'{$_POST['defdisplay']}',$replyby,$postby,'{$_POST['grpaid']}','{$_POST['points']}','{$_POST['gbcat']}','{$_POST['avail']}','{$_POST['sortby']}');";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		
 		$newforumid = mysql_insert_id();
@@ -154,6 +154,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$allowanon = (($line['settings']&1)==1);
 			$allowmod = (($line['settings']&2)==2);
 			//$allowdel = (($line['settings']&4)==4);
+			$sortby = $line['sortby'];
 			$defdisplay = $line['defdisplay'];
 			$replyby = $line['replyby'];
 			$postby = $line['postby'];
@@ -176,6 +177,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$grpaid = 0;
 			$points = 0;
 			$gbcat = 0;
+			$sortby = 0;
 		}   
 		
 		$page_formActionTag = "?block=$block&cid=$cid&folder=" . $_GET['folder'];
@@ -318,6 +320,12 @@ if ($overwriteBody==1) {
 				<option value="1" <?php if ($defdisplay==1) {echo "selected=1";}?>>Collapsed</option>
 				<option value="2" <?php if ($defdisplay==2) {echo "selected=1";}?>>Condensed</option>
 			</select>
+		</span><br class="form" />
+		
+		<span class="form">Sort threads by: </span>
+		<span class="formright">
+			<input type="radio" name="sortby" value="0" <?php writeHtmlChecked($sortby,0);?>/> Thread start date<br/>
+			<input type="radio" name="sortby" value="1" <?php writeHtmlChecked($sortby,1);?>/> Most recent reply date
 		</span><br class="form" />
 		 
 		<span class=form>Students can reply to posts:</span>
