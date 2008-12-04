@@ -22,7 +22,7 @@
 	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 		$forumname[$line['threadid']] = $line['name'];
 		$forumids[$line['threadid']] = $line['id'];
-		$lastpost[$line['threadid']] = tzdate("F j, Y, g:i a",$line['lastpost']);
+		$lastpost[$line['threadid']] = tzdate("F j, Y, g:i a",$line['lastposttime']);
 	}
 	$lastforum = '';
 	
