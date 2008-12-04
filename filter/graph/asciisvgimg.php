@@ -845,16 +845,16 @@ function ASplot($function) {
 		$isparametric = true;
 		$xfunc = str_replace("[","",$funcp[0]);
 		$xfunc = mathphp($xfunc,"t");
-		$xfunc = str_replace("t",'$t',$xfunc);
+		$xfunc = str_replace("(t)",'($t)',$xfunc);
 		$exfunc = create_function('$t','return ('.$xfunc.');');
 		$yfunc = str_replace("]","",$funcp[1]);
 		$yfunc = mathphp($yfunc,"t");
-		$yfunc = str_replace("t",'$t',$yfunc);
+		$yfunc = str_replace("(t)",'($t)',$yfunc);
 		$eyfunc = create_function('$t','return ('.$yfunc.');');
 	} else {
 		$isparametric = false;
 		$func = mathphp($function[0],"x");
-		$func = str_replace("x",'$x',$func);
+		$func = str_replace("(x)",'($x)',$func);
 		$efunc = create_function('$x','return ('.$func.');');
 	}
 	$avoid = array();
