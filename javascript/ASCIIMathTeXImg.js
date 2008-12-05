@@ -699,17 +699,23 @@ function AMTparseExpr(str,rightbracket) {
 
 function AMTparseAMtoTeX(str) {
  AMnestingDepth = 0;
-  str = str.replace(/&nbsp;/g,"");
+  str = str.replace(/(&nbsp;|\u00a0|&#160;)/g,"");
   str = str.replace(/&gt;/g,">");
   str = str.replace(/&lt;/g,"<");
+  if (str.match(/\S/)==null) {
+	  return "";
+  }
   return AMTparseExpr(str.replace(/^\s+/g,""),false)[0];
 }
 
 function AMparseMath(str) {
  //DLMOD to remove &nbsp;, which editor adds on multiple spaces
-  str = str.replace(/&nbsp;/g,"");
+  str = str.replace(/(&nbsp;|\u00a0|&#160;)/g,"");
   str = str.replace(/&gt;/g,">");
   str = str.replace(/&lt;/g,"<");
+  if (str.match(/\S/)==null) {
+	  return document.createTextNode(" ");
+  }
   var texstring = AMTparseAMtoTeX(str);
   if (mathcolor!="") {
 	  texstring = "\\"+mathcolor + texstring;

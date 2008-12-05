@@ -196,7 +196,7 @@
 					}
 				}
 				if (doprocessnode && (t.lastAMnode != null)) { //if not in AM node, process last
-				     if (t.lastAMnode.innerHTML.match(/`(&nbsp;|\s)*`/)) {
+				     if (t.lastAMnode.innerHTML.match(/`(&nbsp;|\s|\u00a0|&#160;)*`/)) {
 					     p = t.lastAMnode.parentNode;
 					     p.removeChild(t.lastAMnode);
 				     } else {

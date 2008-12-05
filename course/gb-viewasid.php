@@ -60,6 +60,11 @@
 	//PROCESS ANY TODOS
 	if (isset($_GET['clearattempt']) && isset($_GET['asid']) && $isteacher) {
 		if ($_GET['clearattempt']=="confirmed") {
+			if ($from=='isolate' || $from=='stugrp') {
+				$query = "SELECT assessmentid FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
+				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				$aid = mysql_result($result,0,0);
+			}
 			$qp = getasidquery($_GET['asid']);
 			deleteasidfilesbyquery(array($qp[0]=>$qp[1]),1);
 			
@@ -69,14 +74,8 @@
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			
 			if ($from=='isolate') {
-				$query = "SELECT assessmentid FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
-				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-				$aid = mysql_result($result,0,0);
 				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/isolateassessgrade.php?stu=$stu&cid={$_GET['cid']}&aid=$aid&gbmode=$gbmode");
 			} else if ($from=='stugrp') {
-				$query = "SELECT assessmentid FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
-				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-				$aid = mysql_result($result,0,0);
 				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid={$_GET['cid']}&aid=$aid");
 			} else {
 				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid={$_GET['cid']}&gbmode=$gbmode");
