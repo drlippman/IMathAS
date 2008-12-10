@@ -171,7 +171,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if ($returnqtxt) {
 		$returntxt = $evaledqtext;
 	} else if ($seqinactive) {
-		echo "<div>";
+		echo "<div class=inactive>";
 		echo filter($evaledqtext);
 	} else {
 		echo "<div class=question><div>\n";

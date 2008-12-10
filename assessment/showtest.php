@@ -458,7 +458,7 @@
 	$useeditor = 1;
 	require("header.php");
 	if ($testsettings['noprint'] == 1) {
-		echo '<style type="text/css" media="print"> body { display: none;} </style>';
+		echo '<style type="text/css" media="print"> div.question, div.todoquestion, div.inactive { display: none;} </style>';
 	}
 	
 	if (!$isdiag && !$isltilimited) {
