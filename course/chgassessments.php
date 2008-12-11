@@ -160,8 +160,11 @@ if (!(isset($teacherid))) {
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		}
 
-		
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
+		if (isset($_POST['chgendmsg'])) {
+			include("assessendmsg.php");
+		} else {
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
+		}
 		exit;
 		 
 	} else { //DATA MANIPULATION FOR INITIAL LOAD
@@ -470,6 +473,11 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 				<input name="showqcat" value="1" type="radio">In Points Possible bar <br/>
 				<input name="showqcat" value="2" type="radio">In navigation bar (Skip-Around only)
 				</td>
+			</tr>
+			<tr>	
+				<td><input type="checkbox" name="chgendmsg" /></td>
+				<td class="r">Define end of assessment messages</td>
+				<td>You will be taken to a page to change these after you hit submit</td>
 			</tr>
 		</tbody>
 		</table>

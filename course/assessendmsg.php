@@ -2,12 +2,13 @@
 //IMathAS:  Add end messages 
 //(c) 2008 David Lippman
 
+if (!isset($imasroot)) {
 	require("../validate.php");
 	if (!(isset($teacherid))) { // loaded by a NON-teacher
 		echo "You must be a teacher to access this page";
 		exit;
 	}
-	$aid = $_GET['aid'];
+}
 	$cid = $_GET['cid'];
 	
 	if (isset($_GET['record'])) {
@@ -17,13 +18,21 @@
 		$i=1;
 		$msgarr = array();
 		while (isset($_POST['sc'][$i]) && !empty($_POST['sc'][$i]) ) {
-			$msgarr[(float)$_POST['sc'][$i]] = stripslashes($_POST['msg'][$i]);
+			$key = (int)$_POST['sc'][$i];
+			if ($key>0) {
+				$msgarr[$key] = stripslashes($_POST['msg'][$i]);
+			}
 			$i++;
 		}
 		krsort($msgarr);
 		$endmsg['msgs'] = $msgarr;
 		$msgstr = addslashes(serialize($endmsg));
-		$query = "UPDATE imas_assessments SET endmsg='$msgstr' WHERE id='$aid'";
+		if (isset($_POST['aid'])) {
+			$query = "UPDATE imas_assessments SET endmsg='$msgstr' WHERE id='{$_POST['aid']}'";
+		} else if (isset($_POST['aidlist'])) {
+			$aidlist = "'".implode("','",explode(',',$_POST['aidlist']))."'";
+			$query = "UPDATE imas_assessments SET endmsg='$msgstr' WHERE id IN ($aidlist)";
+		}
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
@@ -35,11 +44,23 @@
 	
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
-	echo "&gt; <a href=\"addquestions.php?cid=$cid&amp;aid=$aid\">Add/Remove Questions</a> &gt; End of Assessment Msg</div>\n";
-	
-	$query = "SELECT endmsg FROM imas_assessments WHERE id='$aid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$endmsg = mysql_result($result,0,0);
+	if (!isset($_POST['checked'])) {
+		echo "&gt; <a href=\"addquestions.php?cid=$cid&amp;aid={$_GET['aid']}\">Add/Remove Questions</a> &gt; End of Assessment Msg</div>\n";
+	} else {
+		echo "&gt; <a href=\"chgassessments.php?cid=$cid\">Mass Change Assessments</a> &gt; End of Assessment Msg</div>\n";
+	}
+	if (!isset($_POST['checked'])) {
+		$query = "SELECT endmsg FROM imas_assessments WHERE id='{$_GET['aid']}'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$endmsg = mysql_result($result,0,0);
+	} else {
+		$endmsg = '';
+		if (count($_POST['checked'])==0) {
+			echo "No assessments selected";
+			require("../footer.php");
+			exit;
+		}
+	}
 	if ($endmsg!='') {
 		$endmsg = unserialize($endmsg);
 	} else {
@@ -48,8 +69,12 @@
 		$endmsg['type'] = 0;
 		$endmsg['msgs'] = array();
 	}
-	echo "<form method=\"post\" action=\"assessendmsg.php?cid=$cid&amp;aid=$aid&amp;record=true\" />";
-	
+	echo "<form method=\"post\" action=\"assessendmsg.php?cid=$cid&amp;record=true\" />";
+	if (isset($_POST['checked'])) {
+		echo '<input type="hidden" name="aidlist" value="'.implode(',',$_POST['checked']).'" />';
+	} else {
+		echo '<input type="hidden" name="aid" value="'.$_GET['aid'].'" />';
+	}
 	echo '<p>Base messages on: ';
 	echo '<input type="radio" name="type" value="0" ';
 	if ($endmsg['type']==0) { echo 'checked="checked"';}
