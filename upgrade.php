@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 3;
+$latest = 4;
 
 if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 	$handle = fopen("upgradecounter.txt",'w');
@@ -13,7 +13,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 		exit;
 	}
 	
-	$handle = fopen("upgradecounter.txt",'r');
+	$handle = @fopen("upgradecounter.txt",'r');
 	if ($handle===false) {
 		$last = 0;
 	} else {
@@ -47,6 +47,10 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			
 			$query = "ALTER TABLE `imas_exceptions` ADD `islatepass` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0';";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+		}
+		if ($last < 4) {
+			$query = "ALTER TABLE `imas_assessments` ADD `endmsg` TEXT NOT NULL ;";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		}
 		$handle = fopen("upgradecounter.txt",'w');

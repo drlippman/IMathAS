@@ -71,7 +71,7 @@
 				$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 				$headers .= "From: $sendfrom\r\n";
 				$message  = "<h4>This is an automated message.  Do not respond to this email</h4>\r\n";
-				$message .= "<p>You're received a new message</p><p>From: $from<br />Course: $cname.</p>\r\n";
+				$message .= "<p>You've received a new message</p><p>From: $from<br />Course: $cname.</p>\r\n";
 				$message .= "<p>Subject:".stripslashes($_POST['subject'])."</p>";
 				$message .= "<a href=\"http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewmsg.php?cid=0&msgid=$msgid\">";
 				$message .= "View Message</a></p>\r\n";

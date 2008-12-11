@@ -308,6 +308,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	
 	$jsarr = '[';
 	$items = explode(",",$itemorder);
+	$existingq = array();
 	$apointstot = 0;
 	for ($i = 0; $i < count($items); $i++) {
 		if (strpos($items[$i],'~')!==false) {
@@ -332,6 +333,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query .= "WHERE imas_questions.id='{$subs[$j]}' AND imas_questionset.id=imas_questions.questionsetid";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$line = mysql_fetch_array($result, MYSQL_ASSOC);
+			$existingq[] = $line['questionsetid'];
 			if ($j>0) {
 				$jsarr .= ',';
 			} 
@@ -411,6 +413,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$sessiondata['lastsearchlibs'.$cid] = $searchlibs;
 			$searchall = 0;
 			$sessiondata['searchall'.$cid] = $searchall;
+			$sessiondata['lastsearch'.$cid] = '';
+			$searchlikes = '';
+			$search = '';
+			$safesearch = '';
 			writesessiondata();
 		}else if (isset($sessiondata['lastsearchlibs'.$cid])) {
 			//$searchlibs = explode(",",$sessiondata['lastsearchlibs']);
@@ -438,7 +444,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$page_libRowHeader = ($searchall==1) ? "<th>Library</th>" : "";
 			
 			if (isset($search)) {
-	
+				
 				$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_library_items.libid,imas_questionset.ownerid ";
 				$query .= "FROM imas_questionset,imas_library_items WHERE $searchlikes "; //imas_questionset.description LIKE '%$safesearch%' ";
 				$query .= " (imas_questionset.ownerid='$userid' OR imas_questionset.userights>0) "; 
@@ -453,7 +459,19 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$query .= " AND (imas_library_items.libid > 0 OR imas_questionset.ownerid='$userid') "; 
 				}
 				$query .= " ORDER BY imas_library_items.libid,imas_questionset.id";
-	
+				if ($search=='recommend' && count($existing)>0) {
+					$existingqlist = implode(',',$existingq);  //pulled from database, so no quotes needed
+					$query = "SELECT a.questionsetid, count( DISTINCT a.assessmentid ) as qcnt,
+						imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.ownerid
+						FROM imas_questions AS a 
+						JOIN imas_questions AS b ON a.assessmentid = b.assessmentid 
+						JOIN imas_questions AS c ON b.questionsetid = c.questionsetid
+						AND c.assessmentid ='$aid'
+						JOIN imas_questionset  ON a.questionsetid=imas_questionset.id
+						AND (imas_questionset.ownerid='$userid' OR imas_questionset.userights>0)
+						WHERE a.questionsetid NOT IN ($existingqlist)
+						GROUP BY a.questionsetid ORDER BY qcnt DESC LIMIT 100";
+				}
 				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 				if (mysql_num_rows($result)==0) {
 					$noSearchResults = true;
@@ -715,6 +733,7 @@ if ($overwriteBody==1) {
 		<input type=button value="Done" onClick="window.location='course.php?cid=<?php echo $cid ?>'"> 
 		<input type=button value="Categorize Questions" onClick="window.location='categorize.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'"> 
 		<input type=button value="Create Print Version" onClick="window.location='printtest.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'"> 
+		<input type=button value="Define End Messages" onClick="window.location='assessendmsg.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'">
 		<input type=button value="Preview" onClick="window.open('<?php echo $imasroot;?>/assessment/showtest.php?cid=<?php echo $cid ?>&id=<?php echo $aid ?>','Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20))"> 
 	</p>
 		

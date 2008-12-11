@@ -1277,7 +1277,7 @@
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$userinfo = mysql_fetch_array($result, MYSQL_ASSOC);
 			echo "<h3>{$userinfo['LastName']}, {$userinfo['FirstName']}: ";
-			echo substr($userinfo['SID'],0,strpos($userinfo['SID'],'d'));
+			echo substr($userinfo['SID'],0,strpos($userinfo['SID'],'~'));
 			echo "</h3>\n";
 		}
 		
@@ -1340,6 +1340,23 @@
 			
 			$average = round(100*((float)$total)/((float)$totpossible),1);
 			echo "$average % </b></p>\n";	
+			
+			$endmsg = unserialize($testsettings['endmsg']);
+			$outmsg = '';
+			if (isset($endmsg['msgs'])) {
+				foreach ($endmsg['msgs'] as $sc=>$msg) { //array must be reverse sorted
+					if (($endmsg['type']==0 && $total>=$sc) || ($endmsg['type']==1 && $average>=$sc)) {
+						$outmsg = $msg;
+						break;
+					}
+				}
+			}
+			if ($outmsg=='') {
+				$outmsg = $endmsg['def'];
+			}
+			if ($outmsg!='') {
+				echo "<p style=\"color:red;font-weight: bold;\">$outmsg</p>";
+			}
 			
 			if ($total<$testsettings['minscore']) {
 				echo "<p><span style=\"color:red;\"><b>A score of {$testsettings['minscore']} is required to receive credit for this assessment<br/>Grade in Gradebook: No Credit (NC)</span></p> ";	

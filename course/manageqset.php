@@ -490,6 +490,10 @@ if ($myrights<20) {
 			$sessiondata['lastsearchlibs'.$cid] = $searchlibs;
 			$searchall = 0;
 			$sessiondata['searchall'.$cid] = $searchall;
+			$sessiondata['lastsearch'.$cid] = '';
+			$searchlikes = '';
+			$search = '';
+			$safesearch = '';
 			writesessiondata();
 		}else if (isset($sessiondata['lastsearchlibs'.$cid])) {
 			//$searchlibs = explode(",",$sessiondata['lastsearchlibs']);
