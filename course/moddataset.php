@@ -455,10 +455,11 @@
 			echo 'one assessment that is not yours.  ';
 		}
 		echo 'In consideration of the other users, if you want to make changes other than minor fixes to this question, consider creating a new version of this question instead.  </p>';
-		if (isset($_GET['qid'])) {
-			echo "<p><a href=\"moddataset.php?id={$_GET['id']}&cid=$cid&aid={$_GET['aid']}&template=true&makelocal={$_GET['qid']}\">Template this question</a> for use in this assessment.  ";
-			echo "This will let you modify the question for this assessment only without affecting the library version being used in other assessments.</p>";
-		}
+		
+	}
+	if (isset($_GET['qid'])) {
+		echo "<p><a href=\"moddataset.php?id={$_GET['id']}&cid=$cid&aid={$_GET['aid']}&template=true&makelocal={$_GET['qid']}\">Template this question</a> for use in this assessment.  ";
+		echo "This will let you modify the question for this assessment only without affecting the library version being used in other assessments.</p>";
 	}
 	if (!$myq) {
 		echo "<p>This question is not set to allow you to modify the code.  You can only view the code and make additional library assignments</p>";

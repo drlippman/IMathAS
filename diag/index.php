@@ -25,7 +25,7 @@ END;
 			echo "<li>No diagnostics are available through this page at this time</li>";
 		}
 		while ($row = mysql_fetch_row($result)) {
-			echo "<li><a href=\"/diag/index.php?id={$row[0]}\">{$row[1]}</a></li>";
+			echo "<li><a href=\"$imasroot/diag/index.php?id={$row[0]}\">{$row[1]}</a></li>";
 		}
 		echo "</ul></div>";
 		require("../footer.php");
