@@ -353,22 +353,33 @@ function showasciisvg($script) {
 function showarrays() {
 	$alist = func_get_args();
 	if (count($alist)<2) {return false;}
+	if (count($alist)%2==1) {
+		$format = substr($alist[count($alist)-1],0,1);
+	} 
 	$out = '<table class=stats><thead><tr>';
-	for ($i = 0; $i<count($alist)/2; $i++) {
+	for ($i = 0; $i<floor(count($alist)/2); $i++) {
 		$out .= "<th scope=\"col\">{$alist[2*$i]}</th>";
 	}
 	$out .= "</tr></thead><tbody>";
 	for ($j = 0; $j<count($alist[1]); $j++) {
 		$out .="<tr>";
-		for ($i = 0; $i<count($alist)/2; $i++) {
-			$out .= "<td>{$alist[2*$i+1][$j]}</td>";
+		for ($i = 0; $i<floor(count($alist)/2); $i++) {
+			if ($format=='c' || $format=='C') {
+				$out .= '<td class="c">';
+			} else if ($format=='r' || $format=='R') {
+				$out .= '<td class="r">';
+			} else if ($format=='l' || $format=='L') {
+				$out .= '<td class="l">';
+			} else {
+				$out .= '<td>';
+			}
+			$out .= "{$alist[2*$i+1][$j]}</td>";
 		}
 		$out .="</tr>";
 	}
 	$out .= "</tbody></table>\n";
 	return $out;
 }
-
 
 function horizshowarrays() {
 	$alist = func_get_args();

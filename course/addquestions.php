@@ -590,6 +590,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$page_assessmentQuestions['desc'][$x] = $aidnames[$aidq];
 				$y=0;
 				foreach($aiditems[$aidq] as $qid) {
+					if (strpos($qid,'|')!==false) { continue;}
 					$page_assessmentQuestions[$x]['checkbox'][$y] = "<input type=checkbox name='nchecked[]' id='qo$ln' value='" . $qsetid[$qid] . "'>";
 					$page_assessmentQuestions[$x]['desc'][$y] = $descr[$qid];
 					$page_assessmentQuestions[$x]['preview'][$y] = "<input type=button value=\"Preview\" onClick=\"previewq('selq','qo$ln',$qsetid[$qid],true)\"/>";

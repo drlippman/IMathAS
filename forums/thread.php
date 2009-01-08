@@ -586,8 +586,12 @@
 			echo "<a href=\"thread.php?page=$page&cid=$cid&forum=$forumid&remove={$line['id']}\">Remove</a>";
 		}
 		echo "</span>\n";
-		
-		echo "<b><a href=\"posts.php?cid=$cid&forum=$forumid&thread={$line['id']}&page=$page\">{$line['subject']}</a></b>: {$line['LastName']}, {$line['FirstName']}";
+		if ($line['isanon']==1) {
+			$name = "Anonymous";
+		} else {
+			$name = "{$line['LastName']}, {$line['FirstName']}";
+		}
+		echo "<b><a href=\"posts.php?cid=$cid&forum=$forumid&thread={$line['id']}&page=$page\">{$line['subject']}</a></b>: $name";
 		
 		echo "</td>\n";
 		if ($isteacher && $grpaid>0 && !$dofilter) {

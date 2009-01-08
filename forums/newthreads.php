@@ -66,7 +66,12 @@
 				echo "<h4>Forum: <a href=\"thread.php?cid=$cid&forum={$forumids[$line['threadid']]}\">".$forumname[$line['threadid']].'</a></h4><table class="forum"><thead><th>Topic</th><th>Last Post Date</th></thead><tbody>';
 				$lastforum = $forumname[$line['threadid']];
 			}
-			echo "<tr><td><a href=\"posts.php?cid=$cid&forum={$forumids[$line['threadid']]}&thread={$line['id']}&page=-2\">{$line['subject']}</a></b>: {$line['LastName']}, {$line['FirstName']}</td>";
+			if ($line['isanon']==1) {
+				$name = "Anonymous";
+			} else {
+				$name = "{$line['LastName']}, {$line['FirstName']}";
+			}
+			echo "<tr><td><a href=\"posts.php?cid=$cid&forum={$forumids[$line['threadid']]}&thread={$line['id']}&page=-2\">{$line['subject']}</a></b>: $name</td>";
 			echo "<td>{$lastpost[$line['threadid']]}</td></tr>";
 		}
 		echo '</ul>';

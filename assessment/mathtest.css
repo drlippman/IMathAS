@@ -230,4 +230,13 @@ td.matrixright {
 	margin: 0px;
 	padding: 0px;
 }
+td.c, table.stats tbody td.c {
+	text-align: center;
+}
+td.r, table.stats tbody td.r {
+	text-align: right;
+}
+td.l, table.stats tbody td.l {
+	text-align: left;
+}
 
