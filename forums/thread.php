@@ -546,7 +546,7 @@
 	if ($sortby==0) {
 		$query .= "ORDER BY imas_forum_posts.posttype DESC,imas_forum_posts.id DESC ";
 	} else if ($sortby==1) {
-		$query .= "ORDER BY imas_forum_threads.lastposttime DESC,imas_forum_posts.id DESC ";
+		$query .= "ORDER BY imas_forum_posts.posttype DESC,imas_forum_threads.lastposttime DESC ";
 	}
 	$offset = ($page-1)*$threadsperpage;
 	if ($page>0) {

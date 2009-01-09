@@ -356,6 +356,13 @@ function showarrays() {
 	if (count($alist)%2==1) {
 		$format = substr($alist[count($alist)-1],0,1);
 	} 
+	if (count($alist)<4 && is_array($alist[0])) {
+		for ($i=0;$i<count($alist[0]);$i++) {
+			$newalist[] = $alist[0][$i];
+			$newalist[] = $alist[1][$i];
+		}
+		$alist = $newalist;
+	}
 	$out = '<table class=stats><thead><tr>';
 	for ($i = 0; $i<floor(count($alist)/2); $i++) {
 		$out .= "<th scope=\"col\">{$alist[2*$i]}</th>";
@@ -380,6 +387,7 @@ function showarrays() {
 	$out .= "</tbody></table>\n";
 	return $out;
 }
+
 
 function horizshowarrays() {
 	$alist = func_get_args();
