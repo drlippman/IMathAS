@@ -31,6 +31,7 @@
 <h4>Video Guides</h4>
 <ul>
 <li><a href="http://www.imathas.com/imathas/docs/gettingstarted/gettingstarted.html">Getting Started in IMathAS</a> video guide.</li>
+<li><a href="http://www.imathas.com/training.html">Training Videos</a>.  A complete training course set of video guides.</li>
 <li><a href="http://www.imathas.com/imathas/docs/wamaplayouts.html">Examples of Course Layouts</a>.  Some ideas for how to lay out a course page</li>
 <li><a href="http://www.imathas.com/imathas/docs/wamaptemplate2.html">Using Course Templates</a>.  How to copy pre-created course templates to use
   course assignments created by your colleagues.</li>

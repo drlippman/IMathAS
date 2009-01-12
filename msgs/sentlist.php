@@ -91,28 +91,28 @@ isread:
 		if ($page==1) {
 			echo "<b>1</b> ";
 		} else {
-			echo "<a href=\"sentlist.php?page=1&cid=$cid\">1</a> ";
+			echo "<a href=\"sentlist.php?page=1&cid=$cid&filtercid=$filtercid\">1</a> ";
 		}
 		if ($min!=2) { echo " ... ";}
 		for ($i = $min; $i<=$max; $i++) {
 			if ($page == $i) {
 				echo "<b>$i</b> ";
 			} else {
-				echo "<a href=\"sentlist.php?page=$i&cid=$cid\">$i</a> ";
+				echo "<a href=\"sentlist.php?page=$i&cid=$cid&filtercid=$filtercid\">$i</a> ";
 			}
 		}
 		if ($max!=$numpages-1) { echo " ... ";}
 		if ($page == $numpages) {
 			echo "<b>$numpages</b> ";
 		} else {
-			echo "<a href=\"sentlist.php?page=$numpages&cid=$cid\">$numpages</a> ";
+			echo "<a href=\"sentlist.php?page=$numpages&cid=$cid&filtercid=$filtercid\">$numpages</a> ";
 		}
 		echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 		if ($page>1) {
-			echo "<a href=\"sentlist.php?page=".($page-1)."&cid=$cid\">Previous</a> ";
+			echo "<a href=\"sentlist.php?page=".($page-1)."&cid=$cid&filtercid=$filtercid\">Previous</a> ";
 		}
 		if ($page < $numpages) {
-			echo "<a href=\"sentlist.php?page=".($page+1)."&cid=$cid\">Next</a> ";
+			echo "<a href=\"sentlist.php?page=".($page+1)."&cid=$cid&filtercid=$filtercid\">Next</a> ";
 		}
 		echo "</div>\n";
 	}
@@ -143,7 +143,7 @@ function chgfilter() {
 		echo "selected=1 ";
 	}
 	echo ">All courses</option>";
-	$query = "SELECT DISTINCT imas_courses.id,imas_courses.name FROM imas_courses,imas_msgs WHERE imas_courses.id=imas_msgs.courseid AND imas_msgs.msgto='$userid'";
+	$query = "SELECT DISTINCT imas_courses.id,imas_courses.name FROM imas_courses,imas_msgs WHERE imas_courses.id=imas_msgs.courseid AND imas_msgs.msgfrom='$userid'";
 	$query .= " ORDER BY imas_courses.name";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	while ($row = mysql_fetch_row($result)) {

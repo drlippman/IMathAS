@@ -140,9 +140,20 @@ if (isset($_POST['SID'])) {
 	$query = "SELECT id FROM imas_users WHERE SID='{$_POST['SID']}~$diagqtr~$pcid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	if (mysql_num_rows($result)>0) {
+		$userid = mysql_result($result,0,0);
 		$allowreentry = ($line['public']&4);
-		if ($allowreentry) {
-			$userid = mysql_result($result,0,0);
+		if (!$allowreentry) {
+			$aids = explode(',',$line['aidlist']);
+			$paid = $aids[$_POST['course']];
+			$query = "SELECT id FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='$paid'";
+			$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+			if (mysql_num_rows($r2)>0) {
+				echo "You've already taken this diagnostic.  <a href=\"index.php?id=$diagid\">Back</a>\n";
+				exit;
+			}
+		}
+		//if ($allowreentry) {
+			
 			$sessiondata['mathdisp'] = $_POST['mathdisp'];//1;
 			$sessiondata['graphdisp'] = $_POST['graphdisp'];//1;
 			//$sessiondata['mathdisp'] = 1;
@@ -165,10 +176,10 @@ if (isset($_POST['SID'])) {
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$pcid&id=$paid");
 			exit;
 
-		} else {
-			echo "You've already taken this diagnostic.  <a href=\"index.php?id=$diagid\">Back</a>\n";
-			exit;
-		}
+		//} else {
+		//	echo "You've already taken this diagnostic.  <a href=\"index.php?id=$diagid\">Back</a>\n";
+		//	exit;
+		//}
 	}
 	
 	$eclass = $sel1[$_POST['course']] . '@' . $_POST['teachers'];
