@@ -1838,7 +1838,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (is_array($options['strflags'])) {$strflags = $options['strflags'][$qn];} else {$strflags = $options['strflags'];}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$GLOBALS['partlastanswer'] = $givenans;
-
+		$givenans = stripslashes($givenans);
 
 		$strflags = str_replace(' ','',$strflags);
 		$strflags = explode(",",$strflags);
