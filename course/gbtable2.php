@@ -661,8 +661,13 @@ function gbtable() {
 		if (isset($exceptions[$l['assessmentid']][$l['userid']])) {
 			$gb[$row][1][$col][6] = 1; //had exception
 		}
-		if (isset($exceptions[$l['assessmentid']][$l['userid']]) && $now>$enddate[$i] && $now<$exceptions[$l['assessmentid']][$l['userid']]) {
-			$thised = $exceptions[$l['assessmentid']][$l['userid']];
+		if (isset($exceptions[$l['assessmentid']][$l['userid']])) {// && $now>$enddate[$i] && $now<$exceptions[$l['assessmentid']][$l['userid']]) {
+			if ($enddate[$i]>$exceptions[$l['assessmentid']][$l['userid']] && $assessmenttype[$i]=="NoScores") {
+				//if exception set for earlier, and NoScores is set, use later date to hide score until later
+				$thised = $enddate[$i];
+			} else {
+				$thised = $exceptions[$l['assessmentid']][$l['userid']];
+			}
 			$inexception = true;
 		} else {
 			$thised = $enddate[$i];

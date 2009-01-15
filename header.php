@@ -149,7 +149,8 @@ if (!isset($nologo)) {
 	}
 	echo '>'.$smallheaderlogo.'</span>';
 	if ($myrights>10) {
-		echo '<div id="homemenu" class="ddmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()"><b>Switch to:</b><ul class="nomark">';
+		echo '<div id="homemenu" class="ddmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">';
+		/*<b>Switch to:</b><ul class="nomark">';
 		$query = "SELECT imas_courses.name,imas_courses.id FROM imas_teachers,imas_courses ";
 		$query .= "WHERE imas_teachers.courseid=imas_courses.id AND imas_teachers.userid='$userid' ";
 		$query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ";
@@ -163,6 +164,8 @@ if (!isset($nologo)) {
 		}
 		echo "<li><a href=\"$imasroot/actions.php?action=logout\">Log Out</a></li>";
 		echo '</ul></div>';
+		*/
+		echo '</div>';
 	}
 }
 
