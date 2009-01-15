@@ -571,6 +571,9 @@ function makeTopMenu() {
 		if (in_array(4,$topbar[1])) { //Calendar
 			echo "<a href=\"showcalendar.php?cid=$cid\">Calendar</a> &nbsp; \n";
 		}
+		if (in_array(5,$topbar[1])) { //Calendar
+			echo "<a href=\"course.php?cid=$cid&quickview=on\">Quick View</a> &nbsp; \n";
+		}
 		if (in_array(9,$topbar[1])) { //Log out
 			echo "<a href=\"../actions.php?action=logout\">Log Out</a>";
 		}

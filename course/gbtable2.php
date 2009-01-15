@@ -161,12 +161,12 @@ function gbtable() {
 		$query .= "AND cntingb>0 ";
 	}
 	if (!$isteacher) {
-		$query .= "AND startdate<$now ";
+		//$query .= "AND startdate<$now ";
 	}
 	if ($catfilter>-1) {
 		$query .= "AND gbcategory='$catfilter' ";
 	}
-	$query .= "ORDER BY enddate";
+	$query .= "ORDER BY enddate,name";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$overallpts = 0;
 	$now = time();
@@ -667,6 +667,13 @@ function gbtable() {
 				$thised = $enddate[$i];
 			} else {
 				$thised = $exceptions[$l['assessmentid']][$l['userid']];
+				if ($limuser>0 && $gb[0][1][$col][3]==2) {  //change $avail past/cur/future
+					if ($now<$thised) {
+						$gb[0][1][$col][3] = 1;
+					} else {
+						$gb[0][1][$col][3] = 0;
+					}
+				}
 			}
 			$inexception = true;
 		} else {

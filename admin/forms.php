@@ -288,7 +288,9 @@ switch($_GET['action']) {
 		if (in_array(3,$topbar[1])) { echo 'checked=1'; }
 		echo ' /> List Students<br /><input type=checkbox name="insttopbar[]" value="4" ';
 		if (in_array(4,$topbar[1])) { echo 'checked=1'; }
-		echo ' /> Calendar<br /><input type=checkbox name="insttopbar[]" value="9" ';
+		echo ' /> Calendar<br/><input type=checkbox name="insttopbar[]" value="5" ';
+		if (in_array(5,$topbar[1])) { echo 'checked=1'; }
+		echo ' /> Quick View<br /><input type=checkbox name="insttopbar[]" value="9" ';
 		if (in_array(9,$topbar[1])) { echo 'checked=1'; }
 		echo ' /> Log Out</span><br class=form />';
 		

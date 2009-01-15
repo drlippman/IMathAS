@@ -110,6 +110,9 @@ tr.highlight {
 tr.grid td {
 	border: 1px solid #000;
 }
+tr.dbltop td {
+	border-top: 3px double #000;
+}
 table.gbl td.locked, table.gbl th.locked {
 	border-right: 2px solid #00f;
 }

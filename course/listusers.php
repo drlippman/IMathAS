@@ -55,7 +55,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				}
 			}
 			foreach ($keys as $stuid) {
-				$query = "UPDATE imas_students SET section={$_POST['sec'][$stuid]},code={$_POST['code'][$stuid]} WHERE id='$stuid'";
+				$query = "UPDATE imas_students SET section={$_POST['sec'][$stuid]},code={$_POST['code'][$stuid]} WHERE id='$stuid' AND courseid='$cid' ";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
@@ -166,7 +166,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			if (trim($_POST['code'])==='') {
 				$code = "NULL";
 			}
-			$query = "UPDATE imas_students SET code=$code,section=$section WHERE userid='{$_GET['uid']}'";
+			$query = "UPDATE imas_students SET code=$code,section=$section WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		
 			

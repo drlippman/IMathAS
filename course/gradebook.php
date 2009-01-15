@@ -507,7 +507,11 @@ function gbstudisp($stu) {
 				} else if ($availshow==2 && $gbt[0][2][$i][2]==3) {
 					continue;
 				}
-				echo '<tr class="grid">';
+				if ($i==0) {
+					echo '<tr class="grid dbltop">';
+				} else {
+					echo '<tr class="grid">';
+				}
 				echo '<td class="cat'.$gbt[0][2][$i][1].'"><span class="cattothdr">'.$gbt[0][2][$i][0].'</span></td>';
 				echo '<td>'.$gbt[0][2][$i][3+$availshow].'&nbsp;pts</td>';
 				echo '<td>'.$gbt[1][2][$i][$availshow].'</td>';
