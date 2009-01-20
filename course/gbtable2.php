@@ -334,7 +334,7 @@ function gbtable() {
 		
 	}
 	
-	$query = "SELECT id,name,scale,scaletype,chop,dropn,weight FROM imas_gbcats WHERE courseid='$cid' ";
+	$query = "SELECT id,name,scale,scaletype,chop,dropn,weight,hidden FROM imas_gbcats WHERE courseid='$cid' ";
 	$query .= "ORDER BY name";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	while ($row = mysql_fetch_row($result)) {
@@ -344,7 +344,6 @@ function gbtable() {
 			$catcolcnt++;
 		}
 	}
-	
 	//create item headers
 	$pos = 0;
 	$catposspast = array();
@@ -387,6 +386,9 @@ function gbtable() {
 			array_splice($itemorder,count($itemorder),0,$catkeys);
 		}
 		foreach ($catkeys as $k) {
+			if (isset($cats[$cat][6]) && $cats[$cat][6]==1) {//hidden
+				$cntingb[$k] = 0;	
+			}
 			if ($avail[$k]<1) { //is past
 				if ($assessmenttype[$k]!="Practice" && $cntingb[$k]==1) {
 					$catposspast[$cat][] = $possible[$k]; //create category totals
@@ -411,7 +413,7 @@ function gbtable() {
 			if (($orderby&1)==1) {  //display item header if displaying by category
 				//$cathdr[$pos] = $cats[$cat][6];
 				$gb[0][1][$pos][0] = $name[$k]; //item name
-				$gb[0][1][$pos][1] = $cats[$cat][6]; //item category number
+				$gb[0][1][$pos][1] = $cats[$cat][7]; //item category number
 				$gb[0][1][$pos][2] = $possible[$k]; //points possible
 				$gb[0][1][$pos][3] = $avail[$k]; //0 past, 1 current, 2 future
 				$gb[0][1][$pos][4] = $cntingb[$k]; //0 no count and hide, 1 count, 2 EC, 3 no count
@@ -450,7 +452,7 @@ function gbtable() {
 		
 		foreach ($itemorder as $k) {
 			$gb[0][1][$pos][0] = $name[$k]; //item name
-			$gb[0][1][$pos][1] = $cats[$category[$k]][6]; //item category name
+			$gb[0][1][$pos][1] = $cats[$category[$k]][7]; //item category name
 			$gb[0][1][$pos][2] = $possible[$k]; //points possible
 			$gb[0][1][$pos][3] = $avail[$k]; //0 past, 1 current, 2 future
 			$gb[0][1][$pos][4] = $cntingb[$k]; //0 no count and hide, 1 count, 2 EC, 3 no count
@@ -507,7 +509,7 @@ function gbtable() {
 		
 		
 		$gb[0][2][$pos][0] = $cats[$cat][0];
-		$gb[0][2][$pos][1] = $cats[$cat][6];
+		$gb[0][2][$pos][1] = $cats[$cat][7];
 		if ($catposspast[$cat]>0) {
 			$gb[0][2][$pos][2] = 0; //scores in past
 			$cattotweightpast += $cats[$cat][5];

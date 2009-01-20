@@ -59,10 +59,15 @@
 					$weight = 0;
 				}
 			}
-			if ($id==0) {
-				$defaultcat = "$scale,$st,$chop,$drop,$weight";
+			if (isset($_POST['hide'][$id])) {
+				$hide = 1;
 			} else {
-				$query = "UPDATE imas_gbcats SET name='$name',scale='$scale',scaletype='$st',chop='$chop',dropn='$drop',weight='$weight' WHERE id='$id'";
+				$hide = 0;
+			}
+			if ($id==0) {
+				$defaultcat = "$scale,$st,$chop,$drop,$weight,$hide";
+			} else {
+				$query = "UPDATE imas_gbcats SET name='$name',scale='$scale',scaletype='$st',chop='$chop',dropn='$drop',weight='$weight',hidden=$hide WHERE id='$id'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 		}
@@ -154,7 +159,7 @@
 	array_unshift($row,"Default");
 	echo "Categories";
 	echo "<table class=gb><thead>";
-	echo "<tr><th>Category Name</th><th>Scale (optional)</th><th>Drops</th><th id=weighthdr>";
+	echo "<tr><th>Category Name</th><th>Hide</th><th>Scale (optional)</th><th>Drops</th><th id=weighthdr>";
 	if ($useweights==0) {
 		echo "Fixed Category Point Total (optional)";
 	} else if ($useweights==1) {
@@ -163,7 +168,7 @@
 	echo "</th><th>Remove</th></tr></thead><tbody>";
 	
 	disprow(0,$row);
-	$query = "SELECT id,name,scale,scaletype,chop,dropn,weight FROM imas_gbcats WHERE courseid='$cid'";
+	$query = "SELECT id,name,scale,scaletype,chop,dropn,weight,hidden FROM imas_gbcats WHERE courseid='$cid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	while ($row = mysql_fetch_row($result)) {
 		$id = array_shift($row);
@@ -187,6 +192,9 @@
 			echo $row[0];
 		}
 		"</td>";
+		echo "<td><input type=\"checkbox\" name=\"hide[$id]\" value=\"1\" ";
+		writeHtmlChecked($row[6],1);
+		echo "/></td>";
 		echo "<td>Scale <input type=text size=3 name=\"scale[$id]\" value=\"";
 		if ($row[1]>0) {
 			echo $row[1];

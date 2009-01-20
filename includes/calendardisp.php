@@ -2,7 +2,7 @@
 
 function showcalendar($refpage) {
 
-global $imasroot,$cid,$userid,$teacherid,$previewshift;
+global $imasroot,$cid,$userid,$teacherid,$previewshift,$latepasses;
 
 $now= time();
 if ($previewshift!=-1) {
@@ -115,7 +115,7 @@ $assess = array();
 $colors = array();
 $tags = array();
 $k = 0;
-$query = "SELECT id,name,startdate,enddate,reviewdate,gbcategory,reqscore,reqscoreaid,timelimit FROM imas_assessments WHERE avail=1 AND courseid='$cid' AND enddate<2000000000";
+$query = "SELECT id,name,startdate,enddate,reviewdate,gbcategory,reqscore,reqscoreaid,timelimit,allowlate FROM imas_assessments WHERE avail=1 AND courseid='$cid' AND enddate<2000000000";
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 while ($row = mysql_fetch_row($result)) {
 	if (isset($exceptions[$row[0]])) {
@@ -151,11 +151,16 @@ while ($row = mysql_fetch_row($result)) {
 		} else {
 			$tag = '?';
 		}
+		if ($row[9]==1 && $latepasses>0) {
+			$lp = 1;
+		} else {
+			$lp = 0;
+		}
 		$tags[$k] = $tag;
 		list($moday,$time) = explode('~',date('n-j~g:i a',$row[3]));
 		$row[1] = str_replace('"','\"',$row[1]);
 		$colors[$k] = makecolor2($row[2],$row[3],$now);
-		$assess[$moday][$k] = "{type:\"A\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors[$k]."\", tag:\"$tag\"".(($row[8]>0)?", timelimit:true":"").((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
+		$assess[$moday][$k] = "{type:\"A\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors[$k]."\", allowlate:\"$lp\", tag:\"$tag\"".(($row[8]>0)?", timelimit:true":"").((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
 	} else if ($row[4]<2000000000) { //in review
 		list($moday,$time) = explode('~',date('n-j~g:i a',$row[4]));
 		$row[1] = str_replace('"','\"',$row[1]);

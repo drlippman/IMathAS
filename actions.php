@@ -301,6 +301,9 @@
 		$query = "UPDATE imas_users SET FirstName='{$_POST['firstname']}',LastName='{$_POST['lastname']}',email='{$_POST['email']}',msgnotify=$msgnot,qrightsdef=$qrightsdef,deflib='$deflib',usedeflib='$usedeflib' ";
 		$query .= "WHERE id='$userid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
+		if (is_uploaded_file($_FILES['stupic']['tmp_name'])) {
+			processImage($_FILES['stupic'],$userid,100,100);
+		}
 	} else if ($_GET['action']=="googlegadget") {
 		if (isset($_GET['clear'])) {
 			$query = "UPDATE imas_users SET remoteaccess='' WHERE id='$userid'";
@@ -310,8 +313,7 @@
 	header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php");
 	
 	
-	<?php
-
+	
 //not used yet
 // $image is $_FILES[ <image name> ]
 // $imageId is the id used in a database or wherever for this image
@@ -340,24 +342,24 @@ function processImage( $image, $imageId, $thumbWidth, $thumbHeight )
     $th = $thumbHeight;
     $imT = imagecreatetruecolor( $tw, $th );
    
-    if ( $tw/$th > $th/$tw )
+    if ( $w/$h > $tw/$th )
     { // wider
-        $tmph = $h*($tw/$w);
-        $temp = imagecreatetruecolor( $tw, $tmph );
-        imagecopyresampled( $temp, $im, 0, 0, 0, 0, $tw, $tmph, $w, $h ); // resize to width
-        imagecopyresampled( $imT, $temp, 0, 0, 0, $tmph/2-$th/2, $tw, $th, $tw, $th ); // crop
+        $tmpw = $w*($th/$h);
+        $temp = imagecreatetruecolor( $tmpw, $th );
+        imagecopyresampled( $temp, $im, 0, 0, 0, 0, $tmpw, $th, $w, $h ); // resize to width
+        imagecopyresampled( $imT, $temp, 0, 0, $tmpw/2-$tw/2,0, $tw, $th, $tw, $th ); // crop
         imagedestroy( $temp );
     }else
     { // taller
-        $tmpw = $w*($th/$h );
-        $imT = imagecreatetruecolor( $tmpw, $th );
-        imagecopyresampled( $imT, $im, 0, 0, 0, 0, $tmpw, $h, $w, $h ); // resize to height
-        imagecopyresampled( $imT, $temp, 0, 0, $tmpw/2-$tw/2, 0, $tw, $th, $tw, $th ); // crop
+        $tmph = $h*($tw/$w );
+        $temp = imagecreatetruecolor( $tw, $tmph );
+        imagecopyresampled( $temp, $im, 0, 0, 0, 0, $tw, $tmph, $w, $h ); // resize to height
+        imagecopyresampled( $imT, $temp, 0, 0, 0, $tmph/2-$th/2, $tw, $th, $tw, $th ); // crop
         imagedestroy( $temp );
     }
    
     // save the image
-    imagejpeg( $imT, $galleryPath . 'userimg_'.$imgid . '.jpg', 100 );
+   imagejpeg( $imT, $galleryPath . 'userimg_'.$imageId . '.jpg', 100 );
 }
 	
 ?>

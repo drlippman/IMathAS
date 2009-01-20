@@ -119,6 +119,9 @@ function showcalcontentsid(elid) {
 				html += '>';
 				html += caleventsarr[elid].data[i].name + '</a>';
 				html += ' Due '+caleventsarr[elid].data[i].time;
+				if (caleventsarr[elid].data[i].allowlate==1) {
+					html += ' <a href="redeemlatepass.php?cid='+cid+'&aid='+caleventsarr[elid].data[i].id+'">Use LatePass</a>';
+				}
 				if (caleventsarr[elid].data[i].editlink!=null) {
 					html += ' <a href="addassessment.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Settings</a>';
 				}

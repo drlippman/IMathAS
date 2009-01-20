@@ -35,13 +35,24 @@ switch($_GET['action']) {
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$line = mysql_fetch_array($result, MYSQL_ASSOC);
 		echo "<h3>User Info</h3>\n";
-		echo "<form method=post action=\"actions.php?action=chguserinfo\">\n";
+		echo "<form enctype=\"multipart/form-data\" method=post action=\"actions.php?action=chguserinfo\">\n";
 		echo "<span class=form><label for=\"firstname\">Enter First Name:</label></span> <input class=form type=text size=20 id=firstname name=firstname value=\"{$line['FirstName']}\" /><br class=\"form\" />\n";
 		echo "<span class=form><label for=\"lastname\">Enter Last Name:</label></span> <input class=form type=text size=20 id=lastname name=lastname value=\"{$line['LastName']}\"><BR class=form>\n";
 		echo "<span class=form><label for=\"email\">Enter E-mail address:</label></span>  <input class=form type=text size=60 id=email name=email value=\"{$line['email']}\"><BR class=form>\n";
 		echo "<span class=form><label for=\"msgnot\">Notify me by email when I receive a new message:</label></span><span class=formright><input type=checkbox id=msgnot name=msgnot ";
 		if ($line['msgnotify']==1) {echo "checked=1";}
 		echo " /></span><BR class=form>\n";
+		/*echo "<span class=form><label for=\"stupic\">Picture</label</span>";
+		echo "<span class=\"formright\">";
+		$curdir = rtrim(dirname(__FILE__), '/\\');
+		$galleryPath = "$curdir/course/files/";
+		if (file_exists($galleryPath.'userimg_'.$userid.'.jpg')) {
+			echo "<img src=\"$imasroot/course/files/userimg_$userid.jpg\"/> ";
+		} else {
+			echo "No Pic ";
+		}
+		echo '<input type="file" name="stupic"/></span><br class="form" />';
+		*/
 		if ($myrights>19) {
 			echo "<span class=form><label for=\"qrd\">Make new questions private by default?<br/>(recommended for new users):</label></span><span class=formright><input type=checkbox id=qrd name=qrd ";
 			if ($line['qrightsdef']==0) {echo "checked=1";}

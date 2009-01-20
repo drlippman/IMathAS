@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 4;
+$latest = 5;
 
 if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 	$handle = fopen("upgradecounter.txt",'w');
@@ -51,6 +51,16 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 		}
 		if ($last < 4) {
 			$query = "ALTER TABLE `imas_assessments` ADD `endmsg` TEXT NOT NULL ;";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+		}
+		if ($last < 5) {
+			$query = "ALTER TABLE `imas_gbcats` ADD `hidden` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0';";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			
+			$query = "UPDATE imas_gbscheme SET defaultcat=CONCAT(defaultcat,',0');";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			
+			$query = "ALTER TABLE `imas_gbscheme` CHANGE `defaultcat` `defaultcat` VARCHAR( 254 ) NOT NULL DEFAULT '0,0,1,0,-1,0'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		}
 		$handle = fopen("upgradecounter.txt",'w');

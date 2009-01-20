@@ -474,7 +474,7 @@ function showqinfobar($qn,$inreview,$single) {
 	if ($testsettings['showcat']>0 && $qi[$questions[$qn]]['category']!='0') {
 		echo "  Category: {$qi[$questions[$qn]]['category']}.";
 	}
-	if ($attempts[$qn]>0) {
+	if ($attempts[$qn]>0 && !$noindivscores) {
 		if (strpos($scores[$qn],'~')===false) {
 			echo "<br/>Score on last attempt: {$scores[$qn]}.  Score in gradebook: {$bestscores[$qn]}";
 		} else {
