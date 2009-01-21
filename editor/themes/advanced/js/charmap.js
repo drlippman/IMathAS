@@ -10,6 +10,7 @@ var charmap = [
 	['&plusmn;',  '&#177;',  true, 'plus-minus sign'],
 	['&divide;',  '&#247;',  true, 'division sign'],
 	['&times;',   '&#215;',  true, 'multiplication sign'],
+	['&minus;',   '&#8722;',  true, 'subtraction sign'],
 	['&middot;',  '&#183;',  true, 'middle dot'],
 	['&infin;',   '&#8734;', true, 'infinity'],
 	
@@ -230,7 +231,10 @@ var charmap = [
 	['&image;',   '&#8465;', false,'imaginary part'],
 // arrows
 	['&amp;',     '&#38;',   true, 'ampersand'],
-	['&quot;',    '&#34;',   true, 'quotation mark'],
+	//['&quot;',    '&#34;',   true, 'quotation mark'],
+	['&ldquo;',   '&#8220;', true, 'left double quotation mark'],
+	['&rdquo;',   '&#8221;', true, 'right double quotation mark'],
+	['&mdash;',   '&#8212;', true, 'em dash'],
 	['&larr;',    '&#8592;', true, 'leftwards arrow'],
 	['&uarr;',    '&#8593;', true, 'upwards arrow'],
 	['&rarr;',    '&#8594;', true, 'rightwards arrow'],

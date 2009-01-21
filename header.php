@@ -63,6 +63,7 @@ tinyMCE.init({
     theme_advanced_toolbar_align : "left",
     theme_advanced_statusbar_location : "bottom",
     plugins : 'safari,asciimath,asciisvg,table,inlinepopups,paste',
+    gecko_spellcheck : true,
     extended_valid_elements : 'iframe[src|width|height|name|align]',
     content_css : '$imasroot/themes/$coursetheme',
     popup_css_add : '$imasroot/themes/$coursetheme',
@@ -112,10 +113,10 @@ echo <<<END
 function imascleanup(type, value) {
 	if (type=="get_from_editor") {
 		value = value.replace(/[\x84\x93\x94]/g,'"');
-		var rl = '\u2122,<sup>TM</sup>,\u2026,...,\u201c|\u201d,",\u2018|\u2019,\',\u2013|\u2014|\u2015|\u2212,-'.split(',');
-		for (var i=0; i<rl.length; i+=2) {
-			value = value.replace(new RegExp(rl[i], 'gi'), rl[i+1]);
-		}
+		//var rl = '\u2122,<sup>TM</sup>,\u2026,...,\u201c|\u201d,",\u2018|\u2019,\',\u2013|\u2014|\u2015|\u2212,-'.split(',');
+		//for (var i=0; i<rl.length; i+=2) {
+		//	value = value.replace(new RegExp(rl[i], 'gi'), rl[i+1]);
+		//}
 		value = value.replace(/<!--([\s\S]*?)-->|&lt;!--([\s\S]*?)--&gt;|<style>[\s\S]*?<\/style>/g, "");  // Word comments
 		value = value.replace(/class="?Mso\w+"?/g,'');
 		value = value.replace(/<p\s*>\s*<\\/p>/gi,'');
