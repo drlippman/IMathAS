@@ -112,7 +112,7 @@ END;
 echo <<<END
 function imascleanup(type, value) {
 	if (type=="get_from_editor") {
-		value = value.replace(/[\x84\x93\x94]/g,'"');
+		//value = value.replace(/[\x84\x93\x94]/g,'"');
 		//var rl = '\u2122,<sup>TM</sup>,\u2026,...,\u201c|\u201d,",\u2018|\u2019,\',\u2013|\u2014|\u2015|\u2212,-'.split(',');
 		//for (var i=0; i<rl.length; i+=2) {
 		//	value = value.replace(new RegExp(rl[i], 'gi'), rl[i+1]);

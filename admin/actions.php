@@ -4,7 +4,12 @@
 require("../validate.php");
 
 switch($_GET['action']) {
-	
+	case "emulateuser":
+		if ($myrights < 100 ) { break;}
+		$be = $_GET['uid'];
+		$query = "UPDATE imas_sessions SET userid='$be' WHERE sessionid='$sessionid'";
+		mysql_query($query) or die("Query failed : " . mysql_error());
+		break;
 	case "chgrights":  
 		if ($myrights < 100 && $_POST['newrights']>75) { break;}
 		if ($myrights < 75) { echo "You don't have the authority for this action"; break;}

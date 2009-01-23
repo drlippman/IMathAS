@@ -827,17 +827,33 @@
 				if ($allowregen) {
 					echo "<p><a href=\"showtest.php?action=skip&amp;to=$qn&amp;regen=$qn\">Try another similar question</a></p>\n";
 				}
+				
+				echo "<p>Question scored. ";
 				if ($lefttodo > 0) {
-					echo "<p>Question scored.  <b>Select another question</b></p>";
-					if ($reattemptsremain == false && $showeachscore) {
-						echo "<p>This question, with your last answer";
-						if (($showansafterlast && $qi[$questions[$qn]]['showans']=='0') || $qi[$questions[$qn]]['showans']=='F') {
-							echo " and correct answer";
-						} else if ($showansduring && $qi[$questions[$qn]]['showans']=='0' && $qi[$questions[$qn]]['showans']=='0' && $testsettings['showans']==$attempts[$qn]) {
-							echo " and correct answer";
-						}
+					echo '<b>Select another question</b></p>';
+				} else {
+					echo '</p>';
+				}
+				if ($reattemptsremain == false && $showeachscore) {
+					echo "<p>This question, with your last answer";
+					if (($showansafterlast && $qi[$questions[$qn]]['showans']=='0') || $qi[$questions[$qn]]['showans']=='F') {
+						echo " and correct answer";
+						$showcorrectnow = true;
+					} else if ($showansduring && $qi[$questions[$qn]]['showans']=='0' && $qi[$questions[$qn]]['showans']=='0' && $testsettings['showans']==$attempts[$qn]) {
+						echo " and correct answer";
+						$showcorrectnow = true;
+					} else {
+						$showcorrectnow = false;
+					}
+					if ($showcorrectnow) {
+						echo ', is displayed below</p>';
+						
+						displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],2,false,$attempts[$qn],false,false);
+					} else {
 						echo ", can be viewed by clicking on the question number again.</p>";
 					}
+				}
+				if ($lefttodo > 0) {
 					echo "<p>or click <a href=\"showtest.php?action=skip&amp;done=true\">here</a> to end and score test now</p>\n";
 				} else {
 					echo "<a href=\"showtest.php?action=skip&amp;done=true\">Click here to finalize and score test</a>\n";
@@ -887,8 +903,11 @@
 					if (!$reattemptsremain && $showeachscore) {
 						echo "<p>Question with last attempt is displayed for your review only</p>";
 						$qshowans = ((($showansafterlast && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='F') || ($showansduring && $qi[$questions[$next]]['showans']=='0' && $attempts[$next]>=$testsettings['showans']));
-						
-						displayq($next,$qi[$questions[$next]]['questionsetid'],$seeds[$next],$qshowans,false,$attempts[$next],false,false);
+						if ($qshowans) {
+							displayq($next,$qi[$questions[$next]]['questionsetid'],$seeds[$next],2,false,$attempts[$next],false,false);
+						} else {
+							displayq($next,$qi[$questions[$next]]['questionsetid'],$seeds[$next],false,false,$attempts[$next],false,false);
+						}
 					}
 					echo "</div>\n";
 				}

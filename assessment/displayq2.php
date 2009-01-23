@@ -9,6 +9,12 @@ require("macros.php");
 function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false) {
 	global $imasroot, $myrights;
 	srand($seed);
+	if (is_int($doshowans) && $doshowans==2) {
+		$doshowans = true;
+		$nosabutton = true;
+	} else {
+		$nosabutton = false;
+	}
 	
 	/*if (func_num_args()>5 && func_get_arg(5)==true) {
 		$returnqtxt = true;
@@ -212,21 +218,32 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			echo "<p class=\"tips\">Box ".($iidx+1).": $tip</p>";
 		}
 		if ($doshowans && (!isset($showanswer) || (is_array($showanswer) && !isset($showanswer[$iidx]))) && $shans[$iidx]!=='') {
-
-			echo "<div><input class=\"sabtn\" type=button value=\"Show Answer\" onClick='javascript:document.getElementById(\"ans$qnidx-$iidx\").className=\"shown\";' />"; //AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
-			echo filter(" <span id=\"ans$qnidx-$iidx\" class=\"hidden\">{$shans[$iidx]}</span></div>\n");
+			if ($nosabutton) {
+				echo filter("<div>Answer: {$shans[$iidx]} </div>\n");
+			} else {
+				echo "<div><input class=\"sabtn\" type=button value=\"Show Answer\" onClick='javascript:document.getElementById(\"ans$qnidx-$iidx\").className=\"shown\";' />"; //AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
+				echo filter(" <span id=\"ans$qnidx-$iidx\" class=\"hidden\">{$shans[$iidx]}</span></div>\n");
+			}
 		} else if ($doshowans && isset($showanswer) && is_array($showanswer)) { //use part specific showanswer
 			if (isset($showanswer[$iidx])) {
-				echo "<div><input class=\"sabtn\" type=button value=\"Show Answer\" onClick='javascript:document.getElementById(\"ans$qnidx-$iidx\").className=\"shown\";' />";// AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
-				echo filter(" <span id=\"ans$qnidx-$iidx\" class=\"hidden\">{$showanswer[$iidx]}</span></div>\n");
+				if ($nosabutton) {
+					echo filter("<div>Answer: {$showanswer[$iidx]} </div>\n");
+				} else {
+					echo "<div><input class=\"sabtn\" type=button value=\"Show Answer\" onClick='javascript:document.getElementById(\"ans$qnidx-$iidx\").className=\"shown\";' />";// AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
+					echo filter(" <span id=\"ans$qnidx-$iidx\" class=\"hidden\">{$showanswer[$iidx]}</span></div>\n");
+				}
 			}
 		}
 	}
 	echo "</div>\n";
 	
 	if ($doshowans && isset($showanswer) && !is_array($showanswer)) {  //single showanswer defined
-		echo "<div><input class=\"sabtn\" type=button value=\"Show Answer\" onClick='javascript:document.getElementById(\"ans$qnidx\").className=\"shown\"; AMprocessNode(document.getElementById(\"ans$qnidx\"));' />";
-		echo filter(" <span id=\"ans$qnidx\" class=\"hidden\">$showanswer </span></div>\n");
+		if ($nosabutton) {
+			echo filter("<div>Answer: $showanswer </div>\n");	
+		} else {
+			echo "<div><input class=\"sabtn\" type=button value=\"Show Answer\" onClick='javascript:document.getElementById(\"ans$qnidx\").className=\"shown\"; AMprocessNode(document.getElementById(\"ans$qnidx\"));' />";
+			echo filter(" <span id=\"ans$qnidx\" class=\"hidden\">$showanswer </span></div>\n");
+		}
 	}
 	echo "</div>\n";
 }

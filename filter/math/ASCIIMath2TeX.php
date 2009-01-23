@@ -1,6 +1,6 @@
 <?php
 /*
-ASCIIMath2TeX.php
+ASCIIMath2TeX.php - Version 1.1
 ==============
 This file contains functions to convert ASCII math notation
 to TeX, which can be rendered via CGI to images.
@@ -161,8 +161,8 @@ array( 'input'=>'vdots'),
 array( 'input'=>'ddots'), 
 array( 'input'=>'diamond'),
 array( 'input'=>'square', 'tex'=>'boxempty'),
-array( 'input'=>'|_', 'tex'=>'lfloor'),
-array( 'input'=>'_|', 'tex'=>'rfloor'),
+array( 'input'=>'|__', 'tex'=>'lfloor'),
+array( 'input'=>'__|', 'tex'=>'rfloor'),
 array( 'input'=>'|~', 'tex'=>'lceil'),
 array( 'input'=>'lceiling', 'output'=>'|~', 'definition'=>TRUE),
 array( 'input'=>'~|', 'tex'=>'rceil'),
@@ -717,10 +717,10 @@ function AMTparseExpr($str,$rightbracket) {
 	return array($newFrag,$str);
 }
 function AMTparseAMtoTeX($str) {
-	
 	$this->AMnestingDepth = 0;
 	$str = str_replace(array('&nbsp;','&gt;','&lt;'),array('','>','<'),$str);
 	$str = preg_replace('/^\s+/','',$str);
+	
 	$result = $this->AMTparseExpr($str, false);
 	return ($result[0]);
 }
