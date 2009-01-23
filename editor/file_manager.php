@@ -32,7 +32,13 @@ if (isset($_REQUEST["action"]))
 {
 	if ($_REQUEST["action"] == "upload_file")
 	{
-		storeuploadedfile("uploaded_file","ufiles/$userid/". basename($_FILES["uploaded_file"]["name"]),"public");
+		$filename = basename(stripslashes($_POST["uploaded_file_name"]));
+		$filename = str_replace(' ','_',$filename);
+		$filename = preg_replace('/[^\w\.]/','',$filename);
+		//$filename = urlencode($filename);
+		//echo $filename;
+		//exit;
+		storeuploadedfile("uploaded_file","ufiles/$userid/".$filename,"public");
 	}
 	else if ($_REQUEST["action"] == "delete_file")
 	{
@@ -99,6 +105,7 @@ if ($type=="img") {
 
 	document.getElementById("upload_div").style.display = "none";
 	document.getElementById("uploading_div").style.display = "block";
+	document.getElementById("uploaded_file_name").value = fieldvalue;
 	return true;
 }
 </script>
@@ -127,6 +134,7 @@ foreach ($files as $k=>$v) {
 		<input type="hidden" name="action" value="upload_file">
 		<input type="hidden" name="MAX_FILE_SIZE" value="10485760" /> <!-- ~10mb -->
 		<input type="file" name="uploaded_file" id="uploaded_file">
+		<input type="hidden" name="uploaded_file_name" id="uploaded_file_name" />
 		<input type="submit" value="<?php echo $strings["upload_file_submit"]; ?>">
 	</form>
 	</div>
