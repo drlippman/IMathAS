@@ -180,7 +180,9 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				$alt .= "<tr><td>".($xmin + $dx*$i)."</td><td>$y</td></tr>";
 			}
 			
-			
+			if (isNaN($y)) {
+				continue;
+			}
 			if ($py===null) { //starting line
 				
 			} else if ($y>$ymax || $y<$ymin) { //going or still out of bounds
