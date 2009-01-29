@@ -17,8 +17,8 @@ function enditem() {
 	}
 }
 
-  function showitems($items,$parent) {
-	   global $teacherid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$hideicons,$exceptions,$latepasses,$graphicalicons;
+  function showitems($items,$parent,$inpublic=false) {
+	   global $teacherid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$hideicons,$exceptions,$latepasses,$graphicalicons,$ispublic;
 	
 	   $now = time() + $previewshift;
 	   $blocklist = array();
@@ -30,6 +30,15 @@ function enditem() {
 	   if (isset($teacherid)) {echo generateadditem($parent,'t');}
 	   for ($i=0;$i<count($items);$i++) {
 		   if (is_array($items[$i])) { //if is a block
+			   $turnonpublic = false;
+			   if ($ispublic && !$inpublic) {
+				   if (isset($items[$i]['public']) && $items[$i]['public']==1) {
+					   $turnonpublic = true;
+				   } else {
+					   continue;
+				   }
+				   
+			   }
 			$items[$i]['name'] = stripslashes($items[$i]['name']);
 			if (isset($teacherid)) {
 				echo generatemoveselect($i,count($items),$parent,$blocklist);
@@ -86,7 +95,11 @@ function enditem() {
 					echo ">";
 					
 					if (($hideicons&16)==0) {
-						echo "<span class=left><a href=\"course.php?cid=$cid&folder=$parent-$bnum\" border=0>";
+						if ($ispublic) {
+							echo "<span class=left><a href=\"public.php?cid=$cid&folder=$parent-$bnum\" border=0>";
+						} else {
+							echo "<span class=left><a href=\"course.php?cid=$cid&folder=$parent-$bnum\" border=0>";
+						}
 						if ($graphicalicons) {
 							echo "<img src=\"$imasroot/img/folder2.gif\"></a></span>";
 						} else {
@@ -94,7 +107,11 @@ function enditem() {
 						}
 						echo "<div class=title>";
 					}
-					echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle><b>{$items[$i]['name']}</b></a> ";
+					if ($ispublic) {
+						echo "<a href=\"public.php?cid=$cid&folder=$parent-$bnum\" $astyle><b>{$items[$i]['name']}</b></a> ";
+					} else {
+						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle><b>{$items[$i]['name']}</b></a> ";
+					}
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
 						echo "<span style=\"color:red;\">New</span>";
 					}
@@ -174,7 +191,7 @@ function enditem() {
 					echo "id=\"block{$items[$i]['id']}\">";
 					if ($isopen) {
 						//if (isset($teacherid)) {echo generateadditem($parent.'-'.$bnum,'t');}
-						showitems($items[$i]['items'],$parent.'-'.$bnum);
+						showitems($items[$i]['items'],$parent.'-'.$bnum,$inpublic||$turnonpublic);
 						//if (isset($teacherid) && count($items[$i]['items'])>0) {echo generateadditem($parent.'-'.$bnum,'b');}
 					} else {
 						echo "Loading content...";
@@ -305,7 +322,7 @@ function enditem() {
 					echo "id=\"block{$items[$i]['id']}\">";
 					if ($isopen) {
 						//if (isset($teacherid)) {echo generateadditem($parent.'-'.$bnum,'t');}
-						showitems($items[$i]['items'],$parent.'-'.$bnum);
+						showitems($items[$i]['items'],$parent.'-'.$bnum,$inpublic||$turnonpublic);
 						
 						//if (isset($teacherid) && count($items[$i]['items'])>0) {echo generateadditem($parent.'-'.$bnum,'b');}
 					} else {
@@ -315,6 +332,8 @@ function enditem() {
 				}
 			}
 			continue;
+		   } else if ($ispublic && !$inpublic) {
+			   continue;
 		   }
 		   $query = "SELECT itemtype,typeid FROM imas_items WHERE id='{$items[$i]}'";
 		   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -324,6 +343,7 @@ function enditem() {
 			   echo generatemoveselect($i,count($items),$parent,$blocklist);
 		   }
 		   if ($line['itemtype']=="Calendar") {
+			   if ($ispublic) { continue;}
 			   //echo "<div class=item>\n";
 			   beginitem();
 			   if (isset($teacherid)) {
@@ -335,6 +355,7 @@ function enditem() {
 			   showcalendar("course");
 			   enditem();// echo "</div>";
 		   } else if ($line['itemtype']=="Assessment") {
+			   if ($ispublic) { continue;}
 			   $typeid = $line['typeid'];
 			   $query = "SELECT name,summary,startdate,enddate,reviewdate,deffeedback,reqscore,reqscoreaid,avail,allowlate,timelimit FROM imas_assessments WHERE id='$typeid'";
 			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -662,7 +683,11 @@ function enditem() {
 				   }
 						   	   
 			   } else {
-				   $alink = "showlinkedtext.php?cid=$cid&id=$typeid";
+				   if ($ispublic) { 
+					   $alink = "showlinkedtextpublic.php?cid=$cid&id=$typeid";
+				   } else {
+					   $alink = "showlinkedtext.php?cid=$cid&id=$typeid";
+				   }
 				   $icon = 'html';
 			   }
 			   
@@ -722,6 +747,7 @@ function enditem() {
 				   enditem(); // echo "</div>\n";
 			   }
 		   } else if ($line['itemtype']=="Forum") {
+			   if ($ispublic) { continue;}
 			   $typeid = $line['typeid'];
 			   $query = "SELECT id,name,description,startdate,enddate,grpaid,avail,postby,replyby FROM imas_forums WHERE id='$typeid'";
 			   $result = mysql_query($query) or die("Query failed : " . mysql_error());

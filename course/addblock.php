@@ -104,6 +104,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	} else {
 		$colors = $_POST['titlebg'].','.$_POST['titletxt'].','.$_POST['bi'];
 	}
+	if (isset($_POST['public'])) {
+		$public = 1;
+	} else {
+		$public = 0;
+	}
 
 
 	$sub =& $items;
@@ -119,6 +124,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$sub[$existingid]['avail'] = $_POST['avail'];
 		$sub[$existingid]['SH'] = $_POST['showhide'] . $_POST['availbeh'];
 		$sub[$existingid]['colors'] = $colors;
+		$sub[$existingid]['public'] = $public;
 	} else { //add new
 		$blockitems = array();
 		$blockitems['name'] = stripslashes($_POST['title']);
@@ -128,6 +134,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$blockitems['avail'] = $_POST['avail'];
 		$blockitems['SH'] = $_POST['showhide'] . $_POST['availbeh'];
 		$blockitems['colors'] = $colors;
+		$blockitems['public'] = $public;
 		$blockitems['items'] = array();
 		if ($totb=='b') {
 			array_push($sub,$blockitems);
@@ -168,6 +175,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
 			$avail = 1;
 		}
+		if (isset($blockitems[$existingid]['public'])) { //backwards compat
+			$public = $blockitems[$existingid]['public'];
+		} else {
+			$public = 0;
+		}
 		$showhide = $blockitems[$existingid]['SH'][0];
 		if (strlen($blockitems[$existingid]['SH'])==1) {
 			$availbeh = 'O';
@@ -193,6 +205,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$availbeh = 'O';
 		$showhide = 'H';
 		$avail = 1;
+		$public = 0;
 		$titlebg = "#DDDDFF";
 		$titletxt = "#000000";
 		$bi = "#EEEEFF";
@@ -305,7 +318,11 @@ if ($overwriteBody==1) {
 	<input type=radio name=showhide value="H" <?php writeHtmlChecked($showhide,'H') ?> />Hide from Students<br/>
 	<input type=radio name=showhide value="S" <?php writeHtmlChecked($showhide,'S') ?> />Show Collapsed/as folder
 	</span><br class=form />
-
+	
+	<span class=form>Make items publically accessible:</span>
+	<span class=formright>
+	<input type=checkbox name=public value="1" <?php writeHtmlChecked($public,'1') ?> />
+	</span><br class=form />
 	<span class=form>Block colors:</span>
 	<span class=formright>
 	<input type=radio name=colors value="def" <?php  writeHtmlChecked($usedef,1) ?> />Use defaults<br/>
