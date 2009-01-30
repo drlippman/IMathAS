@@ -49,7 +49,7 @@ if ($myrights < 40) {
  //data processing for COURSES block 
 	$query = "SELECT imas_courses.id,imas_courses.ownerid,imas_courses.name,imas_courses.available,imas_users.FirstName,imas_users.LastName FROM imas_courses,imas_users ";
 	$query .= "WHERE imas_courses.ownerid=imas_users.id";
-	if ($myrights == 40 || $showcourses==0) { $query .= " AND imas_courses.ownerid='$userid'";}
+	if (($myrights >= 40 && $myrights<75) || $showcourses==0) { $query .= " AND imas_courses.ownerid='$userid'";}
 	if ($myrights >= 75 && $showcourses>0) {
 		$query .= " AND imas_courses.ownerid='$showcourses'";
 		$query .= " ORDER BY imas_users.LastName,imas_courses.name";
@@ -87,9 +87,9 @@ if ($myrights < 40) {
 	}
 	
 	//data processing for diagnostics block
-	if ($myrights>=75) {
+	if ($myrights>=60) {
 		$query = "SELECT id,name,public FROM imas_diags";
-		if ($myrights==75) {
+		if ($myrights<100) {
 			$query .= " WHERE ownerid='$groupid'";
 		}
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -135,6 +135,7 @@ if ($myrights < 40) {
 			case 15: $page_userDataType[$i] = "Tutor/TA/Proctor"; break;
 			case 20: $page_userDataType[$i] = "Teacher"; break;
 			case 40: $page_userDataType[$i] = "LimCourseCreator"; break;
+			case 60: $page_userDataType[$i] = "DiagCreator"; break;
 			case 75: $page_userDataType[$i] = "GroupAdmin"; break;
 			case 100: $page_userDataType[$i] = "Admin"; break;
 		}
@@ -287,7 +288,7 @@ $placeinhead .= "}</script>";
 <?php
 	}
 // END OF ADMINISTRATION BLOCK, BEGIN DIAGNOSTICS BLOCK
-	if($myrights >= 75) {
+	if($myrights >= 60) {
 ?>	
 	<h4>Diagnostics</h4>
 	<div class=item>

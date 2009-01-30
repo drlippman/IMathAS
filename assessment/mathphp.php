@@ -34,7 +34,8 @@ function mathphp($st,$varlist,$skipfactorial=false,$ignorestrings=true) {
   $st .= ' ';
   
   if ($ignorestrings) {
-	  preg_match_all('/(\'|").*?[^\\\\](\\1)/',$st,$strmatches,PREG_SET_ORDER);
+	   //'/(\'|").*?[^\\\\](\\1)/'
+	  preg_match_all('/(["\'])(?:\\\\?.)*?\\1/',$st,$strmatches,PREG_SET_ORDER);
 	  foreach ($strmatches as $k=>$match) {
 		 $st =  str_replace($match[0],"(#$k#)",$st);
 	  }
@@ -62,12 +63,13 @@ function mathphp($st,$varlist,$skipfactorial=false,$ignorestrings=true) {
 		$st = str_replace(array("sin^-1","cos^-1","tan^-1","sin^(-1)","cos^(-1)","tan^(-1)"),array("asin","acos","atan","asin","acos","atan"),$st);
 		$st = str_replace(array("sinh^-1","cosh^-1","tanh^-1","sinh^(-1)","cosh^(-1)","tanh^(-1)"),array("asinh","acosh","atanh","asinh","acosh","atanh"),$st);
   }
-  
+  if ($st=='pi') { $st = "(M_PI)";}
+  if ($st=='e') { $st = "(exp(1))";}
   $st= preg_replace('/^e$/',"(exp(1))",$st);
-  $st= preg_replace("/^pi([^a-zA-Z])/","(M_PI)$1",$st);
-  $st= preg_replace("/([^a-zA-Z])pi$/","$1(M_PI)",$st);
-  $st= preg_replace("/([^a-zA-Z])pi([^a-zA-Z])/","$1(M_PI)$2",$st);
-  $st= preg_replace("/^e([^a-zA-Z])/","(exp(1))$1",$st);
+  $st= preg_replace('/^pi([^a-zA-Z])/',"(M_PI)$1",$st);
+  $st= preg_replace('/([^a-zA-Z$])pi$/',"$1(M_PI)",$st);
+  $st= preg_replace('/([^a-zA-Z$])pi([^a-zA-Z])/',"$1(M_PI)$2",$st);
+  $st= preg_replace('/^e([^a-zA-Z])/',"(exp(1))$1",$st);
   $st= preg_replace('/([^a-zA-Z$])e$/',"$1(exp(1))",$st);
   
   $st= preg_replace('/([^a-zA-Z$])e([^a-zA-Z])/',"$1(exp(1))$2",$st);
@@ -182,12 +184,16 @@ function mathphp($st,$varlist,$skipfactorial=false,$ignorestrings=true) {
     $st= substr($st,0,$j+1)."factorial(".substr($st,$j+1,($i-$j-1)).")".substr($st,$i+1);
   }
   //down here so log10 doesn't get changed to log*10
-  $st = str_replace("log","log10",$st);
+  //$st = str_replace("log","log10",$st);
+  $st= preg_replace("/^log([^a-zA-Z])/","log10$1",$st);
+  $st= preg_replace('/([^a-zA-Z$])log$/',"\\1log10",$st);
+  $st= preg_replace('/([^a-zA-Z$])log([^a-zA-Z])/',"\\1log10$2",$st);
+  
   //$st = str_replace("ln","log",$st);
   $st= preg_replace("/^ln([^a-zA-Z])/","log$1",$st);
-  $st= preg_replace('/([^a-zA-Z])ln$/',"\\1log",$st);
-  $st= preg_replace("/([^a-zA-Z])ln([^a-zA-Z])/","\\1log$2",$st);
-  
+  $st= preg_replace('/([^a-zA-Z$])ln$/',"\\1log",$st);
+  $st= preg_replace('/([^a-zA-Z$])ln([^a-zA-Z])/',"\\1log$2",$st);
+  $st= preg_replace('/^\s*\((\$[a-zA-Z\d_]+)\)\s*=/',"$1 =",$st);
   if ($ignorestrings) {
 	  foreach ($strmatches as $k=>$match) {
 		 $st =  str_replace("(#$k#)",$match[0],$st);

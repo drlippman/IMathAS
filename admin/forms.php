@@ -67,6 +67,9 @@ switch($_GET['action']) {
 		echo "<input type=radio name=\"newrights\" value=\"40\" ";
 		if ($oldrights == 40) {echo "CHECKED";}
 		echo "> Limited Course Creator <BR>\n";
+		echo "<input type=radio name=\"newrights\" value=\"60\" ";
+		if ($oldrights == 60) {echo "CHECKED";}
+		echo "> Diagnostic Creator <BR>\n";
 		echo "<input type=radio name=\"newrights\" value=\"75\" ";
 		if ($oldrights == 75) {echo "CHECKED";}
 		echo "> Group Admin <BR>\n";

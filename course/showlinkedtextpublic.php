@@ -52,6 +52,7 @@
 		require("../footer.php");
 		exit;
 	}
+	$ispublic = true;
 	
 	if (!isset($_GET['id'])) {
 		echo "<html><body>No item specified.</body></html>\n";
@@ -70,7 +71,7 @@
 	echo filter($text);
 	echo '</div>';
 	
-	echo "<div class=right><a href=\"public.php?cid={$_GET['cid']}\">Return to Public Page</a></div>\n";
+	echo "<div class=right><a href=\"public.php?cid={$_GET['cid']}\">Return to Public Course Page</a></div>\n";
 	require("../footer.php");	
 
 ?>

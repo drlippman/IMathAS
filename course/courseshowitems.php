@@ -659,7 +659,7 @@ function enditem() {
 			   } else if (substr(strip_tags($line['text']),0,5)=="file:") {
 				   $filename = substr(strip_tags($line['text']),5);
 				   $alink = $imasroot . "/course/files/".$filename;
-				   $ext = substr($filename,strpos($filename,'.')+1);
+				   $ext = substr($filename,strrpos($filename,'.')+1);
 				   switch($ext) {
 				   	  case 'xls': $icon = 'xls'; break;
 					  case 'pdf': $icon = 'pdf'; break;
@@ -987,8 +987,12 @@ function enditem() {
 		   if (is_array($item)) {
 			  $hasexc = upsendexceptions($items[$k]['items']);
 			  if ($hasexc!=FALSE) {
-				$items[$k]['startdate'] = $hasexc[0];
-				$items[$k]['enddate'] = $hasexc[1];
+				  if ($hasexc[0]<$items[$k]['startdate']) {
+					  $items[$k]['startdate'] = $hasexc[0];
+				  }
+				  if ($hasexc[1]>$items[$k]['enddate']) {
+					  $items[$k]['enddate'] = $hasexc[1];
+				  }
 				//return ($hasexc);
 				if ($hasexc[0]<$minsdate) { $minsdate = $hasexc[0];}
 				if ($hasexc[1]>$maxedate) { $maxedate = $hasexc[1];}

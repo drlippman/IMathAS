@@ -11,7 +11,7 @@ switch($_GET['action']) {
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		break;
 	case "chgrights":  
-		if ($myrights < 100 && $_POST['newrights']>75) { break;}
+		if ($myrights < 100 && $_POST['newrights']>75) {echo "You don't have the authority for this action"; break;}
 		if ($myrights < 75) { echo "You don't have the authority for this action"; break;}
 		
 		$query = "UPDATE imas_users SET rights='{$_POST['newrights']}'";
@@ -134,7 +134,7 @@ switch($_GET['action']) {
 		
 		$query = "UPDATE imas_courses SET name='{$_POST['coursename']}',enrollkey='{$_POST['ekey']}',hideicons='$hideicons',available='$avail',lockaid='{$_POST['lockaid']}',picicons='{$_POST['picicons']}',chatset=$chatset,";
 		$query .= "allowunenroll='{$_POST['allowunenroll']}',copyrights='{$_POST['copyrights']}',msgset='{$_POST['msgset']}',topbar='$topbar',cploc='{$_POST['cploc']}',theme='{$_POST['theme']}',ltisecret='{$_POST['ltisecret']}' WHERE id='{$_GET['id']}'";
-		if ($myrights==40) { $query .= " AND ownerid='$userid'";}
+		if ($myrights<75) { $query .= " AND ownerid='$userid'";}
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		break;
 	case "addcourse":
@@ -316,7 +316,7 @@ switch($_GET['action']) {
 		exit;
 	case "addteacher":
 		if ($myrights < 75) { echo "You don't have the authority for this action"; break;}
-		if ($myrights < 75) {
+		if ($myrights == 75) {
 			$query = "SELECT imas_users.groupid FROM imas_users,imas_courses WHERE imas_courses.ownerid=imas_users.id AND imas_courses.id='{$_GET['cid']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (mysql_result($result,0,0) != $groupid) { 

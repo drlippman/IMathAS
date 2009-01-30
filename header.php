@@ -18,6 +18,13 @@ var imasroot = '<?php echo $imasroot; ?>';
 </script>
 <script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js"></script>
 <?php
+if ($ispublic) {
+	echo "<script src=\"$imasroot/javascript/ASCIIMathMLwFallback.js\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIsvg.js\" type=\"text/javascript\"></script>\n";
+	echo "<script type=\"text/javascript\">var usingASCIIMath = true; var usingASCIISvg = true;</script>"; 
+	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>'; 
+	echo '<script type="text/javascript">var AScgiloc = "'.$imasroot.'/filter/graph/svgimg.php";</script>'; 
+} else {
 if (!isset($sessiondata['mathdisp'])) {
 	echo "<script src=\"$imasroot/javascript/mathgraphcheck.js\" type=\"text/javascript\"></script>\n";
 }
@@ -39,6 +46,7 @@ if ($sessiondata['graphdisp']==1) {
 } else if (isset($sessiondata['graphdisp'])) {
 	echo "<script src=\"$imasroot/javascript/mathjs.js\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIISvg = false;</script>";
+}
 }
 
 $start_time = microtime(true); 
@@ -145,11 +153,11 @@ if (!isset($nologo)) {
 	//echo '<img id="headerlogo" style="position: absolute; right: 5px; top: 5px;" src="/img/state_logo.gif" alt="logo"/>';
 	//echo '<img id="headerlogo" style="position: absolute; right: 5px; top: 12px;" src="/img/wamaplogosmall.gif" alt="logo"/>';
 	echo '<span id="headerlogo" style="position: absolute; right:5px; top: 12px; cursor: pointer;" ';
-	if ($myrights>10) {
+	if ($myrights>10 && !$ispublic) {
 		echo 'onclick="mopen(\'homemenu\')" onmouseout="mclosetime()"';
 	}
 	echo '>'.$smallheaderlogo.'</span>';
-	if ($myrights>10) {
+	if ($myrights>10 && !$ispublic) {
 		echo '<div id="homemenu" class="ddmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">';
 		/*<b>Switch to:</b><ul class="nomark">';
 		$query = "SELECT imas_courses.name,imas_courses.id FROM imas_teachers,imas_courses ";

@@ -319,7 +319,7 @@ if ($overwriteBody==1) {
 	<input type=radio name=showhide value="S" <?php writeHtmlChecked($showhide,'S') ?> />Show Collapsed/as folder
 	</span><br class=form />
 	
-	<span class=form>Make items publically accessible:</span>
+	<span class=form>Make items publically accessible<sup>*</sup>:</span>
 	<span class=formright>
 	<input type=checkbox name=public value="1" <?php writeHtmlChecked($public,'1') ?> />
 	</span><br class=form />
@@ -368,8 +368,11 @@ if ($overwriteBody==1) {
 	
 	<div class=submit><input type=submit value=Submit></div>
 </form>
+<p><sup>*</sup>If a parent block is set to be publically accessible, this block will automatically be publically accessible, regardless of your selection here.<br/>
+Items from publically accessible blocks can view viewed at http://<?php echo $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') ?>/public.php?cid=<?php echo $_GET['cid'];?>. </p>
 
 <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+
 <?php
 }
 	require("../footer.php");

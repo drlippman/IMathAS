@@ -16,7 +16,7 @@ $pagetitle = "Diagnostic Setup";
 $curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"$imasroot/admin/admin.php\">Admin</a> &gt; Diagnostic Setup</div>\n";
 
 	// SECURITY CHECK DATA PROCESSING
-if ($myrights<75) {
+if ($myrights<60) {
 	$overwriteBody = 1;
 	$body = "You don't have authority to access this page.";
 } elseif (isset($_GET['step']) && $_GET['step']==2) {  // STEP 2 DATA PROCESSING
