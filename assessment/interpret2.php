@@ -50,7 +50,14 @@ function interpret2($blockname,$anstype,$str)
 		$str = '<?php '.$str.'?>';
 		//tokensize.  Scan for unallowed macros or variables.
 		$tokens = token_get_all($str);
-		
+		/*foreach($tokens as $k=>$c) {
+			if (is_array($c)) {
+				echo token_name($c[0]).': '.$c[0].': '.$c[1].'<br/>';
+			} else {
+				echo "$c<br/>";
+			}
+		}*/
+		$instr = false;
 		foreach($tokens as $k=>$c) {
 			if(is_array($c)) {
 				//if ($c[0] == 370 ) { //whitespace
@@ -70,7 +77,7 @@ function interpret2($blockname,$anstype,$str)
 						return '';
 					}
 				}
-				if ($c[0] == 307) { //it's a "word"
+				if ($c[0] == 307 && !$instr) { //it's a "word"
 					if ($c[1]=='userid') {
 						$c[1] = "'userid'";
 					} else {
@@ -80,7 +87,13 @@ function interpret2($blockname,$anstype,$str)
 					}
 					}
 				}
-		
+			} else {
+				if ($instr && $c==$strmarker) {
+					$instr = false;
+				} else if ($c=='"' || $c=="'") {
+					$instr = true;
+					$strmarker = $c;
+				}
 			}
 		}
 		
@@ -263,7 +276,48 @@ function interpretline($tokens) {
 function tokenstostring($tokens,$equalloc,$skipfac = false,$domathphp=true) {
 	$left = '';
 	$right = '';
+	$stm = microtime(true);
 	$cnt = count($tokens);
+	if (!$domathphp) {
+		$lasttype = 0;  //1 number, 2 string, 3 var, 4 left paren
+		for ($i=0; $i<$cnt; $i++) {
+			$c = $tokens[$i];
+			if (is_array($c)) {
+				if ($c[0]==T_NUMBER) {
+					$lasttype = 1;
+				} else if ($c[0]==T_STRING) {  //implicit: 3sin
+					if ($lasttype==1) {
+						$tokens[$i][1] = '*'.$c[1];
+					}
+					//convert arcsin to asin
+					$tokens[$i][1] = str_replace(array("arcsin","arccos","arctan","arcsinh","arccosh","arctanh"),array("asin","acos","atan","asinh","acosh","atanh"),$c[1]);
+  
+					$lasttype = 2;
+				} else if ($c[0]==T_VAR) {  //implicit:  2$var
+					if ($lasttype==1) {
+						$tokens[$i][1] = '*'.$c[1];
+					}
+					$lasttype = 3;
+				} else {
+					$lasttype=0;
+				}
+			} else {
+				if ($c == ')') {
+					$lasttype = 4;
+				} else if ($c == '(') {  //implicit: $var( )  3( )  ()()
+					if ($lasttype==4 || $lasttype==3 || $lasttype==1) {
+						$tokens[$i] = '*(';
+					}
+					$lasttype = 0;
+				} else {
+					$lasttype = 0;
+				}
+			}
+		}
+		
+		
+	}
+	
 	for ($i=0; $i<$cnt; $i++) {
 		$c = $tokens[$i];
 		if (is_array($c)) {
@@ -280,14 +334,15 @@ function tokenstostring($tokens,$equalloc,$skipfac = false,$domathphp=true) {
 			}
 		}
 	}
-
+	
 	if ($domathphp) {
 		$right = mathphp($right.' ',null,$skipfac);
 		$right = preg_replace('/([a-zA-Z]+\d+)\*\(/',"$1(",$right);  
 		$right = preg_replace('/(\$[a-zA-Z]+\d+)\(/',"$1*(",$right);  //lame bug fix for matrixrowcombine3(stuff) w/o affecting $a3(1-$b)
-	
 	} else {
 		
+		/*
+		$stt = microtime(true);
 		$right = str_replace('!=','#=',$right);
 		//need to avoid doing in quotes
 		preg_match_all('/(["\'])(?:\\\\?.)*?\\1/',$right,$strmatches,PREG_SET_ORDER);
@@ -310,8 +365,9 @@ function tokenstostring($tokens,$equalloc,$skipfac = false,$domathphp=true) {
 		}
 		
 		$right = str_replace('#=','!=',$right);
+		$loopt += microtime(true) - $stt;
+		*/
 	}
-	
 	
 	return $left.$right;
 }		
@@ -342,3 +398,5 @@ function setseed($ns) {
 		srand($ns);
 	}	
 }
+
+?>
