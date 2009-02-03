@@ -2,6 +2,8 @@
 //IMathAS:  IMathAS question interpreter.  Defines how the IMathAS question
 //language works.
 //(c) 2006 David Lippman
+
+//TODO:  handle for ($i=0..2) { to handle expressions, array var, etc. for 0 and 2
 /*require_once("mathphp.php");
 array_push($allowedmacros,"loadlibrary","array","where");
 $disallowedwords = array("exit","die");
@@ -36,38 +38,50 @@ function interpretline($str) {
 	$whereloc = -1;
 	$lastsym = '';
 	$lasttype = -1;
-	$closeparens = false;
+	$closeparens = 0;
 	$symcnt = 0;
+	//get tokens from tokenizer
 	$syms = tokenize($str);
 	$k = 0;
 	$symlen = count($syms);
+	//$lines holds lines of code; $bits holds symbols for the current line. 
 	while ($k<$symlen) {
-		list($sym,$type) = $syms[$k];//getsymbol($str,$i);
+		list($sym,$type) = $syms[$k];
 		//first handle stuff that would use last symbol; add it if not needed
-		if ($sym=='^' && $lastsym!='') {
+		if ($sym=='^' && $lastsym!='') { //found a ^: convert a^b to safepow(a,b)
 			$bits[] = 'safepow(';
 			$bits[] = $lastsym;
 			$bits[] = ',';
 			$k++;
-			list($sym,$type) = $syms[$k];//getsymbol($str,$i);
-			$closeparens = true;
+			list($sym,$type) = $syms[$k];
+			$closeparens++;  //triggers to close safepow after next token
 			$lastsym='^';
 			$lasttype = 0;
-		} else if ($sym=='!' && $lasttype!=0 && $lastsym!='' && $syms[$k+1]{0}!='=') {
+		} else if ($sym=='!' && $lasttype!=0 && $lastsym!='' && $syms[$k+1]{0}!='=') { 
+			//convert a! to factorial(a), avoiding if(!a) and a!=b
 			$bits[] = 'factorial(';
 			$bits[] = $lastsym;
 			$bits[] = ')';
 			$sym = '';
 		}  else {
-			$bits[] = $lastsym;	
+			//add last symbol to stack
+			if ($lasttype!=7 && $lasttype!=-1) {
+				$bits[] = $lastsym;
+			}
 		}
-		if ($closeparens==true && $lastsym!='^' && $lasttype!=0) {
-			$bits[] = ')';
-			$closeparens = false;
+		if ($closeparens>0 && $lastsym!='^' && $lasttype!=0) {
+			//close safepow.  lasttype!=0 to get a^-2 to include -
+			while ($closeparens>0) {
+				$bits[] = ')';
+				$closeparens--;
+			}
+			//$closeparens = false;
 		}
 		
 		
-		if ($sym=='=' && $ifloc==-1 && $whereloc==-1 && $lastsym!='<' && $lastsym!='>' && $lastsym!='!') {
+		if ($sym=='=' && $ifloc==-1 && $whereloc==-1 && $lastsym!='<' && $lastsym!='>' && $lastsym!='!' && $lastsym!='=' && $syms[$k+1]{0}!='=') {
+			//if equality equal (not comparison), and before if/where.
+			//check for commas to the left, convert $a,$b =  to list($a,$b) = 
 			$j = count($bits)-1;
 			$hascomma = false;
 			while ($j>=0) {
@@ -83,12 +97,14 @@ function interpretline($str) {
 				$hascomma = false;
 			}
 		} else if ($type==7) {//end of line
-			//$bits[] = $sym;
 			if ($lasttype=='7') {
+				//nothing exciting, so just continue
 				$k++;
 				continue;
 			}
+			//check for for, if, where and rearrange bits if needed
 			if ($forloc>-1) {
+				//convert for($i=a..b) {todo}
 				$j = $forloc; 
 				while ($bits[$j]{0}!='{' && $j<count($bits)) {
 					$j++;
@@ -96,35 +112,37 @@ function interpretline($str) {
 				$cond = implode('',array_slice($bits,$forloc+1,$j-$forloc-1));
 				$todo = implode('',array_slice($bits,$j));
 				//might be $a..$b or 3.*.4  (remnant of implicit handling)
-				if (preg_match('/^\s*\(\s*(\$\w+)\s*\=\s*(\d+|\$\w+)\s*\.\*?\.\s*(\d+|\$\w+)\s*\)\s*$/',$cond,$matches)) {
+				if (preg_match('/^\s*\(\s*(\$\w+)\s*\=\s*(\d+|\$\w+)\s*\.\*?\.\s*(\d+|\$\w+)\s*\)\s*$/',$cond,$matches) && $j<count($bits)) {
 					$forcond = array_slice($matches,1,3);
 					$bits = array( "for ({$forcond[0]}=intval({$forcond[1]});{$forcond[0]}<=round(floatval({$forcond[2]}),0);{$forcond[0]}++) ".$todo."");
 				} else {
-					print_r($bits);
-					echo 'error with for code.. must be for ($var=a..b) where a and b are whole numbers or variables only';
-					return array(array('',9));
+					echo 'error with for code.. must be "for ($var=a..b) {todo}" where a and b are whole numbers or variables only';
+					return 'error';
 				}
 			} else if ($ifloc == 0) {
+				//this is if at beginning of line, form:  if ($a==3) {todo}
 				$j = 0; 
 				while ($bits[$j]{0}!='{' && $j<count($bits)) {
 					$j++;
 				}
 				if ($j==count($bits)) {
 					echo "need curlys for if statement at beginning of line";
-					exit;
+					return 'error';
 				}
-				$cond = implode('',array_slice($bits,1,$j-2));
+				$cond = implode('',array_slice($bits,1,$j-1));
 				$todo = implode('',array_slice($bits,$j));
 				$bits = array("if ($cond) $todo");
 			} 
 			if ($whereloc>0) {
+				//handle $a = rand() where ($a==b)
 				if ($ifloc>-1 && $ifloc<$whereloc) {
 					echo 'line of type $a=b if $c==0 where $d==0 is invalid';
-					exit;
+					return 'error';
 				} 
 				$wheretodo = implode('',array_slice($bits,0,$whereloc));
 				
 				if ($ifloc>-1) {
+					//handle $a = rand() where ($a==b) if ($c==0)
 					$wherecond = implode('',array_slice($bits,$whereloc+1,$ifloc-$whereloc-1));
 					$ifcond = implode('',array_slice($bits,$ifloc+1));
 					$bits = array('if ('.$ifcond.') {$count=0;do{'.$wheretodo.';$count++;} while (!('.$wherecond.') && $count<200); if ($count==200) {echo "where not met in 200 iterations";}}');
@@ -135,6 +153,7 @@ function interpretline($str) {
 				
 				
 			} else if ($ifloc > 0) {
+				//handle $a = b if ($c==0)
 				$todo = implode('',array_slice($bits,0,$ifloc));
 				$cond = implode('',array_slice($bits,$ifloc+1));
 				
@@ -145,6 +164,7 @@ function interpretline($str) {
 			$forloc = -1;
 			$ifloc = -1;
 			$whereloc = -1;
+			//collapse bits to a line, add to lines array
 			$lines[] = implode('',$bits);
 			$bits = array();
 		} else if ($type==1) { //is var
@@ -153,19 +173,23 @@ function interpretline($str) {
 				$bits[] = '*';
 			}
 		} else if ($type==2) { //is func
+			//implicit $v sqrt(2) and 3 sqrt(3)
 			if ($lasttype==3 || $lasttype==1) {
 				$bits[] = '*';
 			}
 		} else if ($type==3) { //is num
+			//implicit 2 pi and $var pi
 			if ($lasttype==3 || $lasttype == 1) {
 				$bits[] = '*';
 			}
 			
 		} else if ($type==4) { //is parens
+			//implicit 3(4) (5)(3)  $v(2)
 			if ($lasttype==3 || $lasttype==4 || $lasttype==1) {
 				$bits[] = '*';
 			}
 		} else if ($type==8) { //is control
+			//mark location of control symbol
 			if ($sym=='if') {
 				$ifloc = count($bits);
 			} else if ($sym=='where') {
@@ -174,35 +198,45 @@ function interpretline($str) {
 				$forloc = count($bits);
 			}
 		} else if ($type==9) {//is error
+			//tokenizer returned an error token - exit current loop with error
 			return 'error';
+		} else if ($sym=='-' && $lastsym=='/') {
+			//paren 1/-2 to 1/(-2)
+			//avoid bug in PHP 4 where 1/-2*5 = -0.1 but 1/(-2)*5 = -2.5
+			$bits[] = '(';
+			$closeparens++;
 		}
+			
 		
 		$lastsym = $sym;
 		$lasttype = $type;
 		$cnt++;
 		$k++;
 	}
+	//if no explicit end-of-line at end of bits
 	if (count($bits)>0) {
 		$lines[] = implode('',$bits);
 	}
+	//collapse to string
 	return implode(';',$lines);
 }
 
 //get tokens
 //eat up extra whitespace at end
 //return array of arrays: array($symbol,$symtype)
-//types: 1 var, 2 funcname (w/ args), 3 num, 4 parens, 5 curlys, 6 string, 7 endofline, 8 control, 9 error, 0 other
+//types: 1 var, 2 funcname (w/ args), 3 num, 4 parens, 5 curlys, 6 string, 7 endofline, 8 control, 9 error, 0 other, 11 array index []
 function tokenize($str) {
 	global $allowedmacros;
 	global $mathfuncs;
 	global $disallowedwords,$disallowedvar;
 	$i = 0;
-	$connecttolast = false;
+	$connecttolast = 0;
 	$len = strlen($str);
 	$syms = array();
 	while ($i<$len) {
 		$intype = 0;
 		$out = '';
+		$lastc = $c;
 		$c = $str{$i};
 		$len = strlen($str);
 		if ($c=='/' && $str{$i+1}=='/') { //comment
@@ -221,6 +255,9 @@ function tokenize($str) {
 				if ($i==$len) {break;}
 				$c = $str{$i};
 			} while ($c>="a" && $c<="z" || $c>="A" && $c<="Z" || $c>='0' && $c<='9' || $c=='_');
+			if ($c=='[') {
+				$connecttolast = 1;
+			}
 			if (in_array($out,$disallowedvar)) {
 				echo "Eeek.. unallowed var $out!";
 				return array(array('',9));
@@ -249,34 +286,52 @@ function tokenize($str) {
 				while ($c==' ') {
 					$i++;
 					$c = $str{$i};
+				}    
+				if ($c=='^' && substr($str,$i+1,2)=='-1') {
+					$i += 3;
+					$out = 'arc'.$out;
+					$c = $str{$i};
+					while ($c==' ') {
+						$i++;
+						$c = $str{$i};
+					}
+				} else if ($c=='^' && substr($str,$i+1,4)=='(-1)') {
+					$i += 3;
+					$out = 'arc'.$out;
+					$c = $str{$i};
+					while ($c==' ') {
+						$i++;
+						$c = $str{$i};
+					}
 				}
 				if ($c=='(' && $out!='e' && $out!='pi') {
 					if ($out=='log') {
 						$out = 'log10';
 					} else if ($out=='ln') {
 						$out = 'log';
-					}
-					$out = str_replace(array("arcsin","arccos","arctan","arcsinh","arccosh","arctanh"),array("asin","acos","atan","asinh","acosh","atanh"),$out);
-	  
-					//list($i,$sym,$type) = getsymbol($str,$i);
-					//$out .= $sym;
-					$connecttolast = true;
-				} else {
-					if ($c=='^' && substr($str,$i+1,2)=='-1') {
-						$i += 3;
-						$out = 'a'.$out;
-					} else if ($c=='^' && substr($str,$i+1,4)=='(-1)') {
-						$i += 5;
-						$out = 'a'.$out;
 					} else {
 						if (!in_array($out,$allowedmacros)) {
 							echo "Eeek.. unallowed macro {$out}";
 							return array(array('',9));
 						}
 					}
+					$out = str_replace(array("arcsin","arccos","arctan","arcsinh","arccosh","arctanh"),array("asin","acos","atan","asinh","acosh","atanh"),$out);
+	  
+					//list($i,$sym,$type) = getsymbol($str,$i);
+					//$out .= $sym;
+					$connecttolast = 2;
+				} else {
+					if ($out=='true' || $out=='false' || $out=='null') {
+						//we like this
+					} else if (isset($GLOBALS['teacherid'])) {
+						echo "Warning... unquoted string $out.. treating as string";
+						$out = "'$out'";
+						$intype = 6;
+					}
+					
 				}
 			}
-		} else if (($c>='0' && $c<='9') || ($c=='.' &&($str{$i+1}>='0' && $str{$i+1}<='9')) ) { //is num
+		} else if (($c>='0' && $c<='9') || ($c=='.' && $lastc!='.' && ($str{$i+1}>='0' && $str{$i+1}<='9')) ) { //is num
 			$intype = 3; //number
 			$cont = true;
 			do {
@@ -285,7 +340,7 @@ function tokenize($str) {
 				$i++;
 				if ($i==$len) {break;}
 				$c= $str{$i};
-				if (($c>='0' && $c<='9') || ($c=='.' && $lastc!='.')) {
+				if (($c>='0' && $c<='9') || ($c=='.' && $str{$i+1}!='.' && $lastc!='.')) {
 					//is still num
 				} else if ($c=='e' || $c=='E') {
 					$d = $str{$i+1};
@@ -306,7 +361,7 @@ function tokenize($str) {
 					$cont = false;
 				}	
 			} while ($cont);
-		} else if ($c=='(' || $c=='{') { //parens or curlys
+		} else if ($c=='(' || $c=='{' || $c=='[') { //parens or curlys
 			if ($c=='(') {
 				$intype = 4; //parens
 				$leftb = '(';
@@ -315,6 +370,10 @@ function tokenize($str) {
 				$intype = 5; //curlys
 				$leftb = '{';
 				$rightb = '}';
+			} else if ($c=='[') {
+				$intype = 11; //array index brackets
+				$leftb = '[';
+				$rightb = ']';
 			}
 			$thisn = 1;
 			$inq = false;
@@ -386,11 +445,16 @@ function tokenize($str) {
 			if ($i==$len) {break;}
 			$c = $str{$i};
 		}
-		if ($connecttolast && $intype!=2) {
+		if ($connecttolast>0 && $intype!=$connecttolast) {
 			$syms[count($syms)-1][0] .= $out;
-			$connecttolast = false;
+			$connecttolast = 0;
+			if ($c=='[') {
+				$connecttolast = 1;
+			}
 		} else {
-			$syms[] =  array($out,$intype);
+			if ($intype!=7 || $syms[count($syms)-1][1]!=7) {
+				$syms[] =  array($out,$intype);
+			}
 		}
 		
 	}
