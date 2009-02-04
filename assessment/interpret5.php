@@ -8,6 +8,7 @@
 array_push($allowedmacros,"loadlibrary","array","off","true","false","e","pi","null","setseed","if","for","where");
 $disallowedvar = array('$link','$qidx','$qnidx','$seed','$qdata','$toevalqtxt','$la','$GLOBALS','$laparts','$anstype','$kidx','$iidx','$tips','$options','$partla','$partnum','$score');
 
+//main interpreter function.  Returns PHP code string, or HTML if blockname==qtext
 function interpret($blockname,$anstype,$str)
 {
 	if ($blockname=="qtext") {
@@ -25,6 +26,7 @@ function interpret($blockname,$anstype,$str)
 	}
 }
 
+//interpreter some code text.  Returns a PHP code string.
 function interpretline($str) {
 	$str .= ';';
 	$bits = array();
@@ -247,15 +249,18 @@ function tokenize($str) {
 			$intype = 7;
 		} else if ($c=='$') { //is var
 			$intype = 1;
+			//read to end of var
 			do {
 				$out .= $c;
 				$i++;
 				if ($i==$len) {break;}
 				$c = $str{$i};
 			} while ($c>="a" && $c<="z" || $c>="A" && $c<="Z" || $c>='0' && $c<='9' || $c=='_');
+			//if [ then array ref - read and connect as part of variable token
 			if ($c=='[') {
 				$connecttolast = 1;
 			}
+			//check if allowed var
 			if (in_array($out,$disallowedvar)) {
 				echo "Eeek.. unallowed var $out!";
 				return array(array('',9));
@@ -269,6 +274,7 @@ function tokenize($str) {
 				if ($i==$len) {break;}
 				$c = $str{$i};
 			} while ($c>="a" && $c<="z" || $c>="A" && $c<="Z" || $c>='0' && $c<='9' || $c=='_');
+			//check if it's a special word, and set type appropriately if it is
 			if ($out=='if' || $out=='where' || $out=='for') {
 				$intype = 8;
 			} else if ($out=='e') {
@@ -281,10 +287,12 @@ function tokenize($str) {
 				$out = '"userid"';
 				$intype = 6;
 			} else {
+				//eat whitespace
 				while ($c==' ') {
 					$i++;
 					$c = $str{$i};
 				}    
+				//could be sin^-1 or sin^(-1) - check for them and rewrite if needed
 				if ($c=='^' && substr($str,$i+1,2)=='-1') {
 					$i += 3;
 					$out = 'arc'.$out;
@@ -302,26 +310,32 @@ function tokenize($str) {
 						$c = $str{$i};
 					}
 				}
+				//if there's a ( then it's a function
 				if ($c=='(' && $out!='e' && $out!='pi') {
+					//rewrite logs
 					if ($out=='log') {
 						$out = 'log10';
 					} else if ($out=='ln') {
 						$out = 'log';
 					} else {
+						//check it's and OK function
 						if (!in_array($out,$allowedmacros)) {
 							echo "Eeek.. unallowed macro {$out}";
 							return array(array('',9));
 						}
 					}
+					//rewrite arctrig into atrig for PHP
 					$out = str_replace(array("arcsin","arccos","arctan","arcsinh","arccosh","arctanh"),array("asin","acos","atan","asinh","acosh","atanh"),$out);
 	  
-					//list($i,$sym,$type) = getsymbol($str,$i);
-					//$out .= $sym;
+					//connect upcoming parens to function
 					$connecttolast = 2;
 				} else {
+					//not a function, so what is it?
 					if ($out=='true' || $out=='false' || $out=='null') {
-						//we like this
+						//we like this - it's an acceptable unquoted string
 					} else if (isset($GLOBALS['teacherid'])) {
+						//an unquoted string!  give a warning to instructor, 
+						//but treat as a quoted string.
 						echo "Warning... unquoted string $out.. treating as string";
 						$out = "'$out'";
 						$intype = 6;
@@ -341,6 +355,7 @@ function tokenize($str) {
 				if (($c>='0' && $c<='9') || ($c=='.' && $str{$i+1}!='.' && $lastc!='.')) {
 					//is still num
 				} else if ($c=='e' || $c=='E') {
+					//might be scientific notation:  5e6 or 3e-6 
 					$d = $str{$i+1};
 					if ($d>='0' && $d<='9') {
 						$out .= $c;
@@ -378,24 +393,29 @@ function tokenize($str) {
 			$j = $i+1;
 			$len = strlen($str);
 			while ($j<$len) {
+				//read terms until we get to right bracket at same nesting level
+				//we have to avoid strings, as they might contain unmatched brackets
 				$d = $str{$j};
-				if ($inq) {
+				if ($inq) {  //if inquote, leave if same marker (not escaped)
 					if ($d==$qtype && $str{$j-1}!='\\') {
 						$inq = false;
 					}
 				} else {
 					if ($d=='"' || $d=="'") {
-						$inq = true;
+						$inq = true; //entering quotes
 						$qtype = $d;
 					} else if ($d==$leftb) {
-						$thisn++;
+						$thisn++;  //increase nesting depth
 					} else if ($d==$rightb) {
-						$thisn--;
+						$thisn--; //decrease nesting depth
 						if ($thisn==0) {
+							//read inside of brackets, send recursively to interpreter
 							$inside = interpretline(substr($str,$i+1,$j-$i-1));
 							if ($inside=='error') {
+								//was an error, return error token
 								return array(array('',9));
 							}
+							//if curly, make sure we have a ; 
 							if ($rightb=='}') {
 								$out .= $leftb.$inside.';'.$rightb;
 							} else {
@@ -430,14 +450,17 @@ function tokenize($str) {
 			$i++;
 			$c = $str{$i};
 		} else if ($c=="\n") {
+			//end of line
 			$intype = 7;
 			$i++;
 			$c = $str{$i};
 		} else if ($c==';') {
+			//end of line
 			$intype = 7;
 			$i++;
 			$c = $str{$i};
 		} else {
+			//no type - just append string.  Could be operators
 			$out .= $c;
 			$i++;
 			$c = $str{$i};
@@ -447,18 +470,22 @@ function tokenize($str) {
 			if ($i==$len) {break;}
 			$c = $str{$i};
 		}
+		//if parens or array index needs to be connected to func/var, do it
 		if ($connecttolast>0 && $intype!=$connecttolast) {
+			//if func is loadlibrary, need to do so now so allowedmacros
+			//will be expanded before reading the rest of the code
 			if ($syms[count($syms)-1][0] == "loadlibrary") {
 				loadlibrary(substr($out,1,strlen($out)-2));
 				array_pop($syms);
 			} else {
 				$syms[count($syms)-1][0] .= $out;
 				$connecttolast = 0;
-				if ($c=='[') {
+				if ($c=='[') {// multidim array ref?
 					$connecttolast = 1;
 				}
 			}
 		} else {
+			//add to symbol list, avoid repeat end-of-lines.
 			if ($intype!=7 || $syms[count($syms)-1][1]!=7) {
 				$syms[] =  array($out,$intype);
 			}
@@ -468,7 +495,7 @@ function tokenize($str) {
 	return $syms;
 }
 
-		
+//loads a macro library	
 function loadlibrary($str) {
 	$str = str_replace(array("/",".",'"'),"",$str);
 	$libs = explode(",",$str);
@@ -482,6 +509,7 @@ function loadlibrary($str) {
 	}
 }
 
+//sets question seed
 function setseed($ns) {
 	if ($ns=="userid") {
 		if (isset($GLOBALS['teacherid']) && isset($GLOBALS['teacherreview'])) { //reviewing in gradebook
