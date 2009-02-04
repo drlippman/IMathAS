@@ -236,7 +236,6 @@ function tokenize($str) {
 	while ($i<$len) {
 		$intype = 0;
 		$out = '';
-		$lastc = $c;
 		$c = $str{$i};
 		$len = strlen($str);
 		if ($c=='/' && $str{$i+1}=='/') { //comment
@@ -343,9 +342,13 @@ function tokenize($str) {
 					
 				}
 			}
-		} else if (($c>='0' && $c<='9') || ($c=='.' && $lastc!='.' && ($str{$i+1}>='0' && $str{$i+1}<='9')) ) { //is num
+		} else if (($c>='0' && $c<='9') || ($c=='.'  && ($str{$i+1}>='0' && $str{$i+1}<='9')) ) { //is num
 			$intype = 3; //number
 			$cont = true;
+			//handle . 3 which needs to act as concat
+			if (count($syms)>0 && $syms[count($syms)-1][0]=='.') {
+				$syms[count($syms)-1][0] .= ' ';
+			}
 			do {
 				$out .= $c;
 				$lastc = $c;
@@ -415,8 +418,9 @@ function tokenize($str) {
 								//was an error, return error token
 								return array(array('',9));
 							}
-							//if curly, make sure we have a ; 
-							if ($rightb=='}') {
+							//if curly, make sure we have a ;, unless preceeded by a $ which
+							//would be a variable variable
+							if ($rightb=='}' && count($syms)>0 && $syms[count($syms)-1][0]!='$') {
 								$out .= $leftb.$inside.';'.$rightb;
 							} else {
 								$out .= $leftb.$inside.$rightb;
@@ -425,7 +429,7 @@ function tokenize($str) {
 							break;
 						}
 					} else if ($d=="\n") {
-						echo "unmatched parens/brackets - likely will cause an error";
+						//echo "unmatched parens/brackets - likely will cause an error";
 					}
 				}
 				$j++;
@@ -469,6 +473,9 @@ function tokenize($str) {
 			$i++;
 			if ($i==$len) {break;}
 			$c = $str{$i};
+			if ($c=='.' && $intype==3) {//if 3 . needs space to act like concat
+				$out .= ' ';
+			}
 		}
 		//if parens or array index needs to be connected to func/var, do it
 		if ($connecttolast>0 && $intype!=$connecttolast) {
