@@ -4,13 +4,11 @@
 //(c) 2006 David Lippman
 
 //TODO:  handle for ($i=0..2) { to handle expressions, array var, etc. for 0 and 2
-/*require_once("mathphp.php");
-array_push($allowedmacros,"loadlibrary","array","where");
-$disallowedwords = array("exit","die");
+//require_once("mathphp.php");
+array_push($allowedmacros,"loadlibrary","array","off","true","false","e","pi","null","setseed","if","for","where");
 $disallowedvar = array('$link','$qidx','$qnidx','$seed','$qdata','$toevalqtxt','$la','$GLOBALS','$laparts','$anstype','$kidx','$iidx','$tips','$options','$partla','$partnum','$score');
-*/
-array_push($allowedmacros,"off","true","false","e","pi","null","setseed","if","for","where");
-function interpret5($blockname,$anstype,$str)
+
+function interpret($blockname,$anstype,$str)
 {
 	if ($blockname=="qtext") {
 		$str = str_replace('"','\"',$str);
@@ -23,7 +21,7 @@ function interpret5($blockname,$anstype,$str)
 		$str = str_replace("\r\n","\n",$str);
 		$str = str_replace("&&\n","<br/>",$str);
 		$str = str_replace("&\n"," ",$str);
-		return interpretline($str.';');	
+		return interpretline($str.';').';';	
 	}
 }
 
@@ -158,7 +156,7 @@ function interpretline($str) {
 				$cond = implode('',array_slice($bits,$ifloc+1));
 				
 				
-				$bits = array("if ($cond) { $todo }");	
+				$bits = array("if ($cond) { $todo ; }");	
 			}
 			
 			$forloc = -1;
@@ -168,8 +166,8 @@ function interpretline($str) {
 			$lines[] = implode('',$bits);
 			$bits = array();
 		} else if ($type==1) { //is var
-			//implict 3$a and $a $b
-			if ($lasttype==3 || $lasttype==1) {
+			//implict 3$a and $a $b and (3-4)$a
+			if ($lasttype==3 || $lasttype==1 || $lasttype==4) {
 				$bits[] = '*';
 			}
 		} else if ($type==2) { //is func
@@ -398,7 +396,11 @@ function tokenize($str) {
 							if ($inside=='error') {
 								return array(array('',9));
 							}
-							$out .= $leftb.$inside.$rightb;
+							if ($rightb=='}') {
+								$out .= $leftb.$inside.';'.$rightb;
+							} else {
+								$out .= $leftb.$inside.$rightb;
+							}
 							$i= $j+1;
 							break;
 						}
@@ -446,10 +448,15 @@ function tokenize($str) {
 			$c = $str{$i};
 		}
 		if ($connecttolast>0 && $intype!=$connecttolast) {
-			$syms[count($syms)-1][0] .= $out;
-			$connecttolast = 0;
-			if ($c=='[') {
-				$connecttolast = 1;
+			if ($syms[count($syms)-1][0] == "loadlibrary") {
+				loadlibrary(substr($out,1,strlen($out)-2));
+				array_pop($syms);
+			} else {
+				$syms[count($syms)-1][0] .= $out;
+				$connecttolast = 0;
+				if ($c=='[') {
+					$connecttolast = 1;
+				}
 			}
 		} else {
 			if ($intype!=7 || $syms[count($syms)-1][1]!=7) {
@@ -461,7 +468,7 @@ function tokenize($str) {
 	return $syms;
 }
 
-/*		
+		
 function loadlibrary($str) {
 	$str = str_replace(array("/",".",'"'),"",$str);
 	$libs = explode(",",$str);
@@ -474,7 +481,7 @@ function loadlibrary($str) {
 		}
 	}
 }
-*/
+
 function setseed($ns) {
 	if ($ns=="userid") {
 		if (isset($GLOBALS['teacherid']) && isset($GLOBALS['teacherreview'])) { //reviewing in gradebook
