@@ -233,6 +233,7 @@ function tokenize($str) {
 	$connecttolast = 0;
 	$len = strlen($str);
 	$syms = array();
+	$lastsym = array('',-1);
 	while ($i<$len) {
 		$intype = 0;
 		$out = '';
@@ -346,7 +347,7 @@ function tokenize($str) {
 			$intype = 3; //number
 			$cont = true;
 			//handle . 3 which needs to act as concat
-			if (count($syms)>0 && $syms[count($syms)-1][0]=='.') {
+			if ($lastsym[0]=='.') {
 				$syms[count($syms)-1][0] .= ' ';
 			}
 			do {
@@ -420,7 +421,7 @@ function tokenize($str) {
 							}
 							//if curly, make sure we have a ;, unless preceeded by a $ which
 							//would be a variable variable
-							if ($rightb=='}' && count($syms)>0 && $syms[count($syms)-1][0]!='$') {
+							if ($rightb=='}' && $lastsym[0]!='$') {
 								$out .= $leftb.$inside.';'.$rightb;
 							} else {
 								$out .= $leftb.$inside.$rightb;
@@ -481,9 +482,10 @@ function tokenize($str) {
 		if ($connecttolast>0 && $intype!=$connecttolast) {
 			//if func is loadlibrary, need to do so now so allowedmacros
 			//will be expanded before reading the rest of the code
-			if ($syms[count($syms)-1][0] == "loadlibrary") {
+			if ($lastsym[0] == "loadlibrary") {
 				loadlibrary(substr($out,1,strlen($out)-2));
 				array_pop($syms);
+				$connecttolast = 0;
 			} else {
 				$syms[count($syms)-1][0] .= $out;
 				$connecttolast = 0;
@@ -493,7 +495,8 @@ function tokenize($str) {
 			}
 		} else {
 			//add to symbol list, avoid repeat end-of-lines.
-			if ($intype!=7 || $syms[count($syms)-1][1]!=7) {
+			if ($intype!=7 || $lastsym[1]!=7) {
+				$lastsym = array($out,$intype);
 				$syms[] =  array($out,$intype);
 			}
 		}
