@@ -1310,7 +1310,7 @@ A question is formed in several parts:
 <div class=h2>
 <h2><a name="basiccontrolsyntax">Basic Control Syntax</a></h2>
 <p>
-Lines of the common control, question control, and answer sections take the form of variable
+Lines of the common control, question control, and answer sections usually take the form of variable
 definition.  In IMathAS, variables are identified with a dollarsign ($) prefix.  For example,
 $a is the variable a.  Most lines will take one of these forms:
 <ul>
@@ -1377,6 +1377,8 @@ $a = rand(0,1)
 $b = &quot;sin(x)&quot; if ($a==0)
 $b = &quot;cos(x)&quot; if ($a==1)
 </pre>
+</p>
+<p>
 Note the use of double equal signs (==) for testing equality.  A single equal sign (=) will
 make an assignment (change the value of $a in this example) and return &quot;true&quot;.  
 <p>
@@ -1394,6 +1396,27 @@ To do compound conditionals, use || for &quot;or&quot;, and &amp;&amp; for &quot
 $a = nonzerorand(-9,9) where ($a!=1 &amp;&amp; $a!=-1)
 </pre>
 </p>
+<p>
+The &quot;if&quot; condition can also be used before or after a code block like this:
+<pre>
+$a = rand(0,1)
+if ($a==0) {
+   $b = 1
+   $c = 2
+}
+{
+   $b = 1
+   $c = 3
+} if ($a==1)
+</pre>
+&quot;where&quot; can also be applied to a block of code:
+<pre>
+{ 
+  $a = rand(-5,-1)
+  $b = rand(1,5)
+} where ($a+$b !==0)
+</pre>
+</p>
 </div>
 <div class=h4>
 <h4><a name="loops">Loops</a></h4>
@@ -1401,7 +1424,9 @@ $a = nonzerorand(-9,9) where ($a!=1 &amp;&amp; $a!=-1)
 there is a "for" loop:</p>
 
 <pre>for ($i=a..b) { action }</pre>
-
+<p>
+Here <i>a</i> and <i>b</i> represent whole numbers or variables.  Expressions are not allowed. 
+</p>
 <p>Examples:
 <pre>
 $f = 0
@@ -1409,12 +1434,15 @@ for ($i=1..5) { $f = $f + $i }
 
 $a = rands(1,5,5)
 $b = rands(1,5,5)
-for ($i=0..4) {$c[$i] = $a[$i]*$b[$i] }
+for ($i=0..4) {
+  $c[$i] = $a[$i]*$b[$i] 
+}
 </pre></p>
 
-<p>Conditions can be used <i>inside</i> a for loop, but not outside.  
+<p>Conditions can be used <i>inside</i> a for loop, but not outside without explicit blocking
 <pre>for ($i=1..5) {$a = $a+$i if ($i>2) }     WORKS
 for ($i=1..5) {$a = $a+$i} if ($a>2)     DOES NOT WORK
+{for ($i=1..5) {$a = $a+$i} } if ($a>2)    WORKS
 </pre>
 </p>
 </div>
@@ -1422,7 +1450,7 @@ for ($i=1..5) {$a = $a+$i} if ($a>2)     DOES NOT WORK
 <div class=h2>
 <p>Note on macros:  The descriptions below explain macros available and the arguments the
 functions should be called with.  arguments in [square brackets] are optional arguments, and
-can be omitted</p>
+can be omitted.</p>
 <h2><a name="randomizers">Randomizers</a></h2>
 
 Single result randomizers:
