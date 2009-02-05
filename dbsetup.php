@@ -134,7 +134,7 @@ $sql = 'CREATE TABLE `imas_students` ('
         . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
         . ' `userid` INT(10) UNSIGNED NOT NULL DEFAULT \'0\', '
         . ' `courseid` INT(10) UNSIGNED NOT NULL DEFAULT \'0\', '
-	. ' `section` VARCHAR(10) NULL, '
+	. ' `section` VARCHAR(40) NULL, '
 	. ' `code` SMALLINT(4) UNSIGNED NULL, '
 	. ' `gbcomment` TEXT NOT NULL, '
 	. ' `gbinstrcomment` TEXT NOT NULL, '
@@ -158,7 +158,18 @@ $sql = 'CREATE TABLE `imas_teachers` ('
         . ' COMMENT = \'Which courses each teacher is teaching\';';
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 echo 'imas_teachers created<br/>';
-	
+
+$sql = 'CREATE TABLE `imas_tutors` ('
+	. '`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
+	. '`userid` INT(10) UNSIGNED NOT NULL, '
+	. '`courseid` INT(10) UNSIGNED NOT NULL, '
+	. '`section` VARCHAR(40) NOT NULL, '
+	. 'INDEX (`userid`, `courseid`) '
+	. ' ) TYPE = innodb '
+	. 'COMMENT = \'course tutors\'';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+echo 'imas_tutors created<br/>';
+
 $sql = 'CREATE TABLE `imas_courses` ('
         . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
 	. ' `ownerid` INT(10) UNSIGNED NOT NULL DEFAULT \'0\', '

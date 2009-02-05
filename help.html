@@ -1420,6 +1420,9 @@ for ($i=1..5) {$a = $a+$i} if ($a>2)     DOES NOT WORK
 </div>
 </div>
 <div class=h2>
+<p>Note on macros:  The descriptions below explain macros available and the arguments the
+functions should be called with.  arguments in [square brackets] are optional arguments, and
+can be omitted</p>
 <h2><a name="randomizers">Randomizers</a></h2>
 
 Single result randomizers:
@@ -1481,11 +1484,12 @@ The following macros help with display:
 <li><b>prettytime(value,informat,outformat)</b>:  Creates a nice representation of a time.  Informat can be 'h', 'm', or 's' designating whether
     value is hours, minutes, or seconds.  Outformat can be any combination of these to specify output.  For example, 'hm' will return "__ hours and __ minutes".  Outformat
     can also be 'clock' which returns 3:42pm, or 'sclock' which returns 3:42:15pm</li>
-<li><b>dispreducedfraction(numerator,denominator)</b>:  Takes two numbers as numerator and denominator of a fraction, returning a display form of the fraction,
-    reduced to lowest terms.  Suitable for $showanswer</li>
-<li><b>makereducedfraction(numerator,denominator)</b>:  Same as dispreducefraction, but not already in display form</li>
-<li><b>showarrays(string,array,[string,array]...)</b>:  Creates a tabular display of the data in the array(s) as column(s), with the strings
-    as column headers</li>
+<li><b>dispreducedfraction(numerator,denominator,[doubleslash])</b>:  Takes two numbers as numerator and denominator of a fraction, returning a display form of the fraction,
+    reduced to lowest terms.  Suitable for $showanswer.  Set doubleslash to true to produced "3//4" rather than "3/4".</li>
+<li><b>makereducedfraction(numerator,denominator,[doubleslash])</b>:  Same as dispreducefraction, but not already in display form</li>
+<li><b>showarrays(string,array,[string,array]...,[format])</b>:  Creates a tabular display of the data in the array(s) as column(s), with the strings
+    as column headers.  format = "c", "r", or "l" to center, left-align, or right align data. Alternatively you can call this function with arguments
+    showarrays(array of column headers, array of data arrays, [format]).</li>
 <li><b>showdataarray(array,[columns])</b>:  Creates a tabular display of the data in the array with no headers.  Data is presented
     in one column unless second argument is provided, in which case the data will be distributed over the specified number of columns.</li>
 <li><b>horizshowarrays(string,array,[string,array]...)</b>:  Creates a tabular display of the data in the array(s) as row(s), with the strings

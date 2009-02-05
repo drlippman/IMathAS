@@ -148,7 +148,7 @@ function gbtable() {
 	} else {
 		$hascode = false;
 	}
-	if ($hassection) {
+	if ($hassection && !$isdiag) {
 		$gb[0][0][] = "Section";
 	}
 	if ($hascode) {
@@ -612,7 +612,7 @@ function gbtable() {
 		} else {
 			$gb[$ln][0][1] = $line['SID'];
 		}
-		if ($hassection) {
+		if ($hassection && !$isdiag) {
 			$gb[$ln][0][] = $line['section'];
 		}
 		if ($hascode) {

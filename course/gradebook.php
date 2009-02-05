@@ -23,7 +23,10 @@ $cid = $_GET['cid'];
 if (isset($teacherid)) {
 	$isteacher = true;
 } 
-if ($isteacher) {
+if (isset($tutorid)) {
+	$istutor = true;
+}
+if ($isteacher || $istutor) {
 	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
 		$gbmode = $_GET['gbmode'];
 		$sessiondata[$cid.'gbmode'] = $gbmode;
@@ -44,14 +47,18 @@ if ($isteacher) {
 	} else {
 		$catfilter = -1;
 	}
-	if (isset($_GET['secfilter'])) {
-		$secfilter = $_GET['secfilter'];
-		$sessiondata[$cid.'secfilter'] = $secfilter;
-		writesessiondata();
-	} else if (isset($sessiondata[$cid.'secfilter'])) {
-		$secfilter = $sessiondata[$cid.'secfilter'];
+	if (isset($tutorsection) && $tutorsection!='') {
+		$secfilter = $tutorsection;
 	} else {
-		$secfilter = -1;
+		if (isset($_GET['secfilter'])) {
+			$secfilter = $_GET['secfilter'];
+			$sessiondata[$cid.'secfilter'] = $secfilter;
+			writesessiondata();
+		} else if (isset($sessiondata[$cid.'secfilter'])) {
+			$secfilter = $sessiondata[$cid.'secfilter'];
+		} else {
+			$secfilter = -1;
+		}
 	}
 	//Gbmode : Links NC Dates
 	$totonleft = floor($gbmode/1000)%10 ; //0 right, 1 left
@@ -70,7 +77,7 @@ if ($isteacher) {
 	$totonleft = 0;
 }
 
-if ($isteacher && isset($_GET['stu'])) {
+if (($isteacher || $istutor) && isset($_GET['stu'])) {
 	$stu = $_GET['stu'];
 } else {
 	$stu = 0;
@@ -104,7 +111,7 @@ require("gbtable2.php");
 require("../includes/htmlutil.php");
 
 $placeinhead = '';
-if ($isteacher) {
+if ($isteacher || $istutor) {
 	$placeinhead .= "<script type=\"text/javascript\">";
 	$placeinhead .= 'function chgfilter() { ';
 	$placeinhead .= '       var cat = document.getElementById("filtersel").value; ';
@@ -141,8 +148,8 @@ if ($isteacher) {
 	$placeinhead .= "</script>";
 }
 
-if (!$isteacher || $stu!=0) { //show student view
-	if (!$isteacher) {
+if (isset($studentid) || $stu!=0) { //show student view
+	if (isset($studentid)) {
 		$stu = $userid;
 	}
 	$pagetitle = "Gradebook";
@@ -153,7 +160,7 @@ if (!$isteacher || $stu!=0) { //show student view
 	if (isset($_GET['from']) && $_GET['from']=="listusers") {
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 		echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt Student Grade Detail</div>\n";
-	} else if ($isteacher) {
+	} else if ($isteacher || $istutor) {
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 		echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; Student Detail</div>";
 	} else {
@@ -165,7 +172,7 @@ if (!$isteacher || $stu!=0) { //show student view
 	} else {
 		echo "<h2>Grade Book Student Detail </h2>\n";
 	}
-	if ($isteacher) {
+	if ($isteacher || $istutor) {
 		echo "<div class=cpmid>";
 		echo 'Category: <select id="filtersel" onchange="chgfilter()">';
 		echo '<option value="-1" ';
@@ -348,7 +355,7 @@ if (!$isteacher || $stu!=0) { //show student view
 }
 
 function gbstudisp($stu) {
-	global $hidenc,$cid,$gbmode,$availshow,$isdiag,$isteacher,$catfilter,$imasroot;
+	global $hidenc,$cid,$gbmode,$availshow,$isdiag,$isteacher,$istutor,$catfilter,$imasroot;
 	if ($availshow==3) {
 		$availshow=1;
 		$hidepast = true;
@@ -397,7 +404,7 @@ function gbstudisp($stu) {
 	echo '</tr></thead><tbody>';
 	if ($catfilter>-2) {
 		for ($i=0;$i<count($gbt[0][1]);$i++) { //assessment headers
-			if (!$isteacher && $gbt[0][1][$i][4]==0) { //skip if hidden 
+			if (!$isteacher && !$istutor && $gbt[0][1][$i][4]==0) { //skip if hidden 
 				continue;
 			}
 			if ($hidenc==1 && $gbt[0][1][$i][4]==0) { //skip NC
@@ -431,7 +438,7 @@ function gbstudisp($stu) {
 			echo '</td><td>';
 			$haslink = false;
 			
-			if ($isteacher || $gbt[1][1][$i][2]==1) { //show link
+			if ($isteacher || $istutor || $gbt[1][1][$i][2]==1) { //show link
 				if ($gbt[0][1][$i][6]==0) {//online
 					if ($stu==-1) { //in averages
 						if (isset($gbt[1][1][$i][0])) { //has score
@@ -478,7 +485,7 @@ function gbstudisp($stu) {
 			if ($haslink) { //show link
 				echo '</a>';
 			}
-			if ($isteacher && isset($gbt[1][1][$i][6]) ) {
+			if (($isteacher || $istutor) && isset($gbt[1][1][$i][6]) ) {
 				echo '<sup>e</sup></span>';
 			}
 			if (isset($gbt[1][1][$i][5]) && ($gbt[1][1][$i][5]&(1<<$availshow)) && !$hidepast) {
@@ -595,7 +602,8 @@ function gbstudisp($stu) {
 }
 
 function gbinstrdisp() {
-	global $hidenc,$isteacher,$cid,$gbmode,$stu,$availshow,$isdiag,$catfilter,$secfilter,$totonleft,$imasroot;
+	global $hidenc,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot;
+	
 	if ($availshow==3) {
 		$availshow=1;
 		$hidepast = true;
@@ -609,13 +617,14 @@ function gbinstrdisp() {
 	for ($i=0;$i<count($gbt[0][0]);$i++) { //biographical headers
 		if ($i==1 && $gbt[0][0][1]!='ID') { continue;}
 		echo '<th>'.$gbt[0][0][$i];
-		if ($gbt[0][0][$i]=='Section') {
+		if ($gbt[0][0][$i]=='Section' && (!$istutor || $tutorsection=='')) {
 			echo "<br/><select id=\"secfiltersel\" onchange=\"chgsecfilter()\"><option value=\"-1\" ";
 			if ($secfilter==-1) {echo  'selected=1';}
 			echo  '>All</option>';
 			$query = "SELECT DISTINCT section FROM imas_students WHERE courseid='$cid' ORDER BY section";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			while ($row = mysql_fetch_row($result)) {
+				if ($row[0]=='') { continue;}
 				echo  "<option value=\"{$row[0]}\" ";
 				if ($row[0]==$secfilter) {
 					echo  'selected=1';
@@ -661,7 +670,7 @@ function gbinstrdisp() {
 	}
 	if ($catfilter>-2) {
 		for ($i=0;$i<count($gbt[0][1]);$i++) { //assessment headers
-			if (!$isteacher && $gbt[0][1][$i][4]==0) { //skip if hidden 
+			if (!$isteacher && !$istutor && $gbt[0][1][$i][4]==0) { //skip if hidden 
 				continue;
 			}
 			if ($hidenc==1 && $gbt[0][1][$i][4]==0) { //skip NC
@@ -689,13 +698,13 @@ function gbinstrdisp() {
 				echo ' (PT)';
 			}
 			//links
-			if ($gbt[0][1][$i][6]==0) { //online
+			if ($gbt[0][1][$i][6]==0 && $isteacher) { //online
 				echo "<br/><a class=small href=\"addassessment.php?id={$gbt[0][1][$i][7]}&cid=$cid&from=gb\">[Settings]</a>";
 				echo "<br/><a class=small href=\"isolateassessgrade.php?cid=$cid&aid={$gbt[0][1][$i][7]}\">[Isolate]</a>";
-			} else if ($gbt[0][1][$i][6]==1) { //offline
+			} else if ($gbt[0][1][$i][6]==1  && $isteacher) { //offline
 				echo "<br/><a class=small href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$i][7]}\">[Settings]</a>";
 				echo "<br/><a class=small href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$i][7]}&isolate=true\">[Isolate]</a>";
-			} else if ($gbt[0][1][$i][6]==2) { //discussion
+			} else if ($gbt[0][1][$i][6]==2  && $isteacher) { //discussion
 				echo "<br/><a class=small href=\"addforum.php?id={$gbt[0][1][$i][7]}&cid=$cid&from=gb\">[Settings]</a>";
 			}
 			
@@ -777,7 +786,7 @@ function gbinstrdisp() {
 		//assessment values
 		if ($catfilter>-2) {
 			for ($j=0;$j<count($gbt[0][1]);$j++) {
-				if (!$isteacher && $gbt[0][1][$j][4]==0) { //skip if hidden 
+				if (!$isteacher && !$istutor && $gbt[0][1][$j][4]==0) { //skip if hidden 
 					continue;
 				}
 				if ($hidenc==1 && $gbt[0][1][$j][4]==0) { //skip NC
@@ -822,8 +831,10 @@ function gbinstrdisp() {
 					} else { //no score
 						if ($gbt[$i][0][0]=='Averages') {
 							echo '-';
-						} else {
+						} else if ($isteacher) {
 							echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid=new&aid={$gbt[0][1][$j][7]}&uid={$gbt[$i][4][0]}\">-</a>";
+						} else {
+							echo '-';
 						}
 					}
 				} else if ($gbt[0][1][$j][6]==1) { //offline

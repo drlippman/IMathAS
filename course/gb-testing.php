@@ -30,14 +30,18 @@ if ($isteacher || $istutor) {
 	} else {
 		$lnfilter = '';
 	}
-	if (isset($_GET['secfilter'])) {
-		$secfilter = $_GET['secfilter'];
-		$sessiondata[$cid.'secfilter'] = $secfilter;
-		writesessiondata();
-	} else if (isset($sessiondata[$cid.'secfilter'])) {
-		$secfilter = $sessiondata[$cid.'secfilter'];
+	if (isset($tutorsection) && $tutorsection!='') {
+		$secfilter = $tutorsection;
 	} else {
-		$secfilter = -1;
+		if (isset($_GET['secfilter'])) {
+			$secfilter = $_GET['secfilter'];
+			$sessiondata[$cid.'secfilter'] = $secfilter;
+			writesessiondata();
+		} else if (isset($sessiondata[$cid.'secfilter'])) {
+			$secfilter = $sessiondata[$cid.'secfilter'];
+		} else {
+			$secfilter = -1;
+		}
 	}
 	//Gbmode : Links NC Dates
 	$totonleft = 0 ; 
@@ -145,7 +149,7 @@ echo "Meanings:   NC-no credit";
 
 
 function gbinstrdisp() {
-	global $isteacher,$istutor,$cid,$stu,$isdiag,$catfilter,$secfilter,$imasroot;
+	global $isteacher,$istutor,$cid,$stu,$isdiag,$catfilter,$secfilter,$imasroot,$tutorsection;
 	$hidenc = 1;
 	$gbt = gbtable();     
 	//print_r($gbt);
@@ -158,7 +162,7 @@ function gbinstrdisp() {
 	for ($i=0;$i<count($gbt[0][0]);$i++) { //biographical headers
 		if ($i==1 && $gbt[0][0][1]!='ID') { continue;}
 		echo '<th>'.$gbt[0][0][$i];
-		if ($gbt[0][0][$i]=='Section') {
+		if ($gbt[0][0][$i]=='Section' && (!$istutor || $tutorsection=='')) {
 			echo "<br/><select id=\"secfiltersel\" onchange=\"chgsecfilter()\"><option value=\"-1\" ";
 			if ($secfilter==-1) {echo  'selected=1';}
 			echo  '>All</option>';

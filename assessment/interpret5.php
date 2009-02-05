@@ -112,7 +112,7 @@ function interpretline($str) {
 				$cond = implode('',array_slice($bits,$forloc+1,$j-$forloc-1));
 				$todo = implode('',array_slice($bits,$j));
 				//might be $a..$b or 3.*.4  (remnant of implicit handling)
-				if (preg_match('/^\s*\(\s*(\$\w+)\s*\=\s*(\d+|\$\w+)\s*\.\*?\.\s*(\d+|\$\w+)\s*\)\s*$/',$cond,$matches) && $j<count($bits)) {
+				if (preg_match('/^\s*\(\s*(\$\w+)\s*\=\s*(\d+|\$\w+)\s*\.\s?\.\s*(\d+|\$\w+)\s*\)\s*$/',$cond,$matches)) {
 					$forcond = array_slice($matches,1,3);
 					$bits = array( "for ({$forcond[0]}=intval({$forcond[1]});{$forcond[0]}<=round(floatval({$forcond[2]}),0);{$forcond[0]}++) ".$todo."");
 				} else {

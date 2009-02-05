@@ -188,7 +188,7 @@ if (isset($_POST['SID'])) {
 	$query .= "VALUES ('{$_POST['SID']}~$diagqtr~$pcid','none',10,'{$_POST['firstname']}','{$_POST['lastname']}','$eclass',$now);";
 	mysql_query($query) or die("Query failed : " . mysql_error());
 	$userid = mysql_insert_id();
-	$query = "INSERT INTO imas_students (userid,courseid) VALUES ('$userid','$pcid');";
+	$query = "INSERT INTO imas_students (userid,courseid,section) VALUES ('$userid','$pcid','{$_POST['teachers']}');";
 	mysql_query($query) or die("Query failed : " . mysql_error());
 	
 	$sessiondata['mathdisp'] = $_POST['mathdisp'];//1;

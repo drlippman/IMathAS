@@ -9,7 +9,7 @@
 	$cid = $_GET['cid'];
 	$asid = $_GET['asid'];
 	
-	if ($isteacher) {
+	if ($isteacher || $istutor) {
 		if (isset($sessiondata[$cid.'gbmode'])) {
 			$gbmode =  $sessiondata[$cid.'gbmode'];
 		} else {
@@ -355,7 +355,7 @@
 		
 		list($testtype,$showans) = explode('-',$line['deffeedback']);
 		echo "<h4>{$line['name']}</h4>\n";
-		if ($isteacher && !isset($_GET['lastver']) && !isset($_GET['reviewver'])) {
+		if (($isteacher || $istutor) && !isset($_GET['lastver']) && !isset($_GET['reviewver'])) {
 			if ($line['agroupid']>0) {
 				$q2 = "SELECT i_u.LastName,i_u.FirstName FROM imas_assessment_sessions AS i_a_s,imas_users AS i_u WHERE ";
 				$q2 .= "i_u.id=i_a_s.userid AND i_a_s.agroupid='{$line['agroupid']}'";
@@ -555,7 +555,7 @@
 			$totalpossible += $pts[$questions[$i]];
 			echo '>';
 			list($qsetid,$cat) = getqsetid($questions[$i]);
-			if ($isteacher || ($testtype=="Practice" && $showans!="N") || ($testtype!="Practice" && (($showans=="I"  && !in_array(-1,$scores))|| ($showans!="N" && time()>$saenddate)))) {$showa=true;} else {$showa=false;}
+			if ($isteacher || $istutor || ($testtype=="Practice" && $showans!="N") || ($testtype!="Practice" && (($showans=="I"  && !in_array(-1,$scores))|| ($showans!="N" && time()>$saenddate)))) {$showa=true;} else {$showa=false;}
 			displayq($i,$qsetid,$seeds[$i],$showa,false,$attempts[$i]);
 			echo '</div>';
 			
@@ -587,7 +587,7 @@
 				echo "(parts: {$answeights[$questions[$i]]}) ";
 			}
 			echo "in {$attempts[$i]} attempt(s)\n";
-			if ($isteacher) {
+			if ($isteacher || $istutor) {
 				$laarr = explode('##',$lastanswers[$i]);
 				if (count($laarr)>1) {
 					echo "<br/>Previous Attempts:";
