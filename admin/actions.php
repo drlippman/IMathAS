@@ -278,6 +278,8 @@ switch($_GET['action']) {
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		$query = "DELETE FROM imas_students WHERE courseid='{$_GET['id']}'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
+		$query = "DELETE FROM imas_tutors WHERE courseid='{$_GET['id']}'";
+		mysql_query($query) or die("Query failed : " . mysql_error());
 		
 		$query = "SELECT id FROM imas_gbitems WHERE courseid='{$_GET['id']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
