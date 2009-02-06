@@ -109,10 +109,11 @@ $placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } </style>";
 
 require("../header.php");
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-echo "&gt; Gradebook</div>";
+echo "&gt; Diagnostic Gradebook</div>";
 echo "<form method=post action=\"gradebook.php?cid=$cid\">";
 
-echo "<span class=\"hdr1\">Grade Book </span>";
+echo "<span class=\"hdr1\">Diagnostic Grade Book </span>";
+echo "<a href=\"gradebook.php?cid=$cid\">View regular gradebook</a>";
 echo "<div class=cpmid>";
 
 echo "Students starting in: <select id=\"timetoggle\" onchange=\"chgtimefilter()\">";
@@ -211,14 +212,16 @@ function gbinstrdisp() {
 			echo ' (PT)';
 		}
 		//links
-		if ($gbt[0][1][$i][6]==0) { //online
-			echo "<br/><a class=small href=\"addassessment.php?id={$gbt[0][1][$i][7]}&cid=$cid&from=gb\">[Settings]</a>";
-			echo "<br/><a class=small href=\"isolateassessgrade.php?cid=$cid&aid={$gbt[0][1][$i][7]}\">[Isolate]</a>";
-		} else if ($gbt[0][1][$i][6]==1) { //offline
-			echo "<br/><a class=small href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$i][7]}\">[Settings]</a>";
-			echo "<br/><a class=small href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$i][7]}&isolate=true\">[Isolate]</a>";
-		} else if ($gbt[0][1][$i][6]==2) { //discussion
-			echo "<br/><a class=small href=\"addforum.php?id={$gbt[0][1][$i][7]}&cid=$cid&from=gb\">[Settings]</a>";
+		if ($isteacher) {
+			if ($gbt[0][1][$i][6]==0) { //online
+				echo "<br/><a class=small href=\"addassessment.php?id={$gbt[0][1][$i][7]}&cid=$cid&from=gb\">[Settings]</a>";
+				echo "<br/><a class=small href=\"isolateassessgrade.php?cid=$cid&aid={$gbt[0][1][$i][7]}\">[Isolate]</a>";
+			} else if ($gbt[0][1][$i][6]==1) { //offline
+				echo "<br/><a class=small href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$i][7]}\">[Settings]</a>";
+				echo "<br/><a class=small href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$i][7]}&isolate=true\">[Isolate]</a>";
+			} else if ($gbt[0][1][$i][6]==2) { //discussion
+				echo "<br/><a class=small href=\"addforum.php?id={$gbt[0][1][$i][7]}&cid=$cid&from=gb\">[Settings]</a>";
+			}
 		}
 		
 		echo '</th>';
@@ -290,10 +293,12 @@ function gbinstrdisp() {
 					}
 				}
 			} else if ($gbt[0][1][$j][6]==1) { //offline
-				if ($gbt[$i][0][0]=='Averages') {
-					echo "<a href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$j][7]}\">";
-				} else {
-					echo "<a href=\"addgrades.php?stu=$stu&cid=$cid&grades={$gbt[$i][4][0]}&gbitem={$gbt[0][1][$j][7]}\">";
+				if ($isteacher) {
+					if ($gbt[$i][0][0]=='Averages') {
+						echo "<a href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$j][7]}\">";
+					} else {
+						echo "<a href=\"addgrades.php?stu=$stu&cid=$cid&grades={$gbt[$i][4][0]}&gbitem={$gbt[0][1][$j][7]}\">";
+					}
 				}
 				if (isset($gbt[$i][1][$j][0])) {
 					echo $gbt[$i][1][$j][0];
@@ -303,7 +308,9 @@ function gbinstrdisp() {
 				} else {
 					echo '-';
 				}
-				echo '</a>';
+				if ($isteacher) {
+					echo '</a>';
+				}
 				if ($gbt[$i][1][$j][1]==1) {
 					echo '<sup>*</sup>';
 				}

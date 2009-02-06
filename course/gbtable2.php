@@ -22,6 +22,18 @@ function getpts($sc) {
 	}
 }
 
+//determine if diagnostic - used in gradebook too
+$isdiag = false;
+if ($isteacher || $istutor) {
+	$query = "SELECT sel1name,sel2name FROM imas_diags WHERE cid='$cid'";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	if (mysql_num_rows($result)>0) {
+		$isdiag = true;
+		$sel1name = mysql_result($result,0,0);
+		$sel2name = mysql_result($result,0,1);
+	}
+}
+
 /****
 The super-nasty gradebook function!  
 gbtable([userid])
@@ -100,7 +112,7 @@ row[1][4][0] = userid
 ****/
 
 function gbtable() {
-	global $cid,$isteacher,$istutor,$tutorid,$userid,$catfilter,$secfilter,$timefilter,$lnfilter;
+	global $cid,$isteacher,$istutor,$tutorid,$userid,$catfilter,$secfilter,$timefilter,$lnfilter,$isdiag,$sel1name,$sel2name;
 	if ($isteacher && func_num_args()>0) {
 		$limuser = func_get_arg(0);
 	} else if (!$isteacher && !$istutor) {
@@ -108,18 +120,8 @@ function gbtable() {
 	} else {
 		$limuser = 0;
 	}
-
-	$isdiag = false;
+	
 	$category = array();
-	if ($isteacher || $istutor) {
-		$query = "SELECT sel1name,sel2name FROM imas_diags WHERE cid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		if (mysql_num_rows($result)>0) {
-			$isdiag = true;
-			$sel1name = mysql_result($result,0,0);
-			$sel2name = mysql_result($result,0,1);
-		}
-	}
 	$gb = array();
 	
 	$ln = 0;

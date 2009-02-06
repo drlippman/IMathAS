@@ -120,29 +120,33 @@ if ($isteacher || $istutor) {
 	$placeinhead .= "       var toopen = '$address&catfilter=' + cat;\n";
 	$placeinhead .= "  	window.location = toopen; \n";
 	$placeinhead .= "}\n";
-	$placeinhead .= 'function chgsecfilter() { ';
-	$placeinhead .= '       var sec = document.getElementById("secfiltersel").value; ';
-	$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid";
-	
-	$placeinhead .= "       var toopen = '$address&secfilter=' + sec;\n";
-	$placeinhead .= "  	window.location = toopen; \n";
-	$placeinhead .= "}\n";
+	if ($isteacher) { 
+		$placeinhead .= 'function chgsecfilter() { ';
+		$placeinhead .= '       var sec = document.getElementById("secfiltersel").value; ';
+		$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid";
+		
+		$placeinhead .= "       var toopen = '$address&secfilter=' + sec;\n";
+		$placeinhead .= "  	window.location = toopen; \n";
+		$placeinhead .= "}\n";
+	}
 	$placeinhead .= 'function chgtoggle() { ';
 	$placeinhead .= "	var altgbmode = 1000*$totonleft + 100*document.getElementById(\"toggle1\").value + 10*document.getElementById(\"toggle2\").value + 1*document.getElementById(\"toggle3\").value; ";
 	$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid&gbmode=";
 	$placeinhead .= "	var toopen = '$address' + altgbmode;\n";
 	$placeinhead .= "  	window.location = toopen; \n";
 	$placeinhead .= "}\n";
-	$placeinhead .= 'function chgexport() { ';
-	$placeinhead .= "	var type = document.getElementById(\"exportsel\").value; ";
-	$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-export.php?stu=$stu&cid=$cid&";
-	$placeinhead .= "	var toopen = '$address';";
-	$placeinhead .= "	if (type==1) { toopen = toopen+'export=true';}\n";
-	$placeinhead .= "	if (type==2) { toopen = toopen+'emailgb=me';}\n";
-	$placeinhead .= "	if (type==3) { toopen = toopen+'emailgb=ask';}\n";
-	$placeinhead .= "	if (type==0) { return false;}\n";
-	$placeinhead .= "  	window.location = toopen; \n";
-	$placeinhead .= "}\n";
+	if ($isteacher) {
+		$placeinhead .= 'function chgexport() { ';
+		$placeinhead .= "	var type = document.getElementById(\"exportsel\").value; ";
+		$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-export.php?stu=$stu&cid=$cid&";
+		$placeinhead .= "	var toopen = '$address';";
+		$placeinhead .= "	if (type==1) { toopen = toopen+'export=true';}\n";
+		$placeinhead .= "	if (type==2) { toopen = toopen+'emailgb=me';}\n";
+		$placeinhead .= "	if (type==3) { toopen = toopen+'emailgb=ask';}\n";
+		$placeinhead .= "	if (type==0) { return false;}\n";
+		$placeinhead .= "  	window.location = toopen; \n";
+		$placeinhead .= "}\n";
+	}
 	
 	
 	$placeinhead .= "</script>";
@@ -249,26 +253,31 @@ if (isset($studentid) || $stu!=0) { //show student view
 	echo "<form method=post action=\"gradebook.php?cid=$cid\">";
 	
 	echo "<span class=\"hdr1\">Grade Book </span>";
-	echo "<div class=cpmid>";
-	echo "Offline Grades: <a href=\"addgrades.php?cid=$cid&gbitem=new&grades=all\">Add</a>, ";
-	echo "<a href=\"chgoffline.php?cid=$cid\">Manage</a> | ";
-	echo '<select id="exportsel" onchange="chgexport()">';
-	echo '<option value="0">Export to...</option>';
-	echo '<option value="1">... file</option>';
-	echo '<option value="2">... my email</option>';
-	echo '<option value="3">... other email</option></select> | ';
-	//echo "Export to <a href=\"gb-export.php?stu=$stu&cid=$cid&export=true\">File</a>, ";
-	//echo "<a href=\"gb-export.php?stu=$stu&cid=$cid&emailgb=me\">My Email</a>, or <a href=\"gb-export.php?stu=$stu&cid=$cid&emailgb=ask\">Other Email</a> | ";
-	echo "<a href=\"gbsettings.php?cid=$cid\">GB Settings</a> | ";
-	echo "<a href=\"gradebook.php?cid=$cid&stu=-1\">Averages</a> | ";
-	echo "<a href=\"gbcomments.php?cid=$cid&stu=0\">Comments</a> | ";
-	echo "<input type=\"button\" id=\"lockbtn\" onclick=\"lockcol()\" value=\"";
-	if (isset($_COOKIE["gblhdr-$cid"]) && $_COOKIE["gblhdr-$cid"]==1) {
-		echo "Unlock headers";
-	} else {
-		echo "Lock headers";
+	if ($isdiag) {
+		echo "<a href=\"gb-testing.php?cid=$cid\">View diagnostic gradebook</a>";
 	}
-	echo "\"/><br/>\n";
+	echo "<div class=cpmid>";
+	if ($isteacher) {
+		echo "Offline Grades: <a href=\"addgrades.php?cid=$cid&gbitem=new&grades=all\">Add</a>, ";
+		echo "<a href=\"chgoffline.php?cid=$cid\">Manage</a> | ";
+		echo '<select id="exportsel" onchange="chgexport()">';
+		echo '<option value="0">Export to...</option>';
+		echo '<option value="1">... file</option>';
+		echo '<option value="2">... my email</option>';
+		echo '<option value="3">... other email</option></select> | ';
+		//echo "Export to <a href=\"gb-export.php?stu=$stu&cid=$cid&export=true\">File</a>, ";
+		//echo "<a href=\"gb-export.php?stu=$stu&cid=$cid&emailgb=me\">My Email</a>, or <a href=\"gb-export.php?stu=$stu&cid=$cid&emailgb=ask\">Other Email</a> | ";
+		echo "<a href=\"gbsettings.php?cid=$cid\">GB Settings</a> | ";
+		echo "<a href=\"gradebook.php?cid=$cid&stu=-1\">Averages</a> | ";
+		echo "<a href=\"gbcomments.php?cid=$cid&stu=0\">Comments</a> | ";
+		echo "<input type=\"button\" id=\"lockbtn\" onclick=\"lockcol()\" value=\"";
+		if (isset($_COOKIE["gblhdr-$cid"]) && $_COOKIE["gblhdr-$cid"]==1) {
+			echo "Unlock headers";
+		} else {
+			echo "Lock headers";
+		}
+		echo "\"/><br/>\n";
+	}
 	echo 'Category: <select id="filtersel" onchange="chgfilter()">';
 	echo '<option value="-1" ';
 	if ($catfilter==-1) {echo "selected=1";}
@@ -287,39 +296,6 @@ if (isset($studentid) || $stu!=0) { //show student view
 	if ($catfilter==-2) {echo "selected=1";}
 	echo '>Category Totals</option>';
 	echo '</select> | ';
-	/*
-	echo 'Toggle: <select id="toggleview" onchange="chgtoggle()">';
-	echo '<option value="-1">Select toggle</option>';
-	if ($nopracticet) {
-		$altgbmode = $gbmode+2;
-		echo "<option value=\"$altgbmode\">Practice Test: hidden -> shown</option>";
-	} else {
-		$altgbmode = $gbmode-2;
-		echo "<option value=\"$altgbmode\">Practice Test: shown -> hidden</option>";
-	} 
-	if (($gbmode&1)==1) {
-		$altgbmode = $gbmode-1;
-		echo "<option value=\"$altgbmode\">Links: question breakdown -> edit</option>";
-	} else {
-		$altgbmode = $gbmode+1;
-		echo "<option value=\"$altgbmode\">Links: edit -> question breakdown</option>";
-	}
-	if ($curonly) {
-		$altgbmode = $gbmode-4;
-		echo "<option value=\"$altgbmode\">Items shown: available -> all</option>";
-	} else {
-		$altgbmode = $gbmode+4;
-		echo "<option value=\"$altgbmode\">Items shown: all -> available and past</option>";
-	}
-	if ($hidenc) {
-		$altgbmode = $gbmode-16;
-		echo "<option value=\"$altgbmode\">Items shown: counted -> all</option>";
-	} else {
-		$altgbmode = $gbmode+16;
-		echo "<option value=\"$altgbmode\">Items shown: all -> counted</option>";
-	}
-	echo '</select>';
-	*/
 	echo "Not Counted: <select id=\"toggle2\" onchange=\"chgtoggle()\">";
 	echo "<option value=0 "; writeHtmlSelected($hidenc,0); echo ">Show all</option>";
 	echo "<option value=1 "; writeHtmlSelected($hidenc,1); echo ">Show stu view</option>";
@@ -333,10 +309,21 @@ if (isset($studentid) || $stu!=0) { //show student view
 	echo " | Links: <select id=\"toggle1\" onchange=\"chgtoggle()\">";
 	echo "<option value=0 "; writeHtmlSelected($links,0); echo ">View/Edit</option>";
 	echo "<option value=1 "; writeHtmlSelected($links,1); echo ">Scores</option></select>";
+	if (!$isteacher) {
+		echo " | <input type=\"button\" id=\"lockbtn\" onclick=\"lockcol()\" value=\"";
+		if (isset($_COOKIE["gblhdr-$cid"]) && $_COOKIE["gblhdr-$cid"]==1) {
+			echo "Unlock headers";
+		} else {
+			echo "Lock headers";
+		}
+		echo "\"/>\n";	
+	}
 	echo "</div>";
 	
-	echo "Check/Uncheck All: <input type=\"checkbox\" name=\"ca\" value=\"1\" onClick=\"chkAll(this.form, 'checked[]', this.checked)\"> \n";
-	echo "With Selected:  <input type=submit name=submit value=\"E-mail\"> <input type=submit name=submit value=\"Message\"> <input type=submit name=submit value=\"Unenroll\"> <input type=submit name=submit value=\"Make Exception\"> ";
+	if ($isteacher) {
+		echo "Check/Uncheck All: <input type=\"checkbox\" name=\"ca\" value=\"1\" onClick=\"chkAll(this.form, 'checked[]', this.checked)\"> \n";
+		echo "With Selected:  <input type=submit name=submit value=\"E-mail\"> <input type=submit name=submit value=\"Message\"> <input type=submit name=submit value=\"Unenroll\"> <input type=submit name=submit value=\"Make Exception\"> ";
+	}
 	
 	$gbt = gbinstrdisp();
 	echo "</form>";
@@ -355,7 +342,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 }
 
 function gbstudisp($stu) {
-	global $hidenc,$cid,$gbmode,$availshow,$isdiag,$isteacher,$istutor,$catfilter,$imasroot;
+	global $hidenc,$cid,$gbmode,$availshow,$isteacher,$istutor,$catfilter,$imasroot;
 	if ($availshow==3) {
 		$availshow=1;
 		$hidepast = true;
@@ -748,7 +735,7 @@ function gbinstrdisp() {
 			echo "<tr class=odd onMouseOver=\"this.className='highlight'\" onMouseOut=\"this.className='odd'\">"; 
 		}
 		echo '<td class="locked" scope="row">';
-		if ($gbt[$i][0][0]!="Averages") {
+		if ($gbt[$i][0][0]!="Averages" && $isteacher) {
 			echo "<input type=\"checkbox\" name='checked[]' value='{$gbt[$i][4][0]}' />&nbsp;";
 		}
 		echo "<a href=\"gradebook.php?cid=$cid&stu={$gbt[$i][4][0]}\">";
@@ -838,10 +825,12 @@ function gbinstrdisp() {
 						}
 					}
 				} else if ($gbt[0][1][$j][6]==1) { //offline
-					if ($gbt[$i][0][0]=='Averages') {
-						echo "<a href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$j][7]}\">";
-					} else {
-						echo "<a href=\"addgrades.php?stu=$stu&cid=$cid&grades={$gbt[$i][4][0]}&gbitem={$gbt[0][1][$j][7]}\">";
+					if ($isteacher) {
+						if ($gbt[$i][0][0]=='Averages') {
+							echo "<a href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$j][7]}\">";
+						} else {
+							echo "<a href=\"addgrades.php?stu=$stu&cid=$cid&grades={$gbt[$i][4][0]}&gbitem={$gbt[0][1][$j][7]}\">";
+						}
 					}
 					if (isset($gbt[$i][1][$j][0])) {
 						echo $gbt[$i][1][$j][0];
@@ -851,7 +840,9 @@ function gbinstrdisp() {
 					} else {
 						echo '-';
 					}
-					echo '</a>';
+					if ($isteacher) {
+						echo '</a>';
+					}
 					if ($gbt[$i][1][$j][1]==1) {
 						echo '<sup>*</sup>';
 					}

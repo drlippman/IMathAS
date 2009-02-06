@@ -94,52 +94,8 @@ if (count($page_currentUserCourseIds)>0) {
 */
 
 
-//check for new posts
+//check for new posts - do for each type if there are courses
 $newpostscnt = array();
-/*$query = "SELECT courseid,count(*) FROM ";
-$query .= "(SELECT imas_forums.courseid,imas_forum_posts.threadid,max(imas_forum_posts.postdate),mfv.lastview FROM imas_forum_posts ";
-$query .= "JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id LEFT JOIN imas_forum_views AS mfv ";
-$query .= "ON mfv.threadid=imas_forum_posts.threadid AND mfv.userid='$userid' WHERE imas_forums.courseid IN ";
-$query .= "(SELECT courseid FROM imas_students WHERE userid='$userid') AND imas_forums.grpaid=0 ";
-$query .= "GROUP BY imas_forum_posts.threadid HAVING ((max(imas_forum_posts.postdate)>mfv.lastview) OR (mfv.lastview IS NULL))) AS newitems ";
-$query .= "GROUP BY courseid";
-*/
-$query = "SELECT courseid,count(*) FROM ";
-$query .= "(SELECT imas_forums.courseid,imas_forum_threads.id FROM imas_forum_threads ";
-$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id LEFT JOIN imas_forum_views AS mfv ";
-$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' WHERE imas_forums.courseid IN ";
-$query .= "(SELECT courseid FROM imas_students WHERE userid='$userid') AND imas_forums.grpaid=0 ";
-$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL))) AS newitems ";
-$query .= "GROUP BY courseid";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-while ($row = mysql_fetch_row($result)) {
-	$newpostscnt[$row[0]] = $row[1];
-}
-
-if ($myrights>10) {
-	/*
-	$query = "SELECT courseid,count(*) FROM ";
-	$query .= "(SELECT imas_forums.courseid,imas_forum_posts.threadid,max(imas_forum_posts.postdate),mfv.lastview FROM imas_forum_posts ";
-	$query .= "JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id LEFT JOIN imas_forum_views AS mfv ";
-	$query .= "ON mfv.threadid=imas_forum_posts.threadid AND mfv.userid='$userid' WHERE imas_forums.courseid IN ";
-	$query .= "(SELECT courseid FROM imas_teachers WHERE userid='$userid') AND imas_forums.grpaid=0 ";
-	$query .= "GROUP BY imas_forum_posts.threadid HAVING ((max(imas_forum_posts.postdate)>mfv.lastview) OR (mfv.lastview IS NULL))) AS newitems ";
-	$query .= "GROUP BY courseid";
-	*/
-	
-	$query = "SELECT courseid,count(*) FROM ";
-	$query .= "(SELECT imas_forums.courseid,imas_forum_threads.id FROM imas_forum_threads ";
-	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id LEFT JOIN imas_forum_views AS mfv ";
-	$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' WHERE imas_forums.courseid IN ";
-	$query .= "(SELECT courseid FROM imas_teachers WHERE userid='$userid') AND imas_forums.grpaid=0 ";
-	$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL))) AS newitems ";
-	$query .= "GROUP BY courseid";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($row = mysql_fetch_row($result)) {
-		$newpostscnt[$row[0]] = $row[1];
-	}
-}
-
 
 //check for new messages    
 $newmsgcnt = array();
@@ -155,10 +111,21 @@ $query .= "WHERE imas_students.courseid=imas_courses.id AND imas_students.userid
 $query .= "AND (imas_courses.available=0 OR imas_courses.available=2) ORDER BY imas_courses.name";
 $result = mysql_query($query) or die("Query failed : " . mysql_error());
 $line = mysql_fetch_array($result, MYSQL_ASSOC);
-
 if ($line == null) {
 	$noclass = true;
 } else {
+	//check for new posts
+	$query = "SELECT courseid,count(*) FROM ";
+	$query .= "(SELECT imas_forums.courseid,imas_forum_threads.id FROM imas_forum_threads ";
+	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id LEFT JOIN imas_forum_views AS mfv ";
+	$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' WHERE imas_forums.courseid IN ";
+	$query .= "(SELECT courseid FROM imas_students WHERE userid='$userid') AND imas_forums.grpaid=0 ";
+	$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL))) AS newitems ";
+	$query .= "GROUP BY courseid";
+	$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+	while ($row = mysql_fetch_row($r2)) {
+		$newpostscnt[$row[0]] = $row[1];
+	}
 	$page_studentCourseData = array();
 	$i=0;
 	do {
@@ -188,6 +155,20 @@ if ($line == null) {
 	$isTeaching = false;
 } else {
 	$isTeaching = true;
+	
+	//check for forum posts to teachers
+	$query = "SELECT courseid,count(*) FROM ";
+	$query .= "(SELECT imas_forums.courseid,imas_forum_threads.id FROM imas_forum_threads ";
+	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id LEFT JOIN imas_forum_views AS mfv ";
+	$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' WHERE imas_forums.courseid IN ";
+	$query .= "(SELECT courseid FROM imas_teachers WHERE userid='$userid') AND imas_forums.grpaid=0 ";
+	$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL))) AS newitems ";
+	$query .= "GROUP BY courseid";
+	$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+	while ($row = mysql_fetch_row($r2)) {
+		$newpostscnt[$row[0]] = $row[1];
+	}
+	
 	$page_teacherCourseData = array();
 	$i=0;
 	do {
@@ -204,6 +185,53 @@ if ($line == null) {
 		}
 		if (isset($newpostscnt[$page_teacherCourseData[$i]['id']]) && $newpostscnt[$page_teacherCourseData[$i]['id']]>0) {
 			$page_teacherCourseData[$i]['courseDisplayTag'] .= " <a href=\"forums/newthreads.php?cid={$page_teacherCourseData[$i]['id']}\" style=\"color:red\">New Posts (". $newpostscnt[$page_teacherCourseData[$i]['id']] .")</a>";
+		}
+		
+		$i++;
+	} while ($line = mysql_fetch_array($result, MYSQL_ASSOC));
+}
+
+
+//check for classes the current user is tutoring
+//TODO:  check for new posts for tutors
+$query = "SELECT imas_courses.name,imas_courses.id,imas_courses.available,imas_courses.lockaid FROM imas_tutors,imas_courses ";
+$query .= "WHERE imas_tutors.courseid=imas_courses.id AND imas_tutors.userid='$userid' ";
+$query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY imas_courses.name";
+$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$line = mysql_fetch_array($result, MYSQL_ASSOC);
+
+if ($line == null) {
+	$isTutoring = false;
+} else {
+	$isTutoring = true;
+	//check for forum posts to tutors
+	$query = "SELECT courseid,count(*) FROM ";
+	$query .= "(SELECT imas_forums.courseid,imas_forum_threads.id FROM imas_forum_threads ";
+	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id LEFT JOIN imas_forum_views AS mfv ";
+	$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' WHERE imas_forums.courseid IN ";
+	$query .= "(SELECT courseid FROM imas_tutors WHERE userid='$userid') AND imas_forums.grpaid=0 ";
+	$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL))) AS newitems ";
+	$query .= "GROUP BY courseid";
+	$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+	while ($row = mysql_fetch_row($r2)) {
+		$newpostscnt[$row[0]] = $row[1];
+	}
+	$page_tutorCourseData = array();
+	$i=0;
+	do {
+		$page_tutorCourseData[$i] = $line;
+		if (($page_tutorCourseData[$i]['available']&1)==1) {
+			$page_tutorCourseData[$i]['courseDisplayTag'] = "<span style=\"color:green;\">Hidden</span>";
+		}
+		
+		if ($page_tutorCourseData[$i]['lockaid']>0) {
+			$page_tutorCourseData[$i]['courseDisplayTag'] .= " <span style=\"color:green;\">In Lockdown</span>";
+		}
+		if (isset($newmsgcnt[$page_teacherCourseData[$i]['id']]) && $newmsgcnt[$page_tutorCourseData[$i]['id']]>0) {
+			$page_tutorCourseData[$i]['courseDisplayTag'] .= " <a href=\"msgs/msglist.php?cid={$page_tutorCourseData[$i]['id']}\" style=\"color:red\">New Messages ({$newmsgcnt[$page_tutorCourseData[$i]['id']]})</a>";
+		}
+		if (isset($newpostscnt[$page_tutorCourseData[$i]['id']]) && $newpostscnt[$page_tutorCourseData[$i]['id']]>0) {
+			$page_tutorCourseData[$i]['courseDisplayTag'] .= " <a href=\"forums/newthreads.php?cid={$page_tutorCourseData[$i]['id']}\" style=\"color:red\">New Posts (". $newpostscnt[$page_tutorCourseData[$i]['id']] .")</a>";
 		}
 		
 		$i++;
@@ -274,6 +302,28 @@ if ($myrights > 5) {
 		</form>
 	</div>
 <?php	
+}
+
+// TUTOR BLOCK 	
+if ($isTutoring == true) {
+?>
+<div class=block>
+	<h3>Courses You're Tutoring</h3>
+</div>
+<div class=blockitems>
+	<ul class=nomark>
+<?php
+	for ($i=0;$i<count($page_tutorCourseData);$i++) {
+?>
+		<li><A HREF="course/course.php?folder=0&cid=<?php echo $page_tutorCourseData[$i]['id'] ?>"><?php echo $page_tutorCourseData[$i]['name'] ?></a>
+		<?php echo $page_tutorCourseData[$i]['courseDisplayTag'] ?>
+		</li>
+<?php
+	}
+?>
+	</ul>
+</div>
+<?php
 }
 
 // TEACHER BLOCK 	
