@@ -163,13 +163,14 @@ function gbinstrdisp() {
 	for ($i=0;$i<count($gbt[0][0]);$i++) { //biographical headers
 		if ($i==1 && $gbt[0][0][1]!='ID') { continue;}
 		echo '<th>'.$gbt[0][0][$i];
-		if ($gbt[0][0][$i]=='Section' && (!$istutor || $tutorsection=='')) {
+		if (($gbt[0][0][$i]=='Section' || ($isdiag && $i==4)) && (!$istutor || $tutorsection=='')) {
 			echo "<br/><select id=\"secfiltersel\" onchange=\"chgsecfilter()\"><option value=\"-1\" ";
 			if ($secfilter==-1) {echo  'selected=1';}
 			echo  '>All</option>';
 			$query = "SELECT DISTINCT section FROM imas_students WHERE courseid='$cid' ORDER BY section";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			while ($row = mysql_fetch_row($result)) {
+				if ($row[0]=='') { continue;}
 				echo  "<option value=\"{$row[0]}\" ";
 				if ($row[0]==$secfilter) {
 					echo  'selected=1';

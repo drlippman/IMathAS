@@ -589,7 +589,7 @@ function gbstudisp($stu) {
 }
 
 function gbinstrdisp() {
-	global $hidenc,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot;
+	global $hidenc,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection;
 	
 	if ($availshow==3) {
 		$availshow=1;
@@ -604,7 +604,7 @@ function gbinstrdisp() {
 	for ($i=0;$i<count($gbt[0][0]);$i++) { //biographical headers
 		if ($i==1 && $gbt[0][0][1]!='ID') { continue;}
 		echo '<th>'.$gbt[0][0][$i];
-		if ($gbt[0][0][$i]=='Section' && (!$istutor || $tutorsection=='')) {
+		if (($gbt[0][0][$i]=='Section' || ($isdiag && $i==4)) && (!$istutor || $tutorsection=='')) {
 			echo "<br/><select id=\"secfiltersel\" onchange=\"chgsecfilter()\"><option value=\"-1\" ";
 			if ($secfilter==-1) {echo  'selected=1';}
 			echo  '>All</option>';

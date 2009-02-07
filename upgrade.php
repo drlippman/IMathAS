@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 6;
+$latest = 7;
 
 if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 	$handle = fopen("upgradecounter.txt",'w');
@@ -68,6 +68,15 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			$query = 'ALTER TABLE `imas_students` CHANGE `section` `section` VARCHAR( 40 ) NULL DEFAULT NULL';
 			mysql_query($query) or die("Query failed : " . mysql_error());
+		}
+		if ($last < 7) {
+			$query = "SELECT imas_students.id,imas_users.email FROM imas_students JOIN imas_users ON imas_users.id=imas_students.userid AND imas_users.SID LIKE '%~%~%'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				$epts = explode('@',$row[1]);
+				$query = "UPDATE imas_students SET section='{$epts[1]}' WHERE id='{$row[0]}'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
 		}
 		$handle = fopen("upgradecounter.txt",'w');
 		fwrite($handle,$latest);
