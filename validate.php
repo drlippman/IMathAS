@@ -281,6 +281,7 @@ END;
 			} else if ($myrights==100) {
 				$teacherid = $userid;
 			} else {
+				
 				$query = "SELECT id,section FROM imas_tutors WHERE userid='$userid' AND courseid='{$_GET['cid']}'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				$line = mysql_fetch_array($result, MYSQL_ASSOC);
@@ -288,6 +289,7 @@ END;
 					$tutorid = $line['id'];
 					$tutorsection = trim($line['section']);
 				}
+		
 			}
 		}
 		$query = "SELECT imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme ";

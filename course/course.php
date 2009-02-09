@@ -158,6 +158,24 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		$sessiondata['lastaccess'.$cid] = $now;
 		writesessiondata();
 	}
+	//get exceptions
+	$now = time() + $previewshift;
+	$exceptions = array();
+	if (!isset($teacherid) && !isset($tutorid)) {
+		$query = "SELECT items.id,ex.startdate,ex.enddate FROM ";
+		$query .= "imas_exceptions AS ex,imas_items as items,imas_assessments as i_a WHERE ex.userid='$userid' AND ";
+		$query .= "ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment') ";
+		// $query .= "AND (($now<i_a.startdate AND ex.startdate<$now) OR ($now>i_a.enddate AND $now<ex.enddate))";
+		//$query .= "AND (ex.startdate<$now AND $now<ex.enddate)";
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+			$exceptions[$line['id']] = array($line['startdate'],$line['enddate']);
+		}
+	}
+	//update block start/end dates to show blocks containing items with exceptions
+	if (count($exceptions)>0) {
+		upsendexceptions($items);
+	}
 		
 	if ($_GET['folder']!='0') {
 		$now = time() + $previewshift;
@@ -165,7 +183,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		$backtrack = array();
 		for ($i=1;$i<count($blocktree);$i++) {
 			$backtrack[] = array($items[$blocktree[$i]-1]['name'],implode('-',array_slice($blocktree,0,$i+1)));
-			if (!isset($teacherid) && $items[$blocktree[$i]-1]['avail']<2 && $items[$blocktree[$i]-1]['SH'][0]!='S' &&($now<$items[$blocktree[$i]-1]['startdate'] || $now>$items[$blocktree[$i]-1]['enddate'] || $items[$blocktree[$i]-1]['avail']=='0')) {
+			if (!isset($teacherid) && !isset($tutorid) && $items[$blocktree[$i]-1]['avail']<2 && $items[$blocktree[$i]-1]['SH'][0]!='S' &&($now<$items[$blocktree[$i]-1]['startdate'] || $now>$items[$blocktree[$i]-1]['enddate'] || $items[$blocktree[$i]-1]['avail']=='0')) {
 				$_GET['folder'] = 0;
 				$items = unserialize($line['itemorder']);
 				unset($backtrack);
@@ -242,20 +260,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		$newpostscnt = '';	
 	}
    
-	//get exceptions
-	$now = time() + $previewshift;
-	$exceptions = array();
-	if (!isset($teacherid)) {
-		$query = "SELECT items.id,ex.startdate,ex.enddate FROM ";
-		$query .= "imas_exceptions AS ex,imas_items as items,imas_assessments as i_a WHERE ex.userid='$userid' AND ";
-		$query .= "ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment') ";
-		// $query .= "AND (($now<i_a.startdate AND ex.startdate<$now) OR ($now>i_a.enddate AND $now<ex.enddate))";
-		//$query .= "AND (ex.startdate<$now AND $now<ex.enddate)";
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
-			$exceptions[$line['id']] = array($line['startdate'],$line['enddate']);
-		}
-	}
+	
 	//get latepasses
 	if (!isset($teacherid) && !isset($tutorid) && $previewshift==-1) {
 	   $query = "SELECT latepass FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
@@ -397,10 +402,7 @@ if ($overwriteBody==1) {
    echo "<h2>$curname</h2>\n";
    
    if (count($items)>0) {
-	   //update block start/end dates to show blocks containing items with exceptions
-	   if (count($exceptions)>0) {
-		   upsendexceptions($items);
-	   }
+	   
 	   	   
 	   if ($quickview=='on' && isset($teacherid)) {
 		   echo '<style type="text/css">.drag {color:red; background-color:#fcc;} .icon {cursor: pointer;}</style>';

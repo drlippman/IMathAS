@@ -427,7 +427,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$llist = "'".implode("','",explode(',',$searchlibs))."'";
 		
 		if (!$beentaken) {
-
 			//potential questions
 			if (substr($searchlibs,0,1)=="0") {
 				$lnamesarr[0] = "Unassigned";
@@ -459,7 +458,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$query .= " AND (imas_library_items.libid > 0 OR imas_questionset.ownerid='$userid') "; 
 				}
 				$query .= " ORDER BY imas_library_items.libid,imas_questionset.id";
-				if ($search=='recommend' && count($existing)>0) {
+				if ($search=='recommend' && count($existingq)>0) {
 					$existingqlist = implode(',',$existingq);  //pulled from database, so no quotes needed
 					$query = "SELECT a.questionsetid, count( DISTINCT a.assessmentid ) as qcnt,
 						imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.ownerid
