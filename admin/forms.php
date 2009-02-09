@@ -58,9 +58,10 @@ switch($_GET['action']) {
 		echo "<input type=radio name=\"newrights\" value=\"10\" ";
 		if ($oldrights == 10) {echo "CHECKED";}
 		echo "> Student <BR>\n";
-		echo "<input type=radio name=\"newrights\" value=\"15\" ";
-		if ($oldrights == 15) {echo "CHECKED";}
-		echo "> TA/Tutor/Proctor <BR>\n";
+		//obscelete
+		//echo "<input type=radio name=\"newrights\" value=\"15\" ";
+		//if ($oldrights == 15) {echo "CHECKED";}
+		//echo "> TA/Tutor/Proctor <BR>\n";
 		echo "<input type=radio name=\"newrights\" value=\"20\" ";
 		if ($oldrights == 20) {echo "CHECKED";}
 		echo "> Teacher <BR>\n";
@@ -337,17 +338,17 @@ switch($_GET['action']) {
 		
 		echo "<h4>Potential Teachers:</h4>\n";
 		if ($myrights==75) {
-			$query = "SELECT id,FirstName,LastName,rights FROM imas_users WHERE rights>14 AND groupid='$groupid' ORDER BY LastName;";
+			$query = "SELECT id,FirstName,LastName,rights FROM imas_users WHERE rights>19 AND groupid='$groupid' ORDER BY LastName;";
 		} else if ($myrights==100) {
-			$query = "SELECT id,FirstName,LastName,rights FROM imas_users WHERE rights>14 ORDER BY LastName;";
+			$query = "SELECT id,FirstName,LastName,rights FROM imas_users WHERE rights>19 ORDER BY LastName;";
 		}
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		echo "<table cellpadding=5>\n";
 		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 			if ($used[$line['id']]!=true) {
-				if ($line['rights']<20) { $type = "Tutor/TA/Proctor";} else {$type = "Teacher";}
+				//if ($line['rights']<20) { $type = "Tutor/TA/Proctor";} else {$type = "Teacher";}
 				echo "<tr><td>{$line['LastName']}, {$line['FirstName']} </td> ";
-				echo "<td><a href=\"actions.php?action=addteacher&cid={$_GET['id']}&tid={$line['id']}\">Add as $type</a></td></tr>\n";
+				echo "<td><a href=\"actions.php?action=addteacher&cid={$_GET['id']}&tid={$line['id']}\">Add as Teacher</a></td></tr>\n";
 			}
 		}
 		echo "</table>\n";

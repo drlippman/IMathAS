@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 7;
+$latest = 8;
 
 if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 	$handle = fopen("upgradecounter.txt",'w');
@@ -64,17 +64,36 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		}
 		if ($last < 6) {
+			//add imas_tutors table
 			$query = 'CREATE TABLE `imas_tutors` (`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, `userid` INT(10) UNSIGNED NOT NULL, `courseid` INT(10) UNSIGNED NOT NULL, `section` VARCHAR(40) NOT NULL, INDEX (`userid`, `courseid`)) COMMENT = \'course tutors\'';
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			$query = 'ALTER TABLE `imas_students` CHANGE `section` `section` VARCHAR( 40 ) NULL DEFAULT NULL';
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		}
 		if ($last < 7) {
+			//for existing diag, put level2 selector as section
 			$query = "SELECT imas_students.id,imas_users.email FROM imas_students JOIN imas_users ON imas_users.id=imas_students.userid AND imas_users.SID LIKE '%~%~%'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			while ($row = mysql_fetch_row($result)) {
 				$epts = explode('@',$row[1]);
 				$query = "UPDATE imas_students SET section='{$epts[1]}' WHERE id='{$row[0]}'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+		}
+		if ($last < 8) {
+			//move existing tutors to new system
+			$query = "SELECT u.id,t.id,t.courseid FROM imas_users as u JOIN imas_teachers as t ON u.id=t.userid AND u.rights=15";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$lastuser = -1;
+			while ($row = mysql_fetch_row($result)) {
+				if ($row[0]!=$lastuser) {
+					$query = "UPDATE imas_users SET rights=10 WHERE id='{$row[0]}'";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+					$lastuser = $row[0];
+				}
+				$query = "DELETE FROM imas_teachers WHERE id='{$row[1]}'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+				$query = "INSERT INTO imas_tutors (userid,courseid,section) VALUES ('{$row[0]}','{$row[2]}','')";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 		}
