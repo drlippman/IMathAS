@@ -351,9 +351,9 @@ if ($overwriteBody==1) { //NO AUTHORITY
 			<td><input type=hidden id="ipout-<?php echo $i ?>" name="ipout-<?php echo $i ?>" value="<?php echo $ips[$i] ?>">
 			<?php echo $ips[$i] ?></td>
 			<td>
-				<a href='#' onclick="removeitem('ipout-<?php echo $i ?>','ipout')">Remove</a>
-				<a href='#' onclick=\"moveitemup('ipout-<?php echo $i ?>','ipout')\">Move up</a>
-				<a href='#' onclick=\"moveitemdown('ipout-<?php echo $i ?>','ipout')\">Move down</a>
+				<a href='#' onclick="return removeitem('ipout-<?php echo $i ?>','ipout')">Remove</a>
+				<a href='#' onclick="return moveitemup('ipout-<?php echo $i ?>','ipout')">Move up</a>
+				<a href='#' onclick="return moveitemdown('ipout-<?php echo $i ?>','ipout')">Move down</a>
 			</td>
 		</tr>
 <?php
@@ -391,9 +391,9 @@ if ($overwriteBody==1) { //NO AUTHORITY
 				<?php echo $pws[$i] ?>
 			</td>
 			<td>
-				<a href='#' onclick="removeitem('pwout-<?php echo $i ?>','pwout')">Remove</a>
-				<a href='#' onclick="moveitemup('pwout-<?php echo $i ?>','pwout')">Move up</a>
-				<a href='#' onclick="moveitemdown('pwout-<?php echo $i ?>','pwout')">Move down</a>
+				<a href='#' onclick="return removeitem('pwout-<?php echo $i ?>','pwout')">Remove</a>
+				<a href='#' onclick="return moveitemup('pwout-<?php echo $i ?>','pwout')">Move up</a>
+				<a href='#' onclick="return moveitemdown('pwout-<?php echo $i ?>','pwout')">Move down</a>
 			</td>
 		</tr>
 <?php
@@ -432,9 +432,9 @@ if ($overwriteBody==1) { //NO AUTHORITY
 						<?php echo $sl[$i]?>
 					</td>
 					<td>
-						<a href='#' onclick="removeitem('selout-<?php echo $i ?>','selout')">Remove</a> 
-						<a href='#' onclick="moveitemup('selout-<?php echo $i ?>','selout')">Move up</a>
-						<a href='#' onclick="moveitemdown('selout-<?php echo $i ?>','selout')">Move down</a>
+						<a href='#' onclick="return removeitem('selout-<?php echo $i ?>','selout')">Remove</a> 
+						<a href='#' onclick="return moveitemup('selout-<?php echo $i ?>','selout')">Move up</a>
+						<a href='#' onclick="return moveitemdown('selout-<?php echo $i ?>','selout')">Move down</a>
 					</td>
 				</tr>
 <?php

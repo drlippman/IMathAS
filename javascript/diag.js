@@ -13,9 +13,9 @@ function additem(inloc,outloc) {
 	newtd.innerHTML = html;
 	newn.appendChild(newtd);
 	
-	html = "  <a href='#' onclick=\"removeitem('"+newid+"','"+outloc+"')\">Remove</a>";
-	html += " <a href='#' onclick=\"moveitemup('"+newid+"','"+outloc+"')\">Move up</a>";
-	html += " <a href='#' onclick=\"moveitemdown('"+newid+"','"+outloc+"')\">Move down</a>";
+	html = "  <a href='#' onclick=\"return removeitem('"+newid+"','"+outloc+"')\">Remove</a>";
+	html += " <a href='#' onclick=\"return moveitemup('"+newid+"','"+outloc+"')\">Move up</a>";
+	html += " <a href='#' onclick=\"return moveitemdown('"+newid+"','"+outloc+"')\">Move down</a>";
 	newtd = document.createElement("td");
 	newtd.innerHTML = html;
 	newn.appendChild(newtd);
@@ -37,6 +37,7 @@ function onenter(e,inloc,outloc) {
 function removeitem(id,outloc) {
 	var outn = document.getElementById(outloc);
 	outn.removeChild(document.getElementById('tr'+id));
+	return false;
 }
 function moveitemup(id,outloc) {
 	var outn = document.getElementById(outloc);
@@ -46,6 +47,7 @@ function moveitemup(id,outloc) {
 		outn.removeChild(cur);
 		outn.insertBefore(cur,prev);
 	}
+	return false;
 }
 function moveitemdown(id,outloc) {
 	var outn = document.getElementById(outloc);
@@ -59,4 +61,5 @@ function moveitemdown(id,outloc) {
 			outn.appendChild(cur);
 		}
 	}
+	return false;
 }
