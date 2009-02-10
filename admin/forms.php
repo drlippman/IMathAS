@@ -424,7 +424,6 @@ switch($_GET['action']) {
 		echo "</form>\n";
 		break;
 	case "removediag":
-		case "delete":
 		echo "<p>Are you sure you want to delete this diagnostic?  This does not delete the connected course and does not remove students or their scores.</p>\n";
 		echo "<p><input type=button value=\"Delete\" onclick=\"window.location='actions.php?action=removediag&id={$_GET['id']}'\">\n";
 		echo "<input type=button value=\"Nevermind\" onclick=\"window.location='admin.php'\"></p>\n";

@@ -473,9 +473,14 @@ switch($_GET['action']) {
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		break;
 	case "removediag";
-		if ($myrights <75) { echo "You don't have the authority for this action"; break;}
-		$query = "DELETE FROM imas_diags WHERE id='{$_GET['id']}'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		if ($myrights <60) { echo "You don't have the authority for this action"; break;}
+		$query = "SELECT imas_users.id,imas_users.groupid FROM imas_users JOIN imas_diags ON imas_users.id=imas_diags.ownerid AND imas_diags.id='{$_GET['id']}'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$row = mysql_fetch_row($result);
+		if (($myrights<75 && $row[0]==$userid) || ($myrights==75 && $row[1]==$groupid) || $myrights==100) { 
+			$query = "DELETE FROM imas_diags WHERE id='{$_GET['id']}'";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+		}
 		break;
 }
 

@@ -88,10 +88,13 @@ if ($myrights < 40) {
 	
 	//data processing for diagnostics block
 	if ($myrights>=60) {
-		$query = "SELECT id,name,public FROM imas_diags";
-		if ($myrights<100) {
-			$query .= " WHERE ownerid='$userid'";
+		$query = "SELECT d.id,d.name,d.public FROM imas_diags as d JOIN imas_users AS u ON u.id=d.ownerid";
+		if ($myrights<75) {
+			$query .= " WHERE d.ownerid='$userid'";
+		} else if ($myrights<100) {
+			$query .= " WHERE u.groupid='$groupid'";
 		}
+		$query .= " ORDER BY d.name";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$i=0;
 		while ($row = mysql_fetch_row($result)) {
