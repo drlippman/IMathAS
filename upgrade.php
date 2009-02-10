@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 8;
+$latest = 9;
 
 if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 	$handle = fopen("upgradecounter.txt",'w');
@@ -10,6 +10,20 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 	require("validate.php");
 	if ($myrights<100) {
 		echo "No rights, aborting";
+		exit;
+	}
+	
+	//handle any postbacks
+	if (isset($_GET['act'])) {
+		if ($_GET['act']=='finish9') {
+			foreach ($_POST['diag'] as $did=>$uid) {
+				$query = "UPDATE imas_diags SET ownerid='$uid' WHERE id='$did'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+			echo "Diag owners updated<br/>";
+		}
+		
+		
 		exit;
 	}
 	
@@ -95,6 +109,52 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				$query = "INSERT INTO imas_tutors (userid,courseid,section) VALUES ('{$row[0]}','{$row[2]}','')";
 				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+		}
+		if ($last < 9) {
+			//change diag owner to userid from groupid
+			$ambig = false;
+			$out = '';
+			$query = "SELECT id,ownerid,name FROM imas_diags";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			if (mysql_num_rows($result)>0) {
+				$owners = array();
+				$dnames = array();
+				while ($row = mysql_fetch_row($result)) {
+					$owners[$row[1]][] = $row[0];
+					$dnames[$row[0]] = $row[2];
+				}
+				$ow = array_keys($owners);
+				$users = array();
+				foreach ($ow as $ogrp) {
+					$query = "SELECT id,LastName,FirstName FROM imas_users WHERE groupid='$ogrp' AND rights>59 ORDER BY id";
+					$result = mysql_query($query) or die("Query failed : " . mysql_error());
+					if (mysql_num_rows($result)==0) {
+						echo "Orphaned Diags: ".implode(',',$owners[$ogrp]).'<br/>';
+					} else if (mysql_num_rows($result)==1) {
+						$uid = mysql_result($result,0,0);
+						$query = "UPDATE imas_diags SET ownerid=$uid WHERE id IN (".implode(',',$owners[$ogrp]).")";
+						mysql_query($query) or die("Query failed : " . mysql_error());
+					} else {
+						$ops = '';
+						while ($row = mysql_fetch_row($result)) {
+							$ops .= "<option value=\"{$row[0]}\">{$row[1]}, {$row[2]}</option>";
+						}
+						foreach ($owners[$ogrp] as $did) {
+							$out .= "Diag <b>".$dnames[$did]."</b> Owner: <select name=\"diag[$did]\">";
+							$out .= $ops;
+							$out .= "</select><br/>";
+						}
+						$ambig = true;
+					}
+				}
+				if ($ambig) {
+					echo "<form method=\"post\" action=\"upgrade.php?act=finish9\">";
+					echo "<p>Converting diagnostic ownership to userid.  Ambiguous situations exist.  Please select the ";
+					echo "appropriate owner for each diagnostic</p><p>";
+					echo $out;
+					echo '</p><input type="submit" value="Submit"/></form>';
+				}
 			}
 		}
 		$handle = fopen("upgradecounter.txt",'w');

@@ -90,7 +90,7 @@ if ($myrights < 40) {
 	if ($myrights>=60) {
 		$query = "SELECT id,name,public FROM imas_diags";
 		if ($myrights<100) {
-			$query .= " WHERE ownerid='$groupid'";
+			$query .= " WHERE ownerid='$userid'";
 		}
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$i=0;
