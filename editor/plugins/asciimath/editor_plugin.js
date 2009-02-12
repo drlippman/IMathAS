@@ -243,10 +243,10 @@
 		math2ascii : function(el) {
 			var myAM = el.innerHTML;
 			if (myAM.indexOf("`") == -1) {
-				myAM = myAM.replace(/.+title=\"(.*?)\".+/g,"`$1`");
-				myAM = myAM.replace(/.+title=\'(.*?)\'.+/g,"`$1`");
-				myAM = myAM.replace(/.+title=([^>]*?)\s.*>.*/g,"`$1`");
-				myAM = myAM.replace(/.+title=(.*?)>.*/g,"`$1`");
+				myAM = myAM.replace(/.+(alt|title)=\"(.*?)\".+/g,"`$2`");
+				myAM = myAM.replace(/.+(alt|title)=\'(.*?)\'.+/g,"`$2`");
+				myAM = myAM.replace(/.+(alt|title)=([^>]*?)\s.*>.*/g,"`$2`");
+				myAM = myAM.replace(/.+(alt|title)=(.*?)>.*/g,"`$2`");
 				//myAM = myAM.replace(/&gt;/g,">");
 				//myAM = myAM.replace(/&lt;/g,"<");
 				myAM = myAM.replace(/>/g,"&gt;");

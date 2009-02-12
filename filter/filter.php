@@ -22,7 +22,7 @@
 		if (trim($tex)=='') {
 			return '';
 		} else {
-			return ('<img style="vertical-align: middle;" src="'.$mathimgurl.'?'.rawurlencode($tex).'" alt="'.str_replace('"','&quot;',$arr[0]).'">');
+			return ('<img style="vertical-align: middle;" src="'.$mathimgurl.'?'.rawurlencode($tex).'" alt="'.str_replace('"','&quot;',$arr[1]).'">');
 		}
 	}
 	function svgfiltersscrcallback($arr) {
