@@ -579,17 +579,17 @@ function doonsubmit(form,type2,skipconfirm) {
 		outn = document.getElementById("p"+ntupletoproc[i]);
 		outn.appendChild(nh);
 	}
-	for (var i=0; i<functoproc.length; i++) {
+	for (var fcnt=0; fcnt<functoproc.length; fcnt++) {
 		var nh = document.createElement("INPUT");
 		nh.type = "hidden";
-		nh.name = "qn" + functoproc[i];
-		str = document.getElementById("tc"+functoproc[i]).value;
+		nh.name = "qn" + functoproc[fcnt];
+		str = document.getElementById("tc"+functoproc[fcnt]).value;
 		str = str.replace(/,/g,"");
-		if (iseqn[functoproc[i]]==1) {
+		if (iseqn[functoproc[fcnt]]==1) {
 			str = str.replace(/(.*)=(.*)/,"$1-($2)");
 		}
-		fl = flist[functoproc[i]];
-		varlist = vlist[functoproc[i]];
+		fl = flist[functoproc[fcnt]];
+		varlist = vlist[functoproc[fcnt]];
 		
 		vars = varlist.split("|");
 		for (var j=0; j<vars.length; j++) {
@@ -615,28 +615,28 @@ function doonsubmit(form,type2,skipconfirm) {
 		vars = varlist.split("|");
 		nh.value = mathjs(str,varlist);
 
-		outn = document.getElementById("p"+functoproc[i]);
+		outn = document.getElementById("p"+functoproc[fcnt]);
 		outn.appendChild(nh);
 		
-		ptlist = pts[functoproc[i]].split(",");
+		ptlist = pts[functoproc[fcnt]].split(",");
 		vals= new Array();
-		for (var j=0; j<ptlist.length;j++) { //for each set of inputs
-			inputs = ptlist[j].split("~");
+		for (var fj=0; fj<ptlist.length;fj++) { //for each set of inputs
+			inputs = ptlist[fj].split("~");
 			totest = '';
-			for (var k=0; k<inputs.length; k++) {
+			for (var fk=0; fk<inputs.length; fk++) {
 				//totest += varlist.charAt(k) + "=" + inputs[k] + ";";
-				totest += vars[k] + "=" + inputs[k] + ";";
+				totest += vars[fk] + "=" + inputs[fk] + ";";
 			}
-			totest += nh.value;
+			totest += nh.value+";";
 			try {
-				with (Math) vals[j] = eval(totest);
+				with (Math) vals[fj] = eval(totest);
 			} catch (e) {
-				vals[j] = NaN;
+				vals[fj] = NaN;
 			}	
 		}
 		var nh2 = document.createElement("input");
 		nh2.type = "hidden";
-		nh2.name = "qn" + functoproc[i] + "-vals";
+		nh2.name = "qn" + functoproc[fcnt] + "-vals";
 		nh2.value = vals.join(",");
 		outn.appendChild(nh2);
 		

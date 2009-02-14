@@ -291,6 +291,7 @@
 		
 	}
 	$qi = getquestioninfo($questions,$testsettings);
+	
 	//check for withdrawn
 	for ($i=0; $i<count($questions); $i++) {
 		if ($qi[$questions[$i]]['withdrawn']==1 && $qi[$questions[$i]]['points']>0) {
