@@ -849,8 +849,13 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		
 		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" />";
-		
-		if ($displayformat == 'point') {
+		if ($answerformat == 'complex') {
+			if ($displayformat == "list") {
+				$tip = "Enter your answer as a list of complex numbers in a+bi form separated with commas.  Example: 2+5.5i,-3-4i<br/>";
+			} else {
+				$tip = "Enter your answer a complex number in a+bi form.  Example: 2+5.5i<br/>";
+			}
+		} else if ($displayformat == 'point') {
 			$tip = "Enter your answer as a point.  Example: (2,5.5)<br/>";
 		} else if ($displayformat == 'pointlist') {
 			$tip = "Enter your answer a list of points separated with commas.  Example: (1,2), (3.5,5)<br/>";
@@ -1489,22 +1494,100 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($answer=='DNE' && strtoupper($givenans)=='DNE') {
 			return 1;
 		}
-		preg_match_all('/([\(\[\<\{])(.*?)([\)\]\>\}])/', $givenans, $gaarr, PREG_SET_ORDER);
-		preg_match_all('/([\(\[\<\{])(.*?)([\)\]\>\}])/', $answer, $anarr, PREG_SET_ORDER);
+		if ($answerformat=='complex') {
+			$gaarr = explode(',',$givenans);
+			$anarr = explode(',',$answer);
+		} else {
+			preg_match_all('/([\(\[\<\{])(.*?)([\)\]\>\}])/', $givenans, $gaarr, PREG_SET_ORDER);
+			preg_match_all('/([\(\[\<\{])(.*?)([\)\]\>\}])/', $answer, $anarr, PREG_SET_ORDER);
+		}
+		
 		if (count($gaarr)==0) {
 			return 0;
 		}
 		$extrapennum = count($gaarr)+count($anarr);
-		
 		$correct = 0;
 		foreach ($anarr as $i=>$answer) {
+			if ($answerformat=='complex') {
+				$cparts = parsecomplex($answer);
+				if (!is_array($cparts)) {
+					echo $cparts;
+				} else {
+					eval('$ansparts[0] = '.$cparts[0].';');
+					eval('$ansparts[1] = '.$cparts[1].';');
+				}
+					
+				/*
+				if (preg_match('/([-+]?(?:\d+\.?\d*|\d*\.?\d+))([-+](?:\d+\.?\d|\d*\.?\d+)?)i/',$answer,$matches)) {
+					$ansparts[0] = $matches[1];
+					$ansparts[1] = $matches[2];
+				} else if (preg_match('/([-+]?(?:\d+\.?\d*|\d*\.?\d+)?)i([-+](?:\d+\.?\d|\d*\.?\d+))/',$answer,$matches)) {
+					$ansparts[0] = $matches[2];
+					$ansparts[1] = $matches[1];
+				} else if (preg_match('/([-+]?(?:\d+\.?\d|\d*\.?\d+)?)(i)?/',$answer,$matches)) {
+					if ($matches[2]=='i') {
+						$ansparts[1] = $matches[1];
+						$ansparts[0] = 0;
+					} else {
+						$ansparts[0] = floatval($matches[1]);
+						$ansparts[1] = 0;
+					}
+				}
+				if ($ansparts[1] === '+' || $ansparts[1] === '') {
+					$ansparts[1] = 1;
+				} else if ($ansparts[1] === '-') {
+					$ansparts[1] = -1;
+				} else {
+					$ansparts[1] = floatval($ansparts[1]);
+				}
+				$ansparts[0] = floatval($ansparts[0]);
+				*/
+			}
 			$foundloc = -1;
 			foreach ($gaarr as $j=>$givenans) {
-				if ($answer[1]!=$givenans[1] || $answer[3]!=$givenans[3]) {
-					break;
+				
+				if ($answerformat=='complex') {
+					$cparts = parsecomplex($givenans);
+					if (!is_array($cparts)) {
+						return 0;
+					} else {
+						$gaparts[0] = floatval($cparts[0]);
+						$gaparts[1] = floatval($cparts[1]);
+					}
+					/*
+					if (preg_match('/([-+]?(?:\d+\.?\d*|\d*\.?\d+))([-+](?:\d+\.?\d|\d*\.?\d+)?)i/',$givenans,$matches)) {
+						$gaparts[0] = $matches[1];
+						$gaparts[1] = $matches[2]; 
+					} else if (preg_match('/([-+]?(?:\d+\.?\d*|\d*\.?\d+)?)i([-+](?:\d+\.?\d|\d*\.?\d+))/',$givenans,$matches)) {
+						$gaparts[0] = $matches[2];
+						$gaparts[1] = $matches[1]; 
+					} else if (preg_match('/([-+]?(?:\d+\.?\d|\d*\.?\d+)?)(i)?/',$givenans,$matches)) {
+						if ($matches[2]=='i') {
+							$gaparts[1] = $matches[1];
+							$gaparts[0] = 0;
+						} else {
+							$gaparts[0] = floatval($matches[1]);
+							$gaparts[1] = 0;
+						}
+					} else {
+						break;
+					}
+					if ($gaparts[1] === '+' || $gaparts[1] === '') {
+						$gaparts[1] = 1;
+					} else if ($gaparts[1] === '-') {
+						$gaparts[1] = -1;
+					} else {
+						$gaparts[1] = floatval($gaparts[1]);
+					}
+					$gaparts[0] = floatval($gaparts[0]);
+					*/
+				} else {
+					if ($answer[1]!=$givenans[1] || $answer[3]!=$givenans[3]) {
+						break;
+					}
+					$ansparts = explode(',',$answer[2]);
+					$gaparts = explode(',',$givenans[2]);
 				}
-				$ansparts = explode(',',$answer[2]);
-				$gaparts = explode(',',$givenans[2]);
 				if (count($ansparts)!=count($gaparts)) {
 					break;
 				}
@@ -2504,5 +2587,82 @@ function checkreqtimes($tocheck,$rtimes) {
 		}
 	}
 	return 1;
+}
+
+//parses complex numbers.  Can handle anything, but only with
+//one i in it.
+function parsecomplex($v) {
+	$v = str_replace(' ','',$v);
+	$len = strlen($v);
+	if (substr_count($v,'i')>1) {
+		return 'error - more than 1 i in expression';
+	} else {
+		$p = strpos($v,'i');
+		if ($p===false) {
+			$real = $v;
+			$imag = 0;
+		} else {
+			//look left
+			$nd = 0;
+			for ($L=$p-1;$L>0;$L--) {
+				$c = $v{$L};
+				if ($c==')') {
+					$nd++;
+				} else if ($c=='(') {
+					$nd--;
+				} else if (($c=='+' || $c=='-') && $nd==0) {
+					break;	
+				}
+			}
+			//look right
+			$nd = 0;
+			
+			for ($R=$p+1;$R<$len;$R++) {
+				$c = $v{$R};
+				if ($c=='(') {
+					$nd++;
+				} else if ($c==')') {
+					$nd--;
+				} else if (($c=='+' || $c=='-') && $nd==0) {
+					break;	
+				}
+			}
+			//which is bigger?
+			if ($p-$L>1 && $R-$p>1) {
+				return 'error - invalid form';
+			} else if ($p-$L>1) {
+				$imag = substr($v,$L,$p-$L);
+				$real = substr($v,0,$L) . substr($v,$p+1);
+			} else if ($R-$p>1) {
+				if ($p>0) {
+					$imag = $v{$p-1}.substr($v,$p+1,$R-$p-1);
+					$real = substr($v,0,$p-1) . substr($v,$R);
+				} else {
+					$imag = substr($v,$p+1,$R-$p-1);
+					$real = substr($v,0,$p) . substr($v,$R);
+				}
+			} else { //i or +i or -i or 3i  (one digit)
+				if ($v{$L}=='+') {
+					$imag = 1;
+				} else if ($v{$L}=='-') {
+					$imag = -1;
+				} else if ($p==0) {
+					$imag = 1;	
+				} else {
+					$imag = $v{$L};
+				}
+				$real = ($p>0?substr($v,0,$L):'') . substr($v,$p+1);
+			}
+			if ($real=='') {
+				$real = 0;
+			}
+			if ($imag{0}=='/') {
+				$imag = '1'.$imag;
+			} else if (($imag{0}=='+' || $imag{0}=='-') && $imag{1}=='/') {
+				$imag = $imag{0}.'1'.substr($imag,1);
+			}
+		}
+		return array($real,$imag);
+	}
 }
 ?>

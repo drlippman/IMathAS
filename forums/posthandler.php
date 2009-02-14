@@ -24,6 +24,11 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		} else {
 			$isanon = 0;
 		}
+		require_once("../includes/htmLawed.php");
+		$htmlawedconfig = array('elements'=>'*-script');
+		$_POST['message'] = addslashes(htmLawed(stripslashes($_POST['message']),$htmlawedconfig));
+		$_POST['subject'] = strip_tags($_POST['subject']);
+		
 		if ($_GET['modify']=="reply") {
 			$now = time();
 			$query = "INSERT INTO imas_forum_posts (forumid,threadid,subject,message,userid,postdate,parent,posttype,isanon) VALUES ";

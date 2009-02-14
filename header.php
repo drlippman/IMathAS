@@ -128,6 +128,8 @@ function imascleanup(type, value) {
 		value = value.replace(/<!--([\s\S]*?)-->|&lt;!--([\s\S]*?)--&gt;|<style>[\s\S]*?<\/style>/g, "");  // Word comments
 		value = value.replace(/class="?Mso\w+"?/g,'');
 		value = value.replace(/<p\s*>\s*<\\/p>/gi,'');
+		value = value.replace(/<script.*?\/script>/gi,'');
+		value = value.replace(/<input[^>]*button[^>]*>/gi,'');
 	}
 	return value;
 }
