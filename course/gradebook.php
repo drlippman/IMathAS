@@ -418,7 +418,7 @@ function gbstudisp($stu) {
 					echo ' (EC)';
 				}
 			}
-			if ($gbt[0][1][$i][5]==1) {
+			if ($gbt[0][1][$i][5]==1 && $gbt[0][1][$i][6]==0) {
 				echo ' (PT)';
 			}
 			
@@ -442,7 +442,7 @@ function gbstudisp($stu) {
 						}
 					}
 				} else if ($gbt[0][1][$i][6]==1) {//offline
-					if ($isteacher) {
+					if ($isteacher || ($istutor && $gbt[0][1][$i][8]==1)) {
 						if ($stu==-1) {
 							if (isset($gbt[1][1][$i][0])) { //has score
 								echo "<a href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$i][7]}\">";
@@ -681,16 +681,24 @@ function gbinstrdisp() {
 					echo ' (EC)';
 				}
 			}
-			if ($gbt[0][1][$i][5]==1) {
+			if ($gbt[0][1][$i][5]==1 && $gbt[0][1][$i][6]==0) {
 				echo ' (PT)';
 			}
 			//links
-			if ($gbt[0][1][$i][6]==0 && $isteacher) { //online
-				echo "<br/><a class=small href=\"addassessment.php?id={$gbt[0][1][$i][7]}&cid=$cid&from=gb\">[Settings]</a>";
-				echo "<br/><a class=small href=\"isolateassessgrade.php?cid=$cid&aid={$gbt[0][1][$i][7]}\">[Isolate]</a>";
-			} else if ($gbt[0][1][$i][6]==1  && $isteacher) { //offline
-				echo "<br/><a class=small href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$i][7]}\">[Settings]</a>";
-				echo "<br/><a class=small href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$i][7]}&isolate=true\">[Isolate]</a>";
+			if ($gbt[0][1][$i][6]==0 ) { //online
+				if ($isteacher) {
+					echo "<br/><a class=small href=\"addassessment.php?id={$gbt[0][1][$i][7]}&cid=$cid&from=gb\">[Settings]</a>";
+					echo "<br/><a class=small href=\"isolateassessgrade.php?cid=$cid&aid={$gbt[0][1][$i][7]}\">[Isolate]</a>";
+				} else {
+					echo "<br/><a class=small href=\"isolateassessgrade.php?cid=$cid&aid={$gbt[0][1][$i][7]}\">[Isolate]</a>";
+				}
+			} else if ($gbt[0][1][$i][6]==1  && ($isteacher || ($istutor && $gbt[0][1][$i][8]==1))) { //offline
+				if ($isteacher) {
+					echo "<br/><a class=small href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$i][7]}\">[Settings]</a>";
+					echo "<br/><a class=small href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$i][7]}&isolate=true\">[Isolate]</a>";
+				} else {
+					echo "<br/><a class=small href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$i][7]}&isolate=true\">[Scores]</a>";
+				}
 			} else if ($gbt[0][1][$i][6]==2  && $isteacher) { //discussion
 				echo "<br/><a class=small href=\"addforum.php?id={$gbt[0][1][$i][7]}&cid=$cid&from=gb\">[Settings]</a>";
 			}
@@ -793,7 +801,9 @@ function gbinstrdisp() {
 				}
 				if ($gbt[0][1][$j][6]==0) {//online
 					if (isset($gbt[$i][1][$j][0])) {
-						if ($gbt[$i][1][$j][4]=='average') {
+						if ($istutor && $gbt[$i][1][$j][4]=='average') {
+							
+						} else if ($gbt[$i][1][$j][4]=='average') {
 							echo "<a href=\"gb-itemanalysis.php?stu=$stu&cid=$cid&asid={$gbt[$i][1][$j][4]}&aid={$gbt[0][1][$j][7]}\">";
 						} else {
 							echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid={$gbt[$i][1][$j][4]}&uid={$gbt[$i][4][0]}\">";
@@ -808,7 +818,10 @@ function gbinstrdisp() {
 						} else if ($gbt[$i][1][$j][3]==4) {
 							echo ' (PT)';
 						} 
-						echo '</a>';
+						if ($istutor && $gbt[$i][1][$j][4]=='average') {
+						} else {
+							echo '</a>';
+						}
 						if ($gbt[$i][1][$j][1]==1) {
 							echo '<sup>*</sup>';
 						}
@@ -831,6 +844,12 @@ function gbinstrdisp() {
 						} else {
 							echo "<a href=\"addgrades.php?stu=$stu&cid=$cid&grades={$gbt[$i][4][0]}&gbitem={$gbt[0][1][$j][7]}\">";
 						}
+					} else if ($istutor && $gbt[0][1][$j][8]==1) {
+						if ($gbt[$i][0][0]=='Averages') {
+							echo "<a href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$j][7]}\">";
+						} else {
+							echo "<a href=\"addgrades.php?stu=$stu&cid=$cid&grades={$gbt[$i][4][0]}&gbitem={$gbt[0][1][$j][7]}\">";
+						}
 					}
 					if (isset($gbt[$i][1][$j][0])) {
 						echo $gbt[$i][1][$j][0];
@@ -840,7 +859,7 @@ function gbinstrdisp() {
 					} else {
 						echo '-';
 					}
-					if ($isteacher) {
+					if ($isteacher || ($istutor && $gbt[0][1][$j][8]==1)) {
 						echo '</a>';
 					}
 					if ($gbt[$i][1][$j][1]==1) {

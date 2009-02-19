@@ -3,7 +3,10 @@
 //(c) 2007 David Lippman
 	require("../validate.php");
 	$isteacher = isset($teacherid);
-	if (!(isset($teacherid))) {
+	$istutor = isset($tutorid);
+	
+	//TODO:  make tutor friendly by adding section filter
+	if (!$istutor && !$istutor) {
 		require("../header.php");
 		echo "You need to log in as a teacher to access this page";
 		require("../footer.php");
@@ -57,6 +60,9 @@
 	$query = "SELECT iu.LastName,iu.FirstName,istu.section,";
 	$query .= "ias.id,ias.userid,ias.bestscores,ias.starttime,ias.endtime,ias.feedback FROM imas_assessment_sessions AS ias,imas_users AS iu,imas_students AS istu ";
 	$query .= "WHERE iu.id = istu.userid AND istu.courseid='$cid' AND iu.id=ias.userid AND ias.assessmentid='$aid'";
+	if ($istutor && isset($tutorsection) && $tutorsection!='') {
+		$query .= " AND istu.section='$tutorsection' ";
+	}
 	if ($hassection && $sortorder=="sec") {
 		 $query .= " ORDER BY istu.section,iu.LastName,iu.FirstName";
 	} else {

@@ -5,8 +5,28 @@
 	//grade edit
 	//single grade edit
 	require("../validate.php");
+	$istutor = false;
+	$isteacher = false;
+	if (isset($tutorid)) { $istutor = true;}
+	if (isset($teacherid)) { $isteacher = true;}
 	
-	if (!(isset($teacherid))) {
+	if ($istutor) {
+		$isok = false;
+		if (is_numeric($_GET['gbitem'])) {
+			$query = "SELECT tutoredit FROM imas_gbitems WHERE id='{$_GET['gbitem']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			if (mysql_result($result,0,0)==1) {
+				$isok = true;
+				$_GET['isolate'] = true;
+			}
+		} 
+		if (!$isok) {
+			require("../header.php");
+			echo "You don't have authority for this action";
+			require("../footer.php");
+			exit;
+		}
+	} else if (!$isteacher) {
 		require("../header.php");
 		echo "You need to log in as a teacher to access this page";
 		require("../footer.php");
@@ -14,7 +34,7 @@
 	}
 	$cid = $_GET['cid'];
 	
-	if (isset($_GET['del'])) {
+	if (isset($_GET['del']) && $isteacher) {
 		if (isset($_GET['confirm'])) {
 			$query = "DELETE FROM imas_grades WHERE gbitemid='{$_GET['del']}'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
@@ -32,21 +52,26 @@
 		}
 		
 	}
-	if (isset($_POST['name'])) {
+	if (isset($_POST['name']) && $isteacher) {
 		require_once("parsedatetime.php");
 		if ($_POST['sdatetype']=='0') {
 			$showdate = 0;
 		} else {
 			$showdate = parsedatetime($_POST['sdate'],$_POST['stime']);
 		}
+		if (isset($_POST['tutoredit'])) {
+			$tutoredit = 1;
+		} else {
+			$tutoredit = 0;
+		}
 		if ($_GET['gbitem']=='new') {
-			$query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb) VALUES ";
-			$query .= "('$cid','{$_POST['name']}','{$_POST['points']}',$showdate,'{$_POST['gbcat']}','{$_POST['cntingb']}') ";
+			$query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit) VALUES ";
+			$query .= "('$cid','{$_POST['name']}','{$_POST['points']}',$showdate,'{$_POST['gbcat']}','{$_POST['cntingb']}',$tutoredit) ";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			$_GET['gbitem'] = mysql_insert_id();
 			$isnewitem = true;
 		} else {
-			$query = "UPDATE imas_gbitems SET name='{$_POST['name']}',points='{$_POST['points']}',showdate=$showdate,gbcategory='{$_POST['gbcat']}',cntingb='{$_POST['cntingb']}' ";
+			$query = "UPDATE imas_gbitems SET name='{$_POST['name']}',points='{$_POST['points']}',showdate=$showdate,gbcategory='{$_POST['gbcat']}',cntingb='{$_POST['cntingb']}',tutoredit=$tutoredit ";
 			$query .= "WHERE id='{$_GET['gbitem']}'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			$isnewitem = false;
@@ -119,9 +144,9 @@
 			$gbcat = 0;
 			$cntingb = 1;
 		} else {
-			$query = "SELECT name,points,showdate,gbcategory,cntingb FROM imas_gbitems WHERE id='{$_GET['gbitem']}'";
+			$query = "SELECT name,points,showdate,gbcategory,cntingb,tutoredit FROM imas_gbitems WHERE id='{$_GET['gbitem']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			list($name,$points,$showdate,$gbcat,$cntingb) = mysql_fetch_row($result);
+			list($name,$points,$showdate,$gbcat,$cntingb,$tutoredit) = mysql_fetch_row($result);
 		}
 		if ($showdate!=0) {
 			$sdate = tzdate("m/d/Y",$showdate);
@@ -173,6 +198,11 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 		echo ' /> Don\'t count in grade total<br/><input type=radio name="cntingb" value="2" ';
 		if ($cntingb==2) {echo "checked=1";}
 		echo ' /> Count as Extra Credit</span><br class=form />';
+		
+		echo '<span class="form">Allow tutors to edit?</span> <span class="formright">';
+		echo '<input type="checkbox" name="tutoredit" value="1" ';
+		if ($tutoredit==1) {echo ' checked="checked" ';}
+		echo '/></span><br class="form"/>';
 		
 		if ($_GET['gbitem']!='new') {
 			echo "<span class=form></span><span class=formright><a href=\"addgrades.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=$cid&del={$_GET['gbitem']}\">Delete Item</a></span><br class=form />";
@@ -305,7 +335,7 @@ function sendtoall(type) {
 			$sortorder = "name";
 		}
 		
-		if ($_GET['grades']=='all' && $_GET['gbitem']!='new') {
+		if ($_GET['grades']=='all' && $_GET['gbitem']!='new' && $isteacher) {
 			echo "<p><a href=\"uploadgrades.php?gbmode={$_GET['gbmode']}&cid=$cid&gbitem={$_GET['gbitem']}\">Upload Grades</a></p>";
 		}
 		/*
@@ -356,6 +386,9 @@ function sendtoall(type) {
 				$query .= "WHERE imas_users.id=imas_students.userid AND imas_users.id='{$_GET['grades']}' AND imas_students.courseid='$cid'";
 			} else {
 				$query .= "WHERE imas_users.id=imas_students.userid AND imas_students.courseid='$cid'";
+			}
+			if ($istutor && isset($tutorsection) && $tutorsection!='') {
+				$query .= " AND imas_students.section='$tutorsection' ";
 			}
 		}
 		if ($hassection && $sortorder=="sec") {

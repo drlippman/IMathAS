@@ -55,9 +55,10 @@ row[0][1][0][1] = "Category"
 row[0][1][0][2] = points possible
 row[0][1][0][3] = 0 past, 1 current, 2 future
 row[0][1][0][4] = 0 no count and hide, 1 count, 2 EC, 3 no count
-row[0][1][0][5] = 0 regular, 1 practice test
+row[0][1][0][5] = 0 regular, 1 practice test  
 row[0][1][0][6] = 0 online, 1 offline, 2 discussion
 row[0][1][0][7] = assessmentid, gbitemid, forumid
+row[0][1][0][8] = tutoredit: 0 no, 1 yes
 
 row[0][2] category totals
 row[0][2][0][0] = "Category Name"
@@ -180,6 +181,7 @@ function gbtable() {
 	$minscores = array();
 	$assessmenttype = array();
 	$enddate = array();
+	$tutoredit = array();
 	$avail = array();
 	$sa = array();
 	$category = array();
@@ -270,6 +272,7 @@ function gbtable() {
 		$possible[$kcnt] = $line['points'];
 		$name[$kcnt] = $line['name'];
 		$cntingb[$kcnt] = $line['cntingb'];
+		$tutoredit[$kcnt] = $line['tutoredit'];
 		$kcnt++;
 	}
 	
@@ -430,6 +433,7 @@ function gbtable() {
 					$assesscol[$assessments[$k]] = $pos;
 				} else if (isset($grades[$k])) {
 					$gb[0][1][$pos][6] = 1; //0 online, 1 offline
+					$gb[0][1][$pos][8] = $tutoredit[$k]; //tutoredit
 					$gb[0][1][$pos][7] = $grades[$k];
 					$gradecol[$grades[$k]] = $pos;
 				} else if (isset($discuss[$k])) {
@@ -465,6 +469,7 @@ function gbtable() {
 				$assesscol[$assessments[$k]] = $pos;
 			} else if (isset($grades[$k])) {
 				$gb[0][1][$pos][6] = 1; //0 online, 1 offline
+				$gb[0][1][$pos][8] = $tutoredit[$k]; //tutoredit
 				$gb[0][1][$pos][7] = $grades[$k];
 				$gradecol[$grades[$k]] = $pos;
 			} else if (isset($discuss[$k])) {
