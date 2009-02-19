@@ -162,6 +162,9 @@ dd {
 		<li><a href="#draw">Drawing</a></li>
 		<li><a href="#ntuple">N-Tuple</a></li>
 		<li><a href="#calcntuple">Calculated N-Tuple</a></li>
+		<li><a href="#complex">Complex</a></li>
+		<li><a href="#calccomplex">Calculated Complex</a></li>
+		
 		<li><a href="#numericalmatrix">Numerical Matrix</a></li>
 		<li><a href="#calculatedmatrix">Calculated Matrix</a></li>
 		<li><a href="#interval">Interval</a></li>
@@ -2109,7 +2112,6 @@ drawn line from the correct line.
 
 N-Tuple questions require the student to enter an n-tuple or list of n-tuples.
 This can be used for coordinate points, vectors, or any other n-tuple of numbers.
-Drawing question require the student to draw one or more lines/curves or dots.  
 
 <p><b>Required Variables</b><BR>
 <dl>
@@ -2183,6 +2185,76 @@ rather than just numbers, such as (5/3, 2/3).
 </p>
 
 </div>
+
+<div class=h3>
+<h3><a name="complex">Complex</a></h3>
+
+Complex questions require the student to enter a complex number in a+bi form.  
+
+<p><b>Required Variables</b><BR>
+<dl>
+<dt>$answers = a string containing a complex number or list of complex numbers (In Answer)</dt>
+  <dd>Defines the answer.  Example: $answer="3+2i"</dd>
+</dl>
+</p>
+<p><b>Optional Variables</b><BR>
+<dl>
+<dt>$answerformat = "list" (In Common Control)</dt>
+	<dd>Specifies that the answer will be a list of complex numbers.</dd>
+<dt>$reltolerance = tolerance scaling factor</dt>
+	<dd>Scales the grading tolerance.  Defaults to 1.  Set $reltolerance = 2 to make the grading twice as tolerant;
+	    $reltolerance = 0.5 to make grading half as forgiving</dd>
+<dt>$abstolerance = grading cutoff</dt>
+	<dd>Sets all-or-nothing grading.  If score &lt; $abstolerance, the student receives 0 for the question (note: score is 
+	between 0 and 1).  Otherwise
+	the student will receive full credit.  Not set by default.</dd>
+<dt>$answerbox (In Question Text)</dt>
+	<dd>Using the variable $answerbox in the Question Text will place the question input drawing tool in that location</dd>
+<dt>$showanswer (In Answer)</dt>
+	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
+	Use this to substitute a detailed answer.</dd>
+<dt>$hidetips = true (In Question Control)</dt>
+	<dd>Hides the question entry tips that display by default</dd>
+</dl>
+</p>
+
+</div>
+<div class=h3>
+<h3><a name="calccomplex">Calculated Complex</a></h3>
+
+Calculated Complex questions require the student to enter a complex number in a+bi form. 
+This is identical the the N-tuple answer type, but allows students to enter mathematical expressions
+rather than just numbers, such as 1/3+sqrt(2)i.
+
+<p><b>Required Variables</b><BR>
+<dl>
+<dt>$answers = a string containing a complex number or list of complex numbers (In Answer)</dt>
+  <dd>Defines the answer.  Example: $answer="3+2i"</dd>
+</dl>
+</p>
+<p><b>Optional Variables</b><BR>
+<dl>
+<dt>$answerformat = "list" (In Common Control)</dt>
+	<dd>Specifies that the answer will be a list of complex numbers.</dd>
+<dt>$reltolerance = tolerance scaling factor</dt>
+	<dd>Scales the grading tolerance.  Defaults to 1.  Set $reltolerance = 2 to make the grading twice as tolerant;
+	    $reltolerance = 0.5 to make grading half as forgiving</dd>
+<dt>$abstolerance = grading cutoff</dt>
+	<dd>Sets all-or-nothing grading.  If score &lt; $abstolerance, the student receives 0 for the question (note: score is 
+	between 0 and 1).  Otherwise
+	the student will receive full credit.  Not set by default.</dd>
+<dt>$answerbox (In Question Text)</dt>
+	<dd>Using the variable $answerbox in the Question Text will place the question input drawing tool in that location</dd>
+<dt>$showanswer (In Answer)</dt>
+	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
+	Use this to substitute a detailed answer.</dd>
+<dt>$hidetips = true (In Question Control)</dt>
+	<dd>Hides the question entry tips that display by default</dd>
+</dl>
+</p>
+
+</div>
+
 <div class=h3>
 <h3><a name="numericalmatrix">Numerical Matrix</a></h3>
 

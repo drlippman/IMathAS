@@ -853,7 +853,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			if ($displayformat == "list") {
 				$tip = "Enter your answer as a list of complex numbers in a+bi form separated with commas.  Example: 2+5.5i,-3-4i<br/>";
 			} else {
-				$tip = "Enter your answer a complex number in a+bi form.  Example: 2+5.5i<br/>";
+				$tip = "Enter your answer as a complex number in a+bi form.  Example: 2+5.5i<br/>";
 			}
 		} else if ($displayformat == 'point') {
 			$tip = "Enter your answer as a point.  Example: (2,5.5)<br/>";
@@ -883,11 +883,18 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		
 		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" />";
 		if (!isset($hidepreview)) {
-			$preview .= "<input type=button class=btn value=Preview onclick=\"ntuplecalc('tc$qn','p$qn')\" /> &nbsp;\n";
+			$preview .= "<input type=button class=btn value=Preview onclick=\"ntuplecalc('tc$qn','p$qn','$qn')\" /> &nbsp;\n";
 		}
 		$preview .= "<span id=p$qn></span> ";
-		$out .= "<script type=\"text/javascript\">ntupletoproc[ntupletoproc.length] = $qn;</script>\n";
-		if ($displayformat == 'point') {
+		$out .= "<script type=\"text/javascript\">ntupletoproc[ntupletoproc.length] = $qn; calcformat[$qn] = '$answerformat';</script>\n";
+		
+		if ($answerformat == 'complex') {
+			if ($displayformat == "list") {
+				$tip = "Enter your answer as a list of complex numbers in a+bi form separated with commas.  Example: 2+5.5i,-3-4i<br/>";
+			} else {
+				$tip = "Enter your answer as a complex number in a+bi form.  Example: 2+5.5i<br/>";
+			}
+		} else if ($displayformat == 'point') {
 			$tip = "Enter your answer as a point.  Example: (2,5.5)<br/>";
 		} else if ($displayformat == 'pointlist') {
 			$tip = "Enter your answer a list of points separated with commas.  Example: (1,2), (3.5,5)<br/>";
@@ -903,6 +910,54 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		$tip .= "Enter DNE for Does Not Exist";
 		if (isset($answer)) {
 			$sa = $answer;
+		}
+	} else if ($anstype == "complex") {
+		if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$qn];} else {$sz = $options['answerboxsize'];}}
+		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
+		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
+		if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$qn];} else {$displayformat = $options['displayformat'];}}
+		
+		if (!isset($sz)) { $sz = 20;}
+		if ($multi>0) { $qn = $multi*1000+$qn;} 
+		
+		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" />";
+		if ($answerformat == "list") {
+			$tip = "Enter your answer as a list of complex numbers in a+bi form separated with commas.  Example: 2+5.5i,-3-4i<br/>";
+		} else {
+			$tip = "Enter your answer as a complex number in a+bi form.  Example: 2+5.5i<br/>";
+		}
+		
+		$tip .= "Enter DNE for Does Not Exist";
+		if (isset($answer)) {
+			$sa = makepretty($answer);
+		}
+	} else if ($anstype == "calccomplex") {
+		if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$qn];} else {$sz = $options['answerboxsize'];}}
+		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
+		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
+		if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$qn];} else {$displayformat = $options['displayformat'];}}
+		
+		if (!isset($sz)) { $sz = 20;}
+		if ($multi>0) { $qn = $multi*1000+$qn;} 
+		if (!isset($answerformat)) { $answerformat = '';}
+		$ansformats = explode(',',$answerformat);
+		
+		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" />";
+		if (!isset($hidepreview)) {
+			$preview .= "<input type=button class=btn value=Preview onclick=\"complexcalc('tc$qn','p$qn')\" /> &nbsp;\n";
+		}
+		$preview .= "<span id=p$qn></span> ";
+		$out .= "<script type=\"text/javascript\">complextoproc[complextoproc.length] = $qn;</script>\n";
+		
+		if (in_array('list',$ansformats)) {
+			$tip = "Enter your answer as a list of complex numbers in a+bi form separated with commas.  Example: 2+5.5i,-3-4i<br/>";
+		} else {
+			$tip = "Enter your answer as a complex number in a+bi form.  Example: 2+5.5i<br/>";
+		}
+	
+		$tip .= "Enter DNE for Does Not Exist";
+		if (isset($answer)) {
+			$sa = makeprettydisp( $answer);
 		}
 	} else if ($anstype == "string") {
 		if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$qn];} else {$ansprompt = $options['ansprompt'];}}
@@ -1615,6 +1670,88 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($score<0) { $score = 0; }
 		return ($score);
 		
+	} else if ($anstype == "complex" || $anstype== 'calccomplex') {
+		if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}
+		if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$qn];} else {$reltolerance = $options['reltolerance'];}}
+		if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$qn];} else {$abstolerance = $options['abstolerance'];}}
+		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
+		if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$qn];} else {$requiretimes = $options['requiretimes'];}}
+		
+		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = .001;}
+		if ($multi>0) { $qn = $multi*1000+$qn;}
+		if ($anstype=='complex') {
+			$GLOBALS['partlastanswer'] = $givenans;
+		} else if ($anstype=='calccomplex') {
+			$GLOBALS['partlastanswer'] = $_POST["tc$qn"];
+			//test for correct format, if specified
+			if (checkreqtimes($_POST["tc$qn"],$requiretimes)==0) {
+				return 0;
+			}
+		}
+		if (!isset($answerformat)) { $answerformat = '';}
+		$ansformats = explode(',',$answerformat);
+		
+		if ($givenans == null) {return 0;}
+		$answer = str_replace(' ','',makepretty($answer));
+		$givenans = str_replace(' ','',$givenans);
+		
+		if ($answer=='DNE' && strtoupper($givenans)=='DNE') {
+			return 1;
+		}
+		
+		$gaarr = explode(',',$givenans);
+		$anarr = explode(',',$answer);
+		
+		if (count($gaarr)==0) {
+			return 0;
+		}
+		$extrapennum = count($gaarr)+count($anarr);
+		$correct = 0;
+		foreach ($anarr as $i=>$answer) {
+			$cparts = parsecomplex($answer);
+			if (!is_array($cparts)) {
+				echo $cparts;
+			} else {
+				eval('$ansparts[0] = '.$cparts[0].';');
+				eval('$ansparts[1] = '.$cparts[1].';');
+			}
+			$foundloc = -1;
+			foreach ($gaarr as $j=>$givenans) {
+				$cparts = parsecomplex($givenans);
+				if (!is_array($cparts)) {
+					return 0;
+				} else {
+					$gaparts[0] = floatval($cparts[0]);
+					$gaparts[1] = floatval($cparts[1]);
+				}
+				
+				if (count($ansparts)!=count($gaparts)) {
+					break;
+				}
+				for ($i=0; $i<count($ansparts); $i++) {
+					if (is_numeric($ansparts[$i]) && is_numeric($gaparts[$i])) {
+						if (isset($abstolerance)) {
+							if (abs($ansparts[$i]-$gaparts[$i]) >= $abstolerance + 1E-12) {break;} 	
+						} else {
+							if (abs($ansparts[$i]-$gaparts[$i])/(abs($ansparts[$i])+.0001) >= $reltolerance+ 1E-12) {break;} 
+						}
+					}
+				}
+				if ($i==count($ansparts)) {
+					$correct += 1; $foundloc = $j; break;
+				}
+			}
+			if ($foundloc>-1) {
+				array_splice($gaarr,$foundloc,1); // remove from list
+				if (count($gaarr)==0) {
+					break;
+				}
+			}
+		}
+		$score = $correct/count($anarr) - count($gaarr)/$extrapennum;
+		if ($score<0) { $score = 0; }
+		return ($score);
+		
 	} else if ($anstype == "calculated") {
 		if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}
 		if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$qn];} else {$reltolerance = $options['reltolerance'];}}
@@ -2004,6 +2141,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$anans = explode("\n",chunk_split($anans,1,"\n"));
 				sort($anans,SORT_STRING);
 				$anans = implode('',$anans);
+			}
+			if ($flags['trim_whitespace']===true || $flags['compress_whitespace']===true) {
+				$anans = trim($anans);
 			}
 			if ($flags['remove_whitespace']===true) {
 				$anans = trim(preg_replace('/\s+/','',$anans));

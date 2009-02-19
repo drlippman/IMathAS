@@ -209,6 +209,52 @@ function ntuplecalc(inputId,outputId) {
 	 return outcalced;
 }
 
+
+function complexcalc(inputId,outputId) {
+	var fullstr = document.getElementById(inputId).value;
+	fullstr = fullstr.replace(/\s+/g,'');
+	if (fullstr.match(/DNE/i)) {
+		fullstr = fullstr.toUpperCase();
+		outcalced = 'DNE';
+		outstr = 'DNE';
+	} else {
+		var outcalced = '';
+		var arr = fullstr.split(',');
+		for (var cnt=0; cnt<arr.length; cnt++) {
+			var prep = mathjs(arr[cnt],'i');
+			try {
+			    with (Math) var real = eval('i=0;'+prep);
+			    with (Math) var imag = eval('i=1;'+prep);
+			} catch(e) {
+			    err = "syntax incomplete";
+			}
+			if (!isNaN(real) && real!="Infinity" && !isNaN(imag) && imag!="Infinity") {
+				imag -= real;
+				if (cnt!=0) {
+					outcalced += ',';
+				}
+				outcalced += real+(imag>0?'+':'')+imag+'i';
+			} else {
+				outcalced = err;
+				break;
+			}
+		}
+		outstr = '`'+fullstr+'` = '+outcalced;
+	}
+	if (outputId != null) {
+		 var outnode = document.getElementById(outputId);
+		 var n = outnode.childNodes.length;
+		 for (var i=0; i<n; i++) {
+		    outnode.removeChild(outnode.firstChild);
+		 }
+		 outnode.appendChild(document.createTextNode(outstr));
+		 if (!noMathRender) {
+			  AMprocessNode(outnode);
+		 }
+	}
+	 return outcalced;
+}
+
 function matrixcalc(inputId,outputId,rows,cols) {
 	
 	function calced(estr) {
@@ -462,6 +508,7 @@ var calcformat = new Array();
 var functoproc = new Array();
 var matcalctoproc = new Array();
 var ntupletoproc = new Array();
+var complextoproc = new Array();
 var matsize = new Array();
 var vlist = new Array();
 var flist = new Array();
@@ -577,6 +624,15 @@ function doonsubmit(form,type2,skipconfirm) {
 		str = ntuplecalc("tc"+ntupletoproc[i],null);
 		nh.value = str;
 		outn = document.getElementById("p"+ntupletoproc[i]);
+		outn.appendChild(nh);
+	}
+	for (var i=0; i<complextoproc.length; i++) {
+		var nh = document.createElement("INPUT");
+		nh.type = "hidden";
+		nh.name = "qn" + complextoproc[i];
+		str = complexcalc("tc"+complextoproc[i],null);
+		nh.value = str;
+		outn = document.getElementById("p"+complextoproc[i]);
 		outn.appendChild(nh);
 	}
 	for (var fcnt=0; fcnt<functoproc.length; fcnt++) {
