@@ -229,7 +229,7 @@ for($i=-1, $ci=count($tx); ++$i<$ci;){
  }
  // if no open ele, $in is parent; except for certain cases, immediate parent-child relation should hold
  if(!$ql or (!isset($eN[$e]) or !array_intersect($q, $cN2))){
-  if(!isset($ok[$e])){continue;}
+	 //if(!isset($ok[$e])){continue;}		//DLMOD:  Want to preserve improperly nested like <p><table> even though bad HTML, so don't remove bad children 
   if(!isset($cE[$e])){$q[] = $e;}
   echo '<', $e, $a, '>'; unset($e); continue;
  }

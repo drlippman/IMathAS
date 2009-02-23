@@ -534,7 +534,8 @@
 	}
 	
 	$query = "SELECT imas_forum_posts.*,imas_forum_threads.views as tviews,imas_users.LastName,imas_users.FirstName FROM imas_forum_posts,imas_users,imas_forum_threads WHERE ";
-	$query .= "imas_forum_posts.userid=imas_users.id AND imas_forum_posts.threadid=imas_forum_threads.id AND imas_forum_posts.parent=0 AND imas_forum_posts.forumid='$forumid' ";
+	$query .= "imas_forum_posts.userid=imas_users.id AND imas_forum_posts.threadid=imas_forum_threads.id AND imas_forum_posts.parent=0 AND imas_forum_posts.forumid='$forumid' ";	
+	
 	if ($dofilter) {
 		$query .= "AND imas_forum_posts.userid IN ($limids) ";
 	}
@@ -580,10 +581,10 @@
 			}
 		}
 		if ($isteacher || ($line['userid']==$userid && $allowmod)) {
-			echo "<a href=\"thread.php?page=$page&cid=$cid&forum=$forumid&modify={$line['id']}\">Modify</a> ";
+			echo "<a href=\"thread.php?page=$page&cid=$cid&forum={$line['forumid']}&modify={$line['id']}\">Modify</a> ";
 		} 
 		if ($isteacher || ($allowdel && $line['userid']==$userid && $posts==0)) {
-			echo "<a href=\"thread.php?page=$page&cid=$cid&forum=$forumid&remove={$line['id']}\">Remove</a>";
+			echo "<a href=\"thread.php?page=$page&cid=$cid&forum={$line['forumid']}&remove={$line['id']}\">Remove</a>";
 		}
 		echo "</span>\n";
 		if ($line['isanon']==1) {

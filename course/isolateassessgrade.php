@@ -6,7 +6,7 @@
 	$istutor = isset($tutorid);
 	
 	//TODO:  make tutor friendly by adding section filter
-	if (!$istutor && !$istutor) {
+	if (!$isteacher && !$istutor) {
 		require("../header.php");
 		echo "You need to log in as a teacher to access this page";
 		require("../footer.php");

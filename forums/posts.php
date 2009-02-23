@@ -19,7 +19,10 @@
 	$forumid = $_GET['forum'];
 	$threadid = $_GET['thread'];
 	$page = $_GET['page'];
-	
+	//special "page"s
+	//-1 new posts from forum page
+	//-2 tagged posts from forum page
+	//-3 new posts from newthreads page
 	$query = "SELECT settings,replyby,defdisplay,name,points FROM imas_forums WHERE id='$forumid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$forumsettings = mysql_result($result,0,0);
@@ -119,7 +122,7 @@
 	}
 	
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
-	if ($page==-2) {
+	if ($page==-3) {
 		echo "<a href=\"newthreads.php?cid=$cid\">New Threads</a> ";
 	} else {
 		echo "<a href=\"thread.php?cid=$cid&forum=$forumid&page=$page\">$forumname</a> ";
