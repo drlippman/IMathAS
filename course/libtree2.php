@@ -100,7 +100,7 @@ END;
 	} else if (!isset($checked)) {
 		$checked = array();
 	}
-	echo "//checked: ".implode(',',$checked)."\n";
+	//echo "//checked: ".implode(',',$checked)."\n";
 	if (isset($_GET['locklibs']) && $_GET['locklibs']!='') {
 		$locked = explode(",",$_GET['locklibs']);
 	} else if (!isset($locked)) {

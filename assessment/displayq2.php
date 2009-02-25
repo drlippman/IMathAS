@@ -650,7 +650,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$qn];} else {$displayformat = $options['displayformat'];}}
 		
 		if (!isset($sz)) { $sz = 20;}
-		if ($multi>0) { $qn = $multi*1000+$qn;} 
+		if ($multi>0) { $qn = $multi*1000+$qn;}
 		if (!isset($answerformat)) { $answerformat = '';}
 		if (isset($ansprompt)) {$out .= "<label for=\"tc$qn\">$ansprompt</label>";}
 		if ($displayformat=="point") {
@@ -677,28 +677,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$tip = '';
 			$eword = "your answer";
 		}
-		if (in_array('fraction',$ansformats)) {
-			$tip .= "Enter $eword as a fraction (like 3/5 or 10/4) or as a whole number (like 4 or -2)";
-		} else if (in_array('reducedfraction',$ansformats)) {
-			$tip .= "Enter $eword as a reduced fraction (like 5/3, not 10/6) or as a whole number (like 4 or -2)";
-		} else if (in_array('mixednumber',$ansformats)) {
-			$tip .= "Enter $eword as a reduced mixed number or as a whole number.  Example: 2_1/2 = `2 1/2`";
-		} else if (in_array('fracordec',$ansformats)) {
-			$tip .= "Enter $eword as a fraction (like 3/5 or 10/4), a whole number (like 4 or -2), or exact decimal (like 0.5 or 1.25)";
-		} else if (in_array('scinot',$ansformats)) {
-			$tip .= "Enter $eword as in scientific notation.  Example: 3*10^2 = `3*10^2`";
-		} else {
-			$tip .= "Enter $eword as a number (like 5, -3, 2.2) or as a calculation (like 5/3, 2^3, 5+4)<br/>";
-			$tip .= "Enter DNE for Does Not Exist, oo for Infinity";
-		}
-		if (in_array('nodecimal',$ansformats)) {
-			$tip .= "<br/>Decimal values are not allowed";
-		} else if (isset($reqdecimals)) {
-			$tip .= "<br/>Your answer should be accurate to $reqdecimals decimal places.";
-		}
-		if (in_array('notrig',$ansformats)) {
-			$tip .= "<br/>Trig functions (sin,cos,etc.) are not allowed";
-		} 
+		$tip .= formathint($eword,$ansformats,'calculated');
 		if (isset($answer)) {
 			$sa = $answer;
 		}
@@ -745,6 +724,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$qn];} else {$sz = $options['answerboxsize'];}}
 		if (isset($options['hidepreview'])) {if (is_array($options['hidepreview'])) {$hidepreview = $options['hidepreview'][$qn];} else {$hidepreview = $options['hidepreview'];}}
 		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
+		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
+		if (!isset($answerformat)) { $answerformat = '';}
+		$ansformats = explode(',',$answerformat);
 		
 		if (!isset($sz)) { $sz = 20;}
 		
@@ -769,13 +751,15 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			if (!isset($hidepreview)) {$preview .= "<input type=button class=btn value=Preview onclick=\"matrixcalc('qn$qn','p$qn',{$answersize[0]},{$answersize[1]})\" /> &nbsp;\n";}
 			$preview .= "<span id=p$qn></span>\n";
 			$out .= "<script type=\"text/javascript\">matcalctoproc[matcalctoproc.length] = $qn; matsize[$qn]='{$answersize[0]},{$answersize[1]}';</script>\n";
-			$tip = "Enter each element of the matrix as  number (like 5, -3, 2.2) or as a calculation (like 5/3, 2^3, 5+4)";
+			$tip .= formathint('each element of the matrix',$ansformats,'calcmatrix');
+			//$tip = "Enter each element of the matrix as  number (like 5, -3, 2.2) or as a calculation (like 5/3, 2^3, 5+4)";
 		} else {
 			$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" />\n";
 			$out .= "<input type=button value=Preview onclick=\"matrixcalc('tc$qn','p$qn')\" /> &nbsp;\n";
 			$out .= "<span id=p$qn></span> \n";
 			$out .= "<script type=\"text/javascript\">matcalctoproc[matcalctoproc.length] = $qn;</script>\n";
-			$tip = "Enter your answer as a matrix filled with numbers or calculations, like ((2,3,4/5),(3^2,4,5))";
+			$tip = "Enter your answer as a matrix, like ((2,3,4),(1,4,5))";
+			$tip .= '<br/>'.formathint('each element of the matrix',$ansformats,'calcmatrix');
 		}
 		if (isset($answer)) {
 			$sa = '`'.$answer.'`';
@@ -849,13 +833,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		
 		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" />";
-		if ($answerformat == 'complex') {
-			if ($displayformat == "list") {
-				$tip = "Enter your answer as a list of complex numbers in a+bi form separated with commas.  Example: 2+5.5i,-3-4i<br/>";
-			} else {
-				$tip = "Enter your answer as a complex number in a+bi form.  Example: 2+5.5i<br/>";
-			}
-		} else if ($displayformat == 'point') {
+		if ($displayformat == 'point') {
 			$tip = "Enter your answer as a point.  Example: (2,5.5)<br/>";
 		} else if ($displayformat == 'pointlist') {
 			$tip = "Enter your answer a list of points separated with commas.  Example: (1,2), (3.5,5)<br/>";
@@ -869,6 +847,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$tip = "Enter your answer as an n-tuple of numbers.  Example: (2,5.5)<br/>";
 		}
 		$tip .= "Enter DNE for Does Not Exist";
+		
 		if (isset($answer)) {
 			$sa = $answer;
 		}
@@ -877,6 +856,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
 		if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$qn];} else {$displayformat = $options['displayformat'];}}
+		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
+		if (!isset($answerformat)) { $answerformat = '';}
+		$ansformats = explode(',',$answerformat);
 		
 		if (!isset($sz)) { $sz = 20;}
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
@@ -888,13 +870,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		$preview .= "<span id=p$qn></span> ";
 		$out .= "<script type=\"text/javascript\">ntupletoproc[ntupletoproc.length] = $qn; calcformat[$qn] = '$answerformat';</script>\n";
 		
-		if ($answerformat == 'complex') {
-			if ($displayformat == "list") {
-				$tip = "Enter your answer as a list of complex numbers in a+bi form separated with commas.  Example: 2+5.5i,-3-4i<br/>";
-			} else {
-				$tip = "Enter your answer as a complex number in a+bi form.  Example: 2+5.5i<br/>";
-			}
-		} else if ($displayformat == 'point') {
+		if ($displayformat == 'point') {
 			$tip = "Enter your answer as a point.  Example: (2,5.5)<br/>";
 		} else if ($displayformat == 'pointlist') {
 			$tip = "Enter your answer a list of points separated with commas.  Example: (1,2), (3.5,5)<br/>";
@@ -907,7 +883,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		} else {
 			$tip = "Enter your answer as an n-tuple of numbers.  Example: (2,5.5)<br/>";
 		}
-		$tip .= "Enter DNE for Does Not Exist";
+		$tip .= formathint('each value',$ansformats,'calcntuple');
+		//$tip .= "Enter DNE for Does Not Exist";
 		if (isset($answer)) {
 			$sa = $answer;
 		}
@@ -936,6 +913,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
 		if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$qn];} else {$displayformat = $options['displayformat'];}}
+		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
+		if (!isset($answerformat)) { $answerformat = '';}
+		$ansformats = explode(',',$answerformat);
 		
 		if (!isset($sz)) { $sz = 20;}
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
@@ -950,12 +930,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		$out .= "<script type=\"text/javascript\">complextoproc[complextoproc.length] = $qn;</script>\n";
 		
 		if (in_array('list',$ansformats)) {
-			$tip = "Enter your answer as a list of complex numbers in a+bi form separated with commas.  Example: 2+5.5i,-3-4i<br/>";
+			$tip = "Enter your answer as a list of complex numbers in a+bi form separated with commas.  Example: 2+5i,-3-4i<br/>";
 		} else {
-			$tip = "Enter your answer as a complex number in a+bi form.  Example: 2+5.5i<br/>";
+			$tip = "Enter your answer as a complex number in a+bi form.  Example: 2+5i<br/>";
 		}
-	
-		$tip .= "Enter DNE for Does Not Exist";
+		$tip .= formathint('each value',$ansformats,'calcntuple');
+		//$tip .= "Enter DNE for Does Not Exist";
 		if (isset($answer)) {
 			$sa = makeprettydisp( $answer);
 		}
@@ -1042,6 +1022,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (isset($options['hidepreview'])) {if (is_array($options['hidepreview'])) {$hidepreview = $options['hidepreview'][$qn];} else {$hidepreview = $options['hidepreview'];}}
 		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
 		if (isset($options['reqdecimals'])) {if (is_array($options['reqdecimals'])) {$reqdecimals = $options['reqdecimals'][$qn];} else {$reqdecimals = $options['reqdecimals'];}}
+		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
+		if (!isset($answerformat)) { $answerformat = '';}
+		$ansformats = explode(',',$answerformat);
 		
 		if (!isset($sz)) { $sz = 20;}
 		if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
@@ -1054,8 +1037,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		$out .= "<script type=\"text/javascript\">intcalctoproc[intcalctoproc.length] = $qn;</script>\n";
 		$tip = "Enter your answer using interval notation.  Example: [2.1,5.6) <br/>";
 		$tip .= "Use U for union to combine intervals.  Example: (-oo,2] U [4,oo)<br/>";
-		$tip .= "Enter values as numbers (like 5, -3, 2.2) or as calculations (like 5/3, 2^3, 5+4)<br/>";
-		$tip .= "Enter DNE for an empty set, oo for Infinity";
+		//$tip .= "Enter values as numbers (like 5, -3, 2.2) or as calculations (like 5/3, 2^3, 5+4)<br/>";
+		//$tip .= "Enter DNE for an empty set, oo for Infinity";
+		$tip .= formathint('each value',$ansformats,'calcinterval');
 		if (isset($reqdecimals)) {
 			$tip .= "<br/>Your numbers should be accurate to $reqdecimals decimal places.";
 		}
@@ -1486,7 +1470,12 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$qn];} else {$abstolerance = $options['abstolerance'];}}
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = .001;}
 		if (isset($options['answersize'])) {if (is_array($options['answersize'])) {$answersize = $options['answersize'][$qn];} else {$answersize = $options['answersize'];}}
+		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
+		
 		if ($multi>0) { $qn = $multi*1000+$qn;}
+		if (!isset($answerformat)) { $answerformat = '';}
+		$ansformats = explode(',',$answerformat);
+		
 		$correct = true;
 		$ansr = substr($answer,2,-2);
 		$ansr = preg_replace('/\)\s*\,\s*\(/',',',$ansr);
@@ -1500,12 +1489,24 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($answersize)) {
 			for ($i=0; $i<count($answerlist); $i++) {
 				$givenanslist[$i] = $_POST["qn$qn-$i"];
+				if (!checkanswerformat($givenanslist[$i],$ansformats)) {
+					return 0; //perhaps should just elim bad answer rather than all?
+				} 
 			}
 			$GLOBALS['partlastanswer'] = implode("|",$givenanslist);
 		} else {
 			$_POST["tc$qn"] = preg_replace('/\)\s*,\s*\(/','),(',$_POST["tc$qn"]);
 			$GLOBALS['partlastanswer'] = $_POST["tc$qn"];
 			if (substr_count($answer,'),(')!=substr_count($_POST["tc$qn"],'),(')) {$correct = false;}
+			$tocheck = str_replace(' ','',$_POST["tc$qn"]);
+			$tocheck = str_replace(array('],[','),(','>,<'),',',$tocheck);
+			$tocheck = substr($tocheck,2,strlen($tocheck)-4);
+			$tocheck = explode(',',$tocheck);
+			foreach($tocheck as $chkme) {
+				if (!checkanswerformat($chkme,$ansformats)) {
+					return 0; //perhaps should just elim bad answer rather than all?
+				} 
+			}
 		}
 		$givenanslist = explode(",",preg_replace('/[^\d\.,\-]/','',$givenans));
 
@@ -1533,6 +1534,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = .001;}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
+		if (!isset($answerformat)) { $answerformat = '';}
+		$ansformats = explode(',',$answerformat);
+		
 		if ($anstype=='ntuple') {
 			$GLOBALS['partlastanswer'] = $givenans;
 		} else if ($anstype=='calcntuple') {
@@ -1540,6 +1544,15 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			//test for correct format, if specified
 			if (checkreqtimes($_POST["tc$qn"],$requiretimes)==0) {
 				return 0;
+			}
+			$tocheck = str_replace(' ','',$_POST["tc$qn"]);
+			$tocheck = str_replace(array('],[','),(','>,<'),',',$tocheck);
+			$tocheck = substr($tocheck,1,strlen($tocheck)-2);
+			$tocheck = explode(',',$tocheck);
+			foreach($tocheck as $chkme) {
+				if (!checkanswerformat($chkme,$ansformats)) {
+					return 0; //perhaps should just elim bad answer rather than all?
+				} 
 			}
 		}
 		if ($givenans == null) {return 0;}
@@ -1549,13 +1562,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($answer=='DNE' && strtoupper($givenans)=='DNE') {
 			return 1;
 		}
-		if ($answerformat=='complex') {
-			$gaarr = explode(',',$givenans);
-			$anarr = explode(',',$answer);
-		} else {
-			preg_match_all('/([\(\[\<\{])(.*?)([\)\]\>\}])/', $givenans, $gaarr, PREG_SET_ORDER);
-			preg_match_all('/([\(\[\<\{])(.*?)([\)\]\>\}])/', $answer, $anarr, PREG_SET_ORDER);
-		}
+		
+		preg_match_all('/([\(\[\<\{])(.*?)([\)\]\>\}])/', $givenans, $gaarr, PREG_SET_ORDER);
+		preg_match_all('/([\(\[\<\{])(.*?)([\)\]\>\}])/', $answer, $anarr, PREG_SET_ORDER);
 		
 		if (count($gaarr)==0) {
 			return 0;
@@ -1563,86 +1572,14 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$extrapennum = count($gaarr)+count($anarr);
 		$correct = 0;
 		foreach ($anarr as $i=>$answer) {
-			if ($answerformat=='complex') {
-				$cparts = parsecomplex($answer);
-				if (!is_array($cparts)) {
-					echo $cparts;
-				} else {
-					eval('$ansparts[0] = '.$cparts[0].';');
-					eval('$ansparts[1] = '.$cparts[1].';');
-				}
-					
-				/*
-				if (preg_match('/([-+]?(?:\d+\.?\d*|\d*\.?\d+))([-+](?:\d+\.?\d|\d*\.?\d+)?)i/',$answer,$matches)) {
-					$ansparts[0] = $matches[1];
-					$ansparts[1] = $matches[2];
-				} else if (preg_match('/([-+]?(?:\d+\.?\d*|\d*\.?\d+)?)i([-+](?:\d+\.?\d|\d*\.?\d+))/',$answer,$matches)) {
-					$ansparts[0] = $matches[2];
-					$ansparts[1] = $matches[1];
-				} else if (preg_match('/([-+]?(?:\d+\.?\d|\d*\.?\d+)?)(i)?/',$answer,$matches)) {
-					if ($matches[2]=='i') {
-						$ansparts[1] = $matches[1];
-						$ansparts[0] = 0;
-					} else {
-						$ansparts[0] = floatval($matches[1]);
-						$ansparts[1] = 0;
-					}
-				}
-				if ($ansparts[1] === '+' || $ansparts[1] === '') {
-					$ansparts[1] = 1;
-				} else if ($ansparts[1] === '-') {
-					$ansparts[1] = -1;
-				} else {
-					$ansparts[1] = floatval($ansparts[1]);
-				}
-				$ansparts[0] = floatval($ansparts[0]);
-				*/
-			}
 			$foundloc = -1;
 			foreach ($gaarr as $j=>$givenans) {
-				
-				if ($answerformat=='complex') {
-					$cparts = parsecomplex($givenans);
-					if (!is_array($cparts)) {
-						return 0;
-					} else {
-						$gaparts[0] = floatval($cparts[0]);
-						$gaparts[1] = floatval($cparts[1]);
-					}
-					/*
-					if (preg_match('/([-+]?(?:\d+\.?\d*|\d*\.?\d+))([-+](?:\d+\.?\d|\d*\.?\d+)?)i/',$givenans,$matches)) {
-						$gaparts[0] = $matches[1];
-						$gaparts[1] = $matches[2]; 
-					} else if (preg_match('/([-+]?(?:\d+\.?\d*|\d*\.?\d+)?)i([-+](?:\d+\.?\d|\d*\.?\d+))/',$givenans,$matches)) {
-						$gaparts[0] = $matches[2];
-						$gaparts[1] = $matches[1]; 
-					} else if (preg_match('/([-+]?(?:\d+\.?\d|\d*\.?\d+)?)(i)?/',$givenans,$matches)) {
-						if ($matches[2]=='i') {
-							$gaparts[1] = $matches[1];
-							$gaparts[0] = 0;
-						} else {
-							$gaparts[0] = floatval($matches[1]);
-							$gaparts[1] = 0;
-						}
-					} else {
-						break;
-					}
-					if ($gaparts[1] === '+' || $gaparts[1] === '') {
-						$gaparts[1] = 1;
-					} else if ($gaparts[1] === '-') {
-						$gaparts[1] = -1;
-					} else {
-						$gaparts[1] = floatval($gaparts[1]);
-					}
-					$gaparts[0] = floatval($gaparts[0]);
-					*/
-				} else {
-					if ($answer[1]!=$givenans[1] || $answer[3]!=$givenans[3]) {
-						break;
-					}
-					$ansparts = explode(',',$answer[2]);
-					$gaparts = explode(',',$givenans[2]);
+				if ($answer[1]!=$givenans[1] || $answer[3]!=$givenans[3]) {
+					break;
 				}
+				$ansparts = explode(',',$answer[2]);
+				$gaparts = explode(',',$givenans[2]);
+				
 				if (count($ansparts)!=count($gaparts)) {
 					break;
 				}
@@ -1679,6 +1616,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = .001;}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
+		if (!isset($answerformat)) { $answerformat = '';}
+		$ansformats = explode(',',$answerformat);
 		if ($anstype=='complex') {
 			$GLOBALS['partlastanswer'] = $givenans;
 		} else if ($anstype=='calccomplex') {
@@ -1686,6 +1625,17 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			//test for correct format, if specified
 			if (checkreqtimes($_POST["tc$qn"],$requiretimes)==0) {
 				return 0;
+			}
+			$tocheck = explode(',',$_POST["tc$qn"]);
+			foreach ($tocheck as $tchk) {
+				$cpts = parsecomplex($tchk);
+				if ($cpts[1]{0}=='+') {
+					$cpts[1] = substr($cpts[1],1);
+				}
+				echo $cpts[0].','.$cpts[1].'<br/>';
+				if (!checkanswerformat($cpts[0],$ansformats) || !checkanswerformat($cpts[1],$ansformats)) {
+					return 0;
+				}
 			}
 		}
 		if (!isset($answerformat)) { $answerformat = '';}
@@ -1823,63 +1773,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$gaarr = array($gamasterarr[$i]);
 			}
 			foreach($gaarr as $j=>$givenans) {
-				if (in_array("fraction",$ansformats) || in_array("reducedfraction",$ansformats) || in_array("fracordec",$ansformats)) {
-					if (!preg_match('/^\s*\-?\(?\d+\s*\/\s*\-?\d+\)?\s*$/',$orarr[$j]) && !preg_match('/^\s*?\-?\d+\s*$/',$orarr[$j]) && (!in_array("fracordec",$ansformats) || !preg_match('/^\s*?\-?\d*?\.\d*?\s*$/',$orarr[$j]))) {
-						continue;
-					} else {
-						if (in_array("reducedfraction",$ansformats) && strpos($orarr[$j],'/')!==false) {
-							$orarr[$j] = str_replace(array('(',')'),'',$orarr[$j]);
-							$tmpa = explode("/",$orarr[$j]);
-							if (gcd(abs($tmpa[0]),abs($tmpa[1]))!=1) {
-								continue;
-							}
-						}
-					}
+				if (!checkanswerformat($orarr[$j],$ansformats)) {
+					continue;
 				} 
-				if (in_array("notrig",$ansformats)) {
-					if (preg_match('/(sin|cos|tan|cot|csc|sec)/',$orarr[$j])) {
-						continue;
-					}
-				} 
-				if (in_array("nolongdec",$ansformats)) {
-					if (preg_match('/\.\d{6}/',$orarr[$j])) {
-						continue;
-					}
-				}
-				if (in_array("scinot",$ansformats)) {
-					$totest = str_replace(' ','',$orarr[$j]);
-					if (!preg_match('/^\-?\d\.?\d*?\*10\^(\-?\d+)$/',$totest)) {
-						continue;
-					} 
-				}
-						
-				if (in_array("mixednumber",$ansformats)) {
-					if (!preg_match('/^\s*\-?\s*\d+\s*_\s*(\d+)\s*\/\s*(\d+)\s*$/',$orarr[$j],$mnmatches) && !preg_match('/^\s*?\-?\d+\s*$/',$orarr[$j]) && !preg_match('/^\s*\-?\d+\s*\/\s*\-?\d+\s*$/',$orarr[$j])) {
-						continue;
-					} else {
-						if (preg_match('/^\s*\-?\d+\s*\/\s*\-?\d+\s*$/',$orarr[$j])) {
-							$tmpa = explode("/",$orarr[$j]);
-							if ((gcd(abs($tmpa[0]),abs($tmpa[1]))!=1) || $tmpa[0]>=$tmpa[1]) {
-								continue;
-							}
-						} else	if (!preg_match('/^\s*?\-?\d+\s*$/',$orarr[$j])) {
-							if ($mnmatches[1]>=$mnmatches[2] || gcd($mnmatches[1],$mnmatches[2])!=1) {
-								continue;
-							}
-						}
-					}
-				}
-				if (in_array("nodecimal",$ansformats)) {
-					if (strpos($orarr[$j],'.')!==false) {
-						continue;
-					}
-					if (strpos($orarr[$j],'E-')!==false) {
-						continue;
-					}
-					if (preg_match('/10\^\(?\-/',$orarr[$j])) {
-						continue;
-					}
-				}
 				
 				$anss = explode(' or ',$answer);
 				foreach ($anss as $anans) {
@@ -2165,9 +2061,12 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}
 		if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$qn];} else {$reltolerance = $options['reltolerance'];}}
 		if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$qn];} else {$abstolerance = $options['abstolerance'];}}
+		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$qn];} else {$requiretimes = $options['requiretimes'];}}
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = .001;}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
+		$ansformats = explode(',',$answerformat);
+		
 		if ($anstype == 'interval') {
 			$GLOBALS['partlastanswer'] = $givenans;
 		} else if ($anstype == 'calcinterval') {
@@ -2176,6 +2075,17 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			if (checkreqtimes($_POST["tc$qn"],$requiretimes)==0) {
 				return 0;
 			}
+			$orarr = explode('U',$_POST["tc$qn"]);
+			foreach ($orarr as $opt) {
+				$opts = explode(',',substr($opt,1,strlen($opt)-2));
+				if (strpos($opts[0],'oo')===false &&  !checkanswerformat($opts[0],$ansformats)) {
+					return 0;
+				}
+				if (strpos($opts[1],'oo')===false &&  !checkanswerformat($opts[1],$ansformats)) {
+					return 0;
+				}
+			}
+			
 		}
 		if ($givenans == null) {return 0;}
 		$correct = 0;
@@ -2804,5 +2714,101 @@ function parsecomplex($v) {
 		}
 		return array($real,$imag);
 	}
+}
+
+
+//checks the format of a value 
+//tocheck:  string to check
+//ansformats:  array of answer formats.  Currently supports:
+//   fraction, reducedfraction, fracordec, notrig, nolongdec, scinot, mixednumber, nodecimal
+//returns:  false: bad format, true: good format
+function checkanswerformat($tocheck,$ansformats) {
+	if (in_array("fraction",$ansformats) || in_array("reducedfraction",$ansformats) || in_array("fracordec",$ansformats)) {
+		if (!preg_match('/^\s*\-?\(?\d+\s*\/\s*\-?\d+\)?\s*$/',$tocheck) && !preg_match('/^\s*?\-?\d+\s*$/',$tocheck) && (!in_array("fracordec",$ansformats) || !preg_match('/^\s*?\-?\d*?\.\d*?\s*$/',$tocheck))) {
+			return false;
+		} else {
+			if (in_array("reducedfraction",$ansformats) && strpos($tocheck,'/')!==false) {
+				$tocheck = str_replace(array('(',')'),'',$tocheck);
+				$tmpa = explode("/",$tocheck);
+				if (gcd(abs($tmpa[0]),abs($tmpa[1]))!=1) {
+					return false;
+				}
+			}
+		}
+	} 
+	if (in_array("notrig",$ansformats)) {
+		if (preg_match('/(sin|cos|tan|cot|csc|sec)/',$tocheck)) {
+			return false;
+		}
+	} 
+	if (in_array("nolongdec",$ansformats)) {
+		if (preg_match('/\.\d{6}/',$tocheck)) {
+			return false;
+		}
+	}
+	if (in_array("scinot",$ansformats)) {
+		$totest = str_replace(' ','',$tocheck);
+		if (!preg_match('/^\-?\d\.?\d*?\*10\^(\-?\d+)$/',$totest)) {
+			return false;
+		} 
+	}
+			
+	if (in_array("mixednumber",$ansformats)) {
+		if (!preg_match('/^\s*\-?\s*\d+\s*_\s*(\d+)\s*\/\s*(\d+)\s*$/',$tocheck,$mnmatches) && !preg_match('/^\s*?\-?\d+\s*$/',$tocheck) && !preg_match('/^\s*\-?\d+\s*\/\s*\-?\d+\s*$/',$tocheck)) {
+			return false;
+		} else {
+			if (preg_match('/^\s*\-?\d+\s*\/\s*\-?\d+\s*$/',$tocheck)) {
+				$tmpa = explode("/",$tocheck);
+				if ((gcd(abs($tmpa[0]),abs($tmpa[1]))!=1) || $tmpa[0]>=$tmpa[1]) {
+					return false;
+				}
+			} else	if (!preg_match('/^\s*?\-?\d+\s*$/',$tocheck)) {
+				if ($mnmatches[1]>=$mnmatches[2] || gcd($mnmatches[1],$mnmatches[2])!=1) {
+					return false;
+				}
+			}
+		}
+	}
+	if (in_array("nodecimal",$ansformats)) {
+		if (strpos($tocheck,'.')!==false) {
+			return false;
+		}
+		if (strpos($tocheck,'E-')!==false) {
+			return false;
+		}
+		if (preg_match('/10\^\(?\-/',$tocheck)) {
+			return false;
+		}
+	}
+	return true;			
+}
+
+function formathint($eword,$ansformats,$calledfrom) {
+	$tip = '';
+	if (in_array('fraction',$ansformats)) {
+		$tip .= "Enter $eword as a fraction (like 3/5 or 10/4) or as a whole number (like 4 or -2)";
+	} else if (in_array('reducedfraction',$ansformats)) {
+		$tip .= "Enter $eword as a reduced fraction (like 5/3, not 10/6) or as a whole number (like 4 or -2)";
+	} else if (in_array('mixednumber',$ansformats)) {
+		$tip .= "Enter $eword as a reduced mixed number or as a whole number.  Example: 2_1/2 = `2 1/2`";
+	} else if (in_array('fracordec',$ansformats)) {
+		$tip .= "Enter $eword as a fraction (like 3/5 or 10/4), a whole number (like 4 or -2), or exact decimal (like 0.5 or 1.25)";
+	} else if (in_array('scinot',$ansformats)) {
+		$tip .= "Enter $eword as in scientific notation.  Example: 3*10^2 = `3*10^2`";
+	} else {
+		$tip .= "Enter $eword as a number (like 5, -3, 2.2) or as a calculation (like 5/3, 2^3, 5+4)";
+	}
+	if ($calledfrom != 'calcmatrix') {
+		$tip .= "<br/>Enter DNE for Does Not Exist, oo for Infinity";
+	}
+	if (in_array('nodecimal',$ansformats)) {
+		$tip .= "<br/>Decimal values are not allowed";
+	} else if (isset($reqdecimals)) {
+		$tip .= "<br/>Your answer should be accurate to $reqdecimals decimal places.";
+	}
+	if (in_array('notrig',$ansformats)) {
+		$tip .= "<br/>Trig functions (sin,cos,etc.) are not allowed";
+	} 	
+	return $tip;
 }
 ?>

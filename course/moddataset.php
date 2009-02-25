@@ -216,6 +216,12 @@
 			if (!$isadmin) {
 				$query .= " AND (ownerid='$userid' OR libid=0)";
 			}
+			$query = "SELECT ili.libid FROM imas_library_items AS ili JOIN imas_libraries AS il ON ";
+			$query .= "ili.libid=il.id WHERE ili.qsetid='$qsetid'";
+			if (!$isadmin) {
+				//unassigned, or owner and lib not closed or mine
+				$query .= " AND ((ili.ownerid='$userid' AND (il.ownerid='$userid' OR il.userights%3<>1)) OR ili.libid=0)";
+			}
 		}
 		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$existing = array();

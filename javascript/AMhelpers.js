@@ -26,7 +26,7 @@ function calculate(inputId,outputId,format) {
 			  }
 		  } else if (format.indexOf('fracordec')!=-1) {
 			  str = str.replace(/\s/,'');
-			  if (!str.match(/^\s*\-?\(?\d+\s*\/\s*\-?\d+\)?\s*$/) && !str.match(/^\s*?\-?\d+\s*$/) && !str.match(/^\s*\-?\d+\.?(\d+)?\d*$/)) {
+			  if (!str.match(/^\s*\-?\(?\d+\s*\/\s*\-?\d+\)?\s*$/) && !str.match(/^\s*?\-?\d+\s*$/) && !str.match(/^(\d+|\d+\.\d*|\d*\.\d+)$/)) {
 				err += " invalid entry format";  
 			  }
 		  } else if (format.indexOf('mixednumber')!=-1) {
@@ -153,6 +153,7 @@ function intcalculate(inputId,outputId) {
 	
 }
 
+//preview for calcntuple
 function ntuplecalc(inputId,outputId) {
 	var fullstr = document.getElementById(inputId).value;
 	fullstr = fullstr.replace(/\s+/g,'');
@@ -209,7 +210,7 @@ function ntuplecalc(inputId,outputId) {
 	 return outcalced;
 }
 
-
+//preview for calccomplex
 function complexcalc(inputId,outputId) {
 	var fullstr = document.getElementById(inputId).value;
 	fullstr = fullstr.replace(/\s+/g,'');
@@ -233,7 +234,7 @@ function complexcalc(inputId,outputId) {
 				if (cnt!=0) {
 					outcalced += ',';
 				}
-				outcalced += real+(imag>0?'+':'')+imag+'i';
+				outcalced += real+(imag>=0?'+':'')+imag+'i';
 			} else {
 				outcalced = err;
 				break;

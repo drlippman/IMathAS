@@ -83,6 +83,7 @@ span.pointer {
 	cursor:pointer;
 }
 ul.nomark {
+	margin-top: 5px;
 	list-style-type: none;
 	margin-left: 15px;
 	padding-left: 0px;

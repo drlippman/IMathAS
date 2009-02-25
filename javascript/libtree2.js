@@ -115,9 +115,11 @@ function toggle(id) {
 } 
 
 function addbranch(id) { 
-        var addtoli = document.getElementById("li"+id);
-	document.getElementById('b'+id).innerHTML = '-';
-        addtoli.appendChild(buildbranch(id)); 
+	try {
+		var addtoli = document.getElementById("li"+id);
+		document.getElementById('b'+id).innerHTML = '-';
+		addtoli.appendChild(buildbranch(id));
+	} catch (er) {}
 } 
 function setlib(frm) {
 	var cnt = 0;

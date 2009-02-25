@@ -173,7 +173,106 @@ if ($myrights<20) {
 					$libarray = array();
 				}
 				$chglist = "'".implode("','",$libarray)."'";
-
+				
+				$alllibs = array();
+				$query = "SELECT qsetid,libid FROM imas_library_items WHERE qsetid IN ($chglist)";
+				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+				while ($row = mysql_fetch_row($result)) {
+					$alllibs[$row[0]][] = $row[1];	
+				}
+				if ($isgrpadmin) {
+					$query = "SELECT imas_library_items.qsetid,imas_library_items.libid FROM imas_library_items,imas_users WHERE ";
+					$query .= "imas_library_items.ownerid=imas_users.id AND (imas_users.groupid='$groupid' OR imas_library_items.libid=0)";
+					$query .= "AND imas_library_items.qsetid IN ($chglist)";
+				} else {
+					$query = "SELECT ili.qsetid,ili.libid FROM imas_library_items AS ili JOIN imas_libraries AS il ON ";
+					$query .= "ili.libid=il.id WHERE ili.qsetid IN ($chglist)";
+					if (!$isadmin) {
+						//unassigned, or owner and lib not closed or mine
+						$query .= " AND ((ili.ownerid='$userid' AND (il.ownerid='$userid' OR il.userights%3<>1)) OR ili.libid=0)";
+					}
+				}
+				$mylibs = array();
+				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+				while ($row = mysql_fetch_row($result)) {
+					$mylibs[$row[0]][] = $row[1];	
+				}
+				
+				if ($_POST['action']==0) {//add, keep existing
+					/*
+					get list of existing library assignments
+					remove any additions that already exist
+					add to new libraries
+					*/
+					foreach ($libarray as $qsetid) { //for each question
+						//determine which checked libraries it's not already in
+						$toadd = array_diff($newlibs,$alllibs[$qsetid]);
+						//and add them
+						foreach($toadd as $libid) {
+							$query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES ('$libid','$qsetid','$userid')";
+							mysql_query($query) or die("Query failed :$query " . mysql_error());	
+						}
+					}
+				} else if ($_POST['action']==1) { //add, remove existing
+					/*
+					get list of existing library assignments
+					rework existing to new libs
+					remove any excess existing
+					add to any new
+					*/
+					foreach ($libarray as $qsetid) { //for each question
+						//determine which checked libraries it's not already in
+						$toadd = array_diff($newlibs,$alllibs[$qsetid]);
+						//and add them
+						foreach($toadd as $libid) {
+							$query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES ('$libid','$qsetid','$userid')";
+							mysql_query($query) or die("Query failed :$query " . mysql_error());	
+						}
+						//determine which libraries to remove from; my lib assignments - newlibs
+						if (isset($mylibs[$qsetid])) {
+							$toremove = array_diff($mylibs[$qsetid],$newlibs);
+							foreach($toremove as $libid) {
+								$query = "DELETE FROM imas_library_items WHERE libid='$libid' AND qsetid='$qsetid'";
+								mysql_query($query) or die("Query failed :$query " . mysql_error());	
+							}
+						
+							//check for unassigneds
+							$query = "SELECT id FROM imas_library_items WHERE qsetid='$qsetid'";
+							$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+							if (mysql_num_rows($result)==0) {
+								$query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES (0,'$qsetid','$userid')";
+								mysql_query($query) or die("Query failed :$query " . mysql_error());
+							}
+						}
+					}
+					
+					
+					
+				} else if ($_POST['action']==2) { //remove
+					/*
+					get list of exisiting assignments
+					if not in checked list, remove
+					*/
+					foreach ($libarray as $qsetid) { //for each question
+						//determine which libraries to remove from; my lib assignments - newlibs
+						if (isset($mylibs[$qsetid])) {
+							$toremove = array_diff($mylibs[$qsetid],$newlibs);
+							foreach($toremove as $libid) {
+								$query = "DELETE FROM imas_library_items WHERE libid='$libid' AND qsetid='$qsetid'";
+								mysql_query($query) or die("Query failed :$query " . mysql_error());	
+							}
+							//check for unassigneds
+							$query = "SELECT id FROM imas_library_items WHERE qsetid='$qsetid'";
+							$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+							if (mysql_num_rows($result)==0) {
+								$query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES (0,'$qsetid','$userid')";
+								mysql_query($query) or die("Query failed :$query " . mysql_error());
+							}
+						}
+					}
+					
+				}
+/*
 				if ($_POST['onlyadd']==1) { //only adding to newly check libs
 					$query = "SELECT libid FROM imas_library_items WHERE qsetid IN ($chglist)";
 					$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
@@ -242,7 +341,7 @@ if ($myrights<20) {
 					//}
 					
 				}
-				
+*/
 				
 			}
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/manageqset.php?cid=$cid");
@@ -259,7 +358,7 @@ if ($myrights<20) {
 				$overwriteBody = 1;
 				$body = "No questions selected.  <a href=\"manageqset.php?cid=$cid\">Go back</a>\n";
 			}
-			
+			/*
 			if (!$isadmin && !$isgrpadmin) {
 				$query = "SELECT libid FROM imas_library_items WHERE qsetid IN ($clist) AND ownerid!='$userid'";
 				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
@@ -274,7 +373,9 @@ if ($myrights<20) {
 					$locked[] = $row[0];	
 				}
 			}
-			if ($isgrpadmin) {
+			*/
+			$query = "SELECT DISTINCT ili.libid FROM imas_library_items AS ili WHERE ili.qsetid IN ($clist)";
+			/*if ($isgrpadmin) {
 				$query = "SELECT ili.libid FROM imas_library_items AS ili,imas_users WHERE ";
 				$query .= "ili.ownerid=imas_users.id AND imas_users.groupid='$groupid' AND ili.qsetid IN ($clist)";
 			} else {
@@ -283,10 +384,12 @@ if ($myrights<20) {
 					$query .= " AND ownerid='$userid'";
 				}
 			}
+			*/
 			$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 			while ($row = mysql_fetch_row($result)) {
 				$checked[] = $row[0];	
 			}
+			$_GET['selectrights'] = 1;
 			
 		}		
 		
@@ -678,21 +781,37 @@ function getnextprev(formn,loc) {
 <?php
 	} else if (isset($_POST['chglib'])) {
 ?>
+		<script type="text/javascript">
+		var chgliblaststate = 0;
+		function chglibtoggle(rad) {
+			var val = rad.value;
+			var help = document.getElementById("chglibhelp");
+			if (val==0) {
+				help.innerHTML = "Select libraries to add these questions to.  You may want to hit Uncheck All to start with a clean tree.";
+			} else if (val==1) {
+				help.innerHTML = "Select libraries to add these questions to.  You may want to hit Uncheck All to start with a clean tree.  Questions will only be removed from existing libraries if you have the rights to make those changes.";
+			} else if (val==2) {
+				help.innerHTML = "Unselect the libraries you want to remove questions from.  The questions will not be deleted; they will be moved to Unassigned if no other library assignments exist.  Questions will only be removed from existing libraries if you have the rights to make those changes.";
+			}
+			 
+		}
+		</script>
 		<form method=post action="manageqset.php?cid=<?php echo $cid ?>">
 			<input type=hidden name=chglib value="true">
 			<input type=hidden name=qtochg value="<?php echo $clist ?>">
-			Add to libraries: <br>
-		
-			<?php include("libtree.php"); ?>
-
-			<p>
-				Add selected questions to: 
-				<input type=radio name="onlyadd" value="1" CHECKED>Only newly checked libraries, 
-				<input type=radio name="onlyadd" value="0">All checked libraries <br/>
-				Question will be removed from any unchecked libraries
+			What do you want to do with these questions?<br/>
+			<input type=radio name="action" value="0" onclick="chglibtoggle(this)" checked="checked"/> Add to libraries, keeping any existing library assignments<br/>
+			<input type=radio name="action" value="1" onclick="chglibtoggle(this)"/> Add to libraries, removing existing library assignments<br/>
+			<input type=radio name="action" value="2" onclick="chglibtoggle(this)"/> Remove library assignments
+			<p id="chglibhelp" style="font-weight: bold;">
+			Select libraries to add these questions to.  You may want to hit Uncheck All to start with a clean tree.
 			</p>
+		
+			<?php include("libtree2.php"); ?>
+
+			
 			<p>
-				<input type=submit value="Update Libraries">
+				<input type=submit value="Make Changes">
 				<input type=button value="Never Mind" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
 			</p>
 		</form>		

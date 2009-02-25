@@ -3,9 +3,9 @@ var closetimer	= 0;
 var ddmenuitem	= 0;
 var homemenuloaded = 0;
 // open hidden layer
-function mopen(id) {	
+function mopen(id,cid) {	
 	if (id=='homemenu' && homemenuloaded==0) {
-		basicahah(imasroot+'/gethomemenu.php','homemenu');
+		basicahah(imasroot+'/gethomemenu.php?cid='+cid,'homemenu');
 		homemenuloaded = 1;
 	}
 	mcancelclosetime();

@@ -16,7 +16,7 @@ div.breadcrumb { display:none;}
 <script type="text/javascript">
 var imasroot = '<?php echo $imasroot; ?>';
 </script>
-<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js"></script>
+<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js?ver=022409"></script>
 <?php
 if ($ispublic) {
 	echo "<script src=\"$imasroot/javascript/ASCIIMathMLwFallback.js\" type=\"text/javascript\"></script>\n";
@@ -156,7 +156,13 @@ if (!isset($nologo)) {
 	//echo '<img id="headerlogo" style="position: absolute; right: 5px; top: 12px;" src="/img/wamaplogosmall.gif" alt="logo"/>';
 	echo '<span id="headerlogo" style="position: absolute; right:5px; top: 12px; cursor: pointer;" ';
 	if ($myrights>10 && !$ispublic) {
-		echo 'onclick="mopen(\'homemenu\')" onmouseout="mclosetime()"';
+		echo 'onclick="mopen(\'homemenu\',';
+		if (isset($cid) && is_numeric($cid)) {
+			echo $cid;
+		} else {
+			echo 0;
+		}
+		echo ')" onmouseout="mclosetime()"';
 	}
 	echo '>'.$smallheaderlogo.'</span>';
 	if ($myrights>10 && !$ispublic) {

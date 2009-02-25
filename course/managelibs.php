@@ -487,10 +487,10 @@ if ($overwriteBody==1) {
 	
 	
 	<style type="text/css">
-	ul {
+	ul.base ul {
 		border-top: 1px solid #ddd;
 	}
-	li {
+	ul.base li {
 		border-bottom: 1px solid #ddd;
 		padding-top: 5px;
 	}

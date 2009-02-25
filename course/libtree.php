@@ -144,7 +144,6 @@ END;
 		}
 	}
 	echo "</ul>";
-	
 	$colorcode =  "<p><b>Color Code</b><br/>";
 	$colorcode .= "<span class=r8>Open to all</span><br/>\n";
 	$colorcode .= "<span class=r4>Closed</span><br/>\n";
@@ -163,6 +162,7 @@ END;
 		}
 		if (count($arr)==0) {return;}
 		foreach ($arr as $child) {
+			
 			if ($rights[$child]>$allsrights || (($rights[$child]%3)>$selectrights && $groupids[$child]==$groupid) || $ownerids[$child]==$userid || ($isgrpadmin && $groupids[$child]==$groupid) ||$isadmin) {	
 			//if ($rights[$child]>$selectrights || $ownerids[$child]==$userid || $isadmin) {
 				if (!$isadmin) {

@@ -1,20 +1,22 @@
-ul {
+ul.base {
 	margin-left: 20px;
 	list-style-type: none;
 	border-left: 1px dashed #00f;
 	padding-left: 5px;
 }
 
-ul ul {
+ul.base ul {
 	border-left: 1px dashed #06f;
+	list-style-type: none;
+	padding-left: 5px;
 }
-ul ul ul {
+ul.base ul ul {
 	border-left: 1px dashed #0bf;
 }
-ul ul ul ul {
+ul.base ul ul ul {
 	border-left: 1px dashed #0cc;
 }
-ul ul ul ul ul {
+ul.base ul ul ul ul {
 	border-left: 1px dashed #0c6;
 }
 ul.show {
