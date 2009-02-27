@@ -250,11 +250,18 @@ END;
 		$breadcrumbbase = "<a href=\"$imasroot/index.php\">Home</a> &gt; ";
 	}
 	if (isset($_GET['cid']) && $_GET['cid']!="admin" && $_GET['cid']>0) {
-		$query = "SELECT id FROM imas_students WHERE userid='$userid' AND courseid='{$_GET['cid']}'";
+		$query = "SELECT id,locked FROM imas_students WHERE userid='$userid' AND courseid='{$_GET['cid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$line = mysql_fetch_array($result, MYSQL_ASSOC);
 		if ($line != null) {
 			$studentid = $line['id'];
+			if ($line['locked']==1) {
+				require("header.php");
+				echo "<p>You have been locked out of this course by your instructor.  Please see your instructor for more information.</p>";
+				echo "<p><a href=\"$imasroot/index.php\">Home</a></p>";
+				require("footer.php");
+				exit;
+			}
 		} else {
 			$query = "SELECT id FROM imas_teachers WHERE userid='$userid' AND courseid='{$_GET['cid']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());

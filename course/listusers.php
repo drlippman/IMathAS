@@ -154,6 +154,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				$newpw = md5($_POST['password']);
 				$query .= ",password='$newpw'";
 			}
+			
 			$query .= " WHERE id='{$_GET['uid']}'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			
@@ -166,7 +167,12 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			if (trim($_POST['code'])==='') {
 				$code = "NULL";
 			}
-			$query = "UPDATE imas_students SET code=$code,section=$section WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
+			if (isset($_POST['locked'])) {
+				$locked = 1;
+			} else {
+				$locked = 0;
+			}
+			$query = "UPDATE imas_students SET code=$code,section=$section,locked=$locked WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		
 			
@@ -187,7 +193,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			//header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
 			exit;
 		} else {
-			$query = "SELECT imas_users.*,imas_students.code,imas_students.section FROM imas_users,imas_students ";
+			$query = "SELECT imas_users.*,imas_students.code,imas_students.section,imas_students.locked FROM imas_users,imas_students ";
 			$query .= "WHERE imas_users.id=imas_students.userid AND imas_users.id='{$_GET['uid']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$lineStudent = mysql_fetch_array($result, MYSQL_ASSOC);
@@ -251,7 +257,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$hascode = false;
 		}	
 		
-		$query = "SELECT imas_students.id,imas_students.userid,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.SID,imas_students.lastaccess,imas_students.section,imas_students.code ";
+		$query = "SELECT imas_students.id,imas_students.userid,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.SID,imas_students.lastaccess,imas_students.section,imas_students.code,imas_students.locked ";
 		$query .= "FROM imas_students,imas_users WHERE imas_students.courseid='$cid' AND imas_students.userid=imas_users.id ";
 		if ($secfilter>-1) {
 			$query .= "AND imas_students.section='$secfilter' ";			
@@ -365,19 +371,21 @@ if ($overwriteBody==1) {
 ?>
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
 	<h3><?php echo $pagetitle ?></h3>
-		<form method=post action="listusers.php?cid=<?php echo $cid ?>&chgstuinfo=true&uid=<?php echo $_GET['uid'] ?>">
+		<form method=post action="listusers.php?cid=<?php echo $cid ?>&chgstuinfo=true&uid=<?php echo $_GET['uid'] ?>"/>
 			<span class=form><label for="username">Enter User Name (login name):</label></span>
-			<input class=form type=text size=20 id=username name=username value="<?php echo $lineStudent['SID'] ?>"><BR class=form>
+			<input class=form type=text size=20 id=username name=username value="<?php echo $lineStudent['SID'] ?>"/><br class=form>
 			<span class=form><label for="firstname">Enter First Name:</label></span>
-			<input class=form type=text size=20 id=firstname name=firstname value="<?php echo $lineStudent['FirstName'] ?>"><BR class=form>
+			<input class=form type=text size=20 id=firstname name=firstname value="<?php echo $lineStudent['FirstName'] ?>"/><br class=form>
 			<span class=form><label for="lastname">Enter Last Name:</label></span>
-			<input class=form type=text size=20 id=lastname name=lastname value="<?php echo $lineStudent['LastName'] ?>"><BR class=form>
+			<input class=form type=text size=20 id=lastname name=lastname value="<?php echo $lineStudent['LastName'] ?>"/><BR class=form>
 			<span class=form><label for="email">Enter E-mail address:</label></span>
-			<input class=form type=text size=60 id=email name=email value="<?php echo $lineStudent['email'] ?>"><BR class=form>
+			<input class=form type=text size=60 id=email name=email value="<?php echo $lineStudent['email'] ?>"/><BR class=form>
 			<span class=form>Section (optional):</span>
-			<span class=formright><input type="text" name="section" value="<?php echo $lineStudent['section'] ?>"></span><br class=form>
+			<span class=formright><input type="text" name="section" value="<?php echo $lineStudent['section'] ?>"/></span><br class=form>
 			<span class=form>Code (optional):</span>
-			<span class=formright><input type="text" name="code" value="<?php echo $lineStudent['code'] ?>"></span><br class=form>
+			<span class=formright><input type="text" name="code" value="<?php echo $lineStudent['code'] ?>"/></span><br class=form>
+			<span class=form>Lock out of course?:</span>
+			<span class=formright><input type="checkbox" name="locked" value="1" <?php if ($lineStudent['locked']==1) {echo ' checked="checked" ';} ?>/></span><br class=form>
 			<span class=form>Reset password?</span>
 			<span class=formright>
 				<input type=checkbox name="doresetpw" value="1" /> Reset to: 
@@ -451,7 +459,11 @@ if ($overwriteBody==1) {
 		$numstu = 0;
 		while ($line=mysql_fetch_array($resultDefaultUserList, MYSQL_ASSOC)) {
 			$numstu++;
-			$lastaccess = ($line['lastaccess']>0) ? date("n/j/y g:ia",$line['lastaccess']) : "never";
+			if ($line['locked']==1) {
+				$lastaccess = "locked";
+			} else {
+				$lastaccess = ($line['lastaccess']>0) ? date("n/j/y g:ia",$line['lastaccess']) : "never";
+			}
 			$hasSectionData = ($hassection) ? "<td>{$line['section']}</td>" : "";
 			$hasCodeData = ($hascode) ? "<td>{$line['code']}</td>" : "";
 			if ($alt==0) {echo "			<tr class=even>"; $alt=1;} else {echo "			<tr class=odd>"; $alt=0;}

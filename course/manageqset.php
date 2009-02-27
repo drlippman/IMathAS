@@ -163,7 +163,7 @@ if ($myrights<20) {
 				if ($_POST['libs']=='') {
 					$newlibs = array();
 				} else {
-					if ($newlibs[0]==0 && count($newlibs)>1) {
+					if ($newlibs[0]==0 && count($newlibs)>1) { //get rid of unassigned if checked and others are checked
 						array_shift($newlibs);
 					}
 				}
@@ -185,7 +185,7 @@ if ($myrights<20) {
 					$query .= "imas_library_items.ownerid=imas_users.id AND (imas_users.groupid='$groupid' OR imas_library_items.libid=0)";
 					$query .= "AND imas_library_items.qsetid IN ($chglist)";
 				} else {
-					$query = "SELECT ili.qsetid,ili.libid FROM imas_library_items AS ili JOIN imas_libraries AS il ON ";
+					$query = "SELECT ili.qsetid,ili.libid FROM imas_library_items AS ili LEFT JOIN imas_libraries AS il ON ";
 					$query .= "ili.libid=il.id WHERE ili.qsetid IN ($chglist)";
 					if (!$isadmin) {
 						//unassigned, or owner and lib not closed or mine
@@ -206,10 +206,15 @@ if ($myrights<20) {
 					*/
 					foreach ($libarray as $qsetid) { //for each question
 						//determine which checked libraries it's not already in
-						$toadd = array_diff($newlibs,$alllibs[$qsetid]);
+						$toadd = array_values(array_diff($newlibs,$alllibs[$qsetid]));
 						//and add them
 						foreach($toadd as $libid) {
+							if ($libid==0) { continue;} //no need to add to unassigned using "keep existing" 
 							$query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES ('$libid','$qsetid','$userid')";
+							mysql_query($query) or die("Query failed :$query " . mysql_error());	
+						}
+						if (count($toadd)>1 || (count($toadd)>0 && $toadd[0]!=0)) {
+							$query = "DELETE FROM imas_library_items WHERE qsetid='$qsetid' AND libid=0";
 							mysql_query($query) or die("Query failed :$query " . mysql_error());	
 						}
 					}
