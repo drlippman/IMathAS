@@ -5,6 +5,9 @@
  *
  * @author David Lippman
  * @copyright Copyright © 2008 David Lippman.
+ *
+ * Plugin format based on code that is:
+ * @copyright Copyright © 2004-2008, Moxiecode Systems AB, All rights reserved.
  */
 
 (function() {
@@ -196,7 +199,7 @@
 					}
 				}
 				if (doprocessnode && (t.lastAMnode != null)) { //if not in AM node, process last
-				     if (t.lastAMnode.innerHTML.match(/`(&nbsp;|\s|\u00a0|&#160;)*`/)) {
+				     if (t.lastAMnode.innerHTML.match(/`(&nbsp;|\s|\u00a0|&#160;)*`/) || t.lastAMnode.innerHTML.match(/^(&nbsp;|\s|\u00a0|&#160;)*$/)) {
 					     p = t.lastAMnode.parentNode;
 					     p.removeChild(t.lastAMnode);
 				     } else {
@@ -209,7 +212,7 @@
 			});
 			ed.onDeactivate.add(function(ed) {
 				if (t.lastAMnode != null) {
-				     if (t.lastAMnode.innerHTML.match(/`(&nbsp;|\s)*`/)) {
+				     if (t.lastAMnode.innerHTML.match(/`(&nbsp;|\s)*`/)|| t.lastAMnode.innerHTML.match(/^(&nbsp;|\s|\u00a0|&#160;)*$/)) {
 					     p = t.lastAMnode.parentNode;
 					     p.removeChild(t.lastAMnode);
 				     } else {

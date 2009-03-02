@@ -212,10 +212,12 @@
 			$query = "SELECT ili.libid FROM imas_library_items AS ili,imas_users WHERE ili.ownerid=imas_users.id ";
 			$query .= "AND (imas_users.groupid='$groupid' OR ili.libid=0) AND ili.qsetid='$qsetid'";
 		} else {
+			/*
 			$query = "SELECT libid FROM imas_library_items WHERE qsetid='$qsetid'";
 			if (!$isadmin) {
 				$query .= " AND (ownerid='$userid' OR libid=0)";
 			}
+			*/
 			$query = "SELECT ili.libid FROM imas_library_items AS ili JOIN imas_libraries AS il ON ";
 			$query .= "ili.libid=il.id WHERE ili.qsetid='$qsetid'";
 			if (!$isadmin) {
@@ -352,10 +354,10 @@
 			
 			} else {
 				if ($isgrpadmin) {
-					$query = "SELECT ili.libid FROM imas_library_items AS ili,imas_users WHERE ili.ownerid=imas_users.id ";
+					$query = "SELECT DISTINCT ili.libid FROM imas_library_items AS ili,imas_users WHERE ili.ownerid=imas_users.id ";
 					$query .= "AND imas_users.groupid='$groupid' AND ili.qsetid='{$_GET['id']}'";
 				} else {
-					$query = "SELECT libid FROM imas_library_items WHERE qsetid='{$_GET['id']}'";
+					$query = "SELECT DISTINCT libid FROM imas_library_items WHERE qsetid='{$_GET['id']}'";
 					if (!$isadmin) {
 						$query .= " AND ownerid='$userid'";
 					}
@@ -402,7 +404,7 @@
 			$twobx = true;
 			$line['description'] = "Enter description here";
 			$query = "SELECT qrightsdef FROM imas_users WHERE id='$userid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			$line['userights'] = mysql_result($result,0,0);
 			
 			$line['qtype'] = "number";
@@ -425,7 +427,7 @@
 			$inlibssafe = "'".implode("','",explode(',',$inlibs))."'";
 			if (!isset($_GET['id']) || isset($_GET['template'])) {
 				$query = "SELECT id,ownerid,userights,groupid FROM imas_libraries WHERE id IN ($inlibssafe)";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				while ($row = mysql_fetch_row($result)) {
 					if ($row[2] == 8 || ($row[3]==$groupid && ($row[2]%3==2)) || $row[1]==$userid) {
 						$oklibs[] = $row[0];

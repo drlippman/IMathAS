@@ -1,7 +1,12 @@
 /**
- * $Id: editor_plugin_src.js 201 2007-02-12 15:56:56Z spocke $
+ * ASCIIsvg plugin for TinyMCE.
+ *   port of ASCIIsvg plugin for HTMLArea written by 
+ *   David Lippman and Peter Jipsen
  *
- * @author Moxiecode
+ * @author David Lippman
+ * @copyright Copyright © 2008 David Lippman.
+ *
+ * Plugin format based on code that is:
  * @copyright Copyright © 2004-2008, Moxiecode Systems AB, All rights reserved.
  */
 
