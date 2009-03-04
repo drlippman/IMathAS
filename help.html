@@ -1798,7 +1798,6 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 	If $answerformat includes "list", "exactlist", or "orderedlist", then a list of answers is expected. An $answerformat of "list" ignores then duplicate values.
 	An $answerformat of "exactlist" does not ignore duplicates. If $answerformat="orderedlist", the list must be in the same order and contain identical counts of 
 	values.</dd>
-	</dd>
 <dt>$reltolerance = a decimal value (In Answer)</dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>
@@ -2167,6 +2166,11 @@ rather than just numbers, such as (5/3, 2/3).
 <dt>$displayformat = "point", "pointlist", "vector", "vectorlist", "list" (In Question Control)</dt>
 	<dd>Changes the answer entry tips (does NOT change how the question is graded).  For points,
 	entry like (2,3) is specified.  For vectors, entry like &lt;2,3&gt; is specified.</dd>
+<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", or "notrig" (In Common Control)</dt>
+	<dd>Requires each component of the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
+	without decimals (also disallows 10^-2 and 3E-2), or 
+	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
+	</dd>
 <dt>$reltolerance = tolerance scaling factor</dt>
 	<dd>Scales the grading tolerance.  Defaults to 1.  Set $reltolerance = 2 to make the grading twice as tolerant;
 	    $reltolerance = 0.5 to make grading half as forgiving</dd>
@@ -2234,8 +2238,11 @@ rather than just numbers, such as 1/3+sqrt(2)i.
 </p>
 <p><b>Optional Variables</b><BR>
 <dl>
-<dt>$answerformat = "list" (In Common Control)</dt>
-	<dd>Specifies that the answer will be a list of complex numbers.</dd>
+<dt><dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", or "notrig" (In Common Control)</dt>
+	<dd>Requires the real and imaginary parts of the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
+	without decimals (also disallows 10^-2 and 3E-2), or 
+	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
+	$answerformat = "list" specifies that the answer will be a list of complex numbers.</dd>
 <dt>$reltolerance = tolerance scaling factor</dt>
 	<dd>Scales the grading tolerance.  Defaults to 1.  Set $reltolerance = 2 to make the grading twice as tolerant;
 	    $reltolerance = 0.5 to make grading half as forgiving</dd>
@@ -2312,6 +2319,11 @@ The entries are compared to a given tolerance.
 	<dd>Defines the size of the answer matrix.  If this is supplied, the student will be provided with a grid of
 	entry boxes in which to input the matrix.  If this is not supplied, they will be required to enter the matrix
 	using the ASCIIMath notation, like "[(1,2,3),(4,5,6)]"</dd>
+<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", or "notrig" (In Common Control)</dt>
+	<dd>Requires the entries of the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
+	without decimals (also disallows 10^-2 and 3E-2), or 
+	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
+	</dd>
 <dt>$reltolerance = a decimal value (In Answer)</dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>
@@ -2390,6 +2402,11 @@ rather than numbers, like [2/5,sqrt(8)].
 </p>
 <p><b>Optional Variables</b><BR>
 <dl>
+<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", or "notrig" (In Common Control)</dt>
+	<dd>Requires the each value in the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
+	without decimals (also disallows 10^-2 and 3E-2), or 
+	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
+	</dd>
 <dt>$reltolerance = a decimal value (In Answer)</dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>
@@ -2425,8 +2442,28 @@ This type of question can contain multiple parts, where each part is one of the 
 <dl>
 <dt>$anstypes = an array or list of answer types (In Answer)</dt>
 	<dd>Defines the answer type for each part.  Example: 
-	$anstypes = array("number","calculated","choices","multans","matching","numfunc","draw","ntuple","calcntuple","essay","matrix","calcmatrix","interval","calcinterval")<BR>
-	Refer to this list for the short names of each question type</dd>
+	$anstypes = array("number","number","choices")<br/>
+	Refer to this list for the short names of each question type:
+	<ul>
+	<li>Number:  "number"</li>
+	<li>Calculated: "calculated"</li>
+	<li>Multiple Choice: "choices"</li>
+	<li>Multiple Answer: "multans"</li>
+	<li>Matching: "matching"</li>
+	<li>Function/expression: "numfunc"</li>
+	<li>Drawing: "draw"</li>
+	<li>N-tuple: "ntuple"</li>
+	<li>Calculated N-tuple: "calcntuple"</li>
+	<li>Matrix: "matrix"</li>
+	<li>Calculated Matrix: "calcmatrix"</li>
+	<li>Complex: "complex"</li>
+	<li>Calculated Complex: "calccomplex"</li>
+	<li>Interval: "interval"</li>
+	<li>Calculated Interval: "calcinterval"</li>
+	<li>Essay: "essay"</li>
+	<li>String: "string"</li>
+	</ul>
+	</dd>
 <dt>Question part variables</dt>
 	<dd>For each question part, you will need to define the variables (like $answer, $questions, etc.) you would normally
 	need to define.  However, you will need to suffix the variable with a part designator.  For example, based on $anstypes 

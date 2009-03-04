@@ -104,11 +104,24 @@ if ($myrights<60) {
 	foreach ($_POST as $k=>$v) {
 		if (strpos($k,'out')!==FALSE) {
 			$n = substr($k,3,strpos($k,'-')-3);
-			$sel2[$n][] = $v;
+			$sel2[$n][] = ucfirst($v);
 		}
 	}
-	for ($i=0;$i<count($sel2);$i++) {
-		$sel2[$i] = implode('~',$sel2[$i]);
+	if (isset($_POST['useoneforall'])) { //use first sel2 for all
+		if (isset($_POST['alpha'])) {
+			sort($sel2[0]);
+		}
+		$sel2[0] = implode('~',$sel2[0]);
+		for ($i=1; $i<count($sel1); $i++) {
+			$sel2[$i] = $sel2[0];
+		}
+	} else {
+		for ($i=0;$i<count($sel2);$i++) {
+			if (isset($_POST['alpha'])) {
+				sort($sel2[$i]);
+			}
+			$sel2[$i] = implode('~',$sel2[$i]);
+		}
 	}
 	$sel2list = implode(';',$sel2);
 	
@@ -244,6 +257,7 @@ if ($overwriteBody==1) { //NO AUTHORITY
 			'Select your ______'</p>
 			<p>For each of the first-level selectors, select which assessment should be delivered, 
 			and provide options for the second-level selector</p>
+			<p>Alphabetize selectors on submit? <input type="checkbox" name="alpha" value="1" /></p>
 <?php	
 		foreach($sel1 as $k=>$s1) {
 ?>		
@@ -255,12 +269,19 @@ if ($overwriteBody==1) { //NO AUTHORITY
 ?>
 			<br/>
 			Force regen on reentry (if allowed)? <input type=checkbox name="reg<?php echo $k; ?>" value="1" <?php if (($forceregen & (1<<$k)) > 0) {echo 'checked="checked"';}?> />
+		<?php
+		if ($k==0 && count($sel1)>1) {
+			echo '<br/>Use these second-level selectors for all first-level selectors?';
+			echo '<input type=checkbox name="useoneforall" value="1" onclick="toggleonefor(this)" />';
+		}
+		?>
 			</p>
-			<p>Add selector value: 
-			<input type=text id="in<?php echo $k ?>"  onkeypress="return onenter(event,'in<?php echo $k ?>','out<?php echo $k ?>')"/>
-			<input type=button value="Add" onclick="additem('in<?php echo $k ?>','out<?php echo $k ?>')"/><br/>
 			
-			<table>
+			<div class="sel2">Add selector value: 
+			<input type=text id="in<?php echo $k ?>"  onkeypress="return onenter(event,'in<?php echo $k ?>','out<?php echo $k ?>')"/>
+			<input type="button" value="Add" onclick="additem('in<?php echo $k ?>','out<?php echo $k ?>')"/><br/>
+			
+			<table >
 			<tbody id="out<?php echo $k ?>">
 
 <?php			
@@ -282,7 +303,7 @@ if ($overwriteBody==1) { //NO AUTHORITY
 ?>
 			</tbody>
 			</table>
-			</p>
+			</div>
 			
 <?php 
 			echo (isset($sel2[$s1]) && count($sel2[$s1])>0) ? "<script> cnt['out$k'] = ".count($sel2[$s1]).";</script>\n"  : "<script> cnt['out$k'] = 0;</script>\n";

@@ -253,43 +253,58 @@
 	//OUTPUTS
 	if ($links==0) { //View/Edit full assessment
 		require("../assessment/displayq2.php");
-		if (isset($_GET['update']) && $isteacher) {
-			$scores = array();
-			$i = 0;
-			while (isset($_POST[$i]) || isset($_POST["$i-0"])) {
-				$j=0;
-				$scpt = array();
-				if (isset($_POST["$i-0"])) {
-
-					while (isset($_POST["$i-$j"])) {
-						if ($_POST["$i-$j"]!='N/A') {
-							$scpt[$j] = $_POST["$i-$j"];
-						} else {
-							$scpt[$j] = -1;
-						}
-						$j++;
-					}
-					$scores[$i] = implode('~',$scpt);
-				} else {
-					if ($_POST[$i]!='N/A') {
-						$scores[$i] = $_POST[$i];
-					} else {
-						$scores[$i] = -1;
-					}
+		if (isset($_GET['update']) && ($isteacher || $istutor)) {
+			$oktorec = false;
+			if ($isteacher) {
+				$oktorec = true;
+			} else if ($istutor) {
+				$query = "SELECT ia.tutoredit FROM imas_assessments AS ia JOIN imas_assessment_sessions AS ias ON ia.id=ias.assessmentid ";
+				$query .= "WHERE ias.id='{$_GET['asid']}'";
+				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				if (mysql_result($result,0,0)==1) {
+					$oktorec = true;
 				}
-				$i++;
 			}
-			$scorelist = implode(",",$scores);
-			$feedback = $_POST['feedback'];
-			$query = "UPDATE imas_assessment_sessions SET bestscores='$scorelist',feedback='$feedback'";
-			if (isset($_POST['updategroup'])) {
-				$qp = getasidquery($_GET['asid']);
-				$query .=  " WHERE {$qp[0]}='{$qp[1]}'";
-				//$query .= getasidquery($_GET['asid']);
+			if ($oktorec) {
+				$scores = array();
+				$i = 0;
+				while (isset($_POST[$i]) || isset($_POST["$i-0"])) {
+					$j=0;
+					$scpt = array();
+					if (isset($_POST["$i-0"])) {
+	
+						while (isset($_POST["$i-$j"])) {
+							if ($_POST["$i-$j"]!='N/A') {
+								$scpt[$j] = $_POST["$i-$j"];
+							} else {
+								$scpt[$j] = -1;
+							}
+							$j++;
+						}
+						$scores[$i] = implode('~',$scpt);
+					} else {
+						if ($_POST[$i]!='N/A') {
+							$scores[$i] = $_POST[$i];
+						} else {
+							$scores[$i] = -1;
+						}
+					}
+					$i++;
+				}
+				$scorelist = implode(",",$scores);
+				$feedback = $_POST['feedback'];
+				$query = "UPDATE imas_assessment_sessions SET bestscores='$scorelist',feedback='$feedback'";
+				if (isset($_POST['updategroup'])) {
+					$qp = getasidquery($_GET['asid']);
+					$query .=  " WHERE {$qp[0]}='{$qp[1]}'";
+					//$query .= getasidquery($_GET['asid']);
+				} else {
+					$query .= "WHERE id='{$_GET['asid']}'";
+				}
 			} else {
-				$query .= "WHERE id='{$_GET['asid']}'";
+				echo "No authority to change scores.";
+				exit;
 			}
-
 			mysql_query($query) or die("Query failed : $query " . mysql_error());
 			if ($from=='isolate') {
 				$query = "SELECT assessmentid FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
@@ -317,7 +332,7 @@
 			mysql_query($query) or die("Query failed : $query " . mysql_error());
 		}
 		
-		$query = "SELECT imas_assessments.name,imas_assessments.timelimit,imas_assessments.defpoints,";
+		$query = "SELECT imas_assessments.name,imas_assessments.timelimit,imas_assessments.defpoints,imas_assessments.tutoredit,";
 		$query .= "imas_assessments.deffeedback,imas_assessments.enddate,imas_assessment_sessions.* ";
 		$query .= "FROM imas_assessments,imas_assessment_sessions ";
 		$query .= "WHERE imas_assessments.id=imas_assessment_sessions.assessmentid AND imas_assessment_sessions.id='{$_GET['asid']}'";
@@ -352,6 +367,11 @@
 		
 		$teacherreview = $_GET['uid'];
 		
+		if ($isteacher || ($istutor && $line['tutoredit']==1)) {
+			$canedit = 1;
+		} else {
+			$canedit = 0;
+		}
 		
 		list($testtype,$showans) = explode('-',$line['deffeedback']);
 		echo "<h4>{$line['name']}</h4>\n";
@@ -565,13 +585,13 @@
 				echo "<span class=\"red\">Question Withdrawn</span> ";
 			}
 			list($pt,$parts) = printscore($scores[$i]);
-			if ($isteacher && $parts=='') { 
+			if ($canedit && $parts=='') { 
 				echo "<input type=text size=4 name=\"$i\" value=\"$pt\">";
 			} else {
 				echo $pt;
 			}
 			if ($parts!='') {
-				if ($isteacher) {
+				if ($canedit) {
 					echo " (parts: ";
 					$prts = explode(', ',$parts);
 					for ($j=0;$j<count($prts);$j++) {
@@ -618,7 +638,7 @@
 			
 		}
 		echo "<p></p><div class=review>Total: $total/$totalpossible</div>\n";
-		if ($isteacher && !isset($_GET['lastver']) && !isset($_GET['reviewver'])) {
+		if ($canedit && !isset($_GET['lastver']) && !isset($_GET['reviewver'])) {
 			echo "<p>Feedback to student:<br/><textarea cols=60 rows=4 name=\"feedback\">{$line['feedback']}</textarea></p>";
 			if ($line['agroupid']>0) {
 				echo "<p>Update grade for all group members? <input type=checkbox name=\"updategroup\" checked=\"checked\" /></p>";

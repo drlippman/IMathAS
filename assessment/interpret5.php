@@ -173,8 +173,8 @@ function interpretline($str) {
 				$bits[] = '*';
 			}
 		} else if ($type==2) { //is func
-			//implicit $v sqrt(2) and 3 sqrt(3)
-			if ($lasttype==3 || $lasttype==1) {
+			//implicit $v sqrt(2) and 3 sqrt(3) and (2-3)sqrt(4) and sqrt(2)sqrt(3)
+			if ($lasttype==3 || $lasttype==1 || $lasttype==4 || $lasttype==2 ) {
 				$bits[] = '*';
 			}
 		} else if ($type==3) { //is num

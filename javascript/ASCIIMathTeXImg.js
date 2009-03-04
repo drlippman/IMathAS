@@ -725,6 +725,7 @@ function AMparseMath(str) {
   } else {
 	  texstring = "\\textstyle" + texstring;
   }
+  texstring = texstring.replace('$','\\$');
   var node = document.createElement("img");
   if (typeof encodeURIComponent == "function") {
 	  texstring = encodeURIComponent(texstring);

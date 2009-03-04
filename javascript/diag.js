@@ -63,3 +63,22 @@ function moveitemdown(id,outloc) {
 	}
 	return false;
 }
+
+function toggleonefor(el) {
+	var hide = el.checked;
+	var els = document.getElementsByTagName("div");
+	var isfirst = 1;
+	for (var i=0; i < els.length; i++) {
+		if (els[i].className=="sel2") {
+			if (isfirst) {
+				isfirst = false;
+			} else {
+				if (hide) {
+					els[i].style.display = "none";
+				} else {
+					els[i].style.display = "block";
+				}
+			}
+		}
+	}
+}

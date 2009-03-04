@@ -2,6 +2,7 @@
 Table row / column header locker
 (c) David Lippman, 2008.  http://www.pierce.ctc.edu/dlippman
 
+v0.2 3/2/09  Fix bug with tablesorter
 v0.1 10/23/08
 
 This script allows you to lock the header row and column of an html table.
@@ -100,85 +101,88 @@ this.preinit = function() {
 		
 	} else {
 	
-	//Approach:  Start with table layed out without scrolling
-	//fix column widths and heights by injecting div's into first and 
-	//second rows and columns.  Then when we restrict the container to
-	//create scroll, we don't have to worry about different wrapping.
-	var trs = document.getElementsByTagName("tr");
-	var theads = trs[0].getElementsByTagName("th");
-	leftth = theads[0];
-	var firstthcontent = theads[0].innerHTML;
-	var first = trs[1].getElementsByTagName("td");
-	//fix column widths by injecting fixed-width div in thead tr th's and 
-	//first tbody tr td's
-	for (var i=0; i<theads.length; i++) {
-		var max = theads[i].offsetWidth;
-		if (i==0) {
-			max += 30;
+		//Approach:  Start with table layed out without scrolling
+		//fix column widths and heights by injecting div's into first and 
+		//second rows and columns.  Then when we restrict the container to
+		//create scroll, we don't have to worry about different wrapping.
+		var trs = document.getElementsByTagName("tr");
+		var theads = trs[0].getElementsByTagName("th");
+		leftth = theads[0];
+		var firstthcontent = theads[0].innerHTML;
+		var first = trs[1].getElementsByTagName("td");
+		//fix column widths by injecting fixed-width div in thead tr th's and 
+		//first tbody tr td's
+		for (var i=0; i<theads.length; i++) {
+			var max = theads[i].offsetWidth;
+			if (i==0) {
+				max += 30;
+			}
+			var nn = document.createElement("div");
+			nn.style.width= max +"px";
+			nn.innerHTML = theads[i].innerHTML;
+			theads[i].innerHTML = "";
+			theads[i].appendChild(nn);
+			var nn = document.createElement("div");
+			nn.style.width= max +"px";
+			nn.innerHTML = first[i].innerHTML;
+			first[i].innerHTML = "";
+			first[i].appendChild(nn);
 		}
-		var nn = document.createElement("div");
-		nn.style.width= max +"px";
-		nn.innerHTML = theads[i].innerHTML;
-		theads[i].innerHTML = "";
-		theads[i].appendChild(nn);
-		var nn = document.createElement("div");
-		nn.style.width= max +"px";
-		nn.innerHTML = first[i].innerHTML;
-		first[i].innerHTML = "";
-		first[i].appendChild(nn);
-	}
-	//fix row heights by injecting fixed-height divs in first columns, 
-	//and adding a new column of fixed-height divs
-	var nnb = document.createElement("div");
-	nnb.style.display = "table-cell";
-	nnb.style.verticalAlign = "middle";
-	for (var i=0;i<trs.length;i++) {
-		var nodes = trs[i].getElementsByTagName((i==0?"th":"td"));
-		
-		var max = nodes[0].offsetHeight;
-		if (i==0) {
-			margtop = max;
+		//fix row heights by injecting fixed-height divs in first columns, 
+		//and adding a new column of fixed-height divs
+		var nnb = document.createElement("div");
+		nnb.style.display = "table-cell";
+		nnb.style.verticalAlign = "middle";
+		for (var i=0;i<trs.length;i++) {
+			var nodes = trs[i].getElementsByTagName((i==0?"th":"td"));
+			
+			var max = nodes[0].offsetHeight;
+			if (i==0) {
+				margtop = max;
+			} else {
+				locktds.push(nodes[0]);
+			}
+			var nn = nnb.cloneNode(true);
+			nn.style.height= max +"px";
+			nn.innerHTML = nodes[0].innerHTML;
+			nodes[0].innerHTML = "";
+			nodes[0].appendChild(nn);
+			var nn = nnb.cloneNode(true);
+			nn.style.height= max +"px";
+			var ntd = document.createElement((i==0?"th":"td"));
+			ntd.style.paddingLeft = "0px";
+			ntd.style.paddingRight = "0px";
+			ntd.appendChild(nn);
+			trs[i].insertBefore(ntd,nodes[1]);
+		}
+		if (tblbrowser=='gecko') {
+			vertadj = 0;
 		} else {
-			locktds.push(nodes[0]);
+			vertadj = 15;
+			upleftdiv = document.createElement("div");
+			upleftdiv.style.left = "0px";
+			upleftdiv.style.top = "0px";
+			upleftdiv.style.position = "absolute";
+			upleftdiv.style.visibility = "hidden";
+			upleftdiv.style.zIndex = 40;
+			upleftdiv.style.display = "table";
+			upleftdiv.style.backgroundColor = "#fff";
+			upleftdiv.style.overflow = "hidden";
+			ndivt = document.createElement("div");
+			ndivt.className = theads[0].className;
+			ndivt.style.display = "table-cell";
+			ndivt.style.verticalAlign = "middle";
+			ndiv = document.createElement("div");
+			ndiv.style.textAlign = "center";
+			ndiv.innerHTML = firstthcontent;
+			ndivt.appendChild(ndiv);
+			upleftdiv.appendChild(ndivt);
+			bigcont.appendChild(upleftdiv);
 		}
-		var nn = nnb.cloneNode(true);
-		nn.style.height= max +"px";
-		nn.innerHTML = nodes[0].innerHTML;
-		nodes[0].innerHTML = "";
-		nodes[0].appendChild(nn);
-		var nn = nnb.cloneNode(true);
-		nn.style.height= max +"px";
-		var ntd = document.createElement((i==0?"th":"td"));
-		ntd.style.paddingLeft = "0px";
-		ntd.style.paddingRight = "0px";
-		ntd.appendChild(nn);
-		trs[i].insertBefore(ntd,nodes[1]);
-	}
-	if (tblbrowser=='gecko') {
-		vertadj = 0;
-	} else {
-		vertadj = 15;
-		upleftdiv = document.createElement("div");
-		upleftdiv.style.left = "0px";
-		upleftdiv.style.top = "0px";
-		upleftdiv.style.position = "absolute";
-		upleftdiv.style.visibility = "hidden";
-		upleftdiv.style.zIndex = 40;
-		upleftdiv.style.display = "table";
-		upleftdiv.style.backgroundColor = "#fff";
-		upleftdiv.style.overflow = "hidden";
-		ndivt = document.createElement("div");
-		ndivt.className = theads[0].className;
-		ndivt.style.display = "table-cell";
-		ndivt.style.verticalAlign = "middle";
-		ndiv = document.createElement("div");
-		ndiv.style.textAlign = "center";
-		ndiv.innerHTML = firstthcontent;
-		ndivt.appendChild(ndiv);
-		upleftdiv.appendChild(ndivt);
-		bigcont.appendChild(upleftdiv);
-	}
-		
+		if (typeof tableWidget_arraySort[thetable.getAttribute('tableIndex')] == 'object') {
+			var cur = tableWidget_arraySort[thetable.getAttribute('tableIndex')];
+			tableWidget_arraySort[thetable.getAttribute('tableIndex')] = Array(cur[0],'S').concat(cur.splice(1));
+		}
 	
 	}
 

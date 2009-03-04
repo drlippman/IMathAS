@@ -830,6 +830,7 @@ function AMTparseMath(str) {
   } else {
 	  texstring = "\\textstyle" + texstring;
   }
+  texstring = texstring.replace('$','\\$');
   var node = AMcreateElementXHTML("img");
   if (typeof encodeURIComponent == "function") {
 	  texstring = encodeURIComponent(texstring);
