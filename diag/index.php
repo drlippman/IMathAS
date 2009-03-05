@@ -130,7 +130,10 @@ if (isset($_POST['SID'])) {
 	if (!$noproctor) {
 		
 		$pws = explode(',',$line['pws']);
-		if (!in_array($_POST['passwd'],$pws) || $line['pws']=='') {
+		foreach ($pws as $k=>$v) {
+			$pws[$k] = strtolower($v);
+		}
+		if (!in_array(strtolower($_POST['passwd']),$pws) || $line['pws']=='') {
 			echo "<html><body>Error, password incorrect.  <a href=\"index.php?id=$diagid\">Try Again</a>\n";
 			exit;
 		}
@@ -142,14 +145,23 @@ if (isset($_POST['SID'])) {
 	if (mysql_num_rows($result)>0) {
 		$userid = mysql_result($result,0,0);
 		$allowreentry = ($line['public']&4);
-		if (!$allowreentry) {
+		if (!$allowreentry || $line['reentrytime']>0) {
 			$aids = explode(',',$line['aidlist']);
 			$paid = $aids[$_POST['course']];
-			$query = "SELECT id FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='$paid'";
+			$query = "SELECT id,starttime FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='$paid'";
 			$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (mysql_num_rows($r2)>0) {
-				echo "You've already taken this diagnostic.  <a href=\"index.php?id=$diagid\">Back</a>\n";
-				exit;
+				if (!$allowreentry) {
+					echo "You've already taken this diagnostic.  <a href=\"index.php?id=$diagid\">Back</a>\n";
+					exit;
+				} else {
+					$d = mysql_fetch_row($r2);
+					$now = time();
+					if ($now - $d[1] > 60*$line['reentrytime']) {
+						echo "Your window to complete this diagnostic has expired.  <a href=\"index.php?id=$diagid\">Back</a>\n";
+						exit;
+					}
+				}
 			}
 		}
 		//if ($allowreentry) {

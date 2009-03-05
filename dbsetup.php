@@ -535,6 +535,7 @@ $sql = 'CREATE TABLE `imas_diags` ('
         . ' `sel2list` TEXT NOT NULL, '
 	. ' `entryformat` CHAR(3) NOT NULL DEFAULT \'C0\', '
 	. ' `forceregen` INT(10) UNSIGNED NOT NULL DEFAULT \'0\', '
+	. ' `reentrytime` SMALLINT(5) UNSIGNED NOT NULL DEFAULT \'0\', '
         . ' INDEX (`ownerid`), INDEX(`public`), INDEX(`cid`)'
         . ' )'
         . ' TYPE = innodb;';

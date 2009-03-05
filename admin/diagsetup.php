@@ -129,15 +129,15 @@ if ($myrights<60) {
 		$query = "UPDATE imas_diags SET ";
 		$query .= "name='{$_POST['diagname']}',cid='{$_POST['cid']}',term='{$_POST['term']}',public='{$_POST['public']}',";
 		$query .= "ips='{$_POST['iplist']}',pws='{$_POST['pwlist']}',idprompt='{$_POST['idprompt']}',sel1name='{$_POST['sel1name']}',";
-		$query .= "sel1list='{$_POST['sel1list']}',aidlist='$aidlist',sel2name='{$_POST['sel2name']}',sel2list='$sel2list',entryformat='{$_POST['entryformat']}',forceregen='$forceregen' ";
+		$query .= "sel1list='{$_POST['sel1list']}',aidlist='$aidlist',sel2name='{$_POST['sel2name']}',sel2list='$sel2list',entryformat='{$_POST['entryformat']}',forceregen='$forceregen',reentrytime='{$_POST['reentrytime']}' ";
 		$query .= " WHERE id='{$_POST['id']}'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		$id = $_POST['id'];
 		$page_successMsg = "<p>Diagnostic Updated</p>\n";
 	} else {
-		$query = "INSERT INTO imas_diags (ownerid,name,cid,term,public,ips,pws,idprompt,sel1name,sel1list,aidlist,sel2name,sel2list,entryformat,forceregen) VALUES ";
+		$query = "INSERT INTO imas_diags (ownerid,name,cid,term,public,ips,pws,idprompt,sel1name,sel1list,aidlist,sel2name,sel2list,entryformat,forceregen,reentrytime) VALUES ";
 		$query .= "('$userid','{$_POST['diagname']}','{$_POST['cid']}','{$_POST['term']}','{$_POST['public']}','{$_POST['iplist']}',";
-		$query .= "'{$_POST['pwlist']}','{$_POST['idprompt']}','{$_POST['sel1name']}','{$_POST['sel1list']}','$aidlist','{$_POST['sel2name']}','$sel2list','{$_POST['entryformat']}','$forceregen')";
+		$query .= "'{$_POST['pwlist']}','{$_POST['idprompt']}','{$_POST['sel1name']}','{$_POST['sel1list']}','$aidlist','{$_POST['sel2name']}','$sel2list','{$_POST['entryformat']}','$forceregen','{$_POST['reentrytime']}')";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		$id = mysql_insert_id();
 		$page_successMsg = "<p>Diagnostic Added</p>\n";
@@ -147,7 +147,7 @@ if ($myrights<60) {
 
 } else {  //STEP 1 DATA PROCESSING, MODIFY MODE
 	if (isset($_GET['id'])) { 
-		$query = "SELECT name,term,cid,public,idprompt,ips,pws,sel1name,sel1list,entryformat,forceregen,ownerid FROM imas_diags WHERE id='{$_GET['id']}'";
+		$query = "SELECT name,term,cid,public,idprompt,ips,pws,sel1name,sel1list,entryformat,forceregen,reentrytime,ownerid FROM imas_diags WHERE id='{$_GET['id']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$line = mysql_fetch_array($result, MYSQL_ASSOC);
 		$diagname = $line['name'];
@@ -161,6 +161,7 @@ if ($myrights<60) {
 		$term = $line['term'];
 		$entryformat = $line['entryformat'];
 		$forceregen = $line['forceregen'];
+		$reentrytime = $line['reentrytime'];
 		if ($myrights>=75) {
 			$owner = $line['ownerid'];
 		} else if ($line['ownerid']!=$userid) {
@@ -181,6 +182,7 @@ if ($myrights<60) {
 		$term = '';
 		$entryformat = 'C0';
 		$forceregen = 0;
+		$reentrytime = 0;
 		$owner = $userid;
 	}
 	$entrytype = substr($entryformat,0,1); //$entryformat{0};
@@ -251,6 +253,7 @@ if ($overwriteBody==1) { //NO AUTHORITY
 			<input type=hidden name="idprompt" value="<?php echo $_POST['idprompt'] ?>"/>
 			<input type=hidden name="entryformat" value="<?php echo $_POST['entrytype'].$_POST['entrydig']; ?>"/>
 			<input type=hidden name="public" value="<?php echo $public ?>"/>
+			<input type=hidden name="reentrytime" value="<?php echo $_POST['reentrytime'] ?>"/>
 			<input type=hidden name="id" value="<?php echo $page_updateId ?>" >
 			<p>Second-level selector name:  
 			<input type=text name=sel2name value="<?php echo $sel2name ?>"/> 
@@ -349,8 +352,11 @@ if ($overwriteBody==1) { //NO AUTHORITY
 	<input type=radio name="public" value="0" <?php writeHtmlChecked(2,($public&2),1); ?> /> No 
 	</p>
 	<p>Allow reentry (continuation of test at later date)? 
-	<input type=radio name="reentry" value="1" <?php writeHtmlChecked(4,($public&4),0); ?> /> Yes 
 	<input type=radio name="reentry" value="0" <?php writeHtmlChecked(4,($public&4),1); ?> /> No 
+	
+	<input type=radio name="reentry" value="1" <?php writeHtmlChecked(4,($public&4),0); ?> /> Yes, within 
+	  <input type="text" name="reentrytime" value="<?php echo $reentrytime; ?>" size="4" /> minutes (0 for no limit)
+	
 	</p>
 	
 	<p>Unique ID prompt: <input type=text size=60 name="idprompt" value="<?php echo $idprompt; ?>" /></p>

@@ -28,10 +28,17 @@ function getquestioninfo($qns,$testsettings) {
 		}
 		if ($line['qtype']=='multipart') {
 			//if (preg_match('/answeights\s*=\s*("|\')([\d\.\,\s]+)/',$line['control'],$match)) {
+			$foundweights = false;
 			if (($p = strpos($line['control'],'answeights'))!==false) {
 				$p = strpos($line['control'],"\n",$p);
-				$line['answeights'] = getansweights($line['id'],substr($line['control'],0,$p));
-			} else {
+				$weights = getansweights($line['id'],substr($line['control'],0,$p));
+				if (is_array($weights)) {
+					$line['answeights'] = $weights;
+					$foundweights = true;
+				}
+				
+			} 
+			if (!$foundweights) {
 				preg_match('/anstypes(.*)/',$line['control'],$match);
 				$n = substr_count($match[1],',')+1;
 				if ($n>1) {
@@ -60,7 +67,9 @@ function getansweights($qi,$code) {
 function sandboxgetweights($code,$seed) {
 	srand($seed);
 	eval(interpret('control','multipart',$code));
-	if (is_array($answeights)) {
+	if (!isset($answeights)) {
+		return false;
+	} else if (is_array($answeights)) {
 		return $answeights;
 	} else {
 		return explode(',',$answeights);

@@ -376,6 +376,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else {
 				$searchmine = 0;
 			}
+			if (isset($_POST['newonly'])) {
+				$newonly = 1;
+			} else {
+				$newonly = 0;
+			}
 			$sessiondata['searchmine'.$cid] = $searchmine;
 			writesessiondata();
 		} else if (isset($sessiondata['lastsearch'.$cid])) {
@@ -481,7 +486,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$page_questionTable = array();
 					
 					while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
-						
+						if ($newonly && in_array($line['id'],$existingq)) {
+							continue;
+						}
 						if ($lastlib!=$line['libid'] && isset($lnamesarr[$line['libid']])) {
 							$page_questionTable[$i]['checkbox'] = "";
 							$page_questionTable[$i]['desc'] = "<b>".$lnamesarr[$line['libid']]."</b>";
@@ -757,7 +764,9 @@ if ($overwriteBody==1) {
 		<input type=checkbox name="searchall" value="1" <?php writeHtmlChecked($searchall,1,0) ?> />
 		Search all libs 
 		<input type=checkbox name="searchmine" value="1" <?php writeHtmlChecked($searchmine,1,0) ?> />
-		Mine only
+		Mine only 
+		<input type=checkbox name="newonly" value="1" <?php writeHtmlChecked($newonly,1,0) ?> />
+		Excluded added
 		<input type=submit value=Search>
 		<input type=button value="Add New Question" onclick="window.location='moddataset.php?aid=<?php echo $aid ?>&cid=<?php echo $cid ?>'">
 	</form>
