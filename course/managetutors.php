@@ -77,6 +77,7 @@
 	
 	//*** PRE-DISPLAY 
 	$isdiag = false;
+	$sections = array();
 	//if diagnostic, then we'll use level-2 selectors in place of sections.  level-2 selector is recorded into the
 	//imas_students.section field, so filter will act the same.
 	$query = "SELECT sel2name,sel2list FROM imas_diags WHERE cid='$cid'";

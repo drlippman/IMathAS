@@ -62,3 +62,36 @@ function arraysearch(needle,hay) {
       }
       return -1;
    }
+   
+var tipobj = 0;
+function tipshow(el,tip) {
+	if (typeof tipobj!= 'object') {
+		tipobj = document.createElement("div");
+		tipobj.className = "tips";
+		document.getElementsByTagName("body")[0].appendChild(tipobj);
+	} 
+	tipobj.style.display = "block";
+	tipobj.innerHTML = tip;
+	var p = findPos(el);
+	tipobj.style.left = (p[0]+20) + "px";
+	if (p[1] < 30) {
+		tipobj.style.top = (p[1]+20) + "px";
+	} else {
+		tipobj.style.top = (p[1]-tipobj.offsetHeight) + "px";
+	}
+}
+
+function tipout(el) {
+	tipobj.style.display = "none";	
+}
+
+function findPos(obj) { //from quirksmode.org
+	var curleft = curtop = 0;
+	if (obj.offsetParent) {
+		do {
+			curleft += obj.offsetLeft;
+			curtop += obj.offsetTop;
+		} while (obj = obj.offsetParent);
+	}
+	return [curleft,curtop];
+}

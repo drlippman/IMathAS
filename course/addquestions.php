@@ -761,12 +761,15 @@ if ($overwriteBody==1) {
 		<br> 
 		Search: 
 		<input type=text size=15 name=search value="<?php echo $search ?>"> 
+		<span onmouseover="tipshow(this,'Search all libraries, not just selected ones')" onmouseout="tipout()">
 		<input type=checkbox name="searchall" value="1" <?php writeHtmlChecked($searchall,1,0) ?> />
-		Search all libs 
+		Search all libs</span> 
+		<span onmouseover="tipshow(this,'List only questions I own')" onmouseout="tipout()">
 		<input type=checkbox name="searchmine" value="1" <?php writeHtmlChecked($searchmine,1,0) ?> />
-		Mine only 
+		Mine only</span> 
+		<span onmouseover="tipshow(this,'Exclude questions already in assessment')" onmouseout="tipout()">
 		<input type=checkbox name="newonly" value="1" <?php writeHtmlChecked($newonly,1,0) ?> />
-		Excluded added
+		Excluded added</span> 
 		<input type=submit value=Search>
 		<input type=button value="Add New Question" onclick="window.location='moddataset.php?aid=<?php echo $aid ?>&cid=<?php echo $cid ?>'">
 	</form>

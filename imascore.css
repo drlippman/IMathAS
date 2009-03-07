@@ -327,3 +327,10 @@ div.inactivewrapper, div.activewrapper {
 	padding: 0px;
 }
 
+div.tips {
+ 	border: 1px solid #000;
+	background-color: #cff;
+	position: absolute;
+	padding: 5px;
+}
+
