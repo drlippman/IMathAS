@@ -444,7 +444,7 @@ function canimproveany() {
 function basicshowq($qn,$seqinactive=false) {
 	global $showansduring,$questions,$testsettings,$qi,$seeds,$showhints,$attempts,$regenonreattempt,$showansafterlast,$showeachscore;
 	$qshowansduring = ($showansduring && $qi[$questions[$qn]]['showans']=='0');
-	$qshowansafterlast = (($showansafterlast && $qi[$questions[$qn]]['showans']=='0') || $qi[$questions[$qn]]['showans']=='F');
+	$qshowansafterlast = (($showansafterlast && $qi[$questions[$qn]]['showans']=='0') || $qi[$questions[$qn]]['showans']=='F' || $qi[$questions[$qn]]['showans']=='J');
 	
 	if (canimprove($qn)) {
 		if ($qshowansduring && $attempts[$qn]>=$testsettings['showans']) {$showa = true;} else {$showa=false;}

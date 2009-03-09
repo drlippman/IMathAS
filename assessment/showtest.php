@@ -301,8 +301,8 @@
 	
 	$allowregen = (!$superdone && ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework"));
 	$showeachscore = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="AsGo" || $testsettings['testtype']=="Homework");
-	$showansduring = (($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework") && $testsettings['showans']!='N' && $testsettings['showans']!='F');
-	$showansafterlast = ($testsettings['showans']==='F');
+	$showansduring = (($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework") && $testsettings['showans']!='N' && $testsettings['showans']!='F' && $testsettings['showans']!='J');
+	$showansafterlast = ($testsettings['showans']==='F' || $testsettings['showans']==='J');
 	$noindivscores = ($testsettings['testtype']=="EndScore" || $testsettings['testtype']=="NoScores");
 	$showhints = ($testsettings['showhints']==1);
 	$regenonreattempt = (($testsettings['shuffle']&8)==8);
@@ -443,6 +443,16 @@
 		recordtestdata();
 			
 	}
+	if (isset($_GET['jumptoans']) && $testsettings['showans']==='J') {
+		$tojump = $_GET['jumptoans'];
+		$attempts[$tojump]=$qi[$questions[$tojump]]['attempts'];
+		if ($scores[$tojump]<0){
+			$scores[$tojump] = 0;
+		}
+		recordtestdata();
+		$reloadqi = true;
+	}
+	
 	if ($reloadqi) {
 		$qi = getquestioninfo($questions,$testsettings);
 	}
@@ -837,7 +847,7 @@
 				}
 				if ($reattemptsremain == false && $showeachscore) {
 					echo "<p>This question, with your last answer";
-					if (($showansafterlast && $qi[$questions[$qn]]['showans']=='0') || $qi[$questions[$qn]]['showans']=='F') {
+					if (($showansafterlast && $qi[$questions[$qn]]['showans']=='0') || $qi[$questions[$qn]]['showans']=='F' || $qi[$questions[$qn]]['showans']=='J') {
 						echo " and correct answer";
 						$showcorrectnow = true;
 					} else if ($showansduring && $qi[$questions[$qn]]['showans']=='0' && $qi[$questions[$qn]]['showans']=='0' && $testsettings['showans']==$attempts[$qn]) {
@@ -874,6 +884,9 @@
 					basicshowq($next);
 					showqinfobar($next,true,true);
 					echo '<input type="submit" class="btn" value="Submit" />';
+					if (($testsettings['showans']=='J' && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='J') {
+						echo ' <input type="button" class="btn" value="Jump to Answer" onclick="if (confirm(\'If you jump to the answer, you must generate a new version to earn credit\')) {window.location = \'showtest.php?action=skip&amp;jumptoans='.$next.'&amp;to='.$next.'\'}"/>';
+					}
 					echo "</form>\n";
 					echo "</div>\n";
 				} else {
@@ -903,7 +916,8 @@
 					}
 					if (!$reattemptsremain && $showeachscore) {
 						echo "<p>Question with last attempt is displayed for your review only</p>";
-						$qshowans = ((($showansafterlast && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='F') || ($showansduring && $qi[$questions[$next]]['showans']=='0' && $attempts[$next]>=$testsettings['showans']));
+						
+						$qshowans = ((($showansafterlast && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='F' || $qi[$questions[$next]]['showans']=='J') || ($showansduring && $qi[$questions[$next]]['showans']=='0' && $attempts[$next]>=$testsettings['showans']));
 						if ($qshowans) {
 							displayq($next,$qi[$questions[$next]]['questionsetid'],$seeds[$next],2,false,$attempts[$next],false,false);
 						} else {
@@ -1138,6 +1152,9 @@
 				basicshowq($i);
 				showqinfobar($i,true,true);
 				echo '<input type="submit" class="btn" value="Submit" />';
+				if (($testsettings['showans']=='J' && $qi[$questions[$i]]['showans']=='0') || $qi[$questions[$i]]['showans']=='J') {
+						echo ' <input type="button" class="btn" value="Jump to Answer" onclick="if (confirm(\'If you jump to the answer, you must generate a new version to earn credit\')) {window.location = \'showtest.php?action=skip&amp;jumptoans='.$i.'&amp;to='.$i.'\'}"/>';
+					}
 				echo "</form>\n";
 				echo "</div>\n";
 				
@@ -1174,6 +1191,7 @@
 					if ($i==$curq) {
 						echo "<div><input type=\"submit\" class=\"btn\" value=\"Submit Question ".($i+1)."\" /></div><p></p>\n";
 					}
+					
 					echo "<hr/>";
 				}
 			}

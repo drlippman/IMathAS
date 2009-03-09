@@ -254,18 +254,7 @@
 	if ($links==0) { //View/Edit full assessment
 		require("../assessment/displayq2.php");
 		if (isset($_GET['update']) && ($isteacher || $istutor)) {
-			$oktorec = false;
-			if ($isteacher) {
-				$oktorec = true;
-			} else if ($istutor) {
-				$query = "SELECT ia.tutoredit FROM imas_assessments AS ia JOIN imas_assessment_sessions AS ias ON ia.id=ias.assessmentid ";
-				$query .= "WHERE ias.id='{$_GET['asid']}'";
-				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-				if (mysql_result($result,0,0)==1) {
-					$oktorec = true;
-				}
-			}
-			if ($oktorec) {
+			if (isoktorec()) {
 				$scores = array();
 				$i = 0;
 				while (isset($_POST[$i]) || isset($_POST["$i-0"])) {
@@ -832,5 +821,21 @@ function getconfirmheader($group=false) {
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$out .= "<h4>".mysql_result($result,0,0)."</h4>";
 	return $out;
+}
+
+function isoktorec() {
+	global $isteacher, $istutor;
+	$oktorec = false;
+	if ($isteacher) {
+		$oktorec = true;
+	} else if ($istutor) {
+		$query = "SELECT ia.tutoredit FROM imas_assessments AS ia JOIN imas_assessment_sessions AS ias ON ia.id=ias.assessmentid ";
+		$query .= "WHERE ias.id='{$_GET['asid']}'";
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		if (mysql_result($result,0,0)==1) {
+			$oktorec = true;
+		}
+	}	
+	return $oktorec;
 }
 ?>

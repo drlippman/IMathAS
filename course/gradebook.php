@@ -242,7 +242,8 @@ if (isset($studentid) || $stu!=0) { //show student view
 	//$placeinhead .= "document.getElementById(\"myTable\").className = \"gbl\"; document.cookie = 'gblhdr-$cid=1'; ";
 	//$placeinhead .= "  document.getElementById(\"lockbtn\").value = \"Unlock headers\"; }";
 	$placeinhead .= "}}\n ";
-	
+	$placeinhead .= 'function highlightrow(el) { el.setAttribute("lastclass",el.className); el.className = "highlight";}';
+	$placeinhead .= 'function unhighlightrow(el) { el.className = el.getAttribute("lastclass");}';
 	$placeinhead .= "function chkAll(frm, arr, mark) {  for (i = 0; i <= frm.elements.length; i++) {   try{     if(frm.elements[i].name == arr) {  frm.elements[i].checked = mark;     }   } catch(er) {}  }}";
 	$placeinhead .= "</script>\n";
 	$placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } </style>";
@@ -738,9 +739,9 @@ function gbinstrdisp() {
 	//create student rows
 	for ($i=1;$i<count($gbt);$i++) {
 		if ($i%2!=0) {
-			echo "<tr class=even onMouseOver=\"this.className='highlight'\" onMouseOut=\"this.className='even'\">"; 
+			echo "<tr class=even onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">"; 
 		} else {
-			echo "<tr class=odd onMouseOver=\"this.className='highlight'\" onMouseOut=\"this.className='odd'\">"; 
+			echo "<tr class=odd onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">"; 
 		}
 		echo '<td class="locked" scope="row">';
 		if ($gbt[$i][0][0]!="Averages" && $isteacher) {
