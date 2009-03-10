@@ -102,6 +102,8 @@ dd {
 			<li><a href="#printcopies">Making Print Copies</a></li>
 			</ul>
 		</ul>
+	<li><a href="#quickview">Quick View</a></li>
+	<li><a href="#calendar">Calendar</a></li>
 	<li><a href="#questionsetmanagementcm">Question Set Management</a></li>
 		<ul>
 		<li><a href="#managequestionsetcm">Manage Question Set</a></li>
@@ -118,10 +120,12 @@ dd {
 	<li><a href="#liststudents">List Students</a></li>
 		<ul>
 		<li><a href="#exceptions">Exceptions</a></li>
-		<li><a href="#resettingpasswords">Resetting Passwords</a></li>
+		<li><a href="#resettingpasswords">Resetting Passwords / Changing Info</a></li>
 		<li><a href="#unenrolling">Unenrolling</a></li>
 		<li><a href="#importstudentscm">Import Students</a></li>
 		<li><a href="#sectioncodes">Assigning Section and/or Code Numbers</a></li>
+		<li><a href="#managelatepasses">Manage LatePasses</a></li>
+		<li><a href="#managetutors">Manage Tutors</a></li>
 		</ul>
 	<li><a href="#gradebook">Gradebook</a></li>
 		<ul>
@@ -226,6 +230,7 @@ course items without needing an enrollment key.  You can limit this ability to i
 own group.</li>
 <li><b>Message System</b>: allows you decide which features of the internal messaging system you
 want to enable.  This allows you restrict who, if anyone, the student can send messages to.</li>
+<li><b>Live Chat</b>: Enable a live chat room for this course</li>
 <li><b>Student Quick-Pick Top Bar</b>: What items, if any, to have in a bar at the top of the student's course page</li>
 <li><b>Instructor Quick-Pick Top Bar</b>:  What items, if any, to have in a bar at the top of the instructor's course page</li>
 <li><b>Instructor Course Management Links</b>:  Whether to have course management links at the bottom or along the
@@ -463,28 +468,32 @@ create a course and add your diagnostic assessments to that course.</p>
 <p>Over two pages, you will be asked for:
 <ul>
  <li>Diagnostic name: the name of your diagnostic to display to students on the login page</li>
- <li>Term designator: Can be changed each term for ongoing assessments to keep track of which term an assessment was taken in</li>
+ <li>Term designator: Can be changed each term for ongoing assessments to keep track of which term an assessment was taken in.  Also will create a unique
+   username for each term, so same student ID could take the assessment again in the different term.</li>
  <li>Linked with course:  What course contains your diagnostic assessments.  You must be listed as a teacher for the course</li>
  <li>Available:  Whether students can take the diagnostic</li>
  <li>Public:  Whether the diagnostic should be listed on the main Diagnostics list page at $imasroot/diag.  If set to no,
      students will have to be provided with the direct link to the diagnostic.</li>
  <li>Allow Reentry:  Whether students should be forced to complete the diagnostic in one sitting, or whether you'll allow them
-     to reaccess the test at a later time</li>
+     to reaccess the test at a later time.  If Yes, you can set a testing window that limits the number of minutes after first accessing
+     the diagnostic they can reenter the diagnostic.</li>
  <li>Unique ID prompt:  How you want to word the prompt for a unique user id</li>
+ <li>ID entry format:  Lets you specify the format of the unique ID, so ensure valid IDs</li>
  <li>Allow access IP addresses:  IP addressed for which the diagnostic can be taken without a password.  If you want to
      allow access from anywhere, enter "*".  You can use "*" for a wildcard as well, e.g. 123.45.* to allow any IP beginning
      with 123.45.</li>
- <li>Passwords:  Passwords which will allow access to the diagnostic from other IP addresses.</li>
+ <li>Passwords:  Passwords which will allow access to the diagnostic from other IP addresses.  Passwords are not case sensitive.</li>
  <li>First level selector name:  Students will be asked to select two items from pull-down lists, with the values in the second
      depending upon the values in the first.  The choice in the first list also dictates which assessment is delivered.  For
      selector name, specify what this selection should be called, filling in the blank "Please enter your ______".  In many cases
      the two selectors will be Course and Instructor, or Course and Section</li>
  <li>First level selector options:  Add options for the first level selector</li>
  <li>Second level selector name:  Secondary selection, with values depending upon the first-level selector choice.  Fill in the blank
-	"Enter your _________".</li>
+	"Enter your _________".  Second level selectors will be become the student's section identifier in the course, allowing you to
+	use the tutor system with diagnostics.</li>
  <li>Deliver assessment:  For each first-level selector, specify which assessment should be delivered if the student
      selects that option</li>
- <li>Second level selector options:  For each first-level selector, specify the options for the second level selector</li>
+ <li>Second level selector options:  For each first-level selector, specify the options for the second level selector.</li>
 </ul>
 <p>After submitting the second page, you will be provided with the direct access link to the diagnostic, which you can
 provide to students or use to create a link from another website</p>
@@ -519,12 +528,12 @@ higher level including the rights of the lower levels:
        accesses the test).  Cannot enroll or unenroll in courses, or change
        user info or password.  Cannot post in forums</li>
 <li><b>Student</b>: Can only access class materials - cannot edit anything</li>
-<li><b>Tutor/TA/Proctor</b>: Can access class materials and view gradebook (and test attempts) for all students.  Cannot edit
-       course materials or change grades</li>
 <li><b>Teacher</b>: Can edit course materials and create assessments, but only in courses
 	to which they have been assigned as a teacher</li>
 <li><b>Limited Course Creator</b>: Can add courses, and they are automatically assigned as the teacher.  Can delete courses
        that they create.</li>
+<li><b>Diagnostic Creator</b>: Can add courses, and they are automatically assigned as the teacher.  Can delete courses
+       that they create.  Can create diagnostics.</li>
 <li><b>Group Admin</b>: Can add/delete teachers and set user rights, but only for users in their group.  Can modify/delete questions
        and libraries created by members of the group regardless of ownership or use rights.  Can always create "open to all" libraries</li>
 <li><b>Full Administrator</b>: Can add/delete administrators and set user rights.  Can import macro files, if installation allows.
@@ -558,7 +567,7 @@ Accessing a course as a teacher shows the course in management (edit) mode.
 <div class=h2>
 <h2><a name="coursepagelayout">Course Page Layout</a></h2>
 
-The course page consists of a list of items.  There are five types of items:
+The course page consists of a list of items.  There are six types of items:
 <ul>
 <li><b>Blocks</b>:  Groupings of items (Inline Text, Linked Text, Assessments)</li>  
 <li><b>Inline Text Items</b>:  Text that displays on the course page</li>
@@ -566,6 +575,7 @@ The course page consists of a list of items.  There are five types of items:
     that can display text, an uploaded file, or a weblink</li>
 <li><b>Forum Items</b>: Basic disussion forum</li>
 <li><b>Assessments</b>:  Tests or Practice questions</li>
+<li><b>Calendar</b>:  The course calendar, if you want to embed it on your course page</li>
 </ul>
 <p>Blocks have a colored header.  If a block is displayed collapsed, click the block
 name or the &quot;Expand&quot; button to view the block's contents.  If the block is 
@@ -680,13 +690,8 @@ all posts in the forum, grouped by student name.  New threads are colored in bla
 <h3><a name="assessments">Assessments</a></h3>
 
 <b>Warning:</b> Making changes to an assessment after students have already taken it
-can seriously mess up those students' assessment results.  It is safe to change:
-<ul>
-<li>Start/End dates</li>
-<li>Summary &amp; Intro</li>
-<li>Time Limit</li>
-<li>Password</li>
-</ul>
+can seriously mess up those students' assessment results.  It is NOT safe to change:  Default points per problem or Default penalty.
+
 
 <div class=h4>
 <h4><a name="assessmentsettings">Assessment Settings</a></h4>
@@ -758,7 +763,8 @@ assessment in the course page.
 	</ul>
 <li><b>Show Answers</b>:  When (if ever) students should be able to see answers.</li>
 	<ul>
-	<li><b>Practice Tests and Homework</b>:  For practice tests and homework, you can set this to never, or after 0,1,3,4,or 5 attempts are made</li>
+	<li><b>Practice Tests and Homework</b>:  For practice tests and homework, you can set this to never, after 0,1,3,4,or 5 attempts are made,
+	    or after last attempt.  There is also an after last attempt option that will allow students to jump directly to the answer.</li>
 	<li><b>Other Tests</b>:  For other tests, you can set this to never, after the assessment due date, after the last last attempt (in Skip Around and Full 
 	    test submitted one at time modes only), or immediately.  
 	    Answers will be available in the gradebook review of a test.  <i>Note</i>:  Do not use the "Immediately" option if you
@@ -772,6 +778,7 @@ assessment in the course page.
 <li><b>Shuffle item order</b>:  Randomizes the order in which questions are presented</li>
 <li><b>Gradebook Category</b>:  If you have created gradebook categories, you can assign the assessment to one of those categories.</li>
 <li><b>Count</b>:  Whether to count the assessment in the gradebook</li>
+<li><b>Allow tutors to edit</b>:  Whether tutors should be able to change students' scores on this assessment</li>
 <li><b>Minimum Score for Credit</b>:  A minimum score which must be acheived to receive credit for the assessment.  Set to 0 to accept all scores.
    If set and score is not met, gradebook will display "NC" (No Credit).</li>
 <li><b>Show based on another assessment</b>:  Use this to hide this assessment until a specific score is acheived on another
@@ -793,14 +800,19 @@ students request a similar problem, different students will receive different ve
 
 <p>You can add existing questions to an assessment by clicking the &quot;Select Library&quot; button 
 to choose libraries to search, then the &quot;Search&quot; button to
-list potential questions.  Leave the &quot;Search&quot; entry blank to list all questions in the libraries selected.</p>
+list potential questions.  Leave the &quot;Search&quot; entry blank to list all questions in the libraries selected.  The checkboxes
+can be used to search in all libraries (not just the selected ones), list only questions you own, or exclude questions you've already
+added to your assessment.</p>
 From this list you can:
 <ul>
 <li>Use the checkboxes to select questions, then click the &quot;Add Selected (using defaults)&quot;
 button to add the questions.  Adding this way will use the assessment default settings for
 points, attempts allowed, and penalty per attempt.  You can change these later by 
 clicking the &quot;Change Settings&quot; link.</li>
-<li>Click the &quot;Add to Assessment&quot; link.  This will allow you to change the default
+<li>Use the checkboxes to select questions, then click the &quot;Add&quot;
+button to add the questions.  Adding this way will allow you to override the default settings for
+points, attempts allowed, and penalty per attempt if you wish, and add a question multiple times.</li>
+<li>Click the &quot;Add&quot; link.  This will allow you to change the default
 question settings</li>
 <li>Click &quot;Use as template for New Question&quot; link.  This will create a new question based
 upon the existing question.  This allows you to avoid rewriting a question from 
@@ -878,6 +890,35 @@ keys.  After hitting continue, you print version of the test will be displayed. 
 
 </div>
 </div>
+</div>
+
+<div class=h2>
+<h2><a name="quickview">Quick View</a></h2>
+<p>Quick view is a condensed view of the course page.  You can use it to quickly look over 
+your entire course.  It is more useful for major editing</p>
+
+<p>It allows easy drag-and-drop
+reordering of course items.  Changes will not be recorded until the "Record Changes" button
+is pressed.</p>
+
+<p>You can also quickly rename items by clicking on their titles and changing the text.  
+Again, changes will not be recorded until the "Record Changes" button
+is pressed.</p>
+
+<p>When done in quick view, click the "Return to regular view" link to get back to the regular course page</p>
+</div>
+
+<div class=h2>
+<h2><a name="calendar">Calendar</a></h2>
+<p>The calendar can be accessed from the course navigation bars, or by embedding the calendar
+on your course page.  The calendar autopopulates with assessment item due dates, and discussion forum
+post-by and reply-by dates.  Text items have options to place them on the calendar.  The calendar
+displays with the current date on the top line; you can jump later in the future or look in the past
+using the "&lt; &lt;" and "&gt; &gt;" links above the calendar.</p>
+
+<p>You can add additional items to the Calendar using the "Manage Events" link on the calendar.  All items
+to be placed on the calendar need a date, a description, and a single letter or symbol tag that will show on
+the calendar</p>
 </div>
 
 <div class=h2>
@@ -1049,9 +1090,13 @@ in the Gradebook.
 
 </div>
 <div class=h3>
-<h3><a name="resettingpasswords">Resetting Passwords</a></h3>
+<h3><a name="resettingpasswords">Resetting Passwords / Changing Info</a></h3>
 
-Use the &quot;Reset Password&quot; link to reset a student's password to 'password'
+Use the &quot;Chg Info&quot; link to reset a student's password, 
+update their email address, username or full name, or change their section or code.  
+You can also lock the student out of the course on this page.  Doing so will
+display a message to the student that they need to see their instructor to
+regain access to the course.
 
 </div>
 <div class=h3>
@@ -1084,6 +1129,33 @@ current class upon submission.</p>
 numbers to students.  These only serve for identification purposes, the the gradebook
 will be sorted first by section, then by name.  Section can be alphanumeric; code number
 must be numeric, up to 4 digits.</p>
+
+</div>
+<div class=h3>
+<h3><a name="managelatepasses">Manage LatePasses</a></h3>
+
+<p>Click the "Manage LatePasses" link to give students LatePasses.  Students can redeed
+a LatePass for an extension on an online assessment without your intervention, provided
+you have clicked the "Allow use of latepasses" option in that assessment.</p>
+
+<p>On this page you can also define the number of hours extension a LatePass will grant</p>
+
+</div>
+<div class=h3>
+<h3><a name="managetutors">Manage Tutors</a></h3>
+
+<p>Click the "Manage Tutors" link to manage tutors for your class.  Tutors can have an
+instructor account or student account. Tutors will be able to view students' scores
+and online assessments.  If given permission, tutors can edit or enter online or offline
+scores.</p>
+
+<p>Add tutors by listing their usernames in the box
+provided.  Remove tutors by clicking the "Remove" checkboxes next to tutors and clicking Update</p>
+
+<p>Once tutors are added, you can limit them to a single section of the course.  If selected,
+tutors will only be able to see scores for students in the section they're limited to.  This
+can be used in conjunction with the diagnostic system, since second-level selections become the 
+student's section identifier</p>
 
 </div>
 </div>
@@ -1142,6 +1214,7 @@ To add an offline grade, click the "Add Offline Grade" link on the gradebook pag
 <li>Show to students after:  The date after which to show the item to students</li>
 <li>Gradebook Category:  The gradebook category you wish to assign the item to</li>
 <li>Count:  Whether to count the score in the gradebook total, not count it, or count it as extra credit</li>
+<li>Allow tutors to edit:  Whether tutors should be able to edit scores for this item</li>
 </ul>
 <p>You can then enter grades for each student.  If you leave a grade blank, no grade will be recorded for that student. 
 You can edit these settings or edit all students' grades at a later time by clicking the "Average" in the gradebook for this item. 
@@ -1451,10 +1524,10 @@ for ($i=1..5) {$a = $a+$i} if ($a>2)     DOES NOT WORK
 </div>
 </div>
 <div class=h2>
-<p>Note on macros:  The descriptions below explain macros available and the arguments the
-functions should be called with.  arguments in [square brackets] are optional arguments, and
-can be omitted.</p>
 <h2><a name="randomizers">Randomizers</a></h2>
+<p>Note on macros:  The descriptions below explain macros available and the arguments the
+functions should be called with.  Arguments in [square brackets] are optional arguments, and
+can be omitted.</p>
 
 Single result randomizers:
 <ul>
@@ -2125,13 +2198,11 @@ This can be used for coordinate points, vectors, or any other n-tuple of numbers
 <dt>$displayformat = "point", "pointlist", "vector", "vectorlist", "list" (In Question Control)</dt>
 	<dd>Changes the answer entry tips (does NOT change how the question is graded).  For points,
 	entry like (2,3) is specified.  For vectors, entry like &lt;2,3&gt; is specified.</dd>
-<dt>$reltolerance = tolerance scaling factor</dt>
-	<dd>Scales the grading tolerance.  Defaults to 1.  Set $reltolerance = 2 to make the grading twice as tolerant;
-	    $reltolerance = 0.5 to make grading half as forgiving</dd>
-<dt>$abstolerance = grading cutoff</dt>
-	<dd>Sets all-or-nothing grading.  If score &lt; $abstolerance, the student receives 0 for the question (note: score is 
-	between 0 and 1).  Otherwise
-	the student will receive full credit.  Not set by default.</dd>
+<dt>$reltolerance = a decimal value (In Answer)</dt>
+	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
+	used by default.</dd>
+<dt>$abstolerance = a number (In Answer)</dt>
+	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the question input drawing tool in that location</dd>
 <dt>$showanswer (In Answer)</dt>
@@ -2171,13 +2242,11 @@ rather than just numbers, such as (5/3, 2/3).
 	without decimals (also disallows 10^-2 and 3E-2), or 
 	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
 	</dd>
-<dt>$reltolerance = tolerance scaling factor</dt>
-	<dd>Scales the grading tolerance.  Defaults to 1.  Set $reltolerance = 2 to make the grading twice as tolerant;
-	    $reltolerance = 0.5 to make grading half as forgiving</dd>
-<dt>$abstolerance = grading cutoff</dt>
-	<dd>Sets all-or-nothing grading.  If score &lt; $abstolerance, the student receives 0 for the question (note: score is 
-	between 0 and 1).  Otherwise
-	the student will receive full credit.  Not set by default.</dd>
+<dt>$reltolerance = a decimal value (In Answer)</dt>
+	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
+	used by default.</dd>
+<dt>$abstolerance = a number (In Answer)</dt>
+	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the question input drawing tool in that location</dd>
 <dt>$showanswer (In Answer)</dt>
@@ -2205,13 +2274,11 @@ Complex questions require the student to enter a complex number in a+bi form.
 <dl>
 <dt>$answerformat = "list" (In Common Control)</dt>
 	<dd>Specifies that the answer will be a list of complex numbers.</dd>
-<dt>$reltolerance = tolerance scaling factor</dt>
-	<dd>Scales the grading tolerance.  Defaults to 1.  Set $reltolerance = 2 to make the grading twice as tolerant;
-	    $reltolerance = 0.5 to make grading half as forgiving</dd>
-<dt>$abstolerance = grading cutoff</dt>
-	<dd>Sets all-or-nothing grading.  If score &lt; $abstolerance, the student receives 0 for the question (note: score is 
-	between 0 and 1).  Otherwise
-	the student will receive full credit.  Not set by default.</dd>
+<dt>$reltolerance = a decimal value (In Answer)</dt>
+	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
+	used by default.</dd>
+<dt>$abstolerance = a number (In Answer)</dt>
+	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the question input drawing tool in that location</dd>
 <dt>$showanswer (In Answer)</dt>
@@ -2243,13 +2310,11 @@ rather than just numbers, such as 1/3+sqrt(2)i.
 	without decimals (also disallows 10^-2 and 3E-2), or 
 	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
 	$answerformat = "list" specifies that the answer will be a list of complex numbers.</dd>
-<dt>$reltolerance = tolerance scaling factor</dt>
-	<dd>Scales the grading tolerance.  Defaults to 1.  Set $reltolerance = 2 to make the grading twice as tolerant;
-	    $reltolerance = 0.5 to make grading half as forgiving</dd>
-<dt>$abstolerance = grading cutoff</dt>
-	<dd>Sets all-or-nothing grading.  If score &lt; $abstolerance, the student receives 0 for the question (note: score is 
-	between 0 and 1).  Otherwise
-	the student will receive full credit.  Not set by default.</dd>
+<dt>$reltolerance = a decimal value (In Answer)</dt>
+	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
+	used by default.</dd>
+<dt>$abstolerance = a number (In Answer)</dt>
+	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the question input drawing tool in that location</dd>
 <dt>$showanswer (In Answer)</dt>
