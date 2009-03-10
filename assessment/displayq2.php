@@ -1283,11 +1283,14 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						} else if (strtoupper($anans)==strtoupper($givenans)) {
 							$correct += 1; $foundloc = $j; break 2;
 						}
-					} else if (is_numeric($givenans)) {
-						if (isset($abstolerance)) {
-							if (abs($anans-$givenans) < $abstolerance + 1E-12) {$correct += 1; $foundloc = $j; break 2;} 	
-						} else {
-							if (abs($anans - $givenans)/(abs($anans)+.0001) < $reltolerance+ 1E-12) {$correct += 1; $foundloc = $j; break 2;} 
+					} else {//{if (is_numeric($givenans)) {
+						$givenans = preg_replace('/[^\-\d\.eE]/','',$givenans); //strip out units, dollar signs, whatever
+						if (is_numeric($givenans)) {
+							if (isset($abstolerance)) {
+								if (abs($anans-$givenans) < $abstolerance + 1E-12) {$correct += 1; $foundloc = $j; break 2;} 	
+							} else {
+								if (abs($anans - $givenans)/(abs($anans)+.0001) < $reltolerance+ 1E-12) {$correct += 1; $foundloc = $j; break 2;} 
+							}
 						}
 					}
 				}
