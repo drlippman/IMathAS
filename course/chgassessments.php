@@ -377,6 +377,7 @@ function chkAll(frm, arr, mark) {
 					<select name="showansprac">
 						<option value="N">Never</option>
 						<option value="F">After last attempt (Skip Around only)</option>
+						<option value="J">After last attempt or Jump to Ans button (Skip Around only)</option>
 						<option value="0" >Always</option>
 						<option value="1" >After 1 attempt</option>
 						<option value="2" >After 2 attempts</option>
@@ -390,6 +391,7 @@ function chkAll(frm, arr, mark) {
 						<option value="N" >Never</option>
 						<option value="I">Immediately (in gradebook) - don't use if allowing multiple attempts per problem</option>
 						<option value="F" >After last attempt (Skip Around only)</option>
+						<option value="J">After last attempt or Jump to Ans button (Skip Around only)</option>
 						<option value="A" SELECTED>After due date (in gradebook)</option>
 					</select>
 					</span>

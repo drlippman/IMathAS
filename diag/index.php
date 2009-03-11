@@ -127,13 +127,26 @@ if (isset($_POST['SID'])) {
 		echo "<html><body>Please select a {$line['sel1name']} and {$line['sel2name']}.  <a href=\"index.php?id=$diagid\">Try Again</a>\n";
 			exit; 
 	}
+	$pws = explode(';',$line['pws']);
+	if (trim($pws[0])!='') {
+		$basicpw = explode(',',$pws[0]);
+	} else {
+		$basicpw = array();
+	}
+	if (count($pws)>1 && trim($pws[1])!='') {
+		$superpw = explode(',',$pws[1]);
+	} else {
+		$superpw = array();
+	}
+	//$pws = explode(',',$line['pws']);
+	foreach ($basicpw as $k=>$v) {
+		$basicpw[$k] = strtolower($v);
+	}
+	foreach ($superpw as $k=>$v) {
+		$superpw[$k] = strtolower($v);
+	}
 	if (!$noproctor) {
-		
-		$pws = explode(',',$line['pws']);
-		foreach ($pws as $k=>$v) {
-			$pws[$k] = strtolower($v);
-		}
-		if (!in_array(strtolower($_POST['passwd']),$pws) || $line['pws']=='') {
+		if (!in_array(strtolower($_POST['passwd']),$basicpw) && !in_array(strtolower($_POST['passwd']),$superpw)) {
 			echo "<html><body>Error, password incorrect.  <a href=\"index.php?id=$diagid\">Try Again</a>\n";
 			exit;
 		}
@@ -145,7 +158,7 @@ if (isset($_POST['SID'])) {
 	if (mysql_num_rows($result)>0) {
 		$userid = mysql_result($result,0,0);
 		$allowreentry = ($line['public']&4);
-		if (!$allowreentry || $line['reentrytime']>0) {
+		if (!in_array(strtolower($_POST['passwd']),$superpw) && (!$allowreentry || $line['reentrytime']>0)) {
 			$aids = explode(',',$line['aidlist']);
 			$paid = $aids[$_POST['course']];
 			$query = "SELECT id,starttime FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='$paid'";
@@ -303,6 +316,14 @@ for ($i=0;$i<count($sel1);$i++) {
 <div id="submit" class="submit" style="display:none"><input type=submit value='Access Diagnostic'></div>
 <input type=hidden name="mathdisp" id="mathdisp" value="2" />
 <input type=hidden name="graphdisp" id="graphdisp" value="2" />
+<?php
+$allowreentry = ($line['public']&4);
+$pws = explode(';',$line['pws']);
+if ($noproctor && count($pws)>1 && trim($pws[1])!='' && (!$allowreentry || $line['reentrytime']>0)) {
+	echo "<p>No access code is required for this diagnostic.  However, if your testing window has expired, a proctor can enter a password to allow reaccess to this test.</br>\n";
+	echo "<span class=form>Override password:</span>  <input class=form type=password size=40 name=passwd><BR class=form>";
+}
+?>
 </form>
 
 <div id="bsetup">JavaScript is not enabled. JavaScript is required for <?php echo $installname; ?>. Please enable JavaScript and reload this page</div>

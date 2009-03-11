@@ -41,11 +41,13 @@
 		echo '<span class="form">Assessment comments:</span><span class="formright"> <input type="radio" name="commentloc" value="-1" checked="checked"> Don\'t include <br/>  <input type="radio" name="commentloc" value="1"> Separate columns at end <br/><input type="radio" name="commentloc" value="0"> After scores</span><br class="form" />';
 		
 		if (isset($_GET['export'])) {
-			echo '<div class="submit"><input type=submit value="Download Gradebook" /></div>';
+			echo '<div class="submit"><input type=submit name="submit" value="Download Gradebook as CSV" /> <input type=submit name="submit" value="Download Gradebook for Excel" /></div>';
 			echo '<p>When you click the <b>Download Gradebook</b> button, your browser will probably ask if you want to save or ';
 			echo 'open the file.  Click <b>Save</b> to save the file to your computer, or <b>Open</b> to open the gradebook in Excel ';
 			echo 'or whatever program your computer has set to open .csv spreadsheet files</p>';
-			echo "<p><a href=\"gradebook.php?cid=$cid\">Return to gradebook</a></p>";
+			echo '<p>A CSV (comma separated values) file will just contain data, and can be opened in most spreadsheet programs</p>';
+			echo '<p>Using the Download for Excel button will generate an HTML file that Excel can open, and will most likely preserve coloring and other formatting</p>';
+			echo '<p><a href=\"gradebook.php?cid=$cid\">Return to gradebook</a></p>';
 		} else {
 			echo '<div class="submit"><input type=submit value="Email Gradebook" /></div>';
 		}
@@ -74,79 +76,92 @@
 
 	require("gbtable2.php");
 	$includecomments = true;
-	$gb = gbinstrexport();
-	if (isset($_GET['export']) && $_GET['export']=="true") {
-		header('Content-type: text/csv');
-		header("Content-Disposition: attachment; filename=\"gradebook-$cid.csv\"");
-		foreach ($gb as $gbline) {
-			$line = '';
-			foreach ($gbline as $val) {
-				 # remove any windows new lines, as they interfere with the parsing at the other end 
-				  $val = str_replace("\r\n", "\n", $val); 
-				  $val = str_replace("\n", " ", $val);
-				  $val = str_replace(array("<BR>",'<br>','<br/>'), ' ',$val);
-				  $val = str_replace("&nbsp;"," ",$val);
-			
-				  # if a deliminator char, a double quote char or a newline are in the field, add quotes 
-				  if(ereg("[\,\"\n\r]", $val)) { 
-					  $val = '"'.str_replace('"', '""', $val).'"'; 
-				  }
-				  $line .= $val.',';
-			}
-			# strip the last deliminator 
-			$line = substr($line, 0, -1); 
-			$line .= "\n";
-			echo $line;
-		}
+	if ($_POST['submit']=="Download Gradebook for Excel") {
+		header('Content-type: application/vnd.ms-excel');
+		header('Content-Disposition: attachment; filename="gradebook-'.$cid.'.xls"');
+		echo '<html><head>';
+		echo '<style type="text/css">';
+		require("../imascore.css");
+		require("../themes/modern.css");
+		echo '</style></head><body>';
+		gbinstrdisp();
+		echo '</body></html>';
 		exit;
-	} 
-	if (isset($_GET['emailgb'])) {
-		
-		$line = '';
-		foreach ($gb as $gbline) {
-			
-			foreach ($gbline as $val) {
-				 # remove any windows new lines, as they interfere with the parsing at the other end 
-				  $val = str_replace("\r\n", "\n", $val); 
-				  $val = str_replace("\n", " ", $val);
-				  $val = str_replace("<BR>", " ",$val);
-				  $val = str_replace("<br/>", " ",$val);
-				  $val = str_replace("&nbsp;"," ",$val);
-			
-				  # if a deliminator char, a double quote char or a newline are in the field, add quotes 
-				  if(ereg("[\,\"\n\r]", $val)) { 
-					  $val = '"'.str_replace('"', '""', $val).'"'; 
-				  }
-				  $line .= $val.',';
+	} else {
+		$gb = gbinstrexport();
+		if (isset($_GET['export']) && $_GET['export']=="true") {
+			header('Content-type: text/csv');
+			header("Content-Disposition: attachment; filename=\"gradebook-$cid.csv\"");
+			foreach ($gb as $gbline) {
+				$line = '';
+				foreach ($gbline as $val) {
+					 # remove any windows new lines, as they interfere with the parsing at the other end 
+					  $val = str_replace("\r\n", "\n", $val); 
+					  $val = str_replace("\n", " ", $val);
+					  $val = str_replace(array("<BR>",'<br>','<br/>'), ' ',$val);
+					  $val = str_replace("&nbsp;"," ",$val);
+				
+					  # if a deliminator char, a double quote char or a newline are in the field, add quotes 
+					  if(ereg("[\,\"\n\r]", $val)) { 
+						  $val = '"'.str_replace('"', '""', $val).'"'; 
+					  }
+					  $line .= $val.',';
+				}
+				# strip the last deliminator 
+				$line = substr($line, 0, -1); 
+				$line .= "\n";
+				echo $line;
 			}
-			# strip the last deliminator 
-			$line = substr($line, 0, -1); 
-			$line .= "\n";
-		}
-		$boundary = '-----=' . md5( uniqid ( rand() ) );
-		$message = "--".$boundary . "\n";
-		$message .= "Content-Type: text/csv; name=\"Gradebook\"\n";
-		$message .= "Content-Transfer-Encoding: base64\n";
-		$message .= "Content-Disposition: attachment; filename=\"gradebook.csv\"\n\n";
-		$content_encode = chunk_split(base64_encode($line));
-		$message .= $content_encode . "\n";
-		$message .= "--" . $boundary . "--\n";
-		$headers  = "From: $sendfrom\n";
-		$headers .= "MIME-Version: 1.0\n";
-		$headers .= "Content-Type: multipart/mixed; boundary=\"$boundary\"";
-		if ($_GET['emailgb']=="me") {
-			$query = "SELECT email FROM imas_users WHERE id='$userid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$_GET['emailgb'] = mysql_result($result,0,0);
-		}
-		if ($_GET['emailgb']!='') {
-			mail($_GET['emailgb'], "Gradebook for $coursename", $message, $headers);
-			require("../header.php");
-			echo "Gradebook Emailed.  <a href=\"gradebook.php?cid=$cid\">Return to Gradebook</a>";
-			require("../footer.php");
 			exit;
+		} 
+		if (isset($_GET['emailgb'])) {
+			
+			$line = '';
+			foreach ($gb as $gbline) {
+				
+				foreach ($gbline as $val) {
+					 # remove any windows new lines, as they interfere with the parsing at the other end 
+					  $val = str_replace("\r\n", "\n", $val); 
+					  $val = str_replace("\n", " ", $val);
+					  $val = str_replace("<BR>", " ",$val);
+					  $val = str_replace("<br/>", " ",$val);
+					  $val = str_replace("&nbsp;"," ",$val);
+				
+					  # if a deliminator char, a double quote char or a newline are in the field, add quotes 
+					  if(ereg("[\,\"\n\r]", $val)) { 
+						  $val = '"'.str_replace('"', '""', $val).'"'; 
+					  }
+					  $line .= $val.',';
+				}
+				# strip the last deliminator 
+				$line = substr($line, 0, -1); 
+				$line .= "\n";
+			}
+			$boundary = '-----=' . md5( uniqid ( rand() ) );
+			$message = "--".$boundary . "\n";
+			$message .= "Content-Type: text/csv; name=\"Gradebook\"\n";
+			$message .= "Content-Transfer-Encoding: base64\n";
+			$message .= "Content-Disposition: attachment; filename=\"gradebook.csv\"\n\n";
+			$content_encode = chunk_split(base64_encode($line));
+			$message .= $content_encode . "\n";
+			$message .= "--" . $boundary . "--\n";
+			$headers  = "From: $sendfrom\n";
+			$headers .= "MIME-Version: 1.0\n";
+			$headers .= "Content-Type: multipart/mixed; boundary=\"$boundary\"";
+			if ($_GET['emailgb']=="me") {
+				$query = "SELECT email FROM imas_users WHERE id='$userid'";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$_GET['emailgb'] = mysql_result($result,0,0);
+			}
+			if ($_GET['emailgb']!='') {
+				mail($_GET['emailgb'], "Gradebook for $coursename", $message, $headers);
+				require("../header.php");
+				echo "Gradebook Emailed.  <a href=\"gradebook.php?cid=$cid\">Return to Gradebook</a>";
+				require("../footer.php");
+				exit;
+			}
+			
 		}
-		
 	}
 	
 	
@@ -442,5 +457,259 @@ function gbinstrexport() {
 		array_splice($gbo,1,0,array($ins));
 	}
 	return $gbo;
+}
+
+
+//HTML formatted, for Excel import?
+function gbinstrdisp() {
+	global $hidenc,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection;
+	
+	if ($availshow==3) {
+		$availshow=1;
+		$hidepast = true;
+	}
+	$gbt = gbtable();
+	echo '<table class="gb" id="myTable"><thead><tr>';
+	$n=0;
+	for ($i=0;$i<count($gbt[0][0]);$i++) { //biographical headers
+		//if ($i==1 && $gbt[0][0][1]!='ID') { continue;}
+		echo '<th>'.$gbt[0][0][$i];
+		if ($gbt[0][0][$i]=='Name') {
+			echo '<br/><span class="small">N='.(count($gbt)-2).'</span>';
+		}
+		echo '</th>';
+		
+		$n++;
+	}
+	if ($totonleft && !$hidepast) {
+		//total totals
+		if ($catfilter<0) {
+			if (isset($gbt[0][3][0])) { //using points based
+				echo '<th><span class="cattothdr">Total<br/>'.$gbt[0][3][$availshow].'&nbsp;pts</span></th>';
+				echo '<th>%</th>';
+				$n+=2;
+			} else {
+				echo '<th><span class="cattothdr">Weighted Total %</span></th>';
+				$n++;
+			}
+		}
+		if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
+			for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers	
+				if ($availshow<2 && $gbt[0][2][$i][2]>1) {
+					continue;
+				} else if ($availshow==2 && $gbt[0][2][$i][2]==3) {
+					continue;
+				}
+				echo '<th class="cat'.$gbt[0][2][$i][1].'"><span class="cattothdr">';
+				echo $gbt[0][2][$i][0].'<br/>';
+				echo $gbt[0][2][$i][3+$availshow].'&nbsp;pts';
+				echo '</span></th>';
+				$n++;
+			}
+		}
+		
+	}
+	if ($catfilter>-2) {
+		for ($i=0;$i<count($gbt[0][1]);$i++) { //assessment headers
+			if (!$isteacher && !$istutor && $gbt[0][1][$i][4]==0) { //skip if hidden 
+				continue;
+			}
+			if ($hidenc==1 && $gbt[0][1][$i][4]==0) { //skip NC
+				continue;
+			} else if ($hidenc==2 && ($gbt[0][1][$i][4]==0 || $gbt[0][1][$i][4]==3)) {//skip all NC
+				continue;
+			}
+			if ($gbt[0][1][$i][3]>$availshow) {
+				continue;
+			}
+			if ($hidepast && $gbt[0][1][$i][3]==0) {
+				continue;
+			}
+			//name and points
+			echo '<th class="cat'.$gbt[0][1][$i][1].'">'.$gbt[0][1][$i][0].'<br/>';
+			if ($gbt[0][1][$i][4]==0 || $gbt[0][1][$i][4]==3) {
+				echo $gbt[0][1][$i][2].' (Not Counted)';
+			} else {
+				echo $gbt[0][1][$i][2].'&nbsp;pts';
+				if ($gbt[0][1][$i][4]==2) {
+					echo ' (EC)';
+				}
+			}
+			if ($gbt[0][1][$i][5]==1 && $gbt[0][1][$i][6]==0) {
+				echo ' (PT)';
+			}
+						
+			echo '</th>';
+			$n++;
+		}
+	}
+	if (!$totonleft && !$hidepast) {
+		if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
+			for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers	
+				if ($availshow<2 && $gbt[0][2][$i][2]>1) {
+					continue;
+				} else if ($availshow==2 && $gbt[0][2][$i][2]==3) {
+					continue;
+				}
+				echo '<th class="cat'.$gbt[0][2][$i][1].'"><span class="cattothdr">';
+				echo $gbt[0][2][$i][0].'<br/>';
+				echo $gbt[0][2][$i][3+$availshow].'&nbsp;pts';
+				echo '</span></th>';
+				$n++;
+			}
+		}
+		//total totals
+		if ($catfilter<0) {
+			if (isset($gbt[0][3][0])) { //using points based
+				echo '<th><span class="cattothdr">Total<br/>'.$gbt[0][3][$availshow].'&nbsp;pts</span></th>';
+				echo '<th>%</th>';
+				$n+=2;
+			} else {
+				echo '<th><span class="cattothdr">Weighted Total %</span></th>';
+				$n++;
+			}
+		}
+	}
+	echo '</tr></thead><tbody>';
+	//create student rows
+	for ($i=1;$i<count($gbt);$i++) {
+		if ($i%2!=0) {
+			echo "<tr class=even onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">"; 
+		} else {
+			echo "<tr class=odd onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">"; 
+		}
+		echo '<td class="locked" scope="row">';
+		echo $gbt[$i][0][0];
+		for ($j=1;$j<count($gbt[0][0]);$j++) {
+			echo '<td class="c">'.$gbt[$i][0][$j].'</td>';	
+		}
+		if ($totonleft && !$hidepast) {
+			//total totals
+			if ($catfilter<0) {
+				if (isset($gbt[0][3][0])) { //using points based
+					echo '<td class="c">'.$gbt[$i][3][$availshow].'</td>';
+					echo '<td class="c">'.$gbt[$i][3][$availshow+3] .'%</td>';
+				} else {
+					echo '<td class="c">'.$gbt[$i][3][$availshow].'%</td>';
+				}
+			}
+			//category totals
+			if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
+				for ($j=0;$j<count($gbt[0][2]);$j++) { //category headers	
+					if ($availshow<2 && $gbt[0][2][$j][2]>1) {
+						continue;
+					} else if ($availshow==2 && $gbt[0][2][$j][2]==3) {
+						continue;
+					}
+					if ($catfilter!=-1 && $gbt[0][2][$j][$availshow+3]>0) {
+						echo '<td class="c">'.$gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)</td>';
+					} else {
+						echo '<td class="c">'.$gbt[$i][2][$j][$availshow].'</td>';
+					}
+				}
+			}
+		}
+		//assessment values
+		if ($catfilter>-2) {
+			for ($j=0;$j<count($gbt[0][1]);$j++) {
+				if (!$isteacher && !$istutor && $gbt[0][1][$j][4]==0) { //skip if hidden 
+					continue;
+				}
+				if ($hidenc==1 && $gbt[0][1][$j][4]==0) { //skip NC
+					continue;
+				} else if ($hidenc==2 && ($gbt[0][1][$j][4]==0 || $gbt[0][1][$j][4]==3)) {//skip all NC
+					continue;
+				}
+				if ($gbt[0][1][$j][3]>$availshow) {
+					continue;
+				}
+				if ($hidepast && $gbt[0][1][$j][3]==0) {
+					continue;
+				}
+				echo '<td class="c">';
+				if (isset($gbt[$i][1][$j][5]) && ($gbt[$i][1][$j][5]&(1<<$availshow)) && !$hidepast) {
+					echo '<span style="font-style:italic">';
+				}
+				if ($gbt[0][1][$j][6]==0) {//online
+					if (isset($gbt[$i][1][$j][0])) {
+						
+						echo $gbt[$i][1][$j][0];
+						if ($gbt[$i][1][$j][3]==1) {
+							echo ' (NC)';
+						} else if ($gbt[$i][1][$j][3]==2) {
+							echo ' (IP)';
+						} else if ($gbt[$i][1][$j][3]==3) {
+							echo ' (OT)';
+						} else if ($gbt[$i][1][$j][3]==4) {
+							echo ' (PT)';
+						} 
+						
+						if (isset($gbt[$i][1][$j][6]) ) {
+							echo '<sup>e</sup></span>';
+						}
+					} else { //no score
+						if ($gbt[$i][0][0]=='Averages') {
+							echo '-';
+						} else {
+							echo '-';
+						}
+					}
+				} else if ($gbt[0][1][$j][6]==1) { //offline
+					
+					if (isset($gbt[$i][1][$j][0])) {
+						echo $gbt[$i][1][$j][0];
+						if ($gbt[$i][1][$j][3]==1) {
+							echo ' (NC)';
+						}
+					} else {
+						echo '-';
+					}
+					
+					if ($gbt[$i][1][$j][1]==1) {
+						echo '<sup>*</sup>';
+					}
+				} else if ($gbt[0][1][$j][6]==2) { //discuss
+					if (isset($gbt[$i][1][$j][0])) {
+						echo $gbt[$i][1][$j][0];
+					} else {
+						echo '-';
+					}
+				}
+				if (isset($gbt[$i][1][$j][5]) && ($gbt[$i][1][$j][5]&(1<<$availshow)) && !$hidepast) {
+					echo '<sub>d</sub></span>';
+				}
+				echo '</td>';
+			}
+		}
+		if (!$totonleft && !$hidepast) {
+			//category totals
+			if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
+				for ($j=0;$j<count($gbt[0][2]);$j++) { //category headers	
+					if ($availshow<2 && $gbt[0][2][$j][2]>1) {
+						continue;
+					} else if ($availshow==2 && $gbt[0][2][$j][2]==3) {
+						continue;
+					}
+					if ($catfilter!=-1 && $gbt[0][2][$j][$availshow+3]>0) {
+						echo '<td class="c">'.$gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)</td>';
+					} else {
+						echo '<td class="c">'.$gbt[$i][2][$j][$availshow].'</td>';
+					}
+				}
+			}
+			
+			//total totals
+			if ($catfilter<0) {
+				if (isset($gbt[0][3][0])) { //using points based
+					echo '<td class="c">'.$gbt[$i][3][$availshow].'</td>';
+					echo '<td class="c">'.$gbt[$i][3][$availshow+3] .'%</td>';
+				} else {
+					echo '<td class="c">'.$gbt[$i][3][$availshow].'%</td>';
+				}
+			}
+		}
+		echo '</tr>';
+	}
+	echo "</tbody></table>";
 }
 ?>

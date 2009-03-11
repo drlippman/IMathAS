@@ -24,6 +24,7 @@ if ($myrights<60) {
 	$sel1 = array();
 	$ips = array();
 	$pws = array();
+	$spws = array();
 	foreach ($_POST as $k=>$v) {
 		if (strpos($k,'selout')!==FALSE) {
 			$sel1[] = $v;
@@ -31,12 +32,14 @@ if ($myrights<60) {
 			$ips[] = $v;
 		} else if (strpos($k,'pwout')!==FALSE) {
 			$pws[] = $v;
+		} else if (strpos($k,'pwsout')!==FALSE) {
+			$spws[] = $v;
 		}
 	}
 	
 	$sel1list = implode(',',$sel1);
 	$iplist = implode(',',$ips);
-	$pwlist = implode(',',$pws);
+	$pwlist = implode(',',$pws) . ';'. implode(',',$spws);
 	$public = 1*$_POST['avail'] + 2*$_POST['public'] + 4*$_POST['reentry'];
 	
 	if ($_POST['termtype']=='mo') {
@@ -417,14 +420,16 @@ if ($overwriteBody==1) { //NO AUTHORITY
 	<table>
 	<tbody id="pwout">
 <?php	
-		if (trim($pws)!='') {
-			$pws= explode(',',$pws);
-			for ($i=0;$i<count($pws);$i++) {
+		$pws = explode(';',$pws);
+		if (trim($pws[0])!='') {
+			
+			$pwsb= explode(',',$pws[0]);
+			for ($i=0;$i<count($pwsb);$i++) {
 ?>
 		<tr id="trpwout-<?php echo $i ?>">
 			<td>
-				<input type=hidden id="pwout-<?php echo $i ?>" name="pwout-<?php echo $i ?>" value="<?php echo $pws[$i] ?>">
-				<?php echo $pws[$i] ?>
+				<input type=hidden id="pwout-<?php echo $i ?>" name="pwout-<?php echo $i ?>" value="<?php echo $pwsb[$i] ?>">
+				<?php echo $pwsb[$i] ?>
 			</td>
 			<td>
 				<a href='#' onclick="return removeitem('pwout-<?php echo $i ?>','pwout')">Remove</a>
@@ -440,10 +445,49 @@ if ($overwriteBody==1) { //NO AUTHORITY
 	</table>
 
 <?php 
-		if (is_array($pws)) {
-			echo "	<script> cnt['pwout'] = ".count($ips).";</script>";
+		if (is_array($pwsb)) {
+			echo "	<script> cnt['pwout'] = ".count($pwsb).";</script>";
 		} else {
 			echo "	<script> cnt['pwout'] = 0;</script>";
+		}
+?>
+	</p>
+	<p>Super passwords will override testing window limits.<br/>  
+	Enter Password: 
+	<input type=text id="pwsin"  onkeypress="return onenter(event,'pwsin','pwsout')">
+	<input type=button value="Add" onclick="additem('pwsin','pwsout')"/>
+
+	<table>
+	<tbody id="pwsout">
+<?php	
+		if (count($pws)>1 && trim($pws[1])!='') {
+			
+			$pwss= explode(',',$pws[1]);
+			for ($i=0;$i<count($pwss);$i++) {
+?>
+		<tr id="trpwsout-<?php echo $i ?>">
+			<td>
+				<input type=hidden id="pwsout-<?php echo $i ?>" name="pwsout-<?php echo $i ?>" value="<?php echo $pwss[$i] ?>">
+				<?php echo $pwss[$i] ?>
+			</td>
+			<td>
+				<a href='#' onclick="return removeitem('pwsout-<?php echo $i ?>','pwsout')">Remove</a>
+				<a href='#' onclick="return moveitemup('pwsout-<?php echo $i ?>','pwsout')">Move up</a>
+				<a href='#' onclick="return moveitemdown('pwsout-<?php echo $i ?>','pwsout')">Move down</a>
+			</td>
+		</tr>
+<?php
+			}
+		}
+?>
+	</tbody>
+	</table>
+
+<?php 
+		if (is_array($pwss)) {
+			echo "	<script> cnt['pwsout'] = ".count($pwss).";</script>";
+		} else {
+			echo "	<script> cnt['pwsout'] = 0;</script>";
 		}
 ?>
 	</p>
