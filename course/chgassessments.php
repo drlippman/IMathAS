@@ -375,7 +375,8 @@ function chkAll(frm, arr, mark) {
 				<td>
 					<span id="showanspracspan" class="<?php echo ($testtype=="Practice" || $testtype=="Homework") ? "show" : "hidden"; ?>">
 					<select name="showansprac">
-						<option value="N">Never</option>
+						<option value="V">Never</option>
+						<option value="N" >Never, and don't allow students to review their own answers</option>
 						<option value="F">After last attempt (Skip Around only)</option>
 						<option value="J">After last attempt or Jump to Ans button (Skip Around only)</option>
 						<option value="0" >Always</option>
@@ -388,7 +389,8 @@ function chkAll(frm, arr, mark) {
 					</span>
 					<span id="showansspan" class="<?php echo ($testtype!="Practice" && $testtype!="Homework") ? "show" : "hidden"; ?>">
 					<select name="showans">
-						<option value="N" >Never</option>
+						<option value="V" >Never</option>
+						<option value="N" >Never, and don't allow students to review their own answers</option>
 						<option value="I">Immediately (in gradebook) - don't use if allowing multiple attempts per problem</option>
 						<option value="F" >After last attempt (Skip Around only)</option>
 						<option value="J">After last attempt or Jump to Ans button (Skip Around only)</option>

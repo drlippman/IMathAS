@@ -690,7 +690,7 @@ function gbtable() {
 			$inexception = false;
 		}
 				
-		if ($isteacher || $assessmenttype[$i]=="Practice" || $sa[$i]=="I" || ($sa[$i]!="N" && $now>$thised)) {
+		if ($isteacher || $sa[$i]=="I" || ($sa[$i]!="N" && $now>$thised)) { //|| $assessmenttype[$i]=="Practice" 
 			$gb[$row][1][$col][2] = 1; //show link
 		} else {
 			$gb[$row][1][$col][2] = 0; //don't show link

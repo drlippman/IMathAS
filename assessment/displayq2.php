@@ -1898,6 +1898,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 		$cntnan = 0;
 		$cntzero = 0;
+		$stunan = 0;
 		for ($i = 0; $i < 20; $i++) {
 			for($j=0; $j < count($variables); $j++) {
 
@@ -1924,8 +1925,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			} else if ($answerformat=="toconst") {
 				$diffs[] = $myans[$i] - $realans;
 			} else { //otherwise, compare points
-				
-				if (isset($abstolerance)) {
+				if (isNaN($myans[$i])) {
+					$stunan++;
+				} else if (isset($abstolerance)) {
 					
 					if (abs($myans[$i]-$realans) > $abstolerance-1E-12) {$correct = false; break;}	
 				} else {
@@ -1935,6 +1937,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 		if ($cntnan==20 && isset($GLOBALS['teacherid'])) {
 			echo "<p>Debug info: function evaled to Not-a-number at all test points.  Check \$domain</p>";
+		}
+		if ($stunan>1) { //if more than 1 student NaN response
+			return 0;
 		}
 		if ($answerformat=="equation") {
 			if (count($ratios)>0) {

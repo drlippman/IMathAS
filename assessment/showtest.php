@@ -301,7 +301,7 @@
 	
 	$allowregen = (!$superdone && ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework"));
 	$showeachscore = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="AsGo" || $testsettings['testtype']=="Homework");
-	$showansduring = (($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework") && $testsettings['showans']!='N' && $testsettings['showans']!='F' && $testsettings['showans']!='J');
+	$showansduring = (($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework") && is_numeric($testsettings['showans']));
 	$showansafterlast = ($testsettings['showans']==='F' || $testsettings['showans']==='J');
 	$noindivscores = ($testsettings['testtype']=="EndScore" || $testsettings['testtype']=="NoScores");
 	$showhints = ($testsettings['showhints']==1);

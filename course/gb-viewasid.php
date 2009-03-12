@@ -363,6 +363,11 @@
 		}
 		
 		list($testtype,$showans) = explode('-',$line['deffeedback']);
+		if ($showans=='N') {
+			echo "You shouldn't be here";
+			require("../footer.php");
+			exit;
+		}
 		echo "<h4>{$line['name']}</h4>\n";
 		if (($isteacher || $istutor) && !isset($_GET['lastver']) && !isset($_GET['reviewver'])) {
 			if ($line['agroupid']>0) {
@@ -564,7 +569,7 @@
 			$totalpossible += $pts[$questions[$i]];
 			echo '>';
 			list($qsetid,$cat) = getqsetid($questions[$i]);
-			if ($isteacher || $istutor || ($testtype=="Practice" && $showans!="N") || ($testtype!="Practice" && (($showans=="I"  && !in_array(-1,$scores))|| ($showans!="N" && time()>$saenddate)))) {$showa=true;} else {$showa=false;}
+			if ($isteacher || $istutor || ($testtype=="Practice" && $showans!="V") || ($testtype!="Practice" && (($showans=="I"  && !in_array(-1,$scores))|| ($showans!="V" && time()>$saenddate)))) {$showa=true;} else {$showa=false;}
 			displayq($i,$qsetid,$seeds[$i],$showa,false,$attempts[$i]);
 			echo '</div>';
 			

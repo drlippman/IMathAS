@@ -568,7 +568,8 @@ if ($overwriteBody==1) {
 			<span class=formright>
 				<span id="showanspracspan" class="<?php if ($testtype=="Practice" || $testtype=="Homework") {echo "show";} else {echo "hidden";} ?>">
 				<select name="showansprac">
-					<option value="N" <?php if ($showans=="N") {echo "SELECTED";} ?>>Never</option>
+					<option value="V" <?php if ($showans=="V") {echo "SELECTED";} ?>>Never</option>
+					<option value="N" <?php if ($showans=="N") {echo "SELECTED";} ?>>Never, and don't allow students to review their own answers</option>
 					<option value="F" <?php if ($showans=="F") {echo "SELECTED";} ?>>After last attempt (Skip Around only)</option>
 					<option value="J" <?php if ($showans=="J") {echo "SELECTED";} ?>>After last attempt or Jump to Ans button (Skip Around only)</option>
 					<option value="0" <?php if ($showans=="0") {echo "SELECTED";} ?>>Always</option>
@@ -581,7 +582,8 @@ if ($overwriteBody==1) {
 				</span>
 				<span id="showansspan" class="<?php if ($testtype!="Practice" && $testtype!="Homework") {echo "show";} else {echo "hidden";} ?>">
 				<select name="showans">
-					<option value="N" <?php if ($showans=="N") {echo "SELECTED";} ?>>Never</option>
+					<option value="V" <?php if ($showans=="V") {echo "SELECTED";} ?>>Never</option>
+					<option value="N" <?php if ($showans=="N") {echo "SELECTED";} ?>>Never, and don't allow students to review their own answers</option>
 					<option value="I" <?php if ($showans=="I") {echo "SELECTED";} ?>>Immediately (in gradebook) - don't use if allowing multiple attempts per problem</option>
 					<option value="F" <?php if ($showans=="F") {echo "SELECTED";} ?>>After last attempt (Skip Around only)</option>
 					<option value="J" <?php if ($showans=="J") {echo "SELECTED";} ?>>After last attempt or Jump to Ans button (Skip Around only)</option>
