@@ -28,7 +28,47 @@
 					$eid = mysql_result($result,0,0);
 					$query = "UPDATE imas_exceptions SET startdate=$startdate,enddate=$enddate WHERE id=$eid";
 				}
-				mysql_query($query) or die("Query failed :$query " . mysql_error());		
+				mysql_query($query) or die("Query failed :$query " . mysql_error());	
+				if (isset($_POST['forceregen'])) {
+					//this is not group-safe
+					$query = "SELECT id,questions,lastanswers FROM imas_assessment_sessions WHERE userid='$stu' AND assessmentid='$aid'";
+					$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+					if (mysql_num_rows($result)>0) {
+						$row = mysql_fetch_row($result);
+						$questions = explode(',',$row[1]);
+						$lastanswers = explode('~',$row[2]);
+						$scores = array(); $attempts = array(); $seeds = array();
+						for ($i=0; $i<count($questions); $i++) {
+							$scores[$i] = -1;
+							$attempts[$i] = 0;
+							$seeds[$i] = rand(1,9999);
+							$newla = array();
+							$laarr = explode('##',$lastanswers[$i]);
+							//may be some files not accounted for here... 
+							//need to fix
+							foreach ($laarr as $lael) {
+								if ($lael=="ReGen") {
+									$newla[] = "ReGen";
+								}
+							}
+							$newla[] = "ReGen";
+							$lastanswers[$i] = implode('##',$newla);
+							$reattempting = array();
+						}
+						$scorelist = implode(',',$scores);
+						$attemptslist = implode(',',$attempts);
+						$seedslist = implode(',',$seeds);
+						$lastanswers = str_replace('~','',$lastanswers);
+						$lalist = implode('~',$lastanswers);
+						$lalist = addslashes(stripslashes($lalist));
+						$reattemptinglist = implode(',',$reattempting);
+						$query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',seeds='$seedslist',lastanswers='$lalist',";
+						$query .= "reattempting='$reattemptinglist' WHERE id='{$row[0]}'";
+						mysql_query($query) or die("Query failed :$query " . mysql_error());
+					}
+					
+				}
+					
 			}
 		}
 	}
@@ -173,6 +213,8 @@
 	}
 	echo '</ul>';
 	echo "<input type=submit value=\"Record Changes\" />";
+	echo '<p><input type="checkbox" name="forceregen"/> Force student to work on new versions of all questions?  Students ';
+	echo 'will keep any scores earned, but must work new versions of questions to improve score.</p>';
 	
 	if (!isset($_GET['uid']) && count($_POST['checked'])>1) {
 		echo "<h4>Students Selected</h4>";
