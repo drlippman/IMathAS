@@ -363,7 +363,7 @@
 		}
 		
 		list($testtype,$showans) = explode('-',$line['deffeedback']);
-		if ($showans=='N') {
+		if ($showans=='N' && !$isteacher && !$istutor) {
 			echo "You shouldn't be here";
 			require("../footer.php");
 			exit;
