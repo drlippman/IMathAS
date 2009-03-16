@@ -172,25 +172,48 @@ div.ddmenu {
 }
 
 /*colors and borders for assessments*/
-div.question {
-	background-color: #ddf; 
-	border: 1px solid #00f;
+/*seq question css*/
+div.curquestion {
+
+}
+div.inactive {
+
+}
+hr.seq {
+
+}
+div.seqqinfocur {
+
+}
+div.seqqinfocur span.current{
+
+}
+div.seqqinfoavail {
+
+}
+div.seqqinfoinactive {
+
 }
 div.todoquestion {
 	background-color: #ffffcc; 
 	border: 1px solid #999966; 
 }
-
-div.review {
-	background-color: #efe;
+/*all questions*/
+div.question {
+	background-color: #ddf; 
 	border: 1px solid #00f;
 }
 
+
+div.review { /*info bar*/
+	background-color: #e0ffe0;
+	border: 1px solid #00f;
+}
 div.intro {
 	border: 1px solid #00f; 
 }
 div.navbar {
-	background:#efe;
+	background:#e0ffe0;
 	border:1px solid #000;
 	color:#000;
 }

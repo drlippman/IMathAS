@@ -517,16 +517,16 @@ function gbtable() {
 		
 		$gb[0][2][$pos][0] = $cats[$cat][0];
 		$gb[0][2][$pos][1] = $cats[$cat][7];
-		if ($catposspast[$cat]>0) {
+		if ($catposspast[$cat]>0 || count($catposspastec[$cat])>0) {
 			$gb[0][2][$pos][2] = 0; //scores in past
 			$cattotweightpast += $cats[$cat][5];
 			$cattotweightcur += $cats[$cat][5];
 			$cattotweightfuture += $cats[$cat][5];
-		} else if ($catposscur[$cat]>0) {
+		} else if ($catposscur[$cat]>0 || count($catposscurec[$cat])>0) {
 			$gb[0][2][$pos][2] = 1; //scores in cur 
 			$cattotweightcur += $cats[$cat][5];
 			$cattotweightfuture += $cats[$cat][5];
-		} else if ($catpossfuture[$cat]>0) {
+		} else if ($catpossfuture[$cat]>0 || count($catpossfutureec[$cat])>0) {
 			$gb[0][2][$pos][2] = 2; //scores in future
 			$cattotweightfuture += $cats[$cat][5];
 		} else {
@@ -959,6 +959,10 @@ function gbtable() {
 						$totpast += ($cattotpast[$ln][$cat]*$cats[$cat][5])/(100*$catposspast[$cat]); //weight total
 					}
 				}
+			} else if (isset($cattotpastec[$ln][$cat])) {
+				$cattotpast[$ln][$cat] = array_sum($cattotpastec[$ln][$cat]);
+				$gb[$ln][2][$pos][0] = $cattotpast[$ln][$cat];
+				
 			} else { //no items in category yet?
 				$gb[$ln][2][$pos][0] = 0;
 			}
@@ -1024,6 +1028,10 @@ function gbtable() {
 						$totcur += ($cattotcur[$ln][$cat]*$cats[$cat][5])/(100*$catposscur[$cat]); //weight total
 					}
 				}
+			} else if (isset($cattotcurec[$ln][$cat])) {
+				$cattotcur[$ln][$cat] = array_sum($cattotcurec[$ln][$cat]);
+				$gb[$ln][2][$pos][1] = $cattotcur[$ln][$cat];
+				
 			} else { //no items in category yet?
 				$gb[$ln][2][$pos][1] = 0;
 			}
@@ -1088,6 +1096,10 @@ function gbtable() {
 						$totfuture += ($cattotfuture[$ln][$cat]*$cats[$cat][5])/(100*$catpossfuture[$cat]); //weight total
 					}
 				}
+			} else if (isset($cattotfutureec[$ln][$cat])) {
+				$cattotfuture[$ln][$cat] = array_sum($cattotfutureec[$ln][$cat]);
+				$gb[$ln][2][$pos][2] = $cattotfuture[$ln][$cat];
+				
 			} else { //no items in category yet?
 				$gb[$ln][2][$pos][2] = 0;
 			}
