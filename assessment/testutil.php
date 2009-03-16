@@ -525,7 +525,9 @@ function seqshowqinfobar($qn,$toshow) {
 	} else {
 		$qlinktxt = "Question ".($qn+1);
 	}
+	
 	if ($qn==$toshow) {
+		echo '<div class="seqqinfocur">';
 		if (unans($scores[$qn]) && $attempts[$qn]==0) {
 			echo "<img src=\"$qnmasroot/img/q_fullbox.gif\"/> ";
 		} else {
@@ -534,17 +536,21 @@ function seqshowqinfobar($qn,$toshow) {
 		echo "<span class=current><a name=\"curq\">$qlinktxt</a></span>  ";
 	} else {
 		if (unans($scores[$qn]) && $attempts[$qn]==0) {
+			echo '<div class="seqqinfoavail">';
 			echo "<img src=\"$qnmasroot/img/q_fullbox.gif\"/> ";
 			echo "<a href=\"showtest.php?action=seq&to=$qn#curq\">$qlinktxt</a>.  ";
 			$qavail = true;
 		} else if (canimprove($qn)) {
+			echo '<div class="seqqinfoavail">';
 			echo "<img src=\"$qnmasroot/img/q_halfbox.gif\"/> ";
 			echo "<a href=\"showtest.php?action=seq&to=$qn#curq\">$qlinktxt</a>.  ";
 			$qavail = true;
 		} else if ($reattemptsremain) {
+			echo '<div class="seqqinfoinactive">';
 			echo "<img src=\"$qnmasroot/img/q_emptybox.gif\"/> ";
 			echo "<a href=\"showtest.php?action=seq&to=$qn#curq\">$qlinktxt</a>.  ";
 		} else {
+			echo '<div class="seqqinfoinactive">';
 			echo "<img src=\"$qnmasroot/img/q_emptybox.gif\"/> ";
 			echo "$qlinktxt.  ";
 		}
@@ -578,6 +584,7 @@ function seqshowqinfobar($qn,$toshow) {
 	if ($testsettings['showcat']>0 && $qi[$questions[$qn]]['category']!='0') {
 		echo "  Category: {$qi[$questions[$qn]]['category']}.";
 	}
+	echo '</div>';
 	return $qavail;
 }
 

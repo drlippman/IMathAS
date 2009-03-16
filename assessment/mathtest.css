@@ -45,6 +45,13 @@ div.question {
 	margin-bottom: 5px;
 	padding: 10px;
 }
+div.inactive {
+	margin-bottom: 5px;
+	padding: 10px;
+}
+div.todoquestion div.inactive {
+	margin: 0; padding: 0;
+}
 div.todoquestion {
 	background-color: #ffffcc; 
 	border: 1px solid #999966; 
@@ -54,7 +61,7 @@ div.todoquestion {
 }
 
 div.review {
-	background-color: #efe;
+	background-color: #e0ffe0;
 	border: 1px solid #00f;
 	margin-top: -4px;
 	margin-bottom: 20px;
@@ -95,7 +102,7 @@ div.navbar {
 	width:120px;
 	padding:10px;
 	margin-top:0px;
-	background:#efe;
+	background-color: #e0ffe0;
 	border:1px solid #000;
 	color:#000;
 }

@@ -35,6 +35,13 @@
 		}
 		echo "&gt; <a href=\"addquestions.php?aid={$_GET['aid']}&cid=$cid\">Add/Remove Questions</a> &gt; Modify Questions</div>";
 	}
+	if ($adminasteacher) {
+		if ($myrights == 100) {
+			$isadmin = true;
+		} else if ($myrights==75) {
+			$isgrpadmin = true;
+		}
+	}
 	
 	if (isset($_GET['frompot'])) {
 		$frompot = 1;

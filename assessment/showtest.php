@@ -1064,7 +1064,9 @@
 					$qavail = seqshowqinfobar($i,$toshow);
 					
 					if ($i==$toshow) {
+						echo '<div class="curquestion">';
 						basicshowq($i,false);
+						echo '</div>';
 					} else if ($qavail) {
 						echo "<div class=todoquestion>";
 						basicshowq($i,true);
@@ -1076,7 +1078,7 @@
 					if ($i==$toshow) {
 						echo "<div><input type=\"submit\" class=\"btn\" value=\"Submit Question ".($i+1)."\" /></div><p></p>\n";
 					}
-					echo "<hr/>";
+					echo '<hr class="seq"/>';
 				}
 				
 			}
@@ -1219,7 +1221,9 @@
 					$qavail = seqshowqinfobar($i,$curq);
 					
 					if ($i==$curq) {
+						echo '<div class="curquestion">';
 						basicshowq($i,false);
+						echo '</div>';
 					} else if ($qavail) {
 						echo "<div class=todoquestion>";
 						basicshowq($i,true);
@@ -1231,7 +1235,7 @@
 						echo "<div><input type=\"submit\" class=\"btn\" value=\"Submit Question ".($i+1)."\" /></div><p></p>\n";
 					}
 					
-					echo "<hr/>";
+					echo '<hr class="seq"/>';
 				}
 			}
 		}

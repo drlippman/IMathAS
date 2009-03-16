@@ -339,7 +339,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} 
 			//output item array
 			$jsarr .= '['.$subs[$j].','.$line['questionsetid'].',"'.addslashes(str_replace(array("\r\n", "\n", "\r")," ",$line['description'])).'","'.$line['qtype'].'",'.$line['points'].',';
-			if ($line['userights']>2 || $line['ownerid']==$userid) {
+			if ($line['userights']>2 || $line['ownerid']==$userid || $adminasteacher) { //can edit without template?
 				$jsarr .= '1';
 			} else {
 				$jsarr .= '0';

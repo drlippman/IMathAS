@@ -287,6 +287,7 @@ END;
 				}
 			} else if ($myrights==100) {
 				$teacherid = $userid;
+				$adminasteacher = true;
 			} else {
 				
 				$query = "SELECT id,section FROM imas_tutors WHERE userid='$userid' AND courseid='{$_GET['cid']}'";
@@ -317,7 +318,11 @@ END;
 				}
 			}
 			unset($lockaid);
-			if ($myrights>19 && !isset($teacherid) && !isset($studentid) && !isset($tutorid) && $previewshift==-1) {
+			if ($myrights==75 && !isset($teacherid) && !isset($studentid) && mysql_result($result,0,4)==$groupid) {
+				//group admin access
+				$teacherid = $userid;
+				$adminasteacher = true;
+			} else if ($myrights>19 && !isset($teacherid) && !isset($studentid) && !isset($tutorid) && $previewshift==-1) {
 				if (mysql_result($result,0,3)==2) {
 					$guestid = $userid;
 				} else if (mysql_result($result,0,3)==1 && mysql_result($result,0,4)==$groupid) {
