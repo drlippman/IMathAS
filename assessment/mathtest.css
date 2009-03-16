@@ -7,7 +7,22 @@ a:visited {
 a:hover {
 	text-decoration: underline;
 }
-
+html {
+	height: 100%;
+}
+body {
+	height: 100%;
+	margin: 10px;
+	padding: 0px;
+}
+div {
+	margin: 0px;
+	padding: 0px;
+}
+form {
+	margin: 0px;
+	padding: 0px;
+}
 div.main {
 	padding: 0px;
 }
@@ -16,17 +31,18 @@ div.toppad {
 }
 div.breadcrumb {
 	border: 1px solid #000;
+	background-color: #ddf;	
 	margin-bottom: 10px;
-	background-color: #ddf;
 	padding: 5px;
 }
 
 div.question {
+	font-family: "Times New Roman", Times, serif;
+	font-size: medium;
 	background-color: #ddf; 
 	border: 1px solid #00f; 
 	margin-top: 0px;
 	margin-bottom: 5px;
-	width: 99%;
 	padding: 10px;
 }
 div.todoquestion {
@@ -34,7 +50,6 @@ div.todoquestion {
 	border: 1px solid #999966; 
 	margin-top: 0px;
 	margin-bottom: 5px;
-	width: 99%;
 	padding: 10px;
 }
 
@@ -43,14 +58,13 @@ div.review {
 	border: 1px solid #00f;
 	margin-top: -4px;
 	margin-bottom: 20px;
-	width: 99%;
 	padding: 5px;
 }
 
 div.intro {
 	border: 1px solid #00f; 
-	margin-bottom: 5px;
 	padding: 5px;
+	margin-bottom: 10px;
 }
 
 div.choice {
@@ -80,7 +94,7 @@ div.navbar {
 	left: 10px;
 	width:120px;
 	padding:10px;
-	margin-top:10px;
+	margin-top:0px;
 	background:#efe;
 	border:1px solid #000;
 	color:#000;
@@ -89,6 +103,7 @@ div.navbar {
 div.navbar h4 {
 	margin-top: 0px;
 }
+
 div.navbar a {
 	color: blue;
 }
@@ -238,5 +253,12 @@ td.r, table.stats tbody td.r {
 }
 td.l, table.stats tbody td.l {
 	text-align: left;
+}
+
+div.tips {
+ 	border: 1px solid #000;
+	background-color: #cff;
+	position: absolute;
+	padding: 5px;
 }
 

@@ -13,6 +13,12 @@
 		echo "started, access it from the course page</body></html>\n";
 		exit;
 	}
+	$actas = false;
+	if (isset($teacherid) && isset($_GET['actas'])) {
+		$userid = $_GET['actas'];
+		unset($teacherid);
+		$actas = true;
+	}
 	include("displayq2.php");
 	include("testutil.php");
 	include("asidutil.php");
@@ -34,7 +40,7 @@
 			echo "Assessment is closed";
 			exit;
 		}
-		if ($now < $adata['startdate'] || $adata['enddate']<$now) { //outside normal range for test
+		if (!$actas && ($now < $adata['startdate'] || $adata['enddate']<$now)) { //outside normal range for test
 			$query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid'";
 			$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 			$row = mysql_fetch_row($result2);
@@ -120,15 +126,22 @@
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$sessiondata['sessiontestid'] = mysql_insert_id();
 			$sessiondata['isreview'] = $isreview;
-			if (isset($teacherid)) {
+			if (isset($teacherid) || $actas) {
 				$sessiondata['isteacher']=true;
 			} else {
 				$sessiondata['isteacher']=false;
 			}
+			if ($actas) {
+				$sessiondata['actas']=$_GET['actas'];
+				$sessiondata['isreview'] = false;
+			} else {
+				unset($sessiondata['actas']);
+			}
 			$sessiondata['groupid'] = 0;
-			$query = "SELECT name FROM imas_courses WHERE id='{$_GET['cid']}'";
+			$query = "SELECT name,theme FROM imas_courses WHERE id='{$_GET['cid']}'";
 			$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 			$sessiondata['coursename'] = mysql_result($result,0,0);
+			$sessiondata['coursetheme'] = mysql_result($result,0,1);
 			writesessiondata();
 			session_write_close();
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/showtest.php");
@@ -148,18 +161,25 @@
 			//Return to test.
 			$sessiondata['sessiontestid'] = $line['id'];
 			$sessiondata['isreview'] = $isreview;
-			if (isset($teacherid)) {
+			if (isset($teacherid) || $actas) {
 				$sessiondata['isteacher']=true;
 			} else {
 				$sessiondata['isteacher']=false;
+			}
+			if ($actas) {
+				$sessiondata['actas']=$_GET['actas'];
+				$sessiondata['isreview'] = false;
+			} else {
+				unset($sessiondata['actas']);
 			}
 			
 			
 			$sessiondata['groupid'] = $line['agroupid'];
 		
-			$query = "SELECT name FROM imas_courses WHERE id='{$_GET['cid']}'";
+			$query = "SELECT name,theme FROM imas_courses WHERE id='{$_GET['cid']}'";
 			$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 			$sessiondata['coursename'] = mysql_result($result,0,0);
+			$sessiondata['coursetheme'] = mysql_result($result,0,1);
 			writesessiondata();
 			session_write_close();
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/showtest.php");
@@ -175,6 +195,9 @@
 	$testid = addslashes($sessiondata['sessiontestid']);
 	$asid = $testid;
 	$isteacher = $sessiondata['isteacher'];
+	if (isset($sessiondata['actas'])) {
+		$userid = $sessiondata['actas'];
+	}
 	$query = "SELECT * FROM imas_assessment_sessions WHERE id='$testid'";
 	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
@@ -222,7 +245,7 @@
 		leavetestmsg();
 		exit;
 	}
-	if ($now < $testsettings['startdate'] || $testsettings['enddate']<$now) { //outside normal range for test
+	if (!isset($sessiondata['actas']) && ($now < $testsettings['startdate'] || $testsettings['enddate']<$now)) { //outside normal range for test
 		$query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='{$line['assessmentid']}'";
 		$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 		$row = mysql_fetch_row($result2);
@@ -254,6 +277,7 @@
 			}
 		}
 	}
+
 	//}
 	$superdone = false;
 	if ($isreview) {
@@ -473,11 +497,18 @@
 	}
 	
 	if (!$isdiag && !$isltilimited) {
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid={$testsettings['courseid']}\">{$sessiondata['coursename']}</a> ";
-	 echo "&gt; Assessment</div>";
+		if (isset($sessiondata['actas'])) {
+			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid={$testsettings['courseid']}\">{$sessiondata['coursename']}</a> ";
+			echo "&gt; <a href=\"../course/gb-viewasid.php?cid={$testsettings['courseid']}&amp;asid=$testid&amp;uid={$sessiondata['actas']}\">Gradebook Detail</a> ";
+			echo "&gt; View as student</div>";
+		} else {
+			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid={$testsettings['courseid']}\">{$sessiondata['coursename']}</a> ";
+	 
+			echo "&gt; Assessment</div>";
+		}
 	}
 	
-	if (!$sessiondata['isteacher'] && ($testsettings['isgroup']==1 || $testsettings['isgroup']==2) && ($sessiondata['groupid']==0 || isset($_GET['addgrpmem']))) {
+	if ((!$sessiondata['isteacher'] || isset($sessiondata['actas'])) && ($testsettings['isgroup']==1 || $testsettings['isgroup']==2) && ($sessiondata['groupid']==0 || isset($_GET['addgrpmem']))) {
 		if (isset($_POST['grpsubmit'])) {
 			if ($sessiondata['groupid']==0) {
 				//double check not already added to group by someone else
@@ -585,7 +616,7 @@
 			exit;
 		}
 	}
-	if (!$sessiondata['isteacher'] && $testsettings['isgroup']==3  && $sessiondata['groupid']==0) {
+	if ((!$sessiondata['isteacher'] || isset($sessiondata['actas'])) && $testsettings['isgroup']==3  && $sessiondata['groupid']==0) {
 		//double check not already added to group by someone else
 		$query = "SELECT agroupid FROM imas_assessment_sessions WHERE id='$testid'";
 		$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
@@ -604,6 +635,14 @@
 	//if was added to existing group, need to reload $questions, etc
 	
 	echo "<h2>{$testsettings['name']}</h2>\n";
+	if ($sessiondata['actas']) {
+		echo '<p style="color: red;">Teacher Acting as ';
+		$query = "SELECT LastName, FirstName FROM imas_users WHERE id='{$sessiondata['actas']}'";
+		$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
+		$row = mysql_fetch_row($result);
+		echo $row[1].' '.$row[0];
+		echo '<p>';
+	}
 	
 	if ($testsettings['testtype']=="Practice" && !$isreview) {
 		echo "<div class=right><span style=\"color:#f00\">Practice Test.</span>  <a href=\"showtest.php?regenall=fromscratch\">Create new version.</a></div>";
@@ -1062,7 +1101,7 @@
 		$testsettings['intro'] .= "<p>Total Points Possible: " . totalpointspossible($qi) . "</p>";
 		if ($testsettings['isgroup']>0) {
 			$testsettings['intro'] .= "<p><span style=\"color:red;\">This is a group assessment.  Any changes effect all group members.</span><br/>";
-			if (!$isteacher) {
+			if (!$isteacher || isset($sessiondata['actas'])) {
 				$testsettings['intro'] .= "Group Members: <ul>";
 				$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM imas_users,imas_assessment_sessions WHERE ";
 				$query .= "imas_users.id=imas_assessment_sessions.userid AND imas_assessment_sessions.agroupid='{$sessiondata['groupid']}' ORDER BY imas_users.LastName,imas_users.FirstName";

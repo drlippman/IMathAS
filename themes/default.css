@@ -171,3 +171,35 @@ div.ddmenu {
 	border: 1px solid #5970B2
 }
 
+/*colors and borders for assessments*/
+div.question {
+	background-color: #ddf; 
+	border: 1px solid #00f;
+}
+div.todoquestion {
+	background-color: #ffffcc; 
+	border: 1px solid #999966; 
+}
+
+div.review {
+	background-color: #efe;
+	border: 1px solid #00f;
+}
+
+div.intro {
+	border: 1px solid #00f; 
+}
+div.navbar {
+	background:#efe;
+	border:1px solid #000;
+	color:#000;
+}
+div.navbar a {
+	color: blue;
+}
+span.current {
+	background-color: #ffa;
+}
+span.done {
+	text-decoration: line-through;
+}

@@ -23,6 +23,10 @@ var imasroot = '<?php echo $imasroot; ?>';
 </script>
 <link rel="stylesheet" href="<?php echo $imasroot . "/assessment/mathtest.css";?>" type="text/css"/>
 <?php
+echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/general.js\"></script>\n";
+if (isset($sessiondata['coursetheme'])) {
+	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/themes/{$sessiondata['coursetheme']}\"/>\n";
+}
 if ($isdiag) {
 	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/diag/print.css\" media=\"print\"/>\n";
 } else {

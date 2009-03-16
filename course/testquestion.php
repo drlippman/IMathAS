@@ -86,6 +86,7 @@ if ($myrights<20) {
 }
 
 /******* begin html output ********/
+$sessiondata['coursetheme'] = $coursetheme;
 require("../assessment/header.php");
 
 if ($overwriteBody==1) {
