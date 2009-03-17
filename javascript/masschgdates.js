@@ -153,6 +153,7 @@ Date.prototype.getWeekDays = function(d) {
 	  var db = new Date();
 	  if (document.getElementById(type+"datetype"+st).value==1) {
 		  var newstartdate = document.getElementById(type+"date"+st).value;
+		  alert(newstartdate);
 		  if (newstartdate!=0 && newstartdate!=2000000000 && basearr[st]!="NA") {
 			  var newstarttime = document.getElementById(type+"time"+st).value;
 			  d.setTime(Date.parse(newstartdate + ' ' + newstarttime.replace(/^\s*(\d+)\s*(am|pm)/,"$1:00 $2")));
@@ -227,7 +228,40 @@ Date.prototype.getWeekDays = function(d) {
 	}
 	  
   }
-  
+  function MCDtoggleselected(form) {
+	  var type = document.getElementById("swaptype").value;
+	  var to = document.getElementById("swapselected").value;
+	  var els = form.getElementsByTagName("input");
+	  for (var i=0; i<els.length; i++) {
+		  if (els[i].type=='checkbox' && els[i].checked && els[i].id!='ca') {
+			var cnt = els[i].value;
+			try {
+				if (to=="dates") { //swap from A/N to date
+					document.getElementById(type+"span0"+cnt).className="hide";
+					document.getElementById(type+"span1"+cnt).className="show";
+					document.getElementById(type+"datetype"+cnt).value = 1;
+				} else { //swap from date to A/N
+					document.getElementById(type+"span0"+cnt).className="show";
+					document.getElementById(type+"span1"+cnt).className="hide";
+					document.getElementById(type+"datetype"+cnt).value = 0;
+				}
+			} catch (e) { };
+			els[i].checked = false;
+		  }
+	  }
+  }
+  function chkAll(frm, mark) {  
+  	var els = frm.getElementsByTagName("input");
+	  for (var i=0; i<els.length; i++) {
+		  if (els[i].type=='checkbox' && els[i].id!='ca') {   
+			  try{     
+				  if(els[i].type == "checkbox" && els[i].id != 'ca') {  
+					  els[i].checked = mark;     
+				  }   
+  			  } catch(er) {}
+		  }
+  	}
+  }
   
   	//TODO: separately calculate day difference (using daysBetween and getWeekDays) and time difference separately
 	//can use getHours()*60+getMinutes() to get minutes into day, then multiply to get ms for timediff

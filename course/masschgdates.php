@@ -186,9 +186,13 @@ if ($overwriteBody==1) {
 	echo "<p>Once changing dates in one row, you can click <i>Send Down List</i> to send the date change ";
 	echo "difference to all rows below.  Click the <img src=\"$imasroot/img/swap.gif\"> icon in each cell to swap from ";
 	echo "Always/Never to Dates.  Swaps to/from Always/Never cannot be sent down the list.</p>";
-	
-	
 	echo "<form method=post action=\"masschgdates.php?cid=$cid\">";
+	
+	echo '<p>Check/Uncheck All: <input type="checkbox" name="ca" value="1" onClick="chkAll(this.form, this.checked)"/>. ';
+	echo 'Change selected items <select id="swaptype"><option value="s">Start Date</option><option value="e">End Date</option><option value="r">Review Date</option></select>';
+	echo ' to <select id="swapselected"><option value="always">Always/Never</option><option value="dates">Dates</option></select>';
+	echo ' <input type="button" value="Go" onclick="MCDtoggleselected(this.form)" />';
+	
 	echo '<table class=gb><thead><tr><th>Name</th><th>Type</th><th>Start Date</th><th>End Date</th><th>Review Date</th><th>Send Date Chg Down List</th></thead><tbody>';
 	
 	$names = Array();
@@ -283,7 +287,9 @@ if ($overwriteBody==1) {
 	}
 	foreach ($keys as $i) {
 		echo '<tr class=grid>';
-		echo "<td>{$names[$i]}<input type=hidden name=\"id$cnt\" value=\"{$ids[$i]}\"/>";
+		echo '<td>';
+		echo "<input type=\"checkbox\" id=\"cb$cnt\" value=\"$cnt\" /> ";
+		echo "{$names[$i]}<input type=hidden name=\"id$cnt\" value=\"{$ids[$i]}\"/>";
 		echo "<script> basesdates[$cnt] = ";
 		if ($startdates[$i]==0) { echo '"NA"';} else {echo $startdates[$i];}
 		echo "; baseedates[$cnt] = ";
