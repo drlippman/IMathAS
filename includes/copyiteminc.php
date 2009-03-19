@@ -18,7 +18,7 @@ function copyitem($itemid,$gbcats) {
 		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$row = mysql_fetch_row($result);
 		$row[0] .= stripslashes($_POST['append']);
-		$fileorder = $row[5];
+		$fileorder = $row[7];
 		array_pop($row);
 		$row = "'".implode("','",addslashes_deep($row))."'";
 		$query = "INSERT INTO imas_inlinetext (courseid,title,text,startdate,enddate,avail,oncal,caltag) ";
@@ -43,6 +43,7 @@ function copyitem($itemid,$gbcats) {
 				$addedfilelist[] = $addedfiles[$fid];
 			}
 			$addedfilelist = implode(',',$addedfilelist);
+			echo $addedfilelist;
 			$query = "UPDATE imas_inlinetext SET fileorder='$addedfilelist' WHERE id=$newtypeid";
 			mysql_query($query) or die("Query failed :$query " . mysql_error());
 		}
