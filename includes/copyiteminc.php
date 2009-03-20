@@ -43,7 +43,6 @@ function copyitem($itemid,$gbcats) {
 				$addedfilelist[] = $addedfiles[$fid];
 			}
 			$addedfilelist = implode(',',$addedfilelist);
-			echo $addedfilelist;
 			$query = "UPDATE imas_inlinetext SET fileorder='$addedfilelist' WHERE id=$newtypeid";
 			mysql_query($query) or die("Query failed :$query " . mysql_error());
 		}

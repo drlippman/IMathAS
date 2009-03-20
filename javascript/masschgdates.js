@@ -153,7 +153,6 @@ Date.prototype.getWeekDays = function(d) {
 	  var db = new Date();
 	  if (document.getElementById(type+"datetype"+st).value==1) {
 		  var newstartdate = document.getElementById(type+"date"+st).value;
-		  alert(newstartdate);
 		  if (newstartdate!=0 && newstartdate!=2000000000 && basearr[st]!="NA") {
 			  var newstarttime = document.getElementById(type+"time"+st).value;
 			  d.setTime(Date.parse(newstartdate + ' ' + newstarttime.replace(/^\s*(\d+)\s*(am|pm)/,"$1:00 $2")));
