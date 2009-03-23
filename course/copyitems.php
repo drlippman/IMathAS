@@ -56,7 +56,26 @@ if (!(isset($teacherid))) {
 			}
 		}
 	}
-	if (isset($_GET['action']) && $_GET['action']=="copy") {
+	if (isset($_GET['action']) && $_GET['action']=="copycalitems") {
+		if (isset($_POST['clearexisting'])) {
+			$query = "DELETE FROM imas_calitems WHERE courseid='$cid'";
+			mysql_query($query) or die("Query failed :$query " . mysql_error());
+		}
+		$checked = $_POST['checked'];
+		$chklist = "'".implode("','",$checked)."'";
+		$query = "SELECT date,tag,title FROM imas_calitems WHERE id IN ($chklist) AND courseid='{$_POST['ctc']}'";
+		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+		$insarr = array();
+		while ($row = mysql_fetch_row($result)) {
+			$insarr[] = "('$cid','".implode("','",addslashes_deep($row))."')";
+		}
+		$query = "INSERT INTO imas_calitems (courseid,date,tag,title) VALUES ";
+		$query .= implode(',',$insarr);
+		mysql_query($query) or die("Query failed :$query " . mysql_error());
+		
+		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+		exit;	
+	} else if (isset($_GET['action']) && $_GET['action']=="copy") {
 		if (isset($_POST['copycourseopt'])) {
 			$query = "SELECT hideicons,allowunenroll,copyrights,msgset,topbar,cploc FROM imas_courses WHERE id='{$_POST['ctc']}'";
 			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
@@ -124,9 +143,19 @@ if (!(isset($teacherid))) {
 			$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt' WHERE id='$cid'";
 			mysql_query($query) or die("Query failed : $query" . mysql_error());
 		}	
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+		if (isset($_POST['selectcalitems'])) {
+			$_GET['action']='selectcalitems';
+			$calitems = array();
+			$query = "SELECT id,date,tag,title FROM imas_calitems WHERE courseid='{$_POST['ctc']}' ORDER BY date";
+			$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				$calitems[] = $row;
+			}
+		} else {
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
 	
-		exit;	
+			exit;
+		}
 	} elseif (isset($_GET['action']) && $_GET['action']=="select") { //DATA MANIPULATION FOR second option
 	
 		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_POST['ctc']}'";
@@ -207,9 +236,59 @@ if ($overwriteBody==1) {
 	<h3>Copy Course Items</h3>
 
 <?php
-	if (isset($_GET['action']) && $_GET['action']=="select") {
+	if (isset($_GET['action']) && $_GET['action']=='selectcalitems') {
+//DISPLAY BLOCK FOR selecting calendar items to copy
+?>
+	<script type="text/javascript">
+	function chkAll(frm, arr, mark) {
+	  for (i = 0; i <= frm.elements.length; i++) {
+	   try{
+	     if(frm.elements[i].name == arr) {
+	       frm.elements[i].checked = mark;
+	     }
+	   } catch(er) {}
+	  }
+	}
+	</script>
+	
+	<form method=post action="copyitems.php?cid=<?php echo $cid ?>&action=copycalitems">
+	<input type=hidden name=ekey id=ekey value="<?php echo $_POST['ekey'] ?>">
+	<input type=hidden name=ctc id=ctc value="<?php echo $_POST['ctc'] ?>">
+	<h4>Select Calendar Items to Copy</h4>
+	Check/Uncheck All: 
+	<input type="checkbox" name="ca" value="1" onClick="chkAll(this.form, 'checked[]', this.checked)" checked=checked>
+	
+	<table cellpadding=5 class=gb>
+		<thead>
+		<tr><th></th><th>Date</th><th>Tag</th><th>Text</th></tr>
+		</thead>
+		<tbody>
+<?php	
+		$alt=0;
+		for ($i = 0 ; $i<(count($calitems)); $i++) {
+			if ($alt==0) {echo "		<tr class=even>"; $alt=1;} else {echo "		<tr class=odd>"; $alt=0;}
+?>			
+			<td>
+			<input type=checkbox name='checked[]' value='<?php echo $calitems[$i][0];?>' checked="checked"/>
+			</td>
+			<td class="nowrap"><?php echo tzdate("m/d/Y",$calitems[$i][1]); ?></td>
+			<td><?php echo $calitems[$i][2]; ?></td>
+			<td><?php echo $calitems[$i][3]; ?></td>
+		</tr>
+<?php
+		}
+?>		
+		</tbody>
+	</table>
+	<p>Remove all existing calendar items? <input type="checkbox" name="clearexisting" value="1" /></p>
+	<p><input type=submit value="Copy Calendar Items"></p>
+	</form>
 
-//DISPLAY BLOCK FOR SECOND STEP
+<?php
+		
+	} else if (isset($_GET['action']) && $_GET['action']=="select") {
+
+//DISPLAY BLOCK FOR SECOND STEP - selecting course item
 ?>
 	<script type="text/javascript">
 	function chkAll(frm, arr, mark) {
@@ -258,6 +337,8 @@ if ($overwriteBody==1) {
 		Copy gradebook scheme and categories (<i>will overwrite current scheme</i>)? 
 		<input type=checkbox name="copygbsetup" value="1"/>
 	</p>
+	<p>Select calendar items to copy? <input type=checkbox name="selectcalitems"  value="1"/></p>
+	
 	<p>Append text to titles?: <input type="text" name="append"></p>
 	<p>Add to block: <br/>
 

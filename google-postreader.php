@@ -21,7 +21,8 @@ include("config.php");
   
   <div id="content_div"></div>
 
-  <script type="text/javascript">      
+  <script type="text/javascript">        
+
 function displayInfo() {	  	  
       // XML post/msg  data
 	  
@@ -33,7 +34,9 @@ function displayInfo() {
 	  if (key=='') {
 	     _gel("content_div").innerHTML = "<i>Edit settings and supply an Access Key.</i>";
 	  }
-          var url = 'http://<?php echo $_SERVER['HTTP_HOST'].$imasroot?>/getxml.php?key=' + key + '&limit=' + showlimit;
+	  var thedate = new Date();  
+	  var tzoffset = thedate.getTimezoneOffset();
+          var url = 'http://<?php echo $_SERVER['HTTP_HOST'].$imasroot?>/getxml.php?key=' + key + '&limit=' + showlimit + '&tzoffset=' + tzoffset;
 	  
       _IG_FetchXmlContent(url, function (response) {
          if (response == null || typeof(response) != "object" || response.firstChild == null) {
