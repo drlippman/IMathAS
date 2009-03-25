@@ -464,14 +464,14 @@ $sql = 'CREATE TABLE `imas_forums` ('
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());	
 echo 'imas_forums created<br/>';
 
-$sql = 'CREATE TABLE `imas_forum_threads` (';
-	. '`id` INT(10) UNSIGNED NOT NULL, ',
-	. '`forumid` INT(10) UNSIGNED NOT NULL, ';
-	. '`lastposttime` INT(10) UNSIGNED NOT NULL, ';
-	. '`lastpostuser` INT(10) UNSIGNED NOT NULL, ';
-	. '`views` INT(10) UNSIGNED NOT NULL, ';
-	. ' PRIMARY KEY (`id`), INDEX (`forumid`), INDEX(`lastposttime`) ) ';
-	. ' TYPE = InnoDB ';
+$sql = 'CREATE TABLE `imas_forum_threads` ('
+	. '`id` INT(10) UNSIGNED NOT NULL, '
+	. '`forumid` INT(10) UNSIGNED NOT NULL, '
+	. '`lastposttime` INT(10) UNSIGNED NOT NULL, '
+	. '`lastpostuser` INT(10) UNSIGNED NOT NULL, '
+	. '`views` INT(10) UNSIGNED NOT NULL, '
+	. ' PRIMARY KEY (`id`), INDEX (`forumid`), INDEX(`lastposttime`) ) '
+	. ' TYPE = InnoDB '
 	. ' COMMENT = \'Forum threads\'';	
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());	
 echo 'imas_forum_threads created<br/>';	
