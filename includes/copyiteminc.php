@@ -158,8 +158,10 @@ function copysub($items,$parent,&$addtoarr,$gbcats) {
 				$blockcnt++;
 				$newblock['startdate'] = $item['startdate'];
 				$newblock['enddate'] = $item['enddate'];
+				$newblock['avail'] = $item['avail'];
 				$newblock['SH'] = $item['SH'];
 				$newblock['colors'] = $item['colors'];
+				$newblock['public'] = $item['public'];
 				$newblock['items'] = array();
 				if (count($item['items'])>0) {
 					copysub($item['items'],$parent.'-'.($k+1),$newblock['items'],$gbcats);
