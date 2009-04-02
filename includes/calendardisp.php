@@ -222,14 +222,14 @@ while ($row = mysql_fetch_row($result)) {
 	if (($row[4]>$now && !isset($teacherid))) {
 		continue;
 	}
-	if ($row[2]>$now) {
+	if ($row[2]>$now && $row[2]!=2000000000) {
 		list($moday,$time) = explode('~',date('n-j~g:i a',$row[2]));
 		$row[1] = str_replace('"','\"',$row[1]);
 		$colors[$k] = makecolor2($row[4],$row[2],$now);
 		$assess[$moday][$k] = "{type:\"FP\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors[$k]."\"".((isset($teacherid))?", editlink:true":"")."}";
 		$k++;
 	}
-	if ($row[3]>$now) {
+	if ($row[3]>$now && $row[3]!=2000000000) {
 		list($moday,$time) = explode('~',date('n-j~g:i a',$row[3]));
 		$colors[$k] = makecolor2($row[4],$row[3],$now);
 		$assess[$moday][$k] = "{type:\"FR\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors[$k]."\"".((isset($teacherid))?", editlink:true":"")."}";

@@ -281,6 +281,11 @@
 	//}
 	$superdone = false;
 	if ($isreview) {
+		if (isset($_POST['isreview']) && $_POST['isreview']==0) {
+			echo "Due date has passed.  Submission rejected.";
+			leavetestmsg();
+			exit;
+		}
 		//$testsettings['displaymethod'] = "SkipAround";
 		$testsettings['testtype']="Practice";
 		$testsettings['defattempts'] = 0;
@@ -604,6 +609,7 @@
 			echo 'here.</p>';
 			echo '<form method="post" enctype="multipart/form-data" action="showtest.php?addgrpmem=true">';
 			echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
+			echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
 			for ($i=1;$i<$testsettings['groupmax']-count($curgrp)+1;$i++) {
 				echo '<br />Username: <select name="user'.$i.'">'.$selops.'</select> ';
 				if ($testsettings['isgroup']==1) {
@@ -825,6 +831,7 @@
 			if (!$done) { //can show next
 				echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=shownext&amp;score=$toshow\" onsubmit=\"return doonsubmit(this)\">\n";
 				echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
+				echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
 				basicshowq($toshow);
 				showqinfobar($toshow,true,true);
 				echo '<input type="submit" class="btn" value="Continue" />';
@@ -919,6 +926,7 @@
 					echo "<div class=inset>\n";
 					echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=skip&amp;score=$next\" onsubmit=\"return doonsubmit(this)\">\n";
 					echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
+					echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
 					echo "<a name=\"beginquestions\"></a>\n";
 					basicshowq($next);
 					showqinfobar($next,true,true);
@@ -1057,6 +1065,7 @@
 				
 				echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=seq&amp;score=$toshow\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
 				echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
+				echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
 				echo "<input type=hidden name=\"verattempts\" value=\"{$attempts[$toshow]}\" />";
 				
 				for ($i = 0; $i < count($questions); $i++) {
@@ -1132,6 +1141,7 @@
 			echo filter("<div class=intro>{$testsettings['intro']}</div>\n");
 			echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=scoreall\" onsubmit=\"return doonsubmit(this,true)\">\n";
 			echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
+			echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
 			$numdisplayed = 0;
 			for ($i = 0; $i < count($questions); $i++) {
 				if (unans($scores[$i]) || amreattempting($i)) {
@@ -1164,6 +1174,7 @@
 				echo filter("<div class=intro>{$testsettings['intro']}</div>\n");
 				echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=shownext&amp;score=$i\" onsubmit=\"return doonsubmit(this)\">\n";
 				echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
+				echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
 				basicshowq($i);
 				showqinfobar($i,true,true);
 				echo '<input type="submit" class="btn" value="Next" />';
@@ -1189,6 +1200,7 @@
 				echo "<div class=inset>\n";
 				echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=skip&amp;score=$i\" onsubmit=\"return doonsubmit(this)\">\n";
 				echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
+				echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
 				echo "<a name=\"beginquestions\"></a>\n";
 				basicshowq($i);
 				showqinfobar($i,true,true);
@@ -1216,6 +1228,7 @@
 				echo filter("<div class=intro>{$testsettings['intro']}</div>\n");
 				echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=seq&amp;score=$i\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
 				echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
+				echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
 				echo "<input type=\"hidden\" name=\"verattempts\" value=\"{$attempts[$i]}\" />";
 				for ($i = 0; $i < count($questions); $i++) {
 					$qavail = seqshowqinfobar($i,$curq);

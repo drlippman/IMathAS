@@ -106,7 +106,7 @@ require("../header.php");
 	 showitems($items,$_GET['folder'],$blockispublic);
  }
  
- echo "<hr/>This is the publically accessible content from a course on $installname.  There may be additional content available by <a href=\"course.php?cid=$cid\">logging in</a>";
+ echo "<hr/>This is the publicly accessible content from a course on $installname.  There may be additional content available by <a href=\"course.php?cid=$cid\">logging in</a>";
 require("../footer.php");
 
  function tzdate($string,$time) {

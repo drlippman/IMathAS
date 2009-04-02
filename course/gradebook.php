@@ -496,14 +496,16 @@ function gbstudisp($stu) {
 	}
 	if (!$hidepast) {
 		if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
+			$donedbltop = false;
 			for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers	
 				if ($availshow<2 && $gbt[0][2][$i][2]>1) {
 					continue;
 				} else if ($availshow==2 && $gbt[0][2][$i][2]==3) {
 					continue;
 				}
-				if ($i==0) {
+				if (!$donedbltop) {
 					echo '<tr class="grid dbltop">';
+					$donedbltop = true;
 				} else {
 					echo '<tr class="grid">';
 				}

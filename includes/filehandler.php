@@ -52,7 +52,7 @@ function deleteasidfilesfromstring($str,$s3asid) {
 //wherearr array of imas_assessment_sessions id=>val for WHERE
 function deleteasidfilesbyquery($wherearr,$lim=0) {
 	if ($GLOBALS['filehandertype'] == 's3') {
-		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		//$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		$delcnt = 0;
 		if (count($wherearr)==0) {
 			return false;
@@ -66,6 +66,7 @@ function deleteasidfilesbyquery($wherearr,$lim=0) {
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$cnt = 0;
 		while (($row = mysql_fetch_row($result)) && ($lim==0 || $cnt<$lim)) {
+			if (strpos($row[2].$row[3].$row[4],'FILE:')===false) { continue;}
 			if ($row[1]>0) {
 				$delcnt += deleteasidfilesfromstring($row[2].$row[3].$row[4],$row[1]);
 			} else {

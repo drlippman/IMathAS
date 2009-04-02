@@ -84,7 +84,7 @@ echo '<tr>';
 echo '<td></td>';
 if (isset($_GET['addto'])) {
 	$date = tzdate("m/d/Y",$_GET['addto']); 
-} else {
+} else if (!isset($date)) {
 	$date = tzdate("m/d/Y",$now);
 }
 echo "<td><input type=text size=10 id=\"datenew\" name=\"datenew\" value=\"$date\"/> ";	
