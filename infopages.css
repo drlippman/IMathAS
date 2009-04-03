@@ -38,7 +38,7 @@ a:hover {
 }
 body {
 	font-family: Arial, Arial, Helvetica, sans-serif;
-	font-size: 11pt;
+	font-size: 95%;
 }
 .content {
 	margin-left: 220px;
@@ -73,7 +73,7 @@ div#header {
 
 .vcenter {
 	font-family: sans-serif;
-	font-size: 28px;
+	font-size: 180%; /*28px;*/
 	margin: 0px;
 	margin-left: 30px;
 	padding-top: 25px;
@@ -106,7 +106,7 @@ background-color: #036;
 ul#navlist li { 
 display: inline;
 font-family: sans-serif;
-font-size: 12pt;
+font-size: 105%;
 }
 
 ul#navlist li a

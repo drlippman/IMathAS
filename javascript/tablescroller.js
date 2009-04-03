@@ -55,6 +55,7 @@ function findPos(obj) { //from quirksmode.org
 }
 
 function tablescroller(id,lockonload) {
+	var t = this;
 	var thetable;
 	var tblcont;
 	var bigcont;
@@ -70,11 +71,12 @@ function tablescroller(id,lockonload) {
 	var upleftdiv;
 	var toggletracker = 0;
 	var locktds = new Array();
+	var ispreinited = false;
 	
 //preinit is called onload
 //fixes column widths and heights by injecting div's 
 //into first and second rows and columns, locking in non-scrolling layout
-this.preinit = function() {
+this.preinit = function(try2) {
 	thetable = document.getElementById(tblid);
 	if (!(thetable.addEventListener || thetable.attachEvent)) {
 		return;
@@ -106,6 +108,11 @@ this.preinit = function() {
 		//second rows and columns.  Then when we restrict the container to
 		//create scroll, we don't have to worry about different wrapping.
 		var trs = document.getElementsByTagName("tr");
+		if (trs.length > 100 && try2!=true) {
+			return;
+		} else if (trs.length > 100) {
+			alert("This might take a minute... header locking is slow with lots of students.");
+		}
 		var theads = trs[0].getElementsByTagName("th");
 		leftth = theads[0];
 		var firstthcontent = theads[0].innerHTML;
@@ -158,7 +165,7 @@ this.preinit = function() {
 		if (tblbrowser=='gecko') {
 			vertadj = 0;
 		} else {
-			vertadj = 15;
+			vertadj = 0;
 			upleftdiv = document.createElement("div");
 			upleftdiv.style.left = "0px";
 			upleftdiv.style.top = "0px";
@@ -185,6 +192,7 @@ this.preinit = function() {
 		}
 	
 	}
+	ispreinited = true;
 
 }
 //handles adjusing headers during scrolling
@@ -240,6 +248,9 @@ ierelock = function() {
 //adjust the winw and winh calculations to adjust sizing - currently handles
 //IE and non-IE separately
 this.lock = function() {
+	if (!ispreinited) {
+		t.preinit(true);
+	}
 	toggletracker = 1;
 	if (tblbrowser == 'ie') {
 		if( document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ) ) {
@@ -420,8 +431,10 @@ this.toggle = function() {
 	}
 	
 }
-	addLoadEvent(this.preinit);
+	
 	if(lockonload) {
 		addLoadEvent(this.lock);
+	} else {
+		addLoadEvent(this.preinit);
 	}
 }

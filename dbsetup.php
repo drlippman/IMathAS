@@ -100,7 +100,7 @@ if ($_POST['create']==1) {
 	$sql = 'GRANT USAGE ON *.* TO \'' . $dbusername . '\'@\''. $dbserver . '\' IDENTIFIED BY \''. $dbpassword . '\' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0;';
 	mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 	
-	$sql = 'GRANT SELECT, INSERT, UPDATE, DELETE ON `' . $dbname . '`.* TO \'' . $dbusername . '\'@\'' . $dbserver . '\';';
+	$sql = 'GRANT SELECT, INSERT, UPDATE, DELETE, CREATE , ALTER  ON `' . $dbname . '`.* TO \'' . $dbusername . '\'@\'' . $dbserver . '\';';
 	mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 }
 mysql_select_db($dbname) 

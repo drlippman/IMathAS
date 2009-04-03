@@ -38,7 +38,7 @@
 	   if (!$GLOBALS['colorshift']) {
 		   return "#ff0";
 	   }
-	   if ($etime==2000000000) {
+	   if ($etime==2000000000 && $now >= $stime) {
 		   return '#0f0';
 	   } else if ($stime==0) {
 		   return makecolor($etime,$now);
