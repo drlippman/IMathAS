@@ -34,18 +34,22 @@
 	} else { //get confirm
 		if (isset($_POST['submit']) && $_POST['submit']=="Unenroll") {
 			if (isset($_POST['ca']) && $secfilter==-1) {
+				//if "check all" and not section limited, mark as all to deliver "all students" message
 				$_GET['uid'] = "all";
 			} else {
 				$_GET['uid'] = "selected";
 			}
-		}
-		if ($_GET['uid']=="all") {
-			$query = "SELECT COUNT(id) FROM imas_students WHERE courseid='{$_GET['cid']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			if (count($_POST['checked']) < mysql_result($result,0,0)) {
-				$_GET['uid'] = 'selected';
+			if ($_GET['uid']=="all") {
+				//not quite sure why we're doing this check... makes sure all students were actually selected..
+				//if not, convert to selected type
+				$query = "SELECT COUNT(id) FROM imas_students WHERE courseid='{$_GET['cid']}'";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				if (count($_POST['checked']) < mysql_result($result,0,0)) {
+					$_GET['uid'] = 'selected';
+				}
 			}
 		}
+		
 		if ($_GET['uid']=="all") {
 
 		} else if ($_GET['uid']=="selected") {

@@ -63,6 +63,13 @@ if (!(isset($teacherid))) {
 				$allowlate = 0;
 			}
 		}
+		if (isset($_POST['chghints'])) {
+			if (isset($_POST['showhints'])) {
+				$showhints = 1;
+			} else {
+				$showhints = 0;
+			}
+		}
 		if ($_POST['skippenalty']==10) {
 			$_POST['defpenalty'] = 'L'.$_POST['defpenalty'];
 		} else if ($_POST['skippenalty']>0) {
@@ -110,7 +117,7 @@ if (!(isset($teacherid))) {
 			$sets[] = "password='{$_POST['password']}'";
 		}
 		if (isset($_POST['chghints'])) {
-			$sets[] = "showhints='{$_POST['showhints']}'";
+			$sets[] = "showhints='$showhints'";
 		}
 		if (isset($_POST['chgisgroup'])) {
 			$sets[] = "isgroup='{$_POST['isgroup']}'";
