@@ -354,7 +354,7 @@ if ($isTeaching == true) {
 	<div class=cp>
 		<span class=column>
 		<a href="<?php echo $imasroot ?>/msgs/msglist.php?cid=0">Messages</a>
-		<?php echo (count($newmsgcnt)>0) ? " <span style=\"color:red\">New Messages (" . array_sum($newmsgcnt) . ")</span>" : ""; ?>
+		<?php echo (count($newmsgcnt)>0) ? " <a href=\"$imasroot/msgs/newmsglist.php?cid=0\" style=\"color:red\">New Messages (" . array_sum($newmsgcnt) . ")</span>" : ""; ?>
 		</span>
 		
 		<div class=clear></div>

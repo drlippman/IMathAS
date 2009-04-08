@@ -38,6 +38,11 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			$query = "UPDATE imas_forum_threads SET lastposttime=$now,lastpostuser='$userid' WHERE id='$threadid'";
 			mysql_query($query) or die("Query failed : $query " . mysql_error());
 			
+			if ($isteacher && isset($_POST['points']) && trim($_POST['points'])!='') {
+				$query = "UPDATE imas_forum_posts SET points='{$_POST['points']}' WHERE id='{$_GET['replyto']}'";
+				mysql_query($query) or die("Query failed : $query " . mysql_error());
+			}
+			
 			$query = "SELECT iu.email FROM imas_users AS iu,imas_forum_subscriptions AS ifs WHERE ";
 			$query .= "iu.id=ifs.userid AND ifs.forumid='$forumid' AND iu.id<>'$userid'";
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -79,12 +84,18 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			echo "<h3>Modify Post</h3>\n";
 		} else {
 			echo "Post Reply</div>\n";
-			$query = "SELECT subject FROM imas_forum_posts WHERE id='{$_GET['replyto']}'";
+			$query = "SELECT subject,points FROM imas_forum_posts WHERE id='{$_GET['replyto']}'";
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			$sub = mysql_result($result,0,0);
 			$sub = str_replace('"','&quot;',$sub);
 			$line['subject'] = "Re: $sub";
 			$line['message'] = "";
+			$points = mysql_result($result,0,1);
+			if ($isteacher) {
+				$query = "SELECT points FROM imas_forums WHERE id='$forumid'";
+				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				$haspoints = (mysql_result($result,0,0)>0);
+			}
 			echo "<h3>Post Reply</h3>\n";
 		}
 		echo "<form method=post action=\"$returnurl&modify={$_GET['modify']}&replyto={$_GET['replyto']}\">\n";
@@ -99,6 +110,10 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			echo "<input type=checkbox name=\"postanon\" value=1 ";
 			if ($line['isanon']==1) {echo "checked=1";}
 			echo "></span><br class=form/>";
+		}
+		if ($isteacher && $haspoints) {
+			echo '<span class="form">Points for message you\'re replying to:</span><span class="formright">';
+			echo '<input type="text" size="4" name="points" value="'.$points.'" /></span><br class="form" />';
 		}
 		echo "<div class=submit><input type=submit value='Submit'></div>\n";
 

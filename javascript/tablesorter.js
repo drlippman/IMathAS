@@ -49,12 +49,20 @@
 	}
 	
 	function sortDate(a,b) {
-		var ar = a.match(/(\d+)\/(\d+)\/(\d+)/);
-		if (ar==null) return -1;
-		a = ar[3]*10000 + ar[1]*100 + 1*ar[2];
-		ar = b.match(/(\d+)\/(\d+)\/(\d+)/);
-		if (ar==null) return 1;
-		b = ar[3]*10000 + ar[1]*100 + 1*ar[2];
+		if (ar = a.match(/(\d+)\/(\d+)\/(\d+)\s+(\d+):(\d+)(am|pm)/)) {
+			a = ar[3]*10000 + ar[1]*100 + 1*ar[2] + .01*(ar[4]/1+(ar[6]=='pm'?12:0))+.0001*ar[5]/1;
+		} else if (ar = a.match(/(\d+)\/(\d+)\/(\d+)/)) {
+			a = ar[3]*10000 + ar[1]*100 + 1*ar[2];
+		} else {
+			return -1;
+		}
+		if (ar = b.match(/(\d+)\/(\d+)\/(\d+)\s+(\d+):(\d+)(am|pm)/)) {
+			b = ar[3]*10000 + ar[1]*100 + 1*ar[2] + .01*(ar[4]/1+(ar[6]=='pm'?12:0))+.0001*ar[5]/1;
+		} else if (ar = b.match(/(\d+)\/(\d+)\/(\d+)/)) {
+			b = ar[3]*10000 + ar[1]*100 + 1*ar[2];
+		} else {
+			return 1;
+		}
 		return a/1 - b/1;
 	}
 

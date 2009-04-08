@@ -39,6 +39,8 @@
 		echo "&gt; <a href=\"sentlist.php?page=$page&cid=$cid&filtercid=$filtercid\">Sent Message List</a> &gt; Message</div>";
 	} else if ($type=='allstu') {
 		echo "&gt; <a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid\">Message List</a> &gt; <a href=\"allstumsglist.php?page=$page&cid=$cid&filterstu=$filterstu\">Student Messages</a> &gt; Message</div>";
+	} else if ($type=='new') {
+		echo "&gt; <a href=\"newmsglist.php?cid=$cid\">New Message List</a> &gt; Message</div>";
 	} else {
 		echo "&gt; <a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid\">Message List</a> &gt; Message</div>";
 	}

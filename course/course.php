@@ -234,7 +234,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	   $query = "SELECT COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND (isread=0 OR isread=4)";
 	   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	   if (mysql_result($result,0,0)>0) {
-		   $newmsgs = " <span style=\"color:red\">New Messages</span>";
+		   $newmsgs = " <a href=\"$imasroot/msgs/newmsglist.php?cid=$cid\" style=\"color:red\">New Messages</span>";
 	   } else {
 		   $newmsgs = '';
 	   }
