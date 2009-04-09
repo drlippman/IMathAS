@@ -74,9 +74,11 @@
 			}
 		}
 		if ($sessiondata['mathdisp']==2) {
+			$str = str_replace('\\`','&grave;',$str);
 			if (strpos($str,'`')!==FALSE) {
 				$str = preg_replace_callback('/`(.*?)`/s', 'mathfiltercallback', $str);
 			}
+			$str = str_replace('&grave;','`',$str);
 		}
 		if ($sessiondata['graphdisp']==2) {
 			if (strpos($str,'embed')!==FALSE) {

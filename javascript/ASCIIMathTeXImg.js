@@ -268,6 +268,8 @@ AMsqrt, AMroot, AMfrac, AMdiv, AMover, AMsub, AMsup,
 {input:"ddot", tag:"mover", output:"..",    tex:null, ttype:UNARY, acc:true},
 {input:"ul", tag:"munder", output:"\u0332", tex:"underline", ttype:UNARY, acc:true},
 AMtext, AMmbox, AMquote,
+//{input:"var", tag:"mstyle", atname:"fontstyle", atval:"italic", output:"var", tex:null, ttype:UNARY},
+
 {input:"bb", tag:"mstyle", atname:"fontweight", atval:"bold", output:"bb", tex:"mathbf", ttype:UNARY, notexcopy:true},
 {input:"mathbf", tag:"mstyle", atname:"fontweight", atval:"bold", output:"mathbf", tex:null, ttype:UNARY},
 {input:"sf", tag:"mstyle", atname:"fontfamily", atval:"sans-serif", output:"sf", tex:"mathsf", ttype:UNARY, notexcopy:true},
@@ -795,6 +797,8 @@ function AMprocessNodeR(n, linebreaks) {
       for (i=0; i<arr.length; i++)
       	if (AMusedelimiter2) {	     
 		arr[i]=arr[i].replace(/AMescape2/g,AMdelimiter2).replace(/AMescape1/g,AMdelimiter1);
+	} else {
+		arr[i]=arr[i].replace(/AMescape1/g,AMdelimiter1);
 	}
       if (arr.length>1 || mtch) {
         

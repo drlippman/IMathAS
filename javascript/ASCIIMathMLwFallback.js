@@ -1210,6 +1210,8 @@ function AMprocessNodeR(n, linebreaks) {
       for (i=0; i<arr.length; i++)
       	if (AMusedelimiter2) {	     
 		arr[i]=arr[i].replace(/AMescape2/g,AMdelimiter2).replace(/AMescape1/g,AMdelimiter1);
+	} else {
+		arr[i]=arr[i].replace(/AMescape1/g,AMdelimiter1);
 	}
       if (arr.length>1 || mtch) {
         if (checkForMathML) {

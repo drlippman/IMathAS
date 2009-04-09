@@ -17,7 +17,8 @@
 			echo "</html></body>\n";
 			exit;
 		}
-		if (!preg_match('/^[a-zA-Z][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$/',$_POST['email'])) {
+		//
+		if (!preg_match('/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/',$_POST['email'])) {
 			echo "<html><body>\n";
 			echo "Invalid email address.  <a href=\"forms.php?action=newuser\">Try Again</a>\n";
 			echo "</html></body>\n";

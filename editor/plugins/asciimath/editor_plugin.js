@@ -141,11 +141,20 @@
 				if (o.get) {
 					AMtags = ed.dom.select('span.AM', o.node);
 					for (var i=0; i<AMtags.length; i++) {
-						t.math2ascii(AMtags[i]);
+						t.math2ascii(AMtags[i]); 
+					}
+					AMtags = ed.dom.select('span.AMedit', o.node);
+					for (var i=0; i<AMtags.length; i++) {
+						var myAM = AMtags[i].innerHTML;
+						myAM = "`"+myAM.replace(/\`/g,"")+"`";
+						AMtags[i].innerHTML = myAM;
+						AMtags[i].className = "AM";
 					}
 				} 
 				
+				
 			});
+
 			
 			ed.onSetContent.add(function(ed,o) {
 					AMtags = ed.dom.select('span.AM');
@@ -246,14 +255,15 @@
 		math2ascii : function(el) {
 			var myAM = el.innerHTML;
 			if (myAM.indexOf("`") == -1) {
-				myAM = myAM.replace(/.+(alt|title)=\"(.*?)\".+/g,"`$2`");
-				myAM = myAM.replace(/.+(alt|title)=\'(.*?)\'.+/g,"`$2`");
-				myAM = myAM.replace(/.+(alt|title)=([^>]*?)\s.*>.*/g,"`$2`");
-				myAM = myAM.replace(/.+(alt|title)=(.*?)>.*/g,"`$2`");
+				myAM = myAM.replace(/.+(alt|title)=\"(.*?)\".+/g,"$2");
+				myAM = myAM.replace(/.+(alt|title)=\'(.*?)\'.+/g,"$2");
+				myAM = myAM.replace(/.+(alt|title)=([^>]*?)\s.*>.*/g,"$2");
+				myAM = myAM.replace(/.+(alt|title)=(.*?)>.*/g,"$2");
 				//myAM = myAM.replace(/&gt;/g,">");
 				//myAM = myAM.replace(/&lt;/g,"<");
 				myAM = myAM.replace(/>/g,"&gt;");
 				myAM = myAM.replace(/</g,"&lt;");
+				myAM = "`"+myAM.replace(/\`/g,"")+"`";
 				el.innerHTML = myAM;
 			}
 		},
@@ -272,7 +282,7 @@
 			  } else {
 				  //doesn't work on IE, probably because this script is in the parent
 				  //windows, and the node is in the iframe.  Should it work in Moz?
-				 var myAM = outnode.innerHTML; //next 2 lines needed to make caret
+				 var myAM = "`"+outnode.innerHTML.replace(/\`/g,"")+"`"; //next 2 lines needed to make caret
 				 outnode.innerHTML = myAM;     //move between `` on Firefox insert math
 				 AMprocessNode(outnode);
 			  }

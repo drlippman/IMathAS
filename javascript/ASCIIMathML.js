@@ -321,6 +321,8 @@ AMsqrt, AMroot, AMfrac, AMdiv, AMover, AMsub, AMsup,
 {input:"ddot", tag:"mover", output:"..",    tex:null, ttype:UNARY, acc:true},
 {input:"ul", tag:"munder", output:"\u0332", tex:"underline", ttype:UNARY, acc:true},
 AMtext, AMmbox, AMquote,
+//{input:"var", tag:"mstyle", atname:"fontstyle", atval:"italic", output:"var", tex:null, ttype:UNARY},
+
 {input:"bb", tag:"mstyle", atname:"fontweight", atval:"bold", output:"bb", tex:null, ttype:UNARY},
 {input:"mathbf", tag:"mstyle", atname:"fontweight", atval:"bold", output:"mathbf", tex:null, ttype:UNARY},
 {input:"sf", tag:"mstyle", atname:"fontfamily", atval:"sans-serif", output:"sf", tex:null, ttype:UNARY},
@@ -563,7 +565,8 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
         return [AMcreateMmlNode(symbol.tag,result[0]),result[1]];
       } else if (typeof symbol.acc == "boolean" && symbol.acc) {   // accent
         node = AMcreateMmlNode(symbol.tag,result[0]);
-        node.appendChild(AMcreateMmlNode("mo",document.createTextNode(symbol.output)));
+	node.setAttribute("accent","true");
+	node.appendChild(AMcreateMmlNode("mo",document.createTextNode(symbol.output)));
         return [node,result[1]];
       } else {                        // font change command
         if (!isIE && typeof symbol.codes != "undefined") {
