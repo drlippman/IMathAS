@@ -41,7 +41,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$page_formActionTag = "addlinkedtext.php?block=$block&cid=$cid&folder=" . $_GET['folder'];
 	$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . $_GET['id'] : "";
 	$page_formActionTag .= "&tb=$totb";
-	
+	$uploaderror = false;
 	if ($_POST['title']!= null) { //if the form has been submitted
 		if ($_POST['sdatetype']=='0') {
 			$startdate = 0;
@@ -76,23 +76,33 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				
 				if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
 					//echo "<p>File is valid, and was successfully uploaded</p>\n";
+					$_POST['text'] = "file:$filename";
 				} else {
-					$overwriteBody = 1;
-					$body = "<p>Error uploading file!</p>\n";
-					$body .= "<p><a href=\"addlinkedtext.php?cid={$_GET['cid']}";
-					if (isset($_GET['id'])) {
-						$body .= "id={$_GET['id']}";
+					switch ($_FILES['userfile']['error']) {
+						case 1:
+						case 2:
+							$errormsg = "File size too large";
+							break;
+						default:
+							$errormsg = "Try again";
+							break;	
 					}
-					$body .= "\">Try Again</a></p>\n";
+					$_POST['text'] = "File upload error - $errormsg";
+					$uploaderror = true;
 				}
 				//$_POST['text'] = "file:$cid-" . basename($_FILES['userfile']['name']);
-				$_POST['text'] = "file:$filename";
+				
 			}
 			
 		} else if (substr(trim(strip_tags($_POST['text'])),0,4)=="http") {
 			$_POST['text'] = trim(strip_tags($_POST['text']));	
 		} else if (substr(trim(strip_tags($_POST['text'])),0,5)=="file:") {
-			$_POST['text'] = trim(strip_tags($_POST['text']));	
+			$_POST['text'] = trim(strip_tags($_POST['text']));
+			$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
+			$filename = substr($_POST['text'],5);
+			if (!file_exists($uploaddir . $filename)) {
+				$_POST['text'] = '<p>File specified, but file is not on server.  Try uploading again</p>';
+			}
 		} else {
 			require_once("../includes/htmLawed.php");
 			$htmlawedconfig = array('elements'=>'*-script');
@@ -108,13 +118,15 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$text = trim(mysql_result($result,0,0));
 			if (substr($text,0,5)=='file:') { //has file
 				$safetext = addslashes($text);
-				if ($_POST['text']!=$safetext) { //if not same file
+				if ($_POST['text']!=$safetext) { //if not same file, delete old if not used
 					$query = "SELECT id FROM imas_linkedtext WHERE text='$safetext'"; //any others using file?
 					$result = mysql_query($query) or die("Query failed : " . mysql_error());
 					if (mysql_num_rows($result)==1) { 
 						$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
 						$filename = substr($text,5);
-						unlink($uploaddir . $filename);
+						if (file_exists($uploaddir . $filename)) {
+							unlink($uploaddir . $filename);
+						}
 					}
 				}
 			}
@@ -156,8 +168,19 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		
 		}
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
-		
+		if ($uploaderror == true) {
+			$body = "<p>Error uploading file! $errormsg</p>\n";
+			$body .= "<p><a href=\"addlinkedtext.php?cid={$_GET['cid']}";
+			if (isset($_GET['id'])) {
+				$body .= "&id={$_GET['id']}";
+			} else {
+				$body .= "&id=$newtextid";
+			}
+			$body .= "\">Try Again</a></p>\n";
+			echo "<html><body>$body</body></html>";
+		} else {
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
+		}
 		exit;
 	} else {
 		if (isset($_GET['id'])) {
@@ -223,8 +246,8 @@ if ($overwriteBody==1) {
 			<textarea cols=80 rows=20 id=text name=text style="width: 100%"><?php echo htmlentities($line['text']);?></textarea>
 		</div>
 		<BR>
-		<input type="hidden" name="MAX_FILE_SIZE" value="3000000" />
-		<span class=form>Or attach file (Max 3MB)<sup>*</sup>: </span>
+		<input type="hidden" name="MAX_FILE_SIZE" value="2000000" />
+		<span class=form>Or attach file (Max 2MB)<sup>*</sup>: </span>
 		<span class=formright><input name="userfile" type="file" /></span><br class=form>
 		
 

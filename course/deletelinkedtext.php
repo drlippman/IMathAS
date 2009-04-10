@@ -47,7 +47,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			if (mysql_num_rows($result)==1) { 
 				$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
 				$filename = substr($text,5);
-				unlink($uploaddir . $filename);
+				if (file_exists($uploaddir . $filename)) {
+					unlink($uploaddir . $filename);
+				}
 			}
 		}
 		

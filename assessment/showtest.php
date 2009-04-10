@@ -1473,8 +1473,8 @@
 			echo "Grade is subject to acceptance by the instructor</p>\n";
 		}
 		
-		//echo "$total, $totpossible, $superdone, $noindivscores";
-		if (!$superdone) { //$total < $totpossible && 
+		
+		if (!$superdone) { // $total < $totpossible && 
 			if ($noindivscores) {
 				echo "<p><a href=\"showtest.php?reattempt=all\">Reattempt test</a> on questions allowed (note: where reattempts are allowed, all scores, correct and incorrect, will be cleared)</p>";
 			} else {

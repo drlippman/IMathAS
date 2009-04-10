@@ -321,7 +321,7 @@ function movefile(from) {
 	} 
 ?>
 
-		<input type="hidden" name="MAX_FILE_SIZE" value="3000000" />
+		<input type="hidden" name="MAX_FILE_SIZE" value="2000000" />
 		New file<sup>*</sup>: <input type="file" name="userfile"/><br/>
 		Description: <input type="text" name="newfiledescr"/><br/>
 		<input type=submit name="submitbtn" value="Add / Update Files"/>

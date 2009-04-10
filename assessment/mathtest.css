@@ -37,6 +37,7 @@ div.breadcrumb {
 }
 
 div.question {
+	position: relative;
 	font-family: "Times New Roman", Times, serif;
 	font-size: medium;
 	background-color: #ddf; 
@@ -46,6 +47,7 @@ div.question {
 	padding: 10px;
 }
 div.inactive {
+	position: relative;
 	margin-bottom: 5px;
 	padding: 10px;
 }
