@@ -30,7 +30,7 @@ function calculate(inputId,outputId,format) {
 				err += " invalid entry format";  
 			  }
 		  } else if (format.indexOf('mixednumber')!=-1) {
-			  if (!str.match(/^\s*\-?\s*\d+\s*_\s*\d+\s*\/\s*\d+\s*$/) && !str.match(/^\s*?\-?\d+\s*$/) && !str.match(/^\s*\-?\d+\s*\/\s*\-?\d+\s*$/)) {
+			  if (!str.match(/^\s*\-?\s*\d+\s*(_|\s)\s*\d+\s*\/\s*\d+\s*$/) && !str.match(/^\s*?\-?\d+\s*$/) && !str.match(/^\s*\-?\d+\s*\/\s*\-?\d+\s*$/)) {
 				err += "not a valid mixed number";
 			  }
 			  str = str.replace(/_/,' ');
@@ -39,19 +39,23 @@ function calculate(inputId,outputId,format) {
 			  if (!str.match(/^\-?\d\.?\d*?\*10\^(\-?\d+)$/)) {
 				err += "not valid scientific notation";  
 			  }
-		  }
+		  } 
 		  if (format.indexOf('notrig')!=-1 && str.match(/(sin|cos|tan|cot|sec|csc)/)) {
 			  str = "no trig functions allowed";
 		  } else if (format.indexOf('nodecimal')!=-1 && str.indexOf('.')!=-1) {
 			  str = "no decimals allowed";
 		  } else {
 			  try {
-			    with (Math) var res = eval(mathjs(str));
+				  var evalstr = str;
+				  if (format.indexOf('allowmixed')!=-1 || format.indexOf('mixednumber')!=-1) {
+					  evalstr = evalstr.replace(/(\d+)\s+(\d+\s*\/\s*\d+)/,"($1+$2)");
+				  }
+			          with (Math) var res = eval(mathjs(evalstr));
 			  } catch(e) {
 			    err = "syntax incomplete";
 			  }
 			  if (!isNaN(res) && res!="Infinity") {
-				  if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1 || format.indexOf('scinot')!=-1) {
+				  if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1 || format.indexOf('scinot')!=-1 || format.indexOf('noval')!=-1) {
 					  str = "`"+str+"` " + err;
 				  } else {
 					  str = "`"+str+" =` "+(Math.abs(res)<1e-15?0:res)+err;
@@ -585,6 +589,9 @@ function doonsubmit(form,type2,skipconfirm) {
 			
 			str = str.replace(/,/g,"");
 			str = str.replace(/(\d+)\s*_\s*(\d+\s*\/\s*\d+)/,"($1+$2)");
+			if (calcformat[calctoproc[i]].indexOf('mixednumber')!=-1 || calcformat[calctoproc[i]].indexOf('allowmixed')!=-1) {
+				str = str.replace(/(\d+)\s+(\d+\s*\/\s*\d+)/,"($1+$2)");
+			}
 			if (str.match(/^\s*$/)) {
 				var res = '';
 			} else if (str.match(/oo$/) || str.match(/oo\W/)) {

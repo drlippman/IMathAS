@@ -6,6 +6,7 @@ ul.base {
 }
 
 ul.base ul {
+	margin-left: 20px;
 	border-left: 1px dashed #06f;
 	list-style-type: none;
 	padding-left: 5px;

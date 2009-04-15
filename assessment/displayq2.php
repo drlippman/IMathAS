@@ -2761,18 +2761,22 @@ function checkanswerformat($tocheck,$ansformats) {
 		} 
 	}
 			
-	if (in_array("mixednumber",$ansformats)) {
-		if (!preg_match('/^\s*\-?\s*\d+\s*_\s*(\d+)\s*\/\s*(\d+)\s*$/',$tocheck,$mnmatches) && !preg_match('/^\s*?\-?\d+\s*$/',$tocheck) && !preg_match('/^\s*\-?\d+\s*\/\s*\-?\d+\s*$/',$tocheck)) {
+	if (in_array("mixednumber",$ansformats) || in_array("sloppymixednumber",$ansformats) ) {
+		if (!preg_match('/^\s*\-?\s*\d+\s*(_|\s)\s*(\d+)\s*\/\s*(\d+)\s*$/',$tocheck,$mnmatches) && !preg_match('/^\s*?\-?\d+\s*$/',$tocheck) && !preg_match('/^\s*\-?\d+\s*\/\s*\-?\d+\s*$/',$tocheck)) {
 			return false;
 		} else {
 			if (preg_match('/^\s*\-?\d+\s*\/\s*\-?\d+\s*$/',$tocheck)) {
 				$tmpa = explode("/",$tocheck);
-				if ((gcd(abs($tmpa[0]),abs($tmpa[1]))!=1) || $tmpa[0]>=$tmpa[1]) {
-					return false;
+				if (in_array("mixednumber",$ansformats)) {
+					if ((gcd(abs($tmpa[0]),abs($tmpa[1]))!=1) || $tmpa[0]>=$tmpa[1]) {
+						return false;
+					}
 				}
 			} else	if (!preg_match('/^\s*?\-?\d+\s*$/',$tocheck)) {
-				if ($mnmatches[1]>=$mnmatches[2] || gcd($mnmatches[1],$mnmatches[2])!=1) {
-					return false;
+				if (in_array("mixednumber",$ansformats)) {
+					if ($mnmatches[1]>=$mnmatches[2] || gcd($mnmatches[1],$mnmatches[2])!=1) {
+						return false;
+					}
 				}
 			}
 		}
@@ -2798,7 +2802,7 @@ function formathint($eword,$ansformats,$calledfrom) {
 	} else if (in_array('reducedfraction',$ansformats)) {
 		$tip .= "Enter $eword as a reduced fraction (like 5/3, not 10/6) or as a whole number (like 4 or -2)";
 	} else if (in_array('mixednumber',$ansformats)) {
-		$tip .= "Enter $eword as a reduced mixed number or as a whole number.  Example: 2_1/2 = `2 1/2`";
+		$tip .= "Enter $eword as a reduced mixed number or as a whole number.  Example: 2 1/2 = `2 1/2`, or 2_1/2 = `2 1/2`";
 	} else if (in_array('fracordec',$ansformats)) {
 		$tip .= "Enter $eword as a fraction (like 3/5 or 10/4), a whole number (like 4 or -2), or exact decimal (like 0.5 or 1.25)";
 	} else if (in_array('scinot',$ansformats)) {

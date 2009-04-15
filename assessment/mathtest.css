@@ -7,6 +7,7 @@ a:visited {
 a:hover {
 	text-decoration: underline;
 }
+
 html {
 	height: 100%;
 }
@@ -23,10 +24,12 @@ form {
 	margin: 0px;
 	padding: 0px;
 }
+
 div.main {
 	padding: 0px;
 }
 div.toppad {
+	/*position: relative;*/
 	padding-top: 5px;
 }
 div.breadcrumb {
@@ -37,7 +40,7 @@ div.breadcrumb {
 }
 
 div.question {
-	position: relative;
+	/*position: relative;*/
 	font-family: "Times New Roman", Times, serif;
 	font-size: medium;
 	background-color: #ddf; 
@@ -45,9 +48,10 @@ div.question {
 	margin-top: 0px;
 	margin-bottom: 5px;
 	padding: 10px;
+	width: 99%;
 }
 div.inactive {
-	position: relative;
+	/*position: relative;*/
 	margin-bottom: 5px;
 	padding: 10px;
 }
@@ -60,14 +64,16 @@ div.todoquestion {
 	margin-top: 0px;
 	margin-bottom: 5px;
 	padding: 10px;
+	width: 99%;
 }
 
 div.review {
-	background-color: #e0ffe0;
+	/*background-color: #e0ffe0;*/
 	border: 1px solid #00f;
 	margin-top: -4px;
 	margin-bottom: 20px;
 	padding: 5px;
+	width: 99%;
 }
 
 div.intro {

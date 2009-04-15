@@ -1864,13 +1864,24 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 </p>
 <p><b>Optional Variables</b><BR>
 <dl>
-<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", "notrig", "list", "exactlist", or "orderedlist" (In Common Control)</dt>
-	<dd>Requires the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
-	without decimals (also disallows 10^-2 and 3E-2), or 
-	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
-	If $answerformat includes "list", "exactlist", or "orderedlist", then a list of answers is expected. An $answerformat of "list" ignores then duplicate values.
-	An $answerformat of "exactlist" does not ignore duplicates. If $answerformat="orderedlist", the list must be in the same order and contain identical counts of 
-	values.</dd>
+<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "sloppymixednumber","scinot", "fracordec", "nodecimal", "notrig", "allowmixed", "noval", "list", "exactlist", or "orderedlist" (In Common Control)</dt>
+	<dd>Specifies answer format options.  Some can be combined, like this: $answerformat="nodecimal,notrig".
+	<ul>
+	<li>fraction: requires the answer to be a single fraction (like 10/6, 1/3, or 5)</li>
+	<li>reducedfraction: a reduced fraction (like 5/3 or 5)</li>
+	<li>mixednumber: a reduced mixed number (like 2 1/2 or 2_1/2, or 2/3 or 5)</li>
+	<li>sloppymixednumber: a mixed number (will take 5/2, 2 1/2, even 1 3/2)</li>
+	<li>scinot: scientific notation (like 2.3*10^4)</li>
+	<li>fracordec: a single fraction or decimal value</li>
+	<li>nodecimal: an answer without decimals (also disallows 10^-2 and 3E-2).</li>
+	<li>notrig: an answer without trig functions (sin,cos,tan,sec,csc,cot)</li>
+	<li>allowmixed: will accept mixed numbers (like 2 1/2) as well as other expressions</li>
+	<li>noval: tells the answer preview to not compute a decimal equivalent</li>
+	<li>list:  a list of answers is expected - ignores duplicate values (1,1,2 is equivalent to 1,2)</li>
+	<li>exactlist: a list of answers is expected - does not ignore duplicates</li>
+	<li>orderedlist: a list of answers is expected - order is important, and duplicates are not ignored</li>
+	</ul>
+	</dd>
 <dt>$reltolerance = a decimal value (In Answer)</dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>
