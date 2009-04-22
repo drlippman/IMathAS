@@ -276,6 +276,7 @@ array( 'input'=>'<<', 'tex'=>'langle', 'leftbracket'=>TRUE, 'notexcopy'=>TRUE),
 array( 'input'=>'>>', 'tex'=>'rangle', 'rightbracket'=>TRUE, 'notexcopy'=>TRUE), 
 
 //fonts
+array('input'=>'color', 'binary'=>TRUE),
 array('input'=>'bb', 'tex'=>'mathbf', 'unary'=>TRUE),
 array('input'=>'sf', 'tex'=>'mathsf', 'unary'=>TRUE),
 array('input'=>'bbb', 'tex'=>'mathbb', 'unary'=>TRUE),
@@ -544,6 +545,10 @@ function AMTparseSexpr($str) {
 			return array('{'+$this->AMTgetTeXsymbol($symbol).'}', $str);
 		}
 		$result2[0] = $this->AMTremoveBrackets($result2[0]);
+		if ($symbol['input']=='color') {
+			$result[0] = str_replace(array('}','{'),'',$result[0]);
+			$newFrag = '{\\color{'.$result[0].'}'.$result2[0].'}}';
+		}
 		if ($symbol['input']=='root' || $symbol['input']=='stackrel') {
 			if ($symbol['input']=='root') {
 				$newFrag = '{\\sqrt['.$result[0].']{'.$result2[0].'}}';

@@ -322,7 +322,7 @@ AMsqrt, AMroot, AMfrac, AMdiv, AMover, AMsub, AMsup,
 {input:"ul", tag:"munder", output:"\u0332", tex:"underline", ttype:UNARY, acc:true},
 AMtext, AMmbox, AMquote,
 //{input:"var", tag:"mstyle", atname:"fontstyle", atval:"italic", output:"var", tex:null, ttype:UNARY},
-
+{input:"color", tag:"mstyle", ttype:BINARY},
 {input:"bb", tag:"mstyle", atname:"fontweight", atval:"bold", output:"bb", tex:null, ttype:UNARY},
 {input:"mathbf", tag:"mstyle", atname:"fontweight", atval:"bold", output:"mathbf", tex:null, ttype:UNARY},
 {input:"sf", tag:"mstyle", atname:"fontfamily", atval:"sans-serif", output:"sf", tex:null, ttype:UNARY},
@@ -600,6 +600,15 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
     if (result2[0]==null) return [AMcreateMmlNode("mo",
                            document.createTextNode(symbol.input)),str];
     AMremoveBrackets(result2[0]);
+    if (symbol.input=="color") {
+	if (str.charAt(0)=="{") i=str.indexOf("}");
+        else if (str.charAt(0)=="(") i=str.indexOf(")");
+        else if (str.charAt(0)=="[") i=str.indexOf("]");
+	st = str.slice(1,i);
+	node = AMcreateMmlNode(symbol.tag,result2[0]);
+	node.setAttribute("color",st);
+	return [node,result2[1]];
+    }
     if (symbol.input=="root" || symbol.input=="stackrel") 
       newFrag.appendChild(result2[0]);
     newFrag.appendChild(result[0]);

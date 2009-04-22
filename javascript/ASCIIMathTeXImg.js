@@ -269,7 +269,7 @@ AMsqrt, AMroot, AMfrac, AMdiv, AMover, AMsub, AMsup,
 {input:"ul", tag:"munder", output:"\u0332", tex:"underline", ttype:UNARY, acc:true},
 AMtext, AMmbox, AMquote,
 //{input:"var", tag:"mstyle", atname:"fontstyle", atval:"italic", output:"var", tex:null, ttype:UNARY},
-
+{input:"color", tag:"mstyle", ttype:BINARY},
 {input:"bb", tag:"mstyle", atname:"fontweight", atval:"bold", output:"bb", tex:"mathbf", ttype:UNARY, notexcopy:true},
 {input:"mathbf", tag:"mstyle", atname:"fontweight", atval:"bold", output:"mathbf", tex:null, ttype:UNARY},
 {input:"sf", tag:"mstyle", atname:"fontfamily", atval:"sans-serif", output:"sf", tex:"mathsf", ttype:UNARY, notexcopy:true},
@@ -528,6 +528,9 @@ function AMTparseSexpr(str) { //parses str and returns [node,tailstr]
     var result2 = AMTparseSexpr(result[1]);
     if (result2[0]==null) return ['{'+AMTgetTeXsymbol(symbol)+'}',str];
     result2[0] = AMTremoveBrackets(result2[0]);
+    if (symbol.input=="color") {
+    	newFrag = '{\\color{'+result[0].replace(/[\{\}]/g,'')+'}'+result2[0]+'}}';    
+    }
     if (symbol.input=="root" || symbol.input=="stackrel") {
 	    if (symbol.input=="root") {
 		    newFrag = '{\\sqrt['+result[0]+']{'+result2[0]+'}}';

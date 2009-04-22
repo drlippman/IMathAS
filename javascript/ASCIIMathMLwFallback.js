@@ -344,6 +344,7 @@ AMsqrt, AMroot, AMfrac, AMdiv, AMover, AMsub, AMsup,
 {input:"ddot", tag:"mover", output:"..",    tex:null, ttype:UNARY, acc:true},
 {input:"ul", tag:"munder", output:"\u0332", tex:"underline", ttype:UNARY, acc:true},
 AMtext, AMmbox, AMquote,
+{input:"color", tag:"mstyle", ttype:BINARY},
 {input:"bb", tag:"mstyle", atname:"fontweight", atval:"bold", output:"bb", tex:"mathbf", ttype:UNARY, notexcopy:true},
 {input:"mathbf", tag:"mstyle", atname:"fontweight", atval:"bold", output:"mathbf", tex:null, ttype:UNARY},
 {input:"sf", tag:"mstyle", atname:"fontfamily", atval:"sans-serif", output:"sf", tex:"mathsf", ttype:UNARY, notexcopy:true},
@@ -631,6 +632,9 @@ function AMTparseSexpr(str) { //parses str and returns [node,tailstr]
     var result2 = AMTparseSexpr(result[1]);
     if (result2[0]==null) return ['{'+AMTgetTeXsymbol(symbol)+'}',str];
     result2[0] = AMTremoveBrackets(result2[0]);
+    if (symbol.input=="color") {
+    	newFrag = '{\\color{'+result[0].replace(/[\{\}]/g,'')+'}'+result2[0]+'}}';    
+    }
     if (symbol.input=="root" || symbol.input=="stackrel") {
 	    if (symbol.input=="root") {
 		    newFrag = '{\\sqrt['+result[0]+']{'+result2[0]+'}}';
@@ -955,6 +959,15 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
     if (result2[0]==null) return [AMcreateMmlNode("mo",
                            document.createTextNode(symbol.input)),str];
     AMremoveBrackets(result2[0]);
+    if (symbol.input=="color") {
+	if (str.charAt(0)=="{") i=str.indexOf("}");
+        else if (str.charAt(0)=="(") i=str.indexOf(")");
+        else if (str.charAt(0)=="[") i=str.indexOf("]");
+	st = str.slice(1,i);
+	node = AMcreateMmlNode(symbol.tag,result2[0]);
+	node.setAttribute("color",st);
+	return [node,result2[1]];
+    }
     if (symbol.input=="root" || symbol.input=="stackrel") 
       newFrag.appendChild(result2[0]);
     newFrag.appendChild(result[0]);
