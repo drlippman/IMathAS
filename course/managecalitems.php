@@ -36,8 +36,8 @@ if (isset($_POST['submit'])) {
 	if (trim($_POST['txtnew'])!='') {
 		$date = $_POST['datenew'];
 		preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/',$date,$dmatches);
-		$date = mktime(12,0,0,$dmatches[1],$dmatches[2],$dmatches[3]);
-		$query = "INSERT INTO imas_calitems (courseid,date,tag,title) VALUES ('$cid','$date','{$_POST['tagnew']}','{$_POST['txtnew']}')";
+		$datenew = mktime(12,0,0,$dmatches[1],$dmatches[2],$dmatches[3]);
+		$query = "INSERT INTO imas_calitems (courseid,date,tag,title) VALUES ('$cid','$datenew','{$_POST['tagnew']}','{$_POST['txtnew']}')";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 	}
 	if ($_POST['submit']=='Save') {
@@ -84,6 +84,8 @@ echo '<tr>';
 echo '<td></td>';
 if (isset($_GET['addto'])) {
 	$date = tzdate("m/d/Y",$_GET['addto']); 
+} else if (isset($datenew)) {
+	$date = tzdate("m/d/Y",$datenew);
 } else if (!isset($date)) {
 	$date = tzdate("m/d/Y",$now);
 }

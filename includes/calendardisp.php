@@ -129,7 +129,7 @@ while ($row = mysql_fetch_row($result)) {
 		continue;
 	}
 	//echo "{$row[1]}, {$row[3]}, $uppertime, {$row[4]}<br/>";
-	if (($row[2]>$now && !isset($teacherid)) || ($now>$row[3] && $row[4]==0) || ($row[4]>0 && $now>$row[4])) {
+	if (($row[2]>$now && !isset($teacherid))  || ($row[4]>0 && $now>$row[4] && !isset($teacherid))) {  //|| ($now>$row[3] && $row[4]==0)
 		continue;
 	}
 	
@@ -145,7 +145,7 @@ while ($row = mysql_fetch_row($result)) {
 			   }
 		   }
 	}
-	if ($now<$row[3]) {
+	if ($row[3]<$uppertime && $row[3]>$exlowertime && ($now<$row[3] || isset($teacherid))) {
 		if (isset($gbcats[$row[5]])) {
 			$tag = $gbcats[$row[5]];
 		} else {
@@ -161,15 +161,16 @@ while ($row = mysql_fetch_row($result)) {
 		$row[1] = str_replace('"','\"',$row[1]);
 		$colors[$k] = makecolor2($row[2],$row[3],$now);
 		$assess[$moday][$k] = "{type:\"A\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors[$k]."\", allowlate:\"$lp\", tag:\"$tag\"".(($row[8]>0)?", timelimit:true":"").((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
-	} else if ($row[4]<2000000000) { //in review
+	} 
+	if ($row[4]<$uppertime && $row[4]>0) { //has review
 		list($moday,$time) = explode('~',date('n-j~g:i a',$row[4]));
 		$row[1] = str_replace('"','\"',$row[1]);
 		$assess[$moday][$k] = "{type:\"AR\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\"".((isset($teacherid))?", editlink:true":"")."}";
-	}
+	} 
 	$k++;
 }
 if (isset($teacherid)) {
-	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag FROM imas_inlinetext WHERE ((oncal=2 AND enddate>$lowertime AND enddate<$uppertime) OR (oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND avail=1 AND courseid='$cid'";
+	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag FROM imas_inlinetext WHERE ((oncal=2 AND enddate>$exlowertime AND enddate<$uppertime) OR (oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND avail=1 AND courseid='$cid'";
 } else {
 	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag FROM imas_inlinetext WHERE ((oncal=2 AND enddate>$lowertime AND enddate<$uppertime AND startdate<$now) OR (oncal=1 AND startdate<$now AND startdate>$exlowertime)) AND avail=1 AND courseid='$cid'";
 }
@@ -191,7 +192,7 @@ while ($row = mysql_fetch_row($result)) {
 }
 //$query = "SELECT id,title,enddate,text,startdate,oncal,caltag FROM imas_linkedtext WHERE ((oncal=2 AND enddate>$lowertime AND enddate<$uppertime AND startdate<$now) OR (oncal=1 AND startdate<$now AND startdate>$exlowertime)) AND avail=1 AND courseid='$cid'";
 if (isset($teacherid)) {
-	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag FROM imas_linkedtext WHERE ((oncal=2 AND enddate>$lowertime AND enddate<$uppertime) OR (oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND avail=1 AND courseid='$cid'";
+	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag FROM imas_linkedtext WHERE ((oncal=2 AND enddate>$exlowertime AND enddate<$uppertime) OR (oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND avail=1 AND courseid='$cid'";
 } else {
 	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag FROM imas_linkedtext WHERE ((oncal=2 AND enddate>$lowertime AND enddate<$uppertime AND startdate<$now) OR (oncal=1 AND startdate<$now AND startdate>$exlowertime)) AND avail=1 AND courseid='$cid'";
 }
@@ -216,20 +217,20 @@ while ($row = mysql_fetch_row($result)) {
 	$tags[$k] = $row[6];
 	$k++;
 }
-$query = "SELECT id,name,postby,replyby,startdate FROM imas_forums WHERE enddate>$lowertime AND ((postby>$now AND postby<$uppertime) OR (replyby>$now AND replyby<$uppertime)) AND avail>0 AND courseid='$cid'";
+$query = "SELECT id,name,postby,replyby,startdate FROM imas_forums WHERE enddate>$lowertime AND ((postby>$exlowertime AND postby<$uppertime) OR (replyby>$exlowertime AND replyby<$uppertime)) AND avail>0 AND courseid='$cid'";
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 while ($row = mysql_fetch_row($result)) {
 	if (($row[4]>$now && !isset($teacherid))) {
 		continue;
 	}
-	if ($row[2]>$now && $row[2]!=2000000000) {
+	if (($row[2]>$now || isset($teacherid)) && $row[2]!=2000000000) {
 		list($moday,$time) = explode('~',date('n-j~g:i a',$row[2]));
 		$row[1] = str_replace('"','\"',$row[1]);
 		$colors[$k] = makecolor2($row[4],$row[2],$now);
 		$assess[$moday][$k] = "{type:\"FP\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors[$k]."\"".((isset($teacherid))?", editlink:true":"")."}";
 		$k++;
 	}
-	if ($row[3]>$now && $row[3]!=2000000000) {
+	if (($row[3]>$now || isset($teacherid)) && $row[3]!=2000000000) {
 		list($moday,$time) = explode('~',date('n-j~g:i a',$row[3]));
 		$colors[$k] = makecolor2($row[4],$row[3],$now);
 		$assess[$moday][$k] = "{type:\"FR\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors[$k]."\"".((isset($teacherid))?", editlink:true":"")."}";

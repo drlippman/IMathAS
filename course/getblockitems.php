@@ -38,7 +38,7 @@
     //get exceptions
    $now = time() + $previewshift;
    $exceptions = array();
-   if (!isset($teacherid)) {
+   if (!isset($teacherid) && !isset($tutorid)) {
 	   $query = "SELECT items.id,ex.startdate,ex.enddate FROM ";
 	   $query .= "imas_exceptions AS ex,imas_items as items,imas_assessments as i_a WHERE ex.userid='$userid' AND ";
 	   $query .= "ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment') ";
@@ -60,7 +60,7 @@
 	   $backtrack = array();
 	   for ($i=1;$i<count($blocktree);$i++) {
 		$backtrack[] = array($items[$blocktree[$i]-1]['name'],implode('-',array_slice($blocktree,0,$i+1)));
-		if (!isset($teacherid) && $items[$blocktree[$i]-1]['avail']<2 && $items[$blocktree[$i]-1]['SH'][0]!='S' &&($now<$items[$blocktree[$i]-1]['startdate'] || $now>$items[$blocktree[$i]-1]['enddate'] || $items[$blocktree[$i]-1]['avail']=='0')) {
+		if (!isset($teacherid) && !isset($tutorid) && $items[$blocktree[$i]-1]['avail']<2 && $items[$blocktree[$i]-1]['SH'][0]!='S' &&($now<$items[$blocktree[$i]-1]['startdate'] || $now>$items[$blocktree[$i]-1]['enddate'] || $items[$blocktree[$i]-1]['avail']=='0')) {
 			$_GET['folder'] = 0;
 			$items = unserialize($line['itemorder']);
 			unset($backtrack);
@@ -83,7 +83,7 @@
    
   
    //get latepasses
-   if (!isset($teacherid) && $previewshift==-1) {
+   if (!isset($teacherid) && !isset($tutorid) && $previewshift==-1) {
 	   $query = "SELECT latepass FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
 	   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	   $latepasses = mysql_result($result,0,0);
