@@ -1008,6 +1008,16 @@ function mathjs(st,varlist) {
       k++;
       while (k<st.length && (ch=st.charAt(k))>="a" && ch<="z" ||
                ch>="A" && ch<="Z") k++;
+      if (ch=='(' && st.slice(i+1,k).match(/^(sin|cos|tan|sec|csc|cot|logten|log|ln|exp|arcsin|arccos|arctan|arcsec|arccsc|arccot|sinh|cosh|tanh|sech|csch|coth|arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|sqrt|abs|nthroot)$/)) {
+	      nested = 1;
+	      k++;
+	      while (k<st.length && nested>0) {
+		ch = st.charAt(k);
+		if (ch=="(") nested++;
+		else if (ch==")") nested--;
+		k++;
+	      }
+      }
     } else { 
       return "Error: incorrect syntax in "+st+" at position "+k;
     }

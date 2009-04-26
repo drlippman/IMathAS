@@ -198,9 +198,9 @@
 			echo "<html><body>\nError: Guests can't enroll in courses</body></html";
 			exit;
 		}
-		if ($_POST['cid']=="" || $_POST['ekey']=="" || !is_numeric($_POST['cid'])) {
+		if ($_POST['cid']=="" || !is_numeric($_POST['cid'])) {
 			echo "<html><body>\n";
-			echo "Please include both Course ID and Enrollment Key.  <a href=\"index.php\">Try Again</a>\n";
+			echo "Please include Course ID.  <a href=\"index.php\">Try Again</a>\n";
 			echo "</html></body>\n";
 			exit;
 		}
@@ -210,6 +210,11 @@
 		if ($line == null) {
 			echo "<html><body>\n";
 			echo "Course not found.  <a href=\"index.php\">Try Again</a>\n";
+			echo "</html></body>\n";
+			exit;
+		} else if ($_POST['ekey']=="" && $line['enrollkey'] != '') {
+			echo "<html><body>\n";
+			echo "Please include Enrollment Key.  <a href=\"index.php\">Try Again</a>\n";
 			echo "</html></body>\n";
 			exit;
 		} else if ($line['enrollkey'] != $_POST['ekey']) {

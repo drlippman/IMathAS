@@ -144,6 +144,16 @@ function mathphp($st,$varlist,$skipfactorial=false,$ignorestrings=true) {
       $k++;
       while ($k<strlen($st) && (($ch=substr($st,$k,1))>="a" && $ch<="z" ||
                $ch>="A" && $ch<="Z") || $ch=='$') $k++;
+	       if ($ch=='(' && preg_match('/^(sin|cos|tan|sec|csc|cot|sinh|cosh|tanh|sech|csch|coth|ln|log|exp|asin|acos|atan|asinh|acosh|atanh|sqrt|abs)$/',substr($st,$i+1,($k-$i-1)))) {
+		       $nested = 1;
+		       $k++;
+		      while ($k<strlen($st) && $nested>0) {
+			$ch = substr($st,$k,1);
+			if ($ch=="(") $nested++;
+			else if ($ch==")") $nested--;
+			$k++;
+		      }
+	       }
     } else { 
       return "Error: incorrect syntax in ".$st." at position "+$k;
     }
