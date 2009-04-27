@@ -80,7 +80,7 @@ function mathjs(st,varlist) {
   //parenthesizes the function variables
   st = st.replace("[","(");
   st = st.replace("]",")");
-  st = st.replace(/arc(sin|cos|tan)/g,"arc $1");
+  st = st.replace(/arc(sin|cos|tan)/g,"a#r#c $1");
   if (varlist != null) {
 	  var reg = new RegExp("(sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs)[\(]","g");
 	  st = st.replace(reg,"$1#(");
@@ -90,8 +90,8 @@ function mathjs(st,varlist) {
 	  st = st.replace(reg,"($1)$2");
 	  var reg = new RegExp("("+varlist+")("+varlist+")([^a-df-zA-Z#])","g"); //rem \(
 	  st = st.replace(reg,"($1)($2)$3"); //get xy3
-	  var reg = new RegExp("("+varlist+")("+varlist+")(\w*[^\(#])","g");
-	  st = st.replace(reg,"($1)($2)$3"); //get xysin
+	 // var reg = new RegExp("("+varlist+")("+varlist+")(\w*[^\(#])","g");
+	  //st = st.replace(reg,"($1)($2)$3"); //get xysin
 	  var reg = new RegExp("([^a-df-zA-Z])("+varlist+")([^a-df-zA-Z])","g");
 	  st = st.replace(reg,"$1($2)$3");	  
 	  var reg = new RegExp("^("+varlist+")([^a-df-zA-Z])","g");
@@ -100,7 +100,7 @@ function mathjs(st,varlist) {
 	  st = st.replace(reg,"$1($2)");
   }
   st = st.replace(/#/g,"");
-  st = st.replace(/arc\s+(sin|cos|tan)/g,"arc$1");
+  st = st.replace(/a#r#c\s+(sin|cos|tan)/g,"arc$1");
   st = st.replace(/\s/g,"");
   st = st.replace(/(Sin|Cos|Tan|Sec|Csc|Cot|Arc|Abs|Log|Ln)/g, matchtolower);
   st = st.replace(/log_(\d+)\(/,"nthlog($1,");

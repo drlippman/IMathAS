@@ -769,7 +769,7 @@ if ($overwriteBody==1) {
 		Mine only</span> 
 		<span onmouseover="tipshow(this,'Exclude questions already in assessment')" onmouseout="tipout()">
 		<input type=checkbox name="newonly" value="1" <?php writeHtmlChecked($newonly,1,0) ?> />
-		Excluded added</span> 
+		Exclude added</span> 
 		<input type=submit value=Search>
 		<input type=button value="Add New Question" onclick="window.location='moddataset.php?aid=<?php echo $aid ?>&cid=<?php echo $cid ?>'">
 	</form>
