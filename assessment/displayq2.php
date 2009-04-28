@@ -2760,9 +2760,10 @@ function checkanswerformat($tocheck,$ansformats) {
 			return false;
 		} 
 	}
-			
+	
 	if (in_array("mixednumber",$ansformats) || in_array("sloppymixednumber",$ansformats) ) {
 		if (!preg_match('/^\s*\-?\s*\d+\s*(_|\s)\s*(\d+)\s*\/\s*(\d+)\s*$/',$tocheck,$mnmatches) && !preg_match('/^\s*?\-?\d+\s*$/',$tocheck) && !preg_match('/^\s*\-?\d+\s*\/\s*\-?\d+\s*$/',$tocheck)) {
+			//if doesn't match any format, exit
 			return false;
 		} else {
 			if (preg_match('/^\s*\-?\d+\s*\/\s*\-?\d+\s*$/',$tocheck)) {
@@ -2774,13 +2775,14 @@ function checkanswerformat($tocheck,$ansformats) {
 				}
 			} else	if (!preg_match('/^\s*?\-?\d+\s*$/',$tocheck)) {
 				if (in_array("mixednumber",$ansformats)) {
-					if ($mnmatches[1]>=$mnmatches[2] || gcd($mnmatches[1],$mnmatches[2])!=1) {
+					if ($mnmatches[2]>=$mnmatches[3] || gcd($mnmatches[2],$mnmatches[3])!=1) {
 						return false;
 					}
 				}
 			}
 		}
 	}
+	
 	if (in_array("nodecimal",$ansformats)) {
 		if (strpos($tocheck,'.')!==false) {
 			return false;
