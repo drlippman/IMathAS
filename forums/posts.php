@@ -211,9 +211,13 @@
 	$bcnt = 0;
 	$icnt = 0;
 	function printchildren($base) {
+		$curdir = rtrim(dirname(__FILE__), '/\\');
 		global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points,$posttype,$lastview,$bcnt,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$view,$page,$allowmsg,$haspoints;
 		foreach($children[$base] as $child) {
 			echo "<div class=block> ";
+			if (file_exists("$curdir/../course/files/userimg_sm{$ownerid[$child]}.jpg")) {
+				echo "<img src=\"$imasroot/course/files/userimg_sm{$ownerid[$child]}.jpg\" class=\"pic\" />";
+			}
 			if ($view==2) {
 				echo "<span class=right>";
 				if ($haspoints) {

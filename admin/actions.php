@@ -56,6 +56,9 @@ switch($_GET['action']) {
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$query = "UPDATE imas_msgs SET isread=isread+4 WHERE msgfrom='{$_GET['id']}' AND isread<2";
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		//todo: delete user picture files
+		//todo: delete user file uploads 
+		//todo: delete courses if any
 		break;
 	case "chgpwd":
 		$query = "SELECT password FROM imas_users WHERE id = '$userid'";

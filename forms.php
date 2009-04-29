@@ -42,7 +42,8 @@ switch($_GET['action']) {
 		echo "<span class=form><label for=\"msgnot\">Notify me by email when I receive a new message:</label></span><span class=formright><input type=checkbox id=msgnot name=msgnot ";
 		if ($line['msgnotify']==1) {echo "checked=1";}
 		echo " /></span><BR class=form>\n";
-		/*echo "<span class=form><label for=\"stupic\">Picture</label</span>";
+		
+		echo "<span class=form><label for=\"stupic\">Picture:</label></span>";
 		echo "<span class=\"formright\">";
 		$curdir = rtrim(dirname(__FILE__), '/\\');
 		$galleryPath = "$curdir/course/files/";
@@ -51,8 +52,8 @@ switch($_GET['action']) {
 		} else {
 			echo "No Pic ";
 		}
-		echo '<input type="file" name="stupic"/></span><br class="form" />';
-		*/
+		echo '<br/><input type="file" name="stupic"/></span><br class="form" />';
+		
 		if ($myrights>19) {
 			echo "<span class=form><label for=\"qrd\">Make new questions private by default?<br/>(recommended for new users):</label></span><span class=formright><input type=checkbox id=qrd name=qrd ";
 			if ($line['qrightsdef']==0) {echo "checked=1";}

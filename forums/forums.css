@@ -29,3 +29,7 @@ table.forum tr.tagged {
 img.pointer {
 	cursor: pointer;
 }
+img.pic {
+	float: left;
+	padding-right: 5px;
+}

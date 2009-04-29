@@ -309,6 +309,7 @@
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		if (is_uploaded_file($_FILES['stupic']['tmp_name'])) {
 			processImage($_FILES['stupic'],$userid,100,100);
+			processImage($_FILES['stupic'],'sm'.$userid,40,40);
 		}
 	} else if ($_GET['action']=="googlegadget") {
 		if (isset($_GET['clear'])) {
