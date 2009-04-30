@@ -337,6 +337,13 @@ function processImage( $image, $imageId, $thumbWidth, $thumbHeight )
         return FALSE;
     }
     $type = str_replace( 'image/', '', $type );
+    if ($type=='pjpeg') { //stupid IE6
+	    $type = 'jpeg';
+    }
+    if ($type!='jpeg' && $type!='png' && $type!='gif') {
+	    //invalid image type
+	    return FALSE;
+    }
     $createFunc = 'imagecreatefrom' . $type;
    
     $im = $createFunc( $image[ 'tmp_name' ] ); 
@@ -347,10 +354,11 @@ function processImage( $image, $imageId, $thumbWidth, $thumbHeight )
     // create thumbnail
     $tw = $thumbWidth;
     $th = $thumbHeight;
-    $imT = imagecreatetruecolor( $tw, $th );
+    
    
     if ( $w/$h > $tw/$th )
     { // wider
+	$imT = imagecreatetruecolor( $tw, $th );
         $tmpw = $w*($th/$h);
         $temp = imagecreatetruecolor( $tmpw, $th );
         imagecopyresampled( $temp, $im, 0, 0, 0, 0, $tmpw, $th, $w, $h ); // resize to width
@@ -358,11 +366,18 @@ function processImage( $image, $imageId, $thumbWidth, $thumbHeight )
         imagedestroy( $temp );
     }else
     { // taller
-        $tmph = $h*($tw/$w );
+        /* crops
+	$imT = imagecreatetruecolor( $tw, $th );
+	$tmph = $h*($tw/$w );
         $temp = imagecreatetruecolor( $tw, $tmph );
         imagecopyresampled( $temp, $im, 0, 0, 0, 0, $tw, $tmph, $w, $h ); // resize to height
         imagecopyresampled( $imT, $temp, 0, 0, 0, $tmph/2-$th/2, $tw, $th, $tw, $th ); // crop
-        imagedestroy( $temp );
+	imagedestroy( $temp );
+	*/
+	//nocrop version
+	$tmpw = $w*($th/$h);
+	$imT = imagecreatetruecolor( $tmpw, $th );
+	imagecopyresampled( $imT, $im, 0, 0, 0, 0, $tmpw, $th, $w, $h ); // resize to width
     }
    
     // save the image
