@@ -100,47 +100,62 @@
 	echo "<h2>Grading a Question in $aname</h2>";
 	echo "<p><b>Warning</b>: This page may not work correctly if the question selected is part of a group of questions</p>";
 	echo "<p>Note: Feedback is for whole assessment, not the individual question.</p>";
-	
-	echo '<script type="text/javascript">';
-	echo 'function hidecorrect() {';
-	echo '   var butn = document.getElementById("hctoggle");';
-	echo '   if (butn.value=="Hide Perfect Score Questions") {';
-	echo '      butn.value = "Show Perfect Score Questions";';
-	echo '      var setdispto = "block";';
-	echo '   } else { ';
-	echo '      butn.value = "Hide Perfect Score Questions";';
-	echo '      var setdispto = "none";';
-	echo '   }';
-	echo '   var divs = document.getElementsByTagName("div");';
-	echo '   for (var i=0;i<divs.length;i++) {';
-	echo '     if (divs[i].className=="iscorrect") { ';
-	echo '         if (divs[i].style.display=="none") {';
-	echo '               divs[i].style.display = "block";';
-	echo '         } else { divs[i].style.display = "none"; }';
-	echo '     }';
-	echo '    }';
-	echo '}';
-	echo 'function hideNA() {';
-	echo '   var butn = document.getElementById("hnatoggle");';
-	echo '   if (butn.value=="Hide Not Answered Questions") {';
-	echo '      butn.value = "Show Not Answered Questions";';
-	echo '      var setdispto = "block";';
-	echo '   } else { ';
-	echo '      butn.value = "Hide Not Answered Questions";';
-	echo '      var setdispto = "none";';
-	echo '   }';
-	echo '   var divs = document.getElementsByTagName("div");';
-	echo '   for (var i=0;i<divs.length;i++) {';
-	echo '     if (divs[i].className=="notanswered") { ';
-	echo '         if (divs[i].style.display=="none") {';
-	echo '               divs[i].style.display = "block";';
-	echo '         } else { divs[i].style.display = "none"; }';
-	echo '     }';
-	echo '    }';
-	echo '}';
-	echo '</script>';
+?>
+	<script type="text/javascript">
+	function hidecorrect() {
+	   var butn = document.getElementById("hctoggle");
+	   if (butn.value=="Hide Perfect Score Questions") {
+	      butn.value = "Show Perfect Score Questions";
+	      var setdispto = "block";
+	   } else { 
+	      butn.value = "Hide Perfect Score Questions";
+	      var setdispto = "none";
+	   }
+	   var divs = document.getElementsByTagName("div");
+	   for (var i=0;i<divs.length;i++) {
+	     if (divs[i].className=="iscorrect") { 
+	         if (divs[i].style.display=="none") {
+	               divs[i].style.display = "block";
+	         } else { divs[i].style.display = "none"; }
+	     }
+	    }
+	}
+	function hideNA() {
+	   var butn = document.getElementById("hnatoggle");
+	   if (butn.value=="Hide Not Answered Questions") {
+	      butn.value = "Show Not Answered Questions";
+	      var setdispto = "block";
+	   } else { 
+	      butn.value = "Hide Not Answered Questions";
+	      var setdispto = "none";
+	   }
+	   var divs = document.getElementsByTagName("div");
+	   for (var i=0;i<divs.length;i++) {
+	     if (divs[i].className=="notanswered") { 
+	         if (divs[i].style.display=="none") {
+	               divs[i].style.display = "block";
+	         } else { divs[i].style.display = "none"; }
+	     }
+	    }
+	}
+	function preprint() {
+		var els = document.getElementsByTagName("input");
+		for (var i=0; i<els.length; i++) {
+			if (els[i].type=='button' && els[i].value=='Preview') {
+				els[i].click();
+			} else if (els[i].type=='button' && els[i].value=='Show Answer') {
+				els[i].click();
+				els[i].parentNode.insertBefore(document.createTextNode('Answer: '),els[i]);
+				els[i].style.display = 'none';
+			}
+		}
+		document.getElementById("preprint").style.display = "none";
+	}
+	</script>
+<?php
 	echo '<input type=button id="hctoggle" value="Hide Perfect Score Questions" onclick="hidecorrect()" />';
 	echo ' <input type=button id="hnatoggle" value="Hide Not Answered Questions" onclick="hideNA()" />';
+	echo ' <input type="button" id="preprint" value="Prepare for Printing (Slow)" onclick="preprint()" />';
 	echo "<form id=\"mainform\" method=post action=\"gradeallq.php?stu=$stu&gbmode=$gbmode&cid=$cid&aid=$aid&qid=$qid&update=true\">\n";
 	echo "<p>";
 	if ($ver=='graded') {
@@ -252,7 +267,7 @@
 							$url = getasidfileurl($s3asid,$match[1]);
 							echo "<a href=\"$url\" target=\"_new\">{$match[1]}</a>";
 						} else {
-							echo str_replace('&','; ',strip_tags($laarr[$k]));
+							echo str_replace(array('&','%nbsp;'),array('; ','&nbsp;'),strip_tags($laarr[$k]));
 						}
 						$cntb++;
 					}

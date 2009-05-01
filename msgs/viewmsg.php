@@ -62,7 +62,7 @@
 	$senddate = tzdate("F j, Y, g:i a",$line['senddate']);
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	if (file_exists("$curdir/../course/files/userimg_sm{$line['msgfrom']}.jpg")) {
-		echo "<img src=\"$imasroot/course/files/userimg_sm{$line['msgfrom']}.jpg\" style=\"float:left;\" />";
+		echo "<img src=\"$imasroot/course/files/userimg_sm{$line['msgfrom']}.jpg\" style=\"float:left;\" onclick=\"togglepic(this)\" />";
 	}
 	echo "<table class=gb ><tbody>";
 	echo "<tr><td><b>From:</b></td><td>{$line['LastName']}, {$line['FirstName']}";

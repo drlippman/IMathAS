@@ -291,6 +291,7 @@ $placeinhead .= "}\n";
 $placeinhead .= "</script>";
 
 require("../header.php");
+$curdir = rtrim(dirname(__FILE__), '/\\');
 }
 /**** post-html data manipulation ******/
 // this page has no post-html data manipulation
@@ -425,6 +426,31 @@ if ($overwriteBody==1) {
 	   } catch(er) {}
 	  }
 	}
+	var picsize = 0;
+	function rotatepics() {
+		picsize = (picsize+1)%3;
+		picshow(picsize);
+	}
+	function picshow(size) {
+		if (size==0) {
+			els = document.getElementById("myTable").getElementsByTagName("img");
+			for (var i=0; i<els.length; i++) {
+				els[i].style.display = "none";
+			}
+		} else {
+			els = document.getElementById("myTable").getElementsByTagName("img");
+			for (var i=0; i<els.length; i++) {
+				els[i].style.display = "inline";
+				if (els[i].getAttribute("src").match("userimg_sm")) {
+					if (size==2) {
+						els[i].setAttribute("src",els[i].getAttribute("src").replace("_sm","_"));
+					}
+				} else if (size==1) {
+					els[i].setAttribute("src",els[i].getAttribute("src").replace("_","_sm"));
+				}
+			}
+		}
+	}
 	</script>
 	<script type="text/javascript" src="<?php echo $imasroot ?>/javascript/tablesorter.js"></script>
 	<form method=post action="listusers.php?cid=<?php echo $cid ?>">
@@ -435,10 +461,12 @@ if ($overwriteBody==1) {
 		<input type=submit name=submit value="Message"> 
 		<input type=submit name=submit value="Unenroll"> 
 		<input type=submit name=submit value="Make Exception">
+		<input type="button" value="Pictures" onclick="rotatepics()" />
 		
 	<table class=gb id=myTable>
 		<thead>
 		<tr>
+			<th></th>
 			<th></th>
 			<?php echo $hasSectionRowHeader; ?>
 			<?php echo $hasCodeRowHeader; ?>
@@ -469,6 +497,14 @@ if ($overwriteBody==1) {
 			if ($alt==0) {echo "			<tr class=even>"; $alt=1;} else {echo "			<tr class=odd>"; $alt=0;}
 ?>			
 				<td><input type=checkbox name="checked[]" value="<?php echo $line['userid'] ?>"></td>
+				<td>
+<?php
+	
+	if (file_exists("$curdir//files/userimg_sm{$line['userid']}.jpg")) {
+		echo "<img src=\"$imasroot/course/files/userimg_sm{$line['userid']}.jpg\" style=\"display:none;\"  />";
+	}
+?>
+				</td>
 				<?php echo $hasSectionData; ?>
 				<?php echo $hasCodeData; ?>
 				<td><?php echo $line['LastName'] ?></td>
@@ -491,7 +527,7 @@ if ($overwriteBody==1) {
 		echo "Number of students: $numstu<br/>";
 ?>
 		<script type="text/javascript">
-			initSortTable('myTable',Array(false,<?php echo $hasSectionSortTable ?><?php echo $hasCodeSortTable ?>'S','S','S','S','D',false,false,false),true);
+			initSortTable('myTable',Array(false,false,<?php echo $hasSectionSortTable ?><?php echo $hasCodeSortTable ?>'S','S','S','S','D',false,false,false),true);
 		</script>
 	</form>
 		

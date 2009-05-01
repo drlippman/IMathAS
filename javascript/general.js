@@ -95,3 +95,10 @@ function findPos(obj) { //from quirksmode.org
 	}
 	return [curleft,curtop];
 }
+function togglepic(el) {
+	if (el.getAttribute("src").match("userimg_sm")) {
+		el.setAttribute("src",el.getAttribute("src").replace("_sm","_"));
+	} else {
+		el.setAttribute("src",el.getAttribute("src").replace("_","_sm"));
+	}
+}

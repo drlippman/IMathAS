@@ -617,7 +617,7 @@
 								$url = getasidfileurl($s3asid,$match[1]);
 								echo "<a href=\"$url\" target=\"_new\">{$match[1]}</a>";
 							} else {
-								echo str_replace('&','; ',strip_tags($laarr[$k]));
+								echo str_replace(array('&','%nbsp;'),array('; ','&nbsp;'),strip_tags($laarr[$k]));
 							}
 							$cnt++;
 						}

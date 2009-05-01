@@ -23,6 +23,17 @@
 	//-1 new posts from forum page
 	//-2 tagged posts from forum page
 	//-3 new posts from newthreads page
+	
+	if (isset($_GET['markunread'])) {
+		$query = "DELETE FROM imas_forum_views WHERE userid='$userid' AND threadid='$threadid'";
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		if ($page==-3) {
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/newthreads.php?cid=$cid");
+		} else {
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?cid=$cid&forum=$forumid&page=$page");
+		}
+		exit;
+	}
 	$query = "SELECT settings,replyby,defdisplay,name,points FROM imas_forums WHERE id='$forumid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$forumsettings = mysql_result($result,0,0);
@@ -146,6 +157,7 @@
 	} else {
 		echo "Next";
 	}
+	echo " | <a href=\"posts.php?cid=$cid&forum=$forumid&thread=$threadid&page=$page&markunread=true\">Mark Unread</a>";
 	
 	echo "<p><b style=\"font-size: 120%\">Post: {$subject[$threadid]}</b><br/>\n";
 	echo "<b style=\"font-size: 100%\">Forum: $forumname</b></p>";
@@ -216,7 +228,7 @@
 		foreach($children[$base] as $child) {
 			echo "<div class=block> ";
 			if (file_exists("$curdir/../course/files/userimg_sm{$ownerid[$child]}.jpg")) {
-				echo "<img src=\"$imasroot/course/files/userimg_sm{$ownerid[$child]}.jpg\" class=\"pic\" />";
+				echo "<img src=\"$imasroot/course/files/userimg_sm{$ownerid[$child]}.jpg\" class=\"pic\" onclick=\"togglepic(this)\"/>";
 			}
 			if ($view==2) {
 				echo "<span class=right>";
