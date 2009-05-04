@@ -2756,7 +2756,7 @@ function checkanswerformat($tocheck,$ansformats) {
 	}
 	if (in_array("scinot",$ansformats)) {
 		$totest = str_replace(' ','',$tocheck);
-		if (!preg_match('/^\-?\d\.?\d*?\*10\^(\-?\d+)$/',$totest)) {
+		if (!preg_match('/^\-?\d(\.\d*)?(\*|x)10\^(\-?\d+)$/',$totest)) {
 			return false;
 		} 
 	}

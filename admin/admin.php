@@ -297,7 +297,7 @@ $placeinhead .= "}</script>";
 	<div class=item>
 	<table class=gb width="90%" id="diagTable">
 		<thead>
-		<tr><th>Name</th><th>Available</th><th>Public</th><th>&nbsp;</th><th>&nbsp;</th></tr>
+		<tr><th>Name</th><th>Available</th><th>Public</th><th>&nbsp;</th><th>&nbsp;</th><th>&nbsp;</th></tr>
 		</thead>
 		<tbody>
 <?php
@@ -310,6 +310,7 @@ $placeinhead .= "}</script>";
 				<td class=c><?php echo $page_diagnosticsPublic[$i] ?></td>
 				<td><a href="diagsetup.php?id=<?php echo $page_diagnosticsId[$i] ?>">Modify</a></td>
 				<td><a href="forms.php?action=removediag&id=<?php echo $page_diagnosticsId[$i] ?>">Remove</a></td>
+				<td><a href="diagonetime.php?id=<?php echo $page_diagnosticsId[$i] ?>">One-time Passwords</a></td>
 			</tr>
 <?php
 	}

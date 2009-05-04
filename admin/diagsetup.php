@@ -1,5 +1,5 @@
 <?php
-//IMathAS:  Main admin page
+//IMathAS:  Diagnostic setup page
 //(c) 2006 David Lippman
 
 /*** master php includes *******/

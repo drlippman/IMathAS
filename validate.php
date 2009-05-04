@@ -36,7 +36,7 @@
 		 if (isset($_POST['skip']) || isset($_POST['isok'])) {
 			 $sessiondata['mathdisp'] = $_POST['mathdisp'];
 			 $sessiondata['graphdisp'] = $_POST['graphdisp'];
-			 $sessiondata['useed'] = 1;
+			 $sessiondata['useed'] = checkeditorok();
 			 if (isset($_POST['savesettings'])) {
 				 setcookie('mathgraphprefs',$_POST['mathdisp'].'-'.$_POST['graphdisp'],2000000000);
 			 }
@@ -158,22 +158,22 @@ END;
 		 } else if ($_POST['access']==2) { //img graphs
 			 $sessiondata['mathdisp'] = 2-$_POST['mathdisp'];
 			 $sessiondata['graphdisp'] = 2;
-			 $sessiondata['useed'] = 1; 
+			 $sessiondata['useed'] = checkeditorok(); 
 			 $enc = base64_encode(serialize($sessiondata));
 		 } else if ($_POST['access']==4) { //img math
 			 $sessiondata['mathdisp'] = 2;
 			 $sessiondata['graphdisp'] = $_POST['graphdisp'];
-			 $sessiondata['useed'] = 1; 
+			 $sessiondata['useed'] = checkeditorok(); 
 			 $enc = base64_encode(serialize($sessiondata));
 		 } else if ($_POST['access']==3) { //img all
 			 $sessiondata['mathdisp'] = 2;  
 			 $sessiondata['graphdisp'] = 2;
-			 $sessiondata['useed'] = 1; 
+			 $sessiondata['useed'] = checkeditorok(); 
 			 $enc = base64_encode(serialize($sessiondata));
 		 } else if ($_POST['isok']) {
 			 $sessiondata['mathdisp'] = 1;  
 			 $sessiondata['graphdisp'] = 1;
-			 $sessiondata['useed'] = 1; 
+			 $sessiondata['useed'] = checkeditorok(); 
 			 $enc = base64_encode(serialize($sessiondata));
 		 } else {
 			 $enc = 0; //give warning
@@ -356,6 +356,14 @@ END;
 	  $enc = base64_encode(serialize($sessiondata));
 	  $query = "UPDATE imas_sessions SET sessiondata='$enc' WHERE sessionid='$sessionid'";
 	  mysql_query($query) or die("Query failed : " . mysql_error());
+  }
+  function checkeditorok() {
+	  $ua = $_SERVER['HTTP_USER_AGENT'];
+	  if (strpos($ua,'iPhone')!==false) {
+		  return 0;
+	  } else {
+		  return 1;
+	  }
   }
   if (!isset($coursename)) {
 	  $coursename = "Course Page";

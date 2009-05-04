@@ -130,7 +130,8 @@ switch($_GET['action']) {
 			$ekey = "Enter enrollment key here";
 			$hideicons = 0;
 			$picicons = 0;
-			$allowunenroll = 0;
+			$allowunenroll = 0; //0 no un, 1 allow un
+					    //0 allow enroll, 2 no enroll
 			$copyrights = 0;
 			$msgset = 0;
 			$cploc = 1;
@@ -231,11 +232,18 @@ switch($_GET['action']) {
 		if (($hideicons&16)==16) { echo "checked=1";}
 		echo '/> Hide</span><br class=form />';
 		
-		echo "<span class=form>Allow students to self-unenroll</span><span class=formright>";
+		echo "<span class=form>Allow students to self-<u>un</u>enroll</span><span class=formright>";
 		echo '<input type=radio name="allowunenroll" value="0" ';
-		if ($allowunenroll==0) { echo "checked=1";}
+		if (($allowunenroll&1)==0) { echo "checked=1";}
 		echo '/> No <input type=radio name="allowunenroll" value="1" ';
-		if ($allowunenroll==1) { echo "checked=1";}
+		if (($allowunenroll&1)==1) { echo "checked=1";}
+		echo '/> Yes </span><br class=form />';
+		
+		echo "<span class=form>Allow students to self-enroll</span><span class=formright>";
+		echo '<input type=radio name="allowenroll" value="2" ';
+		if (($allowunenroll&2)==2) { echo "checked=1";}
+		echo '/> No <input type=radio name="allowenroll" value="0" ';
+		if (($allowunenroll&2)==0) { echo "checked=1";}
 		echo '/> Yes </span><br class=form />';
 		
 		echo "<span class=form>Allow other instructors to copy course items:</span><span class=formright>";

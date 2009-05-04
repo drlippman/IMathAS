@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 12;
+$latest = 13;
 
 if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 	$handle = fopen("upgradecounter.txt",'w');
@@ -169,6 +169,16 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 		}
 		if ($last < 12) {
 			$query = "ALTER TABLE `imas_diags` ADD `reentrytime` SMALLINT( 5 ) UNSIGNED NOT NULL DEFAULT '0';";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+		}
+		if ($last < 13) {
+			$query = "CREATE TABLE `imas_diag_onetime` (
+				`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+				`diag` INT( 10 ) UNSIGNED NOT NULL ,
+				`time` INT( 10 ) UNSIGNED NOT NULL ,
+				`code` VARCHAR( 9 ) NOT NULL ,
+				INDEX (`diag`), INDEX(`time`), INDEX(`code`)
+				) TYPE = innodb;";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		}
 		$handle = fopen("upgradecounter.txt",'w');

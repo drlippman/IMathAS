@@ -126,6 +126,7 @@ switch($_GET['action']) {
 		} else {
 			$chatset = 0;
 		}
+		$unenroll = $_POST['allowunenroll'] + $_POST['allowenroll'];
 		$topbar = implode('|',$topbar);
 		
 		$hideicons = $_POST['HIassess'] + $_POST['HIinline'] + $_POST['HIlinked'] + $_POST['HIforum'] + $_POST['HIblock'];
@@ -136,7 +137,7 @@ switch($_GET['action']) {
 		$_POST['ltisecret'] = trim($_POST['ltisecret']);
 		
 		$query = "UPDATE imas_courses SET name='{$_POST['coursename']}',enrollkey='{$_POST['ekey']}',hideicons='$hideicons',available='$avail',lockaid='{$_POST['lockaid']}',picicons='{$_POST['picicons']}',chatset=$chatset,";
-		$query .= "allowunenroll='{$_POST['allowunenroll']}',copyrights='{$_POST['copyrights']}',msgset='{$_POST['msgset']}',topbar='$topbar',cploc='{$_POST['cploc']}',theme='{$_POST['theme']}',ltisecret='{$_POST['ltisecret']}' WHERE id='{$_GET['id']}'";
+		$query .= "allowunenroll='$unenroll',copyrights='{$_POST['copyrights']}',msgset='{$_POST['msgset']}',topbar='$topbar',cploc='{$_POST['cploc']}',theme='{$_POST['theme']}',ltisecret='{$_POST['ltisecret']}' WHERE id='{$_GET['id']}'";
 		if ($myrights<75) { $query .= " AND ownerid='$userid'";}
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		break;
@@ -158,6 +159,7 @@ switch($_GET['action']) {
 		} else {
 			$chatset = 0;
 		}
+		$unenroll = $_POST['allowunenroll'] + $_POST['allowenroll'];
 		$topbar = implode('|',$topbar);
 		$hideicons = $_POST['HIassess'] + $_POST['HIinline'] + $_POST['HIlinked'] + $_POST['HIforum'] + $_POST['HIblock'];
 		$avail = 3 - $_POST['stuavail'] - $_POST['teachavail'];
@@ -167,7 +169,7 @@ switch($_GET['action']) {
 		$_POST['ltisecret'] = trim($_POST['ltisecret']);
 		$itemorder = addslashes(serialize(array()));
 		$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,chatset,itemorder,topbar,cploc,available,theme,ltisecret) VALUES ";
-		$query .= "('{$_POST['coursename']}','$userid','{$_POST['ekey']}','$hideicons','{$_POST['picicons']}','{$_POST['allowunenroll']}','{$_POST['copyrights']}','{$_POST['msgset']}',$chatset,'$itemorder','$topbar','{$_POST['cploc']}','$avail','{$_POST['theme']}','{$_POST['ltisecret']}');";
+		$query .= "('{$_POST['coursename']}','$userid','{$_POST['ekey']}','$hideicons','{$_POST['picicons']}','$unenroll','{$_POST['copyrights']}','{$_POST['msgset']}',$chatset,'$itemorder','$topbar','{$_POST['cploc']}','$avail','{$_POST['theme']}','{$_POST['ltisecret']}');";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		$cid = mysql_insert_id();
 		//if ($myrights==40) {
@@ -482,6 +484,8 @@ switch($_GET['action']) {
 		$row = mysql_fetch_row($result);
 		if (($myrights<75 && $row[0]==$userid) || ($myrights==75 && $row[1]==$groupid) || $myrights==100) { 
 			$query = "DELETE FROM imas_diags WHERE id='{$_GET['id']}'";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			$query = "DELETE FROM imas_diag_onetime WHERE diag='{$_GET['id']}'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		}
 		break;

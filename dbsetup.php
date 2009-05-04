@@ -542,6 +542,17 @@ $sql = 'CREATE TABLE `imas_diags` ('
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 echo 'imas_diags created<br/>';
 
+$sql = 'CREATE TABLE `imas_diag_onetime` ('
+        . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
+        . ' `diag` INT(10) UNSIGNED NOT NULL, '
+        . ' `time` INT(10) UNSIGNED NOT NULL, '
+        . ' `code` VARCHAR(9) NOT NULL,'
+        . ' INDEX (`diag`), INDEX(`time`), INDEX(`code`)'
+        . ' )'
+        . ' TYPE = innodb;';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+echo 'imas_diag_onetime created<br/>';
+
 $sql = 'CREATE TABLE `imas_msgs` ('
         . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
 	. ' `courseid` INT(10) UNSIGNED NOT NULL, '

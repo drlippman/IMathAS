@@ -204,12 +204,17 @@
 			echo "</html></body>\n";
 			exit;
 		}
-		$query = "SELECT enrollkey FROM imas_courses WHERE id = '{$_POST['cid']}'";
+		$query = "SELECT enrollkey,allowunenroll FROM imas_courses WHERE id = '{$_POST['cid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$line = mysql_fetch_array($result, MYSQL_ASSOC);
 		if ($line == null) {
 			echo "<html><body>\n";
 			echo "Course not found.  <a href=\"index.php\">Try Again</a>\n";
+			echo "</html></body>\n";
+			exit;
+		} else if (($line['allowunenroll']&2)==2) {
+			echo "<html><body>\n";
+			echo "Course is closed for self enrollment.  Contact your instructor for access.  <a href=\"index.php\">Return to home page.</a>\n";
 			echo "</html></body>\n";
 			exit;
 		} else if ($_POST['ekey']=="" && $line['enrollkey'] != '') {
