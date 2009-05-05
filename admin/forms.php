@@ -337,15 +337,20 @@ switch($_GET['action']) {
 		$query .= "imas_teachers.userid=imas_users.id ORDER BY imas_users.LastName;";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		echo "<table cellpadding=5>\n";
+		$onlyone = (mysql_num_rows($result)==1);
 		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 			echo "<tr><td>{$line['LastName']}, {$line['FirstName']}</td> ";
-			echo "<td><A href=\"actions.php?action=remteacher&cid={$_GET['id']}&tid={$line['id']}\">Remove as Teacher</a></td></tr>\n";
+			if ($onlyone) {
+				echo "<td></td></tr>";
+			} else {
+				echo "<td><A href=\"actions.php?action=remteacher&cid={$_GET['id']}&tid={$line['id']}\">Remove as Teacher</a></td></tr>\n";
+			}
 			$used[$line['userid']] = true;
 		}
 		echo "</table>\n";
 		
 		echo "<h4>Potential Teachers:</h4>\n";
-		if ($myrights==75) {
+		if ($myrights<100) {
 			$query = "SELECT id,FirstName,LastName,rights FROM imas_users WHERE rights>19 AND groupid='$groupid' ORDER BY LastName;";
 		} else if ($myrights==100) {
 			$query = "SELECT id,FirstName,LastName,rights FROM imas_users WHERE rights>19 ORDER BY LastName;";

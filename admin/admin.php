@@ -67,7 +67,7 @@ if ($myrights < 40) {
 		$page_courseList[$i]['FirstName'] = $line['FirstName']; 
 		$page_courseList[$i]['ownerid'] = $line['ownerid'];
 		$page_courseList[$i]['available'] = $line['available'];
-		$page_courseList[$i]['addRemove'] = ($myrights<75) ? "" : "<a href=\"forms.php?action=chgteachers&id={$line['id']}\">Add/Remove</a>";
+		$page_courseList[$i]['addRemove'] = ($myrights<40) ? "" : "<a href=\"forms.php?action=chgteachers&id={$line['id']}\">Add/Remove</a>";
 		$page_courseList[$i]['transfer'] = ($line['ownerid']!=$userid && $myrights <75) ? "" : "<a href=\"forms.php?action=transfer&id={$line['id']}\">Transfer</a>";
 		$i++;
 	} 

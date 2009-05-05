@@ -19,7 +19,7 @@
 	exit;	 
  }
  $sessiondata = array();
- $query = "SELECT userid,tzoffset,sessiondata FROM imas_sessions WHERE sessionid='$sessionid'";
+ $query = "SELECT userid,tzoffset,sessiondata,time FROM imas_sessions WHERE sessionid='$sessionid'";
  $result = mysql_query($query) or die("Query failed : " . mysql_error());
  if (mysql_num_rows($result)>0) {
 	 $userid = mysql_result($result,0,0);
@@ -27,6 +27,13 @@
 	 $enc = mysql_result($result,0,2);
 	 if ($enc!='0') {
 		 $sessiondata = unserialize(base64_decode($enc));
+		 //delete own session if old and not posting
+		 if ((time()-mysql_result($result,0,3))>24*60*60 && (!isset($_POST) || count($_POST)==0)) {
+			 echo count($_POST);
+			$query = "DELETE FROM imas_sessions WHERE userid='$userid'";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			unset($userid);
+		 }
 	 } else {
 		 if (isset($_SERVER['QUERY_STRING'])) {
 			 $querys = '?'.$_SERVER['QUERY_STRING'];
@@ -120,7 +127,7 @@ END;
  if ($haslogin && !$hasusername) {
 	  //clean up old sessions
 	 $now = time();
-	 $old = $now - 24*60*60;
+	 $old = $now - 25*60*60;
 	 $query = "DELETE FROM imas_sessions WHERE time<$old";
 	 $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	 

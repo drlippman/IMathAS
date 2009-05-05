@@ -304,7 +304,7 @@ switch($_GET['action']) {
 		
 		break;
 	case "remteacher":
-		if ($myrights < 75) { echo "You don't have the authority for this action"; break;}
+		if ($myrights < 40) { echo "You don't have the authority for this action"; break;}
 		$query = "DELETE FROM imas_teachers WHERE id='{$_GET['tid']}'";
 		if ($myrights < 100) {
 			$query = "SELECT imas_teachers.id FROM imas_teachers,imas_users WHERE imas_teachers.id='{$_GET['tid']}' AND imas_teachers.userid=imas_users.id AND imas_users.groupid='$groupid'";
@@ -322,8 +322,8 @@ switch($_GET['action']) {
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/forms.php?action=chgteachers&id={$_GET['cid']}");
 		exit;
 	case "addteacher":
-		if ($myrights < 75) { echo "You don't have the authority for this action"; break;}
-		if ($myrights == 75) {
+		if ($myrights < 40) { echo "You don't have the authority for this action"; break;}
+		if ($myrights < 100) {
 			$query = "SELECT imas_users.groupid FROM imas_users,imas_courses WHERE imas_courses.ownerid=imas_users.id AND imas_courses.id='{$_GET['cid']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (mysql_result($result,0,0) != $groupid) { 

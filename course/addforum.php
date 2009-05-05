@@ -286,7 +286,7 @@ if ($overwriteBody==1) {
 			 Always after start date<br/>
 			<input type=radio name="edatetype" value="edate"  <?php writeHtmlChecked($enddate,'2000000000',1) ?>/>
 			<input type=text size=10 name=edate value="<?php echo $edate;?>"> 
-			<a href="#" onClick="displayDatePicker('edate', this); return false">
+			<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
 			<img src="../img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=etime value="<?php echo $etime;?>">
 		</span><BR class=form>
@@ -334,7 +334,7 @@ if ($overwriteBody==1) {
 			<input type=radio name="replyby" value="Never" <?php if ($replyby==0) { echo "checked=1";}?>/>Never<br/>
 			<input type=radio name="replyby" value="Date" <?php if ($replyby<2000000000 && $replyby>0) { echo "checked=1";}?>/>Before: 
 			<input type=text size=10 name="replybydate" value="<?php echo $replybydate;?>">
-			<a href="#" onClick="displayDatePicker('replybydate', this); return false">
+			<a href="#" onClick="displayDatePicker('replybydate', this, 'sdate', 'start date'); return false">
 			<img src="../img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=replybytime value="<?php echo $replybytime;?>">
 		</span><br class="form" />
@@ -345,7 +345,7 @@ if ($overwriteBody==1) {
 			<input type=radio name="postby" value="Never" <?php if ($postby==0) { echo "checked=1";}?>/>Never<br/>
 			<input type=radio name="postby" value="Date" <?php if ($postby<2000000000 && $postby>0) { echo "checked=1";}?>/>Before: 
 			<input type=text size=10 name="postbydate" value="<?php echo $postbydate;?>">
-			<a href="#" onClick="displayDatePicker('postbydate', this); return false">
+			<a href="#" onClick="displayDatePicker('postbydate', this, 'sdate', 'start date'); return false">
 			<img src="../img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=postbytime value="<?php echo $postbytime;?>">
 		</span><br class="form"/>

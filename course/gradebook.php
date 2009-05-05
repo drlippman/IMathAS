@@ -245,6 +245,31 @@ if (isset($studentid) || $stu!=0) { //show student view
 	$placeinhead .= 'function highlightrow(el) { el.setAttribute("lastclass",el.className); el.className = "highlight";}';
 	$placeinhead .= 'function unhighlightrow(el) { el.className = el.getAttribute("lastclass");}';
 	$placeinhead .= "function chkAll(frm, arr, mark) {  for (i = 0; i <= frm.elements.length; i++) {   try{     if(frm.elements[i].name == arr) {  frm.elements[i].checked = mark;     }   } catch(er) {}  }}";
+	/*$placeinhead .= 'var picsize = 0;
+		function rotatepics() {
+			picsize = (picsize+1)%3;
+			picshow(picsize);
+		}
+		function picshow(size) {
+			if (size==0) {
+				els = document.getElementById("myTable").getElementsByTagName("img");
+				for (var i=0; i<els.length; i++) {
+					els[i].style.display = "none";
+				}
+			} else {
+				els = document.getElementById("myTable").getElementsByTagName("img");
+				for (var i=0; i<els.length; i++) {
+					els[i].style.display = "inline";
+					if (els[i].getAttribute("src").match("userimg_sm")) {
+						if (size==2) {
+							els[i].setAttribute("src",els[i].getAttribute("src").replace("_sm","_"));
+						}
+					} else if (size==1) {
+						els[i].setAttribute("src",els[i].getAttribute("src").replace("_","_sm"));
+					}
+				}
+			}
+		}';*/
 	$placeinhead .= "</script>\n";
 	$placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } </style>";
 	
@@ -277,7 +302,9 @@ if (isset($studentid) || $stu!=0) { //show student view
 		} else {
 			echo "Lock headers";
 		}
-		echo "\"/><br/>\n";
+		echo "\"/>";
+		//echo '<input type="button" value="Pics" onclick="rotatepics()" />';
+		echo "<br/>\n";
 	}
 	echo 'Category: <select id="filtersel" onchange="chgfilter()">';
 	echo '<option value="-1" ';
@@ -348,7 +375,7 @@ function gbstudisp($stu) {
 		$availshow=1;
 		$hidepast = true;
 	}
-
+	$curdir = rtrim(dirname(__FILE__), '/\\');
 	$gbt = gbtable($stu);
 	
 	if ($stu>0) {
@@ -357,10 +384,16 @@ function gbstudisp($stu) {
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			echo "<p>Comment Updated</p>";
 		}
+		if ($isteacher) {
+			if (file_exists("$curdir//files/userimg_sm{$gbt[1][4][0]}.jpg")) {
+				echo "<img src=\"$imasroot/course/files/userimg_sm{$gbt[1][4][0]}.jpg\" style=\"float: left; padding-right:5px;\" onclick=\"togglepic(this)\"/>";
+			} 
+		}
 		echo '<h3>' . strip_tags($gbt[1][0][0]) . '</h3>';
 		$query = "SELECT imas_students.gbcomment,imas_users.email FROM imas_students,imas_users WHERE ";
 		$query .= "imas_students.userid=imas_users.id AND imas_users.id='$stu' AND imas_students.courseid='{$_GET['cid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		echo '<div style="clear:both">';
 		if (mysql_num_rows($result)>0) {
 			if ($isteacher) {
 				echo '<a href="mailto:'.mysql_result($result,0,1).'">Email</a> | ';
@@ -382,6 +415,7 @@ function gbstudisp($stu) {
 				echo "<div class=\"item\">$gbcomment</div>";
 			}
 		}
+		echo '</div>';
 	}
 	
 	echo '<table id="myTable" class=gb>';
@@ -593,7 +627,7 @@ function gbstudisp($stu) {
 
 function gbinstrdisp() {
 	global $hidenc,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection;
-	
+	$curdir = rtrim(dirname(__FILE__), '/\\');
 	if ($availshow==3) {
 		$availshow=1;
 		$hidepast = true;
@@ -605,6 +639,7 @@ function gbinstrdisp() {
 	echo '<table class="gb" id="myTable"><thead><tr>';
 	$n=0;
 	for ($i=0;$i<count($gbt[0][0]);$i++) { //biographical headers
+		//if ($i==1) {echo '<th></th>';} //for pics
 		if ($i==1 && $gbt[0][0][1]!='ID') { continue;}
 		echo '<th>'.$gbt[0][0][$i];
 		if (($gbt[0][0][$i]=='Section' || ($isdiag && $i==4)) && (!$istutor || $tutorsection=='')) {
@@ -752,6 +787,11 @@ function gbinstrdisp() {
 		echo "<a href=\"gradebook.php?cid=$cid&stu={$gbt[$i][4][0]}\">";
 		echo $gbt[$i][0][0];
 		echo '</a></td>';
+		/*if (file_exists("$curdir//files/userimg_sm{$gbt[$i][4][0]}.jpg")) {
+			echo "<td><img src=\"$imasroot/course/files/userimg_sm{$gbt[$i][4][0]}.jpg\" style=\"display:none;\"/></td>";
+		} else {
+			echo '<td></td>';
+		}*/
 		for ($j=($gbt[0][0][1]=='ID'?1:2);$j<count($gbt[0][0]);$j++) {
 			echo '<td class="c">'.$gbt[$i][0][$j].'</td>';	
 		}

@@ -25,7 +25,7 @@ var dateFormat = defaultDateFormat;
 /**
 This is the main function you'll call from the onClick event of a button.
 */
-function displayDatePicker(dateFieldName, displayBelowThisObject, dtFormat, dtSep)
+function displayDatePicker(dateFieldName, displayBelowThisObject, jumpFieldName, jumpTitle, dtFormat, dtSep)
 {
   var targetDateField = document.getElementsByName (dateFieldName).item(0);
  
@@ -57,7 +57,7 @@ function displayDatePicker(dateFieldName, displayBelowThisObject, dtFormat, dtSe
     y += parent.offsetTop ;
   }
  
-  drawDatePicker(targetDateField, x, y);
+  drawDatePicker(targetDateField, x, y, jumpFieldName, jumpTitle);
 }
 
 
@@ -68,10 +68,10 @@ that will ultimately be populated with a date.
 
 This function will normally be called by the displayDatePicker function.
 */
-function drawDatePicker(targetDateField, x, y)
+function drawDatePicker(targetDateField, x, y, jumpFieldName, jumpTitle)
 {
   var dt = getFieldDate(targetDateField.value );
- 
+  
   // the datepicker table will be drawn inside of a <div> with an ID defined by the
   // global datePickerDivID variable. If such a div doesn't yet exist on the HTML
   // document we're working with, add one.
@@ -96,14 +96,14 @@ function drawDatePicker(targetDateField, x, y)
   pickerDiv.style.zIndex = 10000;
  
   // draw the datepicker table
-  refreshDatePicker(targetDateField.name, dt.getFullYear(), dt.getMonth(), dt.getDate());
+  refreshDatePicker(targetDateField.name, dt.getFullYear(), dt.getMonth(), dt.getDate(), jumpFieldName, jumpTitle);
 }
 
 
 /**
 This is the function that actually draws the datepicker calendar.
 */
-function refreshDatePicker(dateFieldName, year, month, day)
+function refreshDatePicker(dateFieldName, year, month, day, jumpFieldName, jumpTitle)
 {
   // if no arguments are passed, use today's date; otherwise, month and year
   // are required (if a day is passed, it will be highlighted later)
@@ -191,7 +191,14 @@ function refreshDatePicker(dateFieldName, year, month, day)
   var today = new Date();
   var todayString = "Today is " + dayArrayMed[today.getDay()] + ", " + monthArrayMed[ today.getMonth()] + " " + today.getDate();
   html += TR_todaybutton + TD_todaybutton;
-  html += "<button class='dpTodayButton' onClick='refreshDatePicker(\"" + dateFieldName + "\");'>this month</button> ";
+  if (jumpFieldName) {
+	  var dtj = getFieldDate(document.getElementsByName (jumpFieldName).item(0).value );
+	  html += "<button class='dpTodayButton' onClick='refreshDatePicker(\"" + dateFieldName + "\","+ dtj.getFullYear()+ ","+ dtj.getMonth()+ ","+dtj.getDate()+ ",\""+jumpFieldName+ "\",\""+ jumpTitle + "\");'>"+jumpTitle+"</button> ";
+	  html += "<button class='dpTodayButton' onClick='refreshDatePicker(\"" + dateFieldName + "\",0,0,0,\""+jumpFieldName+ "\",\""+ jumpTitle + "\");'>this month</button> ";
+  } else {
+	   html += "<button class='dpTodayButton' onClick='refreshDatePicker(\"" + dateFieldName + "\");'>this month</button> ";
+  }
+ 
   html += "<button class='dpTodayButton' onClick='updateDateField(\"" + dateFieldName + "\");'>close</button>";
   html += xTD + xTR;
  

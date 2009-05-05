@@ -302,7 +302,7 @@ if ($overwriteBody==1) {
 	 Always after start date<br/>
 	<input type=radio name="edatetype" value="edate"  <?php writeHtmlChecked($enddate,'2000000000',1) ?>/>
 	<input type=text size=10 name=edate value="<?php echo $edate;?>"> 
-	<a href="#" onClick="displayDatePicker('edate', this); return false">
+	<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
 	<img src="../img/cal.gif" alt="Calendar"/></a>
 	at <input type=text size=10 name=etime value="<?php echo $etime;?>"></span>
 	<BR class=form>

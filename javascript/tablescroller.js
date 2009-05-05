@@ -431,6 +431,9 @@ this.toggle = function() {
 	}
 	
 }
+this.status = function() {
+	return toggletracker;
+}
 	
 	if(lockonload) {
 		addLoadEvent(this.lock);

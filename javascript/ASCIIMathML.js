@@ -299,6 +299,8 @@ var AMsymbols = [
 {input:"min",  tag:"mo", output:"min", tex:null, ttype:UNDEROVER},
 {input:"max",  tag:"mo", output:"max", tex:null, ttype:UNDEROVER},
 
+//{input:"longdiv", tag:"mtable", output:"longdiv", tex:null, ttype:BINARY},
+
 //arrows
 {input:"uarr", tag:"mo", output:"\u2191", tex:"uparrow", ttype:CONST},
 {input:"darr", tag:"mo", output:"\u2193", tex:"downarrow", ttype:CONST},
@@ -609,6 +611,18 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
 	node.setAttribute("color",st);
 	return [node,result2[1]];
     }
+    /*FireFox doesn't support yet
+    if (symbol.input=="longdiv") {
+	    node = AMcreateMmlNode("mtd",result2[0].firstChild);
+	    node.setAttribute("columnalign","right");
+	    mtr = AMcreateMmlNode("mtr",node);
+	    node = AMcreateMmlNode("menclose",result[0].firstChild);
+	    node.setAttribute("notation","longdiv");
+	    node2 = AMcreateMmlNode("mtd",node);
+	    mtr.appendChild(node2);
+	    newFrag.appendChild(mtr);
+	    return [AMcreateMmlNode(symbol.tag,newFrag),result2[1]];
+    }*/
     if (symbol.input=="root" || symbol.input=="stackrel") 
       newFrag.appendChild(result2[0]);
     newFrag.appendChild(result[0]);
