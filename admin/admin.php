@@ -301,9 +301,11 @@ $placeinhead .= "}</script>";
 		</thead>
 		<tbody>
 <?php
+        $alt = 0;
 	for ($i=0;$i<count($page_diagnosticsId);$i++) {
+		if ($alt==0) {echo "	<tr class=even>"; $alt=1;} else {echo "	<tr class=odd>"; $alt=0;}
 ?>	
-			<tr>
+			
 				<td><a href="<?php echo $imasroot;?>/diag/index.php?id=<?php echo $page_diagnosticsId[$i] ?>">
 				<?php echo $page_diagnosticsName[$i] ?></a></td>
 				<td class=c><?php echo $page_diagnosticsAvailable[$i] ?></td>

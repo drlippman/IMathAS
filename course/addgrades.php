@@ -294,6 +294,11 @@ function doonblur(value) {
 
 function sendtoall(type) {
 	var form=document.getElementById("mainform");
+	if (type==2 && document.getElementById("toallgrade").value == "") {
+		if (!confirm("Clear all scores?")) {
+			return;
+		}
+	}
 	for (var e = 0; e<form.elements.length; e++) {
 		 var el = form.elements[e];
 		if (el.type=="textarea" && el.id!="toallfeedback") {
@@ -306,6 +311,10 @@ function sendtoall(type) {
 				if (type==0) { el.value = doonblur(el.value+'+'+document.getElementById("toallgrade").value);}
 				else if (type==1) { el.value = doonblur(el.value+'*'+document.getElementById("toallgrade").value);}
 				else if (type==2) { el.value = document.getElementById("toallgrade").value;}
+			}
+		} else if (document.getElementById("toallgrade").value == "") {
+			if (el.type=="text" && el.id.match(/score/) && type==2) {
+				el.value = '';
 			}
 		}
 	}

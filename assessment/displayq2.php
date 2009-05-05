@@ -1838,9 +1838,39 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$GLOBALS['partlastanswer'] = $_POST["tc$qn"];
 		$correct = true;
 		
+		if (!isset($variables)) { $variables = "x";}
+		$variables = explode(",",$variables);
+		$ofunc = array();
+		for ($i = 0; $i < count($variables); $i++) {
+			//find f() function variables
+			if (strpos($variables[$i],'(')!==false) {
+				$ofunc[] = substr($variables[$i],0,strpos($variables[$i],'('));
+				$variables[$i] = substr($variables[$i],0,strpos($variables[$i],'('));
+			}
+		}
+		if (count($ofunc)>0) {
+			$flist = implode("|",$ofunc);
+			$answer = preg_replace('/('.$flist.')\(/',"$1*sin($1+",$answer);
+		}
+		$vlist = implode("|",$variables);
+		
+		if (isset($domain)) {$fromto = explode(",",$domain);} else {$fromto[0]=-10; $fromto[1]=10;}
+		
+		for ($i = 0; $i < 20; $i++) {
+			for($j=0; $j < count($variables); $j++) {
+				if (isset($fromto[2]) && $fromto[2]=="integers") {
+					$tps[$i][$j] = rand($fromto[0],$fromto[1]);
+				} else if (isset($fromto[2*$j+1])) {
+					$tps[$i][$j] = $fromto[2*$j] + ($fromto[2*$j+1]-$fromto[2*$j])*rand(0,32000)/32000.0;
+				} else {
+					$tps[$i][$j] = $fromto[0] + ($fromto[1]-$fromto[0])*rand(0,32000)/32000.0;
+				}
+			}
+		}
+		
 		//test for correct format, if specified
 		if (checkreqtimes($_POST["tc$qn"],$requiretimes)==0) {
-			$correct = false;
+			return 0; //$correct = false;
 		}
 		
 		$answer = preg_replace('/[^\w\*\/\+\=\-\(\)\[\]\{\}\,\.\^\$\!]+/','',$answer);
@@ -1855,20 +1885,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			unset($diffs);
 		}
 		
-		if (!isset($variables)) { $variables = "x";}
-		$variables = explode(",",$variables);
-		$ofunc = array();
-		for ($i = 0; $i < count($variables); $i++) {
-			if (strpos($variables[$i],'(')!==false) {
-				$ofunc[] = substr($variables[$i],0,strpos($variables[$i],'('));
-				$variables[$i] = substr($variables[$i],0,strpos($variables[$i],'('));
-			}
-		}
-		if (count($ofunc)>0) {
-			$flist = implode("|",$ofunc);
-			$answer = preg_replace('/('.$flist.')\(/',"$1*sin($1+",$answer);
-		}
-		$vlist = implode("|",$variables);
 		
 		if ($answer == '') {
 			return 0;
@@ -1882,20 +1898,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 
 		$myans = explode(",",$_POST["qn$qn-vals"]);
-
-		if (isset($domain)) {$fromto = explode(",",$domain);} else {$fromto[0]=-10; $fromto[1]=10;}
 		
-		for ($i = 0; $i < 20; $i++) {
-			for($j=0; $j < count($variables); $j++) {
-				if (isset($fromto[2]) && $fromto[2]=="integers") {
-					$tps[$i][$j] = rand($fromto[0],$fromto[1]);
-				} else if (isset($fromto[2*$j+1])) {
-					$tps[$i][$j] = $fromto[2*$j] + ($fromto[2*$j+1]-$fromto[2*$j])*rand(0,32000)/32000.0;
-				} else {
-					$tps[$i][$j] = $fromto[0] + ($fromto[1]-$fromto[0])*rand(0,32000)/32000.0;
-				}
-			}
-		}
 		$cntnan = 0;
 		$cntzero = 0;
 		$stunan = 0;
@@ -1944,7 +1947,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($answerformat=="equation") {
 			if (count($ratios)>0) {
 				if (count($ratios)==$cntzero) {
-					$correct = false;
+					$correct = false; return 0;
 				} else {
 					$meanratio = array_sum($ratios)/count($ratios);
 					for ($i=0; $i<count($ratios); $i++) {
