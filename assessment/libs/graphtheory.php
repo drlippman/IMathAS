@@ -12,7 +12,7 @@
 //    A-Z used for labels.  If array, label[i] used for vertex g[i]
 
 global $allowedmacros;
-array_push($allowedmacros,"graphlayout","graphcirclelayout","graphcomplete","graphgridlayout","graphdijkstra","graphbackflow","graphpathlayout","graphrandomcircle","graphrandomgrid","graphrandomgridschedule","graphrandom");
+array_push($allowedmacros,"graphlayout","graphcirclelayout","graphcirclecomplete","graphbipartite","graphcircleladder","graphrandomcircleladder","graphgridlayout","graphdijkstra","graphbackflow","graphpathlayout","graphrandomcircle","graphrandomgrid","graphrandomgridschedule","graphrandom");
 	
 //graphlayout(g,[options])
 //draws a graph based on a graph incidence matrix
@@ -292,15 +292,124 @@ function graphcirclelayout($g,$op=array()) {
 	return graphdrawit($pos,$g,$op);
 }
 
-//graphcomplete(n,[options])
+//graphcircleladder(n,m,[options])
+//draws a circular ladder graph
+//n vertices around a circle
+//m concentric circles
+//connected around circle and between circles
+function graphcircleladder($n,$m,$op=array()) {
+	$tot = $n*$m;
+	$dtheta = 2*M_PI/$n;
+	$dr = 10/$m;
+	$g = graphemptygraph($tot);
+	for ($i = 0; $i<$n; $i++) {
+		$c = cos($dtheta*$i);
+		$s = sin($dtheta*$i);
+		for ($j = 0; $j<$m; $j++) {
+			$pos[$n*$j+$i][0] = ($j+1)*$dr*$c;
+			$pos[$n*$j+$i][1] = ($j+1)*$dr*$s;
+			if ($i<$n-1) {
+				$g[$n*$j+$i][$n*$j+$i+1] = 1;  //around circle
+			} else {
+				$g[$n*$j][$n*$j+$i] = 1;  //around circle
+			}
+			if ($j<$m-1) {
+				$g[$n*$j+$i][$n*($j+1)+$i] = 1;  //inside circle
+			}
+		}
+	}
+	//print_r($g);
+	$op['xmin'] = -10;
+	$op['xmax'] = 10;
+	$op['ymin'] = -10;
+	$op['ymax'] = 10;
+	return graphdrawit($pos,$g,$op);
+}
+
+//graphrandomcircleladder(n,m,p,[options])
+//draws a circular ladder graph
+//n vertices around a circle
+//m concentric circles
+//Each pair of neighboring vertices has a p probabilility 
+//  (0 to 1) of being connected
+//connected around circle and between circles
+function graphrandomcircleladder($n,$m,$p,$op=array()) {
+	$tot = $n*$m;
+	$dtheta = 2*M_PI/$n;
+	$dr = 10/$m;
+	$g = graphemptygraph($tot);
+	for ($i = 0; $i<$n; $i++) {
+		$c = cos($dtheta*$i);
+		$s = sin($dtheta*$i);
+		for ($j = 0; $j<$m; $j++) {
+			$pos[$n*$j+$i][0] = ($j+1)*$dr*$c;
+			$pos[$n*$j+$i][1] = ($j+1)*$dr*$s;
+			$r = rand(0,99);
+			if ($r<$p*100) {
+				if ($i<$n-1) {
+					$g[$n*$j+$i][$n*$j+$i+1] = 1;  //around circle
+				} else {
+					$g[$n*$j][$n*$j+$i] = 1;  //around circle
+				}
+				if ($j<$m-1) {
+					$g[$n*$j+$i][$n*($j+1)+$i] = 1;  //inside circle
+				}
+			}
+		}
+	}
+	//print_r($g);
+	$op['xmin'] = -10;
+	$op['xmax'] = 10;
+	$op['ymin'] = -10;
+	$op['ymax'] = 10;
+	return graphdrawit($pos,$g,$op);
+}
+
+//graphcirclecomplete(n,[options])
 //draws a complete graph with a circular layout
 //with n vertices
-function graphcomplete($n,$op=array()) {
+function graphcirclecomplete($n,$op=array()) {
 	$g = array();
 	for ($i = 0; $i<$n; $i++) {
 		$g[$i] = array_fill(0,$n,1);
 	}
 	return graphcirclelayout($g,$op);
+}
+
+//graphbipartite(n,[options])
+//draws a complete bipartite graph (every vertex on left is 
+//connected to every vertex on the right)
+//with n vertices in the first column, m in the second
+function graphbipartite($n,$m,$op=array()) {
+	$tot = $n+$m;
+	$g = graphemptygraph($tot);
+	$dv = 10/($n+1);
+	for ($i=0; $i<$n; $i++) {
+		$pos[$i][0] = -10;
+		$pos[$i][1] = ($i+1)*$dv;
+	}
+	$dv = 10/($m+1);
+	for ($i=0; $i<$m; $i++) {
+		$pos[$n+$i][0] = 10;
+		$pos[$n+$i][1] = ($i+1)*$dv;
+	}
+	for ($i=0; $i<$n; $i++) {
+		for ($j=$n; $j<$tot; $j++) {
+			$g[$i][$j] = 1;
+		}
+	}
+		
+	$op['xmin'] = 10;
+	$op['xmax'] = -10;
+	$op['ymin'] = 10;
+	$op['ymax'] = -10;
+	for ($i=0; $i<$tot; $i++) {
+		if ($pos[$i][0]<$op['xmin']) {$op['xmin'] = $pos[$i][0];}
+		if ($pos[$i][0]>$op['xmax']) {$op['xmax'] = $pos[$i][0];}
+		if ($pos[$i][1]<$op['ymin']) {$op['ymin'] = $pos[$i][1];}
+		if ($pos[$i][1]>$op['ymax']) {$op['ymax'] = $pos[$i][1];}
+	}
+	return graphdrawit($pos,$g,$op);
 }
 
 //graphrandomcircle(n, p,[options])
@@ -479,7 +588,7 @@ function graphemptygraph($n) {
 
 //internal function, not to be used
 function graphdrawit($pos,$g,$op) {
-	if (!isset($op['width'])) {$op['width'] = 300;}
+	if (!isset($op['width'])) {$op['width'] = 360;}
 	if (!isset($op['height'])) {$op['height'] = 300;}
 	$lettersarray = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
 	$com = "setBorder(60,30,60,30);initPicture({$op['xmin']},{$op['xmax']},{$op['ymin']},{$op['ymax']});";
