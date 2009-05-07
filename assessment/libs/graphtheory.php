@@ -2,9 +2,17 @@
 //A library of graph theory functions.  Version 0.1, May 6, 2009
 //THIS LIBRARY IS NOT COMPLETE.  THE SYNTAX OR NAMES OF THESE FUNCTIONS
 //MAY CHANGE
+//Most graphing functions in this library use an options array.  Here are the
+//common options - specific functions will mention other options.
+//  options['width'] = width of output, in pixels.  Defaults to 300.
+//  options['height'] = height of output, in pixels.  Defaults to 300.
+//  options['digraph'] = true/false.  If true, g[i][j] > 0 means i leads to j
+//  options['useweights'] = true/false.  If true, g[i][j] used as a weight
+//  options['labels'] = "letters" or array of labels.  If "letters", letters
+//    A-Z used for labels.  If array, label[i] used for vertex g[i]
 
 global $allowedmacros;
-array_push($allowedmacros,"graphlayout","graphcirclelayout","graphcomplete","graphgridlayout");
+array_push($allowedmacros,"graphlayout","graphcirclelayout","graphcomplete","graphgridlayout","graphdijkstra","graphbackflow","graphpathlayout","graphrandomcircle","graphrandomgrid","graphrandomgridschedule","graphrandom");
 	
 //graphlayout(g,[options])
 //draws a graph based on a graph incidence matrix
@@ -12,16 +20,9 @@ array_push($allowedmacros,"graphlayout","graphcirclelayout","graphcomplete","gra
 //g is a 2-dimensional upper triangular matrix
 //g[i][j] > 0 if vertices i and j are connected. i<j used if
 //not a digraph
-//options is an array of options:
-//  options['width'] = width of output, in pixels.  Defaults to 300.
-//  options['height'] = height of output, in pixels.  Defaults to 300.
-//  options['digraph'] = true/false.  If true, g[i][j] > 0 means i leads to j
-//  options['useweights'] = true/false.  If true, g[i][j] used as a weight
-//  options['labels'] = "letters" or array of labels.  If "letters", letters
-//    A-Z used for labels.  If array, label[i] used for vertex g[i]
 function graphlayout($g,$op=array()) {
 	$iterations = 40;
-	$t = 1;
+	$t = 2;
 	$dim = 2;
 	$n = count($g[0]);
 	$k = sqrt(1/$n);
@@ -72,6 +73,7 @@ function graphlayout($g,$op=array()) {
 			for ($x = 0; $x<$dim; $x++) {
 				$pos[$i][$x] += $disp[$i][$x]*$scale;
 			}
+			
 		}
 		$t -= $dt;
 	}
@@ -92,19 +94,24 @@ function graphlayout($g,$op=array()) {
 	
 }
 
-//graphcirclelayout(graph,[width,height])
+//graphgridlayout(graph,[options])
 //draws a graph based on a graph incidence matrix
 //using a rectangular grid layout.  Could hide
 //some edges that connect colinear vertices
-//g is a 2-dimensional upper triangular matrix
-//g[i][j] = 1 if vertexes i and j are connected, i<j
+//use options['wiggle'] = true to perterb off exact grid
+//g is a 2-dimensional matrix
+//g[i][j] = 1 if vertexes i and j are connected
 function graphgridlayout($g,$op=array()) {
 	$n = count($g[0]);
-	$sn = ceil(sqrt($n));
+	if (isset($op['gridv'])) {
+		$sn = $op['gridv'];
+	} else {
+		$sn = ceil(sqrt($n));
+	}
 	$gd = 10/$sn;
 	for ($i=0; $i<$n; $i++) {
-		$pos[$i][0] = floor($i/$sn)*$gd;
-		$pos[$i][1] = ($i%$sn)*$gd;
+		$pos[$i][0] = floor($i/$sn)*$gd  + ($op['wiggle']?$gd/5*sin(3*$i):0);;
+		$pos[$i][1] = ($i%$sn)*$gd + ($op['wiggle']?$gd/5*sin(4*$i):0);
 	}	
 	$op['xmin'] = 10;
 	$op['xmax'] = 0;
@@ -119,7 +126,154 @@ function graphgridlayout($g,$op=array()) {
 	return graphdrawit($pos,$g,$op);
 }
 
-//graphcirclelayout(graph,[width,height])
+//graphgridlayout(graph,[options])
+//draws a graph based on a graph incidence matrix
+//using a backflow to place the vertices in approximate
+//order of incidence.  Could hide
+//some edges that connect colinear vertices
+//use options['wiggle'] = true to perterb off exact grid
+//g is a 2-dimensional matrix
+//g[i][j] = 1 if vertexes i and j are connected
+function graphpathlayout($g,$op=array()) {
+	$n = count($g[0]);
+	list($dist,$next) = graphbackflow($g);
+	$maxh = max($dist);
+	$maxv = ceil($n/$maxh);
+	$dh = 10/$maxh;
+	$dv = 10/$maxv;
+	$odv = $dv/$maxh;
+	
+	
+	for ($i=0; $i<$n; $i++) {
+		if ($dist[$i]<0) { $dist[$i] = 0;}
+		$pos[$i][0] = 1-$dh*$dist[$i];
+		$pos[$i][1] = 5 + ($loccnt[$dist[$i]]%2==0?1:-1)*$dv*ceil($loccnt[$dist[$i]]/2)+ ($op['wiggle']?$dv/5*sin(4*$dist[$i]):0);
+		$loccnt[$dist[$i]]++;
+	}
+
+	$op['xmin'] = 10;
+	$op['xmax'] = 0;
+	$op['ymin'] = 10;
+	$op['ymax'] = 0;
+	for ($i=0; $i<$n; $i++) {
+		if ($pos[$i][0]<$op['xmin']) {$op['xmin'] = $pos[$i][0];}
+		if ($pos[$i][0]>$op['xmax']) {$op['xmax'] = $pos[$i][0];}
+		if ($pos[$i][1]<$op['ymin']) {$op['ymin'] = $pos[$i][1];}
+		if ($pos[$i][1]>$op['ymax']) {$op['ymax'] = $pos[$i][1];}
+	}
+	//$pos[$n-1][1] = ($op['ymax'] - $op['ymin'] )/2;
+	return graphdrawit($pos,$g,$op);
+}
+
+
+
+//graphdijkstra(g) 
+//computes dijkstras algorithm on the graph g
+//g is a 2-dimensional matrix
+//g[i][j] = 1 if vertexes i and j are connected
+//the last vertex will be used as the destination vertex
+//returns array(dist,next) where
+//dist[i] is the shortest dist to end, and
+//next[i] is the vertex next closest to the end
+function graphdijkstra($g) {
+	$n = count($g[0]);
+	$dist = array();
+	$next = array();
+	$eaten = array();
+	$inf = 1e16;
+	for ($i=0; $i<$n; $i++) {
+		$dist[$i] = $inf;
+	}
+	$dist[$n-1] = 0;
+	while (count($eaten)<$n) {
+		$cur = -1;
+		//find starting vertex, if any
+		for ($i=0; $i<$n; $i++) {	
+			if (!isset($eaten[$i])) {
+				$cur = $i;
+				break;
+			}
+		}
+		if ($cur==-1) {break;}
+		//find vertex w/ smallest dist
+		for ($i=0; $i<$n; $i++) {
+			if (!isset($eaten[$i]) && $dist[$i]<$dist[$cur]) {
+				$cur = $i;
+			}
+		}
+		if ($dist[$cur]==$inf) {
+			break;  //can't access remaining verticies
+		}
+		$eaten[$cur] = 1; //remove vertex
+		for ($i=0; $i<$n; $i++) {
+			if (!isset($eaten[$i]) && $g[$i][$cur]>0) { //vertices leading to $cur
+				$alt = $dist[$cur] + $g[$i][$cur];
+				if ($alt<$dist[$i]) {
+					$dist[$i] = $alt;
+					$next[$i] = $cur;
+				}
+			}
+		}
+	}
+	return array($dist,$next);
+}
+
+//graphbackflow(g) 
+//computes longest-path algorithm on the graph g
+//g is a 2-dimensional matrix
+//g[i][j] = 1 if vertexes i leads to j
+//This might give bad/weird results if graph has a circuit
+//the last vertex will be used as the destination vertex
+//returns array(dist,next) where
+//dist[i] is the longest dist to end, and
+//next[i] is the vertex next closest to the end
+function graphbackflow($g) {
+	$n = count($g[0]);
+	$dist = array();
+	$next = array();
+	$eaten = array();
+	$inf = 1e16;
+	for ($i=0; $i<$n; $i++) {
+		$dist[$i] = -1;
+	}
+	$dist[$n-1] = 0;
+	$toprocess = array($n-1);
+	while (count($eaten)<$n) {
+		if (count($toprocess)==0) { break;}
+		for ($k=0; $k<count($toprocess); $k++) {
+			$cur = $toprocess[$k];
+			$newtoprocess = array();
+			for ($i=0; $i<$n; $i++) {
+				if (!isset($eaten[$i]) && $g[$i][$cur]>0) { //vertices leading to $cur
+					$alt = $dist[$cur] + $g[$i][$cur];
+					if ($alt>$dist[$i]) {
+						$dist[$i] = $alt;
+						$next[$i] = $cur;
+						if (!in_array($i,$newtoprocess)) {
+							$douse = true;
+							//don't use if not terminal 
+							for ($j=0; $j<$n; $j++) {
+								if ($g[$i][$j]>0 && !isset($eaten[$j]) && $j!=$cur) {
+									$douse = false; break;
+								}
+							}
+							if ($douse) {
+								$newtoprocess[] = $i;
+							}
+						}
+					}
+					
+				}
+			}
+			$eaten[$cur] = 1;
+		}
+		$toprocess = $newtoprocess;
+	}
+	return array($dist,$next);
+}
+	
+
+//graphcirclelayout(graph,[options])
 //draws a graph based on a graph incidence matrix
 //using a circular layout
 //g is a 2-dimensional upper triangular matrix
@@ -138,21 +292,189 @@ function graphcirclelayout($g,$op=array()) {
 	return graphdrawit($pos,$g,$op);
 }
 
-//graphcomplete(n,[width,height])
+//graphcomplete(n,[options])
 //draws a complete graph with a circular layout
 //with n vertices
 function graphcomplete($n,$op=array()) {
-	$dtheta = 2*M_PI/$n;
+	$g = array();
 	for ($i = 0; $i<$n; $i++) {
-		$pos[$i][0] = 10*cos($dtheta*$i);
-		$pos[$i][1] = 10*sin($dtheta*$i);
 		$g[$i] = array_fill(0,$n,1);
 	}
-	$op['xmin'] = -10;
-	$op['xmax'] = 10;
-	$op['ymin'] = -10;
-	$op['ymax'] = 10;
+	return graphcirclelayout($g,$op);
+}
+
+//graphrandomcircle(n, p,[options])
+//draws a circular group with n vertices.  Each pair of 
+//vertices has a p probabilility (0 to 1) of being connected
+function graphrandomcircle($n,$p,$op=array()) {
+	$g = graphemptygraph($n);
+	for ($i = 0; $i<$n; $i++) {
+		for ($j=$i+1;$j<$n; $j++) {
+			$r = rand(0,99);
+			if ($r<$p*100) {
+				$g[$i][$j] = 1;
+			}
+		}
+	}
+	return graphcirclelayout($g,$op);	
+}
+
+//graphrandomgrid(n, m, p,[options])
+//draws a n by m grid of vertices.  Each pair of neighboring 
+//vertices has a p probabilility (0 to 1) of being connected
+function graphrandomgrid($n,$m,$p,$op=array()) {
+	$tot = $n*$m;
+	$g = graphemptygraph($tot);
+	for ($i = 0; $i<$tot; $i++) {
+		$r = rand(0,99);
+		if ($r<$p*100 && ($i+1)%$n!=0) {
+			$g[$i][$i+1] = 1;
+		}
+		$r = rand(0,99);
+		if ($r<$p*100 && ($i+$n<$tot)) {
+			$g[$i][$i+$n] = 1;
+		}
+	}
+	$op['gridv'] = $n;
+	return graphgridlayout($g,$op);	
+}
+
+//graphrandom(n, p,[options])
+//draws a random grid with n vertices.  Each pair of  
+//vertices has a p probabilility (0 to 1) of being connected
+function graphrandom($n,$p,$op=array()) {
+	$g = graphemptygraph($n);
+	for ($i = 0; $i<$n; $i++) {
+		for ($j=$i+1;$j<$n; $j++) {
+			$r = rand(0,99);
+			if ($r<$p*100) {
+				$g[$i][$j] = 1;
+			}
+		}
+	}	
+	return graphlayout($g,$op);	
+}
+
+//graphrandomgridschedule(n, m, p,[options])
+//draws a n by m grid of vertices.  Each pair of neighboring
+//and diagonal vertices has a p probabilility (0 to 1) of being connected
+//a start and end vertex are added
+//options['weights'] as an array of n*m elements will be used as weights.
+//options['weights'] as a single number will randomize weights from 1 to that
+//  value
+//if options['labels'] are used, "start" and "end" will be added automatically
+function graphrandomgridschedule($n,$m,$p,$op=array()) {
+	$op['digraph'] = true;
+	$lettersarray = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
+	$tot = $n*$m+2;
+	$useweights = false;
+	if (isset($op['weights'])) {
+		$useweights = true;
+		if (!is_array($op['weights'])) {
+			$op['weights'] = rands(1,$op['weights'],$n*$m);
+		}
+	}
+			
+	$g = graphemptygraph($tot);
+	$sn = $n;
+	$gd = 10/$sn;
+	$pos[0][0] = -$gd;
+	$pos[0][1] = $gd*(($n-1)/2);
+	$pos[$tot-1][0] = $m*$gd;
+	$pos[$tot-1][1] = $gd*(($n-1)/2);
+	for ($i=1; $i<$tot-1; $i++) {
+		$pos[$i][0] = floor(($i-1)/$sn)*$gd  + ($op['wiggle']?$gd/5*sin(3*$i):0);;
+		$pos[$i][1] = (($i-1)%$sn)*$gd + ($op['wiggle']?$gd/5*sin(4*$i):0);
+	}	
+	//connections to start and end
+	for ($i = 1; $i<$n+1; $i++) {
+		$g[0][$i] = 1;
+		$g[$tot-1-$i][$tot-1] = 1;
+	}
+	//connections between
+	for ($i = 1; $i<$tot; $i++) {
+		if ($i<$tot-$n) {
+			$r[0] = rand(0,99);
+			$r[1] = rand(0,99);
+			$r[2] = rand(0,99);
+			
+			$out = false;
+			if ($r[0]<$p*100) {
+				$g[$i][$i+$n] = 1;
+				$out = true;
+			}
+			
+			if ($r[1]<$p*100  && ($i)%$n!=0) {
+				$g[$i][$i+$n+1] = 1;
+				$out = true;
+			}
+			
+			if ($r[2]<$p*100 && ($i-1)%$n!=0) {
+				$g[$i][$i+$n-1] = 1;
+				$out = true;
+			}
+			//force one outgoing
+			if (!$out) {
+				$d = rand(0,2);
+				if ($d<2) {
+					$g[$i][$i+$n] = 1;
+				} else {
+					if ($i%$n==0) {
+						$g[$i][$i+$n-1] = 1;
+					} else {
+						$g[$i][$i+$n+1] = 1;
+					}
+				}
+			}
+		}
+		//force one incoming
+		$connected = false;
+		if ($i<=$n) {
+			$connected = true;
+		} else if ($i<=$n || $g[$i-1][$i]==1 || $g[$i-$n][$i]==1 || $g[$i-$n-1][$i]==1 ||  $g[$i-$n+1][$i]==1) {
+			$connected = true;
+		}
+		if (!$connected) {
+			$g[$i-$n][$i] = 1;
+		}
+		
+	}
+	$op['xmin'] = 10;
+	$op['xmax'] = 0;
+	$op['ymin'] = 10;
+	$op['ymax'] = 0;
+	for ($i=0; $i<$tot; $i++) {
+		if ($pos[$i][0]<$op['xmin']) {$op['xmin'] = $pos[$i][0];}
+		if ($pos[$i][0]>$op['xmax']) {$op['xmax'] = $pos[$i][0];}
+		if ($pos[$i][1]<$op['ymin']) {$op['ymin'] = $pos[$i][1];}
+		if ($pos[$i][1]>$op['ymax']) {$op['ymax'] = $pos[$i][1];}
+	}
+	
+	if (isset($op['labels'])) {
+		if ($op['labels']=="letters") {
+			$op['labels'] = array_slice($lettersarray,0,$tot-2);
+		} 
+		array_unshift($op['labels'],"Start");
+		array_push($op['labels'],"End");
+		if ($useweights) {
+			for ($i=1; $i<$tot-1; $i++) {
+				$op['labels'][$i] .= ' ('.$op['weights'][$i-1].')';
+			}
+		}
+	}
+	
 	return graphdrawit($pos,$g,$op);
+}
+
+
+//graphemptygraph(n)
+//creates an empty graph matrix, nxn
+function graphemptygraph($n) {
+	$g = array();
+	for ($i = 0; $i<$n; $i++) {
+		$g[$i] = array_fill(0,$n,0);
+	}
+	return $g;
 }
 
 //internal function, not to be used
@@ -160,7 +482,7 @@ function graphdrawit($pos,$g,$op) {
 	if (!isset($op['width'])) {$op['width'] = 300;}
 	if (!isset($op['height'])) {$op['height'] = 300;}
 	$lettersarray = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
-	$com = "setBorder(40);initPicture({$op['xmin']},{$op['xmax']},{$op['ymin']},{$op['ymax']});";
+	$com = "setBorder(60,30,60,30);initPicture({$op['xmin']},{$op['xmax']},{$op['ymin']},{$op['ymax']});";
 	$cx = ($op['xmin'] + $op['xmax'])/2;
 	$cy = ($op['ymin'] + $op['ymax'])/2;
 	
