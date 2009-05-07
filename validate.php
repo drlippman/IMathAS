@@ -29,7 +29,6 @@
 		 $sessiondata = unserialize(base64_decode($enc));
 		 //delete own session if old and not posting
 		 if ((time()-mysql_result($result,0,3))>24*60*60 && (!isset($_POST) || count($_POST)==0)) {
-			 echo count($_POST);
 			$query = "DELETE FROM imas_sessions WHERE userid='$userid'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			unset($userid);

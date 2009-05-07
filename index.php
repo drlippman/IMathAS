@@ -132,7 +132,7 @@ if ($line == null) {
 		$page_studentCourseData[$i] = $line;
 		
 		if (isset($newmsgcnt[$page_studentCourseData[$i]['id']]) && $newmsgcnt[$page_studentCourseData[$i]['id']]>0) {
-			$page_studentCourseData[$i]['courseDisplayTag'] = " <span style=\"color:red\">New Messages ({$newmsgcnt[$page_studentCourseData[$i]['id']]})</span>";
+			$page_studentCourseData[$i]['courseDisplayTag'] = " <a href=\"msgs/msglist.php?cid={$page_studentCourseData[$i]['id']}\" style=\"color:red\">New Messages ({$newmsgcnt[$page_studentCourseData[$i]['id']]})</a>";
 		}
 		if (isset($newpostscnt[$page_studentCourseData[$i]['id']]) && $newpostscnt[$page_studentCourseData[$i]['id']]>0) {
 			$page_studentCourseData[$i]['courseDisplayTag'] .= " <a href=\"forums/newthreads.php?cid={$page_studentCourseData[$i]['id']}\" style=\"color:red\">New Posts (". $newpostscnt[$page_studentCourseData[$i]['id']] .")</a>";

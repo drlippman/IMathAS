@@ -85,8 +85,11 @@
 			$useeditor = "message";
 			$loadgraphfiler = true;
 			require("../header.php");
-			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
-			echo "&gt; <a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid\">Message List</a> &gt; ";
+			echo "<div class=breadcrumb>$breadcrumbbase ";
+			if ($cid>0) {
+				echo "<a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt;  ";
+			}
+			echo "<a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid\">Message List</a> &gt; ";
 			
 			echo "New Message</div>\n";
 			
