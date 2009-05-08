@@ -682,7 +682,7 @@ function graphdrawit($pos,$g,$op) {
 	$cx = ($op['xmin'] + $op['xmax'])/2;
 	$cy = ($op['ymin'] + $op['ymax'])/2;
 	
-	
+	$com .= "fontstyle='none';";
 	for ($i=0; $i<$n; $i++) {
 		$com .= "dot([".$pos[$i][0].",".$pos[$i][1]."]);";
 		if (isset($op['labels'])) {
@@ -718,8 +718,13 @@ function graphdrawit($pos,$g,$op) {
 			}
 			if ($op['useweights'] && ($g[$i][$j]>0 || $g[$j][$i]>0)) {
 				$mx = ($pos[$i][0] + $pos[$j][0])/2;
-				$my = ($pos[$i][1] + $pos[$j][1])/2;
+				$my = ($pos[$i][1] + $pos[$j][1])/2;     
+				$dx = $pos[$i][0] - $pos[$j][0];
+				$dy = $pos[$i][1] - $pos[$j][1];
+				if ($dx == 0) { $slope = 10000;} else {$slope = $dy/$dx;}
+				if ($dx
 				$com .= "fontfill='red';text([$mx,$my],'".max($g[$i][$j],$g[$j][$i])."');";
+				
 			}
 		}
 	}

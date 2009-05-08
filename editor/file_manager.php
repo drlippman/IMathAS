@@ -35,9 +35,6 @@ if (isset($_REQUEST["action"]))
 		$filename = basename(stripslashes($_POST["uploaded_file_name"]));
 		$filename = str_replace(' ','_',$filename);
 		$filename = preg_replace('/[^\w\.]/','',$filename);
-		echo "Error:";
-		echo ini_get("upload_max_filesize");
-		echo $_FILES['uploaded_file']['error'];
 		//$filename = urlencode($filename);
 		//echo $filename;
 		//exit;
