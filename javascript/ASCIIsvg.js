@@ -36,7 +36,7 @@ var origin = [0,0];   // in pixels (default is bottom left corner)
 var defaultwidth = 300; defaultheight = 200; defaultborder = [0,0,0,0];
 var border = defaultborder;
 var strokewidth, strokedasharray, stroke, fill;
-var fontstyle, fontfamily, fontsize, fontweight, fontstroke, fontfill;
+var fontstyle, fontfamily, fontsize, fontweight, fontstroke, fontfill, fontbackground;
 var markerstrokewidth = "1";
 var markerstroke = "black";
 var markerfill = "yellow";
@@ -294,6 +294,7 @@ function initPicture(x_min,x_max,y_min,y_max) {
   fontweight = "normal";
   fontstroke = "black";  // default font outline color
   fontfill = "black";    // default font color
+  fontbackground = "none";
   marker = "none";
   initialized = true;
   if (x_min!=null) xmin = x_min;
@@ -620,15 +621,15 @@ function textabs(p,st,pos,angle,id,fontsty) {
   if (angle==0) {
 	  var dx = 0; var dy = fontsize/3;
 	  if (pos!=null) {
-	    if (pos.match(/above/)) { dy = -fontsize/2; }
+	    if (pos.match(/above/)) { dy = -fontsize/3; }
 	    if (pos.match(/below/)) { dy = fontsize-0; }
 	    if (pos.match(/right/)) {
 	      textanchor = "start";
-	      dx = fontsize/2;
+	      dx = fontsize/3;
 	    }
 	    if (pos.match(/left/)) {
 	      textanchor = "end";
-	      dx = -fontsize/2;
+	      dx = -fontsize/3;
 	    }
 	  }
   }
@@ -655,6 +656,21 @@ function textabs(p,st,pos,angle,id,fontsty) {
   if (fontstroke!="none") node.setAttribute("stroke",fontstroke);
   if (fontfill!="none") node.setAttribute("fill",fontfill);
   node.setAttribute("stroke-width","0px");
+  if (fontbackground!="none") {
+	  var bgnode = myCreateElementSVG("rect");
+	  var bb = node.getBBox();
+	  bgnode.setAttribute("fill",fontbackground);
+	  bgnode.setAttribute("stroke-width","0px");
+	  bgnode.setAttribute("x",bb.x-2);
+	  bgnode.setAttribute("y",bb.y-2);
+	  bgnode.setAttribute("width",bb.width+4);
+	  bgnode.setAttribute("height",bb.height+4);
+	  if (angle != 0) {
+		   bgnode.setAttribute("transform","rotate("+angle+" "+(p[0]+dx)+" "+(height-p[1]+dy)+")");
+	  }
+	  svgpicture.insertBefore(bgnode,node);
+		  
+  }
   return p;
 }
 

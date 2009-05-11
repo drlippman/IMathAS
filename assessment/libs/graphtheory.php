@@ -21,13 +21,13 @@
 //    position of vertex labels.  
 
 global $allowedmacros;
-array_push($allowedmacros,"graphspringlayout","graphcirclelayout","graphgridlayout","graphpathlayout","graphcircleladder","graphcircle","graphbipartite","graphgrid","graphrandom","graphrandomgridschedule","graphemptygraph","graphdijkstra","graphbackflow","graphkruskal","graphadjacencytoincidence","graphincidencetoadjacency");
+array_push($allowedmacros,"graphspringlayout","graphcirclelayout","graphgridlayout","graphpathlayout","graphcircleladder","graphcircle","graphbipartite","graphgrid","graphrandom","graphrandomgridschedule","graphemptygraph","graphdijkstra","graphbackflow","graphkruskal","graphadjacencytoincidence","graphincidencetoadjacency","graphdrawit");
 	
 //graphspringlayout(g,[options])
 //draws a graph based on a graph incidence matrix
 //using a randomized spring layout engine
 //g is a 2-dimensional upper triangular matrix
-//g[i][j] > 0 if vertices i and j are connected. i<j used if
+//g[i][j] &gt; 0 if vertices i and j are connected
 //not a digraph
 function graphspringlayout($g,$op=array()) {
 	$iterations = 40;
@@ -94,7 +94,7 @@ function graphspringlayout($g,$op=array()) {
 //draws a graph based on a graph incidence matrix
 //using a circular layout
 //g is a 2-dimensional upper triangular matrix
-//g[i][j] = 1 if vertexes i and j are connected, i<j
+//g[i][j] &gt; 0 if vertexes i and j are connected
 function graphcirclelayout($g,$op=array()) {
 	$n = count($g[0]);
 	$dtheta = 2*M_PI/$n;
@@ -115,7 +115,7 @@ function graphcirclelayout($g,$op=array()) {
 //some edges that connect colinear vertices
 //use options['wiggle'] = true to perterb off exact grid
 //g is a 2-dimensional matrix
-//g[i][j] = 1 if vertexes i and j are connected
+//g[i][j] &gt; 0 if vertexes i and j are connected
 function graphgridlayout($g,$op=array()) {
 	$n = count($g[0]);
 	if (isset($op['gridv'])) {
@@ -138,7 +138,7 @@ function graphgridlayout($g,$op=array()) {
 //some edges that connect colinear vertices
 //use options['wiggle'] = true to perterb off exact grid
 //g is a 2-dimensional matrix
-//g[i][j] = 1 if vertexes i and j are connected
+//g[i][j] &gt; 0 if vertexes i and j are connected
 function graphpathlayout($g,$op=array()) {
 	$n = count($g[0]);
 	list($dist,$next) = graphbackflow($g);
@@ -164,7 +164,7 @@ function graphpathlayout($g,$op=array()) {
 //n vertices around a circle
 //m concentric circles
 //connected around circle and between circles
-//returns array($pic,$g)
+//returns array(pic,g)
 function graphcircleladder($n,$m,$op=array()) {
 	$tot = $n*$m;
 	$dtheta = 2*M_PI/$n;
@@ -199,7 +199,7 @@ function graphcircleladder($n,$m,$op=array()) {
 //graphcircle(n,[options])
 //draws a complete graph with a circular layout
 //with n vertices
-//returns array($pic,$g)
+//returns array(pic,g)
 function graphcircle($n,$op=array()) {
 	$g = graphemptygraph($n);
 	for ($i = 0; $i<$n; $i++) {
@@ -215,7 +215,7 @@ function graphcircle($n,$op=array()) {
 //draws a complete bipartite graph (every vertex on left is 
 //connected to every vertex on the right)
 //with n vertices in the first column, m in the second
-//returns array($pic,$g)
+//returns array(pic,g)
 function graphbipartite($n,$m,$op=array()) {
 	$tot = $n+$m;
 	$g = graphemptygraph($tot);
@@ -241,7 +241,7 @@ function graphbipartite($n,$m,$op=array()) {
 
 //graphgrid(n, m, [options])
 //draws a n by m grid of vertices.
-//returns array($pic,$g)
+//returns array(pic,g)
 function graphgrid($n,$m,$op=array()) {
 	$tot = $n*$m;
 	$g = graphemptygraph($tot);
@@ -658,7 +658,10 @@ function graphprocessoptions($g,$op) {
 	}
 	return $g;	
 }
-//internal function, not to be used directly
+
+//internal function, not usually used directly
+//can get called with graph matrix g, g[i][j] if vertex i has edge to j
+//pos is array where pos[i] = array(x,y) positions for vertices
 function graphdrawit($pos,$g,$op) {
 	if (!isset($op['width'])) {$op['width'] = 360;}
 	if (!isset($op['height'])) {$op['height'] = 300;}
@@ -678,13 +681,36 @@ function graphdrawit($pos,$g,$op) {
 	}
 	
 	$lettersarray = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
-	$com = "setBorder(60,30,60,30);initPicture({$op['xmin']},{$op['xmax']},{$op['ymin']},{$op['ymax']});";
+	$com = "setBorder(60,30,60,30);initPicture({$op['xmin']},{$op['xmax']},{$op['ymin']},{$op['ymax']}); fontsize=14;";
 	$cx = ($op['xmin'] + $op['xmax'])/2;
 	$cy = ($op['ymin'] + $op['ymax'])/2;
 	
 	$com .= "fontstyle='none';";
+	if ($op['digraph']) {
+		$com .= 'marker="arrow";';
+	} else {
+		$com .= 'marker=null;';
+	}
 	for ($i=0; $i<$n; $i++) {
-		$com .= "dot([".$pos[$i][0].",".$pos[$i][1]."]);";
+		for ($j=$i+1; $j<$n; $j++) {
+			if ($op['digraph']) {
+				if ($g[$j][$i]>0 && $g[$i][$j]==0) {
+					$com .= "line([".$pos[$j][0].",".$pos[$j][1]."],[".$pos[$i][0].",".$pos[$i][1]."]);";
+				} else if ($g[$i][$j]>0 && $g[$j][$i]==0) {
+					$com .= "line([".$pos[$i][0].",".$pos[$i][1]."],[".$pos[$j][0].",".$pos[$j][1]."]);";
+				} else if ($g[$j][$i]>0 && $g[$i][$j]>0) {
+					$com .= "line([".$pos[$j][0].",".$pos[$j][1]."],[".$pos[$i][0].",".$pos[$i][1]."]);";
+				}
+				
+			} else {
+				if ($g[$i][$j]>0) {
+					$com .= "line([".$pos[$i][0].",".$pos[$i][1]."],[".$pos[$j][0].",".$pos[$j][1]."]);";
+				}
+			}
+		}
+	}
+	$com .= "fontbackground='white';";
+	for ($i=0; $i<$n; $i++) {
 		if (isset($op['labels'])) {
 			if (isset($op['labelposition'])) {
 				$ps = $op['labelposition'];
@@ -698,31 +724,11 @@ function graphdrawit($pos,$g,$op) {
 				$com .= "fontfill='blue';text([".$pos[$i][0].",".$pos[$i][1]."],'".$lettersarray[$i]."','$ps');";	
 			}
 		}
+		$com .= "dot([".$pos[$i][0].",".$pos[$i][1]."]);";
 		for ($j=$i+1; $j<$n; $j++) {
-			if ($op['digraph']) {
-				if ($g[$j][$i]>0 && $g[$i][$j]==0) {
-					$com .= 'marker="arrow";';	
-					$com .= "line([".$pos[$j][0].",".$pos[$j][1]."],[".$pos[$i][0].",".$pos[$i][1]."]);";
-				} else if ($g[$i][$j]>0 && $g[$j][$i]==0) {
-					$com .= 'marker="arrow";';	
-					$com .= "line([".$pos[$i][0].",".$pos[$i][1]."],[".$pos[$j][0].",".$pos[$j][1]."]);";
-				} else if ($g[$j][$i]>0 && $g[$i][$j]>0) {
-					$com .= 'marker=null;';
-					$com .= "line([".$pos[$j][0].",".$pos[$j][1]."],[".$pos[$i][0].",".$pos[$i][1]."]);";
-				}
-				
-			} else {
-				if ($g[$i][$j]>0) {
-					$com .= "line([".$pos[$i][0].",".$pos[$i][1]."],[".$pos[$j][0].",".$pos[$j][1]."]);";
-				}
-			}
 			if ($op['useweights'] && ($g[$i][$j]>0 || $g[$j][$i]>0)) {
 				$mx = ($pos[$i][0] + $pos[$j][0])/2;
 				$my = ($pos[$i][1] + $pos[$j][1])/2;     
-				$dx = $pos[$i][0] - $pos[$j][0];
-				$dy = $pos[$i][1] - $pos[$j][1];
-				if ($dx == 0) { $slope = 10000;} else {$slope = $dy/$dx;}
-				if ($dx
 				$com .= "fontfill='red';text([$mx,$my],'".max($g[$i][$j],$g[$j][$i])."');";
 				
 			}

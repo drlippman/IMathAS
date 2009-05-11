@@ -56,7 +56,7 @@ var $white,$black,$red,$orange,$yellow,$green,$blue,$cyan,$purple,$gray;
 var $stroke = 'black', $fill = 'none', $curdash='', $isdashed=false, $marker='none';
 var $markerfill = 'green', $gridcolor = 'gray', $axescolor = 'black';
 var $strokewidth = 1, $xunitlength, $yunitlength, $dotradius=8, $ticklength=4;
-var $fontsize = 12, $fontfile, $fontfill='';
+var $fontsize = 12, $fontfile, $fontfill='', $fontbackground='';
 
 var $AScom; 
 function AStoIMG($w=200, $h=200) {
@@ -64,7 +64,7 @@ function AStoIMG($w=200, $h=200) {
 	$this->stroke = 'black'; $this->fill = 'none'; $this->curdash=''; $this->isdashed=false; $this->marker='none';
 	$this->markerfill = 'green'; $this->gridcolor = 'gray'; $this->axescolor = 'black';
 	$this->strokewidth = 1; $this->dotradius=8; $this->ticklength=4;
-	$this->fontsize = 12; $this->fontfill='';
+	$this->fontsize = 12; $this->fontfill=''; $this->fontbackground='';
 	
 	if ($w<=0) {$w=200;}
 	if ($h<=0) {$h=200;}
@@ -144,7 +144,6 @@ function processScript($script) {
 	foreach ($this->AScom as $com) {
 		if (preg_match('/\s*(\w+)\s*=(.+)/',$com,$matches)) { //is assignment operator
 			$matches[2] = str_replace(array('"','\''),'',$matches[2]);
-				
 			switch($matches[1]) {
 				case 'border':
 				case 'xmin':
@@ -153,6 +152,7 @@ function processScript($script) {
 				case 'ymax':
 				case 'fill':
 				case 'marker':
+				case 'fontbackground':
 				case 'fontfill':
 					$this->$matches[1] = $matches[2];
 					break;
@@ -334,11 +334,13 @@ function AStextInternal($p,$st,$pos,$angle) {
 	}*/
 	if ($this->usettf) {
 		$bb = imagettfbbox($this->fontsize,$angle,$this->fontfile,$st);
+		
 		$bbw = $bb[4]-$bb[0];
 		$bbh = -1*($bb[5]-$bb[1]);
 		
 		$p[0] = $p[0] - .5*($bbw);
 		$p[1] = $p[1] + .5*($bbh);
+		
 		if ($pos=='above' || $pos=='aboveright' || $pos=='aboveleft') {
 			$p[1] = $p[1] - .5*(abs($bbh)) - $this->fontsize/2;
 		}			
@@ -356,6 +358,13 @@ function AStextInternal($p,$st,$pos,$angle) {
 		} else {
 			$color = $this->stroke;
 		}
+		if ($this->fontbackground != '' && $this->fontbackground != 'none') {
+			$minX = min(array($bb[0],$bb[2],$bb[4],$bb[6]));
+			$maxX = max(array($bb[0],$bb[2],$bb[4],$bb[6]));
+			$minY = min(array($bb[1],$bb[3],$bb[5],$bb[7]));
+			$maxY = max(array($bb[1],$bb[3],$bb[5],$bb[7]));
+			imagefilledrectangle($this->img,$p[0]+$minX-2,$p[1]+$minY-2,$p[0]+$maxX+2,$p[1]+$maxY+2,$this->{$this->fontbackground});
+		} 
 		imagettftext($this->img,$this->fontsize,$angle,$p[0],$p[1],$this->$color,$this->fontfile,$st);
 	} else {
 		if ($this->fontsize<9) {
@@ -392,6 +401,9 @@ function AStextInternal($p,$st,$pos,$angle) {
 			$color = $this->fontfill;
 		} else {
 			$color = $this->stroke;
+		}
+		if ($this->fontbackground != '' && $this->fontbackground != 'none') {
+			imagefilledrectangle($this->img,$p[0]-2,$p[1]-2,$p[0]+$bb[0]+2,$p[1]+$bb[1]+2,$this->{$this->fontbackground});
 		}
 		if ($angle==90 || $angle==270) {
 			imagestringup($this->img,$fs,$p[0],$p[1],$st,$this->$color);
