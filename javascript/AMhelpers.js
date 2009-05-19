@@ -188,6 +188,7 @@ function ntuplecalc(inputId,outputId) {
 			
 			if ((NCdepth==0 && dec) || (NCdepth==1 && fullstr.charAt(i)==',')) {
 				sub = fullstr.substring(lastcut,i);
+				err = "";
 				try {
 				    with (Math) var res = eval(mathjs(sub));
 				} catch(e) {

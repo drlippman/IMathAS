@@ -1552,6 +1552,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$tocheck = str_replace(array('],[','),(','>,<'),',',$tocheck);
 			$tocheck = substr($tocheck,1,strlen($tocheck)-2);
 			$tocheck = explode(',',$tocheck);
+			
 			foreach($tocheck as $chkme) {
 				if (!checkanswerformat($chkme,$ansformats)) {
 					return 0; //perhaps should just elim bad answer rather than all?
@@ -1582,7 +1583,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				}
 				$ansparts = explode(',',$answer[2]);
 				$gaparts = explode(',',$givenans[2]);
-				
+
 				if (count($ansparts)!=count($gaparts)) {
 					break;
 				}
@@ -1593,6 +1594,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						} else {
 							if (abs($ansparts[$i]-$gaparts[$i])/(abs($ansparts[$i])+.0001) >= $reltolerance+ 1E-12) {break;} 
 						}
+					} else {
+						break;
 					}
 				}
 				if ($i==count($ansparts)) {
@@ -1635,7 +1638,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				if ($cpts[1]{0}=='+') {
 					$cpts[1] = substr($cpts[1],1);
 				}
-				echo $cpts[0].','.$cpts[1].'<br/>';
+				//echo $cpts[0].','.$cpts[1].'<br/>';
 				if (!checkanswerformat($cpts[0],$ansformats) || !checkanswerformat($cpts[1],$ansformats)) {
 					return 0;
 				}
@@ -1663,7 +1666,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		foreach ($anarr as $i=>$answer) {
 			$cparts = parsecomplex($answer);
 			if (!is_array($cparts)) {
-				echo $cparts;
+				//echo $cparts;
 			} else {
 				eval('$ansparts[0] = '.$cparts[0].';');
 				eval('$ansparts[1] = '.$cparts[1].';');
@@ -1883,6 +1886,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			unset($ratios);
 		} else if ($answerformat=="toconst") {
 			unset($diffs);
+			unset($realanss);
 		}
 		
 		
@@ -1902,6 +1906,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$cntnan = 0;
 		$cntzero = 0;
 		$stunan = 0;
+		$ysqrtot = 0;
+		$reldifftot = 0;
 		for ($i = 0; $i < 20; $i++) {
 			for($j=0; $j < count($variables); $j++) {
 
@@ -1927,6 +1933,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				}
 			} else if ($answerformat=="toconst") {
 				$diffs[] = $myans[$i] - $realans;
+				$realanss[] = $realans;
+				$ysqr = $realans*$realans;
+				$ysqrtot += 1/($ysqr+.0001);
+				$reldifftot += ($myans[$i] - $realans)/($ysqr+.0001);
 			} else { //otherwise, compare points
 				if (isNaN($myans[$i])) {
 					$stunan++;
@@ -1962,16 +1972,22 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$correct = false;
 			}
 		} else if ($answerformat=="toconst") {
-			$meandiff = array_sum($diffs)/count($diffs);
+			if (isset($abstolerance)) {
+				//if abs, use mean diff - will minimize error in abs diffs
+				$meandiff = array_sum($diffs)/count($diffs);
+			} else {
+				//if relative tol, use meandiff to minimize relative error
+				$meandiff = $reldifftot/$ysqrtot;
+			}
 			if (is_nan($meandiff)) {
 				$correct=false; return 0;
 			} 
 			for ($i=0; $i<count($diffs); $i++) {
 				if (isset($abstolerance)) {
-
 					if (abs($diffs[$i]-$meandiff) > $abstolerance-1E-12) {$correct = false; break;}	
 				} else {
-					if ((abs($diffs[$i]-$meandiff)/(abs($meandiff)+0.0001) > $reltolerance-1E-12)) {$correct = false; break;}
+					//if ((abs($diffs[$i]-$meandiff)/(abs($meandiff)+0.0001) > $reltolerance-1E-12)) {$correct = false; break;}
+					if ((abs($diffs[$i]-$meandiff)/(abs($realanss[$i])+0.0001) > $reltolerance-1E-12)) {$correct = false; break;}
 				}
 			}
 		}
