@@ -80,6 +80,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if ($_POST['cntingb']==0) {
 			$_POST['points'] = 0;
 		}
+		if (intval($_POST['points'])==0) {
+			$_POST['cntingb'] = 0;
+		}
 		
 		require_once("../includes/htmLawed.php");
 		$htmlawedconfig = array('elements'=>'*-script');
@@ -87,13 +90,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				
 		if (isset($_GET['id'])) {  //already have id; update
 		$query = "UPDATE imas_forums SET name='{$_POST['name']}',description='{$_POST['description']}',startdate=$startdate,enddate=$enddate,settings=$fsets,";
-		$query .= "defdisplay='{$_POST['defdisplay']}',replyby=$replyby,postby=$postby,grpaid='{$_POST['grpaid']}',points='{$_POST['points']}',gbcategory='{$_POST['gbcat']}',avail='{$_POST['avail']}',sortby='{$_POST['sortby']}' ";
+		$query .= "defdisplay='{$_POST['defdisplay']}',replyby=$replyby,postby=$postby,grpaid='{$_POST['grpaid']}',points='{$_POST['points']}',cntingb='{$_POST['cntingb']}',gbcategory='{$_POST['gbcat']}',avail='{$_POST['avail']}',sortby='{$_POST['sortby']}' ";
 		$query .= "WHERE id='{$_GET['id']}';";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$newforumid = $_GET['id'];
 		} else { //add new
-		$query = "INSERT INTO imas_forums (courseid,name,description,startdate,enddate,settings,defdisplay,replyby,postby,grpaid,points,gbcategory,avail,sortby) VALUES ";
-		$query .= "('$cid','{$_POST['name']}','{$_POST['description']}',$startdate,$enddate,$fsets,'{$_POST['defdisplay']}',$replyby,$postby,'{$_POST['grpaid']}','{$_POST['points']}','{$_POST['gbcat']}','{$_POST['avail']}','{$_POST['sortby']}');";
+		$query = "INSERT INTO imas_forums (courseid,name,description,startdate,enddate,settings,defdisplay,replyby,postby,grpaid,points,cntingb,gbcategory,avail,sortby) VALUES ";
+		$query .= "('$cid','{$_POST['name']}','{$_POST['description']}',$startdate,$enddate,$fsets,'{$_POST['defdisplay']}',$replyby,$postby,'{$_POST['grpaid']}','{$_POST['points']}','{$_POST['cntingb']}','{$_POST['gbcat']}','{$_POST['avail']}','{$_POST['sortby']}');";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		
 		$newforumid = mysql_insert_id();
@@ -160,6 +163,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$postby = $line['postby'];
 			$grpaid = $line['grpaid'];
 			$points = $line['points'];
+			$cntingb = $line['cntingb'];
 			$gbcat = $line['gbcategory'];
 		} else {  //ADD MODE
 			//set defaults
@@ -178,6 +182,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$points = 0;
 			$gbcat = 0;
 			$sortby = 0;
+			$cntingb = 0;
 		}   
 		
 		$page_formActionTag = "?block=$block&cid=$cid&folder=" . $_GET['folder'];
@@ -352,8 +357,10 @@ if ($overwriteBody==1) {
 		
 		<span class="form">Count in gradebook?</span>
 		<span class="formright">
-			<input type=radio name="cntingb" value="0" <?php if ($points==0) { echo 'checked=1';}?>/>No<br/>
-			<input type=radio name="cntingb" value="1" <?php if ($points!=0) { echo 'checked=1';}?>/>Yes, <input type=text size=4 name="points" value="<?php echo $points;?>"/> points
+			<input type=radio name="cntingb" value="0" <?php if ($cntingb==0) { echo 'checked=1';}?>/>No<br/>
+			<input type=radio name="cntingb" value="1" <?php if ($cntingb==1) { echo 'checked=1';}?>/>Yes<br/>
+			<input type=radio name="cntingb" value="2" <?php if ($cntingb==2) { echo 'checked=1';}?>/>Yes, as extra credit<br/>
+			If yes, for: <input type=text size=4 name="points" value="<?php echo $points;?>"/> points
 		</span><br class="form"/>
 		
 		<span class=form>Gradebook Category:</span>

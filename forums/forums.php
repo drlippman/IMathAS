@@ -68,10 +68,13 @@
 		$newcnt[$line['id']] = $line['pcount'];
 	}
 	
-	
+	$now = time();
 	$query = "SELECT * FROM imas_forums WHERE imas_forums.courseid='$cid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+		if (!$isteacher && !($line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now))) {
+				continue;
+		}
 		echo "<tr><td>";
 		if ($isteacher) {
 			echo '<span class="right">';

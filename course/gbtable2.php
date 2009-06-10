@@ -277,7 +277,7 @@ function gbtable() {
 	}
 	
 	//Pull Discussion Grade info
-	$query = "SELECT id,name,gbcategory,startdate,enddate,replyby,postby,points,avail FROM imas_forums WHERE courseid='$cid' AND points>0 AND avail>0 ";
+	$query = "SELECT id,name,gbcategory,startdate,enddate,replyby,postby,points,cntingb,avail FROM imas_forums WHERE courseid='$cid' AND points>0 AND avail>0 ";
 	if (!$isteacher) {
 		$query .= "AND startdate<$now ";
 	}
@@ -319,7 +319,7 @@ function gbtable() {
 		}
 		$possible[$kcnt] = $line['points'];
 		$name[$kcnt] = $line['name'];
-		$cntingb[$kcnt] = 1;
+		$cntingb[$kcnt] = $line['cntingb'];
 		$kcnt++;
 	}
 	

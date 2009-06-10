@@ -915,7 +915,7 @@ function mathjs(st,varlist) {
 	  st = st.replace(reg,"($1)($2)");
 	  var reg = new RegExp("("+varlist+")(sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs)","g");
 	  st = st.replace(reg,"($1)$2");
-	  var reg = new RegExp("("+varlist+")("+varlist+")([^a-df-zA-Z#])","g"); //rem \(
+	  var reg = new RegExp("("+varlist+")("+varlist+")([^a-df-zA-Z\(#])","g"); // 6/1/09 readded \( for f(350/x)
 	  st = st.replace(reg,"($1)($2)$3"); //get xy3
 	  //var reg = new RegExp("("+varlist+")("+varlist+")(\w*[^\(#])","g");
 	  //st = st.replace(reg,"($1)($2)$3"); //get xysin

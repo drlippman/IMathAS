@@ -50,7 +50,6 @@ if (!(isset($teacherid))) {
 					if (!isset($_POST['ekey']) || $ekey != $_POST['ekey']) {
 						$overwriteBody = 1;
 						$body = "Invalid enrollment key entered.  <a href=\"copyitems.php?cid=$cid\">Try Again</a>";
-						exit;
 					}
 				}
 			}
