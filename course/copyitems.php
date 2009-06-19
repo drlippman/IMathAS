@@ -60,18 +60,19 @@ if (!(isset($teacherid))) {
 			$query = "DELETE FROM imas_calitems WHERE courseid='$cid'";
 			mysql_query($query) or die("Query failed :$query " . mysql_error());
 		}
-		$checked = $_POST['checked'];
-		$chklist = "'".implode("','",$checked)."'";
-		$query = "SELECT date,tag,title FROM imas_calitems WHERE id IN ($chklist) AND courseid='{$_POST['ctc']}'";
-		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-		$insarr = array();
-		while ($row = mysql_fetch_row($result)) {
-			$insarr[] = "('$cid','".implode("','",addslashes_deep($row))."')";
+		if (isset($_POST['checked']) && count($_POST['checked'])>0) {
+			$checked = $_POST['checked'];
+			$chklist = "'".implode("','",$checked)."'";
+			$query = "SELECT date,tag,title FROM imas_calitems WHERE id IN ($chklist) AND courseid='{$_POST['ctc']}'";
+			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+			$insarr = array();
+			while ($row = mysql_fetch_row($result)) {
+				$insarr[] = "('$cid','".implode("','",addslashes_deep($row))."')";
+			}
+			$query = "INSERT INTO imas_calitems (courseid,date,tag,title) VALUES ";
+			$query .= implode(',',$insarr);
+			mysql_query($query) or die("Query failed :$query " . mysql_error());
 		}
-		$query = "INSERT INTO imas_calitems (courseid,date,tag,title) VALUES ";
-		$query .= implode(',',$insarr);
-		mysql_query($query) or die("Query failed :$query " . mysql_error());
-		
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
 		exit;	
 	} else if (isset($_GET['action']) && $_GET['action']=="copy") {

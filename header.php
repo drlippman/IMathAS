@@ -26,6 +26,7 @@ if ($ispublic) {
 	echo '<script type="text/javascript">var AScgiloc = "'.$imasroot.'/filter/graph/svgimg.php";</script>'; 
 } else {
 if (!isset($sessiondata['mathdisp'])) {
+	echo '<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false;</script>';
 	echo "<script src=\"$imasroot/javascript/mathgraphcheck.js\" type=\"text/javascript\"></script>\n";
 }
 if ($sessiondata['mathdisp']==1) {
