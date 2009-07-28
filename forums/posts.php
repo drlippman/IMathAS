@@ -245,6 +245,9 @@
 				}
 				echo "<input type=button id=\"buti$icnt\" value=\"Show\" onClick=\"toggleitem($icnt)\">\n";
 				
+				if ($isteacher && $base==0) {
+					echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&move=$threadid\">Move</a> \n";
+				}
 				if ($isteacher || ($ownerid[$child]==$userid && $allowmod)) {
 					echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&modify=$child\">Modify</a> \n";
 				}
@@ -302,6 +305,9 @@
 				}
 				if (isset($children[$child])) {
 					echo "<input type=button id=\"butb$bcnt\" value=\"Collapse\" onClick=\"toggleshow($bcnt)\">\n";
+				}
+				if ($isteacher && $base==0) {
+					echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&move=$threadid\">Move</a> \n";
 				}
 				if ($isteacher || ($ownerid[$child]==$userid && $allowmod)) {
 					echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&modify=$child\">Modify</a> \n";

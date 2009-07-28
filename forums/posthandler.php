@@ -207,5 +207,37 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		require("../footer.php");
 		exit;
 	}
+} else if (isset($_GET['move']) && $isteacher) { //moving post to a different forum
+	if (isset($_POST['moveto'])) {
+		$query = "UPDATE imas_forum_posts SET forumid='{$_POST['moveto']}' WHERE threadid='{$_GET['move']}'";
+		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$query = "UPDATE imas_forum_threads SET forumid='{$_POST['moveto']}' WHERE id='{$_GET['move']}'";
+		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
+		exit;
+	} else {
+		$pagetitle = "Remove Post";
+		$query = "SELECT id,name FROM imas_forums WHERE courseid='$cid'";
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		require("../header.php");
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
+		echo "&gt; <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> &gt; ";
+		echo "<a href=\"$returnurl\">$returnname</a> &gt; Move Thread</div>";
+		
+		echo "<h3>Move Thread</h3>\n";
+		echo "<form method=post action=\"$returnurl&move={$_GET['move']}\">";
+		echo "Move thread and all replies to forum: <br/>";
+		while ($row = mysql_fetch_row($result)) {
+			echo "<input type=\"radio\" name=\"moveto\" value=\"{$row[0]}\" ";
+			if ($row[0]==$forumid) {echo 'checked="checked"';}
+			echo "/>{$row[1]}<br/>";
+		}
+		echo "<p><input type=submit value=\"Move\">\n";
+		echo "<input type=button value=\"Nevermind\" onClick=\"window.location='$returnurl'\"></p>\n";
+		echo "</form>";
+		require("../footer.php");
+		exit;
+		
+	}
 }
 ?>
