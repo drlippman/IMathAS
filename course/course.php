@@ -561,6 +561,9 @@ function makeTopMenu() {
 		if (in_array(0,$topbar[1]) && $msgset<4) { //messages
 			echo "<a href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a>$newmsgs &nbsp; ";
 		}
+		if (in_array(6,$topbar[1])) { //Calendar
+			echo "<a href=\"$imasroot/forums/forums.php?cid=$cid\">Forums</a>$newpostscnt &nbsp; ";
+		}
 		if (in_array(1,$topbar[1])) { //Stu view
 			echo "<a href=\"course.php?cid=$cid&stuview=0\">Student View</a> &nbsp; ";
 		}
@@ -576,6 +579,7 @@ function makeTopMenu() {
 		if (in_array(5,$topbar[1])) { //Calendar
 			echo "<a href=\"course.php?cid=$cid&quickview=on\">Quick View</a> &nbsp; \n";
 		}
+		
 		if (in_array(9,$topbar[1])) { //Log out
 			echo "<a href=\"../actions.php?action=logout\">Log Out</a>";
 		}

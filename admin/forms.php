@@ -292,7 +292,9 @@ switch($_GET['action']) {
 		echo "<span class=form>Instructor Quick Pick Top Bar items:</span><span class=formright>";
 		echo '<input type=checkbox name="insttopbar[]" value="0" ';
 		if (in_array(0,$topbar[1])) { echo 'checked=1'; }
-		echo ' /> Messages<br /><input type=checkbox name="insttopbar[]" value="1" ';
+		echo ' /> Messages<br /><input type=checkbox name="insttopbar[]" value="6" ';
+		if (in_array(6,$topbar[1])) { echo 'checked=1'; }
+		echo ' /> Forums<br /><input type=checkbox name="insttopbar[]" value="1" ';
 		if (in_array(1,$topbar[1])) { echo 'checked=1'; }
 		echo ' /> Student View<br /><input type=checkbox name="insttopbar[]" value="2" ';
 		if (in_array(2,$topbar[1])) { echo 'checked=1'; }
