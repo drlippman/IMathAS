@@ -451,6 +451,42 @@ if ($myrights<20) {
 			}
 		}
 		
+	} else if (isset($_POST['chgrights'])) {
+		if (isset($_POST['qtochg'])) {
+			if ($isgrpadmin) {
+				$query = "SELECT imas_questionset.id FROM imas_questionset,imas_users WHERE imas_questionset.ownerid=imas_users.id AND imas_questionset.id IN ($chglist) AND imas_users.groupid='$groupid'";
+				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				$tochg = array();
+				while ($row = mysql_fetch_row($result)) {
+					$tochg[] = $row[0];
+				}
+				if (count($tochg)>0) {
+					$chglist = implode(',',$tochg);
+					$query = "UPDATE imas_questionset SET userights='{$_POST['newrights']}' WHERE id IN ($chglist)";
+					mysql_query($query) or die("Query failed : $query " . mysql_error());
+				}
+			} else {
+				$chglist = "'".implode("','",explode(',',$_POST['qtochg']))."'";
+				$query = "UPDATE imas_questionset SET userights='{$_POST['newrights']}' WHERE id IN ($chglist)";
+				if (!$isadmin) {
+					$query .= " AND ownerid='$userid'";
+				}
+				mysql_query($query) or die("Query failed : $query " . mysql_error());
+			}
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/manageqset.php?cid=$cid");
+			exit;
+		} else {
+			$pagetitle = "Change Question Rights";
+			$curBreadcrumb .= " &gt; <a href=\"manageqset.php?cid=$cid\">Manage Question Set </a>";
+			$curBreadcrumb .= " &gt; Change Question Rights";
+			
+			$clist = implode(",",$_POST['nchecked']);
+			
+			if (!isset($_POST['nchecked'])) {
+				$overwriteBody = 1;
+				$body = "No questions selected.  <a href=\"manageqset.php?cid=$cid\">Go back</a>\n";
+			}
+		}
 	} else if (isset($_GET['remove'])) {
 		if (isset($_GET['confirmed'])) {
 			if ($isgrpadmin) {
@@ -843,6 +879,30 @@ function getnextprev(formn,loc) {
 			</p>
 		</form>
 <?php		
+	} else if (isset($_POST['chgrights'])) {
+?>
+		<form method=post action="manageqset.php?cid=<?php echo $cid ?>">
+			<input type=hidden name="chgrights" value="true">
+			
+			<p>
+				This will allow you to change the use rights of the selected questions, if you can change those rights.
+			</p>
+			<p>Select the new rights for these questions: <select name="newrights">
+			 	<option value="0">Private</option>
+				<option value="2" selected="selected">Allow use, use as template, no modifications</option>
+				<option value="3">Allow use and modifications</option>
+				</select>
+			</p>
+			
+			<input type="hidden" name="qtochg" value="<?php echo $clist ?>">
+			
+			
+			<p>
+				<input type=submit value="Change Rights">
+				<input type=button value="Never Mind" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
+			</p>
+		</form>
+<?php		
 	} else if (isset($_GET['remove'])) {
 ?>
 		Are you SURE you want to delete this question from the Question Set.  This will make it unavailable 
@@ -890,6 +950,7 @@ function getnextprev(formn,loc) {
 		echo "With Selected: <input type=submit name=\"transfer\" value=\"Transfer\">\n";
 		echo "<input type=submit name=\"remove\" value=\"Delete\">\n";
 		echo "<input type=submit name=\"chglib\" value=\"Library Assignment\">\n";
+		echo "<input type=submit name=\"chgrights\" value=\"Chg Rights\">\n";
 		echo "<input type=submit name=\"template\" value=\"Template\">\n";
 		if (!$isadmin && !$isgrpadmin) { 
 			echo "<br/>(Delete and Transfer only applies to your questions)\n";
