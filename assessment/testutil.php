@@ -49,6 +49,8 @@ function getquestioninfo($qns,$testsettings) {
 				}
 			}
 		}
+		$line['allowregen'] = 1-floor($line['regen']/3);  //0 if no, 1 if use default
+		$line['regen'] = $line['regen']%3;
 		unset($line['qtype']);
 		unset($line['control']);
 		$out[$line['id']] = $line;
@@ -604,9 +606,9 @@ function startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivsco
 	}
 	if ($allowregen) {
 		if ($perfectscore) {
-			echo "<p><a href=\"showtest.php?regenall=all\">Try similar problems</a> for all questions.</p>";
+			echo "<p><a href=\"showtest.php?regenall=all\">Try similar problems</a> for all questions where allowed.</p>";
 		} else {
-			echo "<p><a href=\"showtest.php?regenall=missed\">Try similar problems</a> for all questions with less than perfect scores.</p>";
+			echo "<p><a href=\"showtest.php?regenall=missed\">Try similar problems</a> for all questions with less than perfect scores where allowed.</p>";
 		}
 	}
 }

@@ -131,12 +131,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				}
 			}
 			
-			$query = "UPDATE imas_linkedtext SET title='{$_POST['title']}',summary='{$_POST['summary']}',text='{$_POST['text']}',startdate=$startdate,enddate=$enddate,avail='{$_POST['avail']}',oncal='{$_POST['oncal']}',caltag='{$_POST['caltag']}' ";
+			$query = "UPDATE imas_linkedtext SET title='{$_POST['title']}',summary='{$_POST['summary']}',text='{$_POST['text']}',startdate=$startdate,enddate=$enddate,avail='{$_POST['avail']}',oncal='{$_POST['oncal']}',caltag='{$_POST['caltag']}',target='{$_POST['target']}' ";
 			$query .= "WHERE id='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		} else { //add new
-		$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate,avail,oncal,caltag) VALUES ";
-		$query .= "('$cid','{$_POST['title']}','{$_POST['summary']}','{$_POST['text']}',$startdate,$enddate,'{$_POST['avail']}','{$_POST['oncal']}','{$_POST['caltag']}');";
+		$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate,avail,oncal,caltag,target) VALUES ";
+		$query .= "('$cid','{$_POST['title']}','{$_POST['summary']}','{$_POST['text']}',$startdate,$enddate,'{$_POST['avail']}','{$_POST['oncal']}','{$_POST['caltag']}','{$_POST['target']}');";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		
 		$newtextid = mysql_insert_id();
@@ -197,6 +197,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$line['avail'] = 1;
 			$line['oncal'] = 0;
 			$line['caltag'] = '!';
+			$line['target'] = 0;
 			$startdate = time();
 			$enddate = time() + 7*24*60*60;
 		}   
@@ -250,7 +251,12 @@ if ($overwriteBody==1) {
 		<span class=form>Or attach file (Max 2MB)<sup>*</sup>: </span>
 		<span class=formright><input name="userfile" type="file" /></span><br class=form>
 		
-
+		<span class="form">Open page in:</span>
+		<span class="formright">
+			<input type=radio name="target" value="0" <?php writeHtmlChecked($line['target'],0);?>/>Current window/tab<br/>
+			<input type=radio name="target" value="1" <?php writeHtmlChecked($line['target'],1);?>/>New window/tab<br/>
+		</span><br class="form"/>
+		
 		<span class=form>Show:</span>
 		<span class=formright>
 			<input type=radio name="avail" value="0" <?php writeHtmlChecked($line['avail'],0);?>/>Hide<br/>

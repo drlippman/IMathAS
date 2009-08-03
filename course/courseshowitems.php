@@ -662,7 +662,7 @@ function enditem($canedit) {
 			   }
 		   } else if ($line['itemtype']=="LinkedText") {
 			   $typeid = $line['typeid'];
-			   $query = "SELECT title,summary,text,startdate,enddate,avail FROM imas_linkedtext WHERE id='$typeid'";
+			   $query = "SELECT title,summary,text,startdate,enddate,avail,target FROM imas_linkedtext WHERE id='$typeid'";
 			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			  
@@ -678,6 +678,11 @@ function enditem($canedit) {
 				   $enddate = "Always";
 			   } else {
 				   $enddate = formatdate($line['enddate']);
+			   }
+			   if ($line['target']==1) {
+				   $target = 'target="_blank"';
+			   } else {
+				   $target = '';
 			   }
 			   if ((substr($line['text'],0,4)=="http") && (strpos(trim($line['text'])," ")===false)) { //is a web link
 				   $alink = trim($line['text']);
@@ -734,7 +739,7 @@ function enditem($canedit) {
 					   }
 				   }
 				   echo "<div class=title>";
-				   echo "<b><a href=\"$alink\">{$line['title']}</a></b>\n";
+				   echo "<b><a href=\"$alink\" $target>{$line['title']}</a></b>\n";
 				   if ($viewall) { 
 					   echo '<span class="instrdates">';
 					   echo "<br/>$show ";
@@ -762,7 +767,7 @@ function enditem($canedit) {
 					   echo "<div class=icon style=\"background-color: #ccc;\">!</div>";
 				   }
 				   echo "<div class=title>";
-				   echo "<i> <b><a href=\"$alink\">{$line['title']}</a></b> </i>";
+				   echo "<i> <b><a href=\"$alink\" $target>{$line['title']}</a></b> </i>";
 				   echo '<span class="instrdates">';
 				   echo "<br/><i>$show</i> ";
 				   echo '</span>';

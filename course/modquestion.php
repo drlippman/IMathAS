@@ -34,7 +34,7 @@ if (!(isset($teacherid))) {
 				$penalty = 'S'.$_POST['skippenalty'].$penalty;
 			}
 		}
-		$regen = $_POST['regen'];
+		$regen = $_POST['regen'] + 3*$_POST['allowregen'];
 		$showans = $_POST['showans'];
 		if (isset($_GET['id'])) { //already have id - updating
 			$query = "UPDATE imas_questions SET points='$points',attempts='$attempts',penalty='$penalty',regen='$regen',showans='$showans' ";
@@ -154,11 +154,18 @@ Leave items blank or set to 9999 to use default values<BR>
 
 <span class=form>New version on reattempt?</span><span class=formright>
     <select name="regen">
-     <option value="0" <?php if ($line['regen']==0) { echo 'selected="1"';}?>>Use Default</option>
-     <option value="1" <?php if ($line['regen']==1) { echo 'selected="1"';}?>>Yes, new version on reattempt</option>
-     <option value="2" <?php if ($line['regen']==2) { echo 'selected="1"';}?>>No, same version on reattempt</option>
+     <option value="0" <?php if (($line['regen']%3)==0) { echo 'selected="1"';}?>>Use Default</option>
+     <option value="1" <?php if (($line['regen']%3)==1) { echo 'selected="1"';}?>>Yes, new version on reattempt</option>
+     <option value="2" <?php if (($line['regen']%3)==2) { echo 'selected="1"';}?>>No, same version on reattempt</option>
     </select></span><br class="form"/>
     
+<span class="form">Allow &quot;Try similar problem&quot;?</span>
+<span class=formright>
+    <select name="allowregen">
+     <option value="0" <?php if ($line['regen']<3) { echo 'selected="1"';}?>>Use Default</option>
+     <option value="1" <?php if ($line['regen']>=3) { echo 'selected="1"';}?>>No</option>
+</select></span><br class="form"/>
+
 <span class=form>Show Answers</span><span class=formright>
     <select name="showans">
      <option value="0" <?php if ($line['showans']=='0') { echo 'selected="1"';}?>>Use Default</option>

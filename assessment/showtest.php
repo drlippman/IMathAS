@@ -388,7 +388,7 @@
 		}
 		recordtestdata();
 	}
-	if (isset($_GET['regen']) && $allowregen) {
+	if (isset($_GET['regen']) && $allowregen && $qi[$questions[$_GET['regen']]]['allowregen']==1) {
 		srand();
 		$toregen = $_GET['regen'];
 		$seeds[$toregen] = rand(1,9999);
@@ -417,7 +417,7 @@
 		srand();
 		if ($_GET['regenall']=="missed") {
 			for ($i = 0; $i<count($questions); $i++) {
-				if (getpts($scores[$i])<$qi[$questions[$i]]['points']) { 
+				if (getpts($scores[$i])<$qi[$questions[$i]]['points'] && $qi[$questions[$i]]['allowregen']==1) { 
 					$scores[$i] = -1;
 					$attempts[$i] = 0;
 					$seeds[$i] = rand(1,9999);
@@ -442,6 +442,9 @@
 			}
 		} else if ($_GET['regenall']=="all") {
 			for ($i = 0; $i<count($questions); $i++) {
+				if ($qi[$questions[$i]]['allowregen']==0) { 
+					continue;
+				}
 				$scores[$i] = -1;
 				$attempts[$i] = 0;
 				$seeds[$i] = rand(1,9999);
@@ -808,7 +811,7 @@
 						echo "<p><a href=\"showtest.php?action=shownext&to=$last&amp;reattempt=$last\">Reattempt last question</a>.  If you do not reattempt now, you will have another chance once you complete the test.</p>\n";
 					}
 				}
-				if ($allowregen) {
+				if ($allowregen && $qi[$questions[$last]]['allowregen']==1) {
 					echo "<p><a href=\"showtest.php?action=shownext&to=$last&amp;regen=$last\">Try another similar question</a></p>\n";
 				}
 				//show next
@@ -881,7 +884,7 @@
 						$reattemptsremain = true;
 					}
 				}
-				if ($allowregen) {
+				if ($allowregen && $qi[$questions[$qn]]['allowregen']==1) {
 					echo "<p><a href=\"showtest.php?action=skip&amp;to=$qn&amp;regen=$qn\">Try another similar question</a></p>\n";
 				}
 				
@@ -955,7 +958,7 @@
 							$reattemptsremain = true;
 						}
 					}
-					if ($allowregen) {
+					if ($allowregen && $qi[$questions[$next]]['allowregen']==1) {
 						echo "<p><a href=\"showtest.php?action=skip&amp;to=$next&amp;regen=$next\">Try another similar question</a></p>\n";
 					}
 					if ($lefttodo == 0) {
@@ -1014,7 +1017,7 @@
 						$reattemptsremain = true; 
 					}
 				}
-				if ($allowregen) {
+				if ($allowregen && $qi[$questions[$qn]]['allowregen']==1) {
 					echo "<p><a href=\"showtest.php?action=seq&amp;to=$qn&amp;regen=$qn\">Try another similar question</a></p>\n";
 				}
 				unset($toshow);
@@ -1487,8 +1490,8 @@
 			}
 			
 			if ($allowregen) {
-				echo "<p><a href=\"showtest.php?regenall=missed\">Try similar problems</a> for all questions with less than perfect scores.</p>";
-				echo "<p><a href=\"showtest.php?regenall=all\">Try similar problems</a> for all questions.</p>";
+				echo "<p><a href=\"showtest.php?regenall=missed\">Try similar problems</a> for all questions with less than perfect scores where allowed.</p>";
+				echo "<p><a href=\"showtest.php?regenall=all\">Try similar problems</a> for all questions where allowed.</p>";
 			}
 		}
 		if ($testsettings['testtype']!="NoScores") {
