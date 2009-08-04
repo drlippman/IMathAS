@@ -61,6 +61,7 @@ if ($isteacher || $istutor) {
 		}
 	}
 	//Gbmode : Links NC Dates
+	$showpics = floor($gbmode/10000)%10 ; //0 none, 1 small, 2 big
 	$totonleft = floor($gbmode/1000)%10 ; //0 right, 1 left
 	$links = floor($gbmode/100)%10; //0: view/edit, 1 q breakdown
 	$hidenc = floor($gbmode/10)%10; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
@@ -74,6 +75,7 @@ if ($isteacher || $istutor) {
 	$links = 0;
 	$hidenc = 1;
 	$availshow = 1;
+	$showpics = 0;
 	$totonleft = 0;
 }
 
@@ -130,7 +132,7 @@ if ($isteacher || $istutor) {
 		$placeinhead .= "}\n";
 	}
 	$placeinhead .= 'function chgtoggle() { ';
-	$placeinhead .= "	var altgbmode = 1000*$totonleft + 100*document.getElementById(\"toggle1\").value + 10*document.getElementById(\"toggle2\").value + 1*document.getElementById(\"toggle3\").value; ";
+	$placeinhead .= "	var altgbmode = 10000*document.getElementById(\"toggle4\").value + 1000*$totonleft + 100*document.getElementById(\"toggle1\").value + 10*document.getElementById(\"toggle2\").value + 1*document.getElementById(\"toggle3\").value; ";
 	$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid&gbmode=";
 	$placeinhead .= "	var toopen = '$address' + altgbmode;\n";
 	$placeinhead .= "  	window.location = toopen; \n";
@@ -337,7 +339,12 @@ if (isset($studentid) || $stu!=0) { //show student view
 	echo " | Links: <select id=\"toggle1\" onchange=\"chgtoggle()\">";
 	echo "<option value=0 "; writeHtmlSelected($links,0); echo ">View/Edit</option>";
 	echo "<option value=1 "; writeHtmlSelected($links,1); echo ">Scores</option></select>";
+	echo " | Pics: <select id=\"toggle4\" onchange=\"chgtoggle()\">";
+	echo "<option value=0 "; writeHtmlSelected($showpics,0); echo ">None</option>";
+	echo "<option value=1 "; writeHtmlSelected($showpics,1); echo ">Small</option>";
+	echo "<option value=2 "; writeHtmlSelected($showpics,2); echo ">Big</option></select>";
 	if (!$isteacher) {
+	
 		echo " | <input type=\"button\" id=\"lockbtn\" onclick=\"lockcol()\" value=\"";
 		if (isset($_COOKIE["gblhdr-$cid"]) && $_COOKIE["gblhdr-$cid"]==1) {
 			echo "Unlock headers";
@@ -626,7 +633,7 @@ function gbstudisp($stu) {
 }
 
 function gbinstrdisp() {
-	global $hidenc,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection;
+	global $hidenc,$showpics,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection;
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	if ($availshow==3) {
 		$availshow=1;
@@ -639,7 +646,7 @@ function gbinstrdisp() {
 	echo '<table class="gb" id="myTable"><thead><tr>';
 	$n=0;
 	for ($i=0;$i<count($gbt[0][0]);$i++) { //biographical headers
-		//if ($i==1) {echo '<th></th>';} //for pics
+		if ($showpics>0 && $i==1) {echo '<th></th>';} //for pics
 		if ($i==1 && $gbt[0][0][1]!='ID') { continue;}
 		echo '<th>'.$gbt[0][0][$i];
 		if (($gbt[0][0][$i]=='Section' || ($isdiag && $i==4)) && (!$istutor || $tutorsection=='')) {
@@ -787,11 +794,13 @@ function gbinstrdisp() {
 		echo "<a href=\"gradebook.php?cid=$cid&stu={$gbt[$i][4][0]}\">";
 		echo $gbt[$i][0][0];
 		echo '</a></td>';
-		/*if (file_exists("$curdir//files/userimg_sm{$gbt[$i][4][0]}.jpg")) {
-			echo "<td><img src=\"$imasroot/course/files/userimg_sm{$gbt[$i][4][0]}.jpg\" style=\"display:none;\"/></td>";
-		} else {
+		if ($showpics==1 && file_exists("$curdir//files/userimg_sm{$gbt[$i][4][0]}.jpg")) {
+			echo "<td><img src=\"$imasroot/course/files/userimg_sm{$gbt[$i][4][0]}.jpg\"/></td>";
+		} else if ($showpics==2 && file_exists("$curdir//files/userimg_{$gbt[$i][4][0]}.jpg")) {
+			echo "<td><img src=\"$imasroot/course/files/userimg_{$gbt[$i][4][0]}.jpg\"/></td>";
+		} else if ($showpics>0) {
 			echo '<td></td>';
-		}*/
+		}
 		for ($j=($gbt[0][0][1]=='ID'?1:2);$j<count($gbt[0][0]);$j++) {
 			echo '<td class="c">'.$gbt[$i][0][$j].'</td>';	
 		}

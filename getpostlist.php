@@ -26,16 +26,21 @@
 	  }
   
   function formatdate($date) {
-	return tzdate("D n/j/y, g:i a",$date);   
+	  return date("D n/j/y, g:i a",$date);   
+	//return tzdate("D n/j/y, g:i a",$date);   
 	//return tzdate("M j, Y, g:i a",$date);   
   }
+  header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
+  header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
+<meta name = "viewport" content = "width = device-width">
 <title><?php echo $installname;?> Posts and Messages</title>
 </head>
 <body>
 <div style="font-weight: bold"><?php echo $installname;?> Posts and Messages</div>
+<div style="color: gray; font-size: 80%">Last updated <?php echo formatdate(time());?> <a href="javascript:location.reload(true)">Refresh</a></div>
 <?php
 
 	$query = "SELECT imas_forums.courseid,imas_forums.name,imas_forums.id,imas_forum_posts.threadid,max(imas_forum_posts.postdate) as lastpost,mfv.lastview,count(imas_forum_posts.id) as pcount FROM imas_forum_posts ";
@@ -98,26 +103,31 @@
 				$forumcontent[$line['forumid']] = '';
 			}
 			$url = $imasroot."/forums/posts.php?page=-2&amp;cid=$cid&amp;forum={$line['id']}&amp;thread={$line['threadid']}";
-			$forumcontent[$line['forumid']] .= "<div style='font-size:75%;'>";
+			/*$forumcontent[$line['forumid']] .= "<div style='font-size:100%;'>";
 			$forumcontent[$line['forumid']] .= "<a style='color: blue;' href='$url' target='_new'>{$line['subject']}</a>";
 			$forumcontent[$line['forumid']] .= " <span style='color: black;'>".htmlspecialchars("{$line['LastName']}, {$line['FirstName']}")."</span>";
 			$forumcontent[$line['forumid']] .= " <span style='color: gray;'>".htmlspecialchars($lastpost[$line['threadid']])."</span></div>";
+			*/
+			$forumcontent[$line['forumid']] .= "<tr><td><a style='color: blue;' href='$url' target='_new'>{$line['subject']}</a></td>";
+			$forumcontent[$line['forumid']] .= "<td><span style='color: black;'>".htmlspecialchars("{$line['LastName']}, {$line['FirstName']}")."</span><br/>";
+			$forumcontent[$line['forumid']] .= "<span style='color: gray;'>".htmlspecialchars($lastpost[$line['threadid']])."</span></td></tr>";
 		}
 		
-		echo "<div style='font-size:80%; font-weight: 700; background-color: #ccf; margin-below:5px;'>New Posts</div>";
+		echo "<div style='font-size:100%; font-weight: 700; background-color: #ccf; margin-below:5px;'>New Posts</div>";
 		foreach($coursenames as $id=>$name) {
-			echo "<div style='font-size:75%; color: #606; font-weight: 700; '>$name</div>";
+			echo "<div style='font-size:100%; color: #606; font-weight: 700; '>$name</div>";
 			echo "<div style='margin-left: 5px;'>";
 			asort($courseforums[$id]);
 			foreach($courseforums[$id] as $fid) {
-				echo "<div style='font-size:75%; color: green;'>{$forumname[$fid]}</div>";
+				echo "<div style='font-size:100%; color: green;'>{$forumname[$fid]}</div>";
+				echo "<table border=0>";
 				echo $forumcontent[$fid];
-				echo '</div>';
+				echo '</table></div>';
 			}
 			echo '</div>';
 		}
 	} else {
-		echo "<div style='font-size:80%; font-weight: 700; background-color: #ccf; margin-below:5px;'>No New Posts</div>";
+		echo "<div style='font-size:100%; font-weight: 700; background-color: #ccf; margin-below:5px;'>No New Posts</div>";
 	}
 	
 	
@@ -125,18 +135,21 @@
 	$query .= "FROM imas_msgs,imas_users WHERE imas_msgs.msgto='$userid' AND imas_msgs.msgfrom=imas_users.id ";
 	$query .= "AND (imas_msgs.isread=0 OR imas_msgs.isread=4) ORDER BY imas_msgs.senddate DESC";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	$msgout = array();
 	if (mysql_num_rows($result)>0) {
-		echo "<div style='font-size:80%; font-weight: 700; background-color: #ccf; '>New Messages</div>";
+		echo "<div style='font-size:100%; font-weight: 700; background-color: #ccf; '>New Messages</div>";
+		echo '<table border=0 cellspacing=2>';
 	} else {
-		echo "<div style='font-size:80%; font-weight: 700; background-color: #ccf; '>No New Messages</div>";	
+		echo "<div style='font-size:100%; font-weight: 700; background-color: #ccf; '>No New Messages</div>";	
 	}
 	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 		$url = "/msgs/viewmsg.php?cid=0&amp;type=msg&amp;msgid="+$line['id'];	
-		echo "<div style='font-size:80%;'>";
-		echo "<a style='color: blue;' href='$url' target='_new'>".htmlspecialchars($line['title'])."</a>";
-		echo " <span style='color: black;'>".htmlspecialchars("{$line['LastName']}, {$line['FirstName']}")."</span>";
-		echo " <span style='color: gray;'>".htmlspecialchars(formatdate($line['senddate']))."</span></div>";
+		echo "<tr><td>";
+		echo "<a style='color: blue;' href='$url' target='_new'>".htmlspecialchars($line['title'])."</a></td>";
+		echo "<td><span style='color: black;'>".htmlspecialchars("{$line['LastName']}, {$line['FirstName']}")."</span><br/>";
+		echo "<span style='color: gray;'>".htmlspecialchars(formatdate($line['senddate']))."</span></td></tr>";
+	}
+	if (mysql_num_rows($result)>0) {
+		echo '</table>';
 	}
 	
 ?>

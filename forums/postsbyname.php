@@ -105,13 +105,16 @@
 	if ($isteacher && $haspoints) {
 		echo "<form method=post action=\"thread.php?cid=$cid&forum=$forumid&page=$page&score=true\">";
 	}
-	
+	$curdir = rtrim(dirname(__FILE__), '/\\');
 	while ($line =  mysql_fetch_array($result, MYSQL_ASSOC)) {
 		if ($line['userid']!=$laststu) {
 			if ($laststu!=-1) {
 				echo '</div>';
 			}
 			echo "<b>{$line['LastName']}, {$line['FirstName']}</b>";
+			if (file_exists("$curdir/../course/files/userimg_sm{$line['userid']}.jpg")) {
+				echo "<img src=\"$imasroot/course/files/userimg_sm{$line['userid']}.jpg\" onclick=\"togglepic(this)\"/>";
+			}
 			echo '<div class="forumgrp">';
 			$laststu = $line['userid'];
 		}
