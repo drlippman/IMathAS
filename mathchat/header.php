@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta http-equiv="X-UA-Compatible" content="IE=7" />
-<title>Math Chat</title>
+<title>Math Chat - <?php echo $roomname;?></title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <link rel="stylesheet" href="mathchat.css" type="text/css" />
 <!--[if lt IE 7]>

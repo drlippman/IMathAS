@@ -6,14 +6,15 @@ require("../config.php");
 $svgimgurl = "$imasroot/filter/graph/svgimg.php";
 $svgdloc = "$imasroot/javascript/d.svg";
 $editorloc = "$imasroot/editor";
-session_start();
-$sessionid = session_id();
+//session_start();
+//$sessionid = session_id();
 
 $now = time();
 //check for session
-$query = "SELECT * FROM mc_sessions WHERE sessionid='$sessionid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-if (mysql_num_rows($result)==0) {
+//$query = "SELECT * FROM mc_sessions WHERE sessionid='$sessionid'";
+//$result = mysql_query($query) or die("Query failed : " . mysql_error());
+//if (mysql_num_rows($result)==0) {
+if (!isset($_GET['userid'])) {
 	if (empty($_REQUEST['uname']) || empty($_REQUEST['room'])) {
 		echo "No identity provided.  Quitting";
 		exit;
@@ -24,31 +25,35 @@ if (mysql_num_rows($result)==0) {
 	$room = $_REQUEST['room'];
 	$mathdisp = $_REQUEST['mathdisp'];
 	$graphdisp = $_REQUEST['graphdisp'];
-	$query = "INSERT INTO mc_sessions (sessionid,name,room,mathdisp,graphdisp,lastping) ";
-	$query .= "VALUES ('$sessionid','$uname','$room','$mathdisp','$graphdisp',$now)";
+	//$query = "INSERT INTO mc_sessions (sessionid,name,room,mathdisp,graphdisp,lastping) ";
+	//$query .= "VALUES ('$sessionid','$uname','$room','$mathdisp','$graphdisp',$now)";
+	$query = "INSERT INTO mc_sessions (name,room,mathdisp,graphdisp,lastping) ";
+	$query .= "VALUES ('$uname','$room','$mathdisp','$graphdisp',$now)";
 	mysql_query($query) or die("Query failed : " . mysql_error());
 	$mcsession['userid'] = mysql_insert_id();
 	$mcsession['name'] = $uname;
 	$mcsession['room'] = $room;
 	$mcsession['mathdisp'] = $mathdisp;
 	$mcsession['graphdisp'] = $graphdisp;
-	$_SESSION['roomname'] = $_REQUEST['roomname'];
+	$roomname = $_REQUEST['roomname'];
 	
 	$old = time() - 24*60*60; //1 day old
 	$query = "DELETE FROM mc_msgs WHERE time<$old";
 	mysql_query($query) or die("Query failed : " . mysql_error());
 	$query = "DELETE FROM mc_sessions WHERE lastping<$old";
 	mysql_query($query) or die("Query failed : " . mysql_error());
-	header("Location: http://" . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF']);
-	exit;
+	//header("Location: http://" . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'].'?userid='.$mcsession['userid']);
+	//exit;
 } else {
-	if (!empty($_REQUEST['uname']) && !empty($_REQUEST['room'])) {
-		$query = "UPDATE mc_sessions SET name='{$_REQUEST['uname']}',room='{$_REQUEST['room']}'  WHERE sessionid='$sessionid'";
+	/*if (!empty($_REQUEST['uname']) && !empty($_REQUEST['room'])) {
+		$query = "UPDATE mc_sessions SET name='{$_REQUEST['uname']}',room='{$_REQUEST['room']}' WHERE sessionid='$sessionid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		$_SESSION['roomname'] = $_REQUEST['roomname'];
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF']);
 		exit;
-	}
+	}*/
+	$query = "SELECT * FROM mc_sessions WHERE userid='{$_GET['userid']}'";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$mcsession = mysql_fetch_array($result, MYSQL_ASSOC);	
 }
 $mcsession['useed'] = 1;
@@ -77,7 +82,7 @@ if (isset($_REQUEST['update'])) {
 	mysql_query($query) or die("Query failed : " . mysql_error());
 	$on = $now - 15;
 	echo '<div id="userlist">';
-	$query = "SELECT name FROM mc_sessions WHERE lastping>$on ORDER BY name";
+	$query = "SELECT name FROM mc_sessions WHERE mc_sessions.room='{$mcsession['room']}' AND lastping>$on ORDER BY name";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	while ($row = mysql_fetch_row($result)) {
 		echo $row[0].'<br/>';
@@ -86,12 +91,12 @@ if (isset($_REQUEST['update'])) {
 	
 } else {
 	$placeinhead = '<script type="text/javascript">if (typeof window.onload == "function") { var existing = window.onload; window.onload = function() { existing(); updatemsgs();};} else { window.onload = updatemsgs;}';
-	$placeinhead .= 'var postback = "http://'.$_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] .'";</script>';
+	$placeinhead .= 'var postback = "http://'.$_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'].'?userid='.$mcsession['userid'] .'";</script>';
 	$useeditor = "addtxt";
 	require("header.php");
 ?>
 <img id="loading" src="loading.gif" />
-<div id="title">Math Chat - <?php echo $_SESSION['roomname'];?></div>
+<div id="title">Math Chat - <?php echo $roomname;?></div>
 <div id="msgbody">
 </div>
 <div id="users"><b>Users:</b><div id="userscontent"></div></div>

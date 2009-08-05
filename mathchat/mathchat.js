@@ -27,7 +27,7 @@ function ahah(params) {
 	  document.getElementById("loading").style.display = "";
     req.onreadystatechange = function() {ahahDone();}; 
     if (params==null) {
-	    req.open("GET", postback+'?update='+last, true); 
+	    req.open("GET", postback+'&update='+last, true); 
 	    req.send("");
     } else {
 	    params += '&update='+last;
