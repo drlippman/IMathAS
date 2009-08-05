@@ -143,7 +143,7 @@ function processScript($script) {
 	$this->AScom =  explode(';',$script);
 	foreach ($this->AScom as $com) {
 		if (preg_match('/\s*(\w+)\s*=(.+)/',$com,$matches)) { //is assignment operator
-			$matches[2] = str_replace(array('"','\''),'',$matches[2]);
+			$matches[2] = trim(str_replace(array('"','\''),'',$matches[2]));
 			switch($matches[1]) {
 				case 'border':
 				case 'xmin':
@@ -214,6 +214,9 @@ function processScript($script) {
 					break;
 				case 'slopefield':
 					$this->ASslopefield($argarr);
+					break;
+				case 'arc':
+					$this->ASarc($argarr);
 					break;
 			}	
 		}
@@ -301,7 +304,6 @@ function AStextAbs($arg) {
 	$this->AStextInternal($pt,$st,$pos,$angle);
 }
 function AStextInternal($p,$st,$pos,$angle) {
-	
 	/*if (func_num_args()>1) {
 		$p = $this->pt2arr($arg);
 		$st = func_get_arg(1);
@@ -728,6 +730,40 @@ function ASrect($arg) {
 	} else {
 		$color = $this->stroke;
 		imagerectangle($this->img,$sx,$sy,$bx,$by,$this->$color);
+	}
+}
+
+function ASarc($arg) {
+	$p = $this->pt2arr($arg[0]);
+	$q = $this->pt2arr($arg[1]);
+	$r = $arg[2];
+	$po[0] = ($p[0]-$this->origin[0])/$this->xunitlength;
+	$qo[0] = ($q[0]-$this->origin[0])/$this->xunitlength;
+	$po[1] = ($this->height - $p[1] - $this->origin[1])/$this->yunitlength;
+	$qo[1] = ($this->height - $q[1] - $this->origin[1])/$this->yunitlength;
+	$t[0] = ($po[0]+$qo[0])/2;
+	$t[1] = ($po[1]+$qo[1])/2;
+	
+	$m = sqrt(($po[0]-$qo[0])*($po[0]-$qo[0]) + ($po[1]-$qo[1])*($po[1]-$qo[1]));
+	$cxo = $t[0] + sqrt($r*$r-($m*$m/4))*($po[1]-$qo[1])/$m;
+	$cyo = $t[1] - sqrt($r*$r-($m*$m/4))*($po[0]-$qo[0])/$m;
+	$cx = round($cxo*$this->xunitlength + $this->origin[0]);
+	$cy = round($this->height - $cyo*$this->yunitlength - $this->origin[1]);
+	
+	$endt = atan2(-$po[1]+$cyo,$po[0]-$cxo);
+	$startt = atan2(-$qo[1]+$cyo,$qo[0]-$cxo);
+	$xdiam = 2*$r*$this->xunitlength;
+	$ydiam = 2*$r*$this->yunitlength;
+	if ($this->fill != 'none') {
+		$color = $this->fill;
+		imagefilledarc($this->img,$cx,$cy,$xdiam,$ydiam,$startt*180/M_PI,$endt*180/M_PI,$this->$color);
+	}
+	
+	if ($this->isdashed) {
+		imagearc($this->img,$cx,$cy,$xdiam,$ydiam,$startt*180/M_PI,$endt*180/M_PI,IMG_COLOR_STYLED);
+	} else {
+		$color = $this->stroke;
+		imagearc($this->img,$cx,$cy,$xdiam,$ydiam,$startt*180/M_PI,$endt*180/M_PI,$this->$color);
 	}
 }
 

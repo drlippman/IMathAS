@@ -1354,7 +1354,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		} else {
 			$randqkeys = array_rand($questions,count($questions));
 		}
-		$akeys = explode(",",$answers);
+		if (trim($answers)=='') {
+			$akeys = array();
+		} else {
+			$akeys = explode(",",$answers);
+		}
 		if (isset($scoremethod) && $scoremethod=='answers') {
 			$deduct = 1.0/count($akeys);
 		} else {
