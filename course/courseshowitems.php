@@ -199,8 +199,15 @@ function enditem($canedit) {
 					} else {
 						echo "<div class=hidden ";
 					}
+					$style = '';
+					if ($items[$i]['fixedheight']>0) {
+						$style .= 'overflow: auto; height:'.$items[$i]['fixedheight'].'px;';
+					}
 					if ($titlebg!='') {
-						echo "style=\"background-color:$bicolor;\"";
+						$style .= "background-color:$bicolor;";
+					}
+					if ($style != '') {
+						echo "style=\"$style\" ";
 					}
 					echo "id=\"block{$items[$i]['id']}\">";
 					if ($isopen) {
@@ -334,8 +341,18 @@ function enditem($canedit) {
 					} else {
 						echo "<div class=hidden ";
 					}
+					//if ($titlebg!='') {
+					//	echo "style=\"background-color:$bicolor;\"";
+					//}
+					$style = '';
+					if ($items[$i]['fixedheight']>0) {
+						$style .= 'overflow: auto; height:'.$items[$i]['fixedheight'].'px;';
+					}
 					if ($titlebg!='') {
-						echo "style=\"background-color:$bicolor;\"";
+						$style .= "background-color:$bicolor;";
+					}
+					if ($style != '') {
+						echo "style=\"$style\" ";
 					}
 					echo "id=\"block{$items[$i]['id']}\">";
 					if ($isopen) {

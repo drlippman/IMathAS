@@ -78,6 +78,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$enddate = parsedatetime($_POST['edate'],$_POST['etime']);
 	}
 
+	if (is_numeric($_POST['fixedheight'])) {
+		$fixedheight = intval($_POST['fixedheight']);
+	} else {
+		$fixedheight = 0;
+	}
 	//$_POST['title'] = str_replace(array(',','\\"','\\\'','~'),"",$_POST['title']);
 
 	$query = "SELECT itemorder,blockcnt FROM imas_courses WHERE id='$cid'";
@@ -125,6 +130,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$sub[$existingid]['SH'] = $_POST['showhide'] . $_POST['availbeh'];
 		$sub[$existingid]['colors'] = $colors;
 		$sub[$existingid]['public'] = $public;
+		$sub[$existingid]['fixedheight'] = $fixedheight;
 	} else { //add new
 		$blockitems = array();
 		$blockitems['name'] = stripslashes($_POST['title']);
@@ -135,6 +141,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$blockitems['SH'] = $_POST['showhide'] . $_POST['availbeh'];
 		$blockitems['colors'] = $colors;
 		$blockitems['public'] = $public;
+		$blockitems['fixedheight'] = $fixedheight;
 		$blockitems['items'] = array();
 		if ($totb=='b') {
 			array_push($sub,$blockitems);
@@ -195,6 +202,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			list($titlebg,$titletxt,$bi) = explode(',',$blockitems[$existingid]['colors']);
 			$usedef = 0;
 		}
+		$fixedheight = $blockitems[$existingid]['fixedheight'];
+		
 			
 
 	} else { //teacher adding new block, load form with default data
@@ -210,6 +219,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$titletxt = "#000000";
 		$bi = "#EEEEFF";
 		$usedef = 1;
+		$fixedheight = 0;
 		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$items = unserialize(mysql_result($result,0,0));
@@ -318,6 +328,11 @@ if ($overwriteBody==1) {
 	<input type=radio name=showhide value="H" <?php writeHtmlChecked($showhide,'H') ?> />Hide from Students<br/>
 	<input type=radio name=showhide value="S" <?php writeHtmlChecked($showhide,'S') ?> />Show Collapsed/as folder
 	</span><br class=form />
+	
+	<span class="form">If expanded, limit height to:</span>
+	<span class="formright">
+	<input type="text" name="fixedheight" size="4" value="<?php if ($fixedheight>0) {echo $fixedheight;};?>" />pixels (blank for no limit)
+	</span><br class="form" />
 	
 	<span class=form>Make items publicly accessible<sup>*</sup>:</span>
 	<span class=formright>

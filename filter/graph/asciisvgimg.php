@@ -2,11 +2,12 @@
 $graphfilterdir = rtrim(dirname(__FILE__), '/\\');
 require_once("$graphfilterdir/../../assessment/mathphp.php");
 // ASCIIsvgIMG.php
-// (c) 2006-2008 David Lippman   http://www.pierce.ctc.edu/dlippman
+// (c) 2006-2009 David Lippman   http://www.pierce.ctc.edu/dlippman
 // Generates an image based on an ASCIIsvg script
 // as a backup for ASCIIsvg.js SVG generator script
 //
 // Revised 3/08 to add angle to text
+// Revised 8/09 to add arc
 //
 // Based on ASCIIsvg.js (c) Peter Jipsen
 // http://www.chapman.edu/~jipsen/svg/asciisvg.html
@@ -14,18 +15,25 @@ require_once("$graphfilterdir/../../assessment/mathphp.php");
 // Recognized commands:
 //	setBorder(border) or setBorder(left,bottom,right,top)
 //	initPicture(xmin,xmax,{ymin,ymax})
-//	axes(xtick,ytick,{"labels",xgrid,ygrid,dox,doy})
-//	plot("func",{xmin,xmax})	//plot a function, i.e.
-//					//"sin(x)" or "[cos(t),sin(t)]"
+//	axes(xtick,ytick,{"labels",xgrid,ygrid,dox,doy})      //0 for off
+//
+//	plot("f(x)",{xmin,xmax,steps})  
+//	plot("[x(t),y(t)]",{tmin,tmax,steps})
+//	slopefield("dy/dx",{xres,yres})
+
 //	line([x1,y1],[x2,y2])
 //	path([[x1,y1],...,[xn,yn]])
 //	circle([x1,y1],rad)
 //	ellipse([x1,y1],xrad,yrad)
+//      arc([x1,y1],[x2,y2],rad)       //arc drawn along counterclockwise arc
 //	rect([x1,y1],[x2,y2])
 //	text([x1,y1],"string",{pos,angle});  	//(pos: left,right,above,below,aboveleft,...)
+//	textabs([pixelx,pixely],"string",{pos,angle}); 
 //	dot([x1,y1],{type,label,pos});	//(type: open, closed)
 //	stroke = "color"		//line color
 //	fill = "color"			//fill color
+//      fontfill = "color"		//text color
+//	fontbackground = "color"	//background color for text
 //	strokewidth=width		//line thickness
 //	strokedasharray=array		//dash array, ie "5 3" for 5 pixel color, 3 white
 //	marker = marker			//"dot" or "arrow" or "arrowdot" or "none"

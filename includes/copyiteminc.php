@@ -51,12 +51,12 @@ function copyitem($itemid,$gbcats) {
 		//$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate) ";
 		//$query .= "SELECT '$cid',title,summary,text,startdate,enddate FROM imas_linkedtext WHERE id='$typeid'";
 		//mysql_query($query) or die("Query failed :$query " . mysql_error());
-		$query = "SELECT title,summary,text,startdate,enddate,avail,oncal,caltag FROM imas_linkedtext WHERE id='$typeid'";
+		$query = "SELECT title,summary,text,startdate,enddate,avail,oncal,caltag,target FROM imas_linkedtext WHERE id='$typeid'";
 		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$row = mysql_fetch_row($result);
 		$row[0] .= stripslashes($_POST['append']);
 		$row = "'".implode("','",addslashes_deep($row))."'";
-		$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate,avail,oncal,caltag) ";
+		$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate,avail,oncal,caltag,target) ";
 		$query .= "VALUES ('$cid',$row)";
 		mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$newtypeid = mysql_insert_id();
@@ -162,6 +162,7 @@ function copysub($items,$parent,&$addtoarr,$gbcats) {
 				$newblock['SH'] = $item['SH'];
 				$newblock['colors'] = $item['colors'];
 				$newblock['public'] = $item['public'];
+				$newblock['fixedheight'] = $item['fixedheight'];
 				$newblock['items'] = array();
 				if (count($item['items'])>0) {
 					copysub($item['items'],$parent.'-'.($k+1),$newblock['items'],$gbcats);

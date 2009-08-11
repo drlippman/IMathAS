@@ -61,6 +61,7 @@ if ($overwriteBody==1) {
 		echo "<input type=submit value=\"Continue\">\n";
 		echo "<p><sup>*</sup><em>Note: FireFox prints high-quality math, but has a bug that prevents it from printing graphs with text (such as axes labels) correctly</em></p>\n";
 		echo "</form>\n";
+		echo "<p>To generate versions to cut-and-paste, use <a href=\"printlayoutbare.php?cid=$cid&aid=$aid\">this page</a></p>";
 	} else {
 		echo "<form method=post action=\"printlayout.php?cid=$cid&aid=$aid&final=1\">\n";
 		echo "<input type=hidden name=heights value=\"{$_POST['heights']}\">\n";
