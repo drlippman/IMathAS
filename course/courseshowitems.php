@@ -201,7 +201,11 @@ function enditem($canedit) {
 					}
 					$style = '';
 					if ($items[$i]['fixedheight']>0) {
-						$style .= 'overflow: auto; height:'.$items[$i]['fixedheight'].'px;';
+						if (strpos($_SERVER['HTTP_USER_AGENT'],'MSIE 6')!==false) {
+							$style .= 'overflow: auto; height: expression( this.offsetHeight > '.$items[$i]['fixedheight'].' ? \''.$items[$i]['fixedheight'].'px\' : \'auto\' );';
+						} else {
+							$style .= 'overflow: auto; max-height:'.$items[$i]['fixedheight'].'px;';
+						}
 					}
 					if ($titlebg!='') {
 						$style .= "background-color:$bicolor;";
@@ -346,7 +350,11 @@ function enditem($canedit) {
 					//}
 					$style = '';
 					if ($items[$i]['fixedheight']>0) {
-						$style .= 'overflow: auto; height:'.$items[$i]['fixedheight'].'px;';
+						if (strpos($_SERVER['HTTP_USER_AGENT'],'MSIE 6')!==false) {
+							$style .= 'overflow: auto; height: expression( this.offsetHeight > '.$items[$i]['fixedheight'].' ? \''.$items[$i]['fixedheight'].'px\' : \'auto\' );';
+						} else {
+							$style .= 'overflow: auto; max-height:'.$items[$i]['fixedheight'].'px;';
+						}
 					}
 					if ($titlebg!='') {
 						$style .= "background-color:$bicolor;";
