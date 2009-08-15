@@ -98,7 +98,7 @@ var AsciisvgDialog = {
 		graphs.options[graphs.options.length] = newopt;
 		graphs.selectedIndex = graphs.options.length - 1;
 		this.graphit();
-		
+		document.getElementById("equation").focus();
 	},
 	
 	replacegraph : function() {
@@ -116,6 +116,7 @@ var AsciisvgDialog = {
 			if (graphs.options.length > 0) {this.loadeqn();}
 		}
 		this.graphit();
+		document.getElementById("equation").focus();
 	},
 	
 	graphit : function() {

@@ -156,7 +156,7 @@
 			});
 
 			
-			ed.onSetContent.add(function(ed,o) {
+			ed.onLoadContent.add(function(ed,o) {
 					AMtags = ed.dom.select('span.AM');
 					for (var i=0; i<AMtags.length; i++) {
 						t.nodeToAM(AMtags[i]);
