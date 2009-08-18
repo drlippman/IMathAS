@@ -18,7 +18,7 @@ del {color:red; text-decoration:line-through}
 cite {border-bottom:1px dashed blue}
 acronym {border-bottom:1px dotted #CCC; cursor:help}
 abbr, html\:abbr {border-bottom:1px dashed #CCC; cursor:help}
-span.AMedit {	border: 1px solid #ff0000;}
+span.AMedit {	border: 1px solid #ff0000; padding: 0px 2px;}
 /* IE */
 * html body {
 scrollbar-3dlight-color:#F0F0EE;

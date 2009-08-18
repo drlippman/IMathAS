@@ -1171,7 +1171,7 @@ function parseShortScript(sscript,gw,gh) {
 		try {
 			eval(commands);
 		} catch (e) {
-			setTimeout(function() {parseShortScript(sscript,gw,gh)},100);
+			//setTimeout(function() {parseShortScript(sscript,gw,gh)},100);
 			//alert("Graph not ready");
 		}
 		
@@ -1189,6 +1189,20 @@ function parseShortScript(sscript,gw,gh) {
 function drawPics() {
   var index, nd;
   pictures = document.getElementsByTagName("embed");
+ // might be needed if setTimeout on parseShortScript isn't working
+ if (!ASnoSVG) {
+	   try {
+		  for (var i = 0; i < pictures.length; i++) {
+			  if (pictures[i].getAttribute("sscr")!='' || pictures[i].getAttribute("script")!='') {
+				  pictures[i].getSVGDocument().getElementById("root");
+			  }
+		  }
+	  } catch (e) {
+		  setTimeout(drawPics,100);
+		  return;
+	  }
+ }
+  
   var len = pictures.length;
   
   

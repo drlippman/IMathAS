@@ -161,8 +161,22 @@
 					for (var i=0; i<AMtags.length; i++) {
 						t.nodeToAM(AMtags[i]);
 					}
+					t.loaded = true;
+			});
+			ed.onSetContent.add(function(ed,o) {
+				if (t.loaded) {
+					AMtags = ed.dom.select('span.AM');
+					for (var i=0; i<AMtags.length; i++) {
+						t.nodeToAM(AMtags[i]);
+					}
+				}
 			});
 			
+			
+			ed.onBeforeSetContent.add(function(ed,o) {
+				o.content = o.content.replace(/(<span[^>]+AM.*?<\/span>)</, "$1 <");
+				
+			});
 			ed.onBeforeExecCommand.add(function(ed,cmd) {
 				if (cmd != 'mceAsciimath' && cmd != 'mceAsciimathDlg') {
 					AMtags = ed.dom.select('span.AM');
@@ -201,7 +215,11 @@
 						p.className = 'AMedit';
 						if (t.lastAMnode != null) { 
 							t.nodeToAM(t.lastAMnode); 
-							t.lastAMnode.className = 'AM'
+							t.lastAMnode.className = 'AM';
+						}
+						if (p.parentNode.lastChild==p) {
+							//not working 
+							//p.parentNode.appendChild(document.createTextNode(" "));
 						}
 						t.lastAMnode = p;
 						doprocessnode = false;
@@ -290,6 +308,7 @@
 		}, 
 		
 		lastAMnode : null,
+		loaded : false,
 		preventAMrender : false,
 		
 		testAMclass : function(el) {
