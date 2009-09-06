@@ -1,4 +1,6 @@
 <?php
+//Google Post and Message reader for imathas
+//(c) 2009 David Lippman
 header('content-type: text/xml'); 
 echo '<?xml version="1.0" encoding="UTF-8" ?>'."\n";
 echo '<Module>';

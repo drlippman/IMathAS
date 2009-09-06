@@ -290,6 +290,8 @@ function scoreq($qnidx,$qidx,$seed,$givenans) {
 	} else {
 		if (isset($_POST["qn$qnidx"]) && is_numeric($_POST["qn$qnidx"])) {
 			$stuanswers[$qnidx+1] = floatval($_POST["qn$qnidx"]);
+		} else if ($qdata['qtype']=="string") {
+			$stuanswers[$qnidx+1] = $_POST["qn$qnidx"];
 		}
 	}
 	$thisq = $qnidx+1;
@@ -441,12 +443,15 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		if ($noshuffle == "last") {
 			$randkeys = array_rand(array_slice($questions,0,count($questions)-1),count($questions)-1);
+			shuffle($randkeys);
 			array_push($randkeys,count($questions)-1);
 		} else if ($noshuffle == "all") {
 			$randkeys = array_keys($questions);
 		} else {
 			$randkeys = array_rand($questions,count($questions));
+			shuffle($randkeys);
 		}
+		
 		if ($displayformat == "select") { 
 			$out = "<select name=\"qn$qn\"><option value=\"NA\">Select an answer</option>\n";
 		} else if ($displayformat == "horiz") {
@@ -503,11 +508,13 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		if ($noshuffle == "last") {
 			$randkeys = array_rand(array_slice($questions,0,count($questions)-1),count($questions)-1);
+			shuffle($randkeys);
 			array_push($randkeys,count($questions)-1);
-		} else if (isset($noshuffle)) {
+		} else if ($noshuffle == "all") {
 			$randkeys = array_keys($questions);
 		} else {
 			$randkeys = array_rand($questions,count($questions));
+			shuffle($randkeys);
 		}
 		$labits = explode('|',$la);
 		if ($displayformat == "horiz") {
@@ -566,11 +573,13 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$randqkeys = array_keys($questions);
 		} else {
 			$randqkeys = array_rand($questions,count($questions));
+			shuffle($randqkeys);
 		}
 		if ($noshuffle=="answers") {
 			$randakeys = array_keys($answers);
 		} else {
 			$randakeys = array_rand($answers,count($answers));
+			shuffle($randakeys);
 		}
 		$out .= "<div class=match>\n";
 		$out .= "<p class=centered>$questiontitle</p>\n";
@@ -1323,11 +1332,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$GLOBALS['partlastanswer'] = $givenans;
 		if ($noshuffle == "last") {
 			$randkeys = array_rand(array_slice($questions,0,count($questions)-1),count($questions)-1);
+			shuffle($randkeys);
 			array_push($randkeys,count($questions)-1);
 		} else if ($noshuffle == "all") {
 			$randkeys = array_keys($questions);
 		} else {
 			$randkeys = array_rand($questions,count($questions));
+			shuffle($randkeys);
 		}
 		if ($givenans == null) {return 0;}
 
@@ -1348,11 +1359,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$score = 1.0;
 		if ($noshuffle == "last") {
 			$randqkeys = array_rand(array_slice($questions,0,count($questions)-1),count($questions)-1);
+			shuffle($randqkeys);
 			array_push($randqkeys,count($questions)-1);
-		} else if (isset($noshuffle)) {
+		} else if ($noshuffle == "all") {
 			$randqkeys = array_keys($questions);
 		} else {
 			$randqkeys = array_rand($questions,count($questions));
+			shuffle($randqkeys);
 		}
 		if (trim($answers)=='') {
 			$akeys = array();
@@ -1393,11 +1406,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$randqkeys = array_keys($questions);
 		} else {
 			$randqkeys = array_rand($questions,count($questions));
+			shuffle($randqkeys);
 		}
 		if ($noshuffle=="answers") {
 			$randakeys = array_keys($answers);
 		} else {
 			$randakeys = array_rand($answers,count($answers));
+			shuffle($randakeys);
 		}
 		if (isset($matchlist)) {$matchlist = explode(',',$matchlist);}
 		
@@ -2261,7 +2276,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				foreach ($line as $j=>$pt) {
 					$line[$j] = explode(',',$pt);
 				}
-				if ($isclosed && ($line[0][0]-$line[count($line)-1][0])*($line[0][0]-$line[count($line)-1][0]) + ($line[0][1]-$line[count($line)-1][1])*($line[0][1]-$line[count($line)-1][1]) <=25) {
+				if ($isclosed && ($line[0][0]-$line[count($line)-1][0])*($line[0][0]-$line[count($line)-1][0]) + ($line[0][1]-$line[count($line)-1][1])*($line[0][1]-$line[count($line)-1][1]) <=25*max(1,$reltolerance)) {
 					array_pop($line);
 				}
 			}
@@ -2270,7 +2285,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$matchstu = array();
 			for ($i=0; $i<count($ansdots); $i++) {
 				for ($j=0;$j<count($line);$j++) {
-					if (($ansdots[$i][0]-$line[$j][0])*($ansdots[$i][0]-$line[$j][0]) + ($ansdots[$i][1]-$line[$j][1])*($ansdots[$i][1]-$line[$j][1]) <=25) {
+					if (($ansdots[$i][0]-$line[$j][0])*($ansdots[$i][0]-$line[$j][0]) + ($ansdots[$i][1]-$line[$j][1])*($ansdots[$i][1]-$line[$j][1]) <=25*max(1,$reltolerance)) {
 						$matchstu[$i] = $j;
 					}
 				}
@@ -2375,7 +2390,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 			$linecnt++;
 		}
-
 		//break apart student entry
 		list($lines,$dots,$odots) = explode(';;',$givenans);
 		if ($lines=='') {

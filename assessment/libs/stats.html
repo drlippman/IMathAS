@@ -1,6 +1,6 @@
 <html><body>
 <h1>Macro Library stats</h1>
-A library of Stats functions.  Version 1.8, June 20, 2007
+A library of Stats functions.  Version 1.9, March 30, 2008
 <BR><ul>
 <li><a href="#nCr">nCr</a></li>
 <li><a href="#nPr">nPr</a></li>
@@ -15,6 +15,8 @@ A library of Stats functions.  Version 1.8, June 20, 2007
 <li><a href="#countif">countif</a></li>
 <li><a href="#histogram">histogram</a></li>
 <li><a href="#fdhistogram">fdhistogram</a></li>
+<li><a href="#fdbargraph">fdbargraph</a></li>
+<li><a href="#piechart">piechart</a></li>
 <li><a href="#normrand">normrand</a></li>
 <li><a href="#boxplot">boxplot</a></li>
 <li><a href="#normalcdf">normalcdf</a></li>
@@ -26,13 +28,7 @@ A library of Stats functions.  Version 1.8, June 20, 2007
 <li><a href="#binomialcdf">binomialcdf</a></li>
 <li><a href="#chi2cdf">chi2cdf</a></li>
 <li><a href="#invchi2cdf">invchi2cdf</a></li>
-<li><a href="#gamma_cdf">gamma_cdf</a></li>
-<li><a href="#gamma_inc">gamma_inc</a></li>
-<li><a href="#gamma_log">gamma_log</a></li>
 <li><a href="#fcdf">fcdf</a></li>
-<li><a href="#fcall">fcall</a></li>
-<li><a href="#fspin">fspin</a></li>
-<li><a href="#LJspin">LJspin</a></li>
 <li><a href="#invfcdf">invfcdf</a></li>
 </ul>
 <h3><a name="nCr">nCr</a></h3>
@@ -82,7 +78,7 @@ countif(array,condition)
 <BR> condition: a condition, using x for data values
 <BR>Example: countif($a,"x<3 && x>2")
 <BR><h3><a name="histogram">histogram</a></h3>
-histogram(array,label,start,classwidth,[labelstart,upper])
+histogram(array,label,start,classwidth,[labelstart,upper,width,height])
 <BR>display macro.  Creates a histogram from a data set
 <BR> array: array of data values
 <BR> label: name of data values
@@ -90,8 +86,9 @@ histogram(array,label,start,classwidth,[labelstart,upper])
 <BR> classwidth: width of the classes
 <BR> labelstart (optional): value to start axis labeling at.  Defaults to start
 <BR> upper (optional): first upper class limit.  Defaults to start+classwidth
+<BR> width,height (optional): width and height in pixels of graph
 <BR><h3><a name="fdhistogram">fdhistogram</a></h3>
-fdhistogram(freqarray,label,start,cw,[labelstart,upper])
+fdhistogram(freqarray,label,start,cw,[labelstart,upper,width,height])
 <BR>display macro.  Creates a histogram from frequency array
 <BR> freqarray: array of frequencies
 <BR> label: name of data values
@@ -99,6 +96,19 @@ fdhistogram(freqarray,label,start,cw,[labelstart,upper])
 <BR> classwidth: width of the classes
 <BR> labelstart (optional): value to start axis labeling at.  Defaults to start
 <BR> upper (optional): first upper class limit.  Defaults to start+classwidth
+<BR> width,height (optional): width and height in pixels of graph
+<BR><h3><a name="fdbargraph">fdbargraph</a></h3>
+fdbargraph(barlabels,freqarray,label,[width,height])
+<BR>barlabels: array of labels for the bars
+<BR>freqarray: array of frequencies/heights for the bars
+<BR>label: general label for bars
+<BR>width,height (optional): width and height for graph
+<BR><h3><a name="piechart">piechart</a></h3>
+piechart(percents, labels, {width, height})
+<BR>create a piechart
+<BR>percents: array of pie percents (should total 100%)
+<BR>labels: array of labels for each pie piece
+<BR>uses Google Charts API
 <BR><h3><a name="normrand">normrand</a></h3>
 normrand(mu,sigma,n)
 <BR>returns an array of n random numbers that are normally distributed with given
@@ -151,18 +161,12 @@ chi2cdf(x,df)
 invchi2cdf(p,df)
 <BR>Compuates the x value with left-tail probability p under the 
 <BR>chi-squared distribution with df degrees of freedom
-<BR><h3><a name="gamma_cdf">gamma_cdf</a></h3>
-<h3><a name="gamma_inc">gamma_inc</a></h3>
-<h3><a name="gamma_log">gamma_log</a></h3>
-<h3><a name="fcdf">fcdf</a></h3>
+<BR><h3><a name="fcdf">fcdf</a></h3>
 fcdf(f,df1,df2)
 <BR>Returns the area to right of the F-value f for the f-distribution
 <BR>with df1 and df2 degrees of freedom (techinically it's 1-CDF)
 <BR>Algorithm is accurate to approximately 4-5 decimals
-<BR><h3><a name="fcall">fcall</a></h3>
-<h3><a name="fspin">fspin</a></h3>
-<h3><a name="LJspin">LJspin</a></h3>
-<h3><a name="invfcdf">invfcdf</a></h3>
+<BR><h3><a name="invfcdf">invfcdf</a></h3>
 invfcdf(p,df1,df2)
 <BR>Computes the f-value with probability of p to the right
 <BR>with degrees of freedom df1 and df2

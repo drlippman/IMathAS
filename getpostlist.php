@@ -1,6 +1,7 @@
 <?php
-//IMathAS:  New threads list for a course
-//(c) 2006 David Lippman
+//IMathAS:  New threads and messages list for a course using remoteaccess code
+//for mobile access w/o logging in 
+//(c) 2009 David Lippman
    	require("config.php");
 	if (!empty($_COOKIE['remoteaccess']) && strlen($_COOKIE['remoteaccess'])==10) {
 		$_GET['key'] = $_COOKIE['remoteaccess'];
@@ -142,9 +143,23 @@
 		echo "<div style='font-size:100%; font-weight: 700; background-color: #ccf; '>No New Messages</div>";	
 	}
 	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+		$n = 0;
+		if (trim($line['title'])=='') {
+			$line['title'] = '[No Subject]';
+		}
+		while (strpos($line['title'],'Re: ')===0) {
+			$line['title'] = substr($line['title'],4);
+			$n++;
+		}
+		$line['title'] = htmlspecialchars($line['title']);
+		if ($n==1) {
+			$line['title'] = 'Re: '.$line['title'];
+		} else if ($n>1) {
+			$line['title'] = "Re<sup>$n</sup>: ".$line['title'];
+		}
 		$url = "/msgs/viewmsg.php?cid=0&amp;type=msg&amp;msgid="+$line['id'];	
 		echo "<tr><td>";
-		echo "<a style='color: blue;' href='$url' target='_new'>".htmlspecialchars($line['title'])."</a></td>";
+		echo "<a style='color: blue;' href='$url' target='_new'>".$line['title']."</a></td>";
 		echo "<td><span style='color: black;'>".htmlspecialchars("{$line['LastName']}, {$line['FirstName']}")."</span><br/>";
 		echo "<span style='color: gray;'>".htmlspecialchars(formatdate($line['senddate']))."</span></td></tr>";
 	}

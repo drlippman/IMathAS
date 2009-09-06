@@ -290,6 +290,7 @@ function copysub($items,$parent,&$addtoarr) {
 
 
  //set some page specific variables and counters
+$cid = $_GET['cid'];
 $overwriteBody = 0;
 $body = "";
 $pagetitle = $installname . " Import Course Items";
@@ -306,7 +307,7 @@ if (!(isset($teacherid))) {
 	$body = "You need to access this page from a menu link";	
 } else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
 	
-	$cid = $_GET['cid'];
+	
 
 	
 	//FORM HAS BEEN POSTED, STEP 3 DATA MANIPULATION
@@ -407,6 +408,9 @@ function setlibnames(libn) {
 <?php	
 	if ($_FILES['userfile']['name']=='') {
 ?>	
+		<p>This page will allow you to import course items previously exported from
+		this site or another site running this software.</p>
+		
 		<input type="hidden" name="MAX_FILE_SIZE" value="300000" />
 		<span class=form>Import file: </span>
 		<span class=formright><input name="userfile" type="file" /></span><br class=form>

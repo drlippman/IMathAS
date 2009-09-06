@@ -1171,7 +1171,7 @@ function parseShortScript(sscript,gw,gh) {
 		try {
 			eval(commands);
 		} catch (e) {
-			//setTimeout(function() {parseShortScript(sscript,gw,gh)},100);
+			setTimeout(function() {parseShortScript(sscript,gw,gh)},100);
 			//alert("Graph not ready");
 		}
 		
@@ -1194,7 +1194,10 @@ function drawPics() {
 	   try {
 		  for (var i = 0; i < pictures.length; i++) {
 			  if (pictures[i].getAttribute("sscr")!='' || pictures[i].getAttribute("script")!='') {
-				  pictures[i].getSVGDocument().getElementById("root");
+				  if (pictures[i].getSVGDocument().getElementById("root") == null) {
+					setTimeout(drawPics,100);
+					return;
+				  }
 			  }
 		  }
 	  } catch (e) {

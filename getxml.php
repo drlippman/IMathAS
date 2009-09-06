@@ -1,6 +1,6 @@
 <?php
-//IMathAS:  New threads list for a course
-//(c) 2006 David Lippman
+//IMathAS:  New threads and messages list for course; part of Google postreader
+//(c) 2009 David Lippman
    	require("config.php");
 	if (empty($_GET['key']) || strlen(trim($_GET['key']))!=10) {
 		echo "Key Error";
@@ -121,6 +121,19 @@
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	echo '<msglist>';
 	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+		$n = 0;
+		if (trim($line['title'])=='') {
+			$line['title'] = '[No Subject]';
+		}
+		while (strpos($line['title'],'Re: ')===0) {
+			$line['title'] = substr($line['title'],4);
+			$n++;
+		}
+		if ($n==1) {
+			$line['title'] = 'Re: '.$line['title'];
+		} else if ($n>1) {
+			$line['title'] = "Re<sup>$n</sup>: ".$line['title'];
+		}
 		echo '<msg>';
 		echo '<id>'.$line['id'].'</id>';
 		echo '<subject>'.htmlspecialchars($line['title']).'</subject>';

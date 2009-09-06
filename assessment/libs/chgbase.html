@@ -1,0 +1,21 @@
+<html><body>
+<h1>Macro Library chgbase</h1>
+A library of base changing functions.  Version 1.0, Nov 13, 2007
+<BR><ul>
+<li><a href="#baseconvert">baseconvert</a></li>
+<li><a href="#asciitodec">asciitodec</a></li>
+<li><a href="#dectoascii">dectoascii</a></li>
+</ul>
+<h3><a name="baseconvert">baseconvert</a></h3>
+baseconvert(num,from,to)
+<BR>converts the number num from base-"from" to base-"to"
+<BR>For example, baseconvert(23,5,7) converts 23-base5 to base7
+<BR>if a base is >10, then each place should be given (or will be returned)
+<BR> separated by commas, eg. 5,12,3
+<BR><h3><a name="asciitodec">asciitodec</a></h3>
+asciitodec(char)
+<BR>returns the ASCII decimal code for a character
+<BR><h3><a name="dectoascii">dectoascii</a></h3>
+dectoascii(num)
+<BR>returns the ASCII character for a decimal value
+<BR>

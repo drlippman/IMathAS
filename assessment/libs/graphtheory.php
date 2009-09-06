@@ -1,5 +1,5 @@
 <?php
-//A library of graph theory functions.  Version 0.1, May 6, 2009
+//A library of graph theory functions.  Version 0.2, Sept 4, 2009
 //THIS LIBRARY IS NOT COMPLETE.  THE SYNTAX OR NAMES OF THESE FUNCTIONS
 //MAY CHANGE
 //Most graphing functions in this library use an options array.  Here are the
@@ -10,6 +10,7 @@
 //  options['useweights'] = true/false.  If true, g[i][j] used as weight
 //  options['labels'] = "letters" or array of labels.  If "letters", letters
 //    A-Z used for labels.  If array, label[i] used for vertex g[i]
+//  options['weightoffset'] = position (0-1) along edge where weights should go
 //  options['connected'] = true/false.  When randomizing graphs, whether you
 //    want to force the result to be connected.  If false for a tree, this
 //    forces a disconnected graph
@@ -21,145 +22,9 @@
 //    position of vertex labels.  
 
 global $allowedmacros;
-array_push($allowedmacros,"graphspringlayout","graphcirclelayout","graphgridlayout","graphpathlayout","graphcircleladder","graphcircle","graphbipartite","graphgrid","graphrandom","graphrandomgridschedule","graphemptygraph","graphdijkstra","graphbackflow","graphkruskal","graphadjacencytoincidence","graphincidencetoadjacency","graphdrawit");
+array_push($allowedmacros,"graphspringlayout","graphcirclelayout","graphgridlayout","graphpathlayout","graphcircleladder","graphcircle","graphbipartite","graphgrid","graphrandom","graphrandomgridschedule","graphemptygraph","graphdijkstra","graphbackflow","graphkruskal","graphadjacencytoincidence","graphincidencetoadjacency","graphdrawit","graphdecreasingtimelist","graphcriticaltimelist","graphcircledstar","graphcircledstarlayout","graphmaketable","graphsortededges","graphcircuittoarray","graphnearestneighbor","graphrepeatednearestneighbor","graphgetedges","graphgettotalcost","graphnestedpolygons","graphmakesymmetric","graphisconnected","graphgetedgesarray","graphsequenceeuleredgedups","graphsequenceishamiltonian","graphshortestpath");
 	
-//graphspringlayout(g,[options])
-//draws a graph based on a graph incidence matrix
-//using a randomized spring layout engine
-//g is a 2-dimensional upper triangular matrix
-//g[i][j] &gt; 0 if vertices i and j are connected
-//not a digraph
-function graphspringlayout($g,$op=array()) {
-	$iterations = 40;
-	$t = 2;
-	$dim = 2;
-	$n = count($g[0]);
-	$k = sqrt(1/$n);
-	$dt = $t/$iterations;
-	$pos = array();
-	
-	for ($i=0; $i<$n; $i++) {
-		$pos[$i] = array();
-		for ($x = 0; $x<$dim; $x++) {
-			$pos[$i][$x] = rand(0,32000)/32000;
-		}
-	}
-	
-	for ($it = 0; $it<$iterations; $it++) {
-		for ($i = 0; $i<$n; $i++) {
-			for ($x = 0; $x<$dim; $x++) {
-				$disp[$i][$x] = 0;
-			}
-		}
-		for ($i = 0; $i<$n; $i++) {
-			for ($j = $i+1; $j<$n; $j++) {
-				$square_dist = 0;
-				for ($x = 0; $x<$dim; $x++) {
-					$delta[$x] = $pos[$i][$x] - $pos[$j][$x];
-					$square_dist += $delta[$x]*$delta[$x];
-				}
-				if ($square_dist<0.01) {
-					$square_dist = 0.01;
-				}
-				//repel
-				$force = $k*$k/$square_dist;
-				//if neighbors, attract
-				if ($g[$i][$j]>0 || $g[$j][$i]>0) {
-					$force -= sqrt($square_dist)/$k;
-				}
-				for ($x = 0; $x<$dim; $x++) {
-					$disp[$i][$x] += $delta[$x]*$force;
-					$disp[$j][$x] -= $delta[$x]*$force;
-				}	
-			}
-		}
-		for ($i = 0; $i<$n; $i++) {
-			$square_dist = 0;
-			for ($x = 0; $x<$dim; $x++) {
-				$square_dist += $disp[$i][$x]*$disp[$i][$x];
-			}
-			$scale = $t/($square_dist<0.01?1:sqrt($square_dist));
-			for ($x = 0; $x<$dim; $x++) {
-				$pos[$i][$x] += $disp[$i][$x]*$scale;
-			}
-			
-		}
-		$t -= $dt;
-	}
-	
-	return graphdrawit($pos,$g,$op);
-}
-
-//graphcirclelayout(graph,[options])
-//draws a graph based on a graph incidence matrix
-//using a circular layout
-//g is a 2-dimensional upper triangular matrix
-//g[i][j] &gt; 0 if vertexes i and j are connected
-function graphcirclelayout($g,$op=array()) {
-	$n = count($g[0]);
-	$dtheta = 2*M_PI/$n;
-	for ($i = 0; $i<$n; $i++) {
-		$pos[$i][0] = 10*cos($dtheta*$i);
-		$pos[$i][1] = 10*sin($dtheta*$i);
-	}
-	$op['xmin'] = -10;
-	$op['xmax'] = 10;
-	$op['ymin'] = -10;
-	$op['ymax'] = 10;
-	return graphdrawit($pos,$g,$op);
-}
-
-//graphgridlayout(graph,[options])
-//draws a graph based on a graph incidence matrix
-//using a rectangular grid layout.  Could hide
-//some edges that connect colinear vertices
-//use options['wiggle'] = true to perterb off exact grid
-//g is a 2-dimensional matrix
-//g[i][j] &gt; 0 if vertexes i and j are connected
-function graphgridlayout($g,$op=array()) {
-	$n = count($g[0]);
-	if (isset($op['gridv'])) {
-		$sn = $op['gridv'];
-	} else {
-		$sn = ceil(sqrt($n));
-	}
-	$gd = 10/$sn;
-	for ($i=0; $i<$n; $i++) {
-		$pos[$i][0] = floor($i/$sn)*$gd  + ($op['wiggle']?$gd/5*sin(3*$i):0);;
-		$pos[$i][1] = ($i%$sn)*$gd + ($op['wiggle']?$gd/5*sin(4*$i):0);
-	}	
-	return graphdrawit($pos,$g,$op);
-}
-
-//graphpathlayout(graph,[options])
-//draws a graph based on a graph incidence matrix
-//using a backflow to place the vertices in approximate
-//order of incidence.  Could hide
-//some edges that connect colinear vertices
-//use options['wiggle'] = true to perterb off exact grid
-//g is a 2-dimensional matrix
-//g[i][j] &gt; 0 if vertexes i and j are connected
-function graphpathlayout($g,$op=array()) {
-	$n = count($g[0]);
-	list($dist,$next) = graphbackflow($g);
-	$maxh = max($dist);
-	$maxv = ceil($n/$maxh);
-	$dh = 10/$maxh;
-	$dv = 10/$maxv;
-	$odv = $dv/$maxh;
-	
-	
-	for ($i=0; $i<$n; $i++) {
-		if ($dist[$i]<0) { $dist[$i] = 0;}
-		$pos[$i][0] = 1-$dh*$dist[$i];
-		$pos[$i][1] = 5 + ($loccnt[$dist[$i]]%2==0?1:-1)*$dv*ceil($loccnt[$dist[$i]]/2)+ ($op['wiggle']?$dv/5*sin(4*$dist[$i]):0);
-		$loccnt[$dist[$i]]++;
-	}
-
-	return graphdrawit($pos,$g,$op);
-}
-
-//graphcircleladder(n,m,[options])
+///graphcircleladder(n,m,[options])
 //draws a circular ladder graph
 //n vertices around a circle
 //m concentric circles
@@ -195,6 +60,66 @@ function graphcircleladder($n,$m,$op=array()) {
 	return array(graphdrawit($pos,$g,$op),$g);
 }
 
+//graphnestedpolygons(n,m,[options])
+//draws a graph of offset nested polygons
+//n vertices around a polygon
+//m concentric polygons
+//vertices of inner polygon touches midpoint of outer polygon
+//returns array(pic,g)
+function graphnestedpolygons($n,$m,$op=array()) {
+	$tot = $n*$m;
+	$dtheta = M_PI/$n;
+	$g = graphemptygraph($tot);
+	$r = 1;
+	$v = 0;
+	//TODO:  MAKE WORK
+	for ($i = 0; $i<$m; $i++) { //inner to outer
+		$r = $r/cos($dtheta);
+		for ($j = 0; $j<$n; $j++) {
+			$pos[$v][0] = $r*cos($dtheta*($j*2+$i%2));
+			$pos[$v][1] = $r*sin($dtheta*($j*2+$i%2));
+			if ($i>0) { //in a points to previous
+				if ($j<$n-1) {
+					if ($i%2==1) {
+						$g[$v-$n][$v] = 1;
+						$g[$v-$n+1][$v] = 1;
+					} else {
+						$g[$v-$n][$v] = 1;
+						if ($j==0) {
+							$g[$v-1][$v] = 1;
+						} else {
+							$g[$v-$n-1][$v] = 1;
+						}
+					}
+					
+				} else {
+					$g[$v-$n][$v] = 1;
+					if ($i%2==1) {
+						$g[$v-2*$n+1][$v] = 1;
+					} else {
+						$g[$v-$n-1][$v] = 1;
+					}
+				}
+			} else {
+				if ($j<$n-1) {
+					$g[$v][$v+1] = 1;  //around circle
+				} else {
+					$g[$v-$n+1][$v] = 1;  //around circle
+				}
+			}
+			$v++;
+			
+		}
+	}
+	//print_r($g);
+	$op['xmin'] = -$r;
+	$op['xmax'] = $r;
+	$op['ymin'] = -$r;
+	$op['ymax'] = $r;
+	$g = graphprocessoptions($g,$op);
+	return array(graphdrawit($pos,$g,$op),$g);
+}
+
 
 //graphcircle(n,[options])
 //draws a complete graph with a circular layout
@@ -209,6 +134,25 @@ function graphcircle($n,$op=array()) {
 	}
 	$g = graphprocessoptions($g,$op);
 	return array(graphcirclelayout($g,$op),$g);
+}
+
+//graphcircledstar(n,[options])
+//draws n vertices in a circle, plus 1 vertex in the middle
+//vertices are connected along the circle, plus all
+//connected to the center vertex
+//returns array(pic,g)
+function graphcircledstar($n,$op=array()) {
+	$g = graphemptygraph($n);
+	for ($i = 1; $i<=$n; $i++) {
+		$g[0][$i] = 1;
+		if ($i==1) { 
+			$g[1][$n] = 1;
+		} else {
+			$g[$i-1][$i] = 1;
+		}
+	}
+	$g = graphprocessoptions($g,$op);
+	return array(graphcircledstarlayout($g,$op),$g);
 }
 
 //graphbipartite(n,[options])
@@ -258,9 +202,10 @@ function graphgrid($n,$m,$op=array()) {
 	return array(graphgridlayout($g,$op),$g);	
 }
 
-//graphrandom(n, p,[options])
-//draws a random graph with n vertices. 
-function graphrandom($n,$p,$op=array()) {
+
+//graphrandom(n,[options])
+//draws a randomly spring laid out graph with n vertices. 
+function graphrandom($n,$op=array()) {
 	$g = graphemptygraph($n);
 	for ($i = 0; $i<$n; $i++) {
 		for ($j=$i+1;$j<$n; $j++) {
@@ -270,6 +215,16 @@ function graphrandom($n,$p,$op=array()) {
 	$g = graphprocessoptions($g,$op);
 	
 	return array(graphspringlayout($g,$op),$g);	
+}
+
+//graphemptygraph(n)
+//creates an empty graph matrix, nxn
+function graphemptygraph($n) {
+	$g = array();
+	for ($i = 0; $i<$n; $i++) {
+		$g[$i] = array_fill(0,$n,0);
+	}
+	return $g;
 }
 
 //graphrandomgridschedule(n, m, p,[options])
@@ -343,6 +298,17 @@ function graphrandomgridschedule($n,$m,$p,$op=array()) {
 					}
 				}
 			}
+			if (isset($op['forcemultpath']) && $op['forcemultpath']==$i) {
+				if ($g[$i][$i+$n] == 1) {
+					if ($i%$n==0) {
+						$g[$i][$i+$n-1] = 1;
+					} else {
+						$g[$i][$i+$n+1] = 1;
+					}
+				} else {
+					$g[$i][$i+$n] = 1;
+				}
+			}
 		}
 		//force one incoming
 		$connected = false;
@@ -360,7 +326,9 @@ function graphrandomgridschedule($n,$m,$p,$op=array()) {
 	if (isset($op['labels'])) {
 		if ($op['labels']=="letters") {
 			$op['labels'] = array_slice($lettersarray,0,$tot-2);
-		} 
+		} else {
+			$op['labels'] = array_slice($op['labels'],0,$tot-2);
+		}
 		array_unshift($op['labels'],"Start");
 		array_push($op['labels'],"End");
 		if ($useweights) {
@@ -369,31 +337,38 @@ function graphrandomgridschedule($n,$m,$p,$op=array()) {
 			}
 		}
 	}
-	
-	return graphdrawit($pos,$g,$op);
+	array_unshift($op['weights'],0);
+	array_push($op['weights'],0);
+	return array(graphdrawit($pos,$g,$op),$g,$op['weights']);
 }
 
-
-//graphemptygraph(n)
-//creates an empty graph matrix, nxn
-function graphemptygraph($n) {
-	$g = array();
-	for ($i = 0; $i<$n; $i++) {
-		$g[$i] = array_fill(0,$n,0);
+function graphdecreasingtimelist($g,$w) {
+	asort($w);
+	$k = array_reverse(array_keys($w));
+	while ($w[$k[count($k)-1]]==0) {
+		array_pop($k);
 	}
-	return $g;
+	return $k;	
+}
+function graphcriticaltimelist($g,$w) {
+	list($dist,$next) = graphbackflow($g,$w);
+	unset($dist[count($dist)-1]);
+	unset($dist[0]);
+	asort($dist);
+	$k = array_reverse(array_keys($dist));
+	return $k;
 }
 
-
-//graphdijkstra(g) 
+//graphdijkstra(g,[dest]) 
 //computes dijkstras algorithm on the graph g
 //g is a 2-dimensional matrix
-//g[i][j] = 1 if vertexes i and j are connected
+//g[i][j]  &gt; 0 if vertexes i and j are connected
+//if dest vertex not set then
 //the last vertex will be used as the destination vertex
 //returns array(dist,next) where
 //dist[i] is the shortest dist to end, and
 //next[i] is the vertex next closest to the end
-function graphdijkstra($g) {
+function graphdijkstra($g,$dest=-1) {
 	$n = count($g[0]);
 	$dist = array();
 	$next = array();
@@ -402,7 +377,11 @@ function graphdijkstra($g) {
 	for ($i=0; $i<$n; $i++) {
 		$dist[$i] = $inf;
 	}
-	$dist[$n-1] = 0;
+	if ($dest==-1) {
+		$dist[$n-1] = 0;
+	} else {
+		$dist[$dest] = 0;
+	}
 	while (count($eaten)<$n) {
 		$cur = -1;
 		//find starting vertex, if any
@@ -436,16 +415,18 @@ function graphdijkstra($g) {
 	return array($dist,$next);
 }
 
-//graphbackflow(g) 
+//graphbackflow(g,[w]) 
 //computes longest-path algorithm on the graph g
 //g is a 2-dimensional matrix
-//g[i][j] = 1 if vertexes i leads to j
+//g[i][j] &gt; 1 if vertexes i leads to j
 //This might give bad/weird results if graph has a circuit
 //the last vertex will be used as the destination vertex
+//w are weights for the vertices, if a scheduling digraph and 
+//tasks rather than edges have weights
 //returns array(dist,next) where
 //dist[i] is the longest dist to end, and
 //next[i] is the vertex next closest to the end
-function graphbackflow($g) {
+function graphbackflow($g,$w=array()) {
 	$n = count($g[0]);
 	$dist = array();
 	$next = array();
@@ -458,16 +439,22 @@ function graphbackflow($g) {
 	$toprocess = array($n-1);
 	while (count($eaten)<$n) {
 		if (count($toprocess)==0) { break;}
+		$newtoprocess = array();
 		for ($k=0; $k<count($toprocess); $k++) {
 			$cur = $toprocess[$k];
-			$newtoprocess = array();
 			for ($i=0; $i<$n; $i++) {
 				if (!isset($eaten[$i]) && $g[$i][$cur]>0) { //vertices leading to $cur
-					$alt = $dist[$cur] + $g[$i][$cur];
+					if (count($w)>0) {
+						$alt = $dist[$cur] + $w[$i];
+					} else {
+						$alt = $dist[$cur] + $g[$i][$cur];
+					}
 					if ($alt>$dist[$i]) {
 						$dist[$i] = $alt;
 						$next[$i] = $cur;
-						if (!in_array($i,$newtoprocess)) {
+						
+					}
+					if (!in_array($i,$newtoprocess)) {
 							$douse = true;
 							//don't use if not terminal 
 							for ($j=0; $j<$n; $j++) {
@@ -479,7 +466,6 @@ function graphbackflow($g) {
 								$newtoprocess[] = $i;
 							}
 						}
-					}
 				}
 			}
 			$eaten[$cur] = 1;
@@ -491,7 +477,7 @@ function graphbackflow($g) {
 
 
 //graphkruskal(g) 
-//return a minimum cost spanning tree from matrix g
+//return a minimum cost spanning tree graph from graph g
 function graphkruskal($g) {
 	$n = count($g[0]);
 	$edgelist = array();
@@ -515,6 +501,7 @@ function graphkruskal($g) {
 	$steps = 0;
 	while (count($addededges)<$n-1) {
 		$steps++;
+		if (count($c)==0) {break;}
 		$c = array_shift($keys);
 		if ($clusters[$edges[$c][0]] != $clusters[$edges[$c][1]]) {
 			$addededges[] = $c;
@@ -536,9 +523,342 @@ function graphkruskal($g) {
 	return $g;
 }
 
+//graphrepeatednearestneighbor(g)
+//returns a hamiltonian circuit graph using repeated nearest neighbor
+function graphrepeatednearestneighbor($g) {
+	$n = count($g[0]);
+	$minval = 1e16;
+	for ($i=0; $i<$n; $i++) {
+		list($ng,$v) = graphnearestneighbor($g,$i,true);
+		if ($v<$minval) {
+			$minat = array($i);
+			$minval = $v;
+			$curming = $ng;
+		} else if ($v==$minval) {
+			$minat[] = $i;
+		}
+	}
+	return array($curming,$minat);
+}
+//graphnearestneighbor(g,start)
+//returns a hamiltonian circuit graph using nearest neighbor
+//starting at vertex start
+function graphnearestneighbor($g,$start,$returnweight=false) {
+	$n = count($g[0]);
+	$visited = array();
+	$cur = $start;
+	$ng = graphemptygraph($n);
+	$totalweight = 0;
+	while (count($visited)<$n-1) {
+		$visited[$cur] = 1;
+		$minat = -1;  
+		$minval = 1e16;
+		for ($i=0; $i<$n; $i++) {
+			if (isset($visited[$i])) {continue;}
+			$m = max($g[$cur][$i],$g[$i][$cur]);
+			if ($m>0 && $m<$minval) {
+				$minat = $i;
+				$minval = $m;
+			}
+		}
+		if ($minat==-1) { break;}
+		$ng[$cur][$minat] = $minval;
+		$ng[$minat][$cur] = $minval;
+		$totalweight += $minval;
+		$cur = $minat;
+	}
+	$ng[$cur][$start] = max($g[$cur][$start],$g[$start][$cur]);
+	$ng[$start][$cur] = $ng[$cur][$start];
+	$totalweight += $ng[$cur][$start];
+	
+	if ($returnweight) {
+		return array($ng,$totalweight);
+	} else {
+		return $ng;
+	}
+}
+
+//graphsortededges(g) 
+//returns a hamiltonian circuit graph using sorted edges
+function graphsortededges($g) {
+	$n = count($g[0]);
+	$edgelist = array();
+	$addededges = array();
+	$clusters = array();
+	$valence = array();
+	$c = 0;
+	for ($i=0; $i<$n; $i++) {
+		$clusters[$i] = $i;
+	}
+	for ($i=0; $i<$n; $i++) {
+		for ($j=$i+1;$j<$n;$j++) {
+			if ($g[$i][$j]>0 || $g[$j][$i]>0) {
+				$edgelist[$c] = max($g[$i][$j],$g[$j][$i]);
+				$edges[$c] = array($i,$j);
+				$c++;
+			}
+		}
+		$valence[$i] = 0;
+	}
+	asort($edgelist);
+	$keys = array_keys($edgelist);
+	$steps = 0;
+	while (count($addededges)<$n) {
+		$steps++;
+		if (count($c)==0) {break;}
+		$c = array_shift($keys);
+		if ($valence[$edges[$c][0]]<2 && $valence[$edges[$c][1]]<2 && ($clusters[$edges[$c][0]] != $clusters[$edges[$c][1]] || count($addededges)==$n-1)) {
+			$addededges[] = $c;
+			//merge clusters
+			for ($i=0; $i<$n; $i++) {
+				if ($i==$edges[$c][1]) { continue;}
+				if ($clusters[$i] == $clusters[$edges[$c][1]]) {
+					$clusters[$i] = $clusters[$edges[$c][0]];
+				}
+			}
+			$clusters[$edges[$c][1]] = $clusters[$edges[$c][0]];
+			$valence[$edges[$c][1]]++;
+			$valence[$edges[$c][0]]++;
+		}
+	}
+	$g = graphemptygraph($n);
+	foreach ($addededges as $c) {
+		$g[$edges[$c][0]][$edges[$c][1]] = $edgelist[$c];	
+	}
+	return $g;
+}
+
+//function graphsequenceeuleredgedups(g,op,seq)
+//determines if given sequence of labels determines
+//an edge-covering circuit on graph g.  options op is needed
+//for labels
+//returns -1 if not all edges covered or seq uses nonexisting edges
+//returns 0 if all edges covered with no dup
+//returns # of dups if covers all edges with duplications
+function graphsequenceeuleredgedups($g,$op,$seq) {
+	$n = count($g[0]);
+	if ($op['labels'] != 'letters') {
+		$lbl = $op['labels'];
+	} else {
+		$lbl = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
+	}
+	$lblrev = array_flip($lbl);
+	$len = strlen($seq);
+	$vseq = array();
+	for ($i=0; $i<$len; $i++) {
+		$vseq[$i] = $lblrev[$seq{$i}];
+	}
+	if ($vseq[0] != $vseq[$len-1]) {
+		return -1; //doesn't return to start
+	} 
+	$dup = 0;
+	for ($i=1; $i<$len; $i++) {
+		if ($g[$vseq[$i]][$vseq[$i-1]]>0 || $g[$vseq[$i-1]][$vseq[$i]]>0) {
+			//edge exists
+			$g[$vseq[$i]][$vseq[$i-1]] = -1;
+			$g[$vseq[$i-1]][$vseq[$i]] = -1;	
+		} else if ($g[$vseq[$i]][$vseq[$i-1]]<0) {
+			//used this edge before.  naughty naughty
+			$g[$vseq[$i]][$vseq[$i-1]]--;
+			$g[$vseq[$i-1]][$vseq[$i]]--;
+			$dup++;
+		} else { 
+			//no edge exists
+			return -1;
+		}
+	}
+	for ($i=0; $i<$n; $i++) {
+		for ($j=$i+1; $j<$n; $j++) {
+			if ($g[$i][$j]>0 || $g[$j][$i]>0) {
+				//unused edge
+				return -1;
+			}
+		}
+	}
+	return $dup;	
+}
+
+//function graphsequencishamiltonian(g,op,seq)
+//determines if given sequence of labels determines
+//a hamiltonian circuit on graph g.  options op is needed
+//for labels
+function graphsequenceishamiltonian($g,$op,$seq) {
+	$n = count($g[0]);
+	if ($op['labels'] != 'letters') {
+		$lbl = $op['labels'];
+	} else {
+		$lbl = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
+	}
+	$lblrev = array_flip($lbl);
+	$len = strlen($seq);
+	$vseq = array();
+	for ($i=0; $i<$len; $i++) {
+		$vseq[$i] = $lblrev[$seq{$i}];
+	}
+	if ($vseq[0] != $vseq[$len-1]) {
+		return false;	
+	}
+	if ($len != $n+1) {
+		return false; //doesn't return to start or not long enough
+	} 
+	$notvis = array_fill(0,$n,1);
+	for ($i=1; $i<$len; $i++) {
+		if ($g[$vseq[$i]][$vseq[$i-1]]>0 || $g[$vseq[$i-1]][$vseq[$i]]>0) {
+			//edge exists
+			if ($notvis[$vseq[$i]]==1) {
+				$notvis[$vseq[$i]] = 0;
+			} else {
+				//second visit to vertex;
+				
+				return false;
+			}
+		} 
+	}
+	if (array_sum($notvis)>0) {
+		//some vertex not visisted.  Should have already been caught
+		echo "sum";
+		return false;
+	}
+	return true;
+}
+
+//graphshortestpath(g,op,start,end,[type])
+//find shortest path on graph g from vertex start to end
+//returns array(shortest path,length of path)
+//for path,
+//type=0 returns labeledpath, like ABCD
+//type=1 returns array of vertex indices
+function graphshortestpath($g,$op,$start,$end,$type=0) {
+	if ($op['labels'] != 'letters') {
+		$lbl = $op['labels'];
+	} else {
+		$lbl = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
+	}
+	list($dist,$next) = graphdijkstra($g,$end);
+	$vertarr = array($start);
+	$cur = $start;
+	if ($dist[$start]==1e16) {
+		//no path exists
+		return array("",1e16);
+	}
+	while ($cur != $end) {
+		$cur = $next[$cur];
+		$vertarr[] = $cur;
+	}
+	if ($type==1) {
+		return array($vertarr,$dist[$start]);
+	} else {
+		$path = '';
+		foreach ($vertarr as $vert) {
+			$path .= $lbl[$vert];
+		}
+		return array($path,$dist[$start]);
+	}	
+}
+
+//graphcircuittoarray(g,[start])
+//converts graph containing a circuit to an array
+//of vertices in circuit order
+function graphcircuittoarray($g,$start=0) {
+	$n = count($g[0]);
+	$order = array($start);
+	$cur = $start;
+	$last = -1;
+	while (count($order)<$n) {
+		for ($i=0;$i<$n;$i++) {
+			if (($g[$cur][$i]>0 || $g[$i][$cur]>0)&& $i!=$last) {
+				$order[] = $i;
+				$last = $cur;
+				$cur = $i;
+				break;
+			}
+		}
+		if ($i==$n) {
+			break;
+		}
+	}
+	return $order;
+}
+
+//graphgetedges(g,op) 
+//gets list of edges in and not in graph
+//need op['labels'] set
+//return (goodedges,badedges)
+function graphgetedges($g,$op) {
+	if ($op['labels'] != 'letters') {
+		$lbl = $op['labels'];
+	} else {
+		$lbl = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
+	}
+	$n = count($g[0]);
+	$good = array();
+	$bad = array();
+	for ($i=0; $i<$n; $i++) {
+		for ($j=$i+1;$j<$n;$j++) {
+			if ($op['digraph']) {
+				if($g[$i][$j]>0) {
+					$good[] = $lbl[$i] . $lbl[$j];
+				} else {
+					$bad[] = $lbl[$i] . $lbl[$j];
+				}
+				if($g[$j][$i]>0) {
+					$good[] = $lbl[$j] . $lbl[$i];
+				} else {
+					$bad[] = $lbl[$j] . $lbl[$i];
+				}
+			} else {
+				if ($g[$i][$j]>0 || $g[$j][$i]>0) {
+					$good[] = $lbl[$i] . $lbl[$j];
+				} else {
+					$bad[] = $lbl[$i] . $lbl[$j];
+				}
+			}
+		}
+	}
+	return array($good,$bad);
+}
+
+//graphgetedgesarray(g) 
+//gets array of edges in a graph
+//returns array of edges; each edge is array(startvert,endvert)
+function graphgetedgesarray($g) {
+	$n = count($g[0]);
+	$good = array();
+	for ($i=0; $i<$n; $i++) {
+		for ($j=$i+1;$j<$n;$j++) {
+			if ($op['digraph']) {
+				if($g[$i][$j]>0) {
+					$good[] = array($i,$j);
+				}
+				if($g[$j][$i]>0) {
+					$good[] = array($j,$i);
+				} 
+			} else {
+				if ($g[$i][$j]>0 || $g[$j][$i]>0) {
+					$good[] = array($i,$j);
+				}
+			}
+		}
+	}
+	return $good;
+}
+
+//graphgettotalcost(g) 
+//gets total cost of all edges in a graph
+function graphgettotalcost($g) {
+	$n = count($g[0]);
+	$totalcost = 0;
+	for ($i=0; $i<$n; $i++) {
+		for ($j=$i+1;$j<$n;$j++) {
+			$totalcost += max($g[$i][$j],$g[$j][$i]);
+		}
+	}
+	return $totalcost;
+}
+
 //graphadjacencytoincidence(g,[options])
 //create incidence lists from adjacency matrix g
-//g[i][j]>0 if edge from i to j
+//g[i][j] &gt; 0 if edge from i to j
 //outputs list where list[i] is array of vertices
 //  that i leads to
 function graphadjacencytoincidence($g,$op) {
@@ -583,9 +903,250 @@ function graphincidencetoadjacency($list,$op) {
 	return $g;
 }
 
+//graphgetvalence(g,vert,[dir])
+//gets valence(degree) of vertex vert
+//if digraph, can use dir:
+//   0: indegree, 1: outdegree, 2: both (default)
+function graphgetvalence($g,$vert,$dir=2) {
+	$n = count($g[0]);
+	$cnt = 0;
+	for ($i=0; $i<$n; $i++) {
+		if ($dir==2 && ($g[$i][$vert]>0 || $g[$vert][$i]>0)) {
+			$cnt++;
+		} else if ($dir==0 && $g[$i][$vert]>0) {
+			$cnt++;
+		} else if ($dir==1 && $g[$vert][$i]>0) {
+			$cnt++;
+		} 
+	}
+	return $cnt;
+}
+
+//graphmakesymmetric(g)
+//ensures that all edges are bidirectional.  
+function graphmakesymmetric($g) {
+	$n = count($g[0]);
+	for ($i=0; $i<$n; $i++) {
+		for ($j=$i+1; $j<$n; $j++) {
+			$m = max($g[$i][$j],$g[$j][$i]);
+			if ($m>0) {
+				$g[$i][$j] = $m;
+				$g[$j][$i] = $m;
+			}
+		}
+	}
+	return $g;
+}
+
+//graphisconnected
+//checks if graph is connected
+function graphisconnected($g) {
+	$n = count($g[0]);
+	$ng = graphmakesymmetric($g);
+	$inf = 1e16;
+	list($dist,$next) = graphdijkstra($ng);
+	for ($i=0; $i<$n; $i++) {
+		if ($dist[$i]==$inf) {
+			return false;
+		}
+	} 
+	return true;
+}
+
+//graphmaketable(g,[op])
+//makes a weights table based on a given graph
+function graphmaketable($g,$o=array()) {
+	$n = count($g[0]);
+	$lettersarray = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
+	if (!is_array($op['labels'])) {
+		$op['labels'] = array_slice($lettersarray,0,$n);
+	}	
+	$table = '<table class="stats"><thead>';
+	$table .= '<tr><th></th>';
+	for ($i=0; $i<$n; $i++) {
+		$table .= '<th>'.$op['labels'][$i].'</th>';
+	}
+	$table .= '</tr></thead><tbody>';
+	for ($i=0; $i<$n; $i++) {
+		$table .= '<tr>';
+		$table .= '<th>'.$op['labels'][$i].'</th>';
+		for ($j=0; $j<$n; $j++) {
+			if ($g[$i][$j]==0 && $g[$j][$i]==0) {
+				$table .= '<td>--</td>';
+			} else {
+				$table .= '<td>'.max($g[$i][$j],$g[$j][$i]).'</td>';
+			}
+		}
+		$table .= '</tr>';
+	}
+	$table .= '</tbody>';
+	$table .= '</table>';
+	return $table;
+}
+
+//graphspringlayout(g,[options])
+//draws a graph based on a graph incidence matrix
+//using a randomized spring layout engine.  Doesn't work great.
+//g is a 2-dimensional upper triangular matrix
+//g[i][j] &gt; 0 if vertices i and j are connected
+//not a digraph
+function graphspringlayout($g,$op=array()) {
+	$iterations = 40;
+	$t = 2;
+	$dim = 2;
+	$n = count($g[0]);
+	$k = sqrt(1/$n);
+	$dt = $t/$iterations;
+	$pos = array();
+	
+	
+	for ($i=0; $i<$n; $i++) {
+		$pos[$i] = array();
+		for ($x = 0; $x<$dim; $x++) {
+			$pos[$i][$x] = rand(0,32000)/32000;
+		}
+	}
+	
+	for ($it = 0; $it<$iterations; $it++) {
+		for ($i = 0; $i<$n; $i++) {
+			for ($x = 0; $x<$dim; $x++) {
+				$disp[$i][$x] = 0;
+			}
+		}
+		for ($i = 0; $i<$n; $i++) {
+			for ($j = $i+1; $j<$n; $j++) {
+				$square_dist = 0;
+				for ($x = 0; $x<$dim; $x++) {
+					$delta[$x] = $pos[$i][$x] - $pos[$j][$x];
+					$square_dist += $delta[$x]*$delta[$x];
+				}
+				if ($square_dist<0.01) {
+					$square_dist = 0.01;
+				}
+				//repel
+				$force = $k*$k/$square_dist;
+				//if neighbors, attract
+				if ($g[$i][$j]>0 || $g[$j][$i]>0) {
+					$force -= sqrt($square_dist)/$k;
+				}
+				for ($x = 0; $x<$dim; $x++) {
+					$disp[$i][$x] += $delta[$x]*$force;
+					$disp[$j][$x] -= $delta[$x]*$force;
+				}	
+			}
+		}
+		for ($i = 0; $i<$n; $i++) {
+			$square_dist = 0;
+			for ($x = 0; $x<$dim; $x++) {
+				$square_dist += $disp[$i][$x]*$disp[$i][$x];
+			}
+			$scale = $t/($square_dist<0.01?1:sqrt($square_dist));
+			for ($x = 0; $x<$dim; $x++) {
+				$pos[$i][$x] += $disp[$i][$x]*$scale;
+			}
+			
+		}
+		$t -= $dt;
+	}
+	
+	return graphdrawit($pos,$g,$op);
+}
+
+//graphcirclelayout(graph,[options])
+//draws a graph based on a graph incidence matrix
+//using a circular layout
+//g is a 2-dimensional upper triangular matrix
+//g[i][j] &gt; 0 if vertexes i and j are connected
+function graphcirclelayout($g,$op=array()) {
+	$n = count($g[0]);
+	$dtheta = 2*M_PI/$n;
+	for ($i = 0; $i<$n; $i++) {
+		$pos[$i][0] = 10*cos($dtheta*$i);
+		$pos[$i][1] = 10*sin($dtheta*$i);
+	}
+	$op['xmin'] = -10;
+	$op['xmax'] = 10;
+	$op['ymin'] = -10;
+	$op['ymax'] = 10;
+	return graphdrawit($pos,$g,$op);
+}
+
+//graphcircledstarlayout(graph,[options])
+//draws a graph based on a graph incidence matrix
+//using a circular layout with the first vertex in the center of the circle
+//g is a 2-dimensional upper triangular matrix
+//g[i][j] &gt; 0 if vertexes i and j are connected
+function graphcircledstarlayout($g,$op=array()) {
+	$n = count($g[0])-1;
+	$dtheta = 2*M_PI/$n;
+	$pos[0][0] = 0;
+	$pos[0][1] = 0;
+	for ($i = 0; $i<$n; $i++) {
+		$pos[$i+1][0] = 10*cos($dtheta*$i);
+		$pos[$i+1][1] = 10*sin($dtheta*$i);
+	}
+	$op['xmin'] = -10;
+	$op['xmax'] = 10;
+	$op['ymin'] = -10;
+	$op['ymax'] = 10;
+	return graphdrawit($pos,$g,$op);
+}
+
+//graphgridlayout(graph,[options])
+//draws a graph based on a graph incidence matrix
+//using a rectangular grid layout.  Could hide
+//some edges that connect colinear vertices
+//use options['wiggle'] = true to perterb off exact grid
+//g is a 2-dimensional matrix
+//g[i][j] &gt; 0 if vertexes i and j are connected
+function graphgridlayout($g,$op=array()) {
+	$n = count($g[0]);
+	if (isset($op['gridv'])) {
+		$sn = $op['gridv'];
+	} else {
+		$sn = ceil(sqrt($n));
+	}
+	$gd = 10/$sn;
+	for ($i=0; $i<$n; $i++) {
+		$pos[$i][0] = floor($i/$sn)*$gd  + ($op['wiggle']?$gd/5*sin(3*$i):0);;
+		$pos[$i][1] = ($i%$sn)*$gd + ($op['wiggle']?$gd/5*sin(4*$i):0);
+	}	
+	return graphdrawit($pos,$g,$op);
+}
+
+//graphpathlayout(graph,[options])
+//draws a graph based on a graph incidence matrix
+//using a backflow to place the vertices in approximate
+//order of incidence.  Could hide
+//some edges that connect colinear vertices
+//use options['wiggle'] = true to perterb off exact grid
+//g is a 2-dimensional matrix
+//g[i][j] &gt; 0 if vertexes i and j are connected
+function graphpathlayout($g,$op=array()) {
+	$n = count($g[0]);
+	list($dist,$next) = graphbackflow($g);
+	$maxh = max($dist);
+	$maxv = ceil($n/$maxh);
+	$dh = 10/$maxh;
+	$dv = 10/$maxv;
+	$odv = $dv/$maxh;
+	
+	
+	for ($i=0; $i<$n; $i++) {
+		if ($dist[$i]<0) { $dist[$i] = 0;}
+		$pos[$i][0] = 1-$dh*$dist[$i];
+		$pos[$i][1] = 5 + ($loccnt[$dist[$i]]%2==0?1:-1)*$dv*ceil($loccnt[$dist[$i]]/2)+ ($op['wiggle']?$dv/5*sin(4*$dist[$i]):0);
+		$loccnt[$dist[$i]]++;
+	}
+
+	return graphdrawit($pos,$g,$op);
+}
+
+
 //internal function, not to be used directly
 function graphprocessoptions($g,$op) {
 	$n = count($g[0]);
+	
 	if (!isset($op['connected'])) {
 		if ($op['tree']) {
 			$op['connected'] = true;
@@ -601,18 +1162,34 @@ function graphprocessoptions($g,$op) {
 			$rmin = 1;
 			$rmax = $op['randweights'];
 		}
+		$nedg = 0;
+		for ($i=0; $i<$n; $i++) {
+			for ($j=$i+1; $j<$n; $j++) {
+				if ($g[$i][$j]>0 || $g[$j][$i]>0) {
+					$nedg++;
+				} 
+				if ($op['digraph'] && $g[$i][$j]>0 && $g[$j][$i]>0) {
+					$nedg++;
+				}
+			}
+		}
+		$rweights = diffrands($rmin,$rmax,$nedg);
+		$c = 0;
 		for ($i=0; $i<$n; $i++) {
 			for ($j=$i+1; $j<$n; $j++) {
 				if ($op['digraph']) {
 					if ($g[$i][$j]>0) {
-						$g[$i][$j] = rand($rmin,$rmax);
+						$g[$i][$j] = $rweights[$c];
+						$c++;
 					} 
 					if ($g[$j][$i]>0) {
-						$g[$j][$i] = rand($rmin,$rmax);
+						$g[$j][$i] = $rweights[$c];
+						$c++;
 					}
 				} else {
 					if ($g[$i][$j]>0 || $g[$j][$i]>0) {
-						$g[$i][$j] = rand($rmin,$rmax);
+						$g[$i][$j] = $rweights[$c];
+						$c++;
 					}
 				}
 			}
@@ -665,6 +1242,7 @@ function graphprocessoptions($g,$op) {
 function graphdrawit($pos,$g,$op) {
 	if (!isset($op['width'])) {$op['width'] = 360;}
 	if (!isset($op['height'])) {$op['height'] = 300;}
+	if (!isset($op['weightoffset'])) { $op['weightoffset'] = .5; }
 	$n = count($pos);
 	if (!isset($op['xmin'])) {
 		$pxmin = 10000; $pxmax = -10000; $pymin = 10000; $pymax = -10000;
@@ -703,7 +1281,7 @@ function graphdrawit($pos,$g,$op) {
 				}
 				
 			} else {
-				if ($g[$i][$j]>0) {
+				if ($g[$i][$j]>0 || $g[$j][$i]>0) {
 					$com .= "line([".$pos[$i][0].",".$pos[$i][1]."],[".$pos[$j][0].",".$pos[$j][1]."]);";
 				}
 			}
@@ -727,8 +1305,13 @@ function graphdrawit($pos,$g,$op) {
 		$com .= "dot([".$pos[$i][0].",".$pos[$i][1]."]);";
 		for ($j=$i+1; $j<$n; $j++) {
 			if ($op['useweights'] && ($g[$i][$j]>0 || $g[$j][$i]>0)) {
-				$mx = ($pos[$i][0] + $pos[$j][0])/2;
-				$my = ($pos[$i][1] + $pos[$j][1])/2;     
+				if (($i+$j)%2==0) {
+					$mx = $pos[$j][0] + ($pos[$i][0] - $pos[$j][0])*($op['weightoffset']);
+					$my = $pos[$j][1] + ($pos[$i][1] - $pos[$j][1])*($op['weightoffset']);
+				} else {
+					$mx = $pos[$j][0] + ($pos[$i][0] - $pos[$j][0])*(1-$op['weightoffset']);
+					$my = $pos[$j][1] + ($pos[$i][1] - $pos[$j][1])*(1-$op['weightoffset']);
+				}
 				$com .= "fontfill='red';text([$mx,$my],'".max($g[$i][$j],$g[$j][$i])."');";
 				
 			}
@@ -736,6 +1319,8 @@ function graphdrawit($pos,$g,$op) {
 	}
 	return showasciisvg($com,$op['width'],$op['height']);	
 }
+
+
 
 
 

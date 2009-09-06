@@ -180,6 +180,16 @@ function chgfilter() {
 		if (trim($line['title'])=='') {
 			$line['title'] = '[No Subject]';
 		}
+		$n = 0;
+		while (strpos($line['title'],'Re: ')===0) {
+			$line['title'] = substr($line['title'],4);
+			$n++;
+		}
+		if ($n==1) {
+			$line['title'] = 'Re: '.$line['title'];
+		} else if ($n>1) {
+			$line['title'] = "Re<sup>$n</sup>: ".$line['title'];
+		}
 		echo "<tr><td><input type=checkbox name=\"checked[]\" value=\"{$line['id']}\"/></td><td>";
 		echo "<a href=\"viewmsg.php?page$page&cid=$cid&filtercid=$filtercid&type=sent&msgid={$line['id']}\">";
 		echo $line['title'];

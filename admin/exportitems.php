@@ -104,7 +104,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	$qsettoexport = array();
 	
 	copysub($items,'0',$newitems);
-	print_r($newitems);
+	//print_r($newitems);
 	echo "EXPORT DESCRIPTION\n";
 	echo $_POST['description']."\n";
 	echo "ITEM LIST\n";
@@ -295,6 +295,8 @@ function chkAll(frm, arr, mark) {
 
 	<?php echo $curBreadcrumb; ?>
 	<h3>Export Course Items</h3>
+	<p>This page will let you export your course items for backup or transfer to
+	another server running this software.</p>
 	
 	<form method=post action="exportitems.php?cid=<?php echo $cid ?>">
 		<p>Export description<br/>

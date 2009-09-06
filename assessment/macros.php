@@ -3,7 +3,7 @@
 //(c) 2006 David Lippman
 
 
-array_push($allowedmacros,"exp","sec","csc","cot","sech","csch","coth","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif","in_array","prettyint","prettyreal","arraystodots","subarray","showdataarray","arraystodoteqns","array_flip","arrayfindindex","fillarray");
+array_push($allowedmacros,"exp","sec","csc","cot","sech","csch","coth","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif","in_array","prettyint","prettyreal","arraystodots","subarray","showdataarray","arraystodoteqns","array_flip","arrayfindindex","fillarray","array_reverse");
 array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf");
 function mergearrays($a,$b) {
 	if (!is_array($a)) {
@@ -176,6 +176,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			} else {
 				$x = $xmin + $dx*$i + 1E-10 - ($domainlimited?0:5*($xmax-$xmin)/$settings[6]);
 				if (in_array($x,$avoid)) { continue;}
+				//echo $func.'<br/>';
 				$y = round(eval("return ($func);"),3);
 				$alt .= "<tr><td>".($xmin + $dx*$i)."</td><td>$y</td></tr>";
 			}
@@ -721,6 +722,9 @@ function diffrands($min,$max,$n) {
 		return $out;
 	} else {
 		$r = range($min,$max);
+		while ($n>count($r)) {
+			$r = array_merge($r,$r);
+		}
 		shuffle($r);
 		return array_slice($r,0,$n);
 	}
@@ -742,6 +746,9 @@ function diffrrands($min,$max,$p,$n) {
 		return $out;
 	} else {
 		$r = range(0,$maxi);
+		while ($n>count($r)) {
+			$r = array_merge($r,$r);
+		}
 		shuffle($r);
 		$r = array_slice($r,0,$n);
 		for ($i=0;$i<$n;$i++) {
@@ -823,6 +830,7 @@ function jointshuffle($a1,$a2) {  //optional third & fourth params $n1 and $n2
 		$a2 = explode(",",$a2);
 	}
 	$r = array_rand($a1,count($a1));
+	shuffle($r);
 	for ($j=0;$j<count($r);$j++) {
 		$ra1[$j] = $a1[$r[$j]];
 		$ra2[$j] = $a2[$r[$j]];

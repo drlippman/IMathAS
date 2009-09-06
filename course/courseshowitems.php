@@ -2,11 +2,14 @@
 //IMathAS:  show items function for main course page
 //(c) 2007 David Lippman
 
-function beginitem($canedit) {
+function beginitem($canedit,$aname=0) {
 	if ($canedit) {
 		echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
 	 }
 	 echo "<div class=item>\n";
+	 if ($aname != 0) {
+		 echo "<a name=\"$aname\"></a>";
+	 }
 }
 function enditem($canedit) {
 	echo "</div>\n";
@@ -442,7 +445,7 @@ function enditem($canedit) {
 				   }
 			   }
 			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now && $nothidden) { //regular show
-				   beginitem($canedit); //echo "<div class=item>\n";
+				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if (($hideicons&1)==0) {
 					   if ($graphicalicons) {
 						   echo "<img class=\"floatleft\" src=\"$imasroot/img/assess.png\" />";
@@ -503,7 +506,7 @@ function enditem($canedit) {
 				   enditem($canedit); //echo "</div>\n";
 				  
 			   } else if ($line['avail']==1 && $line['startdate']<$now && $line['reviewdate']>$now && $nothidden) { //review show
-				   beginitem($canedit); //echo "<div class=item>\n";
+				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if (($hideicons&1)==0) {
 					   if ($graphicalicons) {
 						   echo "<img class=\"floatleft\" src=\"$imasroot/img/assess.png\" />";
@@ -535,7 +538,7 @@ function enditem($canedit) {
 						   $show .= ", Review until $reviewdate";
 					   }
 				   }
-				   beginitem($canedit); //echo "<div class=item>\n";
+				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if (($hideicons&1)==0) {
 					   
 					   if ($graphicalicons) {
@@ -588,7 +591,7 @@ function enditem($canedit) {
 					   $show = "Showing until: $enddate ";
 					   $color = makecolor2($line['startdate'],$line['enddate'],$now);
 				   }
-				   beginitem($canedit);// echo "<div class=item>\n";
+				   beginitem($canedit,$items[$i]);// echo "<div class=item>\n";
 				   if ($line['title']!='##hidden##') {
 					   if (($hideicons&2)==0) {			   
 						   if ($graphicalicons) {
@@ -651,7 +654,7 @@ function enditem($canedit) {
 				   } else {
 					   $show = "Showing $startdate until $enddate";
 				   }
-				   beginitem($canedit); //echo "<div class=item>\n";
+				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if ($line['title']!='##hidden##') {
 					   if ($graphicalicons) {
 						   echo "<img class=\"floatleft faded\" src=\"$imasroot/img/inline.png\" />";
@@ -755,7 +758,7 @@ function enditem($canedit) {
 					   $show = "Showing until: $enddate ";
 					   $color = makecolor2($line['startdate'],$line['enddate'],$now);
 				   }
-				   beginitem($canedit); //echo "<div class=item>\n";
+				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if (($hideicons&4)==0) {
 					   if ($graphicalicons) {
 						  echo "<img class=\"floatleft\" src=\"$imasroot/img/$icon.png\" />";
@@ -785,7 +788,7 @@ function enditem($canedit) {
 				   } else {
 					   $show = "Showing $startdate until $enddate";
 				   }
-				   beginitem($canedit); //echo "<div class=item>\n";
+				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				  if ($graphicalicons) {
 					  echo "<img class=\"floatleft faded\" src=\"$imasroot/img/$icon.png\" />";
 				  } else {
@@ -900,7 +903,7 @@ function enditem($canedit) {
 				   if ($line['replyby']>$now && $line['replyby']!=2000000000) {
 					   $duedates .= "Replies due ". formatdate($line['replyby']) . ". ";
 				   }
-				   beginitem($canedit); //echo "<div class=item>\n";
+				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if (($hideicons&8)==0) {
 					   if ($graphicalicons) {
 						   echo "<img class=\"floatleft\" src=\"$imasroot/img/forum.png\" />";
@@ -934,7 +937,7 @@ function enditem($canedit) {
 				   } else {
 					   $show = "Showing $startdate until $enddate";
 				   }
-				   beginitem($canedit); //echo "<div class=item>\n";
+				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if ($graphicalicons) {
 					   echo "<img class=\"floatleft faded\" src=\"$imasroot/img/forum.png\" />";
 				   } else {
