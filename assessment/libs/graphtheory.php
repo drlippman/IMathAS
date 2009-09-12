@@ -22,7 +22,7 @@
 //    position of vertex labels.  
 
 global $allowedmacros;
-array_push($allowedmacros,"graphspringlayout","graphcirclelayout","graphgridlayout","graphpathlayout","graphcircleladder","graphcircle","graphbipartite","graphgrid","graphrandom","graphrandomgridschedule","graphemptygraph","graphdijkstra","graphbackflow","graphkruskal","graphadjacencytoincidence","graphincidencetoadjacency","graphdrawit","graphdecreasingtimelist","graphcriticaltimelist","graphcircledstar","graphcircledstarlayout","graphmaketable","graphsortededges","graphcircuittoarray","graphnearestneighbor","graphrepeatednearestneighbor","graphgetedges","graphgettotalcost","graphnestedpolygons","graphmakesymmetric","graphisconnected","graphgetedgesarray","graphsequenceeuleredgedups","graphsequenceishamiltonian","graphshortestpath");
+array_push($allowedmacros,"graphspringlayout","graphcirclelayout","graphgridlayout","graphpathlayout","graphcircleladder","graphcircle","graphbipartite","graphgrid","graphrandom","graphrandomgridschedule","graphemptygraph","graphdijkstra","graphbackflow","graphkruskal","graphadjacencytoincidence","graphincidencetoadjacency","graphdrawit","graphdecreasingtimelist","graphcriticaltimelist","graphcircledstar","graphcircledstarlayout","graphmaketable","graphsortededges","graphcircuittoarray","graphnearestneighbor","graphrepeatednearestneighbor","graphgetedges","graphgettotalcost","graphnestedpolygons","graphmakesymmetric","graphisconnected","graphgetedgesarray","graphsequenceeuleredgedups","graphsequenceishamiltonian","graphshortestpath","graphgetpathlength");
 	
 ///graphcircleladder(n,m,[options])
 //draws a circular ladder graph
@@ -720,6 +720,29 @@ function graphsequenceishamiltonian($g,$op,$seq) {
 		return false;
 	}
 	return true;
+}
+
+//graphgetpathlength(g,op,seq)
+//Given sequence seq of graph labels, determine the
+//length of the path on graph g
+//options needed for vertex labels
+function graphgetpathlength($g,$op,$seq) {
+	$n = count($g[0]);
+	if ($op['labels'] != 'letters') {
+		$lbl = $op['labels'];
+	} else {
+		$lbl = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
+	}
+	$lblrev = array_flip($lbl);
+	$len = strlen($seq);
+	$pathlen = '';
+	$last = $lblrev[$seq{0}];
+	for ($i=1; $i<$len; $i++) {
+		$cur = $lblrev[$seq{$i}];
+		$pathlen += max($g[$last][$cur],$g[$cur][$last]);
+		$last = $cur;
+	}
+	return $pathlen;
 }
 
 //graphshortestpath(g,op,start,end,[type])

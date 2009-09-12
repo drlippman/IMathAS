@@ -48,7 +48,7 @@ switch($_GET['action']) {
 		$curdir = rtrim(dirname(__FILE__), '/\\');
 		$galleryPath = "$curdir/course/files/";
 		if (file_exists($galleryPath.'userimg_'.$userid.'.jpg')) {
-			echo "<img src=\"$imasroot/course/files/userimg_$userid.jpg\"/> ";
+			echo "<img src=\"$imasroot/course/files/userimg_$userid.jpg\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
 		} else {
 			echo "No Pic ";
 		}

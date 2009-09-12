@@ -59,11 +59,16 @@ function deleteasidfilesbyquery($wherearr,$lim=0) {
 		}
 		$conds = array();
 		foreach($wherearr as $id=>$key) {
-			$conds[] = "$id='$key'";	
+			if (is_array($key)) {
+				$keylist = "'".implode("','",$key)."'";
+				$conds[] = "$id IN ($keylist)";
+			} else {
+				$conds[] = "$id='$key'";
+			}
 		}
 		$cond = implode(' AND ',$conds);
 		$query = "SELECT id,agroupid,lastanswers,bestlastanswers,reviewlastanswers FROM imas_assessment_sessions WHERE $cond";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$cnt = 0;
 		while (($row = mysql_fetch_row($result)) && ($lim==0 || $cnt<$lim)) {
 			if (strpos($row[2].$row[3].$row[4],'FILE:')===false) { continue;}

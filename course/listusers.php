@@ -175,7 +175,18 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$query = "UPDATE imas_students SET code=$code,section=$section,locked=$locked WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		
-			
+			require('../includes/userpics.php');
+			if (is_uploaded_file($_FILES['stupic']['tmp_name'])) {
+				processImage($_FILES['stupic'],$_GET['uid'],100,100);
+				processImage($_FILES['stupic'],'sm'.$_GET['uid'],40,40);
+			} else if (isset($_POST['removepic'])) {
+				$curdir = rtrim(dirname(__FILE__), '/\\');
+				$galleryPath = "$curdir/../course/files/";
+				if (file_exists($galleryPath.'userimg_'.$_GET['uid'].'.jpg')) {
+					unlink($galleryPath.'userimg_'.$_GET['uid'].'.jpg');
+					unlink($galleryPath.'userimg_sm'.$_GET['uid'].'.jpg');
+				}
+			}
 			
 			require("../header.php");
 			echo "<p>User info updated. ";
@@ -372,7 +383,7 @@ if ($overwriteBody==1) {
 ?>
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
 	<h3><?php echo $pagetitle ?></h3>
-		<form method=post action="listusers.php?cid=<?php echo $cid ?>&chgstuinfo=true&uid=<?php echo $_GET['uid'] ?>"/>
+		<form enctype="multipart/form-data" method=post action="listusers.php?cid=<?php echo $cid ?>&chgstuinfo=true&uid=<?php echo $_GET['uid'] ?>"/>
 			<span class=form><label for="username">Enter User Name (login name):</label></span>
 			<input class=form type=text size=20 id=username name=username value="<?php echo $lineStudent['SID'] ?>"/><br class=form>
 			<span class=form><label for="firstname">Enter First Name:</label></span>
@@ -381,6 +392,18 @@ if ($overwriteBody==1) {
 			<input class=form type=text size=20 id=lastname name=lastname value="<?php echo $lineStudent['LastName'] ?>"/><BR class=form>
 			<span class=form><label for="email">Enter E-mail address:</label></span>
 			<input class=form type=text size=60 id=email name=email value="<?php echo $lineStudent['email'] ?>"/><BR class=form>
+			<span class=form><label for="stupic">Picture:</label></span>
+			<span class="formright">
+			<?php
+		$curdir = rtrim(dirname(__FILE__), '/\\');
+		$galleryPath = "$curdir/../course/files/";
+		if (file_exists($galleryPath.'userimg_'.$_GET['uid'].'.jpg')) {
+			echo "<img src=\"$imasroot/course/files/userimg_{$_GET['uid']}.jpg\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
+		} else {
+			echo "No Pic ";
+		}
+		?>
+			<br/><input type="file" name="stupic"/></span><br class="form" />
 			<span class=form>Section (optional):</span>
 			<span class=formright><input type="text" name="section" value="<?php echo $lineStudent['section'] ?>"/></span><br class=form>
 			<span class=form>Code (optional):</span>
