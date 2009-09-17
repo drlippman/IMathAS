@@ -184,6 +184,23 @@ if (!(isset($teacherid))) {
 			$i++;
 		}
 		
+	} else if (isset($_GET['loadothers'])) {
+		$query = "SELECT id,name FROM imas_groups";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		if (mysql_num_rows($result)>0) {
+			$page_hasGroups=true;
+			$grpnames = array();
+			$grpnames[0] = "Default Group";
+			while ($row = mysql_fetch_row($result)) {
+				$grpnames[$row[0]] = $row[1];
+			}
+		}	
+		
+		$query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid,iu.groupid FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu,imas_groups WHERE ";
+		$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid=imas_groups.id AND iu.groupid<>'$groupid' AND iu.id<>'$userid' ORDER BY imas_groups.name,iu.LastName,iu.FirstName,ic.name";
+		$courseGroupResults = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+		
+		
 	} else { //DATA MANIPULATION FOR DEFAULT LOAD
 	
 		$query = "SELECT ic.id,ic.name FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$userid' and ic.id<>'$cid' ORDER BY ic.name";
@@ -201,20 +218,6 @@ if (!(isset($teacherid))) {
 		$courseTreeResult = mysql_query($query) or die("Query failed : " . mysql_error());
 		$lastteacher = 0;
 		
-		$query = "SELECT id,name FROM imas_groups";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		if (mysql_num_rows($result)>0) {
-			$page_hasGroups=true;
-			$grpnames = array();
-			$grpnames[0] = "Default Group";
-			while ($row = mysql_fetch_row($result)) {
-				$grpnames[$row[0]] = $row[1];
-			}
-		}	
-		
-		$query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid,iu.groupid FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu,imas_groups WHERE ";
-		$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid=imas_groups.id AND iu.groupid<>'$groupid' AND iu.id<>'$userid' ORDER BY imas_groups.name,iu.LastName,iu.FirstName,ic.name";
-		$courseGroupResults = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 		
 		$query = "SELECT ic.id,ic.name,ic.copyrights FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$templateuser' ORDER BY ic.name";
 		$courseTemplateResults = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -222,20 +225,23 @@ if (!(isset($teacherid))) {
 }
 /******* begin html output ********/
 
+if (!isset($_GET['loadothers'])) {
 $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/libtree.js\"></script>\n";
 $placeinhead .= "<style type=\"text/css\">\n<!--\n@import url(\"$imasroot/course/libtree.css\");\n-->\n</style>\n";
 
 require("../header.php");
-
+}
 if ($overwriteBody==1) {
 	echo $body;
 } else {
+	if (!isset($_GET['loadothers'])) {
 ?>
 
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
 	<h3>Copy Course Items</h3>
 
 <?php
+	}
 	if (isset($_GET['action']) && $_GET['action']=='selectcalitems') {
 //DISPLAY BLOCK FOR selecting calendar items to copy
 ?>
@@ -249,6 +255,7 @@ if ($overwriteBody==1) {
 	   } catch(er) {}
 	  }
 	}
+
 	</script>
 	
 	<form method=post action="copyitems.php?cid=<?php echo $cid ?>&action=copycalitems">
@@ -350,8 +357,90 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 	<p><input type=submit value="Copy Items"></p>
 	</form>
 <?php
+	} else if (isset($_GET['loadothers'])) { //loading others subblock
+	 if ($page_hasGroups) {
+				$lastteacher = 0;
+				$lastgroup = -1;
+				while ($line = mysql_fetch_array($courseGroupResults, MYSQL_ASSOC)) {
+					if ($line['groupid']!=$lastgroup) {
+						if ($lastgroup!=-1) {
+							echo "				</ul>\n			</li>\n";
+							echo "			</ul>\n		</li>\n";
+							$lastteacher = 0;
+						}
+	?>					
+				<li class=lihdr>
+					<span class=dd>-</span>
+					<span class=hdr onClick="toggle('g<?php echo $line['groupid'] ?>')">
+						<span class=btn id="bg<?php echo $line['groupid'] ?>">+</span>
+					</span>
+					<span class=hdr onClick="toggle('g<?php echo $line['groupid'] ?>')">
+						<span id="ng<?php echo $line['groupid'] ?>" ><?php echo $grpnames[$line['groupid']] ?></span>
+					</span>
+					<ul class=hide id="g<?php echo $line['groupid'] ?>">
+	
+	<?php
+						$lastgroup = $line['groupid'];
+					}
+					if ($line['userid']!=$lastteacher) {
+						if ($lastteacher!=0) {
+							echo "				</ul>\n			</li>\n";
+						}
+	?>					
+				<li class=lihdr>
+					<span class=dd>-</span>
+					<span class=hdr onClick="toggle(<?php echo $line['userid'] ?>)">
+						<span class=btn id="b<?php echo $line['userid'] ?>">+</span>
+					</span>
+					<span class=hdr onClick="toggle(<?php echo $line['userid'] ?>)">
+						<span id="n<?php echo $line['userid'] ?>" ><?php echo $line['LastName'] . ", " . $line['FirstName'] . "\n" ?>
+						</span>
+					</span> 
+					<a href="mailto:<?php echo $line['email'] ?>">Email</a>
+					<ul class=hide id="<?php echo $line['userid'] ?>">
+	<?php					
+						$lastteacher = $line['userid'];
+					}
+	?>
+						<li>
+							<span class=dd>-</span>
+							<input type=radio name=ctc value="<?php echo $line['id'] ?>">
+							<?php echo $line['name'] ?>
+							<?php 
+								if ($line['copyrights']<2) {
+									echo "&copy;\n"; 
+								} else {
+									echo " <a href=\"course.php?cid={$line['id']}\" target=\"_blank\">Preview</a>";
+								}
+							?>  
+						</li>
+	<?php
+				}
+	?>			
+				
+						</ul>
+					</li>
+				</ul>
+			</li> 
+		</ul>
+	</li>
+	<?php
+		 } else {
+			 echo '<li>No other users</li>';
+		 }	
+		
 	} else { //DEFAULT DISPLAY BLOCK
 ?>
+	<script type="text/javascript">
+	var othersloaded = false;
+	var ahahurl = '<?php echo $imasroot?>/course/copyitems.php?cid=<?php echo $cid ?>&loadothers=true';
+	function loadothers() {
+		if (!othersloaded) {
+			basicahah(ahahurl, "other");
+			othersloaded = true;
+		}
+	}
+	</script>
 	<h4>Select a course to copy items from</h4>
 		
 	<form method=post action="copyitems.php?cid=<?php echo $cid ?>&action=select">
@@ -435,86 +524,18 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 ?>		
 			<li class=lihdr>
 				<span class=dd>-</span>
-				<span class=hdr onClick="toggle('other')">
+				<span class=hdr onClick="toggle('other');loadothers();">
 					<span class=btn id="bother">+</span>
 				</span>
-				<span class=hdr onClick="toggle('other')">
+				<span class=hdr onClick="toggle('other');loadothers();">
 					<span id="nother" >Other's Courses</span>
 				</span>
 				<ul class=hide id="other">
 
 <?php		
-//Other's courses
-		if ($page_hasGroups) {
-			$lastteacher = 0;
-			$lastgroup = -1;
-			while ($line = mysql_fetch_array($courseGroupResults, MYSQL_ASSOC)) {
-				if ($line['groupid']!=$lastgroup) {
-					if ($lastgroup!=-1) {
-						echo "				</ul>\n			</li>\n";
-						echo "			</ul>\n		</li>\n";
-						$lastteacher = 0;
-					}
-?>					
-			<li class=lihdr>
-				<span class=dd>-</span>
-				<span class=hdr onClick="toggle('g<?php echo $line['groupid'] ?>')">
-					<span class=btn id="bg<?php echo $line['groupid'] ?>">+</span>
-				</span>
-				<span class=hdr onClick="toggle('g<?php echo $line['groupid'] ?>')">
-					<span id="ng<?php echo $line['groupid'] ?>" ><?php echo $grpnames[$line['groupid']] ?></span>
-				</span>
-				<ul class=hide id="g<?php echo $line['groupid'] ?>">
-
-<?php
-					$lastgroup = $line['groupid'];
-				}
-				if ($line['userid']!=$lastteacher) {
-					if ($lastteacher!=0) {
-						echo "				</ul>\n			</li>\n";
-					}
-?>					
-			<li class=lihdr>
-				<span class=dd>-</span>
-				<span class=hdr onClick="toggle(<?php echo $line['userid'] ?>)">
-					<span class=btn id="b<?php echo $line['userid'] ?>">+</span>
-				</span>
-				<span class=hdr onClick="toggle(<?php echo $line['userid'] ?>)">
-					<span id="n<?php echo $line['userid'] ?>" ><?php echo $line['LastName'] . ", " . $line['FirstName'] . "\n" ?>
-					</span>
-				</span> 
-				<a href="mailto:<?php echo $line['email'] ?>">Email</a>
-				<ul class=hide id="<?php echo $line['userid'] ?>">
-<?php					
-					$lastteacher = $line['userid'];
-				}
-?>
-					<li>
-						<span class=dd>-</span>
-						<input type=radio name=ctc value="<?php echo $line['id'] ?>">
-						<?php echo $line['name'] ?>
-						<?php 
-							if ($line['copyrights']<2) {
-								echo "&copy;\n"; 
-							} else {
-								echo " <a href=\"course.php?cid={$line['id']}\" target=\"_blank\">Preview</a>";
-							}
-						?>  
-					</li>
-<?php
-			}
-?>			
-			
-					</ul>
-				</li>
-			</ul>
-		</li> 
-	</ul>
-</li>
-<?php
-		} else {
-			echo "			</ul>\n		</li>\n";
-		}
+//Other's courses: loaded via AHAH when clicked  
+		echo "<li>Loading...</li>			</ul>\n		</li>\n";
+		
 //template courses
 		if (isset($templateuser)) {
 ?>
@@ -559,5 +580,7 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 <?php		
 	}
 }	
-require ("../footer.php");
+if (!isset($_GET['loadothers'])) {
+ require ("../footer.php");
+}
 ?>
