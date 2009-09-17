@@ -680,9 +680,16 @@ function enditem($canedit) {
 				   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				   if (mysql_num_rows($result)>0) {
 					   echo "<ul>";
+					   $filenames = array();
+					   $filedescr = array();
 					   while ($row = mysql_fetch_row($result)) {
-						echo "<li><a href=\"$imasroot/course/files/{$row[2]}\" target=\"_blank\">{$row[1]}</a></li>";
+						   $filenames[$row[0]] = $row[2];
+						   $filedescr[$row[0]] = $row[1];
 					   }
+					   foreach (explode(',',$line['fileorder']) as $fid) {
+						   echo "<li><a href=\"$imasroot/course/files/{$filenames[$fid]}\" target=\"_blank\">{$filedescr[$fid]}</a></li>";
+					   }
+					  
 					   echo "</ul>";
 				   }
 				   echo "</div>";

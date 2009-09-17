@@ -210,7 +210,7 @@ Database password.  The password for the database user above.<br/>
 
 <p class="imp">How do you want the database created?<br/>
 <input type="radio" name="dbcreate" checked="checked" value="0"/> My hosting company requires that I create databases
-   and database users through their control panel, so I've already created the database and database user<br/>
+   and database users through their control panel, so I've already created the database and database user.<br/>
 <input type="radio" name="dbcreate" value="1"/> The database user I provided above already exists in the database and has 
    database creation privileges, so use that userid to create the database.<br/>
 <input type="radio" name="dbcreate" value="2"/> The database and database user are not yet created.  Create them using this
