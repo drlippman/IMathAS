@@ -1,0 +1,63 @@
+LTI framework plan:
+
+BLTIlaunchrequest.php listens for launch requests (POST form)
+Checks signature on request using OAuth
+Required params:
+	lti_version = LTI-1p0
+	lti_message_type = basic-lti-launch-request
+	user_id
+	tool_consumer_instance_guid  (LMS domain name)
+	roles (instructor or otherwise)
+Optionally sent:
+	resource link id (only really needed for assessment embed for outcome reporting eventually)
+	lis_person_name_full 
+		or better: lis_person_name_first and _last
+	lis_person_contact_emailprimary	
+	oauth_consumer_key = cid_###, aid_###, or sso_****   _ 1 or 0
+		if 1, user accounts on wamap are auto-created using LMS data; 
+			student will never know wamap username/password
+		if 0, asks student to create wamap account linked to LMS account;
+			can log in SSO from LMS, or log in directly to WAMAP
+	context_id = LMS course id #
+	context_title = course name
+	context_label = course short name (eg MATH142)
+	
+oauth_consumer_key triggers action:
+	cid set:
+		trigger course embed mode with given course id
+	aid set:
+		trigger assessment embed mode with given assessment id
+	sso set:
+		trigger system embed mode with given group admin username
+		in this case, secret used for signing must be MD5 of password, not actual password!
+
+TOCHECK:
+	will repost have valid signature if additional POSTs? ()
+
+On Launchrequest:
+	x check LTI enabled
+	? check for request type
+	x check for necessary params
+	x if repost w name,email, etc.:  unset before checking signature
+	x check signature, but don't mark nonce used yet
+	x if cid or aid request, check availability
+	x check if already in ltiusers
+	if not:
+		if lti_only:
+			ask for name, email
+		if not lti_only:
+			ask if already has account. If not, provide form for it
+		on submit: 
+			record account info
+	if yes:
+		pull their info
+	
+	x if cid or aid request, check course enrollment; enroll if needed
+	
+	if session and settings exist already and not aid w timelimit
+		redirect to resource
+	if no session exists, or session but no settings:
+		create session
+		display accessibility settings
+		prompt for 
+		
