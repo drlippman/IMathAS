@@ -111,6 +111,10 @@ $in = (($cf['cdata'] or $cf['comment']) && strpos($in, "\x01") !== false) ? str_
 unset($cf, $ec, $ac);
 if(isset($resetCf)){$GLOBALS['cf'] = $resetCf;}
 if(isset($resetSpec)){$GLOBALS['spec'] = $resetSpec;}
+//add custom removal of instructor-specific stuff
+if (!isset($GLOBALS['teacherid'])) {
+  $in = remove_instr_only($in);	
+}
 return $in;
 // eof
 }
@@ -672,4 +676,11 @@ function kses_hook($string, &$cf, &$spec){
 // kses compat
 return $string;
 // eof
+}
+
+function remove_instr_only($str) {
+	if (strpos($str,'[LTI:')!==false) {
+		$str = preg_replace('/\[LTI:[^\]]*\]/', '', $str);
+	}
+	return $str;
 }

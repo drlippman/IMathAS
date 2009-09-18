@@ -5,7 +5,7 @@
 	
 	//load in filters as needed
 	$filterdir = rtrim(dirname(__FILE__), '/\\');
-	include("$filterdir/simplelti/simplelti.php");
+	//include("$filterdir/simplelti/simplelti.php");
 	if ($sessiondata['mathdisp']==2) { //use image fallback for math
 		include("$filterdir/math/ASCIIMath2TeX.php");
 		$AMT = new AMtoTeX;
@@ -86,7 +86,18 @@
 				$str = preg_replace_callback('/<\s*embed.*?script=(.)(.+?)\1.*?>/s','svgfilterscriptcallback',$str);
 			}
 		}
+		$search = '/\[LTI:\s*url=(.*),\s*key=(.*),\s*secret=([^\]]*)\]/';
 		
+		if (preg_match($search, $str, $res)){
+			$url = $res[1];
+			$key = $res[2];
+			$secret = $res[3];
+			$sessiondata['lti-secrets'][$key] = $secret;
+			writesessiondata();	
+			$replamnt = getltiiframe($url,$key,time());
+			$str = preg_replace('/\[LTI:[^\]]*\]/', $replamnt, $str);
+		}
+		/* simplelti - deprecated.  No consumer support for basiclti yet
 		$search = '/\[LTI:\s*url=(.*),\s*secret=([^\]]*)\]/';
 		
 		if (preg_match($search, $str, $res)){
@@ -97,6 +108,7 @@
 			$replamnt = simplelti_print_response($response);
 			$str = preg_replace('/\[LTI:[^\]]*\]/', $replamnt, $str);
 		}
+		*/
 		return $str;
 	}
 	function filtergraph($str) {
@@ -129,6 +141,22 @@
 		$str = preg_replace('/<select.*?\/select>/','____',$str);
 		$str = preg_replace('/<input[^>]*hidden[^>]*>/','',$str); //strip hidden fields
 		return $str;
+	}
+	
+	function getltiiframe($url,$key,$linkback) {
+		global $cid;
+		if (!isset($cid) && isset($_GET['cid'])) {
+			$cid = $_GET['cid'];
+		}
+		$height = '95%';
+		$width = '95%';
+		$param = 'key='.urlencode($key) . '&linkback=' . urlencode($linkback) . '&url=' . urlencode($url);
+		if (isset($cid)) {
+			$param .= '&cid='.$cid;
+		}
+		$out = '<iframe src="'.$imasroot.'/filter/basiclti/post.php?'.$param.'" height="'.$height.'" width="'.$width.'" ';
+		$out .= 'scrolling="auto" frameborder="1" transparency>   <p>Error</p> </iframe>';	
+		return $out;
 	}
 		
 ?>

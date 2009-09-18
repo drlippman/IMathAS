@@ -139,7 +139,7 @@ dd {
 	<li><a href="#masschgdates">Change Dates</a></li>
 	<li><a href="#masschgassessments">Change Assessments</a></li>
 	<li><a href="#importexportitems">Import/Export Course Items</a></li>
-	<li><a href="#mashups">Mashups: SimpleLTI and Google Gadgets</a></li>
+	<li><a href="#mashups">Mashups: BasicLTI and Google Gadgets</a></li>
 	</ul>
 	
 <li><a href="#writingquestions">Writing Questions</a></li>
@@ -235,7 +235,7 @@ want to enable.  This allows you restrict who, if anyone, the student can send m
 <li><b>Instructor Quick-Pick Top Bar</b>:  What items, if any, to have in a bar at the top of the instructor's course page</li>
 <li><b>Instructor Course Management Links</b>:  Whether to have course management links at the bottom or along the
   left side of the instructor's course page</li>
-<li><b>LTI access secret</b>:  A secret code to allow placement of your course into a SimpleLTI consumer.</li>
+<li><b>LTI access secret</b>:  A secret code to allow placement of your course into a BasicLTI consumer.</li>
 </ul>
 
 </div>
@@ -791,7 +791,7 @@ students request a similar problem, different students will receive different ve
 <li><b>Is group assessment?</b>: Allows students to specify group members for the assignment.  All group members will receive the same score for the assignment</li>
 <li><b>Show question categories?</b>:  If you plan to categorize questions and would like the categories displayed while the student is taking the test, you can
  select that option here</li>
-<li><b>LTI access secret</b>:  An access code to place this assessment in a SimpleLTI-compliant consumer.</li>
+<li><b>LTI access secret</b>:  An access code to place this assessment in a BasicLTI-compliant consumer.</li>
 </ul>
 
 </div>
@@ -1331,23 +1331,19 @@ the designated library.  Select the items to import, and click "Import Items".</
 
 </div>
 <div class=h2>
-<h2><a name="mashups">Mashups: SimpleLTI and Google Gadget</a></h2>
-<p>IMathAS has experimental support for two mashups: SimpleLTI, both as a producer and
-consumer, and Google Gadgets</p>
+<h2><a name="mashups">Mashups: BasicLTI and Google Gadget</a></h2>
+<p>IMathAS has experimental support for two mashups: BasicLTI as a producer, and Google Gadgets</p>
 
 <p>There is a Google Gadget which users can add to their iGoogle account available through
 a link on the Change User Info page, accessible from the users' home page.  The gadget
 will tell the user how many new messages and forum posts they have.</p>
 
-<p>IMathAS can be used as a consumer by inserting into the body of Inline or Linked text items a line 
-of the form:</p>
-<p><b>[LTI: url=http://theurl.com/to/call, secret=thesecret]</b></p>
 
-<p>IMathAS can be used as a producer using two instructor-initiated placement methods: course level, or
+<p>IMathAS can be used as a BasicLTI producer using two instructor-initiated placement methods: course level, or
 assessment level.  A course level placement will provide access to an entire IMathAS course;  an assessment
 level placement will allow you to provide access to a single assessment via LTI.  You can set the LTI
-access secret through the Course Settings and Assessment Settings.  The URL to use is also provided on those
-pages.  Follow the instructions in your LTI consumer to make the placement using the URL and secret.</p>
+access secret through the Course Settings and Assessment Settings.  The URL and key to use are also provided on those
+pages.  Follow the instructions in your LTI consumer to make the placement using the URL, key and secret.</p>
 
 </div>
 </div>
@@ -2588,11 +2584,15 @@ At the Login page, you will be asked to supply your login credidentials (usernam
 You will also be able to select Viewing/Accessibility options:
 <ul>
 <li>Use visual display, for accurate rendering of math and graphs.  Uses browser-based display if available.</li>
+<li>Force image-based graphs, for browsers without built-in graph display, this option forces use of image-based graph display.</li>
 <li>Force image-based math, for browsers without built-in math display, this option forces use of image-based math display.</li>
+<li>Force image-based display, for browsers without built-in math or graph display, this forces use of image-based display for both</li>
 <li>Use text-based display, for screen readers or older browsers.</li>
 </ul>
 <p>If you choose visual display and your browser does not support browser-based visual display, you be brought to a page explaining how to
 download the necessary plugins (for Windows Internet Explorer), download a compatible browser, or continue with image-based display.</p>
+<p><b>If you're not sure what to choose:</b> Pick "Use visual display", then if the Browser Check page shows,
+click "Continue with image-based display", leaving the "Don't show this screen again on this computer" box checked.</p>
 <p>
 The options are set for your current session only, so you can set them differently depending on the support offered by the
 computer you're currently working at.
