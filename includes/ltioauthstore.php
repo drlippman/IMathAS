@@ -30,13 +30,16 @@ class IMathASLTIOAuthDataStore extends OAuthDataStore {
 		$keyparts[1] = intval($keyparts[1]);
 		$query = "SELECT ltisecret FROM imas_assessments WHERE id='{$keyparts[1]}'";
 	} else if ($keyparts[0]=='sso') {
-		$query = "SELECT password FROM imas_users WHERE SID='{$keyparts[1]}'";
+		$query = "SELECT password,rights FROM imas_users WHERE SID='{$keyparts[1]}'";
 	} else {
 		return NULL;
 	}
 	
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	if (mysql_num_rows($result)>0) {
+		if ($keyparts[0]=='sso' && mysql_result($result,0,1)!=11) {
+			return NULL;
+		}
 		 $consumer = new OAuthConsumer($consumer_key,mysql_result($result,0,0), NULL);
 		 return $consumer;
         }

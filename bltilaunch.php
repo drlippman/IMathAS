@@ -2,6 +2,19 @@
 //IMathAS:  BasicLTI Producer Code
 //(c) David Lippman 2009
 //based on demo code only - not on specs.  No guarantee of compliance with specs
+//launches with three types of keys
+//   aid_###     : launches assessment with given id.  secret is ltisecret
+//   cid_###     : launches course with given id.  secret is ltisecret
+//   sso_userid  : launches single signon using given userid w/ rights 11.  secret is md5(password)
+//   all accept additional _0 or _1  :  0 is default, and links LMS account with a local account
+//                                      1 using LMS for validation, does not ask for local account info
+//  LMS MUST provide, in addition to key and secret:
+//    user_id
+//    tool_consumer_instance_guid  (LMS domain name)
+//  LMS MAY provide:
+//    lis_person_name_first
+//    lis_person_name_last
+//    lis_person_contact_email_primary
 
 include("config.php");
 if ($enablebasiclti!=true) {
@@ -236,13 +249,26 @@ if (isset($_GET['launch'])) {
 		echo "<form method=\"post\" action=\"{$_SERVER['PHP_SELF']}?userinfo=set\" ";	
 		if ($lti_only) { 
 			//using LTI for authentication; don't need username/password
-			//only request name, email
+			//only request name
 			echo "<p>Please provide a little information about yourself:</p>";
 			echo "<span class=form><label for=\"firstname\">Enter First Name:</label></span> <input class=form type=text size=20 id=firstnam name=firstname><BR class=form>\n";
 			echo "<span class=form><label for=\"lastname\">Enter Last Name:</label></span> <input class=form type=text size=20 id=lastname name=lastname><BR class=form>\n";
 			echo "<div class=submit><input type=submit value='Submit'></div>\n";
 			
 		} else {
+			$deffirst = '';
+			$deflast = '';
+			$defemail = '';
+			if (isset($_SESSION['LMSfirstname'])) {
+				$deffirst = $_SESSION['LMSfirstname'];
+			}
+			if (isset($_SESSION['LMSlastname'])) {
+				$deflast = $_SESSION['LMSlastname'];
+			}
+			if (isset($_SESSION['LMSemail'])) {
+				$defemail = $_SESSION['LMSemail'];
+			}
+			
 			//tying LTI to IMAthAS account
 			//give option to provide existing account info, or provide full new student info
 			echo "<p>If you already have an account on $installname, enter your username and ";
@@ -255,9 +281,9 @@ if (isset($_GET['launch'])) {
 			echo "<span class=form><label for=\"SID\">$longloginprompt:</label></span> <input class=form type=text size=12 id=SID name=SID><BR class=form>\n";
 			echo "<span class=form><label for=\"pw1\">Choose a password:</label></span><input class=form type=password size=20 id=pw1 name=pw1><BR class=form>\n";
 			echo "<span class=form><label for=\"pw2\">Confirm password:</label></span> <input class=form type=password size=20 id=pw2 name=pw2><BR class=form>\n";
-			echo "<span class=form><label for=\"firstname\">Enter First Name:</label></span> <input class=form type=text size=20 id=firstnam name=firstname><BR class=form>\n";
-			echo "<span class=form><label for=\"lastname\">Enter Last Name:</label></span> <input class=form type=text size=20 id=lastname name=lastname><BR class=form>\n";
-			echo "<span class=form><label for=\"email\">Enter E-mail address:</label></span>  <input class=form type=text size=60 id=email name=email><BR class=form>\n";
+			echo "<span class=form><label for=\"firstname\">Enter First Name:</label></span> <input class=form type=text value=\"$deffirst\" size=20 id=firstnam name=firstname><BR class=form>\n";
+			echo "<span class=form><label for=\"lastname\">Enter Last Name:</label></span> <input class=form type=text value=\"$deflast\" size=20 id=lastname name=lastname><BR class=form>\n";
+			echo "<span class=form><label for=\"email\">Enter E-mail address:</label></span>  <input class=form type=text value=\"$defemail\" size=60 id=email name=email><BR class=form>\n";
 			echo "<span class=form><label for=\"msgnot\">Notify me by email when I receive a new message:</label></span><input class=floatleft type=checkbox id=msgnot name=msgnot /><BR class=form>\n";
 			echo "<div class=submit><input type=submit value='Create Account'></div>\n";
 		}
@@ -342,8 +368,8 @@ if (isset($_GET['launch'])) {
 		if (count($keyparts)>2 && $keyparts[2]==1 && !empty($_REQUEST['lis_person_name_first']) && !empty($_REQUEST['lis_person_name_last']) ) {
 			$firstname = $_REQUEST['lis_person_name_first'];
 			$lastname = $_REQUEST['lis_person_name_last'];
-			if (!empty($_REQUEST['lis_person_contact_emailprimary'])) {
-				$email = $_REQUEST['lis_person_contact_emailprimary'];
+			if (!empty($_REQUEST['lis_person_contact_email_primary'])) {
+				$email = $_REQUEST['lis_person_contact_email_primary'];
 			} else {
 				$email = 'none@none.com';
 			}
@@ -365,6 +391,11 @@ if (isset($_GET['launch'])) {
 		} else {
 			////create form asking them for user info
 			$askforuserinfo = true;
+			$_SESSION['LMSfirstname'] = $_REQUEST['lis_person_name_first'];
+			$_SESSION['LMSlastname'] = $_REQUEST['lis_person_name_last'];
+			if (!empty($_REQUEST['lis_person_contact_email_primary'])) {
+				$_SESSION['LMSemail'] = $_REQUEST['lis_person_contact_email_primary'];
+			} 
 		}
 	}
 	$_SESSION['ltikey'] = $ltikey;
