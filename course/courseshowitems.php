@@ -835,7 +835,7 @@ function enditem($canedit) {
 					$dofilter = true;
 				} 
 				if ($dofilter) {
-					$query = "SELECT userid FROM imas_assessment_sessions WHERE agroupid='$agroupid'";
+					$query = "SELECT userid FROM imas_assessment_sessions WHERE agroupid='$agroupid' AND assessmentid='{$line['grpaid']}'";
 					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 					$limids = array();
 					while ($row = mysql_fetch_row($result)) {

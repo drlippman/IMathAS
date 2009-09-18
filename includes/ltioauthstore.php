@@ -72,7 +72,7 @@ class IMathASLTIOAuthDataStore extends OAuthDataStore {
 
     function mark_nonce_used($request) {
 	    $nonce = @$request->get_parameter('oauth_nonce');    
-	    record_nonce($nonce);
+	    $this->record_nonce($nonce);
     }
     
     function new_request_token($consumer) {

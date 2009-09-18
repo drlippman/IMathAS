@@ -1,5 +1,18 @@
 LTI framework plan:
+Create parameters:
+	oauth_version=1.0
+	oauth_nonce=nonce (eg md5 of microtime + random number)
+	oauth_timestamp=unix timestamp
+	oauth_consumer_key=value provided by me
+	lti_message_type=basic-lti-launch-request
+	user_id=your local userid (preferably auto database id rather than SID)
+	
+	optionally can also include:
+	lis_person_contact_emailprimary=user email address
+	lis_person_name_first=first name
+	lis_person_name_last=last name
 
+	
 BLTIlaunchrequest.php listens for launch requests (POST form)
 Checks signature on request using OAuth
 Required params:
@@ -16,7 +29,7 @@ Optionally sent:
 	oauth_consumer_key = cid_###, aid_###, or sso_****   _ 1 or 0
 		if 1, user accounts on wamap are auto-created using LMS data; 
 			student will never know wamap username/password
-		if 0, asks student to create wamap account linked to LMS account;
+		if 0 (or left off), asks student to create wamap account linked to LMS account;
 			can log in SSO from LMS, or log in directly to WAMAP
 	context_id = LMS course id #
 	context_title = course name
@@ -61,3 +74,49 @@ On Launchrequest:
 		display accessibility settings
 		prompt for 
 		
+
+JAVA jsp launch:
+<html>
+<head>
+ <title>Redirecting..</title>
+</head>
+<body>
+<p>Redirecting to WAMAP.org.  If you are not automatically redirected, click the button below</p>
+
+<%@ page import="org.imsglobal.basiclti.BasicLTIUtil" %>
+<%@ page import="java.util.Properties" %>
+<%@ page import="javax.servlet.http.HttpServletRequest" %>
+<%
+
+Properties postProp = new Properties();
+
+//for you to implement.  
+//Only userid is required
+String userid = "";
+String firstname = "";
+String lastname = "";
+String email = "";
+
+//these are required.  user_id be database userid rather than SID
+postProp.setProperty("user_id",userid);
+String org_id = "my.tacomacc.net";
+String org_desc = "Tacoma Community College Portal";
+
+//these are optional.  Remove if not using
+postProp.setProperty("lis_person_name_first",firstname);
+postProp.setProperty("lis_person_name_last",lastname);
+postProp.setProperty("lis_person_contact_email_primary",email);
+ 
+
+//provided by me
+String endpoint = "http://www.imathas.com/cur/bltilaunch.php";
+String key = "sso_";
+String secret = " ";
+
+postProp = BasicLTIUtil.signProperties(postProp, endpoint, "POST", key, secret, null, org_id, org_desc);
+String postData = BasicLTIUtil.postLaunchHTML(postProp, endpoint, false);
+out.println(postData);
+
+&>
+</body>
+</html>
