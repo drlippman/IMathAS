@@ -5,7 +5,8 @@
 //launches with three types of keys
 //   aid_###     : launches assessment with given id.  secret is ltisecret
 //   cid_###     : launches course with given id.  secret is ltisecret
-//   sso_userid  : launches single signon using given userid w/ rights 11.  secret is md5(password)
+//   sso_userid  : launches single signon using given userid w/ rights 11. 
+//                 secret value stored in DB password field.  Current must be manually editted in DB
 //   all accept additional _0 or _1  :  0 is default, and links LMS account with a local account
 //                                      1 using LMS for validation, does not ask for local account info
 //  LMS MUST provide, in addition to key and secret:
@@ -269,15 +270,21 @@ if (isset($_GET['launch'])) {
 				$defemail = $_SESSION['LMSemail'];
 			}
 			
+			if (isset($_SESSION['ltiorgname'])) {
+				$ltiorgname = $_SESSION['ltiorgname'];
+			} else {
+				$ltiorgname = $ltiorg;
+			}
+			
 			//tying LTI to IMAthAS account
 			//give option to provide existing account info, or provide full new student info
 			echo "<p>If you already have an account on $installname, enter your username and ";
-			echo "password below to enable automated signon from $ltiorg</p>";
+			echo "password below to enable automated signon from $ltiorgname</p>";
 			echo "<span class=form><label for=\"curSID\">$loginprompt:</label></span> <input class=form type=text size=12 id=\"curSID\" name=\"curSID\"><BR class=form>\n";
 			echo "<span class=form><label for=\"curPW\">Password:</label></span><input class=form type=password size=20 id=\"curPW\" name=\"curPW\"><BR class=form>\n";
 			echo "<div class=submit><input type=submit value='Sign In'></div>\n";
 			echo "<p>If you do not already have an account on $installname, provide the information below to create an account ";
-			echo "and enable automated signon from $ltiorg</p>";
+			echo "and enable automated signon from $ltiorgname</p>";
 			echo "<span class=form><label for=\"SID\">$longloginprompt:</label></span> <input class=form type=text size=12 id=SID name=SID><BR class=form>\n";
 			echo "<span class=form><label for=\"pw1\">Choose a password:</label></span><input class=form type=password size=20 id=pw1 name=pw1><BR class=form>\n";
 			echo "<span class=form><label for=\"pw2\">Confirm password:</label></span> <input class=form type=password size=20 id=pw2 name=pw2><BR class=form>\n";
@@ -414,6 +421,9 @@ if (count($keyparts)<3) {
 //Do we need to ask for student's info?
 //either first connect or bad info on first submit
 if ($askforuserinfo == true) {
+	if (!empty($_REQUEST['tool_consumer_instance_description'])) {
+		$_SESSION['ltiorgname'] = $_REQUEST['tool_consumer_instance_description'];
+	} 	
 	header("Location: http://" . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . "?userinfo=ask");
 	exit;	
 	

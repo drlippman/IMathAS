@@ -12,8 +12,8 @@
  ini_set('auto_detect_line_endings',true);
  session_start();
  $sessionid = session_id();
- //check for bad sessionids
- if (strlen($sessionid)<32) {
+ //check for bad sessionids.  
+ if (strlen($sessionid)<10) { 
 	 if (function_exists('session_regenerate_id')) { session_regenerate_id(); }
 	echo "Error.  Please <a href=\"$imasroot/index.php\">Home</a>try again</a>";
 	exit;	 
