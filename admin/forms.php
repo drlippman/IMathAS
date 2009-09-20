@@ -316,10 +316,11 @@ switch($_GET['action']) {
 		echo ' /> Left side bar</span><br class=form />';
 		echo '<span class="form">LTI access secret (max 10 chars; blank to not use)</span>';
 		echo '<span class="formright"><input name="ltisecret" type="text" value="'.$ltisecret.'" /> ';
-		echo '<a href="#" onclick="document.getElementById(\'ltiurl\').style.display=\'\'; return false;">LTI url?</a>';
+		echo '<a href="#" onclick="document.getElementById(\'ltiurl\').style.display=\'\'; return false;">LTI url/key?</a>';
 		echo '<span id="ltiurl" style="display:none;">';
 		if (isset($_GET['id'])) {
-			echo 'http://'. $_SERVER['HTTP_HOST'].$imasroot.'/ltilaunchrequest.php?cid='.$_GET['id'];
+			echo '<br/>url: http://'. $_SERVER['HTTP_HOST'].$imasroot.'/bltilaunch.php<br/>';
+			echo 'key: cid_'.$_GET['id'].'_0 (to allow local login) or cid_'.$_GET['id'].'_1 (access from LMS only)';
 		} else {
 			echo 'Course ID not yet set.';
 		}		

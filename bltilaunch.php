@@ -372,9 +372,14 @@ if (isset($_GET['launch'])) {
 		$_SESSION['ltiorg'] = $ltiorg;
 		
 		//if doing lti_only, and first/last name were provided, go ahead and use them and don't ask
-		if (count($keyparts)>2 && $keyparts[2]==1 && !empty($_REQUEST['lis_person_name_first']) && !empty($_REQUEST['lis_person_name_last']) ) {
-			$firstname = $_REQUEST['lis_person_name_first'];
-			$lastname = $_REQUEST['lis_person_name_last'];
+		if (count($keyparts)>2 && $keyparts[2]==1 && ((!empty($_REQUEST['lis_person_name_first']) && !empty($_REQUEST['lis_person_name_last'])) || !empty($_REQUEST['lis_person_name_full'])) ) {
+			if (!empty($_REQUEST['lis_person_name_first']) && !empty($_REQUEST['lis_person_name_last'])) {
+				$firstname = $_REQUEST['lis_person_name_first'];
+				$lastname = $_REQUEST['lis_person_name_last'];
+			} else {
+				$firstname = '';
+				$lastname = $_REQUEST['lis_person_name_full'];
+			}
 			if (!empty($_REQUEST['lis_person_contact_email_primary'])) {
 				$email = $_REQUEST['lis_person_contact_email_primary'];
 			} else {
