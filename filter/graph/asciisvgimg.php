@@ -707,8 +707,8 @@ function ASellipse($arg) {
 	//$arg = explode(',',$arg);
 	//$p = $this->pt2arr($arg[0].','.$arg[1]);
 	$p = $this->pt2arr($arg[0]);
-	$arg[1] *= $this->xunitlength;
-	$arg[2] *= $this->yunitlength;
+	$arg[1] = $this->evalifneeded($arg[1])*$this->xunitlength;
+	$arg[2] = $this->evalifneeded($arg[2])*$this->yunitlength;
 	if ($this->fill != 'none') {
 		$color = $this->fill;
 		if ($this->usegd2) {
@@ -744,7 +744,7 @@ function ASrect($arg) {
 function ASarc($arg) {
 	$p = $this->pt2arr($arg[0]);
 	$q = $this->pt2arr($arg[1]);
-	$r = $arg[2];
+	$r = $this->evalifneeded($arg[2]);
 	$po[0] = ($p[0]-$this->origin[0])/$this->xunitlength;
 	$qo[0] = ($q[0]-$this->origin[0])/$this->xunitlength;
 	$po[1] = ($this->height - $p[1] - $this->origin[1])/$this->yunitlength;

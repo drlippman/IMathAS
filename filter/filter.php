@@ -54,6 +54,7 @@
 			$sty = "vertical-align: middle;";
 		}
 		$fn = md5($arr[2].$w.$h);
+			
 		if (!file_exists($filterdir.'/graph/imgs/'.$fn.'.png')) {
 			$AS->AStoIMG($w+0,$h+0);
 			$AS->processScript($arr[2]);
@@ -82,8 +83,8 @@
 		}
 		if ($sessiondata['graphdisp']==2) {
 			if (strpos($str,'embed')!==FALSE) {
-				$str = preg_replace_callback('/<\s*embed.*?sscr=(.)(.+?)\1.*?>/s','svgfiltersscrcallback',$str);
-				$str = preg_replace_callback('/<\s*embed.*?script=(.)(.+?)\1.*?>/s','svgfilterscriptcallback',$str);
+				$str = preg_replace_callback('/<\s*embed[^>]*?sscr=(.)(.+?)\1.*?>/s','svgfiltersscrcallback',$str);
+				$str = preg_replace_callback('/<\s*embed[^>]*?script=(.)(.+?)\1.*?>/s','svgfilterscriptcallback',$str);
 			}
 		}
 		$search = '/\[LTI:\s*url=(.*),\s*key=(.*),\s*secret=([^\]]*)\]/';
