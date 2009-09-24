@@ -525,6 +525,7 @@ if ($keyparts[0]=='aid') {
 	} else {
 		$tlwrds = '';
 	}
+	//this sessiondata tells WAMAP to limit access to the specific resouce requested
 	$sessiondata['ltiitemtype']=0;
 	$sessiondata['ltiitemid'] = $aid;
 }  else if ($keyparts[0]=='cid') { //is cid

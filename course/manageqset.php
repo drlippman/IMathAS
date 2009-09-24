@@ -984,9 +984,9 @@ function getnextprev(formn,loc) {
 			if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 			echo "<td><input type=checkbox name='nchecked[]' id='qo$ln' value='{$line['id']}'></td>\n";
 			if ($line['userights']==0) {
-				echo "<td><span class=red>{$line['description']}</span></td>";
+				echo filter("<td><span class=red>{$line['description']}</span></td>");
 			} else {
-				echo "<td>{$line['description']}</td>";
+				echo filter("<td>{$line['description']}</td>");
 			}
 			echo "<td><input type=button value=\"Preview\" onClick=\"previewq('selform',$ln,{$line['id']})\"/></td>\n";
 			echo "<td><select onchange=\"doaction(this.value,{$line['id']})\"><option value=\"0\">Action..</option>";

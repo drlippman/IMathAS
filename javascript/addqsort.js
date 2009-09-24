@@ -12,6 +12,9 @@
 
 function refreshTable() {
 	document.getElementById("curqtbl").innerHTML = generateTable();
+	 if (usingASCIIMath) {
+	      AMprocessNode(document.getElementById("curqtbl"));
+         }
 }
 function generateMoveSelect(num,cnt) {
 	num++; //adjust indexing

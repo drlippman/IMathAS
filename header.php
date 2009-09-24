@@ -149,7 +149,7 @@ END;
 
 //load filter
 $curdir = rtrim(dirname(__FILE__), '/\\');
-require("$curdir/filter/filter.php");
+require_once("$curdir/filter/filter.php");
 
 //CUSTOMIZE:  put a small (max 120px wide) logo on upper right of course pages
 if (!isset($nologo)) {

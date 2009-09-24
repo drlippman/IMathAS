@@ -166,6 +166,11 @@ if (!(isset($teacherid))) {
 			$query = "UPDATE imas_assessments SET $setslist WHERE id IN ($checkedlist);";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		}
+		
+		if (isset($_POST['removeperq'])) {
+			$query = "UPDATE imas_questions SET points=9999,attempts=9999,penalty=9999,regen=0,showans=0 WHERE assessmentid IN ($checkedlist)";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+		}
 
 		if (isset($_POST['chgendmsg'])) {
 			include("assessendmsg.php");
@@ -463,6 +468,7 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 				<td class="r">Penalty for questions done while in exception/LatePass: </td>
 				<td><input type="text" name="exceptionpenalty" size=4 value="0"> % </td>
 			</tr>
+			
 			<tr>
 				<td><input type="checkbox" name="chgisgroup"/></td>
 				<td class="r">Group assessment: </td>
@@ -478,17 +484,22 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 				<td><input type=text name=groupmax value="6"></td>
 			</tr>
 			<tr>
-				<td><input type="checkbox" name="chgshowqcat"/></td>
-				<td class="r">Show question categories: </td>
-				<td><input name="showqcat" value="0" checked="checked" type="radio">No <br/>
+				<td style="border-bottom: 1px solid #000"><input type="checkbox" name="chgshowqcat"/></td>
+				<td class="r" style="border-bottom: 1px solid #000">Show question categories: </td>
+				<td style="border-bottom: 1px solid #000"><input name="showqcat" value="0" checked="checked" type="radio">No <br/>
 				<input name="showqcat" value="1" type="radio">In Points Possible bar <br/>
 				<input name="showqcat" value="2" type="radio">In navigation bar (Skip-Around only)
 				</td>
 			</tr>
 			<tr>	
-				<td><input type="checkbox" name="chgendmsg" /></td>
-				<td class="r">Define end of assessment messages</td>
-				<td>You will be taken to a page to change these after you hit submit</td>
+				<td></td>
+				<td class="r">Define end of assessment messages?</td>
+				<td><input type="checkbox" name="chgendmsg" /> You will be taken to a page to change these after you hit submit</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td class="r">Remove per-question settings (points, attempts, etc.) for all questions in these assessments?</td>
+				<td><input type="checkbox" name="removeperq" /></td>
 			</tr>
 		</tbody>
 		</table>

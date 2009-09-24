@@ -21,9 +21,9 @@ $query = "SELECT FirstName,LastName,email FROM imas_users WHERE id='$userid'";
 $result = mysql_query($query) or die("Query failed : " . mysql_error());
 list($firstname,$lastname,$email) = mysql_fetch_row($result);
 $parms['user_id'] = $userid;
-$parms['list_person_name_full'] = "$firstname $lastname";
-$parms['list_person_name_last'] = $lastname;
-$parms['list_person_name_first'] = $firstname;
+$parms['lis_person_name_full'] = "$firstname $lastname";
+$parms['lis_person_name_last'] = $lastname;
+$parms['lis_person_name_first'] = $firstname;
 $parms['lis_person_contact_email_primary'] = $email;
 
 if (isset($teacherid)) {

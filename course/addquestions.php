@@ -281,6 +281,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	
 	
 	//DEFAULT LOAD PROCESSING GOES HERE
+	//load filter.  Need earlier than usual header.php load
+	$curdir = rtrim(dirname(__FILE__), '/\\');
+	require_once("$curdir/../filter/filter.php");
+	
 	$query = "SELECT ias.id FROM imas_assessment_sessions AS ias,imas_students WHERE ";
 	$query .= "ias.assessmentid='$aid' AND ias.userid=imas_students.userid AND imas_students.courseid='$cid' LIMIT 1";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -338,7 +342,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$jsarr .= ',';
 			} 
 			//output item array
-			$jsarr .= '['.$subs[$j].','.$line['questionsetid'].',"'.addslashes(str_replace(array("\r\n", "\n", "\r")," ",$line['description'])).'","'.$line['qtype'].'",'.$line['points'].',';
+			$jsarr .= '['.$subs[$j].','.$line['questionsetid'].',"'.addslashes(filter(str_replace(array("\r\n", "\n", "\r")," ",$line['description']))).'","'.$line['qtype'].'",'.$line['points'].',';
 			if ($line['userights']>2 || $line['ownerid']==$userid || $adminasteacher) { //can edit without template?
 				$jsarr .= '1';
 			} else {
@@ -505,7 +509,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 							$i++;
 						} 
 						$page_questionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . $line['id'] . "' id='qo$ln'>";
-						$page_questionTable[$i]['desc'] = $line['description'];
+						$page_questionTable[$i]['desc'] = filter($line['description']);
 						$page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selq','qo$ln',{$line['id']},true,false)\"/>";
 						$page_questionTable[$i]['type'] = $line['qtype'];
 						if ($searchall==1) 

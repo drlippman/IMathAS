@@ -243,7 +243,7 @@ END;
 				exit;
 			}
 		} else if ($sessiondata['ltiitemtype']==0) {
-			if (strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) {
+			if (strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false && strpos(basename($_SERVER['PHP_SELF']),'printtest.php')===false) {
 				$query = "SELECT courseid FROM imas_assessments WHERE id='{$sessiondata['ltiitemid']}'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				$cid = mysql_result($result,0,0);
