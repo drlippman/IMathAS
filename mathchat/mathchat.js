@@ -1,9 +1,10 @@
 var last = 0;
 var t;
 var polldelay = 2000;
+var cnt = 0;
 function updatemsgs() {
-	ahah();
 	clearTimeout(t);
+	ahah();
 	t = setTimeout("updatemsgs()", polldelay);
 }
 
@@ -13,7 +14,7 @@ function posttxt() {
 	var pstr = 'addtxt=' + encodeURIComponent(v);
 	ahah(pstr);
 	tinyMCE.get('addtxt').setContent("");
-	setTimeout("updatemsgs()", polldelay);
+	t = setTimeout("updatemsgs()", polldelay);
 }
 
 function ahah(params) { 
@@ -27,7 +28,8 @@ function ahah(params) {
 	  document.getElementById("loading").style.display = "";
     req.onreadystatechange = function() {ahahDone();}; 
     if (params==null) {
-	    req.open("GET", postback+'&update='+last, true); 
+	    cnt++;
+	    req.open("GET", postback+'&update='+last+'&cnt='+cnt, true); 
 	    req.send("");
     } else {
 	    params += '&update='+last;

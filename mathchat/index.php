@@ -14,6 +14,13 @@ $now = time();
 //$query = "SELECT * FROM mc_sessions WHERE sessionid='$sessionid'";
 //$result = mysql_query($query) or die("Query failed : " . mysql_error());
 //if (mysql_num_rows($result)==0) {
+if (isset($_GET['isactive'])) { //request to see if room is being used
+	$on = $now - 15;
+	$query = "SELECT name FROM mc_sessions WHERE mc_sessions.room='{$_GET['isactive']}' AND lastping>$on";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	echo mysql_num_rows($result);
+	exit;
+}
 if (!isset($_GET['userid'])) {
 	if (empty($_REQUEST['uname']) || empty($_REQUEST['room'])) {
 		echo "No identity provided.  Quitting";
@@ -66,11 +73,12 @@ if (isset($_POST['addtxt'])) {
 if (isset($_REQUEST['update'])) {
 	$query = "SELECT mc_sessions.name,mc_msgs.msg,mc_msgs.id FROM mc_sessions ";
 	$query .= "JOIN mc_msgs ON mc_sessions.userid=mc_msgs.userid ";
+	$lastmsg = intval($_REQUEST['update']);
 	if ($_REQUEST['update']==0) {
 		$last = $now - 5*60;
 		$query .= "WHERE mc_sessions.room='{$mcsession['room']}' AND mc_msgs.time > $last ";
 	} else {
-		$query .= "WHERE mc_sessions.room='{$mcsession['room']}' AND mc_msgs.id > '{$_REQUEST['update']}' ";
+		$query .= "WHERE mc_sessions.room='{$mcsession['room']}' AND mc_msgs.id > $lastmsg ";
 	}
 	$query .= "ORDER BY mc_msgs.time";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
