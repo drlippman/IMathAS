@@ -55,11 +55,15 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 				foreach ($arv as $k=>$arvp) {
 					if (is_numeric($arvp)) {
 						$stuanswers[$i+1][$k] = $arvp;
+					} else {
+						$stuanswers[$i+1][$k] = preg_replace('/\W+/','',$arvp);
 					}
 				}
 			} else {
 				if (is_numeric($arv)) {
 					$stuanswers[$i+1] = $arv;
+				} else {
+					$stuanswers[$i+1] = preg_replace('/\W+/','',$arv);
 				}
 			}
 				
@@ -270,11 +274,15 @@ function scoreq($qnidx,$qidx,$seed,$givenans) {
 				foreach ($arv as $k=>$arvp) {
 					if (is_numeric($arvp)) {
 						$stuanswers[$i+1][$k] = $arvp;
+					} else {
+						$stuanswers[$i+1][$k] = preg_replace('/\W+/','',$arvp);
 					}
 				}
 			} else {
 				if (is_numeric($arv)) {
 					$stuanswers[$i+1] = $arv;
+				} else {
+					$stuanswers[$i+1] = preg_replace('/\W+/','',$arv);
 				}
 			}
 		}
@@ -284,14 +292,16 @@ function scoreq($qnidx,$qidx,$seed,$givenans) {
 			$partnum = ($qnidx+1)*1000 + $kidx;
 			if (isset($_POST["qn$partnum"]) && is_numeric($_POST["qn$partnum"])) {
 				$stuanswers[$qnidx+1][$kidx] = floatval($_POST["qn$partnum"]);
+			} else {
+				$stuanswers[$qnidx+1][$kidx] = preg_replace('/\W+/','',stripslashes($_POST["qn$partnum"]));
 			}
 		}
 		
 	} else {
 		if (isset($_POST["qn$qnidx"]) && is_numeric($_POST["qn$qnidx"])) {
 			$stuanswers[$qnidx+1] = floatval($_POST["qn$qnidx"]);
-		} else if ($qdata['qtype']=="string") {
-			$stuanswers[$qnidx+1] = $_POST["qn$qnidx"];
+		} else {
+			$stuanswers[$qnidx+1] = preg_replace('/\W+/','',stripslashes($_POST["qn$qnidx"]));
 		}
 	}
 	$thisq = $qnidx+1;

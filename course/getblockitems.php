@@ -103,7 +103,7 @@
 	   if (isset($teacherid)) {
 		   //echo generateadditem($_GET['folder'],'b');
 	   }
-   } else {
+   } else if (isset($teacherid)) {
 	 echo generateadditem($_GET['folder'],'b');  
    }
 

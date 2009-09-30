@@ -26,17 +26,23 @@
 			return (strpos($sc,'-1'));
 		}
 	}
-	function getpointspossible($qn,$def) {
-		$query = "SELECT points FROM imas_questions WHERE id='$qn'";
+	function getpointspossible($qn,$defpts,$defatt) {
+		$query = "SELECT points,attempts FROM imas_questions WHERE id='$qn'";
 		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
 		 	if ($row[0] == 9999) {
-				$possible = $def;
+				$possible = $defpts;
 			} else {
 				$possible = $row[0];
 			}
+			if ($row[1] == 9999) {
+				$att = $defatt;
+			} else {
+				$att = $row[1];
+			}
+			if ($att==0) {$att = "unlimited";}
 		}
-		return $possible;
+		return array($possible,$att);
 	}
 	if ($isteacher && isset($_GET['asid'])) {
 		$testid = $_GET['asid'];
@@ -125,7 +131,8 @@
 			$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 			echo '<div>ID:'.$qsetid.', '.mysql_result($result,0,0).'</div>';
 		} else {
-			echo "<div>#".($i+1)." Points possible: " . getpointspossible($questions[$i],$testsettings['defpoints'])."</div>";
+			list($points,$attempts) = getpointspossible($questions[$i],$testsettings['defpoints'],$testsettings['defattempts']);
+			echo "<div>#".($i+1)." Points possible: $points.  Total attempts: $attempts</div>";
 		}
 		displayq($i,$qsetid,$seeds[$i],$showa,($testsettings['showhints']==1),$attempts[$i]);
 		echo "<hr />";	

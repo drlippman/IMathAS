@@ -282,7 +282,7 @@
 				
 				
 				echo filter($message[$child]);
-				echo "</div>\n";
+				echo "<div class=\"clear\"></div></div>\n";
 				$icnt++;
 				if (isset($children[$child]) && ($posttype[$child]!=3 || $isteacher)) { //if has children
 					echo "<div class=forumgrp id=\"block$bcnt\">\n";
@@ -338,7 +338,7 @@
 				echo "</div>\n";
 				echo "<div class=blockitems>";
 				echo filter($message[$child]);
-				echo "</div>\n";
+				echo "<div class=\"clear\"></div></div>\n";
 				if (isset($children[$child]) && ($posttype[$child]!=3 || $isteacher)) { //if has children
 					echo "<div class=";
 					if ($view==0) {
