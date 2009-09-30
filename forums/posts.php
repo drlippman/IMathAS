@@ -101,7 +101,7 @@
 		$message[$line['id']] = $line['message'];
 		$posttype[$line['id']] = $line['posttype'];
 		$ownerid[$line['id']] = $line['userid'];
-		$points[$line['id']] = $line['points'];
+		$points[$line['id']] = 1*$line['points'];
 		if ($line['isanon']==1) {
 			$poster[$line['id']] = "Anonymous";
 			$ownerid[$line['id']] = 0;
