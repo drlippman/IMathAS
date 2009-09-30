@@ -30,8 +30,9 @@ function mcancelclosetime() {
 	}
 }
 
-function basicahah(url, target) { 
-  document.getElementById(target).innerHTML = ' Fetching data... ';
+function basicahah(url, target, def) {
+  if (def==null) { def =  ' Fetching data... ';}
+  document.getElementById(target).innerHTML = def;
   if (window.XMLHttpRequest) { 
     req = new XMLHttpRequest(); 
   } else if (window.ActiveXObject) { 
@@ -102,3 +103,19 @@ function togglepic(el) {
 		el.setAttribute("src",el.getAttribute("src").replace("_","_sm"));
 	}
 }
+
+//from http://www.webreference.com/programming/javascript/onloads/
+function addLoadEvent(func) { 
+	  var oldonload = window.onload; 
+	  if (typeof window.onload != 'function') { 
+	    window.onload = func; 
+	  } else { 
+	    window.onload = function() { 
+	      if (oldonload) { 
+	        oldonload(); 
+	      } 
+	      func(); 
+	    } 
+	  } 
+} 
+

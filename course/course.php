@@ -260,6 +260,22 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		$newpostscnt = '';	
 	}
    
+	//get active chatters
+	if (isset($mathchaturl) &&  $chatset==1) {
+		if (substr($mathchaturl,0,4)=='http') {
+			//remote mathchat
+			$url = $mathchaturl.'?isactive='.$cid.'&sep='.time();
+			$fp = fopen($url,'r');
+			$activechatters = fread($fp,100);
+			fclose($fp);
+		} else {  
+			//local mathchat
+			$on = time() - 15;
+			$query = "SELECT name FROM mc_sessions WHERE mc_sessions.room='$cid' AND lastping>$on";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$activechatters =  mysql_num_rows($result);
+		}
+	}
 	
 	//get latepasses
 	if (!isset($teacherid) && !isset($tutorid) && $previewshift==-1) {
@@ -310,7 +326,7 @@ if ($overwriteBody==1) {
 <?php
 	}	
 ?>
-	<script>
+	<script type="text/javascript">
 		var getbiaddr = 'getblockitems.php?cid=<?php echo $cid ?>&folder=';
 		var oblist = '<?php echo $oblist ?>';
 		var plblist = '<?php echo $plblist ?>';
@@ -345,7 +361,7 @@ if ($overwriteBody==1) {
 			<a href="showcalendar.php?cid=<?php echo $cid ?>">Calendar</a>
 		<?php 
 		if (isset($mathchaturl) &&  $chatset==1) {
-			echo "<br/><a href=\"$mathchaturl?uname=".urlencode($userfullname)."&amp;room=$cid&amp;roomname=".urlencode($coursename)."\" target=\"chat\">Chat</a>";
+			echo "<br/><a href=\"$mathchaturl?uname=".urlencode($userfullname)."&amp;room=$cid&amp;roomname=".urlencode($coursename)."\" target=\"chat\">Chat</a> ($activechatters)";
 		}
 		?>
 		</p>
@@ -441,7 +457,7 @@ if ($overwriteBody==1) {
 			<a href="<?php echo $imasroot ?>/forums/forums.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>">
 			Forums</a> <?php echo $newpostscnt ?>
 	<?php if (isset($mathchaturl) && $chatset==1) {
-			echo "<br/><a href=\"$mathchaturl?uname=".urlencode($userfullname)."&amp;room=$cid&amp;roomname=".urlencode($coursename)."\"  target=\"chat\">Chat</a>";
+			echo "<br/><a href=\"$mathchaturl?uname=".urlencode($userfullname)."&amp;room=$cid&amp;roomname=".urlencode($coursename)."\"  target=\"chat\">Chat</a>  ($activechatters)";
 		}
 	?>
 		</span>

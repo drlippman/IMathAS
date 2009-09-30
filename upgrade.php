@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 15;
+$latest = 16;
 
 if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 	$handle = fopen("upgradecounter.txt",'w');
@@ -188,6 +188,12 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 		if ($last < 15) {
 			$query = "ALTER TABLE `imas_linkedtext` ADD `target` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0';";
 			mysql_query($query) or die("Query failed : " . mysql_error());
+		}
+		if ($last < 16) {
+			 $query = "ALTER TABLE `imas_forum_posts` CHANGE `points` `points` DECIMAL( 5, 1 ) UNSIGNED NULL DEFAULT NULL"; 
+			 mysql_query($query) or die("Query failed : " . mysql_error());
+			 echo "<p>SimpleLTI has been deprecated and replaced with BasicLTI.  If you have enablesimplelti in your config.php, change it to enablebasiclti.  ";
+			 echo "If you do not have either currently in your config.php and want to allow imathas to act as a BasicLTI producer, add \$enablebasiclti = true to config.php</p>";
 		}
 		$handle = fopen("upgradecounter.txt",'w');
 		fwrite($handle,$latest);

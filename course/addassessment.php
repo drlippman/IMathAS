@@ -157,7 +157,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if ($_POST['deffeedback']=="Practice") {
 			$_POST['cntingb'] = $_POST['pcntingb'];
 		}
-		$_POST['ltisecret'] = trim($_POST['ltisecret']);
+		if (isset($_POST['ltisecret'])) {
+			$_POST['ltisecret'] = trim($_POST['ltisecret']);
+		} else {
+			$_POST['ltisecret'] = '';
+		}
 		require_once("../includes/htmLawed.php");
 		$htmlawedconfig = array('elements'=>'*-script');
 		$_POST['summary'] = addslashes(htmLawed(stripslashes($_POST['summary']),$htmlawedconfig));
@@ -680,6 +684,9 @@ if ($overwriteBody==1) {
 				<input name="showqcat" type="radio" value="1" <?php writeHtmlChecked($showqcat,"1"); ?>>In Points Possible bar <br />
 				<input name="showqcat" type="radio" value="2" <?php writeHtmlChecked($showqcat,"2"); ?>>In navigation bar (Skip-Around only)
 			</span><br class="form" />
+	<?php
+	if ($enablebasiclti==true) {
+	?>
 			<span class="form">LTI access secret (max 10 chars; blank to not use)</span>
 			<span class="formright">
 				<input name="ltisecret" type="text" value="<?php echo $line['ltisecret'];?>" />
@@ -695,6 +702,9 @@ if ($overwriteBody==1) {
 				?>
 				</span>
 			</span><br class="form" />
+	<?php
+	}
+	?>
 			
 			</fieldset>
 		</div>

@@ -30,6 +30,7 @@ PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
 ***/
 
 //from http://www.webreference.com/programming/javascript/onloads/
+/*  moved to general.js 
 function addLoadEvent(func) { 
 	  var oldonload = window.onload; 
 	  if (typeof window.onload != 'function') { 
@@ -42,7 +43,8 @@ function addLoadEvent(func) {
 	      func(); 
 	    } 
 	  } 
-	} 
+} */
+
 function findPos(obj) { //from quirksmode.org
 	var curleft = curtop = 0;
 	if (obj.offsetParent) {

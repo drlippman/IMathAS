@@ -51,7 +51,7 @@ $contents .= "';
 \$mathimgurl = \"{$_POST['mathimgurl']}\";
 
 //enable lti?
-\$enablesimplelti = {$_POST['enablesimplelti']};
+\$enablebasiclti = {$_POST['enablebasiclti']};
 
 //allow nongroup libs?
 \$allownongrouplibs = {$_POST['allownongrouplibs']};
@@ -291,9 +291,9 @@ use a live chat from another server to distribute load if you want.<br/>
 </p>
 
 <p>
-Enable use of IMathAS as a SimpleLTI producer?<br/>
-<input type="radio" name="enablesimplelti" value="true" checked="checked" /> Yes<br/>
-<input type="radio" name="enablesimplelti" value="false" /> No
+Enable use of IMathAS as a BasicLTI producer?<br/>
+<input type="radio" name="enablebasiclti" value="true" checked="checked" /> Yes<br/>
+<input type="radio" name="enablebasiclti" value="false" /> No
 </p>
 
 <p>

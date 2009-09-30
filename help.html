@@ -139,7 +139,8 @@ dd {
 	<li><a href="#masschgdates">Change Dates</a></li>
 	<li><a href="#masschgassessments">Change Assessments</a></li>
 	<li><a href="#importexportitems">Import/Export Course Items</a></li>
-	<li><a href="#mashups">Mashups: BasicLTI and Google Gadgets</a></li>
+	<li><a href="#mashups">Mashups: Google Gadgets</a></li>
+	<li><a href="#lti">BasicLTI</a></li>
 	</ul>
 	
 <li><a href="#writingquestions">Writing Questions</a></li>
@@ -235,7 +236,7 @@ want to enable.  This allows you restrict who, if anyone, the student can send m
 <li><b>Instructor Quick-Pick Top Bar</b>:  What items, if any, to have in a bar at the top of the instructor's course page</li>
 <li><b>Instructor Course Management Links</b>:  Whether to have course management links at the bottom or along the
   left side of the instructor's course page</li>
-<li><b>LTI access secret</b>:  A secret code to allow placement of your course into a BasicLTI consumer.</li>
+<li><b>LTI access secret</b>:  A secret code to allow placement of your course into a BasicLTI consumer. <a href="#lti">More info</a></li>
 </ul>
 
 </div>
@@ -791,7 +792,7 @@ students request a similar problem, different students will receive different ve
 <li><b>Is group assessment?</b>: Allows students to specify group members for the assignment.  All group members will receive the same score for the assignment</li>
 <li><b>Show question categories?</b>:  If you plan to categorize questions and would like the categories displayed while the student is taking the test, you can
  select that option here</li>
-<li><b>LTI access secret</b>:  An access code to place this assessment in a BasicLTI-compliant consumer.</li>
+<li><b>LTI access secret</b>:  An access code to place this assessment in a BasicLTI-compliant consumer.  <a href="#lti">More info</a></li>
 </ul>
 
 </div>
@@ -1331,20 +1332,34 @@ the designated library.  Select the items to import, and click "Import Items".</
 
 </div>
 <div class=h2>
-<h2><a name="mashups">Mashups: BasicLTI and Google Gadget</a></h2>
+<h2><a name="mashups">Mashups: Google Gadget</a></h2>
 <p>IMathAS has experimental support for two mashups: BasicLTI as a producer, and Google Gadgets</p>
 
 <p>There is a Google Gadget which users can add to their iGoogle account available through
 a link on the Change User Info page, accessible from the users' home page.  The gadget
 will tell the user how many new messages and forum posts they have.</p>
 
+<p>There is also a link from the Google Gadget page to a webpage that will report new
+messages and posts without requiring you to log in.  This page is convenient on a mobile device.</p>
+</div>
+<div class=h2><h2><a name="lti">BasicLTI</a></h2>
 
 <p>IMathAS can be used as a BasicLTI producer using two instructor-initiated placement methods: course level, or
 assessment level.  A course level placement will provide access to an entire IMathAS course;  an assessment
 level placement will allow you to provide access to a single assessment via LTI.  You can set the LTI
-access secret through the Course Settings and Assessment Settings.  The URL and key to use are also provided on those
+access secret through the Course Settings and Assessment Settings pages.  The URL and key to use are also provided on those
 pages.  Follow the instructions in your LTI consumer to make the placement using the URL, key and secret.</p>
 
+<p>Your LTI keys will take the form cid_###_# or aid_###_#.  The last number determines how authentication is handled.
+If that last digit is 0, then when the student accesses the LTI placement, the first time they will be asked to sign into their
+IMathAS account or create one, and that account will be linked with the account at the host LMS.  From then on, when the same 
+student accesses any LTI placement, they will not need to sign in again.  They will be able to sign in directly to IMathAS as well.</p>
+
+<p>If the last digit of your LTI key is 1, then a student account will automatically be created the first time a student 
+accesses the LTI placement, and that account will be linked with the host LMS account.  The student will not be provided an IMathAS
+username or password, so they will only be able to access IMathAS resources through the LMS LTI placements.</p>
+
+<p>IMathAS can also be an LTI consumer.  In any text item, enter [LTI: url=theurl, key=thekey, secret=thesecret] to place a tool</p>
 </div>
 </div>
 <div class=h1>

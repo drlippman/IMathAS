@@ -40,7 +40,12 @@ class IMathASLTIOAuthDataStore extends OAuthDataStore {
 		if ($keyparts[0]=='sso' && mysql_result($result,0,1)!=11) {
 			return NULL;
 		}
-		 $consumer = new OAuthConsumer($consumer_key,mysql_result($result,0,0), NULL);
+		$secret = mysql_result($result,0,0);
+		if ($secret=='') {
+			//if secret isn't set, don't use blank as secret
+			return NULL;
+		}
+		 $consumer = new OAuthConsumer($consumer_key,$secret, NULL);
 		 return $consumer;
         }
         return NULL;

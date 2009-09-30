@@ -314,17 +314,19 @@ switch($_GET['action']) {
 		echo ' /> Bottom of page<br /><input type=radio name="cploc" value="1" ';
 		if ($cploc==1) {echo "checked=1";}
 		echo ' /> Left side bar</span><br class=form />';
-		echo '<span class="form">LTI access secret (max 10 chars; blank to not use)</span>';
-		echo '<span class="formright"><input name="ltisecret" type="text" value="'.$ltisecret.'" /> ';
-		echo '<a href="#" onclick="document.getElementById(\'ltiurl\').style.display=\'\'; return false;">LTI url/key?</a>';
-		echo '<span id="ltiurl" style="display:none;">';
-		if (isset($_GET['id'])) {
-			echo '<br/>url: http://'. $_SERVER['HTTP_HOST'].$imasroot.'/bltilaunch.php<br/>';
-			echo 'key: cid_'.$_GET['id'].'_0 (to allow local login) or cid_'.$_GET['id'].'_1 (access from LMS only)';
-		} else {
-			echo 'Course ID not yet set.';
-		}		
-		echo '</span></span><br class="form" />';
+		if ($enablebasiclti==true) {
+			echo '<span class="form">LTI access secret (max 10 chars; blank to not use)</span>';
+			echo '<span class="formright"><input name="ltisecret" type="text" value="'.$ltisecret.'" /> ';
+			echo '<a href="#" onclick="document.getElementById(\'ltiurl\').style.display=\'\'; return false;">LTI url/key?</a>';
+			echo '<span id="ltiurl" style="display:none;">';
+			if (isset($_GET['id'])) {
+				echo '<br/>url: http://'. $_SERVER['HTTP_HOST'].$imasroot.'/bltilaunch.php<br/>';
+				echo 'key: cid_'.$_GET['id'].'_0 (to allow local login) or cid_'.$_GET['id'].'_1 (access from LMS only)';
+			} else {
+				echo 'Course ID not yet set.';
+			}		
+			echo '</span></span><br class="form" />';
+		}
 		
 		echo "<div class=submit><input type=submit value=Submit></div></form>\n";
 		break;

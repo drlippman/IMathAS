@@ -134,7 +134,11 @@ switch($_GET['action']) {
 		if (isset($_POST['msgmonitor'])) {
 			$_POST['msgset'] += 5;
 		}
-		$_POST['ltisecret'] = trim($_POST['ltisecret']);
+		if (isset($_POST['ltisecret'])) {
+			$_POST['ltisecret'] = trim($_POST['ltisecret']);
+		} else {
+			$_POST['ltisecret'] = '';
+		}
 		
 		$query = "UPDATE imas_courses SET name='{$_POST['coursename']}',enrollkey='{$_POST['ekey']}',hideicons='$hideicons',available='$avail',lockaid='{$_POST['lockaid']}',picicons='{$_POST['picicons']}',chatset=$chatset,";
 		$query .= "allowunenroll='$unenroll',copyrights='{$_POST['copyrights']}',msgset='{$_POST['msgset']}',topbar='$topbar',cploc='{$_POST['cploc']}',theme='{$_POST['theme']}',ltisecret='{$_POST['ltisecret']}' WHERE id='{$_GET['id']}'";
