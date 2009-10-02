@@ -55,6 +55,7 @@
 				echo '<input type="hidden" name="email" value="'.stripslashes($_POST['email']).'" />';
 				echo '<input type="hidden" name="pw1" value="'.stripslashes($_POST['pw1']).'" />';
 				echo '<input type="hidden" name="pw2" value="'.stripslashes($_POST['pw2']).'" />';
+				echo '<p> </p>';
 				echo '<p>It appears an account already exists with the same email address you just entered. ';
 				echo 'If you are creating an account because you forgot your username, you can ';
 				echo '<a href="forms.php?action=lookupusername">look up your username</a> instead.</p>';

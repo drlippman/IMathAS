@@ -202,6 +202,7 @@
 	
 	$pagetitle = "Messages";
 	require("../header.php");
+	$curdir = rtrim(dirname(__FILE__), '/\\');
 	
 	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> ";
 	if ($cid>0) {
@@ -284,6 +285,31 @@ function chgfilter() {
 	var filtercid = document.getElementById("filtercid").value;
 	window.location = "<?php echo $address;?>"+filtercid;
 }
+var picsize = 0;
+function rotatepics() {
+	picsize = (picsize+1)%3;
+	picshow(picsize);
+}
+function picshow(size) {
+	if (size==0) {
+		els = document.getElementById("myTable").getElementsByTagName("img");
+		for (var i=0; i<els.length; i++) {
+			els[i].style.display = "none";
+		}
+	} else {
+		els = document.getElementById("myTable").getElementsByTagName("img");
+		for (var i=0; i<els.length; i++) {
+			els[i].style.display = "inline";
+			if (els[i].getAttribute("src").match("userimg_sm")) {
+				if (size==2) {
+					els[i].setAttribute("src",els[i].getAttribute("src").replace("_sm","_"));
+				}
+			} else if (size==1) {
+				els[i].setAttribute("src",els[i].getAttribute("src").replace("_","_sm"));
+			}
+		}
+	}
+}
 </script>	
 	<form method=post action="msglist.php?page=<?php echo $page;?>&cid=<?php echo $cid;?>">
 	<p>Filter by course: <select id="filtercid" onchange="chgfilter()">
@@ -309,14 +335,15 @@ function chgfilter() {
 	Check/Uncheck All: <input type="checkbox" name="ca2" value="1" onClick="chkAll(this.form, 'checked[]', this.checked)">	
 	With Selected: <input type=submit name="unread" value="Mark as Unread">
 	<input type=submit name="remove" value="Delete">
+	<input type="button" value="Pictures" onclick="rotatepics()" />
 			
-	<table class=gb>
+	<table class=gb id="myTable">
 	<thead>
-	<tr><th></th><th>Message</th><th>Replied</th><th>From</th><th>Course</th><th>Sent</th></tr>
+	<tr><th></th><th>Message</th><th>Replied</th><th></th><th>From</th><th>Course</th><th>Sent</th></tr>
 	</thead>
 	<tbody>
 <?php
-	$query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_users.LastName,imas_users.FirstName,imas_msgs.isread,imas_courses.name ";
+	$query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_users.LastName,imas_users.FirstName,imas_msgs.isread,imas_courses.name,imas_msgs.msgfrom ";
 	$query .= "FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom LEFT JOIN imas_courses ON imas_courses.id=imas_msgs.courseid WHERE ";
 	$query .= "imas_msgs.msgto='$userid' AND (imas_msgs.isread<2 OR imas_msgs.isread>3) ";
 	if ($filtercid>0) {
@@ -357,6 +384,10 @@ function chgfilter() {
 		if ($line['LastName']==null) {
 			$line['LastName'] = "[Deleted]";
 		}
+		echo '</td><td>';
+		if (file_exists("$curdir/../course/files/userimg_sm{$line['msgfrom']}.jpg")) {
+			echo "<img src=\"$imasroot/course/files/userimg_sm{$line['msgfrom']}.jpg\" style=\"display:none;\"  />";
+		} 
 		echo "</td><td>{$line['LastName']}, {$line['FirstName']}</td>";
 		if ($line['name']==null) {
 			$line['name'] = "[Deleted]";

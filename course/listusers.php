@@ -523,7 +523,7 @@ if ($overwriteBody==1) {
 				<td>
 <?php
 	
-	if (file_exists("$curdir//files/userimg_sm{$line['userid']}.jpg")) {
+	if (file_exists("$curdir/files/userimg_sm{$line['userid']}.jpg")) {
 		echo "<img src=\"$imasroot/course/files/userimg_sm{$line['userid']}.jpg\" style=\"display:none;\"  />";
 	}
 ?>
