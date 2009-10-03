@@ -1,7 +1,24 @@
 <?php
 	//Displays Message list
 	//(c) 2006 David Lippman
-	
+	/*
+isread:
+# to  frm
+0 NR  --
+1 R   --
+2 DR  --
+3 DNR --
+4 NR  D
+5 R   D
+
+0 - not read
+1 - read
+2 - deleted not read
+3 - deleted and read
+4 - deleted by sender
+5 - deleted by sender,read
+
+	*/
 	require("../validate.php");
 	if ($cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 	   require("../header.php");
@@ -186,6 +203,11 @@
 		$query = "UPDATE imas_msgs SET isread=isread-1 WHERE id IN ($checklist) AND (isread=1 OR isread=5)";
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
 	}
+	if (isset($_POST['markread'])) {
+		$checklist = "'".implode("','",$_POST['checked'])."'";
+		$query = "UPDATE imas_msgs SET isread=isread+1 WHERE id IN ($checklist) AND (isread=0 OR isread=4)";
+		mysql_query($query) or die("Query failed : $query " . mysql_error());
+	}
 	if (isset($_POST['remove'])) {
 		$checklist = "'".implode("','",$_POST['checked'])."'";
 		$query = "DELETE FROM imas_msgs WHERE id IN ($checklist) AND isread>1";
@@ -334,6 +356,7 @@ function picshow(size) {
 ?>
 	Check/Uncheck All: <input type="checkbox" name="ca2" value="1" onClick="chkAll(this.form, 'checked[]', this.checked)">	
 	With Selected: <input type=submit name="unread" value="Mark as Unread">
+	<input type=submit name="markread" value="Mark as Read">
 	<input type=submit name="remove" value="Delete">
 	<input type="button" value="Pictures" onclick="rotatepics()" />
 			
