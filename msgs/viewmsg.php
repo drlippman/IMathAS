@@ -29,6 +29,14 @@
 	$page = $_GET['page'];
 	$type = $_GET['type'];
 	
+	$teacherof = array();
+	$query = "SELECT courseid FROM imas_teachers WHERE userid='$userid'";
+	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	while ($row = mysql_fetch_row($result)) {
+		$teacherof[$row[0]] = true;
+	}
+	
+	
 	$pagetitle = "Messages";
 	require("../header.php");
 	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> ";
@@ -66,8 +74,9 @@
 	}
 	echo "<table class=gb ><tbody>";
 	echo "<tr><td><b>From:</b></td><td>{$line['LastName']}, {$line['FirstName']}";
-	if ($isteacher) {
-		echo " <a href=\"mailto:{$line['email']}\">email</a>";
+	if (isset($teacherof[$line['courseid']])) {
+		echo " <a href=\"mailto:{$line['email']}\">email</a> | ";
+		echo " <a href=\"$imasroot/course/gradebook.php?cid={$line['courseid']}&stu={$line['msgfrom']}\" target=\"_popoutgradebook\">gradebook</a>";
 	}
 	echo "</td></tr><tr><td><b>Sent:</b></td><td>$senddate</td></tr>";
 	echo "<tr><td><b>Subject:</b></td><td>{$line['title']}</td></tr>";

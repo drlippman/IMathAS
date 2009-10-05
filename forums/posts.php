@@ -320,17 +320,22 @@
 				}
 				echo "</span>\n";
 				echo "<b>{$subject[$child]}</b><br/>Posted by: ";
-				if ($isteacher && $ownerid[$child]!=0) {
-					echo "<a href=\"mailto:{$email[$child]}\">";
-				} else if ($allowmsg && $ownerid[$child]!=0) {
+				//if ($isteacher && $ownerid[$child]!=0) {
+				//	echo "<a href=\"mailto:{$email[$child]}\">";
+				//} else if ($allowmsg && $ownerid[$child]!=0) {
+				if (($isteacher || $allowmsg) && $ownerid[$child]!=0) {
 					echo "<a href=\"../msgs/msglist.php?cid=$cid&add=new&to={$ownerid[$child]}\">";
 				}
 				echo $poster[$child];
 				if (($isteacher || $allowmsg) && $ownerid[$child]!=0) {
 					echo "</a>";
 				}
+				if ($isteacher && $ownerid[$child]!=0 && $ownerid[$child]!=$userid) {
+					 echo " <a class=\"small\" href=\"$imasroot/course/gradebook.php?cid=$cid&stu={$ownerid[$child]}\" target=\"_popoutgradebook\">[GB]</a>";
+				}
 				echo ', ';
 				echo tzdate("F j, Y, g:i a",$date[$child]);
+				
 				if ($date[$child]>$lastview) {
 					echo " <span style=\"color:red;\">New</span>\n";
 				}
