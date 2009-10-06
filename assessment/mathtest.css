@@ -277,6 +277,7 @@ div.tips {
 }
 /*for eqn helper*/
 .eebtn {
+	font-family: "Times New Roman", Times, serif;
 	cursor: pointer;
 	padding: 0px .5em;
 	height: 35px;
