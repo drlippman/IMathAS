@@ -499,6 +499,11 @@
 	header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
 	header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 	$useeditor = 1;
+	if ($testsettings['eqnhelper']>0) {
+		$placeinhead = '<script type="text/javascript">var eetype='.$testsettings['eqnhelper'].'</script>';
+		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqnhelper.js\"></script>";
+		$useeqnhelper = true;
+	}
 	require("header.php");
 	if ($testsettings['noprint'] == 1) {
 		echo '<style type="text/css" media="print"> div.question, div.todoquestion, div.inactive { display: none;} </style>';
@@ -1255,6 +1260,9 @@
 				}
 			}
 		}
+	}
+	if ($testsettings['eqnhelper']>0) {
+		require("eqnhelper.html");
 	}
 	require("../footer.php");
 	

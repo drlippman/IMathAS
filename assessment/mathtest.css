@@ -275,4 +275,33 @@ div.tips {
 	position: absolute;
 	padding: 5px;
 }
-
+/*for eqn helper*/
+.eebtn {
+	cursor: pointer;
+	padding: 0px .5em;
+	height: 35px;
+	border: 1px solid #000;
+	text-align: center;
+	background: #fff;
+	vertical-align: middle;
+}
+.eetab { 
+	cursor: pointer;
+	height: 35px;
+	padding: 0px 1em;
+	border: 1px solid #000;
+	text-align: center;
+	background: #fff;
+	vertical-align: middle;
+}
+.eedd {
+	cursor: pointer;
+	font-family: sans-serif;
+	position: absolute; 
+	height: 8px; 
+	background: #ff0;
+	display:none; 
+	text-align:center; 
+	color: #fa0;
+	font-size: 6px;
+}

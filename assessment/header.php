@@ -135,6 +135,9 @@ function imascleanup(type, value) {
 END;
 
 }
+if (isset($placeinhead)) {
+	echo $placeinhead;
+}
 ?>
 
 </head>

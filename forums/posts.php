@@ -34,6 +34,25 @@
 		}
 		exit;
 	}
+	if (isset($_GET['marktagged'])) {
+		$query = "UPDATE imas_forum_views SET tagged=1 WHERE userid='$userid' AND threadid='$threadid'";
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		if ($page==-3) {
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/newthreads.php?cid=$cid");
+		} else {
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?cid=$cid&forum=$forumid&page=$page");
+		}
+		exit;
+	} else if (isset($_GET['markuntagged'])) {
+		$query = "UPDATE imas_forum_views SET tagged=0 WHERE userid='$userid' AND threadid='$threadid'";
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		if ($page==-3) {
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/newthreads.php?cid=$cid");
+		} else {
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?cid=$cid&forum=$forumid&page=$page");
+		}
+		exit;
+	}
 	$query = "SELECT settings,replyby,defdisplay,name,points FROM imas_forums WHERE id='$forumid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$forumsettings = mysql_result($result,0,0);
@@ -119,15 +138,17 @@
 	mysql_query($query) or die("Query failed : $query " . mysql_error());
 	
 	//mark as read
-	$query = "SELECT lastview FROM imas_forum_views WHERE userid='$userid' AND threadid='$threadid'";
+	$query = "SELECT lastview,tagged FROM imas_forum_views WHERE userid='$userid' AND threadid='$threadid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$now = time();
 	if (mysql_num_rows($result)>0) {
 		$lastview = mysql_result($result,0,0);
+		$tagged = mysql_result($result,0,1);
 		$query = "UPDATE imas_forum_views SET lastview=$now WHERE userid='$userid' AND threadid='$threadid'";
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
 	} else {
 		$lastview = 0;
+		$tagged = 0;
 		$query = "INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES ('$userid','$threadid',$now)";
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
 	}
@@ -158,7 +179,11 @@
 		echo "Next";
 	}
 	echo " | <a href=\"posts.php?cid=$cid&forum=$forumid&thread=$threadid&page=$page&markunread=true\">Mark Unread</a>";
-	
+	if ($tagged) {
+		echo " | <a href=\"posts.php?cid=$cid&forum=$forumid&thread=$threadid&page=$page&markuntagged=true\">Unflag</a>";
+	} else {
+		echo " | <a href=\"posts.php?cid=$cid&forum=$forumid&thread=$threadid&page=$page&marktagged=true\">Flag</a>";
+	}
 	echo "<p><b style=\"font-size: 120%\">Post: {$subject[$threadid]}</b><br/>\n";
 	echo "<b style=\"font-size: 100%\">Forum: $forumname</b></p>";
 	echo "<input type=button value=\"Expand All\" onclick=\"showall()\"/>";

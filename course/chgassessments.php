@@ -134,6 +134,9 @@ if (!(isset($teacherid))) {
 		if (isset($_POST['chgshowqcat'])) {
 			$sets[] = "showcat='{$_POST['showqcat']}'";
 		}
+		if (isset($_POST['chgeqnhelper'])) {
+			$sets[] = "eqnhelper='{$_POST['eqnhelper']}'";
+		}
 		
 		if (isset($_POST['chgintro'])) {
 			$query = "SELECT intro FROM imas_assessments WHERE id='{$_POST['intro']}'";
@@ -410,6 +413,15 @@ function chkAll(frm, arr, mark) {
 					</select>
 					</span>
 				</td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" name="chgeqnhelper"/></td>
+				<td>Use equation helper?</td>
+				<td><select name="eqnhelper">
+					<option value="0" selected="selected">No</option>
+					<option value="1" >Yes, simple form (no logs or trig)</option>
+					<option value="2" >Yes, advanced form</option>
+				     </select></td>
 			</tr>
 			<tr>
 				<td><input type="checkbox" name="chghints"/></td>

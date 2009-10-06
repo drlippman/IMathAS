@@ -511,7 +511,7 @@ function AMmathpreview(inputId,outputId) {
  
 }
 
-var greekletters = ['alpha','beta','delta','gamma','phi','psi','sigma','rho','theta'];
+var greekletters = ['alpha','beta','delta','epsilon','gamma','phi','psi','sigma','rho','theta'];
 var calctoproc = new Array();
 var intcalctoproc = new Array();
 var calcformat = new Array();

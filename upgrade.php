@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 16;
+$latest = 17;
 
 if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 	$handle = fopen("upgradecounter.txt",'w');
@@ -194,6 +194,10 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 mysql_query($query) or die("Query failed : " . mysql_error());
 			 echo "<p>SimpleLTI has been deprecated and replaced with BasicLTI.  If you have enablesimplelti in your config.php, change it to enablebasiclti.  ";
 			 echo "If you do not have either currently in your config.php and want to allow imathas to act as a BasicLTI producer, add \$enablebasiclti = true to config.php</p>";
+		}
+		if ($last < 17) {
+			 $query = "ALTER TABLE `imas_assessments` ADD `eqnhelper` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0';"; 
+			 mysql_query($query) or die("Query failed : " . mysql_error());
 		}
 		$handle = fopen("upgradecounter.txt",'w');
 		fwrite($handle,$latest);

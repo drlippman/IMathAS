@@ -399,7 +399,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans) {
 
 
 function makeanswerbox($anstype, $qn, $la, $options,$multi) {
-	global $myrights;
+	global $myrights, $useeqnhelper;
 	$out = '';
 	$tip = '';
 	$sa = '';
@@ -682,7 +682,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$leftb = '';
 			$rightb = '';
 		}
-		$out .= "$leftb<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" />$rightb\n";
+		$out .= "$leftb<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" ";
+		if ($useeqnhelper) {
+			$out .= "onfocus=\"showeedd('tc$qn')\" onblur=\"hideee()\" ";
+		}
+		$out .= "/>$rightb\n";
 		if (!isset($hidepreview)) {
 			$preview .= "<input type=button class=btn value=Preview onclick=\"calculate('tc$qn','p$qn','$answerformat')\" /> &nbsp;\n";
 		}
@@ -794,7 +798,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (!isset($sz)) { $sz = 20;}
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		if (isset($ansprompt)) {$out .= "<label for=\"tc$qn\">$ansprompt</label>";}
-		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" />\n";
+		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=\"tc$qn\" id=\"tc$qn\" value=\"$la\" ";
+		if ($useeqnhelper) {
+			$out .= "onfocus=\"showeedd('tc$qn')\" onblur=\"hideee()\" ";
+		}
+		$out .= "/>\n";
 		if (!isset($hidepreview)) {$preview .= "<input type=button class=btn value=Preview onclick=\"AMpreview('tc$qn','p$qn')\" /> &nbsp;\n";}
 		$preview .= "<span id=p$qn></span>\n";
 		

@@ -812,7 +812,9 @@ function gbtable() {
 		$i = $discussidx[$r[1]];
 		$row = $sturow[$r[0]];
 		$col = $discusscol[$r[1]];
-		$gb[$row][1][$col][0] = 1*$r[2];
+		if ($r[2]!=null) {
+			$gb[$row][1][$col][0] = 1*$r[2];
+		}
 		$gb[$row][1][$col][3] = 0; //is counted
 		if ($gb[0][1][$col][3]<1) { //past
 			$cattotpast[$row][$category[$i]][$col] = $r[2];
