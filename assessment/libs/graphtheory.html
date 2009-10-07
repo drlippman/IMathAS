@@ -37,6 +37,10 @@ A library of graph theory functions.  Version 0.2, Sept 4, 2009
 <li><a href="#graphrepeatednearestneighbor">graphrepeatednearestneighbor</a></li>
 <li><a href="#graphnearestneighbor">graphnearestneighbor</a></li>
 <li><a href="#graphsortededges">graphsortededges</a></li>
+<li><a href="#graphsequenceeuleredgedups">graphsequenceeuleredgedups</a></li>
+<li><a href="#graphsequenceishamiltonian">graphsequenceishamiltonian</a></li>
+<li><a href="#graphgetpathlength">graphgetpathlength</a></li>
+<li><a href="#graphshortestpath">graphshortestpath</a></li>
 <li><a href="#graphcircuittoarray">graphcircuittoarray</a></li>
 <li><a href="#graphgetedges">graphgetedges</a></li>
 <li><a href="#graphgetedgesarray">graphgetedgesarray</a></li>
@@ -106,10 +110,11 @@ graphrandomgridschedule(n, m, p,[options])
 <BR>  value
 <BR>if options['labels'] are used, "start" and "end" will be added automatically
 <BR><h3><a name="graphdijkstra">graphdijkstra</a></h3>
-graphdijkstra(g) 
+graphdijkstra(g,[dest]) 
 <BR>computes dijkstras algorithm on the graph g
 <BR>g is a 2-dimensional matrix
 <BR>g[i][j]  &gt; 0 if vertexes i and j are connected
+<BR>if dest vertex not set then
 <BR>the last vertex will be used as the destination vertex
 <BR>returns array(dist,next) where
 <BR>dist[i] is the shortest dist to end, and
@@ -139,8 +144,33 @@ graphnearestneighbor(g,start)
 <BR><h3><a name="graphsortededges">graphsortededges</a></h3>
 graphsortededges(g) 
 <BR>returns a hamiltonian circuit graph using sorted edges
+<BR><h3><a name="graphsequenceeuleredgedups">graphsequenceeuleredgedups</a></h3>
+function graphsequenceeuleredgedups(g,op,seq)
+<BR>determines if given sequence of labels determines
+<BR>an edge-covering circuit on graph g.  options op is needed
+<BR>for labels
+<BR>returns -1 if not all edges covered or seq uses nonexisting edges
+<BR>returns 0 if all edges covered with no dup
+<BR>returns # of dups if covers all edges with duplications
+<BR><h3><a name="graphsequenceishamiltonian">graphsequenceishamiltonian</a></h3>
+function graphsequencishamiltonian(g,op,seq)
+<BR>determines if given sequence of labels determines
+<BR>a hamiltonian circuit on graph g.  options op is needed
+<BR>for labels
+<BR><h3><a name="graphgetpathlength">graphgetpathlength</a></h3>
+graphgetpathlength(g,op,seq)
+<BR>Given sequence seq of graph labels, determine the
+<BR>length of the path on graph g
+<BR>options needed for vertex labels
+<BR><h3><a name="graphshortestpath">graphshortestpath</a></h3>
+graphshortestpath(g,op,start,end,[type])
+<BR>find shortest path on graph g from vertex start to end
+<BR>returns array(shortest path,length of path)
+<BR>for path,
+<BR>type=0 returns labeledpath, like ABCD
+<BR>type=1 returns array of vertex indices
 <BR><h3><a name="graphcircuittoarray">graphcircuittoarray</a></h3>
-function graphcircuittoarray(g,[start])
+graphcircuittoarray(g,[start])
 <BR>converts graph containing a circuit to an array
 <BR>of vertices in circuit order
 <BR><h3><a name="graphgetedges">graphgetedges</a></h3>

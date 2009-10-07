@@ -1,0 +1,13 @@
+<html><body>
+<h1>Macro Library solvers</h1>
+Some solving algorithms.  Version 1.0 Oct 6, 2009
+<BR><ul>
+<li><a href="#discretenewtons">discretenewtons</a></li>
+</ul>
+<h3><a name="discretenewtons">discretenewtons</a></h3>
+discretenewtons(function,xmin,xmax,[guess]) 
+<BR>applies a discrete form of Newton's method to find a root of the function
+<BR>on the interval [xmin,xmax].  Starts at midpoint of interval, or at guess if
+<BR>provided.  If method fails to converge, or converges outside interval, the
+<BR>method returns null.  Make sure function uses the variable x
+<BR>
