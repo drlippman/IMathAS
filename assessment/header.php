@@ -33,24 +33,24 @@ if ($isdiag) {
 	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/assessment/print.css\" media=\"print\"/>\n";
 }
 if ($sessiondata['mathdisp']==1) {
-	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/ASCIIMathML.js\"></script>\n";
+	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/ASCIIMathML_min.js\"></script>\n";
 } else if ($sessiondata['mathdisp']==2) {
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>'; 
-	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg.js\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js\" type=\"text/javascript\"></script>\n";
 } else if ($sessiondata['mathdisp']==0) {
 	echo '<script type="text/javascript">var noMathRender = true;</script>';	
 }
 
 if ($sessiondata['graphdisp']==1) {
-	echo "<script src=\"$imasroot/javascript/ASCIIsvg.js\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js\" type=\"text/javascript\"></script>\n";
 } else {
 	echo "<script src=\"$imasroot/javascript/mathjs.js\" type=\"text/javascript\"></script>\n";
 }
 ?>
-<script src="<?php echo $imasroot . "/javascript/AMhelpers.js?v=022409";?>" type="text/javascript"></script>
+<script src="<?php echo $imasroot . "/javascript/AMhelpers_min.js?v=022409";?>" type="text/javascript"></script>
 <script src="<?php echo $imasroot . "/javascript/confirmsubmit.js";?>" type="text/javascript"></script>
-<!--[if IE]><script type="text/javascript" src="<?php echo $imasroot;?>/javascript/excanvas.js"></script><![endif]-->
-<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/drawing.js"></script>
+<!--[if IE]><script type="text/javascript" src="<?php echo $imasroot;?>/javascript/excanvas_min.js"></script><![endif]-->
+<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/drawing_min.js"></script>
 <?php
 echo "<script type=\"text/javascript\">imasroot = '$imasroot';</script>";
 if ($useeditor==1 && $sessiondata['useed']==1) {

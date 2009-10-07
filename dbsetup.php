@@ -4,6 +4,12 @@
 </head>
 <body>
 <?php
+if (file_exists("upgradecounter.txt")) {
+	echo "It appears the database setup has already been run.  Aborting.  If you need to ";
+	echo "rerun the setup, delete upgradecounter.txt";
+	echo "</body></html>";
+	exit;
+}
 $dbsetup = true;
 include("config.php");
 //IMathAS Database Setup
@@ -228,6 +234,7 @@ $sql = 'CREATE TABLE `imas_assessments` ('
 	. ' `avail` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'1\','
 	. ' `groupmax` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'6\','
 	. ' `allowlate` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'1\','
+	. ' `eqnhelper` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\','
 	. ' `exceptionpenalty` TINYINT(2) UNSIGNED NOT NULL DEFAULT \'0\','
 	. ' `ltisecret` VARCHAR(10) NOT NULL, '
 	. ' `endmsg` TEXT NOT NULL, '
@@ -389,6 +396,7 @@ $sql = 'CREATE TABLE `imas_linkedtext` ('
         . ' `enddate` INT(10) UNSIGNED NOT NULL,'
 	. ' `avail` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'1\', '
 	. ' `oncal` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
+	. ' `target` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `caltag` CHAR(1) NOT NULL DEFAULT \'!\', '
         . ' INDEX (`courseid`), INDEX(`oncal`), INDEX(`avail`), INDEX(`startdate`), INDEX(`enddate`)'
         . ' )'
@@ -490,7 +498,7 @@ $sql = 'CREATE TABLE `imas_forum_posts` ('
 	. ' `message` TEXT NOT NULL, '
 	. ' `isanon` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `replyby` INT(10) UNSIGNED NULL,'
-	. ' `points` SMALLINT(5) UNSIGNED NULL, '
+	. ' `points` DECIMAL( 5, 1 ) UNSIGNED NULL, '
         . ' INDEX (`forumid`), INDEX(`threadid`), INDEX(`userid`), INDEX(`postdate`) '
         . ' )'
         . ' TYPE = innodb'
@@ -668,18 +676,6 @@ $sql = 'CREATE TABLE `imas_ltiusers` ('
         . ' TYPE = innodb;';
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 echo 'imas_ltiusers created<br/>';
-
-$sql = 'CREATE TABLE `imas_ltiaccess` ('
-        . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
-        . ' `password` VARCHAR(32) NOT NULL, '
-        . ' `userid` INT(10) UNSIGNED NOT NULL, '
-        . ' `itemid` INT(10) UNSIGNED NOT NULL, '
-        . ' `itemtype` TINYINT(1) UNSIGNED NOT NULL, '
-        . ' `created` INT(10) UNSIGNED NOT NULL'
-        . ' )'
-        . ' TYPE = innodb;';
-mysql_query($sql) or die("Query failed : $sql " . mysql_error());
-echo 'imas_ltiaccess created<br/>';
 
 $sql = 'CREATE TABLE `imas_ltinonces` ('
         . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '

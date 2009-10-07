@@ -87,8 +87,8 @@
   //use this URL to use the local server:
   $mathchaturl = "$imasroot/mathchat/index.php";
   
-  //enables use of IMathAS as a SimpleLTI producer.
-  $enablesimplelti = true;
+  //enables use of IMathAS as a BasicLTI producer.
+  $enablebasiclti = true;
   
   //template user id
   //Generally not needed.  Use if you want a list of Template courses in the
