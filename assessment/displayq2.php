@@ -502,7 +502,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		}
 		$tip = "Select the best answer";
 		if (isset($answer)) {
-			$sa = $questions[$answer];
+			$anss = explode(' or ',$answer);
+			$sapt = array();
+			foreach ($anss as $v) {
+				$sapt[] = $questions[intval($v)];
+			}
+			$sa = implode(' or ',$sapt); //$questions[$answer];
 		}
 	} else if ($anstype == "multans") {
 		if (is_array($options['questions'][$qn])) {$questions = $options['questions'][$qn];} else {$questions = $options['questions'];}
@@ -1361,7 +1366,12 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($givenans == null) {return 0;}
 
 		if ($givenans=='NA') { return 0; }
-		if ($randkeys[$givenans] == $answer) {return 1;} else { return 0;}
+		$anss = explode(' or ',$answer);
+		foreach ($anss as $k=>$v) {
+			$anss[$k] = intval($v);
+		}
+		//if ($randkeys[$givenans] == $answer) {return 1;} else { return 0;}
+		if (in_array($randkeys[$givenans],$anss)) {return 1;} else { return 0;}
 	} else if ($anstype == "multans") {
 		if (is_array($options['questions'][$qn])) {$questions = $options['questions'][$qn];} else {$questions = $options['questions'];}
 		if (is_array($options['answers'])) {$answers = $options['answers'][$qn];} else {$answers = $options['answers'];}
