@@ -1628,6 +1628,9 @@ The following macros help with display:
 	<li><b>grid</b>: spacing of grid lines.  Defaults to 1.  Set to "off" or 0 for none.  Use "xgrid:ygrid" for different spacing on each axis.</li>
 	<li><b>width,height</b>:  The width and height (in pixels) of the graph.  Defaults to 200x200</li>
 	</ul>
+<li><b>addfractionaxislabels(plot,step)</b>:  Adds labels along the horizontal axis in steps of step to a plot created with showplot. 
+      Step is a fraction like "1/4", or a pi multiple, like "pi/4" or "2pi".  When using this, make sure to set the showplot x-axis label
+      spacing larger than the domain to prevent the default labels from showing.</li>
 <li><b>addlabel(plot,x,y,label,[color,loc,angle])</b>: Adds a label to a plot created with showplot. 
 	<ul>
 	<li><b>plot</b>: The plot created with showplot</li>
@@ -2112,6 +2115,7 @@ A student is asked to enter a string (a word or list of letters).
 		<li>remove_whitespace: removes all whitespace (spaces)</li>
 		<li>ignore_order: treats ABC and CBA as equivalent</li>
 		<li>ignore_commas: removes commas</li>
+		<li>partial_credit: awards partial credit based on Levenshtein distance between strings</li>
 		<li>special_or: use <b>*or*</b> for separating answers rather than <b>or</b>.</li>
 		</ul>
 		By default, compress_whitespace and ignore_case are On.</dd>

@@ -2096,6 +2096,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			sort($givenans,SORT_STRING);
 			$givenans = implode('',$givenans);
 		}
+		
 		foreach ($anss as $anans) {
 			if ($flags['ignore_order']===true) {
 				$anans = explode("\n",chunk_split($anans,1,"\n"));
@@ -2108,9 +2109,16 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			if ($flags['remove_whitespace']===true) {
 				$anans = trim(preg_replace('/\s+/','',$anans));
 			}
-			if (!strcmp($anans,$givenans)) {
-				$correct = 1;
-				break;
+			if ($flags['partial_credit']===true) {
+				$poss = strlen($anans);
+				$dist = levenshtein($anans,$givenans);
+				$score = ($poss - $dist)/$poss;
+				if ($score>$correct) { $correct = $score;}
+			} else {
+				if (!strcmp($anans,$givenans)) {
+					$correct = 1;
+					break;
+				}
 			}
 		}
 		return $correct;

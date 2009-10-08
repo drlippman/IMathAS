@@ -4,7 +4,7 @@
 
 
 array_push($allowedmacros,"exp","sec","csc","cot","sech","csch","coth","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif","in_array","prettyint","prettyreal","arraystodots","subarray","showdataarray","arraystodoteqns","array_flip","arrayfindindex","fillarray","array_reverse");
-array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf","arrayhasduplicates");
+array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels");
 function mergearrays($a,$b) {
 	if (!is_array($a)) {
 		$a = array($a);
@@ -72,7 +72,11 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	if (is_numeric($settings[4]) && $settings[4]>0) {
 		$commands .= 'axes('.$settings[4].','.$settings[4].',1';
 	} else if (isset($lbl[0]) && is_numeric($lbl[0]) && $lbl[0]>0 && $lbl[1]>0) {
-		$commands .= 'axes('.$lbl[0].','.$lbl[1].',1';
+		if (!isset($lbl[2])) {  //allow xscl:yscl:off for ticks but no labels
+			$commands .= 'axes('.$lbl[0].','.$lbl[1].',1';
+		} else {
+			$commands .= 'axes('.$lbl[0].','.$lbl[1].',null';
+		}
 	} else {
 		$commands .= 'axes(1,1,null';
 	}
@@ -339,6 +343,54 @@ function addlabelabs($plot,$x,$y,$lbl) {
 		$plot = str_replace("' />","fontfill=\"$color\";textabs([$x,$y],\"$lbl\");' />",$plot);
 	}
 	return $plot;
+}
+
+function addfractionaxislabels($plot,$step) {
+	if (strpos($step,'/')===false) {
+		$num = $step; $den = 1;
+	} else {
+		list($num,$den) = explode('/',$step);
+	}
+	$ispi = false;
+	if (strpos($num,'pi')!==false) {
+		$ispi = true;
+		$num = str_replace('pi','',$num);
+		if ($num=='') { $num = 1;}
+	}
+	preg_match('/initPicture\(([\-\d\.]+),([\-\d\.]+),([\-\d\.]+),([\-\d\.]+)\)/',$plot,$matches);
+	$xmin = $matches[1];
+	$xmax = $matches[2];
+	$yrange = $matches[4] - $matches[2];
+	$stepn = $num/$den;
+	if ($ispi) { $stepn *= M_PI;}
+	if ($stepn==0) {echo "error: bad step size on pilabels"; return;}
+	$step = ceil($xmin/$stepn);
+	$totstep = ceil(($xmax-$xmin)/$stepn);
+	$tm = -.03*$yrange;
+	$tx = .03*$yrange;
+	$outst = 'fontfill="black";strokewidth=0.5;stroke="black";';
+	for ($i=0; $i<$totstep; $i++) {
+		$x = $step*$stepn;
+		if (abs($x)<.01) {$step++; continue;}
+		$g = gcd($step*$num,$den);
+		$n = ($step*$num)/$g;  $d = $den/$g;
+		if ($ispi) {
+			if ($n==1) {
+				$xd = '&pi;';
+			} else if ($n==-1) {
+				$xd = '-&pi;';
+			} else {
+				$xd = "$n&pi;";
+			}
+		} else {
+			$xd = $n;
+		}
+		if ($d!=1) {$xd .= "/$d";}
+		$outst .= "line([$x,$tm],[$x,$tx]); text([$x,0],\"$xd\",\"below\");";
+		$step++;
+	}
+	return str_replace("' />","$outst' />",$plot);
+	
 }
 
 function showasciisvg($script) {

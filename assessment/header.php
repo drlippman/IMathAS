@@ -21,9 +21,9 @@ initstack = new Array();
 window.onload = init;
 var imasroot = '<?php echo $imasroot; ?>';
 </script>
-<link rel="stylesheet" href="<?php echo $imasroot . "/assessment/mathtest.css";?>" type="text/css"/>
+<link rel="stylesheet" href="<?php echo $imasroot . "/assessment/mathtest.css?ver=100509";?>" type="text/css"/>
 <?php
-echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/general.js\"></script>\n";
+echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/general.js?ver=100509\"></script>\n";
 if (isset($sessiondata['coursetheme'])) {
 	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/themes/{$sessiondata['coursetheme']}\"/>\n";
 }

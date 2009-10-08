@@ -148,6 +148,8 @@ function processScript($script) {
 	//$stroke = 'black'; $fill = 'none'; $curdash=''; $isdashed=false; $marker='none';
         //$markerfill = 'green'; $gridcolor = 'gray'; $axescolor = 'black';
 	//$strokewidth = 1; $dotradius=8; $ticklength=4; $fontfill = ''; $fontsize = 12;
+	//$script = preg_replace('/&[^\s]*;
+	$script = html_entity_decode($script, ENT_COMPAT, 'UTF-8');
 	$this->AScom =  explode(';',$script);
 	foreach ($this->AScom as $com) {
 		if (preg_match('/\s*(\w+)\s*=(.+)/',$com,$matches)) { //is assignment operator

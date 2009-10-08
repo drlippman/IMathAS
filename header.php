@@ -16,7 +16,7 @@ div.breadcrumb { display:none;}
 <script type="text/javascript">
 var imasroot = '<?php echo $imasroot; ?>';
 </script>
-<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js?ver=030509"></script>
+<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js?ver=100509"></script>
 <?php
 if ($ispublic) {
 	echo "<script src=\"$imasroot/javascript/ASCIIMathMLwFallback.js\" type=\"text/javascript\"></script>\n";
