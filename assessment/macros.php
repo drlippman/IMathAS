@@ -1376,6 +1376,30 @@ function prettytime($time,$in,$out) {
 }
 
 function definefunc($func,$varlist) {
+	$vars = explode(',',$varlist);
+	$toparen = implode('|',$vars);
+	if ($toparen != '') {
+		$reg = "/(" . $toparen . ")(" . $toparen . ')$/';
+		  $func= preg_replace($reg,"($1)($2)",$func);	
+		  $reg = "/(" . $toparen . ")(sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs)/";
+		  $func= preg_replace($reg,"($1)$2",$func);	
+		  $reg = "/(" . $toparen . ")(" . $toparen . ')([^a-df-zA-Z\(])/';
+		  $func= preg_replace($reg,"($1)($2)$3",$func);	
+		  $reg = "/([^a-zA-Z])(" . $toparen . ")([^a-zA-Z])/";
+		  $func= preg_replace($reg,"$1($2)$3",$func);	
+		  //need second run through to catch x*x
+		  $func= preg_replace($reg,"$1($2)$3",$func);	
+		  $reg = "/^(" . $toparen . ")([^a-zA-Z])/";
+		  $func= preg_replace($reg,"($1)$2",$func);
+		  $reg = "/([^a-zA-Z])(" . $toparen . ")$/";
+		  $func= preg_replace($reg,"$1($2)",$func);
+		  $reg = "/^(" . $toparen . ")$/";
+		  $func= preg_replace($reg,"($1)",$func);
+		  
+		  $reg = "/\(\((" . $toparen . ")\)\)/";
+		  $func= preg_replace($reg,"($1)",$func);
+		  $func= preg_replace($reg,"($1)",$func);  
+	}
 	return array($func,$varlist);
 }
 
@@ -1384,9 +1408,11 @@ function evalfunc($farr) {
 	array_shift($args);
 	if (is_array($farr)) {
 		list($func,$varlist) = $farr;
+		$skipextracleanup = true;
 	} else {
 		$func = $farr;
 		$varlist = array_shift($args);
+		$skipextracleanup = false;
 	}
 	$func = makepretty($func);
 	$vars = explode(',',$varlist);
@@ -1400,7 +1426,7 @@ function evalfunc($farr) {
 		}
 	}
 	$toparen = implode('|',$vars);
-	if ($toparen != '') {
+	if ($toparen != '' && !$skipextracleanup) {
 		$reg = "/(" . $toparen . ")(" . $toparen . ')$/';
 		  $func= preg_replace($reg,"($1)($2)",$func);	
 		  $reg = "/(" . $toparen . ")(sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs)/";

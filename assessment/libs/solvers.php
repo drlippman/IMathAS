@@ -20,7 +20,7 @@ function discretenewtons($func,$xmin,$xmax,$guess=null) {
 	$eps = 1e-7;
 	$x = $guess;
 	$curx = $guess;
-	$dx = ($xmax-$xmin)/100;
+	$dx = min(($xmax-$xmin)/100,.001);
 	$y = eval("return ($func);");
 	while (abs($y)>$eps && $cnt<20) {
 		$x = $curx + $dx;
@@ -31,6 +31,7 @@ function discretenewtons($func,$xmin,$xmax,$guess=null) {
 		$y = eval("return ($func);");
 		$cnt++;
 	}
+	echo $cnt;
 	if ($cnt==20) {
 		if ($x>$xmax || $x<$xmin) {
 			echo "Newton's did not converge within interval";

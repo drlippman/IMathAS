@@ -174,6 +174,7 @@ dd {
 		<li><a href="#calculatedmatrix">Calculated Matrix</a></li>
 		<li><a href="#interval">Interval</a></li>
 		<li><a href="#calcinterval">Calculated Interval</a></li>
+		<li><a href="#fileupload">File Upload</a></li>
 		<li><a href="#multipart">Multipart</a></li>
 		</ul>
 	</ul>
@@ -1431,6 +1432,14 @@ $str = &quot;What is $a/$b&quot;
 </pre>
 In this example, $str now contains &quot;What is 3/5&quot;.
 </p>
+<p>If needed, you can concatenate (combine) two strings using the . operator.  Example:
+<pre>
+$a = &quot;string one &quot;
+$b = &quot;string two&quot;
+$both = $a . $b
+</pre>
+Here, $both now contains the string &quot;string one string two&quot;
+</p>
 <p>
 If you have a long command to type, you can put a &quot;&amp;&quot; at the end of a line to specify it continues on the next line.  Example:
 <pre>
@@ -1491,10 +1500,14 @@ if ($a==0) {
    $b = 1
    $c = 2
 }
+</pre>
+or 
+<pre>
+$a = rand(0,1)
 {
    $b = 1
-   $c = 3
-} if ($a==1)
+   $c = 2
+} if ($a==0)
 </pre>
 &quot;where&quot; can also be applied to a block of code:
 <pre>
@@ -1543,10 +1556,10 @@ can be omitted.</p>
 Single result randomizers:
 <ul>
 <li><b>rand(min,max)</b>:  Returns an integer between min and max</li>
-<li><b>rrand(min,max,p)</b>:  Returns an real number between min and max with precision p.  Example: rrand(2,5,.1) might return 3.4. 
-       rrand(2,5,.01) might return 3.27</li>
+<li><b>rrand(min,max,p)</b>:  Returns an number between min and max in steps of p.  Example: rrand(2,5,.1) might return 3.4. 
+       rrand(2,5,.01) might return 3.27.  rrand(2,8,2) might return 6</li>
 <li><b>nonzerorand(min,max)</b>:  Returns a nonzero integer between min and max</li>
-<li><b>nonzerorrand(min,max,p)</b>:  Returns a nonzero real number between min and max with precision p</li>
+<li><b>nonzerorrand(min,max,p)</b>:  Returns a nonzero real number between min and max in steps of p</li>
 <li><b>randfrom(list or array)</b>: Return an element of the list/array.  Examples of lists: &quot;2,4,6,8&quot;, or &quot;red,green,blue&quot;</li>
 <li><b>randname(),randmalename(),randfemalename()</b>:  Returns a random first name</li>
 </ul>
@@ -1554,16 +1567,16 @@ Single result randomizers:
 Array randomizers (return multiple results):
 <ul>
 <li><b>rands(min,max,n)</b>:  Returns n integers between min and max</li>
-<li><b>rrands(min,max,p,n)</b>:  Returns n real numbers between min and max with precision p</li>
+<li><b>rrands(min,max,p,n)</b>:  Returns n real numbers between min and max in steps of p</li>
 <li><b>nonzerorands(min,max,n)</b>:  Returns n nonzero integers between min and max</li>
-<li><b>nonzerorrands(min,max,p,n)</b>:  Returns n nonzero real numbers between min and max with precision p</li>
+<li><b>nonzerorrands(min,max,p,n)</b>:  Returns n nonzero real numbers between min and max in steps of p</li>
 <li><b>randsfrom(list/array,n)</b>: Return n elements of the list/array.</li>
 <li><b>jointrandfrom(list/array,list/array)</b>:  Returns one element from each list, where the location used in each list is the same</li>
 <li><b>diffrands(min,max,n)</b>:  Returns n different integers between min and max</li>
-<li><b>diffrrands(min,max,p,n)</b>:  Returns n different real numbers between min and max with precision p</li>
+<li><b>diffrrands(min,max,p,n)</b>:  Returns n different real numbers between min and max in steps of p</li>
 <li><b>diffrandsfrom(list/array,n)</b>: Return n different elements of the list/array.</li>
 <li><b>nonzerodiffrands(min,max,n)</b>:  Returns n different nonzero integers between min and max</li>
-<li><b>nonzerodiffrrands(min,max,p,n)</b>:  Returns n different nonzero real numbers between min and max with precision p</li>
+<li><b>nonzerodiffrrands(min,max,p,n)</b>:  Returns n different nonzero real numbers between min and max in steps of p</li>
 <li><b>jointshuffle(list/array1,list/array2,[n1,n2])</b>:  Shuffles two lists/arrays in a way that retains
     respective order.  In n1 is provided, n1 elements from each shuffled array will be returned (like
     a joint version of diffrandsfrom).  If n2 is also provided, n1 elements of list/array1 and n2 
@@ -2149,7 +2162,7 @@ None - the essay type is not computer graded.
 <dt>$displayformat = "editor" (In Common Control)</dt>
 	<dd>Use the rich text editor for the essay answer box.</dd>
 <dt>$answerbox (In Question Text)</dt>
-	<dd>Using the variable $answerbox in the Question Text will place the choice list in that location</dd>
+	<dd>Using the variable $answerbox in the Question Text will place the essay box in that location</dd>
 <dt>$showanswer (In Answer)</dt>
 	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
 	Use this to substitute a detailed answer.</dd>
@@ -2525,6 +2538,25 @@ rather than numbers, like [2/5,sqrt(8)].
 
 </div>
 <div class=h3>
+<h3><a name="fileupload">File Upload</a></h3>
+
+A student is asked to upload a file.  <b>The file upload type is not automatically graded</b>.  
+
+<p><b>Required Variables</b><BR>
+None - the file upload type is not computer graded.
+</p>
+<p><b>Optional Variables</b><BR>
+<dl>
+<dt>$answerbox (In Question Text)</dt>
+	<dd>Using the variable $answerbox in the Question Text will place the file upload box in that location</dd>
+<dt>$showanswer (In Answer)</dt>
+	<dd>The answer to show to students (if option if available).</dd>
+<dt>$hidetips = true (In Question Control)</dt>
+	<dd>Hides the question entry tips that display by default</dd>
+</dl>
+</p>
+</div>
+<div class=h3>
 <h3><a name="multipart">Multipart</a></h3>
 
 This type of question can contain multiple parts, where each part is one of the previous question types.
@@ -2552,6 +2584,7 @@ This type of question can contain multiple parts, where each part is one of the 
 	<li>Interval: "interval"</li>
 	<li>Calculated Interval: "calcinterval"</li>
 	<li>Essay: "essay"</li>
+	<li>File Upload: "file"</li>
 	<li>String: "string"</li>
 	</ul>
 	</dd>

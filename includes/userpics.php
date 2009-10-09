@@ -7,7 +7,6 @@
 // $thumbWidth and $thumbHeight are desired dimensions for the thumbnail
 function processImage( $image, $imageId, $thumbWidth, $thumbHeight )
 {
-	
     $type = $image[ 'type' ];
     $curdir = rtrim(dirname(__FILE__), '/\\');
     $galleryPath = "$curdir/../course/files/";
@@ -26,7 +25,10 @@ function processImage( $image, $imageId, $thumbWidth, $thumbHeight )
     }
     $createFunc = 'imagecreatefrom' . $type;
    
-    $im = $createFunc( $image[ 'tmp_name' ] ); 
+    $im = @$createFunc( $image[ 'tmp_name' ] );
+    if (!$im) {
+	    return;
+    }
     $size = getimagesize( $image[ 'tmp_name' ] );
     $w = $size[ 0 ];
     $h = $size[ 1 ];
@@ -63,4 +65,5 @@ function processImage( $image, $imageId, $thumbWidth, $thumbHeight )
     // save the image
    imagejpeg( $imT, $galleryPath . 'userimg_'.$imageId . '.jpg', 100 );
 }
+
 ?>
