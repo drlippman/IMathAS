@@ -554,7 +554,7 @@ if ($overwriteBody==1) {
 		</script>
 	</form>
 		
-	<p><input type=button value="Unenroll All Students" onclick="window.location='listusers.php?cid=<?php echo $cid ?>&action=unenroll&uid=all'"></p>
+
 	<div class=cp>
 		<a href="<?php echo $imasroot ?>/admin/importstu.php?cid=<?php echo $cid ?>">
 		Import Students from File</a><br/>

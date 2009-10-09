@@ -51,7 +51,8 @@
 		}
 		
 		if ($_GET['uid']=="all") {
-
+			$query = "SELECT iu.LastName,iu.FirstName,iu.SID FROM imas_users AS iu JOIN imas_students ON iu.id=imas_students.userid WHERE imas_students.courseid='$cid'";
+			$resultUserList = mysql_query($query) or die("Query failed : " . mysql_error());
 		} else if ($_GET['uid']=="selected") {
 
 			$ulist = "'".implode("','",$_POST['checked'])."'";
@@ -60,7 +61,7 @@
 			$query = "SELECT COUNT(id) FROM imas_students WHERE courseid='{$_GET['cid']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (count($_POST['checked']) > floor(mysql_result($result,0,0)/2)) {
-				$delForumMsg = "<p>Also delete <b>ALL</b> forum posts by ALL students (not just the selected ones)? <input type=checkbox name=\"delforumposts\"/></p>";
+				$delForumMsg = "<p>Also delete <b style=\"color:red;\">ALL</b> forum posts by ALL students (not just the selected ones)? <input type=checkbox name=\"delforumposts\"/></p>";
 			} else {
 				$delForumMsg = "";
 			}
@@ -83,7 +84,14 @@
 		
 			if ($_GET['uid']=="all") {
 ?>			
-			Are you SURE you want to unenroll ALL students?
+			<p>Are you SURE you want to unenroll ALL students?</p>
+			<ul>
+<?php
+					while ($row = mysql_fetch_row($resultUserList)) {
+						echo "			<li>{$row[0]}, {$row[1]} ({$row[2]})</li>";
+					}
+?>					
+		</ul>
 			<p>This will also clear all regular posts from all class forums</p>
 			<p>Also remove all offline grade items from gradebook? 
 				<input type=checkbox name="removeoffline" value="1" />
