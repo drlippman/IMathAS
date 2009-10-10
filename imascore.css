@@ -334,3 +334,9 @@ div.tips {
 	padding: 5px;
 }
 
+#headerlogo {
+	position: absolute; 
+	right:5px; 
+	top: 12px; 
+	cursor: pointer;
+}

@@ -112,16 +112,24 @@ function intcalculate(inputId,outputId) {
   fullstr = fullstr.replace(/\s+/g,'');
   if (fullstr.match(/DNE/i)) {
 	  fullstr = fullstr.toUpperCase();
+  } else if (fullstr=='') {
+	  fullstr = "no answer given";
   } else {
 	  var calcvals = new Array();
 	  var calcstrarr = new Array();
-	  strarr = fullstr.split(/U/);
+	  var strarr = fullstr.split(/U/);
+	  var isok = true;
 	  for (i=0; i<strarr.length; i++) {
 		  str = strarr[i];
 		  sm = str.charAt(0);
 		  em = str.charAt(str.length-1);
 		  vals = str.substring(1,str.length-1);
 		  vals = vals.split(/,/);
+		  if (vals.length != 2) {
+			  fullstr = "syntax incomplete";
+			  isok = false;
+			  break;
+		  }
 		  for (j=0; j<2; j++) {	
 			  if (vals[j].match(/oo$/) || vals[j].match(/oo\W/)) {
 				  calcvals[j] = vals[j];
@@ -146,7 +154,9 @@ function intcalculate(inputId,outputId) {
 		  strarr[i] = sm + vals[0] + ',' + vals[1] + em;
 		  calcstrarr[i] = sm + calcvals[0] + ',' + calcvals[1] + em;
 	 }
-	 fullstr = '`'+strarr.join('uu') + '` = ' + calcstrarr.join(' U ');
+	 if (isok) {
+		 fullstr = '`'+strarr.join('uu') + '` = ' + calcstrarr.join(' U ');
+	 }
   }
   
   

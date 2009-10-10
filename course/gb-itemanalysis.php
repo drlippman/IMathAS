@@ -202,6 +202,7 @@
 		include("../assessment/catscores.php");
 		catscores($qs,$avgscore,$defpoints);
 	}
+	echo "<p><a href=\"gb-aidexport.php?cid=$cid&amp;aid=$aid\">Export assessment results</a></p>";
 	require("../footer.php");
 	
 function getpts($sc) {

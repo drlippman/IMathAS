@@ -4,7 +4,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=7" />
 <title><?php echo $installname; if (isset($pagetitle)) { echo " - $pagetitle";}?></title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-<link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css";?>" type="text/css" />
+<link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=101009";?>" type="text/css" />
 <?php if (isset($coursetheme)) { ?>
 <link rel="stylesheet" href="<?php echo $imasroot . "/themes/$coursetheme";?>" type="text/css" />
 <?php } ?>
@@ -155,7 +155,7 @@ require_once("$curdir/filter/filter.php");
 if (!isset($nologo)) {
 	//echo '<img id="headerlogo" style="position: absolute; right: 5px; top: 5px;" src="/img/state_logo.gif" alt="logo"/>';
 	//echo '<img id="headerlogo" style="position: absolute; right: 5px; top: 12px;" src="/img/wamaplogosmall.gif" alt="logo"/>';
-	echo '<span id="headerlogo" style="position: absolute; right:5px; top: 12px; cursor: pointer;" ';
+	echo '<span id="headerlogo" ';
 	if ($myrights>10 && !$ispublic) {
 		echo 'onclick="mopen(\'homemenu\',';
 		if (isset($cid) && is_numeric($cid)) {
