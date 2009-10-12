@@ -121,7 +121,8 @@ while ($row = mysql_fetch_row($result)) {
 	$gbitems[$row[0]] = $row[1];
 }
 if (count($gbitems)==0) {
-	echo "<p>No offline grades.  <a href=\"addgrades.php?cid=$cid&gbitem=new&grades=all\">Add one</a></p>";
+	echo "<p>No offline grades.  <a href=\"addgrades.php?cid=$cid&gbitem=new&grades=all\">Add one</a> or ";
+	echo '<a href="uploadmultgrades.php?cid='.$cid.'">Upload multiple offline grades</a></p>';
 	require("../footer.php");
 	exit;
 }
@@ -137,7 +138,8 @@ foreach($gbitems as $id=>$name) {
 }
 ?>
 </ul>
-With selected, <input type="submit" name="submit" value="Delete"/> or make changes below
+<p>With selected, <input type="submit" name="submit" value="Delete"/> or make changes below<br/>
+<a href="uploadmultgrades.php?cid=<?php echo $cid; ?>">Upload multiple offline grades</a>
 <fieldset>
 <legend>Offline Grade Options</legend>
 <table class=gb>
