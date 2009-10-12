@@ -47,6 +47,11 @@ isread:
 	} else {
 		$filtercid = 0;
 	}
+	if (isset($_GET['filteruid'])) {
+		$filteruid = intval($_GET['filteruid']);
+	} else {
+		$filteruid = 0;
+	}
 	
 	if (isset($_GET['add'])) {
 		if (isset($_POST['subject'])) {
@@ -106,7 +111,7 @@ isread:
 			if ($cid>0) {
 				echo "<a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt;  ";
 			}
-			echo "<a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid\">Message List</a> &gt; ";
+			echo "<a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">Message List</a> &gt; ";
 			
 			echo "New Message</div>\n";
 			
@@ -237,11 +242,25 @@ isread:
 	if ($filtercid>0) {
 		$query .= " AND courseid='$filtercid'";
 	}
+	if ($filteruid>0) {
+		$query .= " AND msgfrom='$filteruid'";
+	}
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$numpages = ceil(mysql_result($result,0,0)/$threadsperpage);
+	if ($numpages==0 && $filteruid>0) {
+		//might have changed filtercid w/o changing user.
+		//we'll open up to all users then
+		$filteruid = 0;	
+		$query = "SELECT COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND (isread<2 OR isread>3)";
+		if ($filtercid>0) {
+			$query .= " AND courseid='$filtercid'";
+		}
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$numpages = ceil(mysql_result($result,0,0)/$threadsperpage);
+	}
 	
 	if ($numpages > 1) {
-		echo "<span class=\"right\" style=\"padding: 5px;\">Page: ";
+		echo "<div>Page: ";
 		if ($page < $numpages/2) {
 			$min = max(2,$page-4);
 			$max = min($numpages-1,$page+8+$min-$page);
@@ -252,30 +271,30 @@ isread:
 		if ($page==1) {
 			echo "<b>1</b> ";
 		} else {
-			echo "<a href=\"msglist.php?page=1&cid=$cid&filtercid=$filtercid\">1</a> ";
+			echo "<a href=\"msglist.php?page=1&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">1</a> ";
 		}
 		if ($min!=2) { echo " ... ";}
 		for ($i = $min; $i<=$max; $i++) {
 			if ($page == $i) {
 				echo "<b>$i</b> ";
 			} else {
-				echo "<a href=\"msglist.php?page=$i&cid=$cid&filtercid=$filtercid\">$i</a> ";
+				echo "<a href=\"msglist.php?page=$i&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">$i</a> ";
 			}
 		}
 		if ($max!=$numpages-1) { echo " ... ";}
 		if ($page == $numpages) {
 			echo "<b>$numpages</b> ";
 		} else {
-			echo "<a href=\"msglist.php?page=$numpages&cid=$cid&filtercid=$filtercid\">$numpages</a> ";
+			echo "<a href=\"msglist.php?page=$numpages&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">$numpages</a> ";
 		}
 		echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 		if ($page>1) {
-			echo "<a href=\"msglist.php?page=".($page-1)."&cid=$cid&filtercid=$filtercid\">Previous</a> ";
+			echo "<a href=\"msglist.php?page=".($page-1)."&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">Previous</a> ";
 		}
 		if ($page < $numpages) {
-			echo "<a href=\"msglist.php?page=".($page+1)."&cid=$cid&filtercid=$filtercid\">Next</a> ";
+			echo "<a href=\"msglist.php?page=".($page+1)."&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">Next</a> ";
 		}
-		echo "</span>\n";
+		echo "</div>\n";
 	}
 	$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/msglist.php?cid=$cid&filtercid=";
 	
@@ -290,7 +309,7 @@ isread:
 		}
 	}	
 	if ($cansendmsgs) {
-		echo "<a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid&add=new\">Send New Message</a>\n";
+		echo "<a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid&add=new\">Send New Message</a>\n";
 	}
 ?>
 <script type="text/javascript">
@@ -305,7 +324,8 @@ function chkAll(frm, arr, mark) {
 }
 function chgfilter() {
 	var filtercid = document.getElementById("filtercid").value;
-	window.location = "<?php echo $address;?>"+filtercid;
+	var filteruid = document.getElementById("filteruid").value;
+	window.location = "<?php echo $address;?>"+filtercid+"&filteruid="+filteruid;
 }
 var picsize = 0;
 function rotatepics() {
@@ -351,6 +371,26 @@ function picshow(size) {
 		}
 		echo " >{$row[1]}</option>";
 	}
+	echo "</select> ";
+	echo 'By sender: <select id="filteruid" onchange="chgfilter()"><option value="0" ';
+	if ($filteruid==0) {
+		echo 'selected="selected" ';
+	}
+	echo '>All</option>';
+	$query = "SELECT DISTINCT imas_users.id, imas_users.LastName, imas_users.FirstName FROM imas_users ";
+	$query .= "JOIN imas_msgs ON imas_msgs.msgfrom=imas_users.id WHERE imas_msgs.msgto='$userid'";
+	if ($filtercid>0) {
+		$query .= " AND imas_msgs.courseid='$filtercid'";
+	}
+	$query .= " ORDER BY imas_users.LastName, imas_users.FirstName";
+	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	while ($row = mysql_fetch_row($result)) {
+		echo "<option value=\"{$row[0]}\" ";
+		if ($filteruid==$row[0]) {
+			echo 'selected=1';
+		}
+		echo " >{$row[1]}, {$row[2]}</option>";
+	}
 	echo "</select></p>";
 	
 ?>
@@ -369,9 +409,13 @@ function picshow(size) {
 	$query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_users.LastName,imas_users.FirstName,imas_msgs.isread,imas_courses.name,imas_msgs.msgfrom ";
 	$query .= "FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom LEFT JOIN imas_courses ON imas_courses.id=imas_msgs.courseid WHERE ";
 	$query .= "imas_msgs.msgto='$userid' AND (imas_msgs.isread<2 OR imas_msgs.isread>3) ";
+	if ($filteruid>0) {
+		$query .= "AND imas_msgs.msgfrom='$filteruid' ";
+	} 
 	if ($filtercid>0) {
 		$query .= "AND imas_msgs.courseid='$filtercid' ";
 	}
+
 	$query .= "ORDER BY senddate DESC ";
 	$offset = ($page-1)*$threadsperpage;
 	$query .= "LIMIT $offset,$threadsperpage";// OFFSET $offset"; 
@@ -394,7 +438,7 @@ function picshow(size) {
 			$line['title'] = "Re<sup>$n</sup>: ".$line['title'];
 		}
 		echo "<tr><td><input type=checkbox name=\"checked[]\" value=\"{$line['id']}\"/></td><td>";
-		echo "<a href=\"viewmsg.php?page$page&cid=$cid&filtercid=$filtercid&type=msg&msgid={$line['id']}\">";
+		echo "<a href=\"viewmsg.php?page$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid&type=msg&msgid={$line['id']}\">";
 		if ($line['isread']==0 || $line['isread']==4) {
 			echo "<b>{$line['title']}</b>";
 		} else {
@@ -425,7 +469,7 @@ function picshow(size) {
 	</form>
 <?php
 	if ($cansendmsgs) {
-		echo "<p><a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid&add=new\">Send New Message</a></p>\n";
+		echo "<p><a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid&add=new\">Send New Message</a></p>\n";
 	}
 	echo "<p><a href=\"sentlist.php?cid=$cid\">Sent Messages</a></p>";
 	

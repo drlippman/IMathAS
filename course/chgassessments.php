@@ -148,6 +148,10 @@ if (!(isset($teacherid))) {
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$row = mysql_fetch_row($result);
 			$sets[] = "startdate='{$row[0]}',enddate='{$row[1]}',reviewdate='{$row[2]}'";
+		} if (isset($_POST['chgcopyendmsg'])) {
+			$query = "SELECT endmsg FROM imas_assessments WHERE id='{$_POST['copyendmsg']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$sets[] = "endmsg='".addslashes(mysql_result($result,0,0))."'";
 		}
 			
 		if ($turnonshuffle!=0 || $turnoffshuffle!=0) {
@@ -312,6 +316,16 @@ function chkAll(frm, arr, mark) {
 <?php
 	writeHtmlSelect("dates",$page_assessSelect['val'],$page_assessSelect['label']);
 ?>
+				</td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" name="chgcopyendmsg"/></td>
+				<td class="r">End of Assessment Messages:</td>
+				<td>Copy from:
+<?php
+	writeHtmlSelect("copyendmsg",$page_assessSelect['val'],$page_assessSelect['label']);
+?>
+				<br/><i style="font-size: 75%">Use option near the bottom to define new messages</i>
 				</td>
 			</tr>
 			<tr>

@@ -43,6 +43,19 @@ if (!(isset($teacherid))) {
 			$pts = intval($_POST["colpts$col"]);
 			$cnt = $_POST["colcnt$col"];
 			$gbcat = $_POST["colgbcat$col"];
+			if ($_POST["coloverwrite$col"]>0) {
+				//we're going to check that this id really belongs to this course.  Don't want cross-course hacking :)
+				$query = "SELECT id FROM imas_gbitems WHERE id='{$_POST["coloverwrite$col"]}' AND courseid='$cid'";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				if (mysql_num_rows($result)>0) { //if this fails, we'll end up creating a new item
+					$gbitemid[$col] = mysql_result($result,0,0);
+					//delete old grades
+					//$query = "DELETE FROM imas_grades WHERE gbitemid={$gbitemid[$col]}";
+					//mysql_query($query) or die("Query failed : " . mysql_error());
+					$gradestodel[$col] = array();
+					continue;
+				}
+			}
 			$query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit) VALUES ";
 			$query .= "('$cid','$name','$pts',$showdate,'$gbcat','$cnt',0) ";
 			//echo "$query <br/>";
@@ -76,8 +89,18 @@ if (!(isset($teacherid))) {
 					} else {
 						$feedback = '';
 					}
+					if (isset($gradestodel[$col])) {
+						$gradestodel[$col][] = $stu;
+					}
 					$adds[] = "($gid,$stu,$score,'$feedback')";
 				}
+			}
+			fclose($handle);
+			//delete any data we're overwriting
+			foreach ($gradestodel as $col=>$stus) {
+				$stulist = implode(',',$stus);
+				$query = "DELETE FROM imas_grades WHERE gbitemid={$gbitemid[$col]} AND userid IN ($stulist)";
+				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 			//now we load in the data!
 			if (count($adds)>0) {
@@ -91,6 +114,7 @@ if (!(isset($teacherid))) {
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/chgoffline.php?cid=$cid");
 		exit;
 	} else if (isset($_FILES['userfile']['name']) && $_FILES['userfile']['name']!='') {
+		//upload file
 		if (is_uploaded_file($_FILES['userfile']['tmp_name'])) {
 			$k = 0;
 			while (file_exists($dir . "upload$k.csv")) {
@@ -98,13 +122,16 @@ if (!(isset($teacherid))) {
 			}
 			$uploadfile = "upload$k.csv";
 			if (move_uploaded_file($_FILES['userfile']['tmp_name'], $dir.$uploadfile)) {
+				//parse out header info
 				$page_fileHiddenInput = '<input type="hidden" name="thefile" value="'.$uploadfile.'" />';
 				$handle = fopen($dir.$uploadfile,'r');
 				$hrow = fgetcsv($handle,4096);
 				$columndata = array();
+				$names = array();
 				if ($_POST['headerrows']==2) {
 					$srow = fgetcsv($handle,4096);
 				}
+				fclose($handle);
 				for ($i=0; $i<count($hrow); $i++) {
 					if ($hrow[$i]=='Username') {
 						$usernamecol = $i;
@@ -114,19 +141,40 @@ if (!(isset($teacherid))) {
 						$columndata[$i-1][2] = $i;
 					} else {
 						if (isset($srow[$i])) {
+							$p = explode(':',$hrow[$i]);
+							if (count($p)>1) {
+								$names[$i] = $p[0];
+							} else {
+								$names[$i] = $hrow[$i];
+							}
 							$pts = intval(preg_replace('/[^\d\.]/','',$srow[$i]));
 							//if ($pts==0) {$pts = '';}
 						} else {
 							$p = explode(':',$hrow[$i]);
 							if (count($p)>1) {
 								$pts = intval(preg_replace('/[^\d\.]/','',$p[count($p)-1]));
+								$names[$i] = $p[0];
 							} else {
 								$pts = 0;
+								$names[$i] = $hrow[$i];
 							}
 							//if ($pts==0) {$pts = '';}
 						}
-						$columndata[$i] = array($hrow[$i],$pts,-1);
+						$columndata[$i] = array($names[$i],$pts,-1,0);
 					}
+				}
+				//look to see if any of these names have been used before
+				foreach ($names as $k=>$n) {
+					//prep for db use
+					$names[$k] = addslashes($n);  
+				}
+				$namelist = "'".implode("','",$names)."'";
+				$query = "SELECT id,name FROM imas_gbitems WHERE name IN ($namelist) AND courseid='$cid'";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				while ($row = mysql_fetch_row($result)) {
+					$loc = array_search($row[1],$names);
+					if ($loc===false) {continue; } //shouldn't happen
+					$columndata[$loc][3] = $row[0];  //store existing gbitems.id 
 				}
 				if (!isset($usernamecol)) {
 					$usernamecol = 1;
@@ -164,6 +212,18 @@ if ($overwriteBody==1) {
 		$sdate = tzdate("m/d/Y",time());
 		$stime = tzdate("g:i a",time());
 	?>
+		<script type="text/javascript">
+		function chkAll(frm, arr, mark) {
+		  for (i = 0; i <= frm.elements.length; i++) {
+		   try{
+		     if(frm.elements[i].name == arr) {
+		       frm.elements[i].checked = mark;
+		     }
+		   } catch(er) {}
+		  }
+		}
+		</script>
+		
 		<span class=form>Username is in column:</span>
 		<span class=formright><input type=text name="sidcol" size=4 value="<?php echo $usernamecol+1; ?>"></span><br class=form />
 		<span class=form>Show grade to students after:</span><span class=formright><input type=radio name="sdatetype" value="0" <?php if ($showdate=='0') {echo "checked=1";}?>/> Always<br/>
@@ -171,9 +231,12 @@ if ($overwriteBody==1) {
 		<a href="#" onClick="displayDatePicker('sdate', this); return false"><img src="../img/cal.gif" alt="Calendar"/></A>
 		at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR class=form>
 
+		<p>Check/Uncheck All: 
+		<input type="checkbox" name="ca" value="1" onClick="chkAll(this.form, 'addcol[]', this.checked)"></p>
+
 		<table class="gb">
 		<thead>
-		  <tr><th>In column</th><th>Add this?</th><th>Name</th><th>Points</th><th>Count?</th><th>Gradebook Category</th><th>Feedback in column<br/>(blank for none)</th></tr>
+		  <tr><th>In column</th><th>Load this?</th><th>Overwrite?</th><th>Name</th><th>Points</th><th>Count?</th><th>Gradebook Category</th><th>Feedback in column<br/>(blank for none)</th></tr>
 		</thead>
 		<tbody>
 	<?php
@@ -188,6 +251,13 @@ if ($overwriteBody==1) {
 		foreach ($columndata as $col=>$data) {
 			echo '<tr><td>'.($col+1).'</td>';
 			echo '<td><input type="checkbox" name="addcol[]" value="'.$col.'" /></td>';
+			echo '<td><select name="coloverwrite'.$col.'"><option value="0" ';
+			if ($data[3]==0) {echo 'selected="selected"';}
+			echo '>Add as new item</option>';
+			if ($data[3]>0) {
+				echo '<option value="'.$data[3].'" selected="selected">Overwrite existing scores</option>';
+			}
+			echo '</select></td>';
 			echo '<td><input type="text" size="20" name="colname'.$col.'" value="'.htmlentities($data[0]).'" /></td>';
 			echo '<td><input type="text" size="3" name="colpts'.$col.'"  value="'.$data[1].'" /></td>';
 			echo '<td><select name="colcnt'.$col.'">';
@@ -201,6 +271,7 @@ if ($overwriteBody==1) {
 		}
 		echo '</tbody></table>';
 		echo '<p><input type="submit" value="Upload" /></p>';
+		echo '<p>Note:  If you choose to overwrite existing scores, it will replace existing scores with any non-blank scores in your upload.</p>';
 	} else {
 		//need file
 	?>
@@ -220,6 +291,7 @@ if ($overwriteBody==1) {
 		</span><br class=form />
 		<div class=submit><input type=submit value="Continue"></div>
 		</p>
+		
 	<?php
 	}
 	echo '</form>';

@@ -30,6 +30,11 @@
 	} else {
 		$filtercid = 0;
 	}
+	if (isset($_GET['filteruid'])) {
+		$filteruid = intval($_GET['filteruid']);
+	} else {
+		$filteruid = 0;
+	}
 	/*
 isread:
 # to  frm
@@ -76,11 +81,25 @@ isread:
 	if ($filtercid>0) {
 		$query .= " AND courseid='$filtercid'";
 	}
+	if ($filteruid>0) {
+		$query .= " AND msgto='$filteruid'";
+	}
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$numpages = ceil(mysql_result($result,0,0)/$threadsperpage);
+	if ($numpages==0 && $filteruid>0) {
+		//might have changed filtercid w/o changing user.
+		//we'll open up to all users then
+		$filteruid = 0;	
+		$query = "SELECT COUNT(id) FROM imas_msgs WHERE msgfrom='$userid' AND isread<4";
+		if ($filtercid>0) {
+			$query .= " AND courseid='$filtercid'";
+		}
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$numpages = ceil(mysql_result($result,0,0)/$threadsperpage);
+	}
 	
 	if ($numpages > 1) {
-		echo "<div style=\"padding: 5px;\">Page: ";
+		echo "<div>Page: ";
 		if ($page < $numpages/2) {
 			$min = max(2,$page-4);
 			$max = min($numpages-1,$page+8+$min-$page);
@@ -91,28 +110,28 @@ isread:
 		if ($page==1) {
 			echo "<b>1</b> ";
 		} else {
-			echo "<a href=\"sentlist.php?page=1&cid=$cid&filtercid=$filtercid\">1</a> ";
+			echo "<a href=\"sentlist.php?page=1&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">1</a> ";
 		}
 		if ($min!=2) { echo " ... ";}
 		for ($i = $min; $i<=$max; $i++) {
 			if ($page == $i) {
 				echo "<b>$i</b> ";
 			} else {
-				echo "<a href=\"sentlist.php?page=$i&cid=$cid&filtercid=$filtercid\">$i</a> ";
+				echo "<a href=\"sentlist.php?page=$i&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">$i</a> ";
 			}
 		}
 		if ($max!=$numpages-1) { echo " ... ";}
 		if ($page == $numpages) {
 			echo "<b>$numpages</b> ";
 		} else {
-			echo "<a href=\"sentlist.php?page=$numpages&cid=$cid&filtercid=$filtercid\">$numpages</a> ";
+			echo "<a href=\"sentlist.php?page=$numpages&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">$numpages</a> ";
 		}
 		echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 		if ($page>1) {
-			echo "<a href=\"sentlist.php?page=".($page-1)."&cid=$cid&filtercid=$filtercid\">Previous</a> ";
+			echo "<a href=\"sentlist.php?page=".($page-1)."&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">Previous</a> ";
 		}
 		if ($page < $numpages) {
-			echo "<a href=\"sentlist.php?page=".($page+1)."&cid=$cid&filtercid=$filtercid\">Next</a> ";
+			echo "<a href=\"sentlist.php?page=".($page+1)."&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">Next</a> ";
 		}
 		echo "</div>\n";
 	}
@@ -132,7 +151,8 @@ function chkAll(frm, arr, mark) {
 }
 function chgfilter() {
 	var filtercid = document.getElementById("filtercid").value;
-	window.location = "<?php echo $address;?>"+filtercid;
+	var filteruid = document.getElementById("filteruid").value;
+	window.location = "<?php echo $address;?>"+filtercid+"&filteruid="+filteruid;
 }
 </script>	
 	<form method=post action="sentlist.php?page=<?php echo $page;?>&cid=<?php echo $cid;?>">
@@ -153,6 +173,26 @@ function chgfilter() {
 		}
 		echo " >{$row[1]}</option>";
 	}
+	echo "</select> ";
+	echo 'By recipient: <select id="filteruid" onchange="chgfilter()"><option value="0" ';
+	if ($filteruid==0) {
+		echo 'selected="selected" ';
+	}
+	echo '>All</option>';
+	$query = "SELECT DISTINCT imas_users.id, imas_users.LastName, imas_users.FirstName FROM imas_users ";
+	$query .= "JOIN imas_msgs ON imas_msgs.msgto=imas_users.id WHERE imas_msgs.msgfrom='$userid'";
+	if ($filtercid>0) {
+		$query .= " AND imas_msgs.courseid='$filtercid'";
+	}
+	$query .= " ORDER BY imas_users.LastName, imas_users.FirstName";
+	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	while ($row = mysql_fetch_row($result)) {
+		echo "<option value=\"{$row[0]}\" ";
+		if ($filteruid==$row[0]) {
+			echo 'selected=1';
+		}
+		echo " >{$row[1]}, {$row[2]}</option>";
+	}
 	echo "</select></p>";
 ?>
 	Check/Uncheck All: <input type="checkbox" name="ca2" value="1" onClick="chkAll(this.form, 'checked[]', this.checked)">	
@@ -169,6 +209,9 @@ function chgfilter() {
 	if ($filtercid>0) {
 		$query .= "AND imas_msgs.courseid='$filtercid' ";
 	}
+	if ($filteruid>0) {
+		$query .= "AND imas_msgs.msgto='$filteruid' ";
+	} 
 	$query .= " ORDER BY senddate DESC ";
 	$offset = ($page-1)*$threadsperpage;
 	$query .= "LIMIT $offset,$threadsperpage";// OFFSET $offset"; 
@@ -191,7 +234,7 @@ function chgfilter() {
 			$line['title'] = "Re<sup>$n</sup>: ".$line['title'];
 		}
 		echo "<tr><td><input type=checkbox name=\"checked[]\" value=\"{$line['id']}\"/></td><td>";
-		echo "<a href=\"viewmsg.php?page$page&cid=$cid&filtercid=$filtercid&type=sent&msgid={$line['id']}\">";
+		echo "<a href=\"viewmsg.php?page$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid&type=sent&msgid={$line['id']}\">";
 		echo $line['title'];
 		echo "</a></td>";
 		echo "<td>{$line['LastName']}, {$line['FirstName']}</td>";
