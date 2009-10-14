@@ -707,7 +707,13 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		}
 		$tip .= formathint($eword,$ansformats,'calculated');
 		if (isset($answer)) {
-			$sa = $answer;
+			if (in_array('mixednumber',$ansformats) || in_array("sloppymixednumber",$ansformats)) {
+				$sa = '`'.decimaltofraction($answer,"mixednumber").'`';
+			} else if (in_array("fraction",$ansformats) || in_array("reducedfraction",$ansformats)) {
+				$sa = '`'.decimaltofraction($answer).'`';
+			} else {
+				$sa = $answer;
+			}
 		}
 	} else if ($anstype == "matrix") {
 		if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$qn];} else {$ansprompt = $options['ansprompt'];}}

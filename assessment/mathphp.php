@@ -264,4 +264,49 @@ function coth($x) {
 	return (1/tanh($x));
 }
 
+function decimaltofraction($d,$format="fraction",$maxden = 5000) {
+	if (floor($d)==$d) {
+		return floor($d);
+	}
+	$numerators = array(0, 1);
+	$denominators = array(1, 0);
+	
+	$d2 = $d;
+	$calcD = -1;
+	$prevCalcD = -1;
+	for ($i = 2; $i < 1000; $i++)  {
+		$L2 = floor($d2);
+		$numerators[$i] = $L2 * $numerators[$i-1] + $numerators[$i-2];
+		//if (Math.abs(numerators[i]) > maxNumerator) return;
+		$denominators[$i] = $L2 * $denominators[$i-1] + $denominators[$i-2];
+		if (abs($denominators[$i])>$maxden) {
+			break;
+		}
+		$calcD = $numerators[$i] / $denominators[$i];
+		if ($calcD == $prevCalcD) { break; }
+	
+		//appendFractionsOutput(numerators[i], denominators[i]);
+	
+		if ($calcD == $d) { break;}
+	
+		$prevCalcD = $calcD;
+	
+		$d2 = 1/($d2-$L2);
+	}
+	if (abs($numerators[$i]/$denominators[$i] - $d)>1e-9) {
+		return $d;
+	}
+	if ($format=="mixednumber") {
+		$w = floor($numerators[$i]/$denominators[$i]);
+		if ($w>0) {
+			$n = $numerators[$i] - $w*$denominators[$i];
+			return "$w $n/".$denominators[$i];
+		} else {
+			return $numerators[$i].'/'.$denominators[$i];
+		}
+	} else {
+		return $numerators[$i].'/'.$denominators[$i];
+	}
+}
+
 ?>
