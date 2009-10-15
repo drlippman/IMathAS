@@ -87,6 +87,19 @@ if (($isteacher || $istutor) && isset($_GET['stu'])) {
 
 //HANDLE ANY POSTS
 if ($isteacher) {
+	if (isset($_GET['togglenewflag'])) {
+		//recording a toggle.  Called via AHAH
+		$query = "SELECT newflag FROM imas_courses WHERE id='$cid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$newflag = mysql_result($result,0,0);
+		$newflag = $newflag ^ 1;  //XOR
+		$query = "UPDATE imas_courses SET newflag = $newflag WHERE id='$cid'";
+		mysql_query($query) or die("Query failed : " . mysql_error());
+		if (($newflag&1)==1) {
+			echo 'New';
+		} 
+		exit;
+	}
 	if ((isset($_POST['submit']) && ($_POST['submit']=="E-mail" || $_POST['submit']=="Message"))|| isset($_GET['masssend']))  {
 		$calledfrom='gb';
 		include("masssend.php");
@@ -129,6 +142,11 @@ if ($isteacher || $istutor) {
 		
 		$placeinhead .= "       var toopen = '$address&secfilter=' + sec;\n";
 		$placeinhead .= "  	window.location = toopen; \n";
+		$placeinhead .= "}\n";
+		$placeinhead .= 'function chgnewflag() { ';
+		$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid&togglenewflag=true";
+		
+		$placeinhead .= "       basicahah('$address','newflag','Recording...');\n";
 		$placeinhead .= "}\n";
 	}
 	$placeinhead .= 'function chgtoggle() { ';
@@ -280,7 +298,11 @@ if (isset($studentid) || $stu!=0) { //show student view
 	echo "&gt; Gradebook</div>";
 	echo "<form method=post action=\"gradebook.php?cid=$cid\">";
 	
-	echo "<span class=\"hdr1\">Grade Book </span>";
+	echo '<span class="hdr1">Grade Book </span><span class="red" id="newflag">';
+	if (($coursenewflag&1)==1) {
+		echo 'New';
+	}
+	echo '</span>';
 	if ($isdiag) {
 		echo "<a href=\"gb-testing.php?cid=$cid\">View diagnostic gradebook</a>";
 	}
@@ -305,6 +327,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 			echo "Lock headers";
 		}
 		echo "\"/>";
+		echo ' | <a href="#" onclick="chgnewflag(); return false;">NewFlag</a>';
 		//echo '<input type="button" value="Pics" onclick="rotatepics()" />';
 		echo "<br/>\n";
 	}
@@ -353,6 +376,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 		}
 		echo "\"/>\n";	
 	}
+	
 	echo "</div>";
 	
 	if ($isteacher) {

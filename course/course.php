@@ -355,7 +355,7 @@ if ($overwriteBody==1) {
 			<a href="<?php echo $imasroot ?>/forums/forums.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>">
 			Forums</a> <?php echo $newpostscnt ?><br/>
 			<a href="listusers.php?cid=<?php echo $cid ?>">Students</a><br/>
-			<a href="gradebook.php?cid=<?php echo $cid ?>">Gradebook</a><br/>
+			<a href="gradebook.php?cid=<?php echo $cid ?>">Gradebook</a> <?php if (($coursenewflag&1)==1) {echo '<span class="red">New</span>';}?><br/>
 			<a href="course.php?cid=<?php echo $cid ?>&stuview=0">Student View</a><br/>
 			<a href="course.php?cid=<?php echo $cid ?>&quickview=on">Quick View</a><br/>
 			<a href="showcalendar.php?cid=<?php echo $cid ?>">Calendar</a>
@@ -472,7 +472,7 @@ if ($overwriteBody==1) {
 		<span class=column>
 			<?php echo generateadditem($_GET['folder'], 'BB') ?>
 			<a href="listusers.php?cid=<?php echo $cid ?>">List Students</a><br/>
-			<a href="gradebook.php?cid=<?php echo $cid ?>">Show Gradebook</a><br/>
+			<a href="gradebook.php?cid=<?php echo $cid ?>">Show Gradebook</a> <?php if (($coursenewflag&1)==1) {echo '<span class="red">New</span>';}?><br/>
 			<a href="course.php?cid=<?php echo $cid ?>&stuview=0">Student View</a><br/>
 			<a href="course.php?cid=<?php echo $cid ?>&quickview=on">Quick View</a></span>
 			<span class=column>
@@ -514,7 +514,7 @@ if ($overwriteBody==1) {
 	   if (!isset($teacherid)) {
 ?>
 	<a href="showcalendar.php?cid=<?php echo $cid ?>">Calendar</a><br />
-	<a href="gradebook.php?cid=<?php echo $cid ?>">Gradebook</a><br/>
+	<a href="gradebook.php?cid=<?php echo $cid ?>">Gradebook</a> <?php if (($coursenewflag&1)==1) {echo '<span class="red">New</span>';}?><br/>
 	<a href="../actions.php?action=logout">Log Out</a><br/>   
 	<a href="<?php echo $imasroot ?>/help.php?section=usingimas">Help Using <?php echo $installname;?></a><br/> 
 <?php		  
@@ -563,6 +563,7 @@ function makeTopMenu() {
 	global $newmsgs;
 	global $quickview;
 	global $newpostscnt;
+	global $coursenewflag;
 	
 	if (isset($teacherid) && $quickview=='on') {
 		echo "<div class=breadcrumb>";
@@ -571,6 +572,11 @@ function makeTopMenu() {
 		 echo '<span id="submitnotice" style="color:red;"></span>';
 		 echo '</div>';
 		
+	}
+	if (($coursenewflag&1)==1) {
+		$gbnewflag = ' <span class="red">New</span>';
+	} else {
+		$gbnewflag = '';
 	}
 	if (isset($teacherid) && count($topbar[1])>0) {
 		echo '<div class=breadcrumb>';
@@ -584,7 +590,7 @@ function makeTopMenu() {
 			echo "<a href=\"course.php?cid=$cid&stuview=0\">Student View</a> &nbsp; ";
 		}
 		if (in_array(2,$topbar[1])) { //Gradebook
-			echo "<a href=\"gradebook.php?cid=$cid\">Show Gradebook</a> &nbsp; ";
+			echo "<a href=\"gradebook.php?cid=$cid\">Show Gradebook</a>$gbnewflag &nbsp; ";
 		}
 		if (in_array(3,$topbar[1])) { //List stu
 			echo "<a href=\"listusers.php?cid=$cid\">List Students</a> &nbsp; \n";
@@ -609,7 +615,7 @@ function makeTopMenu() {
 			echo "<a href=\"$imasroot/forums/forums.php?cid=$cid\">Forums</a>$newpostscnt &nbsp; ";
 		}
 		if (in_array(1,$topbar[0])) { //Gradebook
-			echo "<a href=\"gradebook.php?cid=$cid\">Show Gradebook</a> &nbsp; ";
+			echo "<a href=\"gradebook.php?cid=$cid\">Show Gradebook</a>$gbnewflag &nbsp; ";
 		}
 		if (in_array(2,$topbar[0])) { //Calendar
 			echo "<a href=\"showcalendar.php?cid=$cid\">Calendar</a> &nbsp; \n";

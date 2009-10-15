@@ -306,17 +306,19 @@ END;
 		
 			}
 		}
-		$query = "SELECT imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme ";
+		$query = "SELECT imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme,imas_courses.newflag ";
 		$query .= "FROM imas_courses,imas_users WHERE imas_courses.id='{$_GET['cid']}' AND imas_users.id=imas_courses.ownerid";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		if (mysql_num_rows($result)>0) {
-			$coursename = mysql_result($result,0,0);
-			$coursetheme = mysql_result($result,0,5);
-			if (isset($studentid) && $previewshift==-1 && (mysql_result($result,0,1)&1)==1) {
+			$crow = mysql_fetch_row($result);
+			$coursename = $crow[0]; //mysql_result($result,0,0);
+			$coursetheme = $crow[5]; //mysql_result($result,0,5);
+			$coursenewflag = $crow[6]; //mysql_result($result,0,6);
+			if (isset($studentid) && $previewshift==-1 && (($crow[1])&1)==1) {
 				echo "This course is not available at this time";
 				exit;
 			}
-			$lockaid = mysql_result($result,0,2);
+			$lockaid = $crow[2]; //ysql_result($result,0,2);
 			if (isset($studentid) && $lockaid>0) {
 				if (strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) {
 					header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid={$_GET['cid']}&id=$lockaid");
@@ -324,14 +326,14 @@ END;
 				}
 			}
 			unset($lockaid);
-			if ($myrights==75 && !isset($teacherid) && !isset($studentid) && mysql_result($result,0,4)==$groupid) {
+			if ($myrights==75 && !isset($teacherid) && !isset($studentid) && $crow[4]==$groupid) {
 				//group admin access
 				$teacherid = $userid;
 				$adminasteacher = true;
 			} else if ($myrights>19 && !isset($teacherid) && !isset($studentid) && !isset($tutorid) && $previewshift==-1) {
-				if (mysql_result($result,0,3)==2) {
+				if ($crow[3]==2) {
 					$guestid = $userid;
-				} else if (mysql_result($result,0,3)==1 && mysql_result($result,0,4)==$groupid) {
+				} else if ($crow[3]==1 && $crow[4]==$groupid) {
 					$guestid = $userid;
 				}
 			}

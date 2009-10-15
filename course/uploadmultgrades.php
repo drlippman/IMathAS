@@ -37,6 +37,7 @@ if (!(isset($teacherid))) {
 		} else {
 			$showdate = parsedatetime($_POST['sdate'],$_POST['stime']);
 		}
+		$gradestodel = array();
 		foreach ($coltoadd as $col) {
 			if (trim($_POST["colname$col"])=='') {continue;}
 			$name = trim($_POST["colname$col"]);
@@ -98,9 +99,11 @@ if (!(isset($teacherid))) {
 			fclose($handle);
 			//delete any data we're overwriting
 			foreach ($gradestodel as $col=>$stus) {
-				$stulist = implode(',',$stus);
-				$query = "DELETE FROM imas_grades WHERE gbitemid={$gbitemid[$col]} AND userid IN ($stulist)";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				if (count($stus)>0) {
+					$stulist = implode(',',$stus);
+					$query = "DELETE FROM imas_grades WHERE gbitemid={$gbitemid[$col]} AND userid IN ($stulist)";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+				}
 			}
 			//now we load in the data!
 			if (count($adds)>0) {
