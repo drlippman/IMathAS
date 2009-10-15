@@ -121,6 +121,9 @@
 	if ($isteacher) {
 		echo '<input type="button" class="btn" onclick="rendersa()" value="Show Answers" />';
 	}
+	if ($testsettings['showans']=='N') {
+		$lastanswers = array_fill(0,count($questions),'');
+	}
 	for ($i = 0; $i < count($questions); $i++) {
 		list($qsetid,$cat) = getqsetid($questions[$i]);
 		

@@ -969,7 +969,7 @@
 					if ($lefttodo == 0) {
 						echo "<a href=\"showtest.php?action=skip&amp;done=true\">Click here to finalize and score test</a>\n";
 					}
-					if (!$reattemptsremain && $showeachscore) {
+					if (!$reattemptsremain && $testsettings['showans']!='N') {// && $showeachscore) {
 						echo "<p>Question with last attempt is displayed for your review only</p>";
 						
 						$qshowans = ((($showansafterlast && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='F' || $qi[$questions[$next]]['showans']=='J') || ($showansduring && $qi[$questions[$next]]['showans']=='0' && $attempts[$next]>=$testsettings['showans']));
