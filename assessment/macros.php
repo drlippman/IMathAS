@@ -4,7 +4,7 @@
 
 
 array_push($allowedmacros,"exp","sec","csc","cot","sech","csch","coth","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif","in_array","prettyint","prettyreal","arraystodots","subarray","showdataarray","arraystodoteqns","array_flip","arrayfindindex","fillarray","array_reverse");
-array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction");
+array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction","ifthen","multicalconarray");
 function mergearrays($a,$b) {
 	if (!is_array($a)) {
 		$a = array($a);
@@ -108,11 +108,14 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			$yfunc = mathphp($yfunc,"t");
 			$yfunc = str_replace("(t)",'($t)',$yfunc);
 			array_shift($function);
+			$evalxfunc = create_function('$t','return('.$xfunc.');');
+			$evalyfunc = create_function('$t','return('.$yfunc.');');
 		} else {
 			$isparametric = false;
 			$func = makepretty($function[0]);
 			$func = mathphp($func,"x");
 			$func = str_replace("(x)",'($x)',$func);
+			$evalfunc = create_function('$x','return('.$func.');');
 		}
 		
 		//even though ASCIIsvg has a plot function, we'll calculate it here to hide the function
@@ -174,14 +177,14 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			if ($isparametric) {
 				$t = $xmin + $dx*$i + 1E-10;
 				if (in_array($t,$avoid)) { continue;}
-				$x = round(eval("return ($xfunc);"),3);
-				$y = round(eval("return ($yfunc);"),3);
+				$x = round($evalxfunc($t),3);//round(eval("return ($xfunc);"),3);
+				$y = round($evalyfunc($t),3);//round(eval("return ($yfunc);"),3);
 				$alt .= "<tr><td>$x</td><td>$y</td></tr>";
 			} else {
 				$x = $xmin + $dx*$i + 1E-10 - ($domainlimited?0:5*($xmax-$xmin)/$settings[6]);
 				if (in_array($x,$avoid)) { continue;}
 				//echo $func.'<br/>';
-				$y = round(eval("return ($func);"),3);
+				$y = round($evalfunc($x),3);//round(eval("return ($func);"),3);
 				$alt .= "<tr><td>".($xmin + $dx*$i)."</td><td>$y</td></tr>";
 			}
 			
@@ -903,8 +906,12 @@ function listtoarray($l) {
 }
 
 
-function arraytolist($a) {
-	return (implode(',',$a));
+function arraytolist($a, $sp=false) {
+	if ($sp) {
+		return (implode(', ',$a));
+	} else {
+		return (implode(',',$a));
+	}
 }
 
 function joinarray($a,$s) {
@@ -915,7 +922,6 @@ function joinarray($a,$s) {
 function calclisttoarray($l) {
 	$l = explode(",",$l);
 	foreach ($l as $k=>$tocalc) {
-		$l[$k] = mathphp($tocalc,null);
 		eval('$l[$k] = ' . mathphp($tocalc,null).';');
 	}
 	return $l;
@@ -991,7 +997,7 @@ function makereducedfraction($n,$d,$dblslash=false) {
 
 //use: calconarray($a,"x^$p")
 function calconarray($array,$todo) {
-	global $disallowedwords,$allowedmacros;
+	/*global $disallowedwords,$allowedmacros;
 	$todo = str_replace($disallowedwords,"",$todo);
 	$todo = clean($todo);
 	$rsnoquote = preg_replace('/"[^"]*"/','""',$todo);
@@ -1006,14 +1012,51 @@ function calconarray($array,$todo) {
 			}
 		}
 	}
+	*/
 	$todo = mathphp($todo,'x',false,false);
 	$todo = str_replace('(x)','($x)',$todo);
 	return array_map(create_function('$x','return('.$todo.');'),$array);	
 }
 
+function multicalconarray() {
+	global $disallowedvar;
+	$args = func_get_args();
+	$nargs = count($args);
+	$todo = array_shift($args);
+	$vars = array_shift($args);
+	$vars = explode(',',$vars);
+	if ($nargs-2 != count($vars)) {
+		echo "incorrect number of data arrays";
+		return false;
+	}
+		
+	$todo = mathphp($todo,implode('|',$vars),false,false);
+
+	foreach ($vars as $k=>$var) {
+		$todo = str_replace("($var)","(\$$var)",$todo);
+		if (in_array('$'.$var,$disallowedvar) || substr($var,0,7)=='GLOBALS') {
+			echo "disallowed variable name";
+			return false;
+		}
+	}
+	$varlist = '$'.implode(',$',$vars);
+	$evalstr = "return(array_map(create_function('$varlist','return($todo);')";
+	$cnt = count($args[0]);
+	for ($i=0; $i<count($args); $i++) {
+		$evalstr .= ',$args['.$i.']';
+		if (count($args[$i])!=$cnt) {
+			echo "unequal element count in arrays";
+			return false;
+		}
+	}
+	$evalstr .= '));';
+	return eval($evalstr);	
+}
+
+
 //use: calconarray($a,"x + .01","floor(x)==x")
 function calconarrayif($array,$todo,$ifcond) {
-	global $disallowedwords,$allowedmacros;
+	/*global $disallowedwords,$allowedmacros;
 	$todo = str_replace($disallowedwords,"",$todo);
 	$todo = clean($todo);
 	$ifcond = clean($ifcond);
@@ -1029,9 +1072,10 @@ function calconarrayif($array,$todo,$ifcond) {
 			}
 		}
 	}
+	*/
 	$todo = mathphp($todo,'x',false,false);
 	$todo = str_replace('(x)','($x)',$todo);
-	
+	/*
 	$rsnoquote = preg_replace('/"[^"]*"/','""',$ifcond);
 	$rsnoquote = preg_replace('/\'[^\']*\'/','\'\'',$rsnoquote);
 	if (preg_match_all('/([$\w]+)\s*\([^\)]*\)/',$rsnoquote,$funcs)) {
@@ -1046,9 +1090,11 @@ function calconarrayif($array,$todo,$ifcond) {
 		}
 	}
 	$ifcond = str_replace('!=','#=',$ifcond);
+	*/
 	$ifcond = mathphp($ifcond,'x',false,false);
-	$ifcond = str_replace('#=','!=',$ifcond);
+	//$ifcond = str_replace('#=','!=',$ifcond);
 	$ifcond = str_replace('(x)','($x)',$ifcond);
+	
 	$iffunc = create_function('$x','return('.$ifcond.');');
 	
 	$tmpfunc = create_function('$x','return('.$todo.');');
@@ -1377,7 +1423,7 @@ function prettytime($time,$in,$out) {
 
 function definefunc($func,$varlist) {
 	$vars = explode(',',$varlist);
-	$toparen = implode('|',$vars);
+	/*$toparen = implode('|',$vars);
 	if ($toparen != '') {
 		$reg = "/(" . $toparen . ")(" . $toparen . ')$/';
 		  $func= preg_replace($reg,"($1)($2)",$func);	
@@ -1400,19 +1446,21 @@ function definefunc($func,$varlist) {
 		  $func= preg_replace($reg,"($1)",$func);
 		  $func= preg_replace($reg,"($1)",$func);  
 	}
+	*/
 	return array($func,$varlist);
 }
 
 function evalfunc($farr) {
+	global $disallowedvar;
 	$args = func_get_args();
 	array_shift($args);
 	if (is_array($farr)) {
 		list($func,$varlist) = $farr;
-		$skipextracleanup = true;
+		//$skipextracleanup = true;
 	} else {
 		$func = $farr;
 		$varlist = array_shift($args);
-		$skipextracleanup = false;
+		//$skipextracleanup = false;
 	}
 	$func = makepretty($func);
 	$vars = explode(',',$varlist);
@@ -1425,40 +1473,48 @@ function evalfunc($farr) {
 			$isnum = false;
 		}
 	}
-	$toparen = implode('|',$vars);
-	if ($toparen != '' && !$skipextracleanup) {
-		$reg = "/(" . $toparen . ")(" . $toparen . ')$/';
-		  $func= preg_replace($reg,"($1)($2)",$func);	
-		  $reg = "/(" . $toparen . ")(sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs)/";
-		  $func= preg_replace($reg,"($1)$2",$func);	
-		  $reg = "/(" . $toparen . ")(" . $toparen . ')([^a-df-zA-Z\(])/';
-		  $func= preg_replace($reg,"($1)($2)$3",$func);	
-		  $reg = "/([^a-zA-Z])(" . $toparen . ")([^a-zA-Z])/";
-		  $func= preg_replace($reg,"$1($2)$3",$func);	
-		  //need second run through to catch x*x
-		  $func= preg_replace($reg,"$1($2)$3",$func);	
-		  $reg = "/^(" . $toparen . ")([^a-zA-Z])/";
-		  $func= preg_replace($reg,"($1)$2",$func);
-		  $reg = "/([^a-zA-Z])(" . $toparen . ")$/";
-		  $func= preg_replace($reg,"$1($2)",$func);
-		  $reg = "/^(" . $toparen . ")$/";
-		  $func= preg_replace($reg,"($1)",$func);
-		  
-		  $reg = "/\(\((" . $toparen . ")\)\)/";
-		  $func= preg_replace($reg,"($1)",$func);
-		  $func= preg_replace($reg,"($1)",$func);  
+	//check vars
+	foreach ($vars as $var) {
+		if (in_array('$'.$var,$disallowedvar) || substr($var,0,7)=='GLOBALS') {
+			echo "disallowed variable name";
+			return false;
+		}
 	}
+	$toparen = implode('|',$vars);
+	
 	if ($isnum) {
 		$func = mathphp($func,$toparen);
 		$toeval = '';
 		foreach ($vars as $i=>$var) {
 			$func = str_replace("($var)","(\$$var)",$func);
-			$toeval .= "\$$var = {$args[$i]}\n";
+			$toeval .= "\$$var = {$args[$i]};";
 		}
-		$toeval .= "\$out = $func\n";
-		eval(interpret("control","calculated",$toeval));
+		$toeval .= "\$out = $func;\n";
+		eval($toeval);
 		return $out;
 	} else { //just replacing
+		if ($toparen != '') { // && !$skipextracleanup) {
+			  $reg = "/(" . $toparen . ")(" . $toparen . ')$/';
+			  $func= preg_replace($reg,"($1)($2)",$func);	
+			  $reg = "/(" . $toparen . ")(sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs)/";
+			  $func= preg_replace($reg,"($1)$2",$func);	
+			  $reg = "/(" . $toparen . ")(" . $toparen . ')([^a-df-zA-Z\(])/';
+			  $func= preg_replace($reg,"($1)($2)$3",$func);	
+			  $reg = "/([^a-zA-Z])(" . $toparen . ")([^a-zA-Z])/";
+			  $func= preg_replace($reg,"$1($2)$3",$func);	
+			  //need second run through to catch x*x
+			  $func= preg_replace($reg,"$1($2)$3",$func);	
+			  $reg = "/^(" . $toparen . ")([^a-zA-Z])/";
+			  $func= preg_replace($reg,"($1)$2",$func);
+			  $reg = "/([^a-zA-Z])(" . $toparen . ")$/";
+			  $func= preg_replace($reg,"$1($2)",$func);
+			  $reg = "/^(" . $toparen . ")$/";
+			  $func= preg_replace($reg,"($1)",$func);
+			  
+			  $reg = "/\(\((" . $toparen . ")\)\)/";
+			  $func= preg_replace($reg,"($1)",$func);
+			  $func= preg_replace($reg,"($1)",$func);  
+		}
 		foreach ($vars as $i=>$var) {
 			$func = str_replace("($var)","({$args[$i]})",$func);
 		}
@@ -1528,5 +1584,57 @@ function arrayhasduplicates($arr) {
 		return true;
 	}
 }
+
+function ifthen($c,$t,$f) {
+	return $c?$t:$f;
+}
+
+
+//adapted from http://www.mindspring.com/~alanh/fracs.html
+function decimaltofraction($d,$format="fraction",$maxden = 5000) {
+	if (floor($d)==$d) {
+		return floor($d);
+	}
+	$numerators = array(0, 1);
+	$denominators = array(1, 0);
+	
+	$d2 = $d;
+	$calcD = -1;
+	$prevCalcD = -1;
+	for ($i = 2; $i < 1000; $i++)  {
+		$L2 = floor($d2);
+		$numerators[$i] = $L2 * $numerators[$i-1] + $numerators[$i-2];
+		//if (Math.abs(numerators[i]) > maxNumerator) return;
+		$denominators[$i] = $L2 * $denominators[$i-1] + $denominators[$i-2];
+		if (abs($denominators[$i])>$maxden) {
+			break;
+		}
+		$calcD = $numerators[$i] / $denominators[$i];
+		if ($calcD == $prevCalcD) { break; }
+	
+		//appendFractionsOutput(numerators[i], denominators[i]);
+	
+		if ($calcD == $d) { break;}
+	
+		$prevCalcD = $calcD;
+	
+		$d2 = 1/($d2-$L2);
+	}
+	if (abs($numerators[$i]/$denominators[$i] - $d)>1e-9) {
+		return $d;
+	}
+	if ($format=="mixednumber") {
+		$w = floor($numerators[$i]/$denominators[$i]);
+		if ($w>0) {
+			$n = $numerators[$i] - $w*$denominators[$i];
+			return "$w $n/".$denominators[$i];
+		} else {
+			return $numerators[$i].'/'.$denominators[$i];
+		}
+	} else {
+		return $numerators[$i].'/'.$denominators[$i];
+	}
+}
+
 
 ?>

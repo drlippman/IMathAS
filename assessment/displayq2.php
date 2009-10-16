@@ -3,7 +3,8 @@
 //(c) 2006 David Lippman
 $mathfuncs = array("sin","cos","tan","sinh","cosh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
 $allowedmacros = $mathfuncs;
-require_once("mathphp.php");
+//require_once("mathphp.php");
+require_once("mathphp2.php");
 require("interpret5.php");
 require("macros.php");
 function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false) {
@@ -707,7 +708,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		}
 		$tip .= formathint($eword,$ansformats,'calculated');
 		if (isset($answer)) {
-			if (in_array('mixednumber',$ansformats) || in_array("sloppymixednumber",$ansformats)) {
+			if (!is_numeric($answer)) {
+				$sa = '`'.$answer.'`';
+			} else if (in_array('mixednumber',$ansformats) || in_array("sloppymixednumber",$ansformats)) {
 				$sa = '`'.decimaltofraction($answer,"mixednumber").'`';
 			} else if (in_array("fraction",$ansformats) || in_array("reducedfraction",$ansformats)) {
 				$sa = '`'.decimaltofraction($answer).'`';
@@ -1852,7 +1855,15 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 							$correct += 1; $foundloc = $j; break 2;
 						} else if ($anans=="-oo" && $givenans=="-oo") {
 							$correct += 1; $foundloc = $j; break 2;
-						} 
+						} else if (is_numeric($givenans)) {
+							//try evaling answer
+							$eanans = eval('return('.mathphp($anans,null).');');
+							if (isset($abstolerance)) {
+								if (abs($eanans-$givenans) < $abstolerance+1E-12) {$correct += 1; $foundloc = $j; break 2;} 	
+							} else {
+								if (abs($eanans - $givenans)/(abs($eanans)+.0001) < $reltolerance+1E-12) {$correct += 1; $foundloc = $j; break 2;} 
+							}
+						}
 					} else if (is_numeric($givenans)) {
 						if (isset($abstolerance)) {
 							if (abs($anans-$givenans) < $abstolerance+1E-12) {$correct += 1; $foundloc = $j; break 2;} 	

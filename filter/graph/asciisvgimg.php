@@ -1,6 +1,6 @@
 <?php
 $graphfilterdir = rtrim(dirname(__FILE__), '/\\');
-require_once("$graphfilterdir/../../assessment/mathphp.php");
+require_once("$graphfilterdir/../../assessment/mathphp2.php");
 // ASCIIsvgIMG.php
 // (c) 2006-2009 David Lippman   http://www.pierce.ctc.edu/dlippman
 // Generates an image based on an ASCIIsvg script
@@ -862,11 +862,12 @@ function ASslopefield($arg) {
 	} else {
 		$dy = 1;
 	}
-	preg_match_all('/[a-zA-Z]+/',$func,$matches,PREG_PATTERN_ORDER);
+	/*preg_match_all('/[a-zA-Z]+/',$func,$matches,PREG_PATTERN_ORDER);
 	$okfunc = array('sin','cos','tan','sec','csc','cot','arcsin','arccos','arctan','x','y','log','ln','e','pi','abs','sqrt','safepow');
 	foreach ($matches[0] as $m) {
 		if (!in_array($m,$okfunc)) { echo "$m"; return;}
 	}
+	*/
 	$func = mathphp($func,"x|y");
 	$func = str_replace(array('x','y'),array('$x','$y'),$func);
 	$efunc = create_function('$x,$y','return ('.$func.');');
@@ -876,7 +877,7 @@ function ASslopefield($arg) {
 	for ($x = $x_min; $x<= $this->xmax; $x+= $dx) {
 		for ($y = $y_min; $y<= $this->ymax; $y+= $dy) {
 			$gxy = @$efunc($x,$y);
-			if (!is_nan($gxy)) {
+			if ($gxy!=null && !is_nan($gxy)) {
 				if ($gxy===false) {
 					$u = 0; $v = $dz;
 				} else {
@@ -891,11 +892,13 @@ function ASslopefield($arg) {
 
 function ASplot($function) {
 	$funcstr = implode(',',$function);
+	/*  safety check now in mathphp
 	preg_match_all('/[a-zA-Z]+/',$funcstr,$matches,PREG_PATTERN_ORDER);
 	$okfunc = array('sin','cos','tan','sec','csc','cot','arcsin','arccos','arctan','x','t','log','ln','e','pi','abs','sqrt','safepow');
 	foreach ($matches[0] as $m) {
 		if (!in_array($m,$okfunc)) { echo "$m"; return;}
 	} //do safety check, as this will be eval'ed
+	*/
 	//$function = explode(',',str_replace(array('"','\'',';'),'',$function));
 	$function = str_replace(array('"','\'',';'),'',$function);
 	if (strpos($function[0],'[')===0) {
