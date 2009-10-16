@@ -342,6 +342,9 @@
 			for ($i = 0; $i<count($questions); $i++) {
 				if ($attempts[$i]<$qi[$questions[$i]]['attempts'] || $qi[$questions[$i]]['attempts']==0) {
 					//$scores[$i] = -1;
+					if ($noindivscores) { //clear scores if 
+						$bestscores[$i] = -1;
+					}
 					if (!in_array($i,$reattempting)) {
 						$reattempting[] = $i;
 					}
@@ -884,10 +887,13 @@
 					echo printscore($bestscores[$qn],$qn);
 					echo "</p>";
 										
-					if (hasreattempts($qn)) {
+					
+				}
+				if (hasreattempts($qn)) {
+					if ($showeachscore) {
 						echo "<p><a href=\"showtest.php?action=skip&amp;to=$qn&amp;reattempt=$qn\">Reattempt last question</a></p>\n";
-						$reattemptsremain = true;
 					}
+					$reattemptsremain = true;
 				}
 				if ($allowregen && $qi[$questions[$qn]]['allowregen']==1) {
 					echo "<p><a href=\"showtest.php?action=skip&amp;to=$qn&amp;regen=$qn\">Try another similar question</a></p>\n";
@@ -957,11 +963,12 @@
 						echo "<p>Score in gradebook: ";
 						echo printscore($bestscores[$next],$next);
 						echo "</p>";
-						
-						if (hasreattempts($next)) {
+					}
+					if (hasreattempts($next)) {
+						if ($showeachscore) {
 							echo "<p><a href=\"showtest.php?action=skip&amp;to=$next&amp;reattempt=$next\">Reattempt this question</a></p>\n";
-							$reattemptsremain = true;
 						}
+						$reattemptsremain = true;
 					}
 					if ($allowregen && $qi[$questions[$next]]['allowregen']==1) {
 						echo "<p><a href=\"showtest.php?action=skip&amp;to=$next&amp;regen=$next\">Try another similar question</a></p>\n";
