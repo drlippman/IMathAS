@@ -8,6 +8,11 @@
 //Based on concepts from mathjs from Peter Jipsen's ASCIIsvg.js
 //script, (c) Peter Jipsen.  See /javascript/ASCIIsvg.js
 
+//assumes there is variable
+//$allowedmacros:  allowable function calls (including math functions)
+//mathphp does not use disallowedvar, so be check for those in implementations
+//if changing from letter vars to php $vars to be evaled
+
 
 function mathphppre($st) {
   if (strpos($st,"^-1") || strpos($st,"^(-1)")) {
@@ -31,7 +36,13 @@ function mathphp($st,$varlist,$skipfactorial=false,$ignorestrings=true) {
 	//to handle !something type ifcond.  Might need to reexplore
 	
 	$vars = explode('|',$varlist);
-	$st = makepretty($st);
+	//take care of sin^-1 notation first
+	$st = mathphppre($st);
+	$st = preg_replace('/(\+|\-)\s+(\+|\-)/',"$1$2",$st);
+	//$exp = str_replace(" ", "", $exp);  //caused problems with "x > -3"
+	$st = str_replace("+-","-",$st);
+	$st = str_replace("-+","-",$st);
+	$st = str_replace("--","+",$st);
 	return mathphpinterpretline($st.' ',$vars,$ignorestrings);
   
 }
@@ -147,8 +158,7 @@ function mathphpinterpretline($str,$vars,$ignorestrings) {
 
 function mathphptokenize($str,$vars,$ignorestrings) {
 	global $allowedmacros;
-	global $mathfuncs;
-	global $disallowedwords,$disallowedvar;
+	
 	$lookfor = array_merge($vars, array("e","pi"));
 	$maxvarlen = 0;
 	foreach ($lookfor as $v) {
@@ -204,44 +214,20 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 					$eatenwhite++;
 				}    
 				//if function at end, strip off function
-				if ($c=='(' || ($c=='^' && (substr($str,$i+1,2)=='-1' || substr($str,$i+1,4)=='(-1)'))) {
+				if ($c=='(' && !in_array($out,$allowedmacros)) {// moved to mathphppre-> || ($c=='^' && (substr($str,$i+1,2)=='-1' || substr($str,$i+1,4)=='(-1)'))) {
 					$outlen = strlen($out);
 					$outend = '';
-					for ($j=$outlen-1; $j>0; $j--) {
-						$outend = $out{$j}.$outend;
-						if (in_array($outend,$mathfuncs)) {
-							if (substr($out,$j-3,3)=='arc') {
-								//patch for arcsin becoming 'arc'sin
-								//TODO: rewrite function matcher to search longest
-								//down, rather than shortest up
-								continue;
-							}
-							$i = $i-$outlen+$j;
+					for ($j=1; $j<$outlen-1; $j++) {
+						$outend = substr($out,$j);
+						if (in_array($outend,$allowedmacros)) {
+							$i = $i - $outlen + $j;
 							$c = $str{$i};
 							$out = substr($out,0,$j);
 							break;
 						}
 					}
+					
 				}
-				//could be sin^-1 or sin^(-1) - check for them and rewrite if needed
-				if ($c=='^' && substr($str,$i+1,2)=='-1') {
-					$i += 3;
-					$out = 'arc'.$out;
-					$c = $str{$i};
-					while ($c==' ') {
-						$i++;
-						$c = $str{$i};
-					}
-				} else if ($c=='^' && substr($str,$i+1,4)=='(-1)') {
-					$i += 3;
-					$out = 'arc'.$out;
-					$c = $str{$i};
-					while ($c==' ') {
-						$i++;
-						$c = $str{$i};
-					}
-				}
-				
 				
 				//if there's a ( then it's a function
 				if ($c=='(' && $out!='e' && $out!='pi') {
