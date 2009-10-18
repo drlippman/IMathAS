@@ -1984,7 +1984,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			*/
 				$tp[$j] = $tps[$i][$j];
 			}
-			
 			$realans = eval("return ($answer);");
 			//echo "real: $realans, my: {$myans[$i]},rel: ". (abs($myans[$i]-$realans)/abs($realans))  ."<br/>";
 			if (isNaN($realans)) {$cntnan++; continue;} //avoid NaN problems

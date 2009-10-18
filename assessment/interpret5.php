@@ -5,7 +5,7 @@
 
 //TODO:  handle for ($i=0..2) { to handle expressions, array var, etc. for 0 and 2
 //require_once("mathphp.php");
-array_push($allowedmacros,"loadlibrary","array","off","true","false","e","pi","null","setseed","if","for","where");
+array_push($allowedmacros,"loadlibrary","importcodefrom","array","off","true","false","e","pi","null","setseed","if","for","where");
 $disallowedvar = array('$link','$qidx','$qnidx','$seed','$qdata','$toevalqtxt','$la','$GLOBALS','$laparts','$anstype','$kidx','$iidx','$tips','$options','$partla','$partnum','$score','$disallowedvar','$allowedmacros');
 
 //main interpreter function.  Returns PHP code string, or HTML if blockname==qtext
@@ -22,7 +22,8 @@ function interpret($blockname,$anstype,$str)
 		$str = str_replace("\r\n","\n",$str);
 		$str = str_replace("&&\n","<br/>",$str);
 		$str = str_replace("&\n"," ",$str);
-		return interpretline($str.';').';';	
+		$r =  interpretline($str.';').';';
+		return $r;
 	}
 }
 
@@ -486,6 +487,26 @@ function tokenize($str) {
 				loadlibrary(substr($out,1,strlen($out)-2));
 				array_pop($syms);
 				$connecttolast = 0;
+			} else if ($lastsym[0] == 'importcodefrom') {
+				$out = intval(substr($out,1,strlen($out)-2));
+				$query = "SELECT control FROM imas_questionset WHERE id='$out'";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				if (mysql_num_rows($result)==0) {
+					//was an error, return error token
+					return array(array('',9));
+				} else {
+					$inside = interpretline(mysql_result($result,0,0));
+				}
+				if ($inside=='error') {
+					//was an error, return error token
+					return array(array('',9));
+				} else {
+					array_pop($syms);
+					$connecttolast = 0;
+					$syms[] = array('{$included=true;'.$inside.';$included=false;}',5); //type: curly
+					$syms[] = array('',7); //end of line;
+					$lastsym = array('',7);
+				}
 			} else {
 				$syms[count($syms)-1][0] .= $out;
 				$connecttolast = 0;

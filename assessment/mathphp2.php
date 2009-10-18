@@ -11,8 +11,8 @@
 
 function mathphppre($st) {
   if (strpos($st,"^-1") || strpos($st,"^(-1)")) {
-		$st = str_replace(array("sin^-1","cos^-1","tan^-1","sin^(-1)","cos^(-1)","tan^(-1)"),array("asin","acos","atan","asin","acos","atan"),$st);
-		$st = str_replace(array("sinh^-1","cosh^-1","tanh^-1","sinh^(-1)","cosh^(-1)","tanh^(-1)"),array("asinh","acosh","atanh","asinh","acosh","atanh"),$st);
+		$st = str_replace(array("sin^-1","cos^-1","tan^-1","sin^(-1)","cos^(-1)","tan^(-1)"),array("arcsin","arccos","arctan","arcsin","arccos","arctan"),$st);
+		$st = str_replace(array("sinh^-1","cosh^-1","tanh^-1","sinh^(-1)","cosh^(-1)","tanh^(-1)"),array("arcsinh","arccosh","arctanh","arcsinh","arccosh","arctanh"),$st);
   }
   return $st;
 }
@@ -210,6 +210,12 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 					for ($j=$outlen-1; $j>0; $j--) {
 						$outend = $out{$j}.$outend;
 						if (in_array($outend,$mathfuncs)) {
+							if (substr($out,$j-3,3)=='arc') {
+								//patch for arcsin becoming 'arc'sin
+								//TODO: rewrite function matcher to search longest
+								//down, rather than shortest up
+								continue;
+							}
 							$i = $i-$outlen+$j;
 							$c = $str{$i};
 							$out = substr($out,0,$j);
