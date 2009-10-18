@@ -571,7 +571,7 @@ function gbtable() {
 	
 	//Pull student data
 	$ln = 1;
-	$query = "SELECT imas_users.id,imas_users.SID,imas_users.FirstName,imas_users.LastName,imas_users.SID,imas_users.email,imas_students.section,imas_students.code ";
+	$query = "SELECT imas_users.id,imas_users.SID,imas_users.FirstName,imas_users.LastName,imas_users.SID,imas_users.email,imas_students.section,imas_students.code,imas_students.timelimitmult ";
 	$query .= "FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid AND imas_students.courseid='$cid' ";
 	//$query .= "FROM imas_users,imas_teachers WHERE imas_users.id=imas_teachers.userid AND imas_teachers.courseid='$cid' ";
 	//if (!$isteacher && !isset($tutorid)) {$query .= "AND imas_users.id='$userid' ";}
@@ -597,6 +597,7 @@ function gbtable() {
 	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 	$alt = 0;
 	$sturow = array();
+	$timelimitmult = array();
 	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) { //foreach student
 		unset($asid); unset($pts); unset($IP); unset($timeused);
 		$cattotpast[$ln] = array();
@@ -626,6 +627,7 @@ function gbtable() {
 			$gb[$ln][0][] = $line['code'];
 		}
 		$sturow[$line['id']] = $ln;
+		$timelimitmult[$line['id']] = $line['timelimitmult'];
 		$ln++;
 	}
 	
@@ -711,7 +713,7 @@ function gbtable() {
 			$gb[$row][1][$col][0] = $pts; //the score
 			$gb[$row][1][$col][3] = 2;  //in progress
 			$countthisone =true;
-		} else	if (($timelimits[$i]>0) &&($timeused > $timelimits[$i])) {
+		} else	if (($timelimits[$i]>0) &&($timeused > $timelimits[$i]*$timelimitmult[$l['userid']])) {
 			$gb[$row][1][$col][0] = $pts; //the score
 			$gb[$row][1][$col][3] = 3;  //over time
 		} else if ($assessmenttype[$i]=="Practice") {

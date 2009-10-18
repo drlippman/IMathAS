@@ -1,5 +1,5 @@
 <?php
-//IMathAS:  Display grade list for one online assessent
+//IMathAS:  Display grade list for one online assessment
 //(c) 2007 David Lippman
 	require("../validate.php");
 	$isteacher = isset($teacherid);
@@ -57,7 +57,7 @@
 	
 	echo "<h3>Grades for $name</h3>";
 	
-	$query = "SELECT iu.LastName,iu.FirstName,istu.section,";
+	$query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.timelimitmult,";
 	$query .= "ias.id,ias.userid,ias.bestscores,ias.starttime,ias.endtime,ias.feedback FROM imas_assessment_sessions AS ias,imas_users AS iu,imas_students AS istu ";
 	$query .= "WHERE iu.id = istu.userid AND istu.courseid='$cid' AND iu.id=ias.userid AND ias.assessmentid='$aid'";
 	if ($istutor && isset($tutorsection) && $tutorsection!='') {
@@ -104,7 +104,7 @@
 			echo "{$total}&nbsp;(NC)";
 		} else 	if ($IP==1 && $enddate>$now) {
 			echo "{$total}&nbsp;(IP)";
-		} else	if (($timelimit>0) &&($timeused > $timelimit)) {
+		} else	if (($timelimit>0) &&($timeused > $timelimit*$line['timelimitmult'])) {
 			echo "{$total}&nbsp;(OT)";
 		} else if ($assessmenttype=="Practice") {
 			echo "{$total}&nbsp;(PT)";

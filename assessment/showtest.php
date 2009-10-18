@@ -142,6 +142,11 @@
 			$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 			$sessiondata['coursename'] = mysql_result($result,0,0);
 			$sessiondata['coursetheme'] = mysql_result($result,0,1);
+			if (isset($studentinfo['timelimitmult'])) {
+				$sessiondata['timelimitmult'] = $studentinfo['timelimitmult'];
+			} else {
+				$sessiondata['timelimitmult'] = 1.0;
+			}
 			writesessiondata();
 			session_write_close();
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/showtest.php");
@@ -180,6 +185,11 @@
 			$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 			$sessiondata['coursename'] = mysql_result($result,0,0);
 			$sessiondata['coursetheme'] = mysql_result($result,0,1);
+			if (isset($studentinfo['timelimitmult'])) {
+				$sessiondata['timelimitmult'] = $studentinfo['timelimitmult'];
+			} else {
+				$sessiondata['timelimitmult'] = 1.0;
+			}
 			writesessiondata();
 			session_write_close();
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/showtest.php");
@@ -225,6 +235,9 @@
 	$testsettings = mysql_fetch_array($result, MYSQL_ASSOC);
 	$timelimitkickout = ($testsettings['timelimit']<0);
 	$testsettings['timelimit'] = abs($testsettings['timelimit']);
+	//do time limit mult
+	$testsettings['timelimit'] *= $sessiondata['timelimitmult'];
+	
 	list($testsettings['testtype'],$testsettings['showans']) = explode('-',$testsettings['deffeedback']);
 	
 	//if submitting, verify it's the correct assessment

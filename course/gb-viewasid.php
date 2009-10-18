@@ -350,10 +350,15 @@
 		}
 		echo "&gt; Detail</div>";
 		echo "<h2>Grade Book Detail</h2>\n";
-		$query = "SELECT FirstName,LastName FROM imas_users WHERE id='{$_GET['uid']}'";
+		$query = "SELECT imas_users.FirstName,imas_users.LastName,imas_students.timelimitmult FROM imas_users JOIN imas_students ON imas_users.id=imas_students.userid WHERE imas_users.id='{$_GET['uid']}' AND imas_students.courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$row = mysql_fetch_row($result);
 		echo "<h3>{$row[1]}, {$row[0]}</h3>\n";
+		
+		//do time limit mult
+		$timelimitmult = $row[2];
+		$line['timelimit'] *= $timelimitmult;
+		
 		
 		$teacherreview = $_GET['uid'];
 		

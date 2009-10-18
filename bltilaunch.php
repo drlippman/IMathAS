@@ -461,11 +461,13 @@ if ($keyparts[0]=='cid') {
 
 //see if student is enrolled, if appropriate to action type
 if ($keyparts[0]=='cid' || $keyparts[0]=='aid') {
-	$query = "SELECT id FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
+	$query = "SELECT id,timelimitmult FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	if (mysql_num_rows($result) == 0) { //nope, not enrolled
 		$query = "INSERT INTO imas_students (userid,courseid) VALUES ('$userid','$cid')";
 		mysql_query($query) or die("Query failed : " . mysql_error());
+	} else {
+		$timelimitmult = mysql_result($result,0,1);
 	}
 }
 	
@@ -499,7 +501,7 @@ if (mysql_num_rows($result)>0) {
 if ($keyparts[0]=='aid') {
 	$query = "SELECT timelimit FROM imas_assessments WHERE id='$aid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$timelimit = mysql_result($result,0,0);
+	$timelimit = mysql_result($result,0,0)*$timelimitmult;
 	if ($timelimit>0) {
 		 if ($timelimit>3600) {
 			$tlhrs = floor($timelimit/3600);

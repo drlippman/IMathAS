@@ -463,13 +463,21 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			shuffle($randkeys);
 		}
 		
+		if (substr($displayformat,1)=='column') {
+			$ncol = $displayformat{0};
+			$itempercol = ceil(count($randkeys)/$ncol);
+			$displayformat = 'column';
+		}
+		
 		if ($displayformat == "select") { 
 			$out = "<select name=\"qn$qn\"><option value=\"NA\">Select an answer</option>\n";
 		} else if ($displayformat == "horiz") {
 			
 		} else if ($displayformat == "inline") {
 			
-		} else {
+		} else if ($displayformat == 'column') {
+			
+		}  else {
 			$out .= "<ul class=nomark>";
 		}
 		
@@ -486,6 +494,16 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 				$out .= "<input type=radio name=qn$qn value=$i ";
 				if (($la!='') && ($la == $i)) { $out .= "CHECKED";}
 				$out .= " />{$questions[$randkeys[$i]]}";
+			} else if ($displayformat == 'column') {
+				if ($i%$itempercol==0) {
+					if ($i>0) {
+						$out .= '</ul></div>';
+					}
+					$out .= '<div class="match"><ul class=nomark>';
+				}
+				$out .= "<li><input type=radio name=qn$qn value=$i ";
+				if (($la!='') && ($la == $i)) { $out .= "CHECKED";}
+				$out .= " />{$questions[$randkeys[$i]]}</li> \n";
 			} else {
 				$out .= "<li><input type=radio name=qn$qn value=$i ";
 				if (($la!='') && ($la == $i)) { $out .= "CHECKED";}
@@ -496,6 +514,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$out .= "<div class=spacer>&nbsp;</div>\n";
 		} else if ($displayformat == "select") {
 			$out .= "</select>\n";
+		} else if ($displayformat == 'column') {
+			$out .= "</ul></div><div class=spacer>&nbsp;</div>\n";
 		} else if ($displayformat == "inline") {
 			
 		} else {
@@ -533,13 +553,21 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			shuffle($randkeys);
 		}
 		$labits = explode('|',$la);
+		if (substr($displayformat,1)=='column') {
+			$ncol = $displayformat{0};
+			$itempercol = ceil(count($randkeys)/$ncol);
+			$displayformat = 'column';
+		}
 		if ($displayformat == "horiz") {
 			
 		} else if ($displayformat == "inline") {
 			
+		} else if ($displayformat == 'column') {
+			
 		} else {
 			$out .= "<ul class=nomark>";
 		}
+		
 		for ($i=0; $i < count($randkeys); $i++) {
 			if ($displayformat == "horiz") {
 				$out .= "<div class=choice>{$questions[$randkeys[$i]]}<br/>";
@@ -550,6 +578,16 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 				$out .= "<input type=checkbox name=\"qn$qn"."[$i]\" value=$i ";
 				if (($labits[$i]!='') && ($labits[$i] == $i)) { $out .= "CHECKED";}
 				$out .= " />{$questions[$randkeys[$i]]} ";
+			} else if ($displayformat == 'column') {
+				if ($i%$itempercol==0) {
+					if ($i>0) {
+						$out .= '</ul></div>';
+					}
+					$out .= '<div class="match"><ul class=nomark>';
+				}
+				$out .= "<li><input type=checkbox name=\"qn$qn"."[$i]\" value=$i ";
+				if (($labits[$i]!='') && ($labits[$i] == $i)) { $out .= "CHECKED";}
+				$out .= " />{$questions[$randkeys[$i]]}</li> \n";
 			} else {
 				$out .= "<li><input type=checkbox name=\"qn$qn"."[$i]\" value=$i ";
 				if (($labits[$i]!='') && ($labits[$i] == $i)) { $out .= "CHECKED";}
@@ -560,6 +598,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$out .= "<div class=spacer>&nbsp;</div>\n";
 		} else if ($displayformat == "inline") {
 			
+		} else if ($displayformat == 'column') {
+			$out .= "</ul></div><div class=spacer>&nbsp;</div>\n";
 		} else {
 			$out .= "</ul>\n";
 		}

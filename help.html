@@ -1098,7 +1098,9 @@ Use the &quot;Chg Info&quot; link to reset a student's password,
 update their email address, username or full name, or change their section or code.  
 You can also lock the student out of the course on this page.  Doing so will
 display a message to the student that they need to see their instructor to
-regain access to the course.
+regain access to the course.  On this page you can also set a time limit multiplier 
+for students needing extra time on timed assessments.  Setting the multiplier to 1.5 would
+give the student 1.5 times the usual timelimit for all assessments.
 
 </div>
 <div class=h3>
@@ -1615,6 +1617,8 @@ The following macros help with display:
 <li><b>dispreducedfraction(numerator,denominator,[doubleslash])</b>:  Takes two numbers as numerator and denominator of a fraction, returning a display form of the fraction,
     reduced to lowest terms.  Suitable for $showanswer.  Set doubleslash to true to produced "3//4" rather than "3/4".</li>
 <li><b>makereducedfraction(numerator,denominator,[doubleslash])</b>:  Same as dispreducefraction, but not already in display form</li>
+<li><b>decimaltofraction(decimal,[format,maxden])</b>:  Converts a decimal to a fraction.  Can use format="mixednumber" to get a mixed number rather than improper fraction.  
+    Only works for denominators up to maxden (default 5000)</li>
 <li><b>showarrays(string,array,[string,array]...,[format])</b>:  Creates a tabular display of the data in the array(s) as column(s), with the strings
     as column headers.  format = "c", "r", or "l" to center, left-align, or right align data. Alternatively you can call this function with arguments
     showarrays(array of column headers, array of data arrays, [format]).</li>
@@ -1684,6 +1688,8 @@ These macros are fairly general purpose:
 <li><b>calconarray(array,calculation)</b>:  Returns an array, performing the given calculation on each element of the given array.  Use
     "x" as the variable to represent each element of the array.  Example: $b = calconarray($a,"x^2") will create an array that is the
     square each element of the array $a.</li>
+<li><b>multicalconarray(calculation,varslist,var1array,var2array,etc.)</b>  Returns an array, performing the given calculation on each set
+    of elements from the given arrays.  Allows multivariable calculations.  Example:  $z= multicalconarray("x*y^2","x,y",$xs,$ys)</li>
 <li><b>calconarrayif(array,calculation,ifcondition)</b>:  Like calconarray, but allows you to specify a condition for each element for whether to
     do the calculation.  Example:  $b = calconarray($a,"x+.1","floor(x)==x") will add .1 to add whole numbers in the array, and leave the 
     other elements unchanged.</li>
@@ -1710,6 +1716,7 @@ These macros are fairly general purpose:
   showplot.</li>
 <li><b>arraystodots(xarray,yarray)</b>: Converts an array of x-values and y-values into a form that can be used in the Drawing answer type</li>
 <li><b>today([string])</b>: Returns today's date, like "July 3, 2008".  Can change format using string (see http://us2.php.net/manual/en/function.date.php for formats)</li>
+<li><b>ifthen(condition,trueval,falseval)</b>:  Takes a comparision condition, and returns the trueval if the condition is true and the falseval otherwise.</li>
 </ul>
 </div>
 <div class=h2>
@@ -1961,8 +1968,8 @@ of choices is automatically randomized.
 </p>
 <p><b>Optional Variables</b><BR>
 <dl>
-<dt>$displayformat = "horiz", "select", or "inline" (In Question Control)</dt>
-	<dd>Will lay out the choices horizontally, as a select box, or inline with text rather than using the default vertical layout</dd>
+<dt>$displayformat = "horiz", "select", "2column, "3column", or "inline" (In Question Control)</dt>
+	<dd>Will lay out the choices horizontally, as a select box, in multiple columns, or inline with text rather than using the default vertical layout</dd>
 <dt>$noshuffle = "all" or "last" (In Common Control)</dt>
 	<dd>If $noshuffle="all", then the $questions array will not be randomized (shuffled).  If $noshuffle = "last", then the $questions
 	array will be randomized, except for the last element.  This is for options like "None of the above"</dd>
@@ -1997,6 +2004,8 @@ of choices is automatically randomized.
 	<dd>By default, the total points possible are divided by the number of questions, and partial credit is lost for each
 	correct answer missed and each wrong answer selected.  If $scoremethod="answers" is set, then the total points
 	possible are divided by the number of answers (tougher grading scheme)</dd>
+<dt>$displayformat = "horiz", "2column, "3column", or "inline" (In Question Control)</dt>
+	<dd>Will lay out the choices horizontally, in multiple columns, or inline with text rather than using the default vertical layout</dd>
 <dt>$noshuffle = "all" (In Common Control)</dt>
 	<dd>If $noshuffle="all", then the $questions array will not be randomized (shuffled)</dd>
 <dt>$answerbox (In Question Text)</dt>
