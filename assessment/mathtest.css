@@ -278,6 +278,7 @@ div.tips {
 /*for eqn helper*/
 .eebtn {
 	font-family: "Times New Roman", Times, serif;
+	color: #000;
 	cursor: pointer;
 	padding: 0px .5em;
 	height: 35px;
@@ -294,6 +295,7 @@ div.tips {
 	text-align: center;
 	background: #fff;
 	vertical-align: middle;
+	color: #000;
 }
 .eedd {
 	cursor: pointer;

@@ -250,6 +250,17 @@ if ($noclass == true) {
 	echo "<h4>You are not currently enrolled in any classes as a student</h4>\n";
 } else {
 ?>		
+<div class=cp style="margin-top: 0px; margin-bottom: 20px;">
+		<a href="<?php echo $imasroot ?>/msgs/msglist.php?cid=0">Messages</a>
+		<?php echo (count($newmsgcnt)>0) ? " <a href=\"$imasroot/msgs/newmsglist.php?cid=0\" style=\"color:red\">New Messages (" . array_sum($newmsgcnt) . ")</a>" : ""; ?>
+		&nbsp; 
+		<?php
+		if ($myrights > 39) {
+			echo "<a href=\"admin/admin.php\">Admin page</a> &nbsp; ";
+		}
+		?>
+		<a href="actions.php?action=logout">Log Out</a>
+</div>
 <div class=block>
 	<h3>Courses You're Taking</h3>
 </div>

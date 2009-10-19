@@ -137,7 +137,9 @@ if (!(isset($teacherid))) {
 		if (isset($_POST['chgeqnhelper'])) {
 			$sets[] = "eqnhelper='{$_POST['eqnhelper']}'";
 		}
-		
+		if (isset($_POST['chgavail'])) {
+			$sets[] = "avail='{$_POST['avail']}'";
+		}
 		if (isset($_POST['chgintro'])) {
 			$query = "SELECT intro FROM imas_assessments WHERE id='{$_POST['intro']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -316,6 +318,14 @@ function chkAll(frm, arr, mark) {
 <?php
 	writeHtmlSelect("dates",$page_assessSelect['val'],$page_assessSelect['label']);
 ?>
+				</td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" name="chgavail"/></td>
+				<td class="r">Show:</td>
+				<td>
+				<input type=radio name="avail" value="0" />Hide<br/>
+				<input type=radio name="avail" value="1" checked="checked"/>Show by Dates
 				</td>
 			</tr>
 			<tr>
