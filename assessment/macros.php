@@ -902,6 +902,9 @@ function jointshuffle($a1,$a2) {  //optional third & fourth params $n1 and $n2
 
 
 function listtoarray($l) {
+	if (func_num_args()>1 && ($GLOBALS['sessiondata']['isteacher'] || isset($GLOBALS['teacherid']))) {
+		echo "Warning:  listtoarray expects one argument, more than one provided";
+	}
 	return (explode(",",$l));	
 }
 

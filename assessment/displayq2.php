@@ -637,6 +637,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$randakeys = array_rand($answers,count($answers));
 			shuffle($randakeys);
 		}
+		$ncol = 1;
+		if (substr($displayformat,1)=='columnselect') {
+			$ncol = $displayformat{0};
+			$itempercol = ceil(count($randqkeys)/$ncol);
+			$displayformat = 'select';
+		}
 		$out .= "<div class=match>\n";
 		$out .= "<p class=centered>$questiontitle</p>\n";
 		$out .= "<ul class=nomark>\n";
@@ -645,6 +651,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		
 		for ($i=0;$i<count($randqkeys);$i++) {
 			//$out .= "<li><input class=\"text\" type=\"text\"  size=3 name=\"qn$qn-$i\" value=\"{$las[$i]}\" /> {$questions[$randqkeys[$i]]}</li>\n";
+			if ($ncol>1) {
+				if ($i>0 && $i%$itempercol==0) {
+					$out .= '</ul></div><div class="match"><ul class=nomark>';
+				}
+			}
 			$out .= '<li>';
 			$out .= "<select name=\"qn$qn-$i\">";
 			$out .= '<option value="-" ';
