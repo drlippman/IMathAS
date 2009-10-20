@@ -1422,7 +1422,7 @@
 					
 					echo "Not answered";
 					echo "</td>";
-					echo "<td>  Score in gradebook: ";
+					echo "<td>  Score in Gradebook: ";
 					echo printscore($bestscores[$i],$i);
 					echo "</td>";
 					

@@ -308,3 +308,22 @@ div.tips {
 	color: #fa0;
 	font-size: 6px;
 }
+.scorebarholder {
+	font-size:1px;
+	display:-moz-inline-box;
+	display:inline-block;
+	vertical-align:middle; 
+	width:30px; 
+	height: 10px;
+	border: 1px solid #000;
+}
+.scorebarinner {
+	height:10px;
+	font-size:1px;
+	display:-moz-inline-box;
+	display:inline-block;
+	position:relative;
+	left:0px;
+	top:0px;
+	
+}

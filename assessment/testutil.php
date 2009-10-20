@@ -231,6 +231,8 @@ function printscore($sc,$qn) {
 	if (strpos($sc,'~')===false) {
 		$sc = str_replace('-1','N/A',$sc);
 		$out =  "$sc out of $poss";
+		$pts = $sc;
+		if (!is_numeric($pts)) { $pts = 0;}
 	} else {
 		$ptposs = $qi[$questions[$qn]]['answeights'];
 		for ($i=0; $i<count($ptposs)-1; $i++) {
@@ -246,7 +248,19 @@ function printscore($sc,$qn) {
 		$sc = str_replace('~',', ',$sc);
 		$out =  "$pts out of $poss (parts: $sc out of $ptposs)";
 	}	
-	return $out;	
+	$bar = '<span class="scorebarholder">';
+	$w = round(30*$pts/$poss);
+	if ($w==0) {$w=1;}
+	if ($w < 15) { 
+	     $color = "#f".dechex(floor(16*($w)/15))."0";
+	} else if ($w==15) {
+	     $color = '#ff0';
+	} else { 
+	     $color = "#". dechex(floor(16*(2-$w/15))) . "f0";
+	}
+	
+	$bar .= '<span class="scorebarinner" style="background-color:'.$color.';width:'.$w.'px;">&nbsp;</span></span> ';
+	return $bar . $out;	
 }
 
 //creates display of score  (chg from previous: does not echo self)

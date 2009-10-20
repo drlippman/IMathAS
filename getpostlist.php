@@ -103,7 +103,8 @@
 			if (!isset($forumcontent[$line['forumid']])) {
 				$forumcontent[$line['forumid']] = '';
 			}
-			$url = $imasroot."/forums/posts.php?page=-2&amp;cid=$cid&amp;forum={$line['id']}&amp;thread={$line['threadid']}";
+			$course = $forumcourse[$line['forumid']];
+			$url = $imasroot."/forums/posts.php?page=-2&amp;cid=$course&amp;forum={$line['id']}&amp;thread={$line['threadid']}";
 			/*$forumcontent[$line['forumid']] .= "<div style='font-size:100%;'>";
 			$forumcontent[$line['forumid']] .= "<a style='color: blue;' href='$url' target='_new'>{$line['subject']}</a>";
 			$forumcontent[$line['forumid']] .= " <span style='color: black;'>".htmlspecialchars("{$line['LastName']}, {$line['FirstName']}")."</span>";
