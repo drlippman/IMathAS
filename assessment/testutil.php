@@ -241,12 +241,31 @@ function printscore($sc,$qn) {
 		//adjust for rounding
 		$diff = $poss - array_sum($ptposs);
 		$ptposs[count($ptposs)-1] += $diff;
-		$ptposs = implode(', ',$ptposs); 
 		
 		$pts = getpts($sc);
 		$sc = str_replace('-1','N/A',$sc);
-		$sc = str_replace('~',', ',$sc);
-		$out =  "$pts out of $poss (parts: $sc out of $ptposs)";
+		//$sc = str_replace('~',', ',$sc);
+		$scarr = explode('~',$sc);
+		foreach ($scarr as $k=>$v) {
+			if (!is_numeric($v) || $v==0) { $w = 1; } else {
+				$w = round(14*$sc/$ptposs[$k]);
+			}
+			$bar = '<span class="miniscorebarholder">';
+			if ($w < 7) { 
+			     $color = "#f".dechex(floor(16*($w)/7))."0";
+			} else if ($w==7) {
+			     $color = '#ff0';
+			} else { 
+			     $color = "#". dechex(floor(16*(2-$w/7))) . "f0";
+			}
+			$wmt = 14-$w;
+			$bar .= '<span class="miniscorebarinner" style="background-color:'.$color.';margin-top:'.$wmt.'px;height:'.$w.'px;">&nbsp;</span></span> ';
+			//$scarr[$k] = $bar.$v;
+			$scarr[$k] = "$bar $v/{$ptposs[$k]}";
+		}
+		$sc = implode(', ',$scarr);
+		//$ptposs = implode(', ',$ptposs); 
+		$out =  "$pts out of $poss (parts: $sc)";
 	}	
 	$bar = '<span class="scorebarholder">';
 	$w = round(30*$pts/$poss);
