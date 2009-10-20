@@ -1,13 +1,27 @@
 <?php
 //IMathAS:  Displays a linked text item
 //(c) 2006 David Lippman
-	require("../config.php");
 	if (!isset($_GET['cid'])) {
 		echo "Need course id";
 		exit;
 	}
 	$cid = $_GET['cid'];
-		
+	if (isset($_GET['from'])) {
+		$pubcid = $cid;  //swap out cid's before calling validate
+		$cid = $_GET['from'];
+		$_GET['cid'] = $_GET['from'];
+		require("../validate.php");
+		$fcid = $cid;
+		$cid = $pubcid;
+	} else {
+		$fcid = 0;
+		require("../config.php");
+	}
+	
+	
+	
+	
+			
 	function findinpublic($items,$id) {
 		foreach ($items as $k=>$item) {
 			if (is_array($item)) {
@@ -42,9 +56,13 @@
 	$query = "SELECT itemorder,name,theme FROM imas_courses WHERE id='$cid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$items = unserialize(mysql_result($result,0,0));
-	$coursename = mysql_result($result,0,1);
-	$coursetheme = mysql_result($result,0,2);
-	$breadcrumbbase = '';
+	if ($fcid==0) {
+		$coursename = mysql_result($result,0,1);
+		$coursetheme = mysql_result($result,0,2);
+		$breadcrumbbase = "<a href=\"public.php?cid=$cid\">$coursename</a> &gt; ";
+	} else {
+		$breadcrumbbase = "$breadcrumbbase <a href=\"course.php?cid=$fcid\">$coursename</a> &gt; ";
+	}
 		
 	if (!findinpublic($items,$itemid)) {
 		require("../header.php");
@@ -65,8 +83,7 @@
 	$titlesimp = strip_tags($title);
 
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"public.php?cid={$_GET['cid']}\">$coursename</a> ";
-	echo "&gt; $titlesimp</div>";
+	echo "<div class=breadcrumb>$breadcrumbbase $titlesimp</div>";
 	echo '<div style="padding-left:10px; padding-right: 10px;">';
 	echo filter($text);
 	echo '</div>';

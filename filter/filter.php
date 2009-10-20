@@ -15,13 +15,16 @@
 		$AS = new AStoIMG;
 	} 
 	function mathfiltercallback($arr) {
-		global $AMT,$mathimgurl;
+		global $AMT,$mathimgurl,$coursetheme;
 		//$arr[1] = str_replace(array('&ne;','&quot;','&lt;','&gt;','&le;','&ge;'),array('ne','"','lt','gt','le','ge'),$arr[1]);
 		$arr[1] = str_replace(array('&ne;','&quot;','&le;','&ge;'),array('ne','"','le','ge'),$arr[1]);
 		$tex = $AMT->convert($arr[1]);
 		if (trim($tex)=='') {
 			return '';
 		} else {
+			if (isset($coursetheme) && strpos($coursetheme,'_dark')!==false) {
+				$tex = '\\reverse '.$tex;
+			}
 			return ('<img style="vertical-align: middle;" src="'.$mathimgurl.'?'.rawurlencode($tex).'" alt="'.str_replace('"','&quot;',$arr[1]).'">');
 		}
 	}

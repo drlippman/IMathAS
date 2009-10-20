@@ -722,6 +722,9 @@ function AMparseMath(str) {
 	  return document.createTextNode(" ");
   }
   var texstring = AMTparseAMtoTeX(str);
+  if (typeof mathbg != "undefined" && mathbg=='dark') {
+	  texstring = "\\reverse " + texstring;
+  }
   if (mathcolor!="") {
 	  texstring = "\\"+mathcolor + texstring;
   }

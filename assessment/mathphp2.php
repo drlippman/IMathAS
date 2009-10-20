@@ -158,6 +158,9 @@ function mathphpinterpretline($str,$vars,$ignorestrings) {
 
 function mathphptokenize($str,$vars,$ignorestrings) {
 	global $allowedmacros;
+	if (!isset($allowedmacros)) {
+		$allowedmacros = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
+	}
 	
 	$lookfor = array_merge($vars, array("e","pi"));
 	$maxvarlen = 0;

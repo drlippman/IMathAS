@@ -18,11 +18,14 @@ var imasroot = '<?php echo $imasroot; ?>';
 </script>
 <script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js?ver=100509"></script>
 <?php
+if (isset($coursetheme) && strpos($coursetheme,'_dark')!==false) {$mathdarkbg = true;} else {$mathdarkbg = false;}
 if ($ispublic) {
-	echo "<script src=\"$imasroot/javascript/ASCIIMathMLwFallback.js\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIMathMLwFallback.js?ver=102009\" type=\"text/javascript\"></script>\n";
 	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIIMath = true; var usingASCIISvg = true;</script>"; 
-	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>'; 
+	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";';
+	if ($mathdarkbg) {echo 'var mathbg = "dark";';}
+	echo '</script>'; 
 	echo '<script type="text/javascript">var AScgiloc = "'.$imasroot.'/filter/graph/svgimg.php";</script>'; 
 } else {
 if (!isset($sessiondata['mathdisp'])) {
@@ -34,8 +37,10 @@ if ($sessiondata['mathdisp']==1) {
 	echo "<script type=\"text/javascript\">var usingASCIIMath = true;</script>";
 } else if ($sessiondata['mathdisp']==2 && isset($useeditor) && $sessiondata['useed']==1) {
 	//these scripts are used by the editor to make image-based math work in the editor
-	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>'; 
-	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js\" type=\"text/javascript\"></script>\n";
+	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";';
+	if ($mathdarkbg) {echo 'var mathbg = "dark";';}
+	echo '</script>'; 
+	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=102009\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIIMath = false;</script>";
 } else {
 	echo "<script type=\"text/javascript\">var usingASCIIMath = false;</script>";
