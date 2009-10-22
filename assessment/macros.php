@@ -1022,7 +1022,6 @@ function calconarray($array,$todo) {
 }
 
 function multicalconarray() {
-	global $disallowedvar;
 	$args = func_get_args();
 	$nargs = count($args);
 	$todo = array_shift($args);
@@ -1034,14 +1033,8 @@ function multicalconarray() {
 	}
 		
 	$todo = mathphp($todo,implode('|',$vars),false,false);
+	if ($todo=='0;') { return 0;}
 
-	foreach ($vars as $k=>$var) {
-		$todo = str_replace("($var)","(\$$var)",$todo);
-		if (in_array('$'.$var,$disallowedvar) || substr($var,0,7)=='GLOBALS') {
-			echo "disallowed variable name";
-			return false;
-		}
-	}
 	$varlist = '$'.implode(',$',$vars);
 	$evalstr = "return(array_map(create_function('$varlist','return($todo);')";
 	$cnt = count($args[0]);
@@ -1454,7 +1447,6 @@ function definefunc($func,$varlist) {
 }
 
 function evalfunc($farr) {
-	global $disallowedvar;
 	$args = func_get_args();
 	array_shift($args);
 	if (is_array($farr)) {
@@ -1476,17 +1468,12 @@ function evalfunc($farr) {
 			$isnum = false;
 		}
 	}
-	//check vars
-	foreach ($vars as $var) {
-		if (in_array('$'.$var,$disallowedvar) || substr($var,0,7)=='GLOBALS') {
-			echo "disallowed variable name";
-			return false;
-		}
-	}
+	
 	$toparen = implode('|',$vars);
 	
 	if ($isnum) {
 		$func = mathphp($func,$toparen);
+		if ($func=='0;') { return 0;}
 		$toeval = '';
 		foreach ($vars as $i=>$var) {
 			$func = str_replace("($var)","(\$$var)",$func);

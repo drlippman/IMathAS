@@ -11,13 +11,9 @@ array_push($allowedmacros,"calculusdiffquotient","calculusnumint");
 //calculusdiffquotient(function,variable,a,h)
 //calculated the difference quotient (f(a+h)-f(a))/h
 function calculusdiffquotient($func,$var,$a,$h) {
-	global $disallowedvar;
-	if (in_array('$'.$var,$disallowedvar) || substr($var,0,7)=='GLOBALS') {
-		echo "disallowed variable name";
-		return false;
-	}
 	$func = makepretty($func);
 	$func = mathphp($func,$var);
+	if ($func=='0;') { return 0;}
 	$func = str_replace("($var)","(\$$var)",$func);
 	$fah = eval("\$$var = $a + ($h); return($func);");
 	$fa = eval("\$$var = $a; return($func);");
@@ -36,14 +32,10 @@ function calculusnumint($func,$var,$a,$b,$n,$method) {
 	if ($method=='simpsons' && $n%2!=0) {
 		echo "simpsons requires even n";
 		return false;
-	}
-	global $disallowedvar;
-	if (in_array('$'.$var,$disallowedvar) || substr($var,0,7)=='GLOBALS') {
-		echo "disallowed variable name";
-		return false;
 	}	
 	$func = makepretty($func);
 	$func = mathphp($func,$var);
+	if ($func=='0;') { return 0;}
 	$func = str_replace("($var)","(\$$var)",$func);
 	$evalfunc = create_function("\$$var",'return('.$func.');');
 	$dx = ($b-$a)/$n;

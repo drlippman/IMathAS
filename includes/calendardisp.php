@@ -129,8 +129,11 @@ while ($row = mysql_fetch_row($result)) {
 		continue;
 	}
 	//echo "{$row[1]}, {$row[3]}, $uppertime, {$row[4]}<br/>";
-	if (($row[2]>$now && !isset($teacherid))  || ($row[4]>0 && $now>$row[4] && !isset($teacherid))) {  //|| ($now>$row[3] && $row[4]==0)
+	if (($row[2]>$now && !isset($teacherid))) {  //if startdate is past now
 		continue;
+	} 
+	if ($row[4]>0 && $now>$row[4] && !isset($teacherid)) { //if has reviewdate and we're past it   //|| ($now>$row[3] && $row[4]==0)
+		//continue;
 	}
 	
 	if (!isset($teacherid) && $row[6]>0) {
@@ -145,7 +148,14 @@ while ($row = mysql_fetch_row($result)) {
 			   }
 		   }
 	}
-	if ($row[3]<$uppertime && $row[3]>$exlowertime && ($now<$row[3] || isset($teacherid))) {
+	if ($row[4]<$uppertime && $row[4]>0 && $now>$row[3]) { //has review, and we're past enddate
+		list($moday,$time) = explode('~',date('n-j~g:i a',$row[4]));
+		$row[1] = str_replace('"','\"',$row[1]);
+		if ($now<$row[4]) { $colors[$k] = '#99f';} else {$colors[$k] = '#ccc';}
+		$assess[$moday][$k] = "{type:\"AR\", time:\"$time\", ";
+		if ($now<$row[4] || isset($teacherid)) { $assess[$moday][$k] .= "id:\"$row[0]\",";}
+		$assess[$moday][$k] .=  "color:\"".$colors[$k]."\",name:\"$row[1]\"".((isset($teacherid))?", editlink:true":"")."}";
+	} else if ($row[3]<$uppertime && $row[3]>$exlowertime) {// taking out "hide if past due" && ($now<$row[3] || isset($teacherid))) {
 		if (isset($gbcats[$row[5]])) {
 			$tag = $gbcats[$row[5]];
 		} else {
@@ -160,13 +170,11 @@ while ($row = mysql_fetch_row($result)) {
 		list($moday,$time) = explode('~',date('n-j~g:i a',$row[3]));
 		$row[1] = str_replace('"','\"',$row[1]);
 		$colors[$k] = makecolor2($row[2],$row[3],$now);
-		$assess[$moday][$k] = "{type:\"A\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors[$k]."\", allowlate:\"$lp\", tag:\"$tag\"".(($row[8]>0)?", timelimit:true":"").((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
+		$assess[$moday][$k] = "{type:\"A\", time:\"$time\", ";
+		if ($now<$row[3] || isset($teacherid)) { $assess[$moday][$k] .= "id:\"$row[0]\",";}
+		$assess[$moday][$k] .= "name:\"$row[1]\", color:\"".$colors[$k]."\", allowlate:\"$lp\", tag:\"$tag\"".(($row[8]>0)?", timelimit:true":"").((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
 	} 
-	if ($row[4]<$uppertime && $row[4]>0) { //has review
-		list($moday,$time) = explode('~',date('n-j~g:i a',$row[4]));
-		$row[1] = str_replace('"','\"',$row[1]);
-		$assess[$moday][$k] = "{type:\"AR\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\"".((isset($teacherid))?", editlink:true":"")."}";
-	} 
+	
 	$k++;
 }
 if (isset($teacherid)) {
@@ -280,7 +288,7 @@ for ($i=0;$i<count($hdrs);$i++) {
 			foreach ($assess[$ids[$i][$j]] as $k=>$info) {
 				//echo $assess[$ids[$i][$j]][$k];
 				if (strpos($info,'type:"AR"')!==false) {
-					echo "<span style=\"background-color:#99f;padding: 0px 3px 0px 3px;\">R</span> ";
+					echo "<span style=\"background-color:".$colors[$k].";padding: 0px 3px 0px 3px;\">R</span> ";
 				} else if (strpos($info,'type:"A"')!==false) {
 					echo "<span style=\"background-color:".$colors[$k].";padding: 0px 3px 0px 3px;\">{$tags[$k]}</span> ";
 				} else if (strpos($info,'type:"F')!==false) { 

@@ -36,6 +36,18 @@ function mathphp($st,$varlist,$skipfactorial=false,$ignorestrings=true) {
 	//to handle !something type ifcond.  Might need to reexplore
 	
 	$vars = explode('|',$varlist);
+	//security check variables (we might evaling with them later)
+	global $disallowedvar;
+	if (!isset($disallowedvar)) {
+		$disallowedvar = array('$link','$qidx','$qnidx','$seed','$qdata','$toevalqtxt','$la','$GLOBALS','$laparts','$anstype','$kidx','$iidx','$tips','$options','$partla','$partnum','$score','$disallowedvar','$allowedmacros');
+	}
+	foreach ($vars as $var) {
+		if (in_array('$'.$var,$disallowedvar) || substr($var,0,7)=='GLOBALS') {
+			echo "disallowed variable name";
+			return "0;";
+		}
+	}
+	
 	//take care of sin^-1 notation first
 	$st = mathphppre($st);
 	$st = preg_replace('/(\+|\-)\s+(\+|\-)/',"$1$2",$st);

@@ -4,6 +4,8 @@
 global $allowedmacros;
 array_push($allowedmacros, "discretenewtons");
 
+
+	
 //discretenewtons(function,xmin,xmax,[guess]) 
 //applies a discrete form of Newton's method to find a root of the function
 //on the interval [xmin,xmax].  Starts at midpoint of interval, or at guess if
@@ -31,7 +33,8 @@ function discretenewtons($func,$xmin,$xmax,$guess=null) {
 		$y = eval("return ($func);");
 		$cnt++;
 	}
-	echo $cnt;
+	//echo "N cnt: $cnt. ";
+	
 	if ($cnt==20) {
 		if ($x>$xmax || $x<$xmin) {
 			echo "Newton's did not converge within interval";
@@ -49,6 +52,5 @@ function discretenewtons($func,$xmin,$xmax,$guess=null) {
 	}
 	
 }
-
 
 ?>

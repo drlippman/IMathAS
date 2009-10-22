@@ -42,19 +42,26 @@
 
 	if ($_GET['asid']=="new" && $isteacher) {
 		$aid = $_GET['aid'];
-		$query = "SELECT * FROM imas_assessments WHERE id='$aid'";
+		//student could have started, so better check to make sure it still doesn't exist
+		$query = "SELECT id FROM imas_assessment_sessions WHERE userid='{$_GET['uid']}' AND assessmentid='$aid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$adata = mysql_fetch_array($result, MYSQL_ASSOC);
-	
-		require("../assessment/asidutil.php");
-		list($qlist,$seedlist,$reviewseedlist,$scorelist,$attemptslist,$lalist) = generateAssessmentData($adata['itemorder'],$adata['shuffle'],$aid);
-		$starttime = time();
-		$query = "INSERT INTO imas_assessment_sessions (userid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers,reviewscores,reviewattempts,reviewseeds,reviewlastanswers) ";
-		$query .= "VALUES ('{$_GET['uid']}','$aid','$qlist','$seedlist','$scorelist','$attemptslist','$lalist',$starttime,'$scorelist','$attemptslist','$seedlist','$lalist','$scorelist','$attemptslist','$reviewseedlist','$lalist');";
-		mysql_query($query) or die("Query failed : " . mysql_error());
-		$asid = mysql_insert_id();
-															
-		$_GET['asid'] = $asid;
+		if (mysql_num_rows($result)>0) {
+			$_GET['asid'] = mysql_result($result,0,0);
+		} else {
+			$query = "SELECT * FROM imas_assessments WHERE id='$aid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$adata = mysql_fetch_array($result, MYSQL_ASSOC);
+		
+			require("../assessment/asidutil.php");
+			list($qlist,$seedlist,$reviewseedlist,$scorelist,$attemptslist,$lalist) = generateAssessmentData($adata['itemorder'],$adata['shuffle'],$aid);
+			$starttime = time();
+			$query = "INSERT INTO imas_assessment_sessions (userid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers,reviewscores,reviewattempts,reviewseeds,reviewlastanswers) ";
+			$query .= "VALUES ('{$_GET['uid']}','$aid','$qlist','$seedlist','$scorelist','$attemptslist','$lalist',$starttime,'$scorelist','$attemptslist','$seedlist','$lalist','$scorelist','$attemptslist','$reviewseedlist','$lalist');";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			$asid = mysql_insert_id();
+																
+			$_GET['asid'] = $asid;
+		}
 		
 	}
 	//PROCESS ANY TODOS
