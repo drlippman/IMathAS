@@ -154,12 +154,17 @@ function showcalcontentsid(elid) {
 				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type=='L') {
 				html += '<li><span style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+ caleventsarr[elid].data[i].tag+'</span> ';
-				if (caleventsarr[elid].data[i].link=='') {
-					html += '<a href="../course/showlinkedtext.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">';
+				if (caleventsarr[elid].data[i].id!=null) { 
+					if (caleventsarr[elid].data[i].link=='') {
+						html += '<a href="../course/showlinkedtext.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">';
+					} else {
+						html += '<a href="'+caleventsarr[elid].data[i].link+'">';
+					}
+					html += caleventsarr[elid].data[i].name + '</a>';
 				} else {
-					html += '<a href="'+caleventsarr[elid].data[i].link+'">';
+					html += caleventsarr[elid].data[i].name;
 				}
-				html += caleventsarr[elid].data[i].name + '</a>';
+				
 				if (caleventsarr[elid].data[i].editlink!=null) {
 					html += ' <a href="addlinkedtext.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Modify</a>';
 				}

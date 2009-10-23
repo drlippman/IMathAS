@@ -177,11 +177,11 @@ while ($row = mysql_fetch_row($result)) {
 	
 	$k++;
 }
-if (isset($teacherid)) {
+//if (isset($teacherid)) {
 	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag FROM imas_inlinetext WHERE ((oncal=2 AND enddate>$exlowertime AND enddate<$uppertime) OR (oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND avail=1 AND courseid='$cid'";
-} else {
-	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag FROM imas_inlinetext WHERE ((oncal=2 AND enddate>$lowertime AND enddate<$uppertime AND startdate<$now) OR (oncal=1 AND startdate<$now AND startdate>$exlowertime)) AND avail=1 AND courseid='$cid'";
-}
+//} else {
+//	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag FROM imas_inlinetext WHERE ((oncal=2 AND enddate>$lowertime AND enddate<$uppertime AND startdate<$now) OR (oncal=1 AND startdate<$now AND startdate>$exlowertime)) AND avail=1 AND courseid='$cid'";  //chg 10/23/09: replace $now with $uppertime
+//}
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 while ($row = mysql_fetch_row($result)) {
 	if ($row[1]=='##hidden##') {
@@ -199,11 +199,11 @@ while ($row = mysql_fetch_row($result)) {
 	$k++;
 }
 //$query = "SELECT id,title,enddate,text,startdate,oncal,caltag FROM imas_linkedtext WHERE ((oncal=2 AND enddate>$lowertime AND enddate<$uppertime AND startdate<$now) OR (oncal=1 AND startdate<$now AND startdate>$exlowertime)) AND avail=1 AND courseid='$cid'";
-if (isset($teacherid)) {
+//if (isset($teacherid)) {
 	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag FROM imas_linkedtext WHERE ((oncal=2 AND enddate>$exlowertime AND enddate<$uppertime) OR (oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND avail=1 AND courseid='$cid'";
-} else {
-	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag FROM imas_linkedtext WHERE ((oncal=2 AND enddate>$lowertime AND enddate<$uppertime AND startdate<$now) OR (oncal=1 AND startdate<$now AND startdate>$exlowertime)) AND avail=1 AND courseid='$cid'";
-}
+//} else {
+//	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag FROM imas_linkedtext WHERE ((oncal=2 AND enddate>$lowertime AND enddate<$uppertime AND startdate<$now) OR (oncal=1 AND startdate<$now AND startdate>$exlowertime)) AND avail=1 AND courseid='$cid'";
+//}
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 while ($row = mysql_fetch_row($result)) {
 	if ($row[5]==1) {
@@ -221,7 +221,11 @@ while ($row = mysql_fetch_row($result)) {
 		   $alink = '';
 	   }
 	$colors[$k] = makecolor2($row[4],$row[2],$now);
-	$assess[$moday][$k] = "{type:\"L\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", link:\"$alink\", color:\"".$colors[$k]."\", tag:\"{$row[6]}\"".((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
+	$assess[$moday][$k] = "{type:\"L\", time:\"$time\", ";
+	if (isset($teacherid) || ($now<$row[2] && $now>$row[4])) {
+		$assess[$moday][$k] .= "id:\"$row[0]\", ";
+	}
+	$assess[$moday][$k] .= "name:\"$row[1]\", link:\"$alink\", color:\"".$colors[$k]."\", tag:\"{$row[6]}\"".((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
 	$tags[$k] = $row[6];
 	$k++;
 }
