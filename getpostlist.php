@@ -158,7 +158,7 @@
 		} else if ($n>1) {
 			$line['title'] = "Re<sup>$n</sup>: ".$line['title'];
 		}
-		$url = "/msgs/viewmsg.php?cid=0&amp;type=msg&amp;msgid="+$line['id'];	
+		$url = "/msgs/viewmsg.php?cid=0&amp;type=msg&amp;msgid=".$line['id'];	
 		echo "<tr><td>";
 		echo "<a style='color: blue;' href='$url' target='_new'>".$line['title']."</a></td>";
 		echo "<td><span style='color: black;'>".htmlspecialchars("{$line['LastName']}, {$line['FirstName']}")."</span><br/>";

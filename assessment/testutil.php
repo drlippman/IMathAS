@@ -39,7 +39,7 @@ function getquestioninfo($qns,$testsettings) {
 				
 			} 
 			if (!$foundweights) {
-				preg_match('/anstypes(.*)/',$line['control'],$match);
+				preg_match('/anstypes\s*=(.*)/',$line['control'],$match);
 				$n = substr_count($match[1],',')+1;
 				if ($n>1) {
 					$line['answeights'] = array_fill(0,$n-1,round(1/$n,3));
@@ -242,12 +242,26 @@ function printscore($sc,$qn) {
 		$diff = $poss - array_sum($ptposs);
 		$ptposs[count($ptposs)-1] += $diff;
 		
+		
 		$pts = getpts($sc);
 		$sc = str_replace('-1','N/A',$sc);
 		//$sc = str_replace('~',', ',$sc);
 		$scarr = explode('~',$sc);
 		foreach ($scarr as $k=>$v) {
-			if (!is_numeric($v) || $v==0) { $w = 1; } else {
+			if ($ptposs[$k]==0) {
+				$pm = 'gchk';
+			} else if (!is_numeric($v) || $v==0) { 
+				$pm = 'redx';
+			} else if (abs($v-$ptposs[$k])<.011) {
+				$pm = 'gchk';
+			} else {
+				$pm = 'ychk';
+			}
+			/*if (!is_numeric($v) || $v==0) { 
+				$w = 1; 
+			} if ($ptposs[$k]==0) {
+				$w = 14;	
+			} else {
 				$w = round(14*$sc/$ptposs[$k]);
 			}
 			$bar = '<span class="miniscorebarholder">';
@@ -261,6 +275,8 @@ function printscore($sc,$qn) {
 			$wmt = 14-$w;
 			$bar .= '<span class="miniscorebarinner" style="background-color:'.$color.';margin-top:'.$wmt.'px;height:'.$w.'px;">&nbsp;</span></span> ';
 			//$scarr[$k] = $bar.$v;
+			*/
+			$bar = "<img src=\"$imasroot/img/$pm.gif\" />";
 			$scarr[$k] = "$bar $v/{$ptposs[$k]}";
 		}
 		$sc = implode(', ',$scarr);
@@ -268,7 +284,11 @@ function printscore($sc,$qn) {
 		$out =  "$pts out of $poss (parts: $sc)";
 	}	
 	$bar = '<span class="scorebarholder">';
-	$w = round(30*$pts/$poss);
+	if ($poss==0) {
+		$w = 30;
+	} else {
+		$w = round(30*$pts/$poss);
+	}
 	if ($w==0) {$w=1;}
 	if ($w < 15) { 
 	     $color = "#f".dechex(floor(16*($w)/15))."0";

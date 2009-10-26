@@ -219,7 +219,7 @@ function interpretline($str) {
 		$lines[] = implode('',$bits);
 	}
 	//collapse to string
-	return implode(';',$lines);
+	return implode(";\n",$lines);
 }
 
 //get tokens

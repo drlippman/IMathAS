@@ -6,16 +6,23 @@
 //   aid_###     : launches assessment with given id.  secret is ltisecret
 //   cid_###     : launches course with given id.  secret is ltisecret
 //   sso_userid  : launches single signon using given userid w/ rights 11. 
-//                 secret value stored in DB password field.  Current must be manually editted in DB
+//                 secret value stored in DB password field.  Currently must be manually editted in DB
 //   all accept additional _0 or _1  :  0 is default, and links LMS account with a local account
 //                                      1 using LMS for validation, does not ask for local account info
 //  LMS MUST provide, in addition to key and secret:
 //    user_id
 //    tool_consumer_instance_guid  (LMS domain name)
 //  LMS MAY provide:
-//    lis_person_name_first
-//    lis_person_name_last
+//    lis_person_name_given
+//    lis_person_name_family
 //    lis_person_contact_email_primary
+
+//TODO:  Shouldn't be trusting sent guid, since some other evil instructor could use their LTI key on their
+// own LMS, spoofing a guid and user_id to access accounts of other users
+// resolution:  Add course id to guid.  Doing so should eliminate cross-course hacking.  Don't really care if
+// an instructor spoofs on themselves :)
+// for SSO, we'll need to append something as well - perhaps the key itself.  That was there can't be any
+// cross-ssouser hacking
 
 include("config.php");
 if ($enablebasiclti!=true) {
@@ -276,6 +283,15 @@ if (isset($_GET['launch'])) {
 				$ltiorgname = $ltiorg;
 			}
 			
+			//strip off prepended org info before display
+			$ltiorgparts = explode(':',$ltiorgname);
+			if (count($ltiorgparts)>2) {
+				array_shift($ltiorgparts);
+				$ltiorgname = implode(':',$ltiorgparts);
+			} else {
+				$ltiorgname = $ltiorgparts[1];
+			}
+			
 			//tying LTI to IMAthAS account
 			//give option to provide existing account info, or provide full new student info
 			echo "<p>If you already have an account on $installname, enter your username and ";
@@ -322,11 +338,11 @@ if (isset($_GET['launch'])) {
 	} else {
 		$ltiuserid = $_REQUEST['user_id'];
 	}
-	if (empty($_REQUEST['roles'])) {
+	/*if (empty($_REQUEST['roles'])) {
 		reporterror("roles is required");
 	} else {
 		$ltirole = $_REQUEST['roles'];
-	}
+	}*/
 	if (empty($_REQUEST['tool_consumer_instance_guid'])) {
 		reporterror("tool_consumer_instance_guid (LMS domain name) is required");
 	} else {
@@ -358,6 +374,20 @@ if (isset($_GET['launch'])) {
 	
 	$keyparts = explode('_',$ltikey);
 	
+	// prepend ltiorg with courseid or sso+userid to prevent cross-instructor hacking  
+	if ($keyparts[0]=='cid') {  //cid:org
+		$ltiorg = $keyparts[1].':'.$ltiorg;
+	} else if ($keyparts[0]=='aid') {   //also cid:org
+		$aid = intval($keyparts[1]);
+		$query = "SELECT courseid FROM imas_assessments WHERE id='$aid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$ltiorg = mysql_result($result,0,0) . ':' . $ltiorg;
+	} else if ($keyparts[0]=='sso') {  //ssouserid:org
+		$ltiorg = $keyparts[0].$keyparts[1]. ':' . $ltiorg;
+	} else {
+		reporterror("invalid key. unknown action type");
+	}
+	
 	//look if we know this student
 	$query = "SELECT userid FROM imas_ltiusers WHERE org='$ltiorg' AND ltiuserid='$ltiuserid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -372,10 +402,10 @@ if (isset($_GET['launch'])) {
 		$_SESSION['ltiorg'] = $ltiorg;
 		
 		//if doing lti_only, and first/last name were provided, go ahead and use them and don't ask
-		if (count($keyparts)>2 && $keyparts[2]==1 && ((!empty($_REQUEST['lis_person_name_first']) && !empty($_REQUEST['lis_person_name_last'])) || !empty($_REQUEST['lis_person_name_full'])) ) {
-			if (!empty($_REQUEST['lis_person_name_first']) && !empty($_REQUEST['lis_person_name_last'])) {
-				$firstname = $_REQUEST['lis_person_name_first'];
-				$lastname = $_REQUEST['lis_person_name_last'];
+		if (count($keyparts)>2 && $keyparts[2]==1 && ((!empty($_REQUEST['lis_person_name_given']) && !empty($_REQUEST['lis_person_name_family'])) || !empty($_REQUEST['lis_person_name_full'])) ) {
+			if (!empty($_REQUEST['lis_person_name_given']) && !empty($_REQUEST['lis_person_name_family'])) {
+				$firstname = $_REQUEST['lis_person_name_given'];
+				$lastname = $_REQUEST['lis_person_name_family'];
 			} else {
 				$firstname = '';
 				$lastname = $_REQUEST['lis_person_name_full'];
@@ -403,8 +433,8 @@ if (isset($_GET['launch'])) {
 		} else {
 			////create form asking them for user info
 			$askforuserinfo = true;
-			$_SESSION['LMSfirstname'] = $_REQUEST['lis_person_name_first'];
-			$_SESSION['LMSlastname'] = $_REQUEST['lis_person_name_last'];
+			$_SESSION['LMSfirstname'] = $_REQUEST['lis_person_name_given'];
+			$_SESSION['LMSlastname'] = $_REQUEST['lis_person_name_family'];
 			if (!empty($_REQUEST['lis_person_contact_email_primary'])) {
 				$_SESSION['LMSemail'] = $_REQUEST['lis_person_contact_email_primary'];
 			} 
