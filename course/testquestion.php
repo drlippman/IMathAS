@@ -19,7 +19,10 @@ if ($myrights<20) {
 } else {
 	//data manipulation here
 	$useeditor = 1;
-	if (!isset($_POST['seed']) || isset($_POST['regen'])) {
+	if (isset($_GET['seed'])) {
+		$seed = $_GET['seed'];
+		$attempt = 0;
+	} else if (!isset($_POST['seed']) || isset($_POST['regen'])) {
 		$seed = rand(0,10000);
 		$attempt = 0;
 	} else {
