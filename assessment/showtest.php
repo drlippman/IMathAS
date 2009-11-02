@@ -938,9 +938,9 @@
 					}
 				}
 				if ($lefttodo > 0) {
-					echo "<p>or click <a href=\"showtest.php?action=skip&amp;done=true\">here</a> to end and score test now</p>\n";
+					echo "<p>or click <a href=\"showtest.php?action=skip&amp;done=true\">here</a> to finalize assessment and summarize score</p>\n";
 				} else {
-					echo "<a href=\"showtest.php?action=skip&amp;done=true\">Click here to finalize and score test</a>\n";
+					echo "<a href=\"showtest.php?action=skip&amp;done=true\">Click here to finalize assessment and summarize score</a>\n";
 				}
 				echo "</div>\n";
 			    }
@@ -987,7 +987,7 @@
 						echo "<p><a href=\"showtest.php?action=skip&amp;to=$next&amp;regen=$next\">Try another similar question</a></p>\n";
 					}
 					if ($lefttodo == 0) {
-						echo "<a href=\"showtest.php?action=skip&amp;done=true\">Click here to finalize and score test</a>\n";
+						echo "<a href=\"showtest.php?action=skip&amp;done=true\">Click here to finalize assessment and summarize score</a>\n";
 					}
 					if (!$reattemptsremain && $testsettings['showans']!='N') {// && $showeachscore) {
 						echo "<p>Question with last attempt is displayed for your review only</p>";
@@ -1028,8 +1028,8 @@
 						echo printscore($rawscore,$qn);
 						echo "</p>";
 					}
-					echo "<p>";
-					echo "Score on last attempt: ";
+					//echo "<p>";
+					//echo "Score on last attempt: ";
 					echo "<p>Score on last attempt: ";
 					echo printscore($scores[$qn],$qn);
 					echo "</p>\n";
@@ -1070,7 +1070,7 @@
 					$done = true;
 				} 
 				if (!$done) {
-					echo "<p>Question scored. Continue with assessment, or click <a href=\"showtest.php?action=seq&amp;done=true\">here</a> to end and score test now</p>\n";
+					echo "<p>Question scored. Continue with assessment, or click <a href=\"showtest.php?action=seq&amp;done=true\">here</a> to finalize and summarize score.</p>\n";
 					echo "</div>\n";
 					echo "<hr/>";
 				} else {

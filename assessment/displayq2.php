@@ -897,9 +897,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 				if (isset($fromto[2]) && $fromto[2]=="integers") {
 					$tp[$j] = rand($fromto[0],$fromto[1]);
 				} else if (isset($fromto[2*$j+1])) {
-					$tp[$j] = $fromto[2*$j] + ($fromto[2*$j+1]-$fromto[2*$j])*rand(0,32000)/32000.0;
+					$tp[$j] = $fromto[2*$j] + ($fromto[2*$j+1]-$fromto[2*$j])*rand(0,499)/500.0 + 0.001;
 				} else {
-					$tp[$j] = $fromto[0] + ($fromto[1]-$fromto[0])*rand(0,32000)/32000.0;
+					$tp[$j] = $fromto[0] + ($fromto[1]-$fromto[0])*rand(0,499)/500.0 + 0.001;
 				}
 			}
 			$pts[$i] = implode("~",$tp);
@@ -1163,7 +1163,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			}
 			for ($i=0; $i<count($grid); $i++) {
 				if ($grid[$i]!='') {
-					$settings[$i] = $grid[$i];
+					$settings[$i] = evalbasic($grid[$i]);
 				}
 			}
 		}
@@ -1472,6 +1472,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			if (isset($_POST["qn$qn"][$i])!==(in_array($randqkeys[$i],$akeys))) {
 				$score -= $deduct;
 			}
+		}
+		if (isset($scoremethod) && $scoremethod=='allornothing' && $score<1) {
+			$score = 0;
 		}
 		if ($score < 0) {
 			$score = 0;
@@ -1979,9 +1982,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				if (isset($fromto[2]) && $fromto[2]=="integers") {
 					$tps[$i][$j] = rand($fromto[0],$fromto[1]);
 				} else if (isset($fromto[2*$j+1])) {
-					$tps[$i][$j] = $fromto[2*$j] + ($fromto[2*$j+1]-$fromto[2*$j])*rand(0,32000)/32000.0;
+					$tps[$i][$j] = $fromto[2*$j] + ($fromto[2*$j+1]-$fromto[2*$j])*rand(0,499)/500.0 + 0.001;
 				} else {
-					$tps[$i][$j] = $fromto[0] + ($fromto[1]-$fromto[0])*rand(0,32000)/32000.0;
+					$tps[$i][$j] = $fromto[0] + ($fromto[1]-$fromto[0])*rand(0,499)/500.0 + 0.001;
 				}
 			}
 		}
@@ -2342,12 +2345,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 			for ($i=0; $i<count($grid); $i++) {
 				if ($grid[$i]!='') {
-					$settings[$i] = $grid[$i];
+					$settings[$i] = evalbasic($grid[$i]);
 				}
 			}
 		}
 		$pixelsperx = ($settings[6] - 2*$imgborder)/($settings[1]-$settings[0]);
 		$pixelspery = ($settings[7] - 2*$imgborder)/($settings[3]-$settings[2]);
+		
 		$anslines = array();
 		$ansdots = array();
 		$ansodots = array();

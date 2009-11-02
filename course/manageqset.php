@@ -357,11 +357,19 @@ if ($myrights<20) {
 			$curBreadcrumb .= " &gt; <a href=\"manageqset.php?cid=$cid\">Manage Question Set </a>";
 			$curBreadcrumb .= " &gt; Modify Assignments";
 			
-			$clist = implode(",",$_POST['nchecked']);
+			
 		
 			if (!isset($_POST['nchecked'])) {
 				$overwriteBody = 1;
 				$body = "No questions selected.  <a href=\"manageqset.php?cid=$cid\">Go back</a>\n";
+			} else {
+				$clist = implode(",",$_POST['nchecked']);
+				$query = "SELECT DISTINCT ili.libid FROM imas_library_items AS ili WHERE ili.qsetid IN ($clist)";
+				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+				while ($row = mysql_fetch_row($result)) {
+					$checked[] = $row[0];	
+				}
+				$_GET['selectrights'] = 1;
 			}
 			/*
 			if (!$isadmin && !$isgrpadmin) {
@@ -379,7 +387,7 @@ if ($myrights<20) {
 				}
 			}
 			*/
-			$query = "SELECT DISTINCT ili.libid FROM imas_library_items AS ili WHERE ili.qsetid IN ($clist)";
+			
 			/*if ($isgrpadmin) {
 				$query = "SELECT ili.libid FROM imas_library_items AS ili,imas_users WHERE ";
 				$query .= "ili.ownerid=imas_users.id AND imas_users.groupid='$groupid' AND ili.qsetid IN ($clist)";
@@ -390,11 +398,7 @@ if ($myrights<20) {
 				}
 			}
 			*/
-			$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-			while ($row = mysql_fetch_row($result)) {
-				$checked[] = $row[0];	
-			}
-			$_GET['selectrights'] = 1;
+			
 			
 		}		
 		

@@ -229,23 +229,31 @@ while ($row = mysql_fetch_row($result)) {
 	$tags[$k] = $row[6];
 	$k++;
 }
-$query = "SELECT id,name,postby,replyby,startdate FROM imas_forums WHERE enddate>$lowertime AND ((postby>$exlowertime AND postby<$uppertime) OR (replyby>$exlowertime AND replyby<$uppertime)) AND avail>0 AND courseid='$cid'";
+$query = "SELECT id,name,postby,replyby,startdate FROM imas_forums WHERE enddate>$exlowertime AND ((postby>$exlowertime AND postby<$uppertime) OR (replyby>$exlowertime AND replyby<$uppertime)) AND avail>0 AND courseid='$cid'";
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 while ($row = mysql_fetch_row($result)) {
 	if (($row[4]>$now && !isset($teacherid))) {
 		continue;
 	}
-	if (($row[2]>$now || isset($teacherid)) && $row[2]!=2000000000) {
+	if ($row[2]!=2000000000) { //($row[2]>$now || isset($teacherid))
 		list($moday,$time) = explode('~',date('n-j~g:i a',$row[2]));
 		$row[1] = str_replace('"','\"',$row[1]);
 		$colors[$k] = makecolor2($row[4],$row[2],$now);
-		$assess[$moday][$k] = "{type:\"FP\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors[$k]."\"".((isset($teacherid))?", editlink:true":"")."}";
+		$assess[$moday][$k] = "{type:\"FP\", time:\"$time\", ";
+		if ($row[2]>$now || isset($teacherid)) {
+			$assess[$moday][$k] .= "id:\"$row[0]\",";
+		}
+		$assess[$moday][$k] .= "name:\"$row[1]\", color:\"".$colors[$k]."\"".((isset($teacherid))?", editlink:true":"")."}";
 		$k++;
 	}
-	if (($row[3]>$now || isset($teacherid)) && $row[3]!=2000000000) {
+	if ($row[3]!=2000000000) { //($row[3]>$now || isset($teacherid)) 
 		list($moday,$time) = explode('~',date('n-j~g:i a',$row[3]));
 		$colors[$k] = makecolor2($row[4],$row[3],$now);
-		$assess[$moday][$k] = "{type:\"FR\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors[$k]."\"".((isset($teacherid))?", editlink:true":"")."}";
+		$assess[$moday][$k] = "{type:\"FR\", time:\"$time\",";
+		if ($row[3]>$now || isset($teacherid)) {
+			$assess[$moday][$k] .= "id:\"$row[0]\",";
+		}
+		$assess[$moday][$k] .= "name:\"$row[1]\", color:\"".$colors[$k]."\"".((isset($teacherid))?", editlink:true":"")."}";
 		$k++;	
 	}
 }

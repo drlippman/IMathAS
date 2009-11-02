@@ -1655,5 +1655,15 @@ function decimaltofraction($d,$format="fraction",$maxden = 5000) {
 	}
 }
 
+function evalbasic($str) {
+	if (is_numeric($str)) {
+		return $str;
+	} else if (preg_match('/[^\d+\-\/\*\.]/',$str)) {
+		return $str;
+	} else {
+		eval("\$ret = $str;");
+		return $ret;
+	}
+}
 
 ?>
