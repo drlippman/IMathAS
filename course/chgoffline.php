@@ -33,7 +33,7 @@ if (isset($_POST['checked'])) { //form submitted
 			echo '<input type="hidden" name="submit" value="Delete" />';
 			echo '<input type="hidden" name="checked" value="'.$checkedlist.'"/>';
 			echo '<p>Are you <b>SURE</b> you want to delete these offline grade items ';
-			echo 'and the associated student grades?</p><p>';
+			echo 'and the associated student grades?<br/>If you haven\'t already, you might want to back up the gradebook first.</p><p>';
 			$checkedlist = "'".implode("','",$checked)."'";
 			$query = "SELECT name FROM imas_gbitems WHERE id IN ($checkedlist)";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -112,6 +112,7 @@ echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid
 echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 echo "&gt; Manage Offline Grades</div>";
 echo '<h3>Manage Offline Grades</h3>';
+
 echo "<form id=\"mainform\" method=post action=\"chgoffline.php?cid=$cid\">";
 
 $gbitems = array();
@@ -125,21 +126,22 @@ if (count($gbitems)==0) {
 	echo '<a href="uploadmultgrades.php?cid='.$cid.'">Upload multiple offline grades</a></p>';
 	require("../footer.php");
 	exit;
+} else {
+	echo '<div class="cpmid"><a href="uploadmultgrades.php?cid='.$cid.'">Upload multiple offline grades</a></div>';
 }
 ?>
 Check/Uncheck All: 
-<input type="checkbox" name="ca" value="1" onClick="chkAll(this.form, 'checked[]', this.checked)" checked=checked>
+<input type="checkbox" name="ca" value="1" onClick="chkAll(this.form, 'checked[]', this.checked)" >
 <ul class=nomark>
 
 <?php
 
 foreach($gbitems as $id=>$name) {
-	echo '<li><input type="checkbox" name="checked[]" value="'.$id.'" checked="checked"/> '.$name.'</li>';		
+	echo '<li><input type="checkbox" name="checked[]" value="'.$id.'" /> '.$name.'</li>';		
 }
 ?>
 </ul>
-<p>With selected, <input type="submit" name="submit" value="Delete"/> or make changes below<br/>
-<a href="uploadmultgrades.php?cid=<?php echo $cid; ?>">Upload multiple offline grades</a>
+<p>With selected, <input type="submit" name="submit" value="Delete"/> or make changes below
 <fieldset>
 <legend>Offline Grade Options</legend>
 <table class=gb>

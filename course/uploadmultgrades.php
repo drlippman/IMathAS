@@ -146,9 +146,9 @@ if (!(isset($teacherid))) {
 						if (isset($srow[$i])) {
 							$p = explode(':',$hrow[$i]);
 							if (count($p)>1) {
-								$names[$i] = $p[0];
+								$names[$i] = strip_tags($p[0]);
 							} else {
-								$names[$i] = $hrow[$i];
+								$names[$i] = strip_tags($hrow[$i]);
 							}
 							$pts = intval(preg_replace('/[^\d\.]/','',$srow[$i]));
 							//if ($pts==0) {$pts = '';}
@@ -156,10 +156,10 @@ if (!(isset($teacherid))) {
 							$p = explode(':',$hrow[$i]);
 							if (count($p)>1) {
 								$pts = intval(preg_replace('/[^\d\.]/','',$p[count($p)-1]));
-								$names[$i] = $p[0];
+								$names[$i] = strip_tags($p[0]);
 							} else {
 								$pts = 0;
-								$names[$i] = $hrow[$i];
+								$names[$i] = strip_tags($hrow[$i]);
 							}
 							//if ($pts==0) {$pts = '';}
 						}

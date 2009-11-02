@@ -119,6 +119,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	
 		
 	if (isset($_GET['breakfromgrp']) && isset($_GET['asid'])) {
+		$aid = $_GET['aid'];
 		$query = "SELECT count(id) FROM imas_assessment_sessions WHERE agroupid='{$_GET['asid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		if (mysql_result($result,0,0)>1) { //was group creator and others in group; need to move to new id
@@ -143,6 +144,18 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query = "UPDATE imas_assessment_sessions SET agroupid=0 WHERE id='{$_GET['asid']}'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		}
+		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid&aid=$aid");
+		exit();
+	}
+	if (isset($_GET['breakwholegrp']) && isset($_GET['agid'])) {
+		$agid = intval($_GET['agid']);
+		$aid = $_GET['aid'];
+		if ($agid != 0) {
+			$query = "UPDATE imas_assessment_sessions SET agroupid=0 WHERE agroupid='$agid' AND assessmentid='$aid'";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid&aid=$aid");
+			exit();
+		}
 	}
 
 	if (isset($_GET['aid']) && isset($_GET['cleargrps'])) {
@@ -152,7 +165,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if ($_GET['cleargrps']=='true') {
 			$query = "UPDATE imas_assessment_sessions SET agroupid=0 WHERE assessmentid='$aid'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid");
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid&aid=$aid");
 			exit();
 		} else {
 			$pagetitle = "Clear Groups";
@@ -195,6 +208,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				if (in_array(-1,$scores)) {
 					$page_ulList .= " (IP)";
 				}
+				$page_ulList .= "<br/><a href=\"managestugrps.php?cid=$cid&aid=$aid&agid={$row[0]}&breakwholegrp=true\" onClick=\"return confirm('Are you SURE you want to remove ALL students from this group?');\">Break ALL Students from Group</a>";
+				
 				$page_ulList .=  "		<ul>\n";
 				$groupids[$grpcnt] = $row[0];
 				$grpcnt++;

@@ -170,16 +170,26 @@ function showcalcontentsid(elid) {
 				}
 				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type=='FP') {
-				html += '<li><span style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">F</span> <a href="../forums/thread.php?cid='+cid+'&forum='+caleventsarr[elid].data[i].id+'">';
-				html += caleventsarr[elid].data[i].name + '</a>';
+				html += '<li><span style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">F</span> ';
+				if (caleventsarr[elid].data[i].id!=null) { 
+					html += '<a href="../forums/thread.php?cid='+cid+'&forum='+caleventsarr[elid].data[i].id+'">';
+					html += caleventsarr[elid].data[i].name + '</a>';
+				} else {
+					html += caleventsarr[elid].data[i].name;
+				}
 				html += ' New Threads Due '+caleventsarr[elid].data[i].time;
 				if (caleventsarr[elid].data[i].editlink!=null) {
 					html += ' <a href="addforum.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Modify</a>';
 				}
 				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type=='FR') {
-				html += '<li><span style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">F</span> <a href="../forums/thread.php?cid='+cid+'&forum='+caleventsarr[elid].data[i].id+'">';
-				html += caleventsarr[elid].data[i].name + '</a>';
+				html += '<li><span style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">F</span> ';
+				if (caleventsarr[elid].data[i].id!=null) { 
+					html += '<a href="../forums/thread.php?cid='+cid+'&forum='+caleventsarr[elid].data[i].id+'">';
+					html += caleventsarr[elid].data[i].name + '</a>';
+				} else {
+					html += caleventsarr[elid].data[i].name;
+				}
 				html += ' Replies Due '+caleventsarr[elid].data[i].time;
 				if (caleventsarr[elid].data[i].editlink!=null) {
 					html += ' <a href="addforum.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Modify</a>';
