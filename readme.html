@@ -17,7 +17,7 @@ h2,h3,h4 {
 </style>
 <body>
 <h1>IMathAS</h1>
-<p>Version: 1.7.1.   Released March 25, 2009 <br/>
+<p>Version: 1.8.   Released November __, 2009 <br/>
 See <a href="changelog.html">Change Log</a> for detailed change history.  The most recent version of
 the code is available via SVN at <a href="http://code.google.com/p/imathas/">Google Code</a></p>
 
@@ -108,8 +108,8 @@ and credits for components attributed to others.</p>
 	</ul>
 <li>Mash-ups:</li>
 	<ul>
-	<li>Experimental support for <a href="http://simplelti.appspot.com/">SimpleLTI</a>, both as a consumer and producer</li>
-	<li>Experimental Google gadget for listing messages and forum posts</li>
+	<li>Experimental support for <a href="http://www.imsglobal.org/community/forum/categories.cfm?catid=44">BasicLTI</a>, both as a consumer and producer</li>
+	<li>Google gadget for listing messages and forum posts</li>
 	</ul>
 </ul>
 
@@ -134,7 +134,8 @@ because I don't want students with used books to incur additional cost.</p>
     creation priviledges, you can wait and use it later in the install process.</li>
 <li>Open a browser and access install.php.  This script will write the config.php file, change directory
     permissions, copy distribution files, and set up the database.  At the end of the install you
-    will be given the opportunity to install a small set of example questions.</li>
+    will be given the opportunity to install a small set of example questions.  <i>Note</i>: 
+    If you are running on a Windows server, you may need to set directory permissions manually.</li>
 <li>Log into IMathAS.  If you didn't change the
     initial imathas user settings when running install.php, log in as 'root' with password 'root'. 
     If you did not change the inital imathas user settings, click the "Change Password"
@@ -146,20 +147,21 @@ because I don't want students with used books to incur additional cost.</p>
 </ol>
 </p>
 <h3>Upgrading</h3>
-<p>If you are upgrading from IMathAS 1.6, access update.php to install any new database changes
+<p>If you are upgrading from IMathAS 1.6 or later, access update.php to install any new database changes
 and learn about any other changes necessary.  If you are upgrading from a version earlier
 than 1.6, you'll need to manually apply changes from the upgrade.txt file.
 </p>
 
 <h3>System Requirements</h3>
 <h4>Versions</h4>
-<p>PHP 5 and MySQL 4+ are recommended.  Most of the system will work with PHP 4.2+
+<p>PHP 5 and MySQL 4+ are recommended, and required from some features.  
+Most of the system will work with PHP 4.2+
 and MySQL 3.23, but future compatibility is not guaranteed.</p>
-<p>PHP with GD2 and Treetype are recommended for best image-based graph support</p> 
+<p>PHP with GD2 and Freetype are recommended for best image-based graph support</p> 
 
 <h4>Server Requirements</h4>
-<p>An installation serving 2500+ students 
-with 80+ concurrent users has operated well on a commercial shared web server.</p>
+<p>An installation serving 3500+ students 
+with 100+ concurrent users has operated well on a commercial shared web server.</p>
 
 <h4>Security</h4>
 <p>IMathAS uses a standard databased-stored sessions-based system.  If a user does
@@ -228,7 +230,7 @@ listed here in case anything goes wrong:
 	<li>$mathchaturl:  a URL to the live chat server.  Leave unchanged to use the local install's
 	    server.  Comment out to disable the chat server.  You can also use a different install to
 	    offload chat on a different server</li>
-	<li>$enablesimplelti:  Set to true to enable use of IMathAS as a SimpleLTI producer.</li>
+	<li>$enablebasiclti:  Set to true to enable use of IMathAS as a BasicLTI producer.</li>
 	<li>$AWSkey,$AWSsecret,$AWSbucket:  To allow students and teachers to upload files through
 	    the text editor, and to enable file upload questions, this specifies an Amazon S3
 	    key, secret, and bucket to use for file storage.  Local storage is not yet implemented.</li>

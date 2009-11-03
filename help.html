@@ -1829,6 +1829,14 @@ Your answer was {$stuanswers[0][0]}.  If using it directly in a calculation, enc
 4) $stuanswers[$thisq] is only defined for question scoring, not question display, so don't try to use it in question display.
 </p>
 
+<h4>Reusing Code</h4>
+<p>You can import in the Common Control code from another question using
+<pre>importcodefrom(questionid)</pre>
+where questionid is the ID number of the question you want to import the code of.  In the
+source question, the variable $included can be used to determine if the question has been
+imported into another question, or is running independently.  
+</p>
+
 </div>
 <div class=h2>
 <h2><a name="questiontypes">Question Types</a></h2>
@@ -2000,10 +2008,11 @@ of choices is automatically randomized.
 </p>
 <p><b>Optional Variables</b><BR>
 <dl>
-<dt>$scoremethod = "answers" (In Answer)</dt>
+<dt>$scoremethod = "answers" or "allornothing" (In Answer)</dt>
 	<dd>By default, the total points possible are divided by the number of questions, and partial credit is lost for each
 	correct answer missed and each wrong answer selected.  If $scoremethod="answers" is set, then the total points
-	possible are divided by the number of answers (tougher grading scheme)</dd>
+	possible are divided by the number of answers (tougher grading scheme).  If $scoremethod="allornothing", then the
+	student will only get credit if every piece is correct (no partial credit).</dd>
 <dt>$displayformat = "horiz", "2column, "3column", or "inline" (In Question Control)</dt>
 	<dd>Will lay out the choices horizontally, in multiple columns, or inline with text rather than using the default vertical layout</dd>
 <dt>$noshuffle = "all" (In Common Control)</dt>
@@ -2045,7 +2054,7 @@ A student is asked to match answers with questions
 	<dd>Displays a title above the list of answers</dd>
 <dt>$noshuffle = "questions" or "answers"</dt>
 	<dd>Retains original order of questions or answers, and only shuffles the other.  By default, both lists are shuffled</dd>
-<dt>$displayformat = "select"</dt>
+<dt>$displayformat = "select" or "2columnselect"</dt>
 	<dd>Only displays the $answers, with select boxes next to each containing the $questions.  This should only be used with
 	pure text $questions.</dd>
 <dt>$answerbox (In Question Text)</dt>

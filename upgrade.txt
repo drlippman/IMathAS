@@ -1,6 +1,19 @@
 Upgrade Notes
 
 *********************
+** IMathAS 1.8     **
+*********************
+
+All database changes are now in upgrade.php.  Run that file to apply updates
+to the database.
+
+SimpleLTI has been deprecated and replaced with BasicLTI.  If you have 
+$enablesimplelti in your config.php, change it to enablebasiclti.
+
+If you do not have either currently in your config.php and want to allow 
+imathas to act as a BasicLTI producer, add $enablebasiclti = true to config.php
+
+*********************
 ** IMathAS 1.7     **
 *********************
 
@@ -8,7 +21,6 @@ Upgrade Notes
 
 All database changes are now in upgrade.php.  Run that file to apply updates
 to the database.  
-
 
 *********************
 ** IMathAS 1.6     **
