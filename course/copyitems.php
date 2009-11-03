@@ -166,6 +166,7 @@ if (!(isset($teacherid))) {
 		$types = array();
 		$names = array();
 		$sums = array();
+		$parents = array();
 		getsubinfo($items,'0','');
 		
 		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
@@ -255,6 +256,7 @@ if ($overwriteBody==1) {
 	   } catch(er) {}
 	  }
 	}
+	
 
 	</script>
 	
@@ -307,6 +309,15 @@ if ($overwriteBody==1) {
 	   } catch(er) {}
 	  }
 	}
+	function chkgrp(frm, arr, mark) {
+	  var els = frm.getElementsByTagName("input");
+	  for (var i = 0; i < els.length; i++) {
+		  var el = els[i];
+		  if (el.type=='checkbox' && el.id.indexOf(arr) != -1) {
+	     	       el.checked = mark;
+		  }
+	  }
+	}
 	</script>
 	
 	<form method=post action="copyitems.php?cid=<?php echo $cid ?>&action=copy">
@@ -327,7 +338,8 @@ if ($overwriteBody==1) {
 			if ($alt==0) {echo "		<tr class=even>"; $alt=1;} else {echo "		<tr class=odd>"; $alt=0;}
 ?>			
 			<td>
-			<input type=checkbox name='checked[]' value='<?php echo $ids[$i];?>' checked=checked>
+			<input type=checkbox name='checked[]' value='<?php echo $ids[$i];?>' id='<?php echo $parents[$i];?>' checked=checked <?php
+			if (strpos($types[$i],'Block')!==false) { echo "onClick=\"chkgrp(this.form, '{$ids[$i]}', this.checked);\" ";}?> >
 			</td>
 			<td class="nowrap"><?php echo $types[$i] ?></td>
 			<td><?php echo $names[$i] ?></td>

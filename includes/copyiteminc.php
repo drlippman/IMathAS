@@ -214,13 +214,14 @@ function getiteminfo($itemid) {
 }
 
 function getsubinfo($items,$parent,$pre) {
-	global $ids,$types,$names,$sums;
+	global $ids,$types,$names,$sums,$parents;
 	
 	foreach($items as $k=>$item) {
 		if (is_array($item)) {
 			$ids[] = $parent.'-'.($k+1);
 			$types[] = $pre."Block";
 			$names[] = stripslashes($item['name']);
+			$parents[] = $parent;
 			$sums[] = '';
 			if (count($item['items'])>0) {
 				getsubinfo($item['items'],$parent.'-'.($k+1),$pre.'-&nbsp;');
@@ -230,6 +231,7 @@ function getsubinfo($items,$parent,$pre) {
 				continue;
 			}
 			$ids[] = $item;
+			$parents[] = $parent;
 			$arr = getiteminfo($item);
 			$types[] = $pre.$arr[0];
 			$names[] = $arr[1];
