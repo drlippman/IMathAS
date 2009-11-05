@@ -22,19 +22,20 @@ function interpret($blockname,$anstype,$str)
 		$str = str_replace("\r\n","\n",$str);
 		$str = str_replace("&&\n","<br/>",$str);
 		$str = str_replace("&\n"," ",$str);
-		$r =  interpretline($str.';').';';
+		$r =  interpretline($str.';',$anstype).';';
 		return $r;
 	}
 }
 
 //interpreter some code text.  Returns a PHP code string.
-function interpretline($str) {
+function interpretline($str,$anstype) {
 	$str .= ';';
 	$bits = array();
 	$lines = array();
 	$len = strlen($str);
 	$cnt = 0;
 	$ifloc = -1;
+	$elseloc = array();
 	$forloc = -1;
 	$whereloc = -1;
 	$lastsym = '';
@@ -42,7 +43,7 @@ function interpretline($str) {
 	$closeparens = 0;
 	$symcnt = 0;
 	//get tokens from tokenizer
-	$syms = tokenize($str);
+	$syms = tokenize($str,$anstype);
 	$k = 0;
 	$symlen = count($syms);
 	//$lines holds lines of code; $bits holds symbols for the current line. 
@@ -98,7 +99,7 @@ function interpretline($str) {
 				$hascomma = false;
 			}
 		} else if ($type==7) {//end of line
-			if ($lasttype=='7') {
+			if ($lasttype=='7' || $lasttype==-1) {
 				//nothing exciting, so just continue
 				$k++;
 				continue;
@@ -131,9 +132,43 @@ function interpretline($str) {
 					return 'error';
 				}
 				$cond = implode('',array_slice($bits,1,$j-1));
-				$todo = implode('',array_slice($bits,$j));
-				$bits = array("if ($cond) $todo");
-			} 
+				if (count($elseloc)==0) {
+					$todo = implode('',array_slice($bits,$j));
+				} else {
+					$todo = implode('',array_slice($bits,$j,$elseloc[0][0]-$j));
+				}
+				$out = "if ($cond) $todo";
+				for ($i=0; $i<count($elseloc); $i++) {
+					$j = $elseloc[$i][0];
+					while ($bits[$j]{0}!='{' && $j<count($bits)) {
+						$j++;
+					}
+					if ($j==count($bits)) {
+						echo "need curlys for else statement";
+						return 'error';
+					}
+					if ($i==count($elseloc)-1) {
+						$todo = implode('',array_slice($bits,$j));
+					} else {
+						$todo = implode('',array_slice($bits,$j,$elseloc[$i+1][0]-$j));
+					}
+					if ($j-$elseloc[$i][0]==1) { //no condition
+						if ($elseloc[$i][1]=='elseif') {
+							echo 'need condition for elseif';
+							return 'error';
+						}
+						$out .= " else $todo";
+					} else { //has condition
+						$cond = implode('',array_slice($bits,$elseloc[$i][0]+1,$j-$elseloc[$i][0]-1));
+						$out .= " else if ($cond) $todo";
+					}
+				}
+				$bits = array($out);
+					
+			} else if (count($elseloc)>0) {
+				echo 'else used without leading if statement';
+				return 'error';
+			}
 			if ($whereloc>0) {
 				//handle $a = rand() where ($a==b)
 				if ($ifloc>-1 && $ifloc<$whereloc) {
@@ -197,6 +232,8 @@ function interpretline($str) {
 				$whereloc = count($bits);
 			} else if ($sym=='for') {
 				$forloc = count($bits);
+			} else if ($sym=='else' || $sym=='elseif') {
+				$elseloc[] = array(count($bits),$sym);
 			}
 		} else if ($type==9) {//is error
 			//tokenizer returned an error token - exit current loop with error
@@ -226,7 +263,7 @@ function interpretline($str) {
 //eat up extra whitespace at end
 //return array of arrays: array($symbol,$symtype)
 //types: 1 var, 2 funcname (w/ args), 3 num, 4 parens, 5 curlys, 6 string, 7 endofline, 8 control, 9 error, 0 other, 11 array index []
-function tokenize($str) {
+function tokenize($str,$anstype) {
 	global $allowedmacros;
 	global $mathfuncs;
 	global $disallowedwords,$disallowedvar;
@@ -278,6 +315,16 @@ function tokenize($str) {
 			//check if it's a special word, and set type appropriately if it is
 			if ($out=='if' || $out=='where' || $out=='for') {
 				$intype = 8;
+			} else if ($out=='else' || $out=='elseif') {
+				$intype = 8;
+				if ($out=='else' && substr($str,$i,3)==' if') {
+					$out = 'elseif';
+					$i += 3;
+				}
+				if ($lastsym[1]==7) {
+					array_pop($syms);
+					$lastsym = $syms[count($syms)-1];
+				}
 			} else if ($out=='e') {
 				$out = "exp(1)";
 				$intype = 3;
@@ -334,10 +381,12 @@ function tokenize($str) {
 					//not a function, so what is it?
 					if ($out=='true' || $out=='false' || $out=='null') {
 						//we like this - it's an acceptable unquoted string
-					} else if (isset($GLOBALS['teacherid'])) {
+					} else {//
 						//an unquoted string!  give a warning to instructor, 
 						//but treat as a quoted string.
-						echo "Warning... unquoted string $out.. treating as string";
+						if (isset($GLOBALS['teacherid'])) {
+							echo "Warning... unquoted string $out.. treating as string";
+						}
 						$out = "'$out'";
 						$intype = 6;
 					}
@@ -415,7 +464,7 @@ function tokenize($str) {
 						$thisn--; //decrease nesting depth
 						if ($thisn==0) {
 							//read inside of brackets, send recursively to interpreter
-							$inside = interpretline(substr($str,$i+1,$j-$i-1));
+							$inside = interpretline(substr($str,$i+1,$j-$i-1),$anstype);
 							if ($inside=='error') {
 								//was an error, return error token
 								return array(array('',9));
@@ -489,13 +538,16 @@ function tokenize($str) {
 				$connecttolast = 0;
 			} else if ($lastsym[0] == 'importcodefrom') {
 				$out = intval(substr($out,1,strlen($out)-2));
-				$query = "SELECT control FROM imas_questionset WHERE id='$out'";
+				$query = "SELECT control,qtype FROM imas_questionset WHERE id='$out'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				if (mysql_num_rows($result)==0) {
 					//was an error, return error token
 					return array(array('',9));
 				} else {
-					$inside = interpretline(mysql_result($result,0,0));
+					$inside = interpretline(mysql_result($result,0,0),$anstype);
+					if (mysql_result($result,0,1)!=$anstype) {
+						//echo 'Imported code question type does not match current question answer type';
+					}
 				}
 				if ($inside=='error') {
 					//was an error, return error token
