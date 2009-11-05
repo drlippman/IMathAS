@@ -571,7 +571,7 @@ function showqinfobar($qn,$inreview,$single) {
 
 //shows top info bar for seq mode
 function seqshowqinfobar($qn,$toshow) {
-	global $qi,$questions,$attempts,$testsettings,$scores;
+	global $qi,$questions,$attempts,$testsettings,$scores,$noindivscores;
 	$reattemptsremain = hasreattempts($qn);
 	$pointsremaining = getremainingpossible($qn,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
 	$qavail = false;
@@ -583,19 +583,19 @@ function seqshowqinfobar($qn,$toshow) {
 	
 	if ($qn==$toshow) {
 		echo '<div class="seqqinfocur">';
-		if (unans($scores[$qn]) && $attempts[$qn]==0) {
+		if ((unans($scores[$qn]) && $attempts[$qn]==0) || ($noindivscores && amreattempting($qn))) {
 			echo "<img src=\"$qnmasroot/img/q_fullbox.gif\"/> ";
 		} else {
 			echo "<img src=\"$qnmasroot/img/q_halfbox.gif\"/> ";
 		}
 		echo "<span class=current><a name=\"curq\">$qlinktxt</a></span>  ";
 	} else {
-		if (unans($scores[$qn]) && $attempts[$qn]==0) {
+		if ((unans($scores[$qn]) && $attempts[$qn]==0) || ($noindivscores && amreattempting($qn))) {
 			echo '<div class="seqqinfoavail">';
 			echo "<img src=\"$qnmasroot/img/q_fullbox.gif\"/> ";
 			echo "<a href=\"showtest.php?action=seq&to=$qn#curq\">$qlinktxt</a>.  ";
 			$qavail = true;
-		} else if (canimprove($qn)) {
+		} else if (canimprove($qn) && !$noindivscores) {
 			echo '<div class="seqqinfoavail">';
 			echo "<img src=\"$qnmasroot/img/q_halfbox.gif\"/> ";
 			echo "<a href=\"showtest.php?action=seq&to=$qn#curq\">$qlinktxt</a>.  ";

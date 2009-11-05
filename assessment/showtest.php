@@ -1046,7 +1046,7 @@
 					echo "<p><a href=\"showtest.php?action=seq&amp;to=$qn&amp;regen=$qn\">Try another similar question</a></p>\n";
 				}
 				unset($toshow);
-				if (canimprove($qn)) {
+				if (canimprove($qn) && $showeachscore) {
 					$toshow = $qn;
 				} else {
 					for ($i=$qn+1;$i<count($questions);$i++) {
@@ -1287,7 +1287,7 @@
 	require("../footer.php");
 	
 	function shownavbar($questions,$scores,$current,$showcat) {
-		global $imasroot,$isdiag,$testsettings,$attempts,$qi,$allowregen,$bestscores,$isreview,$showeachscore;
+		global $imasroot,$isdiag,$testsettings,$attempts,$qi,$allowregen,$bestscores,$isreview,$showeachscore,$noindivscores;
 		$todo = 0;
 		$earned = 0;
 		$poss = 0;
@@ -1325,9 +1325,9 @@
 			echo "<img src=\"$imasroot/img/aicon/right$icon.gif\"/>";
 			*/	
 			
-			if (unans($scores[$i]) && $attempts[$i]==0) {
+			if ((unans($scores[$i]) && $attempts[$i]==0) || ($noindivscores && amreattempting($i))) {
 				echo "<img src=\"$imasroot/img/q_fullbox.gif\"/> ";
-			} else if (canimprove($i)) {
+			} else if (canimprove($i) && !$noindivscores) {
 				echo "<img src=\"$imasroot/img/q_halfbox.gif\"/> ";
 			} else {
 				echo "<img src=\"$imasroot/img/q_emptybox.gif\"/> ";
