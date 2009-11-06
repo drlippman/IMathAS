@@ -43,6 +43,7 @@ if (!(isset($teacherid))) {
 			$name = trim($_POST["colname$col"]);
 			$pts = intval($_POST["colpts$col"]);
 			$cnt = $_POST["colcnt$col"];
+			echo "count: $cnt <br/>";
 			$gbcat = $_POST["colgbcat$col"];
 			if ($_POST["coloverwrite$col"]>0) {
 				//we're going to check that this id really belongs to this course.  Don't want cross-course hacking :)
@@ -59,7 +60,6 @@ if (!(isset($teacherid))) {
 			}
 			$query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit) VALUES ";
 			$query .= "('$cid','$name','$pts',$showdate,'$gbcat','$cnt',0) ";
-			//echo "$query <br/>";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			$gbitemid[$col] = mysql_insert_id();
 		}
@@ -78,18 +78,23 @@ if (!(isset($teacherid))) {
 				}
 				$stu = $useridarr[$line[$sidcol]];
 				foreach ($gbitemid as $col=>$gid) { //for each gbitem we're adding
+					$fbcol = $_POST["colfeedback$col"];
+					$feedback = '';
+					if (trim($fbcol)!='' && intval($fbcol)>0) {
+						$feedback = addslashes($line[intval($fbcol)-1]);	
+					} 
 					if (trim($line[$col])=='' || $line[$col] == '-') {
 						//echo "breaking 2";
 						//print_r($line);
-						continue;
-					}
-					$score = floatval($line[$col]);
-					$fbcol = $_POST["colfeedback$col"]-1;
-					if (trim($fbcol)!='' && intval($fbcol)>0) {
-						$feedback = addslashes($line[intval($fbcol)]);	
+						if ($feedback != '') {
+							$score = 'NULL';
+						} else {
+							continue;
+						}
 					} else {
-						$feedback = '';
+						$score = floatval($line[$col]);
 					}
+					
 					if (isset($gradestodel[$col])) {
 						$gradestodel[$col][] = $stu;
 					}

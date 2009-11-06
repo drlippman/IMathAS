@@ -5,13 +5,14 @@
 
 //TODO:  handle for ($i=0..2) { to handle expressions, array var, etc. for 0 and 2
 //require_once("mathphp.php");
-array_push($allowedmacros,"loadlibrary","importcodefrom","array","off","true","false","e","pi","null","setseed","if","for","where");
+array_push($allowedmacros,"loadlibrary","importcodefrom","includecodefrom","array","off","true","false","e","pi","null","setseed","if","for","where");
 $disallowedvar = array('$link','$qidx','$qnidx','$seed','$qdata','$toevalqtxt','$la','$GLOBALS','$laparts','$anstype','$kidx','$iidx','$tips','$options','$partla','$partnum','$score','$disallowedvar','$allowedmacros');
 
 //main interpreter function.  Returns PHP code string, or HTML if blockname==qtext
 function interpret($blockname,$anstype,$str)
 {
 	if ($blockname=="qtext") {
+		$str = preg_replace_callback('/(include|import)qtextfrom\((\d+)\)/','getquestionqtext',$str);
 		$str = str_replace('"','\"',$str);
 		$str = str_replace("\r\n","\n",$str);
 		$str = str_replace("\n\n","<br/><br/>\n",$str);
@@ -27,6 +28,16 @@ function interpret($blockname,$anstype,$str)
 	}
 }
 
+function getquestionqtext($m) {
+	$query = "SELECT qtext FROM imas_questionset WHERE id='{$m[2]}'";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	if (mysql_num_rows($result)==0) {
+		echo "bad question id";
+		return "";
+	} else {
+		return mysql_result($result,0,0);
+	}
+}
 //interpreter some code text.  Returns a PHP code string.
 function interpretline($str,$anstype) {
 	$str .= ';';
@@ -536,7 +547,7 @@ function tokenize($str,$anstype) {
 				loadlibrary(substr($out,1,strlen($out)-2));
 				array_pop($syms);
 				$connecttolast = 0;
-			} else if ($lastsym[0] == 'importcodefrom') {
+			} else if ($lastsym[0] == 'importcodefrom' || $lastsym[0]=='includecodefrom') {
 				$out = intval(substr($out,1,strlen($out)-2));
 				$query = "SELECT control,qtype FROM imas_questionset WHERE id='$out'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
