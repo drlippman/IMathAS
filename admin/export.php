@@ -154,10 +154,35 @@ if (!(isset($teacherid)) && $myrights<75) {
 		echo "\nSTART LIBRARY\nID\n1\nUID\n0\nLASTMODDATE\n$now\nNAME\n{$_POST['libname']}\nPARENT\n0\n";
 		$qsetlist = implode(',',range(0,count($checked)-1));
 		echo "\nSTART LIBRARY ITEMS\nLIBID\n1\nQSETIDS\n$qsetlist\n";
+		//first, lets pull any questions that have include__from so we can lookup backrefs
+		$query = "SELECT * FROM imas_questionset WHERE id IN ($clist)";
+		$query .= " AND (control LIKE '%includecodefrom%' OR qtext LIKE '%includeqtextfrom%')";
+		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+		$includedqs = array();
+		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+			if (preg_match_all('/includecodefrom\((\d+)\)/',$line['control'],$matches,PREG_PATTERN_ORDER) >0) {
+				$includedqs = array_merge($includedqs,$matches[1]);
+			}
+			if (preg_match_all('/includeqtextfrom\((\d+)\)/',$line['qtext'],$matches,PREG_PATTERN_ORDER) >0) {
+				$includedqs = array_merge($includedqs,$matches[1]);
+			}
+		}
+		$includedbackref = array();
+		if (count($includedqs)>0) {
+			$includedlist = implode(',',$includedqs);
+			$query = "SELECT id,uniqueid FROM imas_questionset WHERE id IN ($includedlist)";
+			$result = mysql_query($query) or die("Query failed : $query"  . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				$includedbackref[$row[0]] = $row[1];		
+			}
+		}
+		
 		$query = "SELECT * FROM imas_questionset WHERE id IN ($clist)";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$qcnt = 0;
 		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+			$line['control'] = preg_replace('/includecodefrom\((\d+)\)/e','"includecodefrom(UID".$includedbackref["\\1"].")"',$line['control']);
+			$line['qtext'] = preg_replace('/includeqtextfrom\((\d+)\)/e','"includeqtextfrom(UID".$includedbackref["\\1"].")"',$line['qtext']);
 			echo "\nSTART QUESTION\n";
 			echo "QID\n";
 			echo "$qcnt\n";

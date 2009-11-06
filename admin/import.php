@@ -161,6 +161,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 		$updateq = 0;
 		$newli = 0;
 		$now = time();
+		$allqids = array();
 		foreach ($checked as $qn) {
 			if (isset($exists[$qdata[$qn]['uqid']]) && $_POST['merge']==1) {
 				$qsetid = $exists[$qdata[$qn]['uqid']];
@@ -235,8 +236,46 @@ if (!(isset($teacherid)) && $myrights<75) {
 					$newli++;
 				}
 			}
+			$allqids[] = $qsetid;
 		}
 		unlink($filename);
+		//resolve any includecodefrom links
+		$qidstoupdate = array();
+		$qidstocheck = implode(',',$allqids);
+		//look up any refs to UIDs
+		$query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($qidstocheck) AND (control LIKE '%includecodefrom(UID%' OR qtext LIKE '%includeqtextfrom(UID%')";
+		$result = mysql_query($query) or die("error on: $query: " . mysql_error());
+		$includedqs = array();
+		while ($row = mysql_fetch_row($result)) {
+			$qidstoupdate[] = $row[0];
+			if (preg_match_all('/includecodefrom\(UID(\d+)\)/',$row[1],$matches,PREG_PATTERN_ORDER) >0) {
+				$includedqs = array_merge($includedqs,$matches[1]);
+			}
+			if (preg_match_all('/includeqtextfrom\(UID(\d+)\)/',$row[2],$matches,PREG_PATTERN_ORDER) >0) {
+				$includedqs = array_merge($includedqs,$matches[1]);
+			}
+		}
+		if (count($qidstoupdate)>0) {
+			//lookup backrefs
+			$includedbackref = array();
+			if (count($includedqs)>0) {
+				$includedlist = implode(',',$includedqs);
+				$query = "SELECT id,uniqueid FROM imas_questionset WHERE uniqueid IN ($includedlist)";
+				$result = mysql_query($query) or die("Query failed : $query"  . mysql_error());
+				while ($row = mysql_fetch_row($result)) {
+					$includedbackref[$row[1]] = $row[0];		
+				}
+			}
+			$updatelist = implode(',',$qidstoupdate);
+			$query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($updatelist)";
+			$result = mysql_query($query) or die("error on: $query: " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				$control = addslashes(preg_replace('/includecodefrom\(UID(\d+)\)/e','"includecodefrom(".$includedbackref["\\1"].")"',$row[1]));
+				$qtext = addslashes(preg_replace('/includeqtextfrom\(UID(\d+)\)/e','"includeqtextfrom(".$includedbackref["\\1"].")"',$row[2]));
+				$query = "UPDATE imas_questionset SET control='$control',qtext='$qtext' WHERE id={$row[0]}";
+				mysql_query($query) or die("error on: $query: " . mysql_error());
+			}
+		}
 
 		if ($isadmin || $isgrpadmin) {
 			$page_importSuccessMsg = "<a href=\"http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/admin.php\">Return to Admin page</a>";

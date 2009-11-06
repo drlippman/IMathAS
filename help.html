@@ -1831,10 +1831,15 @@ Your answer was {$stuanswers[0][0]}.  If using it directly in a calculation, enc
 
 <h4>Reusing Code</h4>
 <p>You can import in the Common Control code from another question using
-<pre>importcodefrom(questionid)</pre>
+<pre>includecodefrom(questionid)</pre>
 where questionid is the ID number of the question you want to import the code of.  In the
-source question, the variable $included can be used to determine if the question has been
+source question, the variable $included will automatically be set to true when the question
+has been included, so it can be used to determine if the question has been
 imported into another question, or is running independently.  
+</p>
+<p>Question text can be also brought in from another question by using
+<pre>includeqtextfrom(questionid)</pre>
+somewhere in the Question Text portion of the question.
 </p>
 
 </div>

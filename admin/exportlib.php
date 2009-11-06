@@ -136,7 +136,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 		if ($nonpriv) {
 			$query .= " AND imas_questionset.userights>0";
 		}
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 		$qassoc = Array();
 		$libitems = Array();
 		$qcnt = 0;
@@ -157,13 +157,42 @@ if (!(isset($teacherid)) && $myrights<75) {
 		}
 		
 		$imgfiles = array();
+		//first, lets pull any questions that have include__from so we can lookup backrefs
 		$query = "SELECT imas_questionset.* FROM imas_questionset,imas_library_items ";
 		$query .= "WHERE imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid IN ($liblist)";
 		if ($nonpriv) {
 			$query .= " AND imas_questionset.userights>0";
 		}
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$query .= " AND (imas_questionset.control LIKE '%includecodefrom%' OR imas_questionset.qtext LIKE '%includeqtextfrom%')";
+		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+		$includedqs = array();
 		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+			if (preg_match_all('/includecodefrom\((\d+)\)/',$line['control'],$matches,PREG_PATTERN_ORDER) >0) {
+				$includedqs = array_merge($includedqs,$matches[1]);
+			}
+			if (preg_match_all('/includeqtextfrom\((\d+)\)/',$line['qtext'],$matches,PREG_PATTERN_ORDER) >0) {
+				$includedqs = array_merge($includedqs,$matches[1]);
+			}
+		}
+		$includedbackref = array();
+		if (count($includedqs)>0) {
+			$includedlist = implode(',',$includedqs);
+			$query = "SELECT id,uniqueid FROM imas_questionset WHERE id IN ($includedlist)";
+			$result = mysql_query($query) or die("Query failed : $query"  . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				$includedbackref[$row[0]] = $row[1];		
+			}
+		}
+		
+		$query = "SELECT imas_questionset.* FROM imas_questionset,imas_library_items ";
+		$query .= "WHERE imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid IN ($liblist)";
+		if ($nonpriv) {
+			$query .= " AND imas_questionset.userights>0";
+		}
+		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+			$line['control'] = preg_replace('/includecodefrom\((\d+)\)/e','"includecodefrom(UID".$includedbackref["\\1"].")"',$line['control']);
+			$line['qtext'] = preg_replace('/includeqtextfrom\((\d+)\)/e','"includeqtextfrom(UID".$includedbackref["\\1"].")"',$line['qtext']);
 			echo "\nSTART QUESTION\n";
 			echo "QID\n";
 			echo rtrim($qassoc[$line['id']]) . "\n";

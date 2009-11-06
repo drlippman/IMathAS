@@ -31,7 +31,6 @@ function additem($itemtoadd,$item,$questions,$qset) {
 	global $newlibs;
 	global $userid, $userights, $cid;
 	$mt = microtime();
-
 	if ($item[$itemtoadd]['type'] == "Assessment") {
 		//add assessment.  set $typeid
 		$settings = explode("\n",$item[$itemtoadd]['settings']);
@@ -50,6 +49,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 		//determine question to be added
 		//$qtoadd = explode(',',$item[$itemtoadd]['questions']);  //FIX!!! can be ~ separated as well
 		$qtoadd = preg_split('/[,~]/',$item[$itemtoadd]['questions']);
+		$allqids = array();
 		foreach ($qtoadd as $qid) {
 			//add question or get system id. 
 			$query = "SELECT id,adddate FROM imas_questionset WHERE uniqueid='{$questions[$qid]['uqid']}'";
@@ -90,7 +90,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 					mysql_query($query) or die("error on: $query: " . mysql_error());
 				}
 			}
-		
+			$allqids[] = $questions[$qid]['qsetid'];
 			
 			//add question $questions[$qid].  assessmentid is $typeid
 			$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category)";
@@ -99,6 +99,45 @@ function additem($itemtoadd,$item,$questions,$qset) {
 			mysql_query($query) or die("error on: $query: " . mysql_error());
 			$questions[$qid]['systemid'] = mysql_insert_id();
 		}
+		
+		//resolve any includecodefrom links
+		$qidstoupdate = array();
+		$qidstocheck = implode(',',$allqids);
+		//look up any refs to UIDs
+		$query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($qidstocheck) AND (control LIKE '%includecodefrom(UID%' OR qtext LIKE '%includeqtextfrom(UID%')";
+		$result = mysql_query($query) or die("error on: $query: " . mysql_error());
+		$includedqs = array();
+		while ($row = mysql_fetch_row($result)) {
+			$qidstoupdate[] = $row[0];
+			if (preg_match_all('/includecodefrom\(UID(\d+)\)/',$row[1],$matches,PREG_PATTERN_ORDER) >0) {
+				$includedqs = array_merge($includedqs,$matches[1]);
+			}
+			if (preg_match_all('/includeqtextfrom\(UID(\d+)\)/',$row[2],$matches,PREG_PATTERN_ORDER) >0) {
+				$includedqs = array_merge($includedqs,$matches[1]);
+			}
+		}
+		if (count($qidstoupdate)>0) {
+			//lookup backrefs
+			$includedbackref = array();
+			if (count($includedqs)>0) {
+				$includedlist = implode(',',$includedqs);
+				$query = "SELECT id,uniqueid FROM imas_questionset WHERE uniqueid IN ($includedlist)";
+				$result = mysql_query($query) or die("Query failed : $query"  . mysql_error());
+				while ($row = mysql_fetch_row($result)) {
+					$includedbackref[$row[1]] = $row[0];		
+				}
+			}
+			$updatelist = implode(',',$qidstoupdate);
+			$query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($updatelist)";
+			$result = mysql_query($query) or die("error on: $query: " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				$control = addslashes(preg_replace('/includecodefrom\(UID(\d+)\)/e','"includecodefrom(".$includedbackref["\\1"].")"',$row[1]));
+				$qtext = addslashes(preg_replace('/includeqtextfrom\(UID(\d+)\)/e','"includeqtextfrom(".$includedbackref["\\1"].")"',$row[2]));
+				$query = "UPDATE imas_questionset SET control='$control',qtext='$qtext' WHERE id={$row[0]}";
+				mysql_query($query) or die("error on: $query: " . mysql_error());
+			}
+		}
+		
 		//recreate itemorder 
 		$item[$itemtoadd]['questions'] = preg_replace("/(\d+)/e",'$questions[\\1]["systemid"]',$item[$itemtoadd]['questions']);
 		//write itemorder to db
