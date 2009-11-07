@@ -32,7 +32,7 @@ function getquestionqtext($m) {
 	$query = "SELECT qtext FROM imas_questionset WHERE id='{$m[2]}'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	if (mysql_num_rows($result)==0) {
-		echo "bad question id";
+		echo "bad question id in includeqtextfrom";
 		return "";
 	} else {
 		return mysql_result($result,0,0);
@@ -547,7 +547,7 @@ function tokenize($str,$anstype) {
 				loadlibrary(substr($out,1,strlen($out)-2));
 				array_pop($syms);
 				$connecttolast = 0;
-			} else if ($lastsym[0] == 'importcodefrom' || $lastsym[0]=='includecodefrom') {
+			} else if ($lastsym[0] == 'importcodefrom' || $lastsym[0] == 'includecodefrom') {
 				$out = intval(substr($out,1,strlen($out)-2));
 				$query = "SELECT control,qtype FROM imas_questionset WHERE id='$out'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());

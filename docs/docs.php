@@ -26,6 +26,8 @@
 <li><a href="commontasks.html">Common Tasks in IMathAS</a>.  A walkthrough of common instructor activities.</li>
 <li><a href="managing.html">Managing Libraries and Questions in IMathAS</a>.  A guide to the library and question 
    set management tools</li>
+<li><a href="administration.html">Administration</a>.  A guide to administering IMathAS for Full and Group Admins.</li>
+
 </ul>
 
 <h4>Video Guides</h4>

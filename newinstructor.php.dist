@@ -53,11 +53,11 @@
 		}
 	}
 	if (isset($_POST['firstname'])) {$firstname=$_POST['firstname'];} else {$firstname='';}
-	if (isset($_POST['firstname'])) {$lasname=$_POST['lastname'];} else {$lastname='';}
-	if (isset($_POST['firstname'])) {$email=$_POST['email'];} else {$email='';}
-	if (isset($_POST['firstname'])) {$phone=$_POST['phone'];} else {$phone='';}
-	if (isset($_POST['firstname'])) {$school=$_POST['school'];} else {$school='';}
-	if (isset($_POST['firstname'])) {$username=$_POST['username'];} else {$username='';}
+	if (isset($_POST['lastname'])) {$lasname=$_POST['lastname'];} else {$lastname='';}
+	if (isset($_POST['email'])) {$email=$_POST['email'];} else {$email='';}
+	if (isset($_POST['phone'])) {$phone=$_POST['phone'];} else {$phone='';}
+	if (isset($_POST['school'])) {$school=$_POST['school'];} else {$school='';}
+	if (isset($_POST['username'])) {$username=$_POST['username'];} else {$username='';}
 	
 	echo "<h3>New Instructor Account Request</h3>\n";
 	echo "<form method=post action=\"newinstructor.php\">\n";

@@ -75,9 +75,9 @@ dd {
 	<li><a href="#importstudents">Import Students</a></li>
 	<li><a href="#managegroups">Manage Groups</a></li>
 	<li><a href="#diagnostics">Diagnostics</a></li>
-	<li><a href="#managingadministrators">Managing Administrators</a></li>
+	<li><a href="#managingadministrators">Managing Administrators and Teachers</a></li>
 		<ul>
-		<li><a href="#addingadministrators">Adding Administrators</a></li>
+		<li><a href="#addingadministrators">Adding Administrators and Teachers</a></li>
 		<li><a href="#rights">Rights</a></li>
 		<li><a href="#resettingadminpasswords">Resetting Admin Passwords</a></li>
 		<li><a href="#deletingadmin">Deleting</a></li>
@@ -505,13 +505,16 @@ the term, and the first and second selector values in addition to the students' 
 
 </div>
 <div class=h2>
-<h2><a name="managingadministrators">Managing Administrators</a></h2>
+<h2><a name="managingadministrators">Managing Administrators and Teachers</a></h2>
 
-At the bottom of the admin page is a list of non-students.  This list can be
-expanded by Full Admins to include students by clicking the &quot;List All&quot; button.
+At the bottom of the admin page is a list of users.  Group Admins will see the teachers in their group.  For Full Admins, 
+teacher and higher level users are grouped by instructor Group, or are in the Default
+group if you haven't defined groups.  Student accounts can be listed by choosing the corresponding first letter of the last name.  To approve
+teachers who have filled out the "new instructor account request" form, choose Pending from the list.  Note that if you require email confirmation
+of students, they might also show up in the Pending list until they confirm their account.
 
 <div class=h3>
-<h3><a name="addingadministrators">Adding Administrators</a></h3>
+<h3><a name="addingadministrators">Adding Administrators and Teachers</a></h3>
 
 You can add a new administrator, teacher, or student by clicking the &quot;Add New User&quot; 
 button.  You will be asked to provide a username, user's name, and email.  The 
@@ -1478,7 +1481,8 @@ $b = &quot;cos(x)&quot; if ($a==1)
 </p>
 <p>
 Note the use of double equal signs (==) for testing equality.  A single equal sign (=) will
-make an assignment (change the value of $a in this example) and return &quot;true&quot;.  
+make an assignment (change the value of $a in this example) and return &quot;true&quot;, which is probably not what you intended to do.  
+</p>
 <p>
 Comparison operators available for &quot;if&quot; and &quot;where&quot; statements:
 <ul>
@@ -1511,6 +1515,20 @@ $a = rand(0,1)
    $c = 2
 } if ($a==0)
 </pre>
+When &quot;if&quot; is used before a block of code, it can optionally be followed
+with &quot;elseif&quot; and/or an &quot;else&quot; statement, like this:
+<pre>
+$a = rand(0,5)
+if ($a==0) {
+   $b = 1
+} elseif ($a==2) {
+   $b = 3
+} else {
+   $b = 2
+}
+</pre>
+</p>
+<p>
 &quot;where&quot; can also be applied to a block of code:
 <pre>
 { 
