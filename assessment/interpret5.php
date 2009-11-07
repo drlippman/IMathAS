@@ -211,6 +211,7 @@ function interpretline($str,$anstype) {
 			$forloc = -1;
 			$ifloc = -1;
 			$whereloc = -1;
+			$elseloc = array();
 			//collapse bits to a line, add to lines array
 			$lines[] = implode('',$bits);
 			$bits = array();
