@@ -93,7 +93,7 @@ and credits for components attributed to others.</p>
 	<li>Group assessments</li>
 	<li>Expandable question language, by installing additional macros</li>
 	</ul>
-<li>Other Course Features:</li>
+<li>Other Course Management Features:</li>
 	<ul>
 	<li>Post text items, uploaded files, or web links to the classroom</li>
 	<li>Discussion Forums, optionally gradable </li>
@@ -129,6 +129,9 @@ because I don't want students with used books to incur additional cost.</p>
 <p>
 <ol>
 <li>Download IMathAS, extract it, and copy the files to your webserver.</li>
+<li>Alternatively, if you have shell access to your server, enter the directory you want IMathAS in,
+    and checkout the code from SVN:  <i>svn checkout http://imathas.googlecode.com/svn/trunk/</i>.   
+    Using SVN greatly simplifies upgrading.</li>
 <li>If your web host requires that you create databases through the web panel, create a database
     and database user for IMathAS now.  If you have a username/password with database
     creation priviledges, you can wait and use it later in the install process.</li>
@@ -171,17 +174,13 @@ not log out, the session is cleared from database after 24 hours.</p>
 authorized functions to be used.  Student answers are evaluated client-side using
 JavaScript, and are never evaled server-side.</p>
 
-<p>Macro Libraries (PHP function libraries that can be used in writing questions) 
-can only be installed by full Admins in IMathAS.  The option allowing install can be 
-disabled in the config.php file</p>
-
 <h3>Install Notes</h3>
 <p>
 The install.php script automatically handles the following install steps.  They're 
 listed here in case anything goes wrong:
 <ul>
 <li>Change permissions (chmod) of the following directories to allow the webserver process
-    to write to the directories:</li>
+    to write to the directories: 
     	<ul>
 	<li>assessment/libs</li>
 	<li>assessment/qimages</li>
@@ -189,6 +188,10 @@ listed here in case anything goes wrong:
 	<li>course/files</li>
 	<li>filter/graph/imgs</li>
 	</ul>
+	<br/>
+    <i>Note</i>: If you are running on a Windows server, you may need to set directory permissions manually. <br/>
+    <i>Note</i>: For security, the admin/import directory should not be web-readable.  A .htaccess file is included to
+       prevent access.  If your server doesn't obey .htaccess files, you may need to do additional tweaking. </li>
 <li>Rename (in the main directory):
 	<ul>
 	<li>config.php.dist to config.php</li>

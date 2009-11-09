@@ -29,7 +29,7 @@ function getsubinfo($items,$parent,$pre) {
 function additem($itemtoadd,$item,$questions,$qset) {
 	
 	global $newlibs;
-	global $userid, $userights, $cid;
+	global $userid, $userights, $cid, $missingfiles;
 	$mt = microtime();
 	if ($item[$itemtoadd]['type'] == "Assessment") {
 		//add assessment.  set $typeid
@@ -38,11 +38,18 @@ function additem($itemtoadd,$item,$questions,$qset) {
 			$pair = explode('=',$set);
 			$item[$itemtoadd][$pair[0]] = $pair[1];
 		}
-		$query = "INSERT INTO imas_assessments (courseid,name,summary,intro,startdate,enddate,reviewdate,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,password,cntingb)";
-		$query .= "VALUES ('$cid','{$item[$itemtoadd]['name']}','{$item[$itemtoadd]['summary']}','{$item[$itemtoadd]['intro']}',";
-		$query .= "'{$item[$itemtoadd]['startdate']}','{$item[$itemtoadd]['enddate']}','{$item[$itemtoadd]['reviewdate']}','{$item[$itemtoadd]['timelimit']}',";
+		$query = "INSERT INTO imas_assessments (courseid,name,summary,intro,avail,startdate,enddate,reviewdate,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,password,cntingb,minscore,showcat,showhints,isgroup,allowlate,exceptionpenalty,noprint,groupmax,endmsg,eqnhelper)";
+		$query .= "VALUES ('$cid'";
+		$setstoadd = explode(',','name,summary,intro,avail,startdate,enddate,reviewdate,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,password,cntingb,minscore,showcat,showhints,isgroup,allowlate,exceptionpenalty,noprint,groupmax,endmsg,eqnhelper');
+		foreach ($setstoadd as $set) {
+			$query .= ',\''.$item[$itemtoadd][$set].'\'';
+		}
+		$query .= ')';
+		/*'{$item[$itemtoadd]['name']}','{$item[$itemtoadd]['summary']}','{$item[$itemtoadd]['intro']}',";
+		$query .= "'{$item[$itemtoadd]['avail']}','{$item[$itemtoadd]['startdate']}','{$item[$itemtoadd]['enddate']}','{$item[$itemtoadd]['reviewdate']}','{$item[$itemtoadd]['timelimit']}',";
 		$query .= "'{$item[$itemtoadd]['displaymethod']}','{$item[$itemtoadd]['defpoints']}','{$item[$itemtoadd]['defattempts']}',";
-		$query .= "'{$item[$itemtoadd]['deffeedback']}','{$item[$itemtoadd]['defpenalty']}','{$item[$itemtoadd]['shuffle']}','{$item[$itemtoadd]['password']}','{$item[$itemtoadd]['cntingb']}')";
+		$query .= "'{$item[$itemtoadd]['deffeedback']}','{$item[$itemtoadd]['defpenalty']}','{$item[$itemtoadd]['shuffle']}','{$item[$itemtoadd]['password']}','{$item[$itemtoadd]['cntingb']}',";
+		*/
 		mysql_query($query) or die("error on: $query: " . mysql_error());
 		$typeid = mysql_insert_id();
 					
@@ -93,9 +100,9 @@ function additem($itemtoadd,$item,$questions,$qset) {
 			$allqids[] = $questions[$qid]['qsetid'];
 			
 			//add question $questions[$qid].  assessmentid is $typeid
-			$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category)";
+			$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category,regen,showans)";
 			$query .= "VALUES ($typeid,'{$questions[$qid]['qsetid']}','{$questions[$qid]['points']}',";
-			$query .= "'{$questions[$qid]['attempts']}','{$questions[$qid]['penalty']}','{$questions[$qid]['category']}')";
+			$query .= "'{$questions[$qid]['attempts']}','{$questions[$qid]['penalty']}','{$questions[$qid]['category']}','{$questions[$qid]['regen']}','{$questions[$qid]['showans']}')";
 			mysql_query($query) or die("error on: $query: " . mysql_error());
 			$questions[$qid]['systemid'] = mysql_insert_id();
 		}
@@ -144,21 +151,43 @@ function additem($itemtoadd,$item,$questions,$qset) {
 		$query = "UPDATE imas_assessments SET itemorder='{$item[$itemtoadd]['questions']}' WHERE id=$typeid";
 		mysql_query($query) or die("error on: $query: " . mysql_error());
 	} else if ($item[$itemtoadd]['type'] == "Forum") {
-		$query = "INSERT INTO imas_forums (name,description,courseid,startdate,enddate)";
+		$settings = explode("\n",$item[$itemtoadd]['settings']);
+		foreach ($settings as $set) {
+			$pair = explode('=',$set);
+			$item[$itemtoadd][$pair[0]] = $pair[1];
+		}
+		$query = "INSERT INTO imas_forums (name,description,courseid,avail,startdate,enddate,postby,replyby,defdisplay,points,cntingb,settings)";
 		$query .= "VALUES ('{$item[$itemtoadd]['name']}','{$item[$itemtoadd]['summary']}','$cid',";
-		$query .= "'{$item[$itemtoadd]['startdate']}','{$item[$itemtoadd]['enddate']}')";
+		$query .= "'{$item[$itemtoadd]['avail']}','{$item[$itemtoadd]['startdate']}','{$item[$itemtoadd]['enddate']}','{$item[$itemtoadd]['postby']}','{$item[$itemtoadd]['replyby']}',";
+		$query .= "'{$item[$itemtoadd]['defdisplay']}','{$item[$itemtoadd]['points']}','{$item[$itemtoadd]['cntingb']}','{$item[$itemtoadd]['settings']}')";
 		mysql_query($query) or die("error on: $query: " . mysql_error());
 		$typeid = mysql_insert_id();
 	} else if ($item[$itemtoadd]['type'] == "InlineText") {
-		$query = "INSERT INTO imas_inlinetext (courseid,title,text,startdate,enddate)";
+		$query = "INSERT INTO imas_inlinetext (courseid,title,text,avail,startdate,enddate,oncal,caltag)";
 		$query .= "VALUES ('$cid','{$item[$itemtoadd]['title']}','{$item[$itemtoadd]['text']}',";
-		$query .= "'{$item[$itemtoadd]['startdate']}','{$item[$itemtoadd]['enddate']}')";
+		$query .= "'{$item[$itemtoadd]['avail']}','{$item[$itemtoadd]['startdate']}','{$item[$itemtoadd]['enddate']}','{$item[$itemtoadd]['oncal']}','{$item[$itemtoadd]['caltag']}')";
 		mysql_query($query) or die("error on: $query: " . mysql_error());
 		$typeid = mysql_insert_id();
+		if (isset($item[$itemtoadd]['instrfiles'])) {
+			$item[$itemtoadd]['instrfiles'] = explode("\n",$item[$itemtoadd]['instrfiles']);
+			$fileorder = array();
+			foreach ($item[$itemtoadd]['instrfiles'] as $fileinfo) {
+				if (!file_exists("../course/files/$filename")) {
+					$missingfiles[] = $filename;
+				}
+				list($filename,$filedescr) = explode(':::',addslashes($fileinfo));
+				$query = "INSERT INTO imas_instr_files (description,filename,itemid) VALUES ";
+				$query .= "('$filedescr','$filename',$typeid)";
+				mysql_query($query) or die("error on: $query: " . mysql_error());
+				$fileorder[] = mysql_insert_id();
+			}
+			$query = "UPDATE imas_inlinetext SET fileorder='".implode(',',$fileorder)."' WHERE id=$typeid";
+			mysql_query($query) or die("error on: $query: " . mysql_error());
+		}
 	} else if ($item[$itemtoadd]['type'] == "LinkedText") {
-		$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate)";
+		$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,avail,startdate,enddate,oncal,caltag,target)";
 		$query .= "VALUES ('$cid','{$item[$itemtoadd]['title']}','{$item[$itemtoadd]['summary']}','{$item[$itemtoadd]['text']}',";
-		$query .= "'{$item[$itemtoadd]['startdate']}','{$item[$itemtoadd]['enddate']}')";
+		$query .= "'{$item[$itemtoadd]['avail']}','{$item[$itemtoadd]['startdate']}','{$item[$itemtoadd]['enddate']}','{$item[$itemtoadd]['oncal']}','{$item[$itemtoadd]['caltag']}','{$item[$itemtoadd]['target']}')";
 		mysql_query($query) or die("error on: $query: " . mysql_error());
 		$typeid = mysql_insert_id();
 	} else {
@@ -197,7 +226,7 @@ function parsefile($file) {
 				$desc = rtrim(fgets($handle, 4096));
 				break;
 			case  "ITEM LIST":
-				$itemlist = rtrim(fgets($handle, 4096));
+				$itemlist = rtrim(fgets($handle, 44096));
 				break;	
 			case  "BEGIN ITEM":
 				$itemcnt++;
@@ -225,7 +254,14 @@ function parsefile($file) {
 			case  "QUESTIONS":
 			case  "STARTDATE":
 			case  "ENDDATE":
+			case  "POSTBY":
+			case  "REPLYBY":
+			case  "AVAIL":
 			case  "REVIEWDATE":
+			case  "INSTRFILES";
+			case  "ONCAL":
+			case  "CALTAG":
+			case  "TARGET":
 			case  "SETTINGS":
 				if (isset($part)) {
 					$item[$curid][$part] = rtrim($text);
@@ -254,6 +290,8 @@ function parsefile($file) {
 			case  "POINTS":
 			case  "PENALTY":
 			case  "ATTEMPTS":
+			case  "REGEN":
+			case  "SHOWANS":
 			case  "CATEGORY":
 				if (isset($part)) {
 					$questions[$curqid][$part] = rtrim($text);
@@ -311,8 +349,11 @@ function copysub($items,$parent,&$addtoarr) {
 				$blockcnt++;
 				$newblock['startdate'] = $anitem['startdate'];
 				$newblock['enddate'] = $anitem['enddate'];
+				$newblock['avail'] = $anitem['avail'];
 				$newblock['SH'] = $anitem['SH'];
 				$newblock['colors'] = $anitem['colors'];
+				$newblock['public'] = $anitem['public'];
+				$newblock['fixedheight'] = $anitem['fixedheight'];
 				$newblock['items'] = array();
 				copysub($anitem['items'],$parent.'-'.($k+1),$newblock['items']);
 				$addtoarr[] = $newblock;
@@ -367,7 +408,8 @@ if (!(isset($teacherid))) {
 		$ciditemorder = unserialize(mysql_result($result,0,1));
 		$items = unserialize($itemlist);
 		$newitems = array();
-
+		$missingfiles = array();
+		
 		copysub($items,'0',$newitems);
 		
 		array_splice($ciditemorder,count($ciditemorder),0,$newitems);
@@ -375,7 +417,15 @@ if (!(isset($teacherid))) {
 		$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt' WHERE id='$cid'";
 		mysql_query($query) or die("Query failed : $query" . mysql_error());
 		
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
+		if (count($missingfiles)>0) {
+			echo "These files pointed to by inline text items were not found and will need to be reuploaded:<br/>";
+			foreach ($missingfiles as $file) {
+				echo "$file <br/>";
+			}
+			echo "<p><a href=\"$imasroot/course/course.php?cid=$cid\">Done</a></p>";
+		} else {
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
+		}
 		exit;	
 	} elseif ($_FILES['userfile']['name']!='') { //STEP 2 DATA MANIPULATION
 		$page_fileErrorMsg = "";
@@ -387,7 +437,6 @@ if (!(isset($teacherid))) {
 			$page_fileErrorMsg .= "<p>Error uploading file!</p>\n";
 		}
 		list ($desc,$itemlist,$item,$questions,$qset) = parsefile($uploadfile);
-
 		if (!isset($desc)) {
 			$page_fileErrorMsg .=  "This does not appear to be a course items file.  It may be ";
 			$page_fileErrorMsg .=  "a question or library export.\n";
@@ -397,7 +446,6 @@ if (!(isset($teacherid))) {
 		$ids = array();
 		$types = array();
 		$names = array();
-
 		getsubinfo($items,'0','');
 		
 	}

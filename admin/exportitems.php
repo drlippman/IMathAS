@@ -14,10 +14,13 @@ function copysub($items,$parent,&$addtoarr) {
 			if (array_search($parent.'-'.($k+1),$checked)!==FALSE) { //copy block
 				$newblock = array();
 				$newblock['name'] = $item['name'];
+				$newblock['avail'] = $item['avail'];
 				$newblock['startdate'] = $item['startdate'];
 				$newblock['enddate'] = $item['enddate'];
 				$newblock['SH'] = $item['SH'];
 				$newblock['colors'] = $item['colors'];
+				$newblock['public'] = $item['public'];
+				$newblock['fixedheight'] = $item['fixedheight'];
 				$newblock['items'] = array();
 				copysub($item['items'],$parent.'-'.($k+1),$newblock['items']);
 				$addtoarr[] = $newblock;
@@ -127,10 +130,31 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				echo $line['title'] . "\n";
 				echo "TEXT\n";
 				echo $line['text'] . "\n";
+				echo "AVAIL\n";
+				echo $line['avail'] . "\n";
 				echo "STARTDATE\n";
 				echo $line['startdate'] . "\n";
 				echo "ENDDATE\n";
 				echo $line['enddate'] . "\n";
+				echo "ONCAL\n";
+				echo $line['oncal'] . "\n";
+				echo "CALTAG\n";
+				echo $line['caltag'] . "\n";
+				$query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='{$row[1]}'";
+				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+				if (mysql_num_rows($r2)>0) {
+					   $filenames = array();
+					   $filedescr = array();
+					   while ($row = mysql_fetch_row($r2)) {
+						   $filenames[$row[0]] = $row[2];
+						   $filedescr[$row[0]] = $row[1];
+					   }
+					   echo "INSTRFILES\n";
+					   foreach (explode(',',$line['fileorder']) as $fid) {
+						  echo $filenames[$fid]. ':::'.$filedescr[$fid]."\n";
+					   }
+				}
+				
 				echo "END ITEM\n";
 				break;
 			case ($row[0]==="LinkedText"):
@@ -143,10 +167,18 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				echo $line['summary'] . "\n";
 				echo "TEXT\n";
 				echo $line['text'] . "\n";
+				echo "AVAIL\n";
+				echo $line['avail'] . "\n";
 				echo "STARTDATE\n";
 				echo $line['startdate'] . "\n";
 				echo "ENDDATE\n";
 				echo $line['enddate'] . "\n";
+				echo "ONCAL\n";
+				echo $line['oncal'] . "\n";
+				echo "CALTAG\n";
+				echo $line['caltag'] . "\n";
+				echo "TARGET\n";
+				echo $line['target'] . "\n";
 				echo "END ITEM\n";
 				break;
 			case ($row[0]==="Forum"):
@@ -157,10 +189,20 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				echo $line['name'] . "\n";
 				echo "SUMMARY\n";
 				echo $line['description'] . "\n";
+				echo "AVAIL\n";
+				echo $line['avail'] . "\n";
 				echo "STARTDATE\n";
 				echo $line['startdate'] . "\n";
 				echo "ENDDATE\n";
 				echo $line['enddate'] . "\n";
+				echo "REPLYBY\n";
+				echo $line['replyby'] . "\n";
+				echo "POSTBY\n";
+				echo $line['postby'] . "\n";
+				echo "SETTINGS\n";
+				foreach (array("defdisplay","points","cntingb","settings") as $setting) {
+					echo "$setting=".$line[$setting]."\n";
+				}
 				echo "END ITEM\n";
 				break;
 			case ($row[0]==="Assessment"):
@@ -173,6 +215,8 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				echo $line['summary'] . "\n";
 				echo "INTRO\n";
 				echo $line['intro'] . "\n";
+				echo "AVAIL\n";
+				echo $line['avail'] . "\n";
 				echo "STARTDATE\n";
 				echo $line['startdate'] . "\n";
 				echo "ENDDATE\n";
@@ -180,7 +224,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				echo "REVIEWDATE\n";
 				echo $line['reviewdate'] . "\n";
 				echo "SETTINGS\n";
-				foreach (array("timelimit","displaymethod","defpoints","defattempts","deffeedback","defpenalty","shuffle","password","cntingb") as $setting) {
+				foreach (array("timelimit","displaymethod","defpoints","defattempts","deffeedback","defpenalty","shuffle","password","cntingb","minscore","showcat","showhints","isgroup","allowlate","exceptionpenalty","noprint","groupmax","endmsg","eqnhelper") as $setting) {
 					echo "$setting=".$line[$setting]."\n";
 				}
 				echo "QUESTIONS\n";
@@ -228,6 +272,10 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 		echo $line['attempts'] . "\n";
 		echo "CATEGORY\n";
 		echo $line['category'] . "\n";
+		echo "REGEN\n";
+		echo $line['regen'] . "\n";
+		echo "SHOWANS\n";
+		echo $line['showans'] . "\n";
 		echo "END QUESTION\n";
 		
 		$qsettoexport[] = $line['questionsetid'];
