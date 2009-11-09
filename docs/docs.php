@@ -27,6 +27,7 @@
 <li><a href="managing.html">Managing Libraries and Questions in IMathAS</a>.  A guide to the library and question 
    set management tools</li>
 <li><a href="administration.html">Administration</a>.  A guide to administering IMathAS for Full and Group Admins.</li>
+<li><a href="diagnostics.html">Diagnostics</a>.  A guide to setting up diagnostic assessment login pages.</li>
 
 </ul>
 

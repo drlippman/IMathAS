@@ -363,7 +363,7 @@ if (existingonload) {
 	window.onload = determinesetup;
 }
 </script>
-<hr/><div class=right style="font-size:70%;">Built on <a href="http://imathas.sourceforge.net">IMathAS</a> &copy; 2006 David Lippman</div>
+<hr/><div class=right style="font-size:70%;">Built on <a href="http://imathas.sourceforge.net">IMathAS</a> &copy; 2006-2009 David Lippman</div>
 </div>
 </body>
 </html>
