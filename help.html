@@ -1853,12 +1853,26 @@ Your answer was {$stuanswers[0][0]}.  If using it directly in a calculation, enc
 where questionid is the ID number of the question you want to import the code of.  In the
 source question, the variable $included will automatically be set to true when the question
 has been included, so it can be used to determine if the question has been
-imported into another question, or is running independently.  
+imported into another question, or is running independently.
+</p>
+<p>For example, in the master/source question, you might use the code:
+<pre>
+if (!$included) {
+ $type = rand(0,4)
+}
+do stuff here
+</pre>
+In a question using this code, you could limit to a specific type using:
+<pre>
+$type = 0
+includecodefrom(1234)
+</pre>
 </p>
 <p>Question text can be also brought in from another question by using
 <pre>includeqtextfrom(questionid)</pre>
 somewhere in the Question Text portion of the question.
 </p>
+
 
 </div>
 <div class=h2>

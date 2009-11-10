@@ -30,11 +30,52 @@ function getpts($sc) {
 	}
 }
 
+function evalqsandbox($seed,$qqqcontrol,$qqqanswer) {
+	$sa = '';
+	
+	srand($seed);
+	eval($qqqcontrol);
+	srand($seed+1);
+	eval($qqqanswer);
+
+	if (isset($anstypes) && !is_array($anstypes)) {
+		$anstypes = explode(",",$anstypes);
+	}	
+	if (isset($anstypes)) { //is multipart
+		if (isset($showanswer) && !is_array($showanswer)) {
+			$sa = $showanswer;
+		} else {
+			$sapts =array();
+			for ($i=0; $i<count($anstypes); $i++) {
+				if (isset($showanswer[$i])) {
+					$sapts[] = $showanswer[$i];
+				} else if (isset($answer[$i])) {
+					$sapts[] = $answer[$i];
+				} else if (isset($answers[$i])) {
+					$sapts[] = $answers[$i];
+				}
+			}
+			$sa = implode('&',$sapts);
+		}
+	} else {
+		if (isset($showanswer)) {
+			$sa = $showanswer;
+		} else if (isset($answer)) {
+			$sa = $answer;
+		} else if (isset($answers)) {
+			$sa = $answers;
+		}
+	}
+	return $sa;
+}
+
 if (isset($_POST['options'])) {
 	//ready to output
 	$outcol = 0;
 	if (isset($_POST['pts'])) { $dopts = true; $outcol++;}
-	if (isset($_POST['ba'])) { $doba = true; $outcol++;} 
+	if (isset($_POST['ptpts'])) { $doptpts = true; $outcol++;}
+	if (isset($_POST['ba'])) { $doba = true; $outcol++;}
+	if (isset($_POST['bca'])) { $dobca = true; $outcol++;} 
 	if (isset($_POST['la'])) { $dola = true; $outcol++;} 
 	
 	//get assessment info
@@ -62,13 +103,31 @@ if (isset($_POST['options'])) {
 	}
 	//get question info
 	$qpts = array();
-	$query = "SELECT id,points FROM imas_questions WHERE assessmentid='$aid'";
+	$qsetids = array();
+	$query = "SELECT id,points,questionsetid FROM imas_questions WHERE assessmentid='$aid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	while ($row = mysql_fetch_row($result)) {
 		if ($row[1]==9999) {
 			$qpts[$row[0]] = $defpoints;
 		} else {
 			$qpts[$row[0]] = $row[1];
+		}
+		$qsetids[$row[0]] = $row[2];
+	}
+	if ($dobca) {
+		$qcontrols = array();
+		$qanswers = array();
+		$mathfuncs = array("sin","cos","tan","sinh","cosh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
+		$allowedmacros = $mathfuncs;
+		require_once("../assessment/mathphp2.php");
+		require("../assessment/interpret5.php");
+		require("../assessment/macros.php");
+		$qsetidlist = implode(',',$qsetids);
+		$query = "SELECT id,qtype,control,answer FROM imas_questionset WHERE id IN ($qsetidlist)";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			$qcontrols[$row[0]] = interpret('control',$row[1],$row[2]);
+			$qanswers[$row[0]] = interpret('answer',$row[1],$row[3]);
 		}
 	}
 	
@@ -85,12 +144,21 @@ if (isset($_POST['options'])) {
 			$gb[1][1 + $outcol*$k + $offset] = "Points (".$qpts[$q]." possible)";
 			$offset++;
 		}
+		if ($doptpts) {
+			$gb[0][1 + $outcol*$k + $offset] = "Question ".$itemnum[$q];
+			$gb[1][1 + $outcol*$k + $offset] = "Part Points (".$qpts[$q]." possible)";
+			$offset++;
+		}
 		if ($doba) {
 			$gb[0][1 + $outcol*$k + $offset] = "Question ".$itemnum[$q];
 			$gb[1][1 + $outcol*$k + $offset] = "Scored Answer";
 			$offset++;
 		}
-		
+		if ($dobca) {
+			$gb[0][1 + $outcol*$k + $offset] = "Question ".$itemnum[$q];
+			$gb[1][1 + $outcol*$k + $offset] = "Scored Correct Answer";
+			$offset++;
+		}
 		if ($dola) {
 			$gb[0][1 + $outcol*$k + $offset] = "Question ".$itemnum[$q];
 			$gb[1][1 + $outcol*$k + $offset] = "Last Answer";
@@ -113,12 +181,13 @@ if (isset($_POST['options'])) {
 	}
 	
 	//pull assessment data
-	$query = "SELECT ias.questions,ias.bestscores,ias.bestattempts,ias.bestlastanswers,ias.lastanswers,ias.userid FROM imas_assessment_sessions AS ias,imas_students ";
+	$query = "SELECT ias.questions,ias.bestscores,ias.bestseeds,ias.bestattempts,ias.bestlastanswers,ias.lastanswers,ias.userid FROM imas_assessment_sessions AS ias,imas_students ";
 	$query .= "WHERE ias.userid=imas_students.userid AND imas_students.courseid='$cid' AND ias.assessmentid='$aid'";
 	$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
 	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 		$questions = explode(',',$line['questions']);
 		$scores = explode(',',$line['bestscores']);
+		$seeds = explode(',',$line['bestseeds']);
 		$bla = explode('~',$line['bestlastanswers']);
 		$la =  explode('~',$line['lastanswers']);
 		if (!isset($sturow[$line['userid']])) {
@@ -133,10 +202,17 @@ if (isset($_POST['options'])) {
 				$gb[$r][$c+$offset] = getpts($scores[$k]);
 				$offset++;
 			}
+			if ($doptpts) {
+				$gb[$r][$c+$offset] = $scores[$k];
+				$offset++;
+			}
 			if ($doba) {
 				$laarr = explode('##',$bla[$k]);
 				$gb[$r][$c+$offset] = $laarr[count($laarr)-1];
 				$offset++;
+			}
+			if ($dobca) {
+				$gb[$r][$c+$offset] = evalqsandbox($seeds[$k],$qcontrols[$qsetids[$ques]],$qanswers[$qsetids[$ques]]);
 			}
 			if ($dola) {
 				$laarr = explode('##',$la[$k]);
@@ -180,11 +256,13 @@ if (isset($_POST['options'])) {
 	echo "<form method=\"post\" action=\"gb-aidexport.php?aid=$aid&cid=$cid\">";
 	echo 'What do you want to include in the export:<br/>';
 	echo '<input type="checkbox" name="pts" value="1"/> Points earned<br/>';
+	echo '<input type="checkbox" name="ptpts" value="1"/> Multipart broken-down Points earned<br/>';
 	echo '<input type="checkbox" name="ba" value="1"/> Scored Attempt<br/>';
+	echo '<input type="checkbox" name="bca" value="1"/> Correct Answers for Scored Attempt<br/>';
 	echo '<input type="checkbox" name="la" value="1"/> Last Attempt<br/>';
 	echo '<input type="submit" name="options" value="Export" />';
 	echo '<p>Export will be a commas separated values (.CSV) file, which can be opened in Excel</p>';
-	echo '<p><b class="red">Note</b>: Attempt information from shuffled multiple choice, multiple answer, and matching questions will NOT be correct</p>';
+	echo '<p class="red"><b>Note</b>: Attempt information from shuffled multiple choice, multiple answer, and matching questions will NOT be correct</p>';
 	echo '</form>';
 	require("../footer.php");
 	
