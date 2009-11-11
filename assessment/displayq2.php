@@ -2761,6 +2761,9 @@ function checkreqtimes($tocheck,$rtimes) {
 	//if entry used pow or exp, we want to replace them with their asciimath symbols for requiretimes purposes
 	$cleanans = str_replace("pow","^",$cleanans);
 	$cleanans = str_replace("exp","e",$cleanans);
+	if (is_numeric($cleanans) && $cleanans>0 && $cleanans<1) {
+		$cleanans = ltrim($cleanans,'0');
+	}
 	if ($rtimes != '') {
 		$list = explode(",",$rtimes);
 		for ($i=0;$i < count($list);$i+=2) {
