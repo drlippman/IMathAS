@@ -1006,8 +1006,17 @@ function sortarray($a) {
 
 
 function consecutive($min,$max,$step=1) {
-	for ($i=$min;$i<$max+$step/100.0;$i+=$step) {
-		$a[] = $i;
+	$a = array();
+	if ($min<$max && $step>0) {
+		for ($i=$min;$i<$max+$step/100.0;$i+=$step) {
+			$a[] = $i;
+		}
+	} else if ($min > $max && $step < 0) {
+		for ($i=$min;$i>$max+$step/100.0;$i+=$step) {
+			$a[] = $i;
+		}
+	} else {
+		echo "Invalid inputs to consecutive";
 	}
 	return $a;
 }

@@ -27,6 +27,36 @@
 	$lastforum = '';
 	
 	if (isset($_GET['markallread'])) {
+		$forumidlist = implode(',',$forumids);
+		$query = "SELECT DISTINCT threadid FROM imas_forum_posts WHERE forumid IN ($forumidlist)";
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$now = time();
+		$threadids = array();
+		while ($row = mysql_fetch_row($result)) {
+			$threadids[] = $row[0];
+		}
+		$threadlist = implode(',',$threadids);
+		$toupdate = array();
+		$query = "SELECT threadid FROM imas_forum_views WHERE userid='$userid' AND threadid IN ($threadlist)";
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			$toupdate[] = $row[0];
+		}
+		$touplodatelist= implode(',',$toupdate);
+		$query = "UPDATE imas_forum_views SET lastview=$now WHERE userid='$userid AND threadid IN ($toupdatelist)'";
+		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$toinsert = array_diff($threadids,$toupdate);
+		$query = "INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES ";
+		foreach($toinsert as $i=>$tid) {
+			if ($i != 0) {
+				$query .= ",('$userid','$tid',$now)";
+			} else {
+				$query .= "('$userid','$tid',$now)";
+			}
+		}
+		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		
+		/*
 		foreach($forumids as $forumid) {
 			$query = "SELECT DISTINCT threadid FROM imas_forum_posts WHERE forumid='$forumid'";
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -44,6 +74,7 @@
 				}
 			}
 		}
+		*/
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/../index.php");
 	}
 	
