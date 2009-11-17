@@ -173,11 +173,11 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				$locked = 0;
 			}
 			$timelimitmult = floatval($_POST['timelimitmult']);
-			echo $timelimitmult;
+			//echo $timelimitmult;
 			if ($timelimitmult <= 0) {
 				$timelimitmult = '1.0';
 			} 
-			echo $timelimitmult;
+			//echo $timelimitmult;
 				
 			$query = "UPDATE imas_students SET code=$code,section=$section,locked=$locked,timelimitmult='$timelimitmult' WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
 			mysql_query($query) or die("Query failed : " . mysql_error());

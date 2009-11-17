@@ -43,7 +43,6 @@ if (!(isset($teacherid))) {
 			$name = trim($_POST["colname$col"]);
 			$pts = intval($_POST["colpts$col"]);
 			$cnt = $_POST["colcnt$col"];
-			echo "count: $cnt <br/>";
 			$gbcat = $_POST["colgbcat$col"];
 			if ($_POST["coloverwrite$col"]>0) {
 				//we're going to check that this id really belongs to this course.  Don't want cross-course hacking :)

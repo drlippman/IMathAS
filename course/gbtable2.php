@@ -39,7 +39,6 @@ The super-nasty gradebook function!
 gbtable([userid])
 Student: automatically limits to their userid
 Teacher: gives all students unless userid is provided
-No averages are calculated by this function
 
 Format of output:
 row[0] header
@@ -109,7 +108,7 @@ row[1][3][4] = % past&current
 row[1][3][5] = % all
 
 row[1][4][0] = userid
-
+row[1][4][1] = locked?
 ****/
 
 function gbtable() {
@@ -571,7 +570,7 @@ function gbtable() {
 	
 	//Pull student data
 	$ln = 1;
-	$query = "SELECT imas_users.id,imas_users.SID,imas_users.FirstName,imas_users.LastName,imas_users.SID,imas_users.email,imas_students.section,imas_students.code,imas_students.timelimitmult ";
+	$query = "SELECT imas_users.id,imas_users.SID,imas_users.FirstName,imas_users.LastName,imas_users.SID,imas_users.email,imas_students.section,imas_students.code,imas_students.locked,imas_students.timelimitmult ";
 	$query .= "FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid AND imas_students.courseid='$cid' ";
 	//$query .= "FROM imas_users,imas_teachers WHERE imas_users.id=imas_teachers.userid AND imas_teachers.courseid='$cid' ";
 	//if (!$isteacher && !isset($tutorid)) {$query .= "AND imas_users.id='$userid' ";}
@@ -609,6 +608,7 @@ function gbtable() {
 		//Student ID info
 		$gb[$ln][0][0] = "{$line['LastName']},&nbsp;{$line['FirstName']}";
 		$gb[$ln][4][0] = $line['id'];
+		$gb[$ln][4][1] = $line['locked'];
 		
 		if ($isdiag) {
 			$selparts = explode('~',$line['SID']);
@@ -1193,7 +1193,7 @@ function gbtable() {
 	for ($j=0;$j<count($gb[0][1]);$j++) { //foreach assessment
 		$avgs[$j] = array();
 		for ($i=1;$i<$ln;$i++) { //foreach student
-			if (isset($gb[$i][1][$j][0])) {
+			if (isset($gb[$i][1][$j][0]) && $gb[$i][4][1]==0) { //score exists and student is not locked
 				if ($gb[$i][1][$j][3]==0 && is_numeric($gb[$i][1][$j][0])) {
 					$avgs[$j][] = $gb[$i][1][$j][0];
 				}

@@ -816,7 +816,11 @@ function gbinstrdisp() {
 			echo "<input type=\"checkbox\" name='checked[]' value='{$gbt[$i][4][0]}' />&nbsp;";
 		}
 		echo "<a href=\"gradebook.php?cid=$cid&stu={$gbt[$i][4][0]}\">";
-		echo $gbt[$i][0][0];
+		if ($gbt[$i][4][1]==1) {
+			echo '<span style="text-decoration: line-through;">'.$gbt[$i][0][0].'</span>';
+		} else {
+			echo $gbt[$i][0][0];
+		}
 		echo '</a></td>';
 		if ($showpics==1 && file_exists("$curdir//files/userimg_sm{$gbt[$i][4][0]}.jpg")) {
 			echo "<td><img src=\"$imasroot/course/files/userimg_sm{$gbt[$i][4][0]}.jpg\"/></td>";
