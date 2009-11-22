@@ -125,10 +125,10 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 
 		$laparts = explode("&",$la);
 		foreach ($anstypes as $kidx=>$anstype) {
-			list($answerbox[$kidx],$tips[$kidx],$shans[$kidx],$previewloc[$kidx]) = makeanswerbox($anstype,$kidx,$laparts[$kidx],$options,$qnidx+1);
+			list($answerbox[$kidx],$tips[$kidx],$shanspt[$kidx],$previewloc[$kidx]) = makeanswerbox($anstype,$kidx,$laparts[$kidx],$options,$qnidx+1);
 		}
 	} else {
-		list($answerbox,$tips[0],$shans[0],$previewloc) = makeanswerbox($qdata['qtype'],$qnidx,$la,$options,0);
+		list($answerbox,$tips[0],$shanspt[0],$previewloc) = makeanswerbox($qdata['qtype'],$qnidx,$la,$options,0);
 	}
 	
 	
@@ -222,12 +222,12 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		if (!isset($hidetips) && !$seqinactive) {
 			echo "<p class=\"tips\">Box ".($iidx+1).": $tip</p>";
 		}
-		if ($doshowans && (!isset($showanswer) || (is_array($showanswer) && !isset($showanswer[$iidx]))) && $shans[$iidx]!=='') {
+		if ($doshowans && (!isset($showanswer) || (is_array($showanswer) && !isset($showanswer[$iidx]))) && $shanspt[$iidx]!=='') {
 			if ($nosabutton) {
-				echo filter("<div>Answer: {$shans[$iidx]} </div>\n");
+				echo filter("<div>Answer: {$shanspt[$iidx]} </div>\n");
 			} else {
 				echo "<div><input class=\"sabtn\" type=button value=\"Show Answer\" onClick='javascript:document.getElementById(\"ans$qnidx-$iidx\").className=\"shown\";' />"; //AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
-				echo filter(" <span id=\"ans$qnidx-$iidx\" class=\"hidden\">{$shans[$iidx]}</span></div>\n");
+				echo filter(" <span id=\"ans$qnidx-$iidx\" class=\"hidden\">{$shanspt[$iidx]}</span></div>\n");
 			}
 		} else if ($doshowans && isset($showanswer) && is_array($showanswer)) { //use part specific showanswer
 			if (isset($showanswer[$iidx])) {
