@@ -3,6 +3,7 @@
 	//(c) 20006 David Lippman
 	if ($_GET['action']=="newuser") {
 		require_once("config.php");
+		$_POST['SID'] = trim($_POST['SID']);
 		if ($loginformat!='' && !preg_match($loginformat,$_POST['SID'])) {
 			echo "<html><body>\n";
 			echo "$loginprompt is invalid.  <a href=\"forms.php?action=newuser\">Try Again</a>\n";

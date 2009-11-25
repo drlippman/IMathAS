@@ -115,7 +115,7 @@ $assess = array();
 $colors = array();
 $tags = array();
 $k = 0;
-$query = "SELECT id,name,startdate,enddate,reviewdate,gbcategory,reqscore,reqscoreaid,timelimit,allowlate FROM imas_assessments WHERE avail=1 AND courseid='$cid' AND enddate<2000000000";
+$query = "SELECT id,name,startdate,enddate,reviewdate,gbcategory,reqscore,reqscoreaid,timelimit,allowlate,caltag FROM imas_assessments WHERE avail=1 AND courseid='$cid' AND enddate<2000000000";
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 while ($row = mysql_fetch_row($result)) {
 	if (isset($exceptions[$row[0]])) {
@@ -151,16 +151,18 @@ while ($row = mysql_fetch_row($result)) {
 	if ($row[4]<$uppertime && $row[4]>0 && $now>$row[3]) { //has review, and we're past enddate
 		list($moday,$time) = explode('~',date('n-j~g:i a',$row[4]));
 		$row[1] = str_replace('"','\"',$row[1]);
+		$tag = $row[10]{1};
 		if ($now<$row[4]) { $colors[$k] = '#99f';} else {$colors[$k] = '#ccc';}
-		$assess[$moday][$k] = "{type:\"AR\", time:\"$time\", ";
+		$assess[$moday][$k] = "{type:\"AR\", time:\"$time\", tag:\"$tag\", ";
 		if ($now<$row[4] || isset($teacherid)) { $assess[$moday][$k] .= "id:\"$row[0]\",";}
 		$assess[$moday][$k] .=  "color:\"".$colors[$k]."\",name:\"$row[1]\"".((isset($teacherid))?", editlink:true":"")."}";
 	} else if ($row[3]<$uppertime && $row[3]>$exlowertime) {// taking out "hide if past due" && ($now<$row[3] || isset($teacherid))) {
-		if (isset($gbcats[$row[5]])) {
+		/*if (isset($gbcats[$row[5]])) {
 			$tag = $gbcats[$row[5]];
 		} else {
 			$tag = '?';
-		}
+		}*/
+		$tag = $row[10]{0};
 		if ($row[9]==1 && $latepasses>0) {
 			$lp = 1;
 		} else {
@@ -174,7 +176,7 @@ while ($row = mysql_fetch_row($result)) {
 		if ($now<$row[3] || isset($teacherid)) { $assess[$moday][$k] .= "id:\"$row[0]\",";}
 		$assess[$moday][$k] .= "name:\"$row[1]\", color:\"".$colors[$k]."\", allowlate:\"$lp\", tag:\"$tag\"".(($row[8]>0)?", timelimit:true":"").((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
 	} 
-	
+	$tags[$k] = $tag;
 	$k++;
 }
 //if (isset($teacherid)) {
@@ -300,7 +302,7 @@ for ($i=0;$i<count($hdrs);$i++) {
 			foreach ($assess[$ids[$i][$j]] as $k=>$info) {
 				//echo $assess[$ids[$i][$j]][$k];
 				if (strpos($info,'type:"AR"')!==false) {
-					echo "<span style=\"background-color:".$colors[$k].";padding: 0px 3px 0px 3px;\">R</span> ";
+					echo "<span style=\"background-color:".$colors[$k].";padding: 0px 3px 0px 3px;\">{$tags[$k]}</span> ";
 				} else if (strpos($info,'type:"A"')!==false) {
 					echo "<span style=\"background-color:".$colors[$k].";padding: 0px 3px 0px 3px;\">{$tags[$k]}</span> ";
 				} else if (strpos($info,'type:"F')!==false) { 

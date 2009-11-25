@@ -140,6 +140,10 @@ if (!(isset($teacherid))) {
 		if (isset($_POST['chgavail'])) {
 			$sets[] = "avail='{$_POST['avail']}'";
 		}
+		if (isset($_POST['chgcaltag'])) {
+			$caltag = $_POST['caltagact'].$_POST['caltagrev'];
+			$sets[] = "caltag='$caltag'";
+		}
 		if (isset($_POST['chgintro'])) {
 			$query = "SELECT intro FROM imas_assessments WHERE id='{$_POST['intro']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -483,6 +487,11 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 				<input name="cntingb" value="2" type="radio"> Count as Extra Credit
 				</td>
 			</tr>
+			<tr>
+				<td><input type="checkbox" name="chgcaltag"/></td>
+				<td class="r">Calendar icon:</td>
+				<td>Active: <input name="caltagact" type=text size=1 maxlength=1 value="?"/>, 
+				    Review: <input name="caltagrev" type=text size=1 maxlength=1 value="R"/></td>
 			<tr>
 				<td><input type="checkbox" name="chgminscore"/></td>
 				<td class="r">Minimum score to receive credit: </td>

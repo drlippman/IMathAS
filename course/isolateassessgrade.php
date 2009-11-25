@@ -49,17 +49,54 @@
 		$sortorder = "name";
 	}
 	
-	$query = "SELECT minscore,timelimit,deffeedback,enddate,name FROM imas_assessments WHERE id='$aid'";
+	$query = "SELECT minscore,timelimit,deffeedback,enddate,name,defpoints,itemorder FROM imas_assessments WHERE id='$aid'";
 	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-	list($minscore,$timelimit,$deffeedback,$enddate,$name) = mysql_fetch_row($result);
+	list($minscore,$timelimit,$deffeedback,$enddate,$name,$defpoints,$itemorder) = mysql_fetch_row($result);
 	$deffeedback = explode('-',$deffeedback);
 	$assessmenttype = $deffeedback[0];
 	
-	echo "<h3>Grades for $name</h3>";
+	$aitems = explode(',',$itemorder);
+	foreach ($aitems as $k=>$v) {
+		if (strpos($v,'~')!==FALSE) {
+			$sub = explode('~',$v);
+			if (strpos($sub[0],'|')===false) { //backwards compat
+				$aitems[$k] = $sub[0];
+				$aitemcnt[$k] = 1;
+				
+			} else {
+				$grpparts = explode('|',$sub[0]);
+				$aitems[$k] = $sub[1];
+				$aitemcnt[$k] = $grpparts[0];
+			}
+		} else {
+			$aitemcnt[$k] = 1;
+		}
+	}
+		
+	$query = "SELECT points,id FROM imas_questions WHERE assessmentid='$aid'";
+	$result2 = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+	$totalpossible = 0;
+	while ($r = mysql_fetch_row($result2)) {
+		if (($k = array_search($r[1],$aitems))!==false) { //only use first item from grouped questions for total pts	
+			if ($r[0]==9999) {
+				$totalpossible += $aitemcnt[$k]*$defpoints; //use defpoints
+			} else {
+				$totalpossible += $aitemcnt[$k]*$r[0]; //use points from question
+			}
+		}
+	}
 	
+	
+	echo "<p><b style=\"font-size: 120%\">Grades for $name</b><br/>$totalpossible points possible</p>";
+	
+//	$query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.timelimitmult,";
+//	$query .= "ias.id,ias.userid,ias.bestscores,ias.starttime,ias.endtime,ias.feedback FROM imas_assessment_sessions AS ias,imas_users AS iu,imas_students AS istu ";
+//	$query .= "WHERE iu.id = istu.userid AND istu.courseid='$cid' AND iu.id=ias.userid AND ias.assessmentid='$aid'";
+
 	$query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.timelimitmult,";
-	$query .= "ias.id,ias.userid,ias.bestscores,ias.starttime,ias.endtime,ias.feedback FROM imas_assessment_sessions AS ias,imas_users AS iu,imas_students AS istu ";
-	$query .= "WHERE iu.id = istu.userid AND istu.courseid='$cid' AND iu.id=ias.userid AND ias.assessmentid='$aid'";
+	$query .= "ias.id,istu.userid,ias.bestscores,ias.starttime,ias.endtime,ias.feedback FROM imas_users AS iu JOIN imas_students AS istu ON iu.id = istu.userid AND istu.courseid='$cid' ";
+	$query .= "LEFT JOIN imas_assessment_sessions AS ias ON iu.id=ias.userid AND ias.assessmentid='$aid'";
+	
 	if ($istutor && isset($tutorsection) && $tutorsection!='') {
 		$query .= " AND istu.section='$tutorsection' ";
 	}
@@ -80,6 +117,8 @@
 	echo "<th>Grade</th><th>Feedback</th></tr></thead><tbody>";
 	$now = time();
 	$lc = 1;
+	$n = 0;
+	$tot = 0;
 	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 		if ($lc%2!=0) {
 			echo "<tr class=even onMouseOver=\"this.className='highlight'\" onMouseOut=\"this.className='even'\">"; 
@@ -99,24 +138,45 @@
 		}
 		$timeused = $line['endtime']-$line['starttime'];
 		
-		echo "<td><a href=\"gb-viewasid.php?gbmode=$gbmode&cid=$cid&asid={$line['id']}&uid={$line['userid']}&from=isolate&aid=$aid\">";
-		if ($total<$minscore) {
-			echo "{$total}&nbsp;(NC)";
-		} else 	if ($IP==1 && $enddate>$now) {
-			echo "{$total}&nbsp;(IP)";
-		} else	if (($timelimit>0) &&($timeused > $timelimit*$line['timelimitmult'])) {
-			echo "{$total}&nbsp;(OT)";
-		} else if ($assessmenttype=="Practice") {
-			echo "{$total}&nbsp;(PT)";
+		if ($line['id']==null) {
+			echo "<td><a href=\"gb-viewasid.php?gbmode=$gbmode&cid=$cid&asid=new&uid={$line['userid']}&from=isolate&aid=$aid\">-</a></td><td></td>";		
 		} else {
-			echo "{$total}";
+			echo "<td><a href=\"gb-viewasid.php?gbmode=$gbmode&cid=$cid&asid={$line['id']}&uid={$line['userid']}&from=isolate&aid=$aid\">";
+			if ($total<$minscore) {
+				echo "{$total}&nbsp;(NC)";
+			} else 	if ($IP==1 && $enddate>$now) {
+				echo "{$total}&nbsp;(IP)";
+			} else	if (($timelimit>0) &&($timeused > $timelimit*$line['timelimitmult'])) {
+				echo "{$total}&nbsp;(OT)";
+			} else if ($assessmenttype=="Practice") {
+				echo "{$total}&nbsp;(PT)";
+			} else {
+				echo "{$total}";
+				$tot += $total;
+				$n++;
+			}
+	
+			echo "</a></td>";
+			echo "<td>{$line['feedback']}</td>";
 		}
-
-		echo "</a></td>";
-		echo "<td>{$line['feedback']}</td>";
 		echo "</tr>";
 	}
-	
+	echo '<tr><td>Average</td>';
+	if ($hassection) {
+		echo '<td></td>';
+	}
+	echo "<td><a href=\"gb-itemanalysis.php?cid=$cid&aid=$aid\">";
+	if ($n>0) {
+		echo round($tot/$n,1);
+	} else {
+		echo '-';
+	}
+	if ($totalpossible > 0 ) {
+		$pct = round(100*($tot/$n)/$totalpossible,1).'%';
+	} else {
+		$pct = '';
+	}
+	echo "</a></td><td>$pct</td></tr>";
 	echo "</tbody></table>";
 	if ($hassection) {
 		echo "<script> initSortTable('myTable',Array('S','S','N'),true);</script>";
