@@ -4,8 +4,8 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=7" />
 	<title>Graph Editor</title>
 	<script type="text/javascript" src="../../tiny_mce_popup.js"></script>
-	<script type="text/javascript" src="../../../javascript/ASCIIsvg.js"></script>
-	<script type="text/javascript" src="js/asciisvgdlg.js"></script>
+	<script type="text/javascript" src="../../../javascript/ASCIIsvg.js?v=112909"></script>
+	<script type="text/javascript" src="js/asciisvgdlg.js?v=112909"></script>
 	</head>
 <body>
 
@@ -15,10 +15,11 @@
 <option value="polar">r=f(t)</option>
 <option value="param">x=f(t),y=g(t)</option>
 <option value="slope">dy/dx = f(x,y)</option>
+<option value="label">label</option>
 </select>
 &nbsp;&nbsp;&nbsp;
 <span id="eq1lbl">f(x)=</span> <input type="text" id="equation" size="15" value="sin(x)"/> <span id="eq2lbl"><i></i></span><span id="eq2"><i></i></span>
-&nbsp;from <input type="text" id="xstart" size="4" value=""/> to <input type="text" id="xend" size="4" value=""/>
+&nbsp;<span id="xblbl1">from</span> <input type="text" id="xstart" size="4" value=""/> <span id="xblbl2">to</span> <input type="text" id="xend" size="4" value=""/>
 <HR>
 
 Color: <Select id="gcolor">

@@ -124,6 +124,8 @@ function processShortScript($script) {
 			}
 			if ($sa[$inx]=='slope') {
 				$this->ASslopefield(array($sa[$inx+1],$sa[$inx+2],$sa[$inx+2]));
+			} else if ($sa[$inx]=='label') {
+				$this->AStext(array($sa[$inx+5].','.$sa[$inx+6],$sa[$inx+1]));
 			} else {
 				if ($sa[$inx]=='func') {
 					$eqn = $sa[$inx+1];

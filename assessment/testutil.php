@@ -31,7 +31,7 @@ function getquestioninfo($qns,$testsettings) {
 			$foundweights = false;
 			if (($p = strpos($line['control'],'answeights'))!==false) {
 				$p = strpos($line['control'],"\n",$p);
-				$weights = getansweights($line['id'],substr($line['control'],0,$p));
+				$weights = getansweights($line['id'],$line['control']);
 				if (is_array($weights)) {
 					$line['answeights'] = $weights;
 					$foundweights = true;
