@@ -36,6 +36,17 @@
 		$teacherof[$row[0]] = true;
 	}
 	
+	if (isset($_GET['markunread'])) {
+		$msg = $_GET['msgid'];	
+		$query = "UPDATE imas_msgs SET isread=isread-1 WHERE id='$msg'";
+		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		if ($type=='new') {
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/newmsglist.php?cid=$cid");
+		} else {
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/msglist.php?page=$page&cid=$cid&filtercid=$filtercid");				
+		}
+		exit;
+	}
 	
 	$pagetitle = "Messages";
 	require("../header.php");
@@ -122,6 +133,7 @@
 		if ($isteacher && $line['courseid']==$cid) {
 			echo " | <a href=\"$imasroot/course/gradebook.php?cid={$line['courseid']}&stu={$line['msgfrom']}\">Gradebook</a>";
 		}
+		echo " | <a href=\"viewmsg.php?markunread=true&cid=$cid&filtercid=$filtercid&page=$page&msgid=$msgid&type=$type\">Mark Unread</a>";
 	} else if ($type=='sent' && $type!='allstu') {
 		echo "<a href=\"msghistory.php?cid=$cid&filtercid=$filtercid&page=$page&msgid=$msgid&type=$type\">View Conversation</a>";
 		
