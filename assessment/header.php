@@ -71,6 +71,7 @@ tinyMCE.init({
     theme_advanced_statusbar_location : "bottom",
     plugins : 'safari,asciimath,asciisvg,table,inlinepopups,paste',
     gecko_spellcheck : true,
+    extended_valid_elements : 'img[longdesc|usemap|src|border|alt=|title|hspace|vspace|width|height|align|sscr]',
     theme_advanced_resizing : true,
     cleanup_callback : "imascleanup",
     AScgiloc : '$imasroot/filter/graph/svgimg.php',

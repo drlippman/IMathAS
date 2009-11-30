@@ -21,7 +21,7 @@ var imasroot = '<?php echo $imasroot; ?>';
 if (isset($coursetheme) && strpos($coursetheme,'_dark')!==false) {$mathdarkbg = true;} else {$mathdarkbg = false;}
 if ($ispublic) {
 	echo "<script src=\"$imasroot/javascript/ASCIIMathMLwFallback.js?ver=102009\" type=\"text/javascript\"></script>\n";
-	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?ver=111909\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIIMath = true; var usingASCIISvg = true;</script>"; 
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";';
 	if ($mathdarkbg) {echo 'var mathbg = "dark";';}
@@ -46,7 +46,7 @@ if ($sessiondata['mathdisp']==1) {
 	echo "<script type=\"text/javascript\">var usingASCIIMath = false;</script>";
 }
 if ($sessiondata['graphdisp']==1) {
-	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?ver=111909\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIISvg = true;</script>";
 	//echo "<script src=\"$imasroot/course/editor/plugins/AsciiSvg/ASCIIsvgAddon.js\" type=\"text/javascript\"></script>\n";
 } else if (isset($sessiondata['graphdisp'])) {
@@ -78,7 +78,7 @@ tinyMCE.init({
     theme_advanced_statusbar_location : "bottom",
     plugins : 'safari,asciimath,asciisvg,table,inlinepopups,paste,media',
     gecko_spellcheck : true,
-    extended_valid_elements : 'iframe[src|width|height|name|align],param[name|value]',
+    extended_valid_elements : 'iframe[src|width|height|name|align],param[name|value],img[longdesc|usemap|src|border|alt=|title|hspace|vspace|width|height|align|sscr]',
     content_css : '$imasroot/themes/$coursetheme',
     popup_css_add : '$imasroot/themes/$coursetheme',
     theme_advanced_resizing : true,

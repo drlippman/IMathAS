@@ -81,8 +81,16 @@
 					var imgs = o.content.match(/<img[^>]*sscr[^>]*>/gi);
 					if (imgs != null) {
 						for (var i=0; i<imgs.length; i++) {
-							sscr = imgs[i].replace(/.*sscr=\"?(.*?)[\"\s].*/,"$1");
-							style = imgs[i].replace(/.*style=\"(.*?)\".*/,"$1");
+							if (imgs[i].match(/sscr=\"/)) {
+								sscr = imgs[i].replace(/.*sscr=\"(.*?)\".*/,"$1");
+							} else {
+								sscr = imgs[i].replace(/.*sscr=(.*?)\s.*/,"$1");
+							}
+							if (imgs[i].match(/style=\"/)) {
+								style = imgs[i].replace(/.*style=\"(.*?)\".*/,"$1");
+							} else {
+								style = '';
+							}
 							rep = '<embed type="image/svg+xml" src="'+ed.getParam('ASdloc')+'" style="'+style+'" sscr="'+decodeURIComponent(sscr)+'" />';
 							o.content = o.content.replace(imgs[i],rep);
 						}
@@ -94,8 +102,17 @@
 				var imgs = o.content.match(/<embed[^>]*sscr[^>]*>/gi);
 					if (imgs != null) {
 						for (var i=0; i<imgs.length; i++) {
-							sscr = imgs[i].replace(/.*sscr=\"?(.*?)[\"\s].*/,"$1");
-							style = imgs[i].replace(/.*style=\"(.*?)\".*/,"$1");
+							//sscr = imgs[i].replace(/.*sscr=\"?(.*?)[\"\s].*/,"$1");
+							if (imgs[i].match(/sscr=\"/)) {
+								sscr = imgs[i].replace(/.*sscr=\"(.*?)\".*/,"$1");
+							} else {
+								sscr = imgs[i].replace(/.*sscr=(.*?)\s.*/,"$1");
+							}
+							if (imgs[i].match(/style=\"/)) {
+								style = imgs[i].replace(/.*style=\"(.*?)\".*/,"$1");
+							} else {
+								style = '';
+							}
 							rep = '<img src="'+ed.getParam('AScgiloc')+'?sscr='+sscr+'" style="'+style+'" sscr="'+decodeURIComponent(sscr)+'" />';
 							o.content = o.content.replace(imgs[i],rep);
 						}
