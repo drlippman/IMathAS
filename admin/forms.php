@@ -124,6 +124,7 @@ switch($_GET['action']) {
 			$lockaid = $line['lockaid'];
 			$ltisecret = $line['ltisecret'];
 			$chatset = $line['chatset'];
+			$showlatepass = $line['showlatepass'];
 		} else {
 			$courseid = "Not yet set";
 			$name = "Enter course name here";
@@ -141,6 +142,7 @@ switch($_GET['action']) {
 			$theme = "default.css";
 			$ltisecret = "";
 			$chatset = 0;
+			$showlatepass = 0;
 		}
 		if (isset($_GET['cid'])) {
 			$cid = $_GET['cid'];
@@ -274,6 +276,11 @@ switch($_GET['action']) {
 		echo '<span class="form">Enable live chat:</span><span class="formright">';
 		echo '<input type=checkbox name="chatset" value="1" ';
 		if ($chatset==1) {echo 'checked="checked"';};
+		echo ' /></span><br class="form" />';
+		
+		echo '<span class="form">Show remaining LatePasses on student gradebook page:</span><span class="formright">';
+		echo '<input type=checkbox name="showlatepass" value="1" ';
+		if ($showlatepass==1) {echo 'checked="checked"';};
 		echo ' /></span><br class="form" />';
 		
 		echo "<span class=form>Student Quick Pick Top Bar items:</span><span class=formright>";

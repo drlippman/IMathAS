@@ -77,11 +77,18 @@ if (!(isset($teacherid))) {
 		exit;	
 	} else if (isset($_GET['action']) && $_GET['action']=="copy") {
 		if (isset($_POST['copycourseopt'])) {
-			$query = "SELECT hideicons,allowunenroll,copyrights,msgset,topbar,cploc FROM imas_courses WHERE id='{$_POST['ctc']}'";
+			$tocopy = 'hideicons,allowunenroll,copyrights,msgset,topbar,cploc,picicons,chatset,showlatepass,available,theme';
+			
+			$query = "SELECT $tocopy FROM imas_courses WHERE id='{$_POST['ctc']}'";
 			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 			$row = mysql_fetch_row($result);
-			$query = "UPDATE imas_courses SET hideicons='{$row[0]}',allowunenroll='{$row[1]}',copyrights='{$row[2]}',";
-			$query .= "msgset='{$row[3]}',topbar='{$row[4]}',cploc='{$row[5]}' WHERE id='$cid'";
+			$tocopyarr = explode(',',$tocopy);
+			$sets = '';
+			for ($i=0; $i<count($tocopyarr); $i++) {
+				if ($i>0) {$sets .= ',';}
+				$sets .= $tocopyarr[$i] . "='" . addslashes($row[$i])."'";
+			}
+			$query = "UPDATE imas_courses SET $sets WHERE id='$cid'";
 			mysql_query($query) or die("Query failed :$query " . mysql_error());
 		}
 		if (isset($_POST['copygbsetup'])) {

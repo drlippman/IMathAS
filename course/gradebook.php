@@ -233,7 +233,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	}
 	
 	gbstudisp($stu);
-	echo "<p>Meanings:  IP-In Progress, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sub>d</sub> Dropped score.  </p>\n";
+	echo "<p>Meanings:  IP-In Progress, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sub>d</sub> Dropped score.  <sup>e</sup> Has exception/latepass  </p>\n";
 	
 	require("../footer.php");
 	
@@ -410,6 +410,10 @@ function gbstudisp($stu) {
 	$gbt = gbtable($stu);
 	
 	if ($stu>0) {
+		$query = "SELECT showlatepass FROM imas_courses WHERE id='$cid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$showlatepass = mysql_result($result,0,0);
+		
 		if ($isteacher && isset($_POST['usrcomments'])) {
 			$query = "UPDATE imas_students SET gbcomment='{$_POST['usrcomments']}' WHERE userid='$stu'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
@@ -421,7 +425,7 @@ function gbstudisp($stu) {
 			} 
 		}
 		echo '<h3>' . strip_tags($gbt[1][0][0]) . '</h3>';
-		$query = "SELECT imas_students.gbcomment,imas_users.email FROM imas_students,imas_users WHERE ";
+		$query = "SELECT imas_students.gbcomment,imas_users.email,imas_students.latepass FROM imas_students,imas_users WHERE ";
 		$query .= "imas_students.userid=imas_users.id AND imas_users.id='$stu' AND imas_students.courseid='{$_GET['cid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		echo '<div style="clear:both">';
@@ -433,6 +437,12 @@ function gbstudisp($stu) {
 				echo "<a href=\"listusers.php?cid={$_GET['cid']}&chgstuinfo=true&uid=$stu\">Change Info</a>";
 			}
 			$gbcomment = mysql_result($result,0,0);
+			$latepasses = mysql_result($result,0,2);
+			if ($showlatepass==1) {
+				if ($latepasses==0) { $latepasses = 'No';}
+				if ($isteacher) {echo '<br/>';}
+				echo "$latepasses LatePass".($latepasses!=1?"es":"").' available';
+			}
 		} else {
 			$gbcomment = '';
 		}
@@ -538,8 +548,8 @@ function gbstudisp($stu) {
 			if ($haslink) { //show link
 				echo '</a>';
 			}
-			if (($isteacher || $istutor) && isset($gbt[1][1][$i][6]) ) {
-				echo '<sup>e</sup></span>';
+			if (isset($gbt[1][1][$i][6]) ) {  //($isteacher || $istutor) && 
+				echo '<sup>e</sup>';
 			}
 			if (isset($gbt[1][1][$i][5]) && ($gbt[1][1][$i][5]&(1<<$availshow)) && !$hidepast) {
 				echo '<sub>d</sub>';
@@ -906,7 +916,7 @@ function gbinstrdisp() {
 							echo '<sup>*</sup>';
 						}
 						if (isset($gbt[$i][1][$j][6]) ) {
-							echo '<sup>e</sup></span>';
+							echo '<sup>e</sup>';
 						}
 					} else { //no score
 						if ($gbt[$i][0][0]=='Averages') {
