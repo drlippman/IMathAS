@@ -44,7 +44,7 @@ function addLoadEvent(func) {
 	    } 
 	  } 
 } */
-
+/*
 function findPos(obj) { //from quirksmode.org
 	var curleft = curtop = 0;
 	if (obj.offsetParent) {
@@ -55,7 +55,7 @@ function findPos(obj) { //from quirksmode.org
 	}
 	return [curleft,curtop];
 }
-
+*/
 function tablescroller(id,lockonload) {
 	var t = this;
 	var thetable;

@@ -861,10 +861,29 @@ function gbinstrdisp() {
 						continue;
 					}
 					if ($catfilter!=-1 && $gbt[0][2][$j][$availshow+3]>0) {
-						echo '<td class="c">'.$gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)</td>';
+						//echo '<td class="c">'.$gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)</td>';
+						echo '<td class="c">';
+						if ($gbt[$i][0][0]=='Averages') {
+							echo "<span onmouseover=\"tipshow(this,'5-number summary: {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
+						}
+						echo $gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)';
+						if ($gbt[$i][0][0]=='Averages') {
+							echo '</span>';
+						}
+						echo '</td>';
 					} else {
-						echo '<td class="c">'.$gbt[$i][2][$j][$availshow].'</td>';
+						//echo '<td class="c">'.$gbt[$i][2][$j][$availshow].'</td>';
+						echo '<td class="c">';
+						if ($gbt[$i][0][0]=='Averages') {
+							echo "<span onmouseover=\"tipshow(this,'5-number summary: {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
+						}
+						echo $gbt[$i][2][$j][$availshow];
+						if ($gbt[$i][0][0]=='Averages') {
+							echo '</span>';
+						}
+						echo '</td>';
 					}
+					
 				}
 			}
 		}
@@ -894,7 +913,9 @@ function gbinstrdisp() {
 						if ($istutor && $gbt[$i][1][$j][4]=='average') {
 							
 						} else if ($gbt[$i][1][$j][4]=='average') {
-							echo "<a href=\"gb-itemanalysis.php?stu=$stu&cid=$cid&asid={$gbt[$i][1][$j][4]}&aid={$gbt[0][1][$j][7]}\">";
+							echo "<a href=\"gb-itemanalysis.php?stu=$stu&cid=$cid&asid={$gbt[$i][1][$j][4]}&aid={$gbt[0][1][$j][7]}\" "; 
+							echo "onmouseover=\"tipshow(this,'5-number summary: {$gbt[0][1][$j][9]}')\" onmouseout=\"tipout()\" ";
+							echo ">";
 						} else {
 							echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid={$gbt[$i][1][$j][4]}&uid={$gbt[$i][4][0]}\">";
 						}
@@ -930,7 +951,9 @@ function gbinstrdisp() {
 				} else if ($gbt[0][1][$j][6]==1) { //offline
 					if ($isteacher) {
 						if ($gbt[$i][0][0]=='Averages') {
-							echo "<a href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$j][7]}\">";
+							echo "<a href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$j][7]}\" ";
+							echo "onmouseover=\"tipshow(this,'5-number summary: {$gbt[0][1][$j][9]}')\" onmouseout=\"tipout()\" ";
+							echo ">";
 						} else {
 							echo "<a href=\"addgrades.php?stu=$stu&cid=$cid&grades={$gbt[$i][4][0]}&gbitem={$gbt[0][1][$j][7]}\">";
 						}
@@ -978,9 +1001,25 @@ function gbinstrdisp() {
 						continue;
 					}
 					if ($catfilter!=-1 && $gbt[0][2][$j][$availshow+3]>0) {
-						echo '<td class="c">'.$gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)</td>';
+						echo '<td class="c">';
+						if ($gbt[$i][0][0]=='Averages') {
+							echo "<span onmouseover=\"tipshow(this,'5-number summary: {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
+						}
+						echo $gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)';
+						if ($gbt[$i][0][0]=='Averages') {
+							echo '</span>';
+						}
+						echo '</td>';
 					} else {
-						echo '<td class="c">'.$gbt[$i][2][$j][$availshow].'</td>';
+						echo '<td class="c">';
+						if ($gbt[$i][0][0]=='Averages') {
+							echo "<span onmouseover=\"tipshow(this,'5-number summary: {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
+						}
+						echo $gbt[$i][2][$j][$availshow];
+						if ($gbt[$i][0][0]=='Averages') {
+							echo '</span>';
+						}
+						echo '</td>';
 					}
 				}
 			}

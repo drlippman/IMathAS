@@ -58,6 +58,7 @@ row[0][1][0][5] = 0 regular, 1 practice test
 row[0][1][0][6] = 0 online, 1 offline, 2 discussion
 row[0][1][0][7] = assessmentid, gbitemid, forumid
 row[0][1][0][8] = tutoredit: 0 no, 1 yes
+row[0][1][0][9] = 5 number summary, if not limuser-ed
 
 row[0][2] category totals
 row[0][2][0][0] = "Category Name"
@@ -67,10 +68,12 @@ row[0][2][0][2] = 0 if any scores in past, 1 if any scores in past/current, 2 if
 row[0][2][0][3] = total possible for past
 row[0][2][0][4] = total possible for past/current
 row[0][2][0][5] = total possible for all
+row[0][2][0][6-8] = 5 number summary
 
 row[0][3][0] = total possible past
 row[0][3][1] = total possible past&current
 row[0][3][2] = total possible all
+row[0][3][3-5] = 5 number summary
 
 row[1] first student data row
 row[1][0] biographical
@@ -1187,63 +1190,118 @@ function gbtable() {
 			
 		}
 	}
-	//create averages
-	$gb[$ln][0][0] = "Averages";
-	$avgs = array();
-	for ($j=0;$j<count($gb[0][1]);$j++) { //foreach assessment
-		$avgs[$j] = array();
-		for ($i=1;$i<$ln;$i++) { //foreach student
-			if (isset($gb[$i][1][$j][0]) && $gb[$i][4][1]==0) { //score exists and student is not locked
-				if ($gb[$i][1][$j][3]==0 && is_numeric($gb[$i][1][$j][0])) {
-					$avgs[$j][] = $gb[$i][1][$j][0];
+	if ($limuser<1) {
+		//create averages
+		$gb[$ln][0][0] = "Averages";
+		$avgs = array();
+		for ($j=0;$j<count($gb[0][1]);$j++) { //foreach assessment
+			$avgs[$j] = array();
+			for ($i=1;$i<$ln;$i++) { //foreach student
+				if (isset($gb[$i][1][$j][0]) && $gb[$i][4][1]==0) { //score exists and student is not locked
+					if ($gb[$i][1][$j][3]==0 && is_numeric($gb[$i][1][$j][0])) {
+						$avgs[$j][] = $gb[$i][1][$j][0];
+					}
+				}
+			}
+			
+			if (count($avgs[$j])>0) {
+				sort($avgs[$j], SORT_NUMERIC);
+				$fivenum = array();
+				for ($k=0; $k<5; $k++) {
+					$fivenum[] = gbpercentile($avgs[$j],$k*25);
+				}
+				$fivenumsum = implode(',&nbsp;',$fivenum);
+				if ($gb[0][1][$j][2]>0) {
+					for ($k=0; $k<5; $k++) {
+						$fivenum[$k] = round(100*$fivenum[$k]/$gb[0][1][$j][2],1);
+					}
+					$fivenumsum .= '<br/>'.implode('%,&nbsp;',$fivenum).'%';
+				}
+			} else {
+				$fivenumsum = '';
+			}
+			$gb[0][1][$j][9] = $fivenumsum;	
+			//$gb[0][1][$j][9] = gbpercentile($avgs[$j],0).',&nbsp;'.gbpercentile($avgs[$j],25).',&nbsp;'.gbpercentile($avgs[$j],50).',&nbsp;'.gbpercentile($avgs[$j],75).',&nbsp;'.gbpercentile($avgs[$j],100);
+			
+		}
+	
+		//cat avgs
+		$catavgs = array();
+		for ($j=0;$j<count($gb[0][2]);$j++) { //category headers
+			$catavgs[$j][0] = array();
+			$catavgs[$j][1] = array();
+			$catavgs[$j][2] = array();
+			for ($i=1;$i<$ln;$i++) { //foreach student
+				$catavgs[$j][0][] = $gb[$i][2][$j][0];
+				$catavgs[$j][1][] = $gb[$i][2][$j][1];
+				$catavgs[$j][2][] = $gb[$i][2][$j][2];
+			}
+			for ($i=0; $i<3; $i++) {
+				if (count($catavgs[$j][$i])>0) {
+					sort($catavgs[$j][$i], SORT_NUMERIC);
+					$fivenum = array();
+					for ($k=0; $k<5; $k++) {
+						$fivenum[] = gbpercentile($catavgs[$j][$i],$k*25);
+					}
+					$fivenumsum = implode(',&nbsp;',$fivenum);
+					if ($gb[0][2][$j][3+$i]>0) {
+						for ($k=0; $k<5; $k++) {
+							$fivenum[$k] = round(100*$fivenum[$k]/$gb[0][2][$j][3+$i],1);
+						}
+						$fivenumsum .= '<br/>'.implode('%,&nbsp;',$fivenum).'%';
+					}
+				} else {
+					$fivenumsum = '';
+				}
+				$gb[0][2][$j][6+$i] = $fivenumsum;	
+			}
+		}
+		//tot avgs
+		$totavgs = array();
+		for ($j=0;$j<count($gb[1][3]);$j++) {
+			$totavgs[$j] = array();
+			for ($i=1;$i<$ln;$i++) { //foreach student
+				$totavgs[$j][] = $gb[$i][3][$j];
+			}
+		}
+		foreach ($avgs as $j=>$avg) {
+			if (count($avg)>0) {
+				$gb[$ln][1][$j][0] = round(array_sum($avg)/count($avg),1);
+				$gb[$ln][1][$j][4] = 'average';
+			}
+		}
+		foreach ($catavgs as $j=>$avg) {
+			if (count($avg[0])>0) {
+				for ($m=0;$m<3;$m++) {
+					$gb[$ln][2][$j][$m] = round(array_sum($avg[$m])/count($avg[$m]),1);
 				}
 			}
 		}
-	}
-
-	//cat avgs
-	$catavgs = array();
-	for ($j=0;$j<count($gb[0][2]);$j++) { //category headers
-		$catavgs[$j][0] = array();
-		$catavgs[$j][1] = array();
-		$catavgs[$j][2] = array();
-		for ($i=1;$i<$ln;$i++) { //foreach student
-			$catavgs[$j][0][] = $gb[$i][2][$j][0];
-			$catavgs[$j][1][] = $gb[$i][2][$j][1];
-			$catavgs[$j][2][] = $gb[$i][2][$j][2];
-		}
-	}
-	//tot avgs
-	$totavgs = array();
-	for ($j=0;$j<count($gb[1][3]);$j++) {
-		$totavgs[$j] = array();
-		for ($i=1;$i<$ln;$i++) { //foreach student
-			$totavgs[$j][] = $gb[$i][3][$j];
-		}
-	}
-	foreach ($avgs as $j=>$avg) {
-		if (count($avg)>0) {
-			$gb[$ln][1][$j][0] = round(array_sum($avg)/count($avg),1);
-			$gb[$ln][1][$j][4] = 'average';
-		}
-	}
-	foreach ($catavgs as $j=>$avg) {
-		if (count($avg[0])>0) {
-			for ($m=0;$m<3;$m++) {
-				$gb[$ln][2][$j][$m] = round(array_sum($avg[$m])/count($avg[$m]),1);
+		foreach ($totavgs as $j=>$avg) {
+			if (count($avg)>0) {
+				$gb[$ln][3][$j] = round(array_sum($avg)/count($avg),1);
 			}
 		}
+		$gb[$ln][4][0] = -1;
 	}
-	foreach ($totavgs as $j=>$avg) {
-		if (count($avg)>0) {
-			$gb[$ln][3][$j] = round(array_sum($avg)/count($avg),1);
-		}
-	}
-	$gb[$ln][4][0] = -1;
 
 	if ($limuser==-1) {
 		$gb[1] = $gb[$ln];
 	}
 	return $gb;
+}
+function gbpercentile($a,$p) {
+	if ($p==0) {
+		return $a[0];
+	} else if ($p==100) {
+		return $a[count($a)-1];
+	}
+
+	$l = $p*count($a)/100;
+	if (floor($l)==$l) {
+		return (($a[$l-1]+$a[$l])/2);
+	} else {
+		return ($a[ceil($l)-1]);
+	}
 }
 ?>

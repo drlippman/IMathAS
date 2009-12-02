@@ -73,6 +73,11 @@ function tipshow(el,tip) {
 	} 
 	tipobj.style.display = "block";
 	tipobj.innerHTML = tip;
+	if (typeof AMnoMathML!='undefined' && typeof noMathRender != 'undefined') {
+		if (!AMnoMathML && !noMathRender) {
+			AMprocessNode(tipobj);
+		}
+	}
 	var p = findPos(el);
 	tipobj.style.left = (p[0]+20) + "px";
 	if (p[1] < 30) {
@@ -92,6 +97,15 @@ function findPos(obj) { //from quirksmode.org
 		do {
 			curleft += obj.offsetLeft;
 			curtop += obj.offsetTop;
+			if (obj.offsetParent) {
+				if (obj.parentNode && obj.offsetParent!=obj.parentNode) {
+					curleft -= obj.parentNode.scrollLeft;
+					curtop -= obj.parentNode.scrollTop;
+				} else {
+					curleft -= obj.offsetParent.scrollLeft;
+					curtop -= obj.offsetParent.scrollTop;
+				}
+			}
 		} while (obj = obj.offsetParent);
 	}
 	return [curleft,curtop];
