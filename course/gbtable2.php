@@ -1232,9 +1232,11 @@ function gbtable() {
 			$catavgs[$j][1] = array();
 			$catavgs[$j][2] = array();
 			for ($i=1;$i<$ln;$i++) { //foreach student
-				$catavgs[$j][0][] = $gb[$i][2][$j][0];
-				$catavgs[$j][1][] = $gb[$i][2][$j][1];
-				$catavgs[$j][2][] = $gb[$i][2][$j][2];
+				if ($gb[$i][4][1]==0) {
+					$catavgs[$j][0][] = $gb[$i][2][$j][0];
+					$catavgs[$j][1][] = $gb[$i][2][$j][1];
+					$catavgs[$j][2][] = $gb[$i][2][$j][2];
+				}
 			}
 			for ($i=0; $i<3; $i++) {
 				if (count($catavgs[$j][$i])>0) {
@@ -1261,7 +1263,9 @@ function gbtable() {
 		for ($j=0;$j<count($gb[1][3]);$j++) {
 			$totavgs[$j] = array();
 			for ($i=1;$i<$ln;$i++) { //foreach student
-				$totavgs[$j][] = $gb[$i][3][$j];
+				if ($gb[$i][4][1]==0) {
+					$totavgs[$j][] = $gb[$i][3][$j];
+				}
 			}
 		}
 		foreach ($avgs as $j=>$avg) {
