@@ -25,124 +25,164 @@ if (!(isset($teacherid))) {
 	if (isset($_POST['checked'])) { //if the form has been submitted
 		$checked = $_POST['checked'];
 		$checkedlist = "'".implode("','",$checked)."'";
-
-		$turnonshuffle = 0;
-		$turnoffshuffle = 0;
-		if (isset($_POST['chgshuffle'])) {
-			if (isset($_POST['shuffle'])) {
-				$turnonshuffle += 1;
-			} else {
-				$turnoffshuffle +=1;
-			}
-		}
-		if (isset($_POST['chgsameseed'])) {
-			if (isset($_POST['sameseed'])) {
-				$turnonshuffle += 2;
-			} else {
-				$turnoffshuffle +=2;
-			}
-		}
-		if (isset($_POST['chgsamever'])) {
-			if (isset($_POST['samever'])) {
-				$turnonshuffle += 4;
-			} else {
-				$turnoffshuffle +=4;
-			}
-		}
-		if (isset($_POST['chgdefattempts'])) {
-			if (isset($_POST['reattemptsdiffver'])) {
-				$turnonshuffle += 8;
-			} else {
-				$turnoffshuffle +=8;
-			}
-		}
-		if (isset($_POST['chgallowlate'])) {
-			if (isset($_POST['allowlate'])) {
-				$allowlate = 1;
-			} else {
-				$allowlate = 0;
-			}
-		}
-		if (isset($_POST['chghints'])) {
-			if (isset($_POST['showhints'])) {
-				$showhints = 1;
-			} else {
-				$showhints = 0;
-			}
-		}
-		if ($_POST['skippenalty']==10) {
-			$_POST['defpenalty'] = 'L'.$_POST['defpenalty'];
-		} else if ($_POST['skippenalty']>0) {
-			$_POST['defpenalty'] = 'S'.$_POST['skippenalty'].$_POST['defpenalty'];
-		}
-		if ($_POST['deffeedback']=="Practice" || $_POST['deffeedback']=="Homework") {
-			$deffeedback = $_POST['deffeedback'].'-'.$_POST['showansprac'];
-		} else {
-			$deffeedback = $_POST['deffeedback'].'-'.$_POST['showans'];
-		}
-
+		
 		$sets = array();
-		if (isset($_POST['chgtimelimit'])) {
-			$timelimit = $_POST['timelimit']*60;
-			if (isset($_POST['timelimitkickout'])) {
-				$timelimit = -1*$timelimit;
+		if (isset($_POST['docopyopt'])) {
+			$tocopy = 'password,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,eqnhelper,showhints,allowlate,noprint,shuffle,gbcategory,cntingb,caltag,minscore,exceptionpenalty,isgroup,groupmax,showcat';
+			
+			$query = "SELECT $tocopy FROM imas_assessments WHERE id='{$_POST['copyopt']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$row = mysql_fetch_row($result);
+			$tocopyarr = explode(',',$tocopy);
+			foreach ($tocopyarr as $k=>$item) {
+				$sets[] = "$item='".addslashes($row[$k])."'";
 			}
-			$sets[] = "timelimit='$timelimit'";
-		}
-		if (isset($_POST['chgdisplaymethod'])) {
-			$sets[] = "displaymethod='{$_POST['displaymethod']}'";
-		}
-		if (isset($_POST['chgdefpoints'])) {
-			$sets[] = "defpoints='{$_POST['defpoints']}'";
-		}
-		if (isset($_POST['chgdefattempts'])) {
-			$sets[] = "defattempts='{$_POST['defattempts']}'";
-		}
-		if (isset($_POST['chgdefpenalty'])) {
-			$sets[] = "defpenalty='{$_POST['defpenalty']}'";
-		}
-		if (isset($_POST['chgfeedback'])) {
-			$sets[] = "deffeedback='$deffeedback'";
-		}
-		if (isset($_POST['chggbcat'])) {
-			$sets[] = "gbcategory='{$_POST['gbcat']}'";
-		}
-		if (isset($_POST['chgallowlate'])) {
-			$sets[] = "allowlate='$allowlate'";
-		}
-		if (isset($_POST['chgexcpen'])) {
-			$sets[] = "exceptionpenalty='{$_POST['exceptionpenalty']}'";
-		}
-		if (isset($_POST['chgpassword'])) {
-			$sets[] = "password='{$_POST['password']}'";
-		}
-		if (isset($_POST['chghints'])) {
-			$sets[] = "showhints='$showhints'";
-		}
-		if (isset($_POST['chgisgroup'])) {
-			$sets[] = "isgroup='{$_POST['isgroup']}'";
-		}
-		if (isset($_POST['chggroupmax'])) {
-			$sets[] = "groupmax='{$_POST['groupmax']}'";
-		}
-		if (isset($_POST['chgcntingb'])) {
-			$sets[] = "cntingb='{$_POST['cntingb']}'";
-		}
-		if (isset($_POST['chgminscore'])) {
-			$sets[] = "minscore='{$_POST['minscore']}'";
-		}
-		if (isset($_POST['chgshowqcat'])) {
-			$sets[] = "showcat='{$_POST['showqcat']}'";
-		}
-		if (isset($_POST['chgeqnhelper'])) {
-			$sets[] = "eqnhelper='{$_POST['eqnhelper']}'";
-		}
-		if (isset($_POST['chgavail'])) {
-			$sets[] = "avail='{$_POST['avail']}'";
-		}
-		if (isset($_POST['chgcaltag'])) {
-			$caltag = $_POST['caltagact'].$_POST['caltagrev'];
-			$sets[] = "caltag='$caltag'";
+			
+		} else {
+			$turnonshuffle = 0;
+			$turnoffshuffle = 0;
+			if (isset($_POST['chgshuffle'])) {
+				if (isset($_POST['shuffle'])) {
+					$turnonshuffle += 1;
+				} else {
+					$turnoffshuffle +=1;
+				}
+			}
+			if (isset($_POST['chgsameseed'])) {
+				if (isset($_POST['sameseed'])) {
+					$turnonshuffle += 2;
+				} else {
+					$turnoffshuffle +=2;
+				}
+			}
+			if (isset($_POST['chgsamever'])) {
+				if (isset($_POST['samever'])) {
+					$turnonshuffle += 4;
+				} else {
+					$turnoffshuffle +=4;
+				}
+			}
+			if (isset($_POST['chgdefattempts'])) {
+				if (isset($_POST['reattemptsdiffver'])) {
+					$turnonshuffle += 8;
+				} else {
+					$turnoffshuffle +=8;
+				}
+			}
+			if (isset($_POST['chgallowlate'])) {
+				if (isset($_POST['allowlate'])) {
+					$allowlate = 1;
+				} else {
+					$allowlate = 0;
+				}
+			}
+			if (isset($_POST['chghints'])) {
+				if (isset($_POST['showhints'])) {
+					$showhints = 1;
+				} else {
+					$showhints = 0;
+				}
+			}
+			if (isset($_POST['chgnoprint'])) {
+				if (isset($_POST['noprint'])) {
+					$noprint = 1;
+				} else {
+					$noprint = 0;
+				}
+			}
+			if ($_POST['skippenalty']==10) {
+				$_POST['defpenalty'] = 'L'.$_POST['defpenalty'];
+			} else if ($_POST['skippenalty']>0) {
+				$_POST['defpenalty'] = 'S'.$_POST['skippenalty'].$_POST['defpenalty'];
+			}
+			if ($_POST['deffeedback']=="Practice" || $_POST['deffeedback']=="Homework") {
+				$deffeedback = $_POST['deffeedback'].'-'.$_POST['showansprac'];
+			} else {
+				$deffeedback = $_POST['deffeedback'].'-'.$_POST['showans'];
+			}
+	
+			
+			if (isset($_POST['chgtimelimit'])) {
+				$timelimit = $_POST['timelimit']*60;
+				if (isset($_POST['timelimitkickout'])) {
+					$timelimit = -1*$timelimit;
+				}
+				$sets[] = "timelimit='$timelimit'";
+			}
+			if (isset($_POST['chgdisplaymethod'])) {
+				$sets[] = "displaymethod='{$_POST['displaymethod']}'";
+			}
+			if (isset($_POST['chgdefpoints'])) {
+				$sets[] = "defpoints='{$_POST['defpoints']}'";
+			}
+			if (isset($_POST['chgdefattempts'])) {
+				$sets[] = "defattempts='{$_POST['defattempts']}'";
+			}
+			if (isset($_POST['chgdefpenalty'])) {
+				$sets[] = "defpenalty='{$_POST['defpenalty']}'";
+			}
+			if (isset($_POST['chgfeedback'])) {
+				$sets[] = "deffeedback='$deffeedback'";
+			}
+			if (isset($_POST['chggbcat'])) {
+				$sets[] = "gbcategory='{$_POST['gbcat']}'";
+			}
+			if (isset($_POST['chgallowlate'])) {
+				$sets[] = "allowlate='$allowlate'";
+			}
+			if (isset($_POST['chgexcpen'])) {
+				$sets[] = "exceptionpenalty='{$_POST['exceptionpenalty']}'";
+			}
+			if (isset($_POST['chgpassword'])) {
+				$sets[] = "password='{$_POST['password']}'";
+			}
+			if (isset($_POST['chghints'])) {
+				$sets[] = "showhints='$showhints'";
+			}
+			if (isset($_POST['chgnoprint'])) {
+				$sets[] = "noprint='$noprint'";
+			}
+			if (isset($_POST['chgisgroup'])) {
+				$sets[] = "isgroup='{$_POST['isgroup']}'";
+			}
+			if (isset($_POST['chggroupmax'])) {
+				$sets[] = "groupmax='{$_POST['groupmax']}'";
+			}
+			if (isset($_POST['chgcntingb'])) {
+				$sets[] = "cntingb='{$_POST['cntingb']}'";
+			}
+			if (isset($_POST['chgminscore'])) {
+				$sets[] = "minscore='{$_POST['minscore']}'";
+			}
+			if (isset($_POST['chgshowqcat'])) {
+				$sets[] = "showcat='{$_POST['showqcat']}'";
+			}
+			if (isset($_POST['chgeqnhelper'])) {
+				$sets[] = "eqnhelper='{$_POST['eqnhelper']}'";
+			}
+			if (isset($_POST['chgavail'])) {
+				$sets[] = "avail='{$_POST['avail']}'";
+			}
+			if (isset($_POST['chgcaltag'])) {
+				$caltag = $_POST['caltagact'].$_POST['caltagrev'];
+				$sets[] = "caltag='$caltag'";
+			}
+			
+				
+			if ($turnonshuffle!=0 || $turnoffshuffle!=0) {
+				$shuff = "shuffle = ((shuffle";
+				if ($turnoffshuffle>0) {
+					$shuff .= " & ~$turnoffshuffle)";
+				} else {
+					$shuff .= ")";
+				}
+				if ($turnonshuffle>0) {
+					$shuff .= " | $turnonshuffle";
+				}
+				$shuff .= ")";
+				$sets[] = $shuff;
+				
+			}
 		}
 		if (isset($_POST['chgintro'])) {
 			$query = "SELECT intro FROM imas_assessments WHERE id='{$_POST['intro']}'";
@@ -158,21 +198,6 @@ if (!(isset($teacherid))) {
 			$query = "SELECT endmsg FROM imas_assessments WHERE id='{$_POST['copyendmsg']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$sets[] = "endmsg='".addslashes(mysql_result($result,0,0))."'";
-		}
-			
-		if ($turnonshuffle!=0 || $turnoffshuffle!=0) {
-			$shuff = "shuffle = ((shuffle";
-			if ($turnoffshuffle>0) {
-				$shuff .= " & ~$turnoffshuffle)";
-			} else {
-				$shuff .= ")";
-			}
-			if ($turnonshuffle>0) {
-				$shuff .= " | $turnonshuffle";
-			}
-			$shuff .= ")";
-			$sets[] = $shuff;
-			
 		}
 		if (count($sets)>0) {
 			$setslist = implode(',',$sets);
@@ -249,6 +274,9 @@ span.hidden {
 span.show {
 	display: inline;
 }
+table td {
+	border-bottom: 1px solid #ccf;	
+}
 </style>
 <script type="text/javascript">
 function chgfb() {
@@ -269,6 +297,23 @@ function chkAll(frm, arr, mark) {
      }
    } catch(er) {}
   }
+}
+
+function copyfromtoggle(frm,mark) {
+	var tds = frm.getElementsByTagName("tr");
+	for (var i = 0; i<tds.length; i++) {
+		try {
+			if (tds[i].className=='coptr') {
+				if (mark) {
+					tds[i].style.display = "none";
+				} else {
+					tds[i].style.display = "";
+				}
+			}
+				
+		} catch(er) {}
+	}
+	
 }
 
 </script>
@@ -300,7 +345,7 @@ function chkAll(frm, arr, mark) {
 
 		<fieldset>
 		<legend>Assessment Options</legend>
-		<table class=gb>
+		<table class="gb" id="opttable">
 			<thead>
 			<tr><th>Change?</th><th>Option</th><th>Setting</th></tr>
 			</thead>
@@ -333,9 +378,9 @@ function chkAll(frm, arr, mark) {
 				</td>
 			</tr>
 			<tr>
-				<td><input type="checkbox" name="chgcopyendmsg"/></td>
-				<td class="r">End of Assessment Messages:</td>
-				<td>Copy from:
+				<td style="border-bottom: 1px solid #000"><input type="checkbox" name="chgcopyendmsg"/></td>
+				<td class="r" style="border-bottom: 1px solid #000">End of Assessment Messages:</td>
+				<td style="border-bottom: 1px solid #000">Copy from:
 <?php
 	writeHtmlSelect("copyendmsg",$page_assessSelect['val'],$page_assessSelect['label']);
 ?>
@@ -343,11 +388,20 @@ function chkAll(frm, arr, mark) {
 				</td>
 			</tr>
 			<tr>
+				<td><input type="checkbox" name="docopyopt" onClick="copyfromtoggle(this.form,this.checked)"/></td>
+				<td class="r">Copy remaining options</td>
+				<td>Copy from:
+<?php
+	writeHtmlSelect("copyopt",$page_assessSelect['val'],$page_assessSelect['label']);
+?>
+				</td>
+			</tr>
+			<tr class="coptr">
 				<td><input type="checkbox" name="chgpassword"/></td>
 				<td class="r">Require Password (blank for none):</td>
 				<td><input type=text name=password value=""></td>
 			</tr>
-			<tr>
+			<tr class="coptr">
 				<td><input type="checkbox" name="chgtimelimit"/></td>
 				<td class="r">Time Limit (minutes, 0 for no time limit): </td>
 				<td><input type=text size=4 name="timelimit" value="0" />
@@ -355,7 +409,7 @@ function chkAll(frm, arr, mark) {
 				   </td>
 			</tr>
 
-			<tr>
+			<tr class="coptr">
 				<td><input type="checkbox" name="chgdisplaymethod"/></td>
 				<td class="r">Display method: </td>
 				<td>
@@ -368,12 +422,12 @@ function chkAll(frm, arr, mark) {
 				</td>
 			</tr>
 
-			<tr>
+			<tr class="coptr">
 				<td><input type="checkbox" name="chgdefpoints"/></td>
 				<td class="r">Default points per problem: </td>
 				<td><input type=text size=4 name=defpoints value="<?php echo $line['defpoints'];?>" ></td>
 			</tr>
-			<tr>
+			<tr class="coptr">
 				<td><input type="checkbox" name="chgdefattempts"/></td>
 				<td class="r">Default attempts per problem (0 for unlimited): </td>
 				<td>
@@ -382,7 +436,7 @@ function chkAll(frm, arr, mark) {
 						Reattempts different versions
 				</td>
 			</tr>
-			<tr>
+			<tr class="coptr">
 				<td><input type="checkbox" name="chgdefpenalty"/></td>
 				<td class="r">Default penalty:</td>
 				<td><input type=text size=4 name=defpenalty value="<?php echo $line['defpenalty'];?>" <?php if ($taken) {echo 'disabled=disabled';}?>>% 
@@ -398,9 +452,9 @@ function chkAll(frm, arr, mark) {
 					</select>
 				</td>
 			</tr>
-			<tr>
+			<tr class="coptr">
 				<td><input type="checkbox" name="chgfeedback"/></td>
-				<td class="r">Feedback method: </td>
+				<td class="r">Feedback method:<br/>and Show Answers: </td>
 				<td>
 					<select id="deffeedback" name="deffeedback" onChange="chgfb()" >
 						<option value="NoScores">No scores shown (use with 1 attempt per problem)</option>
@@ -410,12 +464,7 @@ function chkAll(frm, arr, mark) {
 						<option value="Practice">Practice test: Show score on each question as it's submitted & can restart test; scores not saved</option>
 						<option value="Homework">Homework: Show score on each question as it's submitted & allow similar question to replace missed question</option>
 					</select>
-				</td>
-			</tr>
-			<tr>
-				<td></td>
-				<td class="r">and Show Answers: </td>
-				<td>
+					<br/>
 					<span id="showanspracspan" class="<?php echo ($testtype=="Practice" || $testtype=="Homework") ? "show" : "hidden"; ?>">
 					<select name="showansprac">
 						<option value="V">Never, but allow students to review their own answers</option>
@@ -442,33 +491,39 @@ function chkAll(frm, arr, mark) {
 					</span>
 				</td>
 			</tr>
-			<tr>
+			
+			<tr class="coptr">
 				<td><input type="checkbox" name="chgeqnhelper"/></td>
-				<td>Use equation helper?</td>
+				<td class="r">Use equation helper?</td>
 				<td><select name="eqnhelper">
 					<option value="0" selected="selected">No</option>
 					<option value="1" >Yes, simple form (no logs or trig)</option>
 					<option value="2" >Yes, advanced form</option>
 				     </select></td>
 			</tr>
-			<tr>
+			<tr class="coptr">
 				<td><input type="checkbox" name="chghints"/></td>
 				<td class="r">Show hints when available? </td>
 				<td><input type="checkbox" name="showhints" checked="checked"></td>
 			</tr>
-			<tr>
+			<tr class="coptr">
 				<td><input type="checkbox" name="chgallowlate"/></td>
 				<td class="r">Allow use of LatePasses?: </td>
 				<td><input type="checkbox" name="allowlate" checked="1"></td>
 			</tr>
-			<tr>
+			<tr class="coptr">
+				<td><input type="checkbox" name="chgnoprint"/></td>
+				<td class="r">Make hard to print?: </td>
+				<td><input type="checkbox" name="noprint"></td>
+			</tr>
+			<tr class="coptr">
 				<td><input type="checkbox" name="chgshuffle"/></td>
 				<td class="r">Shuffle item order: </td>
 				<td><input type="checkbox" name="shuffle"></td>
 			</tr>
 			
 			
-			<tr>
+			<tr class="coptr">
 				<td><input type="checkbox" name="chggbcat"/></td>
 				<td class="r">Gradebook category: </td>
 				<td>
@@ -478,7 +533,7 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 
 				</td>
 			</tr>
-			<tr>
+			<tr class="coptr">
 				<td style="border-bottom: 1px solid #000"><input type="checkbox" name="chgcntingb"/></td>
 				<td class="r" style="border-bottom: 1px solid #000">Count: </td>
 				<td style="border-bottom: 1px solid #000"><input name="cntingb" value="1" checked="checked" type="radio"> Count in Gradebook<br>
@@ -487,34 +542,34 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 				<input name="cntingb" value="2" type="radio"> Count as Extra Credit
 				</td>
 			</tr>
-			<tr>
+			<tr class="coptr">
 				<td><input type="checkbox" name="chgcaltag"/></td>
 				<td class="r">Calendar icon:</td>
 				<td>Active: <input name="caltagact" type=text size=1 maxlength=1 value="?"/>, 
 				    Review: <input name="caltagrev" type=text size=1 maxlength=1 value="R"/></td>
-			<tr>
+			<tr class="coptr">
 				<td><input type="checkbox" name="chgminscore"/></td>
 				<td class="r">Minimum score to receive credit: </td>
 				<td><input type="text" name="minscore" size=4 value="0"> % </td>
 			</tr>
-			<tr>
+			<tr class="coptr">
 				<td><input type="checkbox" name="chgsameseed"/></td>
 				<td class="r">All items same random seed: </td>
 				<td><input type="checkbox" name="sameseed"></td>
 			</tr>
-			<tr>
+			<tr class="coptr">
 				<td><input type="checkbox" name="chgsamever"/></td>
 				<td class="r">All students same version of questions: </td>
 				<td><input type="checkbox" name="samever"></td>
 			</tr>
 			
-			<tr>
+			<tr class="coptr">
 				<td><input type="checkbox" name="chgexcpen"/></td>
 				<td class="r">Penalty for questions done while in exception/LatePass: </td>
 				<td><input type="text" name="exceptionpenalty" size=4 value="0"> % </td>
 			</tr>
 			
-			<tr>
+			<tr class="coptr">
 				<td><input type="checkbox" name="chgisgroup"/></td>
 				<td class="r">Group assessment: </td>
 				<td><input type="radio" name="isgroup" value="0" checked="checked" />Not a group assessment<br/>
@@ -523,23 +578,23 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 				<input type="radio" name="isgroup" value="3"  />Students cannot add members</td>
 			</tr>
 			
-			<tr>
+			<tr class="coptr">
 				<td><input type="checkbox" name="chggroupmax"/></td>
 				<td class="r">Max group members (if group assessment):</td>
 				<td><input type=text name=groupmax value="6"></td>
 			</tr>
-			<tr>
-				<td style="border-bottom: 1px solid #000"><input type="checkbox" name="chgshowqcat"/></td>
-				<td class="r" style="border-bottom: 1px solid #000">Show question categories: </td>
-				<td style="border-bottom: 1px solid #000"><input name="showqcat" value="0" checked="checked" type="radio">No <br/>
+			<tr class="coptr">
+				<td ><input type="checkbox" name="chgshowqcat"/></td>
+				<td class="r" >Show question categories: </td>
+				<td ><input name="showqcat" value="0" checked="checked" type="radio">No <br/>
 				<input name="showqcat" value="1" type="radio">In Points Possible bar <br/>
 				<input name="showqcat" value="2" type="radio">In navigation bar (Skip-Around only)
 				</td>
 			</tr>
 			<tr>	
-				<td></td>
-				<td class="r">Define end of assessment messages?</td>
-				<td><input type="checkbox" name="chgendmsg" /> You will be taken to a page to change these after you hit submit</td>
+				<td style="border-top: 1px solid #000"></td>
+				<td class="r" style="border-top: 1px solid #000">Define end of assessment messages?</td>
+				<td style="border-top: 1px solid #000"><input type="checkbox" name="chgendmsg" /> You will be taken to a page to change these after you hit submit</td>
 			</tr>
 			<tr>
 				<td></td>
