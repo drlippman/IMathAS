@@ -224,10 +224,32 @@ table.scores td {
 .drawtools span:hover {
 	background: #cfc;
 }
+
+
 .drawcanvas {
 	border: 1px solid #000;
 	margin-bottom: 5px;
 }
+
+.clickable {
+	cursor: pointer;
+}
+
+span.spanbutton {
+	padding: 1px 3px;
+	border: 2px outset #f9f;
+	background: #f9f;
+	cursor: default;
+}
+span.spanbutton:active {
+	border: 2px inset #f9f;
+	background: #fcf;
+	cursor: default;
+}
+span.spanbutton:hover {
+	background: #fcf;
+}	
+
 
 table.longdiv {
   border-collapse: collapse;

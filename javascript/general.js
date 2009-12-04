@@ -87,6 +87,18 @@ function tipshow(el,tip) {
 	}
 }
 
+function popupwindow(content,width,height) {
+	var attr = "width="+width+",height="+height+",status=0,resizeable=1,directories=0,menubar=0";
+	if (content.match(/^http/)) {
+		window.open(content,"popup",attr);
+	} else {
+		var win1 = window.open('',"popup",attr);
+		win1.document.write('<html><head><title>Popup</title></head><body>');
+		win1.document.write(content);
+		win1.document.write('</body></html>');
+		win1.document.close();
+	}
+}
 function tipout(el) {
 	tipobj.style.display = "none";	
 }

@@ -189,6 +189,10 @@ function enditem($canedit) {
 						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\" $astyle>Copy</a>";
 						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>NewFlag</a>";
 						echo '</span>';
+					} else {
+						echo '<span class="right">';
+						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>Isolate</a>";
+						echo '</span>';
 					}
 					if (($hideicons&16)==0) {
 						echo "</div>";
@@ -334,6 +338,10 @@ function enditem($canedit) {
 						echo " | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
 						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">Copy</a>";
 						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>NewFlag</a>";
+						echo '</span>';
+					} else {
+						echo '<span class="instronly">';
+						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>Isolate</a>";
 						echo '</span>';
 					}
 					if (($hideicons&16)==0) {
