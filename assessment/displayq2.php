@@ -428,7 +428,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$leftb = '';
 			$rightb = '';
 		}
-		$out .= "$leftb<input class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" />$rightb";
+		$out .= "$leftb<input ";
+		if ($displayformat=='alignright') { $out .= 'style="text-align: right;" ';}
+		$out .= "class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" />$rightb";
 		if ($answerformat=='list' || $answerformat=='exactlist' ||  $answerformat=='orderedlist') {
 			$tip = "Enter your answer as a list of numbers separated with commas: Example: -4, 3, 2.5<br/>";
 		} else {

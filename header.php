@@ -78,7 +78,7 @@ tinyMCE.init({
     theme_advanced_statusbar_location : "bottom",
     plugins : 'safari,asciimath,asciisvg,table,inlinepopups,paste,media',
     gecko_spellcheck : true,
-    extended_valid_elements : 'iframe[src|width|height|name|align],param[name|value],img[longdesc|usemap|src|border|alt=|title|hspace|vspace|width|height|align|sscr]',
+    extended_valid_elements : 'iframe[src|width|height|name|align],param[name|value],@[sscr]',
     content_css : '$imasroot/themes/$coursetheme',
     popup_css_add : '$imasroot/themes/$coursetheme',
     theme_advanced_resizing : true,
