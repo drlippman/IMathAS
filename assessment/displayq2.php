@@ -217,6 +217,9 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if ($returnqtxt) {
 		return $returntxt;
 	}
+	if (isset($helptext) &&  $showhints) {
+		echo '<div><p class="tips">'.filter($helptext).'</p></div>';
+	}
 	echo "<div>";
 	foreach($tips as $iidx=>$tip) {
 		if (!isset($hidetips) && !$seqinactive) {

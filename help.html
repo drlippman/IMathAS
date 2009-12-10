@@ -1737,6 +1737,9 @@ These macros are fairly general purpose:
 <li><b>arraystodots(xarray,yarray)</b>: Converts an array of x-values and y-values into a form that can be used in the Drawing answer type</li>
 <li><b>today([string])</b>: Returns today's date, like "July 3, 2008".  Can change format using string (see http://us2.php.net/manual/en/function.date.php for formats)</li>
 <li><b>ifthen(condition,trueval,falseval)</b>:  Takes a comparision condition, and returns the trueval if the condition is true and the falseval otherwise.</li>
+<li><b>formhoverover(label,tip)</b>:  Creates a hover-over definition or other tip</li>
+<li><b>formpopup(label,content,[width,height,style])</b>:  Creates a link or button leading to a popup window.  Content can
+  be a web address, or HTML content to put directly into the popup.  Style can be "link" or "button".</li>
 </ul>
 </div>
 <div class=h2>
@@ -1816,6 +1819,12 @@ $hints[question part number][attempt number] = "hint text"
 </pre>
 Then in question text, place each hint using $hintloc[question part number]
 </p>
+
+<h4>Help references</h4>
+<p>To provide help of some sort for a question (typically, links to videos, book references, etc), define $helptext
+in the common control section.  Any text assigned to this variable will show above the answer box entry tips.  The
+display of this text is controlled by the same "show hints?" option that controls the display of hints described above.</p>
+
 
 <h4>Referencing Student Answers</h4>
 <p>To create multipart questions that are graded on consistency, or to create a set of lab-type problems that rely on student-provided data, you can reference
