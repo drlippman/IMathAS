@@ -150,6 +150,22 @@ if (!(isset($teacherid))) {
 			$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt' WHERE id='$cid'";
 			mysql_query($query) or die("Query failed : $query" . mysql_error());
 		}	
+		if (isset($_POST['copyoffline'])) {
+			$query = "SELECT name,points,showdate,gbcategory,cntingb,tutoredit FROM imas_gbitems WHERE courseid='{$_POST['ctc']}'";
+			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+			$insarr = array();
+			while ($row = mysql_fetch_row($result)) {
+				if (isset($gbcats[$row[3]])) {
+					$row[3] = $gbcats[$row[3]];
+				} else {
+					$row[3] = 0;
+				}
+				$insarr[] = "('$cid','".implode("','",addslashes_deep($row))."')";
+			}
+			$query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit) VALUES ";
+			$query .= implode(',',$insarr);
+			mysql_query($query) or die("Query failed :$query " . mysql_error());
+		}
 		if (isset($_POST['selectcalitems'])) {
 			$_GET['action']='selectcalitems';
 			$calitems = array();
@@ -363,6 +379,7 @@ if ($overwriteBody==1) {
 		Copy gradebook scheme and categories (<i>will overwrite current scheme</i>)? 
 		<input type=checkbox name="copygbsetup" value="1"/>
 	</p>
+	<p>Copy offline grade items? <input type=checkbox name="copyoffline"  value="1"/></p>
 	<p>Select calendar items to copy? <input type=checkbox name="selectcalitems"  value="1"/></p>
 	
 	<p>Append text to titles?: <input type="text" name="append"></p>
