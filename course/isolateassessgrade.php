@@ -114,7 +114,7 @@
 	if ($hassection) {
 		echo '<th>Section</th>';
 	}
-	echo "<th>Grade</th><th>Feedback</th></tr></thead><tbody>";
+	echo "<th>Grade</th><th>%</th><th>Feedback</th></tr></thead><tbody>";
 	$now = time();
 	$lc = 1;
 	$n = 0;
@@ -139,7 +139,7 @@
 		$timeused = $line['endtime']-$line['starttime'];
 		
 		if ($line['id']==null) {
-			echo "<td><a href=\"gb-viewasid.php?gbmode=$gbmode&cid=$cid&asid=new&uid={$line['userid']}&from=isolate&aid=$aid\">-</a></td><td></td>";		
+			echo "<td><a href=\"gb-viewasid.php?gbmode=$gbmode&cid=$cid&asid=new&uid={$line['userid']}&from=isolate&aid=$aid\">-</a></td><td>-</td><td></td>";		
 		} else {
 			echo "<td><a href=\"gb-viewasid.php?gbmode=$gbmode&cid=$cid&asid={$line['id']}&uid={$line['userid']}&from=isolate&aid=$aid\">";
 			if ($total<$minscore) {
@@ -157,6 +157,11 @@
 			}
 	
 			echo "</a></td>";
+			if ($totalpossible>0) {
+				echo '<td>'.round(100*($total)/$totalpossible,1).'%</td>';
+			} else {
+				echo '<td></td>';
+			}
 			echo "<td>{$line['feedback']}</td>";
 		}
 		echo "</tr>";

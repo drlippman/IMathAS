@@ -16,7 +16,7 @@ function getquestioninfo($qns,$testsettings) {
 	$query .= "ON iq.category=il.id WHERE iq.id IN ($qnlist)";
 	$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
 	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
-		if ($line['name']!=null) {
+		if ($line['name']!=null && is_numeric($line['category'])) {
 			$line['category'] = $line['name'];
 		}
 		unset($line['name']);
