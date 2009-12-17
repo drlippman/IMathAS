@@ -909,11 +909,11 @@ function mathjs(st,varlist) {
   st = st.replace("]",")");
   st = st.replace(/arc(sin|cos|tan)/g,"a#r#c $1");
   if (varlist != null) {
-	  var reg = new RegExp("(sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs)[\(]","g");
+	  var reg = new RegExp("(sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root)[\(]","g");
 	  st = st.replace(reg,"$1#(");
 	  var reg = new RegExp("("+varlist+")("+varlist+")$","g");
 	  st = st.replace(reg,"($1)($2)");
-	  var reg = new RegExp("("+varlist+")(a#|sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs)","g");
+	  var reg = new RegExp("("+varlist+")(a#|sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root)","g");
 	  st = st.replace(reg,"($1)$2");
 	  var reg = new RegExp("("+varlist+")("+varlist+")([^a-df-zA-Z\(#])","g"); // 6/1/09 readded \( for f(350/x)
 	  st = st.replace(reg,"($1)($2)$3"); //get xy3

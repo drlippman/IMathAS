@@ -92,7 +92,11 @@ function mathphpinterpretline($str,$vars,$ignorestrings) {
 			$bits[] = $lastsym;
 			$bits[] = ')';
 			$sym = '';
-		}  else {
+		} else if ($lasttype==2 && $type==4 && substr($lastsym,0,5)=='root(') {
+			$bits[] = substr($lastsym,0,-1).',';
+			$sym = substr($sym,1);
+			$lasttype = 0;
+		} else {
 			//add last symbol to stack
 			if ($lasttype!=7 && $lasttype!=-1) {
 				$bits[] = $lastsym;
@@ -507,6 +511,16 @@ function safepow($base,$power) {
 		$result = -($result);
 	}
 	return $result;
+}
+
+function root($n,$x) {
+	if ($n%2==0 && $x<0) { //if even root and negative base
+		return sqrt(-1);
+	} else if ($x<0) { //odd root of negative base - negative result
+		return -1*exp(1/$n*log(abs($x)));
+	} else { //root of positive base
+		return exp(1/$n*log(abs($x)));
+	}
 }
 
 function factorial($x) {

@@ -76,7 +76,11 @@ function interpretline($str,$anstype) {
 			$bits[] = $lastsym;
 			$bits[] = ')';
 			$sym = '';
-		}  else {
+		} else if ($lasttype==2 && $type==4 && substr($lastsym,0,5)=='root(') {
+			$bits[] = substr($lastsym,0,-1).',';
+			$sym = substr($sym,1);
+			$lasttype = 0;
+		} else {
 			//add last symbol to stack
 			if ($lasttype!=7 && $lasttype!=-1) {
 				$bits[] = $lastsym;
