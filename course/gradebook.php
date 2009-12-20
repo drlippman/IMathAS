@@ -387,8 +387,9 @@ if (isset($studentid) || $stu!=0) { //show student view
 	$gbt = gbinstrdisp();
 	echo "</form>";
 	echo "</div>";
-	require("../footer.php");
 	echo "Meanings:  IP-In Progress, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sup>*</sup> Has feedback, <sub>d</sub> Dropped score, <sup>e</sup> Has exception/latepass\n";
+	require("../footer.php");
+	
 	/*if ($isteacher) {
 		echo "<div class=cp>";
 		echo "<a href=\"addgrades.php?cid=$cid&gbitem=new&grades=all\">Add Offline Grade</a><br/>";

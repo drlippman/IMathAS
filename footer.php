@@ -1,3 +1,6 @@
+<div class="clear"></div>
+</div>
+<div class="footerwrapper"></div>
 </div>
 <?php
 if (isset($useeditor) && $sessiondata['useed']==1) {

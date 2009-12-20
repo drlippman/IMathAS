@@ -340,3 +340,6 @@ div.tips {
 	top: 12px; 
 	cursor: pointer;
 }
+a {
+	outline: none;
+}

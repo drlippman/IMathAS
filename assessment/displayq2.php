@@ -1187,32 +1187,46 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		$out .= "<canvas class=\"drawcanvas\" id=\"canvas$qn\" width=\"{$settings[6]}\" height=\"{$settings[7]}\"></canvas>";
 		$out .= "<div><span id=\"drawtools$qn\" class=\"drawtools\">";
 		$out .= "<span onclick=\"clearcanvas($qn)\">Clear All</span> Draw: ";
-		for ($i=0; $i<count($answerformat); $i++) {
-			if ($i==0) {
-				$out .= '<span class="sel" ';
-			} else {
-				$out .= '<span ';
+		if ($answerformat[0]=='twopoint') {
+			$out .= "<img src=\"$imasroot/img/tpline.gif\" onclick=\"settool(this,$qn,5)\" class=\"sel\"/>";
+			//$out .= "<img src=\"$imasroot/img/tpline2.gif\" onclick=\"settool(this,$qn,5.2)\"/>";
+			//$out .= "<img src=\"$imasroot/img/tpline3.gif\" onclick=\"settool(this,$qn,5.3)\"/>";
+			$out .= "<img src=\"$imasroot/img/tpparab.gif\" onclick=\"settool(this,$qn,6)\"/>";
+			if ($settings[6]*($settings[3]-$settings[2]) == $settings[7]*($settings[1]-$settings[0])) {
+				//only circles if equal spacing in x and y
+				$out .= "<img src=\"$imasroot/img/tpcirc.gif\" onclick=\"settool(this,$qn,7)\"/>";
 			}
-			if ($answerformat[$i]=='line') {
-				$out .= "onclick=\"settool(this,$qn,0)\">Line</span>";
-			} else if ($answerformat[$i]=='dot') {
-				$out .= "onclick=\"settool(this,$qn,1)\">Dot</span>";
-			} else if ($answerformat[$i]=='opendot') {
-				$out .= "onclick=\"settool(this,$qn,2)\">Open Dot</span>";
-			} else if ($answerformat[$i]=='polygon') {
-				$out .= "onclick=\"settool(this,$qn,0)\">Polygon</span>";
-				$dotline = 1;
+			$out .= "<img src=\"$imasroot/img/tpdot.gif\" onclick=\"settool(this,$qn,1)\"/>";
+			$def = 5;
+		} else {
+			for ($i=0; $i<count($answerformat); $i++) {
+				if ($i==0) {
+					$out .= '<span class="sel" ';
+				} else {
+					$out .= '<span ';
+				}
+				if ($answerformat[$i]=='line') {
+					$out .= "onclick=\"settool(this,$qn,0)\">Line</span>";
+				} else if ($answerformat[$i]=='dot') {
+					$out .= "onclick=\"settool(this,$qn,1)\">Dot</span>";
+				} else if ($answerformat[$i]=='opendot') {
+					$out .= "onclick=\"settool(this,$qn,2)\">Open Dot</span>";
+				} else if ($answerformat[$i]=='polygon') {
+					$out .= "onclick=\"settool(this,$qn,0)\">Polygon</span>";
+					$dotline = 1;
+				} 
+			}
+			if ($answerformat[0]=='line') {
+				$def = 0;
+			} else if ($answerformat[0]=='dot') {
+				$def = 1;
+			} else if ($answerformat[0]=='opendot') {
+				$def = 2;
+			} else if ($answerformat[0]=='polygon') {
+				$def = 0;
 			} 
 		}
-		if ($answerformat[0]=='line') {
-			$def = 0;
-		} else if ($answerformat[0]=='dot') {
-			$def = 1;
-		} else if ($answerformat[0]=='opendot') {
-			$def = 2;
-		} else if ($answerformat[0]=='polygon') {
-			$def = 0;
-		}
+		
 		
 		$out .= '</span></div>';
 		$out .= "<input type=\"hidden\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" />";
@@ -1236,6 +1250,10 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 					} else {
 						$saarr[$k] .= ',open';
 					}
+				} else if ($function[0]=='circle') { //is circle
+					$saarr[$k] = "[{$function[3]}*cos(t)+{$function[1]},{$function[3]}*sin(t)+{$function[2]}],blue,0,6.31";
+				} else if (substr($function[0],0,2)=='x=') {
+					$saarr[$k] = '['.substr($function[0],2).',t],blue,'.($settings[2]-1).','.($settings[3]+1);
 				} else { //is function
 					$saarr[$k] = $function[0].',blue';
 					if (count($function)>2) {
@@ -2362,6 +2380,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$ansodots = array();
 		$anslineptcnt = array();
 		$types = array();
+		$extrastuffpenalty = 0;
 		$linepts = 0;
 		if (!is_array($answers)) {
 			settype($answers,"array");
@@ -2378,7 +2397,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$isclosed = true;
 				array_pop($ansdots);
 			}
-			list($lines,$dots,$odots) = explode(';;',$givenans);
+			list($lines,$dots,$odots,$tplines) = explode(';;',$givenans);
 			if ($lines=='') {
 				$line = array();
 			} else {
@@ -2451,211 +2470,396 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				return $totscore;
 			}
 			
-		}
-		//not polygon, continue
-		
-		//evaluate all the functions in $answers
-		foreach ($answers as $key=>$function) {
-			if ($function=='') { continue; }
-			$function = explode(',',$function);
-			//curves: function
-			//	  function, xmin, xmax
-			//dot:  x,y
-			//	x,y,"closed" or "open"
-			//form: function, color, xmin, xmax, startmaker, endmarker
-			if (count($function)==2 || (count($function)==3 && ($function[2]=='open' || $function[2]=='closed'))) { //is dot
-				$pixx = ($function[0] - $settings[0])*$pixelsperx + $imgborder;
-				$pixy = $settings[7] - ($function[1]-$settings[2])*$pixelspery - $imgborder;	
-				if (count($function)==2 || $function[2]=='closed') {
-					$ansdots[$key] = array($pixx,$pixy);
-				} else {
-					$ansodots[$key] = array($pixx,$pixy);
-				}
-				continue;
-			}
-			$anslines[$key] = array();
-			$func = makepretty($function[0]);
-			$func = mathphp($func,'x');
-			$func = str_replace("(x)",'($x)',$func);
-			$func = create_function('$x', 'return ('.$func.');');
-			if (!isset($function[1])) {
-				$function[1] = $settings[0];
-			}
-			if (!isset($function[2])) {
-				$function[2] = $settings[1];
-			}
-			$xminpix = max(2*$imgborder,($function[1] - $settings[0])*$pixelsperx + $imgborder);
-			$xmaxpix = min($settings[6]-2*$imgborder,($function[2] - $settings[0])*$pixelsperx + $imgborder);
-			for ($k=ceil($xminpix/$step); $k*$step <= $xmaxpix; $k++) {
-				$x = $k*$step;
-				$coordx = ($x - $imgborder)/$pixelsperx + $settings[0]+1E-10;
-				$coordy = $func($coordx);
-				if ($coordy>$settings[2] && $coordy<$settings[3]) {
-					$anslines[$key][$k] = $settings[7] - ($coordy-$settings[2])*$pixelspery - $imgborder;
-					if (!isset($anslineptcnt[$k])) {
-						$anslineptcnt[$k] =1;
+		} else if ($answerformat=="twopoint") {
+			$anscircs = array();
+			$ansparabs = array();
+			$x1 = 1/4*$settings[0] + 3/4*$settings[1];
+			$x2 = 1/2*$settings[0] + 1/2*$settings[1];
+			$x3 = 3/4*$settings[0] + 1/4*$settings[1];
+			$x1p = ($x1 - $settings[0])*$pixelsperx + $imgborder;
+			$x2p = ($x2 - $settings[0])*$pixelsperx + $imgborder;
+			$x3p = ($x3 - $settings[0])*$pixelsperx + $imgborder;
+			$ymid = ($settings[2]+$settings[3])/2;
+			$ymidp = $settings[7] - ($ymid-$settings[2])*$pixelspery - $imgborder;
+			foreach ($answers as $key=>$function) {
+				if ($function=='') { continue; }
+				$function = explode(',',$function);
+				//curves: function
+				//	  function, xmin, xmax
+				//dot:  x,y
+				//	x,y,"closed" or "open"
+				//form: function, color, xmin, xmax, startmaker, endmarker
+				if (count($function)==2 || (count($function)==3 && ($function[2]=='open' || $function[2]=='closed'))) { //is dot
+					$pixx = ($function[0] - $settings[0])*$pixelsperx + $imgborder;
+					$pixy = $settings[7] - ($function[1]-$settings[2])*$pixelspery - $imgborder;	
+					if (count($function)==2 || $function[2]=='closed') {
+						$ansdots[$key] = array($pixx,$pixy);
 					} else {
-						$anslineptcnt[$k]++;
+						$ansodots[$key] = array($pixx,$pixy);
 					}
-					$linepts++;
-				}
-			}
-			$linecnt++;
-		}
-		//break apart student entry
-		list($lines,$dots,$odots) = explode(';;',$givenans);
-		if ($lines=='') {
-			$lines = array();
-		} else {
-			$lines = explode(';',$lines);
-			foreach ($lines as $k=>$line) {
-				$lines[$k] = explode('),(',substr($line,1,strlen($line)-2));
-				foreach ($lines[$k] as $j=>$pt) {
-					$lines[$k][$j] = explode(',',$pt);
-				}
-			}
-		}
-		if ($dots=='') {
-			$dots = array();
-		} else {
-			$dots = explode('),(', substr($dots,1,strlen($dots)-2));
-			foreach ($dots as $k=>$pt) {
-				$dots[$k] = explode(',',$pt);
-			}
-		}
-		if ($odots=='') {
-			$odots = array();
-		} else {
-			$odots = explode('),(', substr($odots,1,strlen($odots)-2));
-			foreach ($odots as $k=>$pt) {
-				$odots[$k] = explode(',',$pt);
-			}
-		}
-		
-		//interp the lines
-		$linedata = array();
-		$totinterp = 0;
-		foreach ($lines as $k=>$line) {
-			for ($i=1;$i<count($line);$i++) {
-				$leftx = min($line[$i][0],$line[$i-1][0]);
-				$rightx = max($line[$i][0],$line[$i-1][0]);
-				if ($line[$i][0]==$line[$i-1][0]) {
-					$m = 9999;
+					continue;
+				} else if ($function[0]=='circle') {
+					$anscircs[$key] = array(($function[1] - $settings[0])*$pixelsperx + $imgborder,$settings[7] - ($function[2]-$settings[2])*$pixelspery - $imgborder,$function[3]*$pixelsperx);
+				} else if (substr($function[0],0,2)=='x=') {
+					$anslines[$key] = array('x',10000,(substr($function[0],2)- $settings[0])*$pixelsperx + $imgborder );
 				} else {
-					$m = ($line[$i][1] - $line[$i-1][1])/($line[$i][0]-$line[$i-1][0]);
-				}
-				for ($k = ceil($leftx/$step); $k*$step<$rightx; $k++) {
-					$x = $k*$step;
-					$y = $line[$i-1][1] + $m*($x-$line[$i-1][0]);
-					if ($y>$imgborder && $y<($settings[7]-$imgborder)) {
-						$linedata[$k][] = $y;
-						$totinterp++;
+					$func = makepretty($function[0]);
+					$func = mathphp($func,'x');
+					$func = str_replace("(x)",'($x)',$func);
+					$func = create_function('$x', 'return ('.$func.');');
+					$y1 = $func($x1);
+					$y2 = $func($x2);
+					$y3 = $func($x3);
+					$y1p = $settings[7] - ($y1-$settings[2])*$pixelspery - $imgborder;
+					$y2p = $settings[7] - ($y2-$settings[2])*$pixelspery - $imgborder;
+					$y3p = $settings[7] - ($y3-$settings[2])*$pixelspery - $imgborder;
+					if (abs(($y3-$y2)-($y2-$y1))<1e-9) {
+						//colinear
+						$slope = ($y2p-$y1p)/($x2p-$x1p);
+						if (abs($slope)>1.4) {
+							//use x value at ymid
+							$anslines[$key] = array('x',$slope,$x1p+($ymidp-$y1p)/$slope);
+						} else {
+							//use y value at x2
+							$anslines[$key] = array('y',$slope,$y2p);
+						}
+					} else {
+						//assume parabolic for now
+						$denom = ($x1p - $x2p)*($x1p - $x3p)*($x2p - $x3p);
+						$A = ($x3p * ($y2p - $y1p) + $x2p * ($y1p - $y3p) + $x1p * ($y3p - $y2p)) / $denom;
+						$B = ($x3p*$x3p * ($y1p - $y2p) + $x2p*$x2p * ($y3p - $y1p) + $x1p*$x1p * ($y2p - $y3p)) / $denom;
+						$C = ($x2p * $x3p * ($x2p - $x3p) * $y1p + $x3p * $x1p * ($x3p - $x1p) * $y2p + $x1p * $x2p * ($x1p - $x2p) * $y3p) / $denom;
+						$xt = -$B/(2*$A)+20;
+						//use vertex and y value at x of vertex + 1
+						$ansparabs[$key] = array(-$B/(2*$A),$C-$B*$B/(4*$A),$A*$xt*$xt+$B*$xt+$C);
 					}
 				}
 			}
-		}
-		
-		$stdevs = array();
-		$stcnts = array();
-		$scores = array();
-		$unmatchedanspts = array();
-		$unmatchedanskeys = array();
-		//compare lines
-		foreach ($anslines as $key=>$answerline) {
-			$unmatchedptcnt = 0;
-			$stdevs[$key] = 0;
-			$stcnts[$key] = 0;
-			foreach($answerline as $k=>$ansy) {
-				//if there are more ans pts than drawn, want to match up better than this; 
-				//mark it for coming back to
-				//if less ans pts than drawn, that's already accounted for in $percentoffpts
-				if ($anslineptcnt[$k]>count($linedata[$k])) {
-					$unmatchedanspts[$k] = 1;
+			list($lines,$dots,$odots,$tplines) = explode(';;',$givenans);
+			$lines = array();
+			$parabs = array();
+			$circs = array();
+			if ($tplines=='') {
+				$tplines = array();
+			} else {
+				$tplines = explode('),(', substr($tplines,1,strlen($tplines)-2));
+				foreach ($tplines as $k=>$val) {
+					$pts = explode(',',$val);
+					if ($pts[0]==5) {
+						//line
+						if ($pts[3]==$pts[1]) {
+							$lines[] = array('x',10000,$pts[1]);
+						} else {
+							$slope = ($pts[4]-$pts[2])/($pts[3]-$pts[1]);
+							if (abs($slope)>100) {$slope = 10000;}
+							if (abs($slope)>1) {
+								$lines[] = array('x',$slope,$pts[1]+($ymidp-$pts[2])/$slope,$pts[2]+($x2p-$pts[1])*$slope);
+							} else {
+								$lines[] = array('y',$slope,$pts[2]+($x2p-$pts[1])*$slope);
+							}
+						}
+					} else if ($pts[0]==6) {
+						//parab
+						if ($pts[4]==$pts[2]) {
+							$lines[] = array('y',0,$pts[4]);
+						} else if ($pts[3]!=$pts[1]) {
+							$a = ($pts[4]-$pts[2])/(($pts[3]-$pts[1])*($pts[3]-$pts[1]));
+							$y = $pts[2]+$a*400;
+							$parabs[] = array($pts[1],$pts[2],$y);
+						}
+						
+					} else if ($pts[0]==7) {
+						//circle
+						$circs[] = array($pts[1],$pts[2],sqrt(($pts[3]-$pts[1])*($pts[3]-$pts[1]) + ($pts[4]-$pts[2])*($pts[4]-$pts[2])));
+					}
+				}
+			}
+			if ($dots=='') {
+				$dots = array();
+			} else {
+				$dots = explode('),(', substr($dots,1,strlen($dots)-2));
+				foreach ($dots as $k=>$pt) {
+					$dots[$k] = explode(',',$pt);
+				}
+			}
+			$scores = array();
+			foreach ($ansdots as $key=>$ansdot) {
+				$scores[$key] = 0;
+				for ($i=0; $i<count($dots); $i++) {
+					if (($dots[$i][0]-$ansdot[0])*($dots[$i][0]-$ansdot[0]) + ($dots[$i][1]-$ansdot[1])*($dots[$i][1]-$ansdot[1]) <= 25) {
+						$scores[$key] = 1;
+						break;
+					}
+				}
+			}
+			$deftol = .1;
+			$defpttol = 5;
+			foreach ($anslines as $key=>$ansline) {
+				$scores[$key] = 0;
+				for ($i=0; $i<count($lines); $i++) {
+					//check slope
+					if (abs($ansline[1]-$lines[$i][1])/(abs($ansline[1])+.000001)>$deftol*$reltolerance) {
+						continue;
+					}
+					if ($ansline[0]!=$lines[$i][0]) {
+						if (abs(abs($ansline[1])-1)<.3) {
+							//check intercept
+							if (abs($ansline[2]-$lines[$i][3])>$defpttol*$reltolerance) {
+								continue;
+							}
+						} else {
+							continue;
+						}
+					} else {
+						if (abs($ansline[2]-$lines[$i][2])>$defpttol*$reltolerance) {
+							continue;
+						}
+					}
+					$scores[$key] = 1;
+					break;
+				}
+			}
+			foreach ($anscircs as $key=>$anscirc) {
+				$scores[$key] = 0;
+				for ($i=0; $i<count($circs); $i++) {
+					if (abs($anscirc[0]-$circs[$i][0])>$defpttol*$reltolerance) {
+						continue;
+					}
+					if (abs($anscirc[1]-$circs[$i][1])>$defpttol*$reltolerance) {
+						continue;
+					}
+					if (abs($anscirc[2]-$circs[$i][2])>$defpttol*$reltolerance) {
+						continue;
+					}
+					$scores[$key] = 1;
+					break;
+				}
+			}
+			
+			foreach ($ansparabs as $key=>$ansparab) {
+				$scores[$key] = 0;
+				for ($i=0; $i<count($parabs); $i++) {
+					if (abs($ansparab[0]-$parabs[$i][0])>$defpttol*$reltolerance) {
+						continue;
+					}
+					if (abs($ansparab[1]-$parabs[$i][1])>$defpttol*$reltolerance) {
+						continue;
+					}
+					if (abs($ansparab[2]-$parabs[$i][2])>$defpttol*$reltolerance) {
+						continue;
+					}
+					$scores[$key] = 1;
+					break;
+				}
+			}
+			$extrastuffpenalty = max((count($tplines)-count($answers))/(max(count($answers),count($tplines))),0);
+			
+		} else {
+			//not polygon or twopoint, continue with regular grading
+			
+			//evaluate all the functions in $answers
+			foreach ($answers as $key=>$function) {
+				if ($function=='') { continue; }
+				$function = explode(',',$function);
+				//curves: function
+				//	  function, xmin, xmax
+				//dot:  x,y
+				//	x,y,"closed" or "open"
+				//form: function, color, xmin, xmax, startmaker, endmarker
+				if (count($function)==2 || (count($function)==3 && ($function[2]=='open' || $function[2]=='closed'))) { //is dot
+					$pixx = ($function[0] - $settings[0])*$pixelsperx + $imgborder;
+					$pixy = $settings[7] - ($function[1]-$settings[2])*$pixelspery - $imgborder;	
+					if (count($function)==2 || $function[2]=='closed') {
+						$ansdots[$key] = array($pixx,$pixy);
+					} else {
+						$ansodots[$key] = array($pixx,$pixy);
+					}
 					continue;
 				}
-				$minerr = $settings[7];
-				for ($i=0; $i<count($linedata[$k]);$i++) {
-					if (abs($ansy-$linedata[$k][$i])<$minerr) {
-						$minerr = abs($ansy-$linedata[$k][$i]);
+				$anslines[$key] = array();
+				$func = makepretty($function[0]);
+				$func = mathphp($func,'x');
+				$func = str_replace("(x)",'($x)',$func);
+				$func = create_function('$x', 'return ('.$func.');');
+				if (!isset($function[1])) {
+					$function[1] = $settings[0];
+				}
+				if (!isset($function[2])) {
+					$function[2] = $settings[1];
+				}
+				$xminpix = max(2*$imgborder,($function[1] - $settings[0])*$pixelsperx + $imgborder);
+				$xmaxpix = min($settings[6]-2*$imgborder,($function[2] - $settings[0])*$pixelsperx + $imgborder);
+				for ($k=ceil($xminpix/$step); $k*$step <= $xmaxpix; $k++) {
+					$x = $k*$step;
+					$coordx = ($x - $imgborder)/$pixelsperx + $settings[0]+1E-10;
+					$coordy = $func($coordx);
+					if ($coordy>$settings[2] && $coordy<$settings[3]) {
+						$anslines[$key][$k] = $settings[7] - ($coordy-$settings[2])*$pixelspery - $imgborder;
+						if (!isset($anslineptcnt[$k])) {
+							$anslineptcnt[$k] =1;
+						} else {
+							$anslineptcnt[$k]++;
+						}
+						$linepts++;
 					}
 				}
-				if ($minerr<$settings[7]) {
-					$stdevs[$key] += $minerr*$minerr;
-					$stcnts[$key]++;
-				}
-			}	
-		}
-		//go back and match up drawn points with unmatched answer points 
-		//we have more answer points than drawn points here
-		foreach (array_keys($unmatchedanspts) as $k) {
-			for ($i=0; $i<count($linedata[$k]); $i++) {
-				$minerr = $settings[7];
-				$minerrkey = -1;
-				foreach ($anslines as $key=>$answerline) {
-					if (abs($answerline[$k]-$linedata[$k][$i])<$minerr) {
-						$minerr = abs($answerline[$k]-$linedata[$k][$i]);
-						$minerrkey = $key;
-					}
-				}
-				if ($minerrkey>-1) {
-					$stdevs[$minerrkey] += $minerr*$minerr;
-					$stcnts[$minerrkey]++;
-				}
+				$linecnt++;
 			}
-		}
-		//time to grade!
-		$percentunmatcheddrawn = 0; //counts extra drawn points: percent of drawn that are extras
-		if ($totinterp>0) {
-			$percentunmatcheddrawn = max(($totinterp-$linepts)/$totinterp-.05*$reltolerance,0);
-		}
-		//divide up over all the lines
-		$percentunmatcheddrawn = $percentunmatcheddrawn;
-		foreach ($anslines as $key=>$answerline) {
-			if ($stcnts[$key]<2) {
-				$stdevs[$key] = 0;
+			//break apart student entry
+			list($lines,$dots,$odots,$tplines) = explode(';;',$givenans);
+			if ($lines=='') {
+				$lines = array();
 			} else {
-				$stdevs[$key] = sqrt($stdevs[$key]/($stcnts[$key]-1));
+				$lines = explode(';',$lines);
+				foreach ($lines as $k=>$line) {
+					$lines[$k] = explode('),(',substr($line,1,strlen($line)-2));
+					foreach ($lines[$k] as $j=>$pt) {
+						$lines[$k][$j] = explode(',',$pt);
+					}
+				}
 			}
-			$stdevpen = max(8*($stdevs[$key]-5)/($settings[7]),0);
-			$percentunmatchedans = max((count($answerline)-$stcnts[$key])/(count($answerline)),0);
-			if ($percentunmatchedans<.05*$reltolerance) {
-				$percentunmatchedans = 0;
+			if ($dots=='') {
+				$dots = array();
+			} else {
+				$dots = explode('),(', substr($dots,1,strlen($dots)-2));
+				foreach ($dots as $k=>$pt) {
+					$dots[$k] = explode(',',$pt);
+				}
 			}
-			$scores[$key] = 1-($stdevpen + $percentunmatcheddrawn + $percentunmatchedans)/$reltolerance;
-			//echo "Line: $key, stdev: {$stdevs[$key]}, unmatchedrawn: $percentunmatcheddrawn, unmatchedans: $percentunmatchedans <br/>";
-			if ($scores[$key]<0) { 
+			if ($odots=='') {
+				$odots = array();
+			} else {
+				$odots = explode('),(', substr($odots,1,strlen($odots)-2));
+				foreach ($odots as $k=>$pt) {
+					$odots[$k] = explode(',',$pt);
+				}
+			}
+			
+			//interp the lines
+			$linedata = array();
+			$totinterp = 0;
+			foreach ($lines as $k=>$line) {
+				for ($i=1;$i<count($line);$i++) {
+					$leftx = min($line[$i][0],$line[$i-1][0]);
+					$rightx = max($line[$i][0],$line[$i-1][0]);
+					if ($line[$i][0]==$line[$i-1][0]) {
+						$m = 9999;
+					} else {
+						$m = ($line[$i][1] - $line[$i-1][1])/($line[$i][0]-$line[$i-1][0]);
+					}
+					for ($k = ceil($leftx/$step); $k*$step<$rightx; $k++) {
+						$x = $k*$step;
+						$y = $line[$i-1][1] + $m*($x-$line[$i-1][0]);
+						if ($y>$imgborder && $y<($settings[7]-$imgborder)) {
+							$linedata[$k][] = $y;
+							$totinterp++;
+						}
+					}
+				}
+			}
+			
+			$stdevs = array();
+			$stcnts = array();
+			$scores = array();
+			$unmatchedanspts = array();
+			$unmatchedanskeys = array();
+			//compare lines
+			foreach ($anslines as $key=>$answerline) {
+				$unmatchedptcnt = 0;
+				$stdevs[$key] = 0;
+				$stcnts[$key] = 0;
+				foreach($answerline as $k=>$ansy) {
+					//if there are more ans pts than drawn, want to match up better than this; 
+					//mark it for coming back to
+					//if less ans pts than drawn, that's already accounted for in $percentoffpts
+					if ($anslineptcnt[$k]>count($linedata[$k])) {
+						$unmatchedanspts[$k] = 1;
+						continue;
+					}
+					$minerr = $settings[7];
+					for ($i=0; $i<count($linedata[$k]);$i++) {
+						if (abs($ansy-$linedata[$k][$i])<$minerr) {
+							$minerr = abs($ansy-$linedata[$k][$i]);
+						}
+					}
+					if ($minerr<$settings[7]) {
+						$stdevs[$key] += $minerr*$minerr;
+						$stcnts[$key]++;
+					}
+				}	
+			}
+			//go back and match up drawn points with unmatched answer points 
+			//we have more answer points than drawn points here
+			foreach (array_keys($unmatchedanspts) as $k) {
+				for ($i=0; $i<count($linedata[$k]); $i++) {
+					$minerr = $settings[7];
+					$minerrkey = -1;
+					foreach ($anslines as $key=>$answerline) {
+						if (abs($answerline[$k]-$linedata[$k][$i])<$minerr) {
+							$minerr = abs($answerline[$k]-$linedata[$k][$i]);
+							$minerrkey = $key;
+						}
+					}
+					if ($minerrkey>-1) {
+						$stdevs[$minerrkey] += $minerr*$minerr;
+						$stcnts[$minerrkey]++;
+					}
+				}
+			}
+			//time to grade!
+			$percentunmatcheddrawn = 0; //counts extra drawn points: percent of drawn that are extras
+			if ($totinterp>0) {
+				$percentunmatcheddrawn = max(($totinterp-$linepts)/$totinterp-.05*$reltolerance,0);
+			}
+			//divide up over all the lines
+			$percentunmatcheddrawn = $percentunmatcheddrawn;
+			foreach ($anslines as $key=>$answerline) {
+				if ($stcnts[$key]<2) {
+					$stdevs[$key] = 0;
+				} else {
+					$stdevs[$key] = sqrt($stdevs[$key]/($stcnts[$key]-1));
+				}
+				$stdevpen = max(8*($stdevs[$key]-5)/($settings[7]),0);
+				$percentunmatchedans = max((count($answerline)-$stcnts[$key])/(count($answerline)),0);
+				if ($percentunmatchedans<.05*$reltolerance) {
+					$percentunmatchedans = 0;
+				}
+				$scores[$key] = 1-($stdevpen + $percentunmatcheddrawn + $percentunmatchedans)/$reltolerance;
+				//echo "Line: $key, stdev: {$stdevs[$key]}, unmatchedrawn: $percentunmatcheddrawn, unmatchedans: $percentunmatchedans <br/>";
+				if ($scores[$key]<0) { 
+					$scores[$key] = 0;
+				} else if ($scores[$key]>1) {
+					$scores[$key] = 1;
+				}
+			}
+			//go through dots
+			//echo count($dots) .','.count($odots).','.count($ansdots).','.count($ansodots).'<br/>';
+			if ((count($dots)+count($odots))==0) {
+				$extradots = 0;
+			} else {
+				$extradots = max((count($dots) + count($odots) - count($ansdots) - count($ansodots))/(count($dots)+count($odots)),0);
+			}
+			foreach ($ansdots as $key=>$ansdot) {
 				$scores[$key] = 0;
-			} else if ($scores[$key]>1) {
-				$scores[$key] = 1;
-			}
-		}
-		//go through dots
-		//echo count($dots) .','.count($odots).','.count($ansdots).','.count($ansodots).'<br/>';
-		if ((count($dots)+count($odots))==0) {
-			$extradots = 0;
-		} else {
-			$extradots = max((count($dots) + count($odots) - count($ansdots) - count($ansodots))/(count($dots)+count($odots)),0);
-		}
-		foreach ($ansdots as $key=>$ansdot) {
-			$scores[$key] = 0;
-			for ($i=0; $i<count($dots); $i++) {
-				if (($dots[$i][0]-$ansdot[0])*($dots[$i][0]-$ansdot[0]) + ($dots[$i][1]-$ansdot[1])*($dots[$i][1]-$ansdot[1]) <= 25) {
-					$scores[$key] = 1 - $extradots;
-					break;
+				for ($i=0; $i<count($dots); $i++) {
+					if (($dots[$i][0]-$ansdot[0])*($dots[$i][0]-$ansdot[0]) + ($dots[$i][1]-$ansdot[1])*($dots[$i][1]-$ansdot[1]) <= 25) {
+						$scores[$key] = 1 - $extradots;
+						break;
+					}
 				}
 			}
-		}
-		//and open dots
-		foreach ($ansodots as $key=>$ansdot) {
-			$scores[$key] = 0;
-			for ($i=0; $i<count($odots); $i++) {
-				if (($odots[$i][0]-$ansdot[0])*($odots[$i][0]-$ansdot[0]) + ($odots[$i][1]-$ansdot[1])*($odots[$i][1]-$ansdot[1]) <= 25) {
-					$scores[$key] = 1 - $extradots;
-					break;
+			//and open dots
+			foreach ($ansodots as $key=>$ansdot) {
+				$scores[$key] = 0;
+				for ($i=0; $i<count($odots); $i++) {
+					if (($odots[$i][0]-$ansdot[0])*($odots[$i][0]-$ansdot[0]) + ($odots[$i][1]-$ansdot[1])*($odots[$i][1]-$ansdot[1]) <= 25) {
+						$scores[$key] = 1 - $extradots;
+						break;
+					}
 				}
 			}
+			
 		}
-		
 		if (!isset($partweights)) {
 			$partweights = array_fill(0,count($scores),1/count($scores));
 		} else {
@@ -2666,6 +2870,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$totscore = 0;
 		foreach ($scores as $key=>$score) {
 			$totscore += $score*$partweights[$key];
+		}
+		if ($extrastuffpenalty>0) {
+			$totscore = max($totscore*(1-$extrastuffpenalty),0);
 		}
 		if (isset($abstolerance)) {
 			if ($totscore<$abstolerance) {

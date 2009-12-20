@@ -192,6 +192,13 @@ if (!isset($nologo)) {
 	}
 }
 
+$insertinheaderwrapper = ' ';
+echo '<div class=mainbody>';
+if (isset($insertinheaderwrapper)) {
+	echo '<div class="headerwrapper">'.$insertinheaderwrapper.'</div>';
+}
+echo '<div class="midwrapper">';
+
 ?>
 
-<div class=mainbody>
+

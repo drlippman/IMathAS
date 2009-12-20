@@ -21,7 +21,7 @@ initstack = new Array();
 window.onload = init;
 var imasroot = '<?php echo $imasroot; ?>';
 </script>
-<link rel="stylesheet" href="<?php echo $imasroot . "/assessment/mathtest.css?ver=120209";?>" type="text/css"/>
+<link rel="stylesheet" href="<?php echo $imasroot . "/assessment/mathtest.css?ver=121809";?>" type="text/css"/>
 <?php
 echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/general.js?ver=120209\"></script>\n";
 if (isset($sessiondata['coursetheme'])) {
@@ -50,7 +50,7 @@ if ($sessiondata['graphdisp']==1) {
 <script src="<?php echo $imasroot . "/javascript/AMhelpers_min.js?v=100909";?>" type="text/javascript"></script>
 <script src="<?php echo $imasroot . "/javascript/confirmsubmit.js";?>" type="text/javascript"></script>
 <!--[if IE]><script type="text/javascript" src="<?php echo $imasroot;?>/javascript/excanvas_min.js"></script><![endif]-->
-<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/drawing_min.js"></script>
+<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/drawing_min.js?v=121809"></script>
 <?php
 echo "<script type=\"text/javascript\">imasroot = '$imasroot';</script>";
 if ($useeditor==1 && $sessiondata['useed']==1) {
@@ -130,15 +130,21 @@ function imascleanup(type, value) {
 </script>
 <!-- /TinyMCE -->
 
-</head>
-<body>
-
 END;
 
 }
 if (isset($placeinhead)) {
 	echo $placeinhead;
 }
+echo '</head><body>';
+
+$insertinheaderwrapper = ' ';
+echo '<div class=mainbody>';
+if (isset($insertinheaderwrapper)) {
+	echo '<div class="headerwrapper">'.$insertinheaderwrapper.'</div>';
+}
+echo '<div class="midwrapper">';
+
 ?>
 
 </head>
