@@ -42,7 +42,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	$ymin = $settings[2];
 	$ymax = $settings[3];
 	$yminauto = false;
-	$yminauto = false;
+	$ymaxauto = false;
 	if (substr($ymin,0,4)=='auto') {
 		$yminauto = true;
 		if (strpos($ymin,':')!==false) {
@@ -122,19 +122,19 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		
 		
 		$path = '';
-		if ($function[1]!='') {
+		if (isset($function[1]) && $function[1]!='') {
 			$path .= "stroke=\"{$function[1]}\";";
 			$alt .= ", Color {$function[1]}";
 		} else {
 			$path .= "stroke=\"black\";";
 			$alt .= ", Color black";
 		}
-		if ($function[6]!='') {
+		if (isset($function[6]) && $function[6]!='') {
 			$path .= "strokewidth=\"{$function[6]}\";";
 		} else {
 			$path .= "strokewidth=\"1\";";
 		}
-		if ($function[7]!='') {
+		if (isset($function[7]) && $function[7]!='') {
 			if ($function[7]=="dash") {
 				$path .= "strokedasharray=\"5\";";
 				$alt .= ", Dashed";
@@ -146,17 +146,17 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		}
 		
 		$avoid = array();
-		if ($function[2]!='') {$xmin = $function[2];} else {$xmin = $settings[0];}
-		if ($function[3]!='') {
+		$domainlimited = false;
+		if (isset($function[2]) && $function[2]!='') {
+			$xmin = $function[2]; 
+			$domainlimited = true;
+		} else {$xmin = $settings[0];}
+		if (isset($function[3]) && $function[3]!='') {
 			$xmaxarr = explode('!',$function[3]);
 			$xmax = $xmaxarr[0];
 			$avoid = array_slice($xmaxarr,1);
-		} else {$xmax = $settings[1];}
-		if ($function[2]!='' || $function[3]!='') {
 			$domainlimited = true;
-		} else {
-			$domainlimited = false;
-		}
+		} else {$xmax = $settings[1];}
 		
 		if ($GLOBALS['sessiondata']['graphdisp']==0) {
 			$dx = 1;
@@ -247,14 +247,14 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		}
 		if ($lastl > 0) {$path .= "]);";}
 		$alt .= "</tbody></table>\n";
-		if ($function[5]=='open') {
+		if (isset($function[5]) && $function[5]=='open') {
 			$path .= "dot([$x,$y],\"open\");";
 			$alt .= "Open dot at $x,$y";
-		} else if ($function[5]=='closed') {
+		} else if (isset($function[5]) && $function[5]=='closed') {
 			$path .= "dot([$x,$y],\"closed\");";
 			$alt .= "Closed dot at $x,$y";
 		}
-		if ($function[4]=='open') {
+		if (isset($function[4]) && $function[4]=='open') {
 			if ($isparametric) {
 				$t = $xmin;
 				$x = round(eval("return ($xfunc);"),3);
@@ -270,7 +270,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				$absymax = $y;
 			}
 			$alt .= "Open dot at $x,$y";
-		} else if ($function[4]=='closed') {
+		} else if (isset($function[4]) && $function[4]=='closed') {
 			if ($isparametric) {
 				$t = $xmin;
 				$x = round(eval("return ($xfunc);"),3);

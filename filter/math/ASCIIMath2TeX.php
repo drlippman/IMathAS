@@ -316,7 +316,7 @@ function AMnewcommand($oldstr,$newstr) {
 }
 
 function AMremoveCharsAndBlanks($str,$n) {
-    	if (strlen($str)>1 && $str{$n}=='\\' && $str{$n+1}!= '\\' && $str{$n+1}!=' ') {
+    	if (strlen($str)>$n+1 && $str{$n}=='\\' && $str{$n+1}!= '\\' && $str{$n+1}!=' ') {
 		$st = substr($str, $n+1);
 	} else {
 		$st = substr($str,$n);

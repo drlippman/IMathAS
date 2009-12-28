@@ -132,7 +132,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		$_GET['folder'] = '0';  
 		$sessiondata['folder'.$cid] = '0';
 		writesessiondata();
-	} else if ((isset($_GET['folder']) && $_GET['folder']!='') && $sessiondata['folder'.$cid]!=$_GET['folder']) {
+	} else if ((isset($_GET['folder']) && $_GET['folder']!='') && (!isset($sessiondata['folder'.$cid]) || $sessiondata['folder'.$cid]!=$_GET['folder'])) {
 		$sessiondata['folder'.$cid] = $_GET['folder'];
 		writesessiondata();
 	} else if ((!isset($_GET['folder']) || $_GET['folder']=='') && isset($sessiondata['folder'.$cid])) {

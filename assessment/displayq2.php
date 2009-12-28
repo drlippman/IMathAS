@@ -577,11 +577,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			if ($displayformat == "horiz") {
 				$out .= "<div class=choice>{$questions[$randkeys[$i]]}<br/>";
 				$out .= "<input type=checkbox name=\"qn$qn"."[$i]\" value=$i ";
-				if (($labits[$i]!='') && ($labits[$i] == $i)) { $out .= "CHECKED";}
+				if (isset($labits[$i]) && ($labits[$i]!='') && ($labits[$i] == $i)) { $out .= "CHECKED";}
 				$out .= " /></div> \n";
 			} else if ($displayformat == "inline") {
 				$out .= "<input type=checkbox name=\"qn$qn"."[$i]\" value=$i ";
-				if (($labits[$i]!='') && ($labits[$i] == $i)) { $out .= "CHECKED";}
+				if (isset($labits[$i]) && ($labits[$i]!='') && ($labits[$i] == $i)) { $out .= "CHECKED";}
 				$out .= " />{$questions[$randkeys[$i]]} ";
 			} else if ($displayformat == 'column') {
 				if ($i%$itempercol==0) {
@@ -591,11 +591,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 					$out .= '<div class="match"><ul class=nomark>';
 				}
 				$out .= "<li><input type=checkbox name=\"qn$qn"."[$i]\" value=$i ";
-				if (($labits[$i]!='') && ($labits[$i] == $i)) { $out .= "CHECKED";}
+				if (isset($labits[$i]) && ($labits[$i]!='') && ($labits[$i] == $i)) { $out .= "CHECKED";}
 				$out .= " />{$questions[$randkeys[$i]]}</li> \n";
 			} else {
 				$out .= "<li><input type=checkbox name=\"qn$qn"."[$i]\" value=$i ";
-				if (($labits[$i]!='') && ($labits[$i] == $i)) { $out .= "CHECKED";}
+				if (isset($labits[$i]) && ($labits[$i]!='') && ($labits[$i] == $i)) { $out .= "CHECKED";}
 				$out .= " />{$questions[$randkeys[$i]]}</li> \n";
 			}
 		}

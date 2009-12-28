@@ -5,7 +5,11 @@
 <title><?php echo $installname; if (isset($pagetitle)) { echo " - $pagetitle";}?></title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=101009";?>" type="text/css" />
-<?php if (isset($coursetheme)) { ?>
+<?php if (isset($coursetheme)) { 
+	if (isset($flexwidth)) {
+		$coursetheme = str_replace('_fw','',$coursetheme);
+	}
+	?>
 <link rel="stylesheet" href="<?php echo $imasroot . "/themes/$coursetheme";?>" type="text/css" />
 <?php } ?>
 <link rel="shortcut icon" href="/favicon.ico" />
@@ -19,7 +23,7 @@ var imasroot = '<?php echo $imasroot; ?>';
 <script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js?ver=100509"></script>
 <?php
 if (isset($coursetheme) && strpos($coursetheme,'_dark')!==false) {$mathdarkbg = true;} else {$mathdarkbg = false;}
-if ($ispublic) {
+if (isset($ispublic) && $ispublic) {
 	echo "<script src=\"$imasroot/javascript/ASCIIMathMLwFallback.js?ver=102009\" type=\"text/javascript\"></script>\n";
 	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?ver=111909\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIIMath = true; var usingASCIISvg = true;</script>"; 
@@ -31,8 +35,7 @@ if ($ispublic) {
 if (!isset($sessiondata['mathdisp'])) {
 	echo '<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false;</script>';
 	echo "<script src=\"$imasroot/javascript/mathgraphcheck.js\" type=\"text/javascript\"></script>\n";
-}
-if ($sessiondata['mathdisp']==1) {
+} else if ($sessiondata['mathdisp']==1) {
 	echo "<script src=\"$imasroot/javascript/ASCIIMathML_min.js\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIIMath = true;</script>";
 } else if ($sessiondata['mathdisp']==2 && isset($useeditor) && $sessiondata['useed']==1) {
@@ -45,7 +48,7 @@ if ($sessiondata['mathdisp']==1) {
 } else {
 	echo "<script type=\"text/javascript\">var usingASCIIMath = false;</script>";
 }
-if ($sessiondata['graphdisp']==1) {
+if (isset($sessiondata['graphdisp']) && $sessiondata['graphdisp']==1) {
 	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?ver=111909\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIISvg = true;</script>";
 	//echo "<script src=\"$imasroot/course/editor/plugins/AsciiSvg/ASCIIsvgAddon.js\" type=\"text/javascript\"></script>\n";
@@ -152,6 +155,13 @@ END;
 	echo "<body>\n";
 }
 
+$insertinheaderwrapper = ' ';
+echo '<div class=mainbody>';
+if (isset($insertinheaderwrapper)) {
+	echo '<div class="headerwrapper">'.$insertinheaderwrapper.'</div>';
+}
+echo '<div class="midwrapper">';
+
 //load filter
 $curdir = rtrim(dirname(__FILE__), '/\\');
 require_once("$curdir/filter/filter.php");
@@ -160,7 +170,7 @@ require_once("$curdir/filter/filter.php");
 if (!isset($nologo)) {
 	//echo '<img id="headerlogo" style="position: absolute; right: 5px; top: 5px;" src="/img/state_logo.gif" alt="logo"/>';
 	//echo '<img id="headerlogo" style="position: absolute; right: 5px; top: 12px;" src="/img/wamaplogosmall.gif" alt="logo"/>';
-	echo '<span id="headerlogo" ';
+	echo '<div id="headerlogo" ';
 	if ($myrights>10 && !$ispublic) {
 		echo 'onclick="mopen(\'homemenu\',';
 		if (isset($cid) && is_numeric($cid)) {
@@ -170,7 +180,7 @@ if (!isset($nologo)) {
 		}
 		echo ')" onmouseout="mclosetime()"';
 	}
-	echo '>'.$smallheaderlogo.'</span>';
+	echo '>'.$smallheaderlogo.'</div>';
 	if ($myrights>10 && !$ispublic) {
 		echo '<div id="homemenu" class="ddmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">';
 		/*<b>Switch to:</b><ul class="nomark">';
@@ -192,12 +202,6 @@ if (!isset($nologo)) {
 	}
 }
 
-$insertinheaderwrapper = ' ';
-echo '<div class=mainbody>';
-if (isset($insertinheaderwrapper)) {
-	echo '<div class="headerwrapper">'.$insertinheaderwrapper.'</div>';
-}
-echo '<div class="midwrapper">';
 
 ?>
 

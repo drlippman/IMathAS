@@ -139,7 +139,7 @@ switch($_GET['action']) {
 			$topbar = array(array(),array());
 			$avail = 0;
 			$lockaid = 0;
-			$theme = "default.css";
+			$theme = $defaultcoursetheme;
 			$ltisecret = "";
 			$chatset = 0;
 			$showlatepass = 0;
@@ -253,9 +253,9 @@ switch($_GET['action']) {
 		if ($copyrights==0) { echo "checked=1";}
 		echo '/> Require enrollment key from everyone<br/> <input type=radio name="copyrights" value="1" ';
 		if ($copyrights==1) { echo "checked=1";}
-		echo '/>No key required for group members, require key from others <br/><input type=radio name="copyrights" value="2" ';
+		echo '/> No key required for group members, require key from others <br/><input type=radio name="copyrights" value="2" ';
 		if ($copyrights==2) { echo "checked=1";}
-		echo '/>No key required from anyone</span><br class=form />';
+		echo '/> No key required from anyone</span><br class=form />';
 		
 		echo "<span class=form>Message System:</span><span class=formright>";
 		//0 on, 1 to instr, 2 to stu, 3 nosend, 4 off

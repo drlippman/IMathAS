@@ -186,10 +186,12 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 			$maxvarlen = $l;
 		}
 	}
+	$connecttolast = 0;
 	$i=0;
 	$cnt = 0;
 	$len = strlen($str);
 	$syms = array();
+	$lastsym = array();
 	while ($i<$len) {
 		$cnt++;
 		if ($cnt>100) {
@@ -327,7 +329,7 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 			$intype = 3; //number
 			$cont = true;
 			//handle . 3 which needs to act as concat
-			if ($lastsym[0]=='.') {
+			if (isset($lastsym[0]) && $lastsym[0]=='.') {
 				$syms[count($syms)-1][0] .= ' ';
 			}
 			do {
@@ -447,17 +449,23 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 			//end of line
 			$intype = 7;
 			$i++;
-			$c = $str{$i};
+			if ($i<$len) {
+				$c = $str{$i};
+			}
 		} else if ($c==';') {
 			//end of line
 			$intype = 7;
 			$i++;
-			$c = $str{$i};
+			if ($i<$len) {
+				$c = $str{$i};
+			}
 		} else {
 			//no type - just append string.  Could be operators
 			$out .= $c;
 			$i++;
-			$c = $str{$i};
+			if ($i<$len) {
+				$c = $str{$i};
+			}
 		}
 		while ($c==' ') { //eat up extra whitespace
 			$i++;

@@ -91,6 +91,11 @@ if (!empty($_POST['AWSkey']) && !empty($_POST['AWSsecret']) && !empty($_POST['AW
 }
 	
 $contents .= '
+//Uncomment to change the default course theme, also used on the home & admin page:
+//$defaultcoursetheme = "default.css"
+
+//To change loginpage based on domain/url/etc, define $loginpage here
+
 //no need to change anything from here on
   /* Connecting, selecting database */
   if (!isset($dbsetup)) {

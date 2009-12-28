@@ -27,3 +27,6 @@ div.question {
 div.nobreak {
 	page-break-inside:avoid;
 }
+.headerwrapper {
+	height: 0px;
+}

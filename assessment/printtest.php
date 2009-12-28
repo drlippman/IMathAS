@@ -7,6 +7,7 @@
 	}
 	
 	include("displayq2.php");
+	$flexwidth = true; //tells header to use non _fw stylesheet
 	require("header.php");
 	echo "<style type=\"text/css\" media=\"print\">p.tips {	display: none;}\n input.btn {display: none;}\n textarea {display: none;}\n input.sabtn {display: none;}</style>\n";
 	echo "<style type=\"text/css\">p.tips {	display: none;}\n </style>\n";

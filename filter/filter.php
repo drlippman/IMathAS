@@ -6,11 +6,11 @@
 	//load in filters as needed
 	$filterdir = rtrim(dirname(__FILE__), '/\\');
 	//include("$filterdir/simplelti/simplelti.php");
-	if ($sessiondata['mathdisp']==2) { //use image fallback for math
+	if (isset($sessiondata['mathdisp']) && $sessiondata['mathdisp']==2) { //use image fallback for math
 		include("$filterdir/math/ASCIIMath2TeX.php");
 		$AMT = new AMtoTeX;
 	} 
-	if ($sessiondata['graphdisp']==2 || isset($loadgraphfilter)) { //use image fallback for graphs
+	if (isset($sessiondata['graphdisp']) && $sessiondata['graphdisp']==2 || isset($loadgraphfilter)) { //use image fallback for graphs
 		include("$filterdir/graph/asciisvgimg.php");
 		$AS = new AStoIMG;
 	} 

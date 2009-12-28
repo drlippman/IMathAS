@@ -14,6 +14,7 @@
 		exit;
 	}
 	$actas = false;
+	$isreview = false;
 	if (isset($teacherid) && isset($_GET['actas'])) {
 		$userid = $_GET['actas'];
 		unset($teacherid);
@@ -665,7 +666,7 @@
 	//if was added to existing group, need to reload $questions, etc
 	
 	echo "<h2>{$testsettings['name']}</h2>\n";
-	if ($sessiondata['actas']) {
+	if (isset($sessiondata['actas'])) {
 		echo '<p style="color: red;">Teacher Acting as ';
 		$query = "SELECT LastName, FirstName FROM imas_users WHERE id='{$sessiondata['actas']}'";
 		$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
@@ -766,11 +767,11 @@
 	} else {
 		echo "<div class=right>No time limit</div>\n";
 	}
-	if ($_GET['action']=="skip" || $_GET['action']=="seq") {
-		echo "<div class=right><span onclick=\"document.getElementById('intro').className='intro';\"><a href=\"#\">Show Instructions</a></span></div>\n";
-	}
+	
 	if (isset($_GET['action'])) {
-		
+		if ($_GET['action']=="skip" || $_GET['action']=="seq") {
+			echo "<div class=right><span onclick=\"document.getElementById('intro').className='intro';\"><a href=\"#\">Show Instructions</a></span></div>\n";
+		}
 		if ($_GET['action']=="scoreall") {
 			//score test
 			for ($i=0; $i < count($questions); $i++) {

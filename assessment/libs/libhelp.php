@@ -1,5 +1,7 @@
 <?php
 	require("../../validate.php");
+	$nologo = true;
+	$flexwidth = true;
 	require("../../header.php");
 	
 	echo "<h1>Installed Macro Libraries</h1>\n";

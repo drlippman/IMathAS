@@ -67,10 +67,10 @@ function copyitem($itemid,$gbcats) {
 		$query = "SELECT name,description,startdate,enddate,settings,defdisplay,replyby,postby,avail,points,cntingb,gbcategory FROM imas_forums WHERE id='$typeid'";
 		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$row = mysql_fetch_row($result);
-		if (isset($gbcats[$row[10]])) {
-			$row[10] = $gbcats[$row[10]];
+		if (isset($gbcats[$row[11]])) {
+			$row[11] = $gbcats[$row[11]];
 		} else if ($_POST['ctc']!=$cid) {
-			$row[10] = 0;
+			$row[11] = 0;
 		}
 		$row[0] .= stripslashes($_POST['append']);
 		$row = "'".implode("','",addslashes_deep($row))."'";

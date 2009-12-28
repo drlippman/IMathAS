@@ -686,7 +686,7 @@ if ($overwriteBody==1) {
 		echo 'How do I find questions to add?</a>';
 		echo '<div id="helpwithadding" style="display:none">';
 		if ($sessiondata['selfrom'.$aid]=='lib') {
-			echo "<p>You are current set to select questions from the question libraries.  If you would like to select questions from ";
+			echo "<p>You are currently set to select questions from the question libraries.  If you would like to select questions from ";
 			echo "assessments you've already created, click the <b>Select From Assessments</b> button below</p>";
 			echo "<p>To find questions to add from the question libraries:";
 			echo "<ol><li>Click the <b>Select Libraries</b> button below to pop open the library selector</li>";
@@ -695,7 +695,7 @@ if ($overwriteBody==1) {
 			echo " <li>On this page, click the <b>Search</b> button to list the questions in the libraries selected.<br/>  You can limit the listing by entering a sepecific search term in the box provided first, or leave it blank to view all questions in the chosen libraries</li>";
 			echo "</ol>";
 		} else if ($sessiondata['selfrom'.$aid]=='assm') {
-			echo "<p>You are current set to select questions existing assessments.  If you would like to select questions from ";
+			echo "<p>You are currently set to select questions existing assessments.  If you would like to select questions from ";
 			echo "the question libraries, click the <b>Select From Libraries</b> button below</p>";
 			echo "<p>To find questions to add from existing assessments:";
 			echo "<ol><li>Use the checkboxes to select the assessments you want to pull questions from</li>";

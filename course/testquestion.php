@@ -90,6 +90,7 @@ if ($myrights<20) {
 
 /******* begin html output ********/
 $sessiondata['coursetheme'] = $coursetheme;
+$flexwidth = true; //tells header to use non _fw stylesheet
 require("../assessment/header.php");
 
 if ($overwriteBody==1) {

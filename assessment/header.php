@@ -25,7 +25,12 @@ var imasroot = '<?php echo $imasroot; ?>';
 <?php
 echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/general.js?ver=120209\"></script>\n";
 if (isset($sessiondata['coursetheme'])) {
-	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/themes/{$sessiondata['coursetheme']}\"/>\n";
+	if (isset($flexwidth)) {
+		$coursetheme = str_replace('_fw','',$sessiondata['coursetheme']);
+	} else {
+		$coursetheme = $sessiondata['coursetheme'];
+	}
+	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/themes/$coursetheme\"/>\n";
 }
 if ($isdiag) {
 	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/diag/print.css\" media=\"print\"/>\n";

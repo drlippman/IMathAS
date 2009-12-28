@@ -158,3 +158,8 @@ color: #fff;
 	padding: 10px 20px;
 }
 
+.headerwrapper, .midwrapper {
+	margin: 0;
+	padding: 0;
+}
+

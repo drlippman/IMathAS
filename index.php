@@ -114,6 +114,7 @@ $line = mysql_fetch_array($result, MYSQL_ASSOC);
 if ($line == null) {
 	$noclass = true;
 } else {
+	$noclass = false;
 	//check for new posts
 	$query = "SELECT courseid,count(*) FROM ";
 	$query .= "(SELECT imas_forums.courseid,imas_forum_threads.id FROM imas_forum_threads ";
@@ -130,9 +131,9 @@ if ($line == null) {
 	$i=0;
 	do {
 		$page_studentCourseData[$i] = $line;
-		
+		$page_studentCourseData[$i]['courseDisplayTag'] = '';
 		if (isset($newmsgcnt[$page_studentCourseData[$i]['id']]) && $newmsgcnt[$page_studentCourseData[$i]['id']]>0) {
-			$page_studentCourseData[$i]['courseDisplayTag'] = " <a href=\"msgs/msglist.php?cid={$page_studentCourseData[$i]['id']}\" style=\"color:red\">New Messages ({$newmsgcnt[$page_studentCourseData[$i]['id']]})</a>";
+			$page_studentCourseData[$i]['courseDisplayTag'] .= " <a href=\"msgs/msglist.php?cid={$page_studentCourseData[$i]['id']}\" style=\"color:red\">New Messages ({$newmsgcnt[$page_studentCourseData[$i]['id']]})</a>";
 		}
 		if (isset($newpostscnt[$page_studentCourseData[$i]['id']]) && $newpostscnt[$page_studentCourseData[$i]['id']]>0) {
 			$page_studentCourseData[$i]['courseDisplayTag'] .= " <a href=\"forums/newthreads.php?cid={$page_studentCourseData[$i]['id']}\" style=\"color:red\">New Posts (". $newpostscnt[$page_studentCourseData[$i]['id']] .")</a>";
@@ -173,8 +174,9 @@ if ($line == null) {
 	$i=0;
 	do {
 		$page_teacherCourseData[$i] = $line;
+		$page_teacherCourseData[$i]['courseDisplayTag'] = '';
 		if (($page_teacherCourseData[$i]['available']&1)==1) {
-			$page_teacherCourseData[$i]['courseDisplayTag'] = "<span style=\"color:green;\">Hidden</span>";
+			$page_teacherCourseData[$i]['courseDisplayTag'] .= "<span style=\"color:green;\">Hidden</span>";
 		}
 		
 		if ($page_teacherCourseData[$i]['lockaid']>0) {
@@ -220,8 +222,9 @@ if ($line == null) {
 	$i=0;
 	do {
 		$page_tutorCourseData[$i] = $line;
+		$page_tutorCourseData[$i]['courseDisplayTag'] = '';
 		if (($page_tutorCourseData[$i]['available']&1)==1) {
-			$page_tutorCourseData[$i]['courseDisplayTag'] = "<span style=\"color:green;\">Hidden</span>";
+			$page_tutorCourseData[$i]['courseDisplayTag'] .= "<span style=\"color:green;\">Hidden</span>";
 		}
 		
 		if ($page_tutorCourseData[$i]['lockaid']>0) {

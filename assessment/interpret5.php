@@ -524,17 +524,23 @@ function tokenize($str,$anstype) {
 			//end of line
 			$intype = 7;
 			$i++;
-			$c = $str{$i};
+			if ($i<$len) {
+				$c = $str{$i};
+			}
 		} else if ($c==';') {
 			//end of line
 			$intype = 7;
 			$i++;
-			$c = $str{$i};
+			if ($i<$len) {
+				$c = $str{$i};
+			}
 		} else {
 			//no type - just append string.  Could be operators
 			$out .= $c;
 			$i++;
-			$c = $str{$i};
+			if ($i<$len) {
+				$c = $str{$i};
+			}
 		}
 		while ($c==' ') { //eat up extra whitespace
 			$i++;

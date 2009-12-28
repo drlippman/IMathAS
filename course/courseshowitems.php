@@ -207,7 +207,7 @@ function enditem($canedit) {
 						echo "<div class=hidden ";
 					}
 					$style = '';
-					if ($items[$i]['fixedheight']>0) {
+					if (isset($items[$i]['fixedheight']) && $items[$i]['fixedheight']>0) {
 						if (strpos($_SERVER['HTTP_USER_AGENT'],'MSIE 6')!==false) {
 							$style .= 'overflow: auto; height: expression( this.offsetHeight > '.$items[$i]['fixedheight'].' ? \''.$items[$i]['fixedheight'].'px\' : \'auto\' );';
 						} else {

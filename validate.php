@@ -12,6 +12,17 @@
  ini_set('auto_detect_line_endings',true);
  session_start();
  $sessionid = session_id();
+ 
+ $myrights = 0;
+ $ispublic = false;
+ //domain checks for special themes, etc. if desired
+ $requestaddress = $_SERVER['HTTP_HOST'] .$_SERVER['PHP_SELF'];
+ if (!isset($defaultcoursetheme)) {
+	 $defaultcoursetheme = "default.css";
+ }
+ $coursetheme = $defaultcoursetheme; //will be overwritten later if set
+ 
+ 
  //check for bad sessionids.  
  if (strlen($sessionid)<10) { 
 	 if (function_exists('session_regenerate_id')) { session_regenerate_id(); }
@@ -230,7 +241,6 @@ END;
 	$userdeflib = $line['deflib'];
 	$userfullname = $line['FirstName'] . ' ' . $line['LastName'];
 	$previewshift = -1;
-	$coursetheme = "default.css";
 	$basephysicaldir = rtrim(dirname(__FILE__), '/\\');
 	if (isset($sessiondata['isdiag']) && strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) {
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php");
@@ -346,7 +356,10 @@ END;
  
  if (!$verified) {
 	if (strpos(basename($_SERVER['SCRIPT_NAME']),'directaccess.php')===false) {
-		require("loginpage.php");
+		if (!isset($loginpage)) {
+			 $loginpage = "loginpage.php";
+		}
+		require($loginpage);
 		exit;
 	} 
  }
