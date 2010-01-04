@@ -316,24 +316,43 @@
 			require("../footer.php");
 			exit;
 		}
-	} else if (isset($_GET['remove']) && $isteacher) { //removing thread
+	} else if (isset($_GET['remove']) && $allowdel) { //isteacher) { //removing thread
 		if (isset($_GET['confirm'])) {
-			$query = "DELETE FROM imas_forum_posts WHERE id='{$_GET['remove']}'";
-			mysql_query($query) or die("Query failed : $query " . mysql_error());
-			
-			$query = "DELETE FROM imas_forum_threads WHERE id='{$_GET['remove']}'";
-			mysql_query($query) or die("Query failed : $query " . mysql_error());
-
-			$query = "DELETE FROM imas_forum_posts WHERE threadid='{$_GET['remove']}'";
-			mysql_query($query) or die("Query failed : $query " . mysql_error());
-			
-			$query = "DELETE FROM imas_forum_views WHERE threadid='{$_GET['remove']}'";
-			mysql_query($query) or die("Query failed : $query " . mysql_error());
+			$go = true;
+			if (!$isteacher) {
+				$query = "SELECT id FROM imas_forum_posts WHERE parent='{$_GET['remove']}'";
+				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				if (mysql_num_rows($result)>0) {
+					$go = false;
+				}
+			} 
+			if ($go) {
+				$query = "DELETE FROM imas_forum_posts WHERE id='{$_GET['remove']}'";
+				mysql_query($query) or die("Query failed : $query " . mysql_error());
+				
+				$query = "DELETE FROM imas_forum_threads WHERE id='{$_GET['remove']}'";
+				mysql_query($query) or die("Query failed : $query " . mysql_error());
+	
+				$query = "DELETE FROM imas_forum_posts WHERE threadid='{$_GET['remove']}'";
+				mysql_query($query) or die("Query failed : $query " . mysql_error());
+				
+				$query = "DELETE FROM imas_forum_views WHERE threadid='{$_GET['remove']}'";
+				mysql_query($query) or die("Query failed : $query " . mysql_error());
+			}
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
 			exit;
 		} else {
 			$pagetitle = "Remove Thread";
 			require("../header.php");
+			if (!$isteacher) {
+				$query = "SELECT id FROM imas_forum_posts WHERE parent='{$_GET['remove']}'";
+				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				if (mysql_num_rows($result)>0) {
+					echo "Someone has replied to this post, so you cannot remove it.  <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Back</a>";
+					require("../footer.php");
+					exit;
+				}
+			} 
 			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
 			echo "&gt; <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> &gt; Remove Thread</div>";
 			echo "<h3>Remove Thread</h3>\n";

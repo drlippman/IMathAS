@@ -90,13 +90,18 @@
 				$str = preg_replace_callback('/<\s*embed[^>]*?script=(.)(.+?)\1.*?>/s','svgfilterscriptcallback',$str);
 			}
 		}
-		$search = '/\[LTI:\s*url=(.*),\s*key=(.*),\s*secret=([^\]]*)\]/';
+		$search = '/\[LTI:\s*url=(.+),\s*key=(.+),\s*secret=([^\],]+)([^\]]*)\]/';
 		
 		if (preg_match($search, $str, $res)){
 			$url = $res[1];
 			$key = $res[2];
 			$secret = $res[3];
-			$sessiondata['lti-secrets'][$key] = $secret;
+			if (isset($res[4]) && $res[4]!='') {
+				$opts = $res[4];
+			} else {
+				$opts = '';
+			}
+			$sessiondata['lti-secrets'][$key] = array($secret,$opts);
 			writesessiondata();	
 			$replamnt = getltiiframe($url,$key,time());
 			$str = preg_replace('/\[LTI:[^\]]*\]/', $replamnt, $str);
@@ -148,7 +153,7 @@
 	}
 	
 	function getltiiframe($url,$key,$linkback) {
-		global $cid;
+		global $cid,$imasroot;
 		if (!isset($cid) && isset($_GET['cid'])) {
 			$cid = $_GET['cid'];
 		}

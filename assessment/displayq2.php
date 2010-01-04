@@ -983,7 +983,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		$tip .= formathint('each value',$ansformats,'calcntuple');
 		//$tip .= "Enter DNE for Does Not Exist";
 		if (isset($answer)) {
-			$sa = $answer;
+			$sa = makeprettydisp($answer);
 		}
 	} else if ($anstype == "complex") {
 		if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$qn];} else {$sz = $options['answerboxsize'];}}
@@ -1701,7 +1701,36 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 		
 		preg_match_all('/([\(\[\<\{])(.*?)([\)\]\>\}])/', $givenans, $gaarr, PREG_SET_ORDER);
-		preg_match_all('/([\(\[\<\{])(.*?)([\)\]\>\}])/', $answer, $anarr, PREG_SET_ORDER);
+		//preg_match_all('/([\(\[\<\{])(.*?)([\)\]\>\}])/', $answer, $anarr, PREG_SET_ORDER);
+		//replaced with string-based approach below.  Allows eval as needed
+		
+		$anarr = array();
+		$NCdepth = 0;
+		$lastcut = 0;
+		$answer = makepretty($answer);
+		for ($i=0; $i<strlen($answer); $i++) {
+			$dec = false;
+			if ($answer{$i}=='(' || $answer{$i}=='[' || $answer{$i}=='<') {
+				if ($NCdepth==0) {
+					$lastcut = $i;
+				}
+				$NCdepth++;
+			} else if ($answer{$i}==')' || $answer{$i}==']' || $answer{$i}=='>') {
+				$NCdepth--;
+				if ($NCdepth==0) {
+					$anarr[] = array('',$answer{$lastcut},substr($answer,$lastcut+1,$i-$lastcut-1),$answer{$i});
+				}
+			}
+		}
+		foreach ($anarr as $k=>$v) {
+			$ansparts = explode(',',$v[2]);
+			foreach ($ansparts as $j=>$v) {
+				if (!is_numeric($v)) {
+					$ansparts[$j] = eval('return('.mathphp($v,null).');');
+				}
+			}
+			$anarr[$k][2] = $ansparts;
+		}
 		
 		if (count($gaarr)==0) {
 			return 0;
@@ -1714,7 +1743,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				if ($answer[1]!=$givenans[1] || $answer[3]!=$givenans[3]) {
 					break;
 				}
-				$ansparts = explode(',',$answer[2]);
+				//$ansparts = explode(',',$answer[2]);
+				$ansparts = $answer[2];
 				$gaparts = explode(',',$givenans[2]);
 
 				if (count($ansparts)!=count($gaparts)) {
@@ -2979,6 +3009,7 @@ function checkreqtimes($tocheck,$rtimes) {
 	if ($rtimes != '') {
 		$list = explode(",",$rtimes);
 		for ($i=0;$i < count($list);$i+=2) {
+			$list[$i+1] = trim($list[$i+1]);
 			$comp = substr($list[$i+1],0,1);
 			$num = intval(substr($list[$i+1],1));
 			

@@ -4,20 +4,21 @@
 global $allowedmacros;
 array_push($allowedmacros,"fe_lpfnc");
 
-//fe_lpfnc(x,xarray,yarray,[period])
+//fe_lpfnc(x,xarray,yarray,[periodic])
 //evals a linear piecewise function (connect-the-dots) from the provided
 //array of x and y values at the given x value.
 //requires x array to be in increasing order
-//If period=true, then xarray values define the domain of one period, 
+//If periodic=true, then xarray values define the domain of one period, 
 //and if x is outside that domain, f(x) = f(x-p) will be used
+//domain: starting x <= x < last x, so make sure last x = x[0]+p
 function fe_lpfnc($x,$xarray,$yarray,$p=false) {
 	$c = count($xarray);
 	if ($p == true) {
 		$per = $xarray[$c-1] - $xarray[0];
 		if ($x < $xarray[0]) {
 		 	$x = $x + $per*ceil(($xarray[0]-$x)/$per);
-		} else if ($x > $xarray[$c-1]) {
-			$x = $x - $per*ceil(($x-$xarray[$c-1])/$per);
+		} else if ($x >= $xarray[$c-1]) {
+			$x = $x - $per*(ceil(($x-$xarray[$c-1])/$per + 1e-12));
 		}
 	}
 	/*if ($p>0 && $x>$p) {

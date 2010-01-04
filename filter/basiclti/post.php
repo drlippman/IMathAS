@@ -10,7 +10,8 @@ if (empty($sessiondata['lti-secrets'][$key])) {
 	echo 'no secret';
 	exit;
 }
-$secret = $sessiondata['lti-secrets'][$key];
+$secret = $sessiondata['lti-secrets'][$key][0];
+$options = $sessiondata['lti-secrets'][$key][1];
 unset($sessiondata['lti-secrets'][$key]);
 writesessiondata();
 
@@ -21,15 +22,18 @@ $query = "SELECT FirstName,LastName,email FROM imas_users WHERE id='$userid'";
 $result = mysql_query($query) or die("Query failed : " . mysql_error());
 list($firstname,$lastname,$email) = mysql_fetch_row($result);
 $parms['user_id'] = $userid;
-$parms['lis_person_name_full'] = "$firstname $lastname";
-$parms['lis_person_name_family'] = $lastname;
-$parms['lis_person_name_given'] = $firstname;
-$parms['lis_person_contact_email_primary'] = $email;
-
+if (strpos($options,'noname')===false) {
+	$parms['lis_person_name_full'] = "$firstname $lastname";
+	$parms['lis_person_name_family'] = $lastname;
+	$parms['lis_person_name_given'] = $firstname;
+}
+if (strpos($options,'noemail')===false) {
+	$parms['lis_person_contact_email_primary'] = $email;
+}
 if (isset($teacherid)) {
 	$parms['roles'] = 'Instructor';
 } else {
-	$parms['roles'] = 'Student';
+	$parms['roles'] = 'Learner';
 }
 
 if (isset($_GET['cid'])) {

@@ -162,9 +162,11 @@ if (!(isset($teacherid))) {
 				}
 				$insarr[] = "('$cid','".implode("','",addslashes_deep($row))."')";
 			}
-			$query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit) VALUES ";
-			$query .= implode(',',$insarr);
-			mysql_query($query) or die("Query failed :$query " . mysql_error());
+			if (count($insarr)>0) {
+				$query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit) VALUES ";
+				$query .= implode(',',$insarr);
+				mysql_query($query) or die("Query failed :$query " . mysql_error());
+			}
 		}
 		if (isset($_POST['selectcalitems'])) {
 			$_GET['action']='selectcalitems';

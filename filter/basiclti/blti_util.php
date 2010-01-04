@@ -26,6 +26,7 @@ require_once '../../includes/OAuth.php';
     if ( $org_id ) $parms["tool_consumer_instance_guid"] = $org_id;
     if ( $org_desc ) $parms["tool_consumer_instance_description"] = $org_desc;
     $parms["basiclti_submit"] = "Launch Endpoint with BasicLTI Data";
+    $parms["oauth_callback"] = "about:blank";
 
     if ( $org_secret ) {
       $oauth_consumer_secret = $org_secret;

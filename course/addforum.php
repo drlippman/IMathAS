@@ -156,7 +156,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$enddate = $line['enddate'];
 			$allowanon = (($line['settings']&1)==1);
 			$allowmod = (($line['settings']&2)==2);
-			//$allowdel = (($line['settings']&4)==4);
+			$allowdel = (($line['settings']&4)==4);
 			$sortby = $line['sortby'];
 			$defdisplay = $line['defdisplay'];
 			$replyby = $line['replyby'];
@@ -311,6 +311,11 @@ if ($overwriteBody==1) {
 		<span class=form>Allow students to modify posts:</span>
 		<span class=formright>
 			<input type=checkbox name="allowmod" value="1" <?php if ($allowmod) { echo "checked=1";}?>/>
+		</span><br class="form"/>
+		
+		<span class=form>Allow students to delete own posts (if no replies):</span>
+		<span class=formright>
+			<input type=checkbox name="allowdel" value="1" <?php if ($allowdel) { echo "checked=1";}?>/>
 		</span><br class="form"/>
 		
 		<span class=form>Get email notify of new posts:</span>
