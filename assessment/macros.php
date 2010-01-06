@@ -1373,16 +1373,16 @@ function numtowords($num,$doth=false) {
 	}
 	if ($dec>0) {
 		$cnt = 0;
-		while (($dec-round($dec))>1e-9 && $cnt<9) {
+		while (abs($dec-round($dec))>1e-9 && $cnt<9) {
 			$dec *= 10;
 			$cnt++;
 		}
-		$dec = round($dec);
 		$out .= convertTri($dec,0);
 		$out .= ' '.$placevals[$cnt];
 		if ($dec!=1) {
 			$out .= 's';
 		}
+		
 	}
 	return trim($out);	
 }
@@ -1683,7 +1683,8 @@ function decimaltofraction($d,$format="fraction",$maxden = 5000) {
 	
 		//appendFractionsOutput(numerators[i], denominators[i]);
 	
-		if ($calcD == $d) { break;}
+		//if ($calcD == $d) { break;}
+		if (abs($calcD - $d)<1e-9) { break;}
 	
 		$prevCalcD = $calcD;
 	

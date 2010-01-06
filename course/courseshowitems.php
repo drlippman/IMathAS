@@ -172,7 +172,11 @@ function enditem($canedit) {
 						echo ".gif\" onClick=\"toggleblock('{$items[$i]['id']}','$parent-$bnum')\" /></span>";
 						echo "<div class=title>";
 					}
-					
+					if (!$canedit) {
+						echo '<span class="right">';
+						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>Isolate</a>";
+						echo '</span>';
+					}
 					echo "<span class=pointer onClick=\"toggleblock('{$items[$i]['id']}','$parent-$bnum')\">";
 					echo "<b><a href=\"#\" onclick=\"return false;\" $astyle>{$items[$i]['name']}</a></b></span> ";
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
@@ -189,11 +193,7 @@ function enditem($canedit) {
 						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\" $astyle>Copy</a>";
 						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>NewFlag</a>";
 						echo '</span>';
-					} else {
-						echo '<span class="right">';
-						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>Isolate</a>";
-						echo '</span>';
-					}
+					} 
 					if (($hideicons&16)==0) {
 						echo "</div>";
 					}

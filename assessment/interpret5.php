@@ -566,7 +566,8 @@ function tokenize($str,$anstype) {
 					//was an error, return error token
 					return array(array('',9));
 				} else {
-					$inside = interpretline(mysql_result($result,0,0),$anstype);
+					//$inside = interpretline(mysql_result($result,0,0),$anstype);
+					$inside = interpret('control',$anstype,mysql_result($result,0,0));
 					if (mysql_result($result,0,1)!=$anstype) {
 						//echo 'Imported code question type does not match current question answer type';
 					}
