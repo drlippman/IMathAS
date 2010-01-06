@@ -329,6 +329,7 @@ function gbtable() {
 	$query = "SELECT useweights,orderby,defaultcat,usersort FROM imas_gbscheme WHERE courseid='$cid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	list($useweights,$orderby,$defaultcat,$usersort) = mysql_fetch_row($result);
+	if ($useweights==2) {$useweights = 0;} //use 0 mode for calculation of totals
 	
 	$cats = array();
 	$catcolcnt = 0;

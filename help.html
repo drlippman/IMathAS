@@ -1734,6 +1734,8 @@ These macros are fairly general purpose:
 <li><b>array_flip(array)</b>:  Reverses a one-to-one array, so indexes become values and values become indexes</li>
 <li><b>arraystodoteqns(xarray,yarray,[color])</b>:  Converts an array of x-values and y-values into a form that can be used in
   showplot.</li>
+<li><b>connectthedots(xarray,yarray,[color,thickness,startmarker,endmarker])</b>: Converts an array of x-values and y-values into a form that
+  can be used in showplot to create a series of lines connecting the (x,y) pairs</li>
 <li><b>arraystodots(xarray,yarray)</b>: Converts an array of x-values and y-values into a form that can be used in the Drawing answer type</li>
 <li><b>today([string])</b>: Returns today's date, like "July 3, 2008".  Can change format using string (see http://us2.php.net/manual/en/function.date.php for formats)</li>
 <li><b>ifthen(condition,trueval,falseval)</b>:  Takes a comparision condition, and returns the trueval if the condition is true and the falseval otherwise.</li>
@@ -2332,9 +2334,8 @@ rather than just numbers, such as (5/3, 2/3).
 <dl>
 <dt>$answers = a string containing an n-tuple or list of n-tuples (In Answer)</dt>
 	<dd>Defines the answer n-tuple or list of n-tuples.  N-tuples can be any dimension,
-	but must be surrounded by any of: (), [], {}, &lt;&gt;.  Examples: $answer = "(1,2)",
-	$answer = "&lt;2,3,4&gt;,&lt;1,5,7&gt;".  Note that the instructor specified $answer needs
-	to be n-tuples of numbers, not calculations.</dd>
+	but must be surrounded by any of: (), [], {}, &lt;&gt;.  Examples: $answer = "(1/3,2)",
+	$answer = "&lt;2,3,4&gt;,&lt;1,5,7&gt;". </dd>
 </dl>
 </p>
 <p><b>Optional Variables</b><BR>
@@ -2405,7 +2406,7 @@ rather than just numbers, such as 1/3+sqrt(2)i.
 <p><b>Required Variables</b><BR>
 <dl>
 <dt>$answers = a string containing a complex number or list of complex numbers (In Answer)</dt>
-  <dd>Defines the answer.  Example: $answer="3+2i"</dd>
+  <dd>Defines the answer.  Example: $answer="3+2i", $answer="2/3+1/3i"</dd>
 </dl>
 </p>
 <p><b>Optional Variables</b><BR>
@@ -2566,8 +2567,8 @@ rather than numbers, like [2/5,sqrt(8)].
 <p><b>Required Variables</b><BR>
 <dl>
 <dt>$answer = a string with the answer in interval notation (In Answer)</dt>
-	<dd>Defines the answer.  Join multiple intervals with U for union.  Example: $answer = "(-oo,4]U(3,oo)".  Use
-	DNE for empty set.   Multiple acceptable answers can be entered using "or".  Example: $answer = "(3,3) or [3,3]"</dd>
+	<dd>Defines the answer.  Join multiple intervals with U for union, and oo for infinity.  Example: $answer = "(-oo,4]U(9/2,oo)".  Use
+	DNE for empty set.   Multiple acceptable answers can be entered using "or".  Example: $answer = "(3,3) or [3,3]".</dd>
 </dl>
 </p>
 <p><b>Optional Variables</b><BR>

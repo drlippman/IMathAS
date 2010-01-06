@@ -1141,7 +1141,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$tip .= "<br/>Your numbers should be accurate to $reqdecimals decimal places.";
 		}
 		if (isset($answer)) {
-			$sa = $answer;
+			$sa = '`'.str_replace('U','uu',$answer).'`';
 		}
 		
 	} else if ($anstype == 'draw') {
@@ -1831,8 +1831,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			if (!is_array($cparts)) {
 				//echo $cparts;
 			} else {
-				eval('$ansparts[0] = '.$cparts[0].';');
-				eval('$ansparts[1] = '.$cparts[1].';');
+				$ansparts[0] = eval('return ('.mathphp($cparts[0],null).');');
+				$ansparts[1] = eval('return ('.mathphp($cparts[1],null).');');
+			
+				//eval('$ansparts[0] = '.$cparts[0].';');
+				//eval('$ansparts[1] = '.$cparts[1].';');
 			}
 			$foundloc = -1;
 			foreach ($gaarr as $j=>$givenans) {
@@ -2319,6 +2322,12 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$ansem = substr($ansint,-1);
 				$ansint = substr($ansint,1,strlen($ansint)-2);
 				list($anssn,$ansen) = explode(',',$ansint);
+				if (!is_numeric($anssn) && strpos($anssn,'oo')===false) {
+					$anssn = eval('return('.mathphp($anssn,null).');');
+				}     
+				if (!is_numeric($ansen) && strpos($ansen,'oo')===false) {
+					$ansen = eval('return('.mathphp($ansen,null).');');
+				}   
 				$foundloc = -1;
 				foreach ($gaarr as $k=>$gansint) {
 					$gansint = trim($gansint);
