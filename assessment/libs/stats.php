@@ -2,7 +2,7 @@
 //A library of Stats functions.  Version 1.9, March 30, 2008
 
 global $allowedmacros;
-array_push($allowedmacros,"nCr","nPr","mean","stdev","percentile","quartile","median","freqdist","frequency","histogram","fdhistogram","fdbargraph","normrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","countif","binomialpdf","binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart");
+array_push($allowedmacros,"nCr","nPr","mean","stdev","percentile","quartile","TIquartile","median","freqdist","frequency","histogram","fdhistogram","fdbargraph","normrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","countif","binomialpdf","binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart");
 
 //nCr(n,r)
 //The Choose function
@@ -80,6 +80,49 @@ function percentile($a,$p) {
 //array of numbers.  Calculates using percentiles.
 function quartile($a,$q) {
 	return percentile($a,$q*25);	
+}
+
+//TIquartile(array,quartile)
+//finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
+//array of numbers.  Calculates using the TI-84 method.
+function TIquartile($a,$q) {
+	sort($a, SORT_NUMERIC);
+	$n = count($a);
+	if ($q==0) {
+		return $a[0];
+	} else if ($q==4) {
+		return $a[count($a)-1];
+	}
+	if ($q==2) {
+		if ($n%2==0) { //even
+			$m = $n/2;
+			return (($a[$m-1] + $a[$m])/2);
+		} else {
+			return ($a[floor($n/2)]);
+		}
+	} else {
+		if ($n%2==0) { //even
+			if ($n%4==0) { //lower half is even
+				$m = $n/4;
+				if ($q==3) { $m = $n-$m;}
+				return (($a[$m-1] + $a[$m])/2);
+			} else {
+				$m = floor($n/4);
+				if ($q==3) { $m = $n-$m-1;}
+				return ($a[$m]);
+			}
+		} else {
+			if ((($n-1)/2)%2==0) {//lower half is even
+				$m = floor($n/4);
+				if ($q==3) { $m = $n-$m;}
+				return (($a[$m-1] + $a[$m])/2);
+			} else {
+				$m = floor($n/4);
+				if ($q==3) { $m = $n-$m-1;}
+				return ($a[$m]);
+			}
+		}
+	}
 }
 
 //median(array)
