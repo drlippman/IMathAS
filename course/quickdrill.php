@@ -8,6 +8,10 @@
 //					 1 - show score, but don't reshow w answer
 //					 2 - don't show score
 //					 3 - don't show score; show answer button
+//					 4 - show score, don't show answer, make students redo
+//		n=#  do n questions then stop
+//		nc=#  do until nc questions are correct then stop
+//		t=#  do as many questions as possible in t seconds
 
 require("../validate.php");
 require("../assessment/displayq2.php");
@@ -27,11 +31,21 @@ if (isset($sessiondata['drill']) && empty($_GET['id'])) {
 	if (isset($sessiondata['drill']['n'])) {
 		$n = $sessiondata['drill']['n'];
 	}
+	if (isset($sessiondata['drill']['nc'])) {
+		$nc = $sessiondata['drill']['nc'];
+	}
 	$scores = $sessiondata['drill']['scores'];
+	
+	$showscore = ($sa==0 || $sa==1 || $sa==4);
+	
 } else {
 	//first access - load into sessiondata and refresh
-	if (empty($_GET['id'])) {
-		echo "Error: Need to supply question ID in URL";
+	if (empty($_GET['id']) || $_GET['id']=='new') {
+		if ($myrights>10) {
+			linkgenerator();
+		} else {
+			echo "Error: Need to supply question ID in URL";
+		}
 		exit;
 	} else {
 		$sessiondata['drill'] = array();
@@ -58,6 +72,10 @@ if (isset($sessiondata['drill']) && empty($_GET['id'])) {
 		$sessiondata['drill']['n'] = $_GET['n'];
 		$sessiondata['drill']['mode'] = 'cntup';
 	}
+	if (!empty($_GET['nc'])) {
+		$sessiondata['drill']['nc'] = $_GET['nc'];
+		$sessiondata['drill']['mode'] = 'cntup';
+	}
 	if ($sessiondata['drill']['mode']=='cntup' || $sessiondata['drill']['mode']=='cntdown') {
 		$sessiondata['drill']['starttime'] = time();
 	}
@@ -75,8 +93,12 @@ if (isset($_POST['seed'])) {
 	$page_scoreMsg =  printscore($score,$qsetid,$_POST['seed']);
 	if (getpts($score)<1 && $sa==0) {
 		$showans = true;
+		$seed = $_POST['seed'];
+	} else if (getpts($score)<1 && $sa==4) {
+		$seed = $_POST['seed'];
 	} else {
 		unset($lastanswers);
+		$seed = rand(1,9999);
 	}
 	$scores[] = $score;
 	$sessiondata['drill']['scores'] = $scores;
@@ -88,11 +110,12 @@ if (isset($_POST['seed'])) {
 } else {
 	$page_scoreMsg = '';
 	$curscore = 0;
+	$seed = rand(1,9999);
 }
 
 //$sessiondata['coursetheme'] = $coursetheme;
 $flexwidth = true; //tells header to use non _fw stylesheet
-$placeinhead = '<style type="text/css">div.question {width: auto;} div.review {width: auto;}</style>';
+$placeinhead = '<style type="text/css">div.question {width: auto;} div.review {width: auto; margin-top: 5px;}</style>';
 $useeditor = 1;
 require("../assessment/header.php");
 if ($cid!=0) {
@@ -108,7 +131,7 @@ if ($mode=='cntup' || $mode=='cntdown') {
 	} else if ($mode=='cntdown') {
 		$cur = $timelimit - ($now - $starttime);
 	}
-	if ($cur <= 0) {
+	if ($mode=='cntdown' && $cur <= 0) {
 		$timesup = true;	
 	}
 	if ($cur > 3600) {
@@ -122,20 +145,62 @@ if ($mode=='cntup' || $mode=='cntdown') {
 	$seconds = $cur;
 }
 
-if (isset($n) && $curscore==$n) {  //if student has completed their n questions
+if (isset($n) && count($scores)==$n && !$showans) {  //if student has completed their n questions
 	//print end-of-drill message for student
 	//show time taken	
-	echo "All done";
+	echo "<p>$n questions completed in ";
+	if ($hours>0) { echo "$hours hours ";}
+	if ($minutes>0) { echo "$minutes minutes ";}
+	echo "$seconds seconds</p>";
+	echo "<p>Score:  $curscore out of ".count($scores)." possible</p>";
+	$addr = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php?id=$qsetid&cid=$cid&sa=$sa&n=$n";
+	echo "<p><a href=\"$addr\">Again</a></p>";
+	require("../footer.php");
+	exit;
+}
+
+if (isset($nc) && $curscore==$nc) {  //if student has completed their nc questions correctly
+	//print end-of-drill message for student
+	//show time taken	
+	echo "<p>$nc questions completed correctly in ";
+	if ($hours>0) { echo "$hours hours ";}
+	if ($minutes>0) { echo "$minutes minutes ";}
+	echo "$seconds seconds</p>";
+	
+	echo "<p>".count($scores)." tries used</p>";
+	$addr = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php?id=$qsetid&cid=$cid&sa=$sa&nc=$nc";
+	echo "<p><a href=\"$addr\">Again</a></p>";
+	require("../footer.php");
 	exit;
 }
 if ($timesup == true) { //if time has expired
 	//print end-of-drill success message for student
 	//show total q's correct
-	echo "Time's up";
+	$cur = $timelimit;
+	if ($cur > 3600) {
+		$hours = floor($cur/3600);
+		$cur = $cur - 3600*$hours;
+	} else { $hours = 0;}
+	if ($cur > 60) {
+		$minutes = floor($cur/60);
+		$cur = $cur - 60*$minutes;
+	} else {$minutes=0;}
+	$seconds = $cur;
+	echo "<p>Score:  $curscore out of ".count($scores)." possible</p>";
+	echo "<p>In ";
+	if ($hours>0) { echo "$hours hours ";}
+	if ($minutes>0) { echo "$minutes minutes ";}
+	echo "$seconds seconds</p>";
+	$addr = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php?id=$qsetid&cid=$cid&sa=$sa&t=$timelimit";
+	echo "<p><a href=\"$addr\">Again</a></p>";
+	require("../footer.php");
 	exit;
 }
 
-
+if ($showscore) {
+	echo '<div class="review">Current score: '.$curscore." out of ".count($scores);
+	echo '</div>';
+}
 if ($mode=='cntup' || $mode=='cntdown') {
 	echo "<script type=\"text/javascript\">\n";
 	echo " hours = $hours; minutes = $minutes; seconds = $seconds; done=false;\n";	
@@ -147,7 +212,6 @@ if ($mode=='cntup' || $mode=='cntdown') {
 	}
 	echo "    if (seconds==0 && minutes==0 && hours==0) {done=true; ";
 	echo "		var theform = document.getElementById(\"qform\");";
-	echo "		alert(document.getElementById(\"qform\"));";
 	echo "		if (doonsubmit(theform,true,true)) { theform.submit(); } \n"; 
 	//setTimeout('document.getElementById(\"qform\").submit()',1000);} \n";
 	echo "		return 0;";
@@ -167,15 +231,20 @@ if ($mode=='cntup' || $mode=='cntdown') {
 	echo "	  document.getElementById('timer').innerHTML = str;\n";
 	echo "    if (!done) {setTimeout(\"updatetime()\",1000);}\n";
 	echo " }\n";
+	echo "function focusfirst() { ";
+	echo "	  var el = document.getElementById(\"qn0\");";
+	echo "    if (el != null) {el.focus();}";
+	echo " }";
 	//echo " //updatetime();\n";
 	echo " initstack.push(updatetime);";
+	echo " initstack.push(focusfirst);";
 	echo "</script>\n";
-	echo "<div class=right id=timelimitholder>Time: <span id=\"timer\" ";
+	echo "<div class=right id=timelimitholder>Time: <span id=\"timer\" style=\"font-size: 120%; color: red;\" ";
 	echo ">$hours:$minutes:$seconds</span></div>\n";
 		
 }
 
-if ($page_scoreMsg != '' && $sa < 2) {
+if ($page_scoreMsg != '' && $showscore) {
 	echo '<div class="review">Score on last question: '.$page_scoreMsg;
 	echo '</div>';
 }
@@ -183,7 +252,7 @@ if ($page_scoreMsg != '' && $sa < 2) {
 if ($showans) {
 	echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit()\">\n";
 	echo "<p>Displaying last question with solution <input type=submit name=\"next\" value=\"New Question\"/></p>\n";
-	displayq(0,$qsetid,$_POST['seed'],2,true,0);
+	displayq(0,$qsetid,$seed,2,true,0);
 	echo "</form>\n";
 } else {
 	if ($sa==3) {
@@ -191,7 +260,6 @@ if ($showans) {
 	} else {
 		$doshowans = 0;
 	}
-	$seed = rand(1,9999);
 	echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit()\">\n";
 	echo "<input type=\"hidden\" name=\"seed\" value=\"$seed\" />";
 	displayq(0,$qsetid,$seed,$doshowans,true,0);
@@ -316,3 +384,64 @@ function getpts($sc) {
 		return round($tot,1);
 	}
 }
+
+function linkgenerator() {
+	$addr = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php";
+	?>
+<html>
+<head>
+ <title>Quick Drill Link Generator</title>
+ <script type="text/javascript">
+ var baseaddr = "<?php echo $addr;?>";
+ function makelink() {
+	 id = document.getElementById("qid").value;
+	 if (id=='') {alert("Question ID is required"); return false;}
+	 cid = document.getElementById("cid").value;
+	 sa = document.getElementById("sa").value;
+	 mode = document.getElementById("type").value;
+	 val = document.getElementById("val").value;
+	 if (mode!='none' && val=='') { alert("need to specify N"); return false;}
+	 var url = baseaddr + '?id=' + id + '&sa='+sa;
+	 if (cid != '') {
+		url += '&cid='+cid;	 
+	 }
+	 if (mode != 'none') {
+		 url += '&'+mode+'='+val;
+	 }
+	 document.getElementById("output").innerHTML = "<p>URL to use: "+url+"</p><p><a href=\""+url+"\" target=\"_blank\">Try it</a></p>"; 
+ }
+ </script>
+ </head>
+ <body>
+ <h2>Quick Drill Link Generator</h2>
+ <table border=0>
+ <tr><td>Question ID to use:</td><td><input type="text" size="5" id="qid" /></td></tr>
+ <tr><td>Course ID (optional):</td><td><input type="text" size="5" id="cid" /></td></tr>
+ <tr><td>Show answer option:</td><td><select id="sa">
+ 	<option value="0">Show score - reshow question with answer if wrong</option>
+	<option value="1">Show score - don't reshow question w answer if wrong</option>
+	<option value="4">Show score - don't show answer - make student redo same version if missed</option>
+	<option value="2">Don't show score at all</option>
+	<option value="3">Flash Cards Style: don't show score, but use Show Answer button</option>
+	</select></td></tr>
+ <tr><td>Behavior:</td><td><select id="type">
+ 	<option value="none">Just keep asking questions forever</option>
+	<option value="n">Do N questions, then stop</option>
+	<option value="nc">Do until N questions are correct, then stop</option>
+	<option value="t">Do as many questions as possible in N seconds</option>
+	</select><br/>
+	Where N = <input type="text" size="4" id="val"/></td></tr>
+</table>
+
+<input type="button" value="Generate Link" onclick="makelink()"/>
+
+<div id="output"></div>
+</body>
+</html>
+ 
+
+	<?php
+	
+}
+
+?>
