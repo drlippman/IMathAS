@@ -369,4 +369,21 @@ div.tips {
 	position:relative;
 	left:0px;
 }
+/*for eqn tips*/
+.ehdd {
+	position: absolute; 
+	background: #669;
+	display:none; 
+	color: #fff;
+	font-size: 75%;
+	padding: 0px 4px;
+}
+.eh {
+	position: absolute;
+	background: #669;
+	color: #fff;
+	display: none;
+	padding: 0px 4px;
+	font-size: 75%;
+}
 

@@ -8,7 +8,7 @@ require_once("mathphp2.php");
 require("interpret5.php");
 require("macros.php");
 function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false) {
-	global $imasroot, $myrights;
+	global $imasroot, $myrights, $showtips;
 	srand($seed);
 	if (is_int($doshowans) && $doshowans==2) {
 		$doshowans = true;
@@ -170,10 +170,16 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			if (strpos($toevalqtxt,"\$previewloc[$iidx]")===false) {
 				$answerbox[$iidx] .= $previewloc[$iidx];
 			}
+			if (isset($hideanswerboxes) && $hideanswerboxes==true) {
+				$answerbox[$iidx] = '';
+			}
 		}
 	} else {
 		if (strpos($toevalqtxt,'$previewloc')===false) {
 			$answerbox .= $previewloc;
+		}
+		if (isset($hideanswerboxes) && $hideanswerboxes==true) {
+			$answerbox = '';
 		}
 	}
 	
@@ -222,8 +228,10 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	}
 	echo "<div>";
 	foreach($tips as $iidx=>$tip) {
-		if (!isset($hidetips) && !$seqinactive) {
-			echo "<p class=\"tips\">Box ".($iidx+1).": $tip</p>";
+		if (!isset($hidetips) && !$seqinactive && $showtips>0) {
+			echo "<p class=\"tips\" ";
+			if ($showtips!=1) { echo 'style="display:none;" ';}
+			echo ">Box ".($iidx+1).": <span id=\"tips$qnidx-$iidx\">$tip</span></p>";
 		}
 		if ($doshowans && (!isset($showanswer) || (is_array($showanswer) && !isset($showanswer[$iidx]))) && $shanspt[$iidx]!=='') {
 			if ($nosabutton) {
@@ -403,7 +411,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans) {
 
 
 function makeanswerbox($anstype, $qn, $la, $options,$multi) {
-	global $myrights, $useeqnhelper;
+	global $myrights, $useeqnhelper, $useeqntips;
 	$out = '';
 	$tip = '';
 	$sa = '';
@@ -431,18 +439,28 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$leftb = '';
 			$rightb = '';
 		}
-		$out .= "$leftb<input ";
-		if ($displayformat=='alignright') { $out .= 'style="text-align: right;" ';}
-		$out .= "class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" />$rightb";
 		if ($answerformat=='list' || $answerformat=='exactlist' ||  $answerformat=='orderedlist') {
 			$tip = "Enter your answer as a list of numbers separated with commas: Example: -4, 3, 2.5<br/>";
+			$shorttip = "Enter a list of numbers";
 		} else {
 			$tip = "Enter your answer as a number.  Examples: 3, -4, 5.5<br/>";
+			$shorttip = "Enter a number";
 		}
 		$tip .= "Enter DNE for Does Not Exist, oo for Infinity";
 		if (isset($reqdecimals)) {
 			$tip .= "<br/>Your answer should be accurate to $reqdecimals decimal places.";
 		}
+		$out .= "$leftb<input ";
+		if ($displayformat=='alignright') { $out .= 'style="text-align: right;" ';}
+		if ($useeqntips==2) { //eqntips: work in progress
+			if ($multi==0) {
+				$qnref = "$qn-0";
+			} else {
+				$qnref = ($multi-1).'-'.$qn;
+			}
+			$out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
+		}
+		$out .= "class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" />$rightb";
 		if (isset($answer)) {
 			$sa = $answer;
 		}
@@ -745,7 +763,19 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$rightb = '';
 		}
 		$out .= "$leftb<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" ";
-		if ($useeqnhelper) {
+		
+		if ($useeqntips==2) { //eqntips: work in progress
+			if ($multi==0) {
+				$qnref = "$qn-0";
+			} else {
+				$qnref = ($multi-1).'-'.$qn;
+			}
+			if ($useeqnhelper) {
+				$out .= "onfocus=\"showeedd('tc$qn');showehdd('tc$qn','Enter a mathematical expression','$qnref');\" onblur=\"hideee();hideeh();\" ";
+			} else {
+				$out .= "onfocus=\"showehdd('tc$qn','Enter a mathematical expression','$qnref')\" onblur=\"hideeh()\" ";
+			}
+		} else if ($useeqnhelper) {
 			$out .= "onfocus=\"showeedd('tc$qn')\" onblur=\"hideee()\" ";
 		}
 		$out .= "/>$rightb\n";
@@ -1128,12 +1158,17 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" />\n";
 		if (!isset($hidepreview)) {
-			$preview .= "<input type=button class=btn value=Preview onclick=\"intcalculate('tc$qn','p$qn')\" /> &nbsp;\n";
+			$preview .= "<input type=button class=btn value=Preview onclick=\"intcalculate('tc$qn','p$qn','$answerformat')\" /> &nbsp;\n";
 		}
 		$preview .= "<span id=p$qn></span> ";
-		$out .= "<script type=\"text/javascript\">intcalctoproc[intcalctoproc.length] = $qn;</script>\n";
-		$tip = "Enter your answer using interval notation.  Example: [2.1,5.6) <br/>";
-		$tip .= "Use U for union to combine intervals.  Example: (-oo,2] U [4,oo)<br/>";
+		$out .= "<script type=\"text/javascript\">intcalctoproc[intcalctoproc.length] = $qn; calcformat[$qn] = '$answerformat';</script>\n";
+		if (in_array('inequality',$ansformats)) {
+			$tip = "Enter your answer using inequality notation.  Example: 3 <= x < 4 <br/>";
+			$tip .= "Use or to combine intervals.  Example: x < 2 or x >= 3<br/>";
+		} else {
+			$tip = "Enter your answer using interval notation.  Example: [2.1,5.6) <br/>";
+			$tip .= "Use U for union to combine intervals.  Example: (-oo,2] U [4,oo)<br/>";
+		}
 		//$tip .= "Enter values as numbers (like 5, -3, 2.2) or as calculations (like 5/3, 2^3, 5+4)<br/>";
 		//$tip .= "Enter DNE for an empty set, oo for Infinity";
 		$tip .= formathint('each value',$ansformats,'calcinterval');
@@ -1141,7 +1176,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$tip .= "<br/>Your numbers should be accurate to $reqdecimals decimal places.";
 		}
 		if (isset($answer)) {
-			$sa = '`'.str_replace('U','uu',$answer).'`';
+			if (in_array('inequality',$ansformats)) {
+				$sa = '`'.intervaltoineq($answer,'x').'`';
+			} else {
+				$sa = '`'.str_replace('U','uu',$answer).'`';
+			}
 		}
 		
 	} else if ($anstype == 'draw') {
@@ -2929,8 +2968,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$filename = preg_replace('/[^\w\.]/','',$filename);
 		$extension = strtolower(strrchr($filename,"."));
 		$badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p",".exe");
+		if ($GLOBALS['scoremessages'] != '') {
+			$GLOBALS['scoremessages'] .= '<br/>';
+		}
+		$GLOBALS['scoremessages'] .= "Upload of $filename: ";
 		if (in_array($extension,$badextensions)) {
 			$GLOBALS['partlastanswer'] = "Error - Invalid file type";
+			$GLOBALS['scoremessages'] .= "Error - Invalid file type";
 			return 0;
 		}
 		if (isset($GLOBALS['testsettings']) && isset($GLOBALS['sessiondata']['groupid']) && $GLOBALS['testsettings']>0 && $GLOBALS['sessiondata']['groupid']>0) {
@@ -2939,10 +2983,12 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$s3asid = $GLOBALS['asid'];
 		} else {
 			$GLOBALS['partlastanswer'] = "Error - no asid";
+			$GLOBALS['scoremessages'] .= "Error - no asid";
 			return 0;
 		}
 		if ($s3asid==0) {
 			$GLOBALS['partlastanswer'] = "Error - File not uploaded in preview";
+			$GLOBALS['scoremessages'] .= "Error - File not uploaded in preview";
 			return 0;
 		}
 		if (isset($GLOBALS['isreview']) && $GLOBALS['isreview']==true) {
@@ -2954,15 +3000,18 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$s3object = "adata/$s3asid/$filename";
 			if (storeuploadedfile("qn$qn",$s3object)) {
 				$GLOBALS['partlastanswer'] = "@FILE:$filename@";
+				$GLOBALS['scoremessages'] .= "Successful";
 			} else {
 				//echo "Error storing file";
 				$GLOBALS['partlastanswer'] = "Error storing file";
+				$GLOBALS['scoremessages'] .= "Error storing file";
 				
 			}
 			return 0;
 		} else {
 			//echo "Error uploading file";
 			$GLOBALS['partlastanswer'] = "Error uploading file";
+			$GLOBALS['scoremessages'] .= "Error uploading file";
 			return 0;
 		}
 	}

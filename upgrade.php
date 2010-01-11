@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 21;
+$latest = 22;
 
 if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 	$handle = fopen("upgradecounter.txt",'w');
@@ -213,6 +213,10 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 		}
 		if ($last < 21) {
 			 $query = "ALTER TABLE `imas_courses` ADD `showlatepass` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0';"; 
+			 mysql_query($query) or die("Query failed : " . mysql_error());
+		}
+		if ($last < 22) {
+			 $query = "ALTER TABLE `imas_assessments` ADD `showtips` TINYINT( 1 ) NOT NULL DEFAULT '1';"; 
 			 mysql_query($query) or die("Query failed : " . mysql_error());
 		}
 		$handle = fopen("upgradecounter.txt",'w');

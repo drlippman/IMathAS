@@ -348,7 +348,7 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 						$i++;
 						if ($i==$len) {break;}
 						$c= $str{$i};
-					} else if ($d=='-' && ($str{$i+2}>='0' && $str{$i+2}<='9')) {
+					} else if (($d=='-'||$d=='+') && ($str{$i+2}>='0' && $str{$i+2}<='9')) {
 						$out .= $c.$d;
 						$i+= 2;
 						if ($i>=$len) {break;}

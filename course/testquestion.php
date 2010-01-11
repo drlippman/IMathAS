@@ -82,7 +82,7 @@ if ($myrights<20) {
 	$descr = mysql_result($result,0,2);
 	$lastmod = date("m/d/y g:i a",mysql_result($result,0,3));
 	$ancestors = mysql_result($result,0,4);
-
+	$showtips = 1;
 	
 	$query = "SELECT imas_libraries.name FROM imas_libraries,imas_library_items WHERE imas_libraries.id=imas_library_items.libid AND imas_library_items.qsetid='{$_GET['qsetid']}'";
 	$resultLibNames = mysql_query($query) or die("Query failed : " . mysql_error());

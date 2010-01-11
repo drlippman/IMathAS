@@ -139,6 +139,9 @@ if (!(isset($teacherid))) {
 			if (isset($_POST['chghints'])) {
 				$sets[] = "showhints='$showhints'";
 			}
+			if (isset($_POST['chgshowtips'])) {
+				$sets[] = "showtips='{$_POST['showtips']}'";
+			}
 			if (isset($_POST['chgnoprint'])) {
 				$sets[] = "noprint='$noprint'";
 			}
@@ -505,6 +508,14 @@ function copyfromtoggle(frm,mark) {
 				<td><input type="checkbox" name="chghints"/></td>
 				<td class="r">Show hints when available? </td>
 				<td><input type="checkbox" name="showhints" checked="checked"></td>
+			</tr>
+			<tr class="coptr">
+				<td><input type="checkbox" name="chgshowtips"/></td>
+				<td class="r">Show answer entry tips?</td>
+				<td><select name="showtips">
+					<option value="0" >No</option>
+					<option value="1" selected="selected">Yes</option>
+				     </select></td>
 			</tr>
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgallowlate"/></td>

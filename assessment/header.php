@@ -52,7 +52,7 @@ if ($sessiondata['graphdisp']==1) {
 	echo "<script src=\"$imasroot/javascript/mathjs.js\" type=\"text/javascript\"></script>\n";
 }
 ?>
-<script src="<?php echo $imasroot . "/javascript/AMhelpers_min.js?v=100909";?>" type="text/javascript"></script>
+<script src="<?php echo $imasroot . "/javascript/AMhelpers_min.js?v=011010";?>" type="text/javascript"></script>
 <script src="<?php echo $imasroot . "/javascript/confirmsubmit.js";?>" type="text/javascript"></script>
 <!--[if IE]><script type="text/javascript" src="<?php echo $imasroot;?>/javascript/excanvas_min.js"></script><![endif]-->
 <script type="text/javascript" src="<?php echo $imasroot;?>/javascript/drawing_min.js?v=121809"></script>

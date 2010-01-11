@@ -403,9 +403,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$searchlikes = '';
 		} else {
 			$searchterms = explode(" ",$safesearch);
-			$searchlikes = "(imas_questionset.description LIKE '%".implode("%' AND imas_questionset.description LIKE '%",$searchterms)."%') AND ";
+			$searchlikes = "((imas_questionset.description LIKE '%".implode("%' AND imas_questionset.description LIKE '%",$searchterms)."%') ";
 			if (substr($safesearch,0,3)=='id=') {
 				$searchlikes = "imas_questionset.id='".substr($safesearch,3)."' AND ";
+			} else if (is_numeric($safesearch)) {
+				$searchlikes .= "OR imas_questionset.id='$safesearch') AND ";
+			} else {
+				$searchlikes .= ") AND";
 			}
 		}
 		

@@ -130,7 +130,7 @@ function ineqtointerval(strw) {
 			if (pat[1]=='<=') { out = '(-oo,'+pat[2]+']';} else
 			if (pat[1]=='>') { out = '('+pat[2]+',oo)';} else
 			if (pat[1]=='>=') { out = '['+pat[2]+',oo)';}
-		} else if (str.match(/all\s+real/i)) {
+		} else if (str.match(/all\s*real/i)) {
 			out = '(-oo,oo)';
 		} else {
 			out = '';
@@ -141,16 +141,25 @@ function ineqtointerval(strw) {
 	return out;
 }
 //preview for calcinterval type 
-function intcalculate(inputId,outputId) {
+function intcalculate(inputId,outputId,format) {
   var fullstr = document.getElementById(inputId).value;
-  fullstr = fullstr.replace(/\s+/g,'');
+  
   if (fullstr.match(/DNE/i)) {
 	  fullstr = fullstr.toUpperCase();
-  } else if (fullstr=='') {
+  } else if (fullstr.replace(/\s+/g,'')=='') {
 	  fullstr = "no answer given";
   } else {
 	  var calcvals = new Array();
 	  var calcstrarr = new Array();
+	  if (format.indexOf('inequality')!=-1) {
+		fullstr = fullstr.replace(/or/g,' or ');
+		var origstr = fullstr;
+		fullstr = ineqtointerval(fullstr);
+		var pat = str.match(/([a-zA-Z]+)/);
+		var ineqvar = pat[1];
+	  } else {
+		  fullstr = fullstr.replace(/\s+/g,'');
+	  }
 	  var strarr = fullstr.split(/U/);
 	  var isok = true;
 	  for (i=0; i<strarr.length; i++) {
@@ -186,10 +195,38 @@ function intcalculate(inputId,outputId) {
 			  }
 		  }
 		  strarr[i] = sm + vals[0] + ',' + vals[1] + em;
-		  calcstrarr[i] = sm + calcvals[0] + ',' + calcvals[1] + em;
+		  if (format.indexOf('inequality')!=-1) {
+			  if (calcvals[0].match(/oo/)) {
+				  if (calcvals[1].match(/oo/)) {
+					  calcstrarr[i] = 'RR';
+				  } else {
+					  calcstrarr[i] = ineqvar + (em==']'?'le':'lt') + calcvals[1];
+				  }
+			  } else if (calcvals[1].match(/oo/)) { 
+				  calcstrarr[i] = ineqvar + (sm=='['?'ge':'gt') + calcvals[0];
+			  } else {
+				  calcstrarr[i] = calcvals[0] + (sm=='['?'le':'lt') + ineqvar + (em==']'?'le':'lt') + calcvals[1];
+			  }
+		  } else {
+			calcstrarr[i] = sm + calcvals[0] + ',' + calcvals[1] + em;  
+		  }
+		  
 	 }
 	 if (isok) {
-		 fullstr = '`'+strarr.join('uu') + '` = ' + calcstrarr.join(' U ');
+		 if (format.indexOf('inequality')!=-1) { 
+			 if (origstr.match(/all\s*real/)) {
+				 fullstr = origstr;
+			 } else {
+				 origstr = origstr.replace(/or/g,' \\ "or" \\ ');
+				 origstr = origstr.replace(/<=/g,'le');
+				 origstr = origstr.replace(/>=/g,'ge');
+				 origstr = origstr.replace(/</g,'lt');
+				 origstr = origstr.replace(/>/g,'gt');
+				 fullstr = '`'+origstr + '= ' + calcstrarr.join(' \\ "or" \\ ')+'`';
+			 }
+		 } else {
+			 fullstr = '`'+strarr.join('uu') + '` = ' + calcstrarr.join(' U ');
+		 }
 	 }
   }
   
@@ -588,9 +625,13 @@ function doonsubmit(form,type2,skipconfirm) {
 		nh.name = "qn" + intcalctoproc[i];
 		fullstr = document.getElementById("tc"+intcalctoproc[i]).value;
 		fullstr = fullstr.replace(/\s+/g,'');
+		
 		if (fullstr.match(/DNE/i)) {
 			  fullstr = fullstr.toUpperCase();
 		  } else {
+			  if (calcformat[intcalctoproc[i]].indexOf('inequality')!=-1) {
+				  fullstr = ineqtointerval(fullstr);
+			  }
 			  strarr = fullstr.split(/U/);
 			  for (k=0; k<strarr.length; k++) {
 				  str = strarr[k];

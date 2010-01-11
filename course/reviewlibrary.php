@@ -403,8 +403,17 @@ if ($overwriteBody==1) {
 				<option value="matching" <?php if ($lineQSet['qtype']=="matching") {echo "SELECTED";} ?>>Matching</option>
 				<option value="numfunc" <?php if ($lineQSet['qtype']=="numfunc") {echo "SELECTED";} ?>>Function</option>
 				<option value="string" <?php if ($lineQSet['qtype']=="string") {echo "SELECTED";} ?>>String</option>
+				<option value="essay" <?php if ($lineQSet['qtype']=="essay") {echo "SELECTED";} ?>>Essay</option>
+				<option value="draw" <?php if ($lineQSet['qtype']=="draw") {echo "SELECTED";} ?>>Drawing</option>
+				<option value="ntuple" <?php if ($lineQSet['qtype']=="ntuple") {echo "SELECTED";} ?>>N-Tuple</option>
+				<option value="calcntuple" <?php if ($lineQSet['qtype']=="calcntuple") {echo "SELECTED";} ?>>Calculated N-Tuple</option>
 				<option value="matrix" <?php if ($lineQSet['qtype']=="matrix") {echo "SELECTED";} ?>>Numerical Matrix</option>
 				<option value="calcmatrix" <?php if ($lineQSet['qtype']=="calcmatrix") {echo "SELECTED";} ?>>Calculated Matrix</option>
+				<option value="interval" <?php if ($lineQSet['qtype']=="interval") {echo "SELECTED";} ?>>Interval</option>
+				<option value="calcinterval" <?php if ($lineQSet['qtype']=="calcinterval") {echo "SELECTED";} ?>>Calculated Interval</option>
+				<option value="complex" <?php if ($lineQSet['qtype']=="complex") {echo "SELECTED";} ?>>Complex</option>
+				<option value="calccomplex" <?php if ($lineQSet['qtype']=="calccomplex") {echo "SELECTED";} ?>>Calculated Complex</option>
+				<option value="file" <?php if ($lineQSet['qtype']=="file") {echo "SELECTED";} ?>>File Upload</option>
 				<option value="multipart" <?php if ($lineQSet['qtype']=="multipart") {echo "SELECTED";} ?>>Multipart</option>
 			</select>
 		</p>
@@ -420,33 +429,25 @@ if ($overwriteBody==1) {
 			Common Control: 
 			<span class=pointer onclick="incboxsize('control')">[+]</span>
 			<span class=pointer onclick="decboxsize('control')">[-]</span><BR>
-			<textarea cols=60 rows=<?php if ($twobx) {echo "20";} else {echo "10";}?> id=control name=control <?php if (!$myq) echo "readonly=\"readonly\"";?>>
-				<?php echo $lineQSet['control'];?>
-			</textarea>
+			<textarea cols=60 rows=<?php if ($twobx) {echo "20";} else {echo "10";}?> id=control name=control <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $lineQSet['control'];?></textarea>
 		</div>
 		<div id=qcbox <?php if ($twobx) {echo "style=\"display: none;\"";}?>>
 			Question Control: 
 			<span class=pointer onclick="incboxsize('qcontrol')">[+]</span>
 			<span class=pointer onclick="decboxsize('qcontrol')">[-]</span><BR>
-			<textarea cols=60 rows=10 id=qcontrol name=qcontrol <?php if (!$myq) echo "readonly=\"readonly\"";?>>
-				<?php echo $lineQSet['qcontrol'];?>
-			</textarea>
+			<textarea cols=60 rows=10 id=qcontrol name=qcontrol <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $lineQSet['qcontrol'];?></textarea>
 		</div>
 		<div id=qtbox>
 			Question Text: 
 			<span class=pointer onclick="incboxsize('qtext')">[+]</span>
 			<span class=pointer onclick="decboxsize('qtext')">[-]</span><BR>
-			<textarea cols=60 rows=10 id=qtext name=qtext <?php if (!$myq) echo "readonly=\"readonly\"";?>>
-				<?php echo $lineQSet['qtext'];?>
-			</textarea>
+			<textarea cols=60 rows=10 id=qtext name=qtext <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $lineQSet['qtext'];?></textarea>
 		</div>
 		<div id=abox <?php if ($twobx) {echo "style=\"display: none;\"";}?>>
 			Answer: 
 			<span class=pointer onclick="incboxsize('answer')">[+]</span>
 			<span class=pointer onclick="decboxsize('answer')">[-]</span><BR>
-			<textarea cols=60 rows=10 id=answer name=answer <?php if (!$myq) echo "readonly=\"readonly\"";?>>
-				<?php echo $lineQSet['answer'];?>
-			</textarea>
+			<textarea cols=60 rows=10 id=answer name=answer <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $lineQSet['answer'];?></textarea>
 		</div>
 		<input type=submit name="update" value="Update">
 	</form>

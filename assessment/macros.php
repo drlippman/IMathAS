@@ -1737,4 +1737,30 @@ function formpopup($label,$content,$width=600,$height=400,$type='link') {
 	}
 }
 
+function intervaltoineq($str,$var) {
+	if ($str=='DNE') {
+		return 'DNE';
+	}
+	$arr = explode('U',$str);
+	$out = array();
+	foreach ($arr as $v) {
+		$v = trim($v);
+		$sm = $v{0};
+		$em = $v{strlen($v)-1};
+		$pts = explode(',',substr($v,1,strlen($v)-2));
+		if ($pts[0]=='-oo') {
+			if ($pts[1]=='oo') {
+				$out[] = '"all real numbers"';
+			} else {
+				$out[] = $var . ($em==']'?'le':'lt') . $pts[1];
+			}
+		} else if ($pts[1]=='oo') {
+			$out[] = $var . ($sm=='['?'ge':'gt') . $pts[0];
+		} else {
+			$out[] = $pts[0] . ($sm=='['?'le':'lt') . $var . ($em==']'?'le':'lt') . $pts[1];
+		}
+	}
+	return implode(' \\ "or" \\ ',$out);
+}
+
 ?>
