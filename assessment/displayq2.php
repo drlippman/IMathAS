@@ -1930,14 +1930,40 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 		
 		$ansformats = explode(',',$answerformat);
+		//pre-evaluate all instruction expressions - preg match all intervals.  Return array of or options
+		if (in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats) || in_array('list',$ansformats)) {
+			$anarr = explode(',',$answer);
+			foreach ($anarr as $k=>$ananswer) {
+				$aarr = explode(' or ',$ananswer);
+				foreach ($aarr as $j=>$anans) {
+					if (preg_match('/(\(|\[)([\d\.]+)\,([\d\.]+)(\)|\])/',$anans,$matches)) {
+						$aarr[$j] = $matches;
+					} else if (!is_numeric($anans) && $anans!='DNE' && $anans!='oo' && $anans!='+oo' && $anans!='-oo') {
+						$aarr[$j] = eval('return('.mathphp($anans,null).');');
+					}
+				}
+				$anarr[$k] = $aarr;
+			}
+		} else {
+			$aarr = explode(' or ',$answer);
+			foreach ($aarr as $j=>$anans) {
+				if (preg_match('/(\(|\[)([\d\.]+)\,([\d\.]+)(\)|\])/',$anans,$matches)) {
+					$aarr[$j] = $matches;
+				} else if (!is_numeric($anans) && $anans!='DNE' && $anans!='oo' && $anans!='+oo' && $anans!='-oo') {
+					$aarr[$j] = eval('return('.mathphp($anans,null).');');
+				}
+			}
+			$answer = $aarr;
+		}
+	
 		if (in_array('exactlist',$ansformats)) {
 			$gaarr = explode(',',$givenans);
-			$anarr = explode(',',$answer);
+			//$anarr = explode(',',$answer);
 			$orarr = explode(',',$_POST["tc$qn"]);
 		} else if (in_array('orderedlist',$ansformats)) {
 			$gamasterarr = explode(',',$givenans);
 			$gaarr = $gamasterarr;
-			$anarr = explode(',',$answer);
+			//$anarr = explode(',',$answer);
 			$orarr = explode(',',$_POST["tc$qn"]);
 		} else if (in_array('list',$ansformats)) {
 			$tmp = explode(',',$givenans);
@@ -1956,14 +1982,16 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				}
 				$lastval = $v;
 			}
-			$tmp = explode(',',$answer);
+			
+			$tmp = $anarr;
 			sort($tmp);
 			$anarr = array($tmp[0]);
 			for ($i=1;$i<count($tmp);$i++) {
-				if ($tmp[$i]-$tmp[$i-1]>1E-12) {
+				if (!is_numeric($tmp[$i]) || !is_numeric($tmp[$i-1]) || $tmp[$i]-$tmp[$i-1]>1E-12) {
 					$anarr[] = $tmp[$i];
 				}
 			}
+			
 		} else {
 			$gaarr = array(str_replace(',','',$givenans));
 			$anarr = array($answer);
@@ -1978,7 +2006,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 		
 		$correct = 0;
-		foreach($anarr as $i=>$answer) {
+		foreach($anarr as $i=>$anss) {
 			$foundloc = -1;
 			if (in_array('orderedlist',$ansformats)) {
 				$gaarr = array($gamasterarr[$i]);
@@ -1987,24 +2015,33 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				if (!checkanswerformat($orarr[$j],$ansformats)) {
 					continue;
 				} 
-				
-				$anss = explode(' or ',$answer);
+				//removed - done above already
+				//$anss = explode(' or ',$answer);  
 				foreach ($anss as $anans) {
 					if (!is_numeric($anans)) {
 						$givenans = trim($givenans);
+						/* moved to preprocessing
 						if (preg_match('/(\(|\[)([\d\.]+)\,([\d\.]+)(\)|\])/',$anans,$matches)) {
 							if (($matches[1]=="(" && $givenans>$matches[2]) || ($matches[1]=="[" && $givenans>=$matches[2])) {
 								if (($matches[4]==")" && $givenans<$matches[3]) || ($matches[4]=="]" && $givenans<=$matches[3])) {
 									$correct += 1; $foundloc = $j; break 2; 
 								} 
 							} 
-						} else	if ($anans=="DNE" && strtoupper($givenans)=="DNE") {
+						} */
+						if (is_array($anans)) {
+							if (($anans[1]=="(" && $givenans>$anans[2]) || ($anans[1]=="[" && $givenans>=$anans[2])) {
+								if (($anans[4]==")" && $givenans<$anans[3]) || ($anans[4]=="]" && $givenans<=$anans[3])) {
+									$correct += 1; $foundloc = $j; break 2; 
+								} 
+							} 
+						} else if ($anans=="DNE" && strtoupper($givenans)=="DNE") {
 							$correct += 1; $foundloc = $j; break 2;
 						} else if (($anans=="+oo" || $anans=="oo") && ($givenans=="+oo" || $givenans=="oo")) {
 							$correct += 1; $foundloc = $j; break 2;
 						} else if ($anans=="-oo" && $givenans=="-oo") {
 							$correct += 1; $foundloc = $j; break 2;
-						} else if (is_numeric($givenans)) {
+						}/* moved to preprocessing
+						else if (is_numeric($givenans)) {
 							//try evaling answer
 							$eanans = eval('return('.mathphp($anans,null).');');
 							if (isset($abstolerance)) {
@@ -2012,7 +2049,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 							} else {
 								if (abs($eanans - $givenans)/(abs($eanans)+.0001) < $reltolerance+1E-12) {$correct += 1; $foundloc = $j; break 2;} 
 							}
-						}
+						}*/
 					} else if (is_numeric($givenans)) {
 						if (isset($abstolerance)) {
 							if (abs($anans-$givenans) < $abstolerance+1E-12) {$correct += 1; $foundloc = $j; break 2;} 	
