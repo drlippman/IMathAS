@@ -9,7 +9,7 @@ array_push($allowedmacros,"loadlibrary","importcodefrom","includecodefrom","arra
 $disallowedvar = array('$link','$qidx','$qnidx','$seed','$qdata','$toevalqtxt','$la','$laarr','$shanspt','$GLOBALS','$laparts','$anstype','$kidx','$iidx','$tips','$options','$partla','$partnum','$score','$disallowedvar','$allowedmacros','$wherecount','$countcnt');
 
 //main interpreter function.  Returns PHP code string, or HTML if blockname==qtext
-function interpret($blockname,$anstype,$str,$countcnt=0)
+function interpret($blockname,$anstype,$str,$countcnt=1)
 {
 	if ($blockname=="qtext") {
 		$str = preg_replace_callback('/(include|import)qtextfrom\((\d+)\)/','getquestionqtext',$str);
@@ -54,7 +54,7 @@ function interpretline($str,$anstype,$countcnt) {
 	$closeparens = 0;
 	$symcnt = 0;
 	//get tokens from tokenizer
-	$syms = tokenize($str,$anstype);
+	$syms = tokenize($str,$anstype,$countcnt);
 	$k = 0;
 	$symlen = count($syms);
 	//$lines holds lines of code; $bits holds symbols for the current line. 
@@ -196,10 +196,18 @@ function interpretline($str,$anstype,$countcnt) {
 					//handle $a = rand() where ($a==b) if ($c==0)
 					$wherecond = implode('',array_slice($bits,$whereloc+1,$ifloc-$whereloc-1));
 					$ifcond = implode('',array_slice($bits,$ifloc+1));
-					$bits = array('if ('.$ifcond.') {$wherecount['.$countcnt.']=0;do{'.$wheretodo.';$wherecount['.$countcnt.']++;} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200); if ($wherecount['.$countcnt.']==200) {echo "where not met in 200 iterations";}}');
+					if ($countcnt==1) { //if outermost 
+						$bits = array('if ('.$ifcond.') {$wherecount[0]=0;$wherecount['.$countcnt.']=0;do{'.$wheretodo.';$wherecount['.$countcnt.']++;$wherecount[0]++;} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200 && $wherecount[0]<1000); if ($wherecount['.$countcnt.']==200) {echo "where not met in 200 iterations";}; if ($wherecount[0]>=1000 && $wherecount[0]<2000) {echo "nested where not met in 1000 iterations";}}');
+					} else {
+						$bits = array('if ('.$ifcond.') {$wherecount['.$countcnt.']=0;do{'.$wheretodo.';$wherecount['.$countcnt.']++;$wherecount[0]++;} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200 && $wherecount[0]<1000); if ($wherecount['.$countcnt.']==200) {echo "where not met in 200 iterations";$wherecount[0]=5000;} }');
+					}
 				} else {
 					$wherecond = implode('',array_slice($bits,$whereloc+1));
-					$bits = array('$wherecount['.$countcnt.']=0;do{'.$wheretodo.';$wherecount['.$countcnt.']++;} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200); if ($wherecount['.$countcnt.']==200) {echo "where not met in 200 iterations";}');
+					if ($countcnt==1) {
+						$bits = array('$wherecount[0]=0;$wherecount['.$countcnt.']=0;do{'.$wheretodo.';$wherecount['.$countcnt.']++;$wherecount[0]++;} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200 && $wherecount[0]<1000); if ($wherecount['.$countcnt.']==200) {echo "where not met in 200 iterations";}; if ($wherecount[0]>=1000 && $wherecount[0]<2000 ) {echo "nested where not met in 1000 iterations";}');
+					} else {
+						$bits = array('$wherecount['.$countcnt.']=0;do{'.$wheretodo.';$wherecount['.$countcnt.']++;$wherecount[0]++;} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200 && $wherecount[0]<1000); if ($wherecount['.$countcnt.']==200) {echo "where not met in 200 iterations";$wherecount[0]=5000;}; ');
+					}
 				}
 				
 			} else if ($ifloc > 0) {
@@ -278,7 +286,7 @@ function interpretline($str,$anstype,$countcnt) {
 //eat up extra whitespace at end
 //return array of arrays: array($symbol,$symtype)
 //types: 1 var, 2 funcname (w/ args), 3 num, 4 parens, 5 curlys, 6 string, 7 endofline, 8 control, 9 error, 0 other, 11 array index []
-function tokenize($str,$anstype) {
+function tokenize($str,$anstype,$countcnt) {
 	global $allowedmacros;
 	global $mathfuncs;
 	global $disallowedwords,$disallowedvar;
