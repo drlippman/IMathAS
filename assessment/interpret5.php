@@ -6,10 +6,10 @@
 //TODO:  handle for ($i=0..2) { to handle expressions, array var, etc. for 0 and 2
 //require_once("mathphp.php");
 array_push($allowedmacros,"loadlibrary","importcodefrom","includecodefrom","array","off","true","false","e","pi","null","setseed","if","for","where");
-$disallowedvar = array('$link','$qidx','$qnidx','$seed','$qdata','$toevalqtxt','$la','$laarr','$shanspt','$GLOBALS','$laparts','$anstype','$kidx','$iidx','$tips','$options','$partla','$partnum','$score','$disallowedvar','$allowedmacros');
+$disallowedvar = array('$link','$qidx','$qnidx','$seed','$qdata','$toevalqtxt','$la','$laarr','$shanspt','$GLOBALS','$laparts','$anstype','$kidx','$iidx','$tips','$options','$partla','$partnum','$score','$disallowedvar','$allowedmacros','$wherecount','$countcnt');
 
 //main interpreter function.  Returns PHP code string, or HTML if blockname==qtext
-function interpret($blockname,$anstype,$str)
+function interpret($blockname,$anstype,$str,$countcnt=0)
 {
 	if ($blockname=="qtext") {
 		$str = preg_replace_callback('/(include|import)qtextfrom\((\d+)\)/','getquestionqtext',$str);
@@ -23,7 +23,7 @@ function interpret($blockname,$anstype,$str)
 		$str = str_replace("\r\n","\n",$str);
 		$str = str_replace("&&\n","<br/>",$str);
 		$str = str_replace("&\n"," ",$str);
-		$r =  interpretline($str.';',$anstype).';';
+		$r =  interpretline($str.';',$anstype,$countcnt).';';
 		return $r;
 	}
 }
@@ -39,7 +39,7 @@ function getquestionqtext($m) {
 	}
 }
 //interpreter some code text.  Returns a PHP code string.
-function interpretline($str,$anstype) {
+function interpretline($str,$anstype,$countcnt) {
 	$str .= ';';
 	$bits = array();
 	$lines = array();
@@ -196,12 +196,11 @@ function interpretline($str,$anstype) {
 					//handle $a = rand() where ($a==b) if ($c==0)
 					$wherecond = implode('',array_slice($bits,$whereloc+1,$ifloc-$whereloc-1));
 					$ifcond = implode('',array_slice($bits,$ifloc+1));
-					$bits = array('if ('.$ifcond.') {$count=0;do{'.$wheretodo.';$count++;} while (!('.$wherecond.') && $count<200); if ($count==200) {echo "where not met in 200 iterations";}}');
+					$bits = array('if ('.$ifcond.') {$wherecount['.$countcnt.']=0;do{'.$wheretodo.';$wherecount['.$countcnt.']++;} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200); if ($wherecount['.$countcnt.']==200) {echo "where not met in 200 iterations";}}');
 				} else {
 					$wherecond = implode('',array_slice($bits,$whereloc+1));
-					$bits = array('$count=0;do{'.$wheretodo.';$count++;} while (!('.$wherecond.') && $count<200); if ($count==200) {echo "where not met in 200 iterations";}');
+					$bits = array('$wherecount['.$countcnt.']=0;do{'.$wheretodo.';$wherecount['.$countcnt.']++;} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200); if ($wherecount['.$countcnt.']==200) {echo "where not met in 200 iterations";}');
 				}
-				
 				
 			} else if ($ifloc > 0) {
 				//handle $a = b if ($c==0)
@@ -480,7 +479,7 @@ function tokenize($str,$anstype) {
 						$thisn--; //decrease nesting depth
 						if ($thisn==0) {
 							//read inside of brackets, send recursively to interpreter
-							$inside = interpretline(substr($str,$i+1,$j-$i-1),$anstype);
+							$inside = interpretline(substr($str,$i+1,$j-$i-1),$anstype,$countcnt+1);
 							if ($inside=='error') {
 								//was an error, return error token
 								return array(array('',9));
@@ -567,7 +566,7 @@ function tokenize($str,$anstype) {
 					return array(array('',9));
 				} else {
 					//$inside = interpretline(mysql_result($result,0,0),$anstype);
-					$inside = interpret('control',$anstype,mysql_result($result,0,0));
+					$inside = interpret('control',$anstype,mysql_result($result,0,0),$countcnt+1);
 					if (mysql_result($result,0,1)!=$anstype) {
 						//echo 'Imported code question type does not match current question answer type';
 					}
