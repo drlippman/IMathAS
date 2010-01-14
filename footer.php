@@ -6,7 +6,10 @@
 if (isset($useeditor) && $sessiondata['useed']==1) {
 	//echo "<script type=\"text/javascript\">initEditor();</script>\n";
 }
-
+if (isset($useeqnhelper) && $useeqnhelper==true) {
+	$curdir = rtrim(dirname(__FILE__), '/\\');
+	require("$curdir/assessment/eqnhelper.html");
+}
 ?>
 </body>
 </html>
