@@ -671,6 +671,39 @@ $sql = 'CREATE TABLE `imas_calitems` ('
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 echo 'imas_calitems created<br/>';
 
+$sql = 'CREATE TABLE `imas_stugroupset` ('
+        . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
+        . ' `courseid` INT(10) UNSIGNED NOT NULL, '
+        . ' `name` VARCHAR(254) NOT NULL, '
+        . ' INDEX (`courseid`)'
+        . ' )'
+        . ' TYPE = innodb'
+        . ' COMMENT = \'Student Group Sets\';';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+echo 'imas_stugroupset created<br/>';
+
+$sql = 'CREATE TABLE `imas_stugroups` ('
+        . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
+        . ' `groupsetid` INT(10) UNSIGNED NOT NULL, '
+        . ' `name` VARCHAR(254) NOT NULL, '
+        . ' INDEX (`groupsetid`)'
+        . ' )'
+        . ' TYPE = innodb'
+        . ' COMMENT = \'Student Groups\';';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+echo 'imas_stugroups created<br/>';
+
+$sql = 'CREATE TABLE `imas_stugroupmembers` ('
+        . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
+        . ' `stugroupid` INT(10) UNSIGNED NOT NULL, '
+        . ' `userid` INT(10) UNSIGNED NOT NULL, '
+        . ' INDEX (`stugroupid`), INDEX (`userid`)'
+        . ' )'
+        . ' TYPE = innodb'
+        . ' COMMENT = \'Student Group Members\';';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+echo 'imas_stugroupmembers created<br/>';
+
 $sql = 'CREATE TABLE `imas_ltiusers` ('
         . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
         . ' `org` VARCHAR(32) NOT NULL, '
