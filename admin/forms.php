@@ -181,14 +181,18 @@ switch($_GET['action']) {
 		
 		echo "<span class=form>Theme:</span><span class=formright>";
 		echo " <select name=\"theme\">";
-		$handle = opendir("../themes/");
-		$themes = array();
-		while (false !== ($file = readdir($handle))) {
-			if (substr($file,strpos($file,'.'))=='.css') {
-				$themes[] = $file;
+		if (isset($themelist)) {
+			$themes = explode(',',$themelist);
+		} else {
+			$handle = opendir("../themes/");
+			$themes = array();
+			while (false !== ($file = readdir($handle))) {
+				if (substr($file,strpos($file,'.'))=='.css') {
+					$themes[] = $file;
+				}
 			}
+			sort($themes);
 		}
-		sort($themes);
 		foreach ($themes as $file) {
 			echo "<option value=\"$file\" ";
 			if ($file==$theme) { echo 'selected="selected"';}
