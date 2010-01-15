@@ -3,6 +3,13 @@
 	//(c) 20006 David Lippman
 	if ($_GET['action']=="newuser") {
 		require_once("config.php");
+		if (isset($studentTOS) && !isset($_POST['agree'])) {
+			echo "<html><body>\n";
+			echo "<p>You must agree to the Terms and Conditions to set up an account</p>";
+			echo "<p><a href=\"forms.php?action=newuser\">Try Again</a></p>\n";
+			echo "</html></body>\n";
+			exit;
+		}
 		$_POST['SID'] = trim($_POST['SID']);
 		if ($loginformat!='' && !preg_match($loginformat,$_POST['SID'])) {
 			echo "<html><body>\n";

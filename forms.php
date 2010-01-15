@@ -4,6 +4,11 @@
 require("config.php");
 if ($_GET['action']!="newuser" && $_GET['action']!="resetpw" && $_GET['action']!="lookupusername") {
 	require("validate.php");
+} else {
+	if (!isset($defaultcoursetheme)) {
+		 $defaultcoursetheme = "default.css";
+	}
+	$coursetheme = $defaultcoursetheme;
 }
 require("header.php");	
 echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Form</div>\n";
@@ -19,8 +24,14 @@ switch($_GET['action']) {
 		echo "<span class=form><label for=\"lastname\">Enter Last Name:</label></span> <input class=form type=text size=20 id=lastname name=lastname><BR class=form>\n";
 		echo "<span class=form><label for=\"email\">Enter E-mail address:</label></span>  <input class=form type=text size=60 id=email name=email><BR class=form>\n";
 		echo "<span class=form><label for=\"msgnot\">Notify me by email when I receive a new message:</label></span><span class=formright><input type=checkbox id=msgnot name=msgnot /></span><BR class=form>\n";
+		if (isset($studentTOS)) {
+			echo "<span class=form><label for=\"agree\">I have read and agree to the Terms of Use (below)</label></span><span class=formright><input type=checkbox name=agree></span><br class=form />\n";
+		}
 		echo "<div class=submit><input type=submit value='Sign Up'></div>\n";
 		echo "</form>\n";
+		if (isset($studentTOS)) {
+			include($studentTOS);
+		}
 		break;
 	case "chgpwd":
 		echo "<h3>Change Your Password</h3>\n";

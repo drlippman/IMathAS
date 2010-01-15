@@ -155,7 +155,7 @@ END;
 	echo "<body>\n";
 }
 
-$insertinheaderwrapper = ' ';
+$insertinheaderwrapper = ' '; //"<h1>$coursename</h1>";
 echo '<div class=mainbody>';
 if (isset($insertinheaderwrapper)) {
 	echo '<div class="headerwrapper">'.$insertinheaderwrapper.'</div>';
