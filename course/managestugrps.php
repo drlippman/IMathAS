@@ -27,7 +27,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		//adding a group.  Could be a "add new group" only, or adding a new group while assigning students
 		$query = "INSERT INTO imas_stugroups (groupsetid,name) VALUES ('$grpsetid','{$_POST['grpname']}')";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		if (!isset($_POST['stustoadd'])) { //if not adding students also
+		if (!isset($_POST['stutoadd'])) { //if not adding students also
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid&grpsetid={$_GET['grpsetid']}");
 			exit();
 		} else {
@@ -134,6 +134,43 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$page_grpsetname = mysql_result($result,0,0);
 		}
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">$page_grpsetname</a> &gt; Rename Group";
+	} else if (isset($_GET['removeall'])) {
+		//removing all group members
+		if (isset($_GET['confirm'])) {
+			//if name is set
+			removeallgroupmembers($_GET['removeall']);
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid&grpsetid=$grpsetid");
+			exit();
+		} else {
+			$query = "SELECT name FROM imas_stugroups WHERE id='{$_GET['removeall']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$page_grpname = mysql_result($result,0,0);
+			$query = "SELECT name FROM imas_stugroupset WHERE id='$grpsetid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$page_grpsetname = mysql_result($result,0,0);
+		}	
+		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">$page_grpsetname</a> &gt; Remove all group members";
+		
+	} else if (isset($_GET['remove']) && isset($_GET['grpid'])) {
+		//removing one group member
+		if (isset($_GET['confirm'])) {
+			//if name is set
+			removegroupmember($_GET['grpid'],$_GET['remove']);
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid&grpsetid=$grpsetid");
+			exit();
+		} else {
+			$query = "SELECT LastName, FirstName FROM imas_users WHERE id='{$_GET['remove']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$page_stuname = mysql_result($result,0,0).', '.mysql_result($result,0,1);
+			$query = "SELECT name FROM imas_stugroups WHERE id='{$_GET['grpid']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$page_grpname = mysql_result($result,0,0);
+			$query = "SELECT name FROM imas_stugroupset WHERE id='$grpsetid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$page_grpsetname = mysql_result($result,0,0);
+		}	
+		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">$page_grpsetname</a> &gt; Remove group member";
+		
 	} else if (isset($_GET['grpsetid'])) {
 		//groupset selected, show groups
 		$grpsetid = $_GET['grpsetid'];
@@ -243,7 +280,7 @@ if ($overwriteBody==1) {
 		echo '<h4>Add new student group</h4>';
 		echo "<form method=\"post\" action=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&addgrp=true\">";
 		if (isset($stulist)) {
-			echo "<input type=\"hidden\" name=\"stustoadd\" value=\"$stulist\" />";
+			echo "<input type=\"hidden\" name=\"stutoadd\" value=\"$stulist\" />";
 		}
 		echo '<p>New group name: <input name="grpname" type="text" /></p>';
 		echo '<p><input type="submit" value="Create" />';
@@ -262,6 +299,16 @@ if ($overwriteBody==1) {
 		echo '<p><input type="submit" value="Rename" />';
 		echo "<input type=button value=\"Nevermind\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid'\" /></p>";
 		echo '</form>';
+	} else if (isset($_GET['removeall'])) {
+		echo '<h4>Remove ALL group members</h4>';
+		echo "<p>Are you SURE you want to remove <b>ALL</b> members of the student group <b>$page_grpname</b>?</p>";
+		echo "<p><input type=button value=\"Yes, Remove\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid&removeall={$_GET['removeall']}&confirm=true'\" /> ";
+		echo "<input type=button value=\"Nevermind\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid'\" /></p>";
+	} else if (isset($_GET['remove']) && $_GET['grpid']) {
+		echo '<h4>Remove group member</h4>';
+		echo "<p>Are you SURE you want to remove <b>$page_stuname</b> from the student group <b>$page_grpname</b>?</p>";
+		echo "<p><input type=button value=\"Yes, Remove\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid&grpid={$_GET['grpid']}&remove={$_GET['remove']}&confirm=true'\" /> ";
+		echo "<input type=button value=\"Nevermind\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid'\" /></p>";
 	} else if (isset($_GET['grpsetid'])) {
 		//groupset selected - list members
 		echo "<h4>Managing groups in collection $page_grpsetname</h4>";
@@ -269,13 +316,13 @@ if ($overwriteBody==1) {
 			echo "<b>Group $grpname</b> | ";
 			echo "<a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&rengrp=$grpid\">Rename</a> | ";
 			echo "<a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&delgrp=$grpid\">Delete</a> | ";
-			echo "Remove all members";
+			echo "<a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&removeall=$grpid\">Remove all members</a>";
 			echo '<ul>';
 			if (count($page_grpmembers[$grpid])==0) {
 				echo '<li>No group members</li>';
 			} else {
 				foreach ($page_grpmembers[$grpid] as $uid=>$name) {
-					echo "<li>$name | Remove from group</li>";
+					echo "<li>$name | <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&remove=$uid&grpid=$grpid\">Remove from group</a></li>";
 				}
 			}
 			echo '</ul>';

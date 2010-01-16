@@ -212,6 +212,8 @@ switch($_GET['action']) {
 		$query = "SELECT id FROM imas_assessments WHERE courseid='{$_GET['id']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($line = mysql_fetch_row($result)) {
+			require("../includes/filehandler.php");
+			echo deleteasidfilesbyquery(array('assessmentid'=>$line[0]));
 			/* work on fileupload
 			$query = "SELECT lastanswers,bestlastanswers,reviewlastanswers FROM imas_assessment_sessions WHERE assessmentid='{$line[0]}'";
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -314,6 +316,20 @@ switch($_GET['action']) {
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		
 		$query = "DELETE FROM imas_calitems WHERE courseid='{$_GET['id']}'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		
+		$query = "SELECT id FROM imas_stugroupset WHERE courseid='{$_GET['id']}'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			$q2 = "SELECT id FROM imas_stugroups WHERE groupsetid='{$row[0]}'";
+			$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+			while ($row2 = mysql_fetch_row($r2)) {
+				$query = "DELETE FROM imas_stugroupmembers WHERE stugroupid='{$row2[0]}'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+			$query = "DELETE FROM imas_stugroups WHERE groupsetid='{$row[0]}'";
+		}
+		$query = "DELETE FROM imas_stugroupset WHERE courseid='{$_GET['id']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		
 		break;
