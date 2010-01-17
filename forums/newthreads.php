@@ -12,7 +12,10 @@
 	*/
 	$query = "SELECT imas_forums.name,imas_forums.id,imas_forum_threads.id as threadid,imas_forum_threads.lastposttime FROM imas_forum_threads ";
 	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id LEFT JOIN imas_forum_views AS mfv ";
-	$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' WHERE imas_forums.courseid='$cid' AND imas_forums.grpaid=0 ";
+	$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' WHERE imas_forums.courseid='$cid' ";//AND imas_forums.grpaid=0 ";
+	if (!isset($teacherid)) {
+		$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
+	}
 	$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL))";
 	
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -105,6 +108,7 @@
 			echo "<tr><td><a href=\"posts.php?cid=$cid&forum={$forumids[$line['threadid']]}&thread={$line['threadid']}&page=-3\">{$line['subject']}</a></b>: $name</td>";
 			echo "<td>{$lastpost[$line['threadid']]}</td></tr>";
 		}
+		if ($lastforum!='') { echo '</tbody></table>';}
 		echo '</ul>';
 	} else {
 		echo "No new posts";

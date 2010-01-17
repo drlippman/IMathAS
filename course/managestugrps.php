@@ -347,8 +347,9 @@ if ($overwriteBody==1) {
 			}
 			echo '</ul>';
 			echo '</form>';
+			echo '<p>&nbsp;</p>';
 		} else {
-			echo 'None';
+			echo '<p>None</p>';
 		}
 		
 	} else {

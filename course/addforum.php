@@ -90,13 +90,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				
 		if (isset($_GET['id'])) {  //already have id; update
 		$query = "UPDATE imas_forums SET name='{$_POST['name']}',description='{$_POST['description']}',startdate=$startdate,enddate=$enddate,settings=$fsets,";
-		$query .= "defdisplay='{$_POST['defdisplay']}',replyby=$replyby,postby=$postby,grpaid='{$_POST['grpaid']}',points='{$_POST['points']}',cntingb='{$_POST['cntingb']}',gbcategory='{$_POST['gbcat']}',avail='{$_POST['avail']}',sortby='{$_POST['sortby']}' ";
+		$query .= "defdisplay='{$_POST['defdisplay']}',replyby=$replyby,postby=$postby,groupsetid='{$_POST['groupsetid']}',points='{$_POST['points']}',cntingb='{$_POST['cntingb']}',gbcategory='{$_POST['gbcat']}',avail='{$_POST['avail']}',sortby='{$_POST['sortby']}' ";
 		$query .= "WHERE id='{$_GET['id']}';";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$newforumid = $_GET['id'];
 		} else { //add new
-		$query = "INSERT INTO imas_forums (courseid,name,description,startdate,enddate,settings,defdisplay,replyby,postby,grpaid,points,cntingb,gbcategory,avail,sortby) VALUES ";
-		$query .= "('$cid','{$_POST['name']}','{$_POST['description']}',$startdate,$enddate,$fsets,'{$_POST['defdisplay']}',$replyby,$postby,'{$_POST['grpaid']}','{$_POST['points']}','{$_POST['cntingb']}','{$_POST['gbcat']}','{$_POST['avail']}','{$_POST['sortby']}');";
+		$query = "INSERT INTO imas_forums (courseid,name,description,startdate,enddate,settings,defdisplay,replyby,postby,groupsetid,points,cntingb,gbcategory,avail,sortby) VALUES ";
+		$query .= "('$cid','{$_POST['name']}','{$_POST['description']}',$startdate,$enddate,$fsets,'{$_POST['defdisplay']}',$replyby,$postby,'{$_POST['groupsetid']}','{$_POST['points']}','{$_POST['cntingb']}','{$_POST['gbcat']}','{$_POST['avail']}','{$_POST['sortby']}');";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		
 		$newforumid = mysql_insert_id();
@@ -161,7 +161,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$defdisplay = $line['defdisplay'];
 			$replyby = $line['replyby'];
 			$postby = $line['postby'];
-			$grpaid = $line['grpaid'];
+			$groupsetid = $line['groupsetid'];
 			$points = $line['points'];
 			$cntingb = $line['cntingb'];
 			$gbcat = $line['gbcategory'];
@@ -178,7 +178,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$replyby = 2000000000;
 			$postby = 2000000000;
 			$hassubscrip = false;
-			$grpaid = 0;
+			$groupsetid = 0;
 			$points = 0;
 			$gbcat = 0;
 			$sortby = 0;
@@ -218,6 +218,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$postbytime = tzdate("g:i a",time()+7*24*60*60);
 		}
 		
+		/*
 		$query = "SELECT id,name FROM imas_assessments WHERE isgroup>0 AND courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$i=0;
@@ -225,6 +226,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		while ($row = mysql_fetch_row($result)) {
 			$page_groupSelect['val'][$i] = $row[0];
 			$page_groupSelect['label'][$i] = "Use groups of $row[1]";
+			$i++;
+		}
+		*/
+		$query = "SELECT id,name FROM imas_stugroupset WHERE courseid='$cid' ORDER BY name";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$i=0;
+		$page_groupSelect = array();
+		while ($row = mysql_fetch_row($result)) {
+			$page_groupSelect['val'][$i] = $row[0];
+			$page_groupSelect['label'][$i] = "Use group collection: {$row[1]}";
 			$i++;
 		}
 		
@@ -296,9 +307,9 @@ if ($overwriteBody==1) {
 			at <input type=text size=10 name=etime value="<?php echo $etime;?>">
 		</span><BR class=form>
 	
-		<span class=form>Group linked forum?</span><span class=formright>
+		<span class=form>Group forum?</span><span class=formright>
 <?php
-	writeHtmlSelect("grpaid",$page_groupSelect['val'],$page_groupSelect['label'],$grpaid,"Not group forum",0);
+	writeHtmlSelect("groupsetid",$page_groupSelect['val'],$page_groupSelect['label'],$groupsetid,"Not group forum",0);
 ?>
 		</span><br class="form"/>
 		
