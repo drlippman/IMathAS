@@ -43,7 +43,7 @@
 	$forumname = mysql_result($result,0,0);
 	$postby = mysql_result($result,0,1);
 	$allowmod = ((mysql_result($result,0,2)&2)==2);
-	$allowdel = ((mysql_result($result,0,2)&4)==4);
+	$allowdel = (((mysql_result($result,0,2)&4)==4) || $isteacher);
 	$grpaid = mysql_result($result,0,3);
 	$sortby = mysql_result($result,0,4);
 	$dofilter = false;

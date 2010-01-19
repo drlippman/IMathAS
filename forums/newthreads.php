@@ -105,6 +105,7 @@
 			echo "<tr><td><a href=\"posts.php?cid=$cid&forum={$forumids[$line['threadid']]}&thread={$line['threadid']}&page=-3\">{$line['subject']}</a></b>: $name</td>";
 			echo "<td>{$lastpost[$line['threadid']]}</td></tr>";
 		}
+		if ($lastforum!='') { echo '</tbody></table>';}
 		echo '</ul>';
 	} else {
 		echo "No new posts";

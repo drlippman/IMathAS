@@ -17,10 +17,10 @@ $useeditor = "description";
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 
 if (isset($_GET['id'])) {
-	$curBreadcrumb .= "&gt; Modify Forum</div>\n";
+	$curBreadcrumb .= "&gt; Modify Forum\n";
 	$pagetitle = "Modify Forum";
 } else {
-	$curBreadcrumb .= "&gt; Add Forum</div>\n";
+	$curBreadcrumb .= "&gt; Add Forum\n";
 	$pagetitle = "Add Forum";
 } 
 if (isset($_GET['tb'])) {

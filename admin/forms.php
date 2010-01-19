@@ -130,7 +130,11 @@ switch($_GET['action']) {
 			$name = "Enter course name here";
 			$ekey = "Enter enrollment key here";
 			$hideicons = 0;
-			$picicons = 0;
+			if (isset($defaults['picicons'])) {
+				$picicons = $defaults['picicons'];
+			} else {
+				$picicons = 0;
+			}
 			$allowunenroll = 0; //0 no un, 1 allow un
 					    //0 allow enroll, 2 no enroll
 			$copyrights = 0;
@@ -277,10 +281,12 @@ switch($_GET['action']) {
 		if ($msgmonitor==1) { echo "checked=1";}
 		echo '/> Enable monitoring of student-to-student messages</span><br class=form />';
 		
-		echo '<span class="form">Enable live chat:</span><span class="formright">';
-		echo '<input type=checkbox name="chatset" value="1" ';
-		if ($chatset==1) {echo 'checked="checked"';};
-		echo ' /></span><br class="form" />';
+		if (isset($mathchaturl) && $mathchaturl!='') {
+			echo '<span class="form">Enable live chat:</span><span class="formright">';
+			echo '<input type=checkbox name="chatset" value="1" ';
+			if ($chatset==1) {echo 'checked="checked"';};
+			echo ' /></span><br class="form" />';
+		}
 		
 		echo '<span class="form">Show remaining LatePasses on student gradebook page:</span><span class="formright">';
 		echo '<input type=checkbox name="showlatepass" value="1" ';
@@ -325,7 +331,7 @@ switch($_GET['action']) {
 		echo ' /> Bottom of page<br /><input type=radio name="cploc" value="1" ';
 		if ($cploc==1) {echo "checked=1";}
 		echo ' /> Left side bar</span><br class=form />';
-		if ($enablebasiclti==true) {
+		if (isset($enablebasiclti) && $enablebasiclti==true) {
 			echo '<span class="form">LTI access secret (max 10 chars; blank to not use)</span>';
 			echo '<span class="formright"><input name="ltisecret" type="text" value="'.$ltisecret.'" /> ';
 			echo '<a href="#" onclick="document.getElementById(\'ltiurl\').style.display=\'\'; return false;">LTI url/key?</a>';
