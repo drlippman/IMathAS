@@ -116,6 +116,15 @@ if ($line == null) {
 } else {
 	$noclass = false;
 	//check for new posts
+	$query = "SELECT imas_forums.courseid, COUNT(imas_forum_threads.id) FROM imas_forum_threads ";
+	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
+	$query .= "JOIN imas_students ON imas_forums.courseid=imas_students.courseid AND imas_students.userid='$userid' ";
+	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' ";
+	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+	$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
+	$query .= "GROUP BY imas_forums.courseid";
+	
+	 /* old:
 	$query = "SELECT courseid,count(*) FROM ";
 	$query .= "(SELECT imas_forums.courseid,imas_forum_threads.id FROM imas_forum_threads ";
 	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id LEFT JOIN imas_forum_views AS mfv ";
@@ -123,6 +132,7 @@ if ($line == null) {
 	$query .= "(SELECT courseid FROM imas_students WHERE userid='$userid') AND imas_forums.grpaid=0 ";
 	$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL))) AS newitems ";
 	$query .= "GROUP BY courseid";
+	*/
 	$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 	while ($row = mysql_fetch_row($r2)) {
 		$newpostscnt[$row[0]] = $row[1];
@@ -158,13 +168,20 @@ if ($line == null) {
 	$isTeaching = true;
 	
 	//check for forum posts to teachers
-	$query = "SELECT courseid,count(*) FROM ";
+	/*$query = "SELECT courseid,count(*) FROM ";
 	$query .= "(SELECT imas_forums.courseid,imas_forum_threads.id FROM imas_forum_threads ";
 	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id LEFT JOIN imas_forum_views AS mfv ";
 	$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' WHERE imas_forums.courseid IN ";
 	$query .= "(SELECT courseid FROM imas_teachers WHERE userid='$userid') AND imas_forums.grpaid=0 ";
 	$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL))) AS newitems ";
-	$query .= "GROUP BY courseid";
+	$query .= "GROUP BY courseid";*/
+	
+	$query = "SELECT imas_forums.courseid, COUNT(imas_forum_threads.id) FROM imas_forum_threads ";
+	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
+	$query .= "JOIN imas_teachers ON imas_forums.courseid=imas_teachers.courseid AND imas_teachers.userid='$userid' ";
+	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' ";
+	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+	$query .= "GROUP BY imas_forums.courseid";
 	$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 	while ($row = mysql_fetch_row($r2)) {
 		$newpostscnt[$row[0]] = $row[1];
@@ -207,13 +224,15 @@ if ($line == null) {
 } else {
 	$isTutoring = true;
 	//check for forum posts to tutors
-	$query = "SELECT courseid,count(*) FROM ";
-	$query .= "(SELECT imas_forums.courseid,imas_forum_threads.id FROM imas_forum_threads ";
-	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id LEFT JOIN imas_forum_views AS mfv ";
-	$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' WHERE imas_forums.courseid IN ";
-	$query .= "(SELECT courseid FROM imas_tutors WHERE userid='$userid') AND imas_forums.grpaid=0 ";
-	$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL))) AS newitems ";
-	$query .= "GROUP BY courseid";
+	$query = "SELECT imas_forums.courseid, COUNT(imas_forum_threads.id) FROM imas_forum_threads ";
+	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
+	$query .= "JOIN imas_tutors ON imas_forums.courseid=imas_tutors.courseid AND imas_tutors.userid='$userid' ";
+	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' ";
+	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+	//$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
+	//TODO:  allow tutors to view all groups' threads?
+	$query .= "AND imas_forum_threads.stugroupid=0 ";
+	$query .= "GROUP BY imas_forums.courseid";
 	$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 	while ($row = mysql_fetch_row($r2)) {
 		$newpostscnt[$row[0]] = $row[1];

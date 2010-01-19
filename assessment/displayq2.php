@@ -1324,7 +1324,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		$out .= "<input type=\"file\" name=\"qn$qn\" id=\"qn$qn\" />\n";
 		if ($la!='') {
 			if (isset($GLOBALS['testsettings']) && isset($GLOBALS['sessiondata']['groupid']) && $GLOBALS['testsettings']>0 && $GLOBALS['sessiondata']['groupid']>0) {
-				$s3asid = $GLOBALS['sessiondata']['groupid'];
+				$s3asid = 'grp'.$GLOBALS['sessiondata']['groupid'];
 			} else if (isset($GLOBALS['asid'])) {
 				$s3asid = $GLOBALS['asid'];
 			} 
@@ -3015,7 +3015,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			return 0;
 		}
 		if (isset($GLOBALS['testsettings']) && isset($GLOBALS['sessiondata']['groupid']) && $GLOBALS['testsettings']>0 && $GLOBALS['sessiondata']['groupid']>0) {
-			$s3asid = $GLOBALS['sessiondata']['groupid'];
+			$s3asid = 'grp'.$GLOBALS['sessiondata']['groupid'];
 		} else if (isset($GLOBALS['asid'])) {
 			$s3asid = $GLOBALS['asid'];
 		} else {

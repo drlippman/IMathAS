@@ -73,7 +73,7 @@ function deleteasidfilesbyquery($wherearr,$lim=0) {
 		while (($row = mysql_fetch_row($result)) && ($lim==0 || $cnt<$lim)) {
 			if (strpos($row[2].$row[3].$row[4],'FILE:')===false) { continue;}
 			if ($row[1]>0) {
-				$delcnt += deleteasidfilesfromstring($row[2].$row[3].$row[4],$row[1]);
+				$delcnt += deleteasidfilesfromstring($row[2].$row[3].$row[4],'grp'.$row[1]);
 			} else {
 				$delcnt += deleteasidfilesfromstring($row[2].$row[3].$row[4],$row[0]);
 			}

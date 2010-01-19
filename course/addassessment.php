@@ -166,6 +166,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$_POST['ltisecret'] = '';
 		}
 		
+		if ($_POST['isgroup']>0 && isset($_POST['groupsetid']) && $_POST['groupsetid']==0) {
+			//create new groupset	
+			$query = "INSERT INTO imas_stugroupset (courseid,name) VALUES ('$cid','Group set for {$_POST['name']}')";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$_POST['groupsetid'] = mysql_insert_id();
+		}
+		
 		$caltag = $_POST['caltagact'].$_POST['caltagrev'];
 		
 		require_once("../includes/htmLawed.php");
@@ -173,15 +180,17 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$_POST['summary'] = addslashes(htmLawed(stripslashes($_POST['summary']),$htmlawedconfig));
 		$_POST['intro'] = addslashes(htmLawed(stripslashes($_POST['intro']),$htmlawedconfig));
 		if (isset($_GET['id'])) {  //already have id; update
-			$query = "SELECT isgroup FROM imas_assessments WHERE id='{$_GET['id']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			if (mysql_result($result,0,0)>0 && $isgroup==0) {
-				$query = "UPDATE imas_assessment_sessions SET agroupid=0 WHERE assessmentid='{$_GET['id']}'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+			if ($isgroup==0) { //set agroupid=0 if switching from groups to not groups
+				$query = "SELECT isgroup FROM imas_assessments WHERE id='{$_GET['id']}'";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				if (mysql_result($result,0,0)>0 {
+					$query = "UPDATE imas_assessment_sessions SET agroupid=0 WHERE assessmentid='{$_GET['id']}'";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+				}
 			}
 			if (isset($_POST['defpoints'])) {
 				$query = "UPDATE imas_assessments SET name='{$_POST['name']}',summary='{$_POST['summary']}',intro='{$_POST['intro']}',startdate=$startdate,enddate=$enddate,reviewdate=$reviewdate,timelimit='$timelimit',minscore='{$_POST['minscore']}',isgroup='$isgroup',showhints='$showhints',tutoredit=$tutoredit,eqnhelper='{$_POST['eqnhelper']}',showtips='{$_POST['showtips']}',";
-				$query .= "displaymethod='{$_POST['displaymethod']}',defpoints='{$_POST['defpoints']}',defattempts='{$_POST['defattempts']}',defpenalty='{$_POST['defpenalty']}',deffeedback='$deffeedback',shuffle='$shuffle',gbcategory='{$_POST['gbcat']}',password='{$_POST['password']}',caltag='$caltag',";
+				$query .= "displaymethod='{$_POST['displaymethod']}',defpoints='{$_POST['defpoints']}',defattempts='{$_POST['defattempts']}',defpenalty='{$_POST['defpenalty']}',deffeedback='$deffeedback',shuffle='$shuffle',gbcategory='{$_POST['gbcat']}',password='{$_POST['password']}',caltag='$caltag',groupsetid='{$_POST['groupsetid']}',";
 				$query .= "cntingb='{$_POST['cntingb']}',showcat='{$_POST['showqcat']}',reqscore='{$_POST['reqscore']}',reqscoreaid='{$_POST['reqscoreaid']}',noprint='{$_POST['noprint']}',avail='{$_POST['avail']}',groupmax='{$_POST['groupmax']}',allowlate='{$_POST['allowlate']}',exceptionpenalty='{$_POST['exceptionpenalty']}',ltisecret='{$_POST['ltisecret']}'";
 				if (isset($_POST['copyendmsg'])) {
 					$query .= ",endmsg='$endmsg' ";
@@ -208,11 +217,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else { //add new
 			if (!isset($_POST['copyendmsg'])) {$endmsg = '';}						
 			$query = "INSERT INTO imas_assessments (courseid,name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,";
-			$query .= "displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,showcat,eqnhelper,showtips,caltag,isgroup,groupmax,showhints,reqscore,reqscoreaid,noprint,avail,allowlate,exceptionpenalty,ltisecret,endmsg) VALUES ";
+			$query .= "displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,showcat,eqnhelper,showtips,caltag,isgroup,groupmax,groupsetid,showhints,reqscore,reqscoreaid,noprint,avail,allowlate,exceptionpenalty,ltisecret,endmsg) VALUES ";
 			$query .= "('$cid','{$_POST['name']}','{$_POST['summary']}','{$_POST['intro']}',$startdate,$enddate,$reviewdate,'$timelimit','{$_POST['minscore']}',";
 			$query .= "'{$_POST['displaymethod']}','{$_POST['defpoints']}','{$_POST['defattempts']}',";
 			$query .= "'{$_POST['defpenalty']}','$deffeedback','$shuffle','{$_POST['gbcat']}','{$_POST['password']}','{$_POST['cntingb']}',$tutoredit,'{$_POST['showqcat']}','{$_POST['eqnhelper']}','{$_POST['showtips']}','$caltag',";
-			$query .= "'$isgroup','{$_POST['groupmax']}','$showhints','{$_POST['reqscore']}','{$_POST['reqscoreaid']}','{$_POST['noprint']}','{$_POST['avail']}','{$_POST['allowlate']}','{$_POST['exceptionpenalty']}','{$_POST['ltisecret']}','$endmsg');";
+			$query .= "'$isgroup','{$_POST['groupmax']}','{$_POST['groupsetid']}','$showhints','{$_POST['reqscore']}','{$_POST['reqscoreaid']}','{$_POST['noprint']}','{$_POST['avail']}','{$_POST['allowlate']}','{$_POST['exceptionpenalty']}','{$_POST['ltisecret']}','$endmsg');";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			
 			$newaid = mysql_insert_id();
@@ -298,6 +307,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$line['reqscoreaid'] = 0;
 			$line['noprint'] = 0;
 			$line['groupmax'] = 6;
+			$line['groupsetid'] = 0;
 			$line['allowlate'] = 1;
 			$line['exceptionpenalty'] = 0;
 			$line['tutoredit'] = 0;
@@ -391,6 +401,18 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$i++;
 			}
 		}	
+		
+		$page_groupsets = array();
+		$query = "SELECT id,name FROM imas_stugroupset WHERE courseid='$cid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$page_groupsets['val'][0] = 0;
+		$page_groupsets['label'][0] = 'Create new group collection';
+		$i=1;
+		while ($row = mysql_fetch_row($result)) {
+			$page_groupsets['val'][$i] = $row[0];
+			$page_groupsets['label'][$i] = $row[1];
+			$i++;
+		}
 	} //END INITIAL LOAD BLOCK
 	
 }
@@ -715,6 +737,10 @@ if ($overwriteBody==1) {
 			<span class=form>Max group members (if group assessment): </span>
 			<span class=formright>
 				<input type="text" name="groupmax" value="<?php echo $line['groupmax'];?>" />
+			</span><br class="form" />
+			<span class="form">Use group set: </span>
+			<span class="formright">
+				<?php writeHtmlSelect('groupsetid',$page_groupsets['val'],$page_groupsets['label'],$line['groupsetid'],null,null,($taken && $line['isgroup']>0)?'disabled="disabled"':''); ?>
 			</span><br class="form" />
 			<span class=form>Show question categories:</span>
 			<span class=formright>

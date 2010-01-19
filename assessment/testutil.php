@@ -414,7 +414,7 @@ function recordtestdata($limit=false) {
 function deletefilesifnotused($delfrom,$ifnothere) {
 	global $testsettings,$sessiondata, $testid;
 	if ($testsettings['isgroup']>0 && $sessiondata['groupid']>0) {
-		$s3asid = $sessiondata['groupid'];
+		$s3asid = 'grp'.$sessiondata['groupid'];
 	} else {
 		$s3asid = $testid;
 	}

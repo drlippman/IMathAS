@@ -19,7 +19,8 @@ function enditem($canedit) {
 }
 
   function showitems($items,$parent,$inpublic=false) {
-	   global $teacherid,$tutorid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$hideicons,$exceptions,$latepasses,$graphicalicons,$ispublic,$studentinfo;
+	   global $teacherid,$tutorid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift;
+	   global $hideicons,$exceptions,$latepasses,$graphicalicons,$ispublic,$studentinfo,$newpostcnts;
 	   
 	   if (isset($teacherid)) {
 		   $canedit = true;
@@ -830,10 +831,10 @@ function enditem($canedit) {
 		   } else if ($line['itemtype']=="Forum") {
 			   if ($ispublic) { continue;}
 			   $typeid = $line['typeid'];
-			   $query = "SELECT id,name,description,startdate,enddate,grpaid,avail,postby,replyby FROM imas_forums WHERE id='$typeid'";
+			   $query = "SELECT id,name,description,startdate,enddate,groupsetid,avail,postby,replyby FROM imas_forums WHERE id='$typeid'";
 			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
-			   $dofilter = false;
+			   /*$dofilter = false;
 			   if ($line['grpaid']>0) {
 				if (!$viewall) {
 					$query = "SELECT agroupid FROM imas_assessment_sessions WHERE assessmentid='{$line['grpaid']}' AND userid='$userid'";
@@ -891,6 +892,7 @@ function enditem($canedit) {
 					   }
 				   }
 			   }
+			   */
 			  
 			  
 			   if (strpos($line['description'],'<p>')!==0) {
@@ -931,8 +933,8 @@ function enditem($canedit) {
 				   }
 				   echo "<div class=title> ";
 				   echo "<b><a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}\">{$line['name']}</a></b>\n";
-				   if ($hasnewitems) {
-					   echo " <a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}&page=-1\" style=\"color:red\">New Posts</a>";
+				   if (isset($newpostcnts[$line['id']]) && $newpostcnts[$line['id']]>0 ) {
+					   echo " <a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}&page=-1\" style=\"color:red\">New Posts ({$newpostcnts[$line['id']]})</a>";
 				   }
 				   if ($viewall) { 
 					   echo '<span class="instrdates">';
@@ -966,8 +968,8 @@ function enditem($canedit) {
 				   echo '<span class="instrdates">';
 				   echo "<br/><i>$show </i>";
 				   echo '</span>';
-				   if ($hasnewitems) {
-					   echo " <span style=\"color:red\">New Posts</span>";
+				    if (isset($newpostcnts[$line['id']]) && $newpostcnts[$line['id']]>0 ) {
+					   echo " <a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}&page=-1\" style=\"color:red\">New Posts ({$newpostcnts[$line['id']]})</a>";
 				   }
 				   if ($canedit) {
 					   echo '<span class="instronly">';
