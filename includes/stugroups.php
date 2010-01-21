@@ -8,6 +8,12 @@ function deletegroupset($grpsetid) {
 	}
 	$query = "DELETE FROM imas_stugroupset WHERE id='$grpsetid'";
 	mysql_query($query) or die("Query failed : " . mysql_error());
+	
+	$query = "UPDATE imas_assessments SET isgroup=0,groupsetid=0 WHERE groupsetid='$grpsetid'";
+	mysql_query($query) or die("Query failed : " . mysql_error());
+	
+	$query = "UPDATE imas_forums SET groupsetid=0 WHERE groupsetid='$grpsetid'";
+	mysql_query($query) or die("Query failed : " . mysql_error());
 }
 
 function deletegroup($grpid) {

@@ -770,7 +770,14 @@ if ($overwriteBody==1) {
 			<span class=formright>
 				<input type="text" name="groupmax" value="<?php echo $line['groupmax'];?>" />
 			</span><br class="form" />
-			<span class="form">Use group set:<?php if ($taken) {echo '<br/>Only empty group sets can be used after the assessment has started';}?></span>
+			<span class="form">Use group set:<?php 
+				if ($taken) {
+					if ($line['isgroup']==0) {
+						echo '<br/>Only empty group sets can be used after the assessment has started';
+					} else {
+						echo '<br/>Cannot change group set after the assessment has started';
+					}
+				}?></span>
 			<span class="formright">
 				<?php writeHtmlSelect('groupsetid',$page_groupsets['val'],$page_groupsets['label'],$line['groupsetid'],null,null,($taken && $line['isgroup']>0)?'disabled="disabled"':''); ?>
 			</span><br class="form" />

@@ -348,7 +348,24 @@ if ($overwriteBody==1) {
 		echo '</form>';
 	} else if (isset($_GET['delgrpset'])) {
 		echo '<h4>Delete student group collection</h4>';
-		echo "<p>Are you SURE you want to delete the student group collection <b>$page_grpsetname</b> and all the groups contained within in?</p>";
+		echo "<p>Are you SURE you want to delete the student group collection <b>$page_grpsetname</b> and all the groups contained within it? ";
+		$used = '';
+		$query = "SELECT name FROM imas_assessments WHERE isgroup>0 AND groupsetid='{$_GET['delgrpset']}'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			$used .= "Assessment: {$row[0]}<br/>";
+		}
+		$query = "SELECT name FROM imas_forums WHERE groupsetid='{$_GET['delgrpset']}'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			$used .= "Forum: {$row[0]}<br/>";
+		}
+		if ($used != '') {
+			echo '<p>This group collection is currently used in the assessments and/or forums below.  These items will be set to non-group if this group collection is deleted</p><p>';
+			echo "$used</p>";	
+		} else {
+			echo '<p>This group collection is not currently being used</p>';
+		}
 		echo "<p><input type=button value=\"Yes, Delete\" onClick=\"window.location='managestugrps.php?cid=$cid&delgrpset={$_GET['delgrpset']}&confirm=true'\" /> ";
 		echo "<input type=button value=\"Nevermind\" onClick=\"window.location='managestugrps.php?cid=$cid'\" /></p>";
 		
