@@ -234,6 +234,9 @@
 				}
 				$query = "INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES ('$userid',$stugroupid)";
 				mysql_query($query) or die("Query failed : " . mysql_error());
+				
+				$query = "UPDATE imas_assessment_sessions SET agroupid=$stugroupid WHERE id={$line['id']}";
+				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 		
 			$query = "SELECT name,theme FROM imas_courses WHERE id='{$_GET['cid']}'";
@@ -608,8 +611,9 @@
 			if ($sessiondata['groupid']==0) {
 				echo '<p>Group error - lost group info</p>';
 			}
-			$query = "SELECT assessmentid,agroupid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers ";
-			$query .= "FROM imas_assessment_sessions WHERE id='$testid'";
+			$fieldstocopy = 'assessmentid,agroupid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers,feedback,reviewseeds,reviewattempts,reviewscores,reviewlastanswers,reattempting,reviewreattempting';
+				
+			$query = "SELECT $fieldstocopy FROM imas_assessment_sessions WHERE id='$testid'";
 			$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
 			$rowgrptest = mysql_fetch_row($result);
 			$rowgrptest = addslashes_deep($rowgrptest);
@@ -639,10 +643,18 @@
 							$query = "INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES ('$userid','{$sessiondata['groupid']}')";
 							mysql_query($query) or die("Query failed : $query:" . mysql_error());
 							
-							$query = "UPDATE imas_assessment_sessions SET assessmentid='{$rowgrptest[0]}',agroupid='{$rowgrptest[1]}',questions='{$rowgrptest[2]}'";
-							$query .= ",seeds='{$rowgrptest[3]}',scores='{$rowgrptest[4]}',attempts='{$rowgrptest[5]}',lastanswers='{$rowgrptest[6]}',";
-							$query .= "starttime='{$rowgrptest[7]}',endtime='{$rowgrptest[8]}',bestseeds='{$rowgrptest[9]}',bestattempts='{$rowgrptest[10]}',";
-							$query .= "bestscores='{$rowgrptest[11]}',bestlastanswers='{$rowgrptest[12]}'  WHERE id='{$row[0]}'";
+							$fieldstocopy = explode(',',$fieldstocopy);
+							$sets = array();
+							foreach ($fieldstocopy as $k=>$val) {
+								$sets[] = "$val='{$rowgrptest[$k]}'";
+							}
+							$setslist = implode(',',$sets);
+							$query = "UPDATE imas_assessment_sessions SET $setslist WHERE id='{$row[0]}'";
+							
+							//$query = "UPDATE imas_assessment_sessions SET assessmentid='{$rowgrptest[0]}',agroupid='{$rowgrptest[1]}',questions='{$rowgrptest[2]}'";
+							//$query .= ",seeds='{$rowgrptest[3]}',scores='{$rowgrptest[4]}',attempts='{$rowgrptest[5]}',lastanswers='{$rowgrptest[6]}',";
+							//$query .= "starttime='{$rowgrptest[7]}',endtime='{$rowgrptest[8]}',bestseeds='{$rowgrptest[9]}',bestattempts='{$rowgrptest[10]}',";
+							//$query .= "bestscores='{$rowgrptest[11]}',bestlastanswers='{$rowgrptest[12]}'  WHERE id='{$row[0]}'";
 							//$query = "UPDATE imas_assessment_sessions SET agroupid='$agroupid' WHERE id='{$row[0]}'";
 							mysql_query($query) or die("Query failed : $query:" . mysql_error());
 							echo "<p>$thisusername added to group, overwriting existing attempt.</p>";
@@ -651,7 +663,7 @@
 						$query = "INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES ('{$_POST['user'.$i]}','{$sessiondata['groupid']}')";
 						mysql_query($query) or die("Query failed : $query:" . mysql_error());
 						
-						$query = "INSERT INTO imas_assessment_sessions (userid,assessmentid,agroupid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers) ";
+						$query = "INSERT INTO imas_assessment_sessions (userid,$fieldstocopy) ";
 						$query .= "VALUES ('{$_POST['user'.$i]}',$insrow)";
 						mysql_query($query) or die("Query failed : $query:" . mysql_error());
 						echo "<p>$thisusername added to group.</p>";

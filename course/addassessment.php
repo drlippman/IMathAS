@@ -166,11 +166,30 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$_POST['ltisecret'] = '';
 		}
 		
+		//is updating, switching from nongroup to group, and not creating new groupset, check if groups already exist
+		//if so, cannot handle
+		$updategroupsetid='';
+		if (isset($_GET['id']) && $_POST['isgroup']>0 && $_POST['groupsetid']>0) {
+			$isok = true;
+			$query = "SELECT isgroup FROM imas_assessments WHERE id='{$_GET['id']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			if (mysql_result($result,0,0)==0) {
+				$query = "SELECT id FROM imas_stugroups WHERE groupsetid='{$_POST['groupsetid']}'";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				if (mysql_num_rows($result)>0) {
+					echo "Sorry, cannot switch to use pre-defined groups after students have already started the assessment";
+					exit;
+				}
+			}
+			$updategroupset = "groupsetid='{$_POST['groupsetid']}',";
+		}
+	
 		if ($_POST['isgroup']>0 && isset($_POST['groupsetid']) && $_POST['groupsetid']==0) {
 			//create new groupset	
 			$query = "INSERT INTO imas_stugroupset (courseid,name) VALUES ('$cid','Group set for {$_POST['name']}')";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$_POST['groupsetid'] = mysql_insert_id();
+			$updategroupset = "groupsetid='{$_POST['groupsetid']}',";
 		}
 		
 		$caltag = $_POST['caltagact'].$_POST['caltagrev'];
@@ -183,10 +202,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			if ($isgroup==0) { //set agroupid=0 if switching from groups to not groups
 				$query = "SELECT isgroup FROM imas_assessments WHERE id='{$_GET['id']}'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				if (mysql_result($result,0,0)>0 {
+				if (mysql_result($result,0,0)>0) {
 					$query = "UPDATE imas_assessment_sessions SET agroupid=0 WHERE assessmentid='{$_GET['id']}'";
 					mysql_query($query) or die("Query failed : " . mysql_error());
 				}
+			} else { //if switching from nogroup to groups and groups already exist, need set agroupids if asids exist already
+				//NOT ALLOWED CURRENTLY
 			}
 			if (isset($_POST['defpoints'])) {
 				$query = "UPDATE imas_assessments SET name='{$_POST['name']}',summary='{$_POST['summary']}',intro='{$_POST['intro']}',startdate=$startdate,enddate=$enddate,reviewdate=$reviewdate,timelimit='$timelimit',minscore='{$_POST['minscore']}',isgroup='$isgroup',showhints='$showhints',tutoredit=$tutoredit,eqnhelper='{$_POST['eqnhelper']}',showtips='{$_POST['showtips']}',";
@@ -198,7 +219,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$query .= " WHERE id='{$_GET['id']}';";
 			} else { //has been taken - not updating "don't change" settings
 				$query = "UPDATE imas_assessments SET name='{$_POST['name']}',summary='{$_POST['summary']}',intro='{$_POST['intro']}',startdate=$startdate,enddate=$enddate,reviewdate=$reviewdate,timelimit='$timelimit',minscore='{$_POST['minscore']}',isgroup='$isgroup',showhints='$showhints',tutoredit=$tutoredit,eqnhelper='{$_POST['eqnhelper']}',showtips='{$_POST['showtips']}',";
-				$query .= "displaymethod='{$_POST['displaymethod']}',defattempts='{$_POST['defattempts']}',deffeedback='$deffeedback',shuffle='$shuffle',gbcategory='{$_POST['gbcat']}',password='{$_POST['password']}',cntingb='{$_POST['cntingb']}',showcat='{$_POST['showqcat']}',caltag='$caltag',";
+				$query .= "displaymethod='{$_POST['displaymethod']}',defattempts='{$_POST['defattempts']}',deffeedback='$deffeedback',shuffle='$shuffle',gbcategory='{$_POST['gbcat']}',password='{$_POST['password']}',cntingb='{$_POST['cntingb']}',showcat='{$_POST['showqcat']}',caltag='$caltag',$updategroupset";
 				$query .= "reqscore='{$_POST['reqscore']}',reqscoreaid='{$_POST['reqscoreaid']}',noprint='{$_POST['noprint']}',avail='{$_POST['avail']}',groupmax='{$_POST['groupmax']}',allowlate='{$_POST['allowlate']}',exceptionpenalty='{$_POST['exceptionpenalty']}',ltisecret='{$_POST['ltisecret']}' ";
 				if (isset($_POST['copyendmsg'])) {
 					$query .= ",endmsg='$endmsg' ";
@@ -279,6 +300,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			$showqcat = $line['showcat'];
 			$timelimit = $line['timelimit']/60;
+			if ($line['isgroup']==0) {
+				$line['groupsetid']=0;
+			}
 		} else {  //INITIAL LOAD IN ADD MODE
 			//set defaults
 			$line['name'] = "Enter assessment name";
@@ -319,6 +343,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$cntingb = 1;
 			$pcntingb = 3;
 			$showqcat = 0;
+			
+			$taken = false;
 		}
 		// ALL BELOW IS COMMON TO MODIFY OR ADD MODE
 		if ($startdate!=0) {
@@ -403,7 +429,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}	
 		
 		$page_groupsets = array();
-		$query = "SELECT id,name FROM imas_stugroupset WHERE courseid='$cid'";
+		if ($taken && $line['isgroup']==0) {
+			$query = "SELECT imas_stugroupset.id,imas_stugroupset.name FROM imas_stugroupset LEFT JOIN imas_stugroups ON imas_stugroups.groupsetid=imas_stugroupset.id ";
+			$query .= "LEFT JOIN imas_stugroupmembers ON imas_stugroups.id=imas_stugroupmembers.stugroupid WHERE imas_stugroupset.courseid='$cid' ";
+			$query .= "GROUP BY imas_stugroupset.id HAVING count(imas_stugroupmembers.id)=0";
+		} else {
+			$query = "SELECT id,name FROM imas_stugroupset WHERE courseid='$cid'";
+		}
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$page_groupsets['val'][0] = 0;
 		$page_groupsets['label'][0] = 'Create new group collection';
@@ -730,15 +762,15 @@ if ($overwriteBody==1) {
 			<span class=form>Group assessment: </span>
 			<span class=formright>
 				<input type="radio" name="isgroup" value="0" <?php writeHtmlChecked($line['isgroup'],0); ?> />Not a group assessment<br/>
-				<input type="radio" name="isgroup" value="1" <?php writeHtmlChecked($line['isgroup'],1); ?> />Students can add members with login passwords<br/>
-				<input type="radio" name="isgroup" value="2" <?php writeHtmlChecked($line['isgroup'],2); ?> />Students can add members without passwords<br/>
-				<input type="radio" name="isgroup" value="3" <?php writeHtmlChecked($line['isgroup'],3); ?> />Students cannot add members
+				<input type="radio" name="isgroup" value="1" <?php  writeHtmlChecked($line['isgroup'],1); ?> />Students can add members with login passwords<br/>
+				<input type="radio" name="isgroup" value="2" <?php  writeHtmlChecked($line['isgroup'],2); ?> />Students can add members without passwords<br/>
+				<input type="radio" name="isgroup" value="3" <?php  writeHtmlChecked($line['isgroup'],3); ?> />Students cannot add members
 			</span><br class="form" />
 			<span class=form>Max group members (if group assessment): </span>
 			<span class=formright>
 				<input type="text" name="groupmax" value="<?php echo $line['groupmax'];?>" />
 			</span><br class="form" />
-			<span class="form">Use group set: </span>
+			<span class="form">Use group set:<?php if ($taken) {echo '<br/>Only empty group sets can be used after the assessment has started';}?></span>
 			<span class="formright">
 				<?php writeHtmlSelect('groupsetid',$page_groupsets['val'],$page_groupsets['label'],$line['groupsetid'],null,null,($taken && $line['isgroup']>0)?'disabled="disabled"':''); ?>
 			</span><br class="form" />

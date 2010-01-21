@@ -85,59 +85,92 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			if (!is_array($stustoadd)) {
 				$stustoadd = explode(',',$stustoadd);
 			}
-			$query = 'INSERT INTO imas_stugroupmembers (stugroupid,userid) VALUES ';
-			for ($i=0;$i<count($stustoadd);$i++) {
-				if ($i>0) {$query .= ',';};
-				$query .= "('$grpid','{$stustoadd[$i]}')";
-			}
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			
-			$query = "SELECT id FROM imas_assessments WHERE groupsetid='$grpsetid'";
-			$resultaid = mysql_query($query) or die("Query failed : " . mysql_error());
+			$alreadygroupedstu = array();
 			$stulist = "'".implode("','",$stustoadd)."'";
-			while ($aid = mysql_fetch_row($resultaid) && $grpsetid>0) {
-				//if asid exists for this grpid, need to update students.
-				//if no asid exists already, but the students we're adding have one, use one (which?) of theirs
-				//otherwise do nothing
-				$rowgrptest = '';
-				$query = "SELECT assessmentid,agroupid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers ";
-				$query .= "FROM imas_assessment_sessions WHERE agroupid='$grpid' AND assessmentid='{$aid[0]}'";
-				$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
-				if (mysql_num_rows($result)>0) {
-					$rowgrptest = addslashes_deep(mysql_fetch_row($result));
-				} else {
-					//use asid from first student assessment
-					$query = "SELECT assessmentid,agroupid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers ";
-					$query .= "FROM imas_assessment_sessions WHERE userid IN ($stulist) AND assessmentid='{$aid[0]}'";
+			$query = "SELECT i_sgm.userid FROM imas_stugroupmembers as i_sgm JOIN imas_stugroups as i_sg ON i_sgm.stugroupid=i_sg.id ";
+			$query .= "WHERE i_sg.groupsetid='$grpsetid' AND i_sgm.userid IN ($stulist)";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				$alreadygroupedstu[] = $row[0];
+			}
+			$stustoadd = array_diff($stustoadd,$alreadygroupedstu);
+			
+			if (count($stustoadd)>0) {
+				$query = 'INSERT INTO imas_stugroupmembers (stugroupid,userid) VALUES ';
+				for ($i=0;$i<count($stustoadd);$i++) {
+					if ($i>0) {$query .= ',';};
+					$query .= "('$grpid','{$stustoadd[$i]}')";
+				}
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				
+				$query = "SELECT id FROM imas_assessments WHERE groupsetid='$grpsetid'";
+				$resultaid = mysql_query($query) or die("Query failed : " . mysql_error());
+				$stulist = "'".implode("','",$stustoadd)."'";
+				while (($aid = mysql_fetch_row($resultaid)) && $grpsetid>0) {
+					//if asid exists for this grpid, need to update students.
+					//if no asid exists already, but the students we're adding have one, use one (which?) of theirs
+					//otherwise do nothing
+					$fieldstocopy = 'assessmentid,agroupid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers,feedback,reviewseeds,reviewattempts,reviewscores,reviewlastanswers,reattempting,reviewreattempting';
+					$rowgrptest = '';
+					$query = "SELECT $fieldstocopy ";
+					$query .= "FROM imas_assessment_sessions WHERE agroupid='$grpid' AND assessmentid='{$aid[0]}'";
 					$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
 					if (mysql_num_rows($result)>0) {
 						$rowgrptest = addslashes_deep(mysql_fetch_row($result));
-						$rowgrptest[1] = $grpid; //use new groupid
-					}
-				}
-				if ($rowgrptest != '') {  //if an assessment session already exists
-					$insrow = "'".implode("','",$rowgrptest)."'";
-					foreach ($stustoadd as $stuid) {
-						$query = "SELECT id,agroupid FROM imas_assessment_sessions WHERE userid='$stuid' AND assessmentid={$aid[0]}";
+					} else {
+						//use asid from first student assessment
+						$query = "SELECT $fieldstocopy ";
+						$query .= "FROM imas_assessment_sessions WHERE userid IN ($stulist) AND assessmentid='{$aid[0]}'";
 						$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
-						if (mysql_num_rows($result)>0) {  
-							$row = mysql_fetch_row($result);
-							$query = "UPDATE imas_assessment_sessions SET assessmentid='{$rowgrptest[0]}',agroupid='{$rowgrptest[1]}',questions='{$rowgrptest[2]}'";
-							$query .= ",seeds='{$rowgrptest[3]}',scores='{$rowgrptest[4]}',attempts='{$rowgrptest[5]}',lastanswers='{$rowgrptest[6]}',";
-							$query .= "starttime='{$rowgrptest[7]}',endtime='{$rowgrptest[8]}',bestseeds='{$rowgrptest[9]}',bestattempts='{$rowgrptest[10]}',";
-							$query .= "bestscores='{$rowgrptest[11]}',bestlastanswers='{$rowgrptest[12]}'  WHERE id='{$row[0]}'";
-							//$query = "UPDATE imas_assessment_sessions SET agroupid='$agroupid' WHERE id='{$row[0]}'";
-							mysql_query($query) or die("Query failed : $query:" . mysql_error());
-						} else {
-							$query = "INSERT INTO imas_assessment_sessions (userid,assessmentid,agroupid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers) ";
-							$query .= "VALUES ('$stuid',$insrow)";
-							mysql_query($query) or die("Query failed : $query:" . mysql_error());
+						if (mysql_num_rows($result)>0) {
+							$rowgrptest = addslashes_deep(mysql_fetch_row($result));
+							$rowgrptest[1] = $grpid; //use new groupid
+						}
+					}
+					if ($rowgrptest != '') {  //if an assessment session already exists
+						$insrow = "'".implode("','",$rowgrptest)."'";
+						foreach ($stustoadd as $stuid) {
+							$query = "SELECT id,agroupid FROM imas_assessment_sessions WHERE userid='$stuid' AND assessmentid={$aid[0]}";
+							$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
+							if (mysql_num_rows($result)>0) {  
+								$row = mysql_fetch_row($result);
+								$fieldstocopy = explode(',',$fieldstocopy);
+								$sets = array();
+								foreach ($fieldstocopy as $k=>$val) {
+									$sets[] = "$val='{$rowgrptest[$k]}'";
+								}
+								$setslist = implode(',',$sets);
+								$query = "UPDATE imas_assessment_sessions SET $setslist WHERE id='{$row[0]}'";
+								//$query = "UPDATE imas_assessment_sessions SET assessmentid='{$rowgrptest[0]}',agroupid='{$rowgrptest[1]}',questions='{$rowgrptest[2]}'";
+								//$query .= ",seeds='{$rowgrptest[3]}',scores='{$rowgrptest[4]}',attempts='{$rowgrptest[5]}',lastanswers='{$rowgrptest[6]}',";
+								//$query .= "starttime='{$rowgrptest[7]}',endtime='{$rowgrptest[8]}',bestseeds='{$rowgrptest[9]}',bestattempts='{$rowgrptest[10]}',";
+								//$query .= "bestscores='{$rowgrptest[11]}',bestlastanswers='{$rowgrptest[12]}'  WHERE id='{$row[0]}'";
+								//$query = "UPDATE imas_assessment_sessions SET agroupid='$agroupid' WHERE id='{$row[0]}'";
+								mysql_query($query) or die("Query failed : $query:" . mysql_error());
+							} else {
+								$query = "INSERT INTO imas_assessment_sessions (userid,$fieldstocopy) ";
+								$query .= "VALUES ('$stuid',$insrow)";
+								mysql_query($query) or die("Query failed : $query:" . mysql_error());
+							}
 						}
 					}
 				}
 			}
-			
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid&grpsetid={$_GET['grpsetid']}");
+			if (count($alreadygroupedstu)>0) {
+				require("../header.php");
+				echo '<p>Some students joined a group already and were skipped:</p><p>';
+				$stulist = "'".implode("','",$alreadygroupedstu)."'";
+				$query = "SELECT FirstName,LastName FROM imas_users WHERE id IN ($stulist) ORDER BY LastName, FirstName";
+				$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
+				while ($row = mysql_fetch_row($result)) {
+					echo $row[1].', '.$row[0].'<br/>';
+				}
+				echo "<p><a href=\"managestugrps.php?cid=$cid&grpsetid={$_GET['grpsetid']}\">Continue</a></p>";
+				require("../footer.php");
+			} else {
+				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid&grpsetid={$_GET['grpsetid']}");
+			}
 			exit();
 		}
 		
@@ -227,9 +260,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		//$page_grps will be an array, groupid=>name
 		$page_grps = array();
 		$page_grpmembers = array();
+		$grpnums = 1;
 		$query = "SELECT id,name FROM imas_stugroups WHERE groupsetid='$grpsetid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
+			if ($row[1] == 'Unnamed group') { 
+				$row[1] .= " $grpnums";
+				$grpnums++;
+			}
 			$page_grps[$row[0]] = $row[1];
 			$page_grpmembers[$row[0]] = array();
 		}
@@ -359,7 +397,7 @@ if ($overwriteBody==1) {
 		//groupset selected - list members
 		echo "<h4>Managing groups in collection $page_grpsetname</h4>";
 		foreach ($page_grps as $grpid=>$grpname) {
-			echo "<b>Group $grpname</b> | ";
+			echo "<b>Group: $grpname</b> | ";
 			echo "<a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&rengrp=$grpid\">Rename</a> | ";
 			echo "<a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&delgrp=$grpid\">Delete</a> | ";
 			echo "<a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&removeall=$grpid\">Remove all members</a>";
