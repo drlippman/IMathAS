@@ -97,7 +97,8 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	$items = unserialize($line['itemorder']);
 	$msgset = $line['msgset']%5;
 	$chatset = $line['chatset'];
-	$useleftbar = ($line['cploc']==1);
+	$useleftbar = (($line['cploc']&1)==1);
+	$useleftstubar = (($line['cploc']&2)==2);
 	$topbar = explode('|',$line['topbar']);
 	$topbar[0] = explode(',',$topbar[0]);
 	$topbar[1] = explode(',',$topbar[1]);
@@ -400,7 +401,32 @@ if ($overwriteBody==1) {
 	</div>
 	<div id="centercontent">
 <?php	
-   }
+	} else if ($useleftstubar && !isset($teacherid)) {
+?>
+		<div id="leftcontent">
+			<p>
+			<a href="<?php echo $imasroot ?>/msgs/msglist.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>">
+			Messages</a> <?php echo $newmsgs ?> <br/>
+			<a href="<?php echo $imasroot ?>/forums/forums.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>">
+			Forums</a> <?php echo $newpostscnt ?><br/>
+			<a href="showcalendar.php?cid=<?php echo $cid ?>">Calendar</a>
+			</p>
+			<p>
+			<a href="gradebook.php?cid=<?php echo $cid ?>">Gradebook</a> <?php if (($coursenewflag&1)==1) {echo '<span class="red">New</span>';}?>
+			</p>
+			<p>
+			<a href="../actions.php?action=logout">Log Out</a><br/>   
+			<a href="<?php echo $imasroot ?>/help.php?section=usingimas">Help Using <?php echo $installname;?></a>
+			</p>
+			<?php		  
+			if ($myrights > 5 && $allowunenroll==1) {
+				echo "<p><a href=\"../forms.php?action=unenroll&cid=$cid\">Unenroll From Course</a></p>\n";
+			}
+			?>
+		</div>
+		<div id="centercontent">
+<?php
+	}
    
    if ($previewshift>-1) {
 ?>
@@ -443,7 +469,7 @@ if ($overwriteBody==1) {
 	   echo $backlink;
    }
    
-   if ($useleftbar && isset($teacherid)) {
+   if (($useleftbar && isset($teacherid)) || ($useleftstubar && !isset($teacherid))) {
 	   echo "</div>";
    } else {
 	  

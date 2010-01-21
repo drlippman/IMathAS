@@ -577,6 +577,9 @@ if ($myrights<20) {
 		} else {
 			$page_adminMsg = "";
 		}
+		//load filter.  Need earlier than usual header.php load
+		$curdir = rtrim(dirname(__FILE__), '/\\');
+		require_once("$curdir/../filter/filter.php");
 
 			//remember search
 		if (isset($_POST['search'])) {
@@ -656,13 +659,17 @@ if ($myrights<20) {
 		
 		$llist = "'".implode("','",explode(',',$searchlibs))."'";
 		
+		$libsortorder = array();
 		if (substr($searchlibs,0,1)=="0") {
 			$lnamesarr[0] = "Unassigned";
+			$libsortorder[0] = 0;
 		}
-		$query = "SELECT name,id FROM imas_libraries WHERE id IN ($llist)";
+		
+		$query = "SELECT name,id,sortorder FROM imas_libraries WHERE id IN ($llist)";
 		$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
 			$lnamesarr[$row[1]] = $row[0];
+			$libsortorder[$row[1]] = $row[2];
 		}
 		if (count($lnamesarr)>0) {
 			$lnames = implode(", ",$lnamesarr);
@@ -709,8 +716,88 @@ if ($myrights<20) {
 		$query.= " ORDER BY imas_library_items.libid,imas_questionset.id";
 		$resultLibs = mysql_query($query) or die("Query failed : " . mysql_error());
 		
+		$page_questionTable = array();
+		$page_libstouse = array();
+		$page_libqids = array();
+		$lastlib = -1;
+		$ln=1;
 		
+		while ($line = mysql_fetch_array($resultLibs, MYSQL_ASSOC)) {
+			if ($lastlib!=$line['libid'] && (isset($lnamesarr[$line['libid']]) || $searchall==1)) {
+				$page_libstouse[] = $line['libid'];
+				$lastlib = $line['libid'];
+				$page_libqids[$line['libid']] = array();
+			} 
+			if ($libsortorder[$line['libid']]==1) { //alpha
+				$page_libqids[$line['libid']][$line['id']] = trim($line['description']);
+			} else { //id
+				$page_libqids[$line['libid']][] = $line['id'];
+			}
+			$i = $line['id'];
+			
+			$page_questionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . $line['id'] . "' id='qo$ln'>";
+			if ($line['userights']==0) {
+				$page_questionTable[$i]['desc'] = '<span class="red">'.filter($line['description']).'</span>';
+			} else {
+				$page_questionTable[$i]['desc'] = filter($line['description']);
+			}
+				
+			$page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selform',$ln,{$line['id']})\"/>";
+			$page_questionTable[$i]['type'] = $line['qtype'];
+			if ($searchall==1) {
+				$page_questionTable[$i]['lib'] = "<a href=\"manageqset.php?cid=$cid&listlib={$line['libid']}\">List lib</a>";
+			}
+			$page_questionTable[$i]['times'] = 0;
+			
+			if ($isadmin || $isgrpadmin) {
+				$page_questionTable[$i]['mine'] = $line['lastName'] . ',' . substr($line['firstName'],0,1);
+				if ($line['userights']==0) {
+					$page_questionTable[$i]['mine'] .= ' <i>Priv</i>';
+				}
+			} else if ($line['ownerid']==$userid) { 
+				if ($line['userights']==0) {
+					$page_questionTable[$i]['mine'] = '<i>Priv</i>';
+				} else {
+					$page_questionTable[$i]['mine'] = 'Yes';
+				}
+			} else {
+				$page_questionTable[$i]['mine'] = '';
+			}							
+			$page_questionTable[$i]['action'] = "<select onchange=\"doaction(this.value,{$line['id']})\"><option value=\"0\">Action..</option>";
+			if ($isadmin || ($isgrpadmin && $line['groupid']==$groupid) || $line['ownerid']==$userid || $line['userights']>2) {
+				$page_questionTable[$i]['action'] .= '<option value="mod">Modify Code</option>';
+			} else {
+				$page_questionTable[$i]['action'] .= '<option value="mod">View Code</option>';
+			}
+			$page_questionTable[$i]['action'] .= '<option value="temp">Template</option>';
+			if ($isadmin || ($isgrpadmin && $line['groupid']==$groupid) || $line['ownerid']==$userid) {
+				$page_questionTable[$i]['action'] .= '<option value="del">Delete</option>';
+				$page_questionTable[$i]['action'] .= '<option value="tr">Transfer</option>';
+			} 
+			$page_questionTable[$i]['action'] .= '</select>';
+			
+			
+			$page_questionTable[$i]['lastmod'] =  date("m/d/y",$line['lastmoddate']);
+			$page_questionTable[$i]['add'] = "<a href=\"modquestion.php?qsetid={$line['id']}&aid=$aid&cid=$cid\">Add</a>";
+			$ln++;
+		}
+		//pull question useage data
+		if (count($page_questionTable)>0) {
+			$allusedqids = implode(',', array_keys($page_questionTable));
+			$query = "SELECT questionsetid,COUNT(id) FROM imas_questions WHERE questionsetid IN ($allusedqids) GROUP BY questionsetid";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				$page_questionTable[$row[0]]['times'] = $row[1];
+			}
+		}
 		
+		//sort alpha sorted libraries
+		foreach ($page_libstouse as $libid) {
+			if ($libsortorder[$libid]==1) {
+				natcasesort($page_libqids[$libid]);
+				$page_libqids[$libid] = array_keys($page_libqids[$libid]);
+			}
+		}
 		
 	}
 	
@@ -974,7 +1061,34 @@ function getnextprev(formn,loc) {
 		echo "</tr>\n";
 		echo "</thead><tbody>\n";
 		$alt = 0;
-		$lastlib = -1;
+		$ln = 1;
+		for ($j=0; $j<count($page_libstouse); $j++) {
+			if ($searchall==0) {
+				if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
+				echo '<td></td>';
+				if ($searchall==1) {echo '<td colspan="9">';} else {echo '<td colspan="8">';}
+				echo '<b>'.$lnamesarr[$page_libstouse[$j]].'</b>';
+				echo '</td></tr>';
+			}
+			for ($i=0;$i<count($page_libqids[$page_libstouse[$j]]); $i++) {
+				$qid =$page_libqids[$page_libstouse[$j]][$i];
+				if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
+				echo '<td>'.$page_questionTable[$qid]['checkbox'].'</td>';
+				echo '<td>'.$page_questionTable[$qid]['desc'].'</td>';
+				echo '<td>'.$page_questionTable[$qid]['preview'].'</td>';
+				echo '<td>'.$page_questionTable[$qid]['action'].'</td>';
+				echo '<td>'.$page_questionTable[$qid]['type'].'</td>';
+				echo '<td class="c">'.$page_questionTable[$qid]['times'].'</td>';
+				echo '<td>'.$page_questionTable[$qid]['lastmod'].'</td>';
+				echo '<td class="c">'.$page_questionTable[$qid]['mine'].'</td>';
+				if ($searchall==1) {
+					echo '<td>'.$page_questionTable[$qid]['lib'].'</td>';
+				}
+				$ln++;
+			}
+		}
+
+		/*$lastlib = -1;
 		$ln = 1;
 		while ($line = mysql_fetch_array($resultLibs, MYSQL_ASSOC)) {
 			if ($lastlib!=$line['libid'] && isset($lnamesarr[$line['libid']])) {
@@ -1037,6 +1151,7 @@ function getnextprev(formn,loc) {
 			echo "</tr>\n";
 			$ln++;
 		}
+		*/
 		echo "</tbody></table>\n";
 		echo "<script type=\"text/javascript\">\n";
 		echo "initSortTable('myTable',Array(false,'S',false,false,'S','N','D'";

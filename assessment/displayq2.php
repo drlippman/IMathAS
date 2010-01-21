@@ -228,7 +228,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	}
 	echo "<div>";
 	foreach($tips as $iidx=>$tip) {
-		if (!isset($hidetips) && !$seqinactive && $showtips>0) {
+		if ((!isset($hidetips) || (is_array($hidetips) && !isset($hidetips[$iidx])))&& !$seqinactive && $showtips>0) {
 			echo "<p class=\"tips\" ";
 			if ($showtips!=1) { echo 'style="display:none;" ';}
 			echo ">Box ".($iidx+1).": <span id=\"tips$qnidx-$iidx\">$tip</span></p>";
@@ -3047,8 +3047,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			return 0;
 		} else {
 			//echo "Error uploading file";
-			$GLOBALS['partlastanswer'] = "Error uploading file";
-			$GLOBALS['scoremessages'] .= "Error uploading file";
+			if ($_FILES["qn$qn"]['error']==2 || $_FILES["qn$qn"]['error']==1) {
+				$GLOBALS['partlastanswer'] = "Error uploading file - file too big";
+				$GLOBALS['scoremessages'] .= "Error uploading file - file too big";
+			} else {
+				$GLOBALS['partlastanswer'] = "Error uploading file";
+				$GLOBALS['scoremessages'] .= "Error uploading file";
+			}
 			return 0;
 		}
 	}

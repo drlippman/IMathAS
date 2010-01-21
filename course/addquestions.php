@@ -441,15 +441,17 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		
 		if (!$beentaken) {
 			//potential questions
+			$libsortorder = array();
 			if (substr($searchlibs,0,1)=="0") {
 				$lnamesarr[0] = "Unassigned";
+				$libsortorder[0] = 0;
 			}
 			
-			$query = "SELECT name,id FROM imas_libraries WHERE id IN ($llist)";
+			$query = "SELECT name,id,sortorder FROM imas_libraries WHERE id IN ($llist)";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			
 			while ($row = mysql_fetch_row($result)) {
 				$lnamesarr[$row[1]] = $row[0];
+				$libsortorder[$row[1]] = $row[2];
 			}
 			$lnames = implode(", ",$lnamesarr);
 
@@ -492,13 +494,15 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$lastlib = -1;
 					$i=0;
 					$page_questionTable = array();
+					$page_libstouse = array();
+					$page_libqids = array();
 					
 					while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 						if ($newonly && in_array($line['id'],$existingq)) {
 							continue;
 						}
 						if ($lastlib!=$line['libid'] && isset($lnamesarr[$line['libid']])) {
-							$page_questionTable[$i]['checkbox'] = "";
+							/*$page_questionTable[$i]['checkbox'] = "";
 							$page_questionTable[$i]['desc'] = "<b>".$lnamesarr[$line['libid']]."</b>";
 							$page_questionTable[$i]['preview'] = "";
 							$page_questionTable[$i]['type'] = "";
@@ -511,18 +515,32 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 							$page_questionTable[$i]['templ'] = "";
 							$lastlib = $line['libid'];
 							$i++;
+							*/
+							$page_libstouse[] = $line['libid'];
+							$lastlib = $line['libid'];
+							$page_libqids[$line['libid']] = array();
+							
 						} 
+						
+						if ($libsortorder[$line['libid']]==1) { //alpha
+							$page_libqids[$line['libid']][$line['id']] = $line['description'];
+						} else { //id
+							$page_libqids[$line['libid']][] = $line['id'];
+						}
+						$i = $line['id'];
 						$page_questionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . $line['id'] . "' id='qo$ln'>";
 						$page_questionTable[$i]['desc'] = filter($line['description']);
 						$page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selq','qo$ln',{$line['id']},true,false)\"/>";
 						$page_questionTable[$i]['type'] = $line['qtype'];
-						if ($searchall==1) 
+						if ($searchall==1) {
 							$page_questionTable[$i]['lib'] = "<a href=\"addquestions.php?cid=$cid&aid=$aid&listlib={$line['libid']}\">List lib</a>";
-						
-						$query = "SELECT COUNT(id) FROM imas_questions WHERE questionsetid='{$line['id']}'";
+						}
+						/*$query = "SELECT COUNT(id) FROM imas_questions WHERE questionsetid='{$line['id']}'";
 						$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 						$times = mysql_result($result2,0,0);
 						$page_questionTable[$i]['times'] = $times;
+						*/
+						$page_questionTable[$i]['times'] = 0;
 						
 						if ($line['ownerid']==$userid) { 
 							if ($line['userights']==0) {
@@ -544,10 +562,28 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						}							
 						
 						$page_questionTable[$i]['templ'] = "<a href=\"moddataset.php?id={$line['id']}&aid=$aid&cid=$cid&template=true\">Template</a>";						
-						$i++;
+						//$i++;
 						$ln++;
 							
 					} //end while
+					
+					//pull question useage data
+					if (count($page_questionTable)>0) {
+						$allusedqids = implode(',', array_keys($page_questionTable));
+						$query = "SELECT questionsetid,COUNT(id) FROM imas_questions WHERE questionsetid IN ($allusedqids) GROUP BY questionsetid";
+						$result = mysql_query($query) or die("Query failed : " . mysql_error());
+						while ($row = mysql_fetch_row($result)) {
+							$page_questionTable[$row[0]]['times'] = $row[1];
+						}
+					}
+					
+					//sort alpha sorted libraries
+					foreach ($page_libstouse as $libid) {
+						if ($libsortorder[$libid]==1) {
+							natcasesort($page_libqids[$libid]);
+							$page_libqids[$libid] = array_keys($page_libqids[$libid]);
+						}
+					}
 					
 				}
 			}
@@ -806,31 +842,40 @@ if ($overwriteBody==1) {
 			</thead>
 			<tbody>
 <?php					
-					$alt=0;
-					for ($i=0;$i<count($page_questionTable); $i++) {
+				$alt=0;
+				for ($j=0; $j<count($page_libstouse); $j++) {
+					if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
+					echo '<td></td>';
+					if ($searchall==1) {echo '<td colspan="9">';} else {echo '<td colspan="8">';}
+					echo '<b>'.$lnamesarr[$page_libstouse[$j]].'</b>';
+					echo '</td></tr>';
+					
+					for ($i=0;$i<count($page_libqids[$page_libstouse[$j]]); $i++) {
+						$qid =$page_libqids[$page_libstouse[$j]][$i];
 						if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 ?>						
 
-					<td><?php echo $page_questionTable[$i]['checkbox'] ?></td>
-					<td><?php echo $page_questionTable[$i]['desc'] ?></td>
-					<td><?php echo $page_questionTable[$i]['preview'] ?></td>
-					<td><?php echo $page_questionTable[$i]['type'] ?></td>
+					<td><?php echo $page_questionTable[$qid]['checkbox'] ?></td>
+					<td><?php echo $page_questionTable[$qid]['desc'] ?></td>
+					<td><?php echo $page_questionTable[$qid]['preview'] ?></td>
+					<td><?php echo $page_questionTable[$qid]['type'] ?></td>
 <?php
 						if ($searchall==1) {
 ?>					
-					<td><?php echo $page_questionTable[$i]['lib'] ?></td>
+					<td><?php echo $page_questionTable[$qid]['lib'] ?></td>
 <?php
 						}
 ?>
-					<td class=c><?php echo $page_questionTable[$i]['times'] ?></td>
-					<td><?php echo $page_questionTable[$i]['mine'] ?></td>
-					<td class=c><?php echo $page_questionTable[$i]['add'] ?></td>
-					<td><?php echo $page_questionTable[$i]['src'] ?></td>
-					<td class=c><?php echo $page_questionTable[$i]['templ'] ?></td>
+					<td class=c><?php echo $page_questionTable[$qid]['times'] ?></td>
+					<td><?php echo $page_questionTable[$qid]['mine'] ?></td>
+					<td class=c><?php echo $page_questionTable[$qid]['add'] ?></td>
+					<td><?php echo $page_questionTable[$qid]['src'] ?></td>
+					<td class=c><?php echo $page_questionTable[$qid]['templ'] ?></td>
 					
 				</tr>
 <?php
 					}
+				}
 ?>					
 			</tbody>
 		</table>

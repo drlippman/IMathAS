@@ -348,14 +348,14 @@ if ($myrights<20) {
 				} else {
 					$mt = microtime();
 					$uqid = substr($mt,11).substr($mt,2,6);
-					$query = "INSERT INTO imas_libraries (uniqueid,adddate,lastmoddate,name,ownerid,userights,parent,groupid) VALUES ";
-					$query .= "($uqid,$now,$now,'{$_POST['name']}','$userid','{$_POST['rights']}','{$_POST['libs']}','$groupid')";
+					$query = "INSERT INTO imas_libraries (uniqueid,adddate,lastmoddate,name,ownerid,userights,sortorder,parent,groupid) VALUES ";
+					$query .= "($uqid,$now,$now,'{$_POST['name']}','$userid','{$_POST['rights']}','{$_POST['sortorder']}','{$_POST['libs']}','$groupid')";
 					mysql_query($query) or die("Query failed : " . mysql_error());
 					header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
 					exit;
 				}
 			} else {
-				$query = "UPDATE imas_libraries SET name='{$_POST['name']}',userights='{$_POST['rights']}',parent='{$_POST['libs']}',lastmoddate=$now ";
+				$query = "UPDATE imas_libraries SET name='{$_POST['name']}',userights='{$_POST['rights']}',sortorder='{$_POST['sortorder']}',parent='{$_POST['libs']}',lastmoddate=$now ";
 				$query .= "WHERE id='{$_GET['modify']}'";
 				if (!$isadmin) {
 					$query .= " AND groupid='$groupid'";
@@ -373,7 +373,7 @@ if ($myrights<20) {
 			
 			if ($_GET['modify']!="new") {
 				$pagetitle = "Modify Library\n";
-				$query = "SELECT name,userights,parent FROM imas_libraries WHERE id='{$_GET['modify']}'";
+				$query = "SELECT name,userights,parent,sortorder FROM imas_libraries WHERE id='{$_GET['modify']}'";
 				if (!$isadmin) {
 					$query .= " AND ownerid='$userid'";
 				}
@@ -382,6 +382,7 @@ if ($myrights<20) {
 					$name = $row[0];
 					$rights = $row[1];
 					$parent = $row[2];
+					$sortorder = $row[3];
 				}
 			} else {
 				$pagetitle = "Add Library\n";
@@ -398,6 +399,7 @@ if ($myrights<20) {
 				}
 			}
 			if (!isset($parent)) {$parent = 0;}
+			if (!isset($sortorder)) {$sortorder = 0;}
 			$parent1 = $parent;
 
 			if ($parent==0) {
@@ -439,11 +441,12 @@ if ($myrights<20) {
 			$page_AdminModeMsg = "";
 		}
 		
-		$query = "SELECT imas_libraries.id,imas_libraries.name,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.parent,imas_libraries.groupid,count(imas_library_items.id) AS count ";
+		$query = "SELECT imas_libraries.id,imas_libraries.name,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.sortorder,imas_libraries.parent,imas_libraries.groupid,count(imas_library_items.id) AS count ";
 		$query .= "FROM imas_libraries LEFT JOIN imas_library_items ON imas_library_items.libid=imas_libraries.id ";
 		$query .= "GROUP BY imas_libraries.id";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$rights = array();
+		$sortorder = array();
 		
 		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 			$id = $line['id'];
@@ -454,6 +457,7 @@ if ($myrights<20) {
 			$parents[$id] = $parent;
 			$names[$id] = $name;
 			$rights[$id] = $line['userights'];
+			$sortorder[$id] = $line['sortorder'];
 			$ownerids[$id] = $line['ownerid'];
 			$groupids[$id] = $line['groupid'];
 		}
@@ -609,6 +613,12 @@ if ($overwriteBody==1) {
 			<?php writeHtmlSelect ("rights",$page_libRights['val'],$page_libRights['label'],$rights,$defaultLabel=null,$defaultVal=null,$actions=null) ?>
 		</span><br class=form>
 		
+		<span class=form>Sort order: </span>
+		<span class=formright>
+			<input type="radio" name="sortorder" value="0" <?php writeHtmlChecked($sortorder,0); ?> />Creation date<br/>
+			<input type="radio" name="sortorder" value="1" <?php writeHtmlChecked($sortorder,1); ?> />Alphabetical
+		</span><br class=form>
+		
 		<span class=form>Parent Library:</span>
 		<span class=formright>
 			<span id="libnames"><?php echo $lnames ?></span>
@@ -697,8 +707,17 @@ function delqimgs($qsid) {
 }
 
 function printlist($parent) {
-	global $names,$ltlibs,$count,$qcount,$cid,$rights,$ownerids,$userid,$isadmin,$groupids,$groupid,$isgrpadmin;
+	global $names,$ltlibs,$count,$qcount,$cid,$rights,$sortorder,$ownerids,$userid,$isadmin,$groupids,$groupid,$isgrpadmin;
 	$arr = $ltlibs[$parent];
+	if ($sortorder[$parent]==1) {
+		$orderarr = array();
+		foreach ($arr as $child) {
+			$orderarr[$child] = $names[$child];
+		}
+		natcasesort($orderarr);
+		$arr = array_keys($orderarr);
+	}
+		
 	foreach ($arr as $child) {
 		//if ($rights[$child]>0 || $ownerids[$child]==$userid || $isadmin) {
 		if ($rights[$child]>2 || ($rights[$child]>0 && $groupids[$child]==$groupid) || $ownerids[$child]==$userid || ($isgrpadmin && $groupids[$child]==$groupid) ||$isadmin) {

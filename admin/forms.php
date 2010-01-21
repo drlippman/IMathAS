@@ -139,7 +139,11 @@ switch($_GET['action']) {
 					    //0 allow enroll, 2 no enroll
 			$copyrights = 0;
 			$msgset = 0;
-			$cploc = 1;
+			if (isset($cplocdefault)) {
+				$cploc = $cplocdefault;
+			} else {
+				$cploc = 1;
+			}
 			$topbar = array(array(),array());
 			$avail = 0;
 			$lockaid = 0;
@@ -327,10 +331,18 @@ switch($_GET['action']) {
 		
 		echo '<span class=form>Instructor course management links location:</span><span class=formright>';
 		echo '<input type=radio name="cploc" value="0" ';
-		if ($cploc==0) {echo "checked=1";}
+		if (($cploc&1)==0) {echo "checked=1";}
 		echo ' /> Bottom of page<br /><input type=radio name="cploc" value="1" ';
-		if ($cploc==1) {echo "checked=1";}
+		if (($cploc&1)==1) {echo "checked=1";}
 		echo ' /> Left side bar</span><br class=form />';
+		
+		echo '<span class=form>Student links location:</span><span class=formright>';
+		echo '<input type=radio name="cplocstu" value="0" ';
+		if (($cploc&2)==0) {echo "checked=1";}
+		echo ' /> Bottom of page<br /><input type=radio name="cplocstu" value="2" ';
+		if (($cploc&2)==2) {echo "checked=1";}
+		echo ' /> Left side bar</span><br class=form />';
+		
 		if (isset($enablebasiclti) && $enablebasiclti==true) {
 			echo '<span class="form">LTI access secret (max 10 chars; blank to not use)</span>';
 			echo '<span class="formright"><input name="ltisecret" type="text" value="'.$ltisecret.'" /> ';

@@ -144,9 +144,10 @@ switch($_GET['action']) {
 		} else {
 			$_POST['ltisecret'] = '';
 		}
+		$cploc = $_POST['cploc'] + $_POST['cplocstu'];
 		
 		$query = "UPDATE imas_courses SET name='{$_POST['coursename']}',enrollkey='{$_POST['ekey']}',hideicons='$hideicons',available='$avail',lockaid='{$_POST['lockaid']}',picicons='{$_POST['picicons']}',chatset=$chatset,showlatepass=$showlatepass,";
-		$query .= "allowunenroll='$unenroll',copyrights='{$_POST['copyrights']}',msgset='{$_POST['msgset']}',topbar='$topbar',cploc='{$_POST['cploc']}',theme='{$_POST['theme']}',ltisecret='{$_POST['ltisecret']}' WHERE id='{$_GET['id']}'";
+		$query .= "allowunenroll='$unenroll',copyrights='{$_POST['copyrights']}',msgset='{$_POST['msgset']}',topbar='$topbar',cploc='$cploc',theme='{$_POST['theme']}',ltisecret='{$_POST['ltisecret']}' WHERE id='{$_GET['id']}'";
 		if ($myrights<75) { $query .= " AND ownerid='$userid'";}
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		break;

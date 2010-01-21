@@ -39,7 +39,7 @@ END;
 END;
 	} 
 	echo "<script type=\"text/javascript\">";
-	$query = "SELECT imas_libraries.id,imas_libraries.name,imas_libraries.parent,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.groupid,COUNT(imas_library_items.id) AS count ";
+	$query = "SELECT imas_libraries.id,imas_libraries.name,imas_libraries.parent,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.sortorder,imas_libraries.groupid,COUNT(imas_library_items.id) AS count ";
 	$query .= "FROM imas_libraries LEFT JOIN imas_library_items ON imas_library_items.libid=imas_libraries.id GROUP BY imas_libraries.id";
 	//$query = "SELECT id,name,parent FROM imas_libraries ORDER BY parent";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -65,6 +65,7 @@ END;
 	$allsrights = 2+3*$selectrights;
 	
 	$rights = array();
+	$sortorder = array();
 	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 		$id = $line['id'];
 		$name = addslashes($line['name']);
@@ -76,6 +77,7 @@ END;
 		$parents[$id] = $parent;
 		$names[$id] = $name;
 		$rights[$id] = $line['userights'];
+		$sortorder[$id] = $line['sortorder'];
 		$ownerids[$id] = $line['ownerid'];
 		$groupids[$id] = $line['groupid'];
 	}
@@ -129,7 +131,7 @@ END;
 	}
 		
 	function printlist($parent) {
-		global $names,$ltlibs,$checked,$toopen, $select,$isempty,$rights,$ownerids,$isadmin,$selectrights,$allsrights,$published,$userid,$locked,$groupids,$groupid,$isgrpadmin,$donefirst;
+		global $names,$ltlibs,$checked,$toopen, $select,$isempty,$rights,$sortorder,$ownerids,$isadmin,$selectrights,$allsrights,$published,$userid,$locked,$groupids,$groupid,$isgrpadmin,$donefirst;
 		$newchildren = array();
 		$arr = array();
 		if ($parent==0 && isset($published)) {
@@ -141,6 +143,14 @@ END;
 		if ($donefirst[$parent]==0) {
 			echo ",\n$parent:[";
 			$donefirst[$parent]==1;
+		}
+		if ($sortorder[$parent]==1) {
+			$orderarr = array();
+			foreach ($arr as $child) {
+				$orderarr[$child] = $names[$child];
+			}
+			natcasesort($orderarr);
+			$arr = array_keys($orderarr);
 		}
 		foreach ($arr as $child) {
 			if ($rights[$child]>$allsrights || (($rights[$child]%3)>$selectrights && $groupids[$child]==$groupid) || $ownerids[$child]==$userid || ($isgrpadmin && $groupids[$child]==$groupid) ||$isadmin) {	

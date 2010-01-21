@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 24;
+$latest = 25;
 
 if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 	$handle = fopen("upgradecounter.txt",'w');
@@ -294,13 +294,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 if ($res===false) {
 				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
-			 /*later (once groups are done)
-			 $query = "ALTER TABLE `imas_assessments` DROP COLUMN `isgroup`"; 
-			 $res = mysql_query($query);
-			 if ($res===false) {
-				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
-			 }
-			 */
+	
 			 $query = "ALTER TABLE `imas_forums` ADD `groupsetid` INT( 10 ) UNSIGNED NOT NULL DEFAULT '0';"; 
 			 $res = mysql_query($query);
 			 if ($res===false) {
@@ -325,6 +319,13 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
 			
+		}
+		if ($last < 25) {
+			 $query = "ALTER TABLE `imas_libraries` ADD `sortorder` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0';"; 
+			 $res = mysql_query($query);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
 		}
 		$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {

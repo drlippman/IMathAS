@@ -24,6 +24,12 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = "";
 $hasInclude = 0;
+if (!isset($allowinstructorstoaddstu)) {
+	$allowinstructorstoaddstu = true;
+}
+if (!isset($allowinstructorstoaddtutors)) {
+	$allowinstructorstoaddtutors = true;
+}
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n";
 
 if (!isset($teacherid)) { // loaded by a NON-teacher
@@ -67,7 +73,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
 			$resultStudentList = mysql_query($query) or die("Query failed : " . mysql_error());
 		}
-	} elseif (isset($_GET['enroll'])) {
+	} elseif (isset($_GET['enroll']) && $allowinstructorstoaddstu) {
 
 		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Enroll Students\n";
 		$pagetitle = "Enroll an Existing User";
@@ -101,7 +107,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			}
 			
 		} 
-	} elseif (isset($_GET['newstu'])) {
+	} elseif (isset($_GET['newstu']) && $allowinstructorstoaddstu) {
 		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Enroll Students\n";
 		$pagetitle = "Enroll a New Student";	
 	
@@ -565,15 +571,19 @@ if ($overwriteBody==1) {
 		
 
 	<div class=cp>
-		<a href="<?php echo $imasroot ?>/admin/importstu.php?cid=<?php echo $cid ?>">
-		Import Students from File</a><br/>
-		<a href="listusers.php?cid=<?php echo $cid ?>&enroll=student">Enroll Student with known username</a><br/>
-		<a href="listusers.php?cid=<?php echo $cid ?>&newstu=new">Create and Enroll new student</a><br/>
-		<a href="enrollfromothercourse.php?cid=<?php echo $cid ?>">Enroll students from another course</a><br/>
-		<a href="listusers.php?cid=<?php echo $cid ?>&assigncode=1">Assign Sections and/or Codes</a><br/>
-		<a href="latepasses.php?cid=<?php echo $cid ?>">Manage LatePasses</a><br/>
-		<a href="managetutors.php?cid=<?php echo $cid ?>">Manage Tutors</a>
-		
+	<?php
+	echo "<a href=\"listusers.php?cid=$cid&enroll=student\">Enroll Student with known username</a><br/>";
+	if ($allowinstructorstoaddstu) { 
+		echo "<a href=\"$imasroot/admin/importstu.php?cid=$cid\">Import Students from File</a><br/>";
+		echo "<a href=\"listusers.php?cid=$cid&newstu=new\">Create and Enroll new student</a><br/>";
+		echo "<a href=\"enrollfromothercourse.php?cid=$cid\">Enroll students from another course</a><br/>";
+	}
+	echo "<a href=\"listusers.php?cid=$cid&assigncode=1\">Assign Sections and/or Codes</a><br/>";
+	echo "<a href=\"latepasses.php?cid=$cid\">Manage LatePasses</a>";
+	if ($allowinstructorstoaddtutors) {
+		echo "<br/><a href=\"managetutors.php?cid=$cid\">Manage Tutors</a>";
+	}
+	?>
 	</div>
 	<p></p>
 <?php
