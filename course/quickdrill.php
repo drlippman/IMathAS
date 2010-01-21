@@ -13,7 +13,28 @@
 //		nc=#  do until nc questions are correct then stop
 //		t=#  do as many questions as possible in t seconds
 
-require("../validate.php");
+if (isset($_GET['public'])) {
+	require("../config.php");
+	session_start();
+	$_SESSION['publicquickdrill'] = true;
+	function writesessiondata() {
+		global $sessiondata;
+		$_SESSION['data'] = base64_encode(serialize($sessiondata));
+	}
+	if (!isset($_SESSION['data'])) {
+		$sessiondata = array();
+	} else {
+		$sessiondata = unserialize(base64_decode($_SESSION['data']));
+	}
+	$public = '?public=true';
+	$publica = '&public=true';
+	$sessiondata['graphdisp'] = 1;
+	$sessiondata['mathdisp'] = 2;
+} else {
+	require("../validate.php");
+	$public = '';
+	$publica = '';
+}
 require("../assessment/displayq2.php");
 
 $pagetitle = "Quick Drill";
@@ -37,6 +58,10 @@ if (isset($sessiondata['drill']) && empty($_GET['id'])) {
 	$scores = $sessiondata['drill']['scores'];
 	
 	$showscore = ($sa==0 || $sa==1 || $sa==4);
+	if (($mode=='cntup' || $mode=='cntdown') && $starttime==0)  {
+		$sessiondata['drill']['starttime'] = time();
+		$starttime = time();
+	}
 	
 } else {
 	//first access - load into sessiondata and refresh
@@ -77,14 +102,22 @@ if (isset($sessiondata['drill']) && empty($_GET['id'])) {
 		$sessiondata['drill']['mode'] = 'cntup';
 	}
 	if ($sessiondata['drill']['mode']=='cntup' || $sessiondata['drill']['mode']=='cntdown') {
-		$sessiondata['drill']['starttime'] = time();
+		$sessiondata['drill']['starttime'] = 0;
 	}
 	$sessiondata['coursetheme'] = $coursetheme;
 	writesessiondata();
-	header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php");
+	
+	if ($sessiondata['drill']['mode']=='cntup' || $sessiondata['drill']['mode']=='cntdown') {
+		echo '<html><body>';
+		echo "<a href=\"http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php$public\">Start</a>";
+		echo '</body></html>';
+	} else {
+		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php$public");
+	}
+	exit;
 }
 
-$page_formAction = "quickdrill.php";
+$page_formAction = "quickdrill.php$public";
 
 $showans = false;
 if (isset($_POST['seed'])) {
@@ -96,6 +129,7 @@ if (isset($_POST['seed'])) {
 		$seed = $_POST['seed'];
 	} else if (getpts($score)<1 && $sa==4) {
 		$seed = $_POST['seed'];
+		unset($lastanswers);
 	} else {
 		unset($lastanswers);
 		$seed = rand(1,9999);
@@ -131,7 +165,7 @@ if ($mode=='cntup' || $mode=='cntdown') {
 	} else if ($mode=='cntdown') {
 		$cur = $timelimit - ($now - $starttime);
 	}
-	if ($mode=='cntdown' && $cur <= 0) {
+	if ($mode=='cntdown' && ($cur <=0 || isset($_GET['superdone']))) {
 		$timesup = true;	
 	}
 	if ($cur > 3600) {
@@ -153,7 +187,7 @@ if (isset($n) && count($scores)==$n && !$showans) {  //if student has completed 
 	if ($minutes>0) { echo "$minutes minutes ";}
 	echo "$seconds seconds</p>";
 	echo "<p>Score:  $curscore out of ".count($scores)." possible</p>";
-	$addr = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php?id=$qsetid&cid=$cid&sa=$sa&n=$n";
+	$addr = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php?id=$qsetid&cid=$cid&sa=$sa&n=$n$publica";
 	echo "<p><a href=\"$addr\">Again</a></p>";
 	require("../footer.php");
 	exit;
@@ -168,7 +202,7 @@ if (isset($nc) && $curscore==$nc) {  //if student has completed their nc questio
 	echo "$seconds seconds</p>";
 	
 	echo "<p>".count($scores)." tries used</p>";
-	$addr = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php?id=$qsetid&cid=$cid&sa=$sa&nc=$nc";
+	$addr = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php?id=$qsetid&cid=$cid&sa=$sa&nc=$nc$publica";
 	echo "<p><a href=\"$addr\">Again</a></p>";
 	require("../footer.php");
 	exit;
@@ -191,7 +225,7 @@ if ($timesup == true) { //if time has expired
 	if ($hours>0) { echo "$hours hours ";}
 	if ($minutes>0) { echo "$minutes minutes ";}
 	echo "$seconds seconds</p>";
-	$addr = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php?id=$qsetid&cid=$cid&sa=$sa&t=$timelimit";
+	$addr = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php?id=$qsetid&cid=$cid&sa=$sa&t=$timelimit$publica";
 	echo "<p><a href=\"$addr\">Again</a></p>";
 	require("../footer.php");
 	exit;
@@ -212,6 +246,8 @@ if ($mode=='cntup' || $mode=='cntdown') {
 	}
 	echo "    if (seconds==0 && minutes==0 && hours==0) {done=true; ";
 	echo "		var theform = document.getElementById(\"qform\");";
+	echo "		var action = theform.getAttribute(\"action\");";
+	echo "		theform.setAttribute(\"action\",action+'&superdone=true');";
 	echo "		if (doonsubmit(theform,true,true)) { theform.submit(); } \n"; 
 	//setTimeout('document.getElementById(\"qform\").submit()',1000);} \n";
 	echo "		return 0;";
@@ -231,18 +267,23 @@ if ($mode=='cntup' || $mode=='cntdown') {
 	echo "	  document.getElementById('timer').innerHTML = str;\n";
 	echo "    if (!done) {setTimeout(\"updatetime()\",1000);}\n";
 	echo " }\n";
-	echo "function focusfirst() { ";
-	echo "	  var el = document.getElementById(\"qn0\");";
-	echo "    if (el != null) {el.focus();}";
-	echo " }";
 	//echo " //updatetime();\n";
 	echo " initstack.push(updatetime);";
-	echo " initstack.push(focusfirst);";
 	echo "</script>\n";
 	echo "<div class=right id=timelimitholder>Time: <span id=\"timer\" style=\"font-size: 120%; color: red;\" ";
 	echo ">$hours:$minutes:$seconds</span></div>\n";
-		
 }
+?>
+<script type="text/javascript">
+function focusfirst() {
+   var el = document.getElementById("qn0");
+   if (el != null) {el.focus();}
+}
+initstack.push(focusfirst);
+</script>
+
+
+<?php
 
 if ($page_scoreMsg != '' && $showscore) {
 	echo '<div class="review">Score on last question: '.$page_scoreMsg;

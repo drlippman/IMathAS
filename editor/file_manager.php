@@ -32,7 +32,8 @@ if (isset($_REQUEST["action"]))
 {
 	if ($_REQUEST["action"] == "upload_file")
 	{
-		$filename = basename(stripslashes($_POST["uploaded_file_name"]));
+		//$filename = basename(stripslashes($_POST["uploaded_file_name"]));
+		$filename = basename($_FILES['uploaded_file']['name']);
 		$filename = str_replace(' ','_',$filename);
 		$filename = preg_replace('/[^\w\.]/','',$filename);
 		//$filename = urlencode($filename);
