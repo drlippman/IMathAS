@@ -4,7 +4,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=7" />
 <title><?php echo $installname; if (isset($pagetitle)) { echo " - $pagetitle";}?></title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-<link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=0121102";?>" type="text/css" />
+<link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=0121103";?>" type="text/css" />
 <?php if (isset($coursetheme)) { 
 	if (isset($flexwidth)) {
 		$coursetheme = str_replace('_fw','',$coursetheme);
@@ -158,15 +158,9 @@ END;
 $insertinheaderwrapper = ' '; //"<h1>$coursename</h1>";
 echo '<div class=mainbody>';
 if (isset($insertinheaderwrapper)) {
-	echo '<div class="headerwrapper">'.$insertinheaderwrapper.'</div>';
+	//echo '<div class="headerwrapper">'.$insertinheaderwrapper.'</div>';
 }
-echo '<div class="midwrapper">';
-
-//load filter
-$curdir = rtrim(dirname(__FILE__), '/\\');
-require_once("$curdir/filter/filter.php");
-
-//CUSTOMIZE:  put a small (max 120px wide) logo on upper right of course pages
+echo '<div class="headerwrapper">';
 $didnavlist = false;
 if (isset($cid) && isset($teacherid) && $coursetopbar[2]==1 && count($coursetopbar[1])>0 && !isset($flexwidth)) {
 	echo '<ul id="navlist">';
@@ -219,6 +213,15 @@ if (isset($cid) && isset($teacherid) && $coursetopbar[2]==1 && count($coursetopb
 	echo '<div class="clear"> </div>';
 	$didnavlist = true;
 }
+echo '</div>';
+echo '<div class="midwrapper">';
+
+//load filter
+$curdir = rtrim(dirname(__FILE__), '/\\');
+require_once("$curdir/filter/filter.php");
+
+//CUSTOMIZE:  put a small (max 120px wide) logo on upper right of course pages
+
 if (!isset($nologo)) {
 	echo '<div id="headerlogo" ';
 	if ($myrights>10 && !$ispublic) {

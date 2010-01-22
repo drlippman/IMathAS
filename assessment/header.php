@@ -146,9 +146,9 @@ echo '</head><body>';
 $insertinheaderwrapper = ' ';
 echo '<div class=mainbody>';
 if (isset($insertinheaderwrapper)) {
-	echo '<div class="headerwrapper">'.$insertinheaderwrapper.'</div>';
+	//echo '<div class="headerwrapper">'.$insertinheaderwrapper.'</div>';
 }
-echo '<div class="midwrapper">';
+echo '<div class="headerwrapper">';
 
 $coursetopbar = explode('|',$sessiondata['coursetopbar']);
 $coursetopbar[0] = explode(',',$coursetopbar[0]);
@@ -205,6 +205,9 @@ if (isset($cid) && $sessiondata['isteacher'] && $coursetopbar[2]==1 && count($co
 	}
 	echo '</ul>';
 }
+echo '</div>';
+echo '<div class="midwrapper">';
+
 
 ?>
 

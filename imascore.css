@@ -231,6 +231,10 @@ span.hdr1 {
 		margin-right: 10px;
 }
 
+.midwrapper {
+	position: relative;
+}
+	
 .red {
 	color: red;
 }
@@ -336,8 +340,8 @@ div.tips {
 
 #headerlogo {
 	position: absolute; 
-	right:5px; 
-	top: 12px; 
+	right:0px; 
+	top: 7px; 
 	cursor: pointer;
 }
 a {
@@ -349,17 +353,15 @@ ul#navlist
 clear: both;
 padding: 0px;
 margin: 0px;
-margin-bottom: 3px;
 list-style-type: none;
 float: left;
-/*width: 100%;*/
+width: 100%;
 color: #fff;
 background-color: #036;
 }
 
 ul#navlist li { 
 display: inline;
-font-family: sans-serif;
 }
 
 ul#navlist li a
