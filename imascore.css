@@ -343,3 +343,39 @@ div.tips {
 a {
 	outline: none;
 }
+
+ul#navlist
+{
+clear: both;
+padding: 0px;
+margin: 0px;
+margin-bottom: 3px;
+list-style-type: none;
+float: left;
+/*width: 100%;*/
+color: #fff;
+background-color: #036;
+}
+
+ul#navlist li { 
+display: inline;
+font-family: sans-serif;
+}
+
+ul#navlist li a
+{
+float: left;
+/*width: 5em;*/
+color: #fff;
+background-color: #036;
+padding: 0.2em 1em;
+text-decoration: none;
+border-right: 1px solid #fff;
+}
+
+ul#navlist li a:hover
+{
+background-color: #369;
+color: #fff;
+}
+	

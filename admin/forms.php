@@ -120,6 +120,7 @@ switch($_GET['action']) {
 			$topbar[1] = explode(',',$topbar[1]);
 			if ($topbar[0][0] == null) {unset($topbar[0][0]);}
 			if ($topbar[1][0] == null) {unset($topbar[1][0]);}
+			if (!isset($topbar[2])) {$topbar[2] = 0;}
 			$avail = $line['available'];
 			$lockaid = $line['lockaid'];
 			$ltisecret = $line['ltisecret'];
@@ -144,7 +145,7 @@ switch($_GET['action']) {
 			} else {
 				$cploc = 1;
 			}
-			$topbar = array(array(),array());
+			$topbar = array(array(),array(),0);
 			$avail = 0;
 			$lockaid = 0;
 			$theme = $defaultcoursetheme;
@@ -328,6 +329,11 @@ switch($_GET['action']) {
 		echo ' /> Quick View<br /><input type=checkbox name="insttopbar[]" value="9" ';
 		if (in_array(9,$topbar[1])) { echo 'checked=1'; }
 		echo ' /> Log Out</span><br class=form />';
+		
+		echo '<span class="form">Quick Pick Bar location:</span><span class="formright">';
+		echo '<input type="radio" name="topbarloc" value="0" '. ($topbar[2]==0?'checked="checked"':'').'>Top of course page<br/>';
+		echo '<input type="radio" name="topbarloc" value="1" '. ($topbar[2]==1?'checked="checked"':'').'>Top of all pages';
+		echo '</span><br class="form" />';
 		
 		echo '<span class=form>Instructor course management links location:</span><span class=formright>';
 		echo '<input type=radio name="cploc" value="0" ';

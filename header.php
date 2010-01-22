@@ -4,7 +4,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=7" />
 <title><?php echo $installname; if (isset($pagetitle)) { echo " - $pagetitle";}?></title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-<link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=101009";?>" type="text/css" />
+<link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=0121102";?>" type="text/css" />
 <?php if (isset($coursetheme)) { 
 	if (isset($flexwidth)) {
 		$coursetheme = str_replace('_fw','',$coursetheme);
@@ -167,6 +167,58 @@ $curdir = rtrim(dirname(__FILE__), '/\\');
 require_once("$curdir/filter/filter.php");
 
 //CUSTOMIZE:  put a small (max 120px wide) logo on upper right of course pages
+$didnavlist = false;
+if (isset($cid) && isset($teacherid) && $coursetopbar[2]==1 && count($coursetopbar[1])>0 && !isset($flexwidth)) {
+	echo '<ul id="navlist">';
+	if (in_array(0,$coursetopbar[1]) && $msgset<4) { //messages
+		echo "<li><a href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a></li> ";
+	}
+	if (in_array(6,$coursetopbar[1])) { //Calendar
+		echo "<li><a href=\"$imasroot/forums/forums.php?cid=$cid\">Forums</a></li>";
+	}
+	if (in_array(1,$coursetopbar[1])) { //Stu view
+		echo "<li><a href=\"$imasroot/course/course.php?cid=$cid&stuview=0\">Student View</a></li>";
+	}
+	if (in_array(2,$coursetopbar[1])) { //Gradebook
+		echo "<li><a href=\"$imasroot/course/gradebook.php?cid=$cid\">Gradebook</a>$gbnewflag</li>";
+	}
+	if (in_array(3,$coursetopbar[1])) { //List stu
+		echo "<li><a href=\"$imasroot/course/listusers.php?cid=$cid\">Roster</a></li>\n";
+	}
+	if (in_array(4,$coursetopbar[1])) { //Calendar
+		echo "<li><a href=\"$imasroot/course/showcalendar.php?cid=$cid\">Calendar</a></li>\n";
+	}
+	if (in_array(5,$coursetopbar[1])) { //Calendar
+		echo "<li><a href=\"$imasroot/course/course.php?cid=$cid&quickview=on\">Quick View</a></li>\n";
+	}
+	
+	if (in_array(9,$coursetopbar[1])) { //Log out
+		echo "<li><a href=\"$imasroot/actions.php?action=logout\">Log Out</a></li>";
+	}
+	echo '</ul>';
+	echo '<div class="clear"> </div>';
+	$didnavlist = true;
+} else if (isset($cid) && !isset($teacherid) && $coursetopbar[2]==1 && count($coursetopbar[0])>0 && !isset($flexwidth)) {
+	echo '<ul id="navlist">';
+	if (in_array(0,$coursetopbar[0]) && $msgset<4) { //messages
+		echo "<li><a href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a></li> ";
+	}
+	if (in_array(3,$coursetopbar[0])) { //forums
+		echo "<li><a href=\"$imasroot/forums/forums.php?cid=$cid\">Forums</a></li> ";
+	}
+	if (in_array(1,$coursetopbar[0])) { //Gradebook
+		echo "<li><a href=\"$imasroot/course/gradebook.php?cid=$cid\">Gradebook</a></li> ";
+	}
+	if (in_array(2,$coursetopbar[0])) { //Calendar
+		echo "<li><a href=\"$imasroot/course/showcalendar.php?cid=$cid\">Calendar</a></li>\n";
+	}
+	if (in_array(9,$coursetopbar[0])) { //Log out
+		echo "<li><a href=\"$imasroot/actions.php?action=logout\">Log Out</a></li>";
+	}
+	echo '</ul>';
+	echo '<div class="clear"> </div>';
+	$didnavlist = true;
+}
 if (!isset($nologo)) {
 	echo '<div id="headerlogo" ';
 	if ($myrights>10 && !$ispublic) {
@@ -183,6 +235,7 @@ if (!isset($nologo)) {
 		echo '<div id="homemenu" class="ddmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">';
 		echo '</div>';
 	}
+	
 }
 
 

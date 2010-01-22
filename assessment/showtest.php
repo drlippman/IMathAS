@@ -139,10 +139,11 @@
 				unset($sessiondata['actas']);
 			}
 			$sessiondata['groupid'] = 0;
-			$query = "SELECT name,theme FROM imas_courses WHERE id='{$_GET['cid']}'";
+			$query = "SELECT name,theme,topbar FROM imas_courses WHERE id='{$_GET['cid']}'";
 			$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 			$sessiondata['coursename'] = mysql_result($result,0,0);
 			$sessiondata['coursetheme'] = mysql_result($result,0,1);
+			$sessiondata['coursetopbar'] =  mysql_result($result,0,2);
 			if (isset($studentinfo['timelimitmult'])) {
 				$sessiondata['timelimitmult'] = $studentinfo['timelimitmult'];
 			} else {
@@ -182,10 +183,11 @@
 			
 			$sessiondata['groupid'] = $line['agroupid'];
 		
-			$query = "SELECT name,theme FROM imas_courses WHERE id='{$_GET['cid']}'";
+			$query = "SELECT name,theme,topbar FROM imas_courses WHERE id='{$_GET['cid']}'";
 			$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 			$sessiondata['coursename'] = mysql_result($result,0,0);
 			$sessiondata['coursetheme'] = mysql_result($result,0,1);
+			$sessiondata['coursetopbar'] =  mysql_result($result,0,2);
 			if (isset($studentinfo['timelimitmult'])) {
 				$sessiondata['timelimitmult'] = $studentinfo['timelimitmult'];
 			} else {
@@ -524,7 +526,8 @@
 	}
 	//IP: eqntips 
 	//$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqntips.js\"></script>";
-		
+	$cid = $testsettings['courseid'];
+	
 	require("header.php");
 	if ($testsettings['noprint'] == 1) {
 		echo '<style type="text/css" media="print"> div.question, div.todoquestion, div.inactive { display: none;} </style>';

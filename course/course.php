@@ -102,6 +102,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	$topbar = explode('|',$line['topbar']);
 	$topbar[0] = explode(',',$topbar[0]);
 	$topbar[1] = explode(',',$topbar[1]);
+	if (!isset($topbar[2])) {$topbar[2] = 0;}
 	if ($topbar[0][0] == null) {unset($topbar[0][0]);}
 	if ($topbar[1][0] == null) {unset($topbar[1][0]);}
   
@@ -604,7 +605,7 @@ function makeTopMenu() {
 	} else {
 		$gbnewflag = '';
 	}
-	if (isset($teacherid) && count($topbar[1])>0) {
+	if (isset($teacherid) && count($topbar[1])>0 && $topbar[2]==0) {
 		echo '<div class=breadcrumb>';
 		if (in_array(0,$topbar[1]) && $msgset<4) { //messages
 			echo "<a href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a>$newmsgs &nbsp; ";
@@ -632,24 +633,26 @@ function makeTopMenu() {
 			echo "<a href=\"../actions.php?action=logout\">Log Out</a>";
 		}
 		echo '<div class=clear></div></div>';
-	} else if (!isset($teacherid) && (count($topbar[0])>0 || $previewshift>-1)) {
+	} else if (!isset($teacherid) && ((count($topbar[0])>0 && $topbar[2]==0) || $previewshift>-1)) {
 		echo '<div class=breadcrumb>';
-		if (in_array(0,$topbar[0]) && $msgset<4) { //messages
-			echo "<a href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a>$newmsgs &nbsp; ";
+		if ($topbar[2]==0) {
+			if (in_array(0,$topbar[0]) && $msgset<4) { //messages
+				echo "<a href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a>$newmsgs &nbsp; ";
+			}
+			if (in_array(3,$topbar[0])) { //forums
+				echo "<a href=\"$imasroot/forums/forums.php?cid=$cid\">Forums</a>$newpostscnt &nbsp; ";
+			}
+			if (in_array(1,$topbar[0])) { //Gradebook
+				echo "<a href=\"gradebook.php?cid=$cid\">Show Gradebook</a>$gbnewflag &nbsp; ";
+			}
+			if (in_array(2,$topbar[0])) { //Calendar
+				echo "<a href=\"showcalendar.php?cid=$cid\">Calendar</a> &nbsp; \n";
+			}
+			if (in_array(9,$topbar[0])) { //Log out
+				echo "<a href=\"../actions.php?action=logout\">Log Out</a>";
+			}
+			if ($previewshift>-1 && count($topbar[0])>0) { echo '<br />';}
 		}
-		if (in_array(3,$topbar[0])) { //forums
-			echo "<a href=\"$imasroot/forums/forums.php?cid=$cid\">Forums</a>$newpostscnt &nbsp; ";
-		}
-		if (in_array(1,$topbar[0])) { //Gradebook
-			echo "<a href=\"gradebook.php?cid=$cid\">Show Gradebook</a>$gbnewflag &nbsp; ";
-		}
-		if (in_array(2,$topbar[0])) { //Calendar
-			echo "<a href=\"showcalendar.php?cid=$cid\">Calendar</a> &nbsp; \n";
-		}
-		if (in_array(9,$topbar[0])) { //Log out
-			echo "<a href=\"../actions.php?action=logout\">Log Out</a>";
-		}
-		if ($previewshift>-1 && count($topbar[0])>0) { echo '<br />';}
 		if ($previewshift>-1) {
 			echo 'Showing student view. Show view: <select id="pshift" onchange="changeshift()">';
 			echo '<option value="0" ';

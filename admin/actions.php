@@ -120,6 +120,7 @@ switch($_GET['action']) {
 		} else {
 			$topbar[1] = '';
 		}
+		$topbar[2] = $_POST['topbarloc'];
 		
 		if (isset($_POST['chatset'])) {
 			$chatset = 1;

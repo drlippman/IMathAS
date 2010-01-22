@@ -317,7 +317,7 @@ END;
 		
 			}
 		}
-		$query = "SELECT imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme,imas_courses.newflag ";
+		$query = "SELECT imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme,imas_courses.newflag,imas_courses.msgset,imas_courses.topbar ";
 		$query .= "FROM imas_courses,imas_users WHERE imas_courses.id='{$_GET['cid']}' AND imas_users.id=imas_courses.ownerid";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		if (mysql_num_rows($result)>0) {
@@ -325,6 +325,13 @@ END;
 			$coursename = $crow[0]; //mysql_result($result,0,0);
 			$coursetheme = $crow[5]; //mysql_result($result,0,5);
 			$coursenewflag = $crow[6]; //mysql_result($result,0,6);
+			$coursemsgset = $crow[7]%5;
+			$coursetopbar = explode('|',$crow[8]);
+			$coursetopbar[0] = explode(',',$coursetopbar[0]);
+			$coursetopbar[1] = explode(',',$coursetopbar[1]);
+			if (!isset($coursetopbar[2])) { $coursetopbar[2] = 0;}
+			if ($coursetopbar[0][0] == null) {unset($coursetopbar[0][0]);}
+			if ($coursetopbar[1][0] == null) {unset($coursetopbar[1][0]);}
 			if (isset($studentid) && $previewshift==-1 && (($crow[1])&1)==1) {
 				echo "This course is not available at this time";
 				exit;
