@@ -139,7 +139,7 @@ function multpolys2($p1,$p2) {
 			$newdeg = $p1[$i][1] + $p2[$j][1];
 			$newdeg2 = $p1[$i][2] + $p2[$j][2];
 			$newcoef = $p1[$i][0]*$p2[$j][0];
-			if (isset($p[$newdeg])) {
+			if (isset($p[$newdeg.','.$newdeg2])) {
 				$p[$newdeg.','.$newdeg2] += $newcoef;
 			} else {
 				$p[$newdeg.','.$newdeg2] = $newcoef;
