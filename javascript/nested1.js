@@ -95,13 +95,21 @@ var Nested = new Class({
 		if (!el.moved) {
 			var sub = $E(this.options.parentTag, el);
 			if (sub) {
+				oblist = oblist.split(',');
+				var obn = el.getAttribute("obn");
+				var loc = arraysearch(obn,oblist);
 				if (sub.getStyle('display') == 'none') {
 					sub.setStyle('display', 'block');
 					el.removeClass(this.options.collapseClass);
+					if (loc==-1) {oblist.push(obn);}
 				} else {
 					sub.setStyle('display', 'none');
 					el.addClass(this.options.collapseClass);
+					if (loc>-1) {oblist.splice(loc,1);}
 				}
+				oblist = oblist.join(',');
+				alert('openblocks-' +cid+'='+ oblist);
+				document.cookie = 'openblocks-' +cid+'='+ oblist;
 			}
 		}
 		event.stop();

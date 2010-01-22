@@ -1190,7 +1190,15 @@ function enditem($canedit) {
 			} else {
 				$color = makecolor2($items[$i]['startdate'],$items[$i]['enddate'],$now);
 			}
-			echo '<li class="blockli" id="'."$parent-$bnum".'"><span class=icon style="background-color:'.$color.'">B</span>';
+			if (in_array($items[$i]['id'],$openblocks)) { $isopen=true;} else {$isopen=false;}
+			if ($isopen) {
+				$liclass = 'blockli';
+				$qviewstyle = '';
+			} else {
+				$liclass = 'blockli nCollapse';
+				$qviewstyle = 'style="display:none;"';
+			}
+			echo '<li class="'.$liclass.'" id="'."$parent-$bnum".'" obn="'.$items[$i]['id'].'"><span class=icon style="background-color:'.$color.'">B</span>';
 			if ($items[$i]['avail']==2 || ($items[$i]['avail']==1 && $items[$i]['startdate']<$now && $items[$i]['enddate']>$now)) {
 				echo '<b><span id="B'.$parent.'-'.$bnum.'" onclick="editinplace(this)">'.$items[$i]['name']. "</span></b>";
 				//echo '<b>'.$items[$i]['name'].'</b>';
@@ -1209,7 +1217,7 @@ function enditem($canedit) {
 				echo '</span>';
 			}
 			if (count($items[$i]['items'])>0) {
-				echo '<ul class=qview>';
+				echo '<ul class=qview '.$qviewstyle.'>';
 				quickview($items[$i]['items'],$parent.'-'.$bnum,$showdats,$showlinks);
 				echo '</ul>';
 			}
