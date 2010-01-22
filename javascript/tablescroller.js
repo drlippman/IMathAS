@@ -264,7 +264,8 @@ this.lock = function() {
 		    winw = document.body.clientWidth;
 		    winh = document.body.clientHeight;
 		  }
-		  winw = Math.round(winw*.95);
+		  winw = tblcont.offsetWidth;
+		  //winw = Math.round(winw*.95);
 		  winh = Math.round(winh*.7);
 		  tblcont.style.width = winw+"px";
 		  tblcont.style.height = winh+"px";
@@ -292,7 +293,8 @@ this.lock = function() {
 		} else {
 			winh = Math.min(Math.round(window.innerHeight - findPos(thetable)[1]-10),thetable.offsetHeight+30);
 		}
-		winw = Math.round(.95*window.innerWidth);
+		//winw = Math.round(.95*window.innerWidth);
+		winw = tblcont.offsetWidth;
 		
 		//Approach:  Start with table layed out without scrolling
 		//fix column widths and heights by injecting div's into first and 
