@@ -218,7 +218,7 @@ span.hdr1 {
 }
 #leftcontent {
 		position: absolute;
-		left: 10px;
+		left: 0px;
 		width:170px;
 		padding:5px;
 		margin-top:10px;

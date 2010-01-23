@@ -108,7 +108,6 @@ var Nested = new Class({
 					if (loc>-1) {oblist.splice(loc,1);}
 				}
 				oblist = oblist.join(',');
-				alert('openblocks-' +cid+'='+ oblist);
 				document.cookie = 'openblocks-' +cid+'='+ oblist;
 			}
 		}

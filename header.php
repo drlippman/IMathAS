@@ -13,6 +13,12 @@
 <link rel="stylesheet" href="<?php echo $imasroot . "/themes/$coursetheme";?>" type="text/css" />
 <?php } ?>
 <link rel="shortcut icon" href="/favicon.ico" />
+<!--[if lte IE 6]> 
+<style> 
+div { height: 0px; } 
+.clear { line-height: 0;}
+</style> 
+<![endif]--> 
 <style type="text/css" media="print">
 div.breadcrumb { display:none;}
 #headerlogo { display:none;}
@@ -190,7 +196,7 @@ if (isset($cid) && isset($teacherid) && $coursetopbar[2]==1 && count($coursetopb
 		echo "<li><a href=\"$imasroot/actions.php?action=logout\">Log Out</a></li>";
 	}
 	echo '</ul>';
-	echo '<div class="clear"> </div>';
+	echo '<br class="clear" />';
 	$didnavlist = true;
 } else if (isset($cid) && !isset($teacherid) && $coursetopbar[2]==1 && count($coursetopbar[0])>0 && !isset($flexwidth)) {
 	echo '<ul id="navlist">';
@@ -210,7 +216,7 @@ if (isset($cid) && isset($teacherid) && $coursetopbar[2]==1 && count($coursetopb
 		echo "<li><a href=\"$imasroot/actions.php?action=logout\">Log Out</a></li>";
 	}
 	echo '</ul>';
-	echo '<div class="clear"> </div>';
+	echo '<br class="clear" />';
 	$didnavlist = true;
 }
 echo '</div>';
