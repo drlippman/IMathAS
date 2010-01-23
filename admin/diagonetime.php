@@ -71,7 +71,7 @@ if ($overwriteBody==1) { //NO AUTHORITY
 	echo $body;
 } else {
 	echo $curBreadcrumb;
-	echo '<h2>Diagnostic One-time Passwords</h2>';
+	echo '<div id="headerdiagonetime" class="pagetitle"><h2>Diagnostic One-time Passwords</h2></div>';
 	$query = "SELECT name FROM imas_diags WHERE id='$diag'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	echo '<h4>'.mysql_result($result,0,0).'</h4>';

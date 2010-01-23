@@ -501,7 +501,7 @@ if ($overwriteBody==1) {
 	</style>
 
 	<div class=breadcrumb><?php echo $curBreadcrumb; ?></div>
-	<h3><?php echo $pagetitle; echo $helpicon; ?></h3>
+	<div id="headermanagelibs" class="pagetitle"><h2><?php echo $pagetitle; echo $helpicon; ?></h2></div>
 	
 <?php
 	if (isset($_POST['remove'])) {

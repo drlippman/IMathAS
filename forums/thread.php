@@ -373,8 +373,8 @@
 	
 	
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Forum Topics</div>\n";
-	echo "<h3>Forum - $forumname</h3>\n";
-	
+	echo '<div id="headerindex" class="pagetitle"><h2>Forum: '.$forumname.'</h2></div>';
+
 	$query = "SELECT threadid,COUNT(id) AS postcount,MAX(postdate) AS maxdate FROM imas_forum_posts ";
 	$query .= "WHERE forumid='$forumid' ";
 	if ($dofilter) {
@@ -454,9 +454,13 @@
 			echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 			if ($page>1) {
 				echo "<a href=\"thread.php?page=".($page-1)."&cid=$cid&forum=$forumid\">Previous</a> ";
+			} else {
+				echo "Previous ";
 			}
 			if ($page < $numpages) {
-				echo "<a href=\"thread.php?page=".($page+1)."&cid=$cid&forum=$forumid\">Next</a> ";
+				echo "| <a href=\"thread.php?page=".($page+1)."&cid=$cid&forum=$forumid\">Next</a> ";
+			} else {
+				echo "| Next ";
 			}
 			echo "</div>\n";
 		}

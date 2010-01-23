@@ -14,7 +14,7 @@ require("header.php");
 echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Form</div>\n";
 switch($_GET['action']) {
 	case "newuser":
-		echo "<h3>New User Signup</h3>\n";
+		echo '<div id="headerforms" class="pagetitle"><h2>New User Signup</h2></div>';
 		echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/validateform.js\"></script>\n";
 		echo "<form method=post action=\"actions.php?action=newuser\" onsubmit=\"return validateForm(this)\">\n";
 		echo "<span class=form><label for=\"SID\">$longloginprompt:</label></span> <input class=form type=text size=12 id=SID name=SID><BR class=form>\n";
@@ -34,7 +34,7 @@ switch($_GET['action']) {
 		}
 		break;
 	case "chgpwd":
-		echo "<h3>Change Your Password</h3>\n";
+		echo '<div id="headerforms" class="pagetitle"><h2>Change Your Password</h2></div>';
 		echo "<form method=post action=\"actions.php?action=chgpwd\">\n";
 		echo "<span class=form><label for=\"oldpw\">Enter old password:</label></span> <input class=form type=password id=oldpw name=oldpw size=40 /> <BR class=form>\n";
 		echo "<span class=form><label for=\"newpw1\">Enter new password:</label></span>  <input class=form type=password id=newpw1 name=newpw1 size=40> <BR class=form>\n";
@@ -45,7 +45,7 @@ switch($_GET['action']) {
 		$query = "SELECT * FROM imas_users WHERE id='$userid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$line = mysql_fetch_array($result, MYSQL_ASSOC);
-		echo "<h3>User Info</h3>\n";
+		echo '<div id="headerforms" class="pagetitle"><h2>User Info</h2></div>';
 		echo "<form enctype=\"multipart/form-data\" method=post action=\"actions.php?action=chguserinfo\">\n";
 		echo "<span class=form><label for=\"firstname\">Enter First Name:</label></span> <input class=form type=text size=20 id=firstname name=firstname value=\"{$line['FirstName']}\" /><br class=\"form\" />\n";
 		echo "<span class=form><label for=\"lastname\">Enter Last Name:</label></span> <input class=form type=text size=20 id=lastname name=lastname value=\"{$line['LastName']}\"><BR class=form>\n";
@@ -110,13 +110,14 @@ switch($_GET['action']) {
 		break;
 	case "unenroll":
 		if (!isset($_GET['cid'])) { echo "Course ID not specified\n"; break;}
-		echo "<h3>Unenroll</h3>\n";
+		echo '<div id="headerforms" class="pagetitle"><h2>Unenroll</h2></div>';
+		
 		echo "Are you SURE you want to unenroll from this course?  All assessment attempts will be deleted.\n";
 		echo "<p><input type=button onclick=\"window.location='actions.php?action=unenroll&cid={$_GET['cid']}'\" value=\"Really Unenroll\">\n";
 		echo "<input type=button value=\"Never Mind\" onclick=\"window.location='./course/course.php?cid={$_GET['cid']}'\"></p>\n";
 		break;
 	case "resetpw":
-		echo "<h3>Reset Password</h3>\n";
+		echo '<div id="headerforms" class="pagetitle"><h2>Reset Password</h2></div>';
 		echo "<form method=post action=\"actions.php?action=resetpw\">\n";
 		echo "<p>Enter your User Name below and click Submit.  An email will be sent to your email address on file.  A link in that email will ";
 		echo "reset your password.</p>";
@@ -124,7 +125,7 @@ switch($_GET['action']) {
 		echo "<p><input type=submit value=\"Submit\" /></p></form>";
 		break;
 	case "lookupusername":
-		echo "<h3>Lookup Username</h3>\n";
+		echo '<div id="headerforms" class="pagetitle"><h2>Lookup Username</h2></div>';
 		echo "<form method=post action=\"actions.php?action=lookupusername\">\n"; 
 		echo "If you can't remember your username, enter your email address below.  An email will be sent to your email address with your username. ";
 		echo "<p>Email: <input type=text name=\"email\"/></p>";
@@ -148,7 +149,7 @@ switch($_GET['action']) {
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			$code = $pass;
 		}
-		echo "<h3>Google Gadget Access Code</h3>";
+		echo '<div id="headerforms" class="pagetitle"><h2>Google Gadget Access Code</h2></div>';
 		echo "<p>The $installname Google Gadget allow you to view a list of new forum posts ";
 		echo "and messages from your iGoogle page.  To install, click the link below to add ";
 		echo "the gadget to your iGoogle page, then use the Access key below in the settings ";

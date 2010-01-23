@@ -271,7 +271,7 @@ if ($overwriteBody==1) {
 } else {	
 ?>
 	<div class="breadcrumb"><?php echo $curBreadcrumb ?></div>
-	<h3><?php echo $pagetitle ?></h3>
+	<div id="headermanagestugrps" class="pagetitle"><h2><?php echo $pagetitle ?></h2></div>
 
 <?php
 	if (isset($_GET['aid']) &&  isset($_GET['cleargrps']) && $_GET['cleargrps']!='true') {

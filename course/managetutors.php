@@ -133,7 +133,7 @@
 
 ?>
 
-	<h2>Manage Tutors</h2>
+	<div id="headermanagetutors" class="pagetitle"><h2>Manage Tutors</h2></div>
 <?php
 	echo $err;
 ?>

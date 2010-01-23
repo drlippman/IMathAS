@@ -29,7 +29,7 @@
 	
 ?>
 	
-	<h3>Forums</h3>
+	<div id="headerforums" class="pagetitle"><h2>Forums</h2></div>
 	
 	<table class=forum>
 	<thead>

@@ -187,7 +187,7 @@ $placeinhead .= "}</script>";
 
 ?> 
 	<div class=breadcrumb><?php echo $curBreadcrumb  ?></div>
-	<h2><?php echo $installname ?> Administration</h2>
+	<div id="headeradmin" class="pagetitle"><h2><?php echo $installname ?> Administration</h2></div>
 	<b>Hello <?php echo $username ?></b>
 
 <?php //WRITE OUT COURSES BLOCK ?>	

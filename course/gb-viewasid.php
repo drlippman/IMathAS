@@ -356,7 +356,7 @@
 			echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 		}
 		echo "&gt; Detail</div>";
-		echo "<h2>Grade Book Detail</h2>\n";
+		echo '<div id="headergb-viewasid" class="pagetitle"><h2>Grade Book Detail</h2></div>';
 		$query = "SELECT imas_users.FirstName,imas_users.LastName,imas_students.timelimitmult FROM imas_users JOIN imas_students ON imas_users.id=imas_students.userid WHERE imas_users.id='{$_GET['uid']}' AND imas_students.courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$row = mysql_fetch_row($result);

@@ -245,7 +245,8 @@ if ($line == null) {
 require("header.php");
 
 /****** begin page body ***********/
-echo "<h2>Welcome to $installname, $userfullname</h2>";
+echo '<div id="headerindex" class="pagetitle"><h2>'.$installname.'</h2></div>';
+echo "<p>Welcome back, $userfullname</p>";
 
 
 //student block	

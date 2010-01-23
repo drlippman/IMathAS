@@ -31,7 +31,7 @@
 	echo "<form id=\"mainform\" method=post action=\"latepasses.php?&cid=$cid\">";
 	
 ?>
-<h3>Manage LatePasses</h3>
+<div id="headerlatepasses" class="pagetitle"><h2>Manage LatePasses</h2></div>
 
 <script type="text/javascript">
 function onenter(e,field) {

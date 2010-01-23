@@ -712,9 +712,9 @@ if ($overwriteBody==1) {
 	}
 ?>	
 
-	<h2>Add/Remove Questions 
+	<div id="headeraddquestions" class="pagetitle"><h2>Add/Remove Questions 
 		<img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=addingquestionstoanassessment','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
-	</h2>
+	</h2></div>
 	<h3>Questions in Assessment - <?php echo $page_assessmentName ?></h3>
 
 <?php	

@@ -356,9 +356,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		
 		if (isset($_GET['id'])) {
-			$formTitle = "<h2>Modify Assessment <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h2>\n";
+			$formTitle = "<div id=\"headeraddassessment\" class=\"pagetitle\"><h2>Modify Assessment <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h2></div>\n";
 		} else {
-			$formTitle = "<h2>Add Assessment <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h2>\n";
+			$formTitle = "<div id=\"headeraddassessment\" class=\"pagetitle\"><h2>Add Assessment <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h2></div>\n";
 		}
 
 		$page_formActionTag = "addassessment.php?block=$block&cid=$cid";

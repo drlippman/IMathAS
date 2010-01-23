@@ -17,6 +17,9 @@ p {
 br {
 	line-height: 1em;
 }
+div.pagetitle h2 {
+	margin: 10px 0px 10px 0px;
+}
 div.item {
 	margin-bottom: 10px;
 	padding: 5px;

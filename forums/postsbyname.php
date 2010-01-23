@@ -56,7 +56,9 @@
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$forumname = mysql_result($result,0,0);
 	
+	echo '<div id="headerpostsbyname" class="pagetitle">';
 	echo "<h2>Posts by Name - $forumname</h2>\n";
+	echo '</div>';
 	
 	echo "<script>\n";
 	echo "function toggleshow(bnum) {\n";

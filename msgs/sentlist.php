@@ -75,8 +75,8 @@ isread:
 		echo "&gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
 	}
 	echo "&gt; Sent Message List</div>";
-	echo "<h3>Sent Messages</h3>";		
-	
+	echo '<div id="headersentlist" class="pagetitle"><h2>Sent Messages</h2></div>';
+
 	$query = "SELECT COUNT(id) FROM imas_msgs WHERE msgfrom='$userid' AND isread<4";
 	if ($filtercid>0) {
 		$query .= " AND courseid='$filtercid'";
@@ -129,9 +129,13 @@ isread:
 		echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 		if ($page>1) {
 			echo "<a href=\"sentlist.php?page=".($page-1)."&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">Previous</a> ";
+		} else {
+			echo "Previous ";
 		}
 		if ($page < $numpages) {
-			echo "<a href=\"sentlist.php?page=".($page+1)."&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">Next</a> ";
+			echo "| <a href=\"sentlist.php?page=".($page+1)."&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">Next</a> ";
+		} else {
+			echo "| Next ";
 		}
 		echo "</div>\n";
 	}

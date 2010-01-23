@@ -46,7 +46,7 @@
 		echo "&gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
 	}
 	echo "&gt; New Message List</div>";
-	echo "<h3>New Messages</h3>";	
+	echo '<div id="headernewmsglist" class="pagetitle"><h2>New Messages</h2></div>';	
 	
 ?>
 <script type="text/javascript">

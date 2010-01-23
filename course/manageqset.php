@@ -886,7 +886,7 @@ function getnextprev(formn,loc) {
 </script>
 
 	<div class="breadcrumb"><?php echo $curBreadcrumb ?></div>
-	<h3><?php echo $pagetitle; echo $helpicon; ?></h3>
+	<div id="headermanageqset" class="pagetitle"><h2><?php echo $pagetitle; echo $helpicon; ?></h2></div>
 
 <?php	
 	if (isset($_POST['remove'])) {

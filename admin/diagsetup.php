@@ -242,7 +242,7 @@ if ($overwriteBody==1) { //NO AUTHORITY
 	
 	if (isset($_GET['step']) && $_GET['step']==2) {  //STEP 2 DISPLAY
 ?>	
-		<h2>Diagnostic Setup</h2>
+		<div id="headerdiagsetup" class="pagetitle"><h2>Diagnostic Setup</h2></div>
 		<h4>Second-level Selector - extra information</h4>
 		<form method=post action="diagsetup.php?step=3">
 		
@@ -330,7 +330,7 @@ if ($overwriteBody==1) { //NO AUTHORITY
 	} else {
 	 //STEP 1 DISPLAY
 ?>
-<h2>Diagnostic Setup</h2>
+<div id="headerdiagsetup" class="pagetitle"><h2>Diagnostic Setup</h2></div>
 <form method=post action=diagsetup.php?step=2>
 
 <?php echo (isset($_GET['id'])) ? "	<input type=hidden name=id value=\"{$_GET['id']}\"/>" : ""; ?>

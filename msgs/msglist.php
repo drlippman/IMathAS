@@ -236,8 +236,8 @@ isread:
 		echo "&gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
 	}
 	echo "&gt; Message List</div>";
-	echo "<h3>Messages</h3>";	
-	
+	echo '<div id="headermsglist" class="pagetitle"><h2>Messages</h2></div>';
+
 	$query = "SELECT COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND (isread<2 OR isread>3)";
 	if ($filtercid>0) {
 		$query .= " AND courseid='$filtercid'";
@@ -290,9 +290,13 @@ isread:
 		echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 		if ($page>1) {
 			echo "<a href=\"msglist.php?page=".($page-1)."&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">Previous</a> ";
+		} else {
+			echo 'Previous ';
 		}
 		if ($page < $numpages) {
-			echo "<a href=\"msglist.php?page=".($page+1)."&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">Next</a> ";
+			echo "| <a href=\"msglist.php?page=".($page+1)."&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">Next</a> ";
+		} else {
+			echo '| Next';
 		}
 		echo "</div>\n";
 	}

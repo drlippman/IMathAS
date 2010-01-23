@@ -97,7 +97,7 @@
 	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 	echo "&gt; <a href=\"gb-itemanalysis.php?stu=$stu&cid=$cid&aid=$aid\">Item Analysis</a> ";
 	echo "&gt; Grading a Question</div>";
-	echo "<h2>Grading a Question in $aname</h2>";
+	echo "<div id=\"headergradeallq\" class=\"pagetitle\"><h2>Grading a Question in $aname</h2></div>";
 	echo "<p><b>Warning</b>: This page may not work correctly if the question selected is part of a group of questions</p>";
 	echo "<p>Note: Feedback is for whole assessment, not the individual question.</p>";
 ?>

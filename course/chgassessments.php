@@ -322,9 +322,9 @@ function copyfromtoggle(frm,mark) {
 </script>
 
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	<h2>Mass Change Assessment Settings 
+	<div id="headerchgassessments" class="pagetitle"><h2>Mass Change Assessment Settings 
 		<img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
-	</h2>
+	</h2></div>
 
 	<p>This form will allow you to change the assessment settings for several or all assessments at once.
 	 <b>Beware</b> that changing default points or penalty after an assessment has been 

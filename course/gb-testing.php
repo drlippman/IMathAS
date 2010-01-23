@@ -112,7 +112,7 @@ echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid
 echo "&gt; Diagnostic Gradebook</div>";
 echo "<form method=post action=\"gradebook.php?cid=$cid\">";
 
-echo "<span class=\"hdr1\">Diagnostic Grade Book </span>";
+echo '<div id="headergb-testing" class="pagetitle"><h2>Diagnostic Grade Book</h2></div>';
 echo "<a href=\"gradebook.php?cid=$cid\">View regular gradebook</a>";
 echo "<div class=cpmid>";
 

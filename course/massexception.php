@@ -91,7 +91,7 @@
 		echo "\">Gradebook</a> &gt; Manage Exceptions</div>\n";
 	}
 	
-	echo "<h2>Manage Exceptions</h2>\n";
+	echo '<div id="headermassexception" class="pagetitle"><h2>Manage Exceptions</h2></div>';
 	if ($calledfrom=='lu') {
 		echo "<form method=post action=\"listusers.php?cid=$cid&massexception=1\">\n";
 	} else if ($calledfrom=='gb') {

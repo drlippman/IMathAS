@@ -526,7 +526,7 @@ if ($overwriteBody==1) {
 		echo $page_uploadSuccessMsg;
 	} else { //STEP 1 or 2
 ?>	
-	<h3>Import Question Libraries</h3>
+	<div id="headerimportlib" class="pagetitle"><h2>Import Question Libraries</h2></div>
 	<form enctype="multipart/form-data" method=post action="importlib.php?cid=<?php echo $cid ?>">
 	
 <?php

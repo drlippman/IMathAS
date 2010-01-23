@@ -64,7 +64,7 @@
 		echo "Question Settings</div>\n";
 	
 ?>
-<h2>Question Settings</h2>
+<div id="headermodquestiongrid" class="pagetitle"><h2>Modify Question Settings</h2></div>
 <p>For more advanced settings, modify the settings for individual questions after adding.
 <?php
 if (isset($_POST['checked'])) { //modifying existing
@@ -73,7 +73,7 @@ if (isset($_POST['checked'])) { //modifying existing
 	echo "<form method=post action=\"addquestions.php?addset=true&process=true&cid=$cid&aid=$aid\">";
 }
 ?>
-Leave items blank or set to 9999 to use default values<BR>
+Leave items blank to use the assessment's default values<br/>
 <table class=gb>
 <thead><tr>
 <?php

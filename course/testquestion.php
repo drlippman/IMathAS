@@ -99,6 +99,7 @@ if ($overwriteBody==1) {
 	$useeditor = 1;
 
 	if (isset($_GET['formn']) && isset($_GET['loc'])) {
+		echo '<p>';
 		echo "<script type=\"text/javascript\">";
 		echo "var numchked = -1;";
 		echo "if (window.opener && !window.opener.closed) {";
@@ -122,6 +123,7 @@ if ($overwriteBody==1) {
 			  }
 			}
 			</script>";
+		echo '</p>';
 	}
 
 	if (isset($_GET['checked'])) {

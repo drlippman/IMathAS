@@ -288,7 +288,7 @@ function movefile(from) {
 
 
 	<div class=breadcrumb><?php echo $curBreadcrumb  ?></div>
-	<h2><?php echo $pagetitle ?><img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=inlinetextitems','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/></h2>
+	<div id="headeraddinlinetext" class="pagetitle"><h2><?php echo $pagetitle ?><img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=inlinetextitems','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/></h2></div>
 
 	<form enctype="multipart/form-data" method=post action="<?php echo $page_formActionTag ?>">
 	<span class=form>Title: </span>

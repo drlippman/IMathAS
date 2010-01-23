@@ -47,11 +47,13 @@
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$toinsert = array_diff($threadids,$toupdate);
 		$query = "INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES ";
+		$first = true;
 		foreach($toinsert as $i=>$tid) {
-			if ($i != 0) {
+			if (!$first) {
 				$query .= ",('$userid','$tid',$now)";
 			} else {
 				$query .= "('$userid','$tid',$now)";
+				$first = false;
 			}
 		}
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -82,7 +84,7 @@
 	$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; New Forum Topics</div>\n";
-	echo "<h3>New Forum Posts</h3>\n";
+	echo '<div id="headernewthreads" class="pagetitle"><h2>New Forum Posts</h2></div>';
 	echo "<p><a href=\"newthreads.php?cid=$cid&markallread=true\">Mark all Read</a></p>";
 
 	if (count($lastpost)>0) {

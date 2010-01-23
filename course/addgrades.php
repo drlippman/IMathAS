@@ -128,9 +128,9 @@
 	echo "&gt; Offline Grades</div>";
 	
 	if ($_GET['gbitem']=='new') {
-		echo "<h3>Add Offline Grades</h3>";
+		echo "<div id=\"headeraddgrades\" class=\"pagetitle\"><h2>Add Offline Grades</h2></div>";
 	} else {
-		echo "<h3>Modify Offline Grades</h3>";
+		echo "<div id=\"headeraddgrades\" class=\"pagetitle\"><h2>Modify Offline Grades</h2></div>";
 	}
 	
 	echo "<form id=\"mainform\" method=post action=\"addgrades.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=$cid&gbitem={$_GET['gbitem']}&grades={$_GET['grades']}\">";

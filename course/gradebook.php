@@ -192,9 +192,9 @@ if (isset($studentid) || $stu!=0) { //show student view
 		echo "&gt; Gradebook</div>";
 	}
 	if ($stu==-1) {
-		echo "<h2>Grade Book Averages </h2>\n";
+		echo '<div id="headergradebook" class="pagetitle"><h2>Grade Book Averages </h2></div>';
 	} else {
-		echo "<h2>Grade Book Student Detail </h2>\n";
+		echo '<div id="headergradebook" class="pagetitle"><h2>Grade Book Student Detail</h2></div>';
 	}
 	if ($isteacher || $istutor) {
 		echo "<div class=cpmid>";
@@ -298,11 +298,11 @@ if (isset($studentid) || $stu!=0) { //show student view
 	echo "&gt; Gradebook</div>";
 	echo "<form method=post action=\"gradebook.php?cid=$cid\">";
 	
-	echo '<span class="hdr1">Grade Book </span><span class="red" id="newflag">';
+	echo '<div id="headergradebook" class="pagetitle"><h2>Gradebook <span class="red" id="newflag" style="font-size: 70%" >';
 	if (($coursenewflag&1)==1) {
 		echo 'New';
 	}
-	echo '</span>';
+	echo '</span></h2></div>';
 	if ($isdiag) {
 		echo "<a href=\"gb-testing.php?cid=$cid\">View diagnostic gradebook</a>";
 	}

@@ -157,7 +157,9 @@
 			require("../footer.php");
 			exit;
 		}
+		echo '<div id="headermasssend" class="pagetitle">';
 		echo "<h3>Send Mass $sendtype</h3>\n";
+		echo '</div>';
 		if ($calledfrom=='lu') {
 			echo "<form method=post action=\"listusers.php?cid=$cid&masssend=$sendtype\">\n";
 		} else if ($calledfrom=='gb') {

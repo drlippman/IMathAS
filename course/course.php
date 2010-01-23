@@ -442,7 +442,7 @@ if ($overwriteBody==1) {
 <?php	
    }
    makeTopMenu();	
-   echo "<h2>$curname</h2>\n";
+   echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>$curname</h2></div>\n";
    
    if (count($items)>0) {
 	   

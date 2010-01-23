@@ -87,7 +87,9 @@
 	}
 	
 	
-	echo "<p><b style=\"font-size: 120%\">Grades for $name</b><br/>$totalpossible points possible</p>";
+	echo '<div id="headerisolateassessgrade" class="pagetitle"><h2>';
+	echo "Grades for $name</h2></div>";
+	echo "<p>$totalpossible points possible</p>";
 	
 //	$query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.timelimitmult,";
 //	$query .= "ias.id,ias.userid,ias.bestscores,ias.starttime,ias.endtime,ias.feedback FROM imas_assessment_sessions AS ias,imas_users AS iu,imas_students AS istu ";

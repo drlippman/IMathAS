@@ -460,7 +460,9 @@
 		$lnames[] = $row[0];
 	}
 	$lnames = implode(", ",$lnames);
+	echo '<div id="headermoddataset" class="pagetitle">';
 	echo "<h2>$addmod QuestionSet Question</h2>\n";
+	echo '</div>';
 
 	if (isset($inusecnt) && $inusecnt>0) {
 		echo '<p style="color:red;">This question is currently being used in ';

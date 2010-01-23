@@ -18,7 +18,7 @@
 		echo <<<END
 <img class="floatleft" src="$imasroot/img/ruler.jpg"/>
 <div class="content">
-<h2>Available Diagnostics</h2>
+<div id="headerdiagindex" class="pagetitle"><h2>Available Diagnostics</h2></div>
 <ul class="nomark">
 END;
 		if (mysql_num_rows($result)==0) {

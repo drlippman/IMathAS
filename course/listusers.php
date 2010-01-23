@@ -329,12 +329,13 @@ if ($overwriteBody==1) {
 		echo $body;
 	}
 } else {	
-
+?>
+	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
+	<div id="headerlistusers" class="pagetitle"><h2><?php echo $pagetitle ?></h2></div>
+<?php
 
 	if (isset($_GET['assigncode'])) {
 ?>
-	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	<h3><?php echo $pagetitle ?></h3>
 	<form method=post action="listusers.php?cid=<?php echo $cid ?>&assigncode=1">
 		<table class=gb>
 			<thead>
@@ -361,8 +362,6 @@ if ($overwriteBody==1) {
 <?php			
 	} elseif (isset($_GET['enroll'])) {
 ?>
-	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	<h3><?php echo $pagetitle ?></h3>
 	<form method=post action="listusers.php?enroll=student&cid=<?php echo $cid ?>">
 		<span class=form>Username to enroll:</span>
 		<span class=formright><input type="text" name="username"></span><br class=form>
@@ -376,8 +375,6 @@ if ($overwriteBody==1) {
 	} elseif (isset($_GET['newstu'])) {
 ?>
 	
-	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	<h3><?php echo $pagetitle ?></h3>
 	<form method=post action="listusers.php?cid=<?php echo $cid ?>&newstu=new">
 		<span class=form><label for="SID"><?php echo $loginprompt;?>:</label></span> <input class=form type=text size=12 id=SID name=SID><BR class=form>
 	<span class=form><label for="pw1">Choose a password:</label></span><input class=form type=password size=20 id=pw1 name=pw1><BR class=form>
@@ -394,8 +391,6 @@ if ($overwriteBody==1) {
 <?php 
 	} elseif (isset($_GET['chgstuinfo'])) {
 ?>
-	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	<h3><?php echo $pagetitle ?></h3>
 		<form enctype="multipart/form-data" method=post action="listusers.php?cid=<?php echo $cid ?>&chgstuinfo=true&uid=<?php echo $_GET['uid'] ?>"/>
 			<span class=form><label for="username">Enter User Name (login name):</label></span>
 			<input class=form type=text size=20 id=username name=username value="<?php echo $lineStudent['SID'] ?>"/><br class=form>
@@ -436,7 +431,6 @@ if ($overwriteBody==1) {
 <?php		
 	} elseif (isset($_GET['action']) && $_GET['action']=="resetpw") {
 ?>
-		<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
 		<form method=post action="listusers.php?cid=<?php echo $cid ?>&action=<?php echo $_GET['action'] ?>&uid=<?php echo $_GET['uid'] ?>&confirmed=true">
 
 		Are you sure you want to reset this student's password	
@@ -450,10 +444,7 @@ if ($overwriteBody==1) {
 <?php		
 	} else {
 ?>	
-	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	<h3><?php echo $pagetitle ?></h3>
-
-
+	
 	<script type="text/javascript">
 	function chkAll(frm, arr, mark) {
 	  for (i = 0; i <= frm.elements.length; i++) {

@@ -92,8 +92,9 @@
 	}
 	echo "<a href=\"viewmsg.php?page=$page&cid=$cid&msgid=$msgid&type=$type&filtercid=$filtercid\">Message</a> &gt; Message Conversation</div>\n";
 	
-	
-	echo "<p><b style=\"font-size: 120%\">Message: {$subject[$msgid]}</b></p>\n";
+	echo '<div id="headermsghistory" class="pagetitle"><h2>Message Conversation</h2></div>';
+	echo "<p><a href=\"viewmsg.php?page=$page&cid=$cid&msgid=$msgid&type=$type&filtercid=$filtercid\">Back to Message</a></p>";
+	//echo "<p><b>Message: {$subject[$msgid]}</b></p>\n";
 	echo "<input type=button value=\"Expand All\" onclick=\"showall()\"/>";
 	echo "<input type=button value=\"Collapse All\" onclick=\"collapseall()\"/>";
 	if ($view==2) {

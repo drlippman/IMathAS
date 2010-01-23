@@ -81,7 +81,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			$query = "SELECT * from imas_forum_posts WHERE id='{$_GET['modify']}'";
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			$line = mysql_fetch_array($result, MYSQL_ASSOC);
-			echo "<h3>Modify Post</h3>\n";
+			echo '<div id="headerposthandler" class="pagetitle"><h2>Modify Post</h2></div>';
 		} else {
 			echo "Post Reply</div>\n";
 			$query = "SELECT subject,points FROM imas_forum_posts WHERE id='{$_GET['replyto']}'";
@@ -96,7 +96,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$haspoints = (mysql_result($result,0,0)>0);
 			}
-			echo "<h3>Post Reply</h3>\n";
+			echo '<div id="headerposthandler" class="pagetitle"><h2>Post Reply</h2></div>';
 		}
 		echo "<form method=post action=\"$returnurl&modify={$_GET['modify']}&replyto={$_GET['replyto']}\">\n";
 		echo "<span class=form><label for=\"subject\">Subject:</label></span>";

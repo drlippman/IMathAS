@@ -11,6 +11,7 @@ switch($_GET['action']) {
 		$query = "SELECT name FROM imas_courses WHERE id='{$_GET['id']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$name = mysql_result($result,0,0);
+		echo '<div id="headerforms" class="pagetitle"><h2>Delete Course</h2></div>';
 		echo "<p>Are you sure you want to delete the course <b>$name</b>?</p>\n";
 		echo "<p><input type=button value=\"Delete\" onclick=\"window.location='actions.php?action=delete&id={$_GET['id']}'\">\n";
 		echo "<input type=button value=\"Nevermind\" onclick=\"window.location='admin.php'\"></p>\n";
@@ -21,7 +22,7 @@ switch($_GET['action']) {
 		echo "<input type=button value=\"Nevermind\" onclick=\"window.location='admin.php'\"></p>\n";
 		break;
 	case "chgpwd":
-		echo "<h4>Change Your Password</h4>\n";
+		echo '<div id="headerforms" class="pagetitle"><h2>Change Your Password</h2></div>';
 		echo "<form method=post action=\"actions.php?action=chgpwd\">\n";
 		echo "<span class=form>Enter old password:</span>  <input class=form type=password name=oldpw size=40> <BR class=form>\n";
 		echo "<span class=form>Enter new password:</span> <input class=form type=password name=newpw1 size=40> <BR class=form>\n";
@@ -157,7 +158,7 @@ switch($_GET['action']) {
 			$cid = $_GET['cid'];
 			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Course Settings</div>";
 		} 
-		
+		echo '<div id="headerforms" class="pagetitle"><h2>Course Settings</h2></div>';
 		echo "<form method=post action=\"actions.php?action={$_GET['action']}";
 		if (isset($_GET['cid'])) {
 			echo "&cid=$cid";
@@ -369,7 +370,9 @@ switch($_GET['action']) {
 		$query = "SELECT name FROM imas_courses WHERE id='{$_GET['id']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$line = mysql_fetch_array($result, MYSQL_ASSOC);
+		echo '<div id="headerforms" class="pagetitle">';
 		echo "<h2>{$line['name']}</h2>\n";
+		echo '</div>';
 		
 		echo "<h4>Current Teachers:</h4>\n";
 		$query = "SELECT imas_users.FirstName,imas_users.LastName,imas_teachers.id,imas_teachers.userid ";
@@ -418,7 +421,9 @@ switch($_GET['action']) {
 		echo "</form>\n";
 		break;
 	case "transfer":
+		echo '<div id="headerforms" class="pagetitle">';
 		echo "<h3>Transfer Course Ownership</h3>\n";
+		echo '</div>';
 		echo "<form method=post action=\"actions.php?action=transfer&id={$_GET['id']}\">\n";
 		echo "Transfer to: <select name=newowner>\n";
 		$query = "SELECT id,FirstName,LastName FROM imas_users WHERE rights>19";
@@ -447,7 +452,9 @@ switch($_GET['action']) {
 		echo "</form>\n";
 		break;
 	case "listgroups":
+		echo '<div id="headerforms" class="pagetitle">';
 		echo "<h3>Modify Groups</h3>\n";
+		echo '</div>';
 		echo "<table><tr><th>Group Name</th><th>Modify</th><th>Delete</th></tr>\n";
 		$query = "SELECT id,name FROM imas_groups ORDER BY name";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -468,6 +475,7 @@ switch($_GET['action']) {
 		echo "</form>\n";
 		break;
 	case "modgroup":
+		echo '<div id="headerforms" class="pagetitle"><h2>Rename Instructor Group</h2></div>';
 		$query = "SELECT name FROM imas_groups WHERE id='{$_GET['id']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$gpname = mysql_result($result,0,0);

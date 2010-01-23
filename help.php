@@ -44,7 +44,7 @@ h2,h3,h4 {
 	}
 	echo "</head><body>\n";
 	if (isset($_GET['section'])) {
-		echo "<h1>$installname Help</h1>\n";
+		echo '<div id="headerindex" class="pagetitle"><h2>'.$installname.' Help</h2></div>';
 	}
 
 
