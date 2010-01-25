@@ -268,6 +268,7 @@ END;
 		$breadcrumbbase = "<a href=\"$imasroot/index.php\">Home</a> &gt; ";
 	}
 	if (isset($_GET['cid']) && $_GET['cid']!="admin" && $_GET['cid']>0) {
+		$cid = $_GET['cid'];
 		$query = "SELECT id,locked,timelimitmult FROM imas_students WHERE userid='$userid' AND courseid='{$_GET['cid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$line = mysql_fetch_array($result, MYSQL_ASSOC);
