@@ -609,7 +609,7 @@
 				}
 			}
 		} else {
-			echo '<h2>Select group members</h2>';
+			echo '<div id="headershowtest" class="pagetitle"><h2>Select group members</h2></div>';
 			
 			if ($sessiondata['groupid']>0) { //adding members to existing grp
 				echo "Current Group Members: <ul>";
@@ -671,8 +671,8 @@
 	}
 	
 	//if was added to existing group, need to reload $questions, etc
-	
-	echo "<h2>{$testsettings['name']}</h2>\n";
+	echo '<div id="headershowtest" class="pagetitle">';
+	echo "<h2>{$testsettings['name']}</h2></div>\n";
 	if (isset($sessiondata['actas'])) {
 		echo '<p style="color: red;">Teacher Acting as ';
 		$query = "SELECT LastName, FirstName FROM imas_users WHERE id='{$sessiondata['actas']}'";

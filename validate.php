@@ -7,7 +7,7 @@
 	 header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/install.php");
  }
  require_once("$curdir/config.php");
- if (isset($sessionpath)) { session_save_path($sessionpath);}
+ if (isset($sessionpath) && $sessionpath!='') { session_save_path($sessionpath);}
  ini_set('session.gc_maxlifetime',86400);
  ini_set('auto_detect_line_endings',true);
  session_start();
@@ -17,7 +17,9 @@
  $ispublic = false;
  //domain checks for special themes, etc. if desired
  $requestaddress = $_SERVER['HTTP_HOST'] .$_SERVER['PHP_SELF'];
- if (!isset($defaultcoursetheme)) {
+ if (isset($CFG['CPS']['theme'])) {
+ 	 $defaultcoursetheme = $CFG['CPS']['theme'][0];
+ } else if (!isset($defaultcoursetheme)) {
 	 $defaultcoursetheme = "default.css";
  }
  $coursetheme = $defaultcoursetheme; //will be overwritten later if set

@@ -24,7 +24,7 @@ function getpts($sc) {
 
 //determine if diagnostic - used in gradebook too
 $isdiag = false;
-if ($isteacher || $istutor) {
+if ($canviewall) {
 	$query = "SELECT sel1name,sel2name FROM imas_diags WHERE cid='$cid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	if (mysql_num_rows($result)>0) {
@@ -115,10 +115,10 @@ row[1][4][1] = locked?
 ****/
 
 function gbtable() {
-	global $cid,$isteacher,$istutor,$tutorid,$userid,$catfilter,$secfilter,$timefilter,$lnfilter,$isdiag,$sel1name,$sel2name;
-	if ($isteacher && func_num_args()>0) {
+	global $cid,$isteacher,$istutor,$tutorid,$userid,$catfilter,$secfilter,$timefilter,$lnfilter,$isdiag,$sel1name,$sel2name,$canviewall;
+	if ($canviewall && func_num_args()>0) {
 		$limuser = func_get_arg(0);
-	} else if (!$isteacher && !$istutor) {
+	} else if (!$canviewall) {
 		$limuser = $userid;
 	} else {
 		$limuser = 0;
@@ -162,7 +162,7 @@ function gbtable() {
 	//Pull Assessment Info
 	$now = time();
 	$query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail FROM imas_assessments WHERE courseid='$cid' AND avail>0 ";
-	if (!$isteacher) {
+	if (!$canviewall) {
 		$query .= "AND cntingb>0 ";
 	}
 	if (!$isteacher) {
@@ -250,10 +250,10 @@ function gbtable() {
 	
 	//Pull Offline Grade item info
 	$query = "SELECT * from imas_gbitems WHERE courseid='$cid' ";
-	if (!$isteacher) {
+	if (!$canviewall) {
 		$query .= "AND showdate<$now ";
 	}
-	if (!$isteacher) {
+	if (!$canviewall) {
 		$query .= "AND cntingb>0 ";
 	}
 	if ($catfilter>-1) {
@@ -280,7 +280,7 @@ function gbtable() {
 	
 	//Pull Discussion Grade info
 	$query = "SELECT id,name,gbcategory,startdate,enddate,replyby,postby,points,cntingb,avail FROM imas_forums WHERE courseid='$cid' AND points>0 AND avail>0 ";
-	if (!$isteacher) {
+	if (!$canviewall) {
 		$query .= "AND startdate<$now ";
 	}
 	if ($catfilter>-1) {
@@ -696,17 +696,17 @@ function gbtable() {
 			$inexception = false;
 		}
 				
-		if ($isteacher || $sa[$i]=="I" || ($sa[$i]!="N" && $now>$thised)) { //|| $assessmenttype[$i]=="Practice" 
+		if ($canviewall || $sa[$i]=="I" || ($sa[$i]!="N" && $now>$thised)) { //|| $assessmenttype[$i]=="Practice" 
 			$gb[$row][1][$col][2] = 1; //show link
 		} else {
 			$gb[$row][1][$col][2] = 0; //don't show link
 		}
 		$countthisone = false;
-		if ($assessmenttype[$i]=="NoScores" && $sa[$i]!="I" && $now<$thised && !$isteacher) {
+		if ($assessmenttype[$i]=="NoScores" && $sa[$i]!="I" && $now<$thised && !$canviewall) {
 			$gb[$row][1][$col][0] = 'N/A'; //score is not available
 			$gb[$row][1][$col][3] = 0;  //no other info
 		} else if ($pts<$minscores[$i]) {
-			if ($isteacher) {
+			if ($canviewall) {
 				$gb[$row][1][$col][0] = $pts; //the score
 				$gb[$row][1][$col][3] = 1;  //no credit
 			} else {

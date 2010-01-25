@@ -24,11 +24,11 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = "";
 $hasInclude = 0;
-if (!isset($allowinstructorstoaddstu)) {
-	$allowinstructorstoaddstu = true;
+if (!isset($CFG['GEN']['allowinstraddstus'])) {
+	$CFG['GEN']['allowinstraddstus'] = true;
 }
-if (!isset($allowinstructorstoaddtutors)) {
-	$allowinstructorstoaddtutors = true;
+if (!isset($CFG['GEN']['allowinstraddtutors'])) {
+	$CFG['GEN']['allowinstraddtutors'] = true;
 }
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n";
 
@@ -73,7 +73,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
 			$resultStudentList = mysql_query($query) or die("Query failed : " . mysql_error());
 		}
-	} elseif (isset($_GET['enroll']) && $allowinstructorstoaddstu) {
+	} elseif (isset($_GET['enroll']) && $CFG['GEN']['allowinstraddstus']) {
 
 		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Enroll Students\n";
 		$pagetitle = "Enroll an Existing User";
@@ -107,7 +107,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			}
 			
 		} 
-	} elseif (isset($_GET['newstu']) && $allowinstructorstoaddstu) {
+	} elseif (isset($_GET['newstu']) && $CFG['GEN']['allowinstraddstus']) {
 		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Enroll Students\n";
 		$pagetitle = "Enroll a New Student";	
 	
@@ -564,14 +564,14 @@ if ($overwriteBody==1) {
 	<div class=cp>
 	<?php
 	echo "<a href=\"listusers.php?cid=$cid&enroll=student\">Enroll Student with known username</a><br/>";
-	if ($allowinstructorstoaddstu) { 
+	if ($CFG['GEN']['allowinstraddstus']) { 
 		echo "<a href=\"$imasroot/admin/importstu.php?cid=$cid\">Import Students from File</a><br/>";
 		echo "<a href=\"listusers.php?cid=$cid&newstu=new\">Create and Enroll new student</a><br/>";
 		echo "<a href=\"enrollfromothercourse.php?cid=$cid\">Enroll students from another course</a><br/>";
 	}
 	echo "<a href=\"listusers.php?cid=$cid&assigncode=1\">Assign Sections and/or Codes</a><br/>";
 	echo "<a href=\"latepasses.php?cid=$cid\">Manage LatePasses</a>";
-	if ($allowinstructorstoaddtutors) {
+	if ($CFG['GEN']['allowinstraddtutors']) {
 		echo "<br/><a href=\"managetutors.php?cid=$cid\">Manage Tutors</a>";
 	}
 	?>

@@ -124,7 +124,7 @@
 	<span class=form>Default user order:</span>
 	<span class=formright>
 		<input type=radio name=usersort value="0" <?php writeHtmlChecked($usersort,0);?>/> Order by section (if used), then Last name<br/> 
-		<input type=radio name=usersort value="1" <?php writeHtmlChecked($usersort,1);?>/>Order by Last name
+		<input type=radio name=usersort value="1" <?php writeHtmlChecked($usersort,1);?>/> Order by Last name
 	</span><br class=form />
 	
 	<p>Default gradebook view:</p>

@@ -161,7 +161,7 @@
 	}
 	echo "&gt; Posts</div>\n";
 	
-	echo '<div id="headerindex" class="pagetitle"><h2>Forum: '.$forumname.'</h2></div>';
+	echo '<div id="headerposts" class="pagetitle"><h2>Forum: '.$forumname.'</h2></div>';
 	echo "<b style=\"font-size: 120%\">Post: {$subject[$threadid]}</b><br/>\n";
 	
 	$query = "SELECT id FROM imas_forum_posts WHERE forumid='$forumid' AND threadid<'$threadid' AND parent=0 ORDER BY threadid DESC LIMIT 1";

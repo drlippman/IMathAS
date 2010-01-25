@@ -11,9 +11,10 @@ if (isset($_GET['cid']) && $_GET['cid']>0) {
 	$topbar = explode('|',mysql_result($result,0,0));
 	$topbar[0] = explode(',',$topbar[0]);
 	$topbar[1] = explode(',',$topbar[1]);
+	if (!isset($topbar[2])) {$topbar[2] = 0;}
 	if ($topbar[0][0] == null) {unset($topbar[0][0]);}
 	if ($topbar[1][0] == null) {unset($topbar[1][0]);}
-	if (isset($teacherid) && count($topbar[1])>0) {
+	if (isset($teacherid) && count($topbar[1])>0 && $topbar[2]==0) {
 		echo '<b>Jump to:</b><ul class="nomark">';
 		if (in_array(0,$topbar[1]) && $msgset<4) { //messages
 			echo "<li><a href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a>$newmsgs </li>";
@@ -35,7 +36,7 @@ if (isset($_GET['cid']) && $_GET['cid']>0) {
 		}
 		echo "<li><a href=\"$imasroot/actions.php?action=logout\">Log Out</a></li>";
 		echo '</ul>';
-	} else if (!isset($teacherid) && (count($topbar[0])>0 || $previewshift>-1)) {
+	} else if (!isset($teacherid)  && $topbar[2]==0 && (count($topbar[0])>0 || $previewshift>-1)) {
 		echo '<ul class="nomark">';
 		if (in_array(0,$topbar[0]) && $msgset<4) { //messages
 			echo "<li><a href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a>$newmsgs </li> ";

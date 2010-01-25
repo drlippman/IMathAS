@@ -172,7 +172,7 @@ $sql = 'CREATE TABLE `imas_tutors` ('
 	. '`userid` INT(10) UNSIGNED NOT NULL, '
 	. '`courseid` INT(10) UNSIGNED NOT NULL, '
 	. '`section` VARCHAR(40) NOT NULL, '
-	. 'INDEX (`userid`, `courseid`) '
+	. 'INDEX (`userid`), INDEX(`courseid`) '
 	. ' ) TYPE = innodb '
 	. 'COMMENT = \'course tutors\'';
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());

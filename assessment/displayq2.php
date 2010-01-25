@@ -648,13 +648,13 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			return false;
 		}
 		if (isset($matchlist)) { $matchlist = explode(',',$matchlist);}
-		if ($noshuffle=="questions") {
+		if ($noshuffle=="questions" || $noshuffle=='all') {
 			$randqkeys = array_keys($questions);
 		} else {
 			$randqkeys = array_rand($questions,count($questions));
 			shuffle($randqkeys);
 		}
-		if ($noshuffle=="answers") {
+		if ($noshuffle=="answers" || $noshuffle=='all') {
 			$randakeys = array_keys($answers);
 		} else {
 			$randakeys = array_rand($answers,count($answers));
@@ -1555,13 +1555,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$score = 1.0;
 		$deduct = 1.0/count($questions);
-		if ($noshuffle=="questions") {
+		if ($noshuffle=="questions" || $noshuffle=='all') {
 			$randqkeys = array_keys($questions);
 		} else {
 			$randqkeys = array_rand($questions,count($questions));
 			shuffle($randqkeys);
 		}
-		if ($noshuffle=="answers") {
+		if ($noshuffle=="answers" || $noshuffle=='all') {
 			$randakeys = array_keys($answers);
 		} else {
 			$randakeys = array_rand($answers,count($answers));

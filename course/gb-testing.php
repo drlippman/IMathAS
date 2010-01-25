@@ -11,6 +11,11 @@ if (isset($tutorid)) {
 	$istutor = true;
 }
 if ($isteacher || $istutor) {
+	$canviewall = true;
+} else {
+	$canviewall = false;
+}
+if ($isteacher || $istutor) {
 	
 	if (isset($_GET['timefilter'])) {
 		$timefilter = $_GET['timefilter'];

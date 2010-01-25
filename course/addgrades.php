@@ -198,11 +198,12 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 		echo ' /> Don\'t count in grade total<br/><input type=radio name="cntingb" value="2" ';
 		if ($cntingb==2) {echo "checked=1";}
 		echo ' /> Count as Extra Credit</span><br class=form />';
-		
-		echo '<span class="form">Allow tutors to edit?</span> <span class="formright">';
-		echo '<input type="checkbox" name="tutoredit" value="1" ';
-		if ($tutoredit==1) {echo ' checked="checked" ';}
-		echo '/></span><br class="form"/>';
+		if (!isset($CFG['GEN']['allowinstraddtutors']) || $CFG['GEN']['allowinstraddtutors']==true) {
+			echo '<span class="form">Allow tutors to edit?</span> <span class="formright">';
+			echo '<input type="checkbox" name="tutoredit" value="1" ';
+			if ($tutoredit==1) {echo ' checked="checked" ';}
+			echo '/></span><br class="form"/>';
+		}
 		
 		if ($_GET['gbitem']!='new') {
 			echo "<span class=form></span><span class=formright><a href=\"addgrades.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=$cid&del={$_GET['gbitem']}\">Delete Item</a></span><br class=form />";

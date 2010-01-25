@@ -8,6 +8,7 @@
 		echo "This page not available to students";
 		exit;
 	}
+	$canviewall = true;
 	if (isset($sessiondata[$cid.'gbmode'])) {
 		$gbmode =  $sessiondata[$cid.'gbmode'];
 	} else {

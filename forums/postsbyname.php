@@ -59,41 +59,86 @@
 	echo '<div id="headerpostsbyname" class="pagetitle">';
 	echo "<h2>Posts by Name - $forumname</h2>\n";
 	echo '</div>';
-	
-	echo "<script>\n";
-	echo "function toggleshow(bnum) {\n";
-	echo "   var node = document.getElementById('m'+bnum);\n";
-	echo "   var butn = document.getElementById('butn'+bnum);\n";
-	echo "   if (node.className == 'blockitems') {\n";
-	echo "       node.className = 'hidden';\n";
-	echo "       butn.value = '+';\n";
-	echo "   } else { ";
-	echo "       node.className = 'blockitems';\n";
-	echo "       butn.value = '-';\n";
-	echo "   }\n";
-	echo "}\n";
-	echo "function toggleshowall() {\n";
-	echo "  for (var i=0; i<bcnt; i++) {";
-	echo "    var node = document.getElementById('m'+i);\n";
-	echo "    var butn = document.getElementById('butn'+i);\n";
-	echo "    node.className = 'blockitems';\n";
-	echo "    butn.value = '-';\n";
-	echo "  }\n";
-	echo "  document.getElementById(\"toggleall\").value = 'Collapse All';";
-	echo "  document.getElementById(\"toggleall\").onclick = togglecollapseall;";
-	echo "}\n";
-	echo "function togglecollapseall() {\n";
-	echo "  for (var i=0; i<bcnt; i++) {";
-	echo "    var node = document.getElementById('m'+i);\n";
-	echo "    var butn = document.getElementById('butn'+i);\n";
-	echo "    node.className = 'hidden';\n";
-	echo "    butn.value = '+';\n";
-	echo "  }\n";
-	echo "  document.getElementById(\"toggleall\").value = 'Expand All';";
-	echo "  document.getElementById(\"toggleall\").onclick = toggleshowall;";
-	echo "}\n";
-	echo "</script>";
-	
+?>
+	<script type="text/javascript">
+	function toggleshow(bnum) {
+	   var node = document.getElementById('m'+bnum);
+	   var butn = document.getElementById('butn'+bnum);
+	   if (node.className == 'blockitems') {
+	       node.className = 'hidden';
+	       butn.value = '+';
+	   } else { 
+	       node.className = 'blockitems';
+	       butn.value = '-';
+	   }
+	}
+	function toggleshowall() {
+	  for (var i=0; i<bcnt; i++) {
+	    var node = document.getElementById('m'+i);
+	    var butn = document.getElementById('butn'+i);
+	    node.className = 'blockitems';
+	    butn.value = '-';
+	  }
+	  document.getElementById("toggleall").value = 'Collapse All';
+	  document.getElementById("toggleall").onclick = togglecollapseall;
+	}
+	function togglecollapseall() {
+	  for (var i=0; i<bcnt; i++) {
+	    var node = document.getElementById('m'+i);
+	    var butn = document.getElementById('butn'+i);
+	    node.className = 'hidden';
+	    butn.value = '+';
+	  }
+	  document.getElementById("toggleall").value = 'Expand All';
+	  document.getElementById("toggleall").onclick = toggleshowall;
+	}
+	function onarrow(e,field) {
+		if (window.event) {
+			var key = window.event.keyCode;
+		} else if (e.which) {
+			var key = e.which;
+		}
+		
+		if (key==40 || key==38) {
+			var i;
+			for (i = 0; i < field.form.elements.length; i++)
+			   if (field == field.form.elements[i])
+			       break;
+			
+		      if (key==38) {
+			      i = i-2;
+			      if (i<0) { i=0;}
+		      } else {
+			      i = (i + 2) % field.form.elements.length;
+		      }
+		      if (field.form.elements[i].type=='text') {
+			      field.form.elements[i].focus();
+		      }
+		      return false;
+		} else {
+			return true;
+		}
+	}
+	function onenter(e,field) {
+		if (window.event) {
+			var key = window.event.keyCode;
+		} else if (e.which) {
+			var key = e.which;
+		}
+		if (key==13) {
+			var i;
+			for (i = 0; i < field.form.elements.length; i++)
+			   if (field == field.form.elements[i])
+			       break;
+		      i = (i + 2) % field.form.elements.length;
+		      field.form.elements[i].focus();
+		      return false;
+		} else {
+			return true;
+		}
+	}
+	</script>
+<?php
 	$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,ifv.lastview from imas_forum_posts JOIN imas_users ";
 	$query .= "ON imas_forum_posts.userid=imas_users.id LEFT JOIN (SELECT DISTINCT threadid,lastview FROM imas_forum_views WHERE userid='$userid') AS ifv ON ";
 	$query .= "ifv.threadid=imas_forum_posts.threadid WHERE imas_forum_posts.forumid='$forumid' AND imas_forum_posts.isanon=0 ORDER BY ";
@@ -128,7 +173,7 @@
 		echo '<span class="right">';
 		if ($haspoints) {
 			if ($isteacher) {
-				echo "<input type=text size=2 name=\"score[{$line['id']}]\" value=\"";
+				echo "<input type=text size=2 name=\"score[{$line['id']}]\"  onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" value=\"";
 				if ($line['points']!=null) {
 					echo $line['points'];
 				}

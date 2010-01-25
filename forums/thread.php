@@ -234,7 +234,7 @@
 
 			require("../header.php");
 			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
-			echo "&gt; <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> &gt;";
+			echo "&gt; <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> &gt; ";
 			if ($_GET['modify']!="new") {
 				echo "Modify Thread</div>\n";
 				$query = "SELECT * from imas_forum_posts WHERE id='{$_GET['modify']}'";
@@ -373,7 +373,7 @@
 	
 	
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Forum Topics</div>\n";
-	echo '<div id="headerindex" class="pagetitle"><h2>Forum: '.$forumname.'</h2></div>';
+	echo '<div id="headerthread" class="pagetitle"><h2>Forum: '.$forumname.'</h2></div>';
 
 	$query = "SELECT threadid,COUNT(id) AS postcount,MAX(postdate) AS maxdate FROM imas_forum_posts ";
 	$query .= "WHERE forumid='$forumid' ";

@@ -5,7 +5,9 @@ require("config.php");
 if ($_GET['action']!="newuser" && $_GET['action']!="resetpw" && $_GET['action']!="lookupusername") {
 	require("validate.php");
 } else {
-	if (!isset($defaultcoursetheme)) {
+	if (isset($CFG['CPS']['theme'])) {
+		$defaultcoursetheme = $CFG['CPS']['theme'][0];
+	} else if (!isset($defaultcoursetheme)) {
 		 $defaultcoursetheme = "default.css";
 	}
 	$coursetheme = $defaultcoursetheme;
