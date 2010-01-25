@@ -73,7 +73,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
 			$resultStudentList = mysql_query($query) or die("Query failed : " . mysql_error());
 		}
-	} elseif (isset($_GET['enroll']) && $CFG['GEN']['allowinstraddstus']) {
+	} elseif (isset($_GET['enroll'])) {
 
 		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Enroll Students\n";
 		$pagetitle = "Enroll an Existing User";
