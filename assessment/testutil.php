@@ -402,7 +402,7 @@ function recordtestdata($limit=false) {
 			$query .= "endtime=$now,reattempting='$reattemptinglist' ";
 		}
 	}
-	if ($testsettings['isgroup']>0 && $sessiondata['groupid']>0) {
+	if ($testsettings['isgroup']>0 && $sessiondata['groupid']>0 && !$isreview) {
 		$query .= "WHERE agroupid='{$sessiondata['groupid']}'";
 	} else {
 		$query .= "WHERE id='$testid' LIMIT 1";
@@ -414,7 +414,7 @@ function recordtestdata($limit=false) {
 function deletefilesifnotused($delfrom,$ifnothere) {
 	global $testsettings,$sessiondata, $testid;
 	if ($testsettings['isgroup']>0 && $sessiondata['groupid']>0) {
-		$s3asid = 'grp'.$sessiondata['groupid'];
+		$s3asid = 'grp'.$sessiondata['groupid'].'/'.$testsettings['assessmentid'];
 	} else {
 		$s3asid = $testid;
 	}

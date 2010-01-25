@@ -367,12 +367,14 @@
 				echo "</ul></p>";
 			}	
 		}
+		$aid = $line['assessmentid'];
+		
 		if ($line['agroupid']>0) {
-			$s3asid = 'grp'.$line['agroupid'];
+			$s3asid = 'grp'.$line['agroupid'].'/'.$aid;
 		} else {
 			$s3asid = $asid;
 		}
-		$aid = $line['assessmentid'];
+		
 		
 		echo "<p>Started: " . tzdate("F j, Y, g:i a",$line['starttime']) ."<BR>\n";
 		if ($line['endtime']==0) { 

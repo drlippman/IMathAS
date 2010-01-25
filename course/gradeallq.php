@@ -176,7 +176,7 @@
 	while($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 		$asid = $line['id'];
 		if ($line['agroupid']>0) {
-			$s3asid = 'grp'.$line['agroupid'];
+			$s3asid = 'grp'.$line['agroupid'].'/'.$aid;
 		} else {
 			$s3asid = $asid;
 		}

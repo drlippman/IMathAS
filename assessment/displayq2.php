@@ -3014,8 +3014,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$GLOBALS['scoremessages'] .= "Error - Invalid file type";
 			return 0;
 		}
-		if (isset($GLOBALS['testsettings']) && isset($GLOBALS['sessiondata']['groupid']) && $GLOBALS['testsettings']>0 && $GLOBALS['sessiondata']['groupid']>0) {
-			$s3asid = 'grp'.$GLOBALS['sessiondata']['groupid'];
+		if (isset($GLOBALS['testsettings']) && isset($GLOBALS['sessiondata']['groupid']) && $GLOBALS['testsettings']>0 && $GLOBALS['sessiondata']['groupid']>0 && (!isset($GLOBALS['isreview']) || $GLOBALS['isreview']==false)) {
+			$s3asid = 'grp'.$GLOBALS['sessiondata']['groupid'].'/'.$GLOBALS['testsettings']['assessmentid'];
 		} else if (isset($GLOBALS['asid'])) {
 			$s3asid = $GLOBALS['asid'];
 		} else {

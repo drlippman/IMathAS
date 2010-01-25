@@ -34,6 +34,42 @@ function getasidfileurl($asid,$file) {
 	}
 				
 }
+
+function moveasidfilesfromstring($str,$s3oldasid,$s3newasid) {
+	if ($GLOBALS['filehandertype'] =='s3') {
+		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		$copycnt = 0;
+		preg_match_all('/@FILE:(.+?)@/',$str,$matches);
+		foreach($matches[1] as $file) {
+			$s3oldobject = "adata/$s3oldasid/$file";
+			$s3newobject = "adata/$s3newasid/$file";
+			if($s3->copyObject($GLOBALS['AWSbucket'],$s3oldobject,$GLOBALS['AWSbucket'],$s3newobject)) {
+				if($s3->deleteObject($GLOBALS['AWSbucket'],$s3oldobject)) {
+					$copycnt++;
+				}
+			}
+			
+		}
+		return $copycnt;
+	}
+}
+
+function copyasidfilesfromstring($str,$s3oldasid,$s3newasid) {
+	if ($GLOBALS['filehandertype'] =='s3') {
+		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		$copycnt = 0;
+		preg_match_all('/@FILE:(.+?)@/',$str,$matches);
+		foreach($matches[1] as $file) {
+			$s3oldobject = "adata/$s3oldasid/$file";
+			$s3newobject = "adata/$s3newasid/$file";
+			if($s3->copyObject($GLOBALS['AWSbucket'],$s3oldobject,$GLOBALS['AWSbucket'],$s3newobject)) {
+				$copycnt++;
+			}
+		}
+		return $copycnt;
+	}
+}
+
 function deleteasidfilesfromstring($str,$s3asid) {
 	if ($GLOBALS['filehandertype'] =='s3') {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
@@ -67,13 +103,14 @@ function deleteasidfilesbyquery($wherearr,$lim=0) {
 			}
 		}
 		$cond = implode(' AND ',$conds);
-		$query = "SELECT id,agroupid,lastanswers,bestlastanswers,reviewlastanswers FROM imas_assessment_sessions WHERE $cond";
+		$query = "SELECT id,agroupid,lastanswers,bestlastanswers,reviewlastanswers,assessmentid FROM imas_assessment_sessions WHERE $cond";
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$cnt = 0;
 		while (($row = mysql_fetch_row($result)) && ($lim==0 || $cnt<$lim)) {
 			if (strpos($row[2].$row[3].$row[4],'FILE:')===false) { continue;}
 			if ($row[1]>0) {
-				$delcnt += deleteasidfilesfromstring($row[2].$row[3].$row[4],'grp'.$row[1]);
+				$delcnt += deleteasidfilesfromstring($row[2].$row[3],'grp'.$row[1].'/'.$row[5]);
+				$delcnt += deleteasidfilesfromstring($row[4],$row[0]);
 			} else {
 				$delcnt += deleteasidfilesfromstring($row[2].$row[3].$row[4],$row[0]);
 			}

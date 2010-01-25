@@ -117,14 +117,20 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$query .= "FROM imas_assessment_sessions WHERE agroupid='$grpid' AND assessmentid='{$aid[0]}'";
 					$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
 					if (mysql_num_rows($result)>0) {
-						$rowgrptest = addslashes_deep(mysql_fetch_row($result));
+						//asid already exists for group - use it
+						$rowgrptest = addslashes_deep(mysql_fetch_row($result)); 
 					} else {
 						//use asid from first student assessment
-						$query = "SELECT $fieldstocopy ";
+						$query = "SELECT id,$fieldstocopy ";
 						$query .= "FROM imas_assessment_sessions WHERE userid IN ($stulist) AND assessmentid='{$aid[0]}'";
 						$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
 						if (mysql_num_rows($result)>0) {
-							$rowgrptest = addslashes_deep(mysql_fetch_row($result));
+							$row = mysql_fetch_row($result);
+							$srcasid = array_shift($row);
+							moveasidfilesfromstring($row[6].$row[12],$srcasid,'grp'.$grpid);
+							$row[6] = str_replace("adata/$srcasid/","adata/grp$grpid/{$aid[0]}/",$row[6]);
+							$row[12] = str_replace("adata/$srcasid/","adata/grp$grpid/{$aid[0]}/",$row[12]);
+							$rowgrptest = addslashes_deep($row);
 							$rowgrptest[1] = $grpid; //use new groupid
 						}
 					}
