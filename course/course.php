@@ -192,10 +192,15 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 				unset($blocktree);
 				break;
 			}
+			if (isset($items[$blocktree[$i]-1]['grouplimit']) && count($items[$blocktree[$i]-1]['grouplimit'])>0 && !isset($teacherid) && !isset($tutorid)) {
+				if (!in_array('s-'.$studentinfo['section'],$items[$blocktree[$i]-1]['grouplimit'])) {
+					echo 'Not authorized';
+					exit;
+				}
+			}  
 			$items = $items[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 		}
 	}
-	
 	//DEFAULT DISPLAY PROCESSING
 	$jsAddress1 = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}";
 	$jsAddress2 = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\');

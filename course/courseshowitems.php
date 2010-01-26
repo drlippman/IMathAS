@@ -52,6 +52,11 @@ function enditem($canedit) {
 				   }
 				   
 			   }
+			if (isset($items[$i]['grouplimit']) && count($items[$i]['grouplimit'])>0 && !$viewall) {
+				if (!in_array('s-'.$studentinfo['section'],$items[$i]['grouplimit'])) {
+					continue;
+				}
+			}  
 			$items[$i]['name'] = stripslashes($items[$i]['name']);
 			if ($canedit) {
 				echo generatemoveselect($i,count($items),$parent,$blocklist);
@@ -987,6 +992,7 @@ function enditem($canedit) {
    }
    
    function generateadditem($blk,$tb) {
+   	global $cid;
 	$html = "<select name=addtype id=\"addtype$blk-$tb\" onchange=\"additem('$blk','$tb')\" ";
 	if ($tb=='t') {
 		$html .= 'style="margin-bottom:5px;"';
@@ -1000,6 +1006,17 @@ function enditem($canedit) {
 	$html .= "<option value=\"block\">Add Block</option>\n";
 	$html .= "<option value=\"calendar\">Add Calendar</option>\n";
 	$html .= "</select><BR>\n";
+	/*
+	if ($tb=='BB' || $tb=='LB') {$tb = 'b';}
+	$html = '<div class="additembox"><span><b>Add:</b> ';
+	$html .= "<a href=\"addassessment.php?block=$blk&tb=$tb&cid=$cid\">Assessment</a> | ";
+	$html .= "<a href=\"addinlinetext.php?block=$blk&tb=$tb&cid=$cid\">Text</a> | ";
+	$html .= "<a href=\"addlinkedtext.php?block=$blk&tb=$tb&cid=$cid\">Link</a> | ";
+	$html .= "<a href=\"addforum.php?block=$blk&tb=$tb&cid=$cid\">Forum</a> | ";
+	$html .= "<a href=\"addblock.php?block=$blk&tb=$tb&cid=$cid\">Block</a> | ";
+	$html .= "<a href=\"addcalendar.php?block=$blk&tb=$tb&cid=$cid\">Calendar</a>";
+	$html .= '</span></div>';
+	*/
 	return $html;
    }
    

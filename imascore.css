@@ -383,4 +383,13 @@ ul#navlist li a:hover
 background-color: #369;
 color: #fff;
 }
+
+div.additembox {
+	margin-bottom: 2px;
+}
+div.additembox span {
+	font-size: 85%;
+	background-color: #ccc;
+	padding: 0 10px;
+}
 	

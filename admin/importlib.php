@@ -379,64 +379,65 @@ if (!(isset($teacherid)) && $myrights<75) {
 		
 		//write questions, get qsetids
 		$qids = parseqs($filename,$touse,$qrights);
-
-		//resolve any includecodefrom links
-		$qidstocheck = implode(',',$qids);
-		$qidstoupdate = array();
-		//look up any refs to UIDs
-		$query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($qidstocheck) AND (control LIKE '%includecodefrom(UID%' OR qtext LIKE '%includeqtextfrom(UID%')";
-		$result = mysql_query($query) or die("error on: $query: " . mysql_error());
-		$includedqs = array();
-		while ($row = mysql_fetch_row($result)) {
-			$qidstoupdate[] = $row[0];
-			if (preg_match_all('/includecodefrom\(UID(\d+)\)/',$row[1],$matches,PREG_PATTERN_ORDER) >0) {
-				$includedqs = array_merge($includedqs,$matches[1]);
-			}
-			if (preg_match_all('/includeqtextfrom\(UID(\d+)\)/',$row[2],$matches,PREG_PATTERN_ORDER) >0) {
-				$includedqs = array_merge($includedqs,$matches[1]);
-			}
-		}
-		if (count($qidstoupdate)>0) {
-			//lookup backrefs
-			$includedbackref = array();
-			if (count($includedqs)>0) {
-				$includedlist = implode(',',$includedqs);
-				$query = "SELECT id,uniqueid FROM imas_questionset WHERE uniqueid IN ($includedlist)";
-				$result = mysql_query($query) or die("Query failed : $query"  . mysql_error());
-				while ($row = mysql_fetch_row($result)) {
-					$includedbackref[$row[1]] = $row[0];		
-				}
-			}
-			$updatelist = implode(',',$qidstoupdate);
-			$query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($updatelist)";
+		if (count($qids)>0) {
+			//resolve any includecodefrom links
+			$qidstocheck = implode(',',$qids);
+			$qidstoupdate = array();
+			//look up any refs to UIDs
+			$query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($qidstocheck) AND (control LIKE '%includecodefrom(UID%' OR qtext LIKE '%includeqtextfrom(UID%')";
 			$result = mysql_query($query) or die("error on: $query: " . mysql_error());
+			$includedqs = array();
 			while ($row = mysql_fetch_row($result)) {
-				$control = addslashes(preg_replace('/includecodefrom\(UID(\d+)\)/e','"includecodefrom(".$includedbackref["\\1"].")"',$row[1]));
-				$qtext = addslashes(preg_replace('/includeqtextfrom\(UID(\d+)\)/e','"includeqtextfrom(".$includedbackref["\\1"].")"',$row[2]));
-				$query = "UPDATE imas_questionset SET control='$control',qtext='$qtext' WHERE id={$row[0]}";
-				mysql_query($query) or die("error on: $query: " . mysql_error());
-			}
-		}
-			
-	
-		//write imas library items, connecting libraries to items
-		foreach ($libstoadd as $libid) {
-			if (!isset($libs[$libid])) { $libs[$libid]=0;} //assign questions to unassigned if library is closed.  Shouldn't ever trigger
-			$query = "SELECT qsetid FROM imas_library_items WHERE libid={$libs[$libid]}";
-			$result = mysql_query($query) or die("error on: $query: " . mysql_error());
-			$existingli = array();
-			while ($row = mysql_fetch_row($result)) { //don't add new LI if exists
-				$existingli[] = $row[0]; 	
-			}
-			$qidlist = explode(',',$libitems[$libid]);
-			foreach ($qidlist as $qid) {
-				if (isset($qids[$qid]) && (array_search($qids[$qid],$existingli)===false)) {
-					$query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES ('{$libs[$libid]}','{$qids[$qid]}','$userid')";
-					mysql_query($query) or die("Import failed on $query: " . mysql_error());
-					$newli++;
+				$qidstoupdate[] = $row[0];
+				if (preg_match_all('/includecodefrom\(UID(\d+)\)/',$row[1],$matches,PREG_PATTERN_ORDER) >0) {
+					$includedqs = array_merge($includedqs,$matches[1]);
+				}
+				if (preg_match_all('/includeqtextfrom\(UID(\d+)\)/',$row[2],$matches,PREG_PATTERN_ORDER) >0) {
+					$includedqs = array_merge($includedqs,$matches[1]);
 				}
 			}
-			unset($existingli);
+			if (count($qidstoupdate)>0) {
+				//lookup backrefs
+				$includedbackref = array();
+				if (count($includedqs)>0) {
+					$includedlist = implode(',',$includedqs);
+					$query = "SELECT id,uniqueid FROM imas_questionset WHERE uniqueid IN ($includedlist)";
+					$result = mysql_query($query) or die("Query failed : $query"  . mysql_error());
+					while ($row = mysql_fetch_row($result)) {
+						$includedbackref[$row[1]] = $row[0];		
+					}
+				}
+				$updatelist = implode(',',$qidstoupdate);
+				$query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($updatelist)";
+				$result = mysql_query($query) or die("error on: $query: " . mysql_error());
+				while ($row = mysql_fetch_row($result)) {
+					$control = addslashes(preg_replace('/includecodefrom\(UID(\d+)\)/e','"includecodefrom(".$includedbackref["\\1"].")"',$row[1]));
+					$qtext = addslashes(preg_replace('/includeqtextfrom\(UID(\d+)\)/e','"includeqtextfrom(".$includedbackref["\\1"].")"',$row[2]));
+					$query = "UPDATE imas_questionset SET control='$control',qtext='$qtext' WHERE id={$row[0]}";
+					mysql_query($query) or die("error on: $query: " . mysql_error());
+				}
+			}
+				
+		
+			//write imas library items, connecting libraries to items
+			foreach ($libstoadd as $libid) {
+				if (!isset($libs[$libid])) { $libs[$libid]=0;} //assign questions to unassigned if library is closed.  Shouldn't ever trigger
+				$query = "SELECT qsetid FROM imas_library_items WHERE libid={$libs[$libid]}";
+				$result = mysql_query($query) or die("error on: $query: " . mysql_error());
+				$existingli = array();
+				while ($row = mysql_fetch_row($result)) { //don't add new LI if exists
+					$existingli[] = $row[0]; 	
+				}
+				$qidlist = explode(',',$libitems[$libid]);
+				foreach ($qidlist as $qid) {
+					if (isset($qids[$qid]) && (array_search($qids[$qid],$existingli)===false)) {
+						$query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES ('{$libs[$libid]}','{$qids[$qid]}','$userid')";
+						mysql_query($query) or die("Import failed on $query: " . mysql_error());
+						$newli++;
+					}
+				}
+				unset($existingli);
+			}
 		}
 		
 		unlink($filename);
