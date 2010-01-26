@@ -992,31 +992,34 @@ function enditem($canedit) {
    }
    
    function generateadditem($blk,$tb) {
-   	global $cid;
-	$html = "<select name=addtype id=\"addtype$blk-$tb\" onchange=\"additem('$blk','$tb')\" ";
-	if ($tb=='t') {
-		$html .= 'style="margin-bottom:5px;"';
-	}
-	$html .= ">\n";
-	$html .= "<option value=\"\">Add An Item...</option>\n";
-	$html .= "<option value=\"assessment\">Add Assessment</option>\n";
-	$html .= "<option value=\"inlinetext\">Add Inline Text</option>\n";
-	$html .= "<option value=\"linkedtext\">Add Linked Text</option>\n";
-	$html .= "<option value=\"forum\">Add Forum</option>\n";
-	$html .= "<option value=\"block\">Add Block</option>\n";
-	$html .= "<option value=\"calendar\">Add Calendar</option>\n";
-	$html .= "</select><BR>\n";
-	/*
-	if ($tb=='BB' || $tb=='LB') {$tb = 'b';}
-	$html = '<div class="additembox"><span><b>Add:</b> ';
-	$html .= "<a href=\"addassessment.php?block=$blk&tb=$tb&cid=$cid\">Assessment</a> | ";
-	$html .= "<a href=\"addinlinetext.php?block=$blk&tb=$tb&cid=$cid\">Text</a> | ";
-	$html .= "<a href=\"addlinkedtext.php?block=$blk&tb=$tb&cid=$cid\">Link</a> | ";
-	$html .= "<a href=\"addforum.php?block=$blk&tb=$tb&cid=$cid\">Forum</a> | ";
-	$html .= "<a href=\"addblock.php?block=$blk&tb=$tb&cid=$cid\">Block</a> | ";
-	$html .= "<a href=\"addcalendar.php?block=$blk&tb=$tb&cid=$cid\">Calendar</a>";
-	$html .= '</span></div>';
-	*/
+   	global $cid, $CFG;
+   	if (isset($CFG['CPS']['additemtype']) && $CFG['CPS']['additemtype'][0]=='links') {
+   		if ($tb=='BB' || $tb=='LB') {$tb = 'b';}
+		$html = '<div class="additembox"><span><b>Add:</b> ';
+		$html .= "<a href=\"addassessment.php?block=$blk&tb=$tb&cid=$cid\">Assessment</a> | ";
+		$html .= "<a href=\"addinlinetext.php?block=$blk&tb=$tb&cid=$cid\">Text</a> | ";
+		$html .= "<a href=\"addlinkedtext.php?block=$blk&tb=$tb&cid=$cid\">Link</a> | ";
+		$html .= "<a href=\"addforum.php?block=$blk&tb=$tb&cid=$cid\">Forum</a> | ";
+		$html .= "<a href=\"addblock.php?block=$blk&tb=$tb&cid=$cid\">Block</a> | ";
+		$html .= "<a href=\"addcalendar.php?block=$blk&tb=$tb&cid=$cid\">Calendar</a>";
+		$html .= '</span></div>';
+   		
+   	} else {
+   		$html = "<select name=addtype id=\"addtype$blk-$tb\" onchange=\"additem('$blk','$tb')\" ";
+		if ($tb=='t') {
+			$html .= 'style="margin-bottom:5px;"';
+		}
+		$html .= ">\n";
+		$html .= "<option value=\"\">Add An Item...</option>\n";
+		$html .= "<option value=\"assessment\">Add Assessment</option>\n";
+		$html .= "<option value=\"inlinetext\">Add Inline Text</option>\n";
+		$html .= "<option value=\"linkedtext\">Add Linked Text</option>\n";
+		$html .= "<option value=\"forum\">Add Forum</option>\n";
+		$html .= "<option value=\"block\">Add Block</option>\n";
+		$html .= "<option value=\"calendar\">Add Calendar</option>\n";
+		$html .= "</select><BR>\n";
+   		
+   	}
 	return $html;
    }
    

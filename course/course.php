@@ -355,7 +355,12 @@ if ($overwriteBody==1) {
 	if ($useleftbar && isset($teacherid)) {
 ?>	
 	<div id="leftcontent">
-		<p><?php echo generateadditem($_GET['folder'],'LB') ?></p>
+	<?php
+		if (isset($CFG['CPS']['additemtype']) && $CFG['CPS']['additemtype'][0]=='links') {
+		} else {
+			echo '<p>'.generateadditem($_GET['folder'],'LB').'</p>';
+		}
+	?>
 		<p><b>Show:</b><br/>
 			<a href="<?php echo $imasroot ?>/msgs/msglist.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>">
 			Messages</a> <?php echo $newmsgs ?> <br/>
