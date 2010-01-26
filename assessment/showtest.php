@@ -1306,9 +1306,6 @@
 			}
 		}
 	}
-	//if ($testsettings['eqnhelper']>0) {
-	//	require("eqnhelper.html");
-	//}
 	//IP:  eqntips
 	//echo '<div id="ehdd" class="ehdd"><span id="ehddtext"></span> <span onclick="showeh(curehdd);" style="cursor:pointer;">[more..]</span></div>';
 	//echo '<div id="eh" class="eh"></div>';

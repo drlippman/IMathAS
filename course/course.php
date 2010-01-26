@@ -411,6 +411,10 @@ if ($overwriteBody==1) {
 			<a href="<?php echo $imasroot ?>/forums/forums.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>">
 			Forums</a> <?php echo $newpostscnt ?><br/>
 			<a href="showcalendar.php?cid=<?php echo $cid ?>">Calendar</a>
+	<?php if (isset($mathchaturl) && $chatset==1) {
+			echo "<br/><a href=\"$mathchaturl?uname=".urlencode($userfullname)."&amp;room=$cid&amp;roomname=".urlencode($coursename)."\"  target=\"chat\">Chat</a>  ($activechatters)";
+		}
+	?>
 			</p>
 			<p>
 			<a href="gradebook.php?cid=<?php echo $cid ?>">Gradebook</a> <?php if (($coursenewflag&1)==1) {echo '<span class="red">New</span>';}?>

@@ -191,14 +191,7 @@ switch($_GET['action']) {
 		if (isset($CFG['CPS']['cploc']) && $CFG['CPS']['cploc'][1]==0) {
 			$cploc = $CFG['CPS']['cploc'][0];
 		} else {
-			if (isset($_POST['cploc'])) {
-				$cploc = 1;
-			} else {
-				$cploc = 0;
-			}
-			if (isset($_POST['cplocstu'])) {
-				$cploc += 2;
-			}
+			$cploc = $_POST['cploc'] + $_POST['cplocstu'];
 		} 
 		
 		$avail = 3 - $_POST['stuavail'] - $_POST['teachavail'];

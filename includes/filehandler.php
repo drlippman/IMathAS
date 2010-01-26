@@ -34,6 +34,42 @@ function getasidfileurl($asid,$file) {
 	}
 				
 }
+
+function moveasidfilesfromstring($str,$s3oldasid,$s3newasid) {
+	if ($GLOBALS['filehandertype'] =='s3') {
+		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		$copycnt = 0;
+		preg_match_all('/@FILE:(.+?)@/',$str,$matches);
+		foreach($matches[1] as $file) {
+			$s3oldobject = "adata/$s3oldasid/$file";
+			$s3newobject = "adata/$s3newasid/$file";
+			if($s3->copyObject($GLOBALS['AWSbucket'],$s3oldobject,$GLOBALS['AWSbucket'],$s3newobject)) {
+				if($s3->deleteObject($GLOBALS['AWSbucket'],$s3oldobject)) {
+					$copycnt++;
+				}
+			}
+			
+		}
+		return $copycnt;
+	}
+}
+
+function copyasidfilesfromstring($str,$s3oldasid,$s3newasid) {
+	if ($GLOBALS['filehandertype'] =='s3') {
+		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		$copycnt = 0;
+		preg_match_all('/@FILE:(.+?)@/',$str,$matches);
+		foreach($matches[1] as $file) {
+			$s3oldobject = "adata/$s3oldasid/$file";
+			$s3newobject = "adata/$s3newasid/$file";
+			if($s3->copyObject($GLOBALS['AWSbucket'],$s3oldobject,$GLOBALS['AWSbucket'],$s3newobject)) {
+				$copycnt++;
+			}
+		}
+		return $copycnt;
+	}
+}
+
 function deleteasidfilesfromstring($str,$s3asid) {
 	if ($GLOBALS['filehandertype'] =='s3') {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);

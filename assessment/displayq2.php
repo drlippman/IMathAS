@@ -1,4 +1,5 @@
 <?php
+
 //IMathAS:  Core of the testing engine.  Displays and grades questions
 //(c) 2006 David Lippman
 $mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
@@ -449,6 +450,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		$tip .= "Enter DNE for Does Not Exist, oo for Infinity";
 		if (isset($reqdecimals)) {
 			$tip .= "<br/>Your answer should be accurate to $reqdecimals decimal places.";
+			$shorttip .= ", accurate to $reqdecimal decimal places";
 		}
 		$out .= "$leftb<input ";
 		if ($displayformat=='alignright') { $out .= 'style="text-align: right;" ';}
@@ -898,10 +900,28 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (!isset($sz)) { $sz = 20;}
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		if (isset($ansprompt)) {$out .= "<label for=\"tc$qn\">$ansprompt</label>";}
+		
+		if ($answerformat=="equation") {
+			$shorttip = 'Enter an algebraic equation';
+		} else {
+			$shorttip = 'Enter an algebraic expression';
+		}
 		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=\"tc$qn\" id=\"tc$qn\" value=\"$la\" ";
-		if ($useeqnhelper) {
+		if ($useeqntips==2) { //eqntips: work in progress
+			if ($multi==0) {
+				$qnref = "$qn-0";
+			} else {
+				$qnref = ($multi-1).'-'.$qn;
+			}
+			if ($useeqnhelper) {
+				$out .= "onfocus=\"showeedd('tc$qn');showehdd('tc$qn','$shorttip','$qnref');\" onblur=\"hideee();hideeh();\" ";
+			} else {
+				$out .= "onfocus=\"showehdd('tc$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
+			}
+		} else if ($useeqnhelper) {
 			$out .= "onfocus=\"showeedd('tc$qn')\" onblur=\"hideee()\" ";
 		}
+		
 		$out .= "/>\n";
 		if (!isset($hidepreview)) {$preview .= "<input type=button class=btn value=Preview onclick=\"AMpreview('tc$qn','p$qn')\" /> &nbsp;\n";}
 		$preview .= "<span id=p$qn></span>\n";
@@ -959,21 +979,37 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (!isset($sz)) { $sz = 20;}
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		
-		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" />";
 		if ($displayformat == 'point') {
 			$tip = "Enter your answer as a point.  Example: (2,5.5)<br/>";
+			$shorttip = 'Enter a point';
 		} else if ($displayformat == 'pointlist') {
 			$tip = "Enter your answer a list of points separated with commas.  Example: (1,2), (3.5,5)<br/>";
+			$shorttip = 'Enter a list of points';
 		} else if ($displayformat == 'vector') {
 			$tip = "Enter your answer as a vector.  Example: <2,5.5><br/>";
+			$shorttip = 'Enter a vector';
 		} else if ($displayformat == 'vectorlist') {
 			$tip = "Enter your answer a list of vectors separated with commas.  Example: <1,2>, <3.5,5><br/>";
+			$shorttip = 'Enter a list of vectors';
 		} else if ($displayformat == 'list') {
 			$tip = "Enter your answer as a list of n-tuples of numbers separated with commas: Example: (1,2),(3.5,4)<br/>";
+			$shorttip = 'Enter a list of n-tuples';
 		} else {
 			$tip = "Enter your answer as an n-tuple of numbers.  Example: (2,5.5)<br/>";
+			$shorttip = 'Enter an n-tuple';
 		}
 		$tip .= "Enter DNE for Does Not Exist";
+		
+		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" ";
+		if ($useeqntips==2) { //eqntips: work in progress
+			if ($multi==0) {
+				$qnref = "$qn-0";
+			} else {
+				$qnref = ($multi-1).'-'.$qn;
+			}
+			$out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
+		}
+		$out .= '/>';
 		
 		if (isset($answer)) {
 			$sa = $answer;
@@ -990,27 +1026,42 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (!isset($sz)) { $sz = 20;}
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		
-		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" />";
+		if ($displayformat == 'point') {
+			$tip = "Enter your answer as a point.  Example: (2,5.5)<br/>";
+			$shorttip = 'Enter a point';
+		} else if ($displayformat == 'pointlist') {
+			$tip = "Enter your answer a list of points separated with commas.  Example: (1,2), (3.5,5)<br/>";
+			$shorttip = 'Enter a list of points';
+		} else if ($displayformat == 'vector') {
+			$tip = "Enter your answer as a vector.  Example: <2,5.5><br/>";
+			$shorttip = 'Enter a vector';
+		} else if ($displayformat == 'vectorlist') {
+			$tip = "Enter your answer a list of vectors separated with commas.  Example: <1,2>, <3.5,5><br/>";
+			$shorttip = 'Enter a list of vectors';
+		} else if ($displayformat == 'list') {
+			$tip = "Enter your answer as a list of n-tuples of numbers separated with commas: Example: (1,2),(3.5,4)<br/>";
+			$shorttip = 'Enter a list of n-tuples';
+		} else {
+			$tip = "Enter your answer as an n-tuple of numbers.  Example: (2,5.5)<br/>";
+			$shorttip = 'Enter an n-tuple';
+		}
+		$tip .= formathint('each value',$ansformats,'calcntuple');
+		
+		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" ";
+		if ($useeqntips==2) { //eqntips: work in progress
+			if ($multi==0) {
+				$qnref = "$qn-0";
+			} else {
+				$qnref = ($multi-1).'-'.$qn;
+			}
+			$out .= "onfocus=\"showehdd('tc$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
+		}
+		$out .= '/>';
 		if (!isset($hidepreview)) {
 			$preview .= "<input type=button class=btn value=Preview onclick=\"ntuplecalc('tc$qn','p$qn','$qn')\" /> &nbsp;\n";
 		}
 		$preview .= "<span id=p$qn></span> ";
 		$out .= "<script type=\"text/javascript\">ntupletoproc[ntupletoproc.length] = $qn; calcformat[$qn] = '$answerformat';</script>\n";
-		
-		if ($displayformat == 'point') {
-			$tip = "Enter your answer as a point.  Example: (2,5.5)<br/>";
-		} else if ($displayformat == 'pointlist') {
-			$tip = "Enter your answer a list of points separated with commas.  Example: (1,2), (3.5,5)<br/>";
-		} else if ($displayformat == 'vector') {
-			$tip = "Enter your answer as a vector.  Example: <2,5.5><br/>";
-		} else if ($displayformat == 'vectorlist') {
-			$tip = "Enter your answer a list of vectors separated with commas.  Example: <1,2>, <3.5,5><br/>";
-		} else if ($displayformat == 'list') {
-			$tip = "Enter your answer as a list of n-tuples of numbers separated with commas: Example: (1,2),(3.5,4)<br/>";
-		} else {
-			$tip = "Enter your answer as an n-tuple of numbers.  Example: (2,5.5)<br/>";
-		}
-		$tip .= formathint('each value',$ansformats,'calcntuple');
 		//$tip .= "Enter DNE for Does Not Exist";
 		if (isset($answer)) {
 			$sa = makeprettydisp($answer);
@@ -1024,14 +1075,27 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (!isset($sz)) { $sz = 20;}
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		
-		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" />";
+		
 		if ($answerformat == "list") {
 			$tip = "Enter your answer as a list of complex numbers in a+bi form separated with commas.  Example: 2+5.5i,-3-4i<br/>";
+			$shorttip = 'Enter a list of complex numbers';
 		} else {
 			$tip = "Enter your answer as a complex number in a+bi form.  Example: 2+5.5i<br/>";
+			$shorttip = 'Enter a complex number';
 		}
 		
 		$tip .= "Enter DNE for Does Not Exist";
+		
+		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\"  ";
+		if ($useeqntips==2) { //eqntips: work in progress
+			if ($multi==0) {
+				$qnref = "$qn-0";
+			} else {
+				$qnref = ($multi-1).'-'.$qn;
+			}
+			$out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
+		}
+		$out .= '/>';
 		if (isset($answer)) {
 			$sa = makepretty($answer);
 		}
@@ -1049,19 +1113,29 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (!isset($answerformat)) { $answerformat = '';}
 		$ansformats = explode(',',$answerformat);
 		
-		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" />";
-		if (!isset($hidepreview)) {
-			$preview .= "<input type=button class=btn value=Preview onclick=\"complexcalc('tc$qn','p$qn')\" /> &nbsp;\n";
-		}
-		$preview .= "<span id=p$qn></span> ";
-		$out .= "<script type=\"text/javascript\">complextoproc[complextoproc.length] = $qn;</script>\n";
-		
 		if (in_array('list',$ansformats)) {
 			$tip = "Enter your answer as a list of complex numbers in a+bi form separated with commas.  Example: 2+5i,-3-4i<br/>";
 		} else {
 			$tip = "Enter your answer as a complex number in a+bi form.  Example: 2+5i<br/>";
 		}
 		$tip .= formathint('each value',$ansformats,'calcntuple');
+		
+		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\"  ";
+		if ($useeqntips==2) { //eqntips: work in progress
+			if ($multi==0) {
+				$qnref = "$qn-0";
+			} else {
+				$qnref = ($multi-1).'-'.$qn;
+			}
+			$out .= "onfocus=\"showehdd('tc$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
+		}
+		$out .= '/>';
+		if (!isset($hidepreview)) {
+			$preview .= "<input type=button class=btn value=Preview onclick=\"complexcalc('tc$qn','p$qn')\" /> &nbsp;\n";
+		}
+		$preview .= "<span id=p$qn></span> ";
+		$out .= "<script type=\"text/javascript\">complextoproc[complextoproc.length] = $qn;</script>\n";
+		
 		//$tip .= "Enter DNE for Does Not Exist";
 		if (isset($answer)) {
 			$sa = makeprettydisp( $answer);
@@ -1074,8 +1148,20 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (!isset($sz)) { $sz = 20;}
 		if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
 		
-		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" />\n";
 		$tip .= "Enter your answer as letters.  Examples: A B C, linear, a cat";
+		$shorttip = 'Enter text';
+		
+		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\"  ";
+		if ($useeqntips==2) { //eqntips: work in progress
+			if ($multi==0) {
+				$qnref = "$qn-0";
+			} else {
+				$qnref = ($multi-1).'-'.$qn;
+			}
+			$out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
+		}
+		$out .= '/>';
+		
 		$sa .= $answer;
 	} else if ($anstype == "essay") {
 		if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$qn];} else {$sz = $options['answerboxsize'];}}
@@ -1133,13 +1219,26 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (!isset($sz)) { $sz = 20;}
 		if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
-		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" />";
+		
 		$tip = "Enter your answer using interval notation.  Example: [2.1,5.6) <br/>";
 		$tip .= "Use U for union to combine intervals.  Example: (-oo,2] U [4,oo)<br/>";
 		$tip .= "Enter DNE for an empty set, oo for Infinity";
 		if (isset($reqdecimals)) {
 			$tip .= "<br/>Your numbers should be accurate to $reqdecimals decimal places.";
 		}
+		$shorttip = 'Enter an interval using interval notation';
+		
+		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\"  ";
+		if ($useeqntips==2) { //eqntips: work in progress
+			if ($multi==0) {
+				$qnref = "$qn-0";
+			} else {
+				$qnref = ($multi-1).'-'.$qn;
+			}
+			$out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
+		}
+		$out .= '/>';
+		
 		if (isset($answer)) {
 			$sa = $answer;
 		}
@@ -1156,18 +1255,15 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (!isset($sz)) { $sz = 20;}
 		if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
-		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" />\n";
-		if (!isset($hidepreview)) {
-			$preview .= "<input type=button class=btn value=Preview onclick=\"intcalculate('tc$qn','p$qn','$answerformat')\" /> &nbsp;\n";
-		}
-		$preview .= "<span id=p$qn></span> ";
-		$out .= "<script type=\"text/javascript\">intcalctoproc[intcalctoproc.length] = $qn; calcformat[$qn] = '$answerformat';</script>\n";
+		
 		if (in_array('inequality',$ansformats)) {
 			$tip = "Enter your answer using inequality notation.  Example: 3 <= x < 4 <br/>";
 			$tip .= "Use or to combine intervals.  Example: x < 2 or x >= 3<br/>";
+			$shorttip = 'Enter an interval using inequalities';
 		} else {
 			$tip = "Enter your answer using interval notation.  Example: [2.1,5.6) <br/>";
 			$tip .= "Use U for union to combine intervals.  Example: (-oo,2] U [4,oo)<br/>";
+			$shorttip = 'Enter an interval using interval notation';
 		}
 		//$tip .= "Enter values as numbers (like 5, -3, 2.2) or as calculations (like 5/3, 2^3, 5+4)<br/>";
 		//$tip .= "Enter DNE for an empty set, oo for Infinity";
@@ -1175,6 +1271,23 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (isset($reqdecimals)) {
 			$tip .= "<br/>Your numbers should be accurate to $reqdecimals decimal places.";
 		}
+		
+		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\"  ";
+		if ($useeqntips==2) { //eqntips: work in progress
+			if ($multi==0) {
+				$qnref = "$qn-0";
+			} else {
+				$qnref = ($multi-1).'-'.$qn;
+			}
+			$out .= "onfocus=\"showehdd('tc$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
+		}
+		$out .= '/>';
+		if (!isset($hidepreview)) {
+			$preview .= "<input type=button class=btn value=Preview onclick=\"intcalculate('tc$qn','p$qn','$answerformat')\" /> &nbsp;\n";
+		}
+		$preview .= "<span id=p$qn></span> ";
+		$out .= "<script type=\"text/javascript\">intcalctoproc[intcalctoproc.length] = $qn; calcformat[$qn] = '$answerformat';</script>\n";
+		
 		if (isset($answer)) {
 			if (in_array('inequality',$ansformats)) {
 				$sa = '`'.intervaltoineq($answer,'x').'`';
