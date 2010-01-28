@@ -522,10 +522,13 @@
 	if ($testsettings['eqnhelper']>0) {
 		$placeinhead = '<script type="text/javascript">var eetype='.$testsettings['eqnhelper'].'</script>';
 		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqnhelper.js\"></script>";
+		$placeinhead .= '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
 		$useeqnhelper = true;
 	}
 	//IP: eqntips 
-	//$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqntips.js\"></script>";
+	if ($testsettings['showtips']==2) {
+		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqntips.js\"></script>";
+	}
 	$cid = $testsettings['courseid'];
 	
 	require("header.php");
@@ -1307,8 +1310,8 @@
 		}
 	}
 	//IP:  eqntips
-	//echo '<div id="ehdd" class="ehdd"><span id="ehddtext"></span> <span onclick="showeh(curehdd);" style="cursor:pointer;">[more..]</span></div>';
-	//echo '<div id="eh" class="eh"></div>';
+	echo '<div id="ehdd" class="ehdd"><span id="ehddtext"></span> <span onclick="showeh(curehdd);" style="cursor:pointer;">[more..]</span></div>';
+	echo '<div id="eh" class="eh"></div>';
 
 	require("../footer.php");
 	

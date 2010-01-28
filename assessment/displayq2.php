@@ -412,7 +412,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans) {
 
 
 function makeanswerbox($anstype, $qn, $la, $options,$multi) {
-	global $myrights, $useeqnhelper, $useeqntips;
+	global $myrights, $useeqnhelper, $showtips;
 	$out = '';
 	$tip = '';
 	$sa = '';
@@ -454,11 +454,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		}
 		$out .= "$leftb<input ";
 		if ($displayformat=='alignright') { $out .= 'style="text-align: right;" ';}
-		if ($useeqntips==2) { //eqntips: work in progress
+		if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
 				$qnref = "$qn-0";
 			} else {
-				$qnref = ($multi-1).'-'.$qn;
+				$qnref = ($multi-1).'-'.($qn%1000);
 			}
 			$out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
 		}
@@ -766,16 +766,16 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		}
 		$out .= "$leftb<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" ";
 		
-		if ($useeqntips==2) { //eqntips: work in progress
+		if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
 				$qnref = "$qn-0";
 			} else {
-				$qnref = ($multi-1).'-'.$qn;
+				$qnref = ($multi-1).'-'.($qn%1000);
 			}
 			if ($useeqnhelper) {
-				$out .= "onfocus=\"showeedd('tc$qn');showehdd('tc$qn','Enter a mathematical expression','$qnref');\" onblur=\"hideee();hideeh();\" ";
+				$out .= "onfocus=\"showeedd('tc$qn');showehdd('tc$qn','Enter a mathematical expression','$qnref');\" onblur=\"hideee();hideeh();\" onclick=\"reshrinkeh('tc$qn')\" ";
 			} else {
-				$out .= "onfocus=\"showehdd('tc$qn','Enter a mathematical expression','$qnref')\" onblur=\"hideeh()\" ";
+				$out .= "onfocus=\"showehdd('tc$qn','Enter a mathematical expression','$qnref')\" onblur=\"hideeh()\" onclick=\"reshrinkeh('tc$qn')\" ";
 			}
 		} else if ($useeqnhelper) {
 			$out .= "onfocus=\"showeedd('tc$qn')\" onblur=\"hideee()\" ";
@@ -907,16 +907,16 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$shorttip = 'Enter an algebraic expression';
 		}
 		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=\"tc$qn\" id=\"tc$qn\" value=\"$la\" ";
-		if ($useeqntips==2) { //eqntips: work in progress
+		if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
 				$qnref = "$qn-0";
 			} else {
-				$qnref = ($multi-1).'-'.$qn;
+				$qnref = ($multi-1).'-'.($qn%1000);
 			}
 			if ($useeqnhelper) {
-				$out .= "onfocus=\"showeedd('tc$qn');showehdd('tc$qn','$shorttip','$qnref');\" onblur=\"hideee();hideeh();\" ";
+				$out .= "onfocus=\"showeedd('tc$qn');showehdd('tc$qn','$shorttip','$qnref');\" onblur=\"hideee();hideeh();\" onclick=\"reshrinkeh('tc$qn')\" ";
 			} else {
-				$out .= "onfocus=\"showehdd('tc$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
+				$out .= "onfocus=\"showehdd('tc$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" onclick=\"reshrinkeh('tc$qn')\" ";
 			}
 		} else if ($useeqnhelper) {
 			$out .= "onfocus=\"showeedd('tc$qn')\" onblur=\"hideee()\" ";
@@ -1001,11 +1001,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		$tip .= "Enter DNE for Does Not Exist";
 		
 		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" ";
-		if ($useeqntips==2) { //eqntips: work in progress
+		if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
 				$qnref = "$qn-0";
 			} else {
-				$qnref = ($multi-1).'-'.$qn;
+				$qnref = ($multi-1).'-'.($qn%1000);
 			}
 			$out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
 		}
@@ -1048,11 +1048,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		$tip .= formathint('each value',$ansformats,'calcntuple');
 		
 		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" ";
-		if ($useeqntips==2) { //eqntips: work in progress
+		if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
 				$qnref = "$qn-0";
 			} else {
-				$qnref = ($multi-1).'-'.$qn;
+				$qnref = ($multi-1).'-'.($qn%1000);
 			}
 			$out .= "onfocus=\"showehdd('tc$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
 		}
@@ -1087,11 +1087,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		$tip .= "Enter DNE for Does Not Exist";
 		
 		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\"  ";
-		if ($useeqntips==2) { //eqntips: work in progress
+		if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
 				$qnref = "$qn-0";
 			} else {
-				$qnref = ($multi-1).'-'.$qn;
+				$qnref = ($multi-1).'-'.($qn%1000);
 			}
 			$out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
 		}
@@ -1121,11 +1121,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		$tip .= formathint('each value',$ansformats,'calcntuple');
 		
 		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\"  ";
-		if ($useeqntips==2) { //eqntips: work in progress
+		if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
 				$qnref = "$qn-0";
 			} else {
-				$qnref = ($multi-1).'-'.$qn;
+				$qnref = ($multi-1).'-'.($qn%1000);
 			}
 			$out .= "onfocus=\"showehdd('tc$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
 		}
@@ -1152,11 +1152,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		$shorttip = 'Enter text';
 		
 		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\"  ";
-		if ($useeqntips==2) { //eqntips: work in progress
+		if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
 				$qnref = "$qn-0";
 			} else {
-				$qnref = ($multi-1).'-'.$qn;
+				$qnref = ($multi-1).'-'.($qn%1000);
 			}
 			$out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
 		}
@@ -1229,11 +1229,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		$shorttip = 'Enter an interval using interval notation';
 		
 		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\"  ";
-		if ($useeqntips==2) { //eqntips: work in progress
+		if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
 				$qnref = "$qn-0";
 			} else {
-				$qnref = ($multi-1).'-'.$qn;
+				$qnref = ($multi-1).'-'.($qn%1000);
 			}
 			$out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
 		}
@@ -1273,11 +1273,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		}
 		
 		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\"  ";
-		if ($useeqntips==2) { //eqntips: work in progress
+		if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
 				$qnref = "$qn-0";
 			} else {
-				$qnref = ($multi-1).'-'.$qn;
+				$qnref = ($multi-1).'-'.($qn%1000);
 			}
 			$out .= "onfocus=\"showehdd('tc$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
 		}

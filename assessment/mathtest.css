@@ -327,11 +327,13 @@ div.tips {
 	font-family: sans-serif;
 	position: absolute; 
 	height: 8px; 
-	background: #ff0;
+	background: #ff0 url('../img/tinyarrow.gif') no-repeat center;
 	display:none; 
 	text-align:center; 
 	color: #fa0;
 	font-size: 6px;
+	border: 1px solid #fa0;
+	border-left: 0;
 }
 .scorebarholder {
 	font-size:1px;
@@ -377,6 +379,7 @@ div.tips {
 	color: #fff;
 	font-size: 75%;
 	padding: 0px 4px;
+	opacity: 0.9;
 }
 .eh {
 	position: absolute;
@@ -385,6 +388,7 @@ div.tips {
 	display: none;
 	padding: 0px 4px;
 	font-size: 75%;
+	opacity: 0.9;
 }
 
 

@@ -627,7 +627,8 @@ if ($overwriteBody==1) {
 			<span class=formright>
 				<select name="showtips">
 					<option value="0" <?php writeHtmlSelected($line['showtips'],0) ?>>No</option>
-					<option value="1" <?php writeHtmlSelected($line['showtips'],1) ?>>Yes</option>
+					<option value="1" <?php writeHtmlSelected($line['showtips'],1) ?>>Yes, after question</option>
+					<option value="2" <?php writeHtmlSelected($line['showtips'],2) ?>>Yes, under answerbox</option>
 				</select>
 			</span><br class=form>
 			
