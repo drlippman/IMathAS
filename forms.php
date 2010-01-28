@@ -110,6 +110,16 @@ switch($_GET['action']) {
 		echo '<p><a href="forms.php?action=googlegadget">Get Google Gadget</a> to monitor your messages and forum posts</p>';
 		echo "</form>\n";
 		break;
+	case "enroll":
+		echo '<div id="headerforms" class="pagetitle"><h2>Enroll in a Course</h2></div>';
+		echo '<form method=post action="actions.php?action=enroll">
+		<span class=form><label for="cid">Course id:</label></span> 
+		<input class=form type=text size=6 id=cid name=cid><br class="form" />
+		<span class=form><label for="ekey">Enrollment key:</label></span> 
+		<input class=form type=text size=10 id="ekey" name="ekey"><br class="form" />
+		<div class=submit><input type=submit value="Sign Up"></div>
+		</form>';
+		break;
 	case "unenroll":
 		if (!isset($_GET['cid'])) { echo "Course ID not specified\n"; break;}
 		echo '<div id="headerforms" class="pagetitle"><h2>Unenroll</h2></div>';

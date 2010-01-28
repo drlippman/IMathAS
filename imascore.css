@@ -3,8 +3,8 @@ html {
 }
 body {
 	height: 100%;
-	margin: 10px;
-	padding: 0px;
+	margin: 0px;
+	padding: 10px;
 }
 div {
 	margin: 0px;
@@ -391,5 +391,16 @@ div.additembox span {
 	font-size: 85%;
 	background-color: #ccc;
 	padding: 0 10px;
+}
+
+a.abutton {
+	display: block;
+	text-align: center;
+	border: 1px solid #000;
+	margin: 0 15px;	
+}
+
+.newnote {
+	color: #f00;
 }
 	

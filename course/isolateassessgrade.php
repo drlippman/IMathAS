@@ -172,7 +172,7 @@
 	if ($hassection) {
 		echo '<td></td>';
 	}
-	echo "<td><a href=\"gb-itemanalysis.php?cid=$cid&aid=$aid\">";
+	echo "<td><a href=\"gb-itemanalysis.php?cid=$cid&aid=$aid&from=isolate\">";
 	if ($n>0) {
 		echo round($tot/$n,1);
 	} else {

@@ -4,13 +4,13 @@
 <meta http-equiv="X-UA-Compatible" content="IE=7" />
 <title><?php echo $installname; if (isset($pagetitle)) { echo " - $pagetitle";}?></title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-<link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=0121103";?>" type="text/css" />
+<link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=012810";?>" type="text/css" />
 <?php if (isset($coursetheme)) { 
 	if (isset($flexwidth)) {
 		$coursetheme = str_replace('_fw','',$coursetheme);
 	}
 	?>
-<link rel="stylesheet" href="<?php echo $imasroot . "/themes/$coursetheme";?>" type="text/css" />
+<link rel="stylesheet" href="<?php echo $imasroot . "/themes/$coursetheme?v=012810";?>" type="text/css" />
 <?php } ?>
 <link rel="shortcut icon" href="/favicon.ico" />
 <!--[if lte IE 6]> 

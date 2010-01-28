@@ -20,6 +20,11 @@
 	} else {
 		$stu = 0;
 	}
+	if (isset($_GET['from'])) {
+		$from = $_GET['from'];
+	} else {
+		$from = 'gb';
+	}
 	
 	$catfilter = -1;
 	$secfilter = -1;
@@ -41,6 +46,8 @@
 	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 	if ($stu==-1) {
 		echo "&gt; <a href=\"gradebook.php?stu=$stu&cid=$cid\">Averages</a> ";
+	} else if ($from=='isolate') {
+		echo "&gt; <a href=\"isolateassessgrade.php?cid=$cid&aid=$aid\">View Scores</a> ";
 	}
 	echo "&gt; Item Analysis</div>";
 	echo '<div id="headergb-itemanalysis" class="pagetitle"><h2>Item Analysis: ';
