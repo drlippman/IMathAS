@@ -95,6 +95,9 @@ if ($myrights<20) {
 /******* begin html output ********/
 $sessiondata['coursetheme'] = $coursetheme;
 $flexwidth = true; //tells header to use non _fw stylesheet
+if ($showtips==2) {
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqntips.js?v=012810\"></script>";
+}
 require("../assessment/header.php");
 
 if ($overwriteBody==1) {
@@ -162,6 +165,10 @@ if ($overwriteBody==1) {
 	echo "<input type=button value=\"White Background\" onClick=\"whiteout()\"/>";
 	echo "</form>\n";
 	
+	if ($showtips==2) {
+		echo '<div id="ehdd" class="ehdd"><span id="ehddtext"></span> <span onclick="showeh(curehdd);" style="cursor:pointer;">[more..]</span></div>';
+		echo '<div id="eh" class="eh"></div>';
+	}
 	echo "<p>Question id: {$_GET['qsetid']}.  <a href=\"mailto:$email\">E-mail owner</a> to report problems</p>";
 	echo "<p>Description: $descr</p><p>Author: $author</p>";
 	echo "<p>Last Modified: $lastmod</p>";

@@ -521,13 +521,13 @@
 	$useeditor = 1;
 	if ($testsettings['eqnhelper']>0) {
 		$placeinhead = '<script type="text/javascript">var eetype='.$testsettings['eqnhelper'].'</script>';
-		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqnhelper.js\"></script>";
+		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqnhelper.js?v=012810\"></script>";
 		$placeinhead .= '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
 		$useeqnhelper = true;
 	}
 	//IP: eqntips 
 	if ($testsettings['showtips']==2) {
-		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqntips.js\"></script>";
+		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqntips.js?v=012810\"></script>";
 	}
 	$cid = $testsettings['courseid'];
 	
