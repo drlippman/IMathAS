@@ -2043,7 +2043,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 		
 		$ansformats = explode(',',$answerformat);
-		//pre-evaluate all instruction expressions - preg match all intervals.  Return array of or options
+		//pre-evaluate all instructor expressions - preg match all intervals.  Return array of or options
 		if (in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats) || in_array('list',$ansformats)) {
 			$anarr = explode(',',$answer);
 			foreach ($anarr as $k=>$ananswer) {
@@ -2528,6 +2528,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						continue;
 					}
 					if (strpos($anssn,'oo')!==false) {
+						$anssn = trim($anssn);
 						if (($anssn=='oo' || $anssn=='+oo') && ($ganssn=='oo' || $ganssn=='+oo')) {
 							
 						} else if ($anssn=='-oo' && $ganssn=='-oo') {
@@ -2542,6 +2543,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						if (abs($anssn - $ganssn)/(abs($anssn)+.0001) < $reltolerance+ 1E-12) {} else {continue;}
 					}
 					if (strpos($ansen,'oo')!==false) {
+						$ansen = trim($ansen);
 						if (($ansen=='oo' || $ansen=='+oo') && ($gansen=='oo' || $gansen=='+oo')) {
 							
 						} else if ($ansen=='-oo' && $gansen=='-oo') {
