@@ -448,7 +448,7 @@ function enditem($canedit) {
 				   $reviewdate = formatdate($line['reviewdate']);
 			   }
 			   $nothidden = true;
-			   if ($line['reqscore']>0 && $line['reqscoreaid']>0 && !$viewall ) {
+			   if ($line['reqscore']>0 && $line['reqscoreaid']>0 && !$viewall && $line['enddate']>$now ) {
 				   $query = "SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid='{$line['reqscoreaid']}' AND userid='$userid'";
 				   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				   if (mysql_num_rows($result)==0) {
@@ -521,7 +521,7 @@ function enditem($canedit) {
 				   echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
 				   enditem($canedit); //echo "</div>\n";
 				  
-			   } else if ($line['avail']==1 && $line['startdate']<$now && $line['reviewdate']>$now) { //review show // && $nothidden
+			   } else if ($line['avail']==1 && $line['enddate']<$now && $line['reviewdate']>$now) { //review show // && $nothidden
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if (($hideicons&1)==0) {
 					   if ($graphicalicons) {

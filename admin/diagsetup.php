@@ -36,6 +36,10 @@ if ($myrights<60) {
 			$spws[] = $v;
 		}
 	}
+	if (isset($_POST['alpha'])) {
+		natsort($sel1);
+		$sel1 = array_values($sel1);
+	}
 	
 	$sel1list = implode(',',$sel1);
 	$iplist = implode(',',$ips);
@@ -47,6 +51,11 @@ if ($myrights<60) {
 	} else if ($_POST['termtype']=='day') {
 		$_POST['term'] = '*day*';
 	}
+	
+	if (isset($_POST['entrynotunique'])) {
+		$_POST['entrytype'] = chr(ord($_POST['entrytype'])-2);
+	}
+	$entryformat = $_POST['entrytype'].$_POST['entrydig'];
 	
 	$sel2 = array();
 	if (isset($_POST['id'])) {
@@ -190,6 +199,12 @@ if ($myrights<60) {
 	}
 	$entrytype = substr($entryformat,0,1); //$entryformat{0};
 	$entrydig = substr($entryformat,1); //$entryformat{1};
+	$entrynotunique = false;
+	if ($entrytype=='A' || $entrytype=='B') {
+		$entrytype = chr(ord($entrytype)+2);
+		$entrynotunique = true;
+	}
+		
 	
 	$query = "SELECT imas_courses.id,imas_courses.name FROM imas_courses,imas_teachers WHERE imas_courses.id=imas_teachers.courseid ";
 	$query .= "AND imas_teachers.userid='$owner' ORDER BY imas_courses.name";
@@ -254,7 +269,7 @@ if ($overwriteBody==1) { //NO AUTHORITY
 			<input type=hidden name="sel1name" value="<?php echo $_POST['sel'] ?>"/>
 			<input type=hidden name="diagname" value="<?php echo $_POST['diagname'] ?>"/>
 			<input type=hidden name="idprompt" value="<?php echo $_POST['idprompt'] ?>"/>
-			<input type=hidden name="entryformat" value="<?php echo $_POST['entrytype'].$_POST['entrydig']; ?>"/>
+			<input type=hidden name="entryformat" value="<?php echo $entryformat; ?>"/>
 			<input type=hidden name="public" value="<?php echo $public ?>"/>
 			<input type=hidden name="reentrytime" value="<?php echo $_POST['reentrytime'] ?>"/>
 			<input type=hidden name="id" value="<?php echo $page_updateId ?>" >
@@ -364,6 +379,8 @@ if ($overwriteBody==1) { //NO AUTHORITY
 	
 	<p>Unique ID prompt: <input type=text size=60 name="idprompt" value="<?php echo $idprompt; ?>" /></p>
 
+	<p>Attach first level selector to ID: <input type="checkbox" name="entrynotunique" value="1" <?php writeHtmlChecked($entrynotunique,true); ?> /></p>
+	
 	<p>ID entry format: 
 <?php
 	writeHtmlSelect("entrytype",$page_entryType['val'],$page_entryType['label'],$page_entryTypeSelected);
@@ -494,6 +511,7 @@ if ($overwriteBody==1) { //NO AUTHORITY
 
 	<h4>First-level selector - selects assessment to be delivered</h4>
 	<p>Selector name:  <input name="sel" type=text value="<?php echo $sel; ?>"/> "Please select your _______"</p>
+	<p>Alphabetize selectors on submit? <input type="checkbox" name="alpha" value="1" /></p>
 	<p>Enter new selector option: 
 		<input type=text id="sellist"  onkeypress="return onenter(event,'sellist','selout')"> 
 		<input type=button value="Add" onclick="additem('sellist','selout')"/>

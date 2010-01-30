@@ -1,7 +1,34 @@
 var last = 0;
 var t;
+var f;
+var newon = 0;
 var polldelay = 2000;
 var cnt = 0;
+var origtitle = null;
+var isnewpost = true;
+function flashnew(n) {
+	if (isnewpost) {
+		isnewpost = false;
+		return;
+	}
+	if (origtitle==null) {
+		origtitle = document.title;
+	}
+	if (n!=null) {
+		newon = 9;
+	}
+	clearTimeout(f);
+	if (newon%2==0) {
+		document.title = "New Message! - Math Chat";
+	} else {
+		document.title = origtitle;
+	}
+	newon--;
+	if (newon>0) {
+		f = setTimeout("flashnew()",400);
+	}
+}
+	
 function updatemsgs() {
 	clearTimeout(t);
 	ahah();
@@ -14,6 +41,7 @@ function posttxt() {
 	var pstr = 'addtxt=' + encodeURIComponent(v);
 	ahah(pstr);
 	tinyMCE.get('addtxt').setContent("");
+	isnewpost = true;
 	t = setTimeout("updatemsgs()", polldelay);
 }
 
@@ -47,41 +75,45 @@ function ahahDone() {
     if (req.status == 200) { // only if "OK" 
       if (req.responseText != '') {
 	      var newmsgs = false;
-	      var mids = req.responseText.match(/class="msg"\s+id="(\d+)/g);
-	      if (mids!=null && mids.length>0) {
-		      for (var i=0; i<mids.length; i++) {
-				n = parseInt(mids[i].replace(/^.*?(\d+)/,"$1"));
-				if (n>last) {
+	      var respobj = eval( '('+req.responseText+')');
+	      if (respobj.msgs.length>0) {
+	      	       var msgbody = document.getElementById("msgbody");
+	      	       for (var i=0; i<respobj.msgs.length; i++) {
+	      	       	       n = respobj.msgs[i].id;
+	      	       	       if (n>last) {
 					last = n;
-				}
+					var newdiv = document.createElement("div");
+					newdiv.id = respobj.msgs[i].id;
+					newdiv.className = "msg";
+					var usrdiv = document.createElement("div");
+					usrdiv.className = "user";
+					usrdiv.innerHTML = respobj.msgs[i].user;
+					var txtdiv = document.createElement("div");
+					txtdiv.className = "txt";
+					txtdiv.innerHTML = respobj.msgs[i].msg;
+					newdiv.appendChild(usrdiv);
+					newdiv.appendChild(txtdiv);
+					msgbody.appendChild(newdiv);
+			       }
 		      }
 		      newmsgs = true;
 	      }
-	      
-	      newdiv = document.createElement("div");
-	      newdiv.innerHTML = req.responseText;// + '<div class="clear">&nbsp;</div>';
-	      var msgbody = document.getElementById("msgbody")
-	      msgbody.appendChild(newdiv);
-	      ulist = document.getElementById("userlist");
-	      var umat = ulist.innerHTML.match(/br/ig);
-	      ucnt = 0;
-	      if (umat!=null) {
-		      ucnt = umat.length;
-	      }
+	      ucnt = respobj.users.length;
+	      document.getElementById("userscontent").innerHTML = respobj.users.join('<br/>');
 	      if (ucnt<2) {
 		      polldelay = 10000;
 	      } else {
 		      polldelay = 2000;
 	      }
-	      document.getElementById("userscontent").innerHTML = ulist.innerHTML;
-	      newdiv.removeChild(ulist);
-	      
+	   
 	      //alert(document.getElementById("msgbody").innerHTML);
 	      if (newmsgs) {
 		      AMprocessNode(newdiv);
 		      setTimeout("drawPics()",100);
 		      
 		      msgbody.scrollTop = msgbody.scrollHeight;
+		      flashnew(9);
+		      
 	      }
 	     // var x = document.getElementById("msgbody").getElementsByTagName("script"); 
 	      //for(var i=0;i<x.length;i++) {

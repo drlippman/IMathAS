@@ -394,10 +394,16 @@ div.additembox span {
 }
 
 a.abutton {
-	display: block;
 	text-align: center;
 	border: 1px solid #000;
-	margin: 0 15px;	
+	padding: 2px 15px;	
+	background-color: #fff;
+	min-width: 100px;
+	color: #000;
+}
+a.abutton:hover {
+	background-color: #ccf;
+	text-decoration: none;
 }
 
 .newnote {

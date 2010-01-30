@@ -214,7 +214,7 @@
 		}
 		if ($_POST['cid']=="" || !is_numeric($_POST['cid'])) {
 			echo "<html><body>\n";
-			echo "Please include Course ID.  <a href=\"index.php\">Try Again</a>\n";
+			echo "Please include Course ID.  <a href=\"forms.php?action=enroll\">Try Again</a>\n";
 			echo "</html></body>\n";
 			exit;
 		}
@@ -223,7 +223,7 @@
 		$line = mysql_fetch_array($result, MYSQL_ASSOC);
 		if ($line == null) {
 			echo "<html><body>\n";
-			echo "Course not found.  <a href=\"index.php\">Try Again</a>\n";
+			echo "Course not found.  <a href=\"forms.php?action=enroll\">Try Again</a>\n";
 			echo "</html></body>\n";
 			exit;
 		} else if (($line['allowunenroll']&2)==2) {
@@ -233,12 +233,12 @@
 			exit;
 		} else if ($_POST['ekey']=="" && $line['enrollkey'] != '') {
 			echo "<html><body>\n";
-			echo "Please include Enrollment Key.  <a href=\"index.php\">Try Again</a>\n";
+			echo "Please include Enrollment Key.  <a href=\"forms.php?action=enroll\">Try Again</a>\n";
 			echo "</html></body>\n";
 			exit;
 		} else if ($line['enrollkey'] != $_POST['ekey']) {
 			echo "<html><body>\n";
-			echo "Incorrect Enrollment Key.  <a href=\"index.php\">Try Again</a>\n";
+			echo "Incorrect Enrollment Key.  <a href=\"forms.php?action=enroll\">Try Again</a>\n";
 			echo "</html></body>\n";
 			exit;
 		} else {
@@ -324,7 +324,27 @@
 		} else {
 			$deflib = $_POST['libs'];
 		}
-		$query = "UPDATE imas_users SET FirstName='{$_POST['firstname']}',LastName='{$_POST['lastname']}',email='{$_POST['email']}',msgnotify=$msgnot,qrightsdef=$qrightsdef,deflib='$deflib',usedeflib='$usedeflib' ";
+		$homelayout[0] = array();
+		$homelayout[1] = array(0,1,2);
+		$homelayout[2] = array();
+		if (isset($_POST['homelayout10'])) {
+			$homelayout[2][] = 10;
+		}
+		if (isset($_POST['homelayout11'])) {
+			$homelayout[2][] = 11;
+		}
+		$homelayout[3] = array();
+		if (isset($_POST['homelayout3-0'])) {
+			$homelayout[3][] = 0;
+		}
+		if (isset($_POST['homelayout3-1'])) {
+			$homelayout[3][] = 1;
+		}
+		foreach ($homelayout as $k=>$v) {
+			$homelayout[$k] = implode(',',$v);
+		}
+		$layoutstr = implode('|',$homelayout);
+		$query = "UPDATE imas_users SET FirstName='{$_POST['firstname']}',LastName='{$_POST['lastname']}',email='{$_POST['email']}',msgnotify=$msgnot,qrightsdef=$qrightsdef,deflib='$deflib',usedeflib='$usedeflib',homelayout='$layoutstr' ";
 		$query .= "WHERE id='$userid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		if (is_uploaded_file($_FILES['stupic']['tmp_name'])) {

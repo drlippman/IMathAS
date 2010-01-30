@@ -92,11 +92,17 @@ if (isset($_POST['SID'])) {
 		echo "<html><body>Please enter your ID, first name, and lastname.  <a href=\"index.php?id=$diagid\">Try Again</a>\n";
 			exit; 
 	}
-	$query = "SELECT entryformat from imas_diags WHERE id='$diagid'";
+	$query = "SELECT entryformat,sel1list from imas_diags WHERE id='$diagid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$entryformat = mysql_result($result,0,0);
+	$sel1 = explode(',',mysql_result($result,0,1));
 	$entrytype = substr($entryformat,0,1); //$entryformat{0};
 	$entrydig = substr($entryformat,1); //$entryformat{1};
+	$entrynotunique = false;
+	if ($entrytype=='A' || $entrytype=='B') {
+		$entrytype = chr(ord($entrytype)+2);
+		$entrynotunique = true;
+	}
 	$pattern = '/^';
 	if ($entrytype=='C') {
 		$pattern .= '\w';
@@ -145,6 +151,7 @@ if (isset($_POST['SID'])) {
 	foreach ($superpw as $k=>$v) {
 		$superpw[$k] = strtolower($v);
 	}
+	$diagSID = $_POST['SID'].'~'.addslashes($diagqtr).'~'.$pcid;
 	if (!$noproctor) {
 		if (!in_array(strtolower($_POST['passwd']),$basicpw) && !in_array(strtolower($_POST['passwd']),$superpw)) {
 			$query = "SELECT id FROM imas_diag_onetime WHERE code='".strtoupper($_POST['passwd'])."' AND diag='$diagid'";
@@ -153,7 +160,7 @@ if (isset($_POST['SID'])) {
 				$query = "DELETE FROM imas_diag_onetime WHERE id=".mysql_result($result,0,0);
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			} else {
-				$query = "SELECT password FROM imas_users WHERE SID='{$_POST['SID']}~$diagqtr~$pcid'";
+				$query = "SELECT password FROM imas_users WHERE SID='$diagSID'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				if (mysql_num_rows($result)>0 && mysql_result($result,0,0)==strtoupper($_POST['passwd'])) {
 					
@@ -166,7 +173,10 @@ if (isset($_POST['SID'])) {
 	}
 	$cnt = 0;
 	$now = time();
-	$query = "SELECT id FROM imas_users WHERE SID='{$_POST['SID']}~$diagqtr~$pcid'";
+	if ($entrynotunique) {
+		$diagSID .= '~'.preg_replace('/\W/','',$sel1[$_POST['course']]);
+	}
+	$query = "SELECT id FROM imas_users WHERE SID='$diagSID'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	if (mysql_num_rows($result)>0) {
 		$userid = mysql_result($result,0,0);
@@ -223,7 +233,7 @@ if (isset($_POST['SID'])) {
 	$eclass = $sel1[$_POST['course']] . '@' . $_POST['teachers'];
 	
 	$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, lastaccess) ";
-	$query .= "VALUES ('{$_POST['SID']}~$diagqtr~$pcid','{$_POST['passwd']}',10,'{$_POST['firstname']}','{$_POST['lastname']}','$eclass',$now);";
+	$query .= "VALUES ('$diagSID','{$_POST['passwd']}',10,'{$_POST['firstname']}','{$_POST['lastname']}','$eclass',$now);";
 	mysql_query($query) or die("Query failed : " . mysql_error());
 	$userid = mysql_insert_id();
 	$query = "INSERT INTO imas_students (userid,courseid,section) VALUES ('$userid','$pcid','{$_POST['teachers']}');";

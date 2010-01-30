@@ -49,6 +49,7 @@ switch($_GET['action']) {
 		$line = mysql_fetch_array($result, MYSQL_ASSOC);
 		echo '<div id="headerforms" class="pagetitle"><h2>User Info</h2></div>';
 		echo "<form enctype=\"multipart/form-data\" method=post action=\"actions.php?action=chguserinfo\">\n";
+		echo '<fieldset id="userinfoprofile"><legend>Profile Settings</legend>';
 		echo "<span class=form><label for=\"firstname\">Enter First Name:</label></span> <input class=form type=text size=20 id=firstname name=firstname value=\"{$line['FirstName']}\" /><br class=\"form\" />\n";
 		echo "<span class=form><label for=\"lastname\">Enter Last Name:</label></span> <input class=form type=text size=20 id=lastname name=lastname value=\"{$line['LastName']}\"><BR class=form>\n";
 		echo "<span class=form><label for=\"email\">Enter E-mail address:</label></span>  <input class=form type=text size=60 id=email name=email value=\"{$line['email']}\"><BR class=form>\n";
@@ -66,8 +67,35 @@ switch($_GET['action']) {
 			echo "No Pic ";
 		}
 		echo '<br/><input type="file" name="stupic"/></span><br class="form" />';
+		$pagelayout = explode('|',$line['homelayout']);
+		foreach($pagelayout as $k=>$v) {
+			if ($v=='') {
+				$pagelayout[$k] = array();
+			} else {
+				$pagelayout[$k] = explode(',',$v);
+			}
+		}
+		echo '<span class="form">Show on home page:</span><span class="formright">';
+		echo '<input type="checkbox" name="homelayout10" ';
+		if (in_array(10,$pagelayout[2])) {echo 'checked="checked"';}
+		echo ' /> New messages widget<br/>';
+		
+		echo '<input type="checkbox" name="homelayout11" ';
+		if (in_array(11,$pagelayout[2])) {echo 'checked="checked"';}
+		echo ' /> New forum posts widget<br/>';
+		
+		echo '<input type="checkbox" name="homelayout3-0" ';
+		if (in_array(0,$pagelayout[3])) {echo 'checked="checked"';}
+		echo ' /> New messages notes on course list<br/>';
+		
+		echo '<input type="checkbox" name="homelayout3-1" ';
+		if (in_array(1,$pagelayout[3])) {echo 'checked="checked"';}
+		echo ' /> New posts notes on course list<br/>';
+		echo '</span><br class="form" />';
+		echo '</fieldset>';
 		
 		if ($myrights>19) {
+			echo '<fieldset id="userinfoinstructor"><legend>Instructor Options</legend>';
 			echo "<span class=form><label for=\"qrd\">Make new questions private by default?<br/>(recommended for new users):</label></span><span class=formright><input type=checkbox id=qrd name=qrd ";
 			if ($line['qrightsdef']==0) {echo "checked=1";}
 			echo " /></span><BR class=form>\n";
@@ -99,6 +127,7 @@ switch($_GET['action']) {
 			echo "<span class=formright><input type=checkbox name=\"usedeflib\"";
 			if ($line['usedeflib']==1) {echo "checked=1";}
 			echo "></span><br class=form>";
+			echo '</fieldset>';
 			
 		}
 		echo "<div class=submit><input type=submit value='Update Info'></div>\n";

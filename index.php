@@ -1,399 +1,376 @@
 <?php
-//IMathAS:  Main page (class list, enrollment form)
-//(c) 2006 David Lippman
+//IMathAS:  Alt main page
+//(c) 2010 David Lippman
 
-/*** master php includes *******/
+/*** master includes ***/
 require("./validate.php");
 
-/*** pre-html data manipulation, including function code *******/
-function writeAdminMenuItem() {
-	global $myrights;
-	if ($myrights > 39) {
-		echo "<A HREF=\"admin/admin.php\">Go to Admin page</a><BR>\n";
-	}
-}
+//0: classes you're teaching
+//1: classes you're tutoring
+//2: classes you're taking
+//10: messages widget
+//11: forum posts widget
 
-function writeHelpMenuItem() {
-	global $myrights;
-	if ($myrights > 10) {
-		echo "<a href=\"docs/docs.php\">Documentation</a><br/>\n";
-	} else if ($myrights > 9) {
-		echo "<a href=\"help.php?section=usingimas\">Help Using IMathAS</a><br/>\n";
-	}
-}
-
-function writeUserInfoMenuItem() {	
-	global $myrights;
-	if ($myrights > 5) {
-		echo "<a href=\"forms.php?action=chgpwd\">Change Password</a><BR>\n";
-		echo "<a href=\"forms.php?action=chguserinfo\">Change User Info</a><BR>\n";
-	}
-}	
-
-function writeLibraryMenuItem() {
-	global $myrights;
-	if ($myrights>19) {
-		echo "<span class=column>";
-		echo "<a href=\"course/manageqset.php?cid=0\">Manage Question Set</a><br/>";
-		echo "<a href=\"course/managelibs.php?cid=0\">Manage Libraries</a>";
-		echo "</span>";
-	}
-}
-
-
-
-$placeinhead = "<style type=\"text/css\">\nh3 { margin: 2px;}\nul { margin: 5px;}\n</style>\n";
-$nologo = true;
-
-//create courseid list, this is in prep for creating a course id array as an object property
-//or session variable
-/*
-$page_currentUserCourseIds = array();
-$query = "SELECT DISTINCT imas_students.courseid, imas_teachers.courseid ";
-$query .= "FROM imas_students, imas_teachers ";
-$query .= "WHERE imas_students.userid = '$userid' OR imas_teachers.userid = '$userid'";
-
+//pagelayout:  array of arrays.  pagelayout[0] = fullwidth header, [1] = left bar 25%, [2] = rigth bar 75%
+//[3]: 0 for newmsg note next to courses, 1 for newpost note next to courses
+$query = "SELECT homelayout FROM imas_users WHERE id='$userid'";
 $result = mysql_query($query) or die("Query failed : " . mysql_error());
-while ($row = mysql_fetch_row($result)) {
-	$page_currentUserCourseIds[$row[0]] = $row[0];
-	$page_currentUserCourseIds[$row[1]] = $row[1];
-}
-   
-if ($debug==1) {
-	echo $query . "<br>\n";
-	var_dump($page_currentUserCourseIds);
-} 
+$homelayout = mysql_result($result,0,0);
 
-//check for new posts
-$newpostscnt = array();
-if (count($page_currentUserCourseIds)>0) {
-	$query = "SELECT courseid,count(*) FROM ";
-	$query .= "(SELECT imas_forums.courseid,imas_forum_posts.threadid,max(imas_forum_posts.postdate),mfv.lastview FROM imas_forum_posts ";
-	$query .= "JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id LEFT JOIN (SELECT * FROM imas_forum_views WHERE userid='$userid') AS mfv ";
-	$query .= "ON mfv.threadid=imas_forum_posts.threadid WHERE imas_forums.courseid IN (";
-	$i=0;
-	foreach ($page_currentUserCourseIds as $val) {
-		$query .= ($i>0) ? ", " : "";
-		$query .= "'$val'";
-		$i++;
-	}
-	
-	$query .= ") AND imas_forums.grpaid=0 GROUP BY imas_forum_posts.threadid HAVING ((max(imas_forum_posts.postdate)>mfv.lastview) OR (mfv.lastview IS NULL))) AS newitems ";
-	$query .= "GROUP BY courseid";
-	
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($row = mysql_fetch_row($result)) {
-		$newpostscnt[$row[0]] = $row[1];
-	}
-	
-	if ($debug==1) {
-		echo $query . "<br>\n";
-		var_dump($newpostscnt);
+$pagelayout = explode('|',$homelayout);
+foreach($pagelayout as $k=>$v) {
+	if ($v=='') {
+		$pagelayout[$k] = array();
+	} else {
+		$pagelayout[$k] = explode(',',$v);
 	}
 }
-*/
+//$pagelayout = array(array(),array(0,1,2),array(10,11),array());
+
+$shownewmsgnote = in_array(0,$pagelayout[3]);
+$shownewpostnote = in_array(1,$pagelayout[3]);
+
+$showmessagesgadget = (in_array(10,$pagelayout[1]) || in_array(10,$pagelayout[0]) || in_array(10,$pagelayout[2]));
+$showpostsgadget = (in_array(11,$pagelayout[1]) || in_array(11,$pagelayout[0]) || in_array(11,$pagelayout[2]));
+
+$twocolumn = (count($pagelayout[1])>0 && count($pagelayout[2])>0);
+
+$placeinhead = ' 
+  <style type="text/css">
+  h3 { margin: 2px;}
+  ul { margin: 5px;}
+  div#leftcolumn {float: left; width: 25%;}
+  div#rightcolumn {float: right; width: 74%; min-width: 250px;}
+  /*.midwrapper {
+  	width: 1000px;
+  	margin: auto;
+  	}*/
+  ul.nomark {
+  	margin-left: 0px;
+  	margin-top: 0px;
+  	}
+  ul.nomark li {
+  	border-bottom: 1px solid #999;
+  	padding: 1px 5px;
+  	}
+  ul.nomark li:last-child {
+  	border: 0;
+  	margin-bottom: 15px;
+  	}
+  div.pagetitle h2 {
+  	margin-top: 0px;
+  	}
+  </style>';
+$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
+	
+$nologo = true;
 
 
 //check for new posts - do for each type if there are courses
 $newpostscnt = array();
+$postcheckcids = array();
+$page_coursenames = array();
+$page_newpostlist = array();
 
-//check for new messages    
 $newmsgcnt = array();
-$query = "SELECT courseid,COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND (isread=0 OR isread=4) GROUP BY courseid";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-while ($row = mysql_fetch_row($result)) {
-	$newmsgcnt[$row[0]] = $row[1];
+if ($showmessagesgadget) {
+	$page_newmessagelist = array();
+	$query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_users.LastName,imas_users.FirstName,imas_msgs.courseid ";
+	$query .= "FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom WHERE ";
+	$query .= "imas_msgs.msgto='$userid' AND (imas_msgs.isread=0 OR imas_msgs.isread=4)";
+	$query .= "ORDER BY senddate DESC ";
+	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+		if (!isset($newmsgcnt[$line['courseid']])) {
+			$newmsgcnt[$line['courseid']] = 1;
+		} else {
+			$newmsgcnt[$line['courseid']]++;
+		}
+		$page_newmessagelist[] = $line;
+	}
+} else {
+	//check for new messages    
+	
+	$query = "SELECT courseid,COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND (isread=0 OR isread=4) GROUP BY courseid";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	while ($row = mysql_fetch_row($result)) {
+		$newmsgcnt[$row[0]] = $row[1];
+	}
 }
+
+$page_studentCourseData = array();
 
 // check to see if the user is enrolled as a student
 $query = "SELECT imas_courses.name,imas_courses.id FROM imas_students,imas_courses ";
 $query .= "WHERE imas_students.courseid=imas_courses.id AND imas_students.userid='$userid' ";
 $query .= "AND (imas_courses.available=0 OR imas_courses.available=2) ORDER BY imas_courses.name";
 $result = mysql_query($query) or die("Query failed : " . mysql_error());
-$line = mysql_fetch_array($result, MYSQL_ASSOC);
-if ($line == null) {
+if (mysql_num_rows($result)==0) {
 	$noclass = true;
 } else {
 	$noclass = false;
-	//check for new posts
-	$query = "SELECT courseid,count(*) FROM ";
-	$query .= "(SELECT imas_forums.courseid,imas_forum_threads.id FROM imas_forum_threads ";
-	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id LEFT JOIN imas_forum_views AS mfv ";
-	$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' WHERE imas_forums.courseid IN ";
-	$query .= "(SELECT courseid FROM imas_students WHERE userid='$userid') AND imas_forums.grpaid=0 ";
-	$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL))) AS newitems ";
-	$query .= "GROUP BY courseid";
-	$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($row = mysql_fetch_row($r2)) {
-		$newpostscnt[$row[0]] = $row[1];
+	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+		$page_studentCourseData[] = $line;	
+		$page_coursenames[$line['id']] = $line['name'];
+		$postcheckcids[] = $line['id'];
 	}
-	$page_studentCourseData = array();
-	$i=0;
-	do {
-		$page_studentCourseData[$i] = $line;
-		$page_studentCourseData[$i]['courseDisplayTag'] = '';
-		if (isset($newmsgcnt[$page_studentCourseData[$i]['id']]) && $newmsgcnt[$page_studentCourseData[$i]['id']]>0) {
-			$page_studentCourseData[$i]['courseDisplayTag'] .= " <a href=\"msgs/msglist.php?cid={$page_studentCourseData[$i]['id']}\" style=\"color:red\">New Messages ({$newmsgcnt[$page_studentCourseData[$i]['id']]})</a>";
-		}
-		if (isset($newpostscnt[$page_studentCourseData[$i]['id']]) && $newpostscnt[$page_studentCourseData[$i]['id']]>0) {
-			$page_studentCourseData[$i]['courseDisplayTag'] .= " <a href=\"forums/newthreads.php?cid={$page_studentCourseData[$i]['id']}\" style=\"color:red\">New Posts (". $newpostscnt[$page_studentCourseData[$i]['id']] .")</a>";
-		}
-		
-		
-		
-		$i++;
-	} while ($line = mysql_fetch_array($result, MYSQL_ASSOC));
 }
 
-//check for classes the current user is teaching
-$query = "SELECT imas_courses.name,imas_courses.id,imas_courses.available,imas_courses.lockaid FROM imas_teachers,imas_courses ";
-$query .= "WHERE imas_teachers.courseid=imas_courses.id AND imas_teachers.userid='$userid' ";
-$query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY imas_courses.name";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-$line = mysql_fetch_array($result, MYSQL_ASSOC);
-
-if ($line == null) {
-	$isTeaching = false;
-} else {
-	$isTeaching = true;
-	
-	//check for forum posts to teachers
-	$query = "SELECT courseid,count(*) FROM ";
-	$query .= "(SELECT imas_forums.courseid,imas_forum_threads.id FROM imas_forum_threads ";
-	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id LEFT JOIN imas_forum_views AS mfv ";
-	$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' WHERE imas_forums.courseid IN ";
-	$query .= "(SELECT courseid FROM imas_teachers WHERE userid='$userid') AND imas_forums.grpaid=0 ";
-	$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL))) AS newitems ";
-	$query .= "GROUP BY courseid";
-	$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($row = mysql_fetch_row($r2)) {
-		$newpostscnt[$row[0]] = $row[1];
+$page_teacherCourseData = array();
+if ($myrights>10) {
+	// check to see if the user is enrolled as a teacher
+	$query = "SELECT imas_courses.name,imas_courses.id,imas_courses.available,imas_courses.lockaid FROM imas_teachers,imas_courses ";
+	$query .= "WHERE imas_teachers.courseid=imas_courses.id AND imas_teachers.userid='$userid' ";
+	$query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY imas_courses.name";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	if (mysql_num_rows($result)==0) {
+		$noclass = true;
+	} else {
+		$noclass = false;
+		$tchcids = array();
+		
+		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+			$page_teacherCourseData[] = $line;	
+			$page_coursenames[$line['id']] = $line['name'];
+			$postcheckcids[] = $line['id'];
+		}
 	}
-	
-	$page_teacherCourseData = array();
-	$i=0;
-	do {
-		$page_teacherCourseData[$i] = $line;
-		$page_teacherCourseData[$i]['courseDisplayTag'] = '';
-		if (($page_teacherCourseData[$i]['available']&1)==1) {
-			$page_teacherCourseData[$i]['courseDisplayTag'] .= "<span style=\"color:green;\">Hidden</span>";
-		}
-		
-		if ($page_teacherCourseData[$i]['lockaid']>0) {
-			$page_teacherCourseData[$i]['courseDisplayTag'] .= " <span style=\"color:green;\">In Lockdown</span>";
-		}
-		if (isset($newmsgcnt[$page_teacherCourseData[$i]['id']]) && $newmsgcnt[$page_teacherCourseData[$i]['id']]>0) {
-			$page_teacherCourseData[$i]['courseDisplayTag'] .= " <a href=\"msgs/msglist.php?cid={$page_teacherCourseData[$i]['id']}\" style=\"color:red\">New Messages ({$newmsgcnt[$page_teacherCourseData[$i]['id']]})</a>";
-		}
-		if (isset($newpostscnt[$page_teacherCourseData[$i]['id']]) && $newpostscnt[$page_teacherCourseData[$i]['id']]>0) {
-			$page_teacherCourseData[$i]['courseDisplayTag'] .= " <a href=\"forums/newthreads.php?cid={$page_teacherCourseData[$i]['id']}\" style=\"color:red\">New Posts (". $newpostscnt[$page_teacherCourseData[$i]['id']] .")</a>";
-		}
-		
-		$i++;
-	} while ($line = mysql_fetch_array($result, MYSQL_ASSOC));
 }
 
-
-//check for classes the current user is tutoring
-//TODO:  check for new posts for tutors
+$page_tutorCourseData = array();
+// check to see if the user is enrolled as a tutor
 $query = "SELECT imas_courses.name,imas_courses.id,imas_courses.available,imas_courses.lockaid FROM imas_tutors,imas_courses ";
 $query .= "WHERE imas_tutors.courseid=imas_courses.id AND imas_tutors.userid='$userid' ";
 $query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY imas_courses.name";
 $result = mysql_query($query) or die("Query failed : " . mysql_error());
-$line = mysql_fetch_array($result, MYSQL_ASSOC);
-
-if ($line == null) {
-	$isTutoring = false;
+if (mysql_num_rows($result)==0) {
+	$noclass = true;
 } else {
-	$isTutoring = true;
-	//check for forum posts to tutors
+	$noclass = false;
+	$tchcids = array();
+	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+		$page_tutorCourseData[] = $line;	
+		$page_coursenames[$line['id']] = $line['name'];
+		$postcheckcids[] = $line['id'];
+	}
+}
+
+//get new posts
+//check for new posts
+$postcidlist = implode(',',$postcheckcids);
+if ($showpostsgadget) {
+	$postthreads = array();
+	$query = "SELECT imas_forums.name,imas_forums.id,imas_forum_threads.id as threadid,imas_forum_threads.lastposttime,imas_forums.courseid FROM imas_forum_threads ";
+	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id LEFT JOIN imas_forum_views AS mfv ";
+	$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' WHERE imas_forums.courseid IN ($postcidlist) AND imas_forums.grpaid=0 ";
+	$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ORDER BY imas_forum_threads.lastposttime DESC";
+	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+		if (!isset($newpostcnt[$line['courseid']])) {
+			$newpostcnt[$line['courseid']] = 1;
+		} else {
+			$newpostcnt[$line['courseid']]++;
+		}
+		if ($newpostcnt[$line['courseid']]<10) {
+			$page_newpostlist[] = $line;	
+			$postthreads[] = $line['threadid'];
+		}
+	}
+} else {
 	$query = "SELECT courseid,count(*) FROM ";
 	$query .= "(SELECT imas_forums.courseid,imas_forum_threads.id FROM imas_forum_threads ";
 	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id LEFT JOIN imas_forum_views AS mfv ";
 	$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' WHERE imas_forums.courseid IN ";
-	$query .= "(SELECT courseid FROM imas_tutors WHERE userid='$userid') AND imas_forums.grpaid=0 ";
+	$query .= "($postcidlist) AND imas_forums.grpaid=0 ";
 	$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL))) AS newitems ";
 	$query .= "GROUP BY courseid";
 	$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 	while ($row = mysql_fetch_row($r2)) {
-		$newpostscnt[$row[0]] = $row[1];
+		$newpostcnt[$row[0]] = $row[1];
 	}
-	$page_tutorCourseData = array();
-	$i=0;
-	do {
-		$page_tutorCourseData[$i] = $line;
-		$page_tutorCourseData[$i]['courseDisplayTag'] = '';
-		if (($page_tutorCourseData[$i]['available']&1)==1) {
-			$page_tutorCourseData[$i]['courseDisplayTag'] .= "<span style=\"color:green;\">Hidden</span>";
-		}
-		
-		if ($page_tutorCourseData[$i]['lockaid']>0) {
-			$page_tutorCourseData[$i]['courseDisplayTag'] .= " <span style=\"color:green;\">In Lockdown</span>";
-		}
-		if (isset($newmsgcnt[$page_teacherCourseData[$i]['id']]) && $newmsgcnt[$page_tutorCourseData[$i]['id']]>0) {
-			$page_tutorCourseData[$i]['courseDisplayTag'] .= " <a href=\"msgs/msglist.php?cid={$page_tutorCourseData[$i]['id']}\" style=\"color:red\">New Messages ({$newmsgcnt[$page_tutorCourseData[$i]['id']]})</a>";
-		}
-		if (isset($newpostscnt[$page_tutorCourseData[$i]['id']]) && $newpostscnt[$page_tutorCourseData[$i]['id']]>0) {
-			$page_tutorCourseData[$i]['courseDisplayTag'] .= " <a href=\"forums/newthreads.php?cid={$page_tutorCourseData[$i]['id']}\" style=\"color:red\">New Posts (". $newpostscnt[$page_tutorCourseData[$i]['id']] .")</a>";
-		}
-		
-		$i++;
-	} while ($line = mysql_fetch_array($result, MYSQL_ASSOC));
 }
 
-/******* end data manipulation, start html  ***********/
+/*** done pulling stuff.  Time to display something ***/
 require("header.php");
-
-/****** begin page body ***********/
-echo '<div id="headerindex" class="pagetitle"><h2>'.$installname.'</h2></div>';
-echo "<p>Welcome back, $userfullname</p>";
-
-
-//student block	
-if ($noclass == true) {
-	echo "<h4>You are not currently enrolled in any classes as a student</h4>\n";
-} else {
-?>		
-<div class=cp style="margin-top: 0px; margin-bottom: 20px;">
-		<a href="<?php echo $imasroot ?>/msgs/msglist.php?cid=0">Messages</a>
-		<?php echo (count($newmsgcnt)>0) ? " <a href=\"$imasroot/msgs/newmsglist.php?cid=0\" style=\"color:red\">New Messages (" . array_sum($newmsgcnt) . ")</a>" : ""; ?>
-		&nbsp; 
-		<?php
-		if ($myrights > 39) {
-			echo "<a href=\"admin/admin.php\">Admin page</a> &nbsp; ";
-		}
-		?>
-		<a href="actions.php?action=logout">Log Out</a>
-</div>
-<div class=block>
-	<h3>Courses You're Taking</h3>
-</div>
-<div class=blockitems>
-	<ul class=nomark>
-<?php
-	for ($i=0;$i<count($page_studentCourseData);$i++) {
-?>	
-		<li><A HREF="course/course.php?folder=0&cid=<?php echo $page_studentCourseData[$i]['id'] ?>"><?php echo $page_studentCourseData[$i]['name'] ?></a>
-		<?php echo $page_studentCourseData[$i]['courseDisplayTag'] ?>
-		</li>
-<?php
-	} 
-?>	
-	</ul>
-</div>
-<?php
+$msgtotal = array_sum($newmsgcnt);
+echo '<div class="floatright" id="homelinkbox">';
+echo "<a href=\"forms.php?action=chguserinfo\">Change User Info</a> | \n";
+echo "<a href=\"forms.php?action=chgpwd\">Change Password</a> | \n";
+echo '<a href="actions.php?action=logout">Log Out</a>';
+echo '<br/><a href="msgs/msglist.php?cid=0">Messages</a>';
+if ($msgtotal>0) {
+	echo ' <a href="msgs/newmsglist.php?cid=0" class="newnote">New (' . $msgtotal . ')</a>';
 }
-// END STUDENT BLOCK 	
-
-// ENROLLMENT BUTTON AND FORM
-if ($myrights > 5) {
-	if (!$noclass || $myrights>10) {
-?>	
-	<p><input id="enrollButton" type=button onClick="document.getElementById('signup').className='signup';this.style.display='none';" value="Enroll in a new class"></p>
-<?php
-	}
-?>	
-	<div id="signup" class="<?php echo ($noclass && $myrights<15) ? "signup" : "hidden"; ?>">
-		<span>Enroll in a new class: 
-			<img align="absmiddle" src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=homepage','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
-			</span>
-			<span style="margin-left: 250px;">&nbsp;</span>
-			<a href="" onclick="document.getElementById('signup').className='hidden';document.getElementById('enrollButton').style.display='';javascript:return false;">
-<?php
-			if (!($noclass && $myrights<15)) {
-?>
-			<span style="text-decoration: none;background-color: #ddf;padding: 3px; border: 1px solid #000;font-size: 70%;">X</span><span style="text-decoration: none; background-color: #ddf;padding: 3px; border: 1px solid #000;font-size: 70%;">Close Form</span>
-<?php
-			}
-?>
-			</a>
-		<BR>
-		<form method=post action="actions.php?action=enroll">
-		<span class=form><label for="cid">Course id:</label></span> 
-		<input class=form type=text size=6 id=cid name=cid><BR class=form>
-		<span class=form><label for="ekey">Enrollment key:</label></span> 
-		<input class=form type=text size=10 id="ekey" name="ekey"><BR class=form>
-		<div class=submit><input type=submit value="Sign Up"></div>
-		</form>
-	</div>
-<?php	
-}
-
-// TUTOR BLOCK 	
-if ($isTutoring == true) {
-?>
-<div class=block>
-	<h3>Courses You're Tutoring</h3>
-</div>
-<div class=blockitems>
-	<ul class=nomark>
-<?php
-	for ($i=0;$i<count($page_tutorCourseData);$i++) {
-?>
-		<li><A HREF="course/course.php?folder=0&cid=<?php echo $page_tutorCourseData[$i]['id'] ?>"><?php echo $page_tutorCourseData[$i]['name'] ?></a>
-		<?php echo $page_tutorCourseData[$i]['courseDisplayTag'] ?>
-		</li>
-<?php
-	}
-?>
-	</ul>
-</div>
-<?php
-}
-
-// TEACHER BLOCK 	
-if ($isTeaching == true) {
-?>
-<div class=block>
-	<h3>Courses You're Teaching</h3>
-</div>
-<div class=blockitems>
-	<ul class=nomark>
-<?php
-	for ($i=0;$i<count($page_teacherCourseData);$i++) {
-?>
-		<li><A HREF="course/course.php?folder=0&cid=<?php echo $page_teacherCourseData[$i]['id'] ?>"><?php echo $page_teacherCourseData[$i]['name'] ?></a>
-		<?php echo $page_teacherCourseData[$i]['courseDisplayTag'] ?>
-		</li>
-<?php
-	}
-?>
-	</ul>
-</div>
-<?php
-}
-// END TEACHER BLOCK 
-
-//MESSAGING BLOCK
-?>	
-	<div class=cp>
-		<span class=column>
-		<a href="<?php echo $imasroot ?>/msgs/msglist.php?cid=0">Messages</a>
-		<?php echo (count($newmsgcnt)>0) ? " <a href=\"$imasroot/msgs/newmsglist.php?cid=0\" style=\"color:red\">New Messages (" . array_sum($newmsgcnt) . ")</a>" : ""; ?>
-		</span>
+echo ' | <a href="docs/docs.php">Documentation</a>';
 		
-		<div class=clear></div>
-	</div>
+echo '</div>';
+echo "<div class=\"pagetitle\" id=\"headerhome\"><h2>Welcome to $installname, $userfullname</h2></div>";
 
-<!-- ADMINISTRATION MENU BLOCK  -->
+echo '<p style="color:#090;">The home page has been improved.  Most of the links that were at the bottom of the ';
+echo 'page are now in the upper right.<br/> You can now customize what shows on this page by clicking the Change User Info link</p>';
+for ($i=0; $i<3; $i++) {
+	if ($i==0) {
+		echo '<div id="homefullwidth">';
+	}
+	if ($twocolumn) {
+		if ($i==1) {
+			echo '</div><div id="leftcolumn">';
+		} else if ($i==2) {
+			echo '</div><div id="rightcolumn">';
+		}
+	}
+	for ($j=0; $j<count($pagelayout[$i]); $j++) {
+		switch ($pagelayout[$i][$j]) {
+			case 0: 
+				printCourses($page_teacherCourseData,'Courses you\'re teaching','teach');
+				break;
+			case 1:
+				printCourses($page_tutorCourseData,'Courses you\'re tutoring');
+				break;
+			case 2: 
+				printCourses($page_studentCourseData,'Courses you\'re taking','take');
+				break;
+			case 10:
+				printMessagesGadget();
+				break;
+			case 11:
+				printPostsGadget();
+				break;
+		}
+	}
+	echo '</div>';
+}
+
+require('./footer.php');
+
+
+function printCourses($data,$title,$type=null) {
+	global $shownewmsgnote, $shownewpostnote;
+	if (count($data)==0) {return;}
+	global $myrights,$showmessagesgadget,$showpostsgadget,$newmsgcnt,$newpostcnt;
+	echo '<div class="block"><h3>'.$title.'</h3></div>';
+	echo '<div class="blockitems"><ul class="nomark">';
+	for ($i=0; $i<count($data); $i++) {
+		echo '<li><a href="course/course.php?folder=0&cid='.$data[$i]['id'].'">';
+		echo $data[$i]['name'].'</a>';
+		if (isset($data[$i]['available']) && (($data[$i]['available']&1)==1)) {
+			echo ' <span style="color:green;">Hidden</span>';
+		}
+		if (isset($data[$i]['lockaid']) && $data[$i]['lockaid']>0) {
+			echo ' <span style="color:green;">Lockdown</span>';
+		}
+		if ($shownewmsgnote && $newmsgcnt[$data[$i]['id']]>0) {
+			echo ' <a class="newnote" href="msgs/msglist.php?cid='.$data[$i]['id'].'">Messages ('.$newmsgcnt[$data[$i]['id']].')</a>';
+		}
+		if ($shownewpostnote && $newpostcnt[$data[$i]['id']]>0) {
+			echo ' <a class="newnote" href="forums/newthreads.php?cid='.$data[$i]['id'].'">Posts ('.$newpostcnt[$data[$i]['id']].')</a>';
+		}
+		
+		echo '</li>';
+	}
+	echo '</ul>';
+	if ($type=='take') {
+		echo '<div class="center"><a class="abutton" href="forms.php?action=enroll">Enroll in a New Class</a></div>';
+	} else if ($type=='teach' && $myrights>39) {
+		echo '<div class="center"><a class="abutton" href="admin/admin.php">Admin Page</a></div>';
+	}
+	echo '</div>';
+}
+
+function printMessagesGadget() {
+	global $page_newmessagelist, $page_coursenames;
+	echo '<div class="block"><h3>New messages</h3></div>';
+	echo '<div class="blockitems">';
+	if (count($page_newmessagelist)==0) {
+		echo '<p>No new messages</p>';
+		echo '</div>';
+		return;
+	}
+	echo '<table class="gb" id="newmsglist"><thead><tr><th>Message</th><th>From</th><th>Course</th><th>Sent</th></tr></thead>';
+	echo '<tbody>';
+	foreach ($page_newmessagelist as $line) {
+		echo '<tr>';
+		if (trim($line['title'])=='') {
+			$line['title'] = '[No Subject]';
+		}
+		$n = 0;
+		while (strpos($line['title'],'Re: ')===0) {
+			$line['title'] = substr($line['title'],4);
+			$n++;
+		}
+		if ($n==1) {
+			$line['title'] = 'Re: '.$line['title'];
+		} else if ($n>1) {
+			$line['title'] = "Re<sup>$n</sup>: ".$line['title'];
+		}
+		echo "<td><a href=\"msgs/viewmsg.php?cid={$line['courseid']}&type=new&msgid={$line['id']}\">";
+		echo $line['title'];
+		echo '</a></td>';
+		echo '<td>'.$line['LastName'].', '.$line['FirstName'].'</td>';
+		echo '<td>'.$page_coursenames[$line['courseid']].'</td>';
+		echo '<td>'.tzdate("D n/j/y, g:i a",$line['senddate']).'</td>';
+		echo '</tr>';
+	}
+	echo '</tbody></table>';
+	echo '<script type="text/javascript">initSortTable("newmsglist",Array("S","S","S","D"),false);</script>';
+	echo '</div>';
 	
-	<div class=cp>
-		<span class=column>
+}
+function printPostsGadget() {
+	global $page_newpostlist, $page_coursenames, $postthreads;
 	
-	<?php
-	writeAdminMenuItem();
-	writeHelpMenuItem();
-	writeUserInfoMenuItem();
-	?>
+	echo '<div class="block"><h3>New forum posts</h3></div>';
+	echo '<div class="blockitems">';
+	if (count($page_newpostlist)==0) {
+		echo '<p>No new posts</p>';
+		echo '</div>';
+		return;
+	}
 	
-			<a href="actions.php?action=logout">Log Out</a>
-		</span>
+	$threadlist = implode(',',$postthreads);
+	$threaddata = array();
+	$query = "SELECT imas_forum_posts.*,imas_users.LastName,imas_users.FirstName FROM imas_forum_posts,imas_users ";
+	$query .= "WHERE imas_forum_posts.userid=imas_users.id AND imas_forum_posts.id IN ($threadlist)";
+	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	while ($tline = mysql_fetch_array($result, MYSQL_ASSOC)) {
+		$threaddata[$tline['id']] = $tline;
+	}
 	
-	<?php writeLibraryMenuItem(); ?>
-		<div class=clear></div>
-	</div>
+	echo '<table class="gb" id="newpostlist"><thead><tr><th>Thread</th><th>Started By</th><th>Course</th><th>Last Post</th></tr></thead>';
+	echo '<tbody>';
+	foreach ($page_newpostlist as $line) {
+		echo '<tr>';
+		$subject = $threaddata[$line['threadid']]['subject'];
+		if (trim($subject)=='') {
+			$subject = '[No Subject]';
+		}
+		$n = 0;
+		while (strpos($subject,'Re: ')===0) {
+			$subject = substr($subject,4);
+			$n++;
+		}
+		if ($n==1) {
+			$subject = 'Re: '.$subject;
+		} else if ($n>1) {
+			$subject = "Re<sup>$n</sup>: ".$subject;
+		}
+		echo "<td><a href=\"forums/posts.php?page=-3&cid={$line['courseid']}&forum={$line['id']}&thread={$line['threadid']}\">";
+		echo $subject;
+		echo '</a></td>';
+		if ($threaddata[$line['threadid']]['isanon']==1) {
+			echo '<td>Anonymous</td>';
+		} else {
+			echo '<td>'.$threaddata[$line['threadid']]['LastName'].', '.$threaddata[$line['threadid']]['FirstName'].'</td>';
+		}
+		echo '<td>'.$page_coursenames[$line['courseid']].'</td>';
+		echo '<td>'.tzdate("D n/j/y, g:i a",$line['lastposttime']).'</td>';
+		echo '</tr>';
+	}
+	echo '</tbody></table>';
+	echo '<script type="text/javascript">initSortTable("newpostlist",Array("S","S","S","D"),false);</script>';
 	
-<?php	
-	require("footer.php");
+	echo '</div>';
+}
+
+
 ?>
-	
