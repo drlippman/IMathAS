@@ -37,27 +37,7 @@ $twocolumn = (count($pagelayout[1])>0 && count($pagelayout[2])>0);
 
 $placeinhead = ' 
   <style type="text/css">
-  h3 { margin: 2px;}
-  ul { margin: 5px;}
-  div#leftcolumn {float: left; width: 25%;}
-  div#rightcolumn {float: right; width: 74%; min-width: 250px;}
-  /*.midwrapper {
-  	width: 1000px;
-  	margin: auto;
-  	}*/
-  ul.nomark {
-  	margin-left: 0px;
-  	margin-top: 0px;
-  	}
-  ul.nomark li {
-  	border-bottom: 1px solid #999;
-  	padding: 1px 5px;
-  	}
-  ul.nomark li:last-child {
-  	border: 0;
-  	margin-bottom: 15px;
-  	}
-  div.pagetitle h2 {
+   div.pagetitle h2 {
   	margin-top: 0px;
   	}
   </style>';
@@ -225,7 +205,7 @@ for ($i=0; $i<3; $i++) {
 				printCourses($page_teacherCourseData,'Courses you\'re teaching','teach');
 				break;
 			case 1:
-				printCourses($page_tutorCourseData,'Courses you\'re tutoring');
+				printCourses($page_tutorCourseData,'Courses you\'re tutoring','tutor');
 				break;
 			case 2: 
 				printCourses($page_studentCourseData,'Courses you\'re taking','take');
@@ -248,10 +228,10 @@ require('./footer.php');
 
 function printCourses($data,$title,$type=null) {
 	global $shownewmsgnote, $shownewpostnote;
-	if (count($data)==0) {return;}
+	if (count($data)==0 && $type=='tutor') {return;}
 	global $myrights,$showmessagesgadget,$showpostsgadget,$newmsgcnt,$newpostcnt;
 	echo '<div class="block"><h3>'.$title.'</h3></div>';
-	echo '<div class="blockitems"><ul class="nomark">';
+	echo '<div class="blockitems"><ul class="nomark courselist">';
 	for ($i=0; $i<count($data); $i++) {
 		echo '<li><a href="course/course.php?folder=0&cid='.$data[$i]['id'].'">';
 		echo $data[$i]['name'].'</a>';

@@ -126,16 +126,16 @@ switch($_GET['action']) {
 			echo "<span class=form>Use default question library for all templated questions?</span>";
 			echo "<span class=formright><input type=checkbox name=\"usedeflib\"";
 			if ($line['usedeflib']==1) {echo "checked=1";}
-			echo "></span><br class=form>";
+			echo "> ";
+			echo "</span><br class=form>";
+			echo "<p>Default question library is used for all local (assessment-only) copies of questions created when you ";
+			echo "edit a question (that's not yours) in an assessment.  You can elect to have all templated questions ";
+			echo "be assigned to this library.</p>";
 			echo '</fieldset>';
 			
 		}
 		echo "<div class=submit><input type=submit value='Update Info'></div>\n";
-		if ($myrights>19) {
-			echo "<p>Default question library is used for all local (assessment-only) copies of questions created when you ";
-			echo "edit a question (that's not yours) in an assessment.  You can elect to have all templated questions ";
-			echo "be assigned to this library.</p>";
-		}
+		
 		echo '<p><a href="forms.php?action=googlegadget">Get Google Gadget</a> to monitor your messages and forum posts</p>';
 		echo "</form>\n";
 		break;

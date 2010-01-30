@@ -409,4 +409,22 @@ a.abutton:hover {
 .newnote {
 	color: #f00;
 }
+div#leftcolumn {float: left; width: 25%;}
+div#rightcolumn {float: right; width: 74%; min-width: 250px;}
+ul.courselist {
+	margin: 5px;
+	margin-left: 0px;
+	margin-top: 0px;
+}
+ul.courselist li {
+	border-bottom: 1px solid #999;
+	padding: 1px 5px;
+}
+ul.courselist li:last-child {
+	border: 0;
+	margin-bottom: 15px;
+}
+div.block h3 {
+	margin: 2px;
+}
 	

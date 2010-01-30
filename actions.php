@@ -51,6 +51,11 @@
 		} else {
 			$msgnot = 0;
 		}
+		if (isset($CFG['GEN']['homelayout'])) {
+			$homelayout = $CFG['GEN']['homelayout'];
+		} else {
+			$homelayout = '|0,2,3||0,1';
+		}
 		if (!isset($_GET['confirmed'])) {
 			$query = "SELECT SID FROM imas_users WHERE email='{$_POST['email']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -73,8 +78,8 @@
 				exit;
 			}
 		}
-		$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, msgnotify) ";
-		$query .= "VALUES ('{$_POST['SID']}','$md5pw',$initialrights,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot);";
+		$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, msgnotify, homelayout) ";
+		$query .= "VALUES ('{$_POST['SID']}','$md5pw',$initialrights,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot,'$homelayout');";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		if ($emailconfirmation) {
 			$id = mysql_insert_id();
