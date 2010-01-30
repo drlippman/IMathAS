@@ -214,9 +214,9 @@ for ($i=0; $i<3; $i++) {
 	}
 	if ($twocolumn) {
 		if ($i==1) {
-			echo '</div><div id="leftcolumn">';
+			echo '<div id="leftcolumn">';
 		} else if ($i==2) {
-			echo '</div><div id="rightcolumn">';
+			echo '<div id="rightcolumn">';
 		}
 	}
 	for ($j=0; $j<count($pagelayout[$i]); $j++) {
@@ -238,7 +238,9 @@ for ($i=0; $i<3; $i++) {
 				break;
 		}
 	}
-	echo '</div>';
+	if ($i==2 || $twocolumn) {
+		echo '</div>';
+	}
 }
 
 require('./footer.php');
