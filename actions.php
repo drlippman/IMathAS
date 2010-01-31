@@ -348,6 +348,13 @@
 		foreach ($homelayout as $k=>$v) {
 			$homelayout[$k] = implode(',',$v);
 		}
+		if (isset($CFG['GEN']['fixedhomelayout']) && $CFG['GEN']['homelayout']) {
+			$deflayout = explode('|',$CFG['GEN']['homelayout']);
+			foreach ($CFG['GEN']['fixedhomelayout'] as $k) {
+				$homelayout[$k] = $deflayout[$k];
+			}
+		}
+				
 		$layoutstr = implode('|',$homelayout);
 		$query = "UPDATE imas_users SET FirstName='{$_POST['firstname']}',LastName='{$_POST['lastname']}',email='{$_POST['email']}',msgnotify=$msgnot,qrightsdef=$qrightsdef,deflib='$deflib',usedeflib='$usedeflib',homelayout='$layoutstr' ";
 		$query .= "WHERE id='$userid'";

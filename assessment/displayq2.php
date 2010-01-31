@@ -412,7 +412,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans) {
 
 
 function makeanswerbox($anstype, $qn, $la, $options,$multi) {
-	global $myrights, $useeqnhelper, $showtips;
+	global $myrights, $useeqnhelper, $showtips, $imasroot;
 	$out = '';
 	$tip = '';
 	$sa = '';

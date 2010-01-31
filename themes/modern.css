@@ -229,3 +229,8 @@ span.current {
 span.done {
 	text-decoration: line-through;
 }
+a.newnote {
+	font-size: 90%;
+}
+
+

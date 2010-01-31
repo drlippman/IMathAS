@@ -10,14 +10,14 @@ array_push($allowedmacros,"calculusdiffquotient","calculusnumint");
 
 //calculusdiffquotient(function,variable,a,h)
 //calculated the difference quotient (f(a+h)-f(a))/h
-function calculusdiffquotient($func,$var,$a,$h) {
+function calculusdiffquotient($func,$var,$ainputval,$hval) {
 	$func = makepretty($func);
 	$func = mathphp($func,$var);
 	if ($func=='0;') { return 0;}
 	$func = str_replace("($var)","(\$$var)",$func);
-	$fah = eval("\$$var = $a + ($h); return($func);");
-	$fa = eval("\$$var = $a; return($func);");
-	return (($fah - $fa)/$h);
+	$fah = eval("\$$var = $ainputval + ($hval); return($func);");
+	$fa = eval("\$$var = $ainputval; return($func);");
+	return (($fah - $fa)/$hval);
 }
 
 //calculusnumint(func,var,a,b,n,method)

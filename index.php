@@ -181,10 +181,20 @@ echo '<br/><a href="msgs/msglist.php?cid=0">Messages</a>';
 if ($msgtotal>0) {
 	echo ' <a href="msgs/newmsglist.php?cid=0" class="newnote">New (' . $msgtotal . ')</a>';
 }
-echo ' | <a href="docs/docs.php">Documentation</a>';
+if ($myrights > 10) {
+	echo " | <a href=\"docs/docs.php\">Documentation</a>\n";
+} else if ($myrights > 9) {
+	echo " | <a href=\"help.php?section=usingimas\">Help</a>\n";
+}
 		
 echo '</div>';
-echo "<div class=\"pagetitle\" id=\"headerhome\"><h2>Welcome to $installname, $userfullname</h2></div>";
+echo '<div class="pagetitle" id="headerhome"><h2>';
+if (isset($CFG['GEN']['hometitle'])) {
+	echo $CFG['GEN']['hometitle'];
+} else {
+	echo "Welcome to $installname, $userfullname";
+}
+echo '</h2></div>';
 
 echo '<p style="color:#090;">The home page has been improved.  Most of the links that were at the bottom of the ';
 echo 'page are now in the upper right.<br/> You can now customize what shows on this page by clicking the Change User Info link</p>';
@@ -202,7 +212,9 @@ for ($i=0; $i<3; $i++) {
 	for ($j=0; $j<count($pagelayout[$i]); $j++) {
 		switch ($pagelayout[$i][$j]) {
 			case 0: 
-				printCourses($page_teacherCourseData,'Courses you\'re teaching','teach');
+				if ($myrights>10) {
+					printCourses($page_teacherCourseData,'Courses you\'re teaching','teach');
+				}
 				break;
 			case 1:
 				printCourses($page_tutorCourseData,'Courses you\'re tutoring','tutor');
