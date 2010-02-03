@@ -339,7 +339,20 @@ if ($overwriteBody==1) {
 		var plblist = '<?php echo $plblist ?>';
 		var cid = '<?php echo $cid ?>';
 	</script> 
-
+	
+<?php
+	//check for theme course layout
+	$themeshort = substr($coursetheme,0,strpos($coursetheme,'.'));
+	if (file_exists("course-$themeshort.php")) {
+		require("course-$themeshort.php");
+		if ($firstload) {
+			echo "<script>document.cookie = 'openblocks-$cid=' + oblist;\n";
+			echo "document.cookie = 'loadedblocks-$cid=0';</script>\n";
+		}
+		require("../footer.php");
+		exit;
+	}
+?>
 	<div class=breadcrumb>
 		<span class="padright">
 		<?php if (isset($guestid)) {

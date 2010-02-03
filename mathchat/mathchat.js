@@ -75,7 +75,7 @@ function ahahDone() {
     if (req.status == 200) { // only if "OK" 
       if (req.responseText != '') {
 	      var newmsgs = false;
-	      var respobj = eval( '('+req.responseText+')');
+	      var respobj = eval('('+req.responseText+')');
 	      if (respobj.msgs.length>0) {
 	      	       var msgbody = document.getElementById("msgbody");
 	      	       for (var i=0; i<respobj.msgs.length; i++) {

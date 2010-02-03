@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 26;
+$latest = 27;
 
 if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 	$handle = fopen("upgradecounter.txt",'w');
@@ -329,6 +329,13 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 		}
 		if ($last < 26) {
 			 $query = "ALTER TABLE `imas_users` ADD `homelayout` VARCHAR(32) NOT NULL DEFAULT '|0,2,3||0,1'"; 
+			 $res = mysql_query($query);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+		}
+		if ($last < 27) {
+			$query = "ALTER TABLE `imas_diag_onetime` ADD `goodfor` INT(10) NOT NULL DEFAULT '0'"; 
 			 $res = mysql_query($query);
 			 if ($res===false) {
 				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";

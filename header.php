@@ -167,8 +167,13 @@ if (isset($insertinheaderwrapper)) {
 	//echo '<div class="headerwrapper">'.$insertinheaderwrapper.'</div>';
 }
 echo '<div class="headerwrapper">';
+$curdir = rtrim(dirname(__FILE__), '/\\');
+if (file_exists("$curdir/headercontent.php")) {
+	require("$curdir/headercontent.php");
+}
 $didnavlist = false;
 if (isset($cid) && isset($teacherid) && $coursetopbar[2]==1 && count($coursetopbar[1])>0 && !isset($flexwidth)) {
+	echo '<div id="navlistcont">';
 	echo '<ul id="navlist">';
 	if (in_array(0,$coursetopbar[1]) && $msgset<4) { //messages
 		echo "<li><a href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a></li> ";
@@ -197,8 +202,10 @@ if (isset($cid) && isset($teacherid) && $coursetopbar[2]==1 && count($coursetopb
 	}
 	echo '</ul>';
 	echo '<br class="clear" />';
+	echo '</div>';
 	$didnavlist = true;
 } else if (isset($cid) && !isset($teacherid) && $coursetopbar[2]==1 && count($coursetopbar[0])>0 && !isset($flexwidth)) {
+	echo '<div id="navlistcont">';
 	echo '<ul id="navlist">';
 	if (in_array(0,$coursetopbar[0]) && $msgset<4) { //messages
 		echo "<li><a href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a></li> ";
@@ -217,6 +224,7 @@ if (isset($cid) && isset($teacherid) && $coursetopbar[2]==1 && count($coursetopb
 	}
 	echo '</ul>';
 	echo '<br class="clear" />';
+	echo '</div>';
 	$didnavlist = true;
 }
 echo '</div>';

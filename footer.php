@@ -1,6 +1,11 @@
 <div class="clear"></div>
 </div>
-<div class="footerwrapper"></div>
+<div class="footerwrapper"><?php
+	$curdir = rtrim(dirname(__FILE__), '/\\');
+	if (file_exists("footercontent.php")) {
+		require("footercontent.php");
+	}
+?></div>
 </div>
 <?php
 if (isset($useeditor) && $sessiondata['useed']==1) {

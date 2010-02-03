@@ -374,7 +374,7 @@ function sendtoall(type) {
 		}
 		echo "<th>Grade</th><th>Feedback</th></tr></thead><tbody>";
 		if ($_GET['gbitem']=="new") {
-			$query = "SELECT imas_users.id,imas_users.LastName,imas_users.FirstName,imas_students.section ";
+			$query = "SELECT imas_users.id,imas_users.LastName,imas_users.FirstName,imas_students.section,imas_students.locked ";
 			$query .= "FROM imas_users,imas_students WHERE ";
 			$query .= "imas_users.id=imas_students.userid AND imas_students.courseid='$cid'";
 		} else {
@@ -391,7 +391,7 @@ function sendtoall(type) {
 				}
 				$feedback[$row[0]] = $row[2];
 			}
-			$query = "SELECT imas_users.id,imas_users.LastName,imas_users.FirstName,imas_students.section FROM imas_users,imas_students ";
+			$query = "SELECT imas_users.id,imas_users.LastName,imas_users.FirstName,imas_students.section,imas_students.locked FROM imas_users,imas_students ";
 			if ($_GET['grades']!='all') {
 				$query .= "WHERE imas_users.id=imas_students.userid AND imas_users.id='{$_GET['grades']}' AND imas_students.courseid='$cid'";
 			} else {
@@ -409,7 +409,13 @@ function sendtoall(type) {
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	
 		while ($row = mysql_fetch_row($result)) {
-			echo "<tr><td>{$row[1]}, {$row[2]}</td>";
+			if ($row[4]==1) {
+				echo '<tr><td style="text-decoration: line-through;">';
+			} else {
+				echo '<tr><td>';
+			}
+			echo "{$row[1]}, {$row[2]}";
+			echo '</td>';
 			if ($hassection) {
 				echo "<td>{$row[3]}</td>";
 			}

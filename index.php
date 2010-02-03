@@ -138,7 +138,7 @@ if (mysql_num_rows($result)==0) {
 //get new posts
 //check for new posts
 $postcidlist = implode(',',$postcheckcids);
-if ($showpostsgadget) {
+if ($showpostsgadget && count($postcheckcids)>0) {
 	$postthreads = array();
 	$query = "SELECT imas_forums.name,imas_forums.id,imas_forum_threads.id as threadid,imas_forum_threads.lastposttime,imas_forums.courseid FROM imas_forum_threads ";
 	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id LEFT JOIN imas_forum_views AS mfv ";
@@ -156,7 +156,7 @@ if ($showpostsgadget) {
 			$postthreads[] = $line['threadid'];
 		}
 	}
-} else {
+} else if (count($postcheckcids)>0) {
 	$query = "SELECT courseid,count(*) FROM ";
 	$query .= "(SELECT imas_forums.courseid,imas_forum_threads.id FROM imas_forum_threads ";
 	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id LEFT JOIN imas_forum_views AS mfv ";

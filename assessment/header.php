@@ -149,7 +149,11 @@ if (isset($insertinheaderwrapper)) {
 	//echo '<div class="headerwrapper">'.$insertinheaderwrapper.'</div>';
 }
 echo '<div class="headerwrapper">';
-
+echo '<div class="headerwrapper">';
+$curdir = rtrim(dirname(__FILE__), '/\\');
+if (file_exists("$curdir/../headercontent.php")) {
+	require("$curdir/../headercontent.php");
+}
 $coursetopbar = explode('|',$sessiondata['coursetopbar']);
 $coursetopbar[0] = explode(',',$coursetopbar[0]);
 $coursetopbar[1] = explode(',',$coursetopbar[1]);
@@ -159,6 +163,7 @@ if ($coursetopbar[1][0] == null) {unset($coursetopbar[1][0]);}
 			
 
 if (isset($cid) && $sessiondata['isteacher'] && $coursetopbar[2]==1 && count($coursetopbar[1])>0) {
+	echo '<div id="navlistcont">';
 	echo '<ul id="navlist">';
 	if (in_array(0,$coursetopbar[1]) && $msgset<4) { //messages
 		echo "<li><a href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a></li> ";
@@ -186,7 +191,10 @@ if (isset($cid) && $sessiondata['isteacher'] && $coursetopbar[2]==1 && count($co
 		echo "<li><a href=\"$imasroot/actions.php?action=logout\">Log Out</a></li>";
 	}
 	echo '</ul>';
+	echo '<br class="clear" />';
+	echo '</div>';
 } else if (isset($cid) && $sessiondata['isteacher'] && $coursetopbar[2]==1 && count($coursetopbar[0])>0) {
+	echo '<div id="navlistcont">';
 	echo '<ul id="navlist">';
 	if (in_array(0,$coursetopbar[0]) && $msgset<4) { //messages
 		echo "<li><a href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a></li> ";
@@ -204,6 +212,8 @@ if (isset($cid) && $sessiondata['isteacher'] && $coursetopbar[2]==1 && count($co
 		echo "<li><a href=\"$imasroot/actions.php?action=logout\">Log Out</a></li>";
 	}
 	echo '</ul>';
+	echo '<br class="clear" />';
+	echo '</div>';
 }
 echo '</div>';
 echo '<div class="midwrapper">';

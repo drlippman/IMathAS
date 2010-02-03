@@ -154,18 +154,38 @@ if (isset($_POST['SID'])) {
 	$diagSID = $_POST['SID'].'~'.addslashes($diagqtr).'~'.$pcid;
 	if (!$noproctor) {
 		if (!in_array(strtolower($_POST['passwd']),$basicpw) && !in_array(strtolower($_POST['passwd']),$superpw)) {
-			$query = "SELECT id FROM imas_diag_onetime WHERE code='".strtoupper($_POST['passwd'])."' AND diag='$diagid'";
+			$query = "SELECT id,goodfor FROM imas_diag_onetime WHERE code='".strtoupper($_POST['passwd'])."' AND diag='$diagid'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$passwordnotfound = false;
 			if (mysql_num_rows($result)>0) {
-				$query = "DELETE FROM imas_diag_onetime WHERE id=".mysql_result($result,0,0);
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				$row = mysql_fetch_row($result); //[0] = id, [1] = goodfor
+				if ($row[1]==0) {  //onetime
+					$query = "DELETE FROM imas_diag_onetime WHERE id={$row[0]}";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+				} else { //set time expiry
+					$now = time();
+					if ($row[1]<100000000) { //is time its good for - not yet used
+						$expiry = $now + $row[1]*60;
+						$query = "UPDATE imas_diag_onetime SET goodfor=$expiry WHERE id={$row[0]}";
+						mysql_query($query) or die("Query failed : " . mysql_error());
+					} else if ($now<$row[1]) {//is expiry time and we're within it
+						//alls good
+					} else { //past expiry
+						$query = "DELETE FROM imas_diag_onetime WHERE id={$row[0]}";
+						mysql_query($query) or die("Query failed : " . mysql_error());
+						$passwordnotfound = true;
+					}
+				}
 			} else {
+				$passwordnotfound = true;
+			}
+			if ($passwordnotfound) {
 				$query = "SELECT password FROM imas_users WHERE SID='$diagSID'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				if (mysql_num_rows($result)>0 && mysql_result($result,0,0)==strtoupper($_POST['passwd'])) {
 					
 				} else {
-					echo "<html><body>Error, password incorrect.  <a href=\"index.php?id=$diagid\">Try Again</a>\n";
+					echo "<html><body>Error, password incorrect or expired.  <a href=\"index.php?id=$diagid\">Try Again</a>\n";
 					exit;
 				}
 			}

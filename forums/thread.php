@@ -283,7 +283,7 @@
 				echo ">Displayed at top and locked (no replies)<br>\n";
 				echo "<input type=radio name=type value=3 ";
 				if ($line['posttype']==3) { echo "checked=1";}
-				echo ">Displayed at top and replies hidden from students\n";
+				echo ">Displayed at top and students can only see their own replies\n";
 				echo "</span><br class=form>";
 				echo "<span class=form>Allow replies:</span><span class=formright>\n";
 				echo "<input type=radio name=replyby value=\"null\" ";
