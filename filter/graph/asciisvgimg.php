@@ -76,9 +76,16 @@ function AStoIMG($w=200, $h=200) {
 	
 	if ($w<=0) {$w=200;}
 	if ($h<=0) {$h=200;}
-	$this->img = imagecreate($w,$h);
 	$this->usegd2 = function_exists('imagesetthickness');
 	$this->usettf = function_exists('imagettftext');
+	if ($this->usegd2) {
+		$this->img = imagecreatetruecolor($w,$h);
+		$this->transblue = imagecolorallocatealpha($this->img, 0,0,255,90);
+		$this->transgreen = imagecolorallocatealpha($this->img, 0,255,0,90);
+		$this->transred = imagecolorallocatealpha($this->img, 255,0,0,90);
+	} else {
+		$this->img = imagecreate($w,$h);
+	}
 	$this->fontfile =  $GLOBALS['graphfilterdir'].'/FreeSerifItalic.ttf';
 	$this->width = $w;
 	$this->height = $h;
@@ -697,9 +704,11 @@ function ASpath($arg) {
 		$color = $this->fill;
 		imagefilledpolygon($this->img,$pt,count($pt)/2,$this->$color);
 	}
-	for ($i=0; $i<count($arg)-2; $i += 2) {
-		//$this->ASline("[{$arg[$i]},{$arg[$i+1]}],[{$arg[$i+2]},{$arg[$i+3]}]");
-		$this->ASline(array("[{$arg[$i]},{$arg[$i+1]}]","[{$arg[$i+2]},{$arg[$i+3]}]"));
+	if ($this->stroke != 'none') {
+		for ($i=0; $i<count($arg)-2; $i += 2) {
+			//$this->ASline("[{$arg[$i]},{$arg[$i+1]}],[{$arg[$i+2]},{$arg[$i+3]}]");
+			$this->ASline(array("[{$arg[$i]},{$arg[$i+1]}]","[{$arg[$i+2]},{$arg[$i+3]}]"));
+		}
 	}
 }
 function AScircle($arg) {
@@ -741,7 +750,9 @@ function ASrect($arg) {
 		imagerectangle($this->img,$sx,$sy,$bx,$by,IMG_COLOR_STYLED);
 	} else {
 		$color = $this->stroke;
-		imagerectangle($this->img,$sx,$sy,$bx,$by,$this->$color);
+		if ($color != 'none') {
+			imagerectangle($this->img,$sx,$sy,$bx,$by,$this->$color);
+		}
 	}
 }
 
@@ -775,7 +786,9 @@ function ASarc($arg) {
 		imagearc($this->img,$cx,$cy,$xdiam,$ydiam,$startt*180/M_PI,$endt*180/M_PI,IMG_COLOR_STYLED);
 	} else {
 		$color = $this->stroke;
-		imagearc($this->img,$cx,$cy,$xdiam,$ydiam,$startt*180/M_PI,$endt*180/M_PI,$this->$color);
+		if ($color != 'none') {
+			imagearc($this->img,$cx,$cy,$xdiam,$ydiam,$startt*180/M_PI,$endt*180/M_PI,$this->$color);
+		}
 	}
 }
 

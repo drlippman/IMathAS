@@ -67,6 +67,10 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	}
 	$ymin = $settings[2];
 	$ymax = $settings[3];
+	$xxmin = $settings[0] - 5*($settings[1] - $settings[0])/$settings[6];
+	$xxmax = $settings[1] + 5*($settings[1] - $settings[0])/$settings[6];
+	$yymin = $settings[2] - 5*($settings[3] - $settings[2])/$settings[7];
+	$yymax = $settings[3] + 5*($settings[3] - $settings[2])/$settings[7];
 	$yminauto = false;
 	$ymaxauto = false;
 	if (substr($ymin,0,4)=='auto') {
@@ -125,7 +129,10 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		$alt .= "Start Graph";
 		$function = explode(",",$function);
 		//correct for parametric
-		if (strpos($function[0],"[")===0) {
+		$isparametric = false;
+		$isineq = false;
+		$isxequals = false;
+		if ($function[0]{0}=='[') { //strpos($function[0],"[")===0) {
 			$isparametric = true;
 			$xfunc = makepretty(str_replace("[","",$function[0]));
 			$xfunc = mathphp($xfunc,"t");
@@ -136,8 +143,33 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			array_shift($function);
 			$evalxfunc = create_function('$t','return('.$xfunc.');');
 			$evalyfunc = create_function('$t','return('.$yfunc.');');
+		} else if ($function[0]{0}=='<' || $function[0]{0}=='>') {
+			$isineq = true;
+			if ($function[0]{1}=='=') {
+				$ineqtype = substr($function[0],0,2);
+				$func = makepretty(substr($function[0],2));
+			} else {
+				$ineqtype = $function[0]{0};
+				$func = makepretty(substr($function[0],1));
+			}
+			$func = mathphp($func,"x");
+			$func = str_replace("(x)",'($x)',$func);
+			$evalfunc = create_function('$x','return('.$func.');');	
+		} else if (strlen($function[0])>1 && $function[0]{0}=='x' && ($function[0]{1}=='<' || $function[0]{1}=='>' || $function[0]{1}=='=')) {
+			$isxequals = true;
+			if ($function[0]{1}=='=') {
+				$val = substr($function[0],2);
+			} else {
+				$isineq = true;
+				if ($function[0]{2}=='=') {
+					$ineqtype = substr($function[0],1,2);
+					$val= substr($function[0],3);
+				} else {
+					$ineqtype = $function[0]{1};
+					$val = substr($function[0],2);
+				}
+			}
 		} else {
-			$isparametric = false;
 			$func = makepretty($function[0]);
 			$func = mathphp($func,"x");
 			$func = str_replace("(x)",'($x)',$func);
@@ -160,7 +192,10 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		} else {
 			$path .= "strokewidth=\"1\";";
 		}
-		if (isset($function[7]) && $function[7]!='') {
+		if ($isineq && strlen($ineqtype)==1) {  //is < or >
+			$path .= "strokedasharray=\"5\";";
+			$alt .= ", Dashed";
+		} else if (isset($function[7]) && $function[7]!='') {
 			if ($function[7]=="dash") {
 				$path .= "strokedasharray=\"5\";";
 				$alt .= ", Dashed";
@@ -170,7 +205,32 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		} else {
 			$path .= "strokedasharray=\"none\";";
 		}
+		$path .= "fill=\"none\";";
 		
+		if ($isxequals) { //handle x-equals case separately
+			$alt .= "<table class=stats><thead><tr><th>x</th><th>y</th></thead></tr><tbody>";
+			$alt .= "<tr><td>$val</td><td>$ymin</td></tr>";
+			$alt .= "<tr><td>$val</td><td>$ymax</td></tr>";
+			$alt .= '</tbody></table>';
+			$path .= "line([$val,$ymin],[$val,$ymax]);";
+			$path .= "stroke=\"none\";strokedasharray=\"none\";";
+			if ($function[1]=='red' || $function[1]=='green') {
+				$path .= "fill=\"trans{$function[1]}\";";
+			} else {
+				$path .= "fill=\"transblue\";";
+			}
+			if ($isineq) {
+				if ($ineqtype{0}=='<') {
+					$path .= "rect([$xxmin,$yymin],[$val,$yymax]);";
+					$alt .= "Shaded left";
+				} else {
+					$path .= "rect([$val,$yymin],[$xxmax,$yymax]);";
+					$alt .= "Shaded right";
+				}
+			}
+			$commands .= $path;
+			continue;
+		}
 		$avoid = array();
 		$domainlimited = false;
 		if (isset($function[2]) && $function[2]!='') {
@@ -199,6 +259,8 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		$lastl = 0;
 		$px = null;
 		$py = null;
+		$pathstr = '';
+		$firstpoint = false;
 		for ($i = 0; $i<$stopat;$i++) {
 			if ($isparametric) {
 				$t = $xmin + $dx*$i + 1E-10;
@@ -227,8 +289,8 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 						$iy = $ymin - 5*($ymax-$ymin)/$settings[7];
 					}
 					$ix = ($x-$px)*($iy - $py)/($y-$py) + $px;
-					if ($lastl == 0) {$path .= "path([";} else { $path .= ",";}
-					$path .= "[$px,$py],[$ix,$iy]]);";
+					if ($lastl == 0) {$pathstr .= "path([";} else { $pathstr .= ",";}
+					$pathstr .= "[$px,$py],[$ix,$iy]]);";
 					$lastl = 0;
 				} else { //still out
 					
@@ -241,25 +303,25 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 						$iy = $ymin - 5*($ymax-$ymin)/$settings[7];
 					}
 					$ix = ($x-$px)*($iy - $py)/($y-$py) + $px;
-					if ($lastl == 0) {$path .= "path([";} else { $path .= ",";}
-					$path .= "[$ix,$iy]";
+					if ($lastl == 0) {$pathstr .= "path([";} else { $pathstr .= ",";}
+					$pathstr .= "[$ix,$iy]";
 					$lastl++;
 				} else { //still out
 					
 				}
 			} else {//all in
-				if ($lastl == 0) {$path .= "path([";} else { $path .= ",";}
-				$path .= "[$px,$py]";
+				if ($lastl == 0) {$pathstr .= "path([";} else { $pathstr .= ",";}
+				$pathstr .= "[$px,$py]";
 				$lastl++;
 			}
 			$px = $x;
 			$py = $y;
 			/*if (abs($y-$lasty) > ($ymax-$ymin)) {
-				if ($lastl > 1) { $path .= ']);'; $lastl = 0;}
+				if ($lastl > 1) { $pathstr .= ']);'; $lastl = 0;}
 				$lasty = $y;
 			} else {
-				if ($lastl == 0) {$path .= "path([";} else { $path .= ",";}
-				$path .= "[$x,$y]";
+				if ($lastl == 0) {$pathstr .= "path([";} else { $pathstr .= ",";}
+				$pathstr .= "[$x,$y]";
 				$lasty = $y;
 				$lastl++;
 				if ($y<$absymin) {
@@ -271,8 +333,42 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			}
 			*/
 		}
-		if ($lastl > 0) {$path .= "]);";}
+		if ($lastl > 0) {$pathstr .= "]);";}
+		$path .= $pathstr;
 		$alt .= "</tbody></table>\n";
+		
+		if ($isineq) {
+			
+			$pathstr = substr($pathstr,0,-3);
+			preg_match('/^path\(\[\[(-?[\d\.]+),(-?[\d\.]+).*(-?[\d\.]+),(-?[\d\.]+)\]$/',$pathstr,$matches);
+			$sig = ($xxmax-$xxmin)/100;
+			$ymid = ($yymax + $yymin)/2;
+			if ($ineqtype{0}=='<') {
+				if (abs($matches[3] - $xxmax)>$sig && $matches[4]>$ymid) {
+					$pathstr .= ",[$xxmax,$yymax]"; //need to add upper right corner	
+				}
+				$pathstr .= ",[$xxmax,$yymin],[$xxmin,$yymin]";
+				if (abs($matches[1] - $xxmin)>$sig  && $matches[2]>$ymid) {
+					$pathstr .= ",[$xxmin,$yymax]"; //need to add upper left corner	
+				}
+				$pathstr .= ']);';
+			} else {
+				if (abs($matches[3] - $xxmax)>$sig && $matches[4]<$ymid) {
+					$pathstr .= ",[$xxmax,$yymin]"; //need to add lower right corner	
+				}
+				$pathstr .= ",[$xxmax,$yymax],[$xxmin,$yymax]";
+				if (abs($matches[1] - $xxmin)>$sig  && $matches[2]<$ymid) {
+					$pathstr .= ",[$xxmin,$yymin]"; //need to add lower left corner	
+				}
+				$pathstr .= ']);';
+			}
+			if ($function[1]=='red' || $function[1]=='green') {
+				$path .= "fill=\"trans{$function[1]}\";";
+			} else {
+				$path .= "fill=\"transblue\";";
+			}
+			$path .= "stroke=\"none\";strokedasharray=\"none\";$pathstr";
+		}
 		if (isset($function[5]) && $function[5]=='open') {
 			$path .= "dot([$x,$y],\"open\");";
 			$alt .= "Open dot at $x,$y";

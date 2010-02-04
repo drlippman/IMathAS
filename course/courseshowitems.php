@@ -455,8 +455,8 @@ function enditem($canedit) {
 					   $nothidden = false;
 				   } else {
 					   $scores = mysql_result($result,0,0);
-					   if (getpts($scores)<$line['reqscore']) {
-						   $nothidden = false;
+					   if (getpts($scores)+.02<$line['reqscore']) {
+					   	   $nothidden = false;
 					   }
 				   }
 			   }
@@ -995,14 +995,19 @@ function enditem($canedit) {
    	global $cid, $CFG;
    	if (isset($CFG['CPS']['additemtype']) && $CFG['CPS']['additemtype'][0]=='links') {
    		if ($tb=='BB' || $tb=='LB') {$tb = 'b';}
-		$html = '<div class="additembox"><span><b>Add:</b> ';
+   		if ($tb=='t' && $blk=='0') {
+   			$html = '<div id="topadditem" class="additembox"><span><b>Add:</b> ';
+   		} else {
+   			$html = '<div class="additembox"><span><b>Add:</b> ';
+   		}
 		$html .= "<a href=\"addassessment.php?block=$blk&tb=$tb&cid=$cid\">Assessment</a> | ";
 		$html .= "<a href=\"addinlinetext.php?block=$blk&tb=$tb&cid=$cid\">Text</a> | ";
 		$html .= "<a href=\"addlinkedtext.php?block=$blk&tb=$tb&cid=$cid\">Link</a> | ";
 		$html .= "<a href=\"addforum.php?block=$blk&tb=$tb&cid=$cid\">Forum</a> | ";
 		$html .= "<a href=\"addblock.php?block=$blk&tb=$tb&cid=$cid\">Block</a> | ";
 		$html .= "<a href=\"addcalendar.php?block=$blk&tb=$tb&cid=$cid\">Calendar</a>";
-		$html .= '</span></div>';
+		$html .= '</span>';
+		$html .= '</div>';
    		
    	} else {
    		$html = "<select name=addtype id=\"addtype$blk-$tb\" onchange=\"additem('$blk','$tb')\" ";

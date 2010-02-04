@@ -1339,7 +1339,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		$out .= "<canvas class=\"drawcanvas\" id=\"canvas$qn\" width=\"{$settings[6]}\" height=\"{$settings[7]}\"></canvas>";
 		$out .= "<div><span id=\"drawtools$qn\" class=\"drawtools\">";
 		$out .= "<span onclick=\"clearcanvas($qn)\">Clear All</span> Draw: ";
-		if ($answerformat[0]=='twopoint') {
+		if ($answerformat[0]=='inequality') {
+			$out .= "<img src=\"$imasroot/img/tpineq.gif\" onclick=\"settool(this,$qn,10)\" class=\"sel\"/>";
+			$out .= "<img src=\"$imasroot/img/tpineqdash.gif\" onclick=\"settool(this,$qn,10.2)\"/>";
+			$def = 10;
+		} else if ($answerformat[0]=='twopoint') {
 			$out .= "<img src=\"$imasroot/img/tpline.gif\" onclick=\"settool(this,$qn,5)\" class=\"sel\"/>";
 			//$out .= "<img src=\"$imasroot/img/tpline2.gif\" onclick=\"settool(this,$qn,5.2)\"/>";
 			//$out .= "<img src=\"$imasroot/img/tpline3.gif\" onclick=\"settool(this,$qn,5.3)\"/>";
@@ -1393,23 +1397,36 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		$tip = "Enter your answer by drawing on the graph.";
 		if (isset($answers)) {
 			$saarr = array();
+			$ineqcolors = array("blue","red","green");
 			foreach($answers as $k=>$ans) {
 				$function = explode(',',$ans);
-				if (count($function)==2 || (count($function)==3 && ($function[2]=='open' || $function[2]=='closed'))) { //is dot
-					$saarr[$k] = $function[1].',blue,'.$function[0].','.$function[0];
-					if (count($function)==2 || $function[2]=='closed') {
-						$saarr[$k] .= ',closed';
+				if ($answerformat[0]=='inequality') {
+					if ($function[0]{2}=='=') {
+						$type = 10;
+						$c = 3;
 					} else {
-						$saarr[$k] .= ',open';
+						$type = 10.2;
+						$c = 2;
 					}
-				} else if ($function[0]=='circle') { //is circle
-					$saarr[$k] = "[{$function[3]}*cos(t)+{$function[1]},{$function[3]}*sin(t)+{$function[2]}],blue,0,6.31";
-				} else if (substr($function[0],0,2)=='x=') {
-					$saarr[$k] = '['.substr($function[0],2).',t],blue,'.($settings[2]-1).','.($settings[3]+1);
-				} else { //is function
-					$saarr[$k] = $function[0].',blue';
-					if (count($function)>2) {
-						$saarr[$k] .= ','.$function[1].','.$function[2];
+					$dir = $function[0]{1};
+					$saarr[$k]  = makepretty($function[0]).','.$ineqcolors[$k%3];
+				} else {
+					if (count($function)==2 || (count($function)==3 && ($function[2]=='open' || $function[2]=='closed'))) { //is dot
+						$saarr[$k] = $function[1].',blue,'.$function[0].','.$function[0];
+						if (count($function)==2 || $function[2]=='closed') {
+							$saarr[$k] .= ',closed';
+						} else {
+							$saarr[$k] .= ',open';
+						}
+					} else if ($function[0]=='circle') { //is circle
+						$saarr[$k] = "[{$function[3]}*cos(t)+{$function[1]},{$function[3]}*sin(t)+{$function[2]}],blue,0,6.31";
+					} else if (substr($function[0],0,2)=='x=') {
+						$saarr[$k] = '['.substr($function[0],2).',t],blue,'.($settings[2]-1).','.($settings[3]+1);
+					} else { //is function
+						$saarr[$k] = $function[0].',blue';
+						if (count($function)>2) {
+							$saarr[$k] .= ','.$function[1].','.$function[2];
+						}
 					}
 				}
 			}
@@ -2627,7 +2644,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$isclosed = true;
 				array_pop($ansdots);
 			}
-			list($lines,$dots,$odots,$tplines) = explode(';;',$givenans);
+			list($lines,$dots,$odots,$tplines,$ineqlines) = explode(';;',$givenans);
 			if ($lines=='') {
 				$line = array();
 			} else {
@@ -2765,7 +2782,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					}
 				}
 			}
-			list($lines,$dots,$odots,$tplines) = explode(';;',$givenans);
+			list($lines,$dots,$odots,$tplines,$ineqlines) = explode(';;',$givenans);
 			$lines = array();
 			$parabs = array();
 			$circs = array();
@@ -2884,6 +2901,114 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 			$extrastuffpenalty = max((count($tplines)-count($answers))/(max(count($answers),count($tplines))),0);
 			
+		} else if ($answerformat=="inequality") {
+			list($lines,$dots,$odots,$tplines,$ineqlines) = explode(';;',$givenans);
+			$x1 = 1/3*$settings[0] + 2/3*$settings[1];
+			$x2 = 2/3*$settings[0] + 1/3*$settings[1];
+			$x1p = ($x1 - $settings[0])*$pixelsperx + $imgborder;
+			$x2p = ($x2 - $settings[0])*$pixelsperx + $imgborder;
+			$ymid = ($settings[2]+$settings[3])/2;
+			$ymidp = $settings[7] - ($ymid-$settings[2])*$pixelspery - $imgborder;
+			foreach ($answers as $key=>$function) {
+				if ($function=='') { continue; }
+				$function = explode(',',$function);
+				if ($function[0]{0}=='x' && ($function[0]{1}=='<' || $function[0]{1}=='>')) {
+					$isxequals = true;
+					$function[0] = substr($function[0],1);
+				} else {
+					$isxequals = false;
+				}
+				if ($function[0]{1}=='=') {
+					$type = 10;
+					$c = 2;
+				} else {
+					$type = 10.2;
+					$c = 1;
+				}
+				$dir = $function[0]{0};
+				if ($isxequals) {
+					$anslines[$key] = array('x',$dir,$type,-10000,(substr($function[0],$c)- $settings[0])*$pixelsperx + $imgborder );
+				} else {
+					$func = makepretty(substr($function[0],$c));
+					$func = mathphp($func,'x');
+					$func = str_replace("(x)",'($x)',$func);
+					$func = create_function('$x', 'return ('.$func.');');
+					$y1 = $func($x1);
+					$y2 = $func($x2);
+					$y1p = $settings[7] - ($y1-$settings[2])*$pixelspery - $imgborder;
+					$y2p = $settings[7] - ($y2-$settings[2])*$pixelspery - $imgborder;
+					$slope = ($y2p-$y1p)/($x2p-$x1p);
+					if (abs($slope)>1.4) {
+						//use x value at ymid
+						$anslines[$key] = array('x',$dir,$type,$slope,$x1p+($ymidp-$y1p)/$slope);
+					} else {
+						//use y value at x2
+						$anslines[$key] = array('y',$dir,$type,$slope,$y2p);
+					}
+				}
+			}
+			if ($ineqlines=='') {
+				$ineqlines = array();
+			} else {
+				$ineqlines = explode('),(', substr($ineqlines,1,strlen($ineqlines)-2));
+				foreach ($ineqlines as $k=>$val) {
+					$pts = explode(',',$val);
+					//line
+					if ($pts[3]==$pts[1]) {
+						$ineqlines[$k] = array('x',-10000,$pts[1]);
+						if ($pts[5]>$pts[3]) {
+							$dir = '>';
+						} else {
+							$dir = '<';
+						}
+					} else {
+						$slope = ($pts[4]-$pts[2])/($pts[3]-$pts[1]);
+						$yatpt5 = $slope*($pts[5] - $pts[1]) + $pts[2];
+						if ($yatpt5 < $pts[6]) {
+							$dir = '<';
+						} else {
+							$dir = '>';
+						}
+						if (abs($slope)>50) {$slope = -10000;}
+						if (abs($slope)>1) {
+							$ineqlines[$k] = array('x',$dir,$pts[0],$slope,$pts[1]+($ymidp-$pts[2])/$slope,$pts[2]+($x2p-$pts[1])*$slope);
+						} else {
+							$ineqlines[$k] = array('y',$dir,$pts[0],$slope,$pts[2]+($x2p-$pts[1])*$slope);
+						}
+					}
+				}
+			}
+			$scores = array();
+			$deftol = .1;
+			$defpttol = 5;
+			foreach ($anslines as $key=>$ansline) {
+				$scores[$key] = 0;
+				for ($i=0; $i<count($ineqlines); $i++) {
+					if ($ansline[2]!=$ineqlines[$i][2]) { continue;}
+					//check slope
+					if (abs($ansline[3]-$ineqlines[$i][3])/(abs($ansline[3])+.000001)>$deftol*$reltolerance) {
+						continue;
+					}
+					if ($ansline[0]!=$ineqlines[$i][0]) {
+						if (abs(abs($ansline[3])-1)<.3) {
+							//check intercept
+							if (abs($ansline[4]-$ineqlines[$i][5])>$defpttol*$reltolerance) {
+								continue;
+							}
+						} else {
+							continue;
+						}
+					} else {
+						if (abs($ansline[4]-$ineqlines[$i][4])>$defpttol*$reltolerance) {
+							continue;
+						}
+					}
+					$scores[$key] = 1;
+					break;
+				}
+			}
+			$extrastuffpenalty = max((count($ineqlines)-count($answers))/(max(count($answers),count($ineqlines))),0);
+			
 		} else {
 			//not polygon or twopoint, continue with regular grading
 			
@@ -2936,7 +3061,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$linecnt++;
 			}
 			//break apart student entry
-			list($lines,$dots,$odots,$tplines) = explode(';;',$givenans);
+			list($lines,$dots,$odots,$tplines,$ineqlines) = explode(';;',$givenans);
 			if ($lines=='') {
 				$lines = array();
 			} else {

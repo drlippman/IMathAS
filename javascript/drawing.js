@@ -7,11 +7,16 @@ var dots = new Array();
 var odots = new Array();
 var tplines = new Array();
 var tptypes = new Array();
+var ineqlines = new Array();
+var ineqtypes = new Array();
 var canvases = new Array();
 var drawla = new Array();
 var curLine = null;
 var drawstyle = [];
-var curTPcurve = {tpline:null, tpparab:null, tpcirc:null, tpellipse:null};
+var curTPcurve = null;
+var curIneqcurve = null; //inequalities
+var ineqcolors = ["rgb(0,0,255)","rgb(255,0,0)","rgb(0,255,0)"];
+var ineqacolors = ["rgba(0,0,255,.4)","rgba(255,0,0,.4)","rgba(0,255,0,.4)"];
 var dragObj = null;
 var oldpointpos = null;
 var curTarget = null;
@@ -23,6 +28,8 @@ function clearcanvas(tarnum) {
 	odots[tarnum].length = 0;
 	tplines[tarnum].length = 0;
 	tptypes[tarnum].length = 0;
+	ineqlines[tarnum].length = 0;
+	ineqtypes[tarnum].length = 0;
 	curTarget = tarnum;
 	drawTarget();
 	curTarget = null;
@@ -41,6 +48,8 @@ function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,im
 	if (odots[tarnum]==null) {odots[tarnum] = new Array();}
 	if (tplines[tarnum]==null) {tplines[tarnum] = new Array();}
 	if (tptypes[tarnum]==null) {tptypes[tarnum] = new Array();}
+	if (ineqlines[tarnum]==null) {ineqlines[tarnum] = new Array();}
+	if (ineqtypes[tarnum]==null) {ineqtypes[tarnum] = new Array();}
 	if (defmode>=5) {
 		drawstyle[tarnum] = 1;
 	} else {
@@ -93,19 +102,144 @@ function drawTarget(x,y) {
 
 	ctx.drawImage(imgs[curTarget],0,0);
 	ctx.beginPath();
+	for (var i=0;i<ineqlines[curTarget].length; i++) { 
+		var colornum = i%3;
+		ctx.strokeStyle = ineqcolors[colornum];
+		ctx.fillStyle = ineqcolors[colornum];
+		//is an inequality
+		var slope = null;
+		var x2 = null; var x3 = null;
+		var y2 = null; var y3 = null;
+		if (ineqlines[curTarget][i].length==3) { //three points set
+			x2 = ineqlines[curTarget][i][1][0];
+			y2 = ineqlines[curTarget][i][1][1];
+			x3 = ineqlines[curTarget][i][2][0];
+			y3 = ineqlines[curTarget][i][2][1];
+		} else if (ineqlines[curTarget][i].length==2) { //two points set
+			x2 = ineqlines[curTarget][i][1][0];
+			y2 = ineqlines[curTarget][i][1][1];
+			x3 = x;
+			y3 = y;
+		} else if (curIneqcurve==i && x!= null && ineqlines[curTarget][i].length==1) {
+			x2 = x;
+			y2 = y;
+		}
+		if (x3 != null) { //third point is set or varying; plot dot at point and shade that side
+			ctx.save();
+			ctx.fillStyle = ineqacolors[colornum];
+			//ctx.fillStyle = "rgba(0,0,255,0.4)";
+			//ctx.fillStyle = "rgb(0,255,0)";
+			ctx.beginPath();
+			if (x2!=ineqlines[curTarget][i][0][0]) {
+				var slope = (y2 - ineqlines[curTarget][i][0][1])/(x2-ineqlines[curTarget][i][0][0]);
+			}
+			if (Math.abs(x2-ineqlines[curTarget][i][0][0])<1 || Math.abs(slope)>100) {
+				ctx.moveTo(ineqlines[curTarget][i][0][0],0);
+				ctx.lineTo(ineqlines[curTarget][i][0][0],targets[curTarget].imgheight);
+				if (x3>x2) {//shade right
+					ctx.lineTo(targets[curTarget].imgwidth,targets[curTarget].imgheight);
+					ctx.lineTo(targets[curTarget].imgwidth,0);
+					ctx.closePath();
+				} else {
+					ctx.lineTo(0,targets[curTarget].imgheight);
+					ctx.lineTo(0,0);
+					ctx.closePath();
+				}
+			} else {
+				var yb = slope*(x3 - x2) + y2;
+				var yleft = ineqlines[curTarget][i][0][1] - slope*ineqlines[curTarget][i][0][0];
+				var yright = ineqlines[curTarget][i][0][1] + slope*(targets[curTarget].imgwidth-ineqlines[curTarget][i][0][0]);
+				
+				ctx.moveTo(0,yleft);
+				ctx.lineTo(targets[curTarget].imgwidth,yright);	
+				if (y3 > yb) { //shade above
+					ctx.lineTo(targets[curTarget].imgwidth,targets[curTarget].imgheight);
+					ctx.lineTo(0,targets[curTarget].imgheight);
+					ctx.closePath();
+				} else { //shade below
+					ctx.lineTo(targets[curTarget].imgwidth,0);
+					ctx.lineTo(0,0);
+					ctx.closePath();
+				}
+				
+			}
+			ctx.fill();
+			ctx.restore();	
+		}
+		ctx.beginPath();
+		if (x2 != null) { //at least one point set
+			if (x2!=ineqlines[curTarget][i][0][0]) {
+				var slope = (y2 - ineqlines[curTarget][i][0][1])/(x2-ineqlines[curTarget][i][0][0]);
+			}
+			if (Math.abs(x2-ineqlines[curTarget][i][0][0])<1 || Math.abs(slope)>100) { //vert line
+				//document.getElementById("ans0-0").innerHTML = 'vert';
+				if (ineqtypes[curTarget][i]==10.2) {
+					//TODO:  line dash
+					var dy = targets[curTarget].imgheight/20;
+					for (var j=0; j<10; j++) {
+						ctx.moveTo(ineqlines[curTarget][i][0][0],dy*2*j);
+						ctx.lineTo(ineqlines[curTarget][i][0][0],dy*(2*j+1));
+						ctx.stroke();
+					}
+					
+				} else {
+					ctx.moveTo(ineqlines[curTarget][i][0][0],0);
+					ctx.lineTo(ineqlines[curTarget][i][0][0],targets[curTarget].imgheight);
+					ctx.stroke();
+				}
+			} else {
+				//document.getElementById("ans0-0").innerHTML = slope;
+				var yleft = ineqlines[curTarget][i][0][1] - slope*ineqlines[curTarget][i][0][0];
+				var yright = ineqlines[curTarget][i][0][1] + slope*(targets[curTarget].imgwidth-ineqlines[curTarget][i][0][0]);
+				//TODO:  fix for very large slopes;
+				if (ineqtypes[curTarget][i]==10.2) {
+					//TODO:  line dash
+					var dx = targets[curTarget].imgwidth/20;
+					if (Math.abs(slope)>1) {
+						dx = dx/Math.abs(slope);
+						if (dx<1) {dx = 1;}
+					}
+					var n = Math.ceil(targets[curTarget].imgwidth/dx);
+					for (var j=0; j<n; j++) {
+						ctx.moveTo(dx*2*j,yleft + slope*dx*2*j);
+						ctx.lineTo(dx*(2*j+1),yleft + slope*dx*(2*j+1));
+						ctx.stroke();
+					}
+					
+				} else {
+					ctx.moveTo(0,yleft);
+					ctx.lineTo(targets[curTarget].imgwidth,yright);	
+					ctx.stroke();
+				}
+			}
+		}
+		ctx.beginPath();
+		for (var j=0; j<ineqlines[curTarget][i].length; j++) {
+			if (j==2) {
+				ctx.arc(ineqlines[curTarget][i][j][0],ineqlines[curTarget][i][j][1],4,0,Math.PI*2,true);
+				ctx.fill();
+			} else {
+				ctx.fillRect(ineqlines[curTarget][i][j][0]-3,ineqlines[curTarget][i][j][1]-3,6,6);
+			}
+		}
+		ctx.beginPath();
+	}
+	ctx.fillStyle = "rgb(0,0,255)";
+	ctx.lineWidth = 2;
+	ctx.strokeStyle = "rgb(0,0,255)";
 	for (var i=0;i<tplines[curTarget].length; i++) {
 		if (tptypes[curTarget][i]>=5 && tptypes[curTarget][i]<6) {//if a tpline 
 			var slope = null;
 			var x2 = null;
 			var y2 = null;
-			if (tplines[curTarget][i].length==2) {
+			if (tplines[curTarget][i].length==2) {  //if two points set
 				x2 = tplines[curTarget][i][1][0];
 				y2 = tplines[curTarget][i][1][1];
-			} else if (curTPcurve.tpline==i && x!=null && tplines[curTarget][i].length==1) {
+			} else if (curTPcurve==i && x!=null && tplines[curTarget][i].length==1) {  //one point set, use mouse pos for third
 				x2 = x;
 				y2 = y;
 			}
-			if (x2 != null) {
+			if (x2 != null) { //at least one point set
 				if (tptypes[curTarget][i]==5.3) {
 					ctx.moveTo(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1]);
 					ctx.lineTo(x2,y2);
@@ -127,6 +261,8 @@ function drawTarget(x,y) {
 							ctx.lineTo(tplines[curTarget][i][0][0],targets[curTarget].imgheight);
 						}
 					} else {
+						var yleft = tplines[curTarget][i][0][1] - slope*tplines[curTarget][i][0][0];
+						var yright = tplines[curTarget][i][0][1] + slope*(targets[curTarget].imgwidth-tplines[curTarget][i][0][0]);
 						
 						//document.getElementById("ans0-0").innerHTML = slope;
 						var yleft = tplines[curTarget][i][0][1] - slope*tplines[curTarget][i][0][0];
@@ -152,7 +288,7 @@ function drawTarget(x,y) {
 			if (tplines[curTarget][i].length==2) {
 				x2 = tplines[curTarget][i][1][0];
 				y2 = tplines[curTarget][i][1][1];
-			} else if (curTPcurve.tpline==i && x!=null && tplines[curTarget][i].length==1) {
+			} else if (curTPcurve==i && x!=null && tplines[curTarget][i].length==1) {
 				x2 = x;
 				y2 = y;
 			}
@@ -187,7 +323,7 @@ function drawTarget(x,y) {
 			if (tplines[curTarget][i].length==2) {
 				x2 = tplines[curTarget][i][1][0];
 				y2 = tplines[curTarget][i][1][1];
-			} else if (curTPcurve.tpline==i && x!=null && tplines[curTarget][i].length==1) {
+			} else if (curTPcurve==i && x!=null && tplines[curTarget][i].length==1) {
 				x2 = x;
 				y2 = y;
 			}
@@ -282,6 +418,15 @@ function encodeDraw() {
 			out += '('+tptypes[curTarget][i]+','+tplines[curTarget][i][0][0]+','+tplines[curTarget][i][0][1]+','+tplines[curTarget][i][1][0]+','+tplines[curTarget][i][1][1]+')';
 		}
 	}
+	out += ';;';
+	for (var i=0; i<ineqlines[curTarget].length; i++) {
+		if (i!=0) {
+			out += ',';	
+		}
+		if (ineqlines[curTarget][i].length>2) {
+			out += '('+ineqtypes[curTarget][i]+','+ineqlines[curTarget][i][0][0]+','+ineqlines[curTarget][i][0][1]+','+ineqlines[curTarget][i][1][0]+','+ineqlines[curTarget][i][1][1]+','+ineqlines[curTarget][i][2][0]+','+ineqlines[curTarget][i][2][1]+')';
+		}
+	}
 	targetOuts[curTarget].value = out;
 }
 
@@ -323,18 +468,32 @@ function drawMouseDown(ev) {
 					} else {//in existing line
 						lines[curTarget][curLine].push([mouseOff.x,mouseOff.y]);
 					}
-				} else if (targets[curTarget].mode>=5) {//in tpline mode
-					if (curTPcurve.tpline==null) { //start new tpline
+				} else if (targets[curTarget].mode>=5 && targets[curTarget].mode<10) {//in tpline mode
+					if (curTPcurve==null) { //start new tpline
 						tplines[curTarget].push([[mouseOff.x,mouseOff.y]]);
-						curTPcurve.tpline = tplines[curTarget].length-1;
-						tptypes[curTarget][curTPcurve.tpline] = targets[curTarget].mode;
+						curTPcurve = tplines[curTarget].length-1;
+						tptypes[curTarget][curTPcurve] = targets[curTarget].mode;
 						mouseisdown = false;
 					} else {//in existing line
-						tplines[curTarget][curTPcurve.tpline].push([mouseOff.x,mouseOff.y]);
-						if (tplines[curTarget][curTPcurve.tpline].length==2) {
+						tplines[curTarget][curTPcurve].push([mouseOff.x,mouseOff.y]);
+						if (tplines[curTarget][curTPcurve].length==2) {
 							//second point is set.  switch to drag and end line
-							dragObj = {mode: targets[curTarget].mode, num: curTPcurve.tpline, subnum: 1};
-							curTPcurve.tpline = null;
+							dragObj = {mode: targets[curTarget].mode, num: curTPcurve, subnum: 1};
+							curTPcurve = null;
+						}		
+					}
+				} else if (targets[curTarget].mode>=10 && targets[curTarget].mode<11) {//in ineqline mode
+					if (curIneqcurve==null) { //start new tpline
+						ineqlines[curTarget].push([[mouseOff.x,mouseOff.y]]);
+						curIneqcurve = ineqlines[curTarget].length-1;
+						ineqtypes[curTarget][curIneqcurve] = targets[curTarget].mode;
+						mouseisdown = false;
+					} else {//in existing line
+						ineqlines[curTarget][curIneqcurve].push([mouseOff.x,mouseOff.y]);
+						if (ineqlines[curTarget][curIneqcurve].length==3) {
+							//second point is set.  switch to drag and end line
+							dragObj = {mode: targets[curTarget].mode, num: curIneqcurve, subnum: 1};
+							curIneqcurve = null;
 						}		
 					}
 				}
@@ -373,12 +532,18 @@ function drawMouseDown(ev) {
 				} else if (foundpt[0]==2) { //if point is a open dot
 					targets[curTarget].el.style.cursor = 'move';
 					dragObj = {mode: 2, num: foundpt[1]};
-				} else if (foundpt[0]>=5) { //if point is on tpline
+				} else if (foundpt[0]>=5 && foundpt[0]<10) { //if point is on tpline
 					targets[curTarget].el.style.cursor = 'move';
 					//start dragging
 					dragObj = {mode: foundpt[0], num: foundpt[1], subnum: foundpt[2]};
 					oldpointpos = tplines[curTarget][foundpt[1]][foundpt[2]];
-					//curTPcurve.tpline = foundpt[1];
+					//curTPcurve = foundpt[1];
+				} else if (foundpt[0]>=10 && foundpt[0]<11) { //if point is on ineqline
+					targets[curTarget].el.style.cursor = 'move';
+					//start dragging
+					dragObj = {mode: foundpt[0], num: foundpt[1], subnum: foundpt[2]};
+					oldpointpos = ineqlines[curTarget][foundpt[1]][foundpt[2]];
+					//curIneqcurve = foundpt[1];
 				}
 				
 			}
@@ -390,14 +555,21 @@ function drawMouseDown(ev) {
 				}
 				targets[curTarget].el.style.cursor = 'url('+imasroot+'/img/pen.cur), default';
 			}
-			if (curTPcurve.tpline != null) {
-				if (tplines[curTarget][curTPcurve.tpline].length<2) {
-					tplines[curTarget].splice(curTPcurve.tpline,1);
+			if (curTPcurve != null) {
+				if (tplines[curTarget][curTPcurve].length<2) {
+					tplines[curTarget].splice(curTPcurve,1);
+				}
+				targets[curTarget].el.style.cursor = 'url('+imasroot+'/img/pen.cur), default';
+			}
+			if (curIneqcurve != null) {
+				if (ineqlines[curTarget][curIneqcurve].length<3) {
+					ineqlines[curTarget].splice(curIneqcurve,1);
 				}
 				targets[curTarget].el.style.cursor = 'url('+imasroot+'/img/pen.cur), default';
 			}
 			curLine = null;
-			curTPcurve.tpline = null;
+			curTPcurve = null;
+			curIneqcurve = null;
 			dragObj = null;
 			drawTarget();
 			curTarget = null;
@@ -429,12 +601,21 @@ function findnearpoint(thetarget,mouseOff) {
 					return [2,i];
 				}
 			}
-		} else if (targets[thetarget].mode>=5) { //if in tpline mode
+		} else if (targets[thetarget].mode>=5 && targets[thetarget].mode<10) { //if in tpline mode
 			for (var i=0;i<tplines[thetarget].length;i++) { //check lines
 				for (var j=tplines[thetarget][i].length-1; j>=0;j--) {
 					var dist = Math.pow(tplines[thetarget][i][j][0]-mouseOff.x,2) + Math.pow(tplines[thetarget][i][j][1]-mouseOff.y,2);
 					if (dist<25) {
 						return [tptypes[thetarget][i],i,j];
+					}
+				}
+			}
+		} else if (targets[thetarget].mode>=10 && targets[thetarget].mode<11) { //if in ineqline mode
+			for (var i=0;i<ineqlines[thetarget].length;i++) { //check lines
+				for (var j=ineqlines[thetarget][i].length-1; j>=0;j--) {
+					var dist = Math.pow(ineqlines[thetarget][i][j][0]-mouseOff.x,2) + Math.pow(ineqlines[thetarget][i][j][1]-mouseOff.y,2);
+					if (dist<25) {
+						return [ineqtypes[thetarget][i],i,j];
 					}
 				}
 			}
@@ -458,6 +639,14 @@ function findnearpoint(thetarget,mouseOff) {
 				}
 			}
 		}
+		for (var i=0;i<ineqlines[thetarget].length;i++) { //check inqs
+			for (var j=ineqlines[thetarget][i].length-1; j>=0;j--) {
+				var dist = Math.pow(ineqlines[thetarget][i][j][0]-mouseOff.x,2) + Math.pow(ineqlines[thetarget][i][j][1]-mouseOff.y,2);
+				if (dist<25) {
+					return [ineqtypes[thetarget][i],i,j];
+				}
+			}
+		}
 	}
 	return null;	
 }
@@ -478,7 +667,7 @@ function drawMouseUp(ev) {
 				drawTarget();
 			}
 		}
-		if (curLine==null && curTPcurve.tpline == null) {
+		if (curLine==null && curTPcurve == null) {
 			targets[curTarget].el.style.cursor = 'move';
 		} else {
 			targets[curTarget].el.style.cursor = 'url('+imasroot+'/img/pen.cur), default';
@@ -498,9 +687,12 @@ function drawMouseUp(ev) {
 				odots[curTarget].splice(dragObj.num,1);
 			} else if (dragObj.mode==0) { //if line, return pt to orig pos
 				lines[curTarget][dragObj.num][dragObj.subnum] = oldpointpos;
-			} else if (dragObj.mode>=5) { //if line, return pt to orig pos
+			} else if (dragObj.mode>=5 && dragObj.mode<10) { //if line, return pt to orig pos
 				tplines[curTarget][dragObj.num][dragObj.subnum] = oldpointpos;
-				curTPcurve.tpline = null;
+				curTPcurve = null;
+			} else if (dragObj.mode>=10 && dragObj.mode<11) { //if ineq, return pt to orig pos
+				ineqlines[curTarget][dragObj.num][dragObj.subnum] = oldpointpos;
+				curIneqcurve = null;
 			}
 			dragObj = null;
 			drawTarget();
@@ -511,7 +703,7 @@ function drawMouseUp(ev) {
 function drawMouseMove(ev) {
 	var tempTarget = null;
 	var mousePos = mouseCoords(ev);
-	//document.getElementById("ans0-0").innerHTML = dragObj + ';' + curTPcurve.tpline;
+	//document.getElementById("ans0-0").innerHTML = dragObj + ';' + curTPcurve;
 	if (curTarget==null) {
 		for (i in targets) {
 			var tarelpos = getPosition(targets[i].el);
@@ -558,7 +750,14 @@ function drawMouseMove(ev) {
 						//draw temp line
 						drawTarget(mouseOff.x,mouseOff.y);
 					}
-				} else if (curTPcurve.tpline!=null) {
+				} else if (curTPcurve!=null) {
+					if (mouseisdown) {
+						drawTarget();
+					} else {
+						drawTarget(mouseOff.x,mouseOff.y);
+					}
+						
+				} else if (curIneqcurve!=null) {
 					if (mouseisdown) {
 						drawTarget();
 					} else {
@@ -581,8 +780,10 @@ function drawMouseMove(ev) {
 					dots[curTarget][dragObj.num] = [mouseOff.x,mouseOff.y];
 				} else if (dragObj.mode==2) {
 					odots[curTarget][dragObj.num] = [mouseOff.x,mouseOff.y];
-				} else if (dragObj.mode>=5) {
+				} else if (dragObj.mode>=5 && dragObj.mode<10) {
 					tplines[curTarget][dragObj.num][dragObj.subnum] = [mouseOff.x,mouseOff.y];
+				} else if (dragObj.mode>=10 && dragObj.mode<11) {
+					ineqlines[curTarget][dragObj.num][dragObj.subnum] = [mouseOff.x,mouseOff.y];
 				}
 				drawTarget();
 			}
@@ -658,6 +859,15 @@ function initCanvases() {
 				for (var j=0; j<drawla[i][3].length;j++) {
 					tptypes[canvases[i][0]][j] = drawla[i][3][j][0];
 					tplines[canvases[i][0]][j] = [drawla[i][3][j].slice(1,3),drawla[i][3][j].slice(3)];
+				}
+			}
+			if (drawla[i].length>4 && drawla[i][4].length>0) {
+				ineqtypes[canvases[i][0]] = [];
+				ineqlines[canvases[i][0]] = [];
+				for (var j=0; j<drawla[i][4].length;j++) {
+					//CHECK
+					ineqtypes[canvases[i][0]][j] = drawla[i][4][j][0];
+					ineqlines[canvases[i][0]][j] = [drawla[i][4][j].slice(1,3),drawla[i][4][j].slice(3,5),drawla[i][4][j].slice(5)];
 				}
 			}
 		}
