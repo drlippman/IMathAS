@@ -23,7 +23,8 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	if (isset($teacherid) && isset($sessiondata['sessiontestid']) && !isset($sessiondata['actas'])) {
 		//clean up coming out of an assessment
 		require_once("../includes/filehandler.php");
-		deleteasidfilesbyquery(array('id'=>$sessiondata['sessiontestid']),1);
+		//deleteasidfilesbyquery(array('id'=>$sessiondata['sessiontestid']),1);
+		deleteasidfilesbyquery2('id',$sessiondata['sessiontestid'],null,1);
 		$query = "DELETE FROM imas_assessment_sessions WHERE id='{$sessiondata['sessiontestid']}' LIMIT 1";
 		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());		
 	}

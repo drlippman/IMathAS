@@ -54,8 +54,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	if (isset($_GET['clearattempts'])) { //FORM POSTED WITH CLEAR ATTEMPTS FLAG
 		if ($_GET['clearattempts']=="confirmed") {
 			require_once('../includes/filehandler.php');
-			deleteasidfilesbyquery(array('assessmentid'=>$_GET['id']));
-			
+			deleteallaidfiles($_GET['id']);
 			$query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='{$_GET['id']}'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			$query = "UPDATE imas_questions SET withdrawn=0 WHERE assessmentid='{$_GET['id']}'";

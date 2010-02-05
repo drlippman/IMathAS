@@ -6,6 +6,7 @@
 require("../validate.php");
 require("../includes/htmlutil.php");
 require("../includes/stugroups.php");
+require("../includes/filehandler.php");
 
 /*** pre-html data manipulation, including function code *******/
 $cid = $_GET['cid'];
@@ -127,23 +128,23 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						if (mysql_num_rows($result)>0) {
 							$row = mysql_fetch_row($result);
 							$srcasid = array_shift($row);
-							moveasidfilesfromstring($row[6].$row[12],$srcasid,'grp'.$grpid);
-							$row[6] = str_replace("adata/$srcasid/","adata/grp$grpid/{$aid[0]}/",$row[6]);
-							$row[12] = str_replace("adata/$srcasid/","adata/grp$grpid/{$aid[0]}/",$row[12]);
 							$rowgrptest = addslashes_deep($row);
 							$rowgrptest[1] = $grpid; //use new groupid
+							while ($row = mysql_fetch_row($result)) { //delete files from everyone else's attempts
+								deleteasidfilesfromstring2($row[7].$row[13],'id',$row[0],$row[1]);	
+							}
 						}
 					}
 					if ($rowgrptest != '') {  //if an assessment session already exists
+						$fieldstocopyarr = explode(',',$fieldstocopy);
 						$insrow = "'".implode("','",$rowgrptest)."'";
 						foreach ($stustoadd as $stuid) {
 							$query = "SELECT id,agroupid FROM imas_assessment_sessions WHERE userid='$stuid' AND assessmentid={$aid[0]}";
 							$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
 							if (mysql_num_rows($result)>0) {  
 								$row = mysql_fetch_row($result);
-								$fieldstocopy = explode(',',$fieldstocopy);
 								$sets = array();
-								foreach ($fieldstocopy as $k=>$val) {
+								foreach ($fieldstocopyarr as $k=>$val) {
 									$sets[] = "$val='{$rowgrptest[$k]}'";
 								}
 								$setslist = implode(',',$sets);

@@ -26,7 +26,7 @@ if (!(isset($teacherid))) {
 	if ($_GET['remove']=="really") {
 		$aid = $_GET['id'];
 		require_once('../includes/filehandler.php');
-		deleteasidfilesbyquery(array('assessmentid'=>$aid));
+		deleteallaidfiles($aid);
 		
 		$query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='$aid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());

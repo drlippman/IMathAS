@@ -74,7 +74,8 @@
 				$aid = mysql_result($result,0,0);
 			}
 			$qp = getasidquery($_GET['asid']);
-			deleteasidfilesbyquery(array($qp[0]=>$qp[1]),1);
+			deleteasidfilesbyquery2($qp[0],$qp[1],$qp[2],1);
+			//deleteasidfilesbyquery(array($qp[0]=>$qp[1]),1);
 			
 			$query = "DELETE FROM imas_assessment_sessions";// WHERE id='{$_GET['asid']}'";
 			$query .= " WHERE {$qp[0]}='{$qp[1]}'";
@@ -125,7 +126,8 @@
 			
 			//$whereqry = getasidquery($_GET['asid']);
 			$qp = getasidquery($_GET['asid']);
-			deleteasidfilesbyquery(array($qp[0]=>$qp[1]),1);
+			//deleteasidfilesbyquery(array($qp[0]=>$qp[1]),1);
+			deleteasidfilesbyquery2($qp[0],$qp[1],$qp[2],1);
 			$whereqry = " WHERE {$qp[0]}='{$qp[1]}'";
 			$query = "SELECT seeds,lastanswers,bestlastanswers FROM imas_assessment_sessions $whereqry";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -183,7 +185,7 @@
 			
 			$clearid = $_GET['clearq'];
 			if ($clearid!=='' && is_numeric($clearid) && isset($scores[$clearid])) {
-				deleteasidfilesfromstring($lastanswers[$clearid].$bestlastanswers[$clearid],$qp[1]);
+				deleteasidfilesfromstring2($lastanswers[$clearid].$bestlastanswers[$clearid],$qp[0],$qp[1],$qp[2]);
 				$scores[$clearid] = -1;
 				$attempts[$clearid] = 0;
 				$lastanswers[$clearid] = '';
@@ -752,14 +754,15 @@ function getpts($sc) {
 	}
 }
 function getasidquery($asid) {
-	$query = "SELECT agroupid FROM imas_assessment_sessions WHERE id='$asid'";
+	$query = "SELECT agroupid,assessmentid FROM imas_assessment_sessions WHERE id='$asid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$agroupid = mysql_result($result,0,0);
+	$aid= mysql_result($result,0,1);
 	if ($agroupid>0) {
-		return array('agroupid',$agroupid);
+		return array('agroupid',$agroupid,$aid);
 		//return (" WHERE agroupid='$agroupid'");
 	} else {
-		return array('id',$asid);
+		return array('id',$asid,$aid);
 		//return (" WHERE id='$asid' LIMIT 1");
 	}
 }

@@ -95,7 +95,7 @@
 			}
 		}
 		
-		$query = "SELECT id,agroupid FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='{$_GET['id']}'";
+		$query = "SELECT id,agroupid,lastanswers,bestlastanswers FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='{$_GET['id']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$line = mysql_fetch_array($result, MYSQL_ASSOC);
 		
@@ -123,7 +123,7 @@
 			$starttime = time();
 			
 			$stugroupid = 0;
-			if ($adata['isgroup']>0 && !$isreview) {
+			if ($adata['isgroup']>0 && !$isreview && !isset($teacherid)) {
 				$query = 'SELECT i_sg.id FROM imas_stugroups as i_sg JOIN imas_stugroupmembers as i_sgm ON i_sg.id=i_sgm.stugroupid ';
 				$query .= "WHERE i_sgm.userid='$userid' AND i_sg.groupsetid={$adata['groupsetid']}";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -199,7 +199,8 @@
 			//removed: $deffeedback[0] == "Practice" || 
 			if ($myrights<6 || isset($teacherid)) {  // is teacher or guest - delete out out assessment session
 				require_once("../includes/filehandler.php");
-				deleteasidfilesbyquery(array('userid'=>$userid,'assessmentid'=>$aid),1);
+				//deleteasidfilesbyquery(array('userid'=>$userid,'assessmentid'=>$aid),1);
+				deleteasidfilesbyquery2('userid',$userid,$aid,1);
 				$query = "DELETE FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='$aid' LIMIT 1";
 				$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/showtest.php?cid={$_GET['cid']}&id=$aid");
@@ -222,7 +223,7 @@
 			
 			if ($adata['isgroup']==0 || $line['agroupid']>0) {
 				$sessiondata['groupid'] = $line['agroupid'];
-			} else { //isgroup>0 && agroupid==0
+			} else if (!isset($teacherid)) { //isgroup>0 && agroupid==0
 				//already has asid, but broken from group
 				$query = "INSERT INTO imas_stugroups (name,groupsetid) VALUES ('Unnamed group',{$adata['groupsetid']})";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -232,6 +233,7 @@
 				} else {
 					$sessiondata['groupid'] = 0;  //leave as 0 to trigger adding group members
 				}
+				
 				$query = "INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES ('$userid',$stugroupid)";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				
@@ -307,7 +309,7 @@
 		exit;
 	}
 	//verify group is ok
-	if ($testsettings['isgroup']>0 && ($line['agroupid']==0 || ($sessiondata['groupid']>0 && $line['agroupid']!=$sessiondata['groupid']))) {
+	if ($testsettings['isgroup']>0 && !$isteacher &&  ($line['agroupid']==0 || ($sessiondata['groupid']>0 && $line['agroupid']!=$sessiondata['groupid']))) {
 		echo "<html><body>Error.  Looks like your group has changed for this assessment. Please reopen the assessment and try again.";
 		echo "<a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to course page</a>";
 		echo '</body></html>';
@@ -547,7 +549,8 @@
 			}
 		} else if ($_GET['regenall']=="fromscratch" && $testsettings['testtype']=="Practice" && !$isreview) {
 			require_once("../includes/filehandler.php");
-			deleteasidfilesbyquery(array('userid'=>$userid,'assessmentid'=>$testsettings['id']),1);
+			//deleteasidfilesbyquery(array('userid'=>$userid,'assessmentid'=>$testsettings['id']),1);
+			deleteasidfilesbyquery('userid',$userid,$testsettings['id'],1);
 			$query = "DELETE FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='{$testsettings['id']}' LIMIT 1";
 			$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/showtest.php?cid={$testsettings['courseid']}&id={$testsettings['id']}");

@@ -412,12 +412,7 @@ function recordtestdata($limit=false) {
 }
 
 function deletefilesifnotused($delfrom,$ifnothere) {
-	global $testsettings,$sessiondata, $testid;
-	if ($testsettings['isgroup']>0 && $sessiondata['groupid']>0) {
-		$s3asid = 'grp'.$sessiondata['groupid'].'/'.$testsettings['assessmentid'];
-	} else {
-		$s3asid = $testid;
-	}
+	global $testsettings,$sessiondata, $testid, $isreview;
 	$outstr = '';
 	preg_match_all('/@FILE:(.+?)@/',$delfrom,$matches);
 	foreach($matches[0] as $match) {
@@ -426,8 +421,12 @@ function deletefilesifnotused($delfrom,$ifnothere) {
 		}
 	}
 	require_once("../includes/filehandler.php");
-	deleteasidfilesfromstring($outstr,$s3asid);
-	
+	if ($testsettings['isgroup']>0 && $sessiondata['groupid']>0 && !$isreview) {
+		deleteasidfilesfromstring2($outstr,'agroupid',$sessiondata['groupid'],$testsettings['id']);
+	} else {
+		deleteasidfilesfromstring2($outstr,'id',$testid,$testsettings['id']);
+	}
+	//deleteasidfilesfromstring($outstr);
 }
 
 //can improve question score?
