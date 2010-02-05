@@ -911,7 +911,11 @@ function gbtable() {
 				//cats: name,scale,scaletype,chop,drop,weight
 				if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotpast[$ln][$cat])) { //if drop is set and have enough items
 					foreach($cattotpast[$ln][$cat] as $col=>$v) {
-						$cattotpast[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	//convert to percents
+						if ($gb[0][1][$col][2] == 0) {
+							$cattotpast[$ln][$cat][$col] = 0;
+						} else {
+							$cattotpast[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	//convert to percents
+						}
 					}
 					asort($cattotpast[$ln][$cat],SORT_NUMERIC);
 					if ($cats[$cat][4]<0) {  //doing keep n
@@ -978,7 +982,11 @@ function gbtable() {
 				//cats: name,scale,scaletype,chop,drop,weight
 				if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotcur[$ln][$cat])) { //if drop is set and have enough items
 					foreach($cattotcur[$ln][$cat] as $col=>$v) {
-						$cattotcur[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	
+						if ($gb[0][1][$col][2] == 0) {
+							$cattotcur[$ln][$cat][$col] = 0;
+						} else {
+							$cattotcur[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	//convert to percents
+						}
 					}
 					asort($cattotcur[$ln][$cat],SORT_NUMERIC);
 					
@@ -1047,7 +1055,11 @@ function gbtable() {
 				//cats: name,scale,scaletype,chop,drop,weight
 				if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotfuture[$ln][$cat])) { //if drop is set and have enough items
 					foreach($cattotfuture[$ln][$cat] as $col=>$v) {
-						$cattotfuture[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	
+						if ($gb[0][1][$col][2] == 0) {
+							$cattotfuture[$ln][$cat][$col] = 0;
+						} else {
+							$cattotfuture[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	//convert to percents
+						}
 					}
 					asort($cattotfuture[$ln][$cat],SORT_NUMERIC);
 					

@@ -10,7 +10,7 @@
 
 	if (isset($_POST['message'])) {
 		$toignore = array();
-		if (isset($_POST['limit']) && $_POST['aidselect']!=0) {
+		if (intval($_POST['aidselect'])!=0) {
 			$limitaid = $_POST['aidselect'];
 			$query = "SELECT IAS.userid FROM imas_assessment_sessions AS IAS WHERE ";
 			$query .= "IAS.scores NOT LIKE '%-1%' AND IAS.assessmentid='$limitaid'";
@@ -175,10 +175,10 @@
 		echo "<input type=radio name=self id=self value=\"self\" checked=checked>Self<br/> ";
 		echo "<input type=radio name=self id=self value=\"allt\">All instructors of this course</span><br class=form>\n";
 		echo "<span class=form><label for=\"limit\">Limit send: </label></span>";
-		echo "<span class=formright><input type=checkbox name=limit id=limit /> ";
+		echo "<span class=formright>";
 		echo "to students who haven't completed: ";
 		echo "<select name=\"aidselect\" id=\"aidselect\">\n";
-		echo "<option value=\"0\">Select an Assessment</option>\n";
+		echo "<option value=\"0\">Don't limit - send to all</option>\n";
 		$query = "SELECT id,name from imas_assessments WHERE courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {

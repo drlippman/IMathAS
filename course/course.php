@@ -238,10 +238,11 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	
 	
 	if ($msgset<4) {
-	   $query = "SELECT COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND (isread=0 OR isread=4)";
+	   $query = "SELECT COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND courseid='$cid' AND (isread=0 OR isread=4)";
 	   $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	   if (mysql_result($result,0,0)>0) {
-		   $newmsgs = " <a href=\"$imasroot/msgs/newmsglist.php?cid=$cid\" style=\"color:red\">New Messages</a>";
+	   $msgcnt = mysql_result($result,0,0);
+	   if ($msgcnt>0) {
+		   $newmsgs = " <a href=\"$imasroot/msgs/newmsglist.php?cid=$cid\" style=\"color:red\">New ($msgcnt)</a>";
 	   } else {
 		   $newmsgs = '';
 	   }
@@ -262,7 +263,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$row = mysql_fetch_row($result);
 	if ($row[0]>0) {
-		$newpostscnt = " <a href=\"$imasroot/forums/newthreads.php?cid=$cid\" style=\"color:red\">New Posts</a>";
+		$newpostscnt = " <a href=\"$imasroot/forums/newthreads.php?cid=$cid\" style=\"color:red\">New ({$row[0]})</a>";
 	} else {
 		$newpostscnt = '';	
 	}
@@ -385,7 +386,7 @@ if ($overwriteBody==1) {
 		}
 		?>
 		</p>
-		<p><b>Tools:</b><br/>
+		<p><b>Tools</b><br/>
 			<a href="listusers.php?cid=<?php echo $cid ?>">Roster</a><br/>
 			<a href="gradebook.php?cid=<?php echo $cid ?>">Gradebook</a> <?php if (($coursenewflag&1)==1) {echo '<span class="red">New</span>';}?><br/>
 			<a href="managestugrps.php?cid=<?php echo $cid ?>">Groups</a><br/>
@@ -395,21 +396,21 @@ if ($overwriteBody==1) {
 	<?php
 	if (!isset($CFG['CPS']['viewbuttons']) || $CFG['CPS']['viewbuttons']!=true) {
 	?>
-		<p><b>Views:</b><br/>
+		<p><b>Views</b><br/>
 		<a href="course.php?cid=<?php echo $cid ?>&stuview=0">Student View</a><br/>
 			<a href="course.php?cid=<?php echo $cid ?>&quickview=on">Quick View</a>
 		</p>
 	<?php
 	}
 	?>
-		<p><b>Manage:</b><br/>
-			<a href="manageqset.php?cid=<?php echo $cid ?>">Question Set</a><br/>
+		<p><b>Questions</b><br/>
+			<a href="manageqset.php?cid=<?php echo $cid ?>">Manage</a><br/>
 			<a href="managelibs.php?cid=<?php echo $cid ?>">Libraries</a>
 		</p>
 <?php			
 		if ($allowcourseimport) {
 ?>
-		<p><b>Export/Import:</b><br/>
+		<p><b>Export/Import</b><br/>
 			<a href="../admin/export.php?cid=<?php echo $cid ?>">Export Question Set</a><br/>
 			<a href="../admin/import.php?cid=<?php echo $cid ?>">Import Question Set</a><br/>
 			<a href="../admin/exportlib.php?cid=<?php echo $cid ?>">Export Libraries</a><br/>
@@ -418,18 +419,18 @@ if ($overwriteBody==1) {
 <?php
 		}
 ?>
-		<p><b>Course Items:</b><br/>
+		<p><b>Course Items</b><br/>
 			<a href="copyitems.php?cid=<?php echo $cid ?>">Copy</a><br/>
 			<a href="../admin/exportitems.php?cid=<?php echo $cid ?>">Export</a><br/>
 			<a href="../admin/importitems.php?cid=<?php echo $cid ?>">Import</a>
 		</p>
 		
-		<p><b>Change:</b><br/>
+		<p><b>Mass Change</b><br/>
 			<a href="chgassessments.php?cid=<?php echo $cid ?>">Assessments</a><br/>
-			<a href="masschgdates.php?cid=<?php echo $cid ?>">Dates</a><br/>
-			<a href="../admin/forms.php?action=modify&id=<?php echo $cid ?>&cid=<?php echo $cid ?>">Course Settings</a>
+			<a href="masschgdates.php?cid=<?php echo $cid ?>">Dates</a>
 		</p>
 		<p>
+			<a href="../admin/forms.php?action=modify&id=<?php echo $cid ?>&cid=<?php echo $cid ?>">Course Settings</a><br/>
 			<a href="<?php echo $imasroot ?>/help.php?section=coursemanagement">Help</a><br/>
 			<a href="../actions.php?action=logout">Log Out</a>
 		</p>
@@ -536,7 +537,7 @@ if ($overwriteBody==1) {
 	<div class=cp>
 		<span class=column>
 			<?php echo generateadditem($_GET['folder'], 'BB') ?>
-			<a href="listusers.php?cid=<?php echo $cid ?>">List Students</a><br/>
+			<a href="listusers.php?cid=<?php echo $cid ?>">Roster</a><br/>
 			<a href="gradebook.php?cid=<?php echo $cid ?>">Show Gradebook</a> <?php if (($coursenewflag&1)==1) {echo '<span class="red">New</span>';}?><br/>
 			<a href="course.php?cid=<?php echo $cid ?>&stuview=0">Student View</a><br/>
 			<a href="course.php?cid=<?php echo $cid ?>&quickview=on">Quick View</a></span>

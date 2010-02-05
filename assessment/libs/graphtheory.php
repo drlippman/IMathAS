@@ -688,6 +688,7 @@ function graphsequenceishamiltonian($g,$op,$seq) {
 		$lbl = $op['labels'];
 	} else {
 		$lbl = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
+		$seq = strtoupper($seq);
 	}
 	$lblrev = array_flip($lbl);
 	$len = strlen($seq);
@@ -732,6 +733,7 @@ function graphgetpathlength($g,$op,$seq) {
 		$lbl = $op['labels'];
 	} else {
 		$lbl = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
+		$seq = strtoupper($seq);
 	}
 	$lblrev = array_flip($lbl);
 	$len = strlen($seq);

@@ -43,7 +43,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 	
 	if (isset($_GET['assigncode'])) {
 		
-		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Assign Codes\n";
+		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Assign Codes\n";
 		$pagetitle = "Assign Section/Code Numbers";
 		
 		if (isset($_POST['submit'])) {
@@ -75,7 +75,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		}
 	} elseif (isset($_GET['enroll'])) {
 
-		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Enroll Students\n";
+		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Enroll Students\n";
 		$pagetitle = "Enroll an Existing User";
 		
 		if (isset($_POST['username'])) {
@@ -108,7 +108,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			
 		} 
 	} elseif (isset($_GET['newstu']) && $CFG['GEN']['allowinstraddstus']) {
-		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Enroll Students\n";
+		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Enroll Students\n";
 		$pagetitle = "Enroll a New Student";	
 	
 		if (isset($_POST['SID'])) {
@@ -141,7 +141,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			}
 		} 
 	} elseif (isset($_GET['chgstuinfo'])) {
-		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Enroll Students\n";	
+		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Enroll Students\n";	
 		$pagetitle = "Change Student Info";
 		
 		if (isset($_POST['firstname'])) {
@@ -239,12 +239,12 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		} else {
 			$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n"; 
-			$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Confirm Change\n";
+			$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Confirm Change\n";
 			$pagetitle = "Confirm Change";
 		}
 	} elseif (isset($_GET['action']) && $_GET['action']=="unenroll" ) {
 		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n"; 
-		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Confirm Change\n";
+		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Confirm Change\n";
 		$pagetitle = "Unenroll Students";		
 		$calledfrom='lu';
 		$overwriteBody = 1;
@@ -252,8 +252,8 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		
 	} else { //DEFAULT DATA MANIPULATION HERE
 	 
-		$curBreadcrumb .= " &gt; List Students\n";
-		$pagetitle = "Students";
+		$curBreadcrumb .= " &gt; Roster\n";
+		$pagetitle = "Student Roster";
 		
 		$query = "SELECT DISTINCT section FROM imas_students WHERE imas_students.courseid='$cid' AND imas_students.section IS NOT NULL ORDER BY section";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
