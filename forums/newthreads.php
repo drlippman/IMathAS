@@ -27,7 +27,7 @@
 	$lastforum = '';
 	
 	if (isset($_GET['markallread'])) {
-		$forumidlist = implode(',',$forumids);
+		/*$forumidlist = implode(',',$forumids);
 		$query = "SELECT DISTINCT threadid FROM imas_forum_posts WHERE forumid IN ($forumidlist)";
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$now = time();
@@ -35,29 +35,35 @@
 		while ($row = mysql_fetch_row($result)) {
 			$threadids[] = $row[0];
 		}
-		$threadlist = implode(',',$threadids);
-		$toupdate = array();
-		$query = "SELECT threadid FROM imas_forum_views WHERE userid='$userid' AND threadid IN ($threadlist)";
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
-			$toupdate[] = $row[0];
-		}
-		$touplodatelist= implode(',',$toupdate);
-		$query = "UPDATE imas_forum_views SET lastview=$now WHERE userid='$userid AND threadid IN ($toupdatelist)'";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
-		$toinsert = array_diff($threadids,$toupdate);
-		if (count($toinsert)>0) {
-			$query = "INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES ";
-			$first = true;
-			foreach($toinsert as $i=>$tid) {
-				if (!$first) {
-					$query .= ",('$userid','$tid',$now)";
-				} else {
-					$query .= "('$userid','$tid',$now)";
-					$first = false;
-				}
+		*/
+		if (count($forumids)>0) {
+			$threadids = array_keys($forumids);
+			$threadlist = implode(',',$threadids);
+			$toupdate = array();
+			$query = "SELECT threadid FROM imas_forum_views WHERE userid='$userid' AND threadid IN ($threadlist)";
+			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				$toupdate[] = $row[0];
 			}
-			mysql_query($query) or die("Query failed : $query " . mysql_error());
+			if (count($toupdate)>0) {
+				$touplodatelist= implode(',',$toupdate);
+				$query = "UPDATE imas_forum_views SET lastview=$now WHERE userid='$userid AND threadid IN ($toupdatelist)'";
+				mysql_query($query) or die("Query failed : $query " . mysql_error());
+			}
+			$toinsert = array_diff($threadids,$toupdate);
+			if (count($toinsert)>0) {
+				$query = "INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES ";
+				$first = true;
+				foreach($toinsert as $i=>$tid) {
+					if (!$first) {
+						$query .= ",('$userid','$tid',$now)";
+					} else {
+						$query .= "('$userid','$tid',$now)";
+						$first = false;
+					}
+				}
+				mysql_query($query) or die("Query failed : $query " . mysql_error());
+			}
 		}
 		
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/../index.php");

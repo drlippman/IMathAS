@@ -2,6 +2,7 @@
 //IMathAS:  show items function for main course page
 //(c) 2007 David Lippman
 
+
 function beginitem($canedit,$aname=0) {
 	if ($canedit) {
 		echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
@@ -19,7 +20,20 @@ function enditem($canedit) {
 }
 
   function showitems($items,$parent,$inpublic=false) {
-	   global $teacherid,$tutorid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$hideicons,$exceptions,$latepasses,$graphicalicons,$ispublic,$studentinfo;
+	   global $teacherid,$tutorid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$hideicons,$exceptions,$latepasses,$graphicalicons,$ispublic,$studentinfo,$CFG;
+	   
+	   if (!isset($CFG['CPS']['itemicons'])) {
+	   	   $itemicons = array('folder'=>'folder2.gif', 'assess'=>'assess.png',
+			'inline'=>'inline.png',	'web'=>'web.png', 'doc'=>'doc.png',
+			'html'=>'html.png', 'forum'=>'forum.png', 'pdf'=>'pdf.png',
+			'ppt'=>'ppt.png', 'zip'=>'zip.png', 'png'=>'image.png', 'xls'=>'xls.png',
+			'gif'=>'image.png', 'jpg'=>'image.png', 'bmp'=>'image.png', 
+			'mp3'=>'sound.png', 'wav'=>'sound.png', 'wma'=>'sound.png', 
+			'swf'=>'video.png', 'avi'=>'video.png', 'mpg'=>'video.png', 
+			'nb'=>'mathnb.png', 'mws'=>'maple.png', 'mw'=>'maple.png'); 
+	   } else {
+	   	   $itemicons = $CFG['CPS']['itemicons'];
+	   }
 	   
 	   if (isset($teacherid)) {
 		   $canedit = true;
@@ -119,7 +133,7 @@ function enditem($canedit) {
 							echo "<span class=left><a href=\"course.php?cid=$cid&folder=$parent-$bnum\" border=0>";
 						}
 						if ($graphicalicons) {
-							echo "<img src=\"$imasroot/img/folder2.gif\"></a></span>";
+							echo "<img src=\"$imasroot/img/{$itemicons['folder']}\"></a></span>";
 						} else {
 							echo "<img src=\"$imasroot/img/folder.gif\"></a></span>";
 						}
@@ -266,7 +280,7 @@ function enditem($canedit) {
 					if (($hideicons&16)==0) {
 						echo "<span class=left><a href=\"course.php?cid=$cid&folder=$parent-$bnum\" border=0>";
 						if ($graphicalicons) {
-							echo "<img src=\"$imasroot/img/folder2.gif\"></a></span>";
+							echo "<img src=\"$imasroot/img/{$itemicons['folder']}\"></a></span>";
 						} else {
 							echo "<img src=\"$imasroot/img/folder.gif\"></a></span>";
 						}
@@ -464,7 +478,7 @@ function enditem($canedit) {
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if (($hideicons&1)==0) {
 					   if ($graphicalicons) {
-						   echo "<img class=\"floatleft\" src=\"$imasroot/img/assess.png\" />";
+						   echo "<img class=\"floatleft\" src=\"$imasroot/img/{$itemicons['assess']}\" />";
 					   } else {
 						  echo "<div class=icon style=\"background-color: " . makecolor2($line['startdate'],$line['enddate'],$now) . ";\">?</div>";
 					   }
@@ -525,7 +539,7 @@ function enditem($canedit) {
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if (($hideicons&1)==0) {
 					   if ($graphicalicons) {
-						   echo "<img class=\"floatleft\" src=\"$imasroot/img/assess.png\" />";
+						   echo "<img class=\"floatleft\" src=\"$imasroot/img/{$itemicons['assess']}\" />";
 					   } else {
 						  echo "<div class=icon style=\"background-color: #99f;\">?</div>";
 					   }
@@ -558,7 +572,7 @@ function enditem($canedit) {
 				   if (($hideicons&1)==0) {
 					   
 					   if ($graphicalicons) {
-						   echo "<img class=\"floatleft faded\" src=\"$imasroot/img/assess.png\" />";
+						   echo "<img class=\"floatleft faded\" src=\"$imasroot/img/{$itemicons['assess']}\" />";
 					   } else {
 						   echo "<div class=icon style=\"background-color: #ccc;\">?</div>";
 					   }
@@ -611,7 +625,7 @@ function enditem($canedit) {
 				   if ($line['title']!='##hidden##') {
 					   if (($hideicons&2)==0) {			   
 						   if ($graphicalicons) {
-							   echo "<img class=\"floatleft\" src=\"$imasroot/img/inline.png\" />";
+							   echo "<img class=\"floatleft\" src=\"$imasroot/img/{$itemicons['inline']}\" />";
 						   } else {
 							   echo "<div class=icon style=\"background-color: $color;\">!</div>";
 						   }
@@ -673,7 +687,7 @@ function enditem($canedit) {
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if ($line['title']!='##hidden##') {
 					   if ($graphicalicons) {
-						   echo "<img class=\"floatleft faded\" src=\"$imasroot/img/inline.png\" />";
+						   echo "<img class=\"floatleft faded\" src=\"$imasroot/img/{$itemicons['inline']}\" />";
 					   } else {
 						   echo "<div class=icon style=\"background-color: #ccc;\">!</div>";
 					   }
@@ -763,6 +777,9 @@ function enditem($canedit) {
 					  case 'mw': $icon = 'maple'; break;
 					  default : $icon = 'doc'; break;
 				   }
+				   if (!isset($itemicons[$icon])) {
+				   	   $icon = 'doc';
+				   }
 						   	   
 			   } else {
 				   if ($ispublic) { 
@@ -772,6 +789,7 @@ function enditem($canedit) {
 				   }
 				   $icon = 'html';
 			   }
+			   
 			   
 			   if ($line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
 				   if ($line['avail']==2) {
@@ -784,7 +802,7 @@ function enditem($canedit) {
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if (($hideicons&4)==0) {
 					   if ($graphicalicons) {
-						  echo "<img class=\"floatleft\" src=\"$imasroot/img/$icon.png\" />";
+						  echo "<img class=\"floatleft\" src=\"$imasroot/img/{$itemicons[$icon]}\" />";
 					   } else {
 						   echo "<div class=icon style=\"background-color: $color;\">!</div>";
 					   }
@@ -813,7 +831,7 @@ function enditem($canedit) {
 				   }
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				  if ($graphicalicons) {
-					  echo "<img class=\"floatleft faded\" src=\"$imasroot/img/$icon.png\" />";
+					  echo "<img class=\"floatleft faded\" src=\"$imasroot/img/{$itemicons[$icon]}\" />";
 				  } else {
 					   echo "<div class=icon style=\"background-color: #ccc;\">!</div>";
 				   }
@@ -929,7 +947,7 @@ function enditem($canedit) {
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if (($hideicons&8)==0) {
 					   if ($graphicalicons) {
-						   echo "<img class=\"floatleft\" src=\"$imasroot/img/forum.png\" />";
+						   echo "<img class=\"floatleft\" src=\"$imasroot/img/{$itemicons['forum']}\" />";
 					   } else {
 						   echo "<div class=icon style=\"background-color: $color;\">F</div>";
 					   }
@@ -962,7 +980,7 @@ function enditem($canedit) {
 				   }
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if ($graphicalicons) {
-					   echo "<img class=\"floatleft faded\" src=\"$imasroot/img/forum.png\" />";
+					   echo "<img class=\"floatleft faded\" src=\"$imasroot/img/{$itemicons['forum']}\" />";
 				   } else {
 					   echo "<div class=icon style=\"background-color: #ccc;\">F</div>";
 				   }   

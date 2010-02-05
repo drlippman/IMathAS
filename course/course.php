@@ -341,10 +341,9 @@ if ($overwriteBody==1) {
 	</script> 
 	
 <?php
-	//check for theme course layout
-	$themeshort = substr($coursetheme,0,strpos($coursetheme,'.'));
-	if (file_exists("course-$themeshort.php")) {
-		require("course-$themeshort.php");
+	//check for course layout
+	if (isset($CFG['GEN']['courseinclude'])) {
+		require($CFG['GEN']['courseinclude']);
 		if ($firstload) {
 			echo "<script>document.cookie = 'openblocks-$cid=' + oblist;\n";
 			echo "document.cookie = 'loadedblocks-$cid=0';</script>\n";
@@ -374,26 +373,38 @@ if ($overwriteBody==1) {
 			echo '<p>'.generateadditem($_GET['folder'],'LB').'</p>';
 		}
 	?>
-		<p><b>Show:</b><br/>
+		<p>
+		<b>Communication</b><br/>
 			<a href="<?php echo $imasroot ?>/msgs/msglist.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>">
 			Messages</a> <?php echo $newmsgs ?> <br/>
 			<a href="<?php echo $imasroot ?>/forums/forums.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>">
 			Forums</a> <?php echo $newpostscnt ?><br/>
-			<a href="listusers.php?cid=<?php echo $cid ?>">Students</a><br/>
-			<a href="gradebook.php?cid=<?php echo $cid ?>">Gradebook</a> <?php if (($coursenewflag&1)==1) {echo '<span class="red">New</span>';}?><br/>
-			<a href="course.php?cid=<?php echo $cid ?>&stuview=0">Student View</a><br/>
-			<a href="course.php?cid=<?php echo $cid ?>&quickview=on">Quick View</a><br/>
-			<a href="showcalendar.php?cid=<?php echo $cid ?>">Calendar</a>
-		<?php 
+<?php 
 		if (isset($mathchaturl) &&  $chatset==1) {
 			echo "<br/><a href=\"$mathchaturl?uname=".urlencode($userfullname)."&amp;room=$cid&amp;roomname=".urlencode($coursename)."\" target=\"chat\">Chat</a> ($activechatters)";
 		}
 		?>
 		</p>
+		<p><b>Tools:</b><br/>
+			<a href="listusers.php?cid=<?php echo $cid ?>">Roster</a><br/>
+			<a href="gradebook.php?cid=<?php echo $cid ?>">Gradebook</a> <?php if (($coursenewflag&1)==1) {echo '<span class="red">New</span>';}?><br/>
+			<a href="managestugrps.php?cid=<?php echo $cid ?>">Groups</a><br/>
+			<a href="showcalendar.php?cid=<?php echo $cid ?>">Calendar</a>
+		
+		</p>
+	<?php
+	if (!isset($CFG['CPS']['viewbuttons']) || $CFG['CPS']['viewbuttons']!=true) {
+	?>
+		<p><b>Views:</b><br/>
+		<a href="course.php?cid=<?php echo $cid ?>&stuview=0">Student View</a><br/>
+			<a href="course.php?cid=<?php echo $cid ?>&quickview=on">Quick View</a>
+		</p>
+	<?php
+	}
+	?>
 		<p><b>Manage:</b><br/>
 			<a href="manageqset.php?cid=<?php echo $cid ?>">Question Set</a><br/>
-			<a href="managelibs.php?cid=<?php echo $cid ?>">Libraries</a><br/>
-			<a href="managestugrps.php?cid=<?php echo $cid ?>">Groups</a>
+			<a href="managelibs.php?cid=<?php echo $cid ?>">Libraries</a>
 		</p>
 <?php			
 		if ($allowcourseimport) {
@@ -618,10 +629,47 @@ function makeTopMenu() {
 	global $quickview;
 	global $newpostscnt;
 	global $coursenewflag;
+	global $CFG;
+	
+	if (isset($CFG['CPS']['viewbuttons']) && $CFG['CPS']['viewbuttons']==true) {
+		$useviewbuttons = true;
+		echo '<div id="viewbuttoncont">View: ';
+		echo "<a href=\"course.php?cid=$cid&quickview=off&teachview=1\" ";
+		if ($previewshift==-1 && $quickview != 'on') {
+			echo 'class="buttonactive"';
+		} else {
+			echo 'class="buttoninactive"';
+		}
+		echo '>Normal</a>';
+		echo "<a href=\"course.php?cid=$cid&quickview=off&stuview=0\" ";
+		if ($previewshift>-1 && $quickview != 'on') {
+			echo 'class="buttonactive"';
+		} else {
+			echo 'class="buttoninactive"';
+		}
+		echo '>Student</a>';
+		echo "<a href=\"course.php?cid=$cid&quickview=on&teachview=1\" ";
+		if ($previewshift==-1 && $quickview == 'on') {
+			echo 'class="buttonactive"';
+		} else {
+			echo 'class="buttoninactive"';
+		}
+		echo '>Quick</a>';
+		echo '</div>';
+		//echo '<br class="clear"/>';
+			
+		
+	} else {
+		$useviewbuttons = false;
+	}
 	
 	if (isset($teacherid) && $quickview=='on') {
 		echo "<div class=breadcrumb>";
-		echo "Quick View. <a href=\"course.php?cid=$cid&quickview=off\">Back to regular view</a>. ";
+		if (!$useviewbuttons) {
+			echo "Quick View. <a href=\"course.php?cid=$cid&quickview=off\">Back to regular view</a>. ";
+		} else {
+			echo '<br class="clear"/>';
+		}
 		 echo 'Use colored boxes to drag-and-drop order.  <input type="button" id="recchg" disabled="disabled" value="Record Changes" onclick="submitChanges()"/>';
 		 echo '<span id="submitnotice" style="color:red;"></span>';
 		 echo '</div>';
@@ -643,11 +691,14 @@ function makeTopMenu() {
 		if (in_array(1,$topbar[1])) { //Stu view
 			echo "<a href=\"course.php?cid=$cid&stuview=0\">Student View</a> &nbsp; ";
 		}
-		if (in_array(2,$topbar[1])) { //Gradebook
-			echo "<a href=\"gradebook.php?cid=$cid\">Show Gradebook</a>$gbnewflag &nbsp; ";
-		}
 		if (in_array(3,$topbar[1])) { //List stu
-			echo "<a href=\"listusers.php?cid=$cid\">List Students</a> &nbsp; \n";
+			echo "<a href=\"listusers.php?cid=$cid\">Roster</a> &nbsp; \n";
+		}
+		if (in_array(2,$topbar[1])) { //Gradebook
+			echo "<a href=\"gradebook.php?cid=$cid\">Gradebook</a>$gbnewflag &nbsp; ";
+		}
+		if (in_array(7,$topbar[1])) { //List stu
+			echo "<a href=\"managestugrps.php?cid=$cid\">Groups</a> &nbsp; \n";
 		}
 		if (in_array(4,$topbar[1])) { //Calendar
 			echo "<a href=\"showcalendar.php?cid=$cid\">Calendar</a> &nbsp; \n";
@@ -660,7 +711,7 @@ function makeTopMenu() {
 			echo "<a href=\"../actions.php?action=logout\">Log Out</a>";
 		}
 		echo '<div class=clear></div></div>';
-	} else if (!isset($teacherid) && ((count($topbar[0])>0 && $topbar[2]==0) || $previewshift>-1)) {
+	} else if (!isset($teacherid) && ((count($topbar[0])>0 && $topbar[2]==0) || ($previewshift>-1 && !$useviewbuttons))) {
 		echo '<div class=breadcrumb>';
 		if ($topbar[2]==0) {
 			if (in_array(0,$topbar[0]) && $msgset<4) { //messages
@@ -680,7 +731,7 @@ function makeTopMenu() {
 			}
 			if ($previewshift>-1 && count($topbar[0])>0) { echo '<br />';}
 		}
-		if ($previewshift>-1) {
+		if ($previewshift>-1 && !$useviewbuttons) {
 			echo 'Showing student view. Show view: <select id="pshift" onchange="changeshift()">';
 			echo '<option value="0" ';
 			if ($previewshift==0) {echo "selected=1";}

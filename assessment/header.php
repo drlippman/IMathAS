@@ -162,28 +162,31 @@ if ($coursetopbar[0][0] == null) {unset($coursetopbar[0][0]);}
 if ($coursetopbar[1][0] == null) {unset($coursetopbar[1][0]);}
 			
 
-if (isset($cid) && $sessiondata['isteacher'] && $coursetopbar[2]==1 && count($coursetopbar[1])>0) {
+if (isset($cid) && !isset($flexwidth) && $sessiondata['isteacher'] && $coursetopbar[2]==1 && count($coursetopbar[1])>0) {
 	echo '<div id="navlistcont">';
 	echo '<ul id="navlist">';
 	if (in_array(0,$coursetopbar[1]) && $msgset<4) { //messages
 		echo "<li><a href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a></li> ";
 	}
-	if (in_array(6,$coursetopbar[1])) { //Calendar
+	if (in_array(6,$coursetopbar[1])) { //Forums
 		echo "<li><a href=\"$imasroot/forums/forums.php?cid=$cid\">Forums</a></li>";
 	}
 	if (in_array(1,$coursetopbar[1])) { //Stu view
 		echo "<li><a href=\"$imasroot/course/course.php?cid=$cid&stuview=0\">Student View</a></li>";
 	}
+	if (in_array(3,$coursetopbar[1])) { //List stu
+		echo "<li><a href=\"$imasroot/course/listusers.php?cid=$cid\">Roster</a></li>\n";
+	}
 	if (in_array(2,$coursetopbar[1])) { //Gradebook
 		echo "<li><a href=\"$imasroot/course/gradebook.php?cid=$cid\">Gradebook</a>$gbnewflag</li>";
 	}
-	if (in_array(3,$coursetopbar[1])) { //List stu
-		echo "<li><a href=\"$imasroot/course/listusers.php?cid=$cid\">Roster</a></li>\n";
+	if (in_array(7,$coursetopbar[1])) { //Groups
+		echo "<li><a href=\"$imasroot/course/managestugrps.php?cid=$cid\">Groups</a></li>\n";
 	}
 	if (in_array(4,$coursetopbar[1])) { //Calendar
 		echo "<li><a href=\"$imasroot/course/showcalendar.php?cid=$cid\">Calendar</a></li>\n";
 	}
-	if (in_array(5,$coursetopbar[1])) { //Calendar
+	if (in_array(5,$coursetopbar[1])) { //Quickview
 		echo "<li><a href=\"$imasroot/course/course.php?cid=$cid&quickview=on\">Quick View</a></li>\n";
 	}
 	
@@ -193,7 +196,7 @@ if (isset($cid) && $sessiondata['isteacher'] && $coursetopbar[2]==1 && count($co
 	echo '</ul>';
 	echo '<br class="clear" />';
 	echo '</div>';
-} else if (isset($cid) && $sessiondata['isteacher'] && $coursetopbar[2]==1 && count($coursetopbar[0])>0) {
+} else if (isset($cid) && !isset($flexwidth) && $sessiondata['isteacher'] && $coursetopbar[2]==1 && count($coursetopbar[0])>0) {
 	echo '<div id="navlistcont">';
 	echo '<ul id="navlist">';
 	if (in_array(0,$coursetopbar[0]) && $msgset<4) { //messages

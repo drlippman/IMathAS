@@ -343,7 +343,9 @@ switch($_GET['action']) {
 			if (in_array(2,$topbar[1])) { echo 'checked=1'; }
 			echo ' /> Gradebook<br /><input type=checkbox name="insttopbar[]" value="3" ';
 			if (in_array(3,$topbar[1])) { echo 'checked=1'; }
-			echo ' /> List Students<br /><input type=checkbox name="insttopbar[]" value="4" ';
+			echo ' /> Roster<br /><input type=checkbox name="insttopbar[]" value="7" ';
+			if (in_array(7,$topbar[1])) { echo 'checked=1'; }
+			echo ' /> Groups<br/><input type=checkbox name="insttopbar[]" value="4" ';
 			if (in_array(4,$topbar[1])) { echo 'checked=1'; }
 			echo ' /> Calendar<br/><input type=checkbox name="insttopbar[]" value="5" ';
 			if (in_array(5,$topbar[1])) { echo 'checked=1'; }

@@ -168,8 +168,8 @@ if (isset($insertinheaderwrapper)) {
 }
 echo '<div class="headerwrapper">';
 $curdir = rtrim(dirname(__FILE__), '/\\');
-if (file_exists("$curdir/headercontent.php")) {
-	require("$curdir/headercontent.php");
+if (isset($CFG['GEN']['headerinclude'])) {
+	require("$curdir/{$CFG['GEN']['headerinclude']}");
 }
 $didnavlist = false;
 if (isset($cid) && isset($teacherid) && $coursetopbar[2]==1 && count($coursetopbar[1])>0 && !isset($flexwidth)) {
@@ -184,11 +184,14 @@ if (isset($cid) && isset($teacherid) && $coursetopbar[2]==1 && count($coursetopb
 	if (in_array(1,$coursetopbar[1])) { //Stu view
 		echo "<li><a href=\"$imasroot/course/course.php?cid=$cid&stuview=0\">Student View</a></li>";
 	}
+	if (in_array(3,$coursetopbar[1])) { //List stu
+		echo "<li><a href=\"$imasroot/course/listusers.php?cid=$cid\">Roster</a></li>\n";
+	}
 	if (in_array(2,$coursetopbar[1])) { //Gradebook
 		echo "<li><a href=\"$imasroot/course/gradebook.php?cid=$cid\">Gradebook</a>$gbnewflag</li>";
 	}
-	if (in_array(3,$coursetopbar[1])) { //List stu
-		echo "<li><a href=\"$imasroot/course/listusers.php?cid=$cid\">Roster</a></li>\n";
+	if (in_array(7,$coursetopbar[1])) { //Groups
+		echo "<li><a href=\"$imasroot/course/managestugrps.php?cid=$cid\">Groups</a></li>\n";
 	}
 	if (in_array(4,$coursetopbar[1])) { //Calendar
 		echo "<li><a href=\"$imasroot/course/showcalendar.php?cid=$cid\">Calendar</a></li>\n";

@@ -427,4 +427,27 @@ ul.courselist li:last-child {
 div.block h3 {
 	margin: 2px;
 }
+div#viewbuttoncont {
+	float: right;
+	background: #fff;
+}
+div#viewbuttoncont a {
+	color: #fff;
+	display: inline-block;	
+	padding: 3px 5px;
+	margin-left: 2px;
+}
+div#viewbuttoncont a:hover {
+	text-decoration: none;
+}
+div#viewbuttoncont a.buttonactive {
+	background-color: #369;
+	cursor: default;
+}
+div#viewbuttoncont a.buttoninactive {
+	background-color: #69a;
+}
+div#viewbuttoncont a.buttoninactive:hover {
+	background-color: #036;
+}
 	
