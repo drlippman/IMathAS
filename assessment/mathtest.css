@@ -426,4 +426,7 @@ ul#navlist li a:hover
 background-color: #369;
 color: #fff;
 }
+div.pagetitle h2 {
+	margin: 10px 0px;
+}
 

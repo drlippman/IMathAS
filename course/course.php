@@ -379,13 +379,16 @@ if ($overwriteBody==1) {
 			<a href="<?php echo $imasroot ?>/msgs/msglist.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>">
 			Messages</a> <?php echo $newmsgs ?> <br/>
 			<a href="<?php echo $imasroot ?>/forums/forums.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>">
-			Forums</a> <?php echo $newpostscnt ?><br/>
+			Forums</a> <?php echo $newpostscnt ?>
 <?php 
 		if (isset($mathchaturl) &&  $chatset==1) {
 			echo "<br/><a href=\"$mathchaturl?uname=".urlencode($userfullname)."&amp;room=$cid&amp;roomname=".urlencode($coursename)."\" target=\"chat\">Chat</a> ($activechatters)";
 		}
-		?>
+?>
 		</p>
+	<?php
+	if (!isset($CFG['CPS']['leftnavtools']) || $CFG['CPS']['leftnavtools']!==false) {
+	?>
 		<p><b>Tools</b><br/>
 			<a href="listusers.php?cid=<?php echo $cid ?>">Roster</a><br/>
 			<a href="gradebook.php?cid=<?php echo $cid ?>">Gradebook</a> <?php if (($coursenewflag&1)==1) {echo '<span class="red">New</span>';}?><br/>
@@ -394,6 +397,7 @@ if ($overwriteBody==1) {
 		
 		</p>
 	<?php
+	}
 	if (!isset($CFG['CPS']['viewbuttons']) || $CFG['CPS']['viewbuttons']!=true) {
 	?>
 		<p><b>Views</b><br/>
@@ -665,12 +669,13 @@ function makeTopMenu() {
 	}
 	
 	if (isset($teacherid) && $quickview=='on') {
+		if ($useviewbuttons) {
+			echo '<br class="clear"/>';
+		}
 		echo "<div class=breadcrumb>";
 		if (!$useviewbuttons) {
 			echo "Quick View. <a href=\"course.php?cid=$cid&quickview=off\">Back to regular view</a>. ";
-		} else {
-			echo '<br class="clear"/>';
-		}
+		} 
 		 echo 'Use colored boxes to drag-and-drop order.  <input type="button" id="recchg" disabled="disabled" value="Record Changes" onclick="submitChanges()"/>';
 		 echo '<span id="submitnotice" style="color:red;"></span>';
 		 echo '</div>';

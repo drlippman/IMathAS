@@ -174,7 +174,7 @@ while ($row = mysql_fetch_row($result)) {
 		$colors[$k] = makecolor2($row[2],$row[3],$now);
 		$assess[$moday][$k] = "{type:\"A\", time:\"$time\", ";
 		if ($now<$row[3] || isset($teacherid)) { $assess[$moday][$k] .= "id:\"$row[0]\",";}
-		$assess[$moday][$k] .= "name:\"$row[1]\", color:\"".$colors[$k]."\", allowlate:\"$lp\", tag:\"$tag\"".(($row[8]>0)?", timelimit:true":"").((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
+		$assess[$moday][$k] .= "name:\"$row[1]\", color:\"".$colors[$k]."\", allowlate:\"$lp\", tag:\"$tag\"".(($row[8]!=0)?", timelimit:true":"").((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
 	} 
 	$tags[$k] = $tag;
 	$k++;

@@ -196,8 +196,6 @@ if (isset($CFG['GEN']['hometitle'])) {
 }
 echo '</h2></div>';
 
-echo '<p style="color:#090;">The home page has been improved.  Most of the links that were at the bottom of the ';
-echo 'page are now in the upper right.<br/> You can now customize what shows on this page by clicking the Change User Info link</p>';
 for ($i=0; $i<3; $i++) {
 	if ($i==0) {
 		echo '<div id="homefullwidth">';

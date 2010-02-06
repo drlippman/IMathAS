@@ -488,6 +488,7 @@ function enditem($canedit) {
 				   } else {
 					   $endname = "Due";
 				   }
+				   $line['timelimit'] = abs($line['timelimit']);
 				   if ($line['timelimit']>0) {
 					   if ($line['timelimit']>3600) {
 						$tlhrs = floor($line['timelimit']/3600);

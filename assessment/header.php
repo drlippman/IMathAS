@@ -151,8 +151,8 @@ if (isset($insertinheaderwrapper)) {
 echo '<div class="headerwrapper">';
 echo '<div class="headerwrapper">';
 $curdir = rtrim(dirname(__FILE__), '/\\');
-if (file_exists("$curdir/../headercontent.php")) {
-	require("$curdir/../headercontent.php");
+if (isset($CFG['GEN']['headerinclude'])) {
+	require("$curdir/../{$CFG['GEN']['headerinclude']}");
 }
 $coursetopbar = explode('|',$sessiondata['coursetopbar']);
 $coursetopbar[0] = explode(',',$coursetopbar[0]);
