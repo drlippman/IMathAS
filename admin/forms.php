@@ -366,6 +366,13 @@ switch($_GET['action']) {
 			if (($cploc&1)==1) {echo "checked=1";}
 			echo ' /> Left side bar</span><br class=form />';
 			
+			echo '<span class=form>View Control links:</span><span class=formright>';
+			echo '<input type=radio name="cplocview" value="0" ';
+			if (($cploc&4)==0) {echo "checked=1";}
+			echo ' /> With other course management links<br /><input type=radio name="cplocview" value="4" ';
+			if (($cploc&4)==4) {echo "checked=1";}
+			echo ' /> Buttons at top right</span><br class=form />';
+			
 			echo '<span class=form>Student links location:</span><span class=formright>';
 			echo '<input type=radio name="cplocstu" value="0" ';
 			if (($cploc&2)==0) {echo "checked=1";}

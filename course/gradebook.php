@@ -250,8 +250,15 @@ if (isset($studentid) || $stu!=0) { //show student view
 	$placeinhead .= 'var ts = new tablescroller("myTable",';
 	if (isset($_COOKIE["gblhdr-$cid"]) && $_COOKIE["gblhdr-$cid"]==1) {
 		$placeinhead .= 'true);';
+		$headerslocked = true;
 	} else {
-		$placeinhead .= 'false);';
+		if (!isset($_COOKIE["gblhdr-$cid"]) && isset($CFG['GBS']['lockheader']) && $CFG['GBS']['lockheader']==true) {
+			$placeinhead .= 'true);';
+			$headerslocked = true;
+		} else {
+			$placeinhead .= 'false);';
+			$headerslocked = false;
+		}
 	}
 	$placeinhead .= "\nfunction lockcol() { \n";
 	$placeinhead .= "var tog = ts.toggle(); ";
@@ -327,7 +334,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 		echo "<a href=\"gradebook.php?cid=$cid&stu=-1\">Averages</a> | ";
 		echo "<a href=\"gbcomments.php?cid=$cid&stu=0\">Comments</a> | ";
 		echo "<input type=\"button\" id=\"lockbtn\" onclick=\"lockcol()\" value=\"";
-		if (isset($_COOKIE["gblhdr-$cid"]) && $_COOKIE["gblhdr-$cid"]==1) {
+		if ($headerslocked) {
 			echo "Unlock headers";
 		} else {
 			echo "Lock headers";
@@ -375,7 +382,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	if (!$isteacher) {
 	
 		echo " | <input type=\"button\" id=\"lockbtn\" onclick=\"lockcol()\" value=\"";
-		if (isset($_COOKIE["gblhdr-$cid"]) && $_COOKIE["gblhdr-$cid"]==1) {
+		if ($headerslocked) {
 			echo "Unlock headers";
 		} else {
 			echo "Lock headers";

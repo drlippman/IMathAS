@@ -120,6 +120,24 @@
 	     }
 	    }
 	}
+	function hidenonzero() {
+	   var butn = document.getElementById("nztoggle");
+	   if (butn.value=="Hide Nonzero Score Questions") {
+	      butn.value = "Show Nonzero Score Questions";
+	      var setdispto = "block";
+	   } else { 
+	      butn.value = "Hide Nonzero Score Questions";
+	      var setdispto = "none";
+	   }
+	   var divs = document.getElementsByTagName("div");
+	   for (var i=0;i<divs.length;i++) {
+	     if (divs[i].className=="isnonzero") { 
+	         if (divs[i].style.display=="none") {
+	               divs[i].style.display = "block";
+	         } else { divs[i].style.display = "none"; }
+	     }
+	    }
+	}
 	function hideNA() {
 	   var butn = document.getElementById("hnatoggle");
 	   if (butn.value=="Hide Not Answered Questions") {
@@ -154,6 +172,7 @@
 	</script>
 <?php
 	echo '<input type=button id="hctoggle" value="Hide Perfect Score Questions" onclick="hidecorrect()" />';
+	echo '<input type=button id="nztoggle" value="Hide Nonzero Score Questions" onclick="hidenonzero()" />';
 	echo ' <input type=button id="hnatoggle" value="Hide Not Answered Questions" onclick="hideNA()" />';
 	echo ' <input type="button" id="preprint" value="Prepare for Printing (Slow)" onclick="preprint()" />';
 	echo "<form id=\"mainform\" method=post action=\"gradeallq.php?stu=$stu&gbmode=$gbmode&cid=$cid&aid=$aid&qid=$qid&update=true\">\n";
@@ -198,6 +217,8 @@
 			echo "<div ";
 			if (getpts($scores[$loc])==$points) {
 				echo 'class="iscorrect"';	
+			} else if ($scores[$loc]>0) {
+				echo 'class="isnonzero"';
 			} else if ($scores[$loc]==-1) {
 				echo 'class="notanswered"';
 			} else {

@@ -99,6 +99,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	$chatset = $line['chatset'];
 	$useleftbar = (($line['cploc']&1)==1);
 	$useleftstubar = (($line['cploc']&2)==2);
+	$useviewbuttons = (($line['cploc']&4)==4);
 	$topbar = explode('|',$line['topbar']);
 	$topbar[0] = explode(',',$topbar[0]);
 	$topbar[1] = explode(',',$topbar[1]);
@@ -257,7 +258,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	$query = "SELECT count(*) FROM ";
 	$query .= "(SELECT imas_forum_threads.id FROM imas_forum_threads ";
 	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id LEFT JOIN imas_forum_views AS mfv ";
-	$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' WHERE imas_forums.courseid='$cid' ";
+	$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' WHERE imas_forums.courseid='$cid' AND imas_forums.grpaid=0 ";
 	$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL))) AS newitems ";
 	
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -398,7 +399,7 @@ if ($overwriteBody==1) {
 		</p>
 	<?php
 	}
-	if (!isset($CFG['CPS']['viewbuttons']) || $CFG['CPS']['viewbuttons']!=true) {
+	if (!$useviewbuttons) {
 	?>
 		<p><b>Views</b><br/>
 		<a href="course.php?cid=<?php echo $cid ?>&stuview=0">Student View</a><br/>
@@ -635,15 +636,15 @@ function makeTopMenu() {
 	global $newpostscnt;
 	global $coursenewflag;
 	global $CFG;
+	global $useviewbuttons;
 	
-	if (isset($CFG['CPS']['viewbuttons']) && $CFG['CPS']['viewbuttons']==true) {
-		$useviewbuttons = true;
+	if ($useviewbuttons) {
 		echo '<div id="viewbuttoncont">View: ';
 		echo "<a href=\"course.php?cid=$cid&quickview=off&teachview=1\" ";
 		if ($previewshift==-1 && $quickview != 'on') {
-			echo 'class="buttonactive"';
+			echo 'class="buttonactive buttoncurveleft"';
 		} else {
-			echo 'class="buttoninactive"';
+			echo 'class="buttoninactive buttoncurveleft"';
 		}
 		echo '>Normal</a>';
 		echo "<a href=\"course.php?cid=$cid&quickview=off&stuview=0\" ";
@@ -655,9 +656,9 @@ function makeTopMenu() {
 		echo '>Student</a>';
 		echo "<a href=\"course.php?cid=$cid&quickview=on&teachview=1\" ";
 		if ($previewshift==-1 && $quickview == 'on') {
-			echo 'class="buttonactive"';
+			echo 'class="buttonactive buttoncurveright"';
 		} else {
-			echo 'class="buttoninactive"';
+			echo 'class="buttoninactive buttoncurveright"';
 		}
 		echo '>Quick</a>';
 		echo '</div>';
