@@ -397,7 +397,6 @@ ul#navlist
 clear: both;
 padding: 0px;
 margin: 0px;
-margin-bottom: 3px;
 list-style-type: none;
 float: left;
 width: 100%;
@@ -407,7 +406,6 @@ background-color: #036;
 
 ul#navlist li { 
 display: inline;
-font-family: sans-serif;
 }
 
 ul#navlist li a
@@ -429,4 +427,6 @@ color: #fff;
 div.pagetitle h2 {
 	margin: 10px 0px;
 }
-
+.clear {
+	clear: both;
+}

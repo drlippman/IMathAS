@@ -168,7 +168,7 @@ if (isset($insertinheaderwrapper)) {
 }
 echo '<div class="headerwrapper">';
 $curdir = rtrim(dirname(__FILE__), '/\\');
-if (isset($CFG['GEN']['headerinclude'])) {
+if (isset($CFG['GEN']['headerinclude']) && !isset($flexwidth)) {
 	require("$curdir/{$CFG['GEN']['headerinclude']}");
 }
 $didnavlist = false;

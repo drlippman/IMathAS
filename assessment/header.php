@@ -21,7 +21,7 @@ initstack = new Array();
 window.onload = init;
 var imasroot = '<?php echo $imasroot; ?>';
 </script>
-<link rel="stylesheet" href="<?php echo $imasroot . "/assessment/mathtest.css?ver=012810";?>" type="text/css"/>
+<link rel="stylesheet" href="<?php echo $imasroot . "/assessment/mathtest.css?ver=020710";?>" type="text/css"/>
 <?php
 echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/general.js?ver=120209\"></script>\n";
 if (isset($sessiondata['coursetheme'])) {
@@ -149,9 +149,8 @@ if (isset($insertinheaderwrapper)) {
 	//echo '<div class="headerwrapper">'.$insertinheaderwrapper.'</div>';
 }
 echo '<div class="headerwrapper">';
-echo '<div class="headerwrapper">';
 $curdir = rtrim(dirname(__FILE__), '/\\');
-if (isset($CFG['GEN']['headerinclude'])) {
+if (isset($CFG['GEN']['headerinclude']) && !isset($flexwidth)) {
 	require("$curdir/../{$CFG['GEN']['headerinclude']}");
 }
 $coursetopbar = explode('|',$sessiondata['coursetopbar']);
@@ -223,7 +222,3 @@ echo '<div class="midwrapper">';
 
 
 ?>
-
-</head>
-<body>
-<div class=main>
