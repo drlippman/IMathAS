@@ -110,8 +110,11 @@ function tipshow(el,tip) {
 	}
 }
 
-function popupwindow(content,width,height) {
+function popupwindow(content,width,height,scroll) {
 	var attr = "width="+width+",height="+height+",status=0,resizeable=1,directories=0,menubar=0";
+	if (scroll!=null && scroll==true) {
+		attr += ",scrollbars=1";
+	}
 	if (content.match(/^http/)) {
 		window.open(content,"popup",attr);
 	} else {

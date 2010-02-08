@@ -4,7 +4,7 @@
 
 
 array_push($allowedmacros,"exp","sec","csc","cot","sech","csch","coth","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif","in_array","prettyint","prettyreal","arraystodots","subarray","showdataarray","arraystodoteqns","array_flip","arrayfindindex","fillarray","array_reverse","root");
-array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","randcity","randcities","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction","ifthen","multicalconarray","htmlentities","formhoverover","formpopup","connectthedots","jointsort","stringpos","stringlen");
+array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","randcity","randcities","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction","ifthen","multicalconarray","htmlentities","formhoverover","formpopup","connectthedots","jointsort","stringpos","stringlen","stringclean","substr");
 function mergearrays($a,$b) {
 	if (!is_array($a)) {
 		$a = array($a);
@@ -29,6 +29,13 @@ function stringpos($n,$h) {
 		$p = -1;
 	}
 	return $p;
+}
+function stringclean($str,$mode=0) {
+	switch($mode) {
+	case 0: return trim($str); break;
+	case 1: return preg_replace('/\s/','',$str); break;
+	case 2: return preg_replace('/\W/','',$str); break;
+	}
 }
 function stringtoarray($str) {
         $str_array=array();
@@ -1865,14 +1872,14 @@ function formhoverover($label,$tip) {
 	}
 }
 
-function formpopup($label,$content,$width=600,$height=400,$type='link') {
+function formpopup($label,$content,$width=600,$height=400,$type='link',$scroll='null') {
 	if (strpos($label,'<img')!==false) {
-		return str_replace('<img', '<img class="clickable" onClick="popupwindow(\''.str_replace('\'','\\\'',htmlentities($content)).'\','.$width.','.$height.')"',$label);
+		return str_replace('<img', '<img class="clickable" onClick="popupwindow(\''.str_replace('\'','\\\'',htmlentities($content)).'\','.$width.','.$height.','.$scroll.')"',$label);
 	} else {
 		if ($type=='link') {
-			return '<span class="link" onClick="popupwindow(\''.str_replace('\'','\\\'',htmlentities($content)).'\','.$width.','.$height.')">'.$label.'</span>';
+			return '<span class="link" onClick="popupwindow(\''.str_replace('\'','\\\'',htmlentities($content)).'\','.$width.','.$height.','.$scroll.')">'.$label.'</span>';
 		} else if ($type=='button') {
-			return '<span class="spanbutton" onClick="popupwindow(\''.str_replace('\'','\\\'',htmlentities($content)).'\','.$width.','.$height.')">'.$label.'</span>';
+			return '<span class="spanbutton" onClick="popupwindow(\''.str_replace('\'','\\\'',htmlentities($content)).'\','.$width.','.$height.','.$scroll.')">'.$label.'</span>';
 		}
 	}
 }

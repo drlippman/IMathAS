@@ -162,7 +162,7 @@ function enditem($canedit) {
 					if (($hideicons&16)==0) {
 						echo "</div>";
 					}
-					
+					echo '<br class="clear" />';
 					echo "</div>";
 					if ($canedit) {
 						echo '</div>'; //itemwrapper

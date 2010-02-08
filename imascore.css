@@ -212,6 +212,10 @@ span.padright {
 .clear {
 	clear: both;
 }
+br.clear {
+	line-height: 0px;
+	height: 0px;
+}
 span.hdr1 {
 	font-size: 120%;
 	font-weight: bold;

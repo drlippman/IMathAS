@@ -588,16 +588,6 @@ if ($myrights<20) {
 			$search = stripslashes($safesearch);
 			$search = str_replace('"','&quot;',$search);
 			$sessiondata['lastsearch'.$cid] = str_replace(" ","+",$safesearch);
-			if (isset($_POST['searchall'])) {
-				$searchall = 1;
-			} else {
-				$searchall = 0;
-			}
-			if ($searchall==1 && trim($search)=='') {
-				$overwriteBody = 1;
-				$body = "Must provide a search term when searching all libraries <a href=\"manageqset.php\">Try again</a>";
-				$searchall = 0;
-			} 
 			$sessiondata['searchall'.$cid] = $searchall;
 			if (isset($_POST['searchmine'])) {
 				$searchmine = 1;
@@ -605,6 +595,17 @@ if ($myrights<20) {
 				$searchmine = 0;
 			}
 			$sessiondata['searchmine'.$cid] = $searchmine;
+			if (isset($_POST['searchall'])) {
+				$searchall = 1;
+			} else {
+				$searchall = 0;
+			}
+			if ($searchall==1 && trim($search)=='' && $searchmine==0) {
+				$overwriteBody = 1;
+				$body = "Must provide a search term when searching all libraries <a href=\"manageqset.php\">Try again</a>";
+				$searchall = 0;
+			} 
+			
 			writesessiondata();
 		} else if (isset($sessiondata['lastsearch'.$cid])) {
 			$safesearch = str_replace("+"," ",$sessiondata['lastsearch'.$cid]);
@@ -713,7 +714,7 @@ if ($myrights<20) {
 				$query .= " AND imas_questionset.ownerid='$userid'";
 			}
 		}
-		$query.= " ORDER BY imas_library_items.libid,imas_questionset.id";
+		$query.= " ORDER BY imas_library_items.libid,imas_questionset.id LIMIT 500";
 		$resultLibs = mysql_query($query) or die("Query failed : " . mysql_error());
 		
 		$page_questionTable = array();

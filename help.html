@@ -1740,9 +1740,14 @@ These macros are fairly general purpose:
 <li><b>arraystodots(xarray,yarray)</b>: Converts an array of x-values and y-values into a form that can be used in the Drawing answer type</li>
 <li><b>today([string])</b>: Returns today's date, like "July 3, 2008".  Can change format using string (see http://us2.php.net/manual/en/function.date.php for formats)</li>
 <li><b>ifthen(condition,trueval,falseval)</b>:  Takes a comparision condition, and returns the trueval if the condition is true and the falseval otherwise.</li>
+<li><b>stringpos(needle,haystack)</b>: Finds the position of the string needle in the string haystack.  Returns -1 if needle is not found</li>
+<li><b>stringlen(string)</b>: returns the character count in the provided string</li>
+<li><b>stringclean(string,mode)</b>: mode 0: trims leading and trailing whitespace.  mode 1: removes all whitespace.  mode 2: removes all non-alphanumeric charactesr.</li>
+<li><b>strtoupper(string)</b>: make all characters in the string upper case</li>
+<li><b>strtolower(string)</b>: make all characters in the string lower case</li>
 <li><b>formhoverover(label,tip)</b>:  Creates a hover-over definition or other tip</li>
-<li><b>formpopup(label,content,[width,height,style])</b>:  Creates a link or button leading to a popup window.  Content can
-  be a web address, or HTML content to put directly into the popup.  Style can be "link" or "button".</li>
+<li><b>formpopup(label,content,[width,height,style,scrollbars])</b>:  Creates a link or button leading to a popup window.  Content can
+  be a web address, or HTML content to put directly into the popup.  Style can be "link" or "button". Scrollbars defaults to false - set true for scrollbars.</li>
 </ul>
 </div>
 <div class=h2>
