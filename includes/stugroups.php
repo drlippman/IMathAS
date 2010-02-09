@@ -27,8 +27,8 @@ function removeallgroupmembers($grpid) {
 	$query = "DELETE FROM imas_stugroupmembers WHERE stugroupid='$grpid'";
 	mysql_query($query) or die("Query failed : " . mysql_error());
 	
-	$query = "SELECT assessmentid,userid FROM imas_assessment_sessions WHERE agroupid='$grpid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//$query = "SELECT assessmentid,userid FROM imas_assessment_sessions WHERE agroupid='$grpid'";
+	//$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	
 	//any assessment session using this group, set group to 0
 	$query = "UPDATE imas_assessment_sessions SET agroupid=0 WHERE agroupid='$grpid'";

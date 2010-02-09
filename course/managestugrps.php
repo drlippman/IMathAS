@@ -97,6 +97,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			$stustoadd = array_diff($stustoadd,$alreadygroupedstu);
 			
+			$query = "SELECT userid FROM imas_stugroupmembers WHERE stugroupid='$grpid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$existinggrpmembers = array();
+			while ($row = mysql_fetch_row($result)) {
+				$existinggrpmembers[] = $row[0];
+			}
+			
 			if (count($stustoadd)>0) {
 				$query = 'INSERT INTO imas_stugroupmembers (stugroupid,userid) VALUES ';
 				for ($i=0;$i<count($stustoadd);$i++) {
@@ -120,8 +127,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					if (mysql_num_rows($result)>0) {
 						//asid already exists for group - use it
 						$rowgrptest = addslashes_deep(mysql_fetch_row($result)); 
+						$grpasidexists = true;
 					} else {
 						//use asid from first student assessment
+						$grpasidexists = false;
 						$query = "SELECT id,$fieldstocopy ";
 						$query .= "FROM imas_assessment_sessions WHERE userid IN ($stulist) AND assessmentid='{$aid[0]}'";
 						$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
@@ -138,6 +147,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					if ($rowgrptest != '') {  //if an assessment session already exists
 						$fieldstocopyarr = explode(',',$fieldstocopy);
 						$insrow = "'".implode("','",$rowgrptest)."'";
+						if ($grpasidexists==false) {
+							//asid coming from added group member.  Also copy to any existing group members
+							$stustoadd = array_merge($stustoadd,$existinggrpmembers);
+						}
 						foreach ($stustoadd as $stuid) {
 							$query = "SELECT id,agroupid FROM imas_assessment_sessions WHERE userid='$stuid' AND assessmentid={$aid[0]}";
 							$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
