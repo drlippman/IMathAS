@@ -458,11 +458,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$page_libRowHeader = ($searchall==1) ? "<th>Library</th>" : "";
 			
 			if (isset($search)) {
-				
 				$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_library_items.libid,imas_questionset.ownerid ";
 				$query .= "FROM imas_questionset,imas_library_items WHERE $searchlikes "; //imas_questionset.description LIKE '%$safesearch%' ";
-				$query .= " (imas_questionset.ownerid='$userid' OR imas_questionset.userights>0) "; 
-				$query .= "AND imas_library_items.qsetid=imas_questionset.id ";
+				$query .= " (imas_questionset.ownerid='$userid' OR imas_questionset.userights>0) AND "; 
+				$query .= "imas_library_items.qsetid=imas_questionset.id ";
 				
 				if ($searchall==0) {
 					$query .= "AND imas_library_items.libid IN ($llist)";
@@ -522,7 +521,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 							
 						} 
 						
-						if ($libsortorder[$line['libid']]==1) { //alpha
+						if (isset($libsortorder[$line['libid']]) && $libsortorder[$line['libid']]==1) { //alpha
 							$page_libqids[$line['libid']][$line['id']] = $line['description'];
 						} else { //id
 							$page_libqids[$line['libid']][] = $line['id'];
@@ -583,6 +582,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 							natcasesort($page_libqids[$libid]);
 							$page_libqids[$libid] = array_keys($page_libqids[$libid]);
 						}
+					}
+					if ($searchall==1) {
+						$page_libstouse = array_keys($page_libqids);
 					}
 					
 				}
@@ -844,11 +846,14 @@ if ($overwriteBody==1) {
 <?php					
 				$alt=0;
 				for ($j=0; $j<count($page_libstouse); $j++) {
-					if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
-					echo '<td></td>';
-					if ($searchall==1) {echo '<td colspan="9">';} else {echo '<td colspan="8">';}
-					echo '<b>'.$lnamesarr[$page_libstouse[$j]].'</b>';
-					echo '</td></tr>';
+					
+					if ($searchall==0) {
+						if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
+						echo '<td></td>';
+						echo '<td colspan="8">';
+						echo '<b>'.$lnamesarr[$page_libstouse[$j]].'</b>';
+						echo '</td></tr>';
+					}
 					
 					for ($i=0;$i<count($page_libqids[$page_libstouse[$j]]); $i++) {
 						$qid =$page_libqids[$page_libstouse[$j]][$i];

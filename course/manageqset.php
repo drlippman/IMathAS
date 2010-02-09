@@ -799,7 +799,9 @@ if ($myrights<20) {
 				$page_libqids[$libid] = array_keys($page_libqids[$libid]);
 			}
 		}
-		
+		if ($searchall==1) {
+			$page_libstouse = array_keys($page_libqids);
+		}
 	}
 	
 }
@@ -1067,7 +1069,7 @@ function getnextprev(formn,loc) {
 			if ($searchall==0) {
 				if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 				echo '<td></td>';
-				if ($searchall==1) {echo '<td colspan="9">';} else {echo '<td colspan="8">';}
+				echo '<td colspan="8">';
 				echo '<b>'.$lnamesarr[$page_libstouse[$j]].'</b>';
 				echo '</td></tr>';
 			}
