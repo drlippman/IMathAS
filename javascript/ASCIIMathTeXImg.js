@@ -476,10 +476,23 @@ function AMTparseSexpr(str) { //parses str and returns [node,tailstr]
    
     result = AMTparseExpr(str,true);
     AMnestingDepth--;
-    if (typeof symbol.invisible == "boolean" && symbol.invisible) 
-    	node = '{\\left.'+result[0]+'}';
-    else {
-	    node = '{\\left'+AMTgetTeXbracket(symbol) + result[0]+'}';
+    if (result[0].substr(0,6)=="\\right") {
+	    if (result[0].substr(0,7)=="\\right.") {
+		    result[0] = result[0].substr(7);
+	    } else {
+		    result[0] = result[0].substr(6);
+	    }
+	    if (typeof symbol.invisible == "boolean" && symbol.invisible) 
+		    node = '{'+result[0]+'}';
+	    else {
+		    node = '{'+AMTgetTeXbracket(symbol) + result[0]+'}';
+	    }    
+    } else {
+	    if (typeof symbol.invisible == "boolean" && symbol.invisible) 
+		    node = '{\\left.'+result[0]+'}';
+	    else {
+		    node = '{\\left'+AMTgetTeXbracket(symbol) + result[0]+'}';
+	    }
     }
     return [node,result[1]];
   case TEXT:

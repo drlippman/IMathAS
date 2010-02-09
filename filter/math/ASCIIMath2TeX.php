@@ -484,10 +484,23 @@ function AMTparseSexpr($str) {
 		$str = $this->AMremoveCharsAndBlanks($str,strlen($symbol['input']));
 		$result = $this->AMTparseExpr($str,true);
 		$this->AMnestingDepth--;
-		if (isset($symbol['invisible'])) {
-			$node = '{\\left.' . $result[0] . '}';
+		if (substr($result[0],0,6)=='\\right') {
+			if (substr($result[0],0,7)=='\\right.') {
+				$result[0] = substr($result[0],7);
+			} else {
+				$result[0] = substr($result[0],6);
+			}
+			if (isset($symbol['invisible'])) {
+				$node = '{' . $result[0] . '}';
+			} else {
+				$node = '{' . $this->AMTgetTeXbracket($symbol) . $result[0] . '}';
+			}
 		} else {
-			$node = '{\\left' . $this->AMTgetTeXbracket($symbol) . $result[0] . '}';
+			if (isset($symbol['invisible'])) {
+				$node = '{\\left.' . $result[0] . '}';
+			} else {
+				$node = '{\\left' . $this->AMTgetTeXbracket($symbol) . $result[0] . '}';
+			}
 		}
 		return array($node, $result[1]);
 	} else if (isset($symbol['text'])) {
