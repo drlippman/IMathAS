@@ -1811,6 +1811,12 @@ function decimaltofraction($d,$format="fraction",$maxden = 5000) {
 	if (floor($d)==$d) {
 		return floor($d);
 	}
+	if ($d<0) {
+		$sign = '-';
+	} else {
+		$sign = '';
+	}
+	$d = abs($d);
 	$numerators = array(0, 1);
 	$denominators = array(1, 0);
 	
@@ -1844,12 +1850,12 @@ function decimaltofraction($d,$format="fraction",$maxden = 5000) {
 		$w = floor($numerators[$i]/$denominators[$i]);
 		if ($w>0) {
 			$n = $numerators[$i] - $w*$denominators[$i];
-			return "$w $n/".$denominators[$i];
+			return "{$sign}$w $n/".$denominators[$i];
 		} else {
-			return $numerators[$i].'/'.$denominators[$i];
+			return $sign.$numerators[$i].'/'.$denominators[$i];
 		}
 	} else {
-		return $numerators[$i].'/'.$denominators[$i];
+		return $sign.$numerators[$i].'/'.$denominators[$i];
 	}
 }
 
