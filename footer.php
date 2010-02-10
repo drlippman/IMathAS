@@ -15,6 +15,11 @@ if (isset($useeqnhelper) && $useeqnhelper==true) {
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	require("$curdir/assessment/eqnhelper.html");
 }
+if (isset($testsettings) && $testsettings['showtips']==2) {
+	echo '<div id="ehdd" class="ehdd"><span id="ehddtext"></span> <span onclick="showeh(curehdd);" style="cursor:pointer;">[more..]</span></div>';
+	echo '<div id="eh" class="eh"></div>';
+	
+}
 ?>
 </body>
 </html>
