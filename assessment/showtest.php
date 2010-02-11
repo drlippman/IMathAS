@@ -542,7 +542,9 @@
 			echo "&gt; <a href=\"../course/gb-viewasid.php?cid={$testsettings['courseid']}&amp;asid=$testid&amp;uid={$sessiondata['actas']}\">Gradebook Detail</a> ";
 			echo "&gt; View as student</div>";
 		} else {
-			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid={$testsettings['courseid']}\">{$sessiondata['coursename']}</a> ";
+			echo "<div class=breadcrumb>";
+			echo "<span style=\"float:right;\">$userfullname</span>";
+			echo "$breadcrumbbase <a href=\"../course/course.php?cid={$testsettings['courseid']}\">{$sessiondata['coursename']}</a> ";
 	 
 			echo "&gt; Assessment</div>";
 		}

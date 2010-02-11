@@ -2955,12 +2955,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					$pts = explode(',',$val);
 					//line
 					if ($pts[3]==$pts[1]) {
-						$ineqlines[$k] = array('x',-10000,$pts[1]);
 						if ($pts[5]>$pts[3]) {
 							$dir = '>';
 						} else {
 							$dir = '<';
 						}
+						$ineqlines[$k] = array('x',$dir,$pts[0],-10000,$pts[1]);
+						
 					} else {
 						$slope = ($pts[4]-$pts[2])/($pts[3]-$pts[1]);
 						$yatpt5 = $slope*($pts[5] - $pts[1]) + $pts[2];
