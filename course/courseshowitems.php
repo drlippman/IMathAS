@@ -24,7 +24,7 @@ function enditem($canedit) {
 	   
 	   if (!isset($CFG['CPS']['itemicons'])) {
 	   	   $itemicons = array('folder'=>'folder2.gif', 'assess'=>'assess.png',
-			'inline'=>'inline.png',	'web'=>'web.png', 'doc'=>'doc.png',
+			'inline'=>'inline.png',	'web'=>'web.png', 'doc'=>'doc.png', 'wiki'=>'wiki.png',
 			'html'=>'html.png', 'forum'=>'forum.png', 'pdf'=>'pdf.png',
 			'ppt'=>'ppt.png', 'zip'=>'zip.png', 'png'=>'image.png', 'xls'=>'xls.png',
 			'gif'=>'image.png', 'jpg'=>'image.png', 'bmp'=>'image.png', 
@@ -1004,7 +1004,90 @@ function enditem($canedit) {
 				   echo filter("</div><div class=itemsum>{$line['description']}</div>\n");
 				   enditem($canedit); //echo "</div>\n";
 			   }
-		   }   
+		   } else if ($line['itemtype']=="Wiki") {
+		   	   if ($ispublic) { continue;}
+			   $typeid = $line['typeid'];
+			   $query = "SELECT id,name,description,startdate,enddate,editbydate,avail,settings FROM imas_wikis WHERE id='$typeid'";
+			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
+			   if (strpos($line['description'],'<p>')!==0) {
+				   $line['description'] = '<p>'.$line['description'].'</p>';
+			   }
+			   if ($line['startdate']==0) {
+				   $startdate = "Always";
+			   } else {
+				   $startdate = formatdate($line['startdate']);
+			   }
+			   if ($line['enddate']==2000000000) {
+				   $enddate = "Always";
+			   } else {
+				   $enddate = formatdate($line['enddate']);
+			   }
+			   if ($line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
+				   if ($line['avail']==2) {
+					   $show = "Showing Always ";
+					   $color = '#0f0';
+				   } else {
+					   $show = "Showing until: $enddate ";
+					   $color = makecolor2($line['startdate'],$line['enddate'],$now);
+				   }
+				   $duedates = "";
+				   if ($line['editbydate']>$now && $line['editbydate']!=2000000000) {
+					   $duedates .= "Edits due by ". formatdate($line['editbydate']) . ". ";
+				   }
+				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
+				   if (($hideicons&8)==0) {
+					   if ($graphicalicons) {
+						   echo "<img class=\"floatleft\" src=\"$imasroot/img/{$itemicons['wiki']}\" />";
+					   } else {
+						   echo "<div class=icon style=\"background-color: $color;\">W</div>";
+					   }
+				   }
+				   echo "<div class=title> ";
+				   echo "<b><a href=\"../wikis/viewwiki.php?cid=$cid&id={$line['id']}\">{$line['name']}</a></b>\n";
+				   if ($viewall) { 
+					   echo '<span class="instrdates">';
+					   echo "<br/>$show ";
+					   echo '</span>';
+				   }
+				   if ($canedit) {
+					   echo '<span class="instronly">';
+					   echo "<a href=\"addwiki.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
+					   echo "<a href=\"deletewiki.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
+					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+					   echo '</span>';
+				   }
+				   if ($duedates!='') {echo "<br/>$duedates";}
+				   echo filter("</div><div class=itemsum>{$line['description']}</div>\n");
+				   enditem($canedit); //echo "</div>\n";
+			   } else if ($viewall) {
+				   if ($line['avail']==0) {
+					   $show = "Hidden";
+				   } else {
+					   $show = "Showing $startdate until $enddate";
+				   }
+				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
+				   if ($graphicalicons) {
+					   echo "<img class=\"floatleft faded\" src=\"$imasroot/img/{$itemicons['wiki']}\" />";
+				   } else {
+					   echo "<div class=icon style=\"background-color: #ccc;\">W</div>";
+				   }   
+				   echo "<div class=title><i> <b><a href=\"../wikis/viewwiki.php?cid=$cid&id={$line['id']}\">{$line['name']}</a></b></i> ";
+				   
+				   echo '<span class="instrdates">';
+				   echo "<br/><i>$show </i>";
+				   echo '</span>';
+				   if ($canedit) {
+					   echo '<span class="instronly">';
+					   echo "<a href=\"addwiki.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
+					   echo "<a href=\"deletewiki.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
+					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+					   echo '</span>';
+				   }
+				   echo filter("</div><div class=itemsum>{$line['description']}</div>\n");
+				   enditem($canedit); //echo "</div>\n";
+			   }
+		   }
 	   }
 	   if (count($items)>0) {
 		   if ($canedit) {echo generateadditem($parent,'b');}
