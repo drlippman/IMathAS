@@ -131,14 +131,18 @@
 					$stugroupid = mysql_result($result,0,0);
 					$sessiondata['groupid'] = $stugroupid;
 				} else {
+					if ($adata['isgroup']==3) {
+						echo "<html><body>You are not yet a member of a group.  Contact your instructor to be added to a group.  <a href=\"$imasroot/course/course.php?cid={$_GET['cid']}\">Back</a></body></html>";
+						exit;
+					}
 					$query = "INSERT INTO imas_stugroups (name,groupsetid) VALUES ('Unnamed group',{$adata['groupsetid']})";
 					$result = mysql_query($query) or die("Query failed : " . mysql_error());
 					$stugroupid = mysql_insert_id();
-					if ($adata['isgroup']==3) {
-						$sessiondata['groupid'] = $stugroupid;
-					} else {
+					//if ($adata['isgroup']==3) {
+					//	$sessiondata['groupid'] = $stugroupid;
+					//} else {
 						$sessiondata['groupid'] = 0;  //leave as 0 to trigger adding group members
-					}
+					//}
 					$query = "INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES ('$userid',$stugroupid)";
 					mysql_query($query) or die("Query failed : " . mysql_error());
 				}

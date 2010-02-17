@@ -437,7 +437,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$page_groupsets['val'][0] = 0;
-		$page_groupsets['label'][0] = 'Create new group collection';
+		$page_groupsets['label'][0] = 'Create new set of groups';
 		$i=1;
 		while ($row = mysql_fetch_row($result)) {
 			$page_groupsets['val'][$i] = $row[0];

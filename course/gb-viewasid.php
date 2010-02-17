@@ -51,15 +51,33 @@
 			$query = "SELECT * FROM imas_assessments WHERE id='$aid'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$adata = mysql_fetch_array($result, MYSQL_ASSOC);
+			
+			$stugroupmem = array();
+			$agroupid = 0;
+			if ($adata['isgroup']>0) { //if is group assessment, and groups already exist, create asid for all in group
+				$query = 'SELECT i_sg.id FROM imas_stugroups as i_sg JOIN imas_stugroupmembers as i_sgm ON i_sg.id=i_sgm.stugroupid ';
+				$query .= "WHERE i_sgm.userid='{$_GET['uid']}' AND i_sg.groupsetid={$adata['groupsetid']}";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				if (mysql_num_rows($result)>0) { //group exists
+					$agroupid = mysql_result($result,0,0);
+					$query = "SELECT userid FROM imas_stugroupmembers WHERE stugroupid=$agroupid AND userid<>'{$_GET['uid']}'";
+					$result = mysql_query($query) or die("Query failed : " . mysql_error());
+					while ($row = mysql_fetch_row($result)) {
+						$stugroupmem[] = $row[0];
+					}
+				} 
+			}
+			$stugroupmem[] = $_GET['uid'];
 		
 			require("../assessment/asidutil.php");
 			list($qlist,$seedlist,$reviewseedlist,$scorelist,$attemptslist,$lalist) = generateAssessmentData($adata['itemorder'],$adata['shuffle'],$aid);
 			$starttime = time();
-			$query = "INSERT INTO imas_assessment_sessions (userid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers,reviewscores,reviewattempts,reviewseeds,reviewlastanswers) ";
-			$query .= "VALUES ('{$_GET['uid']}','$aid','$qlist','$seedlist','$scorelist','$attemptslist','$lalist',$starttime,'$scorelist','$attemptslist','$seedlist','$lalist','$scorelist','$attemptslist','$reviewseedlist','$lalist');";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-			$asid = mysql_insert_id();
-																
+			foreach ($stugroupmem as $uid) {
+				$query = "INSERT INTO imas_assessment_sessions (userid,agroupid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers,reviewscores,reviewattempts,reviewseeds,reviewlastanswers) ";
+				$query .= "VALUES ('$uid','$agroupid','$aid','$qlist','$seedlist','$scorelist','$attemptslist','$lalist',$starttime,'$scorelist','$attemptslist','$seedlist','$lalist','$scorelist','$attemptslist','$reviewseedlist','$lalist');";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+				$asid = mysql_insert_id();
+			}												
 			$_GET['asid'] = $asid;
 		}
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') ."/gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&from=$from&cid=$cid&uid={$_GET['uid']}");
@@ -371,13 +389,6 @@
 		}
 		$aid = $line['assessmentid'];
 		
-		if ($line['agroupid']>0) {
-			$s3asid = 'grp'.$line['agroupid'].'/'.$aid;
-		} else {
-			$s3asid = $asid;
-		}
-		
-		
 		echo "<p>Started: " . tzdate("F j, Y, g:i a",$line['starttime']) ."<BR>\n";
 		if ($line['endtime']==0) { 
 			echo "Not Submitted</p>\n";
@@ -603,8 +614,8 @@
 						} else {
 							echo "  <b>$cnt:</b> " ;
 							if (preg_match('/@FILE:(.+?)@/',$laarr[$k],$match)) {
-								$url = getasidfileurl($s3asid,$match[1]);
-								echo "<a href=\"$url\" target=\"_new\">{$match[1]}</a>";
+								$url = getasidfileurl($match[1]);
+								echo "<a href=\"$url\" target=\"_new\">".basename($match[1])."</a>";
 							} else {
 								echo str_replace(array('&','%nbsp;'),array('; ','&nbsp;'),strip_tags($laarr[$k]));
 							}

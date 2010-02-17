@@ -34,7 +34,7 @@ function getasidfileurl($file) {
 	}
 				
 }
-
+/*
 function deleteasidfilesfromstring($str) {
 	if ($GLOBALS['filehandertype'] =='s3') {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
@@ -51,6 +51,7 @@ function deleteasidfilesfromstring($str) {
 		return count($deled);
 	}
 }
+*/
 
 //need to exclude asid or agroupid we're deleting from 
 function deleteasidfilesfromstring2($str,$tosearchby,$val,$aid=null) {
@@ -166,7 +167,7 @@ function deleteasidfilesbyquery2($tosearchby,$val,$aid=null,$lim=0) {
 		return count($deled);
 	}
 }
-
+/*
 //wherearr array of imas_assessment_sessions id=>val for WHERE
 function deleteasidfilesbyquery($wherearr,$lim=0) {
 	if ($GLOBALS['filehandertype'] == 's3') {
@@ -197,7 +198,7 @@ function deleteasidfilesbyquery($wherearr,$lim=0) {
 	}
 }
 
-
+*/
 //delete all assessment files for an assessmentid
 function deleteallaidfiles($aid) {
 	$delcnt = 0;

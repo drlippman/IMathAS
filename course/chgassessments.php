@@ -579,7 +579,8 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 				<td class="r">Penalty for questions done while in exception/LatePass: </td>
 				<td><input type="text" name="exceptionpenalty" size=4 value="0"> % </td>
 			</tr>
-			
+<?php 
+/* removed because gets too confusing with group sets
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgisgroup"/></td>
 				<td class="r">Group assessment: </td>
@@ -594,6 +595,8 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 				<td class="r">Max group members (if group assessment):</td>
 				<td><input type=text name=groupmax value="6"></td>
 			</tr>
+*/
+?>
 			<tr class="coptr">
 				<td ><input type="checkbox" name="chgshowqcat"/></td>
 				<td class="r" >Show question categories: </td>

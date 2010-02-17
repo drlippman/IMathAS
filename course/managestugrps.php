@@ -45,7 +45,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid");
 			exit();
 		}
-		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; Add Collection";
+		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; Add Group Set";
 	} else if (isset($_GET['delgrpset'])) {
 		//deleting groupset
 		if (isset($_GET['confirm'])) {
@@ -59,7 +59,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$page_grpsetname = mysql_result($result,0,0);
 		}
 			
-		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; Delete Collection";
+		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; Delete Group Set";
 	} else if (isset($_GET['rengrpset'])) {
 		//renaming groupset	
 		if (isset($_POST['grpsetname'])) {
@@ -73,7 +73,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$page_grpsetname = mysql_result($result,0,0);
 		}
-		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; Rename Collection";
+		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; Rename Group Set";
 	} else if (isset($_GET['addstutogrp'])) {
 		//submitting list of students to add to a group
 		$stustoadd = $_POST['stutoadd'];
@@ -360,15 +360,15 @@ if ($overwriteBody==1) {
 
 	if (isset($_GET['addgrpset'])) {
 		//add new group set
-		echo '<h4>Add new student group collection</h4>';
+		echo '<h4>Add new set of student groups</h4>';
 		echo "<form method=\"post\" action=\"managestugrps.php?cid=$cid&addgrpset=true\">";
-		echo '<p>New group collection name: <input name="grpsetname" type="text" /></p>';
+		echo '<p>New group set name: <input name="grpsetname" type="text" /></p>';
 		echo '<p><input type="submit" value="Create" />';
 		echo "<input type=button value=\"Nevermind\" onClick=\"window.location='managestugrps.php?cid=$cid'\" /></p>";
 		echo '</form>';
 	} else if (isset($_GET['delgrpset'])) {
-		echo '<h4>Delete student group collection</h4>';
-		echo "<p>Are you SURE you want to delete the student group collection <b>$page_grpsetname</b> and all the groups contained within it? ";
+		echo '<h4>Delete student group set</h4>';
+		echo "<p>Are you SURE you want to delete the set of student groups <b>$page_grpsetname</b> and all the groups contained within it? ";
 		$used = '';
 		$query = "SELECT name FROM imas_assessments WHERE isgroup>0 AND groupsetid='{$_GET['delgrpset']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -381,18 +381,18 @@ if ($overwriteBody==1) {
 			$used .= "Forum: {$row[0]}<br/>";
 		}
 		if ($used != '') {
-			echo '<p>This group collection is currently used in the assessments and/or forums below.  These items will be set to non-group if this group collection is deleted</p><p>';
+			echo '<p>This set of groups is currently used in the assessments and/or forums below.  These items will be set to non-group if this group set is deleted</p><p>';
 			echo "$used</p>";	
 		} else {
-			echo '<p>This group collection is not currently being used</p>';
+			echo '<p>This set of groups is not currently being used</p>';
 		}
 		echo "<p><input type=button value=\"Yes, Delete\" onClick=\"window.location='managestugrps.php?cid=$cid&delgrpset={$_GET['delgrpset']}&confirm=true'\" /> ";
 		echo "<input type=button value=\"Nevermind\" onClick=\"window.location='managestugrps.php?cid=$cid'\" /></p>";
 		
 	} else if (isset($_GET['rengrpset'])) {
-		echo '<h4>Rename student group collection</h4>';
+		echo '<h4>Rename student group set</h4>';
 		echo "<form method=\"post\" action=\"managestugrps.php?cid=$cid&rengrpset={$_GET['rengrpset']}\">";
-		echo '<p>New group collection name: <input name="grpsetname" type="text" value="'.$page_grpsetname.'"/></p>';
+		echo '<p>New group set name: <input name="grpsetname" type="text" value="'.$page_grpsetname.'"/></p>';
 		echo '<p><input type="submit" value="Rename" />';
 		echo "<input type=button value=\"Nevermind\" onClick=\"window.location='managestugrps.php?cid=$cid'\" /></p>";
 		echo '</form>';
@@ -432,7 +432,7 @@ if ($overwriteBody==1) {
 		echo "<input type=button value=\"Nevermind\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid'\" /></p>";
 	} else if (isset($_GET['grpsetid'])) {
 		//groupset selected - list members
-		echo "<h4>Managing groups in collection $page_grpsetname</h4>";
+		echo "<h4>Managing groups in set $page_grpsetname</h4>";
 		foreach ($page_grps as $grpid=>$grpname) {
 			echo "<b>Group: $grpname</b> | ";
 			echo "<a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&rengrp=$grpid\">Rename</a> | ";
@@ -475,11 +475,11 @@ if ($overwriteBody==1) {
 		
 	} else {
 		//list all groups
-		echo '<h4>Student Group Collections</h4>';
+		echo '<h4>Student Group Sets</h4>';
 		if (count($page_groupsets)==0) {
-			echo '<p>No existing group collections</p>';
+			echo '<p>No existing sets of groups</p>';
 		} else {
-			echo '<p>Select a group collection to modify the groups in that collection</p>';
+			echo '<p>Select a set of groups to modify the groups in that set</p>';
 			echo '<ul>';
 			foreach ($page_groupsets as $gs) {
 				echo "<li><a href=\"managestugrps.php?cid=$cid&grpsetid={$gs[0]}\">{$gs[1]}</a> | ";
@@ -491,7 +491,7 @@ if ($overwriteBody==1) {
 			echo '</ul>';
 		}
 		
-		echo "<p><a href=\"managestugrps.php?cid=$cid&addgrpset=ask\">Add new group collection</a></p>";
+		echo "<p><a href=\"managestugrps.php?cid=$cid&addgrpset=ask\">Add new set of groups</a></p>";
 	}
 	
 }

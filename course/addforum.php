@@ -235,7 +235,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$page_groupSelect = array();
 		while ($row = mysql_fetch_row($result)) {
 			$page_groupSelect['val'][$i] = $row[0];
-			$page_groupSelect['label'][$i] = "Use group collection: {$row[1]}";
+			$page_groupSelect['label'][$i] = "Use group set: {$row[1]}";
 			$i++;
 		}
 		
