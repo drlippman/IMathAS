@@ -2,6 +2,7 @@
 //IMathAS:  show items function for main course page
 //(c) 2007 David Lippman
 
+
 function beginitem($canedit,$aname=0) {
 	if ($canedit) {
 		echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
@@ -20,7 +21,20 @@ function enditem($canedit) {
 
   function showitems($items,$parent,$inpublic=false) {
 	   global $teacherid,$tutorid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift;
-	   global $hideicons,$exceptions,$latepasses,$graphicalicons,$ispublic,$studentinfo,$newpostcnts;
+	   global $hideicons,$exceptions,$latepasses,$graphicalicons,$ispublic,$studentinfo,$newpostcnts,$CFG;
+	   
+	   if (!isset($CFG['CPS']['itemicons'])) {
+	   	   $itemicons = array('folder'=>'folder2.gif', 'assess'=>'assess.png',
+			'inline'=>'inline.png',	'web'=>'web.png', 'doc'=>'doc.png',
+			'html'=>'html.png', 'forum'=>'forum.png', 'pdf'=>'pdf.png',
+			'ppt'=>'ppt.png', 'zip'=>'zip.png', 'png'=>'image.png', 'xls'=>'xls.png',
+			'gif'=>'image.png', 'jpg'=>'image.png', 'bmp'=>'image.png', 
+			'mp3'=>'sound.png', 'wav'=>'sound.png', 'wma'=>'sound.png', 
+			'swf'=>'video.png', 'avi'=>'video.png', 'mpg'=>'video.png', 
+			'nb'=>'mathnb.png', 'mws'=>'maple.png', 'mw'=>'maple.png'); 
+	   } else {
+	   	   $itemicons = $CFG['CPS']['itemicons'];
+	   }
 	   
 	   if (isset($teacherid)) {
 		   $canedit = true;
@@ -53,6 +67,11 @@ function enditem($canedit) {
 				   }
 				   
 			   }
+			if (isset($items[$i]['grouplimit']) && count($items[$i]['grouplimit'])>0 && !$viewall) {
+				if (!in_array('s-'.$studentinfo['section'],$items[$i]['grouplimit'])) {
+					continue;
+				}
+			}  
 			$items[$i]['name'] = stripslashes($items[$i]['name']);
 			if ($canedit) {
 				echo generatemoveselect($i,count($items),$parent,$blocklist);
@@ -115,7 +134,7 @@ function enditem($canedit) {
 							echo "<span class=left><a href=\"course.php?cid=$cid&folder=$parent-$bnum\" border=0>";
 						}
 						if ($graphicalicons) {
-							echo "<img src=\"$imasroot/img/folder2.gif\"></a></span>";
+							echo "<img src=\"$imasroot/img/{$itemicons['folder']}\"></a></span>";
 						} else {
 							echo "<img src=\"$imasroot/img/folder.gif\"></a></span>";
 						}
@@ -144,7 +163,7 @@ function enditem($canedit) {
 					if (($hideicons&16)==0) {
 						echo "</div>";
 					}
-					
+					echo '<br class="clear" />';
 					echo "</div>";
 					if ($canedit) {
 						echo '</div>'; //itemwrapper
@@ -262,7 +281,7 @@ function enditem($canedit) {
 					if (($hideicons&16)==0) {
 						echo "<span class=left><a href=\"course.php?cid=$cid&folder=$parent-$bnum\" border=0>";
 						if ($graphicalicons) {
-							echo "<img src=\"$imasroot/img/folder2.gif\"></a></span>";
+							echo "<img src=\"$imasroot/img/{$itemicons['folder']}\"></a></span>";
 						} else {
 							echo "<img src=\"$imasroot/img/folder.gif\"></a></span>";
 						}
@@ -289,6 +308,7 @@ function enditem($canedit) {
 					if (($hideicons&16)==0) {
 						echo "</div>";
 					}
+					echo '<br class="clear" />';
 					echo "</div>";
 					if ($canedit) {
 						echo '</div>'; //itemwrapper
@@ -444,15 +464,15 @@ function enditem($canedit) {
 				   $reviewdate = formatdate($line['reviewdate']);
 			   }
 			   $nothidden = true;
-			   if ($line['reqscore']>0 && $line['reqscoreaid']>0 && !$viewall ) {
+			   if ($line['reqscore']>0 && $line['reqscoreaid']>0 && !$viewall && $line['enddate']>$now ) {
 				   $query = "SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid='{$line['reqscoreaid']}' AND userid='$userid'";
 				   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				   if (mysql_num_rows($result)==0) {
 					   $nothidden = false;
 				   } else {
 					   $scores = mysql_result($result,0,0);
-					   if (getpts($scores)<$line['reqscore']) {
-						   $nothidden = false;
+					   if (getpts($scores)+.02<$line['reqscore']) {
+					   	   $nothidden = false;
 					   }
 				   }
 			   }
@@ -460,7 +480,7 @@ function enditem($canedit) {
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if (($hideicons&1)==0) {
 					   if ($graphicalicons) {
-						   echo "<img class=\"floatleft\" src=\"$imasroot/img/assess.png\" />";
+						   echo "<img class=\"floatleft\" src=\"$imasroot/img/{$itemicons['assess']}\" />";
 					   } else {
 						  echo "<div class=icon style=\"background-color: " . makecolor2($line['startdate'],$line['enddate'],$now) . ";\">?</div>";
 					   }
@@ -470,6 +490,7 @@ function enditem($canedit) {
 				   } else {
 					   $endname = "Due";
 				   }
+				   $line['timelimit'] = abs($line['timelimit']);
 				   if ($line['timelimit']>0) {
 					   if ($line['timelimit']>3600) {
 						$tlhrs = floor($line['timelimit']/3600);
@@ -517,11 +538,11 @@ function enditem($canedit) {
 				   echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
 				   enditem($canedit); //echo "</div>\n";
 				  
-			   } else if ($line['avail']==1 && $line['startdate']<$now && $line['reviewdate']>$now && $nothidden) { //review show
+			   } else if ($line['avail']==1 && $line['enddate']<$now && $line['reviewdate']>$now) { //review show // && $nothidden
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if (($hideicons&1)==0) {
 					   if ($graphicalicons) {
-						   echo "<img class=\"floatleft\" src=\"$imasroot/img/assess.png\" />";
+						   echo "<img class=\"floatleft\" src=\"$imasroot/img/{$itemicons['assess']}\" />";
 					   } else {
 						  echo "<div class=icon style=\"background-color: #99f;\">?</div>";
 					   }
@@ -554,7 +575,7 @@ function enditem($canedit) {
 				   if (($hideicons&1)==0) {
 					   
 					   if ($graphicalicons) {
-						   echo "<img class=\"floatleft faded\" src=\"$imasroot/img/assess.png\" />";
+						   echo "<img class=\"floatleft faded\" src=\"$imasroot/img/{$itemicons['assess']}\" />";
 					   } else {
 						   echo "<div class=icon style=\"background-color: #ccc;\">?</div>";
 					   }
@@ -607,7 +628,7 @@ function enditem($canedit) {
 				   if ($line['title']!='##hidden##') {
 					   if (($hideicons&2)==0) {			   
 						   if ($graphicalicons) {
-							   echo "<img class=\"floatleft\" src=\"$imasroot/img/inline.png\" />";
+							   echo "<img class=\"floatleft\" src=\"$imasroot/img/{$itemicons['inline']}\" />";
 						   } else {
 							   echo "<div class=icon style=\"background-color: $color;\">!</div>";
 						   }
@@ -669,7 +690,7 @@ function enditem($canedit) {
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if ($line['title']!='##hidden##') {
 					   if ($graphicalicons) {
-						   echo "<img class=\"floatleft faded\" src=\"$imasroot/img/inline.png\" />";
+						   echo "<img class=\"floatleft faded\" src=\"$imasroot/img/{$itemicons['inline']}\" />";
 					   } else {
 						   echo "<div class=icon style=\"background-color: #ccc;\">!</div>";
 					   }
@@ -759,6 +780,9 @@ function enditem($canedit) {
 					  case 'mw': $icon = 'maple'; break;
 					  default : $icon = 'doc'; break;
 				   }
+				   if (!isset($itemicons[$icon])) {
+				   	   $icon = 'doc';
+				   }
 						   	   
 			   } else {
 				   if ($ispublic) { 
@@ -768,6 +792,7 @@ function enditem($canedit) {
 				   }
 				   $icon = 'html';
 			   }
+			   
 			   
 			   if ($line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
 				   if ($line['avail']==2) {
@@ -780,7 +805,7 @@ function enditem($canedit) {
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if (($hideicons&4)==0) {
 					   if ($graphicalicons) {
-						  echo "<img class=\"floatleft\" src=\"$imasroot/img/$icon.png\" />";
+						  echo "<img class=\"floatleft\" src=\"$imasroot/img/{$itemicons[$icon]}\" />";
 					   } else {
 						   echo "<div class=icon style=\"background-color: $color;\">!</div>";
 					   }
@@ -809,7 +834,7 @@ function enditem($canedit) {
 				   }
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				  if ($graphicalicons) {
-					  echo "<img class=\"floatleft faded\" src=\"$imasroot/img/$icon.png\" />";
+					  echo "<img class=\"floatleft faded\" src=\"$imasroot/img/{$itemicons[$icon]}\" />";
 				  } else {
 					   echo "<div class=icon style=\"background-color: #ccc;\">!</div>";
 				   }
@@ -926,7 +951,7 @@ function enditem($canedit) {
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if (($hideicons&8)==0) {
 					   if ($graphicalicons) {
-						   echo "<img class=\"floatleft\" src=\"$imasroot/img/forum.png\" />";
+						   echo "<img class=\"floatleft\" src=\"$imasroot/img/{$itemicons['forum']}\" />";
 					   } else {
 						   echo "<div class=icon style=\"background-color: $color;\">F</div>";
 					   }
@@ -959,7 +984,7 @@ function enditem($canedit) {
 				   }
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if ($graphicalicons) {
-					   echo "<img class=\"floatleft faded\" src=\"$imasroot/img/forum.png\" />";
+					   echo "<img class=\"floatleft faded\" src=\"$imasroot/img/{$itemicons['forum']}\" />";
 				   } else {
 					   echo "<div class=icon style=\"background-color: #ccc;\">F</div>";
 				   }   
@@ -989,19 +1014,39 @@ function enditem($canedit) {
    }
    
    function generateadditem($blk,$tb) {
-	$html = "<select name=addtype id=\"addtype$blk-$tb\" onchange=\"additem('$blk','$tb')\" ";
-	if ($tb=='t') {
-		$html .= 'style="margin-bottom:5px;"';
-	}
-	$html .= ">\n";
-	$html .= "<option value=\"\">Add An Item...</option>\n";
-	$html .= "<option value=\"assessment\">Add Assessment</option>\n";
-	$html .= "<option value=\"inlinetext\">Add Inline Text</option>\n";
-	$html .= "<option value=\"linkedtext\">Add Linked Text</option>\n";
-	$html .= "<option value=\"forum\">Add Forum</option>\n";
-	$html .= "<option value=\"block\">Add Block</option>\n";
-	$html .= "<option value=\"calendar\">Add Calendar</option>\n";
-	$html .= "</select><BR>\n";
+   	global $cid, $CFG;
+   	if (isset($CFG['CPS']['additemtype']) && $CFG['CPS']['additemtype'][0]=='links') {
+   		if ($tb=='BB' || $tb=='LB') {$tb = 'b';}
+   		if ($tb=='t' && $blk=='0') {
+   			$html = '<div id="topadditem" class="additembox"><span><b>Add:</b> ';
+   		} else {
+   			$html = '<div class="additembox"><span><b>Add:</b> ';
+   		}
+		$html .= "<a href=\"addassessment.php?block=$blk&tb=$tb&cid=$cid\">Assessment</a> | ";
+		$html .= "<a href=\"addinlinetext.php?block=$blk&tb=$tb&cid=$cid\">Text</a> | ";
+		$html .= "<a href=\"addlinkedtext.php?block=$blk&tb=$tb&cid=$cid\">Link</a> | ";
+		$html .= "<a href=\"addforum.php?block=$blk&tb=$tb&cid=$cid\">Forum</a> | ";
+		$html .= "<a href=\"addblock.php?block=$blk&tb=$tb&cid=$cid\">Block</a> | ";
+		$html .= "<a href=\"addcalendar.php?block=$blk&tb=$tb&cid=$cid\">Calendar</a>";
+		$html .= '</span>';
+		$html .= '</div>';
+   		
+   	} else {
+   		$html = "<select name=addtype id=\"addtype$blk-$tb\" onchange=\"additem('$blk','$tb')\" ";
+		if ($tb=='t') {
+			$html .= 'style="margin-bottom:5px;"';
+		}
+		$html .= ">\n";
+		$html .= "<option value=\"\">Add An Item...</option>\n";
+		$html .= "<option value=\"assessment\">Add Assessment</option>\n";
+		$html .= "<option value=\"inlinetext\">Add Inline Text</option>\n";
+		$html .= "<option value=\"linkedtext\">Add Linked Text</option>\n";
+		$html .= "<option value=\"forum\">Add Forum</option>\n";
+		$html .= "<option value=\"block\">Add Block</option>\n";
+		$html .= "<option value=\"calendar\">Add Calendar</option>\n";
+		$html .= "</select><BR>\n";
+   		
+   	}
 	return $html;
    }
    
@@ -1125,6 +1170,7 @@ function enditem($canedit) {
    //instructor-only tree-based quick view of full course
    function quickview($items,$parent,$showdates=false,$showlinks=true) { 
 	   global $teacherid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$hideicons,$exceptions,$latepasses;
+	   if (!is_array($openblocks)) {$openblocks = array();}
 	   $itemtypes = array();  $iteminfo = array();
 	   $query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid='$cid'";
 	   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -1192,7 +1238,15 @@ function enditem($canedit) {
 			} else {
 				$color = makecolor2($items[$i]['startdate'],$items[$i]['enddate'],$now);
 			}
-			echo '<li class="blockli" id="'."$parent-$bnum".'"><span class=icon style="background-color:'.$color.'">B</span>';
+			if (in_array($items[$i]['id'],$openblocks)) { $isopen=true;} else {$isopen=false;}
+			if ($isopen) {
+				$liclass = 'blockli';
+				$qviewstyle = '';
+			} else {
+				$liclass = 'blockli nCollapse';
+				$qviewstyle = 'style="display:none;"';
+			}
+			echo '<li class="'.$liclass.'" id="'."$parent-$bnum".'" obn="'.$items[$i]['id'].'"><span class=icon style="background-color:'.$color.'">B</span>';
 			if ($items[$i]['avail']==2 || ($items[$i]['avail']==1 && $items[$i]['startdate']<$now && $items[$i]['enddate']>$now)) {
 				echo '<b><span id="B'.$parent.'-'.$bnum.'" onclick="editinplace(this)">'.$items[$i]['name']. "</span></b>";
 				//echo '<b>'.$items[$i]['name'].'</b>';
@@ -1211,7 +1265,7 @@ function enditem($canedit) {
 				echo '</span>';
 			}
 			if (count($items[$i]['items'])>0) {
-				echo '<ul class=qview>';
+				echo '<ul class=qview '.$qviewstyle.'>';
 				quickview($items[$i]['items'],$parent.'-'.$bnum,$showdats,$showlinks);
 				echo '</ul>';
 			}

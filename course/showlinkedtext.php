@@ -23,6 +23,7 @@
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 	echo "&gt; $titlesimp</div>";
+	echo '<div id="headershowlinkedtext" class="pagetitle"><h2>'.$titlesimp.'</h2></div>';
 	echo '<div style="padding-left:10px; padding-right: 10px;">';
 	echo filter($text);
 	echo '</div>';

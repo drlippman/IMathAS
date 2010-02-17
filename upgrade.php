@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 23;
+$latest = 27;
 
 if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 	$handle = fopen("upgradecounter.txt",'w');
@@ -287,6 +287,59 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			echo 'imas_stugroupmembers created<br/></p>';
 			echo '<p>It is now possible to specify a default course theme by setting $defaultcoursetheme = "theme.css"; in config.php</p>';
 			
+		}
+		if ($last < 24) {
+			 $query = "ALTER TABLE `imas_assessments` ADD `groupsetid` INT( 10 ) UNSIGNED NOT NULL DEFAULT '0';"; 
+			 $res = mysql_query($query);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+	
+			 $query = "ALTER TABLE `imas_forums` ADD `groupsetid` INT( 10 ) UNSIGNED NOT NULL DEFAULT '0';"; 
+			 $res = mysql_query($query);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 /*later (once groups are done)
+			 $query = "ALTER TABLE `imas_forums` DROP COLUMN `grpaid`"; 
+			 $res = mysql_query($query);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 */
+			 $query = "ALTER TABLE `imas_forum_threads` ADD `stugroupid` INT( 10 ) UNSIGNED NOT NULL DEFAULT '0';"; 
+			 $res = mysql_query($query);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 
+			 $query = "ALTER TABLE `imas_forum_threads` ADD INDEX(`stugroupid`);"; 
+			 $res = mysql_query($query);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			
+		}
+		if ($last < 25) {
+			 $query = "ALTER TABLE `imas_libraries` ADD `sortorder` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0';"; 
+			 $res = mysql_query($query);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+		}
+		if ($last < 26) {
+			 $query = "ALTER TABLE `imas_users` ADD `homelayout` VARCHAR(32) NOT NULL DEFAULT '|0,2,3||0,1'"; 
+			 $res = mysql_query($query);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+		}
+		if ($last < 27) {
+			$query = "ALTER TABLE `imas_diag_onetime` ADD `goodfor` INT(10) NOT NULL DEFAULT '0'"; 
+			 $res = mysql_query($query);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
 		}
 		$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {

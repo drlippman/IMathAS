@@ -151,7 +151,7 @@ if ($overwriteBody==1) {
 	
 
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>	
-	<h3>Make Start/Due Date Exception</h3>
+	<div id="headerexception" class="pagetitle"><h2>Make Start/Due Date Exception</h2></div>
 
 <?php 
 	writeHtmlSelect ("aidselect",$page_courseSelect['val'],$page_courseSelect['label'],$_GET['aid'],"Select an assessment","", " onchange='nextpage()'"); 

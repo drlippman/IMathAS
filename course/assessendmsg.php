@@ -69,6 +69,7 @@ if (!isset($imasroot)) {
 		$endmsg['type'] = 0;
 		$endmsg['msgs'] = array();
 	}
+	echo '<div id="headerassessendmsg" class="pagetitle"><h2>End of Assessment Messages</h2></div>';
 	echo "<form method=\"post\" action=\"assessendmsg.php?cid=$cid&amp;record=true\" />";
 	if (isset($_POST['checked'])) {
 		echo '<input type="hidden" name="aidlist" value="'.implode(',',$_POST['checked']).'" />';

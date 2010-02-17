@@ -489,7 +489,7 @@ function setlibnames(libn) {
 </script>
 
 <?php echo $curBreadcrumb; ?>
-	<h3>Import Course Items</h3>
+	<div id="headerimportitems" class="pagetitle"><h2>Import Course Items</h2></div>
 	<form enctype="multipart/form-data" method=post action="importitems.php?cid=<?php echo $cid ?>">
 
 <?php	

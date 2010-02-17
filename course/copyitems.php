@@ -264,7 +264,7 @@ if ($overwriteBody==1) {
 ?>
 
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	<h3>Copy Course Items</h3>
+	<div id="headercopyitems" class="pagetitle"><h2>Copy Course Items</h2></div>
 
 <?php
 	}

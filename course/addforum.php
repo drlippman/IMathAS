@@ -17,10 +17,10 @@ $useeditor = "description";
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 
 if (isset($_GET['id'])) {
-	$curBreadcrumb .= "&gt; Modify Forum</div>\n";
+	$curBreadcrumb .= "&gt; Modify Forum\n";
 	$pagetitle = "Modify Forum";
 } else {
-	$curBreadcrumb .= "&gt; Add Forum</div>\n";
+	$curBreadcrumb .= "&gt; Add Forum\n";
 	$pagetitle = "Add Forum";
 } 
 if (isset($_GET['tb'])) {
@@ -266,7 +266,7 @@ if ($overwriteBody==1) {
 ?>
 	
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	<h2><?php echo $pagetitle ?><img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=forumitems','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/></h2>
+	<div id="headeraddforum" class="pagetitle"><h2><?php echo $pagetitle ?><img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=forumitems','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/></h2></div>
 
 	<form method=post action="addforum.php<?php echo $page_formActionTag ?>">
 		<span class=form>Name: </span>

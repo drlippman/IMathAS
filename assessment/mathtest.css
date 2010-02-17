@@ -327,11 +327,13 @@ div.tips {
 	font-family: sans-serif;
 	position: absolute; 
 	height: 8px; 
-	background: #ff0;
+	background: #ff0 url('../img/tinyarrow.gif') no-repeat center;
 	display:none; 
 	text-align:center; 
 	color: #fa0;
 	font-size: 6px;
+	border: 1px solid #fa0;
+	border-left: 0;
 }
 .scorebarholder {
 	font-size:1px;
@@ -377,6 +379,7 @@ div.tips {
 	color: #fff;
 	font-size: 75%;
 	padding: 0px 4px;
+	opacity: 0.9;
 }
 .eh {
 	position: absolute;
@@ -385,5 +388,45 @@ div.tips {
 	display: none;
 	padding: 0px 4px;
 	font-size: 75%;
+	opacity: 0.9;
 }
 
+
+ul#navlist
+{
+clear: both;
+padding: 0px;
+margin: 0px;
+list-style-type: none;
+float: left;
+width: 100%;
+color: #fff;
+background-color: #036;
+}
+
+ul#navlist li { 
+display: inline;
+}
+
+ul#navlist li a
+{
+float: left;
+/*width: 5em;*/
+color: #fff;
+background-color: #036;
+padding: 0.2em 1em;
+text-decoration: none;
+border-right: 1px solid #fff;
+}
+
+ul#navlist li a:hover
+{
+background-color: #369;
+color: #fff;
+}
+div.pagetitle h2 {
+	margin: 10px 0px;
+}
+.clear {
+	clear: both;
+}

@@ -114,7 +114,7 @@ if ($overwriteBody==1) {
 	
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
 	
-	<h3><?php echo $pagetitle ?></h3>
+	<div id="headeruploadgrades" class="pagetitle"><h2><?php echo $pagetitle ?></h2></div>
 	
 	
 	<form enctype="multipart/form-data" method=post action="uploadgrades.php?cid=<?php echo $cid ?>&gbmode=<?php echo $_GET['gbmode'] ?>&gbitem=<?php echo $_GET['gbitem'] ?>">

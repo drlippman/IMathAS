@@ -132,9 +132,9 @@ if ($overwriteBody==1) {
 	<?php echo $page_beenTakenMsg; ?>		
 
 
-<h2>Modify Question</h2> 
+<div id="headermodquestion" class="pagetitle"><h2>Modify Question Settings</h2></div> 
 <form method=post action="modquestion.php?process=true&<?php echo "cid=$cid&aid=$aid"; if (isset($_GET['id'])) {echo "&id={$_GET['id']}";} if (isset($_GET['qsetid'])) {echo "&qsetid={$_GET['qsetid']}";}?>">
-Leave items blank or set to 9999 to use default values<BR>
+Leave items blank to use the assessment's default values<br/>
 
 <span class=form>Points for this problem:</span><span class=formright> <input type=text size=4 name=points value="<?php echo $line['points'];?>"></span><BR class=form>
 

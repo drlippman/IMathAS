@@ -111,7 +111,7 @@ function chkAll(frm, arr, mark) {
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 echo "&gt; Manage Offline Grades</div>";
-echo '<h3>Manage Offline Grades</h3>';
+echo '<div id="headerchgoffline" class="pagetitle"><h2>Manage Offline Grades</h2></div>';
 
 echo "<form id=\"mainform\" method=post action=\"chgoffline.php?cid=$cid\">";
 

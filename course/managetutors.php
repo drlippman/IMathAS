@@ -10,6 +10,10 @@
 		require("../footer.php");
 		exit;
 	}
+	if (isset($CFG['GEN']['allowinstraddtutors']) &&  $CFG['GEN']['allowinstraddtutors']==false) {
+		echo "Adding tutors is not allowed";
+		exit;
+	}
 	$cid = $_GET['cid'];
 	
 	//*** PROCESSING ***
@@ -133,7 +137,7 @@
 
 ?>
 
-	<h2>Manage Tutors</h2>
+	<div id="headermanagetutors" class="pagetitle"><h2>Manage Tutors</h2></div>
 <?php
 	echo $err;
 ?>

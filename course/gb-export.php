@@ -8,6 +8,7 @@
 		echo "This page not available to students";
 		exit;
 	}
+	$canviewall = true;
 	if (isset($sessiondata[$cid.'gbmode'])) {
 		$gbmode =  $sessiondata[$cid.'gbmode'];
 	} else {
@@ -25,6 +26,7 @@
 		require("../header.php");
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
 		echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; Export Gradebook</div>";
+		echo '<div id="headergb-export" class="pagetitle"><h2>Export Gradebook</h2></div>';
 		
 		echo "<form method=post action=\"gb-export.php?cid=$cid&stu=$stu&gbmode=$gbmode";
 		if (isset($_GET['export'])) {

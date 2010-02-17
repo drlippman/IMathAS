@@ -32,7 +32,8 @@ if (isset($_REQUEST["action"]))
 {
 	if ($_REQUEST["action"] == "upload_file")
 	{
-		$filename = basename(stripslashes($_POST["uploaded_file_name"]));
+		//$filename = basename(stripslashes($_POST["uploaded_file_name"]));
+		$filename = basename($_FILES['uploaded_file']['name']);
 		$filename = str_replace(' ','_',$filename);
 		$filename = preg_replace('/[^\w\.]/','',$filename);
 		//$filename = urlencode($filename);
@@ -150,9 +151,11 @@ upload files with private information.
 
 function delete_file(file_name)
 {
-	document.getElementById("hidden_action").value = "delete_file";
-	document.getElementById("hidden_item_name").value = file_name;
-	document.getElementById("hidden_form").submit();
+	if (confirm("Are you sure you want to delete this file?")) {
+		document.getElementById("hidden_action").value = "delete_file";
+		document.getElementById("hidden_item_name").value = file_name;
+		document.getElementById("hidden_form").submit();
+	}
 }
 </script>
 <div style="display: none;">

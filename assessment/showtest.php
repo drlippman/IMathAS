@@ -184,10 +184,11 @@
 				unset($sessiondata['actas']);
 			}
 			
-			$query = "SELECT name,theme FROM imas_courses WHERE id='{$_GET['cid']}'";
+			$query = "SELECT name,theme,topbar FROM imas_courses WHERE id='{$_GET['cid']}'";
 			$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 			$sessiondata['coursename'] = mysql_result($result,0,0);
 			$sessiondata['coursetheme'] = mysql_result($result,0,1);
+			$sessiondata['coursetopbar'] =  mysql_result($result,0,2);
 			if (isset($studentinfo['timelimitmult'])) {
 				$sessiondata['timelimitmult'] = $studentinfo['timelimitmult'];
 			} else {
@@ -245,10 +246,11 @@
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 		
-			$query = "SELECT name,theme FROM imas_courses WHERE id='{$_GET['cid']}'";
+			$query = "SELECT name,theme,topbar FROM imas_courses WHERE id='{$_GET['cid']}'";
 			$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 			$sessiondata['coursename'] = mysql_result($result,0,0);
 			$sessiondata['coursetheme'] = mysql_result($result,0,1);
+			$sessiondata['coursetopbar'] =  mysql_result($result,0,2);
 			if (isset($studentinfo['timelimitmult'])) {
 				$sessiondata['timelimitmult'] = $studentinfo['timelimitmult'];
 			} else {
@@ -590,12 +592,16 @@
 	$useeditor = 1;
 	if ($testsettings['eqnhelper']>0) {
 		$placeinhead = '<script type="text/javascript">var eetype='.$testsettings['eqnhelper'].'</script>';
-		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqnhelper.js\"></script>";
+		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqnhelper.js?v=012810\"></script>";
+		$placeinhead .= '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
 		$useeqnhelper = true;
 	}
 	//IP: eqntips 
-	//$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqntips.js\"></script>";
-		
+	if ($testsettings['showtips']==2) {
+		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqntips.js?v=012810\"></script>";
+	}
+	$cid = $testsettings['courseid'];
+	
 	require("header.php");
 	if ($testsettings['noprint'] == 1) {
 		echo '<style type="text/css" media="print"> div.question, div.todoquestion, div.inactive { display: none;} </style>';
@@ -607,7 +613,9 @@
 			echo "&gt; <a href=\"../course/gb-viewasid.php?cid={$testsettings['courseid']}&amp;asid=$testid&amp;uid={$sessiondata['actas']}\">Gradebook Detail</a> ";
 			echo "&gt; View as student</div>";
 		} else {
-			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid={$testsettings['courseid']}\">{$sessiondata['coursename']}</a> ";
+			echo "<div class=breadcrumb>";
+			echo "<span style=\"float:right;\">$userfullname</span>";
+			echo "$breadcrumbbase <a href=\"../course/course.php?cid={$testsettings['courseid']}\">{$sessiondata['coursename']}</a> ";
 	 
 			echo "&gt; Assessment</div>";
 		}
@@ -678,7 +686,7 @@
 				}
 			}
 		} else {
-			echo '<h2>Select group members</h2>';
+			echo '<div id="headershowtest" class="pagetitle"><h2>Select group members</h2></div>';
 			if ($sessiondata['groupid']==0) {
 				//a group should already exist
 				$query = 'SELECT i_sg.id FROM imas_stugroups as i_sg JOIN imas_stugroupmembers as i_sgm ON i_sg.id=i_sgm.stugroupid ';
@@ -763,8 +771,8 @@
 	*/
 	
 	//if was added to existing group, need to reload $questions, etc
-	
-	echo "<h2>{$testsettings['name']}</h2>\n";
+	echo '<div id="headershowtest" class="pagetitle">';
+	echo "<h2>{$testsettings['name']}</h2></div>\n";
 	if (isset($sessiondata['actas'])) {
 		echo '<p style="color: red;">Teacher Acting as ';
 		$query = "SELECT LastName, FirstName FROM imas_users WHERE id='{$sessiondata['actas']}'";
@@ -1399,13 +1407,8 @@
 			}
 		}
 	}
-	//if ($testsettings['eqnhelper']>0) {
-	//	require("eqnhelper.html");
-	//}
 	//IP:  eqntips
-	//echo '<div id="ehdd" class="ehdd"><span id="ehddtext"></span> <span onclick="showeh(curehdd);" style="cursor:pointer;">[more..]</span></div>';
-	//echo '<div id="eh" class="eh"></div>';
-
+	
 	require("../footer.php");
 	
 	function shownavbar($questions,$scores,$current,$showcat) {

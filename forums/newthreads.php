@@ -35,54 +35,46 @@
 	$lastforum = '';
 	
 	if (isset($_GET['markallread'])) {
-		$forumidlist = implode(',',$forumids);
-		$query = "SELECT DISTINCT threadid FROM imas_forum_posts WHERE forumid IN ($forumidlist)";
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$now = time();
-		$threadids = array();
-		while ($row = mysql_fetch_row($result)) {
-			$threadids[] = $row[0];
-		}
-		$threadlist = implode(',',$threadids);
-		$toupdate = array();
-		$query = "SELECT threadid FROM imas_forum_views WHERE userid='$userid' AND threadid IN ($threadlist)";
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
-			$toupdate[] = $row[0];
-		}
-		$touplodatelist= implode(',',$toupdate);
-		$query = "UPDATE imas_forum_views SET lastview=$now WHERE userid='$userid AND threadid IN ($toupdatelist)'";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
-		$toinsert = array_diff($threadids,$toupdate);
-		$query = "INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES ";
-		foreach($toinsert as $i=>$tid) {
-			if ($i != 0) {
-				$query .= ",('$userid','$tid',$now)";
-			} else {
-				$query .= "('$userid','$tid',$now)";
-			}
-		}
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
-		
-		/*
-		foreach($forumids as $forumid) {
-			$query = "SELECT DISTINCT threadid FROM imas_forum_posts WHERE forumid='$forumid'";
+		if (count($forumids)>0) {
+			$forumidlist = implode(',',$forumids);
+			$query = "SELECT DISTINCT threadid FROM imas_forum_posts WHERE forumid IN ($forumidlist)";
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-			$now = time();
+			
+			$threadids = array();
 			while ($row = mysql_fetch_row($result)) {
-				$query = "SELECT id FROM imas_forum_views WHERE userid='$userid' AND threadid='{$row[0]}'";
-				$r2 = mysql_query($query) or die("Query failed : $query " . mysql_error());
-				if (mysql_num_rows($r2)>0) {
-					$r2id = mysql_result($r2,0,0);
-					$query = "UPDATE imas_forum_views SET lastview=$now WHERE id='$r2id'";
+				$threadids[] = $row[0];
+			}
+			if (count($threadids)>0) {
+				$threadlist = implode(',',$threadids);
+				$toupdate = array();
+				$query = "SELECT threadid FROM imas_forum_views WHERE userid='$userid' AND threadid IN ($threadlist)";
+				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				while ($row = mysql_fetch_row($result)) {
+					$toupdate[] = $row[0];
+				}
+				if (count($toupdate)>0) {
+					$touplodatelist= implode(',',$toupdate);
+					$query = "UPDATE imas_forum_views SET lastview=$now WHERE userid='$userid AND threadid IN ($toupdatelist)'";
 					mysql_query($query) or die("Query failed : $query " . mysql_error());
-				} else{
-					$query = "INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES ('$userid','{$row[0]}',$now)";
+				}
+				$toinsert = array_diff($threadids,$toupdate);
+				if (count($toinsert)>0) {
+					$query = "INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES ";
+					$first = true;
+					foreach($toinsert as $i=>$tid) {
+						if (!$first) {
+							$query .= ",('$userid','$tid',$now)";
+						} else {
+							$query .= "('$userid','$tid',$now)";
+							$first = false;
+						}
+					}
 					mysql_query($query) or die("Query failed : $query " . mysql_error());
 				}
 			}
 		}
-		*/
+		
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/../index.php");
 	}
 	
@@ -90,7 +82,7 @@
 	$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; New Forum Topics</div>\n";
-	echo "<h3>New Forum Posts</h3>\n";
+	echo '<div id="headernewthreads" class="pagetitle"><h2>New Forum Posts</h2></div>';
 	echo "<p><a href=\"newthreads.php?cid=$cid&markallread=true\">Mark all Read</a></p>";
 
 	if (count($lastpost)>0) {

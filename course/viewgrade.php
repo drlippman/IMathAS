@@ -17,7 +17,7 @@
 	$row = mysql_fetch_row($result);
 	$pagetitle = "View Grade";
 	require("../header.php");
-	echo "<h2>View Grade</h2>";
+	echo '<div id="headerviewgrade" class="pagetitle"><h2>View Grade</h2></div>';
 	echo "<p>Grade on <b>{$row[4]}</b> for <b>{$row[1]} {$row[0]}</b></p>";
 	echo "<p>Grade: <b>{$row[2]}</b></p>";
 	if (trim($row[3])!='') {

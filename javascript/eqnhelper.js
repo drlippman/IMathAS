@@ -184,9 +184,14 @@ function showeedd(eln) {
 		var dd = document.getElementById("eedd");
 		var el = document.getElementById(eln);
 		p = findPos(el);
-		dd.style.left = p[0] + "px";
-		dd.style.top = (p[1] + el.offsetHeight) + "px";
-		dd.style.width = el.offsetWidth + "px";
+		//dd.style.left = p[0] + "px";
+		//dd.style.top = (p[1] + el.offsetHeight) + "px";
+		//dd.style.width = el.offsetWidth + "px";
+		dd.style.left = (p[0]+el.offsetWidth) + "px";
+		dd.style.top = p[1] + "px";
+		dd.style.height = (el.offsetHeight-2) + "px";
+		dd.style.lineHeight = el.offsetHeight + "px";
+		dd.style.width = "10px";
 		dd.style.display = "block";
 	}
 	cureedd = eln;

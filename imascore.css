@@ -3,8 +3,8 @@ html {
 }
 body {
 	height: 100%;
-	margin: 10px;
-	padding: 0px;
+	margin: 0px;
+	padding: 10px;
 }
 div {
 	margin: 0px;
@@ -16,6 +16,9 @@ p {
 }
 br {
 	line-height: 1em;
+}
+div.pagetitle h2 {
+	margin: 10px 0px 20px 0px;
 }
 div.item {
 	margin-bottom: 10px;
@@ -209,6 +212,10 @@ span.padright {
 .clear {
 	clear: both;
 }
+br.clear {
+	line-height: 0px;
+	height: 0px;
+}
 span.hdr1 {
 	font-size: 120%;
 	font-weight: bold;
@@ -218,7 +225,7 @@ span.hdr1 {
 }
 #leftcontent {
 		position: absolute;
-		left: 10px;
+		left: 0px;
 		width:170px;
 		padding:5px;
 		margin-top:10px;
@@ -231,6 +238,10 @@ span.hdr1 {
 		margin-right: 10px;
 }
 
+.midwrapper {
+	position: relative;
+}
+	
 .red {
 	color: red;
 }
@@ -336,10 +347,111 @@ div.tips {
 
 #headerlogo {
 	position: absolute; 
-	right:5px; 
-	top: 12px; 
+	right:0px; 
+	top: 7px; 
 	cursor: pointer;
 }
 a {
 	outline: none;
 }
+
+ul#navlist
+{
+clear: both;
+padding: 0px;
+margin: 0px;
+list-style-type: none;
+float: left;
+width: 100%;
+color: #fff;
+background-color: #036;
+}
+
+ul#navlist li { 
+display: inline;
+}
+
+ul#navlist li a
+{
+float: left;
+/*width: 5em;*/
+color: #fff;
+background-color: #036;
+padding: 0.2em 1em;
+text-decoration: none;
+border-right: 1px solid #fff;
+}
+
+ul#navlist li a:hover
+{
+background-color: #369;
+color: #fff;
+}
+
+div.additembox {
+	margin-bottom: 2px;
+}
+div.additembox span {
+	font-size: 85%;
+	background-color: #ccc;
+	padding: 0 10px;
+}
+
+a.abutton {
+	text-align: center;
+	border: 1px solid #000;
+	padding: 2px 15px;	
+	background-color: #fff;
+	min-width: 100px;
+	color: #000;
+}
+a.abutton:hover {
+	background-color: #ccf;
+	text-decoration: none;
+}
+
+.newnote {
+	color: #f00;
+}
+div#leftcolumn {float: left; width: 25%;}
+div#rightcolumn {float: right; width: 74%; min-width: 250px;}
+ul.courselist {
+	margin: 5px;
+	margin-left: 0px;
+	margin-top: 0px;
+}
+ul.courselist li {
+	border-bottom: 1px solid #999;
+	padding: 1px 5px;
+}
+ul.courselist li:last-child {
+	border: 0;
+	margin-bottom: 15px;
+}
+div.block h3 {
+	margin: 2px;
+}
+div#viewbuttoncont {
+	float: right;
+	background: #fff;
+}
+div#viewbuttoncont a {
+	color: #fff;
+	display: inline-block;	
+	padding: 3px 5px;
+	margin-left: 2px;
+}
+div#viewbuttoncont a:hover {
+	text-decoration: none;
+}
+div#viewbuttoncont a.buttonactive {
+	background-color: #369;
+	cursor: default;
+}
+div#viewbuttoncont a.buttoninactive {
+	background-color: #69a;
+}
+div#viewbuttoncont a.buttoninactive:hover {
+	background-color: #036;
+}
+	

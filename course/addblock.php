@@ -40,9 +40,9 @@ $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$cou
 $curBreadcrumb .= (isset($_GET['id'])) ? "&gt; Modify Block\n" : "&gt; Add Block\n";
 
 if (isset($_GET['id'])) {
-	$formTitle = "<h2>Modify Block <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=blocks','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h2>\n";
+	$formTitle = "<div id=\"headeraddblock\" class=\"pagetitle\"><h2>Modify Block <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=blocks','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h2></div>\n";
 } else {
-	$formTitle = "<h2>Add Block <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=blocks','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h2>\n";
+	$formTitle = "<div id=\"headeraddblock\" class=\"pagetitle\"><h2>Add Block <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=blocks','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h2></div>\n";
 }
 if (isset($_GET['tb'])) {
 	$totb = $_GET['tb'];
@@ -82,6 +82,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$fixedheight = intval($_POST['fixedheight']);
 	} else {
 		$fixedheight = 0;
+	}
+	
+	$grouplimit = array();
+	if ($_POST['grouplimit']!='none') {
+		$grouplimit[] = $_POST['grouplimit'];
 	}
 	//$_POST['title'] = str_replace(array(',','\\"','\\\'','~'),"",$_POST['title']);
 
@@ -131,6 +136,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$sub[$existingid]['colors'] = $colors;
 		$sub[$existingid]['public'] = $public;
 		$sub[$existingid]['fixedheight'] = $fixedheight;
+		$sub[$existingid]['grouplimit'] = $grouplimit;	
 	} else { //add new
 		$blockitems = array();
 		$blockitems['name'] = stripslashes($_POST['title']);
@@ -142,6 +148,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$blockitems['colors'] = $colors;
 		$blockitems['public'] = $public;
 		$blockitems['fixedheight'] = $fixedheight;
+		$blockitems['grouplimit'] = $grouplimit;	
 		$blockitems['items'] = array();
 		if ($totb=='b') {
 			array_push($sub,$blockitems);
@@ -203,6 +210,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$usedef = 0;
 		}
 		$fixedheight = $blockitems[$existingid]['fixedheight'];
+		$grouplimit = $blockitems[$existingid]['grouplimit'];
 		
 			
 
@@ -220,6 +228,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$bi = "#EEEEFF";
 		$usedef = 1;
 		$fixedheight = 0;
+		$grouplimit = array();
 		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$items = unserialize(mysql_result($result,0,0));
@@ -231,7 +240,15 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$existBlocksLabels = array();
 	buildExistBlocksArray($items,'0');
 	
-
+	$page_sectionlistval = array("none");
+	$page_sectionlistlabel = array("No restriction");
+	$query = "SELECT DISTINCT section FROM imas_students WHERE courseid='$cid' ORDER BY section";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	while ($row = mysql_fetch_row($result)) {
+		$page_sectionlistval[] = 's-'.$row[0];
+		$page_sectionlistlabel[] = 'Section '.$row[0];
+	}
+	
 	if ($startdate!=0) {
 		$sdate = tzdate("m/d/Y",$startdate);
 		$stime = tzdate("g:i a",$startdate);
@@ -332,6 +349,11 @@ if ($overwriteBody==1) {
 	<span class="form">If expanded, limit height to:</span>
 	<span class="formright">
 	<input type="text" name="fixedheight" size="4" value="<?php if ($fixedheight>0) {echo $fixedheight;};?>" />pixels (blank for no limit)
+	</span><br class="form" />
+	
+	<span class="form">Restrict access to students in section:</span>
+	<span class="formright">
+	<?php writeHtmlSelect('grouplimit',$page_sectionlistval,$page_sectionlistlabel,$grouplimit[0]); ?>
 	</span><br class="form" />
 	
 	<span class=form>Make items publicly accessible<sup>*</sup>:</span>

@@ -121,7 +121,7 @@ if ($overwriteBody==1) {
 
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";	
 	echo "&gt; Mass Change Dates</div>\n";
-	echo "<h2>Mass Change Dates</h2>";
+	echo '<div id="headermasschgdates" class="pagetitle"><h2>Mass Change Dates</h2></div>';
 	echo '<script type="text/javascript">';
 	echo 'var basesdates = new Array(); var baseedates = new Array(); var baserdates = new Array();';
 	echo '</script>';

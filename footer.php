@@ -1,6 +1,11 @@
 <div class="clear"></div>
 </div>
-<div class="footerwrapper"></div>
+<div class="footerwrapper"><?php
+	$curdir = rtrim(dirname(__FILE__), '/\\');
+	if (file_exists("footercontent.php")) {
+		require("footercontent.php");
+	}
+?></div>
 </div>
 <?php
 if (isset($useeditor) && $sessiondata['useed']==1) {
@@ -9,6 +14,11 @@ if (isset($useeditor) && $sessiondata['useed']==1) {
 if (isset($useeqnhelper) && $useeqnhelper==true) {
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	require("$curdir/assessment/eqnhelper.html");
+}
+if ((isset($testsettings) && $testsettings['showtips']==2) || (isset($showtips) && $showtips==2)) {
+	echo '<div id="ehdd" class="ehdd"><span id="ehddtext"></span> <span onclick="showeh(curehdd);" style="cursor:pointer;">[more..]</span></div>';
+	echo '<div id="eh" class="eh"></div>';
+	
 }
 ?>
 </body>

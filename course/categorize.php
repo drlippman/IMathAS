@@ -70,7 +70,7 @@ END;
 			$extracats[] = $line['category'];
 		}
 	}
-	
+	echo '<div id="headercategorize" class="pagetitle"><h2>Categorize Questions</h2></div>';
 	echo "<form method=post action=\"categorize.php?aid=$aid&cid=$cid&record=true\">";
 	echo "<table><thead><tr><th>Description</th><th>Category</th></tr></thead><tbody>";
 	

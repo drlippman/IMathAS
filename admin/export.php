@@ -251,7 +251,7 @@ function setlibnames(libn) {
 </script>
 
 <?php echo $curBreadcrumb; ?>
-	
+	<div id="headerexport" class="pagetitle"><h2>Question Export</h2></div>
 	<form method=post action="export.php?cid=<?php echo $cid ?>">	
 	<h3>Questions Marked for Export</h3>
 	

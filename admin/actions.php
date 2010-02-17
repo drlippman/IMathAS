@@ -110,90 +110,119 @@ switch($_GET['action']) {
 		session_destroy();
 		break;
 	case "modify":
-		if ($myrights < 40) { echo "You don't have the authority for this action"; break;}
-		$topbar = array();
-		if (isset($_POST['stutopbar'])) {
-			$topbar[0] = implode(',',$_POST['stutopbar']);
-		} else {
-			$topbar[0] = '';
-		}
-		if (isset($_POST['insttopbar'])) {
-			$topbar[1] = implode(',',$_POST['insttopbar']);
-		} else {
-			$topbar[1] = '';
-		}
-		
-		if (isset($_POST['chatset'])) {
-			$chatset = 1;
-		} else {
-			$chatset = 0;
-		}
-		if (isset($_POST['showlatepass'])) {
-			$showlatepass = 1;
-		} else {
-			$showlatepass = 0;
-		}
-		$unenroll = $_POST['allowunenroll'] + $_POST['allowenroll'];
-		$topbar = implode('|',$topbar);
-		
-		$hideicons = $_POST['HIassess'] + $_POST['HIinline'] + $_POST['HIlinked'] + $_POST['HIforum'] + $_POST['HIblock'];
-		$avail = 3 - $_POST['stuavail'] - $_POST['teachavail'];
-		if (isset($_POST['msgmonitor'])) {
-			$_POST['msgset'] += 5;
-		}
-		if (isset($_POST['ltisecret'])) {
-			$_POST['ltisecret'] = trim($_POST['ltisecret']);
-		} else {
-			$_POST['ltisecret'] = '';
-		}
-		
-		$query = "UPDATE imas_courses SET name='{$_POST['coursename']}',enrollkey='{$_POST['ekey']}',hideicons='$hideicons',available='$avail',lockaid='{$_POST['lockaid']}',picicons='{$_POST['picicons']}',chatset=$chatset,showlatepass=$showlatepass,";
-		$query .= "allowunenroll='$unenroll',copyrights='{$_POST['copyrights']}',msgset='{$_POST['msgset']}',topbar='$topbar',cploc='{$_POST['cploc']}',theme='{$_POST['theme']}',ltisecret='{$_POST['ltisecret']}' WHERE id='{$_GET['id']}'";
-		if ($myrights<75) { $query .= " AND ownerid='$userid'";}
-		mysql_query($query) or die("Query failed : " . mysql_error());
-		break;
 	case "addcourse":
 		if ($myrights < 40) { echo "You don't have the authority for this action"; break;}
-		$topbar = array();
-		if (isset($_POST['stutopbar'])) {
-			$topbar[0] = implode(',',$_POST['stutopbar']);
+		
+		if (isset($CFG['CPS']['theme']) && $CFG['CPS']['theme'][1]==0) {
+			$theme = addslashes($CFG['CPS']['theme'][0]);
 		} else {
-			$topbar[0] = '';
+			$theme = $_POST['theme'];
 		}
-		if (isset($_POST['insttopbar'])) {
-			$topbar[1] = implode(',',$_POST['insttopbar']);
+		
+		if (isset($CFG['CPS']['picicons']) && $CFG['CPS']['picicons'][1]==0) {
+			$picicons = $CFG['CPS']['picicons'][0];
 		} else {
-			$topbar[1] = '';
+			$picicons = $_POST['picicons'];
 		}
-		if (isset($_POST['chatset'])) {
-			$chatset = 1;
+		if (isset($CFG['CPS']['hideicons']) && $CFG['CPS']['hideicons'][1]==0) {
+			$hideicons = $CFG['CPS']['hideicons'][0];
 		} else {
-			$chatset = 0;
+			$hideicons = $_POST['HIassess'] + $_POST['HIinline'] + $_POST['HIlinked'] + $_POST['HIforum'] + $_POST['HIblock'];
 		}
-		if (isset($_POST['showlatepass'])) {
-			$showlatepass = 1;
+		
+		if (isset($CFG['CPS']['unenroll']) && $CFG['CPS']['unenroll'][1]==0) {
+			$unenroll = $CFG['CPS']['unenroll'][0];
 		} else {
-			$showlatepass = 0;
+			$unenroll = $_POST['allowunenroll'] + $_POST['allowenroll'];
 		}
-		$unenroll = $_POST['allowunenroll'] + $_POST['allowenroll'];
+		
+		if (isset($CFG['CPS']['copyrights']) && $CFG['CPS']['copyrights'][1]==0) {
+			$copyrights = $CFG['CPS']['copyrights'][0];
+		} else {
+			$copyrights = $_POST['copyrights'];
+		}
+		
+		if (isset($CFG['CPS']['msgset']) && $CFG['CPS']['msgset'][1]==0) {
+			$msgset = $CFG['CPS']['msgset'][0];
+		} else {
+			$msgset = $_POST['msgset'];
+			if (isset($_POST['msgmonitor'])) {
+				$_POST['msgset'] += 5;
+			}
+		}
+		
+		if (isset($CFG['CPS']['chatset']) && $CFG['CPS']['chatset'][1]==0) {
+			$chatset = intval($CFG['CPS']['chatset'][0]);
+		} else {
+			if (isset($_POST['chatset'])) {
+				$chatset = 1;
+			} else {
+				$chatset = 0;
+			}
+		}      
+		
+		if (isset($CFG['CPS']['showlatepass']) && $CFG['CPS']['showlatepass'][1]==0) {
+			$showlatepass = intval($CFG['CPS']['showlatepass'][0]);
+		} else {
+			if (isset($_POST['showlatepass'])) {
+				$showlatepass = 1;
+			} else {
+				$showlatepass = 0;
+			}
+		}
+		
+		if (isset($CFG['CPS']['topbar']) && $CFG['CPS']['topbar'][1]==0) {
+			$topbar = $CFG['CPS']['topbar'][0];
+		} else {
+			$topbar = array();
+			if (isset($_POST['stutopbar'])) {
+				$topbar[0] = implode(',',$_POST['stutopbar']);
+			} else {
+				$topbar[0] = '';
+			}
+			if (isset($_POST['insttopbar'])) {
+				$topbar[1] = implode(',',$_POST['insttopbar']);
+			} else {
+				$topbar[1] = '';
+			}
+			$topbar[2] = $_POST['topbarloc'];
+		}
 		$topbar = implode('|',$topbar);
-		$hideicons = $_POST['HIassess'] + $_POST['HIinline'] + $_POST['HIlinked'] + $_POST['HIforum'] + $_POST['HIblock'];
+		
+		
+		if (isset($CFG['CPS']['cploc']) && $CFG['CPS']['cploc'][1]==0) {
+			$cploc = $CFG['CPS']['cploc'][0];
+		} else {
+			$cploc = $_POST['cploc'] + $_POST['cplocstu'] + $_POST['cplocview'];
+		} 
+		
 		$avail = 3 - $_POST['stuavail'] - $_POST['teachavail'];
-		if (isset($_POST['msgmonitor'])) {
-			$_POST['msgset'] += 5;
-		}
+		
 		$_POST['ltisecret'] = trim($_POST['ltisecret']);
-		$itemorder = addslashes(serialize(array()));
-		$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,chatset,showlatepass,itemorder,topbar,cploc,available,theme,ltisecret) VALUES ";
-		$query .= "('{$_POST['coursename']}','$userid','{$_POST['ekey']}','$hideicons','{$_POST['picicons']}','$unenroll','{$_POST['copyrights']}','{$_POST['msgset']}',$chatset,$showlatepass,'$itemorder','$topbar','{$_POST['cploc']}','$avail','{$_POST['theme']}','{$_POST['ltisecret']}');";
-		mysql_query($query) or die("Query failed : " . mysql_error());
-		$cid = mysql_insert_id();
-		//if ($myrights==40) {
-			$query = "INSERT INTO imas_teachers (userid,courseid) VALUES ('$userid','$cid')";
+		
+		if ($_GET['action']=='modify') {
+			$query = "UPDATE imas_courses SET name='{$_POST['coursename']}',enrollkey='{$_POST['ekey']}',hideicons='$hideicons',available='$avail',lockaid='{$_POST['lockaid']}',picicons='$picicons',chatset=$chatset,showlatepass=$showlatepass,";
+			$query .= "allowunenroll='$unenroll',copyrights='$copyrights',msgset='$msgset',topbar='$topbar',cploc='$cploc',theme='$theme',ltisecret='{$_POST['ltisecret']}' WHERE id='{$_GET['id']}'";
+			if ($myrights<75) { $query .= " AND ownerid='$userid'";}
 			mysql_query($query) or die("Query failed : " . mysql_error());
-		//}
-		$query = "INSERT INTO imas_gbscheme (courseid) VALUES ('$cid')";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		} else {
+			$itemorder = addslashes(serialize(array()));
+			$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,chatset,showlatepass,itemorder,topbar,cploc,available,theme,ltisecret) VALUES ";
+			$query .= "('{$_POST['coursename']}','$userid','{$_POST['ekey']}','$hideicons','$picicons','$unenroll','$copyrights','$msgset',$chatset,$showlatepass,'$itemorder','$topbar','$cploc','$avail','$theme','{$_POST['ltisecret']}');";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			$cid = mysql_insert_id();
+			//if ($myrights==40) {
+				$query = "INSERT INTO imas_teachers (userid,courseid) VALUES ('$userid','$cid')";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			//}
+			$useweights = intval(isset($CFG['GBS']['useweights'])?$CFG['GBS']['useweights']:0);
+			$orderby = intval(isset($CFG['GBS']['orderby'])?$CFG['GBS']['orderby']:0);
+			$defgbmode = intval(isset($CFG['GBS']['defgbmode'])?$CFG['GBS']['defgbmode']:21);
+			$usersort = intval(isset($CFG['GBS']['usersort'])?$CFG['GBS']['usersort']:0);
+			
+			$query = "INSERT INTO imas_gbscheme (courseid,useweights,orderby,defgbmode,usersort) VALUES ('$cid',$useweights,$orderby,$defgbmode,$usersort)";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+		}
 		break;
 	case "delete":
 		if ($myrights < 40) { echo "You don't have the authority for this action"; break;}

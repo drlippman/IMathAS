@@ -229,7 +229,7 @@ if ($overwriteBody==1) {
 ?> 	
 	
 	<div class=breadcrumb><?php echo $curBreadcrumb  ?></div>
-	<h2><?php echo $pagetitle ?></h2>
+	<div id="headeraddlinkedtext" class="pagetitle"><h2><?php echo $pagetitle ?></h2></div>
 
 
 	<form enctype="multipart/form-data" method=post action="<?php echo $page_formActionTag ?>">

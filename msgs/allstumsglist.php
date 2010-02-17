@@ -50,7 +50,7 @@
 		echo "&gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
 	}
 	echo "&gt; <a href=\"msglist.php?cid=$cid\">Message List</a> &gt; Student Messages</div>";
-	echo "<h3>Messages</h3>";	
+	echo '<div id="headerallstumsglist" class="pagetitle"><h2>All Student Messages</h2></div>';
 	
 	$query = "SELECT COUNT(id) FROM imas_msgs WHERE courseid='$cid' AND (isread<2 OR isread>3)";
 	if ($filterstu>0) {

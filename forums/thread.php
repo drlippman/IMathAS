@@ -245,7 +245,7 @@
 
 			require("../header.php");
 			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
-			echo "&gt; <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> &gt;";
+			echo "&gt; <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> &gt; ";
 			if ($_GET['modify']!="new") {
 				echo "Modify Thread</div>\n";
 				$query = "SELECT * from imas_forum_posts WHERE id='{$_GET['modify']}'";
@@ -294,7 +294,7 @@
 				echo ">Displayed at top and locked (no replies)<br>\n";
 				echo "<input type=radio name=type value=3 ";
 				if ($line['posttype']==3) { echo "checked=1";}
-				echo ">Displayed at top and replies hidden from students\n";
+				echo ">Displayed at top and students can only see their own replies\n";
 				echo "</span><br class=form>";
 				echo "<span class=form>Allow replies:</span><span class=formright>\n";
 				echo "<input type=radio name=replyby value=\"null\" ";
@@ -384,8 +384,8 @@
 	
 	
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Forum Topics</div>\n";
-	echo "<h3>Forum - $forumname</h3>\n";
-	
+	echo '<div id="headerthread" class="pagetitle"><h2>Forum: '.$forumname.'</h2></div>';
+
 	$query = "SELECT threadid,COUNT(id) AS postcount,MAX(postdate) AS maxdate FROM imas_forum_posts ";
 	$query .= "WHERE forumid='$forumid' ";
 	if ($dofilter) {
@@ -468,9 +468,13 @@
 			echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 			if ($page>1) {
 				echo "<a href=\"thread.php?page=".($page-1)."&cid=$cid&forum=$forumid\">Previous</a> ";
+			} else {
+				echo "Previous ";
 			}
 			if ($page < $numpages) {
-				echo "<a href=\"thread.php?page=".($page+1)."&cid=$cid&forum=$forumid\">Next</a> ";
+				echo "| <a href=\"thread.php?page=".($page+1)."&cid=$cid&forum=$forumid\">Next</a> ";
+			} else {
+				echo "| Next ";
 			}
 			echo "</div>\n";
 		}

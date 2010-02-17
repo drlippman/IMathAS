@@ -71,14 +71,37 @@ function tipshow(el,tip) {
 		tipobj.className = "tips";
 		document.getElementsByTagName("body")[0].appendChild(tipobj);
 	} 
-	tipobj.style.display = "block";
 	tipobj.innerHTML = tip;
+	tipobj.style.display = "block";
+	
 	if (typeof AMnoMathML!='undefined' && typeof noMathRender != 'undefined') {
 		if (!AMnoMathML && !noMathRender) {
 			AMprocessNode(tipobj);
 		}
 	}
 	var p = findPos(el);
+
+	if (self.innerHeight) {
+                x = self.innerWidth;
+        } else if (document.documentElement && document.documentElement.clientHeight) {
+                x = document.documentElement.clientWidth;
+        } else if (document.body) {
+                x = document.body.clientWidth;
+        }
+        var scrOfX = 0;
+        if( typeof( window.pageYOffset ) == 'number' ) {
+	    scrOfX = window.pageXOffset;
+	  } else if( document.body && ( document.body.scrollLeft || document.body.scrollTop ) ) {
+	    scrOfX = document.body.scrollLeft;
+	  } else if( document.documentElement && ( document.documentElement.scrollLeft || document.documentElement.scrollTop ) ) {
+	    scrOfX = document.documentElement.scrollLeft;
+	  }
+
+        x += scrOfX;
+        if ((p[0] + tipobj.offsetWidth)>x) {
+        	p[0] = x - tipobj.offsetWidth - 30;
+        }
+        
 	tipobj.style.left = (p[0]+20) + "px";
 	if (p[1] < 30) {
 		tipobj.style.top = (p[1]+20) + "px";
@@ -87,8 +110,11 @@ function tipshow(el,tip) {
 	}
 }
 
-function popupwindow(content,width,height) {
+function popupwindow(content,width,height,scroll) {
 	var attr = "width="+width+",height="+height+",status=0,resizeable=1,directories=0,menubar=0";
+	if (scroll!=null && scroll==true) {
+		attr += ",scrollbars=1";
+	}
 	if (content.match(/^http/)) {
 		window.open(content,"popup",attr);
 	} else {

@@ -24,6 +24,12 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = "";
 $hasInclude = 0;
+if (!isset($CFG['GEN']['allowinstraddstus'])) {
+	$CFG['GEN']['allowinstraddstus'] = true;
+}
+if (!isset($CFG['GEN']['allowinstraddtutors'])) {
+	$CFG['GEN']['allowinstraddtutors'] = true;
+}
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n";
 
 if (!isset($teacherid)) { // loaded by a NON-teacher
@@ -37,7 +43,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 	
 	if (isset($_GET['assigncode'])) {
 		
-		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Assign Codes\n";
+		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Assign Codes\n";
 		$pagetitle = "Assign Section/Code Numbers";
 		
 		if (isset($_POST['submit'])) {
@@ -69,7 +75,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		}
 	} elseif (isset($_GET['enroll'])) {
 
-		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Enroll Students\n";
+		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Enroll Students\n";
 		$pagetitle = "Enroll an Existing User";
 		
 		if (isset($_POST['username'])) {
@@ -101,8 +107,8 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			}
 			
 		} 
-	} elseif (isset($_GET['newstu'])) {
-		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Enroll Students\n";
+	} elseif (isset($_GET['newstu']) && $CFG['GEN']['allowinstraddstus']) {
+		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Enroll Students\n";
 		$pagetitle = "Enroll a New Student";	
 	
 		if (isset($_POST['SID'])) {
@@ -135,7 +141,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			}
 		} 
 	} elseif (isset($_GET['chgstuinfo'])) {
-		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Enroll Students\n";	
+		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Enroll Students\n";	
 		$pagetitle = "Change Student Info";
 		
 		if (isset($_POST['firstname'])) {
@@ -233,12 +239,12 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		} else {
 			$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n"; 
-			$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Confirm Change\n";
+			$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Confirm Change\n";
 			$pagetitle = "Confirm Change";
 		}
 	} elseif (isset($_GET['action']) && $_GET['action']=="unenroll" ) {
 		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n"; 
-		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Confirm Change\n";
+		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Confirm Change\n";
 		$pagetitle = "Unenroll Students";		
 		$calledfrom='lu';
 		$overwriteBody = 1;
@@ -246,8 +252,8 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		
 	} else { //DEFAULT DATA MANIPULATION HERE
 	 
-		$curBreadcrumb .= " &gt; List Students\n";
-		$pagetitle = "Students";
+		$curBreadcrumb .= " &gt; Roster\n";
+		$pagetitle = "Student Roster";
 		
 		$query = "SELECT DISTINCT section FROM imas_students WHERE imas_students.courseid='$cid' AND imas_students.section IS NOT NULL ORDER BY section";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -323,12 +329,13 @@ if ($overwriteBody==1) {
 		echo $body;
 	}
 } else {	
-
+?>
+	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
+	<div id="headerlistusers" class="pagetitle"><h2><?php echo $pagetitle ?></h2></div>
+<?php
 
 	if (isset($_GET['assigncode'])) {
 ?>
-	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	<h3><?php echo $pagetitle ?></h3>
 	<form method=post action="listusers.php?cid=<?php echo $cid ?>&assigncode=1">
 		<table class=gb>
 			<thead>
@@ -355,8 +362,6 @@ if ($overwriteBody==1) {
 <?php			
 	} elseif (isset($_GET['enroll'])) {
 ?>
-	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	<h3><?php echo $pagetitle ?></h3>
 	<form method=post action="listusers.php?enroll=student&cid=<?php echo $cid ?>">
 		<span class=form>Username to enroll:</span>
 		<span class=formright><input type="text" name="username"></span><br class=form>
@@ -370,8 +375,6 @@ if ($overwriteBody==1) {
 	} elseif (isset($_GET['newstu'])) {
 ?>
 	
-	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	<h3><?php echo $pagetitle ?></h3>
 	<form method=post action="listusers.php?cid=<?php echo $cid ?>&newstu=new">
 		<span class=form><label for="SID"><?php echo $loginprompt;?>:</label></span> <input class=form type=text size=12 id=SID name=SID><BR class=form>
 	<span class=form><label for="pw1">Choose a password:</label></span><input class=form type=password size=20 id=pw1 name=pw1><BR class=form>
@@ -388,8 +391,6 @@ if ($overwriteBody==1) {
 <?php 
 	} elseif (isset($_GET['chgstuinfo'])) {
 ?>
-	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	<h3><?php echo $pagetitle ?></h3>
 		<form enctype="multipart/form-data" method=post action="listusers.php?cid=<?php echo $cid ?>&chgstuinfo=true&uid=<?php echo $_GET['uid'] ?>"/>
 			<span class=form><label for="username">Enter User Name (login name):</label></span>
 			<input class=form type=text size=20 id=username name=username value="<?php echo $lineStudent['SID'] ?>"/><br class=form>
@@ -430,7 +431,6 @@ if ($overwriteBody==1) {
 <?php		
 	} elseif (isset($_GET['action']) && $_GET['action']=="resetpw") {
 ?>
-		<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
 		<form method=post action="listusers.php?cid=<?php echo $cid ?>&action=<?php echo $_GET['action'] ?>&uid=<?php echo $_GET['uid'] ?>&confirmed=true">
 
 		Are you sure you want to reset this student's password	
@@ -444,10 +444,7 @@ if ($overwriteBody==1) {
 <?php		
 	} else {
 ?>	
-	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	<h3><?php echo $pagetitle ?></h3>
-
-
+	
 	<script type="text/javascript">
 	function chkAll(frm, arr, mark) {
 	  for (i = 0; i <= frm.elements.length; i++) {
@@ -565,15 +562,19 @@ if ($overwriteBody==1) {
 		
 
 	<div class=cp>
-		<a href="<?php echo $imasroot ?>/admin/importstu.php?cid=<?php echo $cid ?>">
-		Import Students from File</a><br/>
-		<a href="listusers.php?cid=<?php echo $cid ?>&enroll=student">Enroll Student with known username</a><br/>
-		<a href="listusers.php?cid=<?php echo $cid ?>&newstu=new">Create and Enroll new student</a><br/>
-		<a href="enrollfromothercourse.php?cid=<?php echo $cid ?>">Enroll students from another course</a><br/>
-		<a href="listusers.php?cid=<?php echo $cid ?>&assigncode=1">Assign Sections and/or Codes</a><br/>
-		<a href="latepasses.php?cid=<?php echo $cid ?>">Manage LatePasses</a><br/>
-		<a href="managetutors.php?cid=<?php echo $cid ?>">Manage Tutors</a>
-		
+	<?php
+	echo "<a href=\"listusers.php?cid=$cid&enroll=student\">Enroll Student with known username</a><br/>";
+	if ($CFG['GEN']['allowinstraddstus']) { 
+		echo "<a href=\"$imasroot/admin/importstu.php?cid=$cid\">Import Students from File</a><br/>";
+		echo "<a href=\"listusers.php?cid=$cid&newstu=new\">Create and Enroll new student</a><br/>";
+		echo "<a href=\"enrollfromothercourse.php?cid=$cid\">Enroll students from another course</a><br/>";
+	}
+	echo "<a href=\"listusers.php?cid=$cid&assigncode=1\">Assign Sections and/or Codes</a><br/>";
+	echo "<a href=\"latepasses.php?cid=$cid\">Manage LatePasses</a>";
+	if ($CFG['GEN']['allowinstraddtutors']) {
+		echo "<br/><a href=\"managetutors.php?cid=$cid\">Manage Tutors</a>";
+	}
+	?>
 	</div>
 	<p></p>
 <?php

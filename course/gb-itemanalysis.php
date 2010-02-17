@@ -20,6 +20,11 @@
 	} else {
 		$stu = 0;
 	}
+	if (isset($_GET['from'])) {
+		$from = $_GET['from'];
+	} else {
+		$from = 'gb';
+	}
 	
 	$catfilter = -1;
 	$secfilter = -1;
@@ -41,9 +46,11 @@
 	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 	if ($stu==-1) {
 		echo "&gt; <a href=\"gradebook.php?stu=$stu&cid=$cid\">Averages</a> ";
+	} else if ($from=='isolate') {
+		echo "&gt; <a href=\"isolateassessgrade.php?cid=$cid&aid=$aid\">View Scores</a> ";
 	}
 	echo "&gt; Item Analysis</div>";
-	echo "<h2>Item Analysis: \n";
+	echo '<div id="headergb-itemanalysis" class="pagetitle"><h2>Item Analysis: ';
 	$aid = $_GET['aid'];
 	$qtotal = array();
 	$qcnt = array();
@@ -55,7 +62,7 @@
 	$query = "SELECT defpoints,name,itemorder FROM imas_assessments WHERE id='$aid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$defpoints = mysql_result($result,0,0);
-	echo mysql_result($result,0,1).'</h2>';
+	echo mysql_result($result,0,1).'</h2></div>';
 	$itemorder = mysql_result($result,0,2);
 	$itemarr = array();
 	$itemnum = array();

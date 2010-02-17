@@ -314,30 +314,31 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$line['avail'] = 1;
 			$line['reviewdate'] = 0;
 			$timelimit = 0;
-			$line['displaymethod']= "SkipAround";
-			$line['defpoints'] = 10;
-			$line['defattempts'] = 1;
+			$line['displaymethod']= isset($CFG['AMS']['displaymethod'])?$CFG['AMS']['displaymethod']:"SkipAround";
+			$line['defpoints'] = isset($CFG['AMS']['defpoints'])?$CFG['AMS']['defpoints']:10;
+			$line['defattempts'] = isset($CFG['AMS']['defattempts'])?$CFG['AMS']['defattempts']:1;
 			$line['password'] = '';
 			//$line['deffeedback'] = "AsGo";
-			$testtype = "AsGo";
-			$showans = "A";
-			$line['defpenalty'] = 10;
-			$line['shuffle'] = 0;
-			$line['minscore'] = 0;
-			$line['isgroup'] = 0;
-			$line['showhints']=1;
+			$testtype = isset($CFG['AMS']['testtype'])?$CFG['AMS']['testtype']:"AsGo";
+			$showans = isset($CFG['AMS']['showans'])?$CFG['AMS']['showans']:"A";
+			$line['defpenalty'] = isset($CFG['AMS']['defpenalty'])?$CFG['AMS']['defpenalty']:10;
+			$line['shuffle'] = isset($CFG['AMS']['shuffle'])?$CFG['AMS']['shuffle']:0;
+			$line['minscore'] = isset($CFG['AMS']['minscore'])?$CFG['AMS']['minscore']:0;
+			$line['isgroup'] = isset($CFG['AMS']['isgroup'])?$CFG['AMS']['isgroup']:0;
+			$line['showhints']=isset($CFG['AMS']['showhints'])?$CFG['AMS']['showhints']:1;
 			$line['reqscore'] = 0;
 			$line['reqscoreaid'] = 0;
-			$line['noprint'] = 0;
-			$line['groupmax'] = 6;
 			$line['groupsetid'] = 0;
-			$line['allowlate'] = 1;
-			$line['exceptionpenalty'] = 0;
-			$line['tutoredit'] = 0;
+			$line['noprint'] = isset($CFG['AMS']['noprint'])?$CFG['AMS']['noprint']:0;
+			$line['groupmax'] = isset($CFG['AMS']['groupmax'])?$CFG['AMS']['groupmax']:6;
+			$line['allowlate'] = isset($CFG['AMS']['allowlate'])?$CFG['AMS']['allowlate']:1;
+			$line['exceptionpenalty'] = isset($CFG['AMS']['exceptionpenalty'])?$CFG['AMS']['exceptionpenalty']:0;
+			$line['tutoredit'] = isset($CFG['AMS']['tutoredit'])?$CFG['AMS']['tutoredit']:0;
+			$line['eqnhelper'] = isset($CFG['AMS']['eqnhelper'])?$CFG['AMS']['eqnhelper']:0;
 			$line['eqnhelper'] = 0;
 			$line['ltisecret'] = '';
-			$line['caltag'] = '?R';
-			$line['showtips'] = 1;
+			$line['caltag'] = isset($CFG['AMS']['caltag'])?$CFG['AMS']['caltag']:'?R';
+			$line['showtips'] = isset($CFG['AMS']['showtips'])?$CFG['AMS']['showtips']:1;
 			$gbcat = 0;
 			$cntingb = 1;
 			$pcntingb = 3;
@@ -391,9 +392,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		
 		if (isset($_GET['id'])) {
-			$formTitle = "<h2>Modify Assessment <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h2>\n";
+			$formTitle = "<div id=\"headeraddassessment\" class=\"pagetitle\"><h2>Modify Assessment <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h2></div>\n";
 		} else {
-			$formTitle = "<h2>Add Assessment <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h2>\n";
+			$formTitle = "<div id=\"headeraddassessment\" class=\"pagetitle\"><h2>Add Assessment <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h2></div>\n";
 		}
 
 		$page_formActionTag = "addassessment.php?block=$block&cid=$cid";
@@ -680,7 +681,8 @@ if ($overwriteBody==1) {
 			<span class=formright>
 				<select name="showtips">
 					<option value="0" <?php writeHtmlSelected($line['showtips'],0) ?>>No</option>
-					<option value="1" <?php writeHtmlSelected($line['showtips'],1) ?>>Yes</option>
+					<option value="1" <?php writeHtmlSelected($line['showtips'],1) ?>>Yes, after question</option>
+					<option value="2" <?php writeHtmlSelected($line['showtips'],2) ?>>Yes, under answerbox</option>
 				</select>
 			</span><br class=form>
 			
@@ -716,12 +718,16 @@ if ($overwriteBody==1) {
 				<input type=radio name="pcntingb" value="0" <?php writeHtmlChecked($pcntingb,0,0); ?> /> Don't count in grade total and hide from students<br/>
 				<input type=radio name="pcntingb" value="3" <?php writeHtmlChecked($pcntingb,3,0); ?> /> Don't count in grade total<br/>
 			</span><br class=form />
-			
+<?php 
+		if (!isset($CFG['GEN']['allowinstraddtutors']) || $CFG['GEN']['allowinstraddtutors']==true) {
+?>
 			<span class="form">Allow tutors to edit scores?</span>
 			<span class="formright">
 				<input type="checkbox" name="tutoredit" value="1" <?php writeHtmlChecked($line['tutoredit'],1); ?> /> <?php echo $tutoredit; ?>
 			</span><br class="form" />
-			
+<?php 
+		} 
+?>
 			<span class="form">Calendar icon:</span>
 			<span class="formright">
 				Active: <input name="caltagact" type=text size=1 maxlength=1 value="<?php echo $line['caltag']{0};?>"/>, 

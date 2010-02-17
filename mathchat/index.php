@@ -82,20 +82,40 @@ if (isset($_REQUEST['update'])) {
 	}
 	$query .= "ORDER BY mc_msgs.time";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	echo '{"msgs":[';
+	$i =0;
 	while ($row = mysql_fetch_row($result)) {
-		echo '<div class="msg" id="'.$row[2].'"><div class="user">'.$row[0].'</div>';
-		echo '<div class="txt">'.$row[1].'</div></div>';
+		if ($i>0) {echo ',';}
+		$i++;
+		//echo '<div class="msg" id="'.$row[2].'"><div class="user">'.$row[0].'</div>';
+		//echo '<div class="txt">'.$row[1].'</div></div>';
+		echo '{"id": '.$row[2].',"user": "'. str_replace(array('\\','/','"',), array('\\\\','\/','\"'), $row[0]).'",';
+		echo '"msg":"'.str_replace(array('\\','/','"',), array('\\\\','\/','\"'), $row[1]).'"}';
+		
 	}
+	echo '],"users":[';
 	$query = "UPDATE mc_sessions SET lastping=$now WHERE userid='{$mcsession['userid']}'";
 	mysql_query($query) or die("Query failed : " . mysql_error());
 	$on = $now - 15;
-	echo '<div id="userlist">';
+	//echo '<div id="userlist">';
 	$query = "SELECT name FROM mc_sessions WHERE mc_sessions.room='{$mcsession['room']}' AND lastping>$on ORDER BY name";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$i =0;
 	while ($row = mysql_fetch_row($result)) {
-		echo $row[0].'<br/>';
+		//echo $row[0].'<br/>';
+		if ($i>0) {echo ',';}
+		$i++;
+		echo '"'.str_replace(array('\\','/','"',), array('\\\\','\/','\"'), $row[0]).'"';
+		
 	}
-	echo '</div>';
+	echo ']}';
+	//JSON this so we can check for non-new message ids?
+	//$obj = str_replace(array('\\','/','"',), array('\\\\','\/','\"'), $obj);
+        //return '"' . $obj . '"';
+        //{ "msgs": [{"id": 5, "user"="name", "msg": "the text escaped},
+        //	     { blah blha }],
+        //  "users": [ "name","name","name"]
+	//echo '</div>';
 	
 } else {
 	$placeinhead = '<script type="text/javascript">if (typeof window.onload == "function") { var existing = window.onload; window.onload = function() { existing(); updatemsgs();};} else { window.onload = updatemsgs;}';

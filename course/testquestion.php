@@ -82,7 +82,11 @@ if ($myrights<20) {
 	$descr = mysql_result($result,0,2);
 	$lastmod = date("m/d/y g:i a",mysql_result($result,0,3));
 	$ancestors = mysql_result($result,0,4);
-	$showtips = 1;
+	if (isset($CFG['AMS']['showtips'])) {
+		$showtips = $CFG['AMS']['showtips'];
+	} else {
+		$showtips = 1;
+	}
 	
 	$query = "SELECT imas_libraries.name FROM imas_libraries,imas_library_items WHERE imas_libraries.id=imas_library_items.libid AND imas_library_items.qsetid='{$_GET['qsetid']}'";
 	$resultLibNames = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -91,6 +95,9 @@ if ($myrights<20) {
 /******* begin html output ********/
 $sessiondata['coursetheme'] = $coursetheme;
 $flexwidth = true; //tells header to use non _fw stylesheet
+if ($showtips==2) {
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqntips.js?v=012810\"></script>";
+}
 require("../assessment/header.php");
 
 if ($overwriteBody==1) {
@@ -99,6 +106,7 @@ if ($overwriteBody==1) {
 	$useeditor = 1;
 
 	if (isset($_GET['formn']) && isset($_GET['loc'])) {
+		echo '<p>';
 		echo "<script type=\"text/javascript\">";
 		echo "var numchked = -1;";
 		echo "if (window.opener && !window.opener.closed) {";
@@ -122,6 +130,7 @@ if ($overwriteBody==1) {
 			  }
 			}
 			</script>";
+		echo '</p>';
 	}
 
 	if (isset($_GET['checked'])) {

@@ -273,6 +273,7 @@ if ($myrights<20) {
 }
 
 /******* begin html output ********/
+$sessiondata['coursetheme'] = $coursetheme;
 require("../assessment/header.php");
 
 if ($overwriteBody==1) {
@@ -281,7 +282,7 @@ if ($overwriteBody==1) {
 ?>
 	
 	<div class="breadcrumb"><?php echo $curBreadcrumb; ?></div> 
-
+	<div id="headerreviewlibrary" class="pagetitle"><h2>Review Library</h2></div>
 <?php	
 	if (!isset($_REQUEST['lib'])) {
 ?>	

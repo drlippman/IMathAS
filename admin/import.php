@@ -384,7 +384,7 @@ if ($overwriteBody==1) {
 		echo $page_fileNoticeMsg;
 ?>
 
-		<h3>Import Question Set</h3>
+		<div id="headerimport" class="pagetitle"><h2>Import Question Set</h2></div>
 		<form enctype="multipart/form-data" method=post action="import.php?cid=<?php echo $cid ?>">	
 
 <?php	 

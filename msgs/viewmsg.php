@@ -63,6 +63,8 @@
 	} else {
 		echo "&gt; <a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid\">Message List</a> &gt; Message</div>";
 	}
+	echo '<div id="headerviewmsg" class="pagetitle"><h2>Message</h2></div>';
+
 			
 	
 	$msgid = $_GET['msgid'];

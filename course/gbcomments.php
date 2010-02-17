@@ -25,9 +25,9 @@
 		echo "&gt; <a href=\"gbcomments.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid&comtype=$comtype\">Gradebook Comments</a> &gt; Upload Comments</div>";
 		
 		if ($comtype=='stu') {
-			echo "<h3>Upload Student Comments</h3>";
+			echo '<div id="headergbcomments" class="pagetitle"><h2>Upload Student Comments</h2></div>';
 		} else if ($comtype=='instr') {
-			echo "<h3>Upload Instructor Notes</h3>";
+			echo '<div id="headergbcomments" class="pagetitle"><h2>Upload Instructor Notes</h2></div>';
 		}
 		
 		if (isset($_FILES['userfile']['name']) && $_FILES['userfile']['name']!='') {

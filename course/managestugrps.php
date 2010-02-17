@@ -355,9 +355,10 @@ require("../header.php");
 if ($overwriteBody==1) {
 	echo $body;
 } else {	
-	echo "<div class=\"breadcrumb\"$curBreadcrumb</div>";
-	echo "<h3>$pagetitle</h3>";
-
+?>
+	<div class="breadcrumb"><?php echo $curBreadcrumb ?></div>
+	<div id="headermanagestugrps" class="pagetitle"><h2><?php echo $pagetitle ?></h2></div>
+<?php
 	if (isset($_GET['addgrpset'])) {
 		//add new group set
 		echo '<h4>Add new set of student groups</h4>';

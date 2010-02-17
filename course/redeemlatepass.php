@@ -45,7 +45,7 @@
 		if ($numlatepass==0) { //shouldn't get here if 0
 			echo "<p>You have no late passes remaining</p>";
 		} else {
-			echo "<h3>Redeem LatePass</h3>";
+			echo '<div id="headerredeemlatepass" class="pagetitle"><h2>Redeem LatePass</h2></div>';
 			echo "<form method=post action=\"redeemlatepass.php?cid=$cid&aid=$aid&confirm=true\">";
 			echo "<p>You have $numlatepass LatePass(es) remaining.  You can redeem one LatePass for a $hours hour ";
 			echo "extension on this assessment.  Are you sure you want to redeem a LatePass?</p>";

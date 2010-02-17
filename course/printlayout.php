@@ -11,6 +11,7 @@ require("../validate.php");
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Print Layout";
+$flexwidth = true;
 
 	
 	//CHECK PERMISSIONS AND SET FLAGS

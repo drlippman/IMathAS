@@ -4,12 +4,19 @@
 require("config.php");
 if ($_GET['action']!="newuser" && $_GET['action']!="resetpw" && $_GET['action']!="lookupusername") {
 	require("validate.php");
+} else {
+	if (isset($CFG['CPS']['theme'])) {
+		$defaultcoursetheme = $CFG['CPS']['theme'][0];
+	} else if (!isset($defaultcoursetheme)) {
+		 $defaultcoursetheme = "default.css";
+	}
+	$coursetheme = $defaultcoursetheme;
 }
 require("header.php");	
 echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Form</div>\n";
 switch($_GET['action']) {
 	case "newuser":
-		echo "<h3>New User Signup</h3>\n";
+		echo '<div id="headerforms" class="pagetitle"><h2>New User Signup</h2></div>';
 		echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/validateform.js\"></script>\n";
 		echo "<form method=post action=\"actions.php?action=newuser\" onsubmit=\"return validateForm(this)\">\n";
 		echo "<span class=form><label for=\"SID\">$longloginprompt:</label></span> <input class=form type=text size=12 id=SID name=SID><BR class=form>\n";
@@ -19,11 +26,17 @@ switch($_GET['action']) {
 		echo "<span class=form><label for=\"lastname\">Enter Last Name:</label></span> <input class=form type=text size=20 id=lastname name=lastname><BR class=form>\n";
 		echo "<span class=form><label for=\"email\">Enter E-mail address:</label></span>  <input class=form type=text size=60 id=email name=email><BR class=form>\n";
 		echo "<span class=form><label for=\"msgnot\">Notify me by email when I receive a new message:</label></span><span class=formright><input type=checkbox id=msgnot name=msgnot /></span><BR class=form>\n";
+		if (isset($studentTOS)) {
+			echo "<span class=form><label for=\"agree\">I have read and agree to the Terms of Use (below)</label></span><span class=formright><input type=checkbox name=agree></span><br class=form />\n";
+		}
 		echo "<div class=submit><input type=submit value='Sign Up'></div>\n";
 		echo "</form>\n";
+		if (isset($studentTOS)) {
+			include($studentTOS);
+		}
 		break;
 	case "chgpwd":
-		echo "<h3>Change Your Password</h3>\n";
+		echo '<div id="headerforms" class="pagetitle"><h2>Change Your Password</h2></div>';
 		echo "<form method=post action=\"actions.php?action=chgpwd\">\n";
 		echo "<span class=form><label for=\"oldpw\">Enter old password:</label></span> <input class=form type=password id=oldpw name=oldpw size=40 /> <BR class=form>\n";
 		echo "<span class=form><label for=\"newpw1\">Enter new password:</label></span>  <input class=form type=password id=newpw1 name=newpw1 size=40> <BR class=form>\n";
@@ -34,8 +47,9 @@ switch($_GET['action']) {
 		$query = "SELECT * FROM imas_users WHERE id='$userid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$line = mysql_fetch_array($result, MYSQL_ASSOC);
-		echo "<h3>User Info</h3>\n";
+		echo '<div id="headerforms" class="pagetitle"><h2>User Info</h2></div>';
 		echo "<form enctype=\"multipart/form-data\" method=post action=\"actions.php?action=chguserinfo\">\n";
+		echo '<fieldset id="userinfoprofile"><legend>Profile Settings</legend>';
 		echo "<span class=form><label for=\"firstname\">Enter First Name:</label></span> <input class=form type=text size=20 id=firstname name=firstname value=\"{$line['FirstName']}\" /><br class=\"form\" />\n";
 		echo "<span class=form><label for=\"lastname\">Enter Last Name:</label></span> <input class=form type=text size=20 id=lastname name=lastname value=\"{$line['LastName']}\"><BR class=form>\n";
 		echo "<span class=form><label for=\"email\">Enter E-mail address:</label></span>  <input class=form type=text size=60 id=email name=email value=\"{$line['email']}\"><BR class=form>\n";
@@ -53,8 +67,44 @@ switch($_GET['action']) {
 			echo "No Pic ";
 		}
 		echo '<br/><input type="file" name="stupic"/></span><br class="form" />';
+		$pagelayout = explode('|',$line['homelayout']);
+		foreach($pagelayout as $k=>$v) {
+			if ($v=='') {
+				$pagelayout[$k] = array();
+			} else {
+				$pagelayout[$k] = explode(',',$v);
+			}
+		}
+		$hpsets = '';
+		if (!isset($CFG['GEN']['fixedhomelayout']) || !in_array(2,$CFG['GEN']['fixedhomelayout'])) {
+			$hpsets .= '<input type="checkbox" name="homelayout10" ';
+			if (in_array(10,$pagelayout[2])) {$hpsets .= 'checked="checked"';}
+			$hpsets .=  ' /> New messages widget<br/>';
+			
+			$hpsets .= '<input type="checkbox" name="homelayout11" ';
+			if (in_array(11,$pagelayout[2])) {$hpsets .= 'checked="checked"';}
+			$hpsets .= ' /> New forum posts widget<br/>';
+		}
+		if (!isset($CFG['GEN']['fixedhomelayout']) || !in_array(3,$CFG['GEN']['fixedhomelayout'])) {
+			
+			$hpsets .= '<input type="checkbox" name="homelayout3-0" ';
+			if (in_array(0,$pagelayout[3])) {$hpsets .= 'checked="checked"';}
+			$hpsets .= ' /> New messages notes on course list<br/>';
+			
+			$hpsets .= '<input type="checkbox" name="homelayout3-1" ';
+			if (in_array(1,$pagelayout[3])) {$hpsets .= 'checked="checked"';}
+			$hpsets .= ' /> New posts notes on course list<br/>';
+		}
+		if ($hpsets != '') {
+			echo '<span class="form">Show on home page:</span><span class="formright">';
+			echo $hpsets;
+			echo '</span><br class="form" />';
+			
+		}
+		echo '</fieldset>';
 		
 		if ($myrights>19) {
+			echo '<fieldset id="userinfoinstructor"><legend>Instructor Options</legend>';
 			echo "<span class=form><label for=\"qrd\">Make new questions private by default?<br/>(recommended for new users):</label></span><span class=formright><input type=checkbox id=qrd name=qrd ";
 			if ($line['qrightsdef']==0) {echo "checked=1";}
 			echo " /></span><BR class=form>\n";
@@ -85,27 +135,39 @@ switch($_GET['action']) {
 			echo "<span class=form>Use default question library for all templated questions?</span>";
 			echo "<span class=formright><input type=checkbox name=\"usedeflib\"";
 			if ($line['usedeflib']==1) {echo "checked=1";}
-			echo "></span><br class=form>";
-			
-		}
-		echo "<div class=submit><input type=submit value='Update Info'></div>\n";
-		if ($myrights>19) {
+			echo "> ";
+			echo "</span><br class=form>";
 			echo "<p>Default question library is used for all local (assessment-only) copies of questions created when you ";
 			echo "edit a question (that's not yours) in an assessment.  You can elect to have all templated questions ";
 			echo "be assigned to this library.</p>";
+			echo '</fieldset>';
+			
 		}
+		echo "<div class=submit><input type=submit value='Update Info'></div>\n";
+		
 		echo '<p><a href="forms.php?action=googlegadget">Get Google Gadget</a> to monitor your messages and forum posts</p>';
 		echo "</form>\n";
 		break;
+	case "enroll":
+		echo '<div id="headerforms" class="pagetitle"><h2>Enroll in a Course</h2></div>';
+		echo '<form method=post action="actions.php?action=enroll">
+		<span class=form><label for="cid">Course id:</label></span> 
+		<input class=form type=text size=6 id=cid name=cid><br class="form" />
+		<span class=form><label for="ekey">Enrollment key:</label></span> 
+		<input class=form type=text size=10 id="ekey" name="ekey"><br class="form" />
+		<div class=submit><input type=submit value="Sign Up"></div>
+		</form>';
+		break;
 	case "unenroll":
 		if (!isset($_GET['cid'])) { echo "Course ID not specified\n"; break;}
-		echo "<h3>Unenroll</h3>\n";
+		echo '<div id="headerforms" class="pagetitle"><h2>Unenroll</h2></div>';
+		
 		echo "Are you SURE you want to unenroll from this course?  All assessment attempts will be deleted.\n";
 		echo "<p><input type=button onclick=\"window.location='actions.php?action=unenroll&cid={$_GET['cid']}'\" value=\"Really Unenroll\">\n";
 		echo "<input type=button value=\"Never Mind\" onclick=\"window.location='./course/course.php?cid={$_GET['cid']}'\"></p>\n";
 		break;
 	case "resetpw":
-		echo "<h3>Reset Password</h3>\n";
+		echo '<div id="headerforms" class="pagetitle"><h2>Reset Password</h2></div>';
 		echo "<form method=post action=\"actions.php?action=resetpw\">\n";
 		echo "<p>Enter your User Name below and click Submit.  An email will be sent to your email address on file.  A link in that email will ";
 		echo "reset your password.</p>";
@@ -113,7 +175,7 @@ switch($_GET['action']) {
 		echo "<p><input type=submit value=\"Submit\" /></p></form>";
 		break;
 	case "lookupusername":
-		echo "<h3>Lookup Username</h3>\n";
+		echo '<div id="headerforms" class="pagetitle"><h2>Lookup Username</h2></div>';
 		echo "<form method=post action=\"actions.php?action=lookupusername\">\n"; 
 		echo "If you can't remember your username, enter your email address below.  An email will be sent to your email address with your username. ";
 		echo "<p>Email: <input type=text name=\"email\"/></p>";
@@ -137,7 +199,7 @@ switch($_GET['action']) {
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			$code = $pass;
 		}
-		echo "<h3>Google Gadget Access Code</h3>";
+		echo '<div id="headerforms" class="pagetitle"><h2>Google Gadget Access Code</h2></div>';
 		echo "<p>The $installname Google Gadget allow you to view a list of new forum posts ";
 		echo "and messages from your iGoogle page.  To install, click the link below to add ";
 		echo "the gadget to your iGoogle page, then use the Access key below in the settings ";

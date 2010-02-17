@@ -53,7 +53,7 @@ require("../header.php");
 
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";	
 echo "&gt; Manage Calendar Items</div>\n";
-echo "<h2>Manage Calendar Items</h2>";
+echo '<div id="headermanagecalitems" class="pagetitle"><h2>Manage Calendar Items</h2></div>';
 echo "<p>This page allows you to add items only to the calendar.  Course items automatically place themselves on the calendar</p>";
 	
 $query = "SELECT id,date,title,tag FROM imas_calitems WHERE courseid='$cid' ORDER BY date";

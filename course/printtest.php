@@ -30,7 +30,7 @@ if ($overwriteBody==1) {
 	
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
 	echo "&gt; Print Test</div>\n";
-	echo "<h2>Print Test</h2>\n";
+	echo '<div id="headerprinttest" class="pagetitle"><h2>Print Test</h2></div>';
 	
 	if (!isset($_POST['heights'])) {
 		echo "<form method=post action=\"printlayout.php?cid=$cid&aid=$aid\">\n";
