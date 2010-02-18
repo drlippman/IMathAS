@@ -989,13 +989,13 @@ function enditem($canedit) {
 					   echo "<div class=icon style=\"background-color: #ccc;\">F</div>";
 				   }   
 				   echo "<div class=title><i> <b><a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}\">{$line['name']}</a></b></i> ";
-				   
+				   if (isset($newpostcnts[$line['id']]) && $newpostcnts[$line['id']]>0 ) {
+					   echo " <a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}&page=-1\" style=\"color:red\">New Posts ({$newpostcnts[$line['id']]})</a>";
+				   }
 				   echo '<span class="instrdates">';
 				   echo "<br/><i>$show </i>";
 				   echo '</span>';
-				    if (isset($newpostcnts[$line['id']]) && $newpostcnts[$line['id']]>0 ) {
-					   echo " <a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}&page=-1\" style=\"color:red\">New Posts ({$newpostcnts[$line['id']]})</a>";
-				   }
+				    
 				   if ($canedit) {
 					   echo '<span class="instronly">';
 					   echo "<a href=\"addforum.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";

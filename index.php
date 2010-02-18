@@ -33,11 +33,7 @@ $shownewpostnote = in_array(1,$pagelayout[3]);
 $showmessagesgadget = (in_array(10,$pagelayout[1]) || in_array(10,$pagelayout[0]) || in_array(10,$pagelayout[2]));
 $showpostsgadget = (in_array(11,$pagelayout[1]) || in_array(11,$pagelayout[0]) || in_array(11,$pagelayout[2]));
 
-
-
-
 $twocolumn = (count($pagelayout[1])>0 && count($pagelayout[2])>0);
-
 
 $placeinhead = ' 
   <style type="text/css">
@@ -47,11 +43,6 @@ $placeinhead = '
   </style>';
 $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 	
-
-
-
-
-
 $nologo = true;
 
 
@@ -141,15 +132,15 @@ if (mysql_num_rows($result)==0) {
 	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 		$page_tutorCourseData[] = $line;	
 		$page_coursenames[$line['id']] = $line['name'];
-		$postcheckcids[] = $line['id'];
+		$postcheckstucids[] = $line['id'];
 	}
 }
 
 //get new posts
-//check for new posts in courses being taught/tutored.
+//check for new posts in courses being taught.
 $postcidlist = implode(',',$postcheckcids);
+$postthreads = array();
 if ($showpostsgadget && count($postcheckcids)>0) {
-	$postthreads = array();
 	/*$query = "SELECT imas_forums.name,imas_forums.id,imas_forum_threads.id as threadid,imas_forum_threads.lastposttime,imas_forums.courseid FROM imas_forum_threads ";
 	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id LEFT JOIN imas_forum_views AS mfv ";
 	$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' WHERE imas_forums.courseid IN ($postcidlist) AND imas_forums.grpaid=0 ";
@@ -160,7 +151,6 @@ if ($showpostsgadget && count($postcheckcids)>0) {
 	$query .= "AND imas_forums.courseid IN ($postcidlist) ";
 	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' ";
 	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
-	$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
 	$query .= "ORDER BY imas_forum_threads.lastposttime DESC";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
@@ -200,12 +190,11 @@ if ($showpostsgadget && count($postcheckcids)>0) {
 //check for new posts in courses being taken
 $poststucidlist = implode(',',$postcheckstucids);
 if ($showpostsgadget && count($postcheckstucids)>0) {
-	$postthreads = array();
 	/*$query = "SELECT imas_forums.name,imas_forums.id,imas_forum_threads.id as threadid,imas_forum_threads.lastposttime,imas_forums.courseid FROM imas_forum_threads ";
 	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id LEFT JOIN imas_forum_views AS mfv ";
 	$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' WHERE imas_forums.courseid IN ($postcidlist) AND imas_forums.grpaid=0 ";
 	$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ORDER BY imas_forum_threads.lastposttime DESC";*/
-	
+	$now = time();
 	$query = "SELECT imas_forums.name,imas_forums.id,imas_forum_threads.id as threadid,imas_forum_threads.lastposttime,imas_forums.courseid FROM imas_forum_threads ";
 	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
 	$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now && imas_forums.enddate>$now)) ";
@@ -225,8 +214,6 @@ if ($showpostsgadget && count($postcheckstucids)>0) {
 		if ($newpostcnt[$line['courseid']]<10) {
 			$page_newpostlist[] = $line;	
 			$postthreads[] = $line['threadid'];
-
-
 		}
 	}
 } else if (count($postcheckstucids)>0) {
@@ -241,36 +228,6 @@ if ($showpostsgadget && count($postcheckstucids)>0) {
 	$query .= "GROUP BY imas_forums.courseid";
 	
 	/*
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	$query = "SELECT courseid,count(*) FROM ";
 	$query .= "(SELECT imas_forums.courseid,imas_forum_threads.id FROM imas_forum_threads ";
 	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id LEFT JOIN imas_forum_views AS mfv ";
@@ -432,7 +389,6 @@ function printPostsGadget() {
 		echo '</div>';
 		return;
 	}
-	
 	$threadlist = implode(',',$postthreads);
 	$threaddata = array();
 	$query = "SELECT imas_forum_posts.*,imas_users.LastName,imas_users.FirstName FROM imas_forum_posts,imas_users ";

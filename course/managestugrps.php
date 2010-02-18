@@ -26,6 +26,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 } else {
 	if (isset($_GET['addgrp']) && isset($_POST['grpname']) && isset($_GET['grpsetid'])) {
 		//adding a group.  Could be a "add new group" only, or adding a new group while assigning students
+		if (trim($_POST['grpname'])=='') {
+			$_POST['grpname'] = 'Unnamed group';
+		}
 		$query = "INSERT INTO imas_stugroups (groupsetid,name) VALUES ('$grpsetid','{$_POST['grpname']}')";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		if (!isset($_POST['stutoadd'])) { //if not adding students also

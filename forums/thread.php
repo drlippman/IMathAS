@@ -81,7 +81,11 @@
 			while ($row = mysql_fetch_row($result)) {
 				$limthreads[] = $row[0];
 			}
-			$limthreads = implode(',',$limthreads);
+			if (count($limthreads)==0) {
+				$limthreads = '0';
+			} else {
+				$limthreads = implode(',',$limthreads);
+			}
 		}
 	}
 	

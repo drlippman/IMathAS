@@ -288,7 +288,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		$newpostcnts[$row[0]] = $row[1];
 	}
 	if (array_sum($newpostcnts)>0) {
-		$newpostscnt = " <a href=\"$imasroot/forums/newthreads.php?cid=$cid\" style=\"color:red\">New ({$row[0]})</a>";
+		$newpostscnt = " <a href=\"$imasroot/forums/newthreads.php?cid=$cid\" style=\"color:red\">New (".array_sum($newpostcnts).")</a>";
 	} else {
 		$newpostscnt = '';	
 	}
