@@ -48,6 +48,7 @@ if ($cid==0) {
 			$htmlawedconfig = array('elements'=>'*-script');
 			$wikicontent = htmLawed(stripslashes($_POST['wikicontent']),$htmlawedconfig);
 			$wikicontent = str_replace(array("\r","\n"),' ',$wikicontent);
+			$wikicontent = preg_replace('/\s+/',' ',$wikicontent);
 			$now = time();
 			
 			//check for conflicts
@@ -66,7 +67,38 @@ if ($cid==0) {
 				} else { //we're all good for a diff calculation
 					require("../includes/diff.php");
 					$diff = diffsparsejson($wikicontent,$row[1]);
-					if (count($diff)>0) {
+					
+					if ($diff != '') {
+						//verify the diff
+						$base = diffstringsplit($wikicontent);
+						$diffs = explode('],[',substr($diff,2,strlen($diff)-4));
+						for ($i = count($diffs)-1; $i>=0; $i--) {
+							$diffs[$i] = explode(',',$diffs[$i]);
+							if ($diffs[$i][0]==2) { //replace
+								if (count($diffs[$i])>4) {
+									$diffs[$i][3] = implode(',',array_slice($diffs[$i],3));
+								}
+								$diffs[$i][3] = str_replace(array('\\"','\\\\'),array('"','\\'),substr($diffs[$i][3],1,strlen($diffs[$i][3])-2));
+								array_splice($base,$diffs[$i][1],$diffs[$i][2],$diffs[$i][3]);
+							} else if ($diffs[$i][0]==0) { //insert
+								if (count($diffs[$i])>3) {
+									$diffs[$i][2] = implode(',',array_slice($diffs[$i],2));
+								}
+								$diffs[$i][2] = str_replace(array('\\"','\\\\'),array('"','\\'),substr($diffs[$i][2],1,strlen($diffs[$i][2])-2));
+								array_splice($base,$diffs[$i][1],0,$diffs[$i][2]);
+							} else if ($diffs[$i][0]==1) { //delete
+								array_splice($base,$diffs[$i][1],$diffs[$i][2]);
+							}
+						}
+						$comp = diffstringsplit($row[1]);
+						if (count(array_diff($comp,$base))>0 || count(array_diff($base,$comp))>0) {
+							echo "<p>Uh oh, it appears something weird happened.  Giving up</p>";
+							print_r($base);
+							print_r($comp);
+							exit;
+						}
+					
+					
 						$diffstr = addslashes($diff);
 						$wikicontent = addslashes($wikicontent);
 						//insert latest content
@@ -100,7 +132,7 @@ if ($cid==0) {
 				$lastedittime = tzdate("F j, Y, g:i a",$row[2]);
 				$lasteditedby = $row[3].', '.$row[4];
 				$revisionid = $row[0];
-				$revisiontext = $row[1];
+				$revisiontext = str_replace('</span></p>','</span> </p>',$row[1]);
 			} else { //new wikipage
 				$revisionid = 0;
 				$revisiontext = '';

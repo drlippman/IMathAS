@@ -790,7 +790,8 @@ if ($overwriteBody==1) {
 		<input type=button value="Preview" onClick="window.open('<?php echo $imasroot;?>/assessment/showtest.php?cid=<?php echo $cid ?>&id=<?php echo $aid ?>','Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20))"> 
 	</p>
 		
-<?php	
+<?php	//<input type=button value="Select Libraries" onClick="libselect()">
+		
 	//POTENTIAL QUESTIONS
 	if ($sessiondata['selfrom'.$aid]=='lib') { //selecting from libraries
 		if (!$beentaken) {
@@ -802,7 +803,7 @@ if ($overwriteBody==1) {
 		In Libraries: 
 		<span id="libnames"><?php echo $lnames ?></span>
 		<input type=hidden name="libs" id="libs"  value="<?php echo $searchlibs ?>">
-		<input type=button value="Select Libraries" onClick="libselect()">
+		<input type="button" value="Select Libraries" onClick="GB_show('Library Select','libtree2.php?libtree=popup&libs='+curlibs,500,500)" />
 		or <input type=button value="Select From Assessments" onClick="window.location='addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&selfrom=assm'">
 		<br> 
 		Search: 

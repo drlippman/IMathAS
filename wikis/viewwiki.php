@@ -49,7 +49,7 @@ if ($cid==0) {
 		$pagetitle = "Confirm History Delete";
 	}
 	
-} else if (isset($_GET['revert'])) {
+} else if (isset($_GET['revert']) && isset($teacherid)) {
 	if ($_GET['revert']=='true') {
 		$revision = intval($_GET['torev']);
 		$query = "SELECT revision FROM imas_wiki_revisions WHERE wikiid='$id' ";
@@ -63,9 +63,15 @@ if ($cid==0) {
 				for ($i = count($diffs)-1; $i>=0; $i--) {
 					$diffs[$i] = explode(',',$diffs[$i]);
 					if ($diffs[$i][0]==2) { //replace
+						if (count($diffs[$i])>4) {
+							$diffs[$i][3] = implode(',',array_slice($diffs[$i],3));
+						}
 						$diffs[$i][3] = str_replace(array('\\"','\\\\'),array('"','\\'),substr($diffs[$i][3],1,strlen($diffs[$i][3])-2));
 						array_splice($base,$diffs[$i][1],$diffs[$i][2],$diffs[$i][3]);
 					} else if ($diffs[$i][0]==0) { //insert
+						if (count($diffs[$i])>3) {
+							$diffs[$i][2] = implode(',',array_slice($diffs[$i],2));
+						}
 						$diffs[$i][2] = str_replace(array('\\"','\\\\'),array('"','\\'),substr($diffs[$i][2],1,strlen($diffs[$i][2])-2));
 						array_splice($base,$diffs[$i][1],0,$diffs[$i][2]);
 					} else if ($diffs[$i][0]==1) { //delete
@@ -74,6 +80,8 @@ if ($cid==0) {
 				}
 			}
 			$newbase = addslashes(implode(' ',$base));
+			echo $newbase;
+			exit;
 			$query = "UPDATE imas_wiki_revisions SET revision='$newbase' WHERE id=$revision";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			$query = "DELETE FROM imas_wiki_revisions WHERE wikiid='$id' AND id>$revision";
@@ -121,6 +129,17 @@ if ($cid==0) {
 			$lastedittime = tzdate("F j, Y, g:i a",$row[2]);
 			$lasteditedby = $row[3].', '.$row[4];
 		}
+		
+		$query = "SELECT id FROM imas_wiki_views WHERE userid='$userid' AND wikiid='$id'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		if (mysql_num_rows($result)>0) {
+			$query = "UPDATE imas_wiki_views SET lastview=$now WHERE id=".mysql_result($result,0,0);
+			mysql_query($query) or die("Query failed : " . mysql_error());
+		} else {
+			$query = "INSERT INTO imas_wiki_views (userid,wikiid,lastview) VALUES ('$userid','$id',$now)";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+		}
+		
 	}
 }
 
@@ -181,7 +200,9 @@ if ($numrevisions>1) {
 	echo '<span id="prevrev"><input type="button" value="Show Revision History" onclick="initrevisionview()" /></span>';
 	echo '<span id="revcontrol" style="display:none;"><br/>Revision history: <a href="#" id="first" onclick="jumpto(1)">First</a> <a id="older" href="#" onclick="seehistory(1); return false;">Older</a> ';
 	echo '<a id="newer" class="grayout" href="#" onclick="seehistory(-1); return false;">Newer</a> <a href="#" class="grayout" id="last" onclick="jumpto(0)">Last</a> <input type="button" id="showrev" value="Show Changes" onclick="showrevisions()" />';
-	echo '<a id="revrevert" style="display:none;" href="#">Revert to this revision</a>';
+	if (isset($teacherid)) {
+		echo '<a id="revrevert" style="display:none;" href="#">Revert to this revision</a>';
+	}
 	echo '</span>';
 }
 ?>

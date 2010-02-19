@@ -1005,11 +1005,12 @@ function enditem($canedit) {
 				   enditem($canedit); //echo "</div>\n";
 			   }
 		   } else if ($line['itemtype']=="Wiki") {
-		   	   if ($ispublic) { continue;}
+		   	  // if ($ispublic) { continue;}
 			   $typeid = $line['typeid'];
-			   $query = "SELECT id,name,description,startdate,enddate,editbydate,avail,settings FROM imas_wikis WHERE id='$typeid'";
+			   $query = "SELECT id,name,description,startdate,enddate,editbydate,avail,settings,groupsetid FROM imas_wikis WHERE id='$typeid'";
 			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
+			   if ($ispublic && $line['groupsetid']>0) { continue;}
 			   if (strpos($line['description'],'<p>')!==0) {
 				   $line['description'] = '<p>'.$line['description'].'</p>';
 			   }
@@ -1023,6 +1024,19 @@ function enditem($canedit) {
 			   } else {
 				   $enddate = formatdate($line['enddate']);
 			   }
+			   if ($viewall || $line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
+			   	   $query = "SELECT time FROM imas_wiki_revisions WHERE wikiid='$typeid' ORDER BY time DESC LIMIT 1";
+			   	   $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			   	   $hasnew = false;
+			   	   if (mysql_num_rows($result)>0) {
+			   	   	   $lastrevised = mysql_result($result,0,0);
+					   $query = "SELECT lastview FROM imas_wiki_views WHERE userid='$userid' AND wikiid='$typeid'";
+					   $result = mysql_query($query) or die("Query failed : " . mysql_error());
+					   if (mysql_num_rows($result)==0 || mysql_result($result,0,0)<$lastrevised) {
+					   	   $hasnew = true;
+					   }
+				   }
+			   } 	   
 			   if ($line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
 				   if ($line['avail']==2) {
 					   $show = "Showing Always ";
@@ -1044,7 +1058,14 @@ function enditem($canedit) {
 					   }
 				   }
 				   echo "<div class=title> ";
-				   echo "<b><a href=\"../wikis/viewwiki.php?cid=$cid&id={$line['id']}\">{$line['name']}</a></b>\n";
+				   if ($ispublic) {
+				   	   echo "<b><a href=\"../wikis/viewwikipublic.php?cid=$cid&id={$line['id']}\">{$line['name']}</a></b>\n"; 
+				   } else {
+				   	   echo "<b><a href=\"../wikis/viewwiki.php?cid=$cid&id={$line['id']}\">{$line['name']}</a></b>\n";
+				   	   if ($hasnew) {
+				   	    	    echo " <span style=\"color:red\">New Revisions</span>";
+				   	   }
+				   }
 				   if ($viewall) { 
 					   echo '<span class="instrdates">';
 					   echo "<br/>$show ";
@@ -1073,7 +1094,9 @@ function enditem($canedit) {
 					   echo "<div class=icon style=\"background-color: #ccc;\">W</div>";
 				   }   
 				   echo "<div class=title><i> <b><a href=\"../wikis/viewwiki.php?cid=$cid&id={$line['id']}\">{$line['name']}</a></b></i> ";
-				   
+				   if ($hasnew) {
+				   	   echo " <span style=\"color:red\">New Revisions</span>";
+				   }
 				   echo '<span class="instrdates">';
 				   echo "<br/><i>$show </i>";
 				   echo '</span>';

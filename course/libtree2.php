@@ -29,13 +29,13 @@ END;
 @import url("$imasroot/course/libtree.css");
 -->
 </style>
-<script type="text/javascript" src="$imasroot/javascript/libtree2.js"></script>
+<script type="text/javascript" src="$imasroot/javascript/libtree2.js?v=021810"></script>
 END;
 	if (isset($_GET['libtree']) && $_GET['libtree']=="popup") {
 		echo <<<END
 </head>
 <body>
-<form>
+<form id="libselectform">
 END;
 	} 
 	echo "<script type=\"text/javascript\">";

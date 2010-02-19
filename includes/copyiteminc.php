@@ -78,6 +78,16 @@ function copyitem($itemid,$gbcats) {
 		$query .= "VALUES ('$cid',$row)";
 		mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$newtypeid = mysql_insert_id();
+	} else if ($itemtype == "Wiki") {
+		$query = "SELECT name,description,startdate,enddate,editbydate,avail,settings,groupsetid FROM imas_wikis WHERE id='$typeid'";
+		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+		$row = mysql_fetch_row($result);
+		$row[0] .= stripslashes($_POST['append']);
+		$row = "'".implode("','",addslashes_deep($row))."'";
+		$query = "INSERT INTO imas_wikis (courseid,name,description,startdate,enddate,editbydate,avail,settings,groupsetid) ";
+		$query .= "VALUES ('$cid',$row)";
+		mysql_query($query) or die("Query failed :$query " . mysql_error());
+		$newtypeid = mysql_insert_id();
 	} else if ($itemtype == "Assessment") {
 		//$query = "INSERT INTO imas_assessments (courseid,name,summary,intro,startdate,enddate,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle) ";
 		//$query .= "SELECT '$cid',name,summary,intro,startdate,enddate,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle FROM imas_assessments WHERE id='$typeid'";
@@ -205,6 +215,9 @@ function getiteminfo($itemid) {
 			break;
 		case ($itemtype==="Assessment"):
 			$query = "SELECT name,summary FROM imas_assessments WHERE id=$typeid";
+			break;
+		case ($itemtype==="Wiki"):
+			$query = "SELECT name,description FROM imas_wikis WHERE id=$typeid";
 			break;
 	}
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());

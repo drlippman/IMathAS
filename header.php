@@ -4,7 +4,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=7" />
 <title><?php echo $installname; if (isset($pagetitle)) { echo " - $pagetitle";}?></title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-<link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=013010";?>" type="text/css" />
+<link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=021810";?>" type="text/css" />
 <?php if (isset($coursetheme)) { 
 	if (isset($flexwidth)) {
 		$coursetheme = str_replace('_fw','',$coursetheme);
@@ -26,7 +26,7 @@ div.breadcrumb { display:none;}
 <script type="text/javascript">
 var imasroot = '<?php echo $imasroot; ?>';
 </script>
-<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js?ver=100509"></script>
+<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js?ver=021810"></script>
 <?php
 if (isset($coursetheme) && strpos($coursetheme,'_dark')!==false) {$mathdarkbg = true;} else {$mathdarkbg = false;}
 if (isset($ispublic) && $ispublic) {

@@ -262,6 +262,10 @@ switch($_GET['action']) {
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		}
 		
+		$query = "DELETE FROM imas_assessments WHERE courseid='{$_GET['id']}'";
+		mysql_query($query) or die("Query failed : " . mysql_error());
+		
+		
 		$query = "SELECT id FROM imas_forums WHERE courseid='{$_GET['id']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
@@ -280,8 +284,15 @@ switch($_GET['action']) {
 		$query = "DELETE FROM imas_forums WHERE courseid='{$_GET['id']}'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		
-		$query = "DELETE FROM imas_assessments WHERE courseid='{$_GET['id']}'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		$query = "SELECT id FROM imas_wikis WHERE courseid='{$_GET['id']}'";
+		$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+		while ($wid = mysql_fetch_row($r2)) {
+			$query = "DELETE FROM imas_wiki_revisions WHERE wikiid=$wid";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			$query = "DELETE FROM imas_wiki_views WHERE wikiid=$wid";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+		}
+		$query = "DELETE FROM imas_wikis WHERE courseid='{$_GET['id']}'";
 		
 		//delete inline text files
 		$query = "SELECT id FROM imas_inlinetext WHERE courseid='{$_GET['id']}'";

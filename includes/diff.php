@@ -62,7 +62,11 @@ function diffsparsejson($old, $new) {
 			}
 		}
 	}	
-	return '['.implode(',',$out).']';
+	if (count($out)==0) {
+		return '';
+	} else {
+		return '['.implode(',',$out).']';
+	}
 }
 
 function diffstringsplit($str) {

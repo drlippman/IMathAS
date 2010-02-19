@@ -1030,7 +1030,8 @@ function getnextprev(formn,loc) {
 		echo "<form method=post action=\"manageqset.php?cid=$cid\">\n";
 
 		echo "In Libraries: <span id=\"libnames\">$lnames</span><input type=hidden name=\"libs\" id=\"libs\"  value=\"$searchlibs\">\n";
-		echo " <input type=button value=\"Select Libraries\" onClick=\"libselect()\"> <br>"; 
+		//echo " <input type=button value=\"Select Libraries\" onClick=\"libselect()\"> <br>"; 
+		echo '<input type="button" value="Select Libraries" onClick="GB_show(\'Library Select\',\'libtree2.php?libtree=popup&libs=\'+curlibs,500,500)" /> <br>';
 		
 		echo "Search: <input type=text size=15 name=search value=\"$search\"> <input type=checkbox name=\"searchall\" value=\"1\" ";
 		if ($searchall==1) {echo "checked=1";}
