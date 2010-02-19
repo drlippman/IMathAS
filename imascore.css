@@ -343,6 +343,7 @@ div.tips {
 	background-color: #cff;
 	position: absolute;
 	padding: 5px;
+	z-index: 100;
 }
 
 #headerlogo {

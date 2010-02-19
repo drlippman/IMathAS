@@ -435,12 +435,12 @@ function linkgenerator() {
  <script type="text/javascript">
  var baseaddr = "<?php echo $addr;?>";
  function makelink() {
-	 id = document.getElementById("qid").value;
+	 var id = document.getElementById("qid").value;
 	 if (id=='') {alert("Question ID is required"); return false;}
-	 cid = document.getElementById("cid").value;
-	 sa = document.getElementById("sa").value;
-	 mode = document.getElementById("type").value;
-	 val = document.getElementById("val").value;
+	 var cid = document.getElementById("cid").value;
+	 var sa = document.getElementById("sa").value;
+	 var mode = document.getElementById("type").value;
+	 var val = document.getElementById("val").value;
 	 if (mode!='none' && val=='') { alert("need to specify N"); return false;}
 	 var url = baseaddr + '?id=' + id + '&sa='+sa;
 	 if (cid != '') {

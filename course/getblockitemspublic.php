@@ -3,6 +3,7 @@
 //(c) 2006 David Lippman
    require("../config.php");
    require("courseshowitems.php");
+   $ispublic = true;
   
    $cid = $_GET['cid'];
    require("../filter/filter.php");
@@ -59,7 +60,7 @@
   
    if (count($items)>0) {
 	  
-	   showitems($items,$_GET['folder']);
+	   showitems($items,$_GET['folder'],$blockispublic);
 	  
    } 
    if ($firstload) {
