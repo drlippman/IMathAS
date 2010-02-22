@@ -20,8 +20,13 @@
 			$tounenroll[] = $_GET['uid'];
 		}
 		
+		if (!isset($_POST['delwikirev'])) {
+			$delwikirev = intval($_POST['delwikirev']);
+		} else {
+			$delwikirev = 0;
+		}
 		require_once("../includes/unenroll.php");
-		unenrollstu($cid,$tounenroll,($_GET['uid']=="all" || isset($_POST['delforumposts'])),($_GET['uid']=="all" && isset($_POST['removeoffline'])),($_GET['uid']=="all"));
+		unenrollstu($cid,$tounenroll,($_GET['uid']=="all" || isset($_POST['delforumposts'])),($_GET['uid']=="all" && isset($_POST['removeoffline'])),($_GET['uid']=="all"),$delwikirev);
 		
 		
 		if ($calledfrom=='lu') {
@@ -62,8 +67,13 @@
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (count($_POST['checked']) > floor(mysql_result($result,0,0)/2)) {
 				$delForumMsg = "<p>Also delete <b style=\"color:red;\">ALL</b> forum posts by ALL students (not just the selected ones)? <input type=checkbox name=\"delforumposts\"/></p>";
+				$delWikiMsg = "<p>Also delete <b style=\"color:red;\">ALL</b> wiki revisions: ";
+				$delWikiMsg .= '<input type="radio" name="delwikirev" value="0" checked="checked" />No,  ';
+				$delWikiMsg .= '<input type="radio" name="delwikirev" value="1" />Yes, from all wikis, ';
+				$delWikiMsg .= '<input type="radio" name="delwikirev" value="2" />Yes, from group wikis only</p>';
 			} else {
 				$delForumMsg = "";
+				$delWikiMsg = '';
 			}
 		} else {
 			$query = "SELECT FirstName,LastName,SID FROM imas_users WHERE id='{$_GET['uid']}'";
@@ -96,6 +106,9 @@
 			<p>Also remove all offline grade items from gradebook? 
 				<input type=checkbox name="removeoffline" value="1" />
 			</p>
+			<p>Also remove wiki revisions: <input type="radio" name="delwikirev" value="1" />All wikis, 
+				<input  type="radio" name="delwikirev" value="2" checked="checked" />Group wikis only
+			</p>
 <?php
 			} else if ($_GET['uid']=="selected") {
 				if (count($_POST['checked'])==0) {
@@ -114,6 +127,7 @@
 ?>					
 		</ul>
 		<?php echo $delForumMsg; ?>
+		<?php echo $delWikiMsg; ?>
 		<input type=hidden name="tounenroll" value="<?php echo implode(",",$_POST['checked']) ?>">
 <?php
 				}

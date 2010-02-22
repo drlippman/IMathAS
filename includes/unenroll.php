@@ -6,7 +6,8 @@
 //$delforum = delete all forum posts
 //$deloffline = delete offline items from gradebook
 //$unwithdraw = unset any withdrawn questions
-function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$unwithdraw=false) {
+//$delwikirev = delete wiki revisions, 1: all, 2: group wikis only
+function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$unwithdraw=false,$delwikirev=false) {
 	$forums = array();
 	$threads = array();
 	$query = "SELECT id FROM imas_forums WHERE courseid='$cid'";
@@ -29,6 +30,20 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$unwithd
 		$assesses[] = $row[0];
 	}
 	$aidlist =  implode(',',$assesses);
+	
+	$wikis = array();
+	$grpwikis = array();
+	$query = "SELECT id,groupsetid FROM imas_wikis WHERE courseid='$cid'";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	while ($row = mysql_fetch_row($result)) {
+		$wikis[] = $row[0];
+		if ($row[1]>0) {
+			$grpwikis[] = $row[0];
+		}
+	}
+	$wikilist =  implode(',',$wikis);
+	$grpwikilist = implode(',',$grpwikis);
+	
 	
 	$stugroups = array();
 	$query = "SELECT imas_stugroups.id FROM imas_stugroups JOIN imas_stugroupset ON imas_stugroups.groupsetid=imas_stugroupset.id WHERE imas_stugroupset.courseid='$cid'";
@@ -66,6 +81,10 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$unwithd
 			$query = "DELETE FROM imas_forum_views WHERE threadid IN ($threadlist)  AND userid IN ($stulist)";
 			mysql_query($query) or die("Query failed : $query" . mysql_error());
 		}
+		if (count($wikis)>0) {
+			$query = "DELETE FROM imas_wiki_views WHERE wikiid IN ($wikilist)  AND userid IN ($stulist)";
+			mysql_query($query) or die("Query failed : $query" . mysql_error());
+		}
 		
 		$query = "DELETE FROM imas_students WHERE userid IN ($stulist) AND courseid='$cid'";
 		mysql_query($query) or die("Query failed : $query" . mysql_error());
@@ -90,6 +109,13 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$unwithd
 			$query = "DELETE FROM imas_forum_posts WHERE forumid='$fid' AND posttype=0";
 			mysql_query($query) or die("Query failed : " . mysql_error());	
 		}*/
+	}
+	if ($delwikirev===1 && count($wikis)>0) {
+		$query = "DELETE FROM imas_wiki_revisions WHERE wikiid IN ($wikilist)";
+		mysql_query($query) or die("Query failed : " . mysql_error());
+	} else if ($delwikirev===2 && count($grpwikis)>0) {
+		$query = "DELETE FROM imas_wiki_revisions WHERE wikiid IN ($grpwikilist)";
+		mysql_query($query) or die("Query failed : " . mysql_error());
 	}
 	if ($deloffline) {
 		$query = "DELETE FROM imas_gbitems WHERE courseid='$cid'";
