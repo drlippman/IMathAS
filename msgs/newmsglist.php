@@ -49,20 +49,10 @@
 	echo '<div id="headernewmsglist" class="pagetitle"><h2>New Messages</h2></div>';	
 	
 ?>
-<script type="text/javascript">
-function chkAll(frm, arr, mark) {
-  for (i = 0; i <= frm.elements.length; i++) {
-   try{
-     if(frm.elements[i].name == arr) {
-       frm.elements[i].checked = mark;
-     }
-   } catch(er) {}
-  }
-}
-</script>	
-	<form method=post action="newmsglist.php?page=<?php echo $page;?>&cid=<?php echo $cid;?>">
 
-	Check/Uncheck All: <input type="checkbox" name="ca2" value="1" onClick="chkAll(this.form, 'checked[]', this.checked)">	
+	<form id="qform" method="post" action="newmsglist.php?page=<?php echo $page;?>&cid=<?php echo $cid;?>">
+
+	Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
 	With Selected: <input type=submit name="read" value="Mark as Read">
 	<input type=submit name="remove" value="Delete">
 		

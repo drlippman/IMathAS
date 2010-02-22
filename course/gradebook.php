@@ -277,39 +277,13 @@ if (isset($studentid) || $stu!=0) { //show student view
 	$placeinhead .= "}}\n ";
 	$placeinhead .= 'function highlightrow(el) { el.setAttribute("lastclass",el.className); el.className = "highlight";}';
 	$placeinhead .= 'function unhighlightrow(el) { el.className = el.getAttribute("lastclass");}';
-	$placeinhead .= "function chkAll(frm, arr, mark) {  for (i = 0; i <= frm.elements.length; i++) {   try{     if(frm.elements[i].name == arr) {  frm.elements[i].checked = mark;     }   } catch(er) {}  }}";
-	/*$placeinhead .= 'var picsize = 0;
-		function rotatepics() {
-			picsize = (picsize+1)%3;
-			picshow(picsize);
-		}
-		function picshow(size) {
-			if (size==0) {
-				els = document.getElementById("myTable").getElementsByTagName("img");
-				for (var i=0; i<els.length; i++) {
-					els[i].style.display = "none";
-				}
-			} else {
-				els = document.getElementById("myTable").getElementsByTagName("img");
-				for (var i=0; i<els.length; i++) {
-					els[i].style.display = "inline";
-					if (els[i].getAttribute("src").match("userimg_sm")) {
-						if (size==2) {
-							els[i].setAttribute("src",els[i].getAttribute("src").replace("_sm","_"));
-						}
-					} else if (size==1) {
-						els[i].setAttribute("src",els[i].getAttribute("src").replace("_","_sm"));
-					}
-				}
-			}
-		}';*/
 	$placeinhead .= "</script>\n";
 	$placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } </style>";
 	
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 	echo "&gt; Gradebook</div>";
-	echo "<form method=post action=\"gradebook.php?cid=$cid\">";
+	echo "<form id=\"qform\" method=post action=\"gradebook.php?cid=$cid\">";
 	
 	echo '<div id="headergradebook" class="pagetitle"><h2>Gradebook <span class="red" id="newflag" style="font-size: 70%" >';
 	if (($coursenewflag&1)==1) {
@@ -393,7 +367,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	echo "</div>";
 	
 	if ($isteacher) {
-		echo "Check/Uncheck All: <input type=\"checkbox\" name=\"ca\" value=\"1\" onClick=\"chkAll(this.form, 'checked[]', this.checked)\"> \n";
+		echo 'Check: <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',false)">None</a> ';
 		echo "With Selected:  <input type=submit name=submit value=\"E-mail\"> <input type=submit name=submit value=\"Message\"> <input type=submit name=submit value=\"Unenroll\"> <input type=submit name=submit value=\"Make Exception\"> ";
 	}
 	

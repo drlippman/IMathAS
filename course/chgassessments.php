@@ -292,16 +292,6 @@ function chgfb() {
 	}
 }
 
-function chkAll(frm, arr, mark) {
-  for (i = 0; i <= frm.elements.length; i++) {
-   try{
-     if(frm.elements[i].name == arr) {
-       frm.elements[i].checked = mark;
-     }
-   } catch(er) {}
-  }
-}
-
 function copyfromtoggle(frm,mark) {
 	var tds = frm.getElementsByTagName("tr");
 	for (var i = 0; i<tds.length; i++) {
@@ -330,11 +320,10 @@ function copyfromtoggle(frm,mark) {
 	 <b>Beware</b> that changing default points or penalty after an assessment has been 
 	 taken will not change the scores of students who have already completed the assessment.</p>
 
-	<form method=post action="chgassessments.php?cid=<?php echo $cid; ?>">
+	<form id="qform" method=post action="chgassessments.php?cid=<?php echo $cid; ?>">
 		<h3>Assessments to Change</h3>
 
-		Check/Uncheck All: 
-		<input type="checkbox" name="ca" value="1" onClick="chkAll(this.form, 'checked[]', this.checked)" checked=checked>
+		Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
 		<ul class=nomark>
 <?php
 	echo $page_assessListMsg;

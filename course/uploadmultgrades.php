@@ -210,7 +210,7 @@ echo '<div id="headeruploadmultgrades" class="pagetitle"><h2>Upload Multiple Gra
 if ($overwriteBody==1) {
 	echo $body;
 } else {		
-	echo '<form enctype="multipart/form-data" method=post action="uploadmultgrades.php?cid='.$cid.'">';
+	echo '<form id="qform" enctype="multipart/form-data" method=post action="uploadmultgrades.php?cid='.$cid.'">';
 
 	if (isset($page_fileHiddenInput)) {
 		//file has been uploaded, need to know what to import
@@ -219,17 +219,6 @@ if ($overwriteBody==1) {
 		$sdate = tzdate("m/d/Y",time());
 		$stime = tzdate("g:i a",time());
 	?>
-		<script type="text/javascript">
-		function chkAll(frm, arr, mark) {
-		  for (i = 0; i <= frm.elements.length; i++) {
-		   try{
-		     if(frm.elements[i].name == arr) {
-		       frm.elements[i].checked = mark;
-		     }
-		   } catch(er) {}
-		  }
-		}
-		</script>
 		
 		<span class=form>Username is in column:</span>
 		<span class=formright><input type=text name="sidcol" size=4 value="<?php echo $usernamecol+1; ?>"></span><br class=form />
@@ -238,8 +227,7 @@ if ($overwriteBody==1) {
 		<a href="#" onClick="displayDatePicker('sdate', this); return false"><img src="../img/cal.gif" alt="Calendar"/></A>
 		at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR class=form>
 
-		<p>Check/Uncheck All: 
-		<input type="checkbox" name="ca" value="1" onClick="chkAll(this.form, 'addcol[]', this.checked)"></p>
+		<p>Check: <a href="#" onclick="return chkAllNone('qform','addcol[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','addcol[]',false)">None</a></p>
 
 		<table class="gb">
 		<thead>

@@ -650,9 +650,9 @@ if ($overwriteBody==1) {
 		$qcount[0] = addupchildqs(0);
 ?>
 		
-	<form method=post action="managelibs.php?cid=<?php echo $cid ?>">
+	<form id="qform" method=post action="managelibs.php?cid=<?php echo $cid ?>">
 		<div>
-			Check/Uncheck All: <input type="checkbox" name="ca2" value="1" onClick="libchkAll(this.form, 'nchecked[]', this.checked)">
+			Check: <a href="#" onclick="return chkAllNone('qform','nchecked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','nchecked[]',false)">None</a>
 			With Selected: <input type=submit name="transfer" value="Transfer">
 			<input type=submit name="remove" value="Delete">
 			<input type=submit name="setparent" value="Change Parent">

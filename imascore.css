@@ -457,7 +457,7 @@ div#viewbuttoncont a.buttoninactive:hover {
 }
 	
 #GB_overlay {
-  position: absolute;
+  position: fixed;
   margin: auto;
   top: 0;
   left: 0;
@@ -473,7 +473,7 @@ div#viewbuttoncont a.buttoninactive:hover {
 #GB_window {
   top: 10px;
   left: 0px;
-  position: absolute;
+  position: fixed;
   background: #fff;
   border: 3px solid #369;
   overflow: auto;

@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 28;
+$latest = 29;
 
 if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 	$handle = fopen("upgradecounter.txt",'w');
@@ -328,7 +328,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 }
 		}
 		if ($last < 26) {
-			 $query = "ALTER TABLE `imas_users` ADD `homelayout` VARCHAR(32) NOT NULL DEFAULT '|0,2,3||0,1'"; 
+			 $query = "ALTER TABLE `imas_users` ADD `homelayout` VARCHAR(32) NOT NULL DEFAULT '|0,1,2||0,1'"; 
 			 $res = mysql_query($query);
 			 if ($res===false) {
 				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
@@ -392,6 +392,19 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 if ($res===false) {
 				 echo "<p>Query failed: ($sql) : ".mysql_error()."</p>";
 			 }
+		}
+		if ($last<29) {
+			//this is a bug fix for a typo in the homelayout default
+			$query = 'ALTER TABLE `imas_users` CHANGE `homelayout` `homelayout` VARCHAR( 32 ) NOT NULL DEFAULT \'|0,1,2||0,1\'';
+			$res = mysql_query($query);
+			if ($res===false) {
+				echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			}
+			$query = 'UPDATE `imas_users` SET homelayout = CONCAT(\'|0,1,2\',SUBSTR(homelayout,7))';
+			$res = mysql_query($query);
+			if ($res===false) {
+				echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			}
 		}
 		$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {

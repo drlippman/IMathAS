@@ -390,9 +390,7 @@ if ($overwriteBody==1) {
 		<input type=submit name="update" value="Update"><br/>
 		
 		Description:<BR> 
-		<textarea cols=60 rows=4 name=description <?php if (!$myq) echo "readonly=\"readonly\"";?>>
-			<?php echo $lineQSet['description'];?>
-		</textarea>
+		<textarea cols=60 rows=4 name=description <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $lineQSet['description'];?></textarea>
 		
 		<p>
 			Question type: 

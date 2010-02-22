@@ -164,6 +164,7 @@ if ($coursetopbar[1][0] == null) {unset($coursetopbar[1][0]);}
 if (isset($cid) && !isset($flexwidth) && $sessiondata['isteacher'] && $coursetopbar[2]==1 && count($coursetopbar[1])>0) {
 	echo '<div id="navlistcont">';
 	echo '<ul id="navlist">';
+	echo "<li><a href=\"$imasroot/course/course.php?cid=$cid\">Course</a></li> ";
 	if (in_array(0,$coursetopbar[1]) && $msgset<4) { //messages
 		echo "<li><a href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a></li> ";
 	}
@@ -198,6 +199,7 @@ if (isset($cid) && !isset($flexwidth) && $sessiondata['isteacher'] && $coursetop
 } else if (isset($cid) && !isset($flexwidth) && $sessiondata['isteacher'] && $coursetopbar[2]==1 && count($coursetopbar[0])>0) {
 	echo '<div id="navlistcont">';
 	echo '<ul id="navlist">';
+	echo "<li><a href=\"$imasroot/course/course.php?cid=$cid\">Course</a></li> ";
 	if (in_array(0,$coursetopbar[0]) && $msgset<4) { //messages
 		echo "<li><a href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a></li> ";
 	}

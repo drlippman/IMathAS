@@ -446,15 +446,6 @@ if ($overwriteBody==1) {
 ?>	
 	
 	<script type="text/javascript">
-	function chkAll(frm, arr, mark) {
-	  for (i = 0; i <= frm.elements.length; i++) {
-	   try{
-	     if(frm.elements[i].name == arr) {
-	       frm.elements[i].checked = mark;
-	     }
-	   } catch(er) {}
-	  }
-	}
 	var picsize = 0;
 	function rotatepics() {
 		picsize = (picsize+1)%3;
@@ -482,9 +473,8 @@ if ($overwriteBody==1) {
 	}
 	</script>
 	<script type="text/javascript" src="<?php echo $imasroot ?>/javascript/tablesorter.js"></script>
-	<form method=post action="listusers.php?cid=<?php echo $cid ?>">
-		Check/Uncheck All: 
-		<input type="checkbox" name="ca" value="1" onClick="chkAll(this.form, 'checked[]', this.checked)"> 
+	<form id="qform" method=post action="listusers.php?cid=<?php echo $cid ?>">
+		Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
 		With Selected:  
 		<input type=submit name=submit value="E-mail">
 		<input type=submit name=submit value="Message"> 

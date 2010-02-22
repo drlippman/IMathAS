@@ -171,10 +171,12 @@ function addLoadEvent(func) {
 	  } 
 } 
 var GB_loaded = false;
+//based on greybox redux, http://jquery.com/demo/grey/
 function GB_show(caption,url,width,height) {
 	if (GB_loaded == false) {
 		var gb_overlay = document.createElement("div");
 		gb_overlay.id = "GB_overlay";
+		gb_overlay.onclick = GB_hide;
 		document.getElementsByTagName("body")[0].appendChild(gb_overlay);
 		var gb_window = document.createElement("div");
 		gb_window.id = "GB_window";
@@ -209,4 +211,16 @@ function GB_doneload() {
 function GB_hide() {
 	document.getElementById("GB_window").style.display = "none";
 	document.getElementById("GB_overlay").style.display = "none";
+}
+
+function chkAllNone(frmid, arr, mark) {
+  var frm = document.getElementById(frmid);
+  for (i = 0; i <= frm.elements.length; i++) {
+   try{
+     if ((arr=='all' && frm.elements[i].type=='checkbox') || frm.elements[i].name == arr) {
+       frm.elements[i].checked = mark;
+     }
+   } catch(er) {}
+  }
+  return false;
 }

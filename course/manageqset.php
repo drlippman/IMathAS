@@ -840,16 +840,6 @@ function doaction(todo,id) {
 	window.location = addr;
 }
 
-function chkAll(frm, arr, mark) {
-  for (i = 0; i <= frm.elements.length; i++) {
-   try{
-     if(frm.elements[i].name == arr) {
-       frm.elements[i].checked = mark;
-     }
-   } catch(er) {}
-  }
-}
-
 var curlibs = '<?php echo $searchlibs ?>';
 
 function libselect() {
@@ -1045,7 +1035,9 @@ function getnextprev(formn,loc) {
 		
 		echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 		echo "<form id=\"selform\" method=post action=\"manageqset.php?cid=$cid\">\n";
-		echo "Check/Uncheck All: <input type=\"checkbox\" name=\"ca2\" value=\"1\" onClick=\"chkAll(this.form, 'nchecked[]', this.checked)\">\n";	
+		//echo "Check/Uncheck All: <input type=\"checkbox\" name=\"ca2\" value=\"1\" onClick=\"chkAll(this.form, 'nchecked[]', this.checked)\">\n";
+		echo 'Check: <a href="#" onclick="return chkAllNone(\'selform\',\'nchecked[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'selform\',\'nchecked[]\',false)">None</a> ';
+
 		echo "With Selected: <input type=submit name=\"transfer\" value=\"Transfer\">\n";
 		echo "<input type=submit name=\"remove\" value=\"Delete\">\n";
 		echo "<input type=submit name=\"chglib\" value=\"Library Assignment\">\n";

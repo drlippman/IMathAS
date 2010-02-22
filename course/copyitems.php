@@ -271,27 +271,12 @@ if ($overwriteBody==1) {
 	if (isset($_GET['action']) && $_GET['action']=='selectcalitems') {
 //DISPLAY BLOCK FOR selecting calendar items to copy
 ?>
-	<script type="text/javascript">
-	function chkAll(frm, arr, mark) {
-	  for (i = 0; i <= frm.elements.length; i++) {
-	   try{
-	     if(frm.elements[i].name == arr) {
-	       frm.elements[i].checked = mark;
-	     }
-	   } catch(er) {}
-	  }
-	}
-	
-
-	</script>
-	
-	<form method=post action="copyitems.php?cid=<?php echo $cid ?>&action=copycalitems">
+	<form id="qform" method=post action="copyitems.php?cid=<?php echo $cid ?>&action=copycalitems">
 	<input type=hidden name=ekey id=ekey value="<?php echo $_POST['ekey'] ?>">
 	<input type=hidden name=ctc id=ctc value="<?php echo $_POST['ctc'] ?>">
 	<h4>Select Calendar Items to Copy</h4>
-	Check/Uncheck All: 
-	<input type="checkbox" name="ca" value="1" onClick="chkAll(this.form, 'checked[]', this.checked)" checked=checked>
-	
+	Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
+		
 	<table cellpadding=5 class=gb>
 		<thead>
 		<tr><th></th><th>Date</th><th>Tag</th><th>Text</th></tr>
@@ -325,15 +310,7 @@ if ($overwriteBody==1) {
 //DISPLAY BLOCK FOR SECOND STEP - selecting course item
 ?>
 	<script type="text/javascript">
-	function chkAll(frm, arr, mark) {
-	  for (i = 0; i <= frm.elements.length; i++) {
-	   try{
-	     if(frm.elements[i].name == arr) {
-	       frm.elements[i].checked = mark;
-	     }
-	   } catch(er) {}
-	  }
-	}
+	
 	function chkgrp(frm, arr, mark) {
 	  var els = frm.getElementsByTagName("input");
 	  for (var i = 0; i < els.length; i++) {
@@ -345,13 +322,12 @@ if ($overwriteBody==1) {
 	}
 	</script>
 	
-	<form method=post action="copyitems.php?cid=<?php echo $cid ?>&action=copy">
+	<form id="qform" method=post action="copyitems.php?cid=<?php echo $cid ?>&action=copy">
 	<input type=hidden name=ekey id=ekey value="<?php echo $_POST['ekey'] ?>">
 	<input type=hidden name=ctc id=ctc value="<?php echo $_POST['ctc'] ?>">
 	<h4>Select Items to Copy</h4>
-	Check/Uncheck All: 
-	<input type="checkbox" name="ca" value="1" onClick="chkAll(this.form, 'checked[]', this.checked)" checked=checked>
-	
+	Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
+		
 	<table cellpadding=5 class=gb>
 		<thead>
 		<tr><th></th><th>Type</th><th>Title</th><th>Summary</th></tr>

@@ -100,21 +100,12 @@
 	
 ?>
 <script type="text/javascript">
-function chkAll(frm, arr, mark) {
-  for (i = 0; i <= frm.elements.length; i++) {
-   try{
-     if(frm.elements[i].name == arr) {
-       frm.elements[i].checked = mark;
-     }
-   } catch(er) {}
-  }
-}
 function chgfilter() {
 	var filterstu = document.getElementById("filterstu").value;
 	window.location = "<?php echo $address;?>"+filterstu;
 }
 </script>	
-	<form method=post action="allstumsglist.php?page=<?php echo $page;?>&cid=<?php echo $cid;?>">
+	<form id="qform" method=post action="allstumsglist.php?page=<?php echo $page;?>&cid=<?php echo $cid;?>">
 	<p>Filter by student: <select id="filterstu" onchange="chgfilter()">
 <?php
 	echo "<option value=\"0\" ";
@@ -144,7 +135,7 @@ function chgfilter() {
 	}
 	
 ?>
-	Check/Uncheck All: <input type="checkbox" name="ca2" value="1" onClick="chkAll(this.form, 'checked[]', this.checked)">	
+	Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
 	With Selected: 	<input type=submit name="remove" value="Delete">
 			
 	<table class=gb>

@@ -145,7 +145,7 @@ switch($_GET['action']) {
 		} else {
 			$msgset = $_POST['msgset'];
 			if (isset($_POST['msgmonitor'])) {
-				$_POST['msgset'] += 5;
+				$msgset += 5;
 			}
 		}
 		

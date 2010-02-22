@@ -762,13 +762,15 @@ if ($overwriteBody==1) {
 			<option value="0"<?php echo $grp0Selected ?>>Rearrange questions</option>
 			<option value="1"<?php echo $grp1Selected ?>>Group questions</option>
 		</select>
+		<br/>Check: <a href="#" onclick="return chkAllNone('curqform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('curqform','checked[]',false)">None</a>
+		
 		With Selected: <input type=button value="Remove" onclick="removeSelected()" />
 				<input type=button value="Group" onclick="groupSelected()" />
 			  	<input type="submit" value="Change Settings" />
+		
 <?php			
 		}
 ?>
-		Check/Uncheck All: <input type="checkbox" name="ca1" value="ignore" onClick="chkAll(this.form, 'checked[]', this.checked)">
 		<span id="submitnotice" style="color:red;"></span>
 		<div id="curqtbl"></div>
 
@@ -830,9 +832,7 @@ if ($overwriteBody==1) {
 ?>				
 		<form id="selq" method=post action="addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&addset=true">
 		
-		
-		Check/Uncheck All: 
-		<input type="checkbox" name="ca2" value="1" onClick="chkAll(this.form, 'nchecked[]', this.checked)">
+		Check: <a href="#" onclick="return chkAllNone('selq','nchecked[]',true)">All</a> <a href="#" onclick="return chkAllNone('selq','nchecked[]',false)">None</a>
 		<input name="add" type=submit value="Add" />
 		<input name="addquick" type=submit value="Add (using defaults)">
 		<input type=button value="Preview Selected" onclick="previewsel('selq')" />
@@ -911,8 +911,7 @@ if ($overwriteBody==1) {
 		or <input type=button value="Select From Libraries" onClick="window.location='addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&selfrom=lib'">
 		<br/>
 			
-		Check/Uncheck All: 
-		<input type="checkbox" name="ca2" value="1" onClick="chkAll(this.form, 'nchecked[]', this.checked)">
+		Check: <a href="#" onclick="return chkAllNone('selq','nchecked[]',true)">All</a> <a href="#" onclick="return chkAllNone('selq','nchecked[]',false)">None</a>
 		<input name="add" type=submit value="Add" />
 		<input name="addquick" type=submit value="Add Selected (using defaults)">
 		<input type=button value="Preview Selected" onclick="previewsel('selq')" />
@@ -969,8 +968,8 @@ if ($overwriteBody==1) {
 		} else {  //choose assessments
 ?>		
 		<h4>Choose assessments to take questions from</h4>
-		<form method=post action="addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>">
-		Check/Uncheck All: <input type="checkbox" name="ca2" value="1" onClick="chkAll(this.form, 'achecked[]', this.checked)" checked=1>
+		<form id="sela" method=post action="addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>">
+		Check: <a href="#" onclick="return chkAllNone('sela','achecked[]',true)">All</a> <a href="#" onclick="return chkAllNone('sela','achecked[]',false)">None</a>
 		<input type=submit value="Use these Assessments" /> or 
 		<input type=button value="Select From Libraries" onClick="window.location='addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&selfrom=lib'">
 			

@@ -317,15 +317,6 @@ isread:
 	}
 ?>
 <script type="text/javascript">
-function chkAll(frm, arr, mark) {
-  for (i = 0; i <= frm.elements.length; i++) {
-   try{
-     if(frm.elements[i].name == arr) {
-       frm.elements[i].checked = mark;
-     }
-   } catch(er) {}
-  }
-}
 function chgfilter() {
 	var filtercid = document.getElementById("filtercid").value;
 	var filteruid = document.getElementById("filteruid").value;
@@ -357,7 +348,7 @@ function picshow(size) {
 	}
 }
 </script>	
-	<form method=post action="msglist.php?page=<?php echo $page;?>&cid=<?php echo $cid;?>">
+	<form id="qform" method=post action="msglist.php?page=<?php echo $page;?>&cid=<?php echo $cid;?>">
 	<p>Filter by course: <select id="filtercid" onchange="chgfilter()">
 <?php
 	echo "<option value=\"0\" ";
@@ -398,7 +389,7 @@ function picshow(size) {
 	echo "</select></p>";
 	
 ?>
-	Check/Uncheck All: <input type="checkbox" name="ca2" value="1" onClick="chkAll(this.form, 'checked[]', this.checked)">	
+	Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
 	With Selected: <input type=submit name="unread" value="Mark as Unread">
 	<input type=submit name="markread" value="Mark as Read">
 	<input type=submit name="remove" value="Delete">
