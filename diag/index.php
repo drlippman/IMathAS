@@ -182,7 +182,7 @@ if (isset($_POST['SID'])) {
 			if ($passwordnotfound) {
 				$query = "SELECT password FROM imas_users WHERE SID='$diagSID'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				if (mysql_num_rows($result)>0 && mysql_result($result,0,0)==strtoupper($_POST['passwd'])) {
+				if (mysql_num_rows($result)>0 && strtoupper(mysql_result($result,0,0))==strtoupper($_POST['passwd'])) {
 					
 				} else {
 					echo "<html><body>Error, password incorrect or expired.  <a href=\"index.php?id=$diagid\">Try Again</a>\n";

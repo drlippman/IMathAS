@@ -724,6 +724,9 @@ if ($myrights<20) {
 		$ln=1;
 		
 		while ($line = mysql_fetch_array($resultLibs, MYSQL_ASSOC)) {
+			if (isset($page_questionTable[$line['id']])) {
+				continue;
+			}
 			if ($lastlib!=$line['libid'] && (isset($lnamesarr[$line['libid']]) || $searchall==1)) {
 				$page_libstouse[] = $line['libid'];
 				$lastlib = $line['libid'];

@@ -500,6 +500,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						if ($newonly && in_array($line['id'],$existingq)) {
 							continue;
 						}
+						if (isset($page_questionTable[$line['id']])) {
+							continue;
+						}
 						if ($lastlib!=$line['libid'] && isset($lnamesarr[$line['libid']])) {
 							/*$page_questionTable[$i]['checkbox'] = "";
 							$page_questionTable[$i]['desc'] = "<b>".$lnamesarr[$line['libid']]."</b>";
@@ -528,7 +531,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						}
 						$i = $line['id'];
 						$page_questionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . $line['id'] . "' id='qo$ln'>";
-						$page_questionTable[$i]['desc'] = filter($line['description']);
+						if (in_array($i,$existingq)) {
+							$page_questionTable[$i]['desc'] = '<span style="color: #999">'.filter($line['description']).'</span>';
+						} else {
+							$page_questionTable[$i]['desc'] = filter($line['description']);
+						}
 						$page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selq','qo$ln',{$line['id']},true,false)\"/>";
 						$page_questionTable[$i]['type'] = $line['qtype'];
 						if ($searchall==1) {
@@ -885,6 +892,7 @@ if ($overwriteBody==1) {
 ?>					
 			</tbody>
 		</table>
+		<p>Questions <span style="color:#999">in gray</span> have been added to the assessment.</p>
 		<script type="text/javascript">
 			initSortTable('myTable',Array(false,'S',false,'S',<?php echo ($searchall==1) ? "false, " : ""; ?>'N','S',false,false,false),true);
 		</script>
