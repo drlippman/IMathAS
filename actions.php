@@ -1,19 +1,26 @@
 <?php
 	//IMathAS:  Basic Actions
 	//(c) 20006 David Lippman
+	if (isset($_GET['greybox'])) {
+		$isgb = true;
+		$gb = '&greybox=true';
+	} else {
+		$isgb = false;
+		$gb = '';
+	}
 	if ($_GET['action']=="newuser") {
 		require_once("config.php");
 		if (isset($studentTOS) && !isset($_POST['agree'])) {
 			echo "<html><body>\n";
 			echo "<p>You must agree to the Terms and Conditions to set up an account</p>";
-			echo "<p><a href=\"forms.php?action=newuser\">Try Again</a></p>\n";
+			echo "<p><a href=\"forms.php?action=newuser$gb\">Try Again</a></p>\n";
 			echo "</html></body>\n";
 			exit;
 		}
 		$_POST['SID'] = trim($_POST['SID']);
 		if ($loginformat!='' && !preg_match($loginformat,$_POST['SID'])) {
 			echo "<html><body>\n";
-			echo "$loginprompt is invalid.  <a href=\"forms.php?action=newuser\">Try Again</a>\n";
+			echo "$loginprompt is invalid.  <a href=\"forms.php?action=newuser$gb\">Try Again</a>\n";
 			echo "</html></body>\n";
 			exit;
 		}
@@ -21,26 +28,26 @@
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		if (mysql_num_rows($result)>0) {
 			echo "<html><body>\n";
-			echo "$loginprompt '{$_POST['SID']}' is used.  <a href=\"forms.php?action=newuser\">Try Again</a>\n";
+			echo "$loginprompt '{$_POST['SID']}' is used.  <a href=\"forms.php?action=newuser$gb\">Try Again</a>\n";
 			echo "</html></body>\n";
 			exit;
 		}
 		//
 		if (!preg_match('/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/',$_POST['email'])) {
 			echo "<html><body>\n";
-			echo "Invalid email address.  <a href=\"forms.php?action=newuser\">Try Again</a>\n";
+			echo "Invalid email address.  <a href=\"forms.php?action=newuser$gb\">Try Again</a>\n";
 			echo "</html></body>\n";
 			exit;
 		}
 		if ($_POST['pw1'] != $_POST['pw2']) {
 			echo "<html><body>\n";
-			echo "Passwords don't match.  <a href=\"forms.php?action=newuser\">Try Again</a>\n";
+			echo "Passwords don't match.  <a href=\"forms.php?action=newuser$gb\">Try Again</a>\n";
 			echo "</html></body>\n";
 			exit;
 		}
 		if ($_POST['SID']=="" || $_POST['firstname']=="" || $_POST['lastname']=="" || $_POST['email']=="" || $_POST['pw1']=="") {
 			echo "<html><body>\n";
-			echo "Please include all information.  <a href=\"forms.php?action=newuser\">Try Again</a>\n";
+			echo "Please include all information.  <a href=\"forms.php?action=newuser$gb\">Try Again</a>\n";
 			echo "</html></body>\n";
 			exit;
 		}
@@ -61,7 +68,7 @@
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (mysql_num_rows($result)>0) {
 				require("header.php");
-				echo '<form method="post" action="actions.php?action=newuser&amp;confirmed=true">';
+				echo '<form method="post" action="actions.php?action=newuser&amp;confirmed=true'.$gb.'">';
 				echo '<input type="hidden" name="SID" value="'.stripslashes($_POST['SID']).'" />';
 				echo '<input type="hidden" name="firstname" value="'.stripslashes($_POST['firstname']).'" />';
 				echo '<input type="hidden" name="lastname" value="'.stripslashes($_POST['lastname']).'" />';
@@ -97,6 +104,7 @@
 			echo "<a href=\"$imasroot/index.php\">Back to main login page</a>\n";
 			echo "</body></html>\n";
 			exit;
+			
 		} else {
 			echo "<html><body>\n";
 			echo "<p>Your account with username <b>{$_POST['SID']}</b> has been created.  If you forget your password, you can ask your ";
@@ -141,7 +149,7 @@
 				$message .= "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=resetpw&id=$id&code=$code</a>\r\n";
 				mail(mysql_result($result,0,2),'Password Reset Request',$message,$headers);
 			} else {
-				echo "Invalid Username.  <a href=\"index.php\">Try again</a>";
+				echo "Invalid Username.  <a href=\"index.php$gb\">Try again</a>";
 				exit;
 			}
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php");
@@ -207,7 +215,7 @@
 			$query = "UPDATE imas_users SET password='$md5pw' WHERE id='$userid'";
 			mysql_query($query) or die("Query failed : " . mysql_error()); 
 		} else {
-			echo "<html><body>Password change failed.  <A HREF=\"forms.php?action=chgpwd\">Try Again</a>\n";
+			echo "<html><body>Password change failed.  <A HREF=\"forms.php?action=chgpwd$gb\">Try Again</a>\n";
 			echo "</body></html>\n";
 			exit;
 		}
@@ -219,7 +227,7 @@
 		}
 		if ($_POST['cid']=="" || !is_numeric($_POST['cid'])) {
 			echo "<html><body>\n";
-			echo "Please include Course ID.  <a href=\"forms.php?action=enroll\">Try Again</a>\n";
+			echo "Please include Course ID.  <a href=\"forms.php?action=enroll$gb\">Try Again</a>\n";
 			echo "</html></body>\n";
 			exit;
 		}
@@ -228,7 +236,7 @@
 		$line = mysql_fetch_array($result, MYSQL_ASSOC);
 		if ($line == null) {
 			echo "<html><body>\n";
-			echo "Course not found.  <a href=\"forms.php?action=enroll\">Try Again</a>\n";
+			echo "Course not found.  <a href=\"forms.php?action=enroll$gb\">Try Again</a>\n";
 			echo "</html></body>\n";
 			exit;
 		} else if (($line['allowunenroll']&2)==2) {
@@ -238,12 +246,12 @@
 			exit;
 		} else if ($_POST['ekey']=="" && $line['enrollkey'] != '') {
 			echo "<html><body>\n";
-			echo "Please include Enrollment Key.  <a href=\"forms.php?action=enroll\">Try Again</a>\n";
+			echo "Please include Enrollment Key.  <a href=\"forms.php?action=enroll$gb\">Try Again</a>\n";
 			echo "</html></body>\n";
 			exit;
 		} else if ($line['enrollkey'] != $_POST['ekey']) {
 			echo "<html><body>\n";
-			echo "Incorrect Enrollment Key.  <a href=\"forms.php?action=enroll\">Try Again</a>\n";
+			echo "Incorrect Enrollment Key.  <a href=\"forms.php?action=enroll$gb\">Try Again</a>\n";
 			echo "</html></body>\n";
 			exit;
 		} else {
@@ -376,7 +384,11 @@
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		}
 	}
-	header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php");
+	if ($isgb) {
+		echo '<html><body>Changes Recorded.  <input type="button" onclick="top.GB_hide()" value="Done" /></body></html>';		
+	} else {
+		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php");
+	}
 	
 	
 	
