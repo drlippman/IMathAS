@@ -665,7 +665,7 @@ function enditem($canedit) {
 				   $query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='$typeid'";
 				   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				   if (mysql_num_rows($result)>0) {
-					   echo "<ul>";
+					   echo '<ul class="fileattachlist">';
 					   $filenames = array();
 					   $filedescr = array();
 					   while ($row = mysql_fetch_row($result)) {
@@ -711,7 +711,7 @@ function enditem($canedit) {
 				   $query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='$typeid'";
 				   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				   if (mysql_num_rows($result)>0) {
-					   echo "<ul>";
+					   echo '<ul class="fileattachlist">';
 					   $filenames = array();
 					   $filedescr = array();
 					   while ($row = mysql_fetch_row($result)) {
@@ -1126,11 +1126,29 @@ function enditem($canedit) {
    		} else {
    			$html = '<div class="additembox"><span><b>Add:</b> ';
    		}
+		if (isset($CFG['CPS']['miniicons']['assess'])) {
+			echo "<img src=\"$imasroot/img/{$CFG['CPS']['miniicons']['assess']}\"/> ";
+		}
 		$html .= "<a href=\"addassessment.php?block=$blk&tb=$tb&cid=$cid\">Assessment</a> | ";
+		if (isset($CFG['CPS']['miniicons']['inline'])) {
+			echo "<img src=\"$imasroot/img/{$CFG['CPS']['miniicons']['inline']}\"/> ";
+		}
 		$html .= "<a href=\"addinlinetext.php?block=$blk&tb=$tb&cid=$cid\">Text</a> | ";
+		if (isset($CFG['CPS']['miniicons']['linked'])) {
+			echo "<img src=\"$imasroot/img/{$CFG['CPS']['miniicons']['linked']}\"/> ";
+		}
 		$html .= "<a href=\"addlinkedtext.php?block=$blk&tb=$tb&cid=$cid\">Link</a> | ";
+		if (isset($CFG['CPS']['miniicons']['forum'])) {
+			echo "<img src=\"$imasroot/img/{$CFG['CPS']['miniicons']['forum']}\"/> ";
+		}
 		$html .= "<a href=\"addforum.php?block=$blk&tb=$tb&cid=$cid\">Forum</a> | ";
+		if (isset($CFG['CPS']['miniicons']['folder'])) {
+			echo "<img src=\"$imasroot/img/{$CFG['CPS']['miniicons']['folder']}\"/> ";
+		}
 		$html .= "<a href=\"addblock.php?block=$blk&tb=$tb&cid=$cid\">Block</a> | ";
+		if (isset($CFG['CPS']['miniicons']['calendar'])) {
+			echo "<img src=\"$imasroot/img/{$CFG['CPS']['miniicons']['calendar']}\"/> ";
+		}
 		$html .= "<a href=\"addcalendar.php?block=$blk&tb=$tb&cid=$cid\">Calendar</a>";
 		$html .= '</span>';
 		$html .= '</div>';
