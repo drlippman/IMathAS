@@ -191,6 +191,32 @@ function copysub($items,$parent,&$addtoarr,$gbcats) {
 	}
 }	
 
+function copyallsub($items,$parent,&$addtoarr,$gbcats) {
+	global $blockcnt;
+	foreach ($items as $k=>$item) {
+		if (is_array($item)) {
+			$newblock = array();
+			$newblock['name'] = $item['name'].stripslashes($_POST['append']);
+			$newblock['id'] = $blockcnt;
+			$blockcnt++;
+			$newblock['startdate'] = $item['startdate'];
+			$newblock['enddate'] = $item['enddate'];
+			$newblock['avail'] = $item['avail'];
+			$newblock['SH'] = $item['SH'];
+			$newblock['colors'] = $item['colors'];
+			$newblock['public'] = $item['public'];
+			$newblock['fixedheight'] = $item['fixedheight'];
+			$newblock['items'] = array();
+			if (count($item['items'])>0) {
+				copyallsub($item['items'],$parent.'-'.($k+1),$newblock['items'],$gbcats);
+			}
+			$addtoarr[] = $newblock;
+		} else {
+			$addtoarr[] = copyitem($item,$gbcats);
+		}
+	}
+}
+
 
 function getiteminfo($itemid) {
 	$query = "SELECT itemtype,typeid FROM imas_items WHERE id='$itemid'";

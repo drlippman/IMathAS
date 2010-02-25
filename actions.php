@@ -378,6 +378,20 @@
 				unlink($galleryPath.'userimg_sm'.$userid.'.jpg');
 			}
 		}
+		if (isset($_POST['dochgpw'])) {
+			$query = "SELECT password FROM imas_users WHERE id = '$userid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$line = mysql_fetch_array($result, MYSQL_ASSOC);
+			if ((md5($_POST['oldpw'])==$line['password']) && ($_POST['newpw1'] == $_POST['newpw2']) && $myrights>5) {
+				$md5pw =md5($_POST['newpw1']);
+				$query = "UPDATE imas_users SET password='$md5pw' WHERE id='$userid'";
+				mysql_query($query) or die("Query failed : " . mysql_error()); 
+			} else {
+				echo "<html><body>Password change failed.  <A HREF=\"forms.php?action=chguserinfo$gb\">Try Again</a>\n";
+				echo "</body></html>\n";
+				exit;
+			}
+		}
 	} else if ($_GET['action']=="googlegadget") {
 		if (isset($_GET['clear'])) {
 			$query = "UPDATE imas_users SET remoteaccess='' WHERE id='$userid'";

@@ -395,6 +395,19 @@ switch($_GET['action']) {
 			echo '</span></span><br class="form" />';
 		}
 		
+		if (isset($CFG['CPS']['templateoncreate']) && $_GET['action']=='addcourse' ) {
+			echo '<span class="form">Use content from a template course:</span>';
+			echo '<span class="formright"><select name="usetemplate">';
+			echo '<option value="0" selected="selected">Start with blank course</option>';
+			$query = "SELECT ic.id,ic.name,ic.copyrights FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$templateuser' ORDER BY ic.name";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				echo '<option value="'.$row[0].'">'.$row[1].'</option>';
+			}
+			echo '</select></span><br class="form" />';
+		}
+		
+		
 		echo "<div class=submit><input type=submit value=Submit></div></form>\n";
 		break;
 	case "chgteachers":

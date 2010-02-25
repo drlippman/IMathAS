@@ -190,7 +190,7 @@ function GB_show(caption,url,width,height) {
 		btnhtml += '<span class="pointer" onclick="GB_hide()">[X]</span>&nbsp;</span>Select Libraries<div class="clear"></div>';
 		document.getElementById("GB_caption").innerHTML = btnhtml;
 	} else {
-		document.getElementById("GB_caption").innerHTML = '<span class="floatright">[X]</span>'+caption;
+		document.getElementById("GB_caption").innerHTML = '<span class="floatright"><span class="pointer" onclick="GB_hide()">[X]</span></span>'+caption;
 		document.getElementById("GB_caption").onclick = GB_hide;
 	}
 	document.getElementById("GB_window").style.display = "block";

@@ -189,79 +189,110 @@
 	}
 	//echo "<br/><b style=\"font-size: 120%\">Post: {$subject[$threadid]}</b><br/>\n";
 	//echo "<b style=\"font-size: 100%\">Forum: $forumname</b></p>";
-	echo " | <input type=button value=\"Expand All\" onclick=\"showall()\"/>";
+	echo " | <input type=button value=\"Expand All\" onclick=\"expandall()\"/>";
 	echo "<input type=button value=\"Collapse All\" onclick=\"collapseall()\"/> | ";
-	if ($view==2) {
+	echo " <input type=button value=\"Show All\" onclick=\"showall()\"/>";
+	echo "<input type=button value=\"Hide All\" onclick=\"hideall()\"/> ";
+	/*if ($view==2) {
 		echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&page=$page&thread=$threadid&view=0\">View Expanded</a>";
 	} else {
-		
 		echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&page=$page&thread=$threadid&view=2\">View Condensed</a>";
+	}*/
+	
+?>
+	<script type="text/javascript">
+	function toggleshow(bnum) {
+	   var node = document.getElementById('block'+bnum);
+	   var butn = document.getElementById('butb'+bnum);
+	   if (node.className == 'forumgrp') {
+	       node.className = 'hidden';
+	       //if (butn.value=='Collapse') {butn.value = 'Expand';} else {butn.value = '+';}
+	//       butn.value = 'Expand';
+		butn.src = imasroot+'/img/expand.gif';
+	   } else { 
+	       node.className = 'forumgrp';
+	       //if (butn.value=='Expand') {butn.value = 'Collapse';} else {butn.value = '-';}
+	//       butn.value = 'Collapse';
+		butn.src = imasroot+'/img/collapse.gif';
+	   }
+	}
+	function toggleitem(inum) {
+	   var node = document.getElementById('item'+inum);
+	   var butn = document.getElementById('buti'+inum);
+	   if (node.className == 'blockitems') {
+	       node.className = 'hidden';
+	       butn.value = 'Show';
+	   } else { 
+	       node.className = 'blockitems';
+	       butn.value = 'Hide';
+	   }
+	}
+	function expandall() {
+	   for (var i=0;i<bcnt;i++) {
+	     var node = document.getElementById('block'+i);
+	     var butn = document.getElementById('butb'+i);
+	     node.className = 'forumgrp';
+	//     butn.value = 'Collapse';
+	       //if (butn.value=='Expand' || butn.value=='Collapse') {butn.value = 'Collapse';} else {butn.value = '-';}
+	       butn.src = imasroot+'/img/collapse.gif';
+	   }
+	}
+	function collapseall() {
+	   for (var i=0;i<bcnt;i++) {
+	     var node = document.getElementById('block'+i);
+	     var butn = document.getElementById('butb'+i);
+	     node.className = 'hidden';
+	//     butn.value = 'Expand';
+	       //if (butn.value=='Collapse' || butn.value=='Expand' ) {butn.value = 'Expand';} else {butn.value = '+';}
+	       butn.src = imasroot+'/img/expand.gif';
+	   }
 	}
 	
-	
-	echo "<script>\n";
-	echo "function toggleshow(bnum) {\n";
-	echo "   var node = document.getElementById('block'+bnum);\n";
-	echo "   var butn = document.getElementById('butb'+bnum);\n";
-	echo "   if (node.className == 'forumgrp') {\n";
-	echo "       node.className = 'hidden';\n";
-	echo "       if (butn.value=='Collapse') {butn.value = 'Expand';} else {butn.value = '+';}\n";
-	//echo "       butn.value = 'Expand';\n";
-	echo "   } else { ";
-	echo "       node.className = 'forumgrp';\n";
-	echo "       if (butn.value=='Expand') {butn.value = 'Collapse';} else {butn.value = '-';}\n";
-	
-	//echo "       butn.value = 'Collapse';\n";
-	echo "   }\n";
-	echo "}\n";
-	echo "function toggleitem(inum) {\n";
-	echo "   var node = document.getElementById('item'+inum);\n";
-	echo "   var butn = document.getElementById('buti'+inum);\n";
-	echo "   if (node.className == 'blockitems') {\n";
-	echo "       node.className = 'hidden';\n";
-	echo "       butn.value = 'Show';\n";
-	echo "   } else { ";
-	echo "       node.className = 'blockitems';\n";
-	echo "       butn.value = 'Hide';\n";
-	echo "   }\n";
-	echo "}\n";
-	echo "function showall() {\n";
-	echo "   for (var i=0;i<bcnt;i++) {";
-	echo "     var node = document.getElementById('block'+i);\n";
-	echo "     var butn = document.getElementById('butb'+i);\n";
-	echo "     node.className = 'forumgrp';\n";
-	//echo "     butn.value = 'Collapse';\n";
-	echo "       if (butn.value=='Expand') {butn.value = 'Collapse';} else {butn.value = '-';}\n";
-	
-	echo "   }\n";
-	echo "}\n";
-	echo "function collapseall() {\n";
-	echo "   for (var i=0;i<bcnt;i++) {";
-	echo "     var node = document.getElementById('block'+i);\n";
-	echo "     var butn = document.getElementById('butb'+i);\n";
-	echo "     node.className = 'hidden';\n";
-	//echo "     butn.value = 'Expand';\n";
-	echo "       if (butn.value=='Collapse') {butn.value = 'Expand';} else {butn.value = '+';}\n";
-	
-	echo "   }\n";
-	echo "}\n";
-
-	echo "</script>\n";
-	
+	function showall() {
+	   for (var i=0;i<icnt;i++) {
+	     var node = document.getElementById('item'+i);
+	     var buti = document.getElementById('buti'+i);
+	     node.className = "blockitems";
+	     buti.value = "Hide";
+	   }
+	}
+	function hideall() {
+	   for (var i=0;i<icnt;i++) {
+	     var node = document.getElementById('item'+i);
+	     var buti = document.getElementById('buti'+i);
+	     node.className = "hidden";
+	     buti.value = "Show";
+	   }
+	}
+	</script>
+<?php
 	$bcnt = 0;
 	$icnt = 0;
 	function printchildren($base,$restricttoowner=false) {
 		$curdir = rtrim(dirname(__FILE__), '/\\');
-		global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points,$posttype,$lastview,$bcnt,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$view,$page,$allowmsg,$haspoints;
+		global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points,$posttype,$lastview,$bcnt,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$view,$page,$allowmsg,$haspoints,$imasroot;
 		foreach($children[$base] as $child) {
 			if ($restricttoowner && $ownerid[$child] != $userid) {
 				continue;
 			}
 			echo "<div class=block> ";
-			if (file_exists("$curdir/../course/files/userimg_sm{$ownerid[$child]}.jpg")) {
-				echo "<img src=\"$imasroot/course/files/userimg_sm{$ownerid[$child]}.jpg\" class=\"pic\" onclick=\"togglepic(this)\"/>";
+			echo '<span class="leftbtns">';
+			if (isset($children[$child])) {
+				if ($view==1) { 
+					$lbl = '+';
+					$img = "expand";
+				} else {
+					$lbl = '-';
+					$img = "collapse";
+				}
+				//echo "<input type=button id=\"butb$bcnt\" value=\"$lbl\" onClick=\"toggleshow($bcnt)\"> ";
+				echo "<img class=\"pointer\" id=\"butb$bcnt\" src=\"$imasroot/img/$img.gif\" onClick=\"toggleshow($bcnt)\"/> ";
 			}
-			if ($view==2) {
+			if (file_exists("$curdir/../course/files/userimg_sm{$ownerid[$child]}.jpg")) {
+				echo "<img src=\"$imasroot/course/files/userimg_sm{$ownerid[$child]}.jpg\" onclick=\"togglepic(this)\"/>";
+			}
+			echo '</span>';
+			/*if ($view==2) {
 				echo "<span class=right>";
 				if ($haspoints) {
 					if ($isteacher) {
@@ -322,6 +353,7 @@
 					echo "</div>\n";
 				}
 			} else {
+			*/
 				echo "<span class=right>";
 				if ($haspoints) {
 					if ($isteacher) {
@@ -334,9 +366,11 @@
 						echo "<span class=red>{$points[$child]} points</span> ";
 					}
 				}
-				if (isset($children[$child])) {
+				/*if (isset($children[$child])) {
 					echo "<input type=button id=\"butb$bcnt\" value=\"Collapse\" onClick=\"toggleshow($bcnt)\">\n";
-				}
+				}*/
+				echo "<input type=button id=\"buti$icnt\" value=\"Show\" onClick=\"toggleitem($icnt)\">\n";
+				
 				if ($isteacher) {
 					echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&move=$child\">Move</a> \n";
 				} 
@@ -372,12 +406,17 @@
 				}
 				
 				echo "</div>\n";
-				echo "<div class=blockitems>";
+				if ($view==2) {
+					echo "<div class=hidden id=\"item$icnt\">";
+				} else {
+					echo "<div class=blockitems id=\"item$icnt\">";
+				}
 				echo filter($message[$child]);
 				echo "<div class=\"clear\"></div></div>\n";
+				$icnt++;
 				if (isset($children[$child])) { //if has children
 					echo "<div class=";
-					if ($view==0) {
+					if ($view==0 || $view==2) {
 						echo '"forumgrp"';
 					} else if ($view==1) {
 						echo '"hidden"';
@@ -387,7 +426,7 @@
 					printchildren($child, ($posttype[$child]==3 && !$isteacher));
 					echo "</div>\n";
 				}
-			}
+			//}
 		}
 	}
 	if ($isteacher && $haspoints) {
@@ -398,8 +437,11 @@
 		echo "<div><input type=submit value=\"Save Grades\" /></div>";
 		echo "</form>";
 	}
+	echo "<img src=\"$imasroot/img/expand.gif\" style=\"visibility:hidden\" />";
+	echo "<img src=\"$imasroot/img/collapse.gif\" style=\"visibility:hidden\" />";
+	
 	echo "<script type=\"text/javascript\">";
-	echo "var bcnt =".$bcnt.";\n";
+	echo "var bcnt =$bcnt; var icnt = $icnt;\n";
 	echo "</script>";
 	echo "<div class=right><a href=\"thread.php?cid=$cid&forum=$forumid&page=$page\">Back to Forum Topics</a></div>\n";
 	require("../footer.php");
