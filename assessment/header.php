@@ -52,6 +52,17 @@ if ($sessiondata['graphdisp']==1) {
 	echo "<script src=\"$imasroot/javascript/mathjs.js\" type=\"text/javascript\"></script>\n";
 }
 ?>
+<!--[if lte IE 6]> 
+<style> 
+div { height: 0px; } 
+.clear { line-height: 0;}
+#GB_overlay, #GB_window { 
+ position: absolute; 
+ top: expression(0+((e=document.documentElement.scrollTop)?e:document.body.scrollTop)+'px'); 
+ left: expression(0+((e=document.documentElement.scrollLeft)?e:document.body.scrollLeft)+'px');} 
+}
+</style> 
+<![endif]--> 
 <script src="<?php echo $imasroot . "/javascript/AMhelpers_min.js?v=011010";?>" type="text/javascript"></script>
 <script src="<?php echo $imasroot . "/javascript/confirmsubmit.js";?>" type="text/javascript"></script>
 <!--[if IE]><script type="text/javascript" src="<?php echo $imasroot;?>/javascript/excanvas_min.js"></script><![endif]-->
