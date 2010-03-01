@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 29;
+$latest = 30;
 
 if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 	$handle = fopen("upgradecounter.txt",'w');
@@ -404,6 +404,38 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			$res = mysql_query($query);
 			if ($res===false) {
 				echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			}
+		}
+		if ($last<30) {
+			$query = "ALTER TABLE `imas_assessments` ADD `calrtag` VARCHAR(254) NOT NULL DEFAULT 'R';"; 
+			$res = mysql_query($query);
+			if ($res===false) {
+			 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			}
+			$query = "UPDATE imas_assessments SET calrtag=substring(caltag,2,1),caltag=substring(caltag,1,1)";
+			$res = mysql_query($query);
+			if ($res===false) {
+			 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			}
+			$query = 'ALTER TABLE `imas_assessments` CHANGE `caltag` `caltag` VARCHAR( 254 ) NOT NULL DEFAULT \'?\'';
+			$res = mysql_query($query);
+			if ($res===false) {
+			 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			}
+			$query = 'ALTER TABLE `imas_inlinetext` CHANGE `caltag` `caltag` VARCHAR( 254 ) NOT NULL DEFAULT \'!\'';
+			$res = mysql_query($query);
+			if ($res===false) {
+			 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			}
+			$query = 'ALTER TABLE `imas_linkedtext` CHANGE `caltag` `caltag` VARCHAR( 254 ) NOT NULL DEFAULT \'!\'';
+			$res = mysql_query($query);
+			if ($res===false) {
+			 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			}
+			$query = 'ALTER TABLE `imas_calitems` CHANGE `tag` `tag` VARCHAR( 254 ) NOT NULL';
+			$res = mysql_query($query);
+			if ($res===false) {
+			 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			}
 		}
 		$handle = fopen("upgradecounter.txt",'w');

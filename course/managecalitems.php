@@ -75,7 +75,7 @@ while ($row = mysql_fetch_row($result)) {
 	echo "<td><input type=text size=10 id=\"date{$row[0]}\" name=\"date{$row[0]}\" value=\"$date\"/> ";	
 	echo "<a href=\"#\" onClick=\"displayDatePicker('date{$row[0]}', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a></td>";
 	$cnt++;
-	echo '<td><input name="tag['.$row[0].']" type=text size=1 maxlength=1 value="'.$row[3].'" /></td>';
+	echo '<td><input name="tag['.$row[0].']" type=text size=1 value="'.$row[3].'" /></td>';
 	echo '<td><input name="txt['.$row[0].']" type=text size=80 value="'.str_replace('"','&quot;',$row[2]).'" /></td>';
 	echo '<tr/>';
 }
@@ -92,7 +92,7 @@ if (isset($_GET['addto'])) {
 echo "<td><input type=text size=10 id=\"datenew\" name=\"datenew\" value=\"$date\"/> ";	
 echo "<a href=\"#\" onClick=\"displayDatePicker('datenew', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a></td>";
 $cnt++;
-echo '<td><input name="tagnew" type=text size=1 maxlength=1 value="!" /></td>';
+echo '<td><input name="tagnew" type=text size=1 value="!" /></td>';
 echo '<td><input name="txtnew" type=text size=80 value="" /></td>';
 echo '<tr/>';
 

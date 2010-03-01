@@ -28,7 +28,7 @@ if (!(isset($teacherid))) {
 		
 		$sets = array();
 		if (isset($_POST['docopyopt'])) {
-			$tocopy = 'password,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,eqnhelper,showhints,allowlate,noprint,shuffle,gbcategory,cntingb,caltag,minscore,exceptionpenalty,isgroup,groupmax,showcat';
+			$tocopy = 'password,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,eqnhelper,showhints,allowlate,noprint,shuffle,gbcategory,cntingb,caltag,calrtag,minscore,exceptionpenalty,isgroup,groupmax,showcat';
 			
 			$query = "SELECT $tocopy FROM imas_assessments WHERE id='{$_POST['copyopt']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -167,8 +167,10 @@ if (!(isset($teacherid))) {
 				$sets[] = "avail='{$_POST['avail']}'";
 			}
 			if (isset($_POST['chgcaltag'])) {
-				$caltag = $_POST['caltagact'].$_POST['caltagrev'];
+				$caltag = $_POST['caltagact'];
 				$sets[] = "caltag='$caltag'";
+				$calrtag = $_POST['caltagrev'];
+				$sets[] = "calrtag='$calrtag'";
 			}
 			
 				
@@ -545,8 +547,8 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgcaltag"/></td>
 				<td class="r">Calendar icon:</td>
-				<td>Active: <input name="caltagact" type=text size=1 maxlength=1 value="?"/>, 
-				    Review: <input name="caltagrev" type=text size=1 maxlength=1 value="R"/></td>
+				<td>Active: <input name="caltagact" type=text size=1 value="?"/>, 
+				    Review: <input name="caltagrev" type=text size=1 value="R"/></td>
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgminscore"/></td>
 				<td class="r">Minimum score to receive credit: </td>

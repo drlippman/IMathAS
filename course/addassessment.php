@@ -166,7 +166,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$_POST['ltisecret'] = '';
 		}
 		
-		$caltag = $_POST['caltagact'].$_POST['caltagrev'];
+		$caltag = $_POST['caltagact'];
+		$calrtag = $_POST['caltagrev'];
 		
 		require_once("../includes/htmLawed.php");
 		$htmlawedconfig = array('elements'=>'*-script');
@@ -181,7 +182,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			if (isset($_POST['defpoints'])) {
 				$query = "UPDATE imas_assessments SET name='{$_POST['name']}',summary='{$_POST['summary']}',intro='{$_POST['intro']}',startdate=$startdate,enddate=$enddate,reviewdate=$reviewdate,timelimit='$timelimit',minscore='{$_POST['minscore']}',isgroup='$isgroup',showhints='$showhints',tutoredit=$tutoredit,eqnhelper='{$_POST['eqnhelper']}',showtips='{$_POST['showtips']}',";
-				$query .= "displaymethod='{$_POST['displaymethod']}',defpoints='{$_POST['defpoints']}',defattempts='{$_POST['defattempts']}',defpenalty='{$_POST['defpenalty']}',deffeedback='$deffeedback',shuffle='$shuffle',gbcategory='{$_POST['gbcat']}',password='{$_POST['password']}',caltag='$caltag',";
+				$query .= "displaymethod='{$_POST['displaymethod']}',defpoints='{$_POST['defpoints']}',defattempts='{$_POST['defattempts']}',defpenalty='{$_POST['defpenalty']}',deffeedback='$deffeedback',shuffle='$shuffle',gbcategory='{$_POST['gbcat']}',password='{$_POST['password']}',caltag='$caltag',calrtag='$calrtag',";
 				$query .= "cntingb='{$_POST['cntingb']}',showcat='{$_POST['showqcat']}',reqscore='{$_POST['reqscore']}',reqscoreaid='{$_POST['reqscoreaid']}',noprint='{$_POST['noprint']}',avail='{$_POST['avail']}',groupmax='{$_POST['groupmax']}',allowlate='{$_POST['allowlate']}',exceptionpenalty='{$_POST['exceptionpenalty']}',ltisecret='{$_POST['ltisecret']}'";
 				if (isset($_POST['copyendmsg'])) {
 					$query .= ",endmsg='$endmsg' ";
@@ -189,7 +190,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$query .= " WHERE id='{$_GET['id']}';";
 			} else { //has been taken - not updating "don't change" settings
 				$query = "UPDATE imas_assessments SET name='{$_POST['name']}',summary='{$_POST['summary']}',intro='{$_POST['intro']}',startdate=$startdate,enddate=$enddate,reviewdate=$reviewdate,timelimit='$timelimit',minscore='{$_POST['minscore']}',isgroup='$isgroup',showhints='$showhints',tutoredit=$tutoredit,eqnhelper='{$_POST['eqnhelper']}',showtips='{$_POST['showtips']}',";
-				$query .= "displaymethod='{$_POST['displaymethod']}',defattempts='{$_POST['defattempts']}',deffeedback='$deffeedback',shuffle='$shuffle',gbcategory='{$_POST['gbcat']}',password='{$_POST['password']}',cntingb='{$_POST['cntingb']}',showcat='{$_POST['showqcat']}',caltag='$caltag',";
+				$query .= "displaymethod='{$_POST['displaymethod']}',defattempts='{$_POST['defattempts']}',deffeedback='$deffeedback',shuffle='$shuffle',gbcategory='{$_POST['gbcat']}',password='{$_POST['password']}',cntingb='{$_POST['cntingb']}',showcat='{$_POST['showqcat']}',caltag='$caltag',calrtag='$calrtag',";
 				$query .= "reqscore='{$_POST['reqscore']}',reqscoreaid='{$_POST['reqscoreaid']}',noprint='{$_POST['noprint']}',avail='{$_POST['avail']}',groupmax='{$_POST['groupmax']}',allowlate='{$_POST['allowlate']}',exceptionpenalty='{$_POST['exceptionpenalty']}',ltisecret='{$_POST['ltisecret']}' ";
 				if (isset($_POST['copyendmsg'])) {
 					$query .= ",endmsg='$endmsg' ";
@@ -208,10 +209,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else { //add new
 			if (!isset($_POST['copyendmsg'])) {$endmsg = '';}						
 			$query = "INSERT INTO imas_assessments (courseid,name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,";
-			$query .= "displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,showcat,eqnhelper,showtips,caltag,isgroup,groupmax,showhints,reqscore,reqscoreaid,noprint,avail,allowlate,exceptionpenalty,ltisecret,endmsg) VALUES ";
+			$query .= "displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,showcat,eqnhelper,showtips,caltag,calrtag,isgroup,groupmax,showhints,reqscore,reqscoreaid,noprint,avail,allowlate,exceptionpenalty,ltisecret,endmsg) VALUES ";
 			$query .= "('$cid','{$_POST['name']}','{$_POST['summary']}','{$_POST['intro']}',$startdate,$enddate,$reviewdate,'$timelimit','{$_POST['minscore']}',";
 			$query .= "'{$_POST['displaymethod']}','{$_POST['defpoints']}','{$_POST['defattempts']}',";
-			$query .= "'{$_POST['defpenalty']}','$deffeedback','$shuffle','{$_POST['gbcat']}','{$_POST['password']}','{$_POST['cntingb']}',$tutoredit,'{$_POST['showqcat']}','{$_POST['eqnhelper']}','{$_POST['showtips']}','$caltag',";
+			$query .= "'{$_POST['defpenalty']}','$deffeedback','$shuffle','{$_POST['gbcat']}','{$_POST['password']}','{$_POST['cntingb']}',$tutoredit,'{$_POST['showqcat']}','{$_POST['eqnhelper']}','{$_POST['showtips']}','$caltag','$calrtag',";
 			$query .= "'$isgroup','{$_POST['groupmax']}','$showhints','{$_POST['reqscore']}','{$_POST['reqscoreaid']}','{$_POST['noprint']}','{$_POST['avail']}','{$_POST['allowlate']}','{$_POST['exceptionpenalty']}','{$_POST['ltisecret']}','$endmsg');";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			
@@ -303,7 +304,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$line['tutoredit'] = isset($CFG['AMS']['tutoredit'])?$CFG['AMS']['tutoredit']:0;
 			$line['eqnhelper'] = isset($CFG['AMS']['eqnhelper'])?$CFG['AMS']['eqnhelper']:0;
 			$line['ltisecret'] = '';
-			$line['caltag'] = isset($CFG['AMS']['caltag'])?$CFG['AMS']['caltag']:'?R';
+			$line['caltag'] = isset($CFG['AMS']['caltag'])?$CFG['AMS']['caltag']:'?';
+			$line['calrtag'] = isset($CFG['AMS']['calrtag'])?$CFG['AMS']['calrtag']:'R';
 			$line['showtips'] = isset($CFG['AMS']['showtips'])?$CFG['AMS']['showtips']:1;
 			$gbcat = 0;
 			$cntingb = 1;
@@ -676,8 +678,8 @@ if ($overwriteBody==1) {
 ?>
 			<span class="form">Calendar icon:</span>
 			<span class="formright">
-				Active: <input name="caltagact" type=text size=1 maxlength=1 value="<?php echo $line['caltag']{0};?>"/>, 
-				Review: <input name="caltagrev" type=text size=1 maxlength=1 value="<?php echo $line['caltag']{1};?>"/>
+				Active: <input name="caltagact" type=text size=1 value="<?php echo $line['caltag'];?>"/>, 
+				Review: <input name="caltagrev" type=text size=1 value="<?php echo $line['calrtag'];?>"/>
 			</span><br class="form" />
 			
 			</fieldset>

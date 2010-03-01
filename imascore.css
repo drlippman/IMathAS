@@ -193,6 +193,9 @@ br.form {
 img {
 	border: 0;
 }
+img.mida {
+	vertical-align: middle;
+}
 div.right {
 	text-align: right;	
 }
@@ -259,6 +262,7 @@ table.cal td {
 	border: 1px solid #000;
 	width: 14%;
 	height: 2.5em;
+	vertical-align: top;
 }
 .day {
 	font-size: 80%;
@@ -270,11 +274,17 @@ table.cal td {
 div.center {
 	text-align: center;
 }
+span.calitem {
+	line-height: 120%;
+	padding: 0 3px;
+}
+/*
 div.td {
 	width: 100%;
 	height: 100%;
 	overflow: hidden;
 }
+*/
 img.faded {
 	filter: alpha(opacity: 30);
 	KHTMLOpacity: .3;
@@ -496,4 +506,5 @@ div#viewbuttoncont a.buttoninactive:hover {
   margin: 0;
   text-align: left;
 }
+
 

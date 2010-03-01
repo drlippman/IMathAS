@@ -112,7 +112,7 @@ function showcalcontentsid(elid) {
 		html += '<ul class=qview style="margin-top: 2px;">';
 		for (var i=0; i<caleventsarr[elid].data.length; i++) {
 			if (caleventsarr[elid].data[i].type=='A') {
-				html += '<li><span style="background-color:'+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+caleventsarr[elid].data[i].tag+'</span> ';
+				html += '<li><span class="calitem" style="background-color:'+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+caleventsarr[elid].data[i].tag+'</span> ';
 				if (caleventsarr[elid].data[i].id!=null) { 
 					html += '<a href="../assessment/showtest.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'"';
 					if (caleventsarr[elid].data[i].timelimit!=null) {
@@ -133,7 +133,7 @@ function showcalcontentsid(elid) {
 				}
 				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type=='AR') {
-				html += '<li><span style="background-color: '+caleventsarr[elid].data[i].color+';padding: 0px 5px 0px 5px;">'+caleventsarr[elid].data[i].tag+'</span> ';
+				html += '<li><span class="calitem" style="background-color: '+caleventsarr[elid].data[i].color+';padding: 0px 5px 0px 5px;">'+caleventsarr[elid].data[i].tag+'</span> ';
 				if (caleventsarr[elid].data[i].id!=null) { 
 					html += '<a href="../assessment/showtest.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">';
 					html += caleventsarr[elid].data[i].name + '</a>';
@@ -146,14 +146,14 @@ function showcalcontentsid(elid) {
 				}
 				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type=='I') {
-				html += '<li><span style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+ caleventsarr[elid].data[i].tag+'</span> ';
+				html += '<li><span class="calitem" style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+ caleventsarr[elid].data[i].tag+'</span> ';
 				html += caleventsarr[elid].data[i].name;
 				if (caleventsarr[elid].data[i].editlink!=null) {
 					html += ' <a href="addinlinetext.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Modify</a>';
 				}
 				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type=='L') {
-				html += '<li><span style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+ caleventsarr[elid].data[i].tag+'</span> ';
+				html += '<li><span class="calitem" style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+ caleventsarr[elid].data[i].tag+'</span> ';
 				if (caleventsarr[elid].data[i].id!=null) { 
 					if (caleventsarr[elid].data[i].link=='') {
 						html += '<a href="../course/showlinkedtext.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">';
@@ -170,7 +170,7 @@ function showcalcontentsid(elid) {
 				}
 				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type=='FP') {
-				html += '<li><span style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">F</span> ';
+				html += '<li><span class="calitem" style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">F</span> ';
 				if (caleventsarr[elid].data[i].id!=null) { 
 					html += '<a href="../forums/thread.php?cid='+cid+'&forum='+caleventsarr[elid].data[i].id+'">';
 					html += caleventsarr[elid].data[i].name + '</a>';
@@ -183,7 +183,7 @@ function showcalcontentsid(elid) {
 				}
 				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type=='FR') {
-				html += '<li><span style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">F</span> ';
+				html += '<li><span class="calitem" style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">F</span> ';
 				if (caleventsarr[elid].data[i].id!=null) { 
 					html += '<a href="../forums/thread.php?cid='+cid+'&forum='+caleventsarr[elid].data[i].id+'">';
 					html += caleventsarr[elid].data[i].name + '</a>';
@@ -196,7 +196,7 @@ function showcalcontentsid(elid) {
 				}
 				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type=='C') {
-				html += '<li><span style="background-color: #0ff; padding: 0px 5px 0px 5px;">'+ caleventsarr[elid].data[i].tag+'</span> ';
+				html += '<li><span class="calitem" style="background-color: #0ff; padding: 0px 5px 0px 5px;">'+ caleventsarr[elid].data[i].tag+'</span> ';
 				html += caleventsarr[elid].data[i].name;
 				html += '</li>';
 			} 

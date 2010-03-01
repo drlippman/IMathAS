@@ -1242,6 +1242,9 @@ function multicalconarray() {
 		
 	$todo = mathphp($todo,implode('|',$vars),false,false);
 	if ($todo=='0;') { return 0;}
+	for ($i=0;$i<count($vars);$i++) {
+		$todo = str_replace('('.$vars[$i].')','($'.$vars[$i].')',$todo);
+	}
 
 	$varlist = '$'.implode(',$',$vars);
 	$evalstr = "return(array_map(create_function('$varlist','return($todo);')";

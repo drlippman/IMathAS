@@ -115,7 +115,7 @@ $assess = array();
 $colors = array();
 $tags = array();
 $k = 0;
-$query = "SELECT id,name,startdate,enddate,reviewdate,gbcategory,reqscore,reqscoreaid,timelimit,allowlate,caltag FROM imas_assessments WHERE avail=1 AND courseid='$cid' AND enddate<2000000000";
+$query = "SELECT id,name,startdate,enddate,reviewdate,gbcategory,reqscore,reqscoreaid,timelimit,allowlate,caltag,calrtag FROM imas_assessments WHERE avail=1 AND courseid='$cid' AND enddate<2000000000";
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 while ($row = mysql_fetch_row($result)) {
 	if (isset($exceptions[$row[0]])) {
@@ -151,7 +151,7 @@ while ($row = mysql_fetch_row($result)) {
 	if ($row[4]<$uppertime && $row[4]>0 && $now>$row[3]) { //has review, and we're past enddate
 		list($moday,$time) = explode('~',date('n-j~g:i a',$row[4]));
 		$row[1] = str_replace('"','\"',$row[1]);
-		$tag = $row[10]{1};
+		$tag = $row[11];
 		if ($now<$row[4]) { $colors[$k] = '#99f';} else {$colors[$k] = '#ccc';}
 		$assess[$moday][$k] = "{type:\"AR\", time:\"$time\", tag:\"$tag\", ";
 		if ($now<$row[4] || isset($teacherid)) { $assess[$moday][$k] .= "id:\"$row[0]\",";}
@@ -162,7 +162,7 @@ while ($row = mysql_fetch_row($result)) {
 		} else {
 			$tag = '?';
 		}*/
-		$tag = $row[10]{0};
+		$tag = $row[10];
 		if ($row[9]==1 && $latepasses>0) {
 			$lp = 1;
 		} else {
@@ -302,18 +302,18 @@ for ($i=0;$i<count($hdrs);$i++) {
 			foreach ($assess[$ids[$i][$j]] as $k=>$info) {
 				//echo $assess[$ids[$i][$j]][$k];
 				if (strpos($info,'type:"AR"')!==false) {
-					echo "<span style=\"background-color:".$colors[$k].";padding: 0px 3px 0px 3px;\">{$tags[$k]}</span> ";
+					echo "<span class=\"calitem\" style=\"background-color:".$colors[$k].";\">{$tags[$k]}</span> ";
 				} else if (strpos($info,'type:"A"')!==false) {
-					echo "<span style=\"background-color:".$colors[$k].";padding: 0px 3px 0px 3px;\">{$tags[$k]}</span> ";
+					echo "<span class=\"calitem\" style=\"background-color:".$colors[$k].";\">{$tags[$k]}</span> ";
 				} else if (strpos($info,'type:"F')!==false) { 
-					echo "<span style=\"background-color:".$colors[$k].";padding: 0px 3px 0px 3px;\">F</span> ";
+					echo "<span class=\"calitem\" style=\"background-color:".$colors[$k].";\">F</span> ";
 				} else if (strpos($info,'type:"C')!==false) { 
-					echo "<span style=\"background-color: #0ff;padding: 0px 3px 0px 3px;\">{$tags[$k]}</span> ";
+					echo "<span class=\"calitem\" style=\"background-color: #0ff;\">{$tags[$k]}</span> ";
 				} else { //textitems
 					if (isset($tags[$k])) {
-						echo "<span style=\"background-color:".$colors[$k].";padding: 0px 3px 0px 3px;\">{$tags[$k]}</span> ";
+						echo "<span class=\"calitem\" style=\"background-color:".$colors[$k].";\">{$tags[$k]}</span> ";
 					} else {
-						echo "<span style=\"background-color:".$colors[$k].";padding: 0px 3px 0px 3px;\">!</span> ";
+						echo "<span class=\"calitem\" style=\"background-color:".$colors[$k].";\">!</span> ";
 					}
 				}
 			}

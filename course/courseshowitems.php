@@ -1118,7 +1118,7 @@ function enditem($canedit) {
    }
    
    function generateadditem($blk,$tb) {
-   	global $cid, $CFG;
+   	global $cid, $CFG,$imasroot;
    	if (isset($CFG['CPS']['additemtype']) && $CFG['CPS']['additemtype'][0]=='links') {
    		if ($tb=='BB' || $tb=='LB') {$tb = 'b';}
    		if ($tb=='t' && $blk=='0') {
@@ -1126,30 +1126,42 @@ function enditem($canedit) {
    		} else {
    			$html = '<div class="additembox"><span><b>Add:</b> ';
    		}
+   		
+		$html .= "<a href=\"addassessment.php?block=$blk&tb=$tb&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['assess'])) {
-			echo "<img src=\"$imasroot/img/{$CFG['CPS']['miniicons']['assess']}\"/> ";
+			$html .= "<img class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['assess']}\"/> ";
 		}
-		$html .= "<a href=\"addassessment.php?block=$blk&tb=$tb&cid=$cid\">Assessment</a> | ";
+		$html .= "Assessment</a> | ";
+		
+		$html .= "<a href=\"addinlinetext.php?block=$blk&tb=$tb&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['inline'])) {
-			echo "<img src=\"$imasroot/img/{$CFG['CPS']['miniicons']['inline']}\"/> ";
+			$html .= "<img class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['inline']}\"/> ";
 		}
-		$html .= "<a href=\"addinlinetext.php?block=$blk&tb=$tb&cid=$cid\">Text</a> | ";
+		$html .= "Text</a> | ";
+		
+		$html .= "<a href=\"addlinkedtext.php?block=$blk&tb=$tb&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['linked'])) {
-			echo "<img src=\"$imasroot/img/{$CFG['CPS']['miniicons']['linked']}\"/> ";
+			$html .= "<img class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['linked']}\"/> ";
 		}
-		$html .= "<a href=\"addlinkedtext.php?block=$blk&tb=$tb&cid=$cid\">Link</a> | ";
+		$html .= "Link</a> | ";
+		
+		$html .= "<a href=\"addforum.php?block=$blk&tb=$tb&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['forum'])) {
-			echo "<img src=\"$imasroot/img/{$CFG['CPS']['miniicons']['forum']}\"/> ";
+			$html .= "<img class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['forum']}\"/> ";
 		}
-		$html .= "<a href=\"addforum.php?block=$blk&tb=$tb&cid=$cid\">Forum</a> | ";
+		$html .= "Forum</a> | ";
+		
+		$html .= "<a href=\"addblock.php?block=$blk&tb=$tb&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['folder'])) {
-			echo "<img src=\"$imasroot/img/{$CFG['CPS']['miniicons']['folder']}\"/> ";
+			$html .= "<img class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['folder']}\"/> ";
 		}
-		$html .= "<a href=\"addblock.php?block=$blk&tb=$tb&cid=$cid\">Block</a> | ";
+		$html .= "Block</a> | ";
+		
+		$html .= "<a href=\"addcalendar.php?block=$blk&tb=$tb&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['calendar'])) {
-			echo "<img src=\"$imasroot/img/{$CFG['CPS']['miniicons']['calendar']}\"/> ";
+			$html .= "<img class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['calendar']}\"/> ";
 		}
-		$html .= "<a href=\"addcalendar.php?block=$blk&tb=$tb&cid=$cid\">Calendar</a>";
+		$html .= "Calendar</a>";
 		$html .= '</span>';
 		$html .= '</div>';
    		
@@ -1291,7 +1303,7 @@ function enditem($canedit) {
    
    //instructor-only tree-based quick view of full course
    function quickview($items,$parent,$showdates=false,$showlinks=true) { 
-	   global $teacherid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$hideicons,$exceptions,$latepasses;
+	   global $teacherid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$hideicons,$exceptions,$latepasses,$CFG;
 	   if (!is_array($openblocks)) {$openblocks = array();}
 	   $itemtypes = array();  $iteminfo = array();
 	   $query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid='$cid'";
@@ -1368,7 +1380,12 @@ function enditem($canedit) {
 				$liclass = 'blockli nCollapse';
 				$qviewstyle = 'style="display:none;"';
 			}
-			echo '<li class="'.$liclass.'" id="'."$parent-$bnum".'" obn="'.$items[$i]['id'].'"><span class=icon style="background-color:'.$color.'">B</span>';
+			if (!isset($CFG['CPS']['miniicons']['folder'])) {
+				$icon  = '<span class=icon style="background-color:'.$color.'">B</span>';
+			} else {
+				$icon = '<img src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['folder'].'" class="mida icon" /> ';
+			}
+			echo '<li class="'.$liclass.'" id="'."$parent-$bnum".'" obn="'.$items[$i]['id'].'">'.$icon;
 			if ($items[$i]['avail']==2 || ($items[$i]['avail']==1 && $items[$i]['startdate']<$now && $items[$i]['enddate']>$now)) {
 				echo '<b><span id="B'.$parent.'-'.$bnum.'" onclick="editinplace(this)">'.$items[$i]['name']. "</span></b>";
 				//echo '<b>'.$items[$i]['name'].'</b>';
@@ -1393,7 +1410,12 @@ function enditem($canedit) {
 			}
 			echo '</li>';
 		   } else if ($itemtypes[$items[$i]][0] == 'Calendar') {
-			echo '<li id="'.$items[$i].'"><span class=icon style="background-color:#0f0;">C</span>Calendar</li>';
+		        if (!isset($CFG['CPS']['miniicons']['calendar'])) {
+				$icon  = '<span class=icon style="background-color:#0f0;">C</span>';
+			} else {
+				$icon = '<img src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['calendar'].'" class="mida icon" /> ';
+			}
+			echo '<li id="'.$items[$i].'">'.$icon.'Calendar</li>';
 			   
 	   	   } else if ($itemtypes[$items[$i]][0] == 'Assessment') {
 			   $typeid = $itemtypes[$items[$i]][1];
@@ -1420,7 +1442,12 @@ function enditem($canedit) {
 			   } else {
 					$color = makecolor2($line['startdate'],$line['enddate'],$now);
 			   }
-			echo '<li id="'.$items[$i].'"><span class=icon style="background-color:'.$color.'">?</span>';
+			 if (!isset($CFG['CPS']['miniicons']['assess'])) {
+				$icon  = '<span class=icon style="background-color:'.$color.'">?</span>';
+			} else {
+				$icon = '<img src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['assess'].'" class="mida icon" /> ';
+			}
+			echo '<li id="'.$items[$i].'">'.$icon;
 			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
 				   $show = "Available until $enddate";
 				   echo '<b><span id="A'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
@@ -1473,7 +1500,12 @@ function enditem($canedit) {
 			   } else {
 					$color = makecolor2($line['startdate'],$line['enddate'],$now);
 				}
-			   echo '<li id="'.$items[$i].'"><span class=icon style="background-color:'.$color.'">!</span>';
+			   if (!isset($CFG['CPS']['miniicons']['inline'])) {
+				$icon  = '<span class=icon style="background-color:'.$color.'">!</span>';
+			   } else {
+				$icon = '<img src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['inline'].'" class="mida icon" /> ';
+			   }
+			   echo '<li id="'.$items[$i].'">'.$icon;
 			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
 				   echo '<b><span id="I'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
 				  // echo '<b>'.$line['name']. "</b>";
@@ -1515,7 +1547,12 @@ function enditem($canedit) {
 			   } else {
 					$color = makecolor2($line['startdate'],$line['enddate'],$now);
 				}
-			   echo '<li id="'.$items[$i].'"><span class=icon style="background-color:'.$color.'">!</span>';
+			   if (!isset($CFG['CPS']['miniicons']['linked'])) {
+				$icon  = '<span class=icon style="background-color:'.$color.'">!</span>';
+			   } else {
+				$icon = '<img src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['linked'].'" class="mida icon" /> ';
+			   }
+			   echo '<li id="'.$items[$i].'">'.$icon;
 			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
 				   //echo '<b>'.$line['name']. "</b>";
 				   echo '<b><span id="L'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
@@ -1557,7 +1594,12 @@ function enditem($canedit) {
 			   } else {
 					$color = makecolor2($line['startdate'],$line['enddate'],$now);
 				}
-			   echo '<li id="'.$items[$i].'"><span class=icon style="background-color:'.$color.'">F</span>';
+		           if (!isset($CFG['CPS']['miniicons']['forum'])) {
+				$icon  = '<span class=icon style="background-color:'.$color.'">F</span>';
+			   } else {
+				$icon = '<img src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['forum'].'" class="mida icon" /> ';
+			   }
+			   echo '<li id="'.$items[$i].'">'.$icon;
 			  if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
 				   //echo '<b>'.$line['name']. "</b>";
 				   echo '<b><span id="F'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
