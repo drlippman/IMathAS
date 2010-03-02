@@ -1122,9 +1122,9 @@ function enditem($canedit) {
    	if (isset($CFG['CPS']['additemtype']) && $CFG['CPS']['additemtype'][0]=='links') {
    		if ($tb=='BB' || $tb=='LB') {$tb = 'b';}
    		if ($tb=='t' && $blk=='0') {
-   			$html = '<div id="topadditem" class="additembox"><span><b>Add:</b> ';
+   			$html = '<div id="topadditem" class="additembox"><span><b>Add here:</b> ';
    		} else {
-   			$html = '<div class="additembox"><span><b>Add:</b> ';
+   			$html = '<div class="additembox"><span><b>Add here:</b> ';
    		}
    		
 		$html .= "<a href=\"addassessment.php?block=$blk&tb=$tb&cid=$cid\">";

@@ -204,21 +204,27 @@ isread:
 		}
 	}
 	if (isset($_POST['unread'])) {
-		$checklist = "'".implode("','",$_POST['checked'])."'";
-		$query = "UPDATE imas_msgs SET isread=isread-1 WHERE id IN ($checklist) AND (isread=1 OR isread=5)";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		if (count($_POST['checked'])>0) {
+			$checklist = "'".implode("','",$_POST['checked'])."'";
+			$query = "UPDATE imas_msgs SET isread=isread-1 WHERE id IN ($checklist) AND (isread=1 OR isread=5)";
+			mysql_query($query) or die("Query failed : $query " . mysql_error());
+		}
 	}
 	if (isset($_POST['markread'])) {
-		$checklist = "'".implode("','",$_POST['checked'])."'";
-		$query = "UPDATE imas_msgs SET isread=isread+1 WHERE id IN ($checklist) AND (isread=0 OR isread=4)";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		if (count($_POST['checked'])>0) {
+			$checklist = "'".implode("','",$_POST['checked'])."'";
+			$query = "UPDATE imas_msgs SET isread=isread+1 WHERE id IN ($checklist) AND (isread=0 OR isread=4)";
+			mysql_query($query) or die("Query failed : $query " . mysql_error());
+		}
 	}
 	if (isset($_POST['remove'])) {
-		$checklist = "'".implode("','",$_POST['checked'])."'";
-		$query = "DELETE FROM imas_msgs WHERE id IN ($checklist) AND isread>1";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
-		$query = "UPDATE imas_msgs SET isread=isread+2 WHERE id IN ($checklist) AND isread<2";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		if (count($_POST['checked'])>0) {
+			$checklist = "'".implode("','",$_POST['checked'])."'";
+			$query = "DELETE FROM imas_msgs WHERE id IN ($checklist) AND isread>1";
+			mysql_query($query) or die("Query failed : $query " . mysql_error());
+			$query = "UPDATE imas_msgs SET isread=isread+2 WHERE id IN ($checklist) AND isread<2";
+			mysql_query($query) or die("Query failed : $query " . mysql_error());
+		}
 	}
 	if (isset($_GET['removeid'])) {
 		$query = "DELETE FROM imas_msgs WHERE id='{$_GET['removeid']}' AND isread>1";
