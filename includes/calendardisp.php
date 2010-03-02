@@ -326,8 +326,7 @@ echo "</tbody></table>";
 
 echo "<div style=\"margin-top: 10px; padding:10px; border:1px solid #000;\">";
 echo '<span class=right><a href="#" onclick="showcalcontents('.(1000*($today - $dayofweek*24*60*60)).'); return false;"/>Show all</a></span>';
-
-echo "<div id=\"caleventslist\"></div></div>";
+echo "<div id=\"caleventslist\"></div><div class=\"clear\"></div></div>";
 if ($pageshift==0) {
 	echo "<script>showcalcontents(document.getElementById('{$ids[0][$dayofweek]}'));</script>";
 }

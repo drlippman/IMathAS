@@ -74,6 +74,14 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	}
 	$ymin = $settings[2];
 	$ymax = $settings[3];
+	$noyaxis = false;
+	if ($ymin==0 && $ymax==0) {
+		$ymin = -0.5;
+		$ymax = 0.5;
+		$noyaxis = true;
+		$settings[2] = -0.5;
+		$settings[3] = 0.5;
+	}
 	$xxmin = $settings[0] - 5*($settings[1] - $settings[0])/$settings[6];
 	$xxmax = $settings[1] + 5*($settings[1] - $settings[0])/$settings[6];
 	$yymin = $settings[2] - 5*($settings[3] - $settings[2])/$settings[7];
@@ -123,9 +131,15 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		$grid = explode(':',$settings[5]);
 	}
 	if (is_numeric($settings[5]) && $settings[5]>0) { 
-		$commands .= ','.$settings[5].','.$settings[5].');';
+		$commands .= ','.$settings[5].','.$settings[5];
 	} else if (isset($grid[0]) && is_numeric($grid[0]) && $grid[0]>0 && $grid[1]>0) {
-		$commands .= ','.$grid[0].','.$grid[1].');';
+		$commands .= ','.$grid[0].','.$grid[1];
+	} else {
+		$commands .= ',0,0';
+		//$commands .= ');';
+	}
+	if ($noyaxis==true) {
+		$commands .= ',1,0);';
 	} else {
 		$commands .= ');';
 	}

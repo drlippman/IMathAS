@@ -40,11 +40,17 @@
 			
 			$tolist = explode(',',$_POST['tolist']);
 			
+			if (isset($_POST['savesent'])) {
+				$isread = 0;
+			} else {
+				$isread = 4;
+			}
+			
 			foreach ($tolist as $msgto) {
 				if (!in_array($msgto,$toignore)) {
 					$message = str_replace(array('LastName','FirstName'),array($lastnames[$msgto],$firstnames[$msgto]),$_POST['message']);
 					$query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
-					$query .= "('{$_POST['subject']}','$message','$msgto','$userid',$now,0,'$cid')";
+					$query .= "('{$_POST['subject']}','$message','$msgto','$userid',$now,$isread,'$cid')";
 					mysql_query($query) or die("Query failed : " . mysql_error());
 				}
 			}
@@ -174,6 +180,12 @@
 		echo "<span class=formright><input type=radio name=self id=self value=\"none\">Only Students<br/> ";
 		echo "<input type=radio name=self id=self value=\"self\" checked=checked>Self<br/> ";
 		echo "<input type=radio name=self id=self value=\"allt\">All instructors of this course</span><br class=form>\n";
+		if ($sendtype=='Message') {
+			echo '<span class="form"><label for="savesent">Save in sent messages?</label></span>';
+			echo '<span class="formright"><input type="checkbox" name="savesent" checked="checked" /></span><br class="form" />';
+		}
+			
+		
 		echo "<span class=form><label for=\"limit\">Limit send: </label></span>";
 		echo "<span class=formright>";
 		echo "to students who haven't completed: ";

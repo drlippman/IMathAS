@@ -638,7 +638,7 @@ function makeTopMenu() {
 	global $CFG;
 	global $useviewbuttons;
 	
-	if ($useviewbuttons && isset($teacherid)) {
+	if ($useviewbuttons && (isset($teacherid) || $previewshift>-1)) {
 		echo '<div id="viewbuttoncont">View: ';
 		echo "<a href=\"course.php?cid=$cid&quickview=off&teachview=1\" ";
 		if ($previewshift==-1 && $quickview != 'on') {

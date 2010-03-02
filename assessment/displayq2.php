@@ -1313,7 +1313,24 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		}
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		
-		$settings = array(-5,5,-5,5,1,1,300,300,"","");
+		if (!isset($answerformat)) {
+			$answerformat = array('line','dot','opendot');
+		} else if (!is_array($answerformat)) {
+			$answerformat = explode(',',$answerformat);
+		}
+		
+		if ($answerformat[0]=='numberline') {
+			$settings = array(-5,5,0,0,1,0,300,50,"","");
+			$locky = 1;
+			if (count($answerformat)==1) {
+				$answerformat[] = "lineseg";
+				$answerformat[] = "dot";
+				$answerformat[] = "opendot";
+			}
+		} else {
+			$settings = array(-5,5,-5,5,1,1,300,300,"","");
+			$locky = 0;
+		}
 		if (isset($grid)) {
 			if (!is_array($grid)) {
 				$grid = explode(',',$grid);
@@ -1325,16 +1342,19 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			}
 		}
 		if (!isset($backg)) { $backg = '';}
-		$scling = $settings[4].':'.$settings[5];
-		$plot = showplot($backg,$settings[0],$settings[1],$settings[2],$settings[3],$scling,$scling,$settings[6],$settings[7]);
+		if ($answerformat[0]=='numberline') {
+			$settings[2] = 0;
+			$settings[3] = 0;
+			$sclinglbl = $settings[4];
+			$sclinggrid = 0;
+		} else {
+			$sclinglbl = $settings[4].':'.$settings[5];
+			$sclinggrid = $settings[4].':'.$settings[5];
+		}
+		$plot = showplot($backg,$settings[0],$settings[1],$settings[2],$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
 		if ($settings[8]!="") {
 		}
 		$bg = getgraphfilename($plot);
-		if (!isset($answerformat)) {
-			$answerformat = array('line','dot','opendot');
-		} else if (!is_array($answerformat)) {
-			$answerformat = explode(',',$answerformat);
-		}
 		$dotline = 0;
 		$out .= "<canvas class=\"drawcanvas\" id=\"canvas$qn\" width=\"{$settings[6]}\" height=\"{$settings[7]}\"></canvas>";
 		$out .= "<div><span id=\"drawtools$qn\" class=\"drawtools\">";
@@ -1355,6 +1375,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$out .= "<img src=\"$imasroot/img/tpdot.gif\" onclick=\"settool(this,$qn,1)\"/>";
 			$def = 5;
 		} else {
+			if ($answerformat[0]=='numberline') {
+				array_shift($answerformat);
+			}
 			for ($i=0; $i<count($answerformat); $i++) {
 				if ($i==0) {
 					$out .= '<span class="sel" ';
@@ -1363,6 +1386,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 				}
 				if ($answerformat[$i]=='line') {
 					$out .= "onclick=\"settool(this,$qn,0)\">Line</span>";
+				} else if ($answerformat[$i]=='lineseg') {
+					$out .= "onclick=\"settool(this,$qn,0.5)\">Line Segment</span>";
 				} else if ($answerformat[$i]=='dot') {
 					$out .= "onclick=\"settool(this,$qn,1)\">Dot</span>";
 				} else if ($answerformat[$i]=='opendot') {
@@ -1374,6 +1399,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			}
 			if ($answerformat[0]=='line') {
 				$def = 0;
+			} else if ($answerformat[0]=='lineseg') {
+				$def = 0.5;
 			} else if ($answerformat[0]=='dot') {
 				$def = 1;
 			} else if ($answerformat[0]=='opendot') {
@@ -1384,9 +1411,10 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		}
 		
 		
+		
 		$out .= '</span></div>';
 		$out .= "<input type=\"hidden\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" />";
-		$out .= "<script type=\"text/javascript\">canvases[canvases.length] = [$qn,'$bg',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline];";
+		$out .= "<script type=\"text/javascript\">canvases[canvases.length] = [$qn,'$bg',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline,$locky];";
 		
 		$la = str_replace(array('(',')'),array('[',']'),$la);
 		$la = explode(';;',$la);
@@ -1418,6 +1446,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 						} else {
 							$saarr[$k] .= ',open';
 						}
+						if ($locky==1) {
+							$saarr[$k] .=',,2';
+						}
 					} else if ($function[0]=='circle') { //is circle
 						$saarr[$k] = "[{$function[3]}*cos(t)+{$function[1]},{$function[3]}*sin(t)+{$function[2]}],blue,0,6.31";
 					} else if (substr($function[0],0,2)=='x=') {
@@ -1426,6 +1457,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 						$saarr[$k] = $function[0].',blue';
 						if (count($function)>2) {
 							$saarr[$k] .= ','.$function[1].','.$function[2];
+							if ($locky==1) {
+								$saarr[$k] .=',,,3';
+							}
+						}
+						if ($locky==1) {
+							$saarr[$k] .=',,,,,3';
 						}
 					}
 				}
@@ -1443,7 +1480,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 				}
 				$saarr = array_merge($saarr,$backg);
 			}
-			$sa = showplot($saarr,$settings[0],$settings[1],$settings[2],$settings[3],$scling,$scling,$settings[6],$settings[7]);
+			$sa = showplot($saarr,$settings[0],$settings[1],$settings[2],$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
 		}
 	} else if ($anstype == "file") {
 		if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$qn];} else {$ansprompt = $options['ansprompt'];}}
@@ -1966,13 +2003,22 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 			$tocheck = explode(',',$_POST["tc$qn"]);
 			foreach ($tocheck as $tchk) {
-				$cpts = parsecomplex($tchk);
-				if ($cpts[1]{0}=='+') {
-					$cpts[1] = substr($cpts[1],1);
-				}
-				//echo $cpts[0].','.$cpts[1].'<br/>';
-				if (!checkanswerformat($cpts[0],$ansformats) || !checkanswerformat($cpts[1],$ansformats)) {
-					return 0;
+				if (in_array('sloppycomplex',$ansformats)) {
+					if (substr_count($tchk,'i')>1) {
+						return 0;
+					}
+				} else {
+					$cpts = parsecomplex($tchk);
+					if (!is_array($cpts)) {
+						return 0;
+					}
+					if ($cpts[1]{0}=='+') {
+						$cpts[1] = substr($cpts[1],1);
+					}
+					//echo $cpts[0].','.$cpts[1].'<br/>';
+					if (!checkanswerformat($cpts[0],$ansformats) || !checkanswerformat($cpts[1],$ansformats)) {
+						return 0;
+					}
 				}
 			}
 		}
@@ -2608,7 +2654,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$GLOBALS['partlastanswer'] = $givenans;
 		$imgborder = 5; $step = 5;
-		$settings = array(-5,5,-5,5,1,1,300,300);
+		if (substr($answerformat,0,10)=='numberline') {
+			$settings = array(-5,5,-0.5,0.5,1,0,300,50);
+		} else {
+			$settings = array(-5,5,-5,5,1,1,300,300);
+		}
 		if (isset($grid)) {
 			if (!is_array($grid)) {
 				$grid = explode(',',$grid);
@@ -2618,6 +2668,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					$settings[$i] = evalbasic($grid[$i]);
 				}
 			}
+		}
+		if (substr($answerformat,0,10)=='numberline') {
+			$settings[2] = -0.5;
+			$settings[3] = 0.5;
 		}
 		$pixelsperx = ($settings[6] - 2*$imgborder)/($settings[1]-$settings[0]);
 		$pixelspery = ($settings[7] - 2*$imgborder)/($settings[3]-$settings[2]);
@@ -3424,6 +3478,9 @@ function parsecomplex($v) {
 				$real = substr($v,0,$L) . substr($v,$p+1);
 			} else if ($R-$p>1) {
 				if ($p>0) {
+					if ($v{$p-1}!='+' && $v{$p-1}!='-') {
+						return 'error - invalid form';
+					}
 					$imag = $v{$p-1}.substr($v,$p+1,$R-$p-1);
 					$real = substr($v,0,$p-1) . substr($v,$R);
 				} else {

@@ -287,7 +287,7 @@ if ($overwriteBody==1) {
 			<input type=radio name="oncal" value=0 <?php writeHtmlChecked($line['oncal'],0); ?> /> No<br/>
 			<input type=radio name="oncal" value=1 <?php writeHtmlChecked($line['oncal'],1); ?> /> Yes, on Available after date (will only show after that date)<br/>
 			<input type=radio name="oncal" value=2 <?php writeHtmlChecked($line['oncal'],2); ?> /> Yes, on Available until date<br/>
-			With tag: <input name="caltag" type=text size=1 maxlength=1 value="<?php echo $line['caltag'];?>"/>
+			With tag: <input name="caltag" type=text size=1 value="<?php echo $line['caltag'];?>"/>
 		</span><br class="form" />
 		
 		<div class=submit><input type=submit value=Submit></div>	
