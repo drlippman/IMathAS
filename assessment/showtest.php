@@ -1100,7 +1100,7 @@
 					$done = true;
 				} 
 				if (!$done) {
-					echo "<p>Question scored. Continue with assessment, or click <a href=\"showtest.php?action=seq&amp;done=true\">here</a> to finalize and summarize score.</p>\n";
+					echo "<p>Question scored. <a href=\"#curq\">Continue with assessment</a>, or click <a href=\"showtest.php?action=seq&amp;done=true\">here</a> to finalize and summarize score.</p>\n";
 					echo "</div>\n";
 					echo "<hr/>";
 				} else {
@@ -1316,7 +1316,7 @@
 	require("../footer.php");
 	
 	function shownavbar($questions,$scores,$current,$showcat) {
-		global $imasroot,$isdiag,$testsettings,$attempts,$qi,$allowregen,$bestscores,$isreview,$showeachscore,$noindivscores;
+		global $imasroot,$isdiag,$testsettings,$attempts,$qi,$allowregen,$bestscores,$isreview,$showeachscore,$noindivscores,$CFG;
 		$todo = 0;
 		$earned = 0;
 		$poss = 0;
@@ -1353,13 +1353,43 @@
 			}
 			echo "<img src=\"$imasroot/img/aicon/right$icon.gif\"/>";
 			*/	
-			
-			if ((unans($scores[$i]) && $attempts[$i]==0) || ($noindivscores && amreattempting($i))) {
-				echo "<img src=\"$imasroot/img/q_fullbox.gif\"/> ";
-			} else if (canimprove($i) && !$noindivscores) {
-				echo "<img src=\"$imasroot/img/q_halfbox.gif\"/> ";
+			if ($isreview) {
+				$thisscore = getpts($scores[$i]);
 			} else {
-				echo "<img src=\"$imasroot/img/q_emptybox.gif\"/> ";
+				$thisscore = getpts($bestscores[$i]);
+			}
+			if ((unans($scores[$i]) && $attempts[$i]==0) || ($noindivscores && amreattempting($i))) {
+				if (isset($CFG['TE']['navicons'])) {
+					echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['untried']}\"/> ";
+				} else {
+					echo "<img src=\"$imasroot/img/q_fullbox.gif\"/> ";
+				}
+			} else if (canimprove($i) && !$noindivscores) {
+				if (isset($CFG['TE']['navicons'])) {
+					if ($thisscore==0 || $noindivscores) {
+						echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['canretrywrong']}\"/> ";
+					} else {
+						echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['canretrypartial']}\"/> ";
+					}
+				} else {
+					echo "<img src=\"$imasroot/img/q_halfbox.gif\"/> ";
+				}
+			} else {
+				if (isset($CFG['TE']['navicons'])) {
+					if (!$showeachscore) {
+						echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['noretry']}\"/> ";
+					} else {
+						if ($thisscore == $qi[$questions[$i]]['points']) {
+							echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['correct']}\"/> ";
+						} else if ($thisscore==0) { 
+							echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['wrong']}\"/> ";
+						} else {
+							echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['partial']}\"/> ";
+						}
+					}
+				} else {
+					echo "<img src=\"$imasroot/img/q_emptybox.gif\"/> ";
+				}
 			}
 			
 				

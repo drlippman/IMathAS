@@ -571,7 +571,7 @@ function showqinfobar($qn,$inreview,$single) {
 
 //shows top info bar for seq mode
 function seqshowqinfobar($qn,$toshow) {
-	global $qi,$questions,$attempts,$testsettings,$scores,$noindivscores,$imasroot;
+	global $qi,$questions,$attempts,$testsettings,$scores,$bestscores,$noindivscores,$showeachscore,$imasroot,$CFG;
 	$reattemptsremain = hasreattempts($qn);
 	$pointsremaining = getremainingpossible($qn,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
 	$qavail = false;
@@ -584,29 +584,82 @@ function seqshowqinfobar($qn,$toshow) {
 	if ($qn==$toshow) {
 		echo '<div class="seqqinfocur">';
 		if ((unans($scores[$qn]) && $attempts[$qn]==0) || ($noindivscores && amreattempting($qn))) {
-			echo "<img src=\"$imasroot/img/q_fullbox.gif\"/> ";
+			if (isset($CFG['TE']['navicons'])) {
+				echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['untried']}\"/> ";
+			} else {
+				echo "<img src=\"$imasroot/img/q_fullbox.gif\"/> ";
+			}
 		} else {
-			echo "<img src=\"$imasroot/img/q_halfbox.gif\"/> ";
+			if (isset($CFG['TE']['navicons'])) {
+				if ($thisscore==0 || $noindivscores) {
+					echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['canretrywrong']}\"/> ";
+				} else {
+					echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['canretrypartial']}\"/> ";
+				}
+			} else {
+				echo "<img src=\"$imasroot/img/q_halfbox.gif\"/> ";
+			}
 		}
 		echo "<span class=current><a name=\"curq\">$qlinktxt</a></span>  ";
 	} else {
+		$thisscore = getpts($bestscores[$qn]);
 		if ((unans($scores[$qn]) && $attempts[$qn]==0) || ($noindivscores && amreattempting($qn))) {
 			echo '<div class="seqqinfoavail">';
-			echo "<img src=\"$imasroot/img/q_fullbox.gif\"/> ";
+			if (isset($CFG['TE']['navicons'])) {
+				echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['untried']}\"/> ";
+			} else {
+				echo "<img src=\"$imasroot/img/q_fullbox.gif\"/> ";
+			}
 			echo "<a href=\"showtest.php?action=seq&to=$qn#curq\">$qlinktxt</a>.  ";
 			$qavail = true;
 		} else if (canimprove($qn) && !$noindivscores) {
 			echo '<div class="seqqinfoavail">';
-			echo "<img src=\"$imasroot/img/q_halfbox.gif\"/> ";
+			if (isset($CFG['TE']['navicons'])) {
+				if ($thisscore==0 || $noindivscores) {
+					echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['canretrywrong']}\"/> ";
+				} else {
+					echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['canretrypartial']}\"/> ";
+				}
+			} else {
+				echo "<img src=\"$imasroot/img/q_halfbox.gif\"/> ";
+			}
 			echo "<a href=\"showtest.php?action=seq&to=$qn#curq\">$qlinktxt</a>.  ";
 			$qavail = true;
 		} else if ($reattemptsremain) {
 			echo '<div class="seqqinfoinactive">';
-			echo "<img src=\"$imasroot/img/q_emptybox.gif\"/> ";
+			if (isset($CFG['TE']['navicons'])) {
+				if (!$showeachscore) {
+					echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['noretry']}\"/> ";
+				} else {
+					if ($thisscore == $qi[$questions[$qn]]['points']) {
+						echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['correct']}\"/> ";
+					} else if ($thisscore==0) { 
+						echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['wrong']}\"/> ";
+					} else {
+						echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['partial']}\"/> ";
+					}
+				}
+			} else {
+				echo "<img src=\"$imasroot/img/q_emptybox.gif\"/> ";
+			}
 			echo "<a href=\"showtest.php?action=seq&to=$qn#curq\">$qlinktxt</a>.  ";
 		} else {
 			echo '<div class="seqqinfoinactive">';
-			echo "<img src=\"$imasroot/img/q_emptybox.gif\"/> ";
+			if (isset($CFG['TE']['navicons'])) {
+				if (!$showeachscore) {
+					echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['noretry']}\"/> ";
+				} else {
+					if ($thisscore == $qi[$questions[$qn]]['points']) {
+						echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['correct']}\"/> ";
+					} else if ($thisscore==0) { 
+						echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['wrong']}\"/> ";
+					} else {
+						echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['partial']}\"/> ";
+					}
+				}
+			} else {
+				echo "<img src=\"$imasroot/img/q_emptybox.gif\"/> ";
+			}
 			echo "$qlinktxt.  ";
 		}
 	}
