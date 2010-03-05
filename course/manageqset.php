@@ -588,7 +588,6 @@ if ($myrights<20) {
 			$search = stripslashes($safesearch);
 			$search = str_replace('"','&quot;',$search);
 			$sessiondata['lastsearch'.$cid] = str_replace(" ","+",$safesearch);
-			$sessiondata['searchall'.$cid] = $searchall;
 			if (isset($_POST['searchmine'])) {
 				$searchmine = 1;
 			} else {
@@ -600,6 +599,7 @@ if ($myrights<20) {
 			} else {
 				$searchall = 0;
 			}
+			$sessiondata['searchall'.$cid] = $searchall;
 			if ($searchall==1 && trim($search)=='' && $searchmine==0) {
 				$overwriteBody = 1;
 				$body = "Must provide a search term when searching all libraries <a href=\"manageqset.php\">Try again</a>";
