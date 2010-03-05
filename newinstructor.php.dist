@@ -22,13 +22,19 @@
 			if (mysql_num_rows($result)>0) {
 				echo "<p>Username <b>{$_POST['username']}</b> is already in use.  Please try another</p>\n";
 			} else {
-				$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email) ";
+				if (isset($CFG['GEN']['homelayout'])) {
+					$homelayout = $CFG['GEN']['homelayout'];
+				} else {
+					$homelayout = '|0,2,3||0,1';
+				}
+				$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, homelayout) ";
 				$md5pw = md5($_POST['password']);
-				$query .= "VALUES ('{$_POST['username']}','$md5pw',0,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}');";
+				$query .= "VALUES ('{$_POST['username']}','$md5pw',0,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}','$homelayout');";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				$newuserid = mysql_insert_id();
-				$query = "INSERT INTO imas_students (userid,courseid) VALUES ('$newuserid',1)";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				//optional: if you want to insert new instructors into a support course.
+				//$query = "INSERT INTO imas_students (userid,courseid) VALUES ('$newuserid',1)";
+				//mysql_query($query) or die("Query failed : " . mysql_error());
 				$headers  = 'MIME-Version: 1.0' . "\r\n";
 				$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 				$headers .= "From: $installname <$sendfrom>\r\n";
@@ -42,8 +48,6 @@
 				
 				$message = "<p>Your new account request has been sent.</p>  ";
 				$message .= "<p>This request is processed by hand, so please be patient.</p>";
-				$message .= "<p>While it is being processed, you may ";
-				$message .= "wish to read some of the new user documentation available at <a href=\"http://www.wamap.org/docs/docs.html\">http://www.wamap.org/docs/docs.html</a></p>\n";
 				mail($_POST['email'],$subject,$message,$headers);
 				
 				echo $message;
