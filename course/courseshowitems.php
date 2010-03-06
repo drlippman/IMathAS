@@ -13,7 +13,7 @@ function beginitem($canedit,$aname=0) {
 	 }
 }
 function enditem($canedit) {
-	echo '<div class="clear"></div>';
+	//echo '<div class="clear"></div>';
 	echo "</div>\n";
 	if ($canedit) {
 		echo '</div>'; //itemwrapper

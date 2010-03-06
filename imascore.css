@@ -23,6 +23,7 @@ div.pagetitle h2 {
 div.item {
 	margin-bottom: 10px;
 	padding: 5px;
+	overflow: auto;
 }
 div.signup {
 	border: 1px solid #000;

@@ -15,7 +15,7 @@
 <link rel="shortcut icon" href="/favicon.ico" />
 <!--[if lte IE 6]> 
 <style> 
-div { height: 0px; } 
+div { zoom: 1; } 
 .clear { line-height: 0;}
 #GB_overlay, #GB_window { 
  position: absolute; 
