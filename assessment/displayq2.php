@@ -3519,6 +3519,10 @@ function parsecomplex($v) {
 //   fraction, reducedfraction, fracordec, notrig, nolongdec, scinot, mixednumber, nodecimal
 //returns:  false: bad format, true: good format
 function checkanswerformat($tocheck,$ansformats) {
+	$tocheck = trim($tocheck);
+	if ($tocheck=='DNE' || $tocheck=='oo' || $tocheck=='+oo' || $tocheck=='-oo') {
+		return true;
+	}
 	if (in_array("fraction",$ansformats) || in_array("reducedfraction",$ansformats) || in_array("fracordec",$ansformats)) {
 		if (!preg_match('/^\s*\-?\(?\d+\s*\/\s*\-?\d+\)?\s*$/',$tocheck) && !preg_match('/^\s*?\-?\d+\s*$/',$tocheck) && (!in_array("fracordec",$ansformats) || !preg_match('/^\s*?\-?\d*?\.\d*?\s*$/',$tocheck))) {
 			return false;
