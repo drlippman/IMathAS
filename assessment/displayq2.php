@@ -2302,121 +2302,126 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			return 0; //$correct = false;
 		}
 		
-		$answer = preg_replace('/[^\w\*\/\+\=\-\(\)\[\]\{\}\,\.\^\$\!]+/','',$answer);
-
-		if ($answerformat=="equation") {
-			if (strpos($_POST["tc$qn"],'=')===false) {
+		$ansarr = explode(' or ',$answer);
+		foreach ($ansarr as $answer) {
+			$correct = true;
+			$answer = preg_replace('/[^\w\*\/\+\=\-\(\)\[\]\{\}\,\.\^\$\!]+/','',$answer);
+	
+			if ($answerformat=="equation") {
+				if (strpos($_POST["tc$qn"],'=')===false) {
+					return 0;
+				}
+				$answer = preg_replace('/(.*)=(.*)/','$1-($2)',$answer);
+				unset($ratios);
+			} else if ($answerformat=="toconst") {
+				unset($diffs);
+				unset($realanss);
+			}
+			
+			
+			if ($answer == '') {
 				return 0;
 			}
-			$answer = preg_replace('/(.*)=(.*)/','$1-($2)',$answer);
-			unset($ratios);
-		} else if ($answerformat=="toconst") {
-			unset($diffs);
-			unset($realanss);
-		}
-		
-		
-		if ($answer == '') {
-			return 0;
-		}
-		$answer = mathphppre($answer);
-		$answer = makepretty($answer);
-		$answer = mathphp($answer,$vlist);
-		//echo $answer;
-		for($i=0; $i < count($variables); $i++) {
-			$answer = str_replace("(".$variables[$i].")",'($tp['.$i.'])',$answer);
-		}
-
-		$myans = explode(",",$_POST["qn$qn-vals"]);
-		
-		$cntnan = 0;
-		$cntzero = 0;
-		$stunan = 0;
-		$ysqrtot = 0;
-		$reldifftot = 0;
-		for ($i = 0; $i < 20; $i++) {
-			for($j=0; $j < count($variables); $j++) {
-
-			//causing problems on multipart - breaking messed up rand order
-			/*	if (isset($fromto[2]) && $fromto[2]=="integers") {
-					$tp[$j] = rand($fromto[0],$fromto[1]);
-				} else {
-					$tp[$j] = $fromto[0] + ($fromto[1]-$fromto[0])*rand(0,32000)/32000.0;
-				}
-			*/
-				$tp[$j] = $tps[$i][$j];
+			$answer = mathphppre($answer);
+			$answer = makepretty($answer);
+			$answer = mathphp($answer,$vlist);
+			//echo $answer;
+			for($i=0; $i < count($variables); $i++) {
+				$answer = str_replace("(".$variables[$i].")",'($tp['.$i.'])',$answer);
 			}
-			$realans = eval("return ($answer);");
-			//echo "real: $realans, my: {$myans[$i]},rel: ". (abs($myans[$i]-$realans)/abs($realans))  ."<br/>";
-			if (isNaN($realans)) {$cntnan++; continue;} //avoid NaN problems
-			if ($answerformat=="equation") {  //if equation, store ratios
-				if (abs($realans)>.000001 && is_numeric($myans[$i])) {
-					$ratios[] = $myans[$i]/$realans;
-					if ($myans[$i]==0 && $realans!=0) {
-						$cntzero++;
+	
+			$myans = explode(",",$_POST["qn$qn-vals"]);
+			
+			$cntnan = 0;
+			$cntzero = 0;
+			$stunan = 0;
+			$ysqrtot = 0;
+			$reldifftot = 0;
+			for ($i = 0; $i < 20; $i++) {
+				for($j=0; $j < count($variables); $j++) {
+	
+				//causing problems on multipart - breaking messed up rand order
+				/*	if (isset($fromto[2]) && $fromto[2]=="integers") {
+						$tp[$j] = rand($fromto[0],$fromto[1]);
+					} else {
+						$tp[$j] = $fromto[0] + ($fromto[1]-$fromto[0])*rand(0,32000)/32000.0;
 					}
+				*/
+					$tp[$j] = $tps[$i][$j];
 				}
-			} else if ($answerformat=="toconst") {
-				$diffs[] = $myans[$i] - $realans;
-				$realanss[] = $realans;
-				$ysqr = $realans*$realans;
-				$ysqrtot += 1/($ysqr+.0001);
-				$reldifftot += ($myans[$i] - $realans)/($ysqr+.0001);
-			} else { //otherwise, compare points
-				if (isNaN($myans[$i])) {
-					$stunan++;
-				} else if (isset($abstolerance)) {
-					
-					if (abs($myans[$i]-$realans) > $abstolerance-1E-12) {$correct = false; break;}	
-				} else {
-					if ((abs($myans[$i]-$realans)/(abs($realans)+.0001) > $reltolerance-1E-12)) {$correct = false; break;}
-				}
-			}
-		}
-		if ($cntnan==20 && isset($GLOBALS['teacherid'])) {
-			echo "<p>Debug info: function evaled to Not-a-number at all test points.  Check \$domain</p>";
-		}
-		if ($stunan>1) { //if more than 1 student NaN response
-			return 0;
-		}
-		if ($answerformat=="equation") {
-			if (count($ratios)>0) {
-				if (count($ratios)==$cntzero) {
-					$correct = false; return 0;
-				} else {
-					$meanratio = array_sum($ratios)/count($ratios);
-					for ($i=0; $i<count($ratios); $i++) {
-						if (isset($abstolerance)) {
-							if (abs($ratios[$i]-$meanratio) > $abstolerance-1E-12) {$correct = false; break;}	
-						} else {
-							if ((abs($ratios[$i]-$meanratio)/(abs($meanratio)+.0001) > $reltolerance-1E-12)) {$correct = false; break;}
+				$realans = eval("return ($answer);");
+				//echo "real: $realans, my: {$myans[$i]},rel: ". (abs($myans[$i]-$realans)/abs($realans))  ."<br/>";
+				if (isNaN($realans)) {$cntnan++; continue;} //avoid NaN problems
+				if ($answerformat=="equation") {  //if equation, store ratios
+					if (abs($realans)>.000001 && is_numeric($myans[$i])) {
+						$ratios[] = $myans[$i]/$realans;
+						if ($myans[$i]==0 && $realans!=0) {
+							$cntzero++;
 						}
 					}
+				} else if ($answerformat=="toconst") {
+					$diffs[] = $myans[$i] - $realans;
+					$realanss[] = $realans;
+					$ysqr = $realans*$realans;
+					$ysqrtot += 1/($ysqr+.0001);
+					$reldifftot += ($myans[$i] - $realans)/($ysqr+.0001);
+				} else { //otherwise, compare points
+					if (isNaN($myans[$i])) {
+						$stunan++;
+					} else if (isset($abstolerance)) {
+						
+						if (abs($myans[$i]-$realans) > $abstolerance-1E-12) {$correct = false; break;}	
+					} else {
+						if ((abs($myans[$i]-$realans)/(abs($realans)+.0001) > $reltolerance-1E-12)) {$correct = false; break;}
+					}
 				}
-			} else {
-				$correct = false;
 			}
-		} else if ($answerformat=="toconst") {
-			if (isset($abstolerance)) {
-				//if abs, use mean diff - will minimize error in abs diffs
-				$meandiff = array_sum($diffs)/count($diffs);
-			} else {
-				//if relative tol, use meandiff to minimize relative error
-				$meandiff = $reldifftot/$ysqrtot;
+			if ($cntnan==20 && isset($GLOBALS['teacherid'])) {
+				echo "<p>Debug info: function evaled to Not-a-number at all test points.  Check \$domain</p>";
 			}
-			if (is_nan($meandiff)) {
-				$correct=false; return 0;
-			} 
-			for ($i=0; $i<count($diffs); $i++) {
-				if (isset($abstolerance)) {
-					if (abs($diffs[$i]-$meandiff) > $abstolerance-1E-12) {$correct = false; break;}	
+			if ($stunan>1) { //if more than 1 student NaN response
+				return 0;
+			}
+			if ($answerformat=="equation") {
+				if (count($ratios)>0) {
+					if (count($ratios)==$cntzero) {
+						$correct = false; return 0;
+					} else {
+						$meanratio = array_sum($ratios)/count($ratios);
+						for ($i=0; $i<count($ratios); $i++) {
+							if (isset($abstolerance)) {
+								if (abs($ratios[$i]-$meanratio) > $abstolerance-1E-12) {$correct = false; break;}	
+							} else {
+								if ((abs($ratios[$i]-$meanratio)/(abs($meanratio)+.0001) > $reltolerance-1E-12)) {$correct = false; break;}
+							}
+						}
+					}
 				} else {
-					//if ((abs($diffs[$i]-$meandiff)/(abs($meandiff)+0.0001) > $reltolerance-1E-12)) {$correct = false; break;}
-					if ((abs($diffs[$i]-$meandiff)/(abs($realanss[$i])+0.0001) > $reltolerance-1E-12)) {$correct = false; break;}
+					$correct = false;
+				}
+			} else if ($answerformat=="toconst") {
+				if (isset($abstolerance)) {
+					//if abs, use mean diff - will minimize error in abs diffs
+					$meandiff = array_sum($diffs)/count($diffs);
+				} else {
+					//if relative tol, use meandiff to minimize relative error
+					$meandiff = $reldifftot/$ysqrtot;
+				}
+				if (is_nan($meandiff)) {
+					$correct=false; return 0;
+				} 
+				for ($i=0; $i<count($diffs); $i++) {
+					if (isset($abstolerance)) {
+						if (abs($diffs[$i]-$meandiff) > $abstolerance-1E-12) {$correct = false; break;}	
+					} else {
+						//if ((abs($diffs[$i]-$meandiff)/(abs($meandiff)+0.0001) > $reltolerance-1E-12)) {$correct = false; break;}
+						if ((abs($diffs[$i]-$meandiff)/(abs($realanss[$i])+0.0001) > $reltolerance-1E-12)) {$correct = false; break;}
+					}
 				}
 			}
+			if ($correct == true) {return 1;}// else { return 0;}
 		}
-		if ($correct == true) {return 1;} else { return 0;}
+		return 0;
 		
 	} else if ($anstype == "string") {
 		if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}
