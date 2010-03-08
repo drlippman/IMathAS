@@ -14,6 +14,10 @@
 	//look up user
 	$query = "SELECT id FROM imas_users WHERE remoteaccess='{$_GET['key']}'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	if (mysql_num_rows($result)==0) {
+		echo "Access key invalid";
+		exit;
+	}
 	$userid = mysql_result($result,0,0);
 	$tzoffset = $_GET['tzoffset'];
 	

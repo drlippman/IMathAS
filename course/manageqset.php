@@ -588,7 +588,6 @@ if ($myrights<20) {
 			$search = stripslashes($safesearch);
 			$search = str_replace('"','&quot;',$search);
 			$sessiondata['lastsearch'.$cid] = str_replace(" ","+",$safesearch);
-			$sessiondata['searchall'.$cid] = $searchall;
 			if (isset($_POST['searchmine'])) {
 				$searchmine = 1;
 			} else {
@@ -600,6 +599,7 @@ if ($myrights<20) {
 			} else {
 				$searchall = 0;
 			}
+			$sessiondata['searchall'.$cid] = $searchall;
 			if ($searchall==1 && trim($search)=='' && $searchmine==0) {
 				$overwriteBody = 1;
 				$body = "Must provide a search term when searching all libraries <a href=\"manageqset.php\">Try again</a>";
@@ -724,6 +724,9 @@ if ($myrights<20) {
 		$ln=1;
 		
 		while ($line = mysql_fetch_array($resultLibs, MYSQL_ASSOC)) {
+			if (isset($page_questionTable[$line['id']])) {
+				continue;
+			}
 			if ($lastlib!=$line['libid'] && (isset($lnamesarr[$line['libid']]) || $searchall==1)) {
 				$page_libstouse[] = $line['libid'];
 				$lastlib = $line['libid'];
@@ -838,16 +841,6 @@ function doaction(todo,id) {
 		addr = addrmq+'&transfer='+id;
 	}
 	window.location = addr;
-}
-
-function chkAll(frm, arr, mark) {
-  for (i = 0; i <= frm.elements.length; i++) {
-   try{
-     if(frm.elements[i].name == arr) {
-       frm.elements[i].checked = mark;
-     }
-   } catch(er) {}
-  }
 }
 
 var curlibs = '<?php echo $searchlibs ?>';
@@ -1030,7 +1023,8 @@ function getnextprev(formn,loc) {
 		echo "<form method=post action=\"manageqset.php?cid=$cid\">\n";
 
 		echo "In Libraries: <span id=\"libnames\">$lnames</span><input type=hidden name=\"libs\" id=\"libs\"  value=\"$searchlibs\">\n";
-		echo " <input type=button value=\"Select Libraries\" onClick=\"libselect()\"> <br>"; 
+		//echo " <input type=button value=\"Select Libraries\" onClick=\"libselect()\"> <br>"; 
+		echo '<input type="button" value="Select Libraries" onClick="GB_show(\'Library Select\',\'libtree2.php?libtree=popup&libs=\'+curlibs,500,500)" /> <br>';
 		
 		echo "Search: <input type=text size=15 name=search value=\"$search\"> <input type=checkbox name=\"searchall\" value=\"1\" ";
 		if ($searchall==1) {echo "checked=1";}
@@ -1044,7 +1038,9 @@ function getnextprev(formn,loc) {
 		
 		echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 		echo "<form id=\"selform\" method=post action=\"manageqset.php?cid=$cid\">\n";
-		echo "Check/Uncheck All: <input type=\"checkbox\" name=\"ca2\" value=\"1\" onClick=\"chkAll(this.form, 'nchecked[]', this.checked)\">\n";	
+		//echo "Check/Uncheck All: <input type=\"checkbox\" name=\"ca2\" value=\"1\" onClick=\"chkAll(this.form, 'nchecked[]', this.checked)\">\n";
+		echo 'Check: <a href="#" onclick="return chkAllNone(\'selform\',\'nchecked[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'selform\',\'nchecked[]\',false)">None</a> ';
+
 		echo "With Selected: <input type=submit name=\"transfer\" value=\"Transfer\">\n";
 		echo "<input type=submit name=\"remove\" value=\"Delete\">\n";
 		echo "<input type=submit name=\"chglib\" value=\"Library Assignment\">\n";

@@ -152,6 +152,9 @@ if (isset($_POST['SID'])) {
 		$superpw[$k] = strtolower($v);
 	}
 	$diagSID = $_POST['SID'].'~'.addslashes($diagqtr).'~'.$pcid;
+	if ($entrynotunique) {
+		$diagSID .= '~'.preg_replace('/\W/','',$sel1[$_POST['course']]);
+	}
 	if (!$noproctor) {
 		if (!in_array(strtolower($_POST['passwd']),$basicpw) && !in_array(strtolower($_POST['passwd']),$superpw)) {
 			$query = "SELECT id,goodfor FROM imas_diag_onetime WHERE code='".strtoupper($_POST['passwd'])."' AND diag='$diagid'";
@@ -182,7 +185,7 @@ if (isset($_POST['SID'])) {
 			if ($passwordnotfound) {
 				$query = "SELECT password FROM imas_users WHERE SID='$diagSID'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				if (mysql_num_rows($result)>0 && mysql_result($result,0,0)==strtoupper($_POST['passwd'])) {
+				if (mysql_num_rows($result)>0 && strtoupper(mysql_result($result,0,0))==strtoupper($_POST['passwd'])) {
 					
 				} else {
 					echo "<html><body>Error, password incorrect or expired.  <a href=\"index.php?id=$diagid\">Try Again</a>\n";
@@ -193,9 +196,7 @@ if (isset($_POST['SID'])) {
 	}
 	$cnt = 0;
 	$now = time();
-	if ($entrynotunique) {
-		$diagSID .= '~'.preg_replace('/\W/','',$sel1[$_POST['course']]);
-	}
+	
 	$query = "SELECT id FROM imas_users WHERE SID='$diagSID'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	if (mysql_num_rows($result)>0) {

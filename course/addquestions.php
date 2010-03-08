@@ -418,23 +418,42 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			$searchlibs = $_POST['libs'];
 			//$sessiondata['lastsearchlibs'] = implode(",",$searchlibs);
-			$sessiondata['lastsearchlibs'.$cid] = $searchlibs;
+			$sessiondata['lastsearchlibs'.$aid] = $searchlibs;
 			writesessiondata();
 		} else if (isset($_GET['listlib'])) {
 			$searchlibs = $_GET['listlib'];
-			$sessiondata['lastsearchlibs'.$cid] = $searchlibs;
+			$sessiondata['lastsearchlibs'.$aid] = $searchlibs;
 			$searchall = 0;
-			$sessiondata['searchall'.$cid] = $searchall;
-			$sessiondata['lastsearch'.$cid] = '';
+			$sessiondata['searchall'.$aid] = $searchall;
+			$sessiondata['lastsearch'.$aid] = '';
 			$searchlikes = '';
 			$search = '';
 			$safesearch = '';
 			writesessiondata();
-		}else if (isset($sessiondata['lastsearchlibs'.$cid])) {
+		}else if (isset($sessiondata['lastsearchlibs'.$aid])) {
 			//$searchlibs = explode(",",$sessiondata['lastsearchlibs']);
-			$searchlibs = $sessiondata['lastsearchlibs'.$cid];
+			$searchlibs = $sessiondata['lastsearchlibs'.$aid];
 		} else {
-			$searchlibs = $userdeflib;
+			if (isset($CFG['AMS']['guesslib']) && count($existingq)>0) {
+				$maj = count($existingq)/2;
+				$existingqlist = implode(',',$existingq);  //pulled from database, so no quotes needed
+				$query = "SELECT libid,COUNT(qsetid) FROM imas_library_items WHERE qsetid IN ($existingqlist) GROUP BY libid";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$foundmaj = false;
+				while ($row = mysql_fetch_row($result)) {
+					if ($row[1]>=$maj) {
+						$searchlibs = $row[0];
+						$foundmaj = true;
+						break;
+					}
+				}
+				if (!$foundmaj) {
+					echo "No maj found";
+					$searchlibs = $userdeflib;
+				}	
+			} else {
+				$searchlibs = $userdeflib;
+			}
 		}
 		$llist = "'".implode("','",explode(',',$searchlibs))."'";
 		
@@ -499,6 +518,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						if ($newonly && in_array($line['id'],$existingq)) {
 							continue;
 						}
+						if (isset($page_questionTable[$line['id']])) {
+							continue;
+						}
 						if ($lastlib!=$line['libid'] && isset($lnamesarr[$line['libid']])) {
 							/*$page_questionTable[$i]['checkbox'] = "";
 							$page_questionTable[$i]['desc'] = "<b>".$lnamesarr[$line['libid']]."</b>";
@@ -527,7 +549,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						}
 						$i = $line['id'];
 						$page_questionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . $line['id'] . "' id='qo$ln'>";
+						if (in_array($i,$existingq)) {
+							$page_questionTable[$i]['desc'] = '<span style="color: #999">'.filter($line['description']).'</span>';
+						} else {
 						$page_questionTable[$i]['desc'] = filter($line['description']);
+						}
 						$page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selq','qo$ln',{$line['id']},true,false)\"/>";
 						$page_questionTable[$i]['type'] = $line['qtype'];
 						if ($searchall==1) {
@@ -761,13 +787,15 @@ if ($overwriteBody==1) {
 			<option value="0"<?php echo $grp0Selected ?>>Rearrange questions</option>
 			<option value="1"<?php echo $grp1Selected ?>>Group questions</option>
 		</select>
+		<br/>Check: <a href="#" onclick="return chkAllNone('curqform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('curqform','checked[]',false)">None</a>
+		
 		With Selected: <input type=button value="Remove" onclick="removeSelected()" />
 				<input type=button value="Group" onclick="groupSelected()" />
 			  	<input type="submit" value="Change Settings" />
+		
 <?php			
 		}
 ?>
-		Check/Uncheck All: <input type="checkbox" name="ca1" value="ignore" onClick="chkAll(this.form, 'checked[]', this.checked)">
 		<span id="submitnotice" style="color:red;"></span>
 		<div id="curqtbl"></div>
 
@@ -789,7 +817,8 @@ if ($overwriteBody==1) {
 		<input type=button value="Preview" onClick="window.open('<?php echo $imasroot;?>/assessment/showtest.php?cid=<?php echo $cid ?>&id=<?php echo $aid ?>','Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20))"> 
 	</p>
 		
-<?php	
+<?php	//<input type=button value="Select Libraries" onClick="libselect()">
+		
 	//POTENTIAL QUESTIONS
 	if ($sessiondata['selfrom'.$aid]=='lib') { //selecting from libraries
 		if (!$beentaken) {
@@ -801,7 +830,7 @@ if ($overwriteBody==1) {
 		In Libraries: 
 		<span id="libnames"><?php echo $lnames ?></span>
 		<input type=hidden name="libs" id="libs"  value="<?php echo $searchlibs ?>">
-		<input type=button value="Select Libraries" onClick="libselect()">
+		<input type="button" value="Select Libraries" onClick="GB_show('Library Select','libtree2.php?libtree=popup&libs='+curlibs,500,500)" />
 		or <input type=button value="Select From Assessments" onClick="window.location='addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&selfrom=assm'">
 		<br> 
 		Search: 
@@ -828,9 +857,7 @@ if ($overwriteBody==1) {
 ?>				
 		<form id="selq" method=post action="addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&addset=true">
 		
-		
-		Check/Uncheck All: 
-		<input type="checkbox" name="ca2" value="1" onClick="chkAll(this.form, 'nchecked[]', this.checked)">
+		Check: <a href="#" onclick="return chkAllNone('selq','nchecked[]',true)">All</a> <a href="#" onclick="return chkAllNone('selq','nchecked[]',false)">None</a>
 		<input name="add" type=submit value="Add" />
 		<input name="addquick" type=submit value="Add (using defaults)">
 		<input type=button value="Preview Selected" onclick="previewsel('selq')" />
@@ -883,6 +910,7 @@ if ($overwriteBody==1) {
 ?>					
 			</tbody>
 		</table>
+		<p>Questions <span style="color:#999">in gray</span> have been added to the assessment.</p>
 		<script type="text/javascript">
 			initSortTable('myTable',Array(false,'S',false,'S',<?php echo ($searchall==1) ? "false, " : ""; ?>'N','S',false,false,false),true);
 		</script>
@@ -909,8 +937,7 @@ if ($overwriteBody==1) {
 		or <input type=button value="Select From Libraries" onClick="window.location='addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&selfrom=lib'">
 		<br/>
 			
-		Check/Uncheck All: 
-		<input type="checkbox" name="ca2" value="1" onClick="chkAll(this.form, 'nchecked[]', this.checked)">
+		Check: <a href="#" onclick="return chkAllNone('selq','nchecked[]',true)">All</a> <a href="#" onclick="return chkAllNone('selq','nchecked[]',false)">None</a>
 		<input name="add" type=submit value="Add" />
 		<input name="addquick" type=submit value="Add Selected (using defaults)">
 		<input type=button value="Preview Selected" onclick="previewsel('selq')" />
@@ -967,8 +994,8 @@ if ($overwriteBody==1) {
 		} else {  //choose assessments
 ?>		
 		<h4>Choose assessments to take questions from</h4>
-		<form method=post action="addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>">
-		Check/Uncheck All: <input type="checkbox" name="ca2" value="1" onClick="chkAll(this.form, 'achecked[]', this.checked)" checked=1>
+		<form id="sela" method=post action="addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>">
+		Check: <a href="#" onclick="return chkAllNone('sela','achecked[]',true)">All</a> <a href="#" onclick="return chkAllNone('sela','achecked[]',false)">None</a>
 		<input type=submit value="Use these Assessments" /> or 
 		<input type=button value="Select From Libraries" onClick="window.location='addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&selfrom=lib'">
 			

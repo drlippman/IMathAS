@@ -383,30 +383,18 @@ if ($overwriteBody==1) {
  echo $body;
 } else {	
 ?>
-<script type="text/javascript">
-function chkAll(frm, arr, mark) {
-  for (i = 0; i <= frm.elements.length; i++) {
-   try{
-     if(frm.elements[i].name == arr) {
-       frm.elements[i].checked = mark;
-     }
-   } catch(er) {}
-  }
-}
-</script>
 
 	<?php echo $curBreadcrumb; ?>
 	<h3>Export Course Items</h3>
 	<p>This page will let you export your course items for backup or transfer to
 	another server running this software.</p>
 	
-	<form method=post action="exportitems.php?cid=<?php echo $cid ?>">
+	<form id="qform" method=post action="exportitems.php?cid=<?php echo $cid ?>">
 		<p>Export description<br/>
 		<textarea rows=5 cols=50 name=description>Course Item Export</textarea></p>
 		<p>Select items to export</p>
 	
-		Check/Uncheck All: 
-		<input type="checkbox" name="ca" value="1" onClick="chkAll(this.form, 'checked[]', this.checked)" checked=checked>
+		Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
 	
 		<table cellpadding=5 class=gb>
 		<thead>

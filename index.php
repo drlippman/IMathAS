@@ -331,6 +331,9 @@ function printCourses($data,$title,$type=null) {
 		
 		echo '</li>';
 	}
+	if ($type=='teach' && $myrights>39 && count($data)==0) {
+		echo '<li>To add a course, head to the Admin Page</li>';
+	}
 	echo '</ul>';
 	if ($type=='take') {
 		echo '<div class="center"><a class="abutton" href="forms.php?action=enroll">Enroll in a New Class</a></div>';

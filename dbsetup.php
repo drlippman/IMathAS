@@ -126,7 +126,7 @@ $sql = 'CREATE TABLE `imas_users` ('
 	. ' `qrightsdef` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\','
 	. ' `deflib` INT(10) UNSIGNED NOT NULL DEFAULT \'0\','
 	. ' `usedeflib` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\','
-	. ' `homelayout` VARCHAR(32)  NOT NULL DEFAULT \'|0,2,3||0,1\','
+	. ' `homelayout` VARCHAR(32)  NOT NULL DEFAULT \'|0,1,2||0,1\','
 	. ' `remoteaccess` VARCHAR(10) NOT NULL, '
 	. ' INDEX (`lastaccess`), INDEX (`rights`), '
         . ' UNIQUE (`SID`)'
@@ -243,7 +243,8 @@ $sql = 'CREATE TABLE `imas_assessments` ('
 	. ' `exceptionpenalty` TINYINT(2) UNSIGNED NOT NULL DEFAULT \'0\','
 	. ' `ltisecret` VARCHAR(10) NOT NULL, '
 	. ' `endmsg` TEXT NOT NULL, '
-	. ' `caltag` CHAR(2) NOT NULL DEFAULT \'?R\', '
+	. ' `caltag` VARCHAR(254) NOT NULL DEFAULT \'?\', '
+	. ' `calrtag` VARCHAR(254) NOT NULL DEFAULT \'R\', '
 	. ' `tutoredit` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
         . ' INDEX (`courseid`), INDEX(`startdate`), INDEX(`enddate`),'
 	. ' INDEX(`cntingb`), INDEX(`reviewdate`), INDEX(`avail`)'
@@ -372,7 +373,7 @@ $sql = 'CREATE TABLE `imas_inlinetext` ('
 	. ' `fileorder` TEXT NOT NULL, '
 	. ' `avail` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'1\', '
 	. ' `oncal` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
-	. ' `caltag` CHAR(1) NOT NULL DEFAULT \'!\', '
+	. ' `caltag` VARCHAR(254) NOT NULL DEFAULT \'!\', '
         . ' INDEX (`courseid`), INDEX(`oncal`), INDEX(`avail`), INDEX(`startdate`), INDEX(`enddate`)'
         . ' )'
         . ' TYPE = innodb'
@@ -403,7 +404,7 @@ $sql = 'CREATE TABLE `imas_linkedtext` ('
 	. ' `avail` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'1\', '
 	. ' `oncal` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `target` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
-	. ' `caltag` CHAR(1) NOT NULL DEFAULT \'!\', '
+	. ' `caltag` VARCHAR(254) NOT NULL DEFAULT \'!\', '
         . ' INDEX (`courseid`), INDEX(`oncal`), INDEX(`avail`), INDEX(`startdate`), INDEX(`enddate`)'
         . ' )'
         . ' TYPE = innodb'
@@ -528,6 +529,52 @@ $sql = 'CREATE TABLE `imas_forum_views` ('
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());	
 echo 'imas_forum_views created<br/>';
 
+
+$sql = 'CREATE TABLE `imas_wikis` ('
+        . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
+        . ' `name` VARCHAR(50) NOT NULL, '
+        . ' `description` TEXT NOT NULL, '
+	. ' `courseid` INT(10) UNSIGNED NOT NULL, '
+        . ' `startdate` INT(10) UNSIGNED NOT NULL, '
+        . ' `editbydate` INT(10) UNSIGNED NOT NULL, '
+	. ' `enddate` INT(10) UNSIGNED NOT NULL, '
+	. ' `settings` TINYINT(2) UNSIGNED NOT NULL DEFAULT \'0\', '
+	. ' `groupsetid` INT(10) UNSIGNED NOT NULL DEFAULT \'0\', '
+	. ' `avail` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'1\','
+        . ' INDEX (`courseid`), '
+	. ' INDEX(`avail`), INDEX(`startdate`), INDEX(`enddate`), INDEX(`editbydate`) '
+        . ' )'
+        . ' TYPE = innodb'
+        . ' COMMENT = \'Wikis\';';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());	
+echo 'imas_wikis created<br/>';
+
+$sql = 'CREATE TABLE `imas_wiki_revisions` ('
+        . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
+        . ' `wikiid` INT(10) UNSIGNED NOT NULL, '
+        . ' `stugroupid` INT(10) UNSIGNED NOT NULL DEFAULT \'0\', '
+	. ' `userid` INT(10) UNSIGNED NOT NULL, '
+	. ' `time` INT(10) UNSIGNED NOT NULL,'
+	. ' `revision` TEXT NOT NULL, '
+        . ' INDEX (`wikiid`), INDEX(`stugroupid`), INDEX(`time`) '
+        . ' )'
+        . ' TYPE = innodb'
+        . ' COMMENT = \'Wiki revisions\';';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());	
+echo 'imas_wiki_revisions created<br/>';
+
+$sql = 'CREATE TABLE `imas_wiki_views` ('
+        . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
+        . ' `userid` INT(10) UNSIGNED NOT NULL, '
+	. ' `wikiid` INT(10) UNSIGNED NOT NULL, '
+        . ' `lastview` INT(10) UNSIGNED NOT NULL,'
+	 . ' INDEX (`userid`), INDEX(`wikiid`)'
+        . ' )'
+        . ' TYPE = innodb'
+        . ' COMMENT = \'Wiki last viewings\';';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());	
+echo 'imas_wiki_views created<br/>';
+
 $sql = 'CREATE TABLE `imas_groups` ('
         . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
         . ' `name` VARCHAR(255) NOT NULL'
@@ -535,6 +582,8 @@ $sql = 'CREATE TABLE `imas_groups` ('
         . ' TYPE = innodb;';
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());	
 echo 'imas_groups created<br/>';
+
+
 
 $sql = 'CREATE TABLE `imas_diags` ('
         . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
@@ -669,7 +718,7 @@ $sql = 'CREATE TABLE `imas_calitems` ('
         . ' `courseid` INT(10) UNSIGNED NOT NULL, '
         . ' `date` INT(10) UNSIGNED NOT NULL, '
         . ' `title` VARCHAR(254) NOT NULL, '
-        . ' `tag` CHAR(1) NOT NULL,'
+        . ' `tag` VARCHAR(254) NOT NULL,'
         . ' INDEX (`courseid`), INDEX(`date`)'
         . ' )'
         . ' TYPE = innodb'

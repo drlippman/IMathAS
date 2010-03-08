@@ -336,15 +336,6 @@ if ($overwriteBody==1) {
 } else {
 ?>
 	<script type="text/javascript">
-	function chkAll(frm, arr, mark) {
-	  for (i = 0; i <= frm.elements.length; i++) {
-	   try{
-	     if(frm.elements[i].name == arr) {
-	       frm.elements[i].checked = mark;
-	     }
-	   } catch(er) {}
-	  }
-	}
 
 	var curlibs = '0';
 	function libselect() {
@@ -385,7 +376,7 @@ if ($overwriteBody==1) {
 ?>
 
 		<div id="headerimport" class="pagetitle"><h2>Import Question Set</h2></div>
-		<form enctype="multipart/form-data" method=post action="import.php?cid=<?php echo $cid ?>">	
+		<form id="qform" enctype="multipart/form-data" method=post action="import.php?cid=<?php echo $cid ?>">	
 
 <?php	 
 		if ($_FILES['userfile']['name']=='') { //INITIAL LOAD, STEP 1 DISPLAY
@@ -419,8 +410,8 @@ if ($overwriteBody==1) {
 					Assign to library: <span id="libnames">Unassigned</span>
 					<input type=hidden name="libs" id="libs"  value="0">
 					<input type=button value="Select Libraries" onClick="libselect()"><br> 
+					Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
 				
-					Check/Uncheck All: <input type="checkbox" name="ca" value="1" onClick="chkAll(this.form, 'checked[]', this.checked)" checked=checked>
 				</p>
 								
 				<table cellpadding=5 class=gb>

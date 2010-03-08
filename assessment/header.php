@@ -52,10 +52,21 @@ if ($sessiondata['graphdisp']==1) {
 	echo "<script src=\"$imasroot/javascript/mathjs.js\" type=\"text/javascript\"></script>\n";
 }
 ?>
+<!--[if lte IE 6]> 
+<style> 
+div { zoom: 1; } 
+.clear { line-height: 0;}
+#GB_overlay, #GB_window { 
+ position: absolute; 
+ top: expression(0+((e=document.documentElement.scrollTop)?e:document.body.scrollTop)+'px'); 
+ left: expression(0+((e=document.documentElement.scrollLeft)?e:document.body.scrollLeft)+'px');} 
+}
+</style> 
+<![endif]--> 
 <script src="<?php echo $imasroot . "/javascript/AMhelpers_min.js?v=011010";?>" type="text/javascript"></script>
 <script src="<?php echo $imasroot . "/javascript/confirmsubmit.js";?>" type="text/javascript"></script>
 <!--[if IE]><script type="text/javascript" src="<?php echo $imasroot;?>/javascript/excanvas_min.js"></script><![endif]-->
-<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/drawing_min.js?v=020210"></script>
+<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/drawing_min.js?v=030110"></script>
 <?php
 echo "<script type=\"text/javascript\">imasroot = '$imasroot';</script>";
 if ($useeditor==1 && $sessiondata['useed']==1) {
@@ -164,6 +175,7 @@ if ($coursetopbar[1][0] == null) {unset($coursetopbar[1][0]);}
 if (isset($cid) && !isset($flexwidth) && $sessiondata['isteacher'] && $coursetopbar[2]==1 && count($coursetopbar[1])>0) {
 	echo '<div id="navlistcont">';
 	echo '<ul id="navlist">';
+	echo "<li><a href=\"$imasroot/course/course.php?cid=$cid\">Course</a></li> ";
 	if (in_array(0,$coursetopbar[1]) && $msgset<4) { //messages
 		echo "<li><a href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a></li> ";
 	}
@@ -198,6 +210,7 @@ if (isset($cid) && !isset($flexwidth) && $sessiondata['isteacher'] && $coursetop
 } else if (isset($cid) && !isset($flexwidth) && $sessiondata['isteacher'] && $coursetopbar[2]==1 && count($coursetopbar[0])>0) {
 	echo '<div id="navlistcont">';
 	echo '<ul id="navlist">';
+	echo "<li><a href=\"$imasroot/course/course.php?cid=$cid\">Course</a></li> ";
 	if (in_array(0,$coursetopbar[0]) && $msgset<4) { //messages
 		echo "<li><a href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a></li> ";
 	}

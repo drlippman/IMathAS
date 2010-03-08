@@ -62,6 +62,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$query = "UPDATE imas_forums SET startdate='$startdate',enddate='$enddate' WHERE id='$id'";
 					mysql_query($query) or die("Query failed : " . mysql_error());
 				}
+			} else if ($type=='Wiki') {
+				if ($id>0) {
+					$query = "UPDATE imas_wikis SET startdate='$startdate',enddate='$enddate' WHERE id='$id'";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+				}
 			} else if ($type=='InlineText') {
 				if ($id>0) {
 					$query = "UPDATE imas_inlinetext SET startdate='$startdate',enddate='$enddate' WHERE id='$id'";
@@ -176,6 +181,9 @@ if ($overwriteBody==1) {
 	echo '<option value="forums" ';
 	if ($filter=='forums') {echo 'selected="selected"';}
 	echo '>Forums</option>';
+	echo '<option value="wikis" ';
+	if ($filter=='wikis') {echo 'selected="selected"';}
+	echo '>Wikis</option>';
 	echo '<option value="blocks" ';
 	if ($filter=='blocks') {echo 'selected="selected"';}
 	echo '>Blocks</option>';
@@ -186,9 +194,11 @@ if ($overwriteBody==1) {
 	echo "<p>Once changing dates in one row, you can click <i>Send Down List</i> to send the date change ";
 	echo "difference to all rows below.  Click the <img src=\"$imasroot/img/swap.gif\"> icon in each cell to swap from ";
 	echo "Always/Never to Dates.  Swaps to/from Always/Never cannot be sent down the list.</p>";
-	echo "<form method=post action=\"masschgdates.php?cid=$cid\">";
+	echo "<form id=\"qform\" method=post action=\"masschgdates.php?cid=$cid\">";
 	
-	echo '<p>Check/Uncheck All: <input type="checkbox" name="ca" value="1" onClick="chkAll(this.form, this.checked)"/>. ';
+	echo 'Check: <a href="#" onclick="return chkAllNone(\'qform\',\'all\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'all\',false)">None</a> ';
+
+	//echo '<p>Check/Uncheck All: <input type="checkbox" name="ca" value="1" onClick="chkAll(this.form, this.checked)"/>. ';
 	echo 'Change selected items <select id="swaptype"><option value="s">Start Date</option><option value="e">End Date</option><option value="r">Review Date</option></select>';
 	echo ' to <select id="swapselected"><option value="always">Always/Never</option><option value="dates">Dates</option></select>';
 	echo ' <input type="button" value="Go" onclick="MCDtoggleselected(this.form)" />';
@@ -200,10 +210,11 @@ if ($overwriteBody==1) {
 	$enddates = Array();
 	$reviewdates = Array();
 	$ids = Array();
+	$avails = array();
 	$types = Array();
 	
 	if ($filter=='all' || $filter=='assessments') {
-		$query = "SELECT name,startdate,enddate,reviewdate,id FROM imas_assessments WHERE courseid='$cid' ";
+		$query = "SELECT name,startdate,enddate,reviewdate,id,avail FROM imas_assessments WHERE courseid='$cid' ";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
 			$types[] = "Assessment";
@@ -212,10 +223,11 @@ if ($overwriteBody==1) {
 			$enddates[] = $row[2];
 			$reviewdates[] = $row[3];
 			$ids[] = $row[4];
+			$avails[] = $row[5];
 		}
 	}
 	if ($filter=='all' || $filter=='inlinetext') {
-		$query = "SELECT title,startdate,enddate,id FROM imas_inlinetext WHERE courseid='$cid' ";
+		$query = "SELECT title,startdate,enddate,id,avail FROM imas_inlinetext WHERE courseid='$cid' ";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
 			$types[] = "InlineText";
@@ -224,10 +236,11 @@ if ($overwriteBody==1) {
 			$enddates[] = $row[2];
 			$reviewdates[] = 0;
 			$ids[] = $row[3];
+			$avails[] = $row[4];
 		}
 	}
 	if ($filter=='all' || $filter=='linkedtext') {
-		$query = "SELECT title,startdate,enddate,id FROM imas_linkedtext WHERE courseid='$cid' ";
+		$query = "SELECT title,startdate,enddate,id,avail FROM imas_linkedtext WHERE courseid='$cid' ";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
 			$types[] = "LinkedText";
@@ -236,10 +249,11 @@ if ($overwriteBody==1) {
 			$enddates[] = $row[2];
 			$reviewdates[] = 0;
 			$ids[] = $row[3];
+			$avails[] = $row[4];
 		}
 	}
 	if ($filter=='all' || $filter=='forums') {
-		$query = "SELECT name,startdate,enddate,id FROM imas_forums WHERE courseid='$cid' ";
+		$query = "SELECT name,startdate,enddate,id,avail FROM imas_forums WHERE courseid='$cid' ";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
 			$types[] = "Forum";
@@ -248,6 +262,20 @@ if ($overwriteBody==1) {
 			$enddates[] = $row[2];
 			$reviewdates[] = 0;
 			$ids[] = $row[3];
+			$avails[] = $row[4];
+		}
+	}
+	if ($filter=='all' || $filter=='wikis') {
+		$query = "SELECT name,startdate,enddate,id,avail FROM imas_wikis WHERE courseid='$cid' ";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			$types[] = "Wiki";
+			$names[] = $row[0];
+			$startdates[] = $row[1];
+			$enddates[] = $row[2];
+			$reviewdates[] = 0;
+			$ids[] = $row[3];
+			$avails[] = $row[4];
 		}
 	}
 	if ($filter=='all' || $filter=='blocks') {
@@ -264,6 +292,7 @@ if ($overwriteBody==1) {
 					$names[] = stripslashes($item['name']);
 					$startdates[] = $item['startdate'];
 					$enddates[] = $item['enddate'];
+					$avails[] = $item['avail'];
 					$reviewdates[] = 0;
 					if (count($item['items'])>0) {
 						getblockinfo($item['items'],$parent.'-'.($k+1));
@@ -289,6 +318,7 @@ if ($overwriteBody==1) {
 		echo '<tr class=grid>';
 		echo '<td>';
 		echo "<input type=\"checkbox\" id=\"cb$cnt\" value=\"$cnt\" /> ";
+		
 		echo "{$names[$i]}<input type=hidden name=\"id$cnt\" value=\"{$ids[$i]}\"/>";
 		echo "<script> basesdates[$cnt] = ";
 		if ($startdates[$i]==0) { echo '"NA"';} else {echo $startdates[$i];}

@@ -459,15 +459,6 @@ if ($overwriteBody==1) {
 } else {
 ?>
 <script type="text/javascript">
-function chkAll(frm, arr, mark) {
-  for (i = 0; i <= frm.elements.length; i++) {
-   try{
-     if(frm.elements[i].name == arr) {
-       frm.elements[i].checked = mark;
-     }
-   } catch(er) {}
-  }
-}
 
 var curlibs = '0';
 function libselect() {
@@ -490,7 +481,7 @@ function setlibnames(libn) {
 
 <?php echo $curBreadcrumb; ?>
 	<div id="headerimportitems" class="pagetitle"><h2>Import Course Items</h2></div>
-	<form enctype="multipart/form-data" method=post action="importitems.php?cid=<?php echo $cid ?>">
+	<form id="qform" enctype="multipart/form-data" method=post action="importitems.php?cid=<?php echo $cid ?>">
 
 <?php	
 	if ($_FILES['userfile']['name']=='') {
@@ -536,8 +527,7 @@ function setlibnames(libn) {
 		<input type=hidden name="libs" id="libs"  value="0">
 		<input type=button value="Select Libraries" onClick="libselect()"><br> 
 			
-		Check/Uncheck All: 
-		<input type="checkbox" name="ca" value="1" onClick="chkAll(this.form, 'checked[]', this.checked)" checked=checked>
+		Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
 			
 
 <?php		

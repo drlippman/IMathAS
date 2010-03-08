@@ -320,7 +320,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	}
 }
   
-$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/course.js?v=112409\"></script>";
+$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/course.js?v=022810\"></script>";
 
 /******* begin html output ********/
 require("../header.php");
@@ -662,7 +662,7 @@ function makeTopMenu() {
 	global $CFG;
 	global $useviewbuttons;
 	
-	if ($useviewbuttons) {
+	if ($useviewbuttons && (isset($teacherid) || $previewshift>-1)) {
 		echo '<div id="viewbuttoncont">View: ';
 		echo "<a href=\"course.php?cid=$cid&quickview=off&teachview=1\" ";
 		if ($previewshift==-1 && $quickview != 'on') {

@@ -33,3 +33,14 @@ img.pic {
 	float: left;
 	padding-right: 5px;
 }
+span.leftbtns {
+	margin-top: -2px;
+	float: left;
+	padding-right: 5px;
+}
+span.leftbtns img {
+	vertical-align: top;
+}
+.block {
+	min-height: 36px;
+}

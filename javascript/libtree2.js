@@ -121,7 +121,8 @@ function addbranch(id) {
 		addtoli.appendChild(buildbranch(id));
 	} catch (er) {}
 } 
-function setlib(frm) {
+function setlib() {
+	var frm = document.getElementById("libselectform");
 	var cnt = 0;
 	var chlibs = new Array();
 	var chlibsn = new Array();
@@ -136,10 +137,18 @@ function setlib(frm) {
 			}
 		} catch(er) {}
 	}
+	if (opener) {
 	opener.setlib(chlibs.join(","));
 	opener.setlibnames(chlibsn.join(", "));
 	self.close();
+	} else {
+		top.setlib(chlibs.join(","));
+		top.setlibnames(chlibsn.join(", "));
+		top.GB_hide();
+	}
+	
 }
+
 function uncheckall(frm) {
 	for (i = 0; i <= frm.elements.length; i++) {
 		try{

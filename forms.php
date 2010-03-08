@@ -12,13 +12,22 @@ if ($_GET['action']!="newuser" && $_GET['action']!="resetpw" && $_GET['action']!
 	}
 	$coursetheme = $defaultcoursetheme;
 }
+if (isset($_GET['greybox'])) {
+	$gb = '&greybox=true';
+	$flexwidth = true;
+	$nologo = true;
+} else {
+	$gb = '';
+}
 require("header.php");	
-echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Form</div>\n";
+if ($gb == '') {
+	echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Form</div>\n";
+}
 switch($_GET['action']) {
 	case "newuser":
 		echo '<div id="headerforms" class="pagetitle"><h2>New User Signup</h2></div>';
 		echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/validateform.js\"></script>\n";
-		echo "<form method=post action=\"actions.php?action=newuser\" onsubmit=\"return validateForm(this)\">\n";
+		echo "<form method=post action=\"actions.php?action=newuser$gb\" onsubmit=\"return validateForm(this)\">\n";
 		echo "<span class=form><label for=\"SID\">$longloginprompt:</label></span> <input class=form type=text size=12 id=SID name=SID><BR class=form>\n";
 		echo "<span class=form><label for=\"pw1\">Choose a password:</label></span><input class=form type=password size=20 id=pw1 name=pw1><BR class=form>\n";
 		echo "<span class=form><label for=\"pw2\">Confirm password:</label></span> <input class=form type=password size=20 id=pw2 name=pw2><BR class=form>\n";
@@ -37,7 +46,7 @@ switch($_GET['action']) {
 		break;
 	case "chgpwd":
 		echo '<div id="headerforms" class="pagetitle"><h2>Change Your Password</h2></div>';
-		echo "<form method=post action=\"actions.php?action=chgpwd\">\n";
+		echo "<form method=post action=\"actions.php?action=chgpwd$gb\">\n";
 		echo "<span class=form><label for=\"oldpw\">Enter old password:</label></span> <input class=form type=password id=oldpw name=oldpw size=40 /> <BR class=form>\n";
 		echo "<span class=form><label for=\"newpw1\">Enter new password:</label></span>  <input class=form type=password id=newpw1 name=newpw1 size=40> <BR class=form>\n";
 		echo "<span class=form><label for=\"newpw1\">Verify new password:</label></span>  <input class=form type=password id=newpw2 name=newpw2 size=40> <BR class=form>\n";
@@ -47,11 +56,19 @@ switch($_GET['action']) {
 		$query = "SELECT * FROM imas_users WHERE id='$userid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$line = mysql_fetch_array($result, MYSQL_ASSOC);
+		echo '<script type="text/javascript">function togglechgpw(val) { if (val) {document.getElementById("pwinfo").style.display="";} else {document.getElementById("pwinfo").style.display="none";} } </script>';
+		
 		echo '<div id="headerforms" class="pagetitle"><h2>User Info</h2></div>';
-		echo "<form enctype=\"multipart/form-data\" method=post action=\"actions.php?action=chguserinfo\">\n";
+		echo "<form enctype=\"multipart/form-data\" method=post action=\"actions.php?action=chguserinfo$gb\">\n";
 		echo '<fieldset id="userinfoprofile"><legend>Profile Settings</legend>';
 		echo "<span class=form><label for=\"firstname\">Enter First Name:</label></span> <input class=form type=text size=20 id=firstname name=firstname value=\"{$line['FirstName']}\" /><br class=\"form\" />\n";
 		echo "<span class=form><label for=\"lastname\">Enter Last Name:</label></span> <input class=form type=text size=20 id=lastname name=lastname value=\"{$line['LastName']}\"><BR class=form>\n";
+		echo '<span class="form"><label for="dochgpw">Change Password?</label></span> <span class="formright"><input type="checkbox" name="dochgpw" onclick="togglechgpw(this.checked)" /></span><br class="form" />';
+		echo '<div style="display:none" id="pwinfo">';
+		echo "<span class=form><label for=\"oldpw\">Enter old password:</label></span> <input class=form type=password id=oldpw name=oldpw size=40 /> <BR class=form>\n";
+		echo "<span class=form><label for=\"newpw1\">Enter new password:</label></span>  <input class=form type=password id=newpw1 name=newpw1 size=40> <BR class=form>\n";
+		echo "<span class=form><label for=\"newpw1\">Verify new password:</label></span>  <input class=form type=password id=newpw2 name=newpw2 size=40> <BR class=form>\n";
+		echo '</div>';
 		echo "<span class=form><label for=\"email\">Enter E-mail address:</label></span>  <input class=form type=text size=60 id=email name=email value=\"{$line['email']}\"><BR class=form>\n";
 		echo "<span class=form><label for=\"msgnot\">Notify me by email when I receive a new message:</label></span><span class=formright><input type=checkbox id=msgnot name=msgnot ";
 		if ($line['msgnotify']==1) {echo "checked=1";}
@@ -150,8 +167,8 @@ switch($_GET['action']) {
 		break;
 	case "enroll":
 		echo '<div id="headerforms" class="pagetitle"><h2>Enroll in a Course</h2></div>';
-		echo '<form method=post action="actions.php?action=enroll">
-		<span class=form><label for="cid">Course id:</label></span> 
+		echo "<form method=post action=\"actions.php?action=enroll$gb\">";
+		echo '<span class=form><label for="cid">Course id:</label></span> 
 		<input class=form type=text size=6 id=cid name=cid><br class="form" />
 		<span class=form><label for="ekey">Enrollment key:</label></span> 
 		<input class=form type=text size=10 id="ekey" name="ekey"><br class="form" />
@@ -168,7 +185,7 @@ switch($_GET['action']) {
 		break;
 	case "resetpw":
 		echo '<div id="headerforms" class="pagetitle"><h2>Reset Password</h2></div>';
-		echo "<form method=post action=\"actions.php?action=resetpw\">\n";
+		echo "<form method=post action=\"actions.php?action=resetpw$gb\">\n";
 		echo "<p>Enter your User Name below and click Submit.  An email will be sent to your email address on file.  A link in that email will ";
 		echo "reset your password.</p>";
 		echo "<p>User Name: <input type=text name=\"username\"/></p>";
@@ -176,7 +193,7 @@ switch($_GET['action']) {
 		break;
 	case "lookupusername":
 		echo '<div id="headerforms" class="pagetitle"><h2>Lookup Username</h2></div>';
-		echo "<form method=post action=\"actions.php?action=lookupusername\">\n"; 
+		echo "<form method=post action=\"actions.php?action=lookupusername$gb\">\n"; 
 		echo "If you can't remember your username, enter your email address below.  An email will be sent to your email address with your username. ";
 		echo "<p>Email: <input type=text name=\"email\"/></p>";
 		echo "<p><input type=submit value=\"Submit\" /></p></form>";
@@ -207,8 +224,8 @@ switch($_GET['action']) {
 		
 		echo '<p>Add to iGoogle: <a href="http://fusion.google.com/add?source=atgs&moduleurl=http%3A//'.$_SERVER['HTTP_HOST'].$imasroot.'/google-postreader.php"><img src="http://gmodules.com/ig/images/plus_google.gif" border="0" alt="Add to Google"></a></p>';
 		echo "<p>Access Code: $code</p>";
-		echo "<p><a href=\"forms.php?action=googlegadget&regen=true\">Generate a new Access code<a/><br/>";
-		echo "<p><a href=\"actions.php?action=googlegadget&clear=true\">Clear Access code</a></p>";
+		echo "<p><a href=\"forms.php?action=googlegadget&regen=true$gb\">Generate a new Access code<a/><br/>";
+		echo "<p><a href=\"actions.php?action=googlegadget&clear=true$gb\">Clear Access code</a></p>";
 		echo "<p>Note: This access code only allows Google to access a list of new posts and messages, and does not provide access to grades or any other data stored at $installname.  Be aware that this form of access is insecure and could be intercepted by a third party.</p>";
 		echo "<p>You can also bookmark <a href=\"getpostlist.php?key=$code\">this page</a> to be able to access your post list without needing to log in.</p>";
 		break;

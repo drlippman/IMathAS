@@ -106,3 +106,11 @@ Apache License, Version 2.0
 tar class
 Copyright (C) 2002  Josh Barger
 LGPL
+
+greybox redux
+John Resig / 4mir Salihefendic (http://amix.dk)
+LGPL
+
+Paul's Simple Diff Algorithm v 0.1
+(C) Paul Butler 2007 <http://www.paulbutler.org/>
+May be used and distributed under the zlib/libpng license.

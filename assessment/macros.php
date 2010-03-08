@@ -4,7 +4,7 @@
 
 
 array_push($allowedmacros,"exp","sec","csc","cot","sech","csch","coth","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif","in_array","prettyint","prettyreal","arraystodots","subarray","showdataarray","arraystodoteqns","array_flip","arrayfindindex","fillarray","array_reverse","root");
-array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","randcity","randcities","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction","ifthen","multicalconarray","htmlentities","formhoverover","formpopup","connectthedots","jointsort","stringpos","stringlen","stringclean","substr");
+array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","randcity","randcities","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction","ifthen","multicalconarray","htmlentities","formhoverover","formpopup","connectthedots","jointsort","stringpos","stringlen","stringclean","substr","makexxpretty","makexxprettydisp");
 function mergearrays($a,$b) {
 	if (!is_array($a)) {
 		$a = array($a);
@@ -74,6 +74,14 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	}
 	$ymin = $settings[2];
 	$ymax = $settings[3];
+	$noyaxis = false;
+	if ($ymin==0 && $ymax==0) {
+		$ymin = -0.5;
+		$ymax = 0.5;
+		$noyaxis = true;
+		$settings[2] = -0.5;
+		$settings[3] = 0.5;
+	}
 	$xxmin = $settings[0] - 5*($settings[1] - $settings[0])/$settings[6];
 	$xxmax = $settings[1] + 5*($settings[1] - $settings[0])/$settings[6];
 	$yymin = $settings[2] - 5*($settings[3] - $settings[2])/$settings[7];
@@ -123,9 +131,15 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		$grid = explode(':',$settings[5]);
 	}
 	if (is_numeric($settings[5]) && $settings[5]>0) { 
-		$commands .= ','.$settings[5].','.$settings[5].');';
+		$commands .= ','.$settings[5].','.$settings[5];
 	} else if (isset($grid[0]) && is_numeric($grid[0]) && $grid[0]>0 && $grid[1]>0) {
-		$commands .= ','.$grid[0].','.$grid[1].');';
+		$commands .= ','.$grid[0].','.$grid[1];
+	} else {
+		$commands .= ',0,0';
+		//$commands .= ');';
+	}
+	if ($noyaxis==true) {
+		$commands .= ',1,0);';
 	} else {
 		$commands .= ');';
 	}
@@ -623,18 +637,21 @@ function clean($exp) {
 }
 
 function xclean($exp) {
+	//goals are to cleam up  1*, 0*  0+  0-  a^0  a^1
 	$exp = clean($exp);
-	$exp = preg_replace('/^([a-zA-Z])\^0/','1',$exp);
-	$exp = preg_replace('/(\d)\*?([a-zA-Z])\^0$/',"$1",$exp);
-	$exp = preg_replace('/(\d)\*?([a-zA-Z])\^0([^\d\.])/',"$1$3",$exp);
-	$exp = preg_replace('/([^\d])\*?([a-zA-Z])\^0$/',"$1 1",$exp);
-	$exp = preg_replace('/([^\d])\*?([a-zA-Z])\^0([^\d\.])/',"$1 1 $3",$exp);
-	$exp = preg_replace('/^0\s*\*?[^\+\-]*\+?/','',$exp);
-	$exp = preg_replace('/[\+\-]\s*0\s*\*?[^\+\-]*/','',$exp);
-	$exp = preg_replace('/^1\s*\*?([a-zA-Z])/',"$1",$exp);
-	$exp = preg_replace('/([^\d\^\.])1\s*\*?([a-zA-Z\(])/',"$1$2",$exp);
-	$exp = preg_replace('/\^1([^\d])/',"$1",$exp);
-	$exp = preg_replace('/\^1$/','',$exp);
+	$exp = preg_replace('/^([a-zA-Z])\^0/','1',$exp); //x^0 -> 1
+	$exp = preg_replace('/(\d)\*?([a-zA-Z])\^0$/',"$1",$exp);   //3x^0  -> 3
+	$exp = preg_replace('/(\d)\*?([a-zA-Z])\^0([^\d\.])/',"$1$3",$exp); //3x^0+4 -> 3+4
+	$exp = preg_replace('/([^\d])\*?([a-zA-Z])\^0$/',"$1 1",$exp); //y*x^0 -> y*1,  y+x^0 -> y+1
+	$exp = preg_replace('/([^\d])\*?([a-zA-Z])\^0([^\d\.])/',"$1 1 $3",$exp);  //y*x^0+3 -> y*1+3,  y+x^0+z -> y+1+z
+	$exp = preg_replace('/^0\s*\*?[^\+\-\.]+\+?/','',$exp); // 0*23+x
+	$exp = preg_replace('/^0\s*([\+\-])/',"$1",$exp);  //0+x, 0-x
+	$exp = preg_replace('/[\+\-]\s*0\s*\*?[^\.\+\-]+/','',$exp); //3+0x-4 -> 3-4
+	$exp = preg_replace('/[\+\-]\s*0\s*([\+\-])/',"$1",$exp);  //3+0+4 -> 3+4
+	$exp = preg_replace('/^1\s*\*?([a-zA-Z])/',"$1",$exp);  //1x -> x
+	$exp = preg_replace('/([^\d\^\.])1\s*\*?([a-zA-Z\(])/',"$1$2",$exp);  //3+1x -> 3+x
+	$exp = preg_replace('/\^1([^\d])/',"$1",$exp); //3x^1+4 =>3x+4 
+	$exp = preg_replace('/\^1$/','',$exp);  //4x^1 -> 4x
 	$exp = clean($exp);
 	if ($exp{0}=='+') {
 		$exp = substr($exp,1);
@@ -752,6 +769,19 @@ function makexpretty($exp) {
 	return $exp;
 }
 
+function makexxpretty($exp,$funcs=array()) {
+	if (is_array($exp)) {
+		for ($i=0;$i<count($exp);$i++) {
+			$exp[$i] = clean($exp[$i]);
+			$exp[$i]=cleanbytoken($exp[$i],$funcs);
+		}
+	} else {
+		$exp = clean($exp);
+		$exp = cleanbytoken($exp,$funcs);
+	}
+	return $exp;
+}
+
 function polymakepretty($exp) {
 	if (is_array($exp)) {
 		for ($i=0;$i<count($exp);$i++) {
@@ -783,6 +813,19 @@ function makexprettydisp($exp) {
 		}
 	} else {
 		$exp = "`".xclean($exp)."`";
+	}
+	return $exp;
+}
+
+function makexxprettydisp($exp,$funcs=array()) {
+	if (is_array($exp)) {
+		for ($i=0;$i<count($exp);$i++) {
+			$exp[$i] = clean($exp[$i]);
+			$exp[$i]="`".cleanbytoken($exp[$i],$funcs)."`";
+		}
+	} else {
+		$exp = clean($exp);
+		$exp = "`".cleanbytoken($exp,$funcs)."`";
 	}
 	return $exp;
 }
@@ -1242,6 +1285,9 @@ function multicalconarray() {
 		
 	$todo = mathphp($todo,implode('|',$vars),false,false);
 	if ($todo=='0;') { return 0;}
+	for ($i=0;$i<count($vars);$i++) {
+		$todo = str_replace('('.$vars[$i].')','($'.$vars[$i].')',$todo);
+	}
 
 	$varlist = '$'.implode(',$',$vars);
 	$evalstr = "return(array_map(create_function('$varlist','return($todo);')";
@@ -1914,6 +1960,325 @@ function intervaltoineq($str,$var) {
 		}
 	}
 	return implode(' \\ "or" \\ ',$out);
+}
+
+function cleanbytoken($str,$funcs = array()) {
+	$tokens = cleantokenize($str,$funcs);
+	//print_r($tokens);
+	$out = array();
+	$lasti = count($tokens)-1;
+	for ($i=0; $i<=$lasti; $i++) {
+		$token = $tokens[$i];
+		$lastout = count($out)-1;
+		if ($token[1]==3 && $token[0]==='0') { //is the number 0 by itself
+			if ($lastout>-1) { //if not first character
+				if ($out[$lastout] != '^') {
+					//( )0, + 0, x0
+					while ($lastout>-1 && $out[$lastout]!= '+' && $out[$lastout]!= '-') {
+						array_pop($out);
+						$lastout--;
+					}
+					if ($lastout>-1) {
+						array_pop($out);
+					}
+					
+				} else if ($out[$lastout] == '^') {
+					if ($lastout>=2 && ($out[$lastout-2]=='+'|| $out[$lastout-2]=='-')) {
+						//4x+x^0 -> 4x+1
+						array_splice($out,-2);
+						$out[] = 1;
+					} else if ($lastout>=2) {
+						//4x^0->4, 5(x+3)^0 -> 5
+						array_splice($out,-2);
+					} else if ($lastout==1) {
+						//x^0 -> 1
+						$out = array(1);
+					}
+				}
+			}
+			if ($i<$lasti) { //if not last character
+				if ($tokens[$i+1][0]=='^') {
+					//0^3
+					$i+=2; //skip over ^ and 3
+				} else {
+					while ($i<$lasti && $tokens[$i+1][0]!= '+' && $tokens[$i+1][0]!= '-') {
+						$i++;
+					}
+				}
+			}
+		} else if ($token[1]==3 && $token[0]==='1') {
+			$dontuse = false;
+			if ($lastout>-1) { //if not first character
+				if ($out[$lastout] != '^' && $out[$lastout]!='+' && $out[$lastout]!='-') {
+					//( )1, x1,*1
+					if ($out[$lastout]=='*') { //elim *
+						array_pop($out);
+					}
+					$dontuse = true;
+				} else if ($out[$lastout] == '^') {
+					if ($lastout>=1) {
+						//4+x^1 -> 4+x, 4x^1 -> 4x
+						array_pop($out);
+						$dontuse = true;
+					}
+				}
+			}
+			if ($i<$lasti) { //if not last character
+				if ($tokens[$i+1][0]=='^') {
+					//1^3
+					$i+=2; //skip over ^ and 3
+				} else if ($tokens[$i+1][0]=='*') {
+					$i++;  //skip over *
+					$dontuse = true;
+				} else if ($tokens[$i+1][0]!= '+' && $tokens[$i+1][0]!= '-') {
+					// 1x, 1(), 1sin
+					if ($lastout<2 || ($out[$lastout-1] != '^' || $out[$lastout] != '-')) { //exclude ^-1 case
+						$dontuse = true;
+					}
+				}
+			}
+			if (!$dontuse) {
+				$out[] = 1;
+			}
+		} else {
+			$out[] = $token[0];	
+		}	
+	}
+	if ($out[0]=='+') {
+		array_shift($out);
+	}
+	if (count($out)==0) {
+		return '0';
+	}
+	return implode('',$out);
+}
+
+
+function cleantokenize($str,$funcs) {
+	$knownfuncs = array_merge($funcs,array("sin","cos","sec","csc","tan","csc","cot","sinh","cosh","sech","csch","tanh","coth","arcsin","arccos","arcsec","arccsc","arctan","arccot","arcsinh","arccosh","arctanh","sqrt","ceil","floor","root","log","ln","abs","max","min"));
+	
+	$lookfor = array("e","pi");
+	$maxvarlen = 0;
+	foreach ($lookfor as $v) {
+		$l = strlen($v);
+		if ($l>$maxvarlen) {
+			$maxvarlen = $l;
+		}
+	}
+	$connecttolast = 0;
+	$i=0;
+	$cnt = 0;
+	$len = strlen($str);
+	$syms = array();
+	$lastsym = array();
+	while ($i<$len) {
+		$cnt++;
+		if ($cnt>100) {
+			exit;
+		}
+		$intype = 0;
+		$out = '';
+		$c = $str{$i};
+		$eatenwhite = 0;
+		if ($c>="a" && $c<="z" || $c>="A" && $c<="Z") {
+			//is a string or function name
+			
+			$intype = 2; //string like function name
+			do {
+				$out .= $c;
+				$i++;
+				if ($i==$len) {break;}
+				$c = $str{$i};
+			} while ($c>="a" && $c<="z" || $c>="A" && $c<="Z" || $c=='_'); // took out : || $c>='0' && $c<='9'  don't need sin3 type function names for cleaning
+			//check if it's a special word
+			if ($out=='e') {
+				$intype = 3;
+			} else if ($out=='pi') {
+				$intype = 3;
+			} else {
+				//eat whitespace
+				while ($c==' ') {
+					$i++;
+					$c = $str{$i};
+					$eatenwhite++;
+				}    
+				//if known function at end, strip off function
+				if ($c=='(' && !in_array($out,$knownfuncs)) {// moved to mathphppre-> || ($c=='^' && (substr($str,$i+1,2)=='-1' || substr($str,$i+1,4)=='(-1)'))) {
+					$outlen = strlen($out);
+					$outend = '';
+					for ($j=1; $j<$outlen-1; $j++) {
+						$outend = substr($out,$j);
+						if (in_array($outend,$knownfuncs)) {
+							$i = $i - $outlen + $j;
+							$c = $str{$i};
+							$out = substr($out,0,$j);
+							break;
+						}
+					}
+					
+				}
+				
+				//if there's a ( then it's a function if it's in our list
+				if ($c=='(' && $out!='e' && $out!='pi' && in_array($out,$knownfuncs)) {
+					//connect upcoming parens to function
+					$connecttolast = 2;
+				} else {
+					//is it a known function?
+					if (in_array($out,$knownfuncs)) {  
+						$intype = 6;
+					} else {
+						//if not, assume it's a variable
+						$intype = 4;		
+					}
+				}
+			}
+		} else if (($c>='0' && $c<='9') || ($c=='.'  && ($str{$i+1}>='0' && $str{$i+1}<='9')) ) { //is num
+			$intype = 3; //number
+			$cont = true;
+			//handle . 3 which needs to act as concat
+			if (isset($lastsym[0]) && $lastsym[0]=='.') {
+				$syms[count($syms)-1][0] .= ' ';
+			}
+			do {
+				$out .= $c;
+				$lastc = $c;
+				$i++;
+				if ($i==$len) {break;}
+				$c= $str{$i};
+				if (($c>='0' && $c<='9') || ($c=='.' && $str{$i+1}!='.' && $lastc!='.')) {
+					//is still num
+				} else if ($c=='e' || $c=='E') {
+					//might be scientific notation:  5e6 or 3e-6 
+					$d = $str{$i+1};
+					if ($d>='0' && $d<='9') {
+						$out .= $c;
+						$i++;
+						if ($i==$len) {break;}
+						$c= $str{$i};
+					} else if (($d=='-'||$d=='+') && ($str{$i+2}>='0' && $str{$i+2}<='9')) {
+						$out .= $c.$d;
+						$i+= 2;
+						if ($i>=$len) {break;}
+						$c= $str{$i};
+					} else {
+						$cont = false;
+					}	
+				} else {
+					$cont = false;
+				}	
+			} while ($cont);
+		} else if ($c=='(' || $c=='{' || $c=='[') { //parens or curlys
+			if ($c=='(') {
+				$intype = 4; //parens
+				$leftb = '(';
+				$rightb = ')';
+			} else if ($c=='{') {
+				$intype = 5; //curlys
+				$leftb = '{';
+				$rightb = '}';
+			} else if ($c=='[') {
+				$intype = 11; //array index brackets
+				$leftb = '[';
+				$rightb = ']';
+			}
+			$thisn = 1;
+			$inq = false;
+			$j = $i+1;
+			$len = strlen($str);
+			while ($j<$len) {
+				//read terms until we get to right bracket at same nesting level
+				//we have to avoid strings, as they might contain unmatched brackets
+				$d = $str{$j};
+				if ($inq) {  //if inquote, leave if same marker (not escaped)
+					if ($d==$qtype && $str{$j-1}!='\\') {
+						$inq = false;
+					}
+				} else {
+					if ($d=='"' || $d=="'") {
+						$inq = true; //entering quotes
+						$qtype = $d;
+					} else if ($d==$leftb) {
+						$thisn++;  //increase nesting depth
+					} else if ($d==$rightb) {
+						$thisn--; //decrease nesting depth
+						if ($thisn==0) {
+							//read inside of brackets, send recursively to interpreter
+							$inside = cleanbytoken(substr($str,$i+1,$j-$i-1), $funcs);
+							if ($inside=='error') {
+								//was an error, return error token
+								return array(array('',9));
+							}
+							//if curly, make sure we have a ;, unless preceeded by a $ which
+							//would be a variable variable
+							if ($rightb=='}' && $lastsym[0]!='$') {
+								$out .= $leftb.$inside.';'.$rightb;
+							} else {
+								$out .= $leftb.$inside.$rightb;
+							}
+							$i= $j+1;
+							break;
+						}
+					} else if ($d=="\n") {
+						//echo "unmatched parens/brackets - likely will cause an error";
+					}
+				}
+				$j++;
+			}
+			if ($j==$len) {
+				$i = $j;
+				echo "unmatched parens/brackets - likely will cause an error";
+			} else {
+				$c = $str{$i};
+			}
+		} else if ($c=='"' || $c=="'") { //string
+			$intype = 6;
+			$qtype = $c;
+			do {
+				$out .= $c;
+				$i++;
+				if ($i==$len) {break;}
+				$lastc = $c;
+				$c = $str{$i};
+			} while (!($c==$qtype && $lastc!='\\'));	
+			$out .= $c;
+							
+			$i++;
+			$c = $str{$i};
+		}  else {
+			//no type - just append string.  Could be operators
+			$out .= $c;
+			$i++;
+			if ($i<$len) {
+				$c = $str{$i};
+			}
+		}
+		while ($c==' ') { //eat up extra whitespace
+			$i++;
+			if ($i==$len) {break;}
+			$c = $str{$i};
+			if ($c=='.' && $intype==3) {//if 3 . needs space to act like concat
+				$out .= ' ';
+			}
+		}
+		//if parens or array index needs to be connected to func/var, do it
+		if ($connecttolast>0 && $intype!=$connecttolast) {
+			
+			$syms[count($syms)-1][0] .= $out;
+			$connecttolast = 0;
+			if ($c=='[') {// multidim array ref?
+				$connecttolast = 1;
+			}
+			
+		} else {
+			//add to symbol list, avoid repeat end-of-lines.
+			if ($intype!=7 || $lastsym[1]!=7) {
+				$lastsym = array($out,$intype);
+				$syms[] =  array($out,$intype);
+			}
+		}
+		
+	}
+	return $syms;
 }
 
 ?>

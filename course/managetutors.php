@@ -119,17 +119,6 @@
 	}
 	
 	//*** DISPLAY ***
-	$placeinhead = '<script type="text/javascript">
-	function chkAll(frm, arr, mark) {
-	  for (i = 0; i <= frm.elements.length; i++) {
-	   try{
-	     if(frm.elements[i].name == arr) {
-	       frm.elements[i].checked = mark;
-	     }
-	   } catch(er) {}
-	  }
-	}
-	</script>';
 	$pagetitle = "Manage Tutors";
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";

@@ -107,8 +107,6 @@ $placeinhead .= " cont.style.height = \"75%\"; cont.style.overflow = \"auto\"; c
 $placeinhead .= "document.getElementById(\"myTable\").className = \"gbl\"; document.cookie = 'gblhdr-$cid=1'; ";
 $placeinhead .= "  document.getElementById(\"lockbtn\").value = \"Unlock headers\"; }";
 $placeinhead .= "} ";
-
-$placeinhead .= "function chkAll(frm, arr, mark) {  for (i = 0; i <= frm.elements.length; i++) {   try{     if(frm.elements[i].name == arr) {  frm.elements[i].checked = mark;     }   } catch(er) {}  }}";
 $placeinhead .= "</script>\n";
 $placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } </style>";
 

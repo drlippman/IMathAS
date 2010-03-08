@@ -227,15 +227,6 @@ if ($overwriteBody==1) {
 ?>
 
 <script type="text/javascript">
-function chkAll(frm, arr, mark) {
-  for (i = 0; i <= frm.elements.length; i++) {
-   try{
-     if(frm.elements[i].name == arr) {
-       frm.elements[i].checked = mark;
-     }
-   } catch(er) {}
-  }
-}
 
 var curlibs = '<?php echo $searchlibs ?>';
 function libselect() {
@@ -252,7 +243,7 @@ function setlibnames(libn) {
 
 <?php echo $curBreadcrumb; ?>
 	<div id="headerexport" class="pagetitle"><h2>Question Export</h2></div>
-	<form method=post action="export.php?cid=<?php echo $cid ?>">	
+	<form id="pform" method=post action="export.php?cid=<?php echo $cid ?>">	
 	<h3>Questions Marked for Export</h3>
 	
 <?php	
@@ -260,8 +251,8 @@ function setlibnames(libn) {
 		echo "<p>No Questions currently marked for export</p>\n";
 	} else {
 ?>	
-
-		Check/Uncheck All: <input type="checkbox" name="ca" value="1" onClick="chkAll(this.form, 'pchecked[]', this.checked)" checked=checked>
+		Check: <a href="#" onclick="return chkAllNone('pform','pchecked[]',true)">All</a> <a href="#" onclick="return chkAllNone('pform','pchecked[]',false)">None</a>
+		
 		<table cellpadding=5 class=gb>
 		<thead>
 			<tr>
@@ -322,7 +313,7 @@ function setlibnames(libn) {
 		} else {
 ?>
 		<script type="text/javascript" src="<?php echo $imasroot ?>/javascript/tablesorter.js"></script>
-		Check/Uncheck All: <input type="checkbox" name="ca2" value="1" onClick="chkAll(this.form, 'nchecked[]', this.checked)">
+		Check: <a href="#" onclick="return chkAllNone('pform','nchecked[]',true)">All</a> <a href="#" onclick="return chkAllNone('pform','nchecked[]',false)">None</a>
 		<table cellpadding=5 id=myTable class=gb>
 		<thead>
 			<tr><th></th><th>Description</th><th>Type</th></tr>
@@ -337,7 +328,7 @@ function setlibnames(libn) {
 ?>	
 
 				<td>
-				<input type=checkbox name='pchecked[]' value='<?php echo $page_nChecked[$i]['id'] ?>'>
+				<input type=checkbox name='nchecked[]' value='<?php echo $page_nChecked[$i]['id'] ?>'>
 				</td>
 				<td><?php echo $page_nChecked[$i]['description'] ?></td>
 				<td><?php echo $page_nChecked[$i]['qtype'] ?></td>

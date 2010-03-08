@@ -35,7 +35,9 @@ function catscores($quests,$scores,$defptsposs) {
 	$catscore = array();
 	$catposs = array();
 	for ($i=0; $i<count($quests); $i++) {
-		$catscore[$cat[$quests[$i]]] += getpts($scores[$i]);
+		$pts = getpts($scores[$i]);
+		if ($pts<0) { $pts = 0;}
+		$catscore[$cat[$quests[$i]]] += $pts;
 		$catposs[$cat[$quests[$i]]] += $pospts[$quests[$i]];
 	}
 	echo "<h4>Categorized Score Breakdown</h4>\n";

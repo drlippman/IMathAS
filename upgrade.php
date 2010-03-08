@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 27;
+$latest = 30;
 
 if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 	$handle = fopen("upgradecounter.txt",'w');
@@ -328,7 +328,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 }
 		}
 		if ($last < 26) {
-			 $query = "ALTER TABLE `imas_users` ADD `homelayout` VARCHAR(32) NOT NULL DEFAULT '|0,2,3||0,1'"; 
+			 $query = "ALTER TABLE `imas_users` ADD `homelayout` VARCHAR(32) NOT NULL DEFAULT '|0,1,2||0,1'"; 
 			 $res = mysql_query($query);
 			 if ($res===false) {
 				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
@@ -340,6 +340,103 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 if ($res===false) {
 				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
+		}
+		if ($last < 28) {
+			$sql = 'CREATE TABLE `imas_wikis` ('
+				. ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
+				. ' `name` VARCHAR(50) NOT NULL, '
+				. ' `description` TEXT NOT NULL, '
+				. ' `courseid` INT(10) UNSIGNED NOT NULL, '
+				. ' `startdate` INT(10) UNSIGNED NOT NULL, '
+				. ' `editbydate` INT(10) UNSIGNED NOT NULL, '
+				. ' `enddate` INT(10) UNSIGNED NOT NULL, '
+				. ' `settings` TINYINT(2) UNSIGNED NOT NULL DEFAULT \'0\', '
+				. ' `groupsetid` INT(10) UNSIGNED NOT NULL DEFAULT \'0\', '
+				. ' `avail` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'1\','
+				. ' INDEX (`courseid`), '
+				. ' INDEX(`avail`), INDEX(`startdate`), INDEX(`enddate`), INDEX(`editbydate`) '
+				. ' )'
+				. ' TYPE = innodb'
+				. ' COMMENT = \'Wikis\';';
+			 $res = mysql_query($sql);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($sql) : ".mysql_error()."</p>";
+			 }
+			
+			$sql = 'CREATE TABLE `imas_wiki_revisions` ('
+				. ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
+				. ' `wikiid` INT(10) UNSIGNED NOT NULL, '
+				. ' `stugroupid` INT(10) UNSIGNED NOT NULL DEFAULT \'0\', '
+				. ' `userid` INT(10) UNSIGNED NOT NULL, '
+				. ' `time` INT(10) UNSIGNED NOT NULL,'
+				. ' `revision` TEXT NOT NULL, '
+				. ' INDEX (`wikiid`), INDEX(`stugroupid`), INDEX(`time`) '
+				. ' )'
+				. ' TYPE = innodb'
+				. ' COMMENT = \'Wiki revisions\';';
+			 $res = mysql_query($sql);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($sql) : ".mysql_error()."</p>";
+			 }
+			
+			$sql = 'CREATE TABLE `imas_wiki_views` ('
+				. ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
+				. ' `userid` INT(10) UNSIGNED NOT NULL, '
+				. ' `wikiid` INT(10) UNSIGNED NOT NULL, '
+				. ' `lastview` INT(10) UNSIGNED NOT NULL,'
+				 . ' INDEX (`userid`), INDEX(`wikiid`)'
+				. ' )'
+				. ' TYPE = innodb'
+				. ' COMMENT = \'Wiki last viewings\';';
+			 $res = mysql_query($sql);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($sql) : ".mysql_error()."</p>";
+			 }
+		}
+		if ($last<29) {
+			//this is a bug fix for a typo in the homelayout default
+			$query = 'ALTER TABLE `imas_users` CHANGE `homelayout` `homelayout` VARCHAR( 32 ) NOT NULL DEFAULT \'|0,1,2||0,1\'';
+			$res = mysql_query($query);
+			if ($res===false) {
+				echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			}
+			$query = 'UPDATE `imas_users` SET homelayout = CONCAT(\'|0,1,2\',SUBSTR(homelayout,7))';
+			$res = mysql_query($query);
+			if ($res===false) {
+				echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			}
+		}
+		if ($last<30) {
+			$query = "ALTER TABLE `imas_assessments` ADD `calrtag` VARCHAR(254) NOT NULL DEFAULT 'R';"; 
+			$res = mysql_query($query);
+			if ($res===false) {
+			 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			}
+			$query = "UPDATE imas_assessments SET calrtag=substring(caltag,2,1),caltag=substring(caltag,1,1)";
+			$res = mysql_query($query);
+			if ($res===false) {
+			 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			}
+			$query = 'ALTER TABLE `imas_assessments` CHANGE `caltag` `caltag` VARCHAR( 254 ) NOT NULL DEFAULT \'?\'';
+			$res = mysql_query($query);
+			if ($res===false) {
+			 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			}
+			$query = 'ALTER TABLE `imas_inlinetext` CHANGE `caltag` `caltag` VARCHAR( 254 ) NOT NULL DEFAULT \'!\'';
+			$res = mysql_query($query);
+			if ($res===false) {
+			 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			}
+			$query = 'ALTER TABLE `imas_linkedtext` CHANGE `caltag` `caltag` VARCHAR( 254 ) NOT NULL DEFAULT \'!\'';
+			$res = mysql_query($query);
+			if ($res===false) {
+			 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			}
+			$query = 'ALTER TABLE `imas_calitems` CHANGE `tag` `tag` VARCHAR( 254 ) NOT NULL';
+			$res = mysql_query($query);
+			if ($res===false) {
+			 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			}
 		}
 		$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {

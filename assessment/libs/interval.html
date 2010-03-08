@@ -1,9 +1,10 @@
 <html><body>
 <h1>Macro Library interval</h1>
-Interval functions, Version 1.0 April 14, 2007
+Interval functions, Version 1.1 March 2, 2010
 <BR><ul>
 <li><a href="#forminterval">forminterval</a></li>
 <li><a href="#linegraph">linegraph</a></li>
+<li><a href="#intervalstodraw">intervalstodraw</a></li>
 </ul>
 <h3><a name="forminterval">forminterval</a></h3>
 forminterval(min,max,minmarkertype,maxmarkertype)
@@ -14,4 +15,11 @@ forminterval(min,max,minmarkertype,maxmarkertype)
 linegraph(intervals,[xmin,xmax,xscl,width,height])
 <BR>Creates a line graph
 <BR>intervals:  string or array of strings in interval notation, ex: [2,5)
+<BR><h3><a name="intervalstodraw">intervalstodraw</a></h3>
+intervalstodraw(interval,xmin,xmax)
+<BR>converts an interval like (-oo,4]U(3,5] into an array of strings 
+<BR>suitable for use as $answers for a drawing question with 
+<BR>$answerformat = 'numberline'
+<BR>also provide xmin and xmax, the min and max of the drawing grid
+<BR>if different than the default -5 to 5
 <BR>

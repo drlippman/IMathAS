@@ -66,16 +66,6 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 /******* begin html output ********/
 
 $pagetitle = "Enroll Students From Another Course";
-$placeinhead = '<script type="text/javascript">
-	function chkAll(frm, arr, mark) {
-	  for (i = 0; i <= frm.elements.length; i++) {
-	   try{
-	     if(frm.elements[i].name == arr) {
-	       frm.elements[i].checked = mark;
-	     }
-	   } catch(er) {}
-	  }
-	}</script>';
 require("../header.php");
 $curBreadcrumb .= '&gt; Enroll From Another Course';
 
@@ -90,7 +80,7 @@ if ($overwriteBody==1) {
 	?>
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
 	<div id="headerenrollfromothercourse" class="pagetitle"><h2><?php echo $pagetitle ?></h2></div>
-	<form method="post" action="enrollfromothercourse.php?cid=<?php echo $cid ?>">
+	<form id="qform" method="post" action="enrollfromothercourse.php?cid=<?php echo $cid ?>">
 	<?php
 	if (isset($resultCourseList)) {
 		echo '<p>Select a course to choose students from:</p><p>';
@@ -106,8 +96,7 @@ if ($overwriteBody==1) {
 	} else {
 		echo '<input type="hidden" name="process" value="true" />';
 		echo '<p>Select students to enroll:</p><p>';
-		echo 'Check/Uncheck All: ';
-		echo '<input type="checkbox" name="ca" value="1" onClick="chkAll(this.form, \'checked[]\', this.checked)"></p>';
+		echo 'Check: <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',false)">None</a>';
 		echo '<p>';
 		while ($line=mysql_fetch_array($resultStudentList, MYSQL_ASSOC)) {
 			echo '<input type=checkbox name="checked[]" value="'.$line['id'].'"/>';

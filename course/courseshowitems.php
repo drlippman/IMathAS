@@ -13,10 +13,12 @@ function beginitem($canedit,$aname=0) {
 	 }
 }
 function enditem($canedit) {
+	//echo '<div class="clear"></div>';
 	echo "</div>\n";
 	if ($canedit) {
 		echo '</div>'; //itemwrapper
 	}
+	
 }
 
   function showitems($items,$parent,$inpublic=false) {
@@ -25,7 +27,7 @@ function enditem($canedit) {
 	   
 	   if (!isset($CFG['CPS']['itemicons'])) {
 	   	   $itemicons = array('folder'=>'folder2.gif', 'assess'=>'assess.png',
-			'inline'=>'inline.png',	'web'=>'web.png', 'doc'=>'doc.png',
+			'inline'=>'inline.png',	'web'=>'web.png', 'doc'=>'doc.png', 'wiki'=>'wiki.png',
 			'html'=>'html.png', 'forum'=>'forum.png', 'pdf'=>'pdf.png',
 			'ppt'=>'ppt.png', 'zip'=>'zip.png', 'png'=>'image.png', 'xls'=>'xls.png',
 			'gif'=>'image.png', 'jpg'=>'image.png', 'bmp'=>'image.png', 
@@ -666,7 +668,7 @@ function enditem($canedit) {
 				   $query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='$typeid'";
 				   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				   if (mysql_num_rows($result)>0) {
-					   echo "<ul>";
+					   echo '<ul class="fileattachlist">';
 					   $filenames = array();
 					   $filedescr = array();
 					   while ($row = mysql_fetch_row($result)) {
@@ -712,7 +714,7 @@ function enditem($canedit) {
 				   $query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='$typeid'";
 				   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				   if (mysql_num_rows($result)>0) {
-					   echo "<ul>";
+					   echo '<ul class="fileattachlist">';
 					   $filenames = array();
 					   $filedescr = array();
 					   while ($row = mysql_fetch_row($result)) {
@@ -1006,7 +1008,127 @@ function enditem($canedit) {
 				   echo filter("</div><div class=itemsum>{$line['description']}</div>\n");
 				   enditem($canedit); //echo "</div>\n";
 			   }
-		   }   
+		   } else if ($line['itemtype']=="Wiki") {
+		   	  // if ($ispublic) { continue;}
+			   $typeid = $line['typeid'];
+			   $query = "SELECT id,name,description,startdate,enddate,editbydate,avail,settings,groupsetid FROM imas_wikis WHERE id='$typeid'";
+			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
+			   if ($ispublic && $line['groupsetid']>0) { continue;}
+			   if (strpos($line['description'],'<p>')!==0) {
+				   $line['description'] = '<p>'.$line['description'].'</p>';
+			   }
+			   if ($line['startdate']==0) {
+				   $startdate = "Always";
+			   } else {
+				   $startdate = formatdate($line['startdate']);
+			   }
+			   if ($line['enddate']==2000000000) {
+				   $enddate = "Always";
+			   } else {
+				   $enddate = formatdate($line['enddate']);
+			   }
+			   $hasnew = false;
+			   if ($viewall || $line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
+			   	   if ($line['groupsetid']>0 && !$canedit) {
+			   	   	   $query = 'SELECT i_sg.id,i_sg.name FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';
+			   	   	   $query .= "WHERE i_sgm.userid='$userid' AND i_sg.groupsetid='{$line['groupsetid']}'";
+			   	   	   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			   	   	   if (mysql_num_rows($result)>0) {
+			   	   	   	   $wikigroupid = mysql_result($result,0,0);
+			   	   	   } else {
+			   	   	   	   $wikigroupid = 0;
+			   	   	   }
+			   	   }
+				   $query = "SELECT time FROM imas_wiki_revisions WHERE wikiid='$typeid' ";
+				   if ($line['groupsetid']>0 && !$canedit) { //if group and not instructor limit to group
+				   	   $query .= "AND stugroupid='$wikigroupid' ";
+				   }
+				   $query .= "ORDER BY time DESC LIMIT 1";
+				   $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				   if (mysql_num_rows($result)>0) {
+					   $lastrevised = mysql_result($result,0,0);
+					   $query = "SELECT lastview FROM imas_wiki_views WHERE userid='$userid' AND wikiid='$typeid'";
+					   $result = mysql_query($query) or die("Query failed : " . mysql_error());
+					   if (mysql_num_rows($result)==0 || mysql_result($result,0,0)<$lastrevised) {
+						   $hasnew = true;
+					   }
+				   }
+			   }   
+			   if ($line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
+				   if ($line['avail']==2) {
+					   $show = "Showing Always ";
+					   $color = '#0f0';
+				   } else {
+					   $show = "Showing until: $enddate ";
+					   $color = makecolor2($line['startdate'],$line['enddate'],$now);
+				   }
+				   $duedates = "";
+				   if ($line['editbydate']>$now && $line['editbydate']!=2000000000) {
+					   $duedates .= "Edits due by ". formatdate($line['editbydate']) . ". ";
+				   }
+				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
+				   if (($hideicons&8)==0) {
+					   if ($graphicalicons) {
+						   echo "<img class=\"floatleft\" src=\"$imasroot/img/{$itemicons['wiki']}\" />";
+					   } else {
+						   echo "<div class=icon style=\"background-color: $color;\">W</div>";
+					   }
+				   }
+				   echo "<div class=title> ";
+				   if ($ispublic) {
+				   	   echo "<b><a href=\"../wikis/viewwikipublic.php?cid=$cid&id={$line['id']}\">{$line['name']}</a></b>\n"; 
+				   } else {
+				   	   echo "<b><a href=\"../wikis/viewwiki.php?cid=$cid&id={$line['id']}\">{$line['name']}</a></b>\n";
+				   	   if ($hasnew) {
+				   	    	    echo " <span style=\"color:red\">New Revisions</span>";
+				   	   }
+				   }
+				   if ($viewall) { 
+					   echo '<span class="instrdates">';
+					   echo "<br/>$show ";
+					   echo '</span>';
+				   }
+				   if ($canedit) {
+					   echo '<span class="instronly">';
+					   echo "<a href=\"addwiki.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
+					   echo "<a href=\"deletewiki.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
+					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+					   echo '</span>';
+				   }
+				   if ($duedates!='') {echo "<br/>$duedates";}
+				   echo filter("</div><div class=itemsum>{$line['description']}</div>\n");
+				   enditem($canedit); //echo "</div>\n";
+			   } else if ($viewall) {
+				   if ($line['avail']==0) {
+					   $show = "Hidden";
+				   } else {
+					   $show = "Showing $startdate until $enddate";
+				   }
+				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
+				   if ($graphicalicons) {
+					   echo "<img class=\"floatleft faded\" src=\"$imasroot/img/{$itemicons['wiki']}\" />";
+				   } else {
+					   echo "<div class=icon style=\"background-color: #ccc;\">W</div>";
+				   }   
+				   echo "<div class=title><i> <b><a href=\"../wikis/viewwiki.php?cid=$cid&id={$line['id']}\">{$line['name']}</a></b></i> ";
+				   if ($hasnew) {
+				   	   echo " <span style=\"color:red\">New Revisions</span>";
+				   }
+				   echo '<span class="instrdates">';
+				   echo "<br/><i>$show </i>";
+				   echo '</span>';
+				   if ($canedit) {
+					   echo '<span class="instronly">';
+					   echo "<a href=\"addwiki.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
+					   echo "<a href=\"deletewiki.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
+					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+					   echo '</span>';
+				   }
+				   echo filter("</div><div class=itemsum>{$line['description']}</div>\n");
+				   enditem($canedit); //echo "</div>\n";
+			   }
+		   }
 	   }
 	   if (count($items)>0) {
 		   if ($canedit) {echo generateadditem($parent,'b');}
@@ -1014,20 +1136,56 @@ function enditem($canedit) {
    }
    
    function generateadditem($blk,$tb) {
-   	global $cid, $CFG;
+   	global $cid, $CFG,$imasroot;
    	if (isset($CFG['CPS']['additemtype']) && $CFG['CPS']['additemtype'][0]=='links') {
    		if ($tb=='BB' || $tb=='LB') {$tb = 'b';}
    		if ($tb=='t' && $blk=='0') {
-   			$html = '<div id="topadditem" class="additembox"><span><b>Add:</b> ';
+   			$html = '<div id="topadditem" class="additembox"><span><b>Add here:</b> ';
    		} else {
-   			$html = '<div class="additembox"><span><b>Add:</b> ';
+   			$html = '<div class="additembox"><span><b>Add here:</b> ';
    		}
-		$html .= "<a href=\"addassessment.php?block=$blk&tb=$tb&cid=$cid\">Assessment</a> | ";
-		$html .= "<a href=\"addinlinetext.php?block=$blk&tb=$tb&cid=$cid\">Text</a> | ";
-		$html .= "<a href=\"addlinkedtext.php?block=$blk&tb=$tb&cid=$cid\">Link</a> | ";
-		$html .= "<a href=\"addforum.php?block=$blk&tb=$tb&cid=$cid\">Forum</a> | ";
-		$html .= "<a href=\"addblock.php?block=$blk&tb=$tb&cid=$cid\">Block</a> | ";
-		$html .= "<a href=\"addcalendar.php?block=$blk&tb=$tb&cid=$cid\">Calendar</a>";
+   		
+		$html .= "<a href=\"addassessment.php?block=$blk&tb=$tb&cid=$cid\">";
+		if (isset($CFG['CPS']['miniicons']['assess'])) {
+			$html .= "<img class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['assess']}\"/> ";
+		}
+		$html .= "Assessment</a> | ";
+		
+		$html .= "<a href=\"addinlinetext.php?block=$blk&tb=$tb&cid=$cid\">";
+		if (isset($CFG['CPS']['miniicons']['inline'])) {
+			$html .= "<img class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['inline']}\"/> ";
+		}
+		$html .= "Text</a> | ";
+		
+		$html .= "<a href=\"addlinkedtext.php?block=$blk&tb=$tb&cid=$cid\">";
+		if (isset($CFG['CPS']['miniicons']['linked'])) {
+			$html .= "<img class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['linked']}\"/> ";
+		}
+		$html .= "Link</a> | ";
+		
+		$html .= "<a href=\"addforum.php?block=$blk&tb=$tb&cid=$cid\">";
+		if (isset($CFG['CPS']['miniicons']['forum'])) {
+			$html .= "<img class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['forum']}\"/> ";
+		}
+		$html .= "Forum</a> | ";
+		
+		$html .= "<a href=\"addwiki.php?block=$blk&tb=$tb&cid=$cid\">";
+		if (isset($CFG['CPS']['miniicons']['wiki'])) {
+			$html .= "<img class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['wiki']}\"/> ";
+		}
+		$html .= "Wiki</a> | ";
+		
+		$html .= "<a href=\"addblock.php?block=$blk&tb=$tb&cid=$cid\">";
+		if (isset($CFG['CPS']['miniicons']['folder'])) {
+			$html .= "<img class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['folder']}\"/> ";
+		}
+		$html .= "Block</a> | ";
+		
+		$html .= "<a href=\"addcalendar.php?block=$blk&tb=$tb&cid=$cid\">";
+		if (isset($CFG['CPS']['miniicons']['calendar'])) {
+			$html .= "<img class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['calendar']}\"/> ";
+		}
+		$html .= "Calendar</a>";
 		$html .= '</span>';
 		$html .= '</div>';
    		
@@ -1042,6 +1200,7 @@ function enditem($canedit) {
 		$html .= "<option value=\"inlinetext\">Add Inline Text</option>\n";
 		$html .= "<option value=\"linkedtext\">Add Linked Text</option>\n";
 		$html .= "<option value=\"forum\">Add Forum</option>\n";
+		$html .= "<option value=\"wiki\">Add Wiki</option>\n";
 		$html .= "<option value=\"block\">Add Block</option>\n";
 		$html .= "<option value=\"calendar\">Add Calendar</option>\n";
 		$html .= "</select><BR>\n";
@@ -1169,7 +1328,7 @@ function enditem($canedit) {
    
    //instructor-only tree-based quick view of full course
    function quickview($items,$parent,$showdates=false,$showlinks=true) { 
-	   global $teacherid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$hideicons,$exceptions,$latepasses;
+	   global $teacherid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$hideicons,$exceptions,$latepasses,$CFG;
 	   if (!is_array($openblocks)) {$openblocks = array();}
 	   $itemtypes = array();  $iteminfo = array();
 	   $query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid='$cid'";
@@ -1200,6 +1359,13 @@ function enditem($canedit) {
 	   while ($row = mysql_fetch_row($result)) {
 		   $id = array_shift($row);
 		   $iteminfo['Forum'][$id] = $row;
+	   }
+	   
+	   $query = "SELECT id,name,startdate,enddate,avail FROM imas_wikis WHERE courseid='$cid'";
+	   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	   while ($row = mysql_fetch_row($result)) {
+		   $id = array_shift($row);
+		   $iteminfo['Wiki'][$id] = $row;
 	   }
 	   $now = time() + $previewshift;
 	   for ($i=0;$i<count($items); $i++) {
@@ -1246,7 +1412,12 @@ function enditem($canedit) {
 				$liclass = 'blockli nCollapse';
 				$qviewstyle = 'style="display:none;"';
 			}
-			echo '<li class="'.$liclass.'" id="'."$parent-$bnum".'" obn="'.$items[$i]['id'].'"><span class=icon style="background-color:'.$color.'">B</span>';
+			if (!isset($CFG['CPS']['miniicons']['folder'])) {
+				$icon  = '<span class=icon style="background-color:'.$color.'">B</span>';
+			} else {
+				$icon = '<img src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['folder'].'" class="mida icon" /> ';
+			}
+			echo '<li class="'.$liclass.'" id="'."$parent-$bnum".'" obn="'.$items[$i]['id'].'">'.$icon;
 			if ($items[$i]['avail']==2 || ($items[$i]['avail']==1 && $items[$i]['startdate']<$now && $items[$i]['enddate']>$now)) {
 				echo '<b><span id="B'.$parent.'-'.$bnum.'" onclick="editinplace(this)">'.$items[$i]['name']. "</span></b>";
 				//echo '<b>'.$items[$i]['name'].'</b>';
@@ -1271,7 +1442,12 @@ function enditem($canedit) {
 			}
 			echo '</li>';
 		   } else if ($itemtypes[$items[$i]][0] == 'Calendar') {
-			echo '<li id="'.$items[$i].'"><span class=icon style="background-color:#0f0;">C</span>Calendar</li>';
+		        if (!isset($CFG['CPS']['miniicons']['calendar'])) {
+				$icon  = '<span class=icon style="background-color:#0f0;">C</span>';
+			} else {
+				$icon = '<img src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['calendar'].'" class="mida icon" /> ';
+			}
+			echo '<li id="'.$items[$i].'">'.$icon.'Calendar</li>';
 			   
 	   	   } else if ($itemtypes[$items[$i]][0] == 'Assessment') {
 			   $typeid = $itemtypes[$items[$i]][1];
@@ -1298,7 +1474,12 @@ function enditem($canedit) {
 			   } else {
 					$color = makecolor2($line['startdate'],$line['enddate'],$now);
 			   }
-			echo '<li id="'.$items[$i].'"><span class=icon style="background-color:'.$color.'">?</span>';
+			 if (!isset($CFG['CPS']['miniicons']['assess'])) {
+				$icon  = '<span class=icon style="background-color:'.$color.'">?</span>';
+			} else {
+				$icon = '<img src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['assess'].'" class="mida icon" /> ';
+			}
+			echo '<li id="'.$items[$i].'">'.$icon;
 			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
 				   $show = "Available until $enddate";
 				   echo '<b><span id="A'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
@@ -1351,7 +1532,12 @@ function enditem($canedit) {
 			   } else {
 					$color = makecolor2($line['startdate'],$line['enddate'],$now);
 				}
-			   echo '<li id="'.$items[$i].'"><span class=icon style="background-color:'.$color.'">!</span>';
+			   if (!isset($CFG['CPS']['miniicons']['inline'])) {
+				$icon  = '<span class=icon style="background-color:'.$color.'">!</span>';
+			   } else {
+				$icon = '<img src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['inline'].'" class="mida icon" /> ';
+			   }
+			   echo '<li id="'.$items[$i].'">'.$icon;
 			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
 				   echo '<b><span id="I'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
 				  // echo '<b>'.$line['name']. "</b>";
@@ -1393,7 +1579,12 @@ function enditem($canedit) {
 			   } else {
 					$color = makecolor2($line['startdate'],$line['enddate'],$now);
 				}
-			   echo '<li id="'.$items[$i].'"><span class=icon style="background-color:'.$color.'">!</span>';
+			   if (!isset($CFG['CPS']['miniicons']['linked'])) {
+				$icon  = '<span class=icon style="background-color:'.$color.'">!</span>';
+			   } else {
+				$icon = '<img src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['linked'].'" class="mida icon" /> ';
+			   }
+			   echo '<li id="'.$items[$i].'">'.$icon;
 			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
 				   //echo '<b>'.$line['name']. "</b>";
 				   echo '<b><span id="L'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
@@ -1435,7 +1626,12 @@ function enditem($canedit) {
 			   } else {
 					$color = makecolor2($line['startdate'],$line['enddate'],$now);
 				}
-			   echo '<li id="'.$items[$i].'"><span class=icon style="background-color:'.$color.'">F</span>';
+		           if (!isset($CFG['CPS']['miniicons']['forum'])) {
+				$icon  = '<span class=icon style="background-color:'.$color.'">F</span>';
+			   } else {
+				$icon = '<img src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['forum'].'" class="mida icon" /> ';
+			   }
+			   echo '<li id="'.$items[$i].'">'.$icon;
 			  if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
 				   //echo '<b>'.$line['name']. "</b>";
 				   echo '<b><span id="F'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
@@ -1453,6 +1649,53 @@ function enditem($canedit) {
 				   echo '<span class="links">';
 				   echo " <a href=\"addforum.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
 				  echo "<a href=\"deleteforum.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
+				  echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+				  echo '</span>';
+			   }
+			   echo '</li>';
+		   } else if ($itemtypes[$items[$i]][0] == 'Wiki') {
+			   $typeid = $itemtypes[$items[$i]][1];
+			   list($line['name'],$line['startdate'],$line['enddate'],$line['avail']) = $iteminfo['Wiki'][$typeid];
+			   if ($line['startdate']==0) {
+				   $startdate = "Always";
+			   } else {
+				   $startdate = formatdate($line['startdate']);
+			   }
+			   if ($line['enddate']==2000000000) {
+				   $enddate = "Always";
+			   } else {
+				   $enddate =formatdate($line['enddate']);
+			   }
+			   if ($line['avail']==2) {
+					$color = '#0f0';
+				} else if ($line['avail']==0) {
+				   $color = '#ccc';
+			   } else {
+					$color = makecolor2($line['startdate'],$line['enddate'],$now);
+				}
+		           if (!isset($CFG['CPS']['miniicons']['wiki'])) {
+				$icon  = '<span class=icon style="background-color:'.$color.'">W</span>';
+			   } else {
+				$icon = '<img src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['wiki'].'" class="mida icon" /> ';
+			   }
+			   echo '<li id="'.$items[$i].'">'.$icon;
+			  if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
+				   //echo '<b>'.$line['name']. "</b>";
+				   echo '<b><span id="W'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
+				   if ($showdates) {
+					   echo " showing until $enddate";
+				   }
+			   } else {
+				   echo '<i><b><span id="W'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b></i>";
+				   //echo '<i><b>'.$line['name']. "</b></i>";
+				   if ($showdates) {
+					   echo " showing $startdate until $enddate";
+				   }
+			   }
+			   if ($showlinks) {
+				   echo '<span class="links">';
+				   echo " <a href=\"addwiki.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
+				  echo "<a href=\"deletewiki.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
 				  echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
 				  echo '</span>';
 			   }

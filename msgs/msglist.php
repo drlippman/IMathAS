@@ -204,21 +204,27 @@ isread:
 		}
 	}
 	if (isset($_POST['unread'])) {
+		if (count($_POST['checked'])>0) {
 		$checklist = "'".implode("','",$_POST['checked'])."'";
 		$query = "UPDATE imas_msgs SET isread=isread-1 WHERE id IN ($checklist) AND (isread=1 OR isread=5)";
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
 	}
+	}
 	if (isset($_POST['markread'])) {
+		if (count($_POST['checked'])>0) {
 		$checklist = "'".implode("','",$_POST['checked'])."'";
 		$query = "UPDATE imas_msgs SET isread=isread+1 WHERE id IN ($checklist) AND (isread=0 OR isread=4)";
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
 	}
+	}
 	if (isset($_POST['remove'])) {
+		if (count($_POST['checked'])>0) {
 		$checklist = "'".implode("','",$_POST['checked'])."'";
 		$query = "DELETE FROM imas_msgs WHERE id IN ($checklist) AND isread>1";
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$query = "UPDATE imas_msgs SET isread=isread+2 WHERE id IN ($checklist) AND isread<2";
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
+	}
 	}
 	if (isset($_GET['removeid'])) {
 		$query = "DELETE FROM imas_msgs WHERE id='{$_GET['removeid']}' AND isread>1";
@@ -317,15 +323,6 @@ isread:
 	}
 ?>
 <script type="text/javascript">
-function chkAll(frm, arr, mark) {
-  for (i = 0; i <= frm.elements.length; i++) {
-   try{
-     if(frm.elements[i].name == arr) {
-       frm.elements[i].checked = mark;
-     }
-   } catch(er) {}
-  }
-}
 function chgfilter() {
 	var filtercid = document.getElementById("filtercid").value;
 	var filteruid = document.getElementById("filteruid").value;
@@ -357,7 +354,7 @@ function picshow(size) {
 	}
 }
 </script>	
-	<form method=post action="msglist.php?page=<?php echo $page;?>&cid=<?php echo $cid;?>">
+	<form id="qform" method=post action="msglist.php?page=<?php echo $page;?>&cid=<?php echo $cid;?>">
 	<p>Filter by course: <select id="filtercid" onchange="chgfilter()">
 <?php
 	echo "<option value=\"0\" ";
@@ -398,7 +395,7 @@ function picshow(size) {
 	echo "</select></p>";
 	
 ?>
-	Check/Uncheck All: <input type="checkbox" name="ca2" value="1" onClick="chkAll(this.form, 'checked[]', this.checked)">	
+	Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
 	With Selected: <input type=submit name="unread" value="Mark as Unread">
 	<input type=submit name="markread" value="Mark as Read">
 	<input type=submit name="remove" value="Delete">

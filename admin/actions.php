@@ -147,7 +147,7 @@ switch($_GET['action']) {
 		} else {
 			$msgset = $_POST['msgset'];
 			if (isset($_POST['msgmonitor'])) {
-				$_POST['msgset'] += 5;
+				$msgset += 5;
 			}
 		}
 		
@@ -206,9 +206,20 @@ switch($_GET['action']) {
 			if ($myrights<75) { $query .= " AND ownerid='$userid'";}
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		} else {
+			$blockcnt = 1;
+			if (isset($CFG['CPS']['templateoncreate']) && isset($_POST['usetemplate']) && $_POST['usetemplate']>0) {
+				$query = "SELECT itemorder FROM imas_courses WHERE id='{$_POST['usetemplate']}'";
+				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+				$items = unserialize(mysql_result($result,0,0));
+				$newitems = array();
+				require("../includes/copyiteminc.php");
+				copyallsub($items,'0',$newitems,array());
+				$itemorder = addslashes(serialize($newitems));
+			} else {
 			$itemorder = addslashes(serialize(array()));
-			$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,chatset,showlatepass,itemorder,topbar,cploc,available,theme,ltisecret) VALUES ";
-			$query .= "('{$_POST['coursename']}','$userid','{$_POST['ekey']}','$hideicons','$picicons','$unenroll','$copyrights','$msgset',$chatset,$showlatepass,'$itemorder','$topbar','$cploc','$avail','$theme','{$_POST['ltisecret']}');";
+			}
+			$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,chatset,showlatepass,itemorder,topbar,cploc,available,theme,ltisecret,blockcnt) VALUES ";
+			$query .= "('{$_POST['coursename']}','$userid','{$_POST['ekey']}','$hideicons','$picicons','$unenroll','$copyrights','$msgset',$chatset,$showlatepass,'$itemorder','$topbar','$cploc','$avail','$theme','{$_POST['ltisecret']}','$blockcnt');";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			$cid = mysql_insert_id();
 			//if ($myrights==40) {
@@ -253,6 +264,10 @@ switch($_GET['action']) {
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		}
 		
+		$query = "DELETE FROM imas_assessments WHERE courseid='{$_GET['id']}'";
+		mysql_query($query) or die("Query failed : " . mysql_error());
+		
+		
 		$query = "SELECT id FROM imas_forums WHERE courseid='{$_GET['id']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
@@ -271,8 +286,15 @@ switch($_GET['action']) {
 		$query = "DELETE FROM imas_forums WHERE courseid='{$_GET['id']}'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		
-		$query = "DELETE FROM imas_assessments WHERE courseid='{$_GET['id']}'";
+		$query = "SELECT id FROM imas_wikis WHERE courseid='{$_GET['id']}'";
+		$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+		while ($wid = mysql_fetch_row($r2)) {
+			$query = "DELETE FROM imas_wiki_revisions WHERE wikiid=$wid";
 		mysql_query($query) or die("Query failed : " . mysql_error());
+			$query = "DELETE FROM imas_wiki_views WHERE wikiid=$wid";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+		}
+		$query = "DELETE FROM imas_wikis WHERE courseid='{$_GET['id']}'";
 		
 		//delete inline text files
 		$query = "SELECT id FROM imas_inlinetext WHERE courseid='{$_GET['id']}'";

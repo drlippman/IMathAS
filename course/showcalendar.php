@@ -12,7 +12,7 @@
 	$cid = $_GET['cid'];
 	
 	require("../includes/calendardisp.php");
-	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/course.js\"></script>";
+	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/course.js?022810\"></script>";
 	
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";

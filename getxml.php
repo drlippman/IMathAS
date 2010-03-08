@@ -119,7 +119,7 @@
 			$forumcontent[$line['forumid']] .= '<id>'. $line['id'] .'</id>';
 			$forumcontent[$line['forumid']] .= "<subject>".htmlspecialchars($line['subject'])."</subject>";
 			$forumcontent[$line['forumid']] .= "<author>".htmlspecialchars("{$line['LastName']}, {$line['FirstName']}")."</author>";
-			$forumcontent[$line['forumid']] .= "<date>".htmlspecialchars($lastpost[$line['threadid']])."</date>";
+			$forumcontent[$line['forumid']] .= "<date>".htmlspecialchars($lastpost[$line['id']])."</date>";
 			$forumcontent[$line['forumid']] .= '</post>';
 		}
 	}
