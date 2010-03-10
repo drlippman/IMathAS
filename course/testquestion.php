@@ -165,7 +165,7 @@ if ($overwriteBody==1) {
 	echo "<input type=button value=\"White Background\" onClick=\"whiteout()\"/>";
 	echo "</form>\n";
 	
-	echo "<p>Question id: {$_GET['qsetid']}.  <a href=\"mailto:$email\">E-mail owner</a> to report problems</p>";
+	echo "<p>Question id: {$_GET['qsetid']}.  <a href=\"mailto:$email?subject=Problem%20with%20question%20id%20{$_GET['qsetid']}\">E-mail owner</a> to report problems</p>";
 	echo "<p>Description: $descr</p><p>Author: $author</p>";
 	echo "<p>Last Modified: $lastmod</p>";
 
