@@ -148,7 +148,10 @@ dd {
 	<li><a href="#questionparts">Question Parts</a></li>
 	<li><a href="#basiccontrolsyntax">Basic Control Syntax</a></li>
 	<li><a href="#randomizers">Randomizers</a></li>
-	<li><a href="#displaymacros">Display Macros</a></li>
+	<li><a href="#graphtablemacros">Graph/Table Macros</a></li>
+	<li><a href="#formatmacros">Format Macros</a></li>
+	<li><a href="#stringmacros">String Macros</a></li>
+	<li><a href="#arraymacros">Array Macros</a></li>
 	<li><a href="#generalmacros">General Macros</a></li>
 	<li><a href="#mathmacros">Math Macros</a></li>
 	<li><a href="#usingothermacros">Using Other Macros</a></li>
@@ -1606,39 +1609,14 @@ Array randomizers (return multiple results):
 <li><b>singleshuffle(list/array,[n])</b>:  returns a shuffled version of a list/array.  If n is provided, 
     it behaves identically to diffrandsfrom</li>
 <li><b>randnames(n),randmalenames(n),randfemalenames(n)</b>:  Returns n random first names</li>
+<li><b>randcity(),randcities(n)</b>:  Returns one or n random city names</li>
 </ul>
 
 </div>
 <div class=h2>
-<h2><a name="displaymacros">Display Macros</a></h2>
-
-The following macros help with display:
+<h2><a name="graphtablemacros">Graph/Table Macros</a></h2>
+The following macros create graphs or tables:
 <ul>
-<li><b>makepretty(string or array of strings)</b>: Changes double add/subtract signs to a single sign.</li>
-<li><b>makeprettydisp(string or array of strings)</b>:  Does makepretty (see above) and backquotes the string for math display</li>
-<li><b>polymakepretty and polymakeprettydisp</b>:  Like makepretty, but for polynomials.  Cleans up 0*, 1*, ^1, and ^0 to make the polynomial look nicer.  
-   This function can do weird things for equations that are not simple polynomials, so test well</li>
-<li><b>makexpretty and makexprettydisp</b>:  Like makepretty, but the X-tra version - attempts to clean up things like 1*, 0*, etc.  This function
-   will often cause weird things to happen, so test well</li>
-<li><b>numtowords(number,[addth])</b>:  Creates a string containing number written out in words.  Add true as second parameter
-    to change five to fifth.</li>
-<li><b>numtoroman(number,[uppercase])</b>:  Converts a number 0.5-3999.5 to a roman numeral string.  Defaults to uppercase; set second parameter to false to
-    produce lowercase</li>
-<li><b>stringappend(value,string)</b>: Appends string to value.  If value is an array, string is appended to each element of the array</li>
-<li><b>stringprepend(value,string)</b>:  Same as stringappend, but prepends string to value</li>
-<li><b>prettyint(number)</b>:  Adds commas in thousands spaces of integers.  Example: prettyint(1234) will return "1,234".  The result is a string, which
-   can only be used for display, not in calculations</li>
-<li><b>prettyreal(number,decimals)</b>:  Adds commas in thousands spaces of number, and rounds decimal to decimals places.  Example: prettyreal(1234.567,2) will return "1,234.57".  The result is a string, which
-   can only be used for display, not in calculations</li> 
-<li><b>makescinot(number,[decimals,format])</b>:  Converts number to scientific notation.  If provided, rounds mantissa to decimals places.  Can specify format: "*" "E" as alternative to default cross.</li>
-<li><b>prettytime(value,informat,outformat)</b>:  Creates a nice representation of a time.  Informat can be 'h', 'm', or 's' designating whether
-    value is hours, minutes, or seconds.  Outformat can be any combination of these to specify output.  For example, 'hm' will return "__ hours and __ minutes".  Outformat
-    can also be 'clock' which returns 3:42pm, or 'sclock' which returns 3:42:15pm</li>
-<li><b>dispreducedfraction(numerator,denominator,[doubleslash])</b>:  Takes two numbers as numerator and denominator of a fraction, returning a display form of the fraction,
-    reduced to lowest terms.  Suitable for $showanswer.  Set doubleslash to true to produced "3//4" rather than "3/4".</li>
-<li><b>makereducedfraction(numerator,denominator,[doubleslash])</b>:  Same as dispreducefraction, but not already in display form</li>
-<li><b>decimaltofraction(decimal,[format,maxden])</b>:  Converts a decimal to a fraction.  Can use format="mixednumber" to get a mixed number rather than improper fraction.  
-    Only works for denominators up to maxden (default 5000)</li>
 <li><b>showarrays(string,array,[string,array]...,[format])</b>:  Creates a tabular display of the data in the array(s) as column(s), with the strings
     as column headers.  format = "c", "r", or "l" to center, left-align, or right align data. Alternatively you can call this function with arguments
     showarrays(array of column headers, array of data arrays, [format]).</li>
@@ -1687,12 +1665,69 @@ The following macros help with display:
     optionally you can specify the width and height (in pixels) for the svg.</li>
 <li><b>textonimage(img,text,top,left,[text,top,left,...])</b>:  Overlays text over an image.  Image can be a URL or the variable for an uploaded
     image.  Specify the text string, and offset in pixels from the top left corner.  Can specify multiple strings to overlay.</li>
+<li><b>arraystodoteqns(xarray,yarray,[color])</b>:  Converts an array of x-values and y-values into a form that can be used in
+  showplot.</li>
+<li><b>connectthedots(xarray,yarray,[color,thickness,startmarker,endmarker])</b>: Converts an array of x-values and y-values into a form that
+  can be used in showplot to create a series of lines connecting the (x,y) pairs</li>
+<li><b>arraystodots(xarray,yarray)</b>: Converts an array of x-values and y-values into a form that can be used in the Drawing answer type</li>
+</ul>
+</div>
+<div class=h2>
+<h2><a name="formatmacros">Format Macros</a></h2>
+
+The following macros help with formatting values for display:
+<ul>
+<li><b>makepretty(string or array of strings)</b>: Changes double add/subtract signs to a single sign.</li>
+<li><b>makeprettydisp(string or array of strings)</b>:  Does makepretty (see above) and backquotes the string for math display</li>
+<li><b>polymakepretty and polymakeprettydisp</b>:  Like makepretty, but for polynomials.  Cleans up 0*, 1*, ^1, and ^0 to make the polynomial look nicer.  
+   This function can do weird things for equations that are not simple polynomials, so test well</li>
+<li><b>makexpretty and makexprettydisp</b>:  (deprecated - use makexxpretty instead) Like makepretty, but the X-tra version - attempts to clean up things like 1*, 0*, etc.  This function
+   will often cause weird things to happen, so test well</li>
+<li><b>makexxpretty and makexxprettydisp</b>:  Like makepretty, but the X-tra version - attempts to clean up things like 1*, 0*, x^1, x^0, etc.  Can occasionally cause strange output, so 
+   be sure to test.  Handles things better than the older makexpretty, but does not always produce 100% identical output.</li>
+<li><b>numtowords(number,[addth])</b>:  Creates a string containing number written out in words.  Add true as second parameter
+    to change five to fifth.</li>
+<li><b>numtoroman(number,[uppercase])</b>:  Converts a number 0.5-3999.5 to a roman numeral string.  Defaults to uppercase; set second parameter to false to
+    produce lowercase</li>
+<li><b>prettyint(number)</b>:  Adds commas in thousands spaces of integers.  Example: prettyint(1234) will return "1,234".  The result is a string, which
+   can only be used for display, not in calculations</li>
+<li><b>prettyreal(number,decimals)</b>:  Adds commas in thousands spaces of number, and rounds decimal to decimals places.  Example: prettyreal(1234.567,2) will return "1,234.57".  The result is a string, which
+   can only be used for display, not in calculations</li> 
+<li><b>makescinot(number,[decimals,format])</b>:  Converts number to scientific notation.  If provided, rounds mantissa to decimals places.  Can specify format: "*" "E" as alternative to default cross.</li>
+<li><b>prettytime(value,informat,outformat)</b>:  Creates a nice representation of a time.  Informat can be 'h', 'm', or 's' designating whether
+    value is hours, minutes, or seconds.  Outformat can be any combination of these to specify output.  For example, 'hm' will return "__ hours and __ minutes".  Outformat
+    can also be 'clock' which returns 3:42pm, or 'sclock' which returns 3:42:15pm</li>
+<li><b>dispreducedfraction(numerator,denominator,[doubleslash])</b>:  Takes two numbers as numerator and denominator of a fraction, returning a display form of the fraction,
+    reduced to lowest terms.  Suitable for $showanswer.  Set doubleslash to true to produced "3//4" rather than "3/4".</li>
+<li><b>makereducedfraction(numerator,denominator,[doubleslash])</b>:  Same as dispreducefraction, but not already in display form</li>
+<li><b>decimaltofraction(decimal,[format,maxden])</b>:  Converts a decimal to a fraction.  Can use format="mixednumber" to get a mixed number rather than improper fraction.  
+    Only works for denominators up to maxden (default 5000)</li>
 </ul>
 
 </div>
+
 <div class=h2>
-<h2><a name="generalmacros">General Macros</a></h2>
-These macros are fairly general purpose:
+<h2><a name="stringmacros">String Macros</a></h2>
+These macros help with working with strings:
+<ul>
+<li><b>stringappend(value,string)</b>: Appends string to value.  If value is an array, string is appended to each element of the array</li>
+<li><b>stringprepend(value,string)</b>:  Same as stringappend, but prepends string to value</li>
+<li><b>today([string])</b>: Returns today's date, like "July 3, 2008".  Can change format using string (see http://us2.php.net/manual/en/function.date.php for formats)</li>
+<li><b>stringpos(needle,haystack)</b>: Finds the position of the string needle in the string haystack.  Returns -1 if needle is not found</li>
+<li><b>stringlen(string)</b>: returns the character count in the provided string</li>
+<li><b>stringclean(string,mode)</b>: mode 0: trims leading and trailing whitespace.  mode 1: removes all whitespace.  mode 2: removes all non-alphanumeric charactesr.</li>
+<li><b>substr(string,start,[length])</b>: grabs the part of the string from the start index with given length.  If length is not specified, it cuts from the start index to the end of the string.</li>
+<li><b>strtoupper(string)</b>: make all characters in the string upper case</li>
+<li><b>ucfirst(string)</b>: makes the first character in the string upper case</li>
+<li><b>strtolower(string)</b>: make all characters in the string lower case</li>
+<li>
+</ul>
+
+</div>
+
+<div class=h2>
+<h2><a name="arraymacros">Array Macros</a></h2>
+These macros are for working with arrays:
 <ul>
 <li><b>listtoarray(list)</b>:  Converts a list, like "1,2,3,4" or "cat,dog,rabbit" to an array</li>
 <li><b>arraytolist(array)</b>:  Converts an array to a list</li>
@@ -1733,18 +1768,14 @@ These macros are fairly general purpose:
 <li><b>arrayfindindex(needle,haystack)</b>: Returns the index in the array haystack of the value needle.  If there are multiple matches, it only returns the first.</li>
 <li><b>arrayfindindices(needle,haystack)</b>: Returns an array of indices in the array haystack of the value needle.</li>
 <li><b>array_flip(array)</b>:  Reverses a one-to-one array, so indexes become values and values become indexes</li>
-<li><b>arraystodoteqns(xarray,yarray,[color])</b>:  Converts an array of x-values and y-values into a form that can be used in
-  showplot.</li>
-<li><b>connectthedots(xarray,yarray,[color,thickness,startmarker,endmarker])</b>: Converts an array of x-values and y-values into a form that
-  can be used in showplot to create a series of lines connecting the (x,y) pairs</li>
-<li><b>arraystodots(xarray,yarray)</b>: Converts an array of x-values and y-values into a form that can be used in the Drawing answer type</li>
-<li><b>today([string])</b>: Returns today's date, like "July 3, 2008".  Can change format using string (see http://us2.php.net/manual/en/function.date.php for formats)</li>
+
+</ul>
+</div>
+<div class=h2>
+<h2><a name="generalmacros">General Macros</a></h2>
+These macros are fairly general purpose:
+<ul>
 <li><b>ifthen(condition,trueval,falseval)</b>:  Takes a comparision condition, and returns the trueval if the condition is true and the falseval otherwise.</li>
-<li><b>stringpos(needle,haystack)</b>: Finds the position of the string needle in the string haystack.  Returns -1 if needle is not found</li>
-<li><b>stringlen(string)</b>: returns the character count in the provided string</li>
-<li><b>stringclean(string,mode)</b>: mode 0: trims leading and trailing whitespace.  mode 1: removes all whitespace.  mode 2: removes all non-alphanumeric charactesr.</li>
-<li><b>strtoupper(string)</b>: make all characters in the string upper case</li>
-<li><b>strtolower(string)</b>: make all characters in the string lower case</li>
 <li><b>formhoverover(label,tip)</b>:  Creates a hover-over definition or other tip</li>
 <li><b>formpopup(label,content,[width,height,style,scrollbars])</b>:  Creates a link or button leading to a popup window.  Content can
   be a web address, or HTML content to put directly into the popup.  Style can be "link" or "button". Scrollbars defaults to false - set true for scrollbars.</li>
@@ -1762,6 +1793,7 @@ These macros are used for mathematical calculations:
 <li><b>v!</b>: Factorial, like $a = $b!</li>
 <li><b>evalfunc(func,vars,val1,val2,..)</b>: Evaluates a function given the variables and values for each variable.
   for example evalfunc("x^2*y","x,y",2,3) will evaluate x^2*y with x=2, y=3</li>
+<li>See also: calconarray and multicalconarray in the <a href="#arraymacros">Array Macros</a> section</li>
 </ul>
 </div>
 <div class=h2>
@@ -2262,15 +2294,23 @@ drawn line from the correct line.
 </p>
 <p><b>Optional Variables</b><BR>
 <dl>
-<dt>$grid = "xmin,xmax,ymin,ymax,xscl,yscl,imagewidth,imageheight" (In Common Control)</dt>
-	<dd>Defines the grid to be drawn on.  Defaults to "-5,5,-5,5,1,1,300,300".  You can set all or just some of the
-	    values.  For example, to just set the window, you could use "0,10,0,10"</dd>
-<dt>$background = equation or array of equations, using the showplot macro format (In Common Control)</dt>
-	<dd>Define a graph to display in the background, to be drawn on top of.  Example:  $background = "x^2,red"</dd>
-<dt>$answerformat = "line,dot,opendot" or "polygon" (In Question Control)</dt>
+<dt>$answerformat = "line,lineseg,dot,opendot" or "polygon" or "twopoint" or "inequality" or "numberline" (In Question Control)</dt>
 	<dd>Limits the drawing tools available to students.  Defaults to "line,dot,opendot".  Define to limit the options.
 	    Example: $answerformat = "line", or $answerformat = "line,dot"<br/>
-	    Can use $answerformat = "polygon" for a single polygon; give $answer as array of points in order joined with edges.</dd>
+	    $answerformat = "polygon" can be used for drawing a single polygon; give $answer as array of points in order joined with edges.<br/>
+	    $answerformat="twopoint" will use a different set of drawing tools for lines, circles, parabols, and dots and all use two
+	    control points to define the shape.  For lines, parabols, and dots, give $answers in the normal way.  For circles, use "circle,x,y,radius", like "circle,2,-1,3".  For
+	      vertical lines use "x=number", like "x=3".<br/>
+	    $answerformat="inequality" will use a set of drawing tools for graphing linear inequalities in two variables.  Give $answers for non-vertical lines in form
+	       like "&gt;=3x+4", "&lt;5x+4", and "x&lt;=3" for vertical lines.<br/>
+	    $answerformat="numberline" will use a set of drawing tools for graphing inequalities or points in one variable on a number line.  Give $answers as dots and
+	       line segments, or use the intervalstodraw function from the interval macro library to form the $answers array.</dd>
+<dt>$grid = "xmin,xmax,ymin,ymax,xscl,yscl,imagewidth,imageheight" (In Common Control)</dt>
+	<dd>Defines the grid to be drawn on.  Defaults to "-5,5,-5,5,1,1,300,300".  You can set all or just some of the
+	    values.  For example, to just set the window, you could use "0,10,0,10"<br/>
+	    If using $answerformat="numberline", set ymin and ymax to 0.</dd>
+<dt>$background = equation or array of equations, using the showplot macro format (In Common Control)</dt>
+	<dd>Define a graph to display in the background, to be drawn on top of.  Example:  $background = "x^2,red"</dd>
 <dt>$partweights = array or list of weights (In Answer)</dt>
 	<dd>Defines grading weight for each line or dot in $answers.  Example: $partweights = ".5,.25,.25".  Defaults
 	    to equal weights on each line or dot.</dd>
