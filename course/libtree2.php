@@ -23,12 +23,12 @@
 <title>IMathAS Library Selection</title>
 END;
 	}
+	if (isset($coursetheme)) { 
+		$coursetheme = str_replace('_fw','',$coursetheme);
+		echo '<link rel="stylesheet" href="'."$imasroot/themes/$coursetheme?v=012810\" type=\"text/css\" />";
+	}
 	echo <<<END
-<style type="text/css">
-<!--
-@import url("$imasroot/course/libtree.css");
--->
-</style>
+<link rel="stylesheet" href="$imasroot/course/libtree.css" type="text/css" />
 <script type="text/javascript" src="$imasroot/javascript/libtree2.js?v=021810"></script>
 END;
 	if (isset($_GET['libtree']) && $_GET['libtree']=="popup") {
