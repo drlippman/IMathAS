@@ -36,41 +36,6 @@ function getasidfileurl($file) {
 }
 /*
 function deleteasidfilesfromstring($str) {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	if ($GLOBALS['filehandertype'] =='s3') {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		$deled = array();

@@ -14,12 +14,19 @@ function deletegroupset($grpsetid) {
 	
 	$query = "UPDATE imas_forums SET groupsetid=0 WHERE groupsetid='$grpsetid'";
 	mysql_query($query) or die("Query failed : " . mysql_error());
+	
+	$query = "UPDATE imas_wikis SET groupsetid=0 WHERE groupsetid='$grpsetid'";
+	mysql_query($query) or die("Query failed : " . mysql_error());
+
 }
 
 function deletegroup($grpid) {
 	removeallgroupmembers($grpid);
 	
 	$query = "DELETE FROM imas_stugroups WHERE id='$grpid'";
+	mysql_query($query) or die("Query failed : " . mysql_error());
+	
+	$query = "DELETE FROM imas_wiki_revisions WHERE stugroupid='$grpid'";
 	mysql_query($query) or die("Query failed : " . mysql_error());
 }
 

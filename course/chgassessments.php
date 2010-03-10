@@ -28,7 +28,7 @@ if (!(isset($teacherid))) {
 		
 		$sets = array();
 		if (isset($_POST['docopyopt'])) {
-			$tocopy = 'password,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,eqnhelper,showhints,allowlate,noprint,shuffle,gbcategory,cntingb,caltag,calrtag,minscore,exceptionpenalty,isgroup,groupmax,showcat';
+			$tocopy = 'password,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,eqnhelper,showhints,allowlate,noprint,shuffle,gbcategory,cntingb,caltag,calrtag,minscore,exceptionpenalty,groupmax,showcat';
 			
 			$query = "SELECT $tocopy FROM imas_assessments WHERE id='{$_POST['copyopt']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());

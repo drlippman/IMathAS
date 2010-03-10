@@ -384,8 +384,13 @@ if ($overwriteBody==1) {
 		while ($row = mysql_fetch_row($result)) {
 			$used .= "Forum: {$row[0]}<br/>";
 		}
+		$query = "SELECT name FROM imas_wikis WHERE groupsetid='{$_GET['delgrpset']}'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			$used .= "Wiki: {$row[0]}<br/>";
+		}
 		if ($used != '') {
-			echo '<p>This set of groups is currently used in the assessments and/or forums below.  These items will be set to non-group if this group set is deleted</p><p>';
+			echo '<p>This set of groups is currently used in the assessments, wikis, and/or forums below.  These items will be set to non-group if this group set is deleted</p><p>';
 			echo "$used</p>";	
 		} else {
 			echo '<p>This set of groups is not currently being used</p>';
@@ -414,6 +419,7 @@ if ($overwriteBody==1) {
 	} else if (isset($_GET['delgrp'])) {
 		echo '<h4>Delete student group</h4>';
 		echo "<p>Are you SURE you want to delete the student group <b>$page_grpname</b>?</p>";
+		echo "<p>Any wiki page content for this group will be deleted.</p>";
 		echo "<p><input type=button value=\"Yes, Delete\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid&delgrp={$_GET['delgrp']}&confirm=true'\" /> ";
 		echo "<input type=button value=\"Nevermind\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid'\" /></p>";
 		
