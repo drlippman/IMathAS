@@ -1427,6 +1427,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$saarr = array();
 			$ineqcolors = array("blue","red","green");
 			foreach($answers as $k=>$ans) {
+				if ($ans=='') { continue;}
 				$function = explode(',',$ans);
 				if ($answerformat[0]=='inequality') {
 					if ($function[0]{2}=='=') {
@@ -2688,6 +2689,14 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$types = array();
 		$extrastuffpenalty = 0;
 		$linepts = 0;
+		
+		if ((is_array($answers) && count($answers)==0) || (!is_array($answers) && $answers=='')) {
+			if ($givenans==';;;;;;;;') {
+				return 1;
+			} else {
+				return 0;
+			}
+		}
 		if (!is_array($answers)) {
 			settype($answers,"array");
 		}
