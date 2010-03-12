@@ -311,7 +311,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
 	
 	$jsarr = '[';
-	$items = explode(",",$itemorder);
+	if ($itemorder != '') {
+		$items = explode(",",$itemorder);
+	} else {
+		$items = array();
+	}
 	$existingq = array();
 	$apointstot = 0;
 	for ($i = 0; $i < count($items); $i++) {
@@ -439,7 +443,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$maj = count($existingq)/2;
 				$existingqlist = implode(',',$existingq);  //pulled from database, so no quotes needed
 				$query = "SELECT libid,COUNT(qsetid) FROM imas_library_items WHERE qsetid IN ($existingqlist) GROUP BY libid";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$foundmaj = false;
 				while ($row = mysql_fetch_row($result)) {
 					if ($row[1]>=$maj) {

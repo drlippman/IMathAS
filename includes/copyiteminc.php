@@ -7,6 +7,9 @@ function copyitem($itemid,$gbcats) {
 	if ($gbcats===false) {
 		$gbcats = array();
 	}
+	if (strlen($_POST['append'])>0 && $_POST['append']{0}!=' ') {
+		$_POST['append'] = ' '.$_POST['append'];
+	}
 	$query = "SELECT itemtype,typeid FROM imas_items WHERE id='$itemid'";
 	$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 	list($itemtype,$typeid) = mysql_fetch_row($result);
@@ -193,6 +196,9 @@ function copysub($items,$parent,&$addtoarr,$gbcats) {
 
 function copyallsub($items,$parent,&$addtoarr,$gbcats) {
 	global $blockcnt;
+	if (strlen($_POST['append'])>0 && $_POST['append']{0}!=' ') {
+		$_POST['append'] = ' '.$_POST['append'];
+	}
 	foreach ($items as $k=>$item) {
 		if (is_array($item)) {
 			$newblock = array();

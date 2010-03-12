@@ -1924,14 +1924,20 @@ function formhoverover($label,$tip) {
 	}
 }
 
-function formpopup($label,$content,$width=600,$height=400,$type='link',$scroll='null') {
+function formpopup($label,$content,$width=600,$height=400,$type='link',$scroll='null',$id='popup') {
+	if ($scroll != null) {
+		$scroll = ','.$scroll;
+	}
+	if ($height=='fit') {
+		$height = "'fit'";
+	}
 	if (strpos($label,'<img')!==false) {
-		return str_replace('<img', '<img class="clickable" onClick="popupwindow(\''.str_replace('\'','\\\'',htmlentities($content)).'\','.$width.','.$height.','.$scroll.')"',$label);
+		return str_replace('<img', '<img class="clickable" onClick="popupwindow(\''.$id.'\',\''.str_replace('\'','\\\'',htmlentities($content)).'\','.$width.','.$height.','.$scroll.')"',$label);
 	} else {
 		if ($type=='link') {
-			return '<span class="link" onClick="popupwindow(\''.str_replace('\'','\\\'',htmlentities($content)).'\','.$width.','.$height.','.$scroll.')">'.$label.'</span>';
+			return '<span class="link" onClick="popupwindow(\''.$id.'\',\''.str_replace('\'','\\\'',htmlentities($content)).'\','.$width.','.$height.$scroll.')">'.$label.'</span>';
 		} else if ($type=='button') {
-			return '<span class="spanbutton" onClick="popupwindow(\''.str_replace('\'','\\\'',htmlentities($content)).'\','.$width.','.$height.','.$scroll.')">'.$label.'</span>';
+			return '<span class="spanbutton" onClick="popupwindow(\''.$id.'\',\''.str_replace('\'','\\\'',htmlentities($content)).'\','.$width.','.$height.$scroll.')">'.$label.'</span>';
 		}
 	}
 }
