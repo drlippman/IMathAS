@@ -176,7 +176,7 @@ function eecellhighlightdown() {
 	}
 }
 function showeedd(eln) {
-	if (ddclosetimer && eln!=cureedd) {
+	if (ddclosetimer && eln!=eecurel) { // && eln!=cureedd
 		window.clearTimeout(ddclosetimer);
 		ddclosetimer = null;
 	}

@@ -6,9 +6,13 @@ var ehcurel = null;
 var ehclosetimer = 0;
 var ehddclosetimer = 0;
 var ehddcur = null;
+var eecurel = null; //so will be defined if eqnhelper isn't being used
 
 //show expanded eqn tip
 function showeh(eln) {
+	if (eecurel!=null) {
+		return;
+	}
 	el = document.getElementById(eln);
 	var eh = document.getElementById('eh');
 	if (eln != ehcurel) {
@@ -28,6 +32,9 @@ function showeh(eln) {
 }
 
 function reshrinkeh(eln) {
+	if (eecurel!=null) {
+		return;
+	}
 	if (eln==ehcurel) {
 		document.getElementById("ehdd").style.display = "block";
 		document.getElementById('eh').style.display = "none";
@@ -59,6 +66,9 @@ function ehcancelclosetimer() {
 }
 //show eqn tip dropdown (shorttipe)
 function showehdd(eln,shorttip,qn) {
+	if (eecurel!=null && eecurel==eln) {
+		return;
+	}
 	//if new el, no need to timeout, since moving it
 	if (ehddclosetimer && eln!=curehdd) {
 		window.clearTimeout(ehddclosetimer);
