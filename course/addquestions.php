@@ -787,13 +787,17 @@ if ($overwriteBody==1) {
 	<form id="curqform" method="post" action="addquestions.php?modqs=true&aid=<?php echo $aid ?>&cid=<?php echo $cid ?>">
 <?php
 		if (!$beentaken) {
-?>		
-		Use select boxes to 
+			/*
+			Use select boxes to 
 		<select name=group id=group>
 			<option value="0"<?php echo $grp0Selected ?>>Rearrange questions</option>
 			<option value="1"<?php echo $grp1Selected ?>>Group questions</option>
 		</select>
-		<br/>Check: <a href="#" onclick="return chkAllNone('curqform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('curqform','checked[]',false)">None</a>
+		<br/>
+		*/
+?>		
+		
+		Check: <a href="#" onclick="return chkAllNone('curqform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('curqform','checked[]',false)">None</a>
 		
 		With Selected: <input type=button value="Remove" onclick="removeSelected()" />
 				<input type=button value="Group" onclick="groupSelected()" />

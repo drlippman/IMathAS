@@ -31,7 +31,7 @@ function generateMoveSelect(num,cnt) {
 }
 
 function moveitem2(from) {
-	var todo = document.getElementById("group").value;
+	var todo = 0;//document.getElementById("group").value;
 	var to = document.getElementById(from).value;
 	var tomove = itemarray.splice(from-1,1);
 	if (todo==0) { //rearrange
@@ -203,7 +203,11 @@ function generateTable() {
 	var pttotal = 0;
 	var html = '';
 	html += "<table cellpadding=5 class=gb><thead><tr>";
-	html += "<th>Order</th><th>Description</th><th>Preview</th><th>Type</th><th>Points</th><th>Settings</th><th>Source</th>";
+	if (!beentaken) {
+		html += "<th></th>";
+	}
+	html += "<th>Order</th>";
+	html += "<th>Description</th><th>Preview</th><th>Type</th><th>Points</th><th>Settings</th><th>Source</th>";
 	if (beentaken) {
 		html += "<th>Clear Attempts</th><th>Withdraw</th>";
 	} else {
@@ -248,6 +252,11 @@ function generateTable() {
 			} else {
 				html += "<td>";
 				if (j==0) {
+					if (!curisgroup) {
+						html += "<input type=checkbox id=\"qc"+ln+"\" name=\"checked[]\" value=\""+(curisgroup?i+'-'+j:i)+":"+curitems[j][0]+"\"/></td><td>";
+					} else {
+						html += '</td><td>';
+					}
 					html += ms;
 					if (curisgroup) {
 						html += "</td><td colspan='"+(beentaken?8:9)+"'><b>Group</b> ";
@@ -265,10 +274,12 @@ function generateTable() {
 					}
 				}
 				if (curisgroup) {
+					html += "<input type=checkbox id=\"qc"+ln+"\" name=\"checked[]\" value=\""+(curisgroup?i+'-'+j:i)+":"+curitems[j][0]+"\"/></td><td>";
 					html += "<a href=\"#\" onclick=\"return ungroupitem('"+i+"-"+j+"');\">Ungroup</a>"; //FIX
 				}
 				html += "</td>";
 			}
+			
 			html += "<td><input type=hidden name=\"curq[]\" id=\"oqc"+ln+"\" value=\""+curitems[j][1]+"\"/>"+curitems[j][2]+"</td>"; //description
 			if (beentaken) {
 				html += "<td><input type=button value='Preview' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",false,false)\"/></td>"; //Preview
@@ -298,7 +309,7 @@ function generateTable() {
 				}
 			} else {
 				html += "<td class=c><a href=\"moddataset.php?id="+curitems[j][1]+"&template=true&aid="+curaid+"&cid="+curcid+"\">Template</a></td>"; //add link
-				html += "<td class=c><a href=\"#\" onclick=\"return removeitem("+(curisgroup?"'"+i+'-'+j+"'":"'"+i+"'")+");\">Remove</a> <input type=checkbox id=\"qc"+ln+"\" name=\"checked[]\" value=\""+(curisgroup?i+'-'+j:i)+":"+curitems[j][0]+"\"/></td>"; //add link and checkbox
+				html += "<td class=c><a href=\"#\" onclick=\"return removeitem("+(curisgroup?"'"+i+'-'+j+"'":"'"+i+"'")+");\">Remove</a></td>"; //add link and checkbox
 			}
 			html += "</tr>";
 			ln++;
