@@ -42,6 +42,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	if (isset($_GET['addgrpset'])) {
 		//adding groupset
 		if (isset($_POST['grpsetname'])) {
+			if (trim($_POST['grpsetname'])=='') {
+				$_POST['grpsetname'] = 'Unnamed group set';
+			}
 			//if name is set
 			$query = "INSERT INTO imas_stugroupset (name,courseid) VALUES ('{$_POST['grpsetname']}','$cid')";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
