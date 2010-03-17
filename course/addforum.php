@@ -89,43 +89,51 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$_POST['description'] = addslashes(htmLawed(stripslashes($_POST['description']),$htmlawedconfig));
 				
 		if (isset($_GET['id'])) {  //already have id; update
-		$query = "UPDATE imas_forums SET name='{$_POST['name']}',description='{$_POST['description']}',startdate=$startdate,enddate=$enddate,settings=$fsets,";
-		$query .= "defdisplay='{$_POST['defdisplay']}',replyby=$replyby,postby=$postby,groupsetid='{$_POST['groupsetid']}',points='{$_POST['points']}',cntingb='{$_POST['cntingb']}',gbcategory='{$_POST['gbcat']}',avail='{$_POST['avail']}',sortby='{$_POST['sortby']}' ";
-		$query .= "WHERE id='{$_GET['id']}';";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$newforumid = $_GET['id'];
+			$query = "SELECT groupsetid FROM imas_forums WHERE id='{$_GET['id']}';";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$oldgroupsetid = mysql_result($result,0,0);
+			if ($oldgroupsetid!=$_POST['groupsetid']) {
+				//change of groupset; zero out stugroupid 
+				$query = "UPDATE imas_forum_threads SET stugroupid=0 WHERE forumid='{$_GET['id']}';";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+			$query = "UPDATE imas_forums SET name='{$_POST['name']}',description='{$_POST['description']}',startdate=$startdate,enddate=$enddate,settings=$fsets,";
+			$query .= "defdisplay='{$_POST['defdisplay']}',replyby=$replyby,postby=$postby,groupsetid='{$_POST['groupsetid']}',points='{$_POST['points']}',cntingb='{$_POST['cntingb']}',gbcategory='{$_POST['gbcat']}',avail='{$_POST['avail']}',sortby='{$_POST['sortby']}' ";
+			$query .= "WHERE id='{$_GET['id']}';";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$newforumid = $_GET['id'];
 		} else { //add new
-		$query = "INSERT INTO imas_forums (courseid,name,description,startdate,enddate,settings,defdisplay,replyby,postby,groupsetid,points,cntingb,gbcategory,avail,sortby) VALUES ";
-		$query .= "('$cid','{$_POST['name']}','{$_POST['description']}',$startdate,$enddate,$fsets,'{$_POST['defdisplay']}',$replyby,$postby,'{$_POST['groupsetid']}','{$_POST['points']}','{$_POST['cntingb']}','{$_POST['gbcat']}','{$_POST['avail']}','{$_POST['sortby']}');";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		
-		$newforumid = mysql_insert_id();
-		
-		$query = "INSERT INTO imas_items (courseid,itemtype,typeid) VALUES ";
-		$query .= "('$cid','Forum','$newforumid');";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		
-		$itemid = mysql_insert_id();
-					
-		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid';";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$line = mysql_fetch_array($result, MYSQL_ASSOC);
-		$items = unserialize($line['itemorder']);
+			$query = "INSERT INTO imas_forums (courseid,name,description,startdate,enddate,settings,defdisplay,replyby,postby,groupsetid,points,cntingb,gbcategory,avail,sortby) VALUES ";
+			$query .= "('$cid','{$_POST['name']}','{$_POST['description']}',$startdate,$enddate,$fsets,'{$_POST['defdisplay']}',$replyby,$postby,'{$_POST['groupsetid']}','{$_POST['points']}','{$_POST['cntingb']}','{$_POST['gbcat']}','{$_POST['avail']}','{$_POST['sortby']}');";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			
-		$blocktree = explode('-',$block);
-		$sub =& $items;
-		for ($i=1;$i<count($blocktree);$i++) {
-			$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
-		}
-		if ($totb=='b') {
-			$sub[] = $itemid;
-		} else if ($totb=='t') {
-			array_unshift($sub,$itemid);
-		}
-		$itemorder = addslashes(serialize($items));
-		$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid';";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		
+			$newforumid = mysql_insert_id();
+			
+			$query = "INSERT INTO imas_items (courseid,itemtype,typeid) VALUES ";
+			$query .= "('$cid','Forum','$newforumid');";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			
+			$itemid = mysql_insert_id();
+						
+			$query = "SELECT itemorder FROM imas_courses WHERE id='$cid';";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$line = mysql_fetch_array($result, MYSQL_ASSOC);
+			$items = unserialize($line['itemorder']);
+				
+			$blocktree = explode('-',$block);
+			$sub =& $items;
+			for ($i=1;$i<count($blocktree);$i++) {
+				$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
+			}
+			if ($totb=='b') {
+				$sub[] = $itemid;
+			} else if ($totb=='t') {
+				array_unshift($sub,$itemid);
+			}
+			$itemorder = addslashes(serialize($items));
+			$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid';";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			
 		}
 		$query = "SELECT id FROM imas_forum_subscriptions WHERE forumid='$newforumid' AND userid='$userid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -162,6 +170,15 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$replyby = $line['replyby'];
 			$postby = $line['postby'];
 			$groupsetid = $line['groupsetid'];
+			if ($groupsetid>0) {
+				$query = "SELECT * FROM imas_forum_threads WHERE forumid='{$_GET['id']}' AND stugroupid>0 LIMIT 1";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				if (mysql_num_rows($result)>0) {
+					$hasgroupthreads = true;
+				} else {
+					$hasgroupthreads = false;
+				}
+			}
 			$points = $line['points'];
 			$cntingb = $line['cntingb'];
 			$gbcat = $line['gbcategory'];
@@ -310,6 +327,9 @@ if ($overwriteBody==1) {
 		<span class=form>Group forum?</span><span class=formright>
 <?php
 	writeHtmlSelect("groupsetid",$page_groupSelect['val'],$page_groupSelect['label'],$groupsetid,"Not group forum",0);
+	if ($groupsetid>0 && $hasgroupthreads) {
+		echo '<br/>WARNING: <span style="font-size: 80%">Group threads exist.  Changing the group set will set all existing threads to be non-group-specific threads</span>';
+	}
 ?>
 		</span><br class="form"/>
 		

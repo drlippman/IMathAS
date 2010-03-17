@@ -194,7 +194,11 @@
 				$now = time();
 				if ($groupsetid>0) {
 					if ($isteacher) {
-						$groupid = 0;
+						if (isset($_POST['stugroup'])) {
+							$groupid = $_POST['stugroup'];
+						} else {
+							$groupid = 0;
+						}
 					} 
 				}
 					
@@ -239,6 +243,11 @@
 				$query .= "WHERE id='{$_GET['modify']}'";
 				if (!$isteacher) { $query .= " AND userid='$userid'";}
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
+				if ($groupsetid>0 && $isteacher && isset($_POST['stugroup'])) {
+					$groupid = $_POST['stugroup'];
+					$query = "UPDATE imas_forum_threads SET stugroupid='$groupid' WHERE id='{$_GET['modify']}'";
+					mysql_query($query) or die("Query failed : $query " . mysql_error());
+				}
 			}
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
 			exit;
@@ -252,6 +261,11 @@
 			echo "&gt; <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> &gt; ";
 			if ($_GET['modify']!="new") {
 				echo "Modify Thread</div>\n";
+				if ($groupsetid>0) {
+					$query = "SELECT stugroupid FROM imas_forum_threads WHERE id='{$_GET['modify']}'";
+					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+					$curstugroupid = mysql_result($result,0,0);
+				}
 				$query = "SELECT * from imas_forum_posts WHERE id='{$_GET['modify']}'";
 				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$line = mysql_fetch_array($result, MYSQL_ASSOC);
@@ -263,6 +277,7 @@
 				$line['subject'] = "";
 				$line['message'] = "";
 				$line['posttype'] = 0;
+				$curstugroupid = 0;
 				$replyby = null;
 				echo "<h3>Add Thread - \n";
 			}
@@ -318,6 +333,22 @@
 				//echo "<A HREF=\"#\" onClick=\"cal1.select(document.forms[0].replybydate,'anchor3','MM/dd/yyyy',(document.forms[0].replybydate.value==$replybydate')?(document.forms[0].replyby.value):(document.forms[0].replyby.value)); return false;\" NAME=\"anchor3\" ID=\"anchor3\">
 				echo "<img src=\"../img/cal.gif\" alt=\"Calendar\"/></A>";
 				echo "at <input type=text size=10 name=replybytime value=\"$replybytime\"></span><br class=\"form\" />";
+				if ($groupsetid >0) {
+					echo '<span class="form">Set thread to group:</span><span class="formright">';
+					echo '<select name="stugroup">';
+					echo '<option value="0" ';
+					if ($curstugroupid==0) { echo 'selected="selected"';}
+					echo '>Non group-specific</option>';
+					$query = "SELECT id,name FROM imas_stugroups WHERE groupsetid='$groupsetid' ORDER BY name";
+					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+					while ($row = mysql_fetch_row($result)) {
+						echo '<option value="'.$row[0].'" ';
+						if ($curstugroupid==$row[0]) { echo 'selected="selected"';}
+						echo '>'.$row[1].'</option>';
+					}
+					echo '</select></span><br class="form" />';
+				}
+					
 			} else {
 				if ($allowanon==1) {
 					echo "<span class=form>Post Anonymously:</span><span class=formright>";
