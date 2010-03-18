@@ -209,7 +209,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		//deleting groupset
 		if (isset($_GET['confirm'])) {
 			//if name is set
-			deletegroup($_GET['delgrp']);
+			deletegroup($_GET['delgrp'], $_POST['delposts']==1);
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid&grpsetid=$grpsetid");
 			exit();
 		} else {
@@ -421,10 +421,15 @@ if ($overwriteBody==1) {
 		echo '</form>';
 	} else if (isset($_GET['delgrp'])) {
 		echo '<h4>Delete student group</h4>';
+		echo "<form method=\"post\" action=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&delgrp={$_GET['delgrp']}&confirm=true\" >";
 		echo "<p>Are you SURE you want to delete the student group <b>$page_grpname</b>?</p>";
 		echo "<p>Any wiki page content for this group will be deleted.</p>";
-		echo "<p><input type=button value=\"Yes, Delete\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid&delgrp={$_GET['delgrp']}&confirm=true'\" /> ";
+		echo '<p><input type="radio" name="delposts" value="1" checked="checked" /> Delete group forum posts ';
+		echo '<input type="radio" name="delposts" value="0" /> Make group forum posts non-group-specific posts</p>';
+		echo '<p><input type="submit" value="Yes, Delete"> ';
+		//echo "<p><input type=button value=\"Yes, Delete\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid&delgrp={$_GET['delgrp']}&confirm=true'\" /> ";
 		echo "<input type=button value=\"Nevermind\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid'\" /></p>";
+		echo '</form>';
 		
 	} else if (isset($_GET['rengrp'])) {
 		echo '<h4>Rename student group</h4>';

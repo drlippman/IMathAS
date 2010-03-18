@@ -771,7 +771,7 @@ if ($overwriteBody==1) {
 				<input type="radio" name="isgroup" value="0" <?php writeHtmlChecked($line['isgroup'],0); ?> />Not a group assessment<br/>
 				<input type="radio" name="isgroup" value="1" <?php  writeHtmlChecked($line['isgroup'],1); ?> />Students can add members with login passwords<br/>
 				<input type="radio" name="isgroup" value="2" <?php  writeHtmlChecked($line['isgroup'],2); ?> />Students can add members without passwords<br/>
-				<input type="radio" name="isgroup" value="3" <?php  writeHtmlChecked($line['isgroup'],3); ?> />Students cannot add members
+				<input type="radio" name="isgroup" value="3" <?php  writeHtmlChecked($line['isgroup'],3); ?> />Students cannot add members, and can't start the assessment until you add them to a group
 			</span><br class="form" />
 			<span class=form>Max group members (if group assessment): </span>
 			<span class=formright>

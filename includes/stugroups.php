@@ -20,9 +20,27 @@ function deletegroupset($grpsetid) {
 
 }
 
-function deletegroup($grpid) {
+function deletegroup($grpid,$delposts=true) {
 	removeallgroupmembers($grpid);
 	
+	if ($delposts) {
+		$query = "SELECT id FROM imas_forum_threads WHERE stugroupid='$grpid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$todel = array();
+		while ($row = mysql_fetch_row($result)) {
+			$todel[] = $row[0];
+		}
+		if (count($todel)>0) {
+			$dellist = implode(',',$todel);
+			$query = "DELETE FROM imas_forum_threads WHERE id IN ($dellist)";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			$query = "DELETE FROM imas_forum_posts WHERE threadid IN ($dellist)";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+		}
+	} else {
+		$query = "UPDATE imas_forum_threads SET stugroupid=0 WHERE stugroupid='$grpid'";
+		mysql_query($query) or die("Query failed : " . mysql_error());
+	}
 	$query = "DELETE FROM imas_stugroups WHERE id='$grpid'";
 	mysql_query($query) or die("Query failed : " . mysql_error());
 	
