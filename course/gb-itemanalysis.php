@@ -4,6 +4,7 @@
 	require("../validate.php");
 	$isteacher = isset($teacherid);
 	$cid = $_GET['cid'];
+	$aid = $_GET['aid'];
 	if (!$isteacher) {
 		echo "This page not available to students";
 		exit;
@@ -48,10 +49,12 @@
 		echo "&gt; <a href=\"gradebook.php?stu=$stu&cid=$cid\">Averages</a> ";
 	} else if ($from=='isolate') {
 		echo "&gt; <a href=\"isolateassessgrade.php?cid=$cid&aid=$aid\">View Scores</a> ";
+	} else if ($from=='gisolate') {
+		echo "&gt; <a href=\"isolateassessbygroup.php?cid=$cid&aid=$aid\">View Group Scores</a> ";
 	}
 	echo "&gt; Item Analysis</div>";
 	echo '<div id="headergb-itemanalysis" class="pagetitle"><h2>Item Analysis: ';
-	$aid = $_GET['aid'];
+	
 	$qtotal = array();
 	$qcnt = array();
 	$qincomplete = array();
@@ -194,7 +197,11 @@
 		echo "initSortTable('myTable',Array('S','N','N'),true);\n";
 		echo "</script>\n";
 		echo "<p>Average time taken on this assessment: ";
-		echo round(array_sum($timetaken)/count($timetaken)/60,1);
+		if (count($timetaken)>0) {
+			echo round(array_sum($timetaken)/count($timetaken)/60,1);
+		} else {
+			echo 0;
+		}
 		echo " minutes</p>\n";
 	} else {
 		echo '</tbody></table>';

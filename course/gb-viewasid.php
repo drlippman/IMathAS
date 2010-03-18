@@ -86,7 +86,7 @@
 	//PROCESS ANY TODOS
 	if (isset($_GET['clearattempt']) && isset($_GET['asid']) && $isteacher) {
 		if ($_GET['clearattempt']=="confirmed") {
-			if ($from=='isolate' || $from=='stugrp') {
+			if ($from=='isolate' || $from=='gisolate' || $from=='stugrp') {
 				$query = "SELECT assessmentid FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
 				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$aid = mysql_result($result,0,0);
@@ -102,6 +102,8 @@
 			
 			if ($from=='isolate') {
 				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/isolateassessgrade.php?stu=$stu&cid={$_GET['cid']}&aid=$aid&gbmode=$gbmode");
+			} else if ($from=='gisolate') {
+				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/isolateassessbygroup.php?stu=$stu&cid={$_GET['cid']}&aid=$aid&gbmode=$gbmode");
 			} else if ($from=='stugrp') {
 				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid={$_GET['cid']}&aid=$aid");
 			} else {
@@ -300,6 +302,11 @@
 				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$aid = mysql_result($result,0,0);
 				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/isolateassessgrade.php?stu=$stu&cid={$_GET['cid']}&aid=$aid&gbmode=$gbmode");
+			} else if ($from=='gisolate') {
+				$query = "SELECT assessmentid FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
+				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				$aid = mysql_result($result,0,0);
+				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/isolateassessbygroup.php?stu=$stu&cid={$_GET['cid']}&aid=$aid&gbmode=$gbmode");
 			} else if ($from=='stugrp') {
 				$query = "SELECT assessmentid FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
 				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -343,7 +350,10 @@
 		} else if ($_GET['from']=="isolate") {
 			echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 			echo "&gt; <a href=\"isolateassessgrade.php?cid=$cid&aid={$line['assessmentid']}\">View Scores</a> ";	
-		} else if ($_GET['from']=='stugrp') {
+		} else if ($_GET['from']=="gisolate") {
+			echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
+			echo "&gt; <a href=\"isolateassessbygroup.php?cid=$cid&aid={$line['assessmentid']}\">View Group Scores</a> ";	
+		}else if ($_GET['from']=='stugrp') {
 			echo "&gt; <a href=\"managestugrps.php?cid=$cid&aid={$line['assessmentid']}\">Student Groups</a> ";	
 		} else {
 			echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
