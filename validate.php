@@ -343,7 +343,11 @@ END;
 			$lockaid = $crow[2]; //ysql_result($result,0,2);
 			if (isset($studentid) && $lockaid>0) {
 				if (strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) {
-					header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid={$_GET['cid']}&id=$lockaid");
+					require("header.php");
+					echo '<p>This course is currently locked for an assessment</p>';
+					echo "<p><a href=\"$imasroot/assessment/showtest.php?cid={$_GET['cid']}&id=$lockaid\">Go to Assessment</a> | <a href=\"$imasroot/index.php\">Go Back</a></p>";
+					require("footer.php");
+					//header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid={$_GET['cid']}&id=$lockaid");
 					exit;
 				}
 			}

@@ -212,11 +212,15 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 			echo "<span class=form>Upload grades?</span><span class=formright><input type=checkbox name=\"doupload\" /> <input type=submit value=\"Submit\"/></span><br class=form />";
 		}
 	    } else {
+		    $query = "SELECT name FROM imas_gbitems WHERE id='{$_GET['gbitem']}'";
+		    $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		    echo '<h3>'.mysql_result($result,0,0).'</h3>';
+	    }
+	} else {
 		$query = "SELECT name FROM imas_gbitems WHERE id='{$_GET['gbitem']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		echo '<h3>'.mysql_result($result,0,0).'</h3>';
-	    }
-	} 
+	}
 ?>
 <script type="text/javascript">
 function onenter(e,field) {

@@ -223,16 +223,34 @@ if (!(isset($teacherid))) {
 		exit;
 		 
 	} else { //DATA MANIPULATION FOR INITIAL LOAD
-		$line['timelimit'] = 0;
-		$line['displaymethod']= "SkipAround";
-		$line['defpoints'] = 10;
-		$line['defattempts'] = 1;
-		//$line['deffeedback'] = "AsGo";
-		$testtype = "AsGo";
-		$showans = "A";
-		$skippenalty = 0;
-		$line['defpenalty'] = 10;
-		$line['shuffle'] = 0;
+		$line['displaymethod']= isset($CFG['AMS']['displaymethod'])?$CFG['AMS']['displaymethod']:"SkipAround";
+		$line['defpoints'] = isset($CFG['AMS']['defpoints'])?$CFG['AMS']['defpoints']:10;
+		$line['defattempts'] = isset($CFG['AMS']['defattempts'])?$CFG['AMS']['defattempts']:1;
+		$testtype = isset($CFG['AMS']['testtype'])?$CFG['AMS']['testtype']:"AsGo";
+		$showans = isset($CFG['AMS']['showans'])?$CFG['AMS']['showans']:"A";
+		$line['defpenalty'] = isset($CFG['AMS']['defpenalty'])?$CFG['AMS']['defpenalty']:10;
+		$line['shuffle'] = isset($CFG['AMS']['shuffle'])?$CFG['AMS']['shuffle']:0;
+		$line['minscore'] = isset($CFG['AMS']['minscore'])?$CFG['AMS']['minscore']:0;
+		$line['showhints']=isset($CFG['AMS']['showhints'])?$CFG['AMS']['showhints']:1;
+		$line['noprint'] = isset($CFG['AMS']['noprint'])?$CFG['AMS']['noprint']:0;
+		$line['groupmax'] = isset($CFG['AMS']['groupmax'])?$CFG['AMS']['groupmax']:6;
+		$line['allowlate'] = isset($CFG['AMS']['allowlate'])?$CFG['AMS']['allowlate']:1;
+		$line['exceptionpenalty'] = isset($CFG['AMS']['exceptionpenalty'])?$CFG['AMS']['exceptionpenalty']:0;
+		$line['tutoredit'] = isset($CFG['AMS']['tutoredit'])?$CFG['AMS']['tutoredit']:0;
+		$line['eqnhelper'] = isset($CFG['AMS']['eqnhelper'])?$CFG['AMS']['eqnhelper']:0;
+		$line['caltag'] = isset($CFG['AMS']['caltag'])?$CFG['AMS']['caltag']:'?';
+		$line['calrtag'] = isset($CFG['AMS']['calrtag'])?$CFG['AMS']['calrtag']:'R';
+		$line['showtips'] = isset($CFG['AMS']['showtips'])?$CFG['AMS']['showtips']:1;
+		if ($line['defpenalty']{0}==='L') {
+			$line['defpenalty'] = substr($line['defpenalty'],1);
+			$skippenalty=10;
+		} else if ($line['defpenalty']{0}==='S') {
+			$skippenalty = $line['defpenalty']{1};
+			$line['defpenalty'] = substr($line['defpenalty'],2);
+		} else {
+			$skippenalty = 0;
+		}	
+		
 		
 		$query = "SELECT id,name FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -408,10 +426,10 @@ function copyfromtoggle(frm,mark) {
 				<td class="r">Display method: </td>
 				<td>
 				<select name="displaymethod">
-					<option value="AllAtOnce">Full test at once</option>
-					<option value="OneByOne">One question at a time</option>
-					<option value="Seq">Full test, submit one at time</option>
-					<option value="SkipAround" SELECTED>Skip Around</option>
+					<option value="AllAtOnce" <?php writeHtmlSelected($line['displaymethod'],"AllAtOnce",0) ?>>Full test at once</option>
+					<option value="OneByOne" <?php writeHtmlSelected($line['displaymethod'],"OneByOne",0) ?>>One question at a time</option>
+					<option value="Seq" <?php writeHtmlSelected($line['displaymethod'],"Seq",0) ?>>Full test, submit one at time</option>
+					<option value="SkipAround" <?php writeHtmlSelected($line['displaymethod'],"SkipAround",0) ?>>Skip Around</option>
 				</select>
 				</td>
 			</tr>
@@ -435,14 +453,14 @@ function copyfromtoggle(frm,mark) {
 				<td class="r">Default penalty:</td>
 				<td><input type=text size=4 name=defpenalty value="<?php echo $line['defpenalty'];?>" <?php if ($taken) {echo 'disabled=disabled';}?>>% 
    					<select name="skippenalty" <?php if ($taken) {echo 'disabled=disabled';}?>>
-						<option value="0">per missed attempt</option>
-						<option value="1">per missed attempt, after 1</option>
-					    <option value="2">per missed attempt, after 2</option>
-					    <option value="3">per missed attempt, after 3</option>
-					    <option value="4">per missed attempt, after 4</option>
-					    <option value="5">per missed attempt, after 5</option>
-					    <option value="6">per missed attempt, after 6</option>
-					    <option value="10">on last possible attempt only</option>
+						<option value="0" <?php if ($skippenalty==0) {echo "selected=1";} ?>>per missed attempt</option>
+						<option value="1" <?php if ($skippenalty==1) {echo "selected=1";} ?>>per missed attempt, after 1</option>
+						<option value="2" <?php if ($skippenalty==2) {echo "selected=1";} ?>>per missed attempt, after 2</option>
+						<option value="3" <?php if ($skippenalty==3) {echo "selected=1";} ?>>per missed attempt, after 3</option>
+						<option value="4" <?php if ($skippenalty==4) {echo "selected=1";} ?>>per missed attempt, after 4</option>
+						<option value="5" <?php if ($skippenalty==5) {echo "selected=1";} ?>>per missed attempt, after 5</option>
+						<option value="6" <?php if ($skippenalty==6) {echo "selected=1";} ?>>per missed attempt, after 6</option>
+						<option value="10" <?php if ($skippenalty==10) {echo "selected=1";} ?>>on last possible attempt only</option>
 					</select>
 				</td>
 			</tr>
@@ -451,36 +469,36 @@ function copyfromtoggle(frm,mark) {
 				<td class="r">Feedback method:<br/>and Show Answers: </td>
 				<td>
 					<select id="deffeedback" name="deffeedback" onChange="chgfb()" >
-						<option value="NoScores">No scores shown (use with 1 attempt per problem)</option>
-						<option value="EndScore" >Just show final score (total points & average) - only whole test can be reattemped</option>
-						<option value="EachAtEnd">Show score on each question at the end of the test </option>
-						<option value="AsGo" SELECTED >Show score on each question as it's submitted (does not apply to Full test at once display)</option>
-						<option value="Practice">Practice test: Show score on each question as it's submitted & can restart test; scores not saved</option>
-						<option value="Homework">Homework: Show score on each question as it's submitted & allow similar question to replace missed question</option>
+						<option value="NoScores" <?php if ($testtype=="NoScores") {echo "SELECTED";} ?>>No scores shown (use with 1 attempt per problem)</option>
+						<option value="EndScore" <?php if ($testtype=="EndScore") {echo "SELECTED";} ?>>Just show final score (total points & average) - only whole test can be reattemped</option>
+						<option value="EachAtEnd" <?php if ($testtype=="EachAtEnd") {echo "SELECTED";} ?>>Show score on each question at the end of the test </option>
+						<option value="AsGo" <?php if ($testtype=="AsGo") {echo "SELECTED";} ?>>Show score on each question as it's submitted (does not apply to Full test at once display)</option>
+						<option value="Practice" <?php if ($testtype=="Practice") {echo "SELECTED";} ?>>Practice test: Show score on each question as it's submitted & can restart test; scores not saved</option>
+						<option value="Homework" <?php if ($testtype=="Homework") {echo "SELECTED";} ?>>Homework: Show score on each question as it's submitted & allow similar question to replace missed question</option>
 					</select>
 					<br/>
-					<span id="showanspracspan" class="<?php echo ($testtype=="Practice" || $testtype=="Homework") ? "show" : "hidden"; ?>">
+					<span id="showanspracspan" class="<?php if ($testtype=="Practice" || $testtype=="Homework") {echo "show";} else {echo "hidden";} ?>">
 					<select name="showansprac">
-						<option value="V">Never, but allow students to review their own answers</option>
-						<option value="N" >Never, and don't allow students to review their own answers</option>
-						<option value="F">After last attempt (Skip Around only)</option>
-						<option value="J">After last attempt or Jump to Ans button (Skip Around only)</option>
-						<option value="0" >Always</option>
-						<option value="1" >After 1 attempt</option>
-						<option value="2" >After 2 attempts</option>
-						<option value="3" >After 3 attempts</option>
-						<option value="4" >After 4 attempts</option>
-						<option value="5" >After 5 attempts</option>
+						<option value="V" <?php if ($showans=="V") {echo "SELECTED";} ?>>Never, but allow students to review their own answers</option>
+						<option value="N" <?php if ($showans=="N") {echo "SELECTED";} ?>>Never, and don't allow students to review their own answers</option>
+						<option value="F" <?php if ($showans=="F") {echo "SELECTED";} ?>>After last attempt (Skip Around only)</option>
+						<option value="J" <?php if ($showans=="J") {echo "SELECTED";} ?>>After last attempt or Jump to Ans button (Skip Around only)</option>
+						<option value="0" <?php if ($showans=="0") {echo "SELECTED";} ?>>Always</option>
+						<option value="1" <?php if ($showans=="1") {echo "SELECTED";} ?>>After 1 attempt</option>
+						<option value="2" <?php if ($showans=="2") {echo "SELECTED";} ?>>After 2 attempts</option>
+						<option value="3" <?php if ($showans=="3") {echo "SELECTED";} ?>>After 3 attempts</option>
+						<option value="4" <?php if ($showans=="4") {echo "SELECTED";} ?>>After 4 attempts</option>
+						<option value="5" <?php if ($showans=="5") {echo "SELECTED";} ?>>After 5 attempts</option>
 					</select>
 					</span>
-					<span id="showansspan" class="<?php echo ($testtype!="Practice" && $testtype!="Homework") ? "show" : "hidden"; ?>">
+					<span id="showansspan" class="<?php if ($testtype!="Practice" && $testtype!="Homework") {echo "show";} else {echo "hidden";} ?>">
 					<select name="showans">
-						<option value="V" >Never, but allow students to review their own answers</option>
-						<option value="N" >Never, and don't allow students to review their own answers</option>
-						<option value="I">Immediately (in gradebook) - don't use if allowing multiple attempts per problem</option>
-						<option value="F" >After last attempt (Skip Around only)</option>
-						<option value="J">After last attempt or Jump to Ans button (Skip Around only)</option>
-						<option value="A" SELECTED>After due date (in gradebook)</option>
+						<option value="V" <?php if ($showans=="V") {echo "SELECTED";} ?>>Never, but allow students to review their own answers</option>
+						<option value="N" <?php if ($showans=="N") {echo "SELECTED";} ?>>Never, and don't allow students to review their own answers</option>
+						<option value="I" <?php if ($showans=="I") {echo "SELECTED";} ?>>Immediately (in gradebook) - don't use if allowing multiple attempts per problem</option>
+						<option value="F" <?php if ($showans=="F") {echo "SELECTED";} ?>>After last attempt (Skip Around only)</option>
+						<option value="J" <?php if ($showans=="J") {echo "SELECTED";} ?>>After last attempt or Jump to Ans button (Skip Around only)</option>
+						<option value="A" <?php if ($showans=="A") {echo "SELECTED";} ?>>After due date (in gradebook)</option>
 					</select>
 					</span>
 				</td>
@@ -489,39 +507,52 @@ function copyfromtoggle(frm,mark) {
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgeqnhelper"/></td>
 				<td class="r">Use equation helper?</td>
-				<td><select name="eqnhelper">
-					<option value="0" selected="selected">No</option>
-					<option value="1" >Yes, simple form (no logs or trig)</option>
-					<option value="2" >Yes, advanced form</option>
-				     </select></td>
+				<td>
+				<select name="eqnhelper">
+					<option value="0" <?php writeHtmlSelected($line['eqnhelper'],0) ?>>No</option>
+					<option value="1" <?php writeHtmlSelected($line['eqnhelper'],1) ?>>Yes, simple form (no logs or trig)</option>
+					<option value="2" <?php writeHtmlSelected($line['eqnhelper'],2) ?>>Yes, advanced form</option>
+				</select>
+				</td>
 			</tr>
 			<tr class="coptr">
 				<td><input type="checkbox" name="chghints"/></td>
 				<td class="r">Show hints when available? </td>
-				<td><input type="checkbox" name="showhints" checked="checked"></td>
+				<td>
+				<input type="checkbox" name="showhints" <?php writeHtmlChecked($line['showhints'],1); ?>>
+				</td>
 			</tr>
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgshowtips"/></td>
 				<td class="r">Show answer entry tips?</td>
-				<td><select name="showtips">
-					<option value="0" >No</option>
-					<option value="1" selected="selected">Yes</option>
-				     </select></td>
+				<td>
+				<select name="showtips">
+					<option value="0" <?php writeHtmlSelected($line['showtips'],0) ?>>No</option>
+					<option value="1" <?php writeHtmlSelected($line['showtips'],1) ?>>Yes, after question</option>
+					<option value="2" <?php writeHtmlSelected($line['showtips'],2) ?>>Yes, under answerbox</option>
+				</select>
+				</td>
 			</tr>
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgallowlate"/></td>
 				<td class="r">Allow use of LatePasses?: </td>
-				<td><input type="checkbox" name="allowlate" checked="1"></td>
+				<td>
+				<input type="checkbox" name="allowlate" <?php writeHtmlChecked($line['allowlate'],1); ?>>
+				</td>
 			</tr>
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgnoprint"/></td>
 				<td class="r">Make hard to print?: </td>
-				<td><input type="checkbox" name="noprint"></td>
+				<td>
+				<input type="radio" value="0" name="noprint" <?php writeHtmlChecked($line['noprint'],0); ?>/> No <input type="radio" value="1" name="noprint" <?php writeHtmlChecked($line['noprint'],1); ?>/> Yes 
+				</td>
 			</tr>
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgshuffle"/></td>
 				<td class="r">Shuffle item order: </td>
-				<td><input type="checkbox" name="shuffle"></td>
+				<td>
+				<span class=formright><input type="checkbox" name="shuffle" <?php writeHtmlChecked($line['shuffle']&1,1); ?>>
+				</td>
 			</tr>
 			
 			
@@ -547,12 +578,16 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgcaltag"/></td>
 				<td class="r">Calendar icon:</td>
-				<td>Active: <input name="caltagact" type=text size=1 value="?"/>, 
-				    Review: <input name="caltagrev" type=text size=1 value="R"/></td>
+				<td>
+				Active: <input name="caltagact" type=text size=1 value="<?php echo $line['caltag'];?>"/>, 
+				Review: <input name="caltagrev" type=text size=1 value="<?php echo $line['calrtag'];?>"/>
+				</td>
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgminscore"/></td>
 				<td class="r">Minimum score to receive credit: </td>
-				<td><input type="text" name="minscore" size=4 value="0"> % </td>
+				<td>
+				<input type=text size=4 name=minscore value="<?php echo $line['minscore'];?>">
+				</td>
 			</tr>
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgsameseed"/></td>
@@ -568,7 +603,9 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgexcpen"/></td>
 				<td class="r">Penalty for questions done while in exception/LatePass: </td>
-				<td><input type="text" name="exceptionpenalty" size=4 value="0"> % </td>
+				<td>
+				<input type=text size=4 name="exceptionpenalty" value="<?php echo $line['exceptionpenalty'];?>">%
+				</td>
 			</tr>
 <?php 
 /* removed because gets too confusing with group sets
@@ -584,7 +621,9 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 			<tr class="coptr">
 				<td><input type="checkbox" name="chggroupmax"/></td>
 				<td class="r">Max group members (if group assessment):</td>
-				<td><input type=text name=groupmax value="6"></td>
+				<td>
+				<input type="text" name="groupmax" value="<?php echo $line['groupmax'];?>" />
+				</td>
 			</tr>
 */
 ?>

@@ -207,17 +207,7 @@ switch($_GET['action']) {
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		} else {
 			$blockcnt = 1;
-			if (isset($CFG['CPS']['templateoncreate']) && isset($_POST['usetemplate']) && $_POST['usetemplate']>0) {
-				$query = "SELECT itemorder FROM imas_courses WHERE id='{$_POST['usetemplate']}'";
-				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-				$items = unserialize(mysql_result($result,0,0));
-				$newitems = array();
-				require("../includes/copyiteminc.php");
-				copyallsub($items,'0',$newitems,array());
-				$itemorder = addslashes(serialize($newitems));
-			} else {
 			$itemorder = addslashes(serialize(array()));
-			}
 			$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,chatset,showlatepass,itemorder,topbar,cploc,available,theme,ltisecret,blockcnt) VALUES ";
 			$query .= "('{$_POST['coursename']}','$userid','{$_POST['ekey']}','$hideicons','$picicons','$unenroll','$copyrights','$msgset',$chatset,$showlatepass,'$itemorder','$topbar','$cploc','$avail','$theme','{$_POST['ltisecret']}','$blockcnt');";
 			mysql_query($query) or die("Query failed : " . mysql_error());
@@ -226,6 +216,17 @@ switch($_GET['action']) {
 				$query = "INSERT INTO imas_teachers (userid,courseid) VALUES ('$userid','$cid')";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			//}
+			if (isset($CFG['CPS']['templateoncreate']) && isset($_POST['usetemplate']) && $_POST['usetemplate']>0) {
+				$query = "SELECT itemorder FROM imas_courses WHERE id='{$_POST['usetemplate']}'";
+				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+				$items = unserialize(mysql_result($result,0,0));
+				$newitems = array();
+				require("../includes/copyiteminc.php");
+				copyallsub($items,'0',$newitems,array());
+				$itemorder = addslashes(serialize($newitems));
+				$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			} 
 			$useweights = intval(isset($CFG['GBS']['useweights'])?$CFG['GBS']['useweights']:0);
 			$orderby = intval(isset($CFG['GBS']['orderby'])?$CFG['GBS']['orderby']:0);
 			$defgbmode = intval(isset($CFG['GBS']['defgbmode'])?$CFG['GBS']['defgbmode']:21);

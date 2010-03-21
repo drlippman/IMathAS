@@ -1141,6 +1141,8 @@ function enditem($canedit) {
    		if ($tb=='BB' || $tb=='LB') {$tb = 'b';}
    		if ($tb=='t' && $blk=='0') {
    			$html = '<div id="topadditem" class="additembox"><span><b>Add here:</b> ';
+   		} else if ($tb=='b' && $blk=='0') {
+   			$html = '<div id="bottomadditem" class="additembox"><span><b>Add here:</b> ';
    		} else {
    			$html = '<div class="additembox"><span><b>Add here:</b> ';
    		}

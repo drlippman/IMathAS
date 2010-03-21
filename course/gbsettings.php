@@ -12,10 +12,10 @@
 	}
 	$cid = $_GET['cid'];
 	
-	if (isset($_POST['addnew'])) {
+	/*if (isset($_POST['addnew'])) {
 		$query = "INSERT INTO imas_gbcats (courseid) VALUES ('$cid')";
 		mysql_query($query) or die("Query failed : " . mysql_error());
-	}
+	}*/
 	if (isset($_GET['remove'])) {
 		$query = "UPDATE imas_assessments SET gbcategory=0 WHERE gbcategory='{$_GET['remove']}'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
@@ -24,13 +24,12 @@
 		$query = "DELETE FROM imas_gbcats WHERE id='{$_GET['remove']}'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 	}
-	if (isset($_POST['submit']) || isset($_POST['addnew'])) {
+	if (isset($_POST['submit']) ) {  //|| isset($_POST['addnew'])
 		//WORK ON ME
 		$useweights = $_POST['useweights'];
 		$orderby = $_POST['orderby'];
 		$usersort = $_POST['usersort'];
 		//name,scale,scaletype,chop,drop,weight
-		
 		$ids = array_keys($_POST['weight']);
 		foreach ($ids as $id) {
 			$name = $_POST['name'][$id];
@@ -64,7 +63,13 @@
 			} else {
 				$hide = 0;
 			}
-			if ($id==0) {
+			if (substr($id,0,3)=='new') {
+				if (trim($name)!='') {
+					$query = "INSERT INTO imas_gbcats (courseid,name,scale,scaletype,chop,dropn,weight,hidden) VALUES ";
+					$query .= "('$cid','$name','$scale','$st','$chop','$drop','$weight',$hide)";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+				}
+			} else if ($id==0) {
 				$defaultcat = "$scale,$st,$chop,$drop,$weight,$hide";
 			} else {
 				$query = "UPDATE imas_gbcats SET name='$name',scale='$scale',scaletype='$st',chop='$chop',dropn='$drop',weight='$weight',hidden=$hide WHERE id='$id'";
@@ -79,16 +84,63 @@
 			exit;
 		}
 	}
+	$sc = 
 	
-	$sc = "<script type=\"text/javascript\">";
-	$sc .= "function swapweighthdr(t) {";
-	$sc .= "  if (t==0) {";
-	$sc .= "     document.getElementById(\"weighthdr\").innerHTML = \"Fixed Category Point Total (optional)<br/>Blank to use point sum\";";
-	$sc .= "  } else {";
-	$sc .= "     document.getElementById(\"weighthdr\").innerHTML = \"Category Weight (%)\";";
-	$sc .= "  }";
-	$sc .= "}";
-	$sc .= "</script>";
+	
+	$sc = '<script type="text/javascript">
+	function swapweighthdr(t) {
+	  if (t==0) {
+	     document.getElementById("weighthdr").innerHTML = "Fixed Category Point Total (optional)<br/>Blank to use point sum";
+	  } else {
+	     document.getElementById("weighthdr").innerHTML = "Category Weight (%)";
+	  }
+	}
+	var addrowcnt = 0;
+	function addcat() {
+		addrowcnt++;
+		var tr = document.createElement("tr");
+		tr.id = \'newrow\'+addrowcnt;
+		tr.className = "grid";
+		var td = document.createElement("td");
+		td.innerHTML = \'<input name="name[new\'+addrowcnt+\']" value="" type="text">\';
+		tr.appendChild(td);
+		
+		var td = document.createElement("td");
+		td.innerHTML = \'<input name="hide[new\'+addrowcnt+\']" value="1" type="checkbox">\';
+		tr.appendChild(td);
+		
+		var td = document.createElement("td");
+		td.innerHTML = \'Scale <input size="3" name="scale[new\'+addrowcnt+\']" value="" type="text"> \' +
+		   \'(<input name="st[new\'+addrowcnt+\']" value="0" checked="1" type="radio">points \' +
+		   \'<input name="st[new\'+addrowcnt+\']" value="1" type="radio">percent)<br/>\' +
+		   \'to perfect score<br/><input name="chop[new\'+addrowcnt+\']" value="1" checked="1" type="checkbox"> \' +
+		   \'no total over <input size="3" name="chopto[new\'+addrowcnt+\']" value="100" type="text">%\';
+		tr.appendChild(td);
+		
+		var td = document.createElement("td");
+		td.innerHTML = \'<input name="droptype[new\'+addrowcnt+\']" value="0" checked="1" type="radio">Keep All<br/>\' +
+			\'<input name="droptype[new\'+addrowcnt+\']" value="1" type="radio">Drop lowest \' +
+			\'<input size="2" name="dropl[new\'+addrowcnt+\']" value="0" type="text"> scores<br/> \' +
+			\'<input name="droptype[new\'+addrowcnt+\']" value="2" type="radio">Keep highest \' +
+			\'<input size="2" name="droph[new\'+addrowcnt+\']" value="0" type="text"> scores\';
+		tr.appendChild(td);
+		
+		var td = document.createElement("td");
+		td.innerHTML = \'<input size="3" name="weight[new\'+addrowcnt+\']" value="" type="text">\';
+		tr.appendChild(td);
+		
+		var td = document.createElement("td");
+		td.innerHTML = \'<a href="#" onclick="removecat(\'+addrowcnt+\'); return false;">Remove</a>\';
+		tr.appendChild(td);
+		
+		document.getElementById("cattbody").appendChild(tr);
+	}
+	function removecat(n) {
+		var torem = document.getElementById("newrow"+n);
+		document.getElementById("cattbody").removeChild(torem);
+	}
+		
+	</script>';
 	
 	$placeinhead = $sc;
 	require("../header.php");
@@ -165,7 +217,7 @@
 	} else if ($useweights==1) {
 		echo "Category Weight (%)";
 	}
-	echo "</th><th>Remove</th></tr></thead><tbody>";
+	echo '</th><th>Remove</th></tr></thead><tbody id="cattbody">';
 	
 	disprow(0,$row);
 	$query = "SELECT id,name,scale,scaletype,chop,dropn,weight,hidden FROM imas_gbcats WHERE courseid='$cid'";
@@ -176,8 +228,9 @@
 	}
 	
 	echo "</tbody></table>";
-	echo "<p><input type=submit name=addnew value=\"Add New Category\"/></p>";
-	echo "<p><input type=submit name=submit value=\"Update\"/></p>";
+	//echo "<p><input type=submit name=addnew value=\"Add New Category\"/></p>";
+	echo '<p><input type="button" value="Add New Category" onclick="addcat()" />';
+	echo '<input type=submit name=submit value="Update"/></p>';
 	echo "</form>";
 	//echo "<p><a href=\"gbsettings.php?cid=$cid&addnew=1\">Add New Category</a></p>";
 	

@@ -310,7 +310,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
 	
 	$jsarr = '[';
-	$items = explode(",",$itemorder);
+	if ($itemorder != '') {
+		$items = explode(",",$itemorder);
+	} else {
+		$items = array();
+	}
 	$existingq = array();
 	$apointstot = 0;
 	for ($i = 0; $i < count($items); $i++) {
@@ -438,7 +442,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$maj = count($existingq)/2;
 				$existingqlist = implode(',',$existingq);  //pulled from database, so no quotes needed
 				$query = "SELECT libid,COUNT(qsetid) FROM imas_library_items WHERE qsetid IN ($existingqlist) GROUP BY libid";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$foundmaj = false;
 				while ($row = mysql_fetch_row($result)) {
 					if ($row[1]>=$maj) {
@@ -781,13 +785,17 @@ if ($overwriteBody==1) {
 	<form id="curqform" method="post" action="addquestions.php?modqs=true&aid=<?php echo $aid ?>&cid=<?php echo $cid ?>">
 <?php
 		if (!$beentaken) {
-?>		
-		Use select boxes to 
+			/*
+			Use select boxes to 
 		<select name=group id=group>
 			<option value="0"<?php echo $grp0Selected ?>>Rearrange questions</option>
 			<option value="1"<?php echo $grp1Selected ?>>Group questions</option>
 		</select>
-		<br/>Check: <a href="#" onclick="return chkAllNone('curqform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('curqform','checked[]',false)">None</a>
+		<br/>
+		*/
+?>		
+		
+		Check: <a href="#" onclick="return chkAllNone('curqform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('curqform','checked[]',false)">None</a>
 		
 		With Selected: <input type=button value="Remove" onclick="removeSelected()" />
 				<input type=button value="Group" onclick="groupSelected()" />
