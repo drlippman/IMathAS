@@ -2,8 +2,8 @@
 </div>
 <div class="footerwrapper"><?php
 	$curdir = rtrim(dirname(__FILE__), '/\\');
-	if (file_exists("footercontent.php")) {
-		require("footercontent.php");
+	if (file_exists("$curdir/footercontent.php")) {
+		require("$curdir/footercontent.php");
 	}
 ?></div>
 </div>
