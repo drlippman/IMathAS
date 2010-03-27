@@ -61,7 +61,7 @@
 		if (isset($CFG['GEN']['homelayout'])) {
 			$homelayout = $CFG['GEN']['homelayout'];
 		} else {
-			$homelayout = '|0,2,3||0,1';
+			$homelayout = '|0,1,2||0,1';
 		}
 		if (!isset($_GET['confirmed'])) {
 			$query = "SELECT SID FROM imas_users WHERE email='{$_POST['email']}'";
