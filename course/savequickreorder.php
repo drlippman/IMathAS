@@ -26,6 +26,8 @@
 		 $query = "UPDATE imas_assessments SET name='$val' WHERE id='$typeid'";
 	 } else if ($type=="F") {
 		 $query = "UPDATE imas_forums SET name='$val' WHERE id='$typeid'";
+	 } else if ($type=="W") {
+		 $query = "UPDATE imas_wikis SET name='$val' WHERE id='$typeid'";
 	 } else if ($type=="B") {
 		 $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 		 $result = mysql_query($query) or die("Query failed : " . mysql_error());

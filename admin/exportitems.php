@@ -395,7 +395,7 @@ if ($overwriteBody==1) {
 		<p>Select items to export</p>
 	
 		Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
-		
+	
 		<table cellpadding=5 class=gb>
 		<thead>
 			<tr><th></th><th>Type</th><th>Title</th></tr>

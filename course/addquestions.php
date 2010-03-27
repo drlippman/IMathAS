@@ -92,8 +92,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	if (isset($_GET['clearattempts'])) {
 		if ($_GET['clearattempts']=="confirmed") {
 			require_once('../includes/filehandler.php');
-			deleteasidfilesbyquery(array('assessmentid'=>$aid));
-			
+			deleteallaidfiles($aid);
 			$query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='$aid'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			$query = "UPDATE imas_questions SET withdrawn=0 WHERE assessmentid='$aid'";
@@ -455,8 +454,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				if (!$foundmaj) {
 					echo "No maj found";
 					$searchlibs = $userdeflib;
-				}
-				
+				}	
 			} else {
 				$searchlibs = $userdeflib;
 			}
@@ -558,7 +556,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						if (in_array($i,$existingq)) {
 							$page_questionTable[$i]['desc'] = '<span style="color: #999">'.filter($line['description']).'</span>';
 						} else {
-							$page_questionTable[$i]['desc'] = filter($line['description']);
+						$page_questionTable[$i]['desc'] = filter($line['description']);
 						}
 						$page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selq','qo$ln',{$line['id']},true,false)\"/>";
 						$page_questionTable[$i]['type'] = $line['qtype'];

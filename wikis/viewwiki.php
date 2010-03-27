@@ -17,6 +17,7 @@ $body = "";
 
 $cid = intval($_GET['cid']);
 $id = intval($_GET['id']);
+$groupid = intval($_GET['grp']);
 $curBreadcrumb = "$breadcrumbbase <a href=\"$imasroot/course/course.php?cid=$cid\">$coursename</a>";
 
 if ($cid==0) {
@@ -25,81 +26,10 @@ if ($cid==0) {
 } else if ($id==0) {
 	$overwriteBody=1;
 	$body = "You need to access this page with a wiki id";
-} else if (isset($_GET['delall']) && isset($teacherid)) {
-	if ($_GET['delall']=='true') {
-		$query = "DELETE FROM imas_wiki_revisions WHERE wikiid='$id'";	
-		mysql_query($query) or die("Query failed : " . mysql_error());
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewwiki.php?cid=$cid&id=$id");	
-		exit;
-	} else {
-		$curBreadcrumb .= " &gt; Clear WikiPage Contents\n";	
-		$pagetitle = "Confirm Page Contents Delete";
-	}
-} else if (isset($_GET['delrev']) && isset($teacherid)) {
-	if ($_GET['delrev']=='true') {
-		$query = "SELECT id FROM imas_wiki_revisions WHERE wikiid='$id' ORDER BY id DESC LIMIT 1";
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		$curid = mysql_result($result,0,0);
-		$query = "DELETE FROM imas_wiki_revisions WHERE wikiid='$id' AND id<$curid";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewwiki.php?cid=$cid&id=$id");	
-		exit;
-	} else {
-		$curBreadcrumb .= " &gt; Clear WikiPage History\n";	
-		$pagetitle = "Confirm History Delete";
-	}
-	
-} else if (isset($_GET['revert']) && isset($teacherid)) {
-	if ($_GET['revert']=='true') {
-		$revision = intval($_GET['torev']);
-		$query = "SELECT revision FROM imas_wiki_revisions WHERE wikiid='$id' ";
-		$query .= "AND id>=$revision ORDER BY id DESC";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		if (mysql_num_rows($result)>1 && $revision>0) {
-			$row = mysql_fetch_row($result);
-			$base = diffstringsplit($row[0]);
-			while ($row = mysql_fetch_row($result)) { //apply diffs
-				$diffs = explode('],[',substr($row[0],2,strlen($row[0])-4));
-				for ($i = count($diffs)-1; $i>=0; $i--) {
-					$diffs[$i] = explode(',',$diffs[$i]);
-					if ($diffs[$i][0]==2) { //replace
-						if (count($diffs[$i])>4) {
-							$diffs[$i][3] = implode(',',array_slice($diffs[$i],3));
-						}
-						$diffs[$i][3] = str_replace(array('\\"','\\\\'),array('"','\\'),substr($diffs[$i][3],1,strlen($diffs[$i][3])-2));
-						array_splice($base,$diffs[$i][1],$diffs[$i][2],$diffs[$i][3]);
-					} else if ($diffs[$i][0]==0) { //insert
-						if (count($diffs[$i])>3) {
-							$diffs[$i][2] = implode(',',array_slice($diffs[$i],2));
-						}
-						$diffs[$i][2] = str_replace(array('\\"','\\\\'),array('"','\\'),substr($diffs[$i][2],1,strlen($diffs[$i][2])-2));
-						array_splice($base,$diffs[$i][1],0,$diffs[$i][2]);
-					} else if ($diffs[$i][0]==1) { //delete
-						array_splice($base,$diffs[$i][1],$diffs[$i][2]);
-					}
-				}
-			}
-			$newbase = addslashes(implode(' ',$base));
-			echo $newbase;
-			exit;
-			$query = "UPDATE imas_wiki_revisions SET revision='$newbase' WHERE id=$revision";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-			$query = "DELETE FROM imas_wiki_revisions WHERE wikiid='$id' AND id>$revision";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-		}
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewwiki.php?cid=$cid&id=$id");	
-		exit;
-	} else {
-		$curBreadcrumb .= " &gt; Revert Wiki\n";	
-		$pagetitle = "Confirm Wiki Version Revert";
-	}
-		
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	
 	
-	$curBreadcrumb .= " &gt; View Wiki";
-	
-	$query = "SELECT name,startdate,enddate,editbydate,avail FROM imas_wikis WHERE id='$id'";
+	$query = "SELECT name,startdate,enddate,editbydate,avail,groupsetid FROM imas_wikis WHERE id='$id'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$row = mysql_fetch_row($result);
 	$wikiname = $row[0];
@@ -107,7 +37,80 @@ if ($cid==0) {
 	if (!isset($teacherid) && ($row[4]==0 || ($row[4]==1 && ($now<$row[1] || $now>$row[2])))) {
 		$overwriteBody=1;
 		$body = "This wiki is not currently available for viewing";
-	} else {
+	} else if (isset($_GET['delall']) && isset($teacherid)) {
+		if ($_GET['delall']=='true') {
+			$query = "DELETE FROM imas_wiki_revisions WHERE wikiid='$id' AND stugroupid='$groupid'";	
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewwiki.php?cid=$cid&id=$id&grp=$groupid");	
+			exit;
+		} else {
+			$curBreadcrumb .= " &gt; <a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid\">View Wiki</a>";
+			$curBreadcrumb .= " &gt; Clear WikiPage Contents\n";	
+			$pagetitle = "Confirm Page Contents Delete";
+		}
+	} else if (isset($_GET['delrev']) && isset($teacherid)) {
+		if ($_GET['delrev']=='true') {
+			$query = "SELECT id FROM imas_wiki_revisions WHERE wikiid='$id' AND stugroupid='$groupid' ORDER BY id DESC LIMIT 1";
+			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			$curid = mysql_result($result,0,0);
+			$query = "DELETE FROM imas_wiki_revisions WHERE wikiid='$id' AND stugroupid='$groupid' AND id<$curid";
+			mysql_query($query) or die("Query failed : $query " . mysql_error());
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewwiki.php?cid=$cid&id=$id&grp=$groupid");	
+			exit;
+		} else {
+			$curBreadcrumb .= " &gt; <a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid\">View Wiki</a>";
+			$curBreadcrumb .= " &gt; Clear WikiPage History\n";	
+			$pagetitle = "Confirm History Delete";
+		}
+		
+	} else if (isset($_GET['revert']) && isset($teacherid)) {
+		if ($_GET['revert']=='true') {
+			$revision = intval($_GET['torev']);
+			$query = "SELECT revision FROM imas_wiki_revisions WHERE wikiid='$id' AND stugroupid='$groupid' ";
+			$query .= "AND id>=$revision ORDER BY id DESC";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			if (mysql_num_rows($result)>1 && $revision>0) {
+				$row = mysql_fetch_row($result);
+				$base = diffstringsplit($row[0]);
+				while ($row = mysql_fetch_row($result)) { //apply diffs
+					$diffs = explode('],[',substr($row[0],2,strlen($row[0])-4));
+					for ($i = count($diffs)-1; $i>=0; $i--) {
+						$diffs[$i] = explode(',',$diffs[$i]);
+						if ($diffs[$i][0]==2) { //replace
+							if (count($diffs[$i])>4) {
+								$diffs[$i][3] = implode(',',array_slice($diffs[$i],3));
+							}
+							$diffs[$i][3] = str_replace(array('\\"','\\\\'),array('"','\\'),substr($diffs[$i][3],1,strlen($diffs[$i][3])-2));
+							array_splice($base,$diffs[$i][1],$diffs[$i][2],$diffs[$i][3]);
+						} else if ($diffs[$i][0]==0) { //insert
+							if (count($diffs[$i])>3) {
+								$diffs[$i][2] = implode(',',array_slice($diffs[$i],2));
+							}
+							$diffs[$i][2] = str_replace(array('\\"','\\\\'),array('"','\\'),substr($diffs[$i][2],1,strlen($diffs[$i][2])-2));
+							array_splice($base,$diffs[$i][1],0,$diffs[$i][2]);
+						} else if ($diffs[$i][0]==1) { //delete
+							array_splice($base,$diffs[$i][1],$diffs[$i][2]);
+						}
+					}
+				}
+				$newbase = addslashes(implode(' ',$base));
+				echo $newbase;
+				exit;
+				$query = "UPDATE imas_wiki_revisions SET revision='$newbase' WHERE id=$revision";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+				$query = "DELETE FROM imas_wiki_revisions WHERE wikiid='$id' AND stugroupid='$groupid' AND id>$revision";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewwiki.php?cid=$cid&id=$id");	
+			exit;
+		} else {
+			$curBreadcrumb .= " &gt; <a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid\">View Wiki</a>";
+			$curBreadcrumb .= " &gt; Revert Wiki\n";	
+			$pagetitle = "Confirm Wiki Version Revert";
+		}
+	} else { //just viewing
+		$curBreadcrumb .= " &gt; View Wiki";
+	
 		require_once("../filter/filter.php");
 
 		if (isset($teacherid) || $now<$row[3]) {
@@ -115,9 +118,66 @@ if ($cid==0) {
 		} else {
 			$canedit = false;
 		}
+		
+		//if is group wiki, get groupid or fail
+		if ($row[5]>0 && !isset($teacherid)) {
+			$isgroup = true;
+			$groupsetid = $row[5];
+			$query = 'SELECT i_sg.id,i_sg.name FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';
+			$query .= "WHERE i_sgm.userid='$userid' AND i_sg.groupsetid='$groupsetid'";
+			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			if (mysql_num_rows($result)==0) {
+				$overwriteBody=1;
+				$body = "You need to be a member of a group before you can view or edit this wiki";
+				$isgroup = false;
+			} else {
+				$groupid = mysql_result($result,0,0);
+				$curgroupname = mysql_result($result,0,1);
+			}
+		} else if ($row[5]>0 && isset($teacherid)) {
+			$isgroup = true;
+			$groupsetid = $row[5];
+			$stugroup_ids = array();
+			$stugroup_names = array();
+			$i = 0;
+			$query = "SELECT id,name FROM imas_stugroups WHERE groupsetid='$groupsetid' ORDER BY name";
+			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());	
+			while ($row = mysql_fetch_row($result)) {
+				$stugroup_ids[$i] = $row[0];
+				$stugroup_names[$i] = $row[1];
+				if ($row[0]==$groupid) {
+					$curgroupname = $row[1];
+				}
+				$i++;
+			}
+			if ($groupid==0) {
+				if (count($stugroup_ids)==0) {
+					$overwriteBody=1;
+					$body = "No groups exist yet.  There have to be groups before you can view their wikis";
+					$isgroup = false;
+				} else {
+					$groupid = $stugroup_ids[0];
+					$curgroupname = $stugroup_names[0];
+				}
+			}
+		} else {
+			$groupid = 0;
+		}
+					
+		if ($groupid>0) {
+			$grpmem = '<p>Group Members: <ul class="nomark">';
+			$query = "SELECT i_u.LastName,i_u.FirstName FROM imas_stugroupmembers AS i_sg,imas_users AS i_u WHERE ";
+			$query .= "i_u.id=i_sg.userid AND i_sg.stugroupid='$groupid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				$grpmem .= "<li>{$row[0]}, {$row[1]}</li>";
+			} 
+			$grpmem .= '</ul></p>';
+		}
+				
 		$query = "SELECT i_w_r.id,i_w_r.revision,i_w_r.time,i_u.LastName,i_u.FirstName,i_u.id FROM ";
 		$query .= "imas_wiki_revisions as i_w_r JOIN imas_users as i_u ON i_u.id=i_w_r.userid ";
-		$query .= "WHERE i_w_r.wikiid='$id' ORDER BY i_w_r.id DESC";
+		$query .= "WHERE i_w_r.wikiid='$id' AND i_w_r.stugroupid='$groupid' ORDER BY i_w_r.id DESC";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$numrevisions = mysql_num_rows($result);
 		
@@ -150,44 +210,77 @@ if ($cid==0) {
  $pagetitle = "View Wiki: $wikiname";
  $placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/viewwiki.js"></script>';
  $addr = 'http://'.$_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\').'/wikirev.php?cid='.$cid.'&id='.$id;
+ if ($isgroup) {
+	 $addr .= '&grp='.$groupid;
+ }
  $addr2 = 'http://'.$_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\').'/viewwiki.php?revert=ask&cid='.$cid.'&id='.$id;
- 
+ if ($isgroup) {
+	 $addr2 .= '&grp='.$groupid;
+ }
  $placeinhead .= '<script type="text/javascript">var AHAHrevurl = "'.$addr.'"; var reverturl = "'.$addr2.'";</script>';
  $placeinhead .= '<style type="text/css"> a.grayout {color: #ccc; cursor: default;} del {background-color: #f99; text-decoration:none;} ins {background-color: #9f9; text-decoration:none;} .wikicontent {padding: 10px;}</style>';
+ if ($isgroup && isset($teacherid)) {
+	$placeinhead .= "<script type=\"text/javascript\">";
+	$placeinhead .= 'function chgfilter() {';
+	$placeinhead .= '  var gfilter = document.getElementById("gfilter").value;';
+	$placeinhead .= "  window.location = \"viewwiki.php?cid=$cid&id=$id&grp=\"+gfilter;";
+	$placeinhead .= '}';
+	$placeinhead .= '</script>';
+ }
+ 
  require("../header.php");
 
 if ($overwriteBody==1) {
 	echo $body;
+	echo "<p><a href=\"$imasroot/course/course.php?cid=$cid\">Back</a></p>";
 } else {  // DISPLAY 	
 ?>
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
 	<div id="headerviewwiki" class="pagetitle"><h2><?php echo $pagetitle ?></h2></div>
 <?php
+	if (isset($teacherid) && $groupid>0 && !isset($curgroupname)) {
+		$query = "SELECT name FROM imas_stugroups WHERE id='$groupid'";		
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$grpnote = 'group '.mysql_result($result,0,0)."'s";
+	} else {
+		$grpnote = 'this';
+	}
 	if (isset($_GET['delall']) && isset($teacherid)) {
-		echo '<p>Are you SURE you want to delete all contents and history for this Wiki page?</p>';
+		echo '<p>Are you SURE you want to delete all contents and history for '.$grpnote.' Wiki page?</p>';
 		
-		echo "<p><a href=\"viewwiki.php?cid=$cid&id=$id&delall=true\">Yes, I'm Sure</a> | ";
-		echo "<a href=\"viewwiki.php?cid=$cid&id=$id\">Nevermind</a></p>";
+		echo "<p><a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid&delall=true\">Yes, I'm Sure</a> | ";
+		echo "<a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid\">Nevermind</a></p>";
 		
 	} else if (isset($_GET['delrev']) && isset($teacherid)) {
-		echo '<p>Are you SURE you want to delete all revision history for this Wiki page?  The current version will be retained.</p>';
+		echo '<p>Are you SURE you want to delete all revision history for '.$grpnote.' Wiki page?  The current version will be retained.</p>';
 		
-		echo "<p><a href=\"viewwiki.php?cid=$cid&id=$id&delrev=true\">Yes, I'm Sure</a> | ";
-		echo "<a href=\"viewwiki.php?cid=$cid&id=$id\">Nevermind</a></p>";
+		echo "<p><a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid&delrev=true\">Yes, I'm Sure</a> | ";
+		echo "<a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid\">Nevermind</a></p>";
 	} else if (isset($_GET['revert'])) {
 		$torev = $_GET['torev'];
 		$disprev = $_GET['disprev'];
-		echo '<p>Are you SURE you want to revert to revision '.$disprev.' of this Wiki page?  All changes after that revision will be deleted.</p>';
+		echo '<p>Are you SURE you want to revert to revision '.$disprev.' of '.$grpnote.' Wiki page?  All changes after that revision will be deleted.</p>';
 		
-		echo "<p><a href=\"viewwiki.php?cid=$cid&id=$id&torev=$torev&revert=true\">Yes, I'm Sure</a> | ";
-		echo "<a href=\"viewwiki.php?cid=$cid&id=$id\">Nevermind</a></p>";
+		echo "<p><a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid&torev=$torev&revert=true\">Yes, I'm Sure</a> | ";
+		echo "<a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid\">Nevermind</a></p>";
 		
 	} else { //default page display
+		if ($isgroup && isset($teacherid)) {
+			echo '<p>Viewing page for group: ';
+			writeHtmlSelect('gfilter',$stugroup_ids,$stugroup_names,$groupid,null,null,'onchange="chgfilter()"');
+			echo '</p>';
+		} else if ($isgroup) {
+			echo "<p>Group: $curgroupname</p>";
+		}
 ?>
 <?php
 if (isset($teacherid)) {
-	echo "<p><a href=\"viewwiki.php?cid=$cid&id=$id&delall=ask\">Clear Page Contents</a> | ";
-	echo "<a href=\"viewwiki.php?cid=$cid&id=$id&delrev=ask\">Clear Page History</a></p>";
+	echo '<p>';
+	if ($isgroup) {
+		$grpnote = "For this group's wiki: ";
+	}
+	echo "<a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid&delall=ask\">Clear Page Contents</a> | ";
+	echo "<a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid&delrev=ask\">Clear Page History</a></p>";
 }
 echo '<p><span id="revisioninfo">Revision '.$numrevisions;
 if ($numrevisions>0) {
@@ -210,12 +303,15 @@ if ($numrevisions>1) {
 	<div class="editor">
 <?php
 if ($canedit) {
-	echo "<a href=\"editwiki.php?cid=$cid&id=$id\">Edit this page</a>";
+	echo "<a href=\"editwiki.php?cid=$cid&id=$id&grp=$groupid\">Edit this page</a>";
 }
 ?>	
 	<div class="wikicontent" id="wikicontent"><?php echo filter($text); ?></div></div>
 	
 <?php
+if ($isgroup) {
+	echo $grpmem;
+}
 }
 }
 

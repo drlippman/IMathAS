@@ -276,7 +276,7 @@ if ($overwriteBody==1) {
 	<input type=hidden name=ctc id=ctc value="<?php echo $_POST['ctc'] ?>">
 	<h4>Select Calendar Items to Copy</h4>
 	Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
-		
+	
 	<table cellpadding=5 class=gb>
 		<thead>
 		<tr><th></th><th>Date</th><th>Tag</th><th>Text</th></tr>
@@ -327,7 +327,7 @@ if ($overwriteBody==1) {
 	<input type=hidden name=ctc id=ctc value="<?php echo $_POST['ctc'] ?>">
 	<h4>Select Items to Copy</h4>
 	Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
-		
+	
 	<table cellpadding=5 class=gb>
 		<thead>
 		<tr><th></th><th>Type</th><th>Title</th><th>Summary</th></tr>

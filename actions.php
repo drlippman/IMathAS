@@ -404,7 +404,7 @@
 	if ($isgb) {
 		echo '<html><body>Changes Recorded.  <input type="button" onclick="top.GB_hide()" value="Done" /></body></html>';		
 	} else {
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php");
+	header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php");
 	}
 	
 	

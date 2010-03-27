@@ -23,7 +23,8 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	if (isset($teacherid) && isset($sessiondata['sessiontestid']) && !isset($sessiondata['actas'])) {
 		//clean up coming out of an assessment
 		require_once("../includes/filehandler.php");
-		deleteasidfilesbyquery(array('id'=>$sessiondata['sessiontestid']),1);
+		//deleteasidfilesbyquery(array('id'=>$sessiondata['sessiontestid']),1);
+		deleteasidfilesbyquery2('id',$sessiondata['sessiontestid'],null,1);
 		$query = "DELETE FROM imas_assessment_sessions WHERE id='{$sessiondata['sessiontestid']}' LIMIT 1";
 		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());		
 	}
@@ -248,23 +249,46 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		   $newmsgs = '';
 	   }
 	}
-	/*
+	/* very old
 	$query = "SELECT count(*) FROM ";
 	$query .= "(SELECT imas_forum_posts.threadid,max(imas_forum_posts.postdate),mfv.lastview FROM imas_forum_posts ";
 	$query .= "JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id LEFT JOIN imas_forum_views AS mfv ";
 	$query .= "ON mfv.threadid=imas_forum_posts.threadid AND mfv.userid='$userid' WHERE imas_forums.courseid='$cid' ";
 	$query .= "GROUP BY imas_forum_posts.threadid HAVING ((max(imas_forum_posts.postdate)>mfv.lastview) OR (mfv.lastview IS NULL))) AS newitems ";
 	*/	
+	/*
 	$query = "SELECT count(*) FROM ";
 	$query .= "(SELECT imas_forum_threads.id FROM imas_forum_threads ";
 	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id LEFT JOIN imas_forum_views AS mfv ";
 	$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' WHERE imas_forums.courseid='$cid' AND imas_forums.grpaid=0 ";
 	$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL))) AS newitems ";
+	*/
+	$now = time();
+	$query = "SELECT imas_forum_threads.forumid, COUNT(imas_forum_threads.id) FROM imas_forum_threads ";
+	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id AND imas_forums.courseid='$cid' ";
+	if (!isset($teacherid)) {
+		$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now && imas_forums.enddate>$now)) ";
+	}
+	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' ";
+	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+	if (!isset($teacherid)) {
+		$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
+	}
+	$query .= "GROUP BY imas_forum_threads.forumid";
 	
+	/*$query = "SELECT imas_forum_threads.forumid,imas_forum_threads.id FROM imas_forum_threads ";
+	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id AND imas_forums.courseid='$cid' ";
+	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' ";
+	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+	$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
+	*/
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$row = mysql_fetch_row($result);
-	if ($row[0]>0) {
-		$newpostscnt = " <a href=\"$imasroot/forums/newthreads.php?cid=$cid\" style=\"color:red\">New ({$row[0]})</a>";
+	$newpostcnts = array();
+	while ($row = mysql_fetch_row($result)) {
+		$newpostcnts[$row[0]] = $row[1];
+	}
+	if (array_sum($newpostcnts)>0) {
+		$newpostscnt = " <a href=\"$imasroot/forums/newthreads.php?cid=$cid\" style=\"color:red\">New (".array_sum($newpostcnts).")</a>";
 	} else {
 		$newpostscnt = '';	
 	}

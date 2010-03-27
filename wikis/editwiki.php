@@ -29,7 +29,7 @@ if ($cid==0) {
 	$curBreadcrumb = "$breadcrumbbase <a href=\"$imasroot/course/course.php?cid=$cid\">$coursename</a> &gt; ";
 	$curBreadcrumb .= "<a href=\"$imasroot/wikis/viewwiki.php?cid=$cid&id=$id\">View Wiki</a> &gt; Edit Wiki";
 	
-	$query = "SELECT name,startdate,enddate,editbydate,avail FROM imas_wikis WHERE id='$id'";
+	$query = "SELECT name,startdate,enddate,editbydate,avail,groupsetid FROM imas_wikis WHERE id='$id'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$row = mysql_fetch_row($result);
 	$wikiname = $row[0];
@@ -38,7 +38,23 @@ if ($cid==0) {
 		$overwriteBody=1;
 		$body = "This wiki is not currently available for editing";
 	} else {
-	
+		if ($row[5]>0) {
+			if (isset($teacherid)) {
+				$groupid = intval($_GET['grp']);
+				$query = "SELECT name FROM imas_stugroups WHERE id='$groupid'";
+				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				$groupname = mysql_result($result,0,0);
+			} else {
+				$groupsetid = $row[5];
+				$query = 'SELECT i_sg.id,i_sg.name FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';
+				$query .= "WHERE i_sgm.userid='$userid' AND i_sg.groupsetid='$groupsetid'";
+				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				$groupid = mysql_result($result,0,0);
+				$groupname = mysql_result($result,0,1);
+			}
+		} else {
+			$groupid = 0;
+		}
 		if ($_POST['wikicontent']!= null) { //FORM SUBMITTED, DATA PROCESSING
 			$inconflict = false;
 			$stugroupid = 0;
@@ -54,7 +70,7 @@ if ($cid==0) {
 			//check for conflicts
 			$query = "SELECT i_w_r.id,i_w_r.revision,i_w_r.time,i_u.LastName,i_u.FirstName FROM ";
 			$query .= "imas_wiki_revisions as i_w_r JOIN imas_users as i_u ON i_u.id=i_w_r.userid ";
-			$query .= "WHERE i_w_r.wikiid='$id' ORDER BY id DESC LIMIT 1";
+			$query .= "WHERE i_w_r.wikiid='$id' AND i_w_r.stugroupid='$groupid' ORDER BY id DESC LIMIT 1";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (mysql_num_rows($result)>0) {//editing existing wiki
 				$row = mysql_fetch_row($result);
@@ -103,7 +119,7 @@ if ($cid==0) {
 						$wikicontent = addslashes($wikicontent);
 						//insert latest content
 						$query = "INSERT INTO imas_wiki_revisions (wikiid,stugroupid,userid,revision,time) VALUES ";
-						$query .= "($id,'$stugroupid','$userid','$wikicontent',$now)";
+						$query .= "($id,'$groupid','$userid','$wikicontent',$now)";
 						mysql_query($query) or die("Query failed : " . mysql_error());
 						//replace previous version with diff off current version
 						$query = "UPDATE imas_wiki_revisions SET revision='$diffstr' WHERE id='$revisionid'";
@@ -113,19 +129,19 @@ if ($cid==0) {
 			} else { //no wiki page exists yet - just need to insert revision
 				$wikicontent = addslashes($wikicontent);
 				$query = "INSERT INTO imas_wiki_revisions (wikiid,stugroupid,userid,revision,time) VALUES ";
-				$query .= "($id,'$stugroupid','$userid','$wikicontent',$now)";
+				$query .= "($id,'$groupid','$userid','$wikicontent',$now)";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				
 			}
 			if (!$inconflict) {
-				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewwiki.php?cid=$cid&id=$id");
+				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewwiki.php?cid=$cid&id=$id&grp=$groupid");
 				exit;
 			}
 				
 		} else {
 			$query = "SELECT i_w_r.id,i_w_r.revision,i_w_r.time,i_u.LastName,i_u.FirstName FROM ";
 			$query .= "imas_wiki_revisions as i_w_r JOIN imas_users as i_u ON i_u.id=i_w_r.userid ";
-			$query .= "WHERE i_w_r.wikiid='$id' ORDER BY id DESC LIMIT 1";
+			$query .= "WHERE i_w_r.wikiid='$id' AND i_w_r.stugroupid='$groupid' ORDER BY id DESC LIMIT 1";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (mysql_num_rows($result)>0) { //wikipage exists already
 				$row = mysql_fetch_row($result);
@@ -157,6 +173,9 @@ if ($overwriteBody==1) {
 	<div id="headereditwiki" class="pagetitle"><h2><?php echo $pagetitle ?></h2></div>
 
 <?php
+if ($groupid>0) {
+	echo "<p>Group: $groupname</p>";
+}
 if ($inconflict) {
 ?>
 	<p><span style="color:#f00;">Conflict</span>.  Someone else has already submitted a revision to this page since you opened it.
@@ -170,7 +189,7 @@ if (isset($lasteditedby)) {
 	echo "<p>Last Edited by $lasteditedby on $lastedittime</p>";
 }
 ?>
-	<form method=post action="editwiki.php?cid=<?php echo $cid;?>&id=<?php echo $id;?>">
+	<form method=post action="editwiki.php?cid=<?php echo $cid;?>&id=<?php echo $id;?>&grp=<?php echo $groupid;?>">
 	<input type="hidden" name="baserevision" value="<?php echo $revisionid;?>" />
 	<div class="editor">
 	<textarea cols=60 rows=30 id="wikicontent" name="wikicontent" style="width: 100%">

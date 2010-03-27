@@ -48,47 +48,74 @@
 <div style="color: gray; font-size: 80%">Last updated <?php echo formatdate(time());?> <a href="javascript:location.reload(true)">Refresh</a></div>
 <?php
 
-	$query = "SELECT imas_forums.courseid,imas_forums.name,imas_forums.id,imas_forum_posts.threadid,max(imas_forum_posts.postdate) as lastpost,mfv.lastview,count(imas_forum_posts.id) as pcount FROM imas_forum_posts ";
-	$query .= "JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id LEFT JOIN (SELECT * FROM imas_forum_views WHERE userid='$userid') AS mfv ";
-	$query .= "ON mfv.threadid=imas_forum_posts.threadid WHERE imas_forums.grpaid=0 ";
-	if ($_GET['limit']=='teach') {
-		$query .= "AND imas_forums.courseid IN (SELECT courseid FROM imas_teachers WHERE userid='$userid') ";
-	} else if ($_GET['limit']=='take') {
-		$query .= "AND imas_forums.courseid IN (SELECT courseid FROM imas_students WHERE userid='$userid') ";
-	} else {
-		$query .= "AND (imas_forums.courseid IN (SELECT courseid FROM imas_teachers WHERE userid='$userid') ";
-		$query .= "OR imas_forums.courseid IN (SELECT courseid FROM imas_students WHERE userid='$userid')) ";
-	}
-	$query .= "GROUP BY imas_forum_posts.threadid HAVING ((max(imas_forum_posts.postdate)>mfv.lastview) OR (mfv.lastview IS NULL)) ORDER BY lastpost DESC LIMIT 30";
-	
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$courseforums = array();
 	$forumthreads = array();
 	$forumname = array();
 	$lastpost = array();
 	$forumcourse = array();
-	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
-		if (!isset($courseforums[$line['courseid']])) {
-			$courseforums[$line['courseid']] = array();
+	if ($_GET['limit'] != 'take') {//teach or all
+		$query = "SELECT imas_forums.courseid, imas_forums.name, imas_forums.id, imas_forum_threads.id as tid, imas_forum_threads.lastposttime FROM imas_forum_threads ";
+		$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
+		$query .= "JOIN imas_teachers ON imas_forums.courseid=imas_teachers.courseid AND imas_teachers.userid='$userid' ";
+		$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' ";
+		$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+		//$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
+		$query .= "ORDER BY imas_forum_threads.lastposttime DESC LIMIT 30";
+	
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+			if (!isset($courseforums[$line['courseid']])) {
+				$courseforums[$line['courseid']] = array();
+			}
+			if (!isset( $forumthreads[$line['id']])) {
+				 $forumthreads[$line['id']]= array();
+			}
+			//add forum to courseforums list if not already there
+			if (!in_array($line['id'], $courseforums[$line['courseid']])) {
+				$courseforums[$line['courseid']][] = $line['id'];
+			}
+			$forumcourse[$line['id']] = $line['courseid'];
+			//add thread to forumthreads list if not already there
+			if (!in_array($line['tid'], $forumthreads[$line['id']])) {
+				$forumthreads[$line['id']][] = $line['tid'];
+			}
+			$forumname[$line['id']] = $line['name'];
+			$lastpost[$line['tid']] = formatdate($line['lastposttime']);
 		}
-		if (!isset( $forumthreads[$line['id']])) {
-			 $forumthreads[$line['id']]= array();
+	}
+	if ($_GET['limit'] != 'teach') {  //take or all
+		$query = "SELECT imas_forums.courseid, imas_forums.name, imas_forums.id, imas_forum_threads.id as tid, imas_forum_threads.lastposttime FROM imas_forum_threads ";
+		$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
+		$query .= "JOIN imas_students ON imas_forums.courseid=imas_students.courseid AND imas_students.userid='$userid' ";
+		$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' ";
+		$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+		$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
+		$query .= "ORDER BY imas_forum_threads.lastposttime DESC LIMIT 30";
+	
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+			if (!isset($courseforums[$line['courseid']])) {
+				$courseforums[$line['courseid']] = array();
+			}
+			if (!isset( $forumthreads[$line['id']])) {
+				 $forumthreads[$line['id']]= array();
+			}
+			//add forum to courseforums list if not already there
+			if (!in_array($line['id'], $courseforums[$line['courseid']])) {
+				$courseforums[$line['courseid']][] = $line['id'];
+			}
+			$forumcourse[$line['id']] = $line['courseid'];
+			//add thread to forumthreads list if not already there
+			if (!in_array($line['tid'], $forumthreads[$line['id']])) {
+				$forumthreads[$line['id']][] = $line['tid'];
+			}
+			$forumname[$line['id']] = $line['name'];
+			$lastpost[$line['tid']] = formatdate($line['lastposttime']);
 		}
-		//add forum to courseforums list if not already there
-		if (!in_array($line['id'], $courseforums[$line['courseid']])) {
-			$courseforums[$line['courseid']][] = $line['id'];
-		}
-		$forumcourse[$line['id']] = $line['courseid'];
-		//add thread to forumthreads list if not already there
-		if (!in_array($line['threadid'], $forumthreads[$line['id']])) {
-			$forumthreads[$line['id']][] = $line['threadid'];
-		}
-		$forumname[$line['id']] = $line['name'];
-		$lastpost[$line['threadid']] = formatdate($line['lastpost']);
 	}
 	
 	$coursenames = array();
-	$cidlist = "'".implode("','",array_keys($courseforums))."'";
+	$cidlist = implode(',',array_keys($courseforums));
 	$query = "SELECT id,name FROM imas_courses WHERE id IN ($cidlist)";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	while ($row = mysql_fetch_row($result)) {

@@ -231,7 +231,7 @@ function drawTarget(x,y) {
 	if (drawlocky[curTarget]==1) {
 		ctx.lineWidth = 4;
 	} else {
-		ctx.lineWidth = 2;
+	ctx.lineWidth = 2;
 	}
 	ctx.strokeStyle = "rgb(0,0,255)";
 	for (var i=0;i<tplines[curTarget].length; i++) {
@@ -374,7 +374,7 @@ function drawTarget(x,y) {
 			ctx.lineTo(linefirstx-arrowsize,linefirsty+arrowsize);
 			ctx.moveTo(linefirstx,linefirsty);
 			ctx.lineTo(linefirstx-arrowsize,linefirsty-arrowsize);
-		}
+	}
 		if (drawlocky[curTarget]==1 && linelastx<targets[curTarget].imgwidth*.02) {
 			ctx.moveTo(linelastx,linelasty);
 			ctx.lineTo(linelastx+arrowsize,linelasty+arrowsize);
@@ -385,7 +385,7 @@ function drawTarget(x,y) {
 			ctx.lineTo(linefirstx+arrowsize,linefirsty+arrowsize);
 			ctx.moveTo(linefirstx,linefirsty);
 			ctx.lineTo(linefirstx+arrowsize,linefirsty-arrowsize);
-		}
+	}
 	}
 	ctx.stroke();
 	
@@ -833,7 +833,7 @@ function drawMouseMove(ev) {
 							if (dist>25) {
 								lines[curTarget][curLine].push([mouseOff.x,mouseOff.y]);
 								drawTarget();
-							} else {
+					} else {
 								drawTarget(mouseOff.x,mouseOff.y);
 							}
 						} else {

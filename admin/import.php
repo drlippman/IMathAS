@@ -411,7 +411,7 @@ if ($overwriteBody==1) {
 					<input type=hidden name="libs" id="libs"  value="0">
 					<input type=button value="Select Libraries" onClick="libselect()"><br> 
 					Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
-		
+				
 				</p>
 								
 				<table cellpadding=5 class=gb>

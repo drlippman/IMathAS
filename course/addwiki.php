@@ -15,13 +15,6 @@ $useeditor = "description";
 
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 
-if (isset($_GET['id'])) {
-	$curBreadcrumb .= "&gt; Modify Wiki\n";
-	$pagetitle = "Modify Wiki";
-} else {
-	$curBreadcrumb .= "&gt; Add Wiki\n";
-	$pagetitle = "Add Wiki";
-} 
 if (isset($_GET['tb'])) {
 	$totb = $_GET['tb'];
 } else {
@@ -38,7 +31,19 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$cid = $_GET['cid'];
 	$block = $_GET['block'];
 	
-	if ($_POST['name']!= null) { //FORM SUBMITTED, DATA PROCESSING
+	if (isset($_GET['clearattempts'])) {
+		if ($_GET['clearattempts']=='true') {
+			$id = $_GET['id'];
+			$query = "DELETE FROM imas_wiki_revisions WHERE wikiid='$id'";	
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addwiki.php?cid=$cid&id=$id");	
+			exit;
+		} else {
+			$curBreadcrumb .= " &gt; <a href=\"addwiki.php?cid=$cid&id=$id\">Modify Wiki</a>";
+			$curBreadcrumb .= " &gt; Clear all Wiki Revisions\n";	
+			$pagetitle = "Confirm Page Contents Delete";
+		}
+	} else if ($_POST['name']!= null) { //FORM SUBMITTED, DATA PROCESSING
 		require_once("parsedatetime.php");
 		if ($_POST['sdatetype']=='0') {
 			$startdate = 0;
@@ -64,13 +69,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		
 		if (isset($_GET['id'])) {  //already have id - update
 			$query = "UPDATE imas_wikis SET name='{$_POST['name']}',description='{$_POST['description']}',startdate=$startdate,enddate=$enddate,";
-			$query .= "editbydate=$revisedate,avail='{$_POST['avail']}',settings=$settings ";
+			$query .= "editbydate=$revisedate,avail='{$_POST['avail']}',groupsetid='{$_POST['groupsetid']}',settings=$settings ";
 			$query .= "WHERE id='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$newwikiid = $_GET['id'];	
 		} else { //add new
-			$query = "INSERT INTO imas_wikis (courseid,name,description,startdate,enddate,editbydate,avail,settings) VALUES ";
-			$query .= "('$cid','{$_POST['name']}','{$_POST['description']}',$startdate,$enddate,$revisedate,'{$_POST['avail']}',$settings);";
+			$query = "INSERT INTO imas_wikis (courseid,name,description,startdate,enddate,editbydate,avail,settings,groupsetid) VALUES ";
+			$query .= "('$cid','{$_POST['name']}','{$_POST['description']}',$startdate,$enddate,$revisedate,'{$_POST['avail']}',$settings,'{$_POST['groupsetid']}');";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$newwikiid = mysql_insert_id();
 			
@@ -105,6 +110,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			
 		exit;
 	} else { //INITIAL LOAD DATA PROCESS
+		
+		if (isset($_GET['id'])) {
+			$curBreadcrumb .= "&gt; Modify Wiki\n";
+			$pagetitle = "Modify Wiki";
+		} else {
+			$curBreadcrumb .= "&gt; Add Wiki\n";
+			$pagetitle = "Add Wiki";
+		} 
+		
+
 		if (isset($_GET['id'])) { //MODIFY MODE
 			$query = "SELECT * FROM imas_wikis WHERE id='{$_GET['id']}';";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -113,14 +128,23 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$enddate = $line['enddate'];
 			$revisedate = $line['editbydate'];
 			$settings = $line['settings'];
+			$query = "SELECT id FROM imas_wiki_revisions WHERE wikiid='{$_GET['id']}';";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			if (mysql_num_rows($result)>0) {
+				$started = true;
+			} else {
+				$started = false;
+			}
 		} else {
 			$line['name'] = "Enter Wiki Name here";
 			$line['description'] = "<p>Enter Wiki description here</p>";
 			$line['avail'] = 1;
+			$line['groupsetid'] = 0;
 			$startdate = time();
 			$enddate = time() + 7*24*60*60;
 			$revisedate  = 2000000000;
 			$settings = 0;
+			$started = false;
 		}
 		
 		$page_formActionTag = "?block=$block&cid=$cid&folder=" . $_GET['folder'];
@@ -148,6 +172,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$rdate = tzdate("m/d/Y",time()+7*24*60*60);
 			$rtime = tzdate("g:i a",time()+7*24*60*60);
 		}
+		
+		$query = "SELECT id,name FROM imas_stugroupset WHERE courseid='$cid' ORDER BY name";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$i=0;
+		$page_groupSelect = array();
+		while ($row = mysql_fetch_row($result)) {
+			$page_groupSelect['val'][$i] = $row[0];
+			$page_groupSelect['label'][$i] = "Use group set: {$row[1]}";
+			$i++;
+		}
 	}
 }
 
@@ -159,11 +193,28 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 if ($overwriteBody==1) {
 	echo $body;
-} else {  //ONLY INITIAL LOAD HAS DISPLAY 	
+} else {  //DISPLAY 	
 
 ?>
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
 	<div id="headeraddwiki" class="pagetitle"><h2><?php echo $pagetitle ?></h2></div>
+<?php
+if (isset($_GET['clearattempts'])) {
+	$id = $_GET['id'];
+	echo '<p>Are you SURE you want to delete all contents and history for this Wiki page? ';
+	echo 'This will clear contents for all groups if you are using groups.</p>';
+	echo "<p><a href=\"addwiki.php?cid=$cid&id=$id&clearattempts=true\">Yes, I'm Sure</a> | ";
+	echo "<a href=\"addwiki.php?cid=$cid&id=$id\">Nevermind</a></p>";
+
+} else { //default display
+
+if ($started) {
+	echo '<p>Revisions have already been made on this wiki.  Changing group settings has been disabled.  If you want to change the ';
+	echo 'group settings, you should clear all existing wiki content.</p>';
+	echo '<p><input type="button" value="Clear All Wiki Content"  onclick="window.location=\'addwiki.php?cid='.$cid.'&id='.$_GET['id'].'&clearattempts=ask\'" /></p>';
+}
+
+?>
 
 	<form method=post action="addwiki.php<?php echo $page_formActionTag ?>">
 		<span class=form>Name: </span>
@@ -204,6 +255,17 @@ if ($overwriteBody==1) {
 			at <input type=text size=10 name=etime value="<?php echo $etime;?>">
 		</span><BR class=form>	
 		
+		<span class=form>Group wiki?</span><span class=formright>
+<?php
+if ($started) {
+	writeHtmlSelect("ignoregroupsetid",$page_groupSelect['val'],$page_groupSelect['label'],$line['groupsetid'],"Not group forum",0,$started?'disabled="disabled"':'');
+	echo '<input type="hidden" name="groupsetid" value="'.$line['groupsetid'].'" />';
+} else {
+	writeHtmlSelect("groupsetid",$page_groupSelect['val'],$page_groupSelect['label'],$line['groupsetid'],"Not group forum",0);
+}
+?>
+		</span><br class="form"/>
+		
 		<span class=form>Students can edit:</span>
 		<span class=formright>
 			<input type=radio name="rdatetype" value="Always" <?php if ($revisedate==2000000000) { echo "checked=1";}?>/>Always<br/>
@@ -219,7 +281,8 @@ if ($overwriteBody==1) {
 	</form>	
 
 <?php
-}
+}//default display
+} 
 
 require("../footer.php");
 ?>

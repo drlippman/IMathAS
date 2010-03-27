@@ -756,6 +756,9 @@ function gbinstrdisp() {
 				if ($isteacher) {
 					echo "<br/><a class=small href=\"addassessment.php?id={$gbt[0][1][$i][7]}&cid=$cid&from=gb\">[Settings]</a>";
 					echo "<br/><a class=small href=\"isolateassessgrade.php?cid=$cid&aid={$gbt[0][1][$i][7]}\">[Isolate]</a>";
+					if ($gbt[0][1][$i][10]==true) {
+						echo "<br/><a class=small href=\"isolateassessbygroup.php?cid=$cid&aid={$gbt[0][1][$i][7]}\">[By Group]</a>";
+					}
 				} else {
 					echo "<br/><a class=small href=\"isolateassessgrade.php?cid=$cid&aid={$gbt[0][1][$i][7]}\">[Isolate]</a>";
 				}

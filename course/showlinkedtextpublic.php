@@ -6,6 +6,7 @@
 		exit;
 	}
 	$cid = $_GET['cid'];
+	
 	if (isset($_GET['from'])) {
 		$pubcid = $cid;  //swap out cid's before calling validate
 		$cid = $_GET['from'];
@@ -13,14 +14,17 @@
 		require("../validate.php");
 		$fcid = $cid;
 		$cid = $pubcid;
+	} else if (preg_match('/cid=(\d+)/',$_SERVER['HTTP_REFERER'],$matches) && $matches[1]!=$cid) {
+		$pubcid = $cid;  //swap out cid's before calling validate
+		$cid = $matches[1];
+		$_GET['cid'] = $matches[1];
+		require("../validate.php");
+		$fcid = $cid;
+		$cid = $pubcid;
 	} else {
 		$fcid = 0;
 		require("../config.php");
 	}
-	
-	
-	
-	
 			
 	function findinpublic($items,$id) {
 		foreach ($items as $k=>$item) {
@@ -84,11 +88,18 @@
 
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase $titlesimp</div>";
+	
 	echo '<div style="padding-left:10px; padding-right: 10px;">';
 	echo filter($text);
 	echo '</div>';
 	
-	echo "<div class=right><a href=\"public.php?cid={$_GET['cid']}\">Return to Public Course Page</a></div>\n";
+	if (isset($_GET['from'])) {
+		echo "<div class=right><a href=\"course.php?cid={$_GET['cid']}\">Back</a></div>\n";
+	} else if ($fcid>0) {
+		echo "<div class=right><a href=\"{$_SERVER['HTTP_REFERER']}\">Back</a></div>\n";
+	} else {
+		echo "<div class=right><a href=\"public.php?cid={$_GET['cid']}\">Return to the Public Course Page</a></div>\n";
+	}
 	require("../footer.php");	
 
 ?>

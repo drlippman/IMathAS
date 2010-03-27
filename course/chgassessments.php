@@ -28,7 +28,7 @@ if (!(isset($teacherid))) {
 		
 		$sets = array();
 		if (isset($_POST['docopyopt'])) {
-			$tocopy = 'password,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,eqnhelper,showhints,allowlate,noprint,shuffle,gbcategory,cntingb,caltag,calrtag,minscore,exceptionpenalty,isgroup,groupmax,showcat';
+			$tocopy = 'password,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,eqnhelper,showhints,allowlate,noprint,shuffle,gbcategory,cntingb,caltag,calrtag,minscore,exceptionpenalty,groupmax,showcat';
 			
 			$query = "SELECT $tocopy FROM imas_assessments WHERE id='{$_POST['copyopt']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -607,7 +607,8 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 				<input type=text size=4 name="exceptionpenalty" value="<?php echo $line['exceptionpenalty'];?>">%
 				</td>
 			</tr>
-			
+<?php 
+/* removed because gets too confusing with group sets
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgisgroup"/></td>
 				<td class="r">Group assessment: </td>
@@ -624,6 +625,8 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 				<input type="text" name="groupmax" value="<?php echo $line['groupmax'];?>" />
 				</td>
 			</tr>
+*/
+?>
 			<tr class="coptr">
 				<td ><input type="checkbox" name="chgshowqcat"/></td>
 				<td class="r" >Show question categories: </td>

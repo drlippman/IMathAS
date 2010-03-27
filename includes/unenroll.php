@@ -44,6 +44,15 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$unwithd
 	$wikilist =  implode(',',$wikis);
 	$grpwikilist = implode(',',$grpwikis);
 	
+	
+	$stugroups = array();
+	$query = "SELECT imas_stugroups.id FROM imas_stugroups JOIN imas_stugroupset ON imas_stugroups.groupsetid=imas_stugroupset.id WHERE imas_stugroupset.courseid='$cid'";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	while ($row = mysql_fetch_row($result)) {
+		$stugroups[] = $row[0];
+	}
+	$stugrouplist = implode(',',$stugroups);
+	
 	if (count($tounenroll)>0) {
 		$curdir = rtrim(dirname(__FILE__), '/\\');
 		require_once("$curdir/filehandler.php");
@@ -57,11 +66,12 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$unwithd
 		//new
 		$stulist = "'".implode("','",$tounenroll)."'";
 		if (count($assesses)>0) {
+			deleteasidfilesbyquery2('userid',$tounenroll,$assesses);
+			//deleteasidfilesbyquery(array('assessmentid'=>$assesses, 'userid'=>$tounenroll));
 			$query = "DELETE FROM imas_assessment_sessions WHERE assessmentid IN ($aidlist) AND userid IN ($stulist)";
 			mysql_query($query) or die("Query failed : $query" . mysql_error());
 			$query = "DELETE FROM imas_exceptions WHERE assessmentid IN ($aidlist) AND userid IN ($stulist)";
-			mysql_query($query) or die("Query failed : $query" . mysql_error());
-			deleteasidfilesbyquery(array('assessmentid'=>$assesses, 'userid'=>$tounenroll));
+			mysql_query($query) or die("Query failed : $query" . mysql_error());	
 		}
 		if (count($gbitems)>0) {
 			$query = "DELETE FROM imas_grades WHERE gbitemid IN ($gblist) AND userid IN ($stulist)";
@@ -78,38 +88,10 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$unwithd
 		
 		$query = "DELETE FROM imas_students WHERE userid IN ($stulist) AND courseid='$cid'";
 		mysql_query($query) or die("Query failed : $query" . mysql_error());
-		/*
-		foreach ($tounenroll as $uid) {
-			foreach ($assesses as $aid) {
-				deleteasidfilesbyquery(array('assessmentid'=>$aid, 'userid'=>$uid));
-			}
-		}*/
-				
 		
-		//old, replaced with above
-		/*
-		foreach ($tounenroll as $uid) {
-			$query = "DELETE FROM imas_students WHERE userid='$uid' AND courseid='$cid'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-			foreach ($assesses as $aid) {
-				deleteasidfilesbyquery(array('assessmentid'=>$aid, 'userid'=>$uid));
-				
-				$query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='$aid' AND userid='$uid'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
-				$query = "DELETE FROM imas_exceptions WHERE assessmentid='$aid' AND userid='$uid'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
-			}
-			foreach ($gbitems as $gbid) {
-				$query = "DELETE FROM imas_grades WHERE gbitemid='$gbid' AND userid='$uid'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
-			}
-			
-			foreach ($threads as $tid) {
-				$query = "DELETE FROM imas_forum_views WHERE threadid='$tid' AND userid='$uid'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
-			}
-		}
-		*/
+		$query = "DELETE FROM imas_stugroupmembers WHERE userid IN ($stulist) AND stugroupid IN ($stugrouplist)";
+		mysql_query($query) or die("Query failed : $query" . mysql_error());
+		
 		
 		
 	}

@@ -402,7 +402,7 @@ function recordtestdata($limit=false) {
 			$query .= "endtime=$now,reattempting='$reattemptinglist' ";
 		}
 	}
-	if ($testsettings['isgroup']>0 && $sessiondata['groupid']>0) {
+	if ($testsettings['isgroup']>0 && $sessiondata['groupid']>0 && !$isreview) {
 		$query .= "WHERE agroupid='{$sessiondata['groupid']}'";
 	} else {
 		$query .= "WHERE id='$testid' LIMIT 1";
@@ -412,12 +412,7 @@ function recordtestdata($limit=false) {
 }
 
 function deletefilesifnotused($delfrom,$ifnothere) {
-	global $testsettings,$sessiondata, $testid;
-	if ($testsettings['isgroup']>0 && $sessiondata['groupid']>0) {
-		$s3asid = $sessiondata['groupid'];
-	} else {
-		$s3asid = $testid;
-	}
+	global $testsettings,$sessiondata, $testid, $isreview;
 	$outstr = '';
 	preg_match_all('/@FILE:(.+?)@/',$delfrom,$matches);
 	foreach($matches[0] as $match) {
@@ -426,8 +421,12 @@ function deletefilesifnotused($delfrom,$ifnothere) {
 		}
 	}
 	require_once("../includes/filehandler.php");
-	deleteasidfilesfromstring($outstr,$s3asid);
-	
+	if ($testsettings['isgroup']>0 && $sessiondata['groupid']>0 && !$isreview) {
+		deleteasidfilesfromstring2($outstr,'agroupid',$sessiondata['groupid'],$testsettings['id']);
+	} else {
+		deleteasidfilesfromstring2($outstr,'id',$testid,$testsettings['id']);
+	}
+	//deleteasidfilesfromstring($outstr);
 }
 
 //can improve question score?
@@ -587,7 +586,7 @@ function seqshowqinfobar($qn,$toshow) {
 			if (isset($CFG['TE']['navicons'])) {
 				echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['untried']}\"/> ";
 			} else {
-				echo "<img src=\"$imasroot/img/q_fullbox.gif\"/> ";
+			echo "<img src=\"$imasroot/img/q_fullbox.gif\"/> ";
 			}
 		} else {
 			if (isset($CFG['TE']['navicons'])) {
@@ -597,8 +596,8 @@ function seqshowqinfobar($qn,$toshow) {
 					echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['canretrypartial']}\"/> ";
 				}
 			} else {
-				echo "<img src=\"$imasroot/img/q_halfbox.gif\"/> ";
-			}
+			echo "<img src=\"$imasroot/img/q_halfbox.gif\"/> ";
+		}
 		}
 		echo "<span class=current><a name=\"curq\">$qlinktxt</a></span>  ";
 	} else {
@@ -608,7 +607,7 @@ function seqshowqinfobar($qn,$toshow) {
 			if (isset($CFG['TE']['navicons'])) {
 				echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['untried']}\"/> ";
 			} else {
-				echo "<img src=\"$imasroot/img/q_fullbox.gif\"/> ";
+			echo "<img src=\"$imasroot/img/q_fullbox.gif\"/> ";
 			}
 			echo "<a href=\"showtest.php?action=seq&to=$qn#curq\">$qlinktxt</a>.  ";
 			$qavail = true;
@@ -621,7 +620,7 @@ function seqshowqinfobar($qn,$toshow) {
 					echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['canretrypartial']}\"/> ";
 				}
 			} else {
-				echo "<img src=\"$imasroot/img/q_halfbox.gif\"/> ";
+			echo "<img src=\"$imasroot/img/q_halfbox.gif\"/> ";
 			}
 			echo "<a href=\"showtest.php?action=seq&to=$qn#curq\">$qlinktxt</a>.  ";
 			$qavail = true;
@@ -640,7 +639,7 @@ function seqshowqinfobar($qn,$toshow) {
 					}
 				}
 			} else {
-				echo "<img src=\"$imasroot/img/q_emptybox.gif\"/> ";
+			echo "<img src=\"$imasroot/img/q_emptybox.gif\"/> ";
 			}
 			echo "<a href=\"showtest.php?action=seq&to=$qn#curq\">$qlinktxt</a>.  ";
 		} else {
@@ -658,7 +657,7 @@ function seqshowqinfobar($qn,$toshow) {
 					}
 				}
 			} else {
-				echo "<img src=\"$imasroot/img/q_emptybox.gif\"/> ";
+			echo "<img src=\"$imasroot/img/q_emptybox.gif\"/> ";
 			}
 			echo "$qlinktxt.  ";
 		}

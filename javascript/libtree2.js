@@ -138,9 +138,9 @@ function setlib() {
 		} catch(er) {}
 	}
 	if (opener) {
-		opener.setlib(chlibs.join(","));
-		opener.setlibnames(chlibsn.join(", "));
-		self.close();
+	opener.setlib(chlibs.join(","));
+	opener.setlibnames(chlibsn.join(", "));
+	self.close();
 	} else {
 		top.setlib(chlibs.join(","));
 		top.setlibnames(chlibsn.join(", "));

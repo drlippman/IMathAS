@@ -199,7 +199,7 @@
 	} else {
 		echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&page=$page&thread=$threadid&view=2\">View Condensed</a>";
 	}*/
-	
+		
 ?>
 	<script type="text/javascript">
 	function toggleshow(bnum) {
@@ -215,7 +215,7 @@
 	       //if (butn.value=='Expand') {butn.value = 'Collapse';} else {butn.value = '-';}
 	//       butn.value = 'Collapse';
 		butn.src = imasroot+'/img/collapse.gif';
-	   }
+	}
 	}
 	function toggleitem(inum) {
 	   var node = document.getElementById('item'+inum);
@@ -432,8 +432,8 @@
 					echo "</div>\n";
 				}
 			//}
+			}
 		}
-	}
 	if ($isteacher && $haspoints) {
 		echo "<form method=post action=\"thread.php?cid=$cid&forum=$forumid&page=$page&score=true\">";
 	}

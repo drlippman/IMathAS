@@ -22,7 +22,8 @@ function enditem($canedit) {
 }
 
   function showitems($items,$parent,$inpublic=false) {
-	   global $teacherid,$tutorid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$hideicons,$exceptions,$latepasses,$graphicalicons,$ispublic,$studentinfo,$CFG;
+	   global $teacherid,$tutorid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift;
+	   global $hideicons,$exceptions,$latepasses,$graphicalicons,$ispublic,$studentinfo,$newpostcnts,$CFG;
 	   
 	   if (!isset($CFG['CPS']['itemicons'])) {
 	   	   $itemicons = array('folder'=>'folder2.gif', 'assess'=>'assess.png',
@@ -857,10 +858,10 @@ function enditem($canedit) {
 		   } else if ($line['itemtype']=="Forum") {
 			   if ($ispublic) { continue;}
 			   $typeid = $line['typeid'];
-			   $query = "SELECT id,name,description,startdate,enddate,grpaid,avail,postby,replyby FROM imas_forums WHERE id='$typeid'";
+			   $query = "SELECT id,name,description,startdate,enddate,groupsetid,avail,postby,replyby FROM imas_forums WHERE id='$typeid'";
 			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
-			   $dofilter = false;
+			   /*$dofilter = false;
 			   if ($line['grpaid']>0) {
 				if (!$viewall) {
 					$query = "SELECT agroupid FROM imas_assessment_sessions WHERE assessmentid='{$line['grpaid']}' AND userid='$userid'";
@@ -918,6 +919,7 @@ function enditem($canedit) {
 					   }
 				   }
 			   }
+			   */
 			  
 			  
 			   if (strpos($line['description'],'<p>')!==0) {
@@ -958,8 +960,8 @@ function enditem($canedit) {
 				   }
 				   echo "<div class=title> ";
 				   echo "<b><a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}\">{$line['name']}</a></b>\n";
-				   if ($hasnewitems) {
-					   echo " <a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}&page=-1\" style=\"color:red\">New Posts</a>";
+				   if (isset($newpostcnts[$line['id']]) && $newpostcnts[$line['id']]>0 ) {
+					   echo " <a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}&page=-1\" style=\"color:red\">New Posts ({$newpostcnts[$line['id']]})</a>";
 				   }
 				   if ($viewall) { 
 					   echo '<span class="instrdates">';
@@ -989,13 +991,13 @@ function enditem($canedit) {
 					   echo "<div class=icon style=\"background-color: #ccc;\">F</div>";
 				   }   
 				   echo "<div class=title><i> <b><a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}\">{$line['name']}</a></b></i> ";
-				   
+				   if (isset($newpostcnts[$line['id']]) && $newpostcnts[$line['id']]>0 ) {
+					   echo " <a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}&page=-1\" style=\"color:red\">New Posts ({$newpostcnts[$line['id']]})</a>";
+				   }
 				   echo '<span class="instrdates">';
 				   echo "<br/><i>$show </i>";
 				   echo '</span>';
-				   if ($hasnewitems) {
-					   echo " <span style=\"color:red\">New Posts</span>";
-				   }
+				    
 				   if ($canedit) {
 					   echo '<span class="instronly">';
 					   echo "<a href=\"addforum.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
@@ -1026,19 +1028,33 @@ function enditem($canedit) {
 			   } else {
 				   $enddate = formatdate($line['enddate']);
 			   }
+			   $hasnew = false;
 			   if ($viewall || $line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
-			   	   $query = "SELECT time FROM imas_wiki_revisions WHERE wikiid='$typeid' ORDER BY time DESC LIMIT 1";
-			   	   $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			   	   $hasnew = false;
-			   	   if (mysql_num_rows($result)>0) {
-			   	   	   $lastrevised = mysql_result($result,0,0);
+			   	   if ($line['groupsetid']>0 && !$canedit) {
+			   	   	   $query = 'SELECT i_sg.id,i_sg.name FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';
+			   	   	   $query .= "WHERE i_sgm.userid='$userid' AND i_sg.groupsetid='{$line['groupsetid']}'";
+			   	   	   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			   	   	   if (mysql_num_rows($result)>0) {
+			   	   	   	   $wikigroupid = mysql_result($result,0,0);
+			   	   	   } else {
+			   	   	   	   $wikigroupid = 0;
+			   	   	   }
+			   	   }
+				   $query = "SELECT time FROM imas_wiki_revisions WHERE wikiid='$typeid' ";
+				   if ($line['groupsetid']>0 && !$canedit) { //if group and not instructor limit to group
+				   	   $query .= "AND stugroupid='$wikigroupid' ";
+				   }
+				   $query .= "ORDER BY time DESC LIMIT 1";
+				   $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				   if (mysql_num_rows($result)>0) {
+					   $lastrevised = mysql_result($result,0,0);
 					   $query = "SELECT lastview FROM imas_wiki_views WHERE userid='$userid' AND wikiid='$typeid'";
 					   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 					   if (mysql_num_rows($result)==0 || mysql_result($result,0,0)<$lastrevised) {
-					   	   $hasnew = true;
+						   $hasnew = true;
 					   }
 				   }
-			   } 	   
+			   }   
 			   if ($line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
 				   if ($line['avail']==2) {
 					   $show = "Showing Always ";
@@ -1155,6 +1171,12 @@ function enditem($canedit) {
 		}
 		$html .= "Forum</a> | ";
 		
+		$html .= "<a href=\"addwiki.php?block=$blk&tb=$tb&cid=$cid\">";
+		if (isset($CFG['CPS']['miniicons']['wiki'])) {
+			$html .= "<img class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['wiki']}\"/> ";
+		}
+		$html .= "Wiki</a> | ";
+		
 		$html .= "<a href=\"addblock.php?block=$blk&tb=$tb&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['folder'])) {
 			$html .= "<img class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['folder']}\"/> ";
@@ -1180,6 +1202,7 @@ function enditem($canedit) {
 		$html .= "<option value=\"inlinetext\">Add Inline Text</option>\n";
 		$html .= "<option value=\"linkedtext\">Add Linked Text</option>\n";
 		$html .= "<option value=\"forum\">Add Forum</option>\n";
+		$html .= "<option value=\"wiki\">Add Wiki</option>\n";
 		$html .= "<option value=\"block\">Add Block</option>\n";
 		$html .= "<option value=\"calendar\">Add Calendar</option>\n";
 		$html .= "</select><BR>\n";
@@ -1338,6 +1361,13 @@ function enditem($canedit) {
 	   while ($row = mysql_fetch_row($result)) {
 		   $id = array_shift($row);
 		   $iteminfo['Forum'][$id] = $row;
+	   }
+	   
+	   $query = "SELECT id,name,startdate,enddate,avail FROM imas_wikis WHERE courseid='$cid'";
+	   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	   while ($row = mysql_fetch_row($result)) {
+		   $id = array_shift($row);
+		   $iteminfo['Wiki'][$id] = $row;
 	   }
 	   $now = time() + $previewshift;
 	   for ($i=0;$i<count($items); $i++) {
@@ -1621,6 +1651,53 @@ function enditem($canedit) {
 				   echo '<span class="links">';
 				   echo " <a href=\"addforum.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
 				  echo "<a href=\"deleteforum.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
+				  echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+				  echo '</span>';
+			   }
+			   echo '</li>';
+		   } else if ($itemtypes[$items[$i]][0] == 'Wiki') {
+			   $typeid = $itemtypes[$items[$i]][1];
+			   list($line['name'],$line['startdate'],$line['enddate'],$line['avail']) = $iteminfo['Wiki'][$typeid];
+			   if ($line['startdate']==0) {
+				   $startdate = "Always";
+			   } else {
+				   $startdate = formatdate($line['startdate']);
+			   }
+			   if ($line['enddate']==2000000000) {
+				   $enddate = "Always";
+			   } else {
+				   $enddate =formatdate($line['enddate']);
+			   }
+			   if ($line['avail']==2) {
+					$color = '#0f0';
+				} else if ($line['avail']==0) {
+				   $color = '#ccc';
+			   } else {
+					$color = makecolor2($line['startdate'],$line['enddate'],$now);
+				}
+		           if (!isset($CFG['CPS']['miniicons']['wiki'])) {
+				$icon  = '<span class=icon style="background-color:'.$color.'">W</span>';
+			   } else {
+				$icon = '<img src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['wiki'].'" class="mida icon" /> ';
+			   }
+			   echo '<li id="'.$items[$i].'">'.$icon;
+			  if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
+				   //echo '<b>'.$line['name']. "</b>";
+				   echo '<b><span id="W'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
+				   if ($showdates) {
+					   echo " showing until $enddate";
+				   }
+			   } else {
+				   echo '<i><b><span id="W'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b></i>";
+				   //echo '<i><b>'.$line['name']. "</b></i>";
+				   if ($showdates) {
+					   echo " showing $startdate until $enddate";
+				   }
+			   }
+			   if ($showlinks) {
+				   echo '<span class="links">';
+				   echo " <a href=\"addwiki.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
+				  echo "<a href=\"deletewiki.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
 				  echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
 				  echo '</span>';
 			   }

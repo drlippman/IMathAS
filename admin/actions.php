@@ -58,6 +58,8 @@ switch($_GET['action']) {
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
 		//todo: delete user picture files
 		//todo: delete user file uploads 
+		require("../includes/filehandler.php");
+		deletealluserfiles($_GET['id']);
 		//todo: delete courses if any
 		break;
 	case "chgpwd":
@@ -253,19 +255,8 @@ switch($_GET['action']) {
 		$query = "SELECT id FROM imas_assessments WHERE courseid='{$_GET['id']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($line = mysql_fetch_row($result)) {
-			/* work on fileupload
-			$query = "SELECT lastanswers,bestlastanswers,reviewlastanswers FROM imas_assessment_sessions WHERE assessmentid='{$line[0]}'";
-			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-			while (mysql_fetch_row($result)) {
-				preg_match_all("/@FILE:([^@]+)@/",$row[0].$row[1].$row[2],$matches);
-				if (count($matches)>0) {
-					foreach($matches[1] as $file) {
-						$s3object = '/adata/'.$_GET['asid'].'/'.$file;
-						$s3->delete($s3object);
-					}
-				}
-			}
-			*/
+			require("../includes/filehandler.php");
+			deleteallaidfiles($line[0]);
 			$query = "DELETE FROM imas_questions WHERE assessmentid='{$line[0]}'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			$query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='{$line[0]}'";
@@ -300,7 +291,7 @@ switch($_GET['action']) {
 		$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($wid = mysql_fetch_row($r2)) {
 			$query = "DELETE FROM imas_wiki_revisions WHERE wikiid=$wid";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+		mysql_query($query) or die("Query failed : " . mysql_error());
 			$query = "DELETE FROM imas_wiki_views WHERE wikiid=$wid";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		}
@@ -366,6 +357,20 @@ switch($_GET['action']) {
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		
 		$query = "DELETE FROM imas_calitems WHERE courseid='{$_GET['id']}'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		
+		$query = "SELECT id FROM imas_stugroupset WHERE courseid='{$_GET['id']}'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			$q2 = "SELECT id FROM imas_stugroups WHERE groupsetid='{$row[0]}'";
+			$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+			while ($row2 = mysql_fetch_row($r2)) {
+				$query = "DELETE FROM imas_stugroupmembers WHERE stugroupid='{$row2[0]}'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+			$query = "DELETE FROM imas_stugroups WHERE groupsetid='{$row[0]}'";
+		}
+		$query = "DELETE FROM imas_stugroupset WHERE courseid='{$_GET['id']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		
 		break;
@@ -487,6 +492,7 @@ switch($_GET['action']) {
 		if ($myrights <100) { echo "You don't have the authority for this action"; break;}
 		$old = time() - 60*60*24*30*$_POST['months'];
 		$who = $_POST['who'];
+		require("../includes/filehandler.php");
 		if ($who=="students") {
 			$query = "SELECT id FROM imas_users WHERE  lastaccess<$old AND (rights=0 OR rights=10)";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -504,7 +510,8 @@ switch($_GET['action']) {
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				//these could break parent structure for forums!
 				//$query = "DELETE FROM imas_forum_posts WHERE forumid='{$row[0]}' AND posttype=0";
-				//mysql_query($query) or die("Query failed : " . mysql_error());	
+				//mysql_query($query) or die("Query failed : " . mysql_error());
+				deletealluserfiles($uid);
 			}
 			$query = "DELETE FROM imas_users WHERE lastaccess<$old AND (rights=0 OR rights=10)";
 		} else if ($who=="all") {

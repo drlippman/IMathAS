@@ -1328,7 +1328,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 				$answerformat[] = "opendot";
 			}
 		} else {
-			$settings = array(-5,5,-5,5,1,1,300,300,"","");
+		$settings = array(-5,5,-5,5,1,1,300,300,"","");
 			$locky = 0;
 		}
 		if (isset($grid)) {
@@ -1460,12 +1460,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 							$saarr[$k] .= ','.$function[1].','.$function[2];
 							if ($locky==1) {
 								$saarr[$k] .=',,,3';
-							}
-						}
-						if ($locky==1) {
-							$saarr[$k] .=',,,,,3';
 						}
 					}
+						if ($locky==1) {
+							$saarr[$k] .=',,,,,3';
+				}
+			}
 				}
 			}
 			if ($answerformat[0]=="polygon") {
@@ -1492,7 +1492,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		$out .= "<input type=\"file\" name=\"qn$qn\" id=\"qn$qn\" />\n";
 		if ($la!='') {
 			if (isset($GLOBALS['testsettings']) && isset($GLOBALS['sessiondata']['groupid']) && $GLOBALS['testsettings']>0 && $GLOBALS['sessiondata']['groupid']>0) {
-				$s3asid = $GLOBALS['sessiondata']['groupid'];
+				$s3asid = 'grp'.$GLOBALS['sessiondata']['groupid'].'/'.$GLOBALS['testsettings']['id'];
 			} else if (isset($GLOBALS['asid'])) {
 				$s3asid = $GLOBALS['asid'];
 			} 
@@ -1503,8 +1503,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 					$out .= "<br/>$la";
 				} else {
 					$file = preg_replace('/@FILE:(.+?)@/',"$1",$la);
-					$url = getasidfileurl($s3asid,$file);
-					$out .= "<br/>Last file uploaded: <a href=\"$url\" target=\"_new\">$file</a>";
+					$url = getasidfileurl($file);
+					$filename = basename($file);
+					$out .= "<br/>Last file uploaded: <a href=\"$url\" target=\"_new\">$filename</a>";
 				}
 			} else {
 				$out .= "<br/>$la";
@@ -2009,19 +2010,19 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						return 0;
 					}
 				} else {
-					$cpts = parsecomplex($tchk);
+				$cpts = parsecomplex($tchk);
 					if (!is_array($cpts)) {
 						return 0;
 					}
-					if ($cpts[1]{0}=='+') {
-						$cpts[1] = substr($cpts[1],1);
-					}
-					//echo $cpts[0].','.$cpts[1].'<br/>';
-					if (!checkanswerformat($cpts[0],$ansformats) || !checkanswerformat($cpts[1],$ansformats)) {
-						return 0;
-					}
+				if ($cpts[1]{0}=='+') {
+					$cpts[1] = substr($cpts[1],1);
+				}
+				//echo $cpts[0].','.$cpts[1].'<br/>';
+				if (!checkanswerformat($cpts[0],$ansformats) || !checkanswerformat($cpts[1],$ansformats)) {
+					return 0;
 				}
 			}
+		}
 		}
 		if (!isset($answerformat)) { $answerformat = '';}
 		$ansformats = explode(',',$answerformat);
@@ -2663,7 +2664,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (substr($answerformat,0,10)=='numberline') {
 			$settings = array(-5,5,-0.5,0.5,1,0,300,50);
 		} else {
-			$settings = array(-5,5,-5,5,1,1,300,300);
+		$settings = array(-5,5,-5,5,1,1,300,300);
 		}
 		if (isset($grid)) {
 			if (!is_array($grid)) {
@@ -3323,35 +3324,42 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$GLOBALS['scoremessages'] .= "Error - Invalid file type";
 			return 0;
 		}
-		if (isset($GLOBALS['testsettings']) && isset($GLOBALS['sessiondata']['groupid']) && $GLOBALS['testsettings']>0 && $GLOBALS['sessiondata']['groupid']>0) {
-			$s3asid = $GLOBALS['sessiondata']['groupid'];
-		} else if (isset($GLOBALS['asid'])) {
-			$s3asid = $GLOBALS['asid'];
+		//if($GLOBALS['isreview']) {echo 'TRUE';}
+		if (isset($GLOBALS['asid'])) { //going to use assessmentid/random
+			$randstr = '';
+			for ($i=0; $i<6; $i++) {
+				$n = rand(0,61);
+				if ($n<10) { $randstr .= chr(48+$n);}
+				else if ($n<36) { $randstr .= chr(65 + $n-10);}
+				else { $randstr .= chr(97 + $n-36);}
+			}
+			$s3asid = $GLOBALS['testsettings']['id']."/$randstr";
 		} else {
 			$GLOBALS['partlastanswer'] = "Error - no asid";
 			$GLOBALS['scoremessages'] .= "Error - no asid";
 			return 0;
 		}
-		if ($s3asid==0) {
+		if (is_numeric($s3asid) && $s3asid==0) {  //set in testquestion for preview
 			$GLOBALS['partlastanswer'] = "Error - File not uploaded in preview";
 			$GLOBALS['scoremessages'] .= "Error - File not uploaded in preview";
 			return 0;
 		}
+		/*
+		not needed if each file is randomly coded
 		if (isset($GLOBALS['isreview']) && $GLOBALS['isreview']==true) {
 			$filename = 'rev-'.$filename;
-		}
+		}*/
 		if (is_uploaded_file($_FILES["qn$qn"]['tmp_name'])) {
 			require_once("../includes/filehandler.php");
 
 			$s3object = "adata/$s3asid/$filename";
 			if (storeuploadedfile("qn$qn",$s3object)) {
-				$GLOBALS['partlastanswer'] = "@FILE:$filename@";
+				$GLOBALS['partlastanswer'] = "@FILE:$s3asid/$filename@";
 				$GLOBALS['scoremessages'] .= "Successful";
 			} else {
 				//echo "Error storing file";
 				$GLOBALS['partlastanswer'] = "Error storing file";
 				$GLOBALS['scoremessages'] .= "Error storing file";
-				
 			}
 			return 0;
 		} else {

@@ -17,6 +17,7 @@ $body = "";
 
 $cid = intval($_GET['cid']);
 $id = intval($_GET['id']);
+$groupid = intval($_GET['grp']);
 
 if ($cid==0) {
 	$overwriteBody=1;
@@ -43,7 +44,7 @@ if ($cid==0) {
 		}
 		$query = "SELECT i_w_r.id,i_w_r.revision,i_w_r.time,i_u.LastName,i_u.FirstName,i_u.id FROM ";
 		$query .= "imas_wiki_revisions as i_w_r JOIN imas_users as i_u ON i_u.id=i_w_r.userid ";
-		$query .= "WHERE i_w_r.wikiid='$id' ORDER BY i_w_r.id DESC";
+		$query .= "WHERE i_w_r.wikiid='$id' AND i_w_r.stugroupid='$groupid' ORDER BY i_w_r.id DESC";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$numrevisions = mysql_num_rows($result);
 		

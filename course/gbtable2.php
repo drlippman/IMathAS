@@ -59,6 +59,7 @@ row[0][1][0][6] = 0 online, 1 offline, 2 discussion
 row[0][1][0][7] = assessmentid, gbitemid, forumid
 row[0][1][0][8] = tutoredit: 0 no, 1 yes
 row[0][1][0][9] = 5 number summary, if not limuser-ed
+row[0][1][0][10] = 0 regular, 1 group
 
 row[0][2] category totals
 row[0][2][0][0] = "Category Name"
@@ -161,7 +162,7 @@ function gbtable() {
 	}
 	//Pull Assessment Info
 	$now = time();
-	$query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail FROM imas_assessments WHERE courseid='$cid' AND avail>0 ";
+	$query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail,groupsetid FROM imas_assessments WHERE courseid='$cid' AND avail>0 ";
 	if (!$canviewall) {
 		$query .= "AND cntingb>0 ";
 	}
@@ -184,6 +185,7 @@ function gbtable() {
 	$assessmenttype = array();
 	$enddate = array();
 	$tutoredit = array();
+	$isgroup = array();
 	$avail = array();
 	$sa = array();
 	$category = array();
@@ -209,6 +211,7 @@ function gbtable() {
 			$avail[$kcnt] = 0;
 		}
 		$category[$kcnt] = $line['gbcategory'];
+		$isgroup[$kcnt] = ($line['groupsetid']!=0);
 		$name[$kcnt] = $line['name'];
 		$cntingb[$kcnt] = $line['cntingb']; //0: ignore, 1: count, 2: extra credit, 3: no count but show
 		if ($deffeedback[0]=='Practice') { //set practice as no count in gb
@@ -433,6 +436,7 @@ function gbtable() {
 				if (isset($assessments[$k])) {
 					$gb[0][1][$pos][6] = 0; //0 online, 1 offline
 					$gb[0][1][$pos][7] = $assessments[$k];
+					$gb[0][1][$pos][10] = $isgroup[$k];
 					$assesscol[$assessments[$k]] = $pos;
 				} else if (isset($grades[$k])) {
 					$gb[0][1][$pos][6] = 1; //0 online, 1 offline
@@ -469,6 +473,7 @@ function gbtable() {
 			if (isset($assessments[$k])) {
 				$gb[0][1][$pos][6] = 0; //0 online, 1 offline
 				$gb[0][1][$pos][7] = $assessments[$k];
+				$gb[0][1][$pos][10] = $isgroup[$k];
 				$assesscol[$assessments[$k]] = $pos;
 			} else if (isset($grades[$k])) {
 				$gb[0][1][$pos][6] = 1; //0 online, 1 offline
