@@ -598,7 +598,7 @@
 	}
 	//IP: eqntips 
 	if ($testsettings['showtips']==2) {
-		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqntips.js?v=012810\"></script>";
+		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqntips.js?v=032810\"></script>";
 	}
 	$cid = $testsettings['courseid'];
 	

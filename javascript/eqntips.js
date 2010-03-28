@@ -69,6 +69,9 @@ function showehdd(eln,shorttip,qn) {
 	if (eecurel!=null && eecurel==eln) {
 		return;
 	}
+	if (document.getElementById("tips"+qn)==null) {
+		return;
+	}
 	//if new el, no need to timeout, since moving it
 	if (ehddclosetimer && eln!=curehdd) {
 		window.clearTimeout(ehddclosetimer);
