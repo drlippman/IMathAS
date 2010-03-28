@@ -47,6 +47,7 @@
 	$groupsetid = mysql_result($result,0,3);
 	$sortby = mysql_result($result,0,4);
 	$dofilter = false;
+	$now = time();
 	if ($groupsetid>0) {
 		if (isset($_GET['ffilter'])) {
 			$sessiondata['ffilter'.$forumid] = $_GET['ffilter'];
