@@ -77,6 +77,25 @@
 			$isnewitem = false;
 		}
 	}
+	//check for grades marked as newscore that aren't really new
+	//shouldn't happen, but could happen if two browser windows open
+	if (isset($_POST['newscore'])) {
+		$keys = array_keys($_POST['newscore']);
+		foreach ($keys as $k=>$v) {
+			if (trim($v)=='') {unset($keys[$k]);}
+		}
+		if (count($keys)>0) {
+			$kl = implode(',',$keys);
+			$query = "SELECT userid FROM imas_grades WHERE gbitemid='{$_GET['gbitem']}' AND userid IN ($kl)";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			while($row = mysql_fetch_row($result)) {
+				$_POST['score'][$row[0]] = $_POST['newscore'][$row[0]];
+				unset($_POST['newscore'][$row[0]]);
+			}
+			
+		}
+	}
+	
 	if (isset($_POST['score'])) {
 		
 		foreach($_POST['score'] as $k=>$sc) {

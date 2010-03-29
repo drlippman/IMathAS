@@ -2133,7 +2133,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 			$answer = $aarr;
 		}
-	
+
 		if (in_array('exactlist',$ansformats)) {
 			$gaarr = explode(',',$givenans);
 			//$anarr = explode(',',$answer);
