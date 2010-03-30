@@ -51,7 +51,6 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$unwithd
 	while ($row = mysql_fetch_row($result)) {
 		$stugroups[] = $row[0];
 	}
-	$stugrouplist = implode(',',$stugroups);
 	
 	if (count($tounenroll)>0) {
 		$curdir = rtrim(dirname(__FILE__), '/\\');
@@ -89,8 +88,11 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$unwithd
 		$query = "DELETE FROM imas_students WHERE userid IN ($stulist) AND courseid='$cid'";
 		mysql_query($query) or die("Query failed : $query" . mysql_error());
 		
-		$query = "DELETE FROM imas_stugroupmembers WHERE userid IN ($stulist) AND stugroupid IN ($stugrouplist)";
-		mysql_query($query) or die("Query failed : $query" . mysql_error());
+		if (count($stugroups)>0) {
+			$stugrouplist = implode(',',$stugroups);
+			$query = "DELETE FROM imas_stugroupmembers WHERE userid IN ($stulist) AND stugroupid IN ($stugrouplist)";
+			mysql_query($query) or die("Query failed : $query" . mysql_error());
+		}
 		
 		
 		
