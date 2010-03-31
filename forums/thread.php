@@ -88,6 +88,8 @@
 				$limthreads = implode(',',$limthreads);
 			}
 		}
+	} else {
+		$groupid = 0;
 	}
 	
 	
