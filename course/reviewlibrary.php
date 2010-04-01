@@ -269,11 +269,19 @@ if ($myrights<20) {
 		if (!$myq) {
 			$page_canModifyMsg = "<p>This question is not set to allow you to modify the code.  You can only view the code and make additional library assignments</p>";
 		}
+		if (isset($CFG['AMS']['showtips'])) {
+			$showtips = $CFG['AMS']['showtips'];
+		} else {
+			$showtips = 1;
+		}
 	}
 }
 
 /******* begin html output ********/
 $sessiondata['coursetheme'] = $coursetheme;
+if ($showtips==2) {
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqntips.js?v=012810\"></script>";
+}
 require("../assessment/header.php");
 
 if ($overwriteBody==1) {

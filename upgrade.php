@@ -448,43 +448,45 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			}
 		}
 		if ($last < 30.5) {
-			//update files.  Need to update before changinge agroupids so we will know the curs3asid
-			$query = "SELECT id,agroupid,lastanswers,bestlastanswers,reviewlastanswers,assessmentid FROM imas_assessment_sessions ";
-			$query .= "WHERE lastanswers LIKE '%@FILE:%' OR bestlastanswers LIKE '%@FILE:%' OR reviewlastanswers LIKE '%@FILE:%'";
-			$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
-			require("./includes/filehandler.php");
-			$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
-			$doneagroups = array();
-			while ($row = mysql_fetch_row($result)) {
-				//set path to aid/asid/  or aid/agroupid/  - won't interefere with random values, and easier to do.
-				if ($row[1]==0) {
-					$path = $row[5].'/'.$row[0];
-					$curs3asid = $row[0];
-				} else {
-					$path = $row[5].'/'.$row[1];
-					$curs3asid = $row[1];
-				}
-				if ($row[1]==0 || !in_array($row[1],$doneagroups)) {
-					preg_match_all('/@FILE:(.*?)@/',$row[2].$row[3].$row[4],$matches);
-					$tomove = array_unique($matches[1]);
-					foreach ($tomove as $file) {
-						if (@$s3->copyObject($GLOBALS['AWSbucket'],"adata/$curs3asid/$file",$GLOBALS['AWSbucket'],"adata/$path/$file")) {
-							@$s3->deleteObject($GLOBALS['AWSbucket'],"adata/$curs3asid/$file");
+			if (isset($GLOBALS['AWSkey'])) {
+				//update files.  Need to update before changinge agroupids so we will know the curs3asid
+				$query = "SELECT id,agroupid,lastanswers,bestlastanswers,reviewlastanswers,assessmentid FROM imas_assessment_sessions ";
+				$query .= "WHERE lastanswers LIKE '%@FILE:%' OR bestlastanswers LIKE '%@FILE:%' OR reviewlastanswers LIKE '%@FILE:%'";
+				$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
+				require("./includes/filehandler.php");
+				$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+				$doneagroups = array();
+				while ($row = mysql_fetch_row($result)) {
+					//set path to aid/asid/  or aid/agroupid/  - won't interefere with random values, and easier to do.
+					if ($row[1]==0) {
+						$path = $row[5].'/'.$row[0];
+						$curs3asid = $row[0];
+					} else {
+						$path = $row[5].'/'.$row[1];
+						$curs3asid = $row[1];
+					}
+					if ($row[1]==0 || !in_array($row[1],$doneagroups)) {
+						preg_match_all('/@FILE:(.*?)@/',$row[2].$row[3].$row[4],$matches);
+						$tomove = array_unique($matches[1]);
+						foreach ($tomove as $file) {
+							if (@$s3->copyObject($GLOBALS['AWSbucket'],"adata/$curs3asid/$file",$GLOBALS['AWSbucket'],"adata/$path/$file")) {
+								@$s3->deleteObject($GLOBALS['AWSbucket'],"adata/$curs3asid/$file");
+							}
+						}
+						if ($row[1]>0) {
+							$doneagroups[] = $row[1];
 						}
 					}
-					if ($row[1]>0) {
-						$doneagroups[] = $row[1];
-					}
+					
+					$la = addslashes(preg_replace('/@FILE:/',"@FILE:$path/",$row[2]));
+					$bla = addslashes(preg_replace('/@FILE:/',"@FILE:$path/",$row[3]));
+					$rla = addslashes(preg_replace('/@FILE:/',"@FILE:$path/",$row[4]));
+					$query = "UPDATE imas_assessment_sessions SET lastanswers='$la',bestlastanswers='$bla',reviewlastanswers='$rla' WHERE id={$row[0]}";
+					$res = mysql_query($query) or die("Query failed : $query:" . mysql_error());
 				}
-				
-				$la = addslashes(preg_replace('/@FILE:/',"@FILE:$path/",$row[2]));
-				$bla = addslashes(preg_replace('/@FILE:/',"@FILE:$path/",$row[3]));
-				$rla = addslashes(preg_replace('/@FILE:/',"@FILE:$path/",$row[4]));
-				$query = "UPDATE imas_assessment_sessions SET lastanswers='$la',bestlastanswers='$bla',reviewlastanswers='$rla' WHERE id={$row[0]}";
-				$res = mysql_query($query) or die("Query failed : $query:" . mysql_error());
+				echo 'Done up through s3 file change.  <a href="upgrade.php?last=30.5">Continue</a>';
+				exit;
 			}
-			echo 'Done up through s3 file change.  <a href="upgrade.php?last=30.5">Continue</a>';
-			exit;
 		}
 		if ($last < 31) {
 			//implement groups changes
