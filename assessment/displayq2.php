@@ -766,6 +766,17 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		}
 		$out .= "$leftb<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\" ";
 		
+		$ansformats = explode(',',$answerformat);
+		if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
+			$tip = "Enter your answer as a list of values separated by commas: Example: -4, 3, 2<br/>";
+			$eword = "each value";
+		} else {
+			$tip = '';
+			$eword = "your answer";
+		}
+		list($longtip,$shorttip) = formathint($eword,$ansformats,'calculated',(in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)), 1);
+		$tip .= $longtip;
+		
 		if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
 				$qnref = "$qn-0";
@@ -773,9 +784,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 				$qnref = ($multi-1).'-'.($qn%1000);
 			}
 			if ($useeqnhelper) {
-				$out .= "onfocus=\"showeedd('tc$qn');showehdd('tc$qn','Enter a mathematical expression','$qnref');\" onblur=\"hideee();hideeh();\" onclick=\"reshrinkeh('tc$qn')\" ";
+				$out .= "onfocus=\"showeedd('tc$qn');showehdd('tc$qn','$shorttip','$qnref');\" onblur=\"hideee();hideeh();\" onclick=\"reshrinkeh('tc$qn')\" ";
 			} else {
-				$out .= "onfocus=\"showehdd('tc$qn','Enter a mathematical expression','$qnref')\" onblur=\"hideeh()\" onclick=\"reshrinkeh('tc$qn')\" ";
+				$out .= "onfocus=\"showehdd('tc$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" onclick=\"reshrinkeh('tc$qn')\" ";
 			}
 		} else if ($useeqnhelper) {
 			$out .= "onfocus=\"showeedd('tc$qn')\" onblur=\"hideee()\" ";
@@ -786,15 +797,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		}
 		$preview .= "$leftb<span id=p$qn></span>$rightb ";
 		$out .= "<script type=\"text/javascript\">calctoproc[calctoproc.length] = $qn; calcformat[$qn] = '$answerformat';</script>\n";
-		$ansformats = explode(',',$answerformat);
-		if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
-			$tip = "Enter your answer as a list of values separated by commas: Example: -4, 3, 2<br/>";
-			$eword = "each value";
-		} else {
-			$tip = '';
-			$eword = "your answer";
-		}
-		$tip .= formathint($eword,$ansformats,'calculated');
+		
 		if (isset($answer)) {
 			if (!is_numeric($answer)) {
 				$sa = '`'.$answer.'`';
@@ -3570,7 +3573,7 @@ function checkanswerformat($tocheck,$ansformats) {
 	}
 	if (in_array("scinot",$ansformats)) {
 		$totest = str_replace(' ','',$tocheck);
-		if (!preg_match('/^\-?\d(\.\d*)?(\*|x)10\^(\-?\d+)$/',$totest)) {
+		if (!preg_match('/^\-?[1-9]\d*(\.\d*)?(\*|x)10\^(\-?\d+)$/',$totest)) {
 			return false;
 		} 
 	}
@@ -3611,20 +3614,27 @@ function checkanswerformat($tocheck,$ansformats) {
 	return true;			
 }
 
-function formathint($eword,$ansformats,$calledfrom) {
+function formathint($eword,$ansformats,$calledfrom, $islist=false,$doshort=false) {
 	$tip = '';
+	$shorttip = '';
 	if (in_array('fraction',$ansformats)) {
 		$tip .= "Enter $eword as a fraction (like 3/5 or 10/4) or as a whole number (like 4 or -2)";
+		$shorttip = $islist?'Enter a list of fractions or whole numbers':'Enter a fraction or whole number';
 	} else if (in_array('reducedfraction',$ansformats)) {
 		$tip .= "Enter $eword as a reduced fraction (like 5/3, not 10/6) or as a whole number (like 4 or -2)";
+		$shorttip = $islist?'Enter a list of reduced fractions or whole numbers':'Enter a reduced fraction or whole number';
 	} else if (in_array('mixednumber',$ansformats)) {
 		$tip .= "Enter $eword as a reduced mixed number or as a whole number.  Example: 2 1/2 = `2 1/2`, or 2_1/2 = `2 1/2`";
+		$shorttip = $islist?'Enter a list of mixed numbers or whole numbers':'Enter a mixed number or whole number';
 	} else if (in_array('fracordec',$ansformats)) {
 		$tip .= "Enter $eword as a fraction (like 3/5 or 10/4), a whole number (like 4 or -2), or exact decimal (like 0.5 or 1.25)";
+		$shorttip = $islist?'Enter a list of fractions or exact decimals':'Enter a fraction or exact decimal';
 	} else if (in_array('scinot',$ansformats)) {
 		$tip .= "Enter $eword as in scientific notation.  Example: 3*10^2 = `3*10^2`";
+		$shorttip = $islist?'Enter a list of numbers using scientific notation':'Enter a number using scientific notation';
 	} else {
 		$tip .= "Enter $eword as a number (like 5, -3, 2.2) or as a calculation (like 5/3, 2^3, 5+4)";
+		$shorttip = $islist?'Enter a list of mathematical expressions':'Enter a mathematical expression';
 	}
 	if ($calledfrom != 'calcmatrix') {
 		$tip .= "<br/>Enter DNE for Does Not Exist, oo for Infinity";
@@ -3637,6 +3647,10 @@ function formathint($eword,$ansformats,$calledfrom) {
 	if (in_array('notrig',$ansformats)) {
 		$tip .= "<br/>Trig functions (sin,cos,etc.) are not allowed";
 	} 	
-	return $tip;
+	if ($doshort) {
+		return array($tip,$shorttip);
+	} else {
+		return $tip;
+	}
 }
 ?>

@@ -20,12 +20,12 @@ function calculate(inputId,outputId,format) {
 		  str = "`"+str+"`";
 	  } else {
 		  if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1) {
-			  str = str.replace(/\s/,'');
+			  str = str.replace(/\s/g,'');
 			  if (!str.match(/^\s*\-?\(?\d+\s*\/\s*\-?\d+\)?\s*$/) && !str.match(/^\s*?\-?\d+\s*$/)) {
 				err += "not a valid fraction";  
 			  }
 		  } else if (format.indexOf('fracordec')!=-1) {
-			  str = str.replace(/\s/,'');
+			  str = str.replace(/\s/g,'');
 			  if (!str.match(/^\s*\-?\(?\d+\s*\/\s*\-?\d+\)?\s*$/) && !str.match(/^\s*?\-?\d+\s*$/) && !str.match(/^(\d+|\d+\.\d*|\d*\.\d+)$/)) {
 				err += " invalid entry format";  
 			  }
@@ -35,7 +35,7 @@ function calculate(inputId,outputId,format) {
 			  }
 			  str = str.replace(/_/,' ');
 		  } else if (format.indexOf('scinot')!=-1) {
-			  str = str.replace(/\s/,'');
+			  str = str.replace(/\s/g,'');
 			  str = str.replace("x","xx");
 			  if (!str.match(/^\-?\d(\.\d*)?(\*|xx)10\^(\-?\d+)$/)) {
 				err += "not valid scientific notation";  
