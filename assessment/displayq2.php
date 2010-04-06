@@ -3573,7 +3573,7 @@ function checkanswerformat($tocheck,$ansformats) {
 	}
 	if (in_array("scinot",$ansformats)) {
 		$totest = str_replace(' ','',$tocheck);
-		if (!preg_match('/^\-?[1-9]\d*(\.\d*)?(\*|x)10\^(\-?\d+)$/',$totest)) {
+		if (!preg_match('/^\-?[1-9](\.\d*)?(\*|x)10\^(\-?\d+)$/',$totest)) {
 			return false;
 		} 
 	}
