@@ -34,6 +34,15 @@ function eeinsert(ins) {
 			insb = '';
 			insa = '^';
 		}
+	} else if (ins=='e') {
+		if (len > 0) {
+			insb = 'e^(';
+			insa = ')';
+		} else {
+			insb = '';
+			insa = 'e^()';
+			posshift = 1;
+		}
 	} else if (ins=='frac') {
 		if (len > 0) {
 			insb = '(';

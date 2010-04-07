@@ -38,6 +38,11 @@ switch($_GET['action']) {
 		if (isset($studentTOS)) {
 			echo "<span class=form><label for=\"agree\">I have read and agree to the Terms of Use (below)</label></span><span class=formright><input type=checkbox name=agree></span><br class=form />\n";
 		}
+		if (!$emailconfirmation) {
+			echo '<p>If you already know your course ID, you can enter it now.  Otherwise, leave this blank and you can enroll later.</p>';
+			echo '<span class="form"><label for="courseid">Course ID:</label></span><input class="form" type="text" size="20" name="courseid"/><br class="form"/>';
+			echo '<span class="form"><label for="ekey">Enrollment Key:</label></span><input class="form" type="text" size="20" name="ekey"/><br class="form"/>';
+		}
 		echo "<div class=submit><input type=submit value='Sign Up'></div>\n";
 		echo "</form>\n";
 		if (isset($studentTOS)) {

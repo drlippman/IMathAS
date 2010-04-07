@@ -556,7 +556,7 @@
 		} else if ($_GET['regenall']=="fromscratch" && $testsettings['testtype']=="Practice" && !$isreview) {
 			require_once("../includes/filehandler.php");
 			//deleteasidfilesbyquery(array('userid'=>$userid,'assessmentid'=>$testsettings['id']),1);
-			deleteasidfilesbyquery('userid',$userid,$testsettings['id'],1);
+			deleteasidfilesbyquery2('userid',$userid,$testsettings['id'],1);
 			$query = "DELETE FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='{$testsettings['id']}' LIMIT 1";
 			$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/showtest.php?cid={$testsettings['courseid']}&id={$testsettings['id']}");
@@ -592,7 +592,7 @@
 	$useeditor = 1;
 	if ($testsettings['eqnhelper']>0) {
 		$placeinhead = '<script type="text/javascript">var eetype='.$testsettings['eqnhelper'].'</script>';
-		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqnhelper.js?v=012810\"></script>";
+		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqnhelper.js?v=040610\"></script>";
 		$placeinhead .= '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
 		$useeqnhelper = true;
 	}

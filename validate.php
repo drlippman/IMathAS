@@ -396,7 +396,7 @@ END;
   }
   function checkeditorok() {
 	  $ua = $_SERVER['HTTP_USER_AGENT'];
-	  if (strpos($ua,'iPhone')!==false) {
+	  if (strpos($ua,'iPhone')!==false || strpos($ua,'iPad')!==false) {
 		  return 0;
 	  } else {
 		  return 1;

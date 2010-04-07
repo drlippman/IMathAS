@@ -75,6 +75,8 @@
 				echo '<input type="hidden" name="email" value="'.stripslashes($_POST['email']).'" />';
 				echo '<input type="hidden" name="pw1" value="'.stripslashes($_POST['pw1']).'" />';
 				echo '<input type="hidden" name="pw2" value="'.stripslashes($_POST['pw2']).'" />';
+				echo '<input type="hidden" name="courseid" value="'.stripslashes($_POST['courseid']).'" />';
+				echo '<input type="hidden" name="ekey" value="'.stripslashes($_POST['ekey']).'" />';
 				if (isset($_POST['agree'])) {
 					echo '<input type="hidden" name="agree" value="1" />';
 				}
@@ -91,6 +93,7 @@
 		$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, msgnotify, homelayout) ";
 		$query .= "VALUES ('{$_POST['SID']}','$md5pw',$initialrights,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot,'$homelayout');";
 		mysql_query($query) or die("Query failed : " . mysql_error());
+		$newuserid = mysql_insert_id();
 		if ($emailconfirmation) {
 			$id = mysql_insert_id();
 			$headers  = 'MIME-Version: 1.0' . "\r\n";
@@ -111,7 +114,36 @@
 		} else {
 			echo "<html><body>\n";
 			echo "<p>Your account with username <b>{$_POST['SID']}</b> has been created.  If you forget your password, you can ask your ";
-			echo "instructor to reset your password.</p>\n";
+			echo "instructor to reset your password or use the forgotten password link on the login page.</p>\n";
+			if (trim($_POST['courseid'])!='') {
+				$error = '';
+				if (!is_numeric($_POST['courseid'])) {
+					$error = 'Invalid course id';
+				} else {
+					$query = "SELECT enrollkey,allowunenroll FROM imas_courses WHERE id = '{$_POST['courseid']}'";
+					$result = mysql_query($query) or die("Query failed : " . mysql_error());
+					$line = mysql_fetch_array($result, MYSQL_ASSOC);
+					if ($line==null) {
+						$error = 'Course not found';
+					} else if (($line['allowunenroll']&2)==2) {
+						$error = 'Course is closed for self enrollment';
+					} else if ($_POST['ekey']=="" && $line['enrollkey'] != '') {
+						$error = 'No enrollment key provided';
+					} else if ($line['enrollkey'] != $_POST['ekey']) {
+						$error = 'Incorrect enrollment key';
+					} else {
+						$query = "INSERT INTO imas_students (userid,courseid) VALUES ('$newuserid','{$_POST['courseid']}');";
+						mysql_query($query) or die("Query failed : " . mysql_error());
+						echo '<p>You have been enrolled in course ID '.$_POST['courseid'].'</p>';
+					}
+				}
+				if ($error != '') {
+					echo "<p>$error, so we were not able to enroll you in your course.  After you log in, you can ";
+					echo 'try enrolling again.  You do <b>not</b> need to create another account</p>';
+				}
+			}
+					
+				
 			echo "You can now <a href=\"http://";
 			echo $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php";
 			echo "\">return to the login page</a> and login with your new username and password</p>";
