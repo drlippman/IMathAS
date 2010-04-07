@@ -110,8 +110,20 @@ function eetoggleactive(n) {
 	unhideee(0);
 }
 
+function showeeselstore(eln) {
+	if (eeselstore==null && document.selection && document.selection.createRange) {
+		document.getElementById(eln).focus();
+		eeselstore = document.selection.createRange();
+	}
+}
 function showee(eln) {
 	el = document.getElementById(eln);
+	if (el.setSelectionRange){
+		var len = el.selectionEnd - el.selectionStart;
+	} else if (document.selection && document.selection.createRange) {
+        	var range = eeselstore;
+		var len = range.text.length;
+	}
 	var ee = document.getElementById('ee');
 	if (eeinit == false) {
 		els = ee.getElementsByTagName("td");
@@ -141,7 +153,13 @@ function showee(eln) {
 		eecurel = null;
 	}
 	unhideee(0);
-	el.focus();
+	//el.focus(); 
+	if (el.setSelectionRange){
+		el.focus();
+		//el.setSelectionRange(el.selectionStart,el.selectionEnd);
+	 } else if (document.selection && document.selection.createRange) {
+		range.select();
+	 }    
 }
 
 

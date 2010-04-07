@@ -782,7 +782,7 @@ if ($myrights<20) {
 			
 			
 			$page_questionTable[$i]['lastmod'] =  date("m/d/y",$line['lastmoddate']);
-			$page_questionTable[$i]['add'] = "<a href=\"modquestion.php?qsetid={$line['id']}&aid=$aid&cid=$cid\">Add</a>";
+			$page_questionTable[$i]['add'] = "<a href=\"modquestion.php?qsetid={$line['id']}&cid=$cid\">Add</a>";
 			$ln++;
 		}
 		//pull question useage data

@@ -11,6 +11,7 @@
 	}
 	$cid = $_GET['cid'];
 	$isadmin = false;
+	$isgrpadmin = false;
 	if (!isset($_GET['aid'])) {
 		if ($_GET['cid']=="admin") {
 			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../admin/admin.php\">Admin</a>";
@@ -35,7 +36,7 @@
 		}
 		echo "&gt; <a href=\"addquestions.php?aid={$_GET['aid']}&cid=$cid\">Add/Remove Questions</a> &gt; Modify Questions</div>";
 	}
-	if ($adminasteacher) {
+	if (isset($adminasteacher) && $adminasteacher) {
 		if ($myrights == 100) {
 			$isadmin = true;
 		} else if ($myrights==75) {

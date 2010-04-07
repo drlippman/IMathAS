@@ -322,10 +322,10 @@ function printCourses($data,$title,$type=null) {
 		if (isset($data[$i]['lockaid']) && $data[$i]['lockaid']>0) {
 			echo ' <span style="color:green;">Lockdown</span>';
 		}
-		if ($shownewmsgnote && $newmsgcnt[$data[$i]['id']]>0) {
+		if ($shownewmsgnote && isset($newmsgcnt[$data[$i]['id']]) && $newmsgcnt[$data[$i]['id']]>0) {
 			echo ' <a class="newnote" href="msgs/msglist.php?cid='.$data[$i]['id'].'">Messages ('.$newmsgcnt[$data[$i]['id']].')</a>';
 		}
-		if ($shownewpostnote && $newpostcnt[$data[$i]['id']]>0) {
+		if ($shownewpostnote && isset($newpostcnt[$data[$i]['id']]) && $newpostcnt[$data[$i]['id']]>0) {
 			echo ' <a class="newnote" href="forums/newthreads.php?cid='.$data[$i]['id'].'">Posts ('.$newpostcnt[$data[$i]['id']].')</a>';
 		}
 		
