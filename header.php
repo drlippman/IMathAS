@@ -16,6 +16,7 @@
 <!--[if lte IE 6]> 
 <style> 
 div { zoom: 1; } 
+.clearlooks2, .clearlooks2 div { zoom: normal;}
 .clear { line-height: 0;}
 #GB_overlay, #GB_window { 
  position: absolute; 

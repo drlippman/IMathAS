@@ -164,13 +164,14 @@ $curdir = rtrim(dirname(__FILE__), '/\\');
 if (isset($CFG['GEN']['headerinclude']) && !isset($flexwidth)) {
 	require("$curdir/../{$CFG['GEN']['headerinclude']}");
 }
-$coursetopbar = explode('|',$sessiondata['coursetopbar']);
-$coursetopbar[0] = explode(',',$coursetopbar[0]);
-$coursetopbar[1] = explode(',',$coursetopbar[1]);
-if (!isset($coursetopbar[2])) { $coursetopbar[2] = 0;}
-if ($coursetopbar[0][0] == null) {unset($coursetopbar[0][0]);}
-if ($coursetopbar[1][0] == null) {unset($coursetopbar[1][0]);}
-			
+if (!isset($coursetopbar)) {
+	$coursetopbar = explode('|',$sessiondata['coursetopbar']);
+	$coursetopbar[0] = explode(',',$coursetopbar[0]);
+	$coursetopbar[1] = explode(',',$coursetopbar[1]);
+	if (!isset($coursetopbar[2])) { $coursetopbar[2] = 0;}
+	if ($coursetopbar[0][0] == null) {unset($coursetopbar[0][0]);}
+	if ($coursetopbar[1][0] == null) {unset($coursetopbar[1][0]);}
+}		
 
 if (isset($cid) && !isset($flexwidth) && $sessiondata['isteacher'] && $coursetopbar[2]==1 && count($coursetopbar[1])>0) {
 	echo '<div id="navlistcont">';

@@ -319,6 +319,7 @@
 		}
 		$useeditor='review';
 		$sessiondata['coursetheme'] = $coursetheme;
+		$sessiondata['isteacher'] = $isteacher;
 		require("../assessment/header.php");
 		echo "<style type=\"text/css\">p.tips {	display: none;}\n</style>\n";
 		if (isset($_GET['starttime']) && $isteacher) {
