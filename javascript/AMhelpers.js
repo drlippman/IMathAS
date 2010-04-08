@@ -784,7 +784,11 @@ function doonsubmit(form,type2,skipconfirm) {
 				//totest += varlist.charAt(k) + "=" + inputs[k] + ";";
 				totest += vars[fk] + "=" + inputs[fk] + ";";
 			}
-			totest += nh.value+";";
+			if (nh.value=='') {
+				totest += Math.random()+";";
+			} else {
+				totest += nh.value+";";
+			}
 			try {
 				with (Math) vals[fj] = eval(totest);
 			} catch (e) {

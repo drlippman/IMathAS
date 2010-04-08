@@ -3,7 +3,7 @@
 //numerical calculations where they are specifically needed, not substitute 
 //for entering symbolic derivatives or integrals.
 //
-//Version 1.0 Oct 19, 2009
+//Version 1.1 April 8, 2009
 
 global $allowedmacros;
 array_push($allowedmacros,"calculusdiffquotient","calculusnumint");
@@ -46,7 +46,7 @@ function calculusnumint($func,$var,$a,$b,$n,$method) {
 	} else {
 		$x = $a;
 	}
-	if ($method=='left' || $method=='right') {
+	if ($method=='left' || $method=='right' || $method=='midpoint') {
 		$ntodo = $n;
 	} else {
 		$ntodo = $n+1;
