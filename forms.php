@@ -26,7 +26,7 @@ if ($gb == '') {
 switch($_GET['action']) {
 	case "newuser":
 		echo '<div id="headerforms" class="pagetitle"><h2>New User Signup</h2></div>';
-		echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/validateform.js\"></script>\n";
+		//echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/validateform.js\"></script>\n";
 		echo "<form method=post action=\"actions.php?action=newuser$gb\" onsubmit=\"return validateForm(this)\">\n";
 		echo "<span class=form><label for=\"SID\">$longloginprompt:</label></span> <input class=form type=text size=12 id=SID name=SID><BR class=form>\n";
 		echo "<span class=form><label for=\"pw1\">Choose a password:</label></span><input class=form type=password size=20 id=pw1 name=pw1><BR class=form>\n";
