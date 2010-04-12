@@ -323,7 +323,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			//sort each group member list by name
 			foreach ($page_grpmembers as $k=>$stuarr) {
-				natsort($stuarr);
+				natcasesort($stuarr);
 				$page_grpmembers[$k] = $stuarr;
 			}
 		}
@@ -332,7 +332,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		foreach ($ungrpids as $uid) {
 			$page_ungrpstu[$uid] = $stunames[$uid];
 		}
-		natsort($page_ungrpstu);
+		natcasesort($page_ungrpstu);
 		
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; $page_grpsetname";
 			

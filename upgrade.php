@@ -569,6 +569,24 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 if ($res===false) {
 				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
+			 
+			 $query = 'ALTER TABLE `imas_forums` CHANGE `name` `name` VARCHAR( 254 ) NOT NULL';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 
+			 $query = 'ALTER TABLE `imas_wikis` CHANGE `name` `name` VARCHAR( 254 ) NOT NULL';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 
+			 $query = 'ALTER TABLE `imas_gbitems` CHANGE `name` `name` VARCHAR( 254 ) NOT NULL';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
 		}
 		$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {
