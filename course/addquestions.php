@@ -556,7 +556,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						if (in_array($i,$existingq)) {
 							$page_questionTable[$i]['desc'] = '<span style="color: #999">'.filter($line['description']).'</span>';
 						} else {
-						$page_questionTable[$i]['desc'] = filter($line['description']);
+							$page_questionTable[$i]['desc'] = filter($line['description']);
 						}
 						$page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selq','qo$ln',{$line['id']},true,false)\"/>";
 						$page_questionTable[$i]['type'] = $line['qtype'];
@@ -668,12 +668,19 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$times[$row[0]] = mysql_result($result2,0,0);
 					
 				}
+				
 				$page_assessmentQuestions['desc'][$x] = $aidnames[$aidq];
 				$y=0;
 				foreach($aiditems[$aidq] as $qid) {
 					if (strpos($qid,'|')!==false) { continue;}
 					$page_assessmentQuestions[$x]['checkbox'][$y] = "<input type=checkbox name='nchecked[]' id='qo$ln' value='" . $qsetid[$qid] . "'>";
-					$page_assessmentQuestions[$x]['desc'][$y] = $descr[$qid];
+					if (in_array($qsetid[$qid],$existingq)) {
+						$page_assessmentQuestions[$x]['desc'][$y] = '<span style="color: #999">'.filter($descr[$qid]).'</span>';
+					} else {
+						$page_assessmentQuestions[$x]['desc'][$y] = filter($descr[$qid]);
+					}
+					//$page_assessmentQuestions[$x]['desc'][$y] = $descr[$qid];
+					$page_assessmentQuestions[$x]['qsetid'][$y] = $qsetid[$qid];
 					$page_assessmentQuestions[$x]['preview'][$y] = "<input type=button value=\"Preview\" onClick=\"previewq('selq','qo$ln',$qsetid[$qid],true)\"/>";
 					$page_assessmentQuestions[$x]['type'][$y] = $qtypes[$qid];
 					$page_assessmentQuestions[$x]['times'][$y] = $times[$qid];
@@ -871,7 +878,7 @@ if ($overwriteBody==1) {
 		<input type=button value="Preview Selected" onclick="previewsel('selq')" />
 		<table cellpadding=5 id=myTable class=gb>
 			<thead>
-				<tr><th></th><th>Description</th><th>Preview</th><th>Type</th>
+				<tr><th></th><th>Description</th><th>ID</th><th>Preview</th><th>Type</th>
 					<?php echo $page_libRowHeader ?>
 					<th>Times Used</th><th>Mine</th><th>Add</th><th>Source</th><th>Use as Template</th>
 				</tr>
@@ -884,9 +891,11 @@ if ($overwriteBody==1) {
 					if ($searchall==0) {
 						if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 						echo '<td></td>';
-						echo '<td colspan="8">';
+						echo '<td>';
 						echo '<b>'.$lnamesarr[$page_libstouse[$j]].'</b>';
-						echo '</td></tr>';
+						echo '</td>';
+						for ($k=0;$k<8;$k++) {echo '<td></td>';}
+						echo '</tr>';
 					}
 					
 					for ($i=0;$i<count($page_libqids[$page_libstouse[$j]]); $i++) {
@@ -896,6 +905,7 @@ if ($overwriteBody==1) {
 
 					<td><?php echo $page_questionTable[$qid]['checkbox'] ?></td>
 					<td><?php echo $page_questionTable[$qid]['desc'] ?></td>
+					<td><?php echo $qid ?></td>
 					<td><?php echo $page_questionTable[$qid]['preview'] ?></td>
 					<td><?php echo $page_questionTable[$qid]['type'] ?></td>
 <?php
@@ -920,7 +930,7 @@ if ($overwriteBody==1) {
 		</table>
 		<p>Questions <span style="color:#999">in gray</span> have been added to the assessment.</p>
 		<script type="text/javascript">
-			initSortTable('myTable',Array(false,'S',false,'S',<?php echo ($searchall==1) ? "false, " : ""; ?>'N','S',false,false,false),true);
+			initSortTable('myTable',Array(false,'S','N',false,'S',<?php echo ($searchall==1) ? "false, " : ""; ?>'N','S',false,false,false),true);
 		</script>
 	</form>
 	
@@ -953,7 +963,7 @@ if ($overwriteBody==1) {
 		<table cellpadding=5 id=myTable class=gb>
 			<thead>
 				<tr>
-					<th> </th><th>Description</th><th>Preview</th><th>Type</th><th>Times Used</th><th>Mine</th><th>Add</th><th>Source</th><th>Use as Template</th>
+					<th> </th><th>Description</th><th>ID</td><th>Preview</th><th>Type</th><th>Times Used</th><th>Mine</th><th>Add</th><th>Source</th><th>Use as Template</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -970,6 +980,7 @@ if ($overwriteBody==1) {
 				<td></td>
 				<td></td>
 				<td></td>
+				<td></td>
 			</tr>
 <?php
 				for ($x=0;$x<count($page_assessmentQuestions[$i]['desc']);$x++) {
@@ -977,6 +988,7 @@ if ($overwriteBody==1) {
 ?>					
 				<td><?php echo $page_assessmentQuestions[$i]['checkbox'][$x] ?></td>
 				<td><?php echo $page_assessmentQuestions[$i]['desc'][$x] ?></td>
+				<td><?php echo $page_assessmentQuestions[$i]['qsetid'][$x] ?></td>
 				<td><?php echo $page_assessmentQuestions[$i]['preview'][$x] ?></td>					
 				<td><?php echo $page_assessmentQuestions[$i]['type'][$x] ?></td>
 				<td class=c><?php echo $page_assessmentQuestions[$i]['times'][$x] ?></td>
@@ -994,7 +1006,7 @@ if ($overwriteBody==1) {
 		</table>
 
 		<script type="text/javascript">
-			initSortTable('myTable',Array(false,'S',false,'S','N','S',false,false,false),true);
+			initSortTable('myTable',Array(false,'S','N',false,'S','N','S',false,false,false),true);
 		</script>
 		</form>
 
