@@ -165,7 +165,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$_POST['ltisecret'] = '';
 		}
 		
-		//is updating, switching from nongroup to group, and not creating new groupset, check if groups already exist
+		//is updating, switching from nongroup to group, and not creating new groupset, check if groups and asids already exist
 		//if so, cannot handle
 		$updategroupsetid='';
 		if (isset($_GET['id']) && $_POST['isgroup']>0 && $_POST['groupsetid']>0) {
@@ -173,9 +173,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query = "SELECT isgroup FROM imas_assessments WHERE id='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (mysql_result($result,0,0)==0) {
-				$query = "SELECT id FROM imas_stugroups WHERE groupsetid='{$_POST['groupsetid']}'";
+				//check to see if students have already started assessment
+				//don't really care if groups exist - just whether asids exist
+				//$query = "SELECT id FROM imas_stugroups WHERE groupsetid='{$_POST['groupsetid']}'";
+				$query = "SELECT COUNT(ias.id) FROM imas_assessment_sessions AS ias,imas_students WHERE ";
+				$query .= "ias.assessmentid='{$_GET['id']}' AND ias.userid=imas_students.userid AND imas_students.courseid='$cid'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				if (mysql_num_rows($result)>0) {
+				if (mysql_result($result,0,0)>0) {//if (mysql_num_rows($result)>0) {
 					echo "Sorry, cannot switch to use pre-defined groups after students have already started the assessment";
 					exit;
 				}

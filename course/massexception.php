@@ -67,6 +67,10 @@
 						mysql_query($query) or die("Query failed :$query " . mysql_error());
 					}
 					
+				} else if (isset($_POST['forceclear'])) {
+					//this is not group-safe
+					$query = "DELETE FROM imas_assessment_sessions WHERE userid='$stu' AND assessmentid='$aid'";
+					$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 				}
 					
 			}
@@ -215,7 +219,8 @@
 	echo "<input type=submit value=\"Record Changes\" />";
 	echo '<p><input type="checkbox" name="forceregen"/> Force student to work on new versions of all questions?  Students ';
 	echo 'will keep any scores earned, but must work new versions of questions to improve score.</p>';
-	
+	echo '<p><input type="checkbox" name="forceclear"/> Clear student\'s attempts?  Students ';
+	echo 'will <b>not</b> keep any scores earned, and must rework all problems.</p>';
 	if (!isset($_GET['uid']) && count($_POST['checked'])>1) {
 		echo "<h4>Students Selected</h4>";
 		$query = "SELECT LastName,FirstName FROM imas_users WHERE id IN ($tolist) ORDER BY LastName,FirstName";
