@@ -4,7 +4,7 @@
 
 
 array_push($allowedmacros,"exp","sec","csc","cot","sech","csch","coth","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif","in_array","prettyint","prettyreal","arraystodots","subarray","showdataarray","arraystodoteqns","array_flip","arrayfindindex","fillarray","array_reverse","root");
-array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","randcity","randcities","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction","ifthen","multicalconarray","htmlentities","formhoverover","formpopup","connectthedots","jointsort","stringpos","stringlen","stringclean","substr","makexxpretty","makexxprettydisp");
+array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","randcity","randcities","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction","ifthen","multicalconarray","htmlentities","formhoverover","formpopup","connectthedots","jointsort","stringpos","stringlen","stringclean","substr","makexxpretty","makexxprettydisp","forminlinebutton");
 function mergearrays($a,$b) {
 	if (!is_array($a)) {
 		$a = array($a);
@@ -1940,6 +1940,32 @@ function formpopup($label,$content,$width=600,$height=400,$type='link',$scroll='
 			return '<span class="spanbutton" onClick="popupwindow(\''.$id.'\',\''.str_replace('\'','\\\'',htmlentities($content)).'\','.$width.','.$height.$scroll.')">'.$label.'</span>';
 		}
 	}
+}
+
+function forminlinebutton($label,$content,$style='button',$outstyle='block') {
+	if (isset($GLOBALS['inlinebuttoncnt'])) {
+		$r = $GLOBALS['inlinebuttoncnt'];
+		$GLOBALS['inlinebuttoncnt']++;
+		//$out = '';
+	} else {
+		$r = 1;
+		$GLOBALS['inlinebuttoncnt'] = 2;
+		//$out = '<script type="text/javascript">function toggleinlinebtn(n){var el=document.getElementById(n);el.style.display=="none"?el.style.display="":el.style.display="none";}</script>';
+	}
+	$label = str_replace('"','',$label);
+	if ($style=='classic') {
+		$out = '<input type="button" value="'.$label.'" onClick="toggleinlinebtn(\'inlinebtn'.$r.'\');" />';
+	} else if ($style=='link') {
+		$out = '<span class="link" onClick="toggleinlinebtn(\'inlinebtn'.$r.'\');">'.$label.'</span>';
+	} else {
+		$out = '<span class="spanbutton" onClick="toggleinlinebtn(\'inlinebtn'.$r.'\');">'.$label.'</span>';
+	}
+	if ($outstyle=='inline') {
+		$out .= ' <span id="inlinebtn'.$r.'" style="display:none;">'.$content.'</span>';
+	} else {
+		$out .= '<div id="inlinebtn'.$r.'" style="display:none;">'.$content.'</div>';
+	}
+	return $out;
 }
 
 function intervaltoineq($str,$var) {

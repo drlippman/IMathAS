@@ -813,3 +813,8 @@ function arraysearch(needle,hay) {
       }
       return -1;
    }
+   
+function toggleinlinebtn(n){
+	var el=document.getElementById(n);
+	el.style.display=="none"?el.style.display="":el.style.display="none";
+}
