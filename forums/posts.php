@@ -53,7 +53,7 @@
 		}
 		exit;
 	}
-	$query = "SELECT settings,replyby,defdisplay,name,points FROM imas_forums WHERE id='$forumid'";
+	$query = "SELECT settings,replyby,defdisplay,name,points,groupsetid FROM imas_forums WHERE id='$forumid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$forumsettings = mysql_result($result,0,0);
 	$allowreply = ($isteacher || (time()<mysql_result($result,0,1)));
@@ -63,7 +63,37 @@
 	$allowdel = ($isteacher || (($forumsettings&4)==4));
 	$haspoints = (mysql_result($result,0,4) > 0);
 	$forumname = mysql_result($result,0,3);
-	
+	$groupset = mysql_result($result,0,5);
+	$groupid = 0;
+	if ($groupset>0) {
+		if (!isset($_GET['grp'])) {
+			if (!$isteacher) {
+				$query = 'SELECT i_sg.id FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';
+				$query .= "WHERE i_sgm.userid='$userid' AND i_sg.groupsetid='$groupset'";
+				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				if (mysql_num_rows($result)>0) {
+					$groupid = mysql_result($result,0,0);
+				} else {
+					$groupid=0;
+				}
+			} else {
+				$groupid = -1;
+			}
+		} else {
+			if (!$isteacher) {
+				$groupid = intval($_GET['grp']);
+				$query = "SELECT id FROM imas_stugroupmembers WHERE stugroupid='$groupid' AND userid='$userid'";
+				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				if (mysql_num_rows($result)==0) {
+					echo 'Invalid group - try again';
+					exit;
+				}
+			} else {
+				$groupid = intval($_GET['grp']);
+			}
+		}
+	}
+		
 		
 	if (isset($_GET['view'])) {
 		$view = $_GET['view'];
@@ -165,7 +195,10 @@
 	echo '<div id="headerposts" class="pagetitle"><h2>Forum: '.$forumname.'</h2></div>';
 	echo "<b style=\"font-size: 120%\">Post: {$subject[$threadid]}</b><br/>\n";
 	
-	$query = "SELECT id FROM imas_forum_posts WHERE forumid='$forumid' AND threadid<'$threadid' AND parent=0 ORDER BY threadid DESC LIMIT 1";
+	$query = "SELECT id FROM imas_forum_threads WHERE forumid='$forumid' AND id<'$threadid' ";
+	if ($groupset>0 && $groupid!=-1) {$query .= "AND (stugroupid='$groupid' OR stugroupid=0) ";}
+	$query .= "ORDER BY id DESC LIMIT 1";
+	//$query = "SELECT id FROM imas_forum_posts WHERE forumid='$forumid' AND threadid<'$threadid' AND parent=0 ORDER BY threadid DESC LIMIT 1";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	if (mysql_num_rows($result)>0) {
 		$nextth = mysql_result($result,0,0);
@@ -174,7 +207,10 @@
 		echo "Prev ";
 	}
 	
-	$query = "SELECT id FROM imas_forum_posts WHERE forumid='$forumid' AND threadid>'$threadid' AND parent=0 ORDER BY threadid LIMIT 1";
+	$query = "SELECT id FROM imas_forum_threads WHERE forumid='$forumid' AND id>'$threadid' ";
+	if ($groupset>0 && $groupid!=-1) {$query .= "AND (stugroupid='$groupid' OR stugroupid=0) ";}
+	$query .= "ORDER BY id LIMIT 1";
+	//$query = "SELECT id FROM imas_forum_posts WHERE forumid='$forumid' AND threadid>'$threadid' AND parent=0 ORDER BY threadid LIMIT 1";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	if (mysql_num_rows($result)>0) {
 		$nextth = mysql_result($result,0,0);
