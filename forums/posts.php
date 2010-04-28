@@ -202,7 +202,7 @@
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	if (mysql_num_rows($result)>0) {
 		$nextth = mysql_result($result,0,0);
-		echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=$nextth\">Prev</a> ";
+		echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=$nextth&grp=$groupid\">Prev</a> ";
 	} else {
 		echo "Prev ";
 	}
@@ -214,7 +214,7 @@
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	if (mysql_num_rows($result)>0) {
 		$nextth = mysql_result($result,0,0);
-		echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=$nextth\">Next</a>";
+		echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=$nextth&grp=$groupid\">Next</a>";
 	} else {
 		echo "Next";
 	}

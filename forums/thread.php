@@ -48,6 +48,7 @@
 	$sortby = mysql_result($result,0,4);
 	$dofilter = false;
 	$now = time();
+	$grpqs = '';
 	if ($groupsetid>0) {
 		if (isset($_GET['ffilter'])) {
 			$sessiondata['ffilter'.$forumid] = $_GET['ffilter'];
@@ -67,6 +68,7 @@
 			if (isset($sessiondata['ffilter'.$forumid]) && $sessiondata['ffilter'.$forumid]>-1) {
 				$groupid = $sessiondata['ffilter'.$forumid];
 				$dofilter = true;
+				$grpqs = "&grp=$groupid";
 			} else {
 				$groupid = 0;
 			}
@@ -678,7 +680,7 @@
 		} else {
 			$name = "{$line['LastName']}, {$line['FirstName']}";
 		}
-		echo "<b><a href=\"posts.php?cid=$cid&forum=$forumid&thread={$line['id']}&page=$page\">{$line['subject']}</a></b>: $name";
+		echo "<b><a href=\"posts.php?cid=$cid&forum=$forumid&thread={$line['id']}&page=$page$grpqs\">{$line['subject']}</a></b>: $name";
 		
 		echo "</td>\n";
 		if ($isteacher && $groupsetid>0 && !$dofilter) {
