@@ -58,6 +58,13 @@ function removeallgroupmembers($grpid) {
 	//any assessment session using this group, set group to 0
 	$query = "UPDATE imas_assessment_sessions SET agroupid=0 WHERE agroupid='$grpid'";
 	mysql_query($query) or die("Query failed : " . mysql_error());
+	
+	$now = time();
+	
+	if (isset($GLOBALS['CFG']['log'])) {
+		$query = "INSERT INTO imas_log (time,log) VALUES ($now,'deleting members from $grpid')";
+		mysql_query($query) or die("Query failed : " . mysql_error());
+	}
 }
 
 function removegroupmember($grpid, $uid) {
@@ -67,6 +74,12 @@ function removegroupmember($grpid, $uid) {
 	//update any assessment sessions using this group
 	$query = "UPDATE imas_assessment_sessions SET agroupid=0 WHERE agroupid='$grpid' AND userid='$uid'";
 	mysql_query($query) or die("Query failed : " . mysql_error());
+	
+	$now = time();
+	if (isset($GLOBALS['CFG']['log'])) {
+		$query = "INSERT INTO imas_log (time,log) VALUES ($now,'deleting $uid from $grpid')";
+		mysql_query($query) or die("Query failed : " . mysql_error());
+	}
 }
 
 ?>

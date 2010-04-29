@@ -2921,7 +2921,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						continue;
 					}
 					if ($ansline[0]!=$lines[$i][0]) {
-						if (abs(abs($ansline[1])-1)<.3) {
+						if (abs(abs($ansline[1])-1)<.4) {
 							//check intercept
 							if (abs($ansline[2]-$lines[$i][3])>$defpttol*$reltolerance) {
 								continue;
@@ -3058,12 +3058,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$scores[$key] = 0;
 				for ($i=0; $i<count($ineqlines); $i++) {
 					if ($ansline[2]!=$ineqlines[$i][2]) { continue;}
+					if ($ansline[1]!=$ineqlines[$i][1]) { continue;}
 					//check slope
 					if (abs($ansline[3]-$ineqlines[$i][3])/(abs($ansline[3])+.000001)>$deftol*$reltolerance) {
 						continue;
 					}
 					if ($ansline[0]!=$ineqlines[$i][0]) {
-						if (abs(abs($ansline[3])-1)<.3) {
+						if (abs(abs($ansline[3])-1)<.4) {
 							//check intercept
 							if (abs($ansline[4]-$ineqlines[$i][5])>$defpttol*$reltolerance) {
 								continue;

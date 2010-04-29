@@ -409,7 +409,7 @@ function AMTremoveBrackets(node) {
     st = node.substr(1,12);
     if (st=="\\left\\lbrace" || st=="\\left\\langle") node = '{'+node.substr(13);
     st = node.charAt(node.length-2);
-    if (st==")" || st=="]") node = node.substr(0,node.length-8)+'}';
+    if (st==")" || st=="]" || st=='.') node = node.substr(0,node.length-8)+'}';
     st = node.substr(node.length-8,7)
     if (st=="\\rbrace" || st=="\\rangle") node = node.substr(0,node.length-14) + '}';
     

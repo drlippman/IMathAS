@@ -614,8 +614,11 @@
 				echo "(parts: {$answeights[$questions[$i]]}) ";
 			}
 			echo "in {$attempts[$i]} attempt(s)\n";
+			$laarr = explode('##',$lastanswers[$i]);
+			if ($attempts[$i]!=count($laarr)) {
+				//echo " (clicked \"Jump to answer\")";
+			}
 			if ($isteacher || $istutor) {
-				$laarr = explode('##',$lastanswers[$i]);
 				if (count($laarr)>1) {
 					echo "<br/>Previous Attempts:";
 					$cnt =1;

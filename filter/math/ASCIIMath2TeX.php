@@ -422,8 +422,10 @@ function AMTremoveBrackets($node) {
 		if ($st=='\\left\\lbrace' || $st=='\\left\\langle') {
 			$node = '{'.substr($node,13);
 		}
-		$st = $node{strlen($node)-2};
-		if ($st==')' || $st==']') {
+		$st = substr($node,-8);
+		if ($st=='\\right)}' || $st=='\\right)}' || $st=='\\right.}') {
+		//$st = $node{strlen($node)-2};
+		//if ($st==')' || $st==']' || $st=='.') {
 			$node = substr($node,0,strlen($node)-8).'}';
 		}
 		$st = substr($node,strlen($node)-8,7);

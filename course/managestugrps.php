@@ -89,6 +89,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stulist = implode(',',$stustoadd);	
 		} else {
 			$grpid = $_POST['addtogrpid'];
+			$loginfo = "instr adding stu to group $grpid. ";
 			if (!is_array($stustoadd)) {
 				$stustoadd = explode(',',$stustoadd);
 			}
@@ -115,6 +116,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				for ($i=0;$i<count($stustoadd);$i++) {
 					if ($i>0) {$query .= ',';};
 					$query .= "('$grpid','{$stustoadd[$i]}')";
+					$loginfo .= "adding {$stustoadd[$i]}.";
 				}
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				
@@ -161,6 +163,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 							$query = "SELECT id,agroupid FROM imas_assessment_sessions WHERE userid='$stuid' AND assessmentid={$aid[0]}";
 							$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
 							if (mysql_num_rows($result)>0) {  
+								$loginfo .= "updating ias for $stuid.";
 								$row = mysql_fetch_row($result);
 								$sets = array();
 								foreach ($fieldstocopyarr as $k=>$val) {
@@ -175,6 +178,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 								//$query = "UPDATE imas_assessment_sessions SET agroupid='$agroupid' WHERE id='{$row[0]}'";
 								mysql_query($query) or die("Query failed : $query:" . mysql_error());
 							} else {
+								$loginfo .= "inserting ias for $stuid.";
 								$query = "INSERT INTO imas_assessment_sessions (userid,$fieldstocopy) ";
 								$query .= "VALUES ('$stuid',$insrow)";
 								mysql_query($query) or die("Query failed : $query:" . mysql_error());
@@ -191,10 +195,21 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
 				while ($row = mysql_fetch_row($result)) {
 					echo $row[1].', '.$row[0].'<br/>';
+					$loginfo .= $row[1].', '.$row[0].' already in group.';
 				}
 				echo "<p><a href=\"managestugrps.php?cid=$cid&grpsetid={$_GET['grpsetid']}\">Continue</a></p>";
 				require("../footer.php");
+				$now = time();
+				if (isset($GLOBALS['CFG']['log'])) {
+					$query = "INSERT INTO imas_log (time,log) VALUES ($now,'".addslashes($loginfo)."')";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+				}
 			} else {
+				$now = time();
+				if (isset($GLOBALS['CFG']['log'])) {
+					$query = "INSERT INTO imas_log (time,log) VALUES ($now,'".addslashes($loginfo)."')";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+				}
 				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid&grpsetid={$_GET['grpsetid']}");
 			}
 			exit();

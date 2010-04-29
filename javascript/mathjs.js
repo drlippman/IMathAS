@@ -102,7 +102,7 @@ function mathjs(st,varlist) {
   st = st.replace(/#/g,"");
   st = st.replace(/a#r#c\s+(sin|cos|tan)/g,"arc$1");
   st = st.replace(/\s/g,"");
-  st = st.replace(/(Sin|Cos|Tan|Sec|Csc|Cot|Arc|Abs|Log|Ln)/g, matchtolower);
+  st = st.replace(/(Sin|Cos|Tan|Sec|Csc|Cot|Arc|Abs|Log|Ln|Sqrt)/g, matchtolower);
   st = st.replace(/log_(\d+)\(/,"nthlog($1,");
   st = st.replace(/log/g,"logten");
   if (st.indexOf("^-1")!=-1) {
@@ -243,6 +243,5 @@ function mathjs(st,varlist) {
     }
     st = st.slice(0,j+1)+"factorial("+st.slice(j+1,i)+")"+st.slice(i+1);
   }
-
   return st;
 }

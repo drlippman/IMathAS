@@ -173,15 +173,20 @@ function getremainingpossible($qn,$qi,$testsettings,$attempts) {
 		$possible = calcpointsafterpenalty(implode('~',$qi['answeights']),$qi,$testsettings,$attempts);
 		$appts = explode('~',$possible);
 		$curs = explode('~',$scores[$qn]);
-		for ($k=0;$k<count($curs);$k++) {
-			if ($appts[$k]>$curs[$k]) { //part after penalty better than orig, replace
-				$curs[$k] = $appts[$k];
+		if (count($curs)==count($appts)) {
+			for ($k=0;$k<count($curs);$k++) {
+				if ($appts[$k]>$curs[$k]) { //part after penalty better than orig, replace
+					$curs[$k] = $appts[$k];
+				}
+				if ($curs[$k]<0) {
+					$curs[$k] = 0;
+				}
 			}
-			if ($curs[$k]<0) {
-				$curs[$k] = 0;
-			}
+			$possible = round(array_sum($curs),1);
+		} else {
+			$possible = round(array_sum($appts),1);
 		}
-		$possible = round(array_sum($curs),1);
+		
 	} else {
 		$possible = calcpointsafterpenalty(1,$qi,$testsettings,$attempts);
 	}

@@ -633,6 +633,7 @@
 			$rowgrptest = mysql_fetch_row($result);
 			$rowgrptest = addslashes_deep($rowgrptest);
 			$insrow = "'".implode("','",$rowgrptest)."'";
+			$loginfo = "$userfullname creating group. ";
 			for ($i=1;$i<$testsettings['groupmax'];$i++) {
 				if (isset($_POST['user'.$i]) && $_POST['user'.$i]!=0) {
 					$query = "SELECT password,LastName,FirstName FROM imas_users WHERE id='{$_POST['user'.$i]}'";
@@ -654,6 +655,7 @@
 						$row = mysql_fetch_row($result);
 						if ($row[1]>0) { 
 							echo "<p>$thisusername already has a group.  No change made</p>";
+							$loginfo .= "$thisusername already in group. ";
 						} else {
 							$query = "INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES ('$userid','{$sessiondata['groupid']}')";
 							mysql_query($query) or die("Query failed : $query:" . mysql_error());
@@ -673,6 +675,7 @@
 							//$query = "UPDATE imas_assessment_sessions SET agroupid='$agroupid' WHERE id='{$row[0]}'";
 							mysql_query($query) or die("Query failed : $query:" . mysql_error());
 							echo "<p>$thisusername added to group, overwriting existing attempt.</p>";
+							$loginfo .= "$thisusername switched to group. ";
 						}
 					} else {
 						$query = "INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES ('{$_POST['user'.$i]}','{$sessiondata['groupid']}')";
@@ -682,8 +685,14 @@
 						$query .= "VALUES ('{$_POST['user'.$i]}',$insrow)";
 						mysql_query($query) or die("Query failed : $query:" . mysql_error());
 						echo "<p>$thisusername added to group.</p>";
+						$loginfo .= "$thisusername added to group. ";
 					}
 				}
+			}
+			$now = time();
+			if (isset($GLOBALS['CFG']['log'])) {
+				$query = "INSERT INTO imas_log (time,log) VALUES ($now,'".addslashes($loginfo)."')";
+				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 		} else {
 			echo '<div id="headershowtest" class="pagetitle"><h2>Select group members</h2></div>';

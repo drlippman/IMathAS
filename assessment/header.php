@@ -47,9 +47,9 @@ if ($sessiondata['mathdisp']==1) {
 }
 
 if ($sessiondata['graphdisp']==1) {
-	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?v=020310\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?v=042810\" type=\"text/javascript\"></script>\n";
 } else {
-	echo "<script src=\"$imasroot/javascript/mathjs.js\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/mathjs.js?v=042810\" type=\"text/javascript\"></script>\n";
 }
 ?>
 <!--[if lte IE 6]> 

@@ -403,7 +403,7 @@
 		$query .= "WHERE id='$userid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		if (is_uploaded_file($_FILES['stupic']['tmp_name'])) {
-			processImage($_FILES['stupic'],$userid,100,100);
+			processImage($_FILES['stupic'],$userid,200,200);
 			processImage($_FILES['stupic'],'sm'.$userid,40,40);
 		} else if (isset($_POST['removepic'])) {
 			$curdir = rtrim(dirname(__FILE__), '/\\');
