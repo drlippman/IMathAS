@@ -148,7 +148,7 @@ Date.prototype.getWeekDays = function(d) {
 	 globd.setTime(Date.parse(el.value));
 	 document.getElementById(el.id.substring(0,2)+el.id.substring(5)).innerHTML = globd.SHORTDAYS[globd.getDay()];
   }
-  function senddownsub(type,basearr,st,usebusdays) {  //type: s,e,r
+  function senddownsub(type,basearr,st,usebusdays,usecb) {  //type: s,e,r
 	  var d = new Date();
 	  var db = new Date();
 	  if (document.getElementById(type+"datetype"+st).value==1) {
@@ -164,6 +164,9 @@ Date.prototype.getWeekDays = function(d) {
 			  }
 			  var timediff = (d.getHours()*60+d.getMinutes()) - (db.getHours()*60+db.getMinutes()); //minutes
 			  for (var i=st+1;i<basearr.length;i++) {
+				  if (usecb && !document.getElementById("cb"+i).checked) {
+					  continue;
+				  }
 				  if (basearr[i]!="NA" && document.getElementById(type+"datetype"+i).value==1) {
 					 curdate = document.getElementById(type+"date"+i).value;
 					 if (curdate!=0 && curdate!=2000000000) {
@@ -186,11 +189,20 @@ Date.prototype.getWeekDays = function(d) {
 	  }
   }
   function senddown(st) {
-	  var usebusdays = document.getElementById("onlyweekdays").checked
-	  senddownsub('s',basesdates,st,usebusdays);
-	  senddownsub('e',baseedates,st,usebusdays);
+	  var usebusdays = document.getElementById("onlyweekdays").checked;
+	  var usecb = false;
+	  var cbs = document.getElementsByTagName("input");
+	  for (var i=0;i<cbs.length;i++) {
+		  if (cbs[i].type=="checkbox" && cbs[i].checked && cbs[i].id.match(/cb/)) {
+			  usecb = true;
+			  break;
+		  }
+	  }
+	 alert(usecb);
+	  senddownsub('s',basesdates,st,usebusdays,usecb);
+	  senddownsub('e',baseedates,st,usebusdays,usecb);
 	  if (baserdates[st]!="NA") {
-		  senddownsub('r',baserdates,st,usebusdays);
+		  senddownsub('r',baserdates,st,usebusdays,usecb);
 	  }
   }
   function filteritems() {

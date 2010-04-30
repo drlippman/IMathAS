@@ -46,6 +46,14 @@
 				}
 			}
 		}
+		if (isset($_POST['onepergroup']) && $_POST['onepergroup']==1) {
+			foreach ($_POST['groupasid'] as $grp=>$asid) {
+				$grpscores[$grp] = $allscores[$asid];
+			}
+			$onepergroup = true;
+		} else {
+			$onepergroup = false;
+		}
 		
 		$query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions ";
 		$query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_assessment_sessions.assessmentid='$aid' ";
@@ -53,13 +61,24 @@
 		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 		$cnt = 0;
 		while($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
-			if (isset($allscores[$line['id']])) {//if (isset($locs[$line['id']])) {
+			if ((!$onepergroup && isset($allscores[$line['id']])) || ($onepergroup && isset($grpscores[$line['agroupid']]))) {//if (isset($locs[$line['id']])) {
 				$scores = explode(",",$line['bestscores']);
-				foreach ($allscores[$line['id']] as $loc=>$sv) {
-					if (is_array($sv)) {
-						$scores[$loc] = implode('~',$sv);
-					} else {
-						$scores[$loc] = $sv;
+				if ($onepergroup) {
+					if ($line['agroupid']==0) { continue;}
+					foreach ($grpscores[$line['agroupid']] as $loc=>$sv) {
+						if (is_array($sv)) {
+							$scores[$loc] = implode('~',$sv);
+						} else {
+							$scores[$loc] = $sv;
+						}
+					}
+				} else {
+					foreach ($allscores[$line['id']] as $loc=>$sv) {
+						if (is_array($sv)) {
+							$scores[$loc] = implode('~',$sv);
+						} else {
+							$scores[$loc] = $sv;
+						}
 					}
 				}
 				$scorelist = implode(",",$scores);
@@ -76,10 +95,18 @@
 	require("../assessment/displayq2.php");
 	list ($qsetid,$cat) = getqsetid($qid);
 	
-	$query = "SELECT name,defpoints FROM imas_assessments WHERE id='$aid'";
+	$query = "SELECT name,defpoints,isgroup,groupsetid FROM imas_assessments WHERE id='$aid'";
 	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-	$aname = mysql_result($result,0,0);
-	$defpoints = mysql_result($result,0,1);
+	list($aname,$defpoints,$isgroup,$groupsetid) = mysql_fetch_row($result);
+	
+	if ($isgroup>0) {
+		$groupnames = array();
+		$query = "SELECT id,name FROM imas_stugroups WHERE groupsetid=$groupsetid";
+		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			$groupnames[$row[0]] = $row[1];
+		}
+	}
 	
 	$query = "SELECT imas_questions.points,imas_questionset.control FROM imas_questions,imas_questionset ";
 	$query .= "WHERE imas_questions.questionsetid=imas_questionset.id AND imas_questions.id='$qid'";
@@ -169,13 +196,44 @@
 		}
 		document.getElementById("preprint").style.display = "none";
 	}
+	function hidegroupdup(el) {  //el.checked = one per group
+	   var divs = document.getElementsByTagName("div");
+	   for (var i=0;i<divs.length;i++) {
+	     if (divs[i].className=="groupdup") { 
+	         if (el.checked) {
+	               divs[i].style.display = "none";
+	         } else { divs[i].style.display = "block"; }
+	     }
+	    }	
+	    var hfours = document.getElementsByTagName("h4");
+	   for (var i=0;i<hfours.length;i++) {
+	     if (hfours[i].className=="person") { 
+	     	hfours[i].style.display = el.checked?"none":"";
+	     } else if (hfours[i].className=="group") { 
+	     	hfours[i].style.display = el.checked?"":"none";
+	     }
+	    }
+	    var spans = document.getElementsByTagName("span");
+	   for (var i=0;i<spans.length;i++) {
+	     if (spans[i].className=="person") { 
+	     	spans[i].style.display = el.checked?"none":"";
+	     } else if (spans[i].className=="group") { 
+	     	spans[i].style.display = el.checked?"":"none";
+	     }
+	    }
+	}
 	</script>
 <?php
 	echo '<input type=button id="hctoggle" value="Hide Perfect Score Questions" onclick="hidecorrect()" />';
 	echo '<input type=button id="nztoggle" value="Hide Nonzero Score Questions" onclick="hidenonzero()" />';
 	echo ' <input type=button id="hnatoggle" value="Hide Not Answered Questions" onclick="hideNA()" />';
 	echo ' <input type="button" id="preprint" value="Prepare for Printing (Slow)" onclick="preprint()" />';
+	
 	echo "<form id=\"mainform\" method=post action=\"gradeallq.php?stu=$stu&gbmode=$gbmode&cid=$cid&aid=$aid&qid=$qid&update=true\">\n";
+	if ($isgroup>0) {
+		echo '<p><input type="checkbox" name="onepergroup" value="1" onclick="hidegroupdup(this)" /> Grade one per group</p>';
+	}
+	
 	echo "<p>";
 	if ($ver=='graded') {
 		echo "Showing Graded Attempts.  ";
@@ -191,12 +249,23 @@
 	$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
 	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 	$cnt = 0;
+	$onepergroup = array();
 	require_once("../includes/filehandler.php");
 	while($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 		$asid = $line['id'];
+		$groupdup = false;
 		if ($line['agroupid']>0) {
 			$s3asid = 'grp'.$line['agroupid'].'/'.$aid;
+			if (isset($onepergroup[$line['agroupid']])) {
+				$groupdup = true;
+			} else {
+				echo "<input type=\"hidden\" name=\"groupasid[{$line['agroupid']}]\" value=\"{$line['id']}\" />";
+				$onepergroup[$line['agroupid']] = $line['id'];
+			}
 		} else {
+			if ($isgroup) {
+				$groupdup = true;
+			}
 			$s3asid = $asid;
 		}
 		$questions = explode(',',$line['questions']);
@@ -212,8 +281,13 @@
 		//$loc = array_search($qid,$questions);
 		$lockeys = array_keys($questions,$qid);
 		foreach ($lockeys as $loc) {
-		
-			echo "<h4>".$line['LastName'].', '.$line['FirstName']."</h4>";
+			if ($groupdup) {
+				echo '<div class="groupdup">';
+			}
+			echo "<h4 class=\"person\">".$line['LastName'].', '.$line['FirstName']."</h4>";
+			if (!$groupdup) {
+				echo '<h4 class="group" style="display:none">'.$groupnames[$line['agroupid']].'</h4>';
+			}
 			echo "<div ";
 			if (getpts($scores[$loc])==$points) {
 				echo 'class="iscorrect"';	
@@ -230,7 +304,14 @@
 			displayq($cnt,$qsetid,$seeds[$loc],true,false,$attempts[$loc]);
 			echo '</div>';
 			
-			echo "<div class=review>".$line['LastName'].', '.$line['FirstName'].': ';
+			echo "<div class=review>";
+			echo '<span class="person">'.$line['LastName'].', '.$line['FirstName'].': </span>';
+			if (!$groupdup) {
+				echo '<span class="group" style="display:none">'.$groupnames[$line['agroupid']].': </span>';
+			}
+			if ($isgroup) {
+				
+			}
 			list($pt,$parts) = printscore($scores[$loc]);
 			if ($parts=='') { 
 				if ($pt==-1) {
@@ -299,6 +380,9 @@
 			//echo " &nbsp; <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$line['id']}&clearq=$i\">Clear Score</a>";
 			echo "<br/>Feedback: <textarea cols=50 rows=1 name=\"feedback-{$line['id']}\">{$line['feedback']}</textarea>";
 			echo "</div>\n";
+			if ($groupdup) {
+				echo '</div>';
+			}
 			$cnt++;
 		}
 	}

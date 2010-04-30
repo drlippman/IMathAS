@@ -386,10 +386,13 @@
 			exit;
 		}
 		echo "<h4>{$line['name']}</h4>\n";
+		
+		$aid = $line['assessmentid'];
+		
 		if (($isteacher || $istutor) && !isset($_GET['lastver']) && !isset($_GET['reviewver'])) {
 			if ($line['agroupid']>0) {
 				$q2 = "SELECT i_u.LastName,i_u.FirstName FROM imas_assessment_sessions AS i_a_s,imas_users AS i_u WHERE ";
-				$q2 .= "i_u.id=i_a_s.userid AND i_a_s.agroupid='{$line['agroupid']}'";
+				$q2 .= "i_u.id=i_a_s.userid AND i_a_s.assessmentid='$aid' AND i_a_s.agroupid='{$line['agroupid']}' ORDER BY LastName,FirstName";
 				$result = mysql_query($q2) or die("Query failed : " . mysql_error());
 				echo "<p>Group members: <ul>";
 				while ($row = mysql_fetch_row($result)) {
@@ -398,7 +401,7 @@
 				echo "</ul></p>";
 			}	
 		}
-		$aid = $line['assessmentid'];
+		
 		
 		echo "<p>Started: " . tzdate("F j, Y, g:i a",$line['starttime']) ."<BR>\n";
 		if ($line['endtime']==0) { 

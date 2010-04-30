@@ -144,7 +144,7 @@ while ($row = mysql_fetch_row($result)) {
 		//continue;
 	}
 	
-	if (!isset($teacherid) && $row[6]>0) {
+	if (!isset($teacherid) && $row[6]>0 && $row[7]>0) {
 		$query = "SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid='{$row[7]}' AND userid='$userid'";
 		   $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 		   if (mysql_num_rows($r2)==0) {

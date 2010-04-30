@@ -103,7 +103,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		exit;
 	} else { //DEFAULT DATA MANIPULATION
 		$pagetitle = "Mass Change Dates";
-		$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/masschgdates.js\"></script>";
+		$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/masschgdates.js?v=042910\"></script>";
 		$placeinhead .= "<style>.show {display:inline;} \n .hide {display:none;} img {cursor:pointer;}\n</style>";
 	}
 }	
@@ -192,7 +192,8 @@ if ($overwriteBody==1) {
 	
 	echo "<p><input type=checkbox id=\"onlyweekdays\" checked=\"checked\"> Shift by weekdays only</p>";
 	echo "<p>Once changing dates in one row, you can click <i>Send Down List</i> to send the date change ";
-	echo "difference to all rows below.  Click the <img src=\"$imasroot/img/swap.gif\"> icon in each cell to swap from ";
+	echo "difference to all rows below.  If you click the checkboxes on the left, you can limit the update to those items. ";
+	echo "Click the <img src=\"$imasroot/img/swap.gif\"> icon in each cell to swap from ";
 	echo "Always/Never to Dates.  Swaps to/from Always/Never cannot be sent down the list.</p>";
 	echo "<form id=\"qform\" method=post action=\"masschgdates.php?cid=$cid\">";
 	
