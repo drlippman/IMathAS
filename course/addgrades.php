@@ -136,7 +136,7 @@
 	}
 	
 	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addgrades.js\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addgrades.js?v=050310\"></script>";
 	$placeinhead .= '<style type="text/css">	
 		 .suggestion_list
 		 {
@@ -322,8 +322,10 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 			echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 		}
 		if ($_GET['grades']=='all') {
-			echo "<br/><span class=form>Add/Replace to all:</span><span class=formright>Grade: <input type=text size=3 id=\"toallgrade\" onblur=\"this.value = doonblur(this.value);\"/> Feedback: <input type=text size=40 id=\"toallfeedback\"/>";
-			echo '<br/><input type=button value="Add / Append" onClick="sendtoall(0);"/> <input type=button value="Multiply / Prepend" onclick="sendtoall(1)"/> <input type=button value="Replace" onclick="sendtoall(2)"/></span><br class="form"/>';
+			echo "<br/><span class=form>Add/Replace to all grades:</span><span class=formright><input type=text size=3 id=\"toallgrade\" onblur=\"this.value = doonblur(this.value);\"/>"; 
+			echo ' <input type=button value="Add" onClick="sendtoall(0,0);"/> <input type=button value="Multiply" onclick="sendtoall(0,1)"/> <input type=button value="Replace" onclick="sendtoall(0,2)"/></span><br class="form"/>';
+			echo "<span class=form>Add/Replace to all feedback:</span><span class=formright><input type=text size=40 id=\"toallfeedback\"/>";
+			echo ' <input type=button value="Append" onClick="sendtoall(1,0);"/> <input type=button value="Prepend" onclick="sendtoall(1,1)"/> <input type=button value="Replace" onclick="sendtoall(1,2)"/></span><br class="form"/>';
 		}
 	
 		echo "<table id=myTable><thead><tr><th>Name</th>";
@@ -335,7 +337,7 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 		if ($hassection) {
 			echo '<td></td>';
 		}
-		echo '<td><input type="text" id="qascore" size="3" onblur="this.value = doonblur(this.value);" /></td>';
+		echo '<td><input type="text" id="qascore" size="3" onblur="this.value = doonblur(this.value);" onkeydown="return qaonenter(event,this);" /></td>';
 		echo '<td><textarea id="qafeedback" rows="1" cols="40"></textarea>';
 		echo '<input type="button" value="Next" onfocus="addsuggest()" /></td></tr>';
 		if ($_GET['gbitem']=="new") {

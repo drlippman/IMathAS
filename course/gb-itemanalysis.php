@@ -28,7 +28,19 @@
 	}
 	
 	$catfilter = -1;
-	$secfilter = -1;
+	if (isset($tutorsection) && $tutorsection!='') {
+		$secfilter = $tutorsection;
+	} else {
+		if (isset($_GET['secfilter'])) {
+			$secfilter = $_GET['secfilter'];
+			$sessiondata[$cid.'secfilter'] = $secfilter;
+			writesessiondata();
+		} else if (isset($sessiondata[$cid.'secfilter'])) {
+			$secfilter = $sessiondata[$cid.'secfilter'];
+		} else {
+			$secfilter = -1;
+		}
+	}
 	
 	//Gbmode : Links NC Dates
 	$totonleft = floor($gbmode/1000)%10 ; //0 right, 1 left
@@ -87,6 +99,9 @@
 	
 	$query = "SELECT ias.questions,ias.bestscores,ias.bestattempts,ias.bestlastanswers,ias.starttime,ias.endtime FROM imas_assessment_sessions AS ias,imas_students ";
 	$query .= "WHERE ias.userid=imas_students.userid AND imas_students.courseid='$cid' AND ias.assessmentid='$aid'";
+	if ($secfilter!=-1) {
+		$query .= " AND imas_students.section='$secfilter' ";
+	}
 	$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
 	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 		$questions = explode(',',$line['questions']);
