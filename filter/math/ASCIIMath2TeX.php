@@ -685,28 +685,47 @@ function AMTparseExpr($str,$rightbracket) {
 					array_push($pos,0);
 					$matrix = true;
 					$mxnestingd = 0;
+					$subpos = array();
+					$subpos[0] = array(0);
+					$lastsubposstart = 0;
+					$mxanynestingd = 0;
 					$addedlast = true;
 					for ($i=1; $i<$len-1;$i++) {
 						if ($newFrag{$i}==$left) { $mxnestingd++;}
 						if ($newFrag{$i}==$right) {
 							$mxnestingd--;
 							if ($mxnestingd==0 && $newFrag{$i+2}==',' && $newFrag{$i+3}=='{') {
-									array_push($pos,$i+2);
+								array_push($pos,$i+2);
+								$lastsubposstart= $i+2;
+								$subpos[$lastsubposstart] = array($i+2);
 							} else if ($mxnestingd==0 && $i+2<$len) {
 								$matrix = false;
 							}
 						}
-					}
+						if ($newFrag{$i}=='[' || $newFrag{$i}=='(') {$mxanynestingd++;}
+						if ($newFrag{$i}==']' || $newFrag{$i}==')') {$mxanynestingd--;}
+						if ($newFrag{$i}==',' && $mxanynestingd==1) {
+							$subpos[$lastsubposstart][] = $i;
+						}
+						
+					} 
 					array_push($pos,$len);
 					$lastmxsubcnt = -1;
 					if ($mxnestingd==0 && count($pos)>0) {
 						for ($i=0; $i<count($pos)-1;$i++) {
 							if ($i>0) { $mxout .= '\\\\';}
 							if ($i==0) {
-								$subarr = explode(',',substr($newFrag,$pos[$i]+7,$pos[$i+1]-$pos[$i]-15));
+								//$subarr = explode(',',substr($newFrag,$pos[$i]+7,$pos[$i+1]-$pos[$i]-15));
+								$subarr = array(substr($newFrag,$pos[$i]+7,$subpos[$pos[$i]][1]-$pos[$i]-7));
 							} else {
-								$subarr = explode(',',substr($newFrag,$pos[$i]+8,$pos[$i+1]-$pos[$i]-16));
+								//$subarr = explode(',',substr($newFrag,$pos[$i]+8,$pos[$i+1]-$pos[$i]-16));
+								$subarr = array(substr($newFrag,$pos[$i]+8,$subpos[$pos[$i]][1]-$pos[$i]-8));
 							}
+							for ($j=2; $j<count($subpos[$pos[$i]]);$j++) {
+								$subarr[] = substr($newFrag,$subpos[$pos[$i]][$j-1]+1,$subpos[$pos[$i]][$j] - $subpos[$pos[$i]][$j-1]-1);
+							}
+							$j = count($subpos[$pos[$i]]);
+							$subarr[] = substr($newFrag,$subpos[$pos[$i]][$j-1]+1,$pos[$i+1] -8 - $subpos[$pos[$i]][$j-1]-1);
 							if ($lastmxsubcnt>0 && count($subarr)!=$lastmxsubcnt) {
 								$matrix = false;
 							} else if ($lastmxsubcnt==-1) {

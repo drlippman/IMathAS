@@ -139,6 +139,10 @@ isread:
 				$row = mysql_fetch_row($result);
 				echo $row[0].', '.$row[1];
 				echo "<input type=hidden name=to value=\"{$_GET['to']}\"/>";
+				$curdir = rtrim(dirname(__FILE__), '/\\');
+				if (isset($_GET['to']) && file_exists("$curdir/../course/files/userimg_sm{$_GET['to']}.jpg")) {
+					echo " <img style=\"vertical-align: middle;\" src=\"$imasroot/course/files/userimg_sm{$_GET['to']}.jpg\" onclick=\"togglepic(this)\" /><br/>";
+				}
 			} else {
 				echo "<select name=\"to\">";
 				if ($isteacher || $msgset<2) {

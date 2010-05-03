@@ -41,7 +41,7 @@ if ($sessiondata['mathdisp']==1) {
 	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/ASCIIMathML_min.js\"></script>\n";
 } else if ($sessiondata['mathdisp']==2) {
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>'; 
-	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?v=050110\" type=\"text/javascript\"></script>\n";
 } else if ($sessiondata['mathdisp']==0) {
 	echo '<script type="text/javascript">var noMathRender = true;</script>';	
 }

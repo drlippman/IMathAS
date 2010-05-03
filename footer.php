@@ -20,6 +20,9 @@ if ((isset($testsettings) && $testsettings['showtips']==2) || (isset($showtips) 
 	echo '<div id="eh" class="eh"></div>';
 	
 }
+if (isset($placeinfooter)) {
+	echo $placeinfooter;
+}
 ?>
 </body>
 </html>

@@ -139,7 +139,9 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	
 	//create hintbuttons
 	if (isset($hints) && $showhints) {
-		$lastkey = end(array_keys($hints));
+		//$hintkeys = array_keys($hints);
+		//$lastkey = array_pop($hintkeys);
+		$lastkey = max(array_keys($hints));
 		if ($qdata['qtype']=="multipart" && is_array($hints[$lastkey])) { //individual part hints
 			foreach ($hints as $iidx=>$hintpart) {
 				$lastkey = end(array_keys($hintpart));
@@ -149,7 +151,11 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 					$usenum = $attemptn;
 				}
 				if ($hintpart[$usenum]!='') {
-					$hintloc[$iidx] = "<p><i>Hint:</i> {$hintpart[$usenum]}</p>\n";
+					if (strpos($hintpart[$usenum],'button"')!==false) {
+						$hintloc[$iidx] = "<p>{$hintpart[$usenum]}</p>\n";
+					} else {
+						$hintloc[$iidx] = "<p><i>Hint:</i> {$hintpart[$usenum]}</p>\n";
+					}
 				}
 				
 			}
@@ -161,7 +167,11 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 				$usenum = $attemptn;
 			}
 			if ($hints[$usenum]!='') {
-				$hintloc = "<p><i>Hint:</i> {$hints[$usenum]}</p>\n";
+				if (strpos($hints[$usenum],'button"')!==false) {
+					$hintloc = "<p>{$hints[$usenum]}</p>\n";
+				} else {
+					$hintloc = "<p><i>Hint:</i> {$hints[$usenum]}</p>\n";
+				}
 			}
 			
 		}
@@ -232,7 +242,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		if ((!isset($hidetips) || (is_array($hidetips) && !isset($hidetips[$iidx])))&& !$seqinactive && $showtips>0) {
 			echo "<p class=\"tips\" ";
 			if ($showtips!=1) { echo 'style="display:none;" ';}
-			echo ">Box ".($iidx+1).": <span id=\"tips$qnidx-$iidx\">$tip</span></p>";
+			echo ">Box ".($iidx+1).": <span id=\"tips$qnidx-$iidx\">".filter($tip)."</span></p>";
 		}
 		if ($doshowans && (!isset($showanswer) || (is_array($showanswer) && !isset($showanswer[$iidx]))) && $shanspt[$iidx]!=='') {
 			if ($nosabutton) {
@@ -3625,13 +3635,13 @@ function formathint($eword,$ansformats,$calledfrom, $islist=false,$doshort=false
 		$tip .= "Enter $eword as a reduced fraction (like 5/3, not 10/6) or as a whole number (like 4 or -2)";
 		$shorttip = $islist?'Enter a list of reduced fractions or whole numbers':'Enter a reduced fraction or whole number';
 	} else if (in_array('mixednumber',$ansformats)) {
-		$tip .= "Enter $eword as a reduced mixed number or as a whole number.  Example: 2 1/2 = `2 1/2`, or 2_1/2 = `2 1/2`";
+		$tip .= "Enter $eword as a reduced mixed number or as a whole number.  Example: 2 1/2 = 2 &frac12;";
 		$shorttip = $islist?'Enter a list of mixed numbers or whole numbers':'Enter a mixed number or whole number';
 	} else if (in_array('fracordec',$ansformats)) {
 		$tip .= "Enter $eword as a fraction (like 3/5 or 10/4), a whole number (like 4 or -2), or exact decimal (like 0.5 or 1.25)";
 		$shorttip = $islist?'Enter a list of fractions or exact decimals':'Enter a fraction or exact decimal';
 	} else if (in_array('scinot',$ansformats)) {
-		$tip .= "Enter $eword as in scientific notation.  Example: 3*10^2 = `3*10^2`";
+		$tip .= "Enter $eword as in scientific notation.  Example: 3*10^2 = 3 &middot; 10<sup>2</sup>";
 		$shorttip = $islist?'Enter a list of numbers using scientific notation':'Enter a number using scientific notation';
 	} else {
 		$tip .= "Enter $eword as a number (like 5, -3, 2.2) or as a calculation (like 5/3, 2^3, 5+4)";

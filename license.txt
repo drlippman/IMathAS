@@ -114,3 +114,7 @@ LGPL
 Paul's Simple Diff Algorithm v 0.1
 (C) Paul Butler 2007 <http://www.paulbutler.org/>
 May be used and distributed under the zlib/libpng license.
+
+AutoSuggest
+(C) 2005 Joe Kepley, The Sling & Rock Design Group, Inc.
+LGPL

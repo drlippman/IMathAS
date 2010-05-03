@@ -666,11 +666,24 @@ function AMTparseExpr(str,rightbracket) {
 				pos.push(0);
 				var matrix = true;
 				var mxnestingd = 0;
+				var subpos = [];
+				subpos[0] = [0];
+				var lastsubposstart = 0;
+				var mxanynestingd = 0;
 				for (i=1; i<len-1; i++) {
 					if (newFrag.charAt(i)==left) mxnestingd++;
 					if (newFrag.charAt(i)==right) {
 						mxnestingd--;
-						if (mxnestingd==0 && newFrag.charAt(i+2)==',' && newFrag.charAt(i+3)=='{') pos.push(i+2);
+						if (mxnestingd==0 && newFrag.charAt(i+2)==',' && newFrag.charAt(i+3)=='{') {
+							pos.push(i+2);
+							lastsubposstart = i+2;
+							subpos[lastsubposstart] = [i+2];
+						}
+					}
+					if (newFrag.charAt(i)=='[' || newFrag.charAt(i)=='(') { mxanynestingd++;}
+					if (newFrag.charAt(i)==']' || newFrag.charAt(i)==')') { mxanynestingd--;}
+					if (newFrag.charAt(i)==',' && mxanynestingd==1) {
+						subpos[lastsubposstart].push(i);
 					}
 				}
 				pos.push(len);
@@ -679,9 +692,19 @@ function AMTparseExpr(str,rightbracket) {
 					for (i=0;i<pos.length-1;i++) {
 						if (i>0) mxout += '\\\\';
 						if (i==0) {
-							var subarr = newFrag.substr(pos[i]+7,pos[i+1]-pos[i]-15).split(',');
+							//var subarr = newFrag.substr(pos[i]+7,pos[i+1]-pos[i]-15).split(',');
+							var subarr = [newFrag.substring(pos[i]+7,subpos[pos[i]][1])];
+							for (var j=2;j<subpos[pos[i]].length;j++) {
+								subarr.push(newFrag.substring(subpos[pos[i]][j-1]+1,subpos[pos[i]][j]));
+							}
+							subarr.push(newFrag.substring(subpos[pos[i]][subpos[pos[i]].length-1]+1,pos[i+1]-8));
 						} else {
-							var subarr = newFrag.substr(pos[i]+8,pos[i+1]-pos[i]-16).split(',');
+							//var subarr = newFrag.substr(pos[i]+8,pos[i+1]-pos[i]-16).split(',');
+							var subarr = [newFrag.substring(pos[i]+8,subpos[pos[i]][1])];
+							for (var j=2;j<subpos[pos[i]].length;j++) {
+								subarr.push(newFrag.substring(subpos[pos[i]][j-1]+1,subpos[pos[i]][j]));
+							}
+							subarr.push(newFrag.substring(subpos[pos[i]][subpos[pos[i]].length-1]+1,pos[i+1]-8));
 						}
 						if (lastmxsubcnt>0 && subarr.length!=lastmxsubcnt) {
 							matrix = false;

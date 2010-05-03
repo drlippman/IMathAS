@@ -136,6 +136,44 @@
 	}
 	
 	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addgrades.js\"></script>";
+	$placeinhead .= '<style type="text/css">	
+		 .suggestion_list
+		 {
+		 background: white;
+		 border: 1px solid;
+		 padding: 0px;
+		 }
+		
+		 .suggestion_list ul
+		 {
+		 padding: 0;
+		 margin: 0;
+		 list-style-type: none;
+		 }
+		
+		 .suggestion_list a
+		 {
+		 text-decoration: none;
+		 color: navy;
+		 padding: 5px;
+		 }
+		
+		 .suggestion_list .selected
+		 {
+		 background: #99f;
+		 }
+		
+		 tr#quickadd td {
+			 border-bottom: 1px solid #000;
+		 }
+		 
+		
+		 #autosuggest
+		 {
+		 display: none;
+		 }
+		 </style>';
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
@@ -241,111 +279,7 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 		echo '<h3>'.mysql_result($result,0,0).'</h3>';
 	}
 ?>
-<script type="text/javascript">
-function onenter(e,field) {
-	if (window.event) {
-		var key = window.event.keyCode;
-	} else if (e.which) {
-		var key = e.which;
-	}
-	if (key==13) {
-		var i;
-                for (i = 0; i < field.form.elements.length; i++)
-                   if (field == field.form.elements[i])
-                       break;
-              i = (i + 2) % field.form.elements.length;
-              field.form.elements[i].focus();
-              return false;
-	} else {
-		return true;
-	}
-}
-function onarrow(e,field) {
-	if (window.event) {
-		var key = window.event.keyCode;
-	} else if (e.which) {
-		var key = e.which;
-	}
-	
-	if (key==40 || key==38) {
-		var i;
-                for (i = 0; i < field.form.elements.length; i++)
-                   if (field == field.form.elements[i])
-                       break;
-		
-	      if (key==38) {
-		      i = i-2;
-		      if (i<0) { i=0;}
-	      } else {
-		      i = (i + 2) % field.form.elements.length;
-	      }
-	      if (field.form.elements[i].type=='text') {
-		      field.form.elements[i].focus();
-	      }
-              return false;
-	} else {
-		return true;
-	}
-}
-function togglefeedback(btn) {
-	var form = document.getElementById("mainform");
-	for (i = 0; i < form.elements.length; i++) {
-		el = form.elements[i];
-		if (el.type == 'textarea') {
-			if (el.rows==1) {
-				el.rows = 4;
-			} else {
-				el.rows = 1;
-			}
-		}
-	}
-	if (btn.value=="Expand Feedback Boxes") {
-		btn.value = "Shrink Feedback Boxes";
-	} else{
-		btn.value = "Expand Feedback Boxes";
-	}
-}
 
-function doonblur(value) {
-	value = value.replace(/[^\d\.\+\-\*\/]/g,'');
-	if (value=='') {return ('');}
-	try {
-		return (eval(value));
-	} catch (e) {
-		return '';
-	}
-}
-
-function sendtoall(type) {
-	var form=document.getElementById("mainform");
-	if (type==2 && document.getElementById("toallgrade").value == "") {
-		if (!confirm("Clear all scores?")) {
-			return;
-		}
-	}
-	for (var e = 0; e<form.elements.length; e++) {
-		 var el = form.elements[e];
-		if (el.type=="textarea" && el.id!="toallfeedback") {
-			if (type==1) { el.value = document.getElementById("toallfeedback").value + el.value;}
-			else if (type==0) { el.value = el.value+document.getElementById("toallfeedback").value;}
-			else if (type==2) { el.value = document.getElementById("toallfeedback").value;}
-		}
-		if (document.getElementById("toallgrade").value.match(/\d/)) {
-			if (el.type=="text" && el.id.match(/score/)) {
-				if (type==0) { el.value = doonblur(el.value+'+'+document.getElementById("toallgrade").value);}
-				else if (type==1) { el.value = doonblur(el.value+'*'+document.getElementById("toallgrade").value);}
-				else if (type==2) { el.value = document.getElementById("toallgrade").value;}
-			}
-		} else if (document.getElementById("toallgrade").value == "") {
-			if (el.type=="text" && el.id.match(/score/) && type==2) {
-				el.value = '';
-			}
-		}
-	}
-	document.getElementById("toallfeedback").value = '';
-	document.getElementById("toallgrade").value = '';
-} 
-</script>
 <?php
 		$query = "SELECT COUNT(imas_users.id) FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid ";
 		$query .= "AND imas_students.courseid='$cid' AND imas_students.section IS NOT NULL";
@@ -383,6 +317,7 @@ function sendtoall(type) {
 		}
 		*/
 		echo '<input type=button value="Expand Feedback Boxes" onClick="togglefeedback(this)"/>';
+		echo ' Use quicksearch entry? <input type="checkbox" id="useqa" onclick="togglequickadd(this)" />';
 		if ($hassection) {
 			echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 		}
@@ -396,6 +331,13 @@ function sendtoall(type) {
 			echo '<th>Section</th>';
 		}
 		echo "<th>Grade</th><th>Feedback</th></tr></thead><tbody>";
+		echo '<tr id="quickadd" style="display:none;"><td><input type="text" id="qaname" /></td>';
+		if ($hassection) {
+			echo '<td></td>';
+		}
+		echo '<td><input type="text" id="qascore" size="3" onblur="this.value = doonblur(this.value);" /></td>';
+		echo '<td><textarea id="qafeedback" rows="1" cols="40"></textarea>';
+		echo '<input type="button" value="Next" onfocus="addsuggest()" /></td></tr>';
 		if ($_GET['gbitem']=="new") {
 			$query = "SELECT imas_users.id,imas_users.LastName,imas_users.FirstName,imas_students.section,imas_students.locked ";
 			$query .= "FROM imas_users,imas_students WHERE ";
@@ -464,6 +406,7 @@ function sendtoall(type) {
 </form>
 
 <?php
+	$placeinfooter = '<div id="autosuggest"><ul></ul></div>';
 	require("../footer.php");
 ?>
 
