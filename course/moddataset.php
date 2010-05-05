@@ -227,7 +227,7 @@
 			}
 			*/
 			$query = "SELECT ili.libid FROM imas_library_items AS ili JOIN imas_libraries AS il ON ";
-			$query .= "ili.libid=il.id WHERE ili.qsetid='$qsetid'";
+			$query .= "ili.libid=il.id OR ili.libid=0 WHERE ili.qsetid='$qsetid'";
 			if (!$isadmin) {
 				//unassigned, or owner and lib not closed or mine
 				$query .= " AND ((ili.ownerid='$userid' AND (il.ownerid='$userid' OR il.userights%3<>1)) OR ili.libid=0)";

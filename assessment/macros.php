@@ -719,13 +719,13 @@ function polyclean($exp) {
 					$outstr .= $parr[0].' '.$parr[1];
 				}
 			} else if ($parr[2]=='1') {
-				if ($parr[0]==1) {
+				if ($parr[0]=='1') {
 					$outstr .= $parr[1];
 				} else {
 					$outstr .= $parr[0] . ' ' . $parr[1]; //n x^1
 				}
 			} else {
-				if ($parr[0]==1) {
+				if ($parr[0]=='1') {
 					$outstr .= $parr[1] . '^' . $parr[2]; // 1 x^m
 				} else {
 					$outstr .= $parr[0] . ' ' . $parr[1] . '^' . $parr[2]; // n x^m
@@ -2062,7 +2062,7 @@ function cleanbytoken($str,$funcs = array()) {
 				} else if ($tokens[$i+1][0]=='*') {
 					$i++;  //skip over *
 					$dontuse = true;
-				} else if ($tokens[$i+1][0]!= '+' && $tokens[$i+1][0]!= '-') {
+				} else if ($tokens[$i+1][0]!= '+' && $tokens[$i+1][0]!= '-' && $tokens[$i+1][0]!= '/') {
 					// 1x, 1(), 1sin
 					if ($lastout<2 || ($out[$lastout-1] != '^' || $out[$lastout] != '-')) { //exclude ^-1 case
 						$dontuse = true;
