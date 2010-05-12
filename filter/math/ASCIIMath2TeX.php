@@ -716,16 +716,26 @@ function AMTparseExpr($str,$rightbracket) {
 							if ($i>0) { $mxout .= '\\\\';}
 							if ($i==0) {
 								//$subarr = explode(',',substr($newFrag,$pos[$i]+7,$pos[$i+1]-$pos[$i]-15));
-								$subarr = array(substr($newFrag,$pos[$i]+7,$subpos[$pos[$i]][1]-$pos[$i]-7));
+								if (count($subpos[$pos[$i]])==1) {
+									$subarr = array(substr($newFrag,$pos[$i]+7,$pos[$i+1]-$pos[$i]-15));
+								} else {
+									$subarr = array(substr($newFrag,$pos[$i]+7,$subpos[$pos[$i]][1]-$pos[$i]-7));
+								}
 							} else {
 								//$subarr = explode(',',substr($newFrag,$pos[$i]+8,$pos[$i+1]-$pos[$i]-16));
-								$subarr = array(substr($newFrag,$pos[$i]+8,$subpos[$pos[$i]][1]-$pos[$i]-8));
+								if (count($subpos[$pos[$i]])==1) {
+									$subarr = array(substr($newFrag,$pos[$i]+8,$pos[$i+1]-$pos[$i]-16));
+								} else {
+									$subarr = array(substr($newFrag,$pos[$i]+8,$subpos[$pos[$i]][1]-$pos[$i]-8));
+								}
 							}
 							for ($j=2; $j<count($subpos[$pos[$i]]);$j++) {
 								$subarr[] = substr($newFrag,$subpos[$pos[$i]][$j-1]+1,$subpos[$pos[$i]][$j] - $subpos[$pos[$i]][$j-1]-1);
 							}
 							$j = count($subpos[$pos[$i]]);
-							$subarr[] = substr($newFrag,$subpos[$pos[$i]][$j-1]+1,$pos[$i+1] -8 - $subpos[$pos[$i]][$j-1]-1);
+							if (count($subpos[$pos[$i]])>1) {
+								$subarr[] = substr($newFrag,$subpos[$pos[$i]][$j-1]+1,$pos[$i+1] -8 - $subpos[$pos[$i]][$j-1]-1);
+							}
 							if ($lastmxsubcnt>0 && count($subarr)!=$lastmxsubcnt) {
 								$matrix = false;
 							} else if ($lastmxsubcnt==-1) {

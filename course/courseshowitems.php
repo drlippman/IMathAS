@@ -136,9 +136,9 @@ function enditem($canedit) {
 							echo "<span class=left><a href=\"course.php?cid=$cid&folder=$parent-$bnum\" border=0>";
 						}
 						if ($graphicalicons) {
-							echo "<img src=\"$imasroot/img/{$itemicons['folder']}\"></a></span>";
+							echo "<img alt=\"folder\" src=\"$imasroot/img/{$itemicons['folder']}\"></a></span>";
 						} else {
-							echo "<img src=\"$imasroot/img/folder.gif\"></a></span>";
+							echo "<img alt=\"folder\" src=\"$imasroot/img/folder.gif\"></a></span>";
 						}
 						echo "<div class=title>";
 					}
@@ -189,7 +189,7 @@ function enditem($canedit) {
 					
 					if (($hideicons&16)==0) {
 						echo "<span class=left>";
-						echo "<img style=\"cursor:pointer;\" id=\"img{$items[$i]['id']}\" src=\"$imasroot/img/";
+						echo "<img alt=\"expand/collapse\" style=\"cursor:pointer;\" id=\"img{$items[$i]['id']}\" src=\"$imasroot/img/";
 						if ($isopen) {echo "collapse";} else {echo "expand";}
 						echo ".gif\" onClick=\"toggleblock('{$items[$i]['id']}','$parent-$bnum')\" /></span>";
 						echo "<div class=title>";
@@ -283,9 +283,9 @@ function enditem($canedit) {
 					if (($hideicons&16)==0) {
 						echo "<span class=left><a href=\"course.php?cid=$cid&folder=$parent-$bnum\" border=0>";
 						if ($graphicalicons) {
-							echo "<img src=\"$imasroot/img/{$itemicons['folder']}\"></a></span>";
+							echo "<img alt=\"folder\" src=\"$imasroot/img/{$itemicons['folder']}\"></a></span>";
 						} else {
-							echo "<img src=\"$imasroot/img/folder.gif\"></a></span>";
+							echo "<img alt=\"folder\" src=\"$imasroot/img/folder.gif\"></a></span>";
 						}
 						echo "<div class=title>";
 					}
@@ -333,7 +333,7 @@ function enditem($canedit) {
 					//echo "\" onClick=\"toggleblock('{$items[$i]['id']}','$parent-$bnum')\">\n";
 					if (($hideicons&16)==0) {
 						echo "<span class=left>";
-						echo "<img style=\"cursor:pointer;\" id=\"img{$items[$i]['id']}\" src=\"$imasroot/img/";
+						echo "<img alt=\"expand/collapse\" style=\"cursor:pointer;\" id=\"img{$items[$i]['id']}\" src=\"$imasroot/img/";
 						if ($isopen) {echo "collapse";} else {echo "expand";}
 						echo ".gif\" onClick=\"toggleblock('{$items[$i]['id']}','$parent-$bnum')\" /></span>";
 						echo "<div class=title>";
@@ -482,7 +482,7 @@ function enditem($canedit) {
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if (($hideicons&1)==0) {
 					   if ($graphicalicons) {
-						   echo "<img class=\"floatleft\" src=\"$imasroot/img/{$itemicons['assess']}\" />";
+						   echo "<img alt=\"assessment\" class=\"floatleft\" src=\"$imasroot/img/{$itemicons['assess']}\" />";
 					   } else {
 						  echo "<div class=icon style=\"background-color: " . makecolor2($line['startdate'],$line['enddate'],$now) . ";\">?</div>";
 					   }
@@ -544,7 +544,7 @@ function enditem($canedit) {
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if (($hideicons&1)==0) {
 					   if ($graphicalicons) {
-						   echo "<img class=\"floatleft\" src=\"$imasroot/img/{$itemicons['assess']}\" />";
+						   echo "<img alt=\"assessment\" class=\"floatleft\" src=\"$imasroot/img/{$itemicons['assess']}\" />";
 					   } else {
 						  echo "<div class=icon style=\"background-color: #99f;\">?</div>";
 					   }
@@ -577,7 +577,7 @@ function enditem($canedit) {
 				   if (($hideicons&1)==0) {
 					   
 					   if ($graphicalicons) {
-						   echo "<img class=\"floatleft faded\" src=\"$imasroot/img/{$itemicons['assess']}\" />";
+						   echo "<img alt=\"assessment\" class=\"floatleft faded\" src=\"$imasroot/img/{$itemicons['assess']}\" />";
 					   } else {
 						   echo "<div class=icon style=\"background-color: #ccc;\">?</div>";
 					   }
@@ -630,7 +630,7 @@ function enditem($canedit) {
 				   if ($line['title']!='##hidden##') {
 					   if (($hideicons&2)==0) {			   
 						   if ($graphicalicons) {
-							   echo "<img class=\"floatleft\" src=\"$imasroot/img/{$itemicons['inline']}\" />";
+							   echo "<img alt=\"text item\" class=\"floatleft\" src=\"$imasroot/img/{$itemicons['inline']}\" />";
 						   } else {
 							   echo "<div class=icon style=\"background-color: $color;\">!</div>";
 						   }
@@ -692,7 +692,7 @@ function enditem($canedit) {
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if ($line['title']!='##hidden##') {
 					   if ($graphicalicons) {
-						   echo "<img class=\"floatleft faded\" src=\"$imasroot/img/{$itemicons['inline']}\" />";
+						   echo "<img alt=\"text item\" class=\"floatleft faded\" src=\"$imasroot/img/{$itemicons['inline']}\" />";
 					   } else {
 						   echo "<div class=icon style=\"background-color: #ccc;\">!</div>";
 					   }
@@ -807,7 +807,7 @@ function enditem($canedit) {
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if (($hideicons&4)==0) {
 					   if ($graphicalicons) {
-						  echo "<img class=\"floatleft\" src=\"$imasroot/img/{$itemicons[$icon]}\" />";
+						  echo "<img alt=\"link to $icon\" class=\"floatleft\" src=\"$imasroot/img/{$itemicons[$icon]}\" />";
 					   } else {
 						   echo "<div class=icon style=\"background-color: $color;\">!</div>";
 					   }
@@ -836,7 +836,7 @@ function enditem($canedit) {
 				   }
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				  if ($graphicalicons) {
-					  echo "<img class=\"floatleft faded\" src=\"$imasroot/img/{$itemicons[$icon]}\" />";
+					  echo "<img alt=\"link to $icon\" class=\"floatleft faded\" src=\"$imasroot/img/{$itemicons[$icon]}\" />";
 				  } else {
 					   echo "<div class=icon style=\"background-color: #ccc;\">!</div>";
 				   }
@@ -953,7 +953,7 @@ function enditem($canedit) {
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if (($hideicons&8)==0) {
 					   if ($graphicalicons) {
-						   echo "<img class=\"floatleft\" src=\"$imasroot/img/{$itemicons['forum']}\" />";
+						   echo "<img alt=\"forum\" class=\"floatleft\" src=\"$imasroot/img/{$itemicons['forum']}\" />";
 					   } else {
 						   echo "<div class=icon style=\"background-color: $color;\">F</div>";
 					   }
@@ -986,7 +986,7 @@ function enditem($canedit) {
 				   }
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if ($graphicalicons) {
-					   echo "<img class=\"floatleft faded\" src=\"$imasroot/img/{$itemicons['forum']}\" />";
+					   echo "<img alt=\"forum\" class=\"floatleft faded\" src=\"$imasroot/img/{$itemicons['forum']}\" />";
 				   } else {
 					   echo "<div class=icon style=\"background-color: #ccc;\">F</div>";
 				   }   
@@ -1070,7 +1070,7 @@ function enditem($canedit) {
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if (($hideicons&8)==0) {
 					   if ($graphicalicons) {
-						   echo "<img class=\"floatleft\" src=\"$imasroot/img/{$itemicons['wiki']}\" />";
+						   echo "<img alt=\"wiki\" class=\"floatleft\" src=\"$imasroot/img/{$itemicons['wiki']}\" />";
 					   } else {
 						   echo "<div class=icon style=\"background-color: $color;\">W</div>";
 					   }
@@ -1107,7 +1107,7 @@ function enditem($canedit) {
 				   }
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if ($graphicalicons) {
-					   echo "<img class=\"floatleft faded\" src=\"$imasroot/img/{$itemicons['wiki']}\" />";
+					   echo "<img alt=\"wiki\" class=\"floatleft faded\" src=\"$imasroot/img/{$itemicons['wiki']}\" />";
 				   } else {
 					   echo "<div class=icon style=\"background-color: #ccc;\">W</div>";
 				   }   
@@ -1149,43 +1149,43 @@ function enditem($canedit) {
    		
 		$html .= "<a href=\"addassessment.php?block=$blk&tb=$tb&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['assess'])) {
-			$html .= "<img class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['assess']}\"/> ";
+			$html .= "<img alt=\"assessment\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['assess']}\"/> ";
 		}
 		$html .= "Assessment</a> | ";
 		
 		$html .= "<a href=\"addinlinetext.php?block=$blk&tb=$tb&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['inline'])) {
-			$html .= "<img class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['inline']}\"/> ";
+			$html .= "<img alt=\"inline text\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['inline']}\"/> ";
 		}
 		$html .= "Text</a> | ";
 		
 		$html .= "<a href=\"addlinkedtext.php?block=$blk&tb=$tb&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['linked'])) {
-			$html .= "<img class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['linked']}\"/> ";
+			$html .= "<img alt=\"linked text\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['linked']}\"/> ";
 		}
 		$html .= "Link</a> | ";
 		
 		$html .= "<a href=\"addforum.php?block=$blk&tb=$tb&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['forum'])) {
-			$html .= "<img class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['forum']}\"/> ";
+			$html .= "<img alt=\"forum\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['forum']}\"/> ";
 		}
 		$html .= "Forum</a> | ";
 		
 		$html .= "<a href=\"addwiki.php?block=$blk&tb=$tb&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['wiki'])) {
-			$html .= "<img class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['wiki']}\"/> ";
+			$html .= "<img alt=\"wiki\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['wiki']}\"/> ";
 		}
 		$html .= "Wiki</a> | ";
 		
 		$html .= "<a href=\"addblock.php?block=$blk&tb=$tb&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['folder'])) {
-			$html .= "<img class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['folder']}\"/> ";
+			$html .= "<img alt=\"folder\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['folder']}\"/> ";
 		}
 		$html .= "Block</a> | ";
 		
 		$html .= "<a href=\"addcalendar.php?block=$blk&tb=$tb&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['calendar'])) {
-			$html .= "<img class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['calendar']}\"/> ";
+			$html .= "<img alt=\"calendar\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['calendar']}\"/> ";
 		}
 		$html .= "Calendar</a>";
 		$html .= '</span>';
@@ -1417,7 +1417,7 @@ function enditem($canedit) {
 			if (!isset($CFG['CPS']['miniicons']['folder'])) {
 				$icon  = '<span class=icon style="background-color:'.$color.'">B</span>';
 			} else {
-				$icon = '<img src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['folder'].'" class="mida icon" /> ';
+				$icon = '<img alt="folder" src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['folder'].'" class="mida icon" /> ';
 			}
 			echo '<li class="'.$liclass.'" id="'."$parent-$bnum".'" obn="'.$items[$i]['id'].'">'.$icon;
 			if ($items[$i]['avail']==2 || ($items[$i]['avail']==1 && $items[$i]['startdate']<$now && $items[$i]['enddate']>$now)) {
@@ -1447,7 +1447,7 @@ function enditem($canedit) {
 		        if (!isset($CFG['CPS']['miniicons']['calendar'])) {
 				$icon  = '<span class=icon style="background-color:#0f0;">C</span>';
 			} else {
-				$icon = '<img src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['calendar'].'" class="mida icon" /> ';
+				$icon = '<img alt="calendar" src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['calendar'].'" class="mida icon" /> ';
 			}
 			echo '<li id="'.$items[$i].'">'.$icon.'Calendar</li>';
 			   
@@ -1479,7 +1479,7 @@ function enditem($canedit) {
 			 if (!isset($CFG['CPS']['miniicons']['assess'])) {
 				$icon  = '<span class=icon style="background-color:'.$color.'">?</span>';
 			} else {
-				$icon = '<img src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['assess'].'" class="mida icon" /> ';
+				$icon = '<img alt="assessment" src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['assess'].'" class="mida icon" /> ';
 			}
 			echo '<li id="'.$items[$i].'">'.$icon;
 			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
@@ -1537,7 +1537,7 @@ function enditem($canedit) {
 			   if (!isset($CFG['CPS']['miniicons']['inline'])) {
 				$icon  = '<span class=icon style="background-color:'.$color.'">!</span>';
 			   } else {
-				$icon = '<img src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['inline'].'" class="mida icon" /> ';
+				$icon = '<img alt="text" src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['inline'].'" class="mida icon" /> ';
 			   }
 			   echo '<li id="'.$items[$i].'">'.$icon;
 			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
@@ -1584,7 +1584,7 @@ function enditem($canedit) {
 			   if (!isset($CFG['CPS']['miniicons']['linked'])) {
 				$icon  = '<span class=icon style="background-color:'.$color.'">!</span>';
 			   } else {
-				$icon = '<img src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['linked'].'" class="mida icon" /> ';
+				$icon = '<img alt="link" src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['linked'].'" class="mida icon" /> ';
 			   }
 			   echo '<li id="'.$items[$i].'">'.$icon;
 			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
@@ -1631,7 +1631,7 @@ function enditem($canedit) {
 		           if (!isset($CFG['CPS']['miniicons']['forum'])) {
 				$icon  = '<span class=icon style="background-color:'.$color.'">F</span>';
 			   } else {
-				$icon = '<img src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['forum'].'" class="mida icon" /> ';
+				$icon = '<img alt="forum" src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['forum'].'" class="mida icon" /> ';
 			   }
 			   echo '<li id="'.$items[$i].'">'.$icon;
 			  if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
@@ -1678,7 +1678,7 @@ function enditem($canedit) {
 		           if (!isset($CFG['CPS']['miniicons']['wiki'])) {
 				$icon  = '<span class=icon style="background-color:'.$color.'">W</span>';
 			   } else {
-				$icon = '<img src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['wiki'].'" class="mida icon" /> ';
+				$icon = '<img alt="wiki"  src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['wiki'].'" class="mida icon" /> ';
 			   }
 			   echo '<li id="'.$items[$i].'">'.$icon;
 			  if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {

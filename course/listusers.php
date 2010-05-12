@@ -524,10 +524,16 @@ if ($overwriteBody==1) {
 	}
 ?>
 				</td>
-				<?php echo $hasSectionData; ?>
-				<?php echo $hasCodeData; ?>
-				<td><?php echo $line['LastName'] ?></td>
-				<td><?php echo $line['FirstName'] ?></td>
+				<?php 
+				echo $hasSectionData; 
+				echo $hasCodeData;
+				if ($line['locked']==1) {
+					echo '<td><span style="text-decoration: line-through;">'.$line['LastName'].'</span></td>';
+					echo '<td><span style="text-decoration: line-through;">'.$line['FirstName'].'</span></td>';
+				} else {
+					echo '<td>'.$line['LastName'].'</td><td>'.$line['FirstName'].'</td>';
+				}
+				?>
 				<td><a href="mailto:<?php echo $line['email'] ?>"><?php echo $line['email'] ?></a></td>
 				<td><?php echo $line['SID'] ?></td>
 				<td><?php echo $lastaccess ?></td>

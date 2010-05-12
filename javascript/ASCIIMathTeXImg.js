@@ -693,18 +693,26 @@ function AMTparseExpr(str,rightbracket) {
 						if (i>0) mxout += '\\\\';
 						if (i==0) {
 							//var subarr = newFrag.substr(pos[i]+7,pos[i+1]-pos[i]-15).split(',');
-							var subarr = [newFrag.substring(pos[i]+7,subpos[pos[i]][1])];
-							for (var j=2;j<subpos[pos[i]].length;j++) {
-								subarr.push(newFrag.substring(subpos[pos[i]][j-1]+1,subpos[pos[i]][j]));
+							if (subpos[pos[i]].length==1) {
+								var subarr = [newFrag.substr(pos[i]+7,pos[i+1]-pos[i]-15)];
+							} else {
+								var subarr = [newFrag.substring(pos[i]+7,subpos[pos[i]][1])];
+								for (var j=2;j<subpos[pos[i]].length;j++) {
+									subarr.push(newFrag.substring(subpos[pos[i]][j-1]+1,subpos[pos[i]][j]));
+								}
+								subarr.push(newFrag.substring(subpos[pos[i]][subpos[pos[i]].length-1]+1,pos[i+1]-8));
 							}
-							subarr.push(newFrag.substring(subpos[pos[i]][subpos[pos[i]].length-1]+1,pos[i+1]-8));
 						} else {
 							//var subarr = newFrag.substr(pos[i]+8,pos[i+1]-pos[i]-16).split(',');
-							var subarr = [newFrag.substring(pos[i]+8,subpos[pos[i]][1])];
-							for (var j=2;j<subpos[pos[i]].length;j++) {
-								subarr.push(newFrag.substring(subpos[pos[i]][j-1]+1,subpos[pos[i]][j]));
+							if (subpos[pos[i]].length==1) {
+								var subarr = [newFrag.substr(pos[i]+8,pos[i+1]-pos[i]-16)];
+							} else {
+								var subarr = [newFrag.substring(pos[i]+8,subpos[pos[i]][1])];
+								for (var j=2;j<subpos[pos[i]].length;j++) {
+									subarr.push(newFrag.substring(subpos[pos[i]][j-1]+1,subpos[pos[i]][j]));
+								}
+								subarr.push(newFrag.substring(subpos[pos[i]][subpos[pos[i]].length-1]+1,pos[i+1]-8));
 							}
-							subarr.push(newFrag.substring(subpos[pos[i]][subpos[pos[i]].length-1]+1,pos[i+1]-8));
 						}
 						if (lastmxsubcnt>0 && subarr.length!=lastmxsubcnt) {
 							matrix = false;
