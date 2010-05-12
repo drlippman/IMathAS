@@ -198,7 +198,7 @@ Date.prototype.getWeekDays = function(d) {
 			  break;
 		  }
 	  }
-	 alert(usecb);
+	// alert(usecb);
 	  senddownsub('s',basesdates,st,usebusdays,usecb);
 	  senddownsub('e',baseedates,st,usebusdays,usecb);
 	  if (baserdates[st]!="NA") {

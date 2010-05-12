@@ -169,11 +169,12 @@ function totalpointspossible($qi) {
 //testsettings: assoc array of assessment settings
 function getremainingpossible($qn,$qi,$testsettings,$attempts) {
 	global $scores;
+	global $regenonreattempt;
 	if (isset($qi['answeights']) && $scores[$qn]!=-1) {
 		$possible = calcpointsafterpenalty(implode('~',$qi['answeights']),$qi,$testsettings,$attempts);
 		$appts = explode('~',$possible);
 		$curs = explode('~',$scores[$qn]);
-		if (count($curs)==count($appts)) {
+		if (count($curs)==count($appts) && !$regenonreattempt) {
 			for ($k=0;$k<count($curs);$k++) {
 				if ($appts[$k]>$curs[$k]) { //part after penalty better than orig, replace
 					$curs[$k] = $appts[$k];
