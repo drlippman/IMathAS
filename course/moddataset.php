@@ -52,6 +52,34 @@
 	
 	if (isset($_POST['qtext'])) {
 		$now = time();
+		//handle help references
+		if (isset($_GET['id']) || isset($_GET['templateid'])) {
+			if (isset($_GET['id'])) {
+				$query = "SELECT extref FROM imas_questionset WHERE id='{$_GET['id']}'";
+			} else {
+				$query = "SELECT extref FROM imas_questionset WHERE id='{$_GET['templateid']}'";
+			}
+			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+			$extref = mysql_result($result,0,0);
+			if ($extref=='') {
+				$extref = array();
+			} else {
+				$extref = explode('~~',$extref);
+			}
+		
+			$newextref = array();
+			for ($i=0;$i<count($extref);$i++) {
+				if (!isset($_POST["delhelp-$i"])) {
+					$newextref[] = $extref[$i];
+				}
+			}
+		} else {
+			$newextref = array();
+		}
+		if ($_POST['helpurl']!='') {
+			$newextref[] = $_POST['helptype'].'!!'.$_POST['helpurl'];
+		}
+		$extref = implode('~~',$newextref);
 		
 		if (isset($_GET['id'])) { //modifying existing
 			$qsetid = $_GET['id'];
@@ -74,7 +102,7 @@
 			} 
 			$query = "UPDATE imas_questionset SET description='{$_POST['description']}',author='{$_POST['author']}',userights='{$_POST['userights']}',";
 			$query .= "qtype='{$_POST['qtype']}',control='{$_POST['control']}',qcontrol='{$_POST['qcontrol']}',";
-			$query .= "qtext='{$_POST['qtext']}',answer='{$_POST['answer']}',lastmoddate=$now ";
+			$query .= "qtext='{$_POST['qtext']}',answer='{$_POST['answer']}',lastmoddate=$now,extref='$extref' ";
 			$query .= "WHERE id='{$_GET['id']}'";
 			if (!$isadmin && !$isgrpadmin) { $query .= " AND (ownerid='$userid' OR userights>2);";}
 			if ($isok) {
@@ -132,9 +160,9 @@
 					$ancestors = $_GET['templateid'];
 				}
 			}
-			$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,description,ownerid,author,userights,qtype,control,qcontrol,qtext,answer,hasimg,ancestors) VALUES ";
+			$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,description,ownerid,author,userights,qtype,control,qcontrol,qtext,answer,hasimg,ancestors,extref) VALUES ";
 			$query .= "($uqid,$now,$now,'{$_POST['description']}','$userid','{$_POST['author']}','{$_POST['userights']}','{$_POST['qtype']}','{$_POST['control']}',";
-			$query .= "'{$_POST['qcontrol']}','{$_POST['qtext']}','{$_POST['answer']}','{$_POST['hasimg']}','$ancestors');";
+			$query .= "'{$_POST['qcontrol']}','{$_POST['qtext']}','{$_POST['answer']}','{$_POST['hasimg']}','$ancestors','$extref');";
 			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 			$qsetid = mysql_insert_id();
 			$_GET['id'] = $qsetid;			
@@ -312,7 +340,11 @@
 			}
 			
 			$inlibs = array();
-			
+			if($line['extref']!='') {
+				$extref = explode('~~',$line['extref']);
+			} else {
+				$extref = array();
+			}
 			$images = array();
 			if ($line['hasimg']>0) {
 				$query = "SELECT id,var,filename FROM imas_qimages WHERE qsetid='{$_GET['id']}'";
@@ -429,6 +461,7 @@
 			}
 			$locklibs='';
 			$images = array();
+			$extref = array();
 			$author = $myname;
 			
 			
@@ -636,6 +669,20 @@ if (isset($images['vars']) && count($images['vars'])>0) {
 		echo "Variable: <input type=\"text\" name=\"imgvar-$id\" value=\"\$$var\" size=\"10\"/> <a href=\"$imasroot/assessment/qimages/{$images['files'][$id]}\" target=\"_blank\">View</a> Delete? <input type=checkbox name=\"delimg-$id\"/><br/>";	
 	}
 	
+}
+?>
+Help button: Type: <select name="helptype">
+ <option value="video">Video</option>
+ <option value="read">Read</option>
+ </select>
+ URL: <input type="text" name="helpurl" size="30" /><br/>
+<?php
+if (count($extref)>0) {
+	echo "Help buttons:<br/>";
+	for ($i=0;$i<count($extref);$i++) {
+		$extrefpt = explode('!!',$extref[$i]);
+		echo 'Type: '.$extrefpt[0].', URL: <a href="'.$extrefpt[1].'">'.$extrefpt[1]."</a>.  Delete? <input type=\"checkbox\" name=\"delhelp-$i\"/><br/>";	
+	}	
 }
 ?>
 </div>

@@ -34,7 +34,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		$seqinactive = false;
 	}*/
 	
-	$query = "SELECT qtype,control,qcontrol,qtext,answer,hasimg FROM imas_questionset WHERE id='$qidx'";
+	$query = "SELECT qtype,control,qcontrol,qtext,answer,hasimg,extref FROM imas_questionset WHERE id='$qidx'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$qdata = mysql_fetch_array($result, MYSQL_ASSOC);
 	
@@ -237,6 +237,20 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if (isset($helptext) &&  $showhints) {
 		echo '<div><p class="tips">'.filter($helptext).'</p></div>';
 	}
+	if ($showhints && $qdata['extref']!='') {
+		$extref = explode('~~',$qdata['extref']);
+		echo '<div><p class="tips">Get help: ';
+		for ($i=0;$i<count($extref);$i++) {
+			$extrefpt = explode('!!',$extref[$i]);
+			if ($extrefpt[0]=='video') {
+				$url = "http://" . $_SERVER['HTTP_HOST'] . "$imasroot/assessment/watchvid.php?url=".urlencode($extrefpt[1]);
+				echo formpopup("Video",$url,660,525,"button",true,"video");
+			} else if ($extrefpt[0]=='read') {
+				echo formpopup("Read",$extrefpt[1],730,500,"button",true,"text");
+			}
+		}
+	}
+	
 	echo "<div>";
 	foreach($tips as $iidx=>$tip) {
 		if ((!isset($hidetips) || (is_array($hidetips) && !isset($hidetips[$iidx])))&& !$seqinactive && $showtips>0) {

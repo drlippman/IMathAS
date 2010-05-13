@@ -1932,7 +1932,7 @@ function formpopup($label,$content,$width=600,$height=400,$type='link',$scroll='
 		$height = "'fit'";
 	}
 	if (strpos($label,'<img')!==false) {
-		return str_replace('<img', '<img class="clickable" onClick="popupwindow(\''.$id.'\',\''.str_replace('\'','\\\'',htmlentities($content)).'\','.$width.','.$height.','.$scroll.')"',$label);
+		return str_replace('<img', '<img class="clickable" onClick="popupwindow(\''.$id.'\',\''.str_replace('\'','\\\'',htmlentities($content)).'\','.$width.','.$height.$scroll.')"',$label);
 	} else {
 		if ($type=='link') {
 			return '<span class="link" onClick="popupwindow(\''.$id.'\',\''.str_replace('\'','\\\'',htmlentities($content)).'\','.$width.','.$height.$scroll.')">'.$label.'</span>';
