@@ -73,25 +73,7 @@ if ($cid==0) {
 				$row = mysql_fetch_row($result);
 				$base = diffstringsplit($row[0]);
 				while ($row = mysql_fetch_row($result)) { //apply diffs
-					$diffs = explode('],[',substr($row[0],2,strlen($row[0])-4));
-					for ($i = count($diffs)-1; $i>=0; $i--) {
-						$diffs[$i] = explode(',',$diffs[$i]);
-						if ($diffs[$i][0]==2) { //replace
-							if (count($diffs[$i])>4) {
-								$diffs[$i][3] = implode(',',array_slice($diffs[$i],3));
-							}
-							$diffs[$i][3] = str_replace(array('\\"','\\\\'),array('"','\\'),substr($diffs[$i][3],1,strlen($diffs[$i][3])-2));
-							array_splice($base,$diffs[$i][1],$diffs[$i][2],$diffs[$i][3]);
-						} else if ($diffs[$i][0]==0) { //insert
-							if (count($diffs[$i])>3) {
-								$diffs[$i][2] = implode(',',array_slice($diffs[$i],2));
-							}
-							$diffs[$i][2] = str_replace(array('\\"','\\\\'),array('"','\\'),substr($diffs[$i][2],1,strlen($diffs[$i][2])-2));
-							array_splice($base,$diffs[$i][1],0,$diffs[$i][2]);
-						} else if ($diffs[$i][0]==1) { //delete
-							array_splice($base,$diffs[$i][1],$diffs[$i][2]);
-						}
-					}
+					$base = diffapplydiff($base,$row[0]);
 				}
 				$newbase = addslashes(implode(' ',$base));
 				echo $newbase;
@@ -208,7 +190,7 @@ if ($cid==0) {
 
  /******* begin html output ********/
  $pagetitle = "View Wiki: $wikiname";
- $placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/viewwiki.js"></script>';
+ $placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/viewwiki.js?v=051710"></script>';
  $addr = 'http://'.$_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\').'/wikirev.php?cid='.$cid.'&id='.$id;
  if ($isgroup) {
 	 $addr .= '&grp='.$groupid;

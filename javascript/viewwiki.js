@@ -69,9 +69,11 @@ function applydiff(current, ver) {
 	var diff = wikihistory[ver].c;
 	for (var i=diff.length-1; i>=0; i--) {
 		if (diff[i][0]==2) { //replace
-			current.splice(diff[i][1], diff[i][2], diff[i][3]);
+			current = current.slice(0,diff[i][1]).concat(diff[i][3]).concat(current.slice(diff[i][1]+diff[i][2]));
+			//current.splice(diff[i][1], diff[i][2], diff[i][3]);
 		} else if (diff[i][0]==0) {//insert
-			current.splice(diff[i][1], 0, diff[i][2]);
+			current = current.slice(0,diff[i][1]).concat(diff[i][2]).concat(current.slice(diff[i][1]));
+			//current.splice(diff[i][1], 0, diff[i][2]);
 		} else if (diff[i][0]==1) {//delete
 			current.splice(diff[i][1], diff[i][2]);
 		}
@@ -109,10 +111,10 @@ function colorrevisions(content,ver) {
 	for (var i=diff.length-1; i>=0; i--) {
 		deled = null;  insed = null;
 		if (diff[i][0]==2) {
-			deled = diff[i][3];
+			deled = diff[i][3].join(' ');
 			insed = current.splice(diff[i][1], diff[i][2]).join(' ');
 		} else if (diff[i][0]==0) {
-			deled = diff[i][2];
+			deled = diff[i][2].join(' ');
 		} else if (diff[i][0]==1) {
 			insed = current.splice(diff[i][1], diff[i][2]).join(' ');
 		}

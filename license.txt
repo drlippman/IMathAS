@@ -118,3 +118,8 @@ May be used and distributed under the zlib/libpng license.
 AutoSuggest
 (C) 2005 Joe Kepley, The Sling & Rock Design Group, Inc.
 LGPL
+
+JSON Library (PEAR)
+(c) 2005 Michal Migurski
+BSD license
+

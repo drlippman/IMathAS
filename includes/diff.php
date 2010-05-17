@@ -45,28 +45,57 @@ function diff($old, $new){
 function diffsparsejson($old, $new) {
 	$diff = diff(diffstringsplit($old), diffstringsplit($new));
 	$adj = 0;
+	$out = array();
 	foreach($diff as $k=>$v) {
 		if (is_array($v)) {
 			if (empty($v['d']) && empty($v['i'])) {
 				$adj += 1;
 				continue;
 			} else if (empty($v['d'])) {//insert
-				$out[] = '[0,'.($k-$adj).',"'.str_replace(array('\\','"',), array('\\\\','\"'), implode(' ',$v['i'])).'"]';
-				$adj += 1;//count($v['i']); 
+				$out[] = array(0,$k-$adj,$v['i']);
+				$adj += 1;
 			} else if (empty($v['i'])) { //delete
-				$out[] = '[1,'.($k-$adj).','.count($v['d']).']';
+				$out[] = array(1,$k-$adj,count($v['d']));
 				$adj -= count($v['d'])-1; 
 			} else { //replace
-				$out[] = '[2,'.($k-$adj).','.count($v['d']).',"'.str_replace(array('\\','"',), array('\\\\','\"'), implode(' ',$v['i'])).'"]';
+				$out[] = array(2,$k-$adj,count($v['d']),$v['i']);
 				$adj -= count($v['d'])-1;
+
 			}
 		}
 	}	
 	if (count($out)==0) {
 		return '';
 	} else {
-		return '['.implode(',',$out).']';
+		if (function_exists('json_encode')) {
+			return json_encode($out);
+		} else {
+			require_once("JSON.php");
+			$jsonser = new Services_JSON();
+			return $jsonser->encode($out);
+		}
 	}
+}
+
+function diffapplydiff($base,$diff) {
+	if (function_exists('json_encode')) {
+		$diffs = json_decode($diff);
+	} else {
+		require_once("JSON.php");
+		$jsonser = new Services_JSON();
+		return $jsonser->decode($diff);
+	}
+	for ($i = count($diffs)-1; $i>=0; $i--) {
+		if ($diffs[$i][0]==2) { //replace
+			array_splice($base,$diffs[$i][1],$diffs[$i][2],$diffs[$i][3]);
+		} else if ($diffs[$i][0]==0) { //insert
+			array_splice($base,$diffs[$i][1],0,$diffs[$i][2]);
+		} else if ($diffs[$i][0]==1) { //delete
+			array_splice($base,$diffs[$i][1],$diffs[$i][2]);
+		}
+	}
+	
+	return $base;
 }
 
 function diffstringsplit($str) {

@@ -54,43 +54,62 @@ if ($cid==0) {
 		$lasteditedby = $row[3].', '.$row[4];
 		$revisionusers = array();
 		$revisionusers[$row[5]] =  $row[3].', '.$row[4];
-		$revisionhistory = '[{u:'.$row[5].',t:"'.$lastedittime.'",id:'.$row[0].'}';
+		$revisionhistory = array(array('u'=>$row[5], 't'=>$lastedittime,'id'=>$row[0]));
+		//$revisionhistory = '[{u:'.$row[5].',t:"'.$lastedittime.'",id:'.$row[0].'}';
 		
 		if ($numrevisions>1) {
 			$i = 0;
 			while ($row = mysql_fetch_row($result)) {
 				$revisionusers[$row[5]] =  $row[3].', '.$row[4];
-				$row[1] = filter(str_replace('"','@^@^@',$row[1]));
-				$row[1] = str_replace('"','\\"',$row[1]);
-				$row[1] = str_replace('@^@^@','"',$row[1]);
-				$revisionhistory .= ',{u:'.$row[5].',c:'.$row[1].',t:"'.tzdate("F j, Y, g:i a",$row[2]).'",id:'.$row[0].'}';
+				//$row[1] = filter(str_replace('"','@^@^@',$row[1]));
+				//$row[1] = str_replace('"','\\"',$row[1]);
+				//$row[1] = str_replace('@^@^@','"',$row[1]);
+				//$revisionhistory .= ',{u:'.$row[5].',c:'.$row[1].',t:"'.tzdate("F j, Y, g:i a",$row[2]).'",id:'.$row[0].'}';
+				if (function_exists('json_encode')) {
+					$row[1]=  json_decode($row[1]);
+				} else {
+					require_once("../includes/JSON.php");
+					$jsonser = new Services_JSON();
+					$row[1] = $jsonser->decode($row[1]);
+				}
+				$revisionhistory[] = array('u'=>$row[5],'c'=>$row[1],'t'=>tzdate("F j, Y, g:i a",$row[2]),'id'=>$row[0]);
 				$i++;
 			}
-			$revisionhistory .= ']';
+			//$revisionhistory .= ']';
 			$keys = array_keys($revisionusers);
 			$i = 0;
-			$users = '{';
+			//$users = '{';
+			$users = array();
 			foreach ($keys as $uid) {
-				if ($i>0) { $users .= ',';}
-				$users .= $uid.':"'.str_replace(array('\\','"',), array('\\\\','\"'), $revisionusers[$uid]).'"';
+				//if ($i>0) { $users .= ',';}
+				//$users .= $uid.':"'.str_replace(array('\\','"',), array('\\\\','\"'), $revisionusers[$uid]).'"';
+				$users[$uid] = $revisionusers[$uid];
 				$i++;
 			}
-			$users .= '}';
+			//$users .= '}';
 		} else {
-			$users = '{}';
-			$revisionhistory = '[]';
+			$users = array(); //'{}';
+			$revisionhistory = array(); //'[]';
 		}
 		 $text = diffstringsplit($text);
 		 foreach ($text as $k=>$v) {
-			 $text[$k] = str_replace(array("\n","\r",'"'),array('','','\\"'),filter($v));
+			 $text[$k] = filter($v);//str_replace(array("\n","\r",'"'),array('','','\\"'),filter($v));
 		 }
-		 $original = '["'.implode('","',$text).'"]';
+		 //$original = '["'.implode('","',$text).'"]';
 	}
 }
 
 if ($overwriteBody==1) {
 	echo $body;
 } else {  // general JSON 
-	echo '{"o":'.$original.',"h":'.$revisionhistory.',"u":'.$users.'}';
+	$out = array('o'=>$text,'h'=>$revisionhistory,'u'=>$users);
+	if (function_exists('json_encode')) {
+		echo json_encode($out);
+	} else {
+		require_once("../includes/JSON.php");
+		$jsonser = new Services_JSON();
+		echo $jsonser->encode($out);
+	}
+	//echo '{"o":'.$original.',"h":'.$revisionhistory.',"u":'.$users.'}';
 }
 ?>

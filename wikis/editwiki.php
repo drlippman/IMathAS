@@ -86,7 +86,8 @@ if ($cid==0) {
 					
 					if ($diff != '') {
 						//verify the diff
-						$base = diffstringsplit($wikicontent);
+						/*$base = diffstringsplit($wikicontent);
+						print_r($base);
 						$diffs = explode('],[',substr($diff,2,strlen($diff)-4));
 						for ($i = count($diffs)-1; $i>=0; $i--) {
 							$diffs[$i] = explode(',',$diffs[$i]);
@@ -107,14 +108,15 @@ if ($cid==0) {
 							}
 						}
 						$comp = diffstringsplit($row[1]);
-						if (count(array_diff($comp,$base))>0 || count(array_diff($base,$comp))>0) {
-							echo "<p>Uh oh, it appears something weird happened.  Giving up</p>";
-							print_r($base);
-							print_r($comp);
-							exit;
-						}
-					
-					
+						//if (count(array_diff($comp,$base))>0 || count(array_diff($base,$comp))>0) {
+						//	echo "<p>Uh oh, it appears something weird happened.  Giving up</p>";
+						//	print_r($base);
+						//	print_r($comp);
+					//		exit;
+				//		}
+						
+						print_r($diff);
+						*/
 						$diffstr = addslashes($diff);
 						$wikicontent = addslashes($wikicontent);
 						//insert latest content
