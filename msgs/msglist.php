@@ -130,14 +130,53 @@ isread:
 				$msgmonitor = floor($msgset/5);
 				$msgset = $msgset%5;
 			}
-				
+			if (isset($_GET['toquote']) || isset($_GET['replyto'])) {
+				$query = "SELECT title,message,courseid FROM imas_msgs WHERE id='$replyto'";
+				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				$title = "Re: ".str_replace('"','&quot;',mysql_result($result,0,0));
+				if (isset($_GET['toquote'])) {
+					$message = mysql_result($result,0,1);
+					$message = '<p> </p><br/><hr/>In reply to:<br/>'.$message;
+				} else {
+					$message = '';
+				}
+				$courseid = mysql_result($result,0,2);
+			} else if (isset($_GET['quoteq'])) {
+				require("../assessment/displayq2.php");
+				$parts = explode('-',$_GET['quoteq']);
+				$message = displayq($parts[0],$parts[1],$parts[2],false,false,0,true);
+				$message = preg_replace('/(`[^`]*`)/',"<span class=\"AM\">$1</span>",$message);
+				$message = forcefiltergraph($message);
+				$message = '<p> </p><br/><hr/>'.$message;
+				$courseid = $cid;
+				$title = '';
+			} else {
+				$title = '';
+				$message = '';
+				$courseid=$cid;
+			}
+			
 			echo "<form method=post action=\"msglist.php?page=$page&cid=$cid&add={$_GET['add']}&replyto=$replyto\">\n";
 			echo "<span class=form>To:</span><span class=formright>\n";
 			if (isset($_GET['to'])) {
-				$query = "SELECT LastName,FirstName FROM imas_users WHERE id='{$_GET['to']}'";
+				$query = "SELECT LastName,FirstName,email FROM imas_users WHERE id='{$_GET['to']}'";
 				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$row = mysql_fetch_row($result);
 				echo $row[0].', '.$row[1];
+				$ismsgsrcteacher = false;
+				if ($courseid==$cid && $isteacher) {
+					$ismsgsrcteacher = true;
+				} else if ($courseid!=$cid) {
+					$query = "SELECT id FROM imas_teachers WHERE userid='$userid' AND courseid='$courseid'";
+					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+					if (mysql_num_rows($result)!=0) {
+						$ismsgsrcteacher = true;
+					}
+				}
+				if ($ismsgsrcteacher) {
+					echo " <a href=\"mailto:{$row[2]}\">email</a> | ";
+					echo " <a href=\"$imasroot/course/gradebook.php?cid=$courseid&stu={$_GET['to']}\" target=\"_popoutgradebook\">gradebook</a>";
+				}
 				echo "<input type=hidden name=to value=\"{$_GET['to']}\"/>";
 				$curdir = rtrim(dirname(__FILE__), '/\\');
 				if (isset($_GET['to']) && file_exists("$curdir/../course/files/userimg_sm{$_GET['to']}.jpg")) {
@@ -165,31 +204,9 @@ isread:
 				}
 				echo "</select>";
 			}
-			if (isset($_GET['toquote']) || isset($_GET['replyto'])) {
-				$query = "SELECT title,message,courseid FROM imas_msgs WHERE id='$replyto'";
-				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-				$title = "Re: ".str_replace('"','&quot;',mysql_result($result,0,0));
-				if (isset($_GET['toquote'])) {
-					$message = mysql_result($result,0,1);
-					$message = '<p> </p><br/><hr/>In reply to:<br/>'.$message;
-				} else {
-					$message = '';
-				}
-				$courseid = mysql_result($result,0,2);
-			} else if (isset($_GET['quoteq'])) {
-				require("../assessment/displayq2.php");
-				$parts = explode('-',$_GET['quoteq']);
-				$message = displayq($parts[0],$parts[1],$parts[2],false,false,0,true);
-				$message = preg_replace('/(`[^`]*`)/',"<span class=\"AM\">$1</span>",$message);
-				$message = forcefiltergraph($message);
-				$message = '<p> </p><br/><hr/>'.$message;
-				$courseid = $cid;
-				$title = '';
-			} else {
-				$title = '';
-				$message = '';
-				$courseid=$cid;
-			}
+			
+			
+				
 			echo "</span><br class=form />";
 			echo "<input type=hidden name=courseid value=\"$courseid\"/>\n";
 			echo "<span class=form><label for=\"subject\">Subject:</label></span>";

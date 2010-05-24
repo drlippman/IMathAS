@@ -135,6 +135,9 @@ if (isset($_GET['modify'])) { //adding or modifying post
 					$poster[$line['id']] = "Anonymous";	
 				} else {
 					$poster[$line['id']] = $line['FirstName'] . ' ' . $line['LastName'];
+					if ($isteacher && $line['userid']!=$userid) {
+						$poster[$line['id']] .= " <a class=\"small\" href=\"$imasroot/course/gradebook.php?cid=$cid&stu={$line['userid']}\" target=\"_popoutgradebook\">[GB]</a>";
+					}
 				}
 			}
 			function printparents($id) {
