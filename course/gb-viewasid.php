@@ -96,7 +96,7 @@
 			//deleteasidfilesbyquery(array($qp[0]=>$qp[1]),1);
 			
 			$query = "DELETE FROM imas_assessment_sessions";// WHERE id='{$_GET['asid']}'";
-			$query .= " WHERE {$qp[0]}='{$qp[1]}'";
+			$query .= " WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}'";
 			//$query .= getasidquery($_GET['asid']);
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			
@@ -148,7 +148,7 @@
 			$qp = getasidquery($_GET['asid']);
 			//deleteasidfilesbyquery(array($qp[0]=>$qp[1]),1);
 			deleteasidfilesbyquery2($qp[0],$qp[1],$qp[2],1);
-			$whereqry = " WHERE {$qp[0]}='{$qp[1]}'";
+			$whereqry = " WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}'";
 			$query = "SELECT seeds,lastanswers,bestlastanswers FROM imas_assessment_sessions $whereqry";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$seeds = explode(',',mysql_result($result,0,0));
@@ -188,7 +188,7 @@
 	if (isset($_GET['clearq']) && isset($_GET['asid']) && $isteacher) {
 		if ($_GET['confirmed']=="true") {
 			$qp = getasidquery($_GET['asid']);
-			$whereqry = " WHERE {$qp[0]}='{$qp[1]}'";
+			$whereqry = " WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}'";
 			//$whereqry = getasidquery($_GET['asid']);
 			
 			$query = "SELECT attempts,lastanswers,reattempting,scores,bestscores,bestattempts,bestlastanswers FROM imas_assessment_sessions $whereqry"; //WHERE id='{$_GET['asid']}'";
@@ -287,7 +287,7 @@
 				$query = "UPDATE imas_assessment_sessions SET bestscores='$scorelist',feedback='$feedback'";
 				if (isset($_POST['updategroup'])) {
 					$qp = getasidquery($_GET['asid']);
-					$query .=  " WHERE {$qp[0]}='{$qp[1]}'";
+					$query .=  " WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}'";
 					//$query .= getasidquery($_GET['asid']);
 				} else {
 					$query .= "WHERE id='{$_GET['asid']}'";
@@ -326,7 +326,7 @@
 			$query = "UPDATE imas_assessment_sessions SET starttime='{$_GET['starttime']}' ";//WHERE id='{$_GET['asid']}'";
 			//$query .= getasidquery($_GET['asid']);
 			$qp = getasidquery($_GET['asid']);
-			$query .=  " WHERE {$qp[0]}='{$qp[1]}'";
+			$query .=  " WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}'";
 			mysql_query($query) or die("Query failed : $query " . mysql_error());
 		}
 		

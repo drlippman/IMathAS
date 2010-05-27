@@ -419,7 +419,7 @@ function recordtestdata($limit=false) {
 		}
 	}
 	if ($testsettings['isgroup']>0 && $sessiondata['groupid']>0 && !$isreview) {
-		$query .= "WHERE agroupid='{$sessiondata['groupid']}'";
+		$query .= "WHERE agroupid='{$sessiondata['groupid']}' AND assessmentid='{$testsettings['id']}'";
 	} else {
 		$query .= "WHERE id='$testid' LIMIT 1";
 	}

@@ -52,9 +52,11 @@ if ($cid==0) {
 		if ($_GET['delrev']=='true') {
 			$query = "SELECT id FROM imas_wiki_revisions WHERE wikiid='$id' AND stugroupid='$groupid' ORDER BY id DESC LIMIT 1";
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-			$curid = mysql_result($result,0,0);
-			$query = "DELETE FROM imas_wiki_revisions WHERE wikiid='$id' AND stugroupid='$groupid' AND id<$curid";
-			mysql_query($query) or die("Query failed : $query " . mysql_error());
+			if (mysql_num_rows($result)>0) {
+				$curid = mysql_result($result,0,0);
+				$query = "DELETE FROM imas_wiki_revisions WHERE wikiid='$id' AND stugroupid='$groupid' AND id<$curid";
+				mysql_query($query) or die("Query failed : $query " . mysql_error());
+			}
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewwiki.php?cid=$cid&id=$id&grp=$groupid");	
 			exit;
 		} else {
