@@ -135,8 +135,8 @@
 			$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 			echo '<div>ID:'.$qsetid.', '.mysql_result($result,0,0).'</div>';
 		} else {
-			list($points,$attempts) = getpointspossible($questions[$i],$testsettings['defpoints'],$testsettings['defattempts']);
-			echo "<div>#".($i+1)." Points possible: $points.  Total attempts: $attempts</div>";
+			list($points,$qattempts) = getpointspossible($questions[$i],$testsettings['defpoints'],$testsettings['defattempts']);
+			echo "<div>#".($i+1)." Points possible: $points.  Total attempts: $qattempts</div>";
 		}
 		displayq($i,$qsetid,$seeds[$i],$showa,($testsettings['showhints']==1),$attempts[$i]);
 		echo "<hr />";	
