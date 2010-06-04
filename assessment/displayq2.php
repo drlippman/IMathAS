@@ -249,6 +249,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 				echo formpopup("Read",$extrefpt[1],730,500,"button",true,"text");
 			}
 		}
+		echo '</p></div>';
 	}
 	
 	echo "<div>";
