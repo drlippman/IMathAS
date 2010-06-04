@@ -447,7 +447,7 @@ function gbstudisp($stu) {
 		echo '</div>';
 	}
 	
-	echo '<table id="myTable" class=gb>';
+	echo '<table id="myTable" class="gb" style="position:relative;">';
 	echo '<thead><tr><th>Item</th><th>Possible</th><th>Grade</th><th>Percent</th>';
 	if ($stu>0) {
 		echo '<th>Feedback</th>';

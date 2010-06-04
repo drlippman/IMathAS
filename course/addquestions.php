@@ -841,7 +841,7 @@ if ($overwriteBody==1) {
 	
 	<h3>Potential Questions</h3>
 	<form method=post action="addquestions.php?aid=<?php echo $aid ?>&cid=<?php echo $cid ?>">
-
+	
 		In Libraries: 
 		<span id="libnames"><?php echo $lnames ?></span>
 		<input type=hidden name="libs" id="libs"  value="<?php echo $searchlibs ?>">
@@ -861,6 +861,7 @@ if ($overwriteBody==1) {
 		Exclude added</span> 
 		<input type=submit value=Search>
 		<input type=button value="Add New Question" onclick="window.location='moddataset.php?aid=<?php echo $aid ?>&cid=<?php echo $cid ?>'">
+	
 	</form>
 <?php			
 			if ($searchall==1 && trim($search)=='') {
@@ -876,7 +877,8 @@ if ($overwriteBody==1) {
 		<input name="add" type=submit value="Add" />
 		<input name="addquick" type=submit value="Add (using defaults)">
 		<input type=button value="Preview Selected" onclick="previewsel('selq')" />
-		<table cellpadding=5 id=myTable class=gb>
+		
+		<table cellpadding="5" id="myTable" class="gb" style="clear:both; position:relative;">
 			<thead>
 				<tr><th></th><th>Description</th><th>ID</th><th>Preview</th><th>Type</th>
 					<?php echo $page_libRowHeader ?>
