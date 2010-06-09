@@ -84,6 +84,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			if (mysql_num_rows($result)==0) {
 				$overwriteBody = 1;
 				$body = "Error, username doesn't exist. <a href=\"listusers.php?cid=$cid&enroll=student\">Try again</a>\n";
+				$body .= "or <a href=\"listusers.php?cid=$cid&newstu=new\">create and enroll a new student</a>";
 			} else {
 				$id = mysql_result($result,0,0);
 				if ($id==$userid) {

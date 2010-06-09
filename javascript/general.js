@@ -114,7 +114,7 @@ function popupwindow(id,content,width,height,scroll) {
 	if (height=='fit') {
 		height = window.height - 80;
 	}
-	var attr = "width="+width+",height="+height+",status=0,resizeable=1,directories=0,menubar=0";
+	var attr = "width="+width+",height="+height+",status=0,resizable=1,directories=0,menubar=0";
 	if (scroll!=null && scroll==true) {
 		attr += ",scrollbars=1";
 	}
