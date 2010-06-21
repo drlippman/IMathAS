@@ -2572,6 +2572,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 			$orarr = explode('U',$_POST["tc$qn"]);
 			foreach ($orarr as $opt) {
+				$opt = trim($opt);
 				$opts = explode(',',substr($opt,1,strlen($opt)-2));
 				if (strpos($opts[0],'oo')===false &&  !checkanswerformat($opts[0],$ansformats)) {
 					return 0;

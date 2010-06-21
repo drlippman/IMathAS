@@ -4,7 +4,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=7" />
 <title><?php echo $installname; if (isset($pagetitle)) { echo " - $pagetitle";}?></title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-<link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=022810";?>" type="text/css" />
+<link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=061010";?>" type="text/css" />
 <?php if (isset($coursetheme)) { 
 	if (isset($flexwidth)) {
 		$coursetheme = str_replace('_fw','',$coursetheme);

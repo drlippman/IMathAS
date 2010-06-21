@@ -119,6 +119,7 @@ div#tbl-container {
 table.gb {
 	border-collapse: collapse;
 	margin: 0px;
+	position:relative;
 }
 
 table.gb thead th {

@@ -58,7 +58,7 @@ switch($_GET['action']) {
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
 		//todo: delete user picture files
 		//todo: delete user file uploads 
-		require("../includes/filehandler.php");
+		require_once("../includes/filehandler.php");
 		deletealluserfiles($_GET['id']);
 		//todo: delete courses if any
 		break;
@@ -254,8 +254,8 @@ switch($_GET['action']) {
 		
 		$query = "SELECT id FROM imas_assessments WHERE courseid='{$_GET['id']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		require_once("../includes/filehandler.php");
 		while ($line = mysql_fetch_row($result)) {
-			require("../includes/filehandler.php");
 			deleteallaidfiles($line[0]);
 			$query = "DELETE FROM imas_questions WHERE assessmentid='{$line[0]}'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
@@ -492,7 +492,7 @@ switch($_GET['action']) {
 		if ($myrights <100) { echo "You don't have the authority for this action"; break;}
 		$old = time() - 60*60*24*30*$_POST['months'];
 		$who = $_POST['who'];
-		require("../includes/filehandler.php");
+		require_once("../includes/filehandler.php");
 		if ($who=="students") {
 			$query = "SELECT id FROM imas_users WHERE  lastaccess<$old AND (rights=0 OR rights=10)";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());

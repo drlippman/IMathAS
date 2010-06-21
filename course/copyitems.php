@@ -315,7 +315,7 @@ if ($overwriteBody==1) {
 	  var els = frm.getElementsByTagName("input");
 	  for (var i = 0; i < els.length; i++) {
 		  var el = els[i];
-		  if (el.type=='checkbox' && el.id.indexOf(arr)==0) {
+		  if (el.type=='checkbox' && (el.id.indexOf(arr+'.')==0 || el.id.indexOf(arr+'-')==0 || el.id==arr)) {
 	     	       el.checked = mark;
 		  }
 	  }
