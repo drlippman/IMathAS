@@ -589,7 +589,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 }
 		}
 		if ($last<33) {
-			$query = 'ALTER TABLE `imas_questionset` ADD `extref` TEXT NOT NULL';
+			$query = 'ALTER TABLE `imas_questionset` ADD `extref` TEXT NOT NULL DEFAULT \'\'';
 			 $res = mysql_query($query);
 			 if ($res===false) {
 			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
