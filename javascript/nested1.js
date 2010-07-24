@@ -308,7 +308,7 @@ function submitChanges() {
   els = document.getElementsByTagName("input");
   for (var i=0; i<els.length; i++) {
 	  if (els[i].type=="hidden") {
-		  params += '&'+els[i].id.substring(5) + '=' + escape(els[i].value);
+		  params += '&'+els[i].id.substring(5) + '=' + encodeURIComponent(els[i].value);
 	  }
   }
 

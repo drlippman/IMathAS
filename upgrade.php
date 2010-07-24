@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 33;
+$latest = 34;
 
 
 @set_time_limit(0);
@@ -590,6 +590,13 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 		}
 		if ($last<33) {
 			$query = 'ALTER TABLE `imas_questionset` ADD `extref` TEXT NOT NULL DEFAULT \'\'';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+		}
+		if ($last<34) {
+			$query = 'ALTER TABLE `imas_assessments` ADD `deffeedbacktext` VARCHAR( 512 ) NOT NULL DEFAULT \'\'';
 			 $res = mysql_query($query);
 			 if ($res===false) {
 			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";

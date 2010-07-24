@@ -165,7 +165,7 @@ END;
 				if (isset($ltlibs[$child])) { //library has children
 					if ($select == "parent" || $select=="all") {
 						if ($_GET['type']=="radio") {				
-							if (in_array($child,$locked) || ($select=="parent" && $rights[$child]>2 && !$allownongrouplibs && !$isadmin && !$isgrpadmin)) { 
+							if (in_array($child,$locked)) { //removed the following which prevented creation of sublibraries of "open to all" libs.  Not sure why I had that.   || ($select=="parent" && $rights[$child]>2 && !$allownongrouplibs && !$isadmin && !$isgrpadmin)) { 
 								echo "1,";
 							} else {
 								echo ",";

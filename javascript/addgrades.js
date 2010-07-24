@@ -133,7 +133,7 @@ function AutoSuggest(elem, suggestions)
 			return;
 		default:
 
-			if (this.value != me.inputText && this.value.length > 0)
+			if (this.value.length > 0) //this.value != me.inputText && 
 			{
 				me.inputText = this.value;
 				me.getEligible();
@@ -156,7 +156,7 @@ function AutoSuggest(elem, suggestions)
 		}
 	};
 	elem.onblur = function(ev) {
-		me.hideDiv();
+		setTimeout(me.hideDiv,100);
 	}
 		
 		
@@ -176,9 +176,9 @@ function AutoSuggest(elem, suggestions)
 			//the event completes.
 			//setTimeout("document.getElementById('" + this.elem.id + "').focus()",0);
 			var namev = this.elem.value;
-			for (var i=0;i<trs.length;i++) {
+			for (var i=1;i<trs.length;i++) {
 				var tds = trs[i].getElementsByTagName("td");
-				if (tds[0].innerHTML.match(namev)) {
+				if (tds[0].innerHTML.match(namev) || tds[0].innerHTML==namev) {
 					document.getElementById("qascore").value = tds[tds.length-2].getElementsByTagName("input")[0].value;
 					document.getElementById("qafeedback").value = tds[tds.length-1].getElementsByTagName("textarea")[0].value;
 				}
@@ -258,7 +258,8 @@ function AutoSuggest(elem, suggestions)
 	
 			var li = document.createElement('li');
 			var a = document.createElement('a');
-			a.href="javascript:false";
+			a.href="#";//javascript:false;";
+			a.onclick= function() {return false;}
 			a.innerHTML = word;
 			li.appendChild(a);
 	
@@ -308,7 +309,7 @@ function AutoSuggest(elem, suggestions)
 		ul.onclick = function(ev)
 		{
 			me.useSuggestion("click");
-			me.hideDiv();
+			me.hideDiv();on
 			me.cancelEvent(ev);
 			return false;
 		};
@@ -409,9 +410,9 @@ function addsuggest() {
 	var scorev = document.getElementById("qascore").value;
 	var feedbv = document.getElementById("qafeedback").value;
 	if (namev != '') {
-		for (var i=0;i<trs.length;i++) {
+		for (var i=1;i<trs.length;i++) {
 			var tds = trs[i].getElementsByTagName("td");
-			if (tds[0].innerHTML.match(namev)) {
+			if (tds[0].innerHTML.match(namev) || tds[0].innerHTML==namev) {
 				tds[tds.length-2].getElementsByTagName("input")[0].value = scorev;
 				tds[tds.length-1].getElementsByTagName("textarea")[0].value = feedbv;
 			}

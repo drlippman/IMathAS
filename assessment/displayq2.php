@@ -466,11 +466,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$rightb = '';
 		}
 		if ($answerformat=='list' || $answerformat=='exactlist' ||  $answerformat=='orderedlist') {
-			$tip = "Enter your answer as a list of numbers separated with commas: Example: -4, 3, 2.5<br/>";
-			$shorttip = "Enter a list of numbers";
+			$tip = "Enter your answer as a list of whole or decimal numbers separated with commas: Examples: -4, 3, 2.5<br/>";
+			$shorttip = "Enter a list of whole or decimal numbers";
 		} else {
-			$tip = "Enter your answer as a number.  Examples: 3, -4, 5.5<br/>";
-			$shorttip = "Enter a number";
+			$tip = "Enter your answer as a whole or decimal number.  Examples: 3, -4, 5.5<br/>";
+			$shorttip = "Enter a whole or decimal number";
 		}
 		$tip .= "Enter DNE for Does Not Exist, oo for Infinity";
 		if (isset($reqdecimals)) {
