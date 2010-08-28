@@ -381,7 +381,7 @@ function gbtable() {
 		}
 		$category = $newcategory;
 	} else if ($orderby==3) { //order $category alpha
-		asort($name);
+		natcasesort($name);//asort($name);
 		$newcategory = array();
 		foreach ($name as $k=>$v) {
 			$newcategory[$k] = $category[$k];
@@ -459,7 +459,7 @@ function gbtable() {
 			asort($enddate,SORT_NUMERIC);
 			$itemorder = array_keys($enddate);
 		} else if ($orderby==2) {
-			asort($name);
+			natcasesort($name);//asort($name);
 			$itemorder = array_keys($name);
 		}
 		

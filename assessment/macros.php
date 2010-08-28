@@ -1207,6 +1207,8 @@ function consecutive($min,$max,$step=1) {
 		for ($i=$min;$i>$max+$step/100.0;$i+=$step) {
 			$a[] = $i;
 		}
+	} else if (abs($min-$max) < .9*abs($step)) {
+		$a[] = $min;
 	} else {
 		echo "Invalid inputs to consecutive";
 	}

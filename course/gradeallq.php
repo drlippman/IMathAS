@@ -379,6 +379,7 @@
 			//echo " <a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid=$cid&add=new&quoteq=$i-$qsetid-{$seeds[$i]}&to={$_GET['uid']}\">Use in Msg</a>";
 			//echo " &nbsp; <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$line['id']}&clearq=$i\">Clear Score</a>";
 			echo "<br/>Feedback: <textarea cols=50 rows=1 name=\"feedback-{$line['id']}\">{$line['feedback']}</textarea>";
+			echo ' Question #'.($loc+1);
 			echo "</div>\n";
 			if ($groupdup) {
 				echo '</div>';
@@ -391,7 +392,7 @@
 
 	
 
-	echo "<a href=\"gb-itemanalysis.php?stu=$stu&cid=$cid&aid=$aid&asid=average\">Back to Gradebook Item Analysis</a>";
+	echo "<p><a href=\"gb-itemanalysis.php?stu=$stu&cid=$cid&aid=$aid&asid=average\">Back to Gradebook Item Analysis</a></p>";
 
 	require("../footer.php");
 	function getpts($sc) {

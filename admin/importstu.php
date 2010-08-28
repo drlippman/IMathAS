@@ -128,7 +128,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 					} else if ($_POST['pwtype']==2) {
 						$pw = md5($_POST['defpw']);
 					} else if ($_POST['pwtype']==3) {
-						if (trim($arr[6])) {
+						if (trim($arr[6])=='') {
 							echo "Password for {$arr[0]} is blank; skipping import<br/>";
 							continue;
 						}
@@ -146,6 +146,13 @@ if (!(isset($teacherid)) && $myrights<100) {
 					$ncid = $cid;
 				}
 				$vals = "'$id','$ncid'";
+				$query = "SELECT id FROM imas_students WHERE userid='$id' AND courseid='$ncid'";
+				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+				if (mysql_num_rows($result)>0) {
+					echo "Username {$arr[0]} already enrolled in course.  Skipping<br/>";
+					continue;
+				}
+				
 				$query = "INSERT INTO imas_students (userid,courseid";
 				if ($_POST['codetype']==1) {
 					$query .= ",code";

@@ -341,7 +341,9 @@ function gbinstrdisp() {
 	array_unshift($sarr,"'S'");
 	
 	$sarr = implode(",",$sarr);
-	echo "<script>initSortTable('myTable',Array($sarr),true,false);</script>\n";
+	if (count($gbt)<500) {
+		echo "<script>initSortTable('myTable',Array($sarr),true,false);</script>\n";
+	}
 		
 	
 }
