@@ -435,6 +435,8 @@ if (!(isset($teacherid))) {
 			$page_fileHiddenInput = "<input type=hidden name=\"filename\" value=\"".basename($uploadfile)."\" />\n";
 		} else {
 			$page_fileErrorMsg .= "<p>Error uploading file!</p>\n";
+			echo $_FILES["userfile"]['error'];
+			exit;
 		}
 		list ($desc,$itemlist,$item,$questions,$qset) = parsefile($uploadfile);
 		if (!isset($desc)) {
@@ -489,7 +491,7 @@ function setlibnames(libn) {
 		<p>This page will allow you to import course items previously exported from
 		this site or another site running this software.</p>
 		
-		<input type="hidden" name="MAX_FILE_SIZE" value="300000" />
+		<input type="hidden" name="MAX_FILE_SIZE" value="3000000" />
 		<span class=form>Import file: </span>
 		<span class=formright><input name="userfile" type="file" /></span><br class=form>
 		<div class=submit><input type=submit value="Submit"></div>
