@@ -95,6 +95,12 @@
 		if ($row[1] == 'Unnamed group') { 
 			$row[1] .= " $grpnums";
 			$grpnums++;
+			$query = "SELECT iu.FirstName,iu.LastName FROM imas_users AS iu JOIN imas_stugroupmembers AS isgm ";
+			$query .= "ON iu.id=isgm.userid AND isgm.stugroupid='{$row[0]}' ORDER BY isgm.id LIMIT 1";
+			$r = mysql_query($query) or die("Query failed : " . mysql_error());
+			if (mysql_num_rows($r)>0) {
+				$row[1] .= ' ('.mysql_result($r,0,1).', '.mysql_result($r,0,0).' &isin;)';
+			}
 		}
 		$groupnames[$row[0]] = $row[1];
 	}

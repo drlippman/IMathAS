@@ -464,8 +464,40 @@ if ($overwriteBody==1) {
 		echo "<p><input type=button value=\"Yes, Remove\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid&grpid={$_GET['grpid']}&remove={$_GET['remove']}&confirm=true'\" /> ";
 		echo "<input type=button value=\"Nevermind\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid'\" /></p>";
 	} else if (isset($_GET['grpsetid'])) {
+		?>
+		<script type="text/javascript">
+		var picsize = 0;
+		function rotatepics() {
+			picsize = (picsize+1)%3;
+			picshow(picsize);
+		}
+		function picshow(size) {
+			if (size==0) {
+				els = document.getElementById("myTable").getElementsByTagName("img");
+				for (var i=0; i<els.length; i++) {
+					els[i].style.display = "none";
+				}
+			} else {
+				els = document.getElementById("myTable").getElementsByTagName("img");
+				for (var i=0; i<els.length; i++) {
+					els[i].style.display = "inline";
+					if (els[i].getAttribute("src").match("userimg_sm")) {
+						if (size==2) {
+							els[i].setAttribute("src",els[i].getAttribute("src").replace("_sm","_"));
+						}
+					} else if (size==1) {
+						els[i].setAttribute("src",els[i].getAttribute("src").replace("_","_sm"));
+					}
+				}
+			}
+		}
+		</script>
+		<?php
+		$curdir = rtrim(dirname(__FILE__), '/\\');
+
 		//groupset selected - list members
 		echo "<h4>Managing groups in set $page_grpsetname</h4>";
+		echo '<div id="myTable">';
 		foreach ($page_grps as $grpid=>$grpname) {
 			echo "<b>Group: $grpname</b> | ";
 			echo "<a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&rengrp=$grpid\">Rename</a> | ";
@@ -476,13 +508,19 @@ if ($overwriteBody==1) {
 				echo '<li>No group members</li>';
 			} else {
 				foreach ($page_grpmembers[$grpid] as $uid=>$name) {
-					echo "<li>$name | <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&remove=$uid&grpid=$grpid\">Remove from group</a></li>";
+					echo '<li>';
+					if (file_exists("$curdir/files/userimg_sm$uid.jpg")) {
+						echo "<img src=\"$imasroot/course/files/userimg_sm$uid.jpg\" style=\"display:none;\"  />";
+					} 
+					echo "$name | <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&remove=$uid&grpid=$grpid\">Remove from group</a></li>";
 				}
 			}
 			echo '</ul>';
 		}
 		
-		echo "<p><a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&addgrp=true\">Add New Group</a></p>";
+		echo "<p><a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&addgrp=true\">Add New Group</a> ";
+		echo ' <input type="button" value="Pictures" onclick="rotatepics()" /></p>';
+		
 		
 		echo '<h4>Students not in a group</h4>';
 		if (count($page_ungrpstu)>0) {
@@ -497,7 +535,11 @@ if ($overwriteBody==1) {
 			echo '<input type="submit" value="Add"/>';
 			echo '<ul class="nomark">';
 			foreach ($page_ungrpstu as $uid=>$name) {
-				echo "<li><input type=\"checkbox\" name=\"stutoadd[]\" value=\"$uid\" />$name</li>";
+				echo "<li><input type=\"checkbox\" name=\"stutoadd[]\" value=\"$uid\" />";
+				if (file_exists("$curdir/files/userimg_sm$uid.jpg")) {
+					echo "<img src=\"$imasroot/course/files/userimg_sm$uid.jpg\" style=\"display:none;\"  />";
+				}
+				echo "$name</li>";
 			}
 			echo '</ul>';
 			echo '</form>';
@@ -505,7 +547,7 @@ if ($overwriteBody==1) {
 		} else {
 			echo '<p>None</p>';
 		}
-		
+		echo '</div>';
 	} else {
 		//list all groups
 		echo '<h4>Student Group Sets</h4>';

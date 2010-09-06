@@ -95,6 +95,14 @@
 //	$query .= "ias.id,ias.userid,ias.bestscores,ias.starttime,ias.endtime,ias.feedback FROM imas_assessment_sessions AS ias,imas_users AS iu,imas_students AS istu ";
 //	$query .= "WHERE iu.id = istu.userid AND istu.courseid='$cid' AND iu.id=ias.userid AND ias.assessmentid='$aid'";
 
+	//get exceptions
+	$query = "SELECT userid,enddate FROM imas_exceptions WHERE assessmentid='$aid'";
+	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+	$exceptions = array();
+	while ($row = mysql_fetch_row($result)) {
+		$exceptions[$row[0]] = $row[1];
+	}
+	
 	$query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.timelimitmult,";
 	$query .= "ias.id,istu.userid,ias.bestscores,ias.starttime,ias.endtime,ias.feedback FROM imas_users AS iu JOIN imas_students AS istu ON iu.id = istu.userid AND istu.courseid='$cid' ";
 	$query .= "LEFT JOIN imas_assessment_sessions AS ias ON iu.id=ias.userid AND ias.assessmentid='$aid'";
@@ -157,8 +165,11 @@
 				$tot += $total;
 				$n++;
 			}
-	
-			echo "</a></td>";
+			echo '</a>';
+			if (isset($exceptions[$line['userid']])) {
+				echo '<sup>e</sup>';
+			} 
+			echo '</td>';
 			if ($totalpossible>0) {
 				echo '<td>'.round(100*($total)/$totalpossible,1).'%</td>';
 			} else {
@@ -190,6 +201,8 @@
 	} else {
 		echo "<script> initSortTable('myTable',Array('S','N'),true);</script>";
 	}
+	echo "<p>Meanings:  IP-In Progress, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sup>e</sup> Has exception/latepass  </p>\n";
+	
 	require("../footer.php");
 	
 	

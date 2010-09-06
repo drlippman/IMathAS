@@ -155,6 +155,9 @@ if (!(isset($teacherid))) {
 				$sets[] = "cntingb='{$_POST['cntingb']}'";
 			}
 			if (isset($_POST['chgminscore'])) {
+				if ($_POST['minscoretype']==1 && trim($_POST['minscore'])!='' && $_POST['minscore']>0) {
+					$_POST['minscore'] = intval($_POST['minscore'])+10000;
+				}
 				$sets[] = "minscore='{$_POST['minscore']}'";
 			}
 			if (isset($_POST['chgshowqcat'])) {
@@ -587,6 +590,9 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 				<td class="r">Minimum score to receive credit: </td>
 				<td>
 				<input type=text size=4 name=minscore value="<?php echo $line['minscore'];?>">
+				<input type="radio" name="minscoretype" value="0" checked="checked"> Points 
+				<input type="radio" name="minscoretype" value="1"> Percent 
+	
 				</td>
 			</tr>
 			<tr class="coptr">

@@ -100,6 +100,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (isset($_POST['samever'])) { $shuffle += 4;}
 		if (isset($_POST['reattemptsdiffver'])) { $shuffle += 8;}
 		
+		if ($_POST['minscoretype']==1 && trim($_POST['minscore'])!='' && $_POST['minscore']>0) {
+			$_POST['minscore'] = intval($_POST['minscore'])+10000;
+		}
+		
 		$isgroup = $_POST['isgroup'];
 		
 		if (isset($_POST['showhints'])) {
@@ -367,6 +371,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$showqcat = 0;
 			
 			$taken = false;
+		}
+		if ($line['minscore']>10000) {
+			$line['minscore'] -= 10000;
+			$minscoretype = 1; //pct;
+		} else {
+			$minscoretype = 0; //points;
 		}
 		// ALL BELOW IS COMMON TO MODIFY OR ADD MODE
 		if ($startdate!=0) {
@@ -762,6 +772,8 @@ if ($overwriteBody==1) {
 			<span class=form>Minimum score to receive credit: </span>
 			<span class=formright>
 				<input type=text size=4 name=minscore value="<?php echo $line['minscore'];?>">
+				<input type="radio" name="minscoretype" value="0" <?php writeHtmlChecked($minscoretype,0);?>> Points 
+				<input type="radio" name="minscoretype" value="1" <?php writeHtmlChecked($minscoretype,1);?>> Percent 
 			</span><BR class=form>
 	
 			<span class=form>Show based on another assessment: </span>
