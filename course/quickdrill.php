@@ -15,13 +15,14 @@
 
 if (isset($_GET['public'])) {
 	require("../config.php");
+	header('P3P: CP="ALL CUR ADM OUR"');
 	session_start();
 	$_SESSION['publicquickdrill'] = true;
 	function writesessiondata() {
 		global $sessiondata;
 		$_SESSION['data'] = base64_encode(serialize($sessiondata));
 	}
-	if (!isset($_SESSION['data'])) {
+	if (!isset($_SESSION['data']) || isset($_GET['reset'])) {
 		$sessiondata = array();
 	} else {
 		$sessiondata = unserialize(base64_decode($_SESSION['data']));
@@ -35,10 +36,61 @@ if (isset($_GET['public'])) {
 	$public = '';
 	$publica = '';
 }
+if (isset($_GET['reset'])) {
+	writesessiondata();
+	echo "Session reset";
+	exit;
+}
 require("../assessment/displayq2.php");
 
 $pagetitle = "Quick Drill";
 
+if (isset($_GET['showresults']) && is_array($sessiondata['drillresults'])) {
+	$qids = array_keys($sessiondata['drillresults']);
+	$list = implode(',',$qids);
+	$query = "SELECT id,description FROM imas_questionset WHERE id IN ($list) ORDER BY description";
+	$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
+	$out = '';
+	while ($row = mysql_fetch_row($result)) {
+		$out .= "<p><b>{$row[1]}</b><ul>";
+		foreach ($sessiondata['drillresults'][$row[0]] as $item) {
+			$out .= '<li>';
+			if ($item[0]=='n') {
+				$out .= $item[1].' questions completed in '.$item[2].', score: '.$item[3];
+			} elseif ($item[0]=='nc') {
+				$out .= $item[1].' questions completed correctly in '.$item[2].', '.$item[3];
+			} elseif ($item[0]=='t') {
+				$out .= 'Score: '.$item[2].', in '.$item[1];
+			}
+			$out .= '</li>';
+		}
+		$out .= '</ul></p>';
+	}
+	echo $out;
+	if (isset($_GET['email']) && isset($_GET['public']) && !isset($_POST['stuname'])) {
+		$addy = 'quickdrill.php?public=true&showresults=true&email='.$_GET['email'];
+		echo '<p><b>Send results to instructor</b><br/>';
+		echo "<form action=\"$addy\" method=\"post\">";
+		echo 'Your name: <input type="text" name="stuname" /></p>';
+		echo '<input type="submit" value="Send results" />';
+		echo '</form>';
+	} else if (isset($_GET['email'])) {
+		if (isset($_GET['public']) && isset($_POST['stuname'])) {
+			$stuname = $_POST['stuname'];
+		} else {
+			$stuname = $userfullname;	
+		}
+		$headers  = 'MIME-Version: 1.0' . "\r\n";
+		$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+		$headers .= "From: $sendfrom\r\n";
+		$message  = "<h4>This is an automated message.  Do not respond to this email</h4>\r\n";
+		$message .= "<p>Quick Drill Results for $stuname</p>";
+		$message .= "<p>$out</p>";
+		mail($_GET['email'],'QuickDrill Results',$message,$headers);
+		echo "<p>Email Sent</p>";
+	}
+	exit;
+}
 if (isset($sessiondata['drill']) && empty($_GET['id'])) {
 	//load from sessiondata
 	$qsetid = $sessiondata['drill']['id'];
@@ -103,6 +155,9 @@ if (isset($sessiondata['drill']) && empty($_GET['id'])) {
 	}
 	if ($sessiondata['drill']['mode']=='cntup' || $sessiondata['drill']['mode']=='cntdown') {
 		$sessiondata['drill']['starttime'] = 0;
+	}
+	if (!isset($sessiondata['drillresults'])) {
+		$sessiondata['drillresults'] = array();
 	}
 	$sessiondata['coursetheme'] = $coursetheme;
 	writesessiondata();
@@ -189,6 +244,11 @@ if (isset($n) && count($scores)==$n && !$showans) {  //if student has completed 
 	echo "<p>Score:  $curscore out of ".count($scores)." possible</p>";
 	$addr = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php?id=$qsetid&cid=$cid&sa=$sa&n=$n$publica";
 	echo "<p><a href=\"$addr\">Again</a></p>";
+	if (!isset($sessiondata['drillresults'][$qsetid])) {
+		$sessiondata['drillresults'][$qsetid] = array();
+	}
+	$sessiondata['drillresults'][$qsetid][] = array("n",$n,"$hours:$minutes:$seconds","$curscore out of ".count($scores));
+	writesessiondata();
 	require("../footer.php");
 	exit;
 }
@@ -204,6 +264,11 @@ if (isset($nc) && $curscore==$nc) {  //if student has completed their nc questio
 	echo "<p>".count($scores)." tries used</p>";
 	$addr = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php?id=$qsetid&cid=$cid&sa=$sa&nc=$nc$publica";
 	echo "<p><a href=\"$addr\">Again</a></p>";
+	if (!isset($sessiondata['drillresults'][$qsetid])) {
+		$sessiondata['drillresults'][$qsetid] = array();
+	}
+	$sessiondata['drillresults'][$qsetid][] = array("nc",$nc,"$hours:$minutes:$seconds",count($scores).' tries used');
+	writesessiondata();
 	require("../footer.php");
 	exit;
 }
@@ -227,6 +292,11 @@ if ($timesup == true) { //if time has expired
 	echo "$seconds seconds</p>";
 	$addr = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php?id=$qsetid&cid=$cid&sa=$sa&t=$timelimit$publica";
 	echo "<p><a href=\"$addr\">Again</a></p>";
+	if (!isset($sessiondata['drillresults'][$qsetid])) {
+		$sessiondata['drillresults'][$qsetid] = array();
+	}
+	$sessiondata['drillresults'][$qsetid][] = array("t","$hours:$minutes:$seconds","$curscore out of ".count($scores));
+	writesessiondata();
 	require("../footer.php");
 	exit;
 }
