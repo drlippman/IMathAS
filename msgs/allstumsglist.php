@@ -18,7 +18,7 @@
 	   exit;
 	}
 	
-	$threadsperpage = 20;
+	$threadsperpage = $listperpage;
 	
 	$cid = $_GET['cid'];
 	if (!isset($_GET['page']) || $_GET['page']=='') {
@@ -59,6 +59,7 @@
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$numpages = ceil(mysql_result($result,0,0)/$threadsperpage);
 	
+	$prevnext = '';
 	if ($numpages > 1) {
 		echo "<span class=\"right\" style=\"padding: 5px;\">Page: ";
 		if ($page < $numpages/2) {
@@ -89,11 +90,16 @@
 		}
 		echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 		if ($page>1) {
-			echo "<a href=\"allstumsglist.php?page=".($page-1)."&cid=$cid&filterstu=$filterstu\">Previous</a> ";
+			$prevnext .= "<a href=\"allstumsglist.php?page=".($page-1)."&cid=$cid&filterstu=$filterstu\">Previous</a> ";
+		} else {
+			$prevnext .= "Previous ";
 		}
 		if ($page < $numpages) {
-			echo "<a href=\"allstumsglist.php?page=".($page+1)."&cid=$cid&filterstu=$filterstu\">Next</a> ";
+			$prevnext .= "<a href=\"allstumsglist.php?page=".($page+1)."&cid=$cid&filterstu=$filterstu\">Next</a> ";
+		} else {
+			$prevnext .= "Next ";
 		}
+		echo $prevnext;
 		echo "</span>\n";
 	}
 	$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/allstumsglist.php?cid=$cid&filterstu=";
@@ -185,7 +191,9 @@ function chgfilter() {
 	</table>
 	</form>
 <?php
-	
+	if ($prevnext != '') {
+		echo "<p>$prevnext</p>";
+	}
 	echo "<p><a href=\"msglist.php?cid=$cid\">Back to My Messages</a></p>";
 	
 	require("../footer.php");

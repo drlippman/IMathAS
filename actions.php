@@ -391,6 +391,7 @@
 		foreach ($homelayout as $k=>$v) {
 			$homelayout[$k] = implode(',',$v);
 		}
+		$perpage = intval($_POST['perpage']);
 		if (isset($CFG['GEN']['fixedhomelayout']) && $CFG['GEN']['homelayout']) {
 			$deflayout = explode('|',$CFG['GEN']['homelayout']);
 			foreach ($CFG['GEN']['fixedhomelayout'] as $k) {
@@ -399,7 +400,7 @@
 		}
 				
 		$layoutstr = implode('|',$homelayout);
-		$query = "UPDATE imas_users SET FirstName='{$_POST['firstname']}',LastName='{$_POST['lastname']}',email='{$_POST['email']}',msgnotify=$msgnot,qrightsdef=$qrightsdef,deflib='$deflib',usedeflib='$usedeflib',homelayout='$layoutstr' ";
+		$query = "UPDATE imas_users SET FirstName='{$_POST['firstname']}',LastName='{$_POST['lastname']}',email='{$_POST['email']}',msgnotify=$msgnot,qrightsdef=$qrightsdef,deflib='$deflib',usedeflib='$usedeflib',homelayout='$layoutstr',listperpage='$perpage' ";
 		$query .= "WHERE id='$userid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		if (is_uploaded_file($_FILES['stupic']['tmp_name'])) {

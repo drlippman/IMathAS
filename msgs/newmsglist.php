@@ -15,7 +15,7 @@
 		$isteacher = false;
 	}
 	$cansendmsgs = false;
-	$threadsperpage = 20;
+	$threadsperpage = $listperpage;
 	
 	$cid = $_GET['cid'];
 	

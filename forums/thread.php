@@ -15,7 +15,7 @@
 		$isteacher = false;
 	}
 	
-	$threadsperpage = 20;
+	$threadsperpage = $listperpage;
 	
 	$cid = $_GET['cid'];
 	$forumid = $_GET['forum'];
@@ -468,7 +468,7 @@
 	} else if ($page==-2 && count($tags)==0) {
 		$page = 1;
 	}
-	
+	$prevnext = '';
 	if ($page>0) {
 		$query = "SELECT COUNT(id) FROM imas_forum_posts WHERE parent=0 AND forumid='$forumid'";
 		if ($dofilter) {
@@ -506,16 +506,18 @@
 				echo "<a href=\"thread.php?page=$numpages&cid=$cid&forum=$forumid\">$numpages</a> ";
 			}
 			echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+			
 			if ($page>1) {
-				echo "<a href=\"thread.php?page=".($page-1)."&cid=$cid&forum=$forumid\">Previous</a> ";
+				$prevnext .= "<a href=\"thread.php?page=".($page-1)."&cid=$cid&forum=$forumid\">Previous</a> ";
 			} else {
-				echo "Previous ";
+				$prevnext .= "Previous ";
 			}
 			if ($page < $numpages) {
-				echo "| <a href=\"thread.php?page=".($page+1)."&cid=$cid&forum=$forumid\">Next</a> ";
+				$prevnext .= "| <a href=\"thread.php?page=".($page+1)."&cid=$cid&forum=$forumid\">Next</a> ";
 			} else {
-				echo "| Next ";
+				$prevnext .= "| Next ";
 			}
+			echo $prevnext;
 			echo "</div>\n";
 		}
 	}
@@ -699,6 +701,9 @@
 <?php
 	if (($myrights > 5 && time()<$postby) || $isteacher) {
 		echo "<p><a href=\"thread.php?page=$page&cid=$cid&forum=$forumid&modify=new\">Add New Thread</a></p>\n";
+	}
+	if ($prevnext!='') {
+		echo "<p>$prevnext</p>";
 	}
 	
 	require("../footer.php");

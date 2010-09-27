@@ -32,7 +32,7 @@ isread:
 		$isteacher = false;
 	}
 	$cansendmsgs = false;
-	$threadsperpage = 20;
+	$threadsperpage = $listperpage;
 	
 	$cid = $_GET['cid'];
 	if (!isset($_GET['page']) || $_GET['page']=='') {
@@ -285,7 +285,7 @@ isread:
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$numpages = ceil(mysql_result($result,0,0)/$threadsperpage);
 	}
-	
+	$prevnext = '';
 	if ($numpages > 1) {
 		echo "<div>Page: ";
 		if ($page < $numpages/2) {
@@ -316,15 +316,16 @@ isread:
 		}
 		echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 		if ($page>1) {
-			echo "<a href=\"msglist.php?page=".($page-1)."&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">Previous</a> ";
+			$prevnext .= "<a href=\"msglist.php?page=".($page-1)."&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">Previous</a> ";
 		} else {
-			echo 'Previous ';
+			$prevnext .= 'Previous ';
 		}
 		if ($page < $numpages) {
-			echo "| <a href=\"msglist.php?page=".($page+1)."&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">Next</a> ";
+			$prevnext .= "| <a href=\"msglist.php?page=".($page+1)."&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">Next</a> ";
 		} else {
-			echo '| Next';
+			$prevnext .= '| Next';
 		}
+		echo $prevnext;
 		echo "</div>\n";
 	}
 	$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/msglist.php?cid=$cid&filtercid=";
@@ -490,6 +491,9 @@ function picshow(size) {
 	</table>
 	</form>
 <?php
+	if ($prevnext != '') {
+		echo "<p>$prevnext</p>";
+	}
 	if ($cansendmsgs) {
 		echo "<p><a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid&add=new\">Send New Message</a></p>\n";
 	}

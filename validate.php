@@ -234,13 +234,14 @@ END;
  if ($hasusername) {
 	//check validity, if desired
 	//$username = $_COOKIE['username'];
-	$query = "SELECT SID,rights,groupid,LastName,FirstName,deflib FROM imas_users WHERE id='$userid'"; 
+	$query = "SELECT SID,rights,groupid,LastName,FirstName,deflib,listperpage FROM imas_users WHERE id='$userid'"; 
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
 	$username = $line['SID'];
 	$myrights = $line['rights'];
 	$groupid = $line['groupid'];
 	$userdeflib = $line['deflib'];
+	$listperpage = $line['listperpage'];
 	$userfullname = $line['FirstName'] . ' ' . $line['LastName'];
 	$previewshift = -1;
 	$basephysicaldir = rtrim(dirname(__FILE__), '/\\');

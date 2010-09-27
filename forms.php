@@ -89,6 +89,15 @@ switch($_GET['action']) {
 			echo "No Pic ";
 		}
 		echo '<br/><input type="file" name="stupic"/></span><br class="form" />';
+		echo '<span class="form"><label for="perpage">Messages/Posts per page:</label></span>';
+		echo '<span class="formright"><select name="perpage">';
+		for ($i=10;$i<=100;$i+=10) {
+			echo '<option value="'.$i.'" ';
+			if ($i==$line['listperpage']) {echo 'selected="selected"';}
+			echo '>'.$i.'</option>';
+		}
+		echo '</select></span><br class="form" />';
+		
 		$pagelayout = explode('|',$line['homelayout']);
 		foreach($pagelayout as $k=>$v) {
 			if ($v=='') {
