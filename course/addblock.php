@@ -65,17 +65,22 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$body = "You need to log in as a teacher to access this page";
 } elseif ($_POST['title']!= null) { //form posted to itself with new/modified data, update the block
 	require_once("parsedatetime.php");
-	if ($_POST['sdatetype']=='0') {
+	if ($_POST['avail']==1) {
+		if ($_POST['sdatetype']=='0') {
+			$startdate = 0;
+		} else if ($_POST['sdatetype']=='now') {
+			$startdate = time()-2;
+		} else {
+			$startdate = parsedatetime($_POST['sdate'],$_POST['stime']);
+		}
+		if ($_POST['edatetype']=='2000000000') {
+			$enddate = 2000000000;
+		} else {
+			$enddate = parsedatetime($_POST['edate'],$_POST['etime']);
+		}
+	} else {
 		$startdate = 0;
-	} else if ($_POST['sdatetype']=='now') {
-		$startdate = time()-2;
-	} else {
-		$startdate = parsedatetime($_POST['sdate'],$_POST['stime']);
-	}
-	if ($_POST['edatetype']=='2000000000') {
 		$enddate = 2000000000;
-	} else {
-		$enddate = parsedatetime($_POST['edate'],$_POST['etime']);
 	}
 
 	if (is_numeric($_POST['fixedheight'])) {
@@ -307,11 +312,12 @@ if ($overwriteBody==1) {
 	<BR class=form>
 	<span class=form>Show:</span>
 	<span class=formright>
-		<input type=radio name="avail" value="0" <?php writeHtmlChecked($avail,0);?>/>Hide<br/>
-		<input type=radio name="avail" value="1" <?php writeHtmlChecked($avail,1);?>/>Show by Dates<br/>
-		<input type=radio name="avail" value="2" <?php writeHtmlChecked($avail,2);?>/>Show Always<br/>
+		<input type=radio name="avail" value="0" <?php writeHtmlChecked($avail,0);?> onclick="document.getElementById('datediv').style.display='none';"/>Hide<br/>
+		<input type=radio name="avail" value="1" <?php writeHtmlChecked($avail,1);?> onclick="document.getElementById('datediv').style.display='block';"/>Show by Dates<br/>
+		<input type=radio name="avail" value="2" <?php writeHtmlChecked($avail,2);?> onclick="document.getElementById('datediv').style.display='none';"/>Show Always<br/>
 	</span><br class="form"/>
 	
+	<div id="datediv" style="display:<?php echo ($avail==1)?"block":"none"; ?>">
 	<span class=form>Available After:</span>
 	<span class=formright>
 	<input type=radio name="sdatetype" value="0" <?php  writeHtmlChecked($startdate,0) ?>/>
@@ -333,7 +339,8 @@ if ($overwriteBody==1) {
 	<img src="../img/cal.gif" alt="Calendar"/></a>
 	at <input type=text size=10 name=etime value="<?php echo $etime;?>"></span>
 	<BR class=form>
-
+	</div>
+	
 	<span class=form>When available:</span>
 	<span class=formright>
 	<input type=radio name=availbeh value="O" <?php writeHtmlChecked($availbeh,'O')?> />Show Expanded<br/>
@@ -362,15 +369,15 @@ if ($overwriteBody==1) {
 	</span><br class=form />
 	<span class=form>Block colors:</span>
 	<span class=formright>
-	<input type=radio name=colors value="def" <?php  writeHtmlChecked($usedef,1) ?> />Use defaults<br/>
-	<input type=radio name=colors value="copy" <?php writeHtmlChecked($usedef,2) ?> />Copy colors from block: 
+	<input type=radio name="colors" value="def" <?php  writeHtmlChecked($usedef,1) ?> />Use defaults<br/>
+	<input type=radio name="colors" value="copy" <?php writeHtmlChecked($usedef,2) ?> />Copy colors from block: 
 	
 	<?php
 	writeHtmlSelect("copycolors",$existBlocksVals,$existBlocksLabels);
 	?>
 
 	<br />&nbsp;<br/>
-	<input type=radio name=colors value="custom" <?php if ($usedef==0) {echo "CHECKED";}?> />Use custom:
+	<input type=radio name="colors" id="colorcustom" value="custom" <?php if ($usedef==0) {echo "CHECKED";}?> />Use custom:
 	<table style="display: inline; border-collapse: collapse; margin-left: 15px;">
 		<tr>
 			<td id="ex1" style="border: 1px solid #000;background-color:

@@ -246,6 +246,7 @@
 		if (cp.cpInput.id=="bi") {
 			document.getElementById("ex2").style.backgroundColor = cp.cpColor;
 		}
+		document.getElementById("colorcustom").checked = true;
 		hideColorPicker();
 	}
 

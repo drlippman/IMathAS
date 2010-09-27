@@ -76,24 +76,30 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	} elseif ($_POST['name']!= null) { //if the form has been submitted
 		
 		require_once("parsedatetime.php");
-		if ($_POST['sdatetype']=='0') {
+		if ($_POST['avail']==1) {
+			if ($_POST['sdatetype']=='0') {
+				$startdate = 0;
+			} else {
+				$startdate = parsedatetime($_POST['sdate'],$_POST['stime']);
+			}
+			if ($_POST['edatetype']=='2000000000') {
+				$enddate = 2000000000;
+			} else {
+				$enddate = parsedatetime($_POST['edate'],$_POST['etime']);
+			}
+		
+			if ($_POST['doreview']=='0') {
+				$reviewdate = 0;
+			} else if ($_POST['doreview']=='2000000000') {
+				$reviewdate = 2000000000;
+			} else {
+				$reviewdate = parsedatetime($_POST['rdate'],$_POST['rtime']);	
+			} 
+		}else {
 			$startdate = 0;
-		} else {
-			$startdate = parsedatetime($_POST['sdate'],$_POST['stime']);
-		}
-		if ($_POST['edatetype']=='2000000000') {
 			$enddate = 2000000000;
-		} else {
-			$enddate = parsedatetime($_POST['edate'],$_POST['etime']);
-		}
-	
-		if ($_POST['doreview']=='0') {
 			$reviewdate = 0;
-		} else if ($_POST['doreview']=='2000000000') {
-			$reviewdate = 2000000000;
-		} else {
-			$reviewdate = parsedatetime($_POST['rdate'],$_POST['rtime']);	
-		} 
+		}
 		
 		if (isset($_POST['shuffle'])) { $shuffle = 1;} else {$shuffle = 0;}
 		if (isset($_POST['sameseed'])) { $shuffle += 2;}
@@ -549,9 +555,12 @@ if ($overwriteBody==1) {
 	
 		<span class=form>Show:</span>
 		<span class=formright>
-			<input type=radio name="avail" value="0" <?php writeHtmlChecked($line['avail'],0);?>/>Hide<br/>
-			<input type=radio name="avail" value="1" <?php writeHtmlChecked($line['avail'],1);?>/>Show by Dates
+			<input type=radio name="avail" value="0" <?php writeHtmlChecked($line['avail'],0);?> onclick="document.getElementById('datediv').style.display='none';"/>Hide<br/>
+			<input type=radio name="avail" value="1" <?php writeHtmlChecked($line['avail'],1);?> onclick="document.getElementById('datediv').style.display='block';"/>Show by Dates<br/>
 		</span><br class="form"/>
+		
+		<div id="datediv" style="display:<?php echo ($line['avail']==1)?"block":"none"; ?>">
+	
 		<span class=form>Available After:</span>
 		<span class=formright>
 			<input type=radio name="sdatetype" value="0" <?php writeHtmlChecked($startdate,"0",0); ?>/> 
@@ -573,6 +582,7 @@ if ($overwriteBody==1) {
 			<img src="../img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=etime value="<?php echo $etime;?>">
 		</span><BR class=form>
+		
 		<span class=form>Keep open as review:</span>
 		<span class=formright>
 			<input type=radio name="doreview" value="0" <?php writeHtmlChecked($line['reviewdate'],0,0); ?>> Never<br/>
@@ -583,6 +593,7 @@ if ($overwriteBody==1) {
 			<img src="../img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=rtime value="<?php echo $rtime;?>">
 		</span><BR class=form>
+		</div>
 		
 		<span class=form></span>
 		<span class=formright>

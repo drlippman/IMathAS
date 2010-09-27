@@ -75,6 +75,12 @@
 					
 			}
 		}
+		if (isset($_POST['sendmsg'])) {
+			$_GET['masssend'] = "Message";
+			$_POST['checked'] = explode(',',$_POST['tolist']);
+			require("masssend.php");
+			exit;
+		}
 	}
 
 
@@ -221,6 +227,9 @@
 	echo 'will keep any scores earned, but must work new versions of questions to improve score.</p>';
 	echo '<p><input type="checkbox" name="forceclear"/> Clear student\'s attempts?  Students ';
 	echo 'will <b>not</b> keep any scores earned, and must rework all problems.</p>';
+	
+	echo '<p><input type="checkbox" name="sendmsg"/> Send message to these students?</p>';
+	
 	if (!isset($_GET['uid']) && count($_POST['checked'])>1) {
 		echo "<h4>Students Selected</h4>";
 		$query = "SELECT LastName,FirstName FROM imas_users WHERE id IN ($tolist) ORDER BY LastName,FirstName";

@@ -168,11 +168,13 @@
 			$_GET['id'] = $qsetid;			
 			
 			if (isset($_GET['templateid'])) {
-				$query = "SELECT var,filename,alttext FROM imas_qimages WHERE qsetid='{$_GET['templateid']}'";
+				$query = "SELECT var,filename,alttext,id FROM imas_qimages WHERE qsetid='{$_GET['templateid']}'";
 				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 				while ($row = mysql_fetch_row($result)) {
-					$query = "INSERT INTO imas_qimages (qsetid,var,filename,alttext) VALUES ('$qsetid','{$row[0]}','{$row[1]}','{$row[2]}')";
-					mysql_query($query) or die("Query failed :$query " . mysql_error());
+					if (!isset($_POST['delimg-'.$row[3]])) {
+						$query = "INSERT INTO imas_qimages (qsetid,var,filename,alttext) VALUES ('$qsetid','{$row[0]}','{$row[1]}','{$row[2]}')";
+						mysql_query($query) or die("Query failed :$query " . mysql_error());
+					}
 				}
 			}
 			
@@ -630,8 +632,8 @@ Question type: <select name=qtype <?php if (!$myq) echo "disabled=\"disabled\"";
 </select>
 </p>
 <p>
-<a href="#" onclick="window.open('<?php echo $imasroot;?>/help.php?section=writingquestions','Help','width=400,height=300,toolbar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420))">Writing Questions Help</a> 
-<a href="#" onclick="window.open('<?php echo $imasroot;?>/assessment/libs/libhelp.php','Help','width=400,height=300,toolbar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420))">Macro Library Help</a> 
+<a href="#" onclick="window.open('<?php echo $imasroot;?>/help.php?section=writingquestions','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',toolbar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6))">Writing Questions Help</a> 
+<a href="#" onclick="window.open('<?php echo $imasroot;?>/assessment/libs/libhelp.php','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',toolbar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6))">Macro Library Help</a> 
 Switch to: 
 <input type=button id=entrymode value="<?php if ($twobx) {echo "4-box entry";} else {echo "2-box entry";}?>" onclick="swapentrymode()" <?php if ($line['qcontrol']!='' || $line['answer']!='') echo "DISABLED"; ?>/>
 </p>

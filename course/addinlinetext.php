@@ -54,15 +54,20 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$page_formActionTag .= "&tb=$totb";
 	
 	if ($_POST['title']!= null || $_POST['text']!=null || $_POST['sdate']!=null) { //if the form has been submitted
-		if ($_POST['sdatetype']=='0') {
+		if ($_POST['avail']==1) {
+			if ($_POST['sdatetype']=='0') {
+				$startdate = 0;
+			} else {
+				$startdate = parsedatetime($_POST['sdate'],$_POST['stime']);
+			}
+			if ($_POST['edatetype']=='2000000000') {
+				$enddate = 2000000000;
+			} else {
+				$enddate = parsedatetime($_POST['edate'],$_POST['etime']);
+			}
+		} else {
 			$startdate = 0;
-		} else {
-			$startdate = parsedatetime($_POST['sdate'],$_POST['stime']);
-		}
-		if ($_POST['edatetype']=='2000000000') {
 			$enddate = 2000000000;
-		} else {
-			$enddate = parsedatetime($_POST['edate'],$_POST['etime']);
 		}
 		if (isset($_POST['hidetitle'])) {
 			$_POST['title']='##hidden##';
@@ -330,10 +335,13 @@ function movefile(from) {
 	<div>
 		<span class=form>Show:</span>
 		<span class=formright>
-			<input type=radio name="avail" value="0" <?php writeHtmlChecked($line['avail'],0);?>/>Hide<br/>
-			<input type=radio name="avail" value="1" <?php writeHtmlChecked($line['avail'],1);?>/>Show by Dates<br/>
-			<input type=radio name="avail" value="2" <?php writeHtmlChecked($line['avail'],2);?>/>Show Always<br/>
+			<input type=radio name="avail" value="0" <?php writeHtmlChecked($line['avail'],0);?> onclick="document.getElementById('datediv').style.display='none';"/>Hide<br/>
+			<input type=radio name="avail" value="1" <?php writeHtmlChecked($line['avail'],1);?> onclick="document.getElementById('datediv').style.display='block';"/>Show by Dates<br/>
+			<input type=radio name="avail" value="2" <?php writeHtmlChecked($line['avail'],2);?> onclick="document.getElementById('datediv').style.display='none';"/>Show Always<br/>
 		</span><br class="form"/>
+		
+		<div id="datediv" style="display:<?php echo ($line['avail']==1)?"block":"none"; ?>">
+	
 		<span class=form>Available After:</span>
 		<span class=formright>
 			<input type=radio name="sdatetype" value="0" <?php writeHtmlChecked($startdate,'0',0) ?>/>
@@ -355,6 +363,8 @@ function movefile(from) {
 			<img src="../img/cal.gif" alt="Calendar"/></a>
 			at <input type=text size=10 name=etime value="<?php echo $etime;?>">
 		</span><BR class=form>
+		</div>
+		
 		<span class=form>Place on Calendar?</span>
 		<span class=formright>
 			<input type=radio name="oncal" value=0 <?php writeHtmlChecked($line['oncal'],0); ?> /> No<br/>
