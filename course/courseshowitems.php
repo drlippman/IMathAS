@@ -527,7 +527,11 @@ function enditem($canedit) {
 					   echo "<BR> $endname $enddate \n";
 				   }
 				   if ($canedit) { 
-				        echo '<span class="instronly">';
+
+					echo '<span class="instronly">';
+					if ($line['allowlate']==1) {
+						echo ' <span onmouseover="tipshow(this,\'LatePasses Allowed\')" onmouseout="tipout()">LP</span> |';
+					}
 					echo " <i><a href=\"addquestions.php?aid=$typeid&cid=$cid\">Questions</a></i> | <a href=\"addassessment.php?id=$typeid&block=$parent&cid=$cid\">Settings</a></i> \n";
 					echo " | <a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
 					echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
@@ -554,7 +558,10 @@ function enditem($canedit) {
 					   echo " until $reviewdate \n";
 				   }
 				   if ($canedit) { 
-					echo '<span class="instronly">';   
+					echo '<span class="instronly">';
+					if ($line['allowlate']==1) {
+						echo ' <span onmouseover="tipshow(this,\'LatePasses Allowed\')" onmouseout="tipout()">LP</span> |';
+					}
 				   	echo " <i><a href=\"addquestions.php?aid=$typeid&cid=$cid\">Questions</a></i> | <a href=\"addassessment.php?id=$typeid&block=$parent&cid=$cid\">Settings</a>\n";
 					echo " | <a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
 					echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
@@ -587,7 +594,11 @@ function enditem($canedit) {
 				   echo "<br/><i>$show</i>\n";
 				   echo '</span>';
 				   if ($canedit) {
+					   
 					   echo '<span class="instronly">';
+					   if ($line['allowlate']==1) {
+						echo ' <span onmouseover="tipshow(this,\'LatePasses Allowed\')" onmouseout="tipout()">LP</span> |';
+					   }
 					   echo "<a href=\"addquestions.php?aid=$typeid&cid=$cid\">Questions</a> | <a href=\"addassessment.php?id=$typeid&cid=$cid\">Settings</a> | \n";
 					   echo "<a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
 					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";

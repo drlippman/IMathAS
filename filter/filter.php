@@ -106,6 +106,16 @@
 			$replamnt = getltiiframe($url,$key,time());
 			$str = preg_replace('/\[LTI:[^\]]*\]/', $replamnt, $str);
 		}
+		
+		$search = '/\[WA:\s*(.+?)\s*\]/';
+		
+		if (preg_match_all($search, $str, $res, PREG_SET_ORDER)){
+			foreach ($res as $resval) {
+				$tag = '<script type="text/javascript" id="WolframAlphaScript'.$resval[1].'" src="http://www.wolframalpha.com/widget/widget.jsp?id='.$resval[1].'"></script>';
+				$str = str_replace($resval[0], $tag, $str);
+			}
+		}
+		
 		/* simplelti - deprecated.  No consumer support for basiclti yet
 		$search = '/\[LTI:\s*url=(.*),\s*secret=([^\]]*)\]/';
 		
