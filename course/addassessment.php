@@ -153,9 +153,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$_POST['defpenalty'] = 'S'.$_POST['skippenalty'].$_POST['defpenalty'];
 		}
 		if ($_POST['copyfrom']!=0) {
-			$query = "SELECT timelimit,displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,showcat,intro,startdate,enddate,reviewdate,isgroup,showhints,reqscore,reqscoreaid,noprint,allowlate,eqnhelper,endmsg,caltag,calrtag,deffeedbacktext FROM imas_assessments WHERE id='{$_POST['copyfrom']}'";
+			$query = "SELECT timelimit,displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,showcat,intro,startdate,enddate,reviewdate,isgroup,showhints,reqscore,reqscoreaid,noprint,allowlate,eqnhelper,endmsg,caltag,calrtag,deffeedbacktext,showtips FROM imas_assessments WHERE id='{$_POST['copyfrom']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			list($timelimit,$_POST['displaymethod'],$_POST['defpoints'],$_POST['defattempts'],$_POST['defpenalty'],$deffeedback,$shuffle,$_POST['gbcat'],$_POST['password'],$_POST['showqcat'],$cpintro,$cpstartdate,$cpenddate,$cpreviewdate,$isgroup,$showhints,$_POST['reqscore'],$_POST['reqscoreaid'],$_POST['noprint'],$_POST['allowlate'],$_POST['eqnhelper'],$endmsg,$_POST['caltagact'],$_POST['caltagrev'],$deffb) = mysql_fetch_row($result);
+			list($timelimit,$_POST['displaymethod'],$_POST['defpoints'],$_POST['defattempts'],$_POST['defpenalty'],$deffeedback,$shuffle,$_POST['gbcat'],$_POST['password'],$_POST['showqcat'],$cpintro,$cpstartdate,$cpenddate,$cpreviewdate,$isgroup,$showhints,$_POST['reqscore'],$_POST['reqscoreaid'],$_POST['noprint'],$_POST['allowlate'],$_POST['eqnhelper'],$endmsg,$_POST['caltagact'],$_POST['caltagrev'],$deffb,$_POST['showtips']) = mysql_fetch_row($result);
 			$deffb = addslashes($deffb);
 			if (isset($_POST['copyinstr'])) {
 				$_POST['intro'] = addslashes($cpintro);

@@ -207,7 +207,7 @@ function generateTable() {
 		html += "<th></th>";
 	}
 	html += "<th>Order</th>";
-	html += "<th>Description</th><th>Preview</th><th>Type</th><th>Points</th><th>Settings</th><th>Source</th>";
+	html += "<th>Description</th><th>ID</th><th>Preview</th><th>Type</th><th>Points</th><th>Settings</th><th>Source</th>";
 	if (beentaken) {
 		html += "<th>Clear Attempts</th><th>Withdraw</th>";
 	} else {
@@ -241,7 +241,7 @@ function generateTable() {
 						} else if (itemarray[i][1]==1) { 
 							html += " with";
 						}
-						html += " replacement</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr class="+curclass+">";
+						html += " replacement</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr class="+curclass+">";
 					}
 					html += "<td>&nbsp;"+(i+1)+'-'+(j+1);
 				} else {
@@ -281,6 +281,7 @@ function generateTable() {
 			}
 			
 			html += "<td><input type=hidden name=\"curq[]\" id=\"oqc"+ln+"\" value=\""+curitems[j][1]+"\"/>"+curitems[j][2]+"</td>"; //description
+			html += "<td>"+curitems[j][1]+"</td>";
 			if (beentaken) {
 				html += "<td><input type=button value='Preview' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",false,false)\"/></td>"; //Preview
 			} else {
