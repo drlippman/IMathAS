@@ -1,9 +1,10 @@
 <?php
 //IMathAS:  Copy Items utility functions
 //(c) 2008 David Lippman
-
+$reqscoretrack = array();
+$assessnewid = array();
 function copyitem($itemid,$gbcats) {
-	global $cid;
+	global $cid, $reqscoretrack, $assessnewid;
 	if ($gbcats===false) {
 		$gbcats = array();
 	}
@@ -95,7 +96,7 @@ function copyitem($itemid,$gbcats) {
 		//$query = "INSERT INTO imas_assessments (courseid,name,summary,intro,startdate,enddate,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle) ";
 		//$query .= "SELECT '$cid',name,summary,intro,startdate,enddate,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle FROM imas_assessments WHERE id='$typeid'";
 		//mysql_query($query) or die("Query failed : $query" . mysql_error());
-		$query = "SELECT name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,allowlate,exceptionpenalty,noprint,avail,groupmax,endmsg,eqnhelper,caltag,calrtag FROM imas_assessments WHERE id='$typeid'";
+		$query = "SELECT name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,allowlate,exceptionpenalty,noprint,avail,groupmax,endmsg,eqnhelper,caltag,calrtag,reqscore,reqscoreaid FROM imas_assessments WHERE id='$typeid'";
 
 		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$row = mysql_fetch_row($result);
@@ -104,13 +105,18 @@ function copyitem($itemid,$gbcats) {
 		} else if ($_POST['ctc']!=$cid) {
 			$row[14] = 0;
 		}
+		$reqscoreaid = array_pop($row);
 		$row[0] .= stripslashes($_POST['append']);
 		$row = "'".implode("','",addslashes_deep($row))."'";
-		$query = "INSERT INTO imas_assessments (courseid,name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,allowlate,exceptionpenalty,noprint,avail,groupmax,endmsg,eqnhelper,caltag,calrtag) ";
+		$query = "INSERT INTO imas_assessments (courseid,name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,allowlate,exceptionpenalty,noprint,avail,groupmax,endmsg,eqnhelper,caltag,calrtag,reqscore) ";
 
 		$query .= "VALUES ('$cid',$row)";
 		mysql_query($query) or die("Query failed : $query" . mysql_error());
 		$newtypeid = mysql_insert_id();
+		if ($reqscoreaid>0) {
+			$reqscoretrack[$newtypeid] = $reqscoreaid;
+		}
+		$assessnewid[$typeid] = $newtypeid;
 		$query = "SELECT itemorder FROM imas_assessments WHERE id='$typeid'";
 		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 		if (trim(mysql_result($result,0,0))!='') {
@@ -163,7 +169,7 @@ function copyitem($itemid,$gbcats) {
 }
 	
 function copysub($items,$parent,&$addtoarr,$gbcats) {
-	global $checked,$blockcnt;
+	global $checked,$blockcnt,$reqscoretrack,$assessnewid;
 	foreach ($items as $k=>$item) {
 		if (is_array($item)) {
 			if (array_search($parent.'-'.($k+1),$checked)!==FALSE) { //copy block
@@ -191,6 +197,19 @@ function copysub($items,$parent,&$addtoarr,$gbcats) {
 		} else {
 			if (array_search($item,$checked)!==FALSE) {
 				$addtoarr[] = copyitem($item,$gbcats);
+			}
+		}
+	}
+	//update reqscoreaids if possible.  
+	if (count($reqscoretrack)>0) {
+		foreach ($reqscoretrack as $newid=>$oldreqaid) {
+			//is old reqscoreaid in copied list?
+			if (isset($assessnewid[$oldreqaid])) {
+				$query = "UPDATE imas_assessments SET reqscoreaid='{$assessnewid[$oldreqaid]}' WHERE id='$newid'";	
+				mysql_query($query) or die("Query failed : $query" . mysql_error());
+			} else {
+				$query = "UPDATE imas_assessments SET reqscore=0 WHERE id='$newid'";
+				mysql_query($query) or die("Query failed : $query" . mysql_error());
 			}
 		}
 	}
