@@ -189,10 +189,10 @@
 	} else {
 		echo '-';
 	}
-	if ($totalpossible > 0 ) {
+	if ($totalpossible > 0 && $n>0) {
 		$pct = round(100*($tot/$n)/$totalpossible,1).'%';
 	} else {
-		$pct = '';
+		$pct = '-';
 	}
 	echo "</a></td><td>$pct</td></tr>";
 	echo "</tbody></table>";

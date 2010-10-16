@@ -1229,7 +1229,8 @@ function gbtable() {
 				for ($k=0; $k<5; $k++) {
 					$fivenum[] = gbpercentile($avgs[$j],$k*25);
 				}
-				$fivenumsum = implode(',&nbsp;',$fivenum);
+				$fivenumsum = 'n = '.count($avgs[$j]).'<br/>';
+				$fivenumsum .= implode(',&nbsp;',$fivenum);
 				if ($gb[0][1][$j][2]>0) {
 					for ($k=0; $k<5; $k++) {
 						$fivenum[$k] = round(100*$fivenum[$k]/$gb[0][1][$j][2],1);
