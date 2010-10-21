@@ -130,7 +130,7 @@ function showcalcontentsid(elid) {
 				if (caleventsarr[elid].data[i].editlink!=null) {
 					html += ' <a href="addassessment.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Settings</a>';
 					html += ' <a href="addquestions.php?cid='+cid+'&aid='+caleventsarr[elid].data[i].id+'">Questions</a>';
-					html += ' <a href="isolateassessgrade.php?cid='+cid+'&aid='+caleventsarr[elid].data[i].id+'">Grades</a>';
+					html += ' <a href="gb-itemanalysis.php?asid=average&cid='+cid+'&aid='+caleventsarr[elid].data[i].id+'">Grades</a>';
 				}
 				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type=='AR') {

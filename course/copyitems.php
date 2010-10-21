@@ -131,6 +131,12 @@ if (!(isset($teacherid))) {
 			$items = unserialize(mysql_result($result,0,0));
 			$newitems = array();
 			
+			if (isset($_POST['copystickyposts'])) {
+				$copystickyposts = true;
+			} else {
+				$copystickyposts = false;
+			}
+			
 			copysub($items,'0',$newitems,$gbcats);
 			
 			$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
@@ -365,6 +371,8 @@ if ($overwriteBody==1) {
 	</p>
 	<p>Copy offline grade items? <input type=checkbox name="copyoffline"  value="1"/></p>
 	<p>Select calendar items to copy? <input type=checkbox name="selectcalitems"  value="1"/></p>
+	
+	<p>Copy "display at top" instructor forum posts? <input type=checkbox name="copystickyposts"  value="1"/></p>
 	
 	<p>Append text to titles?: <input type="text" name="append"></p>
 	<p>Add to block: <br/>

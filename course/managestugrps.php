@@ -80,6 +80,36 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$page_grpsetname = mysql_result($result,0,0);
 		}
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; Rename Group Set";
+	} else if (isset($_GET['copygrpset'])) {
+		//copying groupset
+		$query = "SELECT name FROM imas_stugroupset WHERE id='{$_GET['copygrpset']}'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$grpsetname = addslashes(mysql_result($result,0,0)) . ' (copy)';
+		
+		$query = "INSERT INTO imas_stugroupset (name,courseid) VALUES ('$grpsetname','$cid')";
+		mysql_query($query) or die("Query failed : " . mysql_error());
+		$newgrpset = mysql_insert_id();
+		
+		$query = "SELECT id,name FROM imas_stugroups WHERE groupsetid='{$_GET['copygrpset']}'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			$row[1] = addslashes($row[1]);
+			$query = "INSERT INTO imas_stugroups (name,groupsetid) VALUES ('{$row[1]}',$newgrpset)";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			$newstugrp = mysql_insert_id();
+			$toadd = array();
+			$query = "SELECT userid FROM imas_stugroupmembers WHERE stugroupid='{$row[0]}'";
+			$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+			while ($sgm = mysql_fetch_row($r2)) {
+				$toadd[] = "('{$sgm[0]}',$newstugrp)";
+			}
+			if (count($toadd)>0) {
+				$query = "INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES ".implode(',',$toadd);
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+		}
+		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid");
+		exit();
 	} else if (isset($_GET['addstutogrp'])) {
 		//submitting list of students to add to a group
 		$stustoadd = $_POST['stutoadd'];
@@ -559,6 +589,7 @@ if ($overwriteBody==1) {
 			foreach ($page_groupsets as $gs) {
 				echo "<li><a href=\"managestugrps.php?cid=$cid&grpsetid={$gs[0]}\">{$gs[1]}</a> | ";
 				echo "<a href=\"managestugrps.php?cid=$cid&rengrpset={$gs[0]}\">Rename</a> | ";
+				echo "<a href=\"managestugrps.php?cid=$cid&copygrpset={$gs[0]}\">Copy</a> |";
 				echo "<a href=\"managestugrps.php?cid=$cid&delgrpset={$gs[0]}\">Delete</a>";
 				
 				echo '</li>';

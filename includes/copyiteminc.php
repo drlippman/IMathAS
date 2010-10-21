@@ -4,13 +4,16 @@
 $reqscoretrack = array();
 $assessnewid = array();
 function copyitem($itemid,$gbcats) {
-	global $cid, $reqscoretrack, $assessnewid;
+	global $cid, $reqscoretrack, $assessnewid, $copystickyposts,$userid;
+	if (!isset($copystickyposts)) { $copystickyposts = false;}
 	if ($gbcats===false) {
 		$gbcats = array();
 	}
 	if (strlen($_POST['append'])>0 && $_POST['append']{0}!=' ') {
 		$_POST['append'] = ' '.$_POST['append'];
 	}
+	$now = time();
+	
 	$query = "SELECT itemtype,typeid FROM imas_items WHERE id='$itemid'";
 	$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 	list($itemtype,$typeid) = mysql_fetch_row($result);
@@ -82,6 +85,27 @@ function copyitem($itemid,$gbcats) {
 		$query .= "VALUES ('$cid',$row)";
 		mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$newtypeid = mysql_insert_id();
+		if ($copystickyposts) {
+			//copy instructor sticky posts
+			$query = "SELECT subject,message,posttype,isanon,replyby FROM imas_forum_posts WHERE forumid='$typeid' AND posttype>0";
+			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				$row = addslashes_deep($row);
+				$query = "INSERT INTO imas_forum_posts (forumid,userid,parent,postdate,subject,message,posttype,isanon,replyby) VALUES ";
+				$query .= "('$newtypeid','$userid',0,$now,'{$row[0]}','{$row[1]}','{$row[2]}','{$row[3]}','{$row[4]}')";
+				mysql_query($query) or die("Query failed : $query " . mysql_error());
+				
+				$threadid = mysql_insert_id();
+				$query = "UPDATE imas_forum_posts SET threadid='$threadid' WHERE id='$threadid'";
+				mysql_query($query) or die("Query failed : $query " . mysql_error());
+				
+				$query = "INSERT INTO imas_forum_threads (id,forumid,lastposttime,lastpostuser) VALUES ('$threadid','$newtypeid',$now,'$userid')";
+				mysql_query($query) or die("Query failed : $query " . mysql_error());
+				
+				$query = "INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES ('$userid','$threadid',$now)";
+				mysql_query($query) or die("Query failed : $query " . mysql_error());
+			}
+		}
 	} else if ($itemtype == "Wiki") {
 		$query = "SELECT name,description,startdate,enddate,editbydate,avail,settings,groupsetid FROM imas_wikis WHERE id='$typeid'";
 		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());

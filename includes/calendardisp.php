@@ -130,16 +130,21 @@ while ($row = mysql_fetch_row($result)) {
 		$row[2] = $exceptions[$row[0]][0];
 		$row[3] = $exceptions[$row[0]][1];
 	}
+	//2: start, 3: end, 4: review
+	//if enddate past end of calendar
 	if ($row[3]>$uppertime && ($row[4]==0 || $row[4]>$uppertime || $row[4]<$row[3])) {
 		continue;
 	}
+	//if enddate is past, and reviewdate is past end of calendar
 	if ($row[3]<$now && $row[4]>$uppertime) { 
-		continue;
+		//continue;
 	}
 	//echo "{$row[1]}, {$row[3]}, $uppertime, {$row[4]}<br/>";
-	if (($row[2]>$now && !isset($teacherid))) {  //if startdate is past now
+	//if startdate is past now
+	if (($row[2]>$now && !isset($teacherid))) {  
 		continue;
 	} 
+	//if past reviewdate
 	if ($row[4]>0 && $now>$row[4] && !isset($teacherid)) { //if has reviewdate and we're past it   //|| ($now>$row[3] && $row[4]==0)
 		//continue;
 	}
@@ -181,7 +186,7 @@ while ($row = mysql_fetch_row($result)) {
 		$row[1] = str_replace('"','\"',$row[1]);
 		$colors[$k] = makecolor2($row[2],$row[3],$now);
 		$assess[$moday][$k] = "{type:\"A\", time:\"$time\", ";
-		if ($now<$row[3] || isset($teacherid)) { $assess[$moday][$k] .= "id:\"$row[0]\",";}
+		if ($now<$row[3] || $row[4]>$now || isset($teacherid)) { $assess[$moday][$k] .= "id:\"$row[0]\",";}
 		$assess[$moday][$k] .= "name:\"$row[1]\", color:\"".$colors[$k]."\", allowlate:\"$lp\", tag:\"$tag\"".(($row[8]!=0)?", timelimit:true":"").((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
 	} 
 	$tags[$k] = $tag;
