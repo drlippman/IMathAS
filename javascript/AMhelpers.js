@@ -504,6 +504,7 @@ function AMpreview(inputId,outputId) {
   }
   vars = vl.split('|');
   var totesteqn = mathjs(str,vl); 
+  	  
 
   while (tstpt<ptlist.length && (isNaN(res) || res=="Infinity")) {
 	  var totest = '';

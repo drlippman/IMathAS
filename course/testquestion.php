@@ -88,7 +88,7 @@ if ($myrights<20) {
 		$showtips = 1;
 	}
 	
-	$query = "SELECT imas_libraries.name FROM imas_libraries,imas_library_items WHERE imas_libraries.id=imas_library_items.libid AND imas_library_items.qsetid='{$_GET['qsetid']}'";
+	$query = "SELECT imas_libraries.name,imas_users.LastName,imas_users.FirstName FROM imas_libraries,imas_library_items,imas_users  WHERE imas_libraries.id=imas_library_items.libid AND imas_library_items.ownerid=imas_users.id AND imas_library_items.qsetid='{$_GET['qsetid']}'";
 	$resultLibNames = mysql_query($query) or die("Query failed : " . mysql_error());
 }
 
@@ -172,7 +172,11 @@ if ($overwriteBody==1) {
 	echo '<p>Question is in these libraries:';
 	echo '<ul>';
 	while ($row = mysql_fetch_row($resultLibNames)) {
-		echo '<li>'.$row[0].'</li>';
+		echo '<li>'.$row[0];
+		if ($myrights==100) {
+			echo ' ('.$row[1].', '.$row[2].')';
+		}
+		echo '</li>';
 	}
 	echo '</ul></p>';
 	if ($ancestors!='') {

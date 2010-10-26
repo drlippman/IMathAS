@@ -234,7 +234,11 @@ END;
  if ($hasusername) {
 	//check validity, if desired
 	//$username = $_COOKIE['username'];
-	$query = "SELECT SID,rights,groupid,LastName,FirstName,deflib,listperpage FROM imas_users WHERE id='$userid'"; 
+	$query = "SELECT SID,rights,groupid,LastName,FirstName,deflib";
+	if (strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
+		$query .= ',listperpage';
+	}
+	$query .= " FROM imas_users WHERE id='$userid'"; 
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
 	$username = $line['SID'];

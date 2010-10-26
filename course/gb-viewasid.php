@@ -683,6 +683,7 @@
 			include("../assessment/catscores.php");
 			catscores($questions,$scores,$line['defpoints']);
 		}
+		require("../footer.php");
 		
 	} else if ($links==1) { //show grade detail question/category breakdown
 		require("../header.php");
@@ -759,7 +760,7 @@
 		echo "<p>Total:  $totpt / $totposs  ($pc %)</p>\n";
 		
 		echo "<p><a href=\"gradebook.php?stu=$stu&cid=$cid\">Return to GradeBook</a></p>\n";		
-				
+		require("../footer.php");
 		
 	}
 

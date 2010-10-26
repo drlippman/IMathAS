@@ -234,13 +234,21 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 					$c = $str{$i};
 					$eatenwhite++;
 				}    
-				//if function at end, strip off function
-				if ($c=='(' && !in_array($out,$allowedmacros)) {// moved to mathphppre-> || ($c=='^' && (substr($str,$i+1,2)=='-1' || substr($str,$i+1,4)=='(-1)'))) {
+				//if possible function at end, strip off function
+				//look for xsin(  or nsin(  or  nxsin(  or xy(1+x)
+				if ($c=='(' && !in_array($out,$allowedmacros) && !in_array($out,$vars)) {// moved to mathphppre-> || ($c=='^' && (substr($str,$i+1,2)=='-1' || substr($str,$i+1,4)=='(-1)'))) {
 					$outlen = strlen($out);
 					$outend = '';
-					for ($j=1; $j<$outlen-1; $j++) {
+					for ($j=1; $j<$outlen; $j++) {
 						$outend = substr($out,$j);
 						if (in_array($outend,$allowedmacros)) {
+							$i = $i - $outlen + $j;
+							$c = $str{$i};
+							$out = substr($out,0,$j);
+							break;
+						}
+						//is end a variable?  like xy(1+x)
+						if (in_array($outend,$vars)) {
 							$i = $i - $outlen + $j;
 							$c = $str{$i};
 							$out = substr($out,0,$j);
@@ -250,10 +258,9 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 					
 				}
 				
-				//if there's a ( then it's a function
-				if ($c=='(' && $out!='e' && $out!='pi') {
-					//look for xsin(  or nsin(  or  nxsin(
-					
+				//if there's a ( then it's a function or x(
+				if ($c=='(' && $out!='e' && $out!='pi' && !in_array($out,$vars)) {
+					//is a function
 					//rewrite logs
 					if ($out=='log') {
 						$out = 'log10';

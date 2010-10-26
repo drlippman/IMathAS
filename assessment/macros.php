@@ -4,7 +4,7 @@
 
 
 array_push($allowedmacros,"exp","sec","csc","cot","sech","csch","coth","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif","in_array","prettyint","prettyreal","arraystodots","subarray","showdataarray","arraystodoteqns","array_flip","arrayfindindex","fillarray","array_reverse","root");
-array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","randcity","randcities","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction","ifthen","multicalconarray","htmlentities","formhoverover","formpopup","connectthedots","jointsort","stringpos","stringlen","stringclean","substr","makexxpretty","makexxprettydisp","forminlinebutton");
+array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","randcity","randcities","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction","ifthen","multicalconarray","htmlentities","formhoverover","formpopup","connectthedots","jointsort","stringpos","stringlen","stringclean","substr","makexxpretty","makexxprettydisp","forminlinebutton","makenumberrequiretimes");
 function mergearrays($a,$b) {
 	if (!is_array($a)) {
 		$a = array($a);
@@ -1905,6 +1905,25 @@ function decimaltofraction($d,$format="fraction",$maxden = 5000) {
 	} else {
 		return $sign.$numerators[$i].'/'.$denominators[$i];
 	}
+}
+
+function makenumberrequiretimes($arr) {
+	if (!is_array($arr)) {
+		$arrlist = $arr;
+		$arr = explode(',',$arr);
+	} else {
+		$arrlist = implode(',',$arr);
+	}
+	if (count($arr)==0) {
+		return "";
+	} 
+	$out = array();
+	foreach ($arr as $num) {
+		$num = abs($num);
+		$nummatch = substr_count($arrlist,$num);
+		$out[] = "$num,=$nummatch";
+	}
+	return implode(',',$out);	
 }
 
 function evalbasic($str) {
