@@ -169,7 +169,12 @@ while ($row = mysql_fetch_row($result)) {
 		$assess[$moday][$k] = "{type:\"AR\", time:\"$time\", tag:\"$tag\", ";
 		if ($now<$row[4] || isset($teacherid)) { $assess[$moday][$k] .= "id:\"$row[0]\",";}
 		$assess[$moday][$k] .=  "color:\"".$colors[$k]."\",name:\"$row[1]\"".((isset($teacherid))?", editlink:true":"")."}";
-	} else if ($row[3]<$uppertime && $row[3]>$exlowertime) {// taking out "hide if past due" && ($now<$row[3] || isset($teacherid))) {
+		if ($row[3]<$uppertime && $row[3]>$exlowertime) {  //if going to do a second tag, need to increment.
+			$tags[$k] = $tag;
+			$k++;
+		}
+	} 
+	if ($row[3]<$uppertime && $row[3]>$exlowertime) {// taking out "hide if past due" && ($now<$row[3] || isset($teacherid))) {
 		/*if (isset($gbcats[$row[5]])) {
 			$tag = $gbcats[$row[5]];
 		} else {
