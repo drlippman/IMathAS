@@ -1386,10 +1386,27 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$sclinglbl = $settings[4];
 			$sclinggrid = 0;
 		} else {
-			$sclinglbl = $settings[4].':'.$settings[5];
-			$sclinggrid = $settings[4].':'.$settings[5];
+			if (strpos($settings[4],':')!==false) {
+				$settings[4] = explode(':',$settings[4]);
+				$xlbl = $settings[4][0];
+				$xgrid = $settings[4][1];
+			} else {
+				$xlbl = $settings[4];
+				$xgrid = $settings[4];
+			}
+			if (strpos($settings[5],':')!==false) {
+				$settings[5] = explode(':',$settings[5]);
+				$ylbl = $settings[5][0];
+				$ygrid = $settings[5][1];
+			} else {
+				$ylbl = $settings[5];
+				$ygrid = $settings[5];
+			}
+			$sclinglbl = "$xlbl:$ylbl";
+			$sclinggrid = "$xgrid:$ygrid";
 		}
 		$plot = showplot($backg,$settings[0],$settings[1],$settings[2],$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
+		
 		if ($settings[8]!="") {
 		}
 		$bg = getgraphfilename($plot);
