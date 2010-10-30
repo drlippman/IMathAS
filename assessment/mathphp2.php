@@ -19,6 +19,7 @@ function mathphppre($st) {
 		$st = str_replace(array("sin^-1","cos^-1","tan^-1","sin^(-1)","cos^(-1)","tan^(-1)"),array("arcsin","arccos","arctan","arcsin","arccos","arctan"),$st);
 		$st = str_replace(array("sinh^-1","cosh^-1","tanh^-1","sinh^(-1)","cosh^(-1)","tanh^(-1)"),array("arcsinh","arccosh","arctanh","arcsinh","arccosh","arctanh"),$st);
   }
+  $st = preg_replace('/log_(\d+)\(/','nthlog($1,',$st);
   return $st;
 }
 function mathphp($st,$varlist,$skipfactorial=false,$ignorestrings=true) {
@@ -175,7 +176,7 @@ function mathphpinterpretline($str,$vars,$ignorestrings) {
 function mathphptokenize($str,$vars,$ignorestrings) {
 	global $allowedmacros;
 	if (!isset($allowedmacros)) {
-		$allowedmacros = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
+		$allowedmacros = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count","nthlog");
 	}
 	
 	$lookfor = array_merge($vars, array("e","pi"));
@@ -562,6 +563,9 @@ function csch($x) {
 }
 function coth($x) {
 	return (1/tanh($x));
+}
+function nthlog($n,$x) {
+	return (log($x)/log($n));	
 }
 			
 ?>
