@@ -277,6 +277,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		</script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addquestions.js\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/junkflag.js\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = 'http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savelibassignflag.php';</script>";
 	
 	
 	//DEFAULT LOAD PROCESSING GOES HERE
@@ -480,7 +482,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$page_libRowHeader = ($searchall==1) ? "<th>Library</th>" : "";
 			
 			if (isset($search)) {
-				$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_library_items.libid,imas_questionset.ownerid ";
+				$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_library_items.libid,imas_questionset.ownerid,imas_library_items.junkflag, imas_library_items.id AS libitemid ";
 				$query .= "FROM imas_questionset,imas_library_items WHERE $searchlikes "; //imas_questionset.description LIKE '%$safesearch%' ";
 				$query .= " (imas_questionset.ownerid='$userid' OR imas_questionset.userights>0) AND "; 
 				$query .= "imas_library_items.qsetid=imas_questionset.id ";
@@ -493,7 +495,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				} else {
 					$query .= " AND (imas_library_items.libid > 0 OR imas_questionset.ownerid='$userid') "; 
 				}
-				$query .= " ORDER BY imas_library_items.libid,imas_questionset.id";
+				$query .= " ORDER BY imas_library_items.libid,imas_library_items.junkflag,imas_questionset.id";
 				if ($search=='recommend' && count($existingq)>0) {
 					$existingqlist = implode(',',$existingq);  //pulled from database, so no quotes needed
 					$query = "SELECT a.questionsetid, count( DISTINCT a.assessmentid ) as qcnt,
@@ -562,6 +564,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						$page_questionTable[$i]['type'] = $line['qtype'];
 						if ($searchall==1) {
 							$page_questionTable[$i]['lib'] = "<a href=\"addquestions.php?cid=$cid&aid=$aid&listlib={$line['libid']}\">List lib</a>";
+						} else {
+							$page_questionTable[$i]['junkflag'] = $line['junkflag'];
+							$page_questionTable[$i]['libitemid'] = $line['libitemid'];
 						}
 						/*$query = "SELECT COUNT(id) FROM imas_questions WHERE questionsetid='{$line['id']}'";
 						$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -883,6 +888,7 @@ if ($overwriteBody==1) {
 				<tr><th></th><th>Description</th><th>ID</th><th>Preview</th><th>Type</th>
 					<?php echo $page_libRowHeader ?>
 					<th>Times Used</th><th>Mine</th><th>Add</th><th>Source</th><th>Use as Template</th>
+					<?php if ($searchall==0) { echo '<th><span onmouseover="tipshow(this,\'Flag a question if it is in the wrong library\')" onmouseout="tipout()">Wrong Lib</span></th>';} ?>
 				</tr>
 			</thead>
 			<tbody>
@@ -922,7 +928,13 @@ if ($overwriteBody==1) {
 					<td class=c><?php echo $page_questionTable[$qid]['add'] ?></td>
 					<td><?php echo $page_questionTable[$qid]['src'] ?></td>
 					<td class=c><?php echo $page_questionTable[$qid]['templ'] ?></td>
-					
+					<?php if ($searchall==0) {
+						if ($page_questionTable[$qid]['junkflag']==1) {
+							echo "<td class=c><img class=\"pointer\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" /></td>";
+						} else {
+							echo "<td class=c><img class=\"pointer\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" /></td>";
+						}
+					} ?>
 				</tr>
 <?php
 					}
@@ -932,7 +944,7 @@ if ($overwriteBody==1) {
 		</table>
 		<p>Questions <span style="color:#999">in gray</span> have been added to the assessment.</p>
 		<script type="text/javascript">
-			initSortTable('myTable',Array(false,'S','N',false,'S',<?php echo ($searchall==1) ? "false, " : ""; ?>'N','S',false,false,false),true);
+			initSortTable('myTable',Array(false,'S','N',false,'S',<?php echo ($searchall==1) ? "false, " : ""; ?>'N','S',false,false,false<?php echo ($searchall==0) ? ",false" : ""; ?>),true);
 		</script>
 	</form>
 	

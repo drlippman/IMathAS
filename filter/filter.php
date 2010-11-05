@@ -169,7 +169,7 @@
 		}
 		$height = '95%';
 		$width = '95%';
-		$param = 'key='.urlencode($key) . '&linkback=' . urlencode($linkback) . '&url=' . urlencode($url);
+		$param = 'key='.urlencode($key) . '&linkback=' . urlencode($linkback) . '&url=' . urlencode(str_replace('&amp;','&',$url));
 		if (isset($cid)) {
 			$param .= '&cid='.$cid;
 		}

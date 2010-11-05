@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 35;
+$latest = 36;
 
 
 @set_time_limit(0);
@@ -604,6 +604,13 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 		}
 		if ($last<35) {
 			$query = 'ALTER TABLE `imas_users` ADD `listperpage` TINYINT(3) UNSIGNED NOT NULL DEFAULT \'20\'';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+		}
+		if ($last<36) {
+			$query = 'ALTER TABLE `imas_library_items` ADD `junkflag` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\'';
 			 $res = mysql_query($query);
 			 if ($res===false) {
 			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";

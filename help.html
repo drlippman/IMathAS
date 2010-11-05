@@ -1719,8 +1719,7 @@ These macros help with working with strings:
 <li><b>substr(string,start,[length])</b>: grabs the part of the string from the start index with given length.  If length is not specified, it cuts from the start index to the end of the string.</li>
 <li><b>strtoupper(string)</b>: make all characters in the string upper case</li>
 <li><b>ucfirst(string)</b>: makes the first character in the string upper case</li>
-<li><b>strtolower(string)</b>: make all characters in the string lower case</li>
-<li>
+<li><b>strtolower(string)</b>: make all characters in the string lower case</li>>
 </ul>
 
 </div>
@@ -1779,6 +1778,9 @@ These macros are fairly general purpose:
 <li><b>formhoverover(label,tip)</b>:  Creates a hover-over definition or other tip</li>
 <li><b>formpopup(label,content,[width,height,style,scrollbars])</b>:  Creates a link or button leading to a popup window.  Content can
   be a web address, or HTML content to put directly into the popup.  Style can be "link" or "button". Scrollbars defaults to false - set true for scrollbars.</li>
+<li><b>makenumberrequiretimes(array/list)</b>:  Takes an array or list of numbers and generates a string suitable for use as a $requiretimes.  Writes
+  the string so that every number in the array must show up in the student answer.  Automatically detects and adjusts for number overlaps
+  (like 2 appearing in 32).</li>
 </ul>
 </div>
 <div class=h2>
@@ -2308,7 +2310,8 @@ drawn line from the correct line.
 <dt>$grid = "xmin,xmax,ymin,ymax,xscl,yscl,imagewidth,imageheight" (In Common Control)</dt>
 	<dd>Defines the grid to be drawn on.  Defaults to "-5,5,-5,5,1,1,300,300".  You can set all or just some of the
 	    values.  For example, to just set the window, you could use "0,10,0,10"<br/>
-	    If using $answerformat="numberline", set ymin and ymax to 0.</dd>
+	    If using $answerformat="numberline", set ymin and ymax to 0.<br/>If desired, you can set separate label and grid
+	    spacing using "xmin,xmax,ymin,ymax,xlabel:xgrid,ylabel:ygrid,imagewidth,imageheight"</dd>
 <dt>$background = equation or array of equations, using the showplot macro format (In Common Control)</dt>
 	<dd>Define a graph to display in the background, to be drawn on top of.  Example:  $background = "x^2,red"</dd>
 <dt>$partweights = array or list of weights (In Answer)</dt>

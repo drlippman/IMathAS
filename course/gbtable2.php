@@ -289,7 +289,7 @@ function gbtable() {
 	if ($catfilter>-1) {
 		$query .= "AND gbcategory='$catfilter' ";
 	}
-	$query .= "ORDER BY enddate";
+	$query .= "ORDER BY enddate,postby,replyby,startdate";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 		$discuss[$kcnt] = $line['id'];

@@ -297,6 +297,12 @@
 	$bestlastanswers = explode("~",$line['bestlastanswers']);
 	$starttime = $line['starttime'];
 	
+	if ($starttime == 0) {
+		$starttime = time();
+		$query = "UPDATE imas_assessment_sessions SET starttime=$starttime WHERE id='$testid'";
+		mysql_query($query) or die("Query failed : $query: " . mysql_error());
+	}
+	
 	$query = "SELECT * FROM imas_assessments WHERE id='{$line['assessmentid']}'";
 	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 	$testsettings = mysql_fetch_array($result, MYSQL_ASSOC);

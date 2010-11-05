@@ -1738,7 +1738,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (is_array($options['answers'])) {$answers = $options['answers'][$qn];} else {$answers = $options['answers'];}
 		if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$qn];} else {$noshuffle = $options['noshuffle'];}}
 		
-		if (isset($options['scoremethod']))if (is_array($options['scoremethod'][$qn])) {$scoremethod = $options['scoremethod'][$qn];} else {$scoremethod = $options['scoremethod'];}
+		if (isset($options['scoremethod']))if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$qn];} else {$scoremethod = $options['scoremethod'];}
 		
 		if (!is_array($questions)) {
 			echo "Eeek!  \$questions is not defined or needs to be an array.  Make sure \$questions is defined in the Common Control section.";

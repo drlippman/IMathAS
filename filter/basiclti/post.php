@@ -6,6 +6,7 @@ if (empty($_GET['key']) || empty($_GET['url']) || empty($_GET['linkback'])) {
 }
 $key = $_GET['key'];
 $endpoint = $_GET['url'];
+
 if (empty($sessiondata['lti-secrets'][$key])) {
 	echo 'no secret';
 	exit;

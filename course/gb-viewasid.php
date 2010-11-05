@@ -71,10 +71,10 @@
 		
 			require("../assessment/asidutil.php");
 			list($qlist,$seedlist,$reviewseedlist,$scorelist,$attemptslist,$lalist) = generateAssessmentData($adata['itemorder'],$adata['shuffle'],$aid);
-			$starttime = time();
+			//$starttime = time();
 			foreach ($stugroupmem as $uid) {
 				$query = "INSERT INTO imas_assessment_sessions (userid,agroupid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers,reviewscores,reviewattempts,reviewseeds,reviewlastanswers) ";
-				$query .= "VALUES ('$uid','$agroupid','$aid','$qlist','$seedlist','$scorelist','$attemptslist','$lalist',$starttime,'$scorelist','$attemptslist','$seedlist','$lalist','$scorelist','$attemptslist','$reviewseedlist','$lalist');";
+				$query .= "VALUES ('$uid','$agroupid','$aid','$qlist','$seedlist','$scorelist','$attemptslist','$lalist',0,'$scorelist','$attemptslist','$seedlist','$lalist','$scorelist','$attemptslist','$reviewseedlist','$lalist');";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				$asid = mysql_insert_id();
 			}												
@@ -402,8 +402,11 @@
 			}	
 		}
 		
-		
-		echo "<p>Started: " . tzdate("F j, Y, g:i a",$line['starttime']) ."<BR>\n";
+		if ($line['starttime']==0) {
+			echo '<p>Started: Not yet started<br/>';
+		} else {
+			echo "<p>Started: " . tzdate("F j, Y, g:i a",$line['starttime']) ."<BR>\n";
+		}
 		if ($line['endtime']==0) { 
 			echo "Not Submitted</p>\n";
 		} else {
