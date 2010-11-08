@@ -301,6 +301,7 @@ function AMinitSymbols() {
 				if ($k!='tex') { $tsymb[$k]=$v;}
 			}
 			$tsymb['input']= $this->AMsymbols[$i]['tex'];
+			$tsymb['istex'] = true;
 			array_push($this->AMsymbols, $tsymb);
 		}
 	}
@@ -464,7 +465,11 @@ function AMTgetTeXbracket($symb) {
 	if (isset($symb['tex'])) {
 		return ('\\'.$symb['tex']);
 	} else {
-		return $symb['input'];
+		if (isset($symb['istex']) && $symb['istex']) {
+			return '\\'.$symb['input'];
+		} else {
+			return $symb['input'];
+		}
 	}
 }
 

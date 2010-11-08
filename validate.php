@@ -53,6 +53,8 @@
 			 $querys = '';
 		 }
 		 if (isset($_POST['skip']) || isset($_POST['isok'])) {
+			 $sessiondata['useragent'] = $_SERVER['HTTP_USER_AGENT'];
+			 $sessiondata['ip'] = $_SERVER['REMOTE_ADDR'];
 			 $sessiondata['mathdisp'] = $_POST['mathdisp'];
 			 $sessiondata['graphdisp'] = $_POST['graphdisp'];
 			 $sessiondata['useed'] = checkeditorok();
@@ -136,6 +138,7 @@ END;
  $haslogin = isset($_POST['password']);
 
  $verified = false; 
+ //Just put in username and password, trying to log in
  if ($haslogin && !$hasusername) {
 	  //clean up old sessions
 	 $now = time();
@@ -169,6 +172,8 @@ END;
 		 //$sessiondata['mathdisp'] = $_POST['mathdisp'];
 		 //$sessiondata['graphdisp'] = $_POST['graphdisp'];
 		 //$sessiondata['useed'] = $_POST['useed'];
+		 $sessiondata['useragent'] = $_SERVER['HTTP_USER_AGENT'];
+		 $sessiondata['ip'] = $_SERVER['REMOTE_ADDR'];
 		 if ($_POST['access']==1) { //text-based
 			 $sessiondata['mathdisp'] = $_POST['mathdisp'];
 			 $sessiondata['graphdisp'] = 0;
@@ -231,8 +236,16 @@ END;
 	 }
 	
  }
+ //has logged in already
  if ($hasusername) {
 	//check validity, if desired
+	if (($sessiondata['useragent'] != $_SERVER['HTTP_USER_AGENT']) || ($sessiondata['ip'] != $_SERVER['REMOTE_ADDR'])) {
+		//suggests sidejacking.  Delete session and require relogin
+		$query = "DELETE FROM imas_sessions WHERE userid='$userid'";
+		mysql_query($query) or die("Query failed : " . mysql_error());
+		header("Location: http://" . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . $querys);
+		exit;
+	}
 	//$username = $_COOKIE['username'];
 	$query = "SELECT SID,rights,groupid,LastName,FirstName,deflib";
 	if (strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
