@@ -625,7 +625,7 @@ function seqshowqinfobar($qn,$toshow) {
 			} else {
 			echo "<img src=\"$imasroot/img/q_fullbox.gif\"/> ";
 			}
-			echo "<a href=\"showtest.php?action=seq&to=$qn#curq\">$qlinktxt</a>.  ";
+			echo "<a href=\"showtest.php?action=seq&to=$qn#curq\" onclick=\"return confirm('Are you sure you want to jump to this question, discarding any work you have not submitted?');\">$qlinktxt</a>.  ";
 			$qavail = true;
 		} else if (canimprove($qn) && !$noindivscores) {
 			echo '<div class="seqqinfoavail">';
@@ -638,7 +638,7 @@ function seqshowqinfobar($qn,$toshow) {
 			} else {
 			echo "<img src=\"$imasroot/img/q_halfbox.gif\"/> ";
 			}
-			echo "<a href=\"showtest.php?action=seq&to=$qn#curq\">$qlinktxt</a>.  ";
+			echo "<a href=\"showtest.php?action=seq&to=$qn#curq\" onclick=\"return confirm('Are you sure you want to jump to this question, discarding any work you have not submitted?');\">$qlinktxt</a>.  ";
 			$qavail = true;
 		} else if ($reattemptsremain) {
 			echo '<div class="seqqinfoinactive">';
@@ -657,7 +657,7 @@ function seqshowqinfobar($qn,$toshow) {
 			} else {
 			echo "<img src=\"$imasroot/img/q_emptybox.gif\"/> ";
 			}
-			echo "<a href=\"showtest.php?action=seq&to=$qn#curq\">$qlinktxt</a>.  ";
+			echo "<a href=\"showtest.php?action=seq&to=$qn#curq\" onclick=\"return confirm('Are you sure you want to jump to this question, discarding any work you have not submitted?');\">$qlinktxt</a>.  ";
 		} else {
 			echo '<div class="seqqinfoinactive">';
 			if (isset($CFG['TE']['navicons'])) {

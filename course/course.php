@@ -299,6 +299,8 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 			//remote mathchat
 			$url = $mathchaturl.'?isactive='.$cid.'&sep='.time();
 			$fp = fopen($url,'r');
+			stream_set_timeout($fp,2);
+			stream_set_blocking($fp,0);
 			$activechatters = fread($fp,100);
 			fclose($fp);
 		} else {  

@@ -180,6 +180,8 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		foreach($answerbox as $iidx=>$abox) {
 			if ($seqinactive) {
 				$answerbox[$iidx] = str_replace('<input','<input disabled="disabled"',$abox);
+				$answerbox[$iidx] = str_replace('<textarea','<textarea disabled="disabled"',$answerbox[$iidx]);
+				$answerbox[$iidx] = str_replace('style="width:98%;" class="mceEditor"','',$answerbox[$iidx]); 
 				$answerbox[$iidx] = str_replace('<select','<select disabled="disabled"',$answerbox[$iidx]);
 			}
 			if (strpos($toevalqtxt,"\$previewloc[$iidx]")===false) {
@@ -192,6 +194,8 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	} else {
 		if ($seqinactive) {
 			$answerbox = str_replace('<input','<input disabled="disabled"',$answerbox);
+			$answerbox = str_replace('<textarea','<textarea disabled="disabled"',$answerbox);
+			$answerbox = str_replace('style="width:98%;" class="mceEditor"','',$answerbox); 
 			$answerbox = str_replace('<select','<select disabled="disabled"',$answerbox);
 		}
 		if (strpos($toevalqtxt,'$previewloc')===false) {
@@ -1230,9 +1234,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$la = stripslashes($la);
 			$la = preg_replace('/%(\w+;)/',"&$1",$la);
 			if ($displayformat=='editor' && $GLOBALS['useeditor']==1) {
-				//$la = str_replace('&quot;','"',$la);
+				$la = str_replace('&quot;','"',$la);
 				
-				//$la = preg_replace('/%(\w+;)/',"&$1",$la);
 				$la = htmlentities($la);
 			}
 			$out .= "<textarea rows=\"$rows\" name=\"qn$qn\" id=\"qn$qn\" ";
