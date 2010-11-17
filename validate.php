@@ -241,10 +241,12 @@ END;
 	//check validity, if desired
 	if (($sessiondata['useragent'] != $_SERVER['HTTP_USER_AGENT']) || ($sessiondata['ip'] != $_SERVER['REMOTE_ADDR'])) {
 		//suggests sidejacking.  Delete session and require relogin
+		/*
 		$query = "DELETE FROM imas_sessions WHERE userid='$userid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . $querys);
 		exit;
+		*/
 	}
 	//$username = $_COOKIE['username'];
 	$query = "SELECT SID,rights,groupid,LastName,FirstName,deflib";

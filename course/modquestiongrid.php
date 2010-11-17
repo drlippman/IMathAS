@@ -45,6 +45,28 @@
 			$query = "UPDATE imas_assessments SET itemorder='$itemorder' WHERE id='$aid'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		} else if (isset($_POST['mod'])) { //modifying existing
+			
+			$query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$itemorder = mysql_result($result,0,0);
+			
+			//what qsetids do we need for adding copies?
+			$lookupid = array();
+			foreach(explode(',',$_POST['qids']) as $qid) {
+				if (intval($_POST['copies'.$qid])>0 && intval($qid)>0) {
+					$lookupid[] = intval($qid);
+				}
+			}
+			//lookup qsetids
+			$qidtoqsetid = array();
+			if (count($lookupid)>0) {
+				$query = "SELECT id,questionsetid FROM imas_questions WHERE id IN (".implode(',',$lookupid).")";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				while ($row = mysql_fetch_row($result)) {
+					$qidtoqsetid[$row[0]] = $row[1];
+				}
+			}
+			
 			foreach(explode(',',$_POST['qids']) as $qid) {
 				$points = trim($_POST['points'.$qid]);
 				$attempts = trim($_POST['attempts'.$qid]);
@@ -52,7 +74,27 @@
 				if ($attempts=='') {$attempts = 9999;}
 				$query = "UPDATE imas_questions SET points='$points',attempts='$attempts' WHERE id='$qid'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
+				if (intval($_POST['copies'.$qid])>0 && intval($qid)>0) {
+					for ($i=0;$i<intval($_POST['copies'.$qid]);$i++) {
+						$qsetid = $qidtoqsetid[$qid];
+						$query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,regen,showans,questionsetid) ";
+						$query .= "VALUES ('$aid','$points','$attempts',9999,0,0,'$qsetid')";
+						$result = mysql_query($query) or die("Query failed : " . mysql_error());
+						$newqid = mysql_insert_id();
+						
+						$itemarr = explode(',',$itemorder);
+						$key = array_search($qid,$itemarr);
+						if ($key===false) {
+							$itemarr[] = $newqid;
+						} else {
+							array_splice($itemarr,$key+1,0,$newqid);
+						}
+						$itemorder = implode(',',$itemarr);
+					}
+				}
 			}
+			$query = "UPDATE imas_assessments SET itemorder='$itemorder' WHERE id='$aid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		}
 		
 	} else {
@@ -78,7 +120,7 @@ Leave items blank to use the assessment's default values<br/>
 <thead><tr>
 <?php
 		if (isset($_POST['checked'])) { //modifying existing questions
-			echo "<th>Description><th>Points</th><th>Attempts (0 for unlimited)</th></tr></thead>";
+			echo "<th>Description><th>Points</th><th>Attempts (0 for unlimited)</th><th>Additional Copies to Add</th></tr></thead>";
 			echo "<tbody>";
 
 			$qids = array();
@@ -100,6 +142,7 @@ Leave items blank to use the assessment's default values<br/>
 				echo '<tr><td>'.$row[1].'</td>';
 				echo "<td><input type=text size=4 name=\"points{$row[0]}\" value=\"{$row[2]}\" /></td>";
 				echo "<td><input type=text size=4 name=\"attempts{$row[0]}\" value=\"{$row[3]}\" /></td>";
+				echo "<td><input type=text size=4 name=\"copies{$row[0]}\" value=\"0\" /></td>";
 				echo '</tr>';
 			}
 			echo '</tbody></table>';
