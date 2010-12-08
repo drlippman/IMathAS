@@ -92,7 +92,11 @@ function copyitem($itemid,$gbcats) {
 			while ($row = mysql_fetch_row($result)) {
 				$row = addslashes_deep($row);
 				$query = "INSERT INTO imas_forum_posts (forumid,userid,parent,postdate,subject,message,posttype,isanon,replyby) VALUES ";
-				$query .= "('$newtypeid','$userid',0,$now,'{$row[0]}','{$row[1]}','{$row[2]}','{$row[3]}','{$row[4]}')";
+				if (is_null($row[4]) || trim($row[4])=='') {
+					$query .= "('$newtypeid','$userid',0,$now,'{$row[0]}','{$row[1]}','{$row[2]}','{$row[3]}',NULL)";
+				} else {
+					$query .= "('$newtypeid','$userid',0,$now,'{$row[0]}','{$row[1]}','{$row[2]}','{$row[3]}','{$row[4]}')";
+				}
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
 				
 				$threadid = mysql_insert_id();

@@ -284,6 +284,8 @@ function printq($qn,$qsetid,$seed,$pts) {
 	eval(interpret('control',$qdata['qtype'],$qdata['control']));
 	eval(interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
 	$toevalqtxt = interpret('qtext',$qdata['qtype'],$qdata['qtext']);
+	$toevalqtxt = str_replace('\\','\\\\',$toevalqtxt);
+	$toevalqtxt = str_replace(array('\\\\n','\\\\"','\\\\$','\\\\{'),array('\\n','\\"','\\$','\\{'),$toevalqtxt);
 	srand($seed+1);
 	eval(interpret('answer',$qdata['qtype'],$qdata['answer']));
 	srand($seed+2);
