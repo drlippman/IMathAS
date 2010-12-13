@@ -41,6 +41,8 @@
 		
 		echo '<span class="form">Separate header line for points possible?</span><span class="formright"><input type="radio" name="pointsln" value="0" checked="checked"> No <br/><input type="radio" name="pointsln" value="1"> Yes</span><br class="form" />';
 		echo '<span class="form">Assessment comments:</span><span class="formright"> <input type="radio" name="commentloc" value="-1" checked="checked"> Don\'t include <br/>  <input type="radio" name="commentloc" value="1"> Separate columns at end <br/><input type="radio" name="commentloc" value="0"> After scores</span><br class="form" />';
+		echo '<span class="form">Include last login date?</span><span class="formright"><input type="radio" name="lastlogin" value="0" checked="checked"> No <br/><input type="radio" name="lastlogin" value="1" > Yes </span><br class="form" />';
+		
 		
 		if (isset($_GET['export'])) {
 			echo '<div class="submit"><input type=submit name="submit" value="Download Gradebook as CSV" /> <input type=submit name="submit" value="Download Gradebook for Excel" /></div>';
@@ -65,6 +67,7 @@
 	
 	$commentloc = $_POST['commentloc'];  //0: interleve, 1: at end
 	$pointsln = $_POST['pointsln']; //0: on main, 1: separate line
+	$lastlogin = $_POST['lastlogin']; //0: no, 1 yes
 	
 	
 	$catfilter = -1;
@@ -170,7 +173,7 @@
 	
 	
 function gbinstrexport() {
-	global $hidenc,$nopt,$isteacher,$cid,$gbmode,$stu,$availshow,$isdiag,$catfilter,$secfilter,$totonleft,$commentloc,$pointsln;
+	global $hidenc,$nopt,$isteacher,$cid,$gbmode,$stu,$availshow,$isdiag,$catfilter,$secfilter,$totonleft,$commentloc,$pointsln,$lastlogin;
 	$gbt = gbtable();
 	$gbo = array();
 	//print_r($gbt);
@@ -820,4 +823,5 @@ function gbinstrdisp() {
 	}
 	echo "</tbody></table>";
 }
+
 ?>

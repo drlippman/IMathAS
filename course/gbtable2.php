@@ -116,13 +116,16 @@ row[1][4][1] = locked?
 ****/
 
 function gbtable() {
-	global $cid,$isteacher,$istutor,$tutorid,$userid,$catfilter,$secfilter,$timefilter,$lnfilter,$isdiag,$sel1name,$sel2name,$canviewall;
+	global $cid,$isteacher,$istutor,$tutorid,$userid,$catfilter,$secfilter,$timefilter,$lnfilter,$isdiag,$sel1name,$sel2name,$canviewall,$lastlogin;
 	if ($canviewall && func_num_args()>0) {
 		$limuser = func_get_arg(0);
 	} else if (!$canviewall) {
 		$limuser = $userid;
 	} else {
 		$limuser = 0;
+	}
+	if (!isset($lastlogin)) {
+		$lastlogin = 0;
 	}
 	
 	$category = array();
@@ -159,6 +162,9 @@ function gbtable() {
 	}
 	if ($hascode) {
 		$gb[0][0][] = "Code";
+	}
+	if ($lastlogin) {
+		$gb[0][0][] = "Last Login";
 	}
 	//Pull Assessment Info
 	$now = time();
@@ -585,7 +591,7 @@ function gbtable() {
 	
 	//Pull student data
 	$ln = 1;
-	$query = "SELECT imas_users.id,imas_users.SID,imas_users.FirstName,imas_users.LastName,imas_users.SID,imas_users.email,imas_students.section,imas_students.code,imas_students.locked,imas_students.timelimitmult ";
+	$query = "SELECT imas_users.id,imas_users.SID,imas_users.FirstName,imas_users.LastName,imas_users.SID,imas_users.email,imas_students.section,imas_students.code,imas_students.locked,imas_students.timelimitmult,imas_students.lastaccess ";
 	$query .= "FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid AND imas_students.courseid='$cid' ";
 	//$query .= "FROM imas_users,imas_teachers WHERE imas_users.id=imas_teachers.userid AND imas_teachers.courseid='$cid' ";
 	//if (!$isteacher && !isset($tutorid)) {$query .= "AND imas_users.id='$userid' ";}
@@ -640,6 +646,9 @@ function gbtable() {
 		}
 		if ($hascode) {
 			$gb[$ln][0][] = $line['code'];
+		}
+		if ($lastlogin) {
+			$gb[$ln][0][] = date("n/j/y",$line['lastaccess']);
 		}
 		$sturow[$line['id']] = $ln;
 		$timelimitmult[$line['id']] = $line['timelimitmult'];
