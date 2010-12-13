@@ -109,6 +109,9 @@ if (!(isset($teacherid))) {
 				}
 				$sets[] = "timelimit='$timelimit'";
 			}
+			if (isset($_POST['chgtutoredit'])) {
+				$sets[] = "tutoredit='{$_POST['tutoredit']}'";
+			}
 			if (isset($_POST['chgdisplaymethod'])) {
 				$sets[] = "displaymethod='{$_POST['displaymethod']}'";
 			}
@@ -570,6 +573,19 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 				</td>
 			</tr>
 			<tr class="coptr">
+				<td><input type="checkbox" name="chgtutoredit"/></td>
+				<td class="r">Tutor Access: </td>
+				<td>
+<?php
+$page_tutorSelect['label'] = array("No access","View Scores","View and Edit Scores");
+$page_tutorSelect['val'] = array(2,0,1);
+writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],$line['tutoredit']);
+			
+?>
+				</td>
+			</tr>
+				
+			<tr class="coptr">
 				<td style="border-bottom: 1px solid #000"><input type="checkbox" name="chgcntingb"/></td>
 				<td class="r" style="border-bottom: 1px solid #000">Count: </td>
 				<td style="border-bottom: 1px solid #000"><input name="cntingb" value="1" checked="checked" type="radio"> Count in Gradebook<br>
@@ -578,6 +594,8 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 				<input name="cntingb" value="2" type="radio"> Count as Extra Credit
 				</td>
 			</tr>
+			
+			
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgcaltag"/></td>
 				<td class="r">Calendar icon:</td>

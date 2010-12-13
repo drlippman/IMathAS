@@ -331,14 +331,27 @@ if ($overwriteBody==1) {
 		
 		<span class=form>Email address is in column:<br/>Enter 0 if no email column</span>
 		<span class=formright><input type=text name=emailloc size=4 value="7"></span><br class=form>
-				
+<?php
+if (isset($CFG['GEN']['allowInstrImportStuByName']) && $CFG['GEN']['allowInstrImportStuByName']==false) {
+?>
+
+		<span class=form>Unique username is in column:</span>
+		<span class=formright>
+			<input type=hidden name=unusecol value="1"/><input type=text name=unloc size=4 value="2"/>
+		</span><br class=form>
+<?php
+} else {
+	?>
+	
 		<span class=form>Does a column contain a desired username:</span>
 		<span class=formright>
 			<input type=radio name=unusecol value="1" CHECKED>Yes, Column 
 			<input type=text name=unloc size=4 value="2"/><br/>
 			<input type=radio name=unusecol value="0">No, Use as username: firstname_lastname
 		</span><br class=form>
-		
+<?php
+}
+?>
 		<span class=form>Set password to:</span>
 		<span class=formright>
 			<input type=radio name=pwtype value="0">First 4 characters of username<br/>

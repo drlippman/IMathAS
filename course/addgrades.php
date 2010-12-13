@@ -5,6 +5,8 @@
 	//grade edit
 	//single grade edit
 	require("../validate.php");
+	require("../includes/htmlutil.php");
+
 	$istutor = false;
 	$isteacher = false;
 	if (isset($tutorid)) { $istutor = true;}
@@ -59,11 +61,8 @@
 		} else {
 			$showdate = parsedatetime($_POST['sdate'],$_POST['stime']);
 		}
-		if (isset($_POST['tutoredit'])) {
-			$tutoredit = 1;
-		} else {
-			$tutoredit = 0;
-		}
+		$tutoredit = intval($_POST['tutoredit']);
+		
 		if ($_GET['gbitem']=='new') {
 			$query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit) VALUES ";
 			$query .= "('$cid','{$_POST['name']}','{$_POST['points']}',$showdate,'{$_POST['gbcat']}','{$_POST['cntingb']}',$tutoredit) ";
@@ -200,6 +199,7 @@
 			$showdate = time();
 			$gbcat = 0;
 			$cntingb = 1;
+			$tutoredit = 0;
 		} else {
 			$query = "SELECT name,points,showdate,gbcategory,cntingb,tutoredit FROM imas_gbitems WHERE id='{$_GET['gbitem']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -256,10 +256,11 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 		if ($cntingb==2) {echo "checked=1";}
 		echo ' /> Count as Extra Credit</span><br class=form />';
 		if (!isset($CFG['GEN']['allowinstraddtutors']) || $CFG['GEN']['allowinstraddtutors']==true) {
-			echo '<span class="form">Allow tutors to edit?</span> <span class="formright">';
-			echo '<input type="checkbox" name="tutoredit" value="1" ';
-			if ($tutoredit==1) {echo ' checked="checked" ';}
-			echo '/></span><br class="form"/>';
+			$page_tutorSelect['label'] = array("No access","View Scores","View and Edit Scores");
+			$page_tutorSelect['val'] = array(2,0,1);
+			echo '<span class="form">Tutor Access:</span> <span class="formright">';
+			writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],$tutoredit);
+			echo '</span><br class="form"/>';
 		}
 		
 		if ($_GET['gbitem']!='new') {

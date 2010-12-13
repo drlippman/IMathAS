@@ -118,11 +118,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$showhints = 0;
 		}
 		
-		if (isset($_POST['tutoredit'])) {
-			$tutoredit = 1;
-		} else {
-			$tutoredit = 0;
-		}
+		$tutoredit = intval($_POST['tutoredit']);
 		
 		if (isset($_POST['allowlate'])) {
 			$_POST['allowlate'] = 1;
@@ -483,6 +479,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$page_groupsets['label'][$i] = $row[1];
 			$i++;
 		}
+		
+		$page_tutorSelect['label'] = array("No access","View Scores","View and Edit Scores");
+		$page_tutorSelect['val'] = array(2,0,1);
+		
 	} //END INITIAL LOAD BLOCK
 	
 }
@@ -764,9 +764,11 @@ if ($overwriteBody==1) {
 <?php 
 		if (!isset($CFG['GEN']['allowinstraddtutors']) || $CFG['GEN']['allowinstraddtutors']==true) {
 ?>
-			<span class="form">Allow tutors to edit scores?</span>
+			<span class="form">Tutor Access:</span>
 			<span class="formright">
-				<input type="checkbox" name="tutoredit" value="1" <?php writeHtmlChecked($line['tutoredit'],1); ?> /> <?php echo $tutoredit; ?>
+<?php
+	writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],$line['tutoredit']);
+?>			
 			</span><br class="form" />
 <?php 
 		} 

@@ -108,6 +108,76 @@
   //$AWSbucket = "";
   
   
+  //Special Config tags for customizing
+  //$loginpage = 'custom-login-page.php';
+  /*
+  
+  $CFG['CPS']['theme'] = array("modern.css",1);  //default theme - second value 0=fixed, 1=can change
+  $CFG['CPS']['themelist'] = "default.css,modern.css";  //list of allowed themes
+  $CFG['CPS']['themenames'] = "Default, Modern";  //to give names to the theme files
+  
+  $CFG['GEN']['allowinstraddstus'] = false; //disallow instructors to add students from the roster page
+  $CFG['GEN']['allowInstrImportStuByName'] = false;  //disallow instructors from using first_last username on import
+  $CFG['GEN']['allowinstraddtutors'] = false;  //disallow instructors to enroll tutors
+  $CFG['GEN']['addteachersrights'] = 75;  //min rights to add/remove teachers to a course
+  $CFG['GEN']['homelayout'] = '|0,1,2|10,11|';  //default home layout
+  $CFG['GEN']['fixedhomelayout'] = array(3);  //prevent changing of home layout sections
+  $CFG['GEN']['hometitle'] = "Home";	//title for course list page
+  $CFG['GEN']['headerinclude'] = "headercontent.php";  //page to include in all headers
+  
+  //can set almost any assessment setting this way
+	 $CFG['AMS']['defpoints'] = 1;  //default points
+	 $CFG['AMS']['showtips'] = 2;   //entry answer format
+	 
+	 $CFG['AMS']['guesslib'] = true;  //guess library based on where most questions are from
+	 
+	 //and most of the gradebook settings
+	 $CFG['GBS']['defgbmode'] = 1011;    //default gradebook mode
+	 $CFG['GBS']['orderby'] = 1;         //default gradebook ordering
+	 $CFG['GBS']['lockheader'] = true;   //lock headers?
+	 
+	 //and course settings.  All but themelist are in the form
+	 //array(defvalue, allowchange)
+	 $CFG['CPS']['hideicons'] = array(0,0);  
+	 $CFG['CPS']['cploc'] = array(7,0);
+	 $CFG['CPS']['picicons'] =  array(1,0);
+	 $CFG['CPS']['unenroll'] = array(0,0);
+	 $CFG['CPS']['chatset'] = array(0,0);
+	 $CFG['CPS']['showlatepass'] = array(1,0);
+	 $CFG['CPS']['topbar'] = array(array("0,1,2,3,9","0,2,3,4,6,7,9",1),0);
+	 
+	 $CFG['CPS']['additemtype'] = array('links',0);   //instead of pull-down
+	 $CFG['CPS']['leftnavtools'] = false;      //hide roster, etc from left nav
+	 $CFG['CPS']['templateoncreate'] = true;  //ask to template course on creation?
+	 
+	 $CFG['CPS']['itemicons'] = array(
+		 'folder'=>'folder_icon.png',
+		 'assess'=>'assess_icon.png',
+		 'forum'=>'forum_icon.png',
+		 'inline'=>'text_icon.png',
+		 'web'=>'link_icon.png',
+		 'doc'=>'link_icon.png',
+		 'html'=>'link_icon.png');   //custom icons
+	 
+	 $CFG['CPS']['miniicons'] = array(
+		 'inline'=>'text_mini.png',
+		 'linked'=>'link_mini.png',
+		 'assess'=>'assess_mini.png',
+		 'forum'=>'forum_mini.png',
+		 'folder'=>'folder_mini.png',
+		 'calendar'=>'cal_mini.png');   //custom mini icons, for links display
+	 
+	//custom icons for test display, in place of half-full box, etc
+	 $CFG['TE']['navicons'] = array(
+	 	 'untried'=>'te_blue_arrow.png',
+	 	 'canretrywrong'=>'te_red_redo.png',
+	 	 'canretrypartial'=>'te_yellow_redo.png',
+	 	 'noretry'=>'te_blank.gif',
+	 	 'correct'=>'te_green_check.png',
+	 	 'wrong'=>'te_red_ex.png',
+	 	 'partial'=>'te_yellow_check.png');  
+	 */
+  
   //no need to change anything from here on
   /* Connecting, selecting database */
   if (!isset($dbsetup)) {

@@ -473,7 +473,7 @@ function enditem($canedit) {
 					   $nothidden = false;
 				   } else {
 					   $scores = mysql_result($result,0,0);
-					   if (getpts($scores)+.02<$line['reqscore']) {
+					   if (round(getpts($scores),1)+.02<$line['reqscore']) {
 					   	   $nothidden = false;
 					   }
 				   }
