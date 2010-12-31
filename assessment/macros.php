@@ -512,8 +512,8 @@ function addfractionaxislabels($plot,$step) {
 	if ($stepn==0) {echo "error: bad step size on pilabels"; return;}
 	$step = ceil($xmin/$stepn);
 	$totstep = ceil(($xmax-$xmin)/$stepn);
-	$tm = -.03*$yrange;
-	$tx = .03*$yrange;
+	$tm = -.02*$yrange;
+	$tx = .02*$yrange;
 	$outst = 'fontfill="black";strokewidth=0.5;stroke="black";';
 	for ($i=0; $i<$totstep; $i++) {
 		$x = $step*$stepn;
@@ -532,7 +532,7 @@ function addfractionaxislabels($plot,$step) {
 			$xd = $n;
 		}
 		if ($d!=1) {$xd .= "/$d";}
-		$outst .= "line([$x,$tm],[$x,$tx]); text([$x,0],\"$xd\",\"below\");";
+		$outst .= "line([$x,$tm],[$x,$tx]); text([$x,$tx],\"$xd\",\"below\");";
 		$step++;
 	}
 	return str_replace("' />","$outst' />",$plot);

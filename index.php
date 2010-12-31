@@ -245,8 +245,10 @@ if ($showpostsgadget && count($postcheckstucids)>0) {
 require("header.php");
 $msgtotal = array_sum($newmsgcnt);
 echo '<div class="floatright" id="homelinkbox">';
-echo "<a href=\"forms.php?action=chguserinfo\">Change User Info</a> | \n";
-echo "<a href=\"forms.php?action=chgpwd\">Change Password</a> | \n";
+if ($myrights>5) {
+	echo "<a href=\"forms.php?action=chguserinfo\">Change User Info</a> | \n";
+	echo "<a href=\"forms.php?action=chgpwd\">Change Password</a> | \n";
+}
 echo '<a href="actions.php?action=logout">Log Out</a>';
 echo '<br/><a href="msgs/msglist.php?cid=0">Messages</a>';
 if ($msgtotal>0) {

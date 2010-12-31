@@ -1,6 +1,6 @@
 <?php
-//IMathAS:  Main admin page
-//(c) 2006 David Lippman
+//IMathAS:  Mass change offline grade items
+//(c) 2010 David Lippman
 
 /*** master php includes *******/
 require("../validate.php");

@@ -83,11 +83,26 @@ if (!(isset($teacherid))) {
 				$table = "imas_forums";
 			} else if ($row[0]=="Assessment") {
 				$table = "imas_assessments";
+			} else if ($row[0]=="Calendar") {
+				continue;
+			} else if ($row[0]=="Wiki") {
+				$table = "imas_wikis";
 			}
 			$query = "UPDATE $table SET startdate=startdate+$shift WHERE id='{$row[1]}' AND startdate>0";
 			mysql_query($query) or die("Query failed : $query" . mysql_error());
 			$query = "UPDATE $table SET enddate=enddate+$shift WHERE id='{$row[1]}' AND enddate<2000000000";
 			mysql_query($query) or die("Query failed : $query" . mysql_error());
+			
+			if ($row[0]=="Wiki") {
+				$query = "UPDATE $table SET editbydate=editbydate+$shift WHERE id='{$row[1]}' AND editbydate>0 AND editbydate<2000000000";
+				mysql_query($query) or die("Query failed : $query" . mysql_error());
+			} else if ($row[0]=="Forum") {
+				$query = "UPDATE $table SET replyby=replyby+$shift WHERE id='{$row[1]}' AND replyby>0 AND replyby<2000000000";
+				mysql_query($query) or die("Query failed : $query" . mysql_error());
+				
+				$query = "UPDATE $table SET postby=postby+$shift WHERE id='{$row[1]}' AND postby>0 AND postby<2000000000";
+				mysql_query($query) or die("Query failed : $query" . mysql_error());
+			}
 		}
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
 

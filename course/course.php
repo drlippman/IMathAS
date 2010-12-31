@@ -458,6 +458,7 @@ if ($overwriteBody==1) {
 		
 		<p><b>Mass Change</b><br/>
 			<a href="chgassessments.php?cid=<?php echo $cid ?>">Assessments</a><br/>
+			<a href="chgforums.php?cid=<?php echo $cid ?>">Forums</a><br/>
 			<a href="masschgdates.php?cid=<?php echo $cid ?>">Dates</a>
 		</p>
 		<p>
@@ -636,6 +637,7 @@ if ($overwriteBody==1) {
 		<a href="chgassessments.php?cid=<?php echo $cid ?>">Mass Change Assessments</a>
 	</span>
 	<span class=column>
+		<a href="chgforums.php?cid=<?php echo $cid ?>">Mass Change Forums</a>
 		<a href="masschgdates.php?cid=<?php echo $cid ?>">Mass Change Dates</a>
 	</span>
 <?php		
