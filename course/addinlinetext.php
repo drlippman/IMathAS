@@ -65,9 +65,20 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else {
 				$enddate = parsedatetime($_POST['edate'],$_POST['etime']);
 			}
-		} else {
+			$oncal = $_POST['oncal'];
+		} else if ($_POST['avail']==2) {
+			if ($_POST['altoncal']==0) {
+				$startdate = 0;
+				$oncal = 0;
+			} else {
+				$startdate = parsedatetime($_POST['cdate'],"12:00 pm");
+				$oncal = 1;
+			}
+			$enddate =  2000000000;
+		}else {
 			$startdate = 0;
 			$enddate = 2000000000;
+			$oncal = 0;
 		}
 		if (isset($_POST['hidetitle'])) {
 			$_POST['title']='##hidden##';
@@ -80,7 +91,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$filestoremove = array();
 		if (isset($_GET['id'])) {  //already have id; update
 			$query = "UPDATE imas_inlinetext SET title='{$_POST['title']}',text='{$_POST['text']}',startdate=$startdate,enddate=$enddate,avail='{$_POST['avail']}',";
-			$query .= "oncal='{$_POST['oncal']}',caltag='{$_POST['caltag']}' ";
+			$query .= "oncal='$oncal',caltag='{$_POST['caltag']}' ";
 			$query .= "WHERE id='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//update attached files
@@ -217,6 +228,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$startdate = $line['startdate'];
 		$enddate = $line['enddate'];
 		$fileorder = explode(',',$line['fileorder']);
+		if ($line['avail']==2 && $startdate>0) {
+			$altoncal = 1;
+		} else {
+			$altoncal = 0;
+		}
 	} else {
 		//set defaults
 		$line['title'] = "Enter title here";
@@ -224,6 +240,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$line['avail'] = 1;
 		$line['oncal'] = 0;
 		$line['caltag'] = '!';
+		$altoncal = 0;
 		$startdate = time();
 		$enddate = time() + 7*24*60*60;
 		$hidetitle = false;
@@ -335,9 +352,9 @@ function movefile(from) {
 	<div>
 		<span class=form>Show:</span>
 		<span class=formright>
-			<input type=radio name="avail" value="0" <?php writeHtmlChecked($line['avail'],0);?> onclick="document.getElementById('datediv').style.display='none';"/>Hide<br/>
-			<input type=radio name="avail" value="1" <?php writeHtmlChecked($line['avail'],1);?> onclick="document.getElementById('datediv').style.display='block';"/>Show by Dates<br/>
-			<input type=radio name="avail" value="2" <?php writeHtmlChecked($line['avail'],2);?> onclick="document.getElementById('datediv').style.display='none';"/>Show Always<br/>
+			<input type=radio name="avail" value="0" <?php writeHtmlChecked($line['avail'],0);?> onclick="document.getElementById('datediv').style.display='none';document.getElementById('altcaldiv').style.display='none';"/>Hide<br/>
+			<input type=radio name="avail" value="1" <?php writeHtmlChecked($line['avail'],1);?> onclick="document.getElementById('datediv').style.display='block';document.getElementById('altcaldiv').style.display='none';"/>Show by Dates<br/>
+			<input type=radio name="avail" value="2" <?php writeHtmlChecked($line['avail'],2);?> onclick="document.getElementById('datediv').style.display='none';document.getElementById('altcaldiv').style.display='block';"/>Show Always<br/>
 		</span><br class="form"/>
 		
 		<div id="datediv" style="display:<?php echo ($line['avail']==1)?"block":"none"; ?>">
@@ -363,7 +380,6 @@ function movefile(from) {
 			<img src="../img/cal.gif" alt="Calendar"/></a>
 			at <input type=text size=10 name=etime value="<?php echo $etime;?>">
 		</span><BR class=form>
-		</div>
 		
 		<span class=form>Place on Calendar?</span>
 		<span class=formright>
@@ -372,6 +388,17 @@ function movefile(from) {
 			<input type=radio name="oncal" value=2 <?php writeHtmlChecked($line['oncal'],2); ?> /> Yes, on Available until date<br/>
 			With tag: <input name="caltag" type=text size=1 value="<?php echo $line['caltag'];?>"/>
 		</span><br class="form" />
+		</div>
+		<div id="altcaldiv" style="display:<?php echo ($line['avail']==2)?"block":"none"; ?>">
+		<span class=form>Place on Calendar?</span>
+		<span class=formright>
+			<input type=radio name="altoncal" value="0" <?php writeHtmlChecked($altoncal,0); ?> /> No<br/>
+			<input type=radio name="altoncal" value="1" <?php writeHtmlChecked($altoncal,1); ?> /> Yes, on 
+			<input type=text size=10 name="cdate" value="<?php echo $sdate;?>"> 
+			<a href="#" onClick="displayDatePicker('cdate', this); return false">
+			<img src="../img/cal.gif" alt="Calendar"/></a>
+		</span><BR class=form>
+		</div>
 		
 	</div>
 	<div class=submit><input type=submit name="submitbtn" value="Submit"></div>

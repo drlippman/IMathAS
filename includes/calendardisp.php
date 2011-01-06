@@ -198,7 +198,7 @@ while ($row = mysql_fetch_row($result)) {
 	$k++;
 }
 //if (isset($teacherid)) {
-	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag FROM imas_inlinetext WHERE ((oncal=2 AND enddate>$exlowertime AND enddate<$uppertime) OR (oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND avail=1 AND courseid='$cid'";
+	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag,avail FROM imas_inlinetext WHERE ((oncal=2 AND enddate>$exlowertime AND enddate<$uppertime) OR (oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND (avail=1 OR (avail=2 AND startdate>0)) AND courseid='$cid'";
 //} else {
 //	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag FROM imas_inlinetext WHERE ((oncal=2 AND enddate>$lowertime AND enddate<$uppertime AND startdate<$now) OR (oncal=1 AND startdate<$now AND startdate>$exlowertime)) AND avail=1 AND courseid='$cid'";  //chg 10/23/09: replace $now with $uppertime
 //}
@@ -214,13 +214,16 @@ while ($row = mysql_fetch_row($result)) {
 	}
 	$row[1] = str_replace('"','\"',$row[1]);
 	$colors[$k] = makecolor2($row[4],$row[2],$now);
+	if ($row[7]==2) {
+		$colors[$k] = "#0f0";
+	}
 	$assess[$moday][$k] = "{type:\"I\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors[$k]."\", tag:\"{$row[6]}\"".((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
 	$tags[$k] = $row[6];
 	$k++;
 }
 //$query = "SELECT id,title,enddate,text,startdate,oncal,caltag FROM imas_linkedtext WHERE ((oncal=2 AND enddate>$lowertime AND enddate<$uppertime AND startdate<$now) OR (oncal=1 AND startdate<$now AND startdate>$exlowertime)) AND avail=1 AND courseid='$cid'";
 //if (isset($teacherid)) {
-	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag FROM imas_linkedtext WHERE ((oncal=2 AND enddate>$exlowertime AND enddate<$uppertime) OR (oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND avail=1 AND courseid='$cid' ORDER BY title";
+	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag,avail FROM imas_linkedtext WHERE ((oncal=2 AND enddate>$exlowertime AND enddate<$uppertime) OR (oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND (avail=1 OR (avail=2 AND startdate>0)) AND courseid='$cid' ORDER BY title";
 //} else {
 //	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag FROM imas_linkedtext WHERE ((oncal=2 AND enddate>$lowertime AND enddate<$uppertime AND startdate<$now) OR (oncal=1 AND startdate<$now AND startdate>$exlowertime)) AND avail=1 AND courseid='$cid'";
 //}
@@ -241,6 +244,9 @@ while ($row = mysql_fetch_row($result)) {
 		   $alink = '';
 	   }
 	$colors[$k] = makecolor2($row[4],$row[2],$now);
+	if ($row[7]==2) {
+		$colors[$k] = "#0f0";
+	}
 	$assess[$moday][$k] = "{type:\"L\", time:\"$time\", ";
 	if (isset($teacherid) || ($now<$row[2] && $now>$row[4])) {
 		$assess[$moday][$k] .= "id:\"$row[0]\", ";

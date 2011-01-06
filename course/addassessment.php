@@ -323,7 +323,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			if ($line['deffeedbacktext']=='') {
 				$usedeffb = false;
-				$deffb = "This assessment contains items that not automatically graded.  Your grade may be inaccurate until your instructor grades these items.";
+				$deffb = "This assessment contains items that are not automatically graded.  Your grade may be inaccurate until your instructor grades these items.";
 			} else {
 				$usedeffb = true;
 				$deffb = $line['deffeedbacktext'];
