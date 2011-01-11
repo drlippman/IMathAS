@@ -29,7 +29,14 @@ $placeinhead .= "<script src=\"$imasroot/javascript/AMhelpers.js\" type=\"text/j
 $nologo = true;
 $cid = $_GET['cid'];
 $aid = $_GET['aid'];
-$sessiondata['mathdisp'] = 2;
+if (isset($_POST['mathdisp']) && $_POST['mathdisp']=='text') {
+	$sessiondata['mathdisp'] = 0;
+} else {
+	$sessiondata['mathdisp'] = 2;	
+}
+if (isset($_POST['mathdisp']) && $_POST['mathdisp']=='tex') {
+	$sessiondata['texdisp'] = true;
+}
 $sessiondata['graphdisp'] = 2;
 require("../assessment/header.php");
 
@@ -49,6 +56,7 @@ if ($overwriteBody==1) {
 	echo "<p>Generate answer keys? <input type=radio name=keys value=0>No <input type=radio name=keys value=1 checked=1>Yes</p>\n";
 	echo "<p>Question separator:  <input type=text name=\"qsep\" value=\"\" /></p>";
 	echo "<p>Version separator: <input type=text name=\"vsep\" value=\"+++++++++++++++\" /> </p>";
+	echo '<p>Math display: <input type="radio" name="mathdisp" value="img" checked="checked" /> Images <input type="radio" name="mathdisp" value="text"/> Text <input type="radio" name="mathdisp" value="tex"/> TeX </p>';
 	echo "<p><input type=submit value=\"Continue\"></p></form>\n";
 	
 } else {		
@@ -244,9 +252,9 @@ if ($overwriteBody==1) {
 			for ($i=0; $i<$numq; $i++) {
 				echo '<li>';
 				if (is_array($sa[$j][$i])) {
-					echo printfilter(implode(' ~ ',$sa[$j][$i]));
+					echo printfilter(filter(implode(' ~ ',$sa[$j][$i])));
 				} else {
-					echo printfilter($sa[$j][$i]);
+					echo printfilter(filter($sa[$j][$i]));
 				}
 				echo "</li>\n";
 			}
@@ -370,4 +378,5 @@ function printq($qn,$qsetid,$seed,$pts) {
 		return $showanswer;
 	}
 }
+
 ?>

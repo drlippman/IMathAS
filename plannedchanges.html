@@ -153,3 +153,50 @@ Use serialize for lastanswers and bestlastanswers
 		}
 	}
 }
+
+important things in new assessment storage design:
+1) be able to keep whole assessment attempt data over multiple versions
+2) allow the question ids to change (for question grouping)
+3) be able to track full assessment attempt as well as question reattempts
+
+Assessment options:
+
+Reattempts (retrying same version) is done per assessment/question
+   with penalty of __ for missed attempts [for "per assessment":  on all questions/missed questions]
+   max ___ attempts
+New versions are done per assessment/question
+   with penalty of __ of regens [for "per assessment": one all questions / missed questions]
+   max ___ regens
+   keep best/last
+
+Redesign assessment result storage
+assessment attempt {
+	q1 {
+		version1 {
+			question id
+			seed
+			attempts {
+				attempt1 {
+					submitted answer
+					rawscore [0-1]
+					timestamp?
+				}
+		}
+	}
+	
+	//maybe add for convenience of access
+	curquestions {
+		question id
+	}
+}
+
+So to get lastanswer, $data[$qn][last entry]['attempts'][last entry]
+to get score, have to know assessment settings, and go through and calculate best
+based on raw scores and assessment settings.
+
+how to handle review?  Keep whole other set of attempt data?  Run as a separate 
+version within the same structure?
+			
+		
+
+

@@ -15,7 +15,7 @@
 		$AS = new AStoIMG;
 	} 
 	function mathfiltercallback($arr) {
-		global $AMT,$mathimgurl,$coursetheme;
+		global $AMT,$mathimgurl,$coursetheme,$sessiondata;
 		//$arr[1] = str_replace(array('&ne;','&quot;','&lt;','&gt;','&le;','&ge;'),array('ne','"','lt','gt','le','ge'),$arr[1]);
 		$arr[1] = str_replace(array('&ne;','&quot;','&le;','&ge;'),array('ne','"','le','ge'),$arr[1]);
 		$tex = $AMT->convert($arr[1]);
@@ -25,7 +25,11 @@
 			if (isset($coursetheme) && strpos($coursetheme,'_dark')!==false) {
 				$tex = '\\reverse '.$tex;
 			}
-			return ('<img style="vertical-align: middle;" src="'.$mathimgurl.'?'.rawurlencode($tex).'" alt="'.str_replace('"','&quot;',$arr[1]).'">');
+			if ($sessiondata['texdisp']==true) {
+				return htmlentities($tex);
+			} else {
+				return ('<img style="vertical-align: middle;" src="'.$mathimgurl.'?'.rawurlencode($tex).'" alt="'.str_replace('"','&quot;',$arr[1]).'">');
+			}
 		}
 	}
 	function svgfiltersscrcallback($arr) {
