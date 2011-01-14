@@ -248,7 +248,7 @@ while ($row = mysql_fetch_row($result)) {
 		$colors[$k] = "#0f0";
 	}
 	$assess[$moday][$k] = "{type:\"L\", time:\"$time\", ";
-	if (isset($teacherid) || ($now<$row[2] && $now>$row[4])) {
+	if (isset($teacherid) || ($now<$row[2] && $now>$row[4]) || $row[7]==2) {
 		$assess[$moday][$k] .= "id:\"$row[0]\", ";
 	}
 	$assess[$moday][$k] .= "name:\"$row[1]\", link:\"$alink\", color:\"".$colors[$k]."\", tag:\"{$row[6]}\"".((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";

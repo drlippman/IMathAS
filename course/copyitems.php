@@ -372,7 +372,7 @@ if ($overwriteBody==1) {
 	<p>Copy offline grade items? <input type=checkbox name="copyoffline"  value="1"/></p>
 	<p>Select calendar items to copy? <input type=checkbox name="selectcalitems"  value="1"/></p>
 	
-	<p>Copy "display at top" instructor forum posts? <input type=checkbox name="copystickyposts"  value="1"/></p>
+	<p>Copy "display at top" instructor forum posts? <input type=checkbox name="copystickyposts"  value="1" checked="checked"/></p>
 	
 	<p>Append text to titles?: <input type="text" name="append"></p>
 	<p>Add to block: <br/>

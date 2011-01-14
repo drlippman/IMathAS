@@ -90,6 +90,7 @@ if (!(isset($teacherid))) {
 					$noprint = 0;
 				}
 			}
+			
 			if ($_POST['skippenalty']==10) {
 				$_POST['defpenalty'] = 'L'.$_POST['defpenalty'];
 			} else if ($_POST['skippenalty']>0) {
@@ -178,7 +179,13 @@ if (!(isset($teacherid))) {
 				$calrtag = $_POST['caltagrev'];
 				$sets[] = "calrtag='$calrtag'";
 			}
-			
+			if (isset($_POST['chgdeffb'])) {
+				if (isset($_POST['usedeffb'])) {
+					$sets[] = "deffeedbacktext='{$_POST['deffb']}'";
+				} else {
+					$sets[] = "deffeedbacktext=''";
+				}
+			}
 				
 			if ($turnonshuffle!=0 || $turnoffshuffle!=0) {
 				$shuff = "shuffle = ((shuffle";
@@ -612,6 +619,12 @@ writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],
 				<input type="radio" name="minscoretype" value="1"> Percent 
 	
 				</td>
+			</tr>
+			<tr class="coptr">
+				<td><input type="checkbox" name="chgdeffb"/></td>
+				<td class="r">Default Feedback Text: </td>
+				<td>Use? <input type="checkbox" name="usedeffb"><br/>
+				Text: <input type="text" size="60" name="deffb" value="This assessment contains items that not automatically graded.  Your grade may be inaccurate until your instructor grades these items." /></td>
 			</tr>
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgsameseed"/></td>

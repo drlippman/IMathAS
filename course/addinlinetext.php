@@ -52,7 +52,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$block = $_GET['block'];	
 	$page_formActionTag = "addinlinetext.php?block=$block&cid=$cid&folder=" . $_GET['folder'];
 	$page_formActionTag .= "&tb=$totb";
-	
+	$caltag = $_POST['caltag'];
 	if ($_POST['title']!= null || $_POST['text']!=null || $_POST['sdate']!=null) { //if the form has been submitted
 		if ($_POST['avail']==1) {
 			if ($_POST['sdatetype']=='0') {
@@ -73,6 +73,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else {
 				$startdate = parsedatetime($_POST['cdate'],"12:00 pm");
 				$oncal = 1;
+				$caltag = $_POST['altcaltag'];
 			}
 			$enddate =  2000000000;
 		}else {
@@ -91,7 +92,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$filestoremove = array();
 		if (isset($_GET['id'])) {  //already have id; update
 			$query = "UPDATE imas_inlinetext SET title='{$_POST['title']}',text='{$_POST['text']}',startdate=$startdate,enddate=$enddate,avail='{$_POST['avail']}',";
-			$query .= "oncal='$oncal',caltag='{$_POST['caltag']}' ";
+			$query .= "oncal='$oncal',caltag='$caltag' ";
 			$query .= "WHERE id='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//update attached files
@@ -117,7 +118,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else { //add new
 			
 			$query = "INSERT INTO imas_inlinetext (courseid,title,text,startdate,enddate,avail,oncal,caltag) VALUES ";
-			$query .= "('$cid','{$_POST['title']}','{$_POST['text']}',$startdate,$enddate,'{$_POST['avail']}','{$_POST['oncal']}','{$_POST['caltag']}');";
+			$query .= "('$cid','{$_POST['title']}','{$_POST['text']}',$startdate,$enddate,'{$_POST['avail']}','{$_POST['oncal']}','$caltag');";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			
 			$newtextid = mysql_insert_id();
@@ -396,7 +397,8 @@ function movefile(from) {
 			<input type=radio name="altoncal" value="1" <?php writeHtmlChecked($altoncal,1); ?> /> Yes, on 
 			<input type=text size=10 name="cdate" value="<?php echo $sdate;?>"> 
 			<a href="#" onClick="displayDatePicker('cdate', this); return false">
-			<img src="../img/cal.gif" alt="Calendar"/></a>
+			<img src="../img/cal.gif" alt="Calendar"/></a> <br/>
+			With tag: <input name="altcaltag" type=text size=1 value="<?php echo $line['caltag'];?>"/>
 		</span><BR class=form>
 		</div>
 		

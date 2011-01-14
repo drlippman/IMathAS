@@ -161,6 +161,9 @@
 		$str = preg_replace('/<script.*?\/script>/','',$str);  //strip scripts
 		$str = preg_replace('/<input[^>]*Preview[^>]*>/','',$str); //strip preview buttons
 		$str = preg_replace('/<input[^>]*text[^>]*>/','__________________',$str);
+		$str = preg_replace('/<input[^>]*(radio|checkbox)[^>]*>/','__',$str);
+		$str = preg_replace('/<table/','<table cellspacing="0"',$str);
+		$str = preg_replace('/`\s*(\w)\s*`/','<i>$1</i>',$str);
 		$str = preg_replace('/<select.*?\/select>/','____',$str);
 		$str = preg_replace('/<input[^>]*hidden[^>]*>/','',$str); //strip hidden fields
 		return $str;
