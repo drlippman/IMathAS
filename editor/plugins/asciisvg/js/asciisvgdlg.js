@@ -37,7 +37,7 @@ var AsciisvgDialog = {
 			} else {
 				aligntxt = "vertical-align: "+this.alignm+"; float: none;";
 			}
-			tinyMCEPopup.editor.execCommand('mceInsertContent', false, '<img style="width:300px; height: 200px; '+aligntxt+'" src="'+ this.AScgiloc + '?sscr='+encodeURIComponent(this.sscr)+'" sscr="'+this.sscr+'" script=" " />');
+			tinyMCEPopup.editor.execCommand('mceInsertContent', false, '<img style="width:'+this.width+'px; height:'+this.height+'px; '+aligntxt+'" src="'+ this.AScgiloc + '?sscr='+encodeURIComponent(this.sscr)+'" sscr="'+this.sscr+'" script=" " />');
 		} else {
 			el = tinyMCEPopup.editor.selection.getNode();
 			ed.dom.setAttrib(el,"sscr",this.sscr);

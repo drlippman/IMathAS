@@ -113,7 +113,7 @@
 							} else {
 								style = '';
 							}
-							rep = '<img src="'+ed.getParam('AScgiloc')+'?sscr='+sscr+'" style="'+style+'" sscr="'+decodeURIComponent(sscr)+'" />';
+							rep = '<img src="'+ed.getParam('AScgiloc')+'?sscr='+encodeURIComponent(sscr)+'" style="'+style+'" sscr="'+decodeURIComponent(sscr)+'" />';
 							o.content = o.content.replace(imgs[i],rep);
 						}
 					}
