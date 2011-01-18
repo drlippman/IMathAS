@@ -307,7 +307,7 @@ function getiteminfo($itemid) {
 	return array($itemtype,$name,$summary);
 }
 
-function getsubinfo($items,$parent,$pre) {
+function getsubinfo($items,$parent,$pre,$itemtypelimit=false) {
 	global $ids,$types,$names,$sums,$parents;
 	
 	foreach($items as $k=>$item) {
@@ -318,15 +318,18 @@ function getsubinfo($items,$parent,$pre) {
 			$parents[] = $parent;
 			$sums[] = '';
 			if (count($item['items'])>0) {
-				getsubinfo($item['items'],$parent.'-'.($k+1),$pre.'-&nbsp;');
+				getsubinfo($item['items'],$parent.'-'.($k+1),$pre.'-&nbsp;',$itemtypelimit);
 			}
 		} else {
 			if ($item==null || $item=='') {
 				continue;
 			}
+			$arr = getiteminfo($item);
+			if ($itemtypelimit!==false && $arr[0]!=$itemtypelimit) {
+				continue;
+			}
 			$ids[] = $item;
 			$parents[] = $parent;
-			$arr = getiteminfo($item);
 			$types[] = $pre.$arr[0];
 			$names[] = $arr[1];
 			$arr[2] = strip_tags($arr[2]);

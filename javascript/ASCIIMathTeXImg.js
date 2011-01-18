@@ -220,6 +220,7 @@ var AMsymbols = [
 {input:"log",  tag:"mo", output:"log", tex:null, ttype:UNARY, func:true},
 {input:"ln",   tag:"mo", output:"ln",  tex:null, ttype:UNARY, func:true},
 {input:"abs",   tag:"mo", output:"abs",  tex:"text{abs}", ttype:UNARY, func:true, notexcopy:true},
+
 {input:"Sin",  tag:"mo", output:"sin", tex:null, ttype:UNARY, func:true},
 {input:"Cos",  tag:"mo", output:"cos", tex:null, ttype:UNARY, func:true},
 {input:"Tan",  tag:"mo", output:"tan", tex:null, ttype:UNARY, func:true},
@@ -235,6 +236,7 @@ var AMsymbols = [
 {input:"Log",  tag:"mo", output:"log", tex:null, ttype:UNARY, func:true},
 {input:"Ln",   tag:"mo", output:"ln",  tex:null, ttype:UNARY, func:true},
 {input:"Abs",   tag:"mo", output:"abs",  tex:"text{abs}", ttype:UNARY, func:true, notexcopy:true},
+
 {input:"det",  tag:"mo", output:"det", tex:null, ttype:UNARY, func:true},
 {input:"exp",  tag:"mo", output:"exp", tex:null, ttype:UNARY, func:true},
 {input:"dim",  tag:"mo", output:"dim", tex:null, ttype:CONST},
@@ -437,7 +439,7 @@ function AMTgetTeXsymbol(symb) {
 		pre = '\\';
 	}
 	if (symb.tex==null) {
-		return (pre+symb.input);
+		return (pre+symb.output);
 	} else {
 		return (pre+symb.tex);
 	}

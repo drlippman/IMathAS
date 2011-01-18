@@ -5,6 +5,7 @@
 /*** master php includes *******/
 require("../validate.php");
 require("../includes/htmlutil.php");
+require("../includes/copyiteminc.php");
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -23,7 +24,13 @@ if (!(isset($teacherid))) {
 	$cid = $_GET['cid'];
 	
 	if (isset($_POST['checked'])) { //if the form has been submitted
-		$checked = $_POST['checked'];
+		$checked = array();
+		foreach ($_POST['checked'] as $id) {
+			$id = intval($id);
+			if ($id != 0) {
+				$checked[] = $id;
+			}
+		}
 		$checkedlist = "'".implode("','",$checked)."'";
 		
 		$sets = array();
@@ -83,13 +90,7 @@ if (!(isset($teacherid))) {
 					$showhints = 0;
 				}
 			}
-			if (isset($_POST['chgnoprint'])) {
-				if (isset($_POST['noprint'])) {
-					$noprint = 1;
-				} else {
-					$noprint = 0;
-				}
-			}
+			
 			
 			if ($_POST['skippenalty']==10) {
 				$_POST['defpenalty'] = 'L'.$_POST['defpenalty'];
@@ -147,7 +148,7 @@ if (!(isset($teacherid))) {
 				$sets[] = "showtips='{$_POST['showtips']}'";
 			}
 			if (isset($_POST['chgnoprint'])) {
-				$sets[] = "noprint='$noprint'";
+				$sets[] = "noprint='{$_POST['noprint']}'";
 			}
 			if (isset($_POST['chgisgroup'])) {
 				$sets[] = "isgroup='{$_POST['isgroup']}'";
@@ -264,6 +265,16 @@ if (!(isset($teacherid))) {
 			$skippenalty = 0;
 		}	
 		
+		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	
+		$items = unserialize(mysql_result($result,0,0));
+		$ids = array();
+		$types = array();
+		$names = array();
+		$sums = array();
+		$parents = array();
+		getsubinfo($items,'0','','Assessment');
 		
 		$query = "SELECT id,name FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -341,7 +352,15 @@ function copyfromtoggle(frm,mark) {
 	}
 	
 }
-
+function chkgrp(frm, arr, mark) {
+	  var els = frm.getElementsByTagName("input");
+	  for (var i = 0; i < els.length; i++) {
+		  var el = els[i];
+		  if (el.type=='checkbox' && (el.id.indexOf(arr+'.')==0 || el.id.indexOf(arr+'-')==0 || el.id==arr)) {
+	     	       el.checked = mark;
+		  }
+	  }
+}
 </script>
 
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
@@ -360,11 +379,39 @@ function copyfromtoggle(frm,mark) {
 		<ul class=nomark>
 <?php
 	echo $page_assessListMsg;
-	for ($i=0;$i<count($page_assessSelect['val']);$i++) {
+	$inblock = 0;
+	for ($i = 0 ; $i<(count($ids)); $i++) {
+			
+			if (strpos($types[$i],'Block')!==false) {	
+				$blockout = "<input type=checkbox name='checked[]' value='0' id='{$parents[$i]}' checked=checked ";
+				$blockout .= "onClick=\"chkgrp(this.form, '{$ids[$i]}', this.checked);\" ";
+				$blockout .='/>';
+				$blockout .= '<i>'.$names[$i].'</i>';
+				$blockid = $ids[$i];
+				
+			} else {
+				if ($blockout!='' && $blockid==$parents[$i]) {
+					echo "<li>$blockout</li>";
+					$blockout = '';
+				}
+				echo '<li>';
+				echo "<input type=checkbox name='checked[]' value='{$ids[$i]}' id='{$parents[$i]}.{$ids[$i]}' checked=checked ";
+				echo '/>';
+				$pos = strrpos($types[$i],'-');
+				if ($pos!==false) {
+					echo substr($types[$i],0,$pos+1).' ';
+				}
+				echo $names[$i];
+				echo '</li>';
+			}
+			
+	}
+	
+	/*for ($i=0;$i<count($page_assessSelect['val']);$i++) {
 ?>
 			<li><input type=checkbox name='checked[]' value='<?php echo $page_assessSelect['val'][$i] ?>' checked=checked><?php echo $page_assessSelect['label'][$i] ?></li>
 <?php
-	}
+	}*/
 ?>
 		</ul>
 
