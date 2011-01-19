@@ -557,7 +557,7 @@ function AMTgetTeXsymbol(symb) {
 		pre = '\\';
 	}
 	if (symb.tex==null) {
-		return (pre+symb.output);
+		return (pre+symb.input.toLowerCase());
 	} else {
 		return (pre+symb.tex);
 	}
