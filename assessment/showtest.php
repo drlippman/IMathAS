@@ -1040,9 +1040,9 @@
 					
 				}
 				if (hasreattempts($qn)) {
-					if ($showeachscore) {
+					//if ($showeachscore) {
 						echo "<p><a href=\"showtest.php?action=skip&amp;to=$qn&amp;reattempt=$qn\">Reattempt last question</a></p>\n";
-					}
+					//}
 					$reattemptsremain = true;
 				}
 				if ($allowregen && $qi[$questions[$qn]]['allowregen']==1) {
@@ -1115,9 +1115,9 @@
 						echo "</p>";
 					}
 					if (hasreattempts($next)) {
-						if ($showeachscore) {
+						//if ($showeachscore) {
 							echo "<p><a href=\"showtest.php?action=skip&amp;to=$next&amp;reattempt=$next\">Reattempt this question</a></p>\n";
-						}
+						//}
 						$reattemptsremain = true;
 					}
 					if ($allowregen && $qi[$questions[$next]]['allowregen']==1) {

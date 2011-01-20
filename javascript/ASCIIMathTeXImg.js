@@ -439,7 +439,7 @@ function AMTgetTeXsymbol(symb) {
 		pre = '\\';
 	}
 	if (symb.tex==null) {
-		return (pre+symb.input.toLowerCase());
+		return (pre+(pre==''?symb.input:symb.input.toLowerCase()));
 	} else {
 		return (pre+symb.tex);
 	}
