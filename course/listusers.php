@@ -91,6 +91,12 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 					echo "Instructors can't enroll themselves as students.  Use Student View.";
 					exit;
 				}
+				$query = "SELECT id FROM imas_tutors WHERE userid='$id' AND courseid='$cid'";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				if (mysql_num_rows($result)>0) {
+					echo "Tutors can't be enrolled as students.";
+					exit;
+				}
 				$vals = "$id,'$cid'";
 				$query = "INSERT INTO imas_students (userid,courseid";
 				if (trim($_POST['section'])!='') {

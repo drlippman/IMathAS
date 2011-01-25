@@ -540,6 +540,8 @@ function enditem($canedit) {
 					
 				   } else if ($line['allowlate']==1 && $latepasses>0) {
 					echo " <a href=\"redeemlatepass.php?cid=$cid&aid=$typeid\">Use LatePass</a>";
+				   } else if ($line['allowlate']==1 && isset($sessiondata['stuview'])) {
+					echo " LatePass Allowed";
 				   }
 				   echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
 				   enditem($canedit); //echo "</div>\n";

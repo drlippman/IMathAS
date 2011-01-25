@@ -459,7 +459,8 @@ if ($overwriteBody==1) {
 		<p><b>Mass Change</b><br/>
 			<a href="chgassessments.php?cid=<?php echo $cid ?>">Assessments</a><br/>
 			<a href="chgforums.php?cid=<?php echo $cid ?>">Forums</a><br/>
-			<a href="masschgdates.php?cid=<?php echo $cid ?>">Dates</a>
+			<a href="masschgdates.php?cid=<?php echo $cid ?>">Dates</a><br/>
+			<a href="timeshift.php?cid=<?php echo $cid ?>">Time Shift</a>
 		</p>
 		<p>
 			<a href="../admin/forms.php?action=modify&id=<?php echo $cid ?>&cid=<?php echo $cid ?>">Course Settings</a><br/>

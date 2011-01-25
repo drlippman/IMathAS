@@ -37,6 +37,12 @@ if (isset($_POST['mathdisp']) && $_POST['mathdisp']=='text') {
 if (isset($_POST['mathdisp']) && $_POST['mathdisp']=='tex') {
 	$sessiondata['texdisp'] = true;
 }
+if (isset($_POST['mathdisp']) && $_POST['mathdisp']=='textandimg') {
+	$printtwice = 2;
+} else {
+	$printtwice = 1;
+}
+
 $sessiondata['graphdisp'] = 2;
 require("../assessment/header.php");
 
@@ -53,10 +59,11 @@ if ($overwriteBody==1) {
 	
 	echo "<form method=post action=\"printlayoutbare.php?cid=$cid&aid=$aid\">\n";
 	echo "<p>Number of different versions to generate: <input type=text name=versions value=\"1\"></p>\n";
+	echo '<p>Format?  <input type="radio" name="format" value="trad" checked="checked" /> Form A: 1 2 3 Form B: 1 2 3 <input type="radio" name="format" value="inter"/> 1a 1b 2a 2b</p>';
 	echo "<p>Generate answer keys? <input type=radio name=keys value=0>No <input type=radio name=keys value=1 checked=1>Yes</p>\n";
 	echo "<p>Question separator:  <input type=text name=\"qsep\" value=\"\" /></p>";
 	echo "<p>Version separator: <input type=text name=\"vsep\" value=\"+++++++++++++++\" /> </p>";
-	echo '<p>Math display: <input type="radio" name="mathdisp" value="img" checked="checked" /> Images <input type="radio" name="mathdisp" value="text"/> Text <input type="radio" name="mathdisp" value="tex"/> TeX </p>';
+	echo '<p>Math display: <input type="radio" name="mathdisp" value="img" checked="checked" /> Images <input type="radio" name="mathdisp" value="text"/> Text <input type="radio" name="mathdisp" value="tex"/> TeX <input type="radio" name="mathdisp" value="textandimg"/> Images, then again in text</p>';
 	echo "<p><input type=submit value=\"Continue\"></p></form>\n";
 	
 } else {		
@@ -154,120 +161,122 @@ if ($overwriteBody==1) {
 	} else {
 		$copies = 1;
 	}
-	for ($j=0; $j<$copies; $j++) {	
-		if ($j>0) { echo $_POST['vsep'];}
-		$seeds = array();
-		if ($line['shuffle']&2) {  //set rand seeds
-			$seeds = array_fill(0,count($questions),rand(1,9999));	
-		} else {
-			for ($i = 0; $i<count($questions);$i++) {
-				$seeds[] = rand(1,9999);
-			}
+	//add interlace output
+	//add prettyprint along with text-based output option
+	for ($pt=0;$pt<$printtwice;$pt++) {
+		if ($pt==1) {
+			$sessiondata['mathdisp'] = 0;
 		}
 		
-		$headerleft = '';
-		$headerleft .= $line['name'];
-		if ($copies>1) {
-			$headerleft .= ' - Form ' . ($j+1);
-		}
-		if ((isset($_POST['iname']) || isset($_POST['cname'])) && isset($_POST['aname'])) {
-			$headerleft .= "<br/>";
-		}
-		$headerright = '';
-		/*if (isset($_POST['cname'])) {
-			$query = "SELECT name FROM imas_courses WHERE id=$cid";
-			$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-			$headerleft .= mysql_result($result,0,0);
-			if (isset($_POST['iname'])) { $headerleft .= ' - ';}
-		}
-		if (isset($_POST['iname'])) {
-			$query = "SELECT LastName FROM imas_users WHERE id=$userid";
-			$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-			$headerleft .= mysql_result($result,0,0);
-		}
-		
-		if (isset($_POST['sname'])) {
-			$headerright .= 'Name ____________________________';
-			if (isset($_POST['otherheader'])) {
-				$headerright .= '<br/>';
-			}
-		}
-		if (isset($_POST['otherheader'])) {
-			$headerright .= $_POST['otherheadertext'] . '____________________________';
-		}
-		*/
-		echo "<div class=q>\n";
-		echo "<div class=hdrm>\n";
-		
-		echo "<div id=headerleft>$headerleft</div><div id=headerright>$headerright</div>\n";
-		echo "<div id=intro>{$line['intro']}</div>\n";
-		echo "</div>\n";
-		//if (!$isfinal) {
-		//	echo "<div class=cbutn><a href=\"printtest.php?cid=$cid&aid=$aid\">Cancel</a></div>\n";
-		//} 
-		echo "</div>\n";
-		
-		
-		for ($i=0; $i<$numq; $i++) {
-			if ($i>0) { echo $_POST['qsep'];}
-			$sa[$j][$i] = printq($i,$qn[$questions[$i]],$seeds[$i],$points[$questions[$i]]);
-		}
-		
-		//if ($isfinal) {
-		//	echo "<p class=pageb>&nbsp;</p>\n";
-		//}
-	}
-	//echo "</table>\n";
-	/*if (!$isfinal) {
-
-		echo "<input type=hidden id=heights name=heights value=\"\">\n";
-		if (isset($_POST['points'])) {
-			echo "<input type=hidden name=points value=1>\n";
-		}
-		if (isset($_POST['aname'])) {
-			echo "<input type=hidden name=aname value=1>\n";
-		}
-		if (isset($_POST['iname'])) {
-			echo "<input type=hidden name=iname value=1>\n";
-		}
-		if (isset($_POST['cname'])) {
-			echo "<input type=hidden name=cname value=1>\n";
-		}
-		if (isset($_POST['sname'])) {
-			echo "<input type=hidden name=sname value=1>\n";
-		}
-		if (isset($_POST['hidetxtboxes'])) {
-			echo "<input type=hidden name=hidetxtboxes value=1>\n";
-		}
-		if (isset($_POST['otherheader'])) {
-			echo "<input type=hidden name=otherheader value=1>\n";
-			echo "<input type=hidden name=otherheadertext value=\"{$_POST['otherheadertext']}\">\n";
-		}
-		echo "<div class=q><div class=m>&nbsp;</div><div class=cbutn><input type=submit value=\"Continue\"></div></div>\n";
-	} else*/ if ($_POST['keys']>0) { //print answer keys
-		for ($j=0; $j<$copies; $j++) {
-			echo $_POST['vsep'];
-			echo '<b>Key - Form ' . ($j+1) . "</b>\n";
-			echo "<ol>\n";
-			for ($i=0; $i<$numq; $i++) {
-				echo '<li>';
-				if (is_array($sa[$j][$i])) {
-					echo printfilter(filter(implode(' ~ ',$sa[$j][$i])));
+		if ($_POST['format']=='trad') {
+			for ($j=0; $j<$copies; $j++) {	
+				if ($j>0) { echo $_POST['vsep'];}
+				$seeds = array();
+				if ($line['shuffle']&2) {  //set rand seeds
+					$seeds = array_fill(0,count($questions),rand(1,9999));	
 				} else {
-					echo printfilter(filter($sa[$j][$i]));
+					for ($i = 0; $i<count($questions);$i++) {
+						$seeds[] = rand(1,9999);
+					}
 				}
-				echo "</li>\n";
+				
+				$headerleft = '';
+				$headerleft .= $line['name'];
+				if ($copies>1) {
+					$headerleft .= ' - Form ' . ($j+1);
+				}
+				if ((isset($_POST['iname']) || isset($_POST['cname'])) && isset($_POST['aname'])) {
+					$headerleft .= "<br/>";
+				}
+				$headerright = '';
+				echo "<div class=q>\n";
+				echo "<div class=hdrm>\n";
+				
+				echo "<div id=headerleft>$headerleft</div><div id=headerright>$headerright</div>\n";
+				echo "<div id=intro>{$line['intro']}</div>\n";
+				echo "</div>\n";
+				echo "</div>\n";
+				
+				
+				for ($i=0; $i<$numq; $i++) {
+					if ($i>0) { echo $_POST['qsep'];}
+					$sa[$j][$i] = printq($i,$qn[$questions[$i]],$seeds[$i],$points[$questions[$i]]);
+				}
+				
 			}
-			echo "</ol>\n";
-			//if ($_POST['keys']==2) {
-			//	echo "<p class=pageb>&nbsp;</p>\n";
-			//}
+		
+			if ($_POST['keys']>0) { //print answer keys
+				for ($j=0; $j<$copies; $j++) {
+					echo $_POST['vsep'];
+					echo '<b>Key - Form ' . ($j+1) . "</b>\n";
+					echo "<ol>\n";
+					for ($i=0; $i<$numq; $i++) {
+						echo '<li>';
+						if (is_array($sa[$j][$i])) {
+							echo printfilter(filter(implode(' ~ ',$sa[$j][$i])));
+						} else {
+							echo printfilter(filter($sa[$j][$i]));
+						}
+						echo "</li>\n";
+					}
+					echo "</ol>\n";
+					//if ($_POST['keys']==2) {
+					//	echo "<p class=pageb>&nbsp;</p>\n";
+					//}
+				}
+			}
+		} else if ($_POST['format']=='inter') {
+			$seeds = array();
+			for ($j=0; $j<$copies; $j++) {	
+				if ($j>0) { echo $_POST['vsep'];}
+				$seeds[$j] = array();
+				if ($line['shuffle']&2) {  //set rand seeds
+					$seeds[$j] = array_fill(0,count($questions),rand(1,9999));	
+				} else {
+					for ($i = 0; $i<count($questions);$i++) {
+						$seeds[$j][] = rand(1,9999);
+					}
+				}
+			}
+			$headerleft = '';
+			$headerleft .= $line['name'];
+			if ((isset($_POST['iname']) || isset($_POST['cname'])) && isset($_POST['aname'])) {
+				$headerleft .= "<br/>";
+			}
+			$headerright = '';
+			echo "<div class=q>\n";
+			echo "<div class=hdrm>\n";
+			
+			echo "<div id=headerleft>$headerleft</div><div id=headerright>$headerright</div>\n";
+			echo "<div id=intro>{$line['intro']}</div>\n";
+			echo "</div>\n";
+			echo "</div>\n";
+			for ($i=0; $i<$numq; $i++) {
+				if ($i>0) { echo $_POST['qsep'];}
+				for ($j=0; $j<$copies;$j++) {
+					if ($j>0) { echo $_POST['qsep'];}
+					$sa[] = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]]);
+				}
+			}
+			if ($_POST['keys']>0) { //print answer keys
+				echo $_POST['vsep'];
+				echo "<b>Key</b>\n";
+				echo "<ol>\n";
+				for ($i=0; $i<count($sa); $i++) {
+					echo '<li>';
+					if (is_array($sa[$i])) {
+						echo printfilter(filter(implode(' ~ ',$sa[$i])));
+					} else {
+						echo printfilter(filter($sa[$i]));
+					}
+					echo "</li>\n";
+				}
+				echo "</ol>\n";	
+			}
 		}
 	}
-	//if ($isfinal) {
-		echo "<div class=cbutn><a href=\"course.php?cid=$cid\">Return to course page</a></div>\n";
-	//}
-	//echo "</form>\n";
+	echo "<div class=cbutn><a href=\"course.php?cid=$cid\">Return to course page</a></div>\n";
+	
 
 
 }	

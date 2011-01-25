@@ -41,6 +41,12 @@
 			while ($row = mysql_fetch_row($result)) {
 				$existingsids[] = $row[0];
 			}
+			//also don't want students enrolled as tutors
+			$query = "SELECT u.SID FROM imas_students as stu JOIN imas_users as u ON stu.userid=u.id WHERE stu.courseid='$cid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				$existingsids[] = $row[0];
+			}
 			$sids = explode(',',$_POST['newtutors']);
 			for ($i=0;$i<count($sids);$i++) {
 				$sids[$i] = trim($sids[$i]);

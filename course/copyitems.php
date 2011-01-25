@@ -119,6 +119,12 @@ if (!(isset($teacherid))) {
 			}
 		} else {
 			$gbcats = array();
+			$query = "SELECT tc.id,toc.id FROM imas_gbcats AS tc JOIN imas_gbcats AS toc ON tc.name=toc.name WHERE tc.courseid='{$_POST['ctc']}' AND ";
+			$query .= "toc.courseid='$cid'";
+			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				$gbcats[$row[0]] = $row[1];
+			}
 		}
 		if (isset($_POST['checked'])) {
 			$checked = $_POST['checked'];

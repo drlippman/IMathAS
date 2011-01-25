@@ -300,6 +300,15 @@
 				echo "</html></body>\n";
 				exit;
 			}
+			$query = "SELECT * FROM imas_tutors WHERE userid='$userid' AND courseid='{$_POST['cid']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			if (mysql_num_rows($result)>0) {
+				echo "<html><body>\n";
+				echo "You are a tutor for this course, and can't enroll as a student. ";
+				echo "Click on the course name on the <a href=\"index.php\">main page</a> to access the course\n";
+				echo "</html></body>\n";
+				exit;
+			}
 			$query = "SELECT * FROM imas_students WHERE userid='$userid' AND courseid='{$_POST['cid']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (mysql_num_rows($result)>0) {
