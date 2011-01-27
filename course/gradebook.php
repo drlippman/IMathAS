@@ -68,7 +68,8 @@ if ($canviewall) {
 	}
 	//Gbmode : Links NC Dates
 	$showpics = floor($gbmode/10000)%10 ; //0 none, 1 small, 2 big
-	$totonleft = floor($gbmode/1000)%10 ; //0 right, 1 left
+	$totonleft = ((floor($gbmode/1000)%10)&1) ; //0 right, 1 left
+	$avgontop = ((floor($gbmode/1000)%10)&2) ; //0 bottom, 2 top
 	$links = floor($gbmode/100)%10; //0: view/edit, 1 q breakdown
 	$hidenc = floor($gbmode/10)%10; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
 	$availshow = $gbmode%10; //0: past, 1 past&cur, 2 all
@@ -83,6 +84,7 @@ if ($canviewall) {
 	$availshow = 1;
 	$showpics = 0;
 	$totonleft = 0;
+	$avgontop = 0;
 }
 
 if ($canviewall && isset($_GET['stu'])) {
@@ -655,13 +657,17 @@ function gbstudisp($stu) {
 }
 
 function gbinstrdisp() {
-	global $hidenc,$showpics,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection;
+	global $hidenc,$showpics,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection,$avgontop;
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	if ($availshow==3) {
 		$availshow=1;
 		$hidepast = true;
 	}
 	$gbt = gbtable();
+	if ($avgontop) {
+		$avgrow = array_pop($gbt);
+		array_splice($gbt,1,0,array($avgrow));
+	}
 	//print_r($gbt);
 	//echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n"; in placeinhead
 	echo "<div id=\"tbl-container\">";

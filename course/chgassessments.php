@@ -269,6 +269,7 @@ if (!(isset($teacherid))) {
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	
 		$items = unserialize(mysql_result($result,0,0));
+		$gitypeids = array();
 		$ids = array();
 		$types = array();
 		$names = array();
@@ -395,7 +396,7 @@ function chkgrp(frm, arr, mark) {
 					$blockout = '';
 				}
 				echo '<li>';
-				echo "<input type=checkbox name='checked[]' value='{$ids[$i]}' id='{$parents[$i]}.{$ids[$i]}' checked=checked ";
+				echo "<input type=checkbox name='checked[]' value='{$gitypeids[$i]}' id='{$parents[$i]}.{$ids[$i]}' checked=checked ";
 				echo '/>';
 				$pos = strrpos($types[$i],'-');
 				if ($pos!==false) {

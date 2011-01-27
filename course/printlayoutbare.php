@@ -163,22 +163,28 @@ if ($overwriteBody==1) {
 	}
 	//add interlace output
 	//add prettyprint along with text-based output option
+	$seeds = array();
+	for ($j=0; $j<$copies; $j++) {	
+		$seeds[$j] = array();
+		if ($line['shuffle']&2) {  //set rand seeds
+			$seeds[$j] = array_fill(0,count($questions),rand(1,9999));	
+		} else {
+			for ($i = 0; $i<count($questions);$i++) {
+				$seeds[$j][] = rand(1,9999);
+			}
+		}
+	}
+	
 	for ($pt=0;$pt<$printtwice;$pt++) {
 		if ($pt==1) {
 			$sessiondata['mathdisp'] = 0;
+			echo $_POST['vsep'];
+		
 		}
 		
 		if ($_POST['format']=='trad') {
 			for ($j=0; $j<$copies; $j++) {	
 				if ($j>0) { echo $_POST['vsep'];}
-				$seeds = array();
-				if ($line['shuffle']&2) {  //set rand seeds
-					$seeds = array_fill(0,count($questions),rand(1,9999));	
-				} else {
-					for ($i = 0; $i<count($questions);$i++) {
-						$seeds[] = rand(1,9999);
-					}
-				}
 				
 				$headerleft = '';
 				$headerleft .= $line['name'];
@@ -200,7 +206,7 @@ if ($overwriteBody==1) {
 				
 				for ($i=0; $i<$numq; $i++) {
 					if ($i>0) { echo $_POST['qsep'];}
-					$sa[$j][$i] = printq($i,$qn[$questions[$i]],$seeds[$i],$points[$questions[$i]]);
+					$sa[$j][$i] = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]]);
 				}
 				
 			}
@@ -226,18 +232,7 @@ if ($overwriteBody==1) {
 				}
 			}
 		} else if ($_POST['format']=='inter') {
-			$seeds = array();
-			for ($j=0; $j<$copies; $j++) {	
-				if ($j>0) { echo $_POST['vsep'];}
-				$seeds[$j] = array();
-				if ($line['shuffle']&2) {  //set rand seeds
-					$seeds[$j] = array_fill(0,count($questions),rand(1,9999));	
-				} else {
-					for ($i = 0; $i<count($questions);$i++) {
-						$seeds[$j][] = rand(1,9999);
-					}
-				}
-			}
+			
 			$headerleft = '';
 			$headerleft .= $line['name'];
 			if ((isset($_POST['iname']) || isset($_POST['cname'])) && isset($_POST['aname'])) {

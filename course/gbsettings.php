@@ -76,7 +76,7 @@
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 		}
-		$defgbmode = $_POST['gbmode1'] + 10*$_POST['gbmode10'] + 100*$_POST['gbmode100'] + 1000*$_POST['gbmode1000'];
+		$defgbmode = $_POST['gbmode1'] + 10*$_POST['gbmode10'] + 100*$_POST['gbmode100'] + 1000*$_POST['gbmode1000'] + 1000*$_POST['gbmode1002'];
 		$query = "UPDATE imas_gbscheme SET useweights='$useweights',orderby='$orderby',usersort='$usersort',defaultcat='$defaultcat',defgbmode='$defgbmode' WHERE courseid='$cid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		if (isset($_POST['submit'])) {
@@ -152,7 +152,8 @@
 	$query = "SELECT useweights,orderby,defaultcat,defgbmode,usersort FROM imas_gbscheme WHERE courseid='$cid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	list($useweights,$orderby,$defaultcat,$defgbmode,$usersort) = mysql_fetch_row($result);
-	$totonleft = floor($defgbmode/1000)%10 ; //0 right, 1 left
+	$totonleft = ((floor($defgbmode/1000)%10)&1) ; //0 right, 1 left
+	$avgontop = ((floor($defgbmode/1000)%10)&2) ; //0 bottom, 1 top
 	$links = floor($defgbmode/100)%10; //0: view/edit, 1 q breakdown
 	$hidenc = floor($defgbmode/10)%10; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
 	$availshow = $defgbmode%10; //0: past, 1 past&cur, 2 all
@@ -204,6 +205,12 @@
 	<span class=formright>
 		<input type=radio name="gbmode1000" value="0" <?php writeHtmlChecked($totonleft,0);?>/> Right<br/>
 		<input type=radio name="gbmode1000" value="1" <?php writeHtmlChecked($totonleft,1);?>/> Left
+	</span><br class=form />
+	
+	<span class=form>Average row shows on:</span>
+	<span class=formright>
+		<input type=radio name="gbmode1002" value="0" <?php writeHtmlChecked($avgontop,0);?>/> Bottom<br/>
+		<input type=radio name="gbmode1002" value="2" <?php writeHtmlChecked($avgontop,2);?>/> Top
 	</span><br class=form />
 	
 <?php	
