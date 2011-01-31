@@ -1290,7 +1290,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
 		if (isset($options['reqdecimals'])) {if (is_array($options['reqdecimals'])) {$reqdecimals = $options['reqdecimals'][$qn];} else {$reqdecimals = $options['reqdecimals'];}}
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
+		if (isset($options['variables'])) {if (is_array($options['variables'])) {$variables = $options['variables'][$qn];} else {$variables = $options['variables'];}}
 		if (!isset($answerformat)) { $answerformat = '';}
+		if (!isset($variables)) { $variables = 'x';}
 		$ansformats = explode(',',$answerformat);
 		
 		if (!isset($sz)) { $sz = 20;}
@@ -1298,8 +1300,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		
 		if (in_array('inequality',$ansformats)) {
-			$tip = "Enter your answer using inequality notation.  Example: 3 <= x < 4 <br/>";
-			$tip .= "Use or to combine intervals.  Example: x < 2 or x >= 3<br/>";
+			$tip = "Enter your answer using inequality notation.  Example: 3 <= $variables < 4 <br/>";
+			$tip .= "Use or to combine intervals.  Example: $variables < 2 or $variables >= 3<br/>";
+			$tip .= "Enter <i>all real numbers</i> for solutions of that type<br/>";
 			$shorttip = 'Enter an interval using inequalities';
 		} else {
 			$tip = "Enter your answer using interval notation.  Example: [2.1,5.6) <br/>";
@@ -1331,7 +1334,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		
 		if (isset($answer)) {
 			if (in_array('inequality',$ansformats)) {
-				$sa = '`'.intervaltoineq($answer,'x').'`';
+				$sa = '`'.intervaltoineq($answer,$variables).'`';
 			} else {
 				$sa = '`'.str_replace('U','uu',$answer).'`';
 			}

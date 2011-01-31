@@ -158,7 +158,7 @@ if ($canviewall) {
 		$placeinhead .= "}\n";
 	}
 	$placeinhead .= 'function chgtoggle() { ';
-	$placeinhead .= "	var altgbmode = 10000*document.getElementById(\"toggle4\").value + 1000*$totonleft + 100*document.getElementById(\"toggle1\").value + 10*document.getElementById(\"toggle2\").value + 1*document.getElementById(\"toggle3\").value; ";
+	$placeinhead .= "	var altgbmode = 10000*document.getElementById(\"toggle4\").value + 1000*($totonleft+$avgontop) + 100*document.getElementById(\"toggle1\").value + 10*document.getElementById(\"toggle2\").value + 1*document.getElementById(\"toggle3\").value; ";
 	$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid&gbmode=";
 	$placeinhead .= "	var toopen = '$address' + altgbmode;\n";
 	$placeinhead .= "  	window.location = toopen; \n";
@@ -246,7 +246,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	require("../footer.php");
 	
 } else { //show instructor view
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js?v=012811\"></script>\n";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablescroller.js\"></script>\n";
 	$placeinhead .= "<script type=\"text/javascript\">\n";
 	$placeinhead .= 'var ts = new tablescroller("myTable",';
@@ -1043,7 +1043,11 @@ function gbinstrdisp() {
 	
 	$sarr = implode(",",$sarr);
 	if (count($gbt)<500) {
-		echo "<script>initSortTable('myTable',Array($sarr),true,false);</script>\n";
+		if ($avgontop) {
+			echo "<script>initSortTable('myTable',Array($sarr),true,true,false);</script>\n";
+		} else {
+			echo "<script>initSortTable('myTable',Array($sarr),true,false);</script>\n";
+		}
 	}
 		
 	

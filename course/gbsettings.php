@@ -153,7 +153,7 @@
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	list($useweights,$orderby,$defaultcat,$defgbmode,$usersort) = mysql_fetch_row($result);
 	$totonleft = ((floor($defgbmode/1000)%10)&1) ; //0 right, 1 left
-	$avgontop = ((floor($defgbmode/1000)%10)&2) ; //0 bottom, 1 top
+	$avgontop = ((floor($defgbmode/1000)%10)&2) ; //0 bottom, 2 top
 	$links = floor($defgbmode/100)%10; //0: view/edit, 1 q breakdown
 	$hidenc = floor($defgbmode/10)%10; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
 	$availshow = $defgbmode%10; //0: past, 1 past&cur, 2 all

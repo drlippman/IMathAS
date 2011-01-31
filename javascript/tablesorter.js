@@ -21,6 +21,7 @@
 	var evenodd = false;
 	var dosortlast = true;
 	var skiplast = 0;
+	var skipfirst = 0;
 	
 	function sortNumeric(a,b){
 		try {
@@ -131,8 +132,12 @@
 		
 		var cellArray = new Array();
 		var cellObjArray = new Array();
+		var cellStartObjArray = new Array();
 		var cellEndObjArray = new Array();
-		for(var no=1;no<tableObj.rows.length-skiplast;no++){
+		for (var no=1; no<1+skipfirst; no++) {
+			cellStartObjArray.push(tableObj.rows[no].cells[indexThis]);
+		}
+		for(var no=1+skipfirst;no<tableObj.rows.length-skiplast;no++){
 			var content= tableObj.rows[no].cells[indexThis].innerHTML+'';
 			cellArray.push(content);
 			cellObjArray.push(tableObj.rows[no].cells[indexThis]);
@@ -149,6 +154,11 @@
 			cellArray = cellArray.sort(sortString);
 		}
 		
+		if (skipfirst>0) {
+			for (var no=0; no<skipfirst; no++) {
+				tBody.appendChild(cellStartObjArray[no].parentNode);
+			}
+		}
 		if(direction=='descending'){
 			for(var no=cellArray.length;no>=0;no--){
 				for(var no2=0;no2<cellObjArray.length;no2++){
@@ -196,7 +206,7 @@
 	}
 	//sortlast:  true to sort last, false to not sort last, -n to not
 	//sort last n rows.  undef sorts all
-	function initSortTable(objId,sortArray,switchit,sortlast)
+	function initSortTable(objId,sortArray,switchit,sortlast,sortfirst)
 	{
 		var obj = document.getElementById(objId);
 		obj.setAttribute('tableIndex',tableWidget_tableCounter);
@@ -228,6 +238,13 @@
 			skiplast = 0;
 		} else if (sortlast<0) {
 			skiplast = -1*sortlast;
+		}
+		if (sortfirst==false) {
+			skipfirst = 1;
+		} else if (sortfirst==true) {
+			skipfirst = 0;
+		} else if (sortfirst<0) {
+			skipfirst = -1*sortfirst;
 		}
 	}
 
