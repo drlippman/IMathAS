@@ -3581,7 +3581,7 @@ function parsecomplex($v) {
 					if ($v{$p-1}!='+' && $v{$p-1}!='-') {
 						return 'error - invalid form';
 					}
-					$imag = $v{$p-1}.substr($v,$p+1,$R-$p-1);
+					$imag = $v{$p-1}.substr($v,$p+1+($v{$p+1}=='*'?1:0),$R-$p-1);
 					$real = substr($v,0,$p-1) . substr($v,$R);
 				} else {
 					$imag = substr($v,$p+1,$R-$p-1);
@@ -3606,6 +3606,9 @@ function parsecomplex($v) {
 				$imag = '1'.$imag;
 			} else if (($imag{0}=='+' || $imag{0}=='-') && $imag{1}=='/') {
 				$imag = $imag{0}.'1'.substr($imag,1);
+			}
+			if (substr($imag,-1)=='*') {
+				$imag = substr($imag,0,-1);
 			}
 		}
 		return array($real,$imag);

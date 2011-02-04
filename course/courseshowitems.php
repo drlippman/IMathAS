@@ -1325,18 +1325,20 @@ function enditem($canedit) {
    function getpts($scs) {
 	$tot = 0;
   	foreach(explode(',',$scs) as $sc) {
+		$qtot = 0;
 		if (strpos($sc,'~')===false) {
 			if ($sc>0) { 
-				$tot += $sc;
+				$qtot = $sc;
 			} 
 		} else {
 			$sc = explode('~',$sc);
 			foreach ($sc as $s) {
 				if ($s>0) { 
-					$tot+=$s;
+					$qtot+=$s;
 				}
 			}
 		}
+		$tot += round($qtot,1);
 	}
 	return $tot;
    }
