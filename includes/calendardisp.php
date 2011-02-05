@@ -17,18 +17,18 @@ if (isset($_GET['calpageshift'])) {
 }
 $today = $today + $pageshift*28*24*60*60;
 
-$dayofweek = date('w',$today);
-$dayofmo = date('j',$today);
-$curmo = date('M',$today);
-$longcurmo = date('F',$today);
-$curyr = date('Y',$today);
-$curmonum = date('n',$today);
-$daysinmo = date('t',$today);
-$lastmo = date('M',$today - ($dayofmo+2)*24*60*60);
-$lastmonum = date('n',$today - ($dayofmo+2)*24*60*60);
-$daysinlastmo = date('t',$today - ($dayofmo+2)*24*60*60);
-$nextmo = date('M',$today + ($daysinmo-$dayofmo+2)*24*60*60);
-$nextmonum = date('n',$today + ($daysinmo-$dayofmo+2)*24*60*60);
+$dayofweek = tzdate('w',$today);
+$dayofmo = tzdate('j',$today);
+$curmo = tzdate('M',$today);
+$longcurmo = tzdate('F',$today);
+$curyr = tzdate('Y',$today);
+$curmonum = tzdate('n',$today);
+$daysinmo = tzdate('t',$today);
+$lastmo = tzdate('M',$today - ($dayofmo+2)*24*60*60);
+$lastmonum = tzdate('n',$today - ($dayofmo+2)*24*60*60);
+$daysinlastmo = tzdate('t',$today - ($dayofmo+2)*24*60*60);
+$nextmo = tzdate('M',$today + ($daysinmo-$dayofmo+2)*24*60*60);
+$nextmonum = tzdate('n',$today + ($daysinmo-$dayofmo+2)*24*60*60);
 
 $hdrs = array();
 $ids = array();
@@ -52,7 +52,7 @@ for ($i=0;$i<$dayofweek;$i++) {
 			$ids[0][$i] = $curmonum.'-'.$curday;
 		}
 	}
-	$dates[$ids[0][$i]] = date('l F j, Y',$today - ($dayofweek - $i)*24*60*60);
+	$dates[$ids[0][$i]] = tzdate('l F j, Y',$today - ($dayofweek - $i)*24*60*60);
 }
 
 for ($i=$dayofweek;$i<28;$i++) {
@@ -74,7 +74,7 @@ for ($i=$dayofweek;$i<28;$i++) {
 		}
 		$ids[$row][$col] = $curmonum.'-'.$curday;
 	}
-	$dates[$ids[$row][$col]] = date('l F j, Y',$today + ($i-$dayofweek)*24*60*60);
+	$dates[$ids[$row][$col]] = tzdate('l F j, Y',$today + ($i-$dayofweek)*24*60*60);
 }
 
 ?>
@@ -162,7 +162,7 @@ while ($row = mysql_fetch_row($result)) {
 		   }
 	}
 	if ($row[4]<$uppertime && $row[4]>0 && $now>$row[3]) { //has review, and we're past enddate
-		list($moday,$time) = explode('~',date('n-j~g:i a',$row[4]));
+		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[4]));
 		$row[1] = str_replace('"','\"',$row[1]);
 		$tag = $row[11];
 		if ($now<$row[4]) { $colors[$k] = '#99f';} else {$colors[$k] = '#ccc';}
@@ -187,7 +187,7 @@ while ($row = mysql_fetch_row($result)) {
 			$lp = 0;
 		}
 		$tags[$k] = $tag;
-		list($moday,$time) = explode('~',date('n-j~g:i a',$row[3]));
+		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[3]));
 		$row[1] = str_replace('"','\"',$row[1]);
 		$colors[$k] = makecolor2($row[2],$row[3],$now);
 		$assess[$moday][$k] = "{type:\"A\", time:\"$time\", ";
@@ -208,9 +208,9 @@ while ($row = mysql_fetch_row($result)) {
 		$row[1] = strip_tags( $row[3]);
 	}
 	if ($row[5]==1) {
-		list($moday,$time) = explode('~',date('n-j~g:i a',$row[4]));
+		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[4]));
 	} else {
-		list($moday,$time) = explode('~',date('n-j~g:i a',$row[2]));
+		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[2]));
 	}
 	$row[1] = str_replace('"','\"',$row[1]);
 	$colors[$k] = makecolor2($row[4],$row[2],$now);
@@ -230,9 +230,9 @@ while ($row = mysql_fetch_row($result)) {
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 while ($row = mysql_fetch_row($result)) {
 	if ($row[5]==1) {
-		list($moday,$time) = explode('~',date('n-j~g:i a',$row[4]));
+		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[4]));
 	} else {
-		list($moday,$time) = explode('~',date('n-j~g:i a',$row[2]));
+		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[2]));
 	}
 	$row[1] = str_replace('"','\"',$row[1]);
 	 if ((substr($row[3],0,4)=="http") && (strpos($row[3]," ")===false)) { //is a web link
@@ -262,7 +262,7 @@ while ($row = mysql_fetch_row($result)) {
 		continue;
 	}
 	if ($row[2]!=2000000000) { //($row[2]>$now || isset($teacherid))
-		list($moday,$time) = explode('~',date('n-j~g:i a',$row[2]));
+		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[2]));
 		$row[1] = str_replace('"','\"',$row[1]);
 		$colors[$k] = makecolor2($row[4],$row[2],$now);
 		$assess[$moday][$k] = "{type:\"FP\", time:\"$time\", ";
@@ -273,7 +273,7 @@ while ($row = mysql_fetch_row($result)) {
 		$k++;
 	}
 	if ($row[3]!=2000000000) { //($row[3]>$now || isset($teacherid)) 
-		list($moday,$time) = explode('~',date('n-j~g:i a',$row[3]));
+		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[3]));
 		$colors[$k] = makecolor2($row[4],$row[3],$now);
 		$assess[$moday][$k] = "{type:\"FR\", time:\"$time\",";
 		if ($row[3]>$now || isset($teacherid)) {
@@ -287,7 +287,7 @@ while ($row = mysql_fetch_row($result)) {
 $query = "SELECT title,tag,date FROM imas_calitems WHERE date>$exlowertime AND date<$uppertime and courseid='$cid' ORDER BY title";
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 while ($row = mysql_fetch_row($result)) {
-	list($moday,$time) = explode('~',date('n-j~g:i a',$row[2]));
+	list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[2]));
 	$row[0] = str_replace('"','\"',$row[0]);
 	$assess[$moday][$k] = "{type:\"C\", time:\"$time\", tag:\"$row[1]\", name:\"$row[0]\"}";
 	$tags[$k] = $row[1];
