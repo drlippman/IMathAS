@@ -18,6 +18,12 @@ isread:
 4 - deleted by sender
 5 - deleted by sender,read
 
+isread is bitwise:
+1      2         4                   8
+Read   Deleted   Deleted by Sender   Tagged
+
+If (isread&2)==2 && (isread&4)==4  then should be deleted
+  
 	*/
 	require("../validate.php");
 	if ($cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
@@ -39,6 +45,11 @@ isread:
 		$page = 1;
 	} else {
 		$page = $_GET['page'];
+	}
+	if ($page==-2) {
+		$limittotagged = 1;
+	} else {
+		$limittotagged = 0;
 	}
 	if (isset($_GET['filtercid'])) {
 		$filtercid = $_GET['filtercid'];
@@ -227,34 +238,37 @@ isread:
 	if (isset($_POST['unread'])) {
 		if (count($_POST['checked'])>0) {
 		$checklist = "'".implode("','",$_POST['checked'])."'";
-		$query = "UPDATE imas_msgs SET isread=isread-1 WHERE id IN ($checklist) AND (isread=1 OR isread=5)";
+		$query = "UPDATE imas_msgs SET isread=(isread&~1) WHERE id IN ($checklist) AND (isread&1)=1";
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
 	}
 	}
 	if (isset($_POST['markread'])) {
 		if (count($_POST['checked'])>0) {
 		$checklist = "'".implode("','",$_POST['checked'])."'";
-		$query = "UPDATE imas_msgs SET isread=isread+1 WHERE id IN ($checklist) AND (isread=0 OR isread=4)";
+		$query = "UPDATE imas_msgs SET isread=(isread|1) WHERE id IN ($checklist) AND (isread&1)=0";
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
 	}
 	}
 	if (isset($_POST['remove'])) {
 		if (count($_POST['checked'])>0) {
 		$checklist = "'".implode("','",$_POST['checked'])."'";
-		$query = "DELETE FROM imas_msgs WHERE id IN ($checklist) AND isread>1";
+		$query = "DELETE FROM imas_msgs WHERE id IN ($checklist) AND (isread&4)=4";
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
-		$query = "UPDATE imas_msgs SET isread=isread+2 WHERE id IN ($checklist) AND isread<2";
+		$query = "UPDATE imas_msgs SET isread=(isread|2) WHERE id IN ($checklist)";
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
 	}
 	}
 	if (isset($_GET['removeid'])) {
-		$query = "DELETE FROM imas_msgs WHERE id='{$_GET['removeid']}' AND isread>1";
+		$query = "DELETE FROM imas_msgs WHERE id='{$_GET['removeid']}' AND (isread&4)=4";
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
-		$query = "UPDATE imas_msgs SET isread=isread+2 WHERE id='{$_GET['removeid']}' AND isread<2";
+		$query = "UPDATE imas_msgs SET isread=(isread|2) WHERE id='{$_GET['removeid']}'";
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
 	}
 	
 	$pagetitle = "Messages";
+	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/msg.js\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = 'http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savetagged.php?cid=$cid';</script>";
+	$placeinhead .= '<style type="text/css"> tr.tagged {background-color: #dff;}</style>';
 	require("../header.php");
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	
@@ -265,12 +279,15 @@ isread:
 	echo "&gt; Message List</div>";
 	echo '<div id="headermsglist" class="pagetitle"><h2>Messages</h2></div>';
 
-	$query = "SELECT COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND (isread<2 OR isread>3)";
+	$query = "SELECT COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND (isread&2)=0";
 	if ($filtercid>0) {
 		$query .= " AND courseid='$filtercid'";
 	}
 	if ($filteruid>0) {
 		$query .= " AND msgfrom='$filteruid'";
+	}
+	if ($limittotagged==1) {
+		$query .= " AND (isread&8)=8";
 	}
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$numpages = ceil(mysql_result($result,0,0)/$threadsperpage);
@@ -278,15 +295,18 @@ isread:
 		//might have changed filtercid w/o changing user.
 		//we'll open up to all users then
 		$filteruid = 0;	
-		$query = "SELECT COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND (isread<2 OR isread>3)";
+		$query = "SELECT COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND (isread&2)=0";
 		if ($filtercid>0) {
 			$query .= " AND courseid='$filtercid'";
+		}
+		if ($limittotagged==1) {
+			$query .= " AND (isread&8)=8";
 		}
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$numpages = ceil(mysql_result($result,0,0)/$threadsperpage);
 	}
 	$prevnext = '';
-	if ($numpages > 1) {
+	if ($numpages > 1 && !$limittotagged) {
 		$prevnext .= "Page: ";
 		if ($page < $numpages/2) {
 			$min = max(2,$page-4);
@@ -339,8 +359,15 @@ isread:
 			$cansendmsgs = true;
 		}
 	}	
+	if ($page==-2) {
+		$limitmsg = "<a href=\"msglist.php?page=1&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">Show All</a>";
+	} else {
+		$limitmsg = "<a href=\"msglist.php?page=-2&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">Limit to Tagged</a>";
+	}
 	if ($cansendmsgs) {
-		echo "<a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid&add=new\">Send New Message</a>\n";
+		echo "<p><a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid&add=new\">Send New Message</a> | $limitmsg</p>\n";
+	} else {
+		echo "<p>$limitmsg</p>\n";
 	}
 ?>
 <script type="text/javascript">
@@ -348,31 +375,6 @@ function chgfilter() {
 	var filtercid = document.getElementById("filtercid").value;
 	var filteruid = document.getElementById("filteruid").value;
 	window.location = "<?php echo $address;?>"+filtercid+"&filteruid="+filteruid;
-}
-var picsize = 0;
-function rotatepics() {
-	picsize = (picsize+1)%3;
-	picshow(picsize);
-}
-function picshow(size) {
-	if (size==0) {
-		els = document.getElementById("myTable").getElementsByTagName("img");
-		for (var i=0; i<els.length; i++) {
-			els[i].style.display = "none";
-		}
-	} else {
-		els = document.getElementById("myTable").getElementsByTagName("img");
-		for (var i=0; i<els.length; i++) {
-			els[i].style.display = "inline";
-			if (els[i].getAttribute("src").match("userimg_sm")) {
-				if (size==2) {
-					els[i].setAttribute("src",els[i].getAttribute("src").replace("_sm","_"));
-				}
-			} else if (size==1) {
-				els[i].setAttribute("src",els[i].getAttribute("src").replace("_","_sm"));
-			}
-		}
-	}
 }
 </script>	
 	<form id="qform" method=post action="msglist.php?page=<?php echo $page;?>&cid=<?php echo $cid;?>">
@@ -424,23 +426,28 @@ function picshow(size) {
 			
 	<table class=gb id="myTable">
 	<thead>
-	<tr><th></th><th>Message</th><th>Replied</th><th></th><th>From</th><th>Course</th><th>Sent</th></tr>
+	<tr><th></th><th>Message</th><th>Replied</th><th></th><th>Flag</th><th>From</th><th>Course</th><th>Sent</th></tr>
 	</thead>
 	<tbody>
 <?php
 	$query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_users.LastName,imas_users.FirstName,imas_msgs.isread,imas_courses.name,imas_msgs.msgfrom ";
 	$query .= "FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom LEFT JOIN imas_courses ON imas_courses.id=imas_msgs.courseid WHERE ";
-	$query .= "imas_msgs.msgto='$userid' AND (imas_msgs.isread<2 OR imas_msgs.isread>3) ";
+	$query .= "imas_msgs.msgto='$userid' AND (imas_msgs.isread&2)=0 ";
 	if ($filteruid>0) {
 		$query .= "AND imas_msgs.msgfrom='$filteruid' ";
 	} 
 	if ($filtercid>0) {
 		$query .= "AND imas_msgs.courseid='$filtercid' ";
 	}
+	if ($limittotagged) {
+		$query .= "AND (imas_msgs.isread&8)=8 ";
+	}
 
 	$query .= "ORDER BY senddate DESC ";
 	$offset = ($page-1)*$threadsperpage;
-	$query .= "LIMIT $offset,$threadsperpage";// OFFSET $offset"; 
+	if (!$limittotagged) {
+		$query .= "LIMIT $offset,$threadsperpage";// OFFSET $offset";
+	}
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	if (mysql_num_rows($result)==0) {
 		echo "<tr><td></td><td>No messages</td><td></td></tr>";
@@ -459,9 +466,13 @@ function picshow(size) {
 		} else if ($n>1) {
 			$line['title'] = "Re<sup>$n</sup>: ".$line['title'];
 		}
-		echo "<tr><td><input type=checkbox name=\"checked[]\" value=\"{$line['id']}\"/></td><td>";
+		echo "<tr id=\"tr{$line['id']}\" ";
+		if (($line['isread']&8)==8) {
+			echo 'class="tagged" ';
+		}
+		echo "><td><input type=checkbox name=\"checked[]\" value=\"{$line['id']}\"/></td><td>";
 		echo "<a href=\"viewmsg.php?page$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid&type=msg&msgid={$line['id']}\">";
-		if ($line['isread']==0 || $line['isread']==4) {
+		if (($line['isread']&1)==0) {
 			echo "<b>{$line['title']}</b>";
 		} else {
 			echo $line['title'];
@@ -474,10 +485,20 @@ function picshow(size) {
 			$line['LastName'] = "[Deleted]";
 		}
 		echo '</td><td>';
+		
 		if (file_exists("$curdir/../course/files/userimg_sm{$line['msgfrom']}.jpg")) {
-			echo "<img src=\"$imasroot/course/files/userimg_sm{$line['msgfrom']}.jpg\" style=\"display:none;\"  />";
+			echo "<img src=\"$imasroot/course/files/userimg_sm{$line['msgfrom']}.jpg\" style=\"display:none;\" class=\"userpic\"  />";
 		} 
-		echo "</td><td>{$line['LastName']}, {$line['FirstName']}</td>";
+		echo "</td><td>";
+		if (($line['isread']&8)==8) {
+			echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged({$line['id']});return false;\" />";
+		} else {
+			echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggletagged({$line['id']});return false;\" />";
+		}
+		echo '</td>';
+		echo "<td>{$line['LastName']}, {$line['FirstName']}</td>";
+		
+		
 		if ($line['name']==null) {
 			$line['name'] = "[Deleted]";
 		}
@@ -494,7 +515,9 @@ function picshow(size) {
 		echo "<p>$prevnext</p>";
 	}
 	if ($cansendmsgs) {
-		echo "<p><a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid&add=new\">Send New Message</a></p>\n";
+		echo "<p><a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid&add=new\">Send New Message</a> | $limitmsg</p>\n";
+	} else {
+		echo "<p>$limitmsg</p>\n";
 	}
 	echo "<p><a href=\"sentlist.php?cid=$cid\">Sent Messages</a></p>";
 	

@@ -21,20 +21,20 @@
 	
 	if (isset($_POST['read'])) {
 		$checklist = "'".implode("','",$_POST['checked'])."'";
-		$query = "UPDATE imas_msgs SET isread=isread+1 WHERE id IN ($checklist) AND (isread=0 OR isread=4)";
+		$query = "UPDATE imas_msgs SET isread=(isread|1) WHERE id IN ($checklist) AND (isread&1)=0";
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
 	}
 	if (isset($_POST['remove'])) {
 		$checklist = "'".implode("','",$_POST['checked'])."'";
-		$query = "DELETE FROM imas_msgs WHERE id IN ($checklist) AND isread>1";
+		$query = "DELETE FROM imas_msgs WHERE id IN ($checklist) AND (isread&4)=4";
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
-		$query = "UPDATE imas_msgs SET isread=isread+2 WHERE id IN ($checklist) AND isread<2";
+		$query = "UPDATE imas_msgs SET isread=(isread|2) WHERE id IN ($checklist)";
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
 	}
 	if (isset($_GET['removeid'])) {
-		$query = "DELETE FROM imas_msgs WHERE id='{$_GET['removeid']}' AND isread>1";
+		$query = "DELETE FROM imas_msgs WHERE id='{$_GET['removeid']}' AND (isread&4)=4";
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
-		$query = "UPDATE imas_msgs SET isread=isread+2 WHERE id='{$_GET['removeid']}' AND isread<2";
+		$query = "UPDATE imas_msgs SET isread=(isread|2) WHERE id='{$_GET['removeid']}'";
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
 	}
 	
@@ -59,7 +59,7 @@
 <?php
 	$query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_users.LastName,imas_users.FirstName,imas_msgs.isread,imas_courses.name ";
 	$query .= "FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom LEFT JOIN imas_courses ON imas_courses.id=imas_msgs.courseid WHERE ";
-	$query .= "imas_msgs.msgto='$userid' AND (imas_msgs.isread=0 OR imas_msgs.isread=4)";
+	$query .= "imas_msgs.msgto='$userid' AND (imas_msgs.isread&5)=0 ";
 	$query .= "ORDER BY imas_courses.name, senddate DESC ";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	if (mysql_num_rows($result)==0) {
@@ -90,7 +90,7 @@
 			}
 			echo "<tr><td><input type=checkbox name=\"checked[]\" value=\"{$line['id']}\"/></td><td>";
 			echo "<a href=\"viewmsg.php?page$page&cid=$cid&filtercid=$filtercid&type=new&msgid={$line['id']}\">";
-			if ($line['isread']==0 || $line['isread']==4) {
+			if (($line['isread']&1)==0) {
 				echo "<b>{$line['title']}</b>";
 			} else {
 				echo $line['title'];

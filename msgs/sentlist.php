@@ -52,18 +52,21 @@ isread:
 4 - deleted by sender
 5 - deleted by sender,read
 
+isread is bitwise:
+1      2         4                   8
+Read   Deleted   Deleted by Sender   Tagged
 	*/
 	if (isset($_POST['remove'])) {
 		$checklist = "'".implode("','",$_POST['checked'])."'";
-		$query = "DELETE FROM imas_msgs WHERE id IN ($checklist) AND isread>1";
+		$query = "DELETE FROM imas_msgs WHERE id IN ($checklist) AND (isread&2)=2";
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
-		$query = "UPDATE imas_msgs SET isread=isread+4 WHERE id IN ($checklist) AND isread<2";
+		$query = "UPDATE imas_msgs SET isread=(isread|4) WHERE id IN ($checklist)";
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
 	}
 	if (isset($_GET['removeid'])) {
-		$query = "DELETE FROM imas_msgs WHERE id='{$_GET['removeid']}' AND isread>1";
+		$query = "DELETE FROM imas_msgs WHERE id='{$_GET['removeid']}' AND (isread&2)=2";
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
-		$query = "UPDATE imas_msgs SET isread=isread+4 WHERE id='{$_GET['removeid']}' AND isread<2";
+		$query = "UPDATE imas_msgs SET isread=(isread|4) WHERE id='{$_GET['removeid']}'";
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
 	}
 	
@@ -77,7 +80,7 @@ isread:
 	echo "&gt; Sent Message List</div>";
 	echo '<div id="headersentlist" class="pagetitle"><h2>Sent Messages</h2></div>';
 
-	$query = "SELECT COUNT(id) FROM imas_msgs WHERE msgfrom='$userid' AND isread<4";
+	$query = "SELECT COUNT(id) FROM imas_msgs WHERE msgfrom='$userid' AND (isread&4)=0";
 	if ($filtercid>0) {
 		$query .= " AND courseid='$filtercid'";
 	}
@@ -90,7 +93,7 @@ isread:
 		//might have changed filtercid w/o changing user.
 		//we'll open up to all users then
 		$filteruid = 0;	
-		$query = "SELECT COUNT(id) FROM imas_msgs WHERE msgfrom='$userid' AND isread<4";
+		$query = "SELECT COUNT(id) FROM imas_msgs WHERE msgfrom='$userid' AND (isread&4)=0";
 		if ($filtercid>0) {
 			$query .= " AND courseid='$filtercid'";
 		}
@@ -200,7 +203,7 @@ function chgfilter() {
 	<tbody>
 <?php
 	$query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_users.LastName,imas_users.FirstName,imas_msgs.isread FROM imas_msgs,imas_users ";
-	$query .= "WHERE imas_users.id=imas_msgs.msgto AND imas_msgs.msgfrom='$userid' AND imas_msgs.isread<4 ";
+	$query .= "WHERE imas_users.id=imas_msgs.msgto AND imas_msgs.msgfrom='$userid' AND (imas_msgs.isread&4)=0 ";
 	if ($filtercid>0) {
 		$query .= "AND imas_msgs.courseid='$filtercid' ";
 	}
@@ -233,7 +236,7 @@ function chgfilter() {
 		echo $line['title'];
 		echo "</a></td>";
 		echo "<td>{$line['LastName']}, {$line['FirstName']}</td>";
-		if ($line['isread']==1 || $line['isread']==3) {
+		if (($line['isread']&1)==1) {
 			echo "<td>Yes</td>";
 		} else {
 			echo "<td>No</td>";
