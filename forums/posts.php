@@ -151,7 +151,11 @@
 		$message[$line['id']] = $line['message'];
 		$posttype[$line['id']] = $line['posttype'];
 		$ownerid[$line['id']] = $line['userid'];
-		$points[$line['id']] = 1*$line['points'];
+		if ($line['points']!==null) {
+			$points[$line['id']] = 1*$line['points'];
+		} else {
+			$points[$line['id']] = $line['points'];
+		}
 		if ($line['isanon']==1) {
 			$poster[$line['id']] = "Anonymous";
 			$ownerid[$line['id']] = 0;
@@ -395,11 +399,11 @@
 				if ($haspoints) {
 					if ($isteacher) {
 						echo "<input type=text size=2 name=\"score[$child]\" value=\"";
-						if ($points[$child]!=null) {
+						if ($points[$child]!==null) {
 							echo $points[$child];
 						}
 						echo "\"/> Pts. ";
-					} else if ($ownerid[$child]==$userid && $points[$child]!=null) {
+					} else if ($ownerid[$child]==$userid && $points[$child]!==null) {
 						echo "<span class=red>{$points[$child]} points</span> ";
 					}
 				}

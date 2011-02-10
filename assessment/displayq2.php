@@ -671,7 +671,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (isset($answers)) {
 			$akeys = explode(',',$answers);
 			foreach($akeys as $akey) {
-				$sa .= $questions[$akey]." ";
+				$sa .= '<br/>'.$questions[$akey];
 			}
 		}
 	} else if ($anstype == "matching") {
