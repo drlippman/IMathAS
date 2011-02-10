@@ -684,7 +684,7 @@ if ($myrights<20) {
 		*/
 		
 		$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.ownerid,imas_questionset.description,imas_questionset.userights,imas_questionset.lastmoddate,";
-		$query .= "imas_questionset.qtype,imas_users.firstName,imas_users.lastName,imas_users.groupid,imas_library_items.libid ";
+		$query .= "imas_questionset.qtype,imas_users.firstName,imas_users.lastName,imas_users.groupid,imas_library_items.libid,imas_library_items.junkflag, imas_library_items.id AS libitemid ";
 		$query .= "FROM imas_questionset,imas_library_items,imas_users WHERE $searchlikes ";
 		$query .= "imas_library_items.qsetid=imas_questionset.id AND imas_questionset.ownerid=imas_users.id ";
 		
@@ -714,7 +714,7 @@ if ($myrights<20) {
 				$query .= " AND imas_questionset.ownerid='$userid'";
 			}
 		}
-		$query.= " ORDER BY imas_library_items.libid,imas_questionset.id LIMIT 500";
+		$query.= " ORDER BY imas_library_items.libid,imas_library_items.junkflag,imas_questionset.id LIMIT 500";
 		$resultLibs = mysql_query($query) or die("Query failed : " . mysql_error());
 		
 		$page_questionTable = array();
@@ -750,6 +750,9 @@ if ($myrights<20) {
 			$page_questionTable[$i]['type'] = $line['qtype'];
 			if ($searchall==1) {
 				$page_questionTable[$i]['lib'] = "<a href=\"manageqset.php?cid=$cid&listlib={$line['libid']}\">List lib</a>";
+			} else {
+				$page_questionTable[$i]['junkflag'] = $line['junkflag'];	
+				$page_questionTable[$i]['libitemid'] = $line['libitemid'];
 			}
 			$page_questionTable[$i]['times'] = 0;
 			
@@ -810,6 +813,9 @@ if ($myrights<20) {
 }
 
 /******* begin html output ********/
+$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/junkflag.js\"></script>";
+$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = 'http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savelibassignflag.php';</script>";
+	
 require("../header.php");
 
 $address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
@@ -1024,7 +1030,7 @@ function getnextprev(formn,loc) {
 
 		echo "In Libraries: <span id=\"libnames\">$lnames</span><input type=hidden name=\"libs\" id=\"libs\"  value=\"$searchlibs\">\n";
 		//echo " <input type=button value=\"Select Libraries\" onClick=\"libselect()\"> <br>"; 
-		echo '<input type="button" value="Select Libraries" onClick="GB_show(\'Library Select\',\'libtree2.php?libtree=popup&libs=\'+curlibs,500,500)" /> <br>';
+		echo '<input type="button" value="Select Libraries" onClick="GB_show(\'Library Select\',\'libtree2.php?cid='.$cid.'&libtree=popup&libs=\'+curlibs,500,500)" /> <br>';
 		
 		echo "Search: <input type=text size=15 name=search value=\"$search\"> <input type=checkbox name=\"searchall\" value=\"1\" ";
 		if ($searchall==1) {echo "checked=1";}
@@ -1056,6 +1062,8 @@ function getnextprev(formn,loc) {
 		if ($isadmin || $isgrpadmin) { echo "<th>Owner</th>";} else {echo "<th>Mine</th>";}
 		if ($searchall==1) {
 			echo "<th>Library</th>";
+		} else if ($searchall==0) {
+			echo '<th><span onmouseover="tipshow(this,\'Flag a question if it is in the wrong library\')" onmouseout="tipout()">Wrong Lib</span></th>';
 		}
 		echo "</tr>\n";
 		echo "</thead><tbody>\n";
@@ -1082,7 +1090,13 @@ function getnextprev(formn,loc) {
 				echo '<td class="c">'.$page_questionTable[$qid]['mine'].'</td>';
 				if ($searchall==1) {
 					echo '<td>'.$page_questionTable[$qid]['lib'].'</td>';
-				}
+				} else if ($searchall==0) {
+					if ($page_questionTable[$qid]['junkflag']==1) {
+						echo "<td class=c><img class=\"pointer\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" /></td>";
+					} else {
+						echo "<td class=c><img class=\"pointer\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" /></td>";
+					}
+				} 
 				$ln++;
 			}
 		}
