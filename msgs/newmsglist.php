@@ -2,6 +2,10 @@
 	//Displays New Message list
 	//(c) 2009 David Lippman
 	
+	//isread is bitwise:
+	//1      2         4                   8
+	//Read   Deleted   Deleted by Sender   Tagged
+	
 	require("../validate.php");
 	if ($cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 	   require("../header.php");
@@ -59,7 +63,7 @@
 <?php
 	$query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_users.LastName,imas_users.FirstName,imas_msgs.isread,imas_courses.name ";
 	$query .= "FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom LEFT JOIN imas_courses ON imas_courses.id=imas_msgs.courseid WHERE ";
-	$query .= "imas_msgs.msgto='$userid' AND (imas_msgs.isread&5)=0 ";
+	$query .= "imas_msgs.msgto='$userid' AND (imas_msgs.isread&3)=0 ";
 	$query .= "ORDER BY imas_courses.name, senddate DESC ";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	if (mysql_num_rows($result)==0) {

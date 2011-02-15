@@ -165,19 +165,20 @@ Reattempts (retrying same version) is done per assessment/question
    with penalty of __ for missed attempts [for "per assessment":  on all questions/missed questions]
    max ___ attempts
 New versions are done per assessment/question
-   with penalty of __ of regens [for "per assessment": one all questions / missed questions]
+   with penalty of __ per regen [for "per assessment": on all questions / missed questions]
    max ___ regens
    keep best/last
 
 Redesign assessment result storage
-assessment attempt {
+assessment version1 {
 	q1 {
 		version1 {
 			question id
 			seed
 			attempts {
 				attempt1 {
-					submitted answer
+					submitted answer / lastanswer (for redisplay)
+					stuanswer referenable value of submitted answer (if applicable)
 					rawscore [0-1]
 					timestamp?
 				}
@@ -190,9 +191,12 @@ assessment attempt {
 	}
 }
 
-So to get lastanswer, $data[$qn][last entry]['attempts'][last entry]
+So to get lastanswer, $data[last entry for last version][$qn][last entry for last version]['attempts'][last entry]['lastanswer']
 to get score, have to know assessment settings, and go through and calculate best
 based on raw scores and assessment settings.
+
+Continue to use bestscores field;  recalc after any assessment settings changes
+
 
 how to handle review?  Keep whole other set of attempt data?  Run as a separate 
 version within the same structure?
