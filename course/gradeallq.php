@@ -106,6 +106,15 @@
 		while ($row = mysql_fetch_row($result)) {
 			$groupnames[$row[0]] = $row[1];
 		}
+		$grplist = implode(',',array_keys($groupnames));
+		$groupmembers = array();
+		$query = "SELECT isg.stugroupid,iu.LastName,iu.FirstName FROM imas_stugroupmembers AS isg JOIN imas_users as iu ON isg.userid=iu.id WHERE isg.stugroupid IN ($grplist) ORDER BY iu.LastName,iu.FirstName";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			if (!isset($groupmembers[$row[0]])) {  $groupmembers[$row[0]] = array();}
+			$groupmembers[$row[0]][] = $row[2].' '.$row[1];
+		}
+			
 	}
 	
 	$query = "SELECT imas_questions.points,imas_questionset.control FROM imas_questions,imas_questionset ";
@@ -286,7 +295,12 @@
 			}
 			echo "<h4 class=\"person\">".$line['LastName'].', '.$line['FirstName']."</h4>";
 			if (!$groupdup) {
-				echo '<h4 class="group" style="display:none">'.$groupnames[$line['agroupid']].'</h4>';
+				echo '<h4 class="group" style="display:none">'.$groupnames[$line['agroupid']];
+				if (isset($groupmembers[$line['agroupid']]) && count($groupmembers[$line['agroupid']])>0) {
+					echo ' ('.implode(', ',$groupmembers[$line['agroupid']]).')</h4>';
+				} else {
+					echo ' (empty)</h4>';
+				}
 			}
 			echo "<div ";
 			if (getpts($scores[$loc])==$points) {
