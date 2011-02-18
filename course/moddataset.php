@@ -455,7 +455,9 @@
 			$line['qtext'] = '';
 			$line['answer'] = '';
 			$line['hasimg'] = 0;
-			if (isset($sessiondata['lastsearchlibs'.$cid])) {
+			if (isset($_GET['aid']) && isset($sessiondata['lastsearchlibs'.$_GET['aid']])) {
+				$inlibs = $sessiondata['lastsearchlibs'.$_GET['aid']];
+			} else if (isset($sessiondata['lastsearchlibs'.$cid])) {
 				//$searchlibs = explode(",",$sessiondata['lastsearchlibs']);
 				$inlibs = $sessiondata['lastsearchlibs'.$cid];
 			} else {

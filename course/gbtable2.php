@@ -362,6 +362,9 @@ function gbtable() {
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	while ($row = mysql_fetch_row($result)) {
 		if (in_array($row[0],$category)) { //define category if used
+			if ($row[1]{0}>='1' && $row[1]{0}<='9') {
+				$row[1] = substr($row[1],1);
+			}
 			$cats[$row[0]] = array_slice($row,1);
 			array_push($cats[$row[0]],$catcolcnt);
 			$catcolcnt++;

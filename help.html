@@ -1697,9 +1697,10 @@ The following macros help with formatting values for display:
 <li><b>prettytime(value,informat,outformat)</b>:  Creates a nice representation of a time.  Informat can be 'h', 'm', or 's' designating whether
     value is hours, minutes, or seconds.  Outformat can be any combination of these to specify output.  For example, 'hm' will return "__ hours and __ minutes".  Outformat
     can also be 'clock' which returns 3:42pm, or 'sclock' which returns 3:42:15pm</li>
-<li><b>dispreducedfraction(numerator,denominator,[doubleslash])</b>:  Takes two numbers as numerator and denominator of a fraction, returning a display form of the fraction,
-    reduced to lowest terms.  Suitable for $showanswer.  Set doubleslash to true to produced "3//4" rather than "3/4".</li>
-<li><b>makereducedfraction(numerator,denominator,[doubleslash])</b>:  Same as dispreducefraction, but not already in display form</li>
+<li><b>dispreducedfraction(numerator,denominator,[doubleslash,variable in numerator])</b>:  Takes two numbers as numerator and denominator of a fraction, returning a display form of the fraction,
+    reduced to lowest terms.  Suitable for $showanswer.  Set doubleslash to true to produced "3//4" rather than "3/4".  Set variable in numerator to put a variable
+    in the numerator, such as pi.</li>
+<li><b>makereducedfraction(numerator,denominator,[doubleslash,variable in numerator])</b>:  Same as dispreducefraction, but not already in display form</li>
 <li><b>decimaltofraction(decimal,[format,maxden])</b>:  Converts a decimal to a fraction.  Can use format="mixednumber" to get a mixed number rather than improper fraction.  
     Only works for denominators up to maxden (default 5000)</li>
 </ul>
@@ -1871,7 +1872,7 @@ display of this text is controlled by the same "show hints?" option that control
 
 <h4>Referencing Student Answers</h4>
 <p>To create multipart questions that are graded on consistency, or to create a set of lab-type problems that rely on student-provided data, you can reference
-students' previous answers in your question code.  You will only be able to reference the student answer to number and calculated type answers</p>
+students' previous answers in your question code.  You will only be able to reference the student answer to number and string type answers</p>
 <ul>
 <li>$stuanswers[N] will refer to the student's answer on question N (not zero-indexed: N=1 is question 1)</li>
 <li>$stuanswers[N][P] will refer to the student's answer on question N, part P (if multipart)</li>

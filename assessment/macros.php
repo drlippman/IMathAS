@@ -1228,11 +1228,11 @@ function lcm($n, $m) //least common multiple
    return round($m*($n/gcd($n,$m))); 
 } 
 
-function dispreducedfraction($n,$d,$dblslash=false) {
+function dispreducedfraction($n,$d,$dblslash=false,$varinnum=false) {
 	return '`'.makereducedfraction($n,$d,$dblslash).'`';
 }
 
-function makereducedfraction($n,$d,$dblslash=false) {
+function makereducedfraction($n,$d,$dblslash=false,$varinnum=false) {
 	$g = gcd($n,$d);
 	$n = $n/$g;
 	$d = $d/$g;	
@@ -1240,13 +1240,29 @@ function makereducedfraction($n,$d,$dblslash=false) {
 		$n = $n*-1;
 		$d = $d*-1;
 	}
+	if ($varinnum!==false) {
+		if ($n==1) {
+			$n = '';
+		} else if ($n==-1) {
+			$n = '-';
+		}
+	}
 	if ($d==1) {
-		return "$n";
+		if ($varinnum===false) {
+			return "$n";
+		} else {
+			return "$n$varinnum";
+		}
 	} else {
 		if ($dblslash) {
-			return "$n//$d";
+			$slash = '//';
 		} else {
-			return "$n/$d";
+			$slash = '/';
+		}
+		if ($varinnum===false) {
+			return "$n$slash$d";
+		} else {
+			return "($n$varinnum)$slash$d";
 		}
 	}
 }
