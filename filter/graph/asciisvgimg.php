@@ -1048,8 +1048,10 @@ function ASplot($function) {
 function pt2arr($pt) {
 	$pt = str_replace(array('[',']'),'',$pt);
 	$pt = explode(',',$pt);
-	$pt[0] = round($this->evalifneeded($pt[0])*$this->xunitlength + $this->origin[0]);
-	$pt[1] = round($this->height - $this->evalifneeded($pt[1])*$this->yunitlength - $this->origin[1]);
+	//$pt[0] = round($this->evalifneeded($pt[0])*$this->xunitlength + $this->origin[0]);
+	//$pt[1] = round($this->height - $this->evalifneeded($pt[1])*$this->yunitlength - $this->origin[1]);
+	$pt[0] =$this->evalifneeded($pt[0])*$this->xunitlength + $this->origin[0];
+	$pt[1] = $this->height - $this->evalifneeded($pt[1])*$this->yunitlength - $this->origin[1];
 	return $pt;
 }
 function parseargs($str) {
