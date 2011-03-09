@@ -74,7 +74,7 @@ if ($myrights<20) {
 	}
 	
 	
-	$query = "SELECT imas_users.email,imas_questionset.author,imas_questionset.description,imas_questionset.lastmoddate,imas_questionset.ancestors ";
+	$query = "SELECT imas_users.email,imas_questionset.author,imas_questionset.description,imas_questionset.lastmoddate,imas_questionset.ancestors,imas_questionset.deleted ";
 	$query .= "FROM imas_users,imas_questionset WHERE imas_users.id=imas_questionset.ownerid AND imas_questionset.id='{$_GET['qsetid']}'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$email = mysql_result($result,0,0);
@@ -82,6 +82,7 @@ if ($myrights<20) {
 	$descr = mysql_result($result,0,2);
 	$lastmod = date("m/d/y g:i a",mysql_result($result,0,3));
 	$ancestors = mysql_result($result,0,4);
+	$deleted = mysql_result($result,0,5);
 	if (isset($CFG['AMS']['showtips'])) {
 		$showtips = $CFG['AMS']['showtips'];
 	} else {
@@ -168,6 +169,10 @@ if ($overwriteBody==1) {
 	echo "<p>Question id: {$_GET['qsetid']}.  <a href=\"mailto:$email?subject=Problem%20with%20question%20id%20{$_GET['qsetid']}\">E-mail owner</a> to report problems</p>";
 	echo "<p>Description: $descr</p><p>Author: $author</p>";
 	echo "<p>Last Modified: $lastmod</p>";
+	if ($deleted==1) {
+		echo '<p style="color:red;">This question has been marked for deletion.  This might indicate there is an error in the question. ';
+		echo 'It is recommended you discontinue use of this question when possible</p>';
+	}
 
 	echo '<p>Question is in these libraries:';
 	echo '<ul>';

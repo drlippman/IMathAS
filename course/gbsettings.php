@@ -28,6 +28,9 @@
 		//WORK ON ME
 		$useweights = $_POST['useweights'];
 		$orderby = $_POST['orderby'];
+		if (isset($_POST['grouporderby'])) {
+			$orderby += 1;
+		}
 		$usersort = $_POST['usersort'];
 		//name,scale,scaletype,chop,drop,weight
 		$ids = array_keys($_POST['weight']);
@@ -168,10 +171,12 @@
 	
 	<span class=form>Gradebook display:</span>
 	<span class=formright>
-		<input type=radio name=orderby value="0" <?php writeHtmlChecked($orderby,0);?>/> Order by date<br/> 
-		<input type=radio name=orderby value="1" <?php writeHtmlChecked($orderby,1);?>/> Group by category, then by order by date<br/> 
-		<input type=radio name=orderby value="2" <?php writeHtmlChecked($orderby,2);?>/> Order by alphabetically<br/> 
-		<input type=radio name=orderby value="3" <?php writeHtmlChecked($orderby,3);?>/> Group by category, then order alphabetically
+		<input type="checkbox" name="grouporderby" value="1" <?php writeHtmlChecked($orderby&1,1);?>/> Group by category first<br/> 
+		<input type=radio name=orderby value="0" <?php writeHtmlChecked($orderby&~1,0);?>/> Order by end date, old to new<br/> 
+		<input type=radio name=orderby value="4" <?php writeHtmlChecked($orderby&~1,4);?>/> Order by end date, new to old<br/> 
+		<input type=radio name=orderby value="6" <?php writeHtmlChecked($orderby&~1,6);?>/> Order by start date, old to new<br/> 
+		<input type=radio name=orderby value="8" <?php writeHtmlChecked($orderby&~1,8);?>/> Order by start date, new to old<br/> 
+		<input type=radio name=orderby value="2" <?php writeHtmlChecked($orderby&~1,2);?>/> Order alphabetically<br/> 
 	</span><br class=form />
 	
 	<span class=form>Default user order:</span>

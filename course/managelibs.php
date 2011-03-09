@@ -88,11 +88,12 @@ if ($myrights<20) {
 					$qidstofix = array_diff($qidstocheck,$okqids);
 					if ($_POST['delq']=='yes' && count($qidstofix)>0) {
 						$qlist = implode(',',$qidstofix);
-						$query = "DELETE FROM imas_questionset WHERE id IN ($qlist)";
+						//$query = "DELETE FROM imas_questionset WHERE id IN ($qlist)";
+						$query = "UPDATE imas_questionset SET deleted=1 WHERE id IN ($qlist)";
 						mysql_query($query) or die("Query failed : " . mysql_error());
-						foreach ($qidstofix as $qid) {
+						/*foreach ($qidstofix as $qid) {
 							delqimgs($qid);
-						}
+						}*/
 					} else {
 						foreach($qidstofix as $qid) {
 							$query = "INSERT INTO imas_library_items (qsetid,libid) VALUES ('$qid',0)";
@@ -276,11 +277,12 @@ if ($myrights<20) {
 				$qidstofix = array_diff($qidstocheck,$okqids);
 				if ($_POST['delq']=='yes' && count($qidstofix)>0) {
 					$qlist = implode(',',$qidstofix);
-					$query = "DELETE FROM imas_questionset WHERE id IN ($qlist)";
+					//$query = "DELETE FROM imas_questionset WHERE id IN ($qlist)";
+					$query = "UPDATE imas_questionset SET deleted=1 WHERE id IN ($qlist)";
 					mysql_query($query) or die("Query failed : " . mysql_error());
-					foreach ($qidstofix as $qid) {
+					/*foreach ($qidstofix as $qid) {
 						delqimgs($qid);
-					}
+					}*/
 				} else {
 					foreach($qidstofix as $qid) {
 						$query = "INSERT INTO imas_library_items (qsetid,libid) VALUES ('$qid',0)";

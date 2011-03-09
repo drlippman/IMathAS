@@ -104,17 +104,19 @@ if ($myrights<20) {
 						$query .= "imas_questionset.id='$qsetid'";
 						$result = mysql_query($query) or die("Query failed : " . mysql_error());
 						if (mysql_num_rows($result)>0) {
-							$query = "DELETE FROM imas_questionset WHERE id='{$_GET['remove']}'";
+							//$query = "DELETE FROM imas_questionset WHERE id='$qsetid'";
+							$query = "UPDATE imas_questionset SET deleted=1 WHERE id='$qsetid'";
 							$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 							if (mysql_affected_rows()>0) {
 								$query = "DELETE FROM imas_library_items WHERE qsetid='$qsetid'";
 								$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-								delqimgs($qsetid);
+								//delqimgs($qsetid);
 								$cnt--;
 							}
 						} 
 					} else {
-						$query = "DELETE FROM imas_questionset WHERE id='$qsetid'";
+						//$query = "DELETE FROM imas_questionset WHERE id='$qsetid'";
+						$query = "UPDATE imas_questionset SET deleted=1 WHERE id='$qsetid'";
 						if (!$isadmin) {
 							$query .= " AND ownerid='$userid'";
 						}
@@ -122,7 +124,7 @@ if ($myrights<20) {
 						if (mysql_affected_rows()>0) {
 							$query = "DELETE FROM imas_library_items WHERE qsetid='$qsetid'";
 							$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-							delqimgs($qsetid);
+							//delqimgs($qsetid);
 							$cnt--;
 						}
 					}

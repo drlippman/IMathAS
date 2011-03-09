@@ -54,9 +54,9 @@ if ($myrights<20) {
 				if ($isadmin) {
 					$query = "DELETE FROM imas_library_items WHERE qsetid IN ($remlist)";
 					mysql_query($query) or die("Query failed :$query " . mysql_error());
-					foreach (explode(',',$_POST['remove']) as $qid) {
+					/*foreach (explode(',',$_POST['remove']) as $qid) {
 						delqimgs($qid);
-					}
+					}*/
 				} else if ($isgrpadmin) {
 					$query = "SELECT imas_questionset.id FROM imas_questionset,imas_users WHERE ";
 					$query .= "imas_questionset.id IN ($remlist) AND imas_questionset.ownerid=imas_users.id ";
@@ -65,7 +65,7 @@ if ($myrights<20) {
 					while ($row = mysql_fetch_row($result)) {
 						$query = "DELETE FROM imas_library_items WHERE qsetid='$row[0]'";
 						mysql_query($query) or die("Query failed : $query" . mysql_error());
-						delqimgs($row[0]);
+						//delqimgs($row[0]);
 					}
 					
 				} else {
@@ -74,7 +74,7 @@ if ($myrights<20) {
 					while ($row = mysql_fetch_row($result)) {
 						$query = "DELETE FROM imas_library_items WHERE qsetid='$row[0]'";
 						mysql_query($query) or die("Query failed : $query" . mysql_error());
-						delqimgs($row[0]);
+						//delqimgs($row[0]);
 					}
 				}
 				
@@ -82,11 +82,13 @@ if ($myrights<20) {
 					$query = "SELECT imas_questionset.id FROM imas_questionset,imas_users WHERE imas_questionset.ownerid=imas_users.id AND imas_questionset.id IN ($remlist) AND imas_users.groupid='$groupid'";
 					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 					while ($row = mysql_fetch_row($result)) {
-						$query = "DELETE FROM imas_questionset WHERE id='{$row[0]}'";
+						//$query = "DELETE FROM imas_questionset WHERE id='{$row[0]}'";
+						$query = "UPDATE imas_questionset SET deleted=1 WHERE id='{$row[0]}'";
 						mysql_query($query) or die("Query failed : " . mysql_error());
 					}
 				} else {
-					$query = "DELETE FROM imas_questionset WHERE id IN ($remlist)";
+					$query = "UPDATE imas_questionset SET deleted=1 WHERE id IN ($remlist)";
+					//$query = "DELETE FROM imas_questionset WHERE id IN ($remlist)";
 					if (!$isadmin) {
 						$query .= " AND ownerid='$userid'";
 					}
@@ -499,14 +501,16 @@ if ($myrights<20) {
 				$query .= "imas_questionset.id='{$_GET['remove']}'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				if (mysql_num_rows($result)>0) {
-					$query = "DELETE FROM imas_questionset WHERE id='{$_GET['remove']}'";
+					$query = "UPDATE imas_questionset SET deleted=1 WHERE id='{$_GET['remove']}'";
+					//$query = "DELETE FROM imas_questionset WHERE id='{$_GET['remove']}'";
 				} else {
 					header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/manageqset.php?cid=$cid");
 					exit;
 				}
 
 			} else {
-				$query = "DELETE FROM imas_questionset WHERE id='{$_GET['remove']}'";
+				//$query = "DELETE FROM imas_questionset WHERE id='{$_GET['remove']}'";
+				$query = "UPDATE imas_questionset SET deleted=1 WHERE id='{$_GET['remove']}'";
 				if (!$isadmin) {
 					$query .= " AND ownerid='$userid'";
 				}
@@ -515,7 +519,7 @@ if ($myrights<20) {
 			if (mysql_affected_rows($link)>0) {
 				$query = "DELETE FROM imas_library_items WHERE qsetid='{$_GET['remove']}'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
-				delqimgs($_GET['remove']);
+				//delqimgs($_GET['remove']);
 			}
 			
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/manageqset.php?cid=$cid");
@@ -685,7 +689,7 @@ if ($myrights<20) {
 		
 		$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.ownerid,imas_questionset.description,imas_questionset.userights,imas_questionset.lastmoddate,";
 		$query .= "imas_questionset.qtype,imas_users.firstName,imas_users.lastName,imas_users.groupid,imas_library_items.libid,imas_library_items.junkflag, imas_library_items.id AS libitemid ";
-		$query .= "FROM imas_questionset,imas_library_items,imas_users WHERE $searchlikes ";
+		$query .= "FROM imas_questionset,imas_library_items,imas_users WHERE imas_questionset.deleted=0 AND $searchlikes ";
 		$query .= "imas_library_items.qsetid=imas_questionset.id AND imas_questionset.ownerid=imas_users.id ";
 		
 		if ($isadmin) {

@@ -483,7 +483,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			
 			if (isset($search)) {
 				$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_library_items.libid,imas_questionset.ownerid,imas_library_items.junkflag, imas_library_items.id AS libitemid ";
-				$query .= "FROM imas_questionset,imas_library_items WHERE $searchlikes "; //imas_questionset.description LIKE '%$safesearch%' ";
+				$query .= "FROM imas_questionset,imas_library_items WHERE imas_questionset.deleted=0 AND $searchlikes "; //imas_questionset.description LIKE '%$safesearch%' ";
 				$query .= " (imas_questionset.ownerid='$userid' OR imas_questionset.userights>0) AND "; 
 				$query .= "imas_library_items.qsetid=imas_questionset.id ";
 				
@@ -506,6 +506,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						AND c.assessmentid ='$aid'
 						JOIN imas_questionset  ON a.questionsetid=imas_questionset.id
 						AND (imas_questionset.ownerid='$userid' OR imas_questionset.userights>0)
+						AND imas_questionset.deleted=0
 						WHERE a.questionsetid NOT IN ($existingqlist)
 						GROUP BY a.questionsetid ORDER BY qcnt DESC LIMIT 100";
 				}

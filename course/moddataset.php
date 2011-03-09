@@ -455,6 +455,7 @@
 			$line['qtext'] = '';
 			$line['answer'] = '';
 			$line['hasimg'] = 0;
+			$line['deleted'] = 0;
 			if (isset($_GET['aid']) && isset($sessiondata['lastsearchlibs'.$_GET['aid']])) {
 				$inlibs = $sessiondata['lastsearchlibs'.$_GET['aid']];
 			} else if (isset($sessiondata['lastsearchlibs'.$cid])) {
@@ -502,6 +503,10 @@
 	echo "<h2>$addmod QuestionSet Question</h2>\n";
 	echo '</div>';
 
+	if ($line['deleted']==1) {
+		echo '<p style="color:red;">This question has been marked for deletion.  This might indicate there is an error in the question. ';
+		echo 'It is recommended you discontinue use of this question when possible</p>';
+	}
 	if (isset($inusecnt) && $inusecnt>0) {
 		echo '<p style="color:red;">This question is currently being used in ';
 		if ($inusecnt>1) {

@@ -192,6 +192,7 @@ function gbtable() {
 	$timelimits = array();
 	$minscores = array();
 	$assessmenttype = array();
+	$startdate = array();
 	$enddate = array();
 	$tutoredit = array();
 	$isgroup = array();
@@ -212,6 +213,7 @@ function gbtable() {
 			$line['enddate'] = 2000000000;
 		}
 		$enddate[$kcnt] = $line['enddate'];
+		$startdate[$kcnt] = $line['startdate'];
 		if ($now<$line['startdate']) {
 			$avail[$kcnt] = 2;
 		} else if ($now < $line['enddate']) {
@@ -281,6 +283,7 @@ function gbtable() {
 		$assessmenttype[$kcnt] = "Offline";
 		$category[$kcnt] = $line['gbcategory'];
 		$enddate[$kcnt] = $line['showdate'];
+		$startdate[$kcnt] = $line['showdate'];
 		if ($now < $line['showdate']) {
 			$avail[$kcnt] = 2;
 		} else {
@@ -312,6 +315,7 @@ function gbtable() {
 			$line['enddate'] = 2000000000;
 		}
 		$enddate[$kcnt] = $line['enddate'];
+		$startdate[$kcnt] = $line['startdate'];
 		if ($now < $line['startdate']) {
 			$avail[$kcnt] = 2;
 		} else if ($now < $line['enddate']) {
@@ -395,6 +399,27 @@ function gbtable() {
 			$newcategory[$k] = $category[$k];
 		}
 		$category = $newcategory;
+	} else if ($orderby==5) { //order $category by enddate reverse
+		arsort($enddate,SORT_NUMERIC);
+		$newcategory = array();
+		foreach ($enddate as $k=>$v) {
+			$newcategory[$k] = $category[$k];
+		}
+		$category = $newcategory;
+	} else if ($orderby==7) { //order $category by startdate
+		asort($startdate,SORT_NUMERIC);
+		$newcategory = array();
+		foreach ($startdate as $k=>$v) {
+			$newcategory[$k] = $category[$k];
+		}
+		$category = $newcategory;
+	} else if ($orderby==9) { //order $category by startdate reverse
+		arsort($startdate,SORT_NUMERIC);
+		$newcategory = array();
+		foreach ($startdate as $k=>$v) {
+			$newcategory[$k] = $category[$k];
+		}
+		$category = $newcategory;
 	} else if ($orderby==3) { //order $category alpha
 		natcasesort($name);//asort($name);
 		$newcategory = array();
@@ -402,7 +427,7 @@ function gbtable() {
 			$newcategory[$k] = $category[$k];
 		}
 		$category = $newcategory;
-	}
+	} 
 	foreach(array_keys($cats) as $cat) {//foreach category
 		$catposspast[$cat] = array();
 		$catposscur[$cat] =array();
@@ -470,12 +495,21 @@ function gbtable() {
 		}
 	}
 	if (($orderby&1)==0) {//if not grouped by category
-		if ($orderby==0) {
+		if ($orderby==0) {   //enddate
 			asort($enddate,SORT_NUMERIC);
 			$itemorder = array_keys($enddate);
-		} else if ($orderby==2) {
+		} else if ($orderby==2) {  //alpha
 			natcasesort($name);//asort($name);
 			$itemorder = array_keys($name);
+		} else if ($orderby==4) { //enddate reverse
+			arsort($enddate,SORT_NUMERIC);
+			$itemorder = array_keys($enddate);
+		} else if ($orderby==6) { //startdate
+			asort($startdate,SORT_NUMERIC);
+			$itemorder = array_keys($startdate);
+		} else if ($orderby==8) { //startdate reverse
+			arsort($startdate,SORT_NUMERIC);
+			$itemorder = array_keys($startdate);
 		}
 		
 		foreach ($itemorder as $k) {
