@@ -929,13 +929,22 @@ function getnextprev(formn,loc) {
 			var val = rad.value;
 			var help = document.getElementById("chglibhelp");
 			if (val==0) {
-				help.innerHTML = "Select libraries to add these questions to.  You may want to hit Uncheck All to start with a clean tree.";
+				help.innerHTML = "Select libraries to add these questions to. ";
+				if (chgliblaststate==2) {
+					initlibtree(false);
+				}
 			} else if (val==1) {
-				help.innerHTML = "Select libraries to add these questions to.  You may want to hit Uncheck All to start with a clean tree.  Questions will only be removed from existing libraries if you have the rights to make those changes.";
+				help.innerHTML = "Select libraries to add these questions to.  Questions will only be removed from existing libraries if you have the rights to make those changes.";
+				if (chgliblaststate==2) {
+					initlibtree(false);
+				}
 			} else if (val==2) {
 				help.innerHTML = "Unselect the libraries you want to remove questions from.  The questions will not be deleted; they will be moved to Unassigned if no other library assignments exist.  Questions will only be removed from existing libraries if you have the rights to make those changes.";
+				if (chgliblaststate==0 || chgliblaststate==1) {
+					initlibtree(true);
+				}
 			}
-			 
+			chgliblaststate = val;
 		}
 		</script>
 		<form method=post action="manageqset.php?cid=<?php echo $cid ?>">
@@ -946,10 +955,10 @@ function getnextprev(formn,loc) {
 			<input type=radio name="action" value="1" onclick="chglibtoggle(this)"/> Add to libraries, removing existing library assignments<br/>
 			<input type=radio name="action" value="2" onclick="chglibtoggle(this)"/> Remove library assignments
 			<p id="chglibhelp" style="font-weight: bold;">
-			Select libraries to add these questions to.  You may want to hit Uncheck All to start with a clean tree.
+			Select libraries to add these questions to.
 			</p>
-		
-			<?php include("libtree2.php"); ?>
+			
+			<?php $libtreeshowchecks = false; include("libtree2.php"); ?>
 
 			
 			<p>

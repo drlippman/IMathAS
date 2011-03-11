@@ -19,7 +19,7 @@ var treebox = "checkbox";
 var select = "child";
 */
 
-
+var showlibtreechecks = true;
 
 function buildbranch(parentid) { 
         var outnode = document.createElement("ul"); 
@@ -59,7 +59,7 @@ function buildbranch(parentid) {
 		if (tree[parentid][i][3]==1) {
 			chbx.disabled = true;
 		}
-		if (tree[parentid][i][4]==1) {
+		if (tree[parentid][i][4]==1 && showlibtreechecks) {
 			chbx.defaultChecked = true;
 		}
                 span = document.createElement("span"); 

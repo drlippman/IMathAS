@@ -29,7 +29,8 @@ END;
 	}
 	echo <<<END
 <link rel="stylesheet" href="$imasroot/course/libtree.css" type="text/css" />
-<script type="text/javascript" src="$imasroot/javascript/libtree2.js?v=021810"></script>
+<script type="text/javascript" src="$imasroot/javascript/general.js?v=031111"></script>
+<script type="text/javascript" src="$imasroot/javascript/libtree2.js?v=031111"></script>
 END;
 	if (isset($_GET['libtree']) && $_GET['libtree']=="popup") {
 		echo <<<END
@@ -238,7 +239,12 @@ END;
 	}
 	echo "<div id=tree></div>";
 	echo "<script type=\"text/javascript\">\n";
-	echo "document.getElementById(\"tree\").appendChild(buildbranch(0)); ";
+	echo "function initlibtree(showchecks) {";
+	echo "showlibtreechecks = showchecks;";
+	echo "var tree = document.getElementById(\"tree\");";
+	echo "while (tree.childNodes.length>0) { tree.removeChild(tree.firstChild);}";
+	echo "tree.appendChild(buildbranch(0)); ";
+	echo "if (showchecks) {";
 	$expand = array();
 	foreach ($checked as $child) {
 		if (isset($base)) {
@@ -272,6 +278,13 @@ END;
 			echo "addbranch({$expand[$i]});\n";
 			$setshowed[] = $expand[$i];
 		}
+	}
+	echo "}";
+	echo "}";
+	if (isset($libtreeshowchecks) && $libtreeshowchecks==false) {
+		echo "addLoadEvent(function() {initlibtree(false);})";
+	} else {
+		echo "addLoadEvent(function() {initlibtree(true);})";
 	}
 	echo "</script>\n";
 	
