@@ -1157,10 +1157,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		
 		if (in_array('list',$ansformats)) {
 			$tip = "Enter your answer as a list of complex numbers in a+bi form separated with commas.  Example: 2+5i,-3-4i<br/>";
+			$shorttip = 'Enter a list of complex numbers';
 		} else {
 			$tip = "Enter your answer as a complex number in a+bi form.  Example: 2+5i<br/>";
+			$shorttip = 'Enter a complex number';
 		}
-		$tip .= formathint('each value',$ansformats,'calcntuple');
+		$tip .= formathint('each value',$ansformats,'calccomplex');
 		
 		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\"  ";
 		if ($showtips==2) { //eqntips: work in progress
