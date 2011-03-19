@@ -531,7 +531,7 @@ function basicshowq($qn,$seqinactive=false) {
 
 //shows basic points possible, attempts remaining bar
 function showqinfobar($qn,$inreview,$single) {
-	global $qi,$questions,$attempts,$testsettings,$noindivscores,$scores,$bestscores;
+	global $qi,$questions,$attempts,$seeds,$testsettings,$noindivscores,$scores,$bestscores,$sessiondata,$imasroot;
 	if ($inreview) {
 		echo '<div class="review">';
 	}
@@ -579,6 +579,9 @@ function showqinfobar($qn,$inreview,$single) {
 	} else {
 		echo "<input type=hidden name=\"verattempts[$qn]\" value=\"{$attempts[$qn]}\" />";
 	}
+	if ($sessiondata['msgqtoinstr']==2) {
+		echo "<br/><a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid={$testsettings['courseid']}&add=new&quoteq=$qn-{$qi[$questions[$qn]]['questionsetid']}-{$seeds[$qn]}-{$testsettings['id']}&to=instr\">Message instructor about this question</a>";
+	}
 	if ($inreview) {
 		echo '</div>';
 	}
@@ -586,7 +589,7 @@ function showqinfobar($qn,$inreview,$single) {
 
 //shows top info bar for seq mode
 function seqshowqinfobar($qn,$toshow) {
-	global $qi,$questions,$attempts,$testsettings,$scores,$bestscores,$noindivscores,$showeachscore,$imasroot,$CFG;
+	global $qi,$questions,$attempts,$testsettings,$scores,$bestscores,$noindivscores,$showeachscore,$imasroot,$CFG,$sessiondata,$seeds;
 	$reattemptsremain = hasreattempts($qn);
 	$pointsremaining = getremainingpossible($qn,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
 	$qavail = false;
@@ -706,6 +709,9 @@ function seqshowqinfobar($qn,$toshow) {
 	}
 	if ($testsettings['showcat']>0 && $qi[$questions[$qn]]['category']!='0') {
 		echo "  Category: {$qi[$questions[$qn]]['category']}.";
+	}
+	if ($sessiondata['msgqtoinstr']==2) {
+		echo "<br/><a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid={$testsettings['courseid']}&add=new&quoteq=$qn-{$qi[$questions[$qn]]['questionsetid']}-{$seeds[$qn]}-{$testsettings['id']}&to=instr\">Message instructor about this question</a>";
 	}
 	echo '</div>';
 	return $qavail;

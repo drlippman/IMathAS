@@ -149,6 +149,9 @@ switch($_GET['action']) {
 			if (isset($_POST['msgmonitor'])) {
 				$msgset += 5;
 			}
+			if (isset($_POST['msgqtoinstr'])) {
+				$msgset += 5*2;
+			}
 		}
 		
 		if (isset($CFG['CPS']['chatset']) && $CFG['CPS']['chatset'][1]==0) {

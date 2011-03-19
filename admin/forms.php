@@ -113,7 +113,8 @@ switch($_GET['action']) {
 			$allowunenroll = $line['allowunenroll'];
 			$copyrights = $line['copyrights'];
 			$msgset = $line['msgset']%5;
-			$msgmonitor = floor($line['msgset']/5);
+			$msgmonitor = (floor($line['msgset']/5))&1;
+			$msgQtoInstr = (floor($line['msgset']/5))&2;
 			$cploc = $line['cploc'];
 			$theme = $line['theme'];
 			$topbar = explode('|',$line['topbar']);
@@ -138,6 +139,10 @@ switch($_GET['action']) {
 			
 			$copyrights = isset($CFG['CPS']['copyrights'])?$CFG['CPS']['copyrights'][0]:0;
 			$msgset = isset($CFG['CPS']['msgset'])?$CFG['CPS']['msgset'][0]:0;
+			$msgmonitor = (floor($msgset/5))&1;
+			$msgQtoInstr = (floor($msgset/5))&2;
+			$msgset = $msgset%5;
+			
 			$cploc = isset($CFG['CPS']['cploc'])?$CFG['CPS']['cploc'][0]:1;
 			
 			$topbar = isset($CFG['CPS']['topbar'])?$CFG['CPS']['topbar'][0]:array(array(),array(),0);
@@ -300,7 +305,9 @@ switch($_GET['action']) {
 			if ($msgset==4) { echo "checked=1";}
 			echo '/> Off <br/> <input type=checkbox name="msgmonitor" value="1" ';
 			if ($msgmonitor==1) { echo "checked=1";}
-			echo '/> Enable monitoring of student-to-student messages</span><br class=form />';
+			echo '/> Enable monitoring of student-to-student messages<br/> <input type=checkbox name="msgqtoinstr" value="1" ';
+			if ($msgQtoInstr==2) { echo "checked=1";}
+			echo '/> Enable &quot;Message instructor about this question&quot; links</span><br class=form />';
 		}
 		
 		if (!isset($CFG['CPS']['chatset']) || $CFG['CPS']['chatset'][1]==1) {

@@ -134,7 +134,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	
 	
 	if ($returnqtxt) {
-		$toevalqtxt = preg_replace('/\$answerbox(\[\d+\])?/','',$toevalqtxt);
+		//$toevalqtxt = preg_replace('/\$answerbox(\[\d+\])?/','',$toevalqtxt);
 	}
 	
 	//create hintbuttons
@@ -227,7 +227,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 					$answerbox[$iidx] = str_replace('<select','<select disabled="disabled"',$answerbox[$iidx]);
 				}
 				if ($returnqtxt) {
-					//$returntxt .= "<p>$abox</p>";
+					$returntxt .= "<p>$abox</p>";
 				} else {
 					echo filter("<div class=\"toppad\">$abox</div>\n");
 					echo "<div class=spacer>&nbsp;</div>\n";
@@ -239,7 +239,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 				$answerbox = str_replace('<select','<select disabled="disabled"',$answerbox);
 			}
 			if ($returnqtxt) {
-				//$returntxt .= "<p>$answerbox</p>";
+				$returntxt .= "<p>$answerbox</p>";
 			} else {
 				echo filter("<div class=\"toppad\">$answerbox</div>\n");
 			}

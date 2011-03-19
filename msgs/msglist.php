@@ -116,7 +116,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 		} else {
 			$pagetitle = "New Message";
 			$useeditor = "message";
-			$loadgraphfiler = true;
+			$loadgraphfilter = true;
 			require("../header.php");
 			echo "<div class=breadcrumb>$breadcrumbbase ";
 			if ($cid>0) {
@@ -138,7 +138,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				$query = "SELECT msgset FROM imas_courses WHERE id='$cid'";
 				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$msgset = mysql_result($result,0,0);
-				$msgmonitor = floor($msgset/5);
+				$msgmonitor = (floor($msgset/5)&1);
 				$msgset = $msgset%5;
 			}
 			if (isset($_GET['toquote']) || isset($_GET['replyto'])) {
@@ -156,11 +156,22 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				require("../assessment/displayq2.php");
 				$parts = explode('-',$_GET['quoteq']);
 				$message = displayq($parts[0],$parts[1],$parts[2],false,false,0,true);
+				$message = printfilter(forcefiltergraph($message));
 				$message = preg_replace('/(`[^`]*`)/',"<span class=\"AM\">$1</span>",$message);
-				$message = forcefiltergraph($message);
+				
 				$message = '<p> </p><br/><hr/>'.$message;
 				$courseid = $cid;
-				$title = '';
+				if (isset($parts[3])) {  //sending to instructor
+					$query = "SELECT name FROM imas_assessments WHERE id='".intval($parts[3])."'";
+					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+					$title = 'Question about #'.($parts[0]+1).' in '.str_replace('"','&quot;',mysql_result($result,0,0));
+					if ($_GET['to']=='instr') {
+						unset($_GET['to']);
+						$msgset = 1; //force instructor only list
+					}
+				} else {
+					$title = '';
+				}
 			} else {
 				$title = '';
 				$message = '';
@@ -353,7 +364,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 		$query = "SELECT msgset FROM imas_courses WHERE id='$cid'";
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$msgset = mysql_result($result,0,0);
-		$msgmonitor = floor($msgset/5);
+		$msgmonitor = (floor($msgset/5)&1);
 		$msgset = $msgset%5;
 		if ($msgset<3 || $isteacher) {
 			$cansendmsgs = true;
