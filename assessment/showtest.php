@@ -1629,8 +1629,9 @@
 			$totpossible = totalpointspossible($qi);
 			
 			echo "<p>Total Points on Last Attempts:  $lastattempttotal out of $totpossible possible</p>\n";
-						
-			if ($total<$testsettings['minscore']) {
+			
+			//if ($total<$testsettings['minscore']) {
+			if (($testsettings['minscore']<10000 && $total<$testsettings['minscore']) || ($testsettings['minscore']>10000 && $total<($testsettings['minscore']-10000)/100*$totpossible)) {
 				echo "<p><b>Total Points Earned:  $total out of $totpossible possible: ";	
 			} else {
 				echo "<p><b>Total Points in Gradebook: $total out of $totpossible possible: ";
@@ -1656,8 +1657,14 @@
 				echo "<p style=\"color:red;font-weight: bold;\">$outmsg</p>";
 			}
 			
-			if ($total<$testsettings['minscore']) {
-				echo "<p><span style=\"color:red;\"><b>A score of {$testsettings['minscore']} is required to receive credit for this assessment<br/>Grade in Gradebook: No Credit (NC)</span></p> ";	
+			//if ($total<$testsettings['minscore']) {
+			if (($testsettings['minscore']<10000 && $total<$testsettings['minscore']) || ($testsettings['minscore']>10000 && $total<($testsettings['minscore']-10000)/100*$totpossible)) {
+				if ($testsettings['minscore']<10000) {
+					$reqscore = $testsettings['minscore'];
+				} else {
+					$reqscore = ($testsettings['minscore']-10000).'%';
+				}
+				echo "<p><span style=\"color:red;\"><b>A score of $reqscore is required to receive credit for this assessment<br/>Grade in Gradebook: No Credit (NC)</span></p> ";	
 			}
 		} else {
 			echo "<p><b>Your scores have been recorded for this assessment.</b></p>";
