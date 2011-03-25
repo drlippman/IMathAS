@@ -1967,7 +1967,9 @@ The answer is compared to a given tolerance.  Can also accept DNE, oo (Infinity)
 	then duplicate values are not ignored.  If $answerformat="orderedlist", the list must be in the same order and contain identical counts of values.</dd>
 <dt>$ansprompt = string (In Question Control)</dt>
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="y="</dd>
-<dt>$displayformat = "point" or "vector" (In Question Control)</dt>
+<dt>$displayformat = "alignright" (In Question Control)</dt>
+	<dd>Aligns the text in the answer box to the right side</dd>
+<dt>$displayformat = "point" or "vector" (In Question Control) *deprecated - use ntuple question type instead*</dt>
 	<dd>Used in conjunction with $answerformat = "orderedlist"; surrounds the input box with parens (for point) or angle brackets (for vector).</dd>
 <dt>$answerboxsize = number (In Question Control)</dt>
 	<dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.</dd>
@@ -2032,7 +2034,7 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 	use "#" in the symbol location to match any number (including decimal values); 3.2^5 would match twice.</dd>
 <dt>$ansprompt = string (In Question Control)</dt>
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="y="</dd>
-<dt>$displayformat = "point" or "vector" (In Question Control)</dt>
+<dt>$displayformat = "point" or "vector" (In Question Control) *deprecated - use calculated ntuple question type instead*</dt>
 	<dd>Used in conjunction with $answerformat = "orderedlist"; surrounds the input box with parens (for point) or angle brackets (for vector).</dd>
 <dt>$answerboxsize = number (In Question Control)</dt>
 	<dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.</dd>

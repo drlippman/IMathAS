@@ -451,6 +451,9 @@ function gbstudisp($stu) {
 	
 	echo '<table id="myTable" class="gb" style="position:relative;">';
 	echo '<thead><tr><th>Item</th><th>Possible</th><th>Grade</th><th>Percent</th>';
+	if ($stu>0 && $isteacher) {
+		echo '<th>Time Spent</th>';
+	}
 	if ($stu>0) {
 		echo '<th>Feedback</th>';
 	} 
@@ -553,6 +556,14 @@ function gbstudisp($stu) {
 				echo '0%';
 			}
 			echo '</td>';
+			if ($stu>0 && $isteacher) {
+				if ($gbt[1][1][$i][7] > -1) {
+					echo '<td>'.$gbt[1][1][$i][7].' min</td>';
+				} else {
+					echo '<td></td>';
+				}
+				
+			}
 			if ($stu>0) {
 				echo '<td>'.$gbt[1][1][$i][1].'</td>';
 			}

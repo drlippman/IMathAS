@@ -124,11 +124,12 @@
 	if ($hassection) {
 		echo '<th>Section</th>';
 	}
-	echo "<th>Grade</th><th>%</th><th>Feedback</th></tr></thead><tbody>";
+	echo "<th>Grade</th><th>%</th><th>Time Spent</th><th>Feedback</th></tr></thead><tbody>";
 	$now = time();
 	$lc = 1;
 	$n = 0;
 	$tot = 0;
+	$tottime = 0;
 	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 		if ($lc%2!=0) {
 			echo "<tr class=even onMouseOver=\"this.className='highlight'\" onMouseOut=\"this.className='even'\">"; 
@@ -175,6 +176,12 @@
 			} else {
 				echo '<td></td>';
 			}
+			if ($line['endtime']==0 || $line['starttime']==0) {
+				echo '<td></td>';
+			} else {
+				echo '<td>'.round($timeused/60).' min</td>';
+				$tottime += $timeused;
+			}
 			echo "<td>{$line['feedback']}</td>";
 		}
 		echo "</tr>";
@@ -194,7 +201,12 @@
 	} else {
 		$pct = '-';
 	}
-	echo "</a></td><td>$pct</td></tr>";
+	if ($n>0) {
+		$timeavg = round(($timeused/$n)/60) . ' min';
+	} else {
+		$timeavg = '-';
+	}
+	echo "</a></td><td>$pct</td><td>$timeavg</td><td></td></tr>";
 	echo "</tbody></table>";
 	if ($hassection) {
 		echo "<script> initSortTable('myTable',Array('S','S','N'),true);</script>";

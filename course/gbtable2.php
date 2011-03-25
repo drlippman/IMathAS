@@ -89,6 +89,7 @@ row[1][1][0][3] = other info: 0 none, 1 NC, 2 IP, 3 OT, 4 PT
 row[1][1][0][4] = asid, or 'new'
 row[1][1][0][5] = bitwise for dropped: 1 in past & 2 in cur & 4 in future
 row[1][1][0][6] = 1 if had exception
+row[1][1][0][7] = time spent (minutes)
 
 row[1][1][1] = offline
 row[1][1][1][0] = score
@@ -725,6 +726,11 @@ function gbtable() {
 			//if ($scores[$i]>0) {$total += $scores[$i];}
 		}
 		$timeused = $l['endtime']-$l['starttime'];
+		if ($l['endtime']==0 || $l['starttime']==0) {
+			$gb[$row][1][$col][7] = -1;
+		} else {
+			$gb[$row][1][$col][7] = round($timeused/60);
+		}
 		if (in_array(-1,$scores)) { 
 			$IP=1; 
 		} else {

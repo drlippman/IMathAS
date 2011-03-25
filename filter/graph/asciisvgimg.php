@@ -171,6 +171,7 @@ function processScript($script) {
 				case 'ymax':
 				case 'fill':
 				case 'marker':
+				case 'markerfill':
 				case 'fontbackground':
 				case 'fontfill':
 					$this->$matches[1] = $matches[2];
