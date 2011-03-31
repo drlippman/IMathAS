@@ -241,141 +241,164 @@ switch($_GET['action']) {
 		break;
 	case "delete":
 		if ($myrights < 40) { echo "You don't have the authority for this action"; break;}
-		$query = "DELETE FROM imas_courses WHERE id='{$_GET['id']}'";
-		if ($myrights < 75) { $query .= " AND ownerid='$userid'";}
-		if ($myrights == 75) {
-			$query = "SELECT imas_courses.id FROM imas_courses,imas_users WHERE imas_courses.id='{$_GET['id']}' AND imas_courses.ownerid=imas_users.id AND imas_users.groupid='$groupid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			if (mysql_num_rows($result)>0) {
-				$query = "DELETE FROM imas_courses WHERE id='{$_GET['id']}'";
-			} else {
-				break;
+		if (isset($CFG['GEN']['doSafeCourseDelete']) && $CFG['GEN']['doSafeCourseDelete']==true) {
+			$oktodel = false;
+			if ($myrights < 75) {
+				$query = "SELECT id FROM imas_courses WHERE id='{$_GET['id']}' AND ownerid='$userid'";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				if (mysql_num_rows($result)>0) {
+					$oktodel = true;
+				}
+			} else if ($myrights == 75) {
+				$query = "SELECT imas_courses.id FROM imas_courses,imas_users WHERE imas_courses.id='{$_GET['id']}' AND imas_courses.ownerid=imas_users.id AND imas_users.groupid='$groupid'";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				if (mysql_num_rows($result)>0) {
+					$oktodel = true;
+				}
+			} else if ($myrights==100) {
+				$oktodel = true;
 			}
-		}
-		mysql_query($query) or die("Query failed : " . mysql_error());
-		if (mysql_affected_rows()==0) { break;}
-		
-		$query = "SELECT id FROM imas_assessments WHERE courseid='{$_GET['id']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		require_once("../includes/filehandler.php");
-		while ($line = mysql_fetch_row($result)) {
-			deleteallaidfiles($line[0]);
-			$query = "DELETE FROM imas_questions WHERE assessmentid='{$line[0]}'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-			$query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='{$line[0]}'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-			$query = "DELETE FROM imas_exceptions WHERE assessmentid='{$line[0]}'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-		}
-		
-		$query = "DELETE FROM imas_assessments WHERE courseid='{$_GET['id']}'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
-		
-		
-		$query = "SELECT id FROM imas_forums WHERE courseid='{$_GET['id']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
-			$q2 = "SELECT threadid FROM imas_forum_posts WHERE forumid='{$row[0]}'";
-			$r2 = mysql_query($q2) or die("Query failed : " . mysql_error());
-			while ($row2 = mysql_fetch_row($r2)) {
-				$query = "DELETE FROM imas_forum_views WHERE threadid='{$row2[0]}'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+			if ($oktodel) {
+				$query = "UPDATE imas_courses SET available=4 WHERE id='{$_GET['id']}'";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			}
-			$query = "DELETE FROM imas_forum_posts WHERE forumid='{$row[0]}'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-			
-			$query = "DELETE FROM imas_forum_threads WHERE forumid='{$row[0]}'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-		}
-		$query = "DELETE FROM imas_forums WHERE courseid='{$_GET['id']}'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
-		
-		$query = "SELECT id FROM imas_wikis WHERE courseid='{$_GET['id']}'";
-		$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($wid = mysql_fetch_row($r2)) {
-			$query = "DELETE FROM imas_wiki_revisions WHERE wikiid=$wid";
-		mysql_query($query) or die("Query failed : " . mysql_error());
-			$query = "DELETE FROM imas_wiki_views WHERE wikiid=$wid";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-		}
-		$query = "DELETE FROM imas_wikis WHERE courseid='{$_GET['id']}'";
-		
-		//delete inline text files
-		$query = "SELECT id FROM imas_inlinetext WHERE courseid='{$_GET['id']}'";
-		$r3 = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($ilid = mysql_fetch_row($r3)) {
-			$query = "SELECT filename FROM imas_instr_files WHERE itemid='{$ilid[0]}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/../course/files/';
-			while ($row = mysql_fetch_row($result)) {
-				$safefn = addslashes($row[0]);
-				$query = "SELECT id FROM imas_instr_files WHERE filename='$safefn'";
-				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-				if (mysql_num_rows($r2)==1) {
-					unlink($uploaddir . $row[0]);
+			break;
+		} else {
+			$query = "DELETE FROM imas_courses WHERE id='{$_GET['id']}'";
+			if ($myrights < 75) { $query .= " AND ownerid='$userid'";}
+			if ($myrights == 75) {
+				$query = "SELECT imas_courses.id FROM imas_courses,imas_users WHERE imas_courses.id='{$_GET['id']}' AND imas_courses.ownerid=imas_users.id AND imas_users.groupid='$groupid'";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				if (mysql_num_rows($result)>0) {
+					$query = "DELETE FROM imas_courses WHERE id='{$_GET['id']}'";
+				} else {
+					break;
 				}
 			}
-			$query = "DELETE FROM imas_instr_files WHERE itemid='{$ilid[0]}'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
-		}
-		$query = "DELETE FROM imas_inlinetext WHERE courseid='{$_GET['id']}'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
-		
-		//delete linked text files
-		$query = "SELECT text FROM imas_linkedtext WHERE courseid='{$_GET['id']}' AND text LIKE 'file:%'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
-			$safetext = addslashes($row[0]);
-			$query = "SELECT id FROM imas_linkedtext WHERE text='$safetext'"; //any others using file?
-			$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-			if (mysql_num_rows($r2)==1) { 
-				$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/../course/files/';
-				$filename = substr($row[0],5);
-				unlink($uploaddir . $filename);
-			}
-		}
-		
-		$query = "DELETE FROM imas_linkedtext WHERE courseid='{$_GET['id']}'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
-		$query = "DELETE FROM imas_items WHERE courseid='{$_GET['id']}'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
-		$query = "DELETE FROM imas_teachers WHERE courseid='{$_GET['id']}'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
-		$query = "DELETE FROM imas_students WHERE courseid='{$_GET['id']}'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
-		$query = "DELETE FROM imas_tutors WHERE courseid='{$_GET['id']}'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
-		
-		$query = "SELECT id FROM imas_gbitems WHERE courseid='{$_GET['id']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
-			$query = "DELETE FROM imas_grades WHERE gbitemid={$row[0]}";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-		}
-		$query = "DELETE FROM imas_gbitems WHERE courseid='{$_GET['id']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$query = "DELETE FROM imas_gbscheme WHERE courseid='{$_GET['id']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$query = "DELETE FROM imas_gbcats WHERE courseid='{$_GET['id']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		
-		$query = "DELETE FROM imas_calitems WHERE courseid='{$_GET['id']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		
-		$query = "SELECT id FROM imas_stugroupset WHERE courseid='{$_GET['id']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
-			$q2 = "SELECT id FROM imas_stugroups WHERE groupsetid='{$row[0]}'";
-			$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-			while ($row2 = mysql_fetch_row($r2)) {
-				$query = "DELETE FROM imas_stugroupmembers WHERE stugroupid='{$row2[0]}'";
+			if (mysql_affected_rows()==0) { break;}
+			
+			$query = "SELECT id FROM imas_assessments WHERE courseid='{$_GET['id']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			require_once("../includes/filehandler.php");
+			while ($line = mysql_fetch_row($result)) {
+				deleteallaidfiles($line[0]);
+				$query = "DELETE FROM imas_questions WHERE assessmentid='{$line[0]}'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+				$query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='{$line[0]}'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+				$query = "DELETE FROM imas_exceptions WHERE assessmentid='{$line[0]}'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
-			$query = "DELETE FROM imas_stugroups WHERE groupsetid='{$row[0]}'";
-		}
-		$query = "DELETE FROM imas_stugroupset WHERE courseid='{$_GET['id']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		
+			
+			$query = "DELETE FROM imas_assessments WHERE courseid='{$_GET['id']}'";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			
+			
+			$query = "SELECT id FROM imas_forums WHERE courseid='{$_GET['id']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				$q2 = "SELECT threadid FROM imas_forum_posts WHERE forumid='{$row[0]}'";
+				$r2 = mysql_query($q2) or die("Query failed : " . mysql_error());
+				while ($row2 = mysql_fetch_row($r2)) {
+					$query = "DELETE FROM imas_forum_views WHERE threadid='{$row2[0]}'";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+				}
+				$query = "DELETE FROM imas_forum_posts WHERE forumid='{$row[0]}'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+				
+				$query = "DELETE FROM imas_forum_threads WHERE forumid='{$row[0]}'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+			$query = "DELETE FROM imas_forums WHERE courseid='{$_GET['id']}'";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			
+			$query = "SELECT id FROM imas_wikis WHERE courseid='{$_GET['id']}'";
+			$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+			while ($wid = mysql_fetch_row($r2)) {
+				$query = "DELETE FROM imas_wiki_revisions WHERE wikiid=$wid";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+				$query = "DELETE FROM imas_wiki_views WHERE wikiid=$wid";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+			$query = "DELETE FROM imas_wikis WHERE courseid='{$_GET['id']}'";
+			
+			//delete inline text files
+			$query = "SELECT id FROM imas_inlinetext WHERE courseid='{$_GET['id']}'";
+			$r3 = mysql_query($query) or die("Query failed : " . mysql_error());
+			while ($ilid = mysql_fetch_row($r3)) {
+				$query = "SELECT filename FROM imas_instr_files WHERE itemid='{$ilid[0]}'";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/../course/files/';
+				while ($row = mysql_fetch_row($result)) {
+					$safefn = addslashes($row[0]);
+					$query = "SELECT id FROM imas_instr_files WHERE filename='$safefn'";
+					$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+					if (mysql_num_rows($r2)==1) {
+						unlink($uploaddir . $row[0]);
+					}
+				}
+				$query = "DELETE FROM imas_instr_files WHERE itemid='{$ilid[0]}'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+			$query = "DELETE FROM imas_inlinetext WHERE courseid='{$_GET['id']}'";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			
+			//delete linked text files
+			$query = "SELECT text FROM imas_linkedtext WHERE courseid='{$_GET['id']}' AND text LIKE 'file:%'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				$safetext = addslashes($row[0]);
+				$query = "SELECT id FROM imas_linkedtext WHERE text='$safetext'"; //any others using file?
+				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+				if (mysql_num_rows($r2)==1) { 
+					$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/../course/files/';
+					$filename = substr($row[0],5);
+					unlink($uploaddir . $filename);
+				}
+			}
+			
+			$query = "DELETE FROM imas_linkedtext WHERE courseid='{$_GET['id']}'";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			$query = "DELETE FROM imas_items WHERE courseid='{$_GET['id']}'";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			$query = "DELETE FROM imas_teachers WHERE courseid='{$_GET['id']}'";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			$query = "DELETE FROM imas_students WHERE courseid='{$_GET['id']}'";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			$query = "DELETE FROM imas_tutors WHERE courseid='{$_GET['id']}'";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			
+			$query = "SELECT id FROM imas_gbitems WHERE courseid='{$_GET['id']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				$query = "DELETE FROM imas_grades WHERE gbitemid={$row[0]}";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+			$query = "DELETE FROM imas_gbitems WHERE courseid='{$_GET['id']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$query = "DELETE FROM imas_gbscheme WHERE courseid='{$_GET['id']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$query = "DELETE FROM imas_gbcats WHERE courseid='{$_GET['id']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			
+			$query = "DELETE FROM imas_calitems WHERE courseid='{$_GET['id']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			
+			$query = "SELECT id FROM imas_stugroupset WHERE courseid='{$_GET['id']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				$q2 = "SELECT id FROM imas_stugroups WHERE groupsetid='{$row[0]}'";
+				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+				while ($row2 = mysql_fetch_row($r2)) {
+					$query = "DELETE FROM imas_stugroupmembers WHERE stugroupid='{$row2[0]}'";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+				}
+				$query = "DELETE FROM imas_stugroups WHERE groupsetid='{$row[0]}'";
+			}
+			$query = "DELETE FROM imas_stugroupset WHERE courseid='{$_GET['id']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		}	
 		break;
 	case "remteacher":
 		if ($myrights < 40) { echo "You don't have the authority for this action"; break;}

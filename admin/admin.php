@@ -48,7 +48,8 @@ if ($myrights < 40) {
  //data manipulation here
  //data processing for COURSES block 
 	$query = "SELECT imas_courses.id,imas_courses.ownerid,imas_courses.name,imas_courses.available,imas_users.FirstName,imas_users.LastName FROM imas_courses,imas_users ";
-	$query .= "WHERE imas_courses.ownerid=imas_users.id";
+	$query .= "WHERE imas_courses.ownerid=imas_users.id ";
+	if ($myrights<100) { $query .= " AND imas_courses.available<4 ";}
 	if (($myrights >= 40 && $myrights<75) || $showcourses==0) { $query .= " AND imas_courses.ownerid='$userid'";}
 	if ($myrights >= 75 && $showcourses>0) {
 		$query .= " AND imas_courses.ownerid='$showcourses'";
@@ -218,13 +219,16 @@ $placeinhead .= "}</script>";
 				if (($page_courseList[$i]['available']&2)==2) {
 					echo '<span style="color:#aaf;">';
 				}
+				if (($page_courseList[$i]['available']&4)==4) {
+					echo '<span style="color:#faa;text-decoration: line-through;">';
+				}
 					
 				echo $page_courseList[$i]['name'];
 				
 				if (($page_courseList[$i]['available']&1)==1) {
 					echo '</i>';
 				}
-				if (($page_courseList[$i]['available']&2)==2) {
+				if (($page_courseList[$i]['available']&2)==2 || ($page_courseList[$i]['available']&4)==4) {
 					echo '</span>';
 				}
 					
