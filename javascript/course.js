@@ -172,7 +172,7 @@ function showcalcontentsid(elid) {
 				}
 				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type=='FP') {
-				html += '<li><span class="calitem" style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">F</span> ';
+				html += '<li><span class="calitem" style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+ caleventsarr[elid].data[i].tag+'</span> ';
 				if (caleventsarr[elid].data[i].id!=null) { 
 					html += '<a href="../forums/thread.php?cid='+cid+'&forum='+caleventsarr[elid].data[i].id+'">';
 					html += caleventsarr[elid].data[i].name + '</a>';
@@ -185,7 +185,7 @@ function showcalcontentsid(elid) {
 				}
 				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type=='FR') {
-				html += '<li><span class="calitem" style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">F</span> ';
+				html += '<li><span class="calitem" style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+ caleventsarr[elid].data[i].tag+'</span> ';
 				if (caleventsarr[elid].data[i].id!=null) { 
 					html += '<a href="../forums/thread.php?cid='+cid+'&forum='+caleventsarr[elid].data[i].id+'">';
 					html += caleventsarr[elid].data[i].name + '</a>';

@@ -40,6 +40,9 @@ if (isset($_POST['checked'])) { //form submitted
 		}
 		$sets[] = "postby='$postby'";
 	}	
+	if (isset($_POST['chgcaltag'])) {
+		$sets[] = "caltag='".$_POST['caltagpost'].'--'.$_POST['caltagreply']."'";
+	}
 	$sops = array();
 	if (isset($_POST['chgallowanon'])) {
 		if ( isset($_POST['allowanon']) && $_POST['allowanon']==1) {
@@ -186,7 +189,22 @@ foreach($forumitems as $id=>$name) {
 	<input type=radio name="avail" value="2"/>Show Always
 	</td>
 </tr>
-			
+
+<tr class="coptr">
+	<td><input type="checkbox" name="chgpostby" /></td>
+	<td class="r">Students can create new threads:</td>
+	<td>  
+	<input type=radio name="postby" value="Always" checked="checked"/>Always<br/>
+	<input type=radio name="postby" value="Never" />Never<br/>
+	<input type=radio name="postby" value="Date" />Before: 
+	<input type=text size=10 name="postbydate" value="<?php echo $postbydate;?>">
+	<a href="#" onClick="displayDatePicker('postbydate', this); return false">
+	<img src="../img/cal.gif" alt="Calendar"/></A>
+	at <input type=text size=10 name=postbytime value="<?php echo $postbytime;?>">
+
+	</td>
+</tr>
+
 <tr class="coptr">
 	<td><input type="checkbox" name="chgreplyby" /></td>
 	<td class="r">Students can reply to posts:</td>
@@ -202,19 +220,14 @@ foreach($forumitems as $id=>$name) {
 	</td>
 </tr>
 <tr class="coptr">
-	<td><input type="checkbox" name="chgpostby" /></td>
-	<td class="r">Students can create new threads:</td>
-	<td>  
-	<input type=radio name="postby" value="Always" checked="checked"/>Always<br/>
-	<input type=radio name="postby" value="Never" />Never<br/>
-	<input type=radio name="postby" value="Date" />Before: 
-	<input type=text size=10 name="postbydate" value="<?php echo $postbydate;?>">
-	<a href="#" onClick="displayDatePicker('postbydate', this); return false">
-	<img src="../img/cal.gif" alt="Calendar"/></A>
-	at <input type=text size=10 name=postbytime value="<?php echo $postbytime;?>">
-
+	<td><input type="checkbox" name="chgcaltag" /></td>
+	<td class="r">Calendar icon:</td>
+	<td> 
+	New Threads: <input name="caltagpost" type=text size=1 value="FP"/>, 
+	Replies: <input name="caltagreply" type=text size=1 value="FR"/>
 	</td>
 </tr>
+		
 
 <tr class="coptr">
 	<td><input type="checkbox" name="chgallowanon"/></td>

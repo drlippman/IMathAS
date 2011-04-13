@@ -88,6 +88,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (intval($_POST['points'])==0) {
 			$_POST['cntingb'] = 0;
 		}
+		$caltag = $_POST['caltagpost'].'--'.$_POST['caltagreply'];
 		
 		require_once("../includes/htmLawed.php");
 		$htmlawedconfig = array('elements'=>'*-script');
@@ -102,14 +103,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$query = "UPDATE imas_forum_threads SET stugroupid=0 WHERE forumid='{$_GET['id']}';";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
-			$query = "UPDATE imas_forums SET name='{$_POST['name']}',description='{$_POST['description']}',startdate=$startdate,enddate=$enddate,settings=$fsets,";
+			$query = "UPDATE imas_forums SET name='{$_POST['name']}',description='{$_POST['description']}',startdate=$startdate,enddate=$enddate,settings=$fsets,caltag='$caltag',";
 			$query .= "defdisplay='{$_POST['defdisplay']}',replyby=$replyby,postby=$postby,groupsetid='{$_POST['groupsetid']}',points='{$_POST['points']}',cntingb='{$_POST['cntingb']}',gbcategory='{$_POST['gbcat']}',avail='{$_POST['avail']}',sortby='{$_POST['sortby']}' ";
 			$query .= "WHERE id='{$_GET['id']}';";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$newforumid = $_GET['id'];
 		} else { //add new
-			$query = "INSERT INTO imas_forums (courseid,name,description,startdate,enddate,settings,defdisplay,replyby,postby,groupsetid,points,cntingb,gbcategory,avail,sortby) VALUES ";
-			$query .= "('$cid','{$_POST['name']}','{$_POST['description']}',$startdate,$enddate,$fsets,'{$_POST['defdisplay']}',$replyby,$postby,'{$_POST['groupsetid']}','{$_POST['points']}','{$_POST['cntingb']}','{$_POST['gbcat']}','{$_POST['avail']}','{$_POST['sortby']}');";
+			$query = "INSERT INTO imas_forums (courseid,name,description,startdate,enddate,settings,defdisplay,replyby,postby,groupsetid,points,cntingb,gbcategory,avail,sortby,caltag) VALUES ";
+			$query .= "('$cid','{$_POST['name']}','{$_POST['description']}',$startdate,$enddate,$fsets,'{$_POST['defdisplay']}',$replyby,$postby,'{$_POST['groupsetid']}','{$_POST['points']}','{$_POST['cntingb']}','{$_POST['gbcat']}','{$_POST['avail']}','{$_POST['sortby']}','$caltag');";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			
 			$newforumid = mysql_insert_id();
@@ -192,6 +193,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$line['name'] = "Enter Forum Name here";
 			$line['description'] = "<p>Enter forum description here</p>";
 			$line['avail'] = 1;
+			$line['caltag'] = 'FP--FR';
 			$startdate = time();
 			$enddate = time() + 7*24*60*60;
 			$allowanon = false;
@@ -206,6 +208,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$sortby = 0;
 			$cntingb = 0;
 		}   
+		
+		list($posttag,$replytag) = explode('--',$line['caltag']);
 		
 		$page_formActionTag = "?block=$block&cid=$cid&folder=" . $_GET['folder'];
 		$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . $_GET['id'] : "";
@@ -375,7 +379,17 @@ if ($overwriteBody==1) {
 			<input type="radio" name="sortby" value="0" <?php writeHtmlChecked($sortby,0);?>/> Thread start date<br/>
 			<input type="radio" name="sortby" value="1" <?php writeHtmlChecked($sortby,1);?>/> Most recent reply date
 		</span><br class="form" />
-		 
+		
+		<span class=form>Students can create new threads:</span><span class=formright>
+			<input type=radio name="postby" value="Always" <?php if ($postby==2000000000) { echo "checked=1";}?>/>Always<br/>
+			<input type=radio name="postby" value="Never" <?php if ($postby==0) { echo "checked=1";}?>/>Never<br/>
+			<input type=radio name="postby" value="Date" <?php if ($postby<2000000000 && $postby>0) { echo "checked=1";}?>/>Before: 
+			<input type=text size=10 name="postbydate" value="<?php echo $postbydate;?>">
+			<a href="#" onClick="displayDatePicker('postbydate', this, 'sdate', 'start date'); return false">
+			<img src="../img/cal.gif" alt="Calendar"/></A>
+			at <input type=text size=10 name=postbytime value="<?php echo $postbytime;?>">
+		</span><br class="form"/>
+		
 		<span class=form>Students can reply to posts:</span>
 		<span class=formright>
 			<input type=radio name="replyby" value="Always" <?php if ($replyby==2000000000) { echo "checked=1";}?>/>Always<br/>
@@ -387,16 +401,12 @@ if ($overwriteBody==1) {
 			at <input type=text size=10 name=replybytime value="<?php echo $replybytime;?>">
 		</span><br class="form" />
 		
+		<span class="form">Calendar icon:</span>
+		<span class="formright">
+			New Threads: <input name="caltagpost" type=text size=1 value="<?php echo $posttag;?>"/>, 
+			Replies: <input name="caltagreply" type=text size=1 value="<?php echo $replytag;?>"/>
+		</span><br class="form" />
 		
-		<span class=form>Students can create new threads:</span><span class=formright>
-			<input type=radio name="postby" value="Always" <?php if ($postby==2000000000) { echo "checked=1";}?>/>Always<br/>
-			<input type=radio name="postby" value="Never" <?php if ($postby==0) { echo "checked=1";}?>/>Never<br/>
-			<input type=radio name="postby" value="Date" <?php if ($postby<2000000000 && $postby>0) { echo "checked=1";}?>/>Before: 
-			<input type=text size=10 name="postbydate" value="<?php echo $postbydate;?>">
-			<a href="#" onClick="displayDatePicker('postbydate', this, 'sdate', 'start date'); return false">
-			<img src="../img/cal.gif" alt="Calendar"/></A>
-			at <input type=text size=10 name=postbytime value="<?php echo $postbytime;?>">
-		</span><br class="form"/>
 		
 		<span class="form">Count in gradebook?</span>
 		<span class="formright">

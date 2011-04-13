@@ -298,11 +298,18 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		if (substr($mathchaturl,0,4)=='http') {
 			//remote mathchat
 			$url = $mathchaturl.'?isactive='.$cid.'&sep='.time();
-			$fp = fopen($url,'r');
-			stream_set_timeout($fp,2);
-			stream_set_blocking($fp,0);
-			$activechatters = fread($fp,100);
-			fclose($fp);
+			$timeout = 2;
+			$old = ini_set('default_socket_timeout', $timeout);
+			$fp = @fopen($url,'r');
+			if ($fp!==false) {
+				ini_set('default_socket_timeout', $old);
+				stream_set_timeout($fp,2);
+				stream_set_blocking($fp,0);
+				$activechatters = fread($fp,100);
+				fclose($fp);
+			} else {
+				$activechatters = '?';
+			}
 		} else {  
 			//local mathchat
 			$on = time() - 15;
@@ -322,7 +329,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	}
 }
   
-$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/course.js?v=022810\"></script>";
+$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/course.js?v=041311\"></script>";
 
 /******* begin html output ********/
 require("../header.php");

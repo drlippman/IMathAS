@@ -261,6 +261,8 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 				echo formpopup("Video",$url,660,525,"button",true,"video");
 			} else if ($extrefpt[0]=='read') {
 				echo formpopup("Read",$extrefpt[1],730,500,"button",true,"text");
+			} else {
+				echo formpopup($extrefpt[0],$extrefpt[1],730,500,"button",true,"text");
 			}
 		}
 		echo '</p></div>';

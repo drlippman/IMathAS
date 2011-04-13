@@ -197,11 +197,21 @@ while ($row = mysql_fetch_row($result)) {
 	$tags[$k] = $tag;
 	$k++;
 }
+// 4/4/2011, changing tthis to code block below.  Not sure why change on 10/23 was made :/
 //if (isset($teacherid)) {
-	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag,avail FROM imas_inlinetext WHERE ((oncal=2 AND enddate>$exlowertime AND enddate<$uppertime) OR (oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND (avail=1 OR (avail=2 AND startdate>0)) AND courseid='$cid'";
+	//$query = "SELECT id,title,enddate,text,startdate,oncal,caltag,avail FROM imas_inlinetext WHERE ((oncal=2 AND enddate>$exlowertime AND enddate<$uppertime) OR (oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND (avail=1 OR (avail=2 AND startdate>0)) AND courseid='$cid'";
 //} else {
 //	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag FROM imas_inlinetext WHERE ((oncal=2 AND enddate>$lowertime AND enddate<$uppertime AND startdate<$now) OR (oncal=1 AND startdate<$now AND startdate>$exlowertime)) AND avail=1 AND courseid='$cid'";  //chg 10/23/09: replace $now with $uppertime
 //}
+
+if (isset($teacherid)) {
+	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag,avail FROM imas_inlinetext WHERE ((oncal=2 AND enddate>$exlowertime AND enddate<$uppertime) OR (oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND (avail=1 OR (avail=2 AND startdate>0)) AND courseid='$cid'";
+} else {
+	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag,avail FROM imas_inlinetext WHERE ";
+	$query .= "((avail=1 AND ((oncal=2 AND enddate>$exlowertime AND enddate<$uppertime AND startdate<$now) OR (oncal=1 AND startdate<$now AND startdate>$exlowertime))) OR ";
+	$query .= "(avail=2 AND oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND courseid='$cid'";
+}
+
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 while ($row = mysql_fetch_row($result)) {
 	if ($row[1]=='##hidden##') {
@@ -222,11 +232,13 @@ while ($row = mysql_fetch_row($result)) {
 	$k++;
 }
 //$query = "SELECT id,title,enddate,text,startdate,oncal,caltag FROM imas_linkedtext WHERE ((oncal=2 AND enddate>$lowertime AND enddate<$uppertime AND startdate<$now) OR (oncal=1 AND startdate<$now AND startdate>$exlowertime)) AND avail=1 AND courseid='$cid'";
-//if (isset($teacherid)) {
+if (isset($teacherid)) {
 	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag,avail FROM imas_linkedtext WHERE ((oncal=2 AND enddate>$exlowertime AND enddate<$uppertime) OR (oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND (avail=1 OR (avail=2 AND startdate>0)) AND courseid='$cid' ORDER BY title";
-//} else {
-//	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag FROM imas_linkedtext WHERE ((oncal=2 AND enddate>$lowertime AND enddate<$uppertime AND startdate<$now) OR (oncal=1 AND startdate<$now AND startdate>$exlowertime)) AND avail=1 AND courseid='$cid'";
-//}
+} else {
+	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag,avail FROM imas_linkedtext WHERE ";
+	$query .= "((avail=1 AND ((oncal=2 AND enddate>$exlowertime AND enddate<$uppertime AND startdate<$now) OR (oncal=1 AND startdate<$now AND startdate>$exlowertime))) OR ";
+	$query .= "(avail=2 AND oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND courseid='$cid' ORDER BY title";
+}
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 while ($row = mysql_fetch_row($result)) {
 	if ($row[5]==1) {
@@ -255,12 +267,13 @@ while ($row = mysql_fetch_row($result)) {
 	$tags[$k] = $row[6];
 	$k++;
 }
-$query = "SELECT id,name,postby,replyby,startdate FROM imas_forums WHERE enddate>$exlowertime AND ((postby>$exlowertime AND postby<$uppertime) OR (replyby>$exlowertime AND replyby<$uppertime)) AND avail>0 AND courseid='$cid' ORDER BY name";
+$query = "SELECT id,name,postby,replyby,startdate,caltag FROM imas_forums WHERE enddate>$exlowertime AND ((postby>$exlowertime AND postby<$uppertime) OR (replyby>$exlowertime AND replyby<$uppertime)) AND avail>0 AND courseid='$cid' ORDER BY name";
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 while ($row = mysql_fetch_row($result)) {
 	if (($row[4]>$now && !isset($teacherid))) {
 		continue;
 	}
+	list($posttag,$replytag) = explode('--',$row[5]);
 	if ($row[2]!=2000000000) { //($row[2]>$now || isset($teacherid))
 		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[2]));
 		$row[1] = str_replace('"','\"',$row[1]);
@@ -269,7 +282,8 @@ while ($row = mysql_fetch_row($result)) {
 		if ($row[2]>$now || isset($teacherid)) {
 			$assess[$moday][$k] .= "id:\"$row[0]\",";
 		}
-		$assess[$moday][$k] .= "name:\"$row[1]\", color:\"".$colors[$k]."\"".((isset($teacherid))?", editlink:true":"")."}";
+		$assess[$moday][$k] .= "name:\"$row[1]\", color:\"".$colors[$k]."\", tag:\"$posttag\"".((isset($teacherid))?", editlink:true":"")."}";
+		$tags[$k] = $posttag;
 		$k++;
 	}
 	if ($row[3]!=2000000000) { //($row[3]>$now || isset($teacherid)) 
@@ -279,7 +293,8 @@ while ($row = mysql_fetch_row($result)) {
 		if ($row[3]>$now || isset($teacherid)) {
 			$assess[$moday][$k] .= "id:\"$row[0]\",";
 		}
-		$assess[$moday][$k] .= "name:\"$row[1]\", color:\"".$colors[$k]."\"".((isset($teacherid))?", editlink:true":"")."}";
+		$assess[$moday][$k] .= "name:\"$row[1]\", color:\"".$colors[$k]."\", tag:\"$replytag\"".((isset($teacherid))?", editlink:true":"")."}";
+		$tags[$k] = $replytag;
 		$k++;	
 	}
 }
@@ -330,7 +345,7 @@ for ($i=0;$i<count($hdrs);$i++) {
 				} else if (strpos($info,'type:"A"')!==false) {
 					echo "<span class=\"calitem\" style=\"background-color:".$colors[$k].";\">{$tags[$k]}</span> ";
 				} else if (strpos($info,'type:"F')!==false) { 
-					echo "<span class=\"calitem\" style=\"background-color:".$colors[$k].";\">F</span> ";
+					echo "<span class=\"calitem\" style=\"background-color:".$colors[$k].";\">{$tags[$k]}</span> ";
 				} else if (strpos($info,'type:"C')!==false) { 
 					echo "<span class=\"calitem\" style=\"background-color: #0ff;\">{$tags[$k]}</span> ";
 				} else { //textitems
