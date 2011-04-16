@@ -815,7 +815,12 @@ function arraysearch(needle,hay) {
       return -1;
    }
    
-function toggleinlinebtn(n){
+function toggleinlinebtn(n,p){
 	var el=document.getElementById(n);
 	el.style.display=="none"?el.style.display="":el.style.display="none";
+	if (p!=null) {
+		var s=document.getElementById(p);
+		var k=s.innerHTML;
+		s.innerHTML = k.match(/\+/)?k.replace(/\+/,'-'):k.replace(/\-/,'+');
+	}
 }

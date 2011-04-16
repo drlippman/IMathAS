@@ -2000,12 +2000,13 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 </p>
 <p><b>Optional Variables</b><BR>
 <dl>
-<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "sloppymixednumber","scinot", "fracordec", "nodecimal", "notrig", "allowmixed", "noval", "list", "exactlist", or "orderedlist" (In Common Control)</dt>
+<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "sloppymixednumber", "mixednumberorimproper", "scinot", "fracordec", "nodecimal", "notrig", "allowmixed", "noval", "list", "exactlist", or "orderedlist" (In Common Control)</dt>
 	<dd>Specifies answer format options.  Some can be combined, like this: $answerformat="nodecimal,notrig".
 	<ul>
 	<li>fraction: requires the answer to be a single fraction (like 10/6, 1/3, or 5)</li>
 	<li>reducedfraction: a reduced fraction (like 5/3 or 5)</li>
 	<li>mixednumber: a reduced mixed number (like 2 1/2 or 2_1/2, or 2/3 or 5)</li>
+	<li>mixednumberorimproper: a reduced mixed number or improper fraction (like 2 1/2 or 5/2)</li>
 	<li>sloppymixednumber: a mixed number (will take 5/2, 2 1/2, even 1 3/2)</li>
 	<li>scinot: scientific notation (like 2.3*10^4)</li>
 	<li>fracordec: a single fraction or decimal value</li>
@@ -2615,7 +2616,8 @@ A student is asked to enter an interval notation answer. Example: (2,5]U(7,oo)
 <h3><a name="calcinterval">Calculated Interval</a></h3>
 
 A student is asked to enter an interval notation answer. Example: (2,5]U(7,oo).  Values can be entered as calculations
-rather than numbers, like [2/5,sqrt(8)].
+rather than numbers, like [2/5,sqrt(8)].  Can use $answerformat="inequality" to require the student to use inequalities rather than 
+invertal notation.
 
 <p><b>Required Variables</b><BR>
 <dl>
@@ -2626,10 +2628,12 @@ rather than numbers, like [2/5,sqrt(8)].
 </p>
 <p><b>Optional Variables</b><BR>
 <dl>
-<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", or "notrig" (In Common Control)</dt>
+<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", "notrig", or "inequality" (In Common Control)</dt>
 	<dd>Requires the each value in the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
 	without decimals (also disallows 10^-2 and 3E-2), or 
 	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
+	$answerformat = "inequality" will require the student to enter an inequality rather than an interval.  The instructor answer must still be given in
+	interval notation (it will be reformatted to an inequality automatically for the Show Answer).  Use $variables="y" to change the variable of the inequality.
 	</dd>
 <dt>$reltolerance = a decimal value (In Answer)</dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is

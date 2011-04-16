@@ -842,7 +842,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (isset($answer)) {
 			if (!is_numeric($answer)) {
 				$sa = '`'.$answer.'`';
-			} else if (in_array('mixednumber',$ansformats) || in_array("sloppymixednumber",$ansformats)) {
+			} else if (in_array('mixednumber',$ansformats) || in_array("sloppymixednumber",$ansformats) || in_array("mixednumberorimproper",$ansformats)) {
 				$sa = '`'.decimaltofraction($answer,"mixednumber").'`';
 			} else if (in_array("fraction",$ansformats) || in_array("reducedfraction",$ansformats)) {
 				$sa = '`'.decimaltofraction($answer).'`';
@@ -1584,8 +1584,14 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 				} else {
 					$file = preg_replace('/@FILE:(.+?)@/',"$1",$la);
 					$url = getasidfileurl($file);
+					$extension = substr($url,strrpos($url,'.')+1,3);
 					$filename = basename($file);
 					$out .= "<br/>Last file uploaded: <a href=\"$url\" target=\"_new\">$filename</a>";
+					if (in_array(strtolower($extension),array('jpg','gif','png','bmp','jpe'))) {
+						$out .= " <span class=\"clickable\" id=\"filetog$qn\" onclick=\"toggleinlinebtn('img$qn','filetog$qn');\">[+]</span>";
+						$out .= " <img id=\"img$qn\" style=\"display:none;\" src=\"$url\" />";
+					}
+					
 				}
 			} else {
 				$out .= "<br/>$la";
@@ -2610,6 +2616,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$qn];} else {$abstolerance = $options['abstolerance'];}}
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$qn];} else {$requiretimes = $options['requiretimes'];}}
+		if (isset($options['variables'])) {if (is_array($options['variables'])) {$variables = $options['variables'][$qn];} else {$variables = $options['variables'];}}
+		if (!isset($variables)) { $variables = 'x';}
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = .001;}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$ansformats = explode(',',$answerformat);
@@ -2631,6 +2639,15 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				}
 				if (strpos($opts[1],'oo')===false &&  !checkanswerformat($opts[1],$ansformats)) {
 					return 0;
+				}
+			}
+			
+			if (in_array('inequality',$ansformats)) {
+				preg_match_all('/[a-zA-Z]+/',$_POST["tc$qn"],$matches);
+				foreach ($matches[0] as $var) {
+					if ($var!= 'or' && $var!='and' && $var != $variables) {
+						return 0;
+					}
 				}
 			}
 			
@@ -3660,21 +3677,29 @@ function checkanswerformat($tocheck,$ansformats) {
 		} 
 	}
 	
-	if (in_array("mixednumber",$ansformats) || in_array("sloppymixednumber",$ansformats) ) {
+	if (in_array("mixednumber",$ansformats) || in_array("sloppymixednumber",$ansformats) || in_array("mixednumberorimproper",$ansformats)) {
 		if (!preg_match('/^\s*\-?\s*\d+\s*(_|\s)\s*(\d+)\s*\/\s*(\d+)\s*$/',$tocheck,$mnmatches) && !preg_match('/^\s*?\-?\d+\s*$/',$tocheck) && !preg_match('/^\s*\-?\d+\s*\/\s*\-?\d+\s*$/',$tocheck)) {
 			//if doesn't match any format, exit
 			return false;
 		} else {
-			if (preg_match('/^\s*\-?\d+\s*\/\s*\-?\d+\s*$/',$tocheck)) {
+			if (preg_match('/^\s*\-?\d+\s*\/\s*\-?\d+\s*$/',$tocheck)) {   //if a fraction 
 				$tmpa = explode("/",$tocheck);
 				if (in_array("mixednumber",$ansformats)) {
 					if ((gcd(abs($tmpa[0]),abs($tmpa[1]))!=1) || $tmpa[0]>=$tmpa[1]) {
 						return false;
 					}
+				} else if (in_array("mixednumberorimproper",$ansformats)) {
+					if ((gcd(abs($tmpa[0]),abs($tmpa[1]))!=1)) {
+						return false;
+					}
 				}
-			} else	if (!preg_match('/^\s*?\-?\d+\s*$/',$tocheck)) {
+			} else	if (!preg_match('/^\s*?\-?\d+\s*$/',$tocheck)) {  //is in mixed number format
 				if (in_array("mixednumber",$ansformats)) {
 					if ($mnmatches[2]>=$mnmatches[3] || gcd($mnmatches[2],$mnmatches[3])!=1) {
+						return false;
+					}
+				} else if (in_array("mixednumberorimproper",$ansformats)) {
+					if (gcd($mnmatches[2],$mnmatches[3])!=1) {
 						return false;
 					}
 				}
@@ -3708,6 +3733,9 @@ function formathint($eword,$ansformats,$calledfrom, $islist=false,$doshort=false
 	} else if (in_array('mixednumber',$ansformats)) {
 		$tip .= "Enter $eword as a reduced mixed number or as a whole number.  Example: 2 1/2 = 2 &frac12;";
 		$shorttip = $islist?'Enter a list of mixed numbers or whole numbers':'Enter a mixed number or whole number';
+	} else if (in_array('mixednumberorimproper',$ansformats)) {
+		$tip .= "Enter $eword as a reduced mixed number, reduced improper fraction, or as a whole number.  Example: 2 1/2 = 2 &frac12;";
+		$shorttip = $islist?'Enter a list of mixed numbers or whole numbers':'Enter a mixed number, improper fraction, or whole number';
 	} else if (in_array('fracordec',$ansformats)) {
 		$tip .= "Enter $eword as a fraction (like 3/5 or 10/4), a whole number (like 4 or -2), or exact decimal (like 0.5 or 1.25)";
 		$shorttip = $islist?'Enter a list of fractions or exact decimals':'Enter a fraction or exact decimal';
