@@ -1403,12 +1403,14 @@ function prettyreal($n,$d) {
 }
 
 function prettysigfig($a,$sigfig,$comma=',') {
+	if ($a==0) { return 0;}
+	
 	$v = floor(-log10($a));
 
 	if ($v+$sigfig < 0) {
-		echo number_format(round($a,$v+$sigfig),0,'.',$comma);
+		return number_format(round($a,$v+$sigfig),0,'.',$comma);
 	} else {
-		echo number_format($a,$v+$sigfig);
+		return number_format($a,$v+$sigfig);
 	}
 }
 
