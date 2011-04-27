@@ -3558,10 +3558,11 @@ function checkreqtimes($tocheck,$rtimes) {
 function parsecomplex($v) {
 	$v = str_replace(' ','',$v);
 	$len = strlen($v);
-	if (substr_count($v,'i')>1) {
+	preg_match_all('/(\bi|i\b)/',$v,$matches,PREG_OFFSET_CAPTURE);
+	if (count($matches[0])>1) {
 		return 'error - more than 1 i in expression';
 	} else {
-		$p = strpos($v,'i');
+		$p = $matches[0][0][1];
 		if ($p===false) {
 			$real = $v;
 			$imag = 0;

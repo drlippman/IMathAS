@@ -1410,7 +1410,11 @@ function prettysigfig($a,$sigfig,$comma=',') {
 	if ($v+$sigfig < 0) {
 		return number_format(round($a,$v+$sigfig),0,'.',$comma);
 	} else {
-		return number_format($a,$v+$sigfig);
+		$n = number_format($a,$v+$sigfig);
+		if (substr($n,-1)=='0') {
+			$n = substr($n,0,-1);
+		}
+		return $n;
 	}
 }
 
