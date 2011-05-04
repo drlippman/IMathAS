@@ -1402,19 +1402,30 @@ function prettyreal($n,$d) {
 	return number_format($n,$d);
 }
 
-function prettysigfig($a,$sigfig,$comma=',') {
+function prettysigfig($a,$sigfig,$comma=',',$choptrailing=false) {
 	if ($a==0) { return 0;}
+	if ($a < 0 ) {
+		$sign = '-';
+		$a *= -1;
+	} else {
+		$sign = '';
+	}
 	
-	$v = floor(-log10($a));
-
+	$v = floor(-log10($a)-1e-12);
+	
 	if ($v+$sigfig < 0) {
-		return number_format(round($a,$v+$sigfig),0,'.',$comma);
+		return $sign.number_format(round($a,$v+$sigfig),0,'.',$comma);
 	} else {
 		$n = number_format($a,$v+$sigfig);
-		if (substr($n,-1)=='0') {
-			$n = substr($n,0,-1);
+		if ($choptrailing) {
+			$n = rtrim($n,'0');
+			$n = rtrim($n,'.');
+		} else {
+			if (floor(-log10($n)-1e-12) != $v) {  //adjust for .009 -> .010 1 sig
+				$n = substr($n,0,-1);
+			}
 		}
-		return $n;
+		return $sign.$n;
 	}
 }
 
