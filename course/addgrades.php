@@ -62,15 +62,15 @@
 			$showdate = parsedatetime($_POST['sdate'],$_POST['stime']);
 		}
 		$tutoredit = intval($_POST['tutoredit']);
-		
+		$rubric = intval($_POST['rubric']);
 		if ($_GET['gbitem']=='new') {
-			$query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit) VALUES ";
-			$query .= "('$cid','{$_POST['name']}','{$_POST['points']}',$showdate,'{$_POST['gbcat']}','{$_POST['cntingb']}',$tutoredit) ";
+			$query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit,rubric) VALUES ";
+			$query .= "('$cid','{$_POST['name']}','{$_POST['points']}',$showdate,'{$_POST['gbcat']}','{$_POST['cntingb']}',$tutoredit,$rubric) ";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			$_GET['gbitem'] = mysql_insert_id();
 			$isnewitem = true;
 		} else {
-			$query = "UPDATE imas_gbitems SET name='{$_POST['name']}',points='{$_POST['points']}',showdate=$showdate,gbcategory='{$_POST['gbcat']}',cntingb='{$_POST['cntingb']}',tutoredit=$tutoredit ";
+			$query = "UPDATE imas_gbitems SET name='{$_POST['name']}',points='{$_POST['points']}',showdate=$showdate,gbcategory='{$_POST['gbcat']}',cntingb='{$_POST['cntingb']}',tutoredit=$tutoredit,rubric=$rubric ";
 			$query .= "WHERE id='{$_GET['gbitem']}'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			$isnewitem = false;
@@ -173,6 +173,8 @@
 		 display: none;
 		 }
 		 </style>';
+	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js"></script>';
+	require("../includes/rubric.php");
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
@@ -200,10 +202,11 @@
 			$gbcat = 0;
 			$cntingb = 1;
 			$tutoredit = 0;
+			$rubric = 0;
 		} else {
-			$query = "SELECT name,points,showdate,gbcategory,cntingb,tutoredit FROM imas_gbitems WHERE id='{$_GET['gbitem']}'";
+			$query = "SELECT name,points,showdate,gbcategory,cntingb,tutoredit,rubric FROM imas_gbitems WHERE id='{$_GET['gbitem']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			list($name,$points,$showdate,$gbcat,$cntingb,$tutoredit) = mysql_fetch_row($result);
+			list($name,$points,$showdate,$gbcat,$cntingb,$tutoredit,$rubric) = mysql_fetch_row($result);
 		}
 		if ($showdate!=0) {
 			$sdate = tzdate("m/d/Y",$showdate);
@@ -211,6 +214,14 @@
 		} else {
 			$sdate = tzdate("m/d/Y",time()+60*60);
 			$stime = tzdate("g:i a",time()+60*60);
+		}
+		$rubric_vals = array(0);
+		$rubric_names = array('None');
+		$query = "SELECT id,name FROM imas_rubrics WHERE ownerid='$userid' OR groupid='$gropuid' ORDER BY name";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			$rubric_vals[] = $row[0];
+			$rubric_names[] = $row[1];
 		}
 ?>
 
@@ -263,6 +274,12 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 			echo '</span><br class="form"/>';
 		}
 		
+		echo '<span class=form>Use Scoring Rubric</span><span class=formright>';
+		writeHtmlSelect('rubric',$rubric_vals,$rubric_names,$rubric);
+		echo " <a href=\"addrubric.php?cid=$cid&amp;id=new&amp;from=addg&amp;gbitem={$_GET['gbitem']}\">Add new rubric</a> ";
+		echo "| <a href=\"addrubric.php?cid=$cid&amp;from=addg&amp;gbitem={$_GET['gbitem']}\">Edit rubrics</a> ";
+		echo '</span><br class="form"/>';
+		
 		if ($_GET['gbitem']!='new') {
 			echo "<span class=form></span><span class=formright><a href=\"addgrades.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=$cid&del={$_GET['gbitem']}\">Delete Item</a></span><br class=form />";
 			echo "<span class=form></span><span class=formright><input type=submit value=\"Submit\"/> </span><br class=form />";
@@ -270,14 +287,25 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 			echo "<span class=form>Upload grades?</span><span class=formright><input type=checkbox name=\"doupload\" /> <input type=submit value=\"Submit\"/></span><br class=form />";
 		}
 	    } else {
-		    $query = "SELECT name FROM imas_gbitems WHERE id='{$_GET['gbitem']}'";
-		    $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		    echo '<h3>'.mysql_result($result,0,0).'</h3>';
-	    }
-	} else {
-		$query = "SELECT name FROM imas_gbitems WHERE id='{$_GET['gbitem']}'";
+		$query = "SELECT name,rubric,points FROM imas_gbitems WHERE id='{$_GET['gbitem']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		echo '<h3>'.mysql_result($result,0,0).'</h3>';
+		$rubric = mysql_result($result,0,1);
+		$points = mysql_result($result,0,2);
+	    }
+	} else {
+		$query = "SELECT name,rubric,points FROM imas_gbitems WHERE id='{$_GET['gbitem']}'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		echo '<h3>'.mysql_result($result,0,0).'</h3>';
+		$rubric = mysql_result($result,0,1);
+		$points = mysql_result($result,0,2);
+	}
+	if ($rubric != 0) {
+		$query = "SELECT id,rubrictype,rubric FROM imas_rubrics WHERE id='$rubric'";
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		if (mysql_num_rows($result)>0) {
+			echo printrubrics(array(mysql_fetch_row($result)));
+		}
 	}
 ?>
 
@@ -393,8 +421,12 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 			} else {
 				echo "<td><input type=text size=3 name=\"newscore[{$row[0]}]\" id=\"score{$row[0]}\" value=\"";
 			}
-			echo "\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" onblur=\"this.value = doonblur(this.value);\" /></td>";
-			echo "<td><textarea style=\"display:hidden;\" cols=40 rows=1 name=\"feedback[{$row[0]}]\">{$feedback[$row[0]]}</textarea></td>";
+			echo "\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" onblur=\"this.value = doonblur(this.value);\" />";
+			if ($rubric != 0) {
+				echo printrubriclink($rubric,$points,"score{$row[0]}","feedback{$row[0]}");
+			}
+			echo "</td>";
+			echo "<td><textarea style=\"display:hidden;\" cols=40 rows=1 id=\"feedback{$row[0]}\" name=\"feedback[{$row[0]}]\">{$feedback[$row[0]]}</textarea></td>";
 			echo "</tr>";
 		}
 		

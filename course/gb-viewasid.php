@@ -320,8 +320,14 @@
 		$useeditor='review';
 		$sessiondata['coursetheme'] = $coursetheme;
 		$sessiondata['isteacher'] = $isteacher;
+		if ($isteacher) {
+			$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js"></script>';
+			require("../includes/rubric.php");
+		}
 		require("../assessment/header.php");
 		echo "<style type=\"text/css\">p.tips {	display: none;}\n</style>\n";
+		
+		
 		if (isset($_GET['starttime']) && $isteacher) {
 			$query = "UPDATE imas_assessment_sessions SET starttime='{$_GET['starttime']}' ";//WHERE id='{$_GET['asid']}'";
 			//$query .= getasidquery($_GET['asid']);
@@ -365,6 +371,20 @@
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$row = mysql_fetch_row($result);
 		echo "<h3>{$row[1]}, {$row[0]}</h3>\n";
+		
+		if ($isteacher) {
+			$query = "SELECT id,rubrictype,rubric FROM imas_rubrics WHERE id IN ";
+			$query .= "(SELECT DISTINCT rubric FROM imas_questions WHERE assessmentid={$line['assessmentid']} AND rubric>0)";
+			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			if (mysql_num_rows($result)>0) {
+				$rubrics = array();
+				while ($row = mysql_fetch_row($result)) {
+					$rubrics[] = $row;
+				}
+				echo printrubrics($rubrics);
+			}
+			unset($rubrics);
+		}
 		
 		//do time limit mult
 		$timelimitmult = $row[2];
@@ -495,11 +515,14 @@
 			echo "</p>";
 		}
 		
-		$query = "SELECT iq.id,iq.points,iq.withdrawn,iqs.qtype,iqs.control ";
+		$query = "SELECT iq.id,iq.points,iq.withdrawn,iqs.qtype,iqs.control,iq.rubric ";
 		$query .= "FROM imas_questions AS iq, imas_questionset AS iqs ";
 		$query .= "WHERE iq.questionsetid=iqs.id AND iq.assessmentid='{$line['assessmentid']}'";
 		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 		$totalpossible = 0;
+		$pts = array();
+		$withdrawn = array();
+		$rubric = array();
 		while ($r = mysql_fetch_row($result)) {
 			if ($r[1]==9999) {
 				$pts[$r[0]] = $line['defpoints'];  //use defpoints
@@ -508,6 +531,7 @@
 			}
 			//$totalpossible += $pts[$r[0]];  do later
 			$withdrawn[$r[0]] = $r[2];
+			$rubric[$r[0]] = $r[5];
 			if ($r[3]=='multipart') {
 				//if (preg_match('/answeights\s*=\s*("|\')([\d\.\,\s]+)/',$line['control'],$match)) {
 				if (($p = strpos($r[4],'answeights'))!==false) {
@@ -532,9 +556,6 @@
 				$answeights[$r[0]] = implode(', ',$answeights[$r[0]]);
 			}
 		}
-		
-		
-		
 		echo '<script type="text/javascript">';
 		echo 'function hidecorrect() {';
 		echo '   var butn = document.getElementById("hctoggle");';
@@ -577,6 +598,7 @@
 		echo ' <input type=button id="hnatoggle" value="Hide Not Answered Questions" onclick="hideNA()" />';
 		echo "<form id=\"mainform\" method=post action=\"gb-viewasid.php?stu=$stu&cid=$cid&from=$from&asid={$_GET['asid']}&update=true\">\n";
 		$total = 0;
+		
 		for ($i=0; $i<count($questions);$i++) {
 			echo "<div ";
 			if (getpts($scores[$i])==$pts[$questions[$i]]) {
@@ -600,7 +622,10 @@
 			}
 			list($pt,$parts) = printscore($scores[$i]);
 			if ($canedit && $parts=='') { 
-				echo "<input type=text size=4 name=\"$i\" value=\"$pt\">";
+				echo "<input type=text size=4 id=\"scorebox$i\" name=\"$i\" value=\"$pt\">";
+				if ($rubric[$questions[$i]]!=0) {
+					echo printrubriclink($rubric[$questions[$i]],$pts[$questions[$i]],"scorebox$i","feedback",($i+1));
+				}
 			} else {
 				echo $pt;
 			}
@@ -609,9 +634,12 @@
 					echo " (parts: ";
 					$prts = explode(', ',$parts);
 					for ($j=0;$j<count($prts);$j++) {
-						echo "<input type=text size=2 name=\"$i-$j\" value=\"{$prts[$j]}\"> ";
+						echo "<input type=text size=2 id=\"scorebox$i-$j\" name=\"$i-$j\" value=\"{$prts[$j]}\"> ";
 					}
 					echo ")";
+					if ($rubric[$questions[$i]]!=0) {
+						echo printrubriclink($rubric[$questions[$i]],$pts[$questions[$i]],"scorebox$i-0","feedback",($i+1));
+					}
 				} else {
 					echo " (parts: $parts)";
 				}
@@ -656,7 +684,7 @@
 		}
 		echo "<p></p><div class=review>Total: $total/$totalpossible</div>\n";
 		if ($canedit && !isset($_GET['lastver']) && !isset($_GET['reviewver'])) {
-			echo "<p>Feedback to student:<br/><textarea cols=60 rows=4 name=\"feedback\">{$line['feedback']}</textarea></p>";
+			echo "<p>Feedback to student:<br/><textarea cols=60 rows=4 id=\"feedback\" name=\"feedback\">{$line['feedback']}</textarea></p>";
 			if ($line['agroupid']>0) {
 				echo "<p>Update grade for all group members? <input type=checkbox name=\"updategroup\" checked=\"checked\" /></p>";
 			}

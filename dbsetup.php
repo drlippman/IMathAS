@@ -266,6 +266,7 @@ $sql = 'CREATE TABLE `imas_questions` ('
         . ' `attempts` SMALLINT(4) UNSIGNED NOT NULL DEFAULT \'9999\', '
         . ' `penalty` VARCHAR(6) NOT NULL DEFAULT \'9999\', '
 	. ' `category` VARCHAR(254) NOT NULL DEFAULT \'0\','
+	. ' `rubric` INT(10) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `regen` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\','
 	. ' `showans` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\','
 	. ' `withdrawn` CHAR(1) NOT NULL DEFAULT \'0\','
@@ -591,7 +592,19 @@ $sql = 'CREATE TABLE `imas_groups` ('
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());	
 echo 'imas_groups created<br/>';
 
-
+$sql = 'CREATE TABLE `imas_rubrics` ('
+	. ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
+	. ' `ownerid` INT(10) UNSIGNED NOT NULL, '
+	. ' `groupid` INT(10) NOT NULL DEFAULT \'-1\', '
+	. ' `name` VARCHAR(254) NOT NULL, '
+	. ' `rubrictype` TININT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
+	. ' `rubric` TEXT NOT NULL, '
+	. ' INDEX(`ownerid`), INDEX(`groupid`)'
+	. ' )'
+	. ' TYPE = innodb'
+	. ' COMMENT = \'Rubrics\';';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());	
+echo 'imas_rubrics created<br/>';
 
 $sql = 'CREATE TABLE `imas_diags` ('
         . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
@@ -682,6 +695,7 @@ $sql = 'CREATE TABLE `imas_gbitems` ('
         . ' `points` SMALLINT(4) NOT NULL DEFAULT \'0\', '
         . ' `showdate` INT(10) UNSIGNED NOT NULL, '
         . ' `gbcategory` INT(10) UNSIGNED NOT NULL, '
+	. ' `rubric` INT(10) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `cntingb` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'1\', '
 	. ' `tutoredit` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
         . ' INDEX (`courseid`), INDEX(`showdate`)'

@@ -4,6 +4,7 @@
 
 /*** master php includes *******/
 require("../validate.php");
+require("../includes/htmlutil.php");
 
  //set some page specific variables and counters
 $overwriteBody = 0;
@@ -36,8 +37,9 @@ if (!(isset($teacherid))) {
 		}
 		$regen = $_POST['regen'] + 3*$_POST['allowregen'];
 		$showans = $_POST['showans'];
+		$rubric = intval($_POST['rubric']);
 		if (isset($_GET['id'])) { //already have id - updating
-			$query = "UPDATE imas_questions SET points='$points',attempts='$attempts',penalty='$penalty',regen='$regen',showans='$showans' ";
+			$query = "UPDATE imas_questions SET points='$points',attempts='$attempts',penalty='$penalty',regen='$regen',showans='$showans',rubric=$rubric ";
 			$query .= "WHERE id='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (isset($_POST['copies']) && $_POST['copies']>0) {
@@ -51,8 +53,8 @@ if (!(isset($teacherid))) {
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$itemorder = mysql_result($result,0,0);
 			for ($i=0;$i<$_POST['copies'];$i++) {
-				$query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,regen,showans,questionsetid) ";
-				$query .= "VALUES ('$aid','$points','$attempts','$penalty','$regen','$showans','{$_GET['qsetid']}')";
+				$query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,regen,showans,questionsetid,rubric) ";
+				$query .= "VALUES ('$aid','$points','$attempts','$penalty','$regen','$showans','{$_GET['qsetid']}',$rubric)";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				$qid = mysql_insert_id();
 				
@@ -79,7 +81,7 @@ if (!(isset($teacherid))) {
 	} else { //DEFAULT DATA MANIPULATION
 
 		if (isset($_GET['id'])) {
-			$query = "SELECT points,attempts,penalty,regen,showans FROM imas_questions WHERE id='{$_GET['id']}'";
+			$query = "SELECT points,attempts,penalty,regen,showans,rubric FROM imas_questions WHERE id='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$line = mysql_fetch_array($result, MYSQL_ASSOC);
 			if ($line['penalty']{0}==='L') {
@@ -103,6 +105,16 @@ if (!(isset($teacherid))) {
 			$skippenalty = 0;
 			$line['regen']=0;
 			$line['showans']='0';
+			$line['rubric']=0;
+		}
+		
+		$rubric_vals = array(0);
+		$rubric_names = array('None');
+		$query = "SELECT id,name FROM imas_rubrics WHERE ownerid='$userid' OR groupid='$gropuid' ORDER BY name";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			$rubric_vals[] = $row[0];
+			$rubric_names[] = $row[1];
 		}
 		
 		$query = "SELECT ias.id FROM imas_assessment_sessions AS ias,imas_students WHERE ";
@@ -173,6 +185,13 @@ Leave items blank to use the assessment's default values<br/>
      <option value="F" <?php if ($line['showans']=='F') { echo 'selected="1"';}?>>Show answer after last attempt</option>
     </select></span><br class="form"/>
 
+<span class=form>Use Scoring Rubric</span><span class=formright>
+<?php 
+    writeHtmlSelect('rubric',$rubric_vals,$rubric_names,$line['rubric']);
+    echo " <a href=\"addrubric.php?cid=$cid&amp;id=new&amp;from=modq&amp;aid=$aid&amp;qid={$_GET['id']}\">Add new rubric</a> ";
+    echo "| <a href=\"addrubric.php?cid=$cid&amp;from=modq&amp;aid=$aid&amp;qid={$_GET['id']}\">Edit rubrics</a> ";
+?>
+    </span><br class="form"/>
 <?php
 	if (isset($_GET['qsetid'])) { //adding new question
 		echo "<span class=form>Number of copies of question to add:</span><span class=formright><input type=text size=4 name=copies value=\"1\"/></span><br class=form />";

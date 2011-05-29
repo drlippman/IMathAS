@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 38;
+$latest = 39;
 
 
 @set_time_limit(0);
@@ -624,11 +624,39 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 }
 		}
 		if ($last<38) {
-			$query = 'ALTER TABLE `imas_forums` ADD `caltag` VARCHAR( 254 ) NOT NULL DEFAULT \'FP--FR\'';
+			 $query = 'ALTER TABLE `imas_forums` ADD `caltag` VARCHAR( 254 ) NOT NULL DEFAULT \'FP--FR\'';
 			 $res = mysql_query($query);
 			 if ($res===false) {
 			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
+		}
+		if ($last<39) {
+			$sql = 'CREATE TABLE `imas_rubrics` ('
+				. ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
+				. ' `ownerid` INT(10) UNSIGNED NOT NULL, '
+				. ' `groupid` INT(10) NOT NULL DEFAULT \'-1\', '
+				. ' `name` VARCHAR(254) NOT NULL, '
+				. ' `rubrictype` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
+				. ' `rubric` TEXT NOT NULL, '
+				 . ' INDEX(`ownerid`), INDEX(`groupid`)'
+				. ' )'
+				. ' TYPE = innodb'
+				. ' COMMENT = \'Rubrics\';';
+			 $res = mysql_query($sql);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($sql) : ".mysql_error()."</p>";
+			 }
+			 $query = 'ALTER TABLE `imas_questions` ADD `rubric` INT(10) UNSIGNED NOT NULL DEFAULT \'0\'';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = 'ALTER TABLE `imas_gbitems` ADD `rubric` INT(10) UNSIGNED NOT NULL DEFAULT \'0\'';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 
 		}
 		$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {

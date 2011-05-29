@@ -117,16 +117,19 @@
 			
 	}
 	
-	$query = "SELECT imas_questions.points,imas_questionset.control FROM imas_questions,imas_questionset ";
+	$query = "SELECT imas_questions.points,imas_questionset.control,imas_questions.rubric FROM imas_questions,imas_questionset ";
 	$query .= "WHERE imas_questions.questionsetid=imas_questionset.id AND imas_questions.id='$qid'";
 	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 	$points = mysql_result($result,0,0);
 	$qcontrol = mysql_result($result,0,1);
+	$rubric = mysql_result($result,0,2);
 	if ($points==9999) {
 		$points = $defpoints;
 	}
 	
 	$useeditor='review';
+	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js"></script>';
+	require("../includes/rubric.php");
 	require("../assessment/header.php");
 	echo "<style type=\"text/css\">p.tips {	display: none;}\n</style>\n";
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
@@ -233,6 +236,12 @@
 	}
 	</script>
 <?php
+	$query = "SELECT imas_rubrics.id,imas_rubrics.rubrictype,imas_rubrics.rubric FROM imas_rubrics JOIN imas_questions ";
+	$query .= "ON imas_rubrics.id=imas_questions.rubric WHERE imas_questions.id='$qid'";
+	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	if (mysql_num_rows($result)>0) {
+		echo printrubrics(array(mysql_fetch_row($result)));
+	}
 	echo '<input type=button id="hctoggle" value="Hide Perfect Score Questions" onclick="hidecorrect()" />';
 	echo '<input type=button id="nztoggle" value="Hide Nonzero Score Questions" onclick="hidenonzero()" />';
 	echo ' <input type=button id="hnatoggle" value="Hide Not Answered Questions" onclick="hideNA()" />';
@@ -331,7 +340,10 @@
 				if ($pt==-1) {
 					$pt = 'N/A';
 				}
-				echo "<input type=text size=4 name=\"ud-{$line['id']}-$loc\" value=\"$pt\">";
+				echo "<input type=text size=4 id=\"ud-{$line['id']}-$loc\" name=\"ud-{$line['id']}-$loc\" value=\"$pt\">";
+				if ($rubric != 0) {
+					echo printrubriclink($rubric,$points,"ud-{$line['id']}-$loc","feedback-{$line['id']}",($loc+1));
+				}
 			} 
 			if ($parts!='') {
 				echo " Parts: ";
@@ -340,7 +352,10 @@
 					if ($prts[$j]==-1) {
 						$prts[$j] = 'N/A';
 					}
-					echo "<input type=text size=2 name=\"ud-{$line['id']}-$loc-$j\" value=\"{$prts[$j]}\"> ";
+					echo "<input type=text size=2 id=\"ud-{$line['id']}-$loc-$j\" name=\"ud-{$line['id']}-$loc-$j\" value=\"{$prts[$j]}\"> ";
+				}
+				if ($rubric != 0) {
+					echo printrubriclink($rubric,$points,"ud-{$line['id']}-$loc-0","feedback-{$line['id']}",($loc+1));
 				}
 			}
 			echo " out of $points ";
@@ -392,7 +407,7 @@
 			
 			//echo " <a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid=$cid&add=new&quoteq=$i-$qsetid-{$seeds[$i]}&to={$_GET['uid']}\">Use in Msg</a>";
 			//echo " &nbsp; <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$line['id']}&clearq=$i\">Clear Score</a>";
-			echo "<br/>Feedback: <textarea cols=50 rows=1 name=\"feedback-{$line['id']}\">{$line['feedback']}</textarea>";
+			echo "<br/>Feedback: <textarea cols=50 rows=1 id=\"feedback-{$line['id']}\" name=\"feedback-{$line['id']}\">{$line['feedback']}</textarea>";
 			echo ' Question #'.($loc+1);
 			echo "</div>\n";
 			if ($groupdup) {

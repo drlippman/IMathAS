@@ -491,7 +491,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		$tip .= "Enter DNE for Does Not Exist, oo for Infinity";
 		if (isset($reqdecimals)) {
 			$tip .= "<br/>Your answer should be accurate to $reqdecimals decimal places.";
-			$shorttip .= ", accurate to $reqdecimal decimal places";
+			$shorttip .= ", accurate to $reqdecimals decimal places";
 		}
 		$out .= "$leftb<input ";
 		if ($displayformat=='alignright') { $out .= 'style="text-align: right;" ';}
@@ -2097,9 +2097,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					}
 				} else {
 				$cpts = parsecomplex($tchk);
-					if (!is_array($cpts)) {
-						return 0;
-					}
+				if (!is_array($cpts)) {
+					return 0;
+				}
 				if ($cpts[1]{0}=='+') {
 					$cpts[1] = substr($cpts[1],1);
 				}
@@ -3557,12 +3557,15 @@ function checkreqtimes($tocheck,$rtimes) {
 //one i in it.
 function parsecomplex($v) {
 	$v = str_replace(' ','',$v);
+	$v = str_replace(array('sin','pi'),array('s$n','p$'),$v);
 	$len = strlen($v);
-	preg_match_all('/(\bi|i\b)/',$v,$matches,PREG_OFFSET_CAPTURE);
-	if (count($matches[0])>1) {
+	//preg_match_all('/(\bi|i\b)/',$v,$matches,PREG_OFFSET_CAPTURE);
+	//if (count($matches[0])>1) {
+	if (substr_count($v,'i')>1) {
 		return 'error - more than 1 i in expression';
 	} else {
-		$p = $matches[0][0][1];
+		//$p = $matches[0][0][1];
+		$p = strpos($v,'i');
 		if ($p===false) {
 			$real = $v;
 			$imag = 0;
@@ -3633,6 +3636,8 @@ function parsecomplex($v) {
 				$imag = substr($imag,0,-1);
 			}
 		}
+		$real = str_replace(array('s$n','p$'),array('sin','pi'),$real);
+		$imag = str_replace(array('s$n','p$'),array('sin','pi'),$imag);
 		return array($real,$imag);
 	}
 }
