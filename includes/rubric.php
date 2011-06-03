@@ -28,9 +28,9 @@ function printrubrics($rubricarray) {
 }
 
 //printrubriclink(rubricId,points,scoreboxid,feedbackboxid,[qn,width])
-function printrubriclink($rubricid,$points,$scorebox,$feedbackbox,$qn='null',$width=400) {
+function printrubriclink($rubricid,$points,$scorebox,$feedbackbox,$qn='null',$width=600) {
 	global $imasroot;
-	$out = "<a onclick=\"imasrubric_show($rubricid,$points,'$scorebox','$feedbackbox',$qn,$width); return false;\" href=\"#\">";
+	$out = "<a onclick=\"imasrubric_show($rubricid,$points,'$scorebox','$feedbackbox','$qn',$width); return false;\" href=\"#\">";
 	$out .= "<img border=0 src=\"$imasroot/img/assess.png\" alt=\"rubric\"></a>";
 	return $out;
 }

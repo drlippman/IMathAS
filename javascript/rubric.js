@@ -22,24 +22,34 @@ function imasrubric_show(rubricid,pointsposs,scoreboxid,feedbackid,qn,width) {
 	
 	var html = "<div style='margin: 10px;'><form id='imasrubricform'><table><tbody>";
 	for (var i=0;i<imasrubrics[rubricid].data.length; i++) {
-		if (imasrubrics[rubricid].type==0 || imasrubrics[rubricid].type==1 ) {  //score or score and feedback
+		if (imasrubrics[rubricid].type==0 || imasrubrics[rubricid].type==1 ) {  //score breakdown or score and feedback
 			html += "<tr><td>"+imasrubrics[rubricid].data[i][0];
 			if (imasrubrics[rubricid].data[i][1]!="") {
 				html += "<br/><i>"+imasrubrics[rubricid].data[i][1]+"</i>";
 			}
 			totpts = Math.round(pointsposs*imasrubrics[rubricid].data[i][2])/100;
-			html += '</td><td><input type="radio" name="rubricgrp'+i+'" value="'+totpts+'"/> '+totpts+'</td>';
-			html += '<td><input type="radio" name="rubricgrp'+i+'" value="0" checked="checked"/> 0</td>';
-			html += '<td><input type="radio" name="rubricgrp'+i+'" id="rubricgrpother'+i+'" value="-1"/> Other: <input onfocus="document.getElementById(\'rubricgrpother'+i+'\').checked=true" type="text" size="3" id="rubricother'+i+'" value=""/></td></tr>';
+			html += '</td><td width="10%"><input type="radio" name="rubricgrp'+i+'" value="'+totpts+'"/> '+totpts+'</td>';
+			if (totpts==2) {
+				html += '</td><td width="10%"><input type="radio" name="rubricgrp'+i+'" value="1"/> 1</td>';
+			}
+			html += '<td width="10%"><input type="radio" name="rubricgrp'+i+'" value="0" checked="checked"/> 0</td>';
+			html += '<td width="10%"><input type="radio" name="rubricgrp'+i+'" id="rubricgrpother'+i+'" value="-1"/> Other: <input onfocus="document.getElementById(\'rubricgrpother'+i+'\').checked=true" type="text" size="3" id="rubricother'+i+'" value=""/></td></tr>';
 		} else if (imasrubrics[rubricid].type==2) { //just feedback
 			html += "<tr><td>"+imasrubrics[rubricid].data[i][0];
 			if (imasrubrics[rubricid].data[i][1]!="") {
 				html += "<br/><i>"+imasrubrics[rubricid].data[i][1]+"</i>";
 			}
 			html += '</td><td><input type="checkbox" id="rubricchk'+i+'" value="1"/></td></tr>';
+		} else if (imasrubrics[rubricid].type==3 || imasrubrics[rubricid].type==3) { //score total 
+			html += "<tr><td>"+imasrubrics[rubricid].data[i][0];
+			if (imasrubrics[rubricid].data[i][1]!="") {
+				html += "<br/><i>"+imasrubrics[rubricid].data[i][1]+"</i>";
+			}
+			totpts = Math.round(pointsposs*imasrubrics[rubricid].data[i][2])/100;
+			html += '</td><td width="10%"><input type="radio" name="rubricgrp" value="'+i+'"/> '+totpts+'</td></tr>';
 		}
 	}
-	html += '</tbody></table><br/><input type="button" value="Record" onclick="imasrubric_record(\''+rubricid+'\',\''+scoreboxid+'\',\''+feedbackid+'\','+qn+','+pointsposs+')" /></form></div>';
+	html += '</tbody></table><br/><input type="button" value="Record" onclick="imasrubric_record(\''+rubricid+'\',\''+scoreboxid+'\',\''+feedbackid+'\',\''+qn+'\','+pointsposs+')" /></form></div>';
 	
 	
 	document.getElementById("GB_frameholder").innerHTML = html;
@@ -59,7 +69,7 @@ function imasrubric_record(rubricid,scoreboxid,feedbackid,qn,pointsposs) {
 	if (qn != null && qn != '0') {
 		feedback += '#'+qn+': ';
 	}
-	if (imasrubrics[rubricid].type==0 || imasrubrics[rubricid].type==1 ) {  //score and feedback
+	if (imasrubrics[rubricid].type==0 || imasrubrics[rubricid].type==1 ) {  //score breakdown and feedback
 		var score = 0;
 		for (var i=0;i<imasrubrics[rubricid].data.length; i++) {
 			val = getRadioValue('rubricgrp'+i);
@@ -84,6 +94,14 @@ function imasrubric_record(rubricid,scoreboxid,feedbackid,qn,pointsposs) {
 			}
 		}
 		document.getElementById(feedbackid).value = document.getElementById(feedbackid).value + feedback;
+	} else if (imasrubrics[rubricid].type==3 || imasrubrics[rubricid].type==4 ) {  //score total and feedback
+		loc = getRadioValue('rubricgrp');
+		totpts = Math.round(pointsposs*imasrubrics[rubricid].data[loc][2])/100;
+		feedback += imasrubrics[rubricid].data[loc][0];//+': '+totpts+'/'+pointsposs+'. ';
+		document.getElementById(scoreboxid).value = totpts;
+		if (imasrubrics[rubricid].type==3) {
+			document.getElementById(feedbackid).value = document.getElementById(feedbackid).value + feedback;
+		}
 	}
 	GB_hide();
 	
@@ -100,6 +118,11 @@ function imasrubric_chgtype() {
 			} else {
 				els[i].style.display = '';
 				document.getElementById("pointsheader").style.display = '';
+				if (val==0 || val==1) {
+					document.getElementById("pointsheader").innerHTML='Percentage of score<br/>Should add to 100';
+				} else if (val==3 || val==4) {
+					document.getElementById("pointsheader").innerHTML='Percentage of score';
+				}
 			}
 		}
 	}	

@@ -2,9 +2,10 @@
 //IMathAS:  Copy Items utility functions
 //(c) 2008 David Lippman
 $reqscoretrack = array();
+$qrubrictrack = array();
 $assessnewid = array();
 function copyitem($itemid,$gbcats) {
-	global $cid, $reqscoretrack, $assessnewid, $copystickyposts,$userid;
+	global $cid, $reqscoretrack, $assessnewid, $qrubrictrack, $copystickyposts,$userid;
 	if (!isset($copystickyposts)) { $copystickyposts = false;}
 	if ($gbcats===false) {
 		$gbcats = array();
@@ -155,13 +156,19 @@ function copyitem($itemid,$gbcats) {
 					///$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category) ";
 					///$query .= "SELECT '$newtypeid',questionsetid,points,attempts,penalty,category FROM imas_questions WHERE id='$aitem'";
 					//mysql_query($query) or die("Query failed :$query " . mysql_error());
-					$query = "SELECT questionsetid,points,attempts,penalty,category FROM imas_questions WHERE id='$aitem'";
+					$query = "SELECT questionsetid,points,attempts,penalty,category,rubric FROM imas_questions WHERE id='$aitem'";
 					$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-					$row = "'".implode("','",addslashes_deep(mysql_fetch_row($result)))."'";
+					$row = mysql_fetch_row($result);
+					$rubric = array_pop($row);
+					$row = "'".implode("','",addslashes_deep($row))."'";
 					$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category) ";
 					$query .= "VALUES ('$newtypeid',$row)";
 					mysql_query($query) or die("Query failed : $query" . mysql_error());
-					$newaitems[] = mysql_insert_id();
+					$newid = mysql_insert_id();
+					if ($rubric != 0) {
+						$qrubrictrack[$newid] = $rubric;
+					}
+					$newaitems[] = $newid;
 				} else {
 					$sub = explode('~',$aitem);
 					$newsub = array();
@@ -172,13 +179,19 @@ function copyitem($itemid,$gbcats) {
 						//$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category) ";
 						//$query .= "SELECT '$newtypeid',questionsetid,points,attempts,penalty,category FROM imas_questions WHERE id='$subi'";
 						//mysql_query($query) or die("Query failed : $query" . mysql_error());
-						$query = "SELECT questionsetid,points,attempts,penalty,category FROM imas_questions WHERE id='$subi'";
+						$query = "SELECT questionsetid,points,attempts,penalty,category,rubric FROM imas_questions WHERE id='$subi'";
 						$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-						$row = "'".implode("','",addslashes_deep(mysql_fetch_row($result)))."'";
+						$row = mysql_fetch_row($result);
+						$rubric = array_pop($row);
+						$row = "'".implode("','",addslashes_deep($row))."'";
 						$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category) ";
 						$query .= "VALUES ('$newtypeid',$row)";
 						mysql_query($query) or die("Query failed : $query" . mysql_error());
-						$newsub[] = mysql_insert_id();
+						$newid = mysql_insert_id();
+						if ($rubric != 0) {
+							$qrubrictrack[$newid] = $rubric;
+						}
+						$newsub[] = $newid;
 					}
 					$newaitems[] = implode('~',$newsub);
 				}
@@ -355,6 +368,72 @@ function buildexistblocks($items,$parent) {
 			}
 		}
 	}
+}
+
+function copyrubrics($offlinerubrics=array()) {
+	global $userid,$groupid,$qrubrictrack;
+	if (count($qrubrictrack)==0 && count($offlinerubrics)==0) { return;}
+	$list = implode(',',array_merge($qrubrictrack,$offlinerubrics));
+	echo "copying rubrics";
+	
+	//handle rubrics which I already have access to
+	$query = "SELECT id FROM imas_rubrics WHERE id IN ($list) AND (ownerid='$userid' OR groupid='$groupid')";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	while ($row = mysql_fetch_row($result)) { 
+		$qfound = array_keys($qrubrictrack,$row[0]);
+		if (count($qfound)>0) {
+			foreach ($qfound as $qid) {
+				$query = "UPDATE imas_questions SET rubric={$row[0]} WHERE id=$qid";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+		}
+		$ofound = array_keys($offlinerubrics,$row[0]);
+		if (count($ofound)>0) {
+			foreach ($ofound as $oid) {
+				$query = "UPDATE imas_gbitems SET rubric={$row[0]} WHERE id=$oid";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+		}
+	}
+	
+	//handle rubrics which I don't already have access to - need to copy them
+	$query = "SELECT id FROM imas_rubrics WHERE id IN ($list) AND NOT (ownerid='$userid' OR groupid='$groupid')";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	while ($row = mysql_fetch_row($result)) {
+		echo "handing {$row[0]} which I don't have access to<br/>";
+		$query = "SELECT name,rubrictype,rubric FROM imas_rubrics WHERE id={$row[0]}";
+		$r = mysql_query($query) or die("Query failed : " . mysql_error());
+		$rubrow = addslashes_deep(mysql_fetch_row($r));
+		$query = "SELECT id FROM imas_rubrics WHERE rubric='{$rubrow[2]}' AND (ownerid=$userid OR groupid=$groupid)";
+		$rr = mysql_query($query) or die("Query failed : " . mysql_error());
+		if (mysql_num_rows($rr)>0) {
+			$newid = mysql_result($rr,0,0);
+			echo "found existing of mine, $newid<br/>";
+		} else {
+			$rub = "'".implode("','",$rubrow)."'";
+			$query = "INSERT INTO imas_rubrics (ownerid,groupid,name,rubrictype,rubric) VALUES ";
+			$query .= "($userid,-1,$rub)";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			$newid = mysql_insert_id();
+			echo "created $newid<br/>";
+		}
+		
+		$qfound = array_keys($qrubrictrack,$row[0]);
+		if (count($qfound)>0) {
+			foreach ($qfound as $qid) {
+				$query = "UPDATE imas_questions SET rubric=$newid WHERE id=$qid";
+				echo "updating imas_questions on qid $qid<br/>";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+		}
+		$ofound = array_keys($offlinerubrics,$row[0]);
+		if (count($ofound)>0) {
+			foreach ($ofound as $oid) {
+				$query = "UPDATE imas_gbitems SET rubric=$newid WHERE id=$oid";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+		}
+	}	
 }
 
 ?>

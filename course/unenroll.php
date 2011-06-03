@@ -66,21 +66,22 @@
 			$query = "SELECT iu.LastName,iu.FirstName,iu.SID FROM imas_users AS iu JOIN imas_students ON iu.id=imas_students.userid WHERE imas_students.courseid='$cid'";
 			$resultUserList = mysql_query($query) or die("Query failed : " . mysql_error());
 		} else if ($_GET['uid']=="selected") {
-
-			$ulist = "'".implode("','",$_POST['checked'])."'";
-			$query = "SELECT LastName,FirstName,SID FROM imas_users WHERE id IN ($ulist)";
-			$resultUserList = mysql_query($query) or die("Query failed : " . mysql_error());
-			$query = "SELECT COUNT(id) FROM imas_students WHERE courseid='{$_GET['cid']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			if (count($_POST['checked']) > floor(mysql_result($result,0,0)/2)) {
-				$delForumMsg = "<p>Also delete <b style=\"color:red;\">ALL</b> forum posts by ALL students (not just the selected ones)? <input type=checkbox name=\"delforumposts\"/></p>";
-				$delWikiMsg = "<p>Also delete <b style=\"color:red;\">ALL</b> wiki revisions: ";
-				$delWikiMsg .= '<input type="radio" name="delwikirev" value="0" checked="checked" />No,  ';
-				$delWikiMsg .= '<input type="radio" name="delwikirev" value="1" />Yes, from all wikis, ';
-				$delWikiMsg .= '<input type="radio" name="delwikirev" value="2" />Yes, from group wikis only</p>';
-			} else {
-				$delForumMsg = "";
-				$delWikiMsg = '';
+			if (count($_POST['checked'])>0) {
+				$ulist = "'".implode("','",$_POST['checked'])."'";
+				$query = "SELECT LastName,FirstName,SID FROM imas_users WHERE id IN ($ulist)";
+				$resultUserList = mysql_query($query) or die("Query failed : " . mysql_error());
+				$query = "SELECT COUNT(id) FROM imas_students WHERE courseid='{$_GET['cid']}'";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				if (count($_POST['checked']) > floor(mysql_result($result,0,0)/2)) {
+					$delForumMsg = "<p>Also delete <b style=\"color:red;\">ALL</b> forum posts by ALL students (not just the selected ones)? <input type=checkbox name=\"delforumposts\"/></p>";
+					$delWikiMsg = "<p>Also delete <b style=\"color:red;\">ALL</b> wiki revisions: ";
+					$delWikiMsg .= '<input type="radio" name="delwikirev" value="0" checked="checked" />No,  ';
+					$delWikiMsg .= '<input type="radio" name="delwikirev" value="1" />Yes, from all wikis, ';
+					$delWikiMsg .= '<input type="radio" name="delwikirev" value="2" />Yes, from group wikis only</p>';
+				} else {
+					$delForumMsg = "";
+					$delWikiMsg = '';
+				}
 			}
 		} else {
 			$query = "SELECT FirstName,LastName,SID FROM imas_users WHERE id='{$_GET['uid']}'";

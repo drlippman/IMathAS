@@ -147,6 +147,22 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				exit;
 			}
 		} 
+	} elseif (isset($_POST['submit']) && $_POST['submit']=="Copy Emails") {
+		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Copy Emails\n";
+		$pagetitle = "Copy Student Emails";
+		if (count($_POST['checked'])>0) {
+			$ulist = "'".implode("','",$_POST['checked'])."'";
+			$query = "SELECT imas_users.FirstName,imas_users.LastName,imas_users.email ";
+			$query .= "FROM imas_students JOIN imas_users ON imas_students.userid=imas_users.id WHERE imas_students.courseid='$cid' AND imas_users.id IN ($ulist)";
+			$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$stuemails = array();
+			while ($row = mysql_fetch_row($result)) {
+				$stuemails[] = $row[0].' '.$row[1]. ' &lt;'.$row[2].'&gt;';
+			}
+			$stuemails = implode('; ',$stuemails);
+		}
+		
 	} elseif (isset($_GET['chgstuinfo'])) {
 		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Enroll Students\n";	
 		$pagetitle = "Change Student Info";
@@ -396,7 +412,15 @@ if ($overwriteBody==1) {
 	</form>
 
 <?php 
-	} elseif (isset($_GET['chgstuinfo'])) {
+	} elseif (isset($_POST['submit']) && $_POST['submit']=="Copy Emails") {
+		if (count($_POST['checked'])==0) {
+			echo "No student selected. <a href=\"listusers.php?cid=$cid\">Try again</a>";
+		} else {
+			echo '<textarea id="emails" rows="30" cols="60">'.$stuemails.'</textarea>';
+			echo '<script type="text/javascript">addLoadEvent(function(){var el=document.getElementById("emails");el.focus();el.select();})</script>';
+		}
+		
+	}elseif (isset($_GET['chgstuinfo'])) {
 ?>
 		<form enctype="multipart/form-data" method=post action="listusers.php?cid=<?php echo $cid ?>&chgstuinfo=true&uid=<?php echo $_GET['uid'] ?>"/>
 			<span class=form><label for="username">Enter User Name (login name):</label></span>
@@ -487,6 +511,7 @@ if ($overwriteBody==1) {
 		<input type=submit name=submit value="Message"> 
 		<input type=submit name=submit value="Unenroll"> 
 		<input type=submit name=submit value="Make Exception">
+		<input type=submit name=submit value="Copy Emails">
 		<input type="button" value="Pictures" onclick="rotatepics()" />
 		
 	<table class=gb id=myTable>

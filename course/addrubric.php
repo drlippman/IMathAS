@@ -56,9 +56,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$rubric = array();
 		for ($i=0;$i<15; $i++) {
 			if (!empty($_POST['rubitem'.$i])) {
-				$rubric[] = array($_POST['rubitem'.$i], $_POST['rubnote'.$i], floatval($_POST['rubscore'.$i]));
+				$rubric[] = array(stripslashes($_POST['rubitem'.$i]), stripslashes($_POST['rubnote'.$i]), floatval($_POST['rubscore'.$i]));
 			}
 		}
+		
 		$rubricstring = addslashes(serialize($rubric));
 		if ($_GET['id']!='new') { //MODIFY
 			$query = "UPDATE imas_rubrics SET name='{$_POST['rubname']}',rubrictype='{$_POST['rubtype']}',groupid=$rubgrp,rubric='$rubricstring' WHERE id='{$_GET['id']}'";
@@ -79,7 +80,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$rubric = array();
 				$rubname = "New Rubric";
 				$rubgrp = -1;
-				$rubtype = 0;
+				$rubtype = 1;
 			} else {
 				$rubid = intval($_GET['id']);
 				$query = "SELECT name,groupid,rubrictype,rubric FROM imas_rubrics WHERE id=$rubid";
@@ -115,8 +116,8 @@ if (!isset($_GET['id'])) {//displaying "Manage Rubrics" page
 	}
 	echo '</p>';
 } else {  //adding/editing a rubric
-	$rubtypeval = array(1,0,2);
-	$rubtypelabel = array('Score breakdown, record score and feedback','Score breakdown, record score only','Feedback only');
+	$rubtypeval = array(1,0,3,4,2);
+	$rubtypelabel = array('Score breakdown, record score and feedback','Score breakdown, record score only','Score total, record score and feedback','Score total, record score only','Feedback only');
 	echo "<form method=\"post\" action=\"addrubric.php?cid=$cid&amp;id={$_GET['id']}$fromstr\">";
 	echo '<p>Name:  <input type="text" size="70" name="rubname" value="'.str_replace('"','\\"',$rubname).'"/></p>';
 	
@@ -127,19 +128,23 @@ if (!isset($_GET['id'])) {//displaying "Manage Rubrics" page
 	echo '<p>Share with Group: <input type="checkbox" name="rubisgroup" '.getHtmlChecked($rubgrp,-1,1).' /></p>';
 	echo '<table><thead><tr><th>Rubric Item<br/>Shows in feedback</th><th>Instructor Note<br/>Not in feedback</th><th><span id="pointsheader" ';
 	if ($rubtype==2) {echo 'style="display:none;" ';}
-	echo '>Percentage of score<br/>Should add to 100</span>';
+	if ($rubtype==3 || $rubtype==4) {
+		echo '>Percentage of score</span>';
+	} else {
+		echo '>Percentage of score<br/>Should add to 100</span>';
+	}
 	echo '</th></tr></thead><tbody>';
 	for ($i=0;$i<15; $i++) {
 		echo '<tr><td><input type="text" size="40" name="rubitem'.$i.'" value="';
-		if (isset($rubric[$i]) && isset($rubric[$i][0])) { echo str_replace('"','\\"',$rubric[$i][0]);}
+		if (isset($rubric[$i]) && isset($rubric[$i][0])) { echo str_replace('"','&quot;',$rubric[$i][0]);}
 		echo '"/></td>';
 		echo '<td><input type="text" size="40" name="rubnote'.$i.'" value="';
-		if (isset($rubric[$i]) && isset($rubric[$i][1])) { echo str_replace('"','\\"',$rubric[$i][1]);}
+		if (isset($rubric[$i]) && isset($rubric[$i][1])) { echo str_replace('"','&quot;',$rubric[$i][1]);}
 		echo '"/></td>';
 		echo '<td><input type="text" size="4" class="rubricpoints" ';
 		if ($rubtype==2) {echo 'style="display:none;" ';}
 		echo 'name="rubscore'.$i.'" value="';
-		if (isset($rubric[$i]) && isset($rubric[$i][2])) { echo str_replace('"','\\"',$rubric[$i][2]);} else {echo 0;}
+		if (isset($rubric[$i]) && isset($rubric[$i][2])) { echo str_replace('"','&quot;',$rubric[$i][2]);} else {echo 0;}
 		echo '"/></td></tr>';
 	}
 	echo '</table>';

@@ -69,6 +69,7 @@ $items = unserialize(mysql_result($result,0,1));
 
 $notimportant = array();
 copysubone($items,'0',false,$notimportant);
+copyrubrics();
 
 $itemorder = addslashes(serialize($items));
 $query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt' WHERE id='$cid'";

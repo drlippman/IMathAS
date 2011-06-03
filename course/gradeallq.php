@@ -95,9 +95,9 @@
 	require("../assessment/displayq2.php");
 	list ($qsetid,$cat) = getqsetid($qid);
 	
-	$query = "SELECT name,defpoints,isgroup,groupsetid FROM imas_assessments WHERE id='$aid'";
+	$query = "SELECT name,defpoints,isgroup,groupsetid,deffeedbacktext FROM imas_assessments WHERE id='$aid'";
 	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-	list($aname,$defpoints,$isgroup,$groupsetid) = mysql_fetch_row($result);
+	list($aname,$defpoints,$isgroup,$groupsetid,$deffbtext) = mysql_fetch_row($result);
 	
 	if ($isgroup>0) {
 		$groupnames = array();
@@ -234,6 +234,22 @@
 	     }
 	    }
 	}
+	function clearfeedback() {
+		var els=document.getElementsByTagName("textarea");
+		for (var i=0;i<els.length;i++) {
+			if (els[i].id.match(/feedback/)) {
+				els[i].value = '';
+			}
+		}
+	}
+	function cleardeffeedback() {
+		var els=document.getElementsByTagName("textarea");
+		for (var i=0;i<els.length;i++) {
+			if (els[i].value=='<?php echo str_replace("'","\\'",$deffbtext); ?>') {
+				els[i].value = '';
+			}
+		}
+	}
 	</script>
 <?php
 	$query = "SELECT imas_rubrics.id,imas_rubrics.rubrictype,imas_rubrics.rubric FROM imas_rubrics JOIN imas_questions ";
@@ -246,7 +262,10 @@
 	echo '<input type=button id="nztoggle" value="Hide Nonzero Score Questions" onclick="hidenonzero()" />';
 	echo ' <input type=button id="hnatoggle" value="Hide Not Answered Questions" onclick="hideNA()" />';
 	echo ' <input type="button" id="preprint" value="Prepare for Printing (Slow)" onclick="preprint()" />';
-	
+	echo ' <input type="button" id="clrfeedback" value="Clear all feedback" onclick="clearfeedback()" />';
+	if ($deffbtext != '') {
+		echo ' <input type="button" id="clrfeedback" value="Clear default feedback" onclick="cleardeffeedback()" />';
+	}
 	echo "<form id=\"mainform\" method=post action=\"gradeallq.php?stu=$stu&gbmode=$gbmode&cid=$cid&aid=$aid&qid=$qid&update=true\">\n";
 	if ($isgroup>0) {
 		echo '<p><input type="checkbox" name="onepergroup" value="1" onclick="hidegroupdup(this)" /> Grade one per group</p>';
@@ -336,29 +355,6 @@
 				
 			}
 			list($pt,$parts) = printscore($scores[$loc]);
-			if ($parts=='') { 
-				if ($pt==-1) {
-					$pt = 'N/A';
-				}
-				echo "<input type=text size=4 id=\"ud-{$line['id']}-$loc\" name=\"ud-{$line['id']}-$loc\" value=\"$pt\">";
-				if ($rubric != 0) {
-					echo printrubriclink($rubric,$points,"ud-{$line['id']}-$loc","feedback-{$line['id']}",($loc+1));
-				}
-			} 
-			if ($parts!='') {
-				echo " Parts: ";
-				$prts = explode(', ',$parts);
-				for ($j=0;$j<count($prts);$j++) {
-					if ($prts[$j]==-1) {
-						$prts[$j] = 'N/A';
-					}
-					echo "<input type=text size=2 id=\"ud-{$line['id']}-$loc-$j\" name=\"ud-{$line['id']}-$loc-$j\" value=\"{$prts[$j]}\"> ";
-				}
-				if ($rubric != 0) {
-					echo printrubriclink($rubric,$points,"ud-{$line['id']}-$loc-0","feedback-{$line['id']}",($loc+1));
-				}
-			}
-			echo " out of $points ";
 			if ($parts!='') {
 				if (($p = strpos($qcontrol,'answeights'))!==false) {
 					$p = strpos($qcontrol,"\n",$p);
@@ -379,8 +375,35 @@
 				//adjust for rounding
 				$diff = $points - array_sum($answeights);
 				$answeights[count($answeights)-1] += $diff;
-				$answeights = implode(', ',$answeights);
+			}
+			if ($parts=='') { 
+				if ($pt==-1) {
+					$pt = 'N/A';
+				}
+				echo "<input type=text size=4 id=\"ud-{$line['id']}-$loc\" name=\"ud-{$line['id']}-$loc\" value=\"$pt\">";
+				if ($rubric != 0) {
+					echo printrubriclink($rubric,$points,"ud-{$line['id']}-$loc","feedback-{$line['id']}",($loc+1));
+				}
+			} 
+			if ($parts!='') {
+				echo " Parts: ";
+				$prts = explode(', ',$parts);
+				for ($j=0;$j<count($prts);$j++) {
+					if ($prts[$j]==-1) {
+						$prts[$j] = 'N/A';
+					}
+					echo "<input type=text size=2 id=\"ud-{$line['id']}-$loc-$j\" name=\"ud-{$line['id']}-$loc-$j\" value=\"{$prts[$j]}\">";
+					if ($rubric != 0) {
+						echo printrubriclink($rubric,$answeights[$j],"ud-{$line['id']}-$loc-$j","feedback-{$line['id']}",($loc+1).' pt '.($j+1));
+					}
+					echo ' ';
+				}
 				
+			}
+			echo " out of $points ";
+			
+			if ($parts!='') {
+				$answeights = implode(', ',$answeights);
 				echo "(parts: $answeights) ";
 			}
 			echo "in {$attempts[$loc]} attempt(s)\n";

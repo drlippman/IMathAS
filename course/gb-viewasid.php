@@ -553,7 +553,7 @@
 				//adjust for rounding
 				$diff = $pts[$r[0]] - array_sum($answeights[$r[0]]);
 				$answeights[$r[0]][count($answeights[$r[0]])-1] += $diff;
-				$answeights[$r[0]] = implode(', ',$answeights[$r[0]]);
+				
 			}
 		}
 		echo '<script type="text/javascript">';
@@ -634,19 +634,20 @@
 					echo " (parts: ";
 					$prts = explode(', ',$parts);
 					for ($j=0;$j<count($prts);$j++) {
-						echo "<input type=text size=2 id=\"scorebox$i-$j\" name=\"$i-$j\" value=\"{$prts[$j]}\"> ";
+						echo "<input type=text size=2 id=\"scorebox$i-$j\" name=\"$i-$j\" value=\"{$prts[$j]}\">";
+						if ($rubric != 0) {
+							echo printrubriclink($rubric[$questions[$i]],$answeights[$questions[$i]][$j],"scorebox$i-$j","feedback",($i+1).' pt '.($j+1));
+						}
+						echo ' ';
 					}
 					echo ")";
-					if ($rubric[$questions[$i]]!=0) {
-						echo printrubriclink($rubric[$questions[$i]],$pts[$questions[$i]],"scorebox$i-0","feedback",($i+1));
-					}
 				} else {
 					echo " (parts: $parts)";
 				}
 			}
 			echo " out of {$pts[$questions[$i]]} ";
 			if ($parts!='') {
-				echo "(parts: {$answeights[$questions[$i]]}) ";
+				echo '(parts: '.implode(', ',$answeights[$questions[$i]]).')';
 			}
 			echo "in {$attempts[$i]} attempt(s)\n";
 			$laarr = explode('##',$lastanswers[$i]);

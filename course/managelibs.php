@@ -224,15 +224,24 @@ if ($myrights<20) {
 	} else if (isset($_POST['setparent'])) {
 		if (isset($_POST['libs'])) {
 			if ($_POST['libs']!='') {
-				$parlist = "'".implode("','",explode(',',$_POST['setparent']))."'";
-				$query = "UPDATE imas_libraries SET parent='{$_POST['libs']}',lastmoddate=$now WHERE id IN ($parlist)";
-				if (!$isadmin) {
-					$query .= " AND groupid='$groupid'";
+				$toset = array();
+				$_POST['setparent'] = explode(',',$_POST['setparent']);
+				foreach ($_POST['setparent'] as $alib) {
+					if ($alib != $_POST['libs']) {
+						$toset[] = $alib;
+					}
 				}
-				if (!$isadmin && !$isgrpadmin) {
-					$query .= " AND ownerid='$userid'";
+				if (count($toset)>0) {
+					$parlist = "'".implode("','",$toset)."'";
+					$query = "UPDATE imas_libraries SET parent='{$_POST['libs']}',lastmoddate=$now WHERE id IN ($parlist)";
+					if (!$isadmin) {
+						$query .= " AND groupid='$groupid'";
+					}
+					if (!$isadmin && !$isgrpadmin) {
+						$query .= " AND ownerid='$userid'";
+					}
+					mysql_query($query) or die("Query failed : $query " . mysql_error());
 				}
-				mysql_query($query) or die("Query failed : $query " . mysql_error());
 			}
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
 			
@@ -357,8 +366,12 @@ if ($myrights<20) {
 					exit;
 				}
 			} else {
-				$query = "UPDATE imas_libraries SET name='{$_POST['name']}',userights='{$_POST['rights']}',sortorder='{$_POST['sortorder']}',parent='{$_POST['libs']}',lastmoddate=$now ";
-				$query .= "WHERE id='{$_GET['modify']}'";
+				
+				$query = "UPDATE imas_libraries SET name='{$_POST['name']}',userights='{$_POST['rights']}',sortorder='{$_POST['sortorder']}',lastmoddate=$now";
+				if ($_GET['modify'] != $_POST['libs']) {
+					$query .= ",parent='{$_POST['libs']}'";
+				}
+				$query .= " WHERE id='{$_GET['modify']}'";
 				if (!$isadmin) {
 					$query .= " AND groupid='$groupid'";
 				}
@@ -366,6 +379,7 @@ if ($myrights<20) {
 					$query .= " AND ownerid='$userid'";
 				}
 				mysql_query($query) or die("Query failed : " . mysql_error());
+				
 				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
 				exit;
 			}

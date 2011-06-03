@@ -162,23 +162,28 @@ if (!(isset($teacherid))) {
 			$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt' WHERE id='$cid'";
 			mysql_query($query) or die("Query failed : $query" . mysql_error());
 		}	
+		$offlinerubrics = array();
 		if (isset($_POST['copyoffline'])) {
-			$query = "SELECT name,points,showdate,gbcategory,cntingb,tutoredit FROM imas_gbitems WHERE courseid='{$_POST['ctc']}'";
+			$query = "SELECT name,points,showdate,gbcategory,cntingb,tutoredit,rubric FROM imas_gbitems WHERE courseid='{$_POST['ctc']}'";
 			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 			$insarr = array();
 			while ($row = mysql_fetch_row($result)) {
+				$rubric = array_pop($row);
 				if (isset($gbcats[$row[3]])) {
 					$row[3] = $gbcats[$row[3]];
 				} else {
 					$row[3] = 0;
 				}
-				$insarr[] = "('$cid','".implode("','",addslashes_deep($row))."')";
-			}
-			if (count($insarr)>0) {
-				$query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit) VALUES ";
-				$query .= implode(',',$insarr);
+				$ins = "('$cid','".implode("','",addslashes_deep($row))."')";
+				$query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit) VALUES $ins";
 				mysql_query($query) or die("Query failed :$query " . mysql_error());
+				if ($rubric>0) {
+					$offlinerubrics[mysql_insert_id()] = $rubric;
+				}
 			}
+		}
+		if (isset($_POST['copyrubrics'])) {
+			copyrubrics($offlinerubrics);
 		}
 		if (isset($_POST['selectcalitems'])) {
 			$_GET['action']='selectcalitems';
@@ -370,24 +375,30 @@ if ($overwriteBody==1) {
 		
 		</tbody>
 	</table>
-	<p>Copy course settings? <input type=checkbox name="copycourseopt"  value="1"/></p>
-	<p>
-		Copy gradebook scheme and categories (<i>will overwrite current scheme</i>)? 
-		<input type=checkbox name="copygbsetup" value="1"/>
-	</p>
-	<p>Copy offline grade items? <input type=checkbox name="copyoffline"  value="1"/></p>
-	<p>Select calendar items to copy? <input type=checkbox name="selectcalitems"  value="1"/></p>
 	
-	<p>Copy "display at top" instructor forum posts? <input type=checkbox name="copystickyposts"  value="1" checked="checked"/></p>
+	<p><b>Options</b></p>
+	<table>
+	<tbody>
+	<tr><td class="r">Copy course settings?</td><td><input type=checkbox name="copycourseopt"  value="1"/></td></tr>
+	<tr><td class="r">Copy gradebook scheme and categories<br/>(<i>will overwrite current scheme</i>)? </td><td>
+		<input type=checkbox name="copygbsetup" value="1"/></td></tr>
+	<tr><td class="r">Copy offline grade items?</td><td> <input type=checkbox name="copyoffline"  value="1"/></td></tr>
+	<tr><td class="r">Copy rubrics? </td><td><input type=checkbox name="copyrubrics"  value="1" checked="checked"/></td></tr>
+	<tr><td class="r">Select calendar items to copy?</td><td> <input type=checkbox name="selectcalitems"  value="1"/></td></tr>
 	
-	<p>Append text to titles?: <input type="text" name="append"></p>
-	<p>Add to block: <br/>
+	<tr><td class="r">Copy "display at top" instructor forum posts? </td><td><input type=checkbox name="copystickyposts"  value="1" checked="checked"/></td></tr>
+	
+	<tr><td class="r">Append text to titles?:</td><td> <input type="text" name="append"></td></tr>
+	<tr><td class="r">Add to block:</td><td>
 
 <?php
 writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$selectedVal=null,$defaultLabel="Main Course Page",$defaultVal="none",$actions=null);
 ?>
 		
 		
+	</td></tr>
+	</tbody>
+	</table>
 	<p><input type=submit value="Copy Items"></p>
 	</form>
 <?php

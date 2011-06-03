@@ -181,7 +181,7 @@ while ($row = mysql_fetch_row($result)) {
 			$tag = '?';
 		}*/
 		$tag = $row[10];
-		if ($row[9]==1 && $latepasses>0) {
+		if ($row[9]==1 && $latepasses>0 && $now < $row[3]) {
 			$lp = 1;
 		} else {
 			$lp = 0;
