@@ -80,7 +80,8 @@
 			}
 		}
 		$defgbmode = $_POST['gbmode1'] + 10*$_POST['gbmode10'] + 100*$_POST['gbmode100'] + 1000*$_POST['gbmode1000'] + 1000*$_POST['gbmode1002'];
-		$query = "UPDATE imas_gbscheme SET useweights='$useweights',orderby='$orderby',usersort='$usersort',defaultcat='$defaultcat',defgbmode='$defgbmode' WHERE courseid='$cid'";
+		$stugbmode = $_POST['stugbmode1'] + $_POST['stugbmode2'] + $_POST['stugbmode4'] + $_POST['stugbmode8'];
+		$query = "UPDATE imas_gbscheme SET useweights='$useweights',orderby='$orderby',usersort='$usersort',defaultcat='$defaultcat',defgbmode='$defgbmode',stugbmode='$stugbmode' WHERE courseid='$cid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		if (isset($_POST['submit'])) {
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid={$_GET['cid']}&gbmode=$defgbmode");
@@ -152,14 +153,15 @@
 	echo "<div id=\"headergbsettings\" class=\"pagetitle\"><h2>Grade Book Settings <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=gradebooksettings','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h2></div>\n";
 		
 	
-	$query = "SELECT useweights,orderby,defaultcat,defgbmode,usersort FROM imas_gbscheme WHERE courseid='$cid'";
+	$query = "SELECT useweights,orderby,defaultcat,defgbmode,usersort,stugbmode FROM imas_gbscheme WHERE courseid='$cid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	list($useweights,$orderby,$defaultcat,$defgbmode,$usersort) = mysql_fetch_row($result);
+	list($useweights,$orderby,$defaultcat,$defgbmode,$usersort,$stugbmode) = mysql_fetch_row($result);
 	$totonleft = ((floor($defgbmode/1000)%10)&1) ; //0 right, 1 left
 	$avgontop = ((floor($defgbmode/1000)%10)&2) ; //0 bottom, 2 top
 	$links = floor($defgbmode/100)%10; //0: view/edit, 1 q breakdown
 	$hidenc = floor($defgbmode/10)%10; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
 	$availshow = $defgbmode%10; //0: past, 1 past&cur, 2 all
+	
 ?>
 	<form method=post action="gbsettings.php?cid=<?php echo $cid;?>">
 	
@@ -192,7 +194,7 @@
 		<input type=radio name="gbmode100" value="1"  <?php writeHtmlChecked($links,1);?>/> Question Breakdown
 	</span><br class=form />
 	
-	<span class=form>Show items: </span>
+	<span class=form>Default Show items: </span>
 	<span class=formright>
 		<input type=radio name="gbmode1" value="0" <?php writeHtmlChecked($availshow,0);?>/> Past Due Items <br/>
 		<input type=radio name="gbmode1" value="1" <?php writeHtmlChecked($availshow,1);?>/> Past &amp; Current Items <br/>
@@ -218,6 +220,13 @@
 		<input type=radio name="gbmode1002" value="2" <?php writeHtmlChecked($avgontop,2);?>/> Top
 	</span><br class=form />
 	
+	<span class="form">Totals to show students:</span>
+	<span class=formright>
+		<input type="checkbox" name="stugbmode1" value="1" <?php writeHtmlChecked(($stugbmode)&1,1);?>/> Past Due<br/>
+		<input type="checkbox" name="stugbmode2" value="2" <?php writeHtmlChecked(($stugbmode)&2,2);?>/> Past Due and Attempted<br/>
+		<input type="checkbox" name="stugbmode4" value="4" <?php writeHtmlChecked(($stugbmode)&4,4);?>/> Past Due and Available<br/>
+		<input type="checkbox" name="stugbmode8" value="8" <?php writeHtmlChecked(($stugbmode)&8,8);?>/> All (including future)<br/>
+	</span><br class="form" />
 <?php	
 	$row = explode(',',$defaultcat);
 	array_unshift($row,"Default");

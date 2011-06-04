@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 39;
+$latest = 40;
 
 
 @set_time_limit(0);
@@ -657,6 +657,13 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
 			 
+		}
+		if ($last<40) {
+			 $query = 'ALTER TABLE `imas_gbscheme` ADD `stugbmode` TINYINT(2) UNSIGNED NOT NULL DEFAULT \'7\'';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
 		}
 		$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {

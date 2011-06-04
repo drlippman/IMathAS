@@ -87,7 +87,7 @@ row[1][1][0][1] = 0 no comment, 1 has comment - is comment in stu view
 row[1][1][0][2] = show link: 0 no, 1 yes
 row[1][1][0][3] = other info: 0 none, 1 NC, 2 IP, 3 OT, 4 PT
 row[1][1][0][4] = asid, or 'new'
-row[1][1][0][5] = bitwise for dropped: 1 in past & 2 in cur & 4 in future
+row[1][1][0][5] = bitwise for dropped: 1 in past & 2 in cur & 4 in future & 8 attempted
 row[1][1][0][6] = 1 if had exception
 row[1][1][0][7] = time spent (minutes)
 
@@ -103,6 +103,8 @@ row[1][2] category totals
 row[1][2][0][0] = cat total past
 row[1][2][0][1] = cat total past/current
 row[1][2][0][2] = cat total future
+row[1][2][0][3] = cat total attempted
+row[1][2][0][4] = cat poss attempted
 
 row[1][3] total totals
 row[1][3][0] = total possible past
@@ -111,9 +113,15 @@ row[1][3][2] = total possible all
 row[1][3][3] = % past - null if weighted graded
 row[1][3][4] = % past&current
 row[1][3][5] = % all
+row[1][3][6] = total earned attempted
+row[1][3][7] = total possible attempted
+row[1][3][8] = % past and attempted
 
 row[1][4][0] = userid
 row[1][4][1] = locked?
+
+cats[i]:  0: name, 1: scale, 2: scaletype, 3: chop, 4: dropn, 5: weight, 6: hidden
+
 ****/
 
 function gbtable() {
@@ -387,6 +395,7 @@ function gbtable() {
 	$cattotpastec = array();
 	$cattotcur = array();
 	$cattotcurec = array();
+	$cattotattempted = array();
 	$cattotfuture = array();
 	$cattotfutureec = array();
 	$itemorder = array();
@@ -546,16 +555,22 @@ function gbtable() {
 	$overallptspast = 0;
 	$overallptscur = 0;
 	$overallptsfuture = 0;
+	$overallptsattempted = 0;
 	$cattotweightpast = 0;
 	$cattotweightcur = 0;
 	$cattotweightfuture = 0;
 	$pos = 0;
+	$catpossattempted = array();
+	$catpossattemptedec = array();
 	foreach($catorder as $cat) {//foreach category
 		
 		//cats: name,scale,scaletype,chop,drop,weight
 		$catitemcntpast[$cat] = count($catposspast[$cat]);// + count($catposspastec[$cat]);
 		$catitemcntcur[$cat] = count($catposscur[$cat]);// + count($catposscurec[$cat]);
 		$catitemcntfuture[$cat] = count($catpossfuture[$cat]);// + count($catpossfutureec[$cat]);
+		$catpossattempted[$cat] = $catposscur[$cat];  //a copy of the current for later use with attempted
+		$catpossattemptedec[$cat] = $catposscurec[$cat];
+		
 		if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($catposspast[$cat])) { //if drop is set and have enough items
 			asort($catposspast[$cat],SORT_NUMERIC);
 			$catposspast[$cat] = array_slice($catposspast[$cat],$cats[$cat][4]);
@@ -896,12 +911,16 @@ function gbtable() {
 	}
 	//fill out cattot's with zeros
 	for ($ln=1; $ln<count($sturow)+1; $ln++) {
+		
+		$cattotattempted[$ln] = $cattotcur[$ln];  //copy current to attempted - we will fill in zeros for past due stuff
+		$cattotattemptedec[$ln] = $cattotcurec[$ln];
 		foreach($assessidx as $aid=>$i) {
 			$col = $assesscol[$aid];
 			if (!isset($gb[$ln][1][$col][0])) {
 				if ($cntingb[$i] == 1) {
 					if ($gb[0][1][$col][3]<1) { //past
 						$cattotpast[$ln][$category[$i]][$col] = 0;
+						$cattotattempted[$ln][$category[$i]][$col] = 0;
 					} 
 					if ($gb[0][1][$col][3]<2) { //past or cur
 						$cattotcur[$ln][$category[$i]][$col] = 0;
@@ -910,6 +929,7 @@ function gbtable() {
 				} else if ($cntingb[$i]==2) {
 					if ($gb[0][1][$col][3]<1) { //past
 						$cattotpastec[$ln][$category[$i]][$col] = 0;
+						$cattotattemptedec[$ln][$category[$i]][$col] = 0;
 					} 
 					if ($gb[0][1][$col][3]<2) { //past or cur
 						$cattotcurec[$ln][$category[$i]][$col] = 0;
@@ -924,6 +944,7 @@ function gbtable() {
 				if ($cntingb[$i] == 1) {
 					if ($gb[0][1][$col][3]<1) { //past
 						$cattotpast[$ln][$category[$i]][$col] = 0;
+						$cattotattempted[$ln][$category[$i]][$col] = 0;
 					} 
 					if ($gb[0][1][$col][3]<2) { //past or cur
 						$cattotcur[$ln][$category[$i]][$col] = 0;
@@ -932,6 +953,7 @@ function gbtable() {
 				} else if ($cntingb[$i]==2) {
 					if ($gb[0][1][$col][3]<1) { //past
 						$cattotpastec[$ln][$category[$i]][$col] = 0;
+						$cattotattemptedec[$ln][$category[$i]][$col] = 0;
 					} 
 					if ($gb[0][1][$col][3]<2) { //past or cur
 						$cattotcurec[$ln][$category[$i]][$col] = 0;
@@ -946,6 +968,7 @@ function gbtable() {
 				if ($cntingb[$i] == 1) {
 					if ($gb[0][1][$col][3]<1) { //past
 						$cattotpast[$ln][$category[$i]][$col] = 0;
+						$cattotattempted[$ln][$category[$i]][$col] = 0;
 					} 
 					if ($gb[0][1][$col][3]<2) { //past or cur
 						$cattotcur[$ln][$category[$i]][$col] = 0;
@@ -954,6 +977,7 @@ function gbtable() {
 				} else if ($cntingb[$i]==2) {
 					if ($gb[0][1][$col][3]<1) { //past
 						$cattotpastec[$ln][$category[$i]][$col] = 0;
+						$cattotattemptedec[$ln][$category[$i]][$col] = 0;
 					} 
 					if ($gb[0][1][$col][3]<2) { //past or cur
 						$cattotcurec[$ln][$category[$i]][$col] = 0;
@@ -969,7 +993,34 @@ function gbtable() {
 		$totpast = 0;
 		$totcur = 0;
 		$totfuture = 0;
+		$totattempted = 0;
+		$cattotweightattempted = 0;
 		$pos = 0; //reset position for category totals
+		
+		//update attempted for this student
+		unset($catpossattemptedstu);
+		unset($catpossattemptedecstu);
+		$catpossattemptedstu = $catpossattempted;  //copy attempted array for each stu
+		$catpossattemptedstuec = $catpossattemptedec;
+		foreach($assessidx as $aid=>$i) {
+			$col = $assesscol[$aid];
+			if (!isset($gb[$ln][1][$col][0])) {
+				if ($gb[0][1][$col][3]==1) {  //if cur , clear out of cattotattempted
+					if ($gb[0][1][$col][4]==1) {
+						$atloc = array_search($gb[0][1][$col][2],$catpossattemptedstu[$category[$i]]);
+						if ($atloc!==false) {
+							unset($catpossattemptedstu[$category[$i]][$atloc]);
+						}
+					} else if ($gb[0][1][$col][4]==2) {
+						$atloc = array_search($gb[0][1][$col][2],$catpossattemptedecstu[$category[$i]]);
+						if ($atloc!==false) {
+							unset($catpossattemptedecstu[$category[$i]][$atloc]);
+						}
+					}
+				}
+			}
+		}
+		
 		foreach($catorder as $cat) {//foreach category
 			if (isset($cattotpast[$ln][$cat])) {  //past items
 				//cats: name,scale,scaletype,chop,drop,weight
@@ -1043,6 +1094,9 @@ function gbtable() {
 				$gb[$ln][2][$pos][0] = 0;
 			}
 			if (isset($cattotcur[$ln][$cat])) {  //cur items
+				
+				
+				
 				//cats: name,scale,scaletype,chop,drop,weight
 				if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotcur[$ln][$cat])) { //if drop is set and have enough items
 					foreach($cattotcur[$ln][$cat] as $col=>$v) {
@@ -1115,6 +1169,8 @@ function gbtable() {
 			} else { //no items in category yet?
 				$gb[$ln][2][$pos][1] = 0;
 			}
+			
+			
 			if (isset($cattotfuture[$ln][$cat])) {  //future items
 				//cats: name,scale,scaletype,chop,drop,weight
 				if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotfuture[$ln][$cat])) { //if drop is set and have enough items
@@ -1187,9 +1243,99 @@ function gbtable() {
 			} else { //no items in category yet?
 				$gb[$ln][2][$pos][2] = 0;
 			}
+			
+			
+			//update attempted for this student; adjust for drops
+			if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($catpossattemptedstu[$cat])) { //same for past&current
+				asort($catpossattemptedstu[$cat],SORT_NUMERIC);
+				$catpossattemptedstu[$cat] = array_slice($catpossattemptedstu[$cat],$cats[$cat][4]);	
+			}
+			
+			if (isset($cattotattempted[$ln][$cat])) {  //attempted and attempted items
+				$catitemcntattempted[$cat] = count($catpossattemptedstu[$cat]);
+				$catpossattemptedstu[$cat] = array_sum($catpossattemptedstu[$cat]);
+				//cats: name,scale,scaletype,chop,drop,weight
+				if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotattempted[$ln][$cat])) { //if drop is set and have enough items
+					foreach($cattotattempted[$ln][$cat] as $col=>$v) {
+						if ($gb[0][1][$col][2] == 0) {
+							$cattotattempted[$ln][$cat][$col] = 0;
+						} else {
+							$cattotattempted[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	//convert to percents
+						}
+					}
+					asort($cattotattempted[$ln][$cat],SORT_NUMERIC);
+				
+					if ($cats[$cat][4]<0) {  //doing keep n
+						$ntodrop = count($cattotattempted[$ln][$cat])+$cats[$cat][4];
+					} else {  //doing drop n
+						$ntodrop = $cats[$cat][4];// - ($catitemcntattempted[$cat]-count($cattotattempted[$ln][$cat]));
+					}
+					
+					if ($ntodrop>0) {
+						$ndropcnt = 0;
+						foreach ($cattotattempted[$ln][$cat] as $col=>$v) {
+							$gb[$ln][1][$col][5] += 8; //mark as dropped
+							$ndropcnt++;
+							if ($ndropcnt==$ntodrop) { break;}
+						}
+					}
+					
+					while (count($cattotattempted[$ln][$cat])<$catitemcntattempted[$cat]) {
+						array_unshift($cattotattempted[$ln][$cat],0);
+					}
+					$cattotattempted[$ln][$cat] = array_slice($cattotattempted[$ln][$cat],$cats[$cat][4]);
+					//$tokeep = ($cats[$cat][4]<0)? abs($cats[$cat][4]) : ($catitemcntattempted[$cat] - $cats[$cat][4]);
+					$tokeep = $catitemcntattempted[$cat];
+					$cattotattempted[$ln][$cat] = round($catpossattemptedstu[$cat]*array_sum($cattotattempted[$ln][$cat])/($tokeep),1);
+				} else {
+					$cattotattempted[$ln][$cat] = array_sum($cattotattempted[$ln][$cat]);
+				}
+				
+				if ($cats[$cat][1]!=0) { //scale is set
+					if ($cats[$cat][2]==0) { //pts scale
+						$cattotattempted[$ln][$cat] = round($catpossattemptedstu[$cat]*($cattotattempted[$ln][$cat]/$cats[$cat][1]),1);
+					} else if ($cats[$cat][2]==1) { //percent scale
+						$cattotattempted[$ln][$cat] = round($cattotattempted[$ln][$cat]*(100/($cats[$cat][1])),1);
+					}
+				}
+				if ($useweights==0 && $cats[$cat][5]>-1) {//use fixed pt value for cat
+					$cattotattempted[$ln][$cat] = round($cats[$cat][5]*($cattotattempted[$ln][$cat]/$catpossattemptedstu[$cat]),1);
+				}
+				if (isset($cattotattemptedec[$ln][$cat])) { //add in EC
+					$cattotattempted[$ln][$cat] += array_sum($cattotattemptedec[$ln][$cat]);
+				}
+				if ($cats[$cat][3]>0) { //chop score - no over 100%
+					if ($useweights==0  && $cats[$cat][5]>-1) { //set cat pts
+						$cattotattempted[$ln][$cat] = min($cats[$cat][5]*$cats[$cat][3],$cattotattempted[$ln][$cat]);
+					} else {
+						$cattotattempted[$ln][$cat] = min($catpossattemptedstu[$cat]*$cats[$cat][3],$cattotattempted[$ln][$cat]);
+					}
+				}
+				
+				$gb[$ln][2][$pos][3] = $cattotattempted[$ln][$cat];
+				
+				if ($useweights==1) {
+					if ($cattotattempted[$ln][$cat]>0) {
+						$totattempted += ($cattotattempted[$ln][$cat]*$cats[$cat][5])/(100*$catpossattemptedstu[$cat]); //weight total
+					}
+				}
+				$gb[$ln][2][$pos][4] = $catpossattemptedstu[$cat];
+			} else if (isset($cattotattemptedec[$ln][$cat])) {
+				$cattotattempted[$ln][$cat] = array_sum($cattotattemptedec[$ln][$cat]);
+				$gb[$ln][2][$pos][3] = $cattotattempted[$ln][$cat];
+				$gb[$ln][2][$pos][4] = 0;
+			} else { //no items in category yet?
+				$gb[$ln][2][$pos][3] = 0;
+				$gb[$ln][2][$pos][4] = 0;
+			}
+			if ($catpossattemptedstu[$cat]>0 || count($catpossattemptedecstu[$cat])>0) {
+				$cattotweightattempted += $cats[$cat][5];
+			}
+			
 			$pos++;
 			
 		}
+		$overallptsattempted = array_sum($catpossattemptedstu);
 		
 		if ($useweights==0) { //use points grading method
 			if (!isset($cattotpast)) {
@@ -1207,9 +1353,16 @@ function gbtable() {
 			} else {
 				$totfuture = array_sum($cattotfuture[$ln]);
 			}
+			if (!isset($cattotattempted)) {
+				$totattempted = 0;
+			} else {
+				$totattempted = array_sum($cattotattempted[$ln]);
+			}
 			$gb[$ln][3][0] = $totpast;
 			$gb[$ln][3][1] = $totcur;
 			$gb[$ln][3][2] = $totfuture;
+			$gb[$ln][3][6] = $totattempted;
+			$gb[$ln][3][7] = $overallptsattempted;
 			if ($overallptspast>0) {
 				$gb[$ln][3][3] = sprintf("%01.1f", 100*$totpast/$overallptspast);
 			} else {
@@ -1224,6 +1377,11 @@ function gbtable() {
 				$gb[$ln][3][5] = sprintf("%01.1f", 100*$totfuture/$overallptsfuture);
 			} else {
 				$gb[$ln][3][5] = '0.0';
+			}
+			if ($overallptsattempted>0) {
+				$gb[$ln][3][8] = sprintf("%01.1f", 100*$totattempted/$overallptsattempted);
+			} else {
+				$gb[$ln][3][8] = '0.0';
 			}
 		} else if ($useweights==1) { //use weights (%) grading method
 			//already calculated $tot
@@ -1262,6 +1420,14 @@ function gbtable() {
 				$gb[$ln][3][2] = sprintf("%01.1f", 10000*$totfuture/$cattotweightfuture);
 			}
 			$gb[$ln][3][5] = null;
+			
+			if ($cattotweightattempted==0) {
+				$gb[$ln][3][6] = '0.0';
+			} else {
+				$gb[$ln][3][6] = sprintf("%01.1f", 10000*$totattempted/$cattotweightattempted);
+			}
+			$gb[$ln][3][7] = null;
+			$gb[$ln][3][8] = null;
 			
 			
 			
