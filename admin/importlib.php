@@ -377,7 +377,6 @@ if (!(isset($teacherid)) && $myrights<75) {
 				if ($touse=='') {$touse = $libitems[$libid];} else if (isset($libitems[$libid])) {$touse .= ','.$libitems[$libid];}
 			}
 		}
-		echo "touse: $touse"; 
 		
 		//write questions, get qsetids
 		$qids = parseqs($filename,$touse,$qrights);
