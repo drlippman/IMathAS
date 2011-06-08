@@ -231,8 +231,8 @@ if (isset($studentid) || $stu!=0) { //show student view
 		echo " | Show: <select id=\"toggle3\" onchange=\"chgtoggle()\">";
 		echo "<option value=0 "; writeHtmlSelected($availshow,0); echo ">Past due</option>";
 		echo "<option value=3 "; writeHtmlSelected($availshow,3); echo ">Past &amp; Attempted</option>";
-		echo "<option value=4 "; writeHtmlSelected($availshow,4); echo ">Current</option>";
-		echo "<option value=1 "; writeHtmlSelected($availshow,1); echo ">Past &amp; Current</option>";
+		echo "<option value=4 "; writeHtmlSelected($availshow,4); echo ">Available Only</option>";
+		echo "<option value=1 "; writeHtmlSelected($availshow,1); echo ">Past &amp; Available</option>";
 		echo "<option value=2 "; writeHtmlSelected($availshow,2); echo ">All</option></select>";
 		echo " | Links: <select id=\"toggle1\" onchange=\"chgtoggle()\">";
 		echo "<option value=0 "; writeHtmlSelected($links,0); echo ">View/Edit</option>";
@@ -346,8 +346,8 @@ if (isset($studentid) || $stu!=0) { //show student view
 	echo " | Show: <select id=\"toggle3\" onchange=\"chgtoggle()\">";
 	echo "<option value=0 "; writeHtmlSelected($availshow,0); echo ">Past due</option>";
 	echo "<option value=3 "; writeHtmlSelected($availshow,3); echo ">Past &amp; Attempted</option>";
-	echo "<option value=4 "; writeHtmlSelected($availshow,4); echo ">Current</option>";
-	echo "<option value=1 "; writeHtmlSelected($availshow,1); echo ">Past & Current</option>";
+	echo "<option value=4 "; writeHtmlSelected($availshow,4); echo ">Available Only</option>";
+	echo "<option value=1 "; writeHtmlSelected($availshow,1); echo ">Past &amp; Available</option>";
 	echo "<option value=2 "; writeHtmlSelected($availshow,2); echo ">All</option></select>";
 	echo " | Links: <select id=\"toggle1\" onchange=\"chgtoggle()\">";
 	echo "<option value=0 "; writeHtmlSelected($links,0); echo ">View/Edit</option>";
@@ -958,12 +958,16 @@ function gbinstrdisp() {
 			//total totals
 			if ($catfilter<0) {
 				if ($availshow==3) {
-					if (isset($gbt[$i][3][8])) { //using points based
-						echo '<td class="c">'.$gbt[$i][3][6].'/'.$gbt[$i][3][7].'</td>';
-						echo '<td class="c">'.$gbt[$i][3][8] .'%</td>';
-						
-					} else {
+					if ($gbt[$i][0][0]=='Averages') { 
 						echo '<td class="c">'.$gbt[$i][3][6].'%</td>';
+					} else {
+						if (isset($gbt[$i][3][8])) { //using points based
+							echo '<td class="c">'.$gbt[$i][3][6].'/'.$gbt[$i][3][7].'</td>';
+							echo '<td class="c">'.$gbt[$i][3][8] .'%</td>';
+							
+						} else {
+							echo '<td class="c">'.$gbt[$i][3][6].'%</td>';
+						}
 					}
 				} else {
 					if (isset($gbt[0][3][0])) { //using points based
@@ -997,23 +1001,23 @@ function gbinstrdisp() {
 					} else {
 						//echo '<td class="c">'.$gbt[$i][2][$j][$availshow].'</td>';
 						echo '<td class="c">';
-						if ($gbt[$i][0][0]=='Averages' && $availshow<3) {
+						if ($gbt[$i][0][0]=='Averages') {
 							echo "<span onmouseover=\"tipshow(this,'5-number summary: {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
 						}
 						if ($availshow==3) {
 							if ($gbt[$i][0][0]=='Averages') {
-								echo '-';
+								echo $gbt[$i][2][$j][3].'%';//echo '-';
 							} else {
 								echo $gbt[$i][2][$j][3].'/'.$gbt[$i][2][$j][4];
 							}
 						} else {
 							echo $gbt[$i][2][$j][$availshow];
 						}
-						if ($gbt[$i][0][0]=='Averages' && $availshow<3) {
+						if ($gbt[$i][0][0]=='Averages') {
 							echo '</span>';
 						}
 						echo '</td>';
-					}
+					} 
 					
 				}
 			}
@@ -1126,42 +1130,68 @@ function gbinstrdisp() {
 			//category totals
 			if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
 				for ($j=0;$j<count($gbt[0][2]);$j++) { //category headers	
-					if ($availshow<2 && $gbt[0][2][$j][2]>1) {
+					if (($availshow<2 || $availshow==3) && $gbt[0][2][$j][2]>1) {
 						continue;
 					} else if ($availshow==2 && $gbt[0][2][$j][2]==3) {
 						continue;
 					}
-					if ($catfilter!=-1 && $gbt[0][2][$j][$availshow+3]>0) {
+					if ($catfilter!=-1 && $availshow<3 && $gbt[0][2][$j][$availshow+3]>0) {
+						//echo '<td class="c">'.$gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)</td>';
 						echo '<td class="c">';
-						if ($gbt[$i][0][0]=='Averages') {
+						if ($gbt[$i][0][0]=='Averages' && $availshow!=3) {
 							echo "<span onmouseover=\"tipshow(this,'5-number summary: {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
 						}
 						echo $gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)';
-						if ($gbt[$i][0][0]=='Averages') {
+	
+						if ($gbt[$i][0][0]=='Averages' && $availshow!=3) {
 							echo '</span>';
 						}
 						echo '</td>';
 					} else {
+						//echo '<td class="c">'.$gbt[$i][2][$j][$availshow].'</td>';
 						echo '<td class="c">';
-						if ($gbt[$i][0][0]=='Averages') {
+						if ($gbt[$i][0][0]=='Averages' && $availshow<3) {
 							echo "<span onmouseover=\"tipshow(this,'5-number summary: {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
 						}
-						echo $gbt[$i][2][$j][$availshow];
-						if ($gbt[$i][0][0]=='Averages') {
+						if ($availshow==3) {
+							if ($gbt[$i][0][0]=='Averages') {
+								echo $gbt[$i][2][$j][3].'%';
+							} else {
+								echo $gbt[$i][2][$j][3].'/'.$gbt[$i][2][$j][4];
+							}
+						} else {
+							echo $gbt[$i][2][$j][$availshow];
+						}
+						if ($gbt[$i][0][0]=='Averages' && $availshow<3) {
 							echo '</span>';
 						}
 						echo '</td>';
 					}
+					
 				}
 			}
 			
 			//total totals
 			if ($catfilter<0) {
-				if (isset($gbt[0][3][0])) { //using points based
-					echo '<td class="c">'.$gbt[$i][3][$availshow].'</td>';
-					echo '<td class="c">'.$gbt[$i][3][$availshow+3] .'%</td>';
+				if ($availshow==3) {
+					if ($gbt[$i][0][0]=='Averages') { 
+						echo '<td class="c">'.$gbt[$i][3][6].'%</td>';
+					} else {
+						if (isset($gbt[$i][3][8])) { //using points based
+							echo '<td class="c">'.$gbt[$i][3][6].'/'.$gbt[$i][3][7].'</td>';
+							echo '<td class="c">'.$gbt[$i][3][8] .'%</td>';
+							
+						} else {
+							echo '<td class="c">'.$gbt[$i][3][6].'%</td>';
+						}
+					}
 				} else {
-					echo '<td class="c">'.$gbt[$i][3][$availshow].'%</td>';
+					if (isset($gbt[0][3][0])) { //using points based
+						echo '<td class="c">'.$gbt[$i][3][$availshow].'</td>';
+						echo '<td class="c">'.$gbt[$i][3][$availshow+3] .'%</td>';
+					} else {
+						echo '<td class="c">'.$gbt[$i][3][$availshow].'%</td>';
+					}
 				}
 			}
 		}

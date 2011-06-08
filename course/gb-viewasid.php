@@ -635,7 +635,7 @@
 					$prts = explode(', ',$parts);
 					for ($j=0;$j<count($prts);$j++) {
 						echo "<input type=text size=2 id=\"scorebox$i-$j\" name=\"$i-$j\" value=\"{$prts[$j]}\">";
-						if ($rubric != 0) {
+						if ($rubric[$questions[$i]]!=0) {
 							echo printrubriclink($rubric[$questions[$i]],$answeights[$questions[$i]][$j],"scorebox$i-$j","feedback",($i+1).' pt '.($j+1));
 						}
 						echo ' ';

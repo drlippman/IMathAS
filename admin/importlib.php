@@ -42,6 +42,7 @@ function parseqs($file,$touse,$rights) {
 		} else {
 			$exists = false;
 		}
+		
 		if ($exists && $_POST['merge']==1) {
 			if ($qd['lastmod']>$adddate) { //only update if changed
 				if (!empty($qd['qimgs'])) {
@@ -356,10 +357,10 @@ if (!(isset($teacherid)) && $myrights<75) {
 					}
 					mysql_query($query) or die("error on: $query: " . mysql_error());
 					if (mysql_affected_rows()>0) {
-						$libs[$libid] = $exists[$unique[$libid]];
 						$updatel++;
 					}
-				}
+				} 
+				$libs[$libid] = $exists[$unique[$libid]];
 			} else if (isset($exists[$unique[$libid]]) && $_POST['merge']==-1 ) {
 				$libs[$libid] = $exists[$unique[$libid]];
 			} else {
@@ -376,6 +377,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 				if ($touse=='') {$touse = $libitems[$libid];} else if (isset($libitems[$libid])) {$touse .= ','.$libitems[$libid];}
 			}
 		}
+		echo "touse: $touse"; 
 		
 		//write questions, get qsetids
 		$qids = parseqs($filename,$touse,$qrights);

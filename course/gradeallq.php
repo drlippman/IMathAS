@@ -24,6 +24,8 @@
 	
 	if (isset($_GET['update'])) {
 		$allscores = array();
+		$grpscores = array();
+		$grpfeedback = array();
 		$locs = array();
 		foreach ($_POST as $k=>$v) {
 			if (strpos($k,'-')!==false) {
@@ -49,6 +51,7 @@
 		if (isset($_POST['onepergroup']) && $_POST['onepergroup']==1) {
 			foreach ($_POST['groupasid'] as $grp=>$asid) {
 				$grpscores[$grp] = $allscores[$asid];
+				$grpfeedback[$grp] = $_POST['feedback-'.$asid];
 			}
 			$onepergroup = true;
 		} else {
@@ -72,6 +75,7 @@
 							$scores[$loc] = $sv;
 						}
 					}
+					$feedback = $grpfeedback[$line['agroupid']];
 				} else {
 					foreach ($allscores[$line['id']] as $loc=>$sv) {
 						if (is_array($sv)) {
@@ -80,9 +84,10 @@
 							$scores[$loc] = $sv;
 						}
 					}
+					$feedback = $_POST['feedback-'.$line['id']];
 				}
 				$scorelist = implode(",",$scores);
-				$feedback = $_POST['feedback-'.$line['id']];
+				
 				$query = "UPDATE imas_assessment_sessions SET bestscores='$scorelist',feedback='$feedback' WHERE id='{$line['id']}'";
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
 			}

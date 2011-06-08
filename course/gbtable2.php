@@ -69,12 +69,12 @@ row[0][2][0][2] = 0 if any scores in past, 1 if any scores in past/current, 2 if
 row[0][2][0][3] = total possible for past
 row[0][2][0][4] = total possible for past/current
 row[0][2][0][5] = total possible for all
-row[0][2][0][6-8] = 5 number summary
+row[0][2][0][6-9] = 5 number summary
 
 row[0][3][0] = total possible past
 row[0][3][1] = total possible past&current
 row[0][3][2] = total possible all
-row[0][3][3-5] = 5 number summary
+row[0][3][3-6] = 5 number summary
 
 row[1] first student data row
 row[1][0] biographical
@@ -1322,11 +1322,13 @@ function gbtable() {
 				$gb[$ln][2][$pos][4] = $catpossattemptedstu[$cat];
 			} else if (isset($cattotattemptedec[$ln][$cat])) {
 				$cattotattempted[$ln][$cat] = array_sum($cattotattemptedec[$ln][$cat]);
+				$catpossattemptedstu[$cat] = 0;
 				$gb[$ln][2][$pos][3] = $cattotattempted[$ln][$cat];
 				$gb[$ln][2][$pos][4] = 0;
 			} else { //no items in category yet?
 				$gb[$ln][2][$pos][3] = 0;
 				$gb[$ln][2][$pos][4] = 0;
+				$catpossattemptedstu[$cat] =0;
 			}
 			if ($catpossattemptedstu[$cat]>0 || count($catpossattemptedecstu[$cat])>0) {
 				$cattotweightattempted += $cats[$cat][5];
@@ -1424,6 +1426,7 @@ function gbtable() {
 			if ($cattotweightattempted==0) {
 				$gb[$ln][3][6] = '0.0';
 			} else {
+				//$gb[$ln][3][6] = $totattempted.'/'.$cattotweightattempted;
 				$gb[$ln][3][6] = sprintf("%01.1f", 10000*$totattempted/$cattotweightattempted);
 			}
 			$gb[$ln][3][7] = null;
@@ -1475,22 +1478,32 @@ function gbtable() {
 			$catavgs[$j][0] = array();
 			$catavgs[$j][1] = array();
 			$catavgs[$j][2] = array();
+			$catavgs[$j][3] = array();
 			for ($i=1;$i<$ln;$i++) { //foreach student
 				if ($gb[$i][4][1]==0) {
 					$catavgs[$j][0][] = $gb[$i][2][$j][0];
 					$catavgs[$j][1][] = $gb[$i][2][$j][1];
 					$catavgs[$j][2][] = $gb[$i][2][$j][2];
+					if ($gb[$i][2][$j][4]>0) {
+						$catavgs[$j][3][] = round(100*$gb[$i][2][$j][3]/$gb[$i][2][$j][4],1);
+					} else {
+						//$catavgs[$j][3][] = 0;
+					}
 				}
 			}
-			for ($i=0; $i<3; $i++) {
+			for ($i=0; $i<4; $i++) {
 				if (count($catavgs[$j][$i])>0) {
 					sort($catavgs[$j][$i], SORT_NUMERIC);
 					$fivenum = array();
 					for ($k=0; $k<5; $k++) {
 						$fivenum[] = gbpercentile($catavgs[$j][$i],$k*25);
 					}
-					$fivenumsum = implode(',&nbsp;',$fivenum);
-					if ($gb[0][2][$j][3+$i]>0) {
+					if ($i==3) {
+						$fivenumsum = implode('%,&nbsp;',$fivenum).'%';
+					} else {
+						$fivenumsum = implode(',&nbsp;',$fivenum);
+					}
+					if ($i<3 && $gb[0][2][$j][3+$i]>0) {
 						for ($k=0; $k<5; $k++) {
 							$fivenum[$k] = round(100*$fivenum[$k]/$gb[0][2][$j][3+$i],1);
 						}
@@ -1519,9 +1532,11 @@ function gbtable() {
 			}
 		}
 		foreach ($catavgs as $j=>$avg) {
-			if (count($avg[0])>0) {
-				for ($m=0;$m<3;$m++) {
+			for ($m=0;$m<4;$m++) {
+				if (count($avg[$m])>0) {
 					$gb[$ln][2][$j][$m] = round(array_sum($avg[$m])/count($avg[$m]),1);
+				} else {
+					$gb[$ln][2][$j][$m] = 0;
 				}
 			}
 		}
