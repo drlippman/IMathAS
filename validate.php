@@ -265,6 +265,7 @@ END;
 	$previewshift = -1;
 	$basephysicaldir = rtrim(dirname(__FILE__), '/\\');
 	if ($myrights==100 && isset($_GET['debug'])) {
+		ini_set('display_errors',1);
 		error_reporting(E_ALL);
 	}
 	if (isset($sessiondata['isdiag']) && strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) {
