@@ -509,4 +509,8 @@ div#viewbuttoncont a.buttoninactive:hover {
   text-align: left;
 }
 
+ol li ol {
+	list-style-type: lower-alpha;
+}
+
 

@@ -420,7 +420,7 @@ END;
   }
   function checkeditorok() {
 	  $ua = $_SERVER['HTTP_USER_AGENT'];
-	  if (strpos($ua,'iPhone')!==false || strpos($ua,'iPad')!==false) {
+	  if (strpos($ua,'iPhone')!==false || strpos($ua,'iPad')!==false || strpos($ua,'Android')!==false) {
 		  return 0;
 	  } else {
 		  return 1;

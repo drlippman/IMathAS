@@ -3180,7 +3180,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			
 		} else {
 			//not polygon or twopoint, continue with regular grading
-			
 			//evaluate all the functions in $answers
 			foreach ($answers as $key=>$function) {
 				if ($function=='') { continue; }
@@ -3242,6 +3241,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					}
 				}
 			}
+			
 			if ($dots=='') {
 				$dots = array();
 			} else {
@@ -3344,7 +3344,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					$stdevs[$key] = sqrt($stdevs[$key]/($stcnts[$key]-1));
 				}
 				$stdevpen = max(8*($stdevs[$key]-5)/($settings[7]),0);
-				$percentunmatchedans = max((count($answerline)-$stcnts[$key])/(count($answerline)),0);
+				if (count($answerline)==0) {
+					$percentunmatchedans = 1;
+				} else {
+					$percentunmatchedans = max((count($answerline)-$stcnts[$key])/(count($answerline)),0);
+				}
 				if ($percentunmatchedans<.05*$reltolerance) {
 					$percentunmatchedans = 0;
 				}
@@ -3650,6 +3654,7 @@ function parsecomplex($v) {
 //returns:  false: bad format, true: good format
 function checkanswerformat($tocheck,$ansformats) {
 	$tocheck = trim($tocheck);
+	$tocheck = str_replace(',','',$tocheck);
 	if ($tocheck=='DNE' || $tocheck=='oo' || $tocheck=='+oo' || $tocheck=='-oo') {
 		return true;
 	}
