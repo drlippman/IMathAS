@@ -32,8 +32,12 @@ function shiftsub(&$itema) {
 	global $shift;
 	foreach ($itema as $k=>$item) {
 		if (is_array($item)) {
-			$itema[$k]['startdate'] += $shift;
-			$itema[$k]['enddate'] += $shift;
+			if ($itema[$k]['startdate'] > 0) {
+				$itema[$k]['startdate'] += $shift;
+			}
+			if ($itema[$k]['enddate'] < 2000000000) {
+				$itema[$k]['enddate'] += $shift;
+			}
 			shiftsub($itema[$k]['items']);
 		}
 	}

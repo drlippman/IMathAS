@@ -659,7 +659,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 
 		}
 		if ($last<40) {
-			 $query = 'ALTER TABLE `imas_gbscheme` ADD `stugbmode` TINYINT(2) UNSIGNED NOT NULL DEFAULT \'7\'';
+			 $query = 'ALTER TABLE `imas_gbscheme` ADD `stugbmode` TINYINT(2) UNSIGNED NOT NULL DEFAULT \'5\'';
 			 $res = mysql_query($query);
 			 if ($res===false) {
 			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";

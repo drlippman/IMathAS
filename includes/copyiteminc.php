@@ -374,7 +374,6 @@ function copyrubrics($offlinerubrics=array()) {
 	global $userid,$groupid,$qrubrictrack;
 	if (count($qrubrictrack)==0 && count($offlinerubrics)==0) { return;}
 	$list = implode(',',array_merge($qrubrictrack,$offlinerubrics));
-	echo "copying rubrics";
 	
 	//handle rubrics which I already have access to
 	$query = "SELECT id FROM imas_rubrics WHERE id IN ($list) AND (ownerid='$userid' OR groupid='$groupid')";

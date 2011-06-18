@@ -92,10 +92,10 @@ if (!(isset($teacherid))) {
 			mysql_query($query) or die("Query failed :$query " . mysql_error());
 		}
 		if (isset($_POST['copygbsetup'])) {
-			$query = "SELECT useweights,orderby,defaultcat,defgbmode FROM imas_gbscheme WHERE courseid='{$_POST['ctc']}'";
+			$query = "SELECT useweights,orderby,defaultcat,defgbmode,stugbmode FROM imas_gbscheme WHERE courseid='{$_POST['ctc']}'";
 			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 			$row = mysql_fetch_row($result);
-			$query = "UPDATE imas_gbscheme SET useweights='{$row[0]}',orderby='{$row[1]}',defaultcat='{$row[2]}',defgbmode='{$row[3]}' WHERE courseid='$cid'";
+			$query = "UPDATE imas_gbscheme SET useweights='{$row[0]}',orderby='{$row[1]}',defaultcat='{$row[2]}',defgbmode='{$row[3]}',stugbmode='{$row[4]}' WHERE courseid='$cid'";
 			mysql_query($query) or die("Query failed :$query " . mysql_error());
 			
 			$query = "SELECT id,name,scale,scaletype,chop,dropn,weight FROM imas_gbcats WHERE courseid='{$_POST['ctc']}'";
