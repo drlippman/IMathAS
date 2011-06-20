@@ -75,14 +75,22 @@ if ($cid==0) {
 			if (mysql_num_rows($result)>0) {//editing existing wiki
 				$row = mysql_fetch_row($result);
 				$revisionid = $row[0];
+				$revisiontext = $row[1];
+				if (strlen($revisiontext)>6 && substr($revisiontext,0,6)=='**wver') {
+					$wikiver = substr($revisiontext,6,strpos($revisiontext,'**',6));
+					$revisiontext = substr($revisiontext,strpos($revisiontext,'**',6)+2);
+				} else {
+					$wikiver = 1;
+				}
 				if ($revisionid!=$_POST['baserevision']) { //someone else has updated this wiki since we retrieved it
 					$inconflict = true;
 					$lastedittime = tzdate("F j, Y, g:i a",$row[2]);
 					$lasteditedby = $row[3].', '.$row[4];
-					$revisiontext = $row[1];
+					
 				} else { //we're all good for a diff calculation
 					require("../includes/diff.php");
-					$diff = diffsparsejson($wikicontent,$row[1]);
+					
+					$diff = diffsparsejson($wikicontent,$revisiontext);
 					
 					if ($diff != '') {
 						//verify the diff
@@ -119,6 +127,9 @@ if ($cid==0) {
 						*/
 						$diffstr = addslashes($diff);
 						$wikicontent = addslashes($wikicontent);
+						if ($wikiver>1) {
+							$wikicontent = '**wver'.$wikiver.'**'.$wikicontent;
+						}
 						//insert latest content
 						$query = "INSERT INTO imas_wiki_revisions (wikiid,stugroupid,userid,revision,time) VALUES ";
 						$query .= "($id,'$groupid','$userid','$wikicontent',$now)";
@@ -129,7 +140,7 @@ if ($cid==0) {
 					}
 				}	
 			} else { //no wiki page exists yet - just need to insert revision
-				$wikicontent = addslashes($wikicontent);
+				$wikicontent = addslashes('**wver2**'.$wikicontent);
 				$query = "INSERT INTO imas_wiki_revisions (wikiid,stugroupid,userid,revision,time) VALUES ";
 				$query .= "($id,'$groupid','$userid','$wikicontent',$now)";
 				mysql_query($query) or die("Query failed : " . mysql_error());
@@ -151,6 +162,12 @@ if ($cid==0) {
 				$lasteditedby = $row[3].', '.$row[4];
 				$revisionid = $row[0];
 				$revisiontext = str_replace('</span></p>','</span> </p>',$row[1]);
+				if (strlen($revisiontext)>6 && substr($revisiontext,0,6)=='**wver') {
+					$wikiver = substr($revisiontext,6,strpos($revisiontext,'**',6));
+					$revisiontext = substr($revisiontext,strpos($revisiontext,'**',6)+2);
+				} else {
+					$wikiver = 1;
+				}
 			} else { //new wikipage
 				$revisionid = 0;
 				$revisiontext = '';

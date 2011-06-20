@@ -99,13 +99,22 @@ function diffapplydiff($base,$diff) {
 }
 
 function diffstringsplit($str) {
+	if (isset($GLOBALS['wikiver'])) {
+		$wikiver = $GLOBALS['wikiver'];
+	} else {
+		$wikiver = 1;
+	}
 	$p = preg_split('/(<span\s+class="AM".*?<\/span>|<embed.*?>)/',$str,-1,PREG_SPLIT_DELIM_CAPTURE);
 	$out = array();
 	foreach ($p as $k=>$cont) {
 		if ($k%2==0) {
 			$cont = trim($cont);
 			if ($cont=='') {continue;}
+			if ($wikiver == 2) {
+				$cont = str_replace('><','> <',$cont);
+			}
 			$out = array_merge($out,preg_split('/\s+/',$cont));
+			
 		} else {
 			$out[] = $cont;
 		}

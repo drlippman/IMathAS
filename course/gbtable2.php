@@ -1001,7 +1001,7 @@ function gbtable() {
 		unset($catpossattemptedstu);
 		unset($catpossattemptedecstu);
 		$catpossattemptedstu = $catpossattempted;  //copy attempted array for each stu
-		$catpossattemptedstuec = $catpossattemptedec;
+		$catpossattemptedecstu = $catpossattemptedec;
 		foreach($assessidx as $aid=>$i) {
 			$col = $assesscol[$aid];
 			if (!isset($gb[$ln][1][$col][0])) {

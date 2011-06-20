@@ -50,6 +50,12 @@ if ($cid==0) {
 		
 		$row = mysql_fetch_row($result);
 		$text = $row[1];
+		if (strlen($text)>6 && substr($text,0,6)=='**wver') {
+			$wikiver = substr($text,6,strpos($text,'**',6));
+			$text = substr($text,strpos($text,'**',6)+2);
+		} else {
+			$wikiver = 1;
+		}
 		$lastedittime = tzdate("F j, Y, g:i a",$row[2]);
 		$lasteditedby = $row[3].', '.$row[4];
 		$revisionusers = array();

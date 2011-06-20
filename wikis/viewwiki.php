@@ -78,8 +78,6 @@ if ($cid==0) {
 					$base = diffapplydiff($base,$row[0]);
 				}
 				$newbase = addslashes(implode(' ',$base));
-				echo $newbase;
-				exit;
 				$query = "UPDATE imas_wiki_revisions SET revision='$newbase' WHERE id=$revision";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				$query = "DELETE FROM imas_wiki_revisions WHERE wikiid='$id' AND stugroupid='$groupid' AND id>$revision";
@@ -170,6 +168,12 @@ if ($cid==0) {
 		} else {
 			$row = mysql_fetch_row($result);
 			$text = $row[1];
+			if (strlen($text)>6 && substr($text,0,6)=='**wver') {
+				$wikiver = substr($text,6,strpos($text,'**',6));
+				$text = substr($text,strpos($text,'**',6)+2);
+			} else {
+				$wikiver = 1;
+			}
 			$lastedittime = tzdate("F j, Y, g:i a",$row[2]);
 			$lasteditedby = $row[3].', '.$row[4];
 		}
@@ -202,7 +206,7 @@ if ($cid==0) {
 	 $addr2 .= '&grp='.$groupid;
  }
  $placeinhead .= '<script type="text/javascript">var AHAHrevurl = "'.$addr.'"; var reverturl = "'.$addr2.'";</script>';
- $placeinhead .= '<style type="text/css"> a.grayout {color: #ccc; cursor: default;} del {background-color: #f99; text-decoration:none;} ins {background-color: #9f9; text-decoration:none;} .wikicontent {padding: 10px;}</style>';
+ $placeinhead .= '<style type="text/css"> a.grayout {color: #ccc; cursor: default;} del {color: #f99; text-decoration:none;} ins {color: #6f6; text-decoration:none;} .wikicontent {padding: 10px;}</style>';
  if ($isgroup && isset($teacherid)) {
 	$placeinhead .= "<script type=\"text/javascript\">";
 	$placeinhead .= 'function chgfilter() {';
@@ -248,6 +252,11 @@ if ($overwriteBody==1) {
 		echo "<p><a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid&torev=$torev&revert=true\">Yes, I'm Sure</a> | ";
 		echo "<a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid\">Nevermind</a></p>";
 		
+	} else if (isset($_GET['snapshot'])) {
+		echo "<p>Current Version Code.  <a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid\">Back</a></p>";
+		echo '<div class="editor" style="font-family:courier; padding: 10px;">';
+		echo str_replace('&gt; &lt;',"&gt;<br/>&lt;",htmlentities($text));
+		echo '</div>';
 	} else { //default page display
 		if ($isgroup && isset($teacherid)) {
 			echo '<p>Viewing page for group: ';
@@ -264,7 +273,8 @@ if (isset($teacherid)) {
 		$grpnote = "For this group's wiki: ";
 	}
 	echo "<a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid&delall=ask\">Clear Page Contents</a> | ";
-	echo "<a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid&delrev=ask\">Clear Page History</a></p>";
+	echo "<a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid&delrev=ask\">Clear Page History</a> | ";
+	echo "<a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid&snapshot=true\">Current Version Snapshot</a></p>";
 }
 echo '<p><span id="revisioninfo">Revision '.$numrevisions;
 if ($numrevisions>0) {
