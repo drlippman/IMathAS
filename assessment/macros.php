@@ -1417,7 +1417,7 @@ function prettysigfig($a,$sigfig,$comma=',',$choptrailing=false) {
 		return $sign.number_format(round($a,$v+$sigfig),0,'.',$comma);
 	} else {
 		$n = number_format($a,$v+$sigfig);
-		if ($choptrailing) {
+		if ($choptrailing && abs($a - round($a,$v+$sigfig))<1e-12) {
 			$n = rtrim($n,'0');
 			$n = rtrim($n,'.');
 		} else {
