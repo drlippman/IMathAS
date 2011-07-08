@@ -338,6 +338,41 @@ function drawTarget(x,y) {
 				var rad = Math.sqrt((x2-tplines[curTarget][i][0][0])*(x2-tplines[curTarget][i][0][0]) + (y2-tplines[curTarget][i][0][1])*(y2-tplines[curTarget][i][0][1]));
 				ctx.arc(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],rad,0,2*Math.PI,true);
 			}
+		} else if (tptypes[curTarget][i]==8) {//if a tp absolute value
+			var slope = null;
+			var x2 = null;
+			var y2 = null;
+			if (tplines[curTarget][i].length==2) {  //if two points set
+				x2 = tplines[curTarget][i][1][0];
+				y2 = tplines[curTarget][i][1][1];
+			} else if (curTPcurve==i && x!=null && tplines[curTarget][i].length==1) {  //one point set, use mouse pos for third
+				x2 = x;
+				y2 = y;
+			}
+			if (x2 != null) { //at least one point set
+				if (x2!=tplines[curTarget][i][0][0]) {
+					var slope = (y2 - tplines[curTarget][i][0][1])/(x2-tplines[curTarget][i][0][0]);
+					if (x2<tplines[curTarget][i][0][0]) {  //want slope on right
+						slope *= -1;
+					}
+				}
+				if (Math.abs(x2-tplines[curTarget][i][0][0])<1 || Math.abs(slope)>100) { //vert line
+					ctx.moveTo(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1]);
+					if (y2>tplines[curTarget][i][0][1]) {
+						ctx.lineTo(tplines[curTarget][i][0][0],targets[curTarget].imgheight);
+					} else {
+						ctx.lineTo(tplines[curTarget][i][0][0],0);
+					}
+				} else {
+					var yleft = tplines[curTarget][i][0][1] + slope*tplines[curTarget][i][0][0];
+					var yright = tplines[curTarget][i][0][1] + slope*(targets[curTarget].imgwidth-tplines[curTarget][i][0][0]);
+					ctx.moveTo(0,yleft);
+					ctx.lineTo(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1]);
+					ctx.lineTo(targets[curTarget].imgwidth,yright);
+					
+				}
+				
+			}
 		}
 		ctx.stroke();
 		for (var j=0; j<tplines[curTarget][i].length; j++) {

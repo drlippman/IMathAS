@@ -1439,6 +1439,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			//$out .= "<img src=\"$imasroot/img/tpline2.gif\" onclick=\"settool(this,$qn,5.2)\"/>";
 			//$out .= "<img src=\"$imasroot/img/tpline3.gif\" onclick=\"settool(this,$qn,5.3)\"/>";
 			$out .= "<img src=\"$imasroot/img/tpparab.gif\" onclick=\"settool(this,$qn,6)\"/>";
+			$out .= "<img src=\"$imasroot/img/tpabs.gif\" onclick=\"settool(this,$qn,8)\"/>";
 			if ($settings[6]*($settings[3]-$settings[2]) == $settings[7]*($settings[1]-$settings[0])) {
 				//only circles if equal spacing in x and y
 				$out .= "<img src=\"$imasroot/img/tpcirc.gif\" onclick=\"settool(this,$qn,7)\"/>";
@@ -2887,12 +2888,17 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		} else if ($answerformat=="twopoint") {
 			$anscircs = array();
 			$ansparabs = array();
-			$x1 = 1/4*$settings[0] + 3/4*$settings[1];
-			$x2 = 1/2*$settings[0] + 1/2*$settings[1];
-			$x3 = 3/4*$settings[0] + 1/4*$settings[1];
+			$ansabs = array();
+			$x0 = $settings[0];
+			$x1 = 1/4*$settings[1] + 3/4*$settings[0];
+			$x2 = 1/2*$settings[1] + 1/2*$settings[0];
+			$x3 = 3/4*$settings[1] + 1/4*$settings[0];
+			$x4 = $settings[1];
+			$x0p = $imgborder;
 			$x1p = ($x1 - $settings[0])*$pixelsperx + $imgborder;
 			$x2p = ($x2 - $settings[0])*$pixelsperx + $imgborder;
 			$x3p = ($x3 - $settings[0])*$pixelsperx + $imgborder;
+			$x4p = ($x4 - $settings[0])*$pixelsperx + $imgborder;
 			$ymid = ($settings[2]+$settings[3])/2;
 			$ymidp = $settings[7] - ($ymid-$settings[2])*$pixelspery - $imgborder;
 			foreach ($answers as $key=>$function) {
@@ -2921,13 +2927,32 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					$func = mathphp($func,'x');
 					$func = str_replace("(x)",'($x)',$func);
 					$func = create_function('$x', 'return ('.$func.');');
+					
 					$y1 = $func($x1);
 					$y2 = $func($x2);
 					$y3 = $func($x3);
 					$y1p = $settings[7] - ($y1-$settings[2])*$pixelspery - $imgborder;
 					$y2p = $settings[7] - ($y2-$settings[2])*$pixelspery - $imgborder;
 					$y3p = $settings[7] - ($y3-$settings[2])*$pixelspery - $imgborder;
-					if (abs(($y3-$y2)-($y2-$y1))<1e-9) {
+					
+					$settings[7] - ($y1-$settings[2])*$pixelspery - $imgborder;
+					if (strpos($function[0],'abs')!==false) { //is abs
+						$y0 = $func($x0);
+						$y4 = $func($x4);
+						$y0p = $settings[7] - ($y0-$settings[2])*$pixelspery - $imgborder;
+						$y4p = $settings[7] - ($y4-$settings[2])*$pixelspery - $imgborder;
+						if (abs(($y2-$y1)-($y1-$y0))<1e-9) { //if first 3 points are colinear
+							$slope = ($y2p-$y1p)/($x2p-$x1p);
+						} else if (abs(($y4-$y3)-($y3-$y2))<1e-9) { //if last 3 points are colinear
+							$slope = -1*($y4p-$y3p)/($x4p-$x3p);  //mult by -1 to get slope on left
+						}
+						if ($slope==0) {
+							$anslines[$key] = array('y',$slope,$y2p);
+						} else {
+							$xip = ($slope*($x4p+$x0p)+$y4p-$y0p)/(2*$slope);  //x value of "vertex"
+							$ansabs[$key] = array($xip,$slope*($xip-$x0p)+$y0p, $slope);
+						}
+					} else if (abs(($y3-$y2)-($y2-$y1))<1e-9) {
 						//colinear
 						$slope = ($y2p-$y1p)/($x2p-$x1p);
 						if (abs($slope)>1.4) {
@@ -2953,6 +2978,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$lines = array();
 			$parabs = array();
 			$circs = array();
+			$abs = array();
 			if ($tplines=='') {
 				$tplines = array();
 			} else {
@@ -2985,6 +3011,21 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					} else if ($pts[0]==7) {
 						//circle
 						$circs[] = array($pts[1],$pts[2],sqrt(($pts[3]-$pts[1])*($pts[3]-$pts[1]) + ($pts[4]-$pts[2])*($pts[4]-$pts[2])));
+					} else if ($pts[0]==8) {
+						//abs
+						if ($pts[1]==$pts[3]) {
+							if ($pts[4]>$pts[2]) {
+								$slope = -10000000000;
+							} else {
+								$slope = 10000000000;
+							}
+						} else {
+							$slope = ($pts[4]-$pts[2])/($pts[3]-$pts[1]);
+							if ($pts[3]>$pts[1]) {//we just found slope on right, so reverse for slope on left
+								$slope *= -1;
+							}
+						}
+						$abs[] = array($pts[1],$pts[2], $slope);
 					}
 				}
 			}
@@ -3060,6 +3101,23 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						continue;
 					}
 					if (abs($ansparab[2]-$parabs[$i][2])>$defpttol*$reltolerance) {
+						continue;
+					}
+					$scores[$key] = 1;
+					break;
+				}
+			}
+			
+			foreach ($ansabs as $key=>$ansabs) {
+				$scores[$key] = 0;
+				for ($i=0; $i<count($abs); $i++) {
+					if (abs($ansabs[0]-$abs[$i][0])>$defpttol*$reltolerance) {
+						continue;
+					}
+					if (abs($ansabs[1]-$abs[$i][1])>$defpttol*$reltolerance) {
+						continue;
+					}
+					if (abs($ansabs[2]-$abs[$i][2])>$defpttol*$reltolerance) {
 						continue;
 					}
 					$scores[$key] = 1;
