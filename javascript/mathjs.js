@@ -243,6 +243,5 @@ function mathjs(st,varlist) {
     }
     st = st.slice(0,j+1)+"factorial("+st.slice(j+1,i)+")"+st.slice(i+1);
   }
-  alert(st);
   return st;
 }

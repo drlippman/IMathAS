@@ -55,18 +55,18 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			}
 			if (is_array($arv)) {
 				foreach ($arv as $k=>$arvp) {
-					if (is_numeric($arvp)) {
+					//if (is_numeric($arvp)) {
 						$stuanswers[$i+1][$k] = $arvp;
-					} else {
-						$stuanswers[$i+1][$k] = preg_replace('/\W+/','',$arvp);
-					}
+					//} else {
+					//	$stuanswers[$i+1][$k] = preg_replace('/\W+/','',$arvp);
+					//}
 				}
 			} else {
-				if (is_numeric($arv)) {
+				//if (is_numeric($arv)) {
 					$stuanswers[$i+1] = $arv;
-				} else {
-					$stuanswers[$i+1] = preg_replace('/\W+/','',$arv);
-				}
+				//} else {
+				//	$stuanswers[$i+1] = preg_replace('/\W+/','',$arv);
+				//}
 			}
 				
 			
@@ -331,18 +331,18 @@ function scoreq($qnidx,$qidx,$seed,$givenans) {
 			}
 			if (is_array($arv)) {
 				foreach ($arv as $k=>$arvp) {
-					if (is_numeric($arvp)) {
+					//if (is_numeric($arvp)) {
 						$stuanswers[$i+1][$k] = $arvp;
-					} else {
-						$stuanswers[$i+1][$k] = preg_replace('/\W+/','',$arvp);
-					}
+					//} else {
+					//	$stuanswers[$i+1][$k] = preg_replace('/\W+/','',$arvp);
+					//}
 				}
 			} else {
-				if (is_numeric($arv)) {
+				//if (is_numeric($arv)) {
 					$stuanswers[$i+1] = $arv;
-				} else {
-					$stuanswers[$i+1] = preg_replace('/\W+/','',$arv);
-				}
+				//} else {
+				//	$stuanswers[$i+1] = preg_replace('/\W+/','',$arv);
+				//}
 			}
 		}
 	}
@@ -352,7 +352,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans) {
 			if (isset($_POST["qn$partnum"]) && is_numeric($_POST["qn$partnum"])) {
 				$stuanswers[$qnidx+1][$kidx] = floatval($_POST["qn$partnum"]);
 			} else {
-				$stuanswers[$qnidx+1][$kidx] = preg_replace('/\W+/','',stripslashes($_POST["qn$partnum"]));
+				$stuanswers[$qnidx+1][$kidx] = stripslashes($_POST["qn$partnum"]); //preg_replace('/\W+/','',stripslashes($_POST["qn$partnum"]));
 			}
 		}
 		
@@ -360,7 +360,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans) {
 		if (isset($_POST["qn$qnidx"]) && is_numeric($_POST["qn$qnidx"])) {
 			$stuanswers[$qnidx+1] = floatval($_POST["qn$qnidx"]);
 		} else {
-			$stuanswers[$qnidx+1] = preg_replace('/\W+/','',stripslashes($_POST["qn$qnidx"]));
+			$stuanswers[$qnidx+1] = stripslashes($_POST["qn$qnidx"]); //preg_replace('/\W+/','',stripslashes($_POST["qn$qnidx"]));
 		}
 	}
 	$thisq = $qnidx+1;
@@ -403,6 +403,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans) {
 	if (isset($noshuffle)) {$options['noshuffle'] = $noshuffle;}
 	if (isset($grid)) {$options['grid'] = $grid;}
 	if (isset($partweights)) {$options['partweights'] = $partweights;}
+	if (isset($anstypes)) {$options['anstypes'] = $anstypes;}
 	
 	$score = 0;
 	if ($qdata['qtype']=="multipart") {
@@ -439,8 +440,10 @@ function scoreq($qnidx,$qidx,$seed,$givenans) {
 		return implode('~',$scores);
 	} else {
 		$score = scorepart($qdata['qtype'],$qnidx,$givenans,$options,0);
-		$GLOBALS['partlastanswer'] = str_replace('&','',$GLOBALS['partlastanswer']);
-		$GLOBALS['partlastanswer'] = preg_replace('/#+/','#',$GLOBALS['partlastanswer']);
+		if ($qdata['qtype']!='conditional') {
+			$GLOBALS['partlastanswer'] = str_replace('&','',$GLOBALS['partlastanswer']);
+			$GLOBALS['partlastanswer'] = preg_replace('/#+/','#',$GLOBALS['partlastanswer']);
+		}
 		if ($GLOBALS['lastanswers'][$qnidx]=='') {
 			$GLOBALS['lastanswers'][$qnidx] = $GLOBALS['partlastanswer'];
 		} else {
@@ -3540,12 +3543,59 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			return 0;
 		}
 	} else if ($anstype == "conditional") {
-		if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}
-		if ($answer===true) {
-			return 1;
-		} else {
-			return $answer;
+		$answer = $options['answer'];
+		if (isset($options['abstolerance'])) {$abstolerance = $options['abstolerance'];}
+		if (isset($options['reltolerance'])) {$reltolerance = $options['reltolerance'];}
+		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = .001;}
+		if (isset($options['domain'])) {$domain = $options['domain'];} else { $domain = "-10,10";}
+		if (isset($options['variables'])) {$variables = $options['variables'];} else { $variables = "x";}
+		$anstypes = explode(',',$options['anstypes']);
+		$la = array();
+		foreach ($anstypes as $i=>$anst) {
+			$qnt = 1000*($qn+1)+$i;
+			if (isset($_POST["tc$qnt"])) {
+				$la[$i] = $_POST["tc$qnt"];
+			} else {
+				$la[$i] = $_POST["qn$qnt"];
+			}
+			$la[$i] = str_replace('&','',$la[$i]);
+			$la[$i] = preg_replace('/#+/','#',$la[$i]);
 		}
+		$GLOBALS['partlastanswer'] = implode('&',$la);
+		if (isset($abstolerance)) {
+			$tol = '|'.$abstolerance;
+		} else {
+			$tol = $reltolerance;
+		}
+		$correct = true;
+		if (!is_array($answer)) { //single boolean
+			if ($answer===true) {
+				return 1;
+			} else if ($answer===false) {
+				return 0;
+			} else {
+				return $answer;
+			}
+		} 
+		if (is_array($answer) && is_string($answer[0])) {  //if single {'function',$f,$g) type, make array
+			$answer = array($answer);
+		} 
+		foreach ($answer as $ans) {
+			if (is_array($ans)) {
+				if ($ans[0]=='number') {
+					$pt = comparenumbers($ans[1],$ans[2],$tol);
+				} else if ($ans[0]=='function') {
+					$pt = comparefunctions($ans[1],$ans[2],$variables,$tol,$domain);
+				}
+			} else {
+				$pt = $ans;
+			}
+			if ($pt==false) {
+				return 0;
+				break;
+			}
+		}
+		return 1;
 	}
 	
 }

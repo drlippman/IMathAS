@@ -4,7 +4,7 @@
 
 
 array_push($allowedmacros,"exp","sec","csc","cot","sech","csch","coth","nthlog","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif","in_array","prettyint","prettyreal","prettysigfig","arraystodots","subarray","showdataarray","arraystodoteqns","array_flip","arrayfindindex","fillarray","array_reverse","root");
-array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","randcity","randcities","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction","ifthen","multicalconarray","htmlentities","formhoverover","formpopup","connectthedots","jointsort","stringpos","stringlen","stringclean","substr","substr_count","makexxpretty","makexxprettydisp","forminlinebutton","makenumberrequiretimes");
+array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","randcity","randcities","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction","ifthen","multicalconarray","htmlentities","formhoverover","formpopup","connectthedots","jointsort","stringpos","stringlen","stringclean","substr","substr_count","makexxpretty","makexxprettydisp","forminlinebutton","makenumberrequiretimes","comparenumbers","comparefunctions");
 function mergearrays($a,$b) {
 	if (!is_array($a)) {
 		$a = array($a);
@@ -2375,6 +2375,88 @@ function cleantokenize($str,$funcs) {
 		
 	}
 	return $syms;
+}
+
+
+function comparenumbers($a,$b,$tol='.001') {
+	if ($tol{0}=='|') {
+		$abstolerance = floatval(substr($tol,1));
+	}
+	if (!is_numeric($a)) {
+		$a = @eval('return('.mathphp($a,null).');');
+	}
+	if (!is_numeric($b)) {
+		$b = @eval('return('.mathphp($b,null).');');
+	}
+	//echo "comparing $a and $b ";
+	if (isset($abstolerance)) {
+		if (abs($a-$b) < $abstolerance+1E-12) {return true;} 	
+	} else {
+		if (abs($a-$b)/(abs($a)+.0001) < $tol+1E-12) {return true;} 
+	}
+	return false;
+}
+
+function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
+	if ($a=='' || $b=='') { return false;}
+	//echo "comparing $a and $b";
+	if ($tol{0}=='|') {
+		$abstolerance = floatval(substr($tol,1));
+	}
+	$fromto = explode(',',$domain);
+	$variables = explode(',',$vars);
+	$vlist = implode("|",$variables);
+	for ($i = 0; $i < 20; $i++) {
+		for($j=0; $j < count($variables); $j++) {
+			if (isset($fromto[2]) && $fromto[2]=="integers") {
+				$tps[$i][$j] = rand($fromto[0],$fromto[1]);
+			} else if (isset($fromto[2*$j+1])) {
+				$tps[$i][$j] = $fromto[2*$j] + ($fromto[2*$j+1]-$fromto[2*$j])*rand(0,499)/500.0 + 0.001;
+			} else {
+				$tps[$i][$j] = $fromto[0] + ($fromto[1]-$fromto[0])*rand(0,499)/500.0 + 0.001;
+			}
+		}
+	}
+	$a = mathphp(makepretty(mathphppre($a)), $vlist);
+	$b = mathphp(makepretty(mathphppre($b)), $vlist);
+	//echo "pretty: $a, $b";
+	for($i=0; $i < count($variables); $i++) {
+		$a = str_replace("(".$variables[$i].")",'($tp['.$i.'])',$a);
+		$b = str_replace("(".$variables[$i].")",'($tp['.$i.'])',$b);
+	}
+	$cntnana = 0;
+	$cntnanb = 0;
+	$correct = true;
+	for ($i = 0; $i < 20; $i++) {
+		for($j=0; $j < count($variables); $j++) {
+			$tp[$j] = $tps[$i][$j];
+		}
+		$ansa = @eval("return ($a);");
+		$ansb = @eval("return ($b);");
+		//echo "real: $realans, my: {$myans[$i]},rel: ". (abs($myans[$i]-$realans)/abs($realans))  ."<br/>";
+		if (isNaN($ansa)) {$cntnana++; continue;} //avoid NaN problems
+		if (isNaN($ansb)) {$cntnanb++; continue;}
+		
+		if (isset($abstolerance)) {
+			if (abs($ansa-$ansb) > $abstolerance-1E-12) {$correct = false; break;}	
+		} else {
+			if ((abs($ansa-$ansb)/(abs($ansa)+.0001) > $tol-1E-12)) {$correct = false; break;}
+		}
+		
+	}
+	if (($cntnana==20 || $cntnanb==20) && isset($GLOBALS['teacherid'])) {
+		echo "<p>Debug info: one function evaled to Not-a-number at all test points.  Check \$domain</p>";
+		echo "<p>Funcs: $a and $b</p>";
+		return false;
+	}
+	if (abs($cntnana - $cntnanb)>1) {
+		return false;
+	}
+	if ($correct) {
+		return true;
+	} else {
+		return false;
+	}
 }
 
 ?>
