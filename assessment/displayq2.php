@@ -119,7 +119,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if (isset($grid)) {$options['grid'] = $grid;}
 	if (isset($background)) {$options['background'] = $background;}
 	
-	if ($qdata['qtype']=="multipart") {
+	if ($qdata['qtype']=="multipart" || $qdata['qtype']=='conditional') {
 		if (!is_array($anstypes)) {
 			$anstypes = explode(",",$anstypes);
 		}
@@ -130,6 +130,11 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		}
 	} else {
 		list($answerbox,$tips[0],$shanspt[0],$previewloc) = makeanswerbox($qdata['qtype'],$qnidx,$la,$options,0);
+	}
+	if ($qdata['qtype']=='conditional') {
+		if (!isset($showanswer)) {
+			$showanswer = 'Answers may vary';
+		}
 	}
 	
 	
@@ -341,7 +346,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans) {
 			}
 		}
 	}
-	if ($qdata['qtype']=="multipart") {
+	if ($qdata['qtype']=="multipart" || $qdata['qtype']=='conditional') {
 		for ($kidx=0;$kidx<count($_POST);$kidx++) {
 			$partnum = ($qnidx+1)*1000 + $kidx;
 			if (isset($_POST["qn$partnum"]) && is_numeric($_POST["qn$partnum"])) {
@@ -3533,6 +3538,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$GLOBALS['scoremessages'] .= "Error uploading file";
 			}
 			return 0;
+		}
+	} else if ($anstype == "conditional") {
+		if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}
+		if ($answer===true) {
+			return 1;
+		} else {
+			return $answer;
 		}
 	}
 	

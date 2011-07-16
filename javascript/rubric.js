@@ -49,7 +49,8 @@ function imasrubric_show(rubricid,pointsposs,scoreboxid,feedbackid,qn,width) {
 			html += '</td><td width="10%"><input type="radio" name="rubricgrp" value="'+i+'"/> '+totpts+'</td></tr>';
 		}
 	}
-	html += '</tbody></table><br/><input type="button" value="Record" onclick="imasrubric_record(\''+rubricid+'\',\''+scoreboxid+'\',\''+feedbackid+'\',\''+qn+'\','+pointsposs+')" /></form></div>';
+	html += '</tbody></table><br/><input type="button" value="Record" onclick="imasrubric_record(\''+rubricid+'\',\''+scoreboxid+'\',\''+feedbackid+'\',\''+qn+'\','+pointsposs+',false)" />';
+	html += '<input type="button" value="Clear Existing and Record" onclick="imasrubric_record(\''+rubricid+'\',\''+scoreboxid+'\',\''+feedbackid+'\',\''+qn+'\','+pointsposs+',true)" /></form></div>';
 	
 	
 	document.getElementById("GB_frameholder").innerHTML = html;
@@ -64,7 +65,7 @@ function imasrubric_show(rubricid,pointsposs,scoreboxid,feedbackid,qn,width) {
 	//document.getElementById("GB_frame").style.height = (h - 30 -34)+"px";
 }
 
-function imasrubric_record(rubricid,scoreboxid,feedbackid,qn,pointsposs) {
+function imasrubric_record(rubricid,scoreboxid,feedbackid,qn,pointsposs,clearexisting) {
 	var feedback = '';
 	if (qn != null && qn != 'null' && qn != '0') {
 		feedback += '#'+qn+': ';
@@ -85,7 +86,11 @@ function imasrubric_record(rubricid,scoreboxid,feedbackid,qn,pointsposs) {
 		}
 		document.getElementById(scoreboxid).value = score;
 		if (imasrubrics[rubricid].type==1) {
-			document.getElementById(feedbackid).value = document.getElementById(feedbackid).value + feedback;
+			if (clearexisting) {
+				document.getElementById(feedbackid).value = feedback;
+			} else {
+				document.getElementById(feedbackid).value = document.getElementById(feedbackid).value + feedback;
+			}
 		}
 	} else if (imasrubrics[rubricid].type==2) { //just feedback
 		for (var i=0;i<imasrubrics[rubricid].data.length; i++) {
@@ -93,14 +98,22 @@ function imasrubric_record(rubricid,scoreboxid,feedbackid,qn,pointsposs) {
 				feedback += imasrubrics[rubricid].data[i][0]+'. ';
 			}
 		}
-		document.getElementById(feedbackid).value = document.getElementById(feedbackid).value + feedback;
+		if (clearexisting) {
+			document.getElementById(feedbackid).value = feedback;
+		} else {
+			document.getElementById(feedbackid).value = document.getElementById(feedbackid).value + feedback;
+		}
 	} else if (imasrubrics[rubricid].type==3 || imasrubrics[rubricid].type==4 ) {  //score total and feedback
 		loc = getRadioValue('rubricgrp');
 		totpts = Math.round(pointsposs*imasrubrics[rubricid].data[loc][2])/100;
 		feedback += imasrubrics[rubricid].data[loc][0];//+': '+totpts+'/'+pointsposs+'. ';
 		document.getElementById(scoreboxid).value = totpts;
 		if (imasrubrics[rubricid].type==3) {
-			document.getElementById(feedbackid).value = document.getElementById(feedbackid).value + feedback;
+			if (clearexisting) {
+				document.getElementById(feedbackid).value = feedback;
+			} else {
+				document.getElementById(feedbackid).value = document.getElementById(feedbackid).value + feedback;
+			}
 		}
 	}
 	GB_hide();
