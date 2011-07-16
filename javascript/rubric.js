@@ -66,7 +66,7 @@ function imasrubric_show(rubricid,pointsposs,scoreboxid,feedbackid,qn,width) {
 
 function imasrubric_record(rubricid,scoreboxid,feedbackid,qn,pointsposs) {
 	var feedback = '';
-	if (qn != null && qn != '0') {
+	if (qn != null && qn != 'null' && qn != '0') {
 		feedback += '#'+qn+': ';
 	}
 	if (imasrubrics[rubricid].type==0 || imasrubrics[rubricid].type==1 ) {  //score breakdown and feedback

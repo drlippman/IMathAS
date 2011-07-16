@@ -120,7 +120,7 @@ function mathjs(st,varlist) {
     st = st.replace(/coth\^-1/g,"arccoth");
   }
   
-  st = st.replace(/root\((\d+)\)\(/,"nthroot($1,");
+  st = st.replace(/root\((\d+)\)\(/g,"nthroot($1,");
   //st = st.replace(/E/g,"(EE)");
   st = st.replace(/([0-9])E([\-0-9])/g,"$1(EE)$2");
   st = st.replace(/^e$/g,"(E)");
@@ -243,5 +243,6 @@ function mathjs(st,varlist) {
     }
     st = st.slice(0,j+1)+"factorial("+st.slice(j+1,i)+")"+st.slice(i+1);
   }
+  alert(st);
   return st;
 }

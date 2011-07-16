@@ -156,7 +156,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		} else { //add new
 		$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate,avail,oncal,caltag,target) VALUES ";
-		$query .= "('$cid','{$_POST['title']}','{$_POST['summary']}','{$_POST['text']}',$startdate,$enddate,'{$_POST['avail']}','{$_POST['oncal']}','$caltag','{$_POST['target']}');";
+		$query .= "('$cid','{$_POST['title']}','{$_POST['summary']}','{$_POST['text']}',$startdate,$enddate,'{$_POST['avail']}','$oncal','$caltag','{$_POST['target']}');";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		
 		$newtextid = mysql_insert_id();
