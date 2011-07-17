@@ -154,6 +154,7 @@ dd {
 	<li><a href="#arraymacros">Array Macros</a></li>
 	<li><a href="#generalmacros">General Macros</a></li>
 	<li><a href="#mathmacros">Math Macros</a></li>
+	<li><a href="#conditionalmacros">Conditional Test Macros</a></li>
 	<li><a href="#usingothermacros">Using Other Macros</a></li>
 	<li><a href="#mathentry">Math Entry</li>
 	<li><a href="#writingcommon">Options Common to All Types</a></li>
@@ -179,6 +180,7 @@ dd {
 		<li><a href="#calcinterval">Calculated Interval</a></li>
 		<li><a href="#fileupload">File Upload</a></li>
 		<li><a href="#multipart">Multipart</a></li>
+		<li><a href="#conditional">Conditional</a></li>
 		</ul>
 	</ul>
 
@@ -1803,6 +1805,17 @@ These macros are used for mathematical calculations:
 </ul>
 </div>
 <div class=h2>
+<h2><a name="conditionalmacros">Conditional Test Macros</a></h2>
+These macros are used to test various conditions.  They typically return true or false, depending on whether the desired condition is met.
+<ul>
+<li><b>comparenumbers(a,b,[tol])</b>:  Compares numbers or numerical expressions a and b to see if there are equivalent to the specified
+  tolerance.  Set tol to specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance.</li>
+<li><b>comparefunctions(a,b,[vars,tol,domain])</b>: Compares functions a and b to see if they are algebraically equivalent.  Set
+  vars to a list of variables (defaults to 'x').  Set tol to specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance.
+  Set domain to "xmin,xmax" to specify a domain for comparison.</li>
+</ul>
+</div>
+<div class=h2>
 <h2><a name="usingothermacros">Using Other Macros</a></h2>
 <p>If an IMathAS administrator has installed other Macro Libraries, you can load a macro library by entering the line 
 <pre>loadlibrary("list of library names")</pre> at the beginning of the Common Control section.</p>
@@ -1880,6 +1893,7 @@ students' previous answers in your question code.  You will only be able to refe
 <li>$stuanswers[N][P] will refer to the student's answer on question N, part P (if multipart)</li>
 <li>$stuanswers[$thisq][P] will refer to the student's answer on the current question, part P</li>
 <li>$stuanswers[$thisq-1] will refer to the student's answer on the previous question</li>
+<li>Only with the current question, $stuanswersval[$thisq] or $stuanswersval[$thisq][P] will contain the numerical value of Calculated question types</li>
 </ul>
 Notes (important!):
 </p>
@@ -1893,7 +1907,7 @@ Perhaps also include:
 $warning = "You MUST answer question 1 before this question" if ($a==null), then put $warning in the question text.
 </p>
 <p>
-2) If you use $stuanswers in your $answer, $showanswer will generally not be defined.  If you follow my advice in #1 above, then your 
+2) If you use $stuanswers in your $answer, $showanswer will generally not be defined.  If you follow the advice in #1 above, then your 
 $showanswer will reflect the random number assigned to $a.  For this reason, it is highly recommended that you custom define the $showanswer.
 </p>
 <p>
@@ -2737,6 +2751,57 @@ This type of question can contain multiple parts, where each part is one of the 
 </dl>
 </p>
 	
+</div>
+<div class=h3>
+<h3><a name="conditional">Conditional</a></h3>
+A variation on multipart questions, a conditional question can include multiple answer boxes, but assigns
+a single score.  The score is based on applying some comparison or conditional test to the student answers, referenced through
+the <a href="#writingcommon">$stuanswers</a> array.  This allows the question writer to essentially create their
+own question type.
+<p><b>Required Variables</b><BR>
+<dl>
+<dt>$anstypes = an array or list of answer types</dt>
+	<dd>Defines the answer type for each part.  Example: $anstypes = "number,number".  See the Multipart help above 
+	for the list of short names</dd>
+<dt>$answer = any of these:</dt>
+	<dd>
+	<ul>
+	<li><b>A boolean (true/false) expression</b>: Something that evaluates to true or false. <br/>
+	Example: $answer = ($a>3) <br/>
+	Example: $answer = comparefunctions($f,'x^2') &amp;&amp; ($a!=0)</li>
+	<li><b>array('function',$a,$b)</b>:  Will compare the functions $a and $b and mark the question correct if they
+	   are equivalent.  Can set $variables, $reltolerance, $abstolerance, and $domain as needed, like with Function type
+	   questions</li>
+	<li><b>array('number',$a,$b)</b>:  Will compare the numbers or numerical expressions $a and $b and mark the question correct if they
+	   are equivalent.  Can set $reltolerance or $abstolerance as needed, like with Number/Calculated type
+	   questions</li>
+	<li><b>Multiple comparisons</b>: You can mix the two types above by creating an array of comparions.  All must be true
+	   for the question to be marked correct.  <br/>
+	   Example: $answer = array($a>3, array('function',$b,c), array('number',evalfunc($b,$a),5))</li>
+	</ul>   
+<dt>Question part variables</dt>
+	<dd>For each question part, you will need to define the variables (like $questions, etc.) you would normally
+	need to define, except you <b>should not</b> define an $answer.  However, you will need to suffix the variable with
+	a part designator.  For example, based on $anstypes 
+	above, the first answer is a number.  Instead of $displayformat = "select", enter $displayformat[0] = "select".  
+	This designates that this setting belongs
+	to the first element of $anstypes.  
+	</dd>
+<dt>$answerbox[partnum] (In Question Text)</dt>
+	<dd>The array $answerbox will contain the entry boxes for each answer type.  In the question text, you will need to position
+	these boxes within the question.  For example:  "Enter a number: $answerbox[0].  Now a function: $answerbox[5]"</dd>
+</dl>
+<p><b>Optional Variables</b><BR>
+<dl>
+<dt>Question part options</dt>
+	<dd>You can define any optional variable for each question part.  Like above, suffix the variable with the part designator.
+	Note that $variables, $domain, $reltolerance, and $abstolerance may be used for the comparison, and should not be set for 
+	individual parts.</dd>
+<dt>$showanswer</dt>
+	<dd>By default the $showanswer for conditional types is "Answers may vary".  Set $showanswer to override this.</dd>
+</dl>
+</p>		
+
 </div>
 </div>
 </div>

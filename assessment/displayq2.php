@@ -349,17 +349,26 @@ function scoreq($qnidx,$qidx,$seed,$givenans) {
 	if ($qdata['qtype']=="multipart" || $qdata['qtype']=='conditional') {
 		for ($kidx=0;$kidx<count($_POST);$kidx++) {
 			$partnum = ($qnidx+1)*1000 + $kidx;
-			if (isset($_POST["qn$partnum"]) && is_numeric($_POST["qn$partnum"])) {
+			if (isset($_POST["tc$partnum"])) {
+				$stuanswers[$qnidx+1][$kidx] = stripslashes($_POST["tc$partnum"]);
+				if (is_numeric($_POST["qn$partnum"])) {
+					$stuanswersval[$qnidx+1][$kidx] = floatval($_POST["qn$partnum"]);
+				}
+			} else if (isset($_POST["qn$partnum"]) && is_numeric($_POST["qn$partnum"])) {
 				$stuanswers[$qnidx+1][$kidx] = floatval($_POST["qn$partnum"]);
-			} else {
+			} else if (isset($_POST["qn$partnum"])) {
 				$stuanswers[$qnidx+1][$kidx] = stripslashes($_POST["qn$partnum"]); //preg_replace('/\W+/','',stripslashes($_POST["qn$partnum"]));
 			}
 		}
-		
 	} else {
-		if (isset($_POST["qn$qnidx"]) && is_numeric($_POST["qn$qnidx"])) {
+		if (isset($_POST["tc$qnidx"])) {
+			$stuanswers[$qnidx+1] = stripslashes($_POST["tc$qnidx"]);
+			if (is_numeric($_POST["qn$qnidx"])) {
+				$stuanswersval[$qnidx+1] = floatval($_POST["qn$qnidx"]);
+			}
+		} else if (isset($_POST["qn$qnidx"]) && is_numeric($_POST["qn$qnidx"])) {
 			$stuanswers[$qnidx+1] = floatval($_POST["qn$qnidx"]);
-		} else {
+		} else if (isset($_POST["qn$qnidx"])) {
 			$stuanswers[$qnidx+1] = stripslashes($_POST["qn$qnidx"]); //preg_replace('/\W+/','',stripslashes($_POST["qn$qnidx"]));
 		}
 	}
@@ -3582,10 +3591,19 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		} 
 		foreach ($answer as $ans) {
 			if (is_array($ans)) {
+				if ($ans[0]{0}=='!') {
+					$flip = true;
+					$ans[0] = substr($ans[0],1);
+				} else {
+					$flip = false;
+				}
 				if ($ans[0]=='number') {
 					$pt = comparenumbers($ans[1],$ans[2],$tol);
 				} else if ($ans[0]=='function') {
 					$pt = comparefunctions($ans[1],$ans[2],$variables,$tol,$domain);
+				}
+				if ($flip) {
+					$pt = !$pt;
 				}
 			} else {
 				$pt = $ans;
