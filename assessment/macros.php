@@ -1597,7 +1597,7 @@ function numtowords($num,$doth=false) {
 			$dec *= 10;
 			$cnt++;
 		}
-		$out .= convertTri($dec,0);
+		$out .= convertTri(round($dec),0);
 		$out .= ' '.$placevals[$cnt];
 		if ($dec!=1) {
 			$out .= 's';

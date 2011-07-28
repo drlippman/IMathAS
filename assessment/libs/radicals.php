@@ -1,9 +1,9 @@
 <?php
 //A collection of functions for working with radicals
-//Version 1.0 Oct 21, 2010
+//Version 2 July 27, 2011
 
 global $allowedmacros;
-array_push($allowedmacros,"reduceradical","reduceradicalfrac");
+array_push($allowedmacros,"reduceradical","reduceradicalfrac","reducequadraticform");
 
 //reduceradical(inside,[root,format])
 //given the inside of a radical, reduces it to Aroot(B)
@@ -106,7 +106,70 @@ function reduceradicalfrac($n,$rootnum,$d,$root=2,$format="string") {
 }
 
 	
-
+//reducequadraticform(a,b,c,d)
+//given (a+bsqrt(c))/d, reduces the root then the fraction
+//format: default is "string", which returns "4sqrt(5)/2"
+//                   "disp", returns the string wrapped in backticks for display
+function reducequadraticform($a,$n,$rootnum,$d,$format="string") {
+	if ($rootnum<0) {
+		$iscomplex = true;
+		$rootnum = abs($rootnum);
+	} else {
+		$iscomplex = false;
+	}
+	$root = 2;
+	//reduce to (a+n sqrt(in))/d
+	list($rootA,$in) = reduceradical($rootnum,$root,"parts");
+	$n *= $rootA;
+	if ($in==1) {
+		$n += $a;
+		$a = 0;
+	}
+	$gr = gcd($n,$d);
+	$gw = gcd($a,$d);
+	$g = gcd($gr,$gw); //gcd of a,n, and d
+	$a = $a/$g;
+	$n = $n/$g;
+	$d = $d/$g;	
+	if ($d<0) {
+		$a = $a*-1;
+		$n = $n*-1;
+		$d = $d*-1;
+	}
+	$outstr = '';
+	if ($format=='disp') {
+		$outstr .= '`';
+	}
+	if ($d>1) {
+		$outstr .= '(';
+	}
+	if ($a != 0) {
+		$outstr .= $a;
+		if ($n>0) {
+			$outstr .= '+';
+		} else {
+		//	$outstr .= '-';
+		}
+	}
+	if (abs($n)!=1 || $in==1) {  //  3root(2) or 1root(1)
+		$outstr .= $n;
+	} else if ($n==-1) {
+		$outstr .= '-';
+	}
+	if ($in>1) {
+		$outstr .= "sqrt($in)";
+	}
+	if ($iscomplex) {
+		$outstr .= "i";
+	}
+	if ($d>1) {
+		$outstr .= ")/$d";
+	}
+	if ($format=='disp') {
+		$outstr .= '`';
+	}
+	return $outstr;
+}
 
 
 ?>

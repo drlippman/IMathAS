@@ -540,7 +540,13 @@ function ASaxes($arg) {
 	} else {
 		$yscl *= $this->yunitlength;
 	}
-	$this->fontsize = min($xscl/2,$yscl/2,12);
+	if (!$doy) {
+		$this->fontsize = min($xscl/2,12);
+	} else if (!$dox) {
+		$this->fontsize = min($yscl/2,12);
+	} else {
+		$this->fontsize = min($xscl/2,$yscl/2,12);
+	}
 	$this->ticklength = $this->fontsize/4;
 	if ($this->usegd2) {
 		imagesetthickness($this->img,1);

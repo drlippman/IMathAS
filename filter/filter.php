@@ -174,7 +174,7 @@
 		if (!isset($cid) && isset($_GET['cid'])) {
 			$cid = $_GET['cid'];
 		}
-		$height = '95%';
+		$height = '500px';
 		$width = '95%';
 		$param = 'key='.urlencode($key) . '&linkback=' . urlencode($linkback) . '&url=' . urlencode(str_replace('&amp;','&',$url));
 		if (isset($cid)) {

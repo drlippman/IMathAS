@@ -187,7 +187,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 				`time` INT( 10 ) UNSIGNED NOT NULL ,
 				`code` VARCHAR( 9 ) NOT NULL ,
 				INDEX (`diag`), INDEX(`time`), INDEX(`code`)
-				) TYPE = innodb;";
+				) ENGINE = InnoDB;";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		}
 		if ($last < 14) {
@@ -259,7 +259,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 				. ' `name` VARCHAR(254) NOT NULL, '
 				. ' INDEX (`courseid`)'
 				. ' )'
-				. ' TYPE = innodb'
+				. ' ENGINE = InnoDB'
 				. ' COMMENT = \'Student Group Sets\';';
 			$res = mysql_query($query);
 			if ($res===false) {
@@ -273,7 +273,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 				. ' `name` VARCHAR(254) NOT NULL, '
 				. ' INDEX (`groupsetid`)'
 				. ' )'
-				. ' TYPE = innodb'
+				. ' ENGINE = InnoDB'
 				. ' COMMENT = \'Student Groups\';';
 			$res = mysql_query($query);
 			if ($res===false) {
@@ -287,7 +287,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 				. ' `userid` INT(10) UNSIGNED NOT NULL, '
 				. ' INDEX (`stugroupid`), INDEX (`userid`)'
 				. ' )'
-				. ' TYPE = innodb'
+				. ' ENGINE = InnoDB'
 				. ' COMMENT = \'Student Group Members\';';
 			$res = mysql_query($query);
 			if ($res===false) {
@@ -365,7 +365,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 				. ' INDEX (`courseid`), '
 				. ' INDEX(`avail`), INDEX(`startdate`), INDEX(`enddate`), INDEX(`editbydate`) '
 				. ' )'
-				. ' TYPE = innodb'
+				. ' ENGINE = InnoDB'
 				. ' COMMENT = \'Wikis\';';
 			 $res = mysql_query($sql);
 			 if ($res===false) {
@@ -381,7 +381,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 				. ' `revision` TEXT NOT NULL, '
 				. ' INDEX (`wikiid`), INDEX(`stugroupid`), INDEX(`time`) '
 				. ' )'
-				. ' TYPE = innodb'
+				. ' ENGINE = InnoDB'
 				. ' COMMENT = \'Wiki revisions\';';
 			 $res = mysql_query($sql);
 			 if ($res===false) {
@@ -395,7 +395,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 				. ' `lastview` INT(10) UNSIGNED NOT NULL,'
 				 . ' INDEX (`userid`), INDEX(`wikiid`)'
 				. ' )'
-				. ' TYPE = innodb'
+				. ' ENGINE = InnoDB'
 				. ' COMMENT = \'Wiki last viewings\';';
 			 $res = mysql_query($sql);
 			 if ($res===false) {
@@ -640,7 +640,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 				. ' `rubric` TEXT NOT NULL, '
 				 . ' INDEX(`ownerid`), INDEX(`groupid`)'
 				. ' )'
-				. ' TYPE = innodb'
+				. ' ENGINE = InnoDB'
 				. ' COMMENT = \'Rubrics\';';
 			 $res = mysql_query($sql);
 			 if ($res===false) {
