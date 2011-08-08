@@ -139,10 +139,10 @@ if ($myrights<20) {
 						//$query .= "imas_library_items.qsetid='$qsetid' AND imas_library_items.libid='$libid'";
 						$query = "SELECT imas_library_items FROM imas_library_items,imas_users WHERE ";
 						$query .= "imas_library_items.ownerid=imas_users.id AND imas_users.groupid='$groupid' AND ";
-						$query .= "imas_library_items.qsetid='$qsetid' AND imas_library_items.libid='$libid'";
+						$query .= "imas_library_items.qsetid='$qsetid' AND imas_library_items.libid='$lib'";
 						$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 						if (mysql_num_rows($result)>0) {
-							$query = "DELETE FROM imas_library_items WHERE qsetid='$qsetid' AND libid='$libid'";
+							$query = "DELETE FROM imas_library_items WHERE qsetid='$qsetid' AND libid='$lib'";
 							$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 							if (mysql_affected_rows()>0) {
 								$madechange = true;
@@ -150,7 +150,7 @@ if ($myrights<20) {
 						}
 							
 					} else {
-						$query = "DELETE FROM imas_library_items WHERE qsetid='$qsetid' AND libid='$libid'";
+						$query = "DELETE FROM imas_library_items WHERE qsetid='$qsetid' AND libid='$lib'";
 						if (!$isadmin) {
 							$query .= " AND ownerid='$userid'";
 						}
@@ -159,7 +159,6 @@ if ($myrights<20) {
 							$madechange = true;
 						}
 					}
-					
 					if ($madechange) {
 						$query = "SELECT id FROM imas_library_items WHERE qsetid='$qsetid'";
 						$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -234,11 +233,11 @@ if ($myrights<20) {
 	
 		//$query = "SELECT * FROM imas_questionset WHERE id=$qsetid";
 		$query = "SELECT imas_library_items.ownerid,imas_users.groupid FROM imas_library_items,imas_users WHERE ";
-		$query .= "imas_library_items.ownerid=imas_users.id AND imas_library_items.libid='$lib'";
+		$query .= "imas_library_items.ownerid=imas_users.id AND imas_library_items.libid='$lib' AND imas_library_items.qsetid='$qsetid'";
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$row = mysql_fetch_row($result);
-		$myli = ($row[0]==$userid);
-		if ($isadmin || ($isgrpadmin && $row[1]==$groupid)) {
+		$myli = (intval($row[0])==$userid);
+		if ($isadmin || ($isgrpadmin && intval($row[1])==$groupid)) {
 			$myli = true;
 		}
 		
@@ -246,8 +245,8 @@ if ($myrights<20) {
 		$query .= "imas_questionset.ownerid=imas_users.id AND imas_questionset.id='$qsetid'";	
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$lineQSet = mysql_fetch_array($result, MYSQL_ASSOC);
-		$myq = ($lineQSet['ownerid']==$userid);
-		if ($isadmin || ($isgrpadmin && $lineQSet['groupid']==$groupid) || $lineQSet['userights']==3) {
+		$myq = (intval($lineQSet['ownerid'])==$userid);
+		if ($isadmin || ($isgrpadmin && intval($lineQSet['groupid'])==$groupid) || $lineQSet['userights']==3) {
 			$myq = true;
 		}
 		
@@ -326,9 +325,9 @@ if ($overwriteBody==1) {
 
 <?php
 		
-	} elseif (isset($_POST['remove']) || isset($_POST['delete']))  {
+	} elseif ((isset($_POST['remove']) || isset($_POST['delete'])) && !isset($_POST['confirm']))  {
 
-		if (!isset($_POST['confirm'])) {
+		
 ?>		
 	<form method=post action="reviewlibrary.php?cid=<?php echo $cid ?>&source=<?php echo $source ?>&offset=<?php echo $offset ?>&lib=<?php echo $lib ?>">
 		<?php echo $page_ConfirmMsg; ?>
@@ -337,7 +336,7 @@ if ($overwriteBody==1) {
 	</form>
 
 <?php
-		}
+		
 	
 	} else { //DEFAULT DISPLAY HERE
 ?>

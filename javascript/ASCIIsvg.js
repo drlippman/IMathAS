@@ -910,7 +910,7 @@ function safepow(base,power) {
 				}
 			}
 		}
-		return sqrt(-1);
+		return Math.sqrt(-1);
 	} else {
 		return Math.pow(base,power);
 	}
