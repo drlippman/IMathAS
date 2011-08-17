@@ -261,7 +261,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		echo '<div><p class="tips">Get help: ';
 		for ($i=0;$i<count($extref);$i++) {
 			$extrefpt = explode('!!',$extref[$i]);
-			if ($extrefpt[0]=='video') {
+			if ($extrefpt[0]=='video' || strpos($extrefpt[1],'youtube.com/watch')!==false) {
 				$url = "http://" . $_SERVER['HTTP_HOST'] . "$imasroot/assessment/watchvid.php?url=".urlencode($extrefpt[1]);
 				echo formpopup("Video",$url,660,525,"button",true,"video");
 			} else if ($extrefpt[0]=='read') {

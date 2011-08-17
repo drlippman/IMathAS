@@ -2001,6 +2001,11 @@ function formpopup($label,$content,$width=600,$height=400,$type='link',$scroll='
 		if ($type=='link') {
 			return '<span class="link" onClick="popupwindow(\''.$id.'\',\''.str_replace('\'','\\\'',htmlentities($content)).'\','.$width.','.$height.$scroll.')">'.$label.'</span>';
 		} else if ($type=='button') {
+			if (substr($content,0,31)=='http://www.youtube.com/watch?v=') {
+				$content = "http://" . $_SERVER['HTTP_HOST'] . "$imasroot/assessment/watchvid.php?url=".urlencode($content);
+				$width = 660;
+				$height = 525;
+			}
 			return '<span class="spanbutton" onClick="popupwindow(\''.$id.'\',\''.str_replace('\'','\\\'',htmlentities($content)).'\','.$width.','.$height.$scroll.')">'.$label.'</span>';
 		}
 	}

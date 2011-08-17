@@ -120,18 +120,15 @@
 			}
 		}
 		
-		/* simplelti - deprecated.  No consumer support for basiclti yet
-		$search = '/\[LTI:\s*url=(.*),\s*secret=([^\]]*)\]/';
+		$search = '/\[EMBED:\s*([^,]+),([^,]+),([^,\]]+)\]/';
 		
-		if (preg_match($search, $str, $res)){
-			$secret = $res[2];
-			$url = $res[1];
-			$params = simplelti_get_request_params($secret);
-			$response = simplelti_request($url, $secret,$params);
-			$replamnt = simplelti_print_response($response);
-			$str = preg_replace('/\[LTI:[^\]]*\]/', $replamnt, $str);
+		if (preg_match_all($search, $str, $res, PREG_SET_ORDER)){
+			foreach ($res as $resval) {
+				$tag = "<iframe width=\"{$resval[1]}\" height=\"{$resval[2]}\" src=\"{$resval[3]}\" />";
+				$str = str_replace($resval[0], $tag, $str);
+			}
 		}
-		*/
+		
 		return $str;
 	}
 	function filtergraph($str) {

@@ -20,11 +20,6 @@
 	$title = mysql_result($result,0,1);
 	$titlesimp = strip_tags($title);
 
-	if (substr($text,3,5)=="Embed") {
-		$toembed = substr($text,9,-4);
-		$pts = explode(',',$toembed);
-		$text = "<iframe height=\"{$pts[1]}\" src=\"{$pts[2]}\" style=\"position:absolute;width:100%;\"/>";
-	}
 	
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
