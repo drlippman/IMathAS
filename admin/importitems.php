@@ -71,7 +71,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 					$query .= "author='{$qset['author'][$n]}',qtype='{$qset['qtype'][$n]}',";
 					$query .= "control='{$qset['control'][$n]}',qcontrol='{$qset['qcontrol'][$n]}',";
 					$query .= "qtext='{$qset['qtext'][$n]}',answer='{$qset['answer'][$n]}',";
-					$query .= "lastmoddate=$now,adddate=$now";
+					$query .= "extref='{$qset['extref'][$n]}',lastmoddate=$now,adddate=$now";
 					$query .= " WHERE id='{$questions[$qid]['qsetid']}' AND (ownerid='$userid' OR userights>2)";
 					mysql_query($query) or die("error on: $query: " . mysql_error());
 				}
@@ -85,11 +85,11 @@ function additem($itemtoadd,$item,$questions,$qset) {
 				}
 				$now = time();
 				$query = "INSERT INTO imas_questionset (adddate,lastmoddate,uniqueid,ownerid,";
-				$query .= "author,userights,description,qtype,control,qcontrol,qtext,answer) ";
+				$query .= "author,userights,description,qtype,control,qcontrol,qtext,answer,extref) ";
 				$query .= "VALUES ($now,'{$qset['lastmod'][$n]}','{$qset['uniqueid'][$n]}',";
 				$query .= "'$userid','{$qset['author'][$n]}','$userights',";
 				$query .= "'{$qset['description'][$n]}','{$qset['qtype'][$n]}','{$qset['control'][$n]}',";
-				$query .= "'{$qset['qcontrol'][$n]}','{$qset['qtext'][$n]}','{$qset['answer'][$n]}')";
+				$query .= "'{$qset['qcontrol'][$n]}','{$qset['qtext'][$n]}','{$qset['answer'][$n]}','{$qset['extref'][$n]}')";
 				mysql_query($query) or die("error on: $query: " . mysql_error());
 				$questions[$qid]['qsetid'] = mysql_insert_id();
 				foreach ($newlibs as $lib) {
@@ -320,6 +320,7 @@ function parsefile($file) {
 			case  "QCONTROL":
 			case  "QTEXT":
 			case  "QTYPE":
+			case  "EXTREF":
 			case  "ANSWER":
 				if (isset($part)) {
 					$qset[$part][$qscnt] = rtrim($text);
@@ -525,7 +526,7 @@ function setlibnames(libn) {
 		<p>
 			
 		Assign Added Questions to library: 
-		<span id=\"libnames\">Unassigned</span>
+		<span id="libnames">Unassigned</span>
 		<input type=hidden name="libs" id="libs"  value="0">
 		<input type=button value="Select Libraries" onClick="libselect()"><br> 
 			

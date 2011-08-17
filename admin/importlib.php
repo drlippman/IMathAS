@@ -60,14 +60,14 @@ function parseqs($file,$touse,$rights) {
 					if (mysql_num_rows($result)>0) {
 						$query = "UPDATE imas_questionset SET description='{$qdata[$qn]['description']}',author='{$qdata[$qn]['author']}',";
 						$query .= "qtype='{$qdata[$qn]['qtype']}',control='{$qdata[$qn]['control']}',qcontrol='{$qdata[$qn]['qcontrol']}',qtext='{$qdata[$qn]['qtext']}',";
-						$query .= "answer='{$qdata[$qn]['answer']}',adddate=$now,lastmodddate=$now,hasimg=$hasimg WHERE id='$qsetid'";
+						$query .= "answer='{$qdata[$qn]['answer']}',extref='{$qdata[$qn]['extref']}',adddate=$now,lastmodddate=$now,hasimg=$hasimg WHERE id='$qsetid'";
 					} else {
 						return $qsetid;
 					}
 				} else {
 					$query = "UPDATE imas_questionset SET description='{$qd['description']}',author='{$qd['author']}',";
 					$query .= "qtype='{$qd['qtype']}',control='{$qd['control']}',qcontrol='{$qd['qcontrol']}',qtext='{$qd['qtext']}',";
-					$query .= "answer='{$qd['answer']}',lastmoddate=$now,adddate=$now,hasimg=$hasimg WHERE id='$qsetid'";
+					$query .= "answer='{$qd['answer']}',extref='{$qd['extref']}',lastmoddate=$now,adddate=$now,hasimg=$hasimg WHERE id='$qsetid'";
 					if (!$isadmin) {
 						$query .= " AND ownerid=$userid";
 					}
@@ -101,9 +101,9 @@ function parseqs($file,$touse,$rights) {
 			} else {
 				$hasimg = 0;
 			}
-			$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,ownerid,userights,description,author,qtype,control,qcontrol,qtext,answer,hasimg) VALUES ";
+			$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,ownerid,userights,description,author,qtype,control,qcontrol,qtext,answer,extref,hasimg) VALUES ";
 			$query .= "('{$qd['uqid']}',$now,$now,'$userid','$rights','{$qd['description']}','{$qd['author']}','{$qd['qtype']}','{$qd['control']}','{$qd['qcontrol']}',";
-			$query .= "'{$qd['qtext']}','{$qd['answer']}',$hasimg)";
+			$query .= "'{$qd['qtext']}','{$qd['answer']}','{$qd['extref']}',$hasimg)";
 			mysql_query($query) or die("Import failed on $query: " . mysql_error());
 			$newq++;
 			$qsetid = mysql_insert_id();
@@ -180,6 +180,9 @@ function parseqs($file,$touse,$rights) {
 			continue;
 		} else if ($line == "ANSWER") {
 			$part = 'answer';
+			continue;
+		} else if ($line == "EXTREF") {
+			$part = 'extref';
 			continue;
 		} else if ($line == "QIMGS") {
 			$part = 'qimgs';

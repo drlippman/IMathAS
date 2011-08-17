@@ -57,6 +57,9 @@ function parsefile($file) {
 		} else if ($line == "ANSWER") {
 			$part = 'answer';
 			continue;
+		} else if ($line == "EXTREF") {
+			$part = 'extref';
+			continue;
 		} else if ($line == "QIMGS") {
 			$part = 'qimgs';
 			continue;
@@ -176,15 +179,15 @@ if (!(isset($teacherid)) && $myrights<75) {
 						//$query .= " AND imas_questionset.ownerid=imas_users.id AND imas_users.groupid='$groupid'";
 							$query = "UPDATE imas_questionset SET description='{$qdata[$qn]['description']}',author='{$qdata[$qn]['author']}',";
 							$query .= "qtype='{$qdata[$qn]['qtype']}',control='{$qdata[$qn]['control']}',qcontrol='{$qdata[$qn]['qcontrol']}',qtext='{$qdata[$qn]['qtext']}',";
-							$query .= "answer='{$qdata[$qn]['answer']}',adddate=$now,lastmodddate=$now WHERE id='$qsetid'";
+							$query .= "answer='{$qdata[$qn]['answer']}',extref='{$qdata[$qn]['extref']}',adddate=$now,lastmodddate=$now,hasimg=$hasimg WHERE id='$qsetid'";
 						} else {
 							continue;
 						}
 					} else {
 					
-						$query = "UPDATE imas_questionset SET description='{$qdata[$qn]['description']}',author='{$qdata[$qn]['author']}',";
-						$query .= "qtype='{$qdata[$qn]['qtype']}',control='{$qdata[$qn]['control']}',qcontrol='{$qdata[$qn]['qcontrol']}',qtext='{$qdata[$qn]['qtext']}',";
-						$query .= "answer='{$qdata[$qn]['answer']}',adddate=$now,lastmodddate=$now WHERE id='$qsetid'";
+						$query = "UPDATE imas_questionset SET description='{$qd['description']}',author='{$qd['author']}',";
+						$query .= "qtype='{$qd['qtype']}',control='{$qd['control']}',qcontrol='{$qd['qcontrol']}',qtext='{$qd['qtext']}',";
+						$query .= "answer='{$qd['answer']}',extref='{$qd['extref']}',lastmoddate=$now,adddate=$now,hasimg=$hasimg WHERE id='$qsetid'";
 						if (!$isadmin) {
 							$query .= " AND (ownerid='$userid' OR userights>2)";
 						}
@@ -213,9 +216,9 @@ if (!(isset($teacherid)) && $myrights<75) {
 				if ($qdata[$qn]['uqid']==0 || (isset($exists[$qdata[$qn]['uqid']]) && $_POST['merge']==0)) {
 					$qdata[$qn]['uqid'] = substr($mt,11).substr($mt,2,2).$qn;
 				}
-				$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,ownerid,userights,description,author,qtype,control,qcontrol,qtext,answer) VALUES ";
-				$query .= "('{$qdata[$qn]['uqid']}',$now,$now,'$userid','$rights','{$qdata[$qn]['description']}','{$qdata[$qn]['author']}','{$qdata[$qn]['qtype']}','{$qdata[$qn]['control']}','{$qdata[$qn]['qcontrol']}',";
-				$query .= "'{$qdata[$qn]['qtext']}','{$qdata[$qn]['answer']}')";
+				$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,ownerid,userights,description,author,qtype,control,qcontrol,qtext,answer,extref,hasimg) VALUES ";
+				$query .= "('{$qd['uqid']}',$now,$now,'$userid','$rights','{$qd['description']}','{$qd['author']}','{$qd['qtype']}','{$qd['control']}','{$qd['qcontrol']}',";
+				$query .= "'{$qd['qtext']}','{$qd['answer']}','{$qd['extref']}',$hasimg)";
 				mysql_query($query) or die("Import failed on {$qdata['description']}: " . mysql_error());
 				$qsetid = mysql_insert_id();
 				if (!empty($qd['qimgs'])) {

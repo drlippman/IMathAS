@@ -214,6 +214,8 @@ if (!(isset($teacherid)) && $myrights<75) {
 			echo rtrim($line['qtext']) . "\n";
 			echo "\nANSWER\n";
 			echo rtrim($line['answer']) . "\n";
+			echo "\nEXTREF\n";
+			echo rtrim($line['extref']) . "\n";
 			if ($line['hasimg']==1) {
 				echo "\nQIMGS\n";
 				$query = "SELECT var,filename FROM imas_qimages WHERE qsetid='{$line['id']}'";

@@ -357,6 +357,8 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 		echo rtrim($line['qtext']) . "\n";
 		echo "\nANSWER\n";
 		echo rtrim($line['answer']) . "\n";
+		echo "\nEXTREF\n";
+		echo rtrim($line['extref']) . "\n";
 		//no static file handling happening here yet
 		echo "END QSET\n";
 	}
