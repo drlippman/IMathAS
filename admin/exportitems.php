@@ -331,7 +331,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 			$includedbackref[$row[0]] = $row[1];		
 		}
 	}
-	
+	$imgfiles = array();
 	$query = "SELECT * FROM imas_questionset WHERE id IN ($qstoexportlist)";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$qcnt = 0;
@@ -359,11 +359,33 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 		echo rtrim($line['answer']) . "\n";
 		echo "\nEXTREF\n";
 		echo rtrim($line['extref']) . "\n";
-		//no static file handling happening here yet
+		//no static file handling happening here yet just export the info
+		if ($line['hasimg']==1) {
+			echo "\nQIMGS\n";
+			$query = "SELECT var,filename FROM imas_qimages WHERE qsetid='{$line['id']}'";
+			$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+			while ($row = mysql_fetch_row($r2)) {
+				echo $row[0].','.$row[1]. "\n";
+				
+			}
+		}
 		echo "END QSET\n";
 	}
-		
 	
+	$query = "SELECT DISTINCT filename FROM imas_qimages WHERE qsetid IN ($qstoexportlist)";
+	$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+	while ($row = mysql_fetch_row($r2)) {
+		$imgfiles[] = realpath("../assessment/qimages").DIRECTORY_SEPARATOR. trim($row[0]);
+	}
+	// need to work on
+	include("../includes/tar.class.php");
+	if (file_exists("../course/files/qimages.tar.gz")) {
+		unlink("../course/files/qimages.tar.gz");
+	}
+	$tar = new tar();
+	$tar->addFiles($imgfiles);
+	$tar->toTar("../course/files/qimages.tar.gz",TRUE);
+		
 	
 	exit;
 
@@ -421,8 +443,8 @@ if ($overwriteBody==1) {
 		</table>
 		<p><input type=submit name="export" value="Export Items"></p>
 	</form>
-	<p>Note: Export of questions with static image files is not yet supported</p>
-
+	<p>Once exported, <a href="../course/files/qimages.tar.gz">download image files</a> to be put in assessment/qimages</p>
+	
 <?php
 }	
 

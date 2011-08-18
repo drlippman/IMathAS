@@ -491,6 +491,27 @@ class tar {
 
 		return false;
 	}
+	
+	// how many files?
+	function hasFiles() {
+		return $this->numFiles;
+	}
+	
+	// Extracts files to a directory
+	function extractToDir($dir) {
+		$n = 0;
+		if($this->numFiles > 0) {
+			foreach($this->files as $key => $information) {
+				if(!file_exists($dir . $information["name"])) {
+					$fp = fopen($dir . $information["name"],"wb");
+					fwrite($fp,$information["file"]);
+					fclose($fp);
+					$n++;
+				}
+			}
+		}
+		return $n;
+	}
 
 
 	// Remove a directory from the tar archive

@@ -471,6 +471,17 @@ switch($_GET['action']) {
 		echo "<div class=submit><input type=submit value=\"Submit\"></div>\n";
 		echo "</form>\n";
 		break;
+	
+	case "importqimages":
+		echo "<h3>Install Question Images</h3>\n";
+		echo "<p><b>Warning:</b> This has a large security risk.  <b>Only install question images from a trusted source</b>, and where you've verified the archive only contains images.</p>\n";
+		echo "<p><b>Warning:</b> Install will ignore files with the same filename as existing files.</p>\n"; 
+		echo "<form enctype=\"multipart/form-data\" method=post action=\"actions.php?action=importqimages\">\n";
+		echo "<input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"800000\" />\n";
+		echo "<span class=form>Import file: </span><span class=formright><input name=\"userfile\" type=\"file\" /></span><br class=form>\n";
+		echo "<div class=submit><input type=submit value=\"Submit\"></div>\n";
+		echo "</form>\n";
+		break;
 	case "transfer":
 		echo '<div id="headerforms" class="pagetitle">';
 		echo "<h3>Transfer Course Ownership</h3>\n";

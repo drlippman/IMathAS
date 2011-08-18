@@ -285,7 +285,10 @@ $placeinhead .= "}</script>";
 		if ($myrights == 100) {
 ?>	
 	<span class=column>
-	<?php echo ($allowmacroinstall) ? "<a href=\"forms.php?action=importmacros\">Install Macro File</a><br/>\n" : "" ; ?>
+	<?php if ($allowmacroinstall) {
+		echo "<a href=\"forms.php?action=importmacros\">Install Macro File</a><br/>\n";
+		echo "<a href=\"forms.php?action=importqimages\">Install Question Images</a><br/>\n";
+	} ?>
 	<a href="forms.php?action=deloldusers">Delete Old Users</a><br/>
 	<a href="importstu.php?cid=admin">Import Students from File</a><br/>
 	</span>

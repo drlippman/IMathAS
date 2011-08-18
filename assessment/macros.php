@@ -1576,9 +1576,26 @@ function convertTri($num, $tri, $doth=false) {
    return $str;
  }
 
-function numtowords($num,$doth=false) {
+function numtowords($num,$doth=false,$addcontractiontonum=false) {
 	global $placevals;
 	
+	if ($addcontractiontonum) {
+		$num = strval($num);
+		$len = strlen($num);	
+		$last = $num{$len-1};
+		if ($len>1 && $num{$len-2}=="1") { //ie 612
+			$c = "th";
+		} else if ($last=="1") {
+			$c = "st";
+		} else if ($last=="2") {
+			$c = "nd";
+		} else if ($last=="3") {
+			$c = "rd";
+		} else {
+			$c = "th";
+		}
+		return $num.$c;
+	}
 	if ($num==0) {
 		return "zero";
 	}

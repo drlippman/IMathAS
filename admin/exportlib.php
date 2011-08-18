@@ -228,12 +228,12 @@ if (!(isset($teacherid)) && $myrights<75) {
 		}
 		// need to work on
 		include("../includes/tar.class.php");
-		if (file_exists("qimages.tar.gz")) {
-			unlink("qimages.tar.gz");
+		if (file_exists("../course/files/qimages.tar.gz")) {
+			unlink("../course/files/qimages.tar.gz");
 		}
 		$tar = new tar();
 		$tar->addFiles($imgfiles);
-		$tar->toTar("qimages.tar.gz",TRUE);
+		$tar->toTar("../course/files/qimages.tar.gz",TRUE);
 		
 		exit;
 	} else {  //STEP 1 DATA MANIPULATION
@@ -276,7 +276,7 @@ if ($overwriteBody==1) {
 		</span><br class=form>
 			
 		<input type=submit name="submit" value="Export"><br/>
-		Once exported, <a href="qimages.tar.gz">download image files</a> to be put in assessment/qimages
+		Once exported, <a href="../course/files/qimages.tar.gz">download image files</a> to be put in assessment/qimages
 	</form>
 	
 
