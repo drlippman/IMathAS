@@ -112,6 +112,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	echo $_POST['description']."\n";
 	echo "ITEM LIST\n";
 	echo serialize($newitems)."\n";
+	$coursefiles = array();
 	foreach ($toexport as $exportid=>$itemid) {
 		echo "BEGIN ITEM\n";
 		echo "ID\n";
@@ -148,6 +149,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 					   while ($row = mysql_fetch_row($r2)) {
 						   $filenames[$row[0]] = $row[2];
 						   $filedescr[$row[0]] = $row[1];
+						   $coursefiles[] = $row[2];
 					   }
 					   echo "INSTRFILES\n";
 					   foreach (explode(',',$line['fileorder']) as $fid) {
@@ -180,6 +182,9 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				echo "TARGET\n";
 				echo $line['target'] . "\n";
 				echo "END ITEM\n";
+				if (substr($line['text'],0,5)=='file:') {
+					$coursefiles[] = substr($line['text'],5);
+				}
 				break;
 			case ($row[0]==="Forum"):
 				$query = "SELECT * FROM imas_forums WHERE id='{$row[1]}'";
@@ -262,23 +267,25 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 		$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 		$line = mysql_fetch_array($r2, MYSQL_ASSOC);
 		
-		echo "UQID\n";
-		echo $line['uniqueid'] . "\n";
-		echo "POINTS\n";
-		echo $line['points'] . "\n";
-		echo "PENALTY\n";
-		echo $line['penalty'] . "\n";
-		echo "ATTEMPTS\n";
-		echo $line['attempts'] . "\n";
-		echo "CATEGORY\n";
-		echo $line['category'] . "\n";
-		echo "REGEN\n";
-		echo $line['regen'] . "\n";
-		echo "SHOWANS\n";
-		echo $line['showans'] . "\n";
-		echo "END QUESTION\n";
-		
-		$qsettoexport[] = $line['questionsetid'];
+		if (!empty($line['uniqueid'])) {
+			echo "UQID\n";
+			echo $line['uniqueid'] . "\n";
+			echo "POINTS\n";
+			echo $line['points'] . "\n";
+			echo "PENALTY\n";
+			echo $line['penalty'] . "\n";
+			echo "ATTEMPTS\n";
+			echo $line['attempts'] . "\n";
+			echo "CATEGORY\n";
+			echo $line['category'] . "\n";
+			echo "REGEN\n";
+			echo $line['regen'] . "\n";
+			echo "SHOWANS\n";
+			echo $line['showans'] . "\n";
+			echo "END QUESTION\n";
+			
+			$qsettoexport[] = $line['questionsetid'];
+		}
 	}
 	/*
 	foreach ($qsettoexport as $qsetid) { //export questionset
@@ -385,6 +392,17 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	$tar = new tar();
 	$tar->addFiles($imgfiles);
 	$tar->toTar("../course/files/qimages.tar.gz",TRUE);
+	
+	
+	if (class_exists('ZipArchive')) {
+		$zip = new ZipArchive();
+		if ($zip->open("../course/files/coursefilepack$cid.zip", ZIPARCHIVE::CREATE | ZIPARCHIVE::OVERWRITE )===TRUE) {
+			foreach ($coursefiles as $file) {
+				$zip->addFile("../course/files/$file",$file);
+			}
+		}
+		$zip->close();
+	}
 		
 	
 	exit;
@@ -444,6 +462,11 @@ if ($overwriteBody==1) {
 		<p><input type=submit name="export" value="Export Items"></p>
 	</form>
 	<p>Once exported, <a href="../course/files/qimages.tar.gz">download image files</a> to be put in assessment/qimages</p>
+	<?php
+	if (class_exists('ZipArchive')) {
+		echo '<p>Once exported, <a href="../course/files/coursefilepack'.$cid.'.zip">download course files</a> to be put in course/files/</p>';
+	}
+	?>
 	
 <?php
 }	
