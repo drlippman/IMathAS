@@ -207,7 +207,7 @@ function generateTable() {
 		html += "<th></th>";
 	}
 	html += "<th>Order</th>";
-	html += "<th>Description</th><th>ID</th><th>Preview</th><th>Type</th><th>Points</th><th>Settings</th><th>Source</th>";
+	html += "<th>Description</th><th></th><th>ID</th><th>Preview</th><th>Type</th><th>Points</th><th>Settings</th><th>Source</th>";
 	if (beentaken) {
 		html += "<th>Clear Attempts</th><th>Withdraw</th>";
 	} else {
@@ -281,6 +281,14 @@ function generateTable() {
 			}
 			
 			html += "<td><input type=hidden name=\"curq[]\" id=\"oqc"+ln+"\" value=\""+curitems[j][1]+"\"/>"+curitems[j][2]+"</td>"; //description
+			html += "<td class=\"nowrap\">";
+			if ((curitems[j][7]&1) == 1) {
+				html += '<img src="'+imasroot+'/img/video_tiny.png"/>';
+			}
+			if ((curitems[j][7]&2) == 2) {
+				html += '<img src="'+imasroot+'/img/html_tiny.png"/>';
+			}
+			html += "</td>";
 			html += "<td>"+curitems[j][1]+"</td>";
 			if (beentaken) {
 				html += "<td><input type=button value='Preview' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",false,false)\"/></td>"; //Preview

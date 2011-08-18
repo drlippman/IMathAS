@@ -338,7 +338,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 		} 
 		for ($j=0;$j<count($subs);$j++) {
-			$query = "SELECT imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn FROM imas_questions,imas_questionset ";
+			$query = "SELECT imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn,imas_questionset.extref FROM imas_questions,imas_questionset ";
 			$query .= "WHERE imas_questions.id='{$subs[$j]}' AND imas_questionset.id=imas_questions.questionsetid";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$line = mysql_fetch_array($result, MYSQL_ASSOC);
@@ -354,6 +354,26 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$jsarr .= '0';
 			}
 			$jsarr .= ','.$line['withdrawn'];
+			$extrefval = 0;
+			if ($line['extref']!='') {
+				$extref = explode('~~',$line['extref']);
+				$hasvid = false;  $hasother = false;
+				foreach ($extref as $v) {
+					if (substr($v,0,5)=="Video" || strpos($v,'youtube.com')!==false) {
+						$hasvid = true;
+					} else {
+						$hasother = true;
+					}
+				}
+				$page_questionTable[$i]['extref'] = '';
+				if ($hasvid) {
+					$extrefval += 1;
+				}
+				if ($hasother) {
+					$extrefval += 2;
+				}
+			}
+			$jsarr .= ','.$extrefval;
 			$jsarr .= ']';
 		}
 		if (count($subs)>1) {
@@ -482,7 +502,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$page_libRowHeader = ($searchall==1) ? "<th>Library</th>" : "";
 			
 			if (isset($search)) {
-				$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_library_items.libid,imas_questionset.ownerid,imas_library_items.junkflag, imas_library_items.id AS libitemid ";
+				$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_library_items.junkflag, imas_library_items.id AS libitemid ";
 				$query .= "FROM imas_questionset,imas_library_items WHERE imas_questionset.deleted=0 AND $searchlikes "; //imas_questionset.description LIKE '%$safesearch%' ";
 				$query .= " (imas_questionset.ownerid='$userid' OR imas_questionset.userights>0) AND "; 
 				$query .= "imas_library_items.qsetid=imas_questionset.id ";
@@ -569,6 +589,25 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 							$page_questionTable[$i]['junkflag'] = $line['junkflag'];
 							$page_questionTable[$i]['libitemid'] = $line['libitemid'];
 						}
+						if ($line['extref']!='') {
+							$extref = explode('~~',$line['extref']);
+							$hasvid = false;  $hasother = false;
+							foreach ($extref as $v) {
+								if (substr($v,0,5)=="Video" || strpos($v,'youtube.com')!==false) {
+									$hasvid = true;
+								} else {
+									$hasother = true;
+								}
+							}
+							$page_questionTable[$i]['extref'] = '';
+							if ($hasvid) {
+								$page_questionTable[$i]['extref'] .= "<img src=\"$imasroot/img/video_tiny.png\"/>";
+							}
+							if ($hasother) {
+								$page_questionTable[$i]['extref'] .= "<img src=\"$imasroot/img/html_tiny.png\"/>";
+							}
+						}
+						
 						/*$query = "SELECT COUNT(id) FROM imas_questions WHERE questionsetid='{$line['id']}'";
 						$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 						$times = mysql_result($result2,0,0);
@@ -657,7 +696,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$x=0;
 			$page_assessmentQuestions = array();
 			foreach ($sessiondata['aidstolist'.$aid] as $aidq) {
-				$query = "SELECT imas_questions.id,imas_questionset.id,imas_questionset.description,imas_questionset.qtype,imas_questionset.ownerid,imas_questionset.userights FROM imas_questionset,imas_questions";
+				$query = "SELECT imas_questions.id,imas_questionset.id,imas_questionset.description,imas_questionset.qtype,imas_questionset.ownerid,imas_questionset.userights,imas_questionset.extref FROM imas_questionset,imas_questions";
 				$query .= " WHERE imas_questionset.id=imas_questions.questionsetid AND imas_questions.assessmentid='$aidq'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				if (mysql_num_rows($result)==0) { //maybe defunct aid; if no questions in it, skip it
@@ -669,6 +708,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$qtypes[$row[0]] = $row[3];
 					$owner[$row[0]] = $row[4];
 					$userights[$row[0]] = $row[5];
+					$extref[$row[0]] = $row[6];
 					$query = "SELECT COUNT(id) FROM imas_questions WHERE questionsetid='{$row[1]}'";
 					$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 					$times[$row[0]] = mysql_result($result2,0,0);
@@ -694,7 +734,25 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$page_assessmentQuestions[$x]['add'][$y] = "<a href=\"modquestion.php?qsetid=$qsetid[$qid]&aid=$aid&cid=$cid\">Add</a>";
 					$page_assessmentQuestions[$x]['src'][$y] = ($userights[$qid]>2 || $owner[$qid]==$userid) ? "<a href=\"moddataset.php?id=$qsetid[$qid]&aid=$aid&cid=$cid&frompot=1\">Edit</a>" : "<a href=\"viewsource.php?id=$qsetid[$qid]&aid=$aid&cid=$cid\">View</a>" ;
 					$page_assessmentQuestions[$x]['templ'][$y] = "<a href=\"moddataset.php?id=$qsetid[$qid]&aid=$aid&cid=$cid&template=true\">Template</a>";
-
+					$page_assessmentQuestions[$x]['extref'][$y] = '';
+					if ($extref[$qid]!='') {
+						$extref = explode('~~',$extref[$qid]);
+						$hasvid = false;  $hasother = false;
+						foreach ($extref as $v) {
+							if (substr($v,0,5)=="Video" || strpos($v,'youtube.com')!==false) {
+								$hasvid = true;
+							} else {
+								$hasother = true;
+							}
+						}
+						if ($hasvid) {
+							$page_assessmentQuestions[$x]['extref'][$y] .= "<img src=\"$imasroot/img/video_tiny.png\"/>";
+						}
+						if ($hasother) {
+							$page_assessmentQuestions[$x]['extref'][$y] .= "<img src=\"$imasroot/img/html_tiny.png\"/>";
+						}
+					}
+					
 					$ln++;
 					$y++;
 				}
@@ -886,7 +944,7 @@ if ($overwriteBody==1) {
 		
 		<table cellpadding="5" id="myTable" class="gb" style="clear:both; position:relative;">
 			<thead>
-				<tr><th></th><th>Description</th><th>ID</th><th>Preview</th><th>Type</th>
+				<tr><th></th><th>Description</th><th></th><th>ID</th><th>Preview</th><th>Type</th>
 					<?php echo $page_libRowHeader ?>
 					<th>Times Used</th><th>Mine</th><th>Add</th><th>Source</th><th>Use as Template</th>
 					<?php if ($searchall==0) { echo '<th><span onmouseover="tipshow(this,\'Flag a question if it is in the wrong library\')" onmouseout="tipout()">Wrong Lib</span></th>';} ?>
@@ -903,7 +961,7 @@ if ($overwriteBody==1) {
 						echo '<td>';
 						echo '<b>'.$lnamesarr[$page_libstouse[$j]].'</b>';
 						echo '</td>';
-						for ($k=0;$k<8;$k++) {echo '<td></td>';}
+						for ($k=0;$k<9;$k++) {echo '<td></td>';}
 						echo '</tr>';
 					}
 					
@@ -914,6 +972,7 @@ if ($overwriteBody==1) {
 
 					<td><?php echo $page_questionTable[$qid]['checkbox'] ?></td>
 					<td><?php echo $page_questionTable[$qid]['desc'] ?></td>
+					<td class="nowrap"><?php echo $page_questionTable[$qid]['extref'] ?></td>
 					<td><?php echo $qid ?></td>
 					<td><?php echo $page_questionTable[$qid]['preview'] ?></td>
 					<td><?php echo $page_questionTable[$qid]['type'] ?></td>
@@ -978,7 +1037,7 @@ if ($overwriteBody==1) {
 		<table cellpadding=5 id=myTable class=gb>
 			<thead>
 				<tr>
-					<th> </th><th>Description</th><th>ID</td><th>Preview</th><th>Type</th><th>Times Used</th><th>Mine</th><th>Add</th><th>Source</th><th>Use as Template</th>
+					<th> </th><th>Description</th><th></th><th>ID</td><th>Preview</th><th>Type</th><th>Times Used</th><th>Mine</th><th>Add</th><th>Source</th><th>Use as Template</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -996,6 +1055,7 @@ if ($overwriteBody==1) {
 				<td></td>
 				<td></td>
 				<td></td>
+				<td></td>
 			</tr>
 <?php
 				for ($x=0;$x<count($page_assessmentQuestions[$i]['desc']);$x++) {
@@ -1003,6 +1063,7 @@ if ($overwriteBody==1) {
 ?>					
 				<td><?php echo $page_assessmentQuestions[$i]['checkbox'][$x] ?></td>
 				<td><?php echo $page_assessmentQuestions[$i]['desc'][$x] ?></td>
+				<td class="nowrap"><?php echo $page_assessmentQuestions[$i]['extref'][$x] ?></td>
 				<td><?php echo $page_assessmentQuestions[$i]['qsetid'][$x] ?></td>
 				<td><?php echo $page_assessmentQuestions[$i]['preview'][$x] ?></td>					
 				<td><?php echo $page_assessmentQuestions[$i]['type'][$x] ?></td>

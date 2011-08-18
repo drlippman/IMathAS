@@ -687,7 +687,7 @@ if ($myrights<20) {
 		}
 		*/
 		
-		$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.ownerid,imas_questionset.description,imas_questionset.userights,imas_questionset.lastmoddate,";
+		$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.ownerid,imas_questionset.description,imas_questionset.userights,imas_questionset.lastmoddate,imas_questionset.extref,";
 		$query .= "imas_questionset.qtype,imas_users.firstName,imas_users.lastName,imas_users.groupid,imas_library_items.libid,imas_library_items.junkflag, imas_library_items.id AS libitemid ";
 		$query .= "FROM imas_questionset,imas_library_items,imas_users WHERE imas_questionset.deleted=0 AND $searchlikes ";
 		$query .= "imas_library_items.qsetid=imas_questionset.id AND imas_questionset.ownerid=imas_users.id ";
@@ -749,6 +749,26 @@ if ($myrights<20) {
 			} else {
 				$page_questionTable[$i]['desc'] = filter($line['description']);
 			}
+			
+			if ($line['extref']!='') {
+				$extref = explode('~~',$line['extref']);
+				$hasvid = false;  $hasother = false;
+				foreach ($extref as $v) {
+					if (substr($v,0,5)=="Video" || strpos($v,'youtube.com')!==false) {
+						$hasvid = true;
+					} else {
+						$hasother = true;
+					}
+				}
+				$page_questionTable[$i]['extref'] = '';
+				if ($hasvid) {
+					$page_questionTable[$i]['extref'] .= "<img src=\"$imasroot/img/video_tiny.png\"/>";
+				}
+				if ($hasother) {
+					$page_questionTable[$i]['extref'] .= "<img src=\"$imasroot/img/html_tiny.png\"/>";
+				}
+			}
+					
 				
 			$page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selform',$ln,{$line['id']})\"/>";
 			$page_questionTable[$i]['type'] = $line['qtype'];
@@ -1071,7 +1091,7 @@ function getnextprev(formn,loc) {
 			echo "<br/>(Delete and Transfer only apply to group's questions)\n";
 		}
 		echo "<table id=myTable class=gb><thead>\n";
-		echo "<tr><th>&nbsp;</th><th>Description</th><th>&nbsp;</th><th>Action</th><th>Type</th><th>Times Used</th><th>Last Mod</th>";
+		echo "<tr><th>&nbsp;</th><th>Description</th><th>&nbsp;</th><th>&nbsp;</th><th>Action</th><th>Type</th><th>Times Used</th><th>Last Mod</th>";
 		if ($isadmin || $isgrpadmin) { echo "<th>Owner</th>";} else {echo "<th>Mine</th>";}
 		if ($searchall==1) {
 			echo "<th>Library</th>";
@@ -1095,6 +1115,7 @@ function getnextprev(formn,loc) {
 				if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 				echo '<td>'.$page_questionTable[$qid]['checkbox'].'</td>';
 				echo '<td>'.$page_questionTable[$qid]['desc'].'</td>';
+				echo '<td class="nowrap">'.$page_questionTable[$qid]['extref'].'</td>';
 				echo '<td>'.$page_questionTable[$qid]['preview'].'</td>';
 				echo '<td>'.$page_questionTable[$qid]['action'].'</td>';
 				echo '<td>'.$page_questionTable[$qid]['type'].'</td>';
