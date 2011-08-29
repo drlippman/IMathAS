@@ -59,7 +59,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 		$allqids = array();
 		foreach ($qtoadd as $qid) {
 			//add question or get system id. 
-			$query = "SELECT id,adddate FROM imas_questionset WHERE uniqueid='{$questions[$qid]['uqid']}'";
+			$query = "SELECT id,adddate FROM imas_questionset WHERE uniqueid='{$questions[$qid]['uqid']}' AND deleted=0";
 			$result = mysql_query($query) or die("error on: $query: " . mysql_error());
 			$questionexists = (mysql_num_rows($result)>0);
 			
@@ -118,12 +118,12 @@ function additem($itemtoadd,$item,$questions,$qset) {
 					$qimgs = explode("\n",$qset['qimgs'][$n]);
 					foreach($qimgs as $qimg) {
 						$p = explode(',',$qimg);
-						$query = "INSERT INTO imas_qimages (qsetid,var,filename) VALUES ($qsetid,'{$p[0]}','{$p[1]}')";
+						$query = "INSERT INTO imas_qimages (qsetid,var,filename) VALUES ({$questions[$qid]['qsetid']},'{$p[0]}','{$p[1]}')";
 						mysql_query($query) or die("Import failed on $query: " . mysql_error());
 					}
 				}
 				foreach ($newlibs as $lib) {
-					$query = "INSERT INTO imas_library_items (libid,qsetid) VALUES ('$lib','{$questions[$qid]['qsetid']}')";
+					$query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES ('$lib','{$questions[$qid]['qsetid']}','$userid')";
 					mysql_query($query) or die("error on: $query: " . mysql_error());
 				}
 			}
