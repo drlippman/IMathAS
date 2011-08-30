@@ -95,8 +95,8 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		} else {
 			echo "Post Reply</div>\n";
 			//$query = "SELECT subject,points FROM imas_forum_posts WHERE id='{$_GET['replyto']}'";
-			$query = "SELECT ifp.subject,ig.score FROM imas_forum_posts AS ifp JOIN imas_grades AS ig ON ";
-			$query .= "ifp.id=ig.refid AND ig.gradetype='forum' WHERE ifp.id='{$_GET['replyto']}'";
+			$query = "SELECT ifp.subject,ig.score FROM imas_forum_posts AS ifp LEFT JOIN imas_grades AS ig ON ";
+			$query .= "ig.gradetype='forum' AND ifp.id=ig.refid WHERE ifp.id='{$_GET['replyto']}'";
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			$sub = mysql_result($result,0,0);
 			$sub = str_replace('"','&quot;',$sub);
