@@ -22,7 +22,7 @@ if (!(isset($teacherid))) {
 	if (isset($_FILES['userfile']['name']) && $_FILES['userfile']['name']!='') {
 		if (is_uploaded_file($_FILES['userfile']['tmp_name'])) {
 			$curscores = array();
-			$query = "SELECT userid,score FROM imas_grades WHERE gbitemid='{$_GET['gbitem']}'";
+			$query = "SELECT userid,score FROM imas_grades WHERE gradetype='offline' AND gradetypeid='{$_GET['gbitem']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			while ($row = mysql_fetch_row($result)) {
 				$curscores[$row[0]] = $row[1];
@@ -69,11 +69,11 @@ if (!(isset($teacherid))) {
 				if (mysql_num_rows($result)>0) {
 					$cuserid=mysql_result($result,0,0);
 					if (isset($curscores[$cuserid])) {
-						$query = "UPDATE imas_grades SET score='$score',feedback='$feedback' WHERE userid='$cuserid' AND gbitemid='{$_GET['gbitem']}'";
+						$query = "UPDATE imas_grades SET score='$score',feedback='$feedback' WHERE userid='$cuserid' AND gradetype='offline' AND gradetypeid='{$_GET['gbitem']}'";
 						$successes++;
 					} else {
-						$query = "INSERT INTO imas_grades (gbitemid,userid,score,feedback) VALUES ";
-						$query .= "('{$_GET['gbitem']}','$cuserid','$score','$feedback')";
+						$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,score,feedback) VALUES ";
+						$query .= "('offline','{$_GET['gbitem']}','$cuserid','$score','$feedback')";
 						$successes++;
 					}
 					mysql_query($query) or die("Query failed : " . mysql_error());

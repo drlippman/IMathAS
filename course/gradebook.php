@@ -523,6 +523,11 @@ function gbstudisp($stu) {
 							$haslink = true;
 						}
 					} 
+				} else if ($gbt[0][1][$i][6]==2) {//discuss
+					if ($stu != -1) {
+						echo "<a href=\"viewforumgrade.php?cid=$cid&stu=$stu&uid={$gbt[1][4][0]}&fid={$gbt[0][1][$i][7]}\">";
+						$haslink = true;
+					}
 				}
 			}
 			if (isset($gbt[1][1][$i][0])) {
@@ -1115,9 +1120,21 @@ function gbinstrdisp() {
 					}
 				} else if ($gbt[0][1][$j][6]==2) { //discuss
 					if (isset($gbt[$i][1][$j][0])) {
-						echo $gbt[$i][1][$j][0];
+						if ( $gbt[$i][0][0]!='Averages') {
+							echo "<a href=\"viewforumgrade.php?cid=$cid&stu=$stu&uid={$gbt[$i][4][0]}&fid={$gbt[0][1][$j][7]}\">";
+							echo $gbt[$i][1][$j][0];
+							echo '</a>';
+						} else {
+							echo "<span onmouseover=\"tipshow(this,'5-number summary: {$gbt[0][1][$j][9]}')\" onmouseout=\"tipout()\"> ";
+							echo $gbt[$i][1][$j][0];
+							echo '</span>';
+						}
 					} else {
-						echo '-';
+						if ($isteacher && $gbt[$i][0][0]!='Averages') {
+							echo "<a href=\"viewforumgrade.php?cid=$cid&stu=$stu&uid={$gbt[$i][4][0]}&fid={$gbt[0][1][$j][7]}\">-</a>";
+						} else {
+							echo '-';
+						}
 					}
 				}
 				if (isset($gbt[$i][1][$j][5]) && ($gbt[$i][1][$j][5]&(1<<$availshow)) && !$hidepast) {

@@ -1,22 +1,19 @@
+/**
+ * charmap.js
+ *
+ * Copyright 2009, Moxiecode Systems AB
+ * Released under LGPL License.
+ *
+ * License: http://tinymce.moxiecode.com/license
+ * Contributing: http://tinymce.moxiecode.com/contributing
+ */
+
 tinyMCEPopup.requireLangPack();
 
 var charmap = [
-	['&theta;',   '&#952;',  true, 'theta'],
-	['&pi;',      '&#960;',  true, 'pi'],
-	['&phi;',     '&#966;',  true, 'phi'],
-	['&le;',      '&#8804;', true, 'less-than or equal to'],
-	['&ge;',      '&#8805;', true, 'greater-than or equal to'],
-	['&deg;',     '&#176;',  true, 'degree sign'],
-	['&plusmn;',  '&#177;',  true, 'plus-minus sign'],
-	['&divide;',  '&#247;',  true, 'division sign'],
-	['&times;',   '&#215;',  true, 'multiplication sign'],
-	['&minus;',   '&#8722;',  true, 'subtraction sign'],
-	['&middot;',  '&#183;',  true, 'middle dot'],
-	['&infin;',   '&#8734;', true, 'infinity'],
-	
 	['&nbsp;',    '&#160;',  true, 'no-break space'],
-	['&sect;',    '&#167;',  true, 'section sign'],
-	
+	['&amp;',     '&#38;',   true, 'ampersand'],
+	['&quot;',    '&#34;',   true, 'quotation mark'],
 // finance
 	['&cent;',    '&#162;',  true, 'cent sign'],
 	['&euro;',    '&#8364;', true, 'euro sign'],
@@ -24,27 +21,29 @@ var charmap = [
 	['&yen;',     '&#165;',  true, 'yen sign'],
 // signs
 	['&copy;',    '&#169;',  true, 'copyright sign'],
-	//['&reg;',     '&#174;',  true, 'registered sign'],
+	['&reg;',     '&#174;',  true, 'registered sign'],
 	['&trade;',   '&#8482;', true, 'trade mark sign'],
-	['&permil;',  '&#8240;', false, 'per mille sign'],
-	['&micro;',   '&#181;',  false, 'micro sign'],
+	['&permil;',  '&#8240;', true, 'per mille sign'],
+	['&micro;',   '&#181;',  true, 'micro sign'],
+	['&middot;',  '&#183;',  true, 'middle dot'],
 	['&bull;',    '&#8226;', true, 'bullet'],
 	['&hellip;',  '&#8230;', true, 'three dot leader'],
-	['&prime;',   '&#8242;', true, 'prime'],
-	['&Prime;',   '&#8243;', true, 'double prime'],
+	['&prime;',   '&#8242;', true, 'minutes / feet'],
+	['&Prime;',   '&#8243;', true, 'seconds / inches'],
+	['&sect;',    '&#167;',  true, 'section sign'],
 	['&para;',    '&#182;',  true, 'paragraph sign'],
-	['&szlig;',   '&#223;',  false, 'sharp s / ess-zed'],
+	['&szlig;',   '&#223;',  true, 'sharp s / ess-zed'],
 // quotations
-/*	['&lsaquo;',  '&#8249;', false, 'single left-pointing angle quotation mark'],
-	['&rsaquo;',  '&#8250;', false, 'single right-pointing angle quotation mark'],
-	['&laquo;',   '&#171;',  false, 'left pointing guillemet'],
-	['&raquo;',   '&#187;',  false, 'right pointing guillemet'],
-	['&lsquo;',   '&#8216;', false, 'left single quotation mark'],
-	['&rsquo;',   '&#8217;', false, 'right single quotation mark'],
-	['&ldquo;',   '&#8220;', false, 'left double quotation mark'],
-	['&rdquo;',   '&#8221;', false, 'right double quotation mark'],
-	['&sbquo;',   '&#8218;', false, 'single low-9 quotation mark'],
-	['&bdquo;',   '&#8222;', false, 'double low-9 quotation mark'],
+	['&lsaquo;',  '&#8249;', true, 'single left-pointing angle quotation mark'],
+	['&rsaquo;',  '&#8250;', true, 'single right-pointing angle quotation mark'],
+	['&laquo;',   '&#171;',  true, 'left pointing guillemet'],
+	['&raquo;',   '&#187;',  true, 'right pointing guillemet'],
+	['&lsquo;',   '&#8216;', true, 'left single quotation mark'],
+	['&rsquo;',   '&#8217;', true, 'right single quotation mark'],
+	['&ldquo;',   '&#8220;', true, 'left double quotation mark'],
+	['&rdquo;',   '&#8221;', true, 'right double quotation mark'],
+	['&sbquo;',   '&#8218;', true, 'single low-9 quotation mark'],
+	['&bdquo;',   '&#8222;', true, 'double low-9 quotation mark'],
 	['&lt;',      '&#60;',   true, 'less-than sign'],
 	['&gt;',      '&#62;',   true, 'greater-than sign'],
 	['&le;',      '&#8804;', true, 'less-than or equal to'],
@@ -60,19 +59,23 @@ var charmap = [
 	['&iquest;',  '&#191;',  true, 'turned question mark'],
 	['&circ;',    '&#710;',  true, 'circumflex accent'],
 	['&tilde;',   '&#732;',  true, 'small tilde'],
-*/
-	//['&minus;',   '&#8722;', true, 'minus sign'],
+	['&deg;',     '&#176;',  true, 'degree sign'],
+	['&minus;',   '&#8722;', true, 'minus sign'],
+	['&plusmn;',  '&#177;',  true, 'plus-minus sign'],
+	['&divide;',  '&#247;',  true, 'division sign'],
 	['&frasl;',   '&#8260;', true, 'fraction slash'],
-	//['&sup1;',    '&#185;',  true, 'superscript one'],
+	['&times;',   '&#215;',  true, 'multiplication sign'],
+	['&sup1;',    '&#185;',  true, 'superscript one'],
 	['&sup2;',    '&#178;',  true, 'superscript two'],
 	['&sup3;',    '&#179;',  true, 'superscript three'],
 	['&frac14;',  '&#188;',  true, 'fraction one quarter'],
 	['&frac12;',  '&#189;',  true, 'fraction one half'],
 	['&frac34;',  '&#190;',  true, 'fraction three quarters'],
 // math / logical
-	//['&fnof;',    '&#402;',  true, 'function / florin'],
+	['&fnof;',    '&#402;',  true, 'function / florin'],
 	['&int;',     '&#8747;', true, 'integral'],
 	['&sum;',     '&#8721;', true, 'n-ary sumation'],
+	['&infin;',   '&#8734;', true, 'infinity'],
 	['&radic;',   '&#8730;', true, 'square root'],
 	['&sim;',     '&#8764;', false,'similar to'],
 	['&cong;',    '&#8773;', false,'approximately equal to'],
@@ -85,9 +88,9 @@ var charmap = [
 	['&prod;',    '&#8719;', true, 'n-ary product'],
 	['&and;',     '&#8743;', false,'logical and'],
 	['&or;',      '&#8744;', false,'logical or'],
-	//['&not;',     '&#172;',  true, 'not sign'],
+	['&not;',     '&#172;',  true, 'not sign'],
 	['&cap;',     '&#8745;', true, 'intersection'],
-	['&cup;',     '&#8746;', true,'union'],
+	['&cup;',     '&#8746;', false,'union'],
 	['&part;',    '&#8706;', true, 'partial differential'],
 	['&forall;',  '&#8704;', false,'for all'],
 	['&exist;',   '&#8707;', false,'there exists'],
@@ -97,7 +100,6 @@ var charmap = [
 	['&prop;',    '&#8733;', false,'proportional to'],
 	['&ang;',     '&#8736;', false,'angle'],
 // undefined
-/*
 	['&acute;',   '&#180;',  true, 'acute accent'],
 	['&cedil;',   '&#184;',  true, 'cedilla'],
 	['&ordf;',    '&#170;',  true, 'feminine ordinal indicator'],
@@ -171,8 +173,7 @@ var charmap = [
 	['&yacute;',  '&#253;',  true, 'y - acute'],
 	['&thorn;',   '&#254;',  true, 'thorn'],
 	['&yuml;',    '&#255;',  true, 'y - diaeresis'],
-*/
-    ['&Alpha;',   '&#913;',  true, 'Alpha'],
+	['&Alpha;',   '&#913;',  true, 'Alpha'],
 	['&Beta;',    '&#914;',  true, 'Beta'],
 	['&Gamma;',   '&#915;',  true, 'Gamma'],
 	['&Delta;',   '&#916;',  true, 'Delta'],
@@ -224,24 +225,19 @@ var charmap = [
 // symbols
 	['&alefsym;', '&#8501;', false,'alef symbol'],
 	['&piv;',     '&#982;',  false,'pi symbol'],
-	['&real;',    '&#8476;', true,'real part symbol'],
+	['&real;',    '&#8476;', false,'real part symbol'],
 	['&thetasym;','&#977;',  false,'theta symbol'],
-	//['&upsih;',   '&#978;',  false,'upsilon - hook symbol'],
-	//['&weierp;',  '&#8472;', false,'Weierstrass p'],
+	['&upsih;',   '&#978;',  false,'upsilon - hook symbol'],
+	['&weierp;',  '&#8472;', false,'Weierstrass p'],
 	['&image;',   '&#8465;', false,'imaginary part'],
 // arrows
-	['&amp;',     '&#38;',   true, 'ampersand'],
-	//['&quot;',    '&#34;',   true, 'quotation mark'],
-	['&ldquo;',   '&#8220;', true, 'left double quotation mark'],
-	['&rdquo;',   '&#8221;', true, 'right double quotation mark'],
-	['&mdash;',   '&#8212;', true, 'em dash'],
 	['&larr;',    '&#8592;', true, 'leftwards arrow'],
 	['&uarr;',    '&#8593;', true, 'upwards arrow'],
 	['&rarr;',    '&#8594;', true, 'rightwards arrow'],
 	['&darr;',    '&#8595;', true, 'downwards arrow'],
 	['&harr;',    '&#8596;', true, 'left right arrow'],
-	['&crarr;',   '&#8629;', false,'carriage return']
-/*	['&lArr;',    '&#8656;', false,'leftwards double arrow'],
+	['&crarr;',   '&#8629;', false,'carriage return'],
+	['&lArr;',    '&#8656;', false,'leftwards double arrow'],
 	['&uArr;',    '&#8657;', false,'upwards double arrow'],
 	['&rArr;',    '&#8658;', false,'rightwards double arrow'],
 	['&dArr;',    '&#8659;', false,'downwards double arrow'],
@@ -262,8 +258,8 @@ var charmap = [
 	['&rfloor;',  '&#8971;', false,'right floor'],
 	['&lang;',    '&#9001;', false,'left-pointing angle bracket'],
 	['&rang;',    '&#9002;', false,'right-pointing angle bracket'],
-	['&loz;',     '&#9674;', true,'lozenge'],
-	['&spades;',  '&#9824;', false,'black spade suit'],
+	['&loz;',     '&#9674;', true, 'lozenge'],
+	['&spades;',  '&#9824;', true, 'black spade suit'],
 	['&clubs;',   '&#9827;', true, 'black club suit'],
 	['&hearts;',  '&#9829;', true, 'black heart suit'],
 	['&diams;',   '&#9830;', true, 'black diamond suit'],
@@ -275,24 +271,42 @@ var charmap = [
 	['&lrm;',     '&#8206;', false,'left-to-right mark'],
 	['&rlm;',     '&#8207;', false,'right-to-left mark'],
 	['&shy;',     '&#173;',  false,'soft hyphen']
-	*/
 ];
 
 tinyMCEPopup.onInit.add(function() {
 	tinyMCEPopup.dom.setHTML('charmapView', renderCharMapHTML());
+	addKeyboardNavigation();
 });
+
+function addKeyboardNavigation(){
+	var tableElm, cells, settings;
+
+	cells = tinyMCEPopup.dom.select(".charmaplink", "charmapgroup");
+
+	settings ={
+		root: "charmapgroup",
+		items: cells
+	};
+
+	tinyMCEPopup.editor.windowManager.createInstance('tinymce.ui.KeyboardNavigation', settings, tinyMCEPopup.dom);
+}
 
 function renderCharMapHTML() {
 	var charsPerRow = 20, tdWidth=20, tdHeight=20, i;
-	var html = '<table border="0" cellspacing="1" cellpadding="0" width="' + (tdWidth*charsPerRow) + '"><tr height="' + tdHeight + '">';
+	var html = '<div id="charmapgroup" aria-labelledby="charmap_label" tabindex="0" role="listbox">'+
+	'<table role="presentation" border="0" cellspacing="1" cellpadding="0" width="' + (tdWidth*charsPerRow) + 
+	'"><tr height="' + tdHeight + '">';
 	var cols=-1;
 
 	for (i=0; i<charmap.length; i++) {
+		var previewCharFn;
+
 		if (charmap[i][2]==true) {
 			cols++;
+			previewCharFn = 'previewChar(\'' + charmap[i][1].substring(1,charmap[i][1].length) + '\',\'' + charmap[i][0].substring(1,charmap[i][0].length) + '\',\'' + charmap[i][3] + '\');';
 			html += ''
 				+ '<td class="charmap">'
-				+ '<a onmouseover="previewChar(\'' + charmap[i][1].substring(1,charmap[i][1].length) + '\',\'' + charmap[i][0].substring(1,charmap[i][0].length) + '\',\'' + charmap[i][3] + '\');" onfocus="previewChar(\'' + charmap[i][1].substring(1,charmap[i][1].length) + '\',\'' + charmap[i][0].substring(1,charmap[i][0].length) + '\',\'' + charmap[i][3] + '\');" href="javascript:void(0)" onclick="insertChar(\'' + charmap[i][1].substring(2,charmap[i][1].length-1) + '\');" onclick="return false;" onmousedown="return false;" title="' + charmap[i][3] + '">'
+				+ '<a class="charmaplink" role="button" onmouseover="'+previewCharFn+'" onfocus="'+previewCharFn+'" href="javascript:void(0)" onclick="insertChar(\'' + charmap[i][1].substring(2,charmap[i][1].length-1) + '\');" onclick="return false;" onmousedown="return false;" title="' + charmap[i][3] + '">'
 				+ charmap[i][1]
 				+ '</a></td>';
 			if ((cols+1) % charsPerRow == 0)
@@ -306,7 +320,8 @@ function renderCharMapHTML() {
 			html += '<td width="' + tdWidth + '" height="' + tdHeight + '" class="charmap">&nbsp;</td>';
 	}
 
-	html += '</tr></table>';
+	html += '</tr></table></div>';
+	html = html.replace(/<tr height="20"><\/tr>/g, '');
 
 	return html;
 }

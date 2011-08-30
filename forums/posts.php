@@ -118,9 +118,14 @@
 		} 
 	}
 		
-	
-	$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email from imas_forum_posts,imas_users ";
-	$query .= "WHERE imas_forum_posts.userid=imas_users.id AND (imas_forum_posts.id='$threadid' OR imas_forum_posts.threadid='$threadid') ORDER BY imas_forum_posts.id";
+	if ($haspoints) {
+		$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_grades.score,imas_grades.feedback FROM ";
+		$query .= "imas_forum_posts JOIN imas_users ON imas_forum_posts.userid=imas_users.id LEFT JOIN imas_grades ON imas_grades.gradetype='forum' AND imas_grades.refid=imas_forum_posts.id ";
+		$query .= "WHERE (imas_forum_posts.id='$threadid' OR imas_forum_posts.threadid='$threadid') ORDER BY imas_forum_posts.id";
+	} else {
+		$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email from imas_forum_posts,imas_users ";
+		$query .= "WHERE imas_forum_posts.userid=imas_users.id AND (imas_forum_posts.id='$threadid' OR imas_forum_posts.threadid='$threadid') ORDER BY imas_forum_posts.id";	
+	}
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	while ($line =  mysql_fetch_array($result, MYSQL_ASSOC)) {
 		if ($line['parent']==0) {
@@ -151,10 +156,12 @@
 		$message[$line['id']] = $line['message'];
 		$posttype[$line['id']] = $line['posttype'];
 		$ownerid[$line['id']] = $line['userid'];
-		if ($line['points']!==null) {
-			$points[$line['id']] = 1*$line['points'];
+		if ($haspoints && $line['score']!==null) {
+			$points[$line['id']] = 1*$line['score'];
+			$feedback[$line['id']] = $line['feedback'];
 		} else {
-			$points[$line['id']] = $line['points'];
+			$points[$line['id']] = $line['score'];
+			$feedback[$line['id']] = null;
 		}
 		if ($line['isanon']==1) {
 			$poster[$line['id']] = "Anonymous";
@@ -204,9 +211,10 @@
 	$query .= "ORDER BY id DESC LIMIT 1";
 	//$query = "SELECT id FROM imas_forum_posts WHERE forumid='$forumid' AND threadid<'$threadid' AND parent=0 ORDER BY threadid DESC LIMIT 1";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$prevth = '';
 	if (mysql_num_rows($result)>0) {
-		$nextth = mysql_result($result,0,0);
-		echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=$nextth&grp=$groupid\">Prev</a> ";
+		$prevth = mysql_result($result,0,0);
+		echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=$prevth&grp=$groupid\">Prev</a> ";
 	} else {
 		echo "Prev ";
 	}
@@ -216,6 +224,7 @@
 	$query .= "ORDER BY id LIMIT 1";
 	//$query = "SELECT id FROM imas_forum_posts WHERE forumid='$forumid' AND threadid>'$threadid' AND parent=0 ORDER BY threadid LIMIT 1";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$nextth = '';
 	if (mysql_num_rows($result)>0) {
 		$nextth = mysql_result($result,0,0);
 		echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=$nextth&grp=$groupid\">Next</a>";
@@ -311,7 +320,7 @@
 	$icnt = 0;
 	function printchildren($base,$restricttoowner=false) {
 		$curdir = rtrim(dirname(__FILE__), '/\\');
-		global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points,$posttype,$lastview,$bcnt,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$view,$page,$allowmsg,$haspoints,$imasroot;
+		global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points,$feedback,$posttype,$lastview,$bcnt,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$view,$page,$allowmsg,$haspoints,$imasroot;
 		foreach($children[$base] as $child) {
 			if ($restricttoowner && $ownerid[$child] != $userid) {
 				continue;
@@ -396,7 +405,7 @@
 			} else {
 			*/
 				echo "<span class=right>";
-				if ($haspoints) {
+				/*if ($haspoints) {
 					if ($isteacher) {
 						echo "<input type=text size=2 name=\"score[$child]\" value=\"";
 						if ($points[$child]!==null) {
@@ -407,6 +416,7 @@
 						echo "<span class=red>{$points[$child]} points</span> ";
 					}
 				}
+				*/
 				/*if (isset($children[$child])) {
 					echo "<input type=button id=\"butb$bcnt\" value=\"Collapse\" onClick=\"toggleshow($bcnt)\">\n";
 				}*/
@@ -428,6 +438,7 @@
 				if ($posttype[$child]!=2 && $myrights > 5 && $allowreply) {
 					echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&modify=reply&replyto=$child\">Reply</a>";
 				}
+				
 				echo "</span>\n";
 				echo "<b>{$subject[$child]}</b><br/>Posted by: ";
 				//if ($isteacher && $ownerid[$child]!=0) {
@@ -457,6 +468,31 @@
 					echo "<div class=blockitems id=\"item$icnt\">";
 				}
 				echo filter($message[$child]);
+				if ($haspoints) {
+					if ($isteacher && $ownerid[$child]!=$userid) {
+						echo '<hr/>';
+						echo "Score: <input type=text size=2 name=\"score[$child]\" value=\"";
+						if ($points[$child]!==null) {
+							echo $points[$child];
+						}
+						echo "\"/>  ";
+						echo "Private Feedback: <textarea cols=\"50\" rows=\"2\" name=\"feedback[$child]\">";
+						if ($feedback[$child]!==null) {
+							echo $feedback[$child];
+						}
+						echo "</textarea>";
+					} else if ($ownerid[$child]==$userid && $points[$child]!=null) {
+						echo '<div class="signup">Score: ';
+						echo "<span class=red>{$points[$child]} points</span><br/> ";
+						if ($feedback[$child]!==null && $feedback[$child]!='') {
+							echo 'Private Feedback: ';
+							echo $feedback[$child];
+						}
+						echo '</div>';
+					}
+				}
+				
+				
 				echo "<div class=\"clear\"></div></div>\n";
 				$icnt++;
 				if (isset($children[$child])) { //if has children
@@ -479,7 +515,15 @@
 	}
 	printchildren(0);
 	if ($isteacher && $haspoints) {
-		echo "<div><input type=submit value=\"Save Grades\" /></div>";
+		echo '<div><input type=submit name="save" value="Save Grades" /></div>';
+		if ($prevth!='' && $page!=-3) {
+			echo '<input type="hidden" name="prevth" value="'.$prevth.'"/>';
+			echo '<input type="submit" name="save" value="Save Grades and View Previous"/>';
+		}
+		if ($nextth!='' && $page!=-3) {
+			echo '<input type="hidden" name="nextth" value="'.$nextth.'"/>';
+			echo '<input type="submit" name="save" value="Save Grades and View Next"/>';
+		}
 		echo "</form>";
 	}
 	echo "<img src=\"$imasroot/img/expand.gif\" style=\"visibility:hidden\" />";

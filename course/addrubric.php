@@ -116,6 +116,13 @@ if (!isset($_GET['id'])) {//displaying "Manage Rubrics" page
 	}
 	echo '</p>';
 } else {  //adding/editing a rubric
+	/*  Rubric Types
+	*   1: score breakdown (record score and feedback)
+	*   0: score breakdown (record score)
+	*   3: score total (record score and feedback)
+	*   4: score total (record score only)
+	*   2: record feedback only (checkboxes)
+	*/
 	$rubtypeval = array(1,0,3,4,2);
 	$rubtypelabel = array('Score breakdown, record score and feedback','Score breakdown, record score only','Score total, record score and feedback','Score total, record score only','Feedback only');
 	echo "<form method=\"post\" action=\"addrubric.php?cid=$cid&amp;id={$_GET['id']}$fromstr\">";

@@ -96,7 +96,7 @@ $row[1][1][1][1] = "Category";
 $row[1][1][1][2] = 1; //0 assessment, 1 offline, 2 discussion
 $row[1][1][1][3] = 0;  //0 past, 1 current, 2 future
 $row[1][1][1][4] = 0;  //0 has instructor comment, 1 no comment - is comment if student view
-$row[1][1][1][5] = 23; //gbitemid
+$row[1][1][1][5] = 23; //gradetypeid (gbitems.id)
 $row[1][1][1][6] = 312; //userid
 
 //$row[1][1][2] score-discussion
@@ -561,7 +561,7 @@ function gbtable() {
 		//Get other grades
 		unset($gradeid); unset($opts);
 		$query = "SELECT imas_gbitems.id,imas_grades.id,imas_grades.score,imas_grades.feedback FROM imas_grades,imas_gbitems WHERE ";
-		$query .= "imas_grades.gbitemid=imas_gbitems.id AND imas_grades.userid='{$line['id']}'";
+		$query .= "imas_grades.gradetypeid=imas_gbitems.id AND imas_grades.gradetype='offline' AND imas_grades.userid='{$line['id']}'";
 		$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($r = mysql_fetch_row($result2)) {
 			$gradeid[$r[0]] = $r[1];
@@ -607,7 +607,7 @@ function gbtable() {
 				$gb[$ln][1][$pos][1] = $gb[0][1][$pos][1]; //copy category
 				$gb[$ln][1][$pos][2] = 1; //1 offline
 				$gb[$ln][1][$pos][3] = $gb[0][1][$pos][3]; //copy past/future
-				$gb[$ln][1][$pos][5] = $grades[$i]; //gbitemid
+				$gb[$ln][1][$pos][5] = $grades[$i]; //gbitems.id
 				$gb[$ln][1][$pos][6] = $line['id']; //userid
 			} else if ($assessmenttype[$i]=='Discussion') {
 				if (isset($discusspts[$discuss[$i]])) {

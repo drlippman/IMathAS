@@ -13,8 +13,8 @@ which requires no setup, or browser-based display.  Browser-based display is fas
 than image-based display.  The rest of this page will guide you through setting up browser-based Math and Graph display.</p>
 
 <p>For browser-based Math and Graph display, <?php echo $installname;?> recommends:<br/>
-Windows: Internet Explorer 6 or higher + MathPlayer + AdobeSVG, or <a href="http://www.mozilla.com/firefox/">FireFox 1.5 or higher</a><br/>
-Mac: <a href="http://www.mozilla.com/firefox/">FireFox 1.5 or higher</a> or <a href="http://www.caminobrowser.org/">Camino</a></p>
+Windows: Internet Explorer 6 or higher + MathPlayer + AdobeSVG, or Internet Explorer 9 + MathPlayer, or <a href="http://www.mozilla.com/firefox/">FireFox 1.5 or higher</a><br/>
+Mac: <a href="http://www.mozilla.com/firefox/">FireFox 1.5 or higher</a>.</p>
 <p>The rest of this page will guide you through setting up browser-based Math and Graph display.</p>
 
 <p>Quick Plugin install for Windows Internet Explorer 6 or higher: 

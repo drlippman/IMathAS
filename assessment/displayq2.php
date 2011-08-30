@@ -262,8 +262,9 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		for ($i=0;$i<count($extref);$i++) {
 			$extrefpt = explode('!!',$extref[$i]);
 			if ($extrefpt[0]=='video' || strpos($extrefpt[1],'youtube.com/watch')!==false) {
-				$url = "http://" . $_SERVER['HTTP_HOST'] . "$imasroot/assessment/watchvid.php?url=".urlencode($extrefpt[1]);
-				echo formpopup("Video",$url,660,525,"button",true,"video");
+				$extrefpt[1] = "http://" . $_SERVER['HTTP_HOST'] . "$imasroot/assessment/watchvid.php?url=".urlencode($extrefpt[1]);
+				if ($extrefpt[0]=='video') {$extrefpt[0]='Video';}
+				echo formpopup($extrefpt[0],$extrefpt[1],660,530,"button",true,"video");
 			} else if ($extrefpt[0]=='read') {
 				echo formpopup("Read",$extrefpt[1],730,500,"button",true,"text");
 			} else {

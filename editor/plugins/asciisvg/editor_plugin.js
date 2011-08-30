@@ -30,8 +30,13 @@
 			ed.addCommand('mceAsciisvg', function() {
 				el = ed.selection.getNode();
 				
-				if (el.nodeName == 'IMG' && ed.dom.getAttrib(el,"sscr")!='') {
+				//if (el.nodeName == 'IMG' && ed.dom.getAttrib(el,"sscr")!='') {
+				if (el.nodeName == 'IMG' && (ed.dom.getAttrib(el,"sscr")!='' || ed.dom.getAttrib(el,"src").match(/sscr=/))) {
 					sscr = ed.dom.getAttrib(el,"sscr");
+					if (sscr == '') {
+						sscr = ed.dom.getAttrib(el,"src");
+						sscr = decodeURIComponent(sscr.replace(/.*sscr=(.*)/,"$1"));
+					}
 					isnew = false;
 					elwidth = parseInt(ed.dom.getStyle(el,"width"));
 					elheight = parseInt(ed.dom.getStyle(el,"height"));

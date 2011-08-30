@@ -116,7 +116,11 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	}
 	if (is_numeric($settings[4]) && $settings[4]>0) {
 		$commands .= 'axes('.$settings[4].','.$settings[4].',1';
-	} else if (isset($lbl[0]) && is_numeric($lbl[0]) && $lbl[0]>0 && $lbl[1]>0) {
+	} else if (isset($lbl[0]) && is_numeric($lbl[0]) && $lbl[0]>0) {
+		if ($lbl[1]==0) {
+			$lbl[1] = 1;
+			$noyaxis = true;
+		}
 		if (!isset($lbl[2])) {  //allow xscl:yscl:off for ticks but no labels
 			$commands .= 'axes('.$lbl[0].','.$lbl[1].',1';
 		} else {
@@ -132,7 +136,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	}
 	if (is_numeric($settings[5]) && $settings[5]>0) { 
 		$commands .= ','.$settings[5].','.$settings[5];
-	} else if (isset($grid[0]) && is_numeric($grid[0]) && $grid[0]>0 && $grid[1]>0) {
+	} else if (isset($grid[0]) && is_numeric($grid[0]) ) {
 		$commands .= ','.$grid[0].','.$grid[1];
 	} else {
 		$commands .= ',0,0';

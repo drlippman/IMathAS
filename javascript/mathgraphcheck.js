@@ -62,17 +62,19 @@ if (!AMnoMathML && (AMisGecko>0)) {
 }
 
 function isSVGavailable() {
-//Safari 3 can do SVG, but still has issues
-//  if ((ver = navigator.userAgent.toLowerCase().match(/safari\/(\d+)/))!=null) {
-//		if (ver[1]>524) {
-//			return null;
-//		}
+	return null;
+//WebKit got good at SVG after 531.22.7
+  if ((ver = navigator.userAgent.toLowerCase().match(/webkit\/(\d+)/))!=null) {
+		if (ver[1]>531) {
+			return null;
+		}
+  }
 //Opera can do SVG, but not very pretty, so skip it 
 // } else if ((ver = navigator.userAgent.toLowerCase().match(/opera\/([\d\.]+)/))!=null) {
 //		if (ver[1]>9.1) {
 //			return null;
 //		}
-  if (navigator.product && navigator.product=='Gecko') {
+  else if (navigator.product && navigator.product=='Gecko') {
 	   var rv = navigator.userAgent.toLowerCase().match(/rv:\s*([\d\.]+)/);
 	   if (rv!=null) {
 		rv = rv[1].split('.');
@@ -82,14 +84,22 @@ function isSVGavailable() {
 	   if (rv!=null && 10000*rv[0]+100*rv[1]+1*rv[2]>=10800) return null;
 	   else return 1;
   }
-  else if (navigator.appName.slice(0,9)=="Microsoft")
-    try	{
-      var oSVG=eval("new ActiveXObject('Adobe.SVGCtl.3');");
-        return null;
-    } catch (e) {
-        return 1;
+  else if (navigator.appName.slice(0,9)=="Microsoft") {
+    version = parseFloat(navigator.appVersion.split("MSIE")[1]);
+    alert(version);
+    if (version >= 9) {
+    	    //IE 9+ can do SVG
+	    return null;
+    } else {
+	    try	{
+	      var oSVG=eval("new ActiveXObject('Adobe.SVGCtl.3');");
+		return null;
+	    } catch (e) {
+		    
+		return 1;
+	    }
     }
-  else return 1;
+  } else return 1;
 }
 ASnoSVG = (isSVGavailable()!=null);
 

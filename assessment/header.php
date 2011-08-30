@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
-<meta http-equiv="X-UA-Compatible" content="IE=7" />
+<meta http-equiv="X-UA-Compatible" content="IE=7, IE=9" />
 <title><?php echo $installname;?> Assessment</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <?php
@@ -38,16 +38,16 @@ if ($isdiag) {
 	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/assessment/print.css\" media=\"print\"/>\n";
 }
 if ($sessiondata['mathdisp']==1) {
-	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/ASCIIMathML_min.js?v=052510\"></script>\n";
+	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/ASCIIMathML.js?v=052510\"></script>\n";
 } else if ($sessiondata['mathdisp']==2) {
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>'; 
-	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?v=050110\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?v=082911\" type=\"text/javascript\"></script>\n";
 } else if ($sessiondata['mathdisp']==0) {
 	echo '<script type="text/javascript">var noMathRender = true;</script>';	
 }
 
 if ($sessiondata['graphdisp']==1) {
-	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?v=102510\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIsvg.js?v=102510\" type=\"text/javascript\"></script>\n";
 } else {
 	echo "<script src=\"$imasroot/javascript/mathjs.js?v=102510\" type=\"text/javascript\"></script>\n";
 }
@@ -65,13 +65,13 @@ div { zoom: 1; }
 <![endif]--> 
 <script src="<?php echo $imasroot . "/javascript/AMhelpers_min.js?v=041511";?>" type="text/javascript"></script>
 <script src="<?php echo $imasroot . "/javascript/confirmsubmit.js";?>" type="text/javascript"></script>
-<!--[if IE]><script type="text/javascript" src="<?php echo $imasroot;?>/javascript/excanvas_min.js"></script><![endif]-->
+<!--[if lt IE 9]><script type="text/javascript" src="<?php echo $imasroot;?>/javascript/excanvas_min.js"></script><![endif]-->
 <script type="text/javascript" src="<?php echo $imasroot;?>/javascript/drawing_min.js?v=070711"></script>
 <?php
 echo "<script type=\"text/javascript\">imasroot = '$imasroot';</script>";
 if ($useeditor==1 && $sessiondata['useed']==1) {
 echo <<<END
-<script type="text/javascript" src="$imasroot/editor/tiny_mce.js"></script>
+<script type="text/javascript" src="$imasroot/editor/tiny_mce.js?v=082911"></script>
 
 <script type="text/javascript">
 tinyMCE.init({

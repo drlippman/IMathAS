@@ -48,7 +48,7 @@
 	$caller = "byname";
 	include("posthandler.php");
 	
-	$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
+	$placeinhead = '<link rel="stylesheet" href="'.$imasroot.'/forums/forums.css?ver=082911" type="text/css" />';
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; <a href=\"thread.php?cid=$cid&forum=$forumid&page=$page\">Forum Topics</a> &gt; Posts by Name</div>\n";
 	
@@ -81,6 +81,12 @@
 	  }
 	  document.getElementById("toggleall").value = 'Collapse All';
 	  document.getElementById("toggleall").onclick = togglecollapseall;
+	}
+	function onsubmittoggle() {
+		for (var i=0; i<bcnt; i++) {
+		    var node = document.getElementById('m'+i);
+		    node.className = 'pseudohidden';
+		  }	
 	}
 	function togglecollapseall() {
 	  for (var i=0; i<bcnt; i++) {
@@ -139,6 +145,16 @@
 	}
 	</script>
 <?php
+	$scores = array();
+	$feedback = array();
+	if ($haspoints) {
+		$query = "SELECT refid,score,feedback FROM imas_grades WHERE gradetype='forum' AND gradetypeid='$forumid'";
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			$scores[$row[0]] = $row[1];
+			$feedback[$row[0]] = $row[2];
+		}
+	}
 	$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,ifv.lastview from imas_forum_posts JOIN imas_users ";
 	$query .= "ON imas_forum_posts.userid=imas_users.id LEFT JOIN (SELECT DISTINCT threadid,lastview FROM imas_forum_views WHERE userid='$userid') AS ifv ON ";
 	$query .= "ifv.threadid=imas_forum_posts.threadid WHERE imas_forum_posts.forumid='$forumid' AND imas_forum_posts.isanon=0 ORDER BY ";
@@ -150,7 +166,7 @@
 	echo "<a href=\"postsbyname.php?cid=$cid&forum=$forumid&markallread=true\">Mark all Read</a><br/>";
 	
 	if ($isteacher && $haspoints) {
-		echo "<form method=post action=\"thread.php?cid=$cid&forum=$forumid&page=$page&score=true\">";
+		echo "<form method=post action=\"thread.php?cid=$cid&forum=$forumid&page=$page&score=true\" onsubmit=\"onsubmittoggle()\">";
 	}
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	while ($line =  mysql_fetch_array($result, MYSQL_ASSOC)) {
@@ -174,11 +190,12 @@
 		if ($haspoints) {
 			if ($isteacher) {
 				echo "<input type=text size=2 name=\"score[{$line['id']}]\"  onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" value=\"";
-				if ($line['points']!=null) {
-					echo $line['points'];
+				if (isset($scores[$line['id']])) {
+					echo $scores[$line['id']];
 				}
+				
 				echo "\"/> Pts. ";
-			} else if ($line['ownerid']==$userid && $line['points']!=null) {
+			} else if ($line['ownerid']==$userid && isset($scores[$line['id']])) {
 				echo "<span class=red>{$points[$child]}</span> ";
 			}
 		}
@@ -204,7 +221,22 @@
 			echo " <span style=\"color:red;\">New</span>\n";
 		}
 		echo '</div>';
-		echo "<div id=\"m$cnt\" class=\"hidden\">".filter($line['message']).'</div>';
+		echo "<div id=\"m$cnt\" class=\"hidden\">".filter($line['message']);
+		if ($haspoints) {
+			if ($isteacher && $ownerid[$child]!=$userid) {
+				echo '<hr/>';
+				echo "Private Feedback: <textarea cols=\"50\" rows=\"2\" name=\"feedback[{$line['id']}]\">";
+				if ($feedback[$line['id']]!==null) {
+					echo $feedback[$line['id']];
+				}
+				echo "</textarea>";
+			} else if ($ownerid[$child]==$userid && $feedback[$line['id']]!=null) {
+				echo '<div class="signup">Private Feedback: ';
+				echo $feedback[$line['id']];
+				echo '</div>';
+			}
+		}
+		echo '</div>';
 		$cnt++;
 	}
 	echo '</div>';

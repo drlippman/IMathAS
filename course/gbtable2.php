@@ -56,7 +56,7 @@ row[0][1][0][3] = 0 past, 1 current, 2 future
 row[0][1][0][4] = 0 no count and hide, 1 count, 2 EC, 3 no count
 row[0][1][0][5] = 0 regular, 1 practice test  
 row[0][1][0][6] = 0 online, 1 offline, 2 discussion
-row[0][1][0][7] = assessmentid, gbitemid, forumid
+row[0][1][0][7] = assessmentid, gbitems.id, forumid 
 row[0][1][0][8] = tutoredit: 0 no, 1 yes
 row[0][1][0][9] = 5 number summary, if not limuser-ed
 row[0][1][0][10] = 0 regular, 1 group
@@ -839,49 +839,88 @@ function gbtable() {
 	//Get other grades
 	$gradeidx = array_flip($grades);
 	unset($gradeid); unset($opts);
-	$query = "SELECT imas_grades.gbitemid,imas_grades.id,imas_grades.score,imas_grades.feedback,imas_grades.userid FROM imas_grades,imas_gbitems WHERE ";
-	$query .= "imas_grades.gbitemid=imas_gbitems.id AND imas_gbitems.courseid='$cid'";
-	if ($limuser>0) { $query .= " AND imas_grades.userid='$limuser' ";}
-	$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($l = mysql_fetch_array($result2, MYSQL_ASSOC)) {
-		if (!isset($gradeidx[$l['gbitemid']]) || !isset($sturow[$l['userid']]) || !isset($gradecol[$l['gbitemid']])) {
-			continue;
-		}
-		$i = $gradeidx[$l['gbitemid']];
-		$row = $sturow[$l['userid']];
-		$col = $gradecol[$l['gbitemid']];
-		
-		$gb[$row][1][$col][2] = $l['id'];
-		if ($l['score']!=null) {
-			$gb[$row][1][$col][0] = 1*$l['score'];
-		}
-		if ($limuser>0 || (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments'])) {
-			$gb[$row][1][$col][1] =  $l['feedback']; //the feedback (for students)
-		} else if ($limuser==0 && $l['feedback']!='') { //feedback
-			$gb[$row][1][$col][1] = 1; //yes it has it (for teachers)
-		} else {
-			$gb[$row][1][$col][1] = 0; //no feedback
-		}
-		
-		if ($cntingb[$i] == 1) {
-			if ($gb[0][1][$col][3]<1) { //past
-				$cattotpast[$row][$category[$i]][$col] = 1*$l['score'];
-			} 
-			if ($gb[0][1][$col][3]<2) { //past or cur
-				$cattotcur[$row][$category[$i]][$col] = 1*$l['score'];
+	unset($discusspts);
+	$discussidx = array_flip($discuss);
+	$gradetypeselects = array();
+	if (count($grades)>0) {
+		$gradeidlist = implode(',',$grades);
+		$gradetypeselects[] = "(gradetype='offline' AND gradetypeid IN ($gradeidlist))";
+	}
+	if (count($discuss)>0) {
+		$forumidlist = implode(',',$discuss);
+		$gradetypeselects[] = "(gradetype='forum' AND gradetypeid IN ($forumidlist))";
+	}
+	if (count($gradetypeselects)>0) {
+		$sel = implode(' OR ',$gradetypeselects);
+		$query = "SELECT * FROM imas_grades WHERE ($sel)";
+		//$query = "SELECT imas_grades.gradetypeid,imas_grades.gradetype,imas_grades.refid,imas_grades.id,imas_grades.score,imas_grades.feedback,imas_grades.userid FROM imas_grades,imas_gbitems WHERE ";
+		//$query .= "imas_grades.gradetypeid=imas_gbitems.id AND imas_gbitems.courseid='$cid'";
+		if ($limuser>0) { $query .= " AND userid='$limuser' ";}
+		$result2 = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		while ($l = mysql_fetch_array($result2, MYSQL_ASSOC)) {
+			if ($l['gradetype']=='offline') {
+				if (!isset($gradeidx[$l['gradetypeid']]) || !isset($sturow[$l['userid']]) || !isset($gradecol[$l['gradetypeid']])) {
+					continue;
+				}
+				$i = $gradeidx[$l['gradetypeid']];
+				$row = $sturow[$l['userid']];
+				$col = $gradecol[$l['gradetypeid']];
+				
+				$gb[$row][1][$col][2] = $l['id'];
+				if ($l['score']!=null) {
+					$gb[$row][1][$col][0] = 1*$l['score'];
+				}
+				if ($limuser>0 || (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments'])) {
+					$gb[$row][1][$col][1] =  $l['feedback']; //the feedback (for students)
+				} else if ($limuser==0 && $l['feedback']!='') { //feedback
+					$gb[$row][1][$col][1] = 1; //yes it has it (for teachers)
+				} else {
+					$gb[$row][1][$col][1] = 0; //no feedback
+				}
+				
+				if ($cntingb[$i] == 1) {
+					if ($gb[0][1][$col][3]<1) { //past
+						$cattotpast[$row][$category[$i]][$col] = 1*$l['score'];
+					} 
+					if ($gb[0][1][$col][3]<2) { //past or cur
+						$cattotcur[$row][$category[$i]][$col] = 1*$l['score'];
+					}
+					$cattotfuture[$row][$category[$i]][$col] = 1*$l['score'];		
+				} else if ($cntingb[$i]==2) {
+					if ($gb[0][1][$col][3]<1) { //past
+						$cattotpastec[$row][$category[$i]][$col] = 1*$l['score'];
+					} 
+					if ($gb[0][1][$col][3]<2) { //past or cur
+						$cattotcurec[$row][$category[$i]][$col] = 1*$l['score'];
+					}
+					$cattotfutureec[$row][$category[$i]][$col] = 1*$l['score'];	
+				}
+			} else if ($l['gradetype']=='forum') {
+				if (!isset($discussidx[$l['gradetypeid']]) || !isset($sturow[$l['userid']]) || !isset($discusscol[$l['gradetypeid']])) {
+					continue;
+				}
+				$i = $discussidx[$l['gradetypeid']];
+				$row = $sturow[$l['userid']];
+				$col = $discusscol[$l['gradetypeid']];
+				if ($l['score']!=null) {
+					if (isset($gb[$row][1][$col][0])) {
+						$gb[$row][1][$col][0] += 1*$l['score']; //adding up all forum scores
+					} else {
+						$gb[$row][1][$col][0] = 1*$l['score'];
+					}
+				}
+				$gb[$row][1][$col][3] = 0; //is counted
+				if ($gb[0][1][$col][3]<1) { //past
+					$cattotpast[$row][$category[$i]][$col] = $gb[$row][1][$col][0];
+				} 
+				if ($gb[0][1][$col][3]<2) { //past or cur
+					$cattotcur[$row][$category[$i]][$col] = $gb[$row][1][$col][0];
+				}
+				$cattotfuture[$row][$category[$i]][$col] = $gb[$row][1][$col][0];
 			}
-			$cattotfuture[$row][$category[$i]][$col] = 1*$l['score'];		
-		} else if ($cntingb[$i]==2) {
-			if ($gb[0][1][$col][3]<1) { //past
-				$cattotpastec[$row][$category[$i]][$col] = 1*$l['score'];
-			} 
-			if ($gb[0][1][$col][3]<2) { //past or cur
-				$cattotcurec[$row][$category[$i]][$col] = 1*$l['score'];
-			}
-			$cattotfutureec[$row][$category[$i]][$col] = 1*$l['score'];	
 		}
 	}
-	
+	/*
 	//Get discussion grades
 	unset($discusspts);
 	$discussidx = array_flip($discuss);
@@ -909,6 +948,7 @@ function gbtable() {
 		}
 		$cattotfuture[$row][$category[$i]][$col] = $r[2];
 	}
+	*/
 	//fill out cattot's with zeros
 	for ($ln=1; $ln<count($sturow)+1; $ln++) {
 		

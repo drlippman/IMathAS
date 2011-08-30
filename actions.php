@@ -346,7 +346,7 @@
 		$query = "SELECT id FROM imas_gbitems WHERE courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
-			$query = "DELETE FROM imas_grades WHERE gbitemid='{$row[0]}' AND userid='$userid'";
+			$query = "DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid='{$row[0]}' AND userid='$userid'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		}
 		$query = "SELECT id FROM imas_forums WHERE courseid='$cid'";

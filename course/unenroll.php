@@ -1,6 +1,10 @@
 <?php
 //IMathAS:  Unenroll students; called from List Users or Gradebook
 //(c) 2007 David Lippman
+@set_time_limit(0);
+ini_set("max_input_time", "600");
+ini_set("max_execution_time", "600");
+
 	if (!(isset($teacherid))) {
 		require("../header.php");
 		echo "You need to log in as a teacher to access this page";
@@ -26,7 +30,14 @@
 			$delwikirev = 0;
 		}
 		require_once("../includes/unenroll.php");
-		unenrollstu($cid,$tounenroll,($_GET['uid']=="all" || isset($_POST['delforumposts'])),($_GET['uid']=="all" && isset($_POST['removeoffline'])),($_GET['uid']=="all"),$delwikirev);
+		if (isset($_POST['removewithdrawn'])) {
+			$withwithdraw = 'remove';
+		} else if ($_GET['uid']=="all") {
+			$withwithdraw = 'unwithdraw';
+		} else {
+			$withwithdraw = false;
+		}
+		unenrollstu($cid,$tounenroll,($_GET['uid']=="all" || isset($_POST['delforumposts'])),($_GET['uid']=="all" && isset($_POST['removeoffline'])),$withwithdraw,$delwikirev);
 		
 		
 		if ($calledfrom=='lu') {
@@ -117,7 +128,11 @@
 			<p>Also remove wiki revisions: <input type="radio" name="delwikirev" value="1" />All wikis, 
 				<input  type="radio" name="delwikirev" value="2" checked="checked" />Group wikis only
 			</p>
+			
 <?php
+			//<p>Also remove any withdrawn questions from assessments?
+			//	<input type=checkbox name="removewithdrawn" value="1" />
+			//</p>
 			} else if ($_GET['uid']=="selected") {
 				if (count($_POST['checked'])==0) {
 					if ($calledfrom=='lu') {

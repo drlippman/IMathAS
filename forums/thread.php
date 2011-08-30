@@ -26,17 +26,41 @@
 	}
 	
 	if ($isteacher && isset($_POST['score'])) {
+		$existingscores = array();
+		$query = "SELECT refid,id FROM imas_grades WHERE gradetype='forum' AND gradetypeid='$forumid'";
+		$res = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		while ($row = mysql_fetch_row($res)) {
+			$existingscores[$row[0]] = $row[1];
+		}
 		foreach($_POST['score'] as $k=>$v) {
+			if (isset($_POST['feedback'][$k])) {
+				$feedback = $_POST['feedback'][$k];
+			} else {
+				$feedback = '';
+			}
 			if (is_numeric($v)) {
-				$query = "UPDATE imas_forum_posts SET points='$v' WHERE id='$k'";
+				if (isset($existingscores[$k])) {
+					$query = "UPDATE imas_grades SET score='$v',feedback='$feedback' WHERE id='{$existingscores[$k]}'";
+				} else {
+					$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,refid,score,feedback) VALUES ";
+					$query .= "('forum','$forumid','$userid','$k','$v','$feedback')";
+				}
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
 			} else {
-				$query = "UPDATE imas_forum_posts SET points=NULL WHERE id='$k'";
-				mysql_query($query) or die("Query failed : $query " . mysql_error());
+				if (isset($existingscores[$k])) {
+					$query = "DELETE FROM imas_grades WHERE id='{$existingscores[$k]}'";
+					mysql_query($query) or die("Query failed : $query " . mysql_error());
+				}
 			}
 		}
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
-		exit;	
+		if (isset($_POST['save']) && $_POST['save']=='Save Grades and View Previous') {
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/posts.php?page=$page&cid=$cid&forum=$forumid&thread={$_POST['prevth']}");
+		} else if (isset($_POST['save']) && $_POST['save']=='Save Grades and View Next') {
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/posts.php?page=$page&cid=$cid&forum=$forumid&thread={$_POST['nextth']}");
+		} else {
+			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
+		}
+			exit;	
 	}
 	$query = "SELECT name,postby,settings,groupsetid,sortby FROM imas_forums WHERE id='$forumid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());

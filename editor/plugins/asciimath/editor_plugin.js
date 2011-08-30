@@ -44,11 +44,11 @@
 					   
 					       ed.selection.setContent(entity);
 					       
-					       ed.selection.select(ed.dom.get('removeme'));
+					       ed.selection.setCursorLocation(ed.dom.get('removeme'),0);
 					       ed.dom.remove('removeme');
-					       ed.selection.collapse(true);
-					       
+					       t.justinserted = true;
 					       ed.nodeChanged();
+					       t.justinserted = null;
 					 }
 					
 				} else if (val) {
@@ -81,17 +81,18 @@
 						if (existing.indexOf('class=AM')==-1) { //existing does not contain an AM node, so turn it into one
 						       //strip out all existing html tags.
 						       existing = existing.replace(/<([^>]*)>/g,"");
-						       entity = '<span class=AMedit>`'+existing+'<span id="removeme"></span>`</span> ';
-						    
+						       entity = '<span class="AMedit">`'+existing+'<span id="removeme"></span>`</span> ';
+						       
 						       if (tinymce.isIE) ed.focus();
 						   
 						       ed.selection.setContent(entity);
 						   
-						       ed.selection.select(ed.dom.get('removeme'));
+						       //ed.selection.select(ed.dom.get('removeme'));
+						       ed.selection.setCursorLocation(ed.dom.get('removeme'),0);
 						       ed.dom.remove('removeme');
-						       
+						       t.justinserted = true;
 						       ed.nodeChanged();
-						       
+						       t.justinserted = null;
 						 }
 					}
 					if (ev.stopPropagation) {
@@ -220,6 +221,9 @@
 						if (p.parentNode.lastChild==p) {
 							//not working 
 							//p.parentNode.appendChild(document.createTextNode(" "));
+						}
+						if (t.justinserted==null) {
+							ed.selection.setCursorLocation(p,0);
 						}
 						t.lastAMnode = p;
 						doprocessnode = false;

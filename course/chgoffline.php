@@ -20,7 +20,7 @@ if (isset($_POST['checked'])) { //form submitted
 			foreach ($checked as $k=>$gbi) {
 				$gbi = intval($gbi);
 				$checked[$k] = $gbi;
-				$query = "DELETE FROM imas_grades WHERE gbitemid='$gbi'";
+				$query = "DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid='$gbi'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 			$checkedlist = "'".implode("','",$checked)."'";

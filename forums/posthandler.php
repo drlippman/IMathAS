@@ -39,8 +39,18 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			mysql_query($query) or die("Query failed : $query " . mysql_error());
 			
 			if ($isteacher && isset($_POST['points']) && trim($_POST['points'])!='') {
-				$query = "UPDATE imas_forum_posts SET points='{$_POST['points']}' WHERE id='{$_GET['replyto']}'";
-				mysql_query($query) or die("Query failed : $query " . mysql_error());
+				$query = "SELECT id FROM imas_grades WHERE gradetype='forum' AND refid='{$_GET['replyto']}'";
+				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				if (mysql_num_rows($result)>0) {
+					$gradeid = mysql_result($result,0,0);
+					$query = "UPDATE imas_grades SET score='{$_POST['points']}' WHERE id=$gradeid";
+					//$query = "UPDATE imas_forum_posts SET points='{$_POST['points']}' WHERE id='{$_GET['replyto']}'";
+					mysql_query($query) or die("Query failed : $query " . mysql_error());
+				} else {
+					$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,refid,score) VALUES ";
+					$query .= "('forum','$forumid','$userid','{$_GET['replyto']}','{$_POST['points']}')";
+					mysql_query($query) or die("Query failed : $query " . mysql_error());
+				}
 			}
 			
 			$query = "SELECT iu.email FROM imas_users AS iu,imas_forum_subscriptions AS ifs WHERE ";
@@ -84,7 +94,9 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			echo '<div id="headerposthandler" class="pagetitle"><h2>Modify Post</h2></div>';
 		} else {
 			echo "Post Reply</div>\n";
-			$query = "SELECT subject,points FROM imas_forum_posts WHERE id='{$_GET['replyto']}'";
+			//$query = "SELECT subject,points FROM imas_forum_posts WHERE id='{$_GET['replyto']}'";
+			$query = "SELECT ifp.subject,ig.score FROM imas_forum_posts AS ifp JOIN imas_grades AS ig ON ";
+			$query .= "ifp.id=ig.refid AND ig.gradetype='forum' WHERE ifp.id='{$_GET['replyto']}'";
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			$sub = mysql_result($result,0,0);
 			$sub = str_replace('"','&quot;',$sub);

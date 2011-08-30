@@ -513,3 +513,7 @@ ol li ol {
 	list-style-type: lower-alpha;
 }
 
+svg {
+	overflow: hidden;
+}
+

@@ -96,8 +96,10 @@ this.preinit = function(try2) {
 	tblcont.appendChild(thetable);
 	if (navigator.userAgent.toLowerCase().match(/safari\/(\d+)/)!=null) {
 		tblbrowser = 'safari';
+		thetable.style.position = 'static';
 	} else if (navigator.product && navigator.product=='Gecko') {
 		tblbrowser = 'gecko';
+		thetable.style.position = 'static';
 	} else if (navigator.appName.slice(0,9)=="Microsoft") {
 		tblbrowser = 'ie';;
 	} 

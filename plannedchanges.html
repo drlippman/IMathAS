@@ -170,6 +170,7 @@ New versions are done per assessment/question
    keep best/last
 
 Redesign assessment result storage
+bestversion
 assessment version1 {
 	q1 {
 		version1 {
@@ -177,19 +178,155 @@ assessment version1 {
 			seed
 			attempts {
 				attempt1 {
-					submitted answer / lastanswer (for redisplay)
+					submitted answer / lastanswer (for redisplay)  (array if multipart)
 					stuanswer referenable value of submitted answer (if applicable)
 					rawscore [0-1]
 					timestamp?
+				}
+				[override] {
+					rawscore [0-1]
+					timestamp
 				}
 		}
 	}
 	
 	//maybe add for convenience of access
-	curquestions {
-		question id
+	//curquestions {
+	//	question id
+	//}
+	bestscores { //array of scores from best scoring version
+	    //based on assessment settings
 	}
 }
+
+Files to Update
+/assessment
+  printtest
+  showtest
+  
+/course
+  addassessment
+  addquestions
+  courseshowitems
+  exception
+  gb-aidexport
+  gb-itemanalysis
+  gb-viewasid
+  gb-table2
+  gradeallq
+  isolateassessbygroup
+  isolateassessgrade
+  managestugrps
+  massexception
+  masssend
+  modquestion
+
+/diag
+  index
+
+/includes
+  calendardisp
+  filehandler
+  stugroups
+  
+
+Assessment Object
+priv init(aid) {   load assessment data
+priv getQuestionInfo() {   get question specific info (points, etc)
+pub chooseQuestions() {
+pub allowRegenAssessment()
+pub allowRegenQ(qn)
+pub showHints()
+pub showScoresDuring()
+pub showQScoresAtEnd()
+pub showFinalScore()
+pub getEndMessage(score)
+pub getPassword()
+
+Assessment Display Object
+init (assessment object, score object)
+pub basicShowQ(qn)
+pub showQInfoBar(qn)
+pub showSeqInfoBar(qn)
+pub printScore(qn)
+pub showStartOfTestMessage()
+pub getStatus(userid)  //returns 'normal', 'inexception', 'review', 'closed'
+
+
+
+Score Object
+priv init(assessment object,userid) {
+	load assessment attempt data (or create if blank)
+}
+priv createAssessmentData() {
+	$aData = array();
+	$aData['versions'] = array();
+	$aData['versions'][] = createAssessmentVersion();
+	$aData['bestscores'] = array_fill(0,count($aData['versions'][0]['versions'][0]),0);
+	$aData['bestversion'] = 0;
+	return $aData;
+}
+	
+priv createAssessmentVersion() {
+	$aVersion = array();
+	$questions = $assessObject->chooseQuestions();
+	foreach ($questions as $question) {
+	    $questionarr = array();
+	    $questionarr['versions'] = array();
+	    $questionarr['versions'][] = createQuestionVersion($question);
+	    $questionarr['curqid'] = $questionarr['versions'][0]['id'];
+	    $questionarr['bestversion'] = 0;
+	    $aVersion[] = $questionarr;
+	}
+	return $aVersion;
+}
+priv createQuestionVersion($qid) {
+	$qVersion = array();
+	$qVersion['id'] = $qid;
+	$qVersion['seed'] = chooseSeed();
+	$qVersion['attempts'] = array();
+	return $qVersion;
+}
+
+priv chooseSeed() {
+	return rand(1,9999);
+}
+
+//all these are the score based on assessment settings
+//need to update these to include attemptn
+pub getPointsQ(question number) 
+pub getPointsAllQ(qn) 
+pub getPointsTotal() 
+pub getPointsPossibleTotal() 
+pub getPointsPossibleQ(qn) 
+pub getRemainingPossibleQ(qn) 
+pub getRemainingPossibleAllQ(qn) 
+pub isUnans(qn) {  //if never attempted
+pub isTodo(qn) { //if reattempted or never attempted
+pub canImprove(qn) 
+//does canImproveBest mean anything anymore
+pub canImproveAny() 
+pub canReattemptQ(qn) {
+
+pub deleteAssessmentRecord()
+pub deleteAssessmentAttempt(attemptn)   //remove completely
+pub deleteAssessmentScore(attemptn)     //keep questions
+pub clearQAttempt(attemptn,qn)  
+
+pub regenQ(qn)  //assumes latest attempt
+pub regenQCanImprove()
+pub regenAssessment()
+pub reattemptQ(qn)  //assumes latest attempt
+pub reattemptQCanImprove()
+pub reattemptAssessment()
+
+pub recordScoreQ(attemptn,qn)
+pub overrideScoreQ(attemptn,qn)
+
+priv updateBestScores()
+priv recordData() {
+
+
 
 So to get lastanswer, $data[last entry for last version][$qn][last entry for last version]['attempts'][last entry]['lastanswer']
 to get score, have to know assessment settings, and go through and calculate best

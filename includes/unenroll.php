@@ -7,7 +7,7 @@
 //$deloffline = delete offline items from gradebook
 //$unwithdraw = unset any withdrawn questions
 //$delwikirev = delete wiki revisions, 1: all, 2: group wikis only
-function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$unwithdraw=false,$delwikirev=false) {
+function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwithdraw=false,$delwikirev=false) {
 	$forums = array();
 	$threads = array();
 	$query = "SELECT id FROM imas_forums WHERE courseid='$cid'";
@@ -73,7 +73,7 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$unwithd
 			mysql_query($query) or die("Query failed : $query" . mysql_error());	
 		}
 		if (count($gbitems)>0) {
-			$query = "DELETE FROM imas_grades WHERE gbitemid IN ($gblist) AND userid IN ($stulist)";
+			$query = "DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid IN ($gblist) AND userid IN ($stulist)";
 			mysql_query($query) or die("Query failed : $query" . mysql_error());
 		}
 		if (count($threads)>0) {
@@ -84,9 +84,6 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$unwithd
 			$query = "DELETE FROM imas_wiki_views WHERE wikiid IN ($wikilist)  AND userid IN ($stulist)";
 			mysql_query($query) or die("Query failed : $query" . mysql_error());
 		}
-		
-		$query = "DELETE FROM imas_students WHERE userid IN ($stulist) AND courseid='$cid'";
-		mysql_query($query) or die("Query failed : $query" . mysql_error());
 		
 		if (count($stugroups)>0) {
 			$stugrouplist = implode(',',$stugroups);
@@ -103,6 +100,11 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$unwithd
 			
 		$query = "DELETE FROM imas_forum_posts WHERE forumid IN ($forumlist) AND posttype=0";
 		mysql_query($query) or die("Query failed : " . mysql_error());	
+		
+		if (count($tounenroll)>0) {
+			$query = "DELETE FROM imas_grades WHERE gradetype='forum' AND gradetypeid IN ($forumlist) AND userid IN ($stulist)";
+			mysql_query($query) or die("Query failed : " . mysql_error());	
+		}
 		/* //old
 		foreach ($forums as $fid) {
 			$query = "DELETE imas_forum_threads FROM imas_forum_posts JOIN imas_forum_threads ON imas_forum_posts.threadid=imas_forum_threads.id AND imas_forum_posts.posttype=0 WHERE imas_forum_threads.forumid='$fid'";
@@ -123,13 +125,19 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$unwithd
 		$query = "DELETE FROM imas_gbitems WHERE courseid='$cid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 	}
-	if ($unwithdraw && count($assesses)>0) {
+	if ($withwithdraw=='unwithdraw' && count($assesses)>0) {
 		$query = "UPDATE imas_questions SET withdrawn=0 WHERE assessmentid IN ($aidlist)";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		/*foreach ($assesses as $aid) {
 			$query = "UPDATE imas_questions SET withdrawn=0 WHERE assessmentid='$aid'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		}*/
+	} else if ($withwithdraw=='remove' && count($assesses)>0) {
+		
+	}
+	if (count($tounenroll)>0) {
+		$query = "DELETE FROM imas_students WHERE userid IN ($stulist) AND courseid='$cid'";
+		mysql_query($query) or die("Query failed : $query" . mysql_error());
 	}
 		 
 }

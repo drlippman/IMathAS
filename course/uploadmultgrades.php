@@ -97,7 +97,7 @@ if (!(isset($teacherid))) {
 					if (isset($gradestodel[$col])) {
 						$gradestodel[$col][] = $stu;
 					}
-					$adds[] = "($gid,$stu,$score,'$feedback')";
+					$adds[] = "('offline',$gid,$stu,$score,'$feedback')";
 				}
 			}
 			fclose($handle);
@@ -105,13 +105,13 @@ if (!(isset($teacherid))) {
 			foreach ($gradestodel as $col=>$stus) {
 				if (count($stus)>0) {
 					$stulist = implode(',',$stus);
-					$query = "DELETE FROM imas_grades WHERE gbitemid={$gbitemid[$col]} AND userid IN ($stulist)";
+					$query = "DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid={$gbitemid[$col]} AND userid IN ($stulist)";
 					mysql_query($query) or die("Query failed : " . mysql_error());
 				}
 			}
 			//now we load in the data!
 			if (count($adds)>0) {
-				$query = "INSERT INTO imas_grades (gbitemid,userid,score,feedback) VALUES ";
+				$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,score,feedback) VALUES ";
 				$query .= implode(',',$adds);
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				//echo $query;

@@ -71,8 +71,8 @@
 			 require("header.php");
 			 echo "<h2>Browser check</h2>\n";
 			 echo "<p>For fastest, most accurate, and prettiest math and graph display, this system recommends:";
-			 echo "<ul><li>Windows: Internet Explorer 6+ with MathPlayer and AdobeSVGViewer, or Firefox 1.5+</li>\n";
-			 echo "<li>Mac: Firefox 1.5+ or Camino 1.0+</li></ul>\n";
+			 echo "<ul><li>Windows: Firefox 1.5+, Internet Explorer 9 with MathPlayer, or Internet Explorer 6+ with MathPlayer and AdobeSVGViewer</li>\n";
+			 echo "<li>Mac: Firefox 1.5+</li></ul>\n";
 			 echo "<form method=post action=\"{$_SERVER['PHP_SELF']}$querys\">\n";
 			 echo "<div id=settings></div>";
 			 echo <<<END
@@ -91,8 +91,8 @@
 				html += 'Browser based Math display is faster and prettier than using image-based math display.  To install browser-based ';
 				html += 'math display:</p>';
 				html += '<p>Windows Internet Explorer users: <a href="http://www.dessci.com/en/dl/MathPlayerSetup.asp">Install MathPlayer plugin</a></p>';
-				html += '<p>Mac users or non-IE windows users: <a href="http://www.mozilla.com/firefox/">Install Firefox 1.5+</a> or ';
-				html += '<a href="http://www.caminobrowser.org/">Camino</a>.  With either of these browsers, if you find formulas not displaying ';
+				html += '<p>Mac users or non-IE windows users: <a href="http://www.mozilla.com/firefox/">Install Firefox 1.5+</a></p>';
+				html += '<p>With FireFox, if you find formulas not displaying ';
 				html += 'correctly you may need to <a href="http://www.mozilla.org/projects/mathml/fonts/">install Math fonts</a></p>';
 			}
 		} else {
@@ -103,17 +103,17 @@
 			html += '<p><input type=hidden name="graphdisp" value="2">It appears you do not have browser-based Graph display support. ';
 			html += 'Browser based Graph display is faster and prettier than using image-based graph display.  To install browser-based ';
 			html += 'graph display:</p>';
-			html += '<p>Windows Internet Explorer users: <a href="http://download.adobe.com/pub/adobe/magic/svgviewer/win/3.x/3.03/en/SVGView.exe">Install AdobeSVGPlugin plugin</a></p>';
-			html += '<p>Mac users or non-IE windows users: <a href="http://www.mozilla.com/firefox/">Install Firefox 1.5+</a> or <a href="http://www.caminobrowser.org/">Camino</a></p>';
+			html += '<p>Windows Internet Explorer users: Upgrade to IE version 9, or <a href="http://download.adobe.com/pub/adobe/magic/svgviewer/win/3.x/3.03/en/SVGView.exe">Install AdobeSVGPlugin plugin</a></p>';
+			html += '<p>Mac users or non-IE windows users: <a href="http://www.mozilla.com/firefox/">Install Firefox 1.5+</a></p>';
 		} else {
 			html += '<p><input type=hidden name="graphdisp" value="1">Your browser is set up for browser-based graph display.</p>';
 		}
 		
 		html += '<p><input type="checkbox" name="savesettings" checked="1"> Don\'t show me this screen again on this computer and browser.  If you update your browser, you can get back to this page by selecting Visual Display when you login.</p>';
 		if (AMnoMathML || ASnoSVG) {
-			html += '<p><input type=submit name=recheck value="Recheck Setup"><input type=submit name=skip value="Continue with image-based display"></p>';
+			html += '<p><input type="submit" name="recheck" value="Recheck Setup"><input type="submit" name="skip" value="Continue with image-based display"></p>';
 		} else {
-			html += '<p><input type=submit name=isok value="Browser setup OK - Continue"></p>';
+			html += '<p><input type="submit" name="isok" value="Browser setup OK - Continue"></p>';
 		}
 			
 		setnode.innerHTML = html;

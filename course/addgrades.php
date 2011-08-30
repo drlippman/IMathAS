@@ -38,7 +38,7 @@
 	
 	if (isset($_GET['del']) && $isteacher) {
 		if (isset($_GET['confirm'])) {
-			$query = "DELETE FROM imas_grades WHERE gbitemid='{$_GET['del']}'";
+			$query = "DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid='{$_GET['del']}'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			$query = "DELETE FROM imas_gbitems WHERE id='{$_GET['del']}'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
@@ -85,7 +85,7 @@
 		}
 		if (count($keys)>0) {
 			$kl = implode(',',$keys);
-			$query = "SELECT userid FROM imas_grades WHERE gbitemid='{$_GET['gbitem']}' AND userid IN ($kl)";
+			$query = "SELECT userid FROM imas_grades WHERE gradetype='offline' AND gradetypeid='{$_GET['gbitem']}' AND userid IN ($kl)";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			while($row = mysql_fetch_row($result)) {
 				$_POST['score'][$row[0]] = $_POST['newscore'][$row[0]];
@@ -101,10 +101,10 @@
 			if (trim($k)=='') { continue;}
 			$sc = trim($sc);
 			if ($sc!='') {
-				$query = "UPDATE imas_grades SET score='$sc',feedback='{$_POST['feedback'][$k]}' WHERE userid='$k' AND gbitemid='{$_GET['gbitem']}'";
+				$query = "UPDATE imas_grades SET score='$sc',feedback='{$_POST['feedback'][$k]}' WHERE userid='$k' AND gradetype='offline' AND gradetypeid='{$_GET['gbitem']}'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			} else {
-				$query = "UPDATE imas_grades SET score=NULL,feedback='{$_POST['feedback'][$k]}' WHERE userid='$k' AND gbitemid='{$_GET['gbitem']}'";
+				$query = "UPDATE imas_grades SET score=NULL,feedback='{$_POST['feedback'][$k]}' WHERE userid='$k' AND gradetype='offline' AND gradetypeid='{$_GET['gbitem']}'";
 				//$query = "DELETE FROM imas_grades WHERE gbitemid='{$_GET['gbitem']}' AND userid='$k'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
@@ -115,12 +115,12 @@
 		foreach($_POST['newscore'] as $k=>$sc) {
 			if (trim($k)=='') {continue;}			
 			if ($sc!='') {
-				$query = "INSERT INTO imas_grades (gbitemid,userid,score,feedback) VALUES ";
-				$query .= "('{$_GET['gbitem']}','$k','$sc','{$_POST['feedback'][$k]}')";
+				$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,score,feedback) VALUES ";
+				$query .= "('offline','{$_GET['gbitem']}','$k','$sc','{$_POST['feedback'][$k]}')";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			} else if (trim($_POST['feedback'][$k])!='') {
-				$query = "INSERT INTO imas_grades (gbitemid,userid,score,feedback) VALUES ";
-				$query .= "('{$_GET['gbitem']}','$k',NULL,'{$_POST['feedback'][$k]}')";
+				$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,score,feedback) VALUES ";
+				$query .= "('offline','{$_GET['gbitem']}','$k',NULL,'{$_POST['feedback'][$k]}')";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 		}
@@ -374,7 +374,7 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 			$query .= "FROM imas_users,imas_students WHERE ";
 			$query .= "imas_users.id=imas_students.userid AND imas_students.courseid='$cid'";
 		} else {
-			$query = "SELECT userid,score,feedback FROM imas_grades WHERE gbitemid='{$_GET['gbitem']}' ";
+			$query = "SELECT userid,score,feedback FROM imas_grades WHERE gradetype='offline' AND gradetypeid='{$_GET['gbitem']}' ";
 			if ($_GET['grades']!='all') {
 				$query .= "AND userid='{$_GET['grades']}' ";
 			}

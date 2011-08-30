@@ -20,7 +20,7 @@ var doubleblankmathdelimiter = false; // if true,  x+1  is equal to `x+1`
 				      
 var noMathRender = false;
 //var separatetokens;// has been removed (email me if this is a problem)
-var isIE = document.createElementNS==null;
+var AMisIE = (navigator.appName.slice(0,9)=="Microsoft");// document.createElementNS==null;
 
 if (document.getElementById==null) 
   alert("This webpage requires a recent browser such as\
@@ -29,7 +29,7 @@ if (document.getElementById==null)
 // all further global variables start with "AM"
 
 function AMcreateElementXHTML(t) {
-  if (isIE) return document.createElement(t);
+  if (AMisIE) return document.createElement(t);
   else return document.createElementNS("http://www.w3.org/1999/xhtml",t);
 }
 
@@ -362,13 +362,13 @@ function AMinitSymbols() {
 var AMmathml = "http://www.w3.org/1998/Math/MathML";
 
 function AMcreateElementMathML(t) {
-  if (isIE) return document.createElement("m:"+t);
+  if (AMisIE) return document.createElement("m:"+t);
   else return document.createElementNS(AMmathml,t);
 }
 
 function AMcreateMmlNode(t,frag) {
 //  var node = AMcreateElementMathML(name);
-  if (isIE) var node = document.createElement("m:"+t);
+  if (AMisIE) var node = document.createElement("m:"+t);
   else var node = document.createElementNS(AMmathml,t);
   node.appendChild(frag);
   return node;
@@ -470,11 +470,11 @@ function AMgetSymbol(str) {
 
 function AMremoveBrackets(node) {
   var st;
-  if (node.nodeName=="mrow") {
+  if (node.nodeName=="mrow" || node.nodeName=="M:MROW") {
     st = node.firstChild.firstChild.nodeValue;
     if (st=="(" || st=="[" || st=="{") node.removeChild(node.firstChild);
   }
-  if (node.nodeName=="mrow") {
+  if (node.nodeName=="mrow" || node.nodeName=="M:MROW") {
     st = node.lastChild.firstChild.nodeValue;
     if (st==")" || st=="]" || st=="}") node.removeChild(node.lastChild);
   }
@@ -573,7 +573,7 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
 	node.appendChild(AMcreateMmlNode("mo",document.createTextNode(symbol.output)));
         return [node,result[1]];
       } else {                        // font change command
-        if (!isIE && typeof symbol.codes != "undefined") {
+        if (!AMisIE && typeof symbol.codes != "undefined") {
           for (i=0; i<result[0].childNodes.length; i++)
             if (result[0].childNodes[i].nodeName=="mi" || result[0].nodeName=="mi") {
               st = (result[0].nodeName=="mi"?result[0].firstChild.nodeValue:
@@ -822,7 +822,7 @@ function AMparseMath(str) {
   node = AMcreateMmlNode("math",node);
   if (showasciiformulaonhover)                      //fixed by djhsu so newline
     node.setAttribute("title",str.replace(/\s+/g," "));//does not show in Gecko
-  if (mathfontfamily != "" && (isIE || mathfontfamily != "serif")) {
+  if (mathfontfamily != "" && (AMisIE || mathfontfamily != "serif")) {
     var fnode = AMcreateElementXHTML("font");
     fnode.setAttribute("face",mathfontfamily);
     fnode.appendChild(node);
@@ -921,7 +921,7 @@ function AMprocessNode(n, linebreaks, spanclassAM) {
         st.indexOf(AMdelimiter1)!=-1)// || st.indexOf(AMdelimiter2)!=-1) 
       AMprocessNodeR(n,linebreaks);
   }
-  if (isIE) { //needed to match size and font of formula to surrounding text
+  if (AMisIE) { //needed to match size and font of formula to surrounding text
     frag = document.getElementsByTagName('math');
     for (var i=0;i<frag.length;i++) frag[i].update()
   }
@@ -940,7 +940,7 @@ function translate(spanclassAM) {
 
 AMinitSymbols();
 
-if (isIE) { // avoid adding MathPlayer info explicitly to each webpage
+if (AMisIE) { // avoid adding MathPlayer info explicitly to each webpage
   document.write("<object id=\"mathplayer\"\
   classid=\"clsid:32F66A20-7614-11D4-BD11-00104BD3F987\"></object>");
   document.write("<?import namespace=\"m\" implementation=\"#mathplayer\"?>");

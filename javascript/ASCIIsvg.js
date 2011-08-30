@@ -65,7 +65,7 @@ var csc = function(x) { return 1/Math.sin(x) };
 var cot = function(x) { return 1/Math.tan(x) };
 var xmin, xmax, ymin, ymax, xscl, yscl, 
     xgrid, ygrid, xtick, ytick, initialized;
-var isIE = document.createElementNS==null;
+var isOldIE = document.createElementNS==null;
 var picture, svgpicture, doc, width, height, a, b, c, d, i, n, p, t, x, y;
 var arcsec = function(x) { return arccos(1/x) };
 var arccsc = function(x) { return arcsin(1/x) };
@@ -117,12 +117,18 @@ function ran(a,b,n) {
 
 
 function myCreateElementXHTML(t) {
-  if (isIE) return document.createElement(t);
+  if (isOldIE) return document.createElement(t);
   else return document.createElementNS("http://www.w3.org/1999/xhtml",t);
 }
 
 
 function isSVGavailable() {
+  //WebKit got good at SVG after 531.22.7
+  if ((ver = navigator.userAgent.toLowerCase().match(/webkit\/(\d+)/))!=null) {
+		if (ver[1]>531) {
+			return null;
+		}
+  }
   if (navigator.product && navigator.product=='Gecko') {
 	   var rv = navigator.userAgent.toLowerCase().match(/rv:\s*([\d\.]+)/);
 	   if (rv!=null) {
@@ -133,14 +139,21 @@ function isSVGavailable() {
 	   if (rv!=null && 10000*rv[0]+100*rv[1]+1*rv[2]>=10800) return null;
 	   else return 1;
   }
-  else if (navigator.appName.slice(0,9)=="Microsoft")
-    try	{
-      var oSVG=eval("new ActiveXObject('Adobe.SVGCtl.3');");
-        return null;
-    } catch (e) {
-        return 1;
+  else if (navigator.appName.slice(0,9)=="Microsoft") {
+    version = parseFloat(navigator.appVersion.split("MSIE")[1]);
+    if (version >= 9) {
+    	    //IE9+ can do SVG
+	    return null;
+    } else {
+	    try	{
+	      var oSVG=eval("new ActiveXObject('Adobe.SVGCtl.3');");
+		return null;
+	    } catch (e) {
+		    
+		return 1;
+	    }
     }
-  else return 1;
+  } else return 1;
 }
 
 
@@ -157,7 +170,7 @@ function setText(st,id) {
 
 
 function myCreateElementSVG(t) {
-  if (isIE) return doc.createElement(t);
+  if (isOldIE) return doc.createElement(t);
   else return doc.createElementNS("http://www.w3.org/2000/svg",t);
 }
 
@@ -209,7 +222,7 @@ function switchTo(id) {
   stroke = "black"; // default line color
   fill = "none";    // default fill color
   marker = "none";
-  if ((picture.nodeName == "EMBED" || picture.nodeName == "embed") && isIE) {
+  if ((picture.nodeName == "EMBED" || picture.nodeName == "embed") && isOldIE) {
     svgpicture = picture.getSVGDocument().getElementById("root");
     doc = picture.getSVGDocument();
   } else {
@@ -335,7 +348,7 @@ function initPicture(x_min,x_max,y_min,y_max) {
   winymin = Math.max(border[3]-5,0);
   winymax = Math.min(height-border[1]+5,height);
 //  if (true ||picture.nodeName == "EMBED" || picture.nodeName == "embed") {
-    if (isIE) {
+    if (isOldIE) {
       svgpicture = picture.getSVGDocument().getElementById("root");
       while (svgpicture.childNodes.length()>5) 
         svgpicture.removeChild(svgpicture.lastChild); 
@@ -384,7 +397,7 @@ function initPicture(x_min,x_max,y_min,y_max) {
   node.setAttribute("height",height);
   node.setAttribute("style","stroke-width:1;fill:white");
   svgpicture.appendChild(node);
-  if (!isIE && picture.getAttribute("onmousemove")!=null) {
+  if (!isOldIE && picture.getAttribute("onmousemove")!=null) {
     svgpicture.addEventListener("mousemove", mousemove_listener, true);
     var st = picture.getAttribute("onmousemove");
     svgpicture.addEventListener("mousemove", eval(st.slice(0,st.indexOf("("))), true);
@@ -1244,7 +1257,7 @@ function drawPics() {
   
   
   for (index = 0; index < len; index++) {
-	  picture = ((!ASnoSVG && isIE) ? pictures[index] : pictures[0]);
+	  picture = ((!ASnoSVG && isOldIE) ? pictures[index] : pictures[0]);
   ///  for (index = len-1; index >=0; index--) {
 //	  picture = pictures[index];
 	  if (!ASnoSVG) {

@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 40;
+$latest = 42;
 
 
 @set_time_limit(0);
@@ -665,6 +665,64 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
 		}
+		if ($last<41) {
+			 $query = 'ALTER TABLE `imas_grades` CHANGE `gbitemid` `gradetypeid` INT(10) NOT NULL';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = 'ALTER TABLE `imas_grades` ADD `refid` INT(10) UNSIGNED NOT NULL DEFAULT \'0\'';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = 'ALTER TABLE `imas_grades` ADD `gradetype` VARCHAR(15) NOT NULL DEFAULT \'offline\'';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = "ALTER TABLE `imas_grades` ADD INDEX(`gradetypeid`);"; 
+			 $res = mysql_query($query);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			  $query = "ALTER TABLE `imas_grades` ADD INDEX(`gradetype`);"; 
+			 $res = mysql_query($query);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = "ALTER TABLE `imas_grades` ADD INDEX(`refid`);"; 
+			 $res = mysql_query($query);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = "SELECT id,forumid,userid,points FROM imas_forum_posts WHERE points IS NOT NULL";
+			 $res = mysql_query($query);
+			 $i = 0;
+			 while ($row = mysql_fetch_row($res)) {
+			 	 if ($i%500==0) {
+			 	 	 if ($i>0) {
+			 	 	 	 mysql_query($ins);
+			 	 	 } 
+			 	 	 $ins = "INSERT INTO imas_grades (gradetype,gradetypeid,refid,userid,score) VALUES ";
+			 	 } else {
+			 	 	 $ins .= ",";
+			 	 }
+			 	 $ins .= "('forum',{$row[1]},{$row[0]},{$row[2]},{$row[3]})"; 
+			 	 $i++;
+			 }
+			 if ($i>0) {
+			 	 mysql_query($ins);
+			 }
+		}
+		if ($last<42) {
+			$query = "ALTER TABLE `imas_questionset` ADD INDEX(`deleted`);"; 
+			 $res = mysql_query($query);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+		}
+		
 		$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {
 			echo '<p>Error: unable open upgradecounter.txt for writing</p>';
