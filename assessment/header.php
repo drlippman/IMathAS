@@ -38,7 +38,7 @@ if ($isdiag) {
 	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/assessment/print.css\" media=\"print\"/>\n";
 }
 if ($sessiondata['mathdisp']==1) {
-	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/ASCIIMathML.js?v=052510\"></script>\n";
+	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/ASCIIMathML_min.js?v=091311\"></script>\n";
 } else if ($sessiondata['mathdisp']==2) {
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>'; 
 	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?v=082911\" type=\"text/javascript\"></script>\n";
@@ -47,7 +47,7 @@ if ($sessiondata['mathdisp']==1) {
 }
 
 if ($sessiondata['graphdisp']==1) {
-	echo "<script src=\"$imasroot/javascript/ASCIIsvg.js?v=102510\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?v=091311\" type=\"text/javascript\"></script>\n";
 } else {
 	echo "<script src=\"$imasroot/javascript/mathjs.js?v=102510\" type=\"text/javascript\"></script>\n";
 }

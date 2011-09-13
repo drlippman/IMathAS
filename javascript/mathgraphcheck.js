@@ -62,7 +62,6 @@ if (!AMnoMathML && (AMisGecko>0)) {
 }
 
 function isSVGavailable() {
-	return null;
 //WebKit got good at SVG after 531.22.7
   if ((ver = navigator.userAgent.toLowerCase().match(/webkit\/(\d+)/))!=null) {
 		if (ver[1]>531) {
@@ -86,7 +85,6 @@ function isSVGavailable() {
   }
   else if (navigator.appName.slice(0,9)=="Microsoft") {
     version = parseFloat(navigator.appVersion.split("MSIE")[1]);
-    alert(version);
     if (version >= 9) {
     	    //IE 9+ can do SVG
 	    return null;

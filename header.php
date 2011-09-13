@@ -46,7 +46,7 @@ if (isset($ispublic) && $ispublic) {
 } else {
 if (!isset($sessiondata['mathdisp'])) {
 	echo '<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false;</script>';
-	echo "<script src=\"$imasroot/javascript/mathgraphcheck.js?v=082911\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/mathgraphcheck.js?v=091311\" type=\"text/javascript\"></script>\n";
 } else if ($sessiondata['mathdisp']==1) {
 	echo "<script src=\"$imasroot/javascript/ASCIIMathML.js?v=101210\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIIMath = true;</script>";

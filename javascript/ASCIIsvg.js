@@ -530,6 +530,43 @@ function loop(p,d,id) {
                p[1]+Math.sin(1.4)*d[0]+Math.cos(1.4)*d[1]],p);
 }
 
+function sector(center,radius,startang,endang,id) {
+	var node, v;
+	if (id!=null) node = doc.getElementById(id);
+	if (node==null) {
+		node = myCreateElementSVG("path");
+		node.setAttribute("id", id);
+		svgpicture.appendChild(node);
+	}
+	var arctype = 0;
+	if (Math.abs(endang-startang)>3.142) {
+		arctype = 1;
+	}
+	var angdir = 0;
+	if (endang<startang) {
+		angdir = 1;
+	}
+	var start = [center[0] + radius*Math.cos(startang), center[1] + radius*Math.sin(startang)];
+	var end = [center[0] + radius*Math.cos(endang), center[1] + radius*Math.sin(endang)];
+	
+	var pathstr = "M"+(center[0]*xunitlength+origin[0])+","+
+		(height-center[1]*yunitlength-origin[1])+
+		" L"+(start[0]*xunitlength+origin[0])+","+
+		(height-start[1]*yunitlength-origin[1])+ " A"+radius*xunitlength+","+
+		radius*yunitlength+" 0 "+arctype+","+angdir+" "+(end[0]*xunitlength+origin[0])+","+
+		(height-end[1]*yunitlength-origin[1]) + 
+		" z";
+	node.setAttribute("d",pathstr);
+	node.setAttribute("stroke-width", strokewidth);
+	node.setAttribute("stroke", stroke);
+	if (fill.substr(0,5)=='trans') {
+		node.setAttribute("fill", fill.substring(5));
+		node.setAttribute("fill-opacity",fillopacity);
+	} else {
+		node.setAttribute("fill", fill);
+	}
+}
+
 
 function arc(start,end,radius,id) { // coordinates in units
   var node, v;

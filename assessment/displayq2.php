@@ -1394,7 +1394,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 				$answerformat[] = "opendot";
 			}
 		} else {
-		$settings = array(-5,5,-5,5,1,1,300,300,"","");
+			$settings = array(-5,5,-5,5,1,1,300,300,"","");
 			$locky = 0;
 		}
 		if (isset($grid)) {
@@ -1411,8 +1411,14 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if ($answerformat[0]=='numberline') {
 			$settings[2] = 0;
 			$settings[3] = 0;
-			$sclinglbl = $settings[4];
-			$sclinggrid = 0;
+			if (strpos($settings[4],':')!==false) {
+				$settings[4] = explode(':',$settings[4]);
+				$sclinglbl = $settings[4][0];
+				$sclinggrid = $settings[4][1];
+			} else {
+				$sclinglbl = $settings[4];
+				$sclinggrid = 0;
+			}
 		} else {
 			if (strpos($settings[4],':')!==false) {
 				$settings[4] = explode(':',$settings[4]);
@@ -2781,7 +2787,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (substr($answerformat,0,10)=='numberline') {
 			$settings = array(-5,5,-0.5,0.5,1,0,300,50);
 		} else {
-		$settings = array(-5,5,-5,5,1,1,300,300);
+			$settings = array(-5,5,-5,5,1,1,300,300);
 		}
 		if (isset($grid)) {
 			if (!is_array($grid)) {

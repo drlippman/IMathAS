@@ -238,6 +238,9 @@ function processScript($script) {
 				case 'arc':
 					$this->ASarc($argarr);
 					break;
+				case 'sector':
+					$this->ASsector($argarr);
+					break;
 			}	
 		}
 	}
@@ -475,7 +478,7 @@ function ASinitPicture($arg) {
 }
 function ASaxes($arg) {
 	//$arg = explode(',',$arg);
-	$xscl = 0; $yscl = 0; $xgrid = 0; $ygrid = 0; $dolabels = false; $dogrid = false;
+	$xscl = 0; $yscl = 0; $xgrid = 0; $ygrid = 0; $dolabels = false; $dogrid = false; $dosmallticks = false;
 	$dox = true;
 	$doy = true;
 	if (is_numeric($arg[0])) {
@@ -518,6 +521,12 @@ function ASaxes($arg) {
 			$doy = false;
 		}
 	}
+	if (count($arg)>7) {
+		if ($arg[7]=='1') {
+			$dogrid = false;
+			$dosmallticks = true;
+		}
+	}
 	if ($xscl<0) {
 		$xscl *= -1;
 	}
@@ -547,7 +556,7 @@ function ASaxes($arg) {
 	} else {
 		$this->fontsize = min($xscl/2,$yscl/2,12);
 	}
-	$this->ticklength = $this->fontsize/4;
+	$this->ticklength = max($this->fontsize/4,4);
 	if ($this->usegd2) {
 		imagesetthickness($this->img,1);
 	}
@@ -587,6 +596,43 @@ function ASaxes($arg) {
 				}
 			}
 		}
+	} else if ($dosmallticks) {
+		if ($xgrid==0) {
+			$xgrid = $this->xunitlength;
+		} else {
+			$xgrid *= $this->xunitlength;
+		}
+		if ($ygrid==0) {
+			$ygrid = $this->yunitlength;
+		} else {
+			$ygrid *= $this->yunitlength;
+		}
+		$ac = $this->axescolor;
+		
+		if ($dox) {
+			for ($x=$this->origin[0]+($doy?$xgrid:0); $x<=$this->winxmax; $x += $xgrid) {
+				if ($x>=$this->winxmin) {
+					imageline($this->img,$x,$this->height-$this->origin[1]-.7*$this->ticklength,$x,$this->height-$this->origin[1]+.7*$this->ticklength,$this->$ac);
+				}
+			}
+			for ($x=$this->origin[0]-$xgrid; $x>=$this->winxmin; $x -= $xgrid) {
+				if ($x<=$this->winxmax) {
+					imageline($this->img,$x,$this->height-$this->origin[1]-.7*$this->ticklength,$x,$this->height-$this->origin[1]+.7*$this->ticklength,$this->$ac);
+				}
+			}
+		}
+		if ($doy) {
+			for ($y=$this->height - $this->origin[1]+($dox?$ygrid:0); $y<=$this->winymax; $y += $ygrid) {
+				if ($y>=$this->winymin) {
+					imageline($this->img,$this->origin[0]-.7*$this->ticklength,$y,$this->origin[0]+.7*$this->ticklength,$y,$this->$ac);
+				}
+			}
+			for ($y=$this->height - $this->origin[1]-$ygrid; $y>$this->winymin; $y -= $ygrid) {
+				if ($y<=$this->winymax) {
+					imageline($this->img,$this->origin[0]-.7*$this->ticklength,$y,$this->origin[0]+.7*$this->ticklength,$y,$this->$ac);
+				}
+			}
+		}
 	}
 	
 	$ac = $this->axescolor;
@@ -612,7 +658,7 @@ function ASaxes($arg) {
 			//ticks
 			for ($x=$this->origin[0]; $x<=$this->winxmax; $x += $xscl) {
 				if ($x>=$this->winxmin) {
-						imageline($this->img,$x,$this->height- $this->origin[1] -$this->ticklength,$x,$this->height- $this->origin[1] +$this->ticklength,$this->$ac);
+					imageline($this->img,$x,$this->height- $this->origin[1] -$this->ticklength,$x,$this->height- $this->origin[1] +$this->ticklength,$this->$ac);
 				}
 			}
 			for ($x=$this->origin[0]-$xscl; $x>=$this->winxmin; $x -= $xscl) {
@@ -762,7 +808,38 @@ function ASrect($arg) {
 		}
 	}
 }
-
+function ASsector($arg) {
+	list($cx,$cy) = $this->pt2arr($arg[0]);
+	$r = $this->evalifneeded($arg[1]);
+	$origstart = $this->evalifneeded($arg[2]);
+	$origend = $this->evalifneeded($arg[3]);
+	
+	if ($origend < $origstart) {
+		$startt = 2*M_PI - $origstart;
+		$endt = 2*M_PI - $origend;
+	} else {
+		$startt = 2*M_PI - $origend;
+		$endt = 2*M_PI - $origstart;
+	}
+	
+	$xdiam = 2*$r*$this->xunitlength;
+	$ydiam = 2*$r*$this->yunitlength;
+	 
+	if ($this->fill != 'none') {
+		$color = $this->fill;
+		imagefilledarc($this->img,$cx,$cy,$xdiam,$ydiam,$startt*180/M_PI,$endt*180/M_PI,$this->$color,IMG_ARC_PIE);
+	}
+	$color = $this->stroke;
+	if ($this->isdashed) {
+		imagefilledarc($this->img,$cx,$cy,$xdiam,$ydiam,$startt*180/M_PI,$endt*180/M_PI,IMG_COLOR_STYLED,IMG_ARC_PIE|IMG_ARC_NOFILL|IMG_ARC_EDGED);
+		
+	} else {
+		if ($color != 'none') {
+			imagefilledarc($this->img,$cx,$cy,$xdiam,$ydiam,$startt*180/M_PI,$endt*180/M_PI,$this->$color,IMG_ARC_PIE|IMG_ARC_NOFILL|IMG_ARC_EDGED);
+		}
+	}
+	
+}
 function ASarc($arg) {
 	$p = $this->pt2arr($arg[0]);
 	$q = $this->pt2arr($arg[1]);
@@ -786,7 +863,7 @@ function ASarc($arg) {
 	$ydiam = 2*$r*$this->yunitlength;
 	if ($this->fill != 'none') {
 		$color = $this->fill;
-		imagefilledarc($this->img,$cx,$cy,$xdiam,$ydiam,$startt*180/M_PI,$endt*180/M_PI,$this->$color);
+		imagefilledarc($this->img,$cx,$cy,$xdiam,$ydiam,$startt*180/M_PI,$endt*180/M_PI,$this->$color,IMG_ARC_PIE);
 	}
 	
 	if ($this->isdashed) {

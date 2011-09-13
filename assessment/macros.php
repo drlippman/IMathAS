@@ -143,7 +143,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		//$commands .= ');';
 	}
 	if ($noyaxis==true) {
-		$commands .= ',1,0);';
+		$commands .= ',1,0,1);';
 	} else {
 		$commands .= ');';
 	}
