@@ -1416,12 +1416,11 @@ function prettysigfig($a,$sigfig,$comma=',',$choptrailing=false) {
 	}
 	
 	$v = floor(-log10($a)-1e-12);
-	
 	if ($v+$sigfig < 0) {
 		return $sign.number_format(round($a,$v+$sigfig),0,'.',$comma);
 	} else {
 		$n = number_format($a,$v+$sigfig);
-		if ($choptrailing && abs($a - round($a,$v+$sigfig))<1e-12) {
+		if ($choptrailing && ($v+$sigfig > 0) && abs($a - round($a,$v+$sigfig))<1e-12) {
 			$n = rtrim($n,'0');
 			$n = rtrim($n,'.');
 		} else {
