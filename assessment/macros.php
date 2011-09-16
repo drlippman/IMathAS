@@ -57,6 +57,7 @@ function jointsort() {
 			$out[$i][] = $in[$i][$k];
 		}
 	}
+	$a = array_values($a);
 	array_unshift($out,$a);
 	return $out;
 }

@@ -124,7 +124,7 @@
 		
 		if (preg_match_all($search, $str, $res, PREG_SET_ORDER)){
 			foreach ($res as $resval) {
-				$tag = "<iframe width=\"{$resval[1]}\" height=\"{$resval[2]}\" src=\"{$resval[3]}\" />";
+				$tag = "<iframe width=\"{$resval[1]}\" height=\"{$resval[2]}\" src=\"{$resval[3]}\" ></iframe>";
 				$str = str_replace($resval[0], $tag, $str);
 			}
 		}
