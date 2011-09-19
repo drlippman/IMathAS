@@ -1117,7 +1117,8 @@ function singleshuffle($a) {
 	}
 	shuffle($a);
 	if (func_num_args()>1) {
-		return array_slice($a,0,func_get_arg(1));
+		$n = func_get_arg(1);
+		return array_slice($a,0,$n);
 	} else {
 		return $a;
 	}
