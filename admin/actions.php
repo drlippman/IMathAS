@@ -294,6 +294,14 @@ switch($_GET['action']) {
 			$query = "DELETE FROM imas_assessments WHERE courseid='{$_GET['id']}'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			
+			$query = "SELECT id FROM imas_drillassess WHERE courseid='{$_GET['id']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			while ($line = mysql_fetch_row($result)) {
+				$query = "DELETE FROM imas_drillassess_sessions WHERE drillassessid='{$line[0]}'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+			$query = "DELETE FROM imas_drillassess WHERE courseid='{$_GET['id']}'";
+			mysql_query($query) or die("Query failed : " . mysql_error());
 			
 			$query = "SELECT id FROM imas_forums WHERE courseid='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());

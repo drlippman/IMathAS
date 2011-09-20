@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 42;
+$latest = 43;
 
 
 @set_time_limit(0);
@@ -721,6 +721,39 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 if ($res===false) {
 				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
+		}
+		if ($last<43) {
+			$query = 'CREATE TABLE `imas_drillassess` (
+				`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+				`courseid` INT( 10 ) UNSIGNED NOT NULL ,
+				`itemdescr` TEXT NOT NULL ,
+				`itemids` TEXT NOT NULL ,
+				`scoretype` CHAR( 3 ) NOT NULL ,
+				`showtype` TINYINT( 1 ) UNSIGNED NOT NULL ,
+				`n` SMALLINT( 5 ) UNSIGNED NOT NULL ,
+				`classbests` TEXT NOT NULL ,
+				`showtostu` TINYINT( 1 ) UNSIGNED NOT NULL ,
+				INDEX ( `courseid` )
+				) ENGINE = InnoDB;';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			$query = 'CREATE TABLE `imas_drillassess_sessions` (
+				`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+				`drillassessid` INT( 10 ) UNSIGNED NOT NULL ,
+				`userid` INT( 10 ) UNSIGNED NOT NULL ,
+				`curitem` TINYINT( 3 ) NOT NULL ,
+				`seed` SMALLINT( 5 ) UNSIGNED NOT NULL ,
+				`curscores` TEXT NOT NULL ,
+				`starttime` INT( 10 ) UNSIGNED NOT NULL ,
+				`scorerec` TEXT NOT NULL ,
+				INDEX ( `drillassessid`), INDEX(`userid` )
+				) ENGINE = InnoDB;';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }		
 		}
 		
 		$handle = fopen("upgradecounter.txt",'w');

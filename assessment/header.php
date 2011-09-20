@@ -66,7 +66,7 @@ div { zoom: 1; }
 <script src="<?php echo $imasroot . "/javascript/AMhelpers_min.js?v=041511";?>" type="text/javascript"></script>
 <script src="<?php echo $imasroot . "/javascript/confirmsubmit.js";?>" type="text/javascript"></script>
 <!--[if lt IE 9]><script type="text/javascript" src="<?php echo $imasroot;?>/javascript/excanvas_min.js"></script><![endif]-->
-<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/drawing_min.js?v=070711"></script>
+<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/drawing_min.js?v=092011"></script>
 <?php
 echo "<script type=\"text/javascript\">imasroot = '$imasroot';</script>";
 if ($useeditor==1 && $sessiondata['useed']==1) {

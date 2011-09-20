@@ -699,6 +699,7 @@ function findnearpoint(thetarget,mouseOff) {
 			}
 		} else if (targets[thetarget].mode>=5 && targets[thetarget].mode<10) { //if in tpline mode
 			for (var i=0;i<tplines[thetarget].length;i++) { //check lines
+				if (tptypes[thetarget][i]!=targets[thetarget].mode) {continue;}
 				for (var j=tplines[thetarget][i].length-1; j>=0;j--) {
 					var dist = Math.pow(tplines[thetarget][i][j][0]-mouseOff.x,2) + Math.pow(tplines[thetarget][i][j][1]-mouseOff.y,2);
 					if (dist<25) {
@@ -717,29 +718,36 @@ function findnearpoint(thetarget,mouseOff) {
 			}
 		}
 	} else {
-		for (var i=0; i<dots[thetarget].length;i++) { //check dots
-			if (Math.pow(dots[thetarget][i][0]-mouseOff.x,2) + Math.pow(dots[thetarget][i][1]-mouseOff.y,2)<25) {
-				return [1,i];
-			}
-		}
-		for (var i=0; i<odots[thetarget].length;i++) { //check opendots
-			if (Math.pow(odots[thetarget][i][0]-mouseOff.x,2) + Math.pow(odots[thetarget][i][1]-mouseOff.y,2)<25) {
-				return [2,i];
-			}
-		}
-		for (var i=0;i<tplines[thetarget].length;i++) { //check lines
-			for (var j=tplines[thetarget][i].length-1; j>=0;j--) {
-				var dist = Math.pow(tplines[thetarget][i][j][0]-mouseOff.x,2) + Math.pow(tplines[thetarget][i][j][1]-mouseOff.y,2);
-				if (dist<25) {
-					return [tptypes[thetarget][i],i,j];
+		if (targets[thetarget].mode==1) {
+			for (var i=0; i<dots[thetarget].length;i++) { //check dots
+				if (Math.pow(dots[thetarget][i][0]-mouseOff.x,2) + Math.pow(dots[thetarget][i][1]-mouseOff.y,2)<25) {
+					return [1,i];
 				}
 			}
-		}
-		for (var i=0;i<ineqlines[thetarget].length;i++) { //check inqs
-			for (var j=ineqlines[thetarget][i].length-1; j>=0;j--) {
-				var dist = Math.pow(ineqlines[thetarget][i][j][0]-mouseOff.x,2) + Math.pow(ineqlines[thetarget][i][j][1]-mouseOff.y,2);
-				if (dist<25) {
-					return [ineqtypes[thetarget][i],i,j];
+		} else if (targets[thetarget].mode==2) {
+			for (var i=0; i<odots[thetarget].length;i++) { //check opendots
+				if (Math.pow(odots[thetarget][i][0]-mouseOff.x,2) + Math.pow(odots[thetarget][i][1]-mouseOff.y,2)<25) {
+					return [2,i];
+				}
+			}	
+		} else if (targets[thetarget].mode>=5 && targets[thetarget].mode<10) { //if in tpline mode
+			for (var i=0;i<tplines[thetarget].length;i++) { //check lines
+				for (var j=tplines[thetarget][i].length-1; j>=0;j--) {
+					if (tptypes[thetarget][i]!=targets[thetarget].mode) {continue;}
+					
+					var dist = Math.pow(tplines[thetarget][i][j][0]-mouseOff.x,2) + Math.pow(tplines[thetarget][i][j][1]-mouseOff.y,2);
+					if (dist<25) {
+						return [tptypes[thetarget][i],i,j];
+					}
+				}
+			}
+		} else if (targets[thetarget].mode>=10 && targets[thetarget].mode<11) { //if in ineqline mode
+			for (var i=0;i<ineqlines[thetarget].length;i++) { //check inqs
+				for (var j=ineqlines[thetarget][i].length-1; j>=0;j--) {
+					var dist = Math.pow(ineqlines[thetarget][i][j][0]-mouseOff.x,2) + Math.pow(ineqlines[thetarget][i][j][1]-mouseOff.y,2);
+					if (dist<25) {
+						return [ineqtypes[thetarget][i],i,j];
+					}
 				}
 			}
 		}

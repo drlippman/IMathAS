@@ -827,6 +827,35 @@ $sql = 'CREATE TABLE `mc_msgs` ('
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 echo 'mc_msgs created<br/>';
 
+$sql = 'CREATE TABLE `imas_drillassess` (
+	`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+	`courseid` INT( 10 ) UNSIGNED NOT NULL ,
+	`itemdescr` TEXT NOT NULL ,
+	`itemids` TEXT NOT NULL ,
+	`scoretype` CHAR( 3 ) NOT NULL ,
+	`showtype` TINYINT( 1 ) UNSIGNED NOT NULL ,
+	`n` SMALLINT( 5 ) UNSIGNED NOT NULL ,
+	`classbests` TEXT NOT NULL ,
+	`showtostu` TINYINT( 1 ) UNSIGNED NOT NULL ,
+	INDEX ( `courseid` )
+	) ENGINE = InnoDB;';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+echo 'imas_drillassess created<br/>';
+				
+$sql = 'CREATE TABLE `imas_drillassess_sessions` (
+	`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+	`drillassessid` INT( 10 ) UNSIGNED NOT NULL ,
+	`userid` INT( 10 ) UNSIGNED NOT NULL ,
+	`curitem` TINYINT( 3 ) NOT NULL ,
+	`seed` SMALLINT( 5 ) UNSIGNED NOT NULL ,
+	`curscores` TEXT NOT NULL ,
+	`starttime` INT( 10 ) UNSIGNED NOT NULL ,
+	`scorerec` TEXT NOT NULL ,
+	INDEX ( `drillassessid`), INDEX(`userid` )
+	) ENGINE = InnoDB;';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+echo 'imas_drillassess_sessions created<br/>';
+
 $md5pw = md5($password);
 $now = time();
 $sql = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email) VALUES ('$username','$md5pw',100,'$firstname','$lastname','$email')";
