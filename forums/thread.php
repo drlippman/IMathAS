@@ -32,6 +32,13 @@
 		while ($row = mysql_fetch_row($res)) {
 			$existingscores[$row[0]] = $row[1];
 		}
+		$postuserids = array();
+		$refids = "'".implode("','",array_keys($_POST['score']))."'";
+		$query = "SELECT id,userid FROM imas_forum_posts WHERE id IN ($refids)";
+		$res = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		while ($row = mysql_fetch_row($res)) {
+			$postuserids[$row[0]] = $row[1];
+		}
 		foreach($_POST['score'] as $k=>$v) {
 			if (isset($_POST['feedback'][$k])) {
 				$feedback = $_POST['feedback'][$k];
@@ -43,7 +50,7 @@
 					$query = "UPDATE imas_grades SET score='$v',feedback='$feedback' WHERE id='{$existingscores[$k]}'";
 				} else {
 					$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,refid,score,feedback) VALUES ";
-					$query .= "('forum','$forumid','$userid','$k','$v','$feedback')";
+					$query .= "('forum','$forumid','{$postuserids[$k]}','$k','$v','$feedback')";
 				}
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
 			} else {

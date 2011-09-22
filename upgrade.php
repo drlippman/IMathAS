@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 43;
+$latest = 44;
 
 
 @set_time_limit(0);
@@ -754,6 +754,16 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 if ($res===false) {
 				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }		
+		}
+		if ($last<44) {
+			//bug fix for wrong userid being recorded on forum grades
+			$query = "SELECT ig.id,ifp.userid FROM imas_grades AS ig JOIN imas_forum_posts AS ifp ";
+			$query .= "ON ig.gradetype='forum' AND ig.refid=ifp.id AND ifp.userid<>ig.userid";
+			$res = mysql_query($query);
+			while ($row = mysql_fetch_row($res)) {
+				$query = "UPDATE imas_grades SET userid={$row[1]} WHERE id={$row[0]}";
+				mysql_query($query);
+			}
 		}
 		
 		$handle = fopen("upgradecounter.txt",'w');

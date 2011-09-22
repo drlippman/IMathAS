@@ -87,13 +87,13 @@ if (isset($_GET['score'])) {
 	$query = "UPDATE imas_drillassess_sessions SET curscores='$scorelist',seed='$seed' WHERE id='{$sessdata['id']}'";
 	mysql_query($query) or die("Query failed : " . mysql_error());
 	if ($mode=='cntdown') {
-		$page_scoreMsg .= "<p>Current: ".countcorrect($curscores)." questions correct</p>";
+		$page_scoreMsg .= "<p>Current: ".countcorrect($curscores)." question(s) correct</p>";
 	} else if ($stopattype=='a') {
-		$page_scoreMsg .= "<p>Current: ".count($curscores)." questions attempted</p>";
+		$page_scoreMsg .= "<p>Current: ".count($curscores)." question(s) attempted</p>";
 	} else if ($stopattype=='c') {
-		$page_scoreMsg .= "<p>Current: ".countcorrect($curscores)." questions correct out of ".count($curscores)." attempts</p>";
+		$page_scoreMsg .= "<p>Current: ".countcorrect($curscores)." question(s) correct out of ".count($curscores)." attempt(s)</p>";
 	} else if ($stopattype=='s') {
-		$page_scoreMsg .= "<p>Current: ".countstreak($curscores)." question streak (correct in a row) out of ".count($curscores)." attempts</p>";
+		$page_scoreMsg .= "<p>Current: ".countstreak($curscores)." question streak (correct in a row) out of ".count($curscores)." attempt(s)</p>";
 	}
 	
 } else {
@@ -213,10 +213,10 @@ if ($mode == 'cntdown') {
 	$timelimitsec = $n - $timelimitmin*60;
 	echo 'Answer as many questions correctly as possible in ';
 	if ($timelimitmin>0) {
-		echo $timelimitmin . ' minutes ';
+		echo $timelimitmin . ' minute'. (($timelimitmin>1)?'s':'');
 	}
 	if ($timelimitsec>0) {
-		echo $timelimitsec .' seconds';
+		echo ' '.$timelimitsec .' second'. (($timelimitsec>1)?'s':'');
 	}
 } else {
 	if ($stopattype=='a') {
@@ -397,6 +397,8 @@ function dispscore($sc) {
 	global $torecord;
 	if ($torecord=='t') {
 		return formattime($sc);
+	} else if ($torecord=='cc') {
+		return $sc . ' correct';
 	} else {
 		return $sc . ' attempts';
 	}
