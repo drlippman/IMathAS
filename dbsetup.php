@@ -340,6 +340,7 @@ $sql = 'CREATE TABLE `imas_assessment_sessions` ('
 	. ' `reattempting` VARCHAR(255) NOT NULL, '
         . ' `starttime` INT(10) NOT NULL, '
 	. ' `endtime` INT(10) NOT NULL, '
+	. ' `timeontask` TEXT NOT NULL, '
 	. ' `bestseeds` TEXT NOT NULL, '
         . ' `bestscores` TEXT NOT NULL, '
 	. ' `bestattempts` TEXT NOT NULL, '
@@ -856,6 +857,16 @@ $sql = 'CREATE TABLE `imas_drillassess_sessions` (
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 echo 'imas_drillassess_sessions created<br/>';
 
+$sql = 'CREATE TABLE `imas_login_log` (
+	`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+	`userid` INT( 10 ) UNSIGNED NOT NULL ,
+	`courseid` INT( 10 ) UNSIGNED NOT NULL ,
+	`logintime` INT( 10 ) UNSIGNED NOT NULL ,
+	 INDEX(`userid` ), INDEX(`courseid`)
+	) ENGINE = InnoDB;';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+echo 'imas_login_log created<br/>';
+				
 $md5pw = md5($password);
 $now = time();
 $sql = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email) VALUES ('$username','$md5pw',100,'$firstname','$lastname','$email')";

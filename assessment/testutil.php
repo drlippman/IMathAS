@@ -384,7 +384,7 @@ function scorequestion($qn) {
 //records everything but questions array
 //if limit=true, only records lastanswers
 function recordtestdata($limit=false) { 
-	global $isreview,$bestscores,$bestattempts,$bestseeds,$bestlastanswers,$scores,$attempts,$seeds,$lastanswers,$testid,$testsettings,$sessiondata, $reattempting;
+	global $isreview,$bestscores,$bestattempts,$bestseeds,$bestlastanswers,$scores,$attempts,$seeds,$lastanswers,$testid,$testsettings,$sessiondata,$reattempting,$timesontask;
 	$bestscorelist = implode(',',$bestscores);
 	$bestattemptslist = implode(',',$bestattempts);
 	$bestseedslist = implode(',',$bestseeds);
@@ -398,6 +398,7 @@ function recordtestdata($limit=false) {
 	$lastanswers = str_replace('~','',$lastanswers);
 	$lalist = implode('~',$lastanswers);
 	$lalist = addslashes(stripslashes($lalist));
+	$timeslist = implode(',',$timesontask);
 	
 	$reattemptinglist = implode(',',$reattempting);
 	
@@ -411,11 +412,11 @@ function recordtestdata($limit=false) {
 		}
 	} else {
 		if ($limit) {
-			$query = "UPDATE imas_assessment_sessions SET lastanswers='$lalist' ";
+			$query = "UPDATE imas_assessment_sessions SET lastanswers='$lalist',timeontask='$timeslist' ";
 		} else {
 			$query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',seeds='$seedslist',lastanswers='$lalist',";
 			$query .= "bestseeds='$bestseedslist',bestattempts='$bestattemptslist',bestscores='$bestscorelist',bestlastanswers='$bestlalist',";
-			$query .= "endtime=$now,reattempting='$reattemptinglist' ";
+			$query .= "endtime=$now,reattempting='$reattemptinglist',timeontask='$timeslist' ";
 		}
 	}
 	if ($testsettings['isgroup']>0 && $sessiondata['groupid']>0 && !$isreview) {

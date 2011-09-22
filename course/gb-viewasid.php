@@ -484,6 +484,11 @@
 		
 		
 		$questions = explode(",",$line['questions']);
+		if ($line['timeontask']=='') {
+			$timesontask = array_fill(0,count($questions),'');
+		} else {
+			$timesontask = explode(',',$line['timeontask']);
+		}
 		if (isset($_GET['lastver'])) {
 			$seeds = explode(",",$line['seeds']);
 			$scores = explode(",",$line['scores']);
@@ -672,6 +677,17 @@
 							$cnt++;
 						}
 					}
+				}
+				if ($timesontask[$i]!='' && !isset($_GET['reviewver'])) {
+					echo '<br/>Average time per submission: ';
+					$timesarr = explode('~',$timesontask[$i]);
+					$avgtime = array_sum($timesarr)/count($timesarr);
+					if ($avgtime<60) {
+						echo round($avgtime,1) . ' seconds ';
+					} else {
+						echo round($avgtime/60,1) . ' minutes ';
+					}
+					echo '<br/>';
 				}
 			}
 			if ($isteacher) {

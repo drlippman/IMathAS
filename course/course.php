@@ -155,13 +155,6 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		$_GET['folder'] = '0';
 	}
 	
-	if (!isset($sessiondata['lastaccess'.$cid]) && !isset($teacherid)) {
-		$now = time();
-		$query = "UPDATE imas_students SET lastaccess='$now' WHERE userid='$userid' AND courseid='$cid'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
-		$sessiondata['lastaccess'.$cid] = $now;
-		writesessiondata();
-	}
 	//get exceptions
 	$now = time() + $previewshift;
 	$exceptions = array();

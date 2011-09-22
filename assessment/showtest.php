@@ -8,7 +8,6 @@
 	}
 	if (!isset($sessiondata['sessiontestid']) && !isset($teacherid) && !isset($studentid)) {
 		echo "<html><body>";
-
 		echo "You are not authorized to view this page.  If you are trying to reaccess a test you've already ";
 		echo "started, access it from the course page</body></html>\n";
 		exit;
@@ -286,6 +285,12 @@
 	$scores = explode(",",$line['scores']);
 	$attempts = explode(",",$line['attempts']);
 	$lastanswers = explode("~",$line['lastanswers']);
+	if ($line['timeontask']=='') {
+		$timesontask = array_fill(0,count($questions),'');
+	} else {
+		$timesontask = explode(',',$line['timeontask']);
+	}
+	
 	
 	if (trim($line['reattempting'])=='') {
 		$reattempting = array();
@@ -756,6 +761,7 @@
 			echo 'here.</p>';
 			echo '<form method="post" enctype="multipart/form-data" action="showtest.php?addgrpmem=true">';
 			echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
+			echo '<input type="hidden" name="disptime" value="'.time().'" />';
 			echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
 			for ($i=1;$i<$testsettings['groupmax']-count($curgrp)+1;$i++) {
 				echo '<br />Username: <select name="user'.$i.'">'.$selops.'</select> ';
@@ -912,6 +918,11 @@
 			//record scores
 			
 			$now = time();
+			if (isset($_POST['disptime']) && !$isreview) {
+				$used = $now - intval($_POST['disptime']);
+				$timesontask[0] .= (($timesontask[0]=='')?'':'~').$used;
+			}	
+					
 			if (isset($_POST['saveforlater'])) {
 				recordtestdata(true);
 				if ($GLOBALS['scoremessages'] != '') {
@@ -940,6 +951,10 @@
 				if ($_POST['verattempts']!=$attempts[$last]) {
 					echo "<p>The last question has been submittted since you viewed it, and that grade is shown below.  Your answer just submitted was not scored or recorded.</p>";
 				} else {
+					if (isset($_POST['disptime']) && !$isreview) {
+						$used = $now - intval($_POST['disptime']);
+						$timesontask[$last] .= (($timesontask[$last]=='')?'':'~').$used;
+					}
 					$GLOBALS['scoremessages'] = '';
 					$rawscore = scorequestion($last);
 					if ($GLOBALS['scoremessages'] != '') {
@@ -990,6 +1005,7 @@
 			if (!$done) { //can show next
 				echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=shownext&amp;score=$toshow\" onsubmit=\"return doonsubmit(this)\">\n";
 				echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
+				echo '<input type="hidden" name="disptime" value="'.time().'" />';
 				echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
 				basicshowq($toshow);
 				showqinfobar($toshow,true,true);
@@ -1007,6 +1023,10 @@
 				if ($_POST['verattempts']!=$attempts[$qn]) {
 					echo "<p>This question has been submittted since you viewed it, and that grade is shown below.  Your answer just submitted was not scored or recorded.</p>";
 				} else {
+					if (isset($_POST['disptime']) && !$isreview) {
+						$used = $now - intval($_POST['disptime']);
+						$timesontask[$qn] .= (($timesontask[$qn]=='')?'':'~').$used;
+					}
 					$GLOBALS['scoremessages'] = '';
 					$rawscore = scorequestion($qn);
 					
@@ -1092,6 +1112,7 @@
 					echo "<div class=inset>\n";
 					echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=skip&amp;score=$next\" onsubmit=\"return doonsubmit(this)\">\n";
 					echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
+					echo '<input type="hidden" name="disptime" value="'.time().'" />';
 					echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
 					echo "<a name=\"beginquestions\"></a>\n";
 					basicshowq($next);
@@ -1153,6 +1174,10 @@
 				if ($_POST['verattempts']!=$attempts[$qn]) {
 					echo "<p>The last question has been submitted since you viewed it, and that score is shown below. Your answer just submitted was not scored or recorded.</p>";
 				} else {
+					if (isset($_POST['disptime']) && !$isreview) {
+						$used = $now - intval($_POST['disptime']);
+						$timesontask[$qn] .= (($timesontask[$qn]=='')?'':'~').$used;
+					}
 					$GLOBALS['scoremessages'] = '';
 					$rawscore = scorequestion($qn);
 					//record score
@@ -1236,6 +1261,7 @@
 				
 				echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=seq&amp;score=$toshow\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
 				echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
+				echo '<input type="hidden" name="disptime" value="'.time().'" />';
 				echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
 				echo "<input type=hidden name=\"verattempts\" value=\"{$attempts[$toshow]}\" />";
 				
@@ -1313,6 +1339,7 @@
 			echo filter("<div class=intro>{$testsettings['intro']}</div>\n");
 			echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=scoreall\" onsubmit=\"return doonsubmit(this,true)\">\n";
 			echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
+			echo '<input type="hidden" name="disptime" value="'.time().'" />';
 			echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
 			$numdisplayed = 0;
 			for ($i = 0; $i < count($questions); $i++) {
@@ -1346,6 +1373,7 @@
 				echo filter("<div class=intro>{$testsettings['intro']}</div>\n");
 				echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=shownext&amp;score=$i\" onsubmit=\"return doonsubmit(this)\">\n";
 				echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
+				echo '<input type="hidden" name="disptime" value="'.time().'" />';
 				echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
 				basicshowq($i);
 				showqinfobar($i,true,true);
@@ -1372,6 +1400,7 @@
 				echo "<div class=inset>\n";
 				echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=skip&amp;score=$i\" onsubmit=\"return doonsubmit(this)\">\n";
 				echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
+				echo '<input type="hidden" name="disptime" value="'.time().'" />';
 				echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
 				echo "<a name=\"beginquestions\"></a>\n";
 				basicshowq($i);
@@ -1400,6 +1429,7 @@
 				echo filter("<div class=intro>{$testsettings['intro']}</div>\n");
 				echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=seq&amp;score=$i\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
 				echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
+				echo '<input type="hidden" name="disptime" value="'.time().'" />';
 				echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
 				echo "<input type=\"hidden\" name=\"verattempts\" value=\"{$attempts[$i]}\" />";
 				for ($i = 0; $i < count($questions); $i++) {

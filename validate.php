@@ -306,6 +306,16 @@ END;
 				echo "<p><a href=\"$imasroot/index.php\">Home</a></p>";
 				require("footer.php");
 				exit;
+			} else {
+				if (!isset($sessiondata['lastaccess'.$cid])) {
+					$now = time();
+					$query = "UPDATE imas_students SET lastaccess='$now' WHERE id=$studentid";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+					$sessiondata['lastaccess'.$cid] = $now;
+					writesessiondata();
+					$query = "INSERT INTO imas_login_log (userid,courseid,logintime) VALUES ($userid,'$cid',$now)";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+				}
 			}
 		} else {
 			$query = "SELECT id FROM imas_teachers WHERE userid='$userid' AND courseid='{$_GET['cid']}'";

@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 44;
+$latest = 45;
 
 
 @set_time_limit(0);
@@ -764,6 +764,24 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 				$query = "UPDATE imas_grades SET userid={$row[1]} WHERE id={$row[0]}";
 				mysql_query($query);
 			}
+		}
+		if ($last < 45) {
+			$query = 'ALTER TABLE `imas_assessment_sessions` ADD `timeontask` TEXT NOT NULL';
+			$res = mysql_query($query);
+			if ($res===false) {
+			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			}
+			$query = 'CREATE TABLE `imas_login_log` (
+				`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+				`userid` INT( 10 ) UNSIGNED NOT NULL ,
+				`courseid` INT( 10 ) UNSIGNED NOT NULL ,
+				`logintime` INT( 10 ) UNSIGNED NOT NULL ,
+				 INDEX(`userid` ), INDEX(`courseid`)
+				) ENGINE = InnoDB;';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
 		}
 		
 		$handle = fopen("upgradecounter.txt",'w');
