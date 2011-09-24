@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 45;
+$latest = 46;
 
 
 @set_time_limit(0);
@@ -782,7 +782,15 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 if ($res===false) {
 				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
+		}  
+		if ($last < 46) {
+			$query = 'ALTER TABLE `imas_questionset` ADD `avgtime` SMALLINT(5) UNSIGNED NOT NULL DEFAULT \'0\'';
+			$res = mysql_query($query);
+			if ($res===false) {
+			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			}
 		}
+		
 		
 		$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {
