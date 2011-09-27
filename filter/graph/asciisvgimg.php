@@ -241,6 +241,9 @@ function processScript($script) {
 				case 'sector':
 					$this->ASsector($argarr);
 					break;
+				case 'arrowhead':
+					$this->ASarrowhead($argarr[0],$argarr[1]);
+					break;
 			}	
 		}
 	}
@@ -737,7 +740,7 @@ function ASline($arg) {
 		$this->ASdot($q,8);
 	}
 	if ($this->marker=='arrow' || $this->marker=='arrowdot') {
-		$this->ASarrowhead($p,$q);
+		$this->ASarrowhead($arg[0],$arg[1]);
 	}
 }
 function ASpath($arg) {
@@ -938,7 +941,10 @@ function ASdot2($arg) {
 	}
 	*/	
 }
-function ASarrowhead($v,$w) {
+//function ASarrowhead($v,$w) {
+function ASarrowhead($p,$q) {
+	$v = $this->pt2arr($p);
+	$w = $this->pt2arr($q);
 	$u = array($w[0]-$v[0],$w[1]-$v[1]);
 	$d = sqrt($u[0]*$u[0]+$u[1]*$u[1]);
 	if ($d > 0.00000001) {
@@ -1112,7 +1118,7 @@ function ASplot($function) {
 	if (isset($function[5]) && $function[5]!='' && $function[5]!='null') {
 		if ($function[5]==1) {
 			//need pt2arr for xunit adjust
-			$this->ASarrowhead($this->pt2arr("{$fx[1]},{$fy[1]}"),$this->pt2arr("{$fx[0]},{$fy[0]}"));
+			$this->ASarrowhead("{$fx[1]},{$fy[1]}","{$fx[0]},{$fy[0]}");
 		} else if ($function[5]==2) {
 			$this->ASdot2(array("[{$fx[0]},{$fy[0]}]","open"));
 		} else if ($function[5]==3) {
@@ -1121,7 +1127,7 @@ function ASplot($function) {
 	}
 	if (isset($function[6]) && $function[6]!='' && $function[6]!='null') {
 		if ($function[6]==1) {
-			$this->ASarrowhead($this->pt2arr("{$fx[$stopat-2]},{$fy[$stopat-2]}"),$this->pt2arr("$x,$y"));
+			$this->ASarrowhead("{$fx[$stopat-2]},{$fy[$stopat-2]}","$x,$y");
 		} else if ($function[6]==2) {
 			$this->ASdot2(array("[$x,$y]","open"));
 		} else if ($function[6]==3) {

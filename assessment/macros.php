@@ -76,7 +76,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	$ymin = $settings[2];
 	$ymax = $settings[3];
 	$noyaxis = false;
-	if ($ymin==0 && $ymax==0) {
+	if ($ymin==0 && $ymax==0 && $ymin!='auto' && $ymax!='auto') {
 		$ymin = -0.5;
 		$ymax = 0.5;
 		$noyaxis = true;
@@ -287,6 +287,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		$py = null;
 		$pathstr = '';
 		$firstpoint = false;
+		$fx = array();  $fy = array();
 		for ($i = 0; $i<$stopat;$i++) {
 			if ($isparametric) {
 				$t = $xmin + $dx*$i + 1E-10;
@@ -300,6 +301,10 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				//echo $func.'<br/>';
 				$y = round($evalfunc($x),3);//round(eval("return ($func);"),3);
 				$alt .= "<tr><td>".($xmin + $dx*$i)."</td><td>$y</td></tr>";
+			}
+			if ($i<2 || $i==$stopat-2) {
+				$fx[$i] = $x;
+				$fy[$i] = $y;
 			}
 			
 			if (isNaN($y)) {
@@ -339,6 +344,12 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				if ($lastl == 0) {$pathstr .= "path([";} else { $pathstr .= ",";}
 				$pathstr .= "[$px,$py]";
 				$lastl++;
+				if ($py<$absymin) {
+					$absymin = $py;
+				}
+				if ($py>$absymax) {
+					$absymax = $py;
+				}
 			}
 			$px = $x;
 			$py = $y;
@@ -401,39 +412,19 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		} else if (isset($function[5]) && $function[5]=='closed') {
 			$path .= "dot([$x,$y],\"closed\");";
 			$alt .= "Closed dot at $x,$y";
+		} else if (isset($function[5]) && $function[5]=='arrow') {
+			$path .= "arrowhead([{$fx[$stopat-2]},{$fy[$stopat-2]}],[$x,$y]);";
+			$alt .= "Arrow at $x,$y";
 		}
 		if (isset($function[4]) && $function[4]=='open') {
-			if ($isparametric) {
-				$t = $xmin;
-				$x = round(eval("return ($xfunc);"),3);
-				$y = round(eval("return ($yfunc);"),3);
-			} else {
-				$x = $xmin; $y = round(eval("return ($func);"),4); 
-			}
-			$path .= "dot([$x,$y],\"open\");";
-			if ($y<$absymin) {
-				$absymin = $y;
-			}
-			if ($y>$absymax) {
-				$absymax = $y;
-			}
-			$alt .= "Open dot at $x,$y";
+			$path .= "dot([{$fx[0]},{$fy[0]}],\"open\");";
+			$alt .= "Open dot at {$fx[0]},{$fy[0]}";
 		} else if (isset($function[4]) && $function[4]=='closed') {
-			if ($isparametric) {
-				$t = $xmin;
-				$x = round(eval("return ($xfunc);"),3);
-				$y = round(eval("return ($yfunc);"),3);
-			} else {
-				$x = $xmin; $y = round(eval("return ($func);"),4); 
-			}
-			$path .= "dot([$x,$y],\"closed\");";
-			if ($y<$absymin) {
-				$absymin = $y;
-			}
-			if ($y>$absymax) {
-				$absymax = $y;
-			}
-			$alt .= "Closed dot at $x,$y";
+			$path .= "dot([{$fx[0]},{$fy[0]}],\"closed\");";
+			$alt .= "Closed dot at {$fx[0]},{$fy[0]}";
+		} else if (isset($function[4]) && $function[4]=='arrow') {
+			$path .= "arrowhead([{$fx[1]},{$fy[1]}],[{$fx[0]},{$fy[0]}]);";
+			$alt .= "Arrow at {$fx[0]},{$fy[0]}";
 		}
 		
 		$commands .= $path;

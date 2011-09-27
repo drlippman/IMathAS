@@ -6,7 +6,7 @@
 	if (isset($guestid)) {
 		$teacherid=$guestid;
 	}
-	if (!isset($sessiondata['sessiontestid']) && !isset($teacherid) && !isset($studentid)) {
+	if (!isset($sessiondata['sessiontestid']) && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 		echo "<html><body>";
 		echo "You are not authorized to view this page.  If you are trying to reaccess a test you've already ";
 		echo "started, access it from the course page</body></html>\n";
@@ -36,7 +36,7 @@
 		$adata = mysql_fetch_array($result, MYSQL_ASSOC);
 		$now = time();
 		
-		if ($adata['avail']==0 && !isset($teacherid)) {
+		if ($adata['avail']==0 && !isset($teacherid) && !isset($tutorid)) {
 			echo "Assessment is closed";
 			exit;
 		}
@@ -49,7 +49,7 @@
 					if ($now > $adata['startdate'] && $now<$adata['reviewdate']) {
 						$isreview = true;
 					} else {
-						if (!isset($teacherid)) {
+						if (!isset($teacherid) && !isset($tutorid)) {
 							echo "Assessment is closed";
 							exit;
 						}
@@ -63,7 +63,7 @@
 				if ($now > $adata['startdate'] && $now<$adata['reviewdate']) {
 					$isreview = true;
 				} else {
-					if (!isset($teacherid)) {
+					if (!isset($teacherid) && !isset($tutorid)) {
 						echo "Assessment is closed";
 						exit;
 					}
@@ -72,7 +72,7 @@
 		}
 		
 		//check for password
-		if (trim($adata['password'])!='' && !isset($teacherid)) { //has passwd
+		if (trim($adata['password'])!='' && !isset($teacherid) && !isset($tutorid)) { //has passwd
 			$pwfail = true;
 			if (isset($_POST['password'])) {
 				if (trim($_POST['password'])==trim($adata['password'])) {
@@ -122,7 +122,7 @@
 			$starttime = time();
 			
 			$stugroupid = 0;
-			if ($adata['isgroup']>0 && !$isreview && !isset($teacherid)) {
+			if ($adata['isgroup']>0 && !$isreview && !isset($teacherid) && !isset($tutorid)) {
 				$query = 'SELECT i_sg.id FROM imas_stugroups as i_sg JOIN imas_stugroupmembers as i_sgm ON i_sg.id=i_sgm.stugroupid ';
 				$query .= "WHERE i_sgm.userid='$userid' AND i_sg.groupsetid={$adata['groupsetid']}";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -172,7 +172,7 @@
 		
 			}
 			$sessiondata['isreview'] = $isreview;
-			if (isset($teacherid) || $actas) {
+			if (isset($teacherid) || isset($tutorid) || $actas) {
 				$sessiondata['isteacher']=true;
 			} else {
 				$sessiondata['isteacher']=false;
@@ -203,7 +203,7 @@
 			
 			$deffeedback = explode('-',$adata['deffeedback']);
 			//removed: $deffeedback[0] == "Practice" || 
-			if ($myrights<6 || isset($teacherid)) {  // is teacher or guest - delete out out assessment session
+			if ($myrights<6 || isset($teacherid) || isset($tutorid)) {  // is teacher or guest - delete out out assessment session
 				require_once("../includes/filehandler.php");
 				//deleteasidfilesbyquery(array('userid'=>$userid,'assessmentid'=>$aid),1);
 				deleteasidfilesbyquery2('userid',$userid,$aid,1);
@@ -215,7 +215,7 @@
 			//Return to test.
 			$sessiondata['sessiontestid'] = $line['id'];
 			$sessiondata['isreview'] = $isreview;
-			if (isset($teacherid) || $actas) {
+			if (isset($teacherid) || isset($tutorid) || $actas) {
 				$sessiondata['isteacher']=true;
 			} else {
 				$sessiondata['isteacher']=false;
@@ -229,7 +229,7 @@
 			
 			if ($adata['isgroup']==0 || $line['agroupid']>0) {
 				$sessiondata['groupid'] = $line['agroupid'];
-			} else if (!isset($teacherid)) { //isgroup>0 && agroupid==0
+			} else if (!isset($teacherid) && !isset($tutorid)) { //isgroup>0 && agroupid==0
 				//already has asid, but broken from group
 				$query = "INSERT INTO imas_stugroups (name,groupsetid) VALUES ('Unnamed group',{$adata['groupsetid']})";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());

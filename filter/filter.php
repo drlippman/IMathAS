@@ -72,7 +72,7 @@
 	}
 	
 	function filter($str) {
-		global $sessiondata;
+		global $sessiondata,$userfullname;
 		if (strip_tags($str)==$str) {
 			$str = str_replace("\n","<br/>\n",$str);
 		}
