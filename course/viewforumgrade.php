@@ -38,15 +38,17 @@
 				
 			}
 		}
-		foreach($_POST['score'] as $k=>$sc) {
-			if (trim($k)=='') {continue;}
-			$sc = trim($sc);
-			if ($sc!='') {
-				$query = "UPDATE imas_grades SET score='$sc',feedback='{$_POST['feedback'][$k]}' WHERE refid='$k' AND gradetype='forum' AND gradetypeid='$forumid' AND userid='$uid'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
-			} else {
-				$query = "DELETE FROM imas_grades WHERE refid='$k' AND gradetype='forum' AND gradetypeid='$forumid' AND userid='$uid'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+		if (isset($_POST['score'])) {
+			foreach($_POST['score'] as $k=>$sc) {
+				if (trim($k)=='') {continue;}
+				$sc = trim($sc);
+				if ($sc!='') {
+					$query = "UPDATE imas_grades SET score='$sc',feedback='{$_POST['feedback'][$k]}' WHERE refid='$k' AND gradetype='forum' AND gradetypeid='$forumid' AND userid='$uid'";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+				} else {
+					$query = "DELETE FROM imas_grades WHERE refid='$k' AND gradetype='forum' AND gradetypeid='$forumid' AND userid='$uid'";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+				}
 			}
 		}
 		foreach($_POST['newscore'] as $k=>$sc) {
