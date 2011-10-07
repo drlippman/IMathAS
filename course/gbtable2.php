@@ -792,11 +792,11 @@ function gbtable() {
 				$gb[$row][1][$col][0] = 'NC'; //score is No credit
 				$gb[$row][1][$col][3] = 1;  //no credit
 			}
-		} else 	if ($IP==1 && $thised>$now) {
+		} else 	if ($IP==1 && $thised>$now && (($timelimits[$i]==0) || ($timeused < $timelimits[$i]*$timelimitmult[$l['userid']]))) {
 			$gb[$row][1][$col][0] = $pts; //the score
 			$gb[$row][1][$col][3] = 2;  //in progress
 			$countthisone =true;
-		} else	if (($timelimits[$i]>0) &&($timeused > $timelimits[$i]*$timelimitmult[$l['userid']])) {
+		} else	if (($timelimits[$i]>0) && ($timeused > $timelimits[$i]*$timelimitmult[$l['userid']])) {
 			$gb[$row][1][$col][0] = $pts; //the score
 			$gb[$row][1][$col][3] = 3;  //over time
 		} else if ($assessmenttype[$i]=="Practice") {

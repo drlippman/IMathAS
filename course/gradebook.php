@@ -260,6 +260,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 		} else {
 			$placeinhead .= 'false);';
 			$headerslocked = false;
+			$usefullwidth = true;
 		}
 	}
 	$placeinhead .= "\nfunction lockcol() { \n";

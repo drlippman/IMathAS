@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=061010";?>" type="text/css" />
 <?php if (isset($coursetheme)) { 
-	if (isset($flexwidth)) {
+	if (isset($flexwidth) || isset($usefullwidth)) {
 		$coursetheme = str_replace('_fw','',$coursetheme);
 	}
 	?>

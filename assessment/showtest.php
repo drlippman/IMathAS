@@ -31,7 +31,7 @@
 		$aid = $_GET['id'];
 		$isreview = false;
 		
-		$query = "SELECT deffeedback,startdate,enddate,reviewdate,shuffle,itemorder,password,avail,isgroup,groupsetid,deffeedbacktext FROM imas_assessments WHERE id='$aid'";
+		$query = "SELECT deffeedback,startdate,enddate,reviewdate,shuffle,itemorder,password,avail,isgroup,groupsetid,deffeedbacktext,timelimit FROM imas_assessments WHERE id='$aid'";
 		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 		$adata = mysql_fetch_array($result, MYSQL_ASSOC);
 		$now = time();
@@ -94,7 +94,7 @@
 			}
 		}
 		
-		$query = "SELECT id,agroupid,lastanswers,bestlastanswers FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='{$_GET['id']}'";
+		$query = "SELECT id,agroupid,lastanswers,bestlastanswers,starttime FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='{$_GET['id']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$line = mysql_fetch_array($result, MYSQL_ASSOC);
 		
@@ -382,7 +382,7 @@
 	$superdone = false;
 	if ($isreview) {
 		if (isset($_POST['isreview']) && $_POST['isreview']==0) {
-			echo "Due date has passed.  Submission rejected.";
+			echo "Due date has passed.  Submission rejected. ";
 			leavetestmsg();
 			exit;
 		}
@@ -412,7 +412,7 @@
 		//check for past time limit, with some leniency for javascript timing.
 		//want to reject if javascript was bypassed
 		if ($timelimitremaining < -1*max(0.05*$testsettings['timelimit'],5)) {
-			echo "Time limit has expired.  Submission rejected";
+			echo "Time limit has expired.  Submission rejected. ";
 			leavetestmsg();
 			exit;
 		}
@@ -1305,6 +1305,16 @@
 				$hasreattempts = true;
 			}
 			$ptsearned += getpts($scores[$j]);
+		}
+		if ($testsettings['timelimit']>0 && !$isreview && !$superdone && $remaining < 0) {
+			echo '<script type="text/javascript">';
+			echo 'initstack.push(function() {';
+			if ($timelimitkickout) {
+				echo 'alert("Your time limit has expired.  If you try to submit any questions, your submissions will be rejected.");';
+			} else {
+				echo 'alert("Your time limit has expired.  If you submit any questions, your assessment will be marked overtime, and will have to be reviewed by your instructor.");';
+			}
+			echo '});</script>';
 		}
 		$testsettings['intro'] .= "<p>Total Points Possible: " . totalpointspossible($qi) . "</p>";
 		if ($testsettings['isgroup']>0) {
