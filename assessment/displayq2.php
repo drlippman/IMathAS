@@ -2411,7 +2411,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 		
 		//test for correct format, if specified
-		if (checkreqtimes($_POST["tc$qn"],$requiretimes)==0) {
+		if (checkreqtimes(str_replace(',','',$_POST["tc$qn"]),$requiretimes)==0) {
 			return 0; //$correct = false;
 		}
 		
@@ -3810,7 +3810,7 @@ function checkanswerformat($tocheck,$ansformats) {
 			if (in_array("reducedfraction",$ansformats) && strpos($tocheck,'/')!==false) {
 				$tocheck = str_replace(array('(',')'),'',$tocheck);
 				$tmpa = explode("/",$tocheck);
-				if (gcd(abs($tmpa[0]),abs($tmpa[1]))!=1) {
+				if (gcd(abs($tmpa[0]),abs($tmpa[1]))!=1 || $tmpa[1]==1) {
 					return false;
 				}
 			}

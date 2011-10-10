@@ -502,7 +502,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$page_libRowHeader = ($searchall==1) ? "<th>Library</th>" : "";
 			
 			if (isset($search)) {
-				$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_library_items.junkflag, imas_library_items.id AS libitemid ";
+				$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.avgtime,imas_library_items.junkflag, imas_library_items.id AS libitemid ";
 				$query .= "FROM imas_questionset,imas_library_items WHERE imas_questionset.deleted=0 AND $searchlikes "; //imas_questionset.description LIKE '%$safesearch%' ";
 				$query .= " (imas_questionset.ownerid='$userid' OR imas_questionset.userights>0) AND "; 
 				$query .= "imas_library_items.qsetid=imas_questionset.id ";
@@ -540,6 +540,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$page_questionTable = array();
 					$page_libstouse = array();
 					$page_libqids = array();
+					$page_useavgtimes = false;
 					
 					while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 						if ($newonly && in_array($line['id'],$existingq)) {
@@ -583,6 +584,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						}
 						$page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selq','qo$ln',{$line['id']},true,false)\"/>";
 						$page_questionTable[$i]['type'] = $line['qtype'];
+						if ($line['avgtime']>0) {
+							$page_useavgtimes = true;
+							$page_questionTable[$i]['avgtime'] = round($line['avgtime']/60,1);
+						} else {
+							$page_questionTable[$i]['avgtime'] = '';
+						}
 						if ($searchall==1) {
 							$page_questionTable[$i]['lib'] = "<a href=\"addquestions.php?cid=$cid&aid=$aid&listlib={$line['libid']}\">List lib</a>";
 						} else {
@@ -946,7 +953,9 @@ if ($overwriteBody==1) {
 			<thead>
 				<tr><th></th><th>Description</th><th></th><th>ID</th><th>Preview</th><th>Type</th>
 					<?php echo $page_libRowHeader ?>
-					<th>Times Used</th><th>Mine</th><th>Add</th><th>Source</th><th>Use as Template</th>
+					<th>Times Used</th>
+					<?php if ($page_useavgtimes) {?><th><span onmouseover="tipshow(this,'Average time, in minutes, this question has taken students')" onmouseout="tipout()">Avg Time</span></th><?php } ?>
+					<th>Mine</th><th>Add</th><th>Source</th><th>Use as Template</th>
 					<?php if ($searchall==0) { echo '<th><span onmouseover="tipshow(this,\'Flag a question if it is in the wrong library\')" onmouseout="tipout()">Wrong Lib</span></th>';} ?>
 				</tr>
 			</thead>
@@ -984,6 +993,7 @@ if ($overwriteBody==1) {
 						}
 ?>
 					<td class=c><?php echo $page_questionTable[$qid]['times'] ?></td>
+					<td class="c"><?php echo $page_questionTable[$qid]['avgtime'] ?></td>
 					<td><?php echo $page_questionTable[$qid]['mine'] ?></td>
 					<td class=c><?php echo $page_questionTable[$qid]['add'] ?></td>
 					<td><?php echo $page_questionTable[$qid]['src'] ?></td>
