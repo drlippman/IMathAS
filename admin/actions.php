@@ -219,17 +219,6 @@ switch($_GET['action']) {
 				$query = "INSERT INTO imas_teachers (userid,courseid) VALUES ('$userid','$cid')";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			//}
-			if (isset($CFG['CPS']['templateoncreate']) && isset($_POST['usetemplate']) && $_POST['usetemplate']>0) {
-				$query = "SELECT itemorder FROM imas_courses WHERE id='{$_POST['usetemplate']}'";
-				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-				$items = unserialize(mysql_result($result,0,0));
-				$newitems = array();
-				require("../includes/copyiteminc.php");
-				copyallsub($items,'0',$newitems,array());
-				$itemorder = addslashes(serialize($newitems));
-				$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
-			} 
 			$useweights = intval(isset($CFG['GBS']['useweights'])?$CFG['GBS']['useweights']:0);
 			$orderby = intval(isset($CFG['GBS']['orderby'])?$CFG['GBS']['orderby']:0);
 			$defgbmode = intval(isset($CFG['GBS']['defgbmode'])?$CFG['GBS']['defgbmode']:21);
@@ -237,6 +226,38 @@ switch($_GET['action']) {
 			
 			$query = "INSERT INTO imas_gbscheme (courseid,useweights,orderby,defgbmode,usersort) VALUES ('$cid',$useweights,$orderby,$defgbmode,$usersort)";
 			mysql_query($query) or die("Query failed : " . mysql_error());
+			
+			
+			if (isset($CFG['CPS']['templateoncreate']) && isset($_POST['usetemplate']) && $_POST['usetemplate']>0) {
+				$query = "SELECT useweights,orderby,defaultcat,defgbmode,stugbmode FROM imas_gbscheme WHERE courseid='{$_POST['usetemplate']}'";
+				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+				$row = mysql_fetch_row($result);
+				$query = "UPDATE imas_gbscheme SET useweights='{$row[0]}',orderby='{$row[1]}',defaultcat='{$row[2]}',defgbmode='{$row[3]}',stugbmode='{$row[4]}' WHERE courseid='$cid'";
+				mysql_query($query) or die("Query failed :$query " . mysql_error());
+				
+				$gbcats = array();
+				$query = "SELECT id,name,scale,scaletype,chop,dropn,weight FROM imas_gbcats WHERE courseid='{$_POST['usetemplate']}'";
+				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+				while ($row = mysql_fetch_row($result)) {
+					$query = "INSERT INTO imas_gbcats (courseid,name,scale,scaletype,chop,dropn,weight) VALUES ";
+					$frid = array_shift($row);
+					$irow = "'".implode("','",addslashes_deep($row))."'";
+					$query .= "('$cid',$irow)";
+					mysql_query($query) or die("Query failed :$query " . mysql_error());
+					$gbcats[$frid] = mysql_insert_id();
+				}
+				
+				$query = "SELECT itemorder FROM imas_courses WHERE id='{$_POST['usetemplate']}'";
+				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+				$items = unserialize(mysql_result($result,0,0));
+				$newitems = array();
+				require("../includes/copyiteminc.php");
+				copyallsub($items,'0',$newitems,$gbcats);
+				$itemorder = addslashes(serialize($newitems));
+				$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			} 
+			
 		}
 		break;
 	case "delete":
