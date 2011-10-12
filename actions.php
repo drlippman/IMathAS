@@ -63,6 +63,10 @@
 		} else {
 			$homelayout = '|0,1,2||0,1';
 		}
+		if (isset($_POST['courseselect']) && $_POST['courseselect']>0) {
+			$_POST['courseid'] = $_POST['courseselect'];
+			$_POST['ekey'] = '';
+		}
 		if (!isset($_GET['confirmed'])) {
 			$query = "SELECT SID FROM imas_users WHERE email='{$_POST['email']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -117,6 +121,7 @@
 			echo "instructor to reset your password or use the forgotten password link on the login page.</p>\n";
 			if (trim($_POST['courseid'])!='') {
 				$error = '';
+				
 				if (!is_numeric($_POST['courseid'])) {
 					$error = 'Invalid course id';
 				} else {

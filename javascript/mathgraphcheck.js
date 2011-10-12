@@ -62,11 +62,16 @@ if (!AMnoMathML && (AMisGecko>0)) {
 }
 
 function isSVGavailable() {
+//return null if we've got SVG
+
 //WebKit got good at SVG after 531.22.7
   if ((ver = navigator.userAgent.toLowerCase().match(/webkit\/(\d+)/))!=null) {
-		if (ver[1]>531) {
-			return null;
-		}
+  	  if (navigator.userAgent.toLowerCase().match(/android/)) {
+  	  	  return 1;  //Android still can't do SVG yet
+  	  }
+  	  if (ver[1]>531) {
+		return null;
+	  }
   }
 //Opera can do SVG, but not very pretty, so skip it 
 // } else if ((ver = navigator.userAgent.toLowerCase().match(/opera\/([\d\.]+)/))!=null) {

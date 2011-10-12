@@ -132,7 +132,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 		//$libitems is newlibid=>newqsetid
 		$query = "SELECT imas_library_items.qsetid,imas_library_items.libid FROM imas_library_items ";
 		$query .= "JOIN imas_questionset ON imas_library_items.qsetid=imas_questionset.id ";
-		$query .= "WHERE imas_library_items.libid IN ($liblist) ";
+		$query .= "WHERE imas_library_items.libid IN ($liblist) AND imas_library_items.junkflag=0 ";
 		if ($nonpriv) {
 			$query .= " AND imas_questionset.userights>0";
 		}
@@ -159,7 +159,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 		$imgfiles = array();
 		//first, lets pull any questions that have include__from so we can lookup backrefs
 		$query = "SELECT imas_questionset.* FROM imas_questionset,imas_library_items ";
-		$query .= "WHERE imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid IN ($liblist)";
+		$query .= "WHERE imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid IN ($liblist) AND imas_library_items.junkflag=0 ";
 		if ($nonpriv) {
 			$query .= " AND imas_questionset.userights>0";
 		}
@@ -185,7 +185,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 		}
 		
 		$query = "SELECT imas_questionset.* FROM imas_questionset,imas_library_items ";
-		$query .= "WHERE imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid IN ($liblist)";
+		$query .= "WHERE imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid IN ($liblist) AND imas_library_items.junkflag=0";
 		if ($nonpriv) {
 			$query .= " AND imas_questionset.userights>0";
 		}
