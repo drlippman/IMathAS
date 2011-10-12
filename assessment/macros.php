@@ -76,7 +76,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	$ymin = $settings[2];
 	$ymax = $settings[3];
 	$noyaxis = false;
-	if ($ymin==0 && $ymax==0 && $ymin!='auto' && $ymax!='auto') {
+	if (is_numeric($ymin) && is_numeric($ymax) && $ymin==0 && $ymax==0) {
 		$ymin = -0.5;
 		$ymax = 0.5;
 		$noyaxis = true;
