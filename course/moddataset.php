@@ -193,7 +193,8 @@
 			echo "<a href=\"manageqset.php?cid=$cid\">Return to Question Set Management</a>\n";
 		} else {
 			if ($frompot==1) {
-				echo "<a href=\"modquestion.php?qsetid=$qsetid&cid=$cid&aid={$_GET['aid']}\">Add Question to Assessment</a>  \n";
+				echo "<a href=\"modquestion.php?qsetid=$qsetid&cid=$cid&aid={$_GET['aid']}&process=true&usedef=true\">Add Question to Assessment using Defaults</a> | \n";
+				echo "<a href=\"modquestion.php?qsetid=$qsetid&cid=$cid&aid={$_GET['aid']}\">Add Question to Assessment</a> | \n";
 			}
 			echo "<a href=\"addquestions.php?cid=$cid&aid={$_GET['aid']}\">Return to Assessment</a>\n";
 		}

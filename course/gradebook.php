@@ -426,7 +426,8 @@ function gbstudisp($stu) {
 				echo '<a href="mailto:'.mysql_result($result,0,1).'">Email</a> | ';
 				echo "<a href=\"$imasroot/msgs/msglist.php?cid={$_GET['cid']}&add=new&to=$stu\">Message</a> | ";
 				echo "<a href=\"gradebook.php?cid={$_GET['cid']}&uid=$stu&massexception=1\">Make Exception</a> | ";
-				echo "<a href=\"listusers.php?cid={$_GET['cid']}&chgstuinfo=true&uid=$stu\">Change Info</a>";
+				echo "<a href=\"listusers.php?cid={$_GET['cid']}&chgstuinfo=true&uid=$stu\">Change Info</a> | ";
+				echo "<a href=\"viewloginlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">Login Log</a>";
 			}
 			$gbcomment = mysql_result($result,0,0);
 			$latepasses = mysql_result($result,0,2);

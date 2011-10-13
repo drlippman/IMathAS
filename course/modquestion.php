@@ -25,19 +25,29 @@ if (!(isset($teacherid))) {
 	$curBreadcrumb .= "Modify Question Settings";
 	
 	if ($_GET['process']== true) {
-		if (trim($_POST['points'])=="") {$points=9999;} else {$points = intval($_POST['points']);}
-		if (trim($_POST['attempts'])=="") {$attempts=9999;} else {$attempts = intval($_POST['attempts']);}
-		if (trim($_POST['penalty'])=="") {$penalty=9999;} else {$penalty = intval($_POST['penalty']);}
-		if ($penalty!=9999) {
-			if ($_POST['skippenalty']==10) {
-				$penalty = 'L'.$penalty;
-			} else if ($_POST['skippenalty']>0) {
-				$penalty = 'S'.$_POST['skippenalty'].$penalty;
+		if (isset($_GET['usedef'])) {
+			$points = 9999;
+			$attempts=9999;
+			$penalty=9999;
+			$regen = 0;
+			$showans = 0;
+			$rubric = 0;
+			$_POST['copies'] = 1;
+		} else {
+			if (trim($_POST['points'])=="") {$points=9999;} else {$points = intval($_POST['points']);}
+			if (trim($_POST['attempts'])=="") {$attempts=9999;} else {$attempts = intval($_POST['attempts']);}
+			if (trim($_POST['penalty'])=="") {$penalty=9999;} else {$penalty = intval($_POST['penalty']);}
+			if ($penalty!=9999) {
+				if ($_POST['skippenalty']==10) {
+					$penalty = 'L'.$penalty;
+				} else if ($_POST['skippenalty']>0) {
+					$penalty = 'S'.$_POST['skippenalty'].$penalty;
+				}
 			}
+			$regen = $_POST['regen'] + 3*$_POST['allowregen'];
+			$showans = $_POST['showans'];
+			$rubric = intval($_POST['rubric']);
 		}
-		$regen = $_POST['regen'] + 3*$_POST['allowregen'];
-		$showans = $_POST['showans'];
-		$rubric = intval($_POST['rubric']);
 		if (isset($_GET['id'])) { //already have id - updating
 			$query = "UPDATE imas_questions SET points='$points',attempts='$attempts',penalty='$penalty',regen='$regen',showans='$showans',rubric=$rubric ";
 			$query .= "WHERE id='{$_GET['id']}'";

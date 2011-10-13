@@ -246,7 +246,7 @@ switch($_GET['action']) {
 					mysql_query($query) or die("Query failed :$query " . mysql_error());
 					$gbcats[$frid] = mysql_insert_id();
 				}
-				
+				$copystickyposts = true;
 				$query = "SELECT itemorder FROM imas_courses WHERE id='{$_POST['usetemplate']}'";
 				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 				$items = unserialize(mysql_result($result,0,0));
@@ -256,6 +256,7 @@ switch($_GET['action']) {
 				$itemorder = addslashes(serialize($newitems));
 				$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
+				copyrubrics();
 			} 
 			
 		}

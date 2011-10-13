@@ -12,7 +12,12 @@ if (!isset($teacherid)) {
 
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n";
 if (isset($teacherid)) {
-	$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> ";
+	if (isset($_GET['from']) && $_GET['from']=='gb') {
+		$curBreadcrumb .= " &gt; <a href=\"gradebook.php?cid=$cid&stu=0\">Gradebook</a> ";
+		$curBreadcrumb .= " &gt; <a href=\"gradebook.php?cid=$cid&stu=$uid\">Student Detail</a> ";
+	} else {
+		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> ";
+	}
 }
 $curBreadcrumb .= "&gt; View Login Log\n";	
 $pagetitle = "View Login Log";
