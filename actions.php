@@ -265,6 +265,10 @@
 			echo "<html><body>\nError: Guests can't enroll in courses</body></html";
 			exit;
 		}
+		if (isset($_POST['courseselect']) && $_POST['courseselect']>0) {
+			$_POST['cid'] = $_POST['courseselect'];
+			$_POST['ekey'] = '';
+		}
 		if ($_POST['cid']=="" || !is_numeric($_POST['cid'])) {
 			echo "<html><body>\n";
 			echo "Please include Course ID.  <a href=\"forms.php?action=enroll$gb\">Try Again</a>\n";

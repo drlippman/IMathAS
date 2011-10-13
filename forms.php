@@ -201,12 +201,29 @@ switch($_GET['action']) {
 	case "enroll":
 		echo '<div id="headerforms" class="pagetitle"><h2>Enroll in a Course</h2></div>';
 		echo "<form method=post action=\"actions.php?action=enroll$gb\">";
-		echo '<span class=form><label for="cid">Course id:</label></span> 
-		<input class=form type=text size=6 id=cid name=cid><br class="form" />
-		<span class=form><label for="ekey">Enrollment key:</label></span> 
-		<input class=form type=text size=10 id="ekey" name="ekey"><br class="form" />
-		<div class=submit><input type=submit value="Sign Up"></div>
-		</form>';
+		if (isset($CFG['GEN']['selfenrolluser'])) {
+			echo '<p>Select the course you\'d like to enroll in</p>';
+			echo '<p><select id="courseselect" name="courseselect" onchange="courseselectupdate(this);">';
+			echo '<option value="0" selected="selected">My teacher gave me a course ID (enter below)</option>';
+			$query = "SELECT imas_courses.id,imas_courses.name FROM imas_courses JOIN imas_teachers ON ";
+			$query .= "imas_courses.id=imas_teachers.courseid WHERE imas_teachers.userid='{$CFG['GEN']['selfenrolluser']}' ORDER by imas_courses.name";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				echo '<option value="'.$row[0].'">'.$row[1].'</option>';
+			}
+			echo '</select></p>';
+			echo '<div id="courseinfo">';
+			echo '<script type="text/javascript"> function courseselectupdate(el) { var c = document.getElementById("courseinfo"); ';
+			echo 'if (el.value==0) {c.style.display="";} else {c.style.display="none";}}</script>';
+		} else {
+			echo '<p>If you already know your course ID, you can enter it now.  Otherwise, leave this blank and you can enroll later.</p>';
+		}
+		echo '<span class="form"><label for="cid">Course ID:</label></span><input class="form" type="text" size="20" name="cid"/><br class="form"/>';
+		echo '<span class="form"><label for="ekey">Enrollment Key:</label></span><input class="form" type="text" size="20" name="ekey"/><br class="form"/>';
+		if (isset($CFG['GEN']['selfenrolluser'])) {
+			echo '</div>';
+		}
+		echo '<div class=submit><input type=submit value="Sign Up"></div></form>';
 		break;
 	case "unenroll":
 		if (!isset($_GET['cid'])) { echo "Course ID not specified\n"; break;}

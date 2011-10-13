@@ -47,8 +47,11 @@ if (isset($_GET['modify'])) { //adding or modifying post
 					//$query = "UPDATE imas_forum_posts SET points='{$_POST['points']}' WHERE id='{$_GET['replyto']}'";
 					mysql_query($query) or die("Query failed : $query " . mysql_error());
 				} else {
+					$query = "SELECT userid FROM imas_forum_posts WHERE id='{$_GET['replyto']}'";
+					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+					$uid = mysql_result($result,0,0);
 					$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,refid,score) VALUES ";
-					$query .= "('forum','$forumid','$userid','{$_GET['replyto']}','{$_POST['points']}')";
+					$query .= "('forum','$forumid','$uid','{$_GET['replyto']}','{$_POST['points']}')";
 					mysql_query($query) or die("Query failed : $query " . mysql_error());
 				}
 			}
@@ -123,7 +126,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			if ($line['isanon']==1) {echo "checked=1";}
 			echo "></span><br class=form/>";
 		}
-		if ($isteacher && $haspoints) {
+		if ($isteacher && $haspoints && $_GET['modify']=='reply') {
 			echo '<span class="form">Points for message you\'re replying to:</span><span class="formright">';
 			echo '<input type="text" size="4" name="points" value="'.$points.'" /></span><br class="form" />';
 		}
@@ -166,6 +169,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 			printparents($_GET['replyto']);
 		}
+		echo '</form>';
 		require("../footer.php");
 		exit;
 	}
