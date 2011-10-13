@@ -159,7 +159,9 @@ echo '<div class=mainbody>';
 if (isset($insertinheaderwrapper)) {
 	//echo '<div class="headerwrapper">'.$insertinheaderwrapper.'</div>';
 }
-echo '<div class="headerwrapper">';
+if (!isset($flexwidth)) {
+	echo '<div class="headerwrapper">';
+}
 $curdir = rtrim(dirname(__FILE__), '/\\');
 if (isset($CFG['GEN']['headerinclude']) && !isset($flexwidth)) {
 	require("$curdir/../{$CFG['GEN']['headerinclude']}");
@@ -231,7 +233,9 @@ if (isset($cid) && !isset($flexwidth) && $sessiondata['isteacher'] && $coursetop
 	echo '<br class="clear" />';
 	echo '</div>';
 }
-echo '</div>';
+if (!isset($flexwidth)) {
+	echo '</div>';
+}
 echo '<div class="midwrapper">';
 
 

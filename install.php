@@ -80,14 +80,14 @@ if (!empty($_POST['sessionpath'])) {
 
 if (!empty($_POST['AWSkey']) && !empty($_POST['AWSsecret']) && !empty($_POST['AWSbucket'])) {
 	$contents .= "//Amazon S3 access for file upload \n
-\$AMWkey = \"{$_POST['AWSkey']}\";\n
-\$AMWsecret = \"{$_POST['AWSsecret']}\";\n
-\$AMWbucket = \"{$_POST['AWSbucket']}\";\n\n";
+\$AWSkey = \"{$_POST['AWSkey']}\";\n
+\$AWSsecret = \"{$_POST['AWSsecret']}\";\n
+\$AWSbucket = \"{$_POST['AWSbucket']}\";\n\n";
 } else {
 	$contents .= "//Amazon S3 access for file upload \n
-//\$AMWkey = \"{$_POST['AWSkey']}\";\n
-//\$AMWsecret = \"{$_POST['AWSsecret']}\";\n
-//\$AMWbucket = \"{$_POST['AWSbucket']}\";\n\n";
+//\$AWSkey = \"{$_POST['AWSkey']}\";\n
+//\$AWSsecret = \"{$_POST['AWSsecret']}\";\n
+//\$AWSbucket = \"{$_POST['AWSbucket']}\";\n\n";
 }
 	
 $contents .= '
