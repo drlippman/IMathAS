@@ -993,7 +993,7 @@ if ($overwriteBody==1) {
 						}
 ?>
 					<td class=c><?php echo $page_questionTable[$qid]['times'] ?></td>
-					<td class="c"><?php echo $page_questionTable[$qid]['avgtime'] ?></td>
+					<?php if ($page_useavgtimes) {?><td class="c"><?php echo $page_questionTable[$qid]['avgtime'] ?></td> <?php }?>
 					<td><?php echo $page_questionTable[$qid]['mine'] ?></td>
 					<td class=c><?php echo $page_questionTable[$qid]['add'] ?></td>
 					<td><?php echo $page_questionTable[$qid]['src'] ?></td>

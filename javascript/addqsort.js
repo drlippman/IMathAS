@@ -259,7 +259,7 @@ function generateTable() {
 					}
 					html += ms;
 					if (curisgroup) {
-						html += "</td><td colspan='"+(beentaken?8:9)+"'><b>Group</b> ";
+						html += "</td><td colspan='"+(beentaken?9:10)+"'><b>Group</b> ";
 						html += "Select <input type='text' size='3' id='grpn"+i+"' value='"+itemarray[i][0]+"' onblur='updateGrpN("+i+")'/> from group ";
 						html += "<select id='grptype"+i+"' onchange='updateGrpT("+i+")'><option value=0 ";
 						if (itemarray[i][1]==0) { 

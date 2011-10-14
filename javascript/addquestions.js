@@ -8,7 +8,13 @@ function moveitem(from) {
 }
 
 function previewq(formn,loc,qn,docheck,onlychk) {
-   var addr = previewqaddr+'&formn='+formn+'&loc='+loc+'&qsetid='+qn;
+   var addr = previewqaddr+'&qsetid='+qn;
+   if (formn!=null) {
+	    addr +='&formn='+formn;
+   }
+   if (loc!=null) {
+	   addr +='&loc='+loc;
+   }
    if (docheck) {
       addr += '&checked=1';
    }
@@ -34,6 +40,9 @@ function previewsel(formn) {
 function getnextprev(formn,loc,onlychk) {
 	var onlychk = (onlychk == null) ? false : true;
 	var form = document.getElementById(formn);
+	if (form==null) {
+		return null;
+	}
 	var prevl = 0; var nextl = 0; var found=false;
 	var prevq = 0; var nextq = 0;
 	var cntchecked = 0;  var remaining = 0;

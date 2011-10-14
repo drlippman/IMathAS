@@ -57,18 +57,26 @@ if (isset($_GET['record'])) {
 			$itemdescr[$k] = str_replace(',','',$v);
 		}
 	}
-	for ($i=count($itemdescr)-1;$i>=0;$i--) {
-		if (isset($_POST['delitem'][$i])) {
-			unset($itemids[$i]);
-			unset($itemdescr[$i]);
+	$newitemids = array();
+	$newitemdescr = array();
+	if (isset($_POST['order'])) {
+		asort($_POST['order']);
+		foreach ($_POST['order'] as $id=>$ord) {
+			if (!isset($_POST['delitem'][$id])) {
+				$newitemids[] = $itemids[$id];
+				$newitemdescr[] = $itemdescr[$id];
+			}
 		}
 	}
-	$itemids = array_values($itemids);
-	$itemdescr = array_values($itemdescr);
+	
+	$itemids = array_values($newitemids);
+	$itemdescr = array_values($newitemdescr);
 	$classbests = array();
 	$updatebests = false;
-	if (isset($_POST['idstoadd']) && trim($_POST['idstoadd'])!='') {
-		$toadd = explode(',',$_POST['idstoadd']);
+	//if (isset($_POST['idstoadd']) && trim($_POST['idstoadd'])!='') {
+	if (isset($_POST['nchecked'])) {
+		$toadd = $_POST['nchecked'];
+		//$toadd = explode(',',$_POST['idstoadd']);
 		foreach ($toadd as $k=>$v) {
 			$toadd[$k] = intval($v);
 			if ($toadd[$k]==0) {
@@ -115,9 +123,56 @@ if (isset($_GET['record'])) {
 		$query .= " WHERE id=$daid";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 	}
+	
+	if (isset($_POST['search'])) {
+		$safesearch = $_POST['search'];
+		$safesearch = str_replace(' and ', ' ',$safesearch);
+		$search = stripslashes($safesearch);
+		$search = str_replace('"','&quot;',$search);
+		$sessiondata['lastsearch'.$cid] = str_replace(" ","+",$safesearch);
+		if (isset($_POST['searchall'])) {
+			$searchall = 1;
+		} else {
+			$searchall = 0;
+		}
+		$sessiondata['searchall'.$cid] = $searchall;
+		if (isset($_POST['searchmine'])) {
+			$searchmine = 1;
+		} else {
+			$searchmine = 0;
+		}
+		if (isset($_POST['newonly'])) {
+			$newonly = 1;
+		} else {
+			$newonly = 0;
+		}
+		$sessiondata['searchmine'.$cid] = $searchmine;
+		writesessiondata();
+	}
+	if (isset($_POST['libs'])) {
+		if ($_POST['libs']=='') {
+			$_POST['libs'] = $userdeflib;
+		}
+		$searchlibs = $_POST['libs'];
+		//$sessiondata['lastsearchlibs'] = implode(",",$searchlibs);
+		$sessiondata['lastsearchlibs'.$aid] = $searchlibs;
+		writesessiondata();
+	} else if (isset($_GET['listlib'])) {
+		$searchlibs = $_GET['listlib'];
+		$sessiondata['lastsearchlibs'.$aid] = $searchlibs;
+		$searchall = 0;
+		$sessiondata['searchall'.$aid] = $searchall;
+		$sessiondata['lastsearch'.$aid] = '';
+		$searchlikes = '';
+		$search = '';
+		$safesearch = '';
+		writesessiondata();
+	}
+	
 	header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/adddrillassess.php?cid=$cid&daid=$daid");
 	exit;
 }
+
 
 $query = "SELECT id FROM imas_drillassess_sessions WHERE drillassessid=$daid";
 $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -127,13 +182,268 @@ if (mysql_num_rows($result)>0) {
 	$beentaken = false;
 }
 
+$placeinhead = "<script type=\"text/javascript\">
+		var previewqaddr = '$imasroot/course/testquestion.php?cid=$cid';
+		</script>";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addquestions.js\"></script>";
+$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/tablesorter.js"></script>';
+
 require("../header.php");
+
+/*  Get data for question searching */
+//remember search
+
+if (isset($sessiondata['lastsearch'.$cid])) {
+	$safesearch = str_replace("+"," ",$sessiondata['lastsearch'.$cid]);
+	$search = stripslashes($safesearch);
+	$search = str_replace('"','&quot;',$search);
+	$searchall = $sessiondata['searchall'.$cid];
+	$searchmine = $sessiondata['searchmine'.$cid];
+} else {
+	$search = '';
+	$searchall = 0;
+	$searchmine = 0;
+	$safesearch = '';
+}
+
+if (trim($safesearch)=='') {
+	$searchlikes = '';
+} else {
+	$searchterms = explode(" ",$safesearch);
+	$searchlikes = "((imas_questionset.description LIKE '%".implode("%' AND imas_questionset.description LIKE '%",$searchterms)."%') ";
+	if (substr($safesearch,0,3)=='id=') {
+		$searchlikes = "imas_questionset.id='".substr($safesearch,3)."' AND ";
+	} else if (is_numeric($safesearch)) {
+		$searchlikes .= "OR imas_questionset.id='$safesearch') AND ";
+	} else {
+		$searchlikes .= ") AND";
+	}
+}
+
+if (isset($sessiondata['lastsearchlibs'.$aid])) {
+	//$searchlibs = explode(",",$sessiondata['lastsearchlibs']);
+	$searchlibs = $sessiondata['lastsearchlibs'.$aid];
+} else {
+	$searchlibs = $userdeflib;
+}
+$llist = "'".implode("','",explode(',',$searchlibs))."'";
+
+echo '<script type="text/javascript">';
+echo "var curlibs = '$searchlibs';";
+echo '</script>';
+
+if (!$beentaken) {
+	//potential questions
+	$libsortorder = array();
+	if (substr($searchlibs,0,1)=="0") {
+		$lnamesarr[0] = "Unassigned";
+		$libsortorder[0] = 0;
+	}
+	
+	$query = "SELECT name,id,sortorder FROM imas_libraries WHERE id IN ($llist)";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	while ($row = mysql_fetch_row($result)) {
+		$lnamesarr[$row[1]] = $row[0];
+		$libsortorder[$row[1]] = $row[2];
+	}
+	$lnames = implode(", ",$lnamesarr);
+
+	$page_libRowHeader = ($searchall==1) ? "<th>Library</th>" : "";
+	
+	if (isset($search)) {
+		$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.avgtime,imas_library_items.junkflag, imas_library_items.id AS libitemid ";
+		$query .= "FROM imas_questionset,imas_library_items WHERE imas_questionset.deleted=0 AND $searchlikes "; //imas_questionset.description LIKE '%$safesearch%' ";
+		$query .= " (imas_questionset.ownerid='$userid' OR imas_questionset.userights>0) AND "; 
+		$query .= "imas_library_items.qsetid=imas_questionset.id ";
+		
+		if ($searchall==0) {
+			$query .= "AND imas_library_items.libid IN ($llist)";
+		}
+		if ($searchmine==1) {
+			$query .= " AND imas_questionset.ownerid='$userid'";
+		} else {
+			$query .= " AND (imas_library_items.libid > 0 OR imas_questionset.ownerid='$userid') "; 
+		}
+		$query .= " ORDER BY imas_library_items.libid,imas_library_items.junkflag,imas_questionset.id";
+		
+		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+		if (mysql_num_rows($result)==0) {
+			$noSearchResults = true;
+		} else {
+			$alt=0;
+			$lastlib = -1;
+			$i=0;
+			$page_questionTable = array();
+			$page_libstouse = array();
+			$page_libqids = array();
+			$page_useavgtimes = false;
+			
+			while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+				if ($newonly && in_array($line['id'],$itemids)) {
+					continue;
+				}
+				if (isset($page_questionTable[$line['id']])) {
+					continue;
+				}
+				if ($lastlib!=$line['libid'] && isset($lnamesarr[$line['libid']])) {
+					/*$page_questionTable[$i]['checkbox'] = "";
+					$page_questionTable[$i]['desc'] = "<b>".$lnamesarr[$line['libid']]."</b>";
+					$page_questionTable[$i]['preview'] = "";
+					$page_questionTable[$i]['type'] = "";
+					if ($searchall==1) 
+						$page_questionTable[$i]['lib'] = "";
+					$page_questionTable[$i]['times'] = "";
+					$page_questionTable[$i]['mine'] = "";
+					$page_questionTable[$i]['add'] = "";
+					$page_questionTable[$i]['src'] = "";
+					$page_questionTable[$i]['templ'] = "";
+					$lastlib = $line['libid'];
+					$i++;
+					*/
+					$page_libstouse[] = $line['libid'];
+					$lastlib = $line['libid'];
+					$page_libqids[$line['libid']] = array();
+					
+				} 
+				
+				if (isset($libsortorder[$line['libid']]) && $libsortorder[$line['libid']]==1) { //alpha
+					$page_libqids[$line['libid']][$line['id']] = $line['description'];
+				} else { //id
+					$page_libqids[$line['libid']][] = $line['id'];
+				}
+				$i = $line['id'];
+				$page_questionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . $line['id'] . "' id='qo$ln'>";
+				if (in_array($i,$itemids)) {
+					$page_questionTable[$i]['desc'] = '<span style="color: #999">'.filter($line['description']).'</span>';
+				} else {
+					$page_questionTable[$i]['desc'] = filter($line['description']);
+				}
+				$page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selform','qo$ln',{$line['id']},true,false)\"/>";
+				$page_questionTable[$i]['type'] = $line['qtype'];
+				if ($line['avgtime']>0) {
+					$page_useavgtimes = true;
+					$page_questionTable[$i]['avgtime'] = round($line['avgtime']/60,1);
+				} else {
+					$page_questionTable[$i]['avgtime'] = '';
+				}
+				if ($searchall==1) {
+					$page_questionTable[$i]['lib'] = "<a href=\"addquestions.php?cid=$cid&aid=$aid&listlib={$line['libid']}\">List lib</a>";
+				} else {
+					$page_questionTable[$i]['junkflag'] = $line['junkflag'];
+					$page_questionTable[$i]['libitemid'] = $line['libitemid'];
+				}
+				if ($line['extref']!='') {
+					$extref = explode('~~',$line['extref']);
+					$hasvid = false;  $hasother = false;
+					foreach ($extref as $v) {
+						if (substr($v,0,5)=="Video" || strpos($v,'youtube.com')!==false) {
+							$hasvid = true;
+						} else {
+							$hasother = true;
+						}
+					}
+					$page_questionTable[$i]['extref'] = '';
+					if ($hasvid) {
+						$page_questionTable[$i]['extref'] .= "<img src=\"$imasroot/img/video_tiny.png\"/>";
+					}
+					if ($hasother) {
+						$page_questionTable[$i]['extref'] .= "<img src=\"$imasroot/img/html_tiny.png\"/>";
+					}
+				}
+				
+				/*$query = "SELECT COUNT(id) FROM imas_questions WHERE questionsetid='{$line['id']}'";
+				$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
+				$times = mysql_result($result2,0,0);
+				$page_questionTable[$i]['times'] = $times;
+				*/
+				$page_questionTable[$i]['times'] = 0;
+				
+				if ($line['ownerid']==$userid) { 
+					if ($line['userights']==0) {
+						$page_questionTable[$i]['mine'] = "Private";
+					} else {
+						$page_questionTable[$i]['mine'] = "Yes";
+					}
+				} else {
+					$page_questionTable[$i]['mine'] = "";
+				}							
+				
+				
+				$page_questionTable[$i]['add'] = "<a href=\"modquestion.php?qsetid={$line['id']}&aid=$aid&cid=$cid\">Add</a>";
+				
+				if ($line['userights']>2 || $line['ownerid']==$userid) {
+					$page_questionTable[$i]['src'] = "<a href=\"moddataset.php?id={$line['id']}&aid=$aid&cid=$cid&frompot=1\">Edit</a>";
+				} else { 
+					$page_questionTable[$i]['src'] = "<a href=\"viewsource.php?id={$line['id']}&aid=$aid&cid=$cid\">View</a>";
+				}							
+				
+				$page_questionTable[$i]['templ'] = "<a href=\"moddataset.php?id={$line['id']}&aid=$aid&cid=$cid&template=true\">Template</a>";						
+				//$i++;
+				$ln++;
+					
+			} //end while
+			
+			//pull question useage data
+			if (count($page_questionTable)>0) {
+				$allusedqids = implode(',', array_keys($page_questionTable));
+				$query = "SELECT questionsetid,COUNT(id) FROM imas_questions WHERE questionsetid IN ($allusedqids) GROUP BY questionsetid";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				while ($row = mysql_fetch_row($result)) {
+					$page_questionTable[$row[0]]['times'] = $row[1];
+				}
+			}
+			
+			//sort alpha sorted libraries
+			foreach ($page_libstouse as $libid) {
+				if ($libsortorder[$libid]==1) {
+					natcasesort($page_libqids[$libid]);
+					$page_libqids[$libid] = array_keys($page_libqids[$libid]);
+				}
+			}
+			if ($searchall==1) {
+				$page_libstouse = array_keys($page_libqids);
+			}
+			
+		}
+	}
+
+}
+
+
+
+
 ?>
 <script type="text/javascript">
-function previewq(formn,loc,qn) {
-	var addr = '<?php echo $imasroot ?>/course/testquestion.php?cid=<?php echo $cid ?>&checked=0&qsetid='+qn;
-	previewpop = window.open(addr,'Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20));
-	previewpop.focus();
+
+function updateorder(el) {
+	var tomove = el.parentNode.parentNode;
+	var tbl = document.getElementById("usedqtable").getElementsByTagName("tbody")[0];
+	var trs = tbl.getElementsByTagName("tr");
+	var n = 0;
+	for (var i=0;i<trs.length;i++) {
+		if (trs[i]==tomove) {
+			n = i;
+			break;
+		}
+	}
+	var cnt = trs.length;
+	var moveto = el.value*1;
+	if (moveto<=n) {
+		var dest = trs[moveto];
+	} else if (moveto+1 < cnt) {
+		var dest = trs[moveto+1];
+	} 
+	
+	tbl.removeChild(tomove);
+	if (cnt==moveto+1) {
+		tbl.appendChild(tomove);
+	} else {
+		tbl.insertBefore(tomove,dest);
+	}
+	var sel = tbl.getElementsByTagName("select");
+	for (var i=0;i<sel.length;i++) {
+		sel[i].selectedIndex = i;
+	}
 }
 </script>
 <?php
@@ -164,25 +474,148 @@ echo '<input type="checkbox" name="showlast" '.getHtmlChecked($showtostu&1,1).'/
 echo '<input type="checkbox" name="showpbest" '.getHtmlChecked($showtostu&2,2).'/> Show personal best score. ';
 echo '<input type="checkbox" name="showcbest" '.getHtmlChecked($showtostu&4,4).'/> Show class best score.</p>';
 
-echo '<table>';
-echo '<tr><th>Description</th><th>Preview</th>';
+echo '<table id="usedqtable">';
+echo '<tr><th></th><th>Description</th><th>Preview</th>';
 if (!$beentaken) {echo '<th>Delete?</th>';}
 echo '</tr>';
+function generateselect($cnt,$i) {
+	echo "<select name=\"order[$i]\" onchange=\"updateorder(this)\">";
+	for ($j=1;$j<$cnt+1;$j++) {
+		echo "<option value=\"$j\" ";
+		if ($j==$i+1) {echo 'selected="selected" ';}
+		echo '>'.($j).'</option>';
+	}
+	echo '</select>';
+}
 foreach ($itemids as $k=>$id) {
-	echo '<tr>';
-	echo '<td><input type="text" size="60" name="descr['.$k.']" value="'.$itemdescr[$k].'"/></td>';
-	echo "<td><input type=button value=\"Preview\" onClick=\"previewq('selform',$k,{$itemids[$k]})\"/></td>";
+	echo '<tr id="row'.$k.'"><td>';
+	generateselect(count($itemids),$k);
+	echo '</td><td><input type="text" size="60" name="descr['.$k.']" value="'.$itemdescr[$k].'"/></td>';
+	echo "<td><input type=button value=\"Preview\" onClick=\"previewq(null,$k,{$itemids[$k]})\"/></td>";
 	if (!$beentaken) {
-		echo '<td><input type="checkbox" name="delitem['.$k.']"/></td>';
+		echo '<td><input type="checkbox" name="delitem['.$k.']" value="1"/></td>';
 	}
 	echo '</tr>';
 }
 echo '<table>';
+ echo '<input type="submit" value="Update"/>';
 if (!$beentaken) {
+?>	
+	
+	<h3>Potential Questions</h3>
+	
+		In Libraries: 
+		<span id="libnames"><?php echo $lnames ?></span>
+		<input type=hidden name="libs" id="libs"  value="<?php echo $searchlibs ?>">
+		<input type="button" value="Select Libraries" onClick="GB_show('Library Select','libtree2.php?libtree=popup&libs='+curlibs,500,500)" />
+		<br> 
+		Search: 
+		<input type=text size=15 name=search value="<?php echo $search ?>"> 
+		<span onmouseover="tipshow(this,'Search all libraries, not just selected ones')" onmouseout="tipout()">
+		<input type=checkbox name="searchall" value="1" <?php writeHtmlChecked($searchall,1,0) ?> />
+		Search all libs</span> 
+		<span onmouseover="tipshow(this,'List only questions I own')" onmouseout="tipout()">
+		<input type=checkbox name="searchmine" value="1" <?php writeHtmlChecked($searchmine,1,0) ?> />
+		Mine only</span> 
+		<span onmouseover="tipshow(this,'Exclude questions already in assessment')" onmouseout="tipout()">
+		<input type=checkbox name="newonly" value="1" <?php writeHtmlChecked($newonly,1,0) ?> />
+		Exclude added</span> 
+		<input type=submit value=Search>
+		<input type=button value="Add New Question" onclick="window.location='moddataset.php?aid=<?php echo $aid ?>&cid=<?php echo $cid ?>'">
+	
+	<br/>
+<?php			
+			if ($searchall==1 && trim($search)=='') {
+				echo "Must provide a search term when searching all libraries";
+			} elseif (isset($search)) {
+				if ($noSearchResults) {
+					echo "<p>No Questions matched search</p>\n";
+				} else {
+?>				
+		
+		
+		Check: <a href="#" onclick="return chkAllNone('selq','nchecked[]',true)">All</a> <a href="#" onclick="return chkAllNone('selq','nchecked[]',false)">None</a>
+		<input name="add" type=submit value="Add Selected" />
+		
+		<table cellpadding="5" id="myTable" class="gb" style="clear:both; position:relative;">
+			<thead>
+				<tr><th></th><th>Description</th><th></th><th>ID</th><th>Preview</th><th>Type</th>
+					<?php echo $page_libRowHeader ?>
+					<th>Times Used</th>
+					<?php if ($page_useavgtimes) {?><th><span onmouseover="tipshow(this,'Average time, in minutes, this question has taken students')" onmouseout="tipout()">Avg Time</span></th><?php } ?>
+					<th>Mine</th><th>Add</th><th>Source</th><th>Use as Template</th>
+					<?php if ($searchall==0) { echo '<th><span onmouseover="tipshow(this,\'Flag a question if it is in the wrong library\')" onmouseout="tipout()">Wrong Lib</span></th>';} ?>
+				</tr>
+			</thead>
+			<tbody>
+<?php					
+				$alt=0;
+				for ($j=0; $j<count($page_libstouse); $j++) {
+					
+					if ($searchall==0) {
+						if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
+						echo '<td></td>';
+						echo '<td>';
+						echo '<b>'.$lnamesarr[$page_libstouse[$j]].'</b>';
+						echo '</td>';
+						for ($k=0;$k<9;$k++) {echo '<td></td>';}
+						echo '</tr>';
+					}
+					
+					for ($i=0;$i<count($page_libqids[$page_libstouse[$j]]); $i++) {
+						$qid =$page_libqids[$page_libstouse[$j]][$i];
+						if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
+?>						
+
+					<td><?php echo $page_questionTable[$qid]['checkbox'] ?></td>
+					<td><?php echo $page_questionTable[$qid]['desc'] ?></td>
+					<td class="nowrap"><?php echo $page_questionTable[$qid]['extref'] ?></td>
+					<td><?php echo $qid ?></td>
+					<td><?php echo $page_questionTable[$qid]['preview'] ?></td>
+					<td><?php echo $page_questionTable[$qid]['type'] ?></td>
+<?php
+						if ($searchall==1) {
+?>					
+					<td><?php echo $page_questionTable[$qid]['lib'] ?></td>
+<?php
+						}
+?>
+					<td class=c><?php echo $page_questionTable[$qid]['times'] ?></td>
+					<?php if ($page_useavgtimes) {?><td class="c"><?php echo $page_questionTable[$qid]['avgtime'] ?></td> <?php }?>
+					<td><?php echo $page_questionTable[$qid]['mine'] ?></td>
+					<td class=c><?php echo $page_questionTable[$qid]['add'] ?></td>
+					<td><?php echo $page_questionTable[$qid]['src'] ?></td>
+					<td class=c><?php echo $page_questionTable[$qid]['templ'] ?></td>
+					<?php if ($searchall==0) {
+						if ($page_questionTable[$qid]['junkflag']==1) {
+							echo "<td class=c><img class=\"pointer\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" /></td>";
+						} else {
+							echo "<td class=c><img class=\"pointer\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" /></td>";
+						}
+					} ?>
+				</tr>
+<?php
+					}
+				}
+?>					
+			</tbody>
+		</table>
+		<p>Questions <span style="color:#999">in gray</span> have been added to the assessment.</p>
+		<script type="text/javascript">
+			initSortTable('myTable',Array(false,'S','N',false,'S',<?php echo ($searchall==1) ? "false, " : ""; ?>'N','S',false,false,false<?php echo ($searchall==0) ? ",false" : ""; ?>),true);
+		</script>
+	
+	
+<?php 					
+				}
+			}
+		}
+/*if (!$beentaken) {
 	echo '<p>Add more questions (list ids separated by commas): <input type="text" name="idstoadd" value="" /></p>';
 }
 
 echo '<input type="submit" value="Update"/>';
+*/
 echo '</form>';
 if ($daid>0) {
 	$url = 'http://' . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/drillassess.php?cid=$cid&amp;daid=$daid";

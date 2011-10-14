@@ -112,7 +112,7 @@ if ($overwriteBody==1) {
 		echo "var numchked = -1;";
 		echo "if (window.opener && !window.opener.closed) {";
 		echo $page_onlyChkMsg;
-		echo "	  if (prevnext[0][1]>0){
+		echo "  if (prevnext[0][1]>0){
 				  document.write('<a href=\"testquestion.php?cid={$_GET['cid']}$chk&formn=$formn&onlychk=$onlychk&loc='+prevnext[0][0]+'&qsetid='+prevnext[0][1]+'\">Prev</a> ');
 			  } else {
 				  document.write('Prev ');
