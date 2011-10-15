@@ -149,8 +149,12 @@ function imascleanup(type, value) {
 END;
 
 }
+$curdir = rtrim(dirname(__FILE__), '/\\');
 if (isset($placeinhead)) {
 	echo $placeinhead;
+}
+if (isset($CFG['GEN']['headerscriptinclude'])) {
+	require("$curdir/../{$CFG['GEN']['headerscriptinclude']}");
 }
 echo '</head><body>';
 
@@ -162,7 +166,7 @@ if (isset($insertinheaderwrapper)) {
 if (!isset($flexwidth)) {
 	echo '<div class="headerwrapper">';
 }
-$curdir = rtrim(dirname(__FILE__), '/\\');
+
 if (isset($CFG['GEN']['headerinclude']) && !isset($flexwidth)) {
 	require("$curdir/../{$CFG['GEN']['headerinclude']}");
 }

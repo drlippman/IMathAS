@@ -66,35 +66,50 @@ while ($row = mysql_fetch_row($result)) {
 	}
 	$studata[] = $rowdata;
 }
-
+$placeinhead = '<script type="text/javascript">function highlightrow(el) { el.setAttribute("lastclass",el.className); el.className = "highlight";}';
+$placeinhead .= 'function unhighlightrow(el) { el.className = el.getAttribute("lastclass");}</script>';
+$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js?v=012811\"></script>\n";
+	
 require("../header.php");
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; Drill Assessment Results</div>";
 echo "<h2>Drill Assessment Results</h2>";
 
-echo '<table class="gb">';
+echo '<table id="myTable" class="gb">';
 echo '<thead><tr><th>Best (# tries)<br/>Last</th>';
+$sarr = "'S'";
 foreach ($itemdescr as $qn=>$v) {
 	echo '<th>'.$v.'</th>';
+	$sarr .= ",'N'";
 }
 echo '</tr></thead><tbody>';
-foreach ($studata as $sturow) {
-	echo '<tr>';
+foreach ($studata as $i=>$sturow) {
+	if ($i%2==0) {
+		echo '<tr class="even" onMouseOver="highlightrow(this)" onMouseOut="unhighlightrow(this)">';
+	} else {
+		echo '<tr class="odd" onMouseOver="highlightrow(this)" onMouseOut="unhighlightrow(this)">';
+	}
 	foreach ($sturow as $stuval) {
 		echo '<td>'.$stuval.'</td>';
 	}
 	echo '</tr>';
 }
 echo '</tbody></table>';
+
+echo "<script>initSortTable('myTable',Array($sarr),false);</script>\n";
+	
 require("../footer.php");
 
 function dispscore($sc) {
 	global $torecord;
 	if ($torecord=='t') {
 		return formattime($sc);
+	} else if ($torecord=='cc') {
+		return $sc . ' correct';
 	} else {
 		return $sc . ' attempts';
 	}
 }
+
 
 function formattime($cur) {
 	if ($cur > 3600) {

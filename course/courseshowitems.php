@@ -338,7 +338,11 @@ function enditem($canedit) {
 						echo ".gif\" onClick=\"toggleblock('{$items[$i]['id']}','$parent-$bnum')\" /></span>";
 						echo "<div class=title>";
 					}
-					
+					if (!$canedit) {
+						echo '<span class="right">';
+						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>Isolate</a>";
+						echo '</span>';
+					}
 					echo "<span class=pointer onClick=\"toggleblock('{$items[$i]['id']}','$parent-$bnum')\">";
 					echo "<b>";
 					if ($items[$i]['SH'][0]=='S') {
@@ -362,11 +366,7 @@ function enditem($canedit) {
 						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">Copy</a>";
 						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>NewFlag</a>";
 						echo '</span>';
-					} else {
-						echo '<span class="instronly">';
-						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>Isolate</a>";
-						echo '</span>';
-					}
+					} 
 					if (($hideicons&16)==0) {
 						echo "</div>";
 					}

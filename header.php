@@ -157,15 +157,17 @@ function imascleanup(type, value) {
 </script>
 <!-- /TinyMCE -->
 
-</head>
-<body>
 
 END;
 
-} else {
-	echo "</head>\n";
-	echo "<body>\n";
+} 
+$curdir = rtrim(dirname(__FILE__), '/\\');
+if (isset($CFG['GEN']['headerscriptinclude'])) {
+	require("$curdir/{$CFG['GEN']['headerscriptinclude']}");
 }
+echo "</head>\n";
+echo "<body>\n";
+
 
 $insertinheaderwrapper = ' '; //"<h1>$coursename</h1>";
 echo '<div class=mainbody>';
@@ -173,7 +175,7 @@ if (isset($insertinheaderwrapper)) {
 	//echo '<div class="headerwrapper">'.$insertinheaderwrapper.'</div>';
 }
 echo '<div class="headerwrapper">';
-$curdir = rtrim(dirname(__FILE__), '/\\');
+
 if (isset($CFG['GEN']['headerinclude']) && !isset($flexwidth)) {
 	require("$curdir/{$CFG['GEN']['headerinclude']}");
 }

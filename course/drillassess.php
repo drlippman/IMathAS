@@ -74,15 +74,15 @@ if (isset($_GET['score'])) {
 	$score = scoreq(0,$curitemid,$seed,$_POST['qn0']);
 	$lastanswers[0] = stripslashes($lastanswers[0]);
 	$page_scoreMsg =  printscore($score,$curitemid,$seed);
-	if (getpts($score)<1 && $sa==0) {
+	if (getpts($score)<.99 && $sa==0) {
 		$showans = true;
-	} else if (getpts($score)<1 && $sa==4) {
+	} else if (getpts($score)<.99 && $sa==4) {
 		unset($lastanswers);
 	} else {
 		unset($lastanswers);
 		$seed = rand(1,9999);
 	}
-	$curscores[] = $score;
+	$curscores[] = getpts($score);
 	$scorelist = implode(',',$curscores);
 	$query = "UPDATE imas_drillassess_sessions SET curscores='$scorelist',seed='$seed' WHERE id='{$sessdata['id']}'";
 	mysql_query($query) or die("Query failed : " . mysql_error());

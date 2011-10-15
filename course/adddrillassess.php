@@ -52,25 +52,29 @@ if (isset($_GET['clearatt'])) {
 	exit;
 }
 if (isset($_GET['record'])) {
+	$beentaken = isset($_POST['beentaken']);
+	
 	if (isset($_POST['descr'])) {
 		foreach ($_POST['descr'] as $k=>$v) {
 			$itemdescr[$k] = str_replace(',','',$v);
 		}
 	}
-	$newitemids = array();
-	$newitemdescr = array();
-	if (isset($_POST['order'])) {
-		asort($_POST['order']);
-		foreach ($_POST['order'] as $id=>$ord) {
-			if (!isset($_POST['delitem'][$id])) {
-				$newitemids[] = $itemids[$id];
-				$newitemdescr[] = $itemdescr[$id];
+	if (!$beentaken) {
+		$newitemids = array();
+		$newitemdescr = array();
+		if (isset($_POST['order'])) {
+			asort($_POST['order']);
+			foreach ($_POST['order'] as $id=>$ord) {
+				if (!isset($_POST['delitem'][$id])) {
+					$newitemids[] = $itemids[$id];
+					$newitemdescr[] = $itemdescr[$id];
+				}
 			}
 		}
+		
+		$itemids = array_values($newitemids);
+		$itemdescr = array_values($newitemdescr);
 	}
-	
-	$itemids = array_values($newitemids);
-	$itemdescr = array_values($newitemdescr);
 	$classbests = array();
 	$updatebests = false;
 	//if (isset($_POST['idstoadd']) && trim($_POST['idstoadd'])!='') {
@@ -115,13 +119,22 @@ if (isset($_GET['record'])) {
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		$daid = mysql_insert_id();
 	} else {
-		$query = "UPDATE imas_drillassess SET itemdescr='$descrlist',itemids='$itemlist',scoretype='$scoretype',showtype=$showtype,";
-		$query .= "n=$n,showtostu=$showtostu";
+		if ($beentaken) {
+			$query = "UPDATE imas_drillassess SET itemdescr='$descrlist',showtostu=$showtostu";
+		} else {
+			$query = "UPDATE imas_drillassess SET itemdescr='$descrlist',itemids='$itemlist',scoretype='$scoretype',showtype=$showtype,";
+			$query .= "n=$n,showtostu=$showtostu";
+		}
 		if ($updatebests) {
 			$query .= ",classbests='$bestlist'";
-		} 
+		}
 		$query .= " WHERE id=$daid";
 		mysql_query($query) or die("Query failed : " . mysql_error());
+		if (!$beentaken) {
+			//Delete any instructor attempts to account for possible changes
+			$query = "DELETE FROM imas_drillassess_sessions WHERE drillassessid=$daid";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+		}
 	}
 	
 	if (isset($_POST['search'])) {
@@ -173,8 +186,8 @@ if (isset($_GET['record'])) {
 	exit;
 }
 
-
-$query = "SELECT id FROM imas_drillassess_sessions WHERE drillassessid=$daid";
+$query = "SELECT ias.id FROM imas_drillassess_sessions AS ias,imas_students WHERE ";
+$query .= "ias.drillassessid='$daid' AND ias.userid=imas_students.userid AND imas_students.courseid='$cid' LIMIT 1";
 $result = mysql_query($query) or die("Query failed : " . mysql_error());
 if (mysql_num_rows($result)>0) {
 	$beentaken = true;
@@ -369,15 +382,14 @@ if (!$beentaken) {
 				}							
 				
 				
-				$page_questionTable[$i]['add'] = "<a href=\"modquestion.php?qsetid={$line['id']}&aid=$aid&cid=$cid\">Add</a>";
 				
 				if ($line['userights']>2 || $line['ownerid']==$userid) {
-					$page_questionTable[$i]['src'] = "<a href=\"moddataset.php?id={$line['id']}&aid=$aid&cid=$cid&frompot=1\">Edit</a>";
+					$page_questionTable[$i]['src'] = "<a href=\"moddataset.php?id={$line['id']}&daid=$daid&cid=$cid&frompot=1\">Edit</a>";
 				} else { 
-					$page_questionTable[$i]['src'] = "<a href=\"viewsource.php?id={$line['id']}&aid=$aid&cid=$cid\">View</a>";
+					$page_questionTable[$i]['src'] = "<a href=\"viewsource.php?id={$line['id']}&daid=$daid&cid=$cid\">View</a>";
 				}							
 				
-				$page_questionTable[$i]['templ'] = "<a href=\"moddataset.php?id={$line['id']}&aid=$aid&cid=$cid&template=true\">Template</a>";						
+				$page_questionTable[$i]['templ'] = "<a href=\"moddataset.php?id={$line['id']}&daid=$daid&cid=$cid&template=true\">Template</a>";						
 				//$i++;
 				$ln++;
 					
@@ -453,7 +465,7 @@ echo "<h2>Add/Modify Drill Assessment</h2>";
 
 if ($beentaken) {
 	echo '<p>This drill has already been taken!  You will not be able to modify most settings unless you clear out existing attempts.';
-	echo "<a href=\"adddrillassess.php?cid=$cid&daid=$daid&clearatt=true\" onclick=\"return confirm('Are you SURE you want to clear out existing attempts?');\">Clear existing attempts</a></p>";
+	echo " <a href=\"adddrillassess.php?cid=$cid&daid=$daid&clearatt=true\" onclick=\"return confirm('Are you SURE you want to clear out existing attempts?');\">Clear existing attempts</a></p>";
 }
 
 echo "<form id=\"selform\" method=\"post\" action=\"adddrillassess.php?cid=$cid&daid=$daid&record=true\">";
@@ -474,8 +486,13 @@ echo '<input type="checkbox" name="showlast" '.getHtmlChecked($showtostu&1,1).'/
 echo '<input type="checkbox" name="showpbest" '.getHtmlChecked($showtostu&2,2).'/> Show personal best score. ';
 echo '<input type="checkbox" name="showcbest" '.getHtmlChecked($showtostu&4,4).'/> Show class best score.</p>';
 
+if ($beentaken) {
+	echo '<p>Reset class bests?  <input type="checkbox" name="clearbests" value="1" /></p>';
+}
 echo '<table id="usedqtable">';
-echo '<tr><th></th><th>Description</th><th>Preview</th>';
+echo '<tr>';
+if (!$beentaken) {echo '<th></th>';}
+echo '<th>Description</th><th>Preview</th>';
 if (!$beentaken) {echo '<th>Delete?</th>';}
 echo '</tr>';
 function generateselect($cnt,$i) {
@@ -488,9 +505,13 @@ function generateselect($cnt,$i) {
 	echo '</select>';
 }
 foreach ($itemids as $k=>$id) {
-	echo '<tr id="row'.$k.'"><td>';
-	generateselect(count($itemids),$k);
-	echo '</td><td><input type="text" size="60" name="descr['.$k.']" value="'.$itemdescr[$k].'"/></td>';
+	echo '<tr id="row'.$k.'">';
+	if (!$beentaken) {
+		echo '<td>';
+		generateselect(count($itemids),$k);
+		echo '</td>';
+	}
+	echo '<td><input type="text" size="60" name="descr['.$k.']" value="'.$itemdescr[$k].'"/></td>';
 	echo "<td><input type=button value=\"Preview\" onClick=\"previewq(null,$k,{$itemids[$k]})\"/></td>";
 	if (!$beentaken) {
 		echo '<td><input type="checkbox" name="delitem['.$k.']" value="1"/></td>';
@@ -543,7 +564,7 @@ if (!$beentaken) {
 					<?php echo $page_libRowHeader ?>
 					<th>Times Used</th>
 					<?php if ($page_useavgtimes) {?><th><span onmouseover="tipshow(this,'Average time, in minutes, this question has taken students')" onmouseout="tipout()">Avg Time</span></th><?php } ?>
-					<th>Mine</th><th>Add</th><th>Source</th><th>Use as Template</th>
+					<th>Mine</th><th>Source</th><th>Use as Template</th>
 					<?php if ($searchall==0) { echo '<th><span onmouseover="tipshow(this,\'Flag a question if it is in the wrong library\')" onmouseout="tipout()">Wrong Lib</span></th>';} ?>
 				</tr>
 			</thead>
@@ -583,7 +604,6 @@ if (!$beentaken) {
 					<td class=c><?php echo $page_questionTable[$qid]['times'] ?></td>
 					<?php if ($page_useavgtimes) {?><td class="c"><?php echo $page_questionTable[$qid]['avgtime'] ?></td> <?php }?>
 					<td><?php echo $page_questionTable[$qid]['mine'] ?></td>
-					<td class=c><?php echo $page_questionTable[$qid]['add'] ?></td>
 					<td><?php echo $page_questionTable[$qid]['src'] ?></td>
 					<td class=c><?php echo $page_questionTable[$qid]['templ'] ?></td>
 					<?php if ($searchall==0) {
@@ -609,7 +629,9 @@ if (!$beentaken) {
 <?php 					
 				}
 			}
-		}
+} else {
+	echo '<input type="hidden" name="beentaken" value="1" />';
+}
 /*if (!$beentaken) {
 	echo '<p>Add more questions (list ids separated by commas): <input type="text" name="idstoadd" value="" /></p>';
 }

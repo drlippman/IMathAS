@@ -12,7 +12,14 @@
 	$cid = $_GET['cid'];
 	$isadmin = false;
 	$isgrpadmin = false;
-	if (!isset($_GET['aid'])) {
+	if (isset($_GET['aid'])) {
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+		echo "&gt; <a href=\"addquestions.php?aid={$_GET['aid']}&cid={$_GET['cid']}\">Add/Remove Questions</a> &gt; Modify Questions</div>";
+	
+	} else if (isset($_GET['daid'])) {
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+		echo "&gt; <a href=\"adddrillassess.php?daid={$_GET['daid']}&cid={$_GET['cid']}\">Add Drill Assessment</a> &gt; Modify Questions</div>";
+	} else {
 		if ($_GET['cid']=="admin") {
 			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../admin/admin.php\">Admin</a>";
 			echo "&gt; <a href=\"manageqset.php?cid=admin\">Manage Question Set</a> &gt; Modify Question</div>\n";
@@ -26,16 +33,10 @@
 			if ($cid>0) {
 				echo "&gt; <a href=\"course.php?cid=$cid\">$coursename</a>";
 			}
-			echo "&gt; <a href=\"manageqset.php?cid=$cid\">Manage Question Set</a> &gt; Modify Question</div>\n";
+			echo " &gt; <a href=\"manageqset.php?cid=$cid\">Manage Question Set</a> &gt; Modify Question</div>\n";
 		}
 		
-	} else {
-		echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> ";
-		if ($cid>0) {
-			echo "&gt; <a href=\"course.php?cid=$cid\">$coursename</a> ";
-		}
-		echo "&gt; <a href=\"addquestions.php?aid={$_GET['aid']}&cid=$cid\">Add/Remove Questions</a> &gt; Modify Questions</div>";
-	}
+	} 
 	if (isset($adminasteacher) && $adminasteacher) {
 		if ($myrights == 100) {
 			$isadmin = true;

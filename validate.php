@@ -146,10 +146,51 @@ END;
 	 $query = "DELETE FROM imas_sessions WHERE time<$old";
 	 $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	 
-	 $query = "SELECT id,password,rights,groupid FROM imas_users WHERE SID = '{$_POST['username']}'";
-	 $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	 $line = mysql_fetch_array($result, MYSQL_ASSOC);
-	 
+	 if (isset($CFG['GEN']['guesttempaccts']) && $_POST['username']=='guest') { // create a temp account when someone logs in w/ username: guest
+	 	 $handle = @fopen("$curdir/admin/import/tempacctcounter.txt",'r');
+	 	 if ($handle===false) {
+			$guestcnt = 0;
+		} else {
+			$guestcnt = intval(trim(fgets($handle)));
+			fclose($handle);
+		}
+		$guestcnt++;
+		$handle = @fopen("$curdir/admin/import/tempacctcounter.txt",'w');
+		if ($handle !== false) {
+			$fwrite = fwrite($handle,$guestcnt);
+			fclose($handle);
+		}
+		
+		if (isset($CFG['GEN']['homelayout'])) {
+			$homelayout = $CFG['GEN']['homelayout'];
+		} else {
+			$homelayout = '|0,1,2||0,1';
+		}
+	 	$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify,homelayout) ";
+	 	$query .= "VALUES ('guestacct$guestcnt','',5,'Guest','Account','none@none.com',0,'$homelayout')";
+	 	mysql_query($query) or die("Query failed : " . mysql_error());
+	 	$userid = mysql_insert_id();
+	 	
+	 	if (is_array($CFG['GEN']['guesttempaccts']) && count($CFG['GEN']['guesttempaccts'])>0) {
+	 		$query = "INSERT INTO imas_students (userid,courseid) VALUES ";
+			foreach ($CFG['GEN']['guesttempaccts'] as $i=>$encid) {
+				if ($i>0) { $query .= ',';}
+				$query .= "($userid,$encid)";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+		}
+	 	
+	 	$line['id'] = $userid;
+	 	$line['rights'] = 5;
+	 	$line['groupid'] = 0;
+	 	$_POST['password'] = 'temp';
+	 	$line['password'] = md5('temp');
+	 	$_POST['usedetected'] = true;
+	 } else {
+		 $query = "SELECT id,password,rights,groupid FROM imas_users WHERE SID = '{$_POST['username']}'";
+		 $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		 $line = mysql_fetch_array($result, MYSQL_ASSOC);
+	 }
 	// if (($line != null) && ($line['password'] == md5($_POST['password']))) {
 	 if (($line != null) && ((md5($line['password'].$_SESSION['challenge']) == $_POST['password']) ||($line['password'] == md5($_POST['password'])) )) {
 		 unset($_SESSION['challenge']); //challenge is used up - forget it.
@@ -199,10 +240,15 @@ END;
 			 $sessiondata['graphdisp'] = 1;
 			 $sessiondata['useed'] = checkeditorok(); 
 			 $enc = base64_encode(serialize($sessiondata));
+		 } else if ($_POST['usedetected']==true || isset($CFG['GEN']['skipbrowsercheck'])) {
+		 	 $sessiondata['mathdisp'] = 2-$_POST['mathdisp'];
+		 	 $sessiondata['graphdisp'] = $_POST['graphdisp'];
+		 	 $sessiondata['useed'] = checkeditorok(); 
+			 $enc = base64_encode(serialize($sessiondata));
 		 } else {
 			 $enc = 0; //give warning
 		 }
-		 
+		
 		 $query = "INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,sessiondata) VALUES ('$sessionid','$userid',$now,'{$_POST['tzoffset']}','$enc')";
 		 $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		 
