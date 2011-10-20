@@ -2670,7 +2670,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			if (in_array('inequality',$ansformats)) {
 				preg_match_all('/[a-zA-Z]+/',$_POST["tc$qn"],$matches);
 				foreach ($matches[0] as $var) {
-					if ($var!= 'or' && $var!='and' && $var != $variables) {
+					if ($var!= 'or' && $var!='and' && $var != $variables && $_POST["qn$qn"]!="(-oo,oo)") {
 						return 0;
 					}
 				}
@@ -3077,7 +3077,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$scores[$key] = 0;
 				for ($i=0; $i<count($lines); $i++) {
 					//check slope
-					if (abs($ansline[1]-$lines[$i][1])/(abs($ansline[1])+.000001)>$deftol*$reltolerance) {
+					$toladj = pow(10,-1-6*abs($ansline[1]));
+					if (abs($ansline[1]-$lines[$i][1])/(abs($ansline[1])+$toladj)>$deftol*$reltolerance) {
 						continue;
 					}
 					if ($ansline[0]!=$lines[$i][0]) {
@@ -3203,7 +3204,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				foreach ($ineqlines as $k=>$val) {
 					$pts = explode(',',$val);
 					//line
-					if ($pts[3]==$pts[1]) {
+					$slope = ($pts[4]-$pts[2])/($pts[3]-$pts[1]);
+					if (abs($slope)>50) {
 						if ($pts[5]>$pts[3]) {
 							$dir = '>';
 						} else {
@@ -3212,7 +3214,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						$ineqlines[$k] = array('x',$dir,$pts[0],-10000,$pts[1]);
 						
 					} else {
-						$slope = ($pts[4]-$pts[2])/($pts[3]-$pts[1]);
+						
 						$yatpt5 = $slope*($pts[5] - $pts[1]) + $pts[2];
 						if ($yatpt5 < $pts[6]) {
 							$dir = '<';
@@ -3237,7 +3239,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					if ($ansline[2]!=$ineqlines[$i][2]) { continue;}
 					if ($ansline[1]!=$ineqlines[$i][1]) { continue;}
 					//check slope
-					if (abs($ansline[3]-$ineqlines[$i][3])/(abs($ansline[3])+.000001)>$deftol*$reltolerance) {
+					$toladj = pow(10,-1-6*abs($ansline[3]));
+					$relerr = abs($ansline[3]-$ineqlines[$i][3])/(abs($ansline[3])+$toladj);
+					if ($relerr>$deftol*$reltolerance) {
 						continue;
 					}
 					if ($ansline[0]!=$ineqlines[$i][0]) {

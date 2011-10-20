@@ -709,7 +709,7 @@ echo 'imas_gbitems created<br/>';
 
 $sql = 'CREATE TABLE `imas_grades` ('
         . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
-        . ' `gradetype` VARCHAR(15) UNSIGNED NOT NULL DEFAULT \'offline\', '
+        . ' `gradetype` VARCHAR(15) NOT NULL DEFAULT \'offline\', '
         . ' `gradetypeid` INT(10) UNSIGNED NOT NULL, '
         . ' `refid` INT(10) UNSIGNED NOT NULL DEFAULT \'0\', '
         . ' `userid` INT(10) UNSIGNED NOT NULL, '

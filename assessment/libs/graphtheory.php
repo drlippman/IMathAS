@@ -22,7 +22,7 @@
 //    position of vertex labels.  
 
 global $allowedmacros;
-array_push($allowedmacros,"graphspringlayout","graphcirclelayout","graphgridlayout","graphpathlayout","graphcircleladder","graphcircle","graphbipartite","graphgrid","graphrandom","graphrandomgridschedule","graphemptygraph","graphdijkstra","graphbackflow","graphkruskal","graphadjacencytoincidence","graphincidencetoadjacency","graphdrawit","graphdecreasingtimelist","graphcriticaltimelist","graphcircledstar","graphcircledstarlayout","graphmaketable","graphsortededges","graphcircuittoarray","graphnearestneighbor","graphrepeatednearestneighbor","graphgetedges","graphgettotalcost","graphnestedpolygons","graphmakesymmetric","graphisconnected","graphgetedgesarray","graphsequenceeuleredgedups","graphsequenceishamiltonian","graphshortestpath","graphgetpathlength");
+array_push($allowedmacros,"graphspringlayout","graphcirclelayout","graphgridlayout","graphpathlayout","graphcircleladder","graphcircle","graphbipartite","graphgrid","graphrandom","graphrandomgridschedule","graphemptygraph","graphdijkstra","graphbackflow","graphkruskal","graphadjacencytoincidence","graphincidencetoadjacency","graphdrawit","graphdecreasingtimelist","graphcriticaltimelist","graphcircledstar","graphcircledstarlayout","graphmaketable","graphsortededges","graphcircuittoarray","graphnearestneighbor","graphrepeatednearestneighbor","graphgetedges","graphgettotalcost","graphnestedpolygons","graphmakesymmetric","graphisconnected","graphgetedgesarray","graphsequenceeuleredgedups","graphsequenceishamiltonian","graphshortestpath","graphgetpathlength","graphcomparecircuits");
 	
 ///graphcircleladder(n,m,[options])
 //draws a circular ladder graph
@@ -1345,8 +1345,34 @@ function graphdrawit($pos,$g,$op) {
 	return showasciisvg($com,$op['width'],$op['height']);	
 }
 
-
-
+//graphcomparecircuits(A,B)
+//returns true or false
+//compares two circuits to see if they are the same, regardless of starting
+//vertex.  So "ABCDA" would be considered equivalent to "DCBAD"
+//can be used with the conditional answer type to score circuits. 
+function graphcomparecircuits($a,$b) {
+	$lena = strlen($a);
+	$lenb = strlen($b);
+	if ($a[0]==$a[$lena-1]) {
+		$a = substr($a,0,-1);
+		$lena--;
+	}
+	if ($b[0]==$b[$lenb-1]) {
+		$b = substr($b,0,-1);
+		$lenb--;
+	}
+	if ($lena!=$lenb) {return false;}
+	$loc = strpos($b,$a[0]);
+	$newb = substr($b,$loc).substr($b,0,$loc);
+	$a = $a.$a[0];
+	$newb = $newb.$newb[0];
+	echo "$a, $newb";
+	if ($a==$newb || $a==strrev($newb)) {
+		return true;
+	} else {
+		return false;
+	}
+}
 
 
 ?>

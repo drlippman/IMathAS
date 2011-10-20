@@ -58,6 +58,7 @@ A library of graph theory functions.  Version 0.2, Sept 4, 2009
 <li><a href="#graphpathlayout">graphpathlayout</a></li>
 <li><a href="#graphprocessoptions">graphprocessoptions</a></li>
 <li><a href="#graphdrawit">graphdrawit</a></li>
+<li><a href="#graphcomparecircuits">graphcomparecircuits</a></li>
 </ul>
 <h3><a name="graphcircleladder">graphcircleladder</a></h3>
 /graphcircleladder(n,m,[options])
@@ -253,4 +254,10 @@ internal function, not to be used directly
 internal function, not usually used directly
 <BR>can get called with graph matrix g, g[i][j] if vertex i has edge to j
 <BR>pos is array where pos[i] = array(x,y) positions for vertices
+<BR><h3><a name="graphcomparecircuits">graphcomparecircuits</a></h3>
+graphcomparecircuits(A,B)
+<BR>returns true or false
+<BR>compares two circuits to see if they are the same, regardless of starting
+<BR>vertex.  So "ABCDA" would be considered equivalent to "DCBAD"
+<BR>can be used with the conditional answer type to score circuits. 
 <BR>
