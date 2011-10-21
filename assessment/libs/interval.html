@@ -4,6 +4,7 @@ Interval functions, Version 1.1 March 2, 2010
 <BR><ul>
 <li><a href="#forminterval">forminterval</a></li>
 <li><a href="#linegraph">linegraph</a></li>
+<li><a href="#linegraphbrackets">linegraphbrackets</a></li>
 <li><a href="#intervalstodraw">intervalstodraw</a></li>
 </ul>
 <h3><a name="forminterval">forminterval</a></h3>
@@ -14,6 +15,10 @@ forminterval(min,max,minmarkertype,maxmarkertype)
 <BR><h3><a name="linegraph">linegraph</a></h3>
 linegraph(intervals,[xmin,xmax,xscl,width,height])
 <BR>Creates a line graph
+<BR>intervals:  string or array of strings in interval notation, ex: [2,5)
+<BR><h3><a name="linegraphbrackets">linegraphbrackets</a></h3>
+linegraphbrackets(intervals,[xmin,xmax,xscl,width,height])
+<BR>Creates a line graph using brackets/parens instead of open/closed dots
 <BR>intervals:  string or array of strings in interval notation, ex: [2,5)
 <BR><h3><a name="intervalstodraw">intervalstodraw</a></h3>
 intervalstodraw(interval,xmin,xmax)

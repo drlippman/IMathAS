@@ -474,3 +474,6 @@ div.pagetitle h2 {
 svg {
 	overflow: hidden;
 }
+img {
+	border: 0 none;
+}
