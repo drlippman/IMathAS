@@ -71,6 +71,7 @@
 			$query = "SELECT SID FROM imas_users WHERE email='{$_POST['email']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (mysql_num_rows($result)>0) {
+				$nologo = true;
 				require("header.php");
 				echo '<form method="post" action="actions.php?action=newuser&amp;confirmed=true'.$gb.'">';
 				echo '<input type="hidden" name="SID" value="'.stripslashes($_POST['SID']).'" />';
@@ -116,7 +117,10 @@
 			exit;
 			
 		} else {
-			echo "<html><body>\n";
+			$pagetitle = 'Account Created';
+			require("header.php");
+			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Form</div>\n";
+			echo '<div id="headerforms" class="pagetitle"><h2>New User Signup</h2></div>';
 			echo "<p>Your account with username <b>{$_POST['SID']}</b> has been created.  If you forget your password, you can ask your ";
 			echo "instructor to reset your password or use the forgotten password link on the login page.</p>\n";
 			if (trim($_POST['courseid'])!='') {
@@ -152,7 +156,7 @@
 			echo "You can now <a href=\"http://";
 			echo $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php";
 			echo "\">return to the login page</a> and login with your new username and password</p>";
-			echo "</body></html>";
+			require("footer.php");
 		}
 		//header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php");
 		exit;
