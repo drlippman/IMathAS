@@ -316,7 +316,7 @@ if (isset($_GET['launch'])) {
 			
 	}
 	
-} else if (isset($_SESSION['ltiuserid']) && !isset($_POST['user_id'])) {
+} else if (isset($_SESSION['ltiuserid']) && !isset($_REQUEST['oauth_consumer_key'])) {
 	//refreshed this page from accessibility options page so session already exists
 	// (if user_id is set, then is new LTI request, so want to pass down to OAuth)
 	//pull necessary info and continue
@@ -331,13 +331,22 @@ if (isset($_GET['launch'])) {
 	$keyparts = explode('_',$_SESSION['ltikey']);
 } else {
 	//not postback of new LTI user info, so must be fresh request
-
+	
 	//verify necessary POST values for LTI.  OAuth specific will be checked later
 	if (empty($_REQUEST['user_id'])) {
 		reporterror("user_id is required");
 	} else {
 		$ltiuserid = $_REQUEST['user_id'];
 	}
+	
+	if (isset($_SESSION['ltiuserid']) && $_SESSION['ltiuserid']!=$ltiuserid) {
+		//new user - need to clear out session
+		session_destroy();
+		session_start();
+		session_regenerate_id();
+		setcookie(session_name(),session_id());
+	}
+	
 	/*if (empty($_REQUEST['roles'])) {
 		reporterror("roles is required");
 	} else {
