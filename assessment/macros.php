@@ -2077,94 +2077,99 @@ function intervaltoineq($str,$var) {
 }
 
 function cleanbytoken($str,$funcs = array()) {
-	$tokens = cleantokenize($str,$funcs);
-	//print_r($tokens);
-	$out = array();
-	$lasti = count($tokens)-1;
-	for ($i=0; $i<=$lasti; $i++) {
-		$token = $tokens[$i];
-		$lastout = count($out)-1;
-		if ($token[1]==3 && $token[0]==='0') { //is the number 0 by itself
-			if ($lastout>-1) { //if not first character
-				if ($out[$lastout] != '^') {
-					//( )0, + 0, x0
-					while ($lastout>-1 && $out[$lastout]!= '+' && $out[$lastout]!= '-') {
-						array_pop($out);
-						$lastout--;
-					}
-					if ($lastout>-1) {
-						array_pop($out);
-					}
-					
-				} else if ($out[$lastout] == '^') {
-					if ($lastout>=2 && ($out[$lastout-2]=='+'|| $out[$lastout-2]=='-')) {
-						//4x+x^0 -> 4x+1
-						array_splice($out,-2);
-						$out[] = 1;
-					} else if ($lastout>=2) {
-						//4x^0->4, 5(x+3)^0 -> 5
-						array_splice($out,-2);
-					} else if ($lastout==1) {
-						//x^0 -> 1
-						$out = array(1);
-					}
-				}
-			}
-			if ($i<$lasti) { //if not last character
-				if ($tokens[$i+1][0]=='^') {
-					//0^3
-					$i+=2; //skip over ^ and 3
-				} else {
-					while ($i<$lasti && $tokens[$i+1][0]!= '+' && $tokens[$i+1][0]!= '-') {
-						$i++;
+	$parts = explode('=',$str); 
+	$finalout = array();
+	foreach ($parts as $substr) {
+		$tokens = cleantokenize(trim($substr),$funcs);
+		//print_r($tokens);
+		$out = array();
+		$lasti = count($tokens)-1;
+		for ($i=0; $i<=$lasti; $i++) {
+			$token = $tokens[$i];
+			$lastout = count($out)-1;
+			if ($token[1]==3 && $token[0]==='0') { //is the number 0 by itself
+				if ($lastout>-1) { //if not first character
+					if ($out[$lastout] != '^') {
+						//( )0, + 0, x0
+						while ($lastout>-1 && $out[$lastout]!= '+' && $out[$lastout]!= '-') {
+							array_pop($out);
+							$lastout--;
+						}
+						if ($lastout>-1) {
+							array_pop($out);
+						}
+						
+					} else if ($out[$lastout] == '^') {
+						if ($lastout>=2 && ($out[$lastout-2]=='+'|| $out[$lastout-2]=='-')) {
+							//4x+x^0 -> 4x+1
+							array_splice($out,-2);
+							$out[] = 1;
+						} else if ($lastout>=2) {
+							//4x^0->4, 5(x+3)^0 -> 5
+							array_splice($out,-2);
+						} else if ($lastout==1) {
+							//x^0 -> 1
+							$out = array(1);
+						}
 					}
 				}
-			}
-		} else if ($token[1]==3 && $token[0]==='1') {
-			$dontuse = false;
-			if ($lastout>-1) { //if not first character
-				if ($out[$lastout] != '^' && $out[$lastout]!='+' && $out[$lastout]!='-') {
-					//( )1, x1,*1
-					if ($out[$lastout]=='*') { //elim *
-						array_pop($out);
+				if ($i<$lasti) { //if not last character
+					if ($tokens[$i+1][0]=='^') {
+						//0^3
+						$i+=2; //skip over ^ and 3
+					} else {
+						while ($i<$lasti && $tokens[$i+1][0]!= '+' && $tokens[$i+1][0]!= '-') {
+							$i++;
+						}
 					}
-					$dontuse = true;
-				} else if ($out[$lastout] == '^') {
-					if ($lastout>=1) {
-						//4+x^1 -> 4+x, 4x^1 -> 4x
-						array_pop($out);
+				}
+			} else if ($token[1]==3 && $token[0]==='1') {
+				$dontuse = false;
+				if ($lastout>-1) { //if not first character
+					if ($out[$lastout] != '^' && $out[$lastout]!='+' && $out[$lastout]!='-') {
+						//( )1, x1,*1
+						if ($out[$lastout]=='*') { //elim *
+							array_pop($out);
+						}
 						$dontuse = true;
+					} else if ($out[$lastout] == '^') {
+						if ($lastout>=1) {
+							//4+x^1 -> 4+x, 4x^1 -> 4x
+							array_pop($out);
+							$dontuse = true;
+						}
 					}
 				}
-			}
-			if ($i<$lasti) { //if not last character
-				if ($tokens[$i+1][0]=='^') {
-					//1^3
-					$i+=2; //skip over ^ and 3
-				} else if ($tokens[$i+1][0]=='*') {
-					$i++;  //skip over *
-					$dontuse = true;
-				} else if ($tokens[$i+1][0]!= '+' && $tokens[$i+1][0]!= '-' && $tokens[$i+1][0]!= '/') {
-					// 1x, 1(), 1sin
-					if ($lastout<2 || ($out[$lastout-1] != '^' || $out[$lastout] != '-')) { //exclude ^-1 case
+				if ($i<$lasti) { //if not last character
+					if ($tokens[$i+1][0]=='^') {
+						//1^3
+						$i+=2; //skip over ^ and 3
+					} else if ($tokens[$i+1][0]=='*') {
+						$i++;  //skip over *
 						$dontuse = true;
+					} else if ($tokens[$i+1][0]!= '+' && $tokens[$i+1][0]!= '-' && $tokens[$i+1][0]!= '/') {
+						// 1x, 1(), 1sin
+						if ($lastout<2 || ($out[$lastout-1] != '^' || $out[$lastout] != '-')) { //exclude ^-1 case
+							$dontuse = true;
+						}
 					}
 				}
-			}
-			if (!$dontuse) {
-				$out[] = 1;
-			}
-		} else {
-			$out[] = $token[0];	
-		}	
+				if (!$dontuse) {
+					$out[] = 1;
+				}
+			} else {
+				$out[] = $token[0];	
+			}	
+		}
+		if ($out[0]=='+') {
+			array_shift($out);
+		}
+		if (count($out)==0) {
+			return '0';
+		}
+		$finalout[] = implode('',$out);
 	}
-	if ($out[0]=='+') {
-		array_shift($out);
-	}
-	if (count($out)==0) {
-		return '0';
-	}
-	return implode('',$out);
+	return implode('=',$finalout);
 }
 
 

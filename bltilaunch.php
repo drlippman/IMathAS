@@ -388,6 +388,18 @@ if (isset($_GET['launch'])) {
 		reporterror("invalid key. unknown action type");
 	}
 	
+	//Store all LTI request data in session variable for reuse on submit
+	//if we got this far, secret has already been verified
+	$_SESSION['ltiuserid'] = $ltiuserid;
+	$_SESSION['ltiorg'] = $ltiorg;
+	$ltirole = strtolower($_REQUEST['roles']);          
+	if (strpos($ltirole,'instructor')!== false || strpos($ltirole,'administrator')!== false) {
+		$ltirole = 'instructor';
+	} else {
+		$ltirole = 'learner';
+	}
+	$_SESSION['ltirole'] = $ltirole;
+	
 	//look if we know this student
 	$query = "SELECT userid FROM imas_ltiusers WHERE org='$ltiorg' AND ltiuserid='$ltiuserid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -395,11 +407,7 @@ if (isset($_GET['launch'])) {
 		$userid = mysql_result($result,0,0);
 	} else {
 		//student is not known.  Bummer.  Better figure out what to do with them :)
-		
-		//Store all LTI request data in session variable for reuse on submit
-		//if we got this far, secret has already been verified
-		$_SESSION['ltiuserid'] = $ltiuserid;
-		$_SESSION['ltiorg'] = $ltiorg;
+	
 		
 		//if doing lti_only, and first/last name were provided, go ahead and use them and don't ask
 		if (count($keyparts)>2 && $keyparts[2]==1 && ((!empty($_REQUEST['lis_person_name_given']) && !empty($_REQUEST['lis_person_name_family'])) || !empty($_REQUEST['lis_person_name_full'])) ) {
@@ -423,8 +431,13 @@ if (isset($_GET['launch'])) {
 				//make up a username/password for them
 				$_POST['SID'] = 'lti-'.$localltiuser;
 				$md5pw = 'pass'; //totally unusable since not md5'ed
+				if ($ltirole=='instructor') {
+					$rights = 20;
+				} else {
+					$rights = 10;
+				}
 				$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify) VALUES ";
-				$query .= "('{$_POST['SID']}','$md5pw',10,'$firstname','$lastname','$email',0)";
+				$query .= "('{$_POST['SID']}','$md5pw',$rights,'$firstname','$lastname','$email',0)";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				$userid = mysql_insert_id();	
 			}
@@ -473,17 +486,21 @@ if ($keyparts[0]=='cid') {
 	$query = "SELECT available,ltisecret FROM imas_courses WHERE id='$cid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
-	if (!($line['avail']==0 || $line['avail']==2)) {
-		reporterror("This course is not available");
-	}
+	if ($_SESSION['ltirole']!='instructor') {
+		if (!($line['avail']==0 || $line['avail']==2)) {
+			reporterror("This course is not available");
+		}
+	} 
 } else if ($keyparts[0]=='aid') {
 	$aid = intval($keyparts[1]);
 	$query = "SELECT courseid,startdate,enddate,avail,ltisecret FROM imas_assessments WHERE id='$aid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
 	$cid = $line['courseid'];
-	if ($line['avail']==0 || $now>$line['enddate'] || $now<$line['startdate']) {
-		reporterror("This assessment is closed");
+	if ($_SESSION['ltirole']!='instructor') {
+		if ($line['avail']==0 || $now>$line['enddate'] || $now<$line['startdate']) {
+			reporterror("This assessment is closed");
+		}
 	}
 } else if ($keyparts[0]!='sso') {
 	reporterror("invalid key. unknown action type");
@@ -491,13 +508,24 @@ if ($keyparts[0]=='cid') {
 
 //see if student is enrolled, if appropriate to action type
 if ($keyparts[0]=='cid' || $keyparts[0]=='aid') {
-	$query = "SELECT id,timelimitmult FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	if (mysql_num_rows($result) == 0) { //nope, not enrolled
-		$query = "INSERT INTO imas_students (userid,courseid) VALUES ('$userid','$cid')";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+	if ($_SESSION['ltirole']=='instructor') {
+		$query = "SELECT id FROM imas_teachers WHERE userid='$userid' AND courseid='$cid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		if (mysql_num_rows($result) == 0) { //nope, not enrolled
+			$query = "INSERT INTO imas_teachers (userid,courseid) VALUES ('$userid','$cid')";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+		} 
+		$timelimitmult = 1;
 	} else {
-		$timelimitmult = mysql_result($result,0,1);
+		$query = "SELECT id,timelimitmult FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		if (mysql_num_rows($result) == 0) { //nope, not enrolled
+			$query = "INSERT INTO imas_students (userid,courseid) VALUES ('$userid','$cid')";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			$timelimitmult = 1;
+		} else {
+			$timelimitmult = mysql_result($result,0,1);
+		}
 	}
 }
 	

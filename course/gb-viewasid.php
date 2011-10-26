@@ -251,6 +251,9 @@
 			exit;
 		}
 	}
+	if (isset($_GET['forcegraphimg'])) {
+		$sessiondata['graphdisp'] = 2;
+	}
 	
 	//OUTPUTS
 	if ($links==0) { //View/Edit full assessment
