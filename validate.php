@@ -333,7 +333,11 @@ END;
 				exit;
 			}
 		}
-		$breadcrumbbase = "";
+		if ($sessiondata['ltirole']=='instructor' && $sessiondata['ltiitemtype']==-1) {
+			$breadcrumbbase = "<a href=\"$imasroot/ltihome.php?showhome=true\">LTI Home</a> &gt; ";
+		} else {
+			$breadcrumbbase = "";
+		}
 	} else {
 		$breadcrumbbase = "<a href=\"$imasroot/index.php\">Home</a> &gt; ";
 	}

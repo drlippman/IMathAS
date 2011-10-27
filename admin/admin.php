@@ -119,7 +119,7 @@ if ($myrights < 40) {
 	} else {
 		if ($showusers==-1) {
 			$page_userBlockTitle = "Pending Users";
-			$query = "SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE rights=0 ORDER BY LastName";
+			$query = "SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE rights=0 OR rights=12 ORDER BY LastName";
 		} else if (is_numeric($showusers)) {
 			$page_userBlockTitle = "Group Users";
 			$query = "SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE rights > 10 AND groupid='$showusers' ORDER BY LastName";

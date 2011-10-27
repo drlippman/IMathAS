@@ -1439,7 +1439,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$sclinglbl = "$xlbl:$ylbl";
 			$sclinggrid = "$xgrid:$ygrid";
 		}
-		if (substr($backg,0,5)=="draw:") {
+		if (!is_array($backg) && substr($backg,0,5)=="draw:") {
 			$plot = showplot("",$settings[0],$settings[1],$settings[2],$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
 			$insat = strpos($plot,');',strpos($plot,'axes'))+2;
 			$plot = substr($plot,0,$insat).str_replace("'",'"',substr($backg,5)).substr($plot,$insat);
@@ -1572,7 +1572,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 				}
 			}
 			if ($backg!='') {
-				if (substr($backg,0,5)=="draw:") {
+				if (!is_array($backg) && substr($backg,0,5)=="draw:") {
 					$sa = showplot($saarr,$settings[0],$settings[1],$settings[2],$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
 					$insat = strpos($sa,');',strpos($sa,'axes'))+2;
 					$sa = substr($sa,0,$insat).str_replace("'",'"',substr($backg,5)).substr($sa,$insat);

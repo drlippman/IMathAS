@@ -25,6 +25,7 @@
 // cross-ssouser hacking
 
 include("config.php");
+
 if ($enablebasiclti!=true) {
 	echo "BasicLTI not enabled";
 	exit;
@@ -87,19 +88,19 @@ if (isset($_GET['launch'])) {
 	mysql_query($query) or die("Query failed : " . mysql_error());
 	
 	$keyparts = explode('_',$_SESSION['ltikey']);
-	if ($keyparts[0]=='aid') { //is aid
-		$aid = intval($keyparts[1]);
+	if ($sessiondata['ltiitemtype']==0) { //is aid
+		$aid = $sessiondata['ltiitemid'];
 		$query = "SELECT courseid FROM imas_assessments WHERE id='$aid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$cid = mysql_result($result,0,0);
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id=$aid");
-	} else if ($keyparts[0]=='cid') { //is cid
-		$cid = intval($keyparts[1]);
+	} else if ($sessiondata['ltiitemtype']==1) { //is cid
+		$cid = $sessiondata['ltiitemid'];
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
-	} else if ($keyparts[0]=='sso') {
+	} else if ($sessiondata['ltiitemtype']==2) {
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/index.php");
-	} else {
-		reporterror("Invalid action");
+	} else { //will only be instructors hitting this option
+		header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/ltihome.php");
 	}
 	exit;	
 } else if (isset($_GET['accessibility'])) {
@@ -170,6 +171,7 @@ if (isset($_GET['launch'])) {
 	//check to see if new LTI user is posting back user info
 	$ltiuserid = $_SESSION['ltiuserid'];
 	$ltiorg = $_SESSION['ltiorg'];
+	$ltirole = $_SESSION['ltirole'];
 	$keyparts = explode('_',$_SESSION['ltikey']);
 	if (count($keyparts)<3) {
 		$lti_only = false;
@@ -236,8 +238,13 @@ if (isset($_GET['launch'])) {
 					$_POST['SID'] = 'lti-'.$localltiuser;
 					$md5pw = 'pass'; //totally unusable since not md5'ed
 				}
+				if ($ltirole=='instructor') {
+					$rights = 20;
+				} else {
+					$rights = 10;
+				}
 				$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify) VALUES ";
-				$query .= "('{$_POST['SID']}','$md5pw',10,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot)";
+				$query .= "('{$_POST['SID']}','$md5pw',$rights,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot)";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				$userid = mysql_insert_id();	
 			}
@@ -344,6 +351,8 @@ if (isset($_GET['launch'])) {
 		session_destroy();
 		session_start();
 		session_regenerate_id();
+		$sessionid = session_id();
+		$_SESSION = array();
 		setcookie(session_name(),session_id());
 	}
 	
@@ -394,7 +403,7 @@ if (isset($_GET['launch'])) {
 	} else if ($keyparts[0]=='sso') {  //ssouserid:org
 		$ltiorg = $keyparts[0].$keyparts[1]. ':' . $ltiorg;
 	} else {
-		reporterror("invalid key. unknown action type");
+		$ltiorg = $ltikey.':'.$ltiorg;
 	}
 	
 	//Store all LTI request data in session variable for reuse on submit
@@ -408,6 +417,12 @@ if (isset($_GET['launch'])) {
 		$ltirole = 'learner';
 	}
 	$_SESSION['ltirole'] = $ltirole;
+	$_SESSION['lti_context_id'] = $_REQUEST['context_id'];
+	$_SESSION['lti_resource_link_id'] = $_REQUEST['resource_link_id'];
+	$_SESSION['lti_lis_result_sourcedid'] = $_REQUEST['lis_result_sourcedid'];
+	$_SESSION['lti_outcomeurl'] = $_REQUEST['lis_outcome_service_url'];
+	$_SESSION['lti_context_label'] = $_REQUEST['context_label'];
+	$_SESSION['lti_launch_get'] = $_GET;
 	
 	//look if we know this student
 	$query = "SELECT userid FROM imas_ltiusers WHERE org='$ltiorg' AND ltiuserid='$ltiuserid'";
@@ -419,7 +434,7 @@ if (isset($_GET['launch'])) {
 	
 		
 		//if doing lti_only, and first/last name were provided, go ahead and use them and don't ask
-		if (count($keyparts)>2 && $keyparts[2]==1 && ((!empty($_REQUEST['lis_person_name_given']) && !empty($_REQUEST['lis_person_name_family'])) || !empty($_REQUEST['lis_person_name_full'])) ) {
+		if ((count($keyparts)==1 && $ltirole=='learner') || (count($keyparts)>2 && $keyparts[2]==1 && ((!empty($_REQUEST['lis_person_name_given']) && !empty($_REQUEST['lis_person_name_family'])) || !empty($_REQUEST['lis_person_name_full'])) )) {
 			if (!empty($_REQUEST['lis_person_name_given']) && !empty($_REQUEST['lis_person_name_family'])) {
 				$firstname = $_REQUEST['lis_person_name_given'];
 				$lastname = $_REQUEST['lis_person_name_family'];
@@ -490,6 +505,25 @@ if ($askforuserinfo == true) {
 
 //determine request type, and check availability
 $now = time();
+if (count($keyparts)==1 && $_SESSION['ltirole']!='instructor') { //general placement - let's narrow it down
+	$query = "SELECT placementtype,typeid FROM imas_lti_placements WHERE ";
+	$query .= "contextid='{$_SESSION['lti_context_id']}' AND linkid='{$_SESSION['lti_resource_link_id']}' ";
+	$query .= "AND org='{$_SESSION['ltiorg']}'";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	if (mysql_num_rows($result)==0) {
+		reporterror("This placement is not yet set up: $query");
+	} else {
+		$row = mysql_fetch_row($result);
+		if ($row[0]=='course') {
+			$keyparts = array('cid',$row[1]);
+		} else if ($row[0]=='assess') {
+			$keyparts = array('aid',$row[1]);
+		} else {
+			reporterror("Invalid placement type");
+		}
+		
+	}
+}
 if ($keyparts[0]=='cid') {
 	$cid = intval($keyparts[1]);
 	$query = "SELECT available,ltisecret FROM imas_courses WHERE id='$cid'";
@@ -511,9 +545,9 @@ if ($keyparts[0]=='cid') {
 			reporterror("This assessment is closed");
 		}
 	}
-} else if ($keyparts[0]!='sso') {
+} else if ($keyparts[0]!='sso' && $_SESSION['ltirole']!='instructor') {
 	reporterror("invalid key. unknown action type");
-}
+} 
 
 //see if student is enrolled, if appropriate to action type
 if ($keyparts[0]=='cid' || $keyparts[0]=='aid') {
@@ -546,8 +580,11 @@ if (mysql_num_rows($result)>0) {
 	//check that same userid, and that we're not jumping on someone else's 
 	//existing session.  If so, then we need to create a new session.
 	if (mysql_result($result,0,0)!=$userid) {
+		session_destroy();
+		session_start();
 		session_regenerate_id();
 		$sessionid = session_id();
+		setcookie(session_name(),session_id());
 		$sessiondata = array();
 		$createnewsession = true;
 	} else {
@@ -600,7 +637,19 @@ if ($keyparts[0]=='aid') {
 }  else if ($keyparts[0]=='cid') { //is cid
 	$sessiondata['ltiitemtype']=1;
 	$sessiondata['ltiitemid'] = $cid;
+} else if ($keyparts[0]=='sso') { //is sso
+	$sessiondata['ltiitemtype']=2;
+} else {
+	$sessiondata['ltiitemtype']=-1;
 }
+$sessiondata['ltiorg'] = $_SESSION['ltiorg'];
+$sessiondata['ltirole'] = $_SESSION['ltirole'];
+$sessiondata['lti_context_id']  = $_SESSION['lti_context_id']; 
+$sessiondata['lti_resource_link_id']  = $_SESSION['lti_resource_link_id']; 
+$sessiondata['lti_lis_result_sourcedid']  = stripslashes($_SESSION['lti_lis_result_sourcedid']);
+$sessiondata['lti_outcomeurl']  = $_SESSION['lti_outcomeurl'];
+$sessiondata['lti_context_label'] = $_SESSION['lti_context_label'];
+$sessiondata['lti_launch_get'] = $_SESSION['lti_launch_get'];
 $enc = base64_encode(serialize($sessiondata));
 if ($createnewsession) {
 	$query = "INSERT INTO imas_sessions (sessionid,userid,sessiondata,time) VALUES ('$sessionid','$userid','$enc',$now)";
@@ -620,7 +669,9 @@ if (!$promptforsettings && !$createnewsession && !($keyparts[0]=='aid' && $tlwrd
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
 	} else if ($keyparts[0]=='sso') {
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/index.php");
-	} 
+	} else { //will only be instructors hitting this option
+		header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/ltihome.php");
+	}
 	exit;	
 } else {
 	header("Location: http://" . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . "?accessibility=ask");

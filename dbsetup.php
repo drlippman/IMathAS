@@ -333,6 +333,7 @@ $sql = 'CREATE TABLE `imas_assessment_sessions` ('
         . ' `userid` INT(10) UNSIGNED NOT NULL, '
 	. ' `assessmentid` INT(10) UNSIGNED NOT NULL, '
 	. ' `agroupid` INT(10) UNSIGNED NOT NULL DEFAULT \'0\', '
+	. ' `lti_sourcedid` TEXT NOT NULL, '
         . ' `questions` TEXT NOT NULL, '
         . ' `seeds` TEXT NOT NULL, '
         . ' `scores` TEXT NOT NULL, '
@@ -804,6 +805,29 @@ $sql = 'CREATE TABLE `imas_ltinonces` ('
         . ' ENGINE = InnoDB;';
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 echo 'imas_ltinonces created<br/>';
+
+$sql = 'CREATE TABLE `imas_lti_courses` (
+	`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+	`org` VARCHAR( 255 ) NOT NULL ,
+	`contextid` VARCHAR( 255 ) NOT NULL ,
+	`courseid` INT( 10 ) UNSIGNED NOT NULL ,
+	`outcomeurl` VARCHAR( 1023 ) NOT NULL ,
+	 INDEX(`org`,`contextid`)
+	) ENGINE = InnoDB;';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+echo 'imas_lti_courses created<br/>';
+
+$sql = 'CREATE TABLE `imas_lti_placements` (
+	`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+	`org` VARCHAR( 255 ) NOT NULL ,
+	`contextid` VARCHAR( 255 ) NOT NULL ,
+	`linkid` VARCHAR( 255 ) NOT NULL ,
+	`typeid` INT( 10 ) UNSIGNED NOT NULL ,
+	`placementtype` VARCHAR( 10 ) NOT NULL ,
+	 INDEX(`org`, `contextid`, `linkid`)
+	) ENGINE = InnoDB;';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+echo 'imas_lti_placements created<br/>';
 
 $sql = 'CREATE TABLE `mc_sessions` ('
         . ' `userid` INT( 10 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,'

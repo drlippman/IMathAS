@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 46;
+$latest = 47;
 
 
 @set_time_limit(0);
@@ -790,7 +790,38 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			}
 		}
-		
+		if ($last < 47) {
+			$query = 'CREATE TABLE `imas_lti_courses` (
+				`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+				`org` VARCHAR( 255 ) NOT NULL ,
+				`contextid` VARCHAR( 255 ) NOT NULL ,
+				`courseid` INT( 10 ) UNSIGNED NOT NULL ,
+				`outcomeurl` VARCHAR( 1023 ) NOT NULL ,
+				 INDEX(`org`,`contextid`)
+				) ENGINE = InnoDB;';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			$query = 'CREATE TABLE `imas_lti_placements` (
+				`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+				`org` VARCHAR( 255 ) NOT NULL ,
+				`contextid` VARCHAR( 255 ) NOT NULL ,
+				`linkid` VARCHAR( 255 ) NOT NULL ,
+				`typeid` INT( 10 ) UNSIGNED NOT NULL ,
+				`placementtype` VARCHAR( 10 ) NOT NULL ,
+				 INDEX(`org`, `contextid`, `linkid`)
+				) ENGINE = InnoDB;';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			$query = 'ALTER TABLE `imas_assessment_sessions` ADD `lti_sourcedid` TEXT NOT NULL';
+			$res = mysql_query($query);
+			if ($res===false) {
+			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			}
+		}
 		
 		$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {

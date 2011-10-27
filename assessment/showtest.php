@@ -148,8 +148,13 @@
 					
 			}
 			$deffeedbacktext = addslashes($adata['deffeedbacktext']);
-			$query = "INSERT INTO imas_assessment_sessions (userid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers,reviewscores,reviewattempts,reviewseeds,reviewlastanswers,agroupid,feedback) ";
-			$query .= "VALUES ('$userid','{$_GET['id']}','$qlist','$seedlist','$scorelist','$attemptslist','$lalist',$starttime,'$bestscorelist','$bestattemptslist','$bestseedslist','$bestlalist','$scorelist','$attemptslist','$reviewseedlist','$lalist',$stugroupid,'$deffeedbacktext');";
+			if (isset($sessiondata['lti_lis_result_sourcedid'])) {
+				$ltisourcedid = addslashes(stripslashes($sessiondata['lti_lis_result_sourcedid']));
+			} else {
+				$ltisourcedid = '';
+			}
+			$query = "INSERT INTO imas_assessment_sessions (userid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers,reviewscores,reviewattempts,reviewseeds,reviewlastanswers,agroupid,feedback,lti_sourcedid) ";
+			$query .= "VALUES ('$userid','{$_GET['id']}','$qlist','$seedlist','$scorelist','$attemptslist','$lalist',$starttime,'$bestscorelist','$bestattemptslist','$bestseedslist','$bestlalist','$scorelist','$attemptslist','$reviewseedlist','$lalist',$stugroupid,'$deffeedbacktext','$ltisourcedid');";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$sessiondata['sessiontestid'] = mysql_insert_id();
 			
@@ -307,6 +312,11 @@
 	if ($starttime == 0) {
 		$starttime = time();
 		$query = "UPDATE imas_assessment_sessions SET starttime=$starttime WHERE id='$testid'";
+		mysql_query($query) or die("Query failed : $query: " . mysql_error());
+	}
+	if (isset($sessiondata['lti_lis_result_sourcedid']) && $line['lti_sourcedid']!=$sessiondata['lti_lis_result_sourcedid']) {
+		$ltisourcedid = addslashes(stripslashes($sessiondata['lti_lis_result_sourcedid']));
+		$query = "UPDATE imas_assessment_sessions SET lti_sourcedid='$ltisourcedid' WHERE id='$testid'";
 		mysql_query($query) or die("Query failed : $query: " . mysql_error());
 	}
 	

@@ -1,10 +1,18 @@
 <?php
+// code is adapted from IMS-DEV sample code
+// on code.google.com/p/ims-dev
+
 // vim: foldmethod=marker
 
+$OAuth_last_computed_signature = false;
+
+
+if (!class_exists('OAuthException')) {
 /* Generic exception class
  */
 class OAuthException extends Exception {
   // pass
+}
 }
 
 class OAuthConsumer {
@@ -65,6 +73,9 @@ class OAuthSignatureMethod_HMAC_SHA1 extends OAuthSignatureMethod {
   }
 
   public function build_signature($request, $consumer, $token) {
+    global $OAuth_last_computed_signature;
+    $OAuth_last_computed_signature = false;
+    
     $base_string = $request->get_signature_base_string();
     $request->base_string = $base_string;
 
@@ -77,10 +88,12 @@ class OAuthSignatureMethod_HMAC_SHA1 extends OAuthSignatureMethod {
     $key = implode('&', $key_parts);
 
     if (function_exists("hash_hmac")) {
-	    return base64_encode(hash_hmac('sha1', $base_string, $key, true));
+	    $computed_signature =  base64_encode(hash_hmac('sha1', $base_string, $key, true));
     } else {
-	    return base64_encode(custom_hmac('sha1', $base_string, $key, true));
+	    $computed_signature = base64_encode(custom_hmac('sha1', $base_string, $key, true));
     }
+    $OAuth_last_computed_signature = $computed_signature;
+    return $computed_signature;
   }
 }
 
@@ -196,7 +209,8 @@ class OAuthRequest {
               ? 'http'
               : 'https';
     $port = "";
-    if ( $_SERVER['SERVER_PORT'] != "80" && $_SERVER['SERVER_PORT'] != "443" ) {
+    if ( $_SERVER['SERVER_PORT'] != "80" && $_SERVER['SERVER_PORT'] != "443" &&
+        strpos(':', $_SERVER['HTTP_HOST']) < 0 ) {
       $port =  ':' . $_SERVER['SERVER_PORT'] ;
     }
     @$http_url or $http_url = $scheme .
@@ -216,8 +230,18 @@ class OAuthRequest {
       // Parse the query-string to find GET parameters
       $parameters = OAuthUtil::parse_parameters($_SERVER['QUERY_STRING']);
 
+      $ourpost = $_POST;
+      // Deal with magic_quotes
+      // http://www.php.net/manual/en/security.magicquotes.disabling.php
+      if ( get_magic_quotes_gpc() ) {
+         $outpost = array();
+         foreach ($_POST as $k => $v) {
+            $v = stripslashes($v);
+            $ourpost[$k] = $v;
+         }
+      }
      // Add POST Parameters if they exist
-      $parameters = array_merge($parameters, $_POST);
+      $parameters = array_merge($parameters, $ourpost);
 
       // We have a Authorization-header with OAuth data. Parse the header
       // and add those overriding any duplicates from GET or POST
@@ -487,6 +511,8 @@ class OAuthServer {
    * verify an api call, checks all the parameters
    */
   public function verify_request(&$request) {
+    global $OAuth_last_computed_signature;
+    $OAuth_last_computed_signature = false;
     $this->get_version($request);
     $consumer = $this->get_consumer($request);
     $token = $this->get_token($request, $consumer, "access");
@@ -567,6 +593,9 @@ class OAuthServer {
    */
   private function check_signature(&$request, $consumer, $token) {
     // this should probably be in a different method
+    global $OAuth_last_computed_signature;
+    $OAuth_last_computed_signature = false;
+    
     $timestamp = @$request->get_parameter('oauth_timestamp');
     $nonce = @$request->get_parameter('oauth_nonce');
 
@@ -584,7 +613,11 @@ class OAuthServer {
     );
 
     if (!$valid_sig) {
-      throw new OAuthException("Invalid signature");
+      $ex_text = "Invalid signature";
+      if ( $OAuth_last_computed_signature ) {
+          $ex_text = $ex_text . " ours= $OAuth_last_computed_signature yours=$signature";
+      }
+      throw new OAuthException($ex_text);
     }
   }
 

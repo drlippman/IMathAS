@@ -111,7 +111,7 @@
   //Special Config tags for customizing
   //$loginpage = 'custom-login-page.php';
   /*
-  
+  $studentTOS = "info/studentTOS.php";
   $CFG['CPS']['theme'] = array("modern.css",1);  //default theme - second value 0=fixed, 1=can change
   $CFG['CPS']['themelist'] = "default.css,modern.css";  //list of allowed themes
   $CFG['CPS']['themenames'] = "Default, Modern";  //to give names to the theme files
@@ -124,6 +124,13 @@
   $CFG['GEN']['fixedhomelayout'] = array(3);  //prevent changing of home layout sections
   $CFG['GEN']['hometitle'] = "Home";	//title for course list page
   $CFG['GEN']['headerinclude'] = "headercontent.php";  //page to include in all headers
+  
+  //if you want to allow people to create guest accounts by just logging in with username "guest",
+  //provide an arrary of course ids to automatically enroll them in
+  $CFG['GEN']['guesttempaccts'] = array(264);  
+  
+   //userid for instructor of student self-enroll courses (that show up in enroll list)
+   $CFG['GEN']['selfenrolluser'] = 92434;
   
   //can set almost any assessment setting this way
 	 $CFG['AMS']['defpoints'] = 1;  //default points
