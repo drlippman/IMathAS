@@ -148,8 +148,8 @@
 					
 			}
 			$deffeedbacktext = addslashes($adata['deffeedbacktext']);
-			if (isset($sessiondata['lti_lis_result_sourcedid'])) {
-				$ltisourcedid = addslashes(stripslashes($sessiondata['lti_lis_result_sourcedid']));
+			if (isset($sessiondata['lti_lis_result_sourcedid']) && strlen($sessiondata['lti_lis_result_sourcedid'])>1) {
+				$ltisourcedid = addslashes(stripslashes($sessiondata['lti_lis_result_sourcedid'].':|:'.$sessiondata['lti_outcomeurl'].':|:'.$sessiondata['lti_key'].':|:'.$sessiondata['lti_keytype']));
 			} else {
 				$ltisourcedid = '';
 			}
@@ -263,6 +263,17 @@
 			} else {
 				$sessiondata['timelimitmult'] = 1.0;
 			}
+			
+			if (isset($sessiondata['lti_lis_result_sourcedid'])) {
+				$altltisourcedid = stripslashes($sessiondata['lti_lis_result_sourcedid'].':|:'.$sessiondata['lti_outcomeurl'].':|:'.$sessiondata['lti_key'].':|:'.$sessiondata['lti_keytype']);
+				if ($altltisourcedid != $line['lti_sourcedid']) {
+					$altltisourcedid = addslashes($altltisourcedid);
+					$query = "UPDATE imas_assessment_sessions SET lti_sourcedid='$altltisourcedid' WHERE id='{$line['id']}'";
+					mysql_query($query) or die("Query failed : $query: " . mysql_error());
+				}
+			}
+			
+			
 			writesessiondata();
 			session_write_close();
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/showtest.php");
@@ -295,7 +306,7 @@
 	} else {
 		$timesontask = explode(',',$line['timeontask']);
 	}
-	
+	$lti_sourcedid = $line['lti_sourcedid'];
 	
 	if (trim($line['reattempting'])=='') {
 		$reattempting = array();
@@ -312,11 +323,6 @@
 	if ($starttime == 0) {
 		$starttime = time();
 		$query = "UPDATE imas_assessment_sessions SET starttime=$starttime WHERE id='$testid'";
-		mysql_query($query) or die("Query failed : $query: " . mysql_error());
-	}
-	if (isset($sessiondata['lti_lis_result_sourcedid']) && $line['lti_sourcedid']!=$sessiondata['lti_lis_result_sourcedid']) {
-		$ltisourcedid = addslashes(stripslashes($sessiondata['lti_lis_result_sourcedid']));
-		$query = "UPDATE imas_assessment_sessions SET lti_sourcedid='$ltisourcedid' WHERE id='$testid'";
 		mysql_query($query) or die("Query failed : $query: " . mysql_error());
 	}
 	

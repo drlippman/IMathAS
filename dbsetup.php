@@ -811,7 +811,6 @@ $sql = 'CREATE TABLE `imas_lti_courses` (
 	`org` VARCHAR( 255 ) NOT NULL ,
 	`contextid` VARCHAR( 255 ) NOT NULL ,
 	`courseid` INT( 10 ) UNSIGNED NOT NULL ,
-	`outcomeurl` VARCHAR( 1023 ) NOT NULL ,
 	 INDEX(`org`,`contextid`)
 	) ENGINE = InnoDB;';
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());

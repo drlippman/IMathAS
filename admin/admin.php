@@ -285,16 +285,18 @@ $placeinhead .= "}</script>";
 		if ($myrights == 100) {
 ?>	
 	<span class=column>
+	<a href="forms.php?action=listgroups">Edit Groups</a><br/>
+	<a href="forms.php?action=deloldusers">Delete Old Users</a><br/>
+	<a href="importstu.php?cid=admin">Import Students from File</a>
+	</span>
 	<?php if ($allowmacroinstall) {
+		echo '<span class="column">';
 		echo "<a href=\"forms.php?action=importmacros\">Install Macro File</a><br/>\n";
 		echo "<a href=\"forms.php?action=importqimages\">Install Question Images</a><br/>\n";
+		echo "<a href=\"forms.php?action=importcoursefiles\">Install Course Files</a><br/>\n";
+		echo '</span>';
 	} ?>
-	<a href="forms.php?action=deloldusers">Delete Old Users</a><br/>
-	<a href="importstu.php?cid=admin">Import Students from File</a><br/>
-	</span>
-	<span class=column>
-	<a href="forms.php?action=listgroups">Edit Groups</a><br/>
-	</span>
+	
 <?php
 		} 
 ?>

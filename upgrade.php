@@ -796,7 +796,6 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 				`org` VARCHAR( 255 ) NOT NULL ,
 				`contextid` VARCHAR( 255 ) NOT NULL ,
 				`courseid` INT( 10 ) UNSIGNED NOT NULL ,
-				`outcomeurl` VARCHAR( 1023 ) NOT NULL ,
 				 INDEX(`org`,`contextid`)
 				) ENGINE = InnoDB;';
 			 $res = mysql_query($query);

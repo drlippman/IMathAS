@@ -384,7 +384,7 @@ function scorequestion($qn) {
 //records everything but questions array
 //if limit=true, only records lastanswers
 function recordtestdata($limit=false) { 
-	global $isreview,$bestscores,$bestattempts,$bestseeds,$bestlastanswers,$scores,$attempts,$seeds,$lastanswers,$testid,$testsettings,$sessiondata,$reattempting,$timesontask;
+	global $isreview,$bestscores,$bestattempts,$bestseeds,$bestlastanswers,$scores,$attempts,$seeds,$lastanswers,$testid,$testsettings,$sessiondata,$reattempting,$timesontask,$lti_sourcedid,$qi;
 	$bestscorelist = implode(',',$bestscores);
 	$bestattemptslist = implode(',',$bestattempts);
 	$bestseedslist = implode(',',$bestseeds);
@@ -417,6 +417,20 @@ function recordtestdata($limit=false) {
 			$query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',seeds='$seedslist',lastanswers='$lalist',";
 			$query .= "bestseeds='$bestseedslist',bestattempts='$bestattemptslist',bestscores='$bestscorelist',bestlastanswers='$bestlalist',";
 			$query .= "endtime=$now,reattempting='$reattemptinglist',timeontask='$timeslist' ";
+		}
+		if (isset($lti_sourcedid) && strlen($lti_sourcedid)>0 && $sessiondata['ltiitemtype']==0) { 
+			//update lti record.  We only do this for single assessment placements
+			
+			require_once("../includes/ltioutcomes.php");
+			
+			$total = 0;
+			for ($i =0; $i < count($bestscores);$i++) {
+				if (getpts($bestscores[$i])>0) { $total += getpts($bestscores[$i]);}
+			}
+			$totpossible = totalpointspossible($qi);
+			$grade = round($total/$totpossible,4);
+			$res = updateLTIgrade('update',$lti_sourcedid,$testsettings['id'],$grade);
+			
 		}
 	}
 	if ($testsettings['isgroup']>0 && $sessiondata['groupid']>0 && !$isreview) {

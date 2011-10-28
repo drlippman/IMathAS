@@ -3204,7 +3204,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				foreach ($ineqlines as $k=>$val) {
 					$pts = explode(',',$val);
 					//line
-					$slope = ($pts[4]-$pts[2])/($pts[3]-$pts[1]);
+					if ($pts[3]==$pts[1]) {
+						$slope = 10000;
+					} else {
+						$slope = ($pts[4]-$pts[2])/($pts[3]-$pts[1]);
+					}
 					if (abs($slope)>50) {
 						if ($pts[5]>$pts[3]) {
 							$dir = '>';

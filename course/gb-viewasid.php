@@ -86,11 +86,15 @@
 	//PROCESS ANY TODOS
 	if (isset($_GET['clearattempt']) && isset($_GET['asid']) && $isteacher) {
 		if ($_GET['clearattempt']=="confirmed") {
-			if ($from=='isolate' || $from=='gisolate' || $from=='stugrp') {
-				$query = "SELECT assessmentid FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
-				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-				$aid = mysql_result($result,0,0);
+			$query = "SELECT assessmentid,lti_sourcedid FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
+			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			$aid = mysql_result($result,0,0);
+			$ltisourcedid = mysql_result($result,0,1);
+			if (strlen($ltisourcedid)>1) {
+				require_once("../includes/ltioutcomes");
+				updateLTIgrade('delete',$ltisourcedid,$aid);
 			}
+			
 			$qp = getasidquery($_GET['asid']);
 			deleteasidfilesbyquery2($qp[0],$qp[1],$qp[2],1);
 			//deleteasidfilesbyquery(array($qp[0]=>$qp[1]),1);
@@ -149,10 +153,16 @@
 			//deleteasidfilesbyquery(array($qp[0]=>$qp[1]),1);
 			deleteasidfilesbyquery2($qp[0],$qp[1],$qp[2],1);
 			$whereqry = " WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}'";
-			$query = "SELECT seeds,lastanswers,bestlastanswers FROM imas_assessment_sessions $whereqry";
+			$query = "SELECT seeds,lti_sourcedid FROM imas_assessment_sessions $whereqry";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$seeds = explode(',',mysql_result($result,0,0));
-				
+			$ltisourcedid = mysql_result($result,0,1);
+			if (strlen($ltisourcedid)>1) {
+				require_once("../includes/ltioutcomes");
+				updateLTIgrade('update',$ltisourcedid,$aid,0);
+			}
+			
+			
 			$scores = array_fill(0,count($seeds),-1);
 			$attempts = array_fill(0,count($seeds),0);
 			$lastanswers = array_fill(0,count($seeds),'');
@@ -191,7 +201,7 @@
 			$whereqry = " WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}'";
 			//$whereqry = getasidquery($_GET['asid']);
 			
-			$query = "SELECT attempts,lastanswers,reattempting,scores,bestscores,bestattempts,bestlastanswers FROM imas_assessment_sessions $whereqry"; //WHERE id='{$_GET['asid']}'";
+			$query = "SELECT attempts,lastanswers,reattempting,scores,bestscores,bestattempts,bestlastanswers,lti_sourcedid FROM imas_assessment_sessions $whereqry"; //WHERE id='{$_GET['asid']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$line = mysql_fetch_array($result, MYSQL_ASSOC);
 			
@@ -229,6 +239,12 @@
 				$query .= "bestscores='$bestscorelist',bestattempts='$bestattemptslist',bestlastanswers='$bestlalist',reattempting='$reattemptinglist' ";
 				$query .= $whereqry; //"WHERE id='{$_GET['asid']}'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
+				
+				if (strlen($line['lti_sourcedid'])>1) {
+					require_once("../includes/ltioutcomes");
+					calcandupdateLTIgrade($line['lti_sourcedid'],$aid,$bestscores);
+				}
+				
 				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') ."/gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&from=$from&cid=$cid&uid={$_GET['uid']}");
 			} else {
 				echo "<p>Error.  Try again.</p>";
@@ -295,25 +311,25 @@
 				} else {
 					$query .= "WHERE id='{$_GET['asid']}'";
 				}
+				$q2 = "SELECT assessmentid,lti_sourcedid FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
+				$res = mysql_query($q2) or die("Query failed : $q2 " . mysql_error());
+				$row = mysql_fetch_row($res);
+				$aid = $row[0];
+				if (strlen($row[1])>1) {
+					//update LTI score
+					require_once("../includes/ltioutcomes.php");
+					calcandupdateLTIgrade($row[1],$row[0],$scores);
+				}
 			} else {
 				echo "No authority to change scores.";
 				exit;
 			}
 			mysql_query($query) or die("Query failed : $query " . mysql_error());
 			if ($from=='isolate') {
-				$query = "SELECT assessmentid FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
-				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-				$aid = mysql_result($result,0,0);
 				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/isolateassessgrade.php?stu=$stu&cid={$_GET['cid']}&aid=$aid&gbmode=$gbmode");
 			} else if ($from=='gisolate') {
-				$query = "SELECT assessmentid FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
-				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-				$aid = mysql_result($result,0,0);
 				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/isolateassessbygroup.php?stu=$stu&cid={$_GET['cid']}&aid=$aid&gbmode=$gbmode");
 			} else if ($from=='stugrp') {
-				$query = "SELECT assessmentid FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
-				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-				$aid = mysql_result($result,0,0);
 				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid={$_GET['cid']}&aid=$aid");
 			} else {
 				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid={$_GET['cid']}&gbmode=$gbmode");

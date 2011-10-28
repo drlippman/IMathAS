@@ -84,7 +84,7 @@ if (isset($_GET['launch'])) {
 	$query = "UPDATE imas_users SET lastaccess='$now' WHERE id='$userid'";
 	mysql_query($query) or die("Query failed : " . mysql_error());
 	
-	$query = "UPDATE imas_sessions SET sessiondata='$enc',tzoffset='{$_POST['tzoffset']}'";
+	$query = "UPDATE imas_sessions SET sessiondata='$enc',tzoffset='{$_POST['tzoffset']}' WHERE sessionid='$sessionid'";
 	mysql_query($query) or die("Query failed : " . mysql_error());
 	
 	$keyparts = explode('_',$_SESSION['ltikey']);
@@ -395,15 +395,19 @@ if (isset($_GET['launch'])) {
 	// prepend ltiorg with courseid or sso+userid to prevent cross-instructor hacking  
 	if ($keyparts[0]=='cid') {  //cid:org
 		$ltiorg = $keyparts[1].':'.$ltiorg;
+		$keytype = 'c';
 	} else if ($keyparts[0]=='aid') {   //also cid:org
 		$aid = intval($keyparts[1]);
 		$query = "SELECT courseid FROM imas_assessments WHERE id='$aid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$ltiorg = mysql_result($result,0,0) . ':' . $ltiorg;
+		$keytype = 'a';
 	} else if ($keyparts[0]=='sso') {  //ssouserid:org
 		$ltiorg = $keyparts[0].$keyparts[1]. ':' . $ltiorg;
+		$keytype = 's';
 	} else {
 		$ltiorg = $ltikey.':'.$ltiorg;
+		$keytype = 'g';
 	}
 	
 	//Store all LTI request data in session variable for reuse on submit
@@ -423,6 +427,8 @@ if (isset($_GET['launch'])) {
 	$_SESSION['lti_outcomeurl'] = $_REQUEST['lis_outcome_service_url'];
 	$_SESSION['lti_context_label'] = $_REQUEST['context_label'];
 	$_SESSION['lti_launch_get'] = $_GET;
+	$_SESSION['lti_key'] = $ltikey;
+	$_SESSION['lti_keytype'] = $keytype;
 	
 	//look if we know this student
 	$query = "SELECT userid FROM imas_ltiusers WHERE org='$ltiorg' AND ltiuserid='$ltiuserid'";
@@ -511,7 +517,29 @@ if (count($keyparts)==1 && $_SESSION['ltirole']!='instructor') { //general place
 	$query .= "AND org='{$_SESSION['ltiorg']}'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	if (mysql_num_rows($result)==0) {
-		reporterror("This placement is not yet set up: $query");
+		if (isset($_SESSION['lti_launch_get']) && isset($_SESSION['lti_launch_get']['aid']) && isset($_SESSION['lti_launch_get']['cid'])) {
+			//if we know aid and cid from $_GET, we can go ahead and create the placement now.
+			$aid = intval($_SESSION['lti_launch_get']['aid']);
+			$cid = intval($_SESSION['lti_launch_get']['cid']);
+			if ($aid==0 || $cid==0) {
+				reporterror("This placement is not yet set up");
+			} else {
+				$query = "SELECT courseid FROM imas_lti_courses WHERE contextid='{$_SESSION['lti_context_id']}' ";
+				$query .= "AND org='{$_SESSION['ltiorg']}' AND courseid='$cid'";
+				if (mysql_num_rows($result)==0) {
+					$query = "INSERT INTO imas_lti_courses (org,contextid,courseid) VALUES ";
+					$query .= "('{$_SESSION['ltiorg']}','{$_SESSION['lti_context_id']}',$cid)";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+				}
+				$query = "INSERT INTO imas_lti_placements (org,contextid,linkid,placementtype,typeid) VALUES ";
+				$query .= "('{$_SESSION['ltiorg']}','{$_SESSION['lti_context_id']}','{$_SESSION['lti_resource_link_id']}','assess','$aid')";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+				$keyparts = array('aid',$aid);
+			}
+			
+		} else {
+			reporterror("This placement is not yet set up");
+		}
 	} else {
 		$row = mysql_fetch_row($result);
 		if ($row[0]=='course') {
@@ -650,6 +678,9 @@ $sessiondata['lti_lis_result_sourcedid']  = stripslashes($_SESSION['lti_lis_resu
 $sessiondata['lti_outcomeurl']  = $_SESSION['lti_outcomeurl'];
 $sessiondata['lti_context_label'] = $_SESSION['lti_context_label'];
 $sessiondata['lti_launch_get'] = $_SESSION['lti_launch_get'];
+$sessiondata['lti_key'] = $_SESSION['lti_key'];
+$sessiondata['lti_keytype'] = $_SESSION['lti_keytype'];
+
 $enc = base64_encode(serialize($sessiondata));
 if ($createnewsession) {
 	$query = "INSERT INTO imas_sessions (sessionid,userid,sessiondata,time) VALUES ('$sessionid','$userid','$enc',$now)";

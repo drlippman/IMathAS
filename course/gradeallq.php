@@ -90,6 +90,12 @@
 				
 				$query = "UPDATE imas_assessment_sessions SET bestscores='$scorelist',feedback='$feedback' WHERE id='{$line['id']}'";
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
+				
+				if (strlen($line['lti_sourcedid'])>1) {
+					//update LTI score
+					require_once("../includes/ltioutcomes.php");
+					calcandupdateLTIgrade($line['lti_sourcedid'],$aid,$scores);
+				}
 			}
 		}
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-itemanalysis.php?stu=$stu&cid=$cid&aid=$aid&asid=average");

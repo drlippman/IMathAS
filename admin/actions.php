@@ -542,6 +542,44 @@ switch($_GET['action']) {
 			require("../footer.php");
 			exit;
 		}
+	case "importcoursefiles":
+		if ($myrights < 100 || !$allowmacroinstall) { echo "You don't have the authority for this action"; break;}
+		$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/import/';
+		$uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
+		if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
+			if (strpos($uploadfile,'.zip')!==FALSE && class_exists('ZipArchive')) {
+				$zip = new ZipArchive();
+				$res = $zip->open($uploadfile);
+				$ne = 0;  $ns = 0;
+				if ($res===true) {
+					for($i = 0; $i < $zip->numFiles; $i++) {
+						if (file_exists("../course/files/".$zip->getNameIndex($i))) {
+							$ns++;
+						} else {
+							$zip->extractTo("../course/files/", array($zip->getNameIndex($i)));
+							$ne++;
+						} 
+					}
+					require("../header.php");
+					echo "<p>Extracted $ne files.  Skipped $ns files.  <a href=\"admin.php\">Continue</a></p>\n";
+					require("../footer.php");
+					exit;
+				} else {
+					require("../header.php");
+					echo "<p>File appears to contain nothing</p>\n";
+					require("../footer.php");
+					exit;
+				}
+				
+			}
+			unlink($uploadfile);
+			break;
+		} else {
+			require("../header.php");
+			echo "<p>Error uploading file!</p>\n";
+			require("../footer.php");
+			exit;
+		}
 	case "transfer":
 		if ($myrights < 40) { echo "You don't have the authority for this action"; break;}
 		$exec = false;

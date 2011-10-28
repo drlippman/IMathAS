@@ -13,7 +13,7 @@ if (mysql_num_rows($result)==0) {
 		$cid = intval($sessiondata['lti_launch_get']['cid']);
 		if ($cid>0) {
 			$query = "INSERT INTO imas_lti_courses (org,contextid,courseid,outcomeurl) VALUES ";
-			$query .= "('{$sessiondata['ltiorg']}','{$sessiondata['lti_context_id']}',$cid,'{$sessiondata['lti_outcomeurl']}')";
+			$query .= "('{$sessiondata['ltiorg']}','{$sessiondata['lti_context_id']}',$cid)";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			$hascourse = true;
 		} 

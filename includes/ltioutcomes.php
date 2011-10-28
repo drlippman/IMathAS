@@ -41,6 +41,103 @@ function sendOAuthBodyPOST($method, $endpoint, $oauth_consumer_key, $oauth_consu
     return $response;
 }
 
+$aidtotalpossible = array();
+//use this if we don't know the total possible
+function calcandupdateLTIgrade($sourcedid,$aid,$scores) {
+	global $aidtotalpossible;
+	if (!isset($aidtotalpossible[$aid])) {
+		$query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
+		$res= mysql_query($qr) or die("Query failed : $qr" . mysql_error());
+		$aitems = explode(',',mysql_result($res,0,0));
+		foreach ($aitems as $k=>$v) {
+			if (strpos($v,'~')!==FALSE) {
+				$sub = explode('~',$v);
+				if (strpos($sub[0],'|')===false) { //backwards compat
+					$aitems[$k] = $sub[0];
+					$aitemcnt[$k] = 1;
+				} else {
+					$grpparts = explode('|',$sub[0]);
+					$aitems[$k] = $sub[1];
+					$aitemcnt[$k] = $grpparts[0];
+				}
+			} else {
+				$aitemcnt[$k] = 1;
+			}
+		}
+		
+		$query = "SELECT points,id FROM imas_questions WHERE assessmentid='$aid'";
+		$result2 = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+		$totalpossible = 0;
+		while ($r = mysql_fetch_row($result2)) {
+			if (in_array($r[1],$aitems)) { //only use first item from grouped questions for total pts
+				if ($r[0]==9999) {
+					$totalpossible += $aitemcnt[$k]*$line['defpoints']; //use defpoints
+				} else {
+					$totalpossible += $aitemcnt[$k]*$r[0]; //use points from question
+				}
+			}
+		}
+		$aidtotalpossible[$aid] = $totalpossible;
+	}
+	$total = 0;
+	for ($i =0; $i < count($scores);$i++) {
+		if (getpts($scores[$i])>0) { $total += getpts($scores[$i]);}
+	}
+	$grade = round($total/$aidtotalpossible[$aid],4);
+	return updateLTIgrade('update',$sourcedid,$aid,$grade);
+}
+
+//use this if we know the grade, or want to delete
+function updateLTIgrade($action,$sourcedid,$aid,$grade=0) {
+	global $sessiondata,$testsettings;
+	
+	list($lti_sourcedid,$ltiurl,$ltikey,$keytype) = explode(':|:',$sourcedid);
+	if (strlen($lti_sourcedid)>1 && strlen($ltiurl)>1 && strlen($ltikey)>1) {
+		if (isset($sessiondata[$ltikey.'-'.$aid.'-secret'])) {
+			$secret = $sessiondata[$ltikey.'-'.$aid.'-secret'];
+		} else {
+			if ($keytype=='a') {
+				if (isset($testsettings) && isset($testsettings['ltisecret'])) {
+					$secret = $testsettings['ltisecret'];
+				} else {
+					$query = "SELECT ltisecret FROM imas_assessments WHERE id='$aid'";
+					$res= mysql_query($qr) or die("Query failed : $qr" . mysql_error());
+					if (mysql_num_rows($res)>0) {
+						$secret = mysql_result($res,0,0);
+						$sessiondata[$ltikey.'-'.$aid.'-secret'] = $secret;
+						writesessiondata();
+					} else {
+						$secret = '';
+					}
+				}
+			} else {
+				$qr = "SELECT password FROM imas_users WHERE SID='{$sessiondata['lti_key']}' AND rights=11";
+				$res= mysql_query($qr) or die("Query failed : $qr" . mysql_error());
+				if (mysql_num_rows($res)>0) {
+					$secret = mysql_result($res,0,0);
+					$sessiondata[$ltikey.'-'.$aid.'-secret'] = $secret;
+					writesessiondata();
+				} else {
+					$secret = '';
+				}
+			}
+		}
+		if ($secret != '') {
+			if ($action=='update') {
+				return sendLTIOutcome('update',$ltikey,$secret,$ltiurl,$lti_sourcedid,$grade);
+			} else if ($action=='delete') {
+				return sendLTIOutcome('delete',$ltikey,$secret,$ltiurl,$lti_sourcedid);
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	} else {
+		return false;
+	}
+}
+
 function sendLTIOutcome($action,$key,$secret,$url,$sourcedid,$grade=0) {
 		
 	$method="POST";
