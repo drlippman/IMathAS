@@ -38,13 +38,16 @@ function additem($itemtoadd,$item,$questions,$qset) {
 			$pair = explode('=',$set);
 			$item[$itemtoadd][$pair[0]] = $pair[1];
 		}
-		$query = "INSERT INTO imas_assessments (courseid,name,summary,intro,avail,startdate,enddate,reviewdate,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,password,cntingb,minscore,showcat,showhints,isgroup,allowlate,exceptionpenalty,noprint,groupmax,endmsg,eqnhelper)";
-		$query .= "VALUES ('$cid'";
-		$setstoadd = explode(',','name,summary,intro,avail,startdate,enddate,reviewdate,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,password,cntingb,minscore,showcat,showhints,isgroup,allowlate,exceptionpenalty,noprint,groupmax,endmsg,eqnhelper');
+		$setstoadd = explode(',','name,summary,intro,avail,startdate,enddate,reviewdate,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,password,cntingb,minscore,showcat,showhints,isgroup,allowlate,exceptionpenalty,noprint,groupmax,endmsg,eqnhelper,caltag,calrtag,showtips,deffeedbacktext');
+		$valsets = "'$cid'";
+		$tosets = 'courseid';
 		foreach ($setstoadd as $set) {
-			$query .= ',\''.$item[$itemtoadd][$set].'\'';
+			if (isset($item[$itemtoadd][$set])) {
+				$tosets .= ','.$set;
+				$valsets .= ',\''.$item[$itemtoadd][$set].'\'';
+			}
 		}
-		$query .= ')';
+		$query = "INSERT INTO imas_assessments ($tosets) VALUES ($valsets)";
 		/*'{$item[$itemtoadd]['name']}','{$item[$itemtoadd]['summary']}','{$item[$itemtoadd]['intro']}',";
 		$query .= "'{$item[$itemtoadd]['avail']}','{$item[$itemtoadd]['startdate']}','{$item[$itemtoadd]['enddate']}','{$item[$itemtoadd]['reviewdate']}','{$item[$itemtoadd]['timelimit']}',";
 		$query .= "'{$item[$itemtoadd]['displaymethod']}','{$item[$itemtoadd]['defpoints']}','{$item[$itemtoadd]['defattempts']}',";
