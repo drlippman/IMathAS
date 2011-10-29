@@ -789,8 +789,8 @@ echo 'imas_stugroupmembers created<br/>';
 
 $sql = 'CREATE TABLE `imas_ltiusers` ('
         . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
-        . ' `org` VARCHAR(32) NOT NULL, '
-        . ' `ltiuserid` VARCHAR(32) NOT NULL, '
+        . ' `org` VARCHAR(255) NOT NULL, '
+        . ' `ltiuserid` VARCHAR(255) NOT NULL, '
         . ' `userid` INT(10) NOT NULL'
         . ' )'
         . ' ENGINE = InnoDB;';

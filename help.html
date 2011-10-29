@@ -1784,6 +1784,9 @@ These macros are fairly general purpose:
 <li><b>formhoverover(label,tip)</b>:  Creates a hover-over definition or other tip</li>
 <li><b>formpopup(label,content,[width,height,style,scrollbars])</b>:  Creates a link or button leading to a popup window.  Content can
   be a web address, or HTML content to put directly into the popup.  Style can be "link" or "button". Scrollbars defaults to false - set true for scrollbars.</li>
+<li><b>forminlinebutton(lable,content,[style,outputstyle])</b>:  Creates a link or button that when clicked will reveal hidden content.  
+  Content can be any valid HTML.  Style can be "link" or "button".  Outputstyle can be "inline" or "block".  Block will allow any HTML, but will
+  be displayed on a new line.  Use "inline" to have text stay on the same line.</li>
 <li><b>makenumberrequiretimes(array/list)</b>:  Takes an array or list of numbers and generates a string suitable for use as a $requiretimes.  Writes
   the string so that every number in the array must show up in the student answer.  Automatically detects and adjusts for number overlaps
   (like 2 appearing in 32).</li>

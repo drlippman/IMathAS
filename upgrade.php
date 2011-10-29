@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 47;
+$latest = 48;
 
 
 @set_time_limit(0);
@@ -820,6 +820,18 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			if ($res===false) {
 			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			}
+		}
+		if ($last < 48) {
+			 $query = 'ALTER TABLE `imas_grades` CHANGE `org` `org` VARCHAR( 254 ) NOT NULL';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			  $query = 'ALTER TABLE `imas_grades` CHANGE `ltiuserid` `ltiuserid` VARCHAR( 254 ) NOT NULL';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
 		}
 		
 		$handle = fopen("upgradecounter.txt",'w');

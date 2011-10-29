@@ -1,8 +1,10 @@
 <?php
 //IMathAS:  BasicLTI Producer Code
 //(c) David Lippman 2009
-//based on demo code only - not on specs.  No guarantee of compliance with specs
-//launches with three types of keys
+//
+//
+//launches with four types of keys
+//   username    : of a user with rights 11 (has to manually entered into database, along with a plaintext password as the secret)
 //   aid_###     : launches assessment with given id.  secret is ltisecret
 //   cid_###     : launches course with given id.  secret is ltisecret
 //   sso_userid  : launches single signon using given userid w/ rights 11. 
@@ -11,18 +13,14 @@
 //                                      1 using LMS for validation, does not ask for local account info
 //  LMS MUST provide, in addition to key and secret:
 //    user_id
-//    tool_consumer_instance_guid  (LMS domain name)
+//    
 //  LMS MAY provide:
 //    lis_person_name_given
 //    lis_person_name_family
 //    lis_person_contact_email_primary
+//    tool_consumer_instance_guid  (LMS domain name)
 
-//TODO:  Shouldn't be trusting sent guid, since some other evil instructor could use their LTI key on their
-// own LMS, spoofing a guid and user_id to access accounts of other users
-// resolution:  Add course id to guid.  Doing so should eliminate cross-course hacking.  Don't really care if
-// an instructor spoofs on themselves :)
-// for SSO, we'll need to append something as well - perhaps the key itself.  That was there can't be any
-// cross-ssouser hacking
+
 
 include("config.php");
 
@@ -362,7 +360,7 @@ if (isset($_GET['launch'])) {
 		$ltirole = $_REQUEST['roles'];
 	}*/
 	if (empty($_REQUEST['tool_consumer_instance_guid'])) {
-		reporterror("tool_consumer_instance_guid (LMS domain name) is required");
+		$ltiorg = 'Unknown';
 	} else {
 		$ltiorg = $_REQUEST['tool_consumer_instance_guid'];
 	}
@@ -437,7 +435,6 @@ if (isset($_GET['launch'])) {
 		$userid = mysql_result($result,0,0);
 	} else {
 		//student is not known.  Bummer.  Better figure out what to do with them :)
-	
 		
 		//if doing lti_only, and first/last name were provided, go ahead and use them and don't ask
 		if ((count($keyparts)==1 && $ltirole=='learner') || (count($keyparts)>2 && $keyparts[2]==1 && ((!empty($_REQUEST['lis_person_name_given']) && !empty($_REQUEST['lis_person_name_family'])) || !empty($_REQUEST['lis_person_name_full'])) )) {

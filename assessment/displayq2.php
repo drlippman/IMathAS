@@ -156,7 +156,9 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 					$usenum = $attemptn;
 				}
 				if ($hintpart[$usenum]!='') {
-					if (strpos($hintpart[$usenum],'button"')!==false) {
+					if (strpos($hintpart[$usenum],'</div>')!==false) {
+						$hintloc[$iidx] = $hintpart[$usenum];
+					} else if (strpos($hintpart[$usenum],'button"')!==false) {
 						$hintloc[$iidx] = "<p>{$hintpart[$usenum]}</p>\n";
 					} else {
 						$hintloc[$iidx] = "<p><i>Hint:</i> {$hintpart[$usenum]}</p>\n";
@@ -172,7 +174,9 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 				$usenum = $attemptn;
 			}
 			if ($hints[$usenum]!='') {
-				if (strpos($hints[$usenum],'button"')!==false) {
+				if (strpos($hints[$usenum],'</div>')!==false) {
+					$hintloc = $hints[$usenum];
+				} else if (strpos($hints[$usenum],'button"')!==false) {
 					$hintloc = "<p>{$hints[$usenum]}</p>\n";
 				} else {
 					$hintloc = "<p><i>Hint:</i> {$hints[$usenum]}</p>\n";
