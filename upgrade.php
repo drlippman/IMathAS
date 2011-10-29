@@ -822,12 +822,12 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			}
 		}
 		if ($last < 48) {
-			 $query = 'ALTER TABLE `imas_grades` CHANGE `org` `org` VARCHAR( 254 ) NOT NULL';
+			 $query = 'ALTER TABLE `imas_ltiusers` CHANGE `org` `org` VARCHAR( 254 ) NOT NULL';
 			 $res = mysql_query($query);
 			 if ($res===false) {
 			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
-			  $query = 'ALTER TABLE `imas_grades` CHANGE `ltiuserid` `ltiuserid` VARCHAR( 254 ) NOT NULL';
+			  $query = 'ALTER TABLE `imas_ltiusers` CHANGE `ltiuserid` `ltiuserid` VARCHAR( 254 ) NOT NULL';
 			 $res = mysql_query($query);
 			 if ($res===false) {
 			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
