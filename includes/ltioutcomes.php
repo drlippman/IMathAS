@@ -11,7 +11,7 @@ function sendOAuthBodyPOST($method, $endpoint, $oauth_consumer_key, $oauth_consu
 
     $test_token = '';
     $hmac_method = new OAuthSignatureMethod_HMAC_SHA1();
-    $test_consumer = new OAuthConsumer($oauth_consumer_key, $oauth_consumer_secret, NULL);
+    $test_consumer = new OAuthConsumer($oauth_consumer_key, $oauth_consumer_secret, NULL,11);
 
     $acc_req = OAuthRequest::from_consumer_and_token($test_consumer, $test_token, $method, $endpoint, $parms);
     $acc_req->sign_request($hmac_method, $test_consumer, $test_token);
