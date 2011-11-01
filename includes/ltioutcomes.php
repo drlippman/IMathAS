@@ -46,9 +46,10 @@ $aidtotalpossible = array();
 function calcandupdateLTIgrade($sourcedid,$aid,$scores) {
 	global $aidtotalpossible;
 	if (!isset($aidtotalpossible[$aid])) {
-		$query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
+		$query = "SELECT itemorder,defpoints FROM imas_assessments WHERE id='$aid'";
 		$res= mysql_query($query) or die("Query failed : $query" . mysql_error());
 		$aitems = explode(',',mysql_result($res,0,0));
+		$defpoints = mysql_result($res,0,1);
 		foreach ($aitems as $k=>$v) {
 			if (strpos($v,'~')!==FALSE) {
 				$sub = explode('~',$v);
@@ -71,7 +72,7 @@ function calcandupdateLTIgrade($sourcedid,$aid,$scores) {
 		while ($r = mysql_fetch_row($result2)) {
 			if (in_array($r[1],$aitems)) { //only use first item from grouped questions for total pts
 				if ($r[0]==9999) {
-					$totalpossible += $aitemcnt[$k]*$line['defpoints']; //use defpoints
+					$totalpossible += $aitemcnt[$k]*$defpoints; //use defpoints
 				} else {
 					$totalpossible += $aitemcnt[$k]*$r[0]; //use points from question
 				}
@@ -111,7 +112,7 @@ function updateLTIgrade($action,$sourcedid,$aid,$grade=0) {
 					}
 				}
 			} else {
-				$qr = "SELECT password FROM imas_users WHERE SID='{$sessiondata['lti_key']}' AND rights=11";
+				$qr = "SELECT password FROM imas_users WHERE SID='{$sessiondata['lti_key']}' AND (rights=11 OR rights=76)";
 				$res= mysql_query($qr) or die("Query failed : $qr" . mysql_error());
 				if (mysql_num_rows($res)>0) {
 					$secret = mysql_result($res,0,0);

@@ -21,7 +21,7 @@
 //    tool_consumer_instance_guid  (LMS domain name)
 
 
-
+header('P3P: CP="ALL CUR ADM OUR"');
 include("config.php");
 
 if ($enablebasiclti!=true) {
