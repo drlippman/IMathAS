@@ -2125,19 +2125,19 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						return 0;
 					}
 				} else {
-				$cpts = parsecomplex($tchk);
-				if (!is_array($cpts)) {
-					return 0;
-				}
-				if ($cpts[1]{0}=='+') {
-					$cpts[1] = substr($cpts[1],1);
-				}
-				//echo $cpts[0].','.$cpts[1].'<br/>';
-				if (!checkanswerformat($cpts[0],$ansformats) || !checkanswerformat($cpts[1],$ansformats)) {
-					return 0;
+					$cpts = parsecomplex($tchk);
+					if (!is_array($cpts)) {
+						return 0;
+					}
+					if ($cpts[1]{0}=='+') {
+						$cpts[1] = substr($cpts[1],1);
+					}
+					//echo $cpts[0].','.$cpts[1].'<br/>';
+					if (!checkanswerformat($cpts[0],$ansformats) || !checkanswerformat($cpts[1],$ansformats)) {
+						return 0;
+					}
 				}
 			}
-		}
 		}
 		if (!isset($answerformat)) { $answerformat = '';}
 		$ansformats = explode(',',$answerformat);

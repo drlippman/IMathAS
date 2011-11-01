@@ -318,13 +318,14 @@ END;
 		header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php");
 	}
 	if (isset($sessiondata['ltiitemtype'])) {
+		$flexwidth = true;
 		if ($sessiondata['ltiitemtype']==1) {
 			if (strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false && isset($_GET['cid']) && $sessiondata['ltiitemid']!=$_GET['cid']) {
 				echo "You do not have access to this page";
 				echo "<a href=\"$imasroot/course/course.php?cid={$sessiondata['ltiitemid']}\">Return to course page</a>";
 				exit;
 			}
-		} else if ($sessiondata['ltiitemtype']==0) {
+		} else if ($sessiondata['ltiitemtype']==0 && $sessiondata['ltirole']=='learner') {
 			if (strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false && strpos(basename($_SERVER['PHP_SELF']),'printtest.php')===false) {
 				$query = "SELECT courseid FROM imas_assessments WHERE id='{$sessiondata['ltiitemid']}'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -333,7 +334,7 @@ END;
 				exit;
 			}
 		}
-		if ($sessiondata['ltirole']=='instructor' && $sessiondata['ltiitemtype']==-1) {
+		if ($sessiondata['ltirole']=='instructor' && $sessiondata['ltiitemtype']<1) { //domain level or aid_### type
 			$breadcrumbbase = "<a href=\"$imasroot/ltihome.php?showhome=true\">LTI Home</a> &gt; ";
 		} else {
 			$breadcrumbbase = "";

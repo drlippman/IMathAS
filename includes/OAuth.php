@@ -18,11 +18,13 @@ class OAuthException extends Exception {
 class OAuthConsumer {
   public $key;
   public $secret;
+  public $rights;
 
-  function __construct($key, $secret, $callback_url=NULL) {
+  function __construct($key, $secret, $callback_url=NULL, $rights) {
     $this->key = $key;
     $this->secret = $secret;
     $this->callback_url = $callback_url;
+    $this->rights = $rights;
   }
 
   function __toString() {

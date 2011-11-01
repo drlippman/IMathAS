@@ -2479,13 +2479,16 @@ rather than just numbers, such as 1/3+sqrt(2)i.
 <p><b>Required Variables</b><BR>
 <dl>
 <dt>$answers = a string containing a complex number or list of complex numbers (In Answer)</dt>
-  <dd>Defines the answer.  Example: $answer="3+2i", $answer="2/3+1/3i"</dd>
+  <dd>Defines the answer.  Example: $answer="3+2i", $answer="2/3+1/3i".  The answer <i>must</i> be given in 
+  a + bi format (so 2+3isqrt(2) or 5/2+i/3 will not work)</dd>
 </dl>
 </p>
 <p><b>Optional Variables</b><BR>
 <dl>
-<dt><dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", or "notrig" (In Common Control)</dt>
-	<dd>Requires the real and imaginary parts of the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
+<dt><dt>$answerformat = "sloppycomplex", "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", or "notrig" (In Common Control)</dt>
+	<dd>Use "sloppycomplex" to allow the student to enter complex numbers in forms other than a+bi (allows 2+3isqrt(2) for example).  Student answer
+	must still only contain one i.  <br/>
+	The other options requires the real and imaginary parts of the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
 	without decimals (also disallows 10^-2 and 3E-2), or 
 	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
 	$answerformat = "list" specifies that the answer will be a list of complex numbers.</dd>

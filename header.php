@@ -174,8 +174,9 @@ echo '<div class=mainbody>';
 if (isset($insertinheaderwrapper)) {
 	//echo '<div class="headerwrapper">'.$insertinheaderwrapper.'</div>';
 }
-echo '<div class="headerwrapper">';
-
+if (!isset($flexwidth)) {
+	echo '<div class="headerwrapper">';
+}
 if (isset($CFG['GEN']['headerinclude']) && !isset($flexwidth)) {
 	require("$curdir/{$CFG['GEN']['headerinclude']}");
 }
@@ -265,7 +266,9 @@ if (isset($cid) && isset($teacherid) && $coursetopbar[2]==1 && count($coursetopb
 	echo '</div>';
 	$didnavlist = true;
 }
-echo '</div>';
+if (!isset($flexwidth)) {
+	echo '</div>';
+}
 echo '<div class="midwrapper">';
 
 //load filter

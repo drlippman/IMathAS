@@ -4,7 +4,7 @@
 
 
 array_push($allowedmacros,"exp","sec","csc","cot","sech","csch","coth","nthlog","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif","in_array","prettyint","prettyreal","prettysigfig","arraystodots","subarray","showdataarray","arraystodoteqns","array_flip","arrayfindindex","fillarray","array_reverse","root");
-array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","randcity","randcities","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction","ifthen","multicalconarray","htmlentities","formhoverover","formpopup","connectthedots","jointsort","stringpos","stringlen","stringclean","substr","substr_count","makexxpretty","makexxprettydisp","forminlinebutton","makenumberrequiretimes","comparenumbers","comparefunctions","getnumbervalue");
+array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","randcity","randcities","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction","ifthen","multicalconarray","htmlentities","formhoverover","formpopup","connectthedots","jointsort","stringpos","stringlen","stringclean","substr","substr_count","makexxpretty","makexxprettydisp","forminlinebutton","makenumberrequiretimes","comparenumbers","comparefunctions","getnumbervalue","showrecttable");
 function mergearrays($a,$b) {
 	if (!is_array($a)) {
 		$a = array($a);
@@ -605,6 +605,34 @@ function showarrays() {
 	return $out;
 }
 
+function showrecttable($m,$clabel,$rlabel,$format='') {
+	if (count($m)!=count($rlabel) || count($m[0])!=count($clabel)) {
+		return 'Error - label counts don\'t match dimensions of the data';
+	}
+	$out = '<table class=stats><thead><tr><th></th>';
+	for ($i = 0; $i<count($clabel); $i++) {
+		$out .= "<th scope=\"col\">{$clabel[$i]}</th>";
+	}
+	$out .= "</tr></thead><tbody>";
+	for ($j = 0; $j<count($m); $j++) {
+		$out .= "<tr><th scope=\"row\"><b>{$rlabel[$j]}</b></th>";
+		for ($i = 0; $i<count($m[$j]); $i++) {
+			if ($format=='c' || $format=='C') {
+				$out .= '<td class="c">';
+			} else if ($format=='r' || $format=='R') {
+				$out .= '<td class="r">';
+			} else if ($format=='l' || $format=='L') {
+				$out .= '<td class="l">';
+			} else {
+				$out .= '<td>';
+			}
+			$out .= $m[$j][$i].'</td>';
+		}
+		$out .="</tr>";
+	}
+	$out .= "</tbody></table>\n";
+	return $out;
+}
 
 function horizshowarrays() {
 	$alist = func_get_args();

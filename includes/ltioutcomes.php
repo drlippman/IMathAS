@@ -47,7 +47,7 @@ function calcandupdateLTIgrade($sourcedid,$aid,$scores) {
 	global $aidtotalpossible;
 	if (!isset($aidtotalpossible[$aid])) {
 		$query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
-		$res= mysql_query($qr) or die("Query failed : $qr" . mysql_error());
+		$res= mysql_query($query) or die("Query failed : $query" . mysql_error());
 		$aitems = explode(',',mysql_result($res,0,0));
 		foreach ($aitems as $k=>$v) {
 			if (strpos($v,'~')!==FALSE) {

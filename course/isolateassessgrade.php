@@ -105,8 +105,7 @@
 	
 	$query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.timelimitmult,";
 	$query .= "ias.id,istu.userid,ias.bestscores,ias.starttime,ias.endtime,ias.feedback FROM imas_users AS iu JOIN imas_students AS istu ON iu.id = istu.userid AND istu.courseid='$cid' ";
-	$query .= "LEFT JOIN imas_assessment_sessions AS ias ON iu.id=ias.userid AND ias.assessmentid='$aid'";
-	
+	$query .= "LEFT JOIN imas_assessment_sessions AS ias ON iu.id=ias.userid WHERE ias.assessmentid='$aid'";
 	if ($istutor && isset($tutorsection) && $tutorsection!='') {
 		$query .= " AND istu.section='$tutorsection' ";
 	}

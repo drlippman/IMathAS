@@ -9,17 +9,7 @@ require_once  'OAuth.php';
 class IMathASLTIOAuthDataStore extends OAuthDataStore {
    
     function lookup_consumer($consumer_key) {
-        /*if ( strpos($consumer_key, "http://" ) === 0 ) {
-            $consumer = new OAuthConsumer($consumer_key,"secret", NULL);
-            return $consumer;
-        }
-        if ( $this->consumers[$consumer_key] ) {
-            $consumer = new OAuthConsumer($consumer_key,$this->consumers[$consumer_key], NULL);
-            return $consumer;
-        }
-        return NULL;
-	*/
-	
+        	
 	$keyparts = explode('_',$consumer_key);
 	
 	if ($keyparts[0]=='cid') {
@@ -27,21 +17,27 @@ class IMathASLTIOAuthDataStore extends OAuthDataStore {
 		$query = "SELECT ltisecret FROM imas_courses WHERE id='{$keyparts[1]}'";
 	} else if ($keyparts[0]=='aid') {
 		$keyparts[1] = intval($keyparts[1]);
-		$query = "SELECT ltisecret FROM imas_assessments WHERE id='{$keyparts[1]}'";
+		$query = "SELECT ic.ltisecret FROM imas_courses AS ic JOIN imas_assessments AS ia ON ";
+		$query .= "ic.id=ia.courseid WHERE ia.id='{$keyparts[1]}'";
 	} else if ($keyparts[0]=='sso') {
-		$query = "SELECT password FROM imas_users WHERE SID='{$keyparts[1]}' AND rights=11";
+		$query = "SELECT password,rights FROM imas_users WHERE SID='{$keyparts[1]}' AND (rights=11 OR rights=76)";
 	} else {
-		$query = "SELECT password FROM imas_users WHERE SID='{$keyparts[0]}' AND rights=11";
+		$query = "SELECT password,rights FROM imas_users WHERE SID='{$keyparts[0]}' AND (rights=11 OR rights=76)";
 	}
 	
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	if (mysql_num_rows($result)>0) {
 		$secret = mysql_result($result,0,0);
+		if ($keyparts[0]=='cid' || $keyparts[0]=='aid') {
+			$rights = 11;
+		} else {
+			$rights = mysql_result($result,0,1);
+		}
 		if ($secret=='') {
 			//if secret isn't set, don't use blank as secret
 			return NULL;
 		}
-		 $consumer = new OAuthConsumer($consumer_key,$secret, NULL);
+		 $consumer = new OAuthConsumer($consumer_key,$secret, NULL,$rights);
 		 return $consumer;
         }
         return NULL;

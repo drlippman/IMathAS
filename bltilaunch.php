@@ -7,7 +7,7 @@
 //   username    : of a user with rights 11 (has to manually entered into database, along with a plaintext password as the secret)
 //   aid_###     : launches assessment with given id.  secret is ltisecret
 //   cid_###     : launches course with given id.  secret is ltisecret
-//   sso_userid  : launches single signon using given userid w/ rights 11. 
+//   sso_userid  : launches single signon using given userid w/ rights 11 or 76. 
 //                 secret value stored in DB password field.  Currently must be manually editted in DB
 //   all accept additional _0 or _1  :  0 is default, and links LMS account with a local account
 //                                      1 using LMS for validation, does not ask for local account info
@@ -171,20 +171,22 @@ if (isset($_GET['launch'])) {
 	$ltiorg = $_SESSION['ltiorg'];
 	$ltirole = $_SESSION['ltirole'];
 	$keyparts = explode('_',$_SESSION['ltikey']);
-	if (count($keyparts)<3) {
-		$lti_only = false;
+	$name_only = false;
+	if (count($keyparts)==1 && $ltirole=='learner') {
+		$name_only = true;
+	} else if (count($keyparts)>2 && $keyparts[2]==1 && $ltirole=='learner') {
+		$name_only = true;
+	}
+	if ($ltirole=='learner' || $_SESSION['lti_keyrights']==76) {
+		$allow_acctcreation = true;
 	} else {
-		if ($keyparts[2]==1) {
-			$lti_only = true;
-		} else {
-			$lti_only = false;
-		}
+		$allow_acctcreation = false;
 	}
 	if ($_GET['userinfo']=='set') {	
 		//check input
 		$infoerr = '';
 		unset($userid);
-		if ($lti_only) {
+		if ($name_only) {
 			if (empty($_POST['firstname']) || empty($_POST['lastname'])) {
 				$infoerr = 'Please provide your name';
 			}
@@ -202,6 +204,9 @@ if (isset($_GET['launch'])) {
 					$infoerr = 'Existing username/password provided are not valid.';
 				}
 			} else {
+				if (!$allow_acctcreation) {
+					$infoerr = 'Must link to an existing account';
+				}
 				//new info
 				if (empty($_POST['SID']) || empty($_POST['pw1']) || empty($_POST['pw2']) || empty($_POST['firstname']) || empty($_POST['lastname']) || empty($_POST['email'])) {
 					$infoerr = 'Be sure to leave no requested information empty';
@@ -230,14 +235,18 @@ if (isset($_GET['launch'])) {
 			$query = "INSERT INTO imas_ltiusers (org,ltiuserid) VALUES ('$ltiorg','$ltiuserid')";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			$localltiuser = mysql_insert_id();	
-			if (!isset($userid)) {	
-				if ($lti_only) {
+			if (!isset($userid) && $allow_acctcreation) {	
+				if ($name_only) {
 					//make up a username/password for them
 					$_POST['SID'] = 'lti-'.$localltiuser;
 					$md5pw = 'pass'; //totally unusable since not md5'ed
 				}
 				if ($ltirole=='instructor') {
-					$rights = 20;
+					if (isset($CFG['LTI']['instrrights'])) {
+						$rights = $CFG['LTI']['instrrights'];
+					} else {
+						$rights = 40;
+					}
 				} else {
 					$rights = 10;
 				}
@@ -299,21 +308,30 @@ if (isset($_GET['launch'])) {
 			
 			//tying LTI to IMAthAS account
 			//give option to provide existing account info, or provide full new student info
-			echo "<p>If you already have an account on $installname, enter your username and ";
-			echo "password below to enable automated signon from $ltiorgname</p>";
+			if ($allow_acctcreation) {
+				echo "<p>If you already have an account on $installname, enter your username and ";
+				echo "password below to enable automated signon from $ltiorgname</p>";
+			} else {
+				echo "<p>Enter your username and ";
+				echo "password for $installname below to enable automated signon from $ltiorgname</p>";
+			}
 			echo "<span class=form><label for=\"curSID\">$loginprompt:</label></span> <input class=form type=text size=12 id=\"curSID\" name=\"curSID\"><BR class=form>\n";
 			echo "<span class=form><label for=\"curPW\">Password:</label></span><input class=form type=password size=20 id=\"curPW\" name=\"curPW\"><BR class=form>\n";
 			echo "<div class=submit><input type=submit value='Sign In'></div>\n";
-			echo "<p>If you do not already have an account on $installname, provide the information below to create an account ";
-			echo "and enable automated signon from $ltiorgname</p>";
-			echo "<span class=form><label for=\"SID\">$longloginprompt:</label></span> <input class=form type=text size=12 id=SID name=SID><BR class=form>\n";
-			echo "<span class=form><label for=\"pw1\">Choose a password:</label></span><input class=form type=password size=20 id=pw1 name=pw1><BR class=form>\n";
-			echo "<span class=form><label for=\"pw2\">Confirm password:</label></span> <input class=form type=password size=20 id=pw2 name=pw2><BR class=form>\n";
-			echo "<span class=form><label for=\"firstname\">Enter First Name:</label></span> <input class=form type=text value=\"$deffirst\" size=20 id=firstnam name=firstname><BR class=form>\n";
-			echo "<span class=form><label for=\"lastname\">Enter Last Name:</label></span> <input class=form type=text value=\"$deflast\" size=20 id=lastname name=lastname><BR class=form>\n";
-			echo "<span class=form><label for=\"email\">Enter E-mail address:</label></span>  <input class=form type=text value=\"$defemail\" size=60 id=email name=email><BR class=form>\n";
-			echo "<span class=form><label for=\"msgnot\">Notify me by email when I receive a new message:</label></span><input class=floatleft type=checkbox id=msgnot name=msgnot /><BR class=form>\n";
-			echo "<div class=submit><input type=submit value='Create Account'></div>\n";
+			if ($allow_acctcreation) {
+				echo "<p>If you do not already have an account on $installname, provide the information below to create an account ";
+				echo "and enable automated signon from $ltiorgname</p>";
+				echo "<span class=form><label for=\"SID\">$longloginprompt:</label></span> <input class=form type=text size=12 id=SID name=SID><BR class=form>\n";
+				echo "<span class=form><label for=\"pw1\">Choose a password:</label></span><input class=form type=password size=20 id=pw1 name=pw1><BR class=form>\n";
+				echo "<span class=form><label for=\"pw2\">Confirm password:</label></span> <input class=form type=password size=20 id=pw2 name=pw2><BR class=form>\n";
+				echo "<span class=form><label for=\"firstname\">Enter First Name:</label></span> <input class=form type=text value=\"$deffirst\" size=20 id=firstnam name=firstname><BR class=form>\n";
+				echo "<span class=form><label for=\"lastname\">Enter Last Name:</label></span> <input class=form type=text value=\"$deflast\" size=20 id=lastname name=lastname><BR class=form>\n";
+				echo "<span class=form><label for=\"email\">Enter E-mail address:</label></span>  <input class=form type=text value=\"$defemail\" size=60 id=email name=email><BR class=form>\n";
+				echo "<span class=form><label for=\"msgnot\">Notify me by email when I receive a new message:</label></span><input class=floatleft type=checkbox id=msgnot name=msgnot /><BR class=form>\n";
+				echo "<div class=submit><input type=submit value='Create Account'></div>\n";
+			} else {
+				echo "<p>If you do not already have an account on $installname, please visit the site to request an account.</p>";
+			}
 		}
 		echo "</form>\n";
 		require("footer.php");
@@ -382,7 +400,7 @@ if (isset($_GET['launch'])) {
 	$request = OAuthRequest::from_request();
 	$base = $request->get_signature_base_string();
 	try {
-		$server->verify_request($request);
+		$requestinfo = $server->verify_request($request);
 	} catch (Exception $e) {
 		reporterror($e->getMessage());	
 	}
@@ -427,6 +445,7 @@ if (isset($_GET['launch'])) {
 	$_SESSION['lti_launch_get'] = $_GET;
 	$_SESSION['lti_key'] = $ltikey;
 	$_SESSION['lti_keytype'] = $keytype;
+	$_SESSION['lti_keyrights'] = $requestinfo[0]->rights;
 	
 	//look if we know this student
 	$query = "SELECT userid FROM imas_ltiusers WHERE org='$ltiorg' AND ltiuserid='$ltiuserid'";
@@ -436,8 +455,13 @@ if (isset($_GET['launch'])) {
 	} else {
 		//student is not known.  Bummer.  Better figure out what to do with them :)
 		
-		//if doing lti_only, and first/last name were provided, go ahead and use them and don't ask
-		if ((count($keyparts)==1 && $ltirole=='learner') || (count($keyparts)>2 && $keyparts[2]==1 && ((!empty($_REQUEST['lis_person_name_given']) && !empty($_REQUEST['lis_person_name_family'])) || !empty($_REQUEST['lis_person_name_full'])) )) {
+		//go ahead and create the account if:
+		//has name information (should we skip?)
+		//domain level placement and (student or instructor with acceptable key rights)
+		//a _1 type placement and (student or instructor with acceptable key rights)
+		if (((!empty($_REQUEST['lis_person_name_given']) && !empty($_REQUEST['lis_person_name_family'])) || !empty($_REQUEST['lis_person_name_full'])) &&
+		   ((count($keyparts)==1 && $ltirole=='learner') ||
+		   (count($keyparts)>2 && $keyparts[2]==1 && $ltirole=='learner'))) {
 			if (!empty($_REQUEST['lis_person_name_given']) && !empty($_REQUEST['lis_person_name_family'])) {
 				$firstname = $_REQUEST['lis_person_name_given'];
 				$lastname = $_REQUEST['lis_person_name_family'];
@@ -459,7 +483,11 @@ if (isset($_GET['launch'])) {
 				$_POST['SID'] = 'lti-'.$localltiuser;
 				$md5pw = 'pass'; //totally unusable since not md5'ed
 				if ($ltirole=='instructor') {
-					$rights = 20;
+					if (isset($CFG['LTI']['instrrights'])) {
+						$rights = $CFG['LTI']['instrrights'];
+					} else {
+						$rights = 40;
+					}
 				} else {
 					$rights = 10;
 				}
@@ -483,15 +511,7 @@ if (isset($_GET['launch'])) {
 	$_SESSION['ltikey'] = $ltikey;
 }
 
-if (count($keyparts)<3) {
-	$lti_only = false;
-} else {
-	if ($keyparts[2]==1) {
-		$lti_only = true;
-	} else {
-		$lti_only = false;
-	}
-}
+
 
 //Do we need to ask for student's info?
 //either first connect or bad info on first submit
@@ -579,8 +599,8 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='aid') {
 	if ($_SESSION['ltirole']=='instructor') {
 		$query = "SELECT id FROM imas_teachers WHERE userid='$userid' AND courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		if (mysql_num_rows($result) == 0) { //nope, not enrolled
-			$query = "INSERT INTO imas_teachers (userid,courseid) VALUES ('$userid','$cid')";
+		if (mysql_num_rows($result) == 0) { //nope, not a teacher.  Set as tutor for this context_id
+			$query = "INSERT INTO imas_tutors (userid,courseid,section) VALUES ('$userid','$cid','{$_SESSION['lti_context_id']}')";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		} 
 		$timelimitmult = 1;
@@ -588,7 +608,7 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='aid') {
 		$query = "SELECT id,timelimitmult FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		if (mysql_num_rows($result) == 0) { //nope, not enrolled
-			$query = "INSERT INTO imas_students (userid,courseid) VALUES ('$userid','$cid')";
+			$query = "INSERT INTO imas_students (userid,courseid,section) VALUES ('$userid','$cid','{$_SESSION['lti_context_id']}')";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			$timelimitmult = 1;
 		} else {

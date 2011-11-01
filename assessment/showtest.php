@@ -615,7 +615,7 @@
 	if ($isdiag) {
 		$diagid = $sessiondata['isdiag'];
 	}
-	$isltilimited = (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0);
+	$isltilimited = (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0 && $sessiondata['ltirole']=='learner');
 
 	header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
 	header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
@@ -631,7 +631,6 @@
 		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqntips.js?v=032810\"></script>";
 	}
 	$cid = $testsettings['courseid'];
-	
 	require("header.php");
 	if ($testsettings['noprint'] == 1) {
 		echo '<style type="text/css" media="print"> div.question, div.todoquestion, div.inactive { display: none;} </style>';
@@ -645,9 +644,13 @@
 		} else {
 			echo "<div class=breadcrumb>";
 			echo "<span style=\"float:right;\">$userfullname</span>";
-			echo "$breadcrumbbase <a href=\"../course/course.php?cid={$testsettings['courseid']}\">{$sessiondata['coursename']}</a> ";
+			if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0) {
+				echo "$breadcrumbbase Assessment</div>";
+			} else {
+				echo "$breadcrumbbase <a href=\"../course/course.php?cid={$testsettings['courseid']}\">{$sessiondata['coursename']}</a> ";
 	 
-			echo "&gt; Assessment</div>";
+				echo "&gt; Assessment</div>";
+			}
 		}
 	}
 	
@@ -1304,7 +1307,7 @@
 				}
 				
 			}
-		}
+		} 
 	} else { //starting test display  
 		$canimprove = false;
 		$hasreattempts = false;
@@ -1478,7 +1481,30 @@
 					
 					echo '<hr class="seq"/>';
 				}
+				echo '</form>';
 			}
+		} else if ($testsettings['displaymethod'] == "Embed") {
+			
+			$intro = filter("<div>{$testsettings['intro']}</div>\n");
+			echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=seq&amp;score=$i\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
+			echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
+			echo '<input type="hidden" name="disptime" value="'.time().'" />';
+			echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
+			echo "<input type=\"hidden\" name=\"verattempts\" value=\"{$attempts[$i]}\" />";
+		
+			for ($i = 0; $i < count($questions); $i++) {
+				ob_start();
+				basicshowq($i,false);
+				$quesout = ob_get_clean();
+				$quesout = substr($quesout,0,-7).'<br/><input type="submit" class="btn" value="Submit Question '.($i+1).'" /></div>';
+				ob_start();
+				showqinfobar($i,true,true);
+				$quesout .= ob_get_clean();
+				$intro = str_replace('[QUESTION '.($i+1).']',$quesout,$intro);
+			}
+			echo $intro;
+			echo '</form>';
+			
 		}
 	}
 	//IP:  eqntips

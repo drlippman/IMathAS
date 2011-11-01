@@ -4,45 +4,63 @@
 
 require("validate.php");
 //decide what we need to display
-$query = "SELECT courseid FROM imas_lti_courses WHERE contextid='{$sessiondata['lti_context_id']}' ";
-$query .= "AND org='{$sessiondata['ltiorg']}'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-if (mysql_num_rows($result)==0) {
-	$hascourse = false;
-	if (isset($sessiondata['lti_launch_get']) && isset($sessiondata['lti_launch_get']['cid'])) {
-		$cid = intval($sessiondata['lti_launch_get']['cid']);
-		if ($cid>0) {
-			$query = "INSERT INTO imas_lti_courses (org,contextid,courseid) VALUES ";
-			$query .= "('{$sessiondata['ltiorg']}','{$sessiondata['lti_context_id']}',$cid)";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-			$hascourse = true;
-		} 
-	}
-} else {
+if ($sessiondata['ltiitemtype']==0) {
 	$hascourse = true;
+	$hasplacement = true;
+	$placementtype = 'assess';
+	$typeid = $sessiondata['ltiitemid'];
+	$query = "SELECT courseid FROM imas_assessments WHERE id='$typeid'";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$cid = mysql_result($result,0,0);
-}
-if ($hascourse) {
-	$query = "SELECT id,placementtype,typeid FROM imas_lti_placements WHERE contextid='{$sessiondata['lti_context_id']}' ";
-	$query .= "AND org='{$sessiondata['ltiorg']}' AND linkid='{$sessiondata['lti_resource_link_id']}'";
+	$query = "SELECT id FROM imas_teachers WHERE courseid='$cid' AND userid='$userid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	if (mysql_num_rows($result)==0) {
-		$hasplacement = false;
-		if (isset($sessiondata['lti_launch_get']) && isset($sessiondata['lti_launch_get']['aid'])) {
-			$aid = intval($sessiondata['lti_launch_get']['aid']);
-			if ($aid>0) {
-				$placementtype = 'assess';
-				$typeid = $aid;
-				$query = "INSERT INTO imas_lti_placements (org,contextid,linkid,placementtype,typeid) VALUES ";
-				$query .= "('{$sessiondata['ltiorg']}','{$sessiondata['lti_context_id']}','{$sessiondata['lti_resource_link_id']}','$placementtype','$typeid')";
-				mysql_query($query) or die("Query failed : " . mysql_error());
-				$placementid = mysql_insert_id();
-				$hasplacement = true;
-			} 
-		} 
+		$role = 'tutor';
 	} else {
-		$hasplacement = true;
-		list($placementid,$placementtype,$typeid) = mysql_fetch_row($result);
+		$role = 'teacher';
+	}
+} else {
+	$query = "SELECT courseid FROM imas_lti_courses WHERE contextid='{$sessiondata['lti_context_id']}' ";
+	$query .= "AND org='{$sessiondata['ltiorg']}'";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	if (mysql_num_rows($result)==0) {
+		$hascourse = false;
+		if (isset($sessiondata['lti_launch_get']) && isset($sessiondata['lti_launch_get']['cid'])) {
+			$cid = intval($sessiondata['lti_launch_get']['cid']);
+			if ($cid>0) {
+				$query = "INSERT INTO imas_lti_courses (org,contextid,courseid) VALUES ";
+				$query .= "('{$sessiondata['ltiorg']}','{$sessiondata['lti_context_id']}',$cid)";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+				$hascourse = true;
+			} 
+		}
+	} else {
+		$hascourse = true;
+		$cid = mysql_result($result,0,0);
+	}
+	if ($hascourse) {
+		$query = "SELECT id,placementtype,typeid FROM imas_lti_placements WHERE contextid='{$sessiondata['lti_context_id']}' ";
+		$query .= "AND org='{$sessiondata['ltiorg']}' AND linkid='{$sessiondata['lti_resource_link_id']}'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		if (mysql_num_rows($result)==0) {
+			$hasplacement = false;
+			if (isset($sessiondata['lti_launch_get']) && isset($sessiondata['lti_launch_get']['aid'])) {
+				$aid = intval($sessiondata['lti_launch_get']['aid']);
+				if ($aid>0) {
+					$placementtype = 'assess';
+					$typeid = $aid;
+					$query = "INSERT INTO imas_lti_placements (org,contextid,linkid,placementtype,typeid) VALUES ";
+					$query .= "('{$sessiondata['ltiorg']}','{$sessiondata['lti_context_id']}','{$sessiondata['lti_resource_link_id']}','$placementtype','$typeid')";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+					$placementid = mysql_insert_id();
+					$hasplacement = true;
+				} 
+			} 
+		} else {
+			$hasplacement = true;
+			list($placementid,$placementtype,$typeid) = mysql_fetch_row($result);
+		}
+		$role = 'teacher';
 	}
 }
 
@@ -214,8 +232,10 @@ if (!$hascourse) {
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
 	echo "<h3>LTI Placement of {$line['name']}</h3>";
 	echo "<p><a href=\"assessment/showtest.php?cid=$cid&id=$typeid\">Preview assessment</a> | ";
-	echo "<a href=\"course/isolateassessgrade.php?cid=$cid&aid=$typeid\">Grade list</a> | ";
-	echo "<a href=\"course/gb-itemanalysis.php?cid=$cid&asid=average&aid=$typeid\">Item Analysis</a></p>";
+	echo "<a href=\"course/isolateassessgrade.php?cid=$cid&aid=$typeid\">Grade list</a> ";
+	if ($role == 'teacher') {
+		echo "| <a href=\"course/gb-itemanalysis.php?cid=$cid&asid=average&aid=$typeid\">Item Analysis</a></p>";
+	}
 	
 	$now = time();
 	echo '<p>';
@@ -227,10 +247,13 @@ if (!$hascourse) {
 		echo 'Currently unavailable to students. Available '.formatdate($line['startdate']).' until '.formatdate($line['enddate']); 
 	}
 	echo '</p>';
-	
-	echo "<p><a href=\"course/addassessment.php?cid=$cid&id=$typeid\">Settings</a> | ";
-	echo "<a href=\"course/addquestions.php?cid=$cid&aid=$typeid\">Questions</a></p>";
-	echo '<p><a href="ltihome.php?chgplacement=true">Change placement</a></p>';
+	if ($role == 'teacher') {
+		echo "<p><a href=\"course/addassessment.php?cid=$cid&id=$typeid\">Settings</a> | ";
+		echo "<a href=\"course/addquestions.php?cid=$cid&aid=$typeid\">Questions</a></p>";
+		if ($sessiondata['ltiitemtype']==-1) {
+			echo '<p><a href="ltihome.php?chgplacement=true">Change placement</a></p>';
+		}
+	}
 }
 require("footer.php");
 

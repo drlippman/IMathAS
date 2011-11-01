@@ -840,7 +840,7 @@ if ($overwriteBody==1) {
 				<input name="showqcat" type="radio" value="2" <?php writeHtmlChecked($showqcat,"2"); ?>>In navigation bar (Skip-Around only)
 			</span><br class="form" />
 	<?php
-	if ($enablebasiclti==true) {
+	/*if ($enablebasiclti==true) {
 	?>
 			<span class="form">LTI access secret (max 10 chars; blank to not use)</span>
 			<span class="formright">
@@ -858,7 +858,7 @@ if ($overwriteBody==1) {
 				</span>
 			</span><br class="form" />
 	<?php
-	}
+	}*/
 	?>
 			
 			</fieldset>
