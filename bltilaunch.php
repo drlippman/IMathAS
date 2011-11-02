@@ -3,14 +3,18 @@
 //(c) David Lippman 2009
 //
 //
-//launches with four types of keys
-//   username    : of a user with rights 11 (has to manually entered into database, along with a plaintext password as the secret)
-//   aid_###     : launches assessment with given id.  secret is ltisecret
-//   cid_###     : launches course with given id.  secret is ltisecret
-//   sso_userid  : launches single signon using given userid w/ rights 11 or 76. 
+//launches with four types of key/secrets
+//   username     : of a user with rights 11 or 76 (has to manually entered into database, along with a plaintext password as the secret)
+//   aid_###      : launches assessment with given id.  secret is course's ltisecret
+//   cid_###      : launches course with given id.  secret is course's ltisecret
+//   sso_username : launches single signon using given userid w/ rights 11 or 76. 
 //                 secret value stored in DB password field.  Currently must be manually editted in DB
-//   all accept additional _0 or _1  :  0 is default, and links LMS account with a local account
+//   aid_, cid_, and sso_ types accept additional _0 or _1  :  0 is default, and links LMS account with a local account
 //                                      1 using LMS for validation, does not ask for local account info
+//
+//  for sso_ and username types, if associated user has rights 11, instructors must link accounts;
+//     rights 76 allows TC to create instructor accounts
+//
 //  LMS MUST provide, in addition to key and secret:
 //    user_id
 //    
