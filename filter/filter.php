@@ -94,41 +94,64 @@
 				$str = preg_replace_callback('/<\s*embed[^>]*?script=(.)(.+?)\1.*?>/s','svgfilterscriptcallback',$str);
 			}
 		}
-		$search = '/\[LTI:\s*url=(.+),\s*key=(.+),\s*secret=([^\],]+)([^\]]*)\]/';
 		
-		if (preg_match($search, $str, $res)){
-			$url = $res[1];
-			$key = $res[2];
-			$secret = $res[3];
-			if (isset($res[4]) && $res[4]!='') {
-				$opts = $res[4];
-			} else {
-				$opts = '';
-			}
-			$sessiondata['lti-secrets'][$key] = array($secret,$opts);
-			writesessiondata();	
-			$replamnt = getltiiframe($url,$key,time());
-			$str = preg_replace('/\[LTI:[^\]]*\]/', $replamnt, $str);
-		}
-		
-		$search = '/\[WA:\s*(.+?)\s*\]/';
-		
-		if (preg_match_all($search, $str, $res, PREG_SET_ORDER)){
-			foreach ($res as $resval) {
-				$tag = '<script type="text/javascript" id="WolframAlphaScript'.$resval[1].'" src="http://www.wolframalpha.com/widget/widget.jsp?id='.$resval[1].'"></script>';
-				$str = str_replace($resval[0], $tag, $str);
+		if (strpos($str,'[LTI')!==false) {
+			$search = '/\[LTI:\s*url=(.+),\s*key=(.+),\s*secret=([^\],]+)([^\]]*)\]/';
+			
+			if (preg_match($search, $str, $res)){
+				$url = $res[1];
+				$key = $res[2];
+				$secret = $res[3];
+				if (isset($res[4]) && $res[4]!='') {
+					$opts = $res[4];
+				} else {
+					$opts = '';
+				}
+				$sessiondata['lti-secrets'][$key] = array($secret,$opts);
+				writesessiondata();	
+				$replamnt = getltiiframe($url,$key,time());
+				$str = preg_replace('/\[LTI:[^\]]*\]/', $replamnt, $str);
 			}
 		}
 		
-		$search = '/\[EMBED:\s*([^,]+),([^,]+),([^,\]]+)\]/';
-		
-		if (preg_match_all($search, $str, $res, PREG_SET_ORDER)){
-			foreach ($res as $resval) {
-				$tag = "<iframe width=\"{$resval[1]}\" height=\"{$resval[2]}\" src=\"{$resval[3]}\" ></iframe>";
-				$str = str_replace($resval[0], $tag, $str);
+		if (strpos($str,'[WA')!==false) {
+			$search = '/\[WA:\s*(.+?)\s*\]/';
+			
+			if (preg_match_all($search, $str, $res, PREG_SET_ORDER)){
+				foreach ($res as $resval) {
+					$tag = '<script type="text/javascript" id="WolframAlphaScript'.$resval[1].'" src="http://www.wolframalpha.com/widget/widget.jsp?id='.$resval[1].'"></script>';
+					$str = str_replace($resval[0], $tag, $str);
+				}
 			}
 		}
 		
+		if (strpos($str,'[EMBED')!==false) {
+			$search = '/\[EMBED:\s*([^,]+),([^,]+),([^,\]]+)\]/';
+			
+			if (preg_match_all($search, $str, $res, PREG_SET_ORDER)){
+				foreach ($res as $resval) {
+					$tag = "<iframe width=\"{$resval[1]}\" height=\"{$resval[2]}\" src=\"{$resval[3]}\" ></iframe>";
+					$str = str_replace($resval[0], $tag, $str);
+				}
+			}
+		}
+		
+		if (strpos($str,'[CDF')!==false) {
+			$search = '/\[CDF:\s*([^,]+),([^,]+),([^,\]]+)\]/';
+	
+			if (preg_match_all($search, $str, $res, PREG_SET_ORDER)){
+				foreach ($res as $resval) {
+					if (!isset($GLOBALS['has_set_cdf_embed_script'])) {
+						$GLOBALS['has_set_cdf_embed_script'] = true;
+						$tag = '<script type="text/javascript" src="http://www.wolfram.com/cdf-player/plugin/v2.1/cdfplugin.js"></script><script type="text/javascript">var cdf = new cdfplugin();';
+					} else {
+						$tag = '<script type="text/javascript">';
+					}
+					$tag .= "cdf.embed('{$resval[1]}',{$resval[2]},{$resval[3]});</script>";
+					$str = str_replace($resval[0], $tag, $str);
+				}
+			}
+		}
 		return $str;
 	}
 	function filtergraph($str) {
