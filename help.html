@@ -1626,6 +1626,8 @@ The following macros create graphs or tables:
     in one column unless second argument is provided, in which case the data will be distributed over the specified number of columns.</li>
 <li><b>horizshowarrays(string,array,[string,array]...)</b>:  Creates a tabular display of the data in the array(s) as row(s), with the strings
     as row labels.  Does not text wrap, so only use for small data sets.</li> 
+<li><b>showrecttable(data array of arrays,columnlabels,rowlabels,[format])</b>:  Creates a tabular display of a 2x2 data table, where $data[0] is the first row of the table.  
+    The rowlabels and columnlabels are arrays of labels. format = "c", "r", or "l" to center, left-align, or right align data.</li>
 <li><b>showplot(funcstrings,[xmin,xmax,ymin,ymax,labels,grid,width,height])</b></li>
 	<ul>
 	<li><b>funcstrings</b> is a single string or an array of strings each having at least the first of the following list:<BR>

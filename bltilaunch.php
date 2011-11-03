@@ -416,6 +416,21 @@ if (isset($_GET['launch'])) {
 	if ($keyparts[0]=='cid') {  //cid:org
 		$ltiorg = $keyparts[1].':'.$ltiorg;
 		$keytype = 'c';
+		if (isset($_REQUEST['custom_place_aid'])) { //common catridge blti placement using cid_### key type
+			$placeaid = intval($_REQUEST['custom_place_aid']);
+			$query = "SELECT courseid FROM imas_assessments WHERE id='$placeaid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$sourcecid = mysql_result($result,0,0);
+			if ($keyparts[1]==$sourcecid) { //is key is for source course; treat like aid_### placement
+				$keyparts[0] = 'aid';
+				$keyparts[1] = $placeaid;
+				$ltikey = 'aid_'.$placeaid;
+				$keytype = 'a';
+			} else {  //key is for a different course; mark as cc placement
+				$keytype = 'cc-c';
+				$_SESSION['place_aid'] = array($sourcecid,$_REQUEST['custom_place_aid']);
+			}
+		}		
 	} else if ($keyparts[0]=='aid') {   //also cid:org
 		$aid = intval($keyparts[1]);
 		$query = "SELECT courseid FROM imas_assessments WHERE id='$aid'";
@@ -428,7 +443,16 @@ if (isset($_GET['launch'])) {
 	} else {
 		$ltiorg = $ltikey.':'.$ltiorg;
 		$keytype = 'g';
+		if (isset($_REQUEST['custom_place_aid'])) {
+			$placeaid = intval($_REQUEST['custom_place_aid']);
+			$keytype = 'cc-g';
+			$query = "SELECT courseid FROM imas_assessments WHERE id='$placeaid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$sourcecid = mysql_result($result,0,0);
+			$_SESSION['place_aid'] = array($sourcecid,$_REQUEST['custom_place_aid']);
+		}
 	}
+	
 	
 	//Store all LTI request data in session variable for reuse on submit
 	//if we got this far, secret has already been verified
@@ -446,10 +470,12 @@ if (isset($_GET['launch'])) {
 	$_SESSION['lti_lis_result_sourcedid'] = $_REQUEST['lis_result_sourcedid'];
 	$_SESSION['lti_outcomeurl'] = $_REQUEST['lis_outcome_service_url'];
 	$_SESSION['lti_context_label'] = $_REQUEST['context_label'];
-	$_SESSION['lti_launch_get'] = $_GET;
 	$_SESSION['lti_key'] = $ltikey;
 	$_SESSION['lti_keytype'] = $keytype;
 	$_SESSION['lti_keyrights'] = $requestinfo[0]->rights;
+	
+	
+	
 	
 	//look if we know this student
 	$query = "SELECT userid FROM imas_ltiusers WHERE org='$ltiorg' AND ltiuserid='$ltiuserid'";
@@ -530,33 +556,114 @@ if ($askforuserinfo == true) {
 
 //if here, we know the local userid.
 
+//if it's a common catridge placement and we're here, then either we're using domain credentials, or
+//course credentials for a non-source course.
+
+//see if lti_courses is created
+//  if not, see if source cid is instructors course
+// 	if so, set lti_course
+//	if not, create a new blank course
+//
+//see if courseid==source course cid
+//  if not, copy assessment into course, set placement
+//  if so, set placement
+
 //determine request type, and check availability
 $now = time();
-if (count($keyparts)==1 && $_SESSION['ltirole']!='instructor') { //general placement - let's narrow it down
+
+//general placement or common catridge placement - look for placement, or create if know info
+if ((count($keyparts)==1 && $_SESSION['ltirole']!='instructor') || $_SESSION['lti_keytype']=='cc-g' || $_SESSION['lti_keytype']=='cc-c') { 
 	$query = "SELECT placementtype,typeid FROM imas_lti_placements WHERE ";
 	$query .= "contextid='{$_SESSION['lti_context_id']}' AND linkid='{$_SESSION['lti_resource_link_id']}' ";
 	$query .= "AND org='{$_SESSION['ltiorg']}'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	if (mysql_num_rows($result)==0) {
-		if (isset($_SESSION['lti_launch_get']) && isset($_SESSION['lti_launch_get']['aid']) && isset($_SESSION['lti_launch_get']['cid'])) {
-			//if we know aid and cid from $_GET, we can go ahead and create the placement now.
-			$aid = intval($_SESSION['lti_launch_get']['aid']);
-			$cid = intval($_SESSION['lti_launch_get']['cid']);
-			if ($aid==0 || $cid==0) {
-				reporterror("This placement is not yet set up");
-			} else {
-				$query = "SELECT courseid FROM imas_lti_courses WHERE contextid='{$_SESSION['lti_context_id']}' ";
-				$query .= "AND org='{$_SESSION['ltiorg']}' AND courseid='$cid'";
-				if (mysql_num_rows($result)==0) {
+		if (isset($_SESSION['place_aid'])) {
+			//look to see if we've already linked this context_id with a course
+			$query = "SELECT courseid FROM imas_lti_courses WHERE contextid='{$_SESSION['lti_context_id']}' ";
+			$query .= "AND org='{$_SESSION['ltiorg']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			if (mysql_num_rows($result)==0) {
+				if ($_SESSION['lti_keytype']=='cc-g') {
+					//if instructor, see if the source course is ours
+					$copycourse = true;
+					if ($_SESSION['ltirole']=='instructor') {
+						$query = "SELECT id FROM imas_teachers WHERE courseid='{$_SESSION['place_aid'][0]}' AND userid='$userid'";
+						$result = mysql_query($query) or die("Query failed : " . mysql_error());
+						if (mysql_num_rows($result)>0) {
+							$copycourse=false;
+							$destcid = $_SESSION['place_aid'][0];
+						}
+					}
+					if ($copycourse) {
+						//create a course  
+						//creating a copy of a template course
+						$blockcnt = 1;
+						$itemorder = addslashes(serialize(array()));
+						$randkey = uniqid();
+						$hideicons = isset($CFG['CPS']['hideicons'])?$CFG['CPS']['hideicons'][0]:0;
+						$picicons = isset($CFG['CPS']['picicons'])?$CFG['CPS']['picicons'][0]:0;
+						$allowunenroll = isset($CFG['CPS']['allowunenroll'])?$CFG['CPS']['allowunenroll'][0]:0;
+						$copyrights = isset($CFG['CPS']['copyrights'])?$CFG['CPS']['copyrights'][0]:0;
+						$msgset = isset($CFG['CPS']['msgset'])?$CFG['CPS']['msgset'][0]:0;
+						$msgmonitor = (floor($msgset/5))&1;
+						$msgQtoInstr = (floor($msgset/5))&2;
+						$msgset = $msgset%5;
+						$cploc = isset($CFG['CPS']['cploc'])?$CFG['CPS']['cploc'][0]:1;
+						$topbar = isset($CFG['CPS']['topbar'])?$CFG['CPS']['topbar'][0]:array(array(),array(),0);
+						$theme = isset($CFG['CPS']['theme'])?$CFG['CPS']['theme'][0]:$defaultcoursetheme;
+						$chatset = isset($CFG['CPS']['chatset'])?$CFG['CPS']['chatset'][0]:0;
+						$showlatepass = isset($CFG['CPS']['showlatepass'])?$CFG['CPS']['showlatepass'][0]:0;
+						
+						$avail = 0;
+						$lockaid = 0;
+						$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,chatset,showlatepass,itemorder,topbar,cploc,available,theme,ltisecret,blockcnt) VALUES ";
+						$query .= "('{$_SESSION['lti_context_label']}','$userid','$randkey','$hideicons','$picicons','$unenroll','$copyrights','$msgset',$chatset,$showlatepass,'$itemorder','$topbar','$cploc','$avail','$theme','$randkey','$blockcnt');";
+						mysql_query($query) or die("Query failed : " . mysql_error());
+						$destcid  = mysql_insert_id();
+						$query = "INSERT INTO imas_teachers (userid,courseid) VALUES ('$userid','$destcid')";
+						mysql_query($query) or die("Query failed : " . mysql_error());
+						
+					}
 					$query = "INSERT INTO imas_lti_courses (org,contextid,courseid) VALUES ";
-					$query .= "('{$_SESSION['ltiorg']}','{$_SESSION['lti_context_id']}',$cid)";
+					$query .= "('{$_SESSION['ltiorg']}','{$_SESSION['lti_context_id']}',$destcid)";
 					mysql_query($query) or die("Query failed : " . mysql_error());
+				} else if ($_SESSION['lti_keytype']=='cc-c') {
+					$copyaid = true;
+					//link up key/secret course
+					$query = "INSERT INTO imas_lti_courses (org,contextid,courseid) VALUES ";
+					$query .= "('{$_SESSION['ltiorg']}','{$_SESSION['lti_context_id']}','{$keyparts[1]}')";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+					$destcid = $keyparts[1];
 				}
-				$query = "INSERT INTO imas_lti_placements (org,contextid,linkid,placementtype,typeid) VALUES ";
-				$query .= "('{$_SESSION['ltiorg']}','{$_SESSION['lti_context_id']}','{$_SESSION['lti_resource_link_id']}','assess','$aid')";
-				mysql_query($query) or die("Query failed : " . mysql_error());
-				$keyparts = array('aid',$aid);
+			} else {
+				$destcid = mysql_result($result,0,0);
 			}
+			if ($destcid==$_SESSION['place_aid'][0]) {
+				//aid is in destination course - just make placement
+				$aid = $_SESSION['place_aid'][1];
+			} else {
+				//aid is in source course - need to copy it
+				require("includes/copyiteminc.php");
+				$query = "SELECT id FROM imas_items WHERE itemtype='Assessment' AND typeid='{$_SESSION['place_aid'][1]}'";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$cid = $destcid;
+				$newitem = copyitem(mysql_result($result,0,0),array());
+				$query = "SELECT typeid FROM imas_items WHERE id=$newitem";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$aid = mysql_result($result,0,0);
+				$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$items = unserialize(mysql_result($result,0,0));
+				$items[] = $newitem;
+				$items = addslashes(serialize($items));
+				$query = "UPDATE imas_courses SET itemorder='$items' WHERE id='$cid'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}	
+			$query = "INSERT INTO imas_lti_placements (org,contextid,linkid,placementtype,typeid) VALUES ";
+			$query .= "('{$_SESSION['ltiorg']}','{$_SESSION['lti_context_id']}','{$_SESSION['lti_resource_link_id']}','assess','$aid')";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			$keyparts = array('aid',$aid);
 			
 		} else {
 			reporterror("This placement is not yet set up");
@@ -573,6 +680,8 @@ if (count($keyparts)==1 && $_SESSION['ltirole']!='instructor') { //general place
 		
 	}
 }
+
+//is course level placement
 if ($keyparts[0]=='cid') {
 	$cid = intval($keyparts[1]);
 	$query = "SELECT available,ltisecret FROM imas_courses WHERE id='$cid'";
@@ -583,7 +692,7 @@ if ($keyparts[0]=='cid') {
 			reporterror("This course is not available");
 		}
 	} 
-} else if ($keyparts[0]=='aid') {
+} else if ($keyparts[0]=='aid') {   //is assessment level placement
 	$aid = intval($keyparts[1]);
 	$query = "SELECT courseid,startdate,enddate,avail,ltisecret FROM imas_assessments WHERE id='$aid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());

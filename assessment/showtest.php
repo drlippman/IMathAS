@@ -630,6 +630,19 @@
 	if ($testsettings['showtips']==2) {
 		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqntips.js?v=032810\"></script>";
 	}
+	$placeinhead .= '<script type="text/javascript">
+	   function toggleintroshow(n) {
+	      var link = document.getElementById("introtoggle"+n);
+	      var content = document.getElementById("intropiece"+n);
+	      if (link.innerHTML.match("Hide")) {
+	      	   link.innerHTML = link.innerHTML.replace("Hide","Show");
+		   content.style.display = "none";
+	      } else {
+	      	   link.innerHTML = link.innerHTML.replace("Show","Hide");
+		   content.style.display = "block";
+	      }
+	     }</script>';
+
 	$cid = $testsettings['courseid'];
 	require("header.php");
 	if ($testsettings['noprint'] == 1) {
@@ -918,6 +931,15 @@
 		echo "<div class=right>No time limit</div>\n";
 	}
 	
+	//identify question-specific  intro/instruction 
+	//comes in format [Q 1-3] in intro
+	if (strpos($testsettings['intro'],'[Q')!==false) {
+		if(preg_match_all('/\<p>\s*\[Q\s+(\d+)\-(\d+)\s*\]\s*<\/p>/',$testsettings['intro'],$introdividers,PREG_SET_ORDER)) {
+			$intropieces = preg_split('/\<p>\s*\[Q\s+\d+\-\d+\s*\]\s*<\/p>/',$testsettings['intro']);
+			$testsettings['intro'] = array_shift($intropieces);
+		}
+	}
+	
 	if (isset($_GET['action'])) {
 		if ($_GET['action']=="skip" || $_GET['action']=="seq") {
 			echo "<div class=right><span onclick=\"document.getElementById('intro').className='intro';\"><a href=\"#\">Show Instructions</a></span></div>\n";
@@ -1129,6 +1151,20 @@
 				$lefttodo = shownavbar($questions,$scores,$next,$testsettings['showcat']);
 				if (unans($scores[$next]) || amreattempting($next)) {
 					echo "<div class=inset>\n";
+					if (isset($intropieces)) {
+						foreach ($introdividers as $k=>$v) {
+							if ($v[1]<=$next+1 && $next+1<=$v[2]) {//right divider
+								if ($next+1==$v[1]) {
+									echo '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;">Hide Question Information</a></div>';
+									echo '<div class="intro" id="intropiece'.$k.'">'.$intropieces[$k].'</div>';										
+								} else {
+									echo '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;">Show Question Information</a></div>';
+									echo '<div class="intro" style="display:none;" id="intropiece'.$k.'">'.$intropieces[$k].'</div>';	
+								}
+								break;
+							}
+						}
+					}
 					echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=skip&amp;score=$next\" onsubmit=\"return doonsubmit(this)\">\n";
 					echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
 					echo '<input type="hidden" name="disptime" value="'.time().'" />';
@@ -1427,6 +1463,15 @@
 				
 			} else {
 				echo "<div class=inset>\n";
+				if (isset($intropieces)) {
+					foreach ($introdividers as $k=>$v) {
+						if ($v[1]<=$i+1 && $i+1<=$v[2]) {//right divider
+							echo '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;">Hide Question Information</a></div>';
+							echo '<div class="intro" id="intropiece'.$k.'">'.$intropieces[$k].'</div>';
+							break;
+						}
+					}
+				}	
 				echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=skip&amp;score=$i\" onsubmit=\"return doonsubmit(this)\">\n";
 				echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
 				echo '<input type="hidden" name="disptime" value="'.time().'" />';
