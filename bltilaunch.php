@@ -424,7 +424,7 @@ if (isset($_GET['launch'])) {
 			if ($keyparts[1]==$sourcecid) { //is key is for source course; treat like aid_### placement
 				$keyparts[0] = 'aid';
 				$keyparts[1] = $placeaid;
-				$ltikey = 'aid_'.$placeaid;
+				$ltikey = implode('_',$keyparts);
 				$keytype = 'a';
 			} else {  //key is for a different course; mark as cc placement
 				$keytype = 'cc-c';
@@ -594,6 +594,8 @@ if ((count($keyparts)==1 && $_SESSION['ltirole']!='instructor') || $_SESSION['lt
 							$copycourse=false;
 							$destcid = $_SESSION['place_aid'][0];
 						}
+					} else {
+						reporterror("Course link not established yet");
 					}
 					if ($copycourse) {
 						//create a course  

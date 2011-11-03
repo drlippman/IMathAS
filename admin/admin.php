@@ -295,7 +295,14 @@ $placeinhead .= "}</script>";
 		echo "<a href=\"forms.php?action=importqimages\">Install Question Images</a><br/>\n";
 		echo "<a href=\"forms.php?action=importcoursefiles\">Install Course Files</a><br/>\n";
 		echo '</span>';
-	} ?>
+	}
+	if ($enablebasiclti) {
+		echo '<span class="column">';
+		echo "<a href=\"forms.php?action=listltidomaincred\">Edit LTI Creds</a><br/>\n";
+		echo '</span>';
+	}
+	
+	?>
 	
 <?php
 		} 

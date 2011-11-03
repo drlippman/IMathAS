@@ -529,6 +529,62 @@ switch($_GET['action']) {
 		echo "<div class=submit><input type=submit value=\"Delete\"></div>\n";
 		echo "</form>\n";
 		break;
+	case "listltidomaincred":
+		if ($myrights<100) { echo "not allowed"; exit;}
+		echo '<div id="headerforms" class="pagetitle">';
+		echo "<h3>Modify LTI Domain Credentials</h3>\n";
+		echo '</div>';
+		echo "<table><tr><th>Domain</th><th>Key</th><th>Can create Instructors?</th><th>Modify</th><th>Delete</th></tr>\n";
+		$query = "SELECT id,email,SID,rights FROM imas_users WHERE rights=11 OR rights=76";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			echo "<tr><td>{$row[1]}</td><td>{$row[2]}</td>";
+			if ($row[3]==76) {
+				echo '<td>Yes</td>';
+			} else {
+				echo '<td>No</td>';
+			}
+			echo "<td><a href=\"forms.php?action=modltidomaincred&id={$row[0]}\">Modify</a></td>\n";
+			if ($row[0]==0) {
+				echo "<td></td>";
+			} else {
+				echo "<td><a href=\"actions.php?action=delltidomaincred&id={$row[0]}\" onclick=\"return confirm('Are you sure?');\">Delete</a></td>\n";
+			}
+			echo "</tr>\n";
+		}
+		echo "</table>\n";
+		echo "<form method=post action=\"actions.php?action=modltidomaincred&id=new\">\n";
+		echo "<p>Add new LTI key/secret: <br/>";
+		echo "Domain: <input type=text name=\"ltidomain\" size=20><br/>\n";
+		echo "Key: <input type=text name=\"ltikey\" size=20><br/>\n";
+		echo "Secret: <input type=text name=\"ltisecret\" size=20><br/>\n";
+		echo "Can create instructors: <select name=\"createinstr\"><option value=\"11\" selected=\"selected\">No</option>";
+		echo "<option value=\"76\">Yes</option></select><br/>\n";
+		echo "<input type=submit value=\"Add LTI Credentials\"></p>\n";
+		echo "</form>\n";
+		break;
+	case "modltidomaincred":
+		if ($myrights<100) { echo "not allowed"; exit;}
+		echo '<div id="headerforms" class="pagetitle">';
+		echo "<h3>Modify LTI Domain Credentials</h3>\n";
+		echo '</div>';
+		$query = "SELECT id,email,SID,password,rights FROM imas_users WHERE id='{$_GET['id']}'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$row = mysql_fetch_row($result);
+		echo "<form method=post action=\"actions.php?action=modltidomaincred&id={$row[0]}\">\n";
+		echo "Modify LTI key/secret: <br/>";
+		echo "Domain: <input type=text name=\"ltidomain\" value=\"{$row[1]}\" size=20><br/>\n";
+		echo "Key: <input type=text name=\"ltikey\" value=\"{$row[2]}\" size=20><br/>\n";
+		echo "Secret: <input type=text name=\"ltisecret\"  value=\"{$row[3]}\" size=20><br/>\n";
+		echo "Can create instructors: <select name=\"createinstr\"><option value=\"11\" ";
+		if ($row[4]==11) {echo 'selected="selected"';}
+		echo ">No</option><option value=\"76\" ";
+		if ($row[4]==76) {echo 'selected="selected"';}
+		echo ">Yes</option></select><br/>\n";
+		echo "<input type=submit value=\"Update LTI Credentials\">\n";
+		echo "</form>\n";
+		break;
+		
 	case "listgroups":
 		echo '<div id="headerforms" class="pagetitle">';
 		echo "<h3>Modify Groups</h3>\n";

@@ -675,6 +675,24 @@ switch($_GET['action']) {
 		$query = "UPDATE imas_libraries SET groupid=0 WHERE groupid='{$_GET['id']}'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		break;
+	case "modltidomaincred":
+		if ($myrights <100) { echo "You don't have the authority for this action"; break;}
+		if ($_GET['id']=='new') {
+			$query = "INSERT INTO imas_users (email,SID,password,rights) VALUES ";
+			$query .= "('{$_POST['ltidomain']}','{$_POST['ltikey']}',";
+			$query .= "'{$_POST['ltisecret']}','{$_POST['createinstr']}')";
+		} else {
+			$query = "UPDATE imas_users SET email='{$_POST['ltidomain']}',";
+			$query .= "SID='{$_POST['ltikey']}',password='{$_POST['ltisecret']}',";
+			$query .= "rights='{$_POST['createinstr']}' WHERE id='{$_GET['id']}'";
+		}
+		mysql_query($query) or die("Query failed : " . mysql_error());
+		break;
+	case "delltidomaincred":
+		if ($myrights <100) { echo "You don't have the authority for this action"; break;}
+		$query = "DELETE FROM imas_users WHERE id='{$_GET['id']}'";
+		mysql_query($query) or die("Query failed : " . mysql_error());
+		break;
 	case "removediag";
 		if ($myrights <60) { echo "You don't have the authority for this action"; break;}
 		$query = "SELECT imas_users.id,imas_users.groupid FROM imas_users JOIN imas_diags ON imas_users.id=imas_diags.ownerid AND imas_diags.id='{$_GET['id']}'";
