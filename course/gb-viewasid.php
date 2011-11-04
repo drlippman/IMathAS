@@ -450,7 +450,12 @@
 			echo "Not Submitted</p>\n";
 		} else {
 			echo "Last change: " . tzdate("F j, Y, g:i a",$line['endtime']) . "<br/>";
-			echo "Time spent: ". round(($line['endtime']-$line['starttime'])/60) . " minutes</p>\n";
+			echo "Time spent: ". round(($line['endtime']-$line['starttime'])/60) . " minutes<br/>\n";
+			$timeontask = array_sum(explode(',',str_replace('~',',',$line['timeontask'])));
+			if ($timeontask>0) {
+				echo "Total time questions were on-screen: ". round($timeontask/60,1) . " minutes.\n";
+			}
+			echo '</p>';
 		}
 		$saenddate = $line['enddate'];
 		unset($exped);

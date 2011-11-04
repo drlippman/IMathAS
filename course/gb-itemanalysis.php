@@ -71,6 +71,7 @@
 	$qcnt = array();
 	$qincomplete = array();
 	$timetaken = array();
+	$timeontask = array();
 	$attempts = array();
 	$regens = array();
 	
@@ -97,7 +98,7 @@
 		}
 	}
 	
-	$query = "SELECT ias.questions,ias.bestscores,ias.bestattempts,ias.bestlastanswers,ias.starttime,ias.endtime FROM imas_assessment_sessions AS ias,imas_students ";
+	$query = "SELECT ias.questions,ias.bestscores,ias.bestattempts,ias.bestlastanswers,ias.starttime,ias.endtime,ias.timeontask FROM imas_assessment_sessions AS ias,imas_students ";
 	$query .= "WHERE ias.userid=imas_students.userid AND imas_students.courseid='$cid' AND ias.assessmentid='$aid'";
 	if ($secfilter!=-1) {
 		$query .= " AND imas_students.section='$secfilter' ";
@@ -108,6 +109,7 @@
 		$scores = explode(',',$line['bestscores']);
 		$attp = explode(',',$line['bestattempts']);
 		$bla = explode('~',$line['bestlastanswers']);
+		$timeot = explode(',',$line['timeontask']);
 		foreach ($questions as $k=>$ques) {
 
 			if (!isset($qincomplete[$ques])) { $qincomplete[$ques]=0;}
@@ -115,6 +117,7 @@
 			if (!isset($qcnt[$ques])) { $qcnt[$ques]=0;}
 			if (!isset($attempts[$ques])) { $attempts[$ques]=0;}
 			if (!isset($regens[$ques])) { $regens[$ques]=0;}
+			if (!isset($timeontask[$ques])) { $timeontask[$ques]=0;}
 			if (strpos($scores[$k],'-1')!==false) {
 				$qincomplete[$ques] += 1;
 			}
@@ -122,6 +125,7 @@
 			$attempts[$ques] += $attp[$k];
 			$regens[$ques] += substr_count($bla[$k],'ReGen');
 			$qcnt[$ques] += 1;
+			$timeontask[$ques] += array_sum(explode('~',$timeot[$k]));
 		}
 		if ($line['endtime'] >0 && $line['starttime'] > 0) {
 			$timetaken[] = $line['endtime']-$line['starttime'];
@@ -130,7 +134,7 @@
 	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 	echo "<table class=gb id=myTable><thead>"; //<tr><td>Name</td>\n";
 	echo "<tr><th>#</th><th scope=\"col\">Question</th><th>Grade</th><th scope=\"col\">Average Score<br/>All</th>";
-	echo "<th scope=\"col\">Average Score<br/>Attempted</th><th scope=\"col\">Average Attempts<br/>(Regens)</th><th scope=\"col\">% Incomplete</th><th scope=\"col\">Preview</th></tr></thead>\n";
+	echo "<th scope=\"col\">Average Score<br/>Attempted</th><th scope=\"col\">Average Attempts<br/>(Regens)</th><th scope=\"col\">% Incomplete</th><th scope=\"col\">Time</th><th scope=\"col\">Preview</th></tr></thead>\n";
 	echo "<tbody>";
 	if (count($qtotal)>0) {
 		$i = 1;
@@ -182,9 +186,18 @@
 				if ($qcnt[$qid] - $qincomplete[$qid]>0) {
 					$avgatt = round($attempts[$qid]/($qcnt[$qid] - $qincomplete[$qid]),2);
 					$avgreg = round($regens[$qid]/($qcnt[$qid] - $qincomplete[$qid]),2);
+					$avgtot = round($timeontask[$qid]/($qcnt[$qid] - $qincomplete[$qid]),2);
+					if ($avgtot==0) {
+						$avgtot = 'N/A';
+					} else if ($avgtot<60) {
+						$avgtot .= ' sec';
+					} else {
+						$avgtot = round($avgtot/60,2) . ' min';
+					}
 				} else {
 					$avgatt = 0;
 					$avgreg = 0;
+					$avgtot = 0;
 				}
 			} else {
 				$avg = "NA";
@@ -200,7 +213,7 @@
 			}
 			echo "{$descrips[$qid]}</td>";
 			echo "<td><a href=\"gradeallq.php?stu=$stu&cid=$cid&asid=average&aid=$aid&qid=$qid\">Grade</a></td>";
-			echo "<td>$avg/$pts ($pc%)</td><td>$avg2/$pts ($pc2%)</td><td>$avgatt ($avgreg)</td><td>$pi</td>";
+			echo "<td>$avg/$pts ($pc%)</td><td>$avg2/$pts ($pc2%)</td><td>$avgatt ($avgreg)</td><td>$pi</td><td>$avgtot</td>";
 			echo "<td><input type=button value=\"Preview\" onClick=\"previewq({$qsetids[$qid]})\"/></td>\n";
 			
 			echo "</tr>\n";
@@ -223,7 +236,8 @@
 	}
 	echo "<p><a href=\"gradebook.php?stu=$stu&cid=$cid\">Return to GradeBook</a></p>\n";
 	
-	echo "<p>Note: Average Attempts and Regens only counts those who attempted the problem</p>";
+	echo "<p>Note: Average Attempts, Regens, and Time only counts those who attempted the problem</p>";
+	echo '<p>All averages only include those who have started the assessment</p>';
 	
 	$query = "SELECT COUNT(id) from imas_questions WHERE assessmentid='$aid' AND category<>'0'";
 	$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());

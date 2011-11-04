@@ -90,6 +90,7 @@ row[1][1][0][4] = asid, or 'new'
 row[1][1][0][5] = bitwise for dropped: 1 in past & 2 in cur & 4 in future & 8 attempted
 row[1][1][0][6] = 1 if had exception
 row[1][1][0][7] = time spent (minutes)
+row[1][1][0][8] = time on task (time displayed)
 
 row[1][1][1] = offline
 row[1][1][1][0] = score
@@ -719,7 +720,7 @@ function gbtable() {
 	}
 	//Get assessment scores
 	$assessidx = array_flip($assessments);
-	$query = "SELECT ias.id,ias.assessmentid,ias.bestscores,ias.starttime,ias.endtime,ias.feedback,ias.userid FROM imas_assessment_sessions AS ias,imas_assessments AS ia ";
+	$query = "SELECT ias.id,ias.assessmentid,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,ias.userid FROM imas_assessment_sessions AS ias,imas_assessments AS ia ";
 	$query .= "WHERE ia.id=ias.assessmentid AND ia.courseid='$cid'";
 	if ($limuser>0) { $query .= " AND ias.userid='$limuser' ";}
 	$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -745,6 +746,13 @@ function gbtable() {
 			$gb[$row][1][$col][7] = -1;
 		} else {
 			$gb[$row][1][$col][7] = round($timeused/60);
+		}
+		
+		$timeontask = array_sum(explode(',',str_replace('~',',',$l['timeontask'])));
+		if ($timeontask==0) {
+			$gb[$row][1][$col][8] = "N/A";
+		} else {
+			$gb[$row][1][$col][8] = round($timeontask/60,1);
 		}
 		if (in_array(-1,$scores)) { 
 			$IP=1; 

@@ -593,7 +593,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 				if (($la!='') && ($la == $i)) { $out .= "CHECKED";}
 				$out .= " />{$questions[$randkeys[$i]]}</li> \n";
 			} else {
-				$out .= "<li><input type=radio name=qn$qn value=$i ";
+				$out .= "<li><input class=\"unind\" type=radio name=qn$qn value=$i ";
 				if (($la!='') && ($la == $i)) { $out .= "CHECKED";}
 				$out .= " />{$questions[$randkeys[$i]]}</li> \n";
 			}
@@ -677,7 +677,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 				if (isset($labits[$i]) && ($labits[$i]!='') && ($labits[$i] == $i)) { $out .= "CHECKED";}
 				$out .= " />{$questions[$randkeys[$i]]}</li> \n";
 			} else {
-				$out .= "<li><input type=checkbox name=\"qn$qn"."[$i]\" value=$i ";
+				$out .= "<li><input class=\"unind\" type=checkbox name=\"qn$qn"."[$i]\" value=$i ";
 				if (isset($labits[$i]) && ($labits[$i]!='') && ($labits[$i] == $i)) { $out .= "CHECKED";}
 				$out .= " />{$questions[$randkeys[$i]]}</li> \n";
 			}
