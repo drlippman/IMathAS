@@ -22,6 +22,12 @@ $qsetid=$_GET['id'];
 $sessiondata['coursetheme'] = $coursetheme;
 
 $page_formAction = "embedq.php?id=$qsetid";
+if (isset($_GET['noscores'])) {
+	$page_formAction .= '&noscores=true';
+}
+if (isset($_GET['noregen'])) {
+	$page_formAction .= '&noregen=true';
+}
 
 $showans = false;
 if (isset($_POST['seed'])) {
@@ -40,7 +46,9 @@ if (isset($_POST['seed'])) {
 	}
 	$lastanswers[0] = stripslashes($lastanswers[0]);
 	$page_scoreMsg =  printscore($after,$qsetid,$_POST['seed']);
-	if (getpts($score)<1) {
+	if (isset($_GET['noregen'])) {
+		$seed = $_POST['seed'];
+	} else if (getpts($score)<1) {
 		$showans = true;
 		$seed = $_POST['seed'];
 	} else {
@@ -57,7 +65,7 @@ $placeinhead = '<style type="text/css">div.question {width: auto;} div.review {w
 $useeditor = 1;
 require("./assessment/header.php");
 
-if ($page_scoreMsg != '') {
+if ($page_scoreMsg != '' && !isset($_GET['noscores'])) {
 	echo '<div class="review">Score on last question: '.$page_scoreMsg;
 	echo '</div>';
 }

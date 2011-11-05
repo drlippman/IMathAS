@@ -124,6 +124,37 @@ if ($isteacher) {
 		include("../footer.php");
 		exit;
 	}	
+	if (isset($_POST['usrcomments']) && $stu>0) {
+			$query = "UPDATE imas_students SET gbcomment='{$_POST['usrcomments']}' WHERE userid='$stu'";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			//echo "<p>Comment Updated</p>";
+	}
+	if (isset($_POST['score']) && $stu>0) {
+		foreach ($_POST['score'] as $id=>$val) {
+			if (trim($val)=='') {
+				$query = "DELETE FROM imas_grades WHERE userid='$stu' AND gradetypeid='$id' AND gradetype='offline'";
+			} else {
+				$query = "UPDATE imas_grades SET score='$val',feedback='{$_POST['feedback'][$id]}' WHERE userid='$stu' AND gradetypeid='$id' AND gradetype='offline'";
+			}
+			mysql_query($query) or die("Query failed : " . mysql_error());
+		}
+	}
+	if (isset($_POST['newscore']) && $stu>0) {
+		$toins = array();
+		foreach ($_POST['newscore'] as $id=>$val) {
+			if (trim($val)=="") {continue;}
+			$toins[] = "('$id','offline','$stu','$val','{$_POST['feedback'][$id]}')";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+		}
+		if (count($toins)>0) {
+			$query = "INSERT INTO imas_grades (gradetypeid,gradetype,userid,score,feedback) VALUES ".implode(',',$toins);
+			mysql_query($query) or die("Query failed : " . mysql_error());
+		}
+	}
+	if (isset($_POST['usrcomments']) || isset($_POST['score']) || isset($_POST['newscore'])) {
+		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?{$_SERVER['QUERY_STRING']}");
+		exit;
+	}
 }
 
 
@@ -173,6 +204,36 @@ if ($canviewall) {
 		$placeinhead .= "	if (type==0) { return false;}\n";
 		$placeinhead .= "  	window.location = toopen; \n";
 		$placeinhead .= "}\n";
+		$placeinhead .= 'function makeofflineeditable() {
+					var anchors = document.getElementsByTagName("a");
+					for (var i=0;i<anchors.length;i++) {
+						if (bits=anchors[i].href.match(/addgrades.*gbitem=(\d+)/)) {
+							if (anchors[i].innerHTML.match("-")) {
+							    type = "newscore";
+							} else {
+							    type = "score";
+							}
+							anchors[i].style.display = "none";
+							var newinp = document.createElement("input");
+							newinp.size = 4;
+							if (type=="newscore") {
+							    newinp.name = "newscore["+bits[1]+"]";
+							} else {
+							    newinp.name = "score["+bits[1]+"]";
+							    newinp.value = anchors[i].innerHTML;
+							}
+							anchors[i].parentNode.appendChild(newinp);
+							var newtxta = document.createElement("textarea");
+							newtxta.name = "feedback["+bits[1]+"]";
+							newtxta.cols = 50;
+							var feedbtd = anchors[i].parentNode.nextSibling.nextSibling.nextSibling;
+							newtxta.value = feedbtd.innerHTML;
+							feedbtd.innerHTML = "";
+							feedbtd.appendChild(newtxta);
+						}					
+					}
+					document.getElementById("savechgbtn").style.display = "";
+				}';
 	}
 	
 	
@@ -406,11 +467,6 @@ function gbstudisp($stu) {
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$showlatepass = mysql_result($result,0,0);
 		
-		if ($isteacher && isset($_POST['usrcomments'])) {
-			$query = "UPDATE imas_students SET gbcomment='{$_POST['usrcomments']}' WHERE userid='$stu'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-			echo "<p>Comment Updated</p>";
-		}
 		if ($isteacher) {
 			if (file_exists("$curdir//files/userimg_sm{$gbt[1][4][0]}.jpg")) {
 				echo "<img src=\"$imasroot/course/files/userimg_sm{$gbt[1][4][0]}.jpg\" style=\"float: left; padding-right:5px;\" onclick=\"togglepic(this)\"/>";
@@ -427,7 +483,9 @@ function gbstudisp($stu) {
 				echo "<a href=\"$imasroot/msgs/msglist.php?cid={$_GET['cid']}&add=new&to=$stu\">Message</a> | ";
 				echo "<a href=\"gradebook.php?cid={$_GET['cid']}&uid=$stu&massexception=1\">Make Exception</a> | ";
 				echo "<a href=\"listusers.php?cid={$_GET['cid']}&chgstuinfo=true&uid=$stu\">Change Info</a> | ";
-				echo "<a href=\"viewloginlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">Login Log</a>";
+				echo "<a href=\"viewloginlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">Login Log</a> | ";
+				echo "<a href=\"#\" onclick=\"makeofflineeditable(); return false;\">Edit Offline Scores</a>";
+				
 			}
 			$gbcomment = mysql_result($result,0,0);
 			$latepasses = mysql_result($result,0,2);
@@ -444,14 +502,14 @@ function gbstudisp($stu) {
 				echo "<form method=post action=\"gradebook.php?{$_SERVER['QUERY_STRING']}\">";
 				echo "<textarea name=\"usrcomments\" rows=3 cols=60>$gbcomment</textarea><br/>";
 				echo "<input type=submit value=\"Update Comment\">";
-				echo "</form>";
+				echo '</form>';
 			} else {
 				echo "<div class=\"item\">$gbcomment</div>";
 			}
 		}
 		echo '</div>';
 	}
-	
+	echo "<form method=post action=\"gradebook.php?{$_SERVER['QUERY_STRING']}\">";
 	echo '<table id="myTable" class="gb" style="position:relative;">';
 	echo '<thead><tr><th>Item</th><th>Possible</th><th>Grade</th><th>Percent</th>';
 	if ($stu>0 && $isteacher) {
@@ -583,6 +641,8 @@ function gbstudisp($stu) {
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$show = mysql_result($result,0,0);
 		echo '</tbody></table><br/>';
+		echo '<input type="submit" value="Save Changes" style="display:none"; id="savechgbtn" />';
+		
 		echo '<table class="gb"><thead>';
 		echo '<tr>';
 		echo '<th >Totals</th>';
@@ -754,6 +814,11 @@ function gbstudisp($stu) {
 		}
 	}
 	echo '</tbody></table>';	
+	if ($hidepast) {
+		echo '<input type="submit" value="Save Changes" style="display:none"; id="savechgbtn" />';
+	}
+	
+	echo "</form>";
 	$sarr = "'S','N','N','N'";
 	if ($stu>0) {
 		$sarr .= ",'N','S'";

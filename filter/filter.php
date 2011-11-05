@@ -126,11 +126,17 @@
 		}
 		
 		if (strpos($str,'[EMBED')!==false) {
-			$search = '/\[EMBED:\s*([^,]+),([^,]+),([^,\]]+)\]/';
+			$search = '/\[EMBED:\s*([^\]]+)\]/';
 			
 			if (preg_match_all($search, $str, $res, PREG_SET_ORDER)){
 				foreach ($res as $resval) {
-					$tag = "<iframe width=\"{$resval[1]}\" height=\"{$resval[2]}\" src=\"{$resval[3]}\" ></iframe>";
+					$respt = explode(',',$resval[1]);
+					if (count($respt)<3) { continue;}
+					$tag = "<iframe width=\"{$respt[0]}\" height=\"{$respt[1]}\" src=\"{$respt[2]}\" ";
+					if (isset($respt[3])) {
+						$tag .= 'frameborder="0" ';
+					} 
+					$tag .= "></iframe>";
 					$str = str_replace($resval[0], $tag, $str);
 				}
 			}

@@ -325,11 +325,24 @@ function AutoSuggest(elem, suggestions)
 	this.getEligible = function()
 	{
 		this.eligible = new Array();
+		var added = ',';
+		if (this.inputText.indexOf(" ") == -1) {
+			var bndreg = new RegExp("\\b"+this.inputText.toLowerCase());
+			for (i in this.suggestions) 
+			{
+				var suggestion = this.suggestions[i];
+				if(suggestion.toLowerCase().match(bndreg))
+				{
+					this.eligible[this.eligible.length]=suggestion;
+					added += i+',';
+				}
+			}	
+		}
 		for (i in this.suggestions) 
 		{
 			var suggestion = this.suggestions[i];
 			
-			if(suggestion.toLowerCase().indexOf(this.inputText.toLowerCase()) >-1)
+			if(suggestion.toLowerCase().indexOf(this.inputText.toLowerCase()) >-1 && added.indexOf(','+i+',')<0)
 			{
 				this.eligible[this.eligible.length]=suggestion;
 			}
