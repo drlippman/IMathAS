@@ -590,9 +590,9 @@ function showqinfobar($qn,$inreview,$single) {
 	//	echo "<br/>Score in gradebook: ".printscore2($bestscores[$qn]).".";
 	//}
 	if ($single) {
-		echo "<input type=hidden name=\"verattempts\" value=\"{$attempts[$qn]}\" />";
+		echo "<input type=hidden id=\"verattempts\" name=\"verattempts\" value=\"{$attempts[$qn]}\" />";
 	} else {
-		echo "<input type=hidden name=\"verattempts[$qn]\" value=\"{$attempts[$qn]}\" />";
+		echo "<input type=hidden id=\"verattempts$qn\" name=\"verattempts[$qn]\" value=\"{$attempts[$qn]}\" />";
 	}
 	if ($sessiondata['msgqtoinstr']==2) {
 		echo "<br/><a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid={$testsettings['courseid']}&add=new&quoteq=$qn-{$qi[$questions[$qn]]['questionsetid']}-{$seeds[$qn]}-{$testsettings['id']}&to=instr\">Message instructor about this question</a>";

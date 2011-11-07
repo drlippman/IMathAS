@@ -620,17 +620,15 @@ function doonsubmit(form,type2,skipconfirm) {
 			}
 		}
 	}
-	for (var i=0; i<intcalctoproc.length; i++) {
-		var nh = document.createElement("INPUT");
-		nh.type = "hidden";
-		nh.name = "qn" + intcalctoproc[i];
-		fullstr = document.getElementById("tc"+intcalctoproc[i]).value;
+	for (var qn in intcalctoproc) { //i=0; i<intcalctoproc.length; i++) {
+		var nh = document.getElementById("qn" + qn);
+		fullstr = document.getElementById("tc"+qn).value;
 		fullstr = fullstr.replace(/\s+/g,'');
 		
 		if (fullstr.match(/DNE/i)) {
 			  fullstr = fullstr.toUpperCase();
 		  } else {
-			  if (calcformat[intcalctoproc[i]].indexOf('inequality')!=-1) {
+			  if (calcformat[qn].indexOf('inequality')!=-1) {
 				  fullstr = ineqtointerval(fullstr);
 			  }
 			  strarr = fullstr.split(/U/);
@@ -661,15 +659,13 @@ function doonsubmit(form,type2,skipconfirm) {
 			 fullstr = strarr.join('U');
 		  }
 		  nh.value = fullstr;
-		  outn = document.getElementById("p"+intcalctoproc[i]);
+		  outn = document.getElementById("p"+qn);
 		  outn.appendChild(nh);
 	}
-	for (var i=0; i<calctoproc.length; i++) {
-		var nh = document.createElement("INPUT");
-		nh.type = "hidden";
-		nh.name = "qn" + calctoproc[i];
-		str = document.getElementById("tc"+calctoproc[i]).value;
-		if (calcformat[calctoproc[i]].indexOf('list')!=-1) {
+	for (var qn in calctoproc) { //i=0; i<calctoproc.length; i++) {
+		var nh = document.getElementById("qn" + qn);
+		str = document.getElementById("tc"+qn).value;
+		if (calcformat[qn].indexOf('list')!=-1) {
 			strarr = str.split(/,/);
 		} else {
 			var strarr = new Array();
@@ -679,11 +675,11 @@ function doonsubmit(form,type2,skipconfirm) {
 			str = strarr[sc];
 			
 			str = str.replace(/,/g,"");
-			if (calcformat[calctoproc[i]].indexOf('scinot')!=-1) {
+			if (calcformat[qn].indexOf('scinot')!=-1) {
 				str = str.replace("x","*");
 			}
 			str = str.replace(/(\d+)\s*_\s*(\d+\s*\/\s*\d+)/,"($1+$2)");
-			if (calcformat[calctoproc[i]].indexOf('mixednumber')!=-1 || calcformat[calctoproc[i]].indexOf('allowmixed')!=-1) {
+			if (calcformat[qn].indexOf('mixednumber')!=-1 || calcformat[qn].indexOf('allowmixed')!=-1) {
 				str = str.replace(/(\d+)\s+(\d+\s*\/\s*\d+)/,"($1+$2)");
 			}
 			if (str.match(/^\s*$/)) {
@@ -702,52 +698,44 @@ function doonsubmit(form,type2,skipconfirm) {
 			strarr[sc] = res;
 		}
 		nh.value = strarr.join(',');
-		outn = document.getElementById("p"+calctoproc[i]);
+		outn = document.getElementById("p"+qn);
 		outn.appendChild(nh);
 	}
-	for (var i=0; i<matcalctoproc.length; i++) {
-		var nh = document.createElement("INPUT");
-		nh.type = "hidden";
-		nh.name = "qn" + matcalctoproc[i];
-		if (matsize[matcalctoproc[i]]!= null) {
-			msize = matsize[matcalctoproc[i]].split(",");
-			str = matrixcalc("qn"+matcalctoproc[i],null,msize[0],msize[1]);
+	for (var qn in matcalctoproc) {//i=0; i<matcalctoproc.length; i++) {
+		var nh = document.getElementById("qn" +  qn);
+		if (matsize[qn]!= null) {
+			msize = matsize[qn].split(",");
+			str = matrixcalc("qn"+qn,null,msize[0],msize[1]);
 		} else {
-			str = matrixcalc("tc"+matcalctoproc[i],null);
+			str = matrixcalc("tc"+qn,null);
 		}
 		nh.value = str;
-		outn = document.getElementById("p"+matcalctoproc[i]);
+		outn = document.getElementById("p"+qn);
 		outn.appendChild(nh);
 	}
-	for (var i=0; i<ntupletoproc.length; i++) {
-		var nh = document.createElement("INPUT");
-		nh.type = "hidden";
-		nh.name = "qn" + ntupletoproc[i];
-		str = ntuplecalc("tc"+ntupletoproc[i],null);
+	for (var qn in ntupletoproc) {//i=0; i<ntupletoproc.length; i++) {
+		var nh = document.getElementById("qn" + qn);
+		str = ntuplecalc("tc"+qn,null);
 		nh.value = str;
-		outn = document.getElementById("p"+ntupletoproc[i]);
+		outn = document.getElementById("p"+qn);
 		outn.appendChild(nh);
 	}
-	for (var i=0; i<complextoproc.length; i++) {
-		var nh = document.createElement("INPUT");
-		nh.type = "hidden";
-		nh.name = "qn" + complextoproc[i];
-		str = complexcalc("tc"+complextoproc[i],null);
+	for (var qn in complextoproc) { //i=0; i<complextoproc.length; i++) {
+		var nh = document.getElementById("qn" + qn);
+		str = complexcalc("tc"+qn,null);
 		nh.value = str;
-		outn = document.getElementById("p"+complextoproc[i]);
+		outn = document.getElementById("p"+qn);
 		outn.appendChild(nh);
 	}
-	for (var fcnt=0; fcnt<functoproc.length; fcnt++) {
-		var nh = document.createElement("INPUT");
-		nh.type = "hidden";
-		nh.name = "qn" + functoproc[fcnt];
-		str = document.getElementById("tc"+functoproc[fcnt]).value;
+	for (var qn in functoproc) { //fcnt=0; fcnt<functoproc.length; fcnt++) {
+		var nh = document.getElementById("qn" + qn);
+		str = document.getElementById("tc"+qn).value;
 		str = str.replace(/,/g,"");
-		if (iseqn[functoproc[fcnt]]==1) {
+		if (iseqn[qn]==1) {
 			str = str.replace(/(.*)=(.*)/,"$1-($2)");
 		}
-		fl = flist[functoproc[fcnt]];
-		varlist = vlist[functoproc[fcnt]];
+		fl = flist[qn];
+		varlist = vlist[qn];
 		
 		vars = varlist.split("|");
 		for (var j=0; j<vars.length; j++) {
@@ -773,10 +761,10 @@ function doonsubmit(form,type2,skipconfirm) {
 		vars = varlist.split("|");
 		nh.value = mathjs(str,varlist);
 
-		outn = document.getElementById("p"+functoproc[fcnt]);
+		outn = document.getElementById("p"+qn);
 		outn.appendChild(nh);
 		
-		ptlist = pts[functoproc[fcnt]].split(",");
+		ptlist = pts[qn].split(",");
 		vals= new Array();
 		for (var fj=0; fj<ptlist.length;fj++) { //for each set of inputs
 			inputs = ptlist[fj].split("~");
@@ -796,9 +784,7 @@ function doonsubmit(form,type2,skipconfirm) {
 				vals[fj] = NaN;
 			}	
 		}
-		var nh2 = document.createElement("input");
-		nh2.type = "hidden";
-		nh2.name = "qn" + functoproc[fcnt] + "-vals";
+		var nh2 = document.getElementById("qn" + qn+"-vals");
 		nh2.value = vals.join(",");
 		outn.appendChild(nh2);
 		
@@ -824,3 +810,107 @@ function toggleinlinebtn(n,p){
 		s.innerHTML = k.match(/\+/)?k.replace(/\+/,'-'):k.replace(/\-/,'+');
 	}
 }
+
+function assessbackgsubmit(qn,noticetgt) {
+	if (window.XMLHttpRequest) { 
+		req = new XMLHttpRequest(); 
+	} else if (window.ActiveXObject) { 
+		req = new ActiveXObject("Microsoft.XMLHTTP"); 
+	} 
+	if (req != undefined) { 
+		doonsubmit();
+		params = "embedpostback=true";
+		if (qn != null) {
+			var els = document.getElementsByTagName("input");
+			var regex = new RegExp("^(qn|tc)"+qn);
+			for (var i=0;i<els.length;i++) {
+				if (els[i].name.match(regex)) {
+					if ((els[i].type!='radio' && els[i].type!='checkbox') || els[i].checked) {
+						params += ('&'+els[i].name+'='+encodeURIComponent(els[i].value));
+					}
+				}
+			}
+			params += '&toscore='+qn;
+			params += '&verattempts='+document.getElementById("verattempts"+qn).value;
+		} else {
+			var els = document.getElementsByTagName("input");
+			for (var i=0;i<els.length;i++) {
+				if (els[i].name.match(/^(qn|tc)/)) {
+					if (els[i].type!='radio' || els[i].type!='checkbox' || els[i].checked) {
+						params += ('&'+els[i].name+'='+encodeURIComponent(els[i].value));
+					}
+				}
+			}
+			params += '&verattempts='+document.getElementById("verattempts").value;
+		}
+		params += '&asidverify='+document.getElementById("asidverify").value;
+		params += '&disptime='+document.getElementById("disptime").value;
+		params += '&isreview='+document.getElementById("isreview").value;
+		
+		if (noticetgt != null) {
+			document.getElementById(noticetgt).innerHTML = "Submitting...";
+		}
+		req.open("POST", assesspostbackurl, true);
+		req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		req.setRequestHeader("Content-length", params.length);
+		req.setRequestHeader("Connection", "close");
+		req.onreadystatechange = function() {assessbackgsubmitCallback(qn,noticetgt);}; 
+		req.send(params);  
+	} else {
+		if (noticetgt != null) {
+			document.getElementById(noticetgt).innerHTML = "Error Submitting.";
+		}
+	}
+}  
+
+function assessbackgsubmitCallback(qn,noticetgt) { 
+  if (req.readyState == 4) { // only if req is "loaded" 
+    if (req.status == 200) { // only if "OK" 
+	    if (noticetgt != null) {
+		    document.getElementById(noticetgt).innerHTML = "";
+	    }
+	    if (qn != null) {
+		    var scripts = new Array();         // Array which will store the script's code
+		    var resptxt = req.responseText;
+		    // Strip out tags
+		    while(resptxt.indexOf("<script") > -1 || resptxt.indexOf("</script") > -1) {
+			    var s = resptxt.indexOf("<script");
+			    var s_e = resptxt.indexOf(">", s);
+			    var e = resptxt.indexOf("</script", s);
+			    var e_e = resptxt.indexOf(">", e);
+			    
+			    // Add to scripts array
+			    scripts.push(resptxt.substring(s_e+1, e));
+			    // Strip from strcode
+			    resptxt = resptxt.substring(0, s) + resptxt.substring(e_e+1);
+		    }
+			  
+			
+		    document.getElementById("embedqwrapper"+qn).innerHTML = resptxt;
+		    if (usingASCIIMath) {
+			    AMprocessNode( document.getElementById("embedqwrapper"+qn));
+		    }
+		    if (usingASCIISvg) {
+			    setTimeout("drawPics()",100);
+		    }
+		    
+		    // Loop through every script collected and eval it
+		    for(var i=0; i<scripts.length; i++) {
+			    try {
+				    eval(scripts[i]);
+			    }
+			    catch(ex) {
+				    // do what you want here when a script fails
+			    }
+		    }
+	    }
+	    //var todo = eval('('+req.responseText+')');
+	   
+    } else { 
+	    if (noticetgt != null) {
+		    document.getElementById(noticetgt).innerHTML = "Submission Error:\n"+ req.status + "\n" +req.statusText; 
+	    }
+    }
+  } 
+}	
+	

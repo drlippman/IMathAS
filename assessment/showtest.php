@@ -617,9 +617,14 @@
 	}
 	$isltilimited = (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0 && $sessiondata['ltirole']=='learner');
 
+
+
+		
 	header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
 	header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 	$useeditor = 1;
+if (!isset($_POST['embedpostback'])) {
+	
 	if ($testsettings['eqnhelper']>0) {
 		$placeinhead = '<script type="text/javascript">var eetype='.$testsettings['eqnhelper'].'</script>';
 		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqnhelper.js?v=040710\"></script>";
@@ -930,7 +935,9 @@
 	} else {
 		echo "<div class=right>No time limit</div>\n";
 	}
-	
+} else {
+	require_once("../filter/filter.php");
+}
 	//identify question-specific  intro/instruction 
 	//comes in format [Q 1-3] in intro
 	if (strpos($testsettings['intro'],'[Q')!==false) {
@@ -939,7 +946,6 @@
 			$testsettings['intro'] = array_shift($intropieces);
 		}
 	}
-	
 	if (isset($_GET['action'])) {
 		if ($_GET['action']=="skip" || $_GET['action']=="seq") {
 			echo "<div class=right><span onclick=\"document.getElementById('intro').className='intro';\"><a href=\"#\">Show Instructions</a></span></div>\n";
@@ -1318,7 +1324,7 @@
 				echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
 				echo '<input type="hidden" name="disptime" value="'.time().'" />';
 				echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
-				echo "<input type=hidden name=\"verattempts\" value=\"{$attempts[$toshow]}\" />";
+				echo "<input type=\"hidden\" name=\"verattempts\" value=\"{$attempts[$toshow]}\" />";
 				
 				for ($i = 0; $i < count($questions); $i++) {
 					
@@ -1343,7 +1349,73 @@
 				}
 				
 			}
-		} 
+		} else if ($_GET['action']=='scoreembed') {
+			$qn = $_POST['toscore'];
+			if ($_POST['verattempts']!=$attempts[$qn]) {
+				echo "This question has been submittted since you viewed it, and that grade is shown below.  Your answer just submitted was not scored or recorded.";
+			} else {
+				if (isset($_POST['disptime']) && !$isreview) {
+					$used = $now - intval($_POST['disptime']);
+					$timesontask[$qn] .= (($timesontask[$qn]=='')?'':'~').$used;
+				}
+				$GLOBALS['scoremessages'] = '';
+				$rawscore = scorequestion($qn);
+				
+				//record score
+				
+				recordtestdata();
+				if ($GLOBALS['scoremessages'] != '') {
+					echo '<p>'.$GLOBALS['scoremessages'].'</p>';
+				}
+				$reattemptsremain = false;
+				if ($showeachscore) {
+					$possible = $qi[$questions[$qn]]['points'];
+					if (getpts($rawscore)!=getpts($scores[$qn])) {
+						echo "<p>Score before penalty on last attempt: ";
+						echo printscore($rawscore,$qn);
+						echo "</p>";
+					}
+					echo "<p>";
+					echo "Score on last attempt: ";
+					echo printscore($scores[$qn],$qn);
+					echo "</p>\n";
+					echo "<p>Score in gradebook: ";
+					echo printscore($bestscores[$qn],$qn);
+					echo "</p>";
+										
+					
+				}
+			}
+			if (hasreattempts($qn)) {
+				ob_start();
+				basicshowq($qn,false);
+				$quesout = ob_get_clean();
+				$quesout = substr($quesout,0,-7).'<br/><input type="button" class="btn" value="Submit Question '.($qn+1).'" onclick="assessbackgsubmit('.$qn.',\'submitnotice'.$qn.'\')" /><span id="submitnotice'.$qn.'"></span></div>';
+				echo $quesout;
+				showqinfobar($qn,true,false);
+			} else {
+				echo "<p>No attempts remain on this problem.</p>";
+				if ($showeachscore) {
+					$msg =  "<p>This question, with your last answer";
+					if (($showansafterlast && $qi[$questions[$qn]]['showans']=='0') || $qi[$questions[$qn]]['showans']=='F' || $qi[$questions[$qn]]['showans']=='J') {
+						$msg .= " and correct answer";
+						$showcorrectnow = true;
+					} else if ($showansduring && $qi[$questions[$qn]]['showans']=='0' && $qi[$questions[$qn]]['showans']=='0' && $testsettings['showans']==$attempts[$qn]) {
+						$msg .= " and correct answer";
+						$showcorrectnow = true;
+					} else {
+						$showcorrectnow = false;
+					}
+					if ($showcorrectnow) {
+						echo $msg . ', is displayed below</p>';
+						
+						displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],2,false,$attempts[$qn],false,false);
+					}
+				}
+			}
+			exit;
+			
+		}
 	} else { //starting test display  
 		$canimprove = false;
 		$hasreattempts = false;
@@ -1531,20 +1603,22 @@
 		} else if ($testsettings['displaymethod'] == "Embed") {
 			
 			$intro = filter("<div>{$testsettings['intro']}</div>\n");
+			echo '<script type="text/javascript">var assesspostbackurl="http://'. $_SERVER['HTTP_HOST'] . $imasroot . '/assessment/showtest.php?embedpostback=true&action=scoreembed";</script>';
 			echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=seq&amp;score=$i\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
-			echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
-			echo '<input type="hidden" name="disptime" value="'.time().'" />';
-			echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
-			echo "<input type=\"hidden\" name=\"verattempts\" value=\"{$attempts[$i]}\" />";
-		
+			echo "<input type=\"hidden\" id=\"asidverify\" name=\"asidverify\" value=\"$testid\" />";
+			echo '<input type="hidden" id="disptime" name="disptime" value="'.time().'" />';
+			echo "<input type=\"hidden\" id=\"isreview\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
+			
 			for ($i = 0; $i < count($questions); $i++) {
+				$quesout = '<div id="embedqwrapper'.$i.'">';
 				ob_start();
 				basicshowq($i,false);
-				$quesout = ob_get_clean();
-				$quesout = substr($quesout,0,-7).'<br/><input type="submit" class="btn" value="Submit Question '.($i+1).'" /></div>';
-				ob_start();
-				showqinfobar($i,true,true);
 				$quesout .= ob_get_clean();
+				$quesout = substr($quesout,0,-7).'<br/><input type="button" class="btn" value="Submit Question '.($i+1).'" onclick="assessbackgsubmit('.$i.',\'submitnotice'.$i.'\')" /><span id="submitnotice'.$i.'"></span></div>';
+				ob_start();
+				showqinfobar($i,true,false);
+				$quesout .= ob_get_clean();
+				$quesout .= '</div>';
 				$intro = str_replace('[QUESTION '.($i+1).']',$quesout,$intro);
 			}
 			echo $intro;

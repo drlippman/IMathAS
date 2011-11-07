@@ -3,8 +3,29 @@
 //(c) 2006 David Lippman
 	require("../validate.php");
 	$pagetitle = "Question Editor";
-	$useeditor = "qtext";
-	$delayeditor = true;
+	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/editor/tiny_mce.js?v=082911"></script>';
+	$placeinhead .= '<script type="text/javascript">
+	  var editoron = 0;
+	  var coursetheme = "'.$coursetheme.'";';
+	if (isset($AWSkey)) {
+		$placeinhead .= 'var fileBrowserCallBackFunc = "fileBrowserCallBack";';
+	} else {
+		$placeinhead .= 'var fileBrowserCallBackFunc = null;';
+	}
+	$placeinhead .= 'function toggleeditor() {
+	     var qtextbox =  document.getElementById("qtext");
+	     if (editoron==0) {
+	        qtextbox.rows += 3;
+	        qtextbox.value = qtextbox.value.replace(/`(.*?)`/,\'<span class="AM">`$1`</span>\');
+	        initeditor("exact","qtext");
+	     } else {
+		tinyMCE.execCommand("mceRemoveControl",true,"qtext");
+		qtextbox.rows -= 3;
+		qtextbox.value = qtextbox.value.replace(/<span\s+class="AM">(.*?)<\\/span>/,"$1");
+	     }
+	     editoron = 1 - editoron;
+	   }</script>';
+	        
 	require("../header.php");
 	if ($myrights<20) {
 		echo "You need to log in as a teacher to access this page";
@@ -444,7 +465,7 @@
 			
 			$twobx = ($line['qcontrol']=='' && $line['answer']=='');
 			
-			
+			$line['qtext'] = preg_replace('/<span class="AM">(.*?)<\/span>/','$1',$line['qtext']);
 	} else {
 			$myq = true;
 			$twobx = true;
@@ -664,9 +685,10 @@ Question Control: <span class=pointer onclick="incboxsize('qcontrol')">[+]</span
 </div>
 <div id=qtbox>
 Question Text: <span class=pointer onclick="incboxsize('qtext')">[+]</span><span class=pointer onclick="decboxsize('qtext')">[-]</span>
+<input type="button" onclick="toggleeditor()" value="Toggle Editor"/>
 <input type=submit value="Save">
 <input type=submit name=test value="Save and Test Question"><BR>
-<textarea style="width: 100%" cols=60 rows=<?php echo min(35,max(10,substr_count($line['qtext'],"\n")+1));?> id=qtext name=qtext <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $line['qtext'];?></textarea>
+<textarea style="width: 100%" cols=60 rows=<?php echo min(35,max(10,substr_count($line['qtext'],"\n")+1));?> id="qtext" name="qtext" <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $line['qtext'];?></textarea>
 </div>
 <div id=abox <?php if ($twobx) {echo "style=\"display: none;\"";}?>>
 Answer: <span class=pointer onclick="incboxsize('answer')">[+]</span><span class=pointer onclick="decboxsize('answer')">[-]</span>

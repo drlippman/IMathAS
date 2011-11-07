@@ -39,17 +39,21 @@ if ($isdiag) {
 }
 if ($sessiondata['mathdisp']==1) {
 	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/ASCIIMathML_min.js?v=100411\"></script>\n";
+	echo "<script type=\"text/javascript\">var usingASCIIMath = true;</script>";
 } else if ($sessiondata['mathdisp']==2) {
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>'; 
 	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?v=082911\" type=\"text/javascript\"></script>\n";
+	echo "<script type=\"text/javascript\">var usingASCIIMath = false;</script>";
 } else if ($sessiondata['mathdisp']==0) {
-	echo '<script type="text/javascript">var noMathRender = true;</script>';	
+	echo '<script type="text/javascript">var noMathRender = true; var usingASCIIMath = false;</script>';	
 }
 
 if ($sessiondata['graphdisp']==1) {
 	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?v=091311\" type=\"text/javascript\"></script>\n";
+	echo "<script type=\"text/javascript\">var usingASCIISvg = true;</script>";
 } else {
 	echo "<script src=\"$imasroot/javascript/mathjs.js?v=102510\" type=\"text/javascript\"></script>\n";
+	echo "<script type=\"text/javascript\">var usingASCIISvg = false;</script>";
 }
 ?>
 <!--[if lte IE 6]> 
@@ -63,7 +67,7 @@ div { zoom: 1; }
 }
 </style> 
 <![endif]--> 
-<script src="<?php echo $imasroot . "/javascript/AMhelpers_min.js?v=041511";?>" type="text/javascript"></script>
+<script src="<?php echo $imasroot . "/javascript/AMhelpers_min.js?v=110711";?>" type="text/javascript"></script>
 <script src="<?php echo $imasroot . "/javascript/confirmsubmit.js";?>" type="text/javascript"></script>
 <!--[if lt IE 9]><script type="text/javascript" src="<?php echo $imasroot;?>/javascript/excanvas_min.js"></script><![endif]-->
 <script type="text/javascript" src="<?php echo $imasroot;?>/javascript/drawing_min.js?v=092011"></script>

@@ -855,11 +855,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$out .= "onfocus=\"showeedd('tc$qn')\" onblur=\"hideee()\" ";
 		}
 		$out .= "/>$rightb\n";
+		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
 		if (!isset($hidepreview)) {
 			$preview .= "<input type=button class=btn value=Preview onclick=\"calculate('tc$qn','p$qn','$answerformat')\" /> &nbsp;\n";
 		}
 		$preview .= "$leftb<span id=p$qn></span>$rightb ";
-		$out .= "<script type=\"text/javascript\">calctoproc[calctoproc.length] = $qn; calcformat[$qn] = '$answerformat';</script>\n";
+		$out .= "<script type=\"text/javascript\">calctoproc[$qn] = 1; calcformat[$qn] = '$answerformat';</script>\n";
 		
 		if (isset($answer)) {
 			if (!is_numeric($answer)) {
@@ -941,17 +942,19 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$out .= '</td><td class="matrixright">&nbsp;</td></tr></table>';
 			if (!isset($hidepreview)) {$preview .= "<input type=button class=btn value=Preview onclick=\"matrixcalc('qn$qn','p$qn',{$answersize[0]},{$answersize[1]})\" /> &nbsp;\n";}
 			$preview .= "<span id=p$qn></span>\n";
-			$out .= "<script type=\"text/javascript\">matcalctoproc[matcalctoproc.length] = $qn; matsize[$qn]='{$answersize[0]},{$answersize[1]}';</script>\n";
+			$out .= "<script type=\"text/javascript\">matcalctoproc[$qn] = 1; matsize[$qn]='{$answersize[0]},{$answersize[1]}';</script>\n";
 			$tip .= formathint('each element of the matrix',$ansformats,'calcmatrix');
 			//$tip = "Enter each element of the matrix as  number (like 5, -3, 2.2) or as a calculation (like 5/3, 2^3, 5+4)";
 		} else {
 			$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\" />\n";
 			$out .= "<input type=button value=Preview onclick=\"matrixcalc('tc$qn','p$qn')\" /> &nbsp;\n";
 			$out .= "<span id=p$qn></span> \n";
-			$out .= "<script type=\"text/javascript\">matcalctoproc[matcalctoproc.length] = $qn;</script>\n";
+			$out .= "<script type=\"text/javascript\">matcalctoproc[$qn] = 1;</script>\n";
 			$tip = "Enter your answer as a matrix, like ((2,3,4),(1,4,5))";
 			$tip .= '<br/>'.formathint('each element of the matrix',$ansformats,'calcmatrix');
 		}
+		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
+		
 		if (isset($answer)) {
 			$sa = '`'.$answer.'`';
 		}
@@ -989,6 +992,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		}
 		
 		$out .= "/>\n";
+		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
+		$out .= "<input type=\"hidden\" id=\"qn$qn-vals\" name=\"qn$qn-vals\" />";
+		
 		if (!isset($hidepreview)) {$preview .= "<input type=button class=btn value=Preview onclick=\"AMpreview('tc$qn','p$qn')\" /> &nbsp;\n";}
 		$preview .= "<span id=p$qn></span>\n";
 		
@@ -1010,7 +1016,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		}
 		$vlist = implode("|",$ovar);
 		$flist = implode('|',$ofunc);
-		$out .= "<script type=\"text/javascript\">functoproc[functoproc.length] = $qn; vlist[$qn]=\"$vlist\"; flist[$qn]=\"$flist\";</script>\n";
+		$out .= "<script type=\"text/javascript\">functoproc[$qn] = 1; vlist[$qn]=\"$vlist\"; flist[$qn]=\"$flist\";</script>\n";
 		if (isset($domain)) {$fromto = explode(",",$domain);} else {$fromto[0]=-10; $fromto[1]=10;}
 		
 		for ($i = 0; $i < 20; $i++) {
@@ -1123,11 +1129,13 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$out .= "onfocus=\"showehdd('tc$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
 		}
 		$out .= '/>';
+		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
+		
 		if (!isset($hidepreview)) {
 			$preview .= "<input type=button class=btn value=Preview onclick=\"ntuplecalc('tc$qn','p$qn','$qn')\" /> &nbsp;\n";
 		}
 		$preview .= "<span id=p$qn></span> ";
-		$out .= "<script type=\"text/javascript\">ntupletoproc[ntupletoproc.length] = $qn; calcformat[$qn] = '$answerformat';</script>\n";
+		$out .= "<script type=\"text/javascript\">ntupletoproc[$qn] = 1; calcformat[$qn] = '$answerformat';</script>\n";
 		//$tip .= "Enter DNE for Does Not Exist";
 		if (isset($answer)) {
 			$sa = makeprettydisp($answer);
@@ -1198,11 +1206,13 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$out .= "onfocus=\"showehdd('tc$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
 		}
 		$out .= '/>';
+		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
+		
 		if (!isset($hidepreview)) {
 			$preview .= "<input type=button class=btn value=Preview onclick=\"complexcalc('tc$qn','p$qn')\" /> &nbsp;\n";
 		}
 		$preview .= "<span id=p$qn></span> ";
-		$out .= "<script type=\"text/javascript\">complextoproc[complextoproc.length] = $qn;</script>\n";
+		$out .= "<script type=\"text/javascript\">complextoproc[$qn] = 1;</script>\n";
 		
 		//$tip .= "Enter DNE for Does Not Exist";
 		if (isset($answer)) {
@@ -1352,11 +1362,13 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$out .= "onfocus=\"showehdd('tc$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
 		}
 		$out .= '/>';
+		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
+		
 		if (!isset($hidepreview)) {
 			$preview .= "<input type=button class=btn value=Preview onclick=\"intcalculate('tc$qn','p$qn','$answerformat')\" /> &nbsp;\n";
 		}
 		$preview .= "<span id=p$qn></span> ";
-		$out .= "<script type=\"text/javascript\">intcalctoproc[intcalctoproc.length] = $qn; calcformat[$qn] = '$answerformat';</script>\n";
+		$out .= "<script type=\"text/javascript\">intcalctoproc[$qn] = 1 ; calcformat[$qn] = '$answerformat';</script>\n";
 		
 		if (isset($answer)) {
 			if (in_array('inequality',$ansformats)) {
