@@ -517,3 +517,27 @@ svg {
 	overflow: hidden;
 }
 
+table.gridded {
+	border-collapse: collapse;
+	margin: 0px;
+}
+
+table.gridded thead th, table.gridded thead td {
+	text-align: center;
+	z-index: 20;
+	background-color: #eef;
+	border: 1px solid #333;
+	font-weight: bold;
+	border-bottom: 2px solid #333;
+}
+table.gridded td {
+	border: 1px solid #333;
+}
+table.gridded tbody th {
+	z-index: 20;
+	background-color: #eef;
+	border: 1px solid #333;
+	font-weight: bold;
+	border-right: 2px solid #333;
+}
+

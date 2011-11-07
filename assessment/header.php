@@ -23,7 +23,7 @@ var imasroot = '<?php echo $imasroot; ?>';
 </script>
 <link rel="stylesheet" href="<?php echo $imasroot . "/assessment/mathtest.css?ver=060810";?>" type="text/css"/>
 <?php
-echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/general.js?ver=020710\"></script>\n";
+echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/general.js?ver=110711\"></script>\n";
 if (isset($sessiondata['coursetheme'])) {
 	if (isset($flexwidth)) {
 		$coursetheme = str_replace('_fw','',$sessiondata['coursetheme']);
@@ -69,86 +69,24 @@ div { zoom: 1; }
 <script type="text/javascript" src="<?php echo $imasroot;?>/javascript/drawing_min.js?v=092011"></script>
 <?php
 echo "<script type=\"text/javascript\">imasroot = '$imasroot';</script>";
-if ($useeditor==1 && $sessiondata['useed']==1) {
-echo <<<END
-<script type="text/javascript" src="$imasroot/editor/tiny_mce.js?v=082911"></script>
-
-<script type="text/javascript">
-tinyMCE.init({
-    mode : "textareas",
-    editor_selector : "mceEditor",
-    theme : "advanced",
-    theme_advanced_buttons1 : "fontselect,fontsizeselect,formatselect,bold,italic,underline,strikethrough,separator,sub,sup,separator,cut,copy,paste,pasteword,undo,redo",
-    theme_advanced_buttons2 : "justifyleft,justifycenter,justifyright,justifyfull,separator,numlist,bullist,outdent,indent,separator,forecolor,backcolor,separator,hr,anchor,link,unlink,charmap,image,table"+(document.documentElement.clientWidth<900?"":",tablecontrols,separator")+",code,separator,asciimath,asciimathcharmap,asciisvg",
-    theme_advanced_buttons3 : "",
-    theme_advanced_fonts : "Arial=arial,helvetica,sans-serif,Courier New=courier new,courier,monospace,Georgia=georgia,times new roman,times,serif,Tahoma=tahoma,arial,helvetica,sans-serif,Times=times new roman,times,serif,Verdana=verdana,arial,helvetica,sans-serif",
-    theme_advanced_toolbar_location : "top",
-    theme_advanced_toolbar_align : "left",
-    theme_advanced_statusbar_location : "bottom",
-    plugins : 'safari,asciimath,asciisvg,table,inlinepopups,paste',
-    gecko_spellcheck : true,
-    extended_valid_elements : '@[sscr]',
-    theme_advanced_resizing : true,
-    cleanup_callback : "imascleanup",
-    AScgiloc : '$imasroot/filter/graph/svgimg.php',
-    ASdloc : '$imasroot/javascript/d.svg'
-END;
-if (isset($AWSkey)) {
-echo <<<END
-    ,file_browser_callback : "fileBrowserCallBack"
-});
-function fileBrowserCallBack(field_name, url, type, win) {
-	var connector = "$imasroot/editor/file_manager.php";
-	my_field = field_name;
-	my_win = win;
-	switch (type) {
-		case "image":
-			connector += "?type=img";
-			break;
-		case "file":
-			connector += "?type=files";
-			break;
+if (isset($useeditor) && $sessiondata['useed']==1) {
+	echo '<script type="text/javascript" src="'.$imasroot.'/editor/tiny_mce.js?v=082911"></script>';
+	echo "\n";
+	echo '<script type="text/javascript">';
+	if (isset($sessiondata['coursetheme'])) {
+		echo 'var coursetheme = "'.$sessiondata['coursetheme'].'";';
+	} else {
+		echo 'var coursetheme = "'.$coursetheme.'";';
 	}
-	tinyMCE.activeEditor.windowManager.open({
-		file : connector,
-		title : 'File Browser',
-		width : 450,  // Your dimensions may differ - toy around with them!
-		height : 450,
-		resizable : "yes",
-		inline : "yes",  // This parameter only has an effect if you use the inlinepopups plugin!
-		close_previous : "no"
-	    }, {
-		window : win,
-		input : field_name
-	    });
-
-	//window.open(connector, "file_manager", "modal,width=450,height=440,scrollbars=1");
-}
-
-END;
-} else {
-	echo "});";
-}
-echo <<<END
-function imascleanup(type, value) {
-	if (type=="get_from_editor") {
-		value = value.replace(/[\x84\x93\x94]/g,'"');
-		var rl = '\u2122,<sup>TM</sup>,\u2026,...,\u201c|\u201d,",\u2018|\u2019,\',\u2013|\u2014|\u2015|\u2212,-'.split(',');
-		for (var i=0; i<rl.length; i+=2) {
-			value = value.replace(new RegExp(rl[i], 'gi'), rl[i+1]);
-		}
-		value = value.replace(/<!--([\s\S]*?)-->|&lt;!--([\s\S]*?)--&gt;|<style>[\s\S]*?<\/style>/g, "");  // Word comments
-		value = value.replace(/class="?Mso\w+"?/g,'');
-		value = value.replace(/<p\s*>\s*<\\/p>/gi,'');
+	if (isset($AWSkey)) {
+		echo 'var fileBrowserCallBackFunc = "fileBrowserCallBack";';
+	} else {
+		echo 'var fileBrowserCallBackFunc = null;';
 	}
-	return value;
+	echo 'initeditor("textareas","mceEditor");';
+	echo '</script>';
 }
-</script>
-<!-- /TinyMCE -->
 
-END;
-
-}
 $curdir = rtrim(dirname(__FILE__), '/\\');
 if (isset($placeinhead)) {
 	echo $placeinhead;

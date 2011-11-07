@@ -69,6 +69,7 @@
 	
 	$qtotal = array();
 	$qcnt = array();
+	$tcnt = array();
 	$qincomplete = array();
 	$timetaken = array();
 	$timeontask = array();
@@ -115,6 +116,7 @@
 			if (!isset($qincomplete[$ques])) { $qincomplete[$ques]=0;}
 			if (!isset($qtotal[$ques])) { $qtotal[$ques]=0;}
 			if (!isset($qcnt[$ques])) { $qcnt[$ques]=0;}
+			if (!isset($tcnt[$ques])) { $tcnt[$ques]=0;}
 			if (!isset($attempts[$ques])) { $attempts[$ques]=0;}
 			if (!isset($regens[$ques])) { $regens[$ques]=0;}
 			if (!isset($timeontask[$ques])) { $timeontask[$ques]=0;}
@@ -125,7 +127,9 @@
 			$attempts[$ques] += $attp[$k];
 			$regens[$ques] += substr_count($bla[$k],'ReGen');
 			$qcnt[$ques] += 1;
-			$timeontask[$ques] += array_sum(explode('~',$timeot[$k]));
+			$timeot[$k] = explode('~',$timeot[$k]);
+			$tcnt[$ques] += count($timeot[$k]);
+			$timeontask[$ques] += array_sum($timeot[$k]);
 		}
 		if ($line['endtime'] >0 && $line['starttime'] > 0) {
 			$timetaken[] = $line['endtime']-$line['starttime'];
@@ -134,7 +138,7 @@
 	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 	echo "<table class=gb id=myTable><thead>"; //<tr><td>Name</td>\n";
 	echo "<tr><th>#</th><th scope=\"col\">Question</th><th>Grade</th><th scope=\"col\">Average Score<br/>All</th>";
-	echo "<th scope=\"col\">Average Score<br/>Attempted</th><th scope=\"col\">Average Attempts<br/>(Regens)</th><th scope=\"col\">% Incomplete</th><th scope=\"col\">Time</th><th scope=\"col\">Preview</th></tr></thead>\n";
+	echo "<th scope=\"col\">Average Score<br/>Attempted</th><th scope=\"col\">Average Attempts<br/>(Regens)</th><th scope=\"col\">% Incomplete</th><th scope=\"col\">Time per student<br/> (per attempt)</th><th scope=\"col\">Preview</th></tr></thead>\n";
 	echo "<tbody>";
 	if (count($qtotal)>0) {
 		$i = 1;
@@ -187,12 +191,20 @@
 					$avgatt = round($attempts[$qid]/($qcnt[$qid] - $qincomplete[$qid]),2);
 					$avgreg = round($regens[$qid]/($qcnt[$qid] - $qincomplete[$qid]),2);
 					$avgtot = round($timeontask[$qid]/($qcnt[$qid] - $qincomplete[$qid]),2);
+					$avgtota = round($timeontask[$qid]/($tcnt[$qid]),2);
 					if ($avgtot==0) {
 						$avgtot = 'N/A';
 					} else if ($avgtot<60) {
 						$avgtot .= ' sec';
 					} else {
 						$avgtot = round($avgtot/60,2) . ' min';
+					}
+					if ($avgtota==0) {
+						$avgtot = 'N/A';
+					} else if ($avgtota<60) {
+						$avgtota .= ' sec';
+					} else {
+						$avgtota = round($avgtota/60,2) . ' min';
 					}
 				} else {
 					$avgatt = 0;
@@ -213,7 +225,7 @@
 			}
 			echo "{$descrips[$qid]}</td>";
 			echo "<td><a href=\"gradeallq.php?stu=$stu&cid=$cid&asid=average&aid=$aid&qid=$qid\">Grade</a></td>";
-			echo "<td>$avg/$pts ($pc%)</td><td>$avg2/$pts ($pc2%)</td><td>$avgatt ($avgreg)</td><td>$pi</td><td>$avgtot</td>";
+			echo "<td>$avg/$pts ($pc%)</td><td>$avg2/$pts ($pc2%)</td><td>$avgatt ($avgreg)</td><td>$pi</td><td>$avgtot ($avgtota)</td>";
 			echo "<td><input type=button value=\"Preview\" onClick=\"previewq({$qsetids[$qid]})\"/></td>\n";
 			
 			echo "</tr>\n";

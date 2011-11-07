@@ -3,6 +3,8 @@
 //(c) 2006 David Lippman
 	require("../validate.php");
 	$pagetitle = "Question Editor";
+	$useeditor = "qtext";
+	$delayeditor = true;
 	require("../header.php");
 	if ($myrights<20) {
 		echo "You need to log in as a teacher to access this page";

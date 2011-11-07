@@ -227,3 +227,79 @@ function chkAllNone(frmid, arr, mark) {
   }
   return false;
 }
+
+function initeditor(edmode,edids) {
+	var edsetup = {
+	    mode : edmode,
+	    theme : "advanced",
+	    theme_advanced_buttons1 : "fontselect,fontsizeselect,formatselect,bold,italic,underline,strikethrough,separator,sub,sup,separator,cut,copy,paste,pasteword,undo,redo",
+	    theme_advanced_buttons2 : "justifyleft,justifycenter,justifyright,justifyfull,separator,numlist,bullist,outdent,indent,separator,forecolor,backcolor,separator,hr,anchor,link,unlink,charmap,image,table"+(document.documentElement.clientWidth<900?"":",tablecontrols,separator")+",code,separator,asciimath,asciimathcharmap,asciisvg",
+	    theme_advanced_buttons3 : "",
+	    theme_advanced_fonts : "Arial=arial,helvetica,sans-serif,Courier New=courier new,courier,monospace,Georgia=georgia,times new roman,times,serif,Tahoma=tahoma,arial,helvetica,sans-serif,Times=times new roman,times,serif,Verdana=verdana,arial,helvetica,sans-serif",
+	    theme_advanced_toolbar_location : "top",
+	    theme_advanced_toolbar_align : "left",
+	    theme_advanced_statusbar_location : "bottom",
+	    theme_advanced_source_editor_height: "500",
+	    plugins : 'asciimath,asciisvg,table,inlinepopups,paste,media',
+	    gecko_spellcheck : true,
+	    extended_valid_elements : 'iframe[src|width|height|name|align],param[name|value],@[sscr]',
+	    content_css : imasroot+'/imascore.css,'+imasroot+'/themes/'+coursetheme,
+	    popup_css_add : imasroot+'/themes/'+coursetheme,
+	    theme_advanced_resizing : true,
+	    table_styles: "Gridded=gridded",
+	    cleanup_callback : "imascleanup",
+	    AScgiloc : imasroot+'/filter/graph/svgimg.php',
+	    ASdloc : imasroot+'/javascript/d.svg',
+	    file_browser_callback : fileBrowserCallBackFunc
+	}
+	if (edmode=="exact") {
+		edsetup.elements = edids
+	} else if (edmode=="textareas") {
+		edsetup.editor_selector = edids;
+	}
+	    
+	tinyMCE.init(edsetup);	
+}
+
+function fileBrowserCallBack(field_name, url, type, win) {
+	var connector = imasroot+"/editor/file_manager.php";
+	my_field = field_name;
+	my_win = win;
+	switch (type) {
+		case "image":
+			connector += "?type=img";
+			break;
+		case "file":
+			connector += "?type=files";
+			break;
+	}
+	tinyMCE.activeEditor.windowManager.open({
+		file : connector,
+		title : 'File Manager',
+		width : 350,  
+		height : 450,
+		resizable : "yes",
+		inline : "yes",  
+		close_previous : "no"
+	    }, {
+		window : win,
+		input : field_name
+	    });
+
+	//window.open(connector, "file_manager", "modal,width=450,height=440,scrollbars=1");
+}
+function imascleanup(type, value) {
+	if (type=="get_from_editor") {
+		//value = value.replace(/[\x84\x93\x94]/g,'"');
+		//var rl = '\u2122,<sup>TM</sup>,\u2026,...,\u201c|\u201d,",\u2018|\u2019,\',\u2013|\u2014|\u2015|\u2212,-'.split(',');
+		//for (var i=0; i<rl.length; i+=2) {
+		//	value = value.replace(new RegExp(rl[i], 'gi'), rl[i+1]);
+		//}
+		value = value.replace(/<!--([\s\S]*?)-->|&lt;!--([\s\S]*?)--&gt;|<style>[\s\S]*?<\/style>/g, "");  // Word comments
+		value = value.replace(/class="?Mso\w+"?/g,'');
+		value = value.replace(/<p\s*>\s*<\/p>/gi,'');
+		value = value.replace(/<script.*?\/script>/gi,'');
+		value = value.replace(/<input[^>]*button[^>]*>/gi,'');
+	}
+	return value;
+}
