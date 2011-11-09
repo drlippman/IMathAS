@@ -76,7 +76,7 @@
 			}
 		}
 		if (isset($_POST['sendmsg'])) {
-			$_GET['masssend'] = "Message";
+			$_POST['submit'] = "Message";
 			$_POST['checked'] = explode(',',$_POST['tolist']);
 			require("masssend.php");
 			exit;
