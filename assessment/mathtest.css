@@ -497,9 +497,13 @@ table.gridded thead th, table.gridded thead td {
 	border: 1px solid #333;
 	font-weight: bold;
 	border-bottom: 2px solid #333;
+	margin: 0px;
+	padding: 2px 5px 2px 5px;
 }
 table.gridded td {
 	border: 1px solid #333;
+	margin: 0px;
+	padding: 2px 5px 2px 5px;
 }
 table.gridded tbody th {
 	z-index: 20;
@@ -507,5 +511,10 @@ table.gridded tbody th {
 	border: 1px solid #333;
 	font-weight: bold;
 	border-right: 2px solid #333;
+	margin: 0px;
+	padding: 2px 5px 2px 5px;
 }
-
+span.boxed {
+	border: 1px solid #000; 
+	padding: 2px 5px;
+}

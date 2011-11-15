@@ -654,7 +654,7 @@ if (!isset($_POST['embedpostback'])) {
 		echo '<style type="text/css" media="print"> div.question, div.todoquestion, div.inactive { display: none;} </style>';
 	}
 	
-	if (!$isdiag && !$isltilimited) {
+	if (!$isdiag && !$isltilimited && strpos($_SERVER['HTTP_REFERER'],'treereader')===false) {
 		if (isset($sessiondata['actas'])) {
 			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid={$testsettings['courseid']}\">{$sessiondata['coursename']}</a> ";
 			echo "&gt; <a href=\"../course/gb-viewasid.php?cid={$testsettings['courseid']}&amp;asid=$testid&amp;uid={$sessiondata['actas']}\">Gradebook Detail</a> ";
@@ -941,8 +941,15 @@ if (!isset($_POST['embedpostback'])) {
 	//identify question-specific  intro/instruction 
 	//comes in format [Q 1-3] in intro
 	if (strpos($testsettings['intro'],'[Q')!==false) {
-		if(preg_match_all('/\<p>\s*\[Q\s+(\d+)\-(\d+)\s*\]\s*<\/p>/',$testsettings['intro'],$introdividers,PREG_SET_ORDER)) {
-			$intropieces = preg_split('/\<p>\s*\[Q\s+\d+\-\d+\s*\]\s*<\/p>/',$testsettings['intro']);
+		if(preg_match_all('/\<p[^>]*>\s*\[Q\s+(\d+)(\-(\d+))?\s*\]\s*<\/p>/',$testsettings['intro'],$introdividers,PREG_SET_ORDER)) {
+			$intropieces = preg_split('/\<p[^>]*>\s*\[Q\s+(\d+)(\-(\d+))?\s*\]\s*<\/p>/',$testsettings['intro']);
+			foreach ($introdividers as $k=>$v) {
+				if (count($v)==4) {
+					$introdividers[$k][2] = $v[3];
+				} else if (count($v)==2) {
+					$introdividers[$k][2] = $v[1];
+				}
+			}
 			$testsettings['intro'] = array_shift($intropieces);
 		}
 	}
@@ -1327,7 +1334,14 @@ if (!isset($_POST['embedpostback'])) {
 				echo "<input type=\"hidden\" name=\"verattempts\" value=\"{$attempts[$toshow]}\" />";
 				
 				for ($i = 0; $i < count($questions); $i++) {
-					
+					if (isset($intropieces)) {
+						foreach ($introdividers as $k=>$v) {
+							if ($v[1]==$i+1) {//right divider
+								echo '<div class="intro" id="intropiece'.$k.'">'.$intropieces[$k].'</div>';
+								break;
+							}
+						}
+					}
 					$qavail = seqshowqinfobar($i,$toshow);
 					
 					if ($i==$toshow) {
@@ -1409,9 +1423,18 @@ if (!isset($_POST['embedpostback'])) {
 					if ($showcorrectnow) {
 						echo $msg . ', is displayed below</p>';
 						
-						displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],2,false,$attempts[$qn],false,false);
+						displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],2,false,$attempts[$qn],false,false,true);
+					} else {
+						echo $msg . ', is displayed below</p>';
+						displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],0,false,$attempts[$qn],false,false,true);
 					}
+					
+				} else {
+					//need to adjust for "don't allow to review their own work" setting
+					displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],0,false,$attempts[$qn],false,false,true);
 				}
+				showqinfobar($qn,true,false);
+					
 			}
 			exit;
 			
@@ -1579,6 +1602,14 @@ if (!isset($_POST['embedpostback'])) {
 				echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
 				echo "<input type=\"hidden\" name=\"verattempts\" value=\"{$attempts[$i]}\" />";
 				for ($i = 0; $i < count($questions); $i++) {
+					if (isset($intropieces)) {
+						foreach ($introdividers as $k=>$v) {
+							if ($v[1]==$i+1) {//right divider
+								echo '<div class="intro" id="intropiece'.$k.'">'.$intropieces[$k].'</div>';
+								break;
+							}
+						}
+					}
 					$qavail = seqshowqinfobar($i,$curq);
 					
 					if ($i==$curq) {
@@ -1609,12 +1640,51 @@ if (!isset($_POST['embedpostback'])) {
 			echo '<input type="hidden" id="disptime" name="disptime" value="'.time().'" />';
 			echo "<input type=\"hidden\" id=\"isreview\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
 			
+			if (isset($intropieces)) {
+				foreach ($introdividers as $k=>$v) {
+					$intro .= '<div class="intro" id="intropiece'.$k.'">'.$intropieces[$k].'</div>';
+					for ($j=$v[1];$j<=$v[2];$j++) {
+						$intro .= '[QUESTION '.$j.']';
+					}
+				}
+			}
 			for ($i = 0; $i < count($questions); $i++) {
 				$quesout = '<div id="embedqwrapper'.$i.'">';
 				ob_start();
-				basicshowq($i,false);
-				$quesout .= ob_get_clean();
-				$quesout = substr($quesout,0,-7).'<br/><input type="button" class="btn" value="Submit Question '.($i+1).'" onclick="assessbackgsubmit('.$i.',\'submitnotice'.$i.'\')" /><span id="submitnotice'.$i.'"></span></div>';
+				if (hasreattempts($i)) {
+					
+					basicshowq($i,false);
+					$quesout .= ob_get_clean();
+					$quesout = substr($quesout,0,-7).'<br/><input type="button" class="btn" value="Submit Question '.($i+1).'" onclick="assessbackgsubmit('.$i.',\'submitnotice'.$i.'\')" /><span id="submitnotice'.$i.'"></span></div>';
+					
+				} else {
+					echo "<p>No attempts remain on this problem.</p>";
+					if ($showeachscore) {
+						$msg =  "<p>This question, with your last answer";
+						if (($showansafterlast && $qi[$questions[$i]]['showans']=='0') || $qi[$questions[$i]]['showans']=='F' || $qi[$questions[$i]]['showans']=='J') {
+							$msg .= " and correct answer";
+							$showcorrectnow = true;
+						} else if ($showansduring && $qi[$questions[$i]]['showans']=='0' && $qi[$questions[$i]]['showans']=='0' && $testsettings['showans']==$attempts[$i]) {
+							$msg .= " and correct answer";
+							$showcorrectnow = true;
+						} else {
+							$showcorrectnow = false;
+						}
+						if ($showcorrectnow) {
+							echo $msg . ', is displayed below</p>';
+							
+							displayq($i,$qi[$questions[$i]]['questionsetid'],$seeds[$i],2,false,$attempts[$i],false,false,true);
+						} else {
+							echo $msg . ', is displayed below</p>';
+							displayq($i,$qi[$questions[$i]]['questionsetid'],$seeds[$i],0,false,$attempts[$i],false,false,true);
+						}
+						
+					} else {
+						//need to adjust for "don't allow to review their own work" setting
+						displayq($i,$qi[$questions[$i]]['questionsetid'],$seeds[$i],0,false,$attempts[$i],false,false,true);
+					}
+					$quesout .= ob_get_clean();
+				}
 				ob_start();
 				showqinfobar($i,true,false);
 				$quesout .= ob_get_clean();

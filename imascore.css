@@ -540,4 +540,7 @@ table.gridded tbody th {
 	font-weight: bold;
 	border-right: 2px solid #333;
 }
-
+span.boxed {
+	border: 1px solid #000; 
+	padding: 2px 5px;
+}

@@ -638,6 +638,13 @@ if ($overwriteBody==1) {
 					<option value="OneByOne" <?php writeHtmlSelected($line['displaymethod'],"OneByOne",0) ?>>One question at a time</option>
 					<option value="Seq" <?php writeHtmlSelected($line['displaymethod'],"Seq",0) ?>>Full test, submit one at time</option>
 					<option value="SkipAround" <?php writeHtmlSelected($line['displaymethod'],"SkipAround",0) ?>>Skip Around</option>
+					<?php
+					if ($myrights==100) {
+						echo '<option value="Embed" ';
+						writeHtmlSelected($line['displaymethod'],"Embed",0);
+						echo '>Embedded (*experimental*)</option>';
+					}
+					?>
 				</select>
 			</span><BR class=form>
 	

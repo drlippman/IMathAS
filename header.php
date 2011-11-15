@@ -32,7 +32,7 @@ div.breadcrumb { display:none;}
 <script type="text/javascript">
 var imasroot = '<?php echo $imasroot; ?>';
 </script>
-<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js?ver=110711"></script>
+<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js?ver=111011"></script>
 <?php
 if (isset($coursetheme) && strpos($coursetheme,'_dark')!==false) {$mathdarkbg = true;} else {$mathdarkbg = false;}
 if (isset($ispublic) && $ispublic) {

@@ -187,6 +187,10 @@ if (!(isset($teacherid))) {
 					$sets[] = "deffeedbacktext=''";
 				}
 			}
+			if (isset($_POST['chgreqscore'])) {
+				$sets[] = "reqscore=0";
+				$sets[] = "reqscoreaid=0";
+			}
 				
 			if ($turnonshuffle!=0 || $turnoffshuffle!=0) {
 				$shuff = "shuffle = ((shuffle";
@@ -672,6 +676,11 @@ writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],
 				<td class="r">Default Feedback Text: </td>
 				<td>Use? <input type="checkbox" name="usedeffb"><br/>
 				Text: <input type="text" size="60" name="deffb" value="This assessment contains items that not automatically graded.  Your grade may be inaccurate until your instructor grades these items." /></td>
+			</tr>
+			<tr class="coptr">
+				<td><input type="checkbox" name="chgreqscore"/></td>
+				<td class="r">Clear "show based on another assessment" settings.</td>
+				<td></td>
 			</tr>
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgsameseed"/></td>

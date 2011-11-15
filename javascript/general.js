@@ -240,7 +240,7 @@ function initeditor(edmode,edids) {
 	    theme_advanced_toolbar_align : "left",
 	    theme_advanced_statusbar_location : "bottom",
 	    theme_advanced_source_editor_height: "500",
-	    plugins : 'asciimath,asciisvg,table,inlinepopups,paste,media',
+	    plugins : 'asciimath,asciisvg,table,inlinepopups,paste,media,advlist',
 	    gecko_spellcheck : true,
 	    extended_valid_elements : 'iframe[src|width|height|name|align],param[name|value],@[sscr]',
 	    content_css : imasroot+'/imascore.css,'+imasroot+'/themes/'+coursetheme,
