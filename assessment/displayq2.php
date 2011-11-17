@@ -1274,13 +1274,17 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 				
 				$la = htmlentities($la);
 			}
-			$out .= "<textarea rows=\"$rows\" name=\"qn$qn\" id=\"qn$qn\" ";
-			if ($displayformat=='editor' && $GLOBALS['useeditor']==1) {
-				$out .= "style=\"width:98%;\" class=\"mceEditor\" ";
+			if ($rows<2) {
+				$out .= "<input type=\"text\" size=\"$cols\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" /> ";
 			} else {
-				$out .= "cols=\"$cols\" ";
-			}
-			$out .= ">$la</textarea>\n";
+				$out .= "<textarea rows=\"$rows\" name=\"qn$qn\" id=\"qn$qn\" ";
+				if ($displayformat=='editor' && $GLOBALS['useeditor']==1) {
+					$out .= "style=\"width:98%;\" class=\"mceEditor\" ";
+				} else {
+					$out .= "cols=\"$cols\" ";
+				}
+				$out .= ">$la</textarea>\n";
+			} 
 			if ($displayformat=='editor' && $GLOBALS['useeditor']==1) {
 				//$out .= "<script type=\"text/javascript\">editornames[editornames.length] = \"qn$qn\";</script>";
 			}
@@ -2646,7 +2650,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		return $correct;
 	} else if ($anstype == "essay") {
 		require_once("../includes/htmLawed.php");
-		$htmlawedconfig = array('elements'=>'*-script');
+		$htmlawedconfig = array('elements'=>'*-script-form');
 		$givenans = addslashes(htmLawed(stripslashes($givenans),$htmlawedconfig));
 		$givenans = preg_replace('/&(\w+;)/',"%$1",$givenans);
 		$GLOBALS['partlastanswer'] = $givenans;

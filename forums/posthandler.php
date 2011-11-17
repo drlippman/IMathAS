@@ -25,7 +25,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			$isanon = 0;
 		}
 		require_once("../includes/htmLawed.php");
-		$htmlawedconfig = array('elements'=>'*-script');
+		$htmlawedconfig = array('elements'=>'*-script-form');
 		$_POST['message'] = addslashes(htmLawed(stripslashes($_POST['message']),$htmlawedconfig));
 		$_POST['subject'] = strip_tags($_POST['subject']);
 		
