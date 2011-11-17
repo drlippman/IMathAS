@@ -1640,24 +1640,30 @@ if (!isset($_POST['embedpostback'])) {
 			echo '<input type="hidden" id="disptime" name="disptime" value="'.time().'" />';
 			echo "<input type=\"hidden\" id=\"isreview\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
 			
-			if (isset($intropieces)) {
-				$last = 1;
-				foreach ($introdividers as $k=>$v) {
-					if ($last<$v[1]) {
-						for ($j=$last;$j<$v[1];$j++) {
+			if (strpos($intro,'[QUESTION')===false) {
+				if (isset($intropieces)) {
+					$last = 1;
+					foreach ($introdividers as $k=>$v) {
+						if ($last<$v[1]) {
+							for ($j=$last;$j<$v[1];$j++) {
+								$intro .= '[QUESTION '.$j.']';
+							}
+						}
+						$intro .= '<div class="intro" id="intropiece'.$k.'">'.$intropieces[$k].'</div>';
+						for ($j=$v[1];$j<=$v[2];$j++) {
+							$intro .= '[QUESTION '.$j.']';
+							$last = $j;
+						}
+					}
+					if ($last < count($questions)) {
+						for ($j=$last+1;$j<=count($questions);$j++) {
 							$intro .= '[QUESTION '.$j.']';
 						}
 					}
-					$intro .= '<div class="intro" id="intropiece'.$k.'">'.$intropieces[$k].'</div>';
-					for ($j=$v[1];$j<=$v[2];$j++) {
+				} else {
+					for ($j=1;$j<=count($questions);$j++) {
 						$intro .= '[QUESTION '.$j.']';
-						$last = $j;
-					}
-				}
-				if ($last < count($questions)) {
-					for ($j=$last+1;$j<=count($questions);$j++) {
-						$intro .= '[QUESTION '.$j.']';
-					}
+					}	
 				}
 			}
 			for ($i = 0; $i < count($questions); $i++) {
