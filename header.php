@@ -156,7 +156,7 @@ if (isset($cid) && isset($teacherid) && $coursetopbar[2]==1 && count($coursetopb
 	if (in_array(4,$coursetopbar[1])) { //Calendar
 		echo "<li><a {$a[4]} href=\"$imasroot/course/showcalendar.php?cid=$cid\">Calendar</a></li>\n";
 	}
-	if (in_array(5,$coursetopbar[1])) { //Calendar
+	if (in_array(5,$coursetopbar[1])) { //Quick view
 		echo "<li><a {$a[5]} href=\"$imasroot/course/course.php?cid=$cid&quickview=on\">Quick View</a></li>\n";
 	}
 	

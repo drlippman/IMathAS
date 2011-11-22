@@ -24,6 +24,7 @@ div.item {
 	margin-bottom: 10px;
 	padding: 5px;
 	overflow: auto;
+	border-radius: 5px;
 }
 div.signup {
 	border: 1px solid #000;
@@ -46,6 +47,7 @@ div.title {
 div.block, div.blockitems div.blockitems div.block {
 	padding: 5px;
 	margin-bottom: 10px;
+	border-radius: 4px 4px 0 0;
 }
 div.blockitems, div.blockitems div.blockitems div.blockitems {
 	padding: 10px;
@@ -76,12 +78,14 @@ div.cp {
 	min-height: 1%;
 	padding: 5px;
 	margin-top: 20px;
+	border-radius: 4px;
 }
 div.cpmid {
 	min-height: 1%;
 	padding: 5px;
 	margin-top: 10px;
 	margin-bottom: 10px;
+	border-radius: 4px;
 }
 .pointer {
 	cursor:pointer;
@@ -234,6 +238,7 @@ span.hdr1 {
 		width:170px;
 		padding:5px;
 		margin-top:10px;
+		border-radius: 5px;
 }
 
 #centercontent {
@@ -460,9 +465,11 @@ div#viewbuttoncont a:hover {
 div#viewbuttoncont a.buttonactive {
 	background-color: #369;
 	cursor: default;
+	border-radius: 4px;
 }
 div#viewbuttoncont a.buttoninactive {
 	background-color: #69a;
+	border-radius: 4px;
 }
 div#viewbuttoncont a.buttoninactive:hover {
 	background-color: #036;

@@ -196,6 +196,7 @@ span.link {
 		/*border:1px solid #000;*/
 		color:#000;
 		width: 160px;
+		border-radius: 0;
 }
 
 #centercontent {

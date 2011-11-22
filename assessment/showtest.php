@@ -618,7 +618,11 @@
 	$isltilimited = (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0 && $sessiondata['ltirole']=='learner');
 
 
-
+	if (isset($CFG['GEN']['keeplastactionlog']) && isset($sessiondata['loginlog'.$testsettings['courseid']])) {
+		$now = time();
+		$query = "UPDATE imas_login_log SET lastaction=$now WHERE id=".$sessiondata['loginlog'.$testsettings['courseid']];
+		mysql_query($query) or die("Query failed : " . mysql_error());
+	}
 		
 	header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
 	header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
@@ -1404,7 +1408,7 @@ if (!isset($_POST['embedpostback'])) {
 				ob_start();
 				basicshowq($qn,false);
 				$quesout = ob_get_clean();
-				$quesout = substr($quesout,0,-7).'<br/><input type="button" class="btn" value="Submit Question '.($qn+1).'" onclick="assessbackgsubmit('.$qn.',\'submitnotice'.$qn.'\')" /><span id="submitnotice'.$qn.'"></span></div>';
+				$quesout = substr($quesout,0,-7).'<br/><input type="button" class="btn" value="Submit" onclick="assessbackgsubmit('.$qn.',\'submitnotice'.$qn.'\')" /><span id="submitnotice'.$qn.'"></span></div>';
 				echo $quesout;
 				showqinfobar($qn,true,false);
 			} else {
@@ -1436,6 +1440,7 @@ if (!isset($_POST['embedpostback'])) {
 				showqinfobar($qn,true,false);
 					
 			}
+			echo '<script type="text/javascript">document.getElementById("disptime").value = '.time().';</script>';
 			exit;
 			
 		}
@@ -1673,7 +1678,7 @@ if (!isset($_POST['embedpostback'])) {
 					
 					basicshowq($i,false);
 					$quesout .= ob_get_clean();
-					$quesout = substr($quesout,0,-7).'<br/><input type="button" class="btn" value="Submit Question '.($i+1).'" onclick="assessbackgsubmit('.$i.',\'submitnotice'.$i.'\')" /><span id="submitnotice'.$i.'"></span></div>';
+					$quesout = substr($quesout,0,-7).'<br/><input type="button" class="btn" value="Submit" onclick="assessbackgsubmit('.$i.',\'submitnotice'.$i.'\')" /><span id="submitnotice'.$i.'"></span></div>';
 					
 				} else {
 					echo "<p>No attempts remain on this problem.</p>";

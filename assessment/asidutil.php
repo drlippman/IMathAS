@@ -77,4 +77,47 @@ function generateAssessmentData($itemorder,$shuffle,$aid,$arrayout=false) {
 
 }
 
+//for future:
+//need to rewrite how lastanswers stores data
+//change to serialized array.  Keep separate record of typed responses 
+/*
+format:
+
+$la[0] = the current last answer stuff
+	$la[0][i] = last answer info for question i (currently ~ separated)
+		$la[0][i][j] = last answer info for regen j (currently attempts are ## separated, regens say ReGen)
+		    $la[0][i][j][k] = last answer for attempt k of this version (currently ## separated, not ReGen values)
+		       if multipart: $la[0][i][j][k][L] = last answer for part L of multipart question
+$la[1] = calculated and unshuffled multchoice, etc.
+
+
+*/
+//and cooresponding useful stuff - unshuffled choices answers, calculated
+//values of calc and calcinterval, etc.
+function unpackLA($lastr) {
+	if (substr($lastr,0,4)=='a:2:') {
+		return unserialize($lastr);
+	} else {
+		$lao = explode('~',$lastr);
+		foreach ($lao as $i=>$att) {
+			$newatt = array();
+			$att = explode('##',$att);
+			$j = 0;
+			while ($att[$j]=='ReGen') {
+				$newatt[$j] = array();
+				$j++;
+			}
+			$att[$j] = array();
+			for ($c=$j;$c<count($att);$c++) {
+				$att[$j] = explode('&',$att[$j]);
+				if (count($att[$j]==1)) {
+					$att[$j] = $att[$j][0];
+				}
+				$newatt[$j][$c-$j] = $att[$j];
+			}
+			$lao[$i] = $newatt;
+		}
+		return array($lao,array());
+	}
+}
 ?>

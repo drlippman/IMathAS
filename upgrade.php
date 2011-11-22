@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 48;
+$latest = 49;
 
 
 @set_time_limit(0);
@@ -831,6 +831,13 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 $res = mysql_query($query);
 			 if ($res===false) {
 			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+		}
+		if ($last<49) {
+			$query = "ALTER TABLE `imas_login_log` ADD `lastaction` INT(10) UNSIGNED NOT NULL";
+			 $res = mysql_query($query);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
 		}
 		

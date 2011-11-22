@@ -20,7 +20,7 @@ if (isset($_GET['from'])) {
 } else {
 	$from = 'cp';
 }
-if (isset($_GET['tb'])) {
+if (isset($_GET['tb'])) {               
 	$totb = $_GET['tb'];
 } else {
 	$totb = 'b';
@@ -639,7 +639,7 @@ if ($overwriteBody==1) {
 					<option value="Seq" <?php writeHtmlSelected($line['displaymethod'],"Seq",0) ?>>Full test, submit one at time</option>
 					<option value="SkipAround" <?php writeHtmlSelected($line['displaymethod'],"SkipAround",0) ?>>Skip Around</option>
 					<?php
-					if ($myrights==100) {
+					if ($myrights>=75) {
 						echo '<option value="Embed" ';
 						writeHtmlSelected($line['displaymethod'],"Embed",0);
 						echo '>Embedded (*experimental*)</option>';

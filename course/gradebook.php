@@ -238,7 +238,81 @@ if ($canviewall) {
 	
 	
 	$placeinhead .= "</script>";
+	$placeinhead .= '<script type="text/javascript">function conditionalColor(table,type,low,high) {
+	var tbl = document.getElementById(table);
+	if (type==0) {  //instr gb view
+		var poss = [];
+		var ths = tbl.getElementsByTagName("thead")[0].getElementsByTagName("th");
+		for (var i=0;i<ths.length;i++) {
+			if (k = ths[i].innerHTML.match(/(\d+)&nbsp;pts/)) {
+				poss[i] = k[1]*1;
+				if (poss[i]==0) {poss[i]=.0000001;}
+			} else {
+				poss[i] = 100;
+			}
+		}
+		var trs = tbl.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+		for (var j=0;j<trs.length;j++) {
+			var tds = trs[j].getElementsByTagName("td");
+			for (var i=1;i<tds.length;i++) {
+				if (tds[i].innerText) {
+					var v = tds[i].innerText.replace(/[^\d\.]/g,"");
+				} else {
+					var v = tds[i].textContent.replace(/[^\d\.]/g,"");
+				}
+				if (v/poss[i]<low/100) {
+					tds[i].style.backgroundColor = "#ff9999";
+					
+				} else if (v/poss[i]>high/100) {
+					tds[i].style.backgroundColor = "#99ff99";
+				} else {
+					tds[i].style.backgroundColor = "";
+				}
+			}
+		}
+	} else {
+		var trs = tbl.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+		for (var j=0;j<trs.length;j++) {
+			var tds = trs[j].getElementsByTagName("td");
+			if (tds[1].innerText) {
+				var poss = tds[1].innerText.replace(/[^\d\.]/g,"");
+				var v = tds[2].innerText.replace(/[^\d\.]/g,"");
+			} else {
+				var poss = tds[1].textContent.replace(/[^\d\.]/g,"");
+				var v = tds[2].textContent.replace(/[^\d\.]/g,"");
+			}
+			if (v/poss<low/100) {
+				tds[2].style.backgroundColor = "#ff6666";
+				
+			} else if (v/poss>high/100) {
+				tds[2].style.backgroundColor = "#66ff66";
+			} else {
+				tds[2].style.backgroundColor = "";
+				
+			}
+			
+		}
+	}
 }
+function updateColors(el) {
+	if (el.value==0) {
+		var tds=document.getElementsByTagName("td");
+		for (var i=0;i<tds.length;i++) {
+			tds[i].backgroundColor = "";
+		}
+	} else {
+		var s = el.value.split(/;/);
+		conditionalColor("myTable",0,s[0],s[1]);
+	}
+}
+	
+</script>';
+}
+
+
+
+		
+			
 
 if (isset($studentid) || $stu!=0) { //show student view
 	if (isset($studentid)) {
@@ -342,7 +416,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	$placeinhead .= 'function highlightrow(el) { el.setAttribute("lastclass",el.className); el.className = "highlight";}';
 	$placeinhead .= 'function unhighlightrow(el) { el.className = el.getAttribute("lastclass");}';
 	$placeinhead .= "</script>\n";
-	$placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } </style>";
+	$placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } .highlight { border-bottom:1px solid #fff;  border-top:1px solid #fff;}</style>";
 	
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
@@ -378,10 +452,21 @@ if (isset($studentid) || $stu!=0) { //show student view
 			echo "Lock headers";
 		}
 		echo "\"/>";
+		echo ' | Color: <select id="colorsel" onchange="updateColors(this)">';
+		echo '<option value="0">None</option>';
+		for ($j=50;$j<90;$j+=($j<70?10:5)) {
+			for ($k=$j+($j<70?10:5);$k<100;$k+=($k<70?10:5)) {
+				echo "<option value=\"$j;$k\">$j/$k</option>";
+			}
+		}
+		echo '<select>';
 		echo ' | <a href="#" onclick="chgnewflag(); return false;">NewFlag</a>';
 		//echo '<input type="button" value="Pics" onclick="rotatepics()" />';
+		
 		echo "<br/>\n";
+		
 	}
+	
 	echo 'Category: <select id="filtersel" onchange="chgfilter()">';
 	echo '<option value="-1" ';
 	if ($catfilter==-1) {echo "selected=1";}
@@ -510,6 +595,8 @@ function gbstudisp($stu) {
 		echo '</div>';
 	}
 	echo "<form method=post action=\"gradebook.php?{$_SERVER['QUERY_STRING']}\">";
+	echo "<input type='button' onclick='conditionalColor(\"myTable\",1,50,80);' value='Color'/>";
+	
 	echo '<table id="myTable" class="gb" style="position:relative;">';
 	echo '<thead><tr><th>Item</th><th>Possible</th><th>Grade</th><th>Percent</th>';
 	if ($stu>0 && $isteacher) {

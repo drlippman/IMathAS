@@ -517,4 +517,6 @@ table.gridded tbody th {
 span.boxed {
 	border: 1px solid #000; 
 	padding: 2px 5px;
+	line-height: 1em;
+	display: inline-block;
 }

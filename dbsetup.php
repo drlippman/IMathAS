@@ -886,6 +886,7 @@ $sql = 'CREATE TABLE `imas_login_log` (
 	`userid` INT( 10 ) UNSIGNED NOT NULL ,
 	`courseid` INT( 10 ) UNSIGNED NOT NULL ,
 	`logintime` INT( 10 ) UNSIGNED NOT NULL ,
+	`lastaction` INT( 10 ) UNSIGNED NOT NULL ,
 	 INDEX(`userid` ), INDEX(`courseid`)
 	) ENGINE = InnoDB;';
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());

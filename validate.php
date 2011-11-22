@@ -358,13 +358,17 @@ END;
 				require("footer.php");
 				exit;
 			} else {
+				$now = time();
 				if (!isset($sessiondata['lastaccess'.$cid])) {
-					$now = time();
 					$query = "UPDATE imas_students SET lastaccess='$now' WHERE id=$studentid";
 					mysql_query($query) or die("Query failed : " . mysql_error());
 					$sessiondata['lastaccess'.$cid] = $now;
-					writesessiondata();
 					$query = "INSERT INTO imas_login_log (userid,courseid,logintime) VALUES ($userid,'$cid',$now)";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+					$sessiondata['loginlog'.$cid] = mysql_insert_id();
+					writesessiondata();
+				} else if (isset($CFG['GEN']['keeplastactionlog'])) {
+					$query = "UPDATE imas_login_log SET lastaction=$now WHERE id=".$sessiondata['loginlog'.$cid];
 					mysql_query($query) or die("Query failed : " . mysql_error());
 				}
 			}
@@ -449,7 +453,7 @@ END;
 				}
 			}
 		}
-	}
+	} 
 	$verified = true;
 	
  }
@@ -486,6 +490,9 @@ END;
 	  } else {
 		  return 1;
 	  }
+  }
+  function stripslashes_deep($value) {
+	return (is_array($value) ? array_map('stripslashes_deep', $value) : stripslashes($value));
   }
   if (!isset($coursename)) {
 	  $coursename = "Course Page";

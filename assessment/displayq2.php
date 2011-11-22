@@ -374,7 +374,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans) {
 		} else if (isset($_POST["qn$qnidx"]) && is_numeric($_POST["qn$qnidx"])) {
 			$stuanswers[$qnidx+1] = floatval($_POST["qn$qnidx"]);
 		} else if (isset($_POST["qn$qnidx"])) {
-			$stuanswers[$qnidx+1] = stripslashes($_POST["qn$qnidx"]); //preg_replace('/\W+/','',stripslashes($_POST["qn$qnidx"]));
+			$stuanswers[$qnidx+1] = stripslashes_deep($_POST["qn$qnidx"]); //preg_replace('/\W+/','',stripslashes($_POST["qn$qnidx"]));
 		}
 	}
 	$thisq = $qnidx+1;
@@ -424,10 +424,15 @@ function scoreq($qnidx,$qidx,$seed,$givenans) {
 		if (!is_array($anstypes)) {
 			$anstypes = explode(",",$anstypes);
 		}
-		$partla = Array();
+		$partla = array();
 		if (isset($answeights)) {
 			if (!is_array($answeights)) {
 				$answeights = explode(",",$answeights);
+			}
+			$sum = array_sum($answeights);
+			if ($sum==0) {$sum = 1;}
+			foreach ($answeights as $k=>$v) {
+				$answeights[$k] = $v/$sum;
 			}
 		} else {
 			if (count($anstypes)>1) {
@@ -1688,7 +1693,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 		} else {
 			$gaarr = array(str_replace(',','',$givenans));
-			$anarr = array($answer);
+			$anarr = array(str_replace(',','',$answer));
 		}
 		/*  should students get an answer right by leaving it blank?
 		if ($answerformat=='exactlist' || $answerformat=='orderedlist' || $answerformat=='list') {

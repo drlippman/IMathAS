@@ -54,6 +54,7 @@
 	$placeinhead .= "var addr = '$imasroot/course/testquestion.php?cid=$cid&qsetid='+qn;";
 	$placeinhead .= "window.open(addr,'Testing','width=400,height=300,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));";
 	$placeinhead .= "}\n</script>";
+	$placeinhead .= '<style type="text/css"> .manualgrade { background: #ff6;}</style>';
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
@@ -144,7 +145,7 @@
 		$i = 1;
 		//$qs = array_keys($qtotal);
 		$qslist = implode(',',$itemarr);
-		$query = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questionset.id,imas_questions.withdrawn ";
+		$query = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questionset.id,imas_questions.withdrawn,imas_questionset.qtype,imas_questionset.control ";
 		$query .= "FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
 		$query .= " AND imas_questions.id IN ($qslist)";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -152,11 +153,21 @@
 		$points = array();
 		$withdrawn = array();
 		$qsetids = array();
+		$needmanualgrade = array();
 		while ($row = mysql_fetch_row($result)) {
 			$descrips[$row[1]] = $row[0];
 			$points[$row[1]] = $row[2];
 			$qsetids[$row[1]] = $row[3];
 			$withdrawn[$row[1]] = $row[4];
+			if ($row[5]=='essay' || $row[5]=='file') {
+				$needmanualgrade[$row[1]] = true;
+			} else if ($row[5]=='multipart') {
+				if (preg_match('/anstypes.*?(".*?"|array\(.*?\))/',$row[6],$matches)) {
+					if (strpos($matches[1],'essay')!==false || strpos($matches[1],'essay')!==false) {
+						$needmanualgrade[$row[1]] = true;
+					}
+				}
+			}
 		}
 		
 		$avgscore = array();
@@ -224,7 +235,11 @@
 				echo '<span class="red">Withdrawn</span> ';
 			}
 			echo "{$descrips[$qid]}</td>";
-			echo "<td><a href=\"gradeallq.php?stu=$stu&cid=$cid&asid=average&aid=$aid&qid=$qid\">Grade</a></td>";
+			echo "<td><a href=\"gradeallq.php?stu=$stu&cid=$cid&asid=average&aid=$aid&qid=$qid\" ";
+			if (isset($needmanualgrade[$qid])) {
+				echo 'class="manualgrade" ';
+			}
+			echo ">Grade</a></td>";
 			echo "<td>$avg/$pts ($pc%)</td><td>$avg2/$pts ($pc2%)</td><td>$avgatt ($avgreg)</td><td>$pi</td><td>$avgtot ($avgtota)</td>";
 			echo "<td><input type=button value=\"Preview\" onClick=\"previewq({$qsetids[$qid]})\"/></td>\n";
 			
@@ -248,8 +263,9 @@
 	}
 	echo "<p><a href=\"gradebook.php?stu=$stu&cid=$cid\">Return to GradeBook</a></p>\n";
 	
-	echo "<p>Note: Average Attempts, Regens, and Time only counts those who attempted the problem</p>";
-	echo '<p>All averages only include those who have started the assessment</p>';
+	echo '<p>Items with grade link <span class="manualgrade">highlighted</span> require manual grading.<br/>';
+	echo "Note: Average Attempts, Regens, and Time only counts those who attempted the problem<br/>";
+	echo 'All averages only include those who have started the assessment</p>';
 	
 	$query = "SELECT COUNT(id) from imas_questions WHERE assessmentid='$aid' AND category<>'0'";
 	$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
@@ -257,6 +273,8 @@
 		include("../assessment/catscores.php");
 		catscores($qs,$avgscore,$defpoints);
 	}
+	echo "<p><a href=\"gb-itemresults.php?cid=$cid&amp;aid=$aid\">Summary of assessment results</a> (only meaningful for non-randomized questions)</p>";
+	
 	echo "<p><a href=\"gb-aidexport.php?cid=$cid&amp;aid=$aid\">Export assessment results</a></p>";
 	require("../footer.php");
 	
