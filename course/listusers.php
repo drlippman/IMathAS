@@ -197,7 +197,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				$code = "NULL";
 			}
 			if (isset($_POST['locked'])) {
-				$locked = 1;
+				$locked = time();
 			} else {
 				$locked = 0;
 			}
@@ -207,9 +207,16 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				$timelimitmult = '1.0';
 			} 
 			//echo $timelimitmult;
+			if ($locked==0) {
+				$query = "UPDATE imas_students SET code=$code,section=$section,locked=$locked,timelimitmult='$timelimitmult' WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			} else {
+				$query = "UPDATE imas_students SET code=$code,section=$section,timelimitmult='$timelimitmult' WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+				$query = "UPDATE imas_students SET locked=$locked WHERE userid='{$_GET['uid']}' AND courseid='$cid' AND locked=0";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
 				
-			$query = "UPDATE imas_students SET code=$code,section=$section,locked=$locked,timelimitmult='$timelimitmult' WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
 		
 			require('../includes/userpics.php');
 			if (is_uploaded_file($_FILES['stupic']['tmp_name'])) {
@@ -265,7 +272,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Confirm Change\n";
 			$pagetitle = "Confirm Change";
 		}
-	} elseif (isset($_GET['action']) && $_GET['action']=="unenroll" ) {
+	} elseif (isset($_GET['action']) && $_GET['action']=="unenroll" && !isset($CFG['GEN']['noInstrUnenroll'])){
 		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n"; 
 		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Confirm Change\n";
 		$pagetitle = "Unenroll Students";		
@@ -509,7 +516,11 @@ if ($overwriteBody==1) {
 		With Selected:  
 		<input type=submit name=submit value="E-mail">
 		<input type=submit name=submit value="Message"> 
-		<input type=submit name=submit value="Unenroll"> 
+		<?php 
+		if (!isset($CFG['GEN']['noInstrUnenroll'])) {
+			echo '<input type=submit name=submit value="Unenroll">';
+		}
+		?>
 		<input type=submit name=submit value="Make Exception">
 		<input type=submit name=submit value="Copy Emails">
 		<input type="button" value="Pictures" onclick="rotatepics()" />
@@ -529,7 +540,11 @@ if ($overwriteBody==1) {
 			<th>Grades</th>
 			<th>Due Dates</th>
 			<th>Chg Info</th>
-			<th>Unenroll</th>
+			<?php 
+			if (!isset($CFG['GEN']['noInstrUnenroll'])) {
+				echo '<th>Unenroll</th>';
+			}
+			?>
 		</tr>
 		</thead>
 		<tbody>	
@@ -538,7 +553,7 @@ if ($overwriteBody==1) {
 		$numstu = 0;
 		while ($line=mysql_fetch_array($resultDefaultUserList, MYSQL_ASSOC)) {
 			$numstu++;
-			if ($line['locked']==1) {
+			if ($line['locked']>0) {
 				$lastaccess = "locked";
 			} else {
 				$lastaccess = ($line['lastaccess']>0) ? date("n/j/y g:ia",$line['lastaccess']) : "never";
@@ -559,7 +574,7 @@ if ($overwriteBody==1) {
 				<?php 
 				echo $hasSectionData; 
 				echo $hasCodeData;
-				if ($line['locked']==1) {
+				if ($line['locked']>0) {
 					echo '<td><span style="text-decoration: line-through;">'.$line['LastName'].'</span></td>';
 					echo '<td><span style="text-decoration: line-through;">'.$line['FirstName'].'</span></td>';
 				} else {
@@ -572,7 +587,11 @@ if ($overwriteBody==1) {
 				<td><a href="gradebook.php?cid=<?php echo $cid ?>&stu=<?php echo $line['userid'] ?>&from=listusers">Grades</a></td>
 				<td><a href="listusers.php?cid=<?php echo $cid ?>&uid=<?php echo $line['userid'] ?>&massexception=1">Exception</a></td>
 				<td><a href="listusers.php?cid=<?php echo $cid ?>&chgstuinfo=true&uid=<?php echo $line['userid'] ?>">Chg</a></td>
-				<td><a href="listusers.php?cid=<?php echo $cid ?>&action=unenroll&uid=<?php echo $line['userid'] ?>">Unenroll</a></td>
+				<?php
+				if (!isset($CFG['GEN']['noInstrUnenroll'])) {
+					echo '<td><a href="listusers.php?cid='.$cid.'&action=unenroll&uid='.$line['userid'].'">Unenroll</a></td>';
+				}
+				?>
 			</tr>
 <?php
 		}

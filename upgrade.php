@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 49;
+$latest = 50;
 
 
 @set_time_limit(0);
@@ -835,6 +835,18 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 		}
 		if ($last<49) {
 			$query = "ALTER TABLE `imas_login_log` ADD `lastaction` INT(10) UNSIGNED NOT NULL";
+			 $res = mysql_query($query);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+		}
+		if ($last<50) {
+			$query = "ALTER TABLE `imas_students` CHANGE `locked` `locked` INT(10) UNSIGNED NOT NULL";
+			 $res = mysql_query($query);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = "ALTER TABLE `imas_gbscheme` ADD `colorize` VARCHAR (20) NOT NULL";
 			 $res = mysql_query($query);
 			 if ($res===false) {
 				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";

@@ -136,8 +136,9 @@ $c2 =chmod('assessment/qimages',0755);
 $c3 =chmod('admin/import',0755);
 $c4 =chmod('course/files',0755);
 $c5 =chmod('filter/graph/imgs',0755);
+$c6 =chmod('filestore',0755);
 
-if ($c1 && $c2 && $c3 && $c4 && $c5) {
+if ($c1 && $c2 && $c3 && $c4 && $c5 && c6) {
 	echo 'Permissions set on writeable directories<br/>';
 } else {
 	echo 'Error setting directory permissions.  See readme.html for a list of directories that need to be writable by the web server.<br/>';

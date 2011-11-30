@@ -79,17 +79,15 @@
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 		}
-		$defgbmode = $_POST['gbmode1'] + 10*$_POST['gbmode10'] + 100*$_POST['gbmode100'] + 1000*$_POST['gbmode1000'] + 1000*$_POST['gbmode1002'];
+		$defgbmode = $_POST['gbmode1'] + 10*$_POST['gbmode10'] + 100*($_POST['gbmode100']+$_POST['gbmode200']) + 1000*$_POST['gbmode1000'] + 1000*$_POST['gbmode1002'];
 		$stugbmode = $_POST['stugbmode1'] + $_POST['stugbmode2'] + $_POST['stugbmode4'] + $_POST['stugbmode8'];
-		$query = "UPDATE imas_gbscheme SET useweights='$useweights',orderby='$orderby',usersort='$usersort',defaultcat='$defaultcat',defgbmode='$defgbmode',stugbmode='$stugbmode' WHERE courseid='$cid'";
+		$query = "UPDATE imas_gbscheme SET useweights='$useweights',orderby='$orderby',usersort='$usersort',defaultcat='$defaultcat',defgbmode='$defgbmode',stugbmode='$stugbmode',colorize='{$_POST['colorize']}' WHERE courseid='$cid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		if (isset($_POST['submit'])) {
 			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid={$_GET['cid']}&gbmode=$defgbmode");
 			exit;
 		}
 	}
-	$sc = 
-	
 	
 	$sc = '<script type="text/javascript">
 	function swapweighthdr(t) {
@@ -153,14 +151,24 @@
 	echo "<div id=\"headergbsettings\" class=\"pagetitle\"><h2>Grade Book Settings <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=gradebooksettings','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h2></div>\n";
 		
 	
-	$query = "SELECT useweights,orderby,defaultcat,defgbmode,usersort,stugbmode FROM imas_gbscheme WHERE courseid='$cid'";
+	$query = "SELECT useweights,orderby,defaultcat,defgbmode,usersort,stugbmode,colorize FROM imas_gbscheme WHERE courseid='$cid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	list($useweights,$orderby,$defaultcat,$defgbmode,$usersort,$stugbmode) = mysql_fetch_row($result);
+	list($useweights,$orderby,$defaultcat,$defgbmode,$usersort,$stugbmode,$colorize) = mysql_fetch_row($result);
 	$totonleft = ((floor($defgbmode/1000)%10)&1) ; //0 right, 1 left
 	$avgontop = ((floor($defgbmode/1000)%10)&2) ; //0 bottom, 2 top
-	$links = floor($defgbmode/100)%10; //0: view/edit, 1 q breakdown
+	$links = ((floor($defgbmode/100)%10)&1); //0: view/edit, 1 q breakdown
+	$hidelocked = ((floor($defgbmode/100)%10)&2); //0: show 1: hide locked
 	$hidenc = floor($defgbmode/10)%10; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
 	$availshow = $defgbmode%10; //0: past, 1 past&cur, 2 all
+	
+	$colorval = array(0);
+	$colorlabel = array("No Color");
+	for ($j=50;$j<90;$j+=($j<70?10:5)) {
+		for ($k=$j+($j<70?10:5);$k<100;$k+=($k<70?10:5)) {
+			$colorval[] = "$j:$k";
+			$colorlabel[] = "red &le; $j%, green &ge; $k%";
+		}
+	}
 	
 ?>
 	<form method=post action="gbsettings.php?cid=<?php echo $cid;?>">
@@ -208,6 +216,18 @@
 		<input type=radio name="gbmode10" value="2" <?php writeHtmlChecked($hidenc,2);?>/> Hide All
 	</span><br class=form>
 	
+	<span class=form>Locked Students:</span>
+	<span class=formright>
+		<input type=radio name="gbmode200" value="0"  <?php writeHtmlChecked($hidelocked,0);?>/> Show <br/>
+		<input type=radio name="gbmode200" value="2"  <?php writeHtmlChecked($hidelocked,2);?>/> Hide
+	</span><br class=form />
+	
+	<span class=form>Default Colorization:</span>
+	<span class=formright>
+	<?php writeHtmlSelect("colorize",$colorval,$colorlabel,$colorize); ?>
+	</span><br class=form />
+	
+	</span><br class=form />
 	<span class=form>Totals columns show on:</span>
 	<span class=formright>
 		<input type=radio name="gbmode1000" value="0" <?php writeHtmlChecked($totonleft,0);?>/> Right<br/>

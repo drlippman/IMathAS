@@ -4,7 +4,7 @@
 <title><?php echo $installname; if (isset($pagetitle)) { echo " - $pagetitle";}?></title>
 <meta http-equiv="X-UA-Compatible" content="IE=7, IE=9" />
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-<link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=061010";?>" type="text/css" />
+<link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=112111";?>" type="text/css" />
 <?php if (isset($coursetheme)) { 
 	if (isset($flexwidth) || isset($usefullwidth)) {
 		$coursetheme = str_replace('_fw','',$coursetheme);
@@ -79,7 +79,7 @@ if (isset($useeditor) && $sessiondata['useed']==1) {
 	echo "\n";
 	echo '<script type="text/javascript">';
 	echo 'var coursetheme = "'.$coursetheme.'";';
-	if (isset($AWSkey)) {
+	if (!isset($CFG['GEN']['noFileBrowser'])) {
 		echo 'var fileBrowserCallBackFunc = "fileBrowserCallBack";';
 	} else {
 		echo 'var fileBrowserCallBackFunc = null;';

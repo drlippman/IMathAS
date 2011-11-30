@@ -3,7 +3,7 @@
 //(c) 2007 David Lippman
 	require("../validate.php");
 	require_once("../includes/filehandler.php");
-		
+	
 	$isteacher = isset($teacherid);
 	$istutor = isset($tutorid);
 	$cid = $_GET['cid'];
@@ -29,7 +29,7 @@
 		}
 		//Gbmode : Links NC Dates
 		$totonleft = floor($gbmode/1000)%10 ; //0 right, 1 left
-		$links = floor($gbmode/100)%10; //0: view/edit, 1 q breakdown
+		$links = ((floor($gbmode/100)%10)&1); //0: view/edit, 1 q breakdown
 		$hidenc = floor($gbmode/10)%10; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
 		$availshow = $gbmode%10; //0: past, 1 past&cur, 2 all
 	} else {

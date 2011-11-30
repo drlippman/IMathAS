@@ -119,9 +119,7 @@ while ($row = mysql_fetch_row($result)) {
 	}
 }
 */
-$assess = array();
-$colors = array();
-$tags = array();
+$byid = array();
 $k = 0;
 $query = "SELECT id,name,startdate,enddate,reviewdate,gbcategory,reqscore,reqscoreaid,timelimit,allowlate,caltag,calrtag FROM imas_assessments WHERE avail=1 AND courseid='$cid' AND enddate<2000000000 ORDER BY name";
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
@@ -165,13 +163,12 @@ while ($row = mysql_fetch_row($result)) {
 		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[4]));
 		$row[1] = str_replace('"','\"',$row[1]);
 		$tag = $row[11];
-		if ($now<$row[4]) { $colors[$k] = '#99f';} else {$colors[$k] = '#ccc';}
-		$assess[$moday][$k] = "{type:\"AR\", time:\"$time\", tag:\"$tag\", ";
-		if ($now<$row[4] || isset($teacherid)) { $assess[$moday][$k] .= "id:\"$row[0]\",";}
-		$assess[$moday][$k] .=  "color:\"".$colors[$k]."\",name:\"$row[1]\"".((isset($teacherid))?", editlink:true":"")."}";
+		if ($now<$row[4]) { $colors = '#99f';} else {$colors = '#ccc';}
+		$json = "{type:\"AR\", time:\"$time\", tag:\"$tag\", ";
+		if ($now<$row[4] || isset($teacherid)) { $json .= "id:\"$row[0]\",";}
+		$json .=  "color:\"".$colors."\",name:\"$row[1]\"".((isset($teacherid))?", editlink:true":"")."}";
 		if ($row[3]<$uppertime && $row[3]>$exlowertime) {  //if going to do a second tag, need to increment.
-			$tags[$k] = $tag;
-			$k++;
+			$byid['AR'.$row[0]] = array($moday,$tag,$colors,$json);
 		}
 	} 
 	if ($row[3]<$uppertime && $row[3]>$exlowertime) {// taking out "hide if past due" && ($now<$row[3] || isset($teacherid))) {
@@ -186,16 +183,14 @@ while ($row = mysql_fetch_row($result)) {
 		} else {
 			$lp = 0;
 		}
-		$tags[$k] = $tag;
 		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[3]));
 		$row[1] = str_replace('"','\"',$row[1]);
-		$colors[$k] = makecolor2($row[2],$row[3],$now);
-		$assess[$moday][$k] = "{type:\"A\", time:\"$time\", ";
-		if ($now<$row[3] || $row[4]>$now || isset($teacherid)) { $assess[$moday][$k] .= "id:\"$row[0]\",";}
-		$assess[$moday][$k] .= "name:\"$row[1]\", color:\"".$colors[$k]."\", allowlate:\"$lp\", tag:\"$tag\"".(($row[8]!=0)?", timelimit:true":"").((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
+		$colors = makecolor2($row[2],$row[3],$now);
+		$json = "{type:\"A\", time:\"$time\", ";
+		if ($now<$row[3] || $row[4]>$now || isset($teacherid)) { $json .= "id:\"$row[0]\",";}
+		$json .= "name:\"$row[1]\", color:\"".$colors."\", allowlate:\"$lp\", tag:\"$tag\"".(($row[8]!=0)?", timelimit:true":"").((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
+		$byid['A'.$row[0]] = array($moday,$tag,$colors,$json);
 	} 
-	$tags[$k] = $tag;
-	$k++;
 }
 // 4/4/2011, changing tthis to code block below.  Not sure why change on 10/23 was made :/
 //if (isset($teacherid)) {
@@ -223,13 +218,14 @@ while ($row = mysql_fetch_row($result)) {
 		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[2]));
 	}
 	$row[1] = str_replace('"','\"',$row[1]);
-	$colors[$k] = makecolor2($row[4],$row[2],$now);
+	$colors = makecolor2($row[4],$row[2],$now);
 	if ($row[7]==2) {
-		$colors[$k] = "#0f0";
+		$colors = "#0f0";
 	}
-	$assess[$moday][$k] = "{type:\"I\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors[$k]."\", tag:\"{$row[6]}\"".((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
-	$tags[$k] = $row[6];
-	$k++;
+	$json = "{type:\"I\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors."\", tag:\"{$row[6]}\"".((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
+	$tag = $row[6];
+	$byid['I'.$row[0]] = array($moday,$tag,$colors,$json);
+	
 }
 //$query = "SELECT id,title,enddate,text,startdate,oncal,caltag FROM imas_linkedtext WHERE ((oncal=2 AND enddate>$lowertime AND enddate<$uppertime AND startdate<$now) OR (oncal=1 AND startdate<$now AND startdate>$exlowertime)) AND avail=1 AND courseid='$cid'";
 if (isset($teacherid)) {
@@ -255,17 +251,17 @@ while ($row = mysql_fetch_row($result)) {
 	   } else {
 		   $alink = '';
 	   }
-	$colors[$k] = makecolor2($row[4],$row[2],$now);
+	$colors = makecolor2($row[4],$row[2],$now);
 	if ($row[7]==2) {
-		$colors[$k] = "#0f0";
+		$colors = "#0f0";
 	}
-	$assess[$moday][$k] = "{type:\"L\", time:\"$time\", ";
+	$json = "{type:\"L\", time:\"$time\", ";
 	if (isset($teacherid) || ($now<$row[2] && $now>$row[4]) || $row[7]==2) {
-		$assess[$moday][$k] .= "id:\"$row[0]\", ";
+		$json .= "id:\"$row[0]\", ";
 	}
-	$assess[$moday][$k] .= "name:\"$row[1]\", link:\"$alink\", color:\"".$colors[$k]."\", tag:\"{$row[6]}\"".((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
-	$tags[$k] = $row[6];
-	$k++;
+	$json .= "name:\"$row[1]\", link:\"$alink\", color:\"".$colors."\", tag:\"{$row[6]}\"".((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
+	$tag = $row[6];
+	$byid['L'.$row[0]] = array($moday,$tag,$colors,$json);
 }
 $query = "SELECT id,name,postby,replyby,startdate,caltag FROM imas_forums WHERE enddate>$exlowertime AND ((postby>$exlowertime AND postby<$uppertime) OR (replyby>$exlowertime AND replyby<$uppertime)) AND avail>0 AND courseid='$cid' ORDER BY name";
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
@@ -277,26 +273,101 @@ while ($row = mysql_fetch_row($result)) {
 	if ($row[2]!=2000000000) { //($row[2]>$now || isset($teacherid))
 		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[2]));
 		$row[1] = str_replace('"','\"',$row[1]);
-		$colors[$k] = makecolor2($row[4],$row[2],$now);
-		$assess[$moday][$k] = "{type:\"FP\", time:\"$time\", ";
+		$colors = makecolor2($row[4],$row[2],$now);
+		$json = "{type:\"FP\", time:\"$time\", ";
 		if ($row[2]>$now || isset($teacherid)) {
-			$assess[$moday][$k] .= "id:\"$row[0]\",";
+			$json .= "id:\"$row[0]\",";
 		}
-		$assess[$moday][$k] .= "name:\"$row[1]\", color:\"".$colors[$k]."\", tag:\"$posttag\"".((isset($teacherid))?", editlink:true":"")."}";
-		$tags[$k] = $posttag;
-		$k++;
+		$json .= "name:\"$row[1]\", color:\"".$colors."\", tag:\"$posttag\"".((isset($teacherid))?", editlink:true":"")."}";
+		$byid['FP'.$row[0]] = array($moday,$posttag,$colors,$json);
 	}
 	if ($row[3]!=2000000000) { //($row[3]>$now || isset($teacherid)) 
 		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[3]));
-		$colors[$k] = makecolor2($row[4],$row[3],$now);
-		$assess[$moday][$k] = "{type:\"FR\", time:\"$time\",";
+		$colors = makecolor2($row[4],$row[3],$now);
+		$json = "{type:\"FR\", time:\"$time\",";
 		if ($row[3]>$now || isset($teacherid)) {
-			$assess[$moday][$k] .= "id:\"$row[0]\",";
+			$json .= "id:\"$row[0]\",";
 		}
-		$assess[$moday][$k] .= "name:\"$row[1]\", color:\"".$colors[$k]."\", tag:\"$replytag\"".((isset($teacherid))?", editlink:true":"")."}";
-		$tags[$k] = $replytag;
-		$k++;	
+		$json .= "name:\"$row[1]\", color:\"".$colors."\", tag:\"$replytag\"".((isset($teacherid))?", editlink:true":"")."}";
+		$byid['FR'.$row[0]] = array($moday,$replytag,$colors,$json);
 	}
+}
+$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+$itemorder = unserialize(mysql_result($result,0,0));
+$itemsimporder = array();
+function flattenitems($items,&$addto) {
+	global $itemsimporder;
+	foreach ($items as $item) {
+		if (is_array($item)) {
+			flattenitems($item['items'],$addto);
+		} else {
+			$addto[] = $item;
+		}
+	}
+}
+flattenitems($itemorder,$itemsimporder);
+
+$itemsassoc = array();
+$query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid='$cid'";
+$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+while ($row = mysql_fetch_row($result)) {
+	$itemsassoc[$row[0]] = array($row[1],$row[2]);
+}
+
+$assess = array();
+$colors = array();
+$tags = array();
+$k = 0;
+foreach ($itemsimporder as $item) {
+	if ($itemsassoc[$item][0]=='Assessment') {
+		if (isset($byid['A'.$itemsassoc[$item][1]])) {
+			$moday = $byid['A'.$itemsassoc[$item][1]][0];
+			$tags[$k] = $byid['A'.$itemsassoc[$item][1]][1];
+			$colors[$k] = $byid['A'.$itemsassoc[$item][1]][2];
+			$assess[$moday][$k] = $byid['A'.$itemsassoc[$item][1]][3];
+			$k++;
+		}
+		if (isset($byid['AR'.$itemsassoc[$item][1]])) {
+			$moday = $byid['AR'.$itemsassoc[$item][1]][0];
+			$tags[$k] = $byid['AR'.$itemsassoc[$item][1]][1];
+			$colors[$k] = $byid['AR'.$itemsassoc[$item][1]][2];
+			$assess[$moday][$k] = $byid['AR'.$itemsassoc[$item][1]][3];
+			$k++;
+		}
+	} else if ($itemsassoc[$item][0]=='Forum') {
+		if (isset($byid['FP'.$itemsassoc[$item][1]])) {
+			$moday = $byid['FP'.$itemsassoc[$item][1]][0];
+			$tags[$k] = $byid['FP'.$itemsassoc[$item][1]][1];
+			$colors[$k] = $byid['FP'.$itemsassoc[$item][1]][2];
+			$assess[$moday][$k] = $byid['FP'.$itemsassoc[$item][1]][3];
+			$k++;
+		}
+		if (isset($byid['FR'.$itemsassoc[$item][1]])) {
+			$moday = $byid['FR'.$itemsassoc[$item][1]][0];
+			$tags[$k] = $byid['FR'.$itemsassoc[$item][1]][1];
+			$colors[$k] = $byid['FR'.$itemsassoc[$item][1]][2];
+			$assess[$moday][$k] = $byid['FR'.$itemsassoc[$item][1]][3];
+			$k++;
+		}
+	} else if ($itemsassoc[$item][0]=='InlineText') {
+		if (isset($byid['I'.$itemsassoc[$item][1]])) {
+			$moday = $byid['I'.$itemsassoc[$item][1]][0];
+			$tags[$k] = $byid['I'.$itemsassoc[$item][1]][1];
+			$colors[$k] = $byid['I'.$itemsassoc[$item][1]][2];
+			$assess[$moday][$k] = $byid['I'.$itemsassoc[$item][1]][3];
+			$k++;
+		}
+	} else if ($itemsassoc[$item][0]=='LinkedText') {
+		if (isset($byid['L'.$itemsassoc[$item][1]])) {
+			$moday = $byid['L'.$itemsassoc[$item][1]][0];
+			$tags[$k] = $byid['L'.$itemsassoc[$item][1]][1];
+			$colors[$k] = $byid['L'.$itemsassoc[$item][1]][2];
+			$assess[$moday][$k] = $byid['L'.$itemsassoc[$item][1]][3];
+			$k++;
+		}
+	}
+	
 }
 
 $query = "SELECT title,tag,date FROM imas_calitems WHERE date>$exlowertime AND date<$uppertime and courseid='$cid' ORDER BY title";

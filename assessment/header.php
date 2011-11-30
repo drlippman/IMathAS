@@ -82,7 +82,7 @@ if (isset($useeditor) && $sessiondata['useed']==1) {
 	} else {
 		echo 'var coursetheme = "'.$coursetheme.'";';
 	}
-	if (isset($AWSkey)) {
+	if (!isset($CFG['GEN']['noFileBrowser'])) {
 		echo 'var fileBrowserCallBackFunc = "fileBrowserCallBack";';
 	} else {
 		echo 'var fileBrowserCallBackFunc = null;';

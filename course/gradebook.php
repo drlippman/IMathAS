@@ -43,6 +43,16 @@ if ($canviewall) {
 		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$gbmode = mysql_result($result,0,0);
+		
+		
+	}
+	if (isset($_COOKIE["colorize-$cid"])) {
+		$colorize = $_COOKIE["colorize-$cid"];
+	} else {
+		$query = "SELECT colorize FROM imas_gbscheme WHERE courseid='$cid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$colorize = mysql_result($result,0,0);
+		setcookie("colorize-$cid",$colorize);
 	}
 	if (isset($_GET['catfilter'])) {
 		$catfilter = $_GET['catfilter'];
@@ -70,7 +80,8 @@ if ($canviewall) {
 	$showpics = floor($gbmode/10000)%10 ; //0 none, 1 small, 2 big
 	$totonleft = ((floor($gbmode/1000)%10)&1) ; //0 right, 1 left
 	$avgontop = ((floor($gbmode/1000)%10)&2) ; //0 bottom, 2 top
-	$links = floor($gbmode/100)%10; //0: view/edit, 1 q breakdown
+	$links = ((floor($gbmode/100)%10)&1); //0: view/edit, 1 q breakdown
+	$hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
 	$hidenc = floor($gbmode/10)%10; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
 	$availshow = $gbmode%10; //0: past, 1 past&cur, 2 all, 3 past and attempted, 4=current only
 
@@ -84,6 +95,7 @@ if ($canviewall) {
 	$showpics = 0;
 	$totonleft = 0;
 	$avgontop = 0;
+	$hidelocked = 0;
 }
 
 if ($canviewall && isset($_GET['stu'])) {
@@ -188,7 +200,7 @@ if ($canviewall) {
 		$placeinhead .= "}\n";
 	}
 	$placeinhead .= 'function chgtoggle() { ';
-	$placeinhead .= "	var altgbmode = 10000*document.getElementById(\"toggle4\").value + 1000*($totonleft+$avgontop) + 100*document.getElementById(\"toggle1\").value + 10*document.getElementById(\"toggle2\").value + 1*document.getElementById(\"toggle3\").value; ";
+	$placeinhead .= "	var altgbmode = 10000*document.getElementById(\"toggle4\").value + 1000*($totonleft+$avgontop) + 100*(document.getElementById(\"toggle1\").value+ document.getElementById(\"toggle5\").value) + 10*document.getElementById(\"toggle2\").value + 1*document.getElementById(\"toggle3\").value; ";
 	$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid&gbmode=";
 	$placeinhead .= "	var toopen = '$address' + altgbmode;\n";
 	$placeinhead .= "  	window.location = toopen; \n";
@@ -266,7 +278,7 @@ if ($canviewall) {
 				} else if (v/poss[i]>high/100) {
 					tds[i].style.backgroundColor = "#99ff99";
 				} else {
-					tds[i].style.backgroundColor = "";
+					tds[i].style.backgroundColor = "#ffffff";
 				}
 			}
 		}
@@ -287,7 +299,7 @@ if ($canviewall) {
 			} else if (v/poss>high/100) {
 				tds[2].style.backgroundColor = "#66ff66";
 			} else {
-				tds[2].style.backgroundColor = "";
+				tds[2].style.backgroundColor = "#ffffff";
 				
 			}
 			
@@ -296,14 +308,15 @@ if ($canviewall) {
 }
 function updateColors(el) {
 	if (el.value==0) {
-		var tds=document.getElementsByTagName("td");
+		var tds=document.getElementById("myTable").getElementsByTagName("td");
 		for (var i=0;i<tds.length;i++) {
-			tds[i].backgroundColor = "";
+			tds[i].style.backgroundColor = "";
 		}
 	} else {
-		var s = el.value.split(/;/);
+		var s = el.value.split(/:/);
 		conditionalColor("myTable",0,s[0],s[1]);
 	}
+	document.cookie = "colorize-'.$cid.'="+el.value;
 }
 	
 </script>';
@@ -416,7 +429,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	$placeinhead .= 'function highlightrow(el) { el.setAttribute("lastclass",el.className); el.className = "highlight";}';
 	$placeinhead .= 'function unhighlightrow(el) { el.className = el.getAttribute("lastclass");}';
 	$placeinhead .= "</script>\n";
-	$placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } .highlight { border-bottom:1px solid #fff;  border-top:1px solid #fff;}</style>";
+	$placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } table.gb tr.highlight { border-bottom:1px solid #333;} table.gb tr {border-bottom:1px solid #fff; }</style>";
 	
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
@@ -456,7 +469,11 @@ if (isset($studentid) || $stu!=0) { //show student view
 		echo '<option value="0">None</option>';
 		for ($j=50;$j<90;$j+=($j<70?10:5)) {
 			for ($k=$j+($j<70?10:5);$k<100;$k+=($k<70?10:5)) {
-				echo "<option value=\"$j;$k\">$j/$k</option>";
+				echo "<option value=\"$j:$k\" ";
+				if ("$j:$k"==$colorize) {
+					echo 'selected="selected" ';
+				}
+				echo ">$j/$k</option>";
 			}
 		}
 		echo '<select>';
@@ -518,7 +535,11 @@ if (isset($studentid) || $stu!=0) { //show student view
 	
 	if ($isteacher) {
 		echo 'Check: <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',false)">None</a> ';
-		echo "With Selected:  <input type=submit name=submit value=\"E-mail\"> <input type=submit name=submit value=\"Message\"> <input type=submit name=submit value=\"Unenroll\"> <input type=submit name=submit value=\"Make Exception\"> ";
+		echo "With Selected:  <input type=submit name=submit value=\"E-mail\"> <input type=submit name=submit value=\"Message\"> ";
+		if (!isset($CFG['GEN']['noInstrUnenroll'])) {
+			echo '<input type=submit name=submit value="Unenroll">';
+		}
+		echo "<input type=submit name=submit value=\"Make Exception\"> ";
 	}
 	
 	$gbt = gbinstrdisp();
@@ -595,7 +616,7 @@ function gbstudisp($stu) {
 		echo '</div>';
 	}
 	echo "<form method=post action=\"gradebook.php?{$_SERVER['QUERY_STRING']}\">";
-	echo "<input type='button' onclick='conditionalColor(\"myTable\",1,50,80);' value='Color'/>";
+	//echo "<input type='button' onclick='conditionalColor(\"myTable\",1,50,80);' value='Color'/>";
 	
 	echo '<table id="myTable" class="gb" style="position:relative;">';
 	echo '<thead><tr><th>Item</th><th>Possible</th><th>Grade</th><th>Percent</th>';
@@ -923,7 +944,7 @@ function gbstudisp($stu) {
 }
 
 function gbinstrdisp() {
-	global $hidenc,$showpics,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection,$avgontop;
+	global $hidenc,$showpics,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection,$avgontop,$hidelocked,$colorize;
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	if ($availshow==4) {
 		$availshow=1;
@@ -960,7 +981,11 @@ function gbinstrdisp() {
 			echo  "</select>";	
 			
 		} else if ($gbt[0][0][$i]=='Name') {
-			echo '<br/><span class="small">N='.(count($gbt)-2).'</span>';
+			echo '<br/><span class="small">N='.(count($gbt)-2).'</span><br/>';
+			echo "<select id=\"toggle5\" onchange=\"chgtoggle()\">";
+			echo "<option value=0 "; writeHtmlSelected($hidelocked,0); echo ">Show Locked</option>";
+			echo "<option value=2 "; writeHtmlSelected($hidelocked,2); echo ">Hide Locked</option>";
+			echo "</select>";
 		}
 		echo '</th>';
 		
@@ -1097,7 +1122,7 @@ function gbinstrdisp() {
 			echo "<input type=\"checkbox\" name='checked[]' value='{$gbt[$i][4][0]}' />&nbsp;";
 		}
 		echo "<a href=\"gradebook.php?cid=$cid&stu={$gbt[$i][4][0]}\">";
-		if ($gbt[$i][4][1]==1) {
+		if ($gbt[$i][4][1]>0) {
 			echo '<span style="text-decoration: line-through;">'.$gbt[$i][0][0].'</span>';
 		} else {
 			echo $gbt[$i][0][0];
@@ -1383,6 +1408,9 @@ function gbinstrdisp() {
 		} else {
 			echo "<script>initSortTable('myTable',Array($sarr),true,false);</script>\n";
 		}
+	}
+	if ($colorize != '0') {
+		echo '<script type="text/javascript">addLoadEvent( function() {updateColors(document.getElementById("colorsel"));} );</script>';
 	}
 		
 	

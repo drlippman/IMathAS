@@ -126,7 +126,7 @@ cats[i]:  0: name, 1: scale, 2: scaletype, 3: chop, 4: dropn, 5: weight, 6: hidd
 ****/
 
 function gbtable() {
-	global $cid,$isteacher,$istutor,$tutorid,$userid,$catfilter,$secfilter,$timefilter,$lnfilter,$isdiag,$sel1name,$sel2name,$canviewall,$lastlogin;
+	global $cid,$isteacher,$istutor,$tutorid,$userid,$catfilter,$secfilter,$timefilter,$lnfilter,$isdiag,$sel1name,$sel2name,$canviewall,$lastlogin,$hidelocked;
 	if ($canviewall && func_num_args()>0) {
 		$limuser = func_get_arg(0);
 	} else if (!$canviewall) {
@@ -652,6 +652,9 @@ function gbtable() {
 	if ($limuser>0) { $query .= "AND imas_users.id='$limuser' ";}
 	if ($secfilter!=-1) {
 		$query .= "AND imas_students.section='$secfilter' ";
+	}
+	if ($hidelocked) {
+		$query .= "AND imas_students.locked=0 ";
 	}
 	if (isset($timefilter)) {
 		$tf = time() - 60*60*$timefilter;

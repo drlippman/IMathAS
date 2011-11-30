@@ -35,11 +35,19 @@ if (isset($_REQUEST["action"]))
 		//$filename = basename(stripslashes($_POST["uploaded_file_name"]));
 		$filename = basename($_FILES['uploaded_file']['name']);
 		$filename = str_replace(' ','_',$filename);
-		$filename = preg_replace('/[^\w\.]/','',$filename);
+		$filename = preg_replace('/[^\w\.\-_]/','',$filename);
 		//$filename = urlencode($filename);
 		//echo $filename;
 		//exit;
-		storeuploadedfile("uploaded_file","ufiles/$userid/".$filename,"public");
+		$extension = strtolower(strrchr($filename,"."));
+		$badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p",".exe");
+		if (in_array($extension,$badextensions)) {
+			unset($_REQUEST["action"]);
+		} else if (storeuploadedfile("uploaded_file","ufiles/$userid/".$filename,"public")) {
+			
+		} else {
+			unset($_REQUEST["action"]);
+		}
 	}
 	else if ($_REQUEST["action"] == "delete_file")
 	{
@@ -101,9 +109,21 @@ if ($type=="img") {
 		return false;
 	}
 <?php
+} else {
+?>
+	extension = [".php",".php3",".php4",".php5",".bat",".com",".pl",".p",".exe"];
+	isok = true;
+	var thisext = fieldvalue.substr(fieldvalue.lastIndexOf('.')).toLowerCase();
+	for(var i = 0; i < extension.length; i++) {
+		if(thisext == extension[i]) { isok = false; }
+	}
+	if (!isok) {
+		alert("This filetype is not allowed");
+		return false;
+	}
+<?php
 }
 ?>
-
 	document.getElementById("upload_div").style.display = "none";
 	document.getElementById("uploading_div").style.display = "block";
 	document.getElementById("uploaded_file_name").value = fieldvalue;
@@ -118,6 +138,14 @@ if ($type=="img") {
 <div class="td_main">
 <?php
 $files = getuserfiles($userid,$type=="img");
+if (isset($_REQUEST["action"]) && $_REQUEST["action"] == "upload_file") {
+	echo 'Just uploaded:<br/>';
+	echo "<a href='#' onClick='delete_file(\"" . basename("ufiles/$userid/".$filename) . "\")'>";
+	echo "<img border=0 src='" . $delete_image . "'></a> ";
+	echo "<img src='" . $file_small_image . "'> ";
+	echo "<a class='file' href='#' onClick='FileBrowserDialogue.mySubmit(\"" . getuserfileurl("ufiles/$userid/".$filename) . "\");'>" . basename("ufiles/$userid/".$filename) . "</a><br>\n";
+	echo '<hr/>';
+}
 foreach ($files as $k=>$v) {
 	echo "<a href='#' onClick='delete_file(\"" . basename($v['name']) . "\")'>";
 	echo "<img border=0 src='" . $delete_image . "'></a> ";

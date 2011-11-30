@@ -777,8 +777,8 @@ if ($overwriteBody==1) {
 ?>
 			<span class="form">Calendar icon:</span>
 			<span class="formright">
-				Active: <input name="caltagact" type=text size=1 value="<?php echo $line['caltag'];?>"/>, 
-				Review: <input name="caltagrev" type=text size=1 value="<?php echo $line['calrtag'];?>"/>
+				Active: <input name="caltagact" type=text size=4 value="<?php echo $line['caltag'];?>"/>, 
+				Review: <input name="caltagrev" type=text size=4 value="<?php echo $line['calrtag'];?>"/>
 			</span><br class="form" />
 			
 			</fieldset>
