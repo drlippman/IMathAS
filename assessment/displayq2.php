@@ -563,7 +563,14 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		}
 		
 		if ($displayformat == "select") { 
-			$out = "<select name=\"qn$qn\"><option value=\"NA\">Select an answer</option>\n";
+			$msg = '?';
+			foreach ($questions as $qv) {
+				if (strlen($qv)>2) {
+					$msg = 'Select an answer';
+					break;
+				}
+			}
+			$out = "<select name=\"qn$qn\"><option value=\"NA\">$msg</option>\n";
 		} else if ($displayformat == "horiz") {
 			
 		} else if ($displayformat == "inline") {

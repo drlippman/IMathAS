@@ -213,7 +213,10 @@ div.curquestion {
 
 }
 div.inactive {
-
+	border: 1px solid #bbd;
+}
+div.prequestion {
+	border: 1px solid #bbd;
 }
 hr.seq {
 

@@ -54,6 +54,20 @@ div.inactive {
 	/*position: relative;*/
 	margin-bottom: 5px;
 	padding: 10px;
+	border: 1px solid #00f; 
+}
+div.prequestion {
+	padding-left: 10px;
+	border: 1px solid #00f;
+	margin-bottom: -1px;
+}
+div.embedqwrapper {
+	position: relative;
+}
+img.embedicon {
+	position: absolute;
+	left: -18px;
+	top: 0px;
 }
 div.todoquestion div.inactive {
 	margin: 0; padding: 0;

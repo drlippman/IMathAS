@@ -822,7 +822,7 @@ function assessbackgsubmit(qn,noticetgt) {
 		params = "embedpostback=true";
 		if (qn != null) {
 			var els = document.getElementsByTagName("input");
-			var regex = new RegExp("^(qn|tc)"+qn);
+			var regex = new RegExp("^(qn|tc)("+qn+"\\b|"+(qn+1)+"\\d{3})");
 			for (var i=0;i<els.length;i++) {
 				if (els[i].name.match(regex)) {
 					if ((els[i].type!='radio' && els[i].type!='checkbox') || els[i].checked) {

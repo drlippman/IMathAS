@@ -546,30 +546,34 @@ function basicshowq($qn,$seqinactive=false) {
 
 //shows basic points possible, attempts remaining bar
 function showqinfobar($qn,$inreview,$single) {
-	global $qi,$questions,$attempts,$seeds,$testsettings,$noindivscores,$scores,$bestscores,$sessiondata,$imasroot;
+	global $qi,$questions,$attempts,$seeds,$testsettings,$noindivscores,$showeachscore,$scores,$bestscores,$sessiondata,$imasroot;
 	if ($inreview) {
 		echo '<div class="review">';
 	}
 	if ($qi[$questions[$qn]]['withdrawn']==1) {
 		echo '<span class="red">Question Withdrawn</span> ';
 	}
-	$pointsremaining = getremainingpossible($qn,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
-	if ($pointsremaining == $qi[$questions[$qn]]['points']) {
-		echo 'Points possible: ' . $qi[$questions[$qn]]['points'];
-	} else {
-		echo 'Points available on this attempt: '.$pointsremaining.' of original '.$qi[$questions[$qn]]['points'];
+	if ($attempts[$qn]<$qi[$questions[$qn]]['attempts']) {
+		$pointsremaining = getremainingpossible($qn,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
+		if ($pointsremaining == $qi[$questions[$qn]]['points']) {
+			echo 'Points possible: ' . $qi[$questions[$qn]]['points'] . '<br/>';
+		} else {
+			echo 'Points available on this attempt: '.$pointsremaining.' of original '.$qi[$questions[$qn]]['points'] . '<br/>';
+		}
 	}
 	
 	if ($qi[$questions[$qn]]['attempts']==0) {
-		echo "<br/>Unlimited attempts.";
+		echo "Unlimited attempts.";
+	} else if ($attempts[$qn]>=$qi[$questions[$qn]]['attempts']) {
+		echo 'No attempts remain.';
 	} else {
 		//echo '<br/>'.($qi[$questions[$qn]]['attempts']-$attempts[$qn])." attempts of ".$qi[$questions[$qn]]['attempts']." remaining.";
-		echo "<br/>This is attempt ".($attempts[$qn]+1)." of " . $qi[$questions[$qn]]['attempts'] . ".";
+		echo "This is attempt ".($attempts[$qn]+1)." of " . $qi[$questions[$qn]]['attempts'] . ".";
 	}
 	if ($testsettings['showcat']>0 && $qi[$questions[$qn]]['category']!='0') {
 		echo "  Category: {$qi[$questions[$qn]]['category']}.";
 	}
-	if ($attempts[$qn]>0 && !$noindivscores) {
+	if ($attempts[$qn]>0 && $showeachscore) {
 		if (strpos($scores[$qn],'~')===false) {
 			echo "<br/>Score on last attempt: {$scores[$qn]}.  Score in gradebook: {$bestscores[$qn]}";
 		} else {
@@ -751,6 +755,63 @@ function startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivsco
 			echo "<p><a href=\"showtest.php?regenall=all\">Try similar problems</a> for all questions where allowed.</p>";
 		} else {
 			echo "<p><a href=\"showtest.php?regenall=missed\">Try similar problems</a> for all questions with less than perfect scores where allowed.</p>";
+		}
+	}
+}
+
+function embedshowicon($qn) {
+	global $qi,$questions,$attempts,$testsettings,$scores,$bestscores,$noindivscores,$showeachscore,$imasroot,$CFG,$sessiondata,$seeds;
+	$reattemptsremain = hasreattempts($qn);
+	$pointsremaining = getremainingpossible($qn,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
+	$qavail = false;
+	
+	if ((unans($scores[$qn]) && $attempts[$qn]==0) || ($noindivscores && amreattempting($qn))) {
+			if (isset($CFG['TE']['navicons'])) {
+				echo "<img class=\"embedicon\" src=\"$imasroot/img/{$CFG['TE']['navicons']['untried']}\"/> ";
+			} else {
+				echo "<img class=\"embedicon\" src=\"$imasroot/img/q_fullbox.gif\"/> ";
+			}
+	} else if (canimprove($qn) && !$noindivscores) {
+		if (isset($CFG['TE']['navicons'])) {
+			if ($thisscore==0 || $noindivscores) {
+				echo "<img class=\"embedicon\" src=\"$imasroot/img/{$CFG['TE']['navicons']['canretrywrong']}\"/> ";
+			} else {
+				echo "<img class=\"embedicon\" src=\"$imasroot/img/{$CFG['TE']['navicons']['canretrypartial']}\"/> ";
+			}
+		} else {
+			echo "<img class=\"embedicon\" src=\"$imasroot/img/q_halfbox.gif\"/> ";
+		}
+	} else if ($reattemptsremain) {
+		if (isset($CFG['TE']['navicons'])) {
+			if (!$showeachscore) {
+				echo "<img class=\"embedicon\" src=\"$imasroot/img/{$CFG['TE']['navicons']['noretry']}\"/> ";
+			} else {
+				if ($thisscore == $qi[$questions[$qn]]['points']) {
+					echo "<img class=\"embedicon\" src=\"$imasroot/img/{$CFG['TE']['navicons']['correct']}\"/> ";
+				} else if ($thisscore==0) { 
+					echo "<img class=\"embedicon\" src=\"$imasroot/img/{$CFG['TE']['navicons']['wrong']}\"/> ";
+				} else {
+					echo "<img class=\"embedicon\" src=\"$imasroot/img/{$CFG['TE']['navicons']['partial']}\"/> ";
+				}
+			}
+		} else {
+			echo "<img class=\"embedicon\" src=\"$imasroot/img/q_emptybox.gif\"/> ";
+		}
+	} else {
+		if (isset($CFG['TE']['navicons'])) {
+			if (!$showeachscore) {
+				echo "<img class=\"embedicon\" src=\"$imasroot/img/{$CFG['TE']['navicons']['noretry']}\"/> ";
+			} else {
+				if ($thisscore == $qi[$questions[$qn]]['points']) {
+					echo "<img class=\"embedicon\" src=\"$imasroot/img/{$CFG['TE']['navicons']['correct']}\"/> ";
+				} else if ($thisscore==0) { 
+					echo "<img class=\"embedicon\" src=\"$imasroot/img/{$CFG['TE']['navicons']['wrong']}\"/> ";
+				} else {
+					echo "<img class=\"embedicon\" src=\"$imasroot/img/{$CFG['TE']['navicons']['partial']}\"/> ";
+				}
+			}
+		} else {
+			echo "<img class=\"embedicon\" src=\"$imasroot/img/q_emptybox.gif\"/> ";
 		}
 	}
 }

@@ -1367,9 +1367,14 @@ if (!isset($_POST['embedpostback'])) {
 				}
 				
 			}
+		} else if ($_GET['action']=='embeddone') {
+			showscores($questions,$attempts,$testsettings);
+			endtest($testsettings);
+			leavetestmsg();
 		} else if ($_GET['action']=='scoreembed') {
 			$qn = $_POST['toscore'];
 			if ($_POST['verattempts']!=$attempts[$qn]) {
+				echo '<div class="prequestion">';
 				echo "This question has been submittted since you viewed it, and that grade is shown below.  Your answer just submitted was not scored or recorded.";
 			} else {
 				if (isset($_POST['disptime']) && !$isreview) {
@@ -1380,8 +1385,10 @@ if (!isset($_POST['embedpostback'])) {
 				$rawscore = scorequestion($qn);
 				
 				//record score
-				
 				recordtestdata();
+				
+				embedshowicon($qn);
+				echo '<div class="prequestion">';
 				if ($GLOBALS['scoremessages'] != '') {
 					echo '<p>'.$GLOBALS['scoremessages'].'</p>';
 				}
@@ -1396,21 +1403,26 @@ if (!isset($_POST['embedpostback'])) {
 					echo "<p>";
 					echo "Score on last attempt: ";
 					echo printscore($scores[$qn],$qn);
-					echo "</p>\n";
-					echo "<p>Score in gradebook: ";
+					echo "<br/>\n";
+					echo "Score in gradebook: ";
 					echo printscore($bestscores[$qn],$qn);
-					echo "</p>";
-										
-					
+					echo "</p>";	
+				} else {
+					echo '<p>Question scored.</p>';
 				}
+				
+			}
+			if ($allowregen && $qi[$questions[$qn]]['allowregen']==1) {
+				echo "<p><a href=\"showtest.php?regen=$qn\">Try another similar question</a></p>\n";
 			}
 			if (hasreattempts($qn)) {
+				echo '</div>';
 				ob_start();
 				basicshowq($qn,false);
 				$quesout = ob_get_clean();
 				$quesout = substr($quesout,0,-7).'<br/><input type="button" class="btn" value="Submit" onclick="assessbackgsubmit('.$qn.',\'submitnotice'.$qn.'\')" /><span id="submitnotice'.$qn.'"></span></div>';
 				echo $quesout;
-				showqinfobar($qn,true,false);
+				
 			} else {
 				echo "<p>No attempts remain on this problem.</p>";
 				if ($showeachscore) {
@@ -1426,20 +1438,23 @@ if (!isset($_POST['embedpostback'])) {
 					}
 					if ($showcorrectnow) {
 						echo $msg . ', is displayed below</p>';
-						
+						echo '</div>';
 						displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],2,false,$attempts[$qn],false,false,true);
 					} else {
 						echo $msg . ', is displayed below</p>';
+						echo '</div>';
 						displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],0,false,$attempts[$qn],false,false,true);
 					}
 					
 				} else {
-					//need to adjust for "don't allow to review their own work" setting
-					displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],0,false,$attempts[$qn],false,false,true);
+					echo '</div>';
+					if ($testsettings['showans']!='N') {
+						displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],0,false,$attempts[$qn],false,false,true);
+					}
 				}
-				showqinfobar($qn,true,false);
 					
 			}
+			showqinfobar($qn,true,false);
 			echo '<script type="text/javascript">document.getElementById("disptime").value = '.time().';</script>';
 			exit;
 			
@@ -1640,7 +1655,9 @@ if (!isset($_POST['embedpostback'])) {
 			
 			$intro = filter("<div>{$testsettings['intro']}</div>\n");
 			echo '<script type="text/javascript">var assesspostbackurl="http://'. $_SERVER['HTTP_HOST'] . $imasroot . '/assessment/showtest.php?embedpostback=true&action=scoreembed";</script>';
-			echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=seq&amp;score=$i\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
+			//using the full test scoreall action for timelimit auto-submits
+			echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=scoreall\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
+			echo '<div class="formcontents" style="margin-left:20px;">';
 			echo "<input type=\"hidden\" id=\"asidverify\" name=\"asidverify\" value=\"$testid\" />";
 			echo '<input type="hidden" id="disptime" name="disptime" value="'.time().'" />';
 			echo "<input type=\"hidden\" id=\"isreview\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
@@ -1672,8 +1689,9 @@ if (!isset($_POST['embedpostback'])) {
 				}
 			}
 			for ($i = 0; $i < count($questions); $i++) {
-				$quesout = '<div id="embedqwrapper'.$i.'">';
+				$quesout = '<div id="embedqwrapper'.$i.'" class="embedqwrapper">';
 				ob_start();
+				embedshowicon($i);
 				if (hasreattempts($i)) {
 					
 					basicshowq($i,false);
@@ -1681,7 +1699,11 @@ if (!isset($_POST['embedpostback'])) {
 					$quesout = substr($quesout,0,-7).'<br/><input type="button" class="btn" value="Submit" onclick="assessbackgsubmit('.$i.',\'submitnotice'.$i.'\')" /><span id="submitnotice'.$i.'"></span></div>';
 					
 				} else {
+					echo '<div class="prequestion">';
 					echo "<p>No attempts remain on this problem.</p>";
+					if ($allowregen && $qi[$questions[$i]]['allowregen']==1) {
+						echo "<p><a href=\"showtest.php?regen=$i\">Try another similar question</a></p>\n";
+					}
 					if ($showeachscore) {
 						$msg =  "<p>This question, with your last answer";
 						if (($showansafterlast && $qi[$questions[$i]]['showans']=='0') || $qi[$questions[$i]]['showans']=='F' || $qi[$questions[$i]]['showans']=='J') {
@@ -1695,16 +1717,19 @@ if (!isset($_POST['embedpostback'])) {
 						}
 						if ($showcorrectnow) {
 							echo $msg . ', is displayed below</p>';
-							
+							echo '</div>';
 							displayq($i,$qi[$questions[$i]]['questionsetid'],$seeds[$i],2,false,$attempts[$i],false,false,true);
 						} else {
 							echo $msg . ', is displayed below</p>';
+							echo '</div>';
 							displayq($i,$qi[$questions[$i]]['questionsetid'],$seeds[$i],0,false,$attempts[$i],false,false,true);
 						}
 						
 					} else {
-						//need to adjust for "don't allow to review their own work" setting
-						displayq($i,$qi[$questions[$i]]['questionsetid'],$seeds[$i],0,false,$attempts[$i],false,false,true);
+						echo '</div>';
+						if ($testsettings['showans']!='N') {
+							displayq($i,$qi[$questions[$i]]['questionsetid'],$seeds[$i],0,false,$attempts[$i],false,false,true);
+						}
 					}
 					$quesout .= ob_get_clean();
 				}
@@ -1715,7 +1740,10 @@ if (!isset($_POST['embedpostback'])) {
 				$intro = str_replace('[QUESTION '.($i+1).']',$quesout,$intro);
 			}
 			echo $intro;
+			echo '</div>';
 			echo '</form>';
+			echo "<p><a href=\"showtest.php?action=embeddone\">Click here to finalize assessment and summarize score</a></p>\n";
+					
 			
 		}
 	}
@@ -1796,8 +1824,8 @@ if (!isset($_POST['embedpostback'])) {
 						}
 					}
 				} else {
-				echo "<img src=\"$imasroot/img/q_emptybox.gif\"/> ";
-			}
+					echo "<img src=\"$imasroot/img/q_emptybox.gif\"/> ";
+				}
 			}
 			
 				

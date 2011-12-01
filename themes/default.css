@@ -177,7 +177,10 @@ div.curquestion {
 
 }
 div.inactive {
-
+	border: 1px solid #00f;
+}
+div.prequestion {
+	border: 1px solid #00f;
 }
 hr.seq {
 
