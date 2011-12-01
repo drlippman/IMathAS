@@ -442,7 +442,7 @@ class tar {
 		
 
 	// Add a file to the tar archive
-	function addFile($filename) {
+	function addFile($filename,$newfilename=null) {
 		// Make sure the file we are adding exists!
 		if(!file_exists($filename)) {
 			return false;
@@ -462,7 +462,11 @@ class tar {
 		// Add file to processed data
 		$this->numFiles++;
 		$activeFile			= &$this->files[];
-		$activeFile["name"]		= basename($filename);
+		if ($newfilename !== null) {
+			$activeFile["name"] = $newfilename;
+		} else {
+			$activeFile["name"]		= basename($filename);
+		}
 		$activeFile["mode"]		= $file_information["mode"];
 		$activeFile["user_id"]		= $file_information["uid"];
 		$activeFile["group_id"]		= $file_information["gid"];

@@ -422,6 +422,7 @@ a.abutton {
 	background-color: #fff;
 	min-width: 100px;
 	color: #000;
+	border-radius: 4px;
 }
 a.abutton:hover {
 	background-color: #ccf;

@@ -96,7 +96,12 @@ switch($_GET['action']) {
 		} else if ($myrights == 100) {
 			$newgroup = $_POST['group'];
 		}
-		$query = "INSERT INTO imas_users (SID,password,FirstName,LastName,rights,email,groupid) VALUES ('{$_POST['adminname']}','$md5pw','{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['newrights']}','{$_POST['email']}','$newgroup');";
+		if (isset($CFG['GEN']['homelayout'])) {
+			$homelayout = $CFG['GEN']['homelayout'];
+		} else {
+			$homelayout = '|0,1,2||0,1';
+		}
+		$query = "INSERT INTO imas_users (SID,password,FirstName,LastName,rights,email,groupid,homelayout) VALUES ('{$_POST['adminname']}','$md5pw','{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['newrights']}','{$_POST['email']}','$newgroup','$homelayout');";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		break;
 	case "logout":
