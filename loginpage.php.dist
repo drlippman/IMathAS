@@ -45,7 +45,11 @@ if (!isset($imasroot)) { //don't allow direct access to loginpage.php
 <?php
 	if ($haslogin) {
 		if ($badsession) {
-			echo '<p>Unable to establish a session.  Check that your browser is set to allow session cookies</p>';
+			if (isset($_COOKIE[session_name()])) {
+				echo 'Problems with session storage';
+			}  else {
+				echo '<p>Unable to establish a session.  Check that your browser is set to allow session cookies</p>';
+			}
 		} else {
 			echo "<p>Login Error.  Try Again</p>\n";
 		}

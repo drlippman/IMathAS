@@ -177,17 +177,27 @@
 			echo "</ul></li>";
 		} else {
 			$lasts = 0;
+			$assessarr = array();
 			while ($row = mysql_fetch_row($result)) {
 				$sdate = date("m/d/y g:i a", $row[6]);
 				$edate = date("m/d/y g:i a", $row[7]);
 				if ($lasts!=$row[4]) {
 					if ($lasts!=0) {
+						natsort($assessarr);
+						foreach ($assessarr as $id=>$val) {
+							echo "<li><input type=checkbox name=\"clears[]\" value=\"$id\" />$val</li>";
+						}
 						echo "</ul></li>";
+						$assessarr = array();
 					}
 					echo "<li>{$row[1]}, {$row[2]} <ul>";
 					$lasts = $row[4];
 				}
-				echo "<li><input type=checkbox name=\"clears[]\" value=\"{$row[0]}\" />{$row[3]} ($sdate - $edate)</li>";
+				$assessarr[$row[0]] = "{$row[3]} ($sdate - $edate)";
+			}
+			natsort($assessarr);
+			foreach ($assessarr as $id=>$val) {
+				echo "<li><input type=checkbox name=\"clears[]\" value=\"$id\" />$val</li>";
 			}
 			echo "</ul></li>";
 		}
@@ -218,8 +228,13 @@
 	echo "<ul>";
 	$query = "SELECT id,name FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
 	$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+	$assessarr = array();
 	while ($row = mysql_fetch_row($result)) {
-		echo "<li><input type=checkbox name=\"addexc[]\" value=\"{$row[0]}\" />{$row[1]}</li>";
+		$assessarr[$row[0]] = $row[1];
+	}
+	natsort($assessarr);
+	foreach ($assessarr as $id=>$val) {
+		echo "<li><input type=checkbox name=\"addexc[]\" value=\"$id\" />$val</li>";
 	}
 	echo '</ul>';
 	echo "<input type=submit value=\"Record Changes\" />";

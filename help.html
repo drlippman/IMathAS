@@ -714,7 +714,7 @@ assessment in the course page.
 <ul>
 <li><b>Name</b>:  The name of the assessment</li>
 <li><b>Summary</b>:  A description of the summary (shows on course page)</li>
-<li><b>Intro/Instructions</b>:  Displays at the top of the test</li>
+<li><b>Intro/Instructions</b>:  Displays at the top of the test (see below for details on making question-specific instructions)</li>
 <li><b>Available after</b>:  The first date for the item to be available to students</li>
 <li><b>Available until</b>:  The last date for the item to be available to students.  Students must complete the assessment by this date - they will
     be kicked out if they are in the middle of an assessment when this time is reached.</li>
@@ -739,6 +739,9 @@ assessment in the course page.
 	    answer to one question at a time.  Student can skip between questions.</li>
 	<li><b>Skip around</b>:  Students are provided with a navigation bar and can
 	    jump between questions and complete them in any order</li>
+	<li><b>Embedded</b>:  Similar to "Full test, submit one at time", but all questions are
+	    always active, and any one can be submitted at any time.  Questions can be embedded into the 
+	    Intro/Instructions using [QUESTION #] tags.</li>
 	</ul>
 <li><b>Default points per problem</b>:  How many points each problem should be worth by default.
     This can be changed for individual problems.</li>
@@ -805,6 +808,20 @@ students request a similar problem, different students will receive different ve
  select that option here</li>
 <li><b>LTI access secret</b>:  An access code to place this assessment in a BasicLTI-compliant consumer.  <a href="#lti">More info</a></li>
 </ul>
+
+<p><b>Qustion-specific instructions</b></p>
+<p>In the Intro/Instructions box, you can make question-specific instructions by putting a tag of the form [Q #] or [Q #-#] before the
+text specific to that question or range of questions.  Here is an example:</p>
+<div style="border: 1px solid #000;padding:8px;">
+<p>This is the general info<p>
+<p>[Q 1]</p>
+<p>This text will display before question 1</p>
+<p>[Q 3-4]</p>
+<p>This text will display before questions 3 and 4.  Since there was no tag for question 2, it will display
+  directly after question 1, with no associated intro text.  Likewise, if there was a question 5, it would 
+  display directly after question 4 with no associated intro text.</p>
+</div>
+
 
 </div>
 <div class=h4>
