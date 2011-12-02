@@ -53,10 +53,11 @@
 		}
 		exit;
 	}
-	$query = "SELECT settings,replyby,defdisplay,name,points,groupsetid FROM imas_forums WHERE id='$forumid'";
+	$query = "SELECT settings,replyby,defdisplay,name,points,groupsetid,postby FROM imas_forums WHERE id='$forumid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$forumsettings = mysql_result($result,0,0);
-	$allowreply = ($isteacher || (time()<mysql_result($result,0,1)));
+	$replyby = mysql_result($result,0,1);
+	$allowreply = ($isteacher || (time()<$replyby));
 	$defdisplay = mysql_result($result,0,2);
 	$allowanon = (($forumsettings&1)==1);
 	$allowmod = ($isteacher || (($forumsettings&2)==2));
@@ -64,6 +65,7 @@
 	$haspoints = (mysql_result($result,0,4) > 0);
 	$forumname = mysql_result($result,0,3);
 	$groupset = mysql_result($result,0,5);
+	$postby = mysql_result($result,0,6);
 	$groupid = 0;
 	if ($groupset>0) {
 		if (!isset($_GET['grp'])) {
@@ -320,7 +322,7 @@
 	$icnt = 0;
 	function printchildren($base,$restricttoowner=false) {
 		$curdir = rtrim(dirname(__FILE__), '/\\');
-		global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points,$feedback,$posttype,$lastview,$bcnt,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$view,$page,$allowmsg,$haspoints,$imasroot;
+		global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points,$feedback,$posttype,$lastview,$bcnt,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$view,$page,$allowmsg,$haspoints,$imasroot,$postby,$replyby;
 		foreach($children[$base] as $child) {
 			if ($restricttoowner && $ownerid[$child] != $userid) {
 				continue;
@@ -430,7 +432,9 @@
 					echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&move=$child\">Move</a> \n";
 				} 
 				if ($isteacher || ($ownerid[$child]==$userid && $allowmod)) {
-					echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&modify=$child\">Modify</a> \n";
+					if (($base==0 && time()<$postby) || ($base>0 && time()<$replyby)) {
+						echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&modify=$child\">Modify</a> \n";
+					}
 				}
 				if ($isteacher || ($allowdel && $ownerid[$child]==$userid && !isset($children[$child]))) {
 					echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&remove=$child\">Remove</a> \n";

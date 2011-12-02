@@ -601,24 +601,27 @@
 		echo '</select></p>';
 	}
 	echo '<p>';
+	$toshow = array();
 	if (($myrights > 5 && time()<$postby) || $isteacher) {
-		echo "<a href=\"thread.php?page=$page&cid=$cid&forum=$forumid&modify=new\">Add New Thread</a>\n";
+		$toshow[] =  "<a href=\"thread.php?page=$page&cid=$cid&forum=$forumid&modify=new\">Add New Thread</a>\n";
 	}
 	if ($isteacher) {
-		echo " | <a href=\"postsbyname.php?page=$page&cid=$cid&forum=$forumid\">List Posts by Name</a>";
+		$toshow[] =  "<a href=\"postsbyname.php?page=$page&cid=$cid&forum=$forumid\">List Posts by Name</a>";
 	}
 	
 	if ($page<0) {
-		echo " | <a href=\"thread.php?cid=$cid&forum=$forumid&page=1\">Show All</a>";
+		$toshow[] =  "<a href=\"thread.php?cid=$cid&forum=$forumid&page=1\">Show All</a>";
 	} else {
 		if (count($newpost)>0) {
-			echo " | <a href=\"thread.php?cid=$cid&forum=$forumid&page=-1\">Limit to New</a>";
+			$toshow[] =  "<a href=\"thread.php?cid=$cid&forum=$forumid&page=-1\">Limit to New</a>";
 		}
-		echo " | <a href=\"thread.php?cid=$cid&forum=$forumid&page=-2\">Limit to Flagged</a>";
+		$toshow[] =  "<a href=\"thread.php?cid=$cid&forum=$forumid&page=-2\">Limit to Flagged</a>";
 	} 
 	if (count($newpost)>0) {
-		echo " | <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid&markallread=true\">Mark all Read</a>";
+		$toshow[] =  "<a href=\"thread.php?page=$page&cid=$cid&forum=$forumid&markallread=true\">Mark all Read</a>";
 	}
+	
+	echo implode(' | ',$toshow);
 	
 	echo "</p>";
 	
@@ -701,7 +704,7 @@
 				echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggletagged({$line['id']});return false;\" />";
 			}
 		}
-		if ($isteacher || ($line['userid']==$userid && $allowmod)) {
+		if ($isteacher || ($line['userid']==$userid && $allowmod && time()<$postby)) {
 			echo "<a href=\"thread.php?page=$page&cid=$cid&forum={$line['forumid']}&modify={$line['id']}\">Modify</a> ";
 		} 
 		if ($isteacher || ($allowdel && $line['userid']==$userid && $posts==0)) {
