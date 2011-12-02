@@ -66,7 +66,7 @@ if (!(isset($teacherid))) {
 		$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
 		exit;
 	} else {
 		$query = "SELECT title FROM imas_inlinetext WHERE id='{$_GET['id']}'";

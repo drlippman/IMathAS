@@ -90,12 +90,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			
 		}
 		
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-viewasid.php?cid=$cid&asid=$asid&uid=$uid");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-viewasid.php?cid=$cid&asid=$asid&uid=$uid");
 		
 	} else if (isset($_GET['clear'])) {
 		$query = "DELETE FROM imas_exceptions WHERE id='{$_GET['clear']}'";
 		mysql_query($query) or die("Query failed :$query " . mysql_error());
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-viewasid.php?cid=$cid&asid=$asid&uid=$uid");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-viewasid.php?cid=$cid&asid=$asid&uid=$uid");
 	} elseif (isset($_GET['aid']) && $_GET['aid']!='') {
 		$query = "SELECT startdate,enddate FROM imas_assessments WHERE id='{$_GET['aid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -119,7 +119,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}	
 	} 
 	//DEFAULT LOAD DATA MANIPULATION
-	$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/exception.php?cid={$_GET['cid']}&uid={$_GET['uid']}&asid=$asid";
+	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/exception.php?cid={$_GET['cid']}&uid={$_GET['uid']}&asid=$asid";
 
 	$query = "SELECT id,name from imas_assessments WHERE courseid='$cid' ORDER BY name";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());

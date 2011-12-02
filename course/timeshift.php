@@ -113,7 +113,7 @@ if (!(isset($teacherid))) {
 		$query = "UPDATE imas_calitems SET date=date+$shift WHERE courseid='$cid'";
 		mysql_query($query) or die("Query failed : $query" . mysql_error());
 			
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
 
 		exit;
 	} else { //DEFAULT DATA MANIPULATION

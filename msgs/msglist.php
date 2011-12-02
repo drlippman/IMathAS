@@ -278,7 +278,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 	
 	$pagetitle = "Messages";
 	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/msg.js\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = 'http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savetagged.php?cid=$cid';</script>";
+	$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '". $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savetagged.php?cid=$cid';</script>";
 	$placeinhead .= '<style type="text/css"> tr.tagged {background-color: #dff;}</style>';
 	require("../header.php");
 	$curdir = rtrim(dirname(__FILE__), '/\\');
@@ -358,7 +358,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 		}
 		echo "<div>$prevnext</div>\n";
 	}
-	$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/msglist.php?cid=$cid&filtercid=";
+	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/msglist.php?cid=$cid&filtercid=";
 	
 	if ($myrights > 5 && $cid>0) {
 		$query = "SELECT msgset FROM imas_courses WHERE id='$cid'";

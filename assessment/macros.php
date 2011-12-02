@@ -2031,6 +2031,7 @@ function formhoverover($label,$tip) {
 }
 
 function formpopup($label,$content,$width=600,$height=400,$type='link',$scroll='null',$id='popup') {
+	global $urlmode;
 	if ($scroll != null) {
 		$scroll = ','.$scroll;
 	}
@@ -2044,7 +2045,7 @@ function formpopup($label,$content,$width=600,$height=400,$type='link',$scroll='
 			return '<span class="link" onClick="popupwindow(\''.$id.'\',\''.str_replace('\'','\\\'',htmlentities($content)).'\','.$width.','.$height.$scroll.')">'.$label.'</span>';
 		} else if ($type=='button') {
 			if (substr($content,0,31)=='http://www.youtube.com/watch?v=') {
-				$content = "http://" . $_SERVER['HTTP_HOST'] . "$imasroot/assessment/watchvid.php?url=".urlencode($content);
+				$content = $urlmode . $_SERVER['HTTP_HOST'] . "$imasroot/assessment/watchvid.php?url=".urlencode($content);
 				$width = 660;
 				$height = 525;
 			}

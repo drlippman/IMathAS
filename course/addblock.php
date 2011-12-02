@@ -166,7 +166,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$itemorder = addslashes(serialize($items));
 	$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt=$blockcnt WHERE id='$cid';";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
+	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
 		
 	exit;
 } else { //it is a teacher but the form has not been posted

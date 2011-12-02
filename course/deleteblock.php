@@ -55,7 +55,7 @@ if (!(isset($_GET['cid']))) { //if the cid is missing go back to the index page
 		$obloc = array_search($obid,$obarr);
 		array_splice($obarr,$obloc,1);
 		setcookie('openblocks-'.$_GET['cid'],implode(',',$obarr));
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
 			
 	} else {
 		$blocktree = explode('-',$_GET['id']);

@@ -3,6 +3,11 @@
   //(c) 2008 David Lippman
 
 require("../config.php");
+if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') {
+ 	 $urlmode = 'https://';
+ } else {
+ 	 $urlmode = 'http://';
+ }
 $svgimgurl = "$imasroot/filter/graph/svgimg.php";
 $svgdloc = "$imasroot/javascript/d.svg";
 $editorloc = "$imasroot/editor";
@@ -49,14 +54,14 @@ if (!isset($_GET['userid'])) {
 	mysql_query($query) or die("Query failed : " . mysql_error());
 	$query = "DELETE FROM mc_sessions WHERE lastping<$old";
 	mysql_query($query) or die("Query failed : " . mysql_error());
-	//header("Location: http://" . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'].'?userid='.$mcsession['userid']);
+	//header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'].'?userid='.$mcsession['userid']);
 	//exit;
 } else {
 	/*if (!empty($_REQUEST['uname']) && !empty($_REQUEST['room'])) {
 		$query = "UPDATE mc_sessions SET name='{$_REQUEST['uname']}',room='{$_REQUEST['room']}' WHERE sessionid='$sessionid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		$_SESSION['roomname'] = $_REQUEST['roomname'];
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF']);
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF']);
 		exit;
 	}*/
 	$query = "SELECT * FROM mc_sessions WHERE userid='{$_GET['userid']}'";
@@ -119,7 +124,7 @@ if (isset($_REQUEST['update'])) {
 	
 } else {
 	$placeinhead = '<script type="text/javascript">if (typeof window.onload == "function") { var existing = window.onload; window.onload = function() { existing(); updatemsgs();};} else { window.onload = updatemsgs;}';
-	$placeinhead .= 'var postback = "http://'.$_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'].'?userid='.$mcsession['userid'] .'";</script>';
+	$placeinhead .= 'var postback = "'.$urlmode.$_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'].'?userid='.$mcsession['userid'] .'";</script>';
 	$useeditor = "addtxt";
 	require("header.php");
 ?>

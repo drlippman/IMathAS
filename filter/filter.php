@@ -72,7 +72,7 @@
 	}
 	
 	function filter($str) {
-		global $sessiondata,$userfullname;
+		global $sessiondata,$userfullname,$urlmode;
 		if (strip_tags($str)==$str) {
 			$str = str_replace("\n","<br/>\n",$str);
 		}
@@ -119,7 +119,7 @@
 			
 			if (preg_match_all($search, $str, $res, PREG_SET_ORDER)){
 				foreach ($res as $resval) {
-					$tag = '<script type="text/javascript" id="WolframAlphaScript'.$resval[1].'" src="http://www.wolframalpha.com/widget/widget.jsp?id='.$resval[1].'"></script>';
+					$tag = '<script type="text/javascript" id="WolframAlphaScript'.$resval[1].'" src="'.$urlmode.'//www.wolframalpha.com/widget/widget.jsp?id='.$resval[1].'"></script>';
 					$str = str_replace($resval[0], $tag, $str);
 				}
 			}
@@ -149,7 +149,7 @@
 				foreach ($res as $resval) {
 					if (!isset($GLOBALS['has_set_cdf_embed_script'])) {
 						$GLOBALS['has_set_cdf_embed_script'] = true;
-						$tag = '<script type="text/javascript" src="http://www.wolfram.com/cdf-player/plugin/v2.1/cdfplugin.js"></script><script type="text/javascript">var cdf = new cdfplugin();';
+						$tag = '<script type="text/javascript" src="'.$urlmode.'www.wolfram.com/cdf-player/plugin/v2.1/cdfplugin.js"></script><script type="text/javascript">var cdf = new cdfplugin();';
 					} else {
 						$tag = '<script type="text/javascript">';
 					}

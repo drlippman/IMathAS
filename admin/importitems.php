@@ -459,7 +459,7 @@ if (!(isset($teacherid))) {
 			}
 			echo "<p><a href=\"$imasroot/course/course.php?cid=$cid\">Done</a></p>";
 		} else {
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
 		}
 		exit;	
 	} elseif ($_FILES['userfile']['name']!='') { //STEP 2 DATA MANIPULATION

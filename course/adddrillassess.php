@@ -48,7 +48,7 @@ if (mysql_num_rows($result)==0) {
 if (isset($_GET['clearatt'])) {
 	$query = "DELETE FROM imas_drillassess_sessions WHERE drillassessid=$daid";
 	mysql_query($query) or die("Query failed : " . mysql_error());
-	header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/adddrillassess.php?cid=$cid&daid=$daid");
+	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/adddrillassess.php?cid=$cid&daid=$daid");
 	exit;
 }
 if (isset($_GET['record'])) {
@@ -182,7 +182,7 @@ if (isset($_GET['record'])) {
 		writesessiondata();
 	}
 	
-	header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/adddrillassess.php?cid=$cid&daid=$daid");
+	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/adddrillassess.php?cid=$cid&daid=$daid");
 	exit;
 }
 
@@ -640,9 +640,9 @@ echo '<input type="submit" value="Update"/>';
 */
 echo '</form>';
 if ($daid>0) {
-	$url = 'http://' . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/drillassess.php?cid=$cid&amp;daid=$daid";
+	$url = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/drillassess.php?cid=$cid&amp;daid=$daid";
 	echo "<p>Link to drill assessment: <a href=\"$url\">$url</a></p>" ;
-	$url = 'http://' . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-viewdrill.php?cid=$cid&amp;daid=$daid";
+	$url = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-viewdrill.php?cid=$cid&amp;daid=$daid";
 	echo "<p>Link to view results: <a href=\"$url\">$url</a></p>" ;
 	
 }

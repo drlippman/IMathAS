@@ -50,7 +50,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else if (isset($_POST['add'])) {
 			include("modquestiongrid.php");	
 			if (isset($_GET['process'])) {
-				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
+				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
 				exit;
 			}
 		} else {
@@ -73,7 +73,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		
 			$query = "UPDATE imas_assessments SET itemorder='$itemorder' WHERE id='$aid'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
 			exit;
 		}	
 	}
@@ -84,7 +84,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
 			include("modquestiongrid.php");
 			if (isset($_GET['process'])) {
-				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
+				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
 				exit;
 			}
 		}
@@ -97,7 +97,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			$query = "UPDATE imas_questions SET withdrawn=0 WHERE assessmentid='$aid'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
 			exit;
 		} else {
 			$overwriteBody = 1; 
@@ -149,7 +149,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						mysql_query($query) or die("Query failed : " . mysql_error());
 					} 
 				}
-				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
+				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
 				exit;
 			} else {
 				$overwriteBody = 1;
@@ -238,7 +238,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 			
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
 			exit;
 			
 		} else {
@@ -269,7 +269,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		
 	}
 	
-	$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid";
+	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid";
 	
 	$placeinhead = "<script type=\"text/javascript\">
 		var previewqaddr = '$imasroot/course/testquestion.php?cid=$cid';
@@ -278,7 +278,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addquestions.js\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/junkflag.js\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = 'http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savelibassignflag.php';</script>";
+	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savelibassignflag.php';</script>";
 	
 	
 	//DEFAULT LOAD PROCESSING GOES HERE
@@ -800,7 +800,7 @@ if ($overwriteBody==1) {
 		var curcid = <?php echo $cid ?>; 
 		var curaid = <?php echo $aid ?>; 
 		var defpoints = <?php echo $defpoints ?>;
-		var AHAHsaveurl = 'http://<?php echo $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') ?>/addquestionssave.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>';
+		var AHAHsaveurl = '<?php echo $urlmode.$_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') ?>/addquestionssave.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>';
 		var curlibs = '<?php echo $searchlibs;?>';
 	</script>
 	<script type="text/javascript" src="<?php echo $imasroot ?>/javascript/tablesorter.js"></script>

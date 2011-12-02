@@ -64,7 +64,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				$query = "UPDATE imas_students SET section={$_POST['sec'][$stuid]},code={$_POST['code'][$stuid]} WHERE id='$stuid' AND courseid='$cid' ";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
 			exit;
 	
 		} else {
@@ -109,7 +109,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				}
 				$query .= ") VALUES ($vals)";
 				mysql_query($query) or die("Query failed : " . mysql_error());
-				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
+				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
 				exit;
 			}
 			
@@ -143,7 +143,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				}
 				$query .= ") VALUES ($vals)";
 				mysql_query($query) or die("Query failed : " . mysql_error());
-				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
+				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
 				exit;
 			}
 		} 
@@ -244,7 +244,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			echo "</p><p><a href=\"listusers.php?cid=$cid\">OK</a></p>";
 			require("../footer.php");
 			
-			//header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
+			//header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
 			exit;
 		} else {
 			$query = "SELECT imas_users.*,imas_students.code,imas_students.section,imas_students.locked,imas_students.timelimitmult FROM imas_users,imas_students ";
@@ -338,7 +338,7 @@ if ($fileToInclude==null || $fileToInclude=="") {
 $placeinhead .= "<script type=\"text/javascript\">";
 $placeinhead .= 'function chgsecfilter() { ';
 $placeinhead .= '       var sec = document.getElementById("secfiltersel").value; ';
-$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid";
+$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid";
 $placeinhead .= "       var toopen = '$address&secfilter=' + sec;\n";
 $placeinhead .= "  	window.location = toopen; \n";
 $placeinhead .= "}\n";

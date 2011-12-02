@@ -47,7 +47,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$query .= ') VALUES '.implode(',',$vals);
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		}
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
 		exit;
 	
 	} else if (isset($_POST['sourcecourse'])) {

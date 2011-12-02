@@ -63,10 +63,10 @@ if (isset($_GET['launch'])) {
 		$query = "SELECT courseid FROM imas_assessments WHERE id='$aid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$cid = mysql_result($result,0,0);
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id=$aid");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id=$aid");
 	} else if ($sessiondata['ltiitemtype']==1) { //is cid
 		$cid = $sessiondata['ltiitemid'];
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
 	}
 	exit;	
 } 
@@ -95,10 +95,10 @@ if (mysql_num_rows($result)==0) {
 			$query = "SELECT courseid FROM imas_assessments WHERE id='$aid'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$cid = mysql_result($result,0,0);
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id=$aid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id=$aid");
 		} else if ($sessiondata['ltiitemtype']==1) { //is cid
 			$cid = $sessiondata['ltiitemid'];
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
 		}
 		exit;	
 	} else {
@@ -181,9 +181,9 @@ if (!$promptforsettings && !$createnewsession && !($itemtype==0 && $tlwrds != ''
 	mysql_query($query) or die("Query failed : " . mysql_error());
 	
 	if ($sessiondata['ltiitemtype']==0) { //is aid
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id=$aid");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id=$aid");
 	} else if ($sessiondata['ltiitemtype']==1) { //is cid
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
 	}
 	exit;	
 	

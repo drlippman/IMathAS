@@ -41,7 +41,7 @@ if (isset($_POST['submit'])) {
 		mysql_query($query) or die("Query failed : " . mysql_error());
 	}
 	if ($_POST['submit']=='Save') {
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
 		exit;
 	}
 }

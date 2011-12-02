@@ -164,10 +164,10 @@ if (isset($sessiondata['drill']) && empty($_GET['id'])) {
 	
 	if ($sessiondata['drill']['mode']=='cntup' || $sessiondata['drill']['mode']=='cntdown') {
 		echo '<html><body>';
-		echo "<a href=\"http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php$public\">Start</a>";
+		echo "<a href=\"" . $urlmode. $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php$public\">Start</a>";
 		echo '</body></html>';
 	} else {
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php$public");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php$public");
 	}
 	exit;
 }
@@ -242,7 +242,7 @@ if (isset($n) && count($scores)==$n && !$showans) {  //if student has completed 
 	if ($minutes>0) { echo "$minutes minutes ";}
 	echo "$seconds seconds</p>";
 	echo "<p>Score:  $curscore out of ".count($scores)." possible</p>";
-	$addr = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php?id=$qsetid&cid=$cid&sa=$sa&n=$n$publica";
+	$addr = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php?id=$qsetid&cid=$cid&sa=$sa&n=$n$publica";
 	echo "<p><a href=\"$addr\">Again</a></p>";
 	if (!isset($sessiondata['drillresults'][$qsetid])) {
 		$sessiondata['drillresults'][$qsetid] = array();
@@ -262,7 +262,7 @@ if (isset($nc) && $curscore==$nc) {  //if student has completed their nc questio
 	echo "$seconds seconds</p>";
 	
 	echo "<p>".count($scores)." tries used</p>";
-	$addr = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php?id=$qsetid&cid=$cid&sa=$sa&nc=$nc$publica";
+	$addr = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php?id=$qsetid&cid=$cid&sa=$sa&nc=$nc$publica";
 	echo "<p><a href=\"$addr\">Again</a></p>";
 	if (!isset($sessiondata['drillresults'][$qsetid])) {
 		$sessiondata['drillresults'][$qsetid] = array();
@@ -290,7 +290,7 @@ if ($timesup == true) { //if time has expired
 	if ($hours>0) { echo "$hours hours ";}
 	if ($minutes>0) { echo "$minutes minutes ";}
 	echo "$seconds seconds</p>";
-	$addr = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php?id=$qsetid&cid=$cid&sa=$sa&t=$timelimit$publica";
+	$addr = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php?id=$qsetid&cid=$cid&sa=$sa&t=$timelimit$publica";
 	echo "<p><a href=\"$addr\">Again</a></p>";
 	if (!isset($sessiondata['drillresults'][$qsetid])) {
 		$sessiondata['drillresults'][$qsetid] = array();
@@ -497,7 +497,8 @@ function getpts($sc) {
 }
 
 function linkgenerator() {
-	$addr = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php";
+	global $urlmode;
+	$addr = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php";
 	?>
 <html>
 <head>

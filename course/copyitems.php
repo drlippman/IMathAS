@@ -73,7 +73,7 @@ if (!(isset($teacherid))) {
 			$query .= implode(',',$insarr);
 			mysql_query($query) or die("Query failed :$query " . mysql_error());
 		}
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
 		exit;	
 	} else if (isset($_GET['action']) && $_GET['action']=="copy") {
 		if (isset($_POST['copycourseopt'])) {
@@ -194,7 +194,7 @@ if (!(isset($teacherid))) {
 				$calitems[] = $row;
 			}
 		} else {
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
 	
 			exit;
 		}

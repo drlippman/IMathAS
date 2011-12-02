@@ -214,7 +214,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		mysql_query($query) or die("Query failed : " . mysql_error());
 	}
 	if ($_POST['submitbtn']=='Submit') {
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
 		exit;
 	}
 	
@@ -300,7 +300,7 @@ if ($overwriteBody==1) {
 <script type="text/javascript">
 function movefile(from) {
 	var to = document.getElementById('ms-'+from).value; 
-	var address = "http://<?php echo $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addinlinetext.php?cid=$cid&block=$block&id=" . $_GET['id'] ?>";
+	var address = "<?php echo $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addinlinetext.php?cid=$cid&block=$block&id=" . $_GET['id'] ?>";
 	
 	if (to != from) {
  	var toopen = address + '&movefile=' + from + '&movefileto=' + to;

@@ -281,9 +281,9 @@ if (!(isset($teacherid)) && $myrights<75) {
 		}
 
 		if ($isadmin || $isgrpadmin) {
-			$page_importSuccessMsg = "<a href=\"http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/admin.php\">Return to Admin page</a>";
+			$page_importSuccessMsg = "<a href=\"".$urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/admin.php\">Return to Admin page</a>";
 		} else {
-			$page_importSuccessMsg = "<a href=\" http://" . $_SERVER['HTTP_HOST']  . $imasroot . "/course/course.php?cid=$cid\">Return to Course page</a>";
+			$page_importSuccessMsg = "<a href=\"".$urlmode . $_SERVER['HTTP_HOST']  . $imasroot . "/course/course.php?cid=$cid\">Return to Course page</a>";
 		}
 	} elseif ($_FILES['userfile']['name']!='') { //FILE POSTED, STEP 2 DATA MANIPULATION
 		

@@ -67,7 +67,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				$message .= "<p>A new post has been started in forum $forumname in course $coursename</p>\r\n";
 				$message .= "<p>Subject:".stripslashes($_POST['subject'])."</p>";
 				$message .= "<p>Poster: $userfullname</p>";
-				$message .= "<a href=\"http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/$returnurl\">";
+				$message .= "<a href=\"" . $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/$returnurl\">";
 				$message .= "View Posting</a>\r\n";
 			}
 			while ($row = mysql_fetch_row($result)) {
@@ -80,7 +80,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			if (!$isteacher) { $query .= " AND userid='$userid'";}
 			mysql_query($query) or die("Query failed : $query " . mysql_error());
 		}
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/$returnurl");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/$returnurl");
 		exit;
 	} else { //display mod
 		$pagetitle = "Add/Modify Post";
@@ -207,9 +207,9 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 		}
 		if ($caller == "posts" && $lastpost) {
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
 		} else {
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/$returnurl");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/$returnurl");
 		}
 		exit;
 	} else {
@@ -288,7 +288,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				$query = "INSERT INTO imas_forum_threads (id,forumid,lastposttime,lastpostuser) VALUES ('{$_GET['move']}','{$_POST['movetof']}','{$row[0]}','{$row[1]}')";
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
 			}
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
 			exit;
 		} else if ($_POST['movetype']==1) { //move to different thread
 			if ($_POST['movetot'] != $threadid) {
@@ -308,7 +308,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				}
 			}
 			
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
 			exit;
 			
 		}

@@ -202,7 +202,7 @@
 			}
 			writesessiondata();
 			session_write_close();
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/showtest.php");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/showtest.php");
 			exit;
 		} else { //returning to test
 			
@@ -214,7 +214,7 @@
 				deleteasidfilesbyquery2('userid',$userid,$aid,1);
 				$query = "DELETE FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='$aid' LIMIT 1";
 				$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/showtest.php?cid={$_GET['cid']}&id=$aid");
+				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/showtest.php?cid={$_GET['cid']}&id=$aid");
 				exit;
 			}
 			//Return to test.
@@ -276,7 +276,7 @@
 			
 			writesessiondata();
 			session_write_close();
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/showtest.php");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/showtest.php");
 		}
 		exit;
 	} 
@@ -589,7 +589,7 @@
 			deleteasidfilesbyquery2('userid',$userid,$testsettings['id'],1);
 			$query = "DELETE FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='{$testsettings['id']}' LIMIT 1";
 			$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/showtest.php?cid={$testsettings['courseid']}&id={$testsettings['id']}");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/showtest.php?cid={$testsettings['courseid']}&id={$testsettings['id']}");
 			exit;	
 		}
 		
@@ -1654,7 +1654,7 @@ if (!isset($_POST['embedpostback'])) {
 		} else if ($testsettings['displaymethod'] == "Embed") {
 			
 			$intro = filter("<div>{$testsettings['intro']}</div>\n");
-			echo '<script type="text/javascript">var assesspostbackurl="http://'. $_SERVER['HTTP_HOST'] . $imasroot . '/assessment/showtest.php?embedpostback=true&action=scoreembed";</script>';
+			echo '<script type="text/javascript">var assesspostbackurl="' .$urlmode. $_SERVER['HTTP_HOST'] . $imasroot . '/assessment/showtest.php?embedpostback=true&action=scoreembed";</script>';
 			//using the full test scoreall action for timelimit auto-submits
 			echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=scoreall\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
 			echo '<div class="formcontents" style="margin-left:20px;">';

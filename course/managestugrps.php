@@ -32,7 +32,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$query = "INSERT INTO imas_stugroups (groupsetid,name) VALUES ('$grpsetid','{$_POST['grpname']}')";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		if (!isset($_POST['stutoadd'])) { //if not adding students also
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid&grpsetid={$_GET['grpsetid']}");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid&grpsetid={$_GET['grpsetid']}");
 			exit();
 		} else {
 			$_POST['addtogrpid'] = mysql_insert_id();
@@ -48,7 +48,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//if name is set
 			$query = "INSERT INTO imas_stugroupset (name,courseid) VALUES ('{$_POST['grpsetname']}','$cid')";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid");
 			exit();
 		}
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; Add Group Set";
@@ -57,7 +57,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (isset($_GET['confirm'])) {
 			//if name is set
 			deletegroupset($_GET['delgrpset']);
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid");
 			exit();
 		} else {
 			$query = "SELECT name FROM imas_stugroupset WHERE id='{$_GET['delgrpset']}'";
@@ -72,7 +72,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//if name is set
 			$query = "UPDATE imas_stugroupset SET name='{$_POST['grpsetname']}' WHERE id='{$_GET['rengrpset']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid");
 			exit();
 		} else {
 			$query = "SELECT name FROM imas_stugroupset WHERE id='{$_GET['rengrpset']}'";
@@ -108,7 +108,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 		}
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid");
 		exit();
 	} else if (isset($_GET['addstutogrp'])) {
 		//submitting list of students to add to a group
@@ -240,7 +240,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$query = "INSERT INTO imas_log (time,log) VALUES ($now,'".addslashes($loginfo)."')";
 					mysql_query($query) or die("Query failed : " . mysql_error());
 				}
-				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid&grpsetid={$_GET['grpsetid']}");
+				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid&grpsetid={$_GET['grpsetid']}");
 			}
 			exit();
 		}
@@ -255,7 +255,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (isset($_GET['confirm'])) {
 			//if name is set
 			deletegroup($_GET['delgrp'], $_POST['delposts']==1);
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid&grpsetid=$grpsetid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid&grpsetid=$grpsetid");
 			exit();
 		} else {
 			$query = "SELECT name FROM imas_stugroups WHERE id='{$_GET['delgrp']}'";
@@ -273,7 +273,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//if name is set
 			$query = "UPDATE imas_stugroups SET name='{$_POST['grpname']}' WHERE id='{$_GET['rengrp']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid&grpsetid=$grpsetid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid&grpsetid=$grpsetid");
 			exit();
 		} else {
 			$query = "SELECT name FROM imas_stugroups WHERE id='{$_GET['rengrp']}'";
@@ -289,7 +289,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (isset($_GET['confirm'])) {
 			//if name is set
 			removeallgroupmembers($_GET['removeall']);
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid&grpsetid=$grpsetid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid&grpsetid=$grpsetid");
 			exit();
 		} else {
 			$query = "SELECT name FROM imas_stugroups WHERE id='{$_GET['removeall']}'";
@@ -306,7 +306,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (isset($_GET['confirm'])) {
 			//if name is set
 			removegroupmember($_GET['grpid'],$_GET['remove']);
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid&grpsetid=$grpsetid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid&grpsetid=$grpsetid");
 			exit();
 		} else {
 			$query = "SELECT LastName, FirstName FROM imas_users WHERE id='{$_GET['remove']}'";

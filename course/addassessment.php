@@ -59,7 +59,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			$query = "UPDATE imas_questions SET withdrawn=0 WHERE assessmentid='{$_GET['id']}'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addassessment.php?cid={$_GET['cid']}&id={$_GET['id']}");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addassessment.php?cid={$_GET['cid']}&id={$_GET['id']}");
 			exit;
 		} else {
 			$overwriteBody = 1;
@@ -242,11 +242,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			if ($from=='gb') {
-				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid={$_GET['cid']}");
+				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid={$_GET['cid']}");
 			} else if ($from=='mcd') {
-				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/masschgdates.php?cid={$_GET['cid']}");
+				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/masschgdates.php?cid={$_GET['cid']}");
 			} else {
-				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
+				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
 			}
 			exit;
 		} else { //add new
@@ -287,7 +287,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			
 			$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid';";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid={$_GET['cid']}&aid=$newaid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid={$_GET['cid']}&aid=$newaid");
 			exit;
 		}
 		

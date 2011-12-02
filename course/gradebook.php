@@ -164,7 +164,7 @@ if ($isteacher) {
 		}
 	}
 	if (isset($_POST['usrcomments']) || isset($_POST['score']) || isset($_POST['newscore'])) {
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?{$_SERVER['QUERY_STRING']}");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?{$_SERVER['QUERY_STRING']}");
 		exit;
 	}
 }
@@ -180,7 +180,7 @@ if ($canviewall) {
 	$placeinhead .= "<script type=\"text/javascript\">";
 	$placeinhead .= 'function chgfilter() { ';
 	$placeinhead .= '       var cat = document.getElementById("filtersel").value; ';
-	$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid";
+	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid";
 	
 	$placeinhead .= "       var toopen = '$address&catfilter=' + cat;\n";
 	$placeinhead .= "  	window.location = toopen; \n";
@@ -188,27 +188,27 @@ if ($canviewall) {
 	if ($isteacher) { 
 		$placeinhead .= 'function chgsecfilter() { ';
 		$placeinhead .= '       var sec = document.getElementById("secfiltersel").value; ';
-		$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid";
+		$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid";
 		
 		$placeinhead .= "       var toopen = '$address&secfilter=' + sec;\n";
 		$placeinhead .= "  	window.location = toopen; \n";
 		$placeinhead .= "}\n";
 		$placeinhead .= 'function chgnewflag() { ';
-		$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid&togglenewflag=true";
+		$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid&togglenewflag=true";
 		
 		$placeinhead .= "       basicahah('$address','newflag','Recording...');\n";
 		$placeinhead .= "}\n";
 	}
 	$placeinhead .= 'function chgtoggle() { ';
 	$placeinhead .= "	var altgbmode = 10000*document.getElementById(\"toggle4\").value + 1000*($totonleft+$avgontop) + 100*(document.getElementById(\"toggle1\").value+ document.getElementById(\"toggle5\").value) + 10*document.getElementById(\"toggle2\").value + 1*document.getElementById(\"toggle3\").value; ";
-	$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid&gbmode=";
+	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid&gbmode=";
 	$placeinhead .= "	var toopen = '$address' + altgbmode;\n";
 	$placeinhead .= "  	window.location = toopen; \n";
 	$placeinhead .= "}\n";
 	if ($isteacher) {
 		$placeinhead .= 'function chgexport() { ';
 		$placeinhead .= "	var type = document.getElementById(\"exportsel\").value; ";
-		$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-export.php?stu=$stu&cid=$cid&";
+		$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-export.php?stu=$stu&cid=$cid&";
 		$placeinhead .= "	var toopen = '$address';";
 		$placeinhead .= "	if (type==1) { toopen = toopen+'export=true';}\n";
 		$placeinhead .= "	if (type==2) { toopen = toopen+'emailgb=me';}\n";

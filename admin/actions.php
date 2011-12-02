@@ -451,7 +451,7 @@ switch($_GET['action']) {
 			//$query .= "AND imas_teachers.userid=imas_users.id AND imas_users.groupid='$groupid'";
 		}
 		mysql_query($query) or die("Query failed : " . mysql_error());
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/forms.php?action=chgteachers&id={$_GET['cid']}");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/forms.php?action=chgteachers&id={$_GET['cid']}");
 		exit;
 	case "addteacher":
 		if ($myrights < 40) { echo "You don't have the authority for this action"; break;}
@@ -464,7 +464,7 @@ switch($_GET['action']) {
 		}
 		$query = "INSERT INTO imas_teachers (userid,courseid) VALUES ('{$_GET['tid']}','{$_GET['cid']}')";
 		mysql_query($query) or die("Query failed : " . mysql_error());
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/forms.php?action=chgteachers&id={$_GET['cid']}");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/forms.php?action=chgteachers&id={$_GET['cid']}");
 		exit;
 	case "importmacros":
 		if ($myrights < 100 || !$allowmacroinstall) { echo "You don't have the authority for this action"; break;}
@@ -714,9 +714,9 @@ switch($_GET['action']) {
 
 session_write_close();
 if (isset($_GET['cid'])) {
-	header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid={$_GET['cid']}");
+	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid={$_GET['cid']}");
 } else {
-	header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/admin.php");
+	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/admin.php");
 }
 exit;
 ?>

@@ -96,7 +96,7 @@ if ($myrights<20) {
 				}
 				
 			}
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/manageqset.php?cid=$cid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/manageqset.php?cid=$cid");
 			
 			exit;
 		} else {
@@ -132,7 +132,7 @@ if ($myrights<20) {
 				}
 		
 			}
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/manageqset.php?cid=$cid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/manageqset.php?cid=$cid");
 			
 			exit;
 		} else {
@@ -351,7 +351,7 @@ if ($myrights<20) {
 */
 				
 			}
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/manageqset.php?cid=$cid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/manageqset.php?cid=$cid");
 			
 			exit;
 		} else {
@@ -440,7 +440,7 @@ if ($myrights<20) {
 				}
 				
 			}
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/manageqset.php?cid=$cid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/manageqset.php?cid=$cid");
 			
 			exit;
 		} else {
@@ -479,7 +479,7 @@ if ($myrights<20) {
 				}
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
 			}
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/manageqset.php?cid=$cid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/manageqset.php?cid=$cid");
 			exit;
 		} else {
 			$pagetitle = "Change Question Rights";
@@ -504,7 +504,7 @@ if ($myrights<20) {
 					$query = "UPDATE imas_questionset SET deleted=1 WHERE id='{$_GET['remove']}'";
 					//$query = "DELETE FROM imas_questionset WHERE id='{$_GET['remove']}'";
 				} else {
-					header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/manageqset.php?cid=$cid");
+					header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/manageqset.php?cid=$cid");
 					exit;
 				}
 
@@ -522,7 +522,7 @@ if ($myrights<20) {
 				//delqimgs($_GET['remove']);
 			}
 			
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/manageqset.php?cid=$cid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/manageqset.php?cid=$cid");
 			
 			exit;
 		} else {
@@ -550,7 +550,7 @@ if ($myrights<20) {
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 			
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/manageqset.php?cid=$cid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/manageqset.php?cid=$cid");
 			exit;
 		} else {
 			$pagetitle = "Transfer Ownership";
@@ -838,11 +838,11 @@ if ($myrights<20) {
 
 /******* begin html output ********/
 $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/junkflag.js\"></script>";
-$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = 'http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savelibassignflag.php';</script>";
+$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '".$urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savelibassignflag.php';</script>";
 	
 require("../header.php");
 
-$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
+$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
 
 if ($overwriteBody==1) {
 	echo $body;

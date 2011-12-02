@@ -107,8 +107,8 @@
 			$message  = "<h4>This is an automated message from $installname.  Do not respond to this email</h4>\r\n";
 			$message .= "<p>To complete your $installname registration, please click on the following link, or copy ";
 			$message .= "and paste it into your webbrowser:</p>\r\n";
-			$message .= "<a href=\"http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=confirm&id=$id\">";
-			$message .= "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=confirm&id=$id</a>\r\n";
+			$message .= "<a href=\"" . $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=confirm&id=$id\">";
+			$message .= $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=confirm&id=$id</a>\r\n";
 			mail($_POST['email'],'IMathAS Confirmation',$message,$headers);
 			echo "<html><body>\n";
 			echo "Registration recorded.  You should shortly receive an email with confirmation instructions.";
@@ -153,12 +153,12 @@
 			}
 					
 				
-			echo "You can now <a href=\"http://";
-			echo $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php";
+			echo "You can now <a href=\"";
+			echo $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php";
 			echo "\">return to the login page</a> and login with your new username and password</p>";
 			require("footer.php");
 		}
-		//header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php");
+		//header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php");
 		exit;
 	} else if ($_GET['action']=="confirm") {
 		require_once("config.php");
@@ -189,14 +189,14 @@
 				$message .= "<p>Your username was entered in the Reset Password page.  If you did not do this, you may ignore and delete this message. ";
 				$message .= "If you did request a password reset, click the link below, or copy and paste it into your browser's address bar.  Your ";
 				$message .= "password will then be reset to: password.</p>";
-				$message .= "<a href=\"http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=resetpw&id=$id&code=$code\">";
-				$message .= "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=resetpw&id=$id&code=$code</a>\r\n";
+				$message .= "<a href=\"" .$urlmode. $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=resetpw&id=$id&code=$code\">";
+				$message .= $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=resetpw&id=$id&code=$code</a>\r\n";
 				mail(mysql_result($result,0,2),'Password Reset Request',$message,$headers);
 			} else {
 				echo "Invalid Username.  <a href=\"index.php$gb\">Try again</a>";
 				exit;
 			}
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php");
 		} else if (isset($_GET['code'])) {
 			$query = "SELECT password FROM imas_users WHERE id='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -459,7 +459,7 @@
 	if ($isgb) {
 		echo '<html><body>Changes Recorded.  <input type="button" onclick="top.GB_hide()" value="Done" /></body></html>';		
 	} else {
-	header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php");
+	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php");
 	}
 	
 	

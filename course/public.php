@@ -53,8 +53,8 @@
 		}
 	} 
 	
-	$jsAddress1 = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/public.php?cid={$_GET['cid']}";
-	$jsAddress2 = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
+	$jsAddress1 = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/public.php?cid={$_GET['cid']}";
+	$jsAddress2 = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
 	
 	$openblocks = Array(0);
 	$prevloadedblocks = array(0);

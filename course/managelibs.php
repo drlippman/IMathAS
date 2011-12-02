@@ -110,7 +110,7 @@ if ($myrights<20) {
 				}
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
 			
 			exit;
 		} else {
@@ -146,7 +146,7 @@ if ($myrights<20) {
 				}
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
 			}
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
 			
 			exit;
 			
@@ -200,7 +200,7 @@ if ($myrights<20) {
 				}
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
 			}
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
 			
 			exit;
 		} else {
@@ -243,7 +243,7 @@ if ($myrights<20) {
 					mysql_query($query) or die("Query failed : $query " . mysql_error());
 				}
 			}
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
 			
 			exit;
 		} else {
@@ -300,7 +300,7 @@ if ($myrights<20) {
 				}
 			}
 						
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
 			
 			exit;
 		} else {
@@ -329,7 +329,7 @@ if ($myrights<20) {
 				$query .= " AND ownerid='$userid'";
 			}
 			mysql_query($query) or die("Query failed : $query " . mysql_error());
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
 			exit;
 		} else {
 			$pagetitle = "Transfer Library";
@@ -362,7 +362,7 @@ if ($myrights<20) {
 					$query = "INSERT INTO imas_libraries (uniqueid,adddate,lastmoddate,name,ownerid,userights,sortorder,parent,groupid) VALUES ";
 					$query .= "($uqid,$now,$now,'{$_POST['name']}','$userid','{$_POST['rights']}','{$_POST['sortorder']}','{$_POST['libs']}','$groupid')";
 					mysql_query($query) or die("Query failed : " . mysql_error());
-					header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
+					header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
 					exit;
 				}
 			} else {
@@ -380,7 +380,7 @@ if ($myrights<20) {
 				}
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				
-				header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
+				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
 				exit;
 			}
 		} else {

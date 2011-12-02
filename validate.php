@@ -4,7 +4,7 @@
  header('P3P: CP="ALL CUR ADM OUR"');
  $curdir = rtrim(dirname(__FILE__), '/\\');
  if (!file_exists("$curdir/config.php")) {
-	 header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/install.php");
+	 header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/install.php");
  }
  require_once("$curdir/config.php");
  if (isset($sessionpath) && $sessionpath!='') { session_save_path($sessionpath);}
@@ -12,6 +12,11 @@
  ini_set('auto_detect_line_endings',true);
  session_start();
  $sessionid = session_id();
+ if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') {
+ 	 $urlmode = 'https://';
+ } else {
+ 	 $urlmode = 'http://';
+ }
  
  $myrights = 0;
  $ispublic = false;
@@ -65,7 +70,7 @@
 			 $query = "UPDATE imas_sessions SET sessiondata='$enc' WHERE sessionid='$sessionid'";
 			 mysql_query($query) or die("Query failed : " . mysql_error());
 			 
-			 header("Location: http://" . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . $querys);
+			 header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . $querys);
 			 exit;
 		 } else {
 			 require("header.php");
@@ -260,7 +265,7 @@ END;
 		 } else {
 			 $querys = '';
 		 }
-		 header("Location: http://" . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . $querys);	 
+		 header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . $querys);	 
 	 } else {
 		 if (empty($_SESSION['challenge'])) {
 			 $badsession = true;
@@ -290,7 +295,7 @@ END;
 		/*
 		$query = "DELETE FROM imas_sessions WHERE userid='$userid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . $querys);
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . $querys);
 		exit;
 		*/
 	}
@@ -315,7 +320,7 @@ END;
 		error_reporting(E_ALL);
 	}
 	if (isset($sessiondata['isdiag']) && strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) {
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php");
 	}
 	if (isset($sessiondata['ltiitemtype'])) {
 		$flexwidth = true;
@@ -330,7 +335,7 @@ END;
 				$query = "SELECT courseid FROM imas_assessments WHERE id='{$sessiondata['ltiitemid']}'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				$cid = mysql_result($result,0,0);
-				header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}");
+				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}");
 				exit;
 			}
 		}
@@ -436,7 +441,7 @@ END;
 					echo '<p>This course is currently locked for an assessment</p>';
 					echo "<p><a href=\"$imasroot/assessment/showtest.php?cid={$_GET['cid']}&id=$lockaid\">Go to Assessment</a> | <a href=\"$imasroot/index.php\">Go Back</a></p>";
 					require("footer.php");
-					//header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid={$_GET['cid']}&id=$lockaid");
+					//header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid={$_GET['cid']}&id=$lockaid");
 					exit;
 				}
 			}

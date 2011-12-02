@@ -61,11 +61,11 @@
 			}
 		}
 		if (isset($_POST['save']) && $_POST['save']=='Save Grades and View Previous') {
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/posts.php?page=$page&cid=$cid&forum=$forumid&thread={$_POST['prevth']}");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/posts.php?page=$page&cid=$cid&forum=$forumid&thread={$_POST['prevth']}");
 		} else if (isset($_POST['save']) && $_POST['save']=='Save Grades and View Next') {
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/posts.php?page=$page&cid=$cid&forum=$forumid&thread={$_POST['nextth']}");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/posts.php?page=$page&cid=$cid&forum=$forumid&thread={$_POST['nextth']}");
 		} else {
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
 		}
 			exit;	
 	}
@@ -265,7 +265,7 @@
 					$message .= "<p>A new thread has been started in forum $forumname in course $coursename</p>\r\n";
 					$message .= "<p>Subject:".stripslashes($_POST['subject'])."</p>";
 					$message .= "<p>Poster: $userfullname</p>";
-					$message .= "<a href=\"http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/posts.php?cid=$cid&forum=$forumid&thread=$threadid\">";
+					$message .= "<a href=\"". $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/posts.php?cid=$cid&forum=$forumid&thread=$threadid\">";
 					$message .= "View Posting</a>\r\n";
 				}
 				while ($row = mysql_fetch_row($result)) {
@@ -285,7 +285,7 @@
 					mysql_query($query) or die("Query failed : $query " . mysql_error());
 				}
 			}
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
 			exit;
 		} else { //display mod
 			$pagetitle = "Add/Modify Thread";
@@ -421,7 +421,7 @@
 				$query = "DELETE FROM imas_forum_views WHERE threadid='{$_GET['remove']}'";
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
 			}
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
 			exit;
 		} else {
 			$pagetitle = "Remove Thread";
@@ -450,7 +450,7 @@
 	$pagetitle = "Threads";
 	$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/thread.js\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = 'http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savetagged.php?cid=$cid';</script>";
+	$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savetagged.php?cid=$cid';</script>";
 	require("../header.php");
 	
 	

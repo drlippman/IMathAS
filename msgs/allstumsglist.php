@@ -102,7 +102,7 @@
 		echo $prevnext;
 		echo "</span>\n";
 	}
-	$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/allstumsglist.php?cid=$cid&filterstu=";
+	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/allstumsglist.php?cid=$cid&filterstu=";
 	
 ?>
 <script type="text/javascript">

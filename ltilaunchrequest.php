@@ -29,11 +29,12 @@ function reporterror($err) {
 }
 
 function returnstudentnotice($err) {
+	global $urlmode;
 	//need to create url that will deliver this notice?
 	//echo $not;
 	$host = $_SERVER['HTTP_HOST'];
 	$uri = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
-	$theurl = "http://$host$uri/ltilaunch.php?stuerr=".urlencode($nerr);
+	$theurl = "$urlmode$host$uri/ltilaunch.php?stuerr=".urlencode($nerr);
 	
 	if ( $_REQUEST['action'] == 'launchresolve' ) {
 	    echo "<launchResponse>\n";
@@ -216,7 +217,7 @@ mysql_query($query) or die("Query failed : " . mysql_error());
 $host = $_SERVER['HTTP_HOST'];
 $uri = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
 
-$theurl = "http://$host$uri/ltilaunch.php?id=".$accessid.'&code='.$pass;
+$theurl = "$urlmode$host$uri/ltilaunch.php?id=".$accessid.'&code='.$pass;
 
 if ( $_REQUEST['action'] == 'launchresolve' ) {
     echo "<launchResponse>\n";

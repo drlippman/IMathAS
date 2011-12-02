@@ -1,6 +1,11 @@
 <?php
 	$dbsetup = true; //to prevent database connection
 	require("../../config.php");
+	if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') {
+		 $urlmode = 'https://';
+	 } else {
+		 $urlmode = 'http://';
+	 }
 	$imgdir = 'imgs/'; //relative to current dir
 	$host  = $_SERVER['HTTP_HOST'];
 	$uri  = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
@@ -23,5 +28,5 @@
 			$AS->outputimage($imgdir.$fn.'.png');
 		}
 	}
-	header("Location: http://$host$uri/$imgdir$fn.png");
+	header("Location: $urlmode$host$uri/$imgdir$fn.png");
 ?>

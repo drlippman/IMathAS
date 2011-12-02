@@ -80,7 +80,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		$itemlist = addslashes(serialize($items));
 		$query = "UPDATE imas_courses SET itemorder='$itemlist' WHERE id='{$_GET['cid']}'";
 		mysql_query($query) or die("Query failed : " . mysql_error()); 
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
 	}
 		
 	$query = "SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,chatset,topbar,cploc FROM imas_courses WHERE id='$cid'";
@@ -197,8 +197,8 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		}
 	}
 	//DEFAULT DISPLAY PROCESSING
-	$jsAddress1 = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}";
-	$jsAddress2 = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
+	$jsAddress1 = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}";
+	$jsAddress2 = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
 	
 	$openblocks = Array(0);
 	$prevloadedblocks = array(0);

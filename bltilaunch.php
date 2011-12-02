@@ -95,14 +95,14 @@ if (isset($_GET['launch'])) {
 		$query = "SELECT courseid FROM imas_assessments WHERE id='$aid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$cid = mysql_result($result,0,0);
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id=$aid");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id=$aid");
 	} else if ($sessiondata['ltiitemtype']==1) { //is cid
 		$cid = $sessiondata['ltiitemid'];
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
 	} else if ($sessiondata['ltiitemtype']==2) {
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/index.php");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/index.php");
 	} else { //will only be instructors hitting this option
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/ltihome.php");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/ltihome.php");
 	}
 	exit;	
 } else if (isset($_GET['accessibility'])) {
@@ -549,7 +549,7 @@ if ($askforuserinfo == true) {
 	if (!empty($_REQUEST['tool_consumer_instance_description'])) {
 		$_SESSION['ltiorgname'] = $_REQUEST['tool_consumer_instance_description'];
 	} 	
-	header("Location: http://" . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . "?userinfo=ask");
+	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . "?userinfo=ask");
 	exit;	
 	
 }
@@ -827,17 +827,17 @@ if (!$promptforsettings && !$createnewsession && !($keyparts[0]=='aid' && $tlwrd
 	mysql_query($query) or die("Query failed : " . mysql_error());
 	
 	if ($keyparts[0]=='aid') { //is aid
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id=$aid");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id=$aid");
 	} else if ($keyparts[0]=='cid') { //is cid
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
 	} else if ($keyparts[0]=='sso') {
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/index.php");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/index.php");
 	} else { //will only be instructors hitting this option
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/ltihome.php");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/ltihome.php");
 	}
 	exit;	
 } else {
-	header("Location: http://" . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . "?accessibility=ask");
+	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . "?accessibility=ask");
 	exit;	
 }
 

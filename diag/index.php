@@ -82,7 +82,7 @@ END;
 		   setcookie(session_name(), '', time()-42000, '/');
 	   }
 	   session_destroy();
-	   header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php?id=$diagid");
+	   header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php?id=$diagid");
 	   exit;
 	}
 
@@ -242,7 +242,7 @@ if (isset($_POST['SID'])) {
 			$query = "UPDATE imas_users SET lastaccess=$now WHERE id=$userid";
 		 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$pcid&id=$paid");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$pcid&id=$paid");
 			exit;
 
 		//} else {
@@ -270,7 +270,7 @@ if (isset($_POST['SID'])) {
 	$aids = explode(',',$line['aidlist']);
 	$paid = $aids[$_POST['course']];
 	
-	header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$pcid&id=$paid");
+	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$pcid&id=$paid");
 	exit;
 }
 

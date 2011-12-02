@@ -236,7 +236,7 @@ if (!(isset($teacherid))) {
 		if (isset($_POST['chgendmsg'])) {
 			include("assessendmsg.php");
 		} else {
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
 		}
 		exit;
 		 

@@ -142,7 +142,7 @@ Read   Deleted   Deleted by Sender   Tagged
 		}
 		echo "<div>$prevnext</div>\n";
 	}
-	$address = "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/sentlist.php?cid=$cid&filtercid=";
+	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/sentlist.php?cid=$cid&filtercid=";
 	
 	
 ?>

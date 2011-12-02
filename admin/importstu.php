@@ -175,9 +175,9 @@ if (!(isset($teacherid)) && $myrights<100) {
 		$body = "Import Successful<br/>\n";
 		$body .= "<p>";
 		if ($isadmin) {
-			$body .= "<a href=\"http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/admin.php\">Back to Admin Page";
+			$body .= "<a href=\"". $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/admin.php\">Back to Admin Page";
 		} else {
-			$body .= "<a href=\"http://" . $_SERVER['HTTP_HOST']  . $imasroot . "/course/course.php?cid=$cid\">Back to Course Page";
+			$body .= "<a href=\"". $urlmode . $_SERVER['HTTP_HOST']  . $imasroot . "/course/course.php?cid=$cid\">Back to Course Page";
 		}
 		$body .= "</a></p>\n";
 

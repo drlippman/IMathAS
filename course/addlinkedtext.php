@@ -199,7 +199,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$body .= "\">Try Again</a></p>\n";
 			echo "<html><body>$body</body></html>";
 		} else {
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
 		}
 		exit;
 	} else {

@@ -345,8 +345,9 @@ function deletealluserfiles($uid) {
 }
 
 function getuserfileurl($key) {
+	global $urlmode;
 	if ($GLOBALS['filehandertype'] == 's3') {
-		return "http://s3.amazonaws.com/{$GLOBALS['AWSbucket']}/$key";
+		return $urlmode."s3.amazonaws.com/{$GLOBALS['AWSbucket']}/$key";
 	} else {
 		return "$imasroot/filestore/$key";
 	}

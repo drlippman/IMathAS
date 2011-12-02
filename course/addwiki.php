@@ -36,7 +36,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$id = $_GET['id'];
 			$query = "DELETE FROM imas_wiki_revisions WHERE wikiid='$id'";	
 			mysql_query($query) or die("Query failed : " . mysql_error());
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addwiki.php?cid=$cid&id=$id");	
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addwiki.php?cid=$cid&id=$id");	
 			exit;
 		} else {
 			$curBreadcrumb .= " &gt; <a href=\"addwiki.php?cid=$cid&id=$id\">Modify Wiki</a>";
@@ -111,7 +111,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			
 			
 		}
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
 			
 		exit;
 	} else { //INITIAL LOAD DATA PROCESS

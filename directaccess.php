@@ -6,6 +6,11 @@
 		echo "Invalid address.  Address must be directaccess.php?cid=###, where ### is your courseid";
 		exit;
 	}
+	 if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') {
+		 $urlmode = 'https://';
+	 } else {
+		 $urlmode = 'http://';
+	 }
 	if (isset($_SERVER['QUERY_STRING'])) {
 		 $querys = '?'.$_SERVER['QUERY_STRING'];
 	 } else {
@@ -67,8 +72,8 @@
 				$message  = "<h4>This is an automated message from $installname.  Do not respond to this email</h4>\r\n";
 				$message .= "<p>To complete your $installname registration, please click on the following link, or copy ";
 				$message .= "and paste it into your webbrowser:</p>\r\n";
-				$message .= "<a href=\"http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=confirm&id=$id\">";
-				$message .= "http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=confirm&id=$id</a>\r\n";
+				$message .= "<a href=\"". $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=confirm&id=$id\">";
+				$message .= $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=confirm&id=$id</a>\r\n";
 				mail($_POST['email'],'IMathAS Confirmation',$message,$headers);
 				echo "<html><body>\n";
 				echo "Registration recorded.  You should shortly receive an email with confirmation instructions.";
@@ -92,7 +97,7 @@
 			if (strlen($enrollkey)==0 || (isset($_POST['ekey']) && $_POST['ekey']==$enrollkey)) {
 				$query = "INSERT INTO imas_students (userid,courseid) VALUES ('$userid','{$_GET['cid']}');";
 				mysql_query($query) or die("Query failed : " . mysql_error());
-				header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . '/course/course.php?cid='. $_GET['cid']);
+				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . '/course/course.php?cid='. $_GET['cid']);
 				exit;
 			} else {
 				require("header.php");
@@ -105,7 +110,7 @@
 				exit;
 			}
 		} else {
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . '/course/course.php?cid='. $_GET['cid']);
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . '/course/course.php?cid='. $_GET['cid']);
 			exit;
 		}
 	} else { //not verified

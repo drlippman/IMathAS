@@ -118,7 +118,7 @@ if (!(isset($teacherid))) {
 			}
 		}
 		unlink($dir.$filename);
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/chgoffline.php?cid=$cid");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/chgoffline.php?cid=$cid");
 		exit;
 	} else if (isset($_FILES['userfile']['name']) && $_FILES['userfile']['name']!='') {
 		//upload file

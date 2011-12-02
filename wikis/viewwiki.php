@@ -41,7 +41,7 @@ if ($cid==0) {
 		if ($_GET['delall']=='true') {
 			$query = "DELETE FROM imas_wiki_revisions WHERE wikiid='$id' AND stugroupid='$groupid'";	
 			mysql_query($query) or die("Query failed : " . mysql_error());
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewwiki.php?cid=$cid&id=$id&grp=$groupid");	
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewwiki.php?cid=$cid&id=$id&grp=$groupid");	
 			exit;
 		} else {
 			$curBreadcrumb .= " &gt; <a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid\">View Wiki</a>";
@@ -57,7 +57,7 @@ if ($cid==0) {
 				$query = "DELETE FROM imas_wiki_revisions WHERE wikiid='$id' AND stugroupid='$groupid' AND id<$curid";
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
 			}
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewwiki.php?cid=$cid&id=$id&grp=$groupid");	
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewwiki.php?cid=$cid&id=$id&grp=$groupid");	
 			exit;
 		} else {
 			$curBreadcrumb .= " &gt; <a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid\">View Wiki</a>";
@@ -83,7 +83,7 @@ if ($cid==0) {
 				$query = "DELETE FROM imas_wiki_revisions WHERE wikiid='$id' AND stugroupid='$groupid' AND id>$revision";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
-			header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewwiki.php?cid=$cid&id=$id");	
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewwiki.php?cid=$cid&id=$id");	
 			exit;
 		} else {
 			$curBreadcrumb .= " &gt; <a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid\">View Wiki</a>";
@@ -197,11 +197,11 @@ if ($cid==0) {
  /******* begin html output ********/
  $pagetitle = "View Wiki: $wikiname";
  $placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/viewwiki.js?v=051710"></script>';
- $addr = 'http://'.$_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\').'/wikirev.php?cid='.$cid.'&id='.$id;
+ $addr = $urlmode.$_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\').'/wikirev.php?cid='.$cid.'&id='.$id;
  if ($isgroup) {
 	 $addr .= '&grp='.$groupid;
  }
- $addr2 = 'http://'.$_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\').'/viewwiki.php?revert=ask&cid='.$cid.'&id='.$id;
+ $addr2 = $urlmode.$_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\').'/viewwiki.php?revert=ask&cid='.$cid.'&id='.$id;
  if ($isgroup) {
 	 $addr2 .= '&grp='.$groupid;
  }

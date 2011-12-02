@@ -220,7 +220,7 @@ if (!$hascourse) {
 	echo '</form>';
 } else if ($placementtype=='course') {
 	if (!isset($_GET['showhome'])) {
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
 	} else {
 		echo '<h3>LTI Placement of whole course</h3>';
 		echo "<p><a href=\"course/course.php?cid=$cid\">Enter course</a></p>";

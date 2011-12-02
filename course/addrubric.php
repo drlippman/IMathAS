@@ -70,7 +70,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		}
 		$fromstr = str_replace('&amp;','&',$fromstr);
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addrubric.php?cid=$cid$fromstr");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addrubric.php?cid=$cid$fromstr");
 		
 		
 		

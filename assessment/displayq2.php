@@ -9,7 +9,7 @@ require_once("mathphp2.php");
 require("interpret5.php");
 require("macros.php");
 function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false) {
-	global $imasroot, $myrights, $showtips;
+	global $imasroot, $myrights, $showtips, $urlmode;
 	srand($seed);
 	if (is_int($doshowans) && $doshowans==2) {
 		$doshowans = true;
@@ -266,7 +266,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		for ($i=0;$i<count($extref);$i++) {
 			$extrefpt = explode('!!',$extref[$i]);
 			if ($extrefpt[0]=='video' || strpos($extrefpt[1],'youtube.com/watch')!==false) {
-				$extrefpt[1] = "http://" . $_SERVER['HTTP_HOST'] . "$imasroot/assessment/watchvid.php?url=".urlencode($extrefpt[1]);
+				$extrefpt[1] = 'http://'. $_SERVER['HTTP_HOST'] . "$imasroot/assessment/watchvid.php?url=".urlencode($extrefpt[1]);
 				if ($extrefpt[0]=='video') {$extrefpt[0]='Video';}
 				echo formpopup($extrefpt[0],$extrefpt[1],660,530,"button",true,"video");
 			} else if ($extrefpt[0]=='read') {
