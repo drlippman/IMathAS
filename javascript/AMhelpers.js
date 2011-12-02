@@ -903,6 +903,22 @@ function assessbackgsubmitCallback(qn,noticetgt) {
 				    // do what you want here when a script fails
 			    }
 		    }
+		    
+		    var pagescroll = 0;
+		    if(typeof window.pageYOffset!= 'undefined'){
+			//most browsers
+			pagescroll = window.pageYOffset;
+		    }
+		    else{
+			var B= document.body; //IE 'quirks'
+			var D= document.documentElement; //IE with doctype
+			D= (D.clientHeight)? D: B;
+			pagescroll = D.scrollTop;
+		    }
+		    var elpos = findPos(document.getElementById("embedqwrapper"+qn))[1];
+		    if (pagescroll > elpos) {
+		    	    setTimeout(function () {window.scroll(0,elpos);}, 150);
+		    }
 	    }
 	    //var todo = eval('('+req.responseText+')');
 	   
