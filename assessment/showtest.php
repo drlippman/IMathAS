@@ -1666,7 +1666,7 @@ if (!isset($_POST['embedpostback'])) {
 				if (isset($intropieces)) {
 					$last = 1;
 					foreach ($introdividers as $k=>$v) {
-						if ($last<$v[1]) {
+						if ($last<$v[1]-1) {
 							for ($j=$last;$j<$v[1];$j++) {
 								$intro .= '[QUESTION '.$j.']';
 							}
