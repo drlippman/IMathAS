@@ -27,7 +27,11 @@
 
 header('P3P: CP="ALL CUR ADM OUR"');
 include("config.php");
-
+ if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') {
+ 	 $urlmode = 'https://';
+ } else {
+ 	 $urlmode = 'http://';
+ }
 if ($enablebasiclti!=true) {
 	echo "BasicLTI not enabled";
 	exit;
@@ -272,8 +276,9 @@ if (isset($_GET['launch'])) {
 		if (isset($infoerr)) {
 			echo '<p style="color:red">'.$infoerr.'</p>';
 		}
+		
 		echo "<form method=\"post\" action=\"{$_SERVER['PHP_SELF']}?userinfo=set\" ";	
-		if ($lti_only) { 
+		if ($name_only) { 
 			//using LTI for authentication; don't need username/password
 			//only request name
 			echo "<p>Please provide a little information about yourself:</p>";

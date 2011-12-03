@@ -1,5 +1,10 @@
 <?php
 	require("../config.php");
+	 if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') {
+		 $urlmode = 'https://';
+	 } else {
+		 $urlmode = 'http://';
+	 }
 
 	if (isset($sessionpath)) { session_save_path($sessionpath);}
  	ini_set('session.gc_maxlifetime',86400);
