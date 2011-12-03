@@ -1700,7 +1700,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 		} else {
 			$gaarr = array(str_replace(',','',$givenans));
-			$anarr = array(str_replace(',','',$answer));
+			if (strpos($answer,'[')===false) {
+				$anarr = array(str_replace(',','',$answer));
+			} else {
+				$anarr = array($answer);
+			}
 		}
 		/*  should students get an answer right by leaving it blank?
 		if ($answerformat=='exactlist' || $answerformat=='orderedlist' || $answerformat=='list') {
