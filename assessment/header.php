@@ -21,7 +21,7 @@ initstack = new Array();
 window.onload = init;
 var imasroot = '<?php echo $imasroot; ?>';
 </script>
-<link rel="stylesheet" href="<?php echo $imasroot . "/assessment/mathtest.css?ver=110711";?>" type="text/css"/>
+<link rel="stylesheet" href="<?php echo $imasroot . "/assessment/mathtest.css?ver=120311";?>" type="text/css"/>
 <?php
 echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/general.js?ver=110711\"></script>\n";
 if (isset($sessiondata['coursetheme'])) {
