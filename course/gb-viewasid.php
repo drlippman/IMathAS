@@ -895,11 +895,26 @@ function getansweights($qi,$code) {
 function sandboxgetweights($code,$seed) {
 	srand($seed);
 	eval(interpret('control','multipart',$code));
-	if (is_array($answeights)) {
-		return $answeights;
-	} else {
-		return explode(',',$answeights);
+	if (!isset($answeights)) {
+		if (!is_array($anstypes)) {
+			$anstypes = explode(",",$anstypes);
+		}
+		$n = count($anstypes);
+		if ($n>1) {
+			$answeights = array_fill(0,$n-1,round(1/$n,3));
+			$answeights[] = 1-array_sum($weights);
+		} else {
+			$answeights = array(1);
+		}
+	} else if (!is_array($answeights)) {
+		$answeights =  explode(',',$answeights);
 	}
+	$sum = array_sum($answeights);
+	if ($sum==0) {$sum = 1;}
+	foreach ($answeights as $k=>$v) {
+		$answeights[$k] = $v/$sum;
+	}
+	return $answeights;
 }
 
 function getconfirmheader($group=false) {

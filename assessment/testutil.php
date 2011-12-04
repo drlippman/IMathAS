@@ -75,17 +75,20 @@ function sandboxgetweights($code,$seed) {
 		}
 		$n = count($anstypes);
 		if ($n>1) {
-			$weights = array_fill(0,$n-1,round(1/$n,3));
-			$weights[] = 1-array_sum($weights);
+			$answeights = array_fill(0,$n-1,round(1/$n,3));
+			$answeights[] = 1-array_sum($weights);
 		} else {
-			$weights = array(1);
+			$answeights = array(1);
 		}
-		return $weights;
-	} else if (is_array($answeights)) {
-		return $answeights;
-	} else {
-		return explode(',',$answeights);
+	} else if (!is_array($answeights)) {
+		$answeights =  explode(',',$answeights);
 	}
+	$sum = array_sum($answeights);
+	if ($sum==0) {$sum = 1;}
+	foreach ($answeights as $k=>$v) {
+		$answeights[$k] = $v/$sum;
+	}
+	return $answeights;
 }
 
 //calculates points after penalty

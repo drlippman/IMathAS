@@ -821,7 +821,15 @@ function assessbackgsubmit(qn,noticetgt) {
 		doonsubmit();
 		params = "embedpostback=true";
 		if (qn != null) {
-			var els = document.getElementsByTagName("input");
+			var els = new Array();
+			var tags = document.getElementsByTagName("input");
+			for (var i=0;i<tags.length;i++) {
+				els.push(tags[i]);
+			}
+			var tags = document.getElementsByTagName("select");
+			for (var i=0;i<tags.length;i++) {
+				els.push(tags[i]);
+			}
 			var regex = new RegExp("^(qn|tc)("+qn+"\\b|"+(qn+1)+"\\d{3})");
 			for (var i=0;i<els.length;i++) {
 				if (els[i].name.match(regex)) {
