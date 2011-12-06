@@ -95,33 +95,64 @@
 		}
 	}
 	
-	if (isset($_POST['score'])) {
-		
-		foreach($_POST['score'] as $k=>$sc) {
-			if (trim($k)=='') { continue;}
-			$sc = trim($sc);
-			if ($sc!='') {
-				$query = "UPDATE imas_grades SET score='$sc',feedback='{$_POST['feedback'][$k]}' WHERE userid='$k' AND gradetype='offline' AND gradetypeid='{$_GET['gbitem']}'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+	if (isset($_POST['assesssnap'])) {
+		//doing assessment snapshot
+		$query = "SELECT userid,bestscores FROM imas_assessment_sessions WHERE assessmentid='{$_POST['assesssnapaid']}'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		while($row = mysql_fetch_row($result)) {
+			$sc = explode(',',$row[1]);
+			$tot = 0;
+			$att = 0;
+			foreach ($sc as $v) {
+				if (strpos($v,'-1')===false) {
+					$att++;
+				}
+				$tot += getpts($v);
+			}
+			if ($_POST['assesssnaptype']==0) {
+				$score = $tot;
 			} else {
-				$query = "UPDATE imas_grades SET score=NULL,feedback='{$_POST['feedback'][$k]}' WHERE userid='$k' AND gradetype='offline' AND gradetypeid='{$_GET['gbitem']}'";
-				//$query = "DELETE FROM imas_grades WHERE gbitemid='{$_GET['gbitem']}' AND userid='$k'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				$attper = $att/count($sc);
+				if ($attper>=$_POST['assesssnapatt']/100-.001 && $tot>=$_POST['assesssnappts']-.00001) {
+					$score = $_POST['points'];
+				} else {
+					$score = 0;
+				}
+			}
+			$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,score,feedback) VALUES ";
+			$query .= "('offline','{$_GET['gbitem']}','{$row[0]}','$score','')";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+		}
+	} else {
+		///regular submit
+		if (isset($_POST['score'])) {
+			
+			foreach($_POST['score'] as $k=>$sc) {
+				if (trim($k)=='') { continue;}
+				$sc = trim($sc);
+				if ($sc!='') {
+					$query = "UPDATE imas_grades SET score='$sc',feedback='{$_POST['feedback'][$k]}' WHERE userid='$k' AND gradetype='offline' AND gradetypeid='{$_GET['gbitem']}'";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+				} else {
+					$query = "UPDATE imas_grades SET score=NULL,feedback='{$_POST['feedback'][$k]}' WHERE userid='$k' AND gradetype='offline' AND gradetypeid='{$_GET['gbitem']}'";
+					//$query = "DELETE FROM imas_grades WHERE gbitemid='{$_GET['gbitem']}' AND userid='$k'";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+				}
 			}
 		}
-	}
-	
-	if (isset($_POST['newscore'])) {
-		foreach($_POST['newscore'] as $k=>$sc) {
-			if (trim($k)=='') {continue;}			
-			if ($sc!='') {
-				$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,score,feedback) VALUES ";
-				$query .= "('offline','{$_GET['gbitem']}','$k','$sc','{$_POST['feedback'][$k]}')";
-				mysql_query($query) or die("Query failed : " . mysql_error());
-			} else if (trim($_POST['feedback'][$k])!='') {
-				$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,score,feedback) VALUES ";
-				$query .= "('offline','{$_GET['gbitem']}','$k',NULL,'{$_POST['feedback'][$k]}')";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+		
+		if (isset($_POST['newscore'])) {
+			foreach($_POST['newscore'] as $k=>$sc) {
+				if (trim($k)=='') {continue;}			
+				if ($sc!='') {
+					$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,score,feedback) VALUES ";
+					$query .= "('offline','{$_GET['gbitem']}','$k','$sc','{$_POST['feedback'][$k]}')";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+				} else if (trim($_POST['feedback'][$k])!='') {
+					$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,score,feedback) VALUES ";
+					$query .= "('offline','{$_GET['gbitem']}','$k',NULL,'{$_POST['feedback'][$k]}')";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+				}
 			}
 		}
 	}
@@ -286,6 +317,22 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 		} else {
 			echo "<span class=form>Upload grades?</span><span class=formright><input type=checkbox name=\"doupload\" /> <input type=submit value=\"Submit\"/></span><br class=form />";
 		}
+		if ($_GET['gbitem']=='new') {
+			echo '<span class="form">Assessment snapshot?</span><span class="formright">';
+			echo '<input type="checkbox" name="assesssnap" onclick="if(this.checked){this.nextSibling.style.display=\'\';document.getElementById(\'gradeboxes\').style.display=\'none\';}else{this.nextSibling.style.display=\'none\';document.getElementById(\'gradeboxes\').style.display=\'\';}"/>';
+			echo '<span style="display:none;"><br/>Assessment to snapshot: <select name="assesssnapaid">';
+			$query = "SELECT id,name FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			while($row = mysql_fetch_row($result)) {
+				echo '<option value="'.$row[0].'">'.$row[1].'</option>';
+			}
+			echo '<select><br/>';
+			echo 'Grade type:<br/> <input type="radio" name="assesssnaptype" value="0" checked="checked">Current score ';
+			echo '<br/><input type="radio" name="assesssnaptype" value="1">Participation: give full credit if &ge; ';
+			echo '<input type="text" name="assesssnapatt" value="100" size="3">% of problems attempted and &ge; ';
+			echo '<input type="text" name="assesssnappts" value="0" size="3"> points earned.';
+			echo '<br/><input type=submit value="Submit"/></span></span><br class="form" />';
+		}
 	    } else {
 		$query = "SELECT name,rubric,points FROM imas_gbitems WHERE id='{$_GET['gbitem']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -345,6 +392,7 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 			}
 		}
 		*/
+		echo '<div id="gradeboxes">';
 		echo '<input type=button value="Expand Feedback Boxes" onClick="togglefeedback(this)"/>';
 		echo ' Use quicksearch entry? <input type="checkbox" id="useqa" onclick="togglequickadd(this)" />';
 		if ($hassection) {
@@ -437,12 +485,31 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 
 	
 ?>
-<div class=submit><input type=submit value="Submit"></div>
+<div class=submit><input type=submit value="Submit"></div></div>
 </form>
 
 <?php
 	$placeinfooter = '<div id="autosuggest"><ul></ul></div>';
 	require("../footer.php");
+	
+function getpts($sc) {
+	if (strpos($sc,'~')===false) {
+		if ($sc>0) { 
+			return $sc;
+		} else {
+			return 0;
+		}
+	} else {
+		$sc = explode('~',$sc);
+		$tot = 0;
+		foreach ($sc as $s) {
+			if ($s>0) { 
+				$tot+=$s;
+			}
+		}
+		return round($tot,1);
+	}
+}
 ?>
 
 

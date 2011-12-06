@@ -256,7 +256,7 @@ if ($canviewall) {
 		var poss = [];
 		var ths = tbl.getElementsByTagName("thead")[0].getElementsByTagName("th");
 		for (var i=0;i<ths.length;i++) {
-			if (k = ths[i].innerHTML.match(/(\d+)&nbsp;pts/)) {
+			if (k = ths[i].innerHTML.match(/(\d+)(&nbsp;|\u00a0)pts/)) {
 				poss[i] = k[1]*1;
 				if (poss[i]==0) {poss[i]=.0000001;}
 			} else {
@@ -268,10 +268,12 @@ if ($canviewall) {
 			var tds = trs[j].getElementsByTagName("td");
 			for (var i=1;i<tds.length;i++) {
 				if (tds[i].innerText) {
-					var v = tds[i].innerText.replace(/[^\d\.]/g,"");
+					var v = tds[i].innerText;
 				} else {
-					var v = tds[i].textContent.replace(/[^\d\.]/g,"");
+					var v = tds[i].textContent;
 				}
+				v = v.replace(/\(.*?\)/g,"");
+				v = v.replace(/[^\d\.]/g,"");
 				if (v/poss[i]<low/100) {
 					tds[i].style.backgroundColor = "#ff9999";
 					
@@ -476,7 +478,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 				echo ">$j/$k</option>";
 			}
 		}
-		echo '<select>';
+		echo '</select>';
 		echo ' | <a href="#" onclick="chgnewflag(); return false;">NewFlag</a>';
 		//echo '<input type="button" value="Pics" onclick="rotatepics()" />';
 		
