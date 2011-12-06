@@ -120,7 +120,7 @@ Leave items blank to use the assessment's default values<br/>
 <thead><tr>
 <?php
 		if (isset($_POST['checked'])) { //modifying existing questions
-			echo "<th>Description><th>Points</th><th>Attempts (0 for unlimited)</th><th>Additional Copies to Add</th></tr></thead>";
+			echo "<th>Description<th>Points</th><th>Attempts (0 for unlimited)</th><th>Additional Copies to Add</th></tr></thead>";
 			echo "<tbody>";
 
 			$qids = array();

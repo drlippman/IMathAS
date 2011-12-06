@@ -254,6 +254,7 @@ if ($canviewall) {
 	var tbl = document.getElementById(table);
 	if (type==0) {  //instr gb view
 		var poss = [];
+		var startat = '.($showpics>0?3:2).';
 		var ths = tbl.getElementsByTagName("thead")[0].getElementsByTagName("th");
 		for (var i=0;i<ths.length;i++) {
 			if (k = ths[i].innerHTML.match(/(\d+)(&nbsp;|\u00a0)pts/)) {
@@ -261,23 +262,35 @@ if ($canviewall) {
 				if (poss[i]==0) {poss[i]=.0000001;}
 			} else {
 				poss[i] = 100;
+				if(ths[i].innerHTML.match(/Section/)) {
+					startat++;
+				}
+				if(ths[i].innerHTML.match(/Code/)) {
+					startat++;
+				}
 			}
 		}
 		var trs = tbl.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
 		for (var j=0;j<trs.length;j++) {
 			var tds = trs[j].getElementsByTagName("td");
-			for (var i=1;i<tds.length;i++) {
+			for (var i=startat;i<tds.length;i++) {
 				if (tds[i].innerText) {
 					var v = tds[i].innerText;
 				} else {
 					var v = tds[i].textContent;
 				}
 				v = v.replace(/\(.*?\)/g,"");
-				v = v.replace(/[^\d\.]/g,"");
-				if (v/poss[i]<low/100) {
+				if (k = v.match(/(\d+)\/(\d+)/)) {
+					if (k[2]==0) { var perc = 0;} else { var perc= k[1]/k[2];}
+				} else {
+					v = v.replace(/[^\d\.]/g,"");
+					var perc = v/poss[i];
+				}
+				
+				if (perc<low/100) {
 					tds[i].style.backgroundColor = "#ff9999";
 					
-				} else if (v/poss[i]>high/100) {
+				} else if (perc>high/100) {
 					tds[i].style.backgroundColor = "#99ff99";
 				} else {
 					tds[i].style.backgroundColor = "#ffffff";

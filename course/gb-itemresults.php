@@ -94,7 +94,7 @@ $placeinhead = ' <style type="text/css">
 	
 }
 </style>';
-require("../header.php");
+require("../assessment/header.php");
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 echo "&gt; Item Results</div>";
@@ -128,7 +128,7 @@ require("../assessment/displayq2.php");
 $questions = array_keys($qdata);
 foreach ($itemarr as $k=>$q) {
 	echo '<div style="border:1px solid #000;padding:10px;margin-bottom:10px;clear:left;">';
-	echo '<p><b>'.$qsdata[$qsids[$q]][2].'</b></p>';
+	echo '<p><span style="float:right">(Question ID '.$qsids[$q].')</span><b>'.$qsdata[$qsids[$q]][2].'</b></p>';
 	echo '<br class="clear"/>';
 	echo '<div style="float:left;width:35%;">';
 	showresults($q,$qsdata[$qsids[$q]][0]);
@@ -250,7 +250,7 @@ function disp($q,$qtype,$part=-1,$answer,$questions=array()) {
 	} else {
 		arsort($res);
 		foreach ($res as $ans=>$cnt) {
-			echo '<td>'.$ans.'</td><td>'.$cnt;
+			echo '<tr><td>'.$ans.'</td><td>'.$cnt;
 			echo ' <span class="scorebarinner" style="';
 			
 			if (in_array($ans,$correct)) {
