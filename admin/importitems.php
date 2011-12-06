@@ -110,11 +110,11 @@ function additem($itemtoadd,$item,$questions,$qset) {
 					$hasimg = 0;
 				}
 				$query = "INSERT INTO imas_questionset (adddate,lastmoddate,uniqueid,ownerid,";
-				$query .= "author,userights,description,qtype,control,qcontrol,qtext,answer,extref) ";
+				$query .= "author,userights,description,qtype,control,qcontrol,qtext,answer,extref,hasimg) ";
 				$query .= "VALUES ($now,'{$qset['lastmod'][$n]}','{$qset['uniqueid'][$n]}',";
 				$query .= "'$userid','{$qset['author'][$n]}','$userights',";
 				$query .= "'{$qset['description'][$n]}','{$qset['qtype'][$n]}','{$qset['control'][$n]}',";
-				$query .= "'{$qset['qcontrol'][$n]}','{$qset['qtext'][$n]}','{$qset['answer'][$n]}','{$qset['extref'][$n]}')";
+				$query .= "'{$qset['qcontrol'][$n]}','{$qset['qtext'][$n]}','{$qset['answer'][$n]}','{$qset['extref'][$n]}',$hasimg)";
 				mysql_query($query) or die("error on: $query: " . mysql_error());
 				$questions[$qid]['qsetid'] = mysql_insert_id();
 				if ($hasimg==1) {
@@ -122,6 +122,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 					foreach($qimgs as $qimg) {
 						$p = explode(',',$qimg);
 						$query = "INSERT INTO imas_qimages (qsetid,var,filename) VALUES ({$questions[$qid]['qsetid']},'{$p[0]}','{$p[1]}')";
+							
 						mysql_query($query) or die("Import failed on $query: " . mysql_error());
 					}
 				}
@@ -451,7 +452,6 @@ if (!(isset($teacherid))) {
 		$itemorder = addslashes(serialize($ciditemorder));
 		$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt' WHERE id='$cid'";
 		mysql_query($query) or die("Query failed : $query" . mysql_error());
-		
 		if (count($missingfiles)>0) {
 			echo "These files pointed to by inline text items were not found and will need to be reuploaded:<br/>";
 			foreach ($missingfiles as $file) {
