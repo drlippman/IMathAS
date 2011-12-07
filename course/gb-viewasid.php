@@ -340,7 +340,7 @@
 		$sessiondata['coursetheme'] = $coursetheme;
 		$sessiondata['isteacher'] = $isteacher;
 		if ($isteacher) {
-			$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js"></script>';
+			$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=120311"></script>';
 			require("../includes/rubric.php");
 		}
 		require("../assessment/header.php");
@@ -698,6 +698,8 @@
 					$togr = implode(',',$togr);
 					echo ' | <a href="#" onclick="quickgrade('.$i.',1,\'scorebox\',['.$togr.'],['.implode(',',$answeights[$questions[$i]]).']);return false;">Full credit all manually-graded parts</a>';
 				}
+			} else if ($canedit) {
+				echo '<br/>Quick grade: <a href="#" onclick="quicksetscore(\'scorebox'.$i.'\','.$pts[$questions[$i]].');return false;">Full credit</a>';	
 			}
 			$laarr = explode('##',$lastanswers[$i]);
 			if ($attempts[$i]!=count($laarr)) {
@@ -735,7 +737,7 @@
 				}
 			}
 			if ($isteacher) {
-				echo " <a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid=$cid&add=new&quoteq=$i-$qsetid-{$seeds[$i]}&to={$_GET['uid']}\">Use in Msg</a>";
+				echo "<br/><a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid=$cid&add=new&quoteq=$i-$qsetid-{$seeds[$i]}&to={$_GET['uid']}\">Use in Msg</a>";
 				echo " &nbsp; <a href=\"gb-viewasid.php?stu=$stu&cid=$cid&from=$from&asid={$_GET['asid']}&uid={$_GET['uid']}&clearq=$i\">Clear Score</a> ";
 				echo "(Question ID: <a href=\"$imasroot/course/moddataset.php?id=$qsetid&cid=$cid&qid={$questions[$i]}&aid=$aid\">$qsetid</a>)";
 				

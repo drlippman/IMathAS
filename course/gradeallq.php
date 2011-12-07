@@ -140,7 +140,7 @@
 	}
 	
 	$useeditor='review';
-	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js"></script>';
+	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=120311"></script>';
 	require("../includes/rubric.php");
 	require("../assessment/header.php");
 	echo "<style type=\"text/css\">p.tips {	display: none;}\n</style>\n";
@@ -439,6 +439,8 @@
 					$togr = implode(',',$togr);
 					echo ' | <a href="#" onclick="quickgrade('.$loc.',1,\'ud-'.$line['id'].'-\',['.$togr.'],['.$answeights.']);return false;">Full credit all manually-graded parts</a>';
 				}
+			} else {
+				echo '<br/>Quick grade: <a href="#" onclick="quicksetscore(\'ud-'.$line['id'].'-'.$loc.'\','.$points.');return false;">Full credit</a>';
 			}
 			$laarr = explode('##',$la[$loc]);
 			if (count($laarr)>1) {
