@@ -1695,7 +1695,11 @@ if (!isset($_POST['embedpostback'])) {
 						$intro .= '[QUESTION '.$j.']';
 					}	
 				}
+			} else {
+				$intro = preg_replace('/<p>\[QUESTION\s+(\d+)\s*\]<\/p>/','[QUESTION $1]',$intro);
+				$intro = preg_replace('/\[QUESTION\s+(\d+)\s*\]/','</div>[QUESTION $1]<div class="intro">',$intro);
 			}
+			
 			for ($i = 0; $i < count($questions); $i++) {
 				$quesout = '<div id="embedqwrapper'.$i.'" class="embedqwrapper">';
 				ob_start();
