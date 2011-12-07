@@ -314,6 +314,11 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		}
 	}
 	echo "</div>\n";
+	if ($qdata['qtype']=="multipart" ) {
+		return $anstypes;
+	} else {
+		return array($qdata['qtype']);
+	}
 }
 
 
@@ -424,6 +429,9 @@ function scoreq($qnidx,$qidx,$seed,$givenans) {
 		if (!is_array($anstypes)) {
 			$anstypes = explode(",",$anstypes);
 		}
+		if (in_array('essay',$anstypes) || in_array('file',$anstypes)) {
+			$GLOBALS['questionmanualgrade'] = true;
+		}
 		$partla = array();
 		if (isset($answeights)) {
 			if (!is_array($answeights)) {
@@ -458,6 +466,9 @@ function scoreq($qnidx,$qidx,$seed,$givenans) {
 		//return array_sum($scores);
 		return implode('~',$scores);
 	} else {
+		if ($qdata['qtype']=='essay' || $qdata['qtype']=='file') {
+			$GLOBALS['questionmanualgrade'] = true;
+		}
 		$score = scorepart($qdata['qtype'],$qnidx,$givenans,$options,0);
 		if ($qdata['qtype']!='conditional') {
 			$GLOBALS['partlastanswer'] = str_replace('&','',$GLOBALS['partlastanswer']);
@@ -1277,7 +1288,25 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			if ($displayformat!='editor') {
 				$la = preg_replace('/\n/','<br/>',$la);
 			} 
-			$out .= "<div class=intro>".filter($la)."</div>";
+			$out .= "<div class=intro>";
+			if (isset($GLOBALS['questionscoreref'])) {
+				if ($multi==0) {
+					$el = $GLOBALS['questionscoreref'][0];
+					$sc = $GLOBALS['questionscoreref'][1];
+				} else {
+					$el = $GLOBALS['questionscoreref'][0].'-'.($qn%1000);
+					$sc = $GLOBALS['questionscoreref'][1][$qn%1000];
+				}
+				$out .= '<span style="float:right;">';
+				$out .= '<img class="scoreicon" src="'.$imasroot.'/img/q_fullbox.gif" ';
+				$out .= "onclick=\"quicksetscore('$el',$sc)\" />";
+				$out .= '<img class="scoreicon" src="'.$imasroot.'/img/q_halfbox.gif" ';
+				$out .= "onclick=\"quicksetscore('$el',.5*$sc)\" />";
+				$out .= '<img class="scoreicon" src="'.$imasroot.'/img/q_emptybox.gif" ';
+				$out .= "onclick=\"quicksetscore('$el',0)\" /></span>";
+			}
+				
+			$out .= filter($la)."</div>";
 		} else {
 			$la = stripslashes($la);
 			$la = preg_replace('/%(\w+;)/',"&$1",$la);

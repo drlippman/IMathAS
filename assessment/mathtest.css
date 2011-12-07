@@ -537,3 +537,10 @@ span.boxed {
 div.question p:first-child, div.inactive p:first-child {
 	margin-top: 0;
 }
+
+img.scoreicon {
+	cursor: pointer;
+}
+img.scoreicon:hover {
+	border-bottom:2px solid #f00;
+}

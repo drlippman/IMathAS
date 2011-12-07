@@ -207,7 +207,7 @@ function generateTable() {
 		html += "<th></th>";
 	}
 	html += "<th>Order</th>";
-	html += "<th>Description</th><th></th><th>ID</th><th>Preview</th><th>Type</th><th>Points</th><th>Settings</th><th>Source</th>";
+	html += "<th>Description</th><th>&nbsp;</th><th>ID</th><th>Preview</th><th>Type</th><th>Points</th><th>Settings</th><th>Source</th>";
 	if (beentaken) {
 		html += "<th>Clear Attempts</th><th>Withdraw</th>";
 	} else {

@@ -128,12 +128,13 @@
 			
 	}
 	
-	$query = "SELECT imas_questions.points,imas_questionset.control,imas_questions.rubric FROM imas_questions,imas_questionset ";
+	$query = "SELECT imas_questions.points,imas_questionset.control,imas_questions.rubric,imas_questionset.qtype FROM imas_questions,imas_questionset ";
 	$query .= "WHERE imas_questions.questionsetid=imas_questionset.id AND imas_questions.id='$qid'";
 	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 	$points = mysql_result($result,0,0);
 	$qcontrol = mysql_result($result,0,1);
 	$rubric = mysql_result($result,0,2);
+	$qtype = mysql_result($result,0,3);
 	if ($points==9999) {
 		$points = $defpoints;
 	}
@@ -354,19 +355,8 @@
 			echo '>';
 			$lastanswers[$cnt] = $la[$loc];
 			$teacherreview = $line['userid'];
-			displayq($cnt,$qsetid,$seeds[$loc],true,false,$attempts[$loc]);
-			echo '</div>';
 			
-			echo "<div class=review>";
-			echo '<span class="person">'.$line['LastName'].', '.$line['FirstName'].': </span>';
-			if (!$groupdup) {
-				echo '<span class="group" style="display:none">'.$groupnames[$line['agroupid']].': </span>';
-			}
-			if ($isgroup) {
-				
-			}
-			list($pt,$parts) = printscore($scores[$loc]);
-			if ($parts!='') {
+			if ($qtype=='multipart') {
 				if (($p = strpos($qcontrol,'answeights'))!==false) {
 					$p = strpos($qcontrol,"\n",$p);
 					$answeights = getansweights($loc,substr($qcontrol,0,$p));
@@ -387,6 +377,25 @@
 				$diff = $points - array_sum($answeights);
 				$answeights[count($answeights)-1] += $diff;
 			}
+			
+			if ($qtype=='multipart') {
+				$GLOBALS['questionscoreref'] = array("ud-{$line['id']}-$loc",$answeights);
+			} else {
+				$GLOBALS['questionscoreref'] = array("ud-{$line['id']}-$loc",$points);
+			}
+			$qtypes = displayq($cnt,$qsetid,$seeds[$loc],true,false,$attempts[$loc]);
+			echo '</div>';
+			
+			echo "<div class=review>";
+			echo '<span class="person">'.$line['LastName'].', '.$line['FirstName'].': </span>';
+			if (!$groupdup) {
+				echo '<span class="group" style="display:none">'.$groupnames[$line['agroupid']].': </span>';
+			}
+			if ($isgroup) {
+				
+			}
+			list($pt,$parts) = printscore($scores[$loc]);
+			
 			if ($parts=='') { 
 				if ($pt==-1) {
 					$pt = 'N/A';
@@ -418,7 +427,19 @@
 				echo "(parts: $answeights) ";
 			}
 			echo "in {$attempts[$loc]} attempt(s)\n";
-			
+			if ($parts!='') {
+				$togr = array();
+				foreach ($qtypes as $k=>$t) {
+					if ($t=='essay' || $t=='file') {
+						$togr[] = $k;
+					}
+				}
+				echo '<br/>Quick grade: <a href="#" onclick="quickgrade('.$loc.',0,\'ud-'.$line['id'].'-\','.count($prts).',['.$answeights.']);return false;">Full credit all parts</a>';
+				if (count($togr)>0) {
+					$togr = implode(',',$togr);
+					echo ' | <a href="#" onclick="quickgrade('.$loc.',1,\'ud-'.$line['id'].'-\',['.$togr.'],['.$answeights.']);return false;">Full credit all manually-graded parts</a>';
+				}
+			}
 			$laarr = explode('##',$la[$loc]);
 			if (count($laarr)>1) {
 				echo "<br/>Previous Attempts:";

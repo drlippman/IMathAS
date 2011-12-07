@@ -1086,6 +1086,7 @@ if (!isset($_POST['embedpostback'])) {
 						$timesontask[$qn] .= (($timesontask[$qn]=='')?'':'~').$used;
 					}
 					$GLOBALS['scoremessages'] = '';
+					$GLOBALS['questionmanualgrade'] = false;
 					$rawscore = scorequestion($qn);
 					
 					//record score
@@ -1116,6 +1117,9 @@ if (!isset($_POST['embedpostback'])) {
 					echo "<p>Score in gradebook: ";
 					echo printscore($bestscores[$qn],$qn);
 					echo "</p>";
+					if ($GLOBALS['questionmanualgrade'] == true) {
+						echo '<p><strong>Note:</strong> This question contains parts that can not be auto-graded.  Those parts will show a score of 0 until they are graded by your instructor</p>';
+					}
 										
 					
 				}
@@ -1382,6 +1386,7 @@ if (!isset($_POST['embedpostback'])) {
 					$timesontask[$qn] .= (($timesontask[$qn]=='')?'':'~').$used;
 				}
 				$GLOBALS['scoremessages'] = '';
+				$GLOBALS['questionmanualgrade'] = false;
 				$rawscore = scorequestion($qn);
 				
 				//record score
@@ -1406,6 +1411,9 @@ if (!isset($_POST['embedpostback'])) {
 					echo "<br/>\n";
 					echo "Score in gradebook: ";
 					echo printscore($bestscores[$qn],$qn);
+					if ($GLOBALS['questionmanualgrade'] == true) {
+						echo '<br/><strong>Note:</strong> This question contains parts that can not be auto-graded.  Those parts will show a score of 0 until they are graded by your instructor';
+					}
 					echo "</p>";	
 				} else {
 					echo '<p>Question scored.</p>';

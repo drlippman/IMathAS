@@ -150,3 +150,17 @@ function getRadioValue(theRadioGroup) {
 	}
 }
 
+function quickgrade(qn,type,prefix,todo,vals) {
+	if (type==0) { //all
+		for (var i=0;i<todo;i++) {
+			document.getElementById(prefix+qn+"-"+i).value = vals[i];
+		}
+	} else {  //select
+		for (var i=0;i<todo.length;i++) {
+			document.getElementById(prefix+qn+"-"+todo[i]).value = vals[todo[i]];
+		}
+	}
+}
+function quicksetscore(el,score) {
+	document.getElementById(el).value = score;
+}

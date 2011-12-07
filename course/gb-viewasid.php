@@ -641,7 +641,13 @@
 			echo '>';
 			list($qsetid,$cat) = getqsetid($questions[$i]);
 			if ($isteacher || $istutor || ($testtype=="Practice" && $showans!="V") || ($testtype!="Practice" && (($showans=="I"  && !in_array(-1,$scores))|| ($showans!="V" && time()>$saenddate)))) {$showa=true;} else {$showa=false;}
-			displayq($i,$qsetid,$seeds[$i],$showa,false,$attempts[$i]);
+			
+			if (isset($answeights[$questions[$i]])) {
+				$GLOBALS['questionscoreref'] = array("scorebox$i",$answeights[$questions[$i]]);
+			} else {
+				$GLOBALS['questionscoreref'] = array("scorebox$i",$pts[$questions[$i]]);
+			}
+			$qtypes = displayq($i,$qsetid,$seeds[$i],$showa,false,$attempts[$i]);
 			echo '</div>';
 			
 			if ($scores[$i]==-1) { $scores[$i]="NA";} else {$total+=getpts($scores[$i]);}
@@ -679,6 +685,20 @@
 				echo '(parts: '.implode(', ',$answeights[$questions[$i]]).')';
 			}
 			echo "in {$attempts[$i]} attempt(s)\n";
+			if ($canedit && $parts!='') {
+				$togr = array();
+				foreach ($qtypes as $k=>$t) {
+					if ($t=='essay' || $t=='file') {
+						$togr[] = $k;
+					}
+				}
+				
+				echo '<br/>Quick grade: <a href="#" onclick="quickgrade('.$i.',0,\'scorebox\','.count($prts).',['.implode(',',$answeights[$questions[$i]]).']);return false;">Full credit all parts</a>';
+				if (count($togr)>0) {
+					$togr = implode(',',$togr);
+					echo ' | <a href="#" onclick="quickgrade('.$i.',1,\'scorebox\',['.$togr.'],['.implode(',',$answeights[$questions[$i]]).']);return false;">Full credit all manually-graded parts</a>';
+				}
+			}
 			$laarr = explode('##',$lastanswers[$i]);
 			if ($attempts[$i]!=count($laarr)) {
 				//echo " (clicked \"Jump to answer\")";
