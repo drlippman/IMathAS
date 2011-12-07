@@ -1696,7 +1696,7 @@ if (!isset($_POST['embedpostback'])) {
 					}	
 				}
 			} else {
-				$intro = preg_replace('/<p>\[QUESTION\s+(\d+)\s*\]<\/p>/','[QUESTION $1]',$intro);
+				$intro = preg_replace('/<p>((<span|<strong|<em)[^>]*>)?\[QUESTION\s+(\d+)\s*\]((<\/span|<\/strong|<\/em)[^>]*>)?<\/p>/','[QUESTION $3]',$intro);
 				$intro = preg_replace('/\[QUESTION\s+(\d+)\s*\]/','</div>[QUESTION $1]<div class="intro">',$intro);
 			}
 			
