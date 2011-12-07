@@ -1661,7 +1661,7 @@ if (!isset($_POST['embedpostback'])) {
 			}
 		} else if ($testsettings['displaymethod'] == "Embed") {
 			
-			$intro = filter("<div>{$testsettings['intro']}</div>\n");
+			$intro = filter("<div class=\"intro\">{$testsettings['intro']}</div>\n");
 			echo '<script type="text/javascript">var assesspostbackurl="' .$urlmode. $_SERVER['HTTP_HOST'] . $imasroot . '/assessment/showtest.php?embedpostback=true&action=scoreembed";</script>';
 			//using the full test scoreall action for timelimit auto-submits
 			echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=scoreall\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
