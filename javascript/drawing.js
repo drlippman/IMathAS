@@ -985,31 +985,33 @@ function getPosition(e){
 	return {x:left, y:top};
 }
 
-function initCanvases() {
-	for (var i=0;i<canvases.length;i++) {
-		if (drawla[i]!=null && drawla[i].length>2) {
-			lines[canvases[i][0]] = drawla[i][0];
-			dots[canvases[i][0]] = drawla[i][1];
-			odots[canvases[i][0]] = drawla[i][2];
-			if (drawla[i].length>3 && drawla[i][3].length>0) {
-				tptypes[canvases[i][0]] = [];
-				tplines[canvases[i][0]] = [];
-				for (var j=0; j<drawla[i][3].length;j++) {
-					tptypes[canvases[i][0]][j] = drawla[i][3][j][0];
-					tplines[canvases[i][0]][j] = [drawla[i][3][j].slice(1,3),drawla[i][3][j].slice(3)];
+function initCanvases(k) {
+	for (var i in canvases) {
+		if (typeof(k)=='undefined' || k==i) {
+			if (drawla[i]!=null && drawla[i].length>2) {
+				lines[canvases[i][0]] = drawla[i][0];
+				dots[canvases[i][0]] = drawla[i][1];
+				odots[canvases[i][0]] = drawla[i][2];
+				if (drawla[i].length>3 && drawla[i][3].length>0) {
+					tptypes[canvases[i][0]] = [];
+					tplines[canvases[i][0]] = [];
+					for (var j=0; j<drawla[i][3].length;j++) {
+						tptypes[canvases[i][0]][j] = drawla[i][3][j][0];
+						tplines[canvases[i][0]][j] = [drawla[i][3][j].slice(1,3),drawla[i][3][j].slice(3)];
+					}
+				}
+				if (drawla[i].length>4 && drawla[i][4].length>0) {
+					ineqtypes[canvases[i][0]] = [];
+					ineqlines[canvases[i][0]] = [];
+					for (var j=0; j<drawla[i][4].length;j++) {
+						//CHECK
+						ineqtypes[canvases[i][0]][j] = drawla[i][4][j][0];
+						ineqlines[canvases[i][0]][j] = [drawla[i][4][j].slice(1,3),drawla[i][4][j].slice(3,5),drawla[i][4][j].slice(5)];
+					}
 				}
 			}
-			if (drawla[i].length>4 && drawla[i][4].length>0) {
-				ineqtypes[canvases[i][0]] = [];
-				ineqlines[canvases[i][0]] = [];
-				for (var j=0; j<drawla[i][4].length;j++) {
-					//CHECK
-					ineqtypes[canvases[i][0]][j] = drawla[i][4][j][0];
-					ineqlines[canvases[i][0]][j] = [drawla[i][4][j].slice(1,3),drawla[i][4][j].slice(3,5),drawla[i][4][j].slice(5)];
-				}
-			}
+			addTarget(canvases[i][0],'canvas'+canvases[i][0],imasroot+'/filter/graph/imgs/'+canvases[i][1],'qn'+canvases[i][0],canvases[i][2],canvases[i][3],canvases[i][4],canvases[i][5],canvases[i][6],canvases[i][7],canvases[i][8],canvases[i][9],canvases[i][10],canvases[i][11]);
 		}
-		addTarget(canvases[i][0],'canvas'+canvases[i][0],imasroot+'/filter/graph/imgs/'+canvases[i][1],'qn'+canvases[i][0],canvases[i][2],canvases[i][3],canvases[i][4],canvases[i][5],canvases[i][6],canvases[i][7],canvases[i][8],canvases[i][9],canvases[i][10],canvases[i][11]);
 	}
 }
 

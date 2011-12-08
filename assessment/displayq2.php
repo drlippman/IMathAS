@@ -1574,14 +1574,14 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		
 		$out .= '</span></div>';
 		$out .= "<input type=\"hidden\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" />";
-		$out .= "<script type=\"text/javascript\">canvases[canvases.length] = [$qn,'$bg',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline,$locky];";
+		$out .= "<script type=\"text/javascript\">canvases[$qn] = [$qn,'$bg',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline,$locky];";
 		
 		$la = str_replace(array('(',')'),array('[',']'),$la);
 		$la = explode(';;',$la);
 		$la[0] = '['.str_replace(';','],[',$la[0]).']';
 		$la = '[['.implode('],[',$la).']]';
 		
-		$out .= "drawla[drawla.length] = $la;</script>";
+		$out .= "drawla[$qn] = $la;</script>";
 		$tip = "Enter your answer by drawing on the graph.";
 		if (isset($answers)) {
 			$saarr = array();

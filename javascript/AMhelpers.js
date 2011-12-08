@@ -912,6 +912,12 @@ function assessbackgsubmitCallback(qn,noticetgt) {
 		    // Loop through every script collected and eval it
 		    for(var i=0; i<scripts.length; i++) {
 			    try {
+				    if (k=scripts[i].match(/canvases\[(\d+)\]/)) {
+					if (typeof G_vmlCanvasManager != 'undefined') {
+						scripts[i] = scripts[i] + 'G_vmlCanvasManager.initElement(document.getElementById("canvas'+k[1]+'"));';
+					}
+					scripts[i] = scripts[i] + "initCanvases("+k[1]+");";     
+				    }
 				    eval(scripts[i]);
 			    }
 			    catch(ex) {
