@@ -818,6 +818,7 @@ function assessbackgsubmit(qn,noticetgt) {
 		req = new ActiveXObject("Microsoft.XMLHTTP"); 
 	} 
 	if (req != undefined) { 
+		tinyMCE.triggerSave();
 		doonsubmit();
 		params = "embedpostback=true";
 		if (qn != null) {
@@ -905,7 +906,9 @@ function assessbackgsubmitCallback(qn,noticetgt) {
 		    if (usingASCIISvg) {
 			    setTimeout("drawPics()",100);
 		    }
-		    
+		    if (usingTinymceEditor) {
+			    initeditor("textareas","mceEditor");
+		    }
 		    // Loop through every script collected and eval it
 		    for(var i=0; i<scripts.length; i++) {
 			    try {

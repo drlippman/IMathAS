@@ -67,7 +67,7 @@ div { zoom: 1; }
 }
 </style> 
 <![endif]--> 
-<script src="<?php echo $imasroot . "/javascript/AMhelpers_min.js?v=120311";?>" type="text/javascript"></script>
+<script src="<?php echo $imasroot . "/javascript/AMhelpers_min.js?v=120511";?>" type="text/javascript"></script>
 <script src="<?php echo $imasroot . "/javascript/confirmsubmit.js";?>" type="text/javascript"></script>
 <!--[if lt IE 9]><script type="text/javascript" src="<?php echo $imasroot;?>/javascript/excanvas_min.js"></script><![endif]-->
 <script type="text/javascript" src="<?php echo $imasroot;?>/javascript/drawing_min.js?v=092011"></script>
@@ -77,6 +77,7 @@ if (isset($useeditor) && $sessiondata['useed']==1) {
 	echo '<script type="text/javascript" src="'.$imasroot.'/editor/tiny_mce.js?v=082911"></script>';
 	echo "\n";
 	echo '<script type="text/javascript">';
+	echo 'var usingTinymceEditor = true;';
 	if (isset($sessiondata['coursetheme'])) {
 		echo 'var coursetheme = "'.$sessiondata['coursetheme'].'";';
 	} else {
@@ -89,6 +90,8 @@ if (isset($useeditor) && $sessiondata['useed']==1) {
 	}
 	echo 'initeditor("textareas","mceEditor");';
 	echo '</script>';
+} else {
+	echo '<script type="text/javascript">var usingTinymceEditor = false;</script>';
 }
 
 $curdir = rtrim(dirname(__FILE__), '/\\');
