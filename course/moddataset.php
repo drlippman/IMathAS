@@ -3,7 +3,16 @@
 //(c) 2006 David Lippman
 	require("../validate.php");
 	$pagetitle = "Question Editor";
-	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/editor/tiny_mce.js?v=082911"></script>';
+	$placeinhead = '';
+	if ($sessiondata['mathdisp']==2) {
+		//these scripts are used by the editor to make image-based math work in the editor
+		$placeinhead .= '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";';
+		if ($mathdarkbg) {$placeinhead .=  'var mathbg = "dark";';}
+		$placeinhead .= '</script>'; 
+		$placeinhead .= "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=082911\" type=\"text/javascript\"></script>\n";
+		$placeinhead .= "<script type=\"text/javascript\">var usingASCIIMath = false;</script>";
+	}
+	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/editor/tiny_mce.js?v=082911"></script>';
 	$placeinhead .= '<script type="text/javascript">
 	  var editoron = 0;
 	  var coursetheme = "'.$coursetheme.'";';
@@ -25,7 +34,7 @@
 	     }
 	     editoron = 1 - editoron;
 	   }</script>';
-	        
+	
 	require("../header.php");
 	if ($myrights<20) {
 		echo "You need to log in as a teacher to access this page";

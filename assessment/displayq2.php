@@ -323,7 +323,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 
 
 //inputs: Question number, Question id, rand seed, given answer
-function scoreq($qnidx,$qidx,$seed,$givenans) {
+function scoreq($qnidx,$qidx,$seed,$givenans,$points=1) {
 	unset($abstolerance);
 	srand($seed);
 		
@@ -444,10 +444,13 @@ function scoreq($qnidx,$qidx,$seed,$givenans) {
 			}
 		} else {
 			if (count($anstypes)>1) {
-				$answeights = array_fill(0,count($anstypes)-1,round(1/count($anstypes),5));
-				$answeights[] = 1-array_sum($answeights);
+				$answeights = array_fill(0,count($anstypes)-1,round($points/count($anstypes),2));
+				$answeights[] = $points-array_sum($answeights);
+				foreach ($answeights as $k=>$v) {
+					$answeights[$k] = $v/$points;
+				}
 			} else {
-				$answeights = array(1);
+				$answeights = array($points);
 			}
 		}
 		$scores = Array();

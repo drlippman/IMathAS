@@ -42,7 +42,7 @@ function getquestioninfo($qns,$testsettings) {
 				preg_match('/anstypes\s*=(.*)/',$line['control'],$match);
 				$n = substr_count($match[1],',')+1;
 				if ($n>1) {
-					$line['answeights'] = array_fill(0,$n-1,round(1/$n,3));
+					$line['answeights'] = array_fill(0,$n-1,round(1/$n,5));
 					$line['answeights'][] = 1-array_sum($line['answeights']);
 				} else {
 					$line['answeights'] = array(1);
@@ -75,7 +75,7 @@ function sandboxgetweights($code,$seed) {
 		}
 		$n = count($anstypes);
 		if ($n>1) {
-			$answeights = array_fill(0,$n-1,round(1/$n,3));
+			$answeights = array_fill(0,$n-1,round(1/$n,5));
 			$answeights[] = 1-array_sum($weights);
 		} else {
 			$answeights = array(1);
@@ -342,7 +342,7 @@ function scorequestion($qn) {
 	global $questions,$scores,$seeds,$testsettings,$qi,$attempts,$lastanswers,$isreview,$bestseeds,$bestscores,$bestattempts,$bestlastanswers, $reattempting;
 	global $regenonreattempt;
 	//list($qsetid,$cat) = getqsetid($questions[$qn]);
-	$rawscore = scoreq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$_POST["qn$qn"]);
+	$rawscore = scoreq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$_POST["qn$qn"],$qi[$questions[$qn]]['points']);
 	$afterpenalty = calcpointsafterpenalty($rawscore,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
 	
 	$rawscore = calcpointsafterpenalty($rawscore,$qi[$questions[$qn]],$testsettings,0); //possible
