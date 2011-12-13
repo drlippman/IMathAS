@@ -343,6 +343,7 @@ function scorequestion($qn) {
 	global $regenonreattempt;
 	//list($qsetid,$cat) = getqsetid($questions[$qn]);
 	$rawscore = scoreq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$_POST["qn$qn"],$qi[$questions[$qn]]['points']);
+	
 	$afterpenalty = calcpointsafterpenalty($rawscore,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
 	
 	$rawscore = calcpointsafterpenalty($rawscore,$qi[$questions[$qn]],$testsettings,0); //possible

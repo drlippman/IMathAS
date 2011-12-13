@@ -384,7 +384,6 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$points=1) {
 	}
 	$thisq = $qnidx+1;
 		
-		
 	eval(interpret('control',$qdata['qtype'],$qdata['control']));
 	srand($seed+1);
 	eval(interpret('answer',$qdata['qtype'],$qdata['answer']));
@@ -450,7 +449,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$points=1) {
 					$answeights[$k] = $v/$points;
 				}
 			} else {
-				$answeights = array($points);
+				$answeights = array(1);
 			}
 		}
 		$scores = Array();
