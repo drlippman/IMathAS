@@ -951,7 +951,7 @@ if ($overwriteBody==1) {
 		
 		<table cellpadding="5" id="myTable" class="gb" style="clear:both; position:relative;">
 			<thead>
-				<tr><th></th><th>Description</th><th></th><th>ID</th><th>Preview</th><th>Type</th>
+				<tr><th>&nbsp;</th><th>Description</th><th>&nbsp;</th><th>ID</th><th>Preview</th><th>Type</th>
 					<?php echo $page_libRowHeader ?>
 					<th>Times Used</th>
 					<?php if ($page_useavgtimes) {?><th><span onmouseover="tipshow(this,'Average time, in minutes, this question has taken students')" onmouseout="tipout()">Avg Time</span></th><?php } ?>

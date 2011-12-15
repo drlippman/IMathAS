@@ -17,8 +17,7 @@ h2,h3,h4 {
 </style>
 <body>
 <h1>IMathAS</h1>
-<p>Version: 1.8.   Released November 9, 2009 <br/>
-See <a href="changelog.html">Change Log</a> for detailed change history.  The most recent version of
+<p>See <a href="changelog.html">Change Log</a> for detailed change history.  The most recent version of
 the code is available via SVN at <a href="http://code.google.com/p/imathas/">Google Code</a></p>
 
 <h3>What is IMathAS</h3>
@@ -150,12 +149,28 @@ because I don't want students with used books to incur additional cost.</p>
 </ol>
 </p>
 
+<h3>Upgrading</h3>
+To upgrade your installation:
+<p>
+<ol>
+<li>If you installed using SVN checkout, then run <i>svn update</i> to update the code files.</li>
+<li>If you copied files to your webserver to install, copy the updated files to your server to overwrite the old ones.  It is 
+    recommended that you <i>not</i> delete the original files first, or you will lose your configuration files and
+    and the database upgrade record file (upgradecounter.txt).</li>
+<li><i>Note:</i> Several files (config.php, loginpage.php, newinstructor.php, and infoheader.php) were copied from corresponding
+   distribution files when you first installed, and will not be overwritten when you update, whether you follow method 1 or 2.</li>
+<li>Log into your installation using an Administrator account, and access the /upgrade.php file to make any necessary
+   database upgrades</li>
+</ol>
+</p>
+
 <h3>Installation Issues/Troubleshooting</h3>
 <p>
 <ul>
 <li>If you receive an 500 access error trying to access install.php, try deleting the .htaccess file in the
     IMathAS root directory.  This file is used to give some advice to the web server about file compression 
     and file types, but could potentially cause problems depending on the server configuration</li>
+<li>If you find graphics not displaying, make sure your PHP installation supports GD2.</li>
 </ul>
 </p>
 
@@ -174,8 +189,8 @@ and MySQL 3.23, but future compatibility is not guaranteed.</p>
 <p>PHP with GD2 and Freetype are recommended for best image-based graph support</p> 
 
 <h4>Server Requirements</h4>
-<p>An installation serving 3500+ students 
-with 100+ concurrent users has operated well on a commercial shared web server.</p>
+<p>An installation serving 7000+ students 
+with 300+ concurrent users has operated well on a commercial shared web server.</p>
 
 <h4>Security</h4>
 <p>IMathAS uses a standard databased-stored sessions-based system.  If a user does

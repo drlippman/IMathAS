@@ -271,7 +271,7 @@ END;
 	
 	if (isset($_GET['libtree']) && $_GET['libtree']=="popup") {
 		echo <<<END
-<input type=button value="Use Libaries" onClick="setlib(this.form)">
+<input type=button value="Use Libraries" onClick="setlib(this.form)">
 $colorcode
 </form>
 </body>
