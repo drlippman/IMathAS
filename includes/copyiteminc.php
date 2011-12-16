@@ -4,7 +4,7 @@
 $reqscoretrack = array();
 $qrubrictrack = array();
 $assessnewid = array();
-function copyitem($itemid,$gbcats) {
+function copyitem($itemid,$gbcats,$sethidden=false) {
 	global $cid, $reqscoretrack, $assessnewid, $qrubrictrack, $copystickyposts,$userid;
 	if (!isset($copystickyposts)) { $copystickyposts = false;}
 	if ($gbcats===false) {
@@ -25,6 +25,7 @@ function copyitem($itemid,$gbcats) {
 		$query = "SELECT title,text,startdate,enddate,avail,oncal,caltag,fileorder FROM imas_inlinetext WHERE id='$typeid'";
 		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$row = mysql_fetch_row($result);
+		if ($sethidden) {$row[4] = 0;}
 		$row[0] .= stripslashes($_POST['append']);
 		$fileorder = $row[7];
 		array_pop($row);
@@ -62,6 +63,7 @@ function copyitem($itemid,$gbcats) {
 		$query = "SELECT title,summary,text,startdate,enddate,avail,oncal,caltag,target FROM imas_linkedtext WHERE id='$typeid'";
 		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$row = mysql_fetch_row($result);
+		if ($sethidden) {$row[5] = 0;}
 		$row[0] .= stripslashes($_POST['append']);
 		$row = "'".implode("','",addslashes_deep($row))."'";
 		$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate,avail,oncal,caltag,target) ";
@@ -75,6 +77,7 @@ function copyitem($itemid,$gbcats) {
 		$query = "SELECT name,description,startdate,enddate,settings,defdisplay,replyby,postby,avail,points,cntingb,gbcategory FROM imas_forums WHERE id='$typeid'";
 		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$row = mysql_fetch_row($result);
+		if ($sethidden) {$row[8] = 0;}
 		if (isset($gbcats[$row[11]])) {
 			$row[11] = $gbcats[$row[11]];
 		} else if ($_POST['ctc']!=$cid) {
@@ -115,6 +118,7 @@ function copyitem($itemid,$gbcats) {
 		$query = "SELECT name,description,startdate,enddate,editbydate,avail,settings,groupsetid FROM imas_wikis WHERE id='$typeid'";
 		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$row = mysql_fetch_row($result);
+		if ($sethidden) {$row[5] = 0;}
 		$row[0] .= stripslashes($_POST['append']);
 		$row = "'".implode("','",addslashes_deep($row))."'";
 		$query = "INSERT INTO imas_wikis (courseid,name,description,startdate,enddate,editbydate,avail,settings,groupsetid) ";
@@ -129,6 +133,7 @@ function copyitem($itemid,$gbcats) {
 
 		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$row = mysql_fetch_row($result);
+		if ($sethidden) {$row[23] = 0;}
 		if (isset($gbcats[$row[14]])) {
 			$row[14] = $gbcats[$row[14]];
 		} else if ($_POST['ctc']!=$cid) {
@@ -209,7 +214,7 @@ function copyitem($itemid,$gbcats) {
 	return (mysql_insert_id());	
 }
 	
-function copysub($items,$parent,&$addtoarr,$gbcats) {
+function copysub($items,$parent,&$addtoarr,$gbcats,$sethidden=false) {
 	global $checked,$blockcnt,$reqscoretrack,$assessnewid;
 	foreach ($items as $k=>$item) {
 		if (is_array($item)) {
@@ -220,24 +225,24 @@ function copysub($items,$parent,&$addtoarr,$gbcats) {
 				$blockcnt++;
 				$newblock['startdate'] = $item['startdate'];
 				$newblock['enddate'] = $item['enddate'];
-				$newblock['avail'] = $item['avail'];
+				$newblock['avail'] = $sethidden?0:$item['avail'];
 				$newblock['SH'] = $item['SH'];
 				$newblock['colors'] = $item['colors'];
 				$newblock['public'] = $item['public'];
 				$newblock['fixedheight'] = $item['fixedheight'];
 				$newblock['items'] = array();
 				if (count($item['items'])>0) {
-					copysub($item['items'],$parent.'-'.($k+1),$newblock['items'],$gbcats);
+					copysub($item['items'],$parent.'-'.($k+1),$newblock['items'],$gbcats,$sethidden);
 				}
 				$addtoarr[] = $newblock;
 			} else {
 				if (count($item['items'])>0) {
-					copysub($item['items'],$parent.'-'.($k+1),$addtoarr,$gbcats);
+					copysub($item['items'],$parent.'-'.($k+1),$addtoarr,$gbcats,$sethidden);
 				}
 			}
 		} else {
 			if (array_search($item,$checked)!==FALSE) {
-				$addtoarr[] = copyitem($item,$gbcats);
+				$addtoarr[] = copyitem($item,$gbcats,$sethidden);
 			}
 		}
 	}
@@ -256,7 +261,7 @@ function copysub($items,$parent,&$addtoarr,$gbcats) {
 	}
 }	
 
-function copyallsub($items,$parent,&$addtoarr,$gbcats) {
+function copyallsub($items,$parent,&$addtoarr,$gbcats,$sethidden=false) {
 	global $blockcnt;
 	if (strlen($_POST['append'])>0 && $_POST['append']{0}!=' ') {
 		$_POST['append'] = ' '.$_POST['append'];
@@ -269,18 +274,18 @@ function copyallsub($items,$parent,&$addtoarr,$gbcats) {
 			$blockcnt++;
 			$newblock['startdate'] = $item['startdate'];
 			$newblock['enddate'] = $item['enddate'];
-			$newblock['avail'] = $item['avail'];
+			$newblock['avail'] = $sethidden?0:$item['avail'];
 			$newblock['SH'] = $item['SH'];
 			$newblock['colors'] = $item['colors'];
 			$newblock['public'] = $item['public'];
 			$newblock['fixedheight'] = $item['fixedheight'];
 			$newblock['items'] = array();
 			if (count($item['items'])>0) {
-				copyallsub($item['items'],$parent.'-'.($k+1),$newblock['items'],$gbcats);
+				copyallsub($item['items'],$parent.'-'.($k+1),$newblock['items'],$gbcats,$sethidden);
 			}
 			$addtoarr[] = $newblock;
 		} else {
-			$addtoarr[] = copyitem($item,$gbcats);
+			$addtoarr[] = copyitem($item,$gbcats,$sethidden);
 		}
 	}
 }

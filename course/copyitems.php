@@ -143,7 +143,7 @@ if (!(isset($teacherid))) {
 				$copystickyposts = false;
 			}
 			
-			copysub($items,'0',$newitems,$gbcats);
+			copysub($items,'0',$newitems,$gbcats,isset($_POST['copyhidden']));
 			
 			$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 			$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
@@ -382,6 +382,7 @@ if ($overwriteBody==1) {
 	<tr><td class="r">Copy course settings?</td><td><input type=checkbox name="copycourseopt"  value="1"/></td></tr>
 	<tr><td class="r">Copy gradebook scheme and categories<br/>(<i>will overwrite current scheme</i>)? </td><td>
 		<input type=checkbox name="copygbsetup" value="1"/></td></tr>
+	<tr><td class="r">Set all copied items as hidden to students?</td><td><input type="checkbox" name="copyhidden" value="1"/></td></tr>
 	<tr><td class="r">Copy offline grade items?</td><td> <input type=checkbox name="copyoffline"  value="1"/></td></tr>
 	<tr><td class="r">Copy rubrics? </td><td><input type=checkbox name="copyrubrics"  value="1" checked="checked"/></td></tr>
 	<tr><td class="r">Select calendar items to copy?</td><td> <input type=checkbox name="selectcalitems"  value="1"/></td></tr>
