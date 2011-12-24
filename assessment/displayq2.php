@@ -367,7 +367,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$points=1) {
 			} else if (isset($_POST["qn$partnum"]) && is_numeric($_POST["qn$partnum"])) {
 				$stuanswers[$qnidx+1][$kidx] = floatval($_POST["qn$partnum"]);
 			} else if (isset($_POST["qn$partnum"])) {
-				$stuanswers[$qnidx+1][$kidx] = stripslashes($_POST["qn$partnum"]); //preg_replace('/\W+/','',stripslashes($_POST["qn$partnum"]));
+				$stuanswers[$qnidx+1][$kidx] = stripslashes_deep($_POST["qn$partnum"]); //preg_replace('/\W+/','',stripslashes($_POST["qn$partnum"]));
 			}
 		}
 	} else {
@@ -1882,8 +1882,12 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$score -= $deduct;
 			}
 		}
-		if (isset($scoremethod) && $scoremethod=='allornothing' && $score<1) {
-			$score = 0;
+		if (isset($scoremethod)) {
+			if ($scoremethod=='allornothing' && $score<1) {
+				$score = 0;
+			} else if ($scoremethod == 'takeanything') {
+				$score = 1;
+			}
 		}
 		if ($score < 0) {
 			$score = 0;
