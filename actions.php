@@ -8,6 +8,11 @@
 		$isgb = false;
 		$gb = '';
 	}
+	if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') {
+		 $urlmode = 'https://';
+	} else {
+		 $urlmode = 'http://';
+	}
 	if ($_GET['action']=="newuser") {
 		require_once("config.php");
 		if (isset($studentTOS) && !isset($_POST['agree'])) {
