@@ -578,7 +578,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if ($displayformat == "select") { 
 			$msg = '?';
 			foreach ($questions as $qv) {
-				if (strlen($qv)>2) {
+				if (strlen($qv)>2 && !($qv{0}=='&' && $qv{strlen($qv)-1}==';')) {
 					$msg = 'Select an answer';
 					break;
 				}
@@ -3987,7 +3987,11 @@ function formathint($eword,$ansformats,$calledfrom, $islist=false,$doshort=false
 	if (in_array('nodecimal',$ansformats)) {
 		$tip .= "<br/>Decimal values are not allowed";
 	} else if (isset($reqdecimals)) {
-		$tip .= "<br/>Your answer should be accurate to $reqdecimals decimal places.";
+		if ($reqdecimals == 0) {
+			$tip .= "<br/>Your answer should be accurate to the nearest whole number.";
+		} else {
+			$tip .= "<br/>Your answer should be accurate to $reqdecimals decimal places.";
+		}
 	}
 	if (in_array('notrig',$ansformats)) {
 		$tip .= "<br/>Trig functions (sin,cos,etc.) are not allowed";
