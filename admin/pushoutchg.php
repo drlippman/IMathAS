@@ -1,7 +1,9 @@
 <?php
 require("../validate.php");
 require("../header.php");
-   	   
+@set_time_limit(0);
+ini_set("max_execution_time", "900");
+
 if ($myrights==100) {
    if (isset($_POST['submit'])) {
    	   $cid = intval($_POST['cid']);
@@ -42,7 +44,7 @@ if ($myrights==100) {
    	   	   }
    	   	   echo "<p>Pushed out Intro/Instructions for $na assessments.  $n total changes made.</p>";
    	   }
-   	   echo '<a href="index.php">Back to home page</a>';
+   	   echo '<a href="../index.php">Back to home page</a>';
    } else {
    	   $pagetitle = "Push out Changes";
    	   echo '<h2>Push out Changes</h2>';

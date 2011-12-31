@@ -91,7 +91,7 @@
 			$aid = mysql_result($result,0,0);
 			$ltisourcedid = mysql_result($result,0,1);
 			if (strlen($ltisourcedid)>1) {
-				require_once("../includes/ltioutcomes");
+				require_once("../includes/ltioutcomes.php");
 				updateLTIgrade('delete',$ltisourcedid,$aid);
 			}
 			
@@ -158,7 +158,7 @@
 			$seeds = explode(',',mysql_result($result,0,0));
 			$ltisourcedid = mysql_result($result,0,1);
 			if (strlen($ltisourcedid)>1) {
-				require_once("../includes/ltioutcomes");
+				require_once("../includes/ltioutcomes.php");
 				updateLTIgrade('update',$ltisourcedid,$aid,0);
 			}
 			
@@ -241,7 +241,7 @@
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				
 				if (strlen($line['lti_sourcedid'])>1) {
-					require_once("../includes/ltioutcomes");
+					require_once("../includes/ltioutcomes.php");
 					calcandupdateLTIgrade($line['lti_sourcedid'],$aid,$bestscores);
 				}
 				

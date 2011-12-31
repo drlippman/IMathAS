@@ -366,9 +366,13 @@ if (isset($_GET['launch'])) {
 	
 	//verify necessary POST values for LTI.  OAuth specific will be checked later
 	if (empty($_REQUEST['user_id'])) {
-		reporterror("user_id is required");
+		reporterror("Unable to launch - User information not provided (user_id is required)");
 	} else {
 		$ltiuserid = $_REQUEST['user_id'];
+	}
+	
+	if (empty($_REQUEST['context_id'])) {
+		reporterror("Unable to launch - Course information not provided (context_id is required)");
 	}
 	
 	if (isset($_SESSION['ltiuserid']) && $_SESSION['ltiuserid']!=$ltiuserid) {
@@ -392,7 +396,7 @@ if (isset($_GET['launch'])) {
 		$ltiorg = $_REQUEST['tool_consumer_instance_guid'];
 	}
 	if (empty($_REQUEST['oauth_consumer_key'])) {
-		reporterror("oauth_consumer_key (resource key) is required");
+		reporterror("Unable to launch - oauth_consumer_key (resource key) is required");
 	} else {
 		$ltikey = $_REQUEST['oauth_consumer_key'];
 	}
