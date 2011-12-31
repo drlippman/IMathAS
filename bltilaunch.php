@@ -745,6 +745,7 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='aid') {
 $promptforsettings = false;
 $query = "SELECT userid,sessiondata FROM imas_sessions WHERE sessionid='$sessionid'";
 $result = mysql_query($query) or die("Query failed : " . mysql_error());
+$SESS = $_SESSION;
 if (mysql_num_rows($result)>0) {
 	//check that same userid, and that we're not jumping on someone else's 
 	//existing session.  If so, then we need to create a new session.
@@ -811,16 +812,16 @@ if ($keyparts[0]=='aid') {
 } else {
 	$sessiondata['ltiitemtype']=-1;
 }
-$sessiondata['ltiorg'] = $_SESSION['ltiorg'];
-$sessiondata['ltirole'] = $_SESSION['ltirole'];
-$sessiondata['lti_context_id']  = $_SESSION['lti_context_id']; 
-$sessiondata['lti_resource_link_id']  = $_SESSION['lti_resource_link_id']; 
-$sessiondata['lti_lis_result_sourcedid']  = stripslashes($_SESSION['lti_lis_result_sourcedid']);
-$sessiondata['lti_outcomeurl']  = $_SESSION['lti_outcomeurl'];
-$sessiondata['lti_context_label'] = $_SESSION['lti_context_label'];
-$sessiondata['lti_launch_get'] = $_SESSION['lti_launch_get'];
-$sessiondata['lti_key'] = $_SESSION['lti_key'];
-$sessiondata['lti_keytype'] = $_SESSION['lti_keytype'];
+$sessiondata['ltiorg'] = $SESS['ltiorg'];
+$sessiondata['ltirole'] = $SESS['ltirole'];
+$sessiondata['lti_context_id']  = $SESS['lti_context_id']; 
+$sessiondata['lti_resource_link_id']  = $SESS['lti_resource_link_id']; 
+$sessiondata['lti_lis_result_sourcedid']  = stripslashes($SESS['lti_lis_result_sourcedid']);
+$sessiondata['lti_outcomeurl']  = $SESS['lti_outcomeurl'];
+$sessiondata['lti_context_label'] = $SESS['lti_context_label'];
+$sessiondata['lti_launch_get'] = $SESS['lti_launch_get'];
+$sessiondata['lti_key'] = $SESS['lti_key'];
+$sessiondata['lti_keytype'] = $SESS['lti_keytype'];
 
 $enc = base64_encode(serialize($sessiondata));
 if ($createnewsession) {
