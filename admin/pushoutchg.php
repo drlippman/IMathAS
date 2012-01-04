@@ -44,6 +44,19 @@ if ($myrights==100) {
    	   	   }
    	   	   echo "<p>Pushed out Intro/Instructions for $na assessments.  $n total changes made.</p>";
    	   }
+	   if (isset($_POST['caltag'])) {
+   	   	   $query = "SELECT name,caltag,calrtag FROM imas_assessments WHERE courseid='$cid'";
+   	   	   $result = mysql_query($query) or die("Query failed : " . mysql_error());
+   	   	   $n = 0;
+   	   	   $na = 0;
+   	   	   while ($row = mysql_fetch_array($result)) {
+   	   	   	   $query = "UPDATE imas_assessments SET caltag='".addslashes($row[1])."',calrtag='".addslashes($row[2])."' WHERE name='{$row[0]}'";
+   	   	   	   mysql_query($query) or die("Query failed : " . mysql_error());
+   	   	   	   $n += mysql_affected_rows();
+   	   	   	   $na++;
+   	   	   }
+   	   	   echo "<p>Pushed out Calendar Tags for $na assessments.  $n total changes made.</p>";
+   	   }
    	   echo '<a href="../index.php">Back to home page</a>';
    } else {
    	   $pagetitle = "Push out Changes";
@@ -58,6 +71,7 @@ if ($myrights==100) {
    	   echo '</select></p>';
    	   echo '<p><input type="checkbox" name="quesset" value="1"/> Push out individual question settings (points and attempts).  Does not affect defaults, or overwrite questions that already have per-question points or attempts set.</p>';
    	   echo '<p><input type="checkbox" name="instr" value="1"/> Push out assessment intro/instructions</p>';
+	   echo '<p><input type="checkbox" name="caltag" value="1"/> Push out calendar tags</p>';
    	   echo '<p><input type="submit" name="submit" value="Submit"/></p>';
    	   echo '</form>';
    }
