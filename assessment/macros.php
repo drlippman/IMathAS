@@ -2024,9 +2024,9 @@ function evalbasic($str) {
 
 function formhoverover($label,$tip) {
 	if (function_exists('filter')) {
-		return '<span class="link" onmouseover="tipshow(this,\''.htmlentities(filter($tip),ENT_QUOTES).'\')" onmouseout="tipout()">'.$label.'</span>';
+		return '<span class="link" onmouseover="tipshow(this,\''.str_replace("'","\\'",htmlentities(filter($tip))).'\')" onmouseout="tipout()">'.$label.'</span>';
 	} else {
-		return '<span class="link" onmouseover="tipshow(this,\''.htmlentities($tip,ENT_QUOTES).'\')" onmouseout="tipout()">'.$label.'</span>';
+		return '<span class="link" onmouseover="tipshow(this,\''.str_replace("'","\\'",htmlentities($tip)).'\')" onmouseout="tipout()">'.$label.'</span>';
 	}
 }
 

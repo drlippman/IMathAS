@@ -467,7 +467,8 @@ if ($overwriteBody==1) {
 		echo '<p>Once exported, <a href="../course/files/coursefilepack'.$cid.'.zip">download course files</a> to be put in course/files/</p>';
 	}
 	?>
-	
+	<p>If you were wanting to export this course to a different Learning Management System, you can try the <a href="ccexport.php?cid=<?php echo $cid;?>">
+	Common Cartridge export</a></p>
 <?php
 }	
 

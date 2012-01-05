@@ -1422,7 +1422,7 @@ function enditem($canedit) {
 				$color = makecolor2($items[$i]['startdate'],$items[$i]['enddate'],$now);
 			}
 			if (in_array($items[$i]['id'],$openblocks)) { $isopen=true;} else {$isopen=false;}
-			if ($isopen) {
+			if ($isopen || count($items[$i]['items'])==0) {
 				$liclass = 'blockli';
 				$qviewstyle = '';
 			} else {

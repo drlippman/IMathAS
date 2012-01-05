@@ -6,11 +6,11 @@
 	//load in filters as needed
 	$filterdir = rtrim(dirname(__FILE__), '/\\');
 	//include("$filterdir/simplelti/simplelti.php");
-	if (isset($sessiondata['mathdisp']) && $sessiondata['mathdisp']==2) { //use image fallback for math
+	if ((isset($sessiondata['mathdisp']) && $sessiondata['mathdisp']==2 ) || isset($loadmathfilter)) { //use image fallback for math
 		include("$filterdir/math/ASCIIMath2TeX.php");
 		$AMT = new AMtoTeX;
 	} 
-	if (isset($sessiondata['graphdisp']) && $sessiondata['graphdisp']==2 || isset($loadgraphfilter)) { //use image fallback for graphs
+	if ((isset($sessiondata['graphdisp']) && $sessiondata['graphdisp']==2) || isset($loadgraphfilter)) { //use image fallback for graphs
 		include("$filterdir/graph/asciisvgimg.php");
 		$AS = new AStoIMG;
 	} 
@@ -178,9 +178,21 @@
 		}
 		return $str;
 	}
+	function forcefiltermath($str) {
+		$str = str_replace('\\`','&grave;',$str);
+		if (strpos($str,'`')!==FALSE) {
+			$str = preg_replace_callback('/`(.*?)`/s', 'mathfiltercallback', $str);
+		}
+		$str = str_replace('&grave;','`',$str);
+		return $str;
+	}
 	function getgraphfilename($str) {
 		$str = forcefiltergraph($str);
 		preg_match('/(\w+\.png)/',$str,$matches);
+		return ($matches[1]);
+	}
+	function getgraphfilenames($str) {
+		preg_match_all('/(\w+\.png)/',$str,$matches,PREG_PATTERN_ORDER);
 		return ($matches[1]);
 	}
 	function printfilter($str) {

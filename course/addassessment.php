@@ -176,7 +176,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		
 		//is updating, switching from nongroup to group, and not creating new groupset, check if groups and asids already exist
 		//if so, cannot handle
-		$updategroupsetid='';
+		$updategroupset='';
 		if (isset($_GET['id']) && $_POST['isgroup']>0 && $_POST['groupsetid']>0) {
 			$isok = true;
 			$query = "SELECT isgroup FROM imas_assessments WHERE id='{$_GET['id']}'";
@@ -223,23 +223,21 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else { //if switching from nogroup to groups and groups already exist, need set agroupids if asids exist already
 				//NOT ALLOWED CURRENTLY
 			}
-			if (isset($_POST['defpoints'])) {
-				$query = "UPDATE imas_assessments SET name='{$_POST['name']}',summary='{$_POST['summary']}',intro='{$_POST['intro']}',startdate=$startdate,enddate=$enddate,reviewdate=$reviewdate,timelimit='$timelimit',minscore='{$_POST['minscore']}',isgroup='$isgroup',showhints='$showhints',tutoredit=$tutoredit,eqnhelper='{$_POST['eqnhelper']}',showtips='{$_POST['showtips']}',";
-				$query .= "displaymethod='{$_POST['displaymethod']}',defpoints='{$_POST['defpoints']}',defattempts='{$_POST['defattempts']}',defpenalty='{$_POST['defpenalty']}',deffeedback='$deffeedback',shuffle='$shuffle',gbcategory='{$_POST['gbcat']}',password='{$_POST['password']}',caltag='$caltag',calrtag='$calrtag',groupsetid='{$_POST['groupsetid']}',";
-				$query .= "cntingb='{$_POST['cntingb']}',showcat='{$_POST['showqcat']}',reqscore='{$_POST['reqscore']}',reqscoreaid='{$_POST['reqscoreaid']}',noprint='{$_POST['noprint']}',avail='{$_POST['avail']}',groupmax='{$_POST['groupmax']}',allowlate='{$_POST['allowlate']}',exceptionpenalty='{$_POST['exceptionpenalty']}',ltisecret='{$_POST['ltisecret']}',deffeedbacktext='$deffb' ";
-				if (isset($_POST['copyendmsg'])) {
-					$query .= ",endmsg='$endmsg' ";
-				}
-				$query .= " WHERE id='{$_GET['id']}';";
-			} else { //has been taken - not updating "don't change" settings
-				$query = "UPDATE imas_assessments SET name='{$_POST['name']}',summary='{$_POST['summary']}',intro='{$_POST['intro']}',startdate=$startdate,enddate=$enddate,reviewdate=$reviewdate,timelimit='$timelimit',minscore='{$_POST['minscore']}',isgroup='$isgroup',showhints='$showhints',tutoredit=$tutoredit,eqnhelper='{$_POST['eqnhelper']}',showtips='{$_POST['showtips']}',";
-				$query .= "displaymethod='{$_POST['displaymethod']}',defattempts='{$_POST['defattempts']}',deffeedback='$deffeedback',shuffle='$shuffle',gbcategory='{$_POST['gbcat']}',password='{$_POST['password']}',cntingb='{$_POST['cntingb']}',showcat='{$_POST['showqcat']}',caltag='$caltag',calrtag='$calrtag',$updategroupset";
-				$query .= "reqscore='{$_POST['reqscore']}',reqscoreaid='{$_POST['reqscoreaid']}',noprint='{$_POST['noprint']}',avail='{$_POST['avail']}',groupmax='{$_POST['groupmax']}',allowlate='{$_POST['allowlate']}',exceptionpenalty='{$_POST['exceptionpenalty']}',ltisecret='{$_POST['ltisecret']}',deffeedbacktext='$deffb' ";
-				if (isset($_POST['copyendmsg'])) {
-					$query .= ",endmsg='$endmsg' ";
-				}
-				$query .= "WHERE id='{$_GET['id']}';";
+			
+			$query = "UPDATE imas_assessments SET name='{$_POST['name']}',summary='{$_POST['summary']}',intro='{$_POST['intro']}',timelimit='$timelimit',minscore='{$_POST['minscore']}',isgroup='$isgroup',showhints='$showhints',tutoredit=$tutoredit,eqnhelper='{$_POST['eqnhelper']}',showtips='{$_POST['showtips']}',";
+			$query .= "displaymethod='{$_POST['displaymethod']}',defattempts='{$_POST['defattempts']}',deffeedback='$deffeedback',shuffle='$shuffle',gbcategory='{$_POST['gbcat']}',password='{$_POST['password']}',cntingb='{$_POST['cntingb']}',showcat='{$_POST['showqcat']}',caltag='$caltag',calrtag='$calrtag',$updategroupset";
+			$query .= "reqscore='{$_POST['reqscore']}',reqscoreaid='{$_POST['reqscoreaid']}',noprint='{$_POST['noprint']}',avail='{$_POST['avail']}',groupmax='{$_POST['groupmax']}',allowlate='{$_POST['allowlate']}',exceptionpenalty='{$_POST['exceptionpenalty']}',ltisecret='{$_POST['ltisecret']}',deffeedbacktext='$deffb' ";
+			if (isset($_POST['defpoints'])) {	
+				$query .= ",defpoints='{$_POST['defpoints']}',defpenalty='{$_POST['defpenalty']}'";
 			}
+			if (isset($_POST['copyendmsg'])) {
+				$query .= ",endmsg='$endmsg' ";
+			}
+			if ($_POST['avail']==1) {
+				$query .= ",startdate=$startdate,enddate=$enddate,reviewdate=$reviewdate";
+			}
+			$query .= " WHERE id='{$_GET['id']}';";
+			
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			if ($from=='gb') {
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid={$_GET['cid']}");

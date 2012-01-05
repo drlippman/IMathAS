@@ -2610,8 +2610,14 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 	} else if ($anstype == "string") {
 		if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}
 		if (is_array($options['strflags'])) {$strflags = $options['strflags'][$qn];} else {$strflags = $options['strflags'];}
+		if (isset($options['scoremethod']))if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$qn];} else {$scoremethod = $options['scoremethod'];}
+		
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$GLOBALS['partlastanswer'] = $givenans;
+		
+		if (isset($scoremethod) && $scoremethod=='takeanything' && trim($givenans)!='') {
+			return 1;
+		}
 		$givenans = stripslashes($givenans);
 
 		$strflags = str_replace(' ','',$strflags);
@@ -2705,6 +2711,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$givenans = addslashes(htmLawed(stripslashes($givenans),$htmlawedconfig));
 		$givenans = preg_replace('/&(\w+;)/',"%$1",$givenans);
 		$GLOBALS['partlastanswer'] = $givenans;
+		if (isset($options['scoremethod']))if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$qn];} else {$scoremethod = $options['scoremethod'];}
+		if (isset($scoremethod) && $scoremethod=='takeanything'  && trim($givenans)!='') {
+			return 1;
+		}
 		return 0;
 	} else if ($anstype == 'interval' || $anstype == 'calcinterval') {
 		if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}
@@ -2851,6 +2861,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$qn];} else {$reltolerance = $options['reltolerance'];}}
 		if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$qn];} else {$abstolerance = $options['abstolerance'];}}
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
+		
 		if (!isset($reltolerance)) { $reltolerance = 1; }
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$GLOBALS['partlastanswer'] = $givenans;
@@ -3574,6 +3585,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 			
 	} else if ($anstype == "file") {
+		if (isset($options['scoremethod']))if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$qn];} else {$scoremethod = $options['scoremethod'];}
+				
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$filename = basename($_FILES["qn$qn"]['name']);
 		$filename = preg_replace('/[^\w\.]/','',$filename);
@@ -3620,6 +3633,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			if (storeuploadedfile("qn$qn",$s3object)) {
 				$GLOBALS['partlastanswer'] = "@FILE:$s3asid/$filename@";
 				$GLOBALS['scoremessages'] .= "Successful";
+				if (isset($scoremethod) && $scoremethod=='takeanything') {
+					return 1;
+				}
 			} else {
 				//echo "Error storing file";
 				$GLOBALS['partlastanswer'] = "Error storing file";
