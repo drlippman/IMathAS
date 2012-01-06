@@ -68,7 +68,7 @@ if (isset($_GET['delete'])) {
 	}
 	
 	function getorg($it,$parent,&$res) {
-		global $iteminfo,$newdir,$installname;
+		global $iteminfo,$newdir,$installname,$urlmode;
 		$out = '';
 		foreach ($it as $k=>$item) {
 			if (is_array($item)) {
@@ -185,7 +185,7 @@ if (isset($_GET['delete'])) {
 					fwrite($fp,'<blti:description>'.htmlentities($row[1]).'</blti:description>');
 					fwrite($fp,'<blti:custom><lticm:property name="place_aid">'.$iteminfo[$item][1].'</lticm:property></blti:custom>');
 					fwrite($fp,'<blti:launch_url>http://' . $_SERVER['HTTP_HOST'] . $imasroot . '/bltilaunch.php</blti:launch_url>');
-					fwrite($fp,'<blti:secure_launch_url>https://' . $_SERVER['HTTP_HOST'] . $imasroot . '/bltilaunch.php</blti:secure_launch_url>');
+					if ($urlmode == 'https://') {fwrite($fp,'<blti:secure_launch_url>https://' . $_SERVER['HTTP_HOST'] . $imasroot . '/bltilaunch.php</blti:secure_launch_url>');}
 					fwrite($fp,'<blti:vendor><lticp:code>IMathAS</lticp:code><lticp:name>'.$installname.'</lticp:name></blti:vendor>');
 					fwrite($fp,'</cartridge_basiclti_link>');
 					fclose($fp);
