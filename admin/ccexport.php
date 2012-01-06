@@ -247,7 +247,8 @@ if (isset($_GET['delete'])) {
 	// iterate over the directory
 	// add each file found to the archive
 	foreach ($iterator as $key=>$value) {
-	    $zip->addFile(realpath($key), basename($key)) or die ("ERROR: Could not add file: $key");        
+		if ($key=='.' || $key=='..') { continue;}
+		$zip->addFile(realpath($key), basename($key)) or die ("ERROR: Could not add file: $key");        
 	}
 	
 	// close and save archive
