@@ -80,7 +80,38 @@
 	$now = time();
 	$query = "SELECT * FROM imas_forums WHERE imas_forums.courseid='$cid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$forumdata = array();
 	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+		$forumdata[$line['id']] = $line;
+	}
+	
+	$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+	$itemorder = unserialize(mysql_result($result,0,0));
+	$itemsimporder = array();
+	function flattenitems($items,&$addto) {
+		global $itemsimporder;
+		foreach ($items as $item) {
+			if (is_array($item)) {
+				flattenitems($item['items'],$addto);
+			} else {
+				$addto[] = $item;
+			}
+		}
+	}
+	flattenitems($itemorder,$itemsimporder);
+	
+	$itemsassoc = array();
+	$query = "SELECT id,typeid FROM imas_items WHERE courseid='$cid' AND itemtype='Forum'";
+	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+	while ($row = mysql_fetch_row($result)) {
+		$itemsassoc[$row[0]] = $row[1];
+	}
+	
+	foreach ($itemsimporder as $item) {
+		if (!isset($itemsassoc[$item])) { continue; }
+		$line = $forumdata[$itemsassoc[$item]];
+
 		if (!$isteacher && !($line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now))) {
 				continue;
 		}

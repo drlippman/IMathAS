@@ -24,8 +24,17 @@ function ahahDone(url, target) {
       }
       var x = document.getElementById(target).getElementsByTagName("script"); 
       for(var i=0;i<x.length;i++) {
-	      eval(x[i].text);
+	      if (x[i].src) {
+		      var script = document.createElement("script");
+		      script.src = x[i].src;
+		      var pn = x[i].parentNode;
+		      pn.replaceChild(script,x[i]);
+	      } else {
+		      eval(x[i].text);
+	      }
       }
+
+   
     } else { 
       document.getElementById(target).innerHTML=" AHAH Error:\n"+ req.status + "\n" +req.statusText; 
     } 

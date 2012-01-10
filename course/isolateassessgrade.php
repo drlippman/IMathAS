@@ -127,6 +127,7 @@
 	$now = time();
 	$lc = 1;
 	$n = 0;
+	$ntime = 0;
 	$tot = 0;
 	$tottime = 0;
 	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
@@ -180,6 +181,7 @@
 			} else {
 				echo '<td>'.round($timeused/60).' min</td>';
 				$tottime += $timeused;
+				$ntime++;
 			}
 			echo "<td>{$line['feedback']}</td>";
 		}
@@ -200,8 +202,8 @@
 	} else {
 		$pct = '-';
 	}
-	if ($n>0) {
-		$timeavg = round(($timeused/$n)/60) . ' min';
+	if ($ntime>0) {
+		$timeavg = round(($tottime/$ntime)/60) . ' min';
 	} else {
 		$timeavg = '-';
 	}

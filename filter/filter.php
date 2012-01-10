@@ -131,16 +131,30 @@
 			if (preg_match_all($search, $str, $res, PREG_SET_ORDER)){
 				foreach ($res as $resval) {
 					$respt = explode(',',$resval[1]);
-					if (count($respt)==1) {
-						$respt = array(600,400,$respt[0]);
-					} else if (count($respt)<3) { continue;}
-					$respt[2] = str_replace('"','',$respt[2]);
-					if (substr($respt[2],0,18)=='https://tegr.it/y/') {
-						$respt[2] = preg_replace('/[^\w:\/\.]/','',$respt[2]);
-						$tag = '<script type="text/javascript" src="'.$respt[2].'"></script>';
+					if (isset($respt[3])) {
+						$nobord = true;
+						array_pop($respt);
 					} else {
-						$tag = "<iframe width=\"{$respt[0]}\" height=\"{$respt[1]}\" src=\"{$respt[2]}\" ";
-						if (isset($respt[3])) {
+						$nobord = false;
+					}
+					if (count($respt)==1) {
+						$url = $respt[0]; $w = 600; $h = 400;
+					} else if (count($respt)<3) { 
+						continue;
+					} else {
+						if (strpos($respt[2],'http')!==false) {
+							list ($w,$h,$url) = $respt;
+						} else {
+							list ($url,$w,$h) = $respt;
+						}
+					}
+					$url = str_replace('"','',$url);
+					if (substr($url,0,18)=='https://tegr.it/y/') {
+						$url = preg_replace('/[^\w:\/\.]/','',$url);
+						$tag = '<script type="text/javascript" src="'.$url.'"></script>';
+					} else {
+						$tag = "<iframe width=\"$w\" height=\"$h\" src=\"$url\" ";
+						if ($nobord) {
 							$tag .= 'frameborder="0" ';
 						} 
 						$tag .= "></iframe>";
@@ -152,7 +166,7 @@
 		
 		if (strpos($str,'[CDF')!==false) {
 			$search = '/\[CDF:\s*([^,]+),([^,]+),([^,\]]+)\]/';
-	
+			
 			if (preg_match_all($search, $str, $res, PREG_SET_ORDER)){
 				foreach ($res as $resval) {
 					if (!isset($GLOBALS['has_set_cdf_embed_script'])) {
@@ -161,7 +175,13 @@
 					} else {
 						$tag = '<script type="text/javascript">';
 					}
-					$tag .= "cdf.embed('{$resval[1]}',{$resval[2]},{$resval[3]});</script>";
+					if (strpos($resval[3],'http')!==false) {
+						list ($junk,$w,$h,$url) = $resval;
+					} else {
+						list ($junk,$url,$w,$h) = $resval;
+					}
+						
+					$tag .= "cdf.embed('$url',$w,$h);</script>";
 					$str = str_replace($resval[0], $tag, $str);
 				}
 			}

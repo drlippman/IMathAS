@@ -422,9 +422,13 @@ if (isset($_GET['launch'])) {
 	$keyparts = explode('_',$ltikey);
 	
 	// prepend ltiorg with courseid or sso+userid to prevent cross-instructor hacking  
-	if ($keyparts[0]=='cid') {  //cid:org
+	if ($keyparts[0]=='cid' || $keyparts[0]=='placein') {  //cid:org
 		$ltiorg = $keyparts[1].':'.$ltiorg;
-		$keytype = 'c';
+		if ($keyparts[0]=='placein') {
+			$keytype = 'gc';
+		} else {
+			$keytype = 'c';
+		}
 		if (isset($_REQUEST['custom_place_aid'])) { //common catridge blti placement using cid_### key type
 			$placeaid = intval($_REQUEST['custom_place_aid']);
 			$query = "SELECT courseid FROM imas_assessments WHERE id='$placeaid'";
@@ -581,7 +585,7 @@ if ($askforuserinfo == true) {
 $now = time();
 
 //general placement or common catridge placement - look for placement, or create if know info
-if ((count($keyparts)==1 && $_SESSION['ltirole']!='instructor') || $_SESSION['lti_keytype']=='cc-g' || $_SESSION['lti_keytype']=='cc-c') { 
+if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltirole']!='instructor') || $_SESSION['lti_keytype']=='cc-g' || $_SESSION['lti_keytype']=='cc-c') { 
 	$query = "SELECT placementtype,typeid FROM imas_lti_placements WHERE ";
 	$query .= "contextid='{$_SESSION['lti_context_id']}' AND linkid='{$_SESSION['lti_resource_link_id']}' ";
 	$query .= "AND org='{$_SESSION['ltiorg']}'";
@@ -693,7 +697,7 @@ if ((count($keyparts)==1 && $_SESSION['ltirole']!='instructor') || $_SESSION['lt
 }
 
 //is course level placement
-if ($keyparts[0]=='cid') {
+if ($keyparts[0]=='cid' || $keyparts[0]=='placein') {
 	$cid = intval($keyparts[1]);
 	$query = "SELECT available,ltisecret FROM imas_courses WHERE id='$cid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -719,7 +723,7 @@ if ($keyparts[0]=='cid') {
 } 
 
 //see if student is enrolled, if appropriate to action type
-if ($keyparts[0]=='cid' || $keyparts[0]=='aid') {
+if ($keyparts[0]=='cid' || $keyparts[0]=='aid' || $keyparts[0]=='placein') {
 	if ($_SESSION['ltirole']=='instructor') {
 		$query = "SELECT id FROM imas_teachers WHERE userid='$userid' AND courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -822,6 +826,10 @@ $sessiondata['lti_context_label'] = $SESS['lti_context_label'];
 $sessiondata['lti_launch_get'] = $SESS['lti_launch_get'];
 $sessiondata['lti_key'] = $SESS['lti_key'];
 $sessiondata['lti_keytype'] = $SESS['lti_keytype'];
+
+if ($_SESSION['lti_keytype']=='gc') {
+	$sessiondata['lti_launch_get']['cid'] = $keyparts[1];
+}
 
 $enc = base64_encode(serialize($sessiondata));
 if ($createnewsession) {

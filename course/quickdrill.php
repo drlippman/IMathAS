@@ -15,6 +15,7 @@
 
 if (isset($_GET['public'])) {
 	require("../config.php");
+
 	header('P3P: CP="ALL CUR ADM OUR"');
 	session_start();
 	$_SESSION['publicquickdrill'] = true;

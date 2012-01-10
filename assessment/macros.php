@@ -2110,6 +2110,7 @@ function cleanbytoken($str,$funcs = array()) {
 	$parts = explode('=',$str); 
 	$finalout = array();
 	foreach ($parts as $substr) {
+		if (trim($substr)=='') {$finalout[] = ''; continue;}
 		$tokens = cleantokenize(trim($substr),$funcs);
 		//print_r($tokens);
 		$out = array();
@@ -2195,9 +2196,10 @@ function cleanbytoken($str,$funcs = array()) {
 			array_shift($out);
 		}
 		if (count($out)==0) {
-			return '0';
+			$finalout[] = '0';
+		} else {
+			$finalout[] = implode('',$out);
 		}
-		$finalout[] = implode('',$out);
 	}
 	return implode('=',$finalout);
 }

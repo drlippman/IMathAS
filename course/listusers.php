@@ -457,7 +457,7 @@ if ($overwriteBody==1) {
 			<span class=form>Time Limit Multiplier:</span>
 			<span class=formright><input type="text" name="timelimitmult" value="<?php echo $lineStudent['timelimitmult'] ?>"/></span><br class=form>
 			<span class=form>Lock out of course?:</span>
-			<span class=formright><input type="checkbox" name="locked" value="1" <?php if ($lineStudent['locked']==1) {echo ' checked="checked" ';} ?>/></span><br class=form>
+			<span class=formright><input type="checkbox" name="locked" value="1" <?php if ($lineStudent['locked']>0) {echo ' checked="checked" ';} ?>/></span><br class=form>
 			<span class=form>Reset password?</span>
 			<span class=formright>
 				<input type=checkbox name="doresetpw" value="1" /> Reset to: 

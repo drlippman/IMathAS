@@ -382,6 +382,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$points=1) {
 			$stuanswers[$qnidx+1] = stripslashes_deep($_POST["qn$qnidx"]); //preg_replace('/\W+/','',stripslashes($_POST["qn$qnidx"]));
 		}
 	}
+	
 	$thisq = $qnidx+1;
 		
 	eval(interpret('control',$qdata['qtype'],$qdata['control']));
@@ -2087,6 +2088,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$givenans = str_replace(' ','',$givenans);
 		
 		if ($answer=='DNE' && strtoupper($givenans)=='DNE') {
+			return 1;
+		} else if ($answer=='oo' && $givenans=='oo') {
 			return 1;
 		}
 		
@@ -4016,6 +4019,12 @@ function formathint($eword,$ansformats,$calledfrom, $islist=false,$doshort=false
 		return array($tip,$shorttip);
 	} else {
 		return $tip;
+	}
+}
+
+if (!function_exists('stripslashes_deep')) {
+	function stripslashes_deep($value) {
+		return (is_array($value) ? array_map('stripslashes_deep', $value) : stripslashes($value));
 	}
 }
 ?>

@@ -51,11 +51,12 @@ if (!(isset($teacherid))) {
 			$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 		}
 		$key = array_search($itemid,$sub);
-		array_splice($sub,$key,1);
-		$itemorder = addslashes(serialize($items));
-		$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
-		
+		if ($key!==false) {
+			array_splice($sub,$key,1);
+			$itemorder = addslashes(serialize($items));
+			$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+		}
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
 		
 		exit;
