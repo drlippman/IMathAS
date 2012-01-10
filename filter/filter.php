@@ -131,12 +131,20 @@
 			if (preg_match_all($search, $str, $res, PREG_SET_ORDER)){
 				foreach ($res as $resval) {
 					$respt = explode(',',$resval[1]);
-					if (count($respt)<3) { continue;}
-					$tag = "<iframe width=\"{$respt[0]}\" height=\"{$respt[1]}\" src=\"{$respt[2]}\" ";
-					if (isset($respt[3])) {
-						$tag .= 'frameborder="0" ';
-					} 
-					$tag .= "></iframe>";
+					if (count($respt)==1) {
+						$respt = array(600,400,$respt[0]);
+					} else if (count($respt)<3) { continue;}
+					$respt[2] = str_replace('"','',$respt[2]);
+					if (substr($respt[2],0,18)=='https://tegr.it/y/') {
+						$respt[2] = preg_replace('/[^\w:\/\.]/','',$respt[2]);
+						$tag = '<script type="text/javascript" src="'.$respt[2].'"></script>';
+					} else {
+						$tag = "<iframe width=\"{$respt[0]}\" height=\"{$respt[1]}\" src=\"{$respt[2]}\" ";
+						if (isset($respt[3])) {
+							$tag .= 'frameborder="0" ';
+						} 
+						$tag .= "></iframe>";
+					}
 					$str = str_replace($resval[0], $tag, $str);
 				}
 			}

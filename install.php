@@ -346,7 +346,7 @@ Make sure this directory has write access by the server process.
 For text editor file/image uploads and assessment file uploads, you can use
 Amazon S3 service to hold these files.  If using this option, provide your
 Amazon S3 key and secret below.  You'll also need to create a bucket and
-specify it below.  Leave these blank to disable file uploads.<br/>
+specify it below.<br/>
 Amazon S3 Key:<input type="text" name="AWSkey" value=""/><br/>
 Amazon S3 Secret:<input type="password" name="AWSsecret" value=""/><br/>
 Amazon S3 Bucket:<input type="text" name="AWSbucket" value=""/><br/>

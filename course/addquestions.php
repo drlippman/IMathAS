@@ -474,7 +474,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 				}
 				if (!$foundmaj) {
-					echo "No maj found";
+					//echo "No maj found";
 					$searchlibs = $userdeflib;
 				}	
 			} else {
