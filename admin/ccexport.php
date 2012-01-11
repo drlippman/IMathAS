@@ -67,15 +67,15 @@ if (isset($_GET['delete'])) {
 		return $str;
 	}
 	
-	function getorg($it,$parent,&$res) {
+	function getorg($it,$parent,&$res,$ind) {
 		global $iteminfo,$newdir,$installname,$urlmode;
 		$out = '';
 		foreach ($it as $k=>$item) {
 			if (is_array($item)) {
-				$out .= '<item identifier="BLOCK'.$item['id'].'">'."\n";
-				$out .= '  <title>'.htmlentities($item['name']).'</title>'."\n";
-				$out .= getorg($item['items'],$parent.'-'.($k+1),$res);
-				$out .= '</item>'."\n";
+				$out .= $ind.'<item identifier="BLOCK'.$item['id'].'">'."\n";
+				$out .= $ind.'  <title>'.htmlentities($item['name']).'</title>'."\n";
+				$out .= $ind.getorg($item['items'],$parent.'-'.($k+1),$res,$ind.'  ');
+				$out .= $ind.'</item>'."\n";
 			} else {
 				if ($iteminfo[$item][0]=='InlineText') {
 					$query = "SELECT title,text,fileorder FROM imas_inlinetext WHERE id='{$iteminfo[$item][1]}'";
@@ -95,9 +95,9 @@ if (isset($_GET['delete'])) {
 							$filesout[$r[0]] = array($r[1],$r[2]);
 						}
 					}
-					$out .= '<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
-					$out .= '  <title>'.htmlentities($row[0]).'</title>'."\n";
-					$out .= '</item>';
+					$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
+					$out .= $ind.'  <title>'.htmlentities($row[0]).'</title>'."\n";
+					$out .= $ind.'</item>'."\n";
 					$fp = fopen($newdir.'/inlinetext'.$iteminfo[$item][1].'.html','w');
 					fwrite($fp,filtercapture($row[1],$res));
 					if ($row[2]!='') {
@@ -124,9 +124,9 @@ if (isset($_GET['delete'])) {
 						fwrite($fp,' <url href="'.$alink.'" target="_blank"/>');
 						fwrite($fp,'</webLink>');
 						fclose($fp);
-						$out .= '<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
-						$out .= '  <title>'.htmlentities($row[0]).'</title>'."\n";
-						$out .= '</item>';
+						$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
+						$out .= $ind.'  <title>'.htmlentities($row[0]).'</title>'."\n";
+						$out .= $ind.'</item>'."\n";
 						$resitem =  '<resource identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" type="imswl_xmlv1p1">'."\n";
 						$resitem .= '  <file href="weblink'.$iteminfo[$item][1].'.xml" />'."\n";
 						$resitem .= '</resource>';
@@ -134,18 +134,18 @@ if (isset($_GET['delete'])) {
 					} else if (substr(strip_tags($row[1]),0,5)=="file:") {  //is a file
 						$filename = trim(substr(strip_tags($row[1]),5));
 						copy("../course/files/$filename",$newdir.'/'.$filename);
-						$out .= '<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
-						$out .= '  <title>'.htmlentities($row[0]).'</title>'."\n";
-						$out .= '</item>';
+						$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
+						$out .= $ind.'  <title>'.htmlentities($row[0]).'</title>'."\n";
+						$out .= $ind.'</item>'."\n";
 						
 						$resitem =  '<resource href="'.$filename.'" identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" type="webcontent">'."\n";
 						$resitem .= '  <file href="'.$filename.'" />'."\n";
 						$resitem .= '</resource>';
 						$res[] = $resitem;
 					} else { //is text
-						$out .= '<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
-						$out .= '  <title>'.htmlentities($row[0]).'</title>'."\n";
-						$out .= '</item>';
+						$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
+						$out .= $ind.'  <title>'.htmlentities($row[0]).'</title>'."\n";
+						$out .= $ind.'</item>'."\n";
 						$fp = fopen($newdir.'/linkedtext'.$iteminfo[$item][1].'.html','w');
 						fwrite($fp,filtercapture($row[1],$res));
 						fclose($fp);
@@ -158,9 +158,9 @@ if (isset($_GET['delete'])) {
 					$query = "SELECT name,description FROM imas_forums WHERE id='{$iteminfo[$item][1]}'";
 					$r = mysql_query($query) or die("Query failed : " . mysql_error());
 					$row = mysql_fetch_row($r);
-					$out .= '<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
-					$out .= '  <title>'.htmlentities($row[0]).'</title>'."\n";
-					$out .= '</item>';
+					$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
+					$out .= $ind.'  <title>'.htmlentities($row[0]).'</title>'."\n";
+					$out .= $ind.'</item>'."\n";
 					$fp = fopen($newdir.'/forum'.$iteminfo[$item][1].'.xml','w');
 					fwrite($fp,'<topic xmlns="http://www.imsglobal.org/xsd/imsccv1p1/imsdt_v1p1">');
 					fwrite($fp,' <title >'.htmlentities($row[0]).'</title>');
@@ -176,9 +176,9 @@ if (isset($_GET['delete'])) {
 					$query = "SELECT name,summary FROM imas_assessments WHERE id='{$iteminfo[$item][1]}'";
 					$r = mysql_query($query) or die("Query failed : " . mysql_error());
 					$row = mysql_fetch_row($r);
-					$out .= '<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
-					$out .= '  <title>'.htmlentities($row[0]).'</title>'."\n";
-					$out .= '</item>';
+					$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
+					$out .= $ind.'  <title>'.htmlentities($row[0]).'</title>'."\n";
+					$out .= $ind.'</item>'."\n";
 					$fp = fopen($newdir.'/blti'.$iteminfo[$item][1].'.xml','w');
 					fwrite($fp,'<cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0">');
 					fwrite($fp,'<blti:title>'.htmlentities($row[0]).'</blti:title>');
@@ -200,11 +200,12 @@ if (isset($_GET['delete'])) {
 		return $out;
 	}
 	
-	$manifestorg = getorg($items,'0',$manifestres);
+	$manifestorg = getorg($items,'0',$manifestres,'  ');
 	
 	$fp = fopen($newdir.'/imsmanifest.xml','w');
+	fwrite($fp,'<?xml version="1.0" encoding="UTF-8" ?>'."\n");
 	fwrite($fp,'<manifest identifier="imathas'.$cid.'" xmlns="http://www.imsglobal.org/xsd/imsccv1p1/imscp_v1p1" xmlns:lom="http://ltsc.ieee.org/xsd/imsccv1p1/LOM/resource" xmlns:lomimscc="http://ltsc.ieee.org/xsd/imsccv1p1/LOM/manifest" >'."\n");
-	fwrite($fp,'<metadata>    <schema>IMS Common Cartridge</schema>    <schemaversion>1.1.0</schemaversion> ');
+	fwrite($fp,'<metadata>'."\n".'<schema>IMS Common Cartridge</schema>'."\n".'<schemaversion>1.1.0</schemaversion> '."\n");
 	fwrite($fp, '<lomimscc:lom>
 	      <lomimscc:general>
 		<lomimscc:title>
@@ -217,16 +218,16 @@ if (isset($_GET['delete'])) {
 		  <lomimscc:string language="en-US">IMathAS</lomimscc:string>
 		</lomimscc:keyword>
 	      </lomimscc:general>
-	    </lomimscc:lom></metadata>'."\n");
+	    </lomimscc:lom>'."\n".'</metadata>'."\n");
 	fwrite($fp,'<organizations>'."\n".' <organization identifier="O_1" structure="rooted-hierarchy">'."\n".' <item identifier="I_1">'."\n");
 	fwrite($fp,$manifestorg);
-	fwrite($fp, '</item></organization>  </organizations>');
-	fwrite($fp,'<resources>');
+	fwrite($fp, ' </item>'."\n".' </organization>'."\n".'</organizations>'."\n");
+	fwrite($fp,'<resources>'."\n");
 	foreach($manifestres as $r) {
 		fwrite($fp,$r."\n");
 	}
-	fwrite($fp,'</resources>');
-	fwrite($fp,'</manifest>');
+	fwrite($fp,'</resources>'."\n");
+	fwrite($fp,'</manifest>'."\n");
 	fclose($fp);
 	
 	// increase script timeout value

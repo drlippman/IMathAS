@@ -189,6 +189,11 @@ p.imp {
 </head>
 <body>
 <h2>IMathAS Install</h2>
+<?php
+if (extension_loaded("suhosin")) {
+	echo '<p><b>Warning</b>:  It appears the Suhosin PHP extension is loaded on this server.  ';
+	echo 'IMathAS cannot operate correctly with this extension.</p>';
+}
 <p>This page will help you configure IMathAS.  The database settings <b>must</b> be
 changed.  The rest of the settings autopopulate to reasonable defaults but can be
 changed to allow for customization.</p>
