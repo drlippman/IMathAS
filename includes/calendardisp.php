@@ -296,16 +296,7 @@ $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 $itemorder = unserialize(mysql_result($result,0,0));
 $itemsimporder = array();
-function flattenitems($items,&$addto) {
-	global $itemsimporder;
-	foreach ($items as $item) {
-		if (is_array($item)) {
-			flattenitems($item['items'],$addto);
-		} else {
-			$addto[] = $item;
-		}
-	}
-}
+
 flattenitems($itemorder,$itemsimporder);
 
 $itemsassoc = array();
@@ -441,5 +432,15 @@ if ($pageshift==0) {
 	echo "<script>showcalcontents(document.getElementById('{$ids[0][$dayofweek]}'));</script>";
 }
 
+}
+function flattenitems($items,&$addto) {
+	global $itemsimporder;
+	foreach ($items as $item) {
+		if (is_array($item)) {
+			flattenitems($item['items'],$addto);
+		} else {
+			$addto[] = $item;
+		}
+	}
 }
 ?>

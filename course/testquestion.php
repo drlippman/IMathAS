@@ -164,7 +164,17 @@ if ($overwriteBody==1) {
 	displayq(0,$_GET['qsetid'],$seed,true,true,$attempt);
 	echo "<input type=submit value=\"Submit\"><input type=submit name=\"regen\" value=\"Submit and Regen\">\n";
 	echo "<input type=button value=\"White Background\" onClick=\"whiteout()\"/>";
+	echo "<input type=button value=\"Show HTML\" onClick=\"document.getElementById('qhtml').style.display='';\"/>";
 	echo "</form>\n";
+	
+	echo '<code id="qhtml" style="display:none">';
+	$message = displayq(0,$_GET['qsetid'],$seed,false,false,0,true);
+	$message = printfilter(forcefiltergraph($message));
+	$message = preg_replace('/(`[^`]*`)/',"<span class=\"AM\">$1</span>",$message);
+	$message = str_replacE('`','\`',$message);
+	echo htmlentities($message);
+	echo '</code>';
+				
 	
 	echo "<p>Question id: {$_GET['qsetid']}.  <a href=\"mailto:$email?subject=Problem%20with%20question%20id%20{$_GET['qsetid']}\">E-mail owner</a> to report problems</p>";
 	echo "<p>Description: $descr</p><p>Author: $author</p>";

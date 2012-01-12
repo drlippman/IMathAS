@@ -1676,6 +1676,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 					$extension = substr($url,strrpos($url,'.')+1,3);
 					$filename = basename($file);
 					$out .= "<br/>Last file uploaded: <a href=\"$url\" target=\"_new\">$filename</a>";
+					$out .= "<input type=\"hidden\" name=\"lf$qn\" value=\"$file\"/>";
 					if (in_array(strtolower($extension),array('jpg','gif','png','bmp','jpe'))) {
 						$out .= " <span class=\"clickable\" id=\"filetog$qn\" onclick=\"toggleinlinebtn('img$qn','filetog$qn');\">[+]</span>";
 						$out .= " <img id=\"img$qn\" style=\"display:none;\" src=\"$url\" />";
@@ -3593,6 +3594,31 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$filename = basename($_FILES["qn$qn"]['name']);
 		$filename = preg_replace('/[^\w\.]/','',$filename);
+		if (trim($filename)=='') {
+			$found = false;
+			if ($_POST["lf$qn"]!='') {
+				if ($multi>0) {
+					if (strpos($GLOBALS['lastanswers'][$multi-1],'@FILE:'.$_POST["lf$qn"].'@')!==false) {
+						$found = true;
+					}
+				} else {
+					if (strpos($GLOBALS['lastanswers'][$qn],'@FILE:'.$_POST["lf$qn"].'@')!==false) {
+						$found = true;
+					}
+				}
+			}
+			if ($found) {
+				$GLOBALS['partlastanswer'] = '@FILE:'.$_POST["lf$qn"].'@';
+				if (isset($scoremethod) && $scoremethod=='takeanything') {
+					return 1;
+				} else {
+					return 0;
+				}
+			} else {
+				$GLOBALS['partlastanswer'] = '';
+				return 0;
+			}
+		}
 		$extension = strtolower(strrchr($filename,"."));
 		$badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p",".exe");
 		if ($GLOBALS['scoremessages'] != '') {
