@@ -410,7 +410,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	
 } else { //show instructor view
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js?v=012811\"></script>\n";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablescroller.js\"></script>\n";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablescroller2.js\"></script>\n";
 	$placeinhead .= "<script type=\"text/javascript\">\n";
 	$placeinhead .= 'var ts = new tablescroller("myTable",';
 	if (isset($_COOKIE["gblhdr-$cid"]) && $_COOKIE["gblhdr-$cid"]==1) {
@@ -444,7 +444,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	$placeinhead .= 'function highlightrow(el) { el.setAttribute("lastclass",el.className); el.className = "highlight";}';
 	$placeinhead .= 'function unhighlightrow(el) { el.className = el.getAttribute("lastclass");}';
 	$placeinhead .= "</script>\n";
-	$placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } table.gb tr.highlight { border-bottom:1px solid #333;} table.gb tr {border-bottom:1px solid #fff; }</style>";
+	$placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } table.gb tr.highlight { border-bottom:1px solid #333;} table.gb tr {border-bottom:1px solid #fff; } td.trld {display:table-cell;vertical-align:middle;} </style>";
 	
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
@@ -632,7 +632,6 @@ function gbstudisp($stu) {
 	}
 	echo "<form method=post action=\"gradebook.php?{$_SERVER['QUERY_STRING']}\">";
 	//echo "<input type='button' onclick='conditionalColor(\"myTable\",1,50,80);' value='Color'/>";
-	
 	echo '<table id="myTable" class="gb" style="position:relative;">';
 	echo '<thead><tr><th>Item</th><th>Possible</th><th>Grade</th><th>Percent</th>';
 	if ($stu>0 && $isteacher) {
@@ -973,12 +972,14 @@ function gbinstrdisp() {
 	//print_r($gbt);
 	//echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n"; in placeinhead
 	echo "<div id=\"tbl-container\">";
+	echo '<div id="bigcontmyTable"><div id="tblcontmyTable">';
+	
 	echo '<table class="gb" id="myTable"><thead><tr>';
 	$n=0;
 	for ($i=0;$i<count($gbt[0][0]);$i++) { //biographical headers
-		if ($showpics>0 && $i==1) {echo '<th></th>';} //for pics
+		if ($i==1) {echo '<th><div></div></th>';} //for pics
 		if ($i==1 && $gbt[0][0][1]!='ID') { continue;}
-		echo '<th>'.$gbt[0][0][$i];
+		echo '<th><div>'.$gbt[0][0][$i];
 		if (($gbt[0][0][$i]=='Section' || ($isdiag && $i==4)) && (!$istutor || $tutorsection=='')) {
 			echo "<br/><select id=\"secfiltersel\" onchange=\"chgsecfilter()\"><option value=\"-1\" ";
 			if ($secfilter==-1) {echo  'selected=1';}
@@ -1002,7 +1003,7 @@ function gbinstrdisp() {
 			echo "<option value=2 "; writeHtmlSelected($hidelocked,2); echo ">Hide Locked</option>";
 			echo "</select>";
 		}
-		echo '</th>';
+		echo '</div></th>';
 		
 		$n++;
 	}
@@ -1010,11 +1011,11 @@ function gbinstrdisp() {
 		//total totals
 		if ($catfilter<0) {
 			if (isset($gbt[0][3][0])) { //using points based
-				echo '<th><span class="cattothdr">Total<br/>'.$gbt[0][3][$availshow].'&nbsp;pts</span></th>';
+				echo '<th><div><span class="cattothdr">Total<br/>'.$gbt[0][3][$availshow].'&nbsp;pts</span></div></th>';
 				echo '<th>%</th>';
 				$n+=2;
 			} else {
-				echo '<th><span class="cattothdr">Weighted Total %</span></th>';
+				echo '<th><div><span class="cattothdr">Weighted Total %</span></div></th>';
 				$n++;
 			}
 		}
@@ -1025,14 +1026,14 @@ function gbinstrdisp() {
 				} else if ($availshow==2 && $gbt[0][2][$i][2]==3) {
 					continue;
 				}
-				echo '<th class="cat'.$gbt[0][2][$i][1].'"><span class="cattothdr">';
+				echo '<th class="cat'.$gbt[0][2][$i][1].'"><div><span class="cattothdr">';
 				if ($availshow<3) {
 					echo $gbt[0][2][$i][0].'<br/>';
 					echo $gbt[0][2][$i][3+$availshow].'&nbsp;pts';
 				} else if ($availshow==3) { //past and attempted
 					echo $gbt[0][2][$i][0];
 				}
-				echo '</span></th>';
+				echo '</span></div></th>';
 				$n++;
 			}
 		}
@@ -1055,7 +1056,7 @@ function gbinstrdisp() {
 				continue;
 			}
 			//name and points
-			echo '<th class="cat'.$gbt[0][1][$i][1].'">'.$gbt[0][1][$i][0].'<br/>';
+			echo '<th class="cat'.$gbt[0][1][$i][1].'"><div>'.$gbt[0][1][$i][0].'<br/>';
 			if ($gbt[0][1][$i][4]==0 || $gbt[0][1][$i][4]==3) {
 				echo $gbt[0][1][$i][2].' (Not Counted)';
 			} else {
@@ -1070,26 +1071,26 @@ function gbinstrdisp() {
 			//links
 			if ($gbt[0][1][$i][6]==0 ) { //online
 				if ($isteacher) {
-					echo "<br/><a class=small href=\"addassessment.php?id={$gbt[0][1][$i][7]}&cid=$cid&from=gb\">[Settings]</a>";
-					echo "<br/><a class=small href=\"isolateassessgrade.php?cid=$cid&aid={$gbt[0][1][$i][7]}\">[Isolate]</a>";
+					echo "<br/><a class=small href=\"addassessment.php?id={$gbt[0][1][$i][7]}&amp;cid=$cid&amp;from=gb\">[Settings]</a>";
+					echo "<br/><a class=small href=\"isolateassessgrade.php?cid=$cid&amp;aid={$gbt[0][1][$i][7]}\">[Isolate]</a>";
 					if ($gbt[0][1][$i][10]==true) {
-						echo "<br/><a class=small href=\"isolateassessbygroup.php?cid=$cid&aid={$gbt[0][1][$i][7]}\">[By Group]</a>";
+						echo "<br/><a class=small href=\"isolateassessbygroup.php?cid=$cid&amp;aid={$gbt[0][1][$i][7]}\">[By Group]</a>";
 					}
 				} else {
-					echo "<br/><a class=small href=\"isolateassessgrade.php?cid=$cid&aid={$gbt[0][1][$i][7]}\">[Isolate]</a>";
+					echo "<br/><a class=small href=\"isolateassessgrade.php?cid=$cid&amp;aid={$gbt[0][1][$i][7]}\">[Isolate]</a>";
 				}
 			} else if ($gbt[0][1][$i][6]==1  && ($isteacher || ($istutor && $gbt[0][1][$i][8]==1))) { //offline
 				if ($isteacher) {
-					echo "<br/><a class=small href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$i][7]}\">[Settings]</a>";
-					echo "<br/><a class=small href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$i][7]}&isolate=true\">[Isolate]</a>";
+					echo "<br/><a class=small href=\"addgrades.php?stu=$stu&amp;cid=$cid&amp;grades=all&amp;gbitem={$gbt[0][1][$i][7]}\">[Settings]</a>";
+					echo "<br/><a class=small href=\"addgrades.php?stu=$stu&amp;cid=$cid&amp;grades=all&amp;gbitem={$gbt[0][1][$i][7]}&amp;isolate=true\">[Isolate]</a>";
 				} else {
-					echo "<br/><a class=small href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$i][7]}&isolate=true\">[Scores]</a>";
+					echo "<br/><a class=small href=\"addgrades.php?stu=$stu&amp;cid=$cid&amp;grades=all&amp;gbitem={$gbt[0][1][$i][7]}&amp;isolate=true\">[Scores]</a>";
 				}
 			} else if ($gbt[0][1][$i][6]==2  && $isteacher) { //discussion
-				echo "<br/><a class=small href=\"addforum.php?id={$gbt[0][1][$i][7]}&cid=$cid&from=gb\">[Settings]</a>";
+				echo "<br/><a class=small href=\"addforum.php?id={$gbt[0][1][$i][7]}&amp;cid=$cid&amp;from=gb\">[Settings]</a>";
 			}
 			
-			echo '</th>';
+			echo '</div></th>';
 			$n++;
 		}
 	}
@@ -1101,25 +1102,25 @@ function gbinstrdisp() {
 				} else if ($availshow==2 && $gbt[0][2][$i][2]==3) {
 					continue;
 				}
-				echo '<th class="cat'.$gbt[0][2][$i][1].'"><span class="cattothdr">';
+				echo '<th class="cat'.$gbt[0][2][$i][1].'"><div><span class="cattothdr">';
 				if ($availshow<3) {
 					echo $gbt[0][2][$i][0].'<br/>';
 					echo $gbt[0][2][$i][3+$availshow].'&nbsp;pts';
 				} else if ($availshow==3) { //past and attempted
 					echo $gbt[0][2][$i][0];
 				}
-				echo '</span></th>';
+				echo '</span></div></th>';
 				$n++;
 			}
 		}
 		//total totals
 		if ($catfilter<0) {
 			if (isset($gbt[0][3][0])) { //using points based
-				echo '<th><span class="cattothdr">Total<br/>'.$gbt[0][3][$availshow].'&nbsp;pts</span></th>';
-				echo '<th>%</th>';
+				echo '<th><div><span class="cattothdr">Total<br/>'.$gbt[0][3][$availshow].'&nbsp;pts</span></div></th>';
+				echo '<th><div>%</div></th>';
 				$n+=2;
 			} else {
-				echo '<th><span class="cattothdr">Weighted Total %</span></th>';
+				echo '<th><div><span class="cattothdr">Weighted Total %</span></div></th>';
 				$n++;
 			}
 		}
@@ -1127,53 +1128,54 @@ function gbinstrdisp() {
 	echo '</tr></thead><tbody>';
 	//create student rows
 	for ($i=1;$i<count($gbt);$i++) {
+		if ($i==1) {$insdiv = "<div>";  $enddiv = "</div>";} else {$insdiv = ''; $enddiv = '';}
 		if ($i%2!=0) {
 			echo "<tr class=even onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">"; 
 		} else {
 			echo "<tr class=odd onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">"; 
 		}
-		echo '<td class="locked" scope="row">';
+		echo '<td class="locked" scope="row"><div class="trld">';
 		if ($gbt[$i][0][0]!="Averages" && $isteacher) {
 			echo "<input type=\"checkbox\" name='checked[]' value='{$gbt[$i][4][0]}' />&nbsp;";
 		}
-		echo "<a href=\"gradebook.php?cid=$cid&stu={$gbt[$i][4][0]}\">";
+		echo "<a href=\"gradebook.php?cid=$cid&amp;stu={$gbt[$i][4][0]}\">";
 		if ($gbt[$i][4][1]>0) {
 			echo '<span style="text-decoration: line-through;">'.$gbt[$i][0][0].'</span>';
 		} else {
 			echo $gbt[$i][0][0];
 		}
-		echo '</a></td>';
+		echo '</a></div></td>';
 		if ($showpics==1 && file_exists("$curdir//files/userimg_sm{$gbt[$i][4][0]}.jpg")) {
-			echo "<td><img src=\"$imasroot/course/files/userimg_sm{$gbt[$i][4][0]}.jpg\"/></td>";
+			echo "<td>{$insdiv}<div class=\"trld\"><img src=\"$imasroot/course/files/userimg_sm{$gbt[$i][4][0]}.jpg\"/></div></td>";
 		} else if ($showpics==2 && file_exists("$curdir//files/userimg_{$gbt[$i][4][0]}.jpg")) {
-			echo "<td><img src=\"$imasroot/course/files/userimg_{$gbt[$i][4][0]}.jpg\"/></td>";
-		} else if ($showpics>0) {
-			echo '<td></td>';
+			echo "<td>{$insdiv}<div class=\"trld\"><img src=\"$imasroot/course/files/userimg_{$gbt[$i][4][0]}.jpg\"/></div></td>";
+		} else {
+			echo '<td>'.$insdiv.'<div class="trld">&nbsp;</div></td>';
 		}
 		for ($j=($gbt[0][0][1]=='ID'?1:2);$j<count($gbt[0][0]);$j++) {
-			echo '<td class="c">'.$gbt[$i][0][$j].'</td>';	
+			echo '<td class="c">'.$insdiv.$gbt[$i][0][$j].$enddiv .'</td>';	
 		}
 		if ($totonleft && !$hidepast) {
 			//total totals
 			if ($catfilter<0) {
 				if ($availshow==3) {
 					if ($gbt[$i][0][0]=='Averages') { 
-						echo '<td class="c">'.$gbt[$i][3][6].'%</td>';
+						echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'%'.$enddiv .'</td>';
 					} else {
 						if (isset($gbt[$i][3][8])) { //using points based
-							echo '<td class="c">'.$gbt[$i][3][6].'/'.$gbt[$i][3][7].'</td>';
-							echo '<td class="c">'.$gbt[$i][3][8] .'%</td>';
+							echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'/'.$gbt[$i][3][7].$enddiv.'</td>';
+							echo '<td class="c">'.$insdiv.$gbt[$i][3][8] .'%'.$enddiv .'</td>';
 							
 						} else {
-							echo '<td class="c">'.$gbt[$i][3][6].'%</td>';
+							echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'%'.$enddiv .'</td>';
 						}
 					}
 				} else {
 					if (isset($gbt[0][3][0])) { //using points based
-						echo '<td class="c">'.$gbt[$i][3][$availshow].'</td>';
-						echo '<td class="c">'.$gbt[$i][3][$availshow+3] .'%</td>';
+						echo '<td class="c">'.$insdiv.$gbt[$i][3][$availshow].$enddiv .'</td>';
+						echo '<td class="c">'.$insdiv.$gbt[$i][3][$availshow+3] .'%'.$enddiv .'</td>';
 					} else {
-						echo '<td class="c">'.$gbt[$i][3][$availshow].'%</td>';
+						echo '<td class="c">'.$insdiv.$gbt[$i][3][$availshow].'%'.$enddiv .'</td>';
 					}
 				}
 			}
@@ -1187,7 +1189,7 @@ function gbinstrdisp() {
 					}
 					if ($catfilter!=-1 && $availshow<3 && $gbt[0][2][$j][$availshow+3]>0) {
 						//echo '<td class="c">'.$gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)</td>';
-						echo '<td class="c">';
+						echo '<td class="c">'.$insdiv;
 						if ($gbt[$i][0][0]=='Averages' && $availshow!=3) {
 							echo "<span onmouseover=\"tipshow(this,'5-number summary: {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
 						}
@@ -1196,10 +1198,10 @@ function gbinstrdisp() {
 						if ($gbt[$i][0][0]=='Averages' && $availshow!=3) {
 							echo '</span>';
 						}
-						echo '</td>';
+						echo $enddiv .'</td>';
 					} else {
 						//echo '<td class="c">'.$gbt[$i][2][$j][$availshow].'</td>';
-						echo '<td class="c">';
+						echo '<td class="c">'.$insdiv;
 						if ($gbt[$i][0][0]=='Averages') {
 							echo "<span onmouseover=\"tipshow(this,'5-number summary: {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
 						}
@@ -1215,7 +1217,7 @@ function gbinstrdisp() {
 						if ($gbt[$i][0][0]=='Averages') {
 							echo '</span>';
 						}
-						echo '</td>';
+						echo $enddiv .'</td>';
 					} 
 					
 				}
@@ -1238,7 +1240,7 @@ function gbinstrdisp() {
 				if ($hidepast && $gbt[0][1][$j][3]==0) {
 					continue;
 				}
-				echo '<td class="c">';
+				echo '<td class="c">'.$insdiv;
 				if (isset($gbt[$i][1][$j][5]) && ($gbt[$i][1][$j][5]&(1<<$availshow)) && !$hidepast) {
 					echo '<span style="font-style:italic">';
 				}
@@ -1247,11 +1249,11 @@ function gbinstrdisp() {
 						if ($istutor && $gbt[$i][1][$j][4]=='average') {
 							
 						} else if ($gbt[$i][1][$j][4]=='average') {
-							echo "<a href=\"gb-itemanalysis.php?stu=$stu&cid=$cid&asid={$gbt[$i][1][$j][4]}&aid={$gbt[0][1][$j][7]}\" "; 
+							echo "<a href=\"gb-itemanalysis.php?stu=$stu&amp;cid=$cid&amp;asid={$gbt[$i][1][$j][4]}&amp;aid={$gbt[0][1][$j][7]}\" "; 
 							echo "onmouseover=\"tipshow(this,'5-number summary: {$gbt[0][1][$j][9]}')\" onmouseout=\"tipout()\" ";
 							echo ">";
 						} else {
-							echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid={$gbt[$i][1][$j][4]}&uid={$gbt[$i][4][0]}\">";
+							echo "<a href=\"gb-viewasid.php?stu=$stu&amp;cid=$cid&amp;asid={$gbt[$i][1][$j][4]}&amp;uid={$gbt[$i][4][0]}\">";
 						}
 						echo $gbt[$i][1][$j][0];
 						if ($gbt[$i][1][$j][3]==1) {
@@ -1277,7 +1279,7 @@ function gbinstrdisp() {
 						if ($gbt[$i][0][0]=='Averages') {
 							echo '-';
 						} else if ($isteacher) {
-							echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid=new&aid={$gbt[0][1][$j][7]}&uid={$gbt[$i][4][0]}\">-</a>";
+							echo "<a href=\"gb-viewasid.php?stu=$stu&amp;cid=$cid&amp;asid=new&amp;aid={$gbt[0][1][$j][7]}&amp;uid={$gbt[$i][4][0]}\">-</a>";
 						} else {
 							echo '-';
 						}
@@ -1285,17 +1287,17 @@ function gbinstrdisp() {
 				} else if ($gbt[0][1][$j][6]==1) { //offline
 					if ($isteacher) {
 						if ($gbt[$i][0][0]=='Averages') {
-							echo "<a href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$j][7]}\" ";
+							echo "<a href=\"addgrades.php?stu=$stu&amp;cid=$cid&amp;grades=all&amp;gbitem={$gbt[0][1][$j][7]}\" ";
 							echo "onmouseover=\"tipshow(this,'5-number summary: {$gbt[0][1][$j][9]}')\" onmouseout=\"tipout()\" ";
 							echo ">";
 						} else {
-							echo "<a href=\"addgrades.php?stu=$stu&cid=$cid&grades={$gbt[$i][4][0]}&gbitem={$gbt[0][1][$j][7]}\">";
+							echo "<a href=\"addgrades.php?stu=$stu&amp;cid=$cid&amp;grades={$gbt[$i][4][0]}&amp;gbitem={$gbt[0][1][$j][7]}\">";
 						}
 					} else if ($istutor && $gbt[0][1][$j][8]==1) {
 						if ($gbt[$i][0][0]=='Averages') {
-							echo "<a href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$j][7]}\">";
+							echo "<a href=\"addgrades.php?stu=$stu&amp;cid=$cid&amp;grades=all&amp;gbitem={$gbt[0][1][$j][7]}\">";
 						} else {
-							echo "<a href=\"addgrades.php?stu=$stu&cid=$cid&grades={$gbt[$i][4][0]}&gbitem={$gbt[0][1][$j][7]}\">";
+							echo "<a href=\"addgrades.php?stu=$stu&amp;cid=$cid&amp;grades={$gbt[$i][4][0]}&amp;gbitem={$gbt[0][1][$j][7]}\">";
 						}
 					}
 					if (isset($gbt[$i][1][$j][0])) {
@@ -1315,7 +1317,7 @@ function gbinstrdisp() {
 				} else if ($gbt[0][1][$j][6]==2) { //discuss
 					if (isset($gbt[$i][1][$j][0])) {
 						if ( $gbt[$i][0][0]!='Averages') {
-							echo "<a href=\"viewforumgrade.php?cid=$cid&stu=$stu&uid={$gbt[$i][4][0]}&fid={$gbt[0][1][$j][7]}\">";
+							echo "<a href=\"viewforumgrade.php?cid=$cid&amp;stu=$stu&amp;uid={$gbt[$i][4][0]}&amp;fid={$gbt[0][1][$j][7]}\">";
 							echo $gbt[$i][1][$j][0];
 							echo '</a>';
 						} else {
@@ -1325,7 +1327,7 @@ function gbinstrdisp() {
 						}
 					} else {
 						if ($isteacher && $gbt[$i][0][0]!='Averages') {
-							echo "<a href=\"viewforumgrade.php?cid=$cid&stu=$stu&uid={$gbt[$i][4][0]}&fid={$gbt[0][1][$j][7]}\">-</a>";
+							echo "<a href=\"viewforumgrade.php?cid=$cid&amp;stu=$stu&amp;uid={$gbt[$i][4][0]}&amp;fid={$gbt[0][1][$j][7]}\">-</a>";
 						} else {
 							echo '-';
 						}
@@ -1334,7 +1336,7 @@ function gbinstrdisp() {
 				if (isset($gbt[$i][1][$j][5]) && ($gbt[$i][1][$j][5]&(1<<$availshow)) && !$hidepast) {
 					echo '<sub>d</sub></span>';
 				}
-				echo '</td>';
+				echo $enddiv .'</td>';
 			}
 		}
 		if (!$totonleft && !$hidepast) {
@@ -1348,7 +1350,7 @@ function gbinstrdisp() {
 					}
 					if ($catfilter!=-1 && $availshow<3 && $gbt[0][2][$j][$availshow+3]>0) {
 						//echo '<td class="c">'.$gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)</td>';
-						echo '<td class="c">';
+						echo '<td class="c">'.$insdiv;
 						if ($gbt[$i][0][0]=='Averages' && $availshow!=3) {
 							echo "<span onmouseover=\"tipshow(this,'5-number summary: {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
 						}
@@ -1357,10 +1359,10 @@ function gbinstrdisp() {
 						if ($gbt[$i][0][0]=='Averages' && $availshow!=3) {
 							echo '</span>';
 						}
-						echo '</td>';
+						echo $enddiv .'</td>';
 					} else {
 						//echo '<td class="c">'.$gbt[$i][2][$j][$availshow].'</td>';
-						echo '<td class="c">';
+						echo '<td class="c">'.$insdiv;
 						if ($gbt[$i][0][0]=='Averages' && $availshow<3) {
 							echo "<span onmouseover=\"tipshow(this,'5-number summary: {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
 						}
@@ -1376,7 +1378,7 @@ function gbinstrdisp() {
 						if ($gbt[$i][0][0]=='Averages' && $availshow<3) {
 							echo '</span>';
 						}
-						echo '</td>';
+						echo $enddiv .'</td>';
 					}
 					
 				}
@@ -1386,29 +1388,29 @@ function gbinstrdisp() {
 			if ($catfilter<0) {
 				if ($availshow==3) {
 					if ($gbt[$i][0][0]=='Averages') { 
-						echo '<td class="c">'.$gbt[$i][3][6].'%</td>';
+						echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'%'.$enddiv .'</td>';
 					} else {
 						if (isset($gbt[$i][3][8])) { //using points based
-							echo '<td class="c">'.$gbt[$i][3][6].'/'.$gbt[$i][3][7].'</td>';
-							echo '<td class="c">'.$gbt[$i][3][8] .'%</td>';
+							echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'/'.$gbt[$i][3][7].$enddiv .'</td>';
+							echo '<td class="c">'.$insdiv.$gbt[$i][3][8] .'%'.$enddiv .'</td>';
 							
 						} else {
-							echo '<td class="c">'.$gbt[$i][3][6].'%</td>';
+							echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'%'.$enddiv .'</td>';
 						}
 					}
 				} else {
 					if (isset($gbt[0][3][0])) { //using points based
-						echo '<td class="c">'.$gbt[$i][3][$availshow].'</td>';
-						echo '<td class="c">'.$gbt[$i][3][$availshow+3] .'%</td>';
+						echo '<td class="c">'.$insdiv.$gbt[$i][3][$availshow].$enddiv .'</td>';
+						echo '<td class="c">'.$insdiv.$gbt[$i][3][$availshow+3] .'%'.$enddiv .'</td>';
 					} else {
-						echo '<td class="c">'.$gbt[$i][3][$availshow].'%</td>';
+						echo '<td class="c">'.$insdiv.$gbt[$i][3][$availshow].'%'.$enddiv .'</td>';
 					}
 				}
 			}
 		}
 		echo '</tr>';
 	}
-	echo "</tbody></table>";
+	echo "</tbody></table></div></div>";
 	if ($n>1) {
 		$sarr = array_fill(0,$n-1,"'N'");
 	} else {

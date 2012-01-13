@@ -23,7 +23,7 @@ if (isset($_GET['delete'])) {
 	unlink($path.'/CCEXPORT'.$cid.'.imscc');
 	echo "export file deleted";
 } else if (isset($_GET['create'])) {
-
+	$linktype = $_GET['type'];
 	$iteminfo = array();
 	$query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid=$cid";
 	$r = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -68,7 +68,7 @@ if (isset($_GET['delete'])) {
 	}
 	
 	function getorg($it,$parent,&$res,$ind) {
-		global $iteminfo,$newdir,$installname,$urlmode;
+		global $iteminfo,$newdir,$installname,$urlmode,$linktype;
 		$out = '';
 		foreach ($it as $k=>$item) {
 			if (is_array($item)) {
@@ -183,8 +183,13 @@ if (isset($_GET['delete'])) {
 					fwrite($fp,'<cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0">');
 					fwrite($fp,'<blti:title>'.htmlentities($row[0]).'</blti:title>');
 					fwrite($fp,'<blti:description>'.htmlentities($row[1]).'</blti:description>');
-					fwrite($fp,'<blti:custom><lticm:property name="place_aid">'.$iteminfo[$item][1].'</lticm:property></blti:custom>');
-					fwrite($fp,'<blti:launch_url>http://' . $_SERVER['HTTP_HOST'] . $imasroot . '/bltilaunch.php</blti:launch_url>');
+					if ($linktype=='url') {
+						$urladd = '?custom_place_aid='.$iteminfo[$item][1];
+					} else {
+						fwrite($fp,'<blti:custom><lticm:property name="place_aid">'.$iteminfo[$item][1].'</lticm:property></blti:custom>');
+						$urladd = '';
+					}
+					fwrite($fp,'<blti:launch_url>http://' . $_SERVER['HTTP_HOST'] . $imasroot . '/bltilaunch.php'.$urladd.'</blti:launch_url>');
 					if ($urlmode == 'https://') {fwrite($fp,'<blti:secure_launch_url>https://' . $_SERVER['HTTP_HOST'] . $imasroot . '/bltilaunch.php</blti:secure_launch_url>');}
 					fwrite($fp,'<blti:vendor><lticp:code>IMathAS</lticp:code><lticp:name>'.$installname.'</lticp:name></blti:vendor>');
 					fwrite($fp,'</cartridge_basiclti_link>');
@@ -286,7 +291,8 @@ if (isset($_GET['delete'])) {
 	echo 'to create an account on this system) or cid_###_1 (if you want students to only be able to log in through the LMS), where ### is ';
 	echo 'replaced with your course key.  If you do not see the LTI key setting in your course settings, then your system administrator does ';
 	echo 'not have LTI enabled on your system, and you cannot use this feature.</p>';
-	echo "<p><a href=\"ccexport.php?cid=$cid&create=true\">Create CC Export</a></p>";
+	echo "<p><a href=\"ccexport.php?cid=$cid&create=true&type=custom\">Create CC Export</a> with LTI placements as custom fields</p>";
+	echo "<p><a href=\"ccexport.php?cid=$cid&create=true&type=url\">Create CC Export</a> with LTI placements in URLs</p>";
 }
 require("../footer.php");
 

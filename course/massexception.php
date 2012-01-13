@@ -179,8 +179,8 @@
 			$lasts = 0;
 			$assessarr = array();
 			while ($row = mysql_fetch_row($result)) {
-				$sdate = date("m/d/y g:i a", $row[6]);
-				$edate = date("m/d/y g:i a", $row[7]);
+				$sdate = tzdate("m/d/y g:i a", $row[6]);
+				$edate = tzdate("m/d/y g:i a", $row[7]);
 				if ($lasts!=$row[4]) {
 					if ($lasts!=0) {
 						natsort($assessarr);
