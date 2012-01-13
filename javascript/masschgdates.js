@@ -148,6 +148,51 @@ Date.prototype.getWeekDays = function(d) {
 	 globd.setTime(Date.parse(el.value));
 	 document.getElementById(el.id.substring(0,2)+el.id.substring(5)).innerHTML = globd.SHORTDAYS[globd.getDay()];
   }
+  function senddownselect(el) {
+	  var ln = el.id.substr(3)*1;
+	  var val = el.value*1;
+	  if (val==1) {
+		  senddown(ln);
+	  } else if (val==2) {
+		  copydown(ln,0);
+	  } else if (val==3) {
+		  copydown(ln,1);
+	  }
+	  el.selectedIndex= 0;
+  }
+  function copydownsub(type,basearr,st,usecb,ctype) {  //type: s,e,r
+	  if (document.getElementById(type+"datetype"+st).value==1) {
+		   var newstartdate = document.getElementById(type+"date"+st).value;
+		   if (newstartdate!=0 && newstartdate!=2000000000 && basearr[st]!="NA") {
+			  var newstarttime = document.getElementById(type+"time"+st).value; 
+			  for (var i=st+1;i<basearr.length;i++) {
+				  if (usecb && !document.getElementById("cb"+i).checked) {
+					  continue;
+				  }
+				  if (basearr[i]!="NA" && document.getElementById(type+"datetype"+i).value==1) {
+					  if (ctype==1) {document.getElementById(type+"date"+i).value = newstartdate;}
+					  document.getElementById(type+"time"+i).value = newstarttime;
+				  }
+			  }
+		   }
+	  }
+  }
+  
+  function copydown(st,type) {
+	  var usecb = false;
+	  var cbs = document.getElementsByTagName("input");
+	  for (var i=0;i<cbs.length;i++) {
+		  if (cbs[i].type=="checkbox" && cbs[i].checked && cbs[i].id.match(/cb/)) {
+			  usecb = true;
+			  break;
+		  }
+	  }
+	  copydownsub('s',basesdates,st,usecb,type);
+	  copydownsub('e',baseedates,st,usecb,type);
+	  if (baserdates[st]!="NA") {
+		 copydownsub('r',baserdates,st,usecb,type);
+	  }
+  }
   function senddownsub(type,basearr,st,usebusdays,usecb) {  //type: s,e,r
 	  var d = new Date();
 	  var db = new Date();
@@ -198,13 +243,14 @@ Date.prototype.getWeekDays = function(d) {
 			  break;
 		  }
 	  }
-	// alert(usecb);
+	 
 	  senddownsub('s',basesdates,st,usebusdays,usecb);
 	  senddownsub('e',baseedates,st,usebusdays,usecb);
 	  if (baserdates[st]!="NA") {
 		  senddownsub('r',baserdates,st,usebusdays,usecb);
 	  }
   }
+
   function filteritems() {
 	  var filtertype = document.getElementById("filter").value;
 	  window.location = filteraddr + '&filter=' + filtertype;

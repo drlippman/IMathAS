@@ -37,7 +37,10 @@ if ($isdiag) {
 } else {
 	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/assessment/print.css\" media=\"print\"/>\n";
 }
-if ($sessiondata['mathdisp']==1) {
+if (!isset($sessiondata['mathdisp'])) {
+	echo '<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false;</script>';
+	echo "<script src=\"$imasroot/javascript/mathgraphcheck.js?v=091311\" type=\"text/javascript\"></script>\n";
+} else if ($sessiondata['mathdisp']==1) {
 	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/ASCIIMathML_min.js?v=100411\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIIMath = true;</script>";
 } else if ($sessiondata['mathdisp']==2) {
@@ -67,7 +70,7 @@ div { zoom: 1; }
 }
 </style> 
 <![endif]--> 
-<script src="<?php echo $imasroot . "/javascript/AMhelpers_min.js?v=120811";?>" type="text/javascript"></script>
+<script src="<?php echo $imasroot . "/javascript/AMhelpers_min.js?v=011212b";?>" type="text/javascript"></script>
 <script src="<?php echo $imasroot . "/javascript/confirmsubmit.js";?>" type="text/javascript"></script>
 <!--[if lt IE 9]><script type="text/javascript" src="<?php echo $imasroot;?>/javascript/excanvas_min.js?v=120811"></script><![endif]-->
 <script type="text/javascript" src="<?php echo $imasroot;?>/javascript/drawing_min.js?v=120811"></script>

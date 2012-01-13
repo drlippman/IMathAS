@@ -594,18 +594,18 @@ function AMmathpreview(inputId,outputId) {
 }
 
 var greekletters = ['alpha','beta','delta','epsilon','gamma','phi','psi','sigma','rho','theta'];
-var calctoproc = new Array();
-var intcalctoproc = new Array();
-var calcformat = new Array();
-var functoproc = new Array();
-var matcalctoproc = new Array();
-var ntupletoproc = new Array();
-var complextoproc = new Array();
-var matsize = new Array();
-var vlist = new Array();
-var flist = new Array();
-var pts = new Array();
-var iseqn = new Array();
+var calctoproc = {};
+var intcalctoproc = {};
+var calcformat = {};
+var functoproc ={};
+var matcalctoproc = {};
+var ntupletoproc = {};
+var complextoproc = {};
+var matsize = {};
+var vlist = {};
+var flist = {};
+var pts = {};
+var iseqn = {};
 
 function doonsubmit(form,type2,skipconfirm) {
 	if (form!=null) {
@@ -621,7 +621,8 @@ function doonsubmit(form,type2,skipconfirm) {
 		}
 	}
 	for (var qn in intcalctoproc) { //i=0; i<intcalctoproc.length; i++) {
-		var nh = document.getElementById("qn" + qn);
+		qn = parseInt(qn);
+		
 		fullstr = document.getElementById("tc"+qn).value;
 		fullstr = fullstr.replace(/\s+/g,'');
 		
@@ -658,12 +659,11 @@ function doonsubmit(form,type2,skipconfirm) {
 			 }
 			 fullstr = strarr.join('U');
 		  }
-		  nh.value = fullstr;
-		  outn = document.getElementById("p"+qn);
-		  outn.appendChild(nh);
+		  document.getElementById("qn" + qn).value = fullstr;
 	}
 	for (var qn in calctoproc) { //i=0; i<calctoproc.length; i++) {
-		var nh = document.getElementById("qn" + qn);
+		qn = parseInt(qn);
+		
 		str = document.getElementById("tc"+qn).value;
 		if (calcformat[qn].indexOf('list')!=-1) {
 			strarr = str.split(/,/);
@@ -697,38 +697,30 @@ function doonsubmit(form,type2,skipconfirm) {
 			}
 			strarr[sc] = res;
 		}
-		nh.value = strarr.join(',');
-		outn = document.getElementById("p"+qn);
-		outn.appendChild(nh);
+		document.getElementById("qn" + qn).value = strarr.join(',');
 	}
 	for (var qn in matcalctoproc) {//i=0; i<matcalctoproc.length; i++) {
-		var nh = document.getElementById("qn" +  qn);
+		qn = parseInt(qn);
 		if (matsize[qn]!= null) {
 			msize = matsize[qn].split(",");
 			str = matrixcalc("qn"+qn,null,msize[0],msize[1]);
 		} else {
 			str = matrixcalc("tc"+qn,null);
 		}
-		nh.value = str;
-		outn = document.getElementById("p"+qn);
-		outn.appendChild(nh);
+		document.getElementById("qn" +  qn).value = str;
 	}
 	for (var qn in ntupletoproc) {//i=0; i<ntupletoproc.length; i++) {
-		var nh = document.getElementById("qn" + qn);
+		qn = parseInt(qn);
 		str = ntuplecalc("tc"+qn,null);
-		nh.value = str;
-		outn = document.getElementById("p"+qn);
-		outn.appendChild(nh);
+		document.getElementById("qn" + qn).value = str;
 	}
 	for (var qn in complextoproc) { //i=0; i<complextoproc.length; i++) {
-		var nh = document.getElementById("qn" + qn);
+		qn = parseInt(qn);
 		str = complexcalc("tc"+qn,null);
-		nh.value = str;
-		outn = document.getElementById("p"+qn);
-		outn.appendChild(nh);
+		document.getElementById("qn" + qn).value = str;
 	}
 	for (var qn in functoproc) { //fcnt=0; fcnt<functoproc.length; fcnt++) {
-		var nh = document.getElementById("qn" + qn);
+		qn = parseInt(qn);
 		str = document.getElementById("tc"+qn).value;
 		str = str.replace(/,/g,"");
 		if (iseqn[qn]==1) {
@@ -759,11 +751,9 @@ function doonsubmit(form,type2,skipconfirm) {
 			varlist = varlist+'|'+fl;
 		}
 		vars = varlist.split("|");
+		var nh = document.getElementById("qn" + qn);
 		nh.value = mathjs(str,varlist);
 
-		outn = document.getElementById("p"+qn);
-		outn.appendChild(nh);
-		
 		ptlist = pts[qn].split(",");
 		vals= new Array();
 		for (var fj=0; fj<ptlist.length;fj++) { //for each set of inputs
@@ -784,10 +774,7 @@ function doonsubmit(form,type2,skipconfirm) {
 				vals[fj] = NaN;
 			}	
 		}
-		var nh2 = document.getElementById("qn" + qn+"-vals");
-		nh2.value = vals.join(",");
-		outn.appendChild(nh2);
-		
+		document.getElementById("qn" + qn+"-vals").value = vals.join(",");
 	}
 	return true;
 }

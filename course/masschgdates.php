@@ -103,7 +103,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		exit;
 	} else { //DEFAULT DATA MANIPULATION
 		$pagetitle = "Mass Change Dates";
-		$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/masschgdates.js?v=042910\"></script>";
+		$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/masschgdates.js?v=011212\"></script>";
 		$placeinhead .= "<style>.show {display:inline;} \n .hide {display:none;} img {cursor:pointer;}\n</style>";
 	}
 }	
@@ -191,8 +191,9 @@ if ($overwriteBody==1) {
 	echo '</p>';
 	
 	echo "<p><input type=checkbox id=\"onlyweekdays\" checked=\"checked\"> Shift by weekdays only</p>";
-	echo "<p>Once changing dates in one row, you can click <i>Send Down List</i> to send the date change ";
-	echo "difference to all rows below.  If you click the checkboxes on the left, you can limit the update to those items. ";
+	echo "<p>Once changing dates in one row, you can click <i>Send Chg Down</i> to send the date change ";
+	echo "difference to all rows below.  You can click <i>Copy Down</i> to copy the same date to all rows below.  ";
+	echo "If you click the checkboxes on the left, you can limit the update to those items. ";
 	echo "Click the <img src=\"$imasroot/img/swap.gif\"> icon in each cell to swap from ";
 	echo "Always/Never to Dates.  Swaps to/from Always/Never cannot be sent down the list.</p>";
 	echo "<form id=\"qform\" method=post action=\"masschgdates.php?cid=$cid\">";
@@ -204,7 +205,7 @@ if ($overwriteBody==1) {
 	echo ' to <select id="swapselected"><option value="always">Always/Never</option><option value="dates">Dates</option></select>';
 	echo ' <input type="button" value="Go" onclick="MCDtoggleselected(this.form)" />';
 	
-	echo '<table class=gb><thead><tr><th>Name</th><th>Type</th><th>Start Date</th><th>End Date</th><th>Review Date</th><th>Send Date Chg Down List</th></thead><tbody>';
+	echo '<table class=gb><thead><tr><th>Name</th><th>Type</th><th>Start Date</th><th>End Date</th><th>Review Date</th><th>Send Date Chg / Copy Down List</th></thead><tbody>';
 	
 	$names = Array();
 	$startdates = Array();
@@ -443,7 +444,12 @@ if ($overwriteBody==1) {
 			echo " at <input type=text size=8 id=\"rtime$cnt\" name=\"rtime$cnt\" value=\"$rtime\"></span>";
 		}
 		echo '</td>';
-		echo "<td><input type=button value=\"Send Down List\" onclick=\"senddown($cnt)\"/></td>";
+		//echo "<td>Send Down: <a href=\"#\" <input type=button value=\"Change\" onclick=\"senddown($cnt)\"/> <input type=button value=\"Copy\" onclick=\"copydown($cnt)\"/></td>";
+		echo "<td><select id=\"sel$cnt\" onchange=\"senddownselect(this);\"><option value=\"0\" selected=\"selected\">Action...</option>";
+		echo '<option value="1">Send down date change</option>';
+		echo '<option value="2">Copy down time only</option>';
+		echo '<option value="3">Copy down date &amp; time</option>';
+		echo '</select></td>';
 		echo "</tr>";
 		$cnt++;
 	}
