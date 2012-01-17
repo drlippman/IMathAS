@@ -11,7 +11,31 @@ See htmLawed_README.txt/.htm
 Stripslashes() GET/POST if magic_quotes is on
 */
 
+require_once("filehandler.php");
+
+function convertdatauris($in) {
+	global $CFG,$userid;
+	$okext = array('jpeg'=>'.jpg','gif'=>'.gif','png'=>'.png');
+	if (strpos($in,'data:image')===false) {return $in;}
+	if (!isset($CFG['GEN']['noFileBrowser'])) {
+		preg_match_all('/<img[^>]*src="(data:image\/(\w+);base64,([^"]*))"/',$in,$matches);
+		foreach ($matches[3] as $k=>$code) {
+			$img = base64_decode($code);
+			$ext = $matches[2][$k];
+			if (!isset($okext[$ext])) { continue;}
+			$key = "ufiles/$userid/pastedimage".tzdate("ymd-His",time()).'-'.$k.$okext[$ext];
+			storecontenttofile($img,$key,"public");
+			$in = str_replace($matches[1][$k],getuserfileurl($key),$in);
+		}	
+		return $in;
+	} else {
+		$in = preg_replace('/<img[^>]*src="data:image[^>]*>/','',$in);
+	}
+	return $in;
+}
+
 function htmLawed($in, $cf = 1, $spec = array()){
+$in = convertdatauris($in);
 $cf = is_array($cf) ? $cf : array();
 // config: valid_xhtml
 if(!empty($cf['valid_xhtml'])){

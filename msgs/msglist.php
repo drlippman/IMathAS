@@ -63,6 +63,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 	} else {
 		$filteruid = 0;
 	}
+	$type = $_GET['type'];
 	
 	if (isset($_GET['add'])) {
 		if (isset($_POST['subject'])) {
@@ -113,6 +114,12 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				$message .= "user preferences</a></p>\r\n";
 				mail($email,'New message notification',$message,$headers);
 			}
+			if ($type=='new') {
+				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/newmsglist.php?cid=$cid");
+			} else {
+				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/msglist.php?page=$page&cid=$cid&filtercid=$filtercid");				
+			}
+			exit;
 		} else {
 			$pagetitle = "New Message";
 			$useeditor = "message";
@@ -120,13 +127,18 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			require("../header.php");
 			echo "<div class=breadcrumb>$breadcrumbbase ";
 			if ($cid>0) {
-				echo "<a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt;  ";
+				echo "<a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
 			}
-			echo "<a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">Message List</a> &gt; ";
+			if ($type=='sent') {
+				echo "&gt; <a href=\"sentlist.php?page=$page&cid=$cid&filtercid=$filtercid\">Sent Message List</a> ";
+			} else if ($type=='allstu') {
+				echo "&gt; <a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid\">Message List</a> &gt; <a href=\"allstumsglist.php?page=$page&cid=$cid&filterstu=$filterstu\">Student Messages</a> ";
+			} else if ($type=='new') {
+				echo "&gt; <a href=\"newmsglist.php?cid=$cid\">New Message List</a> ";
+			} else {
+				echo "&gt; <a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid\">Message List</a> ";
+			}
 			
-			echo "New Message</div>\n";
-			
-			echo "<h3>New Message</h3>\n";
 			if (isset($_GET['toquote'])) {
 				$replyto = $_GET['toquote'];
 			} else if (isset($_GET['replyto'])) {
@@ -134,6 +146,17 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			} else {
 				$replyto = 0;
 			}
+			
+			if ($replyto > 0) {
+				echo "&gt; <a href=\"viewmsg.php?page=$page&type=$type&cid=$cid&filtercid=$filtercid&msgid=$replyto\">Message</a> ";
+				echo "&gt; Reply</div>";
+				echo "<h2>Reply</h2>\n";
+			} else {
+				echo "&gt; New Message</div>";
+				echo "<h2>New Message</h2>\n";
+			}
+			
+			
 			if ($cid>0) {
 				$query = "SELECT msgset FROM imas_courses WHERE id='$cid'";
 				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -178,7 +201,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				$courseid=$cid;
 			}
 			
-			echo "<form method=post action=\"msglist.php?page=$page&cid=$cid&add={$_GET['add']}&replyto=$replyto\">\n";
+			echo "<form method=post action=\"msglist.php?page=$page&type=$type&cid=$cid&add={$_GET['add']}&replyto=$replyto\">\n";
 			echo "<span class=form>To:</span><span class=formright>\n";
 			if (isset($_GET['to'])) {
 				$query = "SELECT LastName,FirstName,email FROM imas_users WHERE id='{$_GET['to']}'";
@@ -267,6 +290,12 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$query = "UPDATE imas_msgs SET isread=(isread|2) WHERE id IN ($checklist)";
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		if ($type=='new') {
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/newmsglist.php?cid=$cid");
+		} else {
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/msglist.php?page=$page&cid=$cid&filtercid=$filtercid");				
+		}
+		exit;
 	}
 	}
 	if (isset($_GET['removeid'])) {

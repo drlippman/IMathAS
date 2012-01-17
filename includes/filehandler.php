@@ -7,6 +7,34 @@ if (isset($GLOBALS['AWSkey'])) {
 	$GLOBALS['filehandertype'] = 'local';	
 }
 
+function storecontenttofile($content,$key,$sec="private") {
+	if ($GLOBALS['filehandertype'] == 's3') {
+		if ($sec=="public" || $sec=="public-read") {
+			$sec = "public-read";
+		} else {
+			$sec = "private";
+		}
+		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		if ($s3->putObject($content,$GLOBALS['AWSbucket'],$key,$sec)) {
+			return true;
+		} else {
+			return false;
+		}
+	} else {
+		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore/';
+		$dir = $base.dirname($key);
+		$fn = basename($key);
+		$fh = @fopen($dir.'/'.$fn,'wb');
+		if ($fh) {
+			fwrite($fh,$content);
+			fclose($fh);
+			return true;
+		} else {
+			return false;
+		}
+	}
+}
+
 function storeuploadedfile($id,$key,$sec="private") {
 	if ($GLOBALS['filehandertype'] == 's3') {
 		if ($sec=="public" || $sec=="public-read") {

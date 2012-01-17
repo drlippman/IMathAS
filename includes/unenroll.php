@@ -150,6 +150,9 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 	if (count($tounenroll)>0) {
 		$query = "DELETE FROM imas_students WHERE userid IN ($stulist) AND courseid='$cid'";
 		mysql_query($query) or die("Query failed : $query" . mysql_error());
+		
+		$query = "DELETE FROM imas_login_log WHERE userid IN ($stulist) AND courseid='$cid'";
+		mysql_query($query) or die("Query failed : $query" . mysql_error());
 	}
 		 
 }

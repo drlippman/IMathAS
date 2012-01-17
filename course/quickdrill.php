@@ -347,8 +347,19 @@ if ($mode=='cntup' || $mode=='cntdown') {
 ?>
 <script type="text/javascript">
 function focusfirst() {
-   var el = document.getElementById("qn0");
-   if (el != null) {el.focus();}
+   var el = document.getElementById("tc0");
+   if (el == null) {
+   	   el = document.getElementById("qn0");
+   }
+   if (el == null) {
+   	   el = document.getElementById("tc1000");
+   } 
+   if (el == null) {
+   	   el = document.getElementById("qn1000");
+   }
+   if (el != null) {
+   	el.focus();
+   }
 }
 initstack.push(focusfirst);
 </script>
