@@ -24,7 +24,10 @@ require_once '../../includes/OAuth.php';
     $parms["lti_version"] = "LTI-1p0";
     $parms["lti_message_type"] = "basic-lti-launch-request";
     if ( $org_id ) $parms["tool_consumer_instance_guid"] = $org_id;
-    if ( $org_desc ) $parms["tool_consumer_instance_description"] = $org_desc;
+    if ( $org_desc ) {
+	    $parms["tool_consumer_instance_description"] = $org_desc;
+	    $parms["tool_consumer_instance_name"] = $org_desc;
+    }
     $parms["basiclti_submit"] = "Launch Tool";
     $parms["oauth_callback"] = "about:blank";
 

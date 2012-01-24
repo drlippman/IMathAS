@@ -29,7 +29,7 @@ if (trim($line['custom'])!='') {
 		$pt = explode('=',$custbit);
 		if (count($pt)==2 && trim($pt[0])!='' && trim($pt[1])!='') {
 			$pt[0] = map_keyname($pt[0]);
-			$parms['custom_'.$pt[0]] = $pt[1];
+			$parms['custom_'.$pt[0]] = str_replace(array('$cid','$userid','$linkid'),array($cid,$userid,intval($_GET['linkid'])),$pt[1]);
 		}
 	}
 }
@@ -39,7 +39,7 @@ if (trim($linkcustom)!='') {
 		$pt = explode('=',$custbit);
 		if (count($pt)==2 && trim($pt[0])!='' && trim($pt[1])!='') {
 			$pt[0] = map_keyname($pt[0]);
-			$parms['custom_'.$pt[0]] = $pt[1];
+			$parms['custom_'.$pt[0]] = str_replace(array('$cid','$userid','$linkid'),array($cid,$userid,intval($_GET['linkid'])),$pt[1]);
 		}
 	}
 }
@@ -80,6 +80,7 @@ if ($_GET['target']=='new') {
 } else {
 	$parms['launch_presentation_document_target'] = 'iframe';
 	$parms['launch_presentation_height'] = '500';
+	$parms['launch_presentation_width'] = '600';
 }
 $parms['launch_presentation_return_url'] = $urlmode . $_SERVER['HTTP_HOST'] . $imasroot . '/course/course.php?cid=' . $cid;
 
