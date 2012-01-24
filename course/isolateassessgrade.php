@@ -96,11 +96,11 @@
 //	$query .= "WHERE iu.id = istu.userid AND istu.courseid='$cid' AND iu.id=ias.userid AND ias.assessmentid='$aid'";
 
 	//get exceptions
-	$query = "SELECT userid,enddate FROM imas_exceptions WHERE assessmentid='$aid'";
+	$query = "SELECT userid,enddate,islatepass FROM imas_exceptions WHERE assessmentid='$aid'";
 	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 	$exceptions = array();
 	while ($row = mysql_fetch_row($result)) {
-		$exceptions[$row[0]] = $row[1];
+		$exceptions[$row[0]] = array($row[1],$row[2]);
 	}
 	
 	$query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.timelimitmult,";
@@ -152,23 +152,39 @@
 		if ($line['id']==null) {
 			echo "<td><a href=\"gb-viewasid.php?gbmode=$gbmode&cid=$cid&asid=new&uid={$line['userid']}&from=isolate&aid=$aid\">-</a></td><td>-</td><td></td>";		
 		} else {
-			echo "<td><a href=\"gb-viewasid.php?gbmode=$gbmode&cid=$cid&asid={$line['id']}&uid={$line['userid']}&from=isolate&aid=$aid\">";
-			if ($total<$minscore) {
-				echo "{$total}&nbsp;(NC)";
-			} else 	if ($IP==1 && $enddate>$now) {
-				echo "{$total}&nbsp;(IP)";
-			} else	if (($timelimit>0) &&($timeused > $timelimit*$line['timelimitmult'])) {
-				echo "{$total}&nbsp;(OT)";
-			} else if ($assessmenttype=="Practice") {
-				echo "{$total}&nbsp;(PT)";
+			if (isset($exceptions[$line['userid']])) {
+				$thisenddate = $exceptions[$line['userid']][0];
 			} else {
-				echo "{$total}";
+				$thisenddate = $enddate;
+			}
+			echo "<td><a href=\"gb-viewasid.php?gbmode=$gbmode&cid=$cid&asid={$line['id']}&uid={$line['userid']}&from=isolate&aid=$aid\">";
+			if ($thisenddate>$now) {
+				echo '<i>'.$total;
+			} else {
+				echo $total;
+			}
+			if ($total<$minscore) {
+				echo "&nbsp;(NC)";
+			} else 	if ($IP==1 && $thisenddate>$now) {
+				echo "&nbsp;(IP)";
+			} else	if (($timelimit>0) &&($timeused > $timelimit*$line['timelimitmult'])) {
+				echo "&nbsp;(OT)";
+			} else if ($assessmenttype=="Practice") {
+				echo "&nbsp;(PT)";
+			} else {
 				$tot += $total;
 				$n++;
 			}
+			if ($thisenddate>$now) {
+				echo '</i>';
+			}
 			echo '</a>';
 			if (isset($exceptions[$line['userid']])) {
-				echo '<sup>e</sup>';
+				if ($exceptions[$line['userid']][1]==1) {
+					echo '<sup>LP</sup>';
+				} else {
+					echo '<sup>e</sup>';
+				}
 			} 
 			echo '</td>';
 			if ($totalpossible>0) {
@@ -214,7 +230,8 @@
 	} else {
 		echo "<script> initSortTable('myTable',Array('S','N'),true);</script>";
 	}
-	echo "<p>Meanings:  IP-In Progress, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sup>e</sup> Has exception/latepass  </p>\n";
+	echo "<p>Meanings:  <i>italics</i>-available to student, IP-In Progress (some questions unattempted), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/>";
+	echo "<sup>e</sup> Has exception <sup>LP</sup> Used latepass  </p>\n";
 	
 	require("../footer.php");
 	
