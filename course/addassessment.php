@@ -243,9 +243,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid={$_GET['cid']}");
 			} else if ($from=='mcd') {
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/masschgdates.php?cid={$_GET['cid']}");
+			} else if ($from=='lti') {
+				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/ltihome.php?showhome=true");
 			} else {
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
-			}
+			} 
 			exit;
 		} else { //add new
 			if (!isset($_POST['copyendmsg'])) {$endmsg = '';}						

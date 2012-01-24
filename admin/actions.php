@@ -258,6 +258,7 @@ switch($_GET['action']) {
 				$newitems = array();
 				require("../includes/copyiteminc.php");
 				copyallsub($items,'0',$newitems,$gbcats);
+				doaftercopy($_POST['usetemplate']);
 				$itemorder = addslashes(serialize($newitems));
 				$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
@@ -432,6 +433,9 @@ switch($_GET['action']) {
 				$query = "DELETE FROM imas_stugroups WHERE groupsetid='{$row[0]}'";
 			}
 			$query = "DELETE FROM imas_stugroupset WHERE courseid='{$_GET['id']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			
+			$query = "DELETE FROM imas_external_tools WHERE courseid='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		}	
 		break;

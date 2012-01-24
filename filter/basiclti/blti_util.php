@@ -25,7 +25,7 @@ require_once '../../includes/OAuth.php';
     $parms["lti_message_type"] = "basic-lti-launch-request";
     if ( $org_id ) $parms["tool_consumer_instance_guid"] = $org_id;
     if ( $org_desc ) $parms["tool_consumer_instance_description"] = $org_desc;
-    $parms["basiclti_submit"] = "Launch Endpoint with BasicLTI Data";
+    $parms["basiclti_submit"] = "Launch Tool";
     $parms["oauth_callback"] = "about:blank";
 
     if ( $org_secret ) {
@@ -81,7 +81,7 @@ require_once '../../includes/OAuth.php';
       $r .= "<p><b>OAuth Base String (most recent)</b><br/>\n".$last_base_string."</p>\n";
     } else {
       $basiclti_submit = "basiclti_submit";
-      $basiclti_submit_text = "Launch Endpoint with BasicLTI Data";
+      $basiclti_submit_text = "Launch Tool";
       $r .= " <script language=\"javascript\"> \n" .
           "    document.getElementById(\"ltiLaunchFormSubmitArea\").style.display = \"none\";\n" .
           "    nei = document.createElement('input');\n" .
@@ -123,5 +123,19 @@ require_once '../../includes/OAuth.php';
     }
     return array("launch_url" => $launch_url, "custom" => $custom ) ;
   }
+  
+  function map_keyname($key) {
+    $newkey = "";
+    $key = strtolower(trim($key));
+    foreach (str_split($key) as $ch) {
+        if ( ($ch >= 'a' && $ch <= 'z') || ($ch >= '0' && $ch <= '9') ) {
+            $newkey .= $ch;
+        } else {
+            $newkey .= '_';
+        }
+    }
+    return $newkey;
+}
+
 
 ?>

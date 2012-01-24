@@ -159,6 +159,7 @@ function togglepic(el) {
 	}
 }
 
+
 //from http://www.webreference.com/programming/javascript/onloads/
 function addLoadEvent(func) { 
 	  var oldonload = window.onload; 
@@ -173,6 +174,31 @@ function addLoadEvent(func) {
 	    } 
 	  } 
 } 
+
+function submitlimiter(e) {
+	e = e || window.event;  
+	var target = e.target || e.srcElement;
+	if (target.className == 'submitted') {
+		alert("You have already submitted this page.  Please be patient while your submission is processed.");
+		target.className = "submitted2";
+		e.preventDefault();
+	} else if (target.className == 'submitted2') {
+		e.preventDefault();
+	} else {
+		target.className = 'submitted';
+	}
+}
+function setupFormLimiters() {
+	var el = document.getElementsByTagName("form");
+	for (var i=0;i<el.length;i++) {
+		if (typeof el[i].onsubmit != 'function') {
+			el[i].onsubmit = submitlimiter;
+		}
+	}
+}
+addLoadEvent(setupFormLimiters);
+
+
 var GB_loaded = false;
 //based on greybox redux, http://jquery.com/demo/grey/
 function GB_show(caption,url,width,height) {

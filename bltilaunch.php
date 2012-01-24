@@ -206,10 +206,14 @@ if (isset($_GET['launch'])) {
 				$md5pw = md5($_POST['curPW']);
 				$query = "SELECT password,id FROM imas_users WHERE SID='{$_POST['curSID']}'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				if (mysql_result($result,0,0)==$md5pw) {
-					$userid=mysql_result($result,0,1);
+				if (mysql_num_rows($result)==0) {
+					$infoerr = 'Username (key) is not valid';
 				} else {
-					$infoerr = 'Existing username/password provided are not valid.';
+					if (mysql_result($result,0,0)==$md5pw) {
+						$userid=mysql_result($result,0,1);
+					} else {
+						$infoerr = 'Existing username/password provided are not valid.';
+					}
 				}
 			} else {
 				if (!$allow_acctcreation) {

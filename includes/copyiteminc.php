@@ -4,8 +4,9 @@
 $reqscoretrack = array();
 $qrubrictrack = array();
 $assessnewid = array();
+$exttooltrack = array();
 function copyitem($itemid,$gbcats,$sethidden=false) {
-	global $cid, $reqscoretrack, $assessnewid, $qrubrictrack, $copystickyposts,$userid;
+	global $cid, $reqscoretrack, $assessnewid, $qrubrictrack, $copystickyposts,$userid, $exttooltrack;
 	if (!isset($copystickyposts)) { $copystickyposts = false;}
 	if ($gbcats===false) {
 		$gbcats = array();
@@ -63,6 +64,10 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		$query = "SELECT title,summary,text,startdate,enddate,avail,oncal,caltag,target FROM imas_linkedtext WHERE id='$typeid'";
 		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$row = mysql_fetch_row($result);
+		$istool = (substr($row[2],0,8)=='exttool:');
+		if ($istool) {
+			$tool = explode('~~',substr($row[2],8));
+		}
 		if ($sethidden) {$row[5] = 0;}
 		$row[0] .= stripslashes($_POST['append']);
 		$row = "'".implode("','",addslashes_deep($row))."'";
@@ -70,6 +75,9 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		$query .= "VALUES ('$cid',$row)";
 		mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$newtypeid = mysql_insert_id();
+		if ($istool) {
+			$exttooltrack[$newtypeid] = intval($tool[0]);
+		}
 	} else if ($itemtype == "Forum") {
 		//$query = "INSERT INTO imas_forums (courseid,name,summary,startdate,enddate) ";
 		//$query .= "SELECT '$cid',name,summary,startdate,enddate FROM imas_forums WHERE id='$typeid'";
@@ -215,7 +223,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 }
 	
 function copysub($items,$parent,&$addtoarr,$gbcats,$sethidden=false) {
-	global $checked,$blockcnt,$reqscoretrack,$assessnewid;
+	global $checked,$blockcnt;
 	foreach ($items as $k=>$item) {
 		if (is_array($item)) {
 			if (array_search($parent.'-'.($k+1),$checked)!==FALSE) { //copy block
@@ -246,6 +254,16 @@ function copysub($items,$parent,&$addtoarr,$gbcats,$sethidden=false) {
 			}
 		}
 	}
+	
+}	
+
+function doaftercopy($sourcecid) {
+	global $cid,$reqscoretrack,$assessnewid;
+	if (intval($cid)==intval($sourcecid)) {
+		$samecourse = true;
+	} else {
+		$samecourse = false;
+	}
 	//update reqscoreaids if possible.  
 	if (count($reqscoretrack)>0) {
 		foreach ($reqscoretrack as $newid=>$oldreqaid) {
@@ -253,16 +271,19 @@ function copysub($items,$parent,&$addtoarr,$gbcats,$sethidden=false) {
 			if (isset($assessnewid[$oldreqaid])) {
 				$query = "UPDATE imas_assessments SET reqscoreaid='{$assessnewid[$oldreqaid]}' WHERE id='$newid'";	
 				mysql_query($query) or die("Query failed : $query" . mysql_error());
-			} else {
+			} else if (!$samecourse) {
 				$query = "UPDATE imas_assessments SET reqscore=0 WHERE id='$newid'";
 				mysql_query($query) or die("Query failed : $query" . mysql_error());
 			}
 		}
 	}
-}	
+	if (!$samecourse) {
+		handleextoolcopy($sourcecid);
+	}
+}
 
 function copyallsub($items,$parent,&$addtoarr,$gbcats,$sethidden=false) {
-	global $blockcnt;
+	global $blockcnt,$reqscoretrack,$assessnewid;;
 	if (strlen($_POST['append'])>0 && $_POST['append']{0}!=' ') {
 		$_POST['append'] = ' '.$_POST['append'];
 	}
@@ -288,6 +309,7 @@ function copyallsub($items,$parent,&$addtoarr,$gbcats,$sethidden=false) {
 			$addtoarr[] = copyitem($item,$gbcats,$sethidden);
 		}
 	}
+	
 }
 
 
@@ -438,6 +460,65 @@ function copyrubrics($offlinerubrics=array()) {
 			}
 		}
 	}	
+}
+
+function handleextoolcopy($sourcecid) {
+	//assumes this is a copy into a different course
+	global $cid,$userid,$groupid,$exttooltrack;
+	//$exttooltrack is linked text id => tool id	
+	$toolmap = array();
+	$query = "SELECT id FROM imas_teachers WHERE courseid='$sourcecid' AND userid='$userid'";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	if (mysql_num_rows($result)>0) {
+		$oktocopycoursetools = true;
+	}
+	$toolidlist = implode(',',$exttooltrack);
+	$query = "SELECT id,courseid,groupid,name,url,ltikey,secret,custom,privacy FROM imas_external_tools ";
+	$query .= "WHERE id IN ($toolidlist)";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	while ($row = mysql_fetch_row($result)) {
+		$doremap = false;
+		if (!isset($toolmap[$row[0]])) {
+			//try url matching of existing tools in the destination course
+			$query = "SELECT id FROM imas_external_tools WHERE url='".addslashes($row[4])."' AND courseid='$cid'";
+			$res = mysql_query($query) or die("Query failed : " . mysql_error());
+			if (mysql_num_rows($res)>0) {
+				$toolmap[$row[0]] = mysql_result($res,0,0);
+			}
+		}
+		if (isset($toolmap[$row[0]])) {
+			//already have remapped this tool - need to update linkedtext item
+			$doremap = true;
+		} else if ($row[1]>0 && $oktocopycoursetools) {
+			//do copy
+			$rowsub = array_slice($row,3);
+			$rowsub = addslashes_deep($rowsub);
+			$rowlist = implode("','",$rowsub);
+			$query = "INSERT INTO imas_external_tools (courseid,groupid,name,url,ltikey,secret,custom,privacy) ";
+			$query .= "VALUES ('$cid','$groupid','$rowlist')";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			$toolmap[$row[0]] = mysql_insert_id();
+			$doremap = true;
+		} else if ($row[1]==0 && ($row[2]==0 || $row[2]==$groupid)) {
+			//no need to copy anything - tool will just work
+		} else {
+			//not OK to copy; must disable tool in linked text item	
+			$toupdate = implode(",",array_keys($exttooltrack, $row[0]));
+			$query = "UPDATE imas_linkedtext SET text='<p>Unable to copy tool</p>' WHERE id IN ($toupdate)";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+		}
+		if ($doremap) {
+			//update the linkedtext item with the new tool id
+			$toupdate = implode(",",array_keys($exttooltrack, $row[0]));
+			$query = "SELECT id,text FROM imas_linkedtext WHERE id IN ($toupdate)";
+			$res = mysql_query($query) or die("Query failed : " . mysql_error());
+			while ($r = mysql_fetch_row($res)) {
+				$text = str_replace('exttool:'.$row[0].'~~','exttool:'.$toolmap[$row[0]].'~~',$r[1]);
+				$query = "UPDATE imas_linkedtext SET text='".addslashes($text)."' WHERE id={$r[0]}";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+		}
+	}
 }
 
 ?>

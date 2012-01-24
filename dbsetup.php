@@ -892,7 +892,22 @@ $sql = 'CREATE TABLE `imas_login_log` (
 	) ENGINE = InnoDB;';
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 echo 'imas_login_log created<br/>';
-				
+
+$sql = 'CREATE TABLE `imas_external_tools` (
+	`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+	`name` VARCHAR( 255 ) NOT NULL ,
+	`url` VARCHAR( 255 ) NOT NULL ,
+	`ltikey` VARCHAR( 255 ) NOT NULL ,
+	`secret` VARCHAR( 255 ) NOT NULL ,
+	`custom` VARCHAR( 255 ) NOT NULL ,
+	`privacy` TINYINT( 1 ) UNSIGNED NOT NULL ,
+	`courseid` INT( 10 ) UNSIGNED NOT NULL ,
+	`groupid` INT( 10 ) UNSIGNED NOT NULL ,
+	INDEX ( `url` ), INDEX( `courseid` ), INDEX( `groupid` )
+	) ENGINE = InnoDB COMMENT = \'LTI external tools\'';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+echo 'imas_external_tools created<br/>';	
+	
 $md5pw = md5($password);
 $now = time();
 $sql = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email) VALUES ('$username','$md5pw',100,'$firstname','$lastname','$email')";

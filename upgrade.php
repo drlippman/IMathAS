@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 50;
+$latest = 51;
 
 
 @set_time_limit(0);
@@ -848,6 +848,24 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 }
 			 $query = "ALTER TABLE `imas_gbscheme` ADD `colorize` VARCHAR (20) NOT NULL";
 			 $res = mysql_query($query);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+		}
+		if ($last < 51) {
+			$query = 'CREATE TABLE `imas_external_tools` (
+				`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+				`name` VARCHAR( 255 ) NOT NULL ,
+				`url` VARCHAR( 255 ) NOT NULL ,
+				`ltikey` VARCHAR( 255 ) NOT NULL ,
+				`secret` VARCHAR( 255 ) NOT NULL ,
+				`custom` VARCHAR( 255 ) NOT NULL ,
+				`privacy` TINYINT( 1 ) UNSIGNED NOT NULL ,
+				`courseid` INT( 10 ) UNSIGNED NOT NULL ,
+				`groupid` INT( 10 ) UNSIGNED NOT NULL ,
+				INDEX ( `url` ), INDEX( `courseid` ), INDEX( `groupid` )
+				) ENGINE = InnoDB COMMENT = \'LTI external tools\'';
+			$res = mysql_query($query);
 			 if ($res===false) {
 				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }

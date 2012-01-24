@@ -14,12 +14,32 @@
 		echo "<html><body>No item specified. <a href=\"course.php?cid={$_GET['cid']}\">Try again</a></body></html>\n";
 		exit;
 	}
-	$query = "SELECT text,title FROM imas_linkedtext WHERE id='{$_GET['id']}'";
+	$query = "SELECT text,title,target FROM imas_linkedtext WHERE id='{$_GET['id']}'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$text = mysql_result($result, 0,0);
 	$title = mysql_result($result,0,1);
+	$target = mysql_result($result,0,2);
 	$titlesimp = strip_tags($title);
 
+	if (substr($text,0,8)=='exttool:') {
+		list($tool,$custom) = explode('~~',substr($text,8));
+		$param = "linkid={$_GET['id']}&cid=$cid";
+		
+		if ($target==0) {
+			$height = '500px';
+			$width = '95%';
+			$param .= '&target=iframe';
+			$text = '<iframe src="'.$imasroot.'/filter/basiclti/post.php?'.$param.'" height="'.$height.'" width="'.$width.'" ';
+			$text .= 'scrolling="auto" frameborder="1" transparency>   <p>Error</p> </iframe>';
+			
+		} else {
+			//redirect to post page
+			$param .= '&target=new';
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . '/filter/basiclti/post.php?'.$param);
+			exit;
+		}
+	}
+	
 	
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";

@@ -1909,13 +1909,14 @@ display of this text is controlled by the same "show hints?" option that control
 
 <h4>Referencing Student Answers</h4>
 <p>To create multipart questions that are graded on consistency, or to create a set of lab-type problems that rely on student-provided data, you can reference
-students' previous answers in your question code.  You will only be able to reference the student answer to number and string type answers</p>
+students' previous answers in your question code.  You will only be able to reference the student answer to some question types</p>
 <ul>
 <li>$stuanswers[N] will refer to the student's answer on question N (not zero-indexed: N=1 is question 1)</li>
 <li>$stuanswers[N][P] will refer to the student's answer on question N, part P (if multipart)</li>
 <li>$stuanswers[$thisq][P] will refer to the student's answer on the current question, part P</li>
 <li>$stuanswers[$thisq-1] will refer to the student's answer on the previous question</li>
-<li>Only with the current question, $stuanswersval[$thisq] or $stuanswersval[$thisq][P] will contain the numerical value of Calculated question types</li>
+<li>Only with the current question, $stuanswersval[$thisq] or $stuanswersval[$thisq][P] will contain the numerical value of Calculated question types, or the 
+    numerical equivalent (non-string version) of decimal values of string answers.</li>
 </ul>
 Notes (important!):
 </p>
@@ -2767,7 +2768,8 @@ This type of question can contain multiple parts, where each part is one of the 
 <dl>
 <dt>$answeights = an array or list of weights for each question (In Answer)</dt>
 	<dd>By default the points for a problem are divided evenly over the parts.  Use this option if you wish to weight parts
-	differently.  Weights should be percentages (in decimal form), and add to 1.  Example: $answeights = array(.2,.3,.5)</dd>
+	differently.  Example: $answeights = array(.2,.3,.5).  Best practice is to use percents, but if other values are used, they will
+	be converted to percents.</dd>
 <dt>Question part options</dt>
 	<dd>You can define any optional variable for each question part.  Like above, suffix the variable with the part designator.</dd>
 <dt>$showanswer (In Answer)</dt>
@@ -2794,6 +2796,7 @@ own question type.
 	<li><b>A boolean (true/false) expression</b>: Something that evaluates to true or false. <br/>
 	Example: $answer = ($a>3) <br/>
 	Example: $answer = comparefunctions($f,'x^2') &amp;&amp; ($a!=0)</li>
+	<li><b>A single numerical value</b> in the interval [0,1]: will award that percentage of the total possible points.</li>
 	<li><b>array('function',$a,$b)</b>:  Will compare the functions $a and $b and mark the question correct if they
 	   are equivalent.  Can set $variables, $reltolerance, $abstolerance, and $domain as needed, like with Function type
 	   questions</li>

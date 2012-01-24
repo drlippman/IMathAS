@@ -75,59 +75,74 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$oncal = 0;
 		}
 		
-		if ($_FILES['userfile']['name']!='') {
-			$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
-			//$uploadfile = $uploaddir . "$cid-" . basename($_FILES['userfile']['name']);
-			$userfilename = preg_replace('/[^\w\.]/','',basename($_FILES['userfile']['name']));
-			$filename = $userfilename;
-			$extension = strtolower(strrchr($userfilename,"."));
-			$badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");
-			if (in_array($extension,$badextensions)) {
-				$overwriteBody = 1;
-				$body = "<p>File type is not allowed</p>";
-			} else {
-				$uploadfile = $uploaddir . $filename;
-				$t=0;
-				while(file_exists($uploadfile)){ //make sure filename is unused
-					$filename = substr($filename,0,strpos($userfilename,"."))."_$t".strstr($userfilename,".");
-					$uploadfile=$uploaddir.$filename;
-					$t++;
-				}
-				
-				if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
-					//echo "<p>File is valid, and was successfully uploaded</p>\n";
-					$_POST['text'] = "file:$filename";
-				} else {
-					switch ($_FILES['userfile']['error']) {
-						case 1:
-						case 2:
-							$errormsg = "File size too large";
-							break;
-						default:
-							$errormsg = "Try again";
-							break;	
-					}
-					$_POST['text'] = "File upload error - $errormsg";
-					$uploaderror = true;
-				}
-				//$_POST['text'] = "file:$cid-" . basename($_FILES['userfile']['name']);
-				
-			}
-			
-		} else if (substr(trim(strip_tags($_POST['text'])),0,4)=="http") {
-			$_POST['text'] = trim(strip_tags($_POST['text']));	
-		} else if (substr(trim(strip_tags($_POST['text'])),0,5)=="file:") {
-			$_POST['text'] = trim(strip_tags($_POST['text']));
-			$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
-			$filename = substr($_POST['text'],5);
-			if (!file_exists($uploaddir . $filename)) {
-				$_POST['text'] = '<p>File specified, but file is not on server.  Try uploading again</p>';
-			}
-		} else {
+		$processingerror = false;
+		if ($_POST['linktype']=='text') {
 			require_once("../includes/htmLawed.php");
 			$htmlawedconfig = array('elements'=>'*-script');
-			$_POST['text'] = addslashes(htmLawed(stripslashes($_POST['text']),$htmlawedconfig));	
+			$_POST['text'] = addslashes(htmLawed(stripslashes($_POST['text']),$htmlawedconfig));
+		} else if ($_POST['linktype']=='file') {
+			if ($_FILES['userfile']['name']!='') {
+				$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
+				//$uploadfile = $uploaddir . "$cid-" . basename($_FILES['userfile']['name']);
+				$userfilename = preg_replace('/[^\w\.]/','',basename($_FILES['userfile']['name']));
+				$filename = $userfilename;
+				$extension = strtolower(strrchr($userfilename,"."));
+				$badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");
+				if (in_array($extension,$badextensions)) {
+					$overwriteBody = 1;
+					$body = "<p>File type is not allowed</p>";
+				} else {
+					$uploadfile = $uploaddir . $filename;
+					$t=0;
+					while(file_exists($uploadfile)){ //make sure filename is unused
+						$filename = substr($filename,0,strpos($userfilename,"."))."_$t".strstr($userfilename,".");
+						$uploadfile=$uploaddir.$filename;
+						$t++;
+					}
+					
+					if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
+						//echo "<p>File is valid, and was successfully uploaded</p>\n";
+						$_POST['text'] = "file:$filename";
+					} else {
+						switch ($_FILES['userfile']['error']) {
+							case 1:
+							case 2:
+								$errormsg = "File size too large";
+								break;
+							default:
+								$errormsg = "Try again";
+								break;	
+						}
+						$_POST['text'] = "File upload error - $errormsg";
+						$uploaderror = true;
+					}
+					//$_POST['text'] = "file:$cid-" . basename($_FILES['userfile']['name']);
+					
+				}
+				
+			} else if (!empty($_POST['curfile'])) {
+				$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
+				if (!file_exists($uploaddir . $_POST['curfile'])) {
+					$processingerror = true;
+				} else {
+					$_POST['text'] = "file:".$_POST['curfile'];
+				}
+			} else {
+				$processingerror = true;
+			}
+		} else if ($_POST['linktype']=='web') {
+			$_POST['text'] = trim(strip_tags($_POST['web']));
+			if (substr($_POST['text'],0,4)!='http') {
+				$processingerror = true;
+			}
+		} else if ($_POST['linktype']=='tool') {
+			if ($_POST['tool']==0) {
+				$processingerror = true;
+			} else {
+				$_POST['text'] = 'exttool:'.$_POST['tool'].'~~'.$_POST['toolcustom'];
+			}
 		}
+		
 		require_once("../includes/htmLawed.php");
 		$htmlawedconfig = array('elements'=>'*-script' );
 		$_POST['summary'] = addslashes(htmLawed(stripslashes($_POST['summary']),$htmlawedconfig));
@@ -150,46 +165,51 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 				}
 			}
-			
-			$query = "UPDATE imas_linkedtext SET title='{$_POST['title']}',summary='{$_POST['summary']}',text='{$_POST['text']}',startdate=$startdate,enddate=$enddate,avail='{$_POST['avail']}',oncal='$oncal',caltag='$caltag',target='{$_POST['target']}' ";
-			$query .= "WHERE id='{$_GET['id']}'";
+			if (!$processingerror) {
+				$query = "UPDATE imas_linkedtext SET title='{$_POST['title']}',summary='{$_POST['summary']}',text='{$_POST['text']}',startdate=$startdate,enddate=$enddate,avail='{$_POST['avail']}',oncal='$oncal',caltag='$caltag',target='{$_POST['target']}' ";
+				$query .= "WHERE id='{$_GET['id']}'";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+		} else if (!$processingerror) { //add new
+			$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate,avail,oncal,caltag,target) VALUES ";
+			$query .= "('$cid','{$_POST['title']}','{$_POST['summary']}','{$_POST['text']}',$startdate,$enddate,'{$_POST['avail']}','$oncal','$caltag','{$_POST['target']}');";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		} else { //add new
-		$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate,avail,oncal,caltag,target) VALUES ";
-		$query .= "('$cid','{$_POST['title']}','{$_POST['summary']}','{$_POST['text']}',$startdate,$enddate,'{$_POST['avail']}','$oncal','$caltag','{$_POST['target']}');";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		
-		$newtextid = mysql_insert_id();
-		
-		$query = "INSERT INTO imas_items (courseid,itemtype,typeid) VALUES ";
-		$query .= "('$cid','LinkedText','$newtextid');";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		
-		$itemid = mysql_insert_id();
-					
-		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$line = mysql_fetch_array($result, MYSQL_ASSOC);
-		$items = unserialize($line['itemorder']);
 			
-		$blocktree = explode('-',$block);
-		$sub =& $items;
-		for ($i=1;$i<count($blocktree);$i++) {
-			$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
-		}
-		if ($totb=='b') {
-			$sub[] = $itemid;
-		} else if ($totb=='t') {
-			array_unshift($sub,$itemid);
-		}
-		$itemorder = addslashes(serialize($items));
+			$newtextid = mysql_insert_id();
+			
+			$query = "INSERT INTO imas_items (courseid,itemtype,typeid) VALUES ";
+			$query .= "('$cid','LinkedText','$newtextid');";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			
+			$itemid = mysql_insert_id();
+						
+			$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$line = mysql_fetch_array($result, MYSQL_ASSOC);
+			$items = unserialize($line['itemorder']);
+				
+			$blocktree = explode('-',$block);
+			$sub =& $items;
+			for ($i=1;$i<count($blocktree);$i++) {
+				$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
+			}
+			if ($totb=='b') {
+				$sub[] = $itemid;
+			} else if ($totb=='t') {
+				array_unshift($sub,$itemid);
+			}
+			$itemorder = addslashes(serialize($items));
+			
+			$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		
-		$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		
 		}
-		if ($uploaderror == true) {
-			$body = "<p>Error uploading file! $errormsg</p>\n";
+		if ($uploaderror == true || $processingerror == true) {
+			if ($uploaderror == true) {
+				$body = "<p>Error uploading file! $errormsg</p>\n";
+			} else {
+				$body = "<p>Error with your submission</p>";
+			}
 			$body .= "<p><a href=\"addlinkedtext.php?cid={$_GET['cid']}";
 			if (isset($_GET['id'])) {
 				$body .= "&id={$_GET['id']}";
@@ -203,6 +223,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		exit;
 	} else {
+		$toolcustom = '';
+		$selectedtool = 0;
+		$filename = '';
+		$webaddr = '';
 		if (isset($_GET['id'])) {
 			$query = "SELECT * FROM imas_linkedtext WHERE id='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -213,6 +237,21 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$altoncal = 1;
 			} else {
 				$altoncal = 0;
+			}
+			if (substr($line['text'],0,5)=='http:') {
+				$type = 'web';
+				$webaddr = $line['text'];
+				$line['text'] = "<p>Enter text here</p>";
+			} else if (substr($line['text'],0,5)=='file:') {
+				$type = 'file';
+				$filename = substr($line['text'],5);
+				$line['text'] = "<p>Enter text here</p>";
+			} else if (substr($line['text'],0,8)=='exttool:') {
+				$type = 'tool';
+				list($selectedtool,$toolcustom) = explode('~~',substr($line['text'],8));
+				$line['text'] = "<p>Enter text here</p>";
+			} else {
+				$type = 'text';
 			}
 		} else {
 			//set defaults
@@ -226,6 +265,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$altoncal = 0;
 			$startdate = time();
 			$enddate = time() + 7*24*60*60;
+			$type = 'text';
 		}   
 		if ($startdate!=0) {
 			$sdate = tzdate("m/d/Y",$startdate);
@@ -241,12 +281,38 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$edate = tzdate("m/d/Y",time()+7*24*60*60);
 			$etime = tzdate("g:i a",time()+7*24*60*60);
 		}     
+		$toolvals = array(0);
+		$toollabels = array('Select a tool...');
+		$query = "SELECT id,name FROM imas_external_tools WHERE courseid='$cid' ";
+		$query .= "OR (courseid=0 AND (groupid='$groupid' OR groupid=0)) ORDER BY name";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			$toolvals[] = $row[0];
+			$toollabels[] = $row[1];
+		}
+		if ($selectedtool>0 && !in_array($selectedtool,$toolvals)) {
+			$type = 'text';
+			$line['text'] = "<p>Invalid tool was selected</p>";
+		}
+			
 	}
 }
 	
 /******* begin html output ********/
 $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
-
+$placeinhead .= '<script type="text/javascript">
+ function linktypeupdate(el) {
+ 	var tochg = ["text","web","file","tool"];
+	for (var i=0;i<4;i++) {
+		if (tochg[i]==el.value) {
+			disp = "";
+		} else {
+			disp = "none";
+		}
+		document.getElementById(tochg[i]+"input").style.display = disp;
+	}
+ }
+ </script>';
  require("../header.php");
 
 if ($overwriteBody==1) {
@@ -267,15 +333,61 @@ if ($overwriteBody==1) {
 		<div class=editor>
 			<textarea cols=60 rows=10 id=summary name=summary style="width: 100%"><?php echo htmlentities($line['summary']);?></textarea>
 		</div>
-		<BR>
-		Text or weblink (start with http://)<BR>
-		<div class=editor>
-			<textarea cols=80 rows=20 id=text name=text style="width: 100%"><?php echo htmlentities($line['text']);?></textarea>
+		<br/>
+		
+		<span class=form>Link type: </span>
+		<span class="formright">
+		<select id="linktype" name="linktype" onchange="linktypeupdate(this)">
+			<option value="text" <?php writeHtmlSelected($type,'text');?>>Page of text</option>
+			<option value="web" <?php writeHtmlSelected($type,'web');?>>Web link</option>
+			<option value="file" <?php writeHtmlSelected($type,'file');?>>File</option>
+			<option value="tool" <?php writeHtmlSelected($type,'tool');?>>External Tool</option>
+		</select>
+		</span><br class="form"/>
+		
+		<div id="textinput" <?php if ($type != 'text') {echo 'style="display:none;"';}?> >
+			Text<BR>
+			<div class=editor>
+				<textarea cols=80 rows=20 id=text name=text style="width: 100%"><?php echo htmlentities($line['text']);?></textarea>
+			</div>
 		</div>
-		<BR>
-		<input type="hidden" name="MAX_FILE_SIZE" value="2000000" />
-		<span class=form>Or attach file (Max 2MB)<sup>*</sup>: </span>
-		<span class=formright><input name="userfile" type="file" /></span><br class=form>
+		<div id="webinput" <?php if ($type != 'web') {echo 'style="display:none;"';}?> >
+			<span class="form">Weblink (start with http://)</span>
+			<span class="formright">
+				<input size="80" name="web" value="<?php echo htmlentities($webaddr);?>" />
+			</span><br class="form">
+			
+		</div>
+		<div id="fileinput" <?php if ($type != 'file') {echo 'style="display:none;"';}?>>
+			<span class="form">File</span>
+			<input type="hidden" name="MAX_FILE_SIZE" value="2000000" />
+			<span class="formright">
+			<?php if ($filename != '') {
+				echo '<input type="hidden" name="curfile" value="'.$filename.'"/>';
+				echo 'Current file: <a href="'.$imasroot.'/course/files/'.$filename.'">'.$filename.'</a><br/>Replace ';
+			} else {
+				echo 'Attach ';
+			}
+			?>
+			file (Max 2MB)<sup>*</sup>: <input name="userfile" type="file" />
+			</span><br class="form">
+		</div>
+		<div id="toolinput" <?php if ($type != 'tool') {echo 'style="display:none;"';}?>>
+			<span class="form">External Tool</span>
+			<span class="formright">
+			<?php 
+			if (count($toolvals)>0) {
+				writeHtmlSelect('tool',$toolvals,$toollabels,$selectedtool);
+				echo '<br/>Custom parameters: <input type="text" name="toolcustom" size="40" value="'.htmlentities($toolcustom).'" /><br/>';
+			} else {
+				echo 'No Tools defined yet<br/>';
+			}
+			if (!isset($CFG['GEN']['noInstrExternalTools'])) {
+				echo '<a href="../admin/externaltools.php?cid='.$cid.'&amp;ltfrom='.$_GET['id'].'">Add or edit an external tool</a>';
+			}
+			?>
+			</span><br class="form">
+		</div>
 		
 		<span class="form">Open page in:</span>
 		<span class="formright">

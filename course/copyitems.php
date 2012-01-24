@@ -144,6 +144,7 @@ if (!(isset($teacherid))) {
 			}
 			
 			copysub($items,'0',$newitems,$gbcats,isset($_POST['copyhidden']));
+			doaftercopy($_POST['ctc']);
 			
 			$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 			$result = mysql_query($query) or die("Query failed : $query" . mysql_error());

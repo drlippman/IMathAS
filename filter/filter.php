@@ -94,26 +94,7 @@
 				$str = preg_replace_callback('/<\s*embed[^>]*?script=(.)(.+?)\1.*?>/s','svgfilterscriptcallback',$str);
 			}
 		}
-		
-		if (strpos($str,'[LTI')!==false) {
-			$search = '/\[LTI:\s*url=(.+),\s*key=(.+),\s*secret=([^\],]+)([^\]]*)\]/';
-			
-			if (preg_match($search, $str, $res)){
-				$url = $res[1];
-				$key = $res[2];
-				$secret = $res[3];
-				if (isset($res[4]) && $res[4]!='') {
-					$opts = $res[4];
-				} else {
-					$opts = '';
-				}
-				$sessiondata['lti-secrets'][$key] = array($secret,$opts);
-				writesessiondata();	
-				$replamnt = getltiiframe($url,$key,time());
-				$str = preg_replace('/\[LTI:[^\]]*\]/', $replamnt, $str);
-			}
-		}
-		
+	
 		if (strpos($str,'[WA')!==false) {
 			$search = '/\[WA:\s*(.+?)\s*\]/';
 			
@@ -235,20 +216,5 @@
 		return $str;
 	}
 	
-	function getltiiframe($url,$key,$linkback) {
-		global $cid,$imasroot;
-		if (!isset($cid) && isset($_GET['cid'])) {
-			$cid = $_GET['cid'];
-		}
-		$height = '500px';
-		$width = '95%';
-		$param = 'key='.urlencode($key) . '&linkback=' . urlencode($linkback) . '&url=' . urlencode(str_replace('&amp;','&',$url));
-		if (isset($cid)) {
-			$param .= '&cid='.$cid;
-		}
-		$out = '<iframe src="'.$imasroot.'/filter/basiclti/post.php?'.$param.'" height="'.$height.'" width="'.$width.'" ';
-		$out .= 'scrolling="auto" frameborder="1" transparency>   <p>Error</p> </iframe>';	
-		return $out;
-	}
 		
 ?>

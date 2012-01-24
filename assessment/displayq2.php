@@ -364,10 +364,11 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$points=1) {
 				if (is_numeric($_POST["qn$partnum"])) {
 					$stuanswersval[$qnidx+1][$kidx] = floatval($_POST["qn$partnum"]);
 				}
-			} else if (isset($_POST["qn$partnum"]) && is_numeric($_POST["qn$partnum"])) {
-				$stuanswers[$qnidx+1][$kidx] = floatval($_POST["qn$partnum"]);
 			} else if (isset($_POST["qn$partnum"])) {
 				$stuanswers[$qnidx+1][$kidx] = stripslashes_deep($_POST["qn$partnum"]); //preg_replace('/\W+/','',stripslashes($_POST["qn$partnum"]));
+				if (is_numeric($_POST["qn$partnum"])) {
+					$stuanswersval[$qnidx+1][$kidx] = floatval($_POST["qn$partnum"]);
+				}
 			}
 		}
 	} else {
@@ -376,10 +377,11 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$points=1) {
 			if (is_numeric($_POST["qn$qnidx"])) {
 				$stuanswersval[$qnidx+1] = floatval($_POST["qn$qnidx"]);
 			}
-		} else if (isset($_POST["qn$qnidx"]) && is_numeric($_POST["qn$qnidx"])) {
-			$stuanswers[$qnidx+1] = floatval($_POST["qn$qnidx"]);
 		} else if (isset($_POST["qn$qnidx"])) {
 			$stuanswers[$qnidx+1] = stripslashes_deep($_POST["qn$qnidx"]); //preg_replace('/\W+/','',stripslashes($_POST["qn$qnidx"]));
+			if (is_numeric($_POST["qn$qnidx"])) {
+				$stuanswersval[$qnidx+1] = floatval($_POST["qn$qnidx"]);
+			}
 		}
 	}
 	
@@ -1248,6 +1250,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$qn];} else {$ansprompt = $options['ansprompt'];}}
 		if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$qn];} else {$sz = $options['answerboxsize'];}}
 		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
+		if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$qn];} else {$displayformat = $options['displayformat'];}}
+		
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		if (!isset($sz)) { $sz = 20;}
 		if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
@@ -1265,7 +1269,10 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
 		}
 		$out .= '/>';
-		
+		if ($displayformat == 'usepreview') {
+			$preview .= "<input type=button class=btn value=Preview onclick=\"stringqpreview('qn$qn','p$qn','$answerformat')\" /> &nbsp;\n";
+			$preview .= "<span id=p$qn></span> ";
+		}
 		$sa .= $answer;
 	} else if ($anstype == "essay") {
 		if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$qn];} else {$sz = $options['answerboxsize'];}}
@@ -2300,6 +2307,12 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			foreach ($anarr as $k=>$ananswer) {
 				$aarr = explode(' or ',$ananswer);
 				foreach ($aarr as $j=>$anans) {
+					if ($anans=='') {
+						if (isset($GLOBALS['teacherid'])) {
+							echo '<p>Debug info: empty, missingor invalid $answer </p>';
+						}
+						return 0;
+					}
 					if (preg_match('/(\(|\[)([\d\.]+)\,([\d\.]+)(\)|\])/',$anans,$matches)) {
 						$aarr[$j] = $matches;
 					} else if (!is_numeric($anans) && $anans!='DNE' && $anans!='oo' && $anans!='+oo' && $anans!='-oo') {
@@ -2311,6 +2324,12 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		} else {
 			$aarr = explode(' or ',$answer);
 			foreach ($aarr as $j=>$anans) {
+				if ($anans=='') {
+					if (isset($GLOBALS['teacherid'])) {
+						echo '<p>Debug info: empty, missing, or invalid $answer </p>';
+					}
+					return 0;
+				}
 				if (preg_match('/(\(|\[)([\d\.]+)\,([\d\.]+)(\)|\])/',$anans,$matches)) {
 					$aarr[$j] = $matches;
 				} else if (!is_numeric($anans) && $anans!='DNE' && $anans!='oo' && $anans!='+oo' && $anans!='-oo') {
@@ -3928,7 +3947,8 @@ function checkanswerformat($tocheck,$ansformats) {
 		return true;
 	}
 	if (in_array("fraction",$ansformats) || in_array("reducedfraction",$ansformats) || in_array("fracordec",$ansformats)) {
-		if (!preg_match('/^\s*\-?\(?\d+\s*\/\s*\-?\d+\)?\s*$/',$tocheck) && !preg_match('/^\s*?\-?\d+\s*$/',$tocheck) && (!in_array("fracordec",$ansformats) || !preg_match('/^\s*?\-?\d*?\.\d*?\s*$/',$tocheck))) {
+		$tocheck = preg_replace('/\s/','',$tocheck);
+		if (!preg_match('/^\(?\-?\(?\d+\)?\/\(?\d+\)?$/',$tocheck) && !preg_match('/^\(?\d+\)?\/\(?\-?\d+\)?$/',$tocheck) && !preg_match('/^\s*?\-?\d+\s*$/',$tocheck) && (!in_array("fracordec",$ansformats) || !preg_match('/^\s*?\-?\d*?\.\d*?\s*$/',$tocheck))) {
 			return false;
 		} else {
 			if (in_array("reducedfraction",$ansformats) && strpos($tocheck,'/')!==false) {

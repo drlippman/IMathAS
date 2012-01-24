@@ -21,7 +21,8 @@ function calculate(inputId,outputId,format) {
 	  } else {
 		  if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1) {
 			  str = str.replace(/\s/g,'');
-			  if (!str.match(/^\s*\-?\(?\d+\s*\/\s*\-?\d+\)?\s*$/) && !str.match(/^\s*?\-?\d+\s*$/)) {
+			 // if (!str.match(/^\s*\-?\(?\d+\s*\/\s*\-?\d+\)?\s*$/) && !str.match(/^\s*?\-?\d+\s*$/)) {
+			  if (!str.match(/^\(?\-?\(?\d+\)?\/\(?\d+\)?$/) && !str.match(/^\(?\d+\)?\/\(?\-?\d+\)?$/) && !str.match(/^\s*?\-?\d+\s*$/)) {
 				err += "not a valid fraction";  
 			  }
 		  } else if (format.indexOf('fracordec')!=-1) {
@@ -431,6 +432,18 @@ function mathjsformat(inputId,outputId) {
   outnode.value = mathjs(str);
 }
 
+function stringqpreview(inputId,outputId) {
+	var str = document.getElementById(inputId).value;
+	var outnode = document.getElementById(outputId);
+	var n = outnode.childNodes.length;
+	for (var i=0; i<n; i++)
+		outnode.removeChild(outnode.firstChild);
+	outnode.appendChild(document.createTextNode('`'+str+'`'));
+	if (!noMathRender) {
+		AMprocessNode(outnode);
+	}
+}
+
 //preview button for numfunc type
 function AMpreview(inputId,outputId) {
   var qn = inputId.slice(2);
@@ -609,6 +622,15 @@ var iseqn = {};
 
 function doonsubmit(form,type2,skipconfirm) {
 	if (form!=null) {
+		if (form.className == 'submitted') {
+			alert("You have already submitted this page.  Please be patient while your submission is processed.");
+			form.className = "submitted2";
+			return false;
+		} else if (form.className == 'submitted2') {
+			return false;
+		} else {
+			form.className = 'submitted';
+		}
 		if (!skipconfirm) {
 			if (type2) {
 				var reallysubmit = confirmSubmit2(form);
@@ -799,6 +821,7 @@ function toggleinlinebtn(n,p){
 }
 
 function assessbackgsubmit(qn,noticetgt) {
+	if (noticetgt != null && document.getElementById(noticetgt).innerHTML == "Submitting...") {return false;}
 	if (window.XMLHttpRequest) { 
 		req = new XMLHttpRequest(); 
 	} else if (window.ActiveXObject) { 

@@ -248,8 +248,8 @@ if (!$hascourse) {
 	}
 	echo '</p>';
 	if ($role == 'teacher') {
-		echo "<p><a href=\"course/addassessment.php?cid=$cid&id=$typeid\">Settings</a> | ";
-		echo "<a href=\"course/addquestions.php?cid=$cid&aid=$typeid\">Questions</a></p>";
+		echo "<p><a href=\"course/addassessment.php?cid=$cid&id=$typeid&from=lti\">Settings</a> | ";
+		echo "<a href=\"course/addquestions.php?cid=$cid&aid=$typeid&from=lti\">Questions</a></p>";
 		if ($sessiondata['ltiitemtype']==-1) {
 			echo '<p><a href="ltihome.php?chgplacement=true">Change placement</a></p>';
 		}
