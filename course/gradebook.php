@@ -401,10 +401,11 @@ if (isset($studentid) || $stu!=0) { //show student view
 		echo "<option value=0 "; writeHtmlSelected($links,0); echo ">View/Edit</option>";
 		echo "<option value=1 "; writeHtmlSelected($links,1); echo ">Scores</option></select>";
 		echo '<input type="hidden" id="toggle4" value="'.$showpics.'" />';
+		echo '<input type="hidden" id="toggle5" value="'.$hidelocked.'" />';
 		echo "</div>";
 	}
 	gbstudisp($stu);
-	echo "<p>Meanings:  IP-In Progress, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sub>d</sub> Dropped score.  <sup>e</sup> Has exception/latepass  </p>\n";
+	echo "<p>Meanings: <i>italics</i>-available to be worked on, IP-In Progress (some unattempted questions), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sub>d</sub> Dropped score.  <sup>e</sup> Has exception <sup>LP</sup> Used latepass  </p>\n";
 	
 	require("../footer.php");
 	
@@ -560,7 +561,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	$gbt = gbinstrdisp();
 	echo "</form>";
 	echo "</div>";
-	echo "Meanings:  IP-In Progress, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sup>*</sup> Has feedback, <sub>d</sub> Dropped score, <sup>e</sup> Has exception/latepass\n";
+	echo "Meanings:  <i>italics</i>-available to be worked on, IP-In Progress (some unattempted questions), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sup>*</sup> Has feedback, <sub>d</sub> Dropped score,  <sup>e</sup> Has exception <sup>LP</sup> Used latepass\n";
 	require("../footer.php");
 	
 	/*if ($isteacher) {
@@ -713,7 +714,12 @@ function gbstudisp($stu) {
 				}
 			}
 			if (isset($gbt[1][1][$i][0])) {
-				echo $gbt[1][1][$i][0];
+				if ($gbt[1][1][$i][3]>9) {
+					echo '<i>'.$gbt[1][1][$i][0].'</i>';
+					$gbt[1][1][$i][3] -= 10;
+				} else {
+					echo $gbt[1][1][$i][0];
+				}
 				if ($gbt[1][1][$i][3]==1) {
 					echo ' (NC)';
 				} else if ($gbt[1][1][$i][3]==2) {
@@ -730,7 +736,11 @@ function gbstudisp($stu) {
 				echo '</a>';
 			}
 			if (isset($gbt[1][1][$i][6]) ) {  //($isteacher || $istutor) && 
-				echo '<sup>e</sup>';
+				if ($gbt[1][1][$i][6]==2) {
+					echo '<sup>LP</sup>';
+				} else {
+					echo '<sup>e</sup>';
+				}
 			}
 			if (isset($gbt[1][1][$i][5]) && ($gbt[1][1][$i][5]&(1<<$availshow)) && !$hidepast) {
 				echo '<sub>d</sub>';
@@ -1255,7 +1265,12 @@ function gbinstrdisp() {
 						} else {
 							echo "<a href=\"gb-viewasid.php?stu=$stu&amp;cid=$cid&amp;asid={$gbt[$i][1][$j][4]}&amp;uid={$gbt[$i][4][0]}\">";
 						}
-						echo $gbt[$i][1][$j][0];
+						if ($gbt[$i][1][$j][3]>9) {
+							echo '<i>'.$gbt[$i][1][$j][0].'</i>';
+							$gbt[$i][1][$j][3] -= 10;
+						} else {
+							echo $gbt[$i][1][$j][0];
+						}
 						if ($gbt[$i][1][$j][3]==1) {
 							echo ' (NC)';
 						} else if ($gbt[$i][1][$j][3]==2) {
@@ -1273,7 +1288,11 @@ function gbinstrdisp() {
 							echo '<sup>*</sup>';
 						}
 						if (isset($gbt[$i][1][$j][6]) ) {
-							echo '<sup>e</sup>';
+							if ($gbt[$i][1][$j][6]==2) {
+								echo '<sup>LP</sup>';
+							} else {
+								echo '<sup>e</sup>';
+							}
 						}
 					} else { //no score
 						if ($gbt[$i][0][0]=='Averages') {

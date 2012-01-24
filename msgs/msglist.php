@@ -204,7 +204,8 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			echo "<form method=post action=\"msglist.php?page=$page&type=$type&cid=$cid&add={$_GET['add']}&replyto=$replyto\">\n";
 			echo "<span class=form>To:</span><span class=formright>\n";
 			if (isset($_GET['to'])) {
-				$query = "SELECT LastName,FirstName,email FROM imas_users WHERE id='{$_GET['to']}'";
+				$query = "SELECT iu.LastName,iu.FirstName,iu.email,i_s.lastaccess FROM imas_users AS iu ";
+				$query .= "LEFT JOIN imas_students AS i_s ON iu.id=i_s.userid AND i_s.courseid='$courseid' WHERE iu.id='{$_GET['to']}'";
 				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$row = mysql_fetch_row($result);
 				echo $row[0].', '.$row[1];
@@ -221,6 +222,9 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				if ($ismsgsrcteacher) {
 					echo " <a href=\"mailto:{$row[2]}\">email</a> | ";
 					echo " <a href=\"$imasroot/course/gradebook.php?cid=$courseid&stu={$_GET['to']}\" target=\"_popoutgradebook\">gradebook</a>";
+					if ($row[3]!=null) {
+						echo " | Last login ".tzdate("F j, Y, g:i a",$row[3]);
+					}
 				}
 				echo "<input type=hidden name=to value=\"{$_GET['to']}\"/>";
 				$curdir = rtrim(dirname(__FILE__), '/\\');
@@ -262,9 +266,11 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			echo "</textarea></div></span><br class=form>\n";
 			
 			echo "<div class=submit><input type=submit value='Submit'></div>\n";
+			
 			if ($msgmonitor==1) {
 				echo "<p><span class=red>Note</span>: Student-to-student messages may be monitored by your instructor</p>";
 			}
+			
 			require("../footer.php");
 			exit;
 		}

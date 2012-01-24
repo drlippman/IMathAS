@@ -296,11 +296,12 @@ $placeinhead .= "}</script>";
 		echo "<a href=\"forms.php?action=importcoursefiles\">Install Course Files</a><br/>\n";
 		echo '</span>';
 	}
+	echo '<span class="column">';
 	if ($enablebasiclti) {
-		echo '<span class="column">';
-		echo "<a href=\"forms.php?action=listltidomaincred\">Edit LTI Creds</a><br/>\n";
-		echo '</span>';
+		echo "<a href=\"forms.php?action=listltidomaincred\">LTI Provider Creds</a><br/>\n";
 	}
+	echo "<a href=\"externaltools.php?cid=admin\">External Tools</a><br/>\n";
+	echo '</span>';
 	
 	?>
 	

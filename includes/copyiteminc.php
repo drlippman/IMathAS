@@ -315,7 +315,7 @@ function copyallsub($items,$parent,&$addtoarr,$gbcats,$sethidden=false) {
 
 function getiteminfo($itemid) {
 	$query = "SELECT itemtype,typeid FROM imas_items WHERE id='$itemid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	if (mysql_num_rows($result)==0) {
 		echo "Uh oh, item #$itemid doesn't appear to exist";
 	}
@@ -341,7 +341,7 @@ function getiteminfo($itemid) {
 			$query = "SELECT name,description FROM imas_wikis WHERE id=$typeid";
 			break;
 	}
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$name = mysql_result($result,0,0);
 	$summary = mysql_result($result,0,1);
 	return array($itemtype,$name,$summary,$typeid);
@@ -404,7 +404,7 @@ function copyrubrics($offlinerubrics=array()) {
 	
 	//handle rubrics which I already have access to
 	$query = "SELECT id FROM imas_rubrics WHERE id IN ($list) AND (ownerid='$userid' OR groupid='$groupid')";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 	while ($row = mysql_fetch_row($result)) { 
 		$qfound = array_keys($qrubrictrack,$row[0]);
 		if (count($qfound)>0) {
@@ -465,23 +465,24 @@ function copyrubrics($offlinerubrics=array()) {
 function handleextoolcopy($sourcecid) {
 	//assumes this is a copy into a different course
 	global $cid,$userid,$groupid,$exttooltrack;
+	if (count($exttooltrack)==0) {return;}
 	//$exttooltrack is linked text id => tool id	
 	$toolmap = array();
 	$query = "SELECT id FROM imas_teachers WHERE courseid='$sourcecid' AND userid='$userid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 	if (mysql_num_rows($result)>0) {
 		$oktocopycoursetools = true;
 	}
 	$toolidlist = implode(',',$exttooltrack);
 	$query = "SELECT id,courseid,groupid,name,url,ltikey,secret,custom,privacy FROM imas_external_tools ";
 	$query .= "WHERE id IN ($toolidlist)";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 	while ($row = mysql_fetch_row($result)) {
 		$doremap = false;
 		if (!isset($toolmap[$row[0]])) {
 			//try url matching of existing tools in the destination course
 			$query = "SELECT id FROM imas_external_tools WHERE url='".addslashes($row[4])."' AND courseid='$cid'";
-			$res = mysql_query($query) or die("Query failed : " . mysql_error());
+			$res = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			if (mysql_num_rows($res)>0) {
 				$toolmap[$row[0]] = mysql_result($res,0,0);
 			}

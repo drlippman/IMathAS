@@ -85,10 +85,10 @@ row[1][1][0] first score - assessment
 row[1][1][0][0] = score
 row[1][1][0][1] = 0 no comment, 1 has comment - is comment in stu view
 row[1][1][0][2] = show link: 0 no, 1 yes
-row[1][1][0][3] = other info: 0 none, 1 NC, 2 IP, 3 OT, 4 PT
+row[1][1][0][3] = other info: 0 none, 1 NC, 2 IP, 3 OT, 4 PT  + 10 if still active
 row[1][1][0][4] = asid, or 'new'
 row[1][1][0][5] = bitwise for dropped: 1 in past & 2 in cur & 4 in future & 8 attempted
-row[1][1][0][6] = 1 if had exception
+row[1][1][0][6] = 1 if had exception, = 2 if was latepass
 row[1][1][0][7] = time spent (minutes)
 row[1][1][0][8] = time on task (time displayed)
 
@@ -714,11 +714,11 @@ function gbtable() {
 	
 	//pull exceptions
 	$exceptions = array();
-	$query = "SELECT imas_exceptions.assessmentid,imas_exceptions.userid,imas_exceptions.enddate FROM imas_exceptions,imas_assessments WHERE ";
+	$query = "SELECT imas_exceptions.assessmentid,imas_exceptions.userid,imas_exceptions.enddate,imas_exceptions.islatepass FROM imas_exceptions,imas_assessments WHERE ";
 	$query .= "imas_exceptions.assessmentid=imas_assessments.id AND imas_assessments.courseid='$cid'";
 	$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 	while ($r = mysql_fetch_row($result2)) {
-		$exceptions[$r[0]][$r[1]] = $r[2];	
+		$exceptions[$r[0]][$r[1]] = array($r[2],$r[3]);	
 		
 	}
 	//Get assessment scores
@@ -763,14 +763,14 @@ function gbtable() {
 			$IP=0;
 		}
 		if (isset($exceptions[$l['assessmentid']][$l['userid']])) {
-			$gb[$row][1][$col][6] = 1; //had exception
+			$gb[$row][1][$col][6] = ($exceptions[$l['assessmentid']][$l['userid']][1]==1)?2:1; //had exception
 		}
 		if (isset($exceptions[$l['assessmentid']][$l['userid']])) {// && $now>$enddate[$i] && $now<$exceptions[$l['assessmentid']][$l['userid']]) {
-			if ($enddate[$i]>$exceptions[$l['assessmentid']][$l['userid']] && $assessmenttype[$i]=="NoScores") {
+			if ($enddate[$i]>$exceptions[$l['assessmentid']][$l['userid']][0] && $assessmenttype[$i]=="NoScores") {
 				//if exception set for earlier, and NoScores is set, use later date to hide score until later
 				$thised = $enddate[$i];
 			} else {
-				$thised = $exceptions[$l['assessmentid']][$l['userid']];
+				$thised = $exceptions[$l['assessmentid']][$l['userid']][0];
 				if ($limuser>0 && $gb[0][1][$col][3]==2) {  //change $avail past/cur/future
 					if ($now<$thised) {
 						$gb[0][1][$col][3] = 1;
@@ -817,7 +817,9 @@ function gbtable() {
 			$gb[$row][1][$col][0] = $pts; //the score
 			$gb[$row][1][$col][3] = 0;  //no other info
 			$countthisone =true;
-			
+		}
+		if ($now < $thised) { //still active
+			$gb[$row][1][$col][3] += 10;
 		}
 		if ($countthisone) {
 			if ($cntingb[$i] == 1) {

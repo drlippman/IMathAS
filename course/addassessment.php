@@ -712,7 +712,7 @@ if ($overwriteBody==1) {
 					<option value="2" <?php writeHtmlSelected($line['eqnhelper'],2) ?>>Yes, advanced form</option>
 				</select>
 			</span><br class="form" />
-			<span class=form>Show hints when available?</span>
+			<span class=form>Show hints and video/text buttons when available?</span>
 			<span class=formright>
 				<input type="checkbox" name="showhints" <?php writeHtmlChecked($line['showhints'],1); ?>>
 			</span><br class=form>

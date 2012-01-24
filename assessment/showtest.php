@@ -1494,7 +1494,9 @@ if (!isset($_POST['embedpostback'])) {
 			}
 			echo '});</script>';
 		}
-		$testsettings['intro'] .= "<p>Total Points Possible: " . totalpointspossible($qi) . "</p>";
+		if ($testsettings['displaymethod'] != "Embed") {
+			$testsettings['intro'] .= "<p>Total Points Possible: " . totalpointspossible($qi) . "</p>";
+		}
 		if ($testsettings['isgroup']>0) {
 			$testsettings['intro'] .= "<p><span style=\"color:red;\">This is a group assessment.  Any changes effect all group members.</span><br/>";
 			if (!$isteacher || isset($sessiondata['actas'])) {
@@ -1693,12 +1695,13 @@ if (!isset($_POST['embedpostback'])) {
 				} else {
 					for ($j=1;$j<=count($questions);$j++) {
 						$intro .= '[QUESTION '.$j.']';
-					}	
+					}
 				}
 			} else {
 				$intro = preg_replace('/<p>((<span|<strong|<em)[^>]*>)?\[QUESTION\s+(\d+)\s*\]((<\/span|<\/strong|<\/em)[^>]*>)?<\/p>/','[QUESTION $3]',$intro);
 				$intro = preg_replace('/\[QUESTION\s+(\d+)\s*\]/','</div>[QUESTION $1]<div class="intro">',$intro);
 			}
+			$intro .= "<p>Total Points Possible: " . totalpointspossible($qi) . "</p>";
 			
 			for ($i = 0; $i < count($questions); $i++) {
 				$quesout = '<div id="embedqwrapper'.$i.'" class="embedqwrapper">';
