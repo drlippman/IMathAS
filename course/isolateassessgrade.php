@@ -17,11 +17,15 @@
 	
 	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
 		$gbmode = $_GET['gbmode'];
+	} else if (isset($sessiondata[$cid.'gbmode'])) {
+		$gbmode =  $sessiondata[$cid.'gbmode'];
 	} else {
 		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$gbmode = mysql_result($result,0,0);
 	}
+	$hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
+	
 	
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
@@ -104,10 +108,13 @@
 	}
 	
 	$query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.timelimitmult,";
-	$query .= "ias.id,istu.userid,ias.bestscores,ias.starttime,ias.endtime,ias.feedback FROM imas_users AS iu JOIN imas_students AS istu ON iu.id = istu.userid AND istu.courseid='$cid' ";
+	$query .= "ias.id,istu.userid,ias.bestscores,ias.starttime,ias.endtime,ias.feedback,istu.locked FROM imas_users AS iu JOIN imas_students AS istu ON iu.id = istu.userid AND istu.courseid='$cid' ";
 	$query .= "LEFT JOIN imas_assessment_sessions AS ias ON iu.id=ias.userid AND ias.assessmentid='$aid' WHERE istu.courseid='$cid' ";
 	if ($istutor && isset($tutorsection) && $tutorsection!='') {
 		$query .= " AND istu.section='$tutorsection' ";
+	}
+	if ($hidelocked) {
+		$query .= ' AND istu.locked=0 ';
 	}
 	if ($hassection && $sortorder=="sec") {
 		 $query .= " ORDER BY istu.section,iu.LastName,iu.FirstName";
@@ -137,7 +144,12 @@
 			echo "<tr class=odd onMouseOver=\"this.className='highlight'\" onMouseOut=\"this.className='odd'\">"; 
 		}
 		$lc++;
-		echo "<td>{$line['LastName']}, {$line['FirstName']}</td>";
+		if ($line['locked']>0) {
+			echo '<td><span style="text-decoration: line-through;">';
+			echo "{$line['LastName']}, {$line['FirstName']}</span></td>";
+		} else {
+			echo "<td>{$line['LastName']}, {$line['FirstName']}</td>";
+		}
 		if ($hassection) {
 			echo "<td>{$line['section']}</td>";
 		}
