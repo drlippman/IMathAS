@@ -243,6 +243,49 @@ function amreattempting($n) {
 	return in_array($n,$reattempting);
 }
 
+function scorestocolors($sc,$pts,$answ) {
+	if (trim($sc)=='') {return '';}
+	if (strpos($sc,'~')===false) {
+		if ($pts==0) {
+			$color = 'ansgrn';
+		} else if ($sc<0) {
+			$color = '';
+		} else if ($sc==0) {
+			$color = 'ansred';
+		} else if ($pts-$sc<.011) {
+			$color = 'ansgrn';
+		} else {
+			$color = 'ansyel';
+		}
+		return array($color);
+	} else {
+		for ($i=0; $i<count($answ)-1; $i++) {
+			$answ[$i] = round($answ[$i]*$pts,2);
+		}
+		//adjust for rounding
+		$diff = $pts - array_sum($answ);
+		$answ[count($answ)-1] += $diff;
+		
+		$scarr = explode('~',$sc);
+		$out = array();
+		foreach ($scarr as $k=>$v) {
+			if ($answ[$k]==0) {
+				$color = 'ansgrn';
+			} else if ($v < 0) {
+				$color = '';
+			} else if ($v==0) { 
+				$color = 'ansred';
+			} else if ($answ[$k]-$v < .011) {
+				$color = 'ansgrn';
+			} else {
+				$color = 'ansyel';
+			}
+			$out[$k] = $color;
+		}
+		return $out;
+	}
+}
+
 //creates display of score  (chg from previous: does not echo self)
 function printscore($sc,$qn) {
 	global $qi,$questions,$imasroot;
@@ -530,7 +573,7 @@ function canimproveany() {
 }
 
 //basic show question, for
-function basicshowq($qn,$seqinactive=false) {
+function basicshowq($qn,$seqinactive=false,$colors=array()) {
 	global $showansduring,$questions,$testsettings,$qi,$seeds,$showhints,$attempts,$regenonreattempt,$showansafterlast,$showeachscore;
 	$qshowansduring = ($showansduring && $qi[$questions[$qn]]['showans']=='0');
 	$qshowansafterlast = (($showansafterlast && $qi[$questions[$qn]]['showans']=='0') || $qi[$questions[$qn]]['showans']=='F' || $qi[$questions[$qn]]['showans']=='J');
@@ -541,10 +584,11 @@ function basicshowq($qn,$seqinactive=false) {
 		$showa = ($qshowansafterlast && $showeachscore);	
 	}
 	$regen = (($regenonreattempt && $qi[$questions[$qn]]['regen']==0) || $qi[$questions[$qn]]['regen']==1);
+	
 	if (!$seqinactive) {
-		displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$showa,$showhints,$attempts[$qn],false,$regen,$seqinactive);
+		displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$showa,$showhints,$attempts[$qn],false,$regen,$seqinactive,$colors);
 	} else {
-		displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$showa,false,$attempts[$qn],false,$regen,$seqinactive);
+		displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$showa,false,$attempts[$qn],false,$regen,$seqinactive,$colors);
 	}
 }
 
@@ -557,7 +601,7 @@ function showqinfobar($qn,$inreview,$single) {
 	if ($qi[$questions[$qn]]['withdrawn']==1) {
 		echo '<span class="red">Question Withdrawn</span> ';
 	}
-	if ($attempts[$qn]<$qi[$questions[$qn]]['attempts']) {
+	if ($attempts[$qn]<$qi[$questions[$qn]]['attempts'] || $qi[$questions[$qn]]['attempts']==0) {
 		$pointsremaining = getremainingpossible($qn,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
 		if ($pointsremaining == $qi[$questions[$qn]]['points']) {
 			echo 'Points possible: ' . $qi[$questions[$qn]]['points'] . '<br/>';

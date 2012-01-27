@@ -1377,6 +1377,7 @@ if (!isset($_POST['embedpostback'])) {
 			leavetestmsg();
 		} else if ($_GET['action']=='scoreembed') {
 			$qn = $_POST['toscore'];
+			$colors = array();
 			if ($_POST['verattempts']!=$attempts[$qn]) {
 				echo '<div class="prequestion">';
 				echo "This question has been submittted since you viewed it, and that grade is shown below.  Your answer just submitted was not scored or recorded.";
@@ -1414,7 +1415,9 @@ if (!isset($_POST['embedpostback'])) {
 					if ($GLOBALS['questionmanualgrade'] == true) {
 						echo '<br/><strong>Note:</strong> This question contains parts that can not be auto-graded.  Those parts will show a score of 0 until they are graded by your instructor';
 					}
-					echo "</p>";	
+					echo "</p>";
+					
+					$colors = scorestocolors($rawscore,$qi[$questions[$qn]]['points'],$qi[$questions[$qn]]['answeights']);
 				} else {
 					echo '<p>Question scored.</p>';
 				}
@@ -1425,8 +1428,9 @@ if (!isset($_POST['embedpostback'])) {
 			}
 			if (hasreattempts($qn)) {
 				echo '</div>';
+		
 				ob_start();
-				basicshowq($qn,false);
+				basicshowq($qn,false,$colors);
 				$quesout = ob_get_clean();
 				$quesout = substr($quesout,0,-7).'<br/><input type="button" class="btn" value="Submit" onclick="assessbackgsubmit('.$qn.',\'submitnotice'.$qn.'\')" /><span id="submitnotice'.$qn.'"></span></div>';
 				echo $quesout;
@@ -1447,17 +1451,17 @@ if (!isset($_POST['embedpostback'])) {
 					if ($showcorrectnow) {
 						echo $msg . ', is displayed below</p>';
 						echo '</div>';
-						displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],2,false,$attempts[$qn],false,false,true);
+						displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],2,false,$attempts[$qn],false,false,true,$colors);
 					} else {
 						echo $msg . ', is displayed below</p>';
 						echo '</div>';
-						displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],0,false,$attempts[$qn],false,false,true);
+						displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],0,false,$attempts[$qn],false,false,true,$colors);
 					}
 					
 				} else {
 					echo '</div>';
 					if ($testsettings['showans']!='N') {
-						displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],0,false,$attempts[$qn],false,false,true);
+						displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],0,false,$attempts[$qn],false,false,true,$colors);
 					}
 				}
 					

@@ -235,16 +235,19 @@ class OAuthRequest {
       $ourpost = $_POST;
       // Deal with magic_quotes
       // http://www.php.net/manual/en/security.magicquotes.disabling.php
-      if ( get_magic_quotes_gpc() ) {
+     /* if ( get_magic_quotes_gpc() ) {
          $outpost = array();
          foreach ($_POST as $k => $v) {
             $v = stripslashes($v);
             $ourpost[$k] = $v;
          }
-      }
+      }*/
      // Add POST Parameters if they exist
       $parameters = array_merge($parameters, $ourpost);
-
+      foreach ($parameters as $k=>$v) { //because IMathAS addslashes everything
+      	      $parameters[$k] = stripslashes($v);
+      }
+      
       // We have a Authorization-header with OAuth data. Parse the header
       // and add those overriding any duplicates from GET or POST
       if (@substr($request_headers['Authorization'], 0, 6) == "OAuth ") {
@@ -618,6 +621,7 @@ class OAuthServer {
       $ex_text = "Invalid signature";
       if ( $OAuth_last_computed_signature ) {
           $ex_text = $ex_text . " ours= $OAuth_last_computed_signature yours=$signature";
+          print_r($request);
       }
       throw new OAuthException($ex_text);
     }

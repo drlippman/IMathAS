@@ -411,6 +411,19 @@ div.tips {
 	opacity: 0.9;
 }
 
+/*colors for answer highlighting*/
+.ansred {
+	border: 1px solid #f00;
+	padding: 2px;
+}
+.ansgrn {
+	border: 1px solid #0f0;
+	padding: 2px;
+}
+.ansyel {
+	border: 1px solid #fa0;
+	padding: 2px;
+}
 
 ul#navlist
 {

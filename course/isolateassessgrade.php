@@ -108,7 +108,7 @@
 	}
 	
 	$query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.timelimitmult,";
-	$query .= "ias.id,istu.userid,ias.bestscores,ias.starttime,ias.endtime,ias.feedback,istu.locked FROM imas_users AS iu JOIN imas_students AS istu ON iu.id = istu.userid AND istu.courseid='$cid' ";
+	$query .= "ias.id,istu.userid,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,istu.locked FROM imas_users AS iu JOIN imas_students AS istu ON iu.id = istu.userid AND istu.courseid='$cid' ";
 	$query .= "LEFT JOIN imas_assessment_sessions AS ias ON iu.id=ias.userid AND ias.assessmentid='$aid' WHERE istu.courseid='$cid' ";
 	if ($istutor && isset($tutorsection) && $tutorsection!='') {
 		$query .= " AND istu.section='$tutorsection' ";
@@ -130,7 +130,7 @@
 	if ($hassection) {
 		echo '<th>Section</th>';
 	}
-	echo "<th>Grade</th><th>%</th><th>Time Spent</th><th>Feedback</th></tr></thead><tbody>";
+	echo "<th>Grade</th><th>%</th><th>Time Spent (In Questions)</th><th>Feedback</th></tr></thead><tbody>";
 	$now = time();
 	$lc = 1;
 	$n = 0;
@@ -160,9 +160,10 @@
 			$total += getpts($scores[$i]);
 		}
 		$timeused = $line['endtime']-$line['starttime'];
+		$timeontask = round(array_sum(explode(',',str_replace('~',',',$line['timeontask'])))/60,1);
 		
 		if ($line['id']==null) {
-			echo "<td><a href=\"gb-viewasid.php?gbmode=$gbmode&cid=$cid&asid=new&uid={$line['userid']}&from=isolate&aid=$aid\">-</a></td><td>-</td><td></td>";		
+			echo "<td><a href=\"gb-viewasid.php?gbmode=$gbmode&cid=$cid&asid=new&uid={$line['userid']}&from=isolate&aid=$aid\">-</a></td><td>-</td><td></td><td></td>";		
 		} else {
 			if (isset($exceptions[$line['userid']])) {
 				$thisenddate = $exceptions[$line['userid']][0];
@@ -202,16 +203,20 @@
 			if ($totalpossible>0) {
 				echo '<td>'.round(100*($total)/$totalpossible,1).'%</td>';
 			} else {
-				echo '<td></td>';
+				echo '<td>&nbsp;</td>';
 			}
 			if ($line['endtime']==0 || $line['starttime']==0) {
-				echo '<td></td>';
+				echo '<td>&nbsp;</td>';
 			} else {
-				echo '<td>'.round($timeused/60).' min</td>';
+				echo '<td>'.round($timeused/60).' min';
+				if ($timeontask>0) {
+					echo ' ('.$timeontask.' min)';
+				}
+				echo '</td>';
 				$tottime += $timeused;
 				$ntime++;
 			}
-			echo "<td>{$line['feedback']}</td>";
+			echo "<td>{$line['feedback']}&nbsp;</td>";
 		}
 		echo "</tr>";
 	}

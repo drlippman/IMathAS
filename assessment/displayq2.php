@@ -8,7 +8,7 @@ $allowedmacros = $mathfuncs;
 require_once("mathphp2.php");
 require("interpret5.php");
 require("macros.php");
-function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false) {
+function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false,$qcolors=array()) {
 	global $imasroot, $myrights, $showtips, $urlmode;
 	srand($seed);
 	if (is_int($doshowans) && $doshowans==2) {
@@ -42,7 +42,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		$query = "SELECT var,filename,alttext FROM imas_qimages WHERE qsetid='$qidx'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
-			${$row[0]} = "<img src=\"$imasroot/assessment/qimages/{$row[1]}\" alt=\"{$row[2]}\" />";	
+			${$row[0]} = "<img src=\"$imasroot/assessment/qimages/{$row[1]}\" alt=\"".htmlentities($row[2],ENT_QUOTES)."\" />";	
 		}
 	}
 	if (isset($GLOBALS['lastanswers'])) {
@@ -119,6 +119,9 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if (isset($grid)) {$options['grid'] = $grid;}
 	if (isset($background)) {$options['background'] = $background;}
 	
+	if ($qdata['qtype']=='conditional') {
+		$qcolors = array(); //no colors for conditional type
+	}
 	if ($qdata['qtype']=="multipart" || $qdata['qtype']=='conditional') {
 		if (!is_array($anstypes)) {
 			$anstypes = explode(",",$anstypes);
@@ -126,10 +129,12 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 
 		$laparts = explode("&",$la);
 		foreach ($anstypes as $kidx=>$anstype) {
-			list($answerbox[$kidx],$tips[$kidx],$shanspt[$kidx],$previewloc[$kidx]) = makeanswerbox($anstype,$kidx,$laparts[$kidx],$options,$qnidx+1);
+			$qcol = isset($qcolors[$kidx])?$qcolors[$kidx]:'';
+			list($answerbox[$kidx],$tips[$kidx],$shanspt[$kidx],$previewloc[$kidx]) = makeanswerbox($anstype,$kidx,$laparts[$kidx],$options,$qnidx+1,$qcol);
 		}
 	} else {
-		list($answerbox,$tips[0],$shanspt[0],$previewloc) = makeanswerbox($qdata['qtype'],$qnidx,$la,$options,0);
+		$qcol = isset($qcolors[0])?$qcolors[0]:'';
+		list($answerbox,$tips[0],$shanspt[0],$previewloc) = makeanswerbox($qdata['qtype'],$qnidx,$la,$options,0,$qcol);
 	}
 	if ($qdata['qtype']=='conditional') {
 		if (!isset($showanswer)) {
@@ -495,7 +500,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$points=1) {
 
 
 
-function makeanswerbox($anstype, $qn, $la, $options,$multi) {
+function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox) {
 	global $myrights, $useeqnhelper, $showtips, $imasroot;
 	$out = '';
 	$tip = '';
@@ -537,7 +542,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$shorttip .= ", accurate to $reqdecimals decimal places";
 		}
 		$out .= "$leftb<input ";
-		if ($displayformat=='alignright') { $out .= 'style="text-align: right;" ';}
+		
+		if ($displayformat=='alignright') { $style .= 'style="text-align: right;"';}
+		
 		if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
 				$qnref = "$qn-0";
@@ -546,7 +553,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			}
 			$out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
 		}
-		$out .= "class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\" />$rightb";
+		
+		$out .= "class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\" />$rightb";
 		if (isset($answer)) {
 			$sa = $answer;
 		}
@@ -571,13 +579,20 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$randkeys = array_rand($questions,count($questions));
 			shuffle($randkeys);
 		}
+		if ($displayformat == 'column') { $displayformat = '2column';}
 		
 		if (substr($displayformat,1)=='column') {
 			$ncol = $displayformat{0};
 			$itempercol = ceil(count($randkeys)/$ncol);
 			$displayformat = 'column';
 		}
+		if ($colorbox != '') {$style .= ' class="'.$colorbox.'" ';} else {$style='';}
 		
+		if ($displayformat == 'inline') {
+			$out .= "<span $style>";
+		} else if ($displayformat != 'select') {
+			$out .= "<div $style>";
+		}
 		if ($displayformat == "select") { 
 			$msg = '?';
 			foreach ($questions as $qv) {
@@ -586,7 +601,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 					break;
 				}
 			}
-			$out = "<select name=\"qn$qn\"><option value=\"NA\">$msg</option>\n";
+			$out = "<select name=\"qn$qn\" $style><option value=\"NA\">$msg</option>\n";
 		} else if ($displayformat == "horiz") {
 			
 		} else if ($displayformat == "inline") {
@@ -597,9 +612,10 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$out .= "<ul class=nomark>";
 		}
 		
+		
 		for ($i=0; $i < count($randkeys); $i++) {
 			if ($displayformat == "horiz") {
-				$out .= "<div class=choice>{$questions[$randkeys[$i]]}<br/><input type=radio name=qn$qn value=$i ";
+				$out .= "<div class=choice >{$questions[$randkeys[$i]]}<br/><input type=radio name=qn$qn value=$i ";
 				if (($la!='') && ($la == $i)) { $out .= "CHECKED";}
 				$out .= " /></div>\n";
 			} else if ($displayformat == "select") {
@@ -637,6 +653,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		} else {
 			$out .= "</ul>\n";
 		}
+		if ($displayformat == 'inline') {
+			$out .= "</span>";
+		} else if ($displayformat != 'select') {
+			$out .= "</div>";
+		}
 		$tip = "Select the best answer";
 		if (isset($answer)) {
 			$anss = explode(' or ',$answer);
@@ -669,10 +690,19 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			shuffle($randkeys);
 		}
 		$labits = explode('|',$la);
+		if ($displayformat == 'column') { $displayformat = '2column';}
+		
 		if (substr($displayformat,1)=='column') {
 			$ncol = $displayformat{0};
 			$itempercol = ceil(count($randkeys)/$ncol);
 			$displayformat = 'column';
+		}
+		if ($colorbox != '') {$style .= ' class="'.$colorbox.'" ';} else {$style='';}
+		
+		if ($displayformat == 'inline') {
+			$out .= "<span $style>";
+		} else  {
+			$out .= "<div $style>";
 		}
 		if ($displayformat == "horiz") {
 			
@@ -719,6 +749,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		} else {
 			$out .= "</ul>\n";
 		}
+		if ($displayformat == 'inline') {
+			$out .= "</span>";
+		} else {
+			$out .= "</div>";
+		}
 		$tip = "Select all correct answers";
 		if (isset($answers)) {
 			$akeys = explode(',',$answers);
@@ -759,6 +794,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$itempercol = ceil(count($randqkeys)/$ncol);
 			$displayformat = 'select';
 		}
+		if ($colorbox != '') {$out .= '<div class="'.$colorbox.'">';}
 		$out .= "<div class=match>\n";
 		$out .= "<p class=centered>$questiontitle</p>\n";
 		$out .= "<ul class=nomark>\n";
@@ -813,6 +849,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$out .= "</div>";
 		}
 		$out .= "<input type=hidden name=\"qn$qn\" value=\"done\" /><div class=spacer>&nbsp;</div>";
+		if ($colorbox != '') {$out .= '</div>';}
 		//$tip = "In each box provided, type the letter (a, b, c, etc.) of the matching answer in the right-hand column";
 		if ($displayformat=="select") {
 			$tip = "In each pull-down, select the item that matches with the displayed item";
@@ -855,7 +892,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$leftb = '';
 			$rightb = '';
 		}
-		$out .= "$leftb<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\" ";
+		$out .= "$leftb<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\" ";
 		
 		$ansformats = explode(',',$answerformat);
 		if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
@@ -912,7 +949,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		if (isset($ansprompt)) {$out .= $ansprompt;}
 		if (isset($answersize)) {
-			$out .= '<table><tr><td class="matrixleft">&nbsp;</td><td>';
+			if ($colorbox=='') {
+				$out .= '<table>';
+			} else {
+				$out .= '<table class="'.$colorbox.'">';
+			}
+			$out .= '<tr><td class="matrixleft">&nbsp;</td><td>';
 			$answersize = explode(",",$answersize);
 			$out .= "<table>";
 			$count = 0;
@@ -929,7 +971,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$out .= '</td><td class="matrixright">&nbsp;</td></tr></table>';
 			$tip = "Enter each element of the matrix as  number (like 5, -3, 2.2)";
 		} else {
-			$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\" />\n";
+			$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\" />\n";
 			$out .= "<input type=button class=btn value=Preview onclick=\"AMmathpreview('qn$qn','p$qn')\" /> &nbsp;\n";
 			$out .= "<span id=p$qn></span> ";
 			$tip = "Enter your answer as a matrix filled with numbers, like ((2,3,4),(3,4,5))";
@@ -954,7 +996,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if (isset($ansprompt)) {$out .= $ansprompt;}
 		if (isset($answersize)) {
 			$answersize = explode(",",$answersize);
-			$out .= '<table><tr><td class="matrixleft">&nbsp;</td><td>';
+			if ($colorbox=='') {
+				$out .= '<table>';
+			} else {
+				$out .= '<table class="'.$colorbox.'">';
+			}
+			$out .= '<tr><td class="matrixleft">&nbsp;</td><td>';
 			$out .= "<table>";
 			$count = 0;
 			$las = explode("|",$la);
@@ -974,7 +1021,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$tip .= formathint('each element of the matrix',$ansformats,'calcmatrix');
 			//$tip = "Enter each element of the matrix as  number (like 5, -3, 2.2) or as a calculation (like 5/3, 2^3, 5+4)";
 		} else {
-			$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\" />\n";
+			$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\" />\n";
 			$out .= "<input type=button value=Preview onclick=\"matrixcalc('tc$qn','p$qn')\" /> &nbsp;\n";
 			$out .= "<span id=p$qn></span> \n";
 			$out .= "<script type=\"text/javascript\">matcalctoproc[$qn] = 1;</script>\n";
@@ -1003,7 +1050,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		} else {
 			$shorttip = 'Enter an algebraic expression';
 		}
-		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=\"tc$qn\" id=\"tc$qn\" value=\"$la\" autocomplete=\"off\" ";
+		$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=\"tc$qn\" id=\"tc$qn\" value=\"$la\" autocomplete=\"off\" ";
 		if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
 				$qnref = "$qn-0";
@@ -1100,7 +1147,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		}
 		$tip .= "Enter DNE for Does Not Exist";
 		
-		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\" ";
+		$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\" ";
 		if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
 				$qnref = "$qn-0";
@@ -1147,7 +1194,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		}
 		$tip .= formathint('each value',$ansformats,'calcntuple');
 		
-		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\" ";
+		$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\" ";
 		if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
 				$qnref = "$qn-0";
@@ -1188,7 +1235,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		
 		$tip .= "Enter DNE for Does Not Exist";
 		
-		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\"  ";
+		$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\"  ";
 		if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
 				$qnref = "$qn-0";
@@ -1224,7 +1271,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		}
 		$tip .= formathint('each value',$ansformats,'calccomplex');
 		
-		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\"  ";
+		$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\"  ";
 		if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
 				$qnref = "$qn-0";
@@ -1259,7 +1306,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		$tip .= "Enter your answer as letters.  Examples: A B C, linear, a cat";
 		$shorttip = 'Enter text';
 		
-		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" autocomplete=\"off\"  ";
+		$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" autocomplete=\"off\"  ";
 		if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
 				$qnref = "$qn-0";
@@ -1298,7 +1345,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			if ($displayformat!='editor') {
 				$la = preg_replace('/\n/','<br/>',$la);
 			} 
-			$out .= "<div class=intro>";
+			if ($colorbox=='') {
+				$out .= '<div class="intro">';
+			} else {
+				$out .= '<div class="intro '.$colorbox.'">';
+			}
 			if (isset($GLOBALS['questionscoreref'])) {
 				if ($multi==0) {
 					$el = $GLOBALS['questionscoreref'][0];
@@ -1326,8 +1377,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 				$la = htmlentities($la);
 			}
 			if ($rows<2) {
-				$out .= "<input type=\"text\" size=\"$cols\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" /> ";
+				$out .= "<input type=\"text $colorbox\" size=\"$cols\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" /> ";
 			} else {
+				if ($colorbox!='') { $out .= '<div class="'.$colorbox.'">';}
 				$out .= "<textarea rows=\"$rows\" name=\"qn$qn\" id=\"qn$qn\" ";
 				if ($displayformat=='editor' && $GLOBALS['useeditor']==1) {
 					$out .= "style=\"width:98%;\" class=\"mceEditor\" ";
@@ -1335,6 +1387,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 					$out .= "cols=\"$cols\" ";
 				}
 				$out .= ">$la</textarea>\n";
+				if ($colorbox!='') { $out .= '</div>';} 
 			} 
 			if ($displayformat=='editor' && $GLOBALS['useeditor']==1) {
 				//$out .= "<script type=\"text/javascript\">editornames[editornames.length] = \"qn$qn\";</script>";
@@ -1360,7 +1413,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		}
 		$shorttip = 'Enter an interval using interval notation';
 		
-		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\"  ";
+		$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\"  ";
 		if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
 				$qnref = "$qn-0";
@@ -1407,7 +1460,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 			$tip .= "<br/>Your numbers should be accurate to $reqdecimals decimal places.";
 		}
 		
-		$out .= "<input class=\"text\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\"  ";
+		$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\"  ";
 		if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
 				$qnref = "$qn-0";
@@ -1522,7 +1575,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		}
 		$bg = getgraphfilename($plot);
 		$dotline = 0;
+		if ($colorbox!='') { $out .= '<div class="'.$colorbox.'">';}
 		$out .= "<canvas class=\"drawcanvas\" id=\"canvas$qn\" width=\"{$settings[6]}\" height=\"{$settings[7]}\"></canvas>";
+		if ($colorbox!='') { $out .= '</div>';}
 		$out .= "<div><span id=\"drawtools$qn\" class=\"drawtools\">";
 		$out .= "<span onclick=\"clearcanvas($qn)\">Clear All</span> Draw: ";
 		if ($answerformat[0]=='inequality') {
@@ -1665,7 +1720,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi) {
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
 		
+		if ($colorbox!='') { $out .= '<span class="'.$colorbox.'">';}
 		$out .= "<input type=\"file\" name=\"qn$qn\" id=\"qn$qn\" />\n";
+		if ($colorbox!='') { $out .= '</span>';}
 		if ($la!='') {
 			if (isset($GLOBALS['testsettings']) && isset($GLOBALS['sessiondata']['groupid']) && $GLOBALS['testsettings']>0 && $GLOBALS['sessiondata']['groupid']>0) {
 				$s3asid = 'grp'.$GLOBALS['sessiondata']['groupid'].'/'.$GLOBALS['testsettings']['id'];
@@ -2541,6 +2598,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			
 			$cntnan = 0;
 			$cntzero = 0;
+			$cntbothzero = 0;
 			$stunan = 0;
 			$ysqrtot = 0;
 			$reldifftot = 0;
@@ -2565,6 +2623,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						if ($myans[$i]==0 && $realans!=0) {
 							$cntzero++;
 						}
+					} else if (abs($realans)<=.000001 && is_numeric($myans[$i]) && $myans[$i]==0) {
+						$cntbothzero++;
 					}
 				} else if ($answerformat=="toconst") {
 					$diffs[] = $myans[$i] - $realans;
@@ -2590,7 +2650,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				return 0;
 			}
 			if ($answerformat=="equation") {
-				if (count($ratios)>0) {
+				if ($cntbothzero>18) {
+					$correct = true;
+				} else if (count($ratios)>0) {
 					if (count($ratios)==$cntzero) {
 						$correct = false; return 0;
 					} else {

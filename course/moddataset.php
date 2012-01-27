@@ -146,7 +146,7 @@
 					echo "Library Assignments Updated. ";
 				}
 			} 
-			$query = "SELECT id,filename,var FROM imas_qimages WHERE qsetid='{$_GET['id']}'";
+			$query = "SELECT id,filename,var,alttext FROM imas_qimages WHERE qsetid='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 			$imgcnt = mysql_num_rows($result);
 			while ($row = mysql_fetch_row($result)) {
@@ -163,13 +163,14 @@
 						$query = "UPDATE imas_questionset SET hasimg=0 WHERE id='{$_GET['id']}'";
 						mysql_query($query) or die("Query failed :$query " . mysql_error());
 					}
-				} else if ($row[2]!=$_POST['imgvar-'.$row[0]]) {
+				} else if ($row[2]!=$_POST['imgvar-'.$row[0]] || $row[3]!=$_POST['imgalt-'.$row[0]]) {
 					$newvar = str_replace('$','',$_POST['imgvar-'.$row[0]]);
+					$newalt = $_POST['imgalt-'.$row[0]];
 					$disallowedvar = array('link','qidx','qnidx','seed','qdata','toevalqtxt','la','GLOBALS','laparts','anstype','kidx','iidx','tips','options','partla','partnum','score');
 					if (in_array($newvar,$disallowedvar)) {
 						echo "<p>$newvar is not an allowed variable name</p>";
 					} else {
-						$query = "UPDATE imas_qimages SET var='$newvar' WHERE id='{$row[0]}'";
+						$query = "UPDATE imas_qimages SET var='$newvar',alttext='$newalt' WHERE id='{$row[0]}'";
 						mysql_query($query) or die("Query failed :$query " . mysql_error());
 					}
 				}
@@ -258,7 +259,7 @@
 					if (move_uploaded_file($_FILES['imgfile']['tmp_name'], $uploadfile)) {
 						//echo "<p>File is valid, and was successfully uploaded</p>\n";
 						$_POST['newimgvar'] = str_replace('$','',$_POST['newimgvar']);
-						$query = "INSERT INTO imas_qimages (var,qsetid,filename) VALUES ('{$_POST['newimgvar']}','$qsetid','$filename')";
+						$query = "INSERT INTO imas_qimages (var,qsetid,filename,alttext) VALUES ('{$_POST['newimgvar']}','$qsetid','$filename','{$_POST['newimgalt']}')";
 						mysql_query($query) or die("Query failed :$query " . mysql_error());
 						$query = "UPDATE imas_questionset SET hasimg=1 WHERE id='$qsetid'";
 						mysql_query($query) or die("Query failed :$query " . mysql_error());
@@ -382,12 +383,16 @@
 				$extref = array();
 			}
 			$images = array();
+			$images['vars'] = array();
+			$images['files'] = array();
+			$images['alttext'] = array();
 			if ($line['hasimg']>0) {
-				$query = "SELECT id,var,filename FROM imas_qimages WHERE qsetid='{$_GET['id']}'";
+				$query = "SELECT id,var,filename,alttext FROM imas_qimages WHERE qsetid='{$_GET['id']}'";
 				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				while ($row = mysql_fetch_row($result)) {
 					$images['vars'][$row[0]] = $row[1];
 					$images['files'][$row[0]] = $row[2];
+					$images['alttext'][$row[0]] = $row[3];
 				}
 			}
 			if (isset($_GET['template'])) {
@@ -707,12 +712,13 @@ Answer: <span class=pointer onclick="incboxsize('answer')">[+]</span><span class
 </div>
 <div id=imgbox>
 <input type="hidden" name="MAX_FILE_SIZE" value="500000" />
-Image file: <input type="file" name="imgfile"/> assign to variable: <input type="text" name="newimgvar" size="10"/><br/>
+Image file: <input type="file" name="imgfile"/> assign to variable: <input type="text" name="newimgvar" size="6"/> Description: <input type="text" size="20" name="newimgalt" value=""/><br/>
 <?php
 if (isset($images['vars']) && count($images['vars'])>0) {
 	echo "Images:<br/>\n";
 	foreach ($images['vars'] as $id=>$var) {
-		echo "Variable: <input type=\"text\" name=\"imgvar-$id\" value=\"\$$var\" size=\"10\"/> <a href=\"$imasroot/assessment/qimages/{$images['files'][$id]}\" target=\"_blank\">View</a> Delete? <input type=checkbox name=\"delimg-$id\"/><br/>";	
+		echo "Variable: <input type=\"text\" name=\"imgvar-$id\" value=\"\$$var\" size=\"10\"/> <a href=\"$imasroot/assessment/qimages/{$images['files'][$id]}\" target=\"_blank\">View</a> ";
+		echo "Description: <input type=\"text\" size=\"20\" name=\"imgalt-$id\" value=\"{$images['alttext'][$id]}\"/> Delete? <input type=checkbox name=\"delimg-$id\"/><br/>";	
 	}
 	
 }
