@@ -234,8 +234,9 @@ if (!$hascourse) {
 	echo "<p><a href=\"assessment/showtest.php?cid=$cid&id=$typeid\">Preview assessment</a> | ";
 	echo "<a href=\"course/isolateassessgrade.php?cid=$cid&aid=$typeid\">Grade list</a> ";
 	if ($role == 'teacher') {
-		echo "| <a href=\"course/gb-itemanalysis.php?cid=$cid&asid=average&aid=$typeid\">Item Analysis</a></p>";
+		echo "| <a href=\"course/gb-itemanalysis.php?cid=$cid&asid=average&aid=$typeid\">Item Analysis</a>";
 	}
+	echo "</p>";
 	
 	$now = time();
 	echo '<p>';

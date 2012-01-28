@@ -136,7 +136,7 @@
 <?php
 	echo $err;
 ?>
-	<form method=post action="managetutors.php?cid=<?php echo $cid ?>">	
+	<form id="curform" method=post action="managetutors.php?cid=<?php echo $cid ?>">	
 	
 	<table class="gb">
 	<thead>
@@ -144,8 +144,8 @@
 			<th>Tutor name</th>
 			<th>Limit to <?php echo $limitname; ?></th>
 			
-			<th>Remove? All: 
-			<input type="checkbox" name="ca" value="1" onClick="chkAll(this.form, 'remove[]', this.checked)"> </th>
+			<th>Remove? 
+			Check: <a href="#" onclick="return chkAllNone('curform','remove[]',true)">All</a> <a href="#" onclick="return chkAllNone('curform','remove[]',false)">None</a></th>
 			
 		</tr>
 	</thead>

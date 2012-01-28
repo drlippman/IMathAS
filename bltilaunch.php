@@ -732,16 +732,31 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='aid' || $keyparts[0]=='placein') {
 		$query = "SELECT id FROM imas_teachers WHERE userid='$userid' AND courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		if (mysql_num_rows($result) == 0) { //nope, not a teacher.  Set as tutor for this context_id
-			$query = "INSERT INTO imas_tutors (userid,courseid,section) VALUES ('$userid','$cid','{$_SESSION['lti_context_id']}')";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-		} 
+			$query = "SELECT id FROM imas_tutors WHERE userid='$userid' AND courseid='$cid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			if (mysql_num_rows($result) == 0) { //nope, not a tutor already.  Set as tutor for this context_id
+				$query = "INSERT INTO imas_tutors (userid,courseid,section) VALUES ('$userid','$cid','{$_SESSION['lti_context_id']}')";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+		}
 		$timelimitmult = 1;
 	} else {
 		$query = "SELECT id,timelimitmult FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		if (mysql_num_rows($result) == 0) { //nope, not enrolled
-			$query = "INSERT INTO imas_students (userid,courseid,section) VALUES ('$userid','$cid','{$_SESSION['lti_context_id']}')";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			$query = "SELECT id FROM imas_teachers WHERE userid='$userid' AND courseid='$cid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			if (mysql_num_rows($result) == 0) { //nope, not a teacher either in stuview.  
+				$query = "SELECT id FROM imas_tutors WHERE userid='$userid' AND courseid='$cid'";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				if (mysql_num_rows($result) == 0) { //nope, not a tutor either.  Add new student
+					$query = "INSERT INTO imas_students (userid,courseid,section) VALUES ('$userid','$cid','{$_SESSION['lti_context_id']}')";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+				}
+			} else {
+				$_SESSION['ltirole']='instructor';
+				$setstuviewon = true;
+			}
 			$timelimitmult = 1;
 		} else {
 			$timelimitmult = mysql_result($result,0,1);
@@ -830,6 +845,10 @@ $sessiondata['lti_context_label'] = $SESS['lti_context_label'];
 $sessiondata['lti_launch_get'] = $SESS['lti_launch_get'];
 $sessiondata['lti_key'] = $SESS['lti_key'];
 $sessiondata['lti_keytype'] = $SESS['lti_keytype'];
+
+if (isset($setstuviewon) && $setstuviewon==true) {
+	$sessiondata['stuview'] = 0;
+}
 
 if ($_SESSION['lti_keytype']=='gc') {
 	$sessiondata['lti_launch_get']['cid'] = $keyparts[1];
