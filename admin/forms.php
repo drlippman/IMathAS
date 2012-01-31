@@ -305,9 +305,11 @@ switch($_GET['action']) {
 			if ($msgset==4) { echo "checked=1";}
 			echo '/> Off <br/> <input type=checkbox name="msgmonitor" value="1" ';
 			if ($msgmonitor==1) { echo "checked=1";}
-			echo '/> Enable monitoring of student-to-student messages<br/> <input type=checkbox name="msgqtoinstr" value="1" ';
-			if ($msgQtoInstr==2) { echo "checked=1";}
-			echo '/> Enable &quot;Message instructor about this question&quot; links</span><br class=form />';
+			echo '/> Enable monitoring of student-to-student messages ';
+			//<br/><input type=checkbox name="msgqtoinstr" value="1" ';
+			//if ($msgQtoInstr==2) { echo "checked=1";}
+			//echo '/> Enable &quot;Message instructor about this question&quot; links
+			echo '</span><br class=form />';
 		}
 		
 		if (!isset($CFG['CPS']['chatset']) || $CFG['CPS']['chatset'][1]==1) {

@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 51;
+$latest = 52;
 
 
 @set_time_limit(0);
@@ -869,6 +869,28 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 if ($res===false) {
 				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
+		}
+		if ($last < 52) {
+			 $query = 'ALTER TABLE `imas_assessments` ADD `posttoforum` INT(10) UNSIGNED NOT NULL DEFAULT \'0\'';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = 'ALTER TABLE `imas_assessments` ADD `msgtoinstr` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\'';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 //grab msg to instr settings and move to asssessments
+			 $query = "SELECT id,msgset FROM imas_courses WHERE msgset>9";
+			  $res = mysql_query($query);
+			  while ($row = mysql_fetch_row($res)) {
+			  	  $query = "UPDATE imas_assessments SET msgtoinstr=1 WHERE courseid={$row[0]}";
+			  	  mysql_query($query);
+			  }
+			  $query = "UPDATE imas_courses SET msgset=msgset-10 WHERE msgset>9";
+			  mysql_query($query);
+			 
 		}
 		
 		$handle = fopen("upgradecounter.txt",'w');

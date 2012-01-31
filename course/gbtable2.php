@@ -1495,9 +1495,10 @@ function gbtable() {
 		$avgs = array();
 		for ($j=0;$j<count($gb[0][1]);$j++) { //foreach assessment
 			$avgs[$j] = array();
+			
 			for ($i=1;$i<$ln;$i++) { //foreach student
 				if (isset($gb[$i][1][$j][0]) && $gb[$i][4][1]==0) { //score exists and student is not locked
-					if ($gb[$i][1][$j][3]==0 && is_numeric($gb[$i][1][$j][0])) {
+					if ($gb[$i][1][$j][3]%10==0 && is_numeric($gb[$i][1][$j][0])) {
 						$avgs[$j][] = $gb[$i][1][$j][0];
 					}
 				}

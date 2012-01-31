@@ -291,7 +291,7 @@
 			$pagetitle = "Add/Modify Thread";
 			$useeditor = "message";
 			$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
-
+			$loadgraphfilter = true;
 			require("../header.php");
 			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
 			echo "&gt; <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> &gt; ";
@@ -316,6 +316,21 @@
 				$curstugroupid = 0;
 				$replyby = null;
 				echo "<h3>Add Thread - \n";
+				if (isset($_GET['quoteq'])) {
+					require_once("../assessment/displayq2.php");
+					$parts = explode('-',$_GET['quoteq']);
+					$message = displayq($parts[0],$parts[1],$parts[2],false,false,0,true);
+					$message = printfilter(forcefiltergraph($message));
+					$message = preg_replace('/(`[^`]*`)/',"<span class=\"AM\">$1</span>",$message);
+					
+					$line['message'] = '<p> </p><br/><hr/>'.$message;
+	
+					if (isset($parts[3])) {  
+						$query = "SELECT name FROM imas_assessments WHERE id='".intval($parts[3])."'";
+						$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+						$line['subject'] = 'Question about #'.($parts[0]+1).' in '.str_replace('"','&quot;',mysql_result($result,0,0));
+					}	
+				}
 			}
 			$query = "SELECT name,settings FROM imas_forums WHERE id='$forumid'";
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());

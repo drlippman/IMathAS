@@ -1,20 +1,13 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <?php
+$nologo = true;
+$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/infopages.css\" type=\"text/css\">\n";
+
 	$dbsetup = true; //prevents connection to database
 	include("../config.php");
-?>
-<html>
-<head>
-<title><?php echo $installname; ?></title>
-<link rel="stylesheet" href="<?php echo $imasroot;?>/infopages.css" type="text/css">
-<link rel="shortcut icon" href="/favicon.ico" >
-</head>
-<body>
-<?php
+	require("../header.php");
 	$pagetitle = "Documentation";
 	require("../infoheader.php");
 ?>
-
 
 <h2>Guides</h2>
 <h4>Use Guides</h4>
@@ -62,5 +55,6 @@
 </ul>
 
 <p>Many of these guides were written with development grant support from the WA State Distance Learning Council</p>
+</div>
 </body>
 </html>

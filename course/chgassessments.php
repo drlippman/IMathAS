@@ -35,7 +35,7 @@ if (!(isset($teacherid))) {
 		
 		$sets = array();
 		if (isset($_POST['docopyopt'])) {
-			$tocopy = 'password,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,eqnhelper,showhints,allowlate,noprint,shuffle,gbcategory,cntingb,caltag,calrtag,minscore,exceptionpenalty,groupmax,showcat';
+			$tocopy = 'password,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,eqnhelper,showhints,allowlate,noprint,shuffle,gbcategory,cntingb,caltag,calrtag,minscore,exceptionpenalty,groupmax,showcat,msgtoinstr,posttoforum';
 			
 			$query = "SELECT $tocopy FROM imas_assessments WHERE id='{$_POST['copyopt']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -180,6 +180,20 @@ if (!(isset($teacherid))) {
 				$calrtag = $_POST['caltagrev'];
 				$sets[] = "calrtag='$calrtag'";
 			}
+			if (isset($_POST['chgmsgtoinstr'])) {
+				if (isset($_POST['msgtoinstr'])) {
+					$sets[] = "msgtoinstr=1";
+				} else {
+					$sets[] = "msgtoinstr=1";
+				}
+			}
+			if (isset($_POST['chgposttoforum'])) {
+				if (isset($_POST['doposttoforum'])) {
+					$sets[] = "posttoforum='{$_POST['posttoforum']}'";
+				} else {
+					$sets[] = "posttoforum=0";
+				}
+			}
 			if (isset($_POST['chgdeffb'])) {
 				if (isset($_POST['usedeffb'])) {
 					$sets[] = "deffeedbacktext='{$_POST['deffb']}'";
@@ -306,7 +320,17 @@ if (!(isset($teacherid))) {
 				$page_gbcatSelect['label'][$i] = $row[1];
 				$i++;
 			}
-		}	
+		}
+		
+		$page_forumSelect = array();
+		$query = "SELECT id,name FROM imas_forums WHERE courseid='$cid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$page_forumSelect['val'][0] = 0;
+		$page_forumSelect['label'][0] = "None";
+		while ($row = mysql_fetch_row($result)) {
+			$page_forumSelect['val'][] = $row[0];
+			$page_forumSelect['label'][] = $row[1];
+		}
 
 		
 	}
@@ -582,9 +606,23 @@ function chkgrp(frm, arr, mark) {
 			</tr>
 			<tr class="coptr">
 				<td><input type="checkbox" name="chghints"/></td>
-				<td class="r">Show hints when available? </td>
+				<td class="r">Show hints and video/text buttons when available? </td>
 				<td>
 				<input type="checkbox" name="showhints" <?php writeHtmlChecked($line['showhints'],1); ?>>
+				</td>
+			</tr>
+			<tr class="coptr">
+				<td><input type="checkbox" name="chgmsgtoinstr"/></td>
+				<td class="r">Show "Message instructor about this question" links</td>
+				<td>
+				<input type="checkbox" name="msgtoinstr" <?php writeHtmlChecked($line['msgtoinstr'],1); ?>/>
+				</td>
+			</tr>
+			<tr class="coptr">
+				<td><input type="checkbox" name="chgposttoforum"/></td>
+				<td class="r">Show "Post this question to forum" links?</td>
+				<td>
+				<input type="checkbox" name="doposttoforum" <?php writeHtmlChecked($line['posttoforum'],0,true); ?>/> To forum <?php writeHtmlSelect("posttoforum",$page_forumSelect['val'],$page_forumSelect['label'],$line['posttoforum']); ?>
 				</td>
 			</tr>
 			<tr class="coptr">

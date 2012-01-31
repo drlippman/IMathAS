@@ -142,6 +142,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
 			$deffeedback = $_POST['deffeedback'].'-'.$_POST['showans'];
 		}
+		if (!isset($_POST['doposttoforum'])) {
+			$_POST['posttoforum'] = 0;
+		}
+		if (isset($_POST['msgtoinstr'])) {
+			$_POST['msgtoinstr'] = 1;
+		} else {
+			$_POST['msgtoinstr'] = 0;
+		}
 		
 		if ($_POST['skippenalty']==10) {
 			$_POST['defpenalty'] = 'L'.$_POST['defpenalty'];
@@ -149,9 +157,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$_POST['defpenalty'] = 'S'.$_POST['skippenalty'].$_POST['defpenalty'];
 		}
 		if ($_POST['copyfrom']!=0) {
-			$query = "SELECT timelimit,minscore,displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,showcat,intro,startdate,enddate,reviewdate,isgroup,groupmax,groupsetid,showhints,reqscore,reqscoreaid,noprint,allowlate,eqnhelper,endmsg,caltag,calrtag,deffeedbacktext,showtips,exceptionpenalty,ltisecret FROM imas_assessments WHERE id='{$_POST['copyfrom']}'";
+			$query = "SELECT timelimit,minscore,displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,showcat,intro,startdate,enddate,reviewdate,isgroup,groupmax,groupsetid,showhints,reqscore,reqscoreaid,noprint,allowlate,eqnhelper,endmsg,caltag,calrtag,deffeedbacktext,showtips,exceptionpenalty,ltisecret,msgtoinstr,posttoforum FROM imas_assessments WHERE id='{$_POST['copyfrom']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			list($timelimit,$_POST['minscore'],$_POST['displaymethod'],$_POST['defpoints'],$_POST['defattempts'],$_POST['defpenalty'],$deffeedback,$shuffle,$_POST['gbcat'],$_POST['password'],$_POST['cntingb'],$tutoredit,$_POST['showqcat'],$cpintro,$cpstartdate,$cpenddate,$cpreviewdate,$isgroup,$_POST['groupmax'],$_POST['groupsetid'],$showhints,$_POST['reqscore'],$_POST['reqscoreaid'],$_POST['noprint'],$_POST['allowlate'],$_POST['eqnhelper'],$endmsg,$_POST['caltagact'],$_POST['caltagrev'],$deffb,$_POST['showtips'],$_POST['exceptionpenalty'],$_POST['ltisecret']) = addslashes_deep(mysql_fetch_row($result));
+			list($timelimit,$_POST['minscore'],$_POST['displaymethod'],$_POST['defpoints'],$_POST['defattempts'],$_POST['defpenalty'],$deffeedback,$shuffle,$_POST['gbcat'],$_POST['password'],$_POST['cntingb'],$tutoredit,$_POST['showqcat'],$cpintro,$cpstartdate,$cpenddate,$cpreviewdate,$isgroup,$_POST['groupmax'],$_POST['groupsetid'],$showhints,$_POST['reqscore'],$_POST['reqscoreaid'],$_POST['noprint'],$_POST['allowlate'],$_POST['eqnhelper'],$endmsg,$_POST['caltagact'],$_POST['caltagrev'],$deffb,$_POST['showtips'],$_POST['exceptionpenalty'],$_POST['ltisecret'],$_POST['msgtoinstr'],$_POST['posttoforum']) = addslashes_deep(mysql_fetch_row($result));
 			if (isset($_POST['copyinstr'])) {
 				$_POST['intro'] = $cpintro;
 			}
@@ -173,6 +181,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
 			$_POST['ltisecret'] = '';
 		}
+		
+		
 		
 		//is updating, switching from nongroup to group, and not creating new groupset, check if groups and asids already exist
 		//if so, cannot handle
@@ -226,7 +236,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			
 			$query = "UPDATE imas_assessments SET name='{$_POST['name']}',summary='{$_POST['summary']}',intro='{$_POST['intro']}',timelimit='$timelimit',minscore='{$_POST['minscore']}',isgroup='$isgroup',showhints='$showhints',tutoredit=$tutoredit,eqnhelper='{$_POST['eqnhelper']}',showtips='{$_POST['showtips']}',";
 			$query .= "displaymethod='{$_POST['displaymethod']}',defattempts='{$_POST['defattempts']}',deffeedback='$deffeedback',shuffle='$shuffle',gbcategory='{$_POST['gbcat']}',password='{$_POST['password']}',cntingb='{$_POST['cntingb']}',showcat='{$_POST['showqcat']}',caltag='$caltag',calrtag='$calrtag',$updategroupset";
-			$query .= "reqscore='{$_POST['reqscore']}',reqscoreaid='{$_POST['reqscoreaid']}',noprint='{$_POST['noprint']}',avail='{$_POST['avail']}',groupmax='{$_POST['groupmax']}',allowlate='{$_POST['allowlate']}',exceptionpenalty='{$_POST['exceptionpenalty']}',ltisecret='{$_POST['ltisecret']}',deffeedbacktext='$deffb' ";
+			$query .= "reqscore='{$_POST['reqscore']}',reqscoreaid='{$_POST['reqscoreaid']}',noprint='{$_POST['noprint']}',avail='{$_POST['avail']}',groupmax='{$_POST['groupmax']}',allowlate='{$_POST['allowlate']}',exceptionpenalty='{$_POST['exceptionpenalty']}',ltisecret='{$_POST['ltisecret']}',deffeedbacktext='$deffb',";
+			$query .= "msgtoinstr='{$_POST['msgtoinstr']}',posttoforum='{$_POST['posttoforum']}'";
+			
 			if (isset($_POST['defpoints'])) {	
 				$query .= ",defpoints='{$_POST['defpoints']}',defpenalty='{$_POST['defpenalty']}'";
 			}
@@ -252,11 +264,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else { //add new
 			if (!isset($_POST['copyendmsg'])) {$endmsg = '';}						
 			$query = "INSERT INTO imas_assessments (courseid,name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,";
-			$query .= "displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,showcat,eqnhelper,showtips,caltag,calrtag,isgroup,groupmax,groupsetid,showhints,reqscore,reqscoreaid,noprint,avail,allowlate,exceptionpenalty,ltisecret,endmsg,deffeedbacktext) VALUES ";
+			$query .= "displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,showcat,eqnhelper,showtips,caltag,calrtag,isgroup,groupmax,groupsetid,showhints,reqscore,reqscoreaid,noprint,avail,allowlate,exceptionpenalty,ltisecret,endmsg,deffeedbacktext,msgtoinstr,posttoforum) VALUES ";
 			$query .= "('$cid','{$_POST['name']}','{$_POST['summary']}','{$_POST['intro']}',$startdate,$enddate,$reviewdate,'$timelimit','{$_POST['minscore']}',";
 			$query .= "'{$_POST['displaymethod']}','{$_POST['defpoints']}','{$_POST['defattempts']}',";
 			$query .= "'{$_POST['defpenalty']}','$deffeedback','$shuffle','{$_POST['gbcat']}','{$_POST['password']}','{$_POST['cntingb']}',$tutoredit,'{$_POST['showqcat']}','{$_POST['eqnhelper']}','{$_POST['showtips']}','$caltag','$calrtag',";
-			$query .= "'$isgroup','{$_POST['groupmax']}','{$_POST['groupsetid']}','$showhints','{$_POST['reqscore']}','{$_POST['reqscoreaid']}','{$_POST['noprint']}','{$_POST['avail']}','{$_POST['allowlate']}','{$_POST['exceptionpenalty']}','{$_POST['ltisecret']}','$endmsg','$deffb');";
+			$query .= "'$isgroup','{$_POST['groupmax']}','{$_POST['groupsetid']}','$showhints','{$_POST['reqscore']}','{$_POST['reqscoreaid']}',";
+			$query .= "'{$_POST['noprint']}','{$_POST['avail']}','{$_POST['allowlate']}','{$_POST['exceptionpenalty']}','{$_POST['ltisecret']}','$endmsg','$deffb','{$_POST['msgtoinstr']}','{$_POST['posttoforum']}');";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			
 			$newaid = mysql_insert_id();
@@ -367,7 +380,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$cntingb = 1;
 			$pcntingb = 3;
 			$showqcat = 0;
-			
+			$line['posttoforum'] = 0;
+			$line['msgtoinstr'] = isset($CFG['AMS']['msgtoinstr'])?$CFG['AMS']['msgtoinstr']:0;
 			$taken = false;
 		}
 		if ($line['minscore']>10000) {
@@ -478,6 +492,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		
 		$page_tutorSelect['label'] = array("No access","View Scores","View and Edit Scores");
 		$page_tutorSelect['val'] = array(2,0,1);
+		
+		$page_forumSelect = array();
+		$query = "SELECT id,name FROM imas_forums WHERE courseid='$cid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$page_forumSelect['val'][0] = 0;
+		$page_forumSelect['label'][0] = "None";
+		while ($row = mysql_fetch_row($result)) {
+			$page_forumSelect['val'][] = $row[0];
+			$page_forumSelect['label'][] = $row[1];
+		}
 		
 	} //END INITIAL LOAD BLOCK
 	
@@ -716,6 +740,13 @@ if ($overwriteBody==1) {
 			<span class=formright>
 				<input type="checkbox" name="showhints" <?php writeHtmlChecked($line['showhints'],1); ?>>
 			</span><br class=form>
+			
+			<span class=form>Show "ask question" links?</span>
+			<span class=formright>
+				<input type="checkbox" name="msgtoinstr" <?php writeHtmlChecked($line['msgtoinstr'],1); ?>/> Show "Message instructor about this question" links<br/>
+				<input type="checkbox" name="doposttoforum" <?php writeHtmlChecked($line['posttoforum'],0,true); ?>/> Show "Post this question to forum" links, to forum <?php writeHtmlSelect("posttoforum",$page_forumSelect['val'],$page_forumSelect['label'],$line['posttoforum']); ?>
+			</span><br class=form>
+			
 			<span class=form>Show answer entry tips?</span>
 			<span class=formright>
 				<select name="showtips">
