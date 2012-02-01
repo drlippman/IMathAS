@@ -4,7 +4,7 @@
  header('P3P: CP="ALL CUR ADM OUR"');
  $curdir = rtrim(dirname(__FILE__), '/\\');
  if (!file_exists("$curdir/config.php")) {
-	 header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/install.php");
+	 header('Location: http://' . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/install.php");
  }
  require_once("$curdir/config.php");
  if (isset($sessionpath) && $sessionpath!='') { session_save_path($sessionpath);}
