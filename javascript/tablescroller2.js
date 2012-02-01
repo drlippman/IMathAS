@@ -111,19 +111,18 @@ this.preinit = function(try2) {
 		//second rows and columns.  Then when we restrict the container to
 		//create scroll, we don't have to worry about different wrapping.
 		var trs = document.getElementsByTagName("tr");
-		if (trs.length > 100 && try2!=true) {
-			return;
-		} else if (trs.length > 100) {
-			alert("This might take a minute... header locking is slow with lots of students.");
-		}
 		var theads = trs[0].getElementsByTagName("th");
-		if (theads.length * trs.length > 3000) {
+		if (trs.length > 100 || theads.length * trs.length > 3000) {
 			if (try2!=true) {
 				return;
 			} else {
-				alert("This might take a minute... header locking is slow with this big of a gradebook.");
+				if (!confirm("This might take a minute... header locking is really slow with a big gradebook.  Continue?")) {
+					cancellockcol();	
+					return;
+				}
 			}
 		}
+		
 		leftth = theads[0];
 		var firstthcontent = theads[0].innerHTML;
 		var first = trs[1].getElementsByTagName("td");

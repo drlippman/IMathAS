@@ -28,6 +28,11 @@ if (isset($_GET['public'])) {
 	} else {
 		$sessiondata = unserialize(base64_decode($_SESSION['data']));
 	}
+	if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') {
+		 $urlmode = 'https://';
+	 } else {
+		 $urlmode = 'http://';
+	 }
 	$public = '?public=true';
 	$publica = '&public=true';
 	$sessiondata['graphdisp'] = 1;

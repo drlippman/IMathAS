@@ -763,7 +763,7 @@ function gbtable() {
 			$IP=0;
 		}
 		if (isset($exceptions[$l['assessmentid']][$l['userid']])) {
-			$gb[$row][1][$col][6] = ($exceptions[$l['assessmentid']][$l['userid']][1]==1)?2:1; //had exception
+			$gb[$row][1][$col][6] = ($exceptions[$l['assessmentid']][$l['userid']][1]>0)?2:1; //had exception
 		}
 		if (isset($exceptions[$l['assessmentid']][$l['userid']])) {// && $now>$enddate[$i] && $now<$exceptions[$l['assessmentid']][$l['userid']]) {
 			if ($enddate[$i]>$exceptions[$l['assessmentid']][$l['userid']][0] && $assessmenttype[$i]=="NoScores") {

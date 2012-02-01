@@ -193,7 +193,7 @@
 			}
 			echo '</a>';
 			if (isset($exceptions[$line['userid']])) {
-				if ($exceptions[$line['userid']][1]==1) {
+				if ($exceptions[$line['userid']][1]>0) {
 					echo '<sup>LP</sup>';
 				} else {
 					echo '<sup>e</sup>';

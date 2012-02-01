@@ -547,7 +547,7 @@ span.boxed {
 	line-height: 1em;
 	display: inline-block;
 }
-div.question p:first-child, div.inactive p:first-child {
+div.question>div:first-child>p:first-child, div.inactive>p:first-child {
 	margin-top: 0;
 }
 

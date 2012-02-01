@@ -238,7 +238,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else {
 				$altoncal = 0;
 			}
-			if (substr($line['text'],0,5)=='http:') {
+			if (substr($line['text'],0,4)=='http') {
 				$type = 'web';
 				$webaddr = $line['text'];
 				$line['text'] = "<p>Enter text here</p>";
