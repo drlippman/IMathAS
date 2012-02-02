@@ -96,7 +96,34 @@ if (isset($_POST['checked'])) { //form submitted
 		$query = "UPDATE imas_forums SET $setslist WHERE id IN ($checkedlist);";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	}
-	
+	if (isset($_POST['chgsubscribe'])) {
+		
+		if (isset($_POST['subscribe'])) {
+			//add any subscriptions we don't already have
+			$query = "SELECT forumid FROM imas_forum_subscriptions WHERE forumid IN ($checkedlist) AND userid='$userid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$hassubscribe = array();
+			if (mysql_num_rows($result)>0) {
+				while ($row = mysql_fetch_row($result)) {
+					$hassubscribe[] = $row[0];
+				}
+			}
+			$toadd = array_diff($_POST['checked'],$hassubscribe);
+			foreach ($toadd as $fid) {
+				$fid = intval($fid);
+				if ($fid>0) {
+					$query = "INSERT INTO imas_forum_subscriptions (forumid,userid) VALUES ('$fid','$userid')";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+				}
+			}
+		} else {
+			//remove any existing subscriptions
+			$query = "DELETE FROM imas_forum_subscriptions WHERE forumid IN ($checkedlist) AND userid='$userid'";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			
+		}
+			
+	}
 	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
 	exit;
 } 
@@ -250,7 +277,13 @@ foreach($forumitems as $id=>$name) {
 		<input type=checkbox name="allowdel" value="1"/>
 	</td>
 </tr>
-
+<tr class="coptr">
+	<td><input type="checkbox" name="chgsubscribe"/></td>
+	<td class="r">Get email notify of new posts: </td>
+	<td>
+		<input type=checkbox name="subscribe" value="1"/>
+	</td>
+</tr>
 
 <tr class="coptr">
 	<td><input type="checkbox" name="chgdefdisplay"/></td>
