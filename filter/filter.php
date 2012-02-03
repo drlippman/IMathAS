@@ -17,7 +17,7 @@
 	function mathfiltercallback($arr) {
 		global $AMT,$mathimgurl,$coursetheme,$sessiondata;
 		//$arr[1] = str_replace(array('&ne;','&quot;','&lt;','&gt;','&le;','&ge;'),array('ne','"','lt','gt','le','ge'),$arr[1]);
-		$arr[1] = str_replace(array('&ne;','&quot;','&le;','&ge;'),array('ne','"','le','ge'),$arr[1]);
+		$arr[1] = str_replace(array('&ne;','&quot;','&le;','&ge;','<','>'),array('ne','"','le','ge','&lt;','&gt;'),$arr[1]);
 		$tex = $AMT->convert($arr[1]);
 		if (trim($tex)=='') {
 			return '';

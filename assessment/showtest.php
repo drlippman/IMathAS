@@ -1546,9 +1546,10 @@ if (!isset($_POST['embedpostback'])) {
 			if ($numdisplayed > 0) {
 				echo '<br/><input type="submit" class="btn" value="Submit" />';
 				echo '<input type="submit" class="btn" name="saveforlater" value="Save answers" />';
+				echo "</form>\n";
 			} else {
 				startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testsettings['testtype']=="NoScores");
-				
+				echo "</form>\n";
 				leavetestmsg();
 				
 			}
@@ -1572,6 +1573,7 @@ if (!isset($_POST['embedpostback'])) {
 				basicshowq($i);
 				showqinfobar($i,true,true);
 				echo '<input type="submit" class="btn" value="Next" />';
+				echo "</form>\n";
 			}
 		} else if ($testsettings['displaymethod'] == "SkipAround") {
 			echo filter("<div class=intro>{$testsettings['intro']}</div>\n");
