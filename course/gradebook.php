@@ -254,7 +254,7 @@ if ($canviewall) {
 	var tbl = document.getElementById(table);
 	if (type==0) {  //instr gb view
 		var poss = [];
-		var startat = '.($showpics>0?3:2).';
+		var startat = 2;
 		var ths = tbl.getElementsByTagName("thead")[0].getElementsByTagName("th");
 		for (var i=0;i<ths.length;i++) {
 			if (k = ths[i].innerHTML.match(/(\d+)(&nbsp;|\u00a0)pts/)) {
@@ -986,7 +986,7 @@ function gbinstrdisp() {
 	echo '<table class="gb" id="myTable"><thead><tr>';
 	$n=0;
 	for ($i=0;$i<count($gbt[0][0]);$i++) { //biographical headers
-		if ($i==1) {echo '<th><div></div></th>';} //for pics
+		if ($i==1) {echo '<th><div>&nbsp;</div></th>';} //for pics
 		if ($i==1 && $gbt[0][0][1]!='ID') { continue;}
 		echo '<th><div>'.$gbt[0][0][$i];
 		if (($gbt[0][0][$i]=='Section' || ($isdiag && $i==4)) && (!$istutor || $tutorsection=='')) {
@@ -1432,6 +1432,7 @@ function gbinstrdisp() {
 	} else {
 		$sarr = array();
 	}
+	array_unshift($sarr,"false");
 	array_unshift($sarr,"'S'");
 	
 	$sarr = implode(",",$sarr);

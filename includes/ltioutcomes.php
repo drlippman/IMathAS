@@ -215,4 +215,3 @@ function sendLTIOutcome($action,$key,$secret,$url,$sourcedid,$grade=0) {
 }
 
 ?>
-
