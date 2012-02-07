@@ -145,7 +145,7 @@ function sendLTIOutcome($action,$key,$secret,$url,$sourcedid,$grade=0) {
 	$content_type = "application/xml";
 	
 	$body = '<?xml version = "1.0" encoding = "UTF-8"?>  
-	<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/lis/oms1p0/pox">      
+	<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">      
 		<imsx_POXHeader>         
 			<imsx_POXRequestHeaderInfo>            
 				<imsx_version>V1.0</imsx_version>  
@@ -170,7 +170,7 @@ function sendLTIOutcome($action,$key,$secret,$url,$sourcedid,$grade=0) {
 	</imsx_POXEnvelopeRequest>';
 	
 	$shortBody = '<?xml version = "1.0" encoding = "UTF-8"?>  
-	<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/lis/oms1p0/pox">      
+	<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">      
 		<imsx_POXHeader>         
 			<imsx_POXRequestHeaderInfo>            
 				<imsx_version>V1.0</imsx_version>  

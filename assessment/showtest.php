@@ -1545,7 +1545,7 @@ if (!isset($_POST['embedpostback'])) {
 			}
 			if ($numdisplayed > 0) {
 				echo '<br/><input type="submit" class="btn" value="Submit" />';
-				echo '<input type="submit" class="btn" name="saveforlater" value="Save answers" />';
+				echo '<input type="submit" class="btn" name="saveforlater" value="Save answers" onclick="return confirm(\'This will save your answers so you can come back later and finish, but not submit them for grading. Be sure to come back and submit your answers before the due date.\');" />';
 				echo "</form>\n";
 			} else {
 				startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testsettings['testtype']=="NoScores");
