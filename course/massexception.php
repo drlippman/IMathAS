@@ -226,7 +226,8 @@
 	
 	echo "Set Exception for assessments:";
 	echo "<ul>";
-	$query = "SELECT id,name FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
+	$query = "SELECT id,name FROM imas_assessments WHERE courseid='$cid'";
+	$query .= ' ORDER BY name';
 	$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 	$assessarr = array();
 	while ($row = mysql_fetch_row($result)) {
@@ -234,7 +235,9 @@
 	}
 	natsort($assessarr);
 	foreach ($assessarr as $id=>$val) {
-		echo "<li><input type=checkbox name=\"addexc[]\" value=\"$id\" />$val</li>";
+		echo "<li><input type=checkbox name=\"addexc[]\" value=\"$id\" ";
+		if (isset($_POST['assesschk']) && in_array($id,$_POST['assesschk'])) { echo 'checked="checked" ';}
+		echo "/>$val</li>";
 	}
 	echo '</ul>';
 	echo "<input type=submit value=\"Record Changes\" />";

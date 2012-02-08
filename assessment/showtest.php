@@ -1707,9 +1707,30 @@ if (!isset($_POST['embedpostback'])) {
 				$intro = preg_replace('/<p>((<span|<strong|<em)[^>]*>)?\[QUESTION\s+(\d+)\s*\]((<\/span|<\/strong|<\/em)[^>]*>)?<\/p>/','[QUESTION $3]',$intro);
 				$intro = preg_replace('/\[QUESTION\s+(\d+)\s*\]/','</div>[QUESTION $1]<div class="intro">',$intro);
 			}
+			if (strpos($intro,'[PAGE')!==false) {
+				$intro = preg_replace('/<p>((<span|<strong|<em)[^>]*>)?\[PAGE\s*([^\]]*)]((<\/span|<\/strong|<\/em)[^>]*>)?<\/p>/','[PAGE $3]',$intro);
+				$intro = preg_replace('/\[PAGE\s*([^\]]*)\]/','</div>[PAGE $1]<div class="intro">',$intro);
+				$intropages = preg_split('/\[PAGE\s*([^\]]*)\]/',$intro,-1,PREG_SPLIT_DELIM_CAPTURE); //main pagetitle cont 1 pagetitle
+				if (!isset($_GET['page'])) { $_GET['page'] = 0;}
+				if ($_GET['page']==0) {
+					echo $intropages[0];	
+				} 
+				$intro =  $intropages[2*$_GET['page']+2];
+				preg_match_all('/\[QUESTION\s+(\d+)\s*\]/',$intro,$matches,PREG_PATTERN_ORDER);
+				$qmin = min($matches[1])-1;
+				$qmax = max($matches[1]);
+				$dopage = true;
+				showembednavbar($intropages,$_GET['page']);
+				echo "<div class=inset>\n";
+				echo "<a name=\"beginquestions\"></a>\n";
+			} else {
+				$qmin = 0;
+				$qmax = count($questions);
+				$dopage = false;
+			}
 			$intro .= "<p>Total Points Possible: " . totalpointspossible($qi) . "</p>";
 			
-			for ($i = 0; $i < count($questions); $i++) {
+			for ($i = $qmin; $i < $qmax; $i++) {
 				$quesout = '<div id="embedqwrapper'.$i.'" class="embedqwrapper">';
 				ob_start();
 				embedshowicon($i);
@@ -1760,8 +1781,12 @@ if (!isset($_POST['embedpostback'])) {
 				$quesout .= '</div>';
 				$intro = str_replace('[QUESTION '.($i+1).']',$quesout,$intro);
 			}
+			$intro = preg_replace('/<div class="intro">\s*<\/div>/','',$intro);
 			echo $intro;
 			echo '</div>';
+			if ($dopage) {
+				echo '</div>';
+			}
 			echo '</form>';
 			echo "<p><a href=\"showtest.php?action=embeddone\">Click here to finalize assessment and summarize score</a></p>\n";
 					
@@ -1771,6 +1796,28 @@ if (!isset($_POST['embedpostback'])) {
 	//IP:  eqntips
 	
 	require("../footer.php");
+	
+	function showembednavbar($pginfo,$curpg) {
+		global $imasroot;
+		echo "<a href=\"#beginquestions\"><img class=skipnav src=\"$imasroot/img/blank.gif\" alt=\"Skip Navigation\" /></a>\n";
+		
+		echo "<div class=navbar>";
+		echo "<h4>Pages</h4>\n";
+		echo "<ul class=qlist>\n";
+		$max = (count($pginfo)-1)/2;
+		for ($i = 0; $i < $max; $i++) {
+			echo "<li>";
+			if ($curpg == $i) { echo "<span class=current>";}
+			if (trim($pginfo[2*$i+1])=='') {
+				$pginfo[2*$i+1] =  $i+1;
+			}
+			echo '<a href="showtest.php?page='.$i.'">'.$pginfo[2*$i+1].'</a>';
+			if ($curpg == $i) { echo "</span>";}
+			echo "</li>\n";
+		}
+		echo '</ul>';
+		echo '</div>';	
+	}
 	
 	function shownavbar($questions,$scores,$current,$showcat) {
 		global $imasroot,$isdiag,$testsettings,$attempts,$qi,$allowregen,$bestscores,$isreview,$showeachscore,$noindivscores,$CFG;

@@ -500,7 +500,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 
 
 
-function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox) {
+function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 	global $myrights, $useeqnhelper, $showtips, $imasroot;
 	$out = '';
 	$tip = '';

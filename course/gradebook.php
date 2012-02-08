@@ -632,10 +632,14 @@ function gbstudisp($stu) {
 		}
 		echo '</div>';
 	}
-	echo "<form method=post action=\"gradebook.php?{$_SERVER['QUERY_STRING']}\">";
+	echo "<form method=post action=\"gradebook.php?{$_SERVER['QUERY_STRING']}&uid=$stu\">";
 	//echo "<input type='button' onclick='conditionalColor(\"myTable\",1,50,80);' value='Color'/>";
 	echo '<table id="myTable" class="gb" style="position:relative;">';
-	echo '<thead><tr><th>Item</th><th>Possible</th><th>Grade</th><th>Percent</th>';
+	echo '<thead><tr>';
+	if ($stu>0 && $isteacher) {
+		echo '<th></th>';
+	}
+	echo '<th>Item</th><th>Possible</th><th>Grade</th><th>Percent</th>';
 	if ($stu>0 && $isteacher) {
 		echo '<th>Time Spent (In Questions)</th>';
 	}
@@ -661,6 +665,14 @@ function gbstudisp($stu) {
 			}
 			
 			echo '<tr class="grid">';
+			if ($stu>0 && $isteacher) { 
+				if ($gbt[0][1][$i][6]==0) {
+					echo '<td><input type="checkbox" name="assesschk[]" value="'.$gbt[0][1][$i][7] .'" /></td>';
+				} else {
+					echo '<td></td>';
+				}
+			}
+			
 			echo '<td class="cat'.$gbt[0][1][$i][1].'">'.$gbt[0][1][$i][0].'</td>';
 			echo '<td>';
 			
@@ -772,8 +784,10 @@ function gbstudisp($stu) {
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$show = mysql_result($result,0,0);
 		echo '</tbody></table><br/>';
-		echo '<input type="submit" value="Save Changes" style="display:none"; id="savechgbtn" />';
-		
+		if ($isteacher && $stu>0) {
+			echo '<input type="submit" value="Save Changes" style="display:none"; id="savechgbtn" />';
+			echo '<input type="submit" value="Make Exception" name="submit" /> for selected assessments';
+		}
 		echo '<table class="gb"><thead>';
 		echo '<tr>';
 		echo '<th >Totals</th>';
@@ -945,8 +959,9 @@ function gbstudisp($stu) {
 		}
 	}
 	echo '</tbody></table>';	
-	if ($hidepast) {
+	if ($hidepast && $isteacher && $stu>0) {
 		echo '<input type="submit" value="Save Changes" style="display:none"; id="savechgbtn" />';
+		echo '<input type="submit" value="Make Exception" name="massexception" /> for selected assessments';
 	}
 	
 	echo "</form>";
