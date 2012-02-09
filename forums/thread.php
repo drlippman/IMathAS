@@ -295,6 +295,7 @@
 			require("../header.php");
 			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
 			echo "&gt; <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> &gt; ";
+			$notice = '';
 			if ($_GET['modify']!="new") {
 				echo "Modify Thread</div>\n";
 				if ($groupsetid>0) {
@@ -329,6 +330,20 @@
 						$query = "SELECT name FROM imas_assessments WHERE id='".intval($parts[3])."'";
 						$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 						$line['subject'] = 'Question about #'.($parts[0]+1).' in '.str_replace('"','&quot;',mysql_result($result,0,0));
+						
+						$query = "SELECT ift.id FROM imas_forum_posts AS ifp JOIN imas_forum_threads AS ift ON ifp.threadid=ift.id AND ifp.parent=0 ";
+						$query .= "WHERE ifp.subject='".addslashes($line['subject'])."' AND ift.forumid='$forumid'";
+						if ($groupsetid >0 && !$isteacher) {
+							$query .= " AND ift.stugroupid='$groupid'";
+						}
+						$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+						if (mysql_num_rows($result)>0) {
+							$notice =  '<br/><span style="color:red;font-weight:bold">This question has already been posted about.</span><br/>You may want to read the ';
+							$notice .=   'existing threads before re-posting the question.';
+							while ($row = mysql_fetch_row($result)) {
+								$notice .=  "<br/><a href=\"posts.php?cid=$cid&forum=$forumid&thread={$row[0]}\">{$line['subject']}</a>";
+							}
+						}
 					}	
 				}
 			}
@@ -336,6 +351,8 @@
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			$allowanon = mysql_result($result,0,1)%2;
 			echo mysql_result($result,0,0).'</h3>';
+			
+			
 			
 			if ($replyby!=null && $replyby<2000000000 && $replyby>0) {
 				$replybydate = tzdate("m/d/Y",$replyby);
@@ -346,7 +363,7 @@
 			}
 			echo "<form method=post action=\"thread.php?page=$page&cid=$cid&forum=$forumid&modify={$_GET['modify']}\">\n";
 			echo "<span class=form><label for=\"subject\">Subject:</label></span>";
-			echo "<span class=formright><input type=text size=50 name=subject id=subject value=\"{$line['subject']}\"></span><br class=form>\n";
+			echo "<span class=formright><input type=text size=50 name=subject id=subject value=\"{$line['subject']}\">$notice</span><br class=form>\n";
 			echo "<span class=form><label for=\"message\">Message:</label></span>";
 			echo "<span class=left><div class=editor><textarea id=message name=message style=\"width: 100%;\" rows=20 cols=70>";
 			echo htmlentities($line['message']);

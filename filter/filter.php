@@ -204,6 +204,10 @@
 		preg_match_all('/(\w+\.png)/',$str,$matches,PREG_PATTERN_ORDER);
 		return ($matches[1]);
 	}
+	function mathentitycleanup($arr) {
+		$arr[1] = str_replace(array('<','>'),array('&lt;','&gt;'),$arr[1]);
+		return '`'.$arr[1].'`';
+	}
 	function printfilter($str) {
 		$str = preg_replace('/<script.*?\/script>/','',$str);  //strip scripts
 		$str = preg_replace('/<input[^>]*Preview[^>]*>/','',$str); //strip preview buttons
@@ -213,6 +217,9 @@
 		$str = preg_replace('/`\s*(\w)\s*`/','<i>$1</i>',$str);
 		$str = preg_replace('/<select.*?\/select>/','____',$str);
 		$str = preg_replace('/<input[^>]*hidden[^>]*>/','',$str); //strip hidden fields
+		if (strpos($str,'`')!==FALSE) {
+			$str = preg_replace_callback('/`(.*?)`/s', 'mathentitycleanup', $str);
+		}
 		return $str;
 	}
 	

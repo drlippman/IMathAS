@@ -184,7 +184,7 @@ if (!(isset($teacherid))) {
 				if (isset($_POST['msgtoinstr'])) {
 					$sets[] = "msgtoinstr=1";
 				} else {
-					$sets[] = "msgtoinstr=1";
+					$sets[] = "msgtoinstr=0";
 				}
 			}
 			if (isset($_POST['chgposttoforum'])) {

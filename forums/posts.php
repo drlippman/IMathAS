@@ -432,7 +432,7 @@
 					echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&move=$child\">Move</a> \n";
 				} 
 				if ($isteacher || ($ownerid[$child]==$userid && $allowmod)) {
-					if (($base==0 && time()<$postby) || ($base>0 && time()<$replyby)) {
+					if (($base==0 && time()<$postby) || ($base>0 && time()<$replyby) || $isteacher) {
 						echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&modify=$child\">Modify</a> \n";
 					}
 				}
