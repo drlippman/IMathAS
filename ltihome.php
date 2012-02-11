@@ -164,7 +164,12 @@ if (isset($_POST['createcourse'])) {
 	}
 }
 
-
+if ($hasplacement && $placementtype=='course') {
+	if (!isset($_GET['showhome'])) {
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
+		exit;
+	} 
+}
 
 //HTML Output
 $pagetitle = "LTI Home";
@@ -219,13 +224,9 @@ if (!$hascourse) {
 	echo "<p>If you want to create new assessments, log directly into $installname</p>";
 	echo '</form>';
 } else if ($placementtype=='course') {
-	if (!isset($_GET['showhome'])) {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
-	} else {
-		echo '<h3>LTI Placement of whole course</h3>';
-		echo "<p><a href=\"course/course.php?cid=$cid\">Enter course</a></p>";
-		echo '<p><a href="ltihome.php?chgplacement=true">Change placement</a></p>';
-	}
+	echo '<h3>LTI Placement of whole course</h3>';
+	echo "<p><a href=\"course/course.php?cid=$cid\">Enter course</a></p>";
+	echo '<p><a href="ltihome.php?chgplacement=true">Change placement</a></p>';
 } else if ($placementtype=='assess') {
 	$query = "SELECT name,avail,startdate,enddate FROM imas_assessments WHERE id='$typeid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
