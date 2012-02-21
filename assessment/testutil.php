@@ -507,16 +507,23 @@ function deletefilesifnotused($delfrom,$ifnothere) {
 	//deleteasidfilesfromstring($outstr);
 }
 
-//can improve question score?
+//can improve question score?  (on this version)
 function canimprove($qn) {
 	global $superdone;
 	if ($superdone) { return false;}
-	global $qi,$scores,$attempts,$questions,$testsettings;	
+	global $qi,$scores,$attempts,$questions,$testsettings,$seeds,$bestseeds,$bestscores;	
 	$remainingposs = getremainingpossible($qn,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
 	if (hasreattempts($qn)) {
-		if (getpts($scores[$qn])<$remainingposs) {
-			return true;
-		} 
+		//this fails in the case of partial credit, where last attempt might not be best
+		if ($seeds[$qn] == $bestseeds[$qn]) { //try to handle by using bestscore if current question
+			if (getpts($bestscores[$qn])<$remainingposs) {
+				return true;
+			}
+		} else { //we'll just have to use the last score
+			if (getpts($scores[$qn])<$remainingposs) {
+				return true;
+			}
+		}
 	}
 	return false;
 }

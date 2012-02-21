@@ -30,3 +30,6 @@ div.nobreak {
 .headerwrapper {
 	height: 0px;
 }
+.drawtools {
+	display:none;
+}

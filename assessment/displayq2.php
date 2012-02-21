@@ -73,6 +73,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		}
 		$thisq = $qnidx+1;
 	}
+	
 	eval(interpret('control',$qdata['qtype'],$qdata['control']));
 	eval(interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
 	$toevalqtxt = interpret('qtext',$qdata['qtype'],$qdata['qtext']);
@@ -361,6 +362,8 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 			}
 		}
 	}
+	$thisq = $qnidx+1;
+	unset($stuanswers[$thisq]);  //unset old stuanswer for this question
 	if ($qdata['qtype']=="multipart" || $qdata['qtype']=='conditional') {
 		for ($kidx=0;$kidx<count($_POST);$kidx++) {
 			$partnum = ($qnidx+1)*1000 + $kidx;
@@ -390,7 +393,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 		}
 	}
 	
-	$thisq = $qnidx+1;
+	
 		
 	eval(interpret('control',$qdata['qtype'],$qdata['control']));
 	srand($seed+1);
@@ -1743,7 +1746,10 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					$out .= "<input type=\"hidden\" name=\"lf$qn\" value=\"$file\"/>";
 					if (in_array(strtolower($extension),array('jpg','gif','png','bmp','jpe'))) {
 						$out .= " <span class=\"clickable\" id=\"filetog$qn\" onclick=\"toggleinlinebtn('img$qn','filetog$qn');\">[+]</span>";
-						$out .= " <img id=\"img$qn\" style=\"display:none;\" src=\"$url\" />";
+						$out .= " <img id=\"img$qn\" style=\"display:none;max-width:80%;\" src=\"$url\" />";
+					} else if (in_array(strtolower($extension),array('doc','docx','pdf','xls','xlsx','ppt','pptx'))) {
+						$out .= " <span class=\"clickable\" id=\"filetog$qn\" onclick=\"toggleinlinebtn('fileprev$qn','filetog$qn');\">[+]</span>";
+						$out .= " <iframe id=\"fileprev$qn\" style=\"display:none;\" src=\"http://docs.google.com/viewer?url=".urlencode($url)."&embedded=true\" width=\"80%\" height=\"600px\"></iframe>";
 					}
 					
 				}

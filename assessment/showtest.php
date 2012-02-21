@@ -1378,6 +1378,7 @@ if (!isset($_POST['embedpostback'])) {
 		} else if ($_GET['action']=='scoreembed') {
 			$qn = $_POST['toscore'];
 			$colors = array();
+			$page = $_GET['page'];
 			if ($_POST['verattempts']!=$attempts[$qn]) {
 				echo '<div class="prequestion">';
 				echo "This question has been submittted since you viewed it, and that grade is shown below.  Your answer just submitted was not scored or recorded.";
@@ -1424,7 +1425,7 @@ if (!isset($_POST['embedpostback'])) {
 				
 			}
 			if ($allowregen && $qi[$questions[$qn]]['allowregen']==1) {
-				echo "<p><a href=\"showtest.php?regen=$qn\">Try another similar question</a></p>\n";
+				echo "<p><a href=\"showtest.php?regen=$qn&page=$page\">Try another similar question</a></p>\n";
 			}
 			if (hasreattempts($qn)) {
 				echo '</div>';
@@ -1467,7 +1468,11 @@ if (!isset($_POST['embedpostback'])) {
 					
 			}
 			showqinfobar($qn,true,false);
-			echo '<script type="text/javascript">document.getElementById("disptime").value = '.time().';</script>';
+			echo '<script type="text/javascript">document.getElementById("disptime").value = '.time().'; embedattemptedtrack["q'.$qn.'"][1]=0;';
+			if (false && $showeachscore) {
+				echo 'embedattemptedtrack["q'.$qn.'"][2]='. (canimprove($qn)?"1":"0") . ';';
+			}
+			echo 'updateembednav();</script>';
 			exit;
 			
 		}
@@ -1668,9 +1673,9 @@ if (!isset($_POST['embedpostback'])) {
 				echo '</form>';
 			}
 		} else if ($testsettings['displaymethod'] == "Embed") {
-			
+			if (!isset($_GET['page'])) { $_GET['page'] = 0;}
 			$intro = filter("<div class=\"intro\">{$testsettings['intro']}</div>\n");
-			echo '<script type="text/javascript">var assesspostbackurl="' .$urlmode. $_SERVER['HTTP_HOST'] . $imasroot . '/assessment/showtest.php?embedpostback=true&action=scoreembed";</script>';
+			echo '<script type="text/javascript">var assesspostbackurl="' .$urlmode. $_SERVER['HTTP_HOST'] . $imasroot . '/assessment/showtest.php?embedpostback=true&action=scoreembed&page='.$_GET['page'].'";</script>';
 			//using the full test scoreall action for timelimit auto-submits
 			echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=scoreall\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
 			echo '<div class="formcontents" style="margin-left:20px;">';
@@ -1798,24 +1803,80 @@ if (!isset($_POST['embedpostback'])) {
 	require("../footer.php");
 	
 	function showembednavbar($pginfo,$curpg) {
-		global $imasroot;
+		global $imasroot,$scores,$showeachscore;
 		echo "<a href=\"#beginquestions\"><img class=skipnav src=\"$imasroot/img/blank.gif\" alt=\"Skip Navigation\" /></a>\n";
 		
-		echo "<div class=navbar>";
+		echo '<div class="navbar" style="width:125px">';
 		echo "<h4>Pages</h4>\n";
-		echo "<ul class=qlist>\n";
+		echo '<ul class="qlist" style="margin-left:-10px">';
+		$jsonbits = array();
 		$max = (count($pginfo)-1)/2;
 		for ($i = 0; $i < $max; $i++) {
-			echo "<li>";
+			echo '<li style="margin-bottom:7px;">';
 			if ($curpg == $i) { echo "<span class=current>";}
 			if (trim($pginfo[2*$i+1])=='') {
 				$pginfo[2*$i+1] =  $i+1;
 			}
 			echo '<a href="showtest.php?page='.$i.'">'.$pginfo[2*$i+1].'</a>';
 			if ($curpg == $i) { echo "</span>";}
+			
+			preg_match_all('/\[QUESTION\s+(\d+)\s*\]/',$pginfo[2*$i+2],$matches,PREG_PATTERN_ORDER);
+			$qmin = min($matches[1])-1;
+			$qmax = max($matches[1]);
+			$cntunans = 0;
+			$cntcanimp = 0;
+			for($j=$qmin;$j<$qmax;$j++) {
+				$bit = "\"q$j\":[$i,";
+				if (unans($scores[$j])) {
+					$cntunans++;
+					$bit .= "1,";
+				} else {
+					$bit .= "0,";
+				}
+				if (canimprove($j)) {
+					$cntcanimp++;
+					$bit .= "1]";
+				} else {
+					$bit .= "0]";
+				}
+				$jsonbits[] = $bit;
+			}
+			echo '<br/>';
+			echo " <span id=\"embednavunans$i\" style=\"margin-left:8px\">$cntunans</span> unattempted";
+			if (false && $showeachscore) {
+				echo "<br/><span id=\"embednavcanimp$i\" style=\"margin-left:8px\">$cntcanimp</span> can be improved";
+			}
 			echo "</li>\n";
 		}
 		echo '</ul>';
+		echo '<script type="text/javascript">var embedattemptedtrack = {'.implode(',',$jsonbits).'}; </script>';
+		echo '<script type="text/javascript">function updateembednav() {
+			var unanscnt = [];
+			var canimpcnt = [];
+			var pgmax = -1;
+			for (var i in embedattemptedtrack) {
+				if (embedattemptedtrack[i][0] > pgmax) {
+					pgmax = embedattemptedtrack[i][0];
+				}
+			}
+			for (var i=0; i<=pgmax; i++) {
+				unanscnt[i] = 0;
+				canimpcnt[i] = 0;
+			}
+			for (var i in embedattemptedtrack) {
+				if (embedattemptedtrack[i][1]==1) {
+					unanscnt[embedattemptedtrack[i][0]]++;
+				}
+				if (embedattemptedtrack[i][2]==1) {
+					canimpcnt[embedattemptedtrack[i][0]]++;
+				}
+			}
+			for (var i=0; i<=pgmax; i++) {
+				document.getElementById("embednavunans"+i).innerHTML = unanscnt[i];';
+		if (false && $showeachscore) {
+				echo 'document.getElementById("embednavcanimp"+i).innerHTML = canimpcnt[i];';
+		}
+		echo '}}</script>';
 		echo '</div>';	
 	}
 	
