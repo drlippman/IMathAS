@@ -129,6 +129,8 @@
 		$query .= "WHERE imas_forum_posts.userid=imas_users.id AND (imas_forum_posts.id='$threadid' OR imas_forum_posts.threadid='$threadid') ORDER BY imas_forum_posts.id";	
 	}
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$children = array(); $date = array(); $subject = array(); $message = array(); $posttype = array();
+	$ownerid = array(); $files = array(); $points= array(); $feedback= array(); $poster= array(); $email= array();
 	while ($line =  mysql_fetch_array($result, MYSQL_ASSOC)) {
 		if ($line['parent']==0) {
 			if ($line['replyby']!=null) {
@@ -158,6 +160,9 @@
 		$message[$line['id']] = $line['message'];
 		$posttype[$line['id']] = $line['posttype'];
 		$ownerid[$line['id']] = $line['userid'];
+		if ($line['files']!='') {
+			$files[$line['id']] = $line['files'];
+		}
 		if ($haspoints && $line['score']!==null) {
 			$points[$line['id']] = 1*$line['score'];
 			$feedback[$line['id']] = $line['feedback'];
@@ -173,6 +178,9 @@
 			$email[$line['id']] = $line['email'];
 		}
 		
+	}
+	if (count($files)>0) {
+		require_once('../includes/filehandler.php');
 	}
 	//update view count
 	$query = "UPDATE imas_forum_posts SET views='$newviews' WHERE id='$threadid'";
@@ -322,7 +330,18 @@
 	$icnt = 0;
 	function printchildren($base,$restricttoowner=false) {
 		$curdir = rtrim(dirname(__FILE__), '/\\');
-		global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points,$feedback,$posttype,$lastview,$bcnt,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$view,$page,$allowmsg,$haspoints,$imasroot,$postby,$replyby;
+		global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points,$feedback,$posttype,$lastview,$bcnt,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$view,$page,$allowmsg,$haspoints,$imasroot,$postby,$replyby,$files,$CFG;
+		if (!isset($CFG['CPS']['itemicons'])) {
+	   	   $itemicons = array('web'=>'web.png', 'doc'=>'doc.png', 'wiki'=>'wiki.png',
+			'html'=>'html.png', 'forum'=>'forum.png', 'pdf'=>'pdf.png',
+			'ppt'=>'ppt.png', 'zip'=>'zip.png', 'png'=>'image.png', 'xls'=>'xls.png',
+			'gif'=>'image.png', 'jpg'=>'image.png', 'bmp'=>'image.png', 
+			'mp3'=>'sound.png', 'wav'=>'sound.png', 'wma'=>'sound.png', 
+			'swf'=>'video.png', 'avi'=>'video.png', 'mpg'=>'video.png', 
+			'nb'=>'mathnb.png', 'mws'=>'maple.png', 'mw'=>'maple.png'); 
+	         } else {
+	   	   $itemicons = $CFG['CPS']['itemicons'];
+		 }
 		foreach($children[$base] as $child) {
 			if ($restricttoowner && $ownerid[$child] != $userid) {
 				continue;
@@ -470,6 +489,28 @@
 					echo "<div class=hidden id=\"item$icnt\">";
 				} else {
 					echo "<div class=blockitems id=\"item$icnt\">";
+				}
+				if(isset($files[$child]) && $files[$child]!='') {
+					$fl = explode('@@',$files[$child]);
+					if (count($fl)>2) {
+						echo '<p><b>Files:</b> ';//<ul class="nomark">';
+					} else {
+						echo '<p><b>File:</b> ';
+					}
+					for ($i=0;$i<count($fl)/2;$i++) {
+						//if (count($fl)>2) {echo '<li>';}
+						echo '<a href="'.getuserfileurl('ffiles/'.$child.'/'.$fl[2*$i+1]).'" target="_blank">';
+						$extension = ltrim(strtolower(strrchr($fl[2*$i+1],".")),'.');
+						if (isset($itemicons[$extension])) {
+							echo "<img alt=\"$extension\" src=\"$imasroot/img/{$itemicons[$extension]}\" class=\"mida\"/> ";
+						} else {
+							echo "<img alt=\"doc\" src=\"$imasroot/img/doc.png\" class=\"mida\"/> ";
+						}
+						echo $fl[2*$i].'</a> ';
+						//if (count($fl)>2) {echo '</li>';}
+					}
+					//if (count($fl)>2) {echo '</ul>';}
+					echo '</p>';
 				}
 				echo filter($message[$child]);
 				if ($haspoints) {

@@ -237,7 +237,7 @@
 						}
 					} 
 				}
-					
+				
 				$query = "INSERT INTO imas_forum_posts (forumid,subject,message,userid,postdate,parent,posttype,isanon,replyby) VALUES ";
 				$query .= "('$forumid','{$_POST['subject']}','{$_POST['message']}','$userid',$now,0,'$type','$isanon',$replyby)";
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -274,6 +274,8 @@
 						mail($row[0],'New forum post notification',$message,$headers);
 					}
 				}
+				$_GET['modify'] = $threadid;
+				$files = array();
 			} else {
 				$query = "UPDATE imas_forum_posts SET subject='{$_POST['subject']}',message='{$_POST['message']}',posttype='$type',replyby=$replyby,isanon='$isanon' ";
 				$query .= "WHERE id='{$_GET['modify']}'";
@@ -284,7 +286,44 @@
 					$query = "UPDATE imas_forum_threads SET stugroupid='$groupid' WHERE id='{$_GET['modify']}'";
 					mysql_query($query) or die("Query failed : $query " . mysql_error());
 				}
+				$query = "SELECT files FROM imas_forum_posts WHERE id='{$_GET['modify']}'";
+				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				$files = explode('@@',mysql_result($result,0,0));
 			}
+			//now handle any files
+			if (isset($_POST['filedesc'])) {
+				foreach ($_POST['filedesc'] as $i=>$v) {
+					$files[2*$i] = str_replace('@@','@',$v);
+				}
+				for ($i=count($files)/2-1;$i>=0;$i--) {
+					if (isset($_POST['filedel'][$i])) {
+						if (deleteforumfile($_GET['modify'],$files[2*$i+1])) {
+							array_splice($files,2*$i,2);
+						}
+					}
+				}
+			}
+			if (isset($_FILES['newfile-0'])) {
+				require_once("../includes/filehandler.php");
+				$i = 0;
+				$badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");
+				while (isset($_FILES['newfile-'.$i]) && is_uploaded_file($_FILES['newfile-'.$i]['tmp_name'])) {
+					$userfilename = preg_replace('/[^\w\.]/','',basename($_FILES['newfile-'.$i]['name']));
+					if (trim($_POST['newfiledesc-'.$i])=='') {
+						$_POST['newfiledesc-'.$i] = $userfilename;
+					}
+					$_POST['newfiledesc-'.$i] = str_replace('@@','@',$_POST['newfiledesc-'.$i]);
+					$extension = strtolower(strrchr($userfilename,"."));
+					if (!in_array($extension,$badextensions) && storeuploadedfile('newfile-'.$i,'ffiles/'.$_GET['modify'].'/'.$userfilename,"public")) {
+						$files[] = stripslashes($_POST['newfiledesc-'.$i]);
+						$files[] = $userfilename;
+					}
+					$i++;
+				}
+			}
+			$files = addslashes(implode('@@',$files));
+			$query = "UPDATE imas_forum_posts SET files='$files' WHERE id='{$_GET['modify']}'";
+			mysql_query($query) or die("Query failed : $query " . mysql_error());
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
 			exit;
 		} else { //display mod
@@ -314,6 +353,7 @@
 				$line['subject'] = "";
 				$line['message'] = "";
 				$line['posttype'] = 0;
+				$line['files'] = '';
 				$curstugroupid = 0;
 				$replyby = null;
 				echo "<h3>Add Thread - \n";
@@ -347,10 +387,12 @@
 					}	
 				}
 			}
-			$query = "SELECT name,settings FROM imas_forums WHERE id='$forumid'";
+			$query = "SELECT name,settings,forumtype,taglist FROM imas_forums WHERE id='$forumid'";
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			$allowanon = mysql_result($result,0,1)%2;
 			echo mysql_result($result,0,0).'</h3>';
+			$forumtype = mysql_result($result,0,2);
+			$taglist = mysql_result($result,0,3);
 			
 			
 			
@@ -361,9 +403,46 @@
 				$replybydate = tzdate("m/d/Y",time()+7*24*60*60);
 				$replybytime = tzdate("g:i a",time()+7*24*60*60);
 			}
-			echo "<form method=post action=\"thread.php?page=$page&cid=$cid&forum=$forumid&modify={$_GET['modify']}\">\n";
+			echo "<form enctype=\"multipart/form-data\" method=\"post\" action=\"thread.php?page=$page&cid=$cid&forum=$forumid&modify={$_GET['modify']}\">\n";
 			echo "<span class=form><label for=\"subject\">Subject:</label></span>";
 			echo "<span class=formright><input type=text size=50 name=subject id=subject value=\"{$line['subject']}\">$notice</span><br class=form>\n";
+			if ($forumtype==1) { //file forum
+				
+				echo '<script type="text/javascript">
+					var filecnt = 1;
+					function addnewfile(t) {
+						var s = document.createElement("span");
+						s.innerHTML = \'Description: <input type="text" name="newfiledesc-\'+filecnt+\'" /> File: <input type="file" name="newfile-\'+filecnt+\'" /><br/>\';
+						t.parentNode.insertBefore(s,t);
+						filecnt++;
+					}</script>';
+				echo "<span class=form>Files:</span>";
+				echo "<span class=formright>";
+				if ($line['files']!='') {
+					require_once('../includes/filehandler.php');
+					$files = explode('@@',$line['files']);
+					for ($i=0;$i<count($files)/2;$i++) {
+						echo '<input type="text" name="filedesc['.$i.']" value="'.$files[2*$i].'"/>';
+						echo '<a href="'.getuserfileurl('ffiles/'.$_GET['modify'].'/'.$files[2*$i+1]).'" target="_blank">View</a> ';
+						echo 'Delete? <input type="checkbox" name="filedel['.$i.']" value="1"/><br/>';
+					}
+				}
+				echo 'Description: <input type="text" name="newfiledesc-0" /> ';
+				echo 'File: <input type="file" name="newfile-0" /><br/>';
+				echo '<a href="#" onclick="addnewfile(this);return false;">Add another file</a>';
+				echo "</span><br class=form>\n";
+			}
+			if ($taglist!='') {
+				$p = strpos($taglist,':');
+				echo '<span class="form"><label for="tag">'.substr($taglist,0,$p).'</label></span>'; 
+				echo '<span class="formright"><select name="tag">';
+				$tags = explode(',',substr($taglist,$p+1));
+				foreach ($tags as $tag) {
+					$tag =  str_replace('"','&quot;',$tag);   
+					echo '<option value="'.$tag.'">'.$tag.'</option>';
+				}
+				echo '</select></span><br class="form" />';
+			}
 			echo "<span class=form><label for=\"message\">Message:</label></span>";
 			echo "<span class=left><div class=editor><textarea id=message name=message style=\"width: 100%;\" rows=20 cols=70>";
 			echo htmlentities($line['message']);
