@@ -69,7 +69,7 @@
 		}
 			exit;	
 	}
-	$query = "SELECT name,postby,settings,groupsetid,sortby FROM imas_forums WHERE id='$forumid'";
+	$query = "SELECT name,postby,settings,groupsetid,sortby,taglist FROM imas_forums WHERE id='$forumid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$forumname = mysql_result($result,0,0);
 	$postby = mysql_result($result,0,1);
@@ -77,6 +77,7 @@
 	$allowdel = (((mysql_result($result,0,2)&4)==4) || $isteacher);
 	$groupsetid = mysql_result($result,0,3);
 	$sortby = mysql_result($result,0,4);
+	$taglist = mysql_result($result,0,5);
 	$dofilter = false;
 	$now = time();
 	$grpqs = '';
@@ -125,8 +126,32 @@
 		$groupid = 0;
 	}
 	
-	
-	
+	if (isset($_GET['tagfilter'])) {
+		$sessiondata['tagfilter'.$forumid] = stripslashes($_GET['tagfilter']);
+		writesessiondata();
+		$tagfilter = stripslashes($_GET['tagfilter']);
+	} else if (isset($sessiondata['tagfilter'.$forumid]) && $sessiondata['tagfilter'.$forumid]!='') {
+		$tagfilter = $sessiondata['tagfilter'.$forumid];
+	} else {
+		$tagfilter = '';
+	}
+	if ($tagfilter != '') {
+		$query = "SELECT threadid FROM imas_forum_posts WHERE tag='".addslashes($tagfilter)."'";
+		if ($dofilter) {
+			$query .= " AND threadid IN ($limthreads)";
+		}
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$limthreads = array();
+		while ($row = mysql_fetch_row($result)) {
+			$limthreads[] = $row[0];
+		}
+		if (count($limthreads)==0) {
+			$limthreads = '0';
+		} else {
+			$limthreads = implode(',',$limthreads);
+		}
+		$dofilter = true;
+	}
 	
 	if (isset($_GET['search']) && trim($_GET['search'])!='') {
 		require("../header.php");
@@ -155,6 +180,7 @@
 		if ($dofilter) {
 			$query .= " AND imas_forum_posts.threadid IN ($limthreads)";
 		}
+		
 		$query .= " ORDER BY imas_forum_posts.postdate DESC";
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
@@ -199,384 +225,12 @@
 	if (isset($_GET['modify']) || isset($_GET['remove']) || isset($_GET['move'])) {
 		require("posthandler.php");
 	}
-	/*
 	
-	if (isset($_GET['modify'])) { //adding or modifying thread
-		if (isset($_POST['subject'])) {  //form submitted
-			if ($isteacher) {
-				$type = $_POST['type'];
-			} else {
-				$type = 0;
-			}
-			if (trim($_POST['subject'])=='') {
-				$_POST['subject']= '(none)';
-			}
-			if (isset($_POST['postanon']) && $_POST['postanon']==1) {
-				$isanon = 1;
-			} else {
-				$isanon = 0;
-			}
-			if (!isset($_POST['replyby']) || $_POST['replyby']=="null") {
-				$replyby = "NULL";
-			} else if ($_POST['replyby']=="Always") {
-				$replyby = 2000000000;
-			} else if ($_POST['replyby']=="Never") {
-				$replyby = 0;
-			} else {
-				require_once("../course/parsedatetime.php");
-				$replyby = parsedatetime($_POST['replybydate'],$_POST['replybytime']);
-			}
-			if (isset($_POST['tag'])) {
-				$tag = $_POST['tag'];
-			} else {
-				$tag = '';
-			}
-			require_once("../includes/htmLawed.php");
-			$htmlawedconfig = array('elements'=>'*-script-form');
-			$_POST['message'] = addslashes(htmLawed(stripslashes($_POST['message']),$htmlawedconfig));
-			$_POST['subject'] = strip_tags($_POST['subject']);
-			
-			if ($_GET['modify']=="new") {	
-				$now = time();
-				if ($groupsetid>0) {
-					if ($isteacher) {
-						if (isset($_POST['stugroup'])) {
-							$groupid = $_POST['stugroup'];
-						} else {
-							$groupid = 0;
-						}
-					} 
-				}
-				
-				$query = "INSERT INTO imas_forum_posts (forumid,subject,message,userid,postdate,parent,posttype,isanon,replyby,tag) VALUES ";
-				$query .= "('$forumid','{$_POST['subject']}','{$_POST['message']}','$userid',$now,0,'$type','$isanon',$replyby,'$tag')";
-				mysql_query($query) or die("Query failed : $query " . mysql_error());
-				$threadid = mysql_insert_id();
-				$query = "UPDATE imas_forum_posts SET threadid='$threadid' WHERE id='$threadid'";
-				mysql_query($query) or die("Query failed : $query " . mysql_error());
-				
-				$query = "INSERT INTO imas_forum_threads (id,forumid,lastposttime,lastpostuser,stugroupid) VALUES ('$threadid','$forumid',$now,'$userid','$groupid')";
-				mysql_query($query) or die("Query failed : $query " . mysql_error());
-				
-				$query = "INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES ('$userid','$threadid',$now)";
-				mysql_query($query) or die("Query failed : $query " . mysql_error());
-				
-				$query = "SELECT iu.email FROM imas_users AS iu,imas_forum_subscriptions AS ifs WHERE ";
-				$query .= "iu.id=ifs.userid AND ifs.forumid='$forumid' AND iu.id<>'$userid'";
-				if ($dofilter) {
-					$query .= " AND (iu.id IN (SELECT userid FROM imas_stugroupmembers WHERE stugroupid='$groupid') OR iu.id IN (SELECT userid FROM imas_teachers WHERE courseid='$cid'))";
-				}
-				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-				if (mysql_num_rows($result)>0) {
-					$headers  = 'MIME-Version: 1.0' . "\r\n";
-					$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-					$headers .= "From: $sendfrom\r\n";
-					$message  = "<h4>This is an automated message.  Do not respond to this email</h4>\r\n";
-					$message .= "<p>A new thread has been started in forum $forumname in course $coursename</p>\r\n";
-					$message .= "<p>Subject:".stripslashes($_POST['subject'])."</p>";
-					$message .= "<p>Poster: $userfullname</p>";
-					$message .= "<a href=\"". $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/posts.php?cid=$cid&forum=$forumid&thread=$threadid\">";
-					$message .= "View Posting</a>\r\n";
-				}
-				while ($row = mysql_fetch_row($result)) {
-					$row[0] = trim($row[0]);
-					if ($row[0]!='' && $row[0]!='none@none.com') {
-						mail($row[0],'New forum post notification',$message,$headers);
-					}
-				}
-				$_GET['modify'] = $threadid;
-				$files = array();
-			} else {
-				$query = "UPDATE imas_forum_posts SET subject='{$_POST['subject']}',message='{$_POST['message']}',posttype='$type',replyby=$replyby,isanon='$isanon',tag='$tag' ";
-				$query .= "WHERE id='{$_GET['modify']}'";
-				if (!$isteacher) { $query .= " AND userid='$userid'";}
-				mysql_query($query) or die("Query failed : $query " . mysql_error());
-				if ($groupsetid>0 && $isteacher && isset($_POST['stugroup'])) {
-					$groupid = $_POST['stugroup'];
-					$query = "UPDATE imas_forum_threads SET stugroupid='$groupid' WHERE id='{$_GET['modify']}'";
-					mysql_query($query) or die("Query failed : $query " . mysql_error());
-				}
-				
-				$query = "SELECT files FROM imas_forum_posts WHERE id='{$_GET['modify']}'";
-				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-				$files = explode('@@',mysql_result($result,0,0));
-			}
-			//now handle any files
-			if (isset($_POST['filedesc'])) {
-				foreach ($_POST['filedesc'] as $i=>$v) {
-					$files[2*$i] = str_replace('@@','@',$v);
-				}
-				for ($i=count($files)/2-1;$i>=0;$i--) {
-					if (isset($_POST['filedel'][$i])) {
-						if (deleteforumfile($_GET['modify'],$files[2*$i+1])) {
-							array_splice($files,2*$i,2);
-						}
-					}
-				}
-			}
-			if (isset($_FILES['newfile-0'])) {
-				require_once("../includes/filehandler.php");
-				$i = 0;
-				$badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");
-				while (isset($_FILES['newfile-'.$i]) && is_uploaded_file($_FILES['newfile-'.$i]['tmp_name'])) {
-					$userfilename = preg_replace('/[^\w\.]/','',basename($_FILES['newfile-'.$i]['name']));
-					if (trim($_POST['newfiledesc-'.$i])=='') {
-						$_POST['newfiledesc-'.$i] = $userfilename;
-					}
-					$_POST['newfiledesc-'.$i] = str_replace('@@','@',$_POST['newfiledesc-'.$i]);
-					$extension = strtolower(strrchr($userfilename,"."));
-					if (!in_array($extension,$badextensions) && storeuploadedfile('newfile-'.$i,'ffiles/'.$_GET['modify'].'/'.$userfilename,"public")) {
-						$files[] = stripslashes($_POST['newfiledesc-'.$i]);
-						$files[] = $userfilename;
-					}
-					$i++;
-				}
-			}
-			$files = addslashes(implode('@@',$files));
-			$query = "UPDATE imas_forum_posts SET files='$files' WHERE id='{$_GET['modify']}'";
-			mysql_query($query) or die("Query failed : $query " . mysql_error());
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
-			exit;
-		} else { //display mod
-			$pagetitle = "Add/Modify Thread";
-			$useeditor = "message";
-			$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
-			$loadgraphfilter = true;
-			require("../header.php");
-			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
-			echo "&gt; <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> &gt; ";
-			$notice = '';
-			if ($_GET['modify']!="new") {
-				echo "Modify Thread</div>\n";
-				if ($groupsetid>0) {
-					$query = "SELECT stugroupid FROM imas_forum_threads WHERE id='{$_GET['modify']}'";
-					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-					$curstugroupid = mysql_result($result,0,0);
-				}
-				$query = "SELECT * from imas_forum_posts WHERE id='{$_GET['modify']}'";
-				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-				$line = mysql_fetch_array($result, MYSQL_ASSOC);
-				echo "<h3>Modify Thread - \n";
-				$line['subject'] = str_replace('"','&quot;',$line['subject']);
-				$replyby = $line['replyby'];
-			} else {
-				echo "Add Thread</div>\n";
-				$line['subject'] = "";
-				$line['message'] = "";
-				$line['posttype'] = 0;
-				$line['files'] = '';
-				$line['tag'] = '';
-				$curstugroupid = 0;
-				$replyby = null;
-				echo "<h3>Add Thread - \n";
-				if (isset($_GET['quoteq'])) {
-					require_once("../assessment/displayq2.php");
-					$parts = explode('-',$_GET['quoteq']);
-					$message = displayq($parts[0],$parts[1],$parts[2],false,false,0,true);
-					$message = printfilter(forcefiltergraph($message));
-					$message = preg_replace('/(`[^`]*`)/',"<span class=\"AM\">$1</span>",$message);
-					
-					$line['message'] = '<p> </p><br/><hr/>'.$message;
-	
-					if (isset($parts[3])) {  
-						$query = "SELECT name FROM imas_assessments WHERE id='".intval($parts[3])."'";
-						$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-						$line['subject'] = 'Question about #'.($parts[0]+1).' in '.str_replace('"','&quot;',mysql_result($result,0,0));
-						
-						$query = "SELECT ift.id FROM imas_forum_posts AS ifp JOIN imas_forum_threads AS ift ON ifp.threadid=ift.id AND ifp.parent=0 ";
-						$query .= "WHERE ifp.subject='".addslashes($line['subject'])."' AND ift.forumid='$forumid'";
-						if ($groupsetid >0 && !$isteacher) {
-							$query .= " AND ift.stugroupid='$groupid'";
-						}
-						$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-						if (mysql_num_rows($result)>0) {
-							$notice =  '<br/><span style="color:red;font-weight:bold">This question has already been posted about.</span><br/>You may want to read the ';
-							$notice .=   'existing threads before re-posting the question.';
-							while ($row = mysql_fetch_row($result)) {
-								$notice .=  "<br/><a href=\"posts.php?cid=$cid&forum=$forumid&thread={$row[0]}\">{$line['subject']}</a>";
-							}
-						}
-					}	
-				}
-			}
-			$query = "SELECT name,settings,forumtype,taglist FROM imas_forums WHERE id='$forumid'";
-			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-			$allowanon = mysql_result($result,0,1)%2;
-			echo mysql_result($result,0,0).'</h3>';
-			$forumtype = mysql_result($result,0,2);
-			$taglist = mysql_result($result,0,3);
-			
-			
-			
-			if ($replyby!=null && $replyby<2000000000 && $replyby>0) {
-				$replybydate = tzdate("m/d/Y",$replyby);
-				$replybytime = tzdate("g:i a",$replyby);	
-			} else {
-				$replybydate = tzdate("m/d/Y",time()+7*24*60*60);
-				$replybytime = tzdate("g:i a",time()+7*24*60*60);
-			}
-			echo "<form enctype=\"multipart/form-data\" method=\"post\" action=\"thread.php?page=$page&cid=$cid&forum=$forumid&modify={$_GET['modify']}\">\n";
-			echo "<span class=form><label for=\"subject\">Subject:</label></span>";
-			echo "<span class=formright><input type=text size=50 name=subject id=subject value=\"{$line['subject']}\">$notice</span><br class=form>\n";
-			if ($forumtype==1) { //file forum
-				
-				echo '<script type="text/javascript">
-					var filecnt = 1;
-					function addnewfile(t) {
-						var s = document.createElement("span");
-						s.innerHTML = \'Description: <input type="text" name="newfiledesc-\'+filecnt+\'" /> File: <input type="file" name="newfile-\'+filecnt+\'" /><br/>\';
-						t.parentNode.insertBefore(s,t);
-						filecnt++;
-					}</script>';
-				echo "<span class=form>Files:</span>";
-				echo "<span class=formright>";
-				if ($line['files']!='') {
-					require_once('../includes/filehandler.php');
-					$files = explode('@@',$line['files']);
-					for ($i=0;$i<count($files)/2;$i++) {
-						echo '<input type="text" name="filedesc['.$i.']" value="'.$files[2*$i].'"/>';
-						echo '<a href="'.getuserfileurl('ffiles/'.$_GET['modify'].'/'.$files[2*$i+1]).'" target="_blank">View</a> ';
-						echo 'Delete? <input type="checkbox" name="filedel['.$i.']" value="1"/><br/>';
-					}
-				}
-				echo 'Description: <input type="text" name="newfiledesc-0" /> ';
-				echo 'File: <input type="file" name="newfile-0" /><br/>';
-				echo '<a href="#" onclick="addnewfile(this);return false;">Add another file</a>';
-				echo "</span><br class=form>\n";
-			}
-			if ($taglist!='') {
-				$p = strpos($taglist,':');
-				echo '<span class="form"><label for="tag">'.substr($taglist,0,$p).'</label></span>'; 
-				echo '<span class="formright"><select name="tag">';
-				echo '<option value="">Select...</option>';
-				$tags = explode(',',substr($taglist,$p+1));
-				foreach ($tags as $tag) {
-					$tag =  str_replace('"','&quot;',$tag);   
-					echo '<option value="'.$tag.'" ';
-					if ($tag==$line['tag']) {echo 'selected="selected"';}
-					echo '>'.$tag.'</option>';
-				}
-				echo '</select></span><br class="form" />';
-			}
-			echo "<span class=form><label for=\"message\">Message:</label></span>";
-			echo "<span class=left><div class=editor><textarea id=message name=message style=\"width: 100%;\" rows=20 cols=70>";
-			echo htmlentities($line['message']);
-			echo "</textarea></div></span><br class=form>\n";
-			if ($isteacher) {
-				echo "<span class=form>Post Type:</span><span class=formright>\n";
-				echo "<input type=radio name=type value=0 ";
-				if ($line['posttype']==0) { echo "checked=1";}
-				echo ">Regular<br>\n";
-				echo "<input type=radio name=type value=1 ";
-				if ($line['posttype']==1) { echo "checked=1";}
-				echo ">Displayed at top of list<br>\n";
-				echo "<input type=radio name=type value=2 ";
-				if ($line['posttype']==2) { echo "checked=1";}
-				echo ">Displayed at top and locked (no replies)<br>\n";
-				echo "<input type=radio name=type value=3 ";
-				if ($line['posttype']==3) { echo "checked=1";}
-				echo ">Displayed at top and students can only see their own replies\n";
-				echo "</span><br class=form>";
-				echo "<span class=form>Allow replies:</span><span class=formright>\n";
-				echo "<input type=radio name=replyby value=\"null\" ";
-				if ($line['replyby']==null) { echo "checked=1";}
-				echo "/>Use default<br/>";
-				echo "<input type=radio name=replyby value=\"Always\" ";
-				if ($line['replyby']==2000000000) { echo "checked=1";}
-				echo "/>Always<br/>";
-				echo "<input type=radio name=replyby value=\"Never\" ";
-				if ($line['replyby']==='0') { echo "checked=1";}
-				echo "/>Never<br/>";
-				echo "<input type=radio name=replyby value=\"Date\" ";
-				if ($line['replyby']<2000000000 && $line['replyby']>0) { echo "checked=1";}
-				echo "/>Before: "; 
-				echo "<input type=text size=10 name=replybydate value=\"$replybydate\"/>";
-				echo '<a href="#" onClick="displayDatePicker(\'replybydate\', this); return false">';
-				//echo "<A HREF=\"#\" onClick=\"cal1.select(document.forms[0].replybydate,'anchor3','MM/dd/yyyy',(document.forms[0].replybydate.value==$replybydate')?(document.forms[0].replyby.value):(document.forms[0].replyby.value)); return false;\" NAME=\"anchor3\" ID=\"anchor3\">
-				echo "<img src=\"../img/cal.gif\" alt=\"Calendar\"/></A>";
-				echo "at <input type=text size=10 name=replybytime value=\"$replybytime\"></span><br class=\"form\" />";
-				if ($groupsetid >0) {
-					echo '<span class="form">Set thread to group:</span><span class="formright">';
-					echo '<select name="stugroup">';
-					echo '<option value="0" ';
-					if ($curstugroupid==0) { echo 'selected="selected"';}
-					echo '>Non group-specific</option>';
-					$query = "SELECT id,name FROM imas_stugroups WHERE groupsetid='$groupsetid' ORDER BY name";
-					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-					while ($row = mysql_fetch_row($result)) {
-						echo '<option value="'.$row[0].'" ';
-						if ($curstugroupid==$row[0]) { echo 'selected="selected"';}
-						echo '>'.$row[1].'</option>';
-					}
-					echo '</select></span><br class="form" />';
-				}
-					
-			} else {
-				if ($allowanon==1) {
-					echo "<span class=form>Post Anonymously:</span><span class=formright>";
-					echo "<input type=checkbox name=\"postanon\" value=1 ";
-					if ($line['isanon']==1) {echo "checked=1";}
-					echo "></span><br class=form/>";
-				}
-			}
-			echo "<div class=submit><input type=submit value='Submit'></div>\n";
-			echo '</form><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>';
-			require("../footer.php");
-			exit;
-		}
-	} else if (isset($_GET['remove']) && $allowdel) { //isteacher) { //removing thread
-		if (isset($_GET['confirm'])) {
-			$go = true;
-			if (!$isteacher) {
-				$query = "SELECT id FROM imas_forum_posts WHERE parent='{$_GET['remove']}'";
-				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-				if (mysql_num_rows($result)>0) {
-					$go = false;
-				}
-			} 
-			if ($go) {
-				$query = "DELETE FROM imas_forum_posts WHERE id='{$_GET['remove']}'";
-				mysql_query($query) or die("Query failed : $query " . mysql_error());
-				
-				$query = "DELETE FROM imas_forum_threads WHERE id='{$_GET['remove']}'";
-				mysql_query($query) or die("Query failed : $query " . mysql_error());
-	
-				$query = "DELETE FROM imas_forum_posts WHERE threadid='{$_GET['remove']}'";
-				mysql_query($query) or die("Query failed : $query " . mysql_error());
-				
-				$query = "DELETE FROM imas_forum_views WHERE threadid='{$_GET['remove']}'";
-				mysql_query($query) or die("Query failed : $query " . mysql_error());
-			}
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
-			exit;
-		} else {
-			$pagetitle = "Remove Thread";
-			require("../header.php");
-			if (!$isteacher) {
-				$query = "SELECT id FROM imas_forum_posts WHERE parent='{$_GET['remove']}'";
-				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-				if (mysql_num_rows($result)>0) {
-					echo "Someone has replied to this post, so you cannot remove it.  <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Back</a>";
-					require("../footer.php");
-					exit;
-				}
-			} 
-			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
-			echo "&gt; <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> &gt; Remove Thread</div>";
-			echo "<h3>Remove Thread</h3>\n";
-			echo "<p>Are you SURE you want to remove this Thread and all enclosed posts?</p>\n";
-
-			echo "<p><input type=button value=\"Yes, Remove\" onClick=\"window.location='thread.php?page=$page&cid=$cid&forum=$forumid&remove={$_GET['remove']}&confirm=true'\">\n";
-			echo "<input type=button value=\"Nevermind\" onClick=\"window.location='thread.php?page=$page&cid=$cid&forum=$forumid'\"></p>\n";
-			require("../footer.php");
-			exit;
-		}
-	}
-	*/
 	$pagetitle = "Threads";
 	$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/thread.js\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savetagged.php?cid=$cid';</script>";
+	$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savetagged.php?cid=$cid';";
+	$placeinhead .= "var tagfilterurl = '" . $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$pages&cid=$cid&forum=$forumid';</script>";
 	require("../header.php");
 	
 	
@@ -588,6 +242,7 @@
 	if ($dofilter) {
 		$query .= " AND threadid IN ($limthreads)";
 	}
+
 	$query .= "GROUP BY threadid";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$postcount = array();
@@ -602,6 +257,7 @@
 	if ($dofilter) {
 		$query .= " AND threadid IN ($limthreads)";
 	}
+
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$lastview = array();
 	$tags = array();
@@ -631,6 +287,7 @@
 		if ($dofilter) {
 			$query .= " AND threadid IN ($limthreads)";
 		}
+	
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$numpages = ceil(mysql_result($result,0,0)/$threadsperpage);
 		
@@ -710,12 +367,12 @@
 		
 		$query = "SELECT id,name FROM imas_stugroups WHERE groupsetid='$groupsetid' ORDER BY id";
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		echo "<script type=\"text/javascript\">";
+		/*echo "<script type=\"text/javascript\">";
 		echo 'function chgfilter() {';
 		echo '  var ffilter = document.getElementById("ffilter").value;';
 		echo "  window.location = \"thread.php?page=$pages&cid=$cid&forum=$forumid&ffilter=\"+ffilter;";
 		echo '}';
-		echo '</script>';
+		echo '</script>';*/
 		echo '<p>Show posts for group: <select id="ffilter" onChange="chgfilter()"><option value="-1" ';
 		if ($curfilter==-1) { echo 'selected="1"';}
 		echo '>All groups</option>';
@@ -742,6 +399,26 @@
 			$toshow[] =  "<a href=\"thread.php?cid=$cid&forum=$forumid&page=-1\">Limit to New</a>";
 		}
 		$toshow[] =  "<a href=\"thread.php?cid=$cid&forum=$forumid&page=-2\">Limit to Flagged</a>";
+		if ($taglist!='') {
+			$p = strpos($taglist,':');
+			
+			$tagselect = 'Filter by '.substr($taglist,0,$p).': ';
+			$tagselect .= '<select id="tagfilter" onChange="chgtagfilter()"><option value="" ';
+			if ($tagfilter=='') {
+				$tagselect .= 'selected="selected"';
+			}
+			$tagselect .= '>All</option>';
+			$tags = explode(',',substr($taglist,$p+1));
+			foreach ($tags as $tag) {
+				$tag =  str_replace('"','&quot;',$tag);   
+				$tagselect .= '<option value="'.$tag.'" ';
+				if ($tag==$tagfilter) {$tagselect .= 'selected="selected"';}
+				$tagselect .= '>'.$tag.'</option>';
+			}
+			$tagselect .= '</select>';
+			$toshow[] = $tagselect;
+		}
+		
 	} 
 	if (count($newpost)>0) {
 		$toshow[] =  "<a href=\"thread.php?page=$page&cid=$cid&forum=$forumid&markallread=true\">Mark all Read</a>";
@@ -776,7 +453,7 @@
 		$query .= "AND imas_forum_posts.threadid IN ($newpostlist) ";
 	} else if ($page==-2) {
 		$query .= "AND imas_forum_posts.threadid IN ($taggedlist) ";
-	}
+	} 
 	$query .= "GROUP BY imas_forum_posts.id";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	while ($row = mysql_fetch_row($result)) {
@@ -793,7 +470,7 @@
 		$query .= "AND imas_forum_posts.threadid IN ($newpostlist) ";
 	} else if ($page==-2) {
 		$query .= "AND imas_forum_posts.threadid IN ($taggedlist) ";
-	}
+	} 
 	if ($sortby==0) {
 		$query .= "ORDER BY imas_forum_posts.posttype DESC,imas_forum_posts.id DESC ";
 	} else if ($sortby==1) {
