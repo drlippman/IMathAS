@@ -366,6 +366,28 @@ function deleteforumfile($postid,$file) {
 		}
 	}
 }
+function deleteallpostfiles($postid) {
+	$delcnt = 0;
+	if ($GLOBALS['filehandertype'] == 's3') {
+		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		$arr = $s3->getBucket($GLOBALS['AWSbucket'],"ffiles/$postid/");
+		if ($arr!=false) {
+			foreach ($arr as $s3object) {
+				if($s3->deleteObject($GLOBALS['AWSbucket'],$s3object)) {
+					$delcnt++;
+				}
+			}
+		} else {
+			return false;
+		}
+	} else {
+		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
+		if (($delcnt = unlinkRecursive($base."/ffiles/$postid",true))==0) {
+			return false;
+		}
+	}
+	return $delcnt;
+}
 function deletealluserfiles($uid) {
 	$delcnt = 0;
 	if ($GLOBALS['filehandertype'] == 's3') {

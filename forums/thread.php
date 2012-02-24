@@ -195,6 +195,11 @@
 			}
 		}
 	}
+	$caller = 'thread';
+	if (isset($_GET['modify']) || isset($_GET['remove']) || isset($_GET['move'])) {
+		require("posthandler.php");
+	}
+	/*
 	
 	if (isset($_GET['modify'])) { //adding or modifying thread
 		if (isset($_POST['subject'])) {  //form submitted
@@ -221,6 +226,11 @@
 				require_once("../course/parsedatetime.php");
 				$replyby = parsedatetime($_POST['replybydate'],$_POST['replybytime']);
 			}
+			if (isset($_POST['tag'])) {
+				$tag = $_POST['tag'];
+			} else {
+				$tag = '';
+			}
 			require_once("../includes/htmLawed.php");
 			$htmlawedconfig = array('elements'=>'*-script-form');
 			$_POST['message'] = addslashes(htmLawed(stripslashes($_POST['message']),$htmlawedconfig));
@@ -238,8 +248,8 @@
 					} 
 				}
 				
-				$query = "INSERT INTO imas_forum_posts (forumid,subject,message,userid,postdate,parent,posttype,isanon,replyby) VALUES ";
-				$query .= "('$forumid','{$_POST['subject']}','{$_POST['message']}','$userid',$now,0,'$type','$isanon',$replyby)";
+				$query = "INSERT INTO imas_forum_posts (forumid,subject,message,userid,postdate,parent,posttype,isanon,replyby,tag) VALUES ";
+				$query .= "('$forumid','{$_POST['subject']}','{$_POST['message']}','$userid',$now,0,'$type','$isanon',$replyby,'$tag')";
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$threadid = mysql_insert_id();
 				$query = "UPDATE imas_forum_posts SET threadid='$threadid' WHERE id='$threadid'";
@@ -277,7 +287,7 @@
 				$_GET['modify'] = $threadid;
 				$files = array();
 			} else {
-				$query = "UPDATE imas_forum_posts SET subject='{$_POST['subject']}',message='{$_POST['message']}',posttype='$type',replyby=$replyby,isanon='$isanon' ";
+				$query = "UPDATE imas_forum_posts SET subject='{$_POST['subject']}',message='{$_POST['message']}',posttype='$type',replyby=$replyby,isanon='$isanon',tag='$tag' ";
 				$query .= "WHERE id='{$_GET['modify']}'";
 				if (!$isteacher) { $query .= " AND userid='$userid'";}
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -286,6 +296,7 @@
 					$query = "UPDATE imas_forum_threads SET stugroupid='$groupid' WHERE id='{$_GET['modify']}'";
 					mysql_query($query) or die("Query failed : $query " . mysql_error());
 				}
+				
 				$query = "SELECT files FROM imas_forum_posts WHERE id='{$_GET['modify']}'";
 				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$files = explode('@@',mysql_result($result,0,0));
@@ -354,6 +365,7 @@
 				$line['message'] = "";
 				$line['posttype'] = 0;
 				$line['files'] = '';
+				$line['tag'] = '';
 				$curstugroupid = 0;
 				$replyby = null;
 				echo "<h3>Add Thread - \n";
@@ -436,10 +448,13 @@
 				$p = strpos($taglist,':');
 				echo '<span class="form"><label for="tag">'.substr($taglist,0,$p).'</label></span>'; 
 				echo '<span class="formright"><select name="tag">';
+				echo '<option value="">Select...</option>';
 				$tags = explode(',',substr($taglist,$p+1));
 				foreach ($tags as $tag) {
 					$tag =  str_replace('"','&quot;',$tag);   
-					echo '<option value="'.$tag.'">'.$tag.'</option>';
+					echo '<option value="'.$tag.'" ';
+					if ($tag==$line['tag']) {echo 'selected="selected"';}
+					echo '>'.$tag.'</option>';
 				}
 				echo '</select></span><br class="form" />';
 			}
@@ -557,7 +572,7 @@
 			exit;
 		}
 	}
-	
+	*/
 	$pagetitle = "Threads";
 	$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/thread.js\"></script>";
@@ -808,12 +823,18 @@
 		}
 		echo "><td>";
 		echo "<span class=right>\n";
+		if ($line['tag']!='') { //category tags
+			echo '<span class="forumcattag">'.$line['tag'].'</span> ';
+		}
 		if ($line['posttype']==0) {
 			if (isset($tags[$line['id']])) {
 				echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged({$line['id']});return false;\" />";
 			} else {
 				echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggletagged({$line['id']});return false;\" />";
 			}
+		}
+		if ($isteacher) {
+			echo "<a href=\"thread.php?page=$page&cid=$cid&forum={$line['forumid']}&move={$line['id']}\">Move</a> ";
 		}
 		if ($isteacher || ($line['userid']==$userid && $allowmod && time()<$postby)) {
 			echo "<a href=\"thread.php?page=$page&cid=$cid&forum={$line['forumid']}&modify={$line['id']}\">Modify</a> ";
