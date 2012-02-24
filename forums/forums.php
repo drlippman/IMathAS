@@ -27,9 +27,92 @@
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Forums</div>\n";
 	
+	//get general forum info and page order
+	$now = time();
+	$query = "SELECT * FROM imas_forums WHERE imas_forums.courseid='$cid'";
+	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$forumdata = array();
+	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+		$forumdata[$line['id']] = $line;
+	}
+	
+	$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+	$itemorder = unserialize(mysql_result($result,0,0));
+	$itemsimporder = array();
+	function flattenitems($items,&$addto) {
+		global $itemsimporder;
+		foreach ($items as $item) {
+			if (is_array($item)) {
+				flattenitems($item['items'],$addto);
+			} else {
+				$addto[] = $item;
+			}
+		}
+	}
+	flattenitems($itemorder,$itemsimporder);
+	
+	$itemsassoc = array();
+	$query = "SELECT id,typeid FROM imas_items WHERE courseid='$cid' AND itemtype='Forum'";
+	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+	while ($row = mysql_fetch_row($result)) {
+		$itemsassoc[$row[0]] = $row[1];
+	}
+	
+	//construct tag list selector
+	$taginfo = array();
+	foreach ($itemsimporder as $item) {
+		if (!isset($itemsassoc[$item])) { continue; }
+		$taglist = $forumdata[$itemsassoc[$item]]['taglist'];
+		if ($taglist=='') { continue;}
+		$p = strpos($taglist,':');
+		$catname = substr($taglist,0,$p);
+		if (!isset($taginfo[$catname])) {
+			$taginfo[$catname] = explode(',',substr($taglist,$p+1));
+		} else {
+			$newtags = array_diff(explode(',',substr($taglist,$p+1)), $taginfo[$catname]);
+			foreach ($newtags as $tag) {
+				$taginfo[$catname][] = $tag;
+			}
+		}	
+	}
+	if (count($taginfo)==0) {
+		$tagfilterselect = '';
+	} else {
+		if (count($taginfo)>1) {
+			$tagfilterselect = 'Category: ';
+		} else {
+			$tagfilterselect = $catname .': ';
+		}
+		$tagfilterselect .= '<select name="tagfiltersel">';
+		$tagfilterselect .= '<option value="">All</option>';
+		foreach ($taginfo as $catname=>$tagarr) {
+			if (count($taginfo)>1) {
+				$tagfilterselect .= '<optgroup label="'.$catname.'">';
+			}
+			foreach ($tagarr as $tag) {
+				$tagfilterselect .= '<option value="'.$tag.'">'.$tag.'</option>';
+			}
+			if (count($taginfo)>1) {
+				$tagfilterselect .= '</optgroup>';
+			}
+		}
+		$tagfilterselect .= '</select>';
+	}
+	
 ?>
 	
 	<div id="headerforums" class="pagetitle"><h2>Forums</h2></div>
+	<div id="forumsearch">
+	<form method="post" action="forums.php?cid=<?php echo $cid;?>">
+		Search: <input type=text name="search" /> 
+		<input type="radio" name="allthreads" value="thread" checked="checked"/>All thread subjects
+		<input type="radio" name="allthreads" value="posts" />All posts 
+		Limit by 
+		<input type="submit" value="Search"/>
+	</form>
+	</div>
+	
 	
 	<table class=forum>
 	<thead>
@@ -77,7 +160,7 @@
 		$newcnt[$row[0]] = $row[1];
 	}
 	
-	$now = time();
+	/*$now = time();
 	$query = "SELECT * FROM imas_forums WHERE imas_forums.courseid='$cid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$forumdata = array();
@@ -107,7 +190,7 @@
 	while ($row = mysql_fetch_row($result)) {
 		$itemsassoc[$row[0]] = $row[1];
 	}
-	
+	*/
 	foreach ($itemsimporder as $item) {
 		if (!isset($itemsassoc[$item])) { continue; }
 		$line = $forumdata[$itemsassoc[$item]];
