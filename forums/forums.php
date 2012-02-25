@@ -21,19 +21,56 @@
 	
 	$cid = $_GET['cid'];
 	
+	if (isset($_POST['searchsubmit'])) {
+		if (trim($_POST['search'])=='' && $_POST['tagfiltersel'] == '') {
+			$_GET['clearsearch'] = true;
+		}
+	}
+	
+	if (isset($_GET['clearsearch'])) {
+		unset($sessiondata['forumsearchstr'.$cid]);
+		unset($sessiondata['forumsearchtype'.$cid]);
+		unset($sessiondata['forumsearchtag'.$cid]);
+		writesessiondata();
+		$searchtype = "none";
+	} else if(isset($_POST['searchsubmit'])) {
+		$searchstr = trim($_POST['search']);
+		$searchtype = $_POST['searchtype'];
+		$searchtag = $_POST['tagfiltersel'];
+		$sessiondata['forumsearchstr'.$cid] = $searchstr;
+		$sessiondata['forumsearchtype'.$cid] = $searchtype;
+		$sessiondata['forumsearchtag'.$cid] = $searchtag;
+		writesessiondata();
+	} else if (isset($sessiondata['forumsearchstr'.$cid])) {
+		$searchstr = $sessiondata['forumsearchstr'.$cid];
+		$searchtype = $sessiondata['forumsearchtype'.$cid];
+		$searchtag = $sessiondata['forumsearchtag'.$cid];
+	} else {
+		$searchtype = "none";
+	}
+	
 	
 	$pagetitle = "Forums";
 	$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
+	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/thread.js"></script>';
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Forums</div>\n";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
+	if ($searchtype != 'none') {
+		echo "<a href=\"forums.php?cid=$cid&amp;clearsearch=true\">Forum List</a> &gt; ";
+	} 
+	echo "Forums</div>\n";
 	
 	//get general forum info and page order
 	$now = time();
 	$query = "SELECT * FROM imas_forums WHERE imas_forums.courseid='$cid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$forumdata = array();
+	$anyforumsgroup = false;
 	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 		$forumdata[$line['id']] = $line;
+		if ($line['groupsetid']>0) {
+			$anyforumsgroup = true;
+		}
 	}
 	
 	$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
@@ -91,7 +128,9 @@
 				$tagfilterselect .= '<optgroup label="'.$catname.'">';
 			}
 			foreach ($tagarr as $tag) {
-				$tagfilterselect .= '<option value="'.$tag.'">'.$tag.'</option>';
+				$tagfilterselect .= '<option value="'.$tag.'"';
+				if ($tag==$searchtag) { $tagfilterselect .= ' selected="selected"';}
+				$tagfilterselect .= '>'.$tag.'</option>';
 			}
 			if (count($taginfo)>1) {
 				$tagfilterselect .= '</optgroup>';
@@ -99,21 +138,216 @@
 		}
 		$tagfilterselect .= '</select>';
 	}
-	
+	if ($searchtype=='none') {
+		echo '<div id="headerforums" class="pagetitle"><h2>Forums</h2></div>';
+	} else {
+		echo '<div id="headerforums" class="pagetitle"><h2>Forum Search Results</h2></div>';
+	}
 ?>
 	
-	<div id="headerforums" class="pagetitle"><h2>Forums</h2></div>
+	
 	<div id="forumsearch">
 	<form method="post" action="forums.php?cid=<?php echo $cid;?>">
-		Search: <input type=text name="search" /> 
-		<input type="radio" name="allthreads" value="thread" checked="checked"/>All thread subjects
-		<input type="radio" name="allthreads" value="posts" />All posts 
-		Limit by 
-		<input type="submit" value="Search"/>
+		<p>
+		Search: <input type=text name="search" value="<?php echo $searchstr;?>" /> 
+		<input type="radio" name="searchtype" value="thread" <?php if ($searchtype!='posts') {echo 'checked="checked"';}?>/>All thread subjects
+		<input type="radio" name="searchtype" value="posts" <?php if ($searchtype=='posts') {echo 'checked="checked"';}?>/>All posts.  
+		<?php
+		if ($tagfilterselect != '') {
+			echo "Limit by $tagfilterselect";
+		}
+		?>
+		<input name="searchsubmit" type="submit" value="Search"/>
+		</p>
 	</form>
 	</div>
+<?php
+if ($searchtype == 'thread') { 
+	//doing a search of thread subjects
+	$now = time();
+	if ($searchstr != '') {
+		$searchstr = str_replace(' and ', ' ',$searchstr);
+		$searchterms = explode(" ",addslashes($searchstr));
+		$searchlikes = "(imas_forum_posts.subject LIKE '%".implode("%' AND imas_forum_posts.subject LIKE '%",$searchterms)."%')";
+	}
+	
+	$query = "SELECT imas_forums.id AS forumid,imas_forum_posts.id,imas_forum_posts.subject,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate,imas_forums.name,imas_forum_posts.files,imas_forum_threads.views,imas_forum_posts.tag,imas_forum_posts.isanon ";
+	$query .= "FROM imas_forum_posts JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id ";
+	$query .= "JOIN imas_users ON imas_users.id=imas_forum_posts.userid ";
+	$query .= "JOIN imas_forum_threads ON imas_forum_threads.id=imas_forum_posts.threadid ";
+	
+	$query .= "WHERE imas_forums.courseid='$cid' AND imas_forum_posts.id=imas_forum_posts.threadid "; //these are indexed fields, but parent is not
+	if ($searchstr != '') {
+		$query .= "AND $searchlikes ";
+	} 
+	if ($searchtag != '') {
+		$query .= "AND imas_forum_posts.tag='$searchtag' ";
+	}
+	if (!$isteacher) {
+		$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now AND imas_forums.enddate>$now)) ";
+	}
+	if ($anyforumsgroup && !$isteacher) {
+		$query .= "AND imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid') ";
+	}
+	
+	$query .= " ORDER BY imas_forum_threads.lastposttime DESC";
+	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$threaddata = array();
+	$threadids = array();
+	while ($line =  mysql_fetch_array($result, MYSQL_ASSOC)) {
+		$threaddata[$line['id']] = $line;
+		$threadids[] = $line['id'];
+	}
+	if (count($threadids)==0) {
+		echo 'No results';
+	} else {
+		$limthreads = implode(',',$threadids);
+		$query = "SELECT threadid,COUNT(id) AS postcount,MAX(postdate) AS maxdate FROM imas_forum_posts ";
+		$query .= "WHERE threadid IN ($limthreads) GROUP BY threadid";
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$postcount = array();
+		$maxdate = array();
+		while ($row = mysql_fetch_row($result)) {
+			$postcount[$row[0]] = $row[1] - 1;
+			$maxdate[$row[0]] = $row[2];
+		}
+		echo '<table class=forum><thead>';
+		echo '<tr><th>Topic</th><th>Forum</th><th>Replies</th><th>Views</th><th>Last Post Date</th></tr></thead><tbody>';
+		foreach ($threaddata as $line) {
+			if (isset($postcount[$line['id']])) {
+				$posts = $postcount[$line['id']];
+				$lastpost = tzdate("F j, Y, g:i a",$maxdate[$line['id']]);
+			} else {
+				$posts = 0;
+				$lastpost = '';
+			}
+			echo "<tr id=\"tr{$line['id']}\"><td>";
+			echo "<span class=right>\n";
+			if ($line['tag']!='') { //category tags
+				echo '<span class="forumcattag">'.$line['tag'].'</span> ';
+			}
+			
+			if (isset($tags[$line['id']])) {
+				echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged({$line['id']});return false;\" />";
+			} else {
+				echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggletagged({$line['id']});return false;\" />";
+			}
+			
+			if ($isteacher) {
+				echo "<a href=\"thread.php?page=$page&cid=$cid&forum={$line['forumid']}&move={$line['id']}\">Move</a> ";
+			}
+			if ($isteacher || ($line['userid']==$userid && $allowmod && time()<$postby)) {
+				echo "<a href=\"thread.php?page=$page&cid=$cid&forum={$line['forumid']}&modify={$line['id']}\">Modify</a> ";
+			} 
+			if ($isteacher || ($allowdel && $line['userid']==$userid && $posts==0)) {
+				echo "<a href=\"thread.php?page=$page&cid=$cid&forum={$line['forumid']}&remove={$line['id']}\">Remove</a>";
+			}
+			echo "</span>\n";
+			if ($line['isanon']==1) {
+				$name = "Anonymous";
+			} else {
+				$name = "{$line['LastName']}, {$line['FirstName']}";
+			}
+			echo "<b><a href=\"posts.php?cid=$cid&forum={$line['forumid']}&thread={$line['id']}\">{$line['subject']}</a></b>: $name";
+			echo "</td>\n";
+			echo "<td class=\"c\"><a href=\"thread.php?cid=$cid&forum={$line['forumid']}\">{$line['name']}</a></td>";
+			echo "<td class=c>$posts</td><td class=c>{$line['views']} </td><td class=c>$lastpost ";
+			echo "</td></tr>\n";
+		}
+	}
 	
 	
+	
+	
+} else if ($searchtype == 'posts') {
+	//doing a search of all posts
+	if (!isset($CFG['CPS']['itemicons'])) {
+	   $itemicons = array('web'=>'web.png', 'doc'=>'doc.png', 'wiki'=>'wiki.png',
+		'html'=>'html.png', 'forum'=>'forum.png', 'pdf'=>'pdf.png',
+		'ppt'=>'ppt.png', 'zip'=>'zip.png', 'png'=>'image.png', 'xls'=>'xls.png',
+		'gif'=>'image.png', 'jpg'=>'image.png', 'bmp'=>'image.png', 
+		'mp3'=>'sound.png', 'wav'=>'sound.png', 'wma'=>'sound.png', 
+		'swf'=>'video.png', 'avi'=>'video.png', 'mpg'=>'video.png', 
+		'nb'=>'mathnb.png', 'mws'=>'maple.png', 'mw'=>'maple.png'); 
+	 } else {
+	   $itemicons = $CFG['CPS']['itemicons'];
+	 }
+	require_once("../includes/filehandler.php");
+	$now = time();
+	if ($searchstr != '') {
+		$searchstr = str_replace(' and ', ' ',$searchstr);
+		$searchterms = explode(" ",addslashes($searchstr));
+		$searchlikes = "(imas_forum_posts.message LIKE '%".implode("%' AND imas_forum_posts.message LIKE '%",$searchterms)."%')";
+		$searchlikes2 = "(imas_forum_posts.subject LIKE '%".implode("%' AND imas_forum_posts.subject LIKE '%",$searchterms)."%')";
+		$searchlikes3 = "(imas_users.LastName LIKE '%".implode("%' AND imas_users.LastName LIKE '%",$searchterms)."%')";
+	}
+	
+	$query = "SELECT imas_forums.id AS forumid,imas_forum_posts.id,imas_forum_posts.threadid,imas_forum_posts.subject,imas_forum_posts.message,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate,imas_forums.name,imas_forum_posts.files,imas_forum_posts.isanon ";
+	$query .= "FROM imas_forum_posts JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id ";
+	$query .= "JOIN imas_users ON imas_users.id=imas_forum_posts.userid ";
+	if ($anyforumsgroup && !$isteacher) {
+		$query .= "JOIN imas_forum_threads ON imas_forum_threads.id=imas_forum_posts.threadid ";
+	}
+	$query .= "WHERE imas_forums.courseid='$cid' ";
+	if ($searchstr != '') {
+		$query .= "AND ($searchlikes OR $searchlikes2 OR $searchlikes3) ";
+	} 
+	if ($searchtag != '') {
+		$query .= "AND imas_forum_posts.tag='$searchtag' ";
+	}
+	if (!$isteacher) {
+		$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now AND imas_forums.enddate>$now)) ";
+	}
+	if ($anyforumsgroup && !$isteacher) {
+		$query .= "AND imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid') ";
+	}
+	
+	$query .= " ORDER BY imas_forum_posts.postdate DESC";
+	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	while ($line =  mysql_fetch_array($result, MYSQL_ASSOC)) {
+		echo "<div class=block>";
+		echo "<b>{$line['subject']}</b>";
+		echo ' (in '.$line['name'].')';
+		if ($line['isanon']==1) {
+			$name = "Anonymous";
+		} else {
+			$name = "{$line['LastName']}, {$line['FirstName']}";
+		}
+		echo "<br/>Posted by: $name, ";
+		echo tzdate("F j, Y, g:i a",$line['postdate']);
+		
+		echo "</div><div class=blockitems>";
+		if($line['files']!='') {
+			$fl = explode('@@',$line['files']);
+			if (count($fl)>2) {
+				echo '<p><b>Files:</b> ';//<ul class="nomark">';
+			} else {
+				echo '<p><b>File:</b> ';
+			}
+			for ($i=0;$i<count($fl)/2;$i++) {
+				//if (count($fl)>2) {echo '<li>';}
+				echo '<a href="'.getuserfileurl('ffiles/'.$line['id'].'/'.$fl[2*$i+1]).'" target="_blank">';
+				$extension = ltrim(strtolower(strrchr($fl[2*$i+1],".")),'.');
+				if (isset($itemicons[$extension])) {
+					echo "<img alt=\"$extension\" src=\"$imasroot/img/{$itemicons[$extension]}\" class=\"mida\"/> ";
+				} else {
+					echo "<img alt=\"doc\" src=\"$imasroot/img/doc.png\" class=\"mida\"/> ";
+				}
+				echo $fl[2*$i].'</a> ';
+				//if (count($fl)>2) {echo '</li>';}
+			}
+			//if (count($fl)>2) {echo '</ul>';}
+			echo '</p>';
+		}
+		echo filter($line['message']);
+		echo "<p><a href=\"posts.php?cid=$cid&forum={$line['forumid']}&thread={$line['threadid']}\">Show full thread</a></p>";
+		echo "</div>\n";
+	}
+	
+} else {
+	//default display
+
+?>
 	<table class=forum>
 	<thead>
 	<tr><th>Forum Name</th><th>Threads</th><th>Posts</th><th>Last Post Date</th></tr>
@@ -225,7 +459,7 @@
 	</table>
 <?php
 
-	
+}
 	require("../footer.php");
 ?>
 	

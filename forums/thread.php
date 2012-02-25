@@ -167,10 +167,10 @@
 		$searchlikes2 = "(imas_forum_posts.subject LIKE '%".implode("%' AND imas_forum_posts.subject LIKE '%",$searchterms)."%')";
 		$searchlikes3 = "(imas_users.LastName LIKE '%".implode("%' AND imas_users.LastName LIKE '%",$searchterms)."%')";
 		if (isset($_GET['allforums'])) {
-			$query = "SELECT imas_forums.id,imas_forum_posts.threadid,imas_forum_posts.subject,imas_forum_posts.message,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate,imas_forums.name FROM imas_forum_posts,imas_forums,imas_users ";
+			$query = "SELECT imas_forums.id,imas_forum_posts.threadid,imas_forum_posts.subject,imas_forum_posts.message,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate,imas_forums.name,imas_forum_posts.isanon FROM imas_forum_posts,imas_forums,imas_users ";
 			$query .= "WHERE imas_forum_posts.forumid=imas_forums.id ";
 			if (!$isteacher) {
-				$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now && imas_forums.enddate>$now)) ";
+				$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now AND imas_forums.enddate>$now)) ";
 			}
 			$query .= "AND imas_users.id=imas_forum_posts.userid AND imas_forums.courseid='$cid' AND ($searchlikes OR $searchlikes2 OR $searchlikes3)";
 		} else {
@@ -189,7 +189,12 @@
 			if (isset($_GET['allforums'])) {
 				echo ' (in '.$row[7].')';
 			}
-			echo "<br/>Posted by: {$row[4]} {$row[5]}, ";
+			if ($row[8]==1) {
+				$name = "Anonymous";
+			} else {
+				$name = "{$row[4]} {$row[5]}";
+			}
+			echo "<br/>Posted by: $name, ";
 			echo tzdate("F j, Y, g:i a",$row[6]);
 			
 			echo "</div><div class=blockitems>";
