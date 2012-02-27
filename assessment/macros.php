@@ -2012,6 +2012,7 @@ function makenumberrequiretimes($arr) {
 
 function evalbasic($str) {
 	$str = str_replace(',','',$str);
+	$str = str_replace('pi','3.141592653',$str);
 	if (is_numeric($str)) {
 		return $str;
 	} else if (preg_match('/[^\d+\-\/\*\.]/',$str)) {

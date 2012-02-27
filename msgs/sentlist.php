@@ -63,6 +63,11 @@ Read   Deleted   Deleted by Sender   Tagged
 		$query = "UPDATE imas_msgs SET isread=(isread|4) WHERE id IN ($checklist)";
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
 	}
+	if (isset($_POST['unsend'])) {
+		$checklist = "'".implode("','",$_POST['checked'])."'";
+		$query = "DELETE FROM imas_msgs WHERE id IN ($checklist)";
+		mysql_query($query) or die("Query failed : $query " . mysql_error());
+	}
 	if (isset($_GET['removeid'])) {
 		$query = "DELETE FROM imas_msgs WHERE id='{$_GET['removeid']}' AND (isread&2)=2";
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -195,6 +200,11 @@ function chgfilter() {
 ?>
 	Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
 	With Selected: 	<input type=submit name="remove" value="Remove from Sent Message List">
+	<?php
+	if ($isteacher) {
+		echo ' <input type=submit name="unsend" value="Unsend" onclick="return confirm(\'Are you sure? This will delete the question from the receiver\\\'s inbox and your send list.\');">';
+	}
+	?>
 			
 	<table class=gb>
 	<thead>
