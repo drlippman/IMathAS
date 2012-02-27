@@ -908,7 +908,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 if ($res===false) {
 				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
-			$query = "ALTER TABLE `imas_forum_posts` ADD `tag` VARCHAR(255)";
+			$query = "ALTER TABLE `imas_forum_posts` ADD `tag` VARCHAR(255) NOT NULL";
 			 $res = mysql_query($query);
 			 if ($res===false) {
 				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";

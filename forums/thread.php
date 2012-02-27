@@ -265,14 +265,14 @@
 
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$lastview = array();
-	$tags = array();
+	$flags = array();
 	while ($row = mysql_fetch_row($result)) {
 		$lastview[$row[0]] = $row[1];
 		if ($row[2]==1) {
-			$tags[$row[0]] = 1;
+			$flags[$row[0]] = 1;
 		}
 	}
-	$taggedlist = implode(',',array_keys($tags));
+	$flaggedlist = implode(',',array_keys($flags));
 	//make new list
 	$newpost = array();
 	foreach (array_keys($maxdate) as $tid) {
@@ -283,7 +283,7 @@
 	$newpostlist = implode(',',$newpost);
 	if ($page==-1 && count($newpost)==0) {
 		$page = 1;
-	} else if ($page==-2 && count($tags)==0) {
+	} else if ($page==-2 && count($flags)==0) {
 		$page = 1;
 	}
 	$prevnext = '';
@@ -457,7 +457,7 @@
 	if ($page==-1) {
 		$query .= "AND imas_forum_posts.threadid IN ($newpostlist) ";
 	} else if ($page==-2) {
-		$query .= "AND imas_forum_posts.threadid IN ($taggedlist) ";
+		$query .= "AND imas_forum_posts.threadid IN ($flaggedlist) ";
 	} 
 	$query .= "GROUP BY imas_forum_posts.id";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -474,7 +474,7 @@
 	if ($page==-1) {
 		$query .= "AND imas_forum_posts.threadid IN ($newpostlist) ";
 	} else if ($page==-2) {
-		$query .= "AND imas_forum_posts.threadid IN ($taggedlist) ";
+		$query .= "AND imas_forum_posts.threadid IN ($flaggedlist) ";
 	} 
 	if ($sortby==0) {
 		$query .= "ORDER BY imas_forum_posts.posttype DESC,imas_forum_posts.id DESC ";
@@ -500,7 +500,7 @@
 		echo "<tr id=\"tr{$line['id']}\"";
 		if ($line['posttype']>0) {
 			echo "class=sticky";
-		} else if (isset($tags[$line['id']])) {
+		} else if (isset($flags[$line['id']])) {
 			echo "class=tagged";
 		}
 		echo "><td>";
@@ -509,7 +509,7 @@
 			echo '<span class="forumcattag">'.$line['tag'].'</span> ';
 		}
 		if ($line['posttype']==0) {
-			if (isset($tags[$line['id']])) {
+			if (isset($flags[$line['id']])) {
 				echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged({$line['id']});return false;\" />";
 			} else {
 				echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggletagged({$line['id']});return false;\" />";

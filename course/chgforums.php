@@ -91,6 +91,17 @@ if (isset($_POST['checked'])) { //form submitted
 	if (isset($_POST['chggbcat'])) {
 		$sets[] = "gbcategory='{$_POST['gbcat']}'";
 	}
+	if (isset($_POST['chgforumtype'])) {
+		$sets[] = "forumtype='{$_POST['forumtype']}'";
+	}
+	if (isset($_POST['chgtaglist'])) {
+		if (isset($_POST['usetags'])) {
+			$taglist = trim($_POST['taglist']);
+		} else {
+			$taglist = '';
+		}	
+		$sets[] = "taglist='$taglist'";
+	}
 	if (count($sets)>0 & count($checked)>0) {
 		$setslist = implode(',',$sets);
 		$query = "UPDATE imas_forums SET $setslist WHERE id IN ($checkedlist);";
@@ -324,7 +335,26 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 ?>
 	</td>
 </tr>
-
+<tr class="coptr">
+	<td><input type="checkbox" name="chgforumtype"/></td>
+	<td class="r">Gradebook category: </td>
+	<td>
+		<input type=radio name="forumtype" value="0" checked="checked"/>Regular forum<br/>
+		<input type=radio name="forumtype" value="1"/>File sharing forum
+	</td>
+</tr>
+<tr class="coptr">
+	<td><input type="checkbox" name="chgtaglist"/></td>
+	<td class="r">Categorize posts?: </td>
+	<td>
+		<input type=checkbox name="usetags" value="1" <?php if ($line['taglist']!='') { echo "checked=1";}?> 
+		  onclick="document.getElementById('tagholder').style.display=this.checked?'':'none';" />
+		 <span id="tagholder" style="display:<?php echo ($line['taglist']=='')?"none":"inline"; ?>">
+		   Enter in format CategoryDescription:category,category,category<br/>
+		   <textarea rows="2" cols="60" name="taglist"><?php echo $line['taglist'];?></textarea>
+		 </span>
+	</td>
+</tr>	
 
 </tbody>
 </table>

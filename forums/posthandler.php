@@ -51,6 +51,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 		} else {
 			$type = 0;
+			$replyby = "NULL";
 		}
 		if (isset($_POST['tag'])) {
 			$tag = $_POST['tag'];
@@ -458,11 +459,18 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 		} 
 		if ($go) {
+			require_once("../includes/filehandler.php");
 			$query = "SELECT parent,files FROM imas_forum_posts WHERE id='{$_GET['remove']}'";
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			$parent = mysql_result($result,0,0);
 			$files = mysql_result($result,0,1);
 			if ($parent==0) {
+				$query = "SELECT id FROM imas_forum_posts WHERE threadid='{$_GET['remove']}' AND files<>''";
+				$r = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				while ($row = mysql_fetch_row($r)) {
+					deleteallpostfiles($row[0]); //delete files for each post
+				}
+				
 				$query = "DELETE FROM imas_forum_posts WHERE threadid='{$_GET['remove']}'";
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
 				
@@ -479,11 +487,12 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				$query = "UPDATE imas_forum_posts SET parent='$parent' WHERE parent='{$_GET['remove']}'";
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$lastpost = false;	
+				
+				if ($files!= '') {
+					deleteallpostfiles($_GET['remove']);
+				}
 			}
-			if ($files!= '') {
-				require_once("../includes/filehandler.php");
-				deleteallpostfiles($_GET['remove']);
-			}
+			
 		}
 		if ($caller == "posts" && $lastpost) {
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");

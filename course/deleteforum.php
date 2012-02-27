@@ -37,14 +37,6 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 		$query = "DELETE FROM imas_forums WHERE id='$forumid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		
-		$query = "DELETE FROM imas_forum_subscriptions WHERE forumid='$forumid'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
-		
-		$query = "DELETE FROM imas_forum_posts WHERE forumid='$forumid'";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
-		
-		$query = "DELETE FROM imas_forum_threads WHERE forumid='$forumid'";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
 		
 		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -60,6 +52,24 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 		$itemorder = addslashes(serialize($items));
 		$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
+		
+		
+		$query = "DELETE FROM imas_forum_subscriptions WHERE forumid='$forumid'";
+		mysql_query($query) or die("Query failed : " . mysql_error());
+		
+		require_once("../includes/filehandler.php");
+		$query = "SELECT id FROM imas_forum_posts WHERE forumid='$forumid' AND files<>''";
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			deleteallpostfiles($row[0]);
+		}
+		
+		$query = "DELETE FROM imas_forum_posts WHERE forumid='$forumid'";
+		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		
+		$query = "DELETE FROM imas_forum_threads WHERE forumid='$forumid'";
+		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		
 		
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
 		

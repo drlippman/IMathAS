@@ -23,11 +23,14 @@
 	//-1 new posts from forum page
 	//-2 tagged posts from forum page
 	//-3 new posts from newthreads page
+	//-4 forum search
 	
 	if (isset($_GET['markunread'])) {
 		$query = "DELETE FROM imas_forum_views WHERE userid='$userid' AND threadid='$threadid'";
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		if ($page==-3) {
+		if ($page==-4) {
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/forums.php?cid=$cid");
+		} else if ($page==-3) {
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/newthreads.php?cid=$cid");
 		} else {
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?cid=$cid&forum=$forumid&page=$page");
@@ -37,7 +40,9 @@
 	if (isset($_GET['marktagged'])) {
 		$query = "UPDATE imas_forum_views SET tagged=1 WHERE userid='$userid' AND threadid='$threadid'";
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		if ($page==-3) {
+		if ($page==-4) {
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/forums.php?cid=$cid");
+		} else if ($page==-3) {
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/newthreads.php?cid=$cid");
 		} else {
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?cid=$cid&forum=$forumid&page=$page");
@@ -46,7 +51,9 @@
 	} else if (isset($_GET['markuntagged'])) {
 		$query = "UPDATE imas_forum_views SET tagged=0 WHERE userid='$userid' AND threadid='$threadid'";
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		if ($page==-3) {
+		if ($page==-4) {
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/forums.php?cid=$cid");
+		} else if ($page==-3) {
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/newthreads.php?cid=$cid");
 		} else {
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?cid=$cid&forum=$forumid&page=$page");
@@ -206,7 +213,9 @@
 	}
 	
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
-	if ($page==-3) {
+	if ($page==-4) {
+		echo "<a href=\"forums.php?cid=$cid\">Forum Search</a> ";	
+	} else if ($page==-3) {
 		echo "<a href=\"newthreads.php?cid=$cid\">New Threads</a> ";
 	} else {
 		echo "<a href=\"thread.php?cid=$cid&forum=$forumid&page=$page\">$forumname</a> ";

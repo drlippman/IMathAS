@@ -1,4 +1,9 @@
 <?php
+
+@set_time_limit(0);
+ini_set("max_input_time", "600");
+ini_set("max_execution_time", "600");
+
 if (isset($GLOBALS['AWSkey'])) {
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	require("$curdir/S3.php");
@@ -272,7 +277,7 @@ function deleteallaidfiles($aid) {
 		$arr = $s3->getBucket($GLOBALS['AWSbucket'],"adata/$aid/");
 		if ($arr!=false) {
 			foreach ($arr as $k=>$file) {
-				if($s3->deleteObject($GLOBALS['AWSbucket'],$file)) {
+				if($s3->deleteObject($GLOBALS['AWSbucket'],$file['name'])) {
 					$delcnt++;
 				}
 			}
@@ -373,7 +378,7 @@ function deleteallpostfiles($postid) {
 		$arr = $s3->getBucket($GLOBALS['AWSbucket'],"ffiles/$postid/");
 		if ($arr!=false) {
 			foreach ($arr as $s3object) {
-				if($s3->deleteObject($GLOBALS['AWSbucket'],$s3object)) {
+				if($s3->deleteObject($GLOBALS['AWSbucket'],$s3object['name'])) {
 					$delcnt++;
 				}
 			}
@@ -396,7 +401,7 @@ function deletealluserfiles($uid) {
 		$arr = $s3->getBucket($GLOBALS['AWSbucket'],"ufiles/$uid/");
 		if ($arr!=false) {
 			foreach ($arr as $s3object) {
-				if($s3->deleteObject($GLOBALS['AWSbucket'],$s3object)) {
+				if($s3->deleteObject($GLOBALS['AWSbucket'],$s3object['name'])) {
 					$delcnt++;
 				}
 			}
@@ -441,7 +446,7 @@ function unlinkRecursive($dir, $deleteRootToo) {
             continue;
         }
 	if (is_file($dir . '/' . $obj)) {
-		if (unlink($obj)) {
+		if (unlink($dir . '/' . $obj)) {
 			$cnt++;
 		}
 	} else if (is_dir($dir . '/' . $obj)) {

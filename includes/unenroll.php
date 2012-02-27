@@ -59,10 +59,10 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 	while ($row = mysql_fetch_row($result)) {
 		$stugroups[] = $row[0];
 	}
-	
+	require_once("$curdir/filehandler.php");
 	if (count($tounenroll)>0) {
 		$curdir = rtrim(dirname(__FILE__), '/\\');
-		require_once("$curdir/filehandler.php");
+		
 		$gbitems = array();
 		$query = "SELECT id FROM imas_gbitems WHERE courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -109,7 +109,13 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 	if ($delforum && count($forums)>0) {
 		$query = "DELETE imas_forum_threads FROM imas_forum_posts JOIN imas_forum_threads ON imas_forum_posts.threadid=imas_forum_threads.id AND imas_forum_posts.posttype=0 WHERE imas_forum_threads.forumid IN ($forumlist)";
 		mysql_query($query) or die("Query failed : " . mysql_error());
-			
+		
+		$query = "SELECT id FROM imas_forum_posts WHERE forumid IN ($forumlist) AND files<>''";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			deleteallpostfiles($row[0]);	
+		}
+		
 		$query = "DELETE FROM imas_forum_posts WHERE forumid IN ($forumlist) AND posttype=0";
 		mysql_query($query) or die("Query failed : " . mysql_error());	
 		

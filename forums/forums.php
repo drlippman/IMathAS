@@ -53,6 +53,8 @@
 	$pagetitle = "Forums";
 	$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
 	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/thread.js"></script>';
+	$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savetagged.php?cid=$cid';</script>";
+	
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
 	if ($searchtype != 'none') {
@@ -171,10 +173,11 @@ if ($searchtype == 'thread') {
 		$searchlikes = "(imas_forum_posts.subject LIKE '%".implode("%' AND imas_forum_posts.subject LIKE '%",$searchterms)."%')";
 	}
 	
-	$query = "SELECT imas_forums.id AS forumid,imas_forum_posts.id,imas_forum_posts.subject,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate,imas_forums.name,imas_forum_posts.files,imas_forum_threads.views,imas_forum_posts.tag,imas_forum_posts.isanon ";
+	$query = "SELECT imas_forums.id AS forumid,imas_forum_posts.id,imas_forum_posts.subject,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate,imas_forums.name,imas_forum_posts.files,imas_forum_threads.views,imas_forum_posts.tag,imas_forum_posts.isanon,imas_forum_views.tagged ";
 	$query .= "FROM imas_forum_posts JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id ";
 	$query .= "JOIN imas_users ON imas_users.id=imas_forum_posts.userid ";
 	$query .= "JOIN imas_forum_threads ON imas_forum_threads.id=imas_forum_posts.threadid ";
+	$query .= "LEFT JOIN imas_forum_views ON imas_forum_threads.id=imas_forum_views.threadid AND imas_forum_views.userid='$userid' ";
 	
 	$query .= "WHERE imas_forums.courseid='$cid' AND imas_forum_posts.id=imas_forum_posts.threadid "; //these are indexed fields, but parent is not
 	if ($searchstr != '') {
@@ -187,7 +190,7 @@ if ($searchtype == 'thread') {
 		$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now AND imas_forums.enddate>$now)) ";
 	}
 	if ($anyforumsgroup && !$isteacher) {
-		$query .= "AND imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid') ";
+		$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
 	}
 	
 	$query .= " ORDER BY imas_forum_threads.lastposttime DESC";
@@ -221,13 +224,15 @@ if ($searchtype == 'thread') {
 				$posts = 0;
 				$lastpost = '';
 			}
-			echo "<tr id=\"tr{$line['id']}\"><td>";
+			echo "<tr id=\"tr{$line['id']}\" ";
+			if ($line['tagged']==1) {echo 'class="tagged"';}
+			echo "><td>";
 			echo "<span class=right>\n";
 			if ($line['tag']!='') { //category tags
 				echo '<span class="forumcattag">'.$line['tag'].'</span> ';
 			}
 			
-			if (isset($tags[$line['id']])) {
+			if ($line['tagged']==1) {
 				echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged({$line['id']});return false;\" />";
 			} else {
 				echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggletagged({$line['id']});return false;\" />";
@@ -248,7 +253,7 @@ if ($searchtype == 'thread') {
 			} else {
 				$name = "{$line['LastName']}, {$line['FirstName']}";
 			}
-			echo "<b><a href=\"posts.php?cid=$cid&forum={$line['forumid']}&thread={$line['id']}\">{$line['subject']}</a></b>: $name";
+			echo "<b><a href=\"posts.php?cid=$cid&forum={$line['forumid']}&thread={$line['id']}&page=-4\">{$line['subject']}</a></b>: $name";
 			echo "</td>\n";
 			echo "<td class=\"c\"><a href=\"thread.php?cid=$cid&forum={$line['forumid']}\">{$line['name']}</a></td>";
 			echo "<td class=c>$posts</td><td class=c>{$line['views']} </td><td class=c>$lastpost ";
@@ -299,7 +304,7 @@ if ($searchtype == 'thread') {
 		$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now AND imas_forums.enddate>$now)) ";
 	}
 	if ($anyforumsgroup && !$isteacher) {
-		$query .= "AND imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid') ";
+		$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
 	}
 	
 	$query .= " ORDER BY imas_forum_posts.postdate DESC";
@@ -340,7 +345,7 @@ if ($searchtype == 'thread') {
 			echo '</p>';
 		}
 		echo filter($line['message']);
-		echo "<p><a href=\"posts.php?cid=$cid&forum={$line['forumid']}&thread={$line['threadid']}\">Show full thread</a></p>";
+		echo "<p><a href=\"posts.php?cid=$cid&forum={$line['forumid']}&thread={$line['threadid']}&page=-4\">Show full thread</a></p>";
 		echo "</div>\n";
 	}
 	
