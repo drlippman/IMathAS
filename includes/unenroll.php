@@ -59,10 +59,9 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 	while ($row = mysql_fetch_row($result)) {
 		$stugroups[] = $row[0];
 	}
+	$curdir = rtrim(dirname(__FILE__), '/\\');
 	require_once("$curdir/filehandler.php");
 	if (count($tounenroll)>0) {
-		$curdir = rtrim(dirname(__FILE__), '/\\');
-		
 		$gbitems = array();
 		$query = "SELECT id FROM imas_gbitems WHERE courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());

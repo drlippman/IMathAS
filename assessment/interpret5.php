@@ -131,7 +131,7 @@ function interpretline($str,$anstype,$countcnt) {
 				//might be $a..$b or 3.*.4  (remnant of implicit handling)
 				if (preg_match('/^\s*\(\s*(\$\w+)\s*\=\s*(-?\d+|\$[\w\[\]]+)\s*\.\s?\.\s*(-?\d+|\$[\w\[\]]+)\s*\)\s*$/',$cond,$matches)) {
 					$forcond = array_slice($matches,1,3);
-					$bits = array( "for ({$forcond[0]}=intval({$forcond[1]});{$forcond[0]}<=round(floatval({$forcond[2]}),0);{$forcond[0]}++) ".$todo."");
+					$bits = array( "if (is_nan({$forcond[2]}) || is_nan({$forcond[1]})) {echo 'part of for loop is not a number';} else {for ({$forcond[0]}=intval({$forcond[1]});{$forcond[0]}<=round(floatval({$forcond[2]}),0);{$forcond[0]}++) ".$todo."}");
 				} else {
 					echo 'error with for code.. must be "for ($var=a..b) {todo}" where a and b are whole numbers or variables only';
 					return 'error';
