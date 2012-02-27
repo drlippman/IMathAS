@@ -1,4 +1,9 @@
 <?php
+
+@set_time_limit(0);
+ini_set("max_input_time", "600");
+ini_set("max_execution_time", "600");
+
 if (isset($GLOBALS['AWSkey'])) {
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	require("$curdir/S3.php");
@@ -272,7 +277,7 @@ function deleteallaidfiles($aid) {
 		$arr = $s3->getBucket($GLOBALS['AWSbucket'],"adata/$aid/");
 		if ($arr!=false) {
 			foreach ($arr as $k=>$file) {
-				if($s3->deleteObject($GLOBALS['AWSbucket'],$file)) {
+				if($s3->deleteObject($GLOBALS['AWSbucket'],$file['name'])) {
 					$delcnt++;
 				}
 			}
@@ -348,6 +353,46 @@ function deleteuserfile($uid,$file) {
 		}
 	}
 }
+function deleteforumfile($postid,$file) {
+	if ($GLOBALS['filehandertype'] == 's3') {
+		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		$s3object = "ffiles/$postid/$file";
+		if($s3->deleteObject($GLOBALS['AWSbucket'],$s3object)) {
+			return true;
+		}else {
+			return false;
+		}
+	} else {
+		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
+		if (unlink($base."/ffiles/$postid/$file")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+}
+function deleteallpostfiles($postid) {
+	$delcnt = 0;
+	if ($GLOBALS['filehandertype'] == 's3') {
+		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		$arr = $s3->getBucket($GLOBALS['AWSbucket'],"ffiles/$postid/");
+		if ($arr!=false) {
+			foreach ($arr as $s3object) {
+				if($s3->deleteObject($GLOBALS['AWSbucket'],$s3object['name'])) {
+					$delcnt++;
+				}
+			}
+		} else {
+			return false;
+		}
+	} else {
+		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
+		if (($delcnt = unlinkRecursive($base."/ffiles/$postid",true))==0) {
+			return false;
+		}
+	}
+	return $delcnt;
+}
 function deletealluserfiles($uid) {
 	$delcnt = 0;
 	if ($GLOBALS['filehandertype'] == 's3') {
@@ -356,7 +401,7 @@ function deletealluserfiles($uid) {
 		$arr = $s3->getBucket($GLOBALS['AWSbucket'],"ufiles/$uid/");
 		if ($arr!=false) {
 			foreach ($arr as $s3object) {
-				if($s3->deleteObject($GLOBALS['AWSbucket'],$s3object)) {
+				if($s3->deleteObject($GLOBALS['AWSbucket'],$s3object['name'])) {
 					$delcnt++;
 				}
 			}
@@ -373,7 +418,7 @@ function deletealluserfiles($uid) {
 }
 
 function getuserfileurl($key) {
-	global $urlmode;
+	global $urlmode,$imasroot;
 	if ($GLOBALS['filehandertype'] == 's3') {
 		return $urlmode."s3.amazonaws.com/{$GLOBALS['AWSbucket']}/$key";
 	} else {
@@ -401,7 +446,7 @@ function unlinkRecursive($dir, $deleteRootToo) {
             continue;
         }
 	if (is_file($dir . '/' . $obj)) {
-		if (unlink($obj)) {
+		if (unlink($dir . '/' . $obj)) {
 			$cnt++;
 		}
 	} else if (is_dir($dir . '/' . $obj)) {

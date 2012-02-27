@@ -1747,10 +1747,16 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					}
 					$saarr = array_merge($saarr,$backg);
 					$sa = showplot($saarr,$settings[0],$settings[1],$settings[2],$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
+					if (isset($grid) && strpos($grid[4],'pi')!==false) {
+						$sa = addfractionaxislabels($sa,$grid[4]);
+					}
 				}
 				
 			} else {
 				$sa = showplot($saarr,$settings[0],$settings[1],$settings[2],$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
+				if (isset($grid) && strpos($grid[4],'pi')!==false) {
+					$sa = addfractionaxislabels($sa,$grid[4]);
+				}
 			}
 		}
 	} else if ($anstype == "file") {

@@ -334,12 +334,22 @@ switch($_GET['action']) {
 			$query = "SELECT id FROM imas_forums WHERE courseid='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			while ($row = mysql_fetch_row($result)) {
-				$q2 = "SELECT threadid FROM imas_forum_posts WHERE forumid='{$row[0]}'";
+				$query = "SELECT id FROM imas_forum_posts WHERE forumid='{$row[0]}' AND files<>''";
+				$r2 = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				while ($row = mysql_fetch_row($r2)) {
+					deleteallpostfiles($row[0]);
+				}
+				/*$q2 = "SELECT id FROM imas_forum_threads WHERE forumid='{$row[0]}'";
 				$r2 = mysql_query($q2) or die("Query failed : " . mysql_error());
 				while ($row2 = mysql_fetch_row($r2)) {
 					$query = "DELETE FROM imas_forum_views WHERE threadid='{$row2[0]}'";
 					mysql_query($query) or die("Query failed : " . mysql_error());
 				}
+				*/
+				$query = "DELETE imas_forum_views FROM imas_forum_views JOIN ";
+				$query .= "imas_forum_threads ON imas_forum_views.threadid=imas_forum_threads.id ";
+				$query .= "WHERE imas_forum_threads.forumid='{$row[0]}'";
+				
 				$query = "DELETE FROM imas_forum_posts WHERE forumid='{$row[0]}'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				

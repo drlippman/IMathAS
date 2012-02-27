@@ -23,6 +23,14 @@ function toggletagged(threadid) {
 	return false;
 }
 
+function chgtagfilter() {
+	var tagfilter = document.getElementById("tagfilter").value;
+	window.location = tagfilterurl+'&tagfilter='+tagfilter;
+}
+function chgfilter() {
+	var ffilter = document.getElementById("ffilter").value;
+	window.location = tagfilterurl+'&ffilter='+ffilter;
+}
 function submitTagged(thread,tagged) { 
   url = AHAHsaveurl + '&threadid='+thread+'&tagged='+tagged;
   if (window.XMLHttpRequest) { 
