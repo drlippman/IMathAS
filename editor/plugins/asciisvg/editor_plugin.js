@@ -77,7 +77,7 @@
 
 			// Add a node change handler, selects the button in the UI when a image is selected
 			ed.onNodeChange.add(function(ed, cm, n) {
-				cm.setActive('asciisvg', n.nodeName == 'IMG' && ed.dom.getAttrib(n,"sscr")!='');
+				cm.setActive('asciisvg', n.nodeName == 'IMG' && (ed.dom.getAttrib(n,"sscr")!='' || ed.dom.getAttrib(el,"src").match(/sscr=/)));				
 			});
 			
 			
@@ -89,13 +89,14 @@
 							if (imgs[i].match(/sscr=\"/)) {
 								sscr = imgs[i].replace(/.*sscr=\"(.*?)\".*/,"$1");
 							} else {
-								sscr = imgs[i].replace(/.*sscr=(.*?)\s.*/,"$1");
+								sscr = imgs[i].replace(/.*sscr=(.*?)(\s|\").*/,"$1");
 							}
 							if (imgs[i].match(/style=\"/)) {
 								style = imgs[i].replace(/.*style=\"(.*?)\".*/,"$1");
 							} else {
 								style = '';
 							}
+							
 							rep = '<embed type="image/svg+xml" src="'+ed.getParam('ASdloc')+'" style="'+style+'" sscr="'+decodeURIComponent(sscr)+'" />';
 							o.content = o.content.replace(imgs[i],rep);
 						}

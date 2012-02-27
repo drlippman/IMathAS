@@ -23,6 +23,53 @@ var oldpointpos = null;
 var curTarget = null;
 var nocanvaswarning = false;
 
+/* 
+   Canvas-based function drawing script
+   (c) David Lippman, part of www.imathas.com
+   GNU 2 Licensed - see license in IMathAS distribution
+   
+   HTML should have <canvas id="canvas##"></canvas>
+   and include a <script> tag that defines
+   canvases[##] = [##,'background img',xmin,xmax,ymin,ymax,border,imgwidth,imgheight,defmode,dotline,locky];
+   where
+   	background img is filename is a specific directory (anyone else would need
+   	  	to adjust the directory in the code)
+   	xmin,xmax,ymin,ymax,border are based on the background image coordinates.
+   	    	these are not used by the JS, but could be to convert from 
+   	    	pixel locations to graph coordinate locations
+   	imgwidth, imgheight are the pixels of the canvas element
+   	defmode is the default tool that should be selected (see below for modes)
+   	dotline will, if true, add dots at the end of line segments in mode 0.
+   		this is useful for drawing polygons
+   	locky will, if true, only allow drawing along the center x-axis.
+   		this is useful for numberline graphing
+   
+   Will automatically output to <input id="qn##" />
+   
+   JS can interact with the drawing item by calling:
+      clearcanvas(##)
+      settool(this,##,mode)
+   where ## is the ## in the canvas id, and mode is one of:
+
+   targets.mode
+   	0:  set of line segments / freeform drawing
+   	0.5: single line segment (basic tool)
+   	1: solid dot
+   	2: open dot
+   tptypes
+	5: line
+	5.2:  ray (no arrow)
+	5.3:  line segment
+	6: parabola
+	6.5: square root
+	7: circle (only works on square grids)
+	8: abs value
+	9: cosine/sine
+   ineqtypes
+   	10: linear >= or <=
+   	10.2: linear < or >
+	
+*/
 function clearcanvas(tarnum) {
 	lines[tarnum].length = 0;
 	dots[tarnum].length = 0;
@@ -326,6 +373,36 @@ function drawTarget(x,y) {
 				}
 			
 			}
+		} else if (tptypes[curTarget][i]==6.5) {//if a tp sqrtt
+			var y2 = null;
+			var x2 = null;
+			if (tplines[curTarget][i].length==2) {
+				x2 = tplines[curTarget][i][1][0];
+				y2 = tplines[curTarget][i][1][1];
+			} else if (curTPcurve==i && x!=null && tplines[curTarget][i].length==1) {
+				x2 = x;
+				y2 = y;
+			}
+			if (x2 != null && x2!=tplines[curTarget][i][0][0]) {
+				if (y2==tplines[curTarget][i][0][1]) {
+					ctx.moveTo(tplines[curTarget][i][0][0],y2);
+					if (x2 > tplines[curTarget][i][0][0]) {
+						ctx.lineTo(targets[curTarget].imgwidth,y2);
+					} else {
+						ctx.lineTo(0,y2);
+					}
+				} else {
+					var flip = (x2 < tplines[curTarget][i][0][0])?-1:1;
+					var stretch = (y2-tplines[curTarget][i][0][1])/Math.sqrt(flip*(x2-tplines[curTarget][i][0][0]));
+					ctx.moveTo(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1]);
+					curx = tplines[curTarget][i][0][0]; cury = tplines[curTarget][i][0][1];
+					
+					do {
+						curx += flip*3;
+						ctx.lineTo(curx, stretch*Math.sqrt(flip*(curx - tplines[curTarget][i][0][0])) + tplines[curTarget][i][0][1]);
+					} while (curx > 0 && curx < targets[curTarget].imgwidth && cury > 0 && cury < targets[curTarget].imgheight);
+				}
+			}
 		} else if (tptypes[curTarget][i]==7) {//if a tp circle
 			if (tplines[curTarget][i].length==2) {
 				x2 = tplines[curTarget][i][1][0];
@@ -372,6 +449,44 @@ function drawTarget(x,y) {
 					
 				}
 				
+			}
+		} else if (tptypes[curTarget][i]==9  || tptypes[curTarget][i]==9.1 ) {//if a tp sin/cos
+			var y2 = null;
+			var x2 = null;
+			if (tplines[curTarget][i].length==2) {
+				x2 = tplines[curTarget][i][1][0];
+				y2 = tplines[curTarget][i][1][1];
+			} else if (curTPcurve==i && x!=null && tplines[curTarget][i].length==1) {
+				x2 = x;
+				y2 = y;
+			}
+			if (x2 != null && x2!=tplines[curTarget][i][0][0]) {
+				if (y2==tplines[curTarget][i][0][1]) {
+					ctx.moveTo(0,y2);
+					ctx.lineTo(targets[curTarget].imgwidth,y2);
+				} else {
+					if (tptypes[curTarget][i]==9) {
+						var amp = -1*Math.abs(y2-tplines[curTarget][i][0][1])/2;
+						var mid = (y2+tplines[curTarget][i][0][1])/2;  
+						var stretch = Math.PI/Math.abs(x2-tplines[curTarget][i][0][0]);
+						var horizs = (y2 < tplines[curTarget][i][0][1])?x2:tplines[curTarget][i][0][0];
+					} else if (tptypes[curTarget][i]==9.1) {
+						var amp = -1*Math.abs(y2-tplines[curTarget][i][0][1]);
+						var mid = tplines[curTarget][i][0][1];  
+						var stretch = 0.5*Math.PI/Math.abs(x2-tplines[curTarget][i][0][0]);
+						var horizs = (y2 < tplines[curTarget][i][0][1])?x2:(x2+2*Math.abs(x2-tplines[curTarget][i][0][0]));
+					}
+					
+					var cury = 0;
+					for (var curx=0;curx < targets[curTarget].imgwidth+4;curx += 3) {
+						cury = amp*Math.cos(stretch*(curx - horizs)) + mid;
+						if (curx==0) {
+							ctx.moveTo(curx,cury); 
+						} else {
+							ctx.lineTo(curx,cury);
+						}
+					} 
+				}
 			}
 		}
 		ctx.stroke();
@@ -564,7 +679,7 @@ function drawMouseDown(ev) {
 						curLine = null;
 						dragObj = null;
 					}
-				} else if (targets[curTarget].mode>=5 && targets[curTarget].mode<10) {//in tpline mode
+				} else if (targets[curTarget].mode>=5 && targets[curTarget].mode<10) {//in twopoint mode
 					if (curTPcurve==null) { //start new tpline
 						tplines[curTarget].push([[mouseOff.x,mouseOff.y]]);
 						curTPcurve = tplines[curTarget].length-1;
@@ -628,7 +743,7 @@ function drawMouseDown(ev) {
 				} else if (foundpt[0]==2) { //if point is a open dot
 					targets[curTarget].el.style.cursor = 'move';
 					dragObj = {mode: 2, num: foundpt[1]};
-				} else if (foundpt[0]>=5 && foundpt[0]<10) { //if point is on tpline
+				} else if (foundpt[0]>=5 && foundpt[0]<10) { //if point is on twopoint
 					targets[curTarget].el.style.cursor = 'move';
 					//start dragging
 					dragObj = {mode: foundpt[0], num: foundpt[1], subnum: foundpt[2]};
@@ -697,7 +812,7 @@ function findnearpoint(thetarget,mouseOff) {
 					return [2,i];
 				}
 			}
-		} else if (targets[thetarget].mode>=5 && targets[thetarget].mode<10) { //if in tpline mode
+		} else if (targets[thetarget].mode>=5 && targets[thetarget].mode<10) { //if in twopoint mode
 			for (var i=0;i<tplines[thetarget].length;i++) { //check lines
 				if (tptypes[thetarget][i]!=targets[thetarget].mode) {continue;}
 				for (var j=tplines[thetarget][i].length-1; j>=0;j--) {
@@ -804,11 +919,13 @@ function drawMouseUp(ev) {
 				lines[curTarget].splice(dragObj.num,1);	
 			} else if (dragObj.mode==0) { //if line, return pt to orig pos
 				lines[curTarget][dragObj.num][dragObj.subnum] = oldpointpos;
-			} else if (dragObj.mode>=5 && dragObj.mode<10) { //if line, return pt to orig pos
-				tplines[curTarget][dragObj.num][dragObj.subnum] = oldpointpos;
+			} else if (dragObj.mode>=5 && dragObj.mode<10) { //if twopoint, delete line
+				tplines[curTarget].splice(dragObj.num,1);
+				//tplines[curTarget][dragObj.num][dragObj.subnum] = oldpointpos;
 				curTPcurve = null;
-			} else if (dragObj.mode>=10 && dragObj.mode<11) { //if ineq, return pt to orig pos
-				ineqlines[curTarget][dragObj.num][dragObj.subnum] = oldpointpos;
+			} else if (dragObj.mode>=10 && dragObj.mode<11) { //if ineq, delete ineq
+				ineqlines[curTarget].splice(dragObj.num,1);
+				//ineqlines[curTarget][dragObj.num][dragObj.subnum] = oldpointpos;
 				curIneqcurve = null;
 			}
 			dragObj = null;
@@ -876,7 +993,7 @@ function drawMouseMove(ev) {
 							if (dist>25) {
 								lines[curTarget][curLine].push([mouseOff.x,mouseOff.y]);
 								drawTarget();
-					} else {
+							} else {
 								drawTarget(mouseOff.x,mouseOff.y);
 							}
 						} else {

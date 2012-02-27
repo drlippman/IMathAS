@@ -73,6 +73,38 @@
 				
 			});
 			
+			ed.onKeyDown.add(function(ed, ev) {
+				if (ev.keyCode == 13 || ev.keyCode == 35 || ev.keyCode == 40) {
+				    var rng, AMcontainer, dom = ed.dom;
+		
+				    AMcontainer = dom.getParent(ed.selection.getNode(), 'span.AMedit');
+		
+				    if (AMcontainer) {
+					/*rng = dom.createRng();
+		
+					if (e.keyCode == 37 || e.keyCode == 38) {
+					    rng.setStartBefore(AMcontainer);
+					    rng.setEndBefore(AMcontainer);
+					} else {
+					    rng.setStartAfter(AMcontainer);
+					    rng.setEndAfter(AMcontainer);
+					}
+					ed.selection.setRng(rng);
+					*/
+					ed.selection.select(AMcontainer);
+					ed.selection.collapse(false);
+				    }
+				} else if (ev.keyCode == 46 || ev.keyCode == 8) {
+					/* handle backspaces - not working :( */
+				    node = ed.selection.getNode();
+				    console.log(node);
+				    var AMcontainer = ed.dom.getParent(node, 'span.AM');
+				    if (AMcontainer) {
+					AMcontainer.parentNode.removeChild(AMcontainer);
+				    }
+				}
+			});
+			
 			ed.onKeyPress.add(function(ed, ev) {
 				var key = String.fromCharCode(ev.charCode || ev.keyCode);
 				if (key=='`') {
@@ -102,7 +134,7 @@
 						ev.cancelBubble = true;
 						ev.returnValue = false;
 				       }
-				}
+				} 
 			});
 			
 			// Register asciimath button
