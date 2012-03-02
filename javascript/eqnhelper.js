@@ -167,11 +167,12 @@ function unhideee(t) {
 	eecancelclosetimer();
 }
 function hideee(t) {
-	if (eecurel==null) {
-		ddclosetimer = window.setTimeout(function() {cureedd = null; document.getElementById("eedd").style.display = "none";},250);
-	} else {
+	if (eecurel!=null) {
 		eeclosetimer = window.setTimeout(reallyhideee,250);
 	}
+}
+function hideeedd() {
+	ddclosetimer = window.setTimeout(function() {cureedd = null; document.getElementById("eedd").style.display = "none";},250);
 }
 function reallyhideee() {
 	var ee = document.getElementById('ee');

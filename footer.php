@@ -11,9 +11,12 @@
 if (isset($useeditor) && $sessiondata['useed']==1) {
 	//echo "<script type=\"text/javascript\">initEditor();</script>\n";
 }
-if (isset($useeqnhelper) && $useeqnhelper==true) {
+if (isset($useeqnhelper) && ($useeqnhelper==1 || $useeqnhelper==2)) {
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	require("$curdir/assessment/eqnhelper.html");
+} else if (isset($useeqnhelper) && ($useeqnhelper==3 || $useeqnhelper==4)) {
+	$curdir = rtrim(dirname(__FILE__), '/\\');
+	require("$curdir/assessment/mathquilled.html");
 }
 if ((isset($testsettings) && $testsettings['showtips']==2) || (isset($showtips) && $showtips==2)) {
 	echo '<div id="ehdd" class="ehdd"><span id="ehddtext"></span> <span onclick="showeh(curehdd);" style="cursor:pointer;">[more..]</span></div>';

@@ -5,7 +5,7 @@
 var ehcurel = null;
 var ehclosetimer = 0;
 var ehddclosetimer = 0;
-var ehddcur = null;
+var curehdd = null;
 var eecurel = null; //so will be defined if eqnhelper isn't being used
 
 //show expanded eqn tip

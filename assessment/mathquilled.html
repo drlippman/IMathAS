@@ -1,0 +1,115 @@
+<div id="mqeedd" class="mqeedd" onclick="showee();">&uarr;</div>
+<div id="mqee">
+<div id="mqeetopbar"><span>MathQuill</span><div id="mqeeclosebutton" onclick="hideee()">X</div></div>
+<div id="mqeeinsides">
+<div id="mqeeeditorcont">
+
+<div id="bigtabcontainer">
+<ul class="tabs">
+	<li><a href="#tabs-basic">Basic</a></li>
+	<li><a href="#tabs-general">General</a></li>
+	<li><a href="#tabs-intervals">Intervals</a></li>
+	<li><a href="#tabs-inequalities">Inequalities</a></li>
+	<li><a href="#tabs-functions">Functions</a></li>
+	<li><a href="#tabs-trig">Trig</a></li>
+</ul>
+<div class="tab_container">
+<div id="tabs-basic" class="tab_content">
+<table >
+<tr>
+<td class="mqeebtn" btntext="\\frac" btntype="0"><sup>x</sup>/<sub>y</sub></td>
+<td class="mqeebtn" btntext="^" btntype="0">x<sup>y</sup></td>
+<td class="mqeebtn" btntext="\\sqrt" btntype="0">&radic;</td>
+<td class="mqeebtn" btntext="\\nthroot{3}" btntype="2"><sup>3</sup>&radic;</td>
+<td class="mqeebtn" btntext="|" btntype="0">| x |</td>
+<td class="mqeebtn" btntext="(" btntype="0">( )</td>
+<td class="mqeebtn" btntext="\\pi" btntype="1">&pi;</td>
+<td class="mqeebtn" btntext="\\infty" btntype="1">&infin;</td>
+<td class="mqeebtn" btntext="DNE" btntype="1">DNE</td>
+</tr>
+</table>
+</div>
+
+<div id="tabs-general" class="tab_content">
+<table>
+<tr>
+<td class="mqeebtn" btntext="\\frac" btntype="0"><sup>x</sup>/<sub>y</sub></td>
+<td class="mqeebtn" btntext="^" btntype="0">x<sup>y</sup></td>
+<td class="mqeebtn" btntext="\\sqrt" btntype="0">&radic;</td>
+<td class="mqeebtn" btntext="(" btntype="0">( )</td>
+<td class="mqeebtn" btntext="\\pi" btntype="1">&pi;</td>
+<td class="mqeebtn" btntext="\\infty" btntype="1">&infin;</td>
+<td class="mqeebtn" btntext="DNE" btntype="1">DNE</td>
+</tr>
+</table>
+</div>
+
+<div id="tabs-intervals" class="tab_content">
+<table>
+<tr>
+<td class="mqeebtn" btntext="(" btntype="4">(  )</td>
+<td class="mqeebtn" btntext="\\intervalopenleft" btntype="4">(  ]</td>
+<td class="mqeebtn" btntext="\\intervalopenright" btntype="4">[ )</td> 
+<td class="mqeebtn" btntext="[" btntype="4">[   ]</td>
+<td class="mqeebtn" btntext="-\\infty" btntype="1">-&infin;</td>
+<td class="mqeebtn" btntext="\\infty" btntype="1">&infin;</td>
+<td class="mqeebtn" btntext="DNE" btntype="1">DNE</td>
+</tr>
+</table>
+</div>
+
+<div id="tabs-inequalities" class="tab_content">
+<table>
+<tr>
+<td class="mqeebtn" btntext="<" btntype="1">&lt;</td>
+<td class="mqeebtn" btntext=">" btntype="1">&gt;</td>
+<td class="mqeebtn" btntext="\\le" btntype="1">&le;</td>
+<td class="mqeebtn" btntext="\\ge" btntype="1">&ge;</td>
+<td class="mqeebtn" btntext="\\text{ or }" btntype="1">or</td>
+<td class="mqeebtn" btntext="\\text{all real numbers}" btntype="1">All Real Numbers</td>
+<td class="mqeebtn" btntext="DNE" btntype="1">DNE</td>
+</tr>
+</table>
+</div>
+
+<div id="tabs-functions" class="tab_content">
+<table>
+<tr>
+<td class="mqeebtn" btntext="\\log" btntype="3">log</td>
+<td class="mqeebtn" btntext="\\log_2" btntype="3">log<sub><sub>2</sub></sub></td>
+<td class="mqeebtn" btntext="\\ln" btntype="3">ln</td>
+<td class="mqeebtn" btntext="|" btntype="0">| x |</td>
+<td class="mqeebtn" btntext="e^" btntype="2">e<sup>x</sup></td>
+</tr>
+</table>
+</div>
+
+<div id="tabs-trig" class="tab_content">
+<table>
+<tr>
+<td class="mqeebtn" btntext="\\sin" btntype="3">sin</td>
+<td class="mqeebtn" btntext="\\cos" btntype="3">cos</td>
+<td class="mqeebtn" btntext="\\tan" btntype="3">tan</td>
+<td class="mqeebtn" btntext="\\sin^2" btntype="3">sin<sup>2</sup></td>
+<td class="mqeebtn" btntext="\\arcsin" btntype="3">sin<sup>-1</sup></td>
+<td class="mqeebtn" btntext="\\arccos" btntype="3">cos<sup>-1</sup></td>
+<td class="mqeebtn" btntext="\\arctan" btntype="3">tan<sup>-1</sup></td>
+<td class="mqeebtn" btntext="\\langle" btntype="0">&lt;  &gt;</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+
+
+<div id="mqholder"><span class="mathquill-editable" id="mqarea" ></span></div>
+</div>
+
+<input type="button" value="Save" onclick="savemathquill()" style="float: right;"/>
+<table>
+<tr><td></td><td class="mqeebtn" btntext="u" btntype="5">&uarr;</td><td></td></tr>
+<tr><td class="mqeebtn" btntext="l" btntype="5">&larr;</td><td></td><td class="mqeebtn" btntext="r" btntype="5">&rarr;</td></tr>
+<tr><td></td><td class="mqeebtn" btntext="d" btntype="5">&darr;</td><td></td></tr>
+</table>
+</div>
+</div>
