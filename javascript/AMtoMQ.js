@@ -436,7 +436,7 @@ function AMQTparseSexpr(str) { //parses str and returns [node,tailstr]
         		if (symbol.input=='abs') {
         			node = '\\left|'+AMQTremoveBrackets(result[0])+'\\right|';
         		} else {
-        			node = AMQTgetTeXsymbol(symbol)+result[0];
+        			node = AMQTgetTeXsymbol(symbol)+((st=='(')?"":" ")+result[0];
         		}
         	}
 		return [node,result[1]];
@@ -548,7 +548,7 @@ function AMQTparseIexpr(str) {
     }
   } 
   
-  return [node,str];
+  return [node+' ',str];
 }
 
 function AMQTparseExpr(str,rightbracket) {
@@ -668,7 +668,7 @@ function AMQTparseExpr(str,rightbracket) {
 	  newFrag += '\\right.'; //adjust for non-matching left brackets
 	  //todo: adjust for non-matching right brackets
   }
-  
+  alert(newFrag);
   return [newFrag,str];
 }
 
