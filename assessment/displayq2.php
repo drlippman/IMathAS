@@ -1653,6 +1653,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$out .= '/>';
 				$out .= "<img src=\"$imasroot/img/tpsin.png\" onclick=\"settool(this,$qn,9.1)\"/>";
 			}
+			if (in_array('vector',$answerformat)) {
+				$out .= "<img src=\"$imasroot/img/tpvec.gif\" onclick=\"settool(this,$qn,5.4)\" ";
+				if (count($answerformat)>1 && $answerformat[1]=='vector') { $out .= 'class="sel" '; $def = 5.4;}
+				$out .= '/>';
+			}
 		} else {
 			if ($answerformat[0]=='numberline') {
 				array_shift($answerformat);
@@ -1729,6 +1734,18 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 						if ($locky==1) {
 							$saarr[$k] .=',,2';
 						}
+					} else if ($function[0]=='vector') {
+						if (count($function)>4) {
+							$dx = $function[3] - $function[1];
+							$dy = $function[4] - $function[2];
+							$xs = $function[1];
+							$ys = $function[2];
+						} else {
+							$dx = $function[1];
+							$dy = $function[2];
+							$xs = 0; $ys = 0;
+						}
+						$saarr[$k] = "[$xs + ($dx)*t, $ys + ($dy)*t],blue,0,1,,arrow";
 					} else if ($function[0]=='circle') { //is circle
 						$saarr[$k] = "[{$function[3]}*cos(t)+{$function[1]},{$function[3]}*sin(t)+{$function[2]}],blue,0,6.31";
 					} else if (substr($function[0],0,2)=='x=') {
@@ -3044,6 +3061,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$pixelsperx = ($settings[6] - 2*$imgborder)/($settings[1]-$settings[0]);
 		$pixelspery = ($settings[7] - 2*$imgborder)/($settings[3]-$settings[2]);
 		
+		$xtopix = create_function('$x',"return ((\$x - ({$settings[0]}))*($pixelsperx) + ($imgborder));");
+		$ytopix = create_function('$y',"return (({$settings[7]}) - (\$y- ({$settings[2]}))*($pixelspery) - ($imgborder));");
+		
 		$anslines = array();
 		$ansdots = array();
 		$ansodots = array();
@@ -3153,18 +3173,19 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$ansabs = array();
 			$anssqrts = array();
 			$anscoss = array();
+			$ansvecs = array();
 			$x0 = $settings[0];
 			$x1 = 1/4*$settings[1] + 3/4*$settings[0];
 			$x2 = 1/2*$settings[1] + 1/2*$settings[0];
 			$x3 = 3/4*$settings[1] + 1/4*$settings[0];
 			$x4 = $settings[1];
 			$x0p = $imgborder;
-			$x1p = ($x1 - $settings[0])*$pixelsperx + $imgborder;
-			$x2p = ($x2 - $settings[0])*$pixelsperx + $imgborder;
-			$x3p = ($x3 - $settings[0])*$pixelsperx + $imgborder;
-			$x4p = ($x4 - $settings[0])*$pixelsperx + $imgborder;
+			$x1p = $xtopix($x1); //($x1 - $settings[0])*$pixelsperx + $imgborder;
+			$x2p = $xtopix($x2); //($x2 - $settings[0])*$pixelsperx + $imgborder;
+			$x3p = $xtopix($x3); //($x3 - $settings[0])*$pixelsperx + $imgborder;
+			$x4p = $xtopix($x4); //($x4 - $settings[0])*$pixelsperx + $imgborder;
 			$ymid = ($settings[2]+$settings[3])/2;
-			$ymidp = $settings[7] - ($ymid-$settings[2])*$pixelspery - $imgborder;
+			$ymidp = $ytopix($ymid); //$settings[7] - ($ymid-$settings[2])*$pixelspery - $imgborder;
 			foreach ($answers as $key=>$function) {
 				if ($function=='') { continue; }
 				$function = explode(',',$function);
@@ -3182,7 +3203,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						$ansodots[$key] = array($pixx,$pixy);
 					}
 					continue;
-				} else if ($function[0]=='circle') {
+				} else if ($function[0]=='vector') {
+					if (count($function)>4) { // form "vector, x_start, y_start, x_end, y_end"
+						$ansvecs[$key] = array('p', $xtopix($function[1]), $ytopix($function[2]), $xtopix($function[3]), $ytopix($function[4]));
+					} else if (count($function)>2) {  //form "vector, dx, dy"
+						$ansvecs[$key] = array('d', $function[1]*$pixelsperx, -1*$function[2]*$pixelspery);
+					}
+				} else if ($function[0]=='circle') {  // form "circle,x_center,y_center,radius"
 					$anscircs[$key] = array(($function[1] - $settings[0])*$pixelsperx + $imgborder,$settings[7] - ($function[2]-$settings[2])*$pixelspery - $imgborder,$function[3]*$pixelsperx);
 				} else if (substr($function[0],0,2)=='x=') {
 					$anslines[$key] = array('x',10000,(substr($function[0],2)- $settings[0])*$pixelsperx + $imgborder );
@@ -3301,6 +3328,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$abs = array();
 			$sqrts = array();
 			$coss = array();
+			$vecs = array();
 			if ($tplines=='') {
 				$tplines = array();
 			} else {
@@ -3320,6 +3348,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 								$lines[] = array('y',$slope,$pts[2]+($x2p-$pts[1])*$slope);
 							}
 						}
+					} else if ($pts[0]==5.4) {
+						$vecs[] = array($pts[1],$pts[2],$pts[3],$pts[4]);	
 					} else if ($pts[0]==6) {
 						//parab
 						if ($pts[4]==$pts[2]) {
@@ -3427,6 +3457,39 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					}
 					$scores[$key] = 1;
 					break;
+				}
+			}
+			
+			foreach ($ansvecs as $key=>$ansvec) {
+				$scores[$key] = 0;
+				if ($ansvec[0]=='p') {
+					for ($i=0; $i<count($vecs); $i++) {
+						if (abs($ansvec[1]-$vecs[$i][0])>$defpttol*$reltolerance) {
+							continue;
+						}
+						if (abs($ansvec[2]-$vecs[$i][1])>$defpttol*$reltolerance) {
+							continue;
+						}
+						if (abs($ansvec[3]-$vecs[$i][2])>$defpttol*$reltolerance) {
+							continue;
+						}
+						if (abs($ansvec[4]-$vecs[$i][3])>$defpttol*$reltolerance) {
+							continue;
+						}
+						$scores[$key] = 1;
+						break;
+					}
+				} else {
+					for ($i=0; $i<count($vecs); $i++) {
+						if (abs($ansvec[1]-($vecs[$i][2] - $vecs[$i][0]))>$defpttol*$reltolerance) {
+							continue;
+						}
+						if (abs($ansvec[2]-($vecs[$i][3] - $vecs[$i][1]))>$defpttol*$reltolerance) {
+							continue;
+						}
+						$scores[$key] = 1;
+						break;
+					}
 				}
 			}
 			

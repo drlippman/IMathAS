@@ -285,7 +285,7 @@ function drawTarget(x,y) {
 		if (tptypes[curTarget][i]>=5 && tptypes[curTarget][i]<6) {//if a tpline 
 			var slope = null;
 			var x2 = null;
-			var y2 = null;
+			var y2 = null; var u, uperp;
 			if (tplines[curTarget][i].length==2) {  //if two points set
 				x2 = tplines[curTarget][i][1][0];
 				y2 = tplines[curTarget][i][1][1];
@@ -294,9 +294,21 @@ function drawTarget(x,y) {
 				y2 = y;
 			}
 			if (x2 != null) { //at least one point set
-				if (tptypes[curTarget][i]==5.3) {
+				if (tptypes[curTarget][i]==5.3 || tptypes[curTarget][i]==5.4) {
 					ctx.moveTo(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1]);
 					ctx.lineTo(x2,y2);
+					if (tptypes[curTarget][i]==5.4) {
+						var u = [x2 - tplines[curTarget][i][0][0], y2 - tplines[curTarget][i][0][1]];
+						var d = Math.sqrt(u[0]*u[0]+u[1]*u[1]);
+						if (d > 0.0001) {
+						 	 u = [u[0]/d, u[1]/d];
+						 	 uperp = [-u[1],u[0]];
+						 	 ctx.moveTo(x2 - 15*u[0]-4*uperp[0],y2-15*u[1]-5*uperp[1]);
+						 	 ctx.lineTo(x2,y2);
+						 	 ctx.moveTo(x2 - 15*u[0]+4*uperp[0],y2-15*u[1]+5*uperp[1]);
+						 	 ctx.lineTo(x2,y2);
+						 }
+					} 	 
 				} else {
 					if (x2!=tplines[curTarget][i][0][0]) {
 						var slope = (y2 - tplines[curTarget][i][0][1])/(x2-tplines[curTarget][i][0][0]);
