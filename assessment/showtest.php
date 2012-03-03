@@ -639,8 +639,9 @@ if (!isset($_POST['embedpostback'])) {
 		if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE')!==false) {
 			$placeinhead .= '<!--[if lte IE 7]><style style="text/css">
 				.mathquill-editable.empty { width: 0.5em; }
+				.mathquill-rendered-math .numerator.empty, .mathquill-rendered-math .empty { padding: 0 0.25em;}
 				.mathquill-rendered-math sup { line-height: .8em; }
-				.mathquill-rendered-math .numerator {float: left;}
+				.mathquill-rendered-math .numerator {float: left; padding: 0;}
 				.mathquill-rendered-math .denominator { clear: both;width: auto;float: left;}
 				</style><![endif]-->';
 		}
