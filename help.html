@@ -2281,9 +2281,12 @@ A student is asked to enter a string (a word or list of letters).
 		<li>ignore_order: treats ABC and CBA as equivalent</li>
 		<li>ignore_commas: removes commas</li>
 		<li>partial_credit: awards partial credit based on Levenshtein distance between strings</li>
+		<li>allow_diff=n: gives full credit for answers with Levenshtein distance between strings &le; n </li>
+		<li>in_answer: gives credit if $answer is contained anywhere in the student answer</li>
 		<li>special_or: use <b>*or*</b> for separating answers rather than <b>or</b>.</li>
 		</ul>
-		By default, compress_whitespace and ignore_case are On.</dd>
+		By default, compress_whitespace and ignore_case are On.  Only one of
+		partial_credit, allow_diff, or in_answer may be used at a time.</dd>
 <dt>$ansprompt = string (In Question Control)</dt>
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="type: "</dd>
 <dt>$answerboxsize = number (In Question Control)</dt>

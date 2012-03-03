@@ -171,9 +171,7 @@ if (!(isset($teacherid))) {
 			if (isset($_POST['chgeqnhelper'])) {
 				$sets[] = "eqnhelper='{$_POST['eqnhelper']}'";
 			}
-			if (isset($_POST['chgavail'])) {
-				$sets[] = "avail='{$_POST['avail']}'";
-			}
+			
 			if (isset($_POST['chgcaltag'])) {
 				$caltag = $_POST['caltagact'];
 				$sets[] = "caltag='$caltag'";
@@ -220,6 +218,9 @@ if (!(isset($teacherid))) {
 				$sets[] = $shuff;
 				
 			}
+		}
+		if (isset($_POST['chgavail'])) {
+			$sets[] = "avail='{$_POST['avail']}'";
 		}
 		if (isset($_POST['chgintro'])) {
 			$query = "SELECT intro FROM imas_assessments WHERE id='{$_POST['intro']}'";

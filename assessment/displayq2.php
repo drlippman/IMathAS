@@ -2865,6 +2865,16 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$dist = levenshtein($anans,$givenans);
 				$score = ($poss - $dist)/$poss;
 				if ($score>$correct) { $correct = $score;}
+			} else if (isset($flags['allow_diff'])) {
+				if (levenshtein($anans,$givenans) <= 1*$flags['allow_diff']) {
+					$correct = 1;
+					break;
+				}
+			} else if (isset($flags['in_answer'])) {
+				if (strpos($givenans,$anans)!==false) {
+					$correct = 1;
+					break;
+				}
 			} else {
 				if (!strcmp($anans,$givenans)) {
 					$correct = 1;
