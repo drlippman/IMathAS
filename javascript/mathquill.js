@@ -963,7 +963,7 @@ _.html_template = [
 _.text_template = ['(', '/', ')'];
 _.redraw = function() {
 	  // Fixes display in IE7 - where each numerator/denominator pair aren't set to equal widths
-	 if ($.browser.msie  && parseInt($.browser.version, 10) === 7) {
+	 if ($.browser.msie  && parseInt($.browser.version, 10) <= 7) {
 		var $self = this.jQ,
 		$num = $self.children('.numerator'),
 		$denom = $self.children('.denominator'),
