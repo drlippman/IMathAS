@@ -179,7 +179,7 @@ AMQsqrt, AMQroot, AMQfrac, AMQdiv, AMQover, AMQsub, AMQsup,
 //{input:"dot", tag:"mover", output:".",      tex:null, ttype:UNARY, acc:true},
 //{input:"ddot", tag:"mover", output:"..",    tex:null, ttype:UNARY, acc:true},
 //{input:"ul", tag:"munder", output:"\u0332", tex:"underline", ttype:UNARY, acc:true},
-AMQtext, AMQmbox, AMQquote,
+AMQtext, AMQmbox, AMQquote
 //{input:"var", tag:"mstyle", atname:"fontstyle", atval:"italic", output:"var", tex:null, ttype:UNARY},
 //{input:"color", tag:"mstyle", ttype:BINARY}
 ];
@@ -193,13 +193,16 @@ var AMQnames = []; //list of input symbols
 
 function AMQinitSymbols() {
   var texsymbols = [], i;
-  for (i=0; i<AMQsymbols.length; i++)
-    if (typeof(AMQsymbols[i].tex)!='undefined' && !(typeof AMQsymbols[i].notexcopy == "boolean" && AMQsymbols[i].notexcopy)) 
-      texsymbols[texsymbols.length] = {input:AMQsymbols[i].tex, 
-        tag:AMQsymbols[i].tag, output:AMQsymbols[i].output, ttype:AMQsymbols[i].ttype};
+  for (i=0; i<AMQsymbols.length; i++) {
+	  if (typeof AMQsymbols[i].tex !='undefined' && AMQsymbols[i].tex != null && !(typeof AMQsymbols[i].notexcopy == "boolean" && AMQsymbols[i].notexcopy)) { 
+		  texsymbols[texsymbols.length] = {input:AMQsymbols[i].tex, 
+		  tag:AMQsymbols[i].tag, output:AMQsymbols[i].output, ttype:AMQsymbols[i].ttype};
+	  }
+  }
   AMQsymbols = AMQsymbols.concat(texsymbols);
   AMQsymbols.sort(compareNames);
   for (i=0; i<AMQsymbols.length; i++) AMQnames[i] = AMQsymbols[i].input;
+  
 }
 
 function AMQremoveCharsAndBlanks(str,n) {

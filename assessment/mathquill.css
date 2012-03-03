@@ -397,12 +397,13 @@
 
 #mqee {
 	position: absolute;
+	width: 500px;
 	left: -400px;
-	width: auto;
 	background: #eee;
 	border: 2px solid #009;
 	margin:0; padding: 0;
 	display: none;
+	z-index: 10;
 }
 #mqeetopbar {
 	background: #006;
@@ -436,8 +437,10 @@
 	margin: 10px 5px;
 }
 #mqarea {
-	min-width: 25em;
+	width: 475px;
 	min-height: 2em;
+	background: #fff;
+	font-size: 120%;
 }
 .mqeebtn {
 	font-family: "Times New Roman", Times, serif;

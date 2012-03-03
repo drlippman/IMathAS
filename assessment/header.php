@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
-<meta http-equiv="X-UA-Compatible" content="IE=7, IE=9" />
+
 <title><?php echo $installname;?> Assessment</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <?php
@@ -60,7 +60,7 @@ if ($sessiondata['graphdisp']==1) {
 }
 ?>
 <!--[if lte IE 6]> 
-<style> 
+<style type="text/css"> 
 div { zoom: 1; } 
 .clear { line-height: 0;}
 #GB_overlay, #GB_window { 

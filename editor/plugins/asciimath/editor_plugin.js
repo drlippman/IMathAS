@@ -97,7 +97,6 @@
 				} else if (ev.keyCode == 46 || ev.keyCode == 8) {
 					/* handle backspaces - not working :( */
 				    node = ed.selection.getNode();
-				    console.log(node);
 				    var AMcontainer = ed.dom.getParent(node, 'span.AM');
 				    if (AMcontainer) {
 					AMcontainer.parentNode.removeChild(AMcontainer);

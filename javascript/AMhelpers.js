@@ -157,7 +157,7 @@ function intcalculate(inputId,outputId,format) {
 		var origstr = fullstr;
 		fullstr = ineqtointerval(fullstr);
 		var pat = str.match(/([a-zA-Z]+)/);
-		var ineqvar = pat[1];
+		var ineqvar = (pat != null)?pat[1]:'';
 	  } else {
 		  fullstr = fullstr.replace(/\s+/g,'');
 	  }

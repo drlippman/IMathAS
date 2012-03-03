@@ -76,7 +76,7 @@ function sandboxgetweights($code,$seed) {
 		$n = count($anstypes);
 		if ($n>1) {
 			$answeights = array_fill(0,$n-1,round(1/$n,5));
-			$answeights[] = 1-array_sum($weights);
+			$answeights[] = 1-array_sum($answeights);
 		} else {
 			$answeights = array(1);
 		}

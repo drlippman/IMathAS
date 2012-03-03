@@ -420,24 +420,11 @@ function formattime($cur) {
 }
 function getansweights($code,$seed) {
 	$foundweights = false;
-	if (($p = strpos($code,'answeights'))!==false) {
-		$p = strpos($code,"\n",$p);
-		$weights = sandboxgetweights($code,$seed);
-		if (is_array($weights)) {
-			return $weights;
-		}
-		
-	} 
-	if (!$foundweights) {
-		preg_match('/anstypes\s*=(.*)/',$line['control'],$match);
-		$n = substr_count($match[1],',')+1;
-		if ($n>1) {
-			$weights = array_fill(0,$n-1,round(1/$n,3));
-			$weights[] = 1-array_sum($line['answeights']);
-			return $weights;
-		} else {
-			return array(1);
-		}
+	$weights = sandboxgetweights($code,$seed);
+	if (is_array($weights)) {
+		return $weights;
+	} else {
+		return array(1);
 	}
 }
 
@@ -445,12 +432,21 @@ function sandboxgetweights($code,$seed) {
 	srand($seed);
 	eval(interpret('control','multipart',$code));
 	if (!isset($answeights)) {
-		return false;
-	} else if (is_array($answeights)) {
-		return $answeights;
-	} else {
-		return explode(',',$answeights);
-	}
+		if (!is_array($anstypes)) {
+			$anstypes = explode(",",$anstypes);
+		}
+		$n = count($anstypes);
+		if ($n>1) {
+			$answeights = array_fill(0,$n-1,round(1/$n,5));
+			$answeights[] = 1-array_sum($answeights);
+		} else {
+			$answeights = array(1);
+		}
+	} else if (!is_array($answeights)) {
+		$answeights =  explode(',',$answeights);
+	} 
+
+	return $answeights;
 }
 
 function printscore($sc,$qsetid,$seed) {
@@ -465,20 +461,25 @@ function printscore($sc,$qsetid,$seed) {
 		$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
 		$control = mysql_result($result,0,0);
 		$ptposs = getansweights($control,$seed);
-		
+		$weightsum = array_sum($ptposs);
+		if ($weightsum>1.1) {
+			$poss = $weightsum;
+		} else {
+			$poss = count($ptposs);
+		}
 		for ($i=0; $i<count($ptposs)-1; $i++) {
-			$ptposs[$i] = round($ptposs[$i]*$poss,2);
+			$ptposs[$i] = round($ptposs[$i]/$weightsum*$poss,2);
 		}
 		//adjust for rounding
 		$diff = $poss - array_sum($ptposs);
 		$ptposs[count($ptposs)-1] += $diff;
 		
-		
-		$pts = getpts($sc);
+		$pts = getpts($sc,$poss);
 		$sc = str_replace('-1','N/A',$sc);
 		//$sc = str_replace('~',', ',$sc);
 		$scarr = explode('~',$sc);
 		foreach ($scarr as $k=>$v) {
+			$v = round($v * $poss, 2);
 			if ($ptposs[$k]==0) {
 				$pm = 'gchk';
 			} else if (!is_numeric($v) || $v==0) { 
@@ -494,7 +495,8 @@ function printscore($sc,$qsetid,$seed) {
 		$sc = implode(', ',$scarr);
 		//$ptposs = implode(', ',$ptposs); 
 		$out =  "$pts out of $poss (parts: $sc)";
-	}	
+	}
+
 	$bar = '<span class="scorebarholder">';
 	if ($poss==0) {
 		$w = 30;
@@ -514,15 +516,15 @@ function printscore($sc,$qsetid,$seed) {
 	return $bar . $out;	
 }
 
-function getpts($sc) {
+function getpts($sc,$poss=1) {
 	if (strpos($sc,'~')===false) {
-		return $sc;
+		return $sc*$poss;
 	} else {
 		$sc = explode('~',$sc);
 		$tot = 0;
 		foreach ($sc as $s) {
 			if ($s>0) { 
-				$tot+=$s;
+				$tot+=$s*$poss;
 			}
 		}
 		return round($tot,1);

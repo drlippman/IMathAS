@@ -93,6 +93,8 @@
 				$str = preg_replace_callback('/<\s*embed[^>]*?sscr=(.)(.+?)\1.*?>/s','svgfiltersscrcallback',$str);
 				$str = preg_replace_callback('/<\s*embed[^>]*?script=(.)(.+?)\1.*?>/s','svgfilterscriptcallback',$str);
 			}
+		} else {
+			$str = str_replace("<embed type='image/svg+xml'","<embed type='image/svg+xml' wmode=\"transparent\" ",$str);
 		}
 	
 		if (strpos($str,'[WA')!==false) {
