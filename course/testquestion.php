@@ -74,7 +74,7 @@ if ($myrights<20) {
 	}
 	
 	
-	$query = "SELECT imas_users.email,imas_questionset.author,imas_questionset.description,imas_questionset.lastmoddate,imas_questionset.ancestors,imas_questionset.deleted ";
+	$query = "SELECT imas_users.email,imas_questionset.author,imas_questionset.description,imas_questionset.lastmoddate,imas_questionset.ancestors,imas_questionset.deleted,imas_questionset.ownerid ";
 	$query .= "FROM imas_users,imas_questionset WHERE imas_users.id=imas_questionset.ownerid AND imas_questionset.id='{$_GET['qsetid']}'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$email = mysql_result($result,0,0);
@@ -83,6 +83,7 @@ if ($myrights<20) {
 	$lastmod = date("m/d/y g:i a",mysql_result($result,0,3));
 	$ancestors = mysql_result($result,0,4);
 	$deleted = mysql_result($result,0,5);
+	$ownerid = mysql_result($result,0,6);
 	if (isset($CFG['AMS']['showtips'])) {
 		$showtips = $CFG['AMS']['showtips'];
 	} else {
@@ -175,8 +176,11 @@ if ($overwriteBody==1) {
 	echo htmlentities($message);
 	echo '</code>';
 				
-	
-	echo "<p>Question id: {$_GET['qsetid']}.  <a href=\"mailto:$email?subject=Problem%20with%20question%20id%20{$_GET['qsetid']}\">E-mail owner</a> to report problems</p>";
+	if (isset($CFG['GEN']['sendquestionproblemsthroughcourse'])) {
+		echo "<p>Question id: {$_GET['qsetid']}.  <a href=\"$imasroot/msgs/msglist.php?add=new&cid={$CFG['GEN']['sendquestionproblemsthroughcourse']}&to=$ownerid&title=Problem%20with%20question%20id%20{$_GET['qsetid']}\" target=\"_blank\">Message owner</a> to report problems</p>";
+	} else {
+		echo "<p>Question id: {$_GET['qsetid']}.  <a href=\"mailto:$email?subject=Problem%20with%20question%20id%20{$_GET['qsetid']}\">E-mail owner</a> to report problems</p>";
+	}
 	echo "<p>Description: $descr</p><p>Author: $author</p>";
 	echo "<p>Last Modified: $lastmod</p>";
 	if ($deleted==1) {

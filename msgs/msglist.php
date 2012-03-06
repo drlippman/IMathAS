@@ -195,6 +195,10 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				} else {
 					$title = '';
 				}
+			} else if (isset($_GET['title'])) {
+				$title = $_GET['title'];
+				$message = '';
+				$courseid=$cid;
 			} else {
 				$title = '';
 				$message = '';

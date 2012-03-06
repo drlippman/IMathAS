@@ -137,7 +137,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			$query = "SELECT files FROM imas_forum_posts WHERE id='{$_GET['modify']}'";
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			$files = mysql_result($result,0,0);
-			if ($file=='') {
+			if ($files=='') {
 				$files = array();
 			} else {
 				$files = explode('@@',$files);

@@ -353,6 +353,7 @@ function deleteuserfile($uid,$file) {
 		}
 	}
 }
+
 function deleteforumfile($postid,$file) {
 	if ($GLOBALS['filehandertype'] == 's3') {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
@@ -371,6 +372,26 @@ function deleteforumfile($postid,$file) {
 		}
 	}
 }
+
+function deletefilebykey($key) {
+	if ($GLOBALS['filehandertype'] == 's3') {
+		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		$s3object = "$key";
+		if($s3->deleteObject($GLOBALS['AWSbucket'],$s3object)) {
+			return true;
+		}else {
+			return false;
+		}
+	} else {
+		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
+		if (unlink($base."/$key")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+}
+
 function deleteallpostfiles($postid) {
 	$delcnt = 0;
 	if ($GLOBALS['filehandertype'] == 's3') {
