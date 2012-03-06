@@ -668,7 +668,7 @@ function AMQTparseExpr(str,rightbracket) {
 	  newFrag += '\\right.'; //adjust for non-matching left brackets
 	  //todo: adjust for non-matching right brackets
   }
-  alert(newFrag);
+ 
   return [newFrag,str];
 }
 
