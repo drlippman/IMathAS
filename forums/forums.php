@@ -98,6 +98,15 @@
 		$itemsassoc[$row[0]] = $row[1];
 	}
 	
+	$maxitemnum = max($itemsimporder) + 1;
+	//add non-course page forums
+	foreach ($forumdata as $fid=>$line) {
+		if (in_array($fid,$itemsassoc)) { continue; } //already listed
+		$itemsassoc[$maxitemnum] = $fid;
+		$itemsimporder[] = $maxitemnum;
+		$maxitemnum++;
+	}
+	
 	//construct tag list selector
 	$taginfo = array();
 	foreach ($itemsimporder as $item) {
