@@ -356,7 +356,7 @@ END;
 			$studentid = $line['id'];
 			$studentinfo['timelimitmult'] = $line['timelimitmult'];
 			$studentinfo['section'] = $line['section'];
-			if ($line['locked']==1) {
+			if ($line['locked']>0) {
 				require("header.php");
 				echo "<p>You have been locked out of this course by your instructor.  Please see your instructor for more information.</p>";
 				echo "<p><a href=\"$imasroot/index.php\">Home</a></p>";
