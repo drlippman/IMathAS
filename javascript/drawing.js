@@ -646,6 +646,7 @@ function encodeDraw() {
 }
 
 function drawMouseDown(ev) {
+	
 	if (hasTouch && ev.touches.length>1) {
 		return true;  //bypass when multitouching to prevent interference with pinch zoom
 	}
@@ -660,6 +661,9 @@ function drawMouseDown(ev) {
 		}
 	}
 	if (curTarget!=null) { //is a target currectly in action?
+		if( navigator.userAgent.match(/Android/i) ) {
+			ev.preventDefault();
+		}
 		mouseisdown = true;
 		var tarelpos = getPosition(targets[curTarget].el);
 		var mouseOff = {x:(mousePos.x - tarelpos.x), y: (mousePos.y-tarelpos.y)};

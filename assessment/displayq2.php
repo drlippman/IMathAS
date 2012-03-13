@@ -915,12 +915,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$qnref = ($multi-1).'-'.($qn%1000);
 			}
 			if ($useeqnhelper) {
-				$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper);showehdd('tc$qn','$shorttip','$qnref');\" onblur=\"hideeedd();hideeh();\" onclick=\"reshrinkeh('tc$qn')\" ";
+				$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper);showehdd('tc$qn','$shorttip','$qnref');\" onblur=\"hideee();hideeedd();hideeh();\" onclick=\"reshrinkeh('tc$qn')\" ";
 			} else {
 				$out .= "onfocus=\"showehdd('tc$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" onclick=\"reshrinkeh('tc$qn')\" ";
 			}
 		} else if ($useeqnhelper) {
-			$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper)\" onblur=\"hideeedd();\" ";
+			$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper)\" onblur=\"hideee();hideeedd();\" ";
 		}
 		$out .= "/>$rightb\n";
 		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
@@ -1061,12 +1061,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$qnref = ($multi-1).'-'.($qn%1000);
 			}
 			if ($useeqnhelper) {
-				$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper);showehdd('tc$qn','$shorttip','$qnref');\" onblur=\"hideeedd();hideeh();\" onclick=\"reshrinkeh('tc$qn')\" ";
+				$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper);showehdd('tc$qn','$shorttip','$qnref');\" onblur=\"hideee();hideeedd();hideeh();\" onclick=\"reshrinkeh('tc$qn')\" ";
 			} else {
 				$out .= "onfocus=\"showehdd('tc$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" onclick=\"reshrinkeh('tc$qn')\" ";
 			}
 		} else if ($useeqnhelper) {
-			$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper)\" onblur=\"hideeedd();\" ";
+			$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper)\" onblur=\"hideee();hideeedd();\" ";
 		}
 		
 		$out .= "/>\n";
@@ -1205,12 +1205,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$qnref = ($multi-1).'-'.($qn%1000);
 			}
 			if ($useeqnhelper) {
-				$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper);showehdd('tc$qn','$shorttip','$qnref');\" onblur=\"hideeedd();hideeh();\" onclick=\"reshrinkeh('tc$qn')\" ";
+				$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper);showehdd('tc$qn','$shorttip','$qnref');\" onblur=\"hideee();hideeedd();hideeh();\" onclick=\"reshrinkeh('tc$qn')\" ";
 			} else {
 				$out .= "onfocus=\"showehdd('tc$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" onclick=\"reshrinkeh('tc$qn')\" ";
 			}
 		} else if ($useeqnhelper) {
-			$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper)\" onblur=\"hideeedd();\" ";
+			$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper)\" onblur=\"hideee();hideeedd();\" ";
 		}
 		$out .= "/>";
 		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
@@ -1288,12 +1288,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$qnref = ($multi-1).'-'.($qn%1000);
 			}
 			if ($useeqnhelper) {
-				$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper);showehdd('tc$qn','$shorttip','$qnref');\" onblur=\"hideeedd();hideeh();\" onclick=\"reshrinkeh('tc$qn')\" ";
+				$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper);showehdd('tc$qn','$shorttip','$qnref');\" onblur=\"hideee();hideeedd();hideeh();\" onclick=\"reshrinkeh('tc$qn')\" ";
 			} else {
 				$out .= "onfocus=\"showehdd('tc$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" onclick=\"reshrinkeh('tc$qn')\" ";
 			}
 		} else if ($useeqnhelper) {
-			$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper)\" onblur=\"hideeedd();\" ";
+			$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper)\" onblur=\"hideee();hideeedd();\" ";
 		}
 		$out .= "/>";
 		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
@@ -1483,12 +1483,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$qnref = ($multi-1).'-'.($qn%1000);
 			}
 			if ($useeqnhelper) {
-				$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper,". (in_array('inequality',$ansformats)?"'ineq'":"'int'") .");showehdd('tc$qn','$shorttip','$qnref');\" onblur=\"hideeedd();hideeh();\" onclick=\"reshrinkeh('tc$qn')\" ";
+				$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper,". (in_array('inequality',$ansformats)?"'ineq'":"'int'") .");showehdd('tc$qn','$shorttip','$qnref');\" onblur=\"hideee();hideeedd();hideeh();\" onclick=\"reshrinkeh('tc$qn')\" ";
 			} else {
 				$out .= "onfocus=\"showehdd('tc$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" onclick=\"reshrinkeh('tc$qn')\" ";
 			}
 		} else if ($useeqnhelper) {
-			$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper,". (in_array('inequality',$ansformats)?"'ineq'":"'int'") .")\" onblur=\"hideeedd();\" ";
+			$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper,". (in_array('inequality',$ansformats)?"'ineq'":"'int'") .")\" onblur=\"hideee();hideeedd();\" ";
 		}
 		$out .= '/>';
 		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
