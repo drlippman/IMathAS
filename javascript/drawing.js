@@ -22,7 +22,8 @@ var dragObj = null;
 var oldpointpos = null;
 var curTarget = null;
 var nocanvaswarning = false;
-
+var hasTouch = false;
+var didMultiTouch = false;
 /* 
    Canvas-based function drawing script
    (c) David Lippman, part of www.imathas.com
@@ -87,6 +88,10 @@ function clearcanvas(tarnum) {
 
 function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,imgwidth,imgheight,defmode,dotline,locky) {
 	var tarel = document.getElementById(target);
+	tarel.style.userSelect = "none";
+	tarel.style.webkitUserSelect = "none";
+	tarel.style.MozUserSelect = "none";
+
 	var tarpos = getPosition(tarel);
 	
 	targets[tarnum] = {el: tarel, left: tarpos.x, top: tarpos.y, width: tarel.offsetWidth, height: tarel.offsetHeight, xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax, imgborder: imgborder, imgwidth: imgwidth, imgheight: imgheight, mode: defmode, dotline: dotline};
@@ -641,6 +646,9 @@ function encodeDraw() {
 }
 
 function drawMouseDown(ev) {
+	if (hasTouch && ev.touches.length>1) {
+		return true;  //bypass when multitouching to prevent interference with pinch zoom
+	}
 	var mousePos = mouseCoords(ev);
 	if (curTarget==null) { //see if mouse click is inside a target; if so, select it
 		for (i in targets) {
@@ -703,7 +711,7 @@ function drawMouseDown(ev) {
 							//second point is set.  switch to drag and end line
 							dragObj = {mode: targets[curTarget].mode, num: curTPcurve, subnum: 1};
 							curTPcurve = null;
-						}		
+						} 
 					}
 				} else if (targets[curTarget].mode>=10 && targets[curTarget].mode<11) {//in ineqline mode
 					if (curIneqcurve==null) { //start new tpline
@@ -798,29 +806,37 @@ function drawMouseDown(ev) {
 			curTarget = null;
 			
 		}
-	}		
+		//ev.preventDefault();
+	}	
+		
 }
 
 function findnearpoint(thetarget,mouseOff) {
+	if (hasTouch) {
+		var chkdist = Math.max(15*window.innerWidth/screen.width,15);
+		chkdist *= chkdist;
+	} else {
+		var chkdist = 25;
+	}
 	if (drawstyle[thetarget]==0) {
 		if (targets[thetarget].mode==0 || targets[thetarget].mode==0.5) { //if in line mode
 			for (var i=0;i<lines[thetarget].length;i++) { //check lines
 				for (var j=lines[thetarget][i].length-1; j>=0;j--) {
 					var dist = Math.pow(lines[thetarget][i][j][0]-mouseOff.x,2) + Math.pow(lines[thetarget][i][j][1]-mouseOff.y,2);
-					if (dist<25) {
+					if (dist<chkdist) {
 						return [targets[thetarget].mode,i,j];
 					}
 				}
 			}
 		} else if (targets[thetarget].mode==1) {
 			for (var i=0; i<dots[thetarget].length;i++) { //check dots
-				if (Math.pow(dots[thetarget][i][0]-mouseOff.x,2) + Math.pow(dots[thetarget][i][1]-mouseOff.y,2)<25) {
+				if (Math.pow(dots[thetarget][i][0]-mouseOff.x,2) + Math.pow(dots[thetarget][i][1]-mouseOff.y,2)<chkdist) {
 					return [1,i];
 				}
 			}
 		} else if (targets[thetarget].mode==2) {
 			for (var i=0; i<odots[thetarget].length;i++) { //check opendots
-				if (Math.pow(odots[thetarget][i][0]-mouseOff.x,2) + Math.pow(odots[thetarget][i][1]-mouseOff.y,2)<25) {
+				if (Math.pow(odots[thetarget][i][0]-mouseOff.x,2) + Math.pow(odots[thetarget][i][1]-mouseOff.y,2)<chkdist) {
 					return [2,i];
 				}
 			}
@@ -829,7 +845,7 @@ function findnearpoint(thetarget,mouseOff) {
 				if (tptypes[thetarget][i]!=targets[thetarget].mode) {continue;}
 				for (var j=tplines[thetarget][i].length-1; j>=0;j--) {
 					var dist = Math.pow(tplines[thetarget][i][j][0]-mouseOff.x,2) + Math.pow(tplines[thetarget][i][j][1]-mouseOff.y,2);
-					if (dist<25) {
+					if (dist<chkdist) {
 						return [tptypes[thetarget][i],i,j];
 					}
 				}
@@ -838,7 +854,7 @@ function findnearpoint(thetarget,mouseOff) {
 			for (var i=0;i<ineqlines[thetarget].length;i++) { //check lines
 				for (var j=ineqlines[thetarget][i].length-1; j>=0;j--) {
 					var dist = Math.pow(ineqlines[thetarget][i][j][0]-mouseOff.x,2) + Math.pow(ineqlines[thetarget][i][j][1]-mouseOff.y,2);
-					if (dist<25) {
+					if (dist<chkdist) {
 						return [ineqtypes[thetarget][i],i,j];
 					}
 				}
@@ -847,13 +863,13 @@ function findnearpoint(thetarget,mouseOff) {
 	} else {
 		if (targets[thetarget].mode==1) {
 			for (var i=0; i<dots[thetarget].length;i++) { //check dots
-				if (Math.pow(dots[thetarget][i][0]-mouseOff.x,2) + Math.pow(dots[thetarget][i][1]-mouseOff.y,2)<25) {
+				if (Math.pow(dots[thetarget][i][0]-mouseOff.x,2) + Math.pow(dots[thetarget][i][1]-mouseOff.y,2)<chkdist) {
 					return [1,i];
 				}
 			}
 		} else if (targets[thetarget].mode==2) {
 			for (var i=0; i<odots[thetarget].length;i++) { //check opendots
-				if (Math.pow(odots[thetarget][i][0]-mouseOff.x,2) + Math.pow(odots[thetarget][i][1]-mouseOff.y,2)<25) {
+				if (Math.pow(odots[thetarget][i][0]-mouseOff.x,2) + Math.pow(odots[thetarget][i][1]-mouseOff.y,2)<chkdist) {
 					return [2,i];
 				}
 			}	
@@ -863,7 +879,7 @@ function findnearpoint(thetarget,mouseOff) {
 					if (tptypes[thetarget][i]!=targets[thetarget].mode) {continue;}
 					
 					var dist = Math.pow(tplines[thetarget][i][j][0]-mouseOff.x,2) + Math.pow(tplines[thetarget][i][j][1]-mouseOff.y,2);
-					if (dist<25) {
+					if (dist<chkdist) {
 						return [tptypes[thetarget][i],i,j];
 					}
 				}
@@ -872,7 +888,7 @@ function findnearpoint(thetarget,mouseOff) {
 			for (var i=0;i<ineqlines[thetarget].length;i++) { //check inqs
 				for (var j=ineqlines[thetarget][i].length-1; j>=0;j--) {
 					var dist = Math.pow(ineqlines[thetarget][i][j][0]-mouseOff.x,2) + Math.pow(ineqlines[thetarget][i][j][1]-mouseOff.y,2);
-					if (dist<25) {
+					if (dist<chkdist) {
 						return [ineqtypes[thetarget][i],i,j];
 					}
 				}
@@ -887,6 +903,8 @@ function drawMouseUp(ev) {
 	var mousePos = mouseCoords(ev);
 	mouseisdown = false;
 	if (curTarget!=null) {
+		var tarelpos = getPosition(targets[curTarget].el);
+		var mouseOff = {x:(mousePos.x - tarelpos.x), y: (mousePos.y-tarelpos.y)};
 		if (lastdrawmouseup!=null && mousePos.x==lastdrawmouseup.x && mousePos.y==lastdrawmouseup.y) {
 			//basically a double-click which IE can handle
 			if (curLine!=null && dragObj==null) {
@@ -905,16 +923,37 @@ function drawMouseUp(ev) {
 				drawTarget();
 			}
 		}
+		if (curTPcurve!=null && tplines[curTarget][curTPcurve].length==1) {
+			if (didMultiTouch) {
+				tplines[curTarget].splice(curTPcurve,1);
+				curTPcurve = null;
+				drawTarget();
+			} else if (findnearpoint(curTarget,mouseOff)==null) {
+				tplines[curTarget][curTPcurve].push([mouseOff.x,mouseOff.y]);
+				curTPcurve = null;
+				drawTarget();
+			}
+		}
+		if (curIneqcurve!=null && ineqlines[curTarget][curIneqcurve].length==1) {
+			if (didMultiTouch) {
+				ineqlines[curTarget].splice(curIneqcurve,1);
+				curIneqcurve = null;
+				drawTarget();
+			} else if (findnearpoint(curTarget,mouseOff)==null) {
+				ineqlines[curTarget][curIneqcurve].push([mouseOff.x,mouseOff.y]);
+				drawTarget();
+			}
+		}
 		if (curLine==null && curTPcurve == null) {
 			targets[curTarget].el.style.cursor = 'move';
 		} else {
 			targets[curTarget].el.style.cursor = 'url('+imasroot+'/img/pen.cur), default';
 		}
+		ev.preventDefault();
 	}
 	lastdrawmouseup = mousePos;
 	if (curTarget!=null && dragObj!=null) { //is a target currectly in action, and dragging
 		var tarelpos = getPosition(targets[curTarget].el);
-		var mouseOff = {x:(mousePos.x - tarelpos.x), y: (mousePos.y-tarelpos.y)};
 		
 		//are we inside target region?
 		if (mouseOff.x>-1 && mouseOff.x<targets[curTarget].width && mouseOff.y>-1 && mouseOff.y<targets[curTarget].height) {
@@ -944,11 +983,14 @@ function drawMouseUp(ev) {
 			drawTarget();
 		}
 	}
+	didMultiTouch = false;
+		
 }
 
 function drawMouseMove(ev) {
 	var tempTarget = null;
 	var mousePos = mouseCoords(ev);
+	
 	//document.getElementById("ans0-0").innerHTML = dragObj + ';' + curTPcurve;
 	if (curTarget==null) {
 		for (i in targets) {
@@ -979,6 +1021,12 @@ function drawMouseMove(ev) {
 		}
 	}
 	if (curTarget!=null) {
+		if (hasTouch && ev.touches.length>1) {
+			didMultiTouch = true;
+			return true;  //bypass when multitouching to prevent interference with pinch zoom
+		} else {
+			ev.preventDefault();	
+		}
 		var tarelpos = getPosition(targets[curTarget].el);
 		var mouseOff = {x:(mousePos.x - tarelpos.x), y: (mousePos.y-tarelpos.y)};
 		if (drawlocky[curTarget]==1) {
@@ -1057,11 +1105,17 @@ function drawMouseMove(ev) {
 			return false;
 		}
 	}
+	
 }
 
 function mouseCoords(ev){
 	
 	ev = ev || window.event;
+	
+	if (hasTouch) {
+		var touch = ev.changedTouches[0] || ev.touches[0];
+		return {x:touch.pageX, y:touch.pageY};
+	}
 	
 	if(ev.pageX || ev.pageY){
 		return {x:ev.pageX, y:ev.pageY};
@@ -1085,6 +1139,7 @@ function mouseCoords(ev){
 	};
 	
 }
+
 function getMouseOffset(target, ev){
 
 	var docPos    = getPosition(target);
@@ -1115,6 +1170,16 @@ function getPosition(e){
 }
 
 function initCanvases(k) {
+	hasTouch = 'ontouchstart' in document.documentElement;
+	if (hasTouch) {
+		document.addEventListener('touchstart',drawMouseDown);
+		document.addEventListener('touchmove',drawMouseMove);
+		document.addEventListener('touchend',drawMouseUp);
+	} else {
+		document.onmousedown =  drawMouseDown;
+		document.onmouseup =  drawMouseUp;
+		document.onmousemove = drawMouseMove;
+	}
 	for (var i in canvases) {
 		if (typeof(k)=='undefined' || k==i) {
 			if (drawla[i]!=null && drawla[i].length>2) {
@@ -1144,9 +1209,7 @@ function initCanvases(k) {
 	}
 }
 
-document.onmousedown =  drawMouseDown;
-document.onmouseup =  drawMouseUp;
-document.onmousemove = drawMouseMove;
+
 
 if (typeof(initstack)!='undefined') {
 	initstack.push(initCanvases);

@@ -8,6 +8,7 @@
  * Source version at https://github.com/drlippman/mathquill
  */
 
+
 (function() {
 
 var $ = jQuery,
@@ -316,8 +317,9 @@ _.blockify = function() {
 function createRoot(jQ, root, textbox, editable) {
   var contents = jQ.contents().detach();
 
-  if (!textbox)
+  if (!textbox) {
     jQ.addClass('mathquill-rendered-math');
+  }
 
   root.jQ = jQ.data(jQueryDataKey, {
     block: root,
@@ -336,10 +338,14 @@ function createRoot(jQ, root, textbox, editable) {
   var textareaSpan = root.textarea = $('<span class="textarea"><textarea></textarea></span>'),
     textarea = textareaSpan.children();
 
+  /******
+   * TODO [Han]: Document this
+   */
   var textareaSelectionTimeout;
   root.selectionChanged = function() {
-    if (textareaSelectionTimeout === undefined)
+    if (textareaSelectionTimeout === undefined) {
       textareaSelectionTimeout = setTimeout(setTextareaSelection);
+    }
     forceIERedraw(jQ[0]);
   };
   function setTextareaSelection() {
@@ -347,64 +353,79 @@ function createRoot(jQ, root, textbox, editable) {
     var latex = cursor.selection ? '$'+cursor.selection.latex()+'$' : '';
     textarea.val(latex);
     if (latex) {
-      if (textarea[0].select)
+      if (textarea[0].select) {
         textarea[0].select();
+      }
       else if (document.selection) {
         var range = textarea[0].createTextRange();
         range.expand('textedit');
         range.select();
       }
     }
-  };
+  }
 
   //prevent native selection except textarea
   jQ.bind('selectstart.mathquill', function(e) {
-    if (e.target !== textarea[0])
-      e.preventDefault();
+    if (e.target !== textarea[0]) e.preventDefault();
     e.stopPropagation();
   });
 
   //drag-to-select event handling
   var anticursor, blink = cursor.blink;
   jQ.bind('mousedown.mathquill', function(e) {
+    function mousemove(e) {
+      cursor.seek($(e.target), e.pageX, e.pageY);
+
+      if (cursor.prev !== anticursor.prev
+          || cursor.parent !== anticursor.parent) {
+        cursor.selectFrom(anticursor);
+      }
+
+      return false;
+    }
+
+    // docmousemove is attached to the document, so that
+    // selection still works when the mouse leaves the window.
+    function docmousemove(e) {
+      // [Han]: i delete the target because of the way seek works.
+      // it will not move the mouse to the target, but will instead
+      // just seek those X and Y coordinates.  If there is a target,
+      // it will try to move the cursor to document, which will not work.
+      // cursor.seek needs to be refactored.
+      delete e.target;
+
+      return mousemove(e);
+    }
+
+    function mouseup(e) {
+      anticursor = undefined;
+      cursor.blink = blink;
+      if (!cursor.selection) {
+        if (editable) {
+          cursor.show();
+        }
+        else {
+          textareaSpan.detach();
+        }
+      }
+
+      // delete the mouse handlers now that we're not dragging anymore
+      jQ.unbind('mousemove', mousemove);
+      $(document).unbind('mousemove', docmousemove).unbind('mouseup', mouseup);
+    }
+
     cursor.blink = $.noop;
     cursor.seek($(e.target), e.pageX, e.pageY);
 
     anticursor = new MathFragment(cursor.parent, cursor.prev, cursor.next);
 
-    if (!editable)
-      jQ.prepend(textareaSpan);
+    if (!editable) jQ.prepend(textareaSpan);
 
     jQ.mousemove(mousemove);
     $(document).mousemove(docmousemove).mouseup(mouseup);
 
     e.stopPropagation();
   });
-  function mousemove(e) {
-    cursor.seek($(e.target), e.pageX, e.pageY);
-
-    if (cursor.prev !== anticursor.prev
-        || cursor.parent !== anticursor.parent)
-      cursor.selectFrom(anticursor);
-
-    return false;
-  }
-  function docmousemove(e) {
-    delete e.target;
-    return mousemove(e);
-  }
-  function mouseup(e) {
-    anticursor = undefined;
-    cursor.blink = blink;
-    if (!cursor.selection) {
-      if (editable)
-        cursor.show();
-      else
-        textareaSpan.detach();
-    }
-    jQ.unbind('mousemove', mousemove);
-    $(document).unbind('mousemove', docmousemove).unbind('mouseup', mouseup);
-  }
 
   if (!editable) {
     jQ.bind('cut paste', false).bind('copy', setTextareaSelection)
@@ -458,26 +479,37 @@ function createRoot(jQ, root, textbox, editable) {
   //clipboard event handling
   jQ.bind('cut', function(e) {
     setTextareaSelection();
-    if (cursor.selection)
-      setTimeout(function(){ cursor.deleteSelection(); cursor.redraw(); });
+
+    if (cursor.selection) {
+      setTimeout(function() {
+        cursor.deleteSelection();
+        cursor.redraw();
+      });
+    }
+
     e.stopPropagation();
-  }).bind('copy', function(e) {
+  })
+  .bind('copy', function(e) {
     setTextareaSelection();
     skipTextInput = true;
     e.stopPropagation();
-  }).bind('paste', function(e) {
+  })
+  .bind('paste', function(e) {
     skipTextInput = true;
     setTimeout(paste);
     e.stopPropagation();
   });
+
   function paste() {
     //FIXME HACK the parser in RootTextBlock needs to be moved to
     //Cursor::writeLatex or something so this'll work with MathQuill textboxes
     var latex = textarea.val();
-    if (latex.slice(0,1) === '$' && latex.slice(-1) === '$')
+    if (latex.slice(0,1) === '$' && latex.slice(-1) === '$') {
       latex = latex.slice(1, -1);
-    else
+    }
+    else {
       latex = '\\text{' + latex + '}';
+    }
     cursor.writeLatex(latex).show();
     textarea.val('');
   }
@@ -2066,10 +2098,10 @@ LatexCmds.oslash = LatexCmds.Oslash =
 LatexCmds.nothing = LatexCmds.varnothing =
   bind(BinaryOperator,'\\varnothing ','&empty;');
 
-LatexCmds.cup = LatexCmds.union = bind(VanillaSymbol,'\\cup ','&cup;');
+LatexCmds.cup = LatexCmds.union = bind(BinaryOperator,'\\cup ','&cup;');
 
 LatexCmds.cap = LatexCmds.intersect = LatexCmds.intersection =
-  bind(VanillaSymbol,'\\cap ','&cap;');
+  bind(BinaryOperator,'\\cap ','&cap;');
 
 LatexCmds.deg = LatexCmds.degree = bind(VanillaSymbol,'^\\circ ','&deg;');
 
@@ -2834,7 +2866,7 @@ $.fn.mathquill = function(cmd, latex) {
           else {
             cursor.insertCh(latex);
           }
-         /* if (!hascomma) {
+          /*if (!hascomma) {
             	    cursor.insertCh(',');
             	    cursor.moveLeft();
             }*/
@@ -2861,3 +2893,4 @@ $(function() {
 
 
 }());
+

@@ -4,38 +4,58 @@ var mqmousebase;
 $(function() {
   
   $(window).load(function() {
+        var hasTouch = 'ontouchstart' in document.documentElement;
   	mqarea = $('.mathquill-editable');
 	$('.mathquill-rendered-math').mathquill('redraw');
   	mqarea.find('textarea').focus();
-  	$('#mqee td.mqeebtn').bind('mouseover mouseup', function() {
-		if (!$(this).hasClass("mqeeactive")) {
-			$(this).addClass("mqeehighlight");	
-		}
-  	}).bind('mousedown', function () {
-  		$(this).addClass("mqeeclick");	
-  	}).bind('mouseout', function () {
-  		$(this).removeClass("mqeehighlight");
-  	}).bind('mouseup', function () {
-  		$(this).removeClass("mqeeclick");
-  	});
+  	$('input,textarea').attr('autocapitalize', 'off');
+
   	
-  	$('#mqeetopbar').mousedown(function(evt) {
-  		mqmousebase = {left:evt.pageX, top: evt.pageY};
-  		$("body").bind('mousemove',mqeemousemove);
-  		$("body").mouseup(function(event) {
-  			var p = $('#mqee').offset();
-  			lasteepos.left = p.left;
-  			lasteepos.top = p.top;
-  			$("body").unbind('mousemove',mqeemousemove);
-  			$(this).unbind(event);
-  		});
-  	})
+  	if (!hasTouch) {
+  		$('#mqee td.mqeebtn').bind('mouseover mouseup', function() {
+			if (!$(this).hasClass("mqeeactive")) {
+				$(this).addClass("mqeehighlight");	
+			}
+		}).bind('mousedown', function () {
+			$(this).addClass("mqeeclick");	
+		}).bind('mouseout', function () {
+			$(this).removeClass("mqeehighlight");
+		}).bind('mouseup', function () {
+			$(this).removeClass("mqeeclick");
+		}).bind('click',mqeeinsert);
+  		$('#mqeetopbar').mousedown(function(evt) {
+			mqmousebase = {left:evt.pageX, top: evt.pageY};
+			$("body").bind('mousemove',mqeemousemove);
+			$("body").mouseup(function(event) {
+				var p = $('#mqee').offset();
+				lasteepos.left = p.left;
+				lasteepos.top = p.top;
+				$("body").unbind('mousemove',mqeemousemove);
+				$(this).unbind(event);
+			});
+		});
+  	} else {
+  		$('#mqee td.mqeebtn').bind('touchstart', function () {
+			$(this).addClass("mqeeclick");	
+		}).bind('touchend', function () {
+			$(this).delay(500).removeClass("mqeeclick");
+		}).bind('touchend', mqeeinsert);
+		$('#mqeetopbar').bind('touchstart', function(evt) {
+			var touch = evt.originalEvent.changedTouches[0] || evt.originalEvent.touches[0];
+			mqmousebase = {left:touch.pageX, top: touch.pageY};
+			$("body").bind('touchmove',mqeetouchmove);
+			$("body").bind('touchend', function(event) {
+				var p = $('#mqee').offset();
+				lasteepos.left = p.left;
+				lasteepos.top = p.top;
+				$("body").unbind('touchmove',mqeetouchmove);
+				$(this).unbind(event);
+			});	
+		});
+  	}
+  	
   });
-  
-  $(document).ready(function() { 
-  	$('.mqeebtn').click(mqeeinsert);
-  }); 
-  
+
   //tabs 
 //from http://www.sohtanaka.com/web-design/simple-tabs-w-css-jquery/
 $(document).ready(function() {
@@ -54,7 +74,8 @@ $(document).ready(function() {
 		$(activeTab).show(); //Fade in the active ID content
 		return false;
 	});
-
+	
+	//$("td.mqeebtn span.mathquill-rendered-math").mathquill().mathquill("redraw");
 });
 }); 
 
@@ -102,6 +123,15 @@ function mqPrepTabs(type,extras) {   //type: 0 basic, 1 advanced.  extras = 'int
 function mqeemousemove(evt) {
 	$('#mqee').css('left', (evt.pageX - mqmousebase.left) + lasteepos.left)
 	  .css('top', (evt.pageY - mqmousebase.top) + lasteepos.top);
+	return false;
+}
+function mqeetouchmove(evt) {
+	var touch = evt.originalEvent.changedTouches[0] || evt.originalEvent.touches[0];
+  		
+	$('#mqee').css('left', (touch.pageX - mqmousebase.left) + lasteepos.left)
+	  .css('top', (touch.pageY - mqmousebase.top) + lasteepos.top);
+	  evt.preventDefault();
+
 	return false;
 }
 
@@ -163,9 +193,10 @@ function showee() {
 	mqPrepTabs(cureedd.type - 3,cureedd.extras);
 	var mqee = $("#mqee");
 	if (!lasteepos) {
+		
 		lasteepos = {
 			left: ($(window).width() - mqee.outerWidth())/2,
-			top: $(window).scrollTop() + ($(window).height() - mqee.outerHeight())/2, 
+			top: $(window).scrollTop() + ((window.innerHeight ? window.innerHeight : $(window).height()) - mqee.outerHeight())/2, 
 			scroll: $(window).scrollTop()
 		};
 	} else {
@@ -185,4 +216,5 @@ function savemathquill() {
 	$("#"+cureedd.id).val(MQtoAM(mqarea.mathquill('latex')));
 	hideee();	
 }
+
 

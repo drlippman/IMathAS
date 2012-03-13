@@ -122,7 +122,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			$sendemail = true;
 			$files = array();
 		} else {
-			$query = "UPDATE imas_forum_posts SET subject='{$_POST['subject']}',message='{$_POST['message']}',isanon='$isanon',tag='$tag' ";
+			$query = "UPDATE imas_forum_posts SET subject='{$_POST['subject']}',message='{$_POST['message']}',isanon='$isanon',tag='$tag',posttype='$type' ";
 			$query .= "WHERE id='{$_GET['modify']}'";
 			if (!$isteacher) { $query .= " AND userid='$userid'";}
 			mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -351,7 +351,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			if ($line['isanon']==1) {echo "checked=1";}
 			echo "></span><br class=form/>";
 		}
-		if ($isteacher && ($_GET['modify']=='new' || $_GET['modify']==$_GET['thread'])) {
+		if ($isteacher && ($_GET['modify']=='new' || $_GET['modify']==$_GET['thread'] || $line['parent']==0)) {
 			echo "<span class=form>Post Type:</span><span class=formright>\n";
 			echo "<input type=radio name=type value=0 ";
 			if ($line['posttype']==0) { echo "checked=1";}

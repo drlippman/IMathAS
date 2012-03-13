@@ -226,6 +226,13 @@
 						t.nodeToAM(AMtags[i]);
 						AMtags[i].className = "AM";
 					}
+					AMtags = ed.dom.select('span.AM');
+					for (var i=0; i<AMtags.length; i++) {
+						if (!AMtags[i].innerHTML.match(/(math|img)/)) {
+							AMtags[i].innerHTML = AMtags[i].title;
+							t.nodeToAM(AMtags[i]);
+						}
+					}
 				}
 			});
 			
@@ -308,10 +315,20 @@
 		math2ascii : function(el) {
 			var myAM = el.innerHTML;
 			if (myAM.indexOf("`") == -1) {
-				myAM = myAM.replace(/.+(alt|title)=\"(.*?)\".+/g,"$2");
-				myAM = myAM.replace(/.+(alt|title)=\'(.*?)\'.+/g,"$2");
-				myAM = myAM.replace(/.+(alt|title)=([^>]*?)\s.*>.*/g,"$2");
-				myAM = myAM.replace(/.+(alt|title)=(.*?)>.*/g,"$2");
+				if (myAM.indexOf('math')==-1 && myAM.indexOf('img')==-1 && el.title!='') {
+					myAM = el.title;  //if cut-and-paste, grab eqn from title if there
+				} else if (myAM.indexOf('title')==-1) {
+					myAM = myAM.replace(/.+alt=\"(.*?)\".+/g,"$1");
+					myAM = myAM.replace(/.+alt=\'(.*?)\'.+/g,"$1");
+					myAM = myAM.replace(/.+alt=([^>]*?)\s.*>.*/g,"$1");
+					myAM = myAM.replace(/.+alt=(.*?)>.*/g,"$1");
+				} else {
+					myAM = myAM.replace(/.+title=\"(.*?)\".+/g,"$1");
+					myAM = myAM.replace(/.+title=\'(.*?)\'.+/g,"$1");
+					myAM = myAM.replace(/.+title=([^>]*?)\s.*>.*/g,"$1");
+					myAM = myAM.replace(/.+title=(.*?)>.*/g,"$1");
+				}
+				
 				//myAM = myAM.replace(/&gt;/g,">");
 				//myAM = myAM.replace(/&lt;/g,"<");
 				myAM = myAM.replace(/>/g,"&gt;");
@@ -332,12 +349,14 @@
 					  newAM.appendChild(AMparseMath(str));
 				  }
 				  outnode.innerHTML = newAM.innerHTML;    
+				  outnode.title=str;  //add title to <span class="AM"> with equation for cut-and-paste
 			  } else {
 				  //doesn't work on IE, probably because this script is in the parent
 				  //windows, and the node is in the iframe.  Should it work in Moz?
 				 var myAM = "`"+outnode.innerHTML.replace(/\`/g,"")+"`"; //next 2 lines needed to make caret
 				 outnode.innerHTML = myAM;     //move between `` on Firefox insert math
 				 AMprocessNode(outnode);
+				 outnode.title=myAM.replace(/\`/g,""); //add title to <span class="AM"> with equation for cut-and-paste
 			  }
 			
 		}, 

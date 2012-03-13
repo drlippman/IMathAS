@@ -59,6 +59,13 @@
   user-select: text;
   -moz-user-select: text;
   -webkit-user-select: text;
+  border: medium none;
+    height: 1px;
+    opacity: 0;
+    outline: medium none;
+    overflow: hidden;
+    width: 1px;
+    z-index: -1;
 }
 
 .mathquill-editable .cursor {
@@ -166,7 +173,6 @@
 
 .mathquill-editable, .mathquill-rendered-math {
   cursor: text;
-  white-space: pre-wrap;
   font-family: Symbola, "Times New Roman", serif;
 }
 .mathquill-rendered-math {
@@ -188,6 +194,7 @@
   user-select: none;
   -moz-user-select: none;
   -webkit-user-select: none;
+  white-space: pre-wrap;
 }
 .mathquill-editable.hasCursor,
 .mathquill-rendered-math .latex-command-input.hasCursor {
@@ -399,7 +406,7 @@
 	position: absolute;
 	width: 500px;
 	left: -400px;
-	background: #eee;
+	background: #EEE;
 	border: 2px solid #009;
 	margin:0; padding: 0;
 	display: none;
@@ -412,6 +419,7 @@
 	cursor: pointer;
 	height: 26px;
 	line-height: 26px;
+	cursor: move;
 }
 #mqeetopbar>span {
 	padding-left: 5px;
@@ -426,6 +434,9 @@
 	color: #000;
 	margin: 2px;
 	border: 1px solid #009;
+	font-family: sans-serif;
+	font-size: 70%;
+	cursor: pointer;
 }
 #mqeeclosebutton:hover {
 	color: #f00;
@@ -438,21 +449,28 @@
 }
 #mqarea {
 	width: 475px;
-	min-height: 2em;
 	background: #fff;
+	min-height: 2em;
 	font-size: 120%;
 }
 .mqeebtn {
 	font-family: "Times New Roman", Times, serif;
 	color: #000;
 	cursor: pointer;
-	padding: 0px .5em;
-	height: 35px;
-	border: 1px solid #000;
+	padding: 0 0.5em 0;
+	height: 44px;
+	/*border: 1px solid #000;*/
 	text-align: center;
 	background: #fff;
-	vertical-align: middle;
+	vertical-align:middle;
 }
+
+#tabs-functions .mqeebtn, #tabs-trig .mqeebtn {
+	vertical-align: baseline;
+	height: 35px;
+	padding-top: 5px;
+}
+
 .mqeetab { 
 	cursor: pointer;
 	height: 35px;
@@ -467,10 +485,11 @@
 	background: #cfc;
 }
 .mqeehighlight {
-	background: #ccf;
+	/*background: #ccf;*/
+	color: #00f;
 }
 .mqeeclick {
-	background: #99f;
+	background: #aaf;
 }
 .mqeedd {
 	cursor: pointer;
@@ -480,8 +499,9 @@
 	/*background: #ff0 url('tinyarrow.gif') no-repeat center;*/
 	display:none; 
 	text-align:center; 
-	background: #fc0;
-	font-size: 90%;
+	background: #ff0;
+	color: #930;
+	/*font-size: 6px;*/
 	border: 1px solid #fa0;
 	border-left: 0;
 	width: 10px;
@@ -493,8 +513,10 @@
 	clear: both;
 	float: left; 
 	width: 100%;
+	height: 50px;
 	background: #fff;
 	margin-bottom: 5px;
+	
 }
 ul.tabs {
 	margin: 0;
@@ -534,3 +556,37 @@ html ul.tabs li.active, html ul.tabs li.active a:hover  {
 	background: #fff;
 	border-bottom: 1px solid #fff; 
 }
+.emptybox {
+	display: inline-block;
+	width: .5em;
+	height: .7em;
+	margin: .1em 0;
+	border: 1px solid #999;
+	vertical-align: bottom;
+}
+.emptybox.brack {
+	margin: .1em 0 .2em 0;
+}
+.emptybox.wide {
+	margin: .1em;
+}
+.mqeehighlight .emptybox {
+	border: 1px solid #99f;
+}
+.mqeebtn span {
+	cursor: pointer;
+}
+.mqeebtn.arr {
+	width: auto; height: auto;
+	font-size: 200%;
+	font-weight: bold;
+	padding: 0; margin:0;
+	background: transparent;
+}
+.mqeebtn.arr.mqeeclick {
+	color: #6666FF;
+}
+#mqeeinsides {
+	font-size: medium;
+}
+
