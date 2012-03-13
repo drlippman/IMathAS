@@ -351,12 +351,12 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			if ($line['isanon']==1) {echo "checked=1";}
 			echo "></span><br class=form/>";
 		}
-		if ($isteacher && ($_GET['modify']=='new' || $_GET['modify']==$_GET['thread'] || $line['parent']==0)) {
+		if ($isteacher && ($_GET['modify']=='new' || $line['userid']==$userid) && ($_GET['modify']=='new' || $_GET['modify']==$_GET['thread'] || ($_GET['modify']!='reply' && $line['parent']==0))) {
 			echo "<span class=form>Post Type:</span><span class=formright>\n";
 			echo "<input type=radio name=type value=0 ";
 			if ($line['posttype']==0) { echo "checked=1";}
 			echo ">Regular<br>\n";
-			echo "<input type=radio name=type value=1 ";
+			echo "<input type=radio name=type value=1 ";           
 			if ($line['posttype']==1) { echo "checked=1";}
 			echo ">Displayed at top of list<br>\n";
 			echo "<input type=radio name=type value=2 ";
