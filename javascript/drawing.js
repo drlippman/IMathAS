@@ -229,14 +229,13 @@ function drawTarget(x,y) {
 			if (Math.abs(x2-ineqlines[curTarget][i][0][0])<1 || Math.abs(slope)>100) { //vert line
 				//document.getElementById("ans0-0").innerHTML = 'vert';
 				if (ineqtypes[curTarget][i]==10.2) {
-					//TODO:  line dash
-					var dy = targets[curTarget].imgheight/20;
-					for (var j=0; j<10; j++) {
-						ctx.moveTo(ineqlines[curTarget][i][0][0],dy*2*j);
-						ctx.lineTo(ineqlines[curTarget][i][0][0],dy*(2*j+1));
-						ctx.stroke();
+					if (dragObj != null && dragObj.mode>=10 && dragObj.mode<11 && dragObj.num==i && dragObj.subnum==0) {
+						ctx.dashedLine(ineqlines[curTarget][i][1][0],ineqlines[curTarget][i][1][1],ineqlines[curTarget][i][1][0],targets[curTarget].imgheight);
+						ctx.dashedLine(ineqlines[curTarget][i][1][0],ineqlines[curTarget][i][1][1],ineqlines[curTarget][i][1][0],0);
+					} else {
+						ctx.dashedLine(ineqlines[curTarget][i][0][0],ineqlines[curTarget][i][0][1],ineqlines[curTarget][i][0][0],targets[curTarget].imgheight);
+						ctx.dashedLine(ineqlines[curTarget][i][0][0],ineqlines[curTarget][i][0][1],ineqlines[curTarget][i][0][0],0);
 					}
-					
 				} else {
 					ctx.moveTo(ineqlines[curTarget][i][0][0],0);
 					ctx.lineTo(ineqlines[curTarget][i][0][0],targets[curTarget].imgheight);
@@ -248,19 +247,13 @@ function drawTarget(x,y) {
 				var yright = ineqlines[curTarget][i][0][1] + slope*(targets[curTarget].imgwidth-ineqlines[curTarget][i][0][0]);
 				//TODO:  fix for very large slopes;
 				if (ineqtypes[curTarget][i]==10.2) {
-					//TODO:  line dash
-					var dx = targets[curTarget].imgwidth/20;
-					if (Math.abs(slope)>1) {
-						dx = dx/Math.abs(slope);
-						if (dx<1) {dx = 1;}
+					if (dragObj != null && dragObj.mode>=10 && dragObj.mode<11 && dragObj.num==i && dragObj.subnum==0) {
+						ctx.dashedLine(ineqlines[curTarget][i][1][0],ineqlines[curTarget][i][1][1],targets[curTarget].imgwidth,yright);
+						ctx.dashedLine(ineqlines[curTarget][i][1][0],ineqlines[curTarget][i][1][1],0,yleft);
+					} else {
+						ctx.dashedLine(ineqlines[curTarget][i][0][0],ineqlines[curTarget][i][0][1],targets[curTarget].imgwidth,yright);
+						ctx.dashedLine(ineqlines[curTarget][i][0][0],ineqlines[curTarget][i][0][1],0,yleft);
 					}
-					var n = Math.ceil(targets[curTarget].imgwidth/dx);
-					for (var j=0; j<n; j++) {
-						ctx.moveTo(dx*2*j,yleft + slope*dx*2*j);
-						ctx.lineTo(dx*(2*j+1),yleft + slope*dx*(2*j+1));
-						ctx.stroke();
-					}
-					
 				} else {
 					ctx.moveTo(0,yleft);
 					ctx.lineTo(targets[curTarget].imgwidth,yright);	
@@ -1184,6 +1177,33 @@ function initCanvases(k) {
 		document.onmouseup =  drawMouseUp;
 		document.onmousemove = drawMouseMove;
 	}
+	try {
+		
+		CanvasRenderingContext2D.prototype.dashedLine = function(x1, y1, x2, y2, dashLen) {
+		    if (dashLen == undefined) dashLen = 10;
+		    
+		    this.beginPath();
+		    this.moveTo(x1, y1);
+		    
+		    var dX = x2 - x1;
+		    var dY = y2 - y1;
+		    var dashes = Math.sqrt(dX * dX + dY * dY) / dashLen;
+		    var dashX = dX / dashes;
+		    var dashY = dY / dashes;
+		    dashes = Math.round(dashes);
+		    
+		    var q = 0;
+		    while (q++ < dashes && y1>0 && y1<targets[curTarget].imgheight) {
+		     x1 += dashX;
+		     y1 += dashY;
+		     this[q % 2 == 0 ? 'moveTo' : 'lineTo'](x1, y1);
+		    }
+		    this[q % 2 == 0 ? 'moveTo' : 'lineTo'](x2, y2);
+		    
+		    this.stroke();
+		    this.closePath();
+		};
+	} catch(e) { }
 	for (var i in canvases) {
 		if (typeof(k)=='undefined' || k==i) {
 			if (drawla[i]!=null && drawla[i].length>2) {
@@ -1211,6 +1231,7 @@ function initCanvases(k) {
 			addTarget(canvases[i][0],'canvas'+canvases[i][0],imasroot+'/filter/graph/imgs/'+canvases[i][1],'qn'+canvases[i][0],canvases[i][2],canvases[i][3],canvases[i][4],canvases[i][5],canvases[i][6],canvases[i][7],canvases[i][8],canvases[i][9],canvases[i][10],canvases[i][11]);
 		}
 	}
+	
 }
 
 
