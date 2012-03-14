@@ -406,7 +406,7 @@
 	position: absolute;
 	width: 500px;
 	left: -400px;
-	background: #EEE;
+	background: #F7F7F7;
 	border: 2px solid #009;
 	margin:0; padding: 0;
 	display: none;
@@ -467,7 +467,7 @@
 
 #tabs-functions .mqeebtn, #tabs-trig .mqeebtn {
 	vertical-align: baseline;
-	height: 35px;
+	height: 32px;
 	padding-top: 5px;
 }
 
@@ -589,4 +589,25 @@ html ul.tabs li.active, html ul.tabs li.active a:hover  {
 #mqeeinsides {
 	font-size: medium;
 }
+
+table.cursor-icons td.mqeebtn {
+	height: auto;
+	width: auto;
+	background: transparent;
+	padding: 0px;
+}
+table.cursor-icons td.mqeebtn div {
+	background-repeat:no-repeat;
+	width: 24px;height: 25px;
+	background-image:url('../img/mq_cursor_sprites.png');
+}
+
+table.cursor-icons td.mqeebtn>.left{ background-position: 0 -60px;}
+table.cursor-icons td.mqeebtn>.left:hover{ background-position: 0 -90px;}
+table.cursor-icons td.mqeebtn>.right{ background-position: 0 -120px;}
+table.cursor-icons td.mqeebtn>.right:hover{ background-position: 0 -150px;}
+table.cursor-icons td.mqeebtn>.up{ background-position: 0 -180px;}
+table.cursor-icons td.mqeebtn>.up:hover{ background-position: 0 -210px;}
+table.cursor-icons td.mqeebtn>.down{ background-position: 0 0;} 
+table.cursor-icons td.mqeebtn>.down:hover{ background-position: 0 -30px;}
 
