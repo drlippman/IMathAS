@@ -462,7 +462,7 @@
 	/*border: 1px solid #000;*/
 	text-align: center;
 	background: #fff;
-	vertical-align:middle;
+	vertical-align: middle;
 }
 
 #tabs-functions .mqeebtn, #tabs-trig .mqeebtn {
@@ -516,7 +516,6 @@
 	height: 50px;
 	background: #fff;
 	margin-bottom: 5px;
-	
 }
 ul.tabs {
 	margin: 0;
@@ -576,16 +575,12 @@ html ul.tabs li.active, html ul.tabs li.active a:hover  {
 .mqeebtn span {
 	cursor: pointer;
 }
-.mqeebtn.arr {
-	width: auto; height: auto;
-	font-size: 200%;
-	font-weight: bold;
-	padding: 0; margin:0;
-	background: transparent;
+
+#mqeeclosebutton {
+	font-family: sans-serif;
+	cursor: pointer;
 }
-.mqeebtn.arr.mqeeclick {
-	color: #6666FF;
-}
+
 #mqeeinsides {
 	font-size: medium;
 }
@@ -610,4 +605,3 @@ table.cursor-icons td.mqeebtn>.up{ background-position: 0 -180px;}
 table.cursor-icons td.mqeebtn>.up:hover{ background-position: 0 -210px;}
 table.cursor-icons td.mqeebtn>.down{ background-position: 0 0;} 
 table.cursor-icons td.mqeebtn>.down:hover{ background-position: 0 -30px;}
-
