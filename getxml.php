@@ -37,6 +37,7 @@
 	if ($_GET['limit'] != 'take') {//teach or all
 		$query = "SELECT imas_forums.courseid, imas_forums.name, imas_forums.id, imas_forum_threads.id as tid, imas_forum_threads.lastposttime FROM imas_forum_threads ";
 		$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
+		$query .= "JOIN imas_courses ON imas_forums.courseid=imas_courses.id AND (imas_courses.available=0 OR imas_courses.available=1) ";
 		$query .= "JOIN imas_teachers ON imas_forums.courseid=imas_teachers.courseid AND imas_teachers.userid='$userid' ";
 		$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' ";
 		$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
@@ -67,6 +68,7 @@
 	if ($_GET['limit'] != 'teach') {  //take or all
 		$query = "SELECT imas_forums.courseid, imas_forums.name, imas_forums.id, imas_forum_threads.id as tid, imas_forum_threads.lastposttime FROM imas_forum_threads ";
 		$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
+		$query .= "JOIN imas_courses ON imas_forums.courseid=imas_courses.id AND (imas_courses.available=0 OR imas_courses.available=2) ";
 		$query .= "JOIN imas_students ON imas_forums.courseid=imas_students.courseid AND imas_students.userid='$userid' ";
 		$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' ";
 		$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";

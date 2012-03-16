@@ -87,6 +87,26 @@
 			return 0;
 		}
 	}
+	function sortSortby(a, b) {
+		try {
+			a+='';
+			b+='';
+			
+			reRowText = /.*sortby([\d\.]+).*/;
+			a = a.replace(reRowText,"$1");
+			b = b.replace(reRowText,"$1");
+			console.log (a + ","+b);
+			if (!isNaN(a/1) && !isNaN(b/1)) {
+				return a/1 - b/1;
+			}
+			
+			if ( a.toUpperCase() < b.toUpperCase() ) return -1;
+			if ( a.toUpperCase() > b.toUpperCase() ) return 1;
+			return 0;
+		} catch(e) {
+			return 0;
+		}
+	}
 		
 	function sortTable()
 	{
@@ -150,7 +170,9 @@
 			cellArray = cellArray.sort(sortNumeric);
 		} else if (sortMethod=='D') {
 			cellArray = cellArray.sort(sortDate);
-		}else{
+		} else if (sortMethod=='B') {
+			cellArray = cellArray.sort(sortSortby);
+		} else{
 			cellArray = cellArray.sort(sortString);
 		}
 		

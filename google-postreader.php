@@ -8,7 +8,7 @@ $dbsetup = true;
 include("config.php");
 ?>
 
-  <ModulePrefs title="<?php echo $installname?> Messages and Posts" scrolling="true"/>
+  <ModulePrefs title="<?php echo $installname?> Messages and Posts" scrolling="true" height="200"/>
   <UserPref name="showlimit" 
      display_name="Show from courses I "
      datatype="enum"
