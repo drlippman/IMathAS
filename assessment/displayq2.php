@@ -3040,7 +3040,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$qn];} else {$abstolerance = $options['abstolerance'];}}
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		
-		if (!isset($reltolerance)) { $reltolerance = 1; }
+		if (!isset($reltolerance)) { 
+			if (isset($GLOBALS['CFG']['AMS']['defaultdrawtol'])) {
+				$reltolerance =  $GLOBALS['CFG']['AMS']['defaultdrawtol'];
+			} else {
+				$reltolerance = 1; 
+			}
+		}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$GLOBALS['partlastanswer'] = $givenans;
 		$imgborder = 5; $step = 5;

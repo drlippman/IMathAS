@@ -96,16 +96,21 @@
 	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 	while ($row = mysql_fetch_row($result)) {
 		$itemsassoc[$row[0]] = $row[1];
+		if (!in_array($row[0],$itemsimporder)) {
+			//capture any forums that are in imas_items but not imas_courses.itemorder
+			$itemsimporder[] = $row[0];
+		}
 	}
 	
 	$maxitemnum = max($itemsimporder) + 1;
-	//add non-course page forums
+	//capture any forums that are not in imas_items
 	foreach ($forumdata as $fid=>$line) {
-		if (in_array($fid,$itemsassoc)) { continue; } //already listed
+		if (in_array($fid,$itemsassoc)) { continue; }
 		$itemsassoc[$maxitemnum] = $fid;
 		$itemsimporder[] = $maxitemnum;
 		$maxitemnum++;
 	}
+	
 	
 	//construct tag list selector
 	$taginfo = array();
