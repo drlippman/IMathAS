@@ -1594,6 +1594,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		} else {
 			$plot = showplot($backg,$settings[0],$settings[1],$settings[2],$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
 		}
+		if (is_array($settings[4]) && count($settings[4]>2)) {
+			$plot = addlabel($plot,$settings[1],0,$settings[4][2],"black","aboveleft");
+		}
+		if (is_array($settings[5]) && count($settings[5]>2)) {
+			$plot = addlabel($plot,0,$settings[3],$settings[5][2],"black","belowright");
+		}
 		if (isset($grid) && strpos($grid[4],'pi')!==false) {
 			$plot = addfractionaxislabels($plot,$grid[4]);
 		}
