@@ -132,12 +132,21 @@
 				//$query .= "iq.qtype='{$_POST['qtype']}',iq.control='{$_POST['control']}',iq.qcontrol='{$_POST['qcontrol']}',";
 				//$query .= "iq.qtext='{$_POST['qtext']}',iq.answer='{$_POST['answer']}',iq.lastmoddate=$now ";
 				//$query .= "WHERE iq.id='{$_GET['id']}' AND iq.ownerid=imas_users.id AND (imas_users.groupid='$groupid' OR iq.userights>2)";
-			} 
+			}
+			if (!$isadmin && !$isgrpadmin) {  //check is owner or is allowed to modify
+				$query = "SELECT iq.id FROM imas_questionset AS iq,imas_users ";
+				$query .= "WHERE iq.id='{$_GET['id']}' AND iq.ownerid=imas_users.id AND (iq.ownerid='$userid' OR (iq.userights=3 AND imas_users.groupid='$groupid') OR iq.userights>3)";
+				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+				if (mysql_num_rows($result)==0) {
+					$isok = false;
+				}
+			}
 			$query = "UPDATE imas_questionset SET description='{$_POST['description']}',author='{$_POST['author']}',userights='{$_POST['userights']}',";
 			$query .= "qtype='{$_POST['qtype']}',control='{$_POST['control']}',qcontrol='{$_POST['qcontrol']}',";
 			$query .= "qtext='{$_POST['qtext']}',answer='{$_POST['answer']}',lastmoddate=$now,extref='$extref' ";
 			$query .= "WHERE id='{$_GET['id']}'";
-			if (!$isadmin && !$isgrpadmin) { $query .= " AND (ownerid='$userid' OR userights>2);";}
+			//checked separately above now
+			//if (!$isadmin && !$isgrpadmin) { $query .= " AND (ownerid='$userid' OR userights>2);";}
 			if ($isok) {
 				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 				if (mysql_affected_rows()>0) {
@@ -359,7 +368,7 @@
 			$line = mysql_fetch_array($result, MYSQL_ASSOC);
 			
 			$myq = ($line['ownerid']==$userid);
-			if ($isadmin || ($isgrpadmin && $line['groupid']==$groupid) || $line['userights']==3) {
+			if ($isadmin || ($isgrpadmin && $line['groupid']==$groupid) || ($line['userights']==3 && $line['groupid']==$groupid) || $line['userights']>3) {
 				$myq = true;
 			}
 			$namelist = explode(", mb ",$line['author']);
@@ -594,7 +603,7 @@ Author: <?php echo $line['author']; ?> <input type="hidden" name="author" value=
 </p>
 <p>
 <?php
-if (!isset($line['ownerid']) || isset($_GET['template']) || $line['ownerid']==$userid || $isadmin || ($isgrpadmin && $line['groupid']==$groupid)) {
+if (!isset($line['ownerid']) || isset($_GET['template']) || $line['ownerid']==$userid || ($line['userights']==3 && $line['groupid']==$groupid) || $isadmin || ($isgrpadmin && $line['groupid']==$groupid)) {
 	echo "Use Rights <select name=userights>\n";
 	echo "<option value=\"0\" ";
 	if ($line['userights']==0) {echo "SELECTED";}
@@ -604,7 +613,10 @@ if (!isset($line['ownerid']) || isset($_GET['template']) || $line['ownerid']==$u
 	echo ">Allow use, use as template, no modifications</option>\n";
 	echo "<option value=\"3\" ";
 	if ($line['userights']==3) {echo "SELECTED";}
-	echo ">Allow use and modifications</option>\n";
+	echo ">Allow use by all and modifications by group</option>\n";
+	echo "<option value=\"4\" ";
+	if ($line['userights']==4) {echo "SELECTED";}
+	echo ">Allow use and modifications by all</option>\n";
 }
 ?>
 </select>

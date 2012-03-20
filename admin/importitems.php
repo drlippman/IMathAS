@@ -85,7 +85,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 					$query .= "control='{$qset['control'][$n]}',qcontrol='{$qset['qcontrol'][$n]}',";
 					$query .= "qtext='{$qset['qtext'][$n]}',answer='{$qset['answer'][$n]}',";
 					$query .= "extref='{$qset['extref'][$n]}',lastmoddate=$now,adddate=$now,hasimg=$hasimg ";
-					$query .= " WHERE id='{$questions[$qid]['qsetid']}' AND (ownerid='$userid' OR userights>2)";
+					$query .= " WHERE id='{$questions[$qid]['qsetid']}' AND (ownerid='$userid' OR userights>3)";
 					mysql_query($query) or die("error on: $query: " . mysql_error());
 					if (mysql_affected_rows()>0 && $hasimg==1) {
 						//not efficient, but sufficient :)
@@ -558,7 +558,8 @@ function setlibnames(libn) {
 			<select name=userights>
 				<option value="0">Private</option>
 				<option value="2" SELECTED>Allow use, use as template, no modifications</option>
-				<option value="3">Allow use and modifications</option>
+				<option value="3">Allow use by all and modifications by group</option>
+				<option value="4">Allow use and modifications by all</option>
 			</select>
 		</p>
 		<p>

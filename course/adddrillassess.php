@@ -264,10 +264,10 @@ if (!$beentaken) {
 	$page_libRowHeader = ($searchall==1) ? "<th>Library</th>" : "";
 	
 	if (isset($search)) {
-		$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.avgtime,imas_library_items.junkflag, imas_library_items.id AS libitemid ";
-		$query .= "FROM imas_questionset,imas_library_items WHERE imas_questionset.deleted=0 AND $searchlikes "; //imas_questionset.description LIKE '%$safesearch%' ";
-		$query .= " (imas_questionset.ownerid='$userid' OR imas_questionset.userights>0) AND "; 
-		$query .= "imas_library_items.qsetid=imas_questionset.id ";
+		$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.avgtime,imas_library_items.junkflag, imas_library_items.id AS libitemid,imas_users.groupid ";
+		$query .= "FROM imas_questionset JOIN imas_library_items ON imas_library_items.qsetid=imas_questionset.id ";
+		$query .= "JOIN imas_users ON imas_questionset.ownerid=imas_users.id WHERE imas_questionset.deleted=0 AND $searchlikes "; //imas_questionset.description LIKE '%$safesearch%' ";
+		$query .= " (imas_questionset.ownerid='$userid' OR imas_questionset.userights>0)";
 		
 		if ($searchall==0) {
 			$query .= "AND imas_library_items.libid IN ($llist)";
@@ -383,7 +383,7 @@ if (!$beentaken) {
 				
 				
 				
-				if ($line['userights']>2 || $line['ownerid']==$userid) {
+				if ($line['userights']>3 || ($line['userights']==3 && $line['groupid']==$groupid) || $line['ownerid']==$userid) {
 					$page_questionTable[$i]['src'] = "<a href=\"moddataset.php?id={$line['id']}&daid=$daid&cid=$cid&frompot=1\">Edit</a>";
 				} else { 
 					$page_questionTable[$i]['src'] = "<a href=\"viewsource.php?id={$line['id']}&daid=$daid&cid=$cid\">View</a>";
@@ -555,7 +555,7 @@ if (!$beentaken) {
 ?>				
 		
 		
-		Check: <a href="#" onclick="return chkAllNone('selq','nchecked[]',true)">All</a> <a href="#" onclick="return chkAllNone('selq','nchecked[]',false)">None</a>
+		Check: <a href="#" onclick="return chkAllNone('selform','nchecked[]',true)">All</a> <a href="#" onclick="return chkAllNone('selform','nchecked[]',false)">None</a>
 		<input name="add" type=submit value="Add Selected" />
 		
 		<table cellpadding="5" id="myTable" class="gb" style="clear:both; position:relative;">

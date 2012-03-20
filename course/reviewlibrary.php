@@ -192,7 +192,7 @@ if ($myrights<20) {
 
 			if ($isgrpadmin) {
 				$query = "SELECT iq.id FROM imas_questionset AS iq,imas_users ";
-				$query .= "WHERE iq.id='$qsetid' AND iq.ownerid=imas_users.id AND (imas_users.groupid='$groupid' OR iq.userights>2)";
+				$query .= "WHERE iq.id='$qsetid' AND iq.ownerid=imas_users.id AND (imas_users.groupid='$groupid' OR iq.userights>3)";
 				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 				if (mysql_num_rows($result)>0) {
 					$query = "UPDATE imas_questionset SET description='{$_POST['description']}',";
@@ -207,7 +207,7 @@ if ($myrights<20) {
 				$query .= "qtype='{$_POST['qtype']}',control='{$_POST['control']}',qcontrol='{$_POST['qcontrol']}',";
 				$query .= "qtext='{$_POST['qtext']}',answer='{$_POST['answer']}',lastmoddate=$now ";
 				$query .= "WHERE id='$qsetid'";
-				if (!$isadmin) { $query .= " AND (ownerid='$userid' OR userights>2);";}
+				if (!$isadmin) { $query .= " AND (ownerid='$userid' OR userights>3);";}
 				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 			}
 			
@@ -246,7 +246,7 @@ if ($myrights<20) {
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$lineQSet = mysql_fetch_array($result, MYSQL_ASSOC);
 		$myq = (intval($lineQSet['ownerid'])==$userid);
-		if ($isadmin || ($isgrpadmin && intval($lineQSet['groupid'])==$groupid) || $lineQSet['userights']==3) {
+		if ($isadmin || ($isgrpadmin && intval($lineQSet['groupid'])==$groupid) || $lineQSet['userights']==4) {
 			$myq = true;
 		}
 		

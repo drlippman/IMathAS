@@ -795,7 +795,7 @@ if ($myrights<20) {
 				$page_questionTable[$i]['mine'] = '';
 			}							
 			$page_questionTable[$i]['action'] = "<select onchange=\"doaction(this.value,{$line['id']})\"><option value=\"0\">Action..</option>";
-			if ($isadmin || ($isgrpadmin && $line['groupid']==$groupid) || $line['ownerid']==$userid || $line['userights']>2) {
+			if ($isadmin || ($isgrpadmin && $line['groupid']==$groupid) || $line['ownerid']==$userid || ($line['userights']==3 && $line['groupid']==$groupid) || $line['userights']>3) {
 				$page_questionTable[$i]['action'] .= '<option value="mod">Modify Code</option>';
 			} else {
 				$page_questionTable[$i]['action'] .= '<option value="mod">View Code</option>';
@@ -1020,7 +1020,8 @@ function getnextprev(formn,loc) {
 			<p>Select the new rights for these questions: <select name="newrights">
 			 	<option value="0">Private</option>
 				<option value="2" selected="selected">Allow use, use as template, no modifications</option>
-				<option value="3">Allow use and modifications</option>
+				<option value="3">Allow use by all and modifications by group</option>
+				<option value="4">Allow use and modifications by all</option>
 				</select>
 			</p>
 			
@@ -1135,70 +1136,6 @@ function getnextprev(formn,loc) {
 			}
 		}
 
-		/*$lastlib = -1;
-		$ln = 1;
-		while ($line = mysql_fetch_array($resultLibs, MYSQL_ASSOC)) {
-			if ($lastlib!=$line['libid'] && isset($lnamesarr[$line['libid']])) {
-				if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
-				echo "<td></td><td><b>".$lnamesarr[$line['libid']]."</b></td>";
-				for ($j=0;$j<9+$searchall;$j++) {
-					echo "<td></td>";
-				}
-				echo "</tr>";
-				$lastlib = $line['libid'];
-			}
-			$query = "SELECT COUNT(id) FROM imas_questions WHERE questionsetid='{$line['id']}'";
-			$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
-			$times = mysql_result($result2,0,0);
-			if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
-			echo "<td><input type=checkbox name='nchecked[]' id='qo$ln' value='{$line['id']}'></td>\n";
-			if ($line['userights']==0) {
-				echo filter("<td><span class=red>{$line['description']}</span></td>");
-			} else {
-				echo filter("<td>{$line['description']}</td>");
-			}
-			echo "<td><input type=button value=\"Preview\" onClick=\"previewq('selform',$ln,{$line['id']})\"/></td>\n";
-			echo "<td><select onchange=\"doaction(this.value,{$line['id']})\"><option value=\"0\">Action..</option>";
-			if ($isadmin || ($isgrpadmin && $line['groupid']==$groupid) || $line['ownerid']==$userid || $line['userights']>2) {
-				echo '<option value="mod">Modify Code</option>';
-			} else {
-				echo '<option value="mod">View Code</option>';
-			}
-			echo '<option value="temp">Template</option>';
-			if ($isadmin || ($isgrpadmin && $line['groupid']==$groupid) || $line['ownerid']==$userid) {
-				echo '<option value="del">Delete</option>';
-				echo '<option value="tr">Transfer</option>';
-			} 
-			echo '</select></td>';
-			echo "<td>{$line['qtype']}</td><td class=c>$times</td>\n";
-			$lastmod = date("m/d/y",$line['lastmoddate']);
-			echo "<td>$lastmod</td>";
-			if ($isadmin || $isgrpadmin) {
-				$ownername = $line['lastName'] . ',' . substr($line['firstName'],0,1);
-				echo "<td class=c>$ownername";
-				if ($line['userights']==0) {
-					echo " <i>Priv</i>";
-				}
-				echo "</td>\n";
-			} else {
-				if ($line['ownerid']==$userid) { 
-					if ($line['userights']==0) {
-						echo "<td><i>Priv</i></td>";
-					} else {
-						echo "<td>Yes</td>";
-					}
-				} else {
-					echo "<td></td>";
-				}
-			}
-			if ($searchall==1) {
-				echo "<td><a href=\"manageqset.php?cid=$cid&listlib={$line['libid']}\">List lib</a></td>";
-			}
-
-			echo "</tr>\n";
-			$ln++;
-		}
-		*/
 		echo "</tbody></table>\n";
 		echo "<script type=\"text/javascript\">\n";
 		echo "initSortTable('myTable',Array(false,'S',false,false,'S','N','D'";

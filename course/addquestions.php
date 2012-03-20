@@ -338,8 +338,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 		} 
 		for ($j=0;$j<count($subs);$j++) {
-			$query = "SELECT imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn,imas_questionset.extref FROM imas_questions,imas_questionset ";
-			$query .= "WHERE imas_questions.id='{$subs[$j]}' AND imas_questionset.id=imas_questions.questionsetid";
+			$query = "SELECT imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn,imas_questionset.extref,imas_users.groupid FROM imas_questions,imas_questionset,imas_users ";
+			$query .= "WHERE imas_questions.id='{$subs[$j]}' AND imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id ";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$line = mysql_fetch_array($result, MYSQL_ASSOC);
 			$existingq[] = $line['questionsetid'];
@@ -348,7 +348,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} 
 			//output item array
 			$jsarr .= '['.$subs[$j].','.$line['questionsetid'].',"'.addslashes(filter(str_replace(array("\r\n", "\n", "\r")," ",$line['description']))).'","'.$line['qtype'].'",'.$line['points'].',';
-			if ($line['userights']>2 || $line['ownerid']==$userid || $adminasteacher) { //can edit without template?
+			if ($line['userights']>3 || ($line['userights']==3 && $line['groupid']==$groupid) || $line['ownerid']==$userid || $adminasteacher) { //can edit without template?
 				$jsarr .= '1';
 			} else {
 				$jsarr .= '0';
@@ -502,11 +502,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$page_libRowHeader = ($searchall==1) ? "<th>Library</th>" : "";
 			
 			if (isset($search)) {
-				$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.avgtime,imas_library_items.junkflag, imas_library_items.id AS libitemid ";
-				$query .= "FROM imas_questionset,imas_library_items WHERE imas_questionset.deleted=0 AND $searchlikes "; //imas_questionset.description LIKE '%$safesearch%' ";
-				$query .= " (imas_questionset.ownerid='$userid' OR imas_questionset.userights>0) AND "; 
-				$query .= "imas_library_items.qsetid=imas_questionset.id ";
-				
+				$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.avgtime,imas_library_items.junkflag, imas_library_items.id AS libitemid,imas_users.groupid ";
+				$query .= "FROM imas_questionset JOIN imas_library_items ON imas_library_items.qsetid=imas_questionset.id ";
+				$query .= "JOIN imas_users ON imas_questionset.ownerid=imas_users.id WHERE imas_questionset.deleted=0 AND $searchlikes "; //imas_questionset.description LIKE '%$safesearch%' ";
+				$query .= " (imas_questionset.ownerid='$userid' OR imas_questionset.userights>0)";
+		
 				if ($searchall==0) {
 					$query .= "AND imas_library_items.libid IN ($llist)";
 				}
@@ -635,7 +635,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						
 						$page_questionTable[$i]['add'] = "<a href=\"modquestion.php?qsetid={$line['id']}&aid=$aid&cid=$cid\">Add</a>";
 						
-						if ($line['userights']>2 || $line['ownerid']==$userid) {
+						if ($line['userights']>3 || ($line['userights']==3 && $line['groupid']==$groupid) || $line['ownerid']==$userid) {
 							$page_questionTable[$i]['src'] = "<a href=\"moddataset.php?id={$line['id']}&aid=$aid&cid=$cid&frompot=1\">Edit</a>";
 						} else { 
 							$page_questionTable[$i]['src'] = "<a href=\"viewsource.php?id={$line['id']}&aid=$aid&cid=$cid\">View</a>";
@@ -703,8 +703,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$x=0;
 			$page_assessmentQuestions = array();
 			foreach ($sessiondata['aidstolist'.$aid] as $aidq) {
-				$query = "SELECT imas_questions.id,imas_questionset.id,imas_questionset.description,imas_questionset.qtype,imas_questionset.ownerid,imas_questionset.userights,imas_questionset.extref FROM imas_questionset,imas_questions";
-				$query .= " WHERE imas_questionset.id=imas_questions.questionsetid AND imas_questions.assessmentid='$aidq'";
+				$query = "SELECT imas_questions.id,imas_questionset.id,imas_questionset.description,imas_questionset.qtype,imas_questionset.ownerid,imas_questionset.userights,imas_questionset.extref,imas_users.groupid FROM imas_questionset,imas_questions,imas_users";
+				$query .= " WHERE imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id AND imas_questions.assessmentid='$aidq'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				if (mysql_num_rows($result)==0) { //maybe defunct aid; if no questions in it, skip it
 					continue;
@@ -716,6 +716,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$owner[$row[0]] = $row[4];
 					$userights[$row[0]] = $row[5];
 					$extref[$row[0]] = $row[6];
+					$qgroupid[$row[0]] = $row[7];
 					$query = "SELECT COUNT(id) FROM imas_questions WHERE questionsetid='{$row[1]}'";
 					$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 					$times[$row[0]] = mysql_result($result2,0,0);
@@ -739,7 +740,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$page_assessmentQuestions[$x]['times'][$y] = $times[$qid];
 					$page_assessmentQuestions[$x]['mine'][$y] = ($owner[$qid]==$userid) ? "Yes" : "" ;
 					$page_assessmentQuestions[$x]['add'][$y] = "<a href=\"modquestion.php?qsetid=$qsetid[$qid]&aid=$aid&cid=$cid\">Add</a>";
-					$page_assessmentQuestions[$x]['src'][$y] = ($userights[$qid]>2 || $owner[$qid]==$userid) ? "<a href=\"moddataset.php?id=$qsetid[$qid]&aid=$aid&cid=$cid&frompot=1\">Edit</a>" : "<a href=\"viewsource.php?id=$qsetid[$qid]&aid=$aid&cid=$cid\">View</a>" ;
+					$page_assessmentQuestions[$x]['src'][$y] = ($userights[$qid]>3 || ($userights[$qid]==3 && $qgroupid[$qid]==$groupid) || $owner[$qid]==$userid) ? "<a href=\"moddataset.php?id=$qsetid[$qid]&aid=$aid&cid=$cid&frompot=1\">Edit</a>" : "<a href=\"viewsource.php?id=$qsetid[$qid]&aid=$aid&cid=$cid\">View</a>" ;
 					$page_assessmentQuestions[$x]['templ'][$y] = "<a href=\"moddataset.php?id=$qsetid[$qid]&aid=$aid&cid=$cid&template=true\">Template</a>";
 					$page_assessmentQuestions[$x]['extref'][$y] = '';
 					if ($extref[$qid]!='') {

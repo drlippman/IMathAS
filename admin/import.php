@@ -189,7 +189,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 						$query .= "qtype='{$qd['qtype']}',control='{$qd['control']}',qcontrol='{$qd['qcontrol']}',qtext='{$qd['qtext']}',";
 						$query .= "answer='{$qd['answer']}',extref='{$qd['extref']}',lastmoddate=$now,adddate=$now,hasimg=$hasimg WHERE id='$qsetid'";
 						if (!$isadmin) {
-							$query .= " AND (ownerid='$userid' OR userights>2)";
+							$query .= " AND (ownerid='$userid' OR userights>3)";
 						}
 					}
 					mysql_query($query) or die("Import failed on {$qdata['description']}: " . mysql_error());
@@ -405,7 +405,8 @@ if ($overwriteBody==1) {
 				Set Question Use Rights to <select name=userights>
 				<option value="0">Private</option>
 				<option value="2" SELECTED>Allow use, use as template, no modifications</option>
-				<option value="3">Allow use and modifications</option>
+				<option value="3">Allow use by all and modifications by group</option>
+				<option value="4">Allow use and modifications by all</option>
 				</select>
 				</p>
 				
