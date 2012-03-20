@@ -63,6 +63,7 @@ if ($sessiondata['graphdisp']==1) {
 <style type="text/css"> 
 div { zoom: 1; } 
 .clear { line-height: 0;}
+#mqarea { height: 2em;}
 #GB_overlay, #GB_window { 
  position: absolute; 
  top: expression(0+((e=document.documentElement.scrollTop)?e:document.body.scrollTop)+'px'); 

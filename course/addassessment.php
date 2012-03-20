@@ -734,8 +734,8 @@ if ($overwriteBody==1) {
 					<option value="0" <?php writeHtmlSelected($line['eqnhelper'],0) ?>>No</option>
 					<option value="1" <?php writeHtmlSelected($line['eqnhelper'],1) ?>>Yes, simple form (no logs or trig)</option>
 					<option value="2" <?php writeHtmlSelected($line['eqnhelper'],2) ?>>Yes, advanced form</option>
-					<option value="3" <?php writeHtmlSelected($line['eqnhelper'],3) ?>>MathQuill, simple form *experimental*</option>
-					<option value="4" <?php writeHtmlSelected($line['eqnhelper'],4) ?>>MathQuill, advanced form *experimental*</option>
+					<option value="3" <?php writeHtmlSelected($line['eqnhelper'],3) ?>>MathQuill, simple form</option>
+					<option value="4" <?php writeHtmlSelected($line['eqnhelper'],4) ?>>MathQuill, advanced form</option>
 				</select>
 			</span><br class="form" />
 			<span class=form>Show hints and video/text buttons when available?</span>
