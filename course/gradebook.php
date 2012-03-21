@@ -1356,6 +1356,9 @@ function gbinstrdisp() {
 							echo $gbt[$i][1][$j][0];
 							echo '</span>';
 						}
+						if ($gbt[$i][1][$j][1]==1) {
+							echo '<sup>*</sup>';
+						}
 					} else {
 						if ($isteacher && $gbt[$i][0][0]!='Averages') {
 							echo "<a href=\"viewforumgrade.php?cid=$cid&amp;stu=$stu&amp;uid={$gbt[$i][4][0]}&amp;fid={$gbt[0][1][$j][7]}\">-</a>";
@@ -1363,6 +1366,7 @@ function gbinstrdisp() {
 							echo '-';
 						}
 					}
+					
 				}
 				if (isset($gbt[$i][1][$j][5]) && ($gbt[$i][1][$j][5]&(1<<$availshow)) && !$hidepast) {
 					echo '<sub>d</sub></span>';

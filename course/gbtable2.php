@@ -922,6 +922,21 @@ function gbtable() {
 						$gb[$row][1][$col][0] = 1*$l['score'];
 					}
 				}
+				if ($limuser==0 && !isset($gb[$row][1][$col][1])) {
+					$gb[$row][1][$col][1] = 0; //no feedback
+				}
+				if (trim($l['feedback'])!='') {
+					if ($limuser>0 || (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments'])) {
+						if (isset($gb[$row][1][$col][1])) {
+							$gb[$row][1][$col][1] .= "<br/>".$l['feedback'];
+						} else {
+							$gb[$row][1][$col][1] = $l['feedback'];
+						}
+						//the feedback (for students)
+					} else if ($limuser==0) { //feedback
+						$gb[$row][1][$col][1] = 1; //yes it has it (for teachers)
+					} 
+				}
 				$gb[$row][1][$col][3] = 0; //is counted
 				if ($gb[0][1][$col][3]<1) { //past
 					$cattotpast[$row][$category[$i]][$col] = $gb[$row][1][$col][0];

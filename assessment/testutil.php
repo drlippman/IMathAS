@@ -787,8 +787,11 @@ function seqshowqinfobar($qn,$toshow) {
 	if ($testsettings['showcat']>0 && $qi[$questions[$qn]]['category']!='0') {
 		echo "  Category: {$qi[$questions[$qn]]['category']}.";
 	}
-	if ($sessiondata['msgqtoinstr']==2) {
+	if ($testsettings['msgtoinstr']==1) {
 		echo "<br/><a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid={$testsettings['courseid']}&add=new&quoteq=$qn-{$qi[$questions[$qn]]['questionsetid']}-{$seeds[$qn]}-{$testsettings['id']}&to=instr\">Message instructor about this question</a>";
+	}
+	if ($testsettings['posttoforum']>0) {
+		echo "<br/><a target=\"_blank\" href=\"$imasroot/forums/thread.php?cid={$testsettings['courseid']}&forum={$testsettings['posttoforum']}&modify=new&quoteq=$qn-{$qi[$questions[$qn]]['questionsetid']}-{$seeds[$qn]}-{$testsettings['id']}\">Post this question to forum</a>";
 	}
 	echo '</div>';
 	return $qavail;
