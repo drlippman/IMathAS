@@ -223,6 +223,8 @@
 		return '`'.$arr[1].'`';
 	}
 	function printfilter($str) {
+		global $imasroot;
+		$str = preg_replace('/<canvas.*?\'(\w+\.png)\'.*?\/script>/','<div><img src="'.$imasroot.'/filter/graph/imgs/$1"/></div>',$str);
 		$str = preg_replace('/<script.*?\/script>/','',$str);  //strip scripts
 		$str = preg_replace('/<input[^>]*Preview[^>]*>/','',$str); //strip preview buttons
 		$str = preg_replace('/<input[^>]*text[^>]*>/','__________________',$str);

@@ -11,15 +11,17 @@ require("../validate.php");
 
 /*** pre-html data manipulation, including function code *******/
 function getsubinfo($items,$parent,$pre) {
-	global $ids,$types,$names,$item;
+	global $ids,$types,$names,$item,$parents;
 	foreach($items as $k=>$anitem) {
 		if (is_array($anitem)) {
 			$ids[] = $parent.'-'.($k+1);
 			$types[] = $pre."Block";
 			$names[] = stripslashes($anitem['name']);
+			$parents[] = $parent;
 			getsubinfo($anitem['items'],$parent.'-'.($k+1),$pre.'--');
 		} else {
 			$ids[] = $anitem;
+			$parents[] = $parent;
 			$types[] = $pre.$item[$anitem]['type'];
 			if (isset($item[$anitem]['name'])) {
 				$names[] = $item[$anitem]['name'];
@@ -487,6 +489,7 @@ if (!(isset($teacherid))) {
 		$ids = array();
 		$types = array();
 		$names = array();
+		$parents = array();
 		getsubinfo($items,'0','');
 		
 	}
@@ -518,6 +521,15 @@ function setlibnames(libn) {
 	}
 	document.getElementById("libnames").innerHTML = libn;
 }
+function chkgrp(frm, arr, mark) {
+	  var els = frm.getElementsByTagName("input");
+	  for (var i = 0; i < els.length; i++) {
+		  var el = els[i];
+		  if (el.type=='checkbox' && (el.id.indexOf(arr+'.')==0 || el.id.indexOf(arr+'-')==0 || el.id==arr)) {
+	     	       el.checked = mark;
+		  }
+	  }
+	}
 </script>
 
 <?php echo $curBreadcrumb; ?>
@@ -583,10 +595,17 @@ function setlibnames(libn) {
 <?php			
 				$alt=0;
 				for ($i = 0 ; $i<(count($ids)); $i++) {
-					if ($alt==0) {echo "			<tr class=even>"; $alt=1;} else {echo "			<tr class=odd>"; $alt=0;}
-?>				
-				<td>
-				<input type=checkbox name='checked[]' value='<?php echo $ids[$i] ?>' checked=checked>
+					if ($alt==0) {echo "		<tr class=even>"; $alt=1;} else {echo "		<tr class=odd>"; $alt=0;}
+			echo '<td>';
+			if (strpos($types[$i],'Block')!==false) {		
+				echo "<input type=checkbox name='checked[]' value='{$ids[$i]}' id='{$parents[$i]}' checked=checked ";
+				echo "onClick=\"chkgrp(this.form, '{$ids[$i]}', this.checked);\" ";
+				echo '/>';
+			} else {
+				echo "<input type=checkbox name='checked[]' value='{$ids[$i]}' id='{$parents[$i]}.{$ids[$i]}' checked=checked ";
+				echo '/>';
+			}
+?>
 				</td>
 				<td><?php echo $types[$i] ?></td>
 				<td><?php echo $names[$i] ?></td>
