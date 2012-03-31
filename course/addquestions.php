@@ -359,7 +359,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$extref = explode('~~',$line['extref']);
 				$hasvid = false;  $hasother = false;
 				foreach ($extref as $v) {
-					if (substr($v,0,5)=="Video" || strpos($v,'youtube.com')!==false) {
+					if (substr($v,0,5)=="video" || strpos($v,'youtube.com')!==false) {
 						$hasvid = true;
 					} else {
 						$hasother = true;

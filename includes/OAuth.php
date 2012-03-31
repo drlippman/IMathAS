@@ -456,7 +456,7 @@ class OAuthRequest {
 }
 
 class OAuthServer {
-  protected $timestamp_threshold = 300; // in seconds, five minutes
+  protected $timestamp_threshold = 900; // in seconds, fifteen minutes
   protected $version = 1.0;             // hi blaine
   protected $signature_methods = array();
 

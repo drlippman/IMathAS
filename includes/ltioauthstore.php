@@ -65,7 +65,7 @@ class IMathASLTIOAuthDataStore extends OAuthDataStore {
 	    $query = "INSERT INTO imas_ltinonces (nonce,time) VALUES ('$nonce','$now')";
 	    mysql_query($query) or die("Query failed : " . mysql_error());
 	    
-	    $old = $now - 900; //old stuff - 15 min
+	    $old = $now - 5400; //old stuff - 90 minutes
 	    $query = "DELETE FROM imas_ltinonces WHERE time<$old";
 	    mysql_query($query) or die("Query failed : " . mysql_error());
     }

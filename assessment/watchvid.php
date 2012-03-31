@@ -12,14 +12,30 @@ if (strpos($url,'youtube.com/watch')!==false) {
 	if (strpos($vidid,'&')!==false) {
 		$vidid = substr($vidid,0,strpos($vidid,'&'));
 	} 
+	if (strpos($url,'t=')!==false) {
+		$timestart = '#'.substr($url,strrpos($url,'t='));
+		if (strpos($timestart,'&')!==false) {
+			$timestart = substr($timestart,0,strpos($timestart,'&'));
+		}
+	} else {
+		$timestart = '';
+	}
 	$doembed = true;
-	$out = '<iframe width="640" height="510" src="'.$urlmode.'www.youtube.com/embed/'.$vidid.'" frameborder="0" allowfullscreen></iframe>';
+	$out = '<iframe width="640" height="510" src="'.$urlmode.'www.youtube.com/embed/'.$vidid.$timestart.'" frameborder="0" allowfullscreen></iframe>';
 }
 if (strpos($url,'youtu.be/')!==false) {
 	//youtube 	
 	$vidid = substr($url,strpos($url,'.be/')+4);
+	if (strpos($url,'t=')!==false) {
+		$timestart = '#'.substr($url,strrpos($url,'t='));
+		if (strpos($timestart,'&')!==false) {
+			$timestart = substr($timestart,0,strpos($timestart,'&'));
+		}
+	} else {
+		$timestart = '';
+	}
 	$doembed = true;
-	$out = '<iframe width="640" height="510" src="'.$urlmode.'www.youtube.com/embed/'.$vidid.'" frameborder="0" allowfullscreen></iframe>';
+	$out = '<iframe width="640" height="510" src="'.$urlmode.'www.youtube.com/embed/'.$vidid.$timestart.'" frameborder="0" allowfullscreen></iframe>';
 }
 if (strpos($url,'vimeo.com/')!==false) {
 	//youtube 	
