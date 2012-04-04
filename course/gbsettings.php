@@ -205,7 +205,9 @@
 	<span class=form>Default Show items: </span>
 	<span class=formright>
 		<input type=radio name="gbmode1" value="0" <?php writeHtmlChecked($availshow,0);?>/> Past Due Items <br/>
-		<input type=radio name="gbmode1" value="1" <?php writeHtmlChecked($availshow,1);?>/> Past &amp; Current Items <br/>
+		<input type=radio name="gbmode1" value="3" <?php writeHtmlChecked($availshow,3);?>/> Past &amp; Attempted Items <br/>
+		<input type=radio name="gbmode1" value="4" <?php writeHtmlChecked($availshow,4);?>/> Available Items Only <br/>
+		<input type=radio name="gbmode1" value="1" <?php writeHtmlChecked($availshow,1);?>/> Past &amp; Available Items <br/>
 		<input type=radio name="gbmode1" value="2" <?php writeHtmlChecked($availshow,2);?>/> All Items 
 	</span><br class=form>
 	

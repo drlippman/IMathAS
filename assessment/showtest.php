@@ -23,6 +23,7 @@
 	include("testutil.php");
 	include("asidutil.php");
 	$inexception = false;
+	$exceptionduedate = 0;
 	//error_reporting(0);  //prevents output of error messages
 	
 	//check to see if test starting test or returning to test
@@ -40,7 +41,8 @@
 			echo "Assessment is closed";
 			exit;
 		}
-		if (!$actas && ($now < $adata['startdate'] || $adata['enddate']<$now)) { //outside normal range for test
+	
+		if (!$actas) { 
 			$query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid'";
 			$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 			$row = mysql_fetch_row($result2);
@@ -54,18 +56,21 @@
 							exit;
 						}
 					}
-				} else { //in exception
+				} else { //inside exception dates exception
+					$exceptionduedate = $row[1];
 					if ($adata['enddate']<$now) { //exception is for past-due-date
-						$inexception = true;	
+						$inexception = true; //only trigger if past due date for penalty
 					}
 				}
-			} else { //no exception
-				if ($now > $adata['startdate'] && $now<$adata['reviewdate']) {
-					$isreview = true;
-				} else {
-					if (!isset($teacherid) && !isset($tutorid)) {
-						echo "Assessment is closed";
-						exit;
+			} else { //has no exception
+				if ($now < $adata['startdate'] || $adata['enddate']<$now) { //outside normal dates
+					if ($now > $adata['startdate'] && $now<$adata['reviewdate']) {
+						$isreview = true;
+					} else {
+						if (!isset($teacherid) && !isset($tutorid)) {
+							echo "Assessment is closed";
+							exit;
+						}
 					}
 				}
 			}
@@ -361,7 +366,7 @@
 		leavetestmsg();
 		exit;
 	}
-	if (!isset($sessiondata['actas']) && ($now < $testsettings['startdate'] || $testsettings['enddate']<$now)) { //outside normal range for test
+	if (!isset($sessiondata['actas'])) { 
 		$query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='{$line['assessmentid']}'";
 		$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 		$row = mysql_fetch_row($result2);
@@ -377,18 +382,21 @@
 					}
 				}
 			} else { //in exception
+				$exceptionduedate = $row[1];
 				if ($adata['enddate']<$now) { //exception is for past-due-date
 					$inexception = true;	
 				}
 			}
-		} else { //no exception
-			if ($now > $testsettings['startdate'] && $now<$testsettings['reviewdate']) {
-				$isreview = true;
-			} else {
-				if (!$isteacher) {
-					echo "Assessment is closed";
-					leavetestmsg();
-					exit;
+		} else { //has no exception
+			if ($now < $testsettings['startdate'] || $testsettings['enddate'] < $now) {//outside normal dates
+				if ($now > $testsettings['startdate'] && $now<$testsettings['reviewdate']) {
+					$isreview = true;
+				} else {
+					if (!$isteacher) {
+						echo "Assessment is closed";
+						leavetestmsg();
+						exit;
+					}
 				}
 			}
 		}
@@ -869,9 +877,38 @@ if (!isset($_POST['embedpostback'])) {
 	if ($testsettings['testtype']=="Practice" && !$isreview) {
 		echo "<div class=right><span style=\"color:#f00\">Practice Test.</span>  <a href=\"showtest.php?regenall=fromscratch\">Create new version.</a></div>";
 	}
+	if (!$isreview && !$superdone) {
+		if ($exceptionduedate > 0) {
+			$timebeforedue = $exceptionduedate - time();
+		} else {
+			$timebeforedue = $testsettings['enddate'] - time();
+		}
+		if ($timebeforedue < 24*3600) { //due within 24 hours
+			if ($timebeforedue < 300) {
+				$duetimenote = '<span style="color:#f00;">Due in under ';
+			} else {
+				$duetimenote = "<span>Due in ";
+			}
+			if ($timebeforedue>3599) {
+				$duetimenote .= floor($timebeforedue/3600)." hours, ";
+			}
+			$duetimenote .= ceil(($timebeforedue%3600)/60)." minutes</span>";
+		} else {
+			if ($exceptionduedate > 0) {
+				$duetimenote = "Due ".tzdate('D m/d/Y g:i a',$exceptionduedate);
+			} else {
+				$duetimenote = "Due ".tzdate('D m/d/Y g:i a',$testsettings['enddate']);
+			}
+		}
+	}
+	$restrictedtimelimit = false;
 	if ($testsettings['timelimit']>0 && !$isreview && !$superdone) {
 		$now = time();
 		$remaining = $testsettings['timelimit']-($now - $starttime);
+		if ($timebeforedue < $remaining) {
+			$remaining = $timebeforedue - 5;	
+			$restrictedtimelimit = true;
+		}
 		if ($testsettings['timelimit']>3600) {
 			$tlhrs = floor($testsettings['timelimit']/3600);
 			$tlrem = $testsettings['timelimit'] % 3600;
@@ -905,11 +942,15 @@ if (!isset($_POST['embedpostback'])) {
 			$remaining = $remaining - 60*$minutes;
 		} else {$minutes=0;}
 		$seconds = $remaining;
-		echo "<div class=right id=timelimitholder>Timelimit: $tlwrds. <span id=timeremaining ";
+		echo "<div class=right id=timelimitholder>Timelimit: $tlwrds. ";
+		if (!isset($_GET['action']) && $restrictedtimelimit) {
+			echo '<span style="color:#0a0;">Time limit shortened because of due date</span> ';
+		}
+		echo "<span id=timeremaining ";
 		if ($remaining<300) {
 			echo 'style="color:#f00;" ';
 		}
-		echo ">$hours:$minutes:$seconds</span> remaining</div>\n";
+		echo ">$hours:$minutes:$seconds</span> remaining. </div>\n";
 		echo "<script type=\"text/javascript\">\n";
 		echo " hours = $hours; minutes = $minutes; seconds = $seconds; done=false;\n";	
 		echo " function updatetime() {\n";
@@ -956,7 +997,10 @@ if (!isset($_POST['embedpostback'])) {
 	} else if ($superdone) {
 		echo "<div class=right>Time limit expired</div>";
 	} else {
-		echo "<div class=right>No time limit</div>\n";
+		echo "<div class=right>$duetimenote</div>\n";
+		//if ($timebeforedue < 2*3600 && $timebeforedue > 300 ) {
+		//	echo '<script type="text/javascript">var duetimewarning = setTimeout(function() {alert("This assignment is due in about 5 minutes");},'.(1000*($timebeforedue-300)).');</script>';
+		//}
 	}
 } else {
 	require_once("../filter/filter.php");
