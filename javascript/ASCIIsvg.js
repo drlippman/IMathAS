@@ -639,10 +639,10 @@ function rect(p,q,id,rx,ry) { // opposite corners in units, rounded by radii
     node.setAttribute("id", id);
     svgpicture.appendChild(node);
   }
-  node.setAttribute("x",p[0]*xunitlength+origin[0]);
-  node.setAttribute("y",height-q[1]*yunitlength-origin[1]);
-  node.setAttribute("width",(q[0]-p[0])*xunitlength);
-  node.setAttribute("height",(q[1]-p[1])*yunitlength);
+  node.setAttribute("x",Math.min(p[0],q[0])*xunitlength+origin[0]);
+  node.setAttribute("y",height-Math.max(q[1],p[1])*yunitlength-origin[1]);
+  node.setAttribute("width",Math.abs(q[0]-p[0])*xunitlength);
+  node.setAttribute("height",Math.abs(q[1]-p[1])*yunitlength);
   if (rx!=null) node.setAttribute("rx",rx*xunitlength);
   if (ry!=null) node.setAttribute("ry",ry*yunitlength);
   node.setAttribute("stroke-width", strokewidth);
@@ -672,45 +672,45 @@ function textabs(p,st,pos,angle,id,fontsty) {
   if (angle==270) {
 	  var dy = 0; var dx = fontsize/3;
 	  if (pos!=null) {
-	    if (pos.match(/left/)) {dx = -fontsize/2;}
-	    if (pos.match(/right/)) {dx = fontsize-0;}
+	    if (pos.match(/left/)) {dx = -fontsize/2-2;}
+	    if (pos.match(/right/)) {dx = 1*fontsize+2;}
 	    if (pos.match(/above/)) {
 	      textanchor = "start";
-	      dy = -fontsize/2;
+	      dy = -fontsize/2-2;
 	    }
 	    if (pos.match(/below/)) {
 	      textanchor = "end";
-	      dy = fontsize/2;
+	      dy = fontsize/2+2;
 	    }
 	  }
   } 
   if (angle==90) {
 	  var dy = 0; var dx = -fontsize/3;
 	  if (pos!=null) {
-	    if (pos.match(/left/)) dx = -fontsize-0;
-	    if (pos.match(/right/)) dx = fontsize/2;
+	    if (pos.match(/left/)) dx = -fontsize-2;
+	    if (pos.match(/right/)) dx = fontsize/2+2;
 	    if (pos.match(/above/)) {
 	      textanchor = "end";
-	      dy = -fontsize/2;
+	      dy = -fontsize/2-2;
 	    }
 	    if (pos.match(/below/)) {
 	      textanchor = "start";
-	      dy = fontsize/2;
+	      dy = fontsize/2+2;
 	    }
 	  }
   }
   if (angle==0) {
 	  var dx = 0; var dy = fontsize/3;
 	  if (pos!=null) {
-	    if (pos.match(/above/)) { dy = -fontsize/3; }
-	    if (pos.match(/below/)) { dy = fontsize-0; }
+	    if (pos.match(/above/)) { dy = -fontsize/3-2; }
+	    if (pos.match(/below/)) { dy = 1*fontsize+2; }
 	    if (pos.match(/right/)) {
 	      textanchor = "start";
-	      dx = fontsize/3;
+	      dx = fontsize/3+2;
 	    }
 	    if (pos.match(/left/)) {
 	      textanchor = "end";
-	      dx = -fontsize/3;
+	      dx = -fontsize/3-2;
 	    }
 	  }
   }
@@ -738,18 +738,23 @@ function textabs(p,st,pos,angle,id,fontsty) {
   if (fontfill!="none") node.setAttribute("fill",fontfill);
   node.setAttribute("stroke-width","0px");
   if (fontbackground!="none") {
-	  var bgnode = myCreateElementSVG("rect");
-	  var bb = node.getBBox();
-	  bgnode.setAttribute("fill",fontbackground);
-	  bgnode.setAttribute("stroke-width","0px");
-	  bgnode.setAttribute("x",bb.x-2);
-	  bgnode.setAttribute("y",bb.y-2);
-	  bgnode.setAttribute("width",bb.width+4);
-	  bgnode.setAttribute("height",bb.height+4);
-	  if (angle != 0) {
-		   bgnode.setAttribute("transform","rotate("+angle+" "+(p[0]+dx)+" "+(height-p[1]+dy)+")");
+	  try {
+		 var bb = node.getBBox();  
+		  var bgnode = myCreateElementSVG("rect");
+		 
+		  bgnode.setAttribute("fill",fontbackground);
+		  bgnode.setAttribute("stroke-width","0px");
+		  bgnode.setAttribute("x",bb.x-2);
+		  bgnode.setAttribute("y",bb.y-1);
+		  bgnode.setAttribute("width",bb.width+4);
+		  bgnode.setAttribute("height",bb.height+2);
+		  if (angle != 0) {
+			   bgnode.setAttribute("transform","rotate("+angle+" "+(p[0]+dx)+" "+(height-p[1]+dy)+")");
+		  }
+		  svgpicture.insertBefore(bgnode,node);
+	  } catch (e) {
+		  
 	  }
-	  svgpicture.insertBefore(bgnode,node);
 		  
   }
   return p;

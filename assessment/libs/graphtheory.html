@@ -1,8 +1,7 @@
 <html><body>
 <h1>Macro Library graphtheory</h1>
-A library of graph theory functions.  Version 0.2, Sept 4, 2009
-<BR>THIS LIBRARY IS NOT COMPLETE.  THE SYNTAX OR NAMES OF THESE FUNCTIONS
-<BR>MAY CHANGE
+A library of graph theory and scheduling functions.  Version 1.1, April 3, 2012
+<BR>
 <BR>Most graphing functions in this library use an options array.  Here are the
 <BR>common options - specific functions will mention other options.
 <BR>  options['width'] = width of output, in pixels.  Defaults to 300.
@@ -30,9 +29,7 @@ A library of graph theory functions.  Version 0.2, Sept 4, 2009
 <li><a href="#graphgrid">graphgrid</a></li>
 <li><a href="#graphrandom">graphrandom</a></li>
 <li><a href="#graphemptygraph">graphemptygraph</a></li>
-<li><a href="#graphrandomgridschedule">graphrandomgridschedule</a></li>
 <li><a href="#graphdijkstra">graphdijkstra</a></li>
-<li><a href="#graphbackflow">graphbackflow</a></li>
 <li><a href="#graphkruskal">graphkruskal</a></li>
 <li><a href="#graphrepeatednearestneighbor">graphrepeatednearestneighbor</a></li>
 <li><a href="#graphnearestneighbor">graphnearestneighbor</a></li>
@@ -45,6 +42,8 @@ A library of graph theory functions.  Version 0.2, Sept 4, 2009
 <li><a href="#graphgetedges">graphgetedges</a></li>
 <li><a href="#graphgetedgesarray">graphgetedgesarray</a></li>
 <li><a href="#graphgettotalcost">graphgettotalcost</a></li>
+<li><a href="#graphadjacencytoprereqs">graphadjacencytoprereqs</a></li>
+<li><a href="#graphprereqtable">graphprereqtable</a></li>
 <li><a href="#graphadjacencytoincidence">graphadjacencytoincidence</a></li>
 <li><a href="#graphincidencetoadjacency">graphincidencetoadjacency</a></li>
 <li><a href="#graphgetvalence">graphgetvalence</a></li>
@@ -59,6 +58,18 @@ A library of graph theory functions.  Version 0.2, Sept 4, 2009
 <li><a href="#graphprocessoptions">graphprocessoptions</a></li>
 <li><a href="#graphdrawit">graphdrawit</a></li>
 <li><a href="#graphcomparecircuits">graphcomparecircuits</a></li>
+<li><a href="#graphrandomgridschedule">graphrandomgridschedule</a></li>
+<li><a href="#graphdecreasingtimelist">graphdecreasingtimelist</a></li>
+<li><a href="#graphcriticaltimelist">graphcriticaltimelist</a></li>
+<li><a href="#graphbackflow">graphbackflow</a></li>
+<li><a href="#graphlistprocessing">graphlistprocessing</a></li>
+<li><a href="#graphscheduletaskinfo">graphscheduletaskinfo</a></li>
+<li><a href="#graphschedulecompletion">graphschedulecompletion</a></li>
+<li><a href="#graphscheduleidle">graphscheduleidle</a></li>
+<li><a href="#graphscheduleproctasks">graphscheduleproctasks</a></li>
+<li><a href="#graphdrawschedule">graphdrawschedule</a></li>
+<li><a href="#graphschedulelayout">graphschedulelayout</a></li>
+<li><a href="#graphschedulemultchoice">graphschedulemultchoice</a></li>
 </ul>
 <h3><a name="graphcircleladder">graphcircleladder</a></h3>
 /graphcircleladder(n,m,[options])
@@ -101,15 +112,6 @@ graphrandom(n,[options])
 <BR><h3><a name="graphemptygraph">graphemptygraph</a></h3>
 graphemptygraph(n)
 <BR>creates an empty graph matrix, nxn
-<BR><h3><a name="graphrandomgridschedule">graphrandomgridschedule</a></h3>
-graphrandomgridschedule(n, m, p,[options])
-<BR>draws a n by m grid of vertices.  Each pair of neighboring
-<BR>and diagonal vertices has a p probabilility (0 to 1) of being connected
-<BR>a start and end vertex are added
-<BR>options['weights'] as an array of n*m elements will be used as weights.
-<BR>options['weights'] as a single number will randomize weights from 1 to that
-<BR>  value
-<BR>if options['labels'] are used, "start" and "end" will be added automatically
 <BR><h3><a name="graphdijkstra">graphdijkstra</a></h3>
 graphdijkstra(g,[dest]) 
 <BR>computes dijkstras algorithm on the graph g
@@ -119,18 +121,6 @@ graphdijkstra(g,[dest])
 <BR>the last vertex will be used as the destination vertex
 <BR>returns array(dist,next) where
 <BR>dist[i] is the shortest dist to end, and
-<BR>next[i] is the vertex next closest to the end
-<BR><h3><a name="graphbackflow">graphbackflow</a></h3>
-graphbackflow(g,[w]) 
-<BR>computes longest-path algorithm on the graph g
-<BR>g is a 2-dimensional matrix
-<BR>g[i][j] &gt; 1 if vertexes i leads to j
-<BR>This might give bad/weird results if graph has a circuit
-<BR>the last vertex will be used as the destination vertex
-<BR>w are weights for the vertices, if a scheduling digraph and 
-<BR>tasks rather than edges have weights
-<BR>returns array(dist,next) where
-<BR>dist[i] is the longest dist to end, and
 <BR>next[i] is the vertex next closest to the end
 <BR><h3><a name="graphkruskal">graphkruskal</a></h3>
 graphkruskal(g) 
@@ -186,6 +176,17 @@ graphgetedgesarray(g)
 <BR><h3><a name="graphgettotalcost">graphgettotalcost</a></h3>
 graphgettotalcost(g) 
 <BR>gets total cost of all edges in a graph
+<BR><h3><a name="graphadjacencytoprereqs">graphadjacencytoprereqs</a></h3>
+graphadjacencytoprereqs(g,[options])
+<BR>create incidence lists from adjacency matrix g
+<BR>g[i][j] &gt; 0 if edge from i to j
+<BR>outputs list where list[i] is array of vertices
+<BR>  that lead to i.  Only intended for digraphs.
+<BR><h3><a name="graphprereqtable">graphprereqtable</a></h3>
+graphprereqtable(g,w,[op]) 
+<BR>creates an HTML table showing the tasks in g, the task times in w, and
+<BR>the tasks that must be completed first.
+<BR>use $op['labels'] to provide array of labels, or ='letters' to use letters
 <BR><h3><a name="graphadjacencytoincidence">graphadjacencytoincidence</a></h3>
 graphadjacencytoincidence(g,[options])
 <BR>create incidence lists from adjacency matrix g
@@ -260,4 +261,79 @@ graphcomparecircuits(A,B)
 <BR>compares two circuits to see if they are the same, regardless of starting
 <BR>vertex.  So "ABCDA" would be considered equivalent to "DCBAD"
 <BR>can be used with the conditional answer type to score circuits. 
+<BR><h3><a name="graphrandomgridschedule">graphrandomgridschedule</a></h3>
+graphrandomgridschedule(n, m, p,[options])
+<BR>draws a n by m grid of vertices.  Each pair of neighboring
+<BR>and diagonal vertices has a p probabilility (0 to 1) of being connected
+<BR>an end vertex is added
+<BR>options['weights'] as an array of n*m elements will be used as weights.
+<BR>options['weights'] as a single number will randomize weights from 1 to that
+<BR>  value
+<BR>if options['labels'] are used, "start" and "end" will be added automatically
+<BR><h3><a name="graphdecreasingtimelist">graphdecreasingtimelist</a></h3>
+graphdecreasingtimelist(g,w)
+<BR>uses the scheduling priority list generated by the decreasing time list
+<BR>algorithm
+<BR>g is the graph
+<BR>w is the array of task times
+<BR><h3><a name="graphcriticaltimelist">graphcriticaltimelist</a></h3>
+graphcriticaltimelist(g,w)
+<BR>uses the scheduling priority list generated by the critical path algorithm
+<BR>g is the graph
+<BR>w is the array of task times
+<BR><h3><a name="graphbackflow">graphbackflow</a></h3>
+graphbackflow(g,[w]) 
+<BR>computes longest-path algorithm on the graph g
+<BR>g is a 2-dimensional matrix
+<BR>g[i][j] &gt; 1 if vertexes i leads to j
+<BR>This might give bad/weird results if graph has a circuit
+<BR>the last vertex will be used as the destination vertex
+<BR>w are weights for the vertices, if a scheduling digraph and 
+<BR>tasks rather than edges have weights
+<BR>returns array(dist,next) where
+<BR>dist[i] is the longest dist to end, and
+<BR>next[i] is the vertex next closest to the end
+<BR><h3><a name="graphlistprocessing">graphlistprocessing</a></h3>
+graphlistprocessing(g,t,L,p,[options])
+<BR>calculates the list processing algorithm on p processors with priority list L
+<BR>t is an array of task times
+<BR>L is an array of indices into g showing the priority list
+<BR>g is a 2-dimensional matrix
+<BR>g[i][j] > 0 if vertexes i leads to j, where cost of task i is c
+<BR>This might give bad/weird results if graph has a circuit
+<BR>the last vertex will be used as the destination vertex; it should be the
+<BR>last task on the priority list and have task time 0.
+<BR>output is out[processor] = array of array(task, timestarted, tasklength)
+<BR><h3><a name="graphscheduletaskinfo">graphscheduletaskinfo</a></h3>
+graphscheduletaskinfo(schedule,n)
+<BR>where schedule is the result of graphlistprocessing
+<BR>and n is the task number (0 indexed)
+<BR>returns array(processor assigned (0 indexed), task start, task time)
+<BR><h3><a name="graphschedulecompletion">graphschedulecompletion</a></h3>
+graphschedulecompletion(schedule)
+<BR>where schedule is the result of graphlistprocessing
+<BR>returns completion time of the schedule
+<BR><h3><a name="graphscheduleidle">graphscheduleidle</a></h3>
+graphscheduleidle(schedule,p)
+<BR>where schedule is the result of graphlistprocessing
+<BR>and p is the processor number (0-indexed)
+<BR><h3><a name="graphscheduleproctasks">graphscheduleproctasks</a></h3>
+graphscheduleproctasks(schedule,p,[oneindex])
+<BR>return an array of the tasks the processor worked on, in order
+<BR>set oneindex=true to add one to the last index to get task numbers
+<BR><h3><a name="graphdrawschedule">graphdrawschedule</a></h3>
+graphdrawschedule(sc,[width,height,names])
+<BR>draws the schedule generated by graphlistprocessing
+<BR>defaults to width=600,height=70*# of processors
+<BR>can provide array of task names, or it will default to task numbers (starting at 1)
+<BR><h3><a name="graphschedulelayout">graphschedulelayout</a></h3>
+graphschedulelayout(g,w,pos,[op])
+<BR>draws a schedule digraph 
+<BR>g is the graph, w is an array of task times
+<BR>pos is array where L[task number] = array(column,row (counting up from bottom))
+<BR>use $options['labels'] to specify labels, or T1 - TN will be used
+<BR><h3><a name="graphschedulemultchoice">graphschedulemultchoice</a></h3>
+graphschedulemultchoice(g,t,L,p)
+<BR>attempts to return 4 schedules which are different.  The first is the 
+<BR>correct schedule based on the provided priority list L
 <BR>

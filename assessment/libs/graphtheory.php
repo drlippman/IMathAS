@@ -1,7 +1,6 @@
 <?php
-//A library of graph theory functions.  Version 0.2, Sept 4, 2009
-//THIS LIBRARY IS NOT COMPLETE.  THE SYNTAX OR NAMES OF THESE FUNCTIONS
-//MAY CHANGE
+//A library of graph theory and scheduling functions.  Version 1.1, April 3, 2012
+//
 //Most graphing functions in this library use an options array.  Here are the
 //common options - specific functions will mention other options.
 //  options['width'] = width of output, in pixels.  Defaults to 300.
@@ -22,7 +21,7 @@
 //    position of vertex labels.  
 
 global $allowedmacros;
-array_push($allowedmacros,"graphspringlayout","graphcirclelayout","graphgridlayout","graphpathlayout","graphcircleladder","graphcircle","graphbipartite","graphgrid","graphrandom","graphrandomgridschedule","graphemptygraph","graphdijkstra","graphbackflow","graphkruskal","graphadjacencytoincidence","graphincidencetoadjacency","graphdrawit","graphdecreasingtimelist","graphcriticaltimelist","graphcircledstar","graphcircledstarlayout","graphmaketable","graphsortededges","graphcircuittoarray","graphnearestneighbor","graphrepeatednearestneighbor","graphgetedges","graphgettotalcost","graphnestedpolygons","graphmakesymmetric","graphisconnected","graphgetedgesarray","graphsequenceeuleredgedups","graphsequenceishamiltonian","graphshortestpath","graphgetpathlength","graphcomparecircuits","graphlistprocessing","graphscheduletaskinfo","graphschedulecompletion","graphscheduleidle","graphdrawschedule","graphschedulelayout");
+array_push($allowedmacros,"graphspringlayout","graphcirclelayout","graphgridlayout","graphpathlayout","graphcircleladder","graphcircle","graphbipartite","graphgrid","graphrandom","graphrandomgridschedule","graphemptygraph","graphdijkstra","graphbackflow","graphkruskal","graphadjacencytoincidence","graphincidencetoadjacency","graphdrawit","graphdecreasingtimelist","graphcriticaltimelist","graphcircledstar","graphcircledstarlayout","graphmaketable","graphsortededges","graphcircuittoarray","graphnearestneighbor","graphrepeatednearestneighbor","graphgetedges","graphgettotalcost","graphnestedpolygons","graphmakesymmetric","graphisconnected","graphgetedgesarray","graphsequenceeuleredgedups","graphsequenceishamiltonian","graphshortestpath","graphgetpathlength","graphcomparecircuits","graphlistprocessing","graphscheduletaskinfo","graphschedulecompletion","graphscheduleidle","graphdrawschedule","graphschedulelayout","graphscheduleproctasks","graphschedulemultchoice","graphprereqtable");
 	
 ///graphcircleladder(n,m,[options])
 //draws a circular ladder graph
@@ -227,148 +226,6 @@ function graphemptygraph($n) {
 	return $g;
 }
 
-//graphrandomgridschedule(n, m, p,[options])
-//draws a n by m grid of vertices.  Each pair of neighboring
-//and diagonal vertices has a p probabilility (0 to 1) of being connected
-//a start and end vertex are added
-//options['weights'] as an array of n*m elements will be used as weights.
-//options['weights'] as a single number will randomize weights from 1 to that
-//  value
-//if options['labels'] are used, "start" and "end" will be added automatically
-function graphrandomgridschedule($n,$m,$p,$op=array()) {
-	$op['digraph'] = true;
-	$lettersarray = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
-	$tot = $n*$m+2;
-	$useweights = false;
-	if (isset($op['weights'])) {
-		$useweights = true;
-		if (!is_array($op['weights'])) {
-			$op['weights'] = rands(1,$op['weights'],$n*$m);
-		}
-	}
-			
-	$g = graphemptygraph($tot);
-	$sn = $n;
-	$gd = 10/$sn;
-	$pos[0][0] = -$gd;
-	$pos[0][1] = $gd*(($n-1)/2);
-	$pos[$tot-1][0] = $m*$gd;
-	$pos[$tot-1][1] = $gd*(($n-1)/2);
-	for ($i=1; $i<$tot-1; $i++) {
-		$pos[$i][0] = floor(($i-1)/$sn)*$gd  + ($op['wiggle']?$gd/5*sin(3*$i):0);;
-		$pos[$i][1] = (($i-1)%$sn)*$gd + ($op['wiggle']?$gd/5*sin(4*$i):0);
-	}	
-	//connections to start and end
-	for ($i = 1; $i<$n+1; $i++) {
-		$g[0][$i] = 1;
-		$g[$tot-1-$i][$tot-1] = 1;
-	}
-	//connections between
-	for ($i = 1; $i<$tot; $i++) {
-		if ($i<$tot-$n) {
-			$r[0] = rand(0,99);
-			$r[1] = rand(0,99);
-			$r[2] = rand(0,99);
-			
-			$out = false;
-			if ($r[0]<$p*100) {
-				$g[$i][$i+$n] = 1;
-				$out = true;
-			}
-			
-			if ($r[1]<$p*100  && ($i)%$n!=0) {
-				$g[$i][$i+$n+1] = 1;
-				$out = true;
-			}
-			
-			if ($r[2]<$p*100 && ($i-1)%$n!=0) {
-				$g[$i][$i+$n-1] = 1;
-				$out = true;
-			}
-			//force one outgoing
-			if (!$out) {
-				$d = rand(0,2);
-				if ($d<2) {
-					$g[$i][$i+$n] = 1;
-				} else {
-					if ($i%$n==0) {
-						$g[$i][$i+$n-1] = 1;
-					} else {
-						$g[$i][$i+$n+1] = 1;
-					}
-				}
-			}
-			if (isset($op['forcemultpath']) && $op['forcemultpath']==$i) {
-				if ($g[$i][$i+$n] == 1) {
-					if ($i%$n==0) {
-						$g[$i][$i+$n-1] = 1;
-					} else {
-						$g[$i][$i+$n+1] = 1;
-					}
-				} else {
-					$g[$i][$i+$n] = 1;
-				}
-			}
-		}
-		//force one incoming
-		$connected = false;
-		if ($i<=$n) {
-			$connected = true;
-		} else if ($i<=$n || $g[$i-1][$i]==1 || $g[$i-$n][$i]==1 || $g[$i-$n-1][$i]==1 ||  $g[$i-$n+1][$i]==1) {
-			$connected = true;
-		}
-		if (!$connected) {
-			$g[$i-$n][$i] = 1;
-		}
-		
-	}
-	
-	if (isset($op['labels'])) {
-		if ($op['labels']=="letters") {
-			$op['labels'] = array_slice($lettersarray,0,$tot-2);
-		} else {
-			$op['labels'] = array_slice($op['labels'],0,$tot-2);
-		}
-		array_unshift($op['labels'],"Start");
-		array_push($op['labels'],"End");
-		if ($useweights) {
-			for ($i=1; $i<$tot-1; $i++) {
-				$op['labels'][$i] .= ' ('.$op['weights'][$i-1].')';
-			}
-		}
-	}
-	array_unshift($op['weights'],0);
-	array_push($op['weights'],0);
-	return array(graphdrawit($pos,$g,$op),$g,$op['weights']);
-}
-
-//graphdecreasingtimelist(g,w)
-//uses the scheduling priority list generated by the decreasing time list
-//algorithm
-//g is the graph
-//w is the array of task times
-function graphdecreasingtimelist($g,$w) {
-	asort($w);
-	$k = array_reverse(array_keys($w));
-	while ($w[$k[count($k)-1]]==0) {
-		array_pop($k);
-	}
-	return $k;	
-}
-
-//graphcriticaltimelist(g,w)
-//uses the scheduling priority list generated by the critical path algorithm
-//g is the graph
-//w is the array of task times
-function graphcriticaltimelist($g,$w) {
-	list($dist,$next) = graphbackflow($g,$w);
-	unset($dist[count($dist)-1]);
-	//unset($dist[0]);
-	asort($dist);
-	$k = array_reverse(array_keys($dist));
-	return $k;
-}
-
 //graphdijkstra(g,[dest]) 
 //computes dijkstras algorithm on the graph g
 //g is a 2-dimensional matrix
@@ -425,251 +282,6 @@ function graphdijkstra($g,$dest=-1) {
 	return array($dist,$next);
 }
 
-//graphbackflow(g,[w]) 
-//computes longest-path algorithm on the graph g
-//g is a 2-dimensional matrix
-//g[i][j] &gt; 1 if vertexes i leads to j
-//This might give bad/weird results if graph has a circuit
-//the last vertex will be used as the destination vertex
-//w are weights for the vertices, if a scheduling digraph and 
-//tasks rather than edges have weights
-//returns array(dist,next) where
-//dist[i] is the longest dist to end, and
-//next[i] is the vertex next closest to the end
-function graphbackflow($g,$w=array()) {
-	$n = count($g[0]);
-	$dist = array();
-	$next = array();
-	$eaten = array();
-	$inf = 1e16;
-	for ($i=0; $i<$n; $i++) {
-		$dist[$i] = -1;
-	}
-	$dist[$n-1] = 0;
-	$toprocess = array($n-1);
-	while (count($eaten)<$n) {
-		if (count($toprocess)==0) { break;}
-		$newtoprocess = array();
-		for ($k=0; $k<count($toprocess); $k++) {
-			$cur = $toprocess[$k];
-			for ($i=0; $i<$n; $i++) {
-				if (!isset($eaten[$i]) && $g[$i][$cur]>0) { //vertices leading to $cur
-					if (count($w)>0) {
-						$alt = $dist[$cur] + $w[$i];
-					} else {
-						$alt = $dist[$cur] + $g[$i][$cur];
-					}
-					if ($alt>$dist[$i]) {
-						$dist[$i] = $alt;
-						$next[$i] = $cur;
-						
-					}
-					if (!in_array($i,$newtoprocess)) {
-						$douse = true;
-						//don't use if not terminal 
-						for ($j=0; $j<$n; $j++) {
-							if ($g[$i][$j]>0 && !isset($eaten[$j]) && $j!=$cur) {
-								$douse = false; break;
-							}
-						}
-						if ($douse) {
-							$newtoprocess[] = $i;
-						}
-					}
-				}
-			}
-			$eaten[$cur] = 1;
-		}
-		$toprocess = $newtoprocess;
-	}
-	return array($dist,$next);
-}
-
-
-//graphlistprocessing(g,t,L,p,[options])
-//calculates the list processing algorithm on p processors with priority list L
-//t is an array of task times
-//L is an array of indices into g showing the priority list
-//g is a 2-dimensional matrix
-//g[i][j] > 0 if vertexes i leads to j, where cost of task i is c
-//This might give bad/weird results if graph has a circuit
-//the last vertex will be used as the destination vertex; it should be the
-//last task on the priority list and have task time 0.
-//output is out[processor] = array of array(task, timestarted, tasklength)
-function graphlistprocessing($g,$t,$L,$p,$op=array()) {
-	$out = array();
-	for ($i=0;$i<$p;$i++) {
-		$out[$i] = array();
-	}
-	$n = count($g[0]);
-	$done = array();
-	$started = array();
-	$curtime = 0; 
-	$proc = array_fill(0,$p,0); //holds time when each processor is done w current task
-	$prereqs = graphadjacencytoprereqs($g,$op);
-	$cnt = 0;
-	while (count($done)<$n-1) { //we don't worry about the last task.
-		//mark done tasks 
-		if ($curtime > 0) {
-			for ($i=0;$i<$p;$i++) {
-				if ($proc[$i]<=$curtime) { //if processor is done
-					$done[$out[$i][count($out[$i])-1][0]] = 1; //mark this proc's last task as done
-				}
-			}
-		}
-		//get ready tasks
-		$ready = array();
-		for ($i=0;$i<$n;$i++) {
-			if (isset($started[$i])) {continue; } //skip if done
-			$isready = true;
-			foreach ($prereqs[$L[$i]] as $j) { //foreach prereq check if done
-				if (!isset($done[$j])) {
-					$isready = false; break;
-				}
-			}
-			if ($isready) {
-				$ready[] = $L[$i];
-				if ($L[$i]==$n-1) {break 2;} //last last (dest) is ready
-			}
-		}
-		//assign ready tasks
-		if (count($ready) > 0) { //if anything is ready
-			$todo = count($ready);
-			for ($i=0;$i<$p && $todo>0;$i++) {
-				if ($proc[$i]<=$curtime) { //if processor is done
-					$toassign = array_shift($ready);  //shift off first ready task
-					$out[$i][] = array($toassign,$curtime,$t[$toassign]);  //add to output
-					$proc[$i] = $curtime + $t[$toassign];  //update time when proc will be done
-					$started[$toassign] = 1;
-					$todo--;
-				}
-			}
-			$curtime = min($proc); //update next time to check to when next proc is done.
-		} else {
-			//nothing is ready, so need to idle until next task is done
-			$nexttime = 1000000000;
-			foreach ($proc as $j) {
-				if ($j>$curtime && $j<$nexttime) {
-					$nexttime = $j;
-				}
-			}
-			$curtime = $nexttime;
-		}
-	}
-	return $out;
-}
-
-
-//graphscheduletaskinfo(schedule,n)
-//where schedule is the result of graphlistprocessing
-//and n is the task number (0 indexed)
-//returns array(processor assigned (0 indexed), task start, task time)
-function graphscheduletaskinfo($sc,$n) {
-	foreach ($sc as $p=>$tl) {
-		foreach ($tl as $taskitems) {
-			if ($taskitems[0]==$n) {
-				return array($p,$taskitems[1], $taskitems[2]);
-			}
-		}
-	}
-}
-
-//graphschedulecompletion(schedule)
-//where schedule is the result of graphlistprocessing
-//returns completion time of the schedule
-function graphschedulecompletion($sc) {
-	$time = 0;
-	foreach ($sc as $pl) {
-		$ptime = $pl[count($pl)-1][1] + $pl[count($pl)-1][2];
-		if ($ptime>$time) {
-			$time = $ptime;
-		}
-	}
-	return $time;
-}
-
-//graphscheduleidle(schedule,p)
-//where schedule is the result of graphlistprocessing
-//and p is the processor number (0-indexed)
-function graphscheduleidle($sc,$p) {
-	$idle = 0;
-	$lastend = 0;
-	foreach ($sc[$p] as $i=>$ti) {
-		$idle += ($ti[1] - $lastend);
-		$lastend = $ti[1]+$ti[2];
-	}
-	$idle += (graphschedulecompletion($sc) - $lastend);
-	return $idle;
-}
-
-//graphdrawschedule(sc,[width,height,names])
-//draws the schedule generated by graphlistprocessing
-//defaults to width=600,height=70*# of processors
-//can provide array of task names, or it will default to task numbers (starting at 1)
-function graphdrawschedule($sc,$w=600,$h=-1,$names=array()) {
-	$p = count($sc);
-	if ($h==-1) {
-		$h = 70*$p;
-	}
-	//text label is around 40 px, so can do w/40 labels.  Divide ct / (w/40)
-	$colors = array('red','blue','green','orange','cyan','yellow','purple');
-	$ct = graphschedulecompletion($sc);
-	$sp = ceil($ct/($w/25));
-	//penacto - video thing
-	$com = "setBorder(12,8,12,20);initPicture(0,$ct,0,$p);stroke='gray';";
-	for ($i=0;$i<=$ct;$i++) {
-		$com .= "line([$i,-.1],[$i,$p+.1]);";
-	}
-	$com .= "stroke='black';";
-	for ($i=0;$i<=$ct;$i+=$sp) {
-		$com .= "text([$i,$p],'$i','above');";	
-		$com .= "line([$i,-.1],[$i,$p+.1]);";
-	}
-	$com .= "fill='gray';rect([0,0],[$ct,$p]);";
-	for ($i=1;$i<$p;$i++) {
-		$com .= "line([0,$i],[$ct,$i]);";
-	}
-	$com .= "fontbackground='white';";
-	$cnt = 0;
-	foreach ($sc as $n=>$tl) {
-		foreach ($tl as $ti) {
-			$col = $colors[$cnt%7]; $cnt++;
-			if (count($names)==0) {
-				$tn = 'T'.($ti[0]+1);
-			} else {
-				$tn = $names[$ti[0]];
-			}
-			$com .= "fill='$col';rect([".$ti[1].",".($p-$n)."],[".($ti[1]+$ti[2]).",".($p-$n-1)."]);";
-			$com .= "text([".($ti[1]+.5*$ti[2]).",".($p-$n-.5)."],'$tn');";
-		}
-	}
-	
-	return showasciisvg($com,$w,$h);
-}
-
-//graphschedulelayoutongrid(g,w,pos,[op])
-//draws a schedule digraph 
-//g is the graph, w is an array of last times
-//pos is array where L[task number] = array(column,row (counting up from bottom))
-//use $options['labels'] to specify labels, or T1 - TN will be used
-function graphschedulelayout($g,$w,$pos,$op=array()) {
-	$n = count($g[0]);
-	$op['digraph'] = true;
-	if (!isset($op['width'])) {
-		$op['width'] = 600;
-	}
-	if (!isset($op['labels'])) {
-		for ($i=0;$i<$n-1;$i++) {
-			$op['labels'][$i] = 'T'.($i+1);
-		}
-		$op['labels'][$n-1] = 'End';
-	}
-	for ($i=0;$i<$n-1;$i++) {
-		$op['labels'][$i] .= ' ('.$w[$i].')';
-	}
-	return graphdrawit($pos,$g,$op);
-}
-	
 
 //graphkruskal(g) 
 //return a minimum cost spanning tree graph from graph g
@@ -1098,6 +710,31 @@ function graphadjacencytoprereqs($g,$op) {
 		}
 	}
 	return $list;
+}
+
+//graphprereqtable(g,w,[op]) 
+//creates an HTML table showing the tasks in g, the task times in w, and
+//the tasks that must be completed first.
+//use $op['labels'] to provide array of labels, or ='letters' to use letters
+function graphprereqtable($g,$w,$op=array()) {
+	$prereq = graphadjacencytoprereqs($g,$op);
+	if ($op['labels'] != 'letters') {
+		$lbl = $op['labels'];
+	} else {
+		$lbl = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
+	}
+	$out = '<table class="stats"><thead><tr><th>Task</th><th>Time Required</th><th>Tasks that must be completed first</th></tr></thead><tbody>';
+	for ($i=0;$i<count($prereq)-1;$i++) {
+		$out .= '<tr><td class="c">'.$lbl[$i].'</td><td class="c">'.$w[$i].'</td><td class="l">';
+		foreach ($prereq[$i] as $k=>$p) {
+			$prereq[$i][$k] = $lbl[$p];
+		}
+		$out .= implode(', ',$prereq[$i]);
+		$out .= '</td></tr>';
+	}
+	$out .= '</tbody></table>';
+	return $out;
+		
 }
 	
 //graphadjacencytoincidence(g,[options])
@@ -1594,4 +1231,430 @@ function graphcomparecircuits($a,$b) {
 }
 
 
+//graphrandomgridschedule(n, m, p,[options])
+//draws a n by m grid of vertices.  Each pair of neighboring
+//and diagonal vertices has a p probabilility (0 to 1) of being connected
+//an end vertex is added
+//options['weights'] as an array of n*m elements will be used as weights.
+//options['weights'] as a single number will randomize weights from 1 to that
+//  value
+//if options['labels'] are used, "start" and "end" will be added automatically
+function graphrandomgridschedule($n,$m,$p,$op=array()) {
+	$op['digraph'] = true;
+	$lettersarray = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
+	$tot = $n*$m+1;
+	$useweights = false;
+	if (isset($op['weights'])) {
+		$useweights = true;
+		if (!is_array($op['weights'])) {
+			$op['weights'] = diffrands(1,$op['weights'],$n*$m);
+		}
+	}
+			
+	$g = graphemptygraph($tot);
+	$sn = $n;
+	$gd = 1;//10/$sn;
+	//$pos[0][0] = -$gd;
+	//$pos[0][1] = $gd*(($n-1)/2);
+	$pos[$tot-1][0] = $m*$gd;
+	$pos[$tot-1][1] = $gd*(($n-1)/2);
+	for ($i=0; $i<$tot-1; $i++) {
+		$pos[$i][0] = floor(($i)/$sn)*$gd  + ($op['wiggle']?$gd/5*sin(3*$i):0);;
+		$pos[$i][1] = $sn-1-(($i)%$sn)*$gd + ($op['wiggle']?$gd/5*sin(4*$i):0);
+	}	
+	//connections to start and end
+	for ($i = 1; $i<$n+1; $i++) {
+		//$g[0][$i] = 1;
+		$g[$tot-1-$i][$tot-1] = 1;
+	}
+	//connections between
+	for ($i = 0; $i<$tot; $i++) {
+		if ($i<$tot-$n) {
+			$r[0] = rand(0,99);
+			$r[1] = rand(0,99);
+			$r[2] = rand(0,99);
+			
+			$out = false;
+			if ($r[0]<$p*100) {
+				$g[$i][$i+$n] = 1;
+				$out = true;
+			}
+			
+			if ($r[1]<$p*100  && ($i+1)%$n!=0) {
+				$g[$i][$i+$n+1] = 1;
+				$out = true;
+			}
+			
+			if ($r[2]<$p*100 && ($i)%$n!=0) {
+				$g[$i][$i+$n-1] = 1;
+				$out = true;
+			}
+			//force one outgoing
+			if (!$out) {
+				$d = rand(0,2);
+				if ($d<2) {
+					$g[$i][$i+$n] = 1;
+				} else {
+					if (($i+1)%$n==0) {
+						$g[$i][$i+$n-1] = 1;
+					} else {
+						$g[$i][$i+$n+1] = 1;
+					}
+				}
+			}
+			if (isset($op['forcemultpath']) && $op['forcemultpath']==$i) {
+				if ($g[$i][$i+$n] == 1) {
+					if (($i+1)%$n==0) {
+						$g[$i][$i+$n-1] = 1;
+					} else {
+						$g[$i][$i+$n+1] = 1;
+					}
+				} else {
+					$g[$i][$i+$n] = 1;
+				}
+			}
+		}
+		//force one incoming
+		$connected = false;
+		if ($i<=$n) {
+			$connected = true;
+		} else if ($i<=$n || $g[$i-1][$i]==1 || $g[$i-$n][$i]==1 || $g[$i-$n-1][$i]==1 ||  $g[$i-$n+1][$i]==1) {
+			$connected = true;
+		}
+		if (!$connected) {
+			$g[$i-$n][$i] = 1;
+		}
+		
+	}
+	
+	if (isset($op['labels'])) {
+		if ($op['labels']=="letters") {
+			$op['labels'] = array_slice($lettersarray,0,$tot-1);
+		} else {
+			$op['labels'] = array_slice($op['labels'],0,$tot-1);
+		}
+		//array_unshift($op['labels'],"Start");
+		array_push($op['labels'],"End");
+		if ($useweights) {
+			for ($i=0; $i<$tot-1; $i++) {
+				$op['labels'][$i] .= ' ('.$op['weights'][$i].')';
+			}
+		}
+	}
+	//array_unshift($op['weights'],0);
+	array_push($op['weights'],0);
+	return array(graphdrawit($pos,$g,$op),$g,$op['weights']);
+}
+
+//graphdecreasingtimelist(g,w)
+//uses the scheduling priority list generated by the decreasing time list
+//algorithm
+//g is the graph
+//w is the array of task times
+function graphdecreasingtimelist($g,$w) {
+	asort($w);
+	$k = array_reverse(array_keys($w));
+	while ($w[$k[count($k)-1]]==0) {
+		array_pop($k);
+	}
+	return $k;	
+}
+
+//graphcriticaltimelist(g,w)
+//uses the scheduling priority list generated by the critical path algorithm
+//g is the graph
+//w is the array of task times
+function graphcriticaltimelist($g,$w) {
+	list($dist,$next) = graphbackflow($g,$w);
+	unset($dist[count($dist)-1]);
+	//unset($dist[0]);
+	asort($dist);
+	$k = array_reverse(array_keys($dist));
+	return $k;
+}
+
+//graphbackflow(g,[w]) 
+//computes longest-path algorithm on the graph g
+//g is a 2-dimensional matrix
+//g[i][j] &gt; 1 if vertexes i leads to j
+//This might give bad/weird results if graph has a circuit
+//the last vertex will be used as the destination vertex
+//w are weights for the vertices, if a scheduling digraph and 
+//tasks rather than edges have weights
+//returns array(dist,next) where
+//dist[i] is the longest dist to end, and
+//next[i] is the vertex next closest to the end
+function graphbackflow($g,$w=array()) {
+	$n = count($g[0]);
+	$dist = array();
+	$next = array();
+	$eaten = array();
+	$inf = 1e16;
+	for ($i=0; $i<$n; $i++) {
+		$dist[$i] = -1;
+	}
+	$dist[$n-1] = 0;
+	$toprocess = array($n-1);
+	while (count($eaten)<$n) {
+		if (count($toprocess)==0) { break;}
+		$newtoprocess = array();
+		for ($k=0; $k<count($toprocess); $k++) {
+			$cur = $toprocess[$k];
+			for ($i=0; $i<$n; $i++) {
+				if (!isset($eaten[$i]) && $g[$i][$cur]>0) { //vertices leading to $cur
+					if (count($w)>0) {
+						$alt = $dist[$cur] + $w[$i];
+					} else {
+						$alt = $dist[$cur] + $g[$i][$cur];
+					}
+					if ($alt>$dist[$i]) {
+						$dist[$i] = $alt;
+						$next[$i] = $cur;
+						
+					}
+					if (!in_array($i,$newtoprocess)) {
+						$douse = true;
+						//don't use if not terminal 
+						for ($j=0; $j<$n; $j++) {
+							if ($g[$i][$j]>0 && !isset($eaten[$j]) && $j!=$cur) {
+								$douse = false; break;
+							}
+						}
+						if ($douse) {
+							$newtoprocess[] = $i;
+						}
+					}
+				}
+			}
+			$eaten[$cur] = 1;
+		}
+		$toprocess = $newtoprocess;
+	}
+	
+	return array($dist,$next);
+}
+
+
+//graphlistprocessing(g,t,L,p,[options])
+//calculates the list processing algorithm on p processors with priority list L
+//t is an array of task times
+//L is an array of indices into g showing the priority list
+//g is a 2-dimensional matrix
+//g[i][j] > 0 if vertexes i leads to j, where cost of task i is c
+//This might give bad/weird results if graph has a circuit
+//the last vertex will be used as the destination vertex; it should be the
+//last task on the priority list and have task time 0.
+//output is out[processor] = array of array(task, timestarted, tasklength)
+function graphlistprocessing($g,$t,$L,$p,$op=array()) {
+	//print_r($L);
+	//print_r($t);
+	$out = array();
+	for ($i=0;$i<$p;$i++) {
+		$out[$i] = array();
+	}
+	$n = count($g[0]);
+	$done = array();
+	$started = array();
+	$curtime = 0; 
+	$proc = array_fill(0,$p,0); //holds time when each processor is done w current task
+	$prereqs = graphadjacencytoprereqs($g,$op);
+	$cnt = 0;
+	while (count($done)<$n-1) { //we don't worry about the last task.
+		//mark done tasks 
+		if ($curtime > 0) {
+			for ($i=0;$i<$p;$i++) {
+				if ($proc[$i]<=$curtime) { //if processor is done
+					$done[$out[$i][count($out[$i])-1][0]] = 1; //mark this proc's last task as done
+					//echo "marking".$out[$i][count($out[$i])-1][0]." done<br/>";
+				}
+			}
+		}
+		//get ready tasks
+		$ready = array();
+		for ($i=0;$i<$n;$i++) {
+			if (isset($started[$L[$i]])) {continue; } //skip if done
+			$isready = true;
+			foreach ($prereqs[$L[$i]] as $j) { //foreach prereq check if done
+				if (!isset($done[$j])) {
+					$isready = false; break;
+				}
+			}
+			if ($isready) {
+				$ready[] = $L[$i];
+				if ($L[$i]==$n-1) {break 2;} //last last (dest) is ready
+			}
+		}
+		//echo "curtime: $curtime, ready: ".implode(',',$ready)."<br/>";
+		//assign ready tasks
+		if (count($ready) > 0) { //if anything is ready
+			$todo = count($ready);
+			for ($i=0;$i<$p && $todo>0;$i++) {
+				if ($proc[$i]<=$curtime) { //if processor is done
+					$toassign = array_shift($ready);  //shift off first ready task
+					//echo "assigning $toassign to $i<br/>";
+					$out[$i][] = array($toassign,$curtime,$t[$toassign]);  //add to output
+					$proc[$i] = $curtime + $t[$toassign];  //update time when proc will be done
+					$started[$toassign] = 1;
+					$todo--;
+				}
+			}
+			$curtime = min($proc); //update next time to check to when next proc is done.
+		} else {
+			//nothing is ready, so need to idle until next task is done
+			$nexttime = 1000000000;
+			foreach ($proc as $j) {
+				if ($j>$curtime && $j<$nexttime) {
+					$nexttime = $j;
+				}
+			}
+			$curtime = $nexttime;
+		}
+	}
+	return $out;
+}
+
+
+//graphscheduletaskinfo(schedule,n)
+//where schedule is the result of graphlistprocessing
+//and n is the task number (0 indexed)
+//returns array(processor assigned (0 indexed), task start, task time)
+function graphscheduletaskinfo($sc,$n) {
+	foreach ($sc as $p=>$tl) {
+		foreach ($tl as $taskitems) {
+			if ($taskitems[0]==$n) {
+				return array($p,$taskitems[1], $taskitems[2]);
+			}
+		}
+	}
+}
+
+//graphschedulecompletion(schedule)
+//where schedule is the result of graphlistprocessing
+//returns completion time of the schedule
+function graphschedulecompletion($sc) {
+	$time = 0;
+	foreach ($sc as $pl) {
+		$ptime = $pl[count($pl)-1][1] + $pl[count($pl)-1][2];
+		if ($ptime>$time) {
+			$time = $ptime;
+		}
+	}
+	return $time;
+}
+
+//graphscheduleidle(schedule,p)
+//where schedule is the result of graphlistprocessing
+//and p is the processor number (0-indexed)
+function graphscheduleidle($sc,$p) {
+	$idle = 0;
+	$lastend = 0;
+	foreach ($sc[$p] as $i=>$ti) {
+		$idle += ($ti[1] - $lastend);
+		$lastend = $ti[1]+$ti[2];
+	}
+	$idle += (graphschedulecompletion($sc) - $lastend);
+	return $idle;
+}
+
+//graphscheduleproctasks(schedule,p,[oneindex])
+//return an array of the tasks the processor worked on, in order
+//set oneindex=true to add one to the last index to get task numbers
+function graphscheduleproctasks($sc,$p,$oneindex=false) {
+	$out = array();
+	foreach ($sc[$p] as $ti) {
+		$out[] = $ti[0] + ($oneindex?1:0);
+	}
+	return $out;
+}
+		
+
+//graphdrawschedule(sc,[width,height,names])
+//draws the schedule generated by graphlistprocessing
+//defaults to width=600,height=70*# of processors
+//can provide array of task names, or it will default to task numbers (starting at 1)
+function graphdrawschedule($sc,$w=600,$h=-1,$names=array()) {
+	$p = count($sc);
+	if ($h==-1) {
+		$h = 70*$p;
+	}
+	//text label is around 40 px, so can do w/40 labels.  Divide ct / (w/40)
+	$colors = array('red','blue','green','orange','cyan','yellow','purple');
+	$ct = graphschedulecompletion($sc);
+	$sp = ceil($ct/($w/25));
+	//penacto - video thing
+	$com = "setBorder(12,8,12,20);initPicture(0,$ct,0,$p);stroke='gray';";
+	for ($i=0;$i<=$ct;$i++) {
+		$com .= "line([$i,-.1],[$i,$p+.1]);";
+	}
+	$com .= "stroke='black';";
+	for ($i=0;$i<=$ct;$i+=$sp) {
+		$com .= "text([$i,$p],'$i','above');";	
+		$com .= "line([$i,-.1],[$i,$p+.1]);";
+	}
+	$com .= "fill='gray';rect([0,0],[$ct,$p]);";
+	for ($i=1;$i<$p;$i++) {
+		$com .= "line([0,$i],[$ct,$i]);";
+	}
+	$com .= "fontbackground='white';";
+	$cnt = 0;
+	foreach ($sc as $n=>$tl) {
+		foreach ($tl as $ti) {
+			$col = $colors[$cnt%7]; $cnt++;
+			if (count($names)==0) {
+				$tn = 'T'.($ti[0]+1);
+			} else {
+				$tn = $names[$ti[0]];
+			}
+			$com .= "fill='$col';rect([".$ti[1].",".($p-$n-1)."],[".($ti[1]+$ti[2]).",".($p-$n)."]);";
+			$com .= "text([".($ti[1]+.5*$ti[2]).",".($p-$n-.5)."],'$tn');";
+		}
+	}
+	
+	return showasciisvg($com,$w,$h);
+}
+
+//graphschedulelayout(g,w,pos,[op])
+//draws a schedule digraph 
+//g is the graph, w is an array of task times
+//pos is array where L[task number] = array(column,row (counting up from bottom))
+//use $options['labels'] to specify labels, or T1 - TN will be used
+function graphschedulelayout($g,$w,$pos,$op=array()) {
+	$n = count($g[0]);
+	$op['digraph'] = true;
+	if (!isset($op['width'])) {
+		$op['width'] = 600;
+	}
+	if (!isset($op['labels'])) {
+		for ($i=0;$i<$n-1;$i++) {
+			$op['labels'][$i] = 'T'.($i+1);
+		}
+		$op['labels'][$n-1] = 'End';
+	}
+	for ($i=0;$i<$n-1;$i++) {
+		$op['labels'][$i] .= ' ('.$w[$i].')';
+	}
+	return graphdrawit($pos,$g,$op);
+}
+
+//graphschedulemultchoice(g,t,L,p)
+//attempts to return 4 schedules which are different.  The first is the 
+//correct schedule based on the provided priority list L
+function graphschedulemultchoice($g,$t,$L,$p) {
+	$sc = graphlistprocessing($g,$t,$L,$p);
+	$tocomp = serialize($sc);
+	$n = count($L)-1;
+	$out = array($sc);
+	$found = 0;
+	for ($cnt=0;$cnt<20 && $found<4;$cnt++) {
+		$pl = diffrands(0,$n-1,$n);
+		$pl[] = $n;
+		$newsc = graphlistprocessing($g,$t,$pl,$p);
+		if (serialize($newsc)!=$tocomp) {
+			$found++;
+			$out[] = $newsc;
+		}
+	}
+	//echo "its: $cnt, found: $found<br/>";
+	return $out;
+}
 ?>

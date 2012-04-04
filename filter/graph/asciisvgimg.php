@@ -370,10 +370,10 @@ function AStextInternal($p,$st,$pos,$angle) {
 		$p[1] = $p[1] + .5*($bbh);
 		
 		if ($pos=='above' || $pos=='aboveright' || $pos=='aboveleft') {
-			$p[1] = $p[1] - .5*(abs($bbh)) - $this->fontsize/2;
+			$p[1] = $p[1] - .5*(abs($bbh)) - $this->fontsize/2 - 2;
 		}			
 		if ($pos=='below' || $pos=='belowright' || $pos=='belowleft') {
-			$p[1] = $p[1] + .5*(abs($bbh)) + $this->fontsize/2;
+			$p[1] = $p[1] + .5*(abs($bbh)) + $this->fontsize/2 + 2;
 		}
 		if ($pos=='left' || $pos=='aboveleft' || $pos=='belowleft') {
 			$p[0] = $p[0] - .5*(abs($bbw)) -$this->fontsize/2;
@@ -391,7 +391,7 @@ function AStextInternal($p,$st,$pos,$angle) {
 			$maxX = max(array($bb[0],$bb[2],$bb[4],$bb[6]));
 			$minY = min(array($bb[1],$bb[3],$bb[5],$bb[7]));
 			$maxY = max(array($bb[1],$bb[3],$bb[5],$bb[7]));
-			imagefilledrectangle($this->img,$p[0]+$minX-2,$p[1]+$minY-2,$p[0]+$maxX+2,$p[1]+$maxY+2,$this->{$this->fontbackground});
+			imagefilledrectangle($this->img,$p[0]+$minX-2,$p[1]+$minY-1,$p[0]+$maxX+2,$p[1]+$maxY+1,$this->{$this->fontbackground});
 		} 
 		imagettftext($this->img,$this->fontsize,$angle,$p[0],$p[1],$this->$color,$this->fontfile,$st);
 	} else {
