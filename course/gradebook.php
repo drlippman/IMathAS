@@ -779,14 +779,15 @@ function gbstudisp($stu) {
 			echo '</tr>';
 		}
 	}
+	echo '</tbody></table>';	
 	if (!$hidepast) {
 		$query = "SELECT stugbmode FROM imas_gbscheme WHERE courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$show = mysql_result($result,0,0);
-		echo '</tbody></table><br/>';
+		//echo '</tbody></table><br/>';
 		if ($isteacher && $stu>0) {
-			echo '<input type="submit" value="Save Changes" style="display:none"; id="savechgbtn" />';
-			echo '<input type="submit" value="Make Exception" name="submit" /> for selected assessments';
+			echo '<p><input type="submit" value="Save Changes" style="display:none"; id="savechgbtn" />';
+			echo '<input type="submit" value="Make Exception" name="submit" /> for selected assessments</p>';
 		}
 		echo '<table class="gb"><thead>';
 		echo '<tr>';
@@ -957,11 +958,26 @@ function gbstudisp($stu) {
 			
 			
 		}
+		echo '</tbody></table><br/>';
+		echo '<p>';
+		if (($show&1)==1) {
+			echo '<b>Past Due</b> total only includes items whose due date has past.  Current assignments are not counted in this total.<br/>';
+		}
+		if (($show&2)==2) {
+			echo '<b>Past Due and Attempted</b> total includes items whose due date has past, as well as currently available items you have started working on.<br/>';
+		} 
+		if (($show&4)==4) {
+			echo '<b>Past Due and Available</b> total includes items whose due date has past as well as currently available items, even if you haven\'t starting working on them yet.<br/>';
+		}
+		if (($show&8)==8) {
+			echo '<b>All</b> total includes all items: past, current, and future to-be-done items.';
+		}
+		echo '</p>';
 	}
-	echo '</tbody></table>';	
+	
 	if ($hidepast && $isteacher && $stu>0) {
-		echo '<input type="submit" value="Save Changes" style="display:none"; id="savechgbtn" />';
-		echo '<input type="submit" value="Make Exception" name="massexception" /> for selected assessments';
+		echo '<p><input type="submit" value="Save Changes" style="display:none"; id="savechgbtn" />';
+		echo '<input type="submit" value="Make Exception" name="massexception" /> for selected assessments</p>';
 	}
 	
 	echo "</form>";
@@ -1184,6 +1200,9 @@ function gbinstrdisp() {
 			if ($catfilter<0) {
 				if ($availshow==3) {
 					if ($gbt[$i][0][0]=='Averages') { 
+						if (isset($gbt[$i][3][8])) { //using points based
+							echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'%'.$enddiv .'</td>';
+						}
 						echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'%'.$enddiv .'</td>';
 					} else {
 						if (isset($gbt[$i][3][8])) { //using points based
@@ -1423,6 +1442,9 @@ function gbinstrdisp() {
 			if ($catfilter<0) {
 				if ($availshow==3) {
 					if ($gbt[$i][0][0]=='Averages') { 
+						if (isset($gbt[$i][3][8])) { //using points based
+							echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'%'.$enddiv .'</td>';
+						}
 						echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'%'.$enddiv .'</td>';
 					} else {
 						if (isset($gbt[$i][3][8])) { //using points based
