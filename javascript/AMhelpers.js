@@ -823,12 +823,12 @@ function toggleinlinebtn(n,p){
 function assessbackgsubmit(qn,noticetgt) {
 	if (noticetgt != null && document.getElementById(noticetgt).innerHTML == "Submitting...") {return false;}
 	if (window.XMLHttpRequest) { 
-		req = new XMLHttpRequest(); 
+		req = new XMLHttpRequest();
 	} else if (window.ActiveXObject) { 
-		req = new ActiveXObject("Microsoft.XMLHTTP"); 
+		req = new ActiveXObject("Microsoft.XMLHTTP");
 	} 
-	if (req != undefined) { 
-		tinyMCE.triggerSave();
+	if (typeof req != 'undefined') { 
+		if (typeof tinyMCE != 'undefined') {tinyMCE.triggerSave();}
 		doonsubmit();
 		params = "embedpostback=true";
 		if (qn != null) {
