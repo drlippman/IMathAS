@@ -322,7 +322,7 @@ function submitChanges() {
   } else if (window.ActiveXObject) { 
     req = new ActiveXObject("Microsoft.XMLHTTP"); 
   } 
-  if (req != undefined) { 
+  if (typeof req != 'undefined') { 
 	req.open("POST", url, true);
 	req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	req.setRequestHeader("Content-length", params.length);

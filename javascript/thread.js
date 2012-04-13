@@ -38,7 +38,7 @@ function submitTagged(thread,tagged) {
   } else if (window.ActiveXObject) { 
     req = new ActiveXObject("Microsoft.XMLHTTP"); 
   } 
-  if (req != undefined) { 
+  if (typeof req != 'undefined') { 
     req.onreadystatechange = function() {ahahDone(url, thread, tagged);}; 
     req.open("GET", url, true); 
     req.send(""); 

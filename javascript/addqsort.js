@@ -340,7 +340,7 @@ function submitChanges() {
   } else if (window.ActiveXObject) { 
     req = new ActiveXObject("Microsoft.XMLHTTP"); 
   } 
-  if (req != undefined) { 
+  if (typeof req != 'undefined') { 
     req.onreadystatechange = function() {ahahDone(url, target);}; 
     req.open("GET", url, true); 
     req.send(""); 

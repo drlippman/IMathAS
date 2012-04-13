@@ -172,7 +172,7 @@ function initrevisionview() {
 	} else if (window.ActiveXObject) { 
 		req = new ActiveXObject("Microsoft.XMLHTTP"); 
 	} 
-	if (req != undefined) { 
+	if (typeof req != 'undefined') { 
 		req.onreadystatechange = function() {revloaded();}; 
 		req.open("GET", AHAHrevurl, true); 
 		req.send(""); 
