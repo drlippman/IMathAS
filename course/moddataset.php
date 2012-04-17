@@ -25,15 +25,19 @@
 	     var qtextbox =  document.getElementById("qtext");
 	     if (editoron==0) {
 	        qtextbox.rows += 3;
-	        qtextbox.value = qtextbox.value.replace(/`(.*?)`/,\'<span class="AM">`$1`</span>\');
+		qtextbox.value = qtextbox.value.replace(/<span\s+class="AM"[^>]*>(.*?)<\\/span>/,"$1");
+	        qtextbox.value = qtextbox.value.replace(/`(.*?)`/,\'<span class="AM" title="$1">`$1`</span>\');
 	        initeditor("exact","qtext");
 	     } else {
 		tinyMCE.execCommand("mceRemoveControl",true,"qtext");
 		qtextbox.rows -= 3;
-		qtextbox.value = qtextbox.value.replace(/<span\s+class="AM">(.*?)<\\/span>/,"$1");
+		qtextbox.value = qtextbox.value.replace(/<span\s+class="AM"[^>]*>(.*?)<\\/span>/,"$1");
 	     }
 	     editoron = 1 - editoron;
-	   }</script>';
+	     document.cookie = "qeditoron="+editoron;
+	   }
+	   addLoadEvent(function(){if (document.cookie.match(/qeditoron=1/)) {toggleeditor();}});
+	   </script>';
 	
 	require("../header.php");
 	if ($myrights<20) {
