@@ -200,7 +200,9 @@ Date.prototype.getWeekDays = function(d) {
 		  var newstartdate = document.getElementById(type+"date"+st).value;
 		  if (newstartdate!=0 && newstartdate!=2000000000 && basearr[st]!="NA") {
 			  var newstarttime = document.getElementById(type+"time"+st).value;
-			  d.setTime(Date.parse(newstartdate + ' ' + newstarttime.replace(/^\s*(\d+)\s*(am|pm)/,"$1:00 $2")));
+			  newstarttime = newstarttime.replace(/^\s*(\d+:\d+)(am|pm)/,"$1 $2");
+			  newstarttime = newstarttime.replace(/^\s*(\d+)\s*(am|pm)/,"$1:00 $2");
+			  d.setTime(Date.parse(newstartdate + ' ' + newstarttime));
 			  db.setTime(basearr[st]*1000); 
 			  if (usebusdays) {
 				  var daydiff = db.getWeekDays(d); //days

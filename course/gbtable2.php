@@ -719,7 +719,7 @@ function gbtable() {
 	$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 	while ($r = mysql_fetch_row($result2)) {
 		$exceptions[$r[0]][$r[1]] = array($r[2],$r[3]);	
-		
+		$gb[$sturow[$r[1]]][1][$assesscol[$r[0]]][6] = ($r[3]>0)?2:1;
 	}
 	//Get assessment scores
 	$assessidx = array_flip($assessments);
@@ -762,9 +762,12 @@ function gbtable() {
 		} else {
 			$IP=0;
 		}
+		/*
+		Moved up to exception finding so LP mark will show on unstarted assessments
 		if (isset($exceptions[$l['assessmentid']][$l['userid']])) {
 			$gb[$row][1][$col][6] = ($exceptions[$l['assessmentid']][$l['userid']][1]>0)?2:1; //had exception
 		}
+		*/
 		if (isset($exceptions[$l['assessmentid']][$l['userid']])) {// && $now>$enddate[$i] && $now<$exceptions[$l['assessmentid']][$l['userid']]) {
 			if ($enddate[$i]>$exceptions[$l['assessmentid']][$l['userid']][0] && $assessmenttype[$i]=="NoScores") {
 				//if exception set for earlier, and NoScores is set, use later date to hide score until later
@@ -1587,6 +1590,7 @@ function gbtable() {
 		//tot avgs
 		$totavgs = array();
 		for ($j=0;$j<count($gb[1][3]);$j++) {
+			if ($gb[1][3][$j]===null) {continue;}
 			$totavgs[$j] = array();
 			for ($i=1;$i<$ln;$i++) { //foreach student
 				if ($gb[$i][4][1]==0) {

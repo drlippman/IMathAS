@@ -1352,8 +1352,7 @@ function graphrandomgridschedule($n,$m,$p,$op=array()) {
 //g is the graph
 //w is the array of task times
 function graphdecreasingtimelist($g,$w) {
-	asort($w);
-	$k = array_reverse(array_keys($w));
+	$k = graphgetkeysweights($w); //$k = array_keys($w);  //array_reverse(array_keys($w));
 	while ($w[$k[count($k)-1]]==0) {
 		array_pop($k);
 	}
@@ -1368,9 +1367,19 @@ function graphcriticaltimelist($g,$w) {
 	list($dist,$next) = graphbackflow($g,$w);
 	unset($dist[count($dist)-1]);
 	//unset($dist[0]);
-	asort($dist);
-	$k = array_reverse(array_keys($dist));
+	//asort($dist);
+	$k = graphgetkeysweights($dist);
 	return $k;
+}
+
+function graphgetkeysweights($w) {
+	//have array of task=>weight
+	//want array of tasks, where weights are decreasing order, but tasks for same weights are increasing order
+	foreach ($w as $t=>$v) {
+		$w[$t] += (100-$t-1)/100;
+	}
+	arsort($w);
+	return array_keys($w);
 }
 
 //graphbackflow(g,[w]) 

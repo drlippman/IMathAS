@@ -894,7 +894,9 @@ if (!isset($_POST['embedpostback'])) {
 			}
 			$duetimenote .= ceil(($timebeforedue%3600)/60)." minutes</span>";
 		} else {
-			if ($exceptionduedate > 0) {
+			if ($testsettings['enddate']==2000000000) {
+				$duetimenote = '';
+			} else if ($exceptionduedate > 0) {
 				$duetimenote = "Due ".tzdate('D m/d/Y g:i a',$exceptionduedate);
 			} else {
 				$duetimenote = "Due ".tzdate('D m/d/Y g:i a',$testsettings['enddate']);

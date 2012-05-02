@@ -216,7 +216,7 @@ if ($canviewall) {
 		$placeinhead .= "	if (type==0) { return false;}\n";
 		$placeinhead .= "  	window.location = toopen; \n";
 		$placeinhead .= "}\n";
-		$placeinhead .= 'function makeofflineeditable() {
+		$placeinhead .= 'function makeofflineeditable(el) {
 					var anchors = document.getElementsByTagName("a");
 					for (var i=0;i<anchors.length;i++) {
 						if (bits=anchors[i].href.match(/addgrades.*gbitem=(\d+)/)) {
@@ -245,6 +245,7 @@ if ($canviewall) {
 						}					
 					}
 					document.getElementById("savechgbtn").style.display = "";
+					el.onclick = null;
 				}';
 	}
 	
@@ -607,7 +608,7 @@ function gbstudisp($stu) {
 				echo "<a href=\"gradebook.php?cid={$_GET['cid']}&uid=$stu&massexception=1\">Make Exception</a> | ";
 				echo "<a href=\"listusers.php?cid={$_GET['cid']}&chgstuinfo=true&uid=$stu\">Change Info</a> | ";
 				echo "<a href=\"viewloginlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">Login Log</a> | ";
-				echo "<a href=\"#\" onclick=\"makeofflineeditable(); return false;\">Edit Offline Scores</a>";
+				echo "<a href=\"#\" onclick=\"makeofflineeditable(this); return false;\">Edit Offline Scores</a>";
 				
 			}
 			$gbcomment = mysql_result($result,0,0);
@@ -632,7 +633,7 @@ function gbstudisp($stu) {
 		}
 		echo '</div>';
 	}
-	echo "<form method=post action=\"gradebook.php?{$_SERVER['QUERY_STRING']}&uid=$stu\">";
+	echo "<form method=\"post\" id=\"qform\" action=\"gradebook.php?{$_SERVER['QUERY_STRING']}&uid=$stu\">";
 	//echo "<input type='button' onclick='conditionalColor(\"myTable\",1,50,80);' value='Color'/>";
 	echo '<table id="myTable" class="gb" style="position:relative;">';
 	echo '<thead><tr>';
@@ -786,8 +787,9 @@ function gbstudisp($stu) {
 		$show = mysql_result($result,0,0);
 		//echo '</tbody></table><br/>';
 		if ($isteacher && $stu>0) {
-			echo '<p><input type="submit" value="Save Changes" style="display:none"; id="savechgbtn" />';
-			echo '<input type="submit" value="Make Exception" name="submit" /> for selected assessments</p>';
+			echo '<p><input type="submit" value="Save Changes" style="display:none"; id="savechgbtn" /> ';
+			echo 'Check: <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',false)">None</a> ';
+			echo 'With selected: <input type="submit" value="Make Exception" name="submit" /></p>';
 		}
 		echo '<table class="gb"><thead>';
 		echo '<tr>';
@@ -1318,13 +1320,7 @@ function gbinstrdisp() {
 						if ($gbt[$i][1][$j][1]==1) {
 							echo '<sup>*</sup>';
 						}
-						if (isset($gbt[$i][1][$j][6]) ) {
-							if ($gbt[$i][1][$j][6]==2) {
-								echo '<sup>LP</sup>';
-							} else {
-								echo '<sup>e</sup>';
-							}
-						}
+						
 					} else { //no score
 						if ($gbt[$i][0][0]=='Averages') {
 							echo '-';
@@ -1332,6 +1328,13 @@ function gbinstrdisp() {
 							echo "<a href=\"gb-viewasid.php?stu=$stu&amp;cid=$cid&amp;asid=new&amp;aid={$gbt[0][1][$j][7]}&amp;uid={$gbt[$i][4][0]}\">-</a>";
 						} else {
 							echo '-';
+						}
+					}
+					if (isset($gbt[$i][1][$j][6]) ) {
+						if ($gbt[$i][1][$j][6]==2) {
+							echo '<sup>LP</sup>';
+						} else {
+							echo '<sup>e</sup>';
 						}
 					}
 				} else if ($gbt[0][1][$j][6]==1) { //offline
