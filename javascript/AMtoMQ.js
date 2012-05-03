@@ -298,7 +298,7 @@ function AMQTremoveBrackets(node) {
 	
   var st;
   //if (node.charAt(0)=='{' && node.charAt(node.length-1)=='}') {
-
+    node = trim12(node);
     st = node.charAt(0);
     if (st=="(" || st=="[") node = node.substr(1);
     st = node.substr(0,6);
@@ -306,12 +306,21 @@ function AMQTremoveBrackets(node) {
     st = node.substr(0,12);
     if (st=="\\left\\lbrace" || st=="\\left\\langle") node = node.substr(12);
     st = node.charAt(node.length-1);
+   // alert("lastchar: "+st+" from "+node);
     if (st==")" || st=="]" || st=='.') node = node.substr(0,node.length-7);
     st = node.substr(node.length-7,7)
     if (st=="\\rbrace" || st=="\\rangle") node = node.substr(0,node.length-13);
     
   //} 
   return node;
+}
+
+function trim12 (str) {
+	var	str = str.replace(/^\s\s*/, ''),
+		ws = /\s/,
+		i = str.length;
+	while (ws.test(str.charAt(--i)));
+	return str.slice(0, i + 1);
 }
 
 /*Parsing ASCII math expressions with the following grammar
@@ -753,6 +762,7 @@ function MQtoAM(tex) {
 	tex = tex.replace(/{/g,'(');
 	tex = tex.replace(/}/g,')');
 	tex = tex.replace(/\(([\d\.]+)\)\/\(([\d\.]+)\)/g,'$1/$2');  //change (2)/(3) to 2/3
+	tex = tex.replace(/\/\(([\d\.]+)\)/g,'/$1');  //change /(3) to /3
 	tex = tex.replace(/_{(\d+)}/g,'_$1');
 	tex = tex.replace(/\^\(-1\)/g,'^-1');
 	
