@@ -127,16 +127,16 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			require("../header.php");
 			echo "<div class=breadcrumb>$breadcrumbbase ";
 			if ($cid>0) {
-				echo "<a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
+				echo "<a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
 			}
 			if ($type=='sent') {
-				echo "&gt; <a href=\"sentlist.php?page=$page&cid=$cid&filtercid=$filtercid\">Sent Message List</a> ";
+				echo " <a href=\"sentlist.php?page=$page&cid=$cid&filtercid=$filtercid\">Sent Message List</a> ";
 			} else if ($type=='allstu') {
-				echo "&gt; <a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid\">Message List</a> &gt; <a href=\"allstumsglist.php?page=$page&cid=$cid&filterstu=$filterstu\">Student Messages</a> ";
+				echo " <a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid\">Message List</a> &gt; <a href=\"allstumsglist.php?page=$page&cid=$cid&filterstu=$filterstu\">Student Messages</a> ";
 			} else if ($type=='new') {
-				echo "&gt; <a href=\"newmsglist.php?cid=$cid\">New Message List</a> ";
+				echo " <a href=\"newmsglist.php?cid=$cid\">New Message List</a> ";
 			} else {
-				echo "&gt; <a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid\">Message List</a> ";
+				echo " <a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid\">Message List</a> ";
 			}
 			
 			if (isset($_GET['toquote'])) {

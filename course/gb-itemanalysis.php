@@ -100,6 +100,13 @@
 		}
 	}
 	
+	$query = "SELECT count(id) FROM imas_students WHERE courseid='$cid' AND locked=0 ";
+	if ($secfilter!=-1) {
+		$query .= " AND imas_students.section='$secfilter' ";
+	}
+	$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
+	$totstucnt = mysql_result($result,0,0);
+	
 	$query = "SELECT ias.questions,ias.bestscores,ias.bestattempts,ias.bestlastanswers,ias.starttime,ias.endtime,ias.timeontask FROM imas_assessment_sessions AS ias,imas_students ";
 	$query .= "WHERE ias.userid=imas_students.userid AND imas_students.courseid='$cid' AND ias.assessmentid='$aid'";
 	if ($secfilter!=-1) {
@@ -135,6 +142,13 @@
 		if ($line['endtime'] >0 && $line['starttime'] > 0) {
 			$timetaken[] = $line['endtime']-$line['starttime'];
 		}
+	}
+	$notstarted = ($totstucnt - count($timetaken));
+	$nonstartedper = round(100*$notstarted/$totstucnt,1);
+	if ($notstarted==0) {
+		echo '<p>All students have started this assessment</p>';
+	} else {
+		echo "<p>$notstarted students ($nonstartedper%) have not started this assessment.  They are not included in the numbers below</p>";
 	}
 	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 	echo "<table class=gb id=myTable><thead>"; //<tr><td>Name</td>\n";

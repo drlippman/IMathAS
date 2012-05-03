@@ -34,6 +34,17 @@
 	
 	$pagetitle = "Message Conversation";
 	$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
+	$placeinhead .= '<script type="text/javascript">
+		function showtrimmed(el,n) {
+			if (el.innerHTML.match(/Show/)) {
+				document.getElementById("trimmed"+n).style.display="block";
+				el.innerHTML = "[Hide trimmed content]";
+			} else {
+				document.getElementById("trimmed"+n).style.display="none";
+				el.innerHTML = "[Show trimmed content]";
+			}
+		}
+		</script>';
 	require("../header.php");
 	
 	$allowmsg = false;
@@ -73,12 +84,45 @@
 		if ($sessiondata['graphdisp']==0) {
 			$line['message'] = preg_replace('/<embed[^>]*alt="([^"]*)"[^>]*>/',"[$1]", $line['message']);
 		}
+		if (($p = strpos($line['message'],'<hr'))!==false) {
+			$line['message'] = substr($line['message'],0,$p).'<a href="#" class="small" onclick="showtrimmed(this,\''.$line['id'].'\');return false;">[Show trimmed content]</a><div id="trimmed'.$line['id'].'" style="display:none;">'.substr($line['message'],$p).'</div>';
+		}
 		$message[$line['id']] = $line['message'];
-		$ownerid[$line['id']] = $line['userid'];
+		$ownerid[$line['id']] = $line['msgfrom'];
 		$poster[$line['id']] = $line['FirstName'] . ' ' . $line['LastName'];
 		$email[$line['id']] = $line['email'];
 		
 	}
+	if ($line['courseid']>0) {
+		$query = "SELECT msgset FROM imas_courses WHERE id='{$line['courseid']}'";
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$msgset = mysql_result($result,0,0);
+		$msgmonitor = floor($msgset/5);
+		$msgset = $msgset%5;
+		if ($msgset<3 || $isteacher) {
+			$cansendmsgs = true;
+			if ($msgset==1 && !$isteacher) { //check if sending to teacher 
+				$query = "SELECT id FROM imas_teachers WHERE userid='{$line['msgfrom']}' and courseid='{$line['courseid']}'";
+				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				if (mysql_num_rows($result)==0) {
+					$cansendmsgs = false;
+				}
+			} else if ($msgset==2 && !$isteacher) { //check if sending to stu
+				$query = "SELECT id FROM imas_students WHERE userid='{$line['msgfrom']}' and courseid='{$line['courseid']}'";
+				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				if (mysql_num_rows($result)==0) {
+					$cansendmsgs = false;
+				}
+			} 
+		} else {
+			$cansendmsgs = false;
+		}
+	} else {
+		$cansendmsgs = true;
+	}
+	
+	
+	
 	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> ";
 	if ($cid>0) {
 		echo "&gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
@@ -105,70 +149,109 @@
 		echo "<a href=\"msghistory.php?view=$view&cid=$cid&page=$page&msgid=$msgid&view=2\">View Condensed</a>";
 	}
 	
+?>	
+	<script type="text/javascript">
+	function toggleshow(bnum) {
+	   var node = document.getElementById('block'+bnum);
+	   var butn = document.getElementById('butb'+bnum);
+	   if (node.className == 'forumgrp') {
+	       node.className = 'hidden';
+	       //if (butn.value=='Collapse') {butn.value = 'Expand';} else {butn.value = '+';}
+	//       butn.value = 'Expand';
+		butn.src = imasroot+'/img/expand.gif';
+	   } else { 
+	       node.className = 'forumgrp';
+	       //if (butn.value=='Expand') {butn.value = 'Collapse';} else {butn.value = '-';}
+	//       butn.value = 'Collapse';
+		butn.src = imasroot+'/img/collapse.gif';
+	}
+	}
+	function toggleitem(inum) {
+	   var node = document.getElementById('item'+inum);
+	   var butn = document.getElementById('buti'+inum);
+	   if (node.className == 'blockitems') {
+	       node.className = 'hidden';
+	       butn.value = 'Show';
+	   } else { 
+	       node.className = 'blockitems';
+	       butn.value = 'Hide';
+	   }
+	}
+	function expandall() {
+	   for (var i=0;i<bcnt;i++) {
+	     var node = document.getElementById('block'+i);
+	     var butn = document.getElementById('butb'+i);
+	     node.className = 'forumgrp';
+	//     butn.value = 'Collapse';
+	       //if (butn.value=='Expand' || butn.value=='Collapse') {butn.value = 'Collapse';} else {butn.value = '-';}
+	       butn.src = imasroot+'/img/collapse.gif';
+	   }
+	}
+	function collapseall() {
+	   for (var i=0;i<bcnt;i++) {
+	     var node = document.getElementById('block'+i);
+	     var butn = document.getElementById('butb'+i);
+	     node.className = 'hidden';
+	//     butn.value = 'Expand';
+	       //if (butn.value=='Collapse' || butn.value=='Expand' ) {butn.value = 'Expand';} else {butn.value = '+';}
+	       butn.src = imasroot+'/img/expand.gif';
+	   }
+	}
 	
-	echo "<script>\n";
-	echo "function toggleshow(bnum) {\n";
-	echo "   var node = document.getElementById('block'+bnum);\n";
-	echo "   var butn = document.getElementById('butb'+bnum);\n";
-	echo "   if (node.className == 'forumgrp') {\n";
-	echo "       node.className = 'hidden';\n";
-	echo "       if (butn.value=='Collapse') {butn.value = 'Expand';} else {butn.value = '+';}\n";
-	//echo "       butn.value = 'Expand';\n";
-	echo "   } else { ";
-	echo "       node.className = 'forumgrp';\n";
-	echo "       if (butn.value=='Expand') {butn.value = 'Collapse';} else {butn.value = '-';}\n";
-	
-	//echo "       butn.value = 'Collapse';\n";
-	echo "   }\n";
-	echo "}\n";
-	echo "function toggleitem(inum) {\n";
-	echo "   var node = document.getElementById('item'+inum);\n";
-	echo "   var butn = document.getElementById('buti'+inum);\n";
-	echo "   if (node.className == 'blockitems') {\n";
-	echo "       node.className = 'hidden';\n";
-	echo "       butn.value = 'Show';\n";
-	echo "   } else { ";
-	echo "       node.className = 'blockitems';\n";
-	echo "       butn.value = 'Hide';\n";
-	echo "   }\n";
-	echo "}\n";
-	echo "function showall() {\n";
-	echo "   for (var i=0;i<bcnt;i++) {";
-	echo "     var node = document.getElementById('block'+i);\n";
-	echo "     var butn = document.getElementById('butb'+i);\n";
-	echo "     node.className = 'forumgrp';\n";
-	//echo "     butn.value = 'Collapse';\n";
-	echo "       if (butn.value=='Expand') {butn.value = 'Collapse';} else {butn.value = '-';}\n";
-	
-	echo "   }\n";
-	echo "}\n";
-	echo "function collapseall() {\n";
-	echo "   for (var i=0;i<bcnt;i++) {";
-	echo "     var node = document.getElementById('block'+i);\n";
-	echo "     var butn = document.getElementById('butb'+i);\n";
-	echo "     node.className = 'hidden';\n";
-	//echo "     butn.value = 'Expand';\n";
-	echo "       if (butn.value=='Collapse') {butn.value = 'Expand';} else {butn.value = '+';}\n";
-	
-	echo "   }\n";
-	echo "}\n";
-
-	echo "</script>\n";
-	
+	function showall() {
+	   for (var i=0;i<icnt;i++) {
+	     var node = document.getElementById('item'+i);
+	     var buti = document.getElementById('buti'+i);
+	     node.className = "blockitems";
+	     buti.value = "Hide";
+	   }
+	}
+	function hideall() {
+	   for (var i=0;i<icnt;i++) {
+	     var node = document.getElementById('item'+i);
+	     var buti = document.getElementById('buti'+i);
+	     node.className = "hidden";
+	     buti.value = "Show";
+	   }
+	}
+	</script>
+<?php
+	$bcnt = 0;
 	$bcnt = 0;
 	$icnt = 0;
 	function printchildren($base) {
-		global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points,$posttype,$lastview,$bcnt,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$view,$page,$allowmsg,$haspoints;
+		global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points,$posttype,$lastview,$bcnt,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$view,$page,$allowmsg,$haspoints,$cansendmsgs;
+		global $filtercid,$page,$type,$imasroot;
+		$curdir = rtrim(dirname(__FILE__), '/\\');
 		foreach($children[$base] as $child) {
 			echo "<div class=block> ";
+			echo '<span class="leftbtns">';
+			if (isset($children[$child])) {
+				if ($view==1) { 
+					$lbl = '+';
+					$img = "expand";
+				} else {
+					$lbl = '-';
+					$img = "collapse";
+				}
+				//echo "<input type=button id=\"butb$bcnt\" value=\"$lbl\" onClick=\"toggleshow($bcnt)\"> ";
+				echo "<img class=\"pointer\" id=\"butb$bcnt\" src=\"$imasroot/img/$img.gif\" onClick=\"toggleshow($bcnt)\"/> ";
+			}
+			if (file_exists("$curdir/../course/files/userimg_sm{$ownerid[$child]}.jpg")) {
+				echo "<img src=\"$imasroot/course/files/userimg_sm{$ownerid[$child]}.jpg\" onclick=\"togglepic(this)\"/>";
+			}
+			echo '</span>';
 			if ($view==2) {
 				echo "<span class=right>";
+				if ($ownerid[$child]!=$userid && $cansendmsgs) {
+					echo "<a href=\"msglist.php?cid=$cid&filtercid=$filtercid&page=$page&type=$type&add=new&to={$ownerid[$child]}&toquote=$child\">Reply</a> ";
+				}
 				echo "<input type=button id=\"buti$icnt\" value=\"Show\" onClick=\"toggleitem($icnt)\">\n";
 				
 				echo "</span>";
-				if (isset($children[$child])) {
+				/*if (isset($children[$child])) {
 					echo "<input type=button id=\"butb$bcnt\" value=\"-\" onClick=\"toggleshow($bcnt)\">\n";
-				}
+				}*/
 				echo "<b>{$subject[$child]}</b> Posted by: ";
 				if ($isteacher && $ownerid[$child]!=0) {
 					echo "<a href=\"mailto:{$email[$child]}\">";
@@ -199,7 +282,10 @@
 				echo "<span class=right>";
 				
 				if (isset($children[$child])) {
-					echo "<input type=button id=\"butb$bcnt\" value=\"Collapse\" onClick=\"toggleshow($bcnt)\">\n";
+					if ($ownerid[$child]!=$userid && $cansendmsgs) {
+						echo "<a href=\"msglist.php?cid=$cid&filtercid=$filtercid&page=$page&type=$type&add=new&to={$ownerid[$child]}&toquote=$child\">Reply</a> ";
+					}
+					echo "<input type=button id=\"buti$icnt\" value=\"Hide\" onClick=\"toggleitem($icnt)\">\n";
 				}
 				
 				echo "</span>\n";
@@ -220,7 +306,8 @@
 				}
 				
 				echo "</div>\n";
-				echo "<div class=blockitems>";
+				echo "<div class=\"blockitems\" id=\"item$icnt\">";
+				$icnt++;
 				echo filter($message[$child]);
 				echo "</div>\n";
 				if (isset($children[$child]) && ($posttype[$child]!=3 || $isteacher)) { //if has children

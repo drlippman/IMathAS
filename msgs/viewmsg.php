@@ -49,6 +49,17 @@
 	}
 	
 	$pagetitle = "Messages";
+	$placeinhead = '<script type="text/javascript">
+		function showtrimmed(el) {
+			if (el.innerHTML.match(/Show/)) {
+				document.getElementById("trimmed").style.display="block";
+				el.innerHTML = "[Hide trimmed content]";
+			} else {
+				document.getElementById("trimmed").style.display="none";
+				el.innerHTML = "[Show trimmed content]";
+			}
+		}
+		</script>';
 	require("../header.php");
 	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> ";
 	if ($cid>0) {
@@ -95,6 +106,9 @@
 	echo "<tr><td><b>Subject:</b></td><td>{$line['title']}</td></tr>";
 	echo "</tbody></table>";
 	echo "<div style=\"border: 1px solid #000; margin: 10px; padding: 10px;\">";
+	if (($p = strpos($line['message'],'<hr'))!==false) {
+		$line['message'] = substr($line['message'],0,$p).'<a href="#" class="small" onclick="showtrimmed(this);return false;">[Show trimmed content]</a><div id="trimmed" style="display:none;">'.substr($line['message'],$p).'</div>';
+	}
 	echo filter($line['message']);
 	echo "</div>";
 	
@@ -127,7 +141,7 @@
 			$cansendmsgs = true;
 		}
 		if ($cansendmsgs) {
-			echo "<a href=\"msglist.php?cid=$cid&filtercid=$filtercid&page=$page&type=$type&add=new&to={$line['msgfrom']}&replyto=$msgid\">Reply</a> | ";
+			//echo "<a href=\"msglist.php?cid=$cid&filtercid=$filtercid&page=$page&type=$type&add=new&to={$line['msgfrom']}&replyto=$msgid\">Reply</a> | ";
 			echo "<a href=\"msglist.php?cid=$cid&filtercid=$filtercid&page=$page&type=$type&add=new&to={$line['msgfrom']}&toquote=$msgid\">Quote in Reply</a> | ";
 		}
 		echo "<a href=\"msghistory.php?cid=$cid&filtercid=$filtercid&page=$page&msgid=$msgid&type=$type\">View Conversation</a> | ";

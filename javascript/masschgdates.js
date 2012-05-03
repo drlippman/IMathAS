@@ -157,6 +157,10 @@ Date.prototype.getWeekDays = function(d) {
 		  copydown(ln,0);
 	  } else if (val==3) {
 		  copydown(ln,1);
+	  } else if (val==4) {
+		  copydown(ln,1,'s');
+	  } else if (val==5) {
+		  copydown(ln,1,'e');
 	  }
 	  el.selectedIndex= 0;
   }
@@ -178,7 +182,7 @@ Date.prototype.getWeekDays = function(d) {
 	  }
   }
   
-  function copydown(st,type) {
+  function copydown(st,type,limit) {
 	  var usecb = false;
 	  var cbs = document.getElementsByTagName("input");
 	  for (var i=0;i<cbs.length;i++) {
@@ -187,9 +191,13 @@ Date.prototype.getWeekDays = function(d) {
 			  break;
 		  }
 	  }
-	  copydownsub('s',basesdates,st,usecb,type);
-	  copydownsub('e',baseedates,st,usecb,type);
-	  if (baserdates[st]!="NA") {
+	  if (limit == null || limit == 's') {
+	  	  copydownsub('s',basesdates,st,usecb,type);
+	  }
+	  if (limit == null || limit == 'e') {
+	  	  copydownsub('e',baseedates,st,usecb,type);
+	  }
+	  if ((limit == null || limit == 'r') && baserdates[st]!="NA") {
 		 copydownsub('r',baserdates,st,usecb,type);
 	  }
   }

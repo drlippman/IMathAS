@@ -103,7 +103,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		exit;
 	} else { //DEFAULT DATA MANIPULATION
 		$pagetitle = "Mass Change Dates";
-		$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/masschgdates.js?v=011212\"></script>";
+		$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/masschgdates.js?v=040212\"></script>";
 		$placeinhead .= "<style>.show {display:inline;} \n .hide {display:none;} img {cursor:pointer;}\n</style>";
 	}
 }	
@@ -449,6 +449,8 @@ if ($overwriteBody==1) {
 		echo '<option value="1">Send down date change</option>';
 		echo '<option value="2">Copy down time only</option>';
 		echo '<option value="3">Copy down date &amp; time</option>';
+		echo '<option value="4">Copy down start date &amp; time</option>';
+		echo '<option value="5">Copy down end date &amp; time</option>';
 		echo '</select></td>';
 		echo "</tr>";
 		$cnt++;
