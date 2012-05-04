@@ -57,11 +57,11 @@
 						}
 					}
 				} else { //inside exception dates exception
-					$exceptionduedate = $row[1];
 					if ($adata['enddate']<$now) { //exception is for past-due-date
 						$inexception = true; //only trigger if past due date for penalty
 					}
 				}
+				$exceptionduedate = $row[1];
 			} else { //has no exception
 				if ($now < $adata['startdate'] || $adata['enddate']<$now) { //outside normal dates
 					if ($now > $adata['startdate'] && $now<$adata['reviewdate']) {
@@ -382,11 +382,11 @@
 					}
 				}
 			} else { //in exception
-				$exceptionduedate = $row[1];
 				if ($adata['enddate']<$now) { //exception is for past-due-date
 					$inexception = true;	
 				}
 			}
+			$exceptionduedate = $row[1];
 		} else { //has no exception
 			if ($now < $testsettings['startdate'] || $testsettings['enddate'] < $now) {//outside normal dates
 				if ($now > $testsettings['startdate'] && $now<$testsettings['reviewdate']) {
@@ -399,6 +399,13 @@
 					}
 				}
 			}
+		}
+	} else {
+		$query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='{$sessiondata['actas']}' AND assessmentid='{$line['assessmentid']}'";
+		$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
+		$row = mysql_fetch_row($result2);
+		if ($row!=null) {
+			$exceptionduedate = $row[1];
 		}
 	}
 
@@ -883,7 +890,9 @@ if (!isset($_POST['embedpostback'])) {
 		} else {
 			$timebeforedue = $testsettings['enddate'] - time();
 		}
-		if ($timebeforedue < 24*3600) { //due within 24 hours
+		if ($timebeforedue < 0) {
+			$duetimenote = 'Past due';
+		} else if ($timebeforedue < 24*3600) { //due within 24 hours
 			if ($timebeforedue < 300) {
 				$duetimenote = '<span style="color:#f00;">Due in under ';
 			} else {
