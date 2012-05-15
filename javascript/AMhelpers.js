@@ -523,13 +523,13 @@ function AMpreview(inputId,outputId) {
 	  var totest = '';
 	  testvals = ptlist[tstpt].split("~");
 	  for (var j=0; j<vars.length; j++) {
-		totest += vars[j] + "="+testvals[j]+";"; 
+		totest += "var " + vars[j] + "="+testvals[j]+";"; 
 	  }
 	  totest += totesteqn;
 
 	  var err="syntax ok";
 	  try {
-	    with (Math) var res = eval(totest);
+	    with (Math) var res = scopedeval(totest);
 	  } catch(e) {
 	    err = "syntax error";
 	  }
@@ -783,7 +783,7 @@ function doonsubmit(form,type2,skipconfirm) {
 			totest = '';
 			for (var fk=0; fk<inputs.length; fk++) {
 				//totest += varlist.charAt(k) + "=" + inputs[k] + ";";
-				totest += vars[fk] + "=" + inputs[fk] + ";";
+				totest += "var " + vars[fk] + "=" + inputs[fk] + ";";
 			}
 			if (nh.value=='') {
 				totest += Math.random()+";";
@@ -791,7 +791,7 @@ function doonsubmit(form,type2,skipconfirm) {
 				totest += nh.value+";";
 			}
 			try {
-				with (Math) vals[fj] = eval(totest);
+				with (Math) vals[fj] = scopedeval(totest);
 			} catch (e) {
 				vals[fj] = NaN;
 			}	
@@ -799,6 +799,10 @@ function doonsubmit(form,type2,skipconfirm) {
 		document.getElementById("qn" + qn+"-vals").value = vals.join(",");
 	}
 	return true;
+}
+
+function scopedeval(c) {
+	return eval(c);
 }
 
 function arraysearch(needle,hay) {
