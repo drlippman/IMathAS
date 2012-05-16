@@ -315,8 +315,8 @@ function complexcalc(inputId,outputId) {
 		for (var cnt=0; cnt<arr.length; cnt++) {
 			var prep = mathjs(arr[cnt],'i');
 			try {
-			    with (Math) var real = eval('i=0;'+prep);
-			    with (Math) var imag = eval('i=1;'+prep);
+			    with (Math) var real = scopedeval('var i=0;'+prep);
+			    with (Math) var imag = scopedeval('var i=1;'+prep);
 			} catch(e) {
 			    err = "syntax incomplete";
 			}
@@ -579,12 +579,13 @@ function AMpreview(inputId,outputId) {
 	}
   }
   outnode.appendChild(document.createTextNode(" " + err));
-  //clear out variables that have been defined
-  var toclear = ''; 
+  //clear out variables that have been defined - not needed with scopedeval
+  /*var toclear = ''; 
   for (var j=0; j<vl.length; j++) {
 	toclear += vars[j] + "=NaN;"; 
   }
   eval(toclear);
+  */
 }
 
 //preview for matrix type

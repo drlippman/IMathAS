@@ -20,7 +20,7 @@
 	echo '<div id="headercalendar" class="pagetitle"><h2>Calendar</h2></div>';
 	
 	 if (isset($teacherid)) {
-		echo "<div class=\"cpmid\"><a id=\"mcelink\" href=\"managecalitems.php?cid=$cid\">Manage Events</a></div>";
+		echo "<div class=\"cpmid\"><a href=\"managecalitems.php?cid=$cid&from=cal\">Manage Events</a></div>";
 	 }
 	 if (!isset($teacherid) && $previewshift==-1) {
 		 $query = "SELECT latepass FROM imas_students WHERE userid='$userid' AND courseid='$cid'";

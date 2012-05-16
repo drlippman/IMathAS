@@ -101,6 +101,19 @@
 	if (isset($teacherof[$line['courseid']])) {
 		echo " <a href=\"mailto:{$line['email']}\">email</a> | ";
 		echo " <a href=\"$imasroot/course/gradebook.php?cid={$line['courseid']}&stu={$line['msgfrom']}\" target=\"_popoutgradebook\">gradebook</a>";
+		if (preg_match('/Question\s+about\s+#(\d+)\s+in\s+(.*)\s*$/',$line['title'],$matches)) {
+			$query = "SELECT id FROM imas_assessments WHERE name='{$matches[2]}' AND courseid='{$line['courseid']}'";
+			$res = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			if (mysql_num_rows($res)>0) {
+				$aid = mysql_result($res,0,0);
+				$query = "SELECT id FROM imas_assessment_sessions WHERE assessmentid='$aid' AND userid='{$line['msgfrom']}'";
+				$res = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				if (mysql_num_rows($res)>0) {
+					$asid = mysql_result($res,0,0);
+					echo " | <a href=\"$imasroot/course/gb-viewasid.php?cid={$line['courseid']}&uid={$line['msgfrom']}&asid=$asid\" target=\"_popoutgradebook\">assignment</a>";
+				}
+			}
+		}
 	}
 	echo "</td></tr><tr><td><b>Sent:</b></td><td>$senddate</td></tr>";
 	echo "<tr><td><b>Subject:</b></td><td>{$line['title']}</td></tr>";

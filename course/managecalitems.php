@@ -10,6 +10,11 @@ if (!isset($teacherid)) {
 }
 
 $cid = $_GET['cid'];
+if (isset($_GET['from']) && $_GET['from']=='cal') {
+	$from = 'cal';
+} else {
+	$from = 'cp';
+}
 
 //form processing
 if (isset($_POST['submit'])) {  
@@ -33,7 +38,7 @@ if (isset($_POST['submit'])) {
 	}
 	
 	//add new
-	if (trim($_POST['txtnew'])!='') {
+	if (trim($_POST['txtnew'])!='' || $_POST['tagnew'] != '!') {
 		$date = $_POST['datenew'];
 		preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/',$date,$dmatches);
 		$datenew = mktime(12,0,0,$dmatches[1],$dmatches[2],$dmatches[3]);
@@ -41,7 +46,11 @@ if (isset($_POST['submit'])) {
 		mysql_query($query) or die("Query failed : " . mysql_error());
 	}
 	if ($_POST['submit']=='Save') {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+		if ($from=='cp') {
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+		} else {
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/showcalendar.php?cid=$cid");
+		}
 		exit;
 	}
 }
@@ -60,7 +69,7 @@ $query = "SELECT id,date,title,tag FROM imas_calitems WHERE courseid='$cid' ORDE
 $result = mysql_query($query) or die("Query failed : " . mysql_error());
 
 ?>
-<form method=post action="managecalitems.php?cid=<?php echo $cid;?>">
+<form method=post action="managecalitems.php?cid=<?php echo $cid.'&amp;from='.$from;?>">
 <table>
 <thead>
 <tr><th>Delete?</th><th>Date</th><th>Tag</th><th>Text</th></tr>
@@ -92,7 +101,7 @@ if (isset($_GET['addto'])) {
 echo "<td><input type=text size=10 id=\"datenew\" name=\"datenew\" value=\"$date\"/> ";	
 echo "<a href=\"#\" onClick=\"displayDatePicker('datenew', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a></td>";
 $cnt++;
-echo '<td><input name="tagnew" type=text size=1 value="!" /></td>';
+echo '<td><input name="tagnew" type=text size=4 value="!" /></td>';
 echo '<td><input name="txtnew" type=text size=80 value="" /></td>';
 echo '<tr/>';
 
