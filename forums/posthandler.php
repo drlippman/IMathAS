@@ -480,6 +480,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				$query = "DELETE FROM imas_forum_views WHERE threadid='{$_GET['remove']}'";
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$lastpost = true;
+				
 			} else {
 				$query = "DELETE FROM imas_forum_posts WHERE id='{$_GET['remove']}'";
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -492,6 +493,8 @@ if (isset($_GET['modify'])) { //adding or modifying post
 					deleteallpostfiles($_GET['remove']);
 				}
 			}
+			$query = "DELETE FROM imas_grades WHERE gradetype='forum' AND refid='{$_GET['remove']}'";
+			mysql_query($query) or die("Query failed : $query " . mysql_error());
 			
 		}
 		if ($caller == "posts" && $lastpost) {

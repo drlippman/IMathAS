@@ -329,6 +329,43 @@ Date.prototype.getWeekDays = function(d) {
 		  }
   	}
   }
+  function prepforsubmit(frm) {
+  	var cnt = document.getElementById("chgcnt").value;
+  	for (var i=0;i<cnt;i++) {
+  		var out = [];
+  		if (document.getElementById("sdatetype"+i).value == 0) {
+  			out.push(0);
+  		} else { 
+  			out.push(document.getElementById("sdate"+i).value + "~" + document.getElementById("stime"+i).value);
+  		}
+  		if (document.getElementById("edatetype"+i).value == 0) {
+  			out.push(2000000000);
+  		} else { 
+  			out.push(document.getElementById("edate"+i).value + "~" + document.getElementById("etime"+i).value);
+  		}
+  		if (document.getElementById("rdatetype"+i)) {
+  			if (document.getElementById("rdatetype"+i).value == 0) {
+  				if (document.getElementById("rdateanN"+i).checked) {
+  					out.push("N");
+  				} else {
+  					out.push("A");
+  				}
+  			} else {
+  				out.push(document.getElementById("rdate"+i).value + "~" + document.getElementById("rtime"+i).value);
+  			} 
+  		} else {
+  			out.push('NA');
+  		}
+  		
+  		out.push(document.getElementById("type"+i).value);
+  		out.push(document.getElementById("id"+i).value);
+  		var newel = document.createElement("input");
+  		newel.name = "data"+i;
+  		newel.type = "hidden";
+  		newel.value = out.join(",");
+  		frm.appendChild(newel);
+  	} 
+  }
   
   	//TODO: separately calculate day difference (using daysBetween and getWeekDays) and time difference separately
 	//can use getHours()*60+getMinutes() to get minutes into day, then multiply to get ms for timediff

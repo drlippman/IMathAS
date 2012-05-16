@@ -5,6 +5,7 @@
 /*** master php includes *******/
 require("../validate.php");
 
+
 /*** pre-html data manipulation, including function code *******/
 
 //set some page specific variables and counters
@@ -18,7 +19,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = "You need to log in as a teacher to access this page";
 } else {
-	
 	$cid = $_GET['cid'];
 	
 	if (isset($_POST['chgcnt'])) {
@@ -30,18 +30,47 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$blockchg = 0;
 		for ($i=0; $i<$cnt; $i++) {
 			require_once("parsedatetime.php");
+			$data = explode(',',$_POST['data'.$i]);
+			
+			if ($data[0] == '0') {
+				$startdate = 0;
+			} else {
+				$pts = explode('~',$data[0]);
+				$startdate = parsedatetime($pts[0],$pts[1]);
+			}
+			/*
 			if ($_POST['sdatetype'.$i]=='0') {
 				$startdate = 0;
 			} else {
 				$startdate = parsedatetime($_POST['sdate'.$i],$_POST['stime'.$i]);
 			}
+			*/
 			
+			if ($data[1] == '2000000000') {
+				$enddate = 2000000000;
+			} else {
+				$pts = explode('~',$data[1]);
+				$enddate = parsedatetime($pts[0],$pts[1]);
+			}
+			/*
 			if ($_POST['edatetype'.$i]=='0') {
 				$enddate = 2000000000;
 			} else {
 				$enddate = parsedatetime($_POST['edate'.$i],$_POST['etime'.$i]);
 			}
+			*/
 			
+			if ($data[2] != 'NA') {
+				if ($data[2]=='A') {
+					$reviewdate = 2000000000;
+				} else if ($data[2] == 'N') {
+					$reviewdate = 0;
+				} else {
+					$pts = explode('~',$data[2]);
+					$reviewdate = parsedatetime($pts[0],$pts[1]);
+				}
+			}
+			/*
 			if (isset($_POST['rdatetype'.$i])) {
 				if ($_POST['rdatetype'.$i]=='0') {
 					$reviewdate = $_POST['rdatean'.$i];
@@ -49,9 +78,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$reviewdate = parsedatetime($_POST['rdate'.$i],$_POST['rtime'.$i]);
 				}
 			}
+			*/
 			
-			$type = $_POST['type'.$i];
-			$id = $_POST['id'.$i];
+			$type = $data[3]; // $_POST['type'.$i];
+			$id = $data[4]; // $_POST['id'.$i];
 			if ($type=='Assessment') {
 				if ($id>0) {
 					$query = "UPDATE imas_assessments SET startdate='$startdate',enddate='$enddate',reviewdate='$reviewdate' WHERE id='$id'";
@@ -103,7 +133,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		exit;
 	} else { //DEFAULT DATA MANIPULATION
 		$pagetitle = "Mass Change Dates";
-		$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/masschgdates.js?v=040212\"></script>";
+		$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/masschgdates.js?v=051512\"></script>";
 		$placeinhead .= "<style>.show {display:inline;} \n .hide {display:none;} img {cursor:pointer;}\n</style>";
 	}
 }	
@@ -196,7 +226,7 @@ if ($overwriteBody==1) {
 	echo "If you click the checkboxes on the left, you can limit the update to those items. ";
 	echo "Click the <img src=\"$imasroot/img/swap.gif\"> icon in each cell to swap from ";
 	echo "Always/Never to Dates.  Swaps to/from Always/Never cannot be sent down the list.</p>";
-	echo "<form id=\"qform\" method=post action=\"masschgdates.php?cid=$cid\">";
+	echo "<form id=\"qform\">";
 	
 	echo 'Check: <a href="#" onclick="return chkAllNone(\'qform\',\'all\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'all\',false)">None</a> ';
 
@@ -321,7 +351,7 @@ if ($overwriteBody==1) {
 		echo '<td>';
 		echo "<input type=\"checkbox\" id=\"cb$cnt\" value=\"$cnt\" /> ";
 		
-		echo "{$names[$i]}<input type=hidden name=\"id$cnt\" value=\"{$ids[$i]}\"/>";
+		echo "{$names[$i]}<input type=hidden id=\"id$cnt\" value=\"{$ids[$i]}\"/>";
 		echo "<script> basesdates[$cnt] = ";
 		if ($startdates[$i]==0) { echo '"NA"';} else {echo $startdates[$i];}
 		echo "; baseedates[$cnt] = ";
@@ -330,7 +360,7 @@ if ($overwriteBody==1) {
 		if ($reviewdates[$i]==0 || $reviewdates[$i]==2000000000) {echo '"NA"';} else { echo $reviewdates[$i];}
 		echo ";</script>";
 		echo "</td><td>";
-		echo "{$types[$i]}<input type=hidden name=\"type$cnt\" value=\"{$types[$i]}\"/>";
+		echo "{$types[$i]}<input type=hidden id=\"type$cnt\" value=\"{$types[$i]}\"/>";
 		if ($types[$i]=='Assessment') {
 			if ($now>$startdates[$i] && $now<$enddates[$i]) {
 				echo " <i><a href=\"addquestions.php?aid={$ids[$i]}&cid=$cid\">Q</a></i>";	
@@ -415,11 +445,11 @@ if ($overwriteBody==1) {
 			} else {
 				echo "<span id=\"rspan0$cnt\" class=\"hide\">";
 			}
-			echo "<input type=radio name=\"rdatean$cnt\" value=\"0\" ";
+			echo "<input type=radio name=\"rdatean$cnt\" value=\"0\" id=\"rdateanN$cnt\" ";
 			if ($reviewdates[$i]!=2000000000) {
 				echo 'checked=1';
 			} 
-			echo " />Never <input type=radio name=\"rdatean$cnt\" value=\"2000000000\" ";
+			echo " />Never <input type=radio name=\"rdatean$cnt\" value=\"2000000000\"  id=\"rdateanA$cnt\"  ";
 			if ($reviewdates[$i]==2000000000) {
 				echo 'checked=1';
 			} 
@@ -456,7 +486,9 @@ if ($overwriteBody==1) {
 		$cnt++;
 	}
 	echo '</tbody></table>';
-	echo "<input type=hidden name=\"chgcnt\" value=\"$cnt\" />";
+	echo '</form>';
+	echo "<form id=\"realform\" method=post action=\"masschgdates.php?cid=$cid\" onsubmit=\"prepforsubmit(this)\">";
+	echo "<input type=hidden id=\"chgcnt\" name=\"chgcnt\" value=\"$cnt\" />";
 	echo '<input type=submit value="Save Changes"/>';
 	echo '</form>';
 	//echo "<script>var acnt = $cnt;</script>";
