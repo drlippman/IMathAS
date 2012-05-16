@@ -518,7 +518,6 @@ function AMpreview(inputId,outputId) {
   vars = vl.split('|');
   var totesteqn = mathjs(str,vl); 
   	  
-
   while (tstpt<ptlist.length && (isNaN(res) || res=="Infinity")) {
 	  var totest = '';
 	  testvals = ptlist[tstpt].split("~");
@@ -526,7 +525,6 @@ function AMpreview(inputId,outputId) {
 		totest += "var " + vars[j] + "="+testvals[j]+";"; 
 	  }
 	  totest += totesteqn;
-
 	  var err="syntax ok";
 	  try {
 	    with (Math) var res = scopedeval(totest);
@@ -802,7 +800,9 @@ function doonsubmit(form,type2,skipconfirm) {
 }
 
 function scopedeval(c) {
-	return eval(c);
+	var res;
+	with (Math) res = eval(c); 
+	return res;
 }
 
 function arraysearch(needle,hay) {

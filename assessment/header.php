@@ -71,7 +71,7 @@ div { zoom: 1; }
 }
 </style> 
 <![endif]--> 
-<script src="<?php echo $imasroot . "/javascript/AMhelpers_min.js?v=051512";?>" type="text/javascript"></script>
+<script src="<?php echo $imasroot . "/javascript/AMhelpers_min.js?v=051512b";?>" type="text/javascript"></script>
 <script src="<?php echo $imasroot . "/javascript/confirmsubmit.js";?>" type="text/javascript"></script>
 <!--[if lt IE 9]><script type="text/javascript" src="<?php echo $imasroot;?>/javascript/excanvas_min.js?v=120811"></script><![endif]-->
 <script type="text/javascript" src="<?php echo $imasroot;?>/javascript/drawing_min.js?v=031312"></script>
