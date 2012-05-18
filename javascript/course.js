@@ -101,7 +101,9 @@ function showcalcontents(el) {
 		html += showcalcontentsid(el.id);
 		var mlink = document.getElementById("mcelink");
 		if (mlink!=null) {
-			mlink.href = "managecalitems.php?cid="+cid+"&addto="+(Date.parse(caleventsarr[el.id].date)/1000);
+			var href = mlink.href;
+			href = href.replace(/^(.*?cid=\d+).*$/,"$1");
+			mlink.href = href+"&addto="+(Date.parse(caleventsarr[el.id].date)/1000);
 		}
 	} 
 	

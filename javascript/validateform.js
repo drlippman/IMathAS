@@ -3,7 +3,7 @@
 function validateForm (form) {
   for (var e = 0; e < form.elements.length; e++) {
     var el = form.elements[e];
-    if (typeof el.type == "undefined") {
+    if (typeof el.type == "undefined" || typeof el.name == "undefined") {
 	    continue;
     }
     if (el.type == 'text' || el.type == 'textarea' ||

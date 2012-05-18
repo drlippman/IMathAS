@@ -7,7 +7,7 @@ function checkComplete (form) {
 	if (!form.elements) { return true;} //temp fix for editor preventing this from working right
   for (var e = 0; e < form.elements.length; e++) {
     var el = form.elements[e];
-    if (typeof el.type == "undefined") {
+    if (typeof el.type == "undefined" || typeof el.name == "undefined" || el.name == "") {
 	    continue;
     }
     if (el.type == 'text' || el.type == 'textarea' ||

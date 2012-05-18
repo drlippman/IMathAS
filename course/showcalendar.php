@@ -12,7 +12,7 @@
 	$cid = $_GET['cid'];
 	
 	require("../includes/calendardisp.php");
-	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/course.js?022810\"></script>";
+	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/course.js?v=051712\"></script>";
 	
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
@@ -20,7 +20,7 @@
 	echo '<div id="headercalendar" class="pagetitle"><h2>Calendar</h2></div>';
 	
 	 if (isset($teacherid)) {
-		echo "<div class=\"cpmid\"><a href=\"managecalitems.php?cid=$cid&from=cal\">Manage Events</a></div>";
+		echo "<div class=\"cpmid\"><a id=\"mcelink\" href=\"managecalitems.php?from=cal&cid=$cid\">Manage Events</a></div>";
 	 }
 	 if (!isset($teacherid) && $previewshift==-1) {
 		 $query = "SELECT latepass FROM imas_students WHERE userid='$userid' AND courseid='$cid'";

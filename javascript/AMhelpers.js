@@ -637,6 +637,7 @@ function doonsubmit(form,type2,skipconfirm) {
 				var reallysubmit = confirmSubmit(form);
 			}
 			if (!reallysubmit) {
+				form.className = '';
 				return false;
 			}
 		}
