@@ -4159,6 +4159,9 @@ function checkreqtimes($tocheck,$rtimes) {
 			
 			if ($list[$i]=='#') {
 				$nummatch = preg_match_all('/[\d\.]+/',$cleanans,$m);
+			} else if (strlen($list[$i])>6 && substr($list[$i],0,6)=='regex:') {
+				$regex = str_replace('|','\\|',substr($list[$i],6));
+				$nummatch = preg_match_all('|'.$regex.'|',$cleanans,$m);
 			} else {
 				$nummatch = substr_count($cleanans,$list[$i]);
 			}
@@ -4175,7 +4178,11 @@ function checkreqtimes($tocheck,$rtimes) {
 				if ($nummatch<=$num) {
 					return 0;
 				}
-			}
+			} else if ($comp == "!") {
+				if ($nummatch==$num) {
+					return 0;
+				}
+			} 
 		}
 	}
 	return 1;
