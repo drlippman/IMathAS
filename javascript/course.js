@@ -219,6 +219,10 @@ function showcalcontentsid(elid) {
 	return html;
 }
 
+function changecallength(el) {
+	window.location = calcallback + '&callength=' + el.value;
+}
+
 
 
 

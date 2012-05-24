@@ -1,21 +1,40 @@
 <?php
 
+if (isset($_GET['calstart'])) {
+	setcookie("calstart".$_GET['cid'], $_GET['calstart']);
+	$_COOKIE["calstart".$_GET['cid']] = $_GET['calstart'];
+}	
+if (isset($_GET['callength'])) {
+	setcookie("callength".$_GET['cid'], $_GET['callength']);
+	$_COOKIE["callength".$_GET['cid']] = $_GET['callength'];
+}
+
 function showcalendar($refpage) {
 
-global $imasroot,$cid,$userid,$teacherid,$previewshift,$latepasses;
+global $imasroot,$cid,$userid,$teacherid,$previewshift,$latepasses,$urlmode;
 
 $now= time();
 if ($previewshift!=-1) {
 	$now = $now + $previewshift;
 }
-$today = $now;
+if (!isset($_COOKIE['calstart'.$cid]) || $_COOKIE['calstart'.$cid] == 0) {
+	$today = $now;
+} else {
+	$today = $_COOKIE['calstart'.$cid];
+}
 
 if (isset($_GET['calpageshift'])) {
 	$pageshift = $_GET['calpageshift'];
 } else {
 	$pageshift = 0;
 }
-$today = $today + $pageshift*28*24*60*60;
+if (!isset($_COOKIE['callength'.$cid])) {
+	$callength = 4;
+} else {
+	$callength = $_COOKIE['callength'.$cid];
+}
+
+$today = $today + $pageshift*7*$callength*24*60*60;
 
 $dayofweek = tzdate('w',$today);
 $dayofmo = tzdate('j',$today);
@@ -55,7 +74,7 @@ for ($i=0;$i<$dayofweek;$i++) {
 	$dates[$ids[0][$i]] = tzdate('l F j, Y',$today - ($dayofweek - $i)*24*60*60);
 }
 
-for ($i=$dayofweek;$i<28;$i++) {
+for ($i=$dayofweek;$i<7*$callength;$i++) {
 	$row = floor($i/7);
 	$col = $i%7;
 	$curday = $dayofmo -$dayofweek+ $i;
@@ -82,13 +101,23 @@ for ($i=$dayofweek;$i<28;$i++) {
 
 <?php
 //echo '<div class="floatleft">Jump to <a href="'.$refpage.'.php?calpageshift=0&cid='.$cid.'">Now</a></div>';
+$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/$refpage.php?cid=$cid";
+	
+echo '<script type="text/javascript">var calcallback = "'.$address.'";</script>';
+echo '<div class="floatright">Show <select id="callength" onchange="changecallength(this)">';
+for ($i=2;$i<16;$i++) {
+	echo '<option value="'.$i.'" ';
+	if ($i==$callength) {echo 'selected="selected"';}
+	echo '>'.$i.'</option>';
+}
+echo '</select> weeks </div>';
 echo '<div class=center><a href="'.$refpage.'.php?calpageshift='.($pageshift-1).'&cid='.$cid.'">&lt; &lt;</a> ';
 //echo $longcurmo.' ';
 
-if ($pageshift==0) {
+if ($pageshift==0 && (!isset($_COOKIE['calstart'.$cid]) || $_COOKIE['calstart'.$cid]==0)) {
 	echo "Now ";
 } else {
-	echo '<a href="'.$refpage.'.php?calpageshift=0&cid='.$cid.'">Now</a> ';
+	echo '<a href="'.$refpage.'.php?calpageshift=0&calstart=0&cid='.$cid.'">Now</a> ';
 }
 echo '<a href="'.$refpage.'.php?calpageshift='.($pageshift+1).'&cid='.$cid.'">&gt; &gt;</a> ';
 echo '</div> ';
@@ -96,7 +125,7 @@ echo "<table class=\"cal\" >";  //onmouseout=\"makenorm()\"
 
 $exlowertime = mktime(0,0,0,$curmonum,$dayofmo - $dayofweek,$curyr);
 $lowertime = max($now,$exlowertime);
-$uppertime = mktime(0,0,0,$curmonum,$dayofmo - $dayofweek + 28,$curyr);
+$uppertime = mktime(0,0,0,$curmonum,$dayofmo - $dayofweek + 7*$callength,$curyr);
 
 $exceptions = array();
 if (!isset($teacherid)) {
@@ -395,9 +424,9 @@ for ($i=0;$i<count($hdrs);$i++) {
 	for ($j=0; $j<count($hdrs[$i]);$j++) {
 		if ($i==0 && $j==$dayofweek && $pageshift==0) { //onmouseover="makebig(this)"
 			echo '<td id="'.$ids[$i][$j].'" onclick="showcalcontents(this)" class="today"><div class="td"><span class=day>'.$hdrs[$i][$j]."</span><div class=center>";
-		
 		} else {
-			echo '<td id="'.$ids[$i][$j].'" onclick="showcalcontents(this)" ><div class="td"><span class=day>'.$hdrs[$i][$j]."</span><div class=center>";
+			$addr = $refpage.".php?cid=$cid&calstart=". ($today + $i*7*24*60*60 + ($j - $dayofweek)*24*60*60);
+			echo '<td id="'.$ids[$i][$j].'" onclick="showcalcontents(this)" ><div class="td"><span class=day><a href="'.$addr.'">'.$hdrs[$i][$j]."</a></span><div class=center>";
 		}
 		if (isset($assess[$ids[$i][$j]])) {
 			foreach ($assess[$ids[$i][$j]] as $k=>$info) {

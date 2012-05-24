@@ -857,7 +857,7 @@ function noaxes() {
 }
 
 
-function axes(dx,dy,labels,gdx,gdy,dox,doy) {
+function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
 //xscl=x is equivalent to xtick=x; xgrid=x; labels=true;
   var x, y, ldx, ldy, lx, ly, lxp, lyp, pnode, st;
   if (!initialized) initPicture();
@@ -871,6 +871,7 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy) {
   if (doy==null) {doy = true;}
   if (dox=="off" || dox==0) { dox = false;} else {dox = true;}
   if (doy=="off" || doy==0) { doy = false;} else {doy = true;}
+ 
 //alert(null)
   dx = (dx==null?xunitlength:dx*xunitlength);
   dy = (dy==null?dx:dy*yunitlength);
@@ -879,28 +880,39 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy) {
   if (xgrid!=null) gdx = xgrid;
   if (ygrid!=null) gdy = ygrid;
   if (gdx!=null) {
+    if (smallticks!=null && smallticks==1) {
+    	  var gridymin = origin[1] + .7*ticklength;
+	  var gridymax = origin[1] - .7*ticklength;
+	  var gridxmin = origin[0] - .7*ticklength;
+	  var gridxmax = origin[0] + .7*ticklength;
+    } else {
+	  var gridymin = winymin;
+	  var gridymax = winymax;
+	  var gridxmin = winxmin;
+	  var gridxmax = winxmax;
+    }
     gdx = (typeof gdx=="string"?dx:gdx*xunitlength);
     gdy = (gdy==null?dy:gdy*yunitlength);
     pnode = myCreateElementSVG("path");
     st="";
     if (dox && gdx>0) {
 	    for (x = origin[0]; x<=winxmax; x = x+gdx)
-	      if (x>=winxmin) st += " M"+x+","+winymin+" "+x+","+winymax;
+	      if (x>=winxmin) st += " M"+x+","+gridymin+" "+x+","+gridymax;
 	    for (x = origin[0]-gdx; x>=winxmin; x = x-gdx)
-	      if (x<=winxmax) st += " M"+x+","+winymin+" "+x+","+winymax;
+	      if (x<=winxmax) st += " M"+x+","+gridymin+" "+x+","+gridymax;
     }
     if (doy && gdy>0) {
 	    for (y = height-origin[1]; y<=winymax; y = y+gdy)
-	      if (y>=winymin) st += " M"+winxmin+","+y+" "+winxmax+","+y;
+	      if (y>=winymin) st += " M"+gridxmin+","+y+" "+gridxmax+","+y;
 	    for (y = height-origin[1]-gdy; y>=winymin; y = y-gdy)
-	      if (y<=winymax) st += " M"+winxmin+","+y+" "+winxmax+","+y;
+	      if (y<=winymax) st += " M"+gridxmin+","+y+" "+gridxmax+","+y;
     }
     pnode.setAttribute("d",st);
     pnode.setAttribute("stroke-width", .5);
     pnode.setAttribute("stroke", gridstroke);
     pnode.setAttribute("fill", fill);
     svgpicture.appendChild(pnode);
-  }
+  } 
   pnode = myCreateElementSVG("path");
   if (dox) {
 	  st="M"+winxmin+","+(height-origin[1])+" "+winxmax+","+
