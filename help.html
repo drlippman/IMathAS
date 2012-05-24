@@ -1726,6 +1726,7 @@ The following macros help with formatting values for display:
 <li><b>makereducedfraction(numerator,denominator,[doubleslash,variable in numerator])</b>:  Same as dispreducefraction, but not already in display form</li>
 <li><b>decimaltofraction(decimal,[format,maxden])</b>:  Converts a decimal to a fraction.  Can use format="mixednumber" to get a mixed number rather than improper fraction.  
     Only works for denominators up to maxden (default 5000)</li>
+<li><b>htmldisp(string,[variables])</b>:  Uses HTML instead of the math typesetter to display simple exponents and subscripts, and to italicize variables</li>
 </ul>
 
 </div>
@@ -1745,6 +1746,7 @@ These macros help with working with strings:
 <li><b>ucfirst(string)</b>: makes the first character in the string upper case</li>
 <li><b>strtolower(string)</b>: make all characters in the string lower case</li>
 <li><b>substr_count(haystack,needle)</b>: Find the number of occurances of needle in the string haystack</li>
+<li><b>str_replace(search,replace,string)</b>:  Replace all occurances of search in the string with replace.  Search and replace can be arrays.</li>
 </ul>
 
 </div>
@@ -1938,7 +1940,11 @@ $showanswer will reflect the random number assigned to $a.  For this reason, it 
 Your answer was {$stuanswers[0][0]}.  If using it directly in a calculation, enclose it in parentheses just to be safe.
 </p>
 <p>
-4) $stuanswers[$thisq] is only defined for question scoring, not question display, so don't try to use it in question display.
+4) $stuanswers[$thisq] is defined for question scoring, but may not be for question display.
+</p>
+<p>
+5) You can use the function getstuans($stuanswers,N,P) to retreive a student answer value.  This method bypasses some strange things that happen
+when there is a multipart question with only one part.
 </p>
 
 <h4>Reusing Code</h4>
@@ -2070,8 +2076,9 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 <dt>$requiretimes = a list, like "^,=3,cos,&lt;2" (In Answer)</dt>
 	<dd>Adds format checking to the student's answer.  The list can include multiple checks, which come in pairs.  The
 	first is the symbol to look for.  The second describes what is acceptable.  For example, in the string shown above,
-	the symbol "^" would be required to show up exactly 3 times, and "cos" would be required to show up less than 2 times.  You can
-	use "#" in the symbol location to match any number (including decimal values); 3.2^5 would match twice.</dd>
+	the symbol "^" would be required to show up exactly 3 times, and "cos" would be required to show up less than 2 times. <br/> 
+	You can	use "#" in the symbol location to match any number (including decimal values); 3.2^5 would match twice.<br/>
+	You can use a regular expression by putting in the symbol location "regex:expression"</dd>
 <dt>$ansprompt = string (In Question Control)</dt>
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="y="</dd>
 <dt>$displayformat = "point" or "vector" (In Question Control) *deprecated - use calculated ntuple question type instead*</dt>

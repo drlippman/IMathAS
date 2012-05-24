@@ -91,7 +91,7 @@
 				echo $out;
 				echo "<p>Password required for access.</p>";
 				echo "<form method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?cid={$_GET['cid']}&amp;id={$_GET['id']}\">";
-				echo "<p>Password: <input type=text name=\"password\" /></p>";
+				echo "<p>Password: <input type=\"password\" name=\"password\" /></p>";
 				echo "<input type=submit value=\"Submit\" />";
 				echo "</form>";
 				require("../footer.php");
@@ -841,7 +841,7 @@ if (!isset($_POST['embedpostback'])) {
 			for ($i=1;$i<$testsettings['groupmax']-count($curgrp)+1;$i++) {
 				echo '<br />Username: <select name="user'.$i.'">'.$selops.'</select> ';
 				if ($testsettings['isgroup']==1) {
-					echo 'Password: <input type=password name="pw'.$i.'" />'."\n";
+					echo 'Password: <input type="password" name="pw'.$i.'" />'."\n";
 				}
 			}
 			echo '<p><input type=submit name="grpsubmit" value="Record Group and Continue"/></p>';

@@ -554,6 +554,16 @@ if ($overwriteBody==1) {
 			document.getElementById('copyfromoptions').className="show";
 		}
 	}
+	function apwshowhide(s) {
+		var el = document.getElementById("password");
+		if (el.type == "password") {
+			el.type = "text";
+			s.innerHTML = "Hide";
+		} else {
+			el.type = "password";
+			s.innerHTML = "Show";
+		}
+	}
 	</script>
 	
 	<div class=breadcrumb><?php echo $curBreadcrumb  ?></div>
@@ -651,7 +661,7 @@ if ($overwriteBody==1) {
 		<div id="customoptions" class="show">
 			<fieldset><legend>Core Options</legend>
 			<span class=form>Require Password (blank for none):</span>
-			<span class=formright><input type=text name=password value="<?php echo $line['password'];?>"></span><br class=form />
+			<span class=formright><input type="password" name="password" id="password" value="<?php echo $line['password'];?>"> <a href="#" onclick="apwshowhide(this);return false;">Show</a></span><br class=form />
 			<span class=form>Time Limit (minutes, 0 for no time limit): </span>
 			<span class=formright><input type=text size=4 name=timelimit value="<?php echo abs($timelimit);?>">
 				<input type="checkbox" name="timelimitkickout" <?php if ($timelimit<0) echo 'checked="checked"';?> /> Kick student out at timelimit</span><BR class=form>
