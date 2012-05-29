@@ -37,63 +37,28 @@ if (!isset($_COOKIE['callength'.$cid])) {
 $today = $today + $pageshift*7*$callength*24*60*60;
 
 $dayofweek = tzdate('w',$today);
-$dayofmo = tzdate('j',$today);
-$curmo = tzdate('M',$today);
-$longcurmo = tzdate('F',$today);
-$curyr = tzdate('Y',$today);
 $curmonum = tzdate('n',$today);
-$daysinmo = tzdate('t',$today);
-$lastmo = tzdate('M',$today - ($dayofmo+2)*24*60*60);
-$lastmonum = tzdate('n',$today - ($dayofmo+2)*24*60*60);
-$daysinlastmo = tzdate('t',$today - ($dayofmo+2)*24*60*60);
-$nextmo = tzdate('M',$today + ($daysinmo-$dayofmo+2)*24*60*60);
-$nextmonum = tzdate('n',$today + ($daysinmo-$dayofmo+2)*24*60*60);
+$dayofmo = tzdate('j',$today);
+$curyr = tzdate('Y',$today);
 
 $hdrs = array();
 $ids = array();
 
-for ($i=0;$i<$dayofweek;$i++) {
-	$curday = $dayofmo - $dayofweek + $i;
-	if ($curday<1) {
-		if ($i==0) {
-			$hdrs[0][$i] = $lastmo . " " . ($daysinlastmo+$curday);
-			$ids[0][$i] = $lastmonum.'-'.($daysinlastmo + $curday);
-		} else {
-			$hdrs[0][$i] = ($daysinlastmo + $curday);
-			$ids[0][$i] = $lastmonum.'-'.($daysinlastmo + $curday);
-		}
-	} else {
-		if ($i==0) {
-			$hdrs[0][$i] = $curmo . " " . $curday;
-			$ids[0][$i] = $curmonum.'-'.$curday;
-		} else {
-			$hdrs[0][$i] = $curday;
-			$ids[0][$i] = $curmonum.'-'.$curday;
-		}
-	}
-	$dates[$ids[0][$i]] = tzdate('l F j, Y',$today - ($dayofweek - $i)*24*60*60);
-}
-
-for ($i=$dayofweek;$i<7*$callength;$i++) {
+$lastmo = '';
+for ($i=0;$i<7*$callength;$i++) {
 	$row = floor($i/7);
 	$col = $i%7;
-	$curday = $dayofmo -$dayofweek+ $i;
-	if ($curday > $daysinmo) {
-		if ($curday == $daysinmo+1) {
-			$hdrs[$row][$col] = $nextmo." 1";
-		} else {
-			$hdrs[$row][$col] = $curday - $daysinmo;
-		}
-		$ids[$row][$col] = $nextmonum.'-'.($curday - $daysinmo);
+	
+	list($thismo,$thisday,$thismonum,$datestr) = explode('|',tzdate('M|j|n|l F j, Y',$today - ($dayofweek - $i)*24*60*60));
+	if ($thismo==$lastmo) {
+		$hdrs[$row][$col] = $thisday;
 	} else {
-		if ($curday==1) {
-			$hdrs[0][$i] = $curmo . " " . $curday;
-		} else {
-			$hdrs[$row][$col] = $curday;
-		}
-		$ids[$row][$col] = $curmonum.'-'.$curday;
+		$hdrs[$row][$col] = "$thismo $thisday";
+		$lastmo = $thismo;
 	}
-	$dates[$ids[$row][$col]] = tzdate('l F j, Y',$today + ($i-$dayofweek)*24*60*60);
+	$ids[$row][$col] = "$thismonum-$thisday";
+	
+	$dates[$ids[$row][$col]] = $datestr;
 }
 
 ?>
@@ -136,18 +101,7 @@ if (!isset($teacherid)) {
 	}
 }
 
-/*
-$gbcats = array();
-$query = "SELECT id,UPPER(SUBSTRING(name,1,1)) FROM imas_gbcats WHERE courseid='$cid'";
-$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-while ($row = mysql_fetch_row($result)) {
-	if ($row[1]==strtolower($row[1])) {
-		continue;
-	} else {
-		$gbcats[$row[0]] = $row[1];
-	}
-}
-*/
+
 $byid = array();
 $k = 0;
 $query = "SELECT id,name,startdate,enddate,reviewdate,gbcategory,reqscore,reqscoreaid,timelimit,allowlate,caltag,calrtag FROM imas_assessments WHERE avail=1 AND courseid='$cid' AND enddate<2000000000 ORDER BY name";
