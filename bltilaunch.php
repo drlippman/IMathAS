@@ -424,9 +424,11 @@ if (isset($_GET['launch'])) {
 	$store->mark_nonce_used($request);
 	
 	$keyparts = explode('_',$ltikey);
+	$_SESSION['ltiorigkey'] = $ltikey;
 	
 	// prepend ltiorg with courseid or sso+userid to prevent cross-instructor hacking  
 	if ($keyparts[0]=='cid' || $keyparts[0]=='placein') {  //cid:org
+		$_SESSION['ltilookup'] = 'c';
 		$ltiorg = $keyparts[1].':'.$ltiorg;
 		if ($keyparts[0]=='placein') {
 			$keytype = 'gc';
@@ -449,15 +451,18 @@ if (isset($_GET['launch'])) {
 			}
 		}		
 	} else if ($keyparts[0]=='aid') {   //also cid:org
+		$_SESSION['ltilookup'] = 'a';
 		$aid = intval($keyparts[1]);
 		$query = "SELECT courseid FROM imas_assessments WHERE id='$aid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$ltiorg = mysql_result($result,0,0) . ':' . $ltiorg;
 		$keytype = 'a';
 	} else if ($keyparts[0]=='sso') {  //ssouserid:org
+		$_SESSION['ltilookup'] = 'u';
 		$ltiorg = $keyparts[0].$keyparts[1]. ':' . $ltiorg;
 		$keytype = 's';
 	} else {
+		$_SESSION['ltilookup'] = 'u';
 		$ltiorg = $ltikey.':'.$ltiorg;
 		$keytype = 'g';
 		if (isset($_REQUEST['custom_place_aid'])) {
@@ -845,6 +850,8 @@ $sessiondata['lti_context_label'] = $SESS['lti_context_label'];
 $sessiondata['lti_launch_get'] = $SESS['lti_launch_get'];
 $sessiondata['lti_key'] = $SESS['lti_key'];
 $sessiondata['lti_keytype'] = $SESS['lti_keytype'];
+$sessiondata['lti_keylookup'] = $SESS['ltilookup'];
+$sessiondata['lti_origkey'] = $SESS['ltiorigkey'];
 
 if (isset($setstuviewon) && $setstuviewon==true) {
 	$sessiondata['stuview'] = 0;

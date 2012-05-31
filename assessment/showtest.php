@@ -154,7 +154,7 @@
 			}
 			$deffeedbacktext = addslashes($adata['deffeedbacktext']);
 			if (isset($sessiondata['lti_lis_result_sourcedid']) && strlen($sessiondata['lti_lis_result_sourcedid'])>1) {
-				$ltisourcedid = addslashes(stripslashes($sessiondata['lti_lis_result_sourcedid'].':|:'.$sessiondata['lti_outcomeurl'].':|:'.$sessiondata['lti_key'].':|:'.$sessiondata['lti_keytype']));
+				$ltisourcedid = addslashes(stripslashes($sessiondata['lti_lis_result_sourcedid'].':|:'.$sessiondata['lti_outcomeurl'].':|:'.$sessiondata['lti_origkey'].':|:'.$sessiondata['lti_keylookup']));
 			} else {
 				$ltisourcedid = '';
 			}
@@ -270,7 +270,7 @@
 			}
 			
 			if (isset($sessiondata['lti_lis_result_sourcedid'])) {
-				$altltisourcedid = stripslashes($sessiondata['lti_lis_result_sourcedid'].':|:'.$sessiondata['lti_outcomeurl'].':|:'.$sessiondata['lti_key'].':|:'.$sessiondata['lti_keytype']);
+				$altltisourcedid = stripslashes($sessiondata['lti_lis_result_sourcedid'].':|:'.$sessiondata['lti_outcomeurl'].':|:'.$sessiondata['lti_origkey'].':|:'.$sessiondata['lti_keylookup']);
 				if ($altltisourcedid != $line['lti_sourcedid']) {
 					$altltisourcedid = addslashes($altltisourcedid);
 					$query = "UPDATE imas_assessment_sessions SET lti_sourcedid='$altltisourcedid' WHERE id='{$line['id']}'";
