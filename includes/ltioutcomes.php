@@ -101,7 +101,7 @@ function updateLTIgrade($action,$sourcedid,$aid,$grade=0) {
 				if (isset($testsettings) && isset($testsettings['ltisecret'])) {
 					$secret = $testsettings['ltisecret'];
 				} else {
-					$query = "SELECT ltisecret FROM imas_assessments WHERE id='$aid'";
+					$qr = "SELECT ltisecret FROM imas_assessments WHERE id='$aid'";
 					$res= mysql_query($qr) or die("Query failed : $qr" . mysql_error());
 					if (mysql_num_rows($res)>0) {
 						$secret = mysql_result($res,0,0);
@@ -112,7 +112,7 @@ function updateLTIgrade($action,$sourcedid,$aid,$grade=0) {
 					}
 				}
 			} else if ($keytype=='c') {
-				$query = "SELECT ltisecret FROM imas_courses WHERE id='{$testsettings['courseid']}'";
+				$qr = "SELECT ltisecret FROM imas_courses WHERE id='{$testsettings['courseid']}'";
 				$res= mysql_query($qr) or die("Query failed : $qr" . mysql_error());
 				if (mysql_num_rows($res)>0) {
 					$secret = mysql_result($res,0,0);
