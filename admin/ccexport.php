@@ -68,7 +68,7 @@ if (isset($_GET['delete'])) {
 	}
 	
 	function getorg($it,$parent,&$res,$ind) {
-		global $iteminfo,$newdir,$installname,$urlmode,$linktype;
+		global $iteminfo,$newdir,$installname,$urlmode,$linktype,$urlmode,$imasroot;
 		$out = '';
 		foreach ($it as $k=>$item) {
 			if (is_array($item)) {
@@ -173,39 +173,134 @@ if (isset($_GET['delete'])) {
 					$res[] = $resitem;
 					
 				} else if ($iteminfo[$item][0]=='Assessment') {
-					$query = "SELECT name,summary FROM imas_assessments WHERE id='{$iteminfo[$item][1]}'";
+					$query = "SELECT name,summary,defpoints,itemorder FROM imas_assessments WHERE id='{$iteminfo[$item][1]}'";
 					$r = mysql_query($query) or die("Query failed : " . mysql_error());
 					$row = mysql_fetch_row($r);
 					$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
 					$out .= $ind.'  <title>'.htmlentities($row[0]).'</title>'."\n";
 					$out .= $ind.'</item>'."\n";
-					$fp = fopen($newdir.'/blti'.$iteminfo[$item][1].'.xml','w');
-					fwrite($fp,'<cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0">');
-					fwrite($fp,'<blti:title>'.htmlentities($row[0]).'</blti:title>');
-					fwrite($fp,'<blti:description>'.htmlentities($row[1]).'</blti:description>');
-					if ($linktype=='url') {
-						$urladd = '?custom_place_aid='.$iteminfo[$item][1];
+					if ($linktype=='canvas') {
+						$aitems = explode(',',$row[3]);
+						foreach ($aitems as $k=>$v) {
+							if (strpos($v,'~')!==FALSE) {
+								$sub = explode('~',$v);
+								if (strpos($sub[0],'|')===false) { //backwards compat
+									$aitems[$k] = $sub[0];
+									$aitemcnt[$k] = 1;
+									
+								} else {
+									$grpparts = explode('|',$sub[0]);
+									$aitems[$k] = $sub[1];
+									$aitemcnt[$k] = $grpparts[0];
+								}
+							} else {
+								$aitemcnt[$k] = 1;
+							}
+						}
+						$query = "SELECT points,id FROM imas_questions WHERE assessmentid='{$iteminfo[$item][1]}'";
+						$result2 = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+						$totalpossible = 0;
+						while ($r = mysql_fetch_row($result2)) {
+							if (($k = array_search($r[1],$aitems))!==false) { //only use first item from grouped questions for total pts	
+								if ($r[0]==9999) {
+									$totalpossible += $aitemcnt[$k]*$row[2]; //use defpoints
+								} else {
+									$totalpossible += $aitemcnt[$k]*$r[0]; //use points from question
+								}
+							}
+						}
+						mkdir($newdir.'/assn'.$iteminfo[$item][1]);
+						$fp = fopen($newdir.'/assn'.$iteminfo[$item][1].'/assignment_settings.xml','w');
+						fwrite($fp,'<assignment xmlns="http://canvas.instructure.com/xsd/cccv1p0" identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd">');
+						fwrite($fp,'<title>'.htmlentities($row[0]).'</title>');
+						fwrite($fp,'<points_possible>'.$totalpossible.'</points_possible>');
+						fwrite($fp,'<grading_type>points</grading_type>');
+						fwrite($fp,'<assignment_group_identifierref>assngroup</assignment_group_identifierref>');
+						fwrite($fp,'<submission_types>external_tool</submission_types>');
+						fwrite($fp,'<external_tool_url>'. $urlmode . $_SERVER['HTTP_HOST'] . $imasroot . '/bltilaunch.php?custom_place_aid='.$iteminfo[$item][1].'</external_tool_url>');
+						fwrite($fp,'</assignment>');
+						fclose($fp);
+						$fp = fopen($newdir.'/assn'.$iteminfo[$item][1].'/assignmenthtml'.$iteminfo[$item][1].'.html','w');
+						fwrite($fp,'<html><body> </body></html>');
+						fclose($fp);
+						$resitem =  '<resource identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" type="associatedcontent/imscc_xmlv1p1/learning-application-resource" href="assn'.$iteminfo[$item][1].'/assignmenthtml'.$iteminfo[$item][1].'.html">'."\n";
+						$resitem .= '  <file href="assn'.$iteminfo[$item][1].'/assignmenthtml'.$iteminfo[$item][1].'.html" />'."\n";
+						$resitem .= '  <file href="assn'.$iteminfo[$item][1].'/assignment_settings.xml" />'."\n";
+						$resitem .= '</resource>';
+						$res[] = $resitem;
 					} else {
-						fwrite($fp,'<blti:custom><lticm:property name="place_aid">'.$iteminfo[$item][1].'</lticm:property></blti:custom>');
-						$urladd = '';
+						$fp = fopen($newdir.'/blti'.$iteminfo[$item][1].'.xml','w');
+						fwrite($fp,'<cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0">');
+						fwrite($fp,'<blti:title>'.htmlentities($row[0]).'</blti:title>');
+						fwrite($fp,'<blti:description>'.htmlentities($row[1]).'</blti:description>');
+						if ($linktype=='url') {
+							$urladd = '?custom_place_aid='.$iteminfo[$item][1];
+						} else {
+							fwrite($fp,'<blti:custom><lticm:property name="place_aid">'.$iteminfo[$item][1].'</lticm:property></blti:custom>');
+							$urladd = '';
+						}
+						fwrite($fp,'<blti:launch_url>http://' . $_SERVER['HTTP_HOST'] . $imasroot . '/bltilaunch.php'.$urladd.'</blti:launch_url>');
+						if ($urlmode == 'https://') {fwrite($fp,'<blti:secure_launch_url>https://' . $_SERVER['HTTP_HOST'] . $imasroot . '/bltilaunch.php</blti:secure_launch_url>');}
+						fwrite($fp,'<blti:vendor><lticp:code>IMathAS</lticp:code><lticp:name>'.$installname.'</lticp:name></blti:vendor>');
+						fwrite($fp,'</cartridge_basiclti_link>');
+						fclose($fp);
+						$resitem =  '<resource identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" type="imsbasiclti_xmlv1p0">'."\n";
+						$resitem .= '  <file href="blti'.$iteminfo[$item][1].'.xml" />'."\n";
+						$resitem .= '</resource>';
+						$res[] = $resitem;
 					}
-					fwrite($fp,'<blti:launch_url>http://' . $_SERVER['HTTP_HOST'] . $imasroot . '/bltilaunch.php'.$urladd.'</blti:launch_url>');
-					if ($urlmode == 'https://') {fwrite($fp,'<blti:secure_launch_url>https://' . $_SERVER['HTTP_HOST'] . $imasroot . '/bltilaunch.php</blti:secure_launch_url>');}
-					fwrite($fp,'<blti:vendor><lticp:code>IMathAS</lticp:code><lticp:name>'.$installname.'</lticp:name></blti:vendor>');
-					fwrite($fp,'</cartridge_basiclti_link>');
-					fclose($fp);
-					$resitem =  '<resource identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" type="imsbasiclti_xmlv1p0">'."\n";
-					$resitem .= '  <file href="blti'.$iteminfo[$item][1].'.xml" />'."\n";
-					$resitem .= '</resource>';
-					$res[] = $resitem;
 				}
 				
 			}
 		}
 		return $out;
 	}
-	
+	if ($linktype=='canvas') {
+		$manifestres[] = '<resource identifier="coursesettings1" href="course_settings/syllabus.html" type="associatedcontent/imscc_xmlv1p1/learning-application-resource" intendeduse="syllabus">
+      <file href="course_settings/syllabus.html"/>
+      <file href="course_settings/course_settings.xml"/>
+      <file href="course_settings/assignment_groups.xml"/>
+    </resource>';
+    	}
 	$manifestorg = getorg($items,'0',$manifestres,'  ');
+	
+	if ($linktype=='canvas') {
+		$fp = fopen($newdir.'/bltiimathas.xml','w');
+		fwrite($fp,'<cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0">');
+		fwrite($fp,'<blti:title>'.htmlentities($installname).'</blti:title>');
+		fwrite($fp,'<blti:description>Math Assessment</blti:description>');
+		fwrite($fp,'<blti:vendor><lticp:code>IMathAS</lticp:code><lticp:name>'.$installname.'</lticp:name></blti:vendor>');
+		fwrite($fp,'<blti:extensions platform="canvas.instructure.com">');
+		fwrite($fp,' <lticm:property name="privacy_level">public</lticm:property>');
+		fwrite($fp,' <lticm:property name="domain">'.$_SERVER['HTTP_HOST'].'</lticm:property>');
+		fwrite($fp,'</blti:extensions>');
+		fwrite($fp,'</cartridge_basiclti_link>');
+		fclose($fp);
+		$resitem =  '<resource identifier="RESbltiimathas" type="imsbasiclti_xmlv1p0">'."\n";
+		$resitem .= '  <file href="bltiimathas.xml" />'."\n";
+		$resitem .= '</resource>';
+		$manifestres[] = $resitem;
+		mkdir($newdir.'/non_cc_assessments');
+    		mkdir($newdir.'/course_settings');
+    		$fp = fopen($newdir.'/course_settings/syllabus.html','w');
+    		fwrite($fp,'<html><body> </body></html>');
+    		fclose($fp);
+    		$fp = fopen($newdir.'/course_settings/assignment_groups.xml','w');
+    		fwrite($fp,'<?xml version="1.0" encoding="UTF-8"?>
+			<assignmentGroups xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://canvas.instructure.com/xsd/cccv1p0">
+			  <assignmentGroup identifier="assngroup">
+			    <title>Assignments</title>
+			  </assignmentGroup>
+			</assignmentGroups>');
+		fclose($fp);
+		$fp = fopen($newdir.'/course_settings/course_settings.xml','w');
+		fwrite($fp,'<?xml version="1.0" encoding="UTF-8"?>
+<course xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" identifier="coursesettings1" xmlns="http://canvas.instructure.com/xsd/cccv1p0">
+  <title>imp test</title>
+</course>
+');
+		fclose($fp);
+	}
 	
 	$fp = fopen($newdir.'/imsmanifest.xml','w');
 	fwrite($fp,'<?xml version="1.0" encoding="UTF-8" ?>'."\n");
@@ -246,7 +341,7 @@ if (isset($_GET['delete'])) {
 	    die ("Could not open archive");
 	}
 	
-	// initialize an iterator
+	/*// initialize an iterator
 	// pass it the directory to be processed
 	$iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator('../course/files/CCEXPORT'.$cid.'/'));
 	
@@ -256,24 +351,57 @@ if (isset($_GET['delete'])) {
 		if (basename($key)=='.' || basename($key)=='..') { continue;}
 		$zip->addFile(realpath($key), basename($key)) or die ("ERROR: Could not add file: $key");        
 	}
+	*/
+	function addFolderToZip($dir, $zipArchive, $zipdir = ''){
+	    if (is_dir($dir)) {
+		if ($dh = opendir($dir)) {
+	
+		    //Add the directory
+		    if(!empty($zipdir)) $zipArchive->addEmptyDir($zipdir);
+		  
+		    // Loop through all the files
+		    while (($file = readdir($dh)) !== false) {
+		  
+			//If it's a folder, run the function again!
+			if(!is_file($dir . $file)){
+			    // Skip parent and root directories
+			    if( ($file !== ".") && ($file !== "..")){
+				addFolderToZip($dir . $file . "/", $zipArchive, $zipdir . $file . "/");
+			    }
+			  
+			}else{
+			    // Add the files
+			    $zipArchive->addFile($dir . $file, $zipdir . $file);
+			  
+			}
+		    }
+		}
+	    }
+	} 
+	addFolderToZip($newdir.'/',$zip);
 	
 	// close and save archive
 	$zip->close();
 	rename($path.'/CCEXPORT'.$cid.'.zip',$path.'/CCEXPORT'.$cid.'.imscc');
 	echo "Archive created successfully.";    
 	
-	function rrmdir($dir) {
-	   if (is_dir($dir)) {
-	     $objects = scandir($dir);
-	     foreach ($objects as $object) {
-	       if ($object != "." && $object != "..") {
-		 if (filetype($dir."/".$object) == "dir") rrmdir($dir."/".$object); else unlink($dir."/".$object);
-	       }
-	     }
-	     reset($objects);
-	     rmdir($dir);
-	   }
-	} 
+	function rrmdir($path) {
+	  if (is_file($path) || is_link($path)) {
+	    unlink($path);
+	  }
+	  elseif (is_dir($path)) {
+	    if ($d = opendir($path)) {
+	      while (($entry = readdir($d)) !== false) {
+		if ($entry == '.' || $entry == '..') continue;
+		$entry_path = $path .DIRECTORY_SEPARATOR. $entry;
+		rrmdir($entry_path);
+	      }
+	      closedir($d);
+	    }
+	    rmdir($path);
+	  }
+	 }
+ 
 	rrmdir($newdir);
 	
 	echo "<br/><a href=\"$imasroot/course/files/CCEXPORT$cid.imscc\">Download</a><br/>";
@@ -292,7 +420,8 @@ if (isset($_GET['delete'])) {
 	echo 'replaced with your course key.  If you do not see the LTI key setting in your course settings, then your system administrator does ';
 	echo 'not have LTI enabled on your system, and you cannot use this feature.</p>';
 	echo "<p><a href=\"ccexport.php?cid=$cid&create=true&type=custom\">Create CC Export</a> with LTI placements as custom fields</p>";
-	echo "<p><a href=\"ccexport.php?cid=$cid&create=true&type=url\">Create CC Export</a> with LTI placements in URLs</p>";
+	//echo "<p><a href=\"ccexport.php?cid=$cid&create=true&type=url\">Create CC Export</a> with LTI placements in URLs</p>";
+	echo "<p><a href=\"ccexport.php?cid=$cid&create=true&type=canvas\">Create CC+custom Export</a> that should work with Canvas</p>";
 }
 require("../footer.php");
 

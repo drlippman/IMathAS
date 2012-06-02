@@ -152,6 +152,21 @@ if (isset($_POST['createcourse'])) {
 		$placementtype = 'assess';
 		$typeid = $_POST['setplacement'];
 	}
+	if (isset($sessiondata['lti_selection_return'])) {
+		//Canvas custom LTI selection return
+		if ($placementtype=='assess') {
+			$query = "SELECT name FROM imas_assessments WHERE id='$typeid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$atitle = mysql_result($result,0,0);
+			
+			$url = $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/bltilaunch.php?custom_place_aid=$typeid";
+			header('Location: '.$sessiondata['lti_selection_return'].'?embed_type=basic_lti&url='.urlencode($url).'&title='.urlencode($atitle));
+			exit;
+				
+		} else {
+			exit;
+		}
+	}
 	if ($hasplacement) {
 		$query = "UPDATE imas_lti_placements SET placementtype='$placementtype',typeid='$typeid' WHERE id='$placementid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
@@ -206,10 +221,18 @@ if (!$hascourse) {
 } else if (!$hasplacement || isset($_GET['chgplacement'])) {
 	echo '<h3>Link courses</h3>';
 	echo '<form method="post" action="ltihome.php">';
-	echo "<p>This placement on your LMS has not yet been linked to content on $installname.";
-	echo 'You can either do a full course placement, in which case all content of the course is available from this one placement, or ';
-	echo 'you can place an individual assessment.  Select the placement you\'d like to make:<br/> <select name="setplacement"> ';
-	echo '<option value="course">Whole course Placement</option>';
+	echo "<p>This placement on your LMS has not yet been linked to content on $installname. ";
+	if (!isset($sessiondata['lti_selection_return'])) {
+		echo 'You can either do a full course placement, in which case all content of the course is available from this one placement, or ';
+		echo 'you can place an individual assessment.  Select the placement you\'d like to make: ';
+	} else {
+		echo 'Select the assessment you\'d like to use: ';
+	}
+	
+	echo '<br/> <select name="setplacement"> ';
+	if (!isset($sessiondata['lti_selection_return'])) {
+		echo '<option value="course">Whole course Placement</option>';
+	}
 	$query = "SELECT id,name FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	if (mysql_num_rows($result)>0) {

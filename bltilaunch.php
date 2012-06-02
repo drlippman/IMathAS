@@ -495,7 +495,9 @@ if (isset($_GET['launch'])) {
 	$_SESSION['lti_key'] = $ltikey;
 	$_SESSION['lti_keytype'] = $keytype;
 	$_SESSION['lti_keyrights'] = $requestinfo[0]->rights;
-	
+	if (isset($_REQUEST['selection_directive']) && $_REQUEST['selection_directive']=='select_link') {
+		$_SESSION['selection_return'] = $_REQUEST['launch_presentation_return_url'];
+	}
 	
 	
 	
@@ -852,6 +854,9 @@ $sessiondata['lti_key'] = $SESS['lti_key'];
 $sessiondata['lti_keytype'] = $SESS['lti_keytype'];
 $sessiondata['lti_keylookup'] = $SESS['ltilookup'];
 $sessiondata['lti_origkey'] = $SESS['ltiorigkey'];
+if (isset($SESS['selection_return'])) {
+	$sessiondata['lti_selection_return'] = $SESS['selection_return'];
+}
 
 if (isset($setstuviewon) && $setstuviewon==true) {
 	$sessiondata['stuview'] = 0;
