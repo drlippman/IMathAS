@@ -6,7 +6,8 @@ if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') {
  	 $urlmode = 'http://';
  }
 header("Content-type: text/xml;");
-?><?xml version="1.0" encoding="UTF-8"?>
+echo '<?xml version="1.0" encoding="UTF-8"?>';
+?>
   <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"
       xmlns:blti = "http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
       xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0"

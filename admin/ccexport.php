@@ -273,6 +273,12 @@ if (isset($_GET['delete'])) {
 		fwrite($fp,'<blti:extensions platform="canvas.instructure.com">');
 		fwrite($fp,' <lticm:property name="privacy_level">public</lticm:property>');
 		fwrite($fp,' <lticm:property name="domain">'.$_SERVER['HTTP_HOST'].'</lticm:property>');
+		fwrite($fp,' <lticm:options name="resource_selection">
+			<lticm:property name="url">'.$urlmode.$_SERVER['HTTP_HOST'] . $imasroot . '/bltilaunch.php</lticm:property>
+			<lticm:property name="text">Pick an Assessment</lticm:property>
+			<lticm:property name="selection_width">500</lticm:property>
+			<lticm:property name="selection_height">300</lticm:property>
+		      </lticm:options>');
 		fwrite($fp,'</blti:extensions>');
 		fwrite($fp,'</cartridge_basiclti_link>');
 		fclose($fp);
