@@ -67,15 +67,31 @@ if (isset($_GET['delete'])) {
 		return $str;
 	}
 	
+	$ccnt = 1;
+	$module_meta = '<?xml version="1.0" encoding="UTF-8"?>
+		<modules xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://canvas.instructure.com/xsd/cccv1p0">
+		<module identifier="imported">
+		<title>Imported Content</title>
+		<items>';
+
 	function getorg($it,$parent,&$res,$ind) {
-		global $iteminfo,$newdir,$installname,$urlmode,$linktype,$urlmode,$imasroot;
+		global $iteminfo,$newdir,$installname,$urlmode,$linktype,$urlmode,$imasroot,$ccnt,$module_meta;
 		$out = '';
+		
 		foreach ($it as $k=>$item) {
+			$canvout = '';
 			if (is_array($item)) {
+				$canvout .= '<item identifier="BLOCK'.$item['id'].'">'."\n";
+				$canvout .= '<content_type>ContextModuleSubHeader</content_type>';
+				$canvout .= '<title>'.htmlentities($item['name']).'</title>'."\n";
+				$canvout .= "<position>$ccnt</position> <indent>".(strlen($ind)/2 - 1)."</indent> </item>";
+				$ccnt++;
+				$module_meta .= $canvout;
 				$out .= $ind.'<item identifier="BLOCK'.$item['id'].'">'."\n";
 				$out .= $ind.'  <title>'.htmlentities($item['name']).'</title>'."\n";
 				$out .= $ind.getorg($item['items'],$parent.'-'.($k+1),$res,$ind.'  ');
 				$out .= $ind.'</item>'."\n";
+				
 			} else {
 				if ($iteminfo[$item][0]=='InlineText') {
 					$query = "SELECT title,text,fileorder FROM imas_inlinetext WHERE id='{$iteminfo[$item][1]}'";
@@ -98,6 +114,13 @@ if (isset($_GET['delete'])) {
 					$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
 					$out .= $ind.'  <title>'.htmlentities($row[0]).'</title>'."\n";
 					$out .= $ind.'</item>'."\n";
+					$canvout .= '<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
+					$canvout .= '<content_type>WikiPage</content_type>';
+					$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
+					$canvout .= '<title>'.htmlentities($row[0]).'</title>'."\n";
+					$canvout .= "<position>$ccnt</position> <indent>".(strlen($ind)/2 - 1)."</indent> </item>";
+					$ccnt++;
+					
 					$fp = fopen($newdir.'/inlinetext'.$iteminfo[$item][1].'.html','w');
 					fwrite($fp,filtercapture($row[1],$res));
 					if ($row[2]!='') {
@@ -127,6 +150,13 @@ if (isset($_GET['delete'])) {
 						$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
 						$out .= $ind.'  <title>'.htmlentities($row[0]).'</title>'."\n";
 						$out .= $ind.'</item>'."\n";
+						$canvout .= '<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
+						$canvout .= '<content_type>ExternalUrl</content_type>';
+						$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
+						$canvout .= '<title>'.htmlentities($row[0]).'</title>'."\n";
+						$canvout .= '<url>'.$alink.'</url>';
+						$canvout .= "<position>$ccnt</position> <indent>".(strlen($ind)/2 - 1)."</indent> </item>";
+						$ccnt++;
 						$resitem =  '<resource identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" type="imswl_xmlv1p1">'."\n";
 						$resitem .= '  <file href="weblink'.$iteminfo[$item][1].'.xml" />'."\n";
 						$resitem .= '</resource>';
@@ -137,7 +167,12 @@ if (isset($_GET['delete'])) {
 						$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
 						$out .= $ind.'  <title>'.htmlentities($row[0]).'</title>'."\n";
 						$out .= $ind.'</item>'."\n";
-						
+						$canvout .= '<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
+						$canvout .= '<content_type>Attachment</content_type>';
+						$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
+						$canvout .= '<title>'.htmlentities($row[0]).'</title>'."\n";
+						$canvout .= "<position>$ccnt</position> <indent>".(strlen($ind)/2 - 1)."</indent> </item>";
+						$ccnt++;
 						$resitem =  '<resource href="'.$filename.'" identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" type="webcontent">'."\n";
 						$resitem .= '  <file href="'.$filename.'" />'."\n";
 						$resitem .= '</resource>';
@@ -146,6 +181,12 @@ if (isset($_GET['delete'])) {
 						$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
 						$out .= $ind.'  <title>'.htmlentities($row[0]).'</title>'."\n";
 						$out .= $ind.'</item>'."\n";
+						$canvout .= '<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
+						$canvout .= '<content_type>WikiPage</content_type>';
+						$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
+						$canvout .= '<title>'.htmlentities($row[0]).'</title>'."\n";
+						$canvout .= "<position>$ccnt</position> <indent>".(strlen($ind)/2 - 1)."</indent> </item>";
+						$ccnt++;
 						$fp = fopen($newdir.'/linkedtext'.$iteminfo[$item][1].'.html','w');
 						fwrite($fp,filtercapture($row[1],$res));
 						fclose($fp);
@@ -155,21 +196,50 @@ if (isset($_GET['delete'])) {
 						$res[] = $resitem;
 					}
 				} else if ($iteminfo[$item][0]=='Forum') {
+					if ($linktype=='canvas') {
+						continue;  //workaround to bug until I can figure out what's wrong.
+					}
 					$query = "SELECT name,description FROM imas_forums WHERE id='{$iteminfo[$item][1]}'";
 					$r = mysql_query($query) or die("Query failed : " . mysql_error());
 					$row = mysql_fetch_row($r);
 					$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
 					$out .= $ind.'  <title>'.htmlentities($row[0]).'</title>'."\n";
 					$out .= $ind.'</item>'."\n";
+					$canvout .= '<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
+					$canvout .= '<content_type>DiscussionTopic</content_type>';
+					$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
+					$canvout .= '<title>'.htmlentities($row[0]).'</title>'."\n";
+					$canvout .= "<position>$ccnt</position> <indent>".(strlen($ind)/2 - 1)."</indent> </item>";
+					$ccnt++;
 					$fp = fopen($newdir.'/forum'.$iteminfo[$item][1].'.xml','w');
 					fwrite($fp,'<topic xmlns="http://www.imsglobal.org/xsd/imsccv1p1/imsdt_v1p1">');
 					fwrite($fp,' <title >'.htmlentities($row[0]).'</title>');
 					fwrite($fp,' <text texttype="text/html">'.htmlentities(filtercapture($row[1],$res)).'</text>');
 					fwrite($fp,'</topic>');
 					fclose($fp);
-					$resitem =  '<resource identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" type="imsdt_xmlv1p1">'."\n";
-					$resitem .= '  <file href="forum'.$iteminfo[$item][1].'.xml" />'."\n";
-					$resitem .= '</resource>';
+					
+					if ($linktype=='canvas') {
+						$fp = fopen($newdir.'/forummeta'.$iteminfo[$item][1].'.xml','w');
+						fwrite($fp,'<?xml version="1.0" encoding="UTF-8"?>
+							<topicMeta xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'meta" xmlns="http://canvas.instructure.com/xsd/cccv1p0">
+							  <topic_id>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</topic_id>
+							  <title>'.htmlentities($row[0]).'</title>
+							  <type>topic</type>
+							</topicMeta>');
+						fclose($fp);
+						$resitem =  '<resource identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'meta" type="associatedcontent/imscc_xmlv1p1/learning-application-resource" href="forummeta'.$iteminfo[$item][1].'.xml">'."\n";
+						$resitem .= '  <file href="forummeta'.$iteminfo[$item][1].'.xml" />'."\n";
+						$resitem .= '</resource>';
+						$res[] = $resitem;
+						$resitem =  '<resource identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" type="imsdt_xmlv1p1">'."\n";
+						$resitem .= '  <file href="forum'.$iteminfo[$item][1].'.xml" />'."\n";
+						$resitem .= '  <dependency identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'meta"/>';
+						$resitem .= '</resource>';
+					} else {
+						$resitem =  '<resource identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" type="imsdt_xmlv1p1">'."\n";
+						$resitem .= '  <file href="forum'.$iteminfo[$item][1].'.xml" />'."\n";
+						$resitem .= '</resource>';
+					}
 					$res[] = $resitem;
 					
 				} else if ($iteminfo[$item][0]=='Assessment') {
@@ -180,6 +250,12 @@ if (isset($_GET['delete'])) {
 					$out .= $ind.'  <title>'.htmlentities($row[0]).'</title>'."\n";
 					$out .= $ind.'</item>'."\n";
 					if ($linktype=='canvas') {
+						$canvout .= '<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
+						$canvout .= '<content_type>Assignment</content_type>';
+						$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
+						$canvout .= '<title>'.htmlentities($row[0]).'</title>'."\n";
+						$canvout .= "<position>$ccnt</position> <indent>".(strlen($ind)/2 - 1)."</indent> </item>";
+						$ccnt++;
 						$aitems = explode(',',$row[3]);
 						foreach ($aitems as $k=>$v) {
 							if (strpos($v,'~')!==FALSE) {
@@ -250,21 +326,24 @@ if (isset($_GET['delete'])) {
 						$res[] = $resitem;
 					}
 				}
-				
+				$module_meta .= $canvout;
 			}
 		}
 		return $out;
 	}
 	if ($linktype=='canvas') {
 		$manifestres[] = '<resource identifier="coursesettings1" href="course_settings/syllabus.html" type="associatedcontent/imscc_xmlv1p1/learning-application-resource" intendeduse="syllabus">
-      <file href="course_settings/syllabus.html"/>
-      <file href="course_settings/course_settings.xml"/>
-      <file href="course_settings/assignment_groups.xml"/>
-    </resource>';
+		      <file href="course_settings/syllabus.html"/>
+		      <file href="course_settings/course_settings.xml"/>
+		      <file href="course_settings/assignment_groups.xml"/>
+		      <file href="course_settings/module_meta.xml"/>
+		    </resource>';
     	}
 	$manifestorg = getorg($items,'0',$manifestres,'  ');
 	
 	if ($linktype=='canvas') {
+		$module_meta .= '</items>  </module> </modules>';
+		
 		$fp = fopen($newdir.'/bltiimathas.xml','w');
 		fwrite($fp,'<cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0">');
 		fwrite($fp,'<blti:title>'.htmlentities($installname).'</blti:title>');
@@ -298,6 +377,9 @@ if (isset($_GET['delete'])) {
 			    <title>Assignments</title>
 			  </assignmentGroup>
 			</assignmentGroups>');
+		fclose($fp);
+		$fp = fopen($newdir.'/course_settings/module_meta.xml','w');
+		fwrite($fp,$module_meta);
 		fclose($fp);
 		$fp = fopen($newdir.'/course_settings/course_settings.xml','w');
 		fwrite($fp,'<?xml version="1.0" encoding="UTF-8"?>
