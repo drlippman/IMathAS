@@ -98,6 +98,7 @@ function AStoIMG($w=200, $h=200) {
 	$this->red = imagecolorallocate($this->img, 255,0,0);
 	$this->orange = imagecolorallocate($this->img, 255,165,0);
 	$this->yellow = imagecolorallocate($this->img, 255,255,0);
+	$this->gold = imagecolorallocate($this->img, 255,215,0);
 	$this->green = imagecolorallocate($this->img, 0,255,0);
 	$this->blue = imagecolorallocate($this->img, 0,0,255);
 	$this->cyan = imagecolorallocate($this->img, 0,255,255);

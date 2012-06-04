@@ -495,18 +495,19 @@ if (isset($_GET['delete'])) {
 	echo '<h2>Common Cartridge Export</h2>';
 	echo '<p>This feature will allow you to export a v1.1 compliant IMS Common Cartridge export of your course, which can ';
 	echo 'then be loaded into other Learning Management Systems that support this standard.  Inline text, web links, ';
-	echo 'course files, and forums will all transfer reasonable well, but be aware that any math exported will call back to this server for display.</p>';
+	echo 'course files, and forums will all transfer reasonably well, but be aware that any math exported will call back to this server for display.</p>';
 	echo '<p>Since LMSs cannot support the type of assessment that this system ';
 	echo 'does, assessments are exported as LTI (learning tools interoperability) placements back to this system.  Not all LMSs ';
 	echo 'support this standard yet, so your assessments may not transfer.  If they do, you will need to set up the LTI tool on your LMS ';
 	echo 'to work with this system by supplying an LTI key and secret.  If this system and your LMS have domain credentials set up, you may not have to do ';
-	echo 'anything.  Otherwise, you can use the LTI key you set in your course settings, along with the key cid_###_0 (if you want students ';
-	echo 'to create an account on this system) or cid_###_1 (if you want students to only be able to log in through the LMS), where ### is ';
+	echo 'anything.  Otherwise, you can use the LTI key you set in your course settings, along with the key placein_###_0 (if you want students ';
+	echo 'to create an account on this system) or placein_###_1 (if you want students to only be able to log in through the LMS), where ### is ';
 	echo 'replaced with your course key.  If you do not see the LTI key setting in your course settings, then your system administrator does ';
 	echo 'not have LTI enabled on your system, and you cannot use this feature.</p>';
 	echo "<p><a href=\"ccexport.php?cid=$cid&create=true&type=custom\">Create CC Export</a> with LTI placements as custom fields</p>";
 	//echo "<p><a href=\"ccexport.php?cid=$cid&create=true&type=url\">Create CC Export</a> with LTI placements in URLs</p>";
-	echo "<p><a href=\"ccexport.php?cid=$cid&create=true&type=canvas\">Create CC+custom Export</a> that should work with Canvas</p>";
+	echo "<p><a href=\"ccexport.php?cid=$cid&create=true&type=canvas\">Create CC+custom Export</a> that should work with Canvas (note: text items don't import correctly yet)</p>";
+	
 }
 require("../footer.php");
 

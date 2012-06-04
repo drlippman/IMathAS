@@ -10,8 +10,12 @@
 	echo "You do not need to load the Core libraries.\n";
 	echo "<ul>";
 	echo "<li><a href=\"$imasroot/help.php?section=randomizers\">Core Randomizers</a></li>\n";
-	echo "<li><a href=\"$imasroot/help.php?section=displaymacros\">Core Display Macros</a></li>\n";
+	echo "<li><a href=\"$imasroot/help.php?section=graphtablemacros\">Core Graph/Table Macros</a></li>\n";
+	echo "<li><a href=\"$imasroot/help.php?section=formatmacros\">Core Format Macros</a></li>\n";
+	echo "<li><a href=\"$imasroot/help.php?section=stringmacros\">Core String Macros</a></li>\n";
+	echo "<li><a href=\"$imasroot/help.php?section=arraymacros\">Core Array Macros</a></li>\n";
 	echo "<li><a href=\"$imasroot/help.php?section=generalmacros\">Core General Macros</a></li>\n";
+	echo "<li><a href=\"$imasroot/help.php?section=mathmacros\">Core Math Macros</a></li>\n";
 	$path = ".";
 
 	$dir = opendir($path);

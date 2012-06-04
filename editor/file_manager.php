@@ -179,7 +179,7 @@ upload files with private information.
 
 function delete_file(file_name)
 {
-	if (confirm("Are you sure you want to delete this file?")) {
+	if (confirm("Are you sure you want to delete this file?  If you delete it, it will no longer be accessible or viewable from anywhere you've used it.")) {
 		document.getElementById("hidden_action").value = "delete_file";
 		document.getElementById("hidden_item_name").value = file_name;
 		document.getElementById("hidden_form").submit();
