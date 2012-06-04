@@ -196,9 +196,6 @@ if (isset($_GET['delete'])) {
 						$res[] = $resitem;
 					}
 				} else if ($iteminfo[$item][0]=='Forum') {
-					if ($linktype=='canvas') {
-						continue;  //workaround to bug until I can figure out what's wrong.
-					}
 					$query = "SELECT name,description FROM imas_forums WHERE id='{$iteminfo[$item][1]}'";
 					$r = mysql_query($query) or die("Query failed : " . mysql_error());
 					$row = mysql_fetch_row($r);
@@ -219,7 +216,7 @@ if (isset($_GET['delete'])) {
 					fclose($fp);
 					
 					if ($linktype=='canvas') {
-						$fp = fopen($newdir.'/forummeta'.$iteminfo[$item][1].'.xml','w');
+						$fp = fopen($newdir.'/RES'.$iteminfo[$item][0].$iteminfo[$item][1].'meta.xml','w');
 						fwrite($fp,'<?xml version="1.0" encoding="UTF-8"?>
 							<topicMeta xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'meta" xmlns="http://canvas.instructure.com/xsd/cccv1p0">
 							  <topic_id>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</topic_id>
@@ -227,8 +224,8 @@ if (isset($_GET['delete'])) {
 							  <type>topic</type>
 							</topicMeta>');
 						fclose($fp);
-						$resitem =  '<resource identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'meta" type="associatedcontent/imscc_xmlv1p1/learning-application-resource" href="forummeta'.$iteminfo[$item][1].'.xml">'."\n";
-						$resitem .= '  <file href="forummeta'.$iteminfo[$item][1].'.xml" />'."\n";
+						$resitem =  '<resource identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'meta" type="associatedcontent/imscc_xmlv1p1/learning-application-resource" href="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'meta.xml">'."\n";
+						$resitem .= '  <file href="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'meta.xml" />'."\n";
 						$resitem .= '</resource>';
 						$res[] = $resitem;
 						$resitem =  '<resource identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" type="imsdt_xmlv1p1">'."\n";
