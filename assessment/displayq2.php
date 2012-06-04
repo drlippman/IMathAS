@@ -1851,12 +1851,13 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 
 
 function scorepart($anstype,$qn,$givenans,$options,$multi) {
+	$defaultreltol = .0015;
 	if ($anstype == "number") {
 		if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}
 		if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$qn];} else {$reltolerance = $options['reltolerance'];}}
 		if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$qn];} else {$abstolerance = $options['abstolerance'];}}
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
-		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = .001;}
+		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$GLOBALS['partlastanswer'] = $givenans;
 		if ($givenans == null) {return 0;}
@@ -2101,7 +2102,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (is_array($options['answer']) && isset($options['answer'][$qn])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}
 		if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$qn];} else {$reltolerance = $options['reltolerance'];}}
 		if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$qn];} else {$abstolerance = $options['abstolerance'];}}
-		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = .001;}
+		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if (isset($options['answersize'])) {if (is_array($options['answersize'])) {$answersize = $options['answersize'][$qn];} else {$answersize = $options['answersize'];}}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$correct = true;
@@ -2149,7 +2150,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}
 		if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$qn];} else {$reltolerance = $options['reltolerance'];}}
 		if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$qn];} else {$abstolerance = $options['abstolerance'];}}
-		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = .001;}
+		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if (isset($options['answersize'])) {if (is_array($options['answersize'])) {$answersize = $options['answersize'][$qn];} else {$answersize = $options['answersize'];}}
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		
@@ -2213,7 +2214,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$qn];} else {$requiretimes = $options['requiretimes'];}}
 		
-		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = .001;}
+		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		if (!isset($answerformat)) { $answerformat = '';}
 		$ansformats = explode(',',$answerformat);
@@ -2330,7 +2331,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$qn];} else {$requiretimes = $options['requiretimes'];}}
 		
-		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = .001;}
+		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		if (!isset($answerformat)) { $answerformat = '';}
 		$ansformats = explode(',',$answerformat);
@@ -2437,7 +2438,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$qn];} else {$requiretimes = $options['requiretimes'];}}
 		
-		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = .001;}
+		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$GLOBALS['partlastanswer'] = $_POST["tc$qn"];
 		if ($givenans == null) {return 0;}
@@ -2608,7 +2609,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$qn];} else {$reltolerance = $options['reltolerance'];}}
 		if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$qn];} else {$abstolerance = $options['abstolerance'];}}
 		
-		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = .001;}
+		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if (is_array($options['variables'])) {$variables = $options['variables'][$qn];} else {$variables = $options['variables'];}
 
 		if (isset($options['domain'])) {if (is_array($options['domain'])) {$domain = $options['domain'][$qn];} else {$domain= $options['domain'];}}
@@ -2908,7 +2909,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$qn];} else {$requiretimes = $options['requiretimes'];}}
 		if (isset($options['variables'])) {if (is_array($options['variables'])) {$variables = $options['variables'][$qn];} else {$variables = $options['variables'];}}
 		if (!isset($variables)) { $variables = 'x';}
-		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = .001;}
+		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$ansformats = explode(',',$answerformat);
 		
@@ -4038,7 +4039,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$answer = $options['answer'];
 		if (isset($options['abstolerance'])) {$abstolerance = $options['abstolerance'];}
 		if (isset($options['reltolerance'])) {$reltolerance = $options['reltolerance'];}
-		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = .001;}
+		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if (isset($options['domain'])) {$domain = $options['domain'];} else { $domain = "-10,10";}
 		if (isset($options['variables'])) {$variables = $options['variables'];} else { $variables = "x";}
 		$anstypes = $options['anstypes'];

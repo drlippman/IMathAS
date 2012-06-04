@@ -47,20 +47,34 @@ if (isset($_GET['delete'])) {
 	} else {
 		$addmathabs = false;
 	}
+	
+	$htmldir = '';
+	$filedir = '';
+	if ($linktype=='canvas') {
+		mkdir($newdir.'/wiki_content');
+		mkdir($newdir.'/web_resources');
+		$htmldir = 'wiki_content/';
+		$filedir = 'web_resources/';
+	}
+	
 	function filtercapture($str,&$res) {
-		global $newdir,$imgcnt,$imasroot,$addmathabs,$mathimgurl;
+		global $newdir,$imgcnt,$imasroot,$addmathabs,$mathimgurl,$filedir,$linktype;
 		$str = forcefiltermath($str);
 		$str = forcefiltergraph($str);
 		$graphfiles = getgraphfilenames($str);
 		foreach ($graphfiles as $f) {
-			copy("../filter/graph/imgs/$f",$newdir.'/'.$f);
-			$resitem =  '<resource href="'.$f.'" identifier="RESwebcontentImage'.$imgcnt.'" type="webcontent">'."\n";
-			$resitem .= '  <file href="'.$f.'" />'."\n";
+			copy("../filter/graph/imgs/$f",$newdir.'/'.$filedir.$f);
+			$resitem =  '<resource href="'.$filedir.$f.'" identifier="RESwebcontentImage'.$imgcnt.'" type="webcontent">'."\n";
+			$resitem .= '  <file href="'.$filedir.$f.'" />'."\n";
 			$resitem .= '</resource>';
 			$res[] = $resitem;
 			$imgcnt++;
 		}
-		$str = str_replace($imasroot.'/filter/graph/imgs/','',$str);
+		if ($linktype=='canvas') {
+			$str = str_replace($imasroot.'/filter/graph/imgs/','$IMS_CC_FILEBASE$/',$str); 
+		} else {
+			$str = str_replace($imasroot.'/filter/graph/imgs/','',$str); 
+		}
 		if ($addmathabs) {
 			$str = str_replace($mathimgurl,'http://'. $_SERVER['HTTP_HOST']. $mathimgurl, $str);
 		}
@@ -73,9 +87,12 @@ if (isset($_GET['delete'])) {
 		<module identifier="imported">
 		<title>Imported Content</title>
 		<items>';
-
+		
+	
+		
+	
 	function getorg($it,$parent,&$res,$ind) {
-		global $iteminfo,$newdir,$installname,$urlmode,$linktype,$urlmode,$imasroot,$ccnt,$module_meta;
+		global $iteminfo,$newdir,$installname,$urlmode,$linktype,$urlmode,$imasroot,$ccnt,$module_meta,$htmldir,$filedir;
 		$out = '';
 		
 		foreach ($it as $k=>$item) {
@@ -121,7 +138,14 @@ if (isset($_GET['delete'])) {
 					$canvout .= "<position>$ccnt</position> <indent>".(strlen($ind)/2 - 1)."</indent> </item>";
 					$ccnt++;
 					
-					$fp = fopen($newdir.'/inlinetext'.$iteminfo[$item][1].'.html','w');
+					$fp = fopen($newdir.'/'.$htmldir.'inlinetext'.$iteminfo[$item][1].'.html','w');
+					fwrite($fp,'<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8">');
+					fwrite($fp,'<title>'.htmlentities($row[0]).'</title>');
+					fwrite($fp,'<meta name="identifier" content="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'"/>');
+					if ($linktype=="canvas") {
+						fwrite($fp,'<meta name="editing_roles" content="teachers"/>');
+					}
+					fwrite($fp,"</body></html>");
 					fwrite($fp,filtercapture($row[1],$res));
 					if ($row[2]!='') {
 						fwrite($fp,'<ul>');
@@ -130,9 +154,10 @@ if (isset($_GET['delete'])) {
 						}
 						fwrite($fp,'</ul>');
 					}
+					fwrite($fp,'</body></html>');
 					fclose($fp);
-					$resitem =  '<resource href="inlinetext'.$iteminfo[$item][1].'.html" identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" type="webcontent">'."\n";
-					$resitem .= '  <file href="inlinetext'.$iteminfo[$item][1].'.html" />'."\n";
+					$resitem =  '<resource href="'.$htmldir.'inlinetext'.$iteminfo[$item][1].'.html" identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" type="webcontent">'."\n";
+					$resitem .= '  <file href="'.$htmldir.'inlinetext'.$iteminfo[$item][1].'.html" />'."\n";
 					$resitem .= '</resource>';
 					$res[] = $resitem;
 				} else if ($iteminfo[$item][0]=='LinkedText') {
@@ -163,7 +188,7 @@ if (isset($_GET['delete'])) {
 						$res[] = $resitem;
 					} else if (substr(strip_tags($row[1]),0,5)=="file:") {  //is a file
 						$filename = trim(substr(strip_tags($row[1]),5));
-						copy("../course/files/$filename",$newdir.'/'.$filename);
+						copy("../course/files/$filename",$newdir.'/'.$filedir.$filename);
 						$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
 						$out .= $ind.'  <title>'.htmlentities($row[0]).'</title>'."\n";
 						$out .= $ind.'</item>'."\n";
@@ -173,8 +198,8 @@ if (isset($_GET['delete'])) {
 						$canvout .= '<title>'.htmlentities($row[0]).'</title>'."\n";
 						$canvout .= "<position>$ccnt</position> <indent>".(strlen($ind)/2 - 1)."</indent> </item>";
 						$ccnt++;
-						$resitem =  '<resource href="'.$filename.'" identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" type="webcontent">'."\n";
-						$resitem .= '  <file href="'.$filename.'" />'."\n";
+						$resitem =  '<resource href="'.$filedir.$filename.'" identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" type="webcontent">'."\n";
+						$resitem .= '  <file href="'.$filedir.$filename.'" />'."\n";
 						$resitem .= '</resource>';
 						$res[] = $resitem;
 					} else { //is text
@@ -187,11 +212,19 @@ if (isset($_GET['delete'])) {
 						$canvout .= '<title>'.htmlentities($row[0]).'</title>'."\n";
 						$canvout .= "<position>$ccnt</position> <indent>".(strlen($ind)/2 - 1)."</indent> </item>";
 						$ccnt++;
-						$fp = fopen($newdir.'/linkedtext'.$iteminfo[$item][1].'.html','w');
+						$fp = fopen($newdir.'/'.$htmldir.'linkedtext'.$iteminfo[$item][1].'.html','w');
+						fwrite($fp,'<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8">');
+						fwrite($fp,'<title>'.htmlentities($row[0]).'</title>');
+						fwrite($fp,'<meta name="identifier" content="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'"/>');
+						if ($linktype=="canvas") {
+							fwrite($fp,'<meta name="editing_roles" content="teachers"/>');
+						}
+						fwrite($fp,"</body></html>");
 						fwrite($fp,filtercapture($row[1],$res));
+						fwrite($fp,'</body></html>');
 						fclose($fp);
-						$resitem =  '<resource href="linkedtext'.$iteminfo[$item][1].'.html" identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" type="webcontent">'."\n";
-						$resitem .= '  <file href="linkedtext'.$iteminfo[$item][1].'.html" />'."\n";
+						$resitem =  '<resource href="'.$htmldir.'linkedtext'.$iteminfo[$item][1].'.html" identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" type="webcontent">'."\n";
+						$resitem .= '  <file href="'.$htmldir.'linkedtext'.$iteminfo[$item][1].'.html" />'."\n";
 						$resitem .= '</resource>';
 						$res[] = $resitem;
 					}
@@ -506,7 +539,7 @@ if (isset($_GET['delete'])) {
 	echo 'not have LTI enabled on your system, and you cannot use this feature.</p>';
 	echo "<p><a href=\"ccexport.php?cid=$cid&create=true&type=custom\">Create CC Export</a> with LTI placements as custom fields</p>";
 	//echo "<p><a href=\"ccexport.php?cid=$cid&create=true&type=url\">Create CC Export</a> with LTI placements in URLs</p>";
-	echo "<p><a href=\"ccexport.php?cid=$cid&create=true&type=canvas\">Create CC+custom Export</a> that should work with Canvas (note: text items don't import correctly yet)</p>";
+	echo "<p><a href=\"ccexport.php?cid=$cid&create=true&type=canvas\">Create CC+custom Export</a> that should work with Canvas</p>";
 	
 }
 require("../footer.php");
