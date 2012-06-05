@@ -396,9 +396,9 @@ switch($_GET['action']) {
 			echo '<a href="#" onclick="document.getElementById(\'ltiurl\').style.display=\'\'; return false;">LTI url/key?</a>';
 			echo '<span id="ltiurl" style="display:none;">';
 			if (isset($_GET['id'])) {
-				echo '<br/>url: http://'. $_SERVER['HTTP_HOST'].$imasroot.'/bltilaunch.php<br/>';
-				echo 'key: cid_'.$_GET['id'].'_0 (to allow local login) or cid_'.$_GET['id'].'_1 (access from LMS only) for full course placement, or';
-				echo 'key: placein_'.$_GET['id'].'_0 (to allow local login) or placein_'.$_GET['id'].'_1 (access from LMS only) to create a course-specific LTI tool, or';
+				echo '<br/>URL: http://'. $_SERVER['HTTP_HOST'].$imasroot.'/bltilaunch.php<br/>';
+				echo 'Key: placein_'.$_GET['id'].'_0 (to allow students to login directly to '.$installname.') or<br/>';
+				echo 'Key: placein_'.$_GET['id'].'_1 (to only allow access through the LMS )';
 			} else {
 				echo 'Course ID not yet set.';
 			}		
