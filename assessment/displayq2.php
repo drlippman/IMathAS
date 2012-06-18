@@ -118,6 +118,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if (isset($noshuffle)) {$options['noshuffle'] = $noshuffle;}
 	if (isset($reqdecimals)) {$options['reqdecimals'] = $reqdecimals;}
 	if (isset($grid)) {$options['grid'] = $grid;}
+	if (isset($snaptogrid)) {$options['snaptogrid'] = $snaptogrid;}
 	if (isset($background)) {$options['background'] = $background;}
 	
 	if ($qdata['qtype']=='conditional') {
@@ -1510,10 +1511,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 	} else if ($anstype == 'draw') {
 		if ($multi>0) {
 			if (isset($options['grid'][$qn])) { $grid = $options['grid'][$qn];}
+			if (isset($options['snaptogrid'][$qn])) { $snaptogrid = $options['snaptogrid'][$qn];}
 			if (isset($options['background'][$qn])) { $backg = $options['background'][$qn];}
 			if (isset($options['answers'][$qn])) {$answers = $options['answers'][$qn];}
 		} else {
 			if (isset($options['grid'])) { $grid = $options['grid'];}
+			if (isset($options['snaptogrid'])) { $snaptogrid = $options['snaptogrid'];}
 			if (isset($options['background'])) { $backg = $options['background'];}
 			if (isset($options['answers'])) {$answers = $options['answers'];}
 		
@@ -1521,6 +1524,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if (!is_array($answers)) {
 			settype($answers,"array");
+		}
+		if (!isset($snaptogrid)) {
+			$snaptogrid = 0;
 		}
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		
@@ -1702,9 +1708,10 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		
 		
 		
+		if (strpos($snaptogrid,':')!==false) { $snaptogrid = "'$snaptogrid'";}
 		$out .= '</span></div>';
 		$out .= "<input type=\"hidden\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" />";
-		$out .= "<script type=\"text/javascript\">canvases[$qn] = [$qn,'$bg',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline,$locky];";
+		$out .= "<script type=\"text/javascript\">canvases[$qn] = [$qn,'$bg',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline,$locky,$snaptogrid];";
 		
 		$la = str_replace(array('(',')'),array('[',']'),$la);
 		$la = explode(';;',$la);

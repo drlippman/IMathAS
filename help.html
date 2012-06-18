@@ -2375,6 +2375,10 @@ drawn line from the correct line.
 	    If using $answerformat="numberline", set ymin and ymax to 0.<br/>If desired, you can set separate label and grid
 	    spacing using "xmin,xmax,ymin,ymax,xlabel:xgrid,ylabel:ygrid,imagewidth,imageheight".  You can specify axis labels using
 	    "xmin,xmax,ymin,ymax,xlabel:xgrid:xaxislabel,ylabel:ygrid:yaxislabel,imagewidth,imageheight"</dd>
+<dt>$snaptogrid = spacing (In Common Control)</dt>
+	<dd>Turns on snapping, where points will jump to a grid.  $snaptogrid = 1 will jump to the nearest
+	integer. $snaptogrid = 0.5 will jump to the nearest .5.  $snaptogrid = "2:4" will jump to the nearest
+	2 in the x and 4 in the y.  Does not have to match the actual grid line spacing.</dd>
 <dt>$background = equation or array of equations, using the showplot macro format (In Common Control)</dt>
 	<dd>Define a graph to display in the background, to be drawn on top of.  Example:  $background = "x^2,red"</dd>
 <dt>$partweights = array or list of weights (In Answer)</dt>

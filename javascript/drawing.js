@@ -86,7 +86,7 @@ function clearcanvas(tarnum) {
 	dragObj = null;
 }
 
-function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,imgwidth,imgheight,defmode,dotline,locky) {
+function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,imgwidth,imgheight,defmode,dotline,locky,snaptogrid) {
 	var tarel = document.getElementById(target);
 	tarel.style.userSelect = "none";
 	tarel.style.webkitUserSelect = "none";
@@ -95,6 +95,16 @@ function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,im
 	var tarpos = getPosition(tarel);
 	
 	targets[tarnum] = {el: tarel, left: tarpos.x, top: tarpos.y, width: tarel.offsetWidth, height: tarel.offsetHeight, xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax, imgborder: imgborder, imgwidth: imgwidth, imgheight: imgheight, mode: defmode, dotline: dotline};
+	if (typeof snaptogrid=="string" && snaptogrid.indexOf(":")!=-1) {
+		snaptogrid = snaptogrid.split(":");
+		targets[tarnum].snaptogridx = 1*snaptogrid[0];
+		targets[tarnum].snaptogridy = 1*snaptogrid[1];
+	} else {
+		targets[tarnum].snaptogridx = snaptogrid;
+		targets[tarnum].snaptogridy = snaptogrid;
+	}
+	targets[tarnum].pixperx = (imgwidth - 2*imgborder)/(xmax-xmin);
+	targets[tarnum].pixpery = (imgheight - 2*imgborder)/(ymax-ymin);
 	targetOuts[tarnum] = document.getElementById(formel);
 	if (lines[tarnum]==null) {lines[tarnum] = new Array();}
 	if (dots[tarnum]==null) {dots[tarnum] = new Array();}
@@ -269,6 +279,9 @@ function drawTarget(x,y) {
 			} else {
 				ctx.fillRect(ineqlines[curTarget][i][j][0]-3,ineqlines[curTarget][i][j][1]-3,6,6);
 			}
+		}
+		if (ineqlines[curTarget][i].length==1 && x2!=null) {
+			ctx.fillRect(x2-3,y2-3,6,6);
 		}
 		ctx.beginPath();
 	}
@@ -503,6 +516,9 @@ function drawTarget(x,y) {
 		for (var j=0; j<tplines[curTarget][i].length; j++) {
 			ctx.fillRect(tplines[curTarget][i][j][0]-3,tplines[curTarget][i][j][1]-3,6,6);
 		}
+		if (tplines[curTarget][i].length==1 && x!=null && curTPcurve==i) {
+			ctx.fillRect(x-3,y-3,6,6);
+		}
 		ctx.beginPath();
 	}
 	var linefirstx, linefirsty, linelastx, linelasty;
@@ -663,6 +679,7 @@ function drawMouseDown(ev) {
 		  
 		//are we inside target region?
 		if (mouseOff.x>-1 && mouseOff.x<targets[curTarget].width && mouseOff.y>-1 && mouseOff.y<targets[curTarget].height) {
+			if (targets[curTarget].snaptogridx > 0) {mouseOff = snaptogrid(mouseOff,curTarget);}
 			if (drawlocky[curTarget]==1) {
 				mouseOff.y = targets[curTarget].imgheight/2;
 			}
@@ -902,6 +919,7 @@ function drawMouseUp(ev) {
 	if (curTarget!=null) {
 		var tarelpos = getPosition(targets[curTarget].el);
 		var mouseOff = {x:(mousePos.x - tarelpos.x), y: (mousePos.y-tarelpos.y)};
+		if (targets[curTarget].snaptogridx > 0) {mouseOff = snaptogrid(mouseOff,curTarget);}
 		if (lastdrawmouseup!=null && mousePos.x==lastdrawmouseup.x && mousePos.y==lastdrawmouseup.y) {
 			//basically a double-click which IE can handle
 			if (curLine!=null && dragObj==null) {
@@ -1001,6 +1019,7 @@ function drawMouseMove(ev) {
 	if (tempTarget!=null) {
 		var tarelpos = getPosition(targets[tempTarget].el);
 		var mouseOff = {x:(mousePos.x - tarelpos.x), y: (mousePos.y-tarelpos.y)};
+		if (targets[tempTarget].snaptogridx > 0) {mouseOff = snaptogrid(mouseOff,tempTarget);}
 		if (drawlocky[tempTarget]==1) {
 			mouseOff.y = targets[tempTarget].imgheight/2;
 		}
@@ -1026,6 +1045,7 @@ function drawMouseMove(ev) {
 		}
 		var tarelpos = getPosition(targets[curTarget].el);
 		var mouseOff = {x:(mousePos.x - tarelpos.x), y: (mousePos.y-tarelpos.y)};
+		if (targets[curTarget].snaptogridx > 0) {mouseOff = snaptogrid(mouseOff,curTarget);}
 		if (drawlocky[curTarget]==1) {
 			mouseOff.y = targets[curTarget].imgheight/2;
 		}
@@ -1137,6 +1157,14 @@ function mouseCoords(ev){
 	
 }
 
+function snaptogrid(mousepos, curt) {
+	var posx = mousepos.x - targets[curt].imgborder + targets[curt].xmin*targets[curt].pixperx;
+	var posy = mousepos.y - targets[curt].imgborder - targets[curt].ymax*targets[curt].pixpery;
+	posx = Math.round(Math.round(posx/(targets[curt].pixperx*targets[curt].snaptogridx))*targets[curt].pixperx*targets[curt].snaptogridx + targets[curt].imgborder  - targets[curt].xmin*targets[curt].pixperx);
+	posy = Math.round(Math.round(posy/(targets[curt].pixpery*targets[curt].snaptogridy))*targets[curt].pixpery*targets[curt].snaptogridy + targets[curt].imgborder  + targets[curt].ymax*targets[curt].pixpery);
+	return {x: posx, y: posy};
+}
+
 function getMouseOffset(target, ev){
 
 	var docPos    = getPosition(target);
@@ -1228,7 +1256,7 @@ function initCanvases(k) {
 					}
 				}
 			}
-			addTarget(canvases[i][0],'canvas'+canvases[i][0],imasroot+'/filter/graph/imgs/'+canvases[i][1],'qn'+canvases[i][0],canvases[i][2],canvases[i][3],canvases[i][4],canvases[i][5],canvases[i][6],canvases[i][7],canvases[i][8],canvases[i][9],canvases[i][10],canvases[i][11]);
+			addTarget(canvases[i][0],'canvas'+canvases[i][0],imasroot+'/filter/graph/imgs/'+canvases[i][1],'qn'+canvases[i][0],canvases[i][2],canvases[i][3],canvases[i][4],canvases[i][5],canvases[i][6],canvases[i][7],canvases[i][8],canvases[i][9],canvases[i][10],canvases[i][11],canvases[i][12]);
 		}
 	}
 	

@@ -1437,7 +1437,7 @@ function prettysigfig($a,$sigfig,$comma=',',$choptrailing=false) {
 	}
 	
 	$v = floor(-log10($a)-1e-12);
-	if ($v+$sigfig < 0) {
+	if ($v+$sigfig <= 0) {
 		return $sign.number_format(round($a,$v+$sigfig),0,'.',$comma);
 	} else {
 		$n = number_format($a,$v+$sigfig);
@@ -1448,6 +1448,7 @@ function prettysigfig($a,$sigfig,$comma=',',$choptrailing=false) {
 			if (floor(-log10($n)-1e-12) != $v) {  //adjust for .009 -> .010 1 sig
 				$n = substr($n,0,-1);
 			}
+			$n = rtrim($n,'.');
 		}
 		return $sign.$n;
 	}
@@ -1458,7 +1459,7 @@ function makescinot($n,$d=8,$f="x") {
 	$isneg = "";
 	if ($n<0) { $isneg = "-"; $n = abs($n);}
 	$exp = floor(log10($n));
-	$mant = round($n/pow(10,$exp),$d);
+	$mant = number_format($n/pow(10,$exp),$d);
 	if ($f=="*") {
 		return "$isneg $mant * 10^($exp)";
 	} else if ($f=="E") {
