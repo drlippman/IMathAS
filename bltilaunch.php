@@ -435,7 +435,7 @@ if (isset($_GET['launch'])) {
 		} else {
 			$keytype = 'c';
 		}
-		if (isset($_REQUEST['custom_place_aid'])) { //common catridge blti placement using cid_### key type
+		if (isset($_REQUEST['custom_place_aid'])) { //common catridge blti placement using cid_### or placein_### key type
 			$placeaid = intval($_REQUEST['custom_place_aid']);
 			$query = "SELECT courseid FROM imas_assessments WHERE id='$placeaid'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
