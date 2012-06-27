@@ -74,7 +74,7 @@ if ($myrights<20) {
 	}
 	
 	
-	$query = "SELECT imas_users.email,imas_questionset.author,imas_questionset.description,imas_questionset.lastmoddate,imas_questionset.ancestors,imas_questionset.deleted,imas_questionset.ownerid ";
+	$query = "SELECT imas_users.email,imas_questionset.author,imas_questionset.description,imas_questionset.lastmoddate,imas_questionset.ancestors,imas_questionset.deleted,imas_questionset.ownerid,imas_questionset.broken ";
 	$query .= "FROM imas_users,imas_questionset WHERE imas_users.id=imas_questionset.ownerid AND imas_questionset.id='{$_GET['qsetid']}'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$email = mysql_result($result,0,0);
@@ -84,6 +84,7 @@ if ($myrights<20) {
 	$ancestors = mysql_result($result,0,4);
 	$deleted = mysql_result($result,0,5);
 	$ownerid = mysql_result($result,0,6);
+	$broken = mysql_result($result,0,7);
 	if (isset($CFG['AMS']['showtips'])) {
 		$showtips = $CFG['AMS']['showtips'];
 	} else {
@@ -106,7 +107,44 @@ if ($overwriteBody==1) {
 	echo $body;
 } else { //DISPLAY BLOCK HERE
 	$useeditor = 1;
-
+	$brokenurl = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savebrokenqflag.php?qsetid=".$_GET['qsetid'].'&flag=';
+	?>
+	<script type="text/javascript">
+		var BrokenFlagsaveurl = '<?php echo $brokenurl;?>';
+		function submitBrokenFlag(tagged) { 
+		  url = BrokenFlagsaveurl + tagged;
+		  if (window.XMLHttpRequest) { 
+		    req = new XMLHttpRequest(); 
+		  } else if (window.ActiveXObject) { 
+		    req = new ActiveXObject("Microsoft.XMLHTTP"); 
+		  } 
+		  if (typeof req != 'undefined') { 
+		    req.onreadystatechange = function() {submitBrokenFlagDone(tagged);}; 
+		    req.open("GET", url, true); 
+		    req.send(""); 
+		  } 
+		}  
+		
+		function submitBrokenFlagDone(tagged) { 
+		  if (req.readyState == 4) { // only if req is "loaded" 
+		    if (req.status == 200) { // only if "OK" 
+			    if (req.responseText=='OK') {
+				    toggleBrokenFlagmsg(tagged);
+			    } else {
+				    alert(req.responseText);
+				    alert("Oops, error toggling the flag");
+			    }
+		    } else { 
+			   alert(" Couldn't save changes:\n"+ req.status + "\n" +req.statusText); 
+		    } 
+		  } 
+		}
+		function toggleBrokenFlagmsg(tagged) {
+			document.getElementById("brokenmsgbad").style.display = (tagged==1)?"block":"none";
+			document.getElementById("brokenmsgok").style.display = (tagged==1)?"none":"block";
+		}
+	</script>
+	<?php
 	if (isset($_GET['formn']) && isset($_GET['loc'])) {
 		echo '<p>';
 		echo "<script type=\"text/javascript\">";
@@ -187,6 +225,11 @@ if ($overwriteBody==1) {
 		echo '<p style="color:red;">This question has been marked for deletion.  This might indicate there is an error in the question. ';
 		echo 'It is recommended you discontinue use of this question when possible</p>';
 	}
+	
+	echo '<p id="brokenmsgbad" style="color:red;display:'.(($broken==1)?"block":"none").'">This message has been marked as broken.  This indicates ';
+	echo 'there might be an error with this question.  Use with caution.  <a href="#" onclick="submitBrokenFlag(0);return false;">Unmark as broken</a></p>';
+	echo '<p id="brokenmsgok" style="display:'.(($broken==0)?"block":"none").'"><a href="#" onclick="submitBrokenFlag(1);return false;">Mark as broken</a> if there appears to be an error with the question.</p>';
+	
 
 	echo '<p>Question is in these libraries:';
 	echo '<ul>';
