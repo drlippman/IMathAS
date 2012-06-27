@@ -30,4 +30,4 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
         <lticm:property name="selection_height">300</lticm:property>
       </lticm:options>
     </blti:extensions>
-  </cartridge_basiclti_link>  
+  </cartridge_basiclti_link>

@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 55;
+$latest = 56;
 
 
 @set_time_limit(0);
@@ -932,6 +932,18 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 if ($res===false) {
 			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
+		}
+		if ($last<56) {
+			 $query = 'ALTER TABLE `imas_wiki_views` ADD `stugroupid` INT(10) UNSIGNED NOT NULL DEFAULT \'0\'';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = "ALTER TABLE `imas_wiki_views` ADD INDEX(`stugroupid`);"; 
+			 $res = mysql_query($query);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }	
 		}
 		$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {

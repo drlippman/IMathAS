@@ -298,6 +298,7 @@ $sql = 'CREATE TABLE `imas_questionset` ('
 	. ' `deleted` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `avgtime` SMALLINT(5) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `ancestors` TEXT NOT NULL, '
+	. ' `broken` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' INDEX (`ownerid`), INDEX(`userights`), INDEX(`deleted`)'
         . ' )'
         . ' ENGINE = InnoDB'
@@ -584,8 +585,9 @@ $sql = 'CREATE TABLE `imas_wiki_views` ('
         . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
         . ' `userid` INT(10) UNSIGNED NOT NULL, '
 	. ' `wikiid` INT(10) UNSIGNED NOT NULL, '
-        . ' `lastview` INT(10) UNSIGNED NOT NULL,'
-	 . ' INDEX (`userid`), INDEX(`wikiid`)'
+        . ' `lastview` INT(10) UNSIGNED NOT NULL, '
+        . ' `stugroupid` INT(10) UNSIGNED NOT NULL DEFAULT \'0\', '
+	 . ' INDEX (`userid`), INDEX(`wikiid`), INDEX(`stugroupid`)'
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Wiki last viewings\';';
@@ -861,6 +863,8 @@ echo 'mc_msgs created<br/>';
 
 $sql = 'CREATE TABLE `imas_drillassess` (
 	`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+	`name` VARCHAR(254) NOT NULL, 
+	`summary` TEXT NOT NULL,
 	`courseid` INT( 10 ) UNSIGNED NOT NULL ,
 	`itemdescr` TEXT NOT NULL ,
 	`itemids` TEXT NOT NULL ,

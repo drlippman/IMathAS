@@ -1810,6 +1810,10 @@ if (!isset($_POST['embedpostback'])) {
 			$intro .= "<p>Total Points Possible: " . totalpointspossible($qi) . "</p>";
 			
 			for ($i = $qmin; $i < $qmax; $i++) {
+				if ($qi[$questions[$i]]['points']==0 || $qi[$questions[$i]]['withdrawn']==1) {
+					$intro = str_replace('[QUESTION '.($i+1).']','',$intro);
+					continue;
+				}
 				$quesout = '<div id="embedqwrapper'.$i.'" class="embedqwrapper">';
 				ob_start();
 				embedshowicon($i);

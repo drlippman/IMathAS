@@ -552,3 +552,7 @@ span.boxed {
 	border: 1px solid #000; 
 	padding: 2px 5px;
 }
+a.attach {
+    background: url(editor/plugins/attach/img/ed_attach.gif) center left no-repeat;
+    padding-left: 20px;
+}

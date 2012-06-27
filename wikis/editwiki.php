@@ -77,7 +77,7 @@ if ($cid==0) {
 				$revisionid = $row[0];
 				$revisiontext = $row[1];
 				if (strlen($revisiontext)>6 && substr($revisiontext,0,6)=='**wver') {
-					$wikiver = substr($revisiontext,6,strpos($revisiontext,'**',6));
+					$wikiver = substr($revisiontext,6,strpos($revisiontext,'**',6)-6);
 					$revisiontext = substr($revisiontext,strpos($revisiontext,'**',6)+2);
 				} else {
 					$wikiver = 1;
@@ -161,9 +161,9 @@ if ($cid==0) {
 				$lastedittime = tzdate("F j, Y, g:i a",$row[2]);
 				$lasteditedby = $row[3].', '.$row[4];
 				$revisionid = $row[0];
-				$revisiontext = str_replace('</span></p>','</span> </p>',$row[1]);
+				$revisiontext = str_replace('</span></p>','</span> </p>',$row[1]); 
 				if (strlen($revisiontext)>6 && substr($revisiontext,0,6)=='**wver') {
-					$wikiver = substr($revisiontext,6,strpos($revisiontext,'**',6));
+					$wikiver = substr($revisiontext,6,strpos($revisiontext,'**',6)-6);
 					$revisiontext = substr($revisiontext,strpos($revisiontext,'**',6)+2);
 				} else {
 					$wikiver = 1;

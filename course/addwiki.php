@@ -265,10 +265,10 @@ if ($started) {
 		<span class=form>Group wiki?</span><span class=formright>
 <?php
 if ($started) {
-	writeHtmlSelect("ignoregroupsetid",$page_groupSelect['val'],$page_groupSelect['label'],$line['groupsetid'],"Not group forum",0,$started?'disabled="disabled"':'');
+	writeHtmlSelect("ignoregroupsetid",$page_groupSelect['val'],$page_groupSelect['label'],$line['groupsetid'],"Not group wiki",0,$started?'disabled="disabled"':'');
 	echo '<input type="hidden" name="groupsetid" value="'.$line['groupsetid'].'" />';
 } else {
-	writeHtmlSelect("groupsetid",$page_groupSelect['val'],$page_groupSelect['label'],$line['groupsetid'],"Not group forum",0);
+	writeHtmlSelect("groupsetid",$page_groupSelect['val'],$page_groupSelect['label'],$line['groupsetid'],"Not group wiki",0);
 }
 ?>
 		</span><br class="form"/>

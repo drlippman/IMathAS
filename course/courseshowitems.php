@@ -743,6 +743,92 @@ function enditem($canedit) {
 				   echo "</div>";
 				   enditem($canedit); //echo "</div>\n";
 			   }
+		   } else if ($line['itemtype']=="Drill") {
+			   $typeid = $line['typeid'];
+			   $query = "SELECT name,summary,startdate,enddate,avail FROM imas_drillassess WHERE id='$typeid'";
+			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
+			  
+			   if (strpos($line['summary'],'<p>')!==0) {
+				   $line['summary'] = '<p>'.$line['summary'].'</p>';
+			   }
+			   if ($line['startdate']==0) {
+				   $startdate = "Always";
+			   } else {
+				   $startdate = formatdate($line['startdate']);
+			   }
+			   if ($line['enddate']==2000000000) {
+				   $enddate = "Always";
+			   } else {
+				   $enddate = formatdate($line['enddate']);
+			   }
+			   
+			   $alink = "drillassess.php?cid=$cid&daid=$typeid";
+			   
+			   
+			   if ($line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
+				   if ($line['avail']==2) {
+					   $show = "Showing Always ";
+					   $color = '#0f0';
+				   } else {
+					   $show = "Showing until: $enddate ";
+					   $color = makecolor2($line['startdate'],$line['enddate'],$now);
+				   }
+				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
+				   if (($hideicons&4)==0) {
+					   if ($graphicalicons) {
+						  echo "<img alt=\"Drill\" class=\"floatleft\" src=\"$imasroot/img/{$itemicons['drill']}\" />";
+					   } else {
+						   echo "<div class=icon style=\"background-color: $color;\">!</div>";
+					   }
+				   }
+				   echo "<div class=title>";
+				   echo "<b><a href=\"$alink\" $target>{$line['name']}</a></b>\n";
+				   if ($viewall) { 
+					   echo '<span class="instrdates">';
+					   echo "<br/>$show ";
+					   echo '</span>';
+				   }
+				   if ($canedit) {
+					   echo '<span class="instronly">';
+					   echo "<a href=\"adddrillassess.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
+					   echo "<a href=\"deletedrillassess.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
+					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+					   echo " | <a href=\"gb-viewdrill.php?cid=$cid&daid=$typeid\">Scores</a>";
+					
+					   echo '</span>';
+				   }
+				   echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
+				   enditem($canedit); //echo "</div>\n";
+			   } else if ($viewall) {
+				   if ($line['avail']==0) {
+					   $show = "Hidden";
+				   } else {
+					   $show = "Showing $startdate until $enddate";
+				   }
+				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
+				  if ($graphicalicons) {
+					  echo "<img alt=\"Drill\" class=\"floatleft faded\" src=\"$imasroot/img/{$itemicons['drill']}\" />";
+				  } else {
+					   echo "<div class=icon style=\"background-color: #ccc;\">!</div>";
+				   }
+				   echo "<div class=title>";
+				   echo "<i> <b><a href=\"$alink\" $target>{$line['name']}</a></b> </i>";
+				   echo '<span class="instrdates">';
+				   echo "<br/><i>$show</i> ";
+				   echo '</span>';
+				   if ($canedit) {
+					  echo '<span class="instronly">';
+					   echo "<a href=\"adddrillassess.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
+					   echo "<a href=\"deletedrillassess.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
+					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+					   echo " | <a href=\"gb-viewdrill.php?cid=$cid&daid=$typeid\">Scores</a>";
+					
+					   echo '</span>';
+				   }
+				   echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
+				   enditem($canedit); // echo "</div>\n";
+			   }
 		   } else if ($line['itemtype']=="LinkedText") {
 			   $typeid = $line['typeid'];
 			   $query = "SELECT title,summary,text,startdate,enddate,avail,target FROM imas_linkedtext WHERE id='$typeid'";
@@ -1053,19 +1139,24 @@ function enditem($canedit) {
 			   	   	   	   $wikigroupid = 0;
 			   	   	   }
 			   	   }
-				   $query = "SELECT time FROM imas_wiki_revisions WHERE wikiid='$typeid' ";
+			   	   $wikilastviews = array();
+			   	   $query = "SELECT stugroupid,lastview FROM imas_wiki_views WHERE userid='$userid' AND wikiid='$typeid'";
+			   	   $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				   while ($row = mysql_fetch_row($result)) {
+				   	   $wikilastviews[$row[0]] = $row[1];
+				   }
+				   
+				   $query = "SELECT stugroupid,MAX(time) FROM imas_wiki_revisions WHERE wikiid='$typeid' ";
 				   if ($line['groupsetid']>0 && !$canedit) { //if group and not instructor limit to group
 				   	   $query .= "AND stugroupid='$wikigroupid' ";
 				   }
-				   $query .= "ORDER BY time DESC LIMIT 1";
+				   $query .= "GROUP BY stugroupid";
 				   $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				   if (mysql_num_rows($result)>0) {
-					   $lastrevised = mysql_result($result,0,0);
-					   $query = "SELECT lastview FROM imas_wiki_views WHERE userid='$userid' AND wikiid='$typeid'";
-					   $result = mysql_query($query) or die("Query failed : " . mysql_error());
-					   if (mysql_num_rows($result)==0 || mysql_result($result,0,0)<$lastrevised) {
-						   $hasnew = true;
-					   }
+				   while ($row = mysql_fetch_row($result)) {
+				   	   if (!isset($wikilastviews[$row[0]]) || $wikilastviews[$row[0]] < $row[1]) {
+				   	   	   $hasnew = true;
+				   	   	   break;
+				   	   }
 				   }
 			   }   
 			   if ($line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
@@ -1166,6 +1257,13 @@ function enditem($canedit) {
 		}
 		$html .= "Assessment</a> | ";
 		
+		/*$html .= "<a href=\"adddrillassess.php?block=$blk&tb=$tb&cid=$cid\">";
+		if (isset($CFG['CPS']['miniicons']['drill'])) {
+			$html .= "<img alt=\"drill\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['drill']}\"/> ";
+		}
+		$html .= "Drill</a> | ";
+		*/
+		
 		$html .= "<a href=\"addinlinetext.php?block=$blk&tb=$tb&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['inline'])) {
 			$html .= "<img alt=\"inline text\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['inline']}\"/> ";
@@ -1212,6 +1310,7 @@ function enditem($canedit) {
 		$html .= ">\n";
 		$html .= "<option value=\"\">Add An Item...</option>\n";
 		$html .= "<option value=\"assessment\">Add Assessment</option>\n";
+		//$html .= "<option value=\"drillassess\">Add Drill</option>\n";
 		$html .= "<option value=\"inlinetext\">Add Inline Text</option>\n";
 		$html .= "<option value=\"linkedtext\">Add Linked Text</option>\n";
 		$html .= "<option value=\"forum\">Add Forum</option>\n";

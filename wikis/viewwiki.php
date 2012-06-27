@@ -121,12 +121,27 @@ if ($cid==0) {
 			$groupsetid = $row[5];
 			$stugroup_ids = array();
 			$stugroup_names = array();
+			$hasnew = array();
+			$wikilastviews = array();
+			   $query = "SELECT stugroupid,lastview FROM imas_wiki_views WHERE userid='$userid' AND wikiid='$id'";
+			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			   while ($row = mysql_fetch_row($result)) {
+				   $wikilastviews[$row[0]] = $row[1];
+			   }
+			   
+			   $query = "SELECT stugroupid,MAX(time) FROM imas_wiki_revisions WHERE wikiid='$id' GROUP BY stugroupid";
+			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			   while ($row = mysql_fetch_row($result)) {
+				   if (!isset($wikilastviews[$row[0]]) || $wikilastviews[$row[0]] < $row[1]) {
+					   $hasnew[$row[0]] = 1;
+				   }
+			   }
 			$i = 0;
 			$query = "SELECT id,name FROM imas_stugroups WHERE groupsetid='$groupsetid' ORDER BY name";
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());	
 			while ($row = mysql_fetch_row($result)) {
 				$stugroup_ids[$i] = $row[0];
-				$stugroup_names[$i] = $row[1];
+				$stugroup_names[$i] = $row[1] . ((isset($hasnew[$row[0]]))?' (New Revisions)':'');
 				if ($row[0]==$groupid) {
 					$curgroupname = $row[1];
 				}
@@ -169,7 +184,7 @@ if ($cid==0) {
 			$row = mysql_fetch_row($result);
 			$text = $row[1];
 			if (strlen($text)>6 && substr($text,0,6)=='**wver') {
-				$wikiver = substr($text,6,strpos($text,'**',6));
+				$wikiver = substr($text,6,strpos($text,'**',6)-6);
 				$text = substr($text,strpos($text,'**',6)+2);
 			} else {
 				$wikiver = 1;
@@ -178,13 +193,10 @@ if ($cid==0) {
 			$lasteditedby = $row[3].', '.$row[4];
 		}
 		
-		$query = "SELECT id FROM imas_wiki_views WHERE userid='$userid' AND wikiid='$id'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		if (mysql_num_rows($result)>0) {
-			$query = "UPDATE imas_wiki_views SET lastview=$now WHERE id=".mysql_result($result,0,0);
-			mysql_query($query) or die("Query failed : " . mysql_error());
-		} else {
-			$query = "INSERT INTO imas_wiki_views (userid,wikiid,lastview) VALUES ('$userid','$id',$now)";
+		$query = "UPDATE imas_wiki_views SET lastview=$now WHERE userid='$userid' AND wikiid='$id' AND stugroupid='$groupid'";
+		mysql_query($query) or die("Query failed : " . mysql_error());
+		if (mysql_affected_rows()==0) {
+			$query = "INSERT INTO imas_wiki_views (userid,wikiid,stugroupid,lastview) VALUES ('$userid','$id',$groupid,$now)";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		}
 		
