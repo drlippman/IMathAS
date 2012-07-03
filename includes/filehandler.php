@@ -76,6 +76,7 @@ function storeuploadedfile($id,$key,$sec="private") {
 	}
 }
 function getasidfileurl($file) {
+	global $imasroot;
 	if ($GLOBALS['filehandertype'] == 's3') {
 		$s3object = "adata/$file";
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);

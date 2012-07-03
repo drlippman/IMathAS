@@ -1712,8 +1712,8 @@ The following macros help with formatting values for display:
     produce lowercase</li>
 <li><b>prettyint(number)</b>:  Adds commas in thousands spaces of integers.  Example: prettyint(1234) will return "1,234".  The result is a string, which
    can only be used for display, not in calculations</li>
-<li><b>prettyreal(number,decimals)</b>:  Adds commas in thousands spaces of number, and rounds decimal to decimals places.  Example: prettyreal(1234.567,2) will return "1,234.57".  The result is a string, which
-   can only be used for display, not in calculations</li> 
+<li><b>prettyreal(number,decimals,[comma])</b>:  Adds commas in thousands spaces of number, and rounds decimal to decimals places.  Example: prettyreal(1234.567,2) will return "1,234.57".  The result is a string, which
+   can only be used for display, not in calculations.  By default adds a comma as a thousands separator; set comma to "" to override.</li> 
 <li><b>prettysigfig(number,sigfigs,[comma,choptrailingzeros])</b>:  Rounds number to sigfigs significant figures.  By default it adds commas in thousands spaces; set comma to "" override.
    Set choptrailingzeros to true to chop trailing zeros from the decimal part, even if significant.</li> 
 <li><b>makescinot(number,[decimals,format])</b>:  Converts number to scientific notation.  If provided, rounds mantissa to decimals places.  Can specify format: "*" "E" as alternative to default cross.</li>
@@ -2007,6 +2007,11 @@ The answer is compared to a given tolerance.  Can also accept DNE, oo (Infinity)
 	<dd>Defines the decimal accuracy required (ie 2 for two decimal places).  This will put a message in the answer tips stating the
 	decimals required.  If neither $abstolerance or $reltolerance is set, this will set the tolerance, otherwise the provided tolerance
 	will be used (even if it doesn't agree with the $reqdecimal setting).</dd>
+<dt>$reqsigfigs = a number (In Answer)</dt>
+	<dd>Defines the significant figure accuracy required.  Use $reqsigfigs = 2 for at least 2 sig fig accuracy, or
+	$reqsigfigs = "=2" to require exactly 2 sig figs in the answer.  This will put also a message in the answer tips stating the
+	significant figures required.  This overrides both $reltolerance and $abstolerance.  If you use the "=2" form, it will also 
+	round your $answer if needed for the $showanswer.</dd>
 <dt>$answerformat = "list", "exactlist", or "orderedlist"</dt
 	<dd>Specifies that a list of answers is expected.  If $answerformat="list", then duplicate values are ignored.  If $answerformat="exactlist",
 	then duplicate values are not ignored.  If $answerformat="orderedlist", the list must be in the same order and contain identical counts of values.</dd>

@@ -1423,8 +1423,8 @@ function unionarrays($a1,$a2) {
 function prettyint($n) {
 	return number_format($n);
 }
-function prettyreal($n,$d) {
-	return number_format($n,$d);
+function prettyreal($n,$d,$comma=',') {
+	return number_format($n,$d,'.',$comma);
 }
 
 function prettysigfig($a,$sigfig,$comma=',',$choptrailing=false) {

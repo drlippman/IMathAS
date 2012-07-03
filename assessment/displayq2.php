@@ -117,6 +117,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if (isset($matchlist)) {$options['matchlist'] = $matchlist;}
 	if (isset($noshuffle)) {$options['noshuffle'] = $noshuffle;}
 	if (isset($reqdecimals)) {$options['reqdecimals'] = $reqdecimals;}
+	if (isset($reqsigfigs)) {$options['reqsigfigs'] = $reqsigfigs;}
 	if (isset($grid)) {$options['grid'] = $grid;}
 	if (isset($snaptogrid)) {$options['snaptogrid'] = $snaptogrid;}
 	if (isset($background)) {$options['background'] = $background;}
@@ -431,6 +432,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 	if (isset($strflags)) {$options['strflags'] = $strflags;}
 	if (isset($matchlist)) {$options['matchlist'] = $matchlist;}
 	if (isset($noshuffle)) {$options['noshuffle'] = $noshuffle;}
+	if (isset($reqsigfigs)) {$options['reqsigfigs'] = $reqsigfigs;}
 	if (isset($grid)) {$options['grid'] = $grid;}
 	if (isset($partweights)) {$options['partweights'] = $partweights;}
 	if (isset($anstypes)) {$options['anstypes'] = $anstypes;}
@@ -517,6 +519,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
 		if (isset($options['reqdecimals'])) {if (is_array($options['reqdecimals'])) {$reqdecimals = $options['reqdecimals'][$qn];} else {$reqdecimals = $options['reqdecimals'];}}
+		if (isset($options['reqsigfigs'])) {if (is_array($options['reqsigfigs'])) {$reqsigfigs = $options['reqsigfigs'][$qn];} else {$reqsigfigs = $options['reqsigfigs'];}}
 		if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$qn];} else {$displayformat = $options['displayformat'];}}
 		
 		if (!isset($sz)) { $sz = 20;}
@@ -544,6 +547,23 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($reqdecimals)) {
 			$tip .= "<br/>Your answer should be accurate to $reqdecimals decimal places.";
 			$shorttip .= ", accurate to $reqdecimals decimal places";
+		}
+		if (isset($reqsigfigs)) {
+			if ($reqsigfigs{0}=='=') {
+				$reqsigfigs = substr($reqsigfigs,1);
+				$answer = prettysigfig($answer,$reqsigfigs);
+				$tip .= "<br/>Your answer should have exactly $reqsigfigs significant figures.";
+				$shorttip .= ", with exactly $reqsigfigs significant figures";
+			} else {
+				if ($answer!=0) {
+					$v = -1*floor(-log10(abs($answer))-1e-12) - $reqsigfigs;
+				}		
+				if ($answer!=0  && $v < 0 && strlen($answer) - strpos($answer,'.')-1 + $v < 0) { 
+					$answer = prettysigfig($answer,$reqsigfigs);
+				}
+				$tip .= "<br/>Your answer should have at least $reqsigfigs significant figures.";
+				$shorttip .= ", with at least $reqsigfigs significant figures";
+			}
 		}
 		$out .= "$leftb<input ";
 		
@@ -1864,7 +1884,18 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$qn];} else {$reltolerance = $options['reltolerance'];}}
 		if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$qn];} else {$abstolerance = $options['abstolerance'];}}
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
+		if (isset($options['reqsigfigs'])) {if (is_array($options['reqsigfigs'])) {$reqsigfigs = $options['reqsigfigs'][$qn];} else {$reqsigfigs = $options['reqsigfigs'];}}
+		
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
+		if (isset($reqsigfigs)) {
+			if ($reqsigfigs{0}=='=') {
+				$exactsigfig = true;
+				$reqsigfigs = substr($reqsigfigs,1);
+			} else {
+				$exactsigfig = false;
+			}
+		}
+		
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$GLOBALS['partlastanswer'] = $givenans;
 		if ($givenans == null) {return 0;}
@@ -1900,6 +1931,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$anarr = array($answer);
 			}
 		}
+		
+		
 		/*  should students get an answer right by leaving it blank?
 		if ($answerformat=='exactlist' || $answerformat=='orderedlist' || $answerformat=='list') {
 			if (trim($answer)=='') {
@@ -1950,7 +1983,24 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					} else {//{if (is_numeric($givenans)) {
 						$givenans = preg_replace('/[^\-\d\.eE]/','',$givenans); //strip out units, dollar signs, whatever
 						if (is_numeric($givenans)) {
-							if (isset($abstolerance)) {
+							if (isset($reqsigfigs)) {
+								if ($givenans*$anans < 0) { continue;} //move on if opposite signs
+								
+								if (!$exactsigfig) {
+									if ($anans!=0) {
+										$v = -1*floor(-log10(abs($anans))-1e-12) - $reqsigfigs;
+									}
+									//this line will reject 0.25 if the answer is 0.250 with 3 sigfigs
+									if ($anans != 0 && $v < 0 && strlen($givenans) - strpos($givenans,'.')-1 + $v < 0) { continue; } //not enough decimal places
+									
+									if (abs($anans-$givenans)< pow(10,$v)/2+1E-12) {$correct += 1; $foundloc = $j; break 2;}
+								} else {
+									if (ltrim(prettysigfig($anans,$reqsigfigs,''),'0')===ltrim($givenans,'0')) {
+										$correct += 1; $foundloc = $j; break 2;
+									}
+								}
+								
+							} else if (isset($abstolerance)) {
 								if (abs($anans-$givenans) < $abstolerance + 1E-12) {$correct += 1; $foundloc = $j; break 2;} 	
 							} else {
 								if (abs($anans - $givenans)/(abs($anans)+.0001) < $reltolerance+ 1E-12) {$correct += 1; $foundloc = $j; break 2;} 
