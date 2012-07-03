@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 56;
+$latest = 57;
 
 
 @set_time_limit(0);
@@ -944,6 +944,13 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 if ($res===false) {
 				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }	
+		}
+		if ($last<57) {
+			 $query = 'ALTER TABLE `imas_questions` ADD `showhints` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\'';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
 		}
 		$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {

@@ -19,10 +19,11 @@
 				for ($i=0; $i<$_POST['copies'.$qsetid];$i++) {
 					$points = trim($_POST['points'.$qsetid]);
 					$attempts = trim($_POST['attempts'.$qsetid]);
+					$showhints = intval($_POST['showhints'.$qsetid]);
 					if ($points=='') { $points = 9999;}
 					if ($attempts=='') {$attempts = 9999;}
-					$query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,regen,showans,questionsetid) ";
-					$query .= "VALUES ('$aid','$points','$attempts',9999,0,0,'$qsetid')";
+					$query = "INSERT INTO imas_questions (assessmentid,points,attempts,showhints,penalty,regen,showans,questionsetid) ";
+					$query .= "VALUES ('$aid','$points','$attempts',$showhints,9999,0,0,'$qsetid')";
 					$result = mysql_query($query) or die("Query failed : " . mysql_error());
 					$qid = mysql_insert_id();
 					if ($newitemorder=='') {
@@ -70,15 +71,16 @@
 			foreach(explode(',',$_POST['qids']) as $qid) {
 				$points = trim($_POST['points'.$qid]);
 				$attempts = trim($_POST['attempts'.$qid]);
+				$showhints = intval($_POST['showhints'.$qid]);
 				if ($points=='') { $points = 9999;}
 				if ($attempts=='') {$attempts = 9999;}
-				$query = "UPDATE imas_questions SET points='$points',attempts='$attempts' WHERE id='$qid'";
+				$query = "UPDATE imas_questions SET points='$points',attempts='$attempts',showhints=$showhints WHERE id='$qid'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				if (intval($_POST['copies'.$qid])>0 && intval($qid)>0) {
 					for ($i=0;$i<intval($_POST['copies'.$qid]);$i++) {
 						$qsetid = $qidtoqsetid[$qid];
-						$query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,regen,showans,questionsetid) ";
-						$query .= "VALUES ('$aid','$points','$attempts',9999,0,0,'$qsetid')";
+						$query = "INSERT INTO imas_questions (assessmentid,points,attempts,showhints,penalty,regen,showans,questionsetid) ";
+						$query .= "VALUES ('$aid','$points','$attempts',$showhints,9999,0,0,'$qsetid')";
 						$result = mysql_query($query) or die("Query failed : " . mysql_error());
 						$newqid = mysql_insert_id();
 						
@@ -120,7 +122,7 @@ Leave items blank to use the assessment's default values<br/>
 <thead><tr>
 <?php
 		if (isset($_POST['checked'])) { //modifying existing questions
-			echo "<th>Description<th>Points</th><th>Attempts (0 for unlimited)</th><th>Additional Copies to Add</th></tr></thead>";
+			echo "<th>Description</th><th></th><th>Points</th><th>Attempts (0 for unlimited)</th><th>Show hints &amp; video buttons?</th><th>Additional Copies to Add</th></tr></thead>";
 			echo "<tbody>";
 
 			$qids = array();
@@ -128,7 +130,7 @@ Leave items blank to use the assessment's default values<br/>
 				$v = explode(':',$v);
 				$qids[] = $v[1];
 			}
-			$query = "SELECT imas_questions.id,imas_questionset.description,imas_questions.points,imas_questions.attempts ";
+			$query = "SELECT imas_questions.id,imas_questionset.description,imas_questions.points,imas_questions.attempts,imas_questions.showhints,imas_questionset.extref ";
 			$query .= "FROM imas_questions,imas_questionset WHERE imas_questionset.id=imas_questions.questionsetid AND ";
 			$query .= "imas_questions.id IN ('".implode("','",$qids)."')";
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -139,12 +141,37 @@ Leave items blank to use the assessment's default values<br/>
 				if ($row[3]==9999) {
 					$row[3] = '';
 				}
+				
 				echo '<tr><td>'.$row[1].'</td>';
+				if ($row[5]!='') {
+					$extref = explode('~~',$row[5]);
+					$hasvid = false;  $hasother = false;
+					foreach ($extref as $v) {
+						if (substr($v,0,5)=="Video" || strpos($v,'youtube.com')!==false) {
+							$hasvid = true;
+						} else {
+							$hasother = true;
+						}
+					}
+					$page_questionTable[$i]['extref'] = '';
+					if ($hasvid) {
+						echo "<td><img src=\"$imasroot/img/video_tiny.png\"/></td>";
+					}
+					if ($hasother) {
+						echo "<td><img src=\"$imasroot/img/html_tiny.png\"/></td>";
+					}
+				} else {
+					echo '<td></td>';
+				}
 				echo "<td><input type=text size=4 name=\"points{$row[0]}\" value=\"{$row[2]}\" /></td>";
 				echo "<td><input type=text size=4 name=\"attempts{$row[0]}\" value=\"{$row[3]}\" /></td>";
+				echo "<td><select name=\"showhints{$row[0]}\">";
+				echo '<option value="0" '.(($row[4]==0)?'selected="selected"':'').'>Use Default</option>';
+				echo '<option value="1" '.(($row[4]==1)?'selected="selected"':'').'>No</option>';
+				echo '<option value="2" '.(($row[4]==2)?'selected="selected"':'').'>Yes</option></select></td>';
 				echo "<td><input type=text size=4 name=\"copies{$row[0]}\" value=\"0\" /></td>";
 				echo '</tr>';
-			}
+			} 
 			echo '</tbody></table>';
 			echo '<input type=hidden name="qids" value="'.implode(',',$qids).'" />';
 			echo '<input type=hidden name="mod" value="true" />';
@@ -152,15 +179,39 @@ Leave items blank to use the assessment's default values<br/>
 			echo '<div class=submit><input type=submit value=Submit></div>';
 			
 		} else { //adding new questions
-			echo "<th>Description><th>Points</th><th>Attempts (0 for unlimited)</th><th>Number of Copies to Add</th></tr></thead>";
+			echo "<th>Description</th><th></th><th>Points</th><th>Attempts (0 for unlimited)</th><th>Show hints &amp; video buttons?</th><th>Number of Copies to Add</th></tr></thead>";
 			echo "<tbody>";
 			
-			$query = "SELECT id,description FROM imas_questionset WHERE id IN ('".implode("','",$_POST['nchecked'])."')";
+			$query = "SELECT id,description,extref FROM imas_questionset WHERE id IN ('".implode("','",$_POST['nchecked'])."')";
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			while ($row = mysql_fetch_row($result)) {
 				echo '<tr><td>'.$row[1].'</td>';
+				if ($row[2]!='') {
+					$extref = explode('~~',$row[2]);
+					$hasvid = false;  $hasother = false;
+					foreach ($extref as $v) {
+						if (substr($v,0,5)=="Video" || strpos($v,'youtube.com')!==false) {
+							$hasvid = true;
+						} else {
+							$hasother = true;
+						}
+					}
+					$page_questionTable[$i]['extref'] = '';
+					if ($hasvid) {
+						echo "<td><img src=\"$imasroot/img/video_tiny.png\"/></td>";
+					}
+					if ($hasother) {
+						echo "<td><img src=\"$imasroot/img/html_tiny.png\"/></td>";
+					}
+				} else {
+					echo '<td></td>';
+				}
 				echo "<td><input type=text size=4 name=\"points{$row[0]}\" value=\"\" /></td>";
 				echo "<td><input type=text size=4 name=\"attempts{$row[0]}\" value=\"\" /></td>";
+				echo "<td><select name=\"showhints{$row[0]}\">";
+				echo '<option value="0" selected="selected">Use Default</option>';
+				echo '<option value="1">No</option>';
+				echo '<option value="2">Yes</option></select></td>';
 				echo "<td><input type=text size=4 name=\"copies{$row[0]}\" value=\"1\" /></td>";
 				echo '</tr>';
 			}
