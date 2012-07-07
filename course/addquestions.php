@@ -744,9 +744,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$page_assessmentQuestions[$x]['templ'][$y] = "<a href=\"moddataset.php?id=$qsetid[$qid]&aid=$aid&cid=$cid&template=true\">Template</a>";
 					$page_assessmentQuestions[$x]['extref'][$y] = '';
 					if ($extref[$qid]!='') {
-						$extref = explode('~~',$extref[$qid]);
+						$extrefarr = explode('~~',$extref[$qid]);
 						$hasvid = false;  $hasother = false;
-						foreach ($extref as $v) {
+						foreach ($extrefarr as $v) {
 							if (substr($v,0,5)=="Video" || strpos($v,'youtube.com')!==false) {
 								$hasvid = true;
 							} else {

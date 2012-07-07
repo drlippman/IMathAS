@@ -193,6 +193,9 @@ if ($overwriteBody==1) {
 	echo '<option value="2" ';
 	if ($orderby==2) {echo 'selected="selected"';}
 	echo '>Name</option>';
+	echo '<option value="3" ';
+	if ($orderby==3) {echo 'selected="selected"';}
+	echo '>Course page</option>';
 	echo '</select> ';
 	
 	echo 'Filter by type: <select id="filter" onchange="filteritems()">';
@@ -237,6 +240,35 @@ if ($overwriteBody==1) {
 	
 	echo '<table class=gb><thead><tr><th>Name</th><th>Type</th><th>Start Date</th><th>End Date</th><th>Review Date</th><th>Send Date Chg / Copy Down List</th></thead><tbody>';
 	
+	if ($orderby==3) {  //course page order
+		$itemsassoc = array();
+		$query = "SELECT id,typeid,itemtype FROM imas_items WHERE courseid='$cid'";
+		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			$itemsassoc[$row[0]] = $row[2].$row[1];
+		}
+		
+		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+		$itemorder = unserialize(mysql_result($result,0,0));
+		$itemsimporder = array();
+		function flattenitems($items,&$addto,$parent) {
+			global $itemsimporder,$itemsassoc;
+			foreach ($items as $k=>$item) {
+				if (is_array($item)) {
+					$addto[] = 'Block'.$parent.'-'.($k+1);
+					flattenitems($item['items'],$addto,$parent.'-'.($k+1));
+				} else {
+					$addto[] = $itemsassoc[$item];
+				}
+			}
+		}
+		flattenitems($itemorder,$itemscourseorder,'0');
+		$itemscourseorder = array_flip($itemscourseorder);
+	}
+		
+		
+	
 	$names = Array();
 	$startdates = Array();
 	$enddates = Array();
@@ -244,6 +276,7 @@ if ($overwriteBody==1) {
 	$ids = Array();
 	$avails = array();
 	$types = Array();
+	$courseorder = Array();
 	
 	if ($filter=='all' || $filter=='assessments') {
 		$query = "SELECT name,startdate,enddate,reviewdate,id,avail FROM imas_assessments WHERE courseid='$cid' ";
@@ -256,6 +289,7 @@ if ($overwriteBody==1) {
 			$reviewdates[] = $row[3];
 			$ids[] = $row[4];
 			$avails[] = $row[5];
+			if ($orderby==3) {$courseorder[] = $itemscourseorder['Assessment'.$row[4]];}
 		}
 	}
 	if ($filter=='all' || $filter=='inlinetext') {
@@ -269,6 +303,7 @@ if ($overwriteBody==1) {
 			$reviewdates[] = 0;
 			$ids[] = $row[3];
 			$avails[] = $row[4];
+			if ($orderby==3) {$courseorder[] = $itemscourseorder['InlineText'.$row[3]];}
 		}
 	}
 	if ($filter=='all' || $filter=='linkedtext') {
@@ -282,6 +317,7 @@ if ($overwriteBody==1) {
 			$reviewdates[] = 0;
 			$ids[] = $row[3];
 			$avails[] = $row[4];
+			if ($orderby==3) {$courseorder[] = $itemscourseorder['LinkedText'.$row[3]];}
 		}
 	}
 	if ($filter=='all' || $filter=='forums') {
@@ -295,6 +331,7 @@ if ($overwriteBody==1) {
 			$reviewdates[] = 0;
 			$ids[] = $row[3];
 			$avails[] = $row[4];
+			if ($orderby==3) {$courseorder[] = $itemscourseorder['Forum'.$row[3]];}
 		}
 	}
 	if ($filter=='all' || $filter=='wikis') {
@@ -308,6 +345,7 @@ if ($overwriteBody==1) {
 			$reviewdates[] = 0;
 			$ids[] = $row[3];
 			$avails[] = $row[4];
+			if ($orderby==3) {$courseorder[] = $itemscourseorder['Wiki'.$row[3]];}
 		}
 	}
 	if ($filter=='all' || $filter=='blocks') {
@@ -316,11 +354,12 @@ if ($overwriteBody==1) {
 		$items = unserialize(mysql_result($result,0,0));
 		
 		function getblockinfo($items,$parent) {
-			global $ids,$types,$names,$startdates,$enddates,$reviewdates,$ids;
+			global $ids,$types,$names,$startdates,$enddates,$reviewdates,$ids,$itemscourseorder,$courseorder,$orderby;
 			foreach($items as $k=>$item) {
 				if (is_array($item)) {
 					$ids[] = $parent.'-'.($k+1);
 					$types[] = "Block";
+					if ($orderby==3) {$courseorder[] = $itemscourseorder['Block'.$parent.'-'.($k+1)];}
 					$names[] = stripslashes($item['name']);
 					$startdates[] = $item['startdate'];
 					$enddates[] = $item['enddate'];
@@ -345,6 +384,9 @@ if ($overwriteBody==1) {
 	} else if ($orderby==2) {
 		natcasesort($names);
 		$keys = array_keys($names);
+	} else if ($orderby==3) {
+		asort($courseorder);
+		$keys = array_keys($courseorder);
 	}
 	foreach ($keys as $i) {
 		echo '<tr class=grid>';
