@@ -319,6 +319,10 @@ END;
 		ini_set('display_errors',1);
 		error_reporting(E_ALL);
 	}
+	if (isset($_GET['useflash'])) {
+		$sessiondata['useflash'] = true;
+		writesessiondata();
+	}
 	if (isset($sessiondata['isdiag']) && strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) {
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php");
 	}

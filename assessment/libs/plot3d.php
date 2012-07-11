@@ -12,6 +12,7 @@ array_push($allowedmacros,"plot3d","spacecurve");
 //axes defaults to 1 (on), set to 0 for off
 //bounds: xmin,xmax,ymin,ymax,zmin,zmax
 function plot3d($func,$umin,$umax,$vmin,$vmax) {
+	global $imasroot;
 	if (func_num_args()>5) {
 		$disc = func_get_arg(5);
 		if (!is_numeric($disc)) {
@@ -87,32 +88,39 @@ function plot3d($func,$umin,$umax,$vmin,$vmax) {
 			  $count++;
 		  }
 	  }
-	  /*
-	 $r = rand(1,10000);
-	  $html .= "<div id=\"3d$r\">";
-	  $html .= '<p><a href="http://www.adobe.com/go/getflashplayer"><img src="http://www.adobe.com/images/shared/download_buttons/get_flash_player.gif" alt="Get Adobe Flash player" /></a></p>';
-	  $html .= '</div>';
-	  $html .= '<script type="text/javascript">';
-	  $html .= 'var FlashVars = {';
-	  $html .= '  verts: "'.$verts.'",';
-	  $html .= '  faces: "'.$faces.'",';
-	  $html .= "  width: $width, height: $height };";
-	  $html .= "  swfobject.embedSWF(\"$imasroot/assessment/libs/viewer3d.swf\", \"3d$r\", \"$width\", \"$height\", \"9.0.0\", \"$imasroot/assessment/libs/expressInstall.swf\",FlashVars);";
-	  $html .= '</script>';
-	  */
-	  $html .= "<applet codebase=\"{$GLOBALS['imasroot']}/assessment/libs\" code=\"Viewer.class\" width=$width height=$height>\n";
-	  $html .= "<param name=\"verts\" value=\"$verts\">\n";
-	  $html .= "<param name=\"faces\" value=\"$faces\">\n";
-	  if ($axes==1) {
-		  $html .= "<param name=\"axes\" value=\"show\">\n";
+	  if (isset($GLOBALS['sessiondata']['useflash'])) {
+		  if (!isset($GLOBALS['3dplotcnt'])) {
+			  $r = 1;
+		  } else {
+			  $r = $GLOBALS['3dplotcnt']+1;
+		  }
+		  $GLOBALS['3dplotcnt'] = $r;
+		  $html .= "<div id=\"plot3d$r\">";
+		  $html .= '<p><a href="http://www.adobe.com/go/getflashplayer"><img src="http://www.adobe.com/images/shared/download_buttons/get_flash_player.gif" alt="Get Adobe Flash player" /></a></p>';
+		  $html .= '</div>';
+		  $html .= '<script type="text/javascript">';
+		  $html .= 'var FlashVars = {';
+		  $html .= '  verts: "'.$verts.'",';
+		  $html .= '  faces: "'.$faces.'",';
+		  $html .= "  width: $width, height: $height };";
+		  $html .= "  swfobject.embedSWF(\"$imasroot/assessment/libs/viewer3d.swf\", \"plot3d$r\", \"$width\", \"$height\", \"9.0.0\", \"$imasroot/assessment/libs/expressInstall.swf\",FlashVars);";
+		  $html .= '</script>';
 	  } else {
-		  $html .= "<param name=\"axes\" value=\"hide\">\n";
+		  $html .= "<applet codebase=\"{$GLOBALS['imasroot']}/assessment/libs\" code=\"Viewer.class\" width=$width height=$height>\n";
+		  $html .= "<param name=\"verts\" value=\"$verts\">\n";
+		  $html .= "<param name=\"faces\" value=\"$faces\">\n";
+		  if ($axes==1) {
+			  $html .= "<param name=\"axes\" value=\"show\">\n";
+		  } else {
+			  $html .= "<param name=\"axes\" value=\"hide\">\n";
+		  }
+		  if (isset($bounds)) {
+			  $html .= "<param name=\"bounds\" value=\"" . implode(',',$bounds) . "\">\n";
+		  }
+		  $url = $GLOBALS['urlmode']  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . (isset($_SERVER['QUERY_STRING'])?'?'.$_SERVER['QUERY_STRING'].'&useflash=true':'?useflash=true');
+				 
+		  $html .= "Not seeing the 3D graph?  <a href=\"$url\">Try Alternate</a></applet>\n";
 	  }
-	  if (isset($bounds)) {
-		  $html .= "<param name=\"bounds\" value=\"" . implode(',',$bounds) . "\">\n";
-	  }
-	  $html .= "</applet>\n";
-	  
 	  return $html;
 	
 }
@@ -123,6 +131,7 @@ function plot3d($func,$umin,$umax,$vmin,$vmax) {
 //axes defaults to 1 (on), set to 0 for off
 //bounds: xmin,xmax,ymin,ymax,zmin,zmax
 function spacecurve($func,$tmin,$tmax) {
+	global $imasroot;
 	if (func_num_args()>3) {
 		$disc = func_get_arg(3);
 		if (!is_numeric($disc)) {
@@ -189,20 +198,40 @@ function spacecurve($func,$tmin,$tmax) {
 			  $count++;
 		  }
 	  }
-	  
-	  $html = "<applet codebase=\"{$GLOBALS['imasroot']}/assessment/libs\" code=\"Viewer.class\" width=$width height=$height>\n";
-	  $html .= "<param name=\"verts\" value=\"$verts\">\n";
-	  $html .= "<param name=\"faces\" value=\"$faces\">\n";
-	  if ($axes==1) {
-		  $html .= "<param name=\"axes\" value=\"show\">\n";
+	  if (isset($GLOBALS['sessiondata']['useflash'])) {
+		  if (!isset($GLOBALS['3dplotcnt'])) {
+			  $r = 1;
+		  } else {
+			  $r = $GLOBALS['3dplotcnt']+1;
+		  }
+		  $GLOBALS['3dplotcnt'] = $r;
+		  $html .= "<div id=\"plot3d$r\">";
+		  $html .= '<p><a href="http://www.adobe.com/go/getflashplayer"><img src="http://www.adobe.com/images/shared/download_buttons/get_flash_player.gif" alt="Get Adobe Flash player" /></a></p>';
+		  $html .= '</div>';
+		  $html .= '<script type="text/javascript">';
+		  $html .= 'var FlashVars = {';
+		  $html .= '  verts: "'.$verts.'",';
+		  $html .= '  faces: "'.$faces.'",';
+		  $html .= "  width: $width, height: $height };";
+		  $html .= "  swfobject.embedSWF(\"$imasroot/assessment/libs/viewer3d.swf\", \"plot3d$r\", \"$width\", \"$height\", \"9.0.0\", \"$imasroot/assessment/libs/expressInstall.swf\",FlashVars);";
+		  $html .= '</script>';
 	  } else {
-		  $html .= "<param name=\"axes\" value=\"hide\">\n";
-	  }
-	  $html .= "<param name=\"edges\" value=\"hide\">\n";
-	  if (isset($bounds)) {
-		  $html .= "<param name=\"bounds\" value=\"" . implode(',',$bounds) . "\">\n";
-	  }
-	  $html .= "</applet>\n";
+		  $html = "<applet codebase=\"{$GLOBALS['imasroot']}/assessment/libs\" code=\"Viewer.class\" width=$width height=$height>\n";
+		  $html .= "<param name=\"verts\" value=\"$verts\">\n";
+		  $html .= "<param name=\"faces\" value=\"$faces\">\n";
+		  if ($axes==1) {
+			  $html .= "<param name=\"axes\" value=\"show\">\n";
+		  } else {
+			  $html .= "<param name=\"axes\" value=\"hide\">\n";
+		  }
+		  $html .= "<param name=\"edges\" value=\"hide\">\n";
+		  if (isset($bounds)) {
+			  $html .= "<param name=\"bounds\" value=\"" . implode(',',$bounds) . "\">\n";
+		  }
+		  $url = $GLOBALS['urlmode']  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . (isset($_SERVER['QUERY_STRING'])?'?'.$_SERVER['QUERY_STRING'].'&useflash=true':'?useflash=true');
+				 
+		  $html .= "Not seeing the 3D graph?  <a href=\"$url\">Try Alternate</a></applet>\n";
+	  } 
 	  return $html;
 	
 }
