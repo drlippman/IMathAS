@@ -17,6 +17,7 @@ function convertdatauris($in) {
 	global $CFG,$userid;
 	$okext = array('jpeg'=>'.jpg','gif'=>'.gif','png'=>'.png');
 	if (strpos($in,'data:image')===false) {return $in;}
+	$in = preg_replace('/<img[^>]*src="data:image[^>]*$/','',$in);
 	if (!isset($CFG['GEN']['noFileBrowser'])) {
 		preg_match_all('/<img[^>]*src="(data:image\/(\w+);base64,([^"]*))"/',$in,$matches);
 		foreach ($matches[3] as $k=>$code) {

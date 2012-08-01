@@ -464,10 +464,10 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 				echo "<td>{$row[3]}</td>";
 			}
 			if (isset($score[$row[0]])) {
-				echo "<td><input type=text size=3 name=\"score[{$row[0]}]\" id=\"score{$row[0]}\" value=\"";
+				echo "<td><input type=\"text\" size=\"3\" autocomplete=\"off\" name=\"score[{$row[0]}]\" id=\"score{$row[0]}\" value=\"";
 				echo $score[$row[0]];
 			} else {
-				echo "<td><input type=text size=3 name=\"newscore[{$row[0]}]\" id=\"score{$row[0]}\" value=\"";
+				echo "<td><input type=\"text\" size=\"3\" autocomplete=\"off\" name=\"newscore[{$row[0]}]\" id=\"score{$row[0]}\" value=\"";
 			}
 			echo "\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" onblur=\"this.value = doonblur(this.value);\" />";
 			if ($rubric != 0) {

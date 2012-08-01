@@ -32,11 +32,15 @@ function sendOAuthBodyPOST($method, $endpoint, $oauth_consumer_key, $oauth_consu
     $ctx = stream_context_create($params);
     $fp = @fopen($endpoint, 'rb', false, $ctx);
     if (!$fp) {
-        throw new Exception("Problem with $endpoint, $php_errormsg");
+    	echo "Error setting score in LMS (can't connect)";
+    	return false;
+        //throw new Exception("Problem with $endpoint, $php_errormsg");
     }
     $response = @stream_get_contents($fp);
     if ($response === false) {
-        throw new Exception("Problem reading data from $endpoint, $php_errormsg");
+    	echo "Error setting score in LMS";
+    	return false;    
+        //throw new Exception("Problem reading data from $endpoint, $php_errormsg");
     }
     return $response;
 }

@@ -495,7 +495,7 @@ function normalcdf($ztest,$dec=4) {
 		$s += $ds;
 		$i++;
 		$fact *= $i;
-		if (abs($s)<$eps) {
+		if (abs($s)<$eps && $i>2) {
 			break;
 		}
 	}

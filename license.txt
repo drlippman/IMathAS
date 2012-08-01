@@ -122,3 +122,12 @@ JSON Library (PEAR)
 (c) 2005 Michal Migurski
 BSD license
 
+OAuth Library
+(c) 2007 Andy Smith
+MIT License
+
+LTI Utilities
+(c) IMS Global, written by Dr Chuck
+Apache 2.0 license
+
+

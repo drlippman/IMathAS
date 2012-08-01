@@ -29,6 +29,9 @@ function storecontenttofile($content,$key,$sec="private") {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore/';
 		$dir = $base.dirname($key);
 		$fn = basename($key);
+		if (!is_dir($dir)) {
+			mkdir_recursive($dir);
+		} 
 		$fh = @fopen($dir.'/'.$fn,'wb');
 		if ($fh) {
 			fwrite($fh,$content);

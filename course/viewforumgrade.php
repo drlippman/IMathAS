@@ -51,12 +51,14 @@
 				}
 			}
 		}
-		foreach($_POST['newscore'] as $k=>$sc) {
-			if (trim($k)=='') {continue;}			
-			if ($sc!='') {
-				$query = "INSERT INTO imas_grades (gradetype,gradetypeid,refid,userid,score,feedback) VALUES ";
-				$query .= "('forum','$forumid','$k','$uid','$sc','{$_POST['feedback'][$k]}')";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+		if (isset($_POST['newscore'])) {
+			foreach($_POST['newscore'] as $k=>$sc) {
+				if (trim($k)=='') {continue;}			
+				if ($sc!='') {
+					$query = "INSERT INTO imas_grades (gradetype,gradetypeid,refid,userid,score,feedback) VALUES ";
+					$query .= "('forum','$forumid','$k','$uid','$sc','{$_POST['feedback'][$k]}')";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+				}
 			}
 		}
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid");

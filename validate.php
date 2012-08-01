@@ -95,7 +95,7 @@
 				html += '<p><input type=hidden name="mathdisp" value="2">It appears you do not have browser-based Math display support.';
 				html += 'Browser based Math display is faster and prettier than using image-based math display.  To install browser-based ';
 				html += 'math display:</p>';
-				html += '<p>Windows Internet Explorer users: <a href="http://www.dessci.com/en/dl/MathPlayerSetup.asp">Install MathPlayer plugin</a></p>';
+				html += '<p>Windows Internet Explorer users: <a href="http://www.dessci.com/en/products/mathplayer/download.htm">Install MathPlayer plugin</a></p>';
 				html += '<p>Mac users or non-IE windows users: <a href="http://www.mozilla.com/firefox/">Install Firefox 1.5+</a></p>';
 				html += '<p>With FireFox, if you find formulas not displaying ';
 				html += 'correctly you may need to <a href="http://www.mozilla.org/projects/mathml/fonts/">install Math fonts</a></p>';

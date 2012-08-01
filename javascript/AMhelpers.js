@@ -38,7 +38,7 @@ function calculate(inputId,outputId,format) {
 		  } else if (format.indexOf('scinot')!=-1) {
 			  str = str.replace(/\s/g,'');
 			  str = str.replace("x","xx");
-			  if (!str.match(/^\-?[1-9](\.\d*)?(\*|xx)10\^(\-?\d+)$/)) {
+			  if (!str.match(/^\-?[1-9](\.\d*)?(\*|xx)10\^(\(?\-?\d+\)?)$/)) {
 				err += "not valid scientific notation";  
 			  }
 		  } 
