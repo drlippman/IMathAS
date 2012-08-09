@@ -1796,8 +1796,12 @@ if (!isset($_POST['embedpostback'])) {
 				} 
 				$intro =  $intropages[2*$_GET['page']+2];
 				preg_match_all('/\[QUESTION\s+(\d+)\s*\]/',$intro,$matches,PREG_PATTERN_ORDER);
-				$qmin = min($matches[1])-1;
-				$qmax = max($matches[1]);
+				if (isset($matches[1]) && count($matches[1])>0) {
+					$qmin = min($matches[1])-1;
+					$qmax = max($matches[1]);
+				} else {
+					$qmin =0; $qmax = 0;
+				}
 				$dopage = true;
 				showembednavbar($intropages,$_GET['page']);
 				echo "<div class=inset>\n";
@@ -1899,30 +1903,33 @@ if (!isset($_POST['embedpostback'])) {
 			if ($curpg == $i) { echo "</span>";}
 			
 			preg_match_all('/\[QUESTION\s+(\d+)\s*\]/',$pginfo[2*$i+2],$matches,PREG_PATTERN_ORDER);
-			$qmin = min($matches[1])-1;
-			$qmax = max($matches[1]);
-			$cntunans = 0;
-			$cntcanimp = 0;
-			for($j=$qmin;$j<$qmax;$j++) {
-				$bit = "\"q$j\":[$i,";
-				if (unans($scores[$j])) {
-					$cntunans++;
-					$bit .= "1,";
-				} else {
-					$bit .= "0,";
+			if (isset($matches[1]) && count($matches[1])>0) {
+				$qmin = min($matches[1])-1;
+				$qmax = max($matches[1]);
+			
+				$cntunans = 0;
+				$cntcanimp = 0;
+				for($j=$qmin;$j<$qmax;$j++) {
+					$bit = "\"q$j\":[$i,";
+					if (unans($scores[$j])) {
+						$cntunans++;
+						$bit .= "1,";
+					} else {
+						$bit .= "0,";
+					}
+					if (canimprove($j)) {
+						$cntcanimp++;
+						$bit .= "1]";
+					} else {
+						$bit .= "0]";
+					}
+					$jsonbits[] = $bit;
 				}
-				if (canimprove($j)) {
-					$cntcanimp++;
-					$bit .= "1]";
-				} else {
-					$bit .= "0]";
+				echo '<br/>';
+				echo " <span id=\"embednavunans$i\" style=\"margin-left:8px\">$cntunans</span> unattempted";
+				if (false && $showeachscore) {
+					echo "<br/><span id=\"embednavcanimp$i\" style=\"margin-left:8px\">$cntcanimp</span> can be improved";
 				}
-				$jsonbits[] = $bit;
-			}
-			echo '<br/>';
-			echo " <span id=\"embednavunans$i\" style=\"margin-left:8px\">$cntunans</span> unattempted";
-			if (false && $showeachscore) {
-				echo "<br/><span id=\"embednavcanimp$i\" style=\"margin-left:8px\">$cntcanimp</span> can be improved";
 			}
 			echo "</li>\n";
 		}

@@ -278,7 +278,7 @@ function ntuplecalc(inputId,outputId) {
 			
 			if ((NCdepth==0 && dec) || (NCdepth==1 && fullstr.charAt(i)==',')) {
 				sub = fullstr.substring(lastcut,i);
-				err = "";
+				var err = "";
 				try {
 				    with (Math) var res = eval(mathjs(sub));
 				} catch(e) {
@@ -322,6 +322,7 @@ function complexcalc(inputId,outputId) {
 		var arr = fullstr.split(',');
 		for (var cnt=0; cnt<arr.length; cnt++) {
 			var prep = mathjs(arr[cnt],'i');
+			var err='';
 			try {
 			    with (Math) var real = scopedeval('var i=0;'+prep);
 			    with (Math) var imag = scopedeval('var i=1;'+prep);
@@ -358,7 +359,7 @@ function complexcalc(inputId,outputId) {
 function matrixcalc(inputId,outputId,rows,cols) {
 	
 	function calced(estr) {
-		err='';
+		var err='';
 		try {
 			with (Math) var res = eval(mathjs(estr));
 		} catch(e) {
