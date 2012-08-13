@@ -1291,10 +1291,11 @@ function drawPics() {
   var index, nd;
   pictures = document.getElementsByTagName("embed");
  // might be needed if setTimeout on parseShortScript isn't working
- if (!ASnoSVG) {
+ 
+ if (!ASnoSVG && isOldIE) {
 	   try {
 		  for (var i = 0; i < pictures.length; i++) {
-			  if (pictures[i].getAttribute("sscr")!='' || pictures[i].getAttribute("script")!='') {
+		  	  if (pictures[i].getAttribute("sscr")!='' || pictures[i].getAttribute("script")!='') {
 				  if (pictures[i].getSVGDocument().getElementById("root") == null) {
 					setTimeout(drawPics,100);
 					return;
@@ -1306,7 +1307,7 @@ function drawPics() {
 		  return;
 	  }
  }
-  
+ 
   var len = pictures.length;
   
   

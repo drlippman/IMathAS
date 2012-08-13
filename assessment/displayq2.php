@@ -56,14 +56,22 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			if (is_array($arv)) {
 				foreach ($arv as $k=>$arvp) {
 					//if (is_numeric($arvp)) {
+					if ($arvp==='') {
+						$stuanswers[$i+1][$k] = null;
+					} else {
 						$stuanswers[$i+1][$k] = $arvp;
+					}
 					//} else {
 					//	$stuanswers[$i+1][$k] = preg_replace('/\W+/','',$arvp);
 					//}
 				}
 			} else {
 				//if (is_numeric($arv)) {
+				if ($arv==='') {
+					$stuanswers[$i+1] = null;
+				} else {
 					$stuanswers[$i+1] = $arv;
+				}
 				//} else {
 				//	$stuanswers[$i+1] = preg_replace('/\W+/','',$arv);
 				//}
@@ -350,14 +358,22 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 			if (is_array($arv)) {
 				foreach ($arv as $k=>$arvp) {
 					//if (is_numeric($arvp)) {
+					if ($arvp==='') {
+						$stuanswers[$i+1][$k] = null;
+					} else {
 						$stuanswers[$i+1][$k] = $arvp;
+					}
 					//} else {
 					//	$stuanswers[$i+1][$k] = preg_replace('/\W+/','',$arvp);
 					//}
 				}
 			} else {
 				//if (is_numeric($arv)) {
+				if ($arv==='') {
+					$stuanswers[$i+1] = null;
+				} else {
 					$stuanswers[$i+1] = $arv;
+				}
 				//} else {
 				//	$stuanswers[$i+1] = preg_replace('/\W+/','',$arv);
 				//}
@@ -394,7 +410,6 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 			}
 		}
 	}
-	
 	
 		
 	eval(interpret('control',$qdata['qtype'],$qdata['control']));
