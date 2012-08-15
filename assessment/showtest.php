@@ -691,7 +691,6 @@ if (!isset($_POST['embedpostback'])) {
 	if ($testsettings['noprint'] == 1) {
 		echo '<style type="text/css" media="print"> div.question, div.todoquestion, div.inactive { display: none;} </style>';
 	}
-	
 	if (!$isdiag && !$isltilimited && strpos($_SERVER['HTTP_REFERER'],'treereader')===false) {
 		if (isset($sessiondata['actas'])) {
 			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid={$testsettings['courseid']}\">{$sessiondata['coursename']}</a> ";
@@ -708,6 +707,15 @@ if (!isset($_POST['embedpostback'])) {
 				echo "&gt; Assessment</div>";
 			}
 		}
+	} else if ($isltilimited && $testsettings['msgtoinstr']==1) {
+		$query = "SELECT COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND courseid='$cid' AND (isread=0 OR isread=4)";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$msgcnt = mysql_result($result,0,0);
+		echo "<span style=\"float:right;\"><a href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages ";
+		if ($msgcnt>0) {
+			echo '<span style="color:red;">('.$msgcnt.' new)</span>';
+		} 
+		echo '</a></span>';
 	}
 	
 	if ((!$sessiondata['isteacher'] || isset($sessiondata['actas'])) && ($testsettings['isgroup']==1 || $testsettings['isgroup']==2) && ($sessiondata['groupid']==0 || isset($_GET['addgrpmem']))) {

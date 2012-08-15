@@ -78,11 +78,11 @@ Read   Deleted   Deleted by Sender   Tagged
 	$pagetitle = "Messages";
 	require("../header.php");
 	
-	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> ";
-	if ($cid>0) {
-		echo "&gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase ";
+	if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
+		echo " <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
 	}
-	echo "&gt; Sent Message List</div>";
+	echo " Sent Message List</div>";
 	echo '<div id="headersentlist" class="pagetitle"><h2>Sent Messages</h2></div>';
 
 	$query = "SELECT COUNT(id) FROM imas_msgs WHERE msgfrom='$userid' AND (isread&4)=0";

@@ -61,18 +61,18 @@
 		}
 		</script>';
 	require("../header.php");
-	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> ";
-	if ($cid>0) {
-		echo "&gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase ";
+	if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
+		echo " <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
 	}
 	if ($type=='sent') {
-		echo "&gt; <a href=\"sentlist.php?page=$page&cid=$cid&filtercid=$filtercid\">Sent Message List</a> &gt; Message</div>";
+		echo " <a href=\"sentlist.php?page=$page&cid=$cid&filtercid=$filtercid\">Sent Message List</a> &gt; Message</div>";
 	} else if ($type=='allstu') {
-		echo "&gt; <a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid\">Message List</a> &gt; <a href=\"allstumsglist.php?page=$page&cid=$cid&filterstu=$filterstu\">Student Messages</a> &gt; Message</div>";
+		echo " <a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid\">Message List</a> &gt; <a href=\"allstumsglist.php?page=$page&cid=$cid&filterstu=$filterstu\">Student Messages</a> &gt; Message</div>";
 	} else if ($type=='new') {
-		echo "&gt; <a href=\"newmsglist.php?cid=$cid\">New Message List</a> &gt; Message</div>";
+		echo " <a href=\"newmsglist.php?cid=$cid\">New Message List</a> &gt; Message</div>";
 	} else {
-		echo "&gt; <a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid\">Message List</a> &gt; Message</div>";
+		echo " <a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid\">Message List</a> &gt; Message</div>";
 	}
 	echo '<div id="headerviewmsg" class="pagetitle"><h2>Message</h2></div>';
 

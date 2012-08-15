@@ -464,7 +464,7 @@ function chkgrp(frm, arr, mark) {
 			</tr>
 			<tr>
 				<td><input type="checkbox" name="chgdates"/></td>
-				<td class="r">Dates:</td>
+				<td class="r">Dates and Times:</td>
 				<td>Copy from:
 <?php
 	writeHtmlSelect("dates",$page_assessSelect['val'],$page_assessSelect['label']);

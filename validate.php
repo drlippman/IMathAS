@@ -335,19 +335,19 @@ END;
 				exit;
 			}
 		} else if ($sessiondata['ltiitemtype']==0 && $sessiondata['ltirole']=='learner') {
-			if (strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false && strpos(basename($_SERVER['PHP_SELF']),'printtest.php')===false) {
+			$breadcrumbbase = "<a href=\"$imasroot/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}\">Assignment</a> &gt; ";
+			$urlparts = parse_url($_SERVER['PHP_SELF']);
+			if (!in_array(basename($urlparts['path']),array('showtest.php','printtest.php','msglist.php','sentlist.php','viewmsg.php','msghistory.php'))) {
+			//if (strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false && strpos(basename($_SERVER['PHP_SELF']),'printtest.php')===false && strpos(basename($_SERVER['PHP_SELF']),'msglist.php')===false && strpos(basename($_SERVER['PHP_SELF']),'sentlist.php')===false && strpos(basename($_SERVER['PHP_SELF']),'viewmsg.php')===false ) {
 				$query = "SELECT courseid FROM imas_assessments WHERE id='{$sessiondata['ltiitemid']}'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				$cid = mysql_result($result,0,0);
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}");
 				exit;
 			}
-		}
-		if ($sessiondata['ltirole']=='instructor' && $sessiondata['ltiitemtype']<1) { //domain level or aid_### type
-			$breadcrumbbase = "<a href=\"$imasroot/ltihome.php?showhome=true\">LTI Home</a> &gt; ";
 		} else {
-			$breadcrumbbase = "";
-		}
+			$breadcrumbbase = "<a href=\"$imasroot/ltihome.php?showhome=true\">LTI Home</a> &gt; ";
+		} 
 	} else {
 		$breadcrumbbase = "<a href=\"$imasroot/index.php\">Home</a> &gt; ";
 	}

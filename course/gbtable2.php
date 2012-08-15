@@ -1136,12 +1136,13 @@ function gbtable() {
 						$cattotpast[$ln][$cat] = round($cattotpast[$ln][$cat]*(100/($cats[$cat][1])),1);
 					}
 				}
-				if ($useweights==0 && $cats[$cat][5]>-1) {//use fixed pt value for cat
-					$cattotpast[$ln][$cat] = round($cats[$cat][5]*($cattotpast[$ln][$cat]/$catposspast[$cat]),1);
-				}
 				if (isset($cattotpastec[$ln][$cat])) { //add in EC
 					$cattotpast[$ln][$cat] += array_sum($cattotpastec[$ln][$cat]);
 				}
+				if ($useweights==0 && $cats[$cat][5]>-1) {//use fixed pt value for cat
+					$cattotpast[$ln][$cat] = round($cats[$cat][5]*($cattotpast[$ln][$cat]/$catposspast[$cat]),1);
+				}
+				
 				if ($cats[$cat][3]>0) { //chop score - no over 100%
 					if ($useweights==0  && $cats[$cat][5]>-1) { //set cat pts
 						$cattotpast[$ln][$cat] = min($cats[$cat][5]*$cats[$cat][3],$cattotpast[$ln][$cat]);
@@ -1212,12 +1213,13 @@ function gbtable() {
 						$cattotcur[$ln][$cat] = round($cattotcur[$ln][$cat]*(100/($cats[$cat][1])),1);
 					}
 				}
-				if ($useweights==0 && $cats[$cat][5]>-1) {//use fixed pt value for cat
-					$cattotcur[$ln][$cat] = round($cats[$cat][5]*($cattotcur[$ln][$cat]/$catposscur[$cat]),1);
-				}
 				if (isset($cattotcurec[$ln][$cat])) {
 					$cattotcur[$ln][$cat] += array_sum($cattotcurec[$ln][$cat]);
 				}
+				if ($useweights==0 && $cats[$cat][5]>-1) {//use fixed pt value for cat
+					$cattotcur[$ln][$cat] = round($cats[$cat][5]*($cattotcur[$ln][$cat]/$catposscur[$cat]),1);
+				}
+				
 				if ($cats[$cat][3]>0) {
 					if ($useweights==0  && $cats[$cat][5]>-1) { //set cat pts
 						$cattotcur[$ln][$cat] = min($cats[$cat][5]*$cats[$cat][3],$cattotcur[$ln][$cat]);
@@ -1286,12 +1288,13 @@ function gbtable() {
 						$cattotfuture[$ln][$cat] = round($cattotfuture[$ln][$cat]*(100/($cats[$cat][1])),1);
 					}
 				}
-				if ($useweights==0 && $cats[$cat][5]>-1) {//use fixed pt value for cat
-					$cattotfuture[$ln][$cat] = round($cats[$cat][5]*($cattotfuture[$ln][$cat]/$catpossfuture[$cat]),1);
-				}
 				if (isset($cattotfutureec[$ln][$cat])) {
 					$cattotfuture[$ln][$cat] += array_sum($cattotfutureec[$ln][$cat]);
 				}
+				if ($useweights==0 && $cats[$cat][5]>-1) {//use fixed pt value for cat
+					$cattotfuture[$ln][$cat] = round($cats[$cat][5]*($cattotfuture[$ln][$cat]/$catpossfuture[$cat]),1);
+				}
+				
 				if ($cats[$cat][3]>0) {
 					if ($useweights==0  && $cats[$cat][5]>-1) { //set cat pts
 						$cattotfuture[$ln][$cat] = min($cats[$cat][5]*$cats[$cat][3],$cattotfuture[$ln][$cat]);

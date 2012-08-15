@@ -224,7 +224,7 @@ if ($overwriteBody==1) {
 	echo '</p>';
 	
 	echo "<p><input type=checkbox id=\"onlyweekdays\" checked=\"checked\"> Shift by weekdays only</p>";
-	echo "<p>Once changing dates in one row, you select <i>Send down date change</i> from the Action pulldown to send the date change ";
+	echo "<p>Once changing dates in one row, you select <i>Send down date and time change</i> from the Action pulldown to send the date change ";
 	echo "difference to all rows below.  You can select <i>Copy down time</i> or <i>Copy down date &amp; time</i>to copy the same time/date to all rows below.  ";
 	echo "If you click the checkboxes on the left, you can limit the update to those items. ";
 	echo "Click the <img src=\"$imasroot/img/swap.gif\"> icon in each cell to swap from ";

@@ -126,7 +126,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			$loadgraphfilter = true;
 			require("../header.php");
 			echo "<div class=breadcrumb>$breadcrumbbase ";
-			if ($cid>0) {
+			if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
 				echo "<a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
 			}
 			if ($type=='sent') {
@@ -322,11 +322,11 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 	require("../header.php");
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	
-	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> ";
-	if ($cid>0) {
-		echo "&gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase ";
+	if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
+		echo " <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
 	}
-	echo "&gt; Message List</div>";
+	echo " Message List</div>";
 	echo '<div id="headermsglist" class="pagetitle"><h2>Messages</h2></div>';
 
 	$query = "SELECT COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND (isread&2)=0";
