@@ -160,8 +160,10 @@ if (!(isset($teacherid))) {
 				array_splice($sub,count($sub),0,$newitems);
 			}
 			$itemorder = addslashes(serialize($items));
-			$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt' WHERE id='$cid'";
-			mysql_query($query) or die("Query failed : $query" . mysql_error());
+			if ($itemorder!='') {
+				$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt' WHERE id='$cid'";
+				mysql_query($query) or die("Query failed : $query" . mysql_error());
+			}
 		}	
 		$offlinerubrics = array();
 		if (isset($_POST['copyoffline'])) {

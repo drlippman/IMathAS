@@ -469,7 +469,7 @@ function gbinstrexport() {
 function gbinstrdisp() {
 	global $hidenc,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection,$commentloc,$pointsln;
 	
-	if ($availshow==3) {
+	if ($availshow==4) {
 		$availshow=1;
 		$hidepast = true;
 	}
@@ -511,7 +511,7 @@ function gbinstrdisp() {
 		}
 		if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
 			for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers	
-				if ($availshow<2 && $gbt[0][2][$i][2]>1) {
+				if (($availshow<2 || $availshow==3) && $gbt[0][2][$i][2]>1) {
 					continue;
 				} else if ($availshow==2 && $gbt[0][2][$i][2]==3) {
 					continue;
@@ -576,7 +576,7 @@ function gbinstrdisp() {
 	if (!$totonleft && !$hidepast) {
 		if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
 			for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers	
-				if ($availshow<2 && $gbt[0][2][$i][2]>1) {
+				if (($availshow<2 || $availshow==3) && $gbt[0][2][$i][2]>1) {
 					continue;
 				} else if ($availshow==2 && $gbt[0][2][$i][2]==3) {
 					continue;
@@ -668,7 +668,7 @@ function gbinstrdisp() {
 			//category totals
 			if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
 				for ($j=0;$j<count($gbt[0][2]);$j++) { //category headers	
-					if ($availshow<2 && $gbt[0][2][$j][2]>1) {
+					if (($availshow<2 || $availshow==3) && $gbt[0][2][$j][2]>1) {
 						continue;
 					} else if ($availshow==2 && $gbt[0][2][$j][2]==3) {
 						continue;
@@ -765,7 +765,7 @@ function gbinstrdisp() {
 			//category totals
 			if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
 				for ($j=0;$j<count($gbt[0][2]);$j++) { //category headers	
-					if ($availshow<2 && $gbt[0][2][$j][2]>1) {
+					if (($availshow<2 || $availshow==3) && $gbt[0][2][$j][2]>1) {
 						continue;
 					} else if ($availshow==2 && $gbt[0][2][$j][2]==3) {
 						continue;
