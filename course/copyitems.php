@@ -2,6 +2,10 @@
 //IMathAS:  Copy Course Items
 //(c) 2006 David Lippman
 
+//boost operation time
+@set_time_limit(0);
+ini_set("max_execution_time", "600");
+
 /*** master php includes *******/
 require("../validate.php");
 require("../includes/copyiteminc.php");
