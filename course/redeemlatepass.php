@@ -31,12 +31,21 @@
 				}
 			}
 		}
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+		if ((!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+		} else {
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}");
+		}
 	} else {
 		require("../header.php");
-		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n";
-		$curBreadcrumb .= " &gt; Redeem LatePass\n";
-		echo "<div class=\"breadcrumb\">$curBreadcrumb</div>";
+		echo "<div class=breadcrumb>$breadcrumbbase ";
+		if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
+			echo " <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
+		}
+		echo "Redeem LatePass</div>\n"; 
+		//$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n";
+		//$curBreadcrumb .= " Redeem LatePass\n";
+		//echo "<div class=\"breadcrumb\">$curBreadcrumb</div>";
 		
 		$query = "SELECT latepass FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -50,7 +59,11 @@
 			echo "<p>You have $numlatepass LatePass(es) remaining.  You can redeem one LatePass for a $hours hour ";
 			echo "extension on this assessment.  Are you sure you want to redeem a LatePass?</p>";
 			echo "<input type=submit value=\"Yes, Redeem LatePass\"/>";
-			echo "<input type=button value=\"Nevermind\" onclick=\"window.location='course.php?cid=$cid'\"/>";
+			if ((!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
+				echo "<input type=button value=\"Nevermind\" onclick=\"window.location='course.php?cid=$cid'\"/>";
+			} else {
+				echo "<input type=button value=\"Nevermind\" onclick=\"window.location='../assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}'\"/>";
+			}
 			echo "</form>";
 		}
 		require("../footer.php");

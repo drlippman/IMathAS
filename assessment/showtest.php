@@ -32,7 +32,7 @@
 		$aid = $_GET['id'];
 		$isreview = false;
 		
-		$query = "SELECT deffeedback,startdate,enddate,reviewdate,shuffle,itemorder,password,avail,isgroup,groupsetid,deffeedbacktext,timelimit FROM imas_assessments WHERE id='$aid'";
+		$query = "SELECT deffeedback,startdate,enddate,reviewdate,shuffle,itemorder,password,avail,isgroup,groupsetid,deffeedbacktext,timelimit,courseid FROM imas_assessments WHERE id='$aid'";
 		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 		$adata = mysql_fetch_array($result, MYSQL_ASSOC);
 		$now = time();
@@ -97,6 +97,15 @@
 				require("../footer.php");
 				exit;
 			}
+		}
+	
+		//get latepass info
+		if (!isset($teacherid) && !isset($tutorid)) {
+		   $query = "SELECT latepass FROM imas_students WHERE userid='$userid' AND courseid='{$adata['courseid']}'";
+		   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		   $sessiondata['latepasses'] = mysql_result($result,0,0);
+		} else {
+			$sessiondata['latepasses'] = 0;
 		}
 		
 		$query = "SELECT id,agroupid,lastanswers,bestlastanswers,starttime FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='{$_GET['id']}'";
@@ -711,11 +720,15 @@ if (!isset($_POST['embedpostback'])) {
 		$query = "SELECT COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND courseid='$cid' AND (isread=0 OR isread=4)";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$msgcnt = mysql_result($result,0,0);
-		echo "<span style=\"float:right;\"><a href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages ";
+		echo "<span style=\"float:right;\"><a href=\"$imasroot/msgs/msglist.php?cid=$cid\" onclick=\"return confirm('This will discard any unsaved work.');\">Messages ";
 		if ($msgcnt>0) {
 			echo '<span style="color:red;">('.$msgcnt.' new)</span>';
 		} 
-		echo '</a></span>';
+		echo '</a>';
+		if ($testsettings['allowlate']==1 && $sessiondata['latepasses']>0) {
+			echo "<a href=\"$imasroot/course/redeemlatepass.php?cid=$cid&aid={$testsettings['id']}\" onclick=\"return confirm('This will discard any unsaved work.');\">Redeem LatePass</a>";
+		}
+		echo '</span>';
 	}
 	
 	if ((!$sessiondata['isteacher'] || isset($sessiondata['actas'])) && ($testsettings['isgroup']==1 || $testsettings['isgroup']==2) && ($sessiondata['groupid']==0 || isset($_GET['addgrpmem']))) {

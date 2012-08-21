@@ -337,7 +337,7 @@ END;
 		} else if ($sessiondata['ltiitemtype']==0 && $sessiondata['ltirole']=='learner') {
 			$breadcrumbbase = "<a href=\"$imasroot/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}\">Assignment</a> &gt; ";
 			$urlparts = parse_url($_SERVER['PHP_SELF']);
-			if (!in_array(basename($urlparts['path']),array('showtest.php','printtest.php','msglist.php','sentlist.php','viewmsg.php','msghistory.php'))) {
+			if (!in_array(basename($urlparts['path']),array('showtest.php','printtest.php','msglist.php','sentlist.php','viewmsg.php','msghistory.php','redeemlatepass.php'))) {
 			//if (strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false && strpos(basename($_SERVER['PHP_SELF']),'printtest.php')===false && strpos(basename($_SERVER['PHP_SELF']),'msglist.php')===false && strpos(basename($_SERVER['PHP_SELF']),'sentlist.php')===false && strpos(basename($_SERVER['PHP_SELF']),'viewmsg.php')===false ) {
 				$query = "SELECT courseid FROM imas_assessments WHERE id='{$sessiondata['ltiitemid']}'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
