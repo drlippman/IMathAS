@@ -28,6 +28,7 @@ $placeinhead .= "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/ass
 $placeinhead .= "<script src=\"$imasroot/javascript/AMhelpers.js\" type=\"text/javascript\"></script>\n";
 
 $nologo = true;
+$loadgraphfilter = true;
 require("../header.php");
 
 if ($overwriteBody==1) {
