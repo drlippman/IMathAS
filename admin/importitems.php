@@ -64,7 +64,12 @@ function additem($itemtoadd,$item,$questions,$qset) {
 					
 		//determine question to be added
 		//$qtoadd = explode(',',$item[$itemtoadd]['questions']);  //FIX!!! can be ~ separated as well
-		$qtoadd = preg_split('/[,~]/',$item[$itemtoadd]['questions']);
+		//FIX!!: check on format issues for grouped assessments.
+		if (trim($item[$itemtoadd]['questions'])=='') {
+			$qtoadd = array();
+		} else {
+			$qtoadd = preg_split('/[,~]/',$item[$itemtoadd]['questions']);
+		}
 		$allqids = array();
 		foreach ($qtoadd as $qid) {
 			//add question or get system id. 

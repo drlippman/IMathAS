@@ -202,7 +202,11 @@ function gbinstrexport() {
 				} else if ($availshow==2 && $gbt[0][2][$i][2]==3) {
 					continue;
 				}
-				$gbo[0][$n] = $gbt[0][2][$i][0].': '.$gbt[0][2][$i][3+$availshow].' pts';
+				if ($availshow<3) {
+					$gbo[0][$n] = $gbt[0][2][$i][0].': '.$gbt[0][2][$i][3+$availshow].' pts';
+				} else if ($availshow==3) {
+					$gbo[0][$n] = $gbt[0][2][$i][0];
+				}
 				$n++;
 			}
 		}
@@ -250,7 +254,11 @@ function gbinstrexport() {
 				} else if ($availshow==2 && $gbt[0][2][$i][2]==3) {
 					continue;
 				}
-				$gbo[0][$n] = $gbt[0][2][$i][0].': '.$gbt[0][2][$i][3+$availshow].' pts';
+				if ($availshow<3) {
+					$gbo[0][$n] = $gbt[0][2][$i][0].': '.$gbt[0][2][$i][3+$availshow].' pts';
+				} else if ($availshow==3) {
+					$gbo[0][$n] = $gbt[0][2][$i][0];
+				}
 				$n++;
 			}
 		}
