@@ -582,7 +582,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		$out .= "$leftb<input ";
 		
-		if ($displayformat=='alignright') { $out .= 'style="text-align: right;"';}
+		if ($displayformat=='alignright') { $out .= 'style="text-align: right;" ';}
 		
 		if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
