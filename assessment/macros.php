@@ -502,7 +502,7 @@ function addfractionaxislabels($plot,$step) {
 	preg_match('/initPicture\(([\-\d\.]+),([\-\d\.]+),([\-\d\.]+),([\-\d\.]+)\)/',$plot,$matches);
 	$xmin = $matches[1];
 	$xmax = $matches[2];
-	$yrange = $matches[4] - $matches[2];
+	$yrange = $matches[4] - $matches[3];
 	$stepn = $num/$den;
 	if ($ispi) { $stepn *= M_PI;}
 	if ($stepn==0) {echo "error: bad step size on pilabels"; return;}
