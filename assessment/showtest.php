@@ -725,7 +725,7 @@ if (!isset($_POST['embedpostback'])) {
 			echo '<span style="color:red;">('.$msgcnt.' new)</span>';
 		} 
 		echo '</a>';
-		if ($testsettings['allowlate']==1 && $sessiondata['latepasses']>0) {
+		if ($testsettings['allowlate']==1 && $sessiondata['latepasses']>0 && !$isreview) {
 			echo "<a href=\"$imasroot/course/redeemlatepass.php?cid=$cid&aid={$testsettings['id']}\" onclick=\"return confirm('This will discard any unsaved work.');\">Redeem LatePass</a>";
 		}
 		echo '</span>';

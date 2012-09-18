@@ -27,6 +27,10 @@
 
 header('P3P: CP="ALL CUR ADM OUR"');
 include("config.php");
+if (!get_magic_quotes_gpc()) {
+	$_REQUEST = array_map('addslashes_deep', $_REQUEST);
+}
+
  if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') {
  	 $urlmode = 'https://';
  } else {
@@ -720,14 +724,43 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein') {
 	} 
 } else if ($keyparts[0]=='aid') {   //is assessment level placement
 	$aid = intval($keyparts[1]);
-	$query = "SELECT courseid,startdate,enddate,avail,ltisecret FROM imas_assessments WHERE id='$aid'";
+	$query = "SELECT courseid,startdate,enddate,reviewdate,avail,ltisecret FROM imas_assessments WHERE id='$aid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
 	$cid = $line['courseid'];
 	if ($_SESSION['ltirole']!='instructor') {
-		if ($line['avail']==0 || $now>$line['enddate'] || $now<$line['startdate']) {
+		//if ($line['avail']==0 || $now>$line['enddate'] || $now<$line['startdate']) {
+		//	reporterror("This assessment is closed");
+		//}
+		if ($line['avail']==0) {
 			reporterror("This assessment is closed");
 		}
+		$query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid'";
+		$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
+		$row = mysql_fetch_row($result2);
+		if ($row!=null) {
+			if ($now<$row[0] || $row[1]<$now) { //outside exception dates
+				if ($now > $line['startdate'] && $now < $line['reviewdate']) {
+					$isreview = true;
+				} else {
+					reporterror("This assessment is closed");
+				}
+			} else { //inside exception dates exception
+				if ($line['enddate']<$now) { //exception is for past-due-date
+					$inexception = true; //only trigger if past due date for penalty
+				}
+			}
+			$exceptionduedate = $row[1];
+		} else { //has no exception
+			if ($now < $line['startdate'] || $line['enddate'] < $now) { //outside normal dates
+				if ($now > $line['startdate'] && $now < $line['reviewdate']) {
+					$isreview = true;
+				} else {
+					reporterror("This assessment is closed");
+				}
+			}
+		}
+		
 	}
 } else if ($keyparts[0]!='sso' && $_SESSION['ltirole']!='instructor') {
 	reporterror("invalid key. unknown action type");
