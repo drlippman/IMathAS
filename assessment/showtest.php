@@ -1978,11 +1978,14 @@ if (!isset($_POST['embedpostback'])) {
 				}
 			}
 			for (var i=0; i<=pgmax; i++) {
-				document.getElementById("embednavunans"+i).innerHTML = unanscnt[i];';
+				var el = document.getElementById("embednavunans"+i);
+				if (el != null) {
+					document.getElementById("embednavunans"+i).innerHTML = unanscnt[i];
+				';
 		if (false && $showeachscore) {
 				echo 'document.getElementById("embednavcanimp"+i).innerHTML = canimpcnt[i];';
 		}
-		echo '}}</script>';
+		echo '}}}</script>';
 		echo '</div>';	
 	}
 	

@@ -58,11 +58,16 @@
 			} else {
 				$msgnot = 0;
 			}
+			if (!empty($_POST['code'])) {
+				$code = preg_replace('/[^\w]/','',$_POST['code']);
+			} else {
+				$code = '';
+			}
 			$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, msgnotify) ";
 			$query .= "VALUES ('{$_POST['SID']}','$md5pw',$initialrights,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot);";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			$newuserid = mysql_insert_id();
-			$query = "INSERT INTO imas_students (userid,courseid) VALUES ('$newuserid','{$_GET['cid']}');";
+			$query = "INSERT INTO imas_students (userid,courseid,gbcomment) VALUES ('$newuserid','{$_GET['cid']}','$code');";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			if ($emailconfirmation) {
 				$id = mysql_insert_id();
@@ -236,6 +241,11 @@ if ($page_newaccounterror!='') {
 <span class=form><label for="firstname">Enter First Name:</label></span> <input class=form type=text size=20 id=firstname name=firstname <?php if (isset($_POST['firstname'])) {echo "value=\"{$_POST['firstname']}\"";}?>><BR class=form>
 <span class=form><label for="lastname">Enter Last Name:</label></span> <input class=form type=text size=20 id=lastname name=lastname <?php if (isset($_POST['lastname'])) {echo "value=\"{$_POST['lastname']}\"";}?>><BR class=form>
 <span class=form><label for="email">Enter E-mail address:</label></span>  <input class=form type=text size=60 id=email name=email <?php if (isset($_POST['email'])) {echo "value=\"{$_POST['email']}\"";}?>><BR class=form>
+<?php
+if (isset($_GET['getsid'])) {
+	echo '<span class="form"><label for="code">If you are registered at a Washington Community College, enter your Student ID Number:</label></span><input class="form" type="text" size="20" id="code" name="code"><BR class=form>';
+}
+?>
 <span class=form><label for="msgnot">Notify me by email when I receive a new message:</label></span><span class=formright><input type=checkbox id=msgnot name=msgnot /></span><BR class=form>
 <?php
 	if (strlen($enrollkey)>0) {

@@ -215,6 +215,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			echo "&gt; <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> ";
 		}
 		echo "&gt; <a href=\"$returnurl\">$returnname</a> &gt; ";
+		$notice = '';
 		if ($_GET['modify']!="reply" && $_GET['modify']!='new') {
 			echo "Modify Posting</div>\n";
 			$query = "SELECT * from imas_forum_posts WHERE id='{$_GET['modify']}'";
@@ -271,7 +272,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 						}
 						$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 						if (mysql_num_rows($result)>0) {
-							$notice =  '<br/><span style="color:red;font-weight:bold">This question has already been posted about.</span><br/>You may want to read the ';
+							$notice =  '<span style="color:red;font-weight:bold">This question has already been posted about.</span><br/>You may want to read the ';
 							$notice .=   'existing threads before re-posting the question.';
 							while ($row = mysql_fetch_row($result)) {
 								$notice .=  "<br/><a href=\"posts.php?cid=$cid&forum=$forumid&thread={$row[0]}\">{$line['subject']}</a>";
@@ -300,6 +301,9 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		
 		echo "<form enctype=\"multipart/form-data\" method=\"post\" action=\"$returnurl&modify={$_GET['modify']}&replyto={$_GET['replyto']}\">\n";
 		echo '<input type="hidden" name="MAX_FILE_SIZE" value="10485760" />';
+		if (isset($notice) && $notice!='') {
+			echo '<span class="form">&nbsp;</span><span class="formright">'.$notice.'</span><br class="form"/>';
+		}
 		echo "<span class=form><label for=\"subject\">Subject:</label></span>";
 		echo "<span class=formright><input type=text size=50 name=subject id=subject value=\"{$line['subject']}\"></span><br class=form>\n";
 		if ($forumtype==1) { //file forum
