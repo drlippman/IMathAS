@@ -104,7 +104,8 @@ function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,im
 		targets[tarnum].snaptogridy = snaptogrid;
 	}
 	targets[tarnum].pixperx = (imgwidth - 2*imgborder)/(xmax-xmin);
-	targets[tarnum].pixpery = (imgheight - 2*imgborder)/(ymax-ymin);
+	targets[tarnum].pixpery = (ymin==ymax)?1:((imgheight - 2*imgborder)/(ymax-ymin));
+	
 	targetOuts[tarnum] = document.getElementById(formel);
 	if (lines[tarnum]==null) {lines[tarnum] = new Array();}
 	if (dots[tarnum]==null) {dots[tarnum] = new Array();}
@@ -920,6 +921,7 @@ function drawMouseUp(ev) {
 		var tarelpos = getPosition(targets[curTarget].el);
 		var mouseOff = {x:(mousePos.x - tarelpos.x), y: (mousePos.y-tarelpos.y)};
 		if (targets[curTarget].snaptogridx > 0) {mouseOff = snaptogrid(mouseOff,curTarget);}
+		
 		if (lastdrawmouseup!=null && mousePos.x==lastdrawmouseup.x && mousePos.y==lastdrawmouseup.y) {
 			//basically a double-click which IE can handle
 			if (curLine!=null && dragObj==null) {

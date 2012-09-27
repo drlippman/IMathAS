@@ -45,10 +45,9 @@
 		$enrollkey = mysql_result($result,0,0);
 		if (strlen($enrollkey)>0 && trim($_POST['ekey'])=='') {
 			$page_newaccounterror .= "Please provide the enrollment key";
-		} else if (strlen($enrollkey>0) && $_POST['ekey']!=$enrollkey) {
+		} else if (strlen($enrollkey)>0 && $_POST['ekey']!=$enrollkey) {
 			$page_newaccounterror .= "Enrollment key is invalid.";
-		}
-			
+		}	
 		
 		if ($page_newaccounterror=='') {//no error
 			$md5pw = md5($_POST['pw1']);

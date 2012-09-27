@@ -439,7 +439,9 @@ function AMTgetTeXsymbol(symb) {
 		pre = '\\';
 	}
 	if (symb.tex==null) {
-		return (pre+(pre==''?symb.input:symb.input.toLowerCase()));
+		//can't remember why this was here.  Breaks /delta /Delta to removed
+		//return (pre+(pre==''?symb.input:symb.input.toLowerCase()));
+		return (pre+symb.input);
 	} else {
 		return (pre+symb.tex);
 	}
