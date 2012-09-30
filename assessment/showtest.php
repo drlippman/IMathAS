@@ -100,7 +100,7 @@
 		}
 	
 		//get latepass info
-		if (!isset($teacherid) && !isset($tutorid)) {
+		if (!isset($teacherid) && !isset($tutorid) && !$actas && !isset($sessiondata['stuview'])) {
 		   $query = "SELECT latepass FROM imas_students WHERE userid='$userid' AND courseid='{$adata['courseid']}'";
 		   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		   $sessiondata['latepasses'] = mysql_result($result,0,0);

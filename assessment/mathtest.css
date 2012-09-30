@@ -557,3 +557,8 @@ img.scoreicon {
 img.scoreicon:hover {
 	border-bottom:2px solid #f00;
 }
+
+div.question img {
+	max-width: 90%;
+	height: auto;
+}
