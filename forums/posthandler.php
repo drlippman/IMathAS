@@ -272,8 +272,8 @@ if (isset($_GET['modify'])) { //adding or modifying post
 						}
 						$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 						if (mysql_num_rows($result)>0) {
-							$notice =  '<span style="color:red;font-weight:bold">This question has already been posted about.</span><br/>You may want to read the ';
-							$notice .=   'existing threads before re-posting the question.';
+							$notice =  '<span style="color:red;font-weight:bold">This question has already been posted about.</span><br/>';
+							$notice .= 'Please read and participate in the existing discussion.';
 							while ($row = mysql_fetch_row($result)) {
 								$notice .=  "<br/><a href=\"posts.php?cid=$cid&forum=$forumid&thread={$row[0]}\">{$line['subject']}</a>";
 							}
@@ -303,150 +303,151 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		echo '<input type="hidden" name="MAX_FILE_SIZE" value="10485760" />';
 		if (isset($notice) && $notice!='') {
 			echo '<span class="form">&nbsp;</span><span class="formright">'.$notice.'</span><br class="form"/>';
-		}
-		echo "<span class=form><label for=\"subject\">Subject:</label></span>";
-		echo "<span class=formright><input type=text size=50 name=subject id=subject value=\"{$line['subject']}\"></span><br class=form>\n";
-		if ($forumtype==1) { //file forum
-			echo '<script type="text/javascript">
-				var filecnt = 1;
-				function addnewfile(t) {
-					var s = document.createElement("span");
-					s.innerHTML = \'Description: <input type="text" name="newfiledesc-\'+filecnt+\'" /> File: <input type="file" name="newfile-\'+filecnt+\'" /><br/>\';
-					t.parentNode.insertBefore(s,t);
-					filecnt++;
-				}</script>';
-			echo "<span class=form>Files:</span>";
-			echo "<span class=formright>";
-			if ($line['files']!='') {
-				require_once('../includes/filehandler.php');
-				$files = explode('@@',$line['files']);
-				for ($i=0;$i<count($files)/2;$i++) {
-					echo '<input type="text" name="filedesc['.$i.']" value="'.$files[2*$i].'"/>';
-					echo '<a href="'.getuserfileurl('ffiles/'.$_GET['modify'].'/'.$files[2*$i+1]).'" target="_blank">View</a> ';
-					echo 'Delete? <input type="checkbox" name="filedel['.$i.']" value="1"/><br/>';
+		} else {
+			echo "<span class=form><label for=\"subject\">Subject:</label></span>";
+			echo "<span class=formright><input type=text size=50 name=subject id=subject value=\"{$line['subject']}\"></span><br class=form>\n";
+			if ($forumtype==1) { //file forum
+				echo '<script type="text/javascript">
+					var filecnt = 1;
+					function addnewfile(t) {
+						var s = document.createElement("span");
+						s.innerHTML = \'Description: <input type="text" name="newfiledesc-\'+filecnt+\'" /> File: <input type="file" name="newfile-\'+filecnt+\'" /><br/>\';
+						t.parentNode.insertBefore(s,t);
+						filecnt++;
+					}</script>';
+				echo "<span class=form>Files:</span>";
+				echo "<span class=formright>";
+				if ($line['files']!='') {
+					require_once('../includes/filehandler.php');
+					$files = explode('@@',$line['files']);
+					for ($i=0;$i<count($files)/2;$i++) {
+						echo '<input type="text" name="filedesc['.$i.']" value="'.$files[2*$i].'"/>';
+						echo '<a href="'.getuserfileurl('ffiles/'.$_GET['modify'].'/'.$files[2*$i+1]).'" target="_blank">View</a> ';
+						echo 'Delete? <input type="checkbox" name="filedel['.$i.']" value="1"/><br/>';
+					}
 				}
+				echo 'Description: <input type="text" name="newfiledesc-0" /> ';
+				echo 'File: <input type="file" name="newfile-0" /><br/>';
+				echo '<a href="#" onclick="addnewfile(this);return false;">Add another file</a>';
+				echo "</span><br class=form>\n";
 			}
-			echo 'Description: <input type="text" name="newfiledesc-0" /> ';
-			echo 'File: <input type="file" name="newfile-0" /><br/>';
-			echo '<a href="#" onclick="addnewfile(this);return false;">Add another file</a>';
-			echo "</span><br class=form>\n";
-		}
-		if ($taglist!='' && ($_GET['modify']=='new' || $_GET['modify']==$threadid)) {
-			$p = strpos($taglist,':');
-			echo '<span class="form"><label for="tag">'.substr($taglist,0,$p).'</label></span>'; 
-			echo '<span class="formright"><select name="tag">';
-			echo '<option value="">Select...</option>';
-			$tags = explode(',',substr($taglist,$p+1));
-			foreach ($tags as $tag) {
-				$tag =  str_replace('"','&quot;',$tag);   
-				echo '<option value="'.$tag.'" ';
-				if ($tag==$line['tag']) {echo 'selected="selected"';}
-				echo '>'.$tag.'</option>';
-			}
-			echo '</select></span><br class="form" />';
-		}
-		echo "<span class=form><label for=\"message\">Message:</label></span>";
-		echo "<span class=left><div class=editor><textarea id=message name=message style=\"width: 100%;\" rows=20 cols=70>";
-		echo htmlentities($line['message']);
-		echo "</textarea></div></span><br class=form>\n";
-		if (!$isteacher && $allowanon==1) {
-			echo "<span class=form>Post Anonymously:</span><span class=formright>";
-			echo "<input type=checkbox name=\"postanon\" value=1 ";
-			if ($line['isanon']==1) {echo "checked=1";}
-			echo "></span><br class=form/>";
-		}
-		if ($isteacher && ($_GET['modify']=='new' || $line['userid']==$userid) && ($_GET['modify']=='new' || $_GET['modify']==$_GET['thread'] || ($_GET['modify']!='reply' && $line['parent']==0))) {
-			echo "<span class=form>Post Type:</span><span class=formright>\n";
-			echo "<input type=radio name=type value=0 ";
-			if ($line['posttype']==0) { echo "checked=1";}
-			echo ">Regular<br>\n";
-			echo "<input type=radio name=type value=1 ";           
-			if ($line['posttype']==1) { echo "checked=1";}
-			echo ">Displayed at top of list<br>\n";
-			echo "<input type=radio name=type value=2 ";
-			if ($line['posttype']==2) { echo "checked=1";}
-			echo ">Displayed at top and locked (no replies)<br>\n";
-			echo "<input type=radio name=type value=3 ";
-			if ($line['posttype']==3) { echo "checked=1";}
-			echo ">Displayed at top and students can only see their own replies\n";
-			echo "</span><br class=form>";
-			echo "<span class=form>Allow replies:</span><span class=formright>\n";
-			echo "<input type=radio name=replyby value=\"null\" ";
-			if ($line['replyby']==null) { echo "checked=1";}
-			echo "/>Use default<br/>";
-			echo "<input type=radio name=replyby value=\"Always\" ";
-			if ($line['replyby']==2000000000) { echo "checked=1";}
-			echo "/>Always<br/>";
-			echo "<input type=radio name=replyby value=\"Never\" ";
-			if ($line['replyby']==='0') { echo "checked=1";}
-			echo "/>Never<br/>";
-			echo "<input type=radio name=replyby value=\"Date\" ";
-			if ($line['replyby']<2000000000 && $line['replyby']>0) { echo "checked=1";}
-			echo "/>Before: "; 
-			echo "<input type=text size=10 name=replybydate value=\"$replybydate\"/>";
-			echo '<a href="#" onClick="displayDatePicker(\'replybydate\', this); return false">';
-			//echo "<A HREF=\"#\" onClick=\"cal1.select(document.forms[0].replybydate,'anchor3','MM/dd/yyyy',(document.forms[0].replybydate.value==$replybydate')?(document.forms[0].replyby.value):(document.forms[0].replyby.value)); return false;\" NAME=\"anchor3\" ID=\"anchor3\">
-			echo "<img src=\"../img/cal.gif\" alt=\"Calendar\"/></A>";
-			echo "at <input type=text size=10 name=replybytime value=\"$replybytime\"></span><br class=\"form\" />";
-			if ($groupsetid >0) {
-				echo '<span class="form">Set thread to group:</span><span class="formright">';
-				echo '<select name="stugroup">';
-				echo '<option value="0" ';
-				if ($curstugroupid==0) { echo 'selected="selected"';}
-				echo '>Non group-specific</option>';
-				$query = "SELECT id,name FROM imas_stugroups WHERE groupsetid='$groupsetid' ORDER BY name";
-				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-				while ($row = mysql_fetch_row($result)) {
-					echo '<option value="'.$row[0].'" ';
-					if ($curstugroupid==$row[0]) { echo 'selected="selected"';}
-					echo '>'.$row[1].'</option>';
+			if ($taglist!='' && ($_GET['modify']=='new' || $_GET['modify']==$threadid)) {
+				$p = strpos($taglist,':');
+				echo '<span class="form"><label for="tag">'.substr($taglist,0,$p).'</label></span>'; 
+				echo '<span class="formright"><select name="tag">';
+				echo '<option value="">Select...</option>';
+				$tags = explode(',',substr($taglist,$p+1));
+				foreach ($tags as $tag) {
+					$tag =  str_replace('"','&quot;',$tag);   
+					echo '<option value="'.$tag.'" ';
+					if ($tag==$line['tag']) {echo 'selected="selected"';}
+					echo '>'.$tag.'</option>';
 				}
 				echo '</select></span><br class="form" />';
 			}
-				
-		}
-		if ($isteacher && $haspoints && $_GET['modify']=='reply') {
-			echo '<span class="form">Points for message you\'re replying to:</span><span class="formright">';
-			echo '<input type="text" size="4" name="points" value="'.$points.'" /></span><br class="form" />';
-		}
-		echo "<div class=submit><input type=submit value='Submit'></div>\n";
-
-		if ($_GET['modify']=='reply') {
-			echo "<p>Replying to:</p>";
-			$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName from imas_forum_posts,imas_users ";
-			$query .= "WHERE imas_forum_posts.userid=imas_users.id AND (imas_forum_posts.id='$threadid' OR imas_forum_posts.threadid='$threadid')";
-			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-			while ($line =  mysql_fetch_array($result, MYSQL_ASSOC)) {
-				$parent[$line['id']] = $line['parent'];
-				$date[$line['id']] = $line['postdate'];
-				$subject[$line['id']] = $line['subject'];
-				if ($sessiondata['graphdisp']==0) {
-					$line['message'] = preg_replace('/<embed[^>]*alt="([^"]*)"[^>]*>/',"[$1]", $line['message']);
+			echo "<span class=form><label for=\"message\">Message:</label></span>";
+			echo "<span class=left><div class=editor><textarea id=message name=message style=\"width: 100%;\" rows=20 cols=70>";
+			echo htmlentities($line['message']);
+			echo "</textarea></div></span><br class=form>\n";
+			if (!$isteacher && $allowanon==1) {
+				echo "<span class=form>Post Anonymously:</span><span class=formright>";
+				echo "<input type=checkbox name=\"postanon\" value=1 ";
+				if ($line['isanon']==1) {echo "checked=1";}
+				echo "></span><br class=form/>";
+			}
+			if ($isteacher && ($_GET['modify']=='new' || $line['userid']==$userid) && ($_GET['modify']=='new' || $_GET['modify']==$_GET['thread'] || ($_GET['modify']!='reply' && $line['parent']==0))) {
+				echo "<span class=form>Post Type:</span><span class=formright>\n";
+				echo "<input type=radio name=type value=0 ";
+				if ($line['posttype']==0) { echo "checked=1";}
+				echo ">Regular<br>\n";
+				echo "<input type=radio name=type value=1 ";           
+				if ($line['posttype']==1) { echo "checked=1";}
+				echo ">Displayed at top of list<br>\n";
+				echo "<input type=radio name=type value=2 ";
+				if ($line['posttype']==2) { echo "checked=1";}
+				echo ">Displayed at top and locked (no replies)<br>\n";
+				echo "<input type=radio name=type value=3 ";
+				if ($line['posttype']==3) { echo "checked=1";}
+				echo ">Displayed at top and students can only see their own replies\n";
+				echo "</span><br class=form>";
+				echo "<span class=form>Allow replies:</span><span class=formright>\n";
+				echo "<input type=radio name=replyby value=\"null\" ";
+				if ($line['replyby']==null) { echo "checked=1";}
+				echo "/>Use default<br/>";
+				echo "<input type=radio name=replyby value=\"Always\" ";
+				if ($line['replyby']==2000000000) { echo "checked=1";}
+				echo "/>Always<br/>";
+				echo "<input type=radio name=replyby value=\"Never\" ";
+				if ($line['replyby']==='0') { echo "checked=1";}
+				echo "/>Never<br/>";
+				echo "<input type=radio name=replyby value=\"Date\" ";
+				if ($line['replyby']<2000000000 && $line['replyby']>0) { echo "checked=1";}
+				echo "/>Before: "; 
+				echo "<input type=text size=10 name=replybydate value=\"$replybydate\"/>";
+				echo '<a href="#" onClick="displayDatePicker(\'replybydate\', this); return false">';
+				//echo "<A HREF=\"#\" onClick=\"cal1.select(document.forms[0].replybydate,'anchor3','MM/dd/yyyy',(document.forms[0].replybydate.value==$replybydate')?(document.forms[0].replyby.value):(document.forms[0].replyby.value)); return false;\" NAME=\"anchor3\" ID=\"anchor3\">
+				echo "<img src=\"../img/cal.gif\" alt=\"Calendar\"/></A>";
+				echo "at <input type=text size=10 name=replybytime value=\"$replybytime\"></span><br class=\"form\" />";
+				if ($groupsetid >0) {
+					echo '<span class="form">Set thread to group:</span><span class="formright">';
+					echo '<select name="stugroup">';
+					echo '<option value="0" ';
+					if ($curstugroupid==0) { echo 'selected="selected"';}
+					echo '>Non group-specific</option>';
+					$query = "SELECT id,name FROM imas_stugroups WHERE groupsetid='$groupsetid' ORDER BY name";
+					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+					while ($row = mysql_fetch_row($result)) {
+						echo '<option value="'.$row[0].'" ';
+						if ($curstugroupid==$row[0]) { echo 'selected="selected"';}
+						echo '>'.$row[1].'</option>';
+					}
+					echo '</select></span><br class="form" />';
 				}
-				$message[$line['id']] = $line['message'];
-				$posttype[$line['id']] = $line['posttype'];
-				if ($line['isanon']==1) {
-					$poster[$line['id']] = "Anonymous";	
-				} else {
-					$poster[$line['id']] = $line['FirstName'] . ' ' . $line['LastName'];
-					if ($isteacher && $line['userid']!=$userid) {
-						$poster[$line['id']] .= " <a class=\"small\" href=\"$imasroot/course/gradebook.php?cid=$cid&stu={$line['userid']}\" target=\"_popoutgradebook\">[GB]</a>";
+					
+			}
+			if ($isteacher && $haspoints && $_GET['modify']=='reply') {
+				echo '<span class="form">Points for message you\'re replying to:</span><span class="formright">';
+				echo '<input type="text" size="4" name="points" value="'.$points.'" /></span><br class="form" />';
+			}
+			echo "<div class=submit><input type=submit value='Submit'></div>\n";
+	
+			if ($_GET['modify']=='reply') {
+				echo "<p>Replying to:</p>";
+				$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName from imas_forum_posts,imas_users ";
+				$query .= "WHERE imas_forum_posts.userid=imas_users.id AND (imas_forum_posts.id='$threadid' OR imas_forum_posts.threadid='$threadid')";
+				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				while ($line =  mysql_fetch_array($result, MYSQL_ASSOC)) {
+					$parent[$line['id']] = $line['parent'];
+					$date[$line['id']] = $line['postdate'];
+					$subject[$line['id']] = $line['subject'];
+					if ($sessiondata['graphdisp']==0) {
+						$line['message'] = preg_replace('/<embed[^>]*alt="([^"]*)"[^>]*>/',"[$1]", $line['message']);
+					}
+					$message[$line['id']] = $line['message'];
+					$posttype[$line['id']] = $line['posttype'];
+					if ($line['isanon']==1) {
+						$poster[$line['id']] = "Anonymous";	
+					} else {
+						$poster[$line['id']] = $line['FirstName'] . ' ' . $line['LastName'];
+						if ($isteacher && $line['userid']!=$userid) {
+							$poster[$line['id']] .= " <a class=\"small\" href=\"$imasroot/course/gradebook.php?cid=$cid&stu={$line['userid']}\" target=\"_popoutgradebook\">[GB]</a>";
+						}
 					}
 				}
-			}
-			function printparents($id) {
-				global $parent,$date,$subject,$message,$posttype,$poster;
-				echo "<div class=block>";
-				echo "<b>{$subject[$id]}</b><br/>Posted by: {$poster[$id]}, ";
-				echo tzdate("F j, Y, g:i a",$date[$id]);
-				echo "</div><div class=blockitems>";
-				echo filter($message[$id]);
-				echo "</div>\n";
-				if ($parent[$id]!=0) {
-					printparents($parent[$id]);
+				function printparents($id) {
+					global $parent,$date,$subject,$message,$posttype,$poster;
+					echo "<div class=block>";
+					echo "<b>{$subject[$id]}</b><br/>Posted by: {$poster[$id]}, ";
+					echo tzdate("F j, Y, g:i a",$date[$id]);
+					echo "</div><div class=blockitems>";
+					echo filter($message[$id]);
+					echo "</div>\n";
+					if ($parent[$id]!=0) {
+						printparents($parent[$id]);
+					}
 				}
+				printparents($_GET['replyto']);
 			}
-			printparents($_GET['replyto']);
 		}
 		echo '</form>';
 		require("../footer.php");

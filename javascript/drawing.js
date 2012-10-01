@@ -966,7 +966,9 @@ function drawMouseUp(ev) {
 		} else {
 			targets[curTarget].el.style.cursor = 'url('+imasroot+'/img/pen.cur), default';
 		}
-		ev.preventDefault();
+		if (typeof ev != 'undefined') {
+			ev.preventDefault();
+		}
 	}
 	lastdrawmouseup = mousePos;
 	if (curTarget!=null && dragObj!=null) { //is a target currectly in action, and dragging
@@ -1042,8 +1044,8 @@ function drawMouseMove(ev) {
 		if (hasTouch && ev.touches.length>1) {
 			didMultiTouch = true;
 			return true;  //bypass when multitouching to prevent interference with pinch zoom
-		} else {
-			ev.preventDefault();	
+		} else if (typeof ev != 'undefined') {
+			ev.preventDefault();
 		}
 		var tarelpos = getPosition(targets[curTarget].el);
 		var mouseOff = {x:(mousePos.x - tarelpos.x), y: (mousePos.y-tarelpos.y)};

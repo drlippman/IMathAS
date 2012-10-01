@@ -210,7 +210,7 @@ foreach($forumitems as $id=>$name) {
 }
 ?>
 </ul>
-<p>With selected, <input type="submit" name="submit" value="Delete"/> or make changes below
+<p>With selected, make changes below
 <fieldset>
 <legend>Forum Options</legend>
 <table class=gb>
