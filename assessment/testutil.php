@@ -588,8 +588,9 @@ function basicshowq($qn,$seqinactive=false,$colors=array()) {
 	if (canimprove($qn)) {
 		if ($qshowansduring && $attempts[$qn]>=$testsettings['showans']) {$showa = true;} else {$showa=false;}
 	} else {
-		$showa = ($qshowansafterlast && $showeachscore);	
+		$showa = (($qshowansduring || $qshowansafterlast) && $showeachscore);	
 	}
+	
 	$regen = (($regenonreattempt && $qi[$questions[$qn]]['regen']==0) || $qi[$questions[$qn]]['regen']==1);
 	$thisshowhints = ($qi[$questions[$qn]]['showhints']==2 || ($qi[$questions[$qn]]['showhints']==0 && $showhints));
 	if (!$seqinactive) {
@@ -602,65 +603,69 @@ function basicshowq($qn,$seqinactive=false,$colors=array()) {
 //shows basic points possible, attempts remaining bar
 function showqinfobar($qn,$inreview,$single) {
 	global $qi,$questions,$attempts,$seeds,$testsettings,$noindivscores,$showeachscore,$scores,$bestscores,$sessiondata,$imasroot;
-	if ($inreview) {
-		echo '<div class="review">';
-	}
-	if ($qi[$questions[$qn]]['withdrawn']==1) {
-		echo '<span class="red">Question Withdrawn</span> ';
-	}
-	if ($attempts[$qn]<$qi[$questions[$qn]]['attempts'] || $qi[$questions[$qn]]['attempts']==0) {
-		$pointsremaining = getremainingpossible($qn,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
-		if ($pointsremaining == $qi[$questions[$qn]]['points']) {
-			echo 'Points possible: ' . $qi[$questions[$qn]]['points'] . '<br/>';
-		} else {
-			echo 'Points available on this attempt: '.$pointsremaining.' of original '.$qi[$questions[$qn]]['points'] . '<br/>';
+	if (!$sessiondata['istutorial']) {
+		if ($inreview) {
+			echo '<div class="review">';
 		}
-	}
-	
-	if ($qi[$questions[$qn]]['attempts']==0) {
-		echo "Unlimited attempts.";
-	} else if ($attempts[$qn]>=$qi[$questions[$qn]]['attempts']) {
-		echo 'No attempts remain.';
-	} else {
-		//echo '<br/>'.($qi[$questions[$qn]]['attempts']-$attempts[$qn])." attempts of ".$qi[$questions[$qn]]['attempts']." remaining.";
-		echo "This is attempt ".($attempts[$qn]+1)." of " . $qi[$questions[$qn]]['attempts'] . ".";
-	}
-	if ($testsettings['showcat']>0 && $qi[$questions[$qn]]['category']!='0') {
-		echo "  Category: {$qi[$questions[$qn]]['category']}.";
-	}
-	if ($attempts[$qn]>0 && $showeachscore) {
-		if (strpos($scores[$qn],'~')===false) {
-			echo "<br/>Score on last attempt: {$scores[$qn]}.  Score in gradebook: {$bestscores[$qn]}";
-		} else {
-			echo "<br/>Score on last attempt: (" . str_replace('~', ', ',$scores[$qn]) . '), ';
-			echo "Score in gradebook: (" . str_replace('~', ', ',$bestscores[$qn]) . '), ';
-			$ptposs = $qi[$questions[$qn]]['answeights'];
-			for ($i=0; $i<count($ptposs)-1; $i++) {
-				$ptposs[$i] = round($ptposs[$i]*$qi[$questions[$qn]]['points'],2);
+		if ($qi[$questions[$qn]]['withdrawn']==1) {
+			echo '<span class="red">Question Withdrawn</span> ';
+		}
+		if ($attempts[$qn]<$qi[$questions[$qn]]['attempts'] || $qi[$questions[$qn]]['attempts']==0) {
+			$pointsremaining = getremainingpossible($qn,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
+			if ($pointsremaining == $qi[$questions[$qn]]['points']) {
+				echo 'Points possible: ' . $qi[$questions[$qn]]['points'] . '<br/>';
+			} else {
+				echo 'Points available on this attempt: '.$pointsremaining.' of original '.$qi[$questions[$qn]]['points'] . '<br/>';
 			}
-			//adjust for rounding
-			$diff = $qi[$questions[$qn]]['points'] - array_sum($ptposs);
-			$ptposs[count($ptposs)-1] += $diff;
-			$ptposs = implode(', ',$ptposs); 
-			echo "Out of: ($ptposs)";
 		}
+		
+		if ($qi[$questions[$qn]]['attempts']==0) {
+			echo "Unlimited attempts.";
+		} else if ($attempts[$qn]>=$qi[$questions[$qn]]['attempts']) {
+			echo 'No attempts remain.';
+		} else {
+			//echo '<br/>'.($qi[$questions[$qn]]['attempts']-$attempts[$qn])." attempts of ".$qi[$questions[$qn]]['attempts']." remaining.";
+			echo "This is attempt ".($attempts[$qn]+1)." of " . $qi[$questions[$qn]]['attempts'] . ".";
+		}
+		if ($testsettings['showcat']>0 && $qi[$questions[$qn]]['category']!='0') {
+			echo "  Category: {$qi[$questions[$qn]]['category']}.";
+		}
+		if ($attempts[$qn]>0 && $showeachscore) {
+			if (strpos($scores[$qn],'~')===false) {
+				echo "<br/>Score on last attempt: {$scores[$qn]}.  Score in gradebook: {$bestscores[$qn]}";
+			} else {
+				echo "<br/>Score on last attempt: (" . str_replace('~', ', ',$scores[$qn]) . '), ';
+				echo "Score in gradebook: (" . str_replace('~', ', ',$bestscores[$qn]) . '), ';
+				$ptposs = $qi[$questions[$qn]]['answeights'];
+				for ($i=0; $i<count($ptposs)-1; $i++) {
+					$ptposs[$i] = round($ptposs[$i]*$qi[$questions[$qn]]['points'],2);
+				}
+				//adjust for rounding
+				$diff = $qi[$questions[$qn]]['points'] - array_sum($ptposs);
+				$ptposs[count($ptposs)-1] += $diff;
+				$ptposs = implode(', ',$ptposs); 
+				echo "Out of: ($ptposs)";
+			}
+		}
+		//if (!$noindivscores) {
+		//	echo "<br/>Score in gradebook: ".printscore2($bestscores[$qn]).".";
+		//}
 	}
-	//if (!$noindivscores) {
-	//	echo "<br/>Score in gradebook: ".printscore2($bestscores[$qn]).".";
-	//}
 	if ($single) {
 		echo "<input type=hidden id=\"verattempts\" name=\"verattempts\" value=\"{$attempts[$qn]}\" />";
 	} else {
 		echo "<input type=hidden id=\"verattempts$qn\" name=\"verattempts[$qn]\" value=\"{$attempts[$qn]}\" />";
 	}
-	if ($testsettings['msgtoinstr']==1) {
-		echo "<br/><a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid={$testsettings['courseid']}&add=new&quoteq=$qn-{$qi[$questions[$qn]]['questionsetid']}-{$seeds[$qn]}-{$testsettings['id']}&to=instr\">Message instructor about this question</a>";
-	}
-	if ($testsettings['posttoforum']>0) {
-		echo "<br/><a target=\"_blank\" href=\"$imasroot/forums/thread.php?cid={$testsettings['courseid']}&forum={$testsettings['posttoforum']}&modify=new&quoteq=$qn-{$qi[$questions[$qn]]['questionsetid']}-{$seeds[$qn]}-{$testsettings['id']}\">Post this question to forum</a>";
-	}
-	if ($inreview) {
-		echo '</div>';
+	if (!$sessiondata['istutorial']) {
+		if ($testsettings['msgtoinstr']==1) {
+			echo "<br/><a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid={$testsettings['courseid']}&add=new&quoteq=$qn-{$qi[$questions[$qn]]['questionsetid']}-{$seeds[$qn]}-{$testsettings['id']}&to=instr\">Message instructor about this question</a>";
+		}
+		if ($testsettings['posttoforum']>0) {
+			echo "<br/><a target=\"_blank\" href=\"$imasroot/forums/thread.php?cid={$testsettings['courseid']}&forum={$testsettings['posttoforum']}&modify=new&quoteq=$qn-{$qi[$questions[$qn]]['questionsetid']}-{$seeds[$qn]}-{$testsettings['id']}\">Post this question to forum</a>";
+		}
+		if ($inreview) {
+			echo '</div>';
+		}
 	}
 }
 

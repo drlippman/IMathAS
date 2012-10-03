@@ -32,7 +32,7 @@
 		$aid = $_GET['id'];
 		$isreview = false;
 		
-		$query = "SELECT deffeedback,startdate,enddate,reviewdate,shuffle,itemorder,password,avail,isgroup,groupsetid,deffeedbacktext,timelimit,courseid FROM imas_assessments WHERE id='$aid'";
+		$query = "SELECT deffeedback,startdate,enddate,reviewdate,shuffle,itemorder,password,avail,isgroup,groupsetid,deffeedbacktext,timelimit,courseid,istutorial FROM imas_assessments WHERE id='$aid'";
 		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 		$adata = mysql_fetch_array($result, MYSQL_ASSOC);
 		$now = time();
@@ -107,6 +107,8 @@
 		} else {
 			$sessiondata['latepasses'] = 0;
 		}
+		
+		$sessiondata['istutorial'] = $adata['istutorial'];
 		
 		$query = "SELECT id,agroupid,lastanswers,bestlastanswers,starttime FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='{$_GET['id']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -473,6 +475,7 @@
 	$showansduring = (($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework") && is_numeric($testsettings['showans']));
 	$showansafterlast = ($testsettings['showans']==='F' || $testsettings['showans']==='J');
 	$noindivscores = ($testsettings['testtype']=="EndScore" || $testsettings['testtype']=="NoScores");
+	$reviewatend = ($testsettings['testtype']=="EndReview");
 	$showhints = ($testsettings['showhints']==1);
 	$showtips = $testsettings['showtips'];
 	$regenonreattempt = (($testsettings['shuffle']&8)==8);
@@ -1474,9 +1477,11 @@ if (!isset($_POST['embedpostback'])) {
 			$qn = $_POST['toscore'];
 			$colors = array();
 			$page = $_GET['page'];
+			$divopen = false;
 			if ($_POST['verattempts']!=$attempts[$qn]) {
 				echo '<div class="prequestion">';
 				echo "This question has been submittted since you viewed it, and that grade is shown below.  Your answer just submitted was not scored or recorded.";
+				$divopen = true;
 			} else {
 				if (isset($_POST['disptime']) && !$isreview) {
 					$used = $now - intval($_POST['disptime']);
@@ -1490,32 +1495,35 @@ if (!isset($_POST['embedpostback'])) {
 				recordtestdata();
 				
 				embedshowicon($qn);
-				echo '<div class="prequestion">';
-				if ($GLOBALS['scoremessages'] != '') {
-					echo '<p>'.$GLOBALS['scoremessages'].'</p>';
-				}
-				$reattemptsremain = false;
-				if ($showeachscore) {
-					$possible = $qi[$questions[$qn]]['points'];
-					if (getpts($rawscore)!=getpts($scores[$qn])) {
-						echo "<p>Score before penalty on last attempt: ";
-						echo printscore($rawscore,$qn);
+				if (!$sessiondata['istutorial']) {
+					echo '<div class="prequestion">';
+					$divopen = true;
+					if ($GLOBALS['scoremessages'] != '') {
+						echo '<p>'.$GLOBALS['scoremessages'].'</p>';
+					}
+					$reattemptsremain = false;
+					if ($showeachscore) {
+						$possible = $qi[$questions[$qn]]['points'];
+						if (getpts($rawscore)!=getpts($scores[$qn])) {
+							echo "<p>Score before penalty on last attempt: ";
+							echo printscore($rawscore,$qn);
+							echo "</p>";
+						}
+						echo "<p>";
+						echo "Score on last attempt: ";
+						echo printscore($scores[$qn],$qn);
+						echo "<br/>\n";
+						echo "Score in gradebook: ";
+						echo printscore($bestscores[$qn],$qn);
+						if ($GLOBALS['questionmanualgrade'] == true) {
+							echo '<br/><strong>Note:</strong> This question contains parts that can not be auto-graded.  Those parts will show a score of 0 until they are graded by your instructor';
+						}
 						echo "</p>";
+						
+						$colors = scorestocolors($rawscore,$qi[$questions[$qn]]['points'],$qi[$questions[$qn]]['answeights']);
+					} else {
+						echo '<p>Question scored.</p>';
 					}
-					echo "<p>";
-					echo "Score on last attempt: ";
-					echo printscore($scores[$qn],$qn);
-					echo "<br/>\n";
-					echo "Score in gradebook: ";
-					echo printscore($bestscores[$qn],$qn);
-					if ($GLOBALS['questionmanualgrade'] == true) {
-						echo '<br/><strong>Note:</strong> This question contains parts that can not be auto-graded.  Those parts will show a score of 0 until they are graded by your instructor';
-					}
-					echo "</p>";
-					
-					$colors = scorestocolors($rawscore,$qi[$questions[$qn]]['points'],$qi[$questions[$qn]]['answeights']);
-				} else {
-					echo '<p>Question scored.</p>';
 				}
 				
 			}
@@ -1523,7 +1531,8 @@ if (!isset($_POST['embedpostback'])) {
 				echo "<p><a href=\"showtest.php?regen=$qn&page=$page\">Try another similar question</a></p>\n";
 			}
 			if (hasreattempts($qn)) {
-				echo '</div>';
+				if ($divopen) { echo '</div>';}
+					
 		
 				ob_start();
 				basicshowq($qn,false,$colors);
@@ -1532,40 +1541,50 @@ if (!isset($_POST['embedpostback'])) {
 				echo $quesout;
 				
 			} else {
-				echo "<p>No attempts remain on this problem.</p>";
-				if ($showeachscore) {
-					$msg =  "<p>This question, with your last answer";
-					if (($showansafterlast && $qi[$questions[$qn]]['showans']=='0') || $qi[$questions[$qn]]['showans']=='F' || $qi[$questions[$qn]]['showans']=='J') {
-						$msg .= " and correct answer";
-						$showcorrectnow = true;
-					} else if ($showansduring && $qi[$questions[$qn]]['showans']=='0' && $qi[$questions[$qn]]['showans']=='0' && $testsettings['showans']==$attempts[$qn]) {
-						$msg .= " and correct answer";
-						$showcorrectnow = true;
+				if (!$sessiondata['istutorial']) {
+					echo "<p>No attempts remain on this problem.</p>";
+					if ($showeachscore) {
+						$msg =  "<p>This question, with your last answer";
+						if (($showansafterlast && $qi[$questions[$qn]]['showans']=='0') || $qi[$questions[$qn]]['showans']=='F' || $qi[$questions[$qn]]['showans']=='J') {
+							$msg .= " and correct answer";
+							$showcorrectnow = true;
+						} else if ($showansduring && $qi[$questions[$qn]]['showans']=='0' && $qi[$questions[$qn]]['showans']=='0' && $testsettings['showans']==$attempts[$qn]) {
+							$msg .= " and correct answer";
+							$showcorrectnow = true;
+						} else {
+							$showcorrectnow = false;
+						}
+						if ($showcorrectnow) {
+							echo $msg . ', is displayed below</p>';
+							echo '</div>';
+							displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],2,false,$attempts[$qn],false,false,true,$colors);
+						} else {
+							echo $msg . ', is displayed below</p>';
+							echo '</div>';
+							displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],0,false,$attempts[$qn],false,false,true,$colors);
+						}
+						
 					} else {
-						$showcorrectnow = false;
-					}
-					if ($showcorrectnow) {
-						echo $msg . ', is displayed below</p>';
 						echo '</div>';
-						displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],2,false,$attempts[$qn],false,false,true,$colors);
-					} else {
-						echo $msg . ', is displayed below</p>';
-						echo '</div>';
-						displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],0,false,$attempts[$qn],false,false,true,$colors);
+						if ($testsettings['showans']!='N') {
+							displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],0,false,$attempts[$qn],false,false,true,$colors);
+						}
 					}
-					
 				} else {
-					echo '</div>';
-					if ($testsettings['showans']!='N') {
-						displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],0,false,$attempts[$qn],false,false,true,$colors);
-					}
+					if ($divopen) { echo '</div>';}
 				}
 					
 			}
+			
 			showqinfobar($qn,true,false);
+			
 			echo '<script type="text/javascript">document.getElementById("disptime").value = '.time().'; embedattemptedtrack["q'.$qn.'"][1]=0;';
 			if (false && $showeachscore) {
 				echo 'embedattemptedtrack["q'.$qn.'"][2]='. (canimprove($qn)?"1":"0") . ';';
+			}
+			if ($showeachscore) {
+				$pts = getpts($bestscores[$qn]);
+				echo 'embedattemptedtrack["q'.$qn.'"][3]='. (($pts>0)?$pts:0) . ';';
 			}
 			echo 'updateembednav();</script>';
 			exit;
@@ -1832,7 +1851,9 @@ if (!isset($_POST['embedpostback'])) {
 				$qmax = count($questions);
 				$dopage = false;
 			}
-			$intro .= "<p>Total Points Possible: " . totalpointspossible($qi) . "</p>";
+			if (!$sessiondata['istutorial']) {
+				$intro .= "<p>Total Points Possible: " . totalpointspossible($qi) . "</p>";
+			}
 			
 			for ($i = $qmin; $i < $qmax; $i++) {
 				if ($qi[$questions[$i]]['points']==0 || $qi[$questions[$i]]['withdrawn']==1) {
@@ -1849,38 +1870,41 @@ if (!isset($_POST['embedpostback'])) {
 					$quesout = substr($quesout,0,-7).'<br/><input type="button" class="btn" value="Submit" onclick="assessbackgsubmit('.$i.',\'submitnotice'.$i.'\')" /><span id="submitnotice'.$i.'"></span></div>';
 					
 				} else {
-					echo '<div class="prequestion">';
-					echo "<p>No attempts remain on this problem.</p>";
-					if ($allowregen && $qi[$questions[$i]]['allowregen']==1) {
-						echo "<p><a href=\"showtest.php?regen=$i\">Try another similar question</a></p>\n";
-					}
-					if ($showeachscore) {
-						$msg =  "<p>This question, with your last answer";
-						if (($showansafterlast && $qi[$questions[$i]]['showans']=='0') || $qi[$questions[$i]]['showans']=='F' || $qi[$questions[$i]]['showans']=='J') {
-							$msg .= " and correct answer";
-							$showcorrectnow = true;
-						} else if ($showansduring && $qi[$questions[$i]]['showans']=='0' && $qi[$questions[$i]]['showans']=='0' && $testsettings['showans']==$attempts[$i]) {
-							$msg .= " and correct answer";
-							$showcorrectnow = true;
+					if (!$sessiondata['istutorial']) {
+						echo '<div class="prequestion">';
+						echo "<p>No attempts remain on this problem.</p>";
+						if ($allowregen && $qi[$questions[$i]]['allowregen']==1) {
+							echo "<p><a href=\"showtest.php?regen=$i\">Try another similar question</a></p>\n";
+						}
+						if ($showeachscore) {
+							$msg =  "<p>This question, with your last answer";
+							if (($showansafterlast && $qi[$questions[$i]]['showans']=='0') || $qi[$questions[$i]]['showans']=='F' || $qi[$questions[$i]]['showans']=='J') {
+								$msg .= " and correct answer";
+								$showcorrectnow = true;
+							} else if ($showansduring && $qi[$questions[$i]]['showans']=='0' && $qi[$questions[$i]]['showans']=='0' && $testsettings['showans']==$attempts[$i]) {
+								$msg .= " and correct answer";
+								$showcorrectnow = true;
+							} else {
+								$showcorrectnow = false;
+							}
+							if ($showcorrectnow) {
+								echo $msg . ', is displayed below</p>';
+								echo '</div>';
+								displayq($i,$qi[$questions[$i]]['questionsetid'],$seeds[$i],2,false,$attempts[$i],false,false,true);
+							} else {
+								echo $msg . ', is displayed below</p>';
+								echo '</div>';
+								displayq($i,$qi[$questions[$i]]['questionsetid'],$seeds[$i],0,false,$attempts[$i],false,false,true);
+							}
+							
 						} else {
-							$showcorrectnow = false;
-						}
-						if ($showcorrectnow) {
-							echo $msg . ', is displayed below</p>';
 							echo '</div>';
-							displayq($i,$qi[$questions[$i]]['questionsetid'],$seeds[$i],2,false,$attempts[$i],false,false,true);
-						} else {
-							echo $msg . ', is displayed below</p>';
-							echo '</div>';
-							displayq($i,$qi[$questions[$i]]['questionsetid'],$seeds[$i],0,false,$attempts[$i],false,false,true);
-						}
-						
-					} else {
-						echo '</div>';
-						if ($testsettings['showans']!='N') {
-							displayq($i,$qi[$questions[$i]]['questionsetid'],$seeds[$i],0,false,$attempts[$i],false,false,true);
+							if ($testsettings['showans']!='N') {
+								displayq($i,$qi[$questions[$i]]['questionsetid'],$seeds[$i],0,false,$attempts[$i],false,false,true);
+							}
 						}
 					}
+					
 					$quesout .= ob_get_clean();
 				}
 				ob_start();
@@ -1896,7 +1920,9 @@ if (!isset($_POST['embedpostback'])) {
 				echo '</div>';
 			}
 			echo '</form>';
-			echo "<p><a href=\"showtest.php?action=embeddone\">Click here to finalize assessment and summarize score</a></p>\n";
+			if (!$sessiondata['istutorial']) {
+				echo "<p><a href=\"showtest.php?action=embeddone\">Click here to finalize assessment and summarize score</a></p>\n";
+			}
 					
 			
 		}
@@ -1906,7 +1932,7 @@ if (!isset($_POST['embedpostback'])) {
 	require("../footer.php");
 	
 	function showembednavbar($pginfo,$curpg) {
-		global $imasroot,$scores,$showeachscore;
+		global $imasroot,$scores,$bestscores,$showeachscore,$qi,$questions;
 		echo "<a href=\"#beginquestions\"><img class=skipnav src=\"$imasroot/img/blank.gif\" alt=\"Skip Navigation\" /></a>\n";
 		
 		echo '<div class="navbar" style="width:125px">';
@@ -1930,6 +1956,8 @@ if (!isset($_POST['embedpostback'])) {
 			
 				$cntunans = 0;
 				$cntcanimp = 0;
+				$pgposs = 0;
+				$pgpts = 0;
 				for($j=$qmin;$j<$qmax;$j++) {
 					$bit = "\"q$j\":[$i,";
 					if (unans($scores[$j])) {
@@ -1940,16 +1968,26 @@ if (!isset($_POST['embedpostback'])) {
 					}
 					if (canimprove($j)) {
 						$cntcanimp++;
-						$bit .= "1]";
+						$bit .= "1,";
 					} else {
-						$bit .= "0]";
+						$bit .= "0,";
 					}
+					$curpts = getpts($bestscores[$j]);
+					if ($curpts<0) { $curpts = 0;}
+					$bit .= $curpts.']';
+					$pgposs += $qi[$questions[$j]]['points'];
+					$pgpts += $curpts;
 					$jsonbits[] = $bit;
 				}
 				echo '<br/>';
-				echo " <span id=\"embednavunans$i\" style=\"margin-left:8px\">$cntunans</span> unattempted";
-				if (false && $showeachscore) {
-					echo "<br/><span id=\"embednavcanimp$i\" style=\"margin-left:8px\">$cntcanimp</span> can be improved";
+				
+				//if (false && $showeachscore) {
+				///	echo "<br/><span id=\"embednavcanimp$i\" style=\"margin-left:8px\">$cntcanimp</span> can be improved";
+				//}
+				if ($showeachscore) {
+					echo " <span id=\"embednavscore$i\" style=\"margin-left:8px\">".round($pgpts,1)." point".(($pgpts==1)?"":"s")."</span> out of $pgposs";
+				} else {
+					echo " <span id=\"embednavunans$i\" style=\"margin-left:8px\">$cntunans</span> unattempted";
 				}
 			}
 			echo "</li>\n";
@@ -1959,6 +1997,7 @@ if (!isset($_POST['embedpostback'])) {
 		echo '<script type="text/javascript">function updateembednav() {
 			var unanscnt = [];
 			var canimpcnt = [];
+			var pgpts = [];
 			var pgmax = -1;
 			for (var i in embedattemptedtrack) {
 				if (embedattemptedtrack[i][0] > pgmax) {
@@ -1968,6 +2007,8 @@ if (!isset($_POST['embedpostback'])) {
 			for (var i=0; i<=pgmax; i++) {
 				unanscnt[i] = 0;
 				canimpcnt[i] = 0;
+				pgpts[i] = 0;
+				
 			}
 			for (var i in embedattemptedtrack) {
 				if (embedattemptedtrack[i][1]==1) {
@@ -1976,15 +2017,23 @@ if (!isset($_POST['embedpostback'])) {
 				if (embedattemptedtrack[i][2]==1) {
 					canimpcnt[embedattemptedtrack[i][0]]++;
 				}
+				pgpts[embedattemptedtrack[i][0]] += embedattemptedtrack[i][3];
 			}
 			for (var i=0; i<=pgmax; i++) {
-				var el = document.getElementById("embednavunans"+i);
-				if (el != null) {
-					document.getElementById("embednavunans"+i).innerHTML = unanscnt[i];
 				';
-		if (false && $showeachscore) {
-				echo 'document.getElementById("embednavcanimp"+i).innerHTML = canimpcnt[i];';
+		//if (false && $showeachscore) {
+		//		echo 'document.getElementById("embednavcanimp"+i).innerHTML = canimpcnt[i];';
+		//}
+		if ($showeachscore) {
+				echo 'var el = document.getElementById("embednavscore"+i);';
+				echo 'if (el != null) {';
+				echo '	el.innerHTML = pgpts[i] + ((pgpts[i]==1) ? " point" : " points");';
+		} else {
+				echo 'var el = document.getElementById("embednavunans"+i);';
+				echo 'if (el != null) {';
+				echo '	el.innerHTML = unanscnt[i];';
 		}
+				
 		echo '}}}</script>';
 		echo '</div>';	
 	}
@@ -2128,7 +2177,7 @@ if (!isset($_POST['embedpostback'])) {
 	}
 	
 	function showscores($questions,$attempts,$testsettings) {
-		global $isdiag,$allowregen,$isreview,$noindivscores,$scores,$bestscores,$qi,$superdone,$timelimitkickout;
+		global $isdiag,$allowregen,$isreview,$noindivscores,$scores,$bestscores,$qi,$superdone,$timelimitkickout, $reviewatend;
 		if ($isdiag) {
 			global $userid;
 			$query = "SELECT * from imas_users WHERE id='$userid'";
@@ -2141,7 +2190,7 @@ if (!isset($_POST['embedpostback'])) {
 		
 		echo "<h3>Scores:</h3>\n";
 		
-		if (!$noindivscores) {
+		if (!$noindivscores && !$reviewatend) {
 			echo "<table class=scores>";
 			for ($i=0;$i < count($scores);$i++) {
 				echo "<tr><td>";
@@ -2274,6 +2323,24 @@ if (!isset($_POST['embedpostback'])) {
 				include("../assessment/catscores.php");
 				catscores($questions,$bestscores,$testsettings['defpoints']);
 			}
+		}
+		if ($reviewatend) {
+			global $testtype, $scores, $saenddate, $isteacher, $istutor, $seeds, $attempts;
+			
+			$showa=false;
+			
+			for ($i=0; $i<count($questions); $i++) {
+				echo '<div>';
+				$col = scorestocolors($scores[$i], $qi[$questions[$i]]['points'], $qi[$questions[$i]]['answeights']);
+				displayq($i, $qi[$questions[$i]]['questionsetid'],$seeds[$i],$showa,false,$attempts[$i],false,false,false,$col);
+				echo "<div class=review>Question ".($i+1).". Last Attempt:";
+				echo printscore($scores[$i], $i);
+
+				echo '<br/>Score in Gradebook: ';
+				echo printscore($bestscores[$i],$i);
+				echo '</div>';
+			}
+				
 		}
 			
 		
