@@ -294,9 +294,10 @@ if (!(isset($teacherid))) {
 		$names = array();
 		$sums = array();
 		$parents = array();
+		$agbcats = array();
 		getsubinfo($items,'0','','Assessment');
 		
-		$query = "SELECT id,name FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
+		$query = "SELECT id,name,gbcategory FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		if (mysql_num_rows($result)==0) {
 			$page_assessListMsg = "<li>No Assessments to change</li>\n";
@@ -307,14 +308,17 @@ if (!(isset($teacherid))) {
 			while ($row = mysql_fetch_row($result)) {
 				$page_assessSelect['val'][$i] = $row[0];
 				$page_assessSelect['label'][$i] = $row[1];
+				$agbcats[$row[0]] = $row[2];
 				$i++;
 			}
 		}	
 		
 		$query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$i=0;
+		$i=1;
 		$page_gbcatSelect = array();
+		$page_gbcatSelect['val'][0] = 0;
+		$page_gbcatSelect['label'][0] ='Default';
 		if (mysql_num_rows($result)>0) {
 			while ($row = mysql_fetch_row($result)) {
 				$page_gbcatSelect['val'][$i] = $row[0];
@@ -391,6 +395,18 @@ function chkgrp(frm, arr, mark) {
 		  }
 	  }
 }
+
+function chkgbcat(cat) {
+	chkAllNone('qform','checked[]',false);
+	var els = document.getElementById("alistul").getElementsByTagName("input");
+	var regExp = new RegExp(":"+cat+"$");
+	for (var i = 0; i < els.length; i++) {
+		  var el = els[i];
+		  if (el.type=='checkbox' && el.id.match(regExp)) {
+	     	       el.checked = true;
+		  }
+	}	
+}
 </script>
 
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
@@ -405,8 +421,12 @@ function chkgrp(frm, arr, mark) {
 	<form id="qform" method=post action="chgassessments.php?cid=<?php echo $cid; ?>">
 		<h3>Assessments to Change</h3>
 
-		Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
-		<ul class=nomark>
+		Check: <a href="#" onclick="document.getElementById('selbygbcat').selectedIndex=0;return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="document.getElementById('selbygbcat').selectedIndex=0;return chkAllNone('qform','checked[]',false)">None</a>
+		Check by catgory: 
+		<?php 
+		writeHtmlSelect ("selbygbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],null,"Select...",-1,' onchange="chkgbcat(this.value);" id="selbygbcat" ');
+		?>
+		<ul id="alistul" class=nomark>
 <?php
 	echo $page_assessListMsg;
 	$inblock = 0;
@@ -425,7 +445,7 @@ function chkgrp(frm, arr, mark) {
 					$blockout = '';
 				}
 				echo '<li>';
-				echo "<input type=checkbox name='checked[]' value='{$gitypeids[$i]}' id='{$parents[$i]}.{$ids[$i]}' checked=checked ";
+				echo "<input type=checkbox name='checked[]' value='{$gitypeids[$i]}' id='{$parents[$i]}.{$ids[$i]}:{$agbcats[$gitypeids[$i]]}' checked=checked ";
 				echo '/>';
 				$pos = strrpos($types[$i],'-');
 				if ($pos!==false) {
@@ -668,7 +688,7 @@ function chkgrp(frm, arr, mark) {
 				<td class="r">Gradebook category: </td>
 				<td>
 <?php 
-writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],null,"Default",0," id=gbcat");
+writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],null,null,null," id=gbcat");
 ?>
 
 				</td>
