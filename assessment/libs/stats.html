@@ -9,6 +9,7 @@ A library of Stats functions.  Version 1.9, March 30, 2008
 <li><a href="#stdev">stdev</a></li>
 <li><a href="#percentile">percentile</a></li>
 <li><a href="#quartile">quartile</a></li>
+<li><a href="#TIquartile">TIquartile</a></li>
 <li><a href="#median">median</a></li>
 <li><a href="#freqdist">freqdist</a></li>
 <li><a href="#frequency">frequency</a></li>
@@ -30,6 +31,7 @@ A library of Stats functions.  Version 1.9, March 30, 2008
 <li><a href="#invchi2cdf">invchi2cdf</a></li>
 <li><a href="#fcdf">fcdf</a></li>
 <li><a href="#invfcdf">invfcdf</a></li>
+<li><a href="#mosaicplot">mosaicplot</a></li>
 </ul>
 <h3><a name="nCr">nCr</a></h3>
 nCr(n,r)
@@ -54,6 +56,10 @@ percentile(array,percentile)
 quartile(array,quartile)
 <BR>finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
 <BR>array of numbers.  Calculates using percentiles.
+<BR><h3><a name="TIquartile">TIquartile</a></h3>
+TIquartile(array,quartile)
+<BR>finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
+<BR>array of numbers.  Calculates using the TI-84 method.
 <BR><h3><a name="median">median</a></h3>
 median(array)
 <BR>returns the median of an array of numbers
@@ -172,4 +178,12 @@ invfcdf(p,df1,df2)
 <BR>with degrees of freedom df1 and df2
 <BR>Algorithm is accurate to approximately 2-4 decimal places
 <BR>Less accurate for smaller p-values
+<BR><h3><a name="mosaicplot">mosaicplot</a></h3>
+mosaicplot(rowlabels, columnlabels, count matrix, [width, height])
+<BR>creates a mosaic plot (See http://www.wamap.org/course/showlinkedtextpublic.php?cid=1383&id=82972)
+<BR>rowlabels: an array of labels for the rows of the display
+<BR>columnlabels: an array of labels for the columns of the display
+<BR>count matrix: a 2-dimensional array.  $m[1][5] will give the count for
+<BR>  rowlabel[1] and columnlabel[5]
+<BR>width and height are optional, default to 300 by 300.  Does not include labels
 <BR>

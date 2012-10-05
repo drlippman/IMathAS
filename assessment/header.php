@@ -37,6 +37,7 @@ if ($isdiag) {
 } else {
 	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/assessment/print.css\" media=\"print\"/>\n";
 }
+//$sessiondata['mathdisp'] = 3;
 if (!isset($sessiondata['mathdisp'])) {
 	echo '<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false;</script>';
 	echo "<script src=\"$imasroot/javascript/mathgraphcheck.js?v=091311\" type=\"text/javascript\"></script>\n";
@@ -49,7 +50,12 @@ if (!isset($sessiondata['mathdisp'])) {
 	echo "<script type=\"text/javascript\">var usingASCIIMath = false;</script>";
 } else if ($sessiondata['mathdisp']==0) {
 	echo '<script type="text/javascript">var noMathRender = true; var usingASCIIMath = false;</script>';	
-}
+} /*
+Need to resolve:  including ASCIIMathTeXImg for editor, working around AMprocessNode conflict
+else if ($sessiondata['mathdisp']==3) {
+	echo '<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_HTMLorMML"></script>';
+	echo '<script type="text/javascript">noMathRender = false; function AMprocessNode(node) { MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]); }</script>'; 
+}*/
 
 if ($sessiondata['graphdisp']==1) {
 	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?v=081312\" type=\"text/javascript\"></script>\n";

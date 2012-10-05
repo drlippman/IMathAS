@@ -2,7 +2,7 @@
 //A library of Stats functions.  Version 1.9, March 30, 2008
 
 global $allowedmacros;
-array_push($allowedmacros,"nCr","nPr","mean","stdev","percentile","quartile","TIquartile","median","freqdist","frequency","histogram","fdhistogram","fdbargraph","normrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","countif","binomialpdf","binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart");
+array_push($allowedmacros,"nCr","nPr","mean","stdev","percentile","quartile","TIquartile","median","freqdist","frequency","histogram","fdhistogram","fdbargraph","normrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","countif","binomialpdf","binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart","mosaicplot");
 
 //nCr(n,r)
 //The Choose function
@@ -1164,4 +1164,49 @@ function invfcdf($p,$df1,$df2) {
 	return $f;
 	
 }
+
+//mosaicplot(rowlabels, columnlabels, count matrix, [width, height])
+//creates a mosaic plot (See http://www.wamap.org/course/showlinkedtextpublic.php?cid=1383&id=82972)
+//rowlabels: an array of labels for the rows of the display
+//columnlabels: an array of labels for the columns of the display
+//count matrix: a 2-dimensional array.  $m[1][5] will give the count for
+//  rowlabel[1] and columnlabel[5]
+//width and height are optional, default to 300 by 300.  Does not include labels
+function mosaicplot($rlbl,$clbl,$m, $w = 300, $h=300) {
+	$out = '<div>';
+	$nrow = count($m);
+	$ncol = count($m[0]);
+	$cols = array('#f00','#0f0','#00f','#ff0','#f0f','#0ff','#fa0','#ccc','#066','#909','#06f');
+	$ccnt = array_fill(0,$ncol,0);
+	for ($j=0;$j<$nrow;$j++) {
+		for ($i=0;$i<$ncol;$i++) {
+			$ccnt[$i] += $m[$j][$i];
+		}
+	}
+	$ctot = array_sum($ccnt);
+	$widths = array();
+
+	for ($i=0;$i<$ncol;$i++) {
+		$widths[$i] = round($w*$ccnt[$i]/$ctot);
+	}
+	
+	$out .= '<table style="float:left;"><tbody>';
+	$out .= '<tr><td style="height: 3em;">&nbsp;</td></tr>';
+	for ($j=0;$j<$nrow;$j++) {
+		$out .= '<tr><td style="height: '.round($h*$m[$j][0]/$ccnt[0]).'px; text-align: right;">'.$rlbl[$j].'</td></tr>';
+	}
+	$out .= '</tbody></table>';
+	for ($i=0;$i<$ncol;$i++) {
+		$out .= '<table style="table-layout: fixed; float:left;"><tbody>';	
+		$out .= '<tr style="line-height: 1px;"><td style="text-align: center; width: '.$widths[$i].'px; height: 3em;">'.$clbl[$i].'</td></tr>';
+		for ($j=0;$j<$nrow;$j++) {
+			$out .= '<tr style="line-height: 1px;"><td style="height: '.round($h*$m[$j][$i]/$ccnt[$i]).'px; background-color: '.$cols[$j].';">&nbsp;</td></tr>';
+		}
+		$out .= '</tbody></table>';
+	}
+	$out .= '<div style="height: 1px; clear: left;">&nbsp;</div></div>';
+	return $out;
+}
+
+
 ?>

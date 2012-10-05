@@ -63,13 +63,14 @@ row[0][1][0][10] = 0 regular, 1 group
 
 row[0][2] category totals
 row[0][2][0][0] = "Category Name"
-row[0][2][0][1] = "Category"
+row[0][2][0][1] = Category color #
 row[0][2][0][2] = 0 if any scores in past, 1 if any scores in past/current, 2 if all scores in future
 		  3 no items at all
 row[0][2][0][3] = total possible for past
 row[0][2][0][4] = total possible for past/current
 row[0][2][0][5] = total possible for all
 row[0][2][0][6-9] = 5 number summary
+row[0][2][0][10] = gbcat id
 
 row[0][3][0] = total possible past
 row[0][3][1] = total possible past&current
@@ -108,15 +109,15 @@ row[1][2][0][3] = cat total attempted
 row[1][2][0][4] = cat poss attempted
 
 row[1][3] total totals
-row[1][3][0] = total possible past
-row[1][3][1] = total possible past&current
-row[1][3][2] = total possible all
-row[1][3][3] = % past - null if weighted graded
-row[1][3][4] = % past&current
-row[1][3][5] = % all
-row[1][3][6] = total earned attempted
-row[1][3][7] = total possible attempted
-row[1][3][8] = % past and attempted
+row[1][3][0] = total possible past	 (% if weighted)
+row[1][3][1] = total possible past&current   (% if weighted)
+row[1][3][2] = total possible all	 (% if weighted)
+row[1][3][3] = % past 			 (null if weighted)
+row[1][3][4] = % past&current  		 (null if weighted)
+row[1][3][5] = % all 			 (null if weighted)
+row[1][3][6] = total earned attempted    (% if weighted)
+row[1][3][7] = total possible attempted  (null if weighted)
+row[1][3][8] = % past and attempted      (null if weighted)
 
 row[1][4][0] = userid
 row[1][4][1] = locked?
@@ -591,6 +592,7 @@ function gbtable() {
 		
 		$gb[0][2][$pos][0] = $cats[$cat][0];
 		$gb[0][2][$pos][1] = $cats[$cat][7];
+		$gb[0][2][$pos][10] = $cat;
 		if ($catposspast[$cat]>0 || count($catposspastec[$cat])>0) {
 			$gb[0][2][$pos][2] = 0; //scores in past
 			$cattotweightpast += $cats[$cat][5];

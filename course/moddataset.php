@@ -102,9 +102,9 @@
 	
 	if (isset($_POST['qtext'])) {
 		$now = time();
-		$_POST['qtext'] = stripsmartquotes($_POST['qtext']);
-		$_POST['control'] = stripsmartquotes($_POST['control']);
-		$_POST['qcontrol'] = stripsmartquotes($_POST['qcontrol']);
+		$_POST['qtext'] = addslashes(stripsmartquotes(stripslashes($_POST['qtext'])));
+		$_POST['control'] = addslashes(stripsmartquotes(stripslashes($_POST['control'])));
+		$_POST['qcontrol'] = addslashes(stripsmartquotes(stripslashes($_POST['qcontrol'])));
 		
 		//handle help references
 		if (isset($_GET['id']) || isset($_GET['templateid'])) {

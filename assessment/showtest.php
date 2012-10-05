@@ -1578,15 +1578,19 @@ if (!isset($_POST['embedpostback'])) {
 			
 			showqinfobar($qn,true,false);
 			
-			echo '<script type="text/javascript">document.getElementById("disptime").value = '.time().'; embedattemptedtrack["q'.$qn.'"][1]=0;';
-			if (false && $showeachscore) {
-				echo 'embedattemptedtrack["q'.$qn.'"][2]='. (canimprove($qn)?"1":"0") . ';';
+			echo '<script type="text/javascript">document.getElementById("disptime").value = '.time().';';
+			if (strpos($testsettings['intro'],'[PAGE')!==false) {
+				echo 'embedattemptedtrack["q'.$qn.'"][1]=0;';
+				if (false && $showeachscore) {
+					echo 'embedattemptedtrack["q'.$qn.'"][2]='. (canimprove($qn)?"1":"0") . ';';
+				}
+				if ($showeachscore) {
+					$pts = getpts($bestscores[$qn]);
+					echo 'embedattemptedtrack["q'.$qn.'"][3]='. (($pts>0)?$pts:0) . ';';
+				}
+				echo 'updateembednav();';
 			}
-			if ($showeachscore) {
-				$pts = getpts($bestscores[$qn]);
-				echo 'embedattemptedtrack["q'.$qn.'"][3]='. (($pts>0)?$pts:0) . ';';
-			}
-			echo 'updateembednav();</script>';
+			echo '</script>';
 			exit;
 			
 		}
