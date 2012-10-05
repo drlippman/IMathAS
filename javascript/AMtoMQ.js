@@ -709,6 +709,7 @@ return function(str) {
 n\frac{num}{denom} to n num/denom
 */
 function MQtoAM(tex) {
+	alert(tex);
 	tex = tex.replace(/\\:/g,' ');
 	while ((i=tex.indexOf('\\left|'))!=-1) { //found a left |
 		nested = 0;
@@ -765,6 +766,6 @@ function MQtoAM(tex) {
 	tex = tex.replace(/\/\(([\d\.]+)\)/g,'/$1');  //change /(3) to /3
 	tex = tex.replace(/_{(\d+)}/g,'_$1');
 	tex = tex.replace(/\^\(-1\)/g,'^-1');
-	
+	tex = tex.replace(/\^\((-?[\d\.]+)\)/g,'^$1');
 	return tex;
 }

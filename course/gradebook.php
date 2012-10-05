@@ -1054,7 +1054,7 @@ function gbinstrdisp() {
 		if ($catfilter<0) {
 			if (isset($gbt[0][3][0])) { //using points based
 				echo '<th><div><span class="cattothdr">Total<br/>'.$gbt[0][3][$availshow].'&nbsp;pts</span></div></th>';
-				echo '<th>%</th>';
+				echo '<th><div>%</div></th>';
 				$n+=2;
 			} else {
 				echo '<th><div><span class="cattothdr">Weighted Total %</span></div></th>';
