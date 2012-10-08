@@ -525,7 +525,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 			}
 		}
 		echo '<option value="-1:-1" ';
-		if ($colorize = "-1:-1") { echo 'selected="selected" ';}
+		if ($colorize == "-1:-1") { echo 'selected="selected" ';}
 		echo '>Active</option>';
 		echo '</select>';
 		echo ' | <a href="#" onclick="chgnewflag(); return false;">NewFlag</a>';
