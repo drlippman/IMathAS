@@ -709,7 +709,7 @@ return function(str) {
 n\frac{num}{denom} to n num/denom
 */
 function MQtoAM(tex) {
-	alert(tex);
+	//alert(tex);
 	tex = tex.replace(/\\:/g,' ');
 	while ((i=tex.indexOf('\\left|'))!=-1) { //found a left |
 		nested = 0;
