@@ -39,12 +39,17 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$row = mysql_fetch_row($result);
 		if ($row != null) {
-			$query = "UPDATE imas_exceptions SET startdate=$startdate,enddate=$enddate WHERE id='{$row[0]}'";
+			$query = "UPDATE imas_exceptions SET startdate=$startdate,enddate=$enddate,islatepass=0 WHERE id='{$row[0]}'";
 			mysql_query($query) or die("Query failed :$query " . mysql_error());
 		} else {
 			$query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate) VALUES ";
 			$query .= "('{$_GET['uid']}','{$_GET['aid']}',$startdate,$enddate)";
 			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+		}
+		if (isset($_POST['eatlatepass'])) {
+			$n = intval($_POST['latepassn']);
+			$query = "UPDATE imas_students SET latepass = CASE WHEN latepass>$n THEN latepass-$n ELSE 0 END WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
+			mysql_query($query) or die("Query failed :$query " . mysql_error());
 		}
 		
 		//force regen?
@@ -179,7 +184,7 @@ if ($overwriteBody==1) {
 		<div class=submit><input type=submit value="Submit"></div>
 		<p><input type="checkbox" name="forceregen"/> Force student to work on new versions of all questions?  Students 
 		will keep any scores earned, but must work new versions of questions to improve score.</p>
-	
+		<p><input type="checkbox" name="eatlatepass"/> Deduct <input type="input" name="latepassn" size="1" value="1"/> LatePass(es).</p>
 	</form>
 
 <?php

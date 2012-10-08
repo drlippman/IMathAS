@@ -26,7 +26,7 @@
 					$query .= "('$stu','$aid',$startdate,$enddate)";
 				} else {
 					$eid = mysql_result($result,0,0);
-					$query = "UPDATE imas_exceptions SET startdate=$startdate,enddate=$enddate WHERE id=$eid";
+					$query = "UPDATE imas_exceptions SET startdate=$startdate,enddate=$enddate,islatepass=0 WHERE id=$eid";
 				}
 				mysql_query($query) or die("Query failed :$query " . mysql_error());	
 				if (isset($_POST['forceregen'])) {
@@ -74,6 +74,12 @@
 				}
 					
 			}
+		}
+		if (isset($_POST['eatlatepass'])) {
+			$n = intval($_POST['latepassn']);
+			$tolist = implode("','",explode(',',$_POST['tolist']));
+			$query = "UPDATE imas_students SET latepass = CASE WHEN latepass>$n THEN latepass-$n ELSE 0 END WHERE userid IN ('$tolist') AND courseid='$cid'";
+			mysql_query($query) or die("Query failed :$query " . mysql_error());
 		}
 		if (isset($_POST['sendmsg'])) {
 			$_POST['submit'] = "Message";
@@ -245,6 +251,8 @@
 	echo 'will keep any scores earned, but must work new versions of questions to improve score.</p>';
 	echo '<p><input type="checkbox" name="forceclear"/> Clear student\'s attempts?  Students ';
 	echo 'will <b>not</b> keep any scores earned, and must rework all problems.</p>';
+	
+	echo '<p><input type="checkbox" name="eatlatepass"/> Deduct <input type="input" name="latepassn" size="1" value="1"/> LatePass(es) from each student.</p>';
 	
 	echo '<p><input type="checkbox" name="sendmsg"/> Send message to these students?</p>';
 	

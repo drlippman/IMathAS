@@ -398,7 +398,7 @@
 					}
 				}
 			} else { //in exception
-				if ($adata['enddate']<$now) { //exception is for past-due-date
+				if ($testsettings['enddate']<$now) { //exception is for past-due-date
 					$inexception = true;	
 				}
 			}

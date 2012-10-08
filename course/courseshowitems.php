@@ -23,7 +23,7 @@ function enditem($canedit) {
 
   function showitems($items,$parent,$inpublic=false) {
 	   global $teacherid,$tutorid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift;
-	   global $hideicons,$exceptions,$latepasses,$graphicalicons,$ispublic,$studentinfo,$newpostcnts,$CFG;
+	   global $hideicons,$exceptions,$latepasses,$graphicalicons,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs;
 	   
 	   if (!isset($CFG['CPS']['itemicons'])) {
 	   	   $itemicons = array('folder'=>'folder2.gif', 'assess'=>'assess.png',
@@ -445,7 +445,12 @@ function enditem($canedit) {
 				   $line['summary'] = '<p>'.$line['summary'].'</p>';
 			   }
 			   //check for exception
+			   $canundolatepass = false;
 			   if (isset($exceptions[$items[$i]])) {
+			   	   //if latepass and it's before original due date or exception is for more than a latepass past now
+			   	   if ($exceptions[$items[$i]][2]>0 && ($now < $line['enddate'] || $exceptions[$items[$i]][1] > $now + $latepasshrs*60*60)) {
+			   	   	   $canundolatepass = true;
+			   	   }
 				   $line['startdate'] = $exceptions[$items[$i]][0];
 				   $line['enddate'] = $exceptions[$items[$i]][1];
 			   }
@@ -540,8 +545,13 @@ function enditem($canedit) {
 					
 				   } else if ($line['allowlate']==1 && $latepasses>0) {
 					echo " <a href=\"redeemlatepass.php?cid=$cid&aid=$typeid\">Use LatePass</a>";
+					if ($canundolatepass) {
+						 echo " | <a href=\"redeemlatepass.php?cid=$cid&aid=$typeid&undo=true\">Un-use LatePass</a>";
+					}
 				   } else if ($line['allowlate']==1 && isset($sessiondata['stuview'])) {
 					echo " LatePass Allowed";
+				   } else if ($line['allowlate']==1 && $canundolatepass) {
+				   	   echo " <a href=\"redeemlatepass.php?cid=$cid&aid=$typeid&undo=true\">Un-use LatePass</a>";
 				   }
 				   echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
 				   enditem($canedit); //echo "</div>\n";

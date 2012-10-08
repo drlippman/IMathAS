@@ -10,7 +10,61 @@
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$hours = mysql_result($result,0,0);
 		
-	if (isset($_GET['confirm'])) {
+	if (isset($_GET['undo'])) {
+		require("../header.php");
+		echo "<div class=breadcrumb>$breadcrumbbase ";
+		if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
+			echo " <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
+		}
+		echo "Un-use LatePass</div>";
+		$query = "SELECT enddate,islatepass FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		if (mysql_num_rows($result)==0) {
+			echo '<p>Invalid</p>';
+		} else {
+			$row = mysql_fetch_row($result);
+			if ($row[1]==0) {
+				echo '<p>Invalid</p>';
+			} else {
+				$now = time();
+				$query = "SELECT enddate FROM imas_assessments WHERE id='$aid'";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$enddate = mysql_result($result,0,0);
+				//if it's past original due date and latepass is for less than latepasshrs past now, too late
+				if ($now > $enddate && $row[0] < $now + $hours*60*60) {
+					echo '<p>Too late to un-use this LatePass</p>';
+				} else {
+					if ($now < $enddate) { //before enddate, return all latepasses
+						$n = $row[1];
+						$query = "DELETE FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid'";
+						mysql_query($query) or die("Query failed : " . mysql_error());
+					} else { //figure how many are unused
+						$n = floor(($row[0] - $now)/($hours*60*60));
+						$newend = $row[0] - $n*$hours*60*60;
+						if ($row[1]>$n) {
+							$query = "UPDATE imas_exceptions SET islatepass=islatepass-$n,enddate=$newend WHERE userid='$userid' AND assessmentid='$aid'";
+							mysql_query($query) or die("Query failed : " . mysql_error());
+						} else {
+							$query = "DELETE FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid'";
+							mysql_query($query) or die("Query failed : " . mysql_error());
+							$n = $row[1];
+						}
+					}
+					echo "<p>Returning $n LatePass".($n>1?"es":"")."</p>";
+					$query = "UPDATE imas_students SET latepass=latepass+$n WHERE userid='$userid' AND courseid='$cid'";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+				}
+			}
+		}
+		
+		if ((!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
+			echo "<p><a href=\"course.php?cid=$cid\">Continue</a></p>";
+		} else {
+			echo "<p><a href=\"../assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}\">Continue</a></p>";
+		}
+		require("../footer.php");
+		
+	} else if (isset($_GET['confirm'])) {
 		$addtime = $hours*60*60;
 		$query = "SELECT allowlate,enddate,startdate FROM imas_assessments WHERE id='$aid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());

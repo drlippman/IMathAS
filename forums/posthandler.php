@@ -93,34 +93,53 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			$_GET['modify'] = $threadid;
 			$files = array();
 		} else if ($_GET['modify']=="reply") { //new reply post
-			$now = time();
-			$query = "INSERT INTO imas_forum_posts (forumid,threadid,subject,message,userid,postdate,parent,posttype,isanon) VALUES ";
-			$query .= "('$forumid','$threadid','{$_POST['subject']}','{$_POST['message']}','$userid',$now,'{$_GET['replyto']}',0,'$isanon')";
-			mysql_query($query) or die("Query failed : $query " . mysql_error());
-			$_GET['modify'] = mysql_insert_id();
 			
-			$query = "UPDATE imas_forum_threads SET lastposttime=$now,lastpostuser='$userid' WHERE id='$threadid'";
-			mysql_query($query) or die("Query failed : $query " . mysql_error());
-			
-			if ($isteacher && isset($_POST['points']) && trim($_POST['points'])!='') {
-				$query = "SELECT id FROM imas_grades WHERE gradetype='forum' AND refid='{$_GET['replyto']}'";
-				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-				if (mysql_num_rows($result)>0) {
-					$gradeid = mysql_result($result,0,0);
-					$query = "UPDATE imas_grades SET score='{$_POST['points']}' WHERE id=$gradeid";
-					//$query = "UPDATE imas_forum_posts SET points='{$_POST['points']}' WHERE id='{$_GET['replyto']}'";
-					mysql_query($query) or die("Query failed : $query " . mysql_error());
-				} else {
-					$query = "SELECT userid FROM imas_forum_posts WHERE id='{$_GET['replyto']}'";
+			$query = "SELECT userid FROM imas_forum_posts WHERE id='{$_GET['replyto']}'";
+			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			if (mysql_num_rows($result)==0) {//parent post deleted
+				$sendemail = false;
+				require("../header.php");
+				echo '<h2>Error:</h2><p>It looks like the post you were replying to was deleted.  Your post is below in case you ';
+				echo 'want to copy-and-paste it somewhere. <a href="'.$returnurl.'">Continue</a></p>';
+				echo '<hr>';
+				echo '<p>Message:</p><div class="editor">'.filter(stripslashes($_POST['message'])).'</div>';
+				echo '<p>HTML format:</p>';
+				echo '<div class="editor">'.htmlentities(stripslashes($_POST['message'])).'</div>';
+				require("../footer.php");
+				exit;
+			} else {
+				$uid = mysql_result($result,0,0);
+				
+				$now = time();
+				$query = "INSERT INTO imas_forum_posts (forumid,threadid,subject,message,userid,postdate,parent,posttype,isanon) VALUES ";
+				$query .= "('$forumid','$threadid','{$_POST['subject']}','{$_POST['message']}','$userid',$now,'{$_GET['replyto']}',0,'$isanon')";
+				mysql_query($query) or die("Query failed : $query " . mysql_error());
+				$_GET['modify'] = mysql_insert_id();
+				
+				$query = "UPDATE imas_forum_threads SET lastposttime=$now,lastpostuser='$userid' WHERE id='$threadid'";
+				mysql_query($query) or die("Query failed : $query " . mysql_error());
+				
+				if ($isteacher && isset($_POST['points']) && trim($_POST['points'])!='') {
+					$query = "SELECT id FROM imas_grades WHERE gradetype='forum' AND refid='{$_GET['replyto']}'";
 					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-					$uid = mysql_result($result,0,0);
-					$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,refid,score) VALUES ";
-					$query .= "('forum','$forumid','$uid','{$_GET['replyto']}','{$_POST['points']}')";
-					mysql_query($query) or die("Query failed : $query " . mysql_error());
+					if (mysql_num_rows($result)>0) {
+						$gradeid = mysql_result($result,0,0);
+						$query = "UPDATE imas_grades SET score='{$_POST['points']}' WHERE id=$gradeid";
+						//$query = "UPDATE imas_forum_posts SET points='{$_POST['points']}' WHERE id='{$_GET['replyto']}'";
+						mysql_query($query) or die("Query failed : $query " . mysql_error());
+					} else {
+						//moved up as a "did the post get deleted" check
+						//$query = "SELECT userid FROM imas_forum_posts WHERE id='{$_GET['replyto']}'";
+						//$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+						//$uid = mysql_result($result,0,0);
+						$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,refid,score) VALUES ";
+						$query .= "('forum','$forumid','$uid','{$_GET['replyto']}','{$_POST['points']}')";
+						mysql_query($query) or die("Query failed : $query " . mysql_error());
+					}
 				}
+				$sendemail = true;
+				$files = array();
 			}
-			$sendemail = true;
-			$files = array();
 		} else {
 			$query = "UPDATE imas_forum_posts SET subject='{$_POST['subject']}',message='{$_POST['message']}',isanon='$isanon',tag='$tag',posttype='$type' ";
 			$query .= "WHERE id='{$_GET['modify']}'";

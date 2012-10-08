@@ -15,7 +15,7 @@
    }
    $cid = $_GET['cid'];
    require("../filter/filter.php");
-   $query = "SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,topbar,cploc FROM imas_courses WHERE id='$cid'";
+   $query = "SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,topbar,cploc,latepasshrs FROM imas_courses WHERE id='$cid'";
    $result = mysql_query($query) or die("Query failed : " . mysql_error());
    $line = mysql_fetch_array($result, MYSQL_ASSOC);
    if ($line == null) {
@@ -28,6 +28,7 @@
    $pagetitle = $line['name'];
    $items = unserialize($line['itemorder']);
    $msgset = $line['msgset']%5;
+   $latepasshrs = $line['latepasshrs'];
    $useleftbar = ($line['cploc']==1);
    $topbar = explode('|',$line['topbar']);
    $topbar[0] = explode(',',$topbar[0]);
@@ -39,14 +40,14 @@
    $now = time() + $previewshift;
    $exceptions = array();
    if (!isset($teacherid) && !isset($tutorid)) {
-	   $query = "SELECT items.id,ex.startdate,ex.enddate FROM ";
+	   $query = "SELECT items.id,ex.startdate,ex.enddate,ex.islatepass FROM ";
 	   $query .= "imas_exceptions AS ex,imas_items as items,imas_assessments as i_a WHERE ex.userid='$userid' AND ";
 	   $query .= "ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment') ";
 	  // $query .= "AND (($now<i_a.startdate AND ex.startdate<$now) OR ($now>i_a.enddate AND $now<ex.enddate))";
 	   //$query .= "AND (ex.startdate<$now AND $now<ex.enddate)";
 	   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	   while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
-		   $exceptions[$line['id']] = array($line['startdate'],$line['enddate']);
+		   $exceptions[$line['id']] = array($line['startdate'],$line['enddate'],$line['islatepass']);
 	   }
    }
     if (count($exceptions)>0) {
