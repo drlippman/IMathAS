@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 59;
+$latest = 60;
 
 
 @set_time_limit(0);
@@ -980,6 +980,35 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 if ($res===false) {
 			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
+		}
+		if ($last < 60) {
+			 $query = 'CREATE TABLE `imas_badgesettings` (
+				  `id` int(10) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
+				  `name` varchar(128) NOT NULL,
+				  `badgetext` varchar(254) NOT NULL,
+				  `description` varchar(128) NOT NULL,
+				  `longdescription` text NOT NULL,
+				  `courseid` int(10) unsigned NOT NULL,
+				  `requirements` text NOT NULL,
+				  INDEX(`courseid`)
+				) ENGINE=InnoDB;';
+			$res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 
+			$query = 'CREATE TABLE `imas_badgerecords` (
+				  `id` int(10) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
+				  `userid` int(10) unsigned NOT NULL,
+				  `badgeid` int(10) unsigned NOT NULL,
+				  `data` text NOT NULL,
+				  INDEX (`userid`), INDEX(`badgeid`)
+				) ENGINE=InnoDB;';
+			$res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+				
 		}
 		$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {

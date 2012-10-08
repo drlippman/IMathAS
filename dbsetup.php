@@ -918,7 +918,30 @@ $sql = 'CREATE TABLE `imas_external_tools` (
 	INDEX ( `url` ), INDEX( `courseid` ), INDEX( `groupid` )
 	) ENGINE = InnoDB COMMENT = \'LTI external tools\'';
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());
-echo 'imas_external_tools created<br/>';	
+echo 'imas_external_tools created<br/>';
+
+$sql = 'CREATE TABLE `imas_badgesettings` (
+	  `id` int(10) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	  `name` varchar(128) NOT NULL,
+	  `badgetext` varchar(254) NOT NULL,
+	  `description` varchar(128) NOT NULL,
+	  `longdescription` text NOT NULL,
+	  `courseid` int(10) unsigned NOT NULL,
+	  `requirements` text NOT NULL,
+	  INDEX(`courseid`)
+	) ENGINE=InnoDB;';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+echo 'imas_badgesettings created<br/>';	
+
+$sql = 'CREATE TABLE `imas_badgerecords` (
+	  `id` int(10) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	  `userid` int(10) unsigned NOT NULL,
+	  `badgeid` int(10) unsigned NOT NULL,
+	  `data` text NOT NULL,
+	  INDEX (`userid`), INDEX(`badgeid`)
+	) ENGINE=InnoDB;';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+echo 'imas_badgerecords created<br/>';
 	
 $md5pw = md5($password);
 $now = time();
