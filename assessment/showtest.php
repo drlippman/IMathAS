@@ -204,6 +204,11 @@
 			} else {
 				unset($sessiondata['actas']);
 			}
+			if (strpos($_SERVER['HTTP_REFERER'],'treereader')!==false) {
+				$sessiondata['intreereader'] = true;
+			} else {
+				$sessiondata['intreereader'] = false;
+			}
 			
 			$query = "SELECT name,theme,topbar,msgset FROM imas_courses WHERE id='{$_GET['cid']}'";
 			$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
@@ -703,7 +708,7 @@ if (!isset($_POST['embedpostback'])) {
 	if ($testsettings['noprint'] == 1) {
 		echo '<style type="text/css" media="print"> div.question, div.todoquestion, div.inactive { display: none;} </style>';
 	}
-	if (!$isdiag && !$isltilimited && strpos($_SERVER['HTTP_REFERER'],'treereader')===false) {
+	if (!$isdiag && !$isltilimited && !$sessiondata['intreereader']) {
 		if (isset($sessiondata['actas'])) {
 			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid={$testsettings['courseid']}\">{$sessiondata['coursename']}</a> ";
 			echo "&gt; <a href=\"../course/gb-viewasid.php?cid={$testsettings['courseid']}&amp;asid=$testid&amp;uid={$sessiondata['actas']}\">Gradebook Detail</a> ";
@@ -1854,6 +1859,7 @@ if (!isset($_POST['embedpostback'])) {
 				$qmin = 0;
 				$qmax = count($questions);
 				$dopage = false;
+				showembedupdatescript();
 			}
 			if (!$sessiondata['istutorial']) {
 				$intro .= "<p>Total Points Possible: " . totalpointspossible($qi) . "</p>";
@@ -1935,8 +1941,58 @@ if (!isset($_POST['embedpostback'])) {
 	
 	require("../footer.php");
 	
+	function showembedupdatescript() {
+		global $imasroot,$scores,$bestscores,$showeachscore,$qi,$questions,$testsettings;
+		
+		$jsonbits = array();
+		for($j=0;$j<count($scores);$j++) {
+			$bit = "\"q$j\":[0,";
+			if (unans($scores[$j])) {
+				$cntunans++;
+				$bit .= "1,";
+			} else {
+				$bit .= "0,";
+			}
+			if (canimprove($j)) {
+				$cntcanimp++;
+				$bit .= "1,";
+			} else {
+				$bit .= "0,";
+			}
+			$curpts = getpts($bestscores[$j]);
+			if ($curpts<0) { $curpts = 0;}
+			$bit .= $curpts.']';
+			$pgposs += $qi[$questions[$j]]['points'];
+			$pgpts += $curpts;
+			$jsonbits[] = $bit;
+		}
+		echo '<script type="text/javascript">var embedattemptedtrack = {'.implode(',',$jsonbits).'}; </script>';
+		echo '<script type="text/javascript">function updateembednav() {
+			var unanscnt = 0;
+			var canimpcnt = 0;
+			var pts = 0;
+			var qcnt = 0;
+			for (var i in embedattemptedtrack) {
+				if (embedattemptedtrack[i][1]==1) {
+					unanscnt++;
+				}
+				if (embedattemptedtrack[i][2]==1) {
+					canimpcnt++;
+				}
+				pts += embedattemptedtrack[i][3];
+				qcnt++;
+			}
+			var status = 0;
+			if (unanscnt == 0) { status = 2;} else if (unanscnt<qcnt) {status=1;}
+			if (top !== self) {
+				try {
+					top.updateTRunans("'.$testsettings['id'].'", status);
+				} catch (e) {}
+			}
+		      }</script>';
+	}
 	function showembednavbar($pginfo,$curpg) {
-		global $imasroot,$scores,$bestscores,$showeachscore,$qi,$questions;
+		global $imasroot,$scores,$bestscores,$showeachscore,$qi,$questions,$testsettings;
 		echo "<a href=\"#beginquestions\"><img class=skipnav src=\"$imasroot/img/blank.gif\" alt=\"Skip Navigation\" /></a>\n";
 		
 		echo '<div class="navbar" style="width:125px">';
@@ -2000,13 +2056,16 @@ if (!isset($_POST['embedpostback'])) {
 		echo '<script type="text/javascript">var embedattemptedtrack = {'.implode(',',$jsonbits).'}; </script>';
 		echo '<script type="text/javascript">function updateembednav() {
 			var unanscnt = [];
+			var unanstot = 0;
 			var canimpcnt = [];
 			var pgpts = [];
 			var pgmax = -1;
+			var qcnt = 0;
 			for (var i in embedattemptedtrack) {
 				if (embedattemptedtrack[i][0] > pgmax) {
 					pgmax = embedattemptedtrack[i][0];
 				}
+				qcnt++;
 			}
 			for (var i=0; i<=pgmax; i++) {
 				unanscnt[i] = 0;
@@ -2017,6 +2076,7 @@ if (!isset($_POST['embedpostback'])) {
 			for (var i in embedattemptedtrack) {
 				if (embedattemptedtrack[i][1]==1) {
 					unanscnt[embedattemptedtrack[i][0]]++;
+					unanstot++;
 				}
 				if (embedattemptedtrack[i][2]==1) {
 					canimpcnt[embedattemptedtrack[i][0]]++;
@@ -2038,7 +2098,15 @@ if (!isset($_POST['embedpostback'])) {
 				echo '	el.innerHTML = unanscnt[i];';
 		}
 				
-		echo '}}}</script>';
+		echo '}}
+			var status = 0;
+			if (unanstot == 0) { status = 2;} else if (unanstot<qcnt) {status=1;}
+			if (top !== self) {
+				try {
+					top.updateTRunans("'.$testsettings['id'].'", status);
+				} catch (e) {}
+			}
+		}</script>';
 		echo '</div>';	
 	}
 	
@@ -2358,7 +2426,7 @@ if (!isset($_POST['embedpostback'])) {
 		global $isdiag, $diagid, $isltilimited, $testsettings;
 		if ($isdiag) {
 			echo "<a href=\"../diag/index.php?id=$diagid\">Exit Assessment</a></p>\n";
-		} else if ($isltilimited) {
+		} else if ($isltilimited || $sessiondata['intreereader']) {
 			
 		} else {
 			echo "<a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to Course Page</a></p>\n";

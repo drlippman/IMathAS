@@ -21,6 +21,11 @@
 	} else {
 		$ver = 'graded';
 	}
+	if (isset($_GET['page'])) {
+		$page = intval($_GET['page']);
+	} else {
+		$page = -1;
+	}
 	
 	if (isset($_GET['update'])) {
 		$allscores = array();
@@ -61,6 +66,9 @@
 		$query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions ";
 		$query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_assessment_sessions.assessmentid='$aid' ";
 		$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
+		if ($page != -1 && isset($_GET['userid'])) {
+			$query .= " AND userid='{$_POST['userid']}'";
+		}
 		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 		$cnt = 0;
 		while($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
@@ -98,7 +106,13 @@
 				}
 			}
 		}
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-itemanalysis.php?stu=$stu&cid=$cid&aid=$aid&asid=average");
+		if ($page == -1) {
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-itemanalysis.php?stu=$stu&cid=$cid&aid=$aid&asid=average");
+		} else {
+			$page++;
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradeallq.php?stu=$stu&cid=$cid&aid=$aid&qid=$qid&page=$page");
+			
+		}
 		exit;
 	}
 	
@@ -142,14 +156,20 @@
 	$useeditor='review';
 	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=120311"></script>';
 	require("../includes/rubric.php");
+	$sessiondata['coursetheme'] = $coursetheme;
 	require("../assessment/header.php");
-	echo "<style type=\"text/css\">p.tips {	display: none;}\n</style>\n";
+	echo "<style type=\"text/css\">p.tips {	display: none;}\n .hideongradeall { display: none;}</style>\n";
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 	echo "&gt; <a href=\"gb-itemanalysis.php?stu=$stu&cid=$cid&aid=$aid\">Item Analysis</a> ";
 	echo "&gt; Grading a Question</div>";
 	echo "<div id=\"headergradeallq\" class=\"pagetitle\"><h2>Grading a Question in $aname</h2></div>";
 	echo "<p><b>Warning</b>: This page may not work correctly if the question selected is part of a group of questions</p>";
+	if ($page==-1) {
+		echo "<p><a href=\"gradeallq.php?stu=$stu&gbmode=$gbmode&cid=$cid&aid=$aid&qid=$qid&page=0\">Grade one student at a time</a> (Do not use for group assignments)</p>";
+	} else {
+		echo "<p><a href=\"gradeallq.php?stu=$stu&gbmode=$gbmode&cid=$cid&aid=$aid&qid=$qid&page=-1\">Grade all students at once</a></p>";
+	}
 	echo "<p>Note: Feedback is for whole assessment, not the individual question.</p>";
 ?>
 	<script type="text/javascript">
@@ -270,15 +290,17 @@
 	if (mysql_num_rows($result)>0) {
 		echo printrubrics(array(mysql_fetch_row($result)));
 	}
-	echo '<input type=button id="hctoggle" value="Hide Perfect Score Questions" onclick="hidecorrect()" />';
-	echo '<input type=button id="nztoggle" value="Hide Nonzero Score Questions" onclick="hidenonzero()" />';
-	echo ' <input type=button id="hnatoggle" value="Hide Not Answered Questions" onclick="hideNA()" />';
-	echo ' <input type="button" id="preprint" value="Prepare for Printing (Slow)" onclick="preprint()" />';
+	if ($page==-1) {
+		echo '<input type=button id="hctoggle" value="Hide Perfect Score Questions" onclick="hidecorrect()" />';
+		echo '<input type=button id="nztoggle" value="Hide Nonzero Score Questions" onclick="hidenonzero()" />';
+		echo ' <input type=button id="hnatoggle" value="Hide Not Answered Questions" onclick="hideNA()" />';
+		echo ' <input type="button" id="preprint" value="Prepare for Printing (Slow)" onclick="preprint()" />';
+	}
 	echo ' <input type="button" id="clrfeedback" value="Clear all feedback" onclick="clearfeedback()" />';
 	if ($deffbtext != '') {
 		echo ' <input type="button" id="clrfeedback" value="Clear default feedback" onclick="cleardeffeedback()" />';
 	}
-	echo "<form id=\"mainform\" method=post action=\"gradeallq.php?stu=$stu&gbmode=$gbmode&cid=$cid&aid=$aid&qid=$qid&update=true\">\n";
+	echo "<form id=\"mainform\" method=post action=\"gradeallq.php?stu=$stu&gbmode=$gbmode&cid=$cid&aid=$aid&qid=$qid&page=$page&update=true\">\n";
 	if ($isgroup>0) {
 		echo '<p><input type="checkbox" name="onepergroup" value="1" onclick="hidegroupdup(this)" /> Grade one per group</p>';
 	}
@@ -296,11 +318,19 @@
 	$query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions,imas_students ";
 	$query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_students.userid=imas_users.id AND imas_students.courseid='$cid' AND imas_assessment_sessions.assessmentid='$aid' ";
 	$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
+	if ($page != -1) {
+		$query .= " LIMIT $page,1";
+	}
 	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 	$cnt = 0;
 	$onepergroup = array();
 	require_once("../includes/filehandler.php");
+	if (mysql_num_rows($result)>0) {
+		
 	while($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+		if ($page != -1) {
+			echo '<input type="hidden" name="userid" value="'.$line['userid'].'"/>';
+		}
 		$asid = $line['id'];
 		$groupdup = false;
 		if ($line['agroupid']>0) {
@@ -474,6 +504,7 @@
 		}
 	}
 	echo "<input type=submit value=\"Save Changes\"/>";
+	}
 	echo "</form>";
 
 	

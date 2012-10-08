@@ -144,6 +144,13 @@ function gbtable() {
 	
 	$ln = 0;
 	
+	//Pull Gradebook Scheme info
+	$query = "SELECT useweights,orderby,defaultcat,usersort FROM imas_gbscheme WHERE courseid='$cid'";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	list($useweights,$orderby,$defaultcat,$usersort) = mysql_fetch_row($result);
+	if ($useweights==2) {$useweights = 0;} //use 0 mode for calculation of totals
+	
+	
 	//Build user ID headers 
 	$gb[0][0][0] = "Name";
 	if ($isdiag) {
@@ -177,6 +184,37 @@ function gbtable() {
 	if ($lastlogin) {
 		$gb[0][0][] = "Last Login";
 	}
+	
+	//orderby 10: course order (11 cat first), 12: course order rev (13 cat first)
+	if ($orderby>=10 && $orderby <=13) {
+		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+		$courseitemorder = unserialize(mysql_result($result,0,0));
+		$courseitemsimporder = array();
+		function flattenitems($items,&$addto) {
+			foreach ($items as $item) {
+				if (is_array($item)) {
+					flattenitems($item['items'],$addto);
+				} else {
+					$addto[] = $item;
+				}
+			}
+		}
+		flattenitems($courseitemorder,$courseitemsimporder);
+		$courseitemsimporder = array_flip($courseitemsimporder);
+		$courseitemsassoc = array();
+		$query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid='$cid'";
+		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			if (!isset($courseitemsimporder[$row[1]])) { //error catch items not in course.itemorder
+				$courseitemsassoc[$row[1].$row[2]] = 999+count($courseitemsassoc);
+			} else {
+				$courseitemsassoc[$row[1].$row[2]] = $courseitemsimporder[$row[1]];
+			}
+		}
+		
+	}
+	
 	//Pull Assessment Info
 	$now = time();
 	$query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail,groupsetid FROM imas_assessments WHERE courseid='$cid' AND avail>0 ";
@@ -212,6 +250,7 @@ function gbtable() {
 	$category = array();
 	$name = array();
 	$possible = array();
+	$courseorder = array();
 	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 		$assessments[$kcnt] = $line['id'];
 		$timelimits[$kcnt] = $line['timelimit'];
@@ -355,11 +394,6 @@ function gbtable() {
 		$kcnt++;
 	}
 	
-	//Pull Gradebook Scheme info
-	$query = "SELECT useweights,orderby,defaultcat,usersort FROM imas_gbscheme WHERE courseid='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	list($useweights,$orderby,$defaultcat,$usersort) = mysql_fetch_row($result);
-	if ($useweights==2) {$useweights = 0;} //use 0 mode for calculation of totals
 	
 	$cats = array();
 	$catcolcnt = 0;
@@ -721,7 +755,8 @@ function gbtable() {
 	$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 	while ($r = mysql_fetch_row($result2)) {
 		$exceptions[$r[0]][$r[1]] = array($r[2],$r[3]);	
-		$gb[$sturow[$r[1]]][1][$assesscol[$r[0]]][6] = ($r[3]>0)?2:1;
+		$gb[$sturow[$r[1]]][1][$assesscol[$r[0]]][6] = ($r[3]>0)?(1+$r[3]):1;
+		$gb[$sturow[$r[1]]][1][$assesscol[$r[0]]][3] = 10; //will get overwritten later if assessment session exists
 	}
 	//Get assessment scores
 	$assessidx = array_flip($assessments);

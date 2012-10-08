@@ -275,26 +275,34 @@ if ($canviewall) {
 		for (var j=0;j<trs.length;j++) {
 			var tds = trs[j].getElementsByTagName("td");
 			for (var i=startat;i<tds.length;i++) {
-				if (tds[i].innerText) {
-					var v = tds[i].innerText;
+				if (low==-1) {
+					if (tds[i].className.match("isact")) {
+						tds[i].style.backgroundColor = "#99ff99";
+					} else {
+						tds[i].style.backgroundColor = "#ffffff";
+					}
 				} else {
-					var v = tds[i].textContent;
-				}
-				v = v.replace(/\(.*?\)/g,"");
-				if (k = v.match(/(\d+)\/(\d+)/)) {
-					if (k[2]==0) { var perc = 0;} else { var perc= k[1]/k[2];}
-				} else {
-					v = v.replace(/[^\d\.]/g,"");
-					var perc = v/poss[i];
-				}
-				
-				if (perc<low/100) {
-					tds[i].style.backgroundColor = "#ff9999";
+					if (tds[i].innerText) {
+						var v = tds[i].innerText;
+					} else {
+						var v = tds[i].textContent;
+					}
+					v = v.replace(/\(.*?\)/g,"");
+					if (k = v.match(/(\d+)\/(\d+)/)) {
+						if (k[2]==0) { var perc = 0;} else { var perc= k[1]/k[2];}
+					} else {
+						v = v.replace(/[^\d\.]/g,"");
+						var perc = v/poss[i];
+					}
 					
-				} else if (perc>high/100) {
-					tds[i].style.backgroundColor = "#99ff99";
-				} else {
-					tds[i].style.backgroundColor = "#ffffff";
+					if (perc<low/100) {
+						tds[i].style.backgroundColor = "#ff9999";
+						
+					} else if (perc>high/100) {
+						tds[i].style.backgroundColor = "#99ff99";
+					} else {
+						tds[i].style.backgroundColor = "#ffffff";
+					}
 				}
 			}
 		}
@@ -349,6 +357,28 @@ if (isset($studentid) || $stu!=0) { //show student view
 	}
 	$pagetitle = "Gradebook";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
+	$placeinhead .= '<script type="text/javascript">
+		function showhidefb(el,n) {
+			el.style.display="none";
+			document.getElementById("feedbackholder"+n).style.display = "inline";
+			return false;
+			}
+		function showhideallfb(s) {
+			s.style.display="none";
+			var els = document.getElementsByTagName("a");
+			for (var i=0;i<els.length;i++) {
+				if (els[i].className.match("feedbacksh")) {
+					els[i].style.display="none";
+				}
+			}
+			var els = document.getElementsByTagName("span");
+			for (var i=0;i<els.length;i++) {
+				if (els[i].id.match("feedbackholder")) {
+					els[i].style.display="inline";
+				}
+			}
+			return false;
+		}</script>';
 	
 	require("../header.php");
 	
@@ -494,6 +524,9 @@ if (isset($studentid) || $stu!=0) { //show student view
 				echo ">$j/$k</option>";
 			}
 		}
+		echo '<option value="-1:-1" ';
+		if ($colorize = "-1:-1") { echo 'selected="selected" ';}
+		echo '>Active</option>';
 		echo '</select>';
 		echo ' | <a href="#" onclick="chgnewflag(); return false;">NewFlag</a>';
 		//echo '<input type="button" value="Pics" onclick="rotatepics()" />';
@@ -645,7 +678,7 @@ function gbstudisp($stu) {
 		echo '<th>Time Spent (In Questions)</th>';
 	}
 	if ($stu>0) {
-		echo '<th>Feedback</th>';
+		echo '<th>Feedback<br/><a href="#" class="small pointer" onclick="return showhideallfb(this);">[Show Feedback]</a></th>';
 	} 
 	echo '</tr></thead><tbody>';
 	if ($catfilter>-2) {
@@ -690,6 +723,7 @@ function gbstudisp($stu) {
 			}
 			
 			echo '</td><td>';
+			
 			$haslink = false;
 			
 			if ($isteacher || $istutor || $gbt[1][1][$i][2]==1) { //show link
@@ -748,8 +782,12 @@ function gbstudisp($stu) {
 				echo '</a>';
 			}
 			if (isset($gbt[1][1][$i][6]) ) {  //($isteacher || $istutor) && 
-				if ($gbt[1][1][$i][6]==2) {
-					echo '<sup>LP</sup>';
+				if ($gbt[1][1][$i][6]>1) {
+					if ($gbt[1][1][$i][6]>2) {
+						echo '<sup>LP ('.($gbt[1][1][$i][6]-1).')</sup>';
+					} else {
+						echo '<sup>LP</sup>';
+					}
 				} else {
 					echo '<sup>e</sup>';
 				}
@@ -775,7 +813,11 @@ function gbstudisp($stu) {
 				
 			}
 			if ($stu>0) {
-				echo '<td>'.$gbt[1][1][$i][1].'</td>';
+				if ($gbt[1][1][$i][1]=='') {
+					echo '<td></td>';
+				} else {
+					echo '<td><a href="#" class="small feedbacksh pointer" onclick="return showhidefb(this,'.$i.')">[Show Feedback]</a><span style="display:none;" id="feedbackholder'.$i.'">'.$gbt[1][1][$i][1].'</span></td>';
+				}
 			}
 			echo '</tr>';
 		}
@@ -1285,7 +1327,12 @@ function gbinstrdisp() {
 				if ($hidepast && $gbt[0][1][$j][3]==0) {
 					continue;
 				}
-				echo '<td class="c">'.$insdiv;
+				//if online, not average, and either score exists and active, or score doesn't exist and assess is current,
+				if ($gbt[0][1][$j][6]==0 && $gbt[$i][1][$j][4]!='average' && ((isset($gbt[$i][1][$j][3]) && $gbt[$i][1][$j][3]>9) || (!isset($gbt[$i][1][$j][3]) && $gbt[0][1][$j][3]==1))) {
+					echo '<td class="c isact">'.$insdiv;
+				} else {
+					echo '<td class="c">'.$insdiv;
+				}
 				if (isset($gbt[$i][1][$j][5]) && ($gbt[$i][1][$j][5]&(1<<$availshow)) && !$hidepast) {
 					echo '<span style="font-style:italic">';
 				}
@@ -1331,8 +1378,12 @@ function gbinstrdisp() {
 						}
 					}
 					if (isset($gbt[$i][1][$j][6]) ) {
-						if ($gbt[$i][1][$j][6]==2) {
-							echo '<sup>LP</sup>';
+						if ($gbt[$i][1][$j][6]>1) {
+							if ($gbt[$i][1][$j][6]>2) {
+								echo '<sup>LP ('.($gbt[$i][1][$j][6]-1).')</sup>';
+							} else {
+								echo '<sup>LP</sup>';
+							}
 						} else {
 							echo '<sup>e</sup>';
 						}
