@@ -119,7 +119,7 @@ if (isset($teacherid)) {
 			$verify = urlencode(hash('sha256', $username . $userid));
 			$url = $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . '/course/verifybadge.php?format=json&userid='.$userid.'&badgeid='.$badgeid.'&v='.$verify;
 			
-			echo '<p><input type="button" value="Claim Badge" onclick="OpenBadges.issue([\''.$url.'\'], function(errors,successes) { })"/></p>';
+			echo '<p><input type="button" value="Claim Badge" onclick="OpenBadges.issue([\''.$url.'\'], function(errors,successes) { })"/><br/>FireFox, Chrome, Safari, or IE 9+ is needed to claim badge.</p>';
 		}
 	}
 	

@@ -81,6 +81,7 @@ function print_html($badgetext, $name, $descr, $longdescr, $reqnameout, $reqout,
 	}
 	if ($descr!='') {echo '<p>'.$descr.'</p>';}
 	if ($longdescr!='') {echo '<p>'.$longdescr.'</p>';}
+	
 	echo '<table style="margin-top: 10px;" class="gb"><thead><tr><th>Category/Course Total</th><th>Score Required</th>';
 	if ($stuout != null) {
 		echo '<th>Your Score</th><th>Requirement Met</th>';
@@ -117,8 +118,8 @@ function print_assertation($cid, $badgetext, $badgename, $descr, $userid, $email
 		$img = "$imasroot/img/badge.php?text=".urlencode($badgetext);
 	}
 	
-	$query = "SELECT imas_courses.name AS cname, imas_users.LastName, imas_users.FirstName, imas_users.email, imas_groups.name FROM imas_courses JOIN imas_teachers ON imas_courses.id=imas_teachers.courseid ";
-	$query .= "JOIN imas_users ON imas_teachers.userid=imas_users.id LEFT JOIN imas_groups ON imas_users.groupid=imas_groups.id WHERE imas_courses.id='$cid'";
+	/*$query = "SELECT imas_courses.name AS cname, imas_users.LastName, imas_users.FirstName, imas_users.email, imas_groups.name FROM imas_courses JOIN imas_teachers ON imas_courses.id=imas_teachers.courseid ";
+	$query .= "JOIN imas_users ON imas_teachers.userid=imas_users.id LEFT JOIN imas_groups ON imas_users.groupid=imas_groups.id WHERE imas_courses.id='$cid' LIMIT 1";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	if (mysql_num_rows($result)==0) {
 		$org = ' ';
@@ -138,7 +139,7 @@ function print_assertation($cid, $badgetext, $badgename, $descr, $userid, $email
 		}
 		$org = 'Course: '.$cname.'. Instructor'.((count($t)>1)?'s':'').': '.implode(', ',$t);
 		$contact = implode(', ', $e);
-	}
+	}*/
 		
 	echo <<<END
 {
@@ -152,15 +153,18 @@ function print_assertation($cid, $badgetext, $badgename, $descr, $userid, $email
 		"criteria": "$imasroot/course/verifybadge.php?badgeid=$badgeid",
 		"issuer": {
 			"origin": "$urlbase",
-			"name": "$installname",
-			"org": "$org",
-			"email": "$contact"
+			"name": "$installname"
 		}
 	}
 }		
 END;
 //  can't include because of FERPA :(  
 // "evidence": "$imasroot/course/verifybadge.php?badgeid=$badgeid&userid=$userid",
+//
+//too long, so don't bother
+// 			"org": "$org",
+//			"email": "$contact"
+
 }
 
 function generateSalt($max = 15) {
