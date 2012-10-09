@@ -565,7 +565,7 @@
 				//if (preg_match('/answeights\s*=\s*("|\')([\d\.\,\s]+)/',$line['control'],$match)) {
 				if (($p = strpos($r[4],'answeights'))!==false) {
 					$p = strpos($r[4],"\n",$p);
-					$answeights[$r[0]] = getansweights($r[0],substr($r[4],0,$p));
+					$answeights[$r[0]] = getansweights($r[0],$r[4]);
 				} else {
 					preg_match('/anstypes(.*)/',$r[4],$match);
 					$n = substr_count($match[1],',')+1;
@@ -924,7 +924,7 @@ function sandboxgetweights($code,$seed) {
 		$n = count($anstypes);
 		if ($n>1) {
 			$answeights = array_fill(0,$n-1,round(1/$n,3));
-			$answeights[] = 1-array_sum($weights);
+			$answeights[] = 1-array_sum($answeights);
 		} else {
 			$answeights = array(1);
 		}
