@@ -2,7 +2,7 @@ var AMnoMathML = true;
 var ASnoSVG = true;
 var AMisGecko = 0;
 function AMisMathMLavailable() {
-    if (navigator.product && navigator.product=='Gecko') {
+    if (navigator.product && navigator.product=='Gecko' && !navigator.userAgent.toLowerCase().match(/webkit/)) {
 	   var rv = navigator.userAgent.toLowerCase().match(/rv:\s*([\d\.]+)/);
 	   if (rv!=null) {
 		rv = rv[1].split('.');

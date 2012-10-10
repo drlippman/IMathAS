@@ -4226,6 +4226,7 @@ function checkreqtimes($tocheck,$rtimes) {
 	if ($rtimes != '') {
 		$list = explode(",",$rtimes);
 		for ($i=0;$i < count($list);$i+=2) {
+			if ($list[$i]=='' || strlen($list[$i+1])<2) {continue;}
 			$list[$i+1] = trim($list[$i+1]);
 			$comp = substr($list[$i+1],0,1);
 			$num = intval(substr($list[$i+1],1));

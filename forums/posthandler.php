@@ -228,6 +228,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			$pagetitle = "Add/Modify Post";
 		}
 		$useeditor = "message";
+		$loadgraphfilter = true;
 		require("../header.php");
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
 		if ($caller != 'thread') {
