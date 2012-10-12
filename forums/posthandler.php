@@ -561,6 +561,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 	}
 } else if (isset($_GET['move']) && $isteacher) { //moving post to a different forum   NEW ONE
 	if (isset($_POST['movetype'])) {
+		$threadid = intval($_POST['thread']);
 		$query = "SELECT * FROM imas_forum_posts WHERE threadid='$threadid'";
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		while ($line =  mysql_fetch_array($result, MYSQL_ASSOC)) {
@@ -653,6 +654,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		}
 		
 		echo "<form method=post action=\"$returnurl&move={$_GET['move']}\">";
+		echo '<input type="hidden" name="thread" value="'.$threadid.'"/>';
 		echo "<p>What do you want to do?<br/>";
 		if ($ishead) {
 			echo '<input type="radio" name="movetype" value="0" checked="checked" onclick="toggleforumselect(0)"/> Move thread to different forum<br/>';
