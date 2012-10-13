@@ -1,0 +1,178 @@
+//Largely adapted from thumnails.js, part of Class2go, Apache licensed
+
+// Fetch YouTube Player API as script node
+
+
+//Global settings for video player height and width
+var vidPlayerHeight = 430;
+var videoHeight = vidPlayerHeight - 30;
+var vidPlayerWidth = 710;
+var videoWidth = vidPlayerWidth; 
+
+function onYouTubePlayerAPIReady() {
+	//called automatically by youtube API when the API is loaded
+	//console.log(document.readyState);
+	thumbSet.getVidID();
+	
+} 
+
+function onPlayerReady(event) {
+	//called when youtube video is loaded
+	
+}
+
+function onPlayerError(event) {
+	alert('error');
+}
+function onPlayerStateChange(event) {
+	//called on user seek, pause/play, etc
+	thumbSet.recordMe=event;
+	if (event.data == YT.PlayerState.PLAYING) {
+		setTimeout(thumbSet.checkTime, 200);
+	}
+}
+
+//VidID is string containing YouTube video ID
+//breaktimesarray is an object of objects:  
+//  {curTime:{qn:qn}} 
+var initVideoObject = function (VidId, breaktimesarray) {
+	
+	var thumbSet = {
+
+		// Set up global vars
+		questions: {},
+		vidName: null,
+		player: null,
+		globalQTime: -1,
+		recordMe: null,
+		skipSecQ: -1,
+		lastTime: -1,
+		curQ: -1,
+	
+		getVidID: function() {
+		    vidName = VidId;
+		    questions = breaktimesarray;
+		    
+		    setTimeout(function () { thumbSet.createPlayer(); }, 200);
+		    // add stuff here that happens after video is loaded
+		},
+		
+		// add player to the page
+		createPlayer: function () {
+			
+		    var pVarsInternal = {'autoplay': 0, 'wmode': 'transparent', 'fs': 0, 'controls':1, 'rel':0, 'modestbranding':1, 'showinfo':0}; 
+		  
+		    //console.log(pVarsInternal);
+	
+		    player = new YT.Player('player', {
+			height: vidPlayerHeight,
+			width: vidPlayerWidth,
+			videoId: vidName,
+			playerVars: pVarsInternal,
+			events: {
+			    'onReady': onPlayerReady,
+			    'onStateChange': onPlayerStateChange,
+			    'onError': onPlayerError,
+			}
+		    });
+	
+		    document.getElementById('player').style['z-index']=-10;
+		    document.getElementById('player').style['-webkit-transform']='translateZ(0)';
+		},
+	
+		stripPx: function (sizeWithPx) {
+		    return parseInt(sizeWithPx.substr(0,sizeWithPx.search('px')));
+		},
+	
+		setupQPane: function (qTime) {
+			thumbSet.curQ = questions[qTime];
+			document.getElementById("player").style.visibility = "hidden";
+			document.getElementById("embedqwrapper"+thumbSet.curQ.qn).style.visibility = "visible";
+			document.getElementById("embedqwrapper"+thumbSet.curQ.qn).style.left = "0px";
+		},
+		
+		closeQPane: function (skipahead) {
+		    //hide questions
+		    if (thumbSet.curQ != -1) {
+			    document.getElementById("embedqwrapper"+thumbSet.curQ.qn).style.visibility = "hidden";
+			    document.getElementById("embedqwrapper"+thumbSet.curQ.qn).style.left = "-1000px";
+			    document.getElementById("player").style.visibility = "visible";
+			    
+			    //are we skipping a section of video?
+			    if (skipahead && thumbSet.curQ.hasOwnProperty("showAfter")) {
+				    skipSecQ = thumbSet.curQ.showAfter;
+				    player.seekTo(thumbSet.curQ.showAfter-0.5, true);
+			    }
+			    thumbSet.curQ = -1;
+		    }
+		    //resume playing video
+		    player.playVideo();
+		},
+	
+		timeDisplay: function(timeInSec) {
+		    var min = Math.floor(timeInSec/60);
+		    var sec = timeInSec - 60*min;
+		    if (sec<10) sec = '0'+sec;
+		    return ("" + min + ":" + sec);
+		},
+	
+		// called on setTimeout, this watches the time and launches 
+		// the questions when called for
+		checkTime: function () {    
+		    //console.log('checkTime');
+		    var curTime = Math.floor(player.getCurrentTime());
+		    //console.log(curTime+","+skipSecQ);
+		    if (questions.hasOwnProperty(curTime) && skipSecQ!=curTime && 
+			    player.getPlayerState() == YT.PlayerState.PLAYING) {
+		    		thumbSet.showQuestion(curTime);
+		    } else if (player.getPlayerState() == YT.PlayerState.PLAYING) {
+			    setTimeout(thumbSet.checkTime, 200);
+		    }
+		     if (!questions.hasOwnProperty(curTime)) {
+			skipSecQ=-1;
+		    }
+	
+		    thumbSet.lastTime=curTime;
+		},
+	
+		showQuestion: function (curTime) {
+		    player.pauseVideo();
+	
+		    skipSecQ = curTime;
+	
+		    if (questions.hasOwnProperty(curTime)) {
+			questions[curTime].done=true;
+			thumbSet.setupQPane(curTime);
+		    } else {
+			player.playVideo();
+		    }
+		},
+		
+		jumpToTime: function (idxTime, skipQ) {
+			if (skipQ) {
+				skipSecQ = idxTime; //skip the question at this time
+				player.seekTo(idxTime, true);
+			} else {
+				skipSecQ = -1;
+				player.seekTo(idxTime-0.5, true);
+			}
+			
+			thumbSet.closeQPane(false);
+		},
+		
+		jumpToQ:  function (idxTime) {
+			if (this.curQ != -1) {
+			    document.getElementById("embedqwrapper"+thumbSet.curQ.qn).style.visibility = "hidden";
+			    document.getElementById("embedqwrapper"+thumbSet.curQ.qn).style.left = "-1000px";
+			}
+			this.skipSecQ = -1;
+			player.pauseVideo();
+			player.seekTo(idxTime-0.5, true);
+			thumbSet.showQuestion(idxTime);
+		}
+
+    };  // end of thumbSet object definition
+
+    return thumbSet;
+
+};  // end of initVideoObject definition
