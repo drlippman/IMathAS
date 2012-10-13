@@ -1845,7 +1845,9 @@ if (!isset($_POST['embedpostback'])) {
 			echo '<script type="text/javascript">var assesspostbackurl="' .$urlmode. $_SERVER['HTTP_HOST'] . $imasroot . '/assessment/showtest.php?embedpostback=true&action=scoreembed&page='.$_GET['page'].'";</script>';
 			//using the full test scoreall action for timelimit auto-submits
 			echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=scoreall\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
-			echo '<div class="formcontents" style="margin-left:20px;">';
+			if (strpos($intro,'[PAGE')===false && $testsettings['displaymethod'] != "VideoCue") {
+				echo '<div class="formcontents" style="margin-left:20px;">';
+			}
 			echo "<input type=\"hidden\" id=\"asidverify\" name=\"asidverify\" value=\"$testid\" />";
 			echo '<input type="hidden" id="disptime" name="disptime" value="'.time().'" />';
 			echo "<input type=\"hidden\" id=\"isreview\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
@@ -1908,7 +1910,7 @@ if (!isset($_POST['embedpostback'])) {
 
 				showvideoembednavbar($viddata);
 				$dovidcontrol = true;
-				echo '<div class="inset" style="position: relative; margin-left: 200px;">';
+				echo '<div class="inset" style="position: relative; margin-left: 225px;">';
 				echo "<a name=\"beginquestions\"></a>\n";
 				echo '<div id="player"></div>';
 				$outarr = array();
@@ -1999,10 +2001,8 @@ if (!isset($_POST['embedpostback'])) {
 			if (!$sessiondata['istutorial']) {
 				echo "<p><a href=\"showtest.php?action=embeddone\">Click here to finalize assessment and summarize score</a></p>\n";
 			}
-			if ($dopage || $dovidcontrol) {
-				echo '</div>';
-			}
-			echo '</div>';
+			
+			echo '</div>'; //ends either inset or formcontents div
 			echo '</form>';
 			
 					
