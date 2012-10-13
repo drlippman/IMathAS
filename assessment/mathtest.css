@@ -48,7 +48,7 @@ div.question {
 	margin-top: 0px;
 	margin-bottom: 5px;
 	padding: 10px;
-	width: 99%;
+	/*width: 99%;*/
 }
 div.inactive {
 	/*position: relative;*/
@@ -87,7 +87,7 @@ div.review {
 	margin-top: -4px;
 	margin-bottom: 20px;
 	padding: 5px;
-	width: 99%;
+	/*width: 99%;*/
 }
 
 div.intro {
@@ -561,4 +561,17 @@ img.scoreicon:hover {
 div.question img {
 	max-width: 90%;
 	height: auto;
+}
+
+span.inlinebtn {
+	cursor: pointer;
+	border: 1px solid #000; 
+	padding: 5px 10px;
+	line-height: 1em;
+	display: inline-block;
+	background: #efe;
+	margin: 10px;
+}
+span.inlinebtn:hover {
+	background: #dfd;
 }

@@ -295,12 +295,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$beentaken = false;
 	}
 	
-	$query = "SELECT itemorder,name,defpoints FROM imas_assessments WHERE id='$aid'";
+	$query = "SELECT itemorder,name,defpoints,displaymethod FROM imas_assessments WHERE id='$aid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$itemorder = mysql_result($result, 0,0);
 	$page_assessmentName = mysql_result($result,0,1);
 	$ln = 1;
 	$defpoints = mysql_result($result,0,2);
+	$displaymethod = mysql_result($result,0,3);
 	
 	$grp0Selected = "";
 	if (isset($sessiondata['groupopt'.$aid])) {
@@ -894,6 +895,9 @@ if ($overwriteBody==1) {
 		document.getElementById("curqtbl").innerHTML = generateTable();
 	</script>
 <?php
+	}
+	if ($displaymethod=='VideoCue') {
+		echo '<p><input type=button value="Define Video Cues" onClick="window.location=\'addvideotimes.php?cid='.$cid.'&aid='.$aid.'\'"/></p>';
 	}
 ?>	
 	<p>

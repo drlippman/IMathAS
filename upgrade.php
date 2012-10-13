@@ -1,6 +1,6 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 60;
+$latest = 61;
 
 
 @set_time_limit(0);
@@ -1009,6 +1009,13 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
 				
+		}
+		if ($last < 61) {
+			 $query = 'ALTER TABLE `imas_assessments` ADD `viddata` TEXT NOT NULL DEFAULT \'\'';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
 		}
 		$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {

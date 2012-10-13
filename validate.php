@@ -2,6 +2,7 @@
 //IMathAS:  Checks user's login - prompts if none. 
 //(c) 2006 David Lippman
  header('P3P: CP="ALL CUR ADM OUR"');
+ 
  $curdir = rtrim(dirname(__FILE__), '/\\');
  if (!file_exists("$curdir/config.php")) {
 	 header('Location: http://' . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/install.php");
@@ -10,6 +11,11 @@
  if (isset($sessionpath) && $sessionpath!='') { session_save_path($sessionpath);}
  ini_set('session.gc_maxlifetime',86400);
  ini_set('auto_detect_line_endings',true);
+ 
+ if ($_SERVER['HTTP_HOST'] != 'localhost') {
+ 	 session_set_cookie_params(0, '/', '.'.implode('.',array_slice(explode('.',$_SERVER['HTTP_HOST']),-2)));
+ }
+ 
  session_start();
  $sessionid = session_id();
  if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') {

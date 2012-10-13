@@ -1,12 +1,6 @@
 <?php
-
-/*
-TODO
-
-Add database handling
-
-*/
-
+// IMathAS: Add video cueing to assessments
+// (c) 2012 David Lippman
 
 require("../validate.php");
 if (!isset($teacherid)) {
@@ -15,7 +9,7 @@ if (!isset($teacherid)) {
 $aid = $_GET['aid'];
 
 //form handling
-print_r($_POST);
+
 if (isset($_POST['vidid'])) {
 	$_POST = stripslashes_deep($_POST); 
 	$vidid = $_POST['vidid'];
@@ -24,35 +18,36 @@ if (isset($_POST['vidid'])) {
 	while (isset($_POST['segtitle'.$i])) {
 		$n = array();
 		$n[0] = trim(htmlentities($_POST['segtitle'.$i]));
-		$n[1] = trim($_POST['segend'.$i]);
-		if (strpos($n[1],':')===false) {
-			$thistime = $n[1];
-		} else {
-			$x = explode(':',$n[1]);
-			$thistime = 60*$x[0] + $x[1];
-		}
+		$thistime = timetosec($_POST['segend'.$i]);
+		$n[1] = $thistime;
 		if (isset($_POST['qn'.$i])) {
 			$n[2] = $_POST['qn'.$i];
 		}
 		if (isset($_POST['hasfollowup'.$i])) {
-			$n[3] = trim(htmlentities($_POST['followuptitle'.$i]));
-			$n[4] = trim($_POST['followupend'.$i]);
+			$n[3] = timetosec($_POST['followupend'.$i]);
+			
 			if (isset($_POST['showlink'.$i])) {
-				$n[5] = 1;
+				$n[4] = true;
 			} else { 
-				$n[5] = 0;
+				$n[4] = false;
 			}
+			$n[5] = trim(htmlentities($_POST['followuptitle'.$i]));
 		}
-		$data[$thistime] = implode(',',$n);
+		$data[$thistime] = $n;
 		$i++;	
 	}
 	ksort($data);
 	$data = array_values($data);
-	$data = $vidid.';'.implode(';',$data);
+	array_unshift($data, $vidid);
 	if (trim($_POST['finalseg'])!='') {
-		$data .= ';'.trim(htmlentities($_POST['finalseg']));
+		array_push($data, array(htmlentities($_POST['finalseg'])));
 	}
-	//addslashes and save
+	$data = addslashes(serialize($data));
+	$query = "UPDATE imas_assessments SET viddata='$data' WHERE id='$aid'";
+	mysql_query($query) or die("Query failed : " . mysql_error());
+	
+	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
+	exit;			
 }
 
 
@@ -63,10 +58,11 @@ echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$cou
 echo "&gt; <a href=\"addquestions.php?cid=$cid&aid=$aid\">Add/Remove Questions</a> &gt; Video Navigation</div>\n";
 
 
-$query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
+$query = "SELECT itemorder,viddata FROM imas_assessments WHERE id='$aid'";
 $result = mysql_query($query) or die("Query failed : " . mysql_error());
 $row = mysql_fetch_row($result);
 $qorder = explode(',',$row[0]);
+$viddata = $row[1];
 $qidbynum = array();
 for ($i=0;$i<count($qorder);$i++) {
 	if (strpos($qorder[$i],'~')!==false) {
@@ -94,9 +90,33 @@ while ($row = mysql_fetch_row($result)) {
 	}
 }
 
-if (isset($data)) {
+function sectotime($t) {
+	if ($t<60) {
+		return $t;
+	} else {
+		$o = floor($t/60).':';
+		$t = $t%60;
+		if ($t<10) {
+			$o .= '0'.$t;
+		} else {
+			$o .= $t;
+		}
+	}
+	return $o;
+}
+function timetosec($t) {
+	if (strpos($t,':')===false) {
+		$time = $t;
+	} else {
+		$x = explode(':',$t);
+		$time = 60*$x[0] + $x[1];
+	}
+	return $time;
+}
+
+if ($viddata != '') {
+	$data = unserialize($viddata);
 	//load existing data
-	$data = explode(';',$data);
 	$vidid = array_shift($data);
 	$n = count($data);
 	$title = array(); $endtime = array();
@@ -107,20 +127,19 @@ if (isset($data)) {
 	$showlink = array();
 	$finalsegtitle;
 	for ($i=0;$i<$n;$i++) {
-		$d = explode(',',$data[$i]);
-		$title[$i] = $d[0];
-		if (count($d)==1) {
-			$finalsegtitle = $d[0];
+		$title[$i] = $data[$i][0];
+		if (count($data[$i])==1) {
+			$finalsegtitle = $data[$i][0];
 			$n--;
 		} else {
-			$endtime[$i] = $d[1];
+			$endtime[$i] = sectotime($data[$i][1]);
 		}
-		if (count($d)>2) {  //is a question segment
-			$qn[$i] = $d[2];
-			if (count($d)>3) { //has followup
-				$followuptitle[$i] = $d[3];
-				$followupendtime[$i] = $d[4];
-				$showlink[$i] = $d[5];
+		if (count($data[$i])>2) {  //is a question segment
+			$qn[$i] = $data[$i][2];
+			if (count($data[$i])>3) { //has followup
+				$followuptitle[$i] = $data[$i][5];
+				$followupendtime[$i] = sectotime($data[$i][3]);
+				$showlink[$i] = $data[$i][4];
 				$hasfollowup[$i] = true;
 			} else {
 				$hasfollowup[$i] = false;
@@ -138,7 +157,7 @@ if (isset($data)) {
 	$qn = range(0, $n-1);
 	$followuptitle = array_fill(0, $n, '');
 	$follwupendtime = array_fill(0,$n, '');
-	$showlink = array_fill(0, $n, 1);
+	$showlink = array_fill(0, $n, true);
 	$finalsegtitle = '';
 	$vidid = '';
 	

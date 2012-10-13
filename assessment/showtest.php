@@ -350,6 +350,9 @@
 	$query = "SELECT * FROM imas_assessments WHERE id='{$line['assessmentid']}'";
 	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 	$testsettings = mysql_fetch_array($result, MYSQL_ASSOC);
+	if ($testsettings['displaymethod']=='VideoCue' && $testsettings['viddata']=='') {
+		$testsettings['displaymethod']= 'Embed';
+	}
 	$timelimitkickout = ($testsettings['timelimit']<0);
 	$testsettings['timelimit'] = abs($testsettings['timelimit']);
 	//do time limit mult
@@ -704,6 +707,10 @@ if (!isset($_POST['embedpostback'])) {
 	     }</script>';
 
 	$cid = $testsettings['courseid'];
+	if ($testsettings['displaymethod'] == "VideoCue") {
+		//$placeinhead .= '<script src="'.$urlmode.'www.youtube.com/player_api"></script>';
+		$placeinhead .= '<script src="'.$imasroot.'/javascript/ytapi.js"></script>';
+	}
 	require("header.php");
 	if ($testsettings['noprint'] == 1) {
 		echo '<style type="text/css" media="print"> div.question, div.todoquestion, div.inactive { display: none;} </style>';
@@ -1499,6 +1506,38 @@ if (!isset($_POST['embedpostback'])) {
 				//record score
 				recordtestdata();
 				
+				//is it video question?
+				if ($testsettings['displaymethod'] == "VideoCue") {
+				
+					$viddata = unserialize($testsettings['viddata']);
+					
+					foreach ($viddata as $i=>$v) {
+						if (isset($v[2]) && $v[2]==$qn) {
+							echo '<div>';
+							if (isset($v[3]) && getpts($rawscore)>.99) {
+								echo '<span class="inlinebtn" onclick="thumbSet.jumpToTime('.$v[1].',true);">';
+								echo 'Continue video to '.$v[5].'</span> ';
+								if (isset($viddata[$i+1])) {
+									echo '<span class="inlinebtn" onclick="thumbSet.jumpToTime('.$v[3].',false);">';
+									echo 'Jump video to '.$viddata[$i+1][0].'</span> ';
+								} 	
+							} else if (isset($v[3])) {
+								echo '<span class="inlinebtn" onclick="thumbSet.jumpToTime('.$v[1].',true);">';
+								echo 'Continue video to '.$v[5].'</span> ';
+							} else if (isset($viddata[$i+1])) {
+								echo '<span class="inlinebtn" onclick="thumbSet.jumpToTime('.$v[1].',true);">';
+								echo 'Continue video to '.$viddata[$i+1][0].'</span> ';
+							}
+							if (hasreattempts($qn) && getpts($rawscore)<.99) {
+								echo 'or try the problem again';
+							}
+							
+							echo '</div>';
+							break;	
+						}
+					}
+				}
+				
 				embedshowicon($qn);
 				if (!$sessiondata['istutorial']) {
 					echo '<div class="prequestion">';
@@ -1530,6 +1569,7 @@ if (!isset($_POST['embedpostback'])) {
 						echo '<p>Question scored.</p>';
 					}
 				}
+				
 				
 			}
 			if ($allowregen && $qi[$questions[$qn]]['allowregen']==1) {
@@ -1795,9 +1835,13 @@ if (!isset($_POST['embedpostback'])) {
 				}
 				echo '</form>';
 			}
-		} else if ($testsettings['displaymethod'] == "Embed") {
+		} else if ($testsettings['displaymethod'] == "Embed" || $testsettings['displaymethod'] == "VideoCue") {
 			if (!isset($_GET['page'])) { $_GET['page'] = 0;}
 			$intro = filter("<div class=\"intro\">{$testsettings['intro']}</div>\n");
+			if ($testsettings['displaymethod'] == "VideoCue") {
+				echo $intro;
+				$intro = '';
+			}
 			echo '<script type="text/javascript">var assesspostbackurl="' .$urlmode. $_SERVER['HTTP_HOST'] . $imasroot . '/assessment/showtest.php?embedpostback=true&action=scoreembed&page='.$_GET['page'].'";</script>';
 			//using the full test scoreall action for timelimit auto-submits
 			echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=scoreall\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
@@ -1836,7 +1880,7 @@ if (!isset($_POST['embedpostback'])) {
 				$intro = preg_replace('/\[QUESTION\s+(\d+)\s*\]/','</div>[QUESTION $1]<div class="intro">',$intro);
 			}
 			if (strpos($intro,'[PAGE')!==false) {
-				$intro = preg_replace('/<p>((<span|<strong|<em)[^>]*>)?\[PAGE\s*([^\]]*)]((<\/span|<\/strong|<\/em)[^>]*>)?<\/p>/','[PAGE $3]',$intro);
+				$intro = preg_replace('/<p>((<span|<strong|<em)[^>]*>)?\[PAGE\s*([^\]]*)\]((<\/span|<\/strong|<\/em)[^>]*>)?<\/p>/','[PAGE $3]',$intro);
 				$intro = preg_replace('/\[PAGE\s*([^\]]*)\]/','</div>[PAGE $1]<div class="intro">',$intro);
 				$intropages = preg_split('/\[PAGE\s*([^\]]*)\]/',$intro,-1,PREG_SPLIT_DELIM_CAPTURE); //main pagetitle cont 1 pagetitle
 				if (!isset($_GET['page'])) { $_GET['page'] = 0;}
@@ -1852,16 +1896,40 @@ if (!isset($_POST['embedpostback'])) {
 					$qmin =0; $qmax = 0;
 				}
 				$dopage = true;
+				$dovidcontrol = false;
 				showembednavbar($intropages,$_GET['page']);
 				echo "<div class=inset>\n";
 				echo "<a name=\"beginquestions\"></a>\n";
+			} else if ($testsettings['displaymethod'] == "VideoCue") {
+				$viddata = unserialize($testsettings['viddata']);
+			
+				//asychronously load YouTube API
+				echo '<script type="text/javascript">var tag = document.createElement(\'script\');tag.src = "//www.youtube.com/player_api";var firstScriptTag = document.getElementsByTagName(\'script\')[0];firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);</script>';
+
+				showvideoembednavbar($viddata);
+				$dovidcontrol = true;
+				echo '<div class="inset" style="position: relative; margin-left: 200px;">';
+				echo "<a name=\"beginquestions\"></a>\n";
+				echo '<div id="player"></div>';
+				$outarr = array();
+				for ($i=1;$i<count($viddata);$i++) {
+					if (isset($viddata[$i][2])) {
+						$outarr[] = $viddata[$i][1].':{qn:'.$viddata[$i][2].'}';
+					}
+				}
+				echo '<script type="text/javascript">var thumbSet = initVideoObject("'.$viddata[0].'",{'.implode(',',$outarr).'});</script>';
+				
+				$qmin = 0;
+				$qmax = count($questions);
+				$dopage = false;
 			} else {
 				$qmin = 0;
 				$qmax = count($questions);
 				$dopage = false;
+				$dovidcontrol = false;
 				showembedupdatescript();
 			}
-			if (!$sessiondata['istutorial']) {
+			if (!$sessiondata['istutorial'] && $testsettings['displaymethod'] != "VideoCue") {
 				$intro .= "<p>Total Points Possible: " . totalpointspossible($qi) . "</p>";
 			}
 			
@@ -1870,7 +1938,9 @@ if (!isset($_POST['embedpostback'])) {
 					$intro = str_replace('[QUESTION '.($i+1).']','',$intro);
 					continue;
 				}
-				$quesout = '<div id="embedqwrapper'.$i.'" class="embedqwrapper">';
+				$quesout = '<div id="embedqwrapper'.$i.'" class="embedqwrapper"';
+				if ($dovidcontrol) { $quesout .= ' style="position: absolute; width:100%; visibility:hidden; top:0px;left:-1000px;" ';}
+				$quesout .= '>';
 				ob_start();
 				embedshowicon($i);
 				if (hasreattempts($i)) {
@@ -1925,14 +1995,16 @@ if (!isset($_POST['embedpostback'])) {
 			}
 			$intro = preg_replace('/<div class="intro">\s*<\/div>/','',$intro);
 			echo $intro;
-			echo '</div>';
-			if ($dopage) {
-				echo '</div>';
-			}
-			echo '</form>';
+			
 			if (!$sessiondata['istutorial']) {
 				echo "<p><a href=\"showtest.php?action=embeddone\">Click here to finalize assessment and summarize score</a></p>\n";
 			}
+			if ($dopage || $dovidcontrol) {
+				echo '</div>';
+			}
+			echo '</div>';
+			echo '</form>';
+			
 					
 			
 		}
@@ -1991,6 +2063,42 @@ if (!isset($_POST['embedpostback'])) {
 			}
 		      }</script>';
 	}
+	
+	function showvideoembednavbar($viddata) {
+		global $imasroot,$scores,$bestscores,$showeachscore,$qi,$questions,$testsettings;
+		/*viddata[0] should be video id.  After that, should be [
+		0: title for previous video segment, 
+		1: time to showQ / end of video segment, (in seconds)
+		2: qn, 
+		3: time to jump to if right (and time for next link to start at) (in seconds)
+		4: provide a link to watch directly after Q (T/F), 
+		5: title for the part immediately following the Q]
+		*/
+		echo "<a href=\"#beginquestions\"><img class=skipnav src=\"$imasroot/img/blank.gif\" alt=\"Skip Navigation\" /></a>\n";
+		echo '<div class="navbar" style="width:175px">';
+		echo '<ul class="qlist" style="margin-left:-10px">';
+		$timetoshow = 0;
+		for ($i=1; $i<count($viddata); $i++) {
+			echo '<li style="margin-bottom:7px;">';
+			echo '<a href="#" onclick="thumbSet.jumpToTime('.$timetoshow.',true);return false;">'.$viddata[$i][0].'</a>';
+			if (isset($viddata[$i][2])) {
+				echo '<br/>&nbsp;&nbsp;<a style="font-size:75%;" href="#" onclick="thumbSet.jumpToQ('.$viddata[$i][1].',false);return false;">Jump to Question</a>';
+				if (isset($viddata[$i][4]) && $viddata[$i][4]==true) {
+					echo '<br/>&nbsp;&nbsp;<a style="font-size:75%;" href="#" onclick="thumbSet.jumpToTime('.$viddata[$i][1].',true);return false;">'.$viddata[$i][5].'</a>';
+				}
+			}
+			if (isset($viddata[$i][3])) {
+				$timetoshow = $viddata[$i][3];
+			} else if (isset($viddata[$i][1])) {
+				$timetoshow = $viddata[$i][1];
+			}
+			echo '</li>';
+		}
+		echo '</ul>';
+		echo '</div>';
+		showembedupdatescript();
+	}
+	
 	function showembednavbar($pginfo,$curpg) {
 		global $imasroot,$scores,$bestscores,$showeachscore,$qi,$questions,$testsettings;
 		echo "<a href=\"#beginquestions\"><img class=skipnav src=\"$imasroot/img/blank.gif\" alt=\"Skip Navigation\" /></a>\n";
