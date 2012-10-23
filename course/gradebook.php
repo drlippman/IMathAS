@@ -288,7 +288,7 @@ if ($canviewall) {
 						var v = tds[i].textContent;
 					}
 					v = v.replace(/\(.*?\)/g,"");
-					if (k = v.match(/(\d+)\/(\d+)/)) {
+					if (k = v.match(/([\d\.]+)\/(\d+)/)) {
 						if (k[2]==0) { var perc = 0;} else { var perc= k[1]/k[2];}
 					} else {
 						v = v.replace(/[^\d\.]/g,"");

@@ -884,7 +884,11 @@ function rrand($min,$max,$p) {
 	if (func_num_args()!=3) { echo "rrand expects 3 arguments"; return $min;}
 	if ($max < $min) {echo "Need min&lt;max"; return $min;}
 	if ($p==0) {echo "Error with rrand: need to set step size"; return false;}
-	return($min + $p*rand(0,($max-$min)/$p));	
+	$rn = 0;
+	if (($s = strpos( (string) $p,'.'))!==false) { $rn = max($rn, strlen((string) $p) - $s - 1); }
+	if (($q = strpos((string) $min,'.'))!==false) { $rn = max($rn, strlen((string) $min) - $q - 1); }
+	
+	return( round($min + $p*rand(0,($max-$min)/$p), $rn));	
 }
 
 
@@ -902,8 +906,12 @@ function rrands($min,$max,$p,$n) {
 	if (func_num_args()!=4) { echo "rrands expects 4 arguments"; return $min;}
 	if ($max < $min) {echo "Need min&lt;max"; return $min;}
 	if ($p==0) {echo "Error with rrands: need to set step size"; return false;}
+	$rn = 0;
+	if (($s = strpos( (string) $p,'.'))!==false) { $rn = max($rn, strlen((string) $p) - $s - 1); }
+	if (($q = strpos((string) $min,'.'))!==false) { $rn = max($rn, strlen((string) $min) - $q - 1); }
+	
 	for ($i = 0; $i < $n; $i++) {
-		$r[$i] = $min + $p*rand(0,($max-$min)/$p);
+		$r[$i] = round($min + $p*rand(0,($max-$min)/$p), $rn);
 	}
 	return $r;
 }
@@ -975,8 +983,12 @@ function nonzerorrand($min,$max,$p) {
 		echo "min=0, max=0 bad."; return 0;
 	}
 	if ($p==0) {echo "Error with nonzerorrand: need to set step size"; return false;}
+	$rn = 0;
+	if (($s = strpos( (string) $p,'.'))!==false) { $rn = max($rn, strlen((string) $p) - $s - 1); }
+	if (($q = strpos((string) $min,'.'))!==false) { $rn = max($rn, strlen((string) $min) - $q - 1); }
+	
 	do {
-		$ret = $min + $p*rand(0,($max-$min)/$p);
+		$ret = round($min + $p*rand(0,($max-$min)/$p), $rn);
 	} while (abs($ret)< 1e-14);
 	return $ret;
 }
@@ -1006,9 +1018,13 @@ function nonzerorrands($min,$max,$p,$n) {
 		echo "min=0, max=0 bad."; return 0;
 	}
 	if ($p==0) {echo "Error with nonzerorrands: need to set step size"; return false;}
+	$rn = 0;
+	if (($s = strpos( (string) $p,'.'))!==false) { $rn = max($rn, strlen((string) $p) - $s - 1); }
+	if (($q = strpos((string) $min,'.'))!==false) { $rn = max($rn, strlen((string) $min) - $q - 1); }
+	
 	for ($i = 0; $i < $n; $i++) {	
 		do {
-			$r[$i] = $min + $p*rand(0,($max-$min)/$p);
+			$r[$i] = round($min + $p*rand(0,($max-$min)/$p), $rn);
 		} while (abs($r[$i]) <1e-14);
 	}
 	return $r;
@@ -1038,17 +1054,25 @@ function diffrands($min,$max,$n) {
 }
 
 
-function diffrrands($min,$max,$p,$n) {
-	if (func_num_args()!=4) { echo "diffrrands expects 4 arguments"; return $min;}
+function diffrrands($min,$max,$p,$n, $nonzero=false) {
+	if (func_num_args()<4) { echo "diffrrands expects 4 arguments"; return $min;}
 	if ($max < $min) {echo "Need min&lt;max"; return $min;}
+	if ($min==0 && $max==0) {
+		echo "min=0, max=0 bad."; return 0;
+	}
 	if ($p==0) {echo "Error with diffrrands: need to set step size"; return false;}
+	
+	$rn = 0;
+	if (($s = strpos( (string) $p,'.'))!==false) { $rn = max($rn, strlen((string) $p) - $s - 1); }
+	if (($q = strpos((string) $min,'.'))!==false) { $rn = max($rn, strlen((string) $min) - $q - 1); }
+	
 	$maxi = ($max-$min)/$p;
 	if ($n<.1*$maxi) {
 		$out = array();
 		
 		while (count($out)<$n) {
-			$x = $min + $p*rand(0,$maxi);
-			if (!in_array($x,$out)) {
+			$x = round($min + $p*rand(0,$maxi), $rn);
+			if (!in_array($x,$out) && (!$nonzero || abs($x)>1e-14)) {
 				$out[] = $x;
 			}
 		}
@@ -1058,10 +1082,15 @@ function diffrrands($min,$max,$p,$n) {
 		while ($n>count($r)) {
 			$r = array_merge($r,$r);
 		}
+		if ($nonzero) {
+			if ($min < 0 && $max > 0) {
+				array_splice($r,-1*$min/$p,1);
+			}
+		}
 		shuffle($r);
 		$r = array_slice($r,0,$n);
 		for ($i=0;$i<$n;$i++) {
-			$r[$i] = $min+$p*$r[$i];
+			$r[$i] = round($min+$p*$r[$i], $rn);
 		}
 		return $r;
 	}
@@ -1097,36 +1126,7 @@ function nonzerodiffrands($min,$max,$n) {
 
 
 function nonzerodiffrrands($min,$max,$p,$n) {
-	if (func_num_args()!=4) { echo "nonzerodiffrrands expects 4 arguments"; return $min;}
-	if ($max < $min) {echo "Need min&lt;max"; return $min;}
-	if ($p==0) {echo "Error with nonzerodiffrrands: need to set step size"; return false;}
-	if ($min==0 && $max==0) {
-		echo "min=0, max=0 bad."; return 0;
-	}
-	$maxi = ($max-$min)/$p;
-	if ($n<.1*$maxi) {
-		$out = array();
-		
-		while (count($out)<$n) {
-			$x = $min + $p*rand(0,$maxi);
-			if (abs($x)>1e-14 && !in_array($x,$out)) {
-				$out[] = $x;
-			}
-		}
-		return $out;
-	} else {
-		$r = range(0,$maxi);
-		if ($min < 0 && $max > 0) {
-			array_splice($r,-1*$min/$p,1);
-		}
-		shuffle($r);
-		$r = array_slice($r,0,$n);
-		for ($i=0;$i<$n;$i++) {
-			$r[$i] = $min+$p*$r[$i];
-		}
-		return $r;
-	}
-	
+	return diffrrands($min,$max,$p,$n, true);
 }
 
 
