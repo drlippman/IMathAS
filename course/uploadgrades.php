@@ -49,11 +49,14 @@ if (!(isset($teacherid))) {
 			while (($data = fgetcsv($handle, 4096, ",")) !== FALSE) {
 				$query = "SELECT imas_users.id FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid AND imas_students.courseid='$cid' AND ";
 				if ($_POST['useridtype']==0) {
+					$data[$usercol] = str_replace("'","\\'",trim($data[$usercol]));
+					if ($data[$usercol]=='') {continue;}
 					$query .= "imas_users.SID='{$data[$usercol]}'";
 				} else if ($_POST['useridtype']==1) {
+					if (strpos($data[$usercol],',')===false) { continue;}
 					list($last,$first) = explode(',',$data[$usercol]);
-					$first = str_replace(' ','',$first);
-					$last = str_replace(' ','',$last);
+					$first = str_replace("'","\\'",trim($first));
+					$last = str_replace("'","\\'",trim($last));
 					$query .= "imas_users.FirstName='$first' AND imas_users.LastName='$last'";
 					//echo $query;
 				} else {
