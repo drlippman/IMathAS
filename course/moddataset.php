@@ -571,6 +571,10 @@
 	echo '<div id="headermoddataset" class="pagetitle">';
 	echo "<h2>$addmod QuestionSet Question</h2>\n";
 	echo '</div>';
+	
+	if (strpos($line['control'],'end stored values - Tutorial Style')!==false) {
+		echo '<p>This question appears to be a Tutorial Style question.  <a href="modtutorialq.php?'.$_SERVER['QUERY_STRING'].'">Open in the tutorial question editor</a></p>';
+	}
 
 	if ($line['deleted']==1) {
 		echo '<p style="color:red;">This question has been marked for deletion.  This might indicate there is an error in the question. ';
@@ -717,6 +721,9 @@ Question type: <select name=qtype <?php if (!$myq) echo "disabled=\"disabled\"";
 <a href="#" onclick="window.open('<?php echo $imasroot;?>/assessment/libs/libhelp.php','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',toolbar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6))">Macro Library Help</a> 
 Switch to: 
 <input type=button id=entrymode value="<?php if ($twobx) {echo "4-box entry";} else {echo "2-box entry";}?>" onclick="swapentrymode()" <?php if ($line['qcontrol']!='' || $line['answer']!='') echo "DISABLED"; ?>/>
+<?php if (!isset($_GET['id'])) {
+	echo ' <a href="modtutorialq.php?'.$_SERVER['QUERY_STRING'].'">Tutorial Style editor</a>';
+}?>
 </p>
 <div id=ccbox>
 Common Control: <span class=pointer onclick="incboxsize('control')">[+]</span><span class=pointer onclick="decboxsize('control')">[-]</span>
