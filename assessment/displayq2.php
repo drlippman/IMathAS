@@ -10,6 +10,7 @@ require("interpret5.php");
 require("macros.php");
 function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false,$qcolors=array()) {
 	global $imasroot, $myrights, $showtips, $urlmode;
+	
 	srand($seed);
 	if (is_int($doshowans) && $doshowans==2) {
 		$doshowans = true;
@@ -607,6 +608,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			echo "Eeek!  \$questions is not defined or needs to be an array";
 			return false;
 		}
+		
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		if ($noshuffle == "last") {
 			$randkeys = array_rand(array_slice($questions,0,count($questions)-1),count($questions)-1);
@@ -618,6 +620,27 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$randkeys = array_rand($questions,count($questions));
 			shuffle($randkeys);
 		}
+		
+		if (isset($GLOBALS['lastanspretty'])) {  //generate nice display version of 
+			if ($multi>0) {
+				$laarr = explode('##',$GLOBALS['lastanspretty'][$multi-1]);
+				foreach ($laarr as $k=>$v) {
+					if ($v=='ReGen') { continue;}
+					$laparts = explode('&',$v);
+					$laparts[$qn%1000] = str_replace(array('##','&'),'',$questions[$randkeys[$laparts[$qn%1000]]]);
+					$laarr[$k] = implode('&',$laparts);
+				}
+				$GLOBALS['lastanspretty'][$multi-1] = implode('##',$laarr);
+			} else {
+				$laarr = explode('##',$GLOBALS['lastanspretty'][$qn]);
+				foreach ($laarr as $k=>$v) {
+					if ($v=='ReGen') { continue;}
+					$laarr[$k] = str_replace(array('##','&'),'',$questions[$randkeys[$v]]);	
+				}
+				$GLOBALS['lastanspretty'][$qn] = implode('##',$laarr);
+			}
+		}
+		
 		if ($displayformat == 'column') { $displayformat = '2column';}
 		
 		if (substr($displayformat,1)=='column') {
@@ -1940,7 +1963,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 		} else {
 			$gaarr = array(str_replace(',','',$givenans));
-			if (strpos($answer,'[')===false) {
+			if (strpos($answer,'[')===false && strpos($answer,'(')===false) {
 				$anarr = array(str_replace(',','',$answer));
 			} else {
 				$anarr = array($answer);

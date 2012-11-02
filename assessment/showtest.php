@@ -1624,7 +1624,7 @@ if (!isset($_POST['embedpostback'])) {
 			showqinfobar($qn,true,false);
 			
 			echo '<script type="text/javascript">document.getElementById("disptime").value = '.time().';';
-			if (strpos($testsettings['intro'],'[PAGE')!==false) {
+			if (strpos($testsettings['intro'],'[PAGE')!==false || $sessiondata['intreereader']) {
 				echo 'embedattemptedtrack["q'.$qn.'"][1]=0;';
 				if (false && $showeachscore) {
 					echo 'embedattemptedtrack["q'.$qn.'"][2]='. (canimprove($qn)?"1":"0") . ';';
@@ -1906,8 +1906,11 @@ if (!isset($_POST['embedpostback'])) {
 				$viddata = unserialize($testsettings['viddata']);
 			
 				//asychronously load YouTube API
+				//echo '<script type="text/javascript">var tag = document.createElement(\'script\');tag.src = "//www.youtube.com/player_api";var firstScriptTag = document.getElementsByTagName(\'script\')[0];firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);</script>';
 				echo '<script type="text/javascript">var tag = document.createElement(\'script\');tag.src = "//www.youtube.com/player_api";var firstScriptTag = document.getElementsByTagName(\'script\')[0];firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);</script>';
 
+				
+				  //tag.src = "//www.youtube.com/iframe_api";
 				showvideoembednavbar($viddata);
 				$dovidcontrol = true;
 				echo '<div class="inset" style="position: relative; margin-left: 225px;">';
@@ -2017,6 +2020,7 @@ if (!isset($_POST['embedpostback'])) {
 		global $imasroot,$scores,$bestscores,$showeachscore,$qi,$questions,$testsettings;
 		
 		$jsonbits = array();
+		$pgposs = 0;
 		for($j=0;$j<count($scores);$j++) {
 			$bit = "\"q$j\":[0,";
 			if (unans($scores[$j])) {
@@ -2054,9 +2058,13 @@ if (!isset($_POST['embedpostback'])) {
 				pts += embedattemptedtrack[i][3];
 				qcnt++;
 			}
-			var status = 0;
-			if (unanscnt == 0) { status = 2;} else if (unanscnt<qcnt) {status=1;}
-			if (top !== self) {
+			var status = 0;';
+			if ($showeachscore) {
+				echo 'if (pts == '.$pgposs.') {status=2;} else if (unanscnt<qcnt) {status=1;}';	
+			} else {
+				echo 'if (unanscnt == 0) { status = 2;} else if (unanscnt<qcnt) {status=1;}';
+			}
+			echo 'if (top !== self) {
 				try {
 					top.updateTRunans("'.$testsettings['id'].'", status);
 				} catch (e) {}
@@ -2108,6 +2116,7 @@ if (!isset($_POST['embedpostback'])) {
 		echo '<ul class="qlist" style="margin-left:-10px">';
 		$jsonbits = array();
 		$max = (count($pginfo)-1)/2;
+		$totposs = 0;
 		for ($i = 0; $i < $max; $i++) {
 			echo '<li style="margin-bottom:7px;">';
 			if ($curpg == $i) { echo "<span class=current>";}
@@ -2157,6 +2166,7 @@ if (!isset($_POST['embedpostback'])) {
 				} else {
 					echo " <span id=\"embednavunans$i\" style=\"margin-left:8px\">$cntunans</span> unattempted";
 				}
+				$totposs += $pgposs;
 			}
 			echo "</li>\n";
 		}
@@ -2164,7 +2174,7 @@ if (!isset($_POST['embedpostback'])) {
 		echo '<script type="text/javascript">var embedattemptedtrack = {'.implode(',',$jsonbits).'}; </script>';
 		echo '<script type="text/javascript">function updateembednav() {
 			var unanscnt = [];
-			var unanstot = 0;
+			var unanstot = 0; var ptstot = 0;
 			var canimpcnt = [];
 			var pgpts = [];
 			var pgmax = -1;
@@ -2190,6 +2200,7 @@ if (!isset($_POST['embedpostback'])) {
 					canimpcnt[embedattemptedtrack[i][0]]++;
 				}
 				pgpts[embedattemptedtrack[i][0]] += embedattemptedtrack[i][3];
+				ptstot += embedattemptedtrack[i][3];
 			}
 			for (var i=0; i<=pgmax; i++) {
 				';
@@ -2207,9 +2218,13 @@ if (!isset($_POST['embedpostback'])) {
 		}
 				
 		echo '}}
-			var status = 0;
-			if (unanstot == 0) { status = 2;} else if (unanstot<qcnt) {status=1;}
-			if (top !== self) {
+			var status = 0;';
+			if ($showeachscore) {
+				echo 'if (ptstot == '.$totposs.') {status=2} else if (unanstot<qcnt) {status=1;}';	
+			} else {
+				echo 'if (unanstot == 0) { status = 2;} else if (unanstot<qcnt) {status=1;}';
+			}
+			echo 'if (top !== self) {
 				try {
 					top.updateTRunans("'.$testsettings['id'].'", status);
 				} catch (e) {}

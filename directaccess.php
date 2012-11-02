@@ -107,7 +107,8 @@
 				require("header.php");
 				echo "<h2>$coursename</h2>";
 				echo '<form method="post" action="'.$_SERVER['PHP_SELF'].$querys.'">';
-				echo "Course Enrollment Key:  <input type=text name=\"ekey\">";
+				echo '<p>Incorrect enrollment key.  Try again.</p>';
+				echo "<p>Course Enrollment Key:  <input type=text name=\"ekey\"></p>";
 				echo "<p><input type=\"submit\" value=\"Submit\"></p>";
 				echo "</form>";
 				require("footer.php");
@@ -150,16 +151,31 @@
 		echo "<div id=\"header\"><div class=\"vcenter\">$coursename</div></div>";
 		//echo '<span style="float:right;margin-top:10px;">'.$smallheaderlogo.'</span>';
 		
+		$cid = intval($_GET['cid']);
+		$curdir = rtrim(dirname(__FILE__), '/\\');
+		if (file_exists("$curdir/directaccess$cid.html")) {
+			require("directaccess$cid.html");
+		} 
+		
+		$query = "SELECT enrollkey FROM imas_courses WHERE id='{$_GET['cid']}'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$enrollkey = mysql_result($result,0,0);
+		
 ?>
 <form method="post" action="<?php echo $_SERVER['PHP_SELF'].$querys;?>" onsubmit="hashpw()">
 
 <h3 style="color:#036;">Already have an account?</h3>
-<p><b>Login</b>.  If you have an account but are not enrolled in this course, you will be able to enroll in this course.</p>
+<p><b>Login</b>.  If you have an account on <?php echo $installname;?> but are not enrolled in this course, you will be able to enroll in this course.</p>
 <?php
 	if ($haslogin) {echo '<p style="color: red;">Login Error.  Try Again</p>';}
 ?>
 <span class=form><?php echo $loginprompt;?>:</span><input class="form" type="text" size="15" id="username" name="username"><br class="form">
 <span class=form>Password:</span><input class="form" type="password" size="15" id="password" name="password"><br class="form">
+<?php
+if (strlen($enrollkey)>0) {
+	echo '<span class=form><label for="ekey">Course Enrollment Key:</label></span><input class=form type=text size=12 name="ekey" id="ekey" value="'.(isset($_POST['ekey'])?$_POST['ekey']:"").'"/><BR class=form>';
+}
+?>
 <span class=form> </span><span class=formright><a href="<?php echo $imasroot; ?>/forms.php?action=resetpw">Forgot Password</a></span><br class="form">
 </table>
 <div id="settings">JavaScript is not enabled.  JavaScript is required for <?php echo $installname; ?>.  Please enable JavaScript and reload this page</div>
@@ -209,9 +225,6 @@
 	}
 </script>
 <?php
-	$query = "SELECT enrollkey FROM imas_courses WHERE id='{$_GET['cid']}'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$enrollkey = mysql_result($result,0,0);
 	if ($enrollkey!='closed') {
 ?>
 <script type="text/javascript">
