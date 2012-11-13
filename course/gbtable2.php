@@ -754,10 +754,12 @@ function gbtable() {
 	$query .= "imas_exceptions.assessmentid=imas_assessments.id AND imas_assessments.courseid='$cid'";
 	$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 	while ($r = mysql_fetch_row($result2)) {
+		if (!isset($sturow[$r[1]])) { continue;}
 		$exceptions[$r[0]][$r[1]] = array($r[2],$r[3]);	
 		$gb[$sturow[$r[1]]][1][$assesscol[$r[0]]][6] = ($r[3]>0)?(1+$r[3]):1;
 		$gb[$sturow[$r[1]]][1][$assesscol[$r[0]]][3] = 10; //will get overwritten later if assessment session exists
 	}
+	
 	//Get assessment scores
 	$assessidx = array_flip($assessments);
 	$query = "SELECT ias.id,ias.assessmentid,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,ias.userid FROM imas_assessment_sessions AS ias,imas_assessments AS ia ";
@@ -1017,6 +1019,7 @@ function gbtable() {
 		$cattotfuture[$row][$category[$i]][$col] = $r[2];
 	}
 	*/
+	
 	//fill out cattot's with zeros
 	for ($ln=1; $ln<count($sturow)+1; $ln++) {
 		
@@ -1096,7 +1099,6 @@ function gbtable() {
 		}
 	}
 	//create category totals
-	
 	for ($ln = 1; $ln<count($sturow)+1;$ln++) { //foreach student calculate category totals and total totals
 		$totpast = 0;
 		$totcur = 0;
@@ -1546,6 +1548,7 @@ function gbtable() {
 			
 			
 		}
+		
 	}
 	if ($limuser<1) {
 		//create averages

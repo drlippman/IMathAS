@@ -540,7 +540,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		
 		if (!isset($sz)) { $sz = 20;}
 		if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
-		if ($multi>0) { $qn = $multi*1000+$qn;} 
+		if ($multi>0) { $qn = $multi*1000+$qn; $qstr = ($multi-1).'-'.$qn;} else { $qstr = $qn;} 
 		
 		if ($displayformat=="point") {
 			$leftb = "(";
@@ -584,6 +584,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$out .= "$leftb<input ";
 		
 		if ($displayformat=='alignright') { $out .= 'style="text-align: right;" ';}
+		else if ($displayformat=='hidden') { $out .= 'style="position: absolute; visibility: hidden; left: -5000px;" ';}
 		
 		if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
@@ -595,6 +596,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		
 		$out .= "class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\" />$rightb";
+		if ($displayformat=='hidden') { $out .= '<script type="text/javascript">imasprevans['.$qstr.'] = "'.$la.'";</script>';}
 		if (isset($answer)) {
 			$sa = $answer;
 		}
@@ -1372,13 +1374,20 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$qn];} else {$sz = $options['answerboxsize'];}}
 		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
 		if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$qn];} else {$displayformat = $options['displayformat'];}}
+		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
+		if (!isset($answerformat)) { $answerformat = '';}
 		
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		if (!isset($sz)) { $sz = 20;}
 		if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
 		
-		$tip .= "Enter your answer as letters.  Examples: A B C, linear, a cat";
-		$shorttip = 'Enter text';
+		if ($answerformat=='list') {
+			$tip = "Enter your answer as a list of text separated by commas.  Example:  dog, cat, rabbit.<br/>";
+			$shorttip = "Enter a list of text";
+		} else {
+			$tip .= "Enter your answer as letters.  Examples: A B C, linear, a cat";
+			$shorttip = 'Enter text';
+		}
 		
 		$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" autocomplete=\"off\"  ";
 		if ($showtips==2) { //eqntips: work in progress
@@ -2881,6 +2890,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}
 		if (is_array($options['strflags'])) {$strflags = $options['strflags'][$qn];} else {$strflags = $options['strflags'];}
 		if (isset($options['scoremethod']))if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$qn];} else {$scoremethod = $options['scoremethod'];}
+		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$GLOBALS['partlastanswer'] = $givenans;
@@ -2889,7 +2899,15 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			return 1;
 		}
 		$givenans = stripslashes($givenans);
-
+		
+		if (!isset($answerformat)) { $answerformat = "normal";}
+		if ($answerformat=='list') {
+			$gaarr = explode(',',$givenans);
+			$anarr = explode(',',$answer);
+		} else {
+			$gaarr = array($givenans);
+			$anarr = array($answer);
+		}
 		$strflags = str_replace(' ','',$strflags);
 		$strflags = explode(",",$strflags);
 		foreach($strflags as $flag) {
@@ -2907,84 +2925,104 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$flags['ignore_case']=true;
 		}
 		
-		if ($flags['ignore_commas']===true) {
-			$givenans = str_replace(',','',$givenans);
-			$answer = str_replace(',','',$answer);
-		}
-		if ($flags['compress_whitespace']===true) {
-			$givenans = preg_replace('/\s+/',' ',$givenans);
-			$answer = preg_replace('/\s+/',' ',$answer);
-		}
-		if ($flags['trim_whitespace']===true || $flags['compress_whitespace']===true) {
-			$givenans = trim($givenans);
-			$answer = trim($answer);
-		}
-		if ($flags['remove_whitespace']===true) {
-			$givenans = trim(preg_replace('/\s+/','',$givenans));
-		}
-		$specialor = false;
-		if ($flags['special_or']===true) {
-			$specialor = true;
-		}
 		
-		if ($flags['ignore_case']===true) {
-			$givenans = strtoupper($givenans);
-			$answer = strtoupper($answer);
-			if ($specialor) {
-				$anss = explode(' *OR* ',$answer);
-			} else {
-				$anss = explode(' OR ',$answer);
-			}
-		} else {
-			if ($specialor) {
-				$anss = explode(' *or* ',$answer);
-			} else {
-				$anss = explode(' or ',$answer);
-			}
-		}
-				
 		$correct = 0;
-		if ($flags['ignore_order']) {
-			$givenans = explode("\n",chunk_split($givenans,1,"\n"));
-			sort($givenans,SORT_STRING);
-			$givenans = implode('',$givenans);
-		}
+		foreach($anarr as $i=>$answer) {
+			$foundloc = -1;
+			foreach($gaarr as $j=>$givenans) {
+				$givenans = trim($givenans);
 		
-		foreach ($anss as $anans) {
-			if ($flags['ignore_order']===true) {
-				$anans = explode("\n",chunk_split($anans,1,"\n"));
-				sort($anans,SORT_STRING);
-				$anans = implode('',$anans);
-			}
-			if ($flags['trim_whitespace']===true || $flags['compress_whitespace']===true) {
-				$anans = trim($anans);
-			}
-			if ($flags['remove_whitespace']===true) {
-				$anans = trim(preg_replace('/\s+/','',$anans));
-			}
-			if ($flags['partial_credit']===true) {
-				$poss = strlen($anans);
-				$dist = levenshtein($anans,$givenans);
-				$score = ($poss - $dist)/$poss;
-				if ($score>$correct) { $correct = $score;}
-			} else if (isset($flags['allow_diff'])) {
-				if (levenshtein($anans,$givenans) <= 1*$flags['allow_diff']) {
-					$correct = 1;
-					break;
+				if ($flags['ignore_commas']===true) {
+					$givenans = str_replace(',','',$givenans);
+					$answer = str_replace(',','',$answer);
 				}
-			} else if (isset($flags['in_answer'])) {
-				if (strpos($givenans,$anans)!==false) {
-					$correct = 1;
-					break;
+				if ($flags['compress_whitespace']===true) {
+					$givenans = preg_replace('/\s+/',' ',$givenans);
+					$answer = preg_replace('/\s+/',' ',$answer);
 				}
-			} else {
-				if (!strcmp($anans,$givenans)) {
-					$correct = 1;
-					break;
+				if ($flags['trim_whitespace']===true || $flags['compress_whitespace']===true) {
+					$givenans = trim($givenans);
+					$answer = trim($answer);
+				}
+				if ($flags['remove_whitespace']===true) {
+					$givenans = trim(preg_replace('/\s+/','',$givenans));
+				}
+				$specialor = false;
+				if ($flags['special_or']===true) {
+					$specialor = true;
+				}
+				
+				if ($flags['ignore_case']===true) {
+					$givenans = strtoupper($givenans);
+					$answer = strtoupper($answer);
+					if ($specialor) {
+						$anss = explode(' *OR* ',$answer);
+					} else {
+						$anss = explode(' OR ',$answer);
+					}
+				} else {
+					if ($specialor) {
+						$anss = explode(' *or* ',$answer);
+					} else {
+						$anss = explode(' or ',$answer);
+					}
+				}
+						
+				if ($flags['ignore_order']) {
+					$givenans = explode("\n",chunk_split($givenans,1,"\n"));
+					sort($givenans,SORT_STRING);
+					$givenans = implode('',$givenans);
+				}
+				
+				foreach ($anss as $anans) {
+					if ($flags['ignore_order']===true) {
+						$anans = explode("\n",chunk_split($anans,1,"\n"));
+						sort($anans,SORT_STRING);
+						$anans = implode('',$anans);
+					}
+					if ($flags['trim_whitespace']===true || $flags['compress_whitespace']===true) {
+						$anans = trim($anans);
+					}
+					if ($flags['remove_whitespace']===true) {
+						$anans = trim(preg_replace('/\s+/','',$anans));
+					}
+					if ($flags['partial_credit']===true && $answerformat!='list') {
+						$poss = strlen($anans);
+						$dist = levenshtein($anans,$givenans);
+						$score = ($poss - $dist)/$poss;
+						if ($score>$correct) { $correct = $score;}
+					} else if (isset($flags['allow_diff'])) {
+						if (levenshtein($anans,$givenans) <= 1*$flags['allow_diff']) {
+							$correct += 1;
+							$foundloc = $j;
+							break 2;
+						}
+					} else if (isset($flags['in_answer'])) {
+						if (strpos($givenans,$anans)!==false) {
+							$correct += 1;
+							$foundloc = $j;
+							break 2;
+						}
+					} else {
+						if (!strcmp($anans,$givenans)) {
+							$correct += 1;
+							$foundloc = $j;
+							break 2;
+						}
+					}
+				}
+			}
+			if ($foundloc>-1) {
+				array_splice($gaarr,$foundloc,1); //remove from list
+				if (count($gaarr)==0) {
+					break; //stop if no student answers left
 				}
 			}
 		}
-		return $correct;
+		$score = $correct/count($anarr);
+		if ($score<0) { $score = 0; }
+		return ($score);
+		//return $correct;
 	} else if ($anstype == "essay") {
 		require_once("../includes/htmLawed.php");
 		$htmlawedconfig = array('elements'=>'*-script-form');

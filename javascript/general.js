@@ -332,3 +332,42 @@ function imascleanup(type, value) {
 	}
 	return value;
 }
+
+function readCookie(name) {
+  var nameEQ = name + "=";
+  var ca = document.cookie.split(';');
+  for(var i = 0; i < ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+    if (c.indexOf(nameEQ) == 0) return unescape(c.substring(nameEQ.length, c.length));
+  }
+  return null;
+}
+
+function selectByDivID(el) {
+	var v = el.value;
+	var c = el.value.split(":")[0];
+	var els = document.getElementsByTagName("div");
+	for (var i=0;i<els.length;i++) {
+		if (els[i].className.match(c)) {
+			els[i].style.display = (els[i].id==v)?"block":"none";
+		}
+	}
+	var exdate=new Date();
+	exdate.setDate(exdate.getDate() + 365);
+	document.cookie = c+"store"+"="+escape(v) + ";expires="+exdate.toGMTString();
+}
+function setselectbycookie() {
+	var els = document.getElementsByTagName("select");	
+	for (var i=0;i<els.length;i++) {
+		if (els[i].className.match("alts")) {
+			var cl = els[i].className.replace(/alts/,'').replace(/\s/g,'');
+			if ((co = readCookie(cl+"store"))!=null) { //has cookie
+				co = co.replace('store','');
+				els[i].value = co;
+				selectByDivID(els[i]);
+			}
+		}
+	}
+}
+addLoadEvent(setselectbycookie);

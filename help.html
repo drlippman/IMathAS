@@ -2299,6 +2299,11 @@ A student is asked to enter a string (a word or list of letters).
 		</ul>
 		By default, compress_whitespace and ignore_case are On.  Only one of
 		partial_credit, allow_diff, or in_answer may be used at a time.</dd>
+<dt>$scoremethod = "takeanything" (In Answer)</dt>
+	<dd>Sets the problem to give full credit for any answer.</dd>
+<dt>$answerformat = "list" (In Common Control)</dt>
+	<dd>Specifies that a list of answers is expected.  Renders ignore_commas unnecessary.  Cannot be used with 
+	partial_credit flag.  Duplicates are not ignored.</dd>
 <dt>$ansprompt = string (In Question Control)</dt>
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="type: "</dd>
 <dt>$answerboxsize = number (In Question Control)</dt>
@@ -2328,6 +2333,8 @@ None - the essay type is not computer graded.
 	<dd>Determines size of space provided for entry of an answer.  Defaults to 5 rows, 50 columns.</dd>
 <dt>$displayformat = "editor" (In Common Control)</dt>
 	<dd>Use the rich text editor for the essay answer box.</dd>
+<dt>$scoremethod = "takeanything" (In Answer)</dt>
+	<dd>Sets the problem to give full credit for any answer.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the essay box in that location</dd>
 <dt>$showanswer (In Answer)</dt>
@@ -2741,6 +2748,8 @@ None - the file upload type is not computer graded.
 </p>
 <p><b>Optional Variables</b><BR>
 <dl>
+<dt>$scoremethod = "takeanything" (In Answer)</dt>
+	<dd>Sets the problem to give full credit for any answer.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the file upload box in that location</dd>
 <dt>$showanswer (In Answer)</dt>

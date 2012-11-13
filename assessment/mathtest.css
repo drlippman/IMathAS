@@ -10,7 +10,7 @@ a:hover {
 
 html {
 	height: 100%;
-}
+}                                
 body {
 	height: 100%;
 	margin: 10px;
@@ -60,8 +60,9 @@ div.prequestion {
 	padding-left: 10px;
 	border: 1px solid #00f;
 	margin-bottom: -1px;
+	background-color: #ffffff;
 }
-div.embedqwrapper {
+div.embedqwrapper, #player {
 	position: relative;
 }
 img.embedicon {

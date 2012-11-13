@@ -24,6 +24,7 @@ function onPlayerReady(event) {
 function onPlayerError(event) {
 	alert('error');
 }
+
 function onPlayerStateChange(event) {
 	//called on user seek, pause/play, etc
 	thumbSet.recordMe=event;
@@ -36,6 +37,7 @@ function onPlayerStateChange(event) {
 //breaktimesarray is an object of objects:  
 //  {curTime:{qn:qn}} 
 var ytplayer;
+var skipSecQ = -1;
 var initVideoObject = function (VidId, breaktimesarray) {
 	
 	var thumbSet = {
@@ -45,7 +47,7 @@ var initVideoObject = function (VidId, breaktimesarray) {
 		vidName: null,
 		globalQTime: -1,
 		recordMe: null,
-		skipSecQ: -1,
+		//skipSecQ: -1,
 		lastTime: -1,
 		curQ: -1,
 	
@@ -86,7 +88,8 @@ var initVideoObject = function (VidId, breaktimesarray) {
 	
 		setupQPane: function (qTime) {
 			thumbSet.curQ = questions[qTime];
-			document.getElementById("player").style.visibility = "hidden";
+			//document.getElementById("player").style.visibility = "hidden";
+			document.getElementById("player").style.left = "-5000px";
 			document.getElementById("embedqwrapper"+thumbSet.curQ.qn).style.visibility = "visible";
 			document.getElementById("embedqwrapper"+thumbSet.curQ.qn).style.left = "0px";
 		},
@@ -95,8 +98,9 @@ var initVideoObject = function (VidId, breaktimesarray) {
 		    //hide questions
 		    if (thumbSet.curQ != -1) {
 			    document.getElementById("embedqwrapper"+thumbSet.curQ.qn).style.visibility = "hidden";
-			    document.getElementById("embedqwrapper"+thumbSet.curQ.qn).style.left = "-1000px";
+			    document.getElementById("embedqwrapper"+thumbSet.curQ.qn).style.left = "-5000px";
 			    document.getElementById("player").style.visibility = "visible";
+			    document.getElementById("player").style.left = "0px";
 			    
 			    //are we skipping a section of video?
 			    if (skipahead && thumbSet.curQ.hasOwnProperty("showAfter")) {
@@ -119,14 +123,13 @@ var initVideoObject = function (VidId, breaktimesarray) {
 		// called on setTimeout, this watches the time and launches 
 		// the questions when called for
 		checkTime: function () {    
-		    //console.log('checkTime');
 		    var curTime = Math.floor(ytplayer.getCurrentTime());
 		    //console.log(curTime+","+skipSecQ);
 		    if (questions.hasOwnProperty(curTime) && skipSecQ!=curTime && 
 			    ytplayer.getPlayerState() == YT.PlayerState.PLAYING) {
 		    		thumbSet.showQuestion(curTime);
 		    } else if (ytplayer.getPlayerState() == YT.PlayerState.PLAYING) {
-			    setTimeout(thumbSet.checkTime, 200);
+			   setTimeout(thumbSet.checkTime, 200);
 		    }
 		     if (!questions.hasOwnProperty(curTime)) {
 			skipSecQ=-1;
@@ -146,6 +149,7 @@ var initVideoObject = function (VidId, breaktimesarray) {
 		    } else {
 			ytplayer.playVideo();
 		    }
+		    
 		},
 		
 		jumpToTime: function (idxTime, skipQ) {
@@ -163,9 +167,9 @@ var initVideoObject = function (VidId, breaktimesarray) {
 		jumpToQ:  function (idxTime) {
 			if (this.curQ != -1) {
 			    document.getElementById("embedqwrapper"+thumbSet.curQ.qn).style.visibility = "hidden";
-			    document.getElementById("embedqwrapper"+thumbSet.curQ.qn).style.left = "-1000px";
+			    document.getElementById("embedqwrapper"+thumbSet.curQ.qn).style.left = "-5000px";
 			}
-			this.skipSecQ = -1;
+			skipSecQ = -1;
 			ytplayer.pauseVideo();
 			ytplayer.seekTo(idxTime-0.5, true);
 			thumbSet.showQuestion(idxTime);

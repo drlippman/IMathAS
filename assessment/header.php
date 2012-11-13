@@ -17,6 +17,21 @@ function init() {
 		var foo = initstack[i]();
 	}
 }
+function recordanswer(val, qn, part) {
+	if (part!=null) {
+		qn = (qn+1)*1000 + part;
+	}
+	document.getElementById("qn"+qn).value = val;
+}	
+var imasprevans = [];
+function getlastanswer(qn, part) {
+	if (part != null) {
+		return imasprevans[qn+'-'+part];
+	} else {
+		return imasprevans[qn];
+	}
+}
+//add require_once style script loader
 initstack = new Array();
 window.onload = init;
 var imasroot = '<?php echo $imasroot; ?>';
