@@ -269,7 +269,14 @@ $placeinhead .= "}</script>";
 		<A HREF="actions.php?action=logout">Log Out</a><BR>
 	</div>
 <?php 
-	if($myrights >= 75) { 
+	if($myrights<75 && isset($CFG['GEN']['allowteacherexport'])) {
+?>
+	<div class=cp>
+	<a href="export.php?cid=admin">Export Question Set</a><BR>
+	<a href="exportlib.php?cid=admin">Export Libraries</a>
+	</div>
+<?php 	
+	} else if($myrights >= 75) { 
 ?>
 	<div class=cp>
 	<span class=column>

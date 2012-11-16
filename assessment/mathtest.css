@@ -62,7 +62,7 @@ div.prequestion {
 	margin-bottom: -1px;
 	background-color: #ffffff;
 }
-div.embedqwrapper, #player {
+div.embedqwrapper, #playerwrapper {
 	position: relative;
 }
 img.embedicon {

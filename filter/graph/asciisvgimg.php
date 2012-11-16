@@ -83,6 +83,7 @@ function AStoIMG($w=200, $h=200) {
 		$this->transblue = imagecolorallocatealpha($this->img, 0,0,255,90);
 		$this->transgreen = imagecolorallocatealpha($this->img, 0,255,0,90);
 		$this->transred = imagecolorallocatealpha($this->img, 255,0,0,90);
+		$this->transwhite = imagecolorallocatealpha($this->img, 255,255,255,90);
 	} else {
 		$this->img = imagecreate($w,$h);
 	}

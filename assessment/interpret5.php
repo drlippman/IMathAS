@@ -502,6 +502,13 @@ function tokenize($str,$anstype,$countcnt) {
 							$i= $j+1;
 							break;
 						}
+					} else if ($d=='/' && $str{$j+1}=='/') {
+						//comment inside brackers
+						while ($d!="\n" && $j<$len) {
+							$j++;
+							$d = $str{$j};
+						}
+						$j++;
 					} else if ($d=="\n") {
 						//echo "unmatched parens/brackets - likely will cause an error";
 					}

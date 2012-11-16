@@ -62,7 +62,7 @@ var initVideoObject = function (VidId, breaktimesarray) {
 		// add player to the page
 		createPlayer: function () {
 			
-		    var pVarsInternal = {'autoplay': 0, 'wmode': 'transparent', 'fs': 0, 'controls':1, 'rel':0, 'modestbranding':1, 'showinfo':0}; 
+		    var pVarsInternal = {'autoplay': 0, 'wmode': 'transparent', 'fs': 0, 'controls':2, 'rel':0, 'modestbranding':1, 'showinfo':0}; 
 		  
 		    //console.log(pVarsInternal);
 	
@@ -78,8 +78,8 @@ var initVideoObject = function (VidId, breaktimesarray) {
 			}
 		    });
 		    
-		    document.getElementById('player').style['z-index']=-10;
-		    document.getElementById('player').style['-webkit-transform']='translateZ(0)';
+		    //document.getElementById('playerwrapper').style['z-index']=-10;
+		   // document.getElementById('playerwrapper').style['-webkit-transform']='translateZ(0)';
 		},
 	
 		stripPx: function (sizeWithPx) {
@@ -89,7 +89,7 @@ var initVideoObject = function (VidId, breaktimesarray) {
 		setupQPane: function (qTime) {
 			thumbSet.curQ = questions[qTime];
 			//document.getElementById("player").style.visibility = "hidden";
-			document.getElementById("player").style.left = "-5000px";
+			document.getElementById('playerwrapper').style.left = "-5000px";
 			document.getElementById("embedqwrapper"+thumbSet.curQ.qn).style.visibility = "visible";
 			document.getElementById("embedqwrapper"+thumbSet.curQ.qn).style.left = "0px";
 		},
@@ -99,7 +99,7 @@ var initVideoObject = function (VidId, breaktimesarray) {
 		    if (thumbSet.curQ != -1) {
 			    document.getElementById("embedqwrapper"+thumbSet.curQ.qn).style.visibility = "hidden";
 			    document.getElementById("embedqwrapper"+thumbSet.curQ.qn).style.left = "-5000px";
-			    document.getElementById("player").style.visibility = "visible";
+			    document.getElementById('playerwrapper').style.left = "0px";
 			    document.getElementById("player").style.left = "0px";
 			    
 			    //are we skipping a section of video?

@@ -18,10 +18,10 @@ $isadmin = false;
 $isgrpadmin = false; 
 
 	//CHECK PERMISSIONS AND SET FLAGS
-if (!(isset($teacherid)) && $myrights<75) {
+if (!(isset($teacherid)) && $myrights<20) {
  	$overwriteBody = 1;
 	$body = "You need to log in as a teacher to access this page";
-} elseif (isset($_GET['cid']) && $_GET['cid']=="admin" && $myrights <75) {
+} elseif (isset($_GET['cid']) && $_GET['cid']=="admin" && $myrights <20) {
  	$overwriteBody = 1;
 	$body = "You need to log in as an admin to access this page";
 } elseif (!(isset($_GET['cid'])) && $myrights < 75) {
@@ -35,6 +35,8 @@ if (!(isset($teacherid)) && $myrights<75) {
 		$isgrpadmin = true;
 	} else if ($myrights == 100) {
 		$isadmin = true;
+	} else if (!isset($teacherid)) {
+		$isadminpage = true;	
 	}
 		
 	if (isset($_POST['submit']) && $_POST['submit']=='Export') { //STEP 2 DATA MANIPULATION
@@ -238,7 +240,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 		exit;
 	} else {  //STEP 1 DATA MANIPULATION
 		
-		if ($isadmin || $isgrpadmin) {
+		if ($isadmin || $isgrpadmin || $isadminpage) {
 			$curBreadcrumb =  "<div class=breadcrumb>$breadcrumbbase <a href=\"admin.php\">Admin</a> &gt; Export libraries</div>\n";
 		} else {
 			$curBreadcrumb =  "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Export Libraries</div>\n";

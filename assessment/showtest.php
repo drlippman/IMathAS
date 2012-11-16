@@ -1915,14 +1915,14 @@ if (!isset($_POST['embedpostback'])) {
 				$dovidcontrol = true;
 				echo '<div class="inset" style="position: relative; margin-left: 225px;">';
 				echo "<a name=\"beginquestions\"></a>\n";
-				echo '<div id="player"></div>';
+				echo '<div id="playerwrapper"><div id="player"></div></div>';
 				$outarr = array();
 				for ($i=1;$i<count($viddata);$i++) {
 					if (isset($viddata[$i][2])) {
 						$outarr[] = $viddata[$i][1].':{qn:'.$viddata[$i][2].'}';
 					}
 				}
-				echo '<script type="text/javascript">var thumbSet = initVideoObject("'.$viddata[0].'",{'.implode(',',$outarr).'});</script>';
+				echo '<script type="text/javascript">var thumbSet = initVideoObject("'.$viddata[0].'",{'.implode(',',$outarr).'}); </script>';
 				
 				$qmin = 0;
 				$qmax = count($questions);
