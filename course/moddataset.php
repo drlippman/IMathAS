@@ -3,6 +3,13 @@
 //(c) 2006 David Lippman
 	require("../validate.php");
 	
+	if ($myrights<20) {
+		require("../header.php");
+		echo "You need to log in as a teacher to access this page";
+		require("../footer.php");
+		exit;
+	}
+	
 	function stripsmartquotes($text) {
 		$text = str_replace(
 			array("\xe2\x80\x98", "\xe2\x80\x99", "\xe2\x80\x9c", "\xe2\x80\x9d", "\xe2\x80\x93", "\xe2\x80\x94", "\xe2\x80\xa6"),
@@ -15,77 +22,18 @@
 			$text);
 		return $text;
  	}
-	$pagetitle = "Question Editor";
-	$placeinhead = '';
-	if ($sessiondata['mathdisp']==2) {
-		//these scripts are used by the editor to make image-based math work in the editor
-		$placeinhead .= '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";';
-		if ($mathdarkbg) {$placeinhead .=  'var mathbg = "dark";';}
-		$placeinhead .= '</script>'; 
-		$placeinhead .= "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=082911\" type=\"text/javascript\"></script>\n";
-		$placeinhead .= "<script type=\"text/javascript\">var usingASCIIMath = false;</script>";
-	}
-	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/editor/tiny_mce.js?v=082911"></script>';
-	$placeinhead .= '<script type="text/javascript">
-	  var editoron = 0;
-	  var coursetheme = "'.$coursetheme.'";';
-	if (isset($AWSkey)) {
-		$placeinhead .= 'var fileBrowserCallBackFunc = "fileBrowserCallBack";';
-	} else {
-		$placeinhead .= 'var fileBrowserCallBackFunc = null;';
-	}
-	$placeinhead .= 'function toggleeditor() {
-	     var qtextbox =  document.getElementById("qtext");
-	     if (editoron==0) {
-	        qtextbox.rows += 3;
-		qtextbox.value = qtextbox.value.replace(/<span\s+class="AM"[^>]*>(.*?)<\\/span>/,"$1");
-	        qtextbox.value = qtextbox.value.replace(/`(.*?)`/,\'<span class="AM" title="$1">`$1`</span>\');
-	        initeditor("exact","qtext");
-	     } else {
-		tinyMCE.execCommand("mceRemoveControl",true,"qtext");
-		qtextbox.rows -= 3;
-		qtextbox.value = qtextbox.value.replace(/<span\s+class="AM"[^>]*>(.*?)<\\/span>/,"$1");
-	     }
-	     editoron = 1 - editoron;
-	     document.cookie = "qeditoron="+editoron;
-	   }
-	   addLoadEvent(function(){if (document.cookie.match(/qeditoron=1/)) {toggleeditor();}});
-	   </script>';
-	
-	require("../header.php");
-	if ($myrights<20) {
-		echo "You need to log in as a teacher to access this page";
-		require("../footer.php");
-		exit;
-	}
-	$cid = $_GET['cid'];
+ 	
+ 	$cid = $_GET['cid'];
 	$isadmin = false;
 	$isgrpadmin = false;
-	if (isset($_GET['aid'])) {
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-		echo "&gt; <a href=\"addquestions.php?aid={$_GET['aid']}&cid={$_GET['cid']}\">Add/Remove Questions</a> &gt; Modify Questions</div>";
-	
-	} else if (isset($_GET['daid'])) {
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-		echo "&gt; <a href=\"adddrillassess.php?daid={$_GET['daid']}&cid={$_GET['cid']}\">Add Drill Assessment</a> &gt; Modify Questions</div>";
-	} else {
-		if ($_GET['cid']=="admin") {
-			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../admin/admin.php\">Admin</a>";
-			echo "&gt; <a href=\"manageqset.php?cid=admin\">Manage Question Set</a> &gt; Modify Question</div>\n";
-			if ($myrights == 100) {
-				$isadmin = true;
-			} else if ($myrights==75) {
-				$isgrpadmin = true;
-			}
-		} else {
-			echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> ";
-			if ($cid>0) {
-				echo "&gt; <a href=\"course.php?cid=$cid\">$coursename</a>";
-			}
-			echo " &gt; <a href=\"manageqset.php?cid=$cid\">Manage Question Set</a> &gt; Modify Question</div>\n";
+	if ($_GET['cid']=='admin') {
+		if ($myrights==100) {
+			$isadmin = true;
+		} else if ($myrights==75) {
+			$isgrpadmin = true;
 		}
-		
-	} 
+	}
+	
 	if (isset($adminasteacher) && $adminasteacher) {
 		if ($myrights == 100) {
 			$isadmin = true;
@@ -100,6 +48,8 @@
 		$frompot = 0;
 	}
 	
+	$outputmsg = '';
+	$errmsg = '';
 	if (isset($_POST['qtext'])) {
 		$now = time();
 		$_POST['qtext'] = addslashes(stripsmartquotes(stripslashes($_POST['qtext'])));
@@ -171,9 +121,9 @@
 			if ($isok) {
 				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 				if (mysql_affected_rows()>0) {
-					echo "Question Updated. ";
+					$outputmsg .= "Question Updated. ";
 				} else {
-					echo "Library Assignments Updated. ";
+					$outputmsg .= "Library Assignments Updated. ";
 				}
 			} 
 			$query = "SELECT id,filename,var,alttext FROM imas_qimages WHERE qsetid='{$_GET['id']}'";
@@ -198,7 +148,7 @@
 					$newalt = $_POST['imgalt-'.$row[0]];
 					$disallowedvar = array('link','qidx','qnidx','seed','qdata','toevalqtxt','la','GLOBALS','laparts','anstype','kidx','iidx','tips','options','partla','partnum','score');
 					if (in_array($newvar,$disallowedvar)) {
-						echo "<p>$newvar is not an allowed variable name</p>";
+						$errmsg .= "<p>$newvar is not an allowed variable name</p>";
 					} else {
 						$query = "UPDATE imas_qimages SET var='$newvar',alttext='$newalt' WHERE id='{$row[0]}'";
 						mysql_query($query) or die("Query failed :$query " . mysql_error());
@@ -245,30 +195,22 @@
 			if (isset($_GET['makelocal'])) {
 				$query = "UPDATE imas_questions SET questionsetid='$qsetid' WHERE id='{$_GET['makelocal']}'";
 				mysql_query($query) or die("Query failed :$query " . mysql_error());
-				echo " Local copy of Question Created ";
+				$outputmsg .= " Local copy of Question Created ";
 				$frompot = 0;
 			} else {
-				echo " Question Added to QuestionSet. ";
+				$outputmsg .= " Question Added to QuestionSet. ";
 				$frompot = 1;
 			}
 			
 		}
-		if (!isset($_GET['aid'])) {
-			echo "<a href=\"manageqset.php?cid=$cid\">Return to Question Set Management</a>\n";
-		} else {
-			if ($frompot==1) {
-				echo "<a href=\"modquestion.php?qsetid=$qsetid&cid=$cid&aid={$_GET['aid']}&process=true&usedef=true\">Add Question to Assessment using Defaults</a> | \n";
-				echo "<a href=\"modquestion.php?qsetid=$qsetid&cid=$cid&aid={$_GET['aid']}\">Add Question to Assessment</a> | \n";
-			}
-			echo "<a href=\"addquestions.php?cid=$cid&aid={$_GET['aid']}\">Return to Assessment</a>\n";
-		}
+		
 		//upload image files if attached
 		if ($_FILES['imgfile']['name']!='') {
 			$disallowedvar = array('link','qidx','qnidx','seed','qdata','toevalqtxt','la','GLOBALS','laparts','anstype','kidx','iidx','tips','options','partla','partnum','score');
 			if (trim($_POST['newimgvar'])=='') {
-				echo "<p>Need to specify variable for image to be referenced by</p>";
+				$errmsg .= "<p>Need to specify variable for image to be referenced by</p>";
 			} else if (in_array($_POST['newimgvar'],$disallowedvar)) {
-				echo "<p>$newvar is not an allowed variable name</p>";
+				$errmsg .= "<p>$newvar is not an allowed variable name</p>";
 			} else {
 				$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/../assessment/qimages/';
 				//$filename = basename($_FILES['imgfile']['name']);
@@ -284,7 +226,7 @@
 				}
 				$result_array = getimagesize($_FILES['imgfile']['tmp_name']); 
 				if ($result_array === false) {
-					echo "<p>File is not image file</p>";
+					$errmsg .= "<p>File is not image file</p>";
 				} else {
 					if (move_uploaded_file($_FILES['imgfile']['tmp_name'], $uploadfile)) {
 						//echo "<p>File is valid, and was successfully uploaded</p>\n";
@@ -364,17 +306,34 @@
 				mysql_query($query) or die("Query failed :$query " . mysql_error());
 			}
 		}
-		
+		if (!isset($_GET['aid'])) {
+			$outputmsg .= "<a href=\"manageqset.php?cid=$cid\">Return to Question Set Management</a>\n";
+		} else {
+			if ($frompot==1) {
+				$outputmsg .=  "<a href=\"modquestion.php?qsetid=$qsetid&cid=$cid&aid={$_GET['aid']}&process=true&usedef=true\">Add Question to Assessment using Defaults</a> | \n";
+				$outputmsg .=  "<a href=\"modquestion.php?qsetid=$qsetid&cid=$cid&aid={$_GET['aid']}\">Add Question to Assessment</a> | \n";
+			}
+			$outputmsg .=  "<a href=\"addquestions.php?cid=$cid&aid={$_GET['aid']}\">Return to Assessment</a>\n";
+		}
 		if ($_POST['test']=="Save and Test Question") {
-			echo "<script>addr = '$imasroot/course/testquestion.php?cid=$cid&qsetid={$_GET['id']}';";
+			$outputmsg .= "<script>addr = '$imasroot/course/testquestion.php?cid=$cid&qsetid={$_GET['id']}';";
 			//echo "function previewit() {";
-			echo "previewpop = window.open(addr,'Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20));\n";
-			echo "previewpop.focus();";
-			echo "</script>";
+			$outputmsg .= "previewpop = window.open(addr,'Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20));\n";
+			$outputmsg .= "previewpop.focus();";
+			$outputmsg .= "</script>";
 			//echo "}";
 			//echo "window.onload = previewit;";
 		} else {
-			require("../footer.php");
+			if ($errmsg == '' && !isset($_GET['aid'])) {
+				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . '/course/manageqset.php?cid='.$cid);
+			} else if ($errmsg == '' && $frompot==0) {
+				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . '/course/addquestions.php?cid='.$cid.'&aid='.$_GET['aid']);
+			} else {
+				require("../header.php");
+				echo $errmsg;
+				echo $outputmsg;
+				require("../footer.php");
+			}
 			exit;
 		}
 	} 
@@ -568,6 +527,71 @@
 		$lnames[] = $row[0];
 	}
 	$lnames = implode(", ",$lnames);
+	
+	
+	/// Start display ///
+	$pagetitle = "Question Editor";
+	$placeinhead = '';
+	if ($sessiondata['mathdisp']==2) {
+		//these scripts are used by the editor to make image-based math work in the editor
+		$placeinhead .= '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";';
+		if ($mathdarkbg) {$placeinhead .=  'var mathbg = "dark";';}
+		$placeinhead .= '</script>'; 
+		$placeinhead .= "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=082911\" type=\"text/javascript\"></script>\n";
+		$placeinhead .= "<script type=\"text/javascript\">var usingASCIIMath = false;</script>";
+	}
+	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/editor/tiny_mce.js?v=082911"></script>';
+	$placeinhead .= '<script type="text/javascript">
+	  var editoron = 0;
+	  var coursetheme = "'.$coursetheme.'";';
+	if (isset($AWSkey)) {
+		$placeinhead .= 'var fileBrowserCallBackFunc = "fileBrowserCallBack";';
+	} else {
+		$placeinhead .= 'var fileBrowserCallBackFunc = null;';
+	}
+	$placeinhead .= 'function toggleeditor() {
+	     var qtextbox =  document.getElementById("qtext");
+	     if (editoron==0) {
+	        qtextbox.rows += 3;
+		qtextbox.value = qtextbox.value.replace(/<span\s+class="AM"[^>]*>(.*?)<\\/span>/,"$1");
+	        qtextbox.value = qtextbox.value.replace(/`(.*?)`/,\'<span class="AM" title="$1">`$1`</span>\');
+	        initeditor("exact","qtext");
+	     } else {
+		tinyMCE.execCommand("mceRemoveControl",true,"qtext");
+		qtextbox.rows -= 3;
+		qtextbox.value = qtextbox.value.replace(/<span\s+class="AM"[^>]*>(.*?)<\\/span>/,"$1");
+	     }
+	     editoron = 1 - editoron;
+	     document.cookie = "qeditoron="+editoron;
+	   }
+	   addLoadEvent(function(){if (document.cookie.match(/qeditoron=1/)) {toggleeditor();}});
+	   </script>';
+	
+	require("../header.php");
+	
+	if (isset($_GET['aid'])) {
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+		echo "&gt; <a href=\"addquestions.php?aid={$_GET['aid']}&cid={$_GET['cid']}\">Add/Remove Questions</a> &gt; Modify Questions</div>";
+	
+	} else if (isset($_GET['daid'])) {
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+		echo "&gt; <a href=\"adddrillassess.php?daid={$_GET['daid']}&cid={$_GET['cid']}\">Add Drill Assessment</a> &gt; Modify Questions</div>";
+	} else {
+		if ($_GET['cid']=="admin") {
+			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../admin/admin.php\">Admin</a>";
+			echo "&gt; <a href=\"manageqset.php?cid=admin\">Manage Question Set</a> &gt; Modify Question</div>\n";
+		} else {
+			echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> ";
+			if ($cid>0) {
+				echo "&gt; <a href=\"course.php?cid=$cid\">$coursename</a>";
+			}
+			echo " &gt; <a href=\"manageqset.php?cid=$cid\">Manage Question Set</a> &gt; Modify Question</div>\n";
+		}
+		
+	} 
+	echo $errmsg;
+	echo $outputmsg;
+	
 	echo '<div id="headermoddataset" class="pagetitle">';
 	echo "<h2>$addmod QuestionSet Question</h2>\n";
 	echo '</div>';

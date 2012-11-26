@@ -215,7 +215,13 @@ if (strlen($enrollkey)>0) {
 		} 
 		html += '<div class=submit><input name="submit" type="submit" value="Login"></div>';
 		setnode.innerHTML = html; 
-		document.getElementById("username").focus();
+<?php
+	if ($page_newaccounterror!='') {
+		echo 'document.getElementById("SID").focus();';
+	} else {
+		echo 'document.getElementById("username").focus();';
+	}
+?>
 	}
 	var existingonload = window.onload;
 	if (existingonload) {

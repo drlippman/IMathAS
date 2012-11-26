@@ -30,6 +30,13 @@ function onPlayerStateChange(event) {
 	thumbSet.recordMe=event;
 	if (event.data == YT.PlayerState.PLAYING) {
 		setTimeout(thumbSet.checkTime, 200);
+	} else if (event.data == YT.PlayerState.ENDED) {
+		var curTime = Math.floor(ytplayer.getCurrentTime());
+		for (var i=curTime;i<curTime+5;i++) {
+			if (questions.hasOwnProperty(i)) {
+				thumbSet.showQuestion(i);
+			}
+		}
 	}
 }
 
@@ -100,7 +107,6 @@ var initVideoObject = function (VidId, breaktimesarray) {
 			    document.getElementById("embedqwrapper"+thumbSet.curQ.qn).style.visibility = "hidden";
 			    document.getElementById("embedqwrapper"+thumbSet.curQ.qn).style.left = "-5000px";
 			    document.getElementById('playerwrapper').style.left = "0px";
-			    document.getElementById("player").style.left = "0px";
 			    
 			    //are we skipping a section of video?
 			    if (skipahead && thumbSet.curQ.hasOwnProperty("showAfter")) {

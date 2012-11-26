@@ -129,18 +129,44 @@ var AsciisvgDialog = {
 		
 		//commands = 'setBorder(5);';
 	
-		m_xmin = document.getElementById("xmin").value;
-		m_xmax = document.getElementById("xmax").value;
-		m_ymin = document.getElementById("ymin").value;
-		m_ymax = document.getElementById("ymax").value;
+		m_xmin = document.getElementById("xmin").value*1;
+		m_xmax = document.getElementById("xmax").value*1;
+		if (m_xmin >= m_xmax) {
+			alert("You need xmin < xmax");
+			document.getElementById("xmax").focus();
+			return;
+		}
+		m_ymin = document.getElementById("ymin").value*1;
+		m_ymax = document.getElementById("ymax").value*1;
+		if (m_ymin >= m_ymax) {
+			alert("You need ymin < ymax");
+			document.getElementById("ymax").focus();
+			return;
+		}
 		if (m_ymin == "") m_ymin = null
 		if (m_ymax == "") m_ymax = null
 		commands += m_xmin + ',' + m_xmax + ','+ m_ymin + ',' + m_ymax + ',';
 	
-		m_xscl = document.getElementById("xscl").value;
-		m_yscl = document.getElementById("yscl").value;
-		if (m_xscl == "") m_xscl = null
-		if (m_yscl == "") m_yscl = null
+		m_xscl = document.getElementById("xscl").value*1;
+		m_yscl = document.getElementById("yscl").value*1;
+		if (m_xscl == "") m_xscl = 0;
+		if (m_yscl == "") m_yscl = 0;
+		if (m_xscl<=0) {
+			alert("xscl needs to be positive");
+			document.getElementById("xscl").focus();
+			return;
+		}
+		if (m_yscl<=0) {
+			alert("yscl needs to be positive");
+			document.getElementById("yscl").focus();
+			return;
+		}
+		if (m_xscl < (m_xmax-m_xmin)/500) {
+			m_xscl = m_xmax-m_xmin;
+		}
+		if (m_yscl < (m_ymax-m_ymin)/500) {
+			m_yscl = m_ymax-m_ymin;
+		}
 		if (document.getElementById("labels").checked) {
 			m_labels = '1';
 		} else {

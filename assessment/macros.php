@@ -4,7 +4,7 @@
 
 
 array_push($allowedmacros,"exp","sec","csc","cot","sech","csch","coth","nthlog","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif","in_array","prettyint","prettyreal","prettysigfig","arraystodots","subarray","showdataarray","arraystodoteqns","array_flip","arrayfindindex","fillarray","array_reverse","root");
-array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","randcity","randcities","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction","ifthen","multicalconarray","htmlentities","formhoverover","formpopup","connectthedots","jointsort","stringpos","stringlen","stringclean","substr","substr_count","str_replace","makexxpretty","makexxprettydisp","forminlinebutton","makenumberrequiretimes","comparenumbers","comparefunctions","getnumbervalue","showrecttable","htmldisp","getstuans","checkreqtimes","stringtopolyterms","getfeedbacktxt");
+array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","randcity","randcities","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction","ifthen","multicalconarray","htmlentities","formhoverover","formpopup","connectthedots","jointsort","stringpos","stringlen","stringclean","substr","substr_count","str_replace","makexxpretty","makexxprettydisp","forminlinebutton","makenumberrequiretimes","comparenumbers","comparefunctions","getnumbervalue","showrecttable","htmldisp","getstuans","checkreqtimes","stringtopolyterms","getfeedbacktxt","explode","gettwopointlinedata","getdotsdata","gettwopointdata");
 function mergearrays($a,$b) {
 	if (!is_array($a)) {
 		$a = array($a);
@@ -2585,4 +2585,63 @@ function getfeedbacktxt($stu,$fbtxt,$ans) {
 	}
 }
 
+function gettwopointlinedata($str,$xmin=-5,$xmax=5,$ymin=-5,$ymax=5,$w=300,$h=300) {
+	return gettwopointdata($str,'line',$xmin,$xmax,$ymin,$ymax,$w,$h);
+}
+function gettwopointdata($str,$type,$xmin=-5,$xmax=5,$ymin=-5,$ymax=5,$w=300,$h=300) {
+	if ($type=='line') { 
+		$code = 5;
+	} else if ($type=='parab') {
+		$code = 6;
+	} else if ($type=='sqrt') {
+		$code = 6.5;
+	} else if ($type=='abs') {
+		$code = 8;
+	} else if ($type=='circle') {
+		$code = 7;
+	} else if ($type=='sin') {
+		$code = 9.1;
+	} else if ($type=='cos') {
+		$code = 9;
+	} else if ($type=='vector') {
+		$code = 5.4;
+	} else {
+		$code = -1;
+	}
+	$imgborder = 5;
+	$pixelsperx = ($w - 2*$imgborder)/($xmax-$xmin);
+	$pixelspery = ($h - 2*$imgborder)/($ymax -$ymin);
+	$outpts = array();
+	list($lines,$dots,$odots,$tplines,$ineqlines) = explode(';;',$str);
+	if ($tplines=='') {return array();}
+	$tplines = explode('),(', substr($tplines,1,strlen($tplines)-2));
+	foreach ($tplines as $k=>$val) {
+		$pts = explode(',',$val);
+		if ($pts[0]==$code) {
+			$pts[1] = ($pts[1] - $imgborder)/$pixelsperx + $xmin;
+			$pts[3] = ($pts[3] - $imgborder)/$pixelsperx + $xmin;
+			$pts[2] = ($h - $pts[2] - $imgborder)/$pixelspery + $ymin;
+			$pts[4] = ($h - $pts[4] - $imgborder)/$pixelspery + $ymin;
+			$outpts[] = array($pts[1], $pts[2], $pts[3], $pts[4]);
+		}
+	}
+	return $outpts;
+}
+function getdotsdata($str,$xmin=-5,$xmax=5,$ymin=-5,$ymax=5,$w=300,$h=300) {
+	$imgborder = 5;
+	$pixelsperx = ($w - 2*$imgborder)/($xmax-$xmin);
+	$pixelspery = ($h - 2*$imgborder)/($ymax -$ymin);
+	list($lines,$dots,$odots,$tplines,$ineqlines) = explode(';;',$str);
+	if ($dots=='') { return array();}
+	$dots = explode('),(', substr($dots,1,strlen($dots)-2));
+	foreach ($dots as $k=>$pt) {
+		 $pt =  explode(',',$pt);
+		 $pt[0] = ($pt[0] - $imgborder)/$pixelsperx + $xmin;
+		 $pt[1] = ($h - $pt[1] - $imgborder)/$pixelspery + $ymin;
+		 $dots[$k] = $pt;
+	}	
+	return $dots;
+	
+}
+			
 ?>

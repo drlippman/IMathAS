@@ -1514,6 +1514,7 @@ if (!isset($_POST['embedpostback'])) {
 					foreach ($viddata as $i=>$v) {
 						if (isset($v[2]) && $v[2]==$qn) {
 							echo '<div>';
+							$hascontinue = true;
 							if (isset($v[3]) && getpts($rawscore)>.99) {
 								echo '<span class="inlinebtn" onclick="thumbSet.jumpToTime('.$v[1].',true);">';
 								echo 'Continue video to '.$v[5].'</span> ';
@@ -1527,9 +1528,15 @@ if (!isset($_POST['embedpostback'])) {
 							} else if (isset($viddata[$i+1])) {
 								echo '<span class="inlinebtn" onclick="thumbSet.jumpToTime('.$v[1].',true);">';
 								echo 'Continue video to '.$viddata[$i+1][0].'</span> ';
+							} else {
+								$hascontinue = false;
 							}
 							if (hasreattempts($qn) && getpts($rawscore)<.99) {
-								echo 'or try the problem again';
+								if ($hascontinue) {
+									echo 'or try the problem again';
+								} else {
+									echo 'Try the problem again';
+								}
 							}
 							
 							echo '</div>';

@@ -273,8 +273,41 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				echo "<h2>Add Thread - \n";
 				if (isset($_GET['quoteq'])) {
 					require_once("../assessment/displayq2.php");
+					$showa = false;
 					$parts = explode('-',$_GET['quoteq']);
-					$message = displayq($parts[0],$parts[1],$parts[2],false,false,0,true);
+					if (count($parts)==5) {
+						//wants to show ans
+						$query = "SELECT seeds,attempts,questions FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='{$parts[3]}'";
+						$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+						$seeds = explode(',',mysql_result($result,0,0));
+						$seeds = $seeds[$parts[0]];
+						$attempts = explode(',',mysql_result($result,0,1));
+						$attempts = $attempts[$parts[0]];
+						$qs = explode(',',mysql_result($result,0,2));
+						$qid = intval($qs[$parts[0]]);
+						$query = "SELECT questionsetid,attempts,showans FROM imas_questions WHERE id=$qid";
+						$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+						$parts[1] = mysql_result($result,0,0);
+						$allowedattempts = mysql_result($result,0,1);
+						$showans = mysql_result($result,0,2);
+						
+						$query = "SELECT defattempts,deffeedback,displaymethod FROM imas_assessments WHERE id='{$parts[3]}'";
+						$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+						list($displaymode,$defshowans) = explode('-',mysql_result($result,0,1));
+						if ($allowedattempts==9999) {
+							$allowedattempts = mysql_result($result,0,0);	
+						}
+						if ($showans==0) {
+							$showans = $defshowans;
+						}
+						if ($attempts >= $allowedattempts) {
+							if ($showans=='F' || $showans=='J') { 
+								$showa = true;
+							}
+						}
+								
+					}
+					$message = displayq($parts[0],$parts[1],$parts[2],$showa,false,0,true);
 					$message = printfilter(forcefiltergraph($message));
 					$message = preg_replace('/(`[^`]*`)/',"<span class=\"AM\">$1</span>",$message);
 					
