@@ -762,7 +762,7 @@ function gbtable() {
 	
 	//Get assessment scores
 	$assessidx = array_flip($assessments);
-	$query = "SELECT ias.id,ias.assessmentid,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,ias.userid FROM imas_assessment_sessions AS ias,imas_assessments AS ia ";
+	$query = "SELECT ias.id,ias.assessmentid,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,ias.userid,ia.timelimit FROM imas_assessment_sessions AS ias,imas_assessments AS ia ";
 	$query .= "WHERE ia.id=ias.assessmentid AND ia.courseid='$cid'";
 	if ($limuser>0) { $query .= " AND ias.userid='$limuser' ";}
 	$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -826,12 +826,16 @@ function gbtable() {
 			$thised = $enddate[$i];
 			$inexception = false;
 		}
-				
+		
 		if ($canviewall || $sa[$i]=="I" || ($sa[$i]!="N" && $now>$thised)) { //|| $assessmenttype[$i]=="Practice" 
 			$gb[$row][1][$col][2] = 1; //show link
-		} else {
+		} /*else if ($l['timelimit']<0 && (($now - $l['starttime'])>abs($l['timelimit'])) && $sa[$i]!='N' && ($assessmenttype[$k]=='EachAtEnd' || $assessmenttype[$k]=='EndReview' || $assessmenttype[$k]=='AsGo' || $assessmenttype[$k]=='Homework'))  ) { 
+			//has "kickout after time limit" set, time limit has passed, and is set for showing each score
+			$gb[$row][1][$col][2] = 1; //show link
+		} */else {
 			$gb[$row][1][$col][2] = 0; //don't show link
 		}
+		
 		$countthisone = false;
 		if ($assessmenttype[$i]=="NoScores" && $sa[$i]!="I" && $now<$thised && !$canviewall) {
 			$gb[$row][1][$col][0] = 'N/A'; //score is not available
@@ -1179,7 +1183,7 @@ function gbtable() {
 					$cattotpast[$ln][$cat] += array_sum($cattotpastec[$ln][$cat]);
 				}
 				if ($useweights==0 && $cats[$cat][5]>-1) {//use fixed pt value for cat
-					$cattotpast[$ln][$cat] = round($cats[$cat][5]*($cattotpast[$ln][$cat]/$catposspast[$cat]),1);
+					$cattotpast[$ln][$cat] = ($catposspast[$cat]==0)?0:round($cats[$cat][5]*($cattotpast[$ln][$cat]/$catposspast[$cat]),1);
 				}
 				
 				if ($cats[$cat][3]>0) { //chop score - no over 100%
@@ -1256,7 +1260,7 @@ function gbtable() {
 					$cattotcur[$ln][$cat] += array_sum($cattotcurec[$ln][$cat]);
 				}
 				if ($useweights==0 && $cats[$cat][5]>-1) {//use fixed pt value for cat
-					$cattotcur[$ln][$cat] = round($cats[$cat][5]*($cattotcur[$ln][$cat]/$catposscur[$cat]),1);
+					$cattotcur[$ln][$cat] = ($catposscur[$cat]==0)?0:round($cats[$cat][5]*($cattotcur[$ln][$cat]/$catposscur[$cat]),1);
 				}
 				
 				if ($cats[$cat][3]>0) {
@@ -1412,7 +1416,7 @@ function gbtable() {
 					}
 				}
 				if ($useweights==0 && $cats[$cat][5]>-1) {//use fixed pt value for cat
-					$cattotattempted[$ln][$cat] = round($cats[$cat][5]*($cattotattempted[$ln][$cat]/$catpossattemptedstu[$cat]),1);
+					$cattotattempted[$ln][$cat] = ($catpossattemptedstu[$cat]==0)?0:round($cats[$cat][5]*($cattotattempted[$ln][$cat]/$catpossattemptedstu[$cat]),1);
 				}
 				if (isset($cattotattemptedec[$ln][$cat])) { //add in EC
 					$cattotattempted[$ln][$cat] += array_sum($cattotattemptedec[$ln][$cat]);

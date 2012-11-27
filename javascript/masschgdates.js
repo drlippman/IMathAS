@@ -161,6 +161,8 @@ Date.prototype.getWeekDays = function(d) {
 		  copydown(ln,1,'s');
 	  } else if (val==5) {
 		  copydown(ln,1,'e');
+	  } else if (val==6) {
+		  copydown(ln,1,'r');
 	  }
 	  el.selectedIndex= 0;
   }
@@ -311,6 +313,13 @@ Date.prototype.getWeekDays = function(d) {
 					document.getElementById(type+"span0"+cnt).className="show";
 					document.getElementById(type+"span1"+cnt).className="hide";
 					document.getElementById(type+"datetype"+cnt).value = 0;
+					if (type=='r') {
+						if (to=='always') {
+							document.getElementById("rdateanA"+cnt).checked=true;
+						} else {
+							document.getElementById("rdateanN"+cnt).checked=true;
+						}
+					}
 				}
 			} catch (e) { };
 			els[i].checked = false;
@@ -365,6 +374,17 @@ Date.prototype.getWeekDays = function(d) {
   		newel.value = out.join(",");
   		frm.appendChild(newel);
   	} 
+  }
+  
+  function chgswaptype(el) {
+  	  var elout = document.getElementById("swapselected");
+  	  elout.options.length = 0;
+  	  elout.options[elout.options.length] = new Option('Always','always',false,false);
+  	  
+  	  if (el.value=='r') {
+  	  	  elout.options[elout.options.length] = new Option('Never','never',false,false);
+  	  }
+  	  elout.options[elout.options.length] = new Option('Dates','dates',false,false);
   }
   
   	//TODO: separately calculate day difference (using daysBetween and getWeekDays) and time difference separately

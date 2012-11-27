@@ -133,7 +133,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		exit;
 	} else { //DEFAULT DATA MANIPULATION
 		$pagetitle = "Mass Change Dates";
-		$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/masschgdates.js?v=051512\"></script>";
+		$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/masschgdates.js?v=112612\"></script>";
 		$placeinhead .= "<style>.show {display:inline;} \n .hide {display:none;} img {cursor:pointer;}\n</style>";
 	}
 }	
@@ -234,8 +234,8 @@ if ($overwriteBody==1) {
 	echo 'Check: <a href="#" onclick="return chkAllNone(\'qform\',\'all\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'all\',false)">None</a> ';
 
 	//echo '<p>Check/Uncheck All: <input type="checkbox" name="ca" value="1" onClick="chkAll(this.form, this.checked)"/>. ';
-	echo 'Change selected items <select id="swaptype"><option value="s">Start Date</option><option value="e">End Date</option><option value="r">Review Date</option></select>';
-	echo ' to <select id="swapselected"><option value="always">Always/Never</option><option value="dates">Dates</option></select>';
+	echo 'Change selected items <select id="swaptype" onchange="chgswaptype(this)"><option value="s">Start Date</option><option value="e">End Date</option><option value="r">Review Date</option></select>';
+	echo ' to <select id="swapselected"><option value="always">Always</option><option value="dates">Dates</option></select>';
 	echo ' <input type="button" value="Go" onclick="MCDtoggleselected(this.form)" />';
 	
 	echo '<table class=gb><thead><tr><th>Name</th><th>Type</th><th>Start Date</th><th>End Date</th><th>Review Date</th><th>Send Date Chg / Copy Down List</th></thead><tbody>';
@@ -300,7 +300,7 @@ if ($overwriteBody==1) {
 			$names[] = $row[0];
 			$startdates[] = $row[1];
 			$enddates[] = $row[2];
-			$reviewdates[] = 0;
+			$reviewdates[] = -1;
 			$ids[] = $row[3];
 			$avails[] = $row[4];
 			if ($orderby==3) {$courseorder[] = $itemscourseorder['InlineText'.$row[3]];}
@@ -314,7 +314,7 @@ if ($overwriteBody==1) {
 			$names[] = $row[0];
 			$startdates[] = $row[1];
 			$enddates[] = $row[2];
-			$reviewdates[] = 0;
+			$reviewdates[] = -1;
 			$ids[] = $row[3];
 			$avails[] = $row[4];
 			if ($orderby==3) {$courseorder[] = $itemscourseorder['LinkedText'.$row[3]];}
@@ -328,7 +328,7 @@ if ($overwriteBody==1) {
 			$names[] = $row[0];
 			$startdates[] = $row[1];
 			$enddates[] = $row[2];
-			$reviewdates[] = 0;
+			$reviewdates[] = -1;
 			$ids[] = $row[3];
 			$avails[] = $row[4];
 			if ($orderby==3) {$courseorder[] = $itemscourseorder['Forum'.$row[3]];}
@@ -342,7 +342,7 @@ if ($overwriteBody==1) {
 			$names[] = $row[0];
 			$startdates[] = $row[1];
 			$enddates[] = $row[2];
-			$reviewdates[] = 0;
+			$reviewdates[] = -1;
 			$ids[] = $row[3];
 			$avails[] = $row[4];
 			if ($orderby==3) {$courseorder[] = $itemscourseorder['Wiki'.$row[3]];}
@@ -364,7 +364,7 @@ if ($overwriteBody==1) {
 					$startdates[] = $item['startdate'];
 					$enddates[] = $item['enddate'];
 					$avails[] = $item['avail'];
-					$reviewdates[] = 0;
+					$reviewdates[] = -1;
 					if (count($item['items'])>0) {
 						getblockinfo($item['items'],$parent.'-'.($k+1));
 					}
@@ -395,11 +395,14 @@ if ($overwriteBody==1) {
 		
 		echo "{$names[$i]}<input type=hidden id=\"id$cnt\" value=\"{$ids[$i]}\"/>";
 		echo "<script> basesdates[$cnt] = ";
-		if ($startdates[$i]==0) { echo '"NA"';} else {echo $startdates[$i];}
+		//if ($startdates[$i]==0) { echo '"NA"';} else {echo $startdates[$i];}
+		echo $startdates[$i];
 		echo "; baseedates[$cnt] = ";
-		if ($enddates[$i]==0 || $enddates[$i]==2000000000) { echo '"NA"';} else {echo $enddates[$i];}
+		//if ($enddates[$i]==0 || $enddates[$i]==2000000000) { echo '"NA"';} else {echo $enddates[$i];}
+		echo $enddates[$i];
 		echo "; baserdates[$cnt] = ";
-		if ($reviewdates[$i]==0 || $reviewdates[$i]==2000000000) {echo '"NA"';} else { echo $reviewdates[$i];}
+		//if ($reviewdates[$i]==0 || $reviewdates[$i]==2000000000) {echo '"NA"';} else { echo $reviewdates[$i];}
+		if ($reviewdates[$i]==-1) {echo '"NA"';} else { echo $reviewdates[$i];}
 		echo ";</script>";
 		echo "</td><td>";
 		echo "{$types[$i]}<input type=hidden id=\"type$cnt\" value=\"{$types[$i]}\"/>";
@@ -523,6 +526,7 @@ if ($overwriteBody==1) {
 		echo '<option value="3">Copy down date &amp; time</option>';
 		echo '<option value="4">Copy down start date &amp; time</option>';
 		echo '<option value="5">Copy down end date &amp; time</option>';
+		echo '<option value="6">Copy down review date &amp; time</option>';
 		echo '</select></td>';
 		echo "</tr>";
 		$cnt++;

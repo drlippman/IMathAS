@@ -2819,6 +2819,10 @@ This type of question can contain multiple parts, where each part is one of the 
 	<dd>By default the points for a problem are divided evenly over the parts.  Use this option if you wish to weight parts
 	differently.  Example: $answeights = array(.2,.3,.5).  Best practice is to use percents, but if other values are used, they will
 	be converted to percents.</dd>
+<dt>$scoremethod = "singlescore" or "allornothing" (In Common Control)</dt>
+	<dd>Instead of recording individual scores for each question part, these will cause a single score to be
+	recorded for the question.  "singlescore" totals the individual part scores, while "allornothing"
+	will only give full credit or no credit.</dd>
 <dt>Question part options</dt>
 	<dd>You can define any optional variable for each question part.  Like above, suffix the variable with the part designator.</dd>
 <dt>$showanswer (In Answer)</dt>

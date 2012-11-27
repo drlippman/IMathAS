@@ -176,7 +176,7 @@ function apportion_info($pop, $seats, $method) {
 		foreach ($quotas as $s=>$q) {
 			$luq[$s] = floor($q);
 			$other[$s] = sqrt($luq[$s]*($luq[$s]+1));
-			if ($luq[$s]>$other[$s]) { $luq[$s]++;}
+			if ($q>$other[$s]) { $luq[$s]++;}
 		}
 		$toadd = $seats - array_sum($luq);
 		if ($toadd>0) {

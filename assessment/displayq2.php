@@ -496,7 +496,13 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 			$GLOBALS['lastanswers'][$qnidx] .= '##'.implode("&",$partla);
 		}
 		//return array_sum($scores);
-		return implode('~',$scores);
+		if (isset($scoremethod) && $scoremethod == "singlescore") {
+			return round(array_sum($scores),3);
+		} else if (isset($scoremethod) && $scoremethod == "allornothing") {
+			if (array_sum($scores)<.98) { return 0; } else { return 1;}
+		} else {
+			return implode('~',$scores);
+		}
 	} else {
 		if ($qdata['qtype']=='essay' || $qdata['qtype']=='file') {
 			$GLOBALS['questionmanualgrade'] = true;

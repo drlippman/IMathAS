@@ -160,7 +160,7 @@ if (isset($_POST['createcourse'])) {
 			$atitle = mysql_result($result,0,0);
 			
 			$url = $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/bltilaunch.php?custom_place_aid=$typeid";
-			header('Location: '.$sessiondata['lti_selection_return'].'?embed_type=basic_lti&url='.urlencode($url).'&title='.urlencode($atitle));
+			header('Location: '.$sessiondata['lti_selection_return'].'?embed_type=basic_lti&url='.urlencode($url).'&title='.urlencode($atitle).'&text='.urlencode($atitle));
 			exit;
 				
 		} else {
