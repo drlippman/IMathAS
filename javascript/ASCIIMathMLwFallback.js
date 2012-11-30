@@ -557,7 +557,9 @@ function AMTgetTeXsymbol(symb) {
 		pre = '\\';
 	}
 	if (symb.tex==null) {
-		return (pre+(pre==''?symb.input:symb.input.toLowerCase()));
+		//can't remember why this was here.  Breaks /delta /Delta to removed
+		//return (pre+(pre==''?symb.input:symb.input.toLowerCase()));
+		return (pre+symb.input);
 	} else {
 		return (pre+symb.tex);
 	}
@@ -800,8 +802,8 @@ function AMTparseExpr(str,rightbracket) {
 							subpos[lastsubposstart] = [i+2];
 						}
 					}
-					if (newFrag.charAt(i)=='[' || newFrag.charAt(i)=='(') { mxanynestingd++;}
-					if (newFrag.charAt(i)==']' || newFrag.charAt(i)==')') { mxanynestingd--;}
+					if (newFrag.charAt(i)=='[' || newFrag.charAt(i)=='(' || newFrag.charAt(i)=='{') { mxanynestingd++;}
+					if (newFrag.charAt(i)==']' || newFrag.charAt(i)==')' || newFrag.charAt(i)=='}') { mxanynestingd--;}
 					if (newFrag.charAt(i)==',' && mxanynestingd==1) {
 						subpos[lastsubposstart].push(i);
 					}
@@ -989,6 +991,7 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
         return [AMcreateMmlNode(symbol.tag,result[0]),result[1]];
       } else if (typeof symbol.acc == "boolean" && symbol.acc) {   // accent
         node = AMcreateMmlNode(symbol.tag,result[0]);
+        node.setAttribute("accent","true");
         node.appendChild(AMcreateMmlNode("mo",document.createTextNode(symbol.output)));
         return [node,result[1]];
       } else {                        // font change command
@@ -999,8 +1002,8 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
                               result[0].childNodes[i].firstChild.nodeValue);
               var newst = [];
               for (var j=0; j<st.length; j++)
-                if (st.charCodeAt(j)>64 && st.charCodeAt(j)<91) newst = newst +
-                  String.fromCharCode(symbol.codes[st.charCodeAt(j)-65]);
+                 if (st.charCodeAt(j)>64 && st.charCodeAt(j)<91) newst = newst + symbol.codes[st.charCodeAt(j)-65]; 
+                  //String.fromCharCode(symbol.codes[st.charCodeAt(j)-65]);
                 else newst = newst + st.charAt(j);
               if (result[0].nodeName=="mi")
                 result[0]=AMcreateElementMathML("mo").
@@ -1150,9 +1153,10 @@ function AMparseExpr(str,rightbracket) {
   if (symbol.ttype == RIGHTBRACKET || symbol.ttype == LEFTRIGHT) {
 //    if (AMnestingDepth > 0) AMnestingDepth--;
     var len = newFrag.childNodes.length;
-    if (len>0 && newFrag.childNodes[len-1].nodeName == "mrow" && len>1 &&
-      newFrag.childNodes[len-2].nodeName == "mo" &&
-      newFrag.childNodes[len-2].firstChild.nodeValue == ",") { //matrix
+    if (len>0 && newFrag.childNodes[len-1].nodeName == "mrow" ) { //matrix
+    	    //removed 5/25/10 to allow row vecs: //&& len>1 && 
+    	    //newFrag.childNodes[len-2].nodeName == "mo" &&
+    	    //newFrag.childNodes[len-2].firstChild.nodeValue == ","
       var right = newFrag.childNodes[len-1].lastChild.firstChild.nodeValue;
       if (right==")" || right=="]") {
         var left = newFrag.childNodes[len-1].firstChild.firstChild.nodeValue;

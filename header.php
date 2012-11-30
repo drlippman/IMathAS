@@ -55,7 +55,7 @@ if (!isset($sessiondata['mathdisp'])) {
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";';
 	if ($mathdarkbg) {echo 'var mathbg = "dark";';}
 	echo '</script>'; 
-	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=082911\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=122912\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIIMath = false;</script>";
 } else {
 	echo "<script type=\"text/javascript\">var usingASCIIMath = false;</script>";

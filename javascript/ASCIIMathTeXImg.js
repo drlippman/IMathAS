@@ -684,8 +684,8 @@ function AMTparseExpr(str,rightbracket) {
 							subpos[lastsubposstart] = [i+2];
 						}
 					}
-					if (newFrag.charAt(i)=='[' || newFrag.charAt(i)=='(') { mxanynestingd++;}
-					if (newFrag.charAt(i)==']' || newFrag.charAt(i)==')') { mxanynestingd--;}
+					if (newFrag.charAt(i)=='[' || newFrag.charAt(i)=='(' || newFrag.charAt(i)=='{') { mxanynestingd++;}
+					if (newFrag.charAt(i)==']' || newFrag.charAt(i)==')' || newFrag.charAt(i)=='}') { mxanynestingd--;}
 					if (newFrag.charAt(i)==',' && mxanynestingd==1) {
 						subpos[lastsubposstart].push(i);
 					}
@@ -783,6 +783,7 @@ function AMparseMath(str) {
 	  texstring = "\\textstyle" + texstring;
   }
   texstring = texstring.replace('$','\\$');
+  
   var node = document.createElement("img");
   if (typeof encodeURIComponent == "function") {
 	  texstring = encodeURIComponent(texstring);
