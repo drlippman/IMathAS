@@ -147,7 +147,11 @@ END;
  }
  $hasusername = isset($userid);
  $haslogin = isset($_POST['password']);
-
+ if (!$hasusername && !$haslogin && isset($_GET['guestaccess']) && isset($CFG['GEN']['guesttempaccts'])) {
+ 	 $haslogin = true;
+ 	 $_POST['username']=='guest';
+ }
+ 
  $verified = false; 
  //Just put in username and password, trying to log in
  if ($haslogin && !$hasusername) {

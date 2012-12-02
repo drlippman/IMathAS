@@ -2,7 +2,7 @@
 //A library of Stats functions.  Version 1.9, March 30, 2008
 
 global $allowedmacros;
-array_push($allowedmacros,"nCr","nPr","mean","stdev","percentile","quartile","TIquartile","median","freqdist","frequency","histogram","fdhistogram","fdbargraph","normrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","countif","binomialpdf","binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart","mosaicplot");
+array_push($allowedmacros,"nCr","nPr","mean","stdev","percentile","quartile","TIquartile","median","freqdist","frequency","histogram","fdhistogram","fdbargraph","normrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","countif","binomialpdf","binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart","mosaicplot","checklineagainstdata");
 
 //nCr(n,r)
 //The Choose function
@@ -714,6 +714,83 @@ function linreg($xarr,$yarr) {
 	$m = ($n*$sxy - $sx*$sy)/($n*$sxx - $sx*$sx);
 	$b = ($sy - $sx*$m)/$n;
 	return array($r,$m,$b);
+}
+
+//checklineagainstdata(xarray, yarray, student answer, [variable, alpha])
+//intended for checking a student answer for fitting a line to data.  Determines
+//if the student answer is within the confidence bounds for the regression equation.
+//xarray, yarray:  list/array of data values
+//student answer:  the $stuanswers[$thisq] 
+//variable:  defaults to "x"
+//alpha: for confidence bound.  defaults to .05
+function checklineagainstdata($xarr,$yarr,$line,$var="x",$alpha=.05) {
+	if (!is_array($xarr)) { $xarr = explode(',',$xarr);}	
+	if (!is_array($yarr)) { $yarr = explode(',',$yarr);}
+	if (count($xarr)!=count($yarr)) { 
+		echo "Error: linreg requires xarray length = yarray length";
+		return false;
+	}
+	if (count($xarr)<3) {
+		echo "Requires 3 or more data values";
+		return false;
+	}
+	$sx = array_sum($xarr);
+	$sy = array_sum($yarr);
+	$sxx=0; $syy=0; $sxy = 0;
+	for ($i=0; $i<count($xarr); $i++) {
+		$sxx += $xarr[$i]*$xarr[$i];
+		$syy += $yarr[$i]*$yarr[$i];
+		$sxy += $xarr[$i]*$yarr[$i];
+	}
+	$n = count($xarr);
+	$r = ($n*$sxy - $sx*$sy)/(sqrt($n*$sxx-$sx*$sx)*sqrt($n*$syy-$sy*$sy));
+	$m = ($n*$sxy - $sx*$sy)/($n*$sxx - $sx*$sx);
+	$b = ($sy - $sx*$m)/$n;
+	
+	if ($line=='') {return array('',makepretty("`$m $var + $b`"));}
+
+	foreach ($_POST as $k=>$v) { //try to catch junk answers
+		if ($v==$line) {
+			if (preg_match('/[^,\d\.\-]/',$_POST['qn'.substr($k,2).'-vals'])) {
+				return array('',makepretty("`$m $var + $b`"));
+			}
+		}
+	}
+	$linec = mathphp(makepretty($line),$var);
+	$linec = str_replace("($var)",'($t)',$linec);
+	$linefunc = create_function('$t','return('.$linec.');');
+			
+	$xmin = min($xarr);
+	$xmax = max($xarr);
+	$dx = ($xmax-$xmin)/5;
+	if ($dx<=0) {
+		echo "error with xmin/xmax";
+		return false;
+	}
+	$isinbounds = true;
+	$sqres = 0;
+	for ($i=0;$i<count($xarr);$i++) {
+		$sqres += ($yarr[$i] - ($m*$xarr[$i] + $b))*($yarr[$i] - ($m*$xarr[$i] + $b));
+	}
+	$sqres = sqrt($sqres/($n - 2));
+	$sdiv = $sxx - $sx*$sx/$n;
+	$tcrit = abs(invtcdf($alpha/2,$n-2));
+	$xbar = $sx/$n;
+	for ($x = $xmin;$x<$xmax*1.02;$x+=$dx) {
+		$ypred = $m*$x+$b;
+		$yline = $linefunc($x);
+		$yconf = $tcrit*$sqres*sqrt(1+1/$n+($x-$xbar)*($x-$xbar)/$sdiv);
+		if (abs($ypred-$yline)>$yconf) {
+			$isinbounds = false;
+			break;
+		}
+	}
+	if ($isinbounds) { 
+		return array($line,makepretty("$m $var + $b"));
+	} else {
+		return array("($line) + 200000",makepretty("`$m $var + $b`"));
+	}
+	
 }
 
 //binomialpdf(N,p,x)
