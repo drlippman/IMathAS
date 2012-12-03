@@ -1023,7 +1023,6 @@ function gbtable() {
 		$cattotfuture[$row][$category[$i]][$col] = $r[2];
 	}
 	*/
-	
 	//fill out cattot's with zeros
 	for ($ln=1; $ln<count($sturow)+1; $ln++) {
 		
@@ -1031,7 +1030,7 @@ function gbtable() {
 		$cattotattemptedec[$ln] = $cattotcurec[$ln];
 		foreach($assessidx as $aid=>$i) {
 			$col = $assesscol[$aid];
-			if (!isset($gb[$ln][1][$col][0])) {
+			if (!isset($gb[$ln][1][$col][0]) || $gb[$ln][1][$col][3]%10==1) {
 				if ($cntingb[$i] == 1) {
 					if ($gb[0][1][$col][3]<1) { //past
 						$cattotpast[$ln][$category[$i]][$col] = 0;
@@ -1051,7 +1050,7 @@ function gbtable() {
 					}
 					$cattotfutureec[$ln][$category[$i]][$col] = 0;
 				}
-			}
+			} 
 		}
 		foreach($gradeidx as $aid=>$i) {
 			$col = $gradecol[$aid];
@@ -1102,8 +1101,10 @@ function gbtable() {
 			}
 		}
 	}
+	
 	//create category totals
 	for ($ln = 1; $ln<count($sturow)+1;$ln++) { //foreach student calculate category totals and total totals
+						
 		$totpast = 0;
 		$totcur = 0;
 		$totfuture = 0;
