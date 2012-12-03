@@ -680,11 +680,6 @@ function seqshowqinfobar($qn,$toshow) {
 	} else {
 		$qlinktxt = "Question ".($qn+1);
 	}
-	if ($isreview) {
-		$thisscore = getpts($scores[$qn]);
-	} else {
-		$thisscore = getpts($bestscores[$qn]);
-	}
 	
 	if ($qn==$toshow) {
 		echo '<div class="seqqinfocur">';
@@ -831,11 +826,15 @@ function startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivsco
 }
 
 function embedshowicon($qn) {
-	global $qi,$questions,$attempts,$testsettings,$scores,$bestscores,$noindivscores,$showeachscore,$imasroot,$CFG,$sessiondata,$seeds;
+	global $qi,$questions,$attempts,$testsettings,$scores,$bestscores,$noindivscores,$showeachscore,$imasroot,$CFG,$sessiondata,$seeds,$isreview;
 	$reattemptsremain = hasreattempts($qn);
 	$pointsremaining = getremainingpossible($qn,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
 	$qavail = false;
-	
+	if ($isreview) {
+		$thisscore = getpts($scores[$qn]);
+	} else {
+		$thisscore = getpts($bestscores[$qn]);
+	}
 	if ((unans($scores[$qn]) && $attempts[$qn]==0) || ($noindivscores && amreattempting($qn))) {
 			if (isset($CFG['TE']['navicons'])) {
 				echo "<img class=\"embedicon\" src=\"$imasroot/img/{$CFG['TE']['navicons']['untried']}\"/> ";
