@@ -671,7 +671,7 @@ function showqinfobar($qn,$inreview,$single) {
 
 //shows top info bar for seq mode
 function seqshowqinfobar($qn,$toshow) {
-	global $qi,$questions,$attempts,$testsettings,$scores,$bestscores,$noindivscores,$showeachscore,$imasroot,$CFG,$sessiondata,$seeds;
+	global $qi,$questions,$attempts,$testsettings,$scores,$bestscores,$noindivscores,$showeachscore,$imasroot,$CFG,$sessiondata,$seeds,$isreview;
 	$reattemptsremain = hasreattempts($qn);
 	$pointsremaining = getremainingpossible($qn,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
 	$qavail = false;
@@ -679,6 +679,11 @@ function seqshowqinfobar($qn,$toshow) {
 		$qlinktxt = "<span class=\"withdrawn\">Question ".($qn+1)."</span>";
 	} else {
 		$qlinktxt = "Question ".($qn+1);
+	}
+	if ($isreview) {
+		$thisscore = getpts($scores[$qn]);
+	} else {
+		$thisscore = getpts($bestscores[$qn]);
 	}
 	
 	if ($qn==$toshow) {

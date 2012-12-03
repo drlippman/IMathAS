@@ -213,6 +213,22 @@
 	} else {
 		echo "<p>No exceptions currently exist for the selected students.</p>";
 	}
+	$query = "SELECT latepass FROM imas_students WHERE courseid='$cid' AND userid IN ($tolist)";
+	$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+	$row = mysql_fetch_row($result);
+	$lpmin = $row[0];
+	$lpmax = $row[0];
+	while ($row = mysql_fetch_row($result)) {
+		if ($row[0]<$lpmin) { $lpmin = $row[0];}
+		if ($row[0]>$lpmax) { $lpmax = $row[0];}
+	}
+	if (count($_POST['checked'])<2) {
+		$lpmsg = "This student has $lpmin latepasses.";
+	} else if ($lpmin==$lpmax) {
+		$lpmsg = "These students all have $lpmin latepasses.";
+	} else {
+		$lpmsg = "These students have $lpmin-$lpmax latepasses.";
+	}
 	
 	echo "<h4>Make New Exception</h4>";
 	
@@ -252,7 +268,7 @@
 	echo '<p><input type="checkbox" name="forceclear"/> Clear student\'s attempts?  Students ';
 	echo 'will <b>not</b> keep any scores earned, and must rework all problems.</p>';
 	
-	echo '<p><input type="checkbox" name="eatlatepass"/> Deduct <input type="input" name="latepassn" size="1" value="1"/> LatePass(es) from each student.</p>';
+	echo '<p><input type="checkbox" name="eatlatepass"/> Deduct <input type="input" name="latepassn" size="1" value="1"/> LatePass(es) from each student. '.$lpmsg.'</p>';
 	
 	echo '<p><input type="checkbox" name="sendmsg"/> Send message to these students?</p>';
 	

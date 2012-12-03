@@ -138,6 +138,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	
 }
 
+$query = "SELECT latepass FROM imas_students WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
+$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$latepasses = mysql_result($result,0,0);
+
 /******* begin html output ********/
 $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
  require("../header.php");
@@ -184,7 +188,7 @@ if ($overwriteBody==1) {
 		<div class=submit><input type=submit value="Submit"></div>
 		<p><input type="checkbox" name="forceregen"/> Force student to work on new versions of all questions?  Students 
 		will keep any scores earned, but must work new versions of questions to improve score.</p>
-		<p><input type="checkbox" name="eatlatepass"/> Deduct <input type="input" name="latepassn" size="1" value="1"/> LatePass(es).</p>
+		<p><input type="checkbox" name="eatlatepass"/> Deduct <input type="input" name="latepassn" size="1" value="1"/> LatePass(es).  Student currently has <?php echo $latepasses;?> latepasses.</p>
 	</form>
 
 <?php

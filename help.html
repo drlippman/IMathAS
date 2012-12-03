@@ -1682,6 +1682,8 @@ The following macros create graphs or tables:
      addlabel, except x and y here are pixel values on the picture rather than values relative to the axes.</li>
 <li><b>addplotborder(plot,left,[bottom,right,top])</b>:  Changes the pixel width of border (default 5) around a plot.  Labels
     will show within the border.  Typically used to add room for labels to show.</li>
+<li><b>adddrawcommand(plot,commands)</b>:  Inserts arbitrary asciisvg drawing commands into an existing
+    plot created with showplot or other drawing tools.</li>
 <li><b>showasciisvg(string,[width,height])</b>:  If you know the ASCIIsvg language, this will set up an svg with "string" as the script.
     optionally you can specify the width and height (in pixels) for the svg.</li>
 <li><b>textonimage(img,text,top,left,[text,top,left,...])</b>:  Overlays text over an image.  Image can be a URL or the variable for an uploaded
@@ -1800,6 +1802,7 @@ These macros are for working with arrays:
 <li><b>unionarrays(array,array)</b>:  Unions two arrays, preventing duplicates, into a new array</li>
 <li><b>intersectarrays(array,array)</b>:  Finds the intersection of two arrays</li>
 <li><b>diffarrays(array1,array2)</b>: Returns all elements in array1 that are not also in array2</li>
+<li><b>array_unique(array)</b>: Returns the array, stripping duplicate values</li>
 <li><b>count(array)</b>:  Counts the number of entries in the array</li>
 <li><b>sumarray(array)</b>: Adds the entries in an array</li>
 <li><b>in_array(needle,haystack)</b>:  Checks if value needle is in array haystack.  Returns true or false</li>
