@@ -149,7 +149,7 @@ END;
  $haslogin = isset($_POST['password']);
  if (!$hasusername && !$haslogin && isset($_GET['guestaccess']) && isset($CFG['GEN']['guesttempaccts'])) {
  	 $haslogin = true;
- 	 $_POST['username']=='guest';
+ 	 $_POST['username']='guest';
  	 $_POST['mathdisp'] = 0;
  	 $_POST['graphdisp'] = 2;
  }

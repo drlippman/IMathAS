@@ -1489,20 +1489,47 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$qn];} else {$sz = $options['answerboxsize'];}}
 		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
 		if (isset($options['reqdecimals'])) {if (is_array($options['reqdecimals'])) {$reqdecimals = $options['reqdecimals'][$qn];} else {$reqdecimals = $options['reqdecimals'];}}
+		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		
 		if (!isset($sz)) { $sz = 20;}
 		if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		
-		$tip = "Enter your answer using interval notation.  Example: [2.1,5.6) <br/>";
-		$tip .= "Use U for union to combine intervals.  Example: (-oo,2] U [4,oo)<br/>";
-		$tip .= "Enter DNE for an empty set, oo for Infinity";
-		if (isset($reqdecimals)) {
-			$tip .= "<br/>Your numbers should be accurate to $reqdecimals decimal places.";
-		}
-		$shorttip = 'Enter an interval using interval notation';
+		if ($answerformat=='normalcurve' && $GLOBALS['sessiondata']['graphdisp']!=0) {
+			$top = "Enter your answer by selecting the shade type, and by clicking and dragging the sliders on the normal curve";
+			$shorttip = "Adjust the sliders";
+		} else {
 		
+			$tip = "Enter your answer using interval notation.  Example: [2.1,5.6) <br/>";
+			$tip .= "Use U for union to combine intervals.  Example: (-oo,2] U [4,oo)<br/>";
+			$tip .= "Enter DNE for an empty set, oo for Infinity";
+			if (isset($reqdecimals)) {
+				$tip .= "<br/>Your numbers should be accurate to $reqdecimals decimal places.";
+			}
+			$shorttip = 'Enter an interval using interval notation';
+		}
+		if ($answerformat=='normalcurve' && $GLOBALS['sessiondata']['graphdisp']!=0) {
+			$out .=  '<div style="background:#fff;padding:10px;">';
+			$out .=  '<p style="margin:0px";>Shade: <select id="shaderegions'.$qn.'" onchange="chgnormtype(this.id.substring(12));"><option value="1L">Left of a value</option><option value="1R">Right of a value</option>';
+			$out .=  '<option value="2B">Between two values</option><option value="2O">2 regions</option></select>. Click and drag and arrows to adjust the values.';
+			
+			$out .=  '<div style="position: relative; width: 500px; height:200px;padding:0px;">';
+			$out .=  '<div style="position: absolute; left:0; top:0; height:200px; width:0px; background:#00f;" id="normleft'.$qn.'">&nbsp;</div>';
+			$out .=  '<div style="position: absolute; right:0; top:0; height:200px; width:0px; background:#00f;" id="normright'.$qn.'">&nbsp;</div>';
+			$out .=  '<img style="position: absolute; left:0; top:0;z-index:1;width:100%;max-width:100%" src="'.$imasroot.'/img/normalcurve.gif"/>';
+			$out .=  '<img style="position: absolute; top:142px;left:0px;cursor:pointer;z-index:2;" id="slid1'.$qn.'" src="'.$imasroot.'/img/uppointer.gif"/>';
+			$out .=  '<img style="position: absolute; top:142px;left:0px;cursor:pointer;z-index:2;" id="slid2'.$qn.'" src="'.$imasroot.'/img/uppointer.gif"/>';
+			$out .=  '<div style="position: absolute; top:170px;left:0px;z-index:2;" id="slid1txt'.$qn.'"></div>';
+			$out .=  '<div style="position: absolute; top:170px;left:0px;z-index:2;" id="slid2txt'.$qn.'"></div>';
+			$out .=  '</div></div>';
+			$out .=  '<script type="text/javascript">normslider.idnums.push('.$qn.');</script>';
+		} else if ($answerformat=='normalcurve') {
+			$out .= 'Enter an interval corresponding to the region to be shaded';
+		}
 		$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\"  ";
+		if ($answerformat=='normalcurve' && $GLOBALS['sessiondata']['graphdisp']!=0) {
+			$out .= 'style="position:absolute;left:-2000px;" ';
+		}
 		if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
 				$qnref = "$qn-0";

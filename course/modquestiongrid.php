@@ -8,9 +8,11 @@
 	
 	if ($_GET['process']== true) {
 		if (isset($_POST['add'])) { //adding new questions
-			$query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
+			$query = "SELECT itemorder,viddata FROM imas_assessments WHERE id='$aid'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$itemorder = mysql_result($result,0,0);
+			$viddata = mysql_result($result,0,1);
+			
 			$newitemorder = '';
 			if (isset($_POST['addasgroup'])) {
 				$newitemorder = '1|0';
@@ -37,13 +39,38 @@
 					}
 				}
 			}
+			
+			if ($viddata != '') {
+				if ($itemorder=='') {
+					$nextnum = 0;
+				} else {
+					$nextnum = substr_count($itemorder,',')+1;
+				}
+				$numnew= substr_count($newitemorder,',')+1;
+				$viddata = unserialize($viddata);
+				if (!isset($viddata[count($viddata)-1][1])) {
+					$finalseg = array_pop($viddata);
+				} else {
+					$finalseg = '';
+				}
+				for ($i=$nextnum;$i<$nextnum+$numnew;$i++) {
+					$viddata[] = array('','',$i);
+				}
+				if ($finalseg != '') {
+					$viddata[] = $finalseg;
+				}
+				$viddata = addslashes(serialize($viddata));
+			}
+			
 			if ($itemorder == '') {
 				$itemorder = $newitemorder;
 			} else {
 				$itemorder .= ','.$newitemorder;
 			}
 			
-			$query = "UPDATE imas_assessments SET itemorder='$itemorder' WHERE id='$aid'";
+			
+			
+			$query = "UPDATE imas_assessments SET itemorder='$itemorder',viddata='$viddata' WHERE id='$aid'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		} else if (isset($_POST['mod'])) { //modifying existing
 			

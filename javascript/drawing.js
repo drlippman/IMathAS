@@ -1266,8 +1266,6 @@ function initCanvases(k) {
 	
 }
 
-
-
 if (typeof(initstack)!='undefined') {
 	initstack.push(initCanvases);
 } else {
@@ -1315,4 +1313,210 @@ else
 }
 }
 
+
+
+/*
+normal distribution slider code
+
+For each normal grapher on the page, include this html, and push the id (number on the end of each id) to normslider.idnums
+<div class="normgrapher">
+<p>Shade: <select id="shaderegions0" onchange="chgnormtype(this.id.substring(12));"><option value="1L">Left of a value</option><option value="1R">Right of a value</option>
+<option value="2B">Between two values</option><option value="2O">2 regions</option></select>. Click and drag and arrows to adjust the values.
+
+
+<div style="position: relative; width: 500px; height:220px;padding:0px;background:#fff;">
+<div style="position: absolute; left:0; top:0; height:200px; width:0px; background:#00f; z-index:-1" id="normleft0">&nbsp;</div>
+<div style="position: absolute; right:0; top:0; height:200px; width:0px; background:#00f; z-index:-1" id="normright0">&nbsp;</div>
+<img style="position: absolute; left:0; top:0;" src="img/normalcurve.gif"/>
+<img style="position: absolute; top:142px;left:0px;cursor:pointer;" id="slid10" src="img/uppointer.gif"/>
+<img style="position: absolute; top:142px;left:0px;cursor:pointer;" id="slid20" src="img/uppointer.gif"/>
+<div style="position: absolute; top:170px;left:0px;" id="slid1txt0">-2.5</div>
+<div style="position: absolute; top:170px;left:0px;" id="slid2txt0">1.6</div>
+</div>
+
+reads/writes values from "qn"+id
+
+*/
+var normslider = {idnums:[], curslider:{el: null, startpos: [0,0], outnode: null}};
+function slideronpageload() {
+	var el,id;
+	for(var i=0; i<normslider.idnums.length; i++) {
+		id = normslider.idnums[i];
+		initnormslider(id);
+		el = document.getElementById("slid1"+id);
+		if (hasTouch) {
+			el.addEventListener('touchstart',onsliderstart);
+			el.parentNode.addEventListener('touchend',onsliderstop);
+			el = document.getElementById("slid2"+id);
+			el.addEventListener('touchstart',onsliderstart);
+			el.parentNode.addEventListener('touchend',onsliderstop);
+			
+		} else {
+			el.onmousedown =  onsliderstart;
+			el.parentNode.onmouseup =  onsliderstop;
+			el = document.getElementById("slid2"+id);
+			el.onmousedown =  onsliderstart;
+			el.parentNode.onmouseup =  onsliderstop;
+		}
+	}
+}
+if (typeof(initstack)!='undefined') {
+	initstack.push(slideronpageload);
+}
+function initnormslider(id) {
+	var type, p1, p2, v;
+	var str = document.getElementById("qn"+id).value;
+	if (v = str.match(/\(-oo,([\-\d\.]+)\)U\(([\-\d\.]+),oo\)/)) {
+		type = 3;
+		p1 = v[1];
+		p2 = v[2];	
+	} else if (v = str.match(/\(-oo,([\-\d\.]+)\)/)) {
+		type = 0;
+		p1 = v[1];
+		p2 = 2.5;
+	} else if (v = str.match(/\(([\-\d\.]+),oo\)/)) {
+		type = 1;
+		p1 = v[1];
+		p2 = 2.5;
+	} else if (v = str.match(/\(([\-\d\.]+),([\-\d\.]+)\)/)) {
+		type = 2;
+		p1 = v[1];
+		p2 = v[2];
+	} else {
+		type = 0;
+		p1 = -1.5;
+		p2 = 2.5;
+	}
+	document.getElementById("slid1"+id).style.left = (p1*60+250-6)+"px";
+	document.getElementById("slid2"+id).style.left = (p2*60+250-6)+"px";
+	document.getElementById("shaderegions"+id).selectedIndex = type;
+	//alert(document.getElementById("shaderegions").selectedIndex +","+ type + ","+p1+","+p2);
+	normslider.curslider.type = document.getElementById("shaderegions"+id).value;
+	chgnormtype(id);
+	
+}
+function onsliderstart(ev) {
+	ev = ev || window.event;
+	normslider.curslider.el = ev.target;
+	normslider.curslider.id = ev.target.id.substring(5);
+	normslider.curslider.type = document.getElementById("shaderegions"+normslider.curslider.id).value;
+	normslider.curslider.outnode = document.getElementById(normslider.outputid);
+	normslider.curslider.startpos = getMouseOffset(normslider.curslider.el,ev);
+	if (hasTouch) {
+		document.addEventListener('touchmove',onsliderchange);
+	} else {
+		normslider.curslider.el.parentNode.onmousemove = onsliderchange;
+	}
+	normslider.curslider.el.parentNode.style.cursor = 'pointer';
+	var parentpos = getPosition(normslider.curslider.el.parentNode);
+	ev.preventDefault();
+	return false;
+}
+function onsliderchange(ev) {
+	var id = normslider.curslider.id;
+	ev = ev || window.event;
+	var curpos = getMouseOffset(normslider.curslider.el.parentNode,ev);
+	if (curpos.x<5 || curpos.x>normslider.curslider.el.parentNode.offsetWidth-5 || curpos.y<5 || curpos.y>normslider.curslider.el.parentNode.offsetHeight-5) {
+		return;
+	}
+	var posx =  Math.round((curpos.x-normslider.curslider.startpos.x - 10)/6)*6+10;
+	normslider.curslider.el.style.left = posx + "px";
+	
+	normupdatevalues(id);
+	
+	ev.preventDefault();
+	return false;
+}
+function onsliderstop(ev) {
+	if (normslider.curslider.el !== null) {
+		if (hasTouch) {
+			document.removeEventListener('touchmove',onsliderchange);
+		} else {
+			normslider.curslider.el.parentNode.onmousemove = null;
+		}
+		normslider.curslider.el.parentNode.style.cursor = '';
+		normslider.curslider.el = null;
+	}
+}
+function normupdatevalues(id) {
+	
+	var p1 = parseInt(document.getElementById("slid1"+id).style.left)+6;
+	var p2 = parseInt(document.getElementById("slid2"+id).style.left)+6;
+	var minp = Math.min(p1,p2);
+	var maxp = Math.max(p1,p2);
+	if (normslider.curslider.type=='2O') {
+		document.getElementById("normleft"+id).style.width = (minp+1) + "px";
+	} else if (normslider.curslider.type=='1L') {
+		document.getElementById("normleft"+id).style.width = (p1+1) + "px";
+	} else if (normslider.curslider.type=='2B') {
+		document.getElementById("normleft"+id).style.left = (minp) + "px";
+		document.getElementById("normleft"+id).style.width = (maxp-minp+1) + "px";
+	}
+	if (normslider.curslider.type=='2O') {
+		document.getElementById("normright"+id).style.width = (500-maxp) + "px";
+	} else if (normslider.curslider.type=='1R') {
+		document.getElementById("normright"+id).style.width = (500-p1) + "px";
+	}
+	var lbl1val = (-4+(p1 - 10)/60).toFixed(1);
+	var lbl2val =(-4+(p2 - 10)/60).toFixed(1);
+	var lbl1 = document.getElementById("slid1txt"+id);
+	lbl1.innerHTML = lbl1val;
+	lbl1.style.left = (p1-6) + "px";
+	var lbl2 = document.getElementById("slid2txt"+id);
+	lbl2.innerHTML = lbl2val;
+	lbl2.style.left = (p2-6) + "px";
+	var minlbl = Math.min(lbl1val,lbl2val);
+	var maxlbl = Math.max(lbl1val,lbl2val);
+	if (normslider.curslider.type=='2O') {
+		var outstr = "(-oo,"+minlbl+")U("+maxlbl+",oo)";
+	} else if (normslider.curslider.type=='2B') {
+		var outstr = "("+minlbl+","+maxlbl+")";
+	} else if (normslider.curslider.type=='1L') {
+		var outstr = "(-oo,"+lbl1val+")";
+	} else if (normslider.curslider.type=='1R') {
+		var outstr = "("+lbl1val+",oo)";
+	}
+	document.getElementById("qn"+id).value = outstr;
+}
+
+function chgnormtype(id) {
+	var type = document.getElementById("shaderegions"+id).value;
+	normslider.curslider.type = type;
+	var p1 = parseInt(document.getElementById("slid1"+id).style.left)+6;
+	var p2 = parseInt(document.getElementById("slid2"+id).style.left)+6;
+	var minp = Math.min(p1,p2);
+	var maxp = Math.max(p1,p2);
+	if (type == "1R" || type == "1L") {
+		document.getElementById("slid2"+id).style.display = "none";
+		document.getElementById("slid2txt"+id).style.display = "none";
+		if (type=="1R") {
+			document.getElementById("normleft"+id).style.display = "none";
+			document.getElementById("normright"+id).style.display = "";
+			document.getElementById("normright"+id).style.right = 0+"px";
+			document.getElementById("normright"+id).style.width = (500-p1)+"px";
+		} else {
+			document.getElementById("normright"+id).style.display = "none";
+			document.getElementById("normleft"+id).style.display = "";
+			document.getElementById("normleft"+id).style.left = 0+"px";
+			document.getElementById("normleft"+id).style.width = p1+"px";
+		}
+	} else if (type=='2O') {
+		document.getElementById("slid2"+id).style.display = "";
+		document.getElementById("slid2txt"+id).style.display = "";
+		document.getElementById("normleft"+id).style.display = "";
+		document.getElementById("normright"+id).style.display = "";
+		document.getElementById("normright"+id).style.right = 0+"px";
+		document.getElementById("normleft"+id).style.left = 0+"px";
+		document.getElementById("normright"+id).style.width = (500-maxp)+"px";
+		document.getElementById("normleft"+id).style.width = minp+"px";
+	} else if (type=='2B') {
+		document.getElementById("slid2"+id).style.display = "";
+		document.getElementById("slid2txt"+id).style.display = "";
+		document.getElementById("normleft"+id).style.display = "";
+		document.getElementById("normright"+id).style.display = "none";
+		document.getElementById("normleft"+id).style.left = minp+"px";
+		document.getElementById("normleft"+id).style.width = (maxp-minp)+"px";
+	}
+	normupdatevalues(id);
+}
 

@@ -62,7 +62,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$qids[] = mysql_insert_id();
 			}
 			//add to itemorder
-			$query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
+			$query = "SELECT itemorder,viddata FROM imas_assessments WHERE id='$aid'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$row = mysql_fetch_row($result);
 			if ($row[0]=='') {
@@ -70,8 +70,29 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else {
 				$itemorder  = $row[0] . "," . implode(",",$qids);	
 			}
-		
-			$query = "UPDATE imas_assessments SET itemorder='$itemorder' WHERE id='$aid'";
+			$viddata = $row[1];
+			if ($viddata != '') {
+				if ($row[0]=='') {
+					$nextnum = 0;
+				} else {
+					$nextnum = substr_count($row[0],',')+1;
+				}
+				$numnew= count($checked);
+				$viddata = unserialize($viddata);
+				if (!isset($viddata[count($viddata)-1][1])) {
+					$finalseg = array_pop($viddata);
+				} else {
+					$finalseg = '';
+				}
+				for ($i=$nextnum;$i<$nextnum+$numnew;$i++) {
+					$viddata[] = array('','',$i);
+				}
+				if ($finalseg != '') {
+					$viddata[] = $finalseg;
+				}
+				$viddata = addslashes(serialize($viddata));
+			}
+			$query = "UPDATE imas_assessments SET itemorder='$itemorder',viddata='$viddata' WHERE id='$aid'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
 			exit;
