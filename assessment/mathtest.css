@@ -576,3 +576,10 @@ span.inlinebtn {
 span.inlinebtn:hover {
 	background: #dfd;
 }
+span.feedbackwrap {
+	display: block;
+	padding: 5px;
+	background: #fff;
+	border: 1px solid #ccc;
+	margin-bottom: 2px;
+}

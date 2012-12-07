@@ -71,7 +71,7 @@ function parsefile($file) {
 					$qdata[$qnum]['qtype'] .= $line;
 				}
 			} else {
-				if ($qnum>-1) {
+				if ($qnum>-1 && $part!='') {
 					$qdata[$qnum][$part] .= $line . "\n";
 				}
 			}
@@ -126,6 +126,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 	if (isset($_POST['process'])) {
 		$filename = rtrim(dirname(__FILE__), '/\\') .'/import/' . $_POST['filename'];
 		$qdata = parsefile($filename);
+		
 		//need to addslashes before SQL insert
 		$qdata = array_map('addslashes_deep', $qdata);
 		//$newlibs = $_POST['libs'];
@@ -166,6 +167,11 @@ if (!(isset($teacherid)) && $myrights<75) {
 		$now = time();
 		$allqids = array();
 		foreach ($checked as $qn) {
+			if (!empty($qdata[$qn]['qimgs'])) {
+				$hasimg = 1;
+			} else {
+				$hasimg = 0;
+			}
 			if (isset($exists[$qdata[$qn]['uqid']]) && $_POST['merge']==1) {
 				$qsetid = $exists[$qdata[$qn]['uqid']];
 				if ($qdata[$qn]['lastmod']>$adddate[$qsetid]) { //only update modified questions - should add check for different lastmoddates
@@ -185,17 +191,17 @@ if (!(isset($teacherid)) && $myrights<75) {
 						}
 					} else {
 					
-						$query = "UPDATE imas_questionset SET description='{$qd['description']}',author='{$qd['author']}',";
-						$query .= "qtype='{$qd['qtype']}',control='{$qd['control']}',qcontrol='{$qd['qcontrol']}',qtext='{$qd['qtext']}',";
-						$query .= "answer='{$qd['answer']}',extref='{$qd['extref']}',lastmoddate=$now,adddate=$now,hasimg=$hasimg WHERE id='$qsetid'";
+						$query = "UPDATE imas_questionset SET description='{$qdata[$qn]['description']}',author='{$qdata[$qn]['author']}',";
+						$query .= "qtype='{$qdata[$qn]['qtype']}',control='{$qdata[$qn]['control']}',qcontrol='{$qdata[$qn]['qcontrol']}',qtext='{$qdata[$qn]['qtext']}',";
+						$query .= "answer='{$qdata[$qn]['answer']}',extref='{$qdata[$qn]['extref']}',lastmoddate=$now,adddate=$now,hasimg=$hasimg WHERE id='$qsetid'";
 						if (!$isadmin) {
 							$query .= " AND (ownerid='$userid' OR userights>3)";
 						}
 					}
-					mysql_query($query) or die("Import failed on {$qdata['description']}: " . mysql_error());
+					mysql_query($query) or die("Import failed on {$qdata['description']}: $query: " . mysql_error());
 					if (mysql_affected_rows()>0) {
 						$updateq++;
-						if (!empty($qd['qimgs'])) {
+						if (!empty($qdata[$qn]['qimgs'])) {
 							//not efficient, but sufficient :)
 							$query = "DELETE FROM imas_qimages WHERE qsetid='$qsetid'";
 							mysql_query($query) or die("Import failed on $query: " . mysql_error());
@@ -217,11 +223,11 @@ if (!(isset($teacherid)) && $myrights<75) {
 					$qdata[$qn]['uqid'] = substr($mt,11).substr($mt,2,2).$qn;
 				}
 				$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,ownerid,userights,description,author,qtype,control,qcontrol,qtext,answer,extref,hasimg) VALUES ";
-				$query .= "('{$qd['uqid']}',$now,$now,'$userid','$rights','{$qd['description']}','{$qd['author']}','{$qd['qtype']}','{$qd['control']}','{$qd['qcontrol']}',";
-				$query .= "'{$qd['qtext']}','{$qd['answer']}','{$qd['extref']}',$hasimg)";
-				mysql_query($query) or die("Import failed on {$qdata['description']}: " . mysql_error());
+				$query .= "('{$qdata[$qn]['uqid']}',$now,$now,'$userid','$rights','{$qdata[$qn]['description']}','{$qdata[$qn]['author']}','{$qdata[$qn]['qtype']}','{$qdata[$qn]['control']}','{$qdata[$qn]['qcontrol']}',";
+				$query .= "'{$qdata[$qn]['qtext']}','{$qdata[$qn]['answer']}','{$qdata[$qn]['extref']}',$hasimg)";
+				mysql_query($query) or die("Import failed on {$qdata[$qn]['description']}: $query:" . mysql_error());
 				$qsetid = mysql_insert_id();
-				if (!empty($qd['qimgs'])) {
+				if (!empty($qdata[$qn]['qimgs'])) {
 					$qimgs = explode("\n",$qdata[$qn]['qimgs']);
 					foreach($qimgs as $qimg) {
 						$p = explode(',',$qimg);

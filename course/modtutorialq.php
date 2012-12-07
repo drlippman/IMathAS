@@ -479,7 +479,7 @@ $lnames = implode(", ",$lnames);
 
 function prepd($v) {
 	$v = str_replace('&quot;','"',$v);
-	return htmlentities($v);
+	return htmlentities($v, ENT_COMPAT | ENT_HTML401,"UTF-8", false );
 }
 $dispval = array("vert","horiz","select","inline","2column");
 $displbl = array("Vertical list", "Horizontal list", "Pull-down", "Inline with text", "2 column");
