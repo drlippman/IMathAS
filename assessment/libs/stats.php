@@ -2,7 +2,7 @@
 //A library of Stats functions.  Version 1.9, March 30, 2008
 
 global $allowedmacros;
-array_push($allowedmacros,"nCr","nPr","mean","stdev","percentile","quartile","TIquartile","median","freqdist","frequency","histogram","fdhistogram","fdbargraph","normrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","countif","binomialpdf","binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart","mosaicplot","checklineagainstdata");
+array_push($allowedmacros,"nCr","nPr","mean","stdev","percentile","quartile","TIquartile","median","freqdist","frequency","histogram","fdhistogram","fdbargraph","normrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","countif","binomialpdf","binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart","mosaicplot","checklineagainstdata","chi2teststat");
 
 //nCr(n,r)
 //The Choose function
@@ -810,6 +810,31 @@ function binomialcdf($N,$p,$x) {
 		$out += binomialpdf($N,$p,$i);
 	}
 	return $out;
+}
+
+//chi2teststat(m) 
+//Computes the test stat sum((E-O)^2/E) given a matrix of values
+function chi2teststat($m) {
+	$rows = count($m);
+	$cols = count($m[0]);
+ 	$rowtot = array();
+ 	$coltot = array_fill(0,$cols,0);
+	foreach ($m as $i=>$r) {
+		$rowtot[$i] = array_sum($r);
+		for ($j=0;$j<$cols;$j++) {
+			$coltot[$j] += $r[$j];
+		}
+	}
+	$tottot = array_sum($rowtot);
+	$teststat = 0;
+	for ($r=0;$r<$rows;$r++) {
+		for ($c=0;$c<$cols;$c++) {
+			$E = $rowtot[$r]*$coltot[$c]/$tottot;
+			$teststat += ($E-$m[$r][$c])*($E-$m[$r][$c])/$E;
+		}
+	}
+	return $teststat;
+	
 }
 
 //chi2cdf(x,df)

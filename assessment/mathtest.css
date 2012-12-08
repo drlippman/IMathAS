@@ -581,5 +581,10 @@ span.feedbackwrap {
 	padding: 5px;
 	background: #fff;
 	border: 1px solid #ccc;
-	margin-bottom: 2px;
+}
+span.feedbackwrap.correct {
+	background: #efe;
+}
+span.feedbackwrap.incorrect {
+	background: #fee;
 }

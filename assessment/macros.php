@@ -2577,15 +2577,15 @@ function getfeedbacktxt($stu,$fbtxt,$ans) {
 		return '<span class="feedbackwrap"><img src="'.$imasroot.'/img/redx.gif"/> No answer selected. Try again.</span>';
 	} else if (isset($fbtxt[$stu])) {
 		if ($stu==$ans) {
-			return '<span class="feedbackwrap"><img src="'.$imasroot.'/img/gchk.gif"/> '.$fbtxt[$stu].'</span>';
+			return '<span class="feedbackwrap correct"><img src="'.$imasroot.'/img/gchk.gif"/> '.$fbtxt[$stu].'</span>';
 		} else {
-			return '<span class="feedbackwrap"><img src="'.$imasroot.'/img/redx.gif"/> '.$fbtxt[$stu].'</span>';
+			return '<span class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif"/> '.$fbtxt[$stu].'</span>';
 		}
 	} else {
 		if ($stu==$ans) {
-			return '<span class="feedbackwrap"><img src="'.$imasroot.'/img/gchk.gif"/></span>';
+			return '<span class="feedbackwrap correct"><img src="'.$imasroot.'/img/gchk.gif"/></span>';
 		} else {
-			return '<span class="feedbackwrap"><img src="'.$imasroot.'/img/redx.gif"/></span>';
+			return '<span class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif"/></span>';
 		}
 	}
 }

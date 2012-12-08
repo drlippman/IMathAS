@@ -1541,7 +1541,23 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$out .= '/>';
 		
 		if (isset($answer)) {
-			$sa = $answer;
+			if ($answerformat=='normalcurve' && $GLOBALS['sessiondata']['graphdisp']!=0) {
+				$sa .=  '<div style="position: relative; width: 500px; height:200px;padding:0px;background:#fff;">';
+				if (preg_match('/\(-oo,([\-\d\.]+)\)U\(([\-\d\.]+),oo\)/',$answer,$matches)) {
+					$sa .=  '<div style="position: absolute; left:0; top:0; height:200px; width:'.(250+60*$matches[1]+1).'px; background:#00f;">&nbsp;</div>';
+					$sa .=  '<div style="position: absolute; right:0; top:0; height:200px; width:'.(250-60*$matches[2]).'px; background:#00f;">&nbsp;</div>';
+				} else if (preg_match('/\(-oo,([\-\d\.]+)\)/',$answer,$matches)) {
+					$sa .=  '<div style="position: absolute; left:0; top:0; height:200px; width:'.(250+60*$matches[1]+1).'px; background:#00f;">&nbsp;</div>';
+				} else if (preg_match('/\(([\-\d\.]+),oo\)/',$answer,$matches)) {
+					$sa .=  '<div style="position: absolute; right:0; top:0; height:200px; width:'.(250-60*$matches[1]).'px; background:#00f;">&nbsp;</div>';
+				} else if (preg_match('/\(([\-\d\.]+),([\-\d\.]+)\)/',$answer,$matches)) {
+					$sa .=  '<div style="position: absolute; left:'.(250+60*$matches[1]).'px; top:0; height:200px; width:'.(60*($matches[2]-$matches[1])+1).'px; background:#00f;">&nbsp;</div>';
+				}
+				$sa .=  '<img style="position: absolute; left:0; top:0;z-index:1;width:100%;max-width:100%" src="'.$imasroot.'/img/normalcurve.gif"/>';
+				$sa .=  '</div>';
+			} else {
+				$sa = $answer;
+			}
 		}
 	} else if ($anstype == 'calcinterval') {
 		if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$qn];} else {$ansprompt = $options['ansprompt'];}}
