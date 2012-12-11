@@ -223,7 +223,7 @@ function calcandupdateLTIgrade($sourcedid,$aid,$scores) {
 
 //use this if we know the grade, or want to delete
 function updateLTIgrade($action,$sourcedid,$aid,$grade=0) {
-	global $sessiondata,$testsettings;
+	global $sessiondata,$testsettings,$cid;
 	
 	list($lti_sourcedid,$ltiurl,$ltikey,$keytype) = explode(':|:',$sourcedid);
 	if (strlen($lti_sourcedid)>1 && strlen($ltiurl)>1 && strlen($ltikey)>1) {
@@ -245,7 +245,11 @@ function updateLTIgrade($action,$sourcedid,$aid,$grade=0) {
 					}
 				}
 			} else if ($keytype=='c') {
-				$qr = "SELECT ltisecret FROM imas_courses WHERE id='{$testsettings['courseid']}'";
+				if (!isset($testsettings)) {
+					$qr = "SELECT ltisecret FROM imas_courses WHERE id='$cid'"; //if from gb-viewasid
+				} else {
+					$qr = "SELECT ltisecret FROM imas_courses WHERE id='{$testsettings['courseid']}'";
+				}
 				$res= mysql_query($qr) or die("Query failed : $qr" . mysql_error());
 				if (mysql_num_rows($res)>0) {
 					$secret = mysql_result($res,0,0);
