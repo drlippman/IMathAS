@@ -1975,6 +1975,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 
 function scorepart($anstype,$qn,$givenans,$options,$multi) {
 	$defaultreltol = .0015;
+	global $mathfuncs;
 	if ($anstype == "number") {
 		if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}
 		if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$qn];} else {$reltolerance = $options['reltolerance'];}}
@@ -3118,6 +3119,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			if (in_array('inequality',$ansformats)) {
 				preg_match_all('/[a-zA-Z]+/',$_POST["tc$qn"],$matches);
 				foreach ($matches[0] as $var) {
+					if (in_array($var,$mathfuncs)) { continue;}
 					if ($var!= 'or' && $var!='and' && $var != $variables && $_POST["qn$qn"]!="(-oo,oo)") {
 						return 0;
 					}

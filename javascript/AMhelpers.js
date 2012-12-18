@@ -156,8 +156,9 @@ function intcalculate(inputId,outputId,format) {
 		fullstr = fullstr.replace(/or/g,' or ');
 		var origstr = fullstr;
 		fullstr = ineqtointerval(fullstr);
+		var pats = str.match(/\b([a-zA-Z])\b/);
 		var pat = str.match(/([a-zA-Z]+)/);
-		var ineqvar = (pat != null)?pat[1]:'';
+		var ineqvar = (pats != null)?pats[1]:((pat != null)?pat[1]:'');
 	  } else {
 		  fullstr = fullstr.replace(/\s+/g,'');
 	  }
@@ -197,7 +198,7 @@ function intcalculate(inputId,outputId,format) {
 		  }
 		  strarr[i] = sm + vals[0] + ',' + vals[1] + em;
 		  if (format.indexOf('inequality')!=-1) {
-			  if (calcvals[0].match(/oo/)) {
+		  	  if (calcvals[0].match(/oo/)) {
 				  if (calcvals[1].match(/oo/)) {
 					  calcstrarr[i] = 'RR';
 				  } else {
