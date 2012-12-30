@@ -10,7 +10,7 @@ require("interpret5.php");
 require("macros.php");
 function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false,$qcolors=array()) {
 	global $imasroot, $myrights, $showtips, $urlmode;
-	
+	$GLOBALS['inquestiondisplay'] = true;
 	srand($seed);
 	if (is_int($doshowans) && $doshowans==2) {
 		$doshowans = true;
@@ -166,7 +166,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		$lastkey = max(array_keys($hints));
 		if ($qdata['qtype']=="multipart" && is_array($hints[$lastkey])) { //individual part hints
 			foreach ($hints as $iidx=>$hintpart) {
-				$lastkey = end(array_keys($hintpart));
+				$lastkey = max(array_keys($hintpart));
 				if ($attemptn>$lastkey) {
 					$usenum = $lastkey;
 				} else {
@@ -343,7 +343,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 	unset($abstolerance);
 	srand($seed);
-		
+	$GLOBALS['inquestiondisplay'] = false;
 	$query = "SELECT qtype,control,answer FROM imas_questionset WHERE id='$qidx'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$qdata = mysql_fetch_array($result, MYSQL_ASSOC);

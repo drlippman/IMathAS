@@ -316,13 +316,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$beentaken = false;
 	}
 	
-	$query = "SELECT itemorder,name,defpoints,displaymethod FROM imas_assessments WHERE id='$aid'";
+	$query = "SELECT itemorder,name,defpoints,displaymethod,showhints FROM imas_assessments WHERE id='$aid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$itemorder = mysql_result($result, 0,0);
 	$page_assessmentName = mysql_result($result,0,1);
 	$ln = 1;
 	$defpoints = mysql_result($result,0,2);
 	$displaymethod = mysql_result($result,0,3);
+	$showhintsdef = mysql_result($result,0,4);
 	
 	$grp0Selected = "";
 	if (isset($sessiondata['groupopt'.$aid])) {
@@ -360,7 +361,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 		} 
 		for ($j=0;$j<count($subs);$j++) {
-			$query = "SELECT imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn,imas_questionset.extref,imas_users.groupid FROM imas_questions,imas_questionset,imas_users ";
+			$query = "SELECT imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn,imas_questionset.extref,imas_users.groupid,imas_questions.showhints FROM imas_questions,imas_questionset,imas_users ";
 			$query .= "WHERE imas_questions.id='{$subs[$j]}' AND imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id ";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$line = mysql_fetch_array($result, MYSQL_ASSOC);
@@ -388,8 +389,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 				}
 				$page_questionTable[$i]['extref'] = '';
-				if ($hasvid) {
+				if ($hasvid && (($line['showhints']==0 && $showhintsdef==1) || $line['showhints']==2)) {
 					$extrefval += 1;
+				} else if ($hasvid) {
+					$extrefval += 4;
 				}
 				if ($hasother) {
 					$extrefval += 2;

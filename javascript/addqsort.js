@@ -284,6 +284,8 @@ function generateTable() {
 			html += "<td class=\"nowrap\">";
 			if ((curitems[j][7]&1) == 1) {
 				html += '<img src="'+imasroot+'/img/video_tiny.png"/>';
+			} else if ((curitems[j][7]&4) == 4) {
+				html += '<img src="'+imasroot+'/img/video_tiny_no.png"/>';
 			}
 			if ((curitems[j][7]&2) == 2) {
 				html += '<img src="'+imasroot+'/img/html_tiny.png"/>';
