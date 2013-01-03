@@ -623,6 +623,7 @@ var functoproc ={};
 var matcalctoproc = {};
 var ntupletoproc = {};
 var complextoproc = {};
+var callbackstack = {};
 var matsize = {};
 var vlist = {};
 var flist = {};
@@ -651,6 +652,9 @@ function doonsubmit(form,type2,skipconfirm) {
 				return false;
 			}
 		}
+	}
+	for (var qn in callbackstack) {
+		callbackstack[qn](qn);
 	}
 	for (var qn in intcalctoproc) { //i=0; i<intcalctoproc.length; i++) {
 		qn = parseInt(qn);
