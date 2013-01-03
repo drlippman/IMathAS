@@ -2,7 +2,7 @@
 //IMathAS: Display a summary of student results on a particular question
 //(c) 2011 David Lippman
 
-// Currently works for non-randomized choices, multans, and free response questions
+// Currently works for choices, multans, and non-randomized free response questions
 // and multipart containing those.
 
 // does NOT work for randomized questions or matching.
@@ -72,6 +72,12 @@ while ($row = mysql_fetch_row($result)) {
 		}
 		$qatt = explode('&',$qatt);
 		$qscore = explode('~',$scores[$k]);
+		foreach ($qatt as $kp=>$lav) {
+			if (strpos($lav,'$!$')) {
+				$tmp = explode('$!$',$lav);
+				$qatt[$kp] = $tmp[1];
+			}	
+		}
 		if (count($qatt)==1) {
 			$qatt = $qatt[0];
 			$qscore = $qscore[0];

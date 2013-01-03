@@ -492,6 +492,7 @@ if (isset($_GET['launch'])) {
 	}
 	$_SESSION['ltirole'] = $ltirole;
 	$_SESSION['lti_context_id'] = $_REQUEST['context_id'];
+	$_SESSION['lti_context_label'] = (!empty($_REQUEST['context_label']))?$_REQUEST['context_label']:$_REQUEST['context_id'];
 	$_SESSION['lti_resource_link_id'] = $_REQUEST['resource_link_id'];
 	$_SESSION['lti_lis_result_sourcedid'] = $_REQUEST['lis_result_sourcedid'];
 	$_SESSION['lti_outcomeurl'] = $_REQUEST['lis_outcome_service_url'];
@@ -673,22 +674,32 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 				//aid is in destination course - just make placement
 				$aid = $_SESSION['place_aid'][1];
 			} else {
-				//aid is in source course - need to copy it
-				require("includes/copyiteminc.php");
-				$query = "SELECT id FROM imas_items WHERE itemtype='Assessment' AND typeid='{$_SESSION['place_aid'][1]}'";
+				//aid is in source course.  Let's look and see if there's an assessment in destination with the same title.
+				$query = "SELECT name FROM imas_assessments WHERE id='{$_SESSION['place_aid'][1]}'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				$cid = $destcid;
-				$newitem = copyitem(mysql_result($result,0,0),array());
-				$query = "SELECT typeid FROM imas_items WHERE id=$newitem";
+				$sourceassessname = addslashes(mysql_result($result,0,0));
+				$query = "SELECT id FROM imas_assessments WHERE name='$sourceassessname' AND courseid='$destcid'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				$aid = mysql_result($result,0,0);
-				$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				$items = unserialize(mysql_result($result,0,0));
-				$items[] = $newitem;
-				$items = addslashes(serialize($items));
-				$query = "UPDATE imas_courses SET itemorder='$items' WHERE id='$cid'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				if (mysql_num_rows($result)>0) {
+					$aid = mysql_result($result,0,0);
+				} else {
+				// no assessment with same title - need to copy assessment from destination to source course
+					require("includes/copyiteminc.php");
+					$query = "SELECT id FROM imas_items WHERE itemtype='Assessment' AND typeid='{$_SESSION['place_aid'][1]}'";
+					$result = mysql_query($query) or die("Query failed : " . mysql_error());
+					$cid = $destcid;
+					$newitem = copyitem(mysql_result($result,0,0),array());
+					$query = "SELECT typeid FROM imas_items WHERE id=$newitem";
+					$result = mysql_query($query) or die("Query failed : " . mysql_error());
+					$aid = mysql_result($result,0,0);
+					$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+					$result = mysql_query($query) or die("Query failed : " . mysql_error());
+					$items = unserialize(mysql_result($result,0,0));
+					$items[] = $newitem;
+					$items = addslashes(serialize($items));
+					$query = "UPDATE imas_courses SET itemorder='$items' WHERE id='$cid'";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+				}
 			}	
 			$query = "INSERT INTO imas_lti_placements (org,contextid,linkid,placementtype,typeid) VALUES ";
 			$query .= "('{$_SESSION['ltiorg']}','{$_SESSION['lti_context_id']}','{$_SESSION['lti_resource_link_id']}','assess','$aid')";
@@ -775,7 +786,7 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='aid' || $keyparts[0]=='placein') {
 			$query = "SELECT id FROM imas_tutors WHERE userid='$userid' AND courseid='$cid'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (mysql_num_rows($result) == 0) { //nope, not a tutor already.  Set as tutor for this context_id
-				$query = "INSERT INTO imas_tutors (userid,courseid,section) VALUES ('$userid','$cid','{$_SESSION['lti_context_id']}')";
+				$query = "INSERT INTO imas_tutors (userid,courseid,section) VALUES ('$userid','$cid','{$_SESSION['lti_context_label']}')";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 		}
@@ -790,7 +801,7 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='aid' || $keyparts[0]=='placein') {
 				$query = "SELECT id FROM imas_tutors WHERE userid='$userid' AND courseid='$cid'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				if (mysql_num_rows($result) == 0) { //nope, not a tutor either.  Add new student
-					$query = "INSERT INTO imas_students (userid,courseid,section) VALUES ('$userid','$cid','{$_SESSION['lti_context_id']}')";
+					$query = "INSERT INTO imas_students (userid,courseid,section) VALUES ('$userid','$cid','{$_SESSION['lti_context_label']}')";
 					mysql_query($query) or die("Query failed : " . mysql_error());
 				}
 			} else {

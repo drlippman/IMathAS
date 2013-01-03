@@ -209,6 +209,21 @@ if (isset($_POST['options'])) {
 			if ($doba) {
 				$laarr = explode('##',$bla[$k]);
 				$gb[$r][$c+$offset] = $laarr[count($laarr)-1];
+				if (strpos($gb[$r][$c+$offset],'$!$')) {
+					if (strpos($gb[$r][$c+$offset],'&')) { //is multipart q
+						$laparr = explode('&',$gb[$r][$c+$offset]);
+						foreach ($laparr as $lk=>$v) {
+							if (strpos($v,'$!$')) {
+								$tmp = explode('$!$',$v);
+								$laparr[$lk] = $tmp[1];
+							}
+						}
+						$gb[$r][$c+$offset] = implode('&',$laparr);
+					} else {
+						$tmp = explode('$!$',$gb[$r][$c+$offset]);
+						$gb[$r][$c+$offset] = $tmp[1];
+					}
+				}
 				$offset++;
 			}
 			if ($dobca) {
@@ -217,6 +232,21 @@ if (isset($_POST['options'])) {
 			if ($dola) {
 				$laarr = explode('##',$la[$k]);
 				$gb[$r][$c+$offset] = $laarr[count($laarr)-1];
+				if (strpos($gb[$r][$c+$offset],'$!$')) {
+					if (strpos($gb[$r][$c+$offset],'&')) { //is multipart q
+						$laparr = explode('&',$gb[$r][$c+$offset]);
+						foreach ($laparr as $lk=>$v) {
+							if (strpos($v,'$!$')) {
+								$tmp = explode('$!$',$v);
+								$laparr[$lk] = $tmp[1];
+							}
+						}
+						$gb[$r][$c+$offset] = implode('&',$laparr);
+					} else {
+						$tmp = explode('$!$',$gb[$r][$c+$offset]);
+						$gb[$r][$c+$offset] = $tmp[1];
+					}
+				}  
 				$offset++;
 			}
 		}
@@ -233,7 +263,7 @@ if (isset($_POST['options'])) {
 			  $val = str_replace("&nbsp;"," ",$val);
 		
 			  # if a deliminator char, a double quote char or a newline are in the field, add quotes 
-			  if(ereg("[\,\"\n\r]", $val)) { 
+			  if(preg_match("/[\,\"\n\r]/", $val)) { 
 				  $val = '"'.str_replace('"', '""', $val).'"'; 
 			  }
 			  $line .= $val.',';
@@ -262,7 +292,7 @@ if (isset($_POST['options'])) {
 	echo '<input type="checkbox" name="la" value="1"/> Last Attempt<br/>';
 	echo '<input type="submit" name="options" value="Export" />';
 	echo '<p>Export will be a commas separated values (.CSV) file, which can be opened in Excel</p>';
-	echo '<p class="red"><b>Note</b>: Attempt information from shuffled multiple choice, multiple answer, and matching questions will NOT be correct</p>';
+	//echo '<p class="red"><b>Note</b>: Attempt information from shuffled multiple choice, multiple answer, and matching questions will NOT be correct</p>';
 	echo '</form>';
 	require("../footer.php");
 	
