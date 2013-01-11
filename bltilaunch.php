@@ -528,11 +528,11 @@ if (isset($_GET['launch'])) {
 				$firstname = '';
 				$lastname = $_REQUEST['lis_person_name_full'];
 			}
-			if (!empty($_REQUEST['lis_person_contact_email_primary'])) {
-				$email = $_REQUEST['lis_person_contact_email_primary'];
-			} else {
+			//if (!empty($_REQUEST['lis_person_contact_email_primary'])) {
+			//	$email = $_REQUEST['lis_person_contact_email_primary'];
+			//} else {
 				$email = 'none@none.com';
-			}
+			//}
 			
 			$query = "INSERT INTO imas_ltiusers (org,ltiuserid) VALUES ('$ltiorg','$ltiuserid')";
 			mysql_query($query) or die("Query failed : " . mysql_error());
