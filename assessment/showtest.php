@@ -22,6 +22,7 @@
 	include("displayq2.php");
 	include("testutil.php");
 	include("asidutil.php");
+	
 	$inexception = false;
 	$exceptionduedate = 0;
 	//error_reporting(0);  //prevents output of error messages
@@ -109,6 +110,7 @@
 		}
 		
 		$sessiondata['istutorial'] = $adata['istutorial'];
+		$_SESSION['choicemap'] = array();
 		
 		$query = "SELECT id,agroupid,lastanswers,bestlastanswers,starttime FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='{$_GET['id']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -1287,10 +1289,10 @@ if (!isset($_POST['embedpostback'])) {
 							if ($v[1]<=$next+1 && $next+1<=$v[2]) {//right divider
 								if ($next+1==$v[1]) {
 									echo '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;">Hide Question Information</a></div>';
-									echo '<div class="intro" id="intropiece'.$k.'">'.$intropieces[$k].'</div>';										
+									echo '<div class="intro" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';										
 								} else {
 									echo '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;">Show Question Information</a></div>';
-									echo '<div class="intro" style="display:none;" id="intropiece'.$k.'">'.$intropieces[$k].'</div>';	
+									echo '<div class="intro" style="display:none;" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';	
 								}
 								break;
 							}
@@ -1455,7 +1457,7 @@ if (!isset($_POST['embedpostback'])) {
 					if (isset($intropieces)) {
 						foreach ($introdividers as $k=>$v) {
 							if ($v[1]==$i+1) {//right divider
-								echo '<div class="intro" id="intropiece'.$k.'">'.$intropieces[$k].'</div>';
+								echo '<div class="intro" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
 								break;
 							}
 						}
@@ -1773,7 +1775,7 @@ if (!isset($_POST['embedpostback'])) {
 					foreach ($introdividers as $k=>$v) {
 						if ($v[1]<=$i+1 && $i+1<=$v[2]) {//right divider
 							echo '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;">Hide Question Information</a></div>';
-							echo '<div class="intro" id="intropiece'.$k.'">'.$intropieces[$k].'</div>';
+							echo '<div class="intro" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
 							break;
 						}
 					}
@@ -1816,7 +1818,7 @@ if (!isset($_POST['embedpostback'])) {
 					if (isset($intropieces)) {
 						foreach ($introdividers as $k=>$v) {
 							if ($v[1]==$i+1) {//right divider
-								echo '<div class="intro" id="intropiece'.$k.'">'.$intropieces[$k].'</div>';
+								echo '<div class="intro" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
 								break;
 							}
 						}

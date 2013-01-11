@@ -424,6 +424,14 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 						$stuanswers[$qnidx+1][$kidx] = $_SESSION['choicemap'][$partnum][$stuanswers[$qnidx+1][$kidx]];	
 					}	
 				}
+			} else if (isset($_POST["qn$partnum-0"])) {
+				$tmp = array();
+				$spc = 0;
+				while (isset($_POST["qn$partnum-$spc"])) {
+					$tmp[] = stripslashes($_POST["qn$partnum-$spc"]);
+					$spc++;
+				}
+				$stuanswers[$qnidx+1][$kidx] = implode('|',$tmp);
 			}
 		}
 	} else {
@@ -447,9 +455,17 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 					$stuanswers[$qnidx+1] = $_SESSION['choicemap'][$qnidx][$stuanswers[$qnidx+1]];	
 				}	
 			}
+		} else if (isset($_POST["qn$qnidx-0"])) {
+			$tmp = array();
+			$spc = 0;
+			while (isset($_POST["qn$qnidx-$spc"])) {
+				$tmp[] = stripslashes($_POST["qn$qnidx-$spc"]);
+				$spc++;
+			}
+			$stuanswers[$qnidx+1] = implode('|',$tmp);
 		}
 	}
-		
+	
 	eval(interpret('control',$qdata['qtype'],$qdata['control']));
 	srand($seed+1);
 	eval(interpret('answer',$qdata['qtype'],$qdata['answer']));
@@ -2925,7 +2941,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					$tp[$j] = $tps[$i][$j];
 				}
 				$realans = eval("return ($answer);");
-				//echo "real: $realans, my: {$myans[$i]},rel: ". (abs($myans[$i]-$realans)/abs($realans))  ."<br/>";
+				//echo "$answer, real: $realans, my: {$myans[$i]},rel: ". (abs($myans[$i]-$realans)/abs($realans))  ."<br/>";
 				if (isNaN($realans)) {$cntnan++; continue;} //avoid NaN problems
 				if ($answerformat=="equation") {  //if equation, store ratios
 					if (abs($realans)>.000001 && is_numeric($myans[$i])) {

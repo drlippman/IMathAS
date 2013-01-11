@@ -75,6 +75,7 @@ function tipshow(el,tip) {
 		document.getElementsByTagName("body")[0].appendChild(tipobj);
 	} 
 	tipobj.innerHTML = tip;
+	tipobj.style.left = "5px";
 	tipobj.style.display = "block";
 	
 	if (typeof AMnoMathML!='undefined' && typeof noMathRender != 'undefined') {

@@ -69,7 +69,9 @@ function matrixsystemdisp($m,$v=array('x','y','z','w','v')) {
 				$out .= '=,'.$m[$i][$j];
 				break;
 			}
-			if ($m[$i][$j]==0) {
+			if (!is_numeric($m[$i][$j]) && $firstout) {  //something like a variable coefficient
+				$out .= '+,';
+			} else if ($m[$i][$j]==0) {
 				$out .= ",";
 			} else if ($m[$i][$j]<0) {
 				$out .= "-,";
@@ -78,10 +80,12 @@ function matrixsystemdisp($m,$v=array('x','y','z','w','v')) {
 			} else {
 				$out .= ',';
 			}
-			if ($m[$i][$j]!=0 && abs($m[$i][$j])!=1) {
+			if (!is_numeric($m[$i][$j])) {
+				$out .= $m[$i][$j];
+			} else if ($m[$i][$j]!=0 && abs($m[$i][$j])!=1) {
 				$out .= abs($m[$i][$j]);
 			}
-			if ($m[$i][$j]!=0 && $j<count($m[0])-1) {
+			if ((!is_numeric($m[$i][$j]) || $m[$i][$j]!=0) && $j<count($m[0])-1) {
 				$firstout = true;
 				$out .= $v[$j];
 			}
