@@ -61,6 +61,7 @@ var didMultiTouch = false;
 	5: line
 	5.2:  ray (no arrow)
 	5.3:  line segment
+	5.4:  vector
 	6: parabola
 	6.5: square root
 	7: circle (only works on square grids)

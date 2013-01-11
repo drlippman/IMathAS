@@ -1818,7 +1818,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$out .= '/>';
 			}
 			//$out .= "<img src=\"$imasroot/img/tpline2.gif\" onclick=\"settool(this,$qn,5.2)\"/>";
-			//$out .= "<img src=\"$imasroot/img/tpline3.gif\" onclick=\"settool(this,$qn,5.3)\"/>";
+			if (in_array('lineseg',$answerformat)) {
+				$out .= "<img src=\"$imasroot/img/tpline3.gif\" onclick=\"settool(this,$qn,5.3)\" ";
+				if (count($answerformat)>1 && $answerformat[1]=='lineseg') { $out .= 'class="sel" '; $def = 5.3;}
+				$out .= "/>";
+			}
 			if (count($answerformat)==1 || in_array('parab',$answerformat)) {
 				$out .= "<img src=\"$imasroot/img/tpparab.png\" onclick=\"settool(this,$qn,6)\" ";
 				if (count($answerformat)>1 && $answerformat[1]=='parab') { $out .= 'class="sel" '; $def = 6;}
@@ -3502,6 +3506,14 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					$anscircs[$key] = array(($function[1] - $settings[0])*$pixelsperx + $imgborder,$settings[7] - ($function[2]-$settings[2])*$pixelspery - $imgborder,$function[3]*$pixelsperx);
 				} else if (substr($function[0],0,2)=='x=') {
 					$anslines[$key] = array('x',10000,(substr($function[0],2)- $settings[0])*$pixelsperx + $imgborder );
+				} else if (count($function)==3) { //line segment
+					$func = makepretty($function[0]);
+					$func = mathphp($func,'x');
+					$func = str_replace("(x)",'($x)',$func);
+					$func = create_function('$x', 'return ('.$func.');');
+					$y1p = $ytopix($func(floatval($function[1])));
+					$y2p = $ytopix($func(floatval($function[2])));
+					$ansvecs[$key] = array('ls', $xtopix($function[1]), $y1p, $xtopix($function[2]), $y2p);
 				} else {
 					$func = makepretty($function[0]);
 					$func = mathphp($func,'x');
@@ -3637,8 +3649,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 								$lines[] = array('y',$slope,$pts[2]+($x2p-$pts[1])*$slope);
 							}
 						}
+					} else if ($pts[0]==5.3) {
+						$vecs[] = array($pts[1],$pts[2],$pts[3],$pts[4],'ls');	
 					} else if ($pts[0]==5.4) {
-						$vecs[] = array($pts[1],$pts[2],$pts[3],$pts[4]);	
+						$vecs[] = array($pts[1],$pts[2],$pts[3],$pts[4],'v');	
 					} else if ($pts[0]==6) {
 						//parab
 						if ($pts[4]==$pts[2]) {
@@ -3751,8 +3765,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			
 			foreach ($ansvecs as $key=>$ansvec) {
 				$scores[$key] = 0;
-				if ($ansvec[0]=='p') {
+				if ($ansvec[0]=='p') {  //point
 					for ($i=0; $i<count($vecs); $i++) {
+						if ($vecs[$i][4]!='v') {continue;}
 						if (abs($ansvec[1]-$vecs[$i][0])>$defpttol*$reltolerance) {
 							continue;
 						}
@@ -3768,8 +3783,39 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						$scores[$key] = 1;
 						break;
 					}
-				} else {
+				} else if ($ansvec[0]=='ls') { //line segment
 					for ($i=0; $i<count($vecs); $i++) {
+						if ($vecs[$i][4]!='ls') {continue;}
+						if (abs($ansvec[1]-$vecs[$i][0])>$defpttol*$reltolerance && abs($ansvec[1]-$vecs[$i][2])>$defpttol*$reltolerance) {
+							continue; //ans x1 doesn't match either vec x
+						}
+						if (abs($ansvec[1]-$vecs[$i][0])<=$defpttol*$reltolerance) { //x1 of ans matched first vec x
+							if (abs($ansvec[2]-$vecs[$i][1])>$defpttol*$reltolerance) {
+								continue;
+							}
+							if (abs($ansvec[3]-$vecs[$i][2])>$defpttol*$reltolerance) {
+								continue;
+							}
+							if (abs($ansvec[4]-$vecs[$i][3])>$defpttol*$reltolerance) {
+								continue;
+							}
+						} else {
+							if (abs($ansvec[2]-$vecs[$i][3])>$defpttol*$reltolerance) {
+								continue;
+							}
+							if (abs($ansvec[3]-$vecs[$i][0])>$defpttol*$reltolerance) {
+								continue;
+							}
+							if (abs($ansvec[4]-$vecs[$i][1])>$defpttol*$reltolerance) {
+								continue;
+							}
+						}
+						$scores[$key] = 1;
+						break;
+					}
+				} else {  //direction vector
+					for ($i=0; $i<count($vecs); $i++) {
+						if ($vecs[$i][4]!='v') {continue;}
 						if (abs($ansvec[1]-($vecs[$i][2] - $vecs[$i][0]))>$defpttol*$reltolerance) {
 							continue;
 						}
