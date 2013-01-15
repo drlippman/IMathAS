@@ -1198,7 +1198,7 @@ function gbtable() {
 				$gb[$ln][2][$pos][0] = $cattotpast[$ln][$cat];
 				
 				if ($useweights==1) {
-					if ($cattotpast[$ln][$cat]>0) {
+					if ($cattotpast[$ln][$cat]>0 && $catposspast[$cat]>0) {
 						$totpast += ($cattotpast[$ln][$cat]*$cats[$cat][5])/(100*$catposspast[$cat]); //weight total
 					}
 				}
@@ -1275,7 +1275,7 @@ function gbtable() {
 				$gb[$ln][2][$pos][1] = $cattotcur[$ln][$cat];
 				
 				if ($useweights==1) {
-					if ($cattotcur[$ln][$cat]>0) {
+					if ($cattotcur[$ln][$cat]>0 && $catposscur[$cat]>0) {
 						$totcur += ($cattotcur[$ln][$cat]*$cats[$cat][5])/(100*$catposscur[$cat]); //weight total
 					}
 				}
@@ -1350,7 +1350,7 @@ function gbtable() {
 				$gb[$ln][2][$pos][2] = $cattotfuture[$ln][$cat];
 				
 				if ($useweights==1) {
-					if ($cattotfuture[$ln][$cat]>0) {
+					if ($cattotfuture[$ln][$cat]>0 && $catpossfuture[$cat]>0) {
 						$totfuture += ($cattotfuture[$ln][$cat]*$cats[$cat][5])/(100*$catpossfuture[$cat]); //weight total
 					}
 				}
@@ -1433,7 +1433,7 @@ function gbtable() {
 				$gb[$ln][2][$pos][3] = $cattotattempted[$ln][$cat];
 				
 				if ($useweights==1) {
-					if ($cattotattempted[$ln][$cat]>0) {
+					if ($cattotattempted[$ln][$cat]>0 && $catpossattemptedstu[$cat]>0) {
 						$totattempted += ($cattotattempted[$ln][$cat]*$cats[$cat][5])/(100*$catpossattemptedstu[$cat]); //weight total
 					}
 				}
