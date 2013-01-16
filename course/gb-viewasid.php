@@ -8,6 +8,9 @@
 	$istutor = isset($tutorid);
 	$cid = $_GET['cid'];
 	$asid = $_GET['asid'];
+	if (!isset($_GET['uid']) && !$isteacher && !$istutor) {
+		$_GET['uid'] = $userid;
+	}
 	
 	if ($isteacher || $istutor) {
 		if (isset($sessiondata[$cid.'gbmode'])) {
