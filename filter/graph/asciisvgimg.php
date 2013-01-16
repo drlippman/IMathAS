@@ -565,17 +565,29 @@ function ASaxes($arg) {
 	if ($this->usegd2) {
 		imagesetthickness($this->img,1);
 	}
+	if ($xgrid==0) {
+		$xgrid = $this->xunitlength;
+	} else {
+		$xgrid *= $this->xunitlength;
+	}
+	if ($ygrid==0) {
+		$ygrid = $this->yunitlength;
+	} else {
+		$ygrid *= $this->yunitlength;
+	}
+	if (($this->winxmax - $this->winxmin)/$xgrid > $this->width) {
+		$xgrid = ($this->winxmax - $this->winxmin);
+	} 
+	if (($this->winymax - $this->winymin)/$ygrid > $this->height) {
+		$ygrid = ($this->winymax - $this->winymin);
+	}
+	if (($this->winxmax - $this->winxmin)/$xscl > $this->width) {
+		$xscl = ($this->winxmax - $this->winxmin);
+	} 
+	if (($this->winymax - $this->winymin)/$yscl > $this->height) {
+		$yscl = ($this->winymax - $this->winymin);
+	}
 	if ($dogrid) {
-		if ($xgrid==0) {
-			$xgrid = $this->xunitlength;
-		} else {
-			$xgrid *= $this->xunitlength;
-		}
-		if ($ygrid==0) {
-			$ygrid = $this->yunitlength;
-		} else {
-			$ygrid *= $this->yunitlength;
-		}
 		$gc = $this->gridcolor;
 		if ($dox) {
 			for ($x=$this->origin[0]+($doy?$xgrid:0); $x<=$this->winxmax; $x += $xgrid) {
@@ -602,16 +614,6 @@ function ASaxes($arg) {
 			}
 		}
 	} else if ($dosmallticks) {
-		if ($xgrid==0) {
-			$xgrid = $this->xunitlength;
-		} else {
-			$xgrid *= $this->xunitlength;
-		}
-		if ($ygrid==0) {
-			$ygrid = $this->yunitlength;
-		} else {
-			$ygrid *= $this->yunitlength;
-		}
 		$ac = $this->axescolor;
 		
 		if ($dox) {

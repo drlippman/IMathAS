@@ -369,22 +369,26 @@
 		}
 		$line=mysql_fetch_array($result, MYSQL_ASSOC);
 		
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-		if ($stu>0) {
-			echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
-			echo "&gt; <a href=\"gradebook.php?stu=$stu&cid=$cid\">Student Detail</a> ";
-		} else if ($_GET['from']=="isolate") {
-			echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
-			echo "&gt; <a href=\"isolateassessgrade.php?cid=$cid&aid={$line['assessmentid']}\">View Scores</a> ";	
-		} else if ($_GET['from']=="gisolate") {
-			echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
-			echo "&gt; <a href=\"isolateassessbygroup.php?cid=$cid&aid={$line['assessmentid']}\">View Group Scores</a> ";	
-		}else if ($_GET['from']=='stugrp') {
-			echo "&gt; <a href=\"managestugrps.php?cid=$cid&aid={$line['assessmentid']}\">Student Groups</a> ";	
-		} else {
-			echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
+		echo "<div class=breadcrumb>$breadcrumbbase ";
+		if (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0) {
+			echo "<a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; ";
+		
+			if ($stu>0) {
+				echo "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
+				echo "&gt; <a href=\"gradebook.php?stu=$stu&cid=$cid\">Student Detail</a> &gt; ";
+			} else if ($_GET['from']=="isolate") {
+				echo " <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
+				echo "&gt; <a href=\"isolateassessgrade.php?cid=$cid&aid={$line['assessmentid']}\">View Scores</a> &gt; ";	
+			} else if ($_GET['from']=="gisolate") {
+				echo "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
+				echo "&gt; <a href=\"isolateassessbygroup.php?cid=$cid&aid={$line['assessmentid']}\">View Group Scores</a> &gt; ";	
+			}else if ($_GET['from']=='stugrp') {
+				echo "<a href=\"managestugrps.php?cid=$cid&aid={$line['assessmentid']}\">Student Groups</a> &gt; ";	
+			} else {
+				echo "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; ";
+			}
 		}
-		echo "&gt; Detail</div>";
+		echo "Detail</div>";
 		echo '<div id="headergb-viewasid" class="pagetitle"><h2>Grade Book Detail</h2></div>';
 		$query = "SELECT imas_users.FirstName,imas_users.LastName,imas_students.timelimitmult FROM imas_users JOIN imas_students ON imas_users.id=imas_students.userid WHERE imas_users.id='{$_GET['uid']}' AND imas_students.courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -734,6 +738,21 @@
 										$laarr[$k] = $tmp[0];
 									}
 								}
+								if (strpos($laarr[$k],'$#$')) {
+									if (strpos($laarr[$k],'&')) { //is multipart q
+										$laparr = explode('&',$laarr[$k]);
+										foreach ($laparr as $lk=>$v) {
+											if (strpos($v,'$#$')) {
+												$tmp = explode('$#$',$v);
+												$laparr[$lk] = $tmp[0];
+											}
+										}
+										$laarr[$k] = implode('&',$laparr);
+									} else {
+										$tmp = explode('$#$',$laarr[$k]);
+										$laarr[$k] = $tmp[0];
+									}
+								}
 								
 								echo str_replace(array('&','%nbsp;'),array('; ','&nbsp;'),strip_tags($laarr[$k]));
 							}
@@ -786,8 +805,9 @@
 			echo "<p>Instructor Feedback:<div class=\"intro\">{$line['feedback']}</div></p>";
 		}
 		echo "</form>";
-		
-		echo "<p><a href=\"gradebook.php?stu=$stu&cid=$cid\">Return to GradeBook</a></p>\n";
+		if (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0) {
+			echo "<p><a href=\"gradebook.php?stu=$stu&cid=$cid\">Return to GradeBook</a></p>\n";
+		}
 		
 		$query = "SELECT COUNT(id) from imas_questions WHERE assessmentid='{$line['assessmentid']}' AND category<>'0'";
 		$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());

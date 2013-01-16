@@ -744,7 +744,7 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein') {
 		//	reporterror("This assessment is closed");
 		//}
 		if ($line['avail']==0) {
-			reporterror("This assessment is closed");
+			//reporterror("This assessment is closed");
 		}
 		$query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid'";
 		$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -754,7 +754,7 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein') {
 				if ($now > $line['startdate'] && $now < $line['reviewdate']) {
 					$isreview = true;
 				} else {
-					reporterror("This assessment is closed");
+					//reporterror("This assessment is closed");
 				}
 			} else { //inside exception dates exception
 				if ($line['enddate']<$now) { //exception is for past-due-date
@@ -767,7 +767,7 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein') {
 				if ($now > $line['startdate'] && $now < $line['reviewdate']) {
 					$isreview = true;
 				} else {
-					reporterror("This assessment is closed");
+					//reporterror("This assessment is closed");
 				}
 			}
 		}
@@ -924,7 +924,7 @@ if (!$promptforsettings && !$createnewsession && !($keyparts[0]=='aid' && $tlwrd
 	mysql_query($query) or die("Query failed : " . mysql_error());
 	
 	if ($keyparts[0]=='aid') { //is aid
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id=$aid");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id=$aid&ltilaunch=true");
 	} else if ($keyparts[0]=='cid') { //is cid
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
 	} else if ($keyparts[0]=='sso') {

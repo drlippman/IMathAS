@@ -133,7 +133,7 @@
 					  $val = str_replace("&nbsp;"," ",$val);
 				
 					  # if a deliminator char, a double quote char or a newline are in the field, add quotes 
-					  if(ereg("[\,\"\n\r]", $val)) { 
+					   if(preg_match("/[\,\"\n\r]/", $val)) {  
 						  $val = '"'.str_replace('"', '""', $val).'"'; 
 					  }
 					  $line .= $val.',';

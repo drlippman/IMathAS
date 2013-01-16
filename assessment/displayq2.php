@@ -66,6 +66,11 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 							$arvp = explode('$!$',$arvp);
 							$arvp = $arvp[1];
 						}
+						if (strpos($arvp,'$#$')) {
+							$tmp = explode('$#$',$arvp);
+							$arvp = $tmp[0];
+							$stuanswersval[$i+1][$k] = $tmp[1];
+						}
 						$stuanswers[$i+1][$k] = $arvp;
 					}
 					//} else {
@@ -80,6 +85,11 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 					if (strpos($arv,'$!$')) {
 						$arv = explode('$!$',$arv);
 						$arv = $arv[1];
+					}
+					if (strpos($arv,'$#$')) {
+						$tmp = explode('$#$',$arv);
+						$arv = $tmp[0];
+						$stuanswersval[$i+1] = $tmp[1];
 					}
 					$stuanswers[$i+1] = $arv;
 				}
@@ -376,6 +386,11 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 							$arvp = explode('$!$',$arvp);
 							$arvp = $arvp[1];
 						}
+						if (strpos($arvp,'$#$')) {
+							$tmp = explode('$#$',$arvp);
+							$arvp = $tmp[0];
+							$stuanswersval[$i+1][$k] = $tmp[1];
+						}
 						$stuanswers[$i+1][$k] = $arvp;
 					}
 					//} else {
@@ -390,6 +405,11 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 					if (strpos($arv,'$!$')) {
 						$arv = explode('$!$',$arv);
 						$arv = $arv[1];
+					}
+					if (strpos($arv,'$#$')) {
+						$tmp = explode('$#$',$arv);
+						$arv = $tmp[0];
+						$stuanswersval[$i+1] = $tmp[1];
 					}
 					$stuanswers[$i+1] = $arv;
 				}
@@ -1022,6 +1042,10 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		
 		if (!isset($sz)) { $sz = 20;}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
+		
+		$la = explode('$#$',$la);
+		$la = $la[0];
+		
 		if (!isset($answerformat)) { $answerformat = '';}
 		if (isset($ansprompt)) {$out .= "<label for=\"tc$qn\">$ansprompt</label>";}
 		if ($displayformat=="point") {
@@ -1133,6 +1157,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$ansformats = explode(',',$answerformat);
 		
 		if (!isset($sz)) { $sz = 20;}
+		
+		$la = explode('$#$',$la);
+		$la = $la[0];
 		
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		if (isset($ansprompt)) {$out .= $ansprompt;}
@@ -1709,6 +1736,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			if (isset($options['answers'])) {$answers = $options['answers'];}
 		
 		}
+		
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if (!is_array($answers)) {
 			settype($answers,"array");
@@ -1739,6 +1767,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($grid)) {
 			if (!is_array($grid)) {
 				$grid = explode(',',$grid);
+			} else if (strpos($grid[0],',')!==false) {//forgot to set as multipart?
+				$grid = array();
 			}
 			for ($i=0; $i<count($grid); $i++) {
 				if ($grid[$i]!='') {
@@ -1916,6 +1946,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$saarr = array();
 			$ineqcolors = array("blue","red","green");
 			foreach($answers as $k=>$ans) {
+				if (is_array($ans)) { continue;} //shouldn't happen, unless user forgot to set question to multipart
 				if ($ans=='') { continue;}
 				$function = explode(',',$ans);
 				if ($answerformat[0]=='inequality') {
@@ -2350,6 +2381,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$ansr = substr($answer,2,-2);
 		$ansr = preg_replace('/\)\s*\,\s*\(/',',',$ansr);
 		$answerlist = explode(',',$ansr);
+		
 		foreach ($answerlist as $k=>$v) {
 			$v = eval('return ('.mathphp($v,null).');');
 			$answerlist[$k] = preg_replace('/[^\d\.,\-E]/','',$v);
@@ -2430,8 +2462,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				} 
 			}
 		}
+		$GLOBALS['partlastanswer'] .= '$#$'.$givenans;
+		
 		$givenanslist = explode(",",preg_replace('/[^\d\.,\-]/','',$givenans));
-
+		
 
 		for ($i=0; $i<count($answerlist); $i++) {
 			if (isset($abstolerance)) {
@@ -2680,7 +2714,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
-		$GLOBALS['partlastanswer'] = $_POST["tc$qn"];
+		$GLOBALS['partlastanswer'] = $_POST["tc$qn"].'$#$'.$givenans;
 		if ($givenans == null) {return 0;}
 		
 		if (checkreqtimes($_POST["tc$qn"],$requiretimes)==0) {

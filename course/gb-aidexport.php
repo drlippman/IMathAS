@@ -224,6 +224,21 @@ if (isset($_POST['options'])) {
 						$gb[$r][$c+$offset] = $tmp[1];
 					}
 				}
+				if (strpos($gb[$r][$c+$offset],'$#$')) {
+					if (strpos($gb[$r][$c+$offset],'&')) { //is multipart q
+						$laparr = explode('&',$gb[$r][$c+$offset]);
+						foreach ($laparr as $lk=>$v) {
+							if (strpos($v,'$#$')) {
+								$tmp = explode('$#$',$v);
+								$laparr[$lk] = $tmp[0];
+							}
+						}
+						$gb[$r][$c+$offset] = implode('&',$laparr);
+					} else {
+						$tmp = explode('$#$',$gb[$r][$c+$offset]);
+						$gb[$r][$c+$offset] = $tmp[0];
+					}
+				}
 				$offset++;
 			}
 			if ($dobca) {
@@ -246,7 +261,22 @@ if (isset($_POST['options'])) {
 						$tmp = explode('$!$',$gb[$r][$c+$offset]);
 						$gb[$r][$c+$offset] = $tmp[1];
 					}
-				}  
+				} 
+				if (strpos($gb[$r][$c+$offset],'$#$')) {
+					if (strpos($gb[$r][$c+$offset],'&')) { //is multipart q
+						$laparr = explode('&',$gb[$r][$c+$offset]);
+						foreach ($laparr as $lk=>$v) {
+							if (strpos($v,'$#$')) {
+								$tmp = explode('$#$',$v);
+								$laparr[$lk] = $tmp[0];
+							}
+						}
+						$gb[$r][$c+$offset] = implode('&',$laparr);
+					} else {
+						$tmp = explode('$#$',$gb[$r][$c+$offset]);
+						$gb[$r][$c+$offset] = $tmp[0];
+					}
+				}
 				$offset++;
 			}
 		}

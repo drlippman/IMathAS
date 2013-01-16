@@ -22,11 +22,11 @@ function enditem($canedit) {
 }
 
   function showitems($items,$parent,$inpublic=false) {
-	   global $teacherid,$tutorid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift;
+	   global $teacherid,$tutorid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$myrights;
 	   global $hideicons,$exceptions,$latepasses,$graphicalicons,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs;
 	   
 	   if (!isset($CFG['CPS']['itemicons'])) {
-	   	   $itemicons = array('folder'=>'folder2.gif', 'assess'=>'assess.png',
+	   	   $itemicons = array('folder'=>'folder2.gif', 'foldertree'=>'folder_tree.png', 'assess'=>'assess.png',
 			'inline'=>'inline.png',	'web'=>'web.png', 'doc'=>'doc.png', 'wiki'=>'wiki.png',
 			'html'=>'html.png', 'forum'=>'forum.png', 'pdf'=>'pdf.png',
 			'ppt'=>'ppt.png', 'zip'=>'zip.png', 'png'=>'image.png', 'xls'=>'xls.png',
@@ -95,6 +95,8 @@ function enditem($canedit) {
 				$availbeh = "Expanded";
 			} else if ($items[$i]['SH'][1]=='F') {
 				$availbeh = "as Folder";
+			} else if ($items[$i]['SH'][1]=='T') {
+				$availbeh = "as TreeReader";
 			} else {
 				$availbeh = "Collapsed";
 			}
@@ -170,6 +172,59 @@ function enditem($canedit) {
 					if ($canedit) {
 						echo '</div>'; //itemwrapper
 					}
+				} else if (strlen($items[$i]['SH'])>1 && $items[$i]['SH'][1]=='T') { //show as tree reader
+					if ($ispublic) {continue;} //public treereader not supported yet.
+					if ($canedit) {
+						echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
+					}
+					echo "<div class=block ";
+					if ($titlebg!='') {
+						echo "style=\"background-color:$titlebg;color:$titletxt;\"";
+						$astyle = "style=\"color:$titletxt;\"";
+					} else {
+						$astyle = '';
+					}
+					echo ">";
+					
+					if (($hideicons&16)==0) {
+						if ($ispublic) {
+						} else {
+							echo "<span class=left><a href=\"treereader.php?cid=$cid&folder=$parent-$bnum\" border=0>";
+						}
+						if ($graphicalicons) {
+							echo "<img alt=\"folder\" src=\"$imasroot/img/{$itemicons['foldertree']}\"></a></span>";
+						} else {
+							echo "<img alt=\"folder\" src=\"$imasroot/img/folder_tree.png\"></a></span>";
+						}
+						echo "<div class=title>";
+					}
+					if ($ispublic) {
+					} else {
+						echo "<a href=\"treereader.php?cid=$cid&folder=$parent-$bnum\" $astyle><b>{$items[$i]['name']}</b></a> ";
+					}
+					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
+						echo "<span style=\"color:red;\">New</span>";
+					}
+					if ($viewall) { 
+						echo '<span class="instrdates">';
+						echo "<br>$show ";
+						echo '</span>';
+					}
+					if ($canedit) {
+						echo '<span class="instronly">';
+						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>Edit Contents</a> | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
+						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\" $astyle>Copy</a>";
+						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>NewFlag</a>";
+						echo '</span>';
+					}
+					if (($hideicons&16)==0) {
+						echo "</div>";
+					}
+					echo '<br class="clear" />';
+					echo "</div>";
+					if ($canedit) {
+						echo '</div>'; //itemwrapper
+					}
 				} else {
 					if ($canedit) {
 						echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
@@ -196,7 +251,7 @@ function enditem($canedit) {
 					}
 					if (!$canedit) {
 						echo '<span class="right">';
-						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>Isolate</a>";
+						echo "<a href=\"".($ispublic?"public":"course").".php?cid=$cid&folder=$parent-$bnum\" $astyle>Isolate</a>";
 						echo '</span>';
 					}
 					echo "<span class=pointer onClick=\"toggleblock('{$items[$i]['id']}','$parent-$bnum')\">";
@@ -260,6 +315,8 @@ function enditem($canedit) {
 					$show = "Currently Showing";
 					if (strlen($items[$i]['SH'])>1 && $items[$i]['SH'][1]=='F') {
 						$show .= " as Folder. ";
+					} else if (strlen($items[$i]['SH'])>1 && $items[$i]['SH'][1]=='T') {
+						$show .= " as TreeReader. ";
 					} else {
 						$show .= " Collapsed. ";
 					}
@@ -315,6 +372,53 @@ function enditem($canedit) {
 					if ($canedit) {
 						echo '</div>'; //itemwrapper
 					}
+				} else if (strlen($items[$i]['SH'])>1 && $items[$i]['SH'][1]=='T') { //show as tree reader
+					if ($canedit) {
+						echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
+					}
+					echo "<div class=block ";
+					if ($titlebg!='') {
+						echo "style=\"background-color:$titlebg;color:$titletxt;\"";
+						$astyle = "style=\"color:$titletxt;\"";
+					} else {
+						$astyle = '';
+					}
+					echo ">";
+					if (($hideicons&16)==0) {
+						echo "<span class=left><a href=\"treereader.php?cid=$cid&folder=$parent-$bnum\" border=0>";
+						if ($graphicalicons) {
+							echo "<img alt=\"folder\" src=\"$imasroot/img/{$itemicons['foldertree']}\"></a></span>";
+						} else {
+							echo "<img alt=\"folder\" src=\"$imasroot/img/folder_tree.png\"></a></span>";
+						}
+						echo "<div class=title>";
+					}
+					echo "<a href=\"treereader.php?cid=$cid&folder=$parent-$bnum\" $astyle><b>";
+					if ($items[$i]['SH'][0]=='S') {echo "{$items[$i]['name']}</b></a> ";} else {echo "<i>{$items[$i]['name']}</i></b></a>";}
+					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
+						echo " <span style=\"color:red;\">New</span>";
+					}
+					if ($viewall) { 
+						echo '<span class="instrdates">';
+						echo "<br><i>$show</i> ";
+						echo '</span>';
+					}
+					if ($canedit) {
+						echo '<span class="instronly">';
+						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>Edit Contents</a> | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
+						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">Copy</a>";
+						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>NewFlag</a>";
+						echo '</span>';
+					}
+					
+					if (($hideicons&16)==0) {
+						echo "</div>";
+					}
+					echo '<br class="clear" />';
+					echo "</div>";
+					if ($canedit) {
+						echo '</div>'; //itemwrapper
+					}
 				} else {
 					if ($canedit) {
 						echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
@@ -340,7 +444,7 @@ function enditem($canedit) {
 					}
 					if (!$canedit) {
 						echo '<span class="right">';
-						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>Isolate</a>";
+						echo "<a href=\"".($ispublic?"public":"course").".php?cid=$cid&folder=$parent-$bnum\" $astyle>Isolate</a>";
 						echo '</span>';
 					}
 					echo "<span class=pointer onClick=\"toggleblock('{$items[$i]['id']}','$parent-$bnum')\">";
@@ -896,6 +1000,7 @@ function enditem($canedit) {
 				   }
 						   	   
 			   } else {
+			   	  
 				   if ($ispublic) { 
 					   $alink = "showlinkedtextpublic.php?cid=$cid&id=$typeid";
 				   } else {

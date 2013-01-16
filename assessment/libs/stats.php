@@ -2,7 +2,7 @@
 //A library of Stats functions.  Version 1.9, March 30, 2008
 
 global $allowedmacros;
-array_push($allowedmacros,"nCr","nPr","mean","stdev","percentile","quartile","TIquartile","median","freqdist","frequency","histogram","fdhistogram","fdbargraph","normrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","countif","binomialpdf","binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart","mosaicplot","checklineagainstdata","chi2teststat");
+array_push($allowedmacros,"nCr","nPr","mean","stdev","percentile","quartile","TIquartile","median","freqdist","frequency","histogram","fdhistogram","fdbargraph","normrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","countif","binomialpdf","binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart","mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata");
 
 //nCr(n,r)
 //The Choose function
@@ -720,9 +720,10 @@ function linreg($xarr,$yarr) {
 //intended for checking a student answer for fitting a line to data.  Determines
 //if the student answer is within the confidence bounds for the regression equation.
 //xarray, yarray:  list/array of data values
-//student answer:  the $stuanswers[$thisq] 
+//student answer:  the $stuanswers[$thisq] which is a line equation like "2x+3"
 //variable:  defaults to "x"
 //alpha: for confidence bound.  defaults to .05
+//return array(answer, showanswer) to be used to set $answer and $showanswer
 function checklineagainstdata($xarr,$yarr,$line,$var="x",$alpha=.05) {
 	if (!is_array($xarr)) { $xarr = explode(',',$xarr);}	
 	if (!is_array($yarr)) { $yarr = explode(',',$yarr);}
@@ -792,6 +793,65 @@ function checklineagainstdata($xarr,$yarr,$line,$var="x",$alpha=.05) {
 	}
 	
 }
+
+//checkdrawnlineagainstdata(xarray, yarray, student answer, [grade dots, alpha, grid])
+//intended for checking a student answer for drawing a line fit to data.  Determines
+//if the student answer is within the confidence bounds for the regression equation.
+//xarray, yarray:  list/array of data values
+//student answer from draw:  the $stuanswers[$thisq] 
+//grade dots: default false.  If true, will grade that dots of xarray,yarray were plotted
+//alpha: for confidence bound.  defaults to .05
+//grid:  If you've modified the grid, include it here
+//return array(answer, showanswer) to be used to set $answer and $showanswer
+function checkdrawnlineagainstdata($xarr,$yarr,$line, $gradedots=false,$alpha=.05, $gridi="-5,5,-5,5,1,1,300,300") {
+	if (!is_array($xarr)) { $xarr = explode(',',$xarr);}	
+	if (!is_array($yarr)) { $yarr = explode(',',$yarr);}
+	$gridi = explode(',',$gridi);
+	$grid=array(-5,5,-5,5,1,1,300,300);
+	foreach ($gridi as $i=>$v) {
+		$grid[$i] = $v;
+	}
+	if (count($xarr)!=count($yarr)) { 
+		echo "Error: linreg requires xarray length = yarray length";
+		return false;
+	}
+	if (count($xarr)<3) {
+		echo "Requires 3 or more data values";
+		return false;
+	}
+	$correct = false;
+	$answers = array();
+	$showanswer = null;
+	list($r,$m,$b) = linreg($xarr,$yarr);
+	if ($line!='') {
+		$lines = gettwopointlinedata($line,$grid[0],$grid[1],$grid[2],$grid[3]);
+		if ($lines[0][0]==$lines[0][2]) {
+			$stum = 100000;
+		} else {
+			$stum = ($lines[0][3] - $lines[0][1])/($lines[0][2] - $lines[0][0]);
+		}
+		$stub = $lines[0][1] - $stum*$lines[0][0];
+		list($ans,$sa) = checklineagainstdata($xarr,$yarr,"$stum*x+$stub","x",$alpha);
+		if ($gradedots) {
+			$answers = arraystodots($xarr,$yarr);
+			$answers[] = $ans;
+		} else {
+			$answers = $ans;
+		}
+		$eqns = arraystodoteqns($xarr,$yarr);
+		$eqns[] = "$m*x+$b,blue";
+		$showanswer = showplot($eqns,$grid[0],$grid[1],$grid[2],$grid[3],$grid[4],$grid[5],$grid[6],$grid[7]);
+	} else {
+		if ($gradedots) {
+			$answers = arraystodots($xarr,$yarr);
+			$answers[] = "$m*x+$b";
+		} else {
+			$answers = "$m*x+$b";
+		}
+	}
+	return array($answers,$showanswer);
+}
+
 
 //binomialpdf(N,p,x)
 //Computes the probability of x successes out of N trials

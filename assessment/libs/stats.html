@@ -25,8 +25,11 @@ A library of Stats functions.  Version 1.9, March 30, 2008
 <li><a href="#invnormalcdf">invnormalcdf</a></li>
 <li><a href="#invtcdf">invtcdf</a></li>
 <li><a href="#linreg">linreg</a></li>
+<li><a href="#checklineagainstdata">checklineagainstdata</a></li>
+<li><a href="#checkdrawnlineagainstdata">checkdrawnlineagainstdata</a></li>
 <li><a href="#binomialpdf">binomialpdf</a></li>
 <li><a href="#binomialcdf">binomialcdf</a></li>
+<li><a href="#chi2teststat">chi2teststat</a></li>
 <li><a href="#chi2cdf">chi2cdf</a></li>
 <li><a href="#invchi2cdf">invchi2cdf</a></li>
 <li><a href="#fcdf">fcdf</a></li>
@@ -151,6 +154,25 @@ linreg(xarray,yarray)
 <BR>Computes the linear correlation coefficient, and slope and intercept of
 <BR>regression line, based on array/list of x-values and array/list of y-values
 <BR>Returns as array:  r,slope,intercept
+<BR><h3><a name="checklineagainstdata">checklineagainstdata</a></h3>
+checklineagainstdata(xarray, yarray, student answer, [variable, alpha])
+<BR>intended for checking a student answer for fitting a line to data.  Determines
+<BR>if the student answer is within the confidence bounds for the regression equation.
+<BR>xarray, yarray:  list/array of data values
+<BR>student answer:  the $stuanswers[$thisq] which is a line equation like "2x+3"
+<BR>variable:  defaults to "x"
+<BR>alpha: for confidence bound.  defaults to .05
+<BR>return array(answer, showanswer) to be used to set $answer and $showanswer
+<BR><h3><a name="checkdrawnlineagainstdata">checkdrawnlineagainstdata</a></h3>
+checkdrawnlineagainstdata(xarray, yarray, student answer, [grade dots, alpha, grid])
+<BR>intended for checking a student answer for drawing a line fit to data.  Determines
+<BR>if the student answer is within the confidence bounds for the regression equation.
+<BR>xarray, yarray:  list/array of data values
+<BR>student answer from draw:  the $stuanswers[$thisq] 
+<BR>grade dots: default false.  If true, will grade that dots of xarray,yarray were plotted
+<BR>alpha: for confidence bound.  defaults to .05
+<BR>grid:  If you've modified the grid, include it here
+<BR>return array(answer, showanswer) to be used to set $answer and $showanswer
 <BR><h3><a name="binomialpdf">binomialpdf</a></h3>
 binomialpdf(N,p,x)
 <BR>Computes the probability of x successes out of N trials
@@ -159,6 +181,9 @@ binomialpdf(N,p,x)
 binomialcdf(N,p,x)
 <BR>Computes the probably of &lt;=x successes out of N trials
 <BR>where each trial has probability p of success
+<BR><h3><a name="chi2teststat">chi2teststat</a></h3>
+chi2teststat(m) 
+<BR>Computes the test stat sum((E-O)^2/E) given a matrix of values
 <BR><h3><a name="chi2cdf">chi2cdf</a></h3>
 chi2cdf(x,df)
 <BR>Computes the area to the left of x under the chi-squared disribution

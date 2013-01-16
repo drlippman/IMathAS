@@ -37,10 +37,10 @@
 		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 		$adata = mysql_fetch_array($result, MYSQL_ASSOC);
 		$now = time();
+		$assessmentclosed = false;
 		
 		if ($adata['avail']==0 && !isset($teacherid) && !isset($tutorid)) {
-			echo "Assessment is closed";
-			exit;
+			$assessmentclosed = true;
 		}
 	
 		if (!$actas) { 
@@ -53,8 +53,7 @@
 						$isreview = true;
 					} else {
 						if (!isset($teacherid) && !isset($tutorid)) {
-							echo "Assessment is closed";
-							exit;
+							$assessmentclosed = true;
 						}
 					}
 				} else { //inside exception dates exception
@@ -69,13 +68,27 @@
 						$isreview = true;
 					} else {
 						if (!isset($teacherid) && !isset($tutorid)) {
-							echo "Assessment is closed";
-							exit;
+							$assessmentclosed = true;
 						}
 					}
 				}
 			}
 		}
+		if ($assessmentclosed) {
+			require("header.php");
+			echo '<p>This assessment is closed</p>';
+			if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0 && $sessiondata['ltiitemid']==$aid) {
+				//in LTI and right item
+				list($atype,$sa) = explode('-',$adata['deffeedback']);
+				if ($sa!='N') {
+					$query = "SELECT id FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='$aid'";
+					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+					echo '<p><a href="../course/gb-viewasid.php?cid='.$cid.'&asid='.mysql_result($result,0,0).'">View your assessment</p>';
+				}
+			}
+			require("../footer.php");
+			exit;
+		} 
 		
 		//check for password
 		if (trim($adata['password'])!='' && !isset($teacherid) && !isset($tutorid)) { //has passwd
@@ -733,17 +746,27 @@ if (!isset($_POST['embedpostback'])) {
 				echo "&gt; Assessment</div>";
 			}
 		}
-	} else if ($isltilimited && $testsettings['msgtoinstr']==1) {
-		$query = "SELECT COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND courseid='$cid' AND (isread=0 OR isread=4)";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$msgcnt = mysql_result($result,0,0);
-		echo "<span style=\"float:right;\"><a href=\"$imasroot/msgs/msglist.php?cid=$cid\" onclick=\"return confirm('This will discard any unsaved work.');\">Messages ";
-		if ($msgcnt>0) {
-			echo '<span style="color:red;">('.$msgcnt.' new)</span>';
-		} 
-		echo '</a>';
+	} else if ($isltilimited) {
+		echo "<span style=\"float:right;\">";
+		if ($testsettings['msgtoinstr']==1) {
+			$query = "SELECT COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND courseid='$cid' AND (isread=0 OR isread=4)";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$msgcnt = mysql_result($result,0,0);
+			echo "<a href=\"$imasroot/msgs/msglist.php?cid=$cid\" onclick=\"return confirm('This will discard any unsaved work.');\">Messages ";
+			if ($msgcnt>0) {
+				echo '<span style="color:red;">('.$msgcnt.' new)</span>';
+			} 
+			echo '</a> ';
+		}
 		if ($testsettings['allowlate']==1 && $sessiondata['latepasses']>0 && !$isreview) {
-			echo "<a href=\"$imasroot/course/redeemlatepass.php?cid=$cid&aid={$testsettings['id']}\" onclick=\"return confirm('This will discard any unsaved work.');\">Redeem LatePass</a>";
+			echo "<a href=\"$imasroot/course/redeemlatepass.php?cid=$cid&aid={$testsettings['id']}\" onclick=\"return confirm('This will discard any unsaved work.');\">Redeem LatePass</a> ";
+		}
+		
+		
+		if ($sessiondata['ltiitemid']==$testsettings['id'] && $isreview) {
+			if ($testsettings['showans']!='N') {
+				echo '<p><a href="../course/gb-viewasid.php?cid='.$cid.'&asid='.$testid.'">View your scored assessment</a></p>';
+			}
 		}
 		echo '</span>';
 	}
@@ -1042,7 +1065,7 @@ if (!isset($_POST['embedpostback'])) {
 		echo "</script>\n";
 		}
 	} else if ($isreview) {
-		echo "<div class=right style=\"color:#f00\">In Review Mode - no scores will be saved<br/><a href=\"showtest.php?regenall=all\">Create new versions of all questions.</a></div>\n";	
+		echo "<div class=right style=\"color:#f00;clear:right;\">In Review Mode - no scores will be saved<br/><a href=\"showtest.php?regenall=all\">Create new versions of all questions.</a></div>\n";	
 	} else if ($superdone) {
 		echo "<div class=right>Time limit expired</div>";
 	} else {

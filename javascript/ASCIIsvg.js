@@ -57,7 +57,6 @@ var aboveleft = "aboveleft";
 var aboveright = "aboveright";
 var belowleft = "belowleft";
 var belowright = "belowright";
-var cpi = "\u03C0", ctheta = "\u03B8";
 var pi = Math.PI, ln = Math.log, e = Math.E;
 var arcsin = Math.asin, arccos = Math.acos, arctan = Math.atan;
 var sec = function(x) { return 1/Math.cos(x) };
@@ -890,6 +889,18 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
 	  var gridymax = winymax;
 	  var gridxmin = winxmin;
 	  var gridxmax = winxmax;
+    }
+    if ((xmax-xmin)/gdx > width) {
+    	    gdx = xmax-xmin;
+    }
+    if ((ymax-ymin)/gdy > height) {
+    	    gdy = ymax-ymin;
+    }
+    if ((xmax-xmin)/dx > width) {
+    	    dx = xmax-xmin;
+    }
+    if ((ymax-ymin)/dy > height) {
+    	    dy = ymax-ymin;
     }
     gdx = (typeof gdx=="string"?dx:gdx*xunitlength);
     gdy = (gdy==null?dy:gdy*yunitlength);

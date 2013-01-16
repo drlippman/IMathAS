@@ -76,7 +76,11 @@ while ($row = mysql_fetch_row($result)) {
 			if (strpos($lav,'$!$')) {
 				$tmp = explode('$!$',$lav);
 				$qatt[$kp] = $tmp[1];
-			}	
+			}
+			if (strpos($lav,'$#$')) {
+				$tmp = explode('$#$',$lav);
+				$qatt[$kp] = $tmp[0];
+			}
 		}
 		if (count($qatt)==1) {
 			$qatt = $qatt[0];

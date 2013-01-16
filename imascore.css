@@ -500,6 +500,7 @@ div#viewbuttoncont a.buttoninactive:hover {
   width: 400px;
   height: 400px;
   z-index: 150;
+  -webkit-overflow-scrolling: touch;
 }
 
 #GB_frame {

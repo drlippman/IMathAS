@@ -73,7 +73,7 @@ else if ($sessiondata['mathdisp']==3) {
 }*/
 
 if ($sessiondata['graphdisp']==1) {
-	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?v=081312\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?v=011213\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIISvg = true;</script>";
 } else {
 	echo "<script src=\"$imasroot/javascript/mathjs.js?v=022112\" type=\"text/javascript\"></script>\n";
