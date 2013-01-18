@@ -1704,6 +1704,12 @@ The following macros create graphs or tables:
 <li><b>getdotsdata(stuans, [xmin, xmax, ymin, ymax, drawing width, drawing height])</b>:  Takes a $stuanswers from a drawing
   question and pulls out the closed dots data.  Returns an array of dots, each of form array(x1,y1) giving the coordinates
   of the dot.</li>
+<li><b>getlinesdata(stuans, [xmin, xmax, ymin, ymax, drawing width, drawing height])</b>:  Takes a $stuanswers from a drawing
+  question and pulls out the lines data, which includes polygons.  Returns an array, with an element for each line/curve draw.  Each of those
+  elements will be an array of points on that line/curve.  Each of those points is array (x,y).</li>
+<li><b>getsnapwidthheight(xmin, xmax, ymin, ymax, drawing width, drawing height, snaptogrid)</b>:  Takes drawing grid info and a snaptogrid 
+  value or string, and returns an array(width,height) giving a closeby drawing width and height that will guarantee that the snaptogrid values
+  fall on exact drawing pixel locations.</li>
 </ul>
 </div>
 <div class=h2>
@@ -2030,6 +2036,10 @@ The answer is compared to a given tolerance.  Can also accept DNE, oo (Infinity)
 <dt>$answerformat = "list", "exactlist", or "orderedlist"</dt
 	<dd>Specifies that a list of answers is expected.  If $answerformat="list", then duplicate values are ignored.  If $answerformat="exactlist",
 	then duplicate values are not ignored.  If $answerformat="orderedlist", the list must be in the same order and contain identical counts of values.</dd>
+<dt>$partialcredit = array(number,score,[number,score,...]) (In Common Control)</dt>
+	<dd>Allows you to specify partial credit for other answers.  The array should be given in the form array(number,score,number,score,...), where
+	number is the value to compare to the student answer, and score is a proportion between 0 and 1 to award as partial credit.  Note this
+	currently only works for single number answers; "or" and list answers are not supported.</dd>
 <dt>$ansprompt = string (In Question Control)</dt>
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="y="</dd>
 <dt>$displayformat = "alignright" (In Question Control)</dt>
@@ -2142,6 +2152,11 @@ of choices is automatically randomized.
 <dt>$noshuffle = "all" or "last" (In Common Control)</dt>
 	<dd>If $noshuffle="all", then the $questions array will not be randomized (shuffled).  If $noshuffle = "last", then the $questions
 	array will be randomized, except for the last element.  This is for options like "None of the above"</dd>
+<dt>$partialcredit = array(index,score,[index,score,...]) (In Common Control)</dt>
+	<dd>Allows you to specify partial credit for other answers.  The array should be given in the form array(index,score,index,score,...), where
+	index is the index in $questions, and score is a proportion between 0 and 1 to award as partial credit.  For example, if $answer = 0 
+	and $partialcredit = array(2,.3), then the student would get full credit for selecting the item corresponding with $questions[0], and 30% credit
+	for selecting the item corresponding with $questions[2].  All other answers would receive 0 credit.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the choice list in that location</dd>
 <dt>$showanswer (In Answer)</dt>
@@ -2405,7 +2420,9 @@ drawn line from the correct line.
 <dt>$snaptogrid = spacing (In Common Control)</dt>
 	<dd>Turns on snapping, where points will jump to a grid.  $snaptogrid = 1 will jump to the nearest
 	integer. $snaptogrid = 0.5 will jump to the nearest .5.  $snaptogrid = "2:4" will jump to the nearest
-	2 in the x and 4 in the y.  Does not have to match the actual grid line spacing.</dd>
+	2 in the x and 4 in the y.  Does not have to match the actual grid line spacing.  Be aware that due to pixelation, the snapping
+	may not land on exact values correctly.  To correct for this, it is recommended you use the getsnapwidthheight macro to compute
+	an imagewidth and imageheight that will be pixel accurate.</dd>
 <dt>$background = equation or array of equations, using the showplot macro format (In Common Control)</dt>
 	<dd>Define a graph to display in the background, to be drawn on top of.  Example:  $background = "x^2,red"</dd>
 <dt>$partweights = array or list of weights (In Answer)</dt>

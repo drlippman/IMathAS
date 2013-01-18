@@ -573,17 +573,36 @@ function drawTarget(x,y) {
 		ctx.arc(dots[curTarget][i][0],dots[curTarget][i][1],5,0,Math.PI*2,true);
 	}
 	ctx.fill();
-	if (targets[curTarget].dotline==true) {
+	if (targets[curTarget].dotline>0) {
 		ctx.beginPath();
 		for (var i=0;i<lines[curTarget].length; i++) {
 			for (var j=0;j<lines[curTarget][i].length; j++) {
-				if ((j==0) || Math.pow((lines[curTarget][i][j][0] - lines[curTarget][i][0][0]),2)+Math.pow((lines[curTarget][i][j][1] - lines[curTarget][i][0][1]),2)>25) {
+				if ((j==0) || Math.pow((lines[curTarget][i][j][0] - lines[curTarget][i][j-1][0]),2)+Math.pow((lines[curTarget][i][j][1] - lines[curTarget][i][j-1][1]),2)>25) {
 					ctx.moveTo(lines[curTarget][i][j][0]+5,lines[curTarget][i][j][1]);
 					ctx.arc(lines[curTarget][i][j][0],lines[curTarget][i][j][1],5,0,Math.PI*2,true);
 				}
 			}
 		}
 		ctx.fill();
+		if (targets[curTarget].dotline>1) {
+			for (var i=0;i<lines[curTarget].length; i++) {
+				var ml = lines[curTarget][i].length-1;
+				if (ml<1) {continue;}
+				if (Math.pow((lines[curTarget][i][ml][0] - lines[curTarget][i][0][0]),2)+Math.pow((lines[curTarget][i][ml][1] - lines[curTarget][i][0][1]),2)<25) {
+					ctx.beginPath();
+					//ctx.fillStyle('rgba(0,0,255,.5)');
+					ctx.moveTo(lines[curTarget][i][0][0],lines[curTarget][i][0][1]);
+					for (var j=1;j<lines[curTarget][i].length; j++) {
+						ctx.lineTo(lines[curTarget][i][j][0],lines[curTarget][i][j][1]);
+					}
+					ctx.closePath();
+					ctx.fillStyle = 'rgba(0,0,255,.5)';
+					ctx.fill();
+					ctx.fillStyle = 'rgb(0,0,255)';
+				}
+			}
+		}
+		
 	}
 	//ctx.beginPath();
 	
@@ -765,6 +784,10 @@ function drawMouseDown(ev) {
 							if (lines[curTarget][curLine].length<2) {
 								lines[curTarget].splice(curLine,1);
 							}
+							curLine = null;
+						} else if (targets[curTarget].dotline>1 && foundpt[1]==curLine && foundpt[2]==0) {
+							//clicked on first point, and are in closed poly mode.  Set point to same as first point and end line
+							lines[curTarget][curLine].push(lines[curTarget][curLine][0]);
 							curLine = null;
 						} else {
 							//if (foundpt[1]!=curLine) { //so long as point is not on current line, add it
@@ -977,7 +1000,17 @@ function drawMouseUp(ev) {
 		
 		//are we inside target region?
 		if (mouseOff.x>-1 && mouseOff.x<targets[curTarget].width && mouseOff.y>-1 && mouseOff.y<targets[curTarget].height) {
+			if (dragObj.mode==0 && targets[curTarget].dotline>1) {
+				if (dragObj.subnum==0 || dragObj.subnum==lines[curTarget][dragObj.num].length-1) {
+					//first or last dot being moved
+					if (Math.pow((lines[curTarget][dragObj.num][0][0] - lines[curTarget][dragObj.num][lines[curTarget][dragObj.num].length-1][0]),2)+Math.pow((lines[curTarget][dragObj.num][0][1] - lines[curTarget][dragObj.num][lines[curTarget][dragObj.num].length-1][1]),2)<25) {
+						curLine = null;
+					}
+				}
+			}
+			
 			dragObj = null;
+			
 		} else {
 			if (drawlocky[curTarget]==1) {
 				mouseOff.y = targets[curTarget].imgheight/2;

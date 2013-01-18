@@ -42,6 +42,7 @@ if (isset($_POST['text'])) {
 	$questions = array();
 	$feedback = array();
 	$answer = array();
+	$partial = array();
 	for ($n=0;$n<$nparts;$n++) {
 		$questions[$n] = array(); $feedback[$n] = array();
 		$qparts[$n] = intval($_POST['qparts'.$n]);
@@ -49,13 +50,17 @@ if (isset($_POST['text'])) {
 		for ($i=0;$i<$qparts[$n];$i++) {
 			$questions[$n][$i] = $_POST['txt'.$n.'-'.$i];
 			$feedbacktxt[$n][$i] = $_POST['fb'.$n.'-'.$i];
+			$partial[$n][$i] = floatval($_POST['pc'.$n.'-'.$i]);
 		}
 	}
 	$nhints = intval($_POST['nhints']);
 	$hinttext = array();
 	for ($n=0;$n<$nhints;$n++) {
-		$hinttext[$n] = $_POST['hint'.$n];	
+		if (!empty($_POST['hint'.$n])) {
+			$hinttext[] = $_POST['hint'.$n];
+		}
 	}
+	$nhints = count($hinttext);
 	
 	//generate question code
 	//this part stores the values in the question code, in form that makes
@@ -63,9 +68,17 @@ if (isset($_POST['text'])) {
 	$code = '';
 	if ($nparts==1) {
 		$qtype = 'choices';
+		$partialout = array();
 		for ($i=0;$i<$qparts[0];$i++) {
 			$code .= '$questions['.$i.'] = "'.str_replace('"','&quot;',$questions[0][$i]).'"'."\n";
 			$code .= '$feedbacktxt['.$i.'] = "'.str_replace('"','&quot;',$feedbacktxt[0][$i]).'"'."\n";
+			if ($partial[0][$i]!=0) {
+				$partialout[] = $i;
+				$partialout[] = $partial[0][$i];
+			}
+		}
+		if (count($partialout)>0) {
+			$code .= '$partialcredit = array('.implode(',',$partialout).')'."\n";
 		}
 		$code .= '$displayformat = "'.$_POST['qdisp0'].'"'."\n";
 		$code .= '$answer = '.$answer[0]."\n\n";
@@ -73,9 +86,17 @@ if (isset($_POST['text'])) {
 		$qtype = 'multipart';
 		$code .= '$anstypes = "'.implode(',',array_fill(0,$nparts,"choices")).'"'."\n\n";
 		for ($n=0;$n<$nparts;$n++) {
-			for ($i=0;$i<$qparts[0];$i++) {
+			$partialout = array();
+			for ($i=0;$i<$qparts[$n];$i++) {
 				$code .= '$questions['.$n.']['.$i.'] = "'.str_replace('"','&quot;',$questions[$n][$i]).'"'."\n";
 				$code .= '$feedbacktxt['.$n.']['.$i.'] = "'.str_replace('"','&quot;',$feedbacktxt[$n][$i]).'"'."\n";
+				if ($partial[$n][$i]!=0) {
+					$partialout[] = $i;
+					$partialout[] = $partial[$n][$i];
+				}
+			}
+			if (count($partialout)>0) {
+				$code .= '$partialcredit['.$n.'] = array('.implode(',',$partialout).')'."\n";
 			}
 			$code .= '$displayformat['.$n.'] = "'.$_POST['qdisp'.$n].'"'."\n";
 			$code .= '$answer['.$n.'] = '.$answer[$n]."\n\n";
@@ -257,6 +278,7 @@ if (isset($_POST['text'])) {
 
 //return array (nparts, qparts, nhints, qdisp, questions, feedbacktxt, answer, hinttext)
 function getqvalues($code,$type) {
+	$partialcredit = array();
 	$code = substr($code, 0, strpos($code,'//end stored'));
 	eval(interpret('control',$type,$code));
 	
@@ -271,10 +293,11 @@ function getqvalues($code,$type) {
 		for ($n=0;$n<$nparts;$n++) {
 			$qparts[$n] = count($questions[$n]);
 		}
-		return array($nparts, $qparts, $nhints, $displayformat, $questions, $feedbacktxt, $answer, $hinttext);
+		
+		return array($nparts, $qparts, $nhints, $displayformat, $questions, $feedbacktxt, $answer, $hinttext, $partialcredit);
 	} else {
 		$qparts = array(count($questions));
-		return array(1, $qparts, $nhints, array($displayformat), array($questions), array($feedbacktxt), array($answer), $hinttext);
+		return array(1, $qparts, $nhints, array($displayformat), array($questions), array($feedbacktxt), array($answer), $hinttext, array($partialcredit));
 	}
 }
 
@@ -407,7 +430,14 @@ if (isset($_GET['id']) && $_GET['id']!='new') {
 	$mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
 	$allowedmacros = $mathfuncs;
 	require_once("../assessment/interpret5.php");
-	list($nparts, $qparts, $nhints, $qdisp, $questions, $feedbacktxt, $answer, $hinttext) = getqvalues($code,$type);
+	list($nparts, $qparts, $nhints, $qdisp, $questions, $feedbacktxt, $answer, $hinttext, $partialcredit) = getqvalues($code,$type);
+	$partial = array();
+	for ($n=0;$n<$nparts;$n++) {
+		$parial[$n] = array();
+		for ($i=0;$i<count($partialcredit[$n]);$i+=2) {
+			$partial[$n][$partialcredit[$n][$i]] = $partialcredit[$n][$i+1];
+		}
+	}
 	if ($nhints>0) { //strip out hints para
 		$qtext = substr($qtext, strpos($qtext,'</p>')+4);
 	}
@@ -661,6 +691,7 @@ parts.</p>
 
 <?php
 for ($n=0;$n<5;$n++) {
+	if (!isset($qparts[$n])) { $qparts[$n] = 4;}
 	echo '<div id="partwrapper'.$n.'"';
 	if ($n>=$nparts) {echo ' style="display:none;"';};
 	echo '>';
@@ -671,8 +702,7 @@ for ($n=0;$n<5;$n++) {
 	echo 'choices.  Display those ';
 	writeHtmlSelect("qdisp$n",$dispval,$displbl, $qdisp[$n]);
 	echo '</p>';
-	
-	echo '<table class="choicetbl"><thead><tr><th>Correct</th><th>Choice</th><th>Feedback</th></tr></thead><tbody>';
+	echo '<table class="choicetbl"><thead><tr><th>Correct</th><th>Choice</th><th>Feedback</th><th>Partial Credit (0-1)</th></tr></thead><tbody>';
 	for ($i=0;$i<6;$i++) {
 		echo '<tr id="qc'.$n.'-'.$i.'" ';
 		if ($i>=$qparts[$n]) {echo ' style="display:none;"';};
@@ -680,7 +710,10 @@ for ($n=0;$n<5;$n++) {
 		if ($i==$answer[$n]) {echo 'checked="checked"';}
 		echo '/></td>';
 		echo '<td><input autocomplete="off" name="txt'.$n.'-'.$i.'" type="text" size="60" value="'.(isset($questions[$n][$i])?prepd($questions[$n][$i]):"").'"/></td>';
-		echo '<td><input autocomplete="off" name="fb'.$n.'-'.$i.'" type="text" size="60" value="'.(isset($feedbacktxt[$n][$i])?prepd($feedbacktxt[$n][$i]):"").'"/></td></tr>';
+		echo '<td><input autocomplete="off" name="fb'.$n.'-'.$i.'" type="text" size="60" value="'.(isset($feedbacktxt[$n][$i])?prepd($feedbacktxt[$n][$i]):"").'"/></td>';
+		echo '<td><input autocomplete="off" name="pc'.$n.'-'.$i.'" type="text" size="3" value="'.(isset($partial[$n][$i])?$partial[$n][$i]:"").'"/></td>';
+		
+		echo '</tr>';
 	}
 	echo '</tbody></table>';
 	echo '</div>';
