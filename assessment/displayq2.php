@@ -2008,13 +2008,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			}
 				}
 			}
-			if ($answerformat[0]=="polygon") {
-				for($i=0;$i<count($answers)-1;$i++) {
-					$pt1 = explode(',',$answers[$i]);
-					$pt2 = explode(',',$answers[$i+1]);
-					$saarr[] = "[{$pt1[0]}+t*({$pt2[0]}-({$pt1[0]})),{$pt1[1]}+t*({$pt2[1]}-({$pt1[1]}))],blue,0,1";
-				}
-			}
+			
 			if ($backg!='') {
 				if (!is_array($backg) && substr($backg,0,5)=="draw:") {
 					$sa = showplot($saarr,$settings[0],$settings[1],$settings[2],$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
@@ -2036,6 +2030,17 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				if (isset($grid) && strpos($grid[4],'pi')!==false) {
 					$sa = addfractionaxislabels($sa,$grid[4]);
 				}
+			}
+			if ($answerformat[0]=="polygon") {
+				if ($dotline==2) {
+					$cmd = 'fill="transblue";path([['.implode('],[',$answers).']]);fill="blue";';
+				} else {
+					$cmd = 'path([['.implode('],[',$answers).']]);';
+				}
+				for($i=0;$i<count($answers)-1;$i++) {
+					$cmd .= 'dot(['.$answers[$i].']);';
+				}
+				$sa = adddrawcommand($sa,$cmd);
 			}
 		}
 	} else if ($anstype == "file") {
@@ -2125,6 +2130,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($givenans == null) {return 0;}
 		if ($answerformat=='exactlist') {
 			$gaarr = explode(',',$givenans);
+			$gaarrcnt = count($gaarr);
 			$anarr = explode(',',$answer);
 		} else if ($answerformat=='orderedlist') {
 			$gamasterarr = explode(',',$givenans);
@@ -2139,6 +2145,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					$gaarr[] = $tmp[$i];
 				}
 			}
+			$gaarrcnt = count($gaarr);
 			$tmp = explode(',',$answer);
 			sort($tmp);
 			$anarr = array($tmp[0]);
@@ -2241,7 +2248,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 		}
 		if ($answerformat!='orderedlist') {
-			$score = $correct/count($anarr) - count($gaarr)/$extrapennum;  //take off points for extranous stu answers
+			if ($gaarrcnt<=count($anarr)) {
+				$score = $correct/count($anarr);
+			} else {
+				$score = $correct/count($anarr) - ($gaarrcnt-count($anarr))/$extrapennum;  //take off points for extranous stu answers
+			}
 		} else {
 			$score = $correct/count($anarr);
 		}
@@ -2865,6 +2876,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$orarr = array($_POST["tc$qn"]);
 		}
 		$extrapennum = count($gaarr)+count($anarr);
+		$gaarrcnt = count($gaarr);
 		
 		if (in_array('orderedlist',$ansformats)) {
 			if (count($gamasterarr)!=count($anarr)) {
@@ -2937,7 +2949,12 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (in_array('orderedlist',$ansformats)) {
 			$score = $correct/count($anarr);
 		} else {
-			$score = $correct/count($anarr) - count($gaarr)/$extrapennum;  //take off points for extranous stu answers
+			//$score = $correct/count($anarr) - count($gaarr)/$extrapennum;  //take off points for extranous stu answers
+			if ($gaarrcnt<=count($anarr)) {
+				$score = $correct/count($anarr);
+			} else {
+				$score = $correct/count($anarr) - ($gaarrcnt-count($anarr))/$extrapennum;  //take off points for extranous stu answers
+			}
 		}
 		if ($score<0) { $score = 0; }
 		return ($score);

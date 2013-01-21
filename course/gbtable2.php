@@ -1416,12 +1416,14 @@ function gbtable() {
 						$cattotattempted[$ln][$cat] = round($cattotattempted[$ln][$cat]*(100/($cats[$cat][1])),1);
 					}
 				}
-				if ($useweights==0 && $cats[$cat][5]>-1) {//use fixed pt value for cat
-					$cattotattempted[$ln][$cat] = ($catpossattemptedstu[$cat]==0)?0:round($cats[$cat][5]*($cattotattempted[$ln][$cat]/$catpossattemptedstu[$cat]),1);
-				}
 				if (isset($cattotattemptedec[$ln][$cat])) { //add in EC
 					$cattotattempted[$ln][$cat] += array_sum($cattotattemptedec[$ln][$cat]);
 				}
+				if ($useweights==0 && $cats[$cat][5]>-1) {//use fixed pt value for cat
+					$cattotattempted[$ln][$cat] = ($catpossattemptedstu[$cat]==0)?0:round($cats[$cat][5]*($cattotattempted[$ln][$cat]/$catpossattemptedstu[$cat]),1);
+					$catpossattemptedstu[$cat] = ($catpossattemptedstu[$cat]==0)?0:$cats[$cat][5];
+				}
+				
 				if ($cats[$cat][3]>0) { //chop score - no over 100%
 					if ($useweights==0  && $cats[$cat][5]>-1) { //set cat pts
 						$cattotattempted[$ln][$cat] = min($cats[$cat][5]*$cats[$cat][3],$cattotattempted[$ln][$cat]);
