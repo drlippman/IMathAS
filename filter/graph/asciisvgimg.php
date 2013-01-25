@@ -978,7 +978,8 @@ function ASslopefield($arg) {
 	}
 	*/
 	$func = mathphp($func,"x|y");
-	$func = str_replace(array('x','y'),array('$x','$y'),$func);
+	$func = str_replace(array('(x)','(y)'),array('($x)','($y)'),$func);
+	echo $func;
 	$efunc = create_function('$x,$y','return ('.$func.');');
 	$dz = sqrt($dx*$dx + $dy*$dy)/6;
 	$x_min = ceil($this->xmin/$dx);

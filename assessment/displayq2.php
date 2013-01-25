@@ -2694,9 +2694,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$tocheck = explode(',',$_POST["tc$qn"]);
 			foreach ($tocheck as $tchk) {
 				if (in_array('sloppycomplex',$ansformats)) {
+					$tchk = str_replace(array('sin','pi'),array('s$n','p$'),$tchk);
 					if (substr_count($tchk,'i')>1) {
 						return 0;
 					}
+					$tchk = str_replace(array('s$n','p$'),array('sin','pi'),$tchk);
 				} else {
 					$cpts = parsecomplex($tchk);
 					if (!is_array($cpts)) {
@@ -2712,6 +2714,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				}
 			}
 		}
+					
 		if (!isset($answerformat)) { $answerformat = '';}
 		$ansformats = explode(',',$answerformat);
 		
