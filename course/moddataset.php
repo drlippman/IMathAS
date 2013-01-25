@@ -52,9 +52,15 @@
 	$errmsg = '';
 	if (isset($_POST['qtext'])) {
 		$now = time();
-		$_POST['qtext'] = addslashes(stripsmartquotes(stripslashes($_POST['qtext'])));
+		$_POST['qtext'] = stripsmartquotes(stripslashes($_POST['qtext']));
 		$_POST['control'] = addslashes(stripsmartquotes(stripslashes($_POST['control'])));
 		$_POST['qcontrol'] = addslashes(stripsmartquotes(stripslashes($_POST['qcontrol'])));
+		
+		if (strpos($_POST['qtext'],'data:image')!==false) {
+			require("../includes/htmLawed.php");
+			$_POST['qtext'] = convertdatauris($_POST['qtext']);
+		}
+		$_POST['qtext'] = addslashes($_POST['qtext']);
 		
 		//handle help references
 		if (isset($_GET['id']) || isset($_GET['templateid'])) {

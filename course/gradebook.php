@@ -406,7 +406,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 		echo '<option value="0" ';
 		if ($catfilter==0) { echo "selected=1";}
 		echo '>Default</option>';
-		$query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid'";
+		$query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid' ORDER BY name";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
 			echo '<option value="'.$row[0].'"';
