@@ -1872,6 +1872,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				if (count($answerformat)>1 && $answerformat[1]=='abs') { $out .= 'class="sel" '; $def = 8;}
 				$out .= '/>';
 			}
+			if (in_array('exp',$answerformat)) {
+				$out .= "<img src=\"$imasroot/img/tpexp.png\" onclick=\"settool(this,$qn,8.3)\" ";
+				if (count($answerformat)>1 && $answerformat[1]=='exp') { $out .= 'class="sel" '; $def = 8.3;}
+				$out .= '/>';
+			}
 			if ($settings[6]*($settings[3]-$settings[2]) == $settings[7]*($settings[1]-$settings[0])) {
 				//only circles if equal spacing in x and y
 				if (count($answerformat)==1 || in_array('circle',$answerformat)) {
@@ -2799,6 +2804,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 		
 		$ansformats = explode(',',$answerformat);
+		
+		if (in_array("scinot",$ansformats)) {
+			$answer = str_replace('xx','*',$answer);
+		}
 		//pre-evaluate all instructor expressions - preg match all intervals.  Return array of or options
 		if (in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats) || in_array('list',$ansformats)) {
 			$anarr = explode(',',$answer);
@@ -3482,7 +3491,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$types = array();
 		$extrastuffpenalty = 0;
 		$linepts = 0;
-		
 		if ((is_array($answers) && count($answers)==0) || (!is_array($answers) && $answers=='')) {
 			if ($givenans==';;;;;;;;') {
 				return 1;
@@ -3583,6 +3591,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$ansparabs = array();
 			$ansabs = array();
 			$anssqrts = array();
+			$ansexps = array();
 			$anscoss = array();
 			$ansvecs = array();
 			$x0 = $settings[0];
@@ -3644,7 +3653,12 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					$y1p = $settings[7] - ($y1-$settings[2])*$pixelspery - $imgborder;
 					$y2p = $settings[7] - ($y2-$settings[2])*$pixelspery - $imgborder;
 					$y3p = $settings[7] - ($y3-$settings[2])*$pixelspery - $imgborder;
-					
+					$yop = $imgborder + $settings[3]*$pixelspery;
+					if ($settings[0]<0 && $settings[1]>0) {
+						$xop = $xtopix(0);
+					} else {
+						$xop = $x2p;
+					}
 					$settings[7] - ($y1-$settings[2])*$pixelspery - $imgborder;
 					if (strpos($function[0],'abs')!==false) { //is abs
 						$y0 = $func($x0);
@@ -3718,6 +3732,12 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 								$anscoss[$key] = array($secxp,$xintp,$secyp,$yintp);
 							}
 						}
+					} else if (preg_match('/\^[^2]/',$function[0])) { //exponential
+						
+						$base = safepow(($yop-$y3p)/($yop-$y1p), 1/($x3p-$x1p));
+						$str = ($yop-$y3p)/safepow($base,$x3p-$xop);
+						$ansexps[$key] = array($str,$base);
+						
 					} else if (abs(($y3-$y2)-($y2-$y1))<1e-9) {
 						//colinear
 						$slope = ($y2p-$y1p)/($x2p-$x1p);
@@ -3747,6 +3767,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$abs = array();
 			$sqrts = array();
 			$coss = array();
+			$exps = array();
 			$vecs = array();
 			if ($tplines=='') {
 				$tplines = array();
@@ -3805,6 +3826,18 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 							}
 						}
 						$abs[] = array($pts[1],$pts[2], $slope);
+					} else if ($pts[0]==8.3) {
+						$adjy2 = $yop - $pts[4];
+						$adjy1 = $yop - $pts[2];
+						if ($adjy1*$adjy2>0 && $pts[1]!=$pts[3]) {
+							$base = safepow($adjy2/$adjy1,1/($pts[3]-$pts[1]));
+							if (abs($pts[1]-$xop)<abs($pts[3]-$xop)) {
+								$str = $adjy1/safepow($base,$pts[1]-$xop);
+							} else {
+								$str = $adjy2/safepow($base,$pts[3]-$xop);
+							}
+							$exps[] = array($str,$base);
+						}
 					} else if ($pts[0]==9 || $pts[0]==9.1) {
 						if ($pts[0]==9.1) {
 							$pts[1] -= ($pts[3] - $pts[1]);
@@ -3972,6 +4005,19 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						continue;
 					}
 					if (abs($anssqrt[2]-$sqrts[$i][2])>$defpttol*$reltolerance) {
+						continue;
+					}
+					$scores[$key] = 1;
+					break;
+				}
+			}
+			foreach ($ansexps as $key=>$ansexp) {
+				$scores[$key] = 0;
+				for ($i=0; $i<count($exps); $i++) {
+					if (abs($ansexp[0]-$exps[$i][0])>$defpttol*$reltolerance) {
+						continue;
+					}
+					if (abs($ansexp[1]-$exps[$i][1])/(abs($ansexp[1]-1)+1e-18)>$deftol*$reltolerance) {
 						continue;
 					}
 					$scores[$key] = 1;

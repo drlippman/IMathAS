@@ -475,6 +475,48 @@ function drawTarget(x,y) {
 				}
 				
 			}
+		} else if (tptypes[curTarget][i]==8.3) {//if a tp exponential (unshifted)
+			var y2 = null;
+			var x2 = null;
+			if (tplines[curTarget][i].length==2) {
+				x2 = tplines[curTarget][i][1][0];
+				y2 = tplines[curTarget][i][1][1];
+			} else if (curTPcurve==i && x!=null && tplines[curTarget][i].length==1) {
+				x2 = x;
+				y2 = y;
+			}
+			if (x2 != null && x2!=tplines[curTarget][i][0][0]) {
+				if (y2==tplines[curTarget][i][0][1]) {
+					ctx.moveTo(tplines[curTarget][i][0][0],y2);
+					if (x2 > tplines[curTarget][i][0][0]) {
+						ctx.lineTo(targets[curTarget].imgwidth,y2);
+					} else {
+						ctx.lineTo(0,y2);
+					}
+				} else {
+					// (x1, y1) (x2, y2)  
+					// b^(x2-x1) = y2/y1
+					// a = y1/b^x1
+					
+					var originy = targets[curTarget].ymax*targets[curTarget].pixpery + targets[curTarget].imgborder;
+					var adjy1 = originy - tplines[curTarget][i][0][1];
+					var adjy2 = originy - y2;
+					if (adjy1*adjy2>0 && x2 != tplines[curTarget][i][0][0]) {
+						var expbase = safepow(adjy2/adjy1, 1/(x2-tplines[curTarget][i][0][0]));
+						var stretch = adjy2/safepow(expbase,x2);
+						ctx.moveTo(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1]);
+						var cury = 0;
+						for (var curx=0;curx < targets[curTarget].imgwidth+4;curx += 3) {
+							cury = originy - stretch*safepow(expbase,curx);
+							if (curx==0) {
+								ctx.moveTo(curx,cury); 
+							} else {
+								ctx.lineTo(curx,cury);
+							}
+						} 
+					}
+				}
+			}
 		} else if (tptypes[curTarget][i]==9  || tptypes[curTarget][i]==9.1 ) {//if a tp sin/cos
 			var y2 = null;
 			var x2 = null;

@@ -2,7 +2,7 @@
 //A library of Stats functions.  Version 1.9, March 30, 2008
 
 global $allowedmacros;
-array_push($allowedmacros,"nCr","nPr","mean","stdev","percentile","quartile","TIquartile","median","freqdist","frequency","histogram","fdhistogram","fdbargraph","normrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","countif","binomialpdf","binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart","mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata");
+array_push($allowedmacros,"nCr","nPr","mean","stdev","percentile","quartile","TIquartile","median","freqdist","frequency","histogram","fdhistogram","fdbargraph","normrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","expreg","countif","binomialpdf","binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart","mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata");
 
 //nCr(n,r)
 //The Choose function
@@ -715,6 +715,27 @@ function linreg($xarr,$yarr) {
 	$b = ($sy - $sx*$m)/$n;
 	return array($r,$m,$b);
 }
+
+//expreg(xarray,yarray)
+//Computes the exponential correlation coefficient, and base and intercept of
+//regression exponential, based on array/list of x-values and array/list of y-values
+//Returns as array:  r,base,intercept
+function expreg($xarr,$yarr) {
+	if (!is_array($xarr)) { $xarr = explode(',',$xarr);}	
+	if (!is_array($yarr)) { $yarr = explode(',',$yarr);}
+	if (count($xarr)!=count($yarr)) { 
+		echo "Error: expreg requires xarray length = yarray length";
+		return false;
+	}
+	foreach($yarr as $k=>$y) {
+		if ($y==0) { echo "Error: expreg cannot handle y-values of 0"; return false;}
+		$yarr[$k] = log($y);
+	}
+	list($r,$m,$b) = linreg($xarr,$yarr);
+	//log(y) = mx+b  y = e^b * (e^m)^x
+	return array($r, exp($m), exp($b));
+}
+	
 
 //checklineagainstdata(xarray, yarray, student answer, [variable, alpha])
 //intended for checking a student answer for fitting a line to data.  Determines

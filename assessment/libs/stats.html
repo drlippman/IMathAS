@@ -25,6 +25,7 @@ A library of Stats functions.  Version 1.9, March 30, 2008
 <li><a href="#invnormalcdf">invnormalcdf</a></li>
 <li><a href="#invtcdf">invtcdf</a></li>
 <li><a href="#linreg">linreg</a></li>
+<li><a href="#expreg">expreg</a></li>
 <li><a href="#checklineagainstdata">checklineagainstdata</a></li>
 <li><a href="#checkdrawnlineagainstdata">checkdrawnlineagainstdata</a></li>
 <li><a href="#binomialpdf">binomialpdf</a></li>
@@ -154,6 +155,11 @@ linreg(xarray,yarray)
 <BR>Computes the linear correlation coefficient, and slope and intercept of
 <BR>regression line, based on array/list of x-values and array/list of y-values
 <BR>Returns as array:  r,slope,intercept
+<BR><h3><a name="expreg">expreg</a></h3>
+expreg(xarray,yarray)
+<BR>Computes the exponential correlation coefficient, and base and intercept of
+<BR>regression exponential, based on array/list of x-values and array/list of y-values
+<BR>Returns as array:  r,base,intercept
 <BR><h3><a name="checklineagainstdata">checklineagainstdata</a></h3>
 checklineagainstdata(xarray, yarray, student answer, [variable, alpha])
 <BR>intended for checking a student answer for fitting a line to data.  Determines
