@@ -106,7 +106,7 @@ function reduceradicalfrac($n,$rootnum,$d,$root=2,$format="string") {
 }
 
 	
-//reducequadraticform(a,b,c,d,[format,)
+//reducequadraticform(a,b,c,d,[format])
 //given (a+bsqrt(c))/d, reduces the root then the fraction
 //format: default is "string", which returns "(1+4sqrt(5))/2"
 //                   "disp", returns the string wrapped in backticks for display
@@ -138,7 +138,7 @@ function reducequadraticform($a,$n,$rootnum,$d,$format="string") {
 		$d = $d*-1;
 	}
 	if ($format=='parts') {
-		return array($a, $n, $in, $d);
+		return array($a, $n, $in*($iscomplex?-1:1), $d);
 	}
 	$outstr = '';
 	if ($format=='disp') {
