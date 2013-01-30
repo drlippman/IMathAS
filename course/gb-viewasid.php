@@ -359,7 +359,7 @@
 		}
 		
 		$query = "SELECT imas_assessments.name,imas_assessments.timelimit,imas_assessments.defpoints,imas_assessments.tutoredit,";
-		$query .= "imas_assessments.deffeedback,imas_assessments.enddate,imas_assessment_sessions.* ";
+		$query .= "imas_assessments.showhints,imas_assessments.deffeedback,imas_assessments.enddate,imas_assessment_sessions.* ";
 		$query .= "FROM imas_assessments,imas_assessment_sessions ";
 		$query .= "WHERE imas_assessments.id=imas_assessment_sessions.assessmentid AND imas_assessment_sessions.id='{$_GET['asid']}'";
 		if (!$isteacher && !$istutor) {
@@ -551,7 +551,7 @@
 			echo "</p>";
 		}
 		
-		$query = "SELECT iq.id,iq.points,iq.withdrawn,iqs.qtype,iqs.control,iq.rubric ";
+		$query = "SELECT iq.id,iq.points,iq.withdrawn,iqs.qtype,iqs.control,iq.rubric,iq.showhints,iqs.extref ";
 		$query .= "FROM imas_questions AS iq, imas_questionset AS iqs ";
 		$query .= "WHERE iq.questionsetid=iqs.id AND iq.assessmentid='{$line['assessmentid']}'";
 		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
@@ -559,6 +559,7 @@
 		$pts = array();
 		$withdrawn = array();
 		$rubric = array();
+		$extref = array();
 		while ($r = mysql_fetch_row($result)) {
 			if ($r[1]==9999) {
 				$pts[$r[0]] = $line['defpoints'];  //use defpoints
@@ -590,6 +591,11 @@
 				$diff = $pts[$r[0]] - array_sum($answeights[$r[0]]);
 				$answeights[$r[0]][count($answeights[$r[0]])-1] += $diff;
 				
+			}
+			if (($line['showhints']==1 && $r[6]!=1) || $r[6]==2) {
+				if ($r[7]!='') {
+					$extref[$r[0]] = explode('~~',$r[7]);
+				}
 			}
 		}
 		echo '<script type="text/javascript">';
@@ -779,7 +785,13 @@
 				echo "<br/><a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid=$cid&add=new&quoteq=$i-$qsetid-{$seeds[$i]}&to={$_GET['uid']}\">Use in Msg</a>";
 				echo " &nbsp; <a href=\"gb-viewasid.php?stu=$stu&cid=$cid&from=$from&asid={$_GET['asid']}&uid={$_GET['uid']}&clearq=$i\">Clear Score</a> ";
 				echo "(Question ID: <a href=\"$imasroot/course/moddataset.php?id=$qsetid&cid=$cid&qid={$questions[$i]}&aid=$aid\">$qsetid</a>)";
-				
+				if (isset($extref[$questions[$i]])) {
+					echo "&nbsp; Had help available: ";
+					foreach ($extref[$questions[$i]] as $v) {
+						$extrefpt = explode('!!',$v);
+						echo '<a href="'.$extrefpt[1].'" target="_blank">'.$extrefpt[0].'</a> ';
+					}
+				}	
 			}
 			echo "</div>\n";
 			

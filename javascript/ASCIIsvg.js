@@ -733,7 +733,7 @@ function textabs(p,st,pos,angle,id,fontsty) {
   node.setAttribute("font-size",fontsize);
   node.setAttribute("font-weight",fontweight);
   node.setAttribute("text-anchor",textanchor);
-  if (fontstroke!="none") node.setAttribute("stroke",fontstroke);
+  //if (fontstroke!="none") node.setAttribute("stroke",fontstroke);
   if (fontfill!="none") node.setAttribute("fill",fontfill);
   node.setAttribute("stroke-width","0px");
   if (fontbackground!="none") {

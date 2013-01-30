@@ -228,7 +228,6 @@ function drawTarget(x,y) {
 					ctx.lineTo(0,0);
 					ctx.closePath();
 				}
-				
 			}
 			ctx.fill();
 			ctx.restore();	
@@ -566,7 +565,9 @@ function drawTarget(x,y) {
 		ctx.beginPath();
 	}
 	var linefirstx, linefirsty, linelastx, linelasty;
+	ctx.fillStyle = 'rgba(0,0,255,.5)';
 	for (var i=0;i<lines[curTarget].length; i++) {
+		ctx.beginPath();
 		for (var j=0;j<lines[curTarget][i].length; j++) {
 			if (j==0) {
 				ctx.moveTo(lines[curTarget][i][j][0],lines[curTarget][i][j][1]);
@@ -594,7 +595,7 @@ function drawTarget(x,y) {
 			ctx.lineTo(linefirstx-arrowsize,linefirsty+arrowsize);
 			ctx.moveTo(linefirstx,linefirsty);
 			ctx.lineTo(linefirstx-arrowsize,linefirsty-arrowsize);
-	}
+		}
 		if (drawlocky[curTarget]==1 && linelastx<targets[curTarget].imgwidth*.02) {
 			ctx.moveTo(linelastx,linelasty);
 			ctx.lineTo(linelastx+arrowsize,linelasty+arrowsize);
@@ -605,10 +606,23 @@ function drawTarget(x,y) {
 			ctx.lineTo(linefirstx+arrowsize,linefirsty+arrowsize);
 			ctx.moveTo(linefirstx,linefirsty);
 			ctx.lineTo(linefirstx+arrowsize,linefirsty-arrowsize);
+		}
+		ctx.stroke();
+		if (targets[curTarget].dotline>1) {
+			var ml = lines[curTarget][i].length-1;
+			if (ml<1) {continue;}
+			if (Math.pow((linelastx - linefirstx),2)+Math.pow((linelasty - linefirsty),2)<25) {
+				//ctx.fillStyle('rgba(0,0,255,.5)');
+				ctx.moveTo(lines[curTarget][i][0][0],lines[curTarget][i][0][1]);
+				for (var j=1;j<lines[curTarget][i].length; j++) {
+					ctx.lineTo(lines[curTarget][i][j][0],lines[curTarget][i][j][1]);
+				}
+				ctx.closePath();
+				ctx.fill();
+			}
+		}
 	}
-	}
-	ctx.stroke();
-	
+	ctx.fillStyle = 'rgb(0,0,255)';
 	ctx.beginPath();
 	for (var i=0; i<dots[curTarget].length; i++) {
 		ctx.moveTo(dots[curTarget][i][0]+5,dots[curTarget][i][1]);
@@ -626,25 +640,6 @@ function drawTarget(x,y) {
 			}
 		}
 		ctx.fill();
-		if (targets[curTarget].dotline>1) {
-			for (var i=0;i<lines[curTarget].length; i++) {
-				var ml = lines[curTarget][i].length-1;
-				if (ml<1) {continue;}
-				if (Math.pow((lines[curTarget][i][ml][0] - lines[curTarget][i][0][0]),2)+Math.pow((lines[curTarget][i][ml][1] - lines[curTarget][i][0][1]),2)<25) {
-					ctx.beginPath();
-					//ctx.fillStyle('rgba(0,0,255,.5)');
-					ctx.moveTo(lines[curTarget][i][0][0],lines[curTarget][i][0][1]);
-					for (var j=1;j<lines[curTarget][i].length; j++) {
-						ctx.lineTo(lines[curTarget][i][j][0],lines[curTarget][i][j][1]);
-					}
-					ctx.closePath();
-					ctx.fillStyle = 'rgba(0,0,255,.5)';
-					ctx.fill();
-					ctx.fillStyle = 'rgb(0,0,255)';
-				}
-			}
-		}
-		
 	}
 	//ctx.beginPath();
 	
@@ -1046,7 +1041,15 @@ function drawMouseUp(ev) {
 				if (dragObj.subnum==0 || dragObj.subnum==lines[curTarget][dragObj.num].length-1) {
 					//first or last dot being moved
 					if (Math.pow((lines[curTarget][dragObj.num][0][0] - lines[curTarget][dragObj.num][lines[curTarget][dragObj.num].length-1][0]),2)+Math.pow((lines[curTarget][dragObj.num][0][1] - lines[curTarget][dragObj.num][lines[curTarget][dragObj.num].length-1][1]),2)<25) {
+						if (dragObj.subnum==0) {
+							lines[curTarget][dragObj.num][lines[curTarget][dragObj.num].length-1][0] = lines[curTarget][dragObj.num][0][0];
+							lines[curTarget][dragObj.num][lines[curTarget][dragObj.num].length-1][1] = lines[curTarget][dragObj.num][0][1];
+						} else {
+							lines[curTarget][dragObj.num][0][0] = lines[curTarget][dragObj.num][lines[curTarget][dragObj.num].length-1][0];
+							lines[curTarget][dragObj.num][0][1] = lines[curTarget][dragObj.num][lines[curTarget][dragObj.num].length-1][1];
+						}
 						curLine = null;
+						drawTarget();
 					}
 				}
 			}

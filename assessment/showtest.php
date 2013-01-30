@@ -695,7 +695,6 @@ if (!isset($_POST['embedpostback'])) {
 				.mathquill-rendered-math .denominator { clear: both;width: auto;float: left;}
 				</style><![endif]-->';
 		}
-		$placeinhead .= '<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js" type="text/javascript"></script>';
 		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquill_min.js?v=030112\"></script>";
 		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquilled.js?v=030112\"></script>";
 		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/AMtoMQ.js?v=030112\"></script>";
@@ -1225,7 +1224,6 @@ if (!isset($_POST['embedpostback'])) {
 					$rawscore = scorequestion($qn);
 					
 					//record score
-					
 					recordtestdata();
 				}
 			   if (!$superdone) {
@@ -1292,7 +1290,7 @@ if (!isset($_POST['embedpostback'])) {
 					} else {
 						echo ", can be viewed by clicking on the question number again.</p>";
 					}
-				}
+				} 
 				if ($lefttodo > 0) {
 					echo "<p>or click <a href=\"showtest.php?action=skip&amp;done=true\">here</a> to finalize assessment and summarize score</p>\n";
 				} else {

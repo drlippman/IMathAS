@@ -1,25 +1,57 @@
 //var imasrubrics = new Array();
 //imasrubrics[2] = {'type':1,'data':[['Opening and Closing','',20],['Includes units','',30],['Includes values','',30],['Other considerations','Ex: public perception',20]]};
 //imasrubrics[5] = {'type':2,'data':[['Good','Includes everything'],['Good, but missing details',''],['Nice use of descriptors','']]};
+var hasTouch;
+var rubricbase, lastrubricpos;
 
 function imasrubric_show(rubricid,pointsposs,scoreboxid,feedbackid,qn,width) {
+	hasTouch = 'ontouchstart' in document.documentElement;
 	if (GB_loaded == false) {
-		var gb_overlay = document.createElement("div");
-		gb_overlay.id = "GB_overlay";
-		gb_overlay.onclick = GB_hide;
-		document.getElementsByTagName("body")[0].appendChild(gb_overlay);
+		//var gb_overlay = document.createElement("div");
+		//gb_overlay.id = "GB_overlay";
+		//gb_overlay.onclick = GB_hide;
+		//document.getElementsByTagName("body")[0].appendChild(gb_overlay);
 		var gb_window = document.createElement("div");
 		gb_window.id = "GB_window";
 		gb_window.innerHTML = '<div id="GB_caption"></div><div id="GB_loading">Loading...</div><div id="GB_frameholder"></div>';
 		document.getElementsByTagName("body")[0].appendChild(gb_window);
-		GB_loaded  = true;
+		GB_loaded  = true;	
 	}
 	document.getElementById("GB_caption").innerHTML = '<span style="float:right;"><span class="pointer clickable" onclick="GB_hide()">[X]</span></span> Rubric';
-	document.getElementById("GB_caption").onclick = GB_hide;
+	//document.getElementById("GB_caption").onclick = GB_hide;
+	document.getElementById("GB_caption").style.cursor = "move";
 	document.getElementById("GB_window").style.display = "block";
-	document.getElementById("GB_overlay").style.display = "block";
+	document.getElementById("GB_window").style.position = "absolute";
+	document.getElementById("GB_window").style.height = "auto";
+	//document.getElementById("GB_overlay").style.display = "block";
 	document.getElementById("GB_loading").style.display = "block";
-	
+	if (!hasTouch) {
+		$('#GB_caption').mousedown(function(evt) {
+			rubricbase = {left:evt.pageX, top: evt.pageY};
+			$("body").bind('mousemove',rubricmousemove);
+			$("body").mouseup(function(event) {
+				var p = $('#GB_window').offset();
+				lastrubricpos.left = p.left;
+				lastrubricpos.top = p.top;
+				$("body").unbind('mousemove',rubricmousemove);
+				$(this).unbind(event);
+			});
+		});
+	} else {
+		$('#GB_caption').bind('touchstart', function(evt) {
+			var touch = evt.originalEvent.changedTouches[0] || evt.originalEvent.touches[0];
+			rubricbase = {left:touch.pageX, top: touch.pageY};
+			$("body").bind('touchmove',rubricmousemove);
+			$("body").bind('touchend', function(event) {
+				var p = $('#GB_window').offset();
+				lastrubricpos.left = p.left;
+				lastrubricpos.top = p.top;
+				$("body").unbind('touchmove',rubricmousemove);
+				$(this).unbind(event);
+			});	
+		});
+		
+	}
 	var html = "<div style='margin: 10px;'><form id='imasrubricform'><table><tbody>";
 	for (var i=0;i<imasrubrics[rubricid].data.length; i++) {
 		if (imasrubrics[rubricid].type==0 || imasrubrics[rubricid].type==1 ) {  //score breakdown or score and feedback
@@ -33,7 +65,7 @@ function imasrubric_show(rubricid,pointsposs,scoreboxid,feedbackid,qn,width) {
 				html += '</td><td width="10%"><input type="radio" name="rubricgrp'+i+'" value="1"/> 1</td>';
 			}
 			html += '<td width="10%"><input type="radio" name="rubricgrp'+i+'" value="0" checked="checked"/> 0</td>';
-			html += '<td width="10%"><input type="radio" name="rubricgrp'+i+'" id="rubricgrpother'+i+'" value="-1"/> Other: <input onfocus="document.getElementById(\'rubricgrpother'+i+'\').checked=true" type="text" size="3" id="rubricother'+i+'" value=""/></td></tr>';
+			html += '<td width="10%" style="white-space:nowrap;"><input type="radio" name="rubricgrp'+i+'" id="rubricgrpother'+i+'" value="-1"/> Other: <input onfocus="document.getElementById(\'rubricgrpother'+i+'\').checked=true" type="text" size="3" id="rubricother'+i+'" value=""/></td></tr>';
 		} else if (imasrubrics[rubricid].type==2) { //just feedback
 			html += "<tr><td>"+imasrubrics[rubricid].data[i][0];
 			if (imasrubrics[rubricid].data[i][1]!="") {
@@ -60,9 +92,33 @@ function imasrubric_show(rubricid,pointsposs,scoreboxid,feedbackid,qn,width) {
 	var w = self.innerWidth || (de&&de.clientWidth) || document.body.clientWidth;
 	var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
 	document.getElementById("GB_window").style.width = width + "px";
-	document.getElementById("GB_window").style.height = (h-30) + "px";
+	if ($("#GB_window").outerHeight() > h - 30) {
+		document.getElementById("GB_window").style.height = (h-30) + "px";
+	}
 	document.getElementById("GB_window").style.left = ((w - width)/2)+"px";
+	lastrubricpos = {
+		left: ($(window).width() - $("#GB_window").outerWidth())/2,
+		top: $(window).scrollTop() + ((window.innerHeight ? window.innerHeight : $(window).height()) - $("#GB_window").outerHeight())/2, 
+		scroll: $(window).scrollTop()
+	}; 
+	document.getElementById("GB_window").style.top = lastrubricpos.top+"px";
+	
 	//document.getElementById("GB_frame").style.height = (h - 30 -34)+"px";
+}
+
+function rubricmousemove(evt) {
+	$('#GB_window').css('left', (evt.pageX - rubricbase.left) + lastrubricpos.left)
+	.css('top', (evt.pageY - rubricbase.top) + lastrubricpos.top);
+	return false;	
+}
+function rubrictouchmove(evt) {
+	var touch = evt.originalEvent.changedTouches[0] || evt.originalEvent.touches[0];
+  		
+	$('#GB_window').css('left', (touch.pageX - rubricbase.left) + lastrubricpos.left)
+	.css('top', (touch.pageY - rubricbase.top) + lastrubricpos.top);
+	evt.preventDefault();
+
+	return false;	
 }
 
 function imasrubric_record(rubricid,scoreboxid,feedbackid,qn,pointsposs,clearexisting) {

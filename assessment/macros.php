@@ -2690,5 +2690,23 @@ function getsnapwidthheight($xmin,$xmax,$ymin,$ymax,$width,$height,$snaptogrid) 
 	}
 	return array($width,$height);
 }
+
+function getscorenonzero() {
+	global $scores;
+	$out = array();
+	for ($i=0;$i<count($scores);$i++) {
+		if (strpos('~',$scores[$i])===false) {
+			$out[$i+1] = ($scores[$i]>0)?'1':'0';
+		} else {
+			$sp = explode('~',$scores[$i]);
+			$out[$i+1] = array();
+			for ($j=0;$j<count($sp);$j++) {
+				$out[$i+1][$j] = ($sp[$j]>0)?'1':'0';
+			}
+		}
+	}
+	return $out;
+}
+
 			
 ?>

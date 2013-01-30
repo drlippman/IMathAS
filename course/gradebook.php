@@ -119,15 +119,15 @@ if ($isteacher) {
 		} 
 		exit;
 	}
-	if ((isset($_POST['submit']) && ($_POST['submit']=="E-mail" || $_POST['submit']=="Message"))|| isset($_GET['masssend']))  {
+	if ((isset($_POST['posted']) && ($_POST['posted']=="E-mail" || $_POST['posted']=="Message"))|| isset($_GET['masssend']))  {
 		$calledfrom='gb';
 		include("masssend.php");
 	}
-	if ((isset($_POST['submit']) && $_POST['submit']=="Make Exception") || isset($_GET['massexception'])) {
+	if ((isset($_POST['posted']) && $_POST['posted']=="Make Exception") || isset($_GET['massexception'])) {
 		$calledfrom='gb';
 		include("massexception.php");
 	}
-	if ((isset($_POST['submit']) && $_POST['submit']=="Unenroll") || (isset($_GET['action']) && $_GET['action']=="unenroll" )) {
+	if ((isset($_POST['posted']) && $_POST['posted']=="Unenroll") || (isset($_GET['action']) && $_GET['action']=="unenroll" )) {
 		$calledfrom='gb';
 		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 		$curBreadcrumb .= "&gt; <a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; Confirm Change";
@@ -135,7 +135,31 @@ if ($isteacher) {
 		include("unenroll.php");
 		include("../footer.php");
 		exit;
-	}	
+	}
+	if (isset($_POST['posted']) && $_POST['posted']=='Print Report') {
+		require_once("gbtable2.php");
+		
+		$placeinhead = '<style type="text/css" >@media print { .noPrint  { display:none; } }</style>';
+		$placeinhead .= '<script type="text/javascript">addLoadEvent(print);</script>';
+		require("../header.php");
+		
+		echo '<div class="noPrint"><a href="#" onclick="window.print(); return false;">Print Reports</a> ';
+		echo '<a href="gradebook.php?'.$_SERVER['QUERY_STRING'].'">Back to Gradebook</a></div>';
+		if( isset($_POST['checked']) ) {
+			echo "<div id=\"tbl-container\">";
+			echo '<div id="bigcontmyTable"><div id="tblcontmyTable">';
+			$value = $_POST['checked'];
+			$last = count($value)-1;
+			for($i = 0; $i < $last; $i++){
+				gbstudisp($value[$i]);
+				echo "<div style=\"page-break-after:always\"></div>";
+			}
+			gbstudisp($value[$last]);//no page break after last report
+	
+			echo "</div></div></div>";
+		}
+		
+	}
 	if (isset($_POST['usrcomments']) && $stu>0) {
 			$query = "UPDATE imas_students SET gbcomment='{$_POST['usrcomments']}' WHERE userid='$stu'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
@@ -172,7 +196,7 @@ if ($isteacher) {
 
 
 //DISPLAY
-require("gbtable2.php");
+require_once("gbtable2.php");
 require("../includes/htmlutil.php");
 
 $placeinhead = '';
@@ -342,7 +366,15 @@ function updateColors(el) {
 	}
 	document.cookie = "colorize-'.$cid.'="+el.value;
 }
-	
+
+function popupReports(){
+	var f = document.getElementById("qform");
+	f.setAttribute("action","printreports.php?cid='.$cid.'");
+	f.setAttribute("target","printreports");
+	var repWin = window.open("about:blank","printreports");
+	f.submit();
+	return false;
+}
 </script>';
 }
 
@@ -586,11 +618,11 @@ if (isset($studentid) || $stu!=0) { //show student view
 	
 	if ($isteacher) {
 		echo 'Check: <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',false)">None</a> ';
-		echo "With Selected:  <input type=submit name=submit value=\"E-mail\"> <input type=submit name=submit value=\"Message\"> ";
+		echo 'With Selected:  <input type="submit" name="posted" value="Print Report"/> <input type="submit" name="posted" value="E-mail"/> <input type="submit" name="posted" value="Message"/> ';
 		if (!isset($CFG['GEN']['noInstrUnenroll'])) {
-			echo '<input type=submit name=submit value="Unenroll">';
+			echo '<input type=submit name=posted value="Unenroll">';
 		}
-		echo "<input type=submit name=submit value=\"Make Exception\"> ";
+		echo "<input type=submit name=posted value=\"Make Exception\"> ";
 	}
 	
 	$gbt = gbinstrdisp();
@@ -831,7 +863,7 @@ function gbstudisp($stu) {
 		if ($isteacher && $stu>0) {
 			echo '<p><input type="submit" value="Save Changes" style="display:none"; id="savechgbtn" /> ';
 			echo 'Check: <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',false)">None</a> ';
-			echo 'With selected: <input type="submit" value="Make Exception" name="submit" /></p>';
+			echo 'With selected: <input type="submit" value="Make Exception" name="posted" /></p>';
 		}
 		echo '<table class="gb"><thead>';
 		echo '<tr>';
