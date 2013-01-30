@@ -137,6 +137,7 @@ if ($isteacher) {
 		exit;
 	}
 	if (isset($_POST['posted']) && $_POST['posted']=='Print Report') {
+		//based on a contribution by Cam Joyce
 		require_once("gbtable2.php");
 		
 		$placeinhead = '<style type="text/css" >@media print { .noPrint  { display:none; } }</style>';
@@ -365,15 +366,6 @@ function updateColors(el) {
 		conditionalColor("myTable",0,s[0],s[1]);
 	}
 	document.cookie = "colorize-'.$cid.'="+el.value;
-}
-
-function popupReports(){
-	var f = document.getElementById("qform");
-	f.setAttribute("action","printreports.php?cid='.$cid.'");
-	f.setAttribute("target","printreports");
-	var repWin = window.open("about:blank","printreports");
-	f.submit();
-	return false;
 }
 </script>';
 }
