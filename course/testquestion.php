@@ -58,6 +58,8 @@ if ($myrights<20) {
 		$page_scoreMsg =  "<p>Score on last answer: $score/1</p>\n";
 	} else {
 		$page_scoreMsg = "";
+		$scores = array(-1);
+		$_SESSION['choicemap'] = array();
 	}
 	
 	$page_formAction = "testquestion.php?cid={$_GET['cid']}&qsetid={$_GET['qsetid']}";

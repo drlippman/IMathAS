@@ -2573,7 +2573,7 @@ function getfeedbacktxt($stu,$fbtxt,$ans) {
 	global $imasroot;
 	if ($stu==null) {
 		return " ";
-	} else if ($stu=='NA') {
+	} else if ($stu==='NA') {
 		return '<span class="feedbackwrap"><img src="'.$imasroot.'/img/redx.gif"/> No answer selected. Try again.</span>';
 	} else if (isset($fbtxt[$stu])) {
 		if ($stu==$ans) {
@@ -2696,12 +2696,12 @@ function getscorenonzero() {
 	$out = array();
 	for ($i=0;$i<count($scores);$i++) {
 		if (strpos('~',$scores[$i])===false) {
-			$out[$i+1] = ($scores[$i]>0)?'1':'0';
+			$out[$i+1] = ($scores[$i]<0)?-1:(($scores[$i]>0)?1:0);
 		} else {
 			$sp = explode('~',$scores[$i]);
 			$out[$i+1] = array();
 			for ($j=0;$j<count($sp);$j++) {
-				$out[$i+1][$j] = ($sp[$j]>0)?'1':'0';
+				$out[$i+1][$j] = ($sp[$j]>0)?1:0;
 			}
 		}
 	}

@@ -424,6 +424,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 	}
 	$thisq = $qnidx+1;
 	unset($stuanswers[$thisq]);  //unset old stuanswer for this question
+	
 	if ($qdata['qtype']=="multipart" || $qdata['qtype']=='conditional') {
 		for ($kidx=0;$kidx<count($_POST);$kidx++) {
 			$partnum = ($qnidx+1)*1000 + $kidx;
@@ -2325,7 +2326,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$randkeys = array_rand($questions,count($questions));
 			shuffle($randkeys);
 		}
-		$GLOBALS['partlastanswer'] = $givenans.'$!$'.$randkeys[$givenans];
+		if ($givenans==='NA' || $givenans == null) {
+			$GLOBALS['partlastanswer'] = $givenans;
+		} else {
+			$GLOBALS['partlastanswer'] = $givenans.'$!$'.$randkeys[$givenans];
+		}
 		if ($givenans == null) {return 0;}
 
 		if ($givenans=='NA') { return 0; }

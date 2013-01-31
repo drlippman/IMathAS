@@ -1101,7 +1101,7 @@ if (!isset($_POST['embedpostback'])) {
 			for ($i=0; $i < count($questions); $i++) {
 				//if (isset($_POST["qn$i"]) || isset($_POST['qn'.(1000*($i+1))]) || isset($_POST["qn$i-0"]) || isset($_POST['qn'.(1000*($i+1)).'-0'])) {
 					if ($_POST['verattempts'][$i]!=$attempts[$i]) {
-						echo "Question ".($i+1)." has been submittted since you viewed it.  Your answer just submitted was not scored or recorded.<br/>";
+						echo "Question ".($i+1)." has been submitted since you viewed it.  Your answer just submitted was not scored or recorded.<br/>";
 					} else {
 						scorequestion($i);
 					}
@@ -1131,10 +1131,10 @@ if (!isset($_POST['embedpostback'])) {
 				if ($GLOBALS['scoremessages'] != '') {
 					echo '<p>'.$GLOBALS['scoremessages'].'</p>';
 				}
-				showscores($questions,$attempts,$testsettings);
+				$shown = showscores($questions,$attempts,$testsettings);
 			
 				endtest($testsettings);
-				leavetestmsg();
+				if ($shown) {leavetestmsg();}
 			}
 		} else if ($_GET['action']=="shownext") {
 			if (isset($_GET['score'])) {
@@ -1203,9 +1203,9 @@ if (!isset($_POST['embedpostback'])) {
 				showqinfobar($toshow,true,true);
 				echo '<input type="submit" class="btn" value="Continue" />';
 			} else { //are all done
-				showscores($questions,$attempts,$testsettings);
+				$shown = showscores($questions,$attempts,$testsettings);
 				endtest($testsettings);
-				leavetestmsg();
+				if ($shown) {leavetestmsg();}
 			}
 		} else if ($_GET['action']=="skip") {
 
@@ -1373,9 +1373,9 @@ if (!isset($_POST['embedpostback'])) {
 			} 
 			if (isset($_GET['done'])) { //are all done
 
-				showscores($questions,$attempts,$testsettings);
+				$shown = showscores($questions,$attempts,$testsettings);
 				endtest($testsettings);
-				leavetestmsg();
+				if ($shown) {leavetestmsg();}
 			}
 		} else if ($_GET['action']=="seq") {
 			if (isset($_GET['score'])) { //score a problem
@@ -1462,9 +1462,9 @@ if (!isset($_POST['embedpostback'])) {
 			}
 			if ($done || isset($_GET['done'])) { //are all done
 
-				showscores($questions,$attempts,$testsettings);
+				$shown = showscores($questions,$attempts,$testsettings);
 				endtest($testsettings);
-				leavetestmsg();
+				if ($shown) {leavetestmsg();}
 			} else { //show more test 
 				echo filter("<div id=intro class=hidden>{$testsettings['intro']}</div>\n");
 				
@@ -1505,9 +1505,9 @@ if (!isset($_POST['embedpostback'])) {
 				
 			}
 		} else if ($_GET['action']=='embeddone') {
-			showscores($questions,$attempts,$testsettings);
+			$shown = showscores($questions,$attempts,$testsettings);
 			endtest($testsettings);
-			leavetestmsg();
+			if ($shown) {leavetestmsg();}
 		} else if ($_GET['action']=='scoreembed') {
 			$qn = $_POST['toscore'];
 			$colors = array();
@@ -2403,6 +2403,36 @@ if (!isset($_POST['embedpostback'])) {
 	
 	function showscores($questions,$attempts,$testsettings) {
 		global $isdiag,$allowregen,$isreview,$noindivscores,$scores,$bestscores,$qi,$superdone,$timelimitkickout, $reviewatend;
+		
+		$total = 0;
+		$lastattempttotal = 0;
+		for ($i =0; $i < count($bestscores);$i++) {
+			if (getpts($bestscores[$i])>0) { $total += getpts($bestscores[$i]);}
+			if (getpts($scores[$i])>0) { $lastattempttotal += getpts($scores[$i]);}
+		}
+		$totpossible = totalpointspossible($qi);
+		$average = round(100*((float)$total)/((float)$totpossible),1);
+			
+		$doendredirect = false;
+		$outmsg = '';
+		if ($testsettings['endmsg']!='') {
+			$endmsg = unserialize($testsettings['endmsg']);
+			$redirecturl = '';
+			if (isset($endmsg['msgs'])) {
+				foreach ($endmsg['msgs'] as $sc=>$msg) { //array must be reverse sorted
+					if (($endmsg['type']==0 && $total>=$sc) || ($endmsg['type']==1 && $average>=$sc)) {
+						$outmsg = $msg;
+						if (strpos($msg,'redirectto:')!==false) {
+							$redirecturl = trim(substr($msg,11));
+							echo "<input type=\"button\" value=\"Continue\" onclick=\"window.location.href='$redirecturl'\"/>";
+							return false;
+						}
+						break;
+					}
+				}
+			}
+		}
+		
 		if ($isdiag) {
 			global $userid;
 			$query = "SELECT * from imas_users WHERE id='$userid'";
@@ -2454,13 +2484,6 @@ if (!isset($_POST['embedpostback'])) {
 		recordtestdata();
 			
 		if ($testsettings['testtype']!="NoScores") {
-			$total = 0;
-			$lastattempttotal = 0;
-			for ($i =0; $i < count($bestscores);$i++) {
-				if (getpts($bestscores[$i])>0) { $total += getpts($bestscores[$i]);}
-				if (getpts($scores[$i])>0) { $lastattempttotal += getpts($scores[$i]);}
-			}
-			$totpossible = totalpointspossible($qi);
 			
 			echo "<p>Total Points on Last Attempts:  $lastattempttotal out of $totpossible possible</p>\n";
 			
@@ -2471,19 +2494,8 @@ if (!isset($_POST['embedpostback'])) {
 				echo "<p><b>Total Points in Gradebook: $total out of $totpossible possible: ";
 			}
 			
-			$average = round(100*((float)$total)/((float)$totpossible),1);
 			echo "$average % </b></p>\n";	
 			
-			$endmsg = unserialize($testsettings['endmsg']);
-			$outmsg = '';
-			if (isset($endmsg['msgs'])) {
-				foreach ($endmsg['msgs'] as $sc=>$msg) { //array must be reverse sorted
-					if (($endmsg['type']==0 && $total>=$sc) || ($endmsg['type']==1 && $average>=$sc)) {
-						$outmsg = $msg;
-						break;
-					}
-				}
-			}
 			if ($outmsg=='') {
 				$outmsg = $endmsg['def'];
 			}
@@ -2567,7 +2579,7 @@ if (!isset($_POST['embedpostback'])) {
 			}
 				
 		}
-			
+		return true;
 		
 	}
 
