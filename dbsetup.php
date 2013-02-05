@@ -943,7 +943,18 @@ $sql = 'CREATE TABLE `imas_badgerecords` (
 	) ENGINE=InnoDB;';
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 echo 'imas_badgerecords created<br/>';
-	
+
+$sql = 'CREATE TABLE `imas_bookmarks` (
+	`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+	`courseid` INT( 10 ) UNSIGNED NOT NULL ,
+	`userid` INT( 10 ) UNSIGNED NOT NULL ,
+	`name` VARCHAR( 128 ) NOT NULL ,
+	`value` TEXT NOT NULL ,
+	INDEX ( `courseid`) , INDEX( `userid`) , INDEX( `name` )
+	) ENGINE = InnoDB';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+echo 'imas_bookmarks created<br/>';
+
 $md5pw = md5($password);
 $now = time();
 $sql = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email) VALUES ('$username','$md5pw',100,'$firstname','$lastname','$email')";

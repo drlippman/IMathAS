@@ -1,6 +1,7 @@
 <?php  
 //change counter; increase by 1 each time a change is made
-$latest = 61;
+//TODO:  change linked text tex to mediumtext
+$latest = 62;
 
 
 @set_time_limit(0);
@@ -1013,6 +1014,20 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 		if ($last < 61) {
 			 $query = 'ALTER TABLE `imas_assessments` ADD `viddata` TEXT NOT NULL DEFAULT \'\'';
 			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+		}
+		if ($last < 62) {
+			 $query = 'CREATE TABLE `imas_bookmarks` (
+				`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+				`courseid` INT( 10 ) UNSIGNED NOT NULL ,
+				`userid` INT( 10 ) UNSIGNED NOT NULL ,
+				`name` VARCHAR( 128 ) NOT NULL ,
+				`value` TEXT NOT NULL ,
+				INDEX ( `courseid`) , INDEX( `userid`) , INDEX( `name` )
+				) ENGINE = InnoDB';
+			$res = mysql_query($query);
 			 if ($res===false) {
 			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }

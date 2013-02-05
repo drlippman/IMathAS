@@ -14,6 +14,12 @@
 		echo "<html><body>No item specified. <a href=\"course.php?cid={$_GET['cid']}\">Try again</a></body></html>\n";
 		exit;
 	}
+	if (strpos($_SERVER['HTTP_REFERER'],'treereader')!==false) {
+		$shownav = false;
+		$flexwidth = true;
+	} else {
+		$shownav = true;
+	}
 	$query = "SELECT text,title,target FROM imas_linkedtext WHERE id='{$_GET['id']}'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$text = mysql_result($result, 0,0);
@@ -42,14 +48,17 @@
 	
 	
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-	echo "&gt; $titlesimp</div>";
-	echo '<div id="headershowlinkedtext" class="pagetitle"><h2>'.$titlesimp.'</h2></div>';
+	if ($shownav) {
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+		echo "&gt; $titlesimp</div>";
+		echo '<div id="headershowlinkedtext" class="pagetitle"><h2>'.$titlesimp.'</h2></div>';
+	}
 	echo '<div style="padding-left:10px; padding-right: 10px;">';
 	echo filter($text);
 	echo '</div>';
-	
-	echo "<div class=right><a href=\"course.php?cid={$_GET['cid']}\">Return to Course Page</a></div>\n";
+	if ($shownav) {
+		echo "<div class=right><a href=\"course.php?cid={$_GET['cid']}\">Return to Course Page</a></div>\n";
+	}
 	require("../footer.php");	
 
 ?>

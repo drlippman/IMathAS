@@ -345,7 +345,8 @@ if ($overwriteBody==1) {
 	<span class=formright>
 	<input type=radio name=availbeh value="O" <?php writeHtmlChecked($availbeh,'O')?> />Show Expanded<br/>
 	<input type=radio name=availbeh value="C" <?php writeHtmlChecked($availbeh,'C')?> />Show Collapsed<br/>
-	<input type=radio name=availbeh value="F" <?php writeHtmlChecked($availbeh,'F')?> />Show as Folder
+	<input type=radio name=availbeh value="F" <?php writeHtmlChecked($availbeh,'F')?> />Show as Folder<br/>
+	<input type=radio name=availbeh value="T" <?php writeHtmlChecked($availbeh,'T')?> />Show as TreeReader
 	</span><br class=form />
 	<span class=form>When not available:</span>
 	<span class=formright>
