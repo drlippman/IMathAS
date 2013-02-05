@@ -1535,7 +1535,7 @@ if (!isset($_POST['embedpostback'])) {
 					$viddata = unserialize($testsettings['viddata']);
 					
 					foreach ($viddata as $i=>$v) {
-						if (isset($v[2]) && $v[2]==$qn) {
+						if ($i>0 && isset($v[2]) && $v[2]==$qn) {
 							echo '<div>';
 							$hascontinue = true;
 							if (isset($v[3]) && getpts($rawscore)>.99) {

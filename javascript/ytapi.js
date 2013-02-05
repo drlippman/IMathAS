@@ -145,7 +145,9 @@ var initVideoObject = function (VidId, breaktimesarray) {
 		},
 	
 		showQuestion: function (curTime) {
-		    ytplayer.pauseVideo();
+		    if (ytplayer && ytplayer.pauseVideo) {
+		    	    ytplayer.pauseVideo();
+		    }
 	
 		    skipSecQ = curTime;
 	
