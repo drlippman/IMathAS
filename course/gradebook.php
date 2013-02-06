@@ -142,6 +142,7 @@ if ($isteacher) {
 		
 		$placeinhead = '<style type="text/css" >@media print { .noPrint  { display:none; } }</style>';
 		$placeinhead .= '<script type="text/javascript">addLoadEvent(print);</script>';
+		$flexwidth = true;
 		require("../header.php");
 		
 		echo '<div class="noPrint"><a href="#" onclick="window.print(); return false;">Print Reports</a> ';
@@ -159,6 +160,8 @@ if ($isteacher) {
 	
 			echo "</div></div></div>";
 		}
+		require("../footer.php");
+		exit;
 		
 	}
 	if (isset($_POST['usrcomments']) && $stu>0) {
