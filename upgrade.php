@@ -1,7 +1,7 @@
 <?php  
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 62;
+$latest = 63;
 
 
 @set_time_limit(0);
@@ -1028,6 +1028,13 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 				INDEX ( `courseid`) , INDEX( `userid`) , INDEX( `name` )
 				) ENGINE = InnoDB';
 			$res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+		}
+		if ($last < 63) {
+			 $query = 'ALTER TABLE `imas_forums` ADD `rubric` INT( 10 ) UNSIGNED NOT NULL DEFAULT \'0\'';
+			 $res = mysql_query($query);
 			 if ($res===false) {
 			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }

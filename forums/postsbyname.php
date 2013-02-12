@@ -36,19 +36,25 @@
 		}
 	}
 	
-	$query = "SELECT settings,replyby,defdisplay,name,points FROM imas_forums WHERE id='$forumid'";
+	$query = "SELECT settings,replyby,defdisplay,name,points,rubric FROM imas_forums WHERE id='$forumid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$forumsettings = mysql_result($result,0,0);
 	$allowreply = ($isteacher || (time()<mysql_result($result,0,1)));
 	$allowanon = (($forumsettings&1)==1);
 	$allowmod = ($isteacher || (($forumsettings&2)==2));
 	$allowdel = ($isteacher || (($forumsettings&4)==4));
-	$haspoints = (mysql_result($result,0,4)>0);
+	$pointspos = mysql_result($result,0,4);
+	$haspoints = ($pointspos>0);
+	$rubric = mysql_result($result,0,5);
 	
 	$caller = "byname";
 	include("posthandler.php");
 	
 	$placeinhead = '<link rel="stylesheet" href="'.$imasroot.'/forums/forums.css?ver=082911" type="text/css" />';
+	if ($haspoints && $rubric != 0) {
+		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=120311"></script>';
+		require("../includes/rubric.php");
+	}
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; <a href=\"thread.php?cid=$cid&forum=$forumid&page=$page\">Forum Topics</a> &gt; Posts by Name</div>\n";
 	
@@ -145,6 +151,16 @@
 	}
 	</script>
 <?php
+
+	if ($haspoints && $rubric != 0) {
+		$query = "SELECT id,rubrictype,rubric FROM imas_rubrics WHERE id=$rubric";
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		if (mysql_num_rows($result)>0) {
+			$row = mysql_fetch_row($result);
+			echo printrubrics(array($row));
+		}
+	}
+	
 	$scores = array();
 	$feedback = array();
 	if ($haspoints) {
@@ -189,12 +205,15 @@
 		echo '<span class="right">';
 		if ($haspoints) {
 			if ($isteacher) {
-				echo "<input type=text size=2 name=\"score[{$line['id']}]\"  onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" value=\"";
+				echo "<input type=text size=2 name=\"score[{$line['id']}]\" id=\"score{$line['id']}\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" value=\"";
 				if (isset($scores[$line['id']])) {
 					echo $scores[$line['id']];
 				}
 				
-				echo "\"/> Pts. ";
+				echo "\"/> Pts ";
+				if ($rubric != 0) {
+					echo printrubriclink($rubric,$pointspos,"score{$line['id']}", "feedback{$line['id']}").' ';
+				}
 			} else if ($line['ownerid']==$userid && isset($scores[$line['id']])) {
 				echo "<span class=red>{$points[$child]}</span> ";
 			}
@@ -225,7 +244,7 @@
 		if ($haspoints) {
 			if ($isteacher && $ownerid[$child]!=$userid) {
 				echo '<hr/>';
-				echo "Private Feedback: <textarea cols=\"50\" rows=\"2\" name=\"feedback[{$line['id']}]\">";
+				echo "Private Feedback: <textarea cols=\"50\" rows=\"2\" name=\"feedback[{$line['id']}]\" id=\"feedback{$line['id']}\">";
 				if ($feedback[$line['id']]!==null) {
 					echo $feedback[$line['id']];
 				}

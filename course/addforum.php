@@ -39,7 +39,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$cid = $_GET['cid'];
 	$block = $_GET['block'];
 	
-	
 	if ($_POST['name']!= null) { //FORM SUBMITTED, DATA PROCESSING
 		require_once("parsedatetime.php");
 		if ($_POST['avail']==1) {
@@ -94,6 +93,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
 			$taglist = '';
 		}
+		if (isset($_POST['rubric'])) {
+			$rubric = intval($_POST['rubric']);
+		} else {
+			$rubric = 0;
+		}
 		
 		require_once("../includes/htmLawed.php");
 		$htmlawedconfig = array('elements'=>'*-script');
@@ -110,13 +114,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			$query = "UPDATE imas_forums SET name='{$_POST['name']}',description='{$_POST['description']}',startdate=$startdate,enddate=$enddate,settings=$fsets,caltag='$caltag',";
 			$query .= "defdisplay='{$_POST['defdisplay']}',replyby=$replyby,postby=$postby,groupsetid='{$_POST['groupsetid']}',points='{$_POST['points']}',cntingb='{$_POST['cntingb']}',";
-			$query .= "gbcategory='{$_POST['gbcat']}',avail='{$_POST['avail']}',sortby='{$_POST['sortby']}',forumtype='{$_POST['forumtype']}',taglist='$taglist' ";
+			$query .= "gbcategory='{$_POST['gbcat']}',avail='{$_POST['avail']}',sortby='{$_POST['sortby']}',forumtype='{$_POST['forumtype']}',taglist='$taglist',rubric=$rubric ";
 			$query .= "WHERE id='{$_GET['id']}';";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$newforumid = $_GET['id'];
 		} else { //add new
-			$query = "INSERT INTO imas_forums (courseid,name,description,startdate,enddate,settings,defdisplay,replyby,postby,groupsetid,points,cntingb,gbcategory,avail,sortby,caltag,forumtype,taglist) VALUES ";
-			$query .= "('$cid','{$_POST['name']}','{$_POST['description']}',$startdate,$enddate,$fsets,'{$_POST['defdisplay']}',$replyby,$postby,'{$_POST['groupsetid']}','{$_POST['points']}','{$_POST['cntingb']}','{$_POST['gbcat']}','{$_POST['avail']}','{$_POST['sortby']}','$caltag','{$_POST['forumtype']}','$taglist');";
+			$query = "INSERT INTO imas_forums (courseid,name,description,startdate,enddate,settings,defdisplay,replyby,postby,groupsetid,points,cntingb,gbcategory,avail,sortby,caltag,forumtype,taglist,rubric) VALUES ";
+			$query .= "('$cid','{$_POST['name']}','{$_POST['description']}',$startdate,$enddate,$fsets,'{$_POST['defdisplay']}',$replyby,$postby,'{$_POST['groupsetid']}','{$_POST['points']}','{$_POST['cntingb']}','{$_POST['gbcat']}','{$_POST['avail']}','{$_POST['sortby']}','$caltag','{$_POST['forumtype']}','$taglist',$rubric);";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			
 			$newforumid = mysql_insert_id();
@@ -202,6 +206,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$line['caltag'] = 'FP--FR';
 			$line['forumtype'] = 0;
 			$line['taglist'] = '';
+			$line['rubric'] = 0;
 			$startdate = time();
 			$enddate = time() + 7*24*60*60;
 			$allowanon = false;
@@ -284,6 +289,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$i++;
 			}
 		}
+		$rubric_vals = array(0);
+		$rubric_names = array('None');
+		$query = "SELECT id,name FROM imas_rubrics WHERE ownerid='$userid' OR groupid='$gropuid' ORDER BY name";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			$rubric_vals[] = $row[0];
+			$rubric_names[] = $row[1];
+		}
 	}
 }
 
@@ -291,6 +304,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
  /******* begin html output ********/
  $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+ $placeinhead .= '<script type="text/javascript"> function toggleGBdetail(v) { document.getElementById("gbdetail").style.display = v?"block":"none";}</script>';
  require("../header.php");
 
 if ($overwriteBody==1) {
@@ -418,12 +432,15 @@ if ($overwriteBody==1) {
 		
 		<span class="form">Count in gradebook?</span>
 		<span class="formright">
-			<input type=radio name="cntingb" value="0" <?php if ($cntingb==0) { echo 'checked=1';}?>/>No<br/>
-			<input type=radio name="cntingb" value="1" <?php if ($cntingb==1) { echo 'checked=1';}?>/>Yes<br/>
-			<input type=radio name="cntingb" value="2" <?php if ($cntingb==2) { echo 'checked=1';}?>/>Yes, as extra credit<br/>
-			If yes, for: <input type=text size=4 name="points" value="<?php echo $points;?>"/> points
+			<input type=radio name="cntingb" value="0" <?php if ($cntingb==0) { echo 'checked=1';}?> onclick="toggleGBdetail(false)"/>No<br/>
+			<input type=radio name="cntingb" value="1" <?php if ($cntingb==1) { echo 'checked=1';}?> onclick="toggleGBdetail(true)"/>Yes<br/>
+			<input type=radio name="cntingb" value="2" <?php if ($cntingb==2) { echo 'checked=1';}?> onclick="toggleGBdetail(true)"/>Yes, as extra credit<br/>
 		</span><br class="form"/>
-		
+		<div id="gbdetail" <?php if ($cntingb==0) { echo 'style="display:none;"';}?>>
+		<span class="form">Points:</span>
+		<span class="formright">
+			<input type=text size=4 name="points" value="<?php echo $points;?>"/> points
+		</span><br class="form"/>
 		<span class=form>Gradebook Category:</span>
 			<span class=formright>
 		
@@ -431,6 +448,15 @@ if ($overwriteBody==1) {
 	writeHtmlSelect("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],$gbcat,"Default",0);
 ?>
 		</span><br class=form>
+		
+		<span class=form>Use Scoring Rubric</span><span class=formright>
+<?php 
+    writeHtmlSelect('rubric',$rubric_vals,$rubric_names,$line['rubric']);
+    echo " <a href=\"addrubric.php?cid=$cid&amp;id=new&amp;from=addf&amp;fid={$_GET['id']}\">Add new rubric</a> ";
+    echo "| <a href=\"addrubric.php?cid=$cid&amp;from=addf&amp;fid={$_GET['id']}\">Edit rubrics</a> ";
+?>
+    		</span><br class="form"/>
+		</div>
 		<span class="form">Forum type:</span>
 		<span class="formright">
 			<input type=radio name="forumtype" value="0" <?php if ($line['forumtype']==0) { echo 'checked=1';}?>/>Regular forum<br/>

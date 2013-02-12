@@ -23,6 +23,10 @@ if ($from=='modq') {
 	$fromstr = '&amp;from=addg&amp;gbitem='.$_GET['gbitem'];
 	$returnstr = 'addgrades.php?cid='.$cid.'&amp;gbitem='.$_GET['gbitem'].'&amp;grades=all';
 	$curBreadcrumb .= "&gt; <a href=\"$returnstr\">Offline Grades</a> ";
+} else if ($from=='addf') {
+	$fromstr = '&amp;from=addf&amp;fid='.$_GET['fid'];
+	$returnstr = 'addforum.php?cid='.$cid.'&amp;id='.$_GET['fid'];
+	$curBreadcrumb .= "&gt; <a href=\"$returnstr\">Modify Forum</a> ";
 }
 
 

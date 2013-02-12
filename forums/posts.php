@@ -60,7 +60,7 @@
 		}
 		exit;
 	}
-	$query = "SELECT settings,replyby,defdisplay,name,points,groupsetid,postby FROM imas_forums WHERE id='$forumid'";
+	$query = "SELECT settings,replyby,defdisplay,name,points,groupsetid,postby,rubric FROM imas_forums WHERE id='$forumid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$forumsettings = mysql_result($result,0,0);
 	$replyby = mysql_result($result,0,1);
@@ -69,10 +69,12 @@
 	$allowanon = (($forumsettings&1)==1);
 	$allowmod = ($isteacher || (($forumsettings&2)==2));
 	$allowdel = ($isteacher || (($forumsettings&4)==4));
-	$haspoints = (mysql_result($result,0,4) > 0);
+	$pointsposs = mysql_result($result,0,4);
+	$haspoints =  ($pointsposs > 0);
 	$forumname = mysql_result($result,0,3);
 	$groupset = mysql_result($result,0,5);
 	$postby = mysql_result($result,0,6);
+	$rubric = mysql_result($result,0,7);
 	$groupid = 0;
 	if ($groupset>0) {
 		if (!isset($_GET['grp'])) {
@@ -102,6 +104,11 @@
 			}
 		}
 	}
+	$placeinhead = '';
+	if ($haspoints && $isteacher && $rubric != 0) {
+		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=120311"></script>';
+		require("../includes/rubric.php");
+	}
 		
 		
 	if (isset($_GET['view'])) {
@@ -114,9 +121,18 @@
 	include("posthandler.php");
 	
 	$pagetitle = "Posts";
-	$placeinhead = '<link rel="stylesheet" href="'.$imasroot.'/forums/forums.css?ver=022410" type="text/css" />';
+	$placeinhead .= '<link rel="stylesheet" href="'.$imasroot.'/forums/forums.css?ver=022410" type="text/css" />';
 	//$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
 	require("../header.php");
+	
+	if ($haspoints && $isteacher && $rubric != 0) {
+		$query = "SELECT id,rubrictype,rubric FROM imas_rubrics WHERE id=$rubric";
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		if (mysql_num_rows($result)>0) {
+			$row = mysql_fetch_row($result);
+			echo printrubrics(array($row));
+		}
+	}
 	
 	$allowmsg = false;
 	if (!$isteacher) {
@@ -339,7 +355,7 @@
 	$icnt = 0;
 	function printchildren($base,$restricttoowner=false) {
 		$curdir = rtrim(dirname(__FILE__), '/\\');
-		global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points,$feedback,$posttype,$lastview,$bcnt,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$view,$page,$allowmsg,$haspoints,$imasroot,$postby,$replyby,$files,$CFG;
+		global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points,$feedback,$posttype,$lastview,$bcnt,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$view,$page,$allowmsg,$haspoints,$imasroot,$postby,$replyby,$files,$CFG,$rubric,$pointsposs;
 		if (!isset($CFG['CPS']['itemicons'])) {
 	   	   $itemicons = array('web'=>'web.png', 'doc'=>'doc.png', 'wiki'=>'wiki.png',
 			'html'=>'html.png', 'forum'=>'forum.png', 'pdf'=>'pdf.png',
@@ -525,12 +541,15 @@
 				if ($haspoints) {
 					if ($isteacher && $ownerid[$child]!=$userid) {
 						echo '<hr/>';
-						echo "Score: <input type=text size=2 name=\"score[$child]\" value=\"";
+						echo "Score: <input type=text size=2 name=\"score[$child]\" id=\"scorebox$child\" value=\"";
 						if ($points[$child]!==null) {
 							echo $points[$child];
 						}
-						echo "\"/>  ";
-						echo "Private Feedback: <textarea cols=\"50\" rows=\"2\" name=\"feedback[$child]\">";
+						echo "\"/> ";
+						if ($rubric != 0) {
+							echo printrubriclink($rubric,$pointsposs,"scorebox$child", "feedback$child");
+						}
+						echo " Private Feedback: <textarea cols=\"50\" rows=\"2\" name=\"feedback[$child]\" id=\"feedback$child\">";
 						if ($feedback[$child]!==null) {
 							echo $feedback[$child];
 						}

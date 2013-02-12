@@ -61,9 +61,9 @@ function imasrubric_show(rubricid,pointsposs,scoreboxid,feedbackid,qn,width) {
 			}
 			totpts = Math.round(pointsposs*imasrubrics[rubricid].data[i][2])/100;
 			html += '</td><td width="10%"><input type="radio" name="rubricgrp'+i+'" value="'+totpts+'"/> '+totpts+'</td>';
-			if (totpts==2) {
-				html += '</td><td width="10%"><input type="radio" name="rubricgrp'+i+'" value="1"/> 1</td>';
-			}
+			//if (totpts==2) {
+			//	html += '</td><td width="10%"><input type="radio" name="rubricgrp'+i+'" value="1"/> 1</td>';
+			//}
 			html += '<td width="10%"><input type="radio" name="rubricgrp'+i+'" value="0" checked="checked"/> 0</td>';
 			html += '<td width="10%" style="white-space:nowrap;"><input type="radio" name="rubricgrp'+i+'" id="rubricgrpother'+i+'" value="-1"/> Other: <input onfocus="document.getElementById(\'rubricgrpother'+i+'\').checked=true" type="text" size="3" id="rubricother'+i+'" value=""/></td></tr>';
 		} else if (imasrubrics[rubricid].type==2) { //just feedback
