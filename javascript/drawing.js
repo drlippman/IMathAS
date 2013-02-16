@@ -1476,8 +1476,8 @@ function initnormslider(id) {
 }
 function onsliderstart(ev) {
 	ev = ev || window.event;
-	normslider.curslider.el = ev.target;
-	normslider.curslider.id = ev.target.id.substring(5);
+	normslider.curslider.el = ev.target || ev.srcElement;
+	normslider.curslider.id = normslider.curslider.el.id.substring(5);
 	normslider.curslider.type = document.getElementById("shaderegions"+normslider.curslider.id).value;
 	normslider.curslider.outnode = document.getElementById(normslider.outputid);
 	normslider.curslider.startpos = getMouseOffset(normslider.curslider.el,ev);
@@ -1488,7 +1488,7 @@ function onsliderstart(ev) {
 	}
 	normslider.curslider.el.parentNode.style.cursor = 'pointer';
 	var parentpos = getPosition(normslider.curslider.el.parentNode);
-	ev.preventDefault();
+	if (ev.preventDefault) {ev.preventDefault()};
 	return false;
 }
 function onsliderchange(ev) {
@@ -1503,7 +1503,7 @@ function onsliderchange(ev) {
 	
 	normupdatevalues(id);
 	
-	ev.preventDefault();
+	if (ev.preventDefault) {ev.preventDefault()};
 	return false;
 }
 function onsliderstop(ev) {

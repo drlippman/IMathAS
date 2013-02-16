@@ -2427,13 +2427,16 @@ if (!isset($_POST['embedpostback'])) {
 				foreach ($endmsg['msgs'] as $sc=>$msg) { //array must be reverse sorted
 					if (($endmsg['type']==0 && $total>=$sc) || ($endmsg['type']==1 && $average>=$sc)) {
 						$outmsg = $msg;
-						if (strpos($msg,'redirectto:')!==false) {
-							$redirecturl = trim(substr($msg,11));
-							echo "<input type=\"button\" value=\"Continue\" onclick=\"window.location.href='$redirecturl'\"/>";
-							return false;
-						}
 						break;
 					}
+				}
+				if ($outmsg=='') {
+					$outmsg = $endmsg['def'];
+				}
+				if (strpos($outmsg,'redirectto:')!==false) {
+					$redirecturl = trim(substr($outmsg,11));
+					echo "<input type=\"button\" value=\"Continue\" onclick=\"window.location.href='$redirecturl'\"/>";
+					return false;
 				}
 			}
 		}
