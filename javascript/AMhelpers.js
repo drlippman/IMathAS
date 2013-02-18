@@ -466,15 +466,15 @@ function AMpreview(inputId,outputId) {
    var dispstr = str;
    
   for (var i=0; i<vars.length; i++) {
-	  if (vars[i].charCodeAt(0)>96) { //lowercase
+  	  if (vars[i].charCodeAt(0)>96) { //lowercase
 		  if (arraysearch(vars[i].toUpperCase(),vars)==-1) {
-			vars[i] = vars[i].toLowerCase();
+			//vars[i] = vars[i].toLowerCase();
 			str = str.replace(new RegExp(vars[i],"gi"),vars[i]);	  
 		  }
 	  } else {
-		   if (arraysearch(vars[i].toLowerCase(),vars)==-1) {
-			vars[i] = vars[i].toLowerCase();
-			str = str.replace(new RegExp(vars[i],"gi"),vars[i]);	  
+	  	  if (arraysearch(vars[i].toLowerCase(),vars)==-1) {
+		   	//vars[i] = vars[i].toLowerCase();
+		   	str = str.replace(new RegExp(vars[i],"gi"),vars[i]);	  
 		  }
 	  }
   }
@@ -491,7 +491,7 @@ function AMpreview(inputId,outputId) {
 				break;
 			  }
 		  }
-		  if (!isgreek) {
+		  if (!isgreek && !vars[i].match(/^(\w)_\d+$/)) {
 			  varstoquote.push(vars[i]);
 		  }
 	  }
@@ -615,7 +615,7 @@ function AMmathpreview(inputId,outputId) {
  
 }
 
-var greekletters = ['alpha','beta','delta','epsilon','gamma','phi','psi','sigma','rho','theta'];
+var greekletters = ['alpha','beta','delta','epsilon','gamma','phi','psi','sigma','rho','theta','lambda','mu','nu'];
 var calctoproc = {};
 var intcalctoproc = {};
 var calcformat = {};
@@ -773,7 +773,7 @@ function doonsubmit(form,type2,skipconfirm) {
 					  str = str.replace(new RegExp(vars[j],"gi"),vars[j]);	  
 				  }
 			  } else {
-				   if (arraysearch(vars[j].toLowerCase(),vars)==-1) {
+				  if (arraysearch(vars[j].toLowerCase(),vars)==-1) {
 					vars[j] = vars[j].toLowerCase();
 					str = str.replace(new RegExp(vars[j],"gi"),vars[j]);	  
 				  }
