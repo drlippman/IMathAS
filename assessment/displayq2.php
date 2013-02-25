@@ -1283,6 +1283,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$ovar = array();
 		$ofunc = array();
 		for ($i = 0; $i < count($variables); $i++) {
+			$variables[$i] = trim($variables[$i]);
 			if (strpos($variables[$i],'(')===false) {
 				$ovar[] = $variables[$i];
 			} else {
@@ -3032,6 +3033,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$variables = explode(",",$variables);
 		$ofunc = array();
 		for ($i = 0; $i < count($variables); $i++) {
+			$variables[$i] = trim($variables[$i]);
 			//find f() function variables
 			if (strpos($variables[$i],'(')!==false) {
 				$ofunc[] = substr($variables[$i],0,strpos($variables[$i],'('));

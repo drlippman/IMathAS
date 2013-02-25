@@ -1277,17 +1277,26 @@ function getPosition(e){
 	return {x:left, y:top};
 }
 
+function drawTouchCatch(ev) {
+	hasTouch = true;
+	drawMouseDown(ev);
+	document.addEventListener('touchstart',drawMouseDown);
+	document.addEventListener('touchmove',drawMouseMove);
+	document.addEventListener('touchend',drawMouseUp);
+	document.removeEventListener('touchstart',drawTouchCatch);
+	document.onmousedown = null;
+	document.onmouseup =  null;
+	document.onmousemove = null;
+}
+
 function initCanvases(k) {
-	hasTouch = 'ontouchstart' in document.documentElement;
-	if (hasTouch) {
-		document.addEventListener('touchstart',drawMouseDown);
-		document.addEventListener('touchmove',drawMouseMove);
-		document.addEventListener('touchend',drawMouseUp);
-	} else {
-		document.onmousedown =  drawMouseDown;
-		document.onmouseup =  drawMouseUp;
-		document.onmousemove = drawMouseMove;
+	if (document.addEventListener) {
+		document.addEventListener('touchstart',drawTouchCatch);	
 	}
+	document.onmousedown =  drawMouseDown;
+	document.onmouseup =  drawMouseUp;
+	document.onmousemove = drawMouseMove;
+	
 	try {
 		
 		CanvasRenderingContext2D.prototype.dashedLine = function(x1, y1, x2, y2, dashLen) {
