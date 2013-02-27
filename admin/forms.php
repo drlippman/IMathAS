@@ -115,6 +115,7 @@ switch($_GET['action']) {
 			$msgset = $line['msgset']%5;
 			$msgmonitor = (floor($line['msgset']/5))&1;
 			$msgQtoInstr = (floor($line['msgset']/5))&2;
+			$toolset = $line['toolset'];
 			$cploc = $line['cploc'];
 			$theme = $line['theme'];
 			$topbar = explode('|',$line['topbar']);
@@ -139,6 +140,7 @@ switch($_GET['action']) {
 			
 			$copyrights = isset($CFG['CPS']['copyrights'])?$CFG['CPS']['copyrights'][0]:0;
 			$msgset = isset($CFG['CPS']['msgset'])?$CFG['CPS']['msgset'][0]:0;
+			$toolset = isset($CFG['CPS']['toolset'])?$CFG['CPS']['toolset'][0]:0;
 			$msgmonitor = (floor($msgset/5))&1;
 			$msgQtoInstr = (floor($msgset/5))&2;
 			$msgset = $msgset%5;
@@ -309,6 +311,18 @@ switch($_GET['action']) {
 			//<br/><input type=checkbox name="msgqtoinstr" value="1" ';
 			//if ($msgQtoInstr==2) { echo "checked=1";}
 			//echo '/> Enable &quot;Message instructor about this question&quot; links
+			echo '</span><br class=form />';
+		}
+		if (!isset($CFG['CPS']['toolset']) || $CFG['CPS']['toolset'][1]==1) {
+			echo "<span class=form>Navigation Links for Students:</span><span class=formright>";
+			echo '<input type="checkbox" name="toolset-cal" value="1" ';
+			if (($toolset&1)==0) { echo 'checked="checked"';}
+			echo '> Calendar<br/>';
+			
+			echo '<input type="checkbox" name="toolset-forum" value="2" ';
+			if (($toolset&2)==0) { echo 'checked="checked"';}
+			echo '> Forum List';
+			
 			echo '</span><br class=form />';
 		}
 		

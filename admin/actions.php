@@ -197,6 +197,11 @@ switch($_GET['action']) {
 		}
 		$topbar = implode('|',$topbar);
 		
+		if (isset($CFG['CPS']['toolset']) && $CFG['CPS']['toolset'][1]==0) {
+			$toolset = $CFG['CPS']['toolset'][0];
+		} else {
+			$toolset = 1*!isset($_POST['toolset-cal']) + 2*!isset($_POST['toolset-forum']);
+		}
 		
 		if (isset($CFG['CPS']['cploc']) && $CFG['CPS']['cploc'][1]==0) {
 			$cploc = $CFG['CPS']['cploc'][0];
@@ -210,14 +215,14 @@ switch($_GET['action']) {
 		
 		if ($_GET['action']=='modify') {
 			$query = "UPDATE imas_courses SET name='{$_POST['coursename']}',enrollkey='{$_POST['ekey']}',hideicons='$hideicons',available='$avail',lockaid='{$_POST['lockaid']}',picicons='$picicons',chatset=$chatset,showlatepass=$showlatepass,";
-			$query .= "allowunenroll='$unenroll',copyrights='$copyrights',msgset='$msgset',topbar='$topbar',cploc='$cploc',theme='$theme',ltisecret='{$_POST['ltisecret']}' WHERE id='{$_GET['id']}'";
+			$query .= "allowunenroll='$unenroll',copyrights='$copyrights',msgset='$msgset',toolset='$toolset',topbar='$topbar',cploc='$cploc',theme='$theme',ltisecret='{$_POST['ltisecret']}' WHERE id='{$_GET['id']}'";
 			if ($myrights<75) { $query .= " AND ownerid='$userid'";}
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		} else {
 			$blockcnt = 1;
 			$itemorder = addslashes(serialize(array()));
-			$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,chatset,showlatepass,itemorder,topbar,cploc,available,theme,ltisecret,blockcnt) VALUES ";
-			$query .= "('{$_POST['coursename']}','$userid','{$_POST['ekey']}','$hideicons','$picicons','$unenroll','$copyrights','$msgset',$chatset,$showlatepass,'$itemorder','$topbar','$cploc','$avail','$theme','{$_POST['ltisecret']}','$blockcnt');";
+			$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,toolset,chatset,showlatepass,itemorder,topbar,cploc,available,theme,ltisecret,blockcnt) VALUES ";
+			$query .= "('{$_POST['coursename']}','$userid','{$_POST['ekey']}','$hideicons','$picicons','$unenroll','$copyrights','$msgset',$toolset,$chatset,$showlatepass,'$itemorder','$topbar','$cploc','$avail','$theme','{$_POST['ltisecret']}','$blockcnt');";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			$cid = mysql_insert_id();
 			//if ($myrights==40) {
