@@ -153,6 +153,7 @@ if (!isset($coursetopbar)) {
 	if (!isset($coursetopbar[2])) { $coursetopbar[2] = 0;}
 	if ($coursetopbar[0][0] == null) {unset($coursetopbar[0][0]);}
 	if ($coursetopbar[1][0] == null) {unset($coursetopbar[1][0]);}
+	$coursetoolset = $sessiondata['coursetoolset'];
 }		
 
 if (isset($cid) && !isset($flexwidth) && (!isset($sessiondata['intreereader']) || $sessiondata['intreereader']==false) && $sessiondata['isteacher'] && $coursetopbar[2]==1 && count($coursetopbar[1])>0) {
@@ -162,7 +163,7 @@ if (isset($cid) && !isset($flexwidth) && (!isset($sessiondata['intreereader']) |
 	if (in_array(0,$coursetopbar[1]) && $msgset<4) { //messages
 		echo "<li><a href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a></li> ";
 	}
-	if (in_array(6,$coursetopbar[1])) { //Forums
+	if (in_array(6,$coursetopbar[1]) && (($coursetoolset&2)==0 || !isset($CFG['CPS']['topbar']) || $CFG['CPS']['topbar'][1]==1)) { //Forums
 		echo "<li><a href=\"$imasroot/forums/forums.php?cid=$cid\">Forums</a></li>";
 	}
 	if (in_array(1,$coursetopbar[1])) { //Stu view
@@ -177,7 +178,7 @@ if (isset($cid) && !isset($flexwidth) && (!isset($sessiondata['intreereader']) |
 	if (in_array(7,$coursetopbar[1])) { //Groups
 		echo "<li><a href=\"$imasroot/course/managestugrps.php?cid=$cid\">Groups</a></li>\n";
 	}
-	if (in_array(4,$coursetopbar[1])) { //Calendar
+	if (in_array(4,$coursetopbar[1])  && (($coursetoolset&1)==0 || !isset($CFG['CPS']['topbar']) || $CFG['CPS']['topbar'][1]==1)) { //Calendar
 		echo "<li><a href=\"$imasroot/course/showcalendar.php?cid=$cid\">Calendar</a></li>\n";
 	}
 	if (in_array(5,$coursetopbar[1])) { //Quickview

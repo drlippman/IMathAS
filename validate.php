@@ -13,7 +13,7 @@
  ini_set('auto_detect_line_endings',true);
  
  if ($_SERVER['HTTP_HOST'] != 'localhost') {
- 	 session_set_cookie_params(0, '/', '.'.implode('.',array_slice(explode('.',$_SERVER['HTTP_HOST']),-2)));
+ 	 session_set_cookie_params(0, '/', '.'.implode('.',array_slice(explode('.',$_SERVER['HTTP_HOST']),isset($CFG['GEN']['domainlevel'])?$CFG['GEN']['domainlevel']:-2)));
  }
  
  session_start();
@@ -440,7 +440,7 @@ END;
 		
 			}
 		}
-		$query = "SELECT imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme,imas_courses.newflag,imas_courses.msgset,imas_courses.topbar ";
+		$query = "SELECT imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme,imas_courses.newflag,imas_courses.msgset,imas_courses.topbar,imas_courses.toolset ";
 		$query .= "FROM imas_courses,imas_users WHERE imas_courses.id='{$_GET['cid']}' AND imas_users.id=imas_courses.ownerid";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		if (mysql_num_rows($result)>0) {
@@ -452,6 +452,7 @@ END;
 			$coursetopbar = explode('|',$crow[8]);
 			$coursetopbar[0] = explode(',',$coursetopbar[0]);
 			$coursetopbar[1] = explode(',',$coursetopbar[1]);
+			$coursetoolset = $crow[9];
 			if (!isset($coursetopbar[2])) { $coursetopbar[2] = 0;}
 			if ($coursetopbar[0][0] == null) {unset($coursetopbar[0][0]);}
 			if ($coursetopbar[1][0] == null) {unset($coursetopbar[1][0]);}

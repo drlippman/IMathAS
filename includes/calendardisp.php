@@ -40,6 +40,8 @@ $dayofweek = tzdate('w',$today);
 $curmonum = tzdate('n',$today);
 $dayofmo = tzdate('j',$today);
 $curyr = tzdate('Y',$today);
+$midtoday = mktime(12,0,0,$curmonum,$dayofmo,$curyr);
+
 
 $hdrs = array();
 $ids = array();
@@ -49,7 +51,7 @@ for ($i=0;$i<7*$callength;$i++) {
 	$row = floor($i/7);
 	$col = $i%7;
 	
-	list($thismo,$thisday,$thismonum,$datestr) = explode('|',tzdate('M|j|n|l F j, Y',$today - ($dayofweek - $i)*24*60*60));
+	list($thismo,$thisday,$thismonum,$datestr) = explode('|',tzdate('M|j|n|l F j, Y',$midtoday - ($dayofweek - $i)*24*60*60));
 	if ($thismo==$lastmo) {
 		$hdrs[$row][$col] = $thisday;
 	} else {
@@ -379,7 +381,7 @@ for ($i=0;$i<count($hdrs);$i++) {
 		if ($i==0 && $j==$dayofweek && $pageshift==0) { //onmouseover="makebig(this)"
 			echo '<td id="'.$ids[$i][$j].'" onclick="showcalcontents(this)" class="today"><div class="td"><span class=day>'.$hdrs[$i][$j]."</span><div class=center>";
 		} else {
-			$addr = $refpage.".php?cid=$cid&calstart=". ($today + $i*7*24*60*60 + ($j - $dayofweek)*24*60*60);
+			$addr = $refpage.".php?cid=$cid&calstart=". ($midtoday + $i*7*24*60*60 + ($j - $dayofweek)*24*60*60);
 			echo '<td id="'.$ids[$i][$j].'" onclick="showcalcontents(this)" ><div class="td"><span class=day><a href="'.$addr.'">'.$hdrs[$i][$j]."</a></span><div class=center>";
 		}
 		if (isset($assess[$ids[$i][$j]])) {
@@ -409,7 +411,7 @@ for ($i=0;$i<count($hdrs);$i++) {
 echo "</tbody></table>";
 
 echo "<div style=\"margin-top: 10px; padding:10px; border:1px solid #000;\">";
-echo '<span class=right><a href="#" onclick="showcalcontents('.(1000*($today - $dayofweek*24*60*60)).'); return false;"/>Show all</a></span>';
+echo '<span class=right><a href="#" onclick="showcalcontents('.(1000*($midtoday - $dayofweek*24*60*60)).'); return false;"/>Show all</a></span>';
 echo "<div id=\"caleventslist\"></div><div class=\"clear\"></div></div>";
 if ($pageshift==0) {
 	echo "<script>showcalcontents(document.getElementById('{$ids[0][$dayofweek]}'));</script>";
