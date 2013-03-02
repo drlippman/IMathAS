@@ -15,6 +15,11 @@
  if ($_SERVER['HTTP_HOST'] != 'localhost') {
  	 session_set_cookie_params(0, '/', '.'.implode('.',array_slice(explode('.',$_SERVER['HTTP_HOST']),isset($CFG['GEN']['domainlevel'])?$CFG['GEN']['domainlevel']:-2)));
  }
+ if (isset($CFG['GEN']['randfunc'])) {
+ 	 $randf = $CFG['GEN']['randfunc'];
+ } else {
+ 	 $randf = 'rand';
+ }
  
  session_start();
  $sessionid = session_id();
@@ -336,9 +341,13 @@ END;
 	$userfullname = $line['FirstName'] . ' ' . $line['LastName'];
 	$previewshift = -1;
 	$basephysicaldir = rtrim(dirname(__FILE__), '/\\');
-	if ($myrights==100 && isset($_GET['debug'])) {
+	if ($myrights==100 && (isset($_GET['debug']) || isset($sessiondata['debugmode']))) {
 		ini_set('display_errors',1);
-		error_reporting(E_ALL);
+		error_reporting(E_ALL ^ E_NOTICE);
+		if (isset($_GET['debug'])) {
+			$sessiondata['debugmode'] = true;
+			writesessiondata();
+		}
 	}
 	if (isset($_GET['useflash'])) {
 		$sessiondata['useflash'] = true;
