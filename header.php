@@ -57,9 +57,9 @@ if (!isset($sessiondata['mathdisp'])) {
 	if ($mathdarkbg) {echo 'var mathbg = "dark";';}
 	echo '</script>'; 
 	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=122912\" type=\"text/javascript\"></script>\n";
-	echo "<script type=\"text/javascript\">var usingASCIIMath = false;</script>";
+	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true;</script>";
 } else {
-	echo "<script type=\"text/javascript\">var usingASCIIMath = false;</script>";
+	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true;</script>";
 }
 if (isset($sessiondata['graphdisp']) && $sessiondata['graphdisp']==1) {
 	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?ver=091311\" type=\"text/javascript\"></script>\n";
@@ -67,7 +67,7 @@ if (isset($sessiondata['graphdisp']) && $sessiondata['graphdisp']==1) {
 	//echo "<script src=\"$imasroot/course/editor/plugins/AsciiSvg/ASCIIsvgAddon.js\" type=\"text/javascript\"></script>\n";
 } else if (isset($sessiondata['graphdisp'])) {
 	echo "<script src=\"$imasroot/javascript/mathjs.js\" type=\"text/javascript\"></script>\n";
-	echo "<script type=\"text/javascript\">var usingASCIISvg = false;</script>";
+	echo "<script type=\"text/javascript\">var usingASCIISvg = false; var ASnoSVg=true;</script>";
 }
 }
 

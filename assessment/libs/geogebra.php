@@ -19,7 +19,7 @@ array_push($allowedmacros,"addGeogebra","addGeogebraJava");
 //  (1-indexed - usually use $thisq) and if multipart, part number (0-indexed)
 function addGeogebra($url,$width=400,$height=200,$commands=array(),$params=array(),$callback=null,$qn=null,$part=null) {
 	$out = '';
-	//if ($GLOBALS['inquestiondisplay'] == false) {return '';}
+	if ($GLOBALS['inquestiondisplay'] == false) {return '';}
 	if (!isset($GLOBALS['geogebracount'])) {
 		$GLOBALS['geogebracount'] = 0;
 		$out .= '<script type="text/javascript" src="http://www.geogebra.org/web/4.2/web/web.nocache.js"></script>';
