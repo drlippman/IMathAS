@@ -4,7 +4,7 @@
 
 
 array_push($allowedmacros,"exp","sec","csc","cot","sech","csch","coth","nthlog","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif","in_array","prettyint","prettyreal","prettysigfig","arraystodots","subarray","showdataarray","arraystodoteqns","array_flip","arrayfindindex","fillarray","array_reverse","root","getsnapwidthheight");
-array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","randcity","randcities","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction","ifthen","multicalconarray","htmlentities","formhoverover","formpopup","connectthedots","jointsort","stringpos","stringlen","stringclean","substr","substr_count","str_replace","makexxpretty","makexxprettydisp","forminlinebutton","makenumberrequiretimes","comparenumbers","comparefunctions","getnumbervalue","showrecttable","htmldisp","getstuans","checkreqtimes","stringtopolyterms","getfeedbacktxt","explode","gettwopointlinedata","getdotsdata","gettwopointdata","getlinesdata","adddrawcommand","array_unique");
+array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","randcity","randcities","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction","ifthen","multicalconarray","htmlentities","formhoverover","formpopup","connectthedots","jointsort","stringpos","stringlen","stringclean","substr","substr_count","str_replace","makexxpretty","makexxprettydisp","forminlinebutton","makenumberrequiretimes","comparenumbers","comparefunctions","getnumbervalue","showrecttable","htmldisp","getstuans","checkreqtimes","stringtopolyterms","getfeedbacktxt","getfeedbacktxtessay","getfeedbacktxtnumber","explode","gettwopointlinedata","getdotsdata","gettwopointdata","getlinesdata","adddrawcommand","array_unique");
 function mergearrays($a,$b) {
 	if (!is_array($a)) {
 		$a = array($a);
@@ -2589,6 +2589,49 @@ function getfeedbacktxt($stu,$fbtxt,$ans) {
 		}
 	}
 }
+
+function getfeedbacktxtessay($stu,$fbtxt) {
+	if ($stu==null || trim($stu)=='') {
+		return '';
+	} else {
+		return '<span class="feedbackwrap correct">'.$fbtxt.'</span>';
+	}
+}
+
+function getfeedbacktxtnumber($stu, $partial, $fbtxt, $deffb, $tol=.001) {
+	global $imasroot;
+	if ($stu===null) {
+		return " ";
+	} else if (!is_numeric($stu)) {
+		return '<span class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif"/> This answer does not appear to be a valid number.</span>';
+	} else {
+		if ($tol{0}=='|') {
+			$abstol = true;
+			$tol = substr($tol,1);
+		} else {
+			$abstol =false;
+		}
+		$match = -1;
+		if (!is_array($partial)) { $partial = explode(',',$partial);}
+		for ($i=0;$i<count($partial);$i+=2) {
+			if ($abstol) {
+				if (abs($stu-$partial[$i]) < $tol + 1E-12) { $match = $i; break;}
+			} else {
+				if (abs($stu - $partial[$i])/(abs($partial[$i])+.0001) < $tol+ 1E-12) {$match = $i; break;}
+			}
+		}
+		if ($match>-1) {
+			if ($partial[$i+1]<1) {
+				return '<span class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif"/> '.$fbtxt[$i/2].'</span>';
+			} else {
+				return '<span class="feedbackwrap correct"><img src="'.$imasroot.'/img/gchk.gif"/> '.$fbtxt[$i/2].'</span>';
+			}
+		} else {
+			return '<span class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif"/> '.$deffb.'</span>';
+		}
+	}
+}
+
 
 function gettwopointlinedata($str,$xmin=-5,$xmax=5,$ymin=-5,$ymax=5,$w=300,$h=300) {
 	return gettwopointdata($str,'line',$xmin,$xmax,$ymin,$ymax,$w,$h);

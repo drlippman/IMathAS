@@ -245,6 +245,19 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 					while ($row = mysql_fetch_row($result)) {
 						echo "<option value=\"{$row[0]}\">{$row[2]}, {$row[1]}</option>";
 					}
+					$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM ";
+					$query .= "imas_users,imas_tutors WHERE imas_users.id=imas_tutors.userid AND ";
+					$query .= "imas_tutors.courseid='$cid' ";
+					if (!$isteacher && $studentinfo['section']!=null) {
+						$query .= "AND (imas_tutors.section='".addslashes($studentinfo['section'])."' OR imas_tutors.section='') ";
+					}
+					$query .= "ORDER BY imas_users.LastName";
+					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+					while ($row = mysql_fetch_row($result)) {
+						echo "<option value=\"{$row[0]}\">{$row[2]}, {$row[1]}</option>";
+					} 
+					
+					
 				}
 				if ($isteacher || $msgset==0 || $msgset==2) {
 					$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM ";
