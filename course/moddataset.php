@@ -550,11 +550,12 @@
 	$placeinhead .= '<script type="text/javascript">
 	  var editoron = 0;
 	  var coursetheme = "'.$coursetheme.'";';
-	if (isset($AWSkey)) {
+	if (!isset($CFG['GEN']['noFileBrowser'])) {
 		$placeinhead .= 'var fileBrowserCallBackFunc = "fileBrowserCallBack";';
 	} else {
 		$placeinhead .= 'var fileBrowserCallBackFunc = null;';
 	}
+
 	$placeinhead .= 'function toggleeditor() {
 	     var qtextbox =  document.getElementById("qtext");
 	     if (editoron==0) {

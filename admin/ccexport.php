@@ -145,7 +145,7 @@ if (isset($_GET['delete'])) {
 					if ($linktype=="canvas") {
 						fwrite($fp,'<meta name="editing_roles" content="teachers"/>');
 					}
-					fwrite($fp,"</body></html>");
+					fwrite($fp,"</head><body>");
 					fwrite($fp,filtercapture($row[1],$res));
 					if ($row[2]!='') {
 						fwrite($fp,'<ul>');
@@ -537,9 +537,9 @@ if (isset($_GET['delete'])) {
 	echo 'to create an account on this system) or placein_###_1 (if you want students to only be able to log in through the LMS), where ### is ';
 	echo 'replaced with your course key.  If you do not see the LTI key setting in your course settings, then your system administrator does ';
 	echo 'not have LTI enabled on your system, and you cannot use this feature.</p>';
-	echo "<p><a href=\"ccexport.php?cid=$cid&create=true&type=custom\">Create CC Export</a> with LTI placements as custom fields</p>";
-	//echo "<p><a href=\"ccexport.php?cid=$cid&create=true&type=url\">Create CC Export</a> with LTI placements in URLs</p>";
-	echo "<p><a href=\"ccexport.php?cid=$cid&create=true&type=canvas\">Create CC+custom Export</a> that should work with Canvas</p>";
+	echo "<p><a href=\"ccexport.php?cid=$cid&create=true&type=custom\">Create CC Export</a> with LTI placements as custom fields (works in BlackBoard)</p>";
+	echo "<p><a href=\"ccexport.php?cid=$cid&create=true&type=url\">Create CC Export</a> with LTI placements in URLs (works in Moodle)</p>";
+	echo "<p><a href=\"ccexport.php?cid=$cid&create=true&type=canvas\">Create CC+custom Export</a> (works in Canvas)</p>";
 	
 }
 require("../footer.php");

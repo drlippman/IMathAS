@@ -2645,6 +2645,8 @@ function gettwopointdata($str,$type,$xmin=-5,$xmax=5,$ymin=-5,$ymax=5,$w=300,$h=
 		$code = 6.5;
 	} else if ($type=='abs') {
 		$code = 8;
+	} else if ($type=='exp') {
+		$code = 8.3;
 	} else if ($type=='circle') {
 		$code = 7;
 	} else if ($type=='sin') {
