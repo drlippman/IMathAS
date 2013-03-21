@@ -312,23 +312,42 @@ if (isset($_GET['modify'])) { //adding or modifying post
 					$message = preg_replace('/(`[^`]*`)/',"<span class=\"AM\">$1</span>",$message);
 					
 					$line['message'] = '<p> </p><br/><hr/>'.$message;
-	
 					if (isset($parts[3])) {  
-						$query = "SELECT name FROM imas_assessments WHERE id='".intval($parts[3])."'";
+						$query = "SELECT name,itemorder FROM imas_assessments WHERE id='".intval($parts[3])."'";
 						$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 						$line['subject'] = 'Question about #'.($parts[0]+1).' in '.str_replace('"','&quot;',mysql_result($result,0,0));
+						$itemorder = mysql_result($result,0,1);
+						$isgroupedq = false;
+						if (strpos($itemorder, '~')!==false) {
+							$itemorder = explode(',',$itemorder);
+							$icnt = 0;
+							foreach ($itemorder as $item) {
+								if (strpos($item,'~')===false) {
+									if ($icnt==$parts[0]) { break;}
+									$icnt++; 
+								} else {
+									$pts = explode('|',$item);
+									if ($parts[0]<$icnt+$pts[0]) { 
+										$isgroupedq = true; break;
+									}
+									$icnt += $pts[0];
+								}
+							}
+						} 
 						
-						$query = "SELECT ift.id FROM imas_forum_posts AS ifp JOIN imas_forum_threads AS ift ON ifp.threadid=ift.id AND ifp.parent=0 ";
-						$query .= "WHERE ifp.subject='".addslashes($line['subject'])."' AND ift.forumid='$forumid'";
-						if ($groupsetid >0 && !$isteacher) {
-							$query .= " AND ift.stugroupid='$groupid'";
-						}
-						$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-						if (mysql_num_rows($result)>0) {
-							$notice =  '<span style="color:red;font-weight:bold">This question has already been posted about.</span><br/>';
-							$notice .= 'Please read and participate in the existing discussion.';
-							while ($row = mysql_fetch_row($result)) {
-								$notice .=  "<br/><a href=\"posts.php?cid=$cid&forum=$forumid&thread={$row[0]}\">{$line['subject']}</a>";
+						if (!$isgroupedq) {
+							$query = "SELECT ift.id FROM imas_forum_posts AS ifp JOIN imas_forum_threads AS ift ON ifp.threadid=ift.id AND ifp.parent=0 ";
+							$query .= "WHERE ifp.subject='".addslashes($line['subject'])."' AND ift.forumid='$forumid'";
+							if ($groupsetid >0 && !$isteacher) {
+								$query .= " AND ift.stugroupid='$groupid'";
+							}
+							$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+							if (mysql_num_rows($result)>0) {
+								$notice =  '<span style="color:red;font-weight:bold">This question has already been posted about.</span><br/>';
+								$notice .= 'Please read and participate in the existing discussion.';
+								while ($row = mysql_fetch_row($result)) {
+									$notice .=  "<br/><a href=\"posts.php?cid=$cid&forum=$forumid&thread={$row[0]}\">{$line['subject']}</a>";
+								}
 							}
 						}
 					}	

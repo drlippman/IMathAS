@@ -1598,13 +1598,16 @@ if (!isset($_POST['embedpostback'])) {
 						echo printscore($bestscores[$qn],$qn);
 						if ($GLOBALS['questionmanualgrade'] == true) {
 							echo '<br/><strong>Note:</strong> This question contains parts that can not be auto-graded.  Those parts will show a score of 0 until they are graded by your instructor';
-						}
+						} 
 						echo "</p>";
 						
-						$colors = scorestocolors($rawscore,$qi[$questions[$qn]]['points'],$qi[$questions[$qn]]['answeights']);
+						
 					} else {
 						echo '<p>Question scored.</p>';
 					}
+				}
+				if ($showeachscore && $GLOBALS['questionmanualgrade'] != true) {
+					$colors = scorestocolors($rawscore,$qi[$questions[$qn]]['points'],$qi[$questions[$qn]]['answeights']);
 				}
 				
 				
