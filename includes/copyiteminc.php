@@ -222,7 +222,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		}
 	} else if ($itemtype == "Calendar") {
 		$newtypeid = 0;	
-	}
+	} 
 	$query = "INSERT INTO imas_items (courseid,itemtype,typeid) ";
 	$query .= "VALUES ('$cid','$itemtype',$newtypeid)";
 	mysql_query($query) or die("Query failed :$query " . mysql_error());
@@ -245,6 +245,7 @@ function copysub($items,$parent,&$addtoarr,$gbcats,$sethidden=false) {
 				$newblock['colors'] = $item['colors'];
 				$newblock['public'] = $item['public'];
 				$newblock['fixedheight'] = $item['fixedheight'];
+				$newblock['grouplimit'] = $item['grouplimit'];
 				$newblock['items'] = array();
 				if (count($item['items'])>0) {
 					copysub($item['items'],$parent.'-'.($k+1),$newblock['items'],$gbcats,$sethidden);
@@ -307,6 +308,7 @@ function copyallsub($items,$parent,&$addtoarr,$gbcats,$sethidden=false) {
 			$newblock['colors'] = $item['colors'];
 			$newblock['public'] = $item['public'];
 			$newblock['fixedheight'] = $item['fixedheight'];
+			$newblock['grouplimit'] = $item['grouplimit'];
 			$newblock['items'] = array();
 			if (count($item['items'])>0) {
 				copyallsub($item['items'],$parent.'-'.($k+1),$newblock['items'],$gbcats,$sethidden);

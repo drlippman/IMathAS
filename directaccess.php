@@ -2,7 +2,13 @@
 //IMathAS:  Course direct access - redirects to course page or presents 
 //login / new student page specific for course
 //(c) 2007 David Lippman
-	if (!isset($_GET['cid'])) {
+	$curdir = rtrim(dirname(__FILE__), '/\\');
+	 if (!file_exists("$curdir/config.php")) {
+		 header('Location: http://' . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/install.php");
+	 }
+ 	require_once("$curdir/config.php");
+ 
+ 	if (!isset($_GET['cid'])) {
 		echo "Invalid address.  Address must be directaccess.php?cid=###, where ### is your courseid";
 		exit;
 	}

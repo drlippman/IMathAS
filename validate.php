@@ -64,9 +64,9 @@
 		 }
 	 } else {
 		 if (isset($_SERVER['QUERY_STRING'])) {
-			 $querys = '?'.$_SERVER['QUERY_STRING'];
+			 $querys = '?'.$_SERVER['QUERY_STRING'].(isset($addtoquerystring)?'&'.$addtoquerystring:'');
 		 } else {
-			 $querys = '';
+			 $querys = (isset($addtoquerystring)?'?'.$addtoquerystring:'');
 		 }
 		 if (isset($_POST['skip']) || isset($_POST['isok'])) {
 			 $sessiondata['useragent'] = $_SERVER['HTTP_USER_AGENT'];
@@ -283,9 +283,9 @@ END;
 		 $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		 
 		 if (isset($_SERVER['QUERY_STRING'])) {
-			 $querys = '?'.$_SERVER['QUERY_STRING'];
+			 $querys = '?'.$_SERVER['QUERY_STRING'].(isset($addtoquerystring)?'&'.$addtoquerystring:'');
 		 } else {
-			 $querys = '';
+			 $querys = (isset($addtoquerystring)?'?'.$addtoquerystring:'');
 		 }
 		 //$now = time();
 		 //$query = "INSERT INTO imas_log (time,log) VALUES ($now,'$userid from IP: {$_SERVER['REMOTE_ADDR']}')";
@@ -499,7 +499,7 @@ END;
  }
  
  if (!$verified) {
-	if (strpos(basename($_SERVER['SCRIPT_NAME']),'directaccess.php')===false) {
+	if (!isset($skiploginredirect) && strpos(basename($_SERVER['SCRIPT_NAME']),'directaccess.php')===false) {
 		if (!isset($loginpage)) {
 			 $loginpage = "loginpage.php";
 		}

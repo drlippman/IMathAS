@@ -54,6 +54,11 @@ function delitembyid($itemid) {
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		$query = "DELETE FROM imas_assessments WHERE id='$typeid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
+	} else if ($itemtype == "Drill") {
+		$query = "DELETE FROM imas_drillassess_sessions WHERE drillassessid='$typeid'";
+		mysql_query($query) or die("Query failed : " . mysql_error());
+		$query = "DELETE FROM imas_drillassess WHERE id='$typeid'";
+		mysql_query($query) or die("Query failed : " . mysql_error());
 	}
 	$query = "DELETE FROM imas_items WHERE id='$itemid'";
 	mysql_query($query) or die("Query failed : " . mysql_error());

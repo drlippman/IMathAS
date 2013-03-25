@@ -58,6 +58,7 @@ if (isset($_POST['text'])) {
 			$qtol[$n] = (($_POST['qtol'.$n]=='abs')?'|':'') . $_POST['tol'.$n];
 			$feedbacktxtdef[$n] = $_POST['fb'.$n.'-def'];
 			$answer[$n] = $_POST['txt'.$n.'-'.$_POST['ans'.$n]];
+			$_POST['pc'.$n.'-'.$_POST['ans'.$n]] = 1;
 		}
 		for ($i=0;$i<$qparts[$n];$i++) {
 			if ($qtypes[$n] == 'choices') {

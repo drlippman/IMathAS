@@ -351,30 +351,38 @@
 			exit;
 		}
 		$cid = $_GET['cid'];
-		$query = "DELETE FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
-		$query = "SELECT id FROM imas_assessments WHERE courseid='$cid'";
+		$query = "SELECT allowunenroll FROM imas_courses WHERE id='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
-			$query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='{$row[0]}' AND userid='$userid'";
+		if (mysql_result($result,0,0)==1) {
+			$query = "DELETE FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
-			$query = "DELETE FROM imas_exceptions WHERE assessmentid='{$row[0]}' AND userid='$userid'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-		}
-		$query = "SELECT id FROM imas_gbitems WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
-			$query = "DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid='{$row[0]}' AND userid='$userid'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-		}
-		$query = "SELECT id FROM imas_forums WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
-			$q2 = "SELECT threadid FROM imas_forum_posts WHERE forumid='{$row[0]}'";
-			$r2 = mysql_query($q2) or die("Query failed : " . mysql_error());
-			while ($rw2 = mysql_fetch_row($r2)) {
-				$query = "DELETE FROM imas_forum_views WHERE threadid='{$rw2[0]}' AND userid='$userid'";
+			$query = "SELECT id FROM imas_assessments WHERE courseid='$cid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				$query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='{$row[0]}' AND userid='$userid'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
+				$query = "DELETE FROM imas_exceptions WHERE assessmentid='{$row[0]}' AND userid='$userid'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+			
+			$query = "DELETE FROM imas_drillassess_sessions WHERE drillassessid IN (SELECT id FROM imas_drillassess WHERE courseid='$cid') AND userid='$userid'";
+			mysql_query($query) or die("Query failed : $query" . mysql_error());
+			
+			$query = "SELECT id FROM imas_gbitems WHERE courseid='$cid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				$query = "DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid='{$row[0]}' AND userid='$userid'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+			$query = "SELECT id FROM imas_forums WHERE courseid='$cid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				$q2 = "SELECT threadid FROM imas_forum_posts WHERE forumid='{$row[0]}'";
+				$r2 = mysql_query($q2) or die("Query failed : " . mysql_error());
+				while ($rw2 = mysql_fetch_row($r2)) {
+					$query = "DELETE FROM imas_forum_views WHERE threadid='{$rw2[0]}' AND userid='$userid'";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+				}
 			}
 		}
 	} else if ($_GET['action']=="chguserinfo") {
