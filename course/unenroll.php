@@ -48,7 +48,7 @@ ini_set("max_execution_time", "600");
 			exit;		
 		}
 	} else { //get confirm
-		if (isset($_POST['submit']) && $_POST['submit']=="Unenroll") {
+		if ((isset($_POST['submit']) && $_POST['submit']=="Unenroll") || (isset($_POST['posted']) && $_POST['posted']=="Unenroll")) {
 			/*if (isset($_POST['ca']) && $secfilter==-1) {
 				//if "check all" and not section limited, mark as all to deliver "all students" message
 				$_GET['uid'] = "all";
