@@ -877,6 +877,14 @@ $sql = 'CREATE TABLE `imas_login_log` (
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 echo 'imas_login_log created<br/>';
 
+$sql = 'CREATE TABLE `imas_log` (
+	`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+	`time` INT( 10 ) UNSIGNED NOT NULL ,
+	`log` TEXT NOT NULL 
+	) ENGINE = InnoDB';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+echo 'imas_log created<br/>';
+
 $sql = 'CREATE TABLE `imas_external_tools` (
 	`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 	`name` VARCHAR( 255 ) NOT NULL ,

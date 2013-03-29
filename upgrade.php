@@ -1,7 +1,7 @@
 <?php  
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 65;
+$latest = 66;
 
 
 @set_time_limit(0);
@@ -1066,6 +1066,18 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 	 mysql_query($query) or die ("can't run $query");
 			 }
 			echo "Moved upgrade counter to database<br/>";
+		}
+		if ($last < 66) {
+			$query = 'CREATE TABLE `imas_log` (
+				`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+				`time` INT( 10 ) UNSIGNED NOT NULL ,
+				`log` TEXT NOT NULL 
+				) ENGINE = InnoDB';
+			$res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 } 
+			echo "Added imas_log table<br/>";
 		}
 		/*$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {
