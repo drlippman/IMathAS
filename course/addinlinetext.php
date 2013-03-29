@@ -6,6 +6,7 @@
 require("../validate.php");
 require("../includes/htmlutil.php");
 require("../includes/parsedatetime.php");
+require("../includes/filehandler.php");
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -86,6 +87,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 
 		require_once("../includes/htmLawed.php");
+		
 		$htmlawedconfig = array('elements'=>'*-script');
 		$_POST['text'] = addslashes(htmLawed(stripslashes($_POST['text']),$htmlawedconfig));
 
@@ -106,8 +108,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$query = "SELECT id FROM imas_instr_files WHERE filename='{$row[2]}'";
 					$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 					if (mysql_num_rows($r2)==0) {
-						$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
-						unlink($uploaddir . $row[2]);
+						//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
+						//unlink($uploaddir . $row[2]);
+						deletecoursefile($row[2]);
 					}
 				} else if ($_POST['filedescr-'.$row[0]]!=$row[1]) {
 					$query = "UPDATE imas_instr_files SET description='{$_POST['filedescr-'.$row[0]]}' WHERE id='{$row[0]}'";
@@ -159,7 +162,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$overwriteBody = 1;
 				$body = "<p>File type is not allowed</p>";
 			} else {
-				$uploadfile = $uploaddir . $filename;
+				/*$uploadfile = $uploaddir . $filename;
 				$t=0;
 				while(file_exists($uploadfile)){
 					$filename = substr($filename,0,strpos($userfilename,"."))."_$t".strstr($userfilename,".");
@@ -169,6 +172,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				
 				if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
 					//echo "<p>File is valid, and was successfully uploaded</p>\n";
+					if (trim($_POST['newfiledescr'])=='') {
+						$_POST['newfiledescr'] = $filename;
+					}
+					$query = "INSERT INTO imas_instr_files (description,filename,itemid) VALUES ('{$_POST['newfiledescr']}','$filename','$newtextid')";
+					mysql_query($query) or die("Query failed :$query " . mysql_error());
+					$addedfile = mysql_insert_id();
+					$_GET['id'] = $newtextid;
+					
+					*/
+				if (($filename=storeuploadedcoursefile('userfile',$cid.'/'.$filename))!==false) {
 					if (trim($_POST['newfiledescr'])=='') {
 						$_POST['newfiledescr'] = $filename;
 					}
@@ -335,7 +348,7 @@ function movefile(from) {
 		foreach ($page_FileLinks as $k=>$arr) {
 			echo generatemoveselect($page_fileorderCount,$k);
 ?>			
-		<a href="<?php echo $imasroot ?>/course/files/<?php echo $arr['link'] ?>" target="_blank">
+		<a href="<?php echo getcoursefileurl($arr['link']); ?>" target="_blank">
 		View</a>
 		<input type="text" name="filedescr-<?php echo $arr['fid'] ?>" value="<?php echo $arr['desc'] ?>"/>
 		Delete? <input type=checkbox name="delfile-<?php echo $arr['fid'] ?>"/><br/>	

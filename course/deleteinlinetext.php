@@ -25,6 +25,7 @@ if (!(isset($teacherid))) {
 	$cid = $_GET['cid'];
 	$block = $_GET['block'];	
 	if ($_GET['remove']=="really") {
+		require("../includes/filehandler.php");
 		$textid = $_GET['id'];
 		
 		$query = "SELECT id FROM imas_items WHERE typeid='$textid' AND itemtype='InlineText'";
@@ -39,13 +40,14 @@ if (!(isset($teacherid))) {
 		
 		$query = "SELECT filename FROM imas_instr_files WHERE itemid='$textid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
+		//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
 		while ($row = mysql_fetch_row($result)) {
 			$safefn = addslashes($row[0]);
 			$query = "SELECT id FROM imas_instr_files WHERE filename='$safefn'";
 			$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (mysql_num_rows($r2)==1) {
-				unlink($uploaddir . $row[0]);
+				//unlink($uploaddir . $row[0]);
+				deletecoursefile($row[0]);
 			}
 		}
 		$query = "DELETE FROM imas_instr_files WHERE itemid='$textid'";

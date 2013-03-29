@@ -87,8 +87,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$htmlawedconfig = array('elements'=>'*-script');
 			$_POST['text'] = addslashes(htmLawed(stripslashes($_POST['text']),$htmlawedconfig));
 		} else if ($_POST['linktype']=='file') {
+			require_once("../includes/filehandler.php");
 			if ($_FILES['userfile']['name']!='') {
-				$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
+				//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
 				//$uploadfile = $uploaddir . "$cid-" . basename($_FILES['userfile']['name']);
 				$userfilename = preg_replace('/[^\w\.]/','',basename($_FILES['userfile']['name']));
 				$filename = $userfilename;
@@ -98,6 +99,21 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$overwriteBody = 1;
 					$body = "<p>File type is not allowed</p>";
 				} else {
+					if ($_FILES['userfile']['error']==1 || $_FILES['userfile']['error']==2) {
+						$errormsg = "File size too large";
+						$_POST['text'] = "File upload error - $errormsg";
+						$uploaderror = true;
+					} else {
+						if (($filename=storeuploadedcoursefile('userfile',$cid.'/'.$filename))===false) {
+							$errormsg = "Try again";
+							$_POST['text'] = "File upload error - $errormsg";
+							$uploaderror = true;
+						} else {
+							$_POST['text'] = "file:$filename";
+						}
+						
+					}
+					/*
 					$uploadfile = $uploaddir . $filename;
 					$t=0;
 					while(file_exists($uploadfile)){ //make sure filename is unused
@@ -123,12 +139,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						$uploaderror = true;
 					}
 					//$_POST['text'] = "file:$cid-" . basename($_FILES['userfile']['name']);
-					
+					*/
 				}
 				
 			} else if (!empty($_POST['curfile'])) {
-				$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
-				if (!file_exists($uploaddir . $_POST['curfile'])) {
+				//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
+				///if (!file_exists($uploaddir . $_POST['curfile'])) {
+				if (!doesfileexist('cfile',$_POST['curfile'])) {
 					$processingerror = true;
 				} else {
 					$_POST['text'] = "file:".$_POST['curfile'];
@@ -163,11 +180,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$query = "SELECT id FROM imas_linkedtext WHERE text='$safetext'"; //any others using file?
 					$result = mysql_query($query) or die("Query failed : " . mysql_error());
 					if (mysql_num_rows($result)==1) { 
-						$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
+						//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
 						$filename = substr($text,5);
-						if (file_exists($uploaddir . $filename)) {
-							unlink($uploaddir . $filename);
-						}
+						deletecoursefile($filename);
+						//if (file_exists($uploaddir . $filename)) {
+						//	unlink($uploaddir . $filename);
+						//}
 					}
 				}
 			}

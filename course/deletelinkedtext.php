@@ -28,6 +28,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$block = $_GET['block'];	
 	
 	if ($_GET['remove']=="really") {
+		require("../includes/filehandler.php");
+		
 		$textid = $_GET['id'];
 		
 		$query = "SELECT id FROM imas_items WHERE typeid='$textid' AND itemtype='LinkedText'";
@@ -45,11 +47,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query = "SELECT id FROM imas_linkedtext WHERE text='$safetext'"; //any others using file?
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (mysql_num_rows($result)==1) { 
-				$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
+				/*$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
 				$filename = substr($text,5);
 				if (file_exists($uploaddir . $filename)) {
 					unlink($uploaddir . $filename);
-				}
+				}*/
+				deletecoursefile(substr($text,5));
 			}
 		}
 		

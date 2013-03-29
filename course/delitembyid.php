@@ -1,6 +1,8 @@
 <?php
+require_once("../includes/filehandler.php");
+	
 function delitembyid($itemid) {
-
+		
 	$query = "SELECT itemtype,typeid FROM imas_items WHERE id='$itemid'";
 	$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 	list($itemtype,$typeid) = mysql_fetch_row($result);
@@ -11,13 +13,14 @@ function delitembyid($itemid) {
 		
 		$query = "SELECT filename FROM imas_instr_files WHERE itemid='$typeid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
+		//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
 		while ($row = mysql_fetch_row($result)) {
 			$safefn = addslashes($row[0]);
 			$query = "SELECT id FROM imas_instr_files WHERE filename='$safefn'";
 			$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (mysql_num_rows($r2)==1) {
-				unlink($uploaddir . $row[0]);
+				//unlink($uploaddir . $row[0]);
+				deletecoursefile($row[0]);
 			}
 		}
 		$query = "DELETE FROM imas_instr_files WHERE itemid='$typeid'";
@@ -33,9 +36,10 @@ function delitembyid($itemid) {
 			$query = "SELECT id FROM imas_linkedtext WHERE text='$safetext'"; //any others using file?
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (mysql_num_rows($result)==1) { 
-				$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
+				//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
 				$filename = substr($text,5);
-				unlink($uploaddir . $filename);
+				//unlink($uploaddir . $filename);
+				deletecoursefile($filename);
 			}
 		}
 		

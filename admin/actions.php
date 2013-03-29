@@ -386,7 +386,8 @@ switch($_GET['action']) {
 					$query = "SELECT id FROM imas_instr_files WHERE filename='$safefn'";
 					$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 					if (mysql_num_rows($r2)==1) {
-						unlink($uploaddir . $row[0]);
+						//unlink($uploaddir . $row[0]);
+						deletecoursefile($row[0]);
 					}
 				}
 				$query = "DELETE FROM imas_instr_files WHERE itemid='{$ilid[0]}'";
@@ -403,9 +404,10 @@ switch($_GET['action']) {
 				$query = "SELECT id FROM imas_linkedtext WHERE text='$safetext'"; //any others using file?
 				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 				if (mysql_num_rows($r2)==1) { 
-					$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/../course/files/';
+					//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/../course/files/';
 					$filename = substr($row[0],5);
-					unlink($uploaddir . $filename);
+					//unlink($uploaddir . $filename);
+					deletecoursefile($filename);
 				}
 			}
 			
@@ -542,10 +544,15 @@ switch($_GET['action']) {
 		if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
 			if (strpos($uploadfile,'.tar.gz')!==FALSE) {
 				include("../includes/tar.class.php");
+				include("../includes/filehandler.php");
 				$tar = new tar();
 				$tar->openTAR($uploadfile);
 				if ($tar->hasFiles()) {
-					$n = $tar->extractToDir("../assessment/qimages/");
+					if ($GLOBALS['filehandertypecfiles'] == 's3') {
+						$n = $tar->extractToS3("qimages","public");
+					} else {
+						$n = $tar->extractToDir("../assessment/qimages/");	
+					}
 					require("../header.php");
 					echo "<p>Extracted $n files.  <a href=\"admin.php\">Continue</a></p>\n";
 					require("../footer.php");
@@ -572,15 +579,18 @@ switch($_GET['action']) {
 		$uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
 		if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
 			if (strpos($uploadfile,'.zip')!==FALSE && class_exists('ZipArchive')) {
+				require("../includes/filehandler.php");
 				$zip = new ZipArchive();
 				$res = $zip->open($uploadfile);
 				$ne = 0;  $ns = 0;
 				if ($res===true) {
 					for($i = 0; $i < $zip->numFiles; $i++) {
-						if (file_exists("../course/files/".$zip->getNameIndex($i))) {
+						//if (file_exists("../course/files/".$zip->getNameIndex($i))) {
+						if (doesfileexist('cfile',$zip->getNameIndex($i))) {
 							$ns++;
 						} else {
 							$zip->extractTo("../course/files/", array($zip->getNameIndex($i)));
+							relocatecoursefileifneeded("../course/files/".$zip->getNameIndex($i),$zip->getNameIndex($i));
 							$ne++;
 						} 
 					}

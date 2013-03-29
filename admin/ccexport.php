@@ -23,6 +23,7 @@ if (isset($_GET['delete'])) {
 	unlink($path.'/CCEXPORT'.$cid.'.imscc');
 	echo "export file deleted";
 } else if (isset($_GET['create'])) {
+	require("../includes/filehandler.php");
 	$linktype = $_GET['type'];
 	$iteminfo = array();
 	$query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid=$cid";
@@ -120,9 +121,10 @@ if (isset($_GET['delete'])) {
 						$result = mysql_query($query) or die("Query failed : " . mysql_error());
 						$filesout = array();
 						while ($r = mysql_fetch_row($result)) {
-							copy("../course/files/{$r[2]}",$newdir.'/'.$r[2]);
-							$resitem =  '<resource href="'.$r[2].'" identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'file'.$r[0].'" type="webcontent">'."\n";
-							$resitem .= '  <file href="'.$r[2].'" />'."\n";
+							//copy("../course/files/{$r[2]}",$newdir.'/'.$r[2]);
+							copycoursefile($r[2], $newdir.'/'.$filedir.basename($r[2]));
+							$resitem =  '<resource href="'.$filedir.basename($r[2]).'" identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'file'.$r[0].'" type="webcontent">'."\n";
+							$resitem .= '  <file href="'.$filedir.basename($r[2]).'" />'."\n";
 							$resitem .= '</resource>';
 							$res[] = $resitem;
 							$filesout[$r[0]] = array($r[1],$r[2]);
@@ -150,7 +152,7 @@ if (isset($_GET['delete'])) {
 					if ($row[2]!='') {
 						fwrite($fp,'<ul>');
 						foreach ($files as $f) {
-							fwrite($fp,'<li><a href="'.$filesout[$f][1].'">'.htmlentities($filesout[$f][0]).'</a></li>');
+							fwrite($fp,'<li><a href="'.$filedir.basename($filesout[$f][1]).'">'.htmlentities($filesout[$f][0]).'</a></li>');
 						}
 						fwrite($fp,'</ul>');
 					}
@@ -188,7 +190,9 @@ if (isset($_GET['delete'])) {
 						$res[] = $resitem;
 					} else if (substr(strip_tags($row[1]),0,5)=="file:") {  //is a file
 						$filename = trim(substr(strip_tags($row[1]),5));
-						copy("../course/files/$filename",$newdir.'/'.$filedir.$filename);
+						//copy("../course/files/$filename",$newdir.'/'.$filedir.$filename);
+						copycoursefile($filename, $newdir.'/'.$filedir.basename($filename));
+							
 						$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
 						$out .= $ind.'  <title>'.htmlentities($row[0]).'</title>'."\n";
 						$out .= $ind.'</item>'."\n";
@@ -198,8 +202,8 @@ if (isset($_GET['delete'])) {
 						$canvout .= '<title>'.htmlentities($row[0]).'</title>'."\n";
 						$canvout .= "<position>$ccnt</position> <indent>".(strlen($ind)/2 - 1)."</indent> </item>";
 						$ccnt++;
-						$resitem =  '<resource href="'.$filedir.$filename.'" identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" type="webcontent">'."\n";
-						$resitem .= '  <file href="'.$filedir.$filename.'" />'."\n";
+						$resitem =  '<resource href="'.$filedir.basename($filename).'" identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" type="webcontent">'."\n";
+						$resitem .= '  <file href="'.$filedir.basename($filename).'" />'."\n";
 						$resitem .= '</resource>';
 						$res[] = $resitem;
 					} else { //is text

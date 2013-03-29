@@ -51,6 +51,7 @@
 	$outputmsg = '';
 	$errmsg = '';
 	if (isset($_POST['qtext'])) {
+		require("../includes/filehandler.php");
 		$now = time();
 		$_POST['qtext'] = stripsmartquotes(stripslashes($_POST['qtext']));
 		$_POST['control'] = addslashes(stripsmartquotes(stripslashes($_POST['control'])));
@@ -140,8 +141,9 @@
 					$query = "SELECT id FROM imas_qimages WHERE filename='{$row[1]}'";
 					$r2 = mysql_query($query) or die("Query failed :$query " . mysql_error());
 					if (mysql_num_rows($r2)==1) { //don't delete if file is used in other questions
-						unlink(rtrim(dirname(__FILE__), '/\\') .'/../assessment/qimages/'.$row[1]);
-					}
+						//unlink(rtrim(dirname(__FILE__), '/\\') .'/../assessment/qimages/'.$row[1]);
+						deleteqimage($row[1]);
+					} 
 					$query = "DELETE FROM imas_qimages WHERE id='{$row[0]}'";
 					mysql_query($query) or die("Query failed :$query " . mysql_error());
 					$imgcnt--;
@@ -223,20 +225,22 @@
 				$userfilename = preg_replace('/[^\w\.]/','',basename($_FILES['imgfile']['name']));
 				$filename = $userfilename;
 			
-				$uploadfile = $uploaddir . $filename;
-				$t=0;
-				while(file_exists($uploadfile)){
-					$filename = substr($filename,0,strpos($userfilename,"."))."_$t".strstr($userfilename,".");
-					$uploadfile=$uploaddir.$filename;
-					$t++;
-				}
+				//$uploadfile = $uploaddir . $filename;
+				//$t=0;
+				//while(file_exists($uploadfile)){
+				//	$filename = substr($filename,0,strpos($userfilename,"."))."_$t".strstr($userfilename,".");
+				//	$uploadfile=$uploaddir.$filename;
+				//	$t++;
+				//}
 				$result_array = getimagesize($_FILES['imgfile']['tmp_name']); 
 				if ($result_array === false) {
 					$errmsg .= "<p>File is not image file</p>";
 				} else {
-					if (move_uploaded_file($_FILES['imgfile']['tmp_name'], $uploadfile)) {
+					if (($filename=storeuploadedqimage('imgfile',$filename))!==false) {
+					//if (move_uploaded_file($_FILES['imgfile']['tmp_name'], $uploadfile)) {
 						//echo "<p>File is valid, and was successfully uploaded</p>\n";
 						$_POST['newimgvar'] = str_replace('$','',$_POST['newimgvar']);
+						$filename = addslashes($filename);
 						$query = "INSERT INTO imas_qimages (var,qsetid,filename,alttext) VALUES ('{$_POST['newimgvar']}','$qsetid','$filename','{$_POST['newimgalt']}')";
 						mysql_query($query) or die("Query failed :$query " . mysql_error());
 						$query = "UPDATE imas_questionset SET hasimg=1 WHERE id='$qsetid'";
@@ -788,7 +792,13 @@ Image file: <input type="file" name="imgfile"/> assign to variable: <input type=
 if (isset($images['vars']) && count($images['vars'])>0) {
 	echo "Images:<br/>\n";
 	foreach ($images['vars'] as $id=>$var) {
-		echo "Variable: <input type=\"text\" name=\"imgvar-$id\" value=\"\$$var\" size=\"10\"/> <a href=\"$imasroot/assessment/qimages/{$images['files'][$id]}\" target=\"_blank\">View</a> ";
+		if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
+			$urlimg = $urlmode."s3.amazonaws.com/{$GLOBALS['AWSbucket']}/qimages/{$images['files'][$id]}";
+		} else {
+			$urlimg = "$imasroot/assessment/qimages/{$images['files'][$id]}";
+		}
+		
+		echo "Variable: <input type=\"text\" name=\"imgvar-$id\" value=\"\$$var\" size=\"10\"/> <a href=\"$urlimg\" target=\"_blank\">View</a> ";
 		echo "Description: <input type=\"text\" size=\"20\" name=\"imgalt-$id\" value=\"{$images['alttext'][$id]}\"/> Delete? <input type=checkbox name=\"delimg-$id\"/><br/>";	
 	}
 	
