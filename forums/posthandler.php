@@ -229,6 +229,8 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		}
 		$useeditor = "message";
 		$loadgraphfilter = true;
+		$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+
 		require("../header.php");
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
 		if ($caller != 'thread') {
@@ -519,6 +521,8 @@ if (isset($_GET['modify'])) { //adding or modifying post
 					}
 				}
 				printparents($_GET['replyto']);
+			} else {
+				echo '<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>';	
 			}
 		}
 		echo '</form>';
