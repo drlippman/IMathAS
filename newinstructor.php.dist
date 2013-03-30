@@ -46,6 +46,11 @@
 				$message .= "Username: {$_POST['username']} <br/>\n";
 				mail($sendfrom,$subject,$message,$headers);
 				
+				$now = time();
+				$query = "INSERT INTO imas_log (time, log) VALUES ($now, 'New Instructor Request: $newuserid:: School: {$_POST['school']} <br/> Phone: {$_POST['phone']} <br/>')";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+				
+				
 				$message = "<p>Your new account request has been sent.</p>  ";
 				$message .= "<p>This request is processed by hand, so please be patient.</p>";
 				mail($_POST['email'],$subject,$message,$headers);
