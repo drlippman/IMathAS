@@ -858,7 +858,7 @@ if (mysql_num_rows($result)>0) {
 if ($keyparts[0]=='aid') {
 	$query = "SELECT timelimit FROM imas_assessments WHERE id='$aid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$timelimit = mysql_result($result,0,0)*$timelimitmult;
+	$timelimit = abs(mysql_result($result,0,0)*$timelimitmult);
 	if ($timelimit>0) {
 		 if ($timelimit>3600) {
 			$tlhrs = floor($timelimit/3600);
