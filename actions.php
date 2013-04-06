@@ -435,20 +435,21 @@
 		}
 				
 		$layoutstr = implode('|',$homelayout);
-		$query = "UPDATE imas_users SET FirstName='{$_POST['firstname']}',LastName='{$_POST['lastname']}',email='{$_POST['email']}',msgnotify=$msgnot,qrightsdef=$qrightsdef,deflib='$deflib',usedeflib='$usedeflib',homelayout='$layoutstr',listperpage='$perpage' ";
-		$query .= "WHERE id='$userid'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
 		if (is_uploaded_file($_FILES['stupic']['tmp_name'])) {
 			processImage($_FILES['stupic'],$userid,200,200);
 			processImage($_FILES['stupic'],'sm'.$userid,40,40);
+			$chguserimg = ",hasuserimg=1";
 		} else if (isset($_POST['removepic'])) {
-			$curdir = rtrim(dirname(__FILE__), '/\\');
-			$galleryPath = "$curdir/course/files/";
-			if (file_exists($galleryPath.'userimg_'.$userid.'.jpg')) {
-				unlink($galleryPath.'userimg_'.$userid.'.jpg');
-				unlink($galleryPath.'userimg_sm'.$userid.'.jpg');
-			}
+			deletecoursefile('userimg_'.$userid.'.jpg');
+			deletecoursefile('userimg_sm'.$userid.'.jpg');
+			$chguserimg = ",hasuserimg=0";
+		} else {
+			$chguserimg = '';
 		}
+		$query = "UPDATE imas_users SET FirstName='{$_POST['firstname']}',LastName='{$_POST['lastname']}',email='{$_POST['email']}',msgnotify=$msgnot,qrightsdef=$qrightsdef,deflib='$deflib',usedeflib='$usedeflib',homelayout='$layoutstr',listperpage='$perpage'$chguserimg ";
+		$query .= "WHERE id='$userid'";
+		mysql_query($query) or die("Query failed : " . mysql_error());
+		
 		if (isset($_POST['dochgpw'])) {
 			$query = "SELECT password FROM imas_users WHERE id = '$userid'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());

@@ -207,6 +207,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				$timelimitmult = '1.0';
 			} 
 			//echo $timelimitmult;
+			
 			if ($locked==0) {
 				$query = "UPDATE imas_students SET code=$code,section=$section,locked=$locked,timelimitmult='$timelimitmult' WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
@@ -215,21 +216,25 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				$query = "UPDATE imas_students SET locked=$locked WHERE userid='{$_GET['uid']}' AND courseid='$cid' AND locked=0";
 				mysql_query($query) or die("Query failed : " . mysql_error());
-			}
-				
+			}	
 		
 			require('../includes/userpics.php');
 			if (is_uploaded_file($_FILES['stupic']['tmp_name'])) {
 				processImage($_FILES['stupic'],$_GET['uid'],200,200);
 				processImage($_FILES['stupic'],'sm'.$_GET['uid'],40,40);
+				$chguserimg = "hasuserimg=1";
 			} else if (isset($_POST['removepic'])) {
-				$curdir = rtrim(dirname(__FILE__), '/\\');
-				$galleryPath = "$curdir/../course/files/";
-				if (file_exists($galleryPath.'userimg_'.$_GET['uid'].'.jpg')) {
-					unlink($galleryPath.'userimg_'.$_GET['uid'].'.jpg');
-					unlink($galleryPath.'userimg_sm'.$_GET['uid'].'.jpg');
-				}
+				deletecoursefile('userimg_'.$_GET['uid'].'.jpg');
+				deletecoursefile('userimg_sm'.$_GET['uid'].'.jpg');
+				$chguserimg = "hasuserimg=0";
+			} else {
+				$chguserimg = '';
 			}
+			if ($chguserimg != '') {
+				$query = "UPDATE imas_users SET $chguserimg WHERE id='{$_GET['uid']}'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+			
 			
 			require("../header.php");
 			echo "<p>User info updated. ";
@@ -311,7 +316,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$hascode = false;
 		}	
 		
-		$query = "SELECT imas_students.id,imas_students.userid,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.SID,imas_students.lastaccess,imas_students.section,imas_students.code,imas_students.locked ";
+		$query = "SELECT imas_students.id,imas_students.userid,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.SID,imas_students.lastaccess,imas_students.section,imas_students.code,imas_students.locked,imas_users.hasuserimg ";
 		$query .= "FROM imas_students,imas_users WHERE imas_students.courseid='$cid' AND imas_students.userid=imas_users.id ";
 		if ($secfilter>-1) {
 			$query .= "AND imas_students.section='$secfilter' ";			
@@ -441,10 +446,14 @@ if ($overwriteBody==1) {
 			<span class=form><label for="stupic">Picture:</label></span>
 			<span class="formright">
 			<?php
-		$curdir = rtrim(dirname(__FILE__), '/\\');
-		$galleryPath = "$curdir/../course/files/";
-		if (file_exists($galleryPath.'userimg_'.$_GET['uid'].'.jpg')) {
-			echo "<img src=\"$imasroot/course/files/userimg_{$_GET['uid']}.jpg\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
+		if ($lineStudent['hasuserimg']==1) {
+			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
+				echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_{$_GET['uid']}.jpg\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
+			} else {
+				$curdir = rtrim(dirname(__FILE__), '/\\');
+				$galleryPath = "$curdir/course/files/";
+				echo "<img src=\"$imasroot/course/files/userimg_{$_GET['uid']}.jpg\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
+			}
 		} else {
 			echo "No Pic ";
 		}
@@ -566,8 +575,12 @@ if ($overwriteBody==1) {
 				<td>
 <?php
 	
-	if (file_exists("$curdir/files/userimg_sm{$line['userid']}.jpg")) {
-		echo "<img src=\"$imasroot/course/files/userimg_sm{$line['userid']}.jpg\" style=\"display:none;\"  />";
+	if ($line['hasuserimg']==1) {
+		if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
+			echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$line['userid']}.jpg\" style=\"display:none;\"  />";
+		} else {
+			echo "<img src=\"$imasroot/course/files/userimg_sm{$line['userid']}.jpg\" style=\"display:none;\"  />";
+		}
 	}
 ?>
 				</td>

@@ -6,7 +6,7 @@ require("../validate.php");
 switch($_GET['action']) {
 	case "emulateuser":
 		if ($myrights < 100 ) { break;}
-		$be = $_GET['uid'];
+		$be = $_REQUEST['uid'];
 		$query = "UPDATE imas_sessions SET userid='$be' WHERE sessionid='$sessionid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		break;

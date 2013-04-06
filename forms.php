@@ -100,10 +100,14 @@ switch($_GET['action']) {
 		
 		echo "<span class=form><label for=\"stupic\">Picture:</label></span>";
 		echo "<span class=\"formright\">";
-		$curdir = rtrim(dirname(__FILE__), '/\\');
-		$galleryPath = "$curdir/course/files/";
-		if (file_exists($galleryPath.'userimg_'.$userid.'.jpg')) {
-			echo "<img src=\"$imasroot/course/files/userimg_$userid.jpg\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
+		if ($line['hasuserimg']==1) {
+			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
+				echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_$userid.jpg\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
+			} else {
+				$curdir = rtrim(dirname(__FILE__), '/\\');
+				$galleryPath = "$curdir/course/files/";
+				echo "<img src=\"$imasroot/course/files/userimg_$userid.jpg\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
+			}
 		} else {
 			echo "No Pic ";
 		}

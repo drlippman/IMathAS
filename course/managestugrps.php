@@ -348,10 +348,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		
 		//get all students
 		$stunames = array();
-		$query = "SELECT iu.id,iu.FirstName,iu.LastName FROM imas_users AS iu JOIN imas_students ON iu.id=imas_students.userid WHERE imas_students.courseid='$cid'";
+		$hasuserimg = array();
+		$query = "SELECT iu.id,iu.FirstName,iu.LastName,iu.hasuserimg FROM imas_users AS iu JOIN imas_students ON iu.id=imas_students.userid WHERE imas_students.courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
 			$stunames[$row[0]] = $row[2].', '.$row[1];
+			$hasuserimg[$row[0]] = $row[3];
 		}
 		
 		//$page_grpmembers will be groupid=>array(  userid=>stuname )
@@ -539,9 +541,13 @@ if ($overwriteBody==1) {
 			} else {
 				foreach ($page_grpmembers[$grpid] as $uid=>$name) {
 					echo '<li>';
-					if (file_exists("$curdir/files/userimg_sm$uid.jpg")) {
-						echo "<img src=\"$imasroot/course/files/userimg_sm$uid.jpg\" style=\"display:none;\"  />";
-					} 
+					if ($hasuserimg[$uid]==1) {
+						if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
+							echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$uid}.jpg\" style=\"display:none;\"  />";
+						} else {
+							echo "<img src=\"$imasroot/course/files/userimg_sm{$uid}.jpg\" style=\"display:none;\"  />";
+						}
+					}
 					echo "$name | <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&remove=$uid&grpid=$grpid\">Remove from group</a></li>";
 				}
 			}
@@ -566,8 +572,12 @@ if ($overwriteBody==1) {
 			echo '<ul class="nomark">';
 			foreach ($page_ungrpstu as $uid=>$name) {
 				echo "<li><input type=\"checkbox\" name=\"stutoadd[]\" value=\"$uid\" />";
-				if (file_exists("$curdir/files/userimg_sm$uid.jpg")) {
-					echo "<img src=\"$imasroot/course/files/userimg_sm$uid.jpg\" style=\"display:none;\"  />";
+				if ($hasuserimg[$uid]==1) {
+					if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
+						echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$uid}.jpg\" style=\"display:none;\"  />";
+					} else {
+						echo "<img src=\"$imasroot/course/files/userimg_sm{$uid}.jpg\" style=\"display:none;\"  />";
+					}
 				}
 				echo "$name</li>";
 			}

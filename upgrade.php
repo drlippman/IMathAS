@@ -1,7 +1,7 @@
 <?php  
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 66;
+$latest = 67;
 
 
 @set_time_limit(0);
@@ -1078,6 +1078,44 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 } 
 			echo "Added imas_log table<br/>";
+		}
+		if ($last < 67) {
+			 $query = 'ALTER TABLE `imas_users` ADD `hasuserimg` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT \'0\'';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $hasimg = array();
+			 if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
+				require("includes/filehandler.php");
+				$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+				$arr = $s3->getBucket($GLOBALS['AWSbucket'],"cfiles/");
+				if ($arr!=false) {
+					foreach ($arr as $k=>$v) {
+						if (substr(basename($arr[$k]['name']),0,10)=='userimg_sm') {
+							$hasimg[] = substr(basename($arr[$k]['name']),10,-4);
+						}
+					}
+				}
+			 } else {
+			 	 $query = "SELECT max(id) FROM imas_users";
+			 	 $res = mysql_query($query);
+			 	 $maxid = mysql_result($result,0,0);
+			 	 $curdir = rtrim(dirname(__FILE__), '/\\');
+			 	 $galleryPath = "$curdir/course/files/";
+			 	 for ($i=1;$i<=$maxid;$i++) {
+			 	 	 if (file_exists($galleryPath.'userimg_'.$i.'.jpg')) {
+			 	 	 	 $hasimg[] = $i;
+			 	 	 }
+			 	 }
+			 }
+			 if (count($hasimg)>0) {
+			 	 $haslist = implode(',',$hasimg);
+			 	 $query = "UPDATE imas_users SET hasuserimg=1 WHERE id IN ($haslist)";
+			 	 mysql_query($query);
+			 	 $n = mysql_affected_rows();
+			 }
+			 echo "hasuserimg field added, $n user images identified<br/>";
 		}
 		/*$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {

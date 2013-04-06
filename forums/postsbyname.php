@@ -171,7 +171,7 @@
 			$feedback[$row[0]] = $row[2];
 		}
 	}
-	$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,ifv.lastview from imas_forum_posts JOIN imas_users ";
+	$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,ifv.lastview from imas_forum_posts JOIN imas_users ";
 	$query .= "ON imas_forum_posts.userid=imas_users.id LEFT JOIN (SELECT DISTINCT threadid,lastview FROM imas_forum_views WHERE userid='$userid') AS ifv ON ";
 	$query .= "ifv.threadid=imas_forum_posts.threadid WHERE imas_forum_posts.forumid='$forumid' AND imas_forum_posts.isanon=0 ORDER BY ";
 	$query .= "imas_users.LastName,imas_users.FirstName,imas_forum_posts.postdate DESC";
@@ -191,8 +191,12 @@
 				echo '</div>';
 			}
 			echo "<b>{$line['LastName']}, {$line['FirstName']}</b>";
-			if (file_exists("$curdir/../course/files/userimg_sm{$line['userid']}.jpg")) {
-				echo "<img src=\"$imasroot/course/files/userimg_sm{$line['userid']}.jpg\" onclick=\"togglepic(this)\"/>";
+			if ($line['hasuserimg']==1) {
+				if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
+					echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$line['userid']}.jpg\"  onclick=\"togglepic(this)\"  />";
+				} else {
+					echo "<img src=\"$imasroot/course/files/userimg_sm{$line['userid']}.jpg\"  onclick=\"togglepic(this)\" />";
+				}
 			}
 			echo '<div class="forumgrp">';
 			$laststu = $line['userid'];
