@@ -121,6 +121,7 @@ row[1][3][8] = % past and attempted      (null if weighted)
 
 row[1][4][0] = userid
 row[1][4][1] = locked?
+row[1][4][2] = hasuserimg
 
 cats[i]:  0: name, 1: scale, 2: scaletype, 3: chop, 4: dropn, 5: weight, 6: hidden
 
@@ -681,7 +682,7 @@ function gbtable() {
 	
 	//Pull student data
 	$ln = 1;
-	$query = "SELECT imas_users.id,imas_users.SID,imas_users.FirstName,imas_users.LastName,imas_users.SID,imas_users.email,imas_students.section,imas_students.code,imas_students.locked,imas_students.timelimitmult,imas_students.lastaccess ";
+	$query = "SELECT imas_users.id,imas_users.SID,imas_users.FirstName,imas_users.LastName,imas_users.SID,imas_users.email,imas_students.section,imas_students.code,imas_students.locked,imas_students.timelimitmult,imas_students.lastaccess,imas_users.hasuserimg ";
 	$query .= "FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid AND imas_students.courseid='$cid' ";
 	//$query .= "FROM imas_users,imas_teachers WHERE imas_users.id=imas_teachers.userid AND imas_teachers.courseid='$cid' ";
 	//if (!$isteacher && !isset($tutorid)) {$query .= "AND imas_users.id='$userid' ";}
@@ -723,6 +724,7 @@ function gbtable() {
 		$gb[$ln][0][0] = "{$line['LastName']},&nbsp;{$line['FirstName']}";
 		$gb[$ln][4][0] = $line['id'];
 		$gb[$ln][4][1] = $line['locked'];
+		$gb[$ln][4][2] = $line['hasuserimg'];
 		
 		if ($isdiag) {
 			$selparts = explode('~',$line['SID']);

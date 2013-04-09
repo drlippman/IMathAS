@@ -22,7 +22,6 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		$_POST['append'] = ' '.$_POST['append'];
 	}
 	$now = time();
-	
 	$query = "SELECT itemtype,typeid FROM imas_items WHERE id='$itemid'";
 	$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 	list($itemtype,$typeid) = mysql_fetch_row($result);
@@ -223,6 +222,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 	} else if ($itemtype == "Calendar") {
 		$newtypeid = 0;	
 	} 
+	
 	$query = "INSERT INTO imas_items (courseid,itemtype,typeid) ";
 	$query .= "VALUES ('$cid','$itemtype',$newtypeid)";
 	mysql_query($query) or die("Query failed :$query " . mysql_error());
@@ -315,7 +315,9 @@ function copyallsub($items,$parent,&$addtoarr,$gbcats,$sethidden=false) {
 			}
 			$addtoarr[] = $newblock;
 		} else {
-			$addtoarr[] = copyitem($item,$gbcats,$sethidden);
+			if ($item != null && $item != 0) {
+				$addtoarr[] = copyitem($item,$gbcats,$sethidden);
+			}
 		}
 	}
 	

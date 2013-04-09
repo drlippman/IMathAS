@@ -237,9 +237,7 @@
 				//echo "<input type=button id=\"butb$bcnt\" value=\"$lbl\" onClick=\"toggleshow($bcnt)\"> ";
 				echo "<img class=\"pointer\" id=\"butb$bcnt\" src=\"$imasroot/img/$img.gif\" onClick=\"toggleshow($bcnt)\"/> ";
 			}
-			if (file_exists("$curdir/../course/files/userimg_sm{$ownerid[$child]}.jpg")) {
-				echo "<img src=\"$imasroot/course/files/userimg_sm{$ownerid[$child]}.jpg\" onclick=\"togglepic(this)\"/>";
-			}
+			
 			echo '</span>';
 			if ($view==2) {
 				echo "<span class=right>";

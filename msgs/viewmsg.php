@@ -79,7 +79,7 @@
 			
 	
 	$msgid = $_GET['msgid'];
-	$query = "SELECT imas_msgs.*,imas_users.LastName,imas_users.FirstName,imas_users.email ";
+	$query = "SELECT imas_msgs.*,imas_users.LastName,imas_users.FirstName,imas_users.email,imas_users.hasuserimg ";
 	$query .= "FROM imas_msgs,imas_users WHERE imas_msgs.msgfrom=imas_users.id AND imas_msgs.id='$msgid' ";
 	if ($type!='allstu' || !$isteacher) {
 		$query .= "AND (imas_msgs.msgto='$userid' OR imas_msgs.msgfrom='$userid')";
@@ -93,8 +93,12 @@
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
 	$senddate = tzdate("F j, Y, g:i a",$line['senddate']);
 	$curdir = rtrim(dirname(__FILE__), '/\\');
-	if (file_exists("$curdir/../course/files/userimg_sm{$line['msgfrom']}.jpg")) {
-		echo "<img src=\"$imasroot/course/files/userimg_sm{$line['msgfrom']}.jpg\" style=\"float:left;\" onclick=\"togglepic(this)\" />";
+	if ($line['hasuserimg']==1) {
+		if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
+			echo " <img style=\"float:left;\" src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$line['msgfrom']}.jpg\"  onclick=\"togglepic(this)\" /><br/>";
+		} else {
+			echo " <img style=\"float:left;\" src=\"$imasroot/course/files/userimg_sm{$line['msgfrom']}.jpg\"  onclick=\"togglepic(this)\" /><br/>";
+		}
 	}
 	echo "<table class=gb ><tbody>";
 	echo "<tr><td><b>From:</b></td><td>{$line['LastName']}, {$line['FirstName']}";

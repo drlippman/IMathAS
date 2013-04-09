@@ -208,7 +208,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			echo "<form method=post action=\"msglist.php?page=$page&type=$type&cid=$cid&add={$_GET['add']}&replyto=$replyto\">\n";
 			echo "<span class=form>To:</span><span class=formright>\n";
 			if (isset($_GET['to'])) {
-				$query = "SELECT iu.LastName,iu.FirstName,iu.email,i_s.lastaccess FROM imas_users AS iu ";
+				$query = "SELECT iu.LastName,iu.FirstName,iu.email,i_s.lastaccess,iu.hasuserimg FROM imas_users AS iu ";
 				$query .= "LEFT JOIN imas_students AS i_s ON iu.id=i_s.userid AND i_s.courseid='$courseid' WHERE iu.id='{$_GET['to']}'";
 				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$row = mysql_fetch_row($result);
@@ -232,8 +232,12 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				}
 				echo "<input type=hidden name=to value=\"{$_GET['to']}\"/>";
 				$curdir = rtrim(dirname(__FILE__), '/\\');
-				if (isset($_GET['to']) && file_exists("$curdir/../course/files/userimg_sm{$_GET['to']}.jpg")) {
-					echo " <img style=\"vertical-align: middle;\" src=\"$imasroot/course/files/userimg_sm{$_GET['to']}.jpg\" onclick=\"togglepic(this)\" /><br/>";
+				if (isset($_GET['to']) && $row[4]==1) {
+					if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
+						echo " <img style=\"vertical-align: middle;\" src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$_GET['to']}.jpg\"  onclick=\"togglepic(this)\" /><br/>";
+					} else {
+						echo " <img style=\"vertical-align: middle;\" src=\"$imasroot/course/files/userimg_sm{$_GET['to']}.jpg\"  onclick=\"togglepic(this)\" /><br/>";
+					}
 				}
 			} else {
 				echo "<select name=\"to\">";
@@ -493,7 +497,7 @@ function chgfilter() {
 	</thead>
 	<tbody>
 <?php
-	$query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_users.LastName,imas_users.FirstName,imas_msgs.isread,imas_courses.name,imas_msgs.msgfrom ";
+	$query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_users.LastName,imas_users.FirstName,imas_msgs.isread,imas_courses.name,imas_msgs.msgfrom,imas_users.hasuserimg ";
 	$query .= "FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom LEFT JOIN imas_courses ON imas_courses.id=imas_msgs.courseid WHERE ";
 	$query .= "imas_msgs.msgto='$userid' AND (imas_msgs.isread&2)=0 ";
 	if ($filteruid>0) {
@@ -549,9 +553,14 @@ function chgfilter() {
 		}
 		echo '</td><td>';
 		
-		if (file_exists("$curdir/../course/files/userimg_sm{$line['msgfrom']}.jpg")) {
-			echo "<img src=\"$imasroot/course/files/userimg_sm{$line['msgfrom']}.jpg\" style=\"display:none;\" class=\"userpic\"  />";
-		} 
+		if ($line['hasuserimg']==1) {
+			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
+				echo " <img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$line['msgfrom']}.jpg\" style=\"display:none;\"  class=\"userpic\"  />";
+			} else {
+				echo " <img src=\"$imasroot/course/files/userimg_sm{$line['msgfrom']}.jpg\" style=\"display:none;\" class=\"userpic\"  />";
+			}
+		}
+		
 		echo "</td><td>";
 		if (($line['isread']&8)==8) {
 			echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged({$line['id']});return false;\" />";

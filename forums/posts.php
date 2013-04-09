@@ -144,16 +144,16 @@
 	}
 		
 	if ($haspoints) {
-		$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_grades.score,imas_grades.feedback FROM ";
+		$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,imas_grades.score,imas_grades.feedback FROM ";
 		$query .= "imas_forum_posts JOIN imas_users ON imas_forum_posts.userid=imas_users.id LEFT JOIN imas_grades ON imas_grades.gradetype='forum' AND imas_grades.refid=imas_forum_posts.id ";
 		$query .= "WHERE (imas_forum_posts.id='$threadid' OR imas_forum_posts.threadid='$threadid') ORDER BY imas_forum_posts.id";
 	} else {
-		$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email from imas_forum_posts,imas_users ";
+		$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg from imas_forum_posts,imas_users ";
 		$query .= "WHERE imas_forum_posts.userid=imas_users.id AND (imas_forum_posts.id='$threadid' OR imas_forum_posts.threadid='$threadid') ORDER BY imas_forum_posts.id";	
 	}
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$children = array(); $date = array(); $subject = array(); $message = array(); $posttype = array();
-	$ownerid = array(); $files = array(); $points= array(); $feedback= array(); $poster= array(); $email= array();
+	$ownerid = array(); $files = array(); $points= array(); $feedback= array(); $poster= array(); $email= array(); $hasuserimg = array();
 	while ($line =  mysql_fetch_array($result, MYSQL_ASSOC)) {
 		if ($line['parent']==0) {
 			if ($line['replyby']!=null) {
@@ -183,6 +183,8 @@
 		$message[$line['id']] = $line['message'];
 		$posttype[$line['id']] = $line['posttype'];
 		$ownerid[$line['id']] = $line['userid'];
+		$hasuserimg[$line['id']] = $line['hasuserimg'];
+		
 		if ($line['files']!='') {
 			$files[$line['id']] = $line['files'];
 		}
@@ -355,7 +357,7 @@
 	$icnt = 0;
 	function printchildren($base,$restricttoowner=false) {
 		$curdir = rtrim(dirname(__FILE__), '/\\');
-		global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points,$feedback,$posttype,$lastview,$bcnt,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$view,$page,$allowmsg,$haspoints,$imasroot,$postby,$replyby,$files,$CFG,$rubric,$pointsposs;
+		global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points,$feedback,$posttype,$lastview,$bcnt,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$view,$page,$allowmsg,$haspoints,$imasroot,$postby,$replyby,$files,$CFG,$rubric,$pointsposs,$hasuserimg,$urlmode;
 		if (!isset($CFG['CPS']['itemicons'])) {
 	   	   $itemicons = array('web'=>'web.png', 'doc'=>'doc.png', 'wiki'=>'wiki.png',
 			'html'=>'html.png', 'forum'=>'forum.png', 'pdf'=>'pdf.png',
@@ -384,8 +386,12 @@
 				//echo "<input type=button id=\"butb$bcnt\" value=\"$lbl\" onClick=\"toggleshow($bcnt)\"> ";
 				echo "<img class=\"pointer\" id=\"butb$bcnt\" src=\"$imasroot/img/$img.gif\" onClick=\"toggleshow($bcnt)\"/> ";
 			}
-			if (file_exists("$curdir/../course/files/userimg_sm{$ownerid[$child]}.jpg")) {
-				echo "<img src=\"$imasroot/course/files/userimg_sm{$ownerid[$child]}.jpg\" onclick=\"togglepic(this)\"/>";
+			if ($hasuserimg[$child]==1) {
+				if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
+					echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$ownerid[$child]}.jpg\"  onclick=\"togglepic(this)\" />";
+				} else {
+					echo "<img src=\"$imasroot/course/files/userimg_sm{$ownerid[$child]}.jpg\"  onclick=\"togglepic(this)\" />";
+				}
 			}
 			echo '</span>';
 			/*if ($view==2) {

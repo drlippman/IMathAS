@@ -638,7 +638,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 }
 
 function gbstudisp($stu) {
-	global $hidenc,$cid,$gbmode,$availshow,$isteacher,$istutor,$catfilter,$imasroot,$canviewall;
+	global $hidenc,$cid,$gbmode,$availshow,$isteacher,$istutor,$catfilter,$imasroot,$canviewall,$urlmode;
 	if ($availshow==4) {
 		$availshow=1;
 		$hidepast = true;
@@ -652,8 +652,12 @@ function gbstudisp($stu) {
 		$showlatepass = mysql_result($result,0,0);
 		
 		if ($isteacher) {
-			if (file_exists("$curdir//files/userimg_sm{$gbt[1][4][0]}.jpg")) {
-				echo "<img src=\"$imasroot/course/files/userimg_sm{$gbt[1][4][0]}.jpg\" style=\"float: left; padding-right:5px;\" onclick=\"togglepic(this)\"/>";
+			if ($gbt[1][4][2]==1) {
+				if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
+					echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$gbt[1][4][0]}.jpg\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
+				} else {
+					echo "<img src=\"$imasroot/course/files/userimg_sm{$gbt[1][4][0]}.jpg\" style=\"float: left; padding-right:5px;\" onclick=\"togglepic(this)\"/>";
+				}
 			} 
 		}
 		echo '<h3>' . strip_tags($gbt[1][0][0]) . ' <span class="small">('.$gbt[1][0][1].')</span></h3>';
@@ -1069,7 +1073,7 @@ function gbstudisp($stu) {
 }
 
 function gbinstrdisp() {
-	global $hidenc,$showpics,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection,$avgontop,$hidelocked,$colorize;
+	global $hidenc,$showpics,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection,$avgontop,$hidelocked,$colorize,$urlmode;
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	if ($availshow==4) {
 		$availshow=1;
@@ -1238,6 +1242,11 @@ function gbinstrdisp() {
 	}
 	echo '</tr></thead><tbody>';
 	//create student rows
+	if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
+		$userimgbase = $urlmode."s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles";
+	} else {
+		$userimgbase = "$imasroot/course/files";
+	}
 	for ($i=1;$i<count($gbt);$i++) {
 		if ($i==1) {$insdiv = "<div>";  $enddiv = "</div>";} else {$insdiv = ''; $enddiv = '';}
 		if ($i%2!=0) {
@@ -1256,10 +1265,10 @@ function gbinstrdisp() {
 			echo $gbt[$i][0][0];
 		}
 		echo '</a></div></td>';
-		if ($showpics==1 && file_exists("$curdir//files/userimg_sm{$gbt[$i][4][0]}.jpg")) {
-			echo "<td>{$insdiv}<div class=\"trld\"><img src=\"$imasroot/course/files/userimg_sm{$gbt[$i][4][0]}.jpg\"/></div></td>";
-		} else if ($showpics==2 && file_exists("$curdir//files/userimg_{$gbt[$i][4][0]}.jpg")) {
-			echo "<td>{$insdiv}<div class=\"trld\"><img src=\"$imasroot/course/files/userimg_{$gbt[$i][4][0]}.jpg\"/></div></td>";
+		if ($showpics==1 && $gbt[$i][4][2]==1) { //file_exists("$curdir//files/userimg_sm{$gbt[$i][4][0]}.jpg")) {
+			echo "<td>{$insdiv}<div class=\"trld\"><img src=\"$userimgbase/userimg_sm{$gbt[$i][4][0]}.jpg\"/></div></td>";
+		} else if ($showpics==2 && $gbt[$i][4][2]==1) {
+			echo "<td>{$insdiv}<div class=\"trld\"><img src=\"$userimgbase/userimg_{$gbt[$i][4][0]}.jpg\"/></div></td>";
 		} else {
 			echo '<td>'.$insdiv.'<div class="trld">&nbsp;</div></td>';
 		}

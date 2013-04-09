@@ -143,12 +143,19 @@
 						$error = 'Course is closed for self enrollment';
 					} else if ($_POST['ekey']=="" && $line['enrollkey'] != '') {
 						$error = 'No enrollment key provided';
-					} else if ($line['enrollkey'] != $_POST['ekey']) {
-						$error = 'Incorrect enrollment key';
 					} else {
-						$query = "INSERT INTO imas_students (userid,courseid) VALUES ('$newuserid','{$_POST['courseid']}');";
-						mysql_query($query) or die("Query failed : " . mysql_error());
-						echo '<p>You have been enrolled in course ID '.$_POST['courseid'].'</p>';
+						$keylist = array_map('trim',explode(';',$line['enrollkey']));
+						if (!in_array($_POST['ekey'], $keylist)) {
+							$error = 'Incorrect enrollment key';
+						} else {
+							if (count($keylist)>1) {
+								$query = "INSERT INTO imas_students (userid,courseid,section) VALUES ('$newuserid','{$_POST['courseid']}','{$_POST['ekey']}');";
+							} else {
+								$query = "INSERT INTO imas_students (userid,courseid) VALUES ('$newuserid','{$_POST['courseid']}');";
+							}
+							mysql_query($query) or die("Query failed : " . mysql_error());
+							echo '<p>You have been enrolled in course ID '.$_POST['courseid'].'</p>';
+						}
 					}
 				}
 				if ($error != '') {
@@ -302,12 +309,7 @@
 			echo "Please include Enrollment Key.  <a href=\"forms.php?action=enroll$gb\">Try Again</a>\n";
 			echo "</html></body>\n";
 			exit;
-		} else if ($line['enrollkey'] != $_POST['ekey']) {
-			echo "<html><body>\n";
-			echo "Incorrect Enrollment Key.  <a href=\"forms.php?action=enroll$gb\">Try Again</a>\n";
-			echo "</html></body>\n";
-			exit;
-		} else {
+		}  else {
 			$query = "SELECT * FROM imas_teachers WHERE userid='$userid' AND courseid='{$_POST['cid']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (mysql_num_rows($result)>0) {
@@ -335,8 +337,25 @@
 				echo "</html></body>\n";
 				exit;
 			} else {
-				$query = "INSERT INTO imas_students (userid,courseid) VALUES ('$userid','{$_POST['cid']}');";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				$keylist = array_map('trim',explode(';',$line['enrollkey']));
+				if (!in_array($_POST['ekey'], $keylist)) {
+					echo "<html><body>\n";
+					echo "Incorrect Enrollment Key.  <a href=\"forms.php?action=enroll$gb\">Try Again</a>\n";
+					echo "</html></body>\n";
+					exit;
+				} else {
+					if (count($keylist)>1) {
+						$query = "INSERT INTO imas_students (userid,courseid,section) VALUES ('$userid','{$_POST['cid']}','{$_POST['ekey']}');";
+					} else {
+						$query = "INSERT INTO imas_students (userid,courseid) VALUES ('$userid','{$_POST['cid']}');";
+					}
+					mysql_query($query) or die("Query failed : " . mysql_error());
+					echo '<p>You have been enrolled in course ID '.$_POST['courseid'].'</p>';
+				}
+				
+				
+				//$query = "INSERT INTO imas_students (userid,courseid) VALUES ('$userid','{$_POST['cid']}');";
+				//mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 		}	
 	} else if ($_GET['action']=="unenroll") {
@@ -435,20 +454,21 @@
 		}
 				
 		$layoutstr = implode('|',$homelayout);
-		$query = "UPDATE imas_users SET FirstName='{$_POST['firstname']}',LastName='{$_POST['lastname']}',email='{$_POST['email']}',msgnotify=$msgnot,qrightsdef=$qrightsdef,deflib='$deflib',usedeflib='$usedeflib',homelayout='$layoutstr',listperpage='$perpage' ";
-		$query .= "WHERE id='$userid'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
 		if (is_uploaded_file($_FILES['stupic']['tmp_name'])) {
 			processImage($_FILES['stupic'],$userid,200,200);
 			processImage($_FILES['stupic'],'sm'.$userid,40,40);
+			$chguserimg = ",hasuserimg=1";
 		} else if (isset($_POST['removepic'])) {
-			$curdir = rtrim(dirname(__FILE__), '/\\');
-			$galleryPath = "$curdir/course/files/";
-			if (file_exists($galleryPath.'userimg_'.$userid.'.jpg')) {
-				unlink($galleryPath.'userimg_'.$userid.'.jpg');
-				unlink($galleryPath.'userimg_sm'.$userid.'.jpg');
-			}
+			deletecoursefile('userimg_'.$userid.'.jpg');
+			deletecoursefile('userimg_sm'.$userid.'.jpg');
+			$chguserimg = ",hasuserimg=0";
+		} else {
+			$chguserimg = '';
 		}
+		$query = "UPDATE imas_users SET FirstName='{$_POST['firstname']}',LastName='{$_POST['lastname']}',email='{$_POST['email']}',msgnotify=$msgnot,qrightsdef=$qrightsdef,deflib='$deflib',usedeflib='$usedeflib',homelayout='$layoutstr',listperpage='$perpage'$chguserimg ";
+		$query .= "WHERE id='$userid'";
+		mysql_query($query) or die("Query failed : " . mysql_error());
+		
 		if (isset($_POST['dochgpw'])) {
 			$query = "SELECT password FROM imas_users WHERE id = '$userid'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
