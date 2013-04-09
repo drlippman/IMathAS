@@ -49,10 +49,15 @@
 		$query = "SELECT enrollkey FROM imas_courses WHERE id = '{$_GET['cid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$enrollkey = mysql_result($result,0,0);
-		if (strlen($enrollkey)>0 && trim($_POST['ekey'])=='') {
+		if (strlen($enrollkey)>0 && trim($_POST['ekey2'])=='') {
 			$page_newaccounterror .= "Please provide the enrollment key";
-		} else if (strlen($enrollkey)>0 && $_POST['ekey']!=$enrollkey) {
-			$page_newaccounterror .= "Enrollment key is invalid.";
+		} else if (strlen($enrollkey)>0) {
+			$keylist = array_map('trim',explode(';',$enrollkey));
+			if (!in_array($_POST['ekey2'], $keylist)) {	
+				$page_newaccounterror .= "Enrollment key is invalid.";
+			} else {
+				$_POST['ekey'] = $_POST['ekey2'];
+			}
 		}	
 		
 		if ($page_newaccounterror=='') {//no error
@@ -97,22 +102,31 @@
 		}
 	 }
 	//check for session
+	$origquerys = $querys;
+	if ($_POST['ekey']!='') {
+		$addtoquerystring = "ekey=".urlencode($_POST['ekey']);
+	}
 	require("validate.php");
 	
 	if ($verified) { //already have session
-		if (!isset($studentid) && !isset($teacherid)) {  //have account, not a student
+		if (!isset($studentid) && !isset($teacherid) && !isset($tutorid)) {  //have account, not a student
 			$query = "SELECT name,enrollkey FROM imas_courses WHERE id='{$_GET['cid']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			list($coursename,$enrollkey) = mysql_fetch_row($result);
-			if (strlen($enrollkey)==0 || (isset($_POST['ekey']) && $_POST['ekey']==$enrollkey)) {
-				$query = "INSERT INTO imas_students (userid,courseid) VALUES ('$userid','{$_GET['cid']}');";
+			$keylist = array_map('trim',explode(';',$enrollkey));
+			if (strlen($enrollkey)==0 || (isset($_REQUEST['ekey']) && in_array($_REQUEST['ekey'], $keylist))) {
+				if (count($keylist)>1) {
+					$query = "INSERT INTO imas_students (userid,courseid,section) VALUES ('$userid','{$_GET['cid']}','{$_REQUEST['ekey']}');";		
+				} else {
+					$query = "INSERT INTO imas_students (userid,courseid) VALUES ('$userid','{$_GET['cid']}');";
+				}
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . '/course/course.php?cid='. $_GET['cid']);
 				exit;
 			} else {
 				require("header.php");
 				echo "<h2>$coursename</h2>";
-				echo '<form method="post" action="'.$_SERVER['PHP_SELF'].$querys.'">';
+				echo '<form method="post" action="directaccess.php?cid='.$_GET['cid'].'">';
 				echo '<p>Incorrect enrollment key.  Try again.</p>';
 				echo "<p>Course Enrollment Key:  <input type=text name=\"ekey\"></p>";
 				echo "<p><input type=\"submit\" value=\"Submit\"></p>";
@@ -274,7 +288,7 @@ if (isset($_GET['getsid'])) {
 <?php
 	if (strlen($enrollkey)>0) {
 ?>
-<span class=form><label for="ekey">Course Enrollment Key:</label></span><input class=form type=text size=12 name="ekey" id="ekey" <?php if (isset($_POST['ekey'])) {echo "value=\"{$_POST['ekey']}\"";}?>/><BR class=form>
+<span class=form><label for="ekey">Course Enrollment Key:</label></span><input class=form type=text size=12 name="ekey2" id="ekey2" <?php if (isset($_POST['ekey2'])) {echo "value=\"{$_POST['ekey2']}\"";}?>/><BR class=form>
 <?php
 	}
 ?>
