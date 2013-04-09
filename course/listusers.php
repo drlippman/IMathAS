@@ -552,6 +552,9 @@ if ($overwriteBody==1) {
 		$alt = 0;
 		$numstu = 0;
 		while ($line=mysql_fetch_array($resultDefaultUserList, MYSQL_ASSOC)) {
+			if ($line['section']==null) {
+				$line['section'] = '';
+			}
 			$numstu++;
 			if ($line['locked']>0) {
 				$lastaccess = "locked";

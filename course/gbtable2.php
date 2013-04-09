@@ -735,7 +735,7 @@ function gbtable() {
 			$gb[$ln][0][1] = $line['SID'];
 		}
 		if ($hassection && !$isdiag) {
-			$gb[$ln][0][] = $line['section'];
+			$gb[$ln][0][] = ($line['section']==null)?'':$line['section'];
 		}
 		if ($hascode) {
 			$gb[$ln][0][] = $line['code'];
