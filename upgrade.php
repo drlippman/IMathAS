@@ -1100,7 +1100,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 } else {
 			 	 $query = "SELECT max(id) FROM imas_users";
 			 	 $res = mysql_query($query);
-			 	 $maxid = mysql_result($result,0,0);
+			 	 $maxid = mysql_result($res,0,0);
 			 	 $curdir = rtrim(dirname(__FILE__), '/\\');
 			 	 $galleryPath = "$curdir/course/files/";
 			 	 for ($i=1;$i<=$maxid;$i++) {
