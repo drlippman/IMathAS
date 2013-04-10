@@ -1098,16 +1098,20 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 					}
 				}
 			 } else {
-			 	 $query = "SELECT max(id) FROM imas_users";
-			 	 $res = mysql_query($query);
-			 	 $maxid = mysql_result($res,0,0);
 			 	 $curdir = rtrim(dirname(__FILE__), '/\\');
-			 	 $galleryPath = "$curdir/course/files/";
-			 	 for ($i=1;$i<=$maxid;$i++) {
-			 	 	 if (file_exists($galleryPath.'userimg_'.$i.'.jpg')) {
-			 	 	 	 $hasimg[] = $i;
+			 	 $galleryPath = "$curdir/course/files";
+			 	
+			 	 if ($handle = @opendir($galleryPath)) {
+			 	 	 while (false !== ($file=readdir($handle))) {
+			 	 	 	 if ($file != "." && $file != ".." && !is_dir($file)) {
+			 	 	 	 	 if (substr(basename($file),0,10)=='userimg_sm') {
+			 	 	 	 	 	$hasimg[] = substr(basename($file),10,-4); 
+			 	 	 	 	 }
+			 	 	 	 }
 			 	 	 }
+			 	 	 closedir($handle);
 			 	 }
+			 	
 			 }
 			 if (count($hasimg)>0) {
 			 	 $haslist = implode(',',$hasimg);
