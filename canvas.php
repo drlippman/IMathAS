@@ -29,5 +29,6 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
         <lticm:property name="selection_width">500</lticm:property>
         <lticm:property name="selection_height">300</lticm:property>
       </lticm:options>
+      <lticm:property name="session_setup_url"><?php echo $urlmode.$_SERVER['HTTP_HOST'] . $imasroot . '/ltisessionsetup.php';?></lticm:property>
     </blti:extensions>
   </cartridge_basiclti_link>
