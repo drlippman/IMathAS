@@ -1426,25 +1426,35 @@ reads/writes values from "qn"+id
 
 */
 var normslider = {idnums:[], curslider:{el: null, startpos: [0,0], outnode: null}};
-function slideronpageload() {
+function addnormslider(k) {
+	if (arraysearch(k,normslider.idnums)==-1) { //not in there yet.  First load
+		normslider.idnums.push(k);
+	} else {
+		//resubmit.  Must be on embedded reload.  call pageload
+		slideronpageload(k);
+	}
+}
+function slideronpageload(k) {
 	var el,id;
 	for(var i=0; i<normslider.idnums.length; i++) {
-		id = normslider.idnums[i];
-		initnormslider(id);
-		el = document.getElementById("slid1"+id);
-		if (hasTouch) {
-			el.addEventListener('touchstart',onsliderstart);
-			el.parentNode.addEventListener('touchend',onsliderstop);
-			el = document.getElementById("slid2"+id);
-			el.addEventListener('touchstart',onsliderstart);
-			el.parentNode.addEventListener('touchend',onsliderstop);
-			
-		} else {
-			el.onmousedown =  onsliderstart;
-			el.parentNode.onmouseup =  onsliderstop;
-			el = document.getElementById("slid2"+id);
-			el.onmousedown =  onsliderstart;
-			el.parentNode.onmouseup =  onsliderstop;
+		if (typeof(k)=='undefined' || k==normslider.idnums[i]) {
+			id = normslider.idnums[i];
+			initnormslider(id);
+			el = document.getElementById("slid1"+id);
+			if (hasTouch) {
+				el.addEventListener('touchstart',onsliderstart);
+				el.parentNode.addEventListener('touchend',onsliderstop);
+				el = document.getElementById("slid2"+id);
+				el.addEventListener('touchstart',onsliderstart);
+				el.parentNode.addEventListener('touchend',onsliderstop);
+				
+			} else {
+				el.onmousedown =  onsliderstart;
+				el.parentNode.onmouseup =  onsliderstop;
+				el = document.getElementById("slid2"+id);
+				el.onmousedown =  onsliderstart;
+				el.parentNode.onmouseup =  onsliderstop;
+			}
 		}
 	}
 }
