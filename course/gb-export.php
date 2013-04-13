@@ -316,14 +316,26 @@ function gbinstrexport() {
 		if ($totonleft) {
 			//total totals
 			if ($catfilter<0) {
-				if (isset($gbt[0][3][0])) { //using points based
-					$gbo[$i][$n] = $gbt[$i][3][$availshow];
-					$n++;
-					$gbo[$i][$n] = $gbt[$i][3][$availshow+3] ;
-					$n++;
+				if ($availshow==3) {
+					if (isset($gbt[$i][3][8])) { //using points based
+						$gbo[$i][$n] = $gbt[$i][3][6].'/'.$gbt[$i][3][7];
+						$n++;
+						$gbo[$i][$n] = $gbt[$i][3][8] ;
+						$n++;
+					} else {
+						$gbo[$i][$n] = $gbt[$i][3][6];
+						$n++;
+					}
 				} else {
-					$gbo[$i][$n] = $gbt[$i][3][$availshow];
-					$n++;
+					if (isset($gbt[0][3][0])) { //using points based
+						$gbo[$i][$n] = $gbt[$i][3][$availshow];
+						$n++;
+						$gbo[$i][$n] = $gbt[$i][3][$availshow+3] ;
+						$n++;
+					} else {
+						$gbo[$i][$n] = $gbt[$i][3][$availshow];
+						$n++;
+					}
 				}
 			}
 			//category totals
@@ -412,14 +424,26 @@ function gbinstrexport() {
 			}
 			//total totals
 			if ($catfilter<0) {
-				if (isset($gbt[0][3][0])) { //using points based
-					$gbo[$i][$n] = $gbt[$i][3][$availshow];
-					$n++;
-					$gbo[$i][$n] = $gbt[$i][3][$availshow+3] ;
-					$n++;
+				if ($availshow==3) {
+					if (isset($gbt[$i][3][8])) { //using points based
+						$gbo[$i][$n] = $gbt[$i][3][6].'/'.$gbt[$i][3][7];
+						$n++;
+						$gbo[$i][$n] = $gbt[$i][3][8] ;
+						$n++;
+					} else {
+						$gbo[$i][$n] = $gbt[$i][3][6];
+						$n++;
+					}
 				} else {
-					$gbo[$i][$n] = $gbt[$i][3][$availshow];
-					$n++;
+					if (isset($gbt[0][3][0])) { //using points based
+						$gbo[$i][$n] = $gbt[$i][3][$availshow];
+						$n++;
+						$gbo[$i][$n] = $gbt[$i][3][$availshow+3] ;
+						$n++;
+					} else {
+						$gbo[$i][$n] = $gbt[$i][3][$availshow];
+						$n++;
+					}
 				}
 			}
 			
