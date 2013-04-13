@@ -174,19 +174,11 @@ END;
 	 $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	 
 	 if (isset($CFG['GEN']['guesttempaccts']) && $_POST['username']=='guest') { // create a temp account when someone logs in w/ username: guest
-	 	 $handle = @fopen("$curdir/admin/import/tempacctcounter.txt",'r');
-	 	 if ($handle===false) {
-			$guestcnt = 0;
-		} else {
-			$guestcnt = intval(trim(fgets($handle)));
-			fclose($handle);
-		}
-		$guestcnt++;
-		$handle = @fopen("$curdir/admin/import/tempacctcounter.txt",'w');
-		if ($handle !== false) {
-			$fwrite = fwrite($handle,$guestcnt);
-			fclose($handle);
-		}
+	 	$query = 'SELECT ver FROM imas_dbschema WHERE id=2';
+	 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	 	$guestcnt = mysql_result($result,0,0);
+	 	$query = 'UPDATE imas_dbschema SET ver=ver+1 WHERE id=2';
+	 	mysql_query($query) or die("Query failed : " . mysql_error());
 		
 		if (isset($CFG['GEN']['homelayout'])) {
 			$homelayout = $CFG['GEN']['homelayout'];

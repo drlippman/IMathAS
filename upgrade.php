@@ -1,7 +1,7 @@
 <?php  
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 67;
+$latest = 68;
 
 
 @set_time_limit(0);
@@ -1120,6 +1120,16 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 	 $n = mysql_affected_rows();
 			 }
 			 echo "hasuserimg field added, $n user images identified<br/>";
+		}
+		if ($last < 68) {
+			 $query = 'ALTER TABLE `imas_assessments` CHANGE `intro` `intro` MEDIUMTEXT NOT NULL';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = 'INSERT INTO imas_dbschema (id,ver) VALUES (2,100)';
+			 $res = mysql_query($query);
+			 echo "changed assessment intro to mediumtext, moved guest acct counter to DB<br/>"; 
 		}
 		/*$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {
