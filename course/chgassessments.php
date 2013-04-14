@@ -227,6 +227,11 @@ if (!(isset($teacherid))) {
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$sets[] = "intro='".addslashes(mysql_result($result,0,0))."'";
 		}
+		if (isset($_POST['chgsummary'])) {
+			$query = "SELECT summary FROM imas_assessments WHERE id='{$_POST['summary']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$sets[] = "summary='".addslashes(mysql_result($result,0,0))."'";
+		}
 		if (isset($_POST['chgdates'])) {
 			$query = "SELECT startdate,enddate,reviewdate FROM imas_assessments WHERE id='{$_POST['dates']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -472,6 +477,16 @@ function chkgbcat(cat) {
 			<tr><th>Change?</th><th>Option</th><th>Setting</th></tr>
 			</thead>
 			<tbody>
+			<tr>
+				<td><input type="checkbox" name="chgsummary"/></td>
+				<td class="r">Summary:</td>
+				<td>Copy from: 
+<?php
+	writeHtmlSelect("summary",$page_assessSelect['val'],$page_assessSelect['label']);
+?>
+
+				</td>
+			</tr>
 			<tr>
 				<td><input type="checkbox" name="chgintro"/></td>
 				<td class="r">Instructions:</td>
