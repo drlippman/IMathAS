@@ -494,6 +494,7 @@
 				}
 				
 				echo "</span>\n";
+				echo '<span style="float:left">';
 				echo "<b>{$subject[$child]}</b><br/>Posted by: ";
 				//if ($isteacher && $ownerid[$child]!=0) {
 				//	echo "<a href=\"mailto:{$email[$child]}\">";
@@ -514,12 +515,16 @@
 				if ($date[$child]>$lastview) {
 					echo " <span style=\"color:red;\">New</span>\n";
 				}
-				
+				echo '</span>';
+				echo '<div style="float:left; padding-left:8px;">';
+				echo "<img class=\"likeicon\" style=\"background-color:#0f0;\" src=\"$imasroot/img/thumbw22.png\" title=\"Liked by you, 2 students and the instructor\">";
+				echo " 4";
+				echo '</div>';
 				echo "</div>\n";
 				if ($view==2) {
 					echo "<div class=hidden id=\"item$icnt\">";
 				} else {
-					echo "<div class=blockitems id=\"item$icnt\">";
+					echo "<div class=blockitems id=\"item$icnt\" style=\"clear:all\">";
 				}
 				if(isset($files[$child]) && $files[$child]!='') {
 					$fl = explode('@@',$files[$child]);

@@ -53,3 +53,9 @@ span.leftbtns img {
 .forumcattag {
 	color: #090;
 }	
+.likeicon {
+	vertical-align: middle;
+	border-radius: 8px;
+	padding: 5px;
+}
+	
