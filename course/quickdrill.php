@@ -28,8 +28,8 @@ if (isset($_GET['public'])) {
 	} else {
 		$sessiondata = unserialize(base64_decode($_SESSION['data']));
 	}
-	if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') {
-		 $urlmode = 'https://';
+	if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
+		$urlmode = 'https://';
 	 } else {
 		 $urlmode = 'http://';
 	 }
