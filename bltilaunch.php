@@ -31,8 +31,8 @@ if (!get_magic_quotes_gpc()) {
 	$_REQUEST = array_map('addslashes_deep', $_REQUEST);
 }
 
- if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') {
- 	 $urlmode = 'https://';
+ if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
+	 $urlmode = 'https://';
  } else {
  	 $urlmode = 'http://';
  }

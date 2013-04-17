@@ -143,11 +143,12 @@ function sendOAuthBodyPOST($method, $endpoint, $oauth_consumer_key, $oauth_consu
     }
 
     if ($response === false) {
-    	    global $sessiondata;
-    	    if (isset($sessiondata['debugmode'])) {
-        	    throw new Exception("Problem reading data from $endpoint, $php_errormsg");
-            }
-            //otherwise fail silently
+    	global $sessiondata;
+    	if ($sessiondata['debugmode']==true) {
+    		throw new Exception("Problem reading data from $endpoint, $php_errormsg");
+    	} else {
+    		echo "Unable to update score via LTI.";
+    	}
     }
     return $response;
 }

@@ -4,7 +4,7 @@
 <title><?php echo $installname; if (isset($pagetitle)) { echo " - $pagetitle";}?></title>
 <meta http-equiv="X-UA-Compatible" content="IE=7, IE=9" />
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js" type="text/javascript"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js" type="text/javascript"></script>
 <link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=112111";?>" type="text/css" />
 <?php if (isset($coursetheme)) { 
 	if (isset($flexwidth) || isset($usefullwidth)) {

@@ -185,7 +185,7 @@ $sql = 'CREATE TABLE `imas_assessments` ('
         . ' `courseid` INT(10) UNSIGNED NOT NULL DEFAULT \'0\', '
         . ' `name` VARCHAR(254) NOT NULL, '
 	. ' `summary` TEXT NOT NULL, '
-        . ' `intro` TEXT NOT NULL, '
+        . ' `intro` MEDIUMTEXT NOT NULL, '
         . ' `startdate` INT(10) UNSIGNED NOT NULL DEFAULT \'0\', '
         . ' `enddate` INT(10) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `reviewdate` INT(10) UNSIGNED NOT NULL DEFAULT \'0\', '
@@ -939,6 +939,8 @@ $sql = 'CREATE TABLE `imas_dbschema` (
 	`id` INT( 10 ) UNSIGNED NOT NULL PRIMARY KEY ,
 	`ver` SMALLINT( 4 ) UNSIGNED NOT NULL
 	) ENGINE = InnoDB';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+$sql = 'INSERT INTO imas_dbschema (id,ver) VALUES (2,0)';  //initialize guest account counter
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 echo 'imas_dbschema created<br/>';
 

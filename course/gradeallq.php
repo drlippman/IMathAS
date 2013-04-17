@@ -155,6 +155,14 @@
 	
 	$useeditor='review';
 	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=120311"></script>';
+	$placeinhead .= "<script type=\"text/javascript\">";
+	$placeinhead .= 'function jumptostu() { ';
+	$placeinhead .= '       var stun = document.getElementById("stusel").value; ';
+	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradeallq.php?stu=$stu&cid=$cid&gbmode=$gbmode&aid=$aid&qid=$qid&ver=$ver";
+	$placeinhead .= "       var toopen = '$address&page=' + stun;\n";
+	$placeinhead .= "  	window.location = toopen; \n";
+	$placeinhead .= "}\n";
+	$placeinhead .= '</script>';
 	require("../includes/rubric.php");
 	$sessiondata['coursetheme'] = $coursetheme;
 	require("../assessment/header.php");
@@ -315,6 +323,18 @@
 		echo "<br/><b>Note:</b> Grades and number of attempt used are for the Graded Attempt.  Part points might be inaccurate.";
 	}
 	echo "</p>";
+	
+	if ($page!=-1) {
+		$stulist = array();
+		$query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions,imas_students ";
+		$query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_students.userid=imas_users.id AND imas_students.courseid='$cid' AND imas_assessment_sessions.assessmentid='$aid' ";
+		$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
+		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			$stulist[] = $row[0].', '.$row[1];
+		}
+	}
+	
 	$query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions,imas_students ";
 	$query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_students.userid=imas_users.id AND imas_students.courseid='$cid' AND imas_assessment_sessions.assessmentid='$aid' ";
 	$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
@@ -363,7 +383,17 @@
 			if ($groupdup) {
 				echo '<div class="groupdup">';
 			}
-			echo "<h4 class=\"person\">".$line['LastName'].', '.$line['FirstName']."</h4>";
+			echo "<p><span class=\"person\"><b>".$line['LastName'].', '.$line['FirstName'].'</b></span>';
+			if ($page != -1) {
+				echo '.  Jump to <select id="stusel" onchange="jumptostu()">';
+				foreach ($stulist as $i=>$st) {
+					echo '<option value="'.$i.'" ';
+					if ($i==$page) {echo 'selected="selected"';}
+					echo '>'.$st.'</option>';
+				}
+				echo '</select>';
+			}
+			echo '</p>';
 			if (!$groupdup) {
 				echo '<h4 class="group" style="display:none">'.$groupnames[$line['agroupid']];
 				if (isset($groupmembers[$line['agroupid']]) && count($groupmembers[$line['agroupid']])>0) {

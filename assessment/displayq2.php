@@ -1662,7 +1662,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .=  '<div style="position: absolute; top:170px;left:0px;z-index:2;" id="slid1txt'.$qn.'"></div>';
 			$out .=  '<div style="position: absolute; top:170px;left:0px;z-index:2;" id="slid2txt'.$qn.'"></div>';
 			$out .=  '</div></div>';
-			$out .=  '<script type="text/javascript">normslider.idnums.push('.$qn.');</script>';
+			$out .=  '<script type="text/javascript">addnormslider('.$qn.');</script>';
 		} else if ($answerformat=='normalcurve') {
 			$out .= 'Enter an interval corresponding to the region to be shaded';
 		}

@@ -102,7 +102,7 @@ function print_html($badgetext, $name, $descr, $longdescr, $reqnameout, $reqout,
 function print_assertation($cid, $badgetext, $badgename, $descr, $userid, $email) {
 	global $badgeid, $installname, $imasroot;
 	header('Content-Type: application/json');
-	if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') {
+	if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
 		$urlmode = 'https://';
 	} else {
 		$urlmode = 'http://';
