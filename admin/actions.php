@@ -458,20 +458,34 @@ switch($_GET['action']) {
 		break;
 	case "remteacher":
 		if ($myrights < 40) { echo "You don't have the authority for this action"; break;}
-		$query = "DELETE FROM imas_teachers WHERE id='{$_GET['tid']}'";
-		if ($myrights < 100) {
-			$query = "SELECT imas_teachers.id FROM imas_teachers,imas_users WHERE imas_teachers.id='{$_GET['tid']}' AND imas_teachers.userid=imas_users.id AND imas_users.groupid='$groupid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			if (mysql_num_rows($result)>0) {
-				$query = "DELETE FROM imas_teachers WHERE id='{$_GET['tid']}'";
-			} else {
-				break;
+		$tids = array();
+		if (isset($_GET['tid'])) {
+			$tids = array($_GET['tid']);
+		} else if (isset($_POST['tid'])) {
+			$tids = $_POST['tid'];
+			if (count($tids)==$_GET['tot']) {
+				array_shift($tids);
 			}
-			
-			//$query = "DELETE imas_teachers FROM imas_users,imas_teachers WHERE imas_teachers.id='{$_GET['tid']}' ";
-			//$query .= "AND imas_teachers.userid=imas_users.id AND imas_users.groupid='$groupid'";
 		}
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		foreach ($tids as $tid) {
+			if ($myrights < 100) {
+				$query = "SELECT imas_teachers.id FROM imas_teachers,imas_users WHERE imas_teachers.id='$tid' AND imas_teachers.userid=imas_users.id AND imas_users.groupid='$groupid'";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				if (mysql_num_rows($result)>0) {
+					$query = "DELETE FROM imas_teachers WHERE id='$tid'";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+				} else {
+					//break;
+				}
+				
+				//$query = "DELETE imas_teachers FROM imas_users,imas_teachers WHERE imas_teachers.id='{$_GET['tid']}' ";
+				//$query .= "AND imas_teachers.userid=imas_users.id AND imas_users.groupid='$groupid'";
+			} else {
+				$query = "DELETE FROM imas_teachers WHERE id='$tid'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+		}
+		
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/forms.php?action=chgteachers&id={$_GET['cid']}");
 		exit;
 	case "addteacher":
@@ -483,8 +497,20 @@ switch($_GET['action']) {
 				break;
 			}
 		}
-		$query = "INSERT INTO imas_teachers (userid,courseid) VALUES ('{$_GET['tid']}','{$_GET['cid']}')";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		$tids = array();
+		if (isset($_GET['tid'])) {
+			$tids = array($_GET['tid']);
+		} else if (isset($_POST['atid'])) {
+			$tids = $_POST['atid'];
+		}
+		$ins = array();
+		foreach ($tids as $tid) {
+			$ins[] = "('$tid','{$_GET['cid']}')";
+		}
+		if (count($ins)>0) {
+			$query = "INSERT INTO imas_teachers (userid,courseid) VALUES ".implode(',',$ins);
+			mysql_query($query) or die("Query failed : " . mysql_error());
+		}
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/forms.php?action=chgteachers&id={$_GET['cid']}");
 		exit;
 	case "importmacros":

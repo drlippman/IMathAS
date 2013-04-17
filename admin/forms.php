@@ -453,10 +453,19 @@ switch($_GET['action']) {
 		$query .= "FROM imas_users,imas_teachers WHERE imas_teachers.courseid='{$_GET['id']}' AND ";
 		$query .= "imas_teachers.userid=imas_users.id ORDER BY imas_users.LastName;";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$num = mysql_num_rows($result);
+		echo '<form method="post" action="actions.php?action=remteacher&cid='.$_GET['id'].'&tot='.$num.'">';
+		echo 'With Selected: <input type="submit" value="Remove as Teacher"/>';
 		echo "<table cellpadding=5>\n";
-		$onlyone = (mysql_num_rows($result)==1);
+		$onlyone = ($num==1);
 		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
-			echo "<tr><td>{$line['LastName']}, {$line['FirstName']}</td> ";
+			if ($onlyone) {
+				echo '<tr><td></td>';
+			} else {
+				echo '<tr><td><input type="checkbox" name="tid[]" value="'.$line['id'].'"/></td>';
+			}
+			
+			echo "<td>{$line['LastName']}, {$line['FirstName']}</td>";
 			if ($onlyone) {
 				echo "<td></td></tr>";
 			} else {
@@ -464,24 +473,27 @@ switch($_GET['action']) {
 			}
 			$used[$line['userid']] = true;
 		}
-		echo "</table>\n";
+		echo "</table></form>\n";
 		
 		echo "<h4>Potential Teachers:</h4>\n";
 		if ($myrights<100) {
-			$query = "SELECT id,FirstName,LastName,rights FROM imas_users WHERE rights>19 AND groupid='$groupid' ORDER BY LastName;";
+			$query = "SELECT id,FirstName,LastName,rights FROM imas_users WHERE rights>19 AND rights<>76 AND groupid='$groupid' ORDER BY LastName;";
 		} else if ($myrights==100) {
-			$query = "SELECT id,FirstName,LastName,rights FROM imas_users WHERE rights>19 ORDER BY LastName;";
+			$query = "SELECT id,FirstName,LastName,rights FROM imas_users WHERE rights>19 AND rights<>76 ORDER BY LastName;";
 		}
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		echo '<form method="post" action="actions.php?action=addteacher&cid='.$_GET['id'].'">';
+		echo 'With Selected: <input type="submit" value="Add as Teacher"/>';
 		echo "<table cellpadding=5>\n";
 		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 			if ($used[$line['id']]!=true) {
 				//if ($line['rights']<20) { $type = "Tutor/TA/Proctor";} else {$type = "Teacher";}
-				echo "<tr><td>{$line['LastName']}, {$line['FirstName']} </td> ";
+				echo '<tr><td><input type="checkbox" name="atid[]" value="'.$line['id'].'"/></td>';
+				echo "<td>{$line['LastName']}, {$line['FirstName']} </td> ";
 				echo "<td><a href=\"actions.php?action=addteacher&cid={$_GET['id']}&tid={$line['id']}\">Add as Teacher</a></td></tr>\n";
 			}
 		}
-		echo "</table>\n";
+		echo "</table></form>\n";
 		echo "<p><input type=button value=\"Done\" onclick=\"window.location='admin.php'\" /></p>\n";
 		break;
 	case "importmacros":
