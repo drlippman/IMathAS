@@ -143,7 +143,11 @@ function sendOAuthBodyPOST($method, $endpoint, $oauth_consumer_key, $oauth_consu
     }
 
     if ($response === false) {
-        throw new Exception("Problem reading data from $endpoint, $php_errormsg");
+    	    global $sessiondata;
+    	    if (isset($sessiondata['debugmode'])) {
+        	    throw new Exception("Problem reading data from $endpoint, $php_errormsg");
+            }
+            //otherwise fail silently
     }
     return $response;
 }
@@ -203,7 +207,7 @@ function calcandupdateLTIgrade($sourcedid,$aid,$scores) {
 		$result2 = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 		$totalpossible = 0;
 		while ($r = mysql_fetch_row($result2)) {
-			if (in_array($r[1],$aitems)) { //only use first item from grouped questions for total pts
+			if (($k=array_search($r[1],$aitems))!==false) { //only use first item from grouped questions for total pts
 				if ($r[0]==9999) {
 					$totalpossible += $aitemcnt[$k]*$defpoints; //use defpoints
 				} else {
