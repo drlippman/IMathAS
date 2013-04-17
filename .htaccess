@@ -18,3 +18,4 @@ AddType application/vnd.openxmlformats-officedocument.spreadsheetml.sheet xlsx
 AddType application/vnd.ms-excel.template.macroEnabled.12 xltm
 AddType application/vnd.openxmlformats-officedocument.spreadsheetml.template xltx
 Options -Indexes
+php_value upload_max_filesize 10M
