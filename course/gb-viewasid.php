@@ -287,7 +287,7 @@
 					if (isset($_POST["$i-0"])) {
 	
 						while (isset($_POST["$i-$j"])) {
-							if ($_POST["$i-$j"]!='N/A') {
+							if ($_POST["$i-$j"]!='N/A' && $_POST["$i-$j"]!='NA') {
 								$scpt[$j] = $_POST["$i-$j"];
 							} else {
 								$scpt[$j] = -1;
@@ -296,7 +296,7 @@
 						}
 						$scores[$i] = implode('~',$scpt);
 					} else {
-						if ($_POST[$i]!='N/A') {
+						if ($_POST[$i]!='N/A' && $_POST["$i-$j"]!='NA') {
 							$scores[$i] = $_POST[$i];
 						} else {
 							$scores[$i] = -1;
@@ -663,7 +663,7 @@
 			$qtypes = displayq($i,$qsetid,$seeds[$i],$showa,false,$attempts[$i]);
 			echo '</div>';
 			
-			if ($scores[$i]==-1) { $scores[$i]="NA";} else {$total+=getpts($scores[$i]);}
+			if ($scores[$i]==-1) { $scores[$i]="N/A";} else {$total+=getpts($scores[$i]);}
 			echo "<div class=review>Question ".($i+1).": ";
 			if ($withdrawn[$questions[$i]]==1) {
 				echo "<span class=\"red\">Question Withdrawn</span> ";
