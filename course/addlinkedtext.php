@@ -388,7 +388,7 @@ if ($overwriteBody==1) {
 			<span class="formright">
 			<?php if ($filename != '') {
 				echo '<input type="hidden" name="curfile" value="'.$filename.'"/>';
-				echo 'Current file: <a href="'.$imasroot.'/course/files/'.$filename.'">'.$filename.'</a><br/>Replace ';
+				echo 'Current file: <a href="'.$imasroot.'/course/files/'.$filename.'">'.basename($filename).'</a><br/>Replace ';
 			} else {
 				echo 'Attach ';
 			}
