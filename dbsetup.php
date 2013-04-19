@@ -522,6 +522,15 @@ $sql = 'CREATE TABLE `imas_forum_views` ('
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());	
 echo 'imas_forum_views created<br/>';
 
+$sql = 'CREATE TABLE `imas_forum_likes` (
+	`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+	`userid` INT(10) UNSIGNED NOT NULL, 
+	`threadid` INT(10) UNSIGNED NOT NULL, 
+	`postid` INT(10) UNSIGNED NOT NULL, 
+	`type` TINYINT(1) UNSIGNED NOT NULL
+	) ENGINE = InnoDB';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());	
+echo 'imas_forum_likes created<br/>';
 
 $sql = 'CREATE TABLE `imas_wikis` ('
         . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '

@@ -69,6 +69,7 @@
 	$allowanon = (($forumsettings&1)==1);
 	$allowmod = ($isteacher || (($forumsettings&2)==2));
 	$allowdel = ($isteacher || (($forumsettings&4)==4));
+	$allowlikes = (($forumsettings&8)==8);
 	$pointsposs = mysql_result($result,0,4);
 	$haspoints =  ($pointsposs > 0);
 	$forumname = mysql_result($result,0,3);
@@ -152,7 +153,7 @@
 		$query .= "WHERE imas_forum_posts.userid=imas_users.id AND (imas_forum_posts.id='$threadid' OR imas_forum_posts.threadid='$threadid') ORDER BY imas_forum_posts.id";	
 	}
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	$children = array(); $date = array(); $subject = array(); $message = array(); $posttype = array();
+	$children = array(); $date = array(); $subject = array(); $message = array(); $posttype = array(); $likes = array(); $mylikes = array();
 	$ownerid = array(); $files = array(); $points= array(); $feedback= array(); $poster= array(); $email= array(); $hasuserimg = array();
 	while ($line =  mysql_fetch_array($result, MYSQL_ASSOC)) {
 		if ($line['parent']==0) {
@@ -202,8 +203,26 @@
 			$poster[$line['id']] = $line['FirstName'] . ' ' . $line['LastName'];
 			$email[$line['id']] = $line['email'];
 		}
+		$likes[$line['id']] = array(0,0,0);
 		
 	}
+	
+	if ($allowlikes) {
+		//get likes
+		$query = "SELECT postid,type,count(*) FROM imas_forum_likes WHERE threadid='$threadid'";
+		$query .= "GROUP BY postid,type";	
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			$likes[$row[0]][$row[1]] = $row[2];
+		}
+		
+		$query = "SELECT postid FROM imas_forum_likes WHERE threadid='$threadid' AND userid='$userid'";
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			$mylikes[] = $row[0];
+		}
+	}
+	
 	if (count($files)>0) {
 		require_once('../includes/filehandler.php');
 	}
@@ -351,13 +370,37 @@
 	     buti.value = "Show";
 	   }
 	}
+	function savelike(el) {
+		var like = (el.src.match(/gray/))?1:0;
+		var postid = el.id.substring(8);
+		$(el).parent().append('<img style="vertical-align: middle" src="../img/updating.gif" id="updating"/>');
+		$.ajax({
+			url: "recordlikes.php",
+			data: {cid:<?php echo $cid;?>, postid: postid, like: like},
+			dataType: "json"
+		}).done(function(msg) {
+			if (msg.aff==1) {
+				el.title = msg.msg;
+				$('#likecnt'+postid).text(msg.cnt>0?msg.cnt:'');
+				el.className = "likeicon"+msg.classn;
+				if (like==0) {
+					el.src = el.src.replace("liked","likedgray");
+				} else {
+					el.src = el.src.replace("likedgray","liked");
+				}
+			}
+			$('#updating').remove();
+		});
+	}
 	</script>
 <?php
 	$bcnt = 0;
 	$icnt = 0;
 	function printchildren($base,$restricttoowner=false) {
 		$curdir = rtrim(dirname(__FILE__), '/\\');
-		global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points,$feedback,$posttype,$lastview,$bcnt,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$view,$page,$allowmsg,$haspoints,$imasroot,$postby,$replyby,$files,$CFG,$rubric,$pointsposs,$hasuserimg,$urlmode;
+		global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points;
+		global $feedback,$posttype,$lastview,$bcnt,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$allowlikes,$view,$page,$allowmsg;
+		global $haspoints,$imasroot,$postby,$replyby,$files,$CFG,$rubric,$pointsposs,$hasuserimg,$urlmode,$likes,$mylikes;
 		if (!isset($CFG['CPS']['itemicons'])) {
 	   	   $itemicons = array('web'=>'web.png', 'doc'=>'doc.png', 'wiki'=>'wiki.png',
 			'html'=>'html.png', 'forum'=>'forum.png', 'pdf'=>'pdf.png',
@@ -494,6 +537,7 @@
 				}
 				
 				echo "</span>\n";
+				echo '<span style="float:left">';
 				echo "<b>{$subject[$child]}</b><br/>Posted by: ";
 				//if ($isteacher && $ownerid[$child]!=0) {
 				//	echo "<a href=\"mailto:{$email[$child]}\">";
@@ -514,12 +558,53 @@
 				if ($date[$child]>$lastview) {
 					echo " <span style=\"color:red;\">New</span>\n";
 				}
+				echo '</span>';
 				
+				if ($allowlikes) {
+					$icon = (in_array($child,$mylikes))?'liked':'likedgray';
+					$likemsg = 'Liked by ';
+					$likecnt = 0;
+					if ($likes[$child][0]>0) {
+						$likeclass = ' liked';
+						$likemsg .= $likes[$child][0].' ' . ($likes[$child][0]==1?'student':'students');
+						$likecnt += $likes[$child][0];
+					}
+					if ($likes[$child][1]>0 || $likes[$child][2]>0) {
+						$likeclass = ' likedt';
+						$n = $likes[$child][1] + $likes[$child][2];
+						if ($likes[$child][0]>0) { $likemsg .= ' and ';}
+						$likemsg .= $n.' ';
+						if ($likes[$child][2]>0) {
+							$likemsg .= ($n==1?'teacher':'teachers');
+							if ($likes[$child][1]>0) {
+								$likemsg .= '/tutors/TAs';
+							}
+						} else if ($likes[$child][1]>0) {
+							$likemsg .= ($n==1?'tutor/TA':'tutors/TAs');
+						}
+						$likecnt += $n;
+					}
+					if ($likemsg=='Liked by ') {
+						$likemsg = '';
+					} else {
+						$likemsg .= '.';
+					}
+					if ($icon=='liked') {
+						$likemsg = 'You like this. '.$likemsg;
+					} else {
+						$likemsg = 'Click to like this post. '.$likemsg;;
+					}
+					
+					echo '<div class="likewrap">';
+					echo "<img id=\"likeicon$child\" class=\"likeicon$likeclass\" src=\"$imasroot/img/$icon.png\" title=\"$likemsg\" onclick=\"savelike(this)\">";
+					echo " <span id=\"likecnt$child\">".($likecnt>0?$likecnt:'').' </span> ';
+					echo '</div>';
+				}
 				echo "</div>\n";
 				if ($view==2) {
 					echo "<div class=hidden id=\"item$icnt\">";
 				} else {
-					echo "<div class=blockitems id=\"item$icnt\">";
+					echo "<div class=blockitems id=\"item$icnt\" style=\"clear:all\">";
 				}
 				if(isset($files[$child]) && $files[$child]!='') {
 					$fl = explode('@@',$files[$child]);
