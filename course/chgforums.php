@@ -71,6 +71,15 @@ if (isset($_POST['checked'])) { //form submitted
 			$sops[] = " & ~4";
 		}
 	}
+	if (isset($_POST['chgallowlikes'])) {
+		if (isset($_POST['allowlikes']) && $_POST['allowlikes']==1) {
+			//turn on 8's bit
+			$sops[] = " | 8";
+		} else {
+			//turn off 8's bit
+			$sops[] = " & ~8";
+		}
+	}
 	if (count($sops)>0) {
 		$out = "settings";
 		foreach ($sops as $op) {
@@ -286,6 +295,13 @@ foreach($forumitems as $id=>$name) {
 	<td class="r">Allow students to delete own posts (if no replies): </td>
 	<td>
 		<input type=checkbox name="allowdel" value="1"/>
+	</td>
+</tr>
+<tr class="coptr">
+	<td><input type="checkbox" name="chgallowlikes"/></td>
+	<td class="r">Turn on "liking" posts: </td>
+	<td>
+		<input type=checkbox name="allowlikes" value="1"/>
 	</td>
 </tr>
 <tr class="coptr">

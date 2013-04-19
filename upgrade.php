@@ -1,7 +1,7 @@
 <?php  
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 68;
+$latest = 69;
 
 
 @set_time_limit(0);
@@ -1130,6 +1130,20 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 $query = 'INSERT INTO imas_dbschema (id,ver) VALUES (2,100)';
 			 $res = mysql_query($query);
 			 echo "changed assessment intro to mediumtext, moved guest acct counter to DB<br/>"; 
+		}
+		if ($last < 69) {
+			$query = 'CREATE TABLE `imas_forum_likes` (
+				`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+				`userid` INT(10) UNSIGNED NOT NULL, 
+				`threadid` INT(10) UNSIGNED NOT NULL, 
+				`postid` INT(10) UNSIGNED NOT NULL, 
+				`type` TINYINT(1) UNSIGNED NOT NULL
+				) ENGINE = InnoDB';
+			$res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 } 
+			echo "Added imas_forum_likes table<br/>";
 		}
 		/*$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {
