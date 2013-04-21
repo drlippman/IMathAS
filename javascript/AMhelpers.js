@@ -23,29 +23,29 @@ function calculate(inputId,outputId,format) {
 			  str = str.replace(/\s/g,'');
 			 // if (!str.match(/^\s*\-?\(?\d+\s*\/\s*\-?\d+\)?\s*$/) && !str.match(/^\s*?\-?\d+\s*$/)) {
 			  if (!str.match(/^\(?\-?\(?\d+\)?\/\(?\d+\)?$/) && !str.match(/^\(?\d+\)?\/\(?\-?\d+\)?$/) && !str.match(/^\s*?\-?\d+\s*$/)) {
-				err += "not a valid fraction";  
+				err += _("not a valid fraction");  
 			  }
 		  } else if (format.indexOf('fracordec')!=-1) {
 			  str = str.replace(/\s/g,'');
 			  if (!str.match(/^\s*\-?\(?\d+\s*\/\s*\-?\d+\)?\s*$/) && !str.match(/^\s*?\-?\d+\s*$/) && !str.match(/^(\d+|\d+\.\d*|\d*\.\d+)$/)) {
-				err += " invalid entry format";  
+				err += _(" invalid entry format");  
 			  }
 		  } else if (format.indexOf('mixednumber')!=-1) {
 			  if (!str.match(/^\s*\-?\s*\d+\s*(_|\s)\s*\d+\s*\/\s*\d+\s*$/) && !str.match(/^\s*?\-?\d+\s*$/) && !str.match(/^\s*\-?\d+\s*\/\s*\-?\d+\s*$/)) {
-				err += "not a valid mixed number";
+				err += _("not a valid mixed number");
 			  }
 			  str = str.replace(/_/,' ');
 		  } else if (format.indexOf('scinot')!=-1) {
 			  str = str.replace(/\s/g,'');
 			  str = str.replace("x","xx");
 			  if (!str.match(/^\-?[1-9](\.\d*)?(\*|xx)10\^(\(?\-?\d+\)?)$/)) {
-				err += "not valid scientific notation";  
+				err += _("not valid scientific notation");  
 			  }
 		  } 
 		  if (format.indexOf('notrig')!=-1 && str.match(/(sin|cos|tan|cot|sec|csc)/)) {
-			  str = "no trig functions allowed";
+			  str = _("no trig functions allowed");
 		  } else if (format.indexOf('nodecimal')!=-1 && str.indexOf('.')!=-1) {
-			  str = "no decimals allowed";
+			  str = _("no decimals allowed");
 		  } else {
 			  try {
 				  var evalstr = str;
@@ -57,7 +57,7 @@ function calculate(inputId,outputId,format) {
 				  }
 			          with (Math) var res = eval(mathjs(evalstr));
 			  } catch(e) {
-			    err = "syntax incomplete";
+			    err = _("syntax incomplete");
 			  }
 			  if (!isNaN(res) && res!="Infinity") {
 				  if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1 || format.indexOf('scinot')!=-1 || format.indexOf('noval')!=-1) {
@@ -78,18 +78,20 @@ function calculate(inputId,outputId,format) {
 						Bdepth--;
 					}
 				  }
-				  str = "`"+str+"` = undefined";
+				  str = "`"+str+"` = "+_("undefined");
 				  if (Pdepth!=0 || Bdepth!=0) {
-					  str += " (unmatched parens)";
+					  str += " ("+_("unmatched parens")+")";
 				  }
 				  trg = str.match(/(sin|cos|tan|sec|csc|cot)\^/);
 				  reg = new RegExp("(sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs)([^\(])");
 				  errstuff = str.match(reg)
 				  if (trg!=null) {
 					  trg = trg[1];
-					  str += " [use ("+trg+"(x))^2 instead of "+trg+"^2(x)]";
+					  //str += "["+_("use")+" ("+trg+"(x))^2 "+_("instead of ")+trg+_("^2(x)]");
+					  str += "["+_("use $1 instead of $2","("+trg+"(x))^2", trg+"^2(x)")+"]";
+					//  "["+_("use")+" ("+trg+"(x))^2 "+_("instead of ")+trg+_("^2(x)]");
 				  } else if (errstuff!=null) {  
-					  str += " [use function notation - "+errstuff[1]+"("+errstuff[2]+"), not "+errstuff[0]+"]";
+					  str += "["+_("use function notation")+" - "+_("$1 instead of $2",errstuff[1]+"("+errstuff[2]+")",errstuff[0])+"]";
 				  }
 			  }
 		  }
@@ -148,7 +150,7 @@ function intcalculate(inputId,outputId,format) {
   if (fullstr.match(/DNE/i)) {
 	  fullstr = fullstr.toUpperCase();
   } else if (fullstr.replace(/\s+/g,'')=='') {
-	  fullstr = "no answer given";
+	  fullstr = _("no answer given");
   } else {
 	  var calcvals = new Array();
 	  var calcstrarr = new Array();
@@ -171,7 +173,7 @@ function intcalculate(inputId,outputId,format) {
 		  vals = str.substring(1,str.length-1);
 		  vals = vals.split(/,/);
 		  if (vals.length != 2) {
-			  fullstr = "syntax incomplete";
+			  fullstr = _("syntax incomplete");
 			  isok = false;
 			  break;
 		  }
@@ -184,7 +186,7 @@ function intcalculate(inputId,outputId,format) {
 				  try {
 				    with (Math) var res = eval(mathjs(vals[j]));
 				  } catch(e) {
-				    err = "syntax incomplete";
+				    err = _("syntax incomplete");
 				  }
 				  if (!isNaN(res) && res!="Infinity") {
 					 // if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1) {
@@ -283,7 +285,7 @@ function ntuplecalc(inputId,outputId) {
 				try {
 				    with (Math) var res = eval(mathjs(sub));
 				} catch(e) {
-				    err = "syntax incomplete";
+				    err = _("syntax incomplete");
 				}
 				if (!isNaN(res) && res!="Infinity") {
 					outcalced += res;
@@ -328,7 +330,7 @@ function complexcalc(inputId,outputId) {
 			    with (Math) var real = scopedeval('var i=0;'+prep);
 			    with (Math) var imag = scopedeval('var i=1;'+prep);
 			} catch(e) {
-			    err = "syntax incomplete";
+			    err = _("syntax incomplete");
 			}
 			if (!isNaN(real) && real!="Infinity" && !isNaN(imag) && imag!="Infinity") {
 				imag -= real;
@@ -364,11 +366,11 @@ function matrixcalc(inputId,outputId,rows,cols) {
 		try {
 			with (Math) var res = eval(mathjs(estr));
 		} catch(e) {
-			err = "syntax incomplete";
+			err = _("syntax incomplete");
 		}
 		if (!isNaN(res) && res!="Infinity") 
 			estr = (Math.abs(res)<1e-15?0:res)+err; 
-		else if (estr!="") estr = "undefined";
+		else if (estr!="") estr = _("undefined");
 		return estr;
 	}
 	if (rows!=null && cols!=null) {
@@ -536,11 +538,11 @@ function AMpreview(inputId,outputId) {
 		totest += "var " + vars[j] + "="+testvals[j]+";"; 
 	  }
 	  totest += totesteqn;
-	  var err="syntax ok";
+	  var err=_("syntax ok");
 	  try {
 	    with (Math) var res = scopedeval(totest);
 	  } catch(e) {
-	    err = "syntax error";
+	    err = _("syntax error");
 	  }
 	  tstpt++;
   }
@@ -551,9 +553,10 @@ function AMpreview(inputId,outputId) {
 	  errstuff = str.match(reg)
 	  if (trg!=null) {
 		  trg = trg[1];
-		  err = "syntax error: use ("+trg+"(x))^2 instead of "+trg+"^2(x)";
+		  //err = _("syntax error")+": "+_("use")+" ("+trg+"(x))^2 "+_("instead of ")+trg+"^2(x)";
+		  err += _("syntax error")+": "+_("use $1 instead of $2","("+trg+"(x))^2", trg+"^2(x)");
 	  } else if (errstuff!=null) {  
-		  err += ": use "+errstuff[1]+"("+errstuff[2]+"), not "+errstuff[0];
+		  err += ": "+_("use")+" "+errstuff[1]+"("+errstuff[2]+"), "+_("not")+" "+errstuff[0];
 	  } else {
 		  var Pdepth = 0; var Bdepth = 0;
 		  for (var i=0; i<str.length; i++) {
@@ -568,16 +571,16 @@ function AMpreview(inputId,outputId) {
 			}
 		  }
 		  if (Pdepth!=0 || Bdepth!=0) {
-			  err += ": unmatched parens";
+			  err += ": "+_("unmatched parens");
 		  } else {
 			 //catch (cos)(x)
 			 reg = new RegExp("(sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs)([^\(])");
 			 errstuff = str.match(reg);
 			 
 			if (errstuff!=null && errstuff[2]!='h') {
-				err = "syntax error: use function notation - "+errstuff[1]+"(x)";
+				err =_("syntax error")+": "+_("use function notation")+" - "+errstuff[1]+"(x)";
 			} else {
-				err = "syntax error";
+				err = _("syntax error");
 			}
 		  }
 		  //err = "syntax error";
@@ -586,10 +589,10 @@ function AMpreview(inputId,outputId) {
 	reg = new RegExp("(sqrt|ln|log|sinh|cosh|tanh|sech|csch|tanh|sin|cos|tan|sec|csc|cot|abs)\\s*("+vl+")");
 	errstuff = str.match(reg);
 	if (errstuff!=null) {
-		err += ": warning: use "+errstuff[1]+"("+errstuff[2]+") rather than "+errstuff[0];
+		err += ". "+_("warning")+": "+_("use $1 instead of $2",errstuff[1]+"("+errstuff[2]+")",errstuff[0])
 	}
   }
-  if (iseqn[qn]==1 && isnoteqn) { err = "syntax error: this is not an equation";}
+  if (iseqn[qn]==1 && isnoteqn) { err = _("syntax error: this is not an equation");}
   outnode.appendChild(document.createTextNode(" " + err));
   //clear out variables that have been defined - not needed with scopedeval
   /*var toclear = ''; 
@@ -635,7 +638,7 @@ var iseqn = {};
 function doonsubmit(form,type2,skipconfirm) {
 	if (form!=null) {
 		if (form.className == 'submitted') {
-			alert("You have already submitted this page.  Please be patient while your submission is processed.");
+			alert(_("You have already submitted this page.  Please be patient while your submission is processed."));
 			form.className = "submitted2";
 			return false;
 		} else if (form.className == 'submitted2') {
@@ -730,7 +733,7 @@ function doonsubmit(form,type2,skipconfirm) {
 				try {
 					with (Math) var res = eval(mathjs(str));
 				} catch(e) {
-					err = "syntax incomplete";
+					err = _("syntax incomplete");
 				}
 			}
 			strarr[sc] = res;
@@ -843,7 +846,7 @@ function toggleinlinebtn(n,p){
 }
 
 function assessbackgsubmit(qn,noticetgt) {
-	if (noticetgt != null && document.getElementById(noticetgt).innerHTML == "Submitting...") {return false;}
+	if (noticetgt != null && document.getElementById(noticetgt).innerHTML == _("Submitting...")) {return false;}
 	if (window.XMLHttpRequest) { 
 		req = new XMLHttpRequest();
 	} else if (window.ActiveXObject) { 
@@ -893,7 +896,7 @@ function assessbackgsubmit(qn,noticetgt) {
 		params += '&isreview='+document.getElementById("isreview").value;
 		
 		if (noticetgt != null) {
-			document.getElementById(noticetgt).innerHTML = "Submitting...";
+			document.getElementById(noticetgt).innerHTML = _("Submitting...");
 		}
 		req.open("POST", assesspostbackurl, true);
 		req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -903,7 +906,7 @@ function assessbackgsubmit(qn,noticetgt) {
 		req.send(params);  
 	} else {
 		if (noticetgt != null) {
-			document.getElementById(noticetgt).innerHTML = "Error Submitting.";
+			document.getElementById(noticetgt).innerHTML = _("Error Submitting.");
 		}
 	}
 }  
@@ -977,9 +980,23 @@ function assessbackgsubmitCallback(qn,noticetgt) {
 	   
     } else { 
 	    if (noticetgt != null) {
-		    document.getElementById(noticetgt).innerHTML = "Submission Error:\n"+ req.status + "\n" +req.statusText; 
+		    document.getElementById(noticetgt).innerHTML = _("Submission Error")+":\n"+ req.status + "\n" +req.statusText; 
 	    }
     }
   } 
 }	
+
+function _(txt) {
+	if (typeof i18n != "undefined" && i18n[txt]) {
+		var outtxt = i18n[txt];
+	} else {
+		var outtxt = txt;
+	}
+	if (arguments.length>1) {
+		for (var i=1;i<arguments.length;i++) {
+			outtxt = outtxt.replace('$'+i,arguments[i]);
+		}
+	}
+	return outtxt;
+}
 	
