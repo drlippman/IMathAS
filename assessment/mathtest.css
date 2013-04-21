@@ -551,7 +551,12 @@ span.boxed {
 div.question>div:first-child>p:first-child, div.inactive>p:first-child {
 	margin-top: 0;
 }
-
+td>p:first-child, td>p:first-child {
+	margin-top: 0;
+}      
+td>p:last-child, td>p:last-child {
+	margin-bottom: 0;
+}
 img.scoreicon {
 	cursor: pointer;
 }

@@ -32,6 +32,7 @@ function copysubone(&$items,$parent,$copyinside,&$addtoarr) {
 				$newblock['SH'] = $item['SH'];
 				$newblock['colors'] = $item['colors'];
 				$newblock['fixedheight'] = $item['fixedheight'];
+				$newblock['grouplimit'] = $item['grouplimit'];
 				$newblock['items'] = array();
 				if (count($item['items'])>0) {
 					copysubone($items[$k]['items'],$parent.'-'.($k+1),true,$newblock['items']);

@@ -155,16 +155,9 @@ if ($c6 && $c7 && $c8) {
 }
 ?>
 <form method="post" action="dbsetup.php">
-<input type="hidden" name="dbsetupmethod" value="<?php echo $_POST['dbcreate'];?>" />
-<?php 
-if ($_POST['dbcreate']==2) {
-?>
-<input type="hidden" name="dbauthuser" value="<?php echo $_POST['dbauthuser'];?>" />
-<input type="hidden" name="dbauthpass" value="<?php echo $_POST['dbauthpass'];?>" />
-<?php
-} 
-?>
-<input type="submit" value="Continue to creating database"/>
+<input type="hidden" name="dbsetup" value="true" />
+
+<input type="submit" value="Continue to creating database tables"/>
 </form>
 </body>
 </html>
@@ -220,14 +213,8 @@ Database password.  The password for the database user above.<br/>
 <input type="text" name="dbpassword" value="" />
 </p>
 
-<p class="imp">How do you want the database created?<br/>
-<input type="radio" name="dbcreate" checked="checked" value="0"/> My hosting company requires that I create databases
-   and database users through their control panel, so I've already created the database and database user.<br/>
-<input type="radio" name="dbcreate" value="1"/> The database user I provided above already exists in the database and has 
-   database creation privileges, so use that userid to create the database.<br/>
-<input type="radio" name="dbcreate" value="2"/> The database and database user are not yet created.  Create them using this
-   username and password that has database and user creation privileges.  Username: <input type="text" name="dbauthuser"/> Password: 
-   <input type="password" name="dbauthpass" />
+<p class="imp">
+<b>The database and database user you provided above must already exist.</b>
 </p>
 
 <h3>Customization</h3>

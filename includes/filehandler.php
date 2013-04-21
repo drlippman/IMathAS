@@ -4,10 +4,14 @@
 ini_set("max_input_time", "600");
 ini_set("max_execution_time", "600");
 
+$GLOBALS['filehandertypecfiles'] = 'local';
 if (isset($GLOBALS['AWSkey'])) {
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	require("$curdir/S3.php");
 	$GLOBALS['filehandertype'] = 's3';
+	if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
+		$GLOBALS['filehandertypecfiles'] = 's3';
+	}
 } else {
 	$GLOBALS['filehandertype'] = 'local';	
 }
@@ -43,6 +47,24 @@ function storecontenttofile($content,$key,$sec="private") {
 	}
 }
 
+function relocatecoursefileifneeded($file, $key, $sec="public") {
+	if ($GLOBALS['filehandertypecfiles'] == 's3') {
+		if ($sec=="public" || $sec=="public-read") {
+			$sec = "public-read";
+		} else {
+			$sec = "private";
+		}
+		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		if ($s3->putObjectFile($file,$GLOBALS['AWSbucket'],'cfiles/'.$key,$sec)) {
+			return true;
+		} else {
+			return false;
+		}
+	} else {
+		return true;
+	}
+}
+
 function storeuploadedfile($id,$key,$sec="private") {
 	if ($GLOBALS['filehandertype'] == 's3') {
 		if ($sec=="public" || $sec=="public-read") {
@@ -70,6 +92,99 @@ function storeuploadedfile($id,$key,$sec="private") {
 			} 
 			if (move_uploaded_file($_FILES[$id]['tmp_name'],$dir.'/'.$fn)) {
 				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+}
+
+function storeuploadedcoursefile($id,$key,$sec="public-read") {
+	if ($GLOBALS['filehandertypecfiles'] == 's3') {
+		if ($sec=="public" || $sec=="public-read") {
+			$sec = "public-read";
+		} else {
+			$sec = "private";
+		}
+		if (is_uploaded_file($_FILES[$id]['tmp_name'])) {
+			$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+			$t=0;
+			$fn = $key;
+			while ($s3->getObjectInfo($GLOBALS['AWSbucket'], 'cfiles/'.$key, false) !==false) {
+				$key = substr($fn,0,strpos($fn,"."))."_$t".strstr($fn,".");
+				$t++;
+			}
+			if ($s3->putObjectFile($_FILES[$id]['tmp_name'],$GLOBALS['AWSbucket'],'cfiles/'.$key,$sec)) {
+				return $key;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	} else {
+		if (is_uploaded_file($_FILES[$id]['tmp_name'])) {	
+			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/course/files/';
+			$dir = $base.dirname($key);
+			$fn = basename($key);
+			if (!is_dir($dir)) {
+				mkdir_recursive($dir);
+			} 
+			$t=0; $tfn = $fn;
+			while(file_exists($dir.'/'.$fn)){
+				$fn = substr($tfn,0,strpos($tfn,"."))."_$t".strstr($tfn,".");
+				$t++;
+			}
+			if (move_uploaded_file($_FILES[$id]['tmp_name'],$dir.'/'.$fn)) {
+				return $fn;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+}
+function storeuploadedqimage($id,$key,$sec="public-read") {
+	if ($GLOBALS['filehandertypecfiles'] == 's3') {
+		if ($sec=="public" || $sec=="public-read") {
+			$sec = "public-read";
+		} else {
+			$sec = "private";
+		}
+		if (is_uploaded_file($_FILES[$id]['tmp_name'])) {
+			$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+			$t=0;
+			$fn = $key;
+			while ($s3->getObjectInfo($GLOBALS['AWSbucket'], 'qimages/'.$key, false) !==false) {
+				$key = substr($fn,0,strpos($fn,"."))."_$t".strstr($fn,".");
+				$t++;
+			}
+			if ($s3->putObjectFile($_FILES[$id]['tmp_name'],$GLOBALS['AWSbucket'],'qimages/'.$key,$sec)) {
+				return $key;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	} else {
+		if (is_uploaded_file($_FILES[$id]['tmp_name'])) {	
+			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/assessment/qimages/';
+			$dir = $base.dirname($key);
+			$fn = basename($key);
+			if (!is_dir($dir)) {
+				mkdir_recursive($dir);
+			} 
+			$t=0; $tfn = $fn;
+			while(file_exists($dir.'/'.$fn)){
+				$fn = substr($tfn,0,strpos($tfn,"."))."_$t".strstr($tfn,".");
+				$t++;
+			}
+			if (move_uploaded_file($_FILES[$id]['tmp_name'],$dir.'/'.$fn)) {
+				return $fn;
 			} else {
 				return false;
 			}
@@ -296,6 +411,7 @@ function deleteallaidfiles($aid) {
 	return $delcnt;
 }
 
+
 function getuserfiles($uid,$img=false) {
 	if ($GLOBALS['filehandertype'] == 's3') {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
@@ -377,6 +493,43 @@ function deleteforumfile($postid,$file) {
 	}
 }
 
+function deletecoursefile($file) {
+	if ($GLOBALS['filehandertypecfiles'] == 's3') {
+		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		$s3object = "cfiles/$file";
+		if($s3->deleteObject($GLOBALS['AWSbucket'],$s3object)) {
+			return true;
+		}else {
+			return false;
+		}
+	} else {
+		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/course/files';
+		if (unlink($base."/$file")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+}
+function deleteqimage($file) {
+	if ($GLOBALS['filehandertypecfiles'] == 's3') {
+		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		$s3object = "qimages/$file";
+		if($s3->deleteObject($GLOBALS['AWSbucket'],$s3object)) {
+			return true;
+		}else {
+			return false;
+		}
+	} else {
+		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/assessment/qimages';
+		if (unlink($base."/$file")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+}
+
 function deletefilebykey($key) {
 	if ($GLOBALS['filehandertype'] == 's3') {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
@@ -442,6 +595,45 @@ function deletealluserfiles($uid) {
 	return $delcnt;
 }
 
+function doesfileexist($type,$key) {
+	if ($type=='cfile') {
+		if ($GLOBALS['filehandertypecfiles'] == 's3') {
+			$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+			return $s3->getObjectInfo($GLOBALS['AWSbucket'], 'cfiles/'.$key, false);
+		} else {
+			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/course/files/';
+			return file_exists($base.$key);
+		}
+	} else {
+		if ($GLOBALS['filehandertype'] == 's3') {
+			$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+			return $s3->getObjectInfo($GLOBALS['AWSbucket'], $key, false);
+		} else {
+			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore/';
+			return file_exists($base.$key);
+		}
+	}
+}
+
+function copycoursefile($key,$dest) {
+	if ($GLOBALS['filehandertypecfiles'] == 's3') {
+		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		$s3->getObject($GLOBALS['AWSbucket'], 'cfiles/'.$key, $dest);
+	} else {
+		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/course/files/';
+		copy($base.$key, $dest);
+	}
+}
+function copyqimage($key,$dest) {
+	if ($GLOBALS['filehandertypecfiles'] == 's3') {
+		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		$s3->getObject($GLOBALS['AWSbucket'], 'qimages/'.$key, $dest);
+	} else {
+		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/assessment/qimages/';
+		copy($base.$key, $dest);
+	}
+}
+
 function getuserfileurl($key) {
 	global $urlmode,$imasroot;
 	if ($GLOBALS['filehandertype'] == 's3') {
@@ -450,13 +642,21 @@ function getuserfileurl($key) {
 		return "$imasroot/filestore/$key";
 	}
 }
+function getcoursefileurl($key) {
+	global $urlmode,$imasroot;
+	if ($GLOBALS['filehandertypecfiles'] == 's3') {
+		return $urlmode."s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/$key";
+	} else {
+		return "$imasroot/course/files/$key";
+	}
+}
 function mkdir_recursive($pathname, $mode=0777)
 {
     is_dir(dirname($pathname)) || mkdir_recursive(dirname($pathname), $mode);
     return is_dir($pathname) || @mkdir($pathname, $mode);
 }
 function recursiveRmdir($dir) {
-	if (basename($dir)=='adata' || basename($dir)=='ufiles') { return;}
+	if (basename($dir)=='adata' || basename($dir)=='ufiles' || basename($dir)=='files') { return;}
 	if (@rmdir($dir)) {
 		recursiveRmdir(dirname($dir));
 	}

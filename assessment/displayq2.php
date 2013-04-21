@@ -45,7 +45,11 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		$query = "SELECT var,filename,alttext FROM imas_qimages WHERE qsetid='$qidx'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
-			${$row[0]} = "<img src=\"$imasroot/assessment/qimages/{$row[1]}\" alt=\"".htmlentities($row[2],ENT_QUOTES)."\" />";	
+			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
+				${$row[0]} = "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/qimages/{$row[1]}\" alt=\"".htmlentities($row[2],ENT_QUOTES)."\" />";
+			} else {
+				${$row[0]} = "<img src=\"$imasroot/assessment/qimages/{$row[1]}\" alt=\"".htmlentities($row[2],ENT_QUOTES)."\" />";
+			}
 		}
 	}
 	if (isset($GLOBALS['lastanswers'])) {
@@ -1658,7 +1662,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .=  '<div style="position: absolute; top:170px;left:0px;z-index:2;" id="slid1txt'.$qn.'"></div>';
 			$out .=  '<div style="position: absolute; top:170px;left:0px;z-index:2;" id="slid2txt'.$qn.'"></div>';
 			$out .=  '</div></div>';
-			$out .=  '<script type="text/javascript">normslider.idnums.push('.$qn.');</script>';
+			$out .=  '<script type="text/javascript">addnormslider('.$qn.');</script>';
 		} else if ($answerformat=='normalcurve') {
 			$out .= _('Enter an interval corresponding to the region to be shaded');
 		}

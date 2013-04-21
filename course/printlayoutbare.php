@@ -64,6 +64,7 @@ if ($overwriteBody==1) {
 	echo "<p>Question separator:  <input type=text name=\"qsep\" value=\"\" /></p>";
 	echo "<p>Version separator: <input type=text name=\"vsep\" value=\"+++++++++++++++\" /> </p>";
 	echo '<p>Math display: <input type="radio" name="mathdisp" value="img" checked="checked" /> Images <input type="radio" name="mathdisp" value="text"/> Text <input type="radio" name="mathdisp" value="tex"/> TeX <input type="radio" name="mathdisp" value="textandimg"/> Images, then again in text</p>';
+	echo '<p>Include question numbers and point values: <input type="checkbox" name="showqn" checked="checked" /> </p>';
 	echo "<p><input type=submit value=\"Continue\"></p></form>\n";
 	
 } else {		
@@ -178,13 +179,13 @@ if ($overwriteBody==1) {
 	for ($pt=0;$pt<$printtwice;$pt++) {
 		if ($pt==1) {
 			$sessiondata['mathdisp'] = 0;
-			echo $_POST['vsep'];
+			echo $_POST['vsep'].'<br/>';;
 		
 		}
 		
 		if ($_POST['format']=='trad') {
 			for ($j=0; $j<$copies; $j++) {	
-				if ($j>0) { echo $_POST['vsep'];}
+				if ($j>0) { echo $_POST['vsep'].'<br/>';}
 				
 				$headerleft = '';
 				$headerleft .= $line['name'];
@@ -206,14 +207,14 @@ if ($overwriteBody==1) {
 				
 				for ($i=0; $i<$numq; $i++) {
 					if ($i>0) { echo $_POST['qsep'];}
-					$sa[$j][$i] = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]]);
+					$sa[$j][$i] = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_POST['showqn']));
 				}
 				
 			}
 		
 			if ($_POST['keys']>0) { //print answer keys
 				for ($j=0; $j<$copies; $j++) {
-					echo $_POST['vsep'];
+					echo $_POST['vsep'].'<br/>';
 					echo '<b>Key - Form ' . ($j+1) . "</b>\n";
 					echo "<ol>\n";
 					for ($i=0; $i<$numq; $i++) {
@@ -250,11 +251,11 @@ if ($overwriteBody==1) {
 				if ($i>0) { echo $_POST['qsep'];}
 				for ($j=0; $j<$copies;$j++) {
 					if ($j>0) { echo $_POST['qsep'];}
-					$sa[] = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]]);
+					$sa[] = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_POST['showqn']));
 				}
 			}
 			if ($_POST['keys']>0) { //print answer keys
-				echo $_POST['vsep'];
+				echo $_POST['vsep'].'<br/>';
 				echo "<b>Key</b>\n";
 				echo "<ol>\n";
 				for ($i=0; $i<count($sa); $i++) {
@@ -278,7 +279,7 @@ if ($overwriteBody==1) {
 
 require("../footer.php");
 
-function printq($qn,$qsetid,$seed,$pts) {
+function printq($qn,$qsetid,$seed,$pts,$showpts) {
 	global $isfinal,$imasroot;
 	srand($seed);
 
@@ -351,7 +352,9 @@ function printq($qn,$qsetid,$seed,$pts) {
 	} else {
 		echo "<div class=m id=\"trq$qn\">\n";
 	}
-	
+	if ($showpts) {
+		echo ($qn+1).'. ('.$pts.' pts) ';	
+	}
 	echo "<div>\n";
 	//echo $toevalqtext;
 	eval("\$evaledqtext = \"$toevalqtxt\";");

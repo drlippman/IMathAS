@@ -83,7 +83,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
 	}
 		
-	$query = "SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,chatset,topbar,cploc,latepasshrs FROM imas_courses WHERE id='$cid'";
+	$query = "SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,toolset,chatset,topbar,cploc,latepasshrs FROM imas_courses WHERE id='$cid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
 	if ($line == null) {
@@ -97,6 +97,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	$pagetitle = $line['name'];
 	$items = unserialize($line['itemorder']);
 	$msgset = $line['msgset']%5;
+	$toolset = $line['toolset'];
 	$chatset = $line['chatset'];
 	$latepasshrs = $line['latepasshrs'];
 	$useleftbar = (($line['cploc']&1)==1);
@@ -475,12 +476,19 @@ if ($overwriteBody==1) {
 ?>
 		<div id="leftcontent">
 			<p>
-			<a href="<?php echo $imasroot ?>/msgs/msglist.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>">
-			<?php echo _('Messages'); ?></a> <?php echo $newmsgs ?> <br/>
-			<a href="<?php echo $imasroot ?>/forums/forums.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>">
-			<?php echo _('Forums'); ?></a> <?php echo $newpostscnt ?><br/>
-			<a href="showcalendar.php?cid=<?php echo $cid ?>"><?php echo _('Calendar'); ?></a>
-	<?php if (isset($mathchaturl) && $chatset==1) {
+<?php
+		if ($msgset<4) {		
+			echo '<a href="'.$imasroot.'/msgs/msglist.php?cid='.$cid.'&amp;folder='.$_GET['folder'].'">';
+			echo _('Messages').'</a> '.$newmsgs .' <br/>';
+		}
+		if (($toolset&2)==0) {
+			echo '<a href="'.$imasroot.'/forums/forums.php?cid='.$cid.'&amp;folder='.$_GET['folder'].'">';
+			echo _('Forums').'</a> '.$newpostscnt.'<br/>';
+		}
+		if (($toolset&1)==0) {	
+			echo '<a href="showcalendar.php?cid='.$cid.'">'._('Calendar').'</a>';
+		}
+		if (isset($mathchaturl) && $chatset==1) {
 			echo "<br/><a href=\"$mathchaturl?uname=".urlencode($userfullname)."&amp;room=$cid&amp;roomname=".urlencode($coursename)."\"  target=\"chat\">", _('Chat'), "</a>  ($activechatters)";
 		}
 	?>
@@ -550,14 +558,16 @@ if ($overwriteBody==1) {
 ?>	   
 	<div class=cp>
 		<span class=column>
-<?php		 if ($msgset<4) {  ?>
-			<a href="<?php echo $imasroot ?>/msgs/msglist.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>">
-			<?php echo _('Messages'); ?></a><?php echo $newmsgs ?> <br/>
-<?php		 } ?>
-			<a href="<?php echo $imasroot ?>/forums/forums.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>">
-			<?php echo _('Forums'); ?></a> <?php echo $newpostscnt ?>
-	<?php if (isset($mathchaturl) && $chatset==1) {
-			echo "<br/><a href=\"$mathchaturl?uname=".urlencode($userfullname)."&amp;room=$cid&amp;roomname=".urlencode($coursename)."\"  target=\"chat\">", _('Chat'), "</a>  ($activechatters)";
+<?php		if ($msgset<4) {		
+			echo '<a href="'.$imasroot.'/msgs/msglist.php?cid='.$cid.'&amp;folder='.$_GET['folder'].'">';
+			echo _('Messages').'</a> '.$newmsgs .' <br/>';
+		}
+		if (($toolset&2)==0) {
+			echo '<a href="'.$imasroot.'/forums/forums.php?cid='.$cid.'&amp;folder='.$_GET['folder'].'">';
+			echo _('Forums').'</a> '.$newpostscnt.'<br/>';
+		}
+		if (isset($mathchaturl) && $chatset==1) {
+			echo "<a href=\"$mathchaturl?uname=".urlencode($userfullname)."&amp;room=$cid&amp;roomname=".urlencode($coursename)."\"  target=\"chat\">"._('Chat')."</a>  ($activechatters) <br/>";
 		}
 	?>
 		</span>
@@ -612,8 +622,11 @@ if ($overwriteBody==1) {
 		echo "<div class=cp>\n";
 	   
 	   if (!isset($teacherid)) {
+	   	if (($toolset&1)==0) {	
+			echo '<a href="showcalendar.php?cid='.$cid.'">Calendar</a><br/>';
+		}
 ?>
-	<a href="showcalendar.php?cid=<?php echo $cid ?>"><?php echo _('Calendar'); ?></a><br />
+	<a href="<?php echo $imasroot ?>/help.php?section=usingimas">Help Using <?php echo $installname;?></a><br/> 
 	<a href="gradebook.php?cid=<?php echo $cid ?>"><?php echo _('Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="red">', _('New'), '</span>';}?><br/>
 	<a href="../actions.php?action=logout"><?php echo _('Log Out'); ?></a><br/>   
 	<a href="<?php echo $imasroot ?>/help.php?section=usingimas"><?php printf(_('Help Using %s'), $installname); ?></a><br/> 

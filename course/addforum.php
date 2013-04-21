@@ -66,6 +66,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (isset($_POST['allowdel']) && $_POST['allowdel']==1) {
 			$fsets += 4;
 		}
+		if (isset($_POST['allowlikes']) && $_POST['allowlikes']==1) {
+			$fsets += 8;
+		}
 		if ($_POST['replyby']=="Always") {
 			$replyby = 2000000000;
 		} else if ($_POST['replyby']=="Never") {
@@ -181,6 +184,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$allowanon = (($line['settings']&1)==1);
 			$allowmod = (($line['settings']&2)==2);
 			$allowdel = (($line['settings']&4)==4);
+			$allowlikes = (($line['settings']&8)==8);
 			$sortby = $line['sortby'];
 			$defdisplay = $line['defdisplay'];
 			$replyby = $line['replyby'];
@@ -212,6 +216,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$allowanon = false;
 			$allowmod = true;
 			$allowdel = false;
+			$allowlikes = false;
 			$replyby = 2000000000;
 			$postby = 2000000000;
 			$hassubscrip = false;
@@ -382,6 +387,11 @@ if ($overwriteBody==1) {
 			<input type=checkbox name="allowdel" value="1" <?php if ($allowdel) { echo "checked=1";}?>/>
 		</span><br class="form"/>
 		
+		<span class=form>Turn on "liking" posts:</span>
+		<span class=formright>
+			<input type=checkbox name="allowlikes" value="1" <?php if ($allowlikes) { echo "checked=1";}?>/>
+		</span><br class="form"/>
+		
 		<span class=form>Get email notify of new posts:</span>
 		<span class=formright>
 			<input type=checkbox name="subscribe" value="1" <?php if ($hassubscrip) { echo "checked=1";}?>/>
@@ -422,6 +432,8 @@ if ($overwriteBody==1) {
 			<img src="../img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=replybytime value="<?php echo $replybytime;?>">
 		</span><br class="form" />
+		
+		
 		
 		<span class="form">Calendar icon:</span>
 		<span class="formright">

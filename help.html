@@ -155,6 +155,7 @@ dd {
 	<li><a href="#generalmacros">General Macros</a></li>
 	<li><a href="#mathmacros">Math Macros</a></li>
 	<li><a href="#conditionalmacros">Conditional Test Macros</a></li>
+	<li><a href="#feedbackmacros">Feedback Macros</a></li>
 	<li><a href="#usingothermacros">Using Other Macros</a></li>
 	<li><a href="#mathentry">Math Entry</li>
 	<li><a href="#writingcommon">Options Common to All Types</a></li>
@@ -1861,6 +1862,29 @@ These macros are used to test various conditions.  They typically return true or
 </ul>
 </div>
 <div class=h2>
+<h2><a name="feedbackmacros">Feedback Macros</a></h2>
+These macros are used to select and format feedback messages to students.  They return a string which can be placed in the question text.
+<ul>
+<li><b>getfeedbacktxt(stuans, feedbacktxt, ans)</b>:  Gives feedback on multiple choice questions.  <br/>
+  stuans should be the student answer, obtained from
+   $stuanswers[$thisq] for single part questions, or using the getstuans macro for multipart. <br/>
+   feedbacktxt is an array of feedback responses, corresponding     in array order to the $questions, so feedbacktxt[1] is the feedback 
+   if the student selections $questions[1] as their answer.  <br/>
+   ans is the correct    answer; you can usually pass $answer if it's been defined already.</li>
+<li><b>getfeedbacktxtessay(stuans, feedbacktxt)</b>:  Gives feedback on essay questions.  stuans should be the student answer, obtained from
+   $stuanswers[$thisq] for single part questions, or using the getstuans macro for multipart.  It is not actually evaluated or compared - it is only 
+   needed to see if the student has entered a response or not.  Once the student has entered any response, feedbacktxt will be returned.</li>  
+<li><b>getfeedbacktxtnumber(stuans, partialcredit, feedbacktxt, defaultfeedback, [tol])</b>:  Gives feedback on number questions.  <br/>
+  stuans should be the student answer, obtained from $stuanswers[$thisq] for single part questions, or using the getstuans macro for multipart.  For Calculated
+  type questions, be sure to use $stuanswersval.  <br/>
+  partialcredit is an array or list of form array(number, score, number, score, ... ) where the scores are in the range [0,1].  <br/>
+  feedbacktxt is an array of feedback messages, corresponding in array order to the order of the numbers in the partialcredit list.<br/>
+  defaultfeedback is the default incorrect response feedback <br/>
+  Set tol to specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance.</li>
+
+</ul>
+</div>
+<div class=h2>
 <h2><a name="usingothermacros">Using Other Macros</a></h2>
 <p>If an IMathAS administrator has installed other Macro Libraries, you can load a macro library by entering the line 
 <pre>loadlibrary("list of library names")</pre> at the beginning of the Common Control section.</p>
@@ -1938,8 +1962,7 @@ students' previous answers in your question code.  You will only be able to refe
 <li>$stuanswers[N][P] will refer to the student's answer on question N, part P (if multipart)</li>
 <li>$stuanswers[$thisq][P] will refer to the student's answer on the current question, part P</li>
 <li>$stuanswers[$thisq-1] will refer to the student's answer on the previous question</li>
-<li>Only with the current question, $stuanswersval[$thisq] or $stuanswersval[$thisq][P] will contain the numerical value of Calculated question types, or the 
-    numerical equivalent (non-string version) of decimal values of string answers.</li>
+<li>$stuanswersval[$thisq] or $stuanswersval[$thisq][P] will contain the numerical value of Calculated question types.</li>
 </ul>
 Notes (important!):
 </p>

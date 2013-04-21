@@ -147,7 +147,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 					   $filenames = array();
 					   $filedescr = array();
 					   while ($row = mysql_fetch_row($r2)) {
-						   $filenames[$row[0]] = $row[2];
+						   $filenames[$row[0]] = basename($row[2]);
 						   $filedescr[$row[0]] = $row[1];
 						   $coursefiles[] = $row[2];
 					   }
@@ -163,6 +163,10 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				$query = "SELECT * FROM imas_linkedtext WHERE id='{$row[1]}'";
 				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 				$line = mysql_fetch_array($r2, MYSQL_ASSOC);
+				if (substr($line['text'],0,5)=='file:') {
+					$coursefiles[] = substr($line['text'],5);
+					$line['text'] = 'file:'.basename(substr($line['text'],5));
+				}
 				echo "TITLE\n";
 				echo $line['title'] . "\n";
 				echo "SUMMARY\n";
@@ -182,9 +186,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				echo "TARGET\n";
 				echo $line['target'] . "\n";
 				echo "END ITEM\n";
-				if (substr($line['text'],0,5)=='file:') {
-					$coursefiles[] = substr($line['text'],5);
-				}
+				
 				break;
 			case ($row[0]==="Forum"):
 				$query = "SELECT * FROM imas_forums WHERE id='{$row[1]}'";
@@ -379,9 +381,14 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 		echo "END QSET\n";
 	}
 	
+	include("../includes/filehandler.php");
+	
 	$query = "SELECT DISTINCT filename FROM imas_qimages WHERE qsetid IN ($qstoexportlist)";
 	$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 	while ($row = mysql_fetch_row($r2)) {
+		if ($GLOBALS['filehandertypecfiles'] == 's3') {
+			copyqimage($row[0], realpath("../assessment/qimages").DIRECTORY_SEPARATOR. trim($row[0]));
+		}
 		$imgfiles[] = realpath("../assessment/qimages").DIRECTORY_SEPARATOR. trim($row[0]);
 	}
 	// need to work on
@@ -398,9 +405,14 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 		$zip = new ZipArchive();
 		if ($zip->open("../course/files/coursefilepack$cid.zip", ZIPARCHIVE::CREATE | ZIPARCHIVE::OVERWRITE )===TRUE) {
 			foreach ($coursefiles as $file) {
-				$zip->addFile("../course/files/$file",$file);
+				if ($GLOBALS['filehandertypecfiles'] == 's3') {
+					copycoursefile($file, realpath("../course/files").DIRECTORY_SEPARATOR.basename($file));
+					$zip->addFile("../course/files/".basename($file),basename($file));
+				} else {
+					$zip->addFile("../course/files/$file",basename($file));
+				}
 			}
-		}
+		} 
 		$zip->close();
 	}
 		

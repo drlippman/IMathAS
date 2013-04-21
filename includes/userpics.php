@@ -2,6 +2,9 @@
 //IMathAS:  User image upload function
 //(c) 20009 David Lippman
 
+$curdir = rtrim(dirname(__FILE__), '/\\');
+require_once("$curdir/filehandler.php");
+
 // $image is $_FILES[ <image name> ]
 // $imageId is the id used in a database or wherever for this image
 // $thumbWidth and $thumbHeight are desired dimensions for the thumbnail
@@ -64,6 +67,7 @@ function processImage( $image, $imageId, $thumbWidth, $thumbHeight )
    
     // save the image
    imagejpeg( $imT, $galleryPath . 'userimg_'.$imageId . '.jpg', 100 );
+   relocatecoursefileifneeded($galleryPath . 'userimg_'.$imageId . '.jpg', 'userimg_'.$imageId . '.jpg');
 }
 
 ?>

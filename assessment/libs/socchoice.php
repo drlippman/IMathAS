@@ -20,6 +20,7 @@ function apportion($pop, $seats, $method, $md = 0) {
 		$pop = explode(',',$pop);
 	}
 	list($md, $quotas, $chopped, $other, $outdiv) = apportion_info($pop, $seats, $method);
+
 	if ($method=='hamilton' || $method=='lowndes') {
 		$toadd = $seats - array_sum($chopped);
 		if ($toadd>0) {
@@ -113,11 +114,21 @@ function apportion_info($pop, $seats, $method) {
 		$moddivs = array_values($toraiseup);
 		//if the next value is the same, then the divisor that adds $toadd additional
 		//seats would add $toadd+1 additional seats, so the method fails.
-		if ($moddivs[$toadd-1]==$moddivs[$toadd]) {
+		if ($toadd==0) {
+			$tolowerdown = array();
+			foreach ($quotas as $s=>$q) {
+				$luq[$s] = floor($q);
+				//calculate divisor needed to lower to next whole value
+				if ($luq[$s]==0) { break;}
+				$tolowerdown[] = $pop[$s]/($luq[$s]);
+			}
+			$outdiv = '('.max($toraiseup).','.min($tolowerdown).']';
+		} else if ($moddivs[$toadd-1]==$moddivs[$toadd]) {
 			$outdiv = "fail";
 		} else {
 			$outdiv = '('.$moddivs[$toadd].','.$moddivs[$toadd-1].')';
 		}
+
 	} else if ($method=='adams') {
 		$tolowerdown = array();
 		foreach ($quotas as $s=>$q) {
@@ -133,7 +144,16 @@ function apportion_info($pop, $seats, $method) {
 		$moddivs = array_values($tolowerdown);
 		//if the next value is the same, then the divisor that adds $tosub additional
 		//seats would add $tosub+1 additional seats, so the method fails.
-		if ($moddivs[$tosub-1]==$moddivs[$tosub]) {
+		if ($toadd==0) {
+			$toraiseup = array();
+			foreach ($quotas as $s=>$q) {
+				$luq[$s] = ceil($q);
+				//calculate divisor needed to lower to next whole value
+				if ($luq[$s]-1==0) { break;}
+				$toraiseup[] = $pop[$s]/($luq[$s]);
+			}
+			$outdiv = '['.max($toraiseup).','.min($tolowerdown).')';
+		} else if ($moddivs[$tosub-1]==$moddivs[$tosub]) {
 			$outdiv = "fail";
 		} else {
 			$outdiv = '('.$moddivs[$tosub-1].','.$moddivs[$tosub].')';
@@ -145,7 +165,7 @@ function apportion_info($pop, $seats, $method) {
 			//calculate divisor needed to lower to next whole value
 		}
 		$toadd = $seats - array_sum($luq);
-		if ($toadd>0) {
+		if ($toadd>=0) {
 			//need to add seats.
 			foreach ($quotas as $s=>$q) {
 				for ($i=0;$i<5;$i++) {
@@ -153,7 +173,12 @@ function apportion_info($pop, $seats, $method) {
 				}
 			}
 			arsort($tochange);
-		} else {
+		} 
+		if ($toadd==0) {
+			$maxq = max($tochange);
+			$tochange= array();
+		}
+		if ($toadd<=0){
 			$toadd = -1*$toadd;
 			//proceed as in adams
 			foreach ($quotas as $s=>$q) {
@@ -164,10 +189,14 @@ function apportion_info($pop, $seats, $method) {
 			}
 			asort($tochange);
 		}
+		
 		$moddivs = array_values($tochange);
 		//if the next value is the same, then the divisor that adds $toadd additional
 		//seats would add $toadd+1 additional seats, so the method fails.
-		if ($moddivs[$toadd-1]==$moddivs[$toadd]) {
+		if ($toadd==0) {
+			$minq = min($tochange);
+			$outdiv = '('.$maxq.','.$minq.')';
+		} else if ($moddivs[$toadd-1]==$moddivs[$toadd]) {
 			$outdiv = "fail";
 		} else {
 			$outdiv = '('.min($moddivs[$toadd-1],$moddivs[$toadd]).','.max($moddivs[$toadd-1],$moddivs[$toadd]).')';
@@ -179,9 +208,10 @@ function apportion_info($pop, $seats, $method) {
 			if ($q>$other[$s]) { $luq[$s]++;}
 		}
 		$toadd = $seats - array_sum($luq);
-		if ($toadd>0) {
+		if ($toadd>=0) {
 			//need to add seats, so lower the divisor
 			foreach ($quotas as $s=>$q) {
+				if (floor($q)==0) {continue;}
 				for ($i=0;$i<4;$i++) {
 					$tochange[] = $pop[$s]/(sqrt((floor($q)+$i)*(floor($q)+$i+1))+.0001); //what to get it over GM?
 				}
@@ -191,6 +221,7 @@ function apportion_info($pop, $seats, $method) {
 			$toadd = -1*$toadd;
 			//need to remove seats, so increase the divisor
 			foreach ($quotas as $s=>$q) {
+				if (floor($q)==0) {continue;}
 				for ($i=0;$i<4;$i++) {
 					$tochange[] = $pop[$s]/(sqrt((floor($q)+$i)*(floor($q)+$i+1))-.0001); //what to get it under GM?
 				}
@@ -201,11 +232,14 @@ function apportion_info($pop, $seats, $method) {
 		$moddivs = array_values($tochange);
 		//if the next value is the same, then the divisor that adds $toadd additional
 		//seats would add $toadd+1 additional seats, so the method fails.
-		if ($moddivs[$toadd-1]==$moddivs[$toadd]) {
+		if ($toadd==0) {
+			$outdiv = '('.min($moddivs[1],$moddivs[2]).','.max($moddivs[1],$moddivs[2]).')';
+		} else if ($moddivs[$toadd-1]==$moddivs[$toadd]) {
 			$outdiv = "fail";
 		} else {
 			$outdiv = '('.min($moddivs[$toadd-1],$moddivs[$toadd]).','.max($moddivs[$toadd-1],$moddivs[$toadd]).')';
 		}
+		
 	} else if ($method=='lowndes') {
 		foreach ($quotas as $s=>$q) {
 			$luq[$s] = floor($q);
@@ -304,13 +338,13 @@ function shapleyshubikrecurse(&$powercnt, $weights, $quota, $used, $curplayer, $
 	if ($curplayer!=-1) {
 		$used[$curplayer] = 1;  
 		$curpower += $weights[$curplayer];
-		echo "curplayer: ".($curplayer+1)."<br/>";
+		//echo "curplayer: ".($curplayer+1)."<br/>";
 	}
 	for ($i=0;$i<$n;$i++) {
 		if ($used[$i]) {continue;}
 		if ($curpower + $weights[$i] >= $quota) { //is pivotal player
 			$remaining = $n - array_sum($used) - 1;
-			echo "player ".($i+1)." was pivotal with $remaining remaining <br/>";
+			//echo "player ".($i+1)." was pivotal with $remaining remaining <br/>";
 			if ($remaining<2) { 
 				$powercnt[$i] += 1;
 			} else {

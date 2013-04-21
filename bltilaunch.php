@@ -31,8 +31,8 @@ if (!get_magic_quotes_gpc()) {
 	$_REQUEST = array_map('addslashes_deep', $_REQUEST);
 }
 
- if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') {
- 	 $urlmode = 'https://';
+ if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
+	 $urlmode = 'https://';
  } else {
  	 $urlmode = 'http://';
  }
@@ -114,6 +114,13 @@ if (isset($_GET['launch'])) {
 	}
 	exit;	
 } else if (isset($_GET['accessibility'])) {
+	$query = "SELECT sessiondata,userid FROM imas_sessions WHERE sessionid='$sessionid'";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	if (mysql_num_rows($result)==0) {
+		reporterror("No authorized session exists");
+	}
+	list($enc,$userid) = mysql_fetch_row($result);
+	$sessiondata = unserialize(base64_decode($enc));
 	//time to output a postback to capture tzoffset and math/graph settings
 	$pref = 0;
 	if (isset($_COOKIE['mathgraphprefs'])) {
@@ -130,10 +137,12 @@ if (isset($_GET['launch'])) {
 	require("header.php");
 	echo "<h4>Logging in to $installname</h4>";
 	echo "<form method=\"post\" action=\"{$_SERVER['PHP_SELF']}?launch=true\" ";
-	if ($itemtype==0 && $tlwrds != '') {
-		echo "onsubmit='return confirm(\"This assessment has a time limit of $tlwrds.  Click OK to start or continue working on the assessment.\")' ";
+	if ($sessiondata['ltiitemtype']==0 && $sessiondata['ltitlwrds'] != '') {
+		echo "onsubmit='return confirm(\"This assessment has a time limit of {$sessiondata['ltitlwrds']}.  Click OK to start or continue working on the assessment.\")' >";
+		echo "<p style=\"color:red;\">This assessment has a time limit of {$sessiondata['ltitlwrds']}.</p>";
+	} else {
+		echo ">";
 	}
-	echo ">";
 	?>
 	<div id="settings"><noscript>JavaScript is not enabled.  JavaScript is required for <?php echo $installname; ?>.  
 	Please enable JavaScript and reload this page</noscript></div>
@@ -849,7 +858,7 @@ if (mysql_num_rows($result)>0) {
 if ($keyparts[0]=='aid') {
 	$query = "SELECT timelimit FROM imas_assessments WHERE id='$aid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$timelimit = mysql_result($result,0,0)*$timelimitmult;
+	$timelimit = abs(mysql_result($result,0,0)*$timelimitmult);
 	if ($timelimit>0) {
 		 if ($timelimit>3600) {
 			$tlhrs = floor($timelimit/3600);
@@ -862,7 +871,7 @@ if ($keyparts[0]=='aid') {
 			if ($tlmin > 1) { $tlwrds .= "s";}
 			if ($tlsec > 0) { $tlwrds .= ", $tlsec second";}
 			if ($tlsec > 1) { $tlwrds .= "s";}
-		} else if ($line['timelimit']>60) {
+		} else if ($timelimit>60) {
 			$tlmin = floor($timelimit/60);
 			$tlsec = $timelimit % 60;
 			$tlwrds = "$tlmin minute";
@@ -876,6 +885,7 @@ if ($keyparts[0]=='aid') {
 		$tlwrds = '';
 	}
 	//this sessiondata tells WAMAP to limit access to the specific resouce requested
+	$sessiondata['ltitlwrds'] = $tlwrds;
 	$sessiondata['ltiitemtype']=0;
 	$sessiondata['ltiitemid'] = $aid;
 }  else if ($keyparts[0]=='cid') { //is cid

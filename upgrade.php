@@ -1,7 +1,7 @@
 <?php  
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 63;
+$latest = 69;
 
 
 @set_time_limit(0);
@@ -10,25 +10,32 @@ ini_set("max_execution_time", "600");
 ini_set("memory_limit", "104857600");
 
 if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
-	$handle = fopen("upgradecounter.txt",'w');
-	fwrite($handle,$latest);
-	fclose($handle);	
+	$query = "INSERT INTO imas_dbschema (id,ver) VALUES (1,$latest)";
+	mysql_query($query);
+	//$handle = fopen("upgradecounter.txt",'w');
+	//fwrite($handle,$latest);
+	//fclose($handle);	
 } else { //doing upgrade
 	require("validate.php");
 	if ($myrights<100) {
 		echo "No rights, aborting";
 		exit;
 	}
-	
-	$handle = @fopen("upgradecounter.txt",'r');
-	if ($handle===false) {
-		$last = 0;
-	} else if (isset($_GET['last'])) {
-		$last = floatval($_GET['last']);	
-		fclose($handle);
+	$query = "SELECT ver FROM imas_dbschema WHERE id=1";
+	$result = mysql_query($query);
+	if ($result===false) { //for upgrading older versions
+		$handle = @fopen("upgradecounter.txt",'r');
+		if ($handle===false) {
+			$last = 0;
+		} else if (isset($_GET['last'])) {
+			$last = floatval($_GET['last']);	
+			fclose($handle);
+		} else {
+			$last = intval(trim(fgets($handle)));
+			fclose($handle);
+		}
 	} else {
-		$last = intval(trim(fgets($handle)));
-		fclose($handle);
+		$last = mysql_result($result,0,0);
 	}
 	
 	if ($last==$latest) {
@@ -1039,7 +1046,106 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
 		}
-		$handle = fopen("upgradecounter.txt",'w');
+		if ($last < 64) {
+			 $query = 'ALTER TABLE `imas_courses` ADD `toolset` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT \'0\'';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+		}
+		if ($last < 65) {
+			$query = 'CREATE TABLE `imas_dbschema` (
+				`id` INT( 10 ) UNSIGNED NOT NULL PRIMARY KEY ,
+				`ver` SMALLINT( 4 ) UNSIGNED NOT NULL
+				) ENGINE = InnoDB';
+			$res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 } else {
+			 	 $query = "INSERT INTO imas_dbschema (id,ver) VALUES (1,$latest)";
+			 	 mysql_query($query) or die ("can't run $query");
+			 }
+			echo "Moved upgrade counter to database<br/>";
+		}
+		if ($last < 66) {
+			$query = 'CREATE TABLE `imas_log` (
+				`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+				`time` INT( 10 ) UNSIGNED NOT NULL ,
+				`log` TEXT NOT NULL 
+				) ENGINE = InnoDB';
+			$res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 } 
+			echo "Added imas_log table<br/>";
+		}
+		if ($last < 67) {
+			 $query = 'ALTER TABLE `imas_users` ADD `hasuserimg` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT \'0\'';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $hasimg = array();
+			 if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
+				require("includes/filehandler.php");
+				$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+				$arr = $s3->getBucket($GLOBALS['AWSbucket'],"cfiles/");
+				if ($arr!=false) {
+					foreach ($arr as $k=>$v) {
+						if (substr(basename($arr[$k]['name']),0,10)=='userimg_sm') {
+							$hasimg[] = substr(basename($arr[$k]['name']),10,-4);
+						}
+					}
+				}
+			 } else {
+			 	 $curdir = rtrim(dirname(__FILE__), '/\\');
+			 	 $galleryPath = "$curdir/course/files";
+			 	
+			 	 if ($handle = @opendir($galleryPath)) {
+			 	 	 while (false !== ($file=readdir($handle))) {
+			 	 	 	 if ($file != "." && $file != ".." && !is_dir($file)) {
+			 	 	 	 	 if (substr(basename($file),0,10)=='userimg_sm') {
+			 	 	 	 	 	$hasimg[] = substr(basename($file),10,-4); 
+			 	 	 	 	 }
+			 	 	 	 }
+			 	 	 }
+			 	 	 closedir($handle);
+			 	 }
+			 	
+			 }
+			 if (count($hasimg)>0) {
+			 	 $haslist = implode(',',$hasimg);
+			 	 $query = "UPDATE imas_users SET hasuserimg=1 WHERE id IN ($haslist)";
+			 	 mysql_query($query);
+			 	 $n = mysql_affected_rows();
+			 }
+			 echo "hasuserimg field added, $n user images identified<br/>";
+		}
+		if ($last < 68) {
+			 $query = 'ALTER TABLE `imas_assessments` CHANGE `intro` `intro` MEDIUMTEXT NOT NULL';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = 'INSERT INTO imas_dbschema (id,ver) VALUES (2,100)';
+			 $res = mysql_query($query);
+			 echo "changed assessment intro to mediumtext, moved guest acct counter to DB<br/>"; 
+		}
+		if ($last < 69) {
+			$query = 'CREATE TABLE `imas_forum_likes` (
+				`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+				`userid` INT(10) UNSIGNED NOT NULL, 
+				`threadid` INT(10) UNSIGNED NOT NULL, 
+				`postid` INT(10) UNSIGNED NOT NULL, 
+				`type` TINYINT(1) UNSIGNED NOT NULL
+				) ENGINE = InnoDB';
+			$res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 } 
+			echo "Added imas_forum_likes table<br/>";
+		}
+		/*$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {
 			echo '<p>Error: unable open upgradecounter.txt for writing</p>';
 		} else {
@@ -1049,6 +1155,9 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			}
 			fclose($handle);
 		}
+		*/
+		$query = "UPDATE imas_dbschema SET ver=$latest WHERE id=1";
+		mysql_query($query);
 		echo "Upgrades complete";
 	}	
 }

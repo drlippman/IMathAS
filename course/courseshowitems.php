@@ -24,6 +24,7 @@ function enditem($canedit) {
   function showitems($items,$parent,$inpublic=false) {
 	   global $teacherid,$tutorid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$myrights;
 	   global $hideicons,$exceptions,$latepasses,$graphicalicons,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs;
+	   require_once("../includes/filehandler.php");
 	   
 	   if (!isset($CFG['CPS']['itemicons'])) {
 	   	   $itemicons = array('folder'=>'folder2.gif', 'foldertree'=>'folder_tree.png', 'assess'=>'assess.png',
@@ -803,7 +804,8 @@ function enditem($canedit) {
 						   $filedescr[$row[0]] = $row[1];
 					   }
 					   foreach (explode(',',$line['fileorder']) as $fid) {
-						   echo "<li><a href=\"$imasroot/course/files/{$filenames[$fid]}\" target=\"_blank\">{$filedescr[$fid]}</a></li>";
+						   //echo "<li><a href=\"$imasroot/course/files/{$filenames[$fid]}\" target=\"_blank\">{$filedescr[$fid]}</a></li>";
+						   echo "<li><a href=\"".getcoursefileurl($filenames[$fid])."\" target=\"_blank\">{$filedescr[$fid]}</a></li>";
 					   }
 					  
 					   echo "</ul>";
@@ -849,7 +851,9 @@ function enditem($canedit) {
 						   $filedescr[$row[0]] = $row[1];
 					   }
 					   foreach (explode(',',$line['fileorder']) as $fid) {
-						   echo "<li><a href=\"$imasroot/course/files/{$filenames[$fid]}\" target=\"_blank\">{$filedescr[$fid]}</a></li>";
+						  // echo "<li><a href=\"$imasroot/course/files/{$filenames[$fid]}\" target=\"_blank\">{$filedescr[$fid]}</a></li>";
+						    echo "<li><a href=\"".getcoursefileurl($filenames[$fid])."\" target=\"_blank\">{$filedescr[$fid]}</a></li>";
+					  
 					   }
 					  
 					   echo "</ul>";
@@ -972,7 +976,7 @@ function enditem($canedit) {
 				   $icon = 'web';
 			   } else if (substr(strip_tags($line['text']),0,5)=="file:") {
 				   $filename = substr(strip_tags($line['text']),5);
-				   $alink = $imasroot . "/course/files/".$filename;
+				   $alink = getcoursefileurl($filename);//$imasroot . "/course/files/".$filename;
 				   $ext = substr($filename,strrpos($filename,'.')+1);
 				   switch($ext) {
 				   	  case 'xls': $icon = 'xls'; break;

@@ -230,12 +230,13 @@
 				$sessiondata['intreereader'] = false;
 			}
 			
-			$query = "SELECT name,theme,topbar,msgset FROM imas_courses WHERE id='{$_GET['cid']}'";
+			$query = "SELECT name,theme,topbar,msgset,toolset FROM imas_courses WHERE id='{$_GET['cid']}'";
 			$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 			$sessiondata['coursename'] = mysql_result($result,0,0);
 			$sessiondata['coursetheme'] = mysql_result($result,0,1);
 			$sessiondata['coursetopbar'] =  mysql_result($result,0,2);
 			$sessiondata['msgqtoinstr'] = (floor( mysql_result($result,0,3)/5))&2;
+			$sessiondata['coursetoolset'] = mysql_result($result,0,4);
 			if (isset($studentinfo['timelimitmult'])) {
 				$sessiondata['timelimitmult'] = $studentinfo['timelimitmult'];
 			} else {
@@ -293,12 +294,13 @@
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 		
-			$query = "SELECT name,theme,topbar,msgset FROM imas_courses WHERE id='{$_GET['cid']}'";
+			$query = "SELECT name,theme,topbar,msgset,toolset FROM imas_courses WHERE id='{$_GET['cid']}'";
 			$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 			$sessiondata['coursename'] = mysql_result($result,0,0);
 			$sessiondata['coursetheme'] = mysql_result($result,0,1);
 			$sessiondata['coursetopbar'] =  mysql_result($result,0,2);
 			$sessiondata['msgqtoinstr'] = (floor( mysql_result($result,0,3)/5))&2;
+			$sessiondata['coursetoolset'] = mysql_result($result,0,4);
 			if (isset($studentinfo['timelimitmult'])) {
 				$sessiondata['timelimitmult'] = $studentinfo['timelimitmult'];
 			} else {
@@ -1597,13 +1599,16 @@ if (!isset($_POST['embedpostback'])) {
 						echo printscore($bestscores[$qn],$qn);
 						if ($GLOBALS['questionmanualgrade'] == true) {
 							echo '<br/><strong>', _('Note:'), '</strong> ', _('This question contains parts that can not be auto-graded.  Those parts will show a score of 0 until they are graded by your instructor');
-						}
+						} 
 						echo "</p>";
 						
-						$colors = scorestocolors($rawscore,$qi[$questions[$qn]]['points'],$qi[$questions[$qn]]['answeights']);
+						
 					} else {
 						echo '<p>', _('Question scored.'), '</p>';
 					}
+				}
+				if ($showeachscore && $GLOBALS['questionmanualgrade'] != true) {
+					$colors = scorestocolors($rawscore,$qi[$questions[$qn]]['points'],$qi[$questions[$qn]]['answeights']);
 				}
 				
 				

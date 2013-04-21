@@ -370,6 +370,7 @@ function editinplace(el) {
 		var inputt  = document.createElement("input");
 		inputt.id = 'inputt'+el.id;
 		inputt.type = "text";
+		inputt.size = 60;
 		inputt.onblur = editinplaceun;
 		el.parentNode.insertBefore(inputt,el);	
 	} else {

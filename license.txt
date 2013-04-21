@@ -1,12 +1,14 @@
 *********************************************************
 **   Internet Mathematics Assessment System (IMathAS)  ** 
-**   (c) David Lippman, 2006-2011		       **
+**   (c) David Lippman, 2006-2013		       **
 *********************************************************
 
 See readme.html for installation information.
 
 IMathAS was written by David Lippman with partial support from the
 WA State E-Learning Council, the Transition Math Project, and Pierce College.
+Additional work has been supported by xyzTextbooks, Carnegie Foundation,
+and Lumen Learning.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License version 2 as published 
@@ -129,5 +131,11 @@ MIT License
 LTI Utilities
 (c) IMS Global, written by Dr Chuck
 Apache 2.0 license
+
+Thumbs-up icon remixed from work (c) Bersam at
+http://commons.wikimedia.org/wiki/File:Thumbs-up-icon.svg
+CC-BY
+
+
 
 

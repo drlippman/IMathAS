@@ -6,7 +6,7 @@ require("../validate.php");
 switch($_GET['action']) {
 	case "emulateuser":
 		if ($myrights < 100 ) { break;}
-		$be = $_GET['uid'];
+		$be = $_REQUEST['uid'];
 		$query = "UPDATE imas_sessions SET userid='$be' WHERE sessionid='$sessionid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		break;
@@ -197,6 +197,11 @@ switch($_GET['action']) {
 		}
 		$topbar = implode('|',$topbar);
 		
+		if (isset($CFG['CPS']['toolset']) && $CFG['CPS']['toolset'][1]==0) {
+			$toolset = $CFG['CPS']['toolset'][0];
+		} else {
+			$toolset = 1*!isset($_POST['toolset-cal']) + 2*!isset($_POST['toolset-forum']);
+		}
 		
 		if (isset($CFG['CPS']['cploc']) && $CFG['CPS']['cploc'][1]==0) {
 			$cploc = $CFG['CPS']['cploc'][0];
@@ -210,14 +215,14 @@ switch($_GET['action']) {
 		
 		if ($_GET['action']=='modify') {
 			$query = "UPDATE imas_courses SET name='{$_POST['coursename']}',enrollkey='{$_POST['ekey']}',hideicons='$hideicons',available='$avail',lockaid='{$_POST['lockaid']}',picicons='$picicons',chatset=$chatset,showlatepass=$showlatepass,";
-			$query .= "allowunenroll='$unenroll',copyrights='$copyrights',msgset='$msgset',topbar='$topbar',cploc='$cploc',theme='$theme',ltisecret='{$_POST['ltisecret']}' WHERE id='{$_GET['id']}'";
+			$query .= "allowunenroll='$unenroll',copyrights='$copyrights',msgset='$msgset',toolset='$toolset',topbar='$topbar',cploc='$cploc',theme='$theme',ltisecret='{$_POST['ltisecret']}' WHERE id='{$_GET['id']}'";
 			if ($myrights<75) { $query .= " AND ownerid='$userid'";}
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		} else {
 			$blockcnt = 1;
 			$itemorder = addslashes(serialize(array()));
-			$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,chatset,showlatepass,itemorder,topbar,cploc,available,theme,ltisecret,blockcnt) VALUES ";
-			$query .= "('{$_POST['coursename']}','$userid','{$_POST['ekey']}','$hideicons','$picicons','$unenroll','$copyrights','$msgset',$chatset,$showlatepass,'$itemorder','$topbar','$cploc','$avail','$theme','{$_POST['ltisecret']}','$blockcnt');";
+			$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,toolset,chatset,showlatepass,itemorder,topbar,cploc,available,theme,ltisecret,blockcnt) VALUES ";
+			$query .= "('{$_POST['coursename']}','$userid','{$_POST['ekey']}','$hideicons','$picicons','$unenroll','$copyrights','$msgset',$toolset,$chatset,$showlatepass,'$itemorder','$topbar','$cploc','$avail','$theme','{$_POST['ltisecret']}','$blockcnt');";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			$cid = mysql_insert_id();
 			//if ($myrights==40) {
@@ -381,7 +386,8 @@ switch($_GET['action']) {
 					$query = "SELECT id FROM imas_instr_files WHERE filename='$safefn'";
 					$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 					if (mysql_num_rows($r2)==1) {
-						unlink($uploaddir . $row[0]);
+						//unlink($uploaddir . $row[0]);
+						deletecoursefile($row[0]);
 					}
 				}
 				$query = "DELETE FROM imas_instr_files WHERE itemid='{$ilid[0]}'";
@@ -398,9 +404,10 @@ switch($_GET['action']) {
 				$query = "SELECT id FROM imas_linkedtext WHERE text='$safetext'"; //any others using file?
 				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 				if (mysql_num_rows($r2)==1) { 
-					$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/../course/files/';
+					//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/../course/files/';
 					$filename = substr($row[0],5);
-					unlink($uploaddir . $filename);
+					//unlink($uploaddir . $filename);
+					deletecoursefile($filename);
 				}
 			}
 			
@@ -451,20 +458,34 @@ switch($_GET['action']) {
 		break;
 	case "remteacher":
 		if ($myrights < 40) { echo "You don't have the authority for this action"; break;}
-		$query = "DELETE FROM imas_teachers WHERE id='{$_GET['tid']}'";
-		if ($myrights < 100) {
-			$query = "SELECT imas_teachers.id FROM imas_teachers,imas_users WHERE imas_teachers.id='{$_GET['tid']}' AND imas_teachers.userid=imas_users.id AND imas_users.groupid='$groupid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			if (mysql_num_rows($result)>0) {
-				$query = "DELETE FROM imas_teachers WHERE id='{$_GET['tid']}'";
-			} else {
-				break;
+		$tids = array();
+		if (isset($_GET['tid'])) {
+			$tids = array($_GET['tid']);
+		} else if (isset($_POST['tid'])) {
+			$tids = $_POST['tid'];
+			if (count($tids)==$_GET['tot']) {
+				array_shift($tids);
 			}
-			
-			//$query = "DELETE imas_teachers FROM imas_users,imas_teachers WHERE imas_teachers.id='{$_GET['tid']}' ";
-			//$query .= "AND imas_teachers.userid=imas_users.id AND imas_users.groupid='$groupid'";
 		}
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		foreach ($tids as $tid) {
+			if ($myrights < 100) {
+				$query = "SELECT imas_teachers.id FROM imas_teachers,imas_users WHERE imas_teachers.id='$tid' AND imas_teachers.userid=imas_users.id AND imas_users.groupid='$groupid'";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				if (mysql_num_rows($result)>0) {
+					$query = "DELETE FROM imas_teachers WHERE id='$tid'";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+				} else {
+					//break;
+				}
+				
+				//$query = "DELETE imas_teachers FROM imas_users,imas_teachers WHERE imas_teachers.id='{$_GET['tid']}' ";
+				//$query .= "AND imas_teachers.userid=imas_users.id AND imas_users.groupid='$groupid'";
+			} else {
+				$query = "DELETE FROM imas_teachers WHERE id='$tid'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+		}
+		
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/forms.php?action=chgteachers&id={$_GET['cid']}");
 		exit;
 	case "addteacher":
@@ -476,8 +497,20 @@ switch($_GET['action']) {
 				break;
 			}
 		}
-		$query = "INSERT INTO imas_teachers (userid,courseid) VALUES ('{$_GET['tid']}','{$_GET['cid']}')";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		$tids = array();
+		if (isset($_GET['tid'])) {
+			$tids = array($_GET['tid']);
+		} else if (isset($_POST['atid'])) {
+			$tids = $_POST['atid'];
+		}
+		$ins = array();
+		foreach ($tids as $tid) {
+			$ins[] = "('$tid','{$_GET['cid']}')";
+		}
+		if (count($ins)>0) {
+			$query = "INSERT INTO imas_teachers (userid,courseid) VALUES ".implode(',',$ins);
+			mysql_query($query) or die("Query failed : " . mysql_error());
+		}
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/forms.php?action=chgteachers&id={$_GET['cid']}");
 		exit;
 	case "importmacros":
@@ -537,10 +570,15 @@ switch($_GET['action']) {
 		if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
 			if (strpos($uploadfile,'.tar.gz')!==FALSE) {
 				include("../includes/tar.class.php");
+				include("../includes/filehandler.php");
 				$tar = new tar();
 				$tar->openTAR($uploadfile);
 				if ($tar->hasFiles()) {
-					$n = $tar->extractToDir("../assessment/qimages/");
+					if ($GLOBALS['filehandertypecfiles'] == 's3') {
+						$n = $tar->extractToS3("qimages","public");
+					} else {
+						$n = $tar->extractToDir("../assessment/qimages/");	
+					}
 					require("../header.php");
 					echo "<p>Extracted $n files.  <a href=\"admin.php\">Continue</a></p>\n";
 					require("../footer.php");
@@ -567,15 +605,18 @@ switch($_GET['action']) {
 		$uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
 		if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
 			if (strpos($uploadfile,'.zip')!==FALSE && class_exists('ZipArchive')) {
+				require("../includes/filehandler.php");
 				$zip = new ZipArchive();
 				$res = $zip->open($uploadfile);
 				$ne = 0;  $ns = 0;
 				if ($res===true) {
 					for($i = 0; $i < $zip->numFiles; $i++) {
-						if (file_exists("../course/files/".$zip->getNameIndex($i))) {
+						//if (file_exists("../course/files/".$zip->getNameIndex($i))) {
+						if (doesfileexist('cfile',$zip->getNameIndex($i))) {
 							$ns++;
 						} else {
 							$zip->extractTo("../course/files/", array($zip->getNameIndex($i)));
+							relocatecoursefileifneeded("../course/files/".$zip->getNameIndex($i),$zip->getNameIndex($i));
 							$ne++;
 						} 
 					}

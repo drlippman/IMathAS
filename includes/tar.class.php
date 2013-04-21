@@ -516,6 +516,28 @@ class tar {
 		}
 		return $n;
 	}
+	
+	function extractToS3($keybase,$sec="public") {
+		$n = 0;
+		if($this->numFiles > 0) {
+			foreach($this->files as $key => $information) {
+				if (storecontenttofile($information["file"],$keybase.'/'.$information["name"], $sec)) {
+					$n++;
+				}
+			}
+		}
+		return $n;
+	}
+	
+	function getFileList() {
+		$out = array();
+		if($this->numFiles > 0) {
+			foreach($this->files as $key => $information) {
+				$out[] = $information["name"];
+			}
+		}
+		return $out;
+	}
 
 
 	// Remove a directory from the tar archive

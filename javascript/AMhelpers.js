@@ -516,8 +516,9 @@ function AMpreview(inputId,outputId) {
   
   
   ptlist = pts[qn].split(",");
-  var tstpt = 0; res = NaN;
+  var tstpt = 0; var res = NaN; var isnoteqn = false;
   if (iseqn[qn]==1) {
+  	  if (!str.match(/=/)) {isnoteqn = true;}
 	str = str.replace(/(.*)=(.*)/,"$1-($2)");
   }
   if (fl!='') {
@@ -588,6 +589,7 @@ function AMpreview(inputId,outputId) {
 		err += ": warning: use "+errstuff[1]+"("+errstuff[2]+") rather than "+errstuff[0];
 	}
   }
+  if (iseqn[qn]==1 && isnoteqn) { err = "syntax error: this is not an equation";}
   outnode.appendChild(document.createTextNode(" " + err));
   //clear out variables that have been defined - not needed with scopedeval
   /*var toclear = ''; 

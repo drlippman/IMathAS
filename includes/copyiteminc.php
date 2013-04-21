@@ -22,7 +22,6 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		$_POST['append'] = ' '.$_POST['append'];
 	}
 	$now = time();
-	
 	$query = "SELECT itemtype,typeid FROM imas_items WHERE id='$itemid'";
 	$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 	list($itemtype,$typeid) = mysql_fetch_row($result);
@@ -222,7 +221,8 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		}
 	} else if ($itemtype == "Calendar") {
 		$newtypeid = 0;	
-	}
+	} 
+	
 	$query = "INSERT INTO imas_items (courseid,itemtype,typeid) ";
 	$query .= "VALUES ('$cid','$itemtype',$newtypeid)";
 	mysql_query($query) or die("Query failed :$query " . mysql_error());
@@ -245,6 +245,7 @@ function copysub($items,$parent,&$addtoarr,$gbcats,$sethidden=false) {
 				$newblock['colors'] = $item['colors'];
 				$newblock['public'] = $item['public'];
 				$newblock['fixedheight'] = $item['fixedheight'];
+				$newblock['grouplimit'] = $item['grouplimit'];
 				$newblock['items'] = array();
 				if (count($item['items'])>0) {
 					copysub($item['items'],$parent.'-'.($k+1),$newblock['items'],$gbcats,$sethidden);
@@ -307,13 +308,16 @@ function copyallsub($items,$parent,&$addtoarr,$gbcats,$sethidden=false) {
 			$newblock['colors'] = $item['colors'];
 			$newblock['public'] = $item['public'];
 			$newblock['fixedheight'] = $item['fixedheight'];
+			$newblock['grouplimit'] = $item['grouplimit'];
 			$newblock['items'] = array();
 			if (count($item['items'])>0) {
 				copyallsub($item['items'],$parent.'-'.($k+1),$newblock['items'],$gbcats,$sethidden);
 			}
 			$addtoarr[] = $newblock;
 		} else {
-			$addtoarr[] = copyitem($item,$gbcats,$sethidden);
+			if ($item != null && $item != 0) {
+				$addtoarr[] = copyitem($item,$gbcats,$sethidden);
+			}
 		}
 	}
 	

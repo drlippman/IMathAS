@@ -93,6 +93,11 @@ if ($myrights<20) {
 	} else {
 		$showtips = 1;
 	}
+	if (isset($CFG['AMS']['eqnhelper'])) {
+		$eqnhelper = $CFG['AMS']['eqnhelper'];
+	} else {
+		$eqnhelper = 0;
+	}
 	
 	$query = "SELECT imas_libraries.name,imas_users.LastName,imas_users.FirstName FROM imas_libraries,imas_library_items,imas_users  WHERE imas_libraries.id=imas_library_items.libid AND imas_library_items.ownerid=imas_users.id AND imas_library_items.qsetid='{$_GET['qsetid']}'";
 	$resultLibNames = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -101,9 +106,35 @@ if ($myrights<20) {
 /******* begin html output ********/
 $sessiondata['coursetheme'] = $coursetheme;
 $flexwidth = true; //tells header to use non _fw stylesheet
+$placeinhead = '';
 if ($showtips==2) {
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqntips.js?v=012810\"></script>";
 }
+
+if ($eqnhelper==1 || $eqnhelper==2) {
+	$placeinhead .= '<script type="text/javascript">var eetype='.$eqnhelper.'</script>';
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqnhelper.js?v=030112\"></script>";
+	$placeinhead .= '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
+	
+} else if ($eqnhelper==3 || $eqnhelper==4) {
+	$placeinhead .= "<link rel=\"stylesheet\" href=\"$imasroot/assessment/mathquill.css?v=030212\" type=\"text/css\" />";
+	if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE')!==false) {
+		$placeinhead .= '<!--[if lte IE 7]><style style="text/css">
+			.mathquill-editable.empty { width: 0.5em; }
+			.mathquill-rendered-math .numerator.empty, .mathquill-rendered-math .empty { padding: 0 0.25em;}
+			.mathquill-rendered-math sup { line-height: .8em; }
+			.mathquill-rendered-math .numerator {float: left; padding: 0;}
+			.mathquill-rendered-math .denominator { clear: both;width: auto;float: left;}
+			</style><![endif]-->';
+	}
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquill_min.js?v=030112\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquilled.js?v=030112\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/AMtoMQ.js?v=030112\"></script>";
+	$placeinhead .= '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
+	
+} 
+$useeqnhelper = $eqnhelper;
+
 require("../assessment/header.php");
 
 if ($overwriteBody==1) {

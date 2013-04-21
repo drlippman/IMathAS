@@ -4,35 +4,33 @@
 </head>
 <body>
 <?php
-if (file_exists("upgradecounter.txt")) {
+/*if (file_exists("upgradecounter.txt")) {
 	echo "It appears the database setup has already been run.  Aborting.  If you need to ";
 	echo "rerun the setup, delete upgradecounter.txt";
 	echo "</body></html>";
 	exit;
-}
+}*/
 $dbsetup = true;
 include("config.php");
+$link = mysql_connect($dbserver,$dbusername, $dbpassword) 
+  or die("Could not connect : " . mysql_error());
+mysql_select_db($dbname) 
+  or die("Could not select database");
+  
+$query = "SELECT ver FROM imas_dbschema WHERE id=1";
+$result = mysql_query($query);
+if ($result!==false) {
+	echo "It appears the database setup has already been run.  Aborting.  If you need to ";
+	echo "rerun the setup, clear out your database";
+	echo "</body></html>";
+	exit;
+}
 //IMathAS Database Setup
 //(c) 2006 David Lippman
-if (isset($_POST['dbsetupmethod'])) { //called from install script
-	if ($_POST['dbsetupmethod']>0) {
-		$docreate = 1;
-	} else {
-		$docreate = 0;
-	}
+if (isset($_POST['dbsetup'])) { //called from install script
 	echo "<h3>This step will set up the database required for IMathAS</h3>\n";
 	echo "<form method=post action=\"dbsetup.php\">\n";
-	echo "<input type=\"hidden\" name=\"create\" value=\"$docreate\" />";
-	echo '<input type="hidden" name="authuser" value="';
-	if ($_POST['dbsetupmethod']==2) {
-		echo $_POST['dbauthuser'];
-	} 
-	echo '" />';
-	echo '<input type="hidden" name="authpass" value="';
-	if ($_POST['dbsetupmethod']==2) {
-		echo $_POST['dbauthpass'];
-	} 
-	echo '" />';
+	
 	echo "<fieldset><legend>Initial IMathAS User Information</legend>\n";
 	echo "<span class=form>First Name</span>";
 	echo "<span class=formright><input type=type name=firstname value=\"root\"></span><br class=form>\n";
@@ -49,18 +47,11 @@ if (isset($_POST['dbsetupmethod'])) { //called from install script
 	echo "</form>\n";
 	echo "</body></html>\n";
 	exit;
-} else if (!isset($_POST['authuser'])) {
+} else if (!isset($_POST['username'])) {
 	echo "<form method=post action=\"dbsetup.php\">\n";
 	echo "<h3>This script will set up the database required for IMathAS</h3>\n";
-	echo "<p><b>Before submitting this form</b> be sure you have edited the config.php file to match the settings for your server</p>\n";
-	echo "<p><fieldset><legend>Database Creation</legend>\n";
-	echo "<span class=form>Username of MySQL user authorized to create new database tables</span>";
-	echo "<span class=formright><input type=text name=authuser></span><br class=form>\n";
-	echo "<span class=form>Password</span>";
-	echo "<span class=formright><input type=password name=authpass></span><br class=form>\n";
-	echo "<span class=form>Have the IMathAS database and database user been created already? <sup>*</sup></span>";
-	echo "<span class=formright><input type=radio name=create value=1 CHECKED>No, create them<br/><input type=radio name=create value=0>Yes, already created</span><br class=form>\n";
-	echo "</fieldset><fieldset><legend>Initial IMathAS User Information</legend>\n";
+	echo "<p><b>Before submitting this form</b> be sure you have edited the config.php file to match the settings for your server, and the database has been created.</p>\n";
+	echo "<fieldset><legend>Initial IMathAS User Information</legend>\n";
 	echo "<span class=form>First Name</span>";
 	echo "<span class=formright><input type=type name=firstname value=\"root\"></span><br class=form>\n";
 	echo "<span class=form>Last Name</span>";
@@ -82,35 +73,13 @@ if (isset($_POST['dbsetupmethod'])) { //called from install script
 	exit;
 }
 
-$authuser = $_POST['authuser'];
-$authpass = $_POST['authpass'];
 $username = $_POST['username'];
 $password = $_POST['password'];
 $firstname = $_POST['firstname'];
 $lastname = $_POST['lastname'];
 $email = $_POST['email'];
-if ($authuser=='' && $authpass=='') {
-	$authuser = $dbusername; 
-	$authpass = $dbpassword;
-}
 
-$link = mysql_connect($dbserver,$authuser, $authpass) 
-  or die("Could not connect : " . mysql_error());
 
-//comment out these three pairs of lines (down to but not including
-//mysql_select_db) if you've already created the database and database user
-if ($_POST['create']==1) {
-	$sql = 'CREATE DATABASE `' . $dbname . '` ;';
-	mysql_query($sql) or die("Query failed : $sql " . mysql_error());
-	
-	$sql = 'GRANT USAGE ON *.* TO \'' . $dbusername . '\'@\''. $dbserver . '\' IDENTIFIED BY \''. $dbpassword . '\' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0;';
-	mysql_query($sql) or die("Query failed : $sql " . mysql_error());
-	
-	$sql = 'GRANT SELECT, INSERT, UPDATE, DELETE, CREATE , ALTER  ON `' . $dbname . '`.* TO \'' . $dbusername . '\'@\'' . $dbserver . '\';';
-	mysql_query($sql) or die("Query failed : $sql " . mysql_error());
-}
-mysql_select_db($dbname) 
-  or die("Could not select database");
 
 $sql = 'CREATE TABLE `imas_users` ('
         . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
@@ -127,6 +96,7 @@ $sql = 'CREATE TABLE `imas_users` ('
 	. ' `deflib` INT(10) UNSIGNED NOT NULL DEFAULT \'0\','
 	. ' `usedeflib` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\','
 	. ' `homelayout` VARCHAR(32)  NOT NULL DEFAULT \'|0,1,2||0,1\','
+	. ' `hasuserimg` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\','
 	. ' `remoteaccess` VARCHAR(10) NOT NULL DEFAULT \'\', '
 	. ' `listperpage` TINYINT(3) UNSIGNED NOT NULL DEFAULT \'20\', '
 	. ' INDEX (`lastaccess`), INDEX (`rights`), '
@@ -191,6 +161,7 @@ $sql = 'CREATE TABLE `imas_courses` ('
 	. ' `copyrights` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `blockcnt` INT(10) UNSIGNED NOT NULL DEFAULT \'1\', '
 	. ' `msgset` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
+	. ' `toolset` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `chatset` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `showlatepass` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `topbar` VARCHAR(32) NOT NULL DEFAULT \'|\', '
@@ -214,7 +185,7 @@ $sql = 'CREATE TABLE `imas_assessments` ('
         . ' `courseid` INT(10) UNSIGNED NOT NULL DEFAULT \'0\', '
         . ' `name` VARCHAR(254) NOT NULL, '
 	. ' `summary` TEXT NOT NULL, '
-        . ' `intro` TEXT NOT NULL, '
+        . ' `intro` MEDIUMTEXT NOT NULL, '
         . ' `startdate` INT(10) UNSIGNED NOT NULL DEFAULT \'0\', '
         . ' `enddate` INT(10) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `reviewdate` INT(10) UNSIGNED NOT NULL DEFAULT \'0\', '
@@ -551,6 +522,15 @@ $sql = 'CREATE TABLE `imas_forum_views` ('
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());	
 echo 'imas_forum_views created<br/>';
 
+$sql = 'CREATE TABLE `imas_forum_likes` (
+	`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+	`userid` INT(10) UNSIGNED NOT NULL, 
+	`threadid` INT(10) UNSIGNED NOT NULL, 
+	`postid` INT(10) UNSIGNED NOT NULL, 
+	`type` TINYINT(1) UNSIGNED NOT NULL
+	) ENGINE = InnoDB';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());	
+echo 'imas_forum_likes created<br/>';
 
 $sql = 'CREATE TABLE `imas_wikis` ('
         . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
@@ -907,6 +887,14 @@ $sql = 'CREATE TABLE `imas_login_log` (
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 echo 'imas_login_log created<br/>';
 
+$sql = 'CREATE TABLE `imas_log` (
+	`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+	`time` INT( 10 ) UNSIGNED NOT NULL ,
+	`log` TEXT NOT NULL 
+	) ENGINE = InnoDB';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+echo 'imas_log created<br/>';
+
 $sql = 'CREATE TABLE `imas_external_tools` (
 	`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 	`name` VARCHAR( 255 ) NOT NULL ,
@@ -955,6 +943,15 @@ $sql = 'CREATE TABLE `imas_bookmarks` (
 	) ENGINE = InnoDB';
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 echo 'imas_bookmarks created<br/>';
+
+$sql = 'CREATE TABLE `imas_dbschema` (
+	`id` INT( 10 ) UNSIGNED NOT NULL PRIMARY KEY ,
+	`ver` SMALLINT( 4 ) UNSIGNED NOT NULL
+	) ENGINE = InnoDB';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+$sql = 'INSERT INTO imas_dbschema (id,ver) VALUES (2,0)';  //initialize guest account counter
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+echo 'imas_dbschema created<br/>';
 
 $md5pw = md5($password);
 $now = time();

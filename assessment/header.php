@@ -37,7 +37,7 @@ window.onload = init;
 var imasroot = '<?php echo $imasroot; ?>';
 </script>
 <link rel="stylesheet" href="<?php echo $imasroot . "/assessment/mathtest.css?ver=092812";?>" type="text/css"/>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js" type="text/javascript"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js" type="text/javascript"></script>
 <?php
 echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/general.js?ver=011312\"></script>\n";
 if (isset($sessiondata['coursetheme'])) {
@@ -93,7 +93,7 @@ div { zoom: 1; }
 }
 </style> 
 <![endif]--> 
-<script src="<?php echo $imasroot . "/javascript/AMhelpers_min.js?v=021813";?>" type="text/javascript"></script>
+<script src="<?php echo $imasroot . "/javascript/AMhelpers_min.js?v=021613";?>" type="text/javascript"></script>
 <?php 
 if (isset($sessiondata['useflash'])) {
 	echo '<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>';
@@ -101,7 +101,7 @@ if (isset($sessiondata['useflash'])) {
 ?>
 <script src="<?php echo $imasroot . "/javascript/confirmsubmit.js";?>" type="text/javascript"></script>
 <!--[if lt IE 9]><script type="text/javascript" src="<?php echo $imasroot;?>/javascript/excanvas_min.js?v=120811"></script><![endif]-->
-<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/drawing_min.js?v=022413"></script>
+<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/drawing_min.js?v=041313"></script>
 <?php
 echo "<script type=\"text/javascript\">imasroot = '$imasroot';</script>";
 if (isset($useeditor) && $sessiondata['useed']==1) {
@@ -153,6 +153,7 @@ if (!isset($coursetopbar)) {
 	if (!isset($coursetopbar[2])) { $coursetopbar[2] = 0;}
 	if ($coursetopbar[0][0] == null) {unset($coursetopbar[0][0]);}
 	if ($coursetopbar[1][0] == null) {unset($coursetopbar[1][0]);}
+	$coursetoolset = $sessiondata['coursetoolset'];
 }		
 
 if (isset($cid) && !isset($flexwidth) && (!isset($sessiondata['intreereader']) || $sessiondata['intreereader']==false) && $sessiondata['isteacher'] && $coursetopbar[2]==1 && count($coursetopbar[1])>0) {
@@ -162,7 +163,7 @@ if (isset($cid) && !isset($flexwidth) && (!isset($sessiondata['intreereader']) |
 	if (in_array(0,$coursetopbar[1]) && $msgset<4) { //messages
 		echo "<li><a href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a></li> ";
 	}
-	if (in_array(6,$coursetopbar[1])) { //Forums
+	if (in_array(6,$coursetopbar[1]) && (($coursetoolset&2)==0 || !isset($CFG['CPS']['topbar']) || $CFG['CPS']['topbar'][1]==1)) { //Forums
 		echo "<li><a href=\"$imasroot/forums/forums.php?cid=$cid\">Forums</a></li>";
 	}
 	if (in_array(1,$coursetopbar[1])) { //Stu view
@@ -177,7 +178,7 @@ if (isset($cid) && !isset($flexwidth) && (!isset($sessiondata['intreereader']) |
 	if (in_array(7,$coursetopbar[1])) { //Groups
 		echo "<li><a href=\"$imasroot/course/managestugrps.php?cid=$cid\">Groups</a></li>\n";
 	}
-	if (in_array(4,$coursetopbar[1])) { //Calendar
+	if (in_array(4,$coursetopbar[1])  && (($coursetoolset&1)==0 || !isset($CFG['CPS']['topbar']) || $CFG['CPS']['topbar'][1]==1)) { //Calendar
 		echo "<li><a href=\"$imasroot/course/showcalendar.php?cid=$cid\">Calendar</a></li>\n";
 	}
 	if (in_array(5,$coursetopbar[1])) { //Quickview

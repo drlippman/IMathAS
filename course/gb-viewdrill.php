@@ -3,6 +3,22 @@
 //(c) 2011 David Lippman
 require("../validate.php");
 
+function stddev($array){
+  //Don Knuth is the $deity of algorithms
+  //http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#III._On-line_algorithm
+  $n = 0;
+  $mean = 0;
+  $M2 = 0;
+  foreach($array as $x){
+      $n++;
+      $delta = $x - $mean;
+      $mean = $mean + $delta/$n;
+      $M2 = $M2 + $delta*($x - $mean);
+  }
+  $variance = $M2/($n - 1);
+  return sqrt($variance);
+}
+
 $cid = intval($_GET['cid']);
 $daid = intval($_GET['daid']);
 
@@ -56,9 +72,22 @@ while ($row = mysql_fetch_row($result)) {
 			} else {
 				$score =  dispscore(min($scorerec[$qn]));
 			}
-			$score .= '('.count($scorerec[$qn]).')';
-			$score .= '<br/>';
+			
+			if (isset($_GET['details'])) {
+				$score .= ' ; '.count($scorerec[$qn]).' ; ';
+			} else {
+				$score .= '('.count($scorerec[$qn]).')';
+				$score .= '<br/>';
+			}
 			$score .= dispscore($scorerec[$qn][count($scorerec[$qn])-1]); 
+			if (isset($_GET['details'])) {
+				$score .= ' ; ' . dispscore(round(array_sum($scorerec[$qn])/count($scorerec[$qn]), 1));
+				if (count($scorerec[$qn])>1) {
+					$score .= ' ; ' . round(stddev($scorerec[$qn]),1);
+				} else {
+					$score .= ' ; 0';
+				}
+			}
 		} else {
 			$score = 'N/A';
 		}
