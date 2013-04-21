@@ -427,7 +427,7 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 			}
 			if ($j==$len) {
 				$i = $j;
-				echo "unmatched parens/brackets - likely will cause an error";
+				echo _('unmatched parens/brackets - likely will cause an error');
 			} else {
 				$c = $str{$i};
 			}

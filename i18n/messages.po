@@ -1,0 +1,2413 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-04-10 14:32+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: course/courseshowitems.php:321
+msgid " Collapsed. "
+msgstr ""
+
+#: course/courseshowitems.php:656
+msgid " LatePass Allowed"
+msgstr ""
+
+#: course/courseshowitems.php:317
+msgid " as Folder. "
+msgstr ""
+
+#: course/courseshowitems.php:319
+msgid " as TreeReader. "
+msgstr ""
+
+#: course/courseshowitems.php:625
+msgid " second(s)"
+msgstr ""
+
+#: course/courseshowitems.php:1782 course/courseshowitems.php:1829
+#: course/courseshowitems.php:1876 course/courseshowitems.php:1923
+#, php-format
+msgid " showing %1$s until %2$s"
+msgstr ""
+
+#: course/courseshowitems.php:1776 course/courseshowitems.php:1823
+#: course/courseshowitems.php:1870 course/courseshowitems.php:1917
+#, php-format
+msgid " showing until %s"
+msgstr ""
+
+#: assessment/testutil.php:774
+#, php-format
+msgid "%d available on this attempt."
+msgstr ""
+
+#: assessment/showtest.php:831
+#, php-format
+msgid "%s added to group, overwriting existing attempt."
+msgstr ""
+
+#: assessment/showtest.php:841
+#, php-format
+msgid "%s added to group."
+msgstr ""
+
+#: assessment/showtest.php:811
+#, php-format
+msgid "%s already has a group.  No change made"
+msgstr ""
+
+#: loginpage.php:117
+#, php-format
+msgid "%s is a web based mathematics assessment and course management platform."
+msgstr ""
+
+#: loginpage.php:134
+#, php-format
+msgid "%s is powered by %s"
+msgstr ""
+
+#: course/gradebook.php:742 course/gradebook.php:1173
+msgid "(Not Counted)"
+msgstr ""
+
+#: course/courseshowitems.php:696
+#, php-format
+msgid ", Review until %s"
+msgstr ""
+
+#: assessment/displayq2.php:682
+#, php-format
+msgid ", accurate to %d decimal places"
+msgstr ""
+
+#: course/courseshowitems.php:1725
+#, php-format
+msgid ", review until %s"
+msgstr ""
+
+#: assessment/displayq2.php:698
+#, php-format
+msgid ", with at least %d significant figures"
+msgstr ""
+
+#: assessment/displayq2.php:689
+#, php-format
+msgid ", with exactly %d significant figures"
+msgstr ""
+
+#: course/gradebook.php:528
+msgid "... file"
+msgstr ""
+
+#: course/gradebook.php:529
+msgid "... my email"
+msgstr ""
+
+#: course/gradebook.php:530
+msgid "... other email"
+msgstr ""
+
+#: course/course.php:784
+msgid "1 day from now"
+msgstr ""
+
+#: course/course.php:778
+msgid "1 hour from now"
+msgstr ""
+
+#: course/course.php:787
+msgid "1 week from now"
+msgstr ""
+
+#: assessment/displayq2.php:1650
+msgid "2 regions"
+msgstr ""
+
+#: course/course.php:781
+msgid "4 hours from now"
+msgstr ""
+
+#: course/gradebook.php:1309 course/gradebook.php:1321
+#: course/gradebook.php:1373 course/gradebook.php:1423
+#: course/gradebook.php:1456 course/gradebook.php:1491
+#: course/gradebook.php:1503
+msgid "5-number summary:"
+msgstr ""
+
+#: assessment/showtest.php:1131
+msgid "<a href=\"showtest.php\">Return to test</a> or"
+msgstr ""
+
+#: assessment/showtest.php:2554
+msgid "<a href=\"showtest.php?reattempt=all\">Reattempt test</a> on all questions where allowed"
+msgstr ""
+
+#: assessment/testutil.php:812
+msgid "<a href=\"showtest.php?reattempt=all\">Reattempt test</a> on questions allowed (note: all scores, correct and incorrect, will be cleared)"
+msgstr ""
+
+#: assessment/showtest.php:2548
+msgid "<a href=\"showtest.php?reattempt=all\">Reattempt test</a> on questions allowed (note: where reattempts are allowed, all scores, correct and incorrect, will be cleared)"
+msgstr ""
+
+#: assessment/testutil.php:814
+msgid "<a href=\"showtest.php?reattempt=all\">Reattempt test</a> on questions missed where allowed"
+msgstr ""
+
+#: assessment/showtest.php:2551
+msgid "<a href=\"showtest.php?reattempt=canimprove\">Reattempt test</a> on questions that can be improved where allowed"
+msgstr ""
+
+#: assessment/showtest.php:2560 assessment/testutil.php:821
+msgid "<a href=\"showtest.php?regenall=all\">Try similar problems</a> for all questions where allowed."
+msgstr ""
+
+#: assessment/showtest.php:2559 assessment/testutil.php:823
+msgid "<a href=\"showtest.php?regenall=missed\">Try similar problems</a> for all questions with less than perfect scores where allowed."
+msgstr ""
+
+#: course/gradebook.php:1045
+msgid "<b>All</b> total includes all items: past, current, and future to-be-done items."
+msgstr ""
+
+#: course/gradebook.php:1039
+msgid "<b>Past Due and Attempted</b> total includes items whose due date has past, as well as currently available items you have started working on."
+msgstr ""
+
+#: course/gradebook.php:1042
+msgid "<b>Past Due and Available</b> total includes items whose due date has past as well as currently available items, even if you haven't starting working on them yet."
+msgstr ""
+
+#: course/gradebook.php:1036
+msgid "<b>Past Due</b> total only includes items whose due date has past.  Current assignments are not counted in this total."
+msgstr ""
+
+#: assessment/showtest.php:2525
+#, php-format
+msgid "A score of %d is required to receive credit for this assessment"
+msgstr ""
+
+#: infoheader.php:6 loginpage.php:25
+msgid "About Us"
+msgstr ""
+
+#: loginpage.php:82
+msgid "Accessibility:"
+msgstr ""
+
+#: course/gradebook.php:556
+msgid "Active"
+msgstr ""
+
+#: course/gradebook.php:524
+msgid "Add"
+msgstr ""
+
+#: course/courseshowitems.php:1426
+msgid "Add An Item..."
+msgstr ""
+
+#: course/courseshowitems.php:1427
+msgid "Add Assessment"
+msgstr ""
+
+#: course/courseshowitems.php:1433
+msgid "Add Block"
+msgstr ""
+
+#: course/courseshowitems.php:1434
+msgid "Add Calendar"
+msgstr ""
+
+#: course/courseshowitems.php:1431
+msgid "Add Forum"
+msgstr ""
+
+#: assessment/showtest.php:1725
+msgid "Add Group Members"
+msgstr ""
+
+#: course/courseshowitems.php:1429
+msgid "Add Inline Text"
+msgstr ""
+
+#: course/courseshowitems.php:1430
+msgid "Add Linked Text"
+msgstr ""
+
+#: course/courseshowitems.php:1432
+msgid "Add Wiki"
+msgstr ""
+
+#: course/courseshowitems.php:1362 course/courseshowitems.php:1364
+#: course/courseshowitems.php:1366
+msgid "Add here:"
+msgstr ""
+
+#: assessment/displayq2.php:1636
+msgid "Adjust the sliders"
+msgstr ""
+
+#: index.php:344
+msgid "Admin Page"
+msgstr ""
+
+#: course/gradebook.php:432 course/gradebook.php:457 course/gradebook.php:568
+#: course/gradebook.php:593 course/gradebook.php:615 course/gradebook.php:877
+#: course/gradebook.php:1098
+msgid "All"
+msgstr ""
+
+#: loginpage.php:127
+msgid "Also available:"
+msgstr ""
+
+#: course/courseshowitems.php:82 course/courseshowitems.php:87
+#: course/courseshowitems.php:563 course/courseshowitems.php:573
+#: course/courseshowitems.php:739 course/courseshowitems.php:744
+#: course/courseshowitems.php:870 course/courseshowitems.php:875
+#: course/courseshowitems.php:956 course/courseshowitems.php:961
+#: course/courseshowitems.php:1143 course/courseshowitems.php:1148
+#: course/courseshowitems.php:1236 course/courseshowitems.php:1241
+#: course/courseshowitems.php:1607 course/courseshowitems.php:1612
+#: course/courseshowitems.php:1687 course/courseshowitems.php:1692
+#: course/courseshowitems.php:1697 course/courseshowitems.php:1750
+#: course/courseshowitems.php:1755 course/courseshowitems.php:1797
+#: course/courseshowitems.php:1802 course/courseshowitems.php:1844
+#: course/courseshowitems.php:1849 course/courseshowitems.php:1891
+#: course/courseshowitems.php:1896
+msgid "Always"
+msgstr ""
+
+#: index.php:429
+msgid "Anonymous"
+msgstr ""
+
+#: assessment/displayq2.php:330 assessment/displayq2.php:338
+#: assessment/displayq2.php:350
+msgid "Answer:"
+msgstr ""
+
+#: assessment/displayq2.php:176
+msgid "Answers may vary"
+msgstr ""
+
+#: assessment/showtest.php:1129
+msgid "Answers saved, but not submitted for grading.  You may continue with the test, or come back to it later. "
+msgstr ""
+
+#: assessment/testutil.php:713 assessment/testutil.php:726
+#: assessment/testutil.php:745
+msgid "Are you sure you want to jump to this question, discarding any work you have not submitted?"
+msgstr ""
+
+#: assessment/showtest.php:107 assessment/showtest.php:746
+#: assessment/showtest.php:750 course/courseshowitems.php:1373
+msgid "Assessment"
+msgstr ""
+
+#: assessment/showtest.php:148
+msgid "Assessment has no questions!"
+msgstr ""
+
+#: assessment/showtest.php:404 assessment/showtest.php:418
+#: assessment/showtest.php:435
+msgid "Assessment is closed"
+msgstr ""
+
+#: assessment/testutil.php:808
+msgid "Assessment is complete with perfect score."
+msgstr ""
+
+#: course/course.php:461
+msgid "Assessments"
+msgstr ""
+
+#: course/courseshowitems.php:1723
+#, php-format
+msgid "Available %1$s to %2$s"
+msgstr ""
+
+#: course/courseshowitems.php:694
+#, php-format
+msgid "Available %1$s until %2$s"
+msgstr ""
+
+#: course/gradebook.php:455 course/gradebook.php:591
+msgid "Available Only"
+msgstr ""
+
+#: course/courseshowitems.php:600
+msgid "Available until"
+msgstr ""
+
+#: course/courseshowitems.php:1715
+#, php-format
+msgid "Available until %s"
+msgstr ""
+
+#: course/gradebook.php:534
+msgid "Averages"
+msgstr ""
+
+#: course/course.php:226 course/course.php:228
+msgid "Back"
+msgstr ""
+
+#: course/gradebook.php:149
+msgid "Back to Gradebook"
+msgstr ""
+
+#: course/course.php:789
+msgid "Back to instructor view"
+msgstr ""
+
+#: course/course.php:708
+msgid "Back to regular view"
+msgstr ""
+
+#: assessment/displayq2.php:1319 assessment/displayq2.php:1321
+msgid "Be sure your variables match those in the question"
+msgstr ""
+
+#: assessment/displayq2.php:1650
+msgid "Between two values"
+msgstr ""
+
+#: course/gradebook.php:600
+msgid "Big"
+msgstr ""
+
+#: course/courseshowitems.php:1410
+msgid "Block"
+msgstr ""
+
+#: assessment/displayq2.php:326
+msgid "Box"
+msgstr ""
+
+#: loginpage.php:68
+msgid "Browser check"
+msgstr ""
+
+#: course/course.php:424 course/course.php:482 course/course.php:594
+#: course/course.php:601 course/course.php:616 course/course.php:741
+#: course/course.php:764 course/courseshowitems.php:1416
+msgid "Calendar"
+msgstr ""
+
+#: assessment/catscores.php:43
+msgid "Categorized Score Breakdown"
+msgstr ""
+
+#: assessment/catscores.php:44 course/gradebook.php:429
+msgid "Category"
+msgstr ""
+
+#: course/gradebook.php:445
+msgid "Category Totals"
+msgstr ""
+
+#: assessment/testutil.php:631 assessment/testutil.php:793
+#: course/gradebook.php:565
+msgid "Category:"
+msgstr ""
+
+#: course/gradebook.php:669
+msgid "Change Info"
+msgstr ""
+
+#: index.php:251
+msgid "Change Password"
+msgstr ""
+
+#: index.php:250
+msgid "Change User Info"
+msgstr ""
+
+#: course/course.php:413 course/course.php:484 course/course.php:560
+msgid "Chat"
+msgstr ""
+
+#: course/gradebook.php:615 course/gradebook.php:861
+msgid "Check:"
+msgstr ""
+
+#: assessment/displayq2.php:1878
+msgid "Clear All"
+msgstr ""
+
+#: assessment/displayq2.php:1650
+msgid "Click and drag and arrows to adjust the values."
+msgstr ""
+
+#: assessment/showtest.php:1365 assessment/showtest.php:2044
+msgid "Click here to finalize assessment and summarize score"
+msgstr ""
+
+#: course/courseshowitems.php:101 course/courseshowitems.php:1622
+msgid "Collapsed"
+msgstr ""
+
+#: course/gradebook.php:543
+msgid "Color:"
+msgstr ""
+
+#: course/gradebook.php:535
+msgid "Comments"
+msgstr ""
+
+#: course/course.php:406
+msgid "Communication"
+msgstr ""
+
+#: assessment/showtest.php:1209 assessment/showtest.php:2442
+msgid "Continue"
+msgstr ""
+
+#: assessment/showtest.php:1549 assessment/showtest.php:1556
+#: assessment/showtest.php:1559
+#, php-format
+msgid "Continue video to %s"
+msgstr ""
+
+#: course/course.php:455 course/courseshowitems.php:163
+#: course/courseshowitems.php:216 course/courseshowitems.php:270
+#: course/courseshowitems.php:362 course/courseshowitems.php:409
+#: course/courseshowitems.php:470 course/courseshowitems.php:646
+#: course/courseshowitems.php:683 course/courseshowitems.php:720
+#: course/courseshowitems.php:789 course/courseshowitems.php:837
+#: course/courseshowitems.php:910 course/courseshowitems.php:938
+#: course/courseshowitems.php:1040 course/courseshowitems.php:1066
+#: course/courseshowitems.php:1189 course/courseshowitems.php:1219
+#: course/courseshowitems.php:1315 course/courseshowitems.php:1344
+#: course/courseshowitems.php:1665 course/courseshowitems.php:1737
+#: course/courseshowitems.php:1789 course/courseshowitems.php:1836
+#: course/courseshowitems.php:1883 course/courseshowitems.php:1930
+msgid "Copy"
+msgstr ""
+
+#: course/course.php:592 course/course.php:600 course/course.php:630
+msgid "Copy Course Items"
+msgstr ""
+
+#: index.php:358 index.php:407
+msgid "Course"
+msgstr ""
+
+#: course/course.php:454
+msgid "Course Items"
+msgstr ""
+
+#: course/course.php:467 course/course.php:605
+msgid "Course Settings"
+msgstr ""
+
+#: course/course.php:91
+msgid "Course does not exist.  <a hre=\"../index.php\">Return to main page</a>"
+msgstr ""
+
+#: index.php:295
+msgid "Courses you're taking"
+msgstr ""
+
+#: index.php:288
+msgid "Courses you're teaching"
+msgstr ""
+
+#: index.php:292
+msgid "Courses you're tutoring"
+msgstr ""
+
+#: assessment/showtest.php:951
+msgid "Create new version."
+msgstr ""
+
+#: assessment/showtest.php:1073
+msgid "Create new versions of all questions."
+msgstr ""
+
+#: assessment/showtest.php:869
+msgid "Current Group Members:"
+msgstr ""
+
+#: course/courseshowitems.php:315
+msgid "Currently Showing"
+msgstr ""
+
+#: course/course.php:463
+msgid "Dates"
+msgstr ""
+
+#: assessment/displayq2.php:2878
+msgid "Debug info: empty, missing, or invalid $answer"
+msgstr ""
+
+#: assessment/displayq2.php:2861
+msgid "Debug info: empty, missingor invalid $answer"
+msgstr ""
+
+#: assessment/displayq2.php:3146
+msgid "Debug info: function evaled to Not-a-number at all test points.  Check $domain"
+msgstr ""
+
+#: assessment/displayq2.php:4917
+msgid "Decimal values are not allowed"
+msgstr ""
+
+#: course/gradebook.php:435 course/gradebook.php:571
+msgid "Default"
+msgstr ""
+
+#: course/courseshowitems.php:162 course/courseshowitems.php:215
+#: course/courseshowitems.php:269 course/courseshowitems.php:361
+#: course/courseshowitems.php:408 course/courseshowitems.php:469
+#: course/courseshowitems.php:532 course/courseshowitems.php:645
+#: course/courseshowitems.php:682 course/courseshowitems.php:719
+#: course/courseshowitems.php:774 course/courseshowitems.php:788
+#: course/courseshowitems.php:836 course/courseshowitems.php:909
+#: course/courseshowitems.php:937 course/courseshowitems.php:1039
+#: course/courseshowitems.php:1065 course/courseshowitems.php:1188
+#: course/courseshowitems.php:1218 course/courseshowitems.php:1314
+#: course/courseshowitems.php:1343 course/courseshowitems.php:1664
+#: course/courseshowitems.php:1736 course/courseshowitems.php:1788
+#: course/courseshowitems.php:1835 course/courseshowitems.php:1882
+#: course/courseshowitems.php:1929
+msgid "Delete"
+msgstr ""
+
+#: infoheader.php:7
+msgid "Diagnostics"
+msgstr ""
+
+#: index.php:259
+msgid "Documentation"
+msgstr ""
+
+#: assessment/displayq2.php:1954
+msgid "Dot"
+msgstr ""
+
+#: assessment/displayq2.php:1878
+msgid "Draw:"
+msgstr ""
+
+#: assessment/showtest.php:975 assessment/showtest.php:977
+#: course/courseshowitems.php:602
+msgid "Due"
+msgstr ""
+
+#: assessment/showtest.php:455
+msgid "Due date has passed.  Submission rejected. "
+msgstr ""
+
+#: assessment/showtest.php:965
+msgid "Due in "
+msgstr ""
+
+#: assessment/showtest.php:963
+msgid "Due in under "
+msgstr ""
+
+#: course/gradebook.php:616
+msgid "E-mail"
+msgstr ""
+
+#: course/courseshowitems.php:215 course/courseshowitems.php:408
+msgid "Edit Contents"
+msgstr ""
+
+#: course/gradebook.php:671
+msgid "Edit Offline Scores"
+msgstr ""
+
+#: course/courseshowitems.php:1287
+#, php-format
+msgid "Edits due by %s. "
+msgstr ""
+
+#: assessment/displayq2.php:727 assessment/displayq2.php:863
+msgid "Eeek!  $questions is not defined or needs to be an array"
+msgstr ""
+
+#: assessment/displayq2.php:2345 assessment/displayq2.php:2388
+msgid "Eeek!  $questions is not defined or needs to be an array.  Make sure $questions is defined in the Common Control section."
+msgstr ""
+
+#: assessment/displayq2.php:973
+msgid "Eeek!  $questions or $answers is not defined or needs to be an array"
+msgstr ""
+
+#: assessment/displayq2.php:2444
+msgid "Eeek!  $questions or $answers is not defined or needs to be an array.  Make sure both are defined in the Common Control section."
+msgstr ""
+
+#: assessment/interpret5.php:394
+#, php-format
+msgid "Eeek.. unallowed macro %s"
+msgstr ""
+
+#: assessment/interpret5.php:326
+#, php-format
+msgid "Eeek.. unallowed var %s!"
+msgstr ""
+
+#: course/gradebook.php:666
+msgid "Email"
+msgstr ""
+
+#: index.php:342
+msgid "Enroll in a New Class"
+msgstr ""
+
+#: assessment/displayq2.php:4892
+#, php-format
+msgid "Enter %s as a fraction (like 3/5 or 10/4) or as a whole number (like 4 or -2)"
+msgstr ""
+
+#: assessment/displayq2.php:4904
+#, php-format
+msgid "Enter %s as a fraction (like 3/5 or 10/4), a whole number (like 4 or -2), or exact decimal (like 0.5 or 1.25)"
+msgstr ""
+
+#: assessment/displayq2.php:4910
+#, php-format
+msgid "Enter %s as a number (like 5, -3, 2.2) or as a calculation (like 5/3, 2^3, 5+4)"
+msgstr ""
+
+#: assessment/displayq2.php:4895
+#, php-format
+msgid "Enter %s as a reduced fraction (like 5/3, not 10/6) or as a whole number (like 4 or -2)"
+msgstr ""
+
+#: assessment/displayq2.php:4898
+#, php-format
+msgid "Enter %s as a reduced mixed number or as a whole number.  Example: 2 1/2 = 2 &frac12;"
+msgstr ""
+
+#: assessment/displayq2.php:4901
+#, php-format
+msgid "Enter %s as a reduced mixed number, reduced improper fraction, or as a whole number.  Example: 2 1/2 = 2 &frac12;"
+msgstr ""
+
+#: assessment/displayq2.php:4907
+#, php-format
+msgid "Enter %s as in scientific notation.  Example: 3*10^2 = 3 &middot; 10<sup>2</sup>"
+msgstr ""
+
+#: assessment/displayq2.php:1717
+msgid "Enter <i>all real numbers</i> for solutions of that type"
+msgstr ""
+
+#: assessment/displayq2.php:1354 assessment/displayq2.php:1448
+msgid "Enter DNE for Does Not Exist"
+msgstr ""
+
+#: assessment/displayq2.php:679 assessment/displayq2.php:4914
+msgid "Enter DNE for Does Not Exist, oo for Infinity"
+msgstr ""
+
+#: assessment/displayq2.php:1641
+msgid "Enter DNE for an empty set, oo for Infinity"
+msgstr ""
+
+#: assessment/displayq2.php:1445 assessment/displayq2.php:1482
+msgid "Enter a complex number"
+msgstr ""
+
+#: assessment/displayq2.php:4905
+msgid "Enter a fraction or exact decimal"
+msgstr ""
+
+#: assessment/displayq2.php:4893
+msgid "Enter a fraction or whole number"
+msgstr ""
+
+#: assessment/displayq2.php:1442 assessment/displayq2.php:1479
+msgid "Enter a list of complex numbers"
+msgstr ""
+
+#: assessment/displayq2.php:4905
+msgid "Enter a list of fractions or exact decimals"
+msgstr ""
+
+#: assessment/displayq2.php:4893
+msgid "Enter a list of fractions or whole numbers"
+msgstr ""
+
+#: assessment/displayq2.php:4911
+msgid "Enter a list of mathematical expressions"
+msgstr ""
+
+#: assessment/displayq2.php:4899 assessment/displayq2.php:4902
+msgid "Enter a list of mixed numbers or whole numbers"
+msgstr ""
+
+#: assessment/displayq2.php:1349 assessment/displayq2.php:1396
+msgid "Enter a list of n-tuples"
+msgstr ""
+
+#: assessment/displayq2.php:4908
+msgid "Enter a list of numbers using scientific notation"
+msgstr ""
+
+#: assessment/displayq2.php:1340 assessment/displayq2.php:1387
+msgid "Enter a list of points"
+msgstr ""
+
+#: assessment/displayq2.php:4896
+msgid "Enter a list of reduced fractions or whole numbers"
+msgstr ""
+
+#: assessment/displayq2.php:1528
+msgid "Enter a list of text"
+msgstr ""
+
+#: assessment/displayq2.php:1346 assessment/displayq2.php:1393
+msgid "Enter a list of vectors"
+msgstr ""
+
+#: assessment/displayq2.php:674
+msgid "Enter a list of whole or decimal numbers"
+msgstr ""
+
+#: assessment/displayq2.php:4911
+msgid "Enter a mathematical expression"
+msgstr ""
+
+#: assessment/displayq2.php:4899
+msgid "Enter a mixed number or whole number"
+msgstr ""
+
+#: assessment/displayq2.php:4902
+msgid "Enter a mixed number, improper fraction, or whole number"
+msgstr ""
+
+#: assessment/displayq2.php:4908
+msgid "Enter a number using scientific notation"
+msgstr ""
+
+#: assessment/displayq2.php:1337 assessment/displayq2.php:1384
+msgid "Enter a point"
+msgstr ""
+
+#: assessment/displayq2.php:4896
+msgid "Enter a reduced fraction or whole number"
+msgstr ""
+
+#: assessment/displayq2.php:1343 assessment/displayq2.php:1390
+msgid "Enter a vector"
+msgstr ""
+
+#: assessment/displayq2.php:677
+msgid "Enter a whole or decimal number"
+msgstr ""
+
+#: assessment/displayq2.php:1254
+msgid "Enter an algebraic equation"
+msgstr ""
+
+#: assessment/displayq2.php:1256
+msgid "Enter an algebraic expression"
+msgstr ""
+
+#: assessment/displayq2.php:1663
+msgid "Enter an interval corresponding to the region to be shaded"
+msgstr ""
+
+#: assessment/displayq2.php:1718
+msgid "Enter an interval using inequalities"
+msgstr ""
+
+#: assessment/displayq2.php:1645 assessment/displayq2.php:1722
+msgid "Enter an interval using interval notation"
+msgstr ""
+
+#: assessment/displayq2.php:1352 assessment/displayq2.php:1399
+msgid "Enter an n-tuple"
+msgstr ""
+
+#: assessment/displayq2.php:1174
+msgid "Enter each element of the matrix as  number (like 5, -3, 2.2)"
+msgstr ""
+
+#: assessment/displayq2.php:1531
+msgid "Enter text"
+msgstr ""
+
+#: assessment/displayq2.php:1339 assessment/displayq2.php:1386
+msgid "Enter your answer a list of points separated with commas.  Example: (1,2), (3.5,5)"
+msgstr ""
+
+#: assessment/displayq2.php:1345 assessment/displayq2.php:1392
+msgid "Enter your answer a list of vectors separated with commas.  Example: <1,2>, <3.5,5>"
+msgstr ""
+
+#: assessment/displayq2.php:1444
+msgid "Enter your answer as a complex number in a+bi form.  Example: 2+5.5i"
+msgstr ""
+
+#: assessment/displayq2.php:1481
+msgid "Enter your answer as a complex number in a+bi form.  Example: 2+5i"
+msgstr ""
+
+#: assessment/displayq2.php:1441
+msgid "Enter your answer as a list of complex numbers in a+bi form separated with commas.  Example: 2+5.5i,-3-4i"
+msgstr ""
+
+#: assessment/displayq2.php:1478
+msgid "Enter your answer as a list of complex numbers in a+bi form separated with commas.  Example: 2+5i,-3-4i"
+msgstr ""
+
+#: assessment/displayq2.php:1348 assessment/displayq2.php:1395
+msgid "Enter your answer as a list of n-tuples of numbers separated with commas: Example: (1,2),(3.5,4)"
+msgstr ""
+
+#: assessment/displayq2.php:1527
+msgid "Enter your answer as a list of text separated by commas.  Example:  dog, cat, rabbit."
+msgstr ""
+
+#: assessment/displayq2.php:1101
+msgid "Enter your answer as a list of values separated by commas: Example: -4, 3, 2"
+msgstr ""
+
+#: assessment/displayq2.php:673
+msgid "Enter your answer as a list of whole or decimal numbers separated with commas: Examples: -4, 3, 2.5"
+msgstr ""
+
+#: assessment/displayq2.php:1179
+msgid "Enter your answer as a matrix filled with numbers, like ((2,3,4),(3,4,5))"
+msgstr ""
+
+#: assessment/displayq2.php:1233
+msgid "Enter your answer as a matrix, like ((2,3,4),(1,4,5))"
+msgstr ""
+
+#: assessment/displayq2.php:1336 assessment/displayq2.php:1383
+msgid "Enter your answer as a point.  Example: (2,5.5)"
+msgstr ""
+
+#: assessment/displayq2.php:1342 assessment/displayq2.php:1389
+msgid "Enter your answer as a vector.  Example: <2,5.5>"
+msgstr ""
+
+#: assessment/displayq2.php:676
+msgid "Enter your answer as a whole or decimal number.  Examples: 3, -4, 5.5"
+msgstr ""
+
+#: assessment/displayq2.php:1319
+msgid "Enter your answer as an equation.  Example: y=3x^2+1, 2+x+y=3"
+msgstr ""
+
+#: assessment/displayq2.php:1321
+msgid "Enter your answer as an expression.  Example: 3x^2+1, x/5, (a+b)/c"
+msgstr ""
+
+#: assessment/displayq2.php:1351 assessment/displayq2.php:1398
+msgid "Enter your answer as an n-tuple of numbers.  Example: (2,5.5)"
+msgstr ""
+
+#: assessment/displayq2.php:1530
+msgid "Enter your answer as letters.  Examples: A B C, linear, a cat"
+msgstr ""
+
+#: assessment/displayq2.php:1621
+msgid "Enter your answer as text.  This question is not automatically graded."
+msgstr ""
+
+#: assessment/displayq2.php:1992
+msgid "Enter your answer by drawing on the graph."
+msgstr ""
+
+#: assessment/displayq2.php:1635
+msgid "Enter your answer by selecting the shade type, and by clicking and dragging the sliders on the normal curve"
+msgstr ""
+
+#: assessment/displayq2.php:1715
+#, php-format
+msgid "Enter your answer using inequality notation.  Example: 3 <= %d < 4"
+msgstr ""
+
+#: assessment/displayq2.php:1639 assessment/displayq2.php:1720
+msgid "Enter your answer using interval notation.  Example: [2.1,5.6)"
+msgstr ""
+
+#: assessment/displayq2.php:4521 assessment/displayq2.php:4522
+msgid "Error - File not uploaded in preview"
+msgstr ""
+
+#: assessment/displayq2.php:4501 assessment/displayq2.php:4502
+msgid "Error - Invalid file type"
+msgstr ""
+
+#: assessment/displayq2.php:4516 assessment/displayq2.php:4517
+msgid "Error - no asid"
+msgstr ""
+
+#: assessment/interpret5.php:626
+#, php-format
+msgid "Error loading library %s\n"
+msgstr ""
+
+#: assessment/displayq2.php:4542 assessment/displayq2.php:4543
+msgid "Error storing file"
+msgstr ""
+
+#: assessment/displayq2.php:4552 assessment/displayq2.php:4553
+msgid "Error uploading file"
+msgstr ""
+
+#: assessment/displayq2.php:4549 assessment/displayq2.php:4550
+msgid "Error uploading file - file too big"
+msgstr ""
+
+#: assessment/showtest.php:327
+msgid "Error.  Access test from course page"
+msgstr ""
+
+#: assessment/showtest.php:385
+msgid "Error.  It appears you have opened another assessment since you opened this one. "
+msgstr ""
+
+#: assessment/showtest.php:393
+msgid "Error.  Looks like your group has changed for this assessment. Please reopen the assessment and try again."
+msgstr ""
+
+#: assessment/showtest.php:2605
+msgid "Exit Assessment"
+msgstr ""
+
+#: course/courseshowitems.php:95 course/courseshowitems.php:1618
+msgid "Expanded"
+msgstr ""
+
+#: course/course.php:456
+msgid "Export"
+msgstr ""
+
+#: course/course.php:633
+msgid "Export Course Items"
+msgstr ""
+
+#: course/course.php:448 course/course.php:588
+msgid "Export Libraries"
+msgstr ""
+
+#: course/course.php:446 course/course.php:583
+msgid "Export Question Set"
+msgstr ""
+
+#: course/gradebook.php:527
+msgid "Export to..."
+msgstr ""
+
+#: course/course.php:445
+msgid "Export/Import"
+msgstr ""
+
+#: course/gradebook.php:709
+msgid "Feedback"
+msgstr ""
+
+#: loginpage.php:87
+msgid "Force image based display"
+msgstr ""
+
+#: loginpage.php:85
+msgid "Force image-based graphs"
+msgstr ""
+
+#: loginpage.php:86
+msgid "Force image-based math"
+msgstr ""
+
+#: loginpage.php:66
+msgid "Forgot Password"
+msgstr ""
+
+#: loginpage.php:67
+msgid "Forgot Username"
+msgstr ""
+
+#: course/courseshowitems.php:1398
+msgid "Forum"
+msgstr ""
+
+#: course/course.php:410 course/course.php:462 course/course.php:481
+#: course/course.php:558 course/course.php:726 course/course.php:758
+msgid "Forums"
+msgstr ""
+
+#: index.php:358
+msgid "From"
+msgstr ""
+
+#: course/gradebook.php:533
+msgid "GB Settings"
+msgstr ""
+
+#: assessment/displayq2.php:305
+msgid "Get help: "
+msgstr ""
+
+#: course/gradebook.php:704
+msgid "Grade"
+msgstr ""
+
+#: course/gradebook.php:423
+msgid "Grade Book Averages"
+msgstr ""
+
+#: course/gradebook.php:425
+msgid "Grade Book Student Detail"
+msgstr ""
+
+#: assessment/showtest.php:2525
+msgid "Grade in Gradebook: No Credit (NC)"
+msgstr ""
+
+#: assessment/showtest.php:2542
+msgid "Grade is subject to acceptance by the instructor"
+msgstr ""
+
+#: assessment/showtest.php:2401
+msgid "Grade: "
+msgstr ""
+
+#: course/course.php:422 course/course.php:489 course/course.php:617
+#: course/course.php:735 course/gradebook.php:385 course/gradebook.php:420
+#: course/gradebook.php:511 course/gradebook.php:514
+msgid "Gradebook"
+msgstr ""
+
+#: assessment/showtest.php:740
+msgid "Gradebook Detail"
+msgstr ""
+
+#: course/courseshowitems.php:647 course/courseshowitems.php:684
+#: course/courseshowitems.php:721 course/courseshowitems.php:1738
+msgid "Grades"
+msgstr ""
+
+#: assessment/showtest.php:1712
+msgid "Group Members:"
+msgstr ""
+
+#: assessment/showtest.php:781
+msgid "Group error - lost group info"
+msgstr ""
+
+#: assessment/showtest.php:859
+msgid "Group error.  Please try reaccessing the assessment from the course page"
+msgstr ""
+
+#: course/course.php:423 course/course.php:738
+msgid "Groups"
+msgstr ""
+
+#: loginpage.php:83 index.php:261 course/course.php:468 course/course.php:637
+msgid "Help"
+msgstr ""
+
+#: course/course.php:493 course/course.php:619
+#, php-format
+msgid "Help Using %s"
+msgstr ""
+
+#: loginpage.php:129
+msgid "Help for student with entering answers"
+msgstr ""
+
+#: index.php:323 course/courseshowitems.php:313 course/courseshowitems.php:692
+#: course/courseshowitems.php:815 course/courseshowitems.php:919
+#: course/courseshowitems.php:1047 course/courseshowitems.php:1197
+#: course/courseshowitems.php:1323 course/courseshowitems.php:1627
+msgid "Hidden"
+msgstr ""
+
+#: course/gradebook.php:1115
+msgid "Hide Locked"
+msgstr ""
+
+#: assessment/showtest.php:1318 assessment/showtest.php:1805
+msgid "Hide Question Information"
+msgstr ""
+
+#: course/gradebook.php:450 course/gradebook.php:586
+msgid "Hide all"
+msgstr ""
+
+#: assessment/displayq2.php:204 assessment/displayq2.php:222
+msgid "Hint:"
+msgstr ""
+
+#: loginpage.php:123
+msgid "If you already have an account, you can log on using the box to the right."
+msgstr ""
+
+#: loginpage.php:124
+#, php-format
+msgid "If you are a new student to the system, <a href=\"%s/forms.php?action=newuser\">Register as a new student</a>"
+msgstr ""
+
+#: loginpage.php:125
+#, php-format
+msgid "If you are an instructor, you can <a href=\"%s/newinstructor.php\">request an account</a>"
+msgstr ""
+
+#: assessment/showtest.php:1179
+msgid "If you do not reattempt now, you will have another chance once you complete the test."
+msgstr ""
+
+#: assessment/showtest.php:1337 assessment/showtest.php:1820
+msgid "If you jump to the answer, you must generate a new version to earn credit"
+msgstr ""
+
+#: course/course.php:457
+msgid "Import"
+msgstr ""
+
+#: course/course.php:634
+msgid "Import Course Items"
+msgstr ""
+
+#: course/course.php:449 course/course.php:589
+msgid "Import Libraries"
+msgstr ""
+
+#: course/course.php:447 course/course.php:584
+msgid "Import Question Set"
+msgstr ""
+
+#: assessment/displayq2.php:1055
+msgid "In each pull-down on the left, select the letter (a, b, c, etc.) of the matching answer in the right-hand column"
+msgstr ""
+
+#: assessment/displayq2.php:1053
+msgid "In each pull-down, select the item that matches with the displayed item"
+msgstr ""
+
+#: loginpage.php:130
+msgid "Instructor Documentation"
+msgstr ""
+
+#: course/course.php:387
+msgid "Instructor Preview"
+msgstr ""
+
+#: course/courseshowitems.php:1451
+#, php-format
+msgid "Into %s"
+msgstr ""
+
+#: course/courseshowitems.php:254 course/courseshowitems.php:269
+#: course/courseshowitems.php:447 course/courseshowitems.php:468
+msgid "Isolate"
+msgstr ""
+
+#: course/gradebook.php:704
+msgid "Item"
+msgstr ""
+
+#: assessment/showtest.php:1337 assessment/showtest.php:1820
+msgid "Jump to Answer"
+msgstr ""
+
+#: assessment/showtest.php:2132
+msgid "Jump to Question"
+msgstr ""
+
+#: assessment/showtest.php:1552
+#, php-format
+msgid "Jump video to %s"
+msgstr ""
+
+#: course/courseshowitems.php:642 course/courseshowitems.php:716
+msgid "LP"
+msgstr ""
+
+#: assessment/showtest.php:2585
+msgid "Last Attempt:"
+msgstr ""
+
+#: index.php:407
+msgid "Last Post"
+msgstr ""
+
+#: assessment/showtest.php:2470 assessment/showtest.php:2481
+msgid "Last attempt: "
+msgstr ""
+
+#: assessment/displayq2.php:2111
+msgid "Last file uploaded:"
+msgstr ""
+
+#: course/courseshowitems.php:642 course/courseshowitems.php:679
+#: course/courseshowitems.php:716
+msgid "LatePasses Allowed"
+msgstr ""
+
+#: assessment/displayq2.php:1649
+msgid "Left of a value"
+msgstr ""
+
+#: course/course.php:440
+msgid "Libraries"
+msgstr ""
+
+#: assessment/displayq2.php:1950
+msgid "Line"
+msgstr ""
+
+#: assessment/displayq2.php:1952
+msgid "Line Segment"
+msgstr ""
+
+#: course/courseshowitems.php:1392
+msgid "Link"
+msgstr ""
+
+#: course/gradebook.php:458 course/gradebook.php:594
+msgid "Links:"
+msgstr ""
+
+#: course/courseshowitems.php:306 course/courseshowitems.php:510
+msgid "Loading content..."
+msgstr ""
+
+#: course/gradebook.php:493 course/gradebook.php:503 course/gradebook.php:540
+#: course/gradebook.php:607
+msgid "Lock headers"
+msgstr ""
+
+#: index.php:326
+msgid "Lockdown"
+msgstr ""
+
+#: index.php:253 course/course.php:469 course/course.php:492
+#: course/course.php:618 course/course.php:627 course/course.php:748
+#: course/course.php:767
+msgid "Log Out"
+msgstr ""
+
+#: loginpage.php:55
+msgid "Login Error.  Try Again"
+msgstr ""
+
+#: course/gradebook.php:670
+msgid "Login Log"
+msgstr ""
+
+#: course/gradebook.php:620 course/gradebook.php:668 course/gradebook.php:862
+#: course/gradebook.php:1052
+msgid "Make Exception"
+msgstr ""
+
+#: course/course.php:439 course/gradebook.php:525
+msgid "Manage"
+msgstr ""
+
+#: course/courseshowitems.php:533
+msgid "Manage Events"
+msgstr ""
+
+#: course/course.php:587 course/course.php:599
+msgid "Manage Libraries"
+msgstr ""
+
+#: course/course.php:579
+msgid "Manage Question Set"
+msgstr ""
+
+#: course/course.php:460
+msgid "Mass Change"
+msgstr ""
+
+#: course/course.php:639
+msgid "Mass Change Assessments"
+msgstr ""
+
+#: course/course.php:643
+msgid "Mass Change Dates"
+msgstr ""
+
+#: course/course.php:642
+msgid "Mass Change Forums"
+msgstr ""
+
+#: course/gradebook.php:626
+msgid "Meanings:  IP-In Progress (some unattempted questions), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sup>*</sup> Has feedback, <sub>d</sub> Dropped score,  <sup>e</sup> Has exception <sup>LP</sup> Used latepass"
+msgstr ""
+
+#: course/gradebook.php:466
+msgid "Meanings: IP-In Progress (some unattempted questions), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sub>d</sub> Dropped score.  <sup>e</sup> Has exception <sup>LP</sup> Used latepass"
+msgstr ""
+
+#: index.php:358 course/gradebook.php:616 course/gradebook.php:667
+msgid "Message"
+msgstr ""
+
+#: assessment/testutil.php:661 assessment/testutil.php:796
+msgid "Message instructor about this question"
+msgstr ""
+
+#: assessment/showtest.php:759 index.php:254 course/course.php:408
+#: course/course.php:479 course/course.php:555 course/course.php:723
+#: course/course.php:755
+msgid "Messages"
+msgstr ""
+
+#: index.php:329
+#, php-format
+msgid "Messages (%d)"
+msgstr ""
+
+#: course/courseshowitems.php:162 course/courseshowitems.php:215
+#: course/courseshowitems.php:269 course/courseshowitems.php:361
+#: course/courseshowitems.php:408 course/courseshowitems.php:468
+#: course/courseshowitems.php:773 course/courseshowitems.php:787
+#: course/courseshowitems.php:835 course/courseshowitems.php:908
+#: course/courseshowitems.php:936 course/courseshowitems.php:1038
+#: course/courseshowitems.php:1064 course/courseshowitems.php:1187
+#: course/courseshowitems.php:1217 course/courseshowitems.php:1313
+#: course/courseshowitems.php:1342 course/courseshowitems.php:1664
+#: course/courseshowitems.php:1787 course/courseshowitems.php:1834
+#: course/courseshowitems.php:1881 course/courseshowitems.php:1928
+msgid "Modify"
+msgstr ""
+
+#: course/courseshowitems.php:568
+msgid "Never"
+msgstr ""
+
+#: course/course.php:422 course/course.php:489 course/course.php:575
+#: course/course.php:617 course/course.php:716 course/courseshowitems.php:153
+#: course/courseshowitems.php:206 course/courseshowitems.php:260
+#: course/courseshowitems.php:352 course/courseshowitems.php:399
+#: course/courseshowitems.php:459 course/gradebook.php:516
+msgid "New"
+msgstr ""
+
+#: index.php:256 course/course.php:241 course/course.php:285
+#, php-format
+msgid "New (%d)"
+msgstr ""
+
+#: course/courseshowitems.php:1178 course/courseshowitems.php:1209
+#, php-format
+msgid "New Posts (%s)"
+msgstr ""
+
+#: course/courseshowitems.php:1303 course/courseshowitems.php:1335
+msgid "New Revisions"
+msgstr ""
+
+#: course/courseshowitems.php:1162
+#, php-format
+msgid "New Threads due %s. "
+msgstr ""
+
+#: index.php:391
+msgid "New forum posts"
+msgstr ""
+
+#: index.php:351
+msgid "New messages"
+msgstr ""
+
+#: course/courseshowitems.php:164 course/courseshowitems.php:217
+#: course/courseshowitems.php:271 course/courseshowitems.php:363
+#: course/courseshowitems.php:410 course/courseshowitems.php:471
+#: course/courseshowitems.php:1666 course/gradebook.php:558
+msgid "NewFlag"
+msgstr ""
+
+#: assessment/showtest.php:1780
+msgid "Next"
+msgstr ""
+
+#: index.php:363 index.php:413
+msgid "No Subject"
+msgstr ""
+
+#: assessment/testutil.php:817
+msgid "No attempts left on current versions of questions."
+msgstr ""
+
+#: assessment/showtest.php:1626 assessment/showtest.php:1998
+msgid "No attempts remain on this problem."
+msgstr ""
+
+#: assessment/testutil.php:625
+msgid "No attempts remain."
+msgstr ""
+
+#: index.php:354
+msgid "No new messages"
+msgstr ""
+
+#: index.php:394
+msgid "No new posts"
+msgstr ""
+
+#: assessment/showtest.php:141
+msgid "No questions in assessment!"
+msgstr ""
+
+#: course/gradebook.php:544 course/gradebook.php:598 course/gradebook.php:615
+#: course/gradebook.php:861
+msgid "None"
+msgstr ""
+
+#: course/course.php:679
+msgid "Normal"
+msgstr ""
+
+#: course/gradebook.php:447 course/gradebook.php:583
+msgid "Not Counted:"
+msgstr ""
+
+#: assessment/showtest.php:2472
+msgid "Not answered"
+msgstr ""
+
+#: assessment/showtest.php:1259 assessment/showtest.php:1599
+msgid "Note:"
+msgstr ""
+
+#: course/course.php:775
+msgid "Now"
+msgstr ""
+
+#: course/gradebook.php:524
+msgid "Offline Grades:"
+msgstr ""
+
+#: assessment/showtest.php:386
+msgid "Only one open assessment can be handled at a time. Please reopen the assessment and try again. "
+msgstr ""
+
+#: assessment/displayq2.php:1956
+msgid "Open Dot"
+msgstr ""
+
+#: course/courseshowitems.php:1455
+msgid "Out of Block"
+msgstr ""
+
+#: assessment/testutil.php:647
+msgid "Out of:"
+msgstr ""
+
+#: assessment/showtest.php:2154
+msgid "Pages"
+msgstr ""
+
+#: loginpage.php:62 assessment/showtest.php:910
+msgid "Password"
+msgstr ""
+
+#: assessment/showtest.php:100
+msgid "Password incorrect.  Try again."
+msgstr ""
+
+#: assessment/showtest.php:111
+msgid "Password required for access."
+msgstr ""
+
+#: course/gradebook.php:454 course/gradebook.php:590
+msgid "Past &amp; Attempted"
+msgstr ""
+
+#: course/gradebook.php:456 course/gradebook.php:592
+msgid "Past &amp; Available"
+msgstr ""
+
+#: course/gradebook.php:868
+msgid "Past Due"
+msgstr ""
+
+#: course/courseshowitems.php:672
+msgid "Past Due Date.  Showing as Review"
+msgstr ""
+
+#: course/gradebook.php:871
+msgid "Past Due and Attempted"
+msgstr ""
+
+#: course/gradebook.php:874
+msgid "Past Due and Available"
+msgstr ""
+
+#: assessment/showtest.php:960 course/gradebook.php:453
+#: course/gradebook.php:589
+msgid "Past due"
+msgstr ""
+
+#: course/gradebook.php:704
+msgid "Percent"
+msgstr ""
+
+#: course/gradebook.php:597
+msgid "Pics:"
+msgstr ""
+
+#: assessment/catscores.php:44
+msgid "Points Earned / Possible (Percent)"
+msgstr ""
+
+#: assessment/testutil.php:618 assessment/testutil.php:780
+#, php-format
+msgid "Points available on this attempt: %1$d of original %2$d"
+msgstr ""
+
+#: assessment/testutil.php:778
+msgid "Points possible:"
+msgstr ""
+
+#: assessment/testutil.php:616
+msgid "Points possible: "
+msgstr ""
+
+#: assessment/testutil.php:772
+#, php-format
+msgid "Points: %1$d out of %2$d possible."
+msgstr ""
+
+#: assessment/displayq2.php:1958 assessment/displayq2.php:1961
+msgid "Polygon"
+msgstr ""
+
+#: course/gradebook.php:704
+msgid "Possible"
+msgstr ""
+
+#: assessment/testutil.php:664 assessment/testutil.php:799
+msgid "Post this question to forum"
+msgstr ""
+
+#: index.php:332
+#, php-format
+msgid "Posts (%d)"
+msgstr ""
+
+#: assessment/displayq2.php:1177 assessment/displayq2.php:1223
+#: assessment/displayq2.php:1278 assessment/displayq2.php:1422
+#: assessment/displayq2.php:1505 assessment/displayq2.php:1545
+#: assessment/displayq2.php:1750
+msgid "Preview"
+msgstr ""
+
+#: assessment/showtest.php:1166
+msgid "Previous Question"
+msgstr ""
+
+#: course/gradebook.php:616
+msgid "Print Report"
+msgstr ""
+
+#: assessment/showtest.php:2406
+msgid "Print Version"
+msgstr ""
+
+#: loginpage.php:50
+msgid "Problems with session storage"
+msgstr ""
+
+#: assessment/showtest.php:2469 assessment/showtest.php:2480
+#: assessment/showtest.php:2585 assessment/testutil.php:679
+#: assessment/testutil.php:681
+msgid "Question"
+msgstr ""
+
+#: assessment/showtest.php:1110
+#, php-format
+msgid "Question %d has been submitted since you viewed it.  Your answer just submitted was not scored or recorded."
+msgstr ""
+
+#: assessment/testutil.php:611 assessment/testutil.php:767
+msgid "Question Withdrawn"
+msgstr ""
+
+#: assessment/showtest.php:1274 assessment/showtest.php:1605
+msgid "Question scored."
+msgstr ""
+
+#: assessment/showtest.php:1456
+msgid "Question scored. <a href=\"#curq\">Continue with assessment</a>, or click <a href=\"showtest.php?action=seq&amp;done=true\">here</a> to finalize and summarize score."
+msgstr ""
+
+#: assessment/showtest.php:1368
+msgid "Question with last attempt is displayed for your review only"
+msgstr ""
+
+#: assessment/showtest.php:2282 course/course.php:438
+#: course/courseshowitems.php:644 course/courseshowitems.php:681
+#: course/courseshowitems.php:718 course/courseshowitems.php:1735
+msgid "Questions"
+msgstr ""
+
+#: course/course.php:693
+msgid "Quick"
+msgstr ""
+
+#: course/course.php:433 course/course.php:577 course/course.php:744
+msgid "Quick View"
+msgstr ""
+
+#: course/course.php:708
+msgid "Quick View."
+msgstr ""
+
+#: assessment/showtest.php:1179 assessment/showtest.php:1266
+#: assessment/showtest.php:1424
+msgid "Reattempt last question"
+msgstr ""
+
+#: assessment/showtest.php:1357
+msgid "Reattempt this question"
+msgstr ""
+
+#: course/course.php:710
+msgid "Record Changes"
+msgstr ""
+
+#: assessment/showtest.php:913
+msgid "Record Group and Continue"
+msgstr ""
+
+#: assessment/showtest.php:766
+msgid "Redeem LatePass"
+msgstr ""
+
+#: loginpage.php:65
+msgid "Register as a new student"
+msgstr ""
+
+#: course/courseshowitems.php:1165
+#, php-format
+msgid "Replies due %s. "
+msgstr ""
+
+#: assessment/showtest.php:2609
+msgid "Return to Course Page"
+msgstr ""
+
+#: assessment/showtest.php:387 assessment/showtest.php:394
+msgid "Return to course page"
+msgstr ""
+
+#: course/courseshowitems.php:1719
+#, php-format
+msgid "Review until %s"
+msgstr ""
+
+#: assessment/showtest.php:2399
+msgid "Review: "
+msgstr ""
+
+#: assessment/displayq2.php:1649
+msgid "Right of a value"
+msgstr ""
+
+#: course/course.php:421 course/course.php:574 course/course.php:732
+msgid "Roster"
+msgstr ""
+
+#: course/gradebook.php:860 course/gradebook.php:1051
+msgid "Save Changes"
+msgstr ""
+
+#: assessment/showtest.php:1753
+msgid "Save answers"
+msgstr ""
+
+#: assessment/showtest.php:1168 assessment/showtest.php:1247
+#: assessment/showtest.php:1410 assessment/showtest.php:1588
+msgid "Score before penalty on last attempt: "
+msgstr ""
+
+#: assessment/showtest.php:2474 assessment/showtest.php:2485
+#: assessment/showtest.php:2588
+msgid "Score in Gradebook: "
+msgstr ""
+
+#: assessment/showtest.php:1174
+msgid "Score in gradebook"
+msgstr ""
+
+#: assessment/testutil.php:635 assessment/testutil.php:638
+msgid "Score in gradebook:"
+msgstr ""
+
+#: assessment/showtest.php:1255 assessment/showtest.php:1351
+#: assessment/showtest.php:1419 assessment/showtest.php:1596
+msgid "Score in gradebook: "
+msgstr ""
+
+#: assessment/showtest.php:1172
+msgid "Score on last attempt"
+msgstr ""
+
+#: assessment/testutil.php:635 assessment/testutil.php:637
+msgid "Score on last attempt:"
+msgstr ""
+
+#: assessment/showtest.php:1252 assessment/showtest.php:1348
+#: assessment/showtest.php:1416 assessment/showtest.php:1593
+msgid "Score on last attempt: "
+msgstr ""
+
+#: course/courseshowitems.php:911 course/courseshowitems.php:939
+#: course/gradebook.php:460 course/gradebook.php:596
+msgid "Scores"
+msgstr ""
+
+#: assessment/showtest.php:2458
+msgid "Scores:"
+msgstr ""
+
+#: assessment/displayq2.php:2126
+msgid "Select a file to upload"
+msgstr ""
+
+#: assessment/showtest.php:888
+msgid "Select a name.."
+msgstr ""
+
+#: assessment/displayq2.php:950
+msgid "Select all correct answers"
+msgstr ""
+
+#: assessment/displayq2.php:786
+msgid "Select an answer"
+msgstr ""
+
+#: assessment/showtest.php:1276
+msgid "Select another question"
+msgstr ""
+
+#: assessment/showtest.php:852
+msgid "Select group members"
+msgstr ""
+
+#: assessment/displayq2.php:847
+msgid "Select the best answer"
+msgstr ""
+
+#: index.php:358
+msgid "Sent"
+msgstr ""
+
+#: course/courseshowitems.php:644 course/courseshowitems.php:681
+#: course/courseshowitems.php:718 course/courseshowitems.php:1735
+msgid "Settings"
+msgstr ""
+
+#: course/course.php:638
+msgid "Shift all Course Dates"
+msgstr ""
+
+#: assessment/displayq2.php:332
+msgid "Show Answer"
+msgstr ""
+
+#: course/course.php:575 course/course.php:761
+msgid "Show Gradebook"
+msgstr ""
+
+#: assessment/showtest.php:1102
+msgid "Show Instructions"
+msgstr ""
+
+#: course/gradebook.php:1114
+msgid "Show Locked"
+msgstr ""
+
+#: assessment/showtest.php:1321
+msgid "Show Question Information"
+msgstr ""
+
+#: course/gradebook.php:448 course/gradebook.php:584
+msgid "Show all"
+msgstr ""
+
+#: course/gradebook.php:449 course/gradebook.php:585
+msgid "Show stu view"
+msgstr ""
+
+#: course/gradebook.php:452 course/gradebook.php:588
+msgid "Show:"
+msgstr ""
+
+#: course/courseshowitems.php:323 course/courseshowitems.php:326
+#, php-format
+msgid "Showing %1$s %2$s to %3$s"
+msgstr ""
+
+#: course/courseshowitems.php:119 course/courseshowitems.php:1629
+#, php-format
+msgid "Showing %1$s %2$s until %3$s"
+msgstr ""
+
+#: course/courseshowitems.php:817 course/courseshowitems.php:921
+#: course/courseshowitems.php:1049 course/courseshowitems.php:1199
+#: course/courseshowitems.php:1325
+#, php-format
+msgid "Showing %1$s until %2$s"
+msgstr ""
+
+#: course/courseshowitems.php:117
+#, php-format
+msgid "Showing %s Always"
+msgstr ""
+
+#: course/courseshowitems.php:750 course/courseshowitems.php:885
+#: course/courseshowitems.php:1015 course/courseshowitems.php:1154
+#: course/courseshowitems.php:1279
+msgid "Showing Always "
+msgstr ""
+
+#: course/course.php:772
+msgid "Showing student view. Show view:"
+msgstr ""
+
+#: course/courseshowitems.php:753 course/courseshowitems.php:888
+#: course/courseshowitems.php:1018 course/courseshowitems.php:1157
+#: course/courseshowitems.php:1282
+msgid "Showing until:"
+msgstr ""
+
+#: assessment/showtest.php:2124 assessment/showtest.php:2151
+#: assessment/showtest.php:2280
+msgid "Skip Navigation"
+msgstr ""
+
+#: course/gradebook.php:599
+msgid "Small"
+msgstr ""
+
+#: index.php:407
+msgid "Started By"
+msgstr ""
+
+#: course/course.php:686
+msgid "Student"
+msgstr ""
+
+#: course/gradebook.php:417
+msgid "Student Detail"
+msgstr ""
+
+#: course/gradebook.php:414
+msgid "Student Grade Detail"
+msgstr ""
+
+#: course/course.php:593 course/course.php:604
+msgid "Student Groups"
+msgstr ""
+
+#: course/course.php:432 course/course.php:576 course/course.php:729
+msgid "Student View"
+msgstr ""
+
+#: assessment/showtest.php:114 assessment/showtest.php:1621
+#: assessment/showtest.php:1752 assessment/showtest.php:1818
+msgid "Submit"
+msgstr ""
+
+#: assessment/showtest.php:1507 assessment/showtest.php:1868
+#, php-format
+msgid "Submit Question %d"
+msgstr ""
+
+#: assessment/showtest.php:942
+msgid "Teacher Acting as "
+msgstr ""
+
+#: course/courseshowitems.php:1386
+msgid "Text"
+msgstr ""
+
+#: assessment/showtest.php:1390
+msgid "The last question has been submitted since you viewed it, and that score is shown below. Your answer just submitted was not scored or recorded."
+msgstr ""
+
+#: assessment/showtest.php:1149
+msgid "The last question has been submittted since you viewed it, and that grade is shown below.  Your answer just submitted was not scored or recorded."
+msgstr ""
+
+#: assessment/showtest.php:1130
+msgid "The timelimit will continue to count down"
+msgstr ""
+
+#: course/courseshowitems.php:632
+#, php-format
+msgid "This assessment has a time limit of %s.  Click OK to start or continue working on the assessment."
+msgstr ""
+
+#: assessment/showtest.php:79
+msgid "This assessment is closed"
+msgstr ""
+
+#: course/courseshowitems.php:688
+msgid "This assessment is in review mode - no scores will be saved"
+msgstr ""
+
+#: assessment/showtest.php:1710
+msgid "This is a group assessment.  Any changes effect all group members."
+msgstr ""
+
+#: assessment/testutil.php:628 assessment/testutil.php:789
+#, php-format
+msgid "This is attempt %1$d of %2$d."
+msgstr ""
+
+#: assessment/showtest.php:1259 assessment/showtest.php:1599
+msgid "This question contains parts that can not be auto-graded.  Those parts will show a score of 0 until they are graded by your instructor"
+msgstr ""
+
+#: assessment/showtest.php:1221 assessment/showtest.php:1524
+msgid "This question has been submittted since you viewed it, and that grade is shown below.  Your answer just submitted was not scored or recorded."
+msgstr ""
+
+#: loginpage.php:120
+msgid "This system is designed for mathematics, providing delivery of homework, quizzes, tests, practice tests,and diagnostics with rich mathematical content.  Students can receive immediate feedback on algorithmically generated questions with numerical or algebraic expression answers."
+msgstr ""
+
+#: assessment/showtest.php:759 assessment/showtest.php:766
+msgid "This will discard any unsaved work."
+msgstr ""
+
+#: assessment/showtest.php:1753
+msgid "This will save your answers so you can come back later and finish, but not submit them for grading. Be sure to come back and submit your answers before the due date."
+msgstr ""
+
+#: index.php:407
+msgid "Thread"
+msgstr ""
+
+#: assessment/showtest.php:1052
+msgid "Time Limit has elapsed"
+msgstr ""
+
+#: course/course.php:464
+msgid "Time Shift"
+msgstr ""
+
+#: course/gradebook.php:706
+msgid "Time Spent (In Questions)"
+msgstr ""
+
+#: assessment/showtest.php:2535
+msgid "Time limit exceeded by"
+msgstr ""
+
+#: assessment/showtest.php:1075
+msgid "Time limit expired"
+msgstr ""
+
+#: assessment/showtest.php:1039
+msgid "Time limit expired - submitting now"
+msgstr ""
+
+#: assessment/showtest.php:485
+msgid "Time limit has expired.  Submission rejected. "
+msgstr ""
+
+#: assessment/showtest.php:1024
+msgid "Time limit shortened because of due date"
+msgstr ""
+
+#: assessment/showtest.php:1022
+msgid "Timelimit"
+msgstr ""
+
+#: assessment/showtest.php:1011
+#, php-format
+msgid "Timelimit: %s.  Time Expired"
+msgstr ""
+
+#: index.php:338
+msgid "To add a course, head to the Admin Page"
+msgstr ""
+
+#: course/course.php:420
+msgid "Tools"
+msgstr ""
+
+#: course/gradebook.php:936 course/gradebook.php:1126
+#: course/gradebook.php:1231
+msgid "Total"
+msgstr ""
+
+#: assessment/showtest.php:2504
+#, php-format
+msgid "Total Points Earned:  %d out of %d possible: "
+msgstr ""
+
+#: assessment/showtest.php:1707 assessment/showtest.php:1976
+msgid "Total Points Possible: "
+msgstr ""
+
+#: assessment/showtest.php:2506
+#, php-format
+msgid "Total Points in Gradebook: %d out of %d possible: "
+msgstr ""
+
+#: assessment/showtest.php:2500
+#, php-format
+msgid "Total Points on Last Attempts:  %d out of %d possible"
+msgstr ""
+
+#: course/gradebook.php:866
+msgid "Totals"
+msgstr ""
+
+#: assessment/displayq2.php:4926
+msgid "Trig functions (sin,cos,etc.) are not allowed"
+msgstr ""
+
+#: assessment/showtest.php:1183 assessment/showtest.php:1271
+#: assessment/showtest.php:1362 assessment/showtest.php:1429
+#: assessment/showtest.php:1612 assessment/showtest.php:2000
+msgid "Try another similar question"
+msgstr ""
+
+#: assessment/showtest.php:1567
+msgid "Try the problem again"
+msgstr ""
+
+#: course/courseshowitems.php:653 course/courseshowitems.php:658
+msgid "Un-use LatePass"
+msgstr ""
+
+#: loginpage.php:52
+msgid "Unable to establish a session.  Check that your browser is set to allow session cookies"
+msgstr ""
+
+#: course/gradebook.php:618
+msgid "Unenroll"
+msgstr ""
+
+#: course/course.php:497 course/course.php:622
+msgid "Unenroll From Course"
+msgstr ""
+
+#: course/gradebook.php:134
+msgid "Unenroll Students"
+msgstr ""
+
+#: assessment/testutil.php:787
+msgid "Unlimited attempts"
+msgstr ""
+
+#: assessment/testutil.php:623
+msgid "Unlimited attempts."
+msgstr ""
+
+#: course/gradebook.php:490 course/gradebook.php:538 course/gradebook.php:605
+msgid "Unlock headers"
+msgstr ""
+
+#: course/gradebook.php:689
+msgid "Update Comment"
+msgstr ""
+
+#: assessment/displayq2.php:4499
+#, php-format
+msgid "Upload of %s: "
+msgstr ""
+
+#: course/courseshowitems.php:651
+msgid "Use LatePass"
+msgstr ""
+
+#: assessment/displayq2.php:1640 assessment/displayq2.php:1721
+msgid "Use U for union to combine intervals.  Example: (-oo,2] U [4,oo)"
+msgstr ""
+
+#: course/course.php:710
+msgid "Use colored boxes to drag-and-drop order."
+msgstr ""
+
+#: assessment/displayq2.php:1716
+#, php-format
+msgid "Use or to combine intervals.  Example: %d < 2 or %d >= 3"
+msgstr ""
+
+#: loginpage.php:88
+msgid "Use text-based display"
+msgstr ""
+
+#: loginpage.php:84
+msgid "Use visual display"
+msgstr ""
+
+#: assessment/showtest.php:908
+msgid "Username"
+msgstr ""
+
+#: assessment/showtest.php:741
+msgid "View as student"
+msgstr ""
+
+#: course/gradebook.php:520
+msgid "View diagnostic gradebook"
+msgstr ""
+
+#: assessment/showtest.php:86
+msgid "View your assessment"
+msgstr ""
+
+#: assessment/showtest.php:772
+msgid "View your scored assessment"
+msgstr ""
+
+#: course/gradebook.php:459 course/gradebook.php:595
+msgid "View/Edit"
+msgstr ""
+
+#: course/course.php:431
+msgid "Views"
+msgstr ""
+
+#: assessment/interpret5.php:411
+#, php-format
+msgid "Warning... unquoted string %s.. treating as string"
+msgstr ""
+
+#: course/gradebook.php:951
+msgid "Weighted Total"
+msgstr ""
+
+#: course/gradebook.php:1130 course/gradebook.php:1235
+msgid "Weighted Total %"
+msgstr ""
+
+#: index.php:269
+msgid "Welcome to"
+msgstr ""
+
+#: course/courseshowitems.php:1404
+msgid "Wiki"
+msgstr ""
+
+#: course/gradebook.php:616
+msgid "With Selected:"
+msgstr ""
+
+#: course/gradebook.php:862
+msgid "With selected:"
+msgstr ""
+
+#: assessment/showtest.php:11
+msgid "You are not authorized to view this page.  If you are trying to reaccess a test you've already started, access it from the course page"
+msgstr ""
+
+#: course/course.php:19
+msgid "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n"
+msgstr ""
+
+#: assessment/showtest.php:170
+msgid "You are not yet a member of a group.  Contact your instructor to be added to a group."
+msgstr ""
+
+#: assessment/showtest.php:1344
+msgid "You've already done this problem."
+msgstr ""
+
+#: assessment/displayq2.php:681 assessment/displayq2.php:4922
+#, php-format
+msgid "Your answer should be accurate to %d decimal places."
+msgstr ""
+
+#: assessment/displayq2.php:4920
+msgid "Your answer should be accurate to the nearest whole number."
+msgstr ""
+
+#: assessment/displayq2.php:697
+#, php-format
+msgid "Your answer should have at least %d significant figures."
+msgstr ""
+
+#: assessment/displayq2.php:688
+#, php-format
+msgid "Your answer should have exactly %d significant figures."
+msgstr ""
+
+#: assessment/displayq2.php:1643 assessment/displayq2.php:1728
+#, php-format
+msgid "Your numbers should be accurate to %d decimal places."
+msgstr ""
+
+#: assessment/showtest.php:2528
+msgid "Your scores have been recorded for this assessment."
+msgstr ""
+
+#: assessment/showtest.php:1702
+msgid "Your time limit has expired.  If you submit any questions, your assessment will be marked overtime, and will have to be reviewed by your instructor."
+msgstr ""
+
+#: assessment/showtest.php:1700
+msgid "Your time limit has expired.  If you try to submit any questions, your submissions will be rejected."
+msgstr ""
+
+#: course/gradebook.php:1189
+msgid "[By Group]"
+msgstr ""
+
+#: course/gradebook.php:1187 course/gradebook.php:1192
+#: course/gradebook.php:1197
+msgid "[Isolate]"
+msgstr ""
+
+#: course/gradebook.php:1199
+msgid "[Scores]"
+msgstr ""
+
+#: course/gradebook.php:1186 course/gradebook.php:1196
+#: course/gradebook.php:1202
+msgid "[Settings]"
+msgstr ""
+
+#: course/gradebook.php:709 course/gradebook.php:847
+msgid "[Show Feedback]"
+msgstr ""
+
+#: course/courseshowitems.php:97 course/courseshowitems.php:1620
+msgid "as Folder"
+msgstr ""
+
+#: course/courseshowitems.php:99
+msgid "as TreeReader"
+msgstr ""
+
+#: assessment/interpret5.php:35
+msgid "bad question id in includeqtextfrom"
+msgstr ""
+
+#: course/courseshowitems.php:248 course/courseshowitems.php:441
+msgid "collapse"
+msgstr ""
+
+#: assessment/displayq2.php:1226 assessment/displayq2.php:1234
+msgid "each element of the matrix"
+msgstr ""
+
+#: assessment/displayq2.php:1102 assessment/displayq2.php:1726
+msgid "each value"
+msgstr ""
+
+#: assessment/interpret5.php:184
+msgid "else used without leading if statement"
+msgstr ""
+
+#: assessment/displayq2.php:4756 assessment/displayq2.php:4763
+msgid "error - invalid form"
+msgstr ""
+
+#: assessment/displayq2.php:4721
+msgid "error - more than 1 i in expression"
+msgstr ""
+
+#: assessment/interpret5.php:136
+msgid "error with for code.. must be \"for ($var=a..b) {todo}\" where a and b are whole numbers or variables only"
+msgstr ""
+
+#: course/courseshowitems.php:248 course/courseshowitems.php:441
+msgid "expand"
+msgstr ""
+
+#: course/gradebook.php:1052
+msgid "for selected assessments"
+msgstr ""
+
+#: assessment/showtest.php:994 course/courseshowitems.php:611
+msgid "hour"
+msgstr ""
+
+#: assessment/showtest.php:968
+msgid "hours"
+msgstr ""
+
+#: assessment/interpret5.php:190
+msgid "line of type $a=b if $c==0 where $d==0 is invalid"
+msgstr ""
+
+#: assessment/showtest.php:996 assessment/showtest.php:1003
+#: course/courseshowitems.php:613 course/courseshowitems.php:620
+msgid "minute"
+msgstr ""
+
+#: assessment/showtest.php:970 assessment/showtest.php:2538
+msgid "minutes"
+msgstr ""
+
+#: assessment/interpret5.php:172
+msgid "need condition for elseif"
+msgstr ""
+
+#: assessment/interpret5.php:162
+msgid "need curlys for else statement"
+msgstr ""
+
+#: assessment/interpret5.php:146
+msgid "need curlys for if statement at beginning of line"
+msgstr ""
+
+#: assessment/showtest.php:1565
+msgid "or try the problem again"
+msgstr ""
+
+#: assessment/showtest.php:799
+msgid "password incorrect"
+msgstr ""
+
+#: course/gradebook.php:744 course/gradebook.php:1126
+#: course/gradebook.php:1144 course/gradebook.php:1175
+#: course/gradebook.php:1220 course/gradebook.php:1231
+msgid "pts"
+msgstr ""
+
+#: assessment/showtest.php:1030
+msgid "remaining"
+msgstr ""
+
+#: assessment/showtest.php:998 assessment/showtest.php:1005
+#: course/courseshowitems.php:615 course/courseshowitems.php:622
+msgid "second"
+msgstr ""
+
+#: assessment/showtest.php:1008
+msgid "second(s)"
+msgstr ""
+
+#: assessment/showtest.php:2541
+msgid "seconds"
+msgstr ""
+
+#: assessment/mathphp2.php:430 assessment/interpret5.php:519
+msgid "unmatched parens/brackets - likely will cause an error"
+msgstr ""
+
+#: course/courseshowitems.php:674
+msgid "until"
+msgstr ""
+
+#: assessment/displayq2.php:1105
+msgid "your answer"
+msgstr ""

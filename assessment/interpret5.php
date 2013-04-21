@@ -32,7 +32,7 @@ function getquestionqtext($m) {
 	$query = "SELECT qtext FROM imas_questionset WHERE id='{$m[2]}'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	if (mysql_num_rows($result)==0) {
-		echo "bad question id in includeqtextfrom";
+		echo _('bad question id in includeqtextfrom');
 		return "";
 	} else {
 		return mysql_result($result,0,0);
@@ -133,7 +133,7 @@ function interpretline($str,$anstype,$countcnt) {
 					$forcond = array_slice($matches,1,3);
 					$bits = array( "if (is_nan({$forcond[2]}) || is_nan({$forcond[1]})) {echo 'part of for loop is not a number';} else {for ({$forcond[0]}=intval({$forcond[1]});{$forcond[0]}<=round(floatval({$forcond[2]}),0);{$forcond[0]}++) ".$todo."}");
 				} else {
-					echo 'error with for code.. must be "for ($var=a..b) {todo}" where a and b are whole numbers or variables only';
+					echo _('error with for code.. must be "for ($var=a..b) {todo}" where a and b are whole numbers or variables only');
 					return 'error';
 				}
 			} else if ($ifloc == 0) {
@@ -143,7 +143,7 @@ function interpretline($str,$anstype,$countcnt) {
 					$j++;
 				}
 				if ($j==count($bits)) {
-					echo "need curlys for if statement at beginning of line";
+					echo _('need curlys for if statement at beginning of line');
 					return 'error';
 				}
 				$cond = implode('',array_slice($bits,1,$j-1));
@@ -159,7 +159,7 @@ function interpretline($str,$anstype,$countcnt) {
 						$j++;
 					}
 					if ($j==count($bits)) {
-						echo "need curlys for else statement";
+						echo _('need curlys for else statement');
 						return 'error';
 					}
 					if ($i==count($elseloc)-1) {
@@ -169,7 +169,7 @@ function interpretline($str,$anstype,$countcnt) {
 					}
 					if ($j-$elseloc[$i][0]==1) { //no condition
 						if ($elseloc[$i][1]=='elseif') {
-							echo 'need condition for elseif';
+							echo _('need condition for elseif');
 							return 'error';
 						}
 						$out .= " else $todo";
@@ -181,13 +181,13 @@ function interpretline($str,$anstype,$countcnt) {
 				$bits = array($out);
 					
 			} else if (count($elseloc)>0) {
-				echo 'else used without leading if statement';
+				echo _('else used without leading if statement');
 				return 'error';
 			}
 			if ($whereloc>0) {
 				//handle $a = rand() where ($a==b)
 				if ($ifloc>-1 && $ifloc<$whereloc) {
-					echo 'line of type $a=b if $c==0 where $d==0 is invalid';
+					echo _('line of type $a=b if $c==0 where $d==0 is invalid');
 					return 'error';
 				} 
 				$wheretodo = implode('',array_slice($bits,0,$whereloc));
@@ -323,7 +323,7 @@ function tokenize($str,$anstype,$countcnt) {
 			}
 			//check if allowed var
 			if (in_array($out,$disallowedvar)) {
-				echo "Eeek.. unallowed var $out!";
+				sprintf(_('Eeek.. unallowed var %s!'), $out);
 				return array(array('',9));
 			}
 		
@@ -391,7 +391,7 @@ function tokenize($str,$anstype,$countcnt) {
 					} else {
 						//check it's and OK function
 						if (!in_array($out,$allowedmacros)) {
-							echo "Eeek.. unallowed macro {$out}";
+							sprintf(_('Eeek.. unallowed macro %s'), $out);
 							return array(array('',9));
 						}
 					}
@@ -408,7 +408,7 @@ function tokenize($str,$anstype,$countcnt) {
 						//an unquoted string!  give a warning to instructor, 
 						//but treat as a quoted string.
 						if (isset($GLOBALS['teacherid'])) {
-							echo "Warning... unquoted string $out.. treating as string";
+							sprintf(_('Warning... unquoted string %s.. treating as string'), $out);
 						}
 						$out = "'$out'";
 						$intype = 6;
@@ -516,7 +516,7 @@ function tokenize($str,$anstype,$countcnt) {
 			}
 			if ($j==$len) {
 				$i = $j;
-				echo "unmatched parens/brackets - likely will cause an error";
+				echo _('unmatched parens/brackets - likely will cause an error');
 			} else {
 				$c = $str{$i};
 			}
@@ -623,7 +623,7 @@ function loadlibrary($str) {
 		if (is_file($libdir . $lib.".php")) {
 			include_once($libdir.$lib.".php");
 		} else {
-			echo "Error loading library $lib\n";	
+			sprintf(_("Error loading library %s\n"), $lib);	
 		}
 	}
 }

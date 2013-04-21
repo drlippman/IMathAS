@@ -16,7 +16,7 @@ $body = "";
 
 if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($guestid)) { // loaded by a NON-teacher
 	$overwriteBody=1;
-	$body = "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
+	$body = _("You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n");
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$cid = $_GET['cid'];
 	
@@ -88,7 +88,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
 	if ($line == null) {
 		$overwriteBody = 1;
-		$body = "Course does not exist.  <a hre=\"../index.php\">Return to main page</a></body></html>\n";
+		$body = _("Course does not exist.  <a hre=\"../index.php\">Return to main page</a>") . "</body></html>\n";
 	}	
 	
 	$allowunenroll = $line['allowunenroll'];
@@ -223,9 +223,9 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		}
 		$curname = $backtrack[count($backtrack)-1][0];
 		if (count($backtrack)==1) {
-			$backlink =  "<span class=right><a href=\"course.php?cid=$cid&folder=0\">Back</a></span><br class=\"form\" />";
+			$backlink =  "<span class=right><a href=\"course.php?cid=$cid&folder=0\">" . _('Back') . "</a></span><br class=\"form\" />";
 		} else {
-			$backlink = "<span class=right><a href=\"course.php?cid=$cid&folder=".$backtrack[count($backtrack)-2][1]."\">Back</a></span><br class=\"form\" />";
+			$backlink = "<span class=right><a href=\"course.php?cid=$cid&folder=".$backtrack[count($backtrack)-2][1]."\">" . _('Back') . "</a></span><br class=\"form\" />";
 		}
 	} else {
 		$curBreadcrumb .= $coursename;
@@ -238,7 +238,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	   $msgcnt = mysql_result($result,0,0);
 	   if ($msgcnt>0) {
-		   $newmsgs = " <a href=\"$imasroot/msgs/newmsglist.php?cid=$cid\" style=\"color:red\">New ($msgcnt)</a>";
+		   $newmsgs = " <a href=\"$imasroot/msgs/newmsglist.php?cid=$cid\" style=\"color:red\">" . sprintf(_('New (%d)'), $msgcnt) . "</a>";
 	   } else {
 		   $newmsgs = '';
 	   }
@@ -282,7 +282,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		$newpostcnts[$row[0]] = $row[1];
 	}
 	if (array_sum($newpostcnts)>0) {
-		$newpostscnt = " <a href=\"$imasroot/forums/newthreads.php?cid=$cid\" style=\"color:red\">New (".array_sum($newpostcnts).")</a>";
+		$newpostscnt = " <a href=\"$imasroot/forums/newthreads.php?cid=$cid\" style=\"color:red\">" . sprintf(_('New (%d)'), array_sum($newpostcnts)) . "</a>";
 	} else {
 		$newpostscnt = '';	
 	}
@@ -384,7 +384,7 @@ if ($overwriteBody==1) {
 	<div class=breadcrumb>
 		<span class="padright">
 		<?php if (isset($guestid)) {
-			echo '<span class="red">Instructor Preview</span> ';
+			echo '<span class="red">', _('Instructor Preview'), '</span> ';
 		}?>
 		<?php echo $userfullname ?>
 		</span>
@@ -403,70 +403,70 @@ if ($overwriteBody==1) {
 		}
 	?>
 		<p>
-		<b>Communication</b><br/>
+		<b><?php echo _('Communication'); ?></b><br/>
 			<a href="<?php echo $imasroot ?>/msgs/msglist.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>">
-			Messages</a> <?php echo $newmsgs ?> <br/>
+			<?php echo _('Messages'); ?></a> <?php echo $newmsgs ?> <br/>
 			<a href="<?php echo $imasroot ?>/forums/forums.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>">
-			Forums</a> <?php echo $newpostscnt ?>
+			<?php echo _('Forums'); ?></a> <?php echo $newpostscnt ?>
 <?php 
 		if (isset($mathchaturl) &&  $chatset==1) {
-			echo "<br/><a href=\"$mathchaturl?uname=".urlencode($userfullname)."&amp;room=$cid&amp;roomname=".urlencode($coursename)."\" target=\"chat\">Chat</a> ($activechatters)";
+			echo "<br/><a href=\"$mathchaturl?uname=".urlencode($userfullname)."&amp;room=$cid&amp;roomname=".urlencode($coursename)."\" target=\"chat\">", _('Chat'), "</a> ($activechatters)";
 		}
 ?>
 		</p>
 	<?php
 	if (!isset($CFG['CPS']['leftnavtools']) || $CFG['CPS']['leftnavtools']!==false) {
 	?>
-		<p><b>Tools</b><br/>
-			<a href="listusers.php?cid=<?php echo $cid ?>">Roster</a><br/>
-			<a href="gradebook.php?cid=<?php echo $cid ?>">Gradebook</a> <?php if (($coursenewflag&1)==1) {echo '<span class="red">New</span>';}?><br/>
-			<a href="managestugrps.php?cid=<?php echo $cid ?>">Groups</a><br/>
-			<a href="showcalendar.php?cid=<?php echo $cid ?>">Calendar</a>
+		<p><b><?php echo _('Tools'); ?></b><br/>
+			<a href="listusers.php?cid=<?php echo $cid ?>"><?php echo _('Roster'); ?></a><br/>
+			<a href="gradebook.php?cid=<?php echo $cid ?>"><?php echo _('Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="red">', _('New'), '</span>';}?><br/>
+			<a href="managestugrps.php?cid=<?php echo $cid ?>"><?php echo _('Groups'); ?></a><br/>
+			<a href="showcalendar.php?cid=<?php echo $cid ?>"><?php echo _('Calendar'); ?></a>
 		
 		</p>
 	<?php
 	}
 	if (!$useviewbuttons) {
 	?>
-		<p><b>Views</b><br/>
-		<a href="course.php?cid=<?php echo $cid ?>&stuview=0">Student View</a><br/>
-			<a href="course.php?cid=<?php echo $cid ?>&quickview=on">Quick View</a>
+		<p><b><?php echo _('Views'); ?></b><br/>
+		<a href="course.php?cid=<?php echo $cid ?>&stuview=0"><?php echo _('Student View'); ?></a><br/>
+			<a href="course.php?cid=<?php echo $cid ?>&quickview=on"><?php echo _('Quick View'); ?></a>
 		</p>
 	<?php
 	}
 	?>
-		<p><b>Questions</b><br/>
-			<a href="manageqset.php?cid=<?php echo $cid ?>">Manage</a><br/>
-			<a href="managelibs.php?cid=<?php echo $cid ?>">Libraries</a>
+		<p><b><?php echo _('Questions'); ?></b><br/>
+			<a href="manageqset.php?cid=<?php echo $cid ?>"><?php echo _('Manage'); ?></a><br/>
+			<a href="managelibs.php?cid=<?php echo $cid ?>"><?php echo _('Libraries'); ?></a>
 		</p>
 <?php			
 		if ($allowcourseimport) {
 ?>
-		<p><b>Export/Import</b><br/>
-			<a href="../admin/export.php?cid=<?php echo $cid ?>">Export Question Set</a><br/>
-			<a href="../admin/import.php?cid=<?php echo $cid ?>">Import Question Set</a><br/>
-			<a href="../admin/exportlib.php?cid=<?php echo $cid ?>">Export Libraries</a><br/>
-			<a href="../admin/importlib.php?cid=<?php echo $cid ?>">Import Libraries</a>
+		<p><b><?php echo _('Export/Import'); ?></b><br/>
+			<a href="../admin/export.php?cid=<?php echo $cid ?>"><?php echo _('Export Question Set'); ?></a><br/>
+			<a href="../admin/import.php?cid=<?php echo $cid ?>"><?php echo _('Import Question Set'); ?></a><br/>
+			<a href="../admin/exportlib.php?cid=<?php echo $cid ?>"><?php echo _('Export Libraries'); ?></a><br/>
+			<a href="../admin/importlib.php?cid=<?php echo $cid ?>"><?php echo _('Import Libraries'); ?></a>
 		</p>
 <?php
 		}
 ?>
-		<p><b>Course Items</b><br/>
-			<a href="copyitems.php?cid=<?php echo $cid ?>">Copy</a><br/>
-			<a href="../admin/exportitems.php?cid=<?php echo $cid ?>">Export</a><br/>
-			<a href="../admin/importitems.php?cid=<?php echo $cid ?>">Import</a>
+		<p><b><?php echo _('Course Items'); ?></b><br/>
+			<a href="copyitems.php?cid=<?php echo $cid ?>"><?php echo _('Copy'); ?></a><br/>
+			<a href="../admin/exportitems.php?cid=<?php echo $cid ?>"><?php echo _('Export'); ?></a><br/>
+			<a href="../admin/importitems.php?cid=<?php echo $cid ?>"><?php echo _('Import'); ?></a>
 		</p>
 		
-		<p><b>Mass Change</b><br/>
-			<a href="chgassessments.php?cid=<?php echo $cid ?>">Assessments</a><br/>
-			<a href="chgforums.php?cid=<?php echo $cid ?>">Forums</a><br/>
-			<a href="masschgdates.php?cid=<?php echo $cid ?>">Dates</a><br/>
-			<a href="timeshift.php?cid=<?php echo $cid ?>">Time Shift</a>
+		<p><b><?php echo _('Mass Change'); ?></b><br/>
+			<a href="chgassessments.php?cid=<?php echo $cid ?>"><?php echo _('Assessments'); ?></a><br/>
+			<a href="chgforums.php?cid=<?php echo $cid ?>"><?php echo _('Forums'); ?></a><br/>
+			<a href="masschgdates.php?cid=<?php echo $cid ?>"><?php echo _('Dates'); ?></a><br/>
+			<a href="timeshift.php?cid=<?php echo $cid ?>"><?php echo _('Time Shift'); ?></a>
 		</p>
 		<p>
-			<a href="../admin/forms.php?action=modify&id=<?php echo $cid ?>&cid=<?php echo $cid ?>">Course Settings</a><br/>
-			<a href="<?php echo $imasroot ?>/help.php?section=coursemanagement">Help</a><br/>
-			<a href="../actions.php?action=logout">Log Out</a>
+			<a href="../admin/forms.php?action=modify&id=<?php echo $cid ?>&cid=<?php echo $cid ?>"><?php echo _('Course Settings'); ?></a><br/>
+			<a href="<?php echo $imasroot ?>/help.php?section=coursemanagement"><?php echo _('Help'); ?></a><br/>
+			<a href="../actions.php?action=logout"><?php echo _('Log Out'); ?></a>
 		</p>
 	</div>
 	<div id="centercontent">
@@ -476,25 +476,25 @@ if ($overwriteBody==1) {
 		<div id="leftcontent">
 			<p>
 			<a href="<?php echo $imasroot ?>/msgs/msglist.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>">
-			Messages</a> <?php echo $newmsgs ?> <br/>
+			<?php echo _('Messages'); ?></a> <?php echo $newmsgs ?> <br/>
 			<a href="<?php echo $imasroot ?>/forums/forums.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>">
-			Forums</a> <?php echo $newpostscnt ?><br/>
-			<a href="showcalendar.php?cid=<?php echo $cid ?>">Calendar</a>
+			<?php echo _('Forums'); ?></a> <?php echo $newpostscnt ?><br/>
+			<a href="showcalendar.php?cid=<?php echo $cid ?>"><?php echo _('Calendar'); ?></a>
 	<?php if (isset($mathchaturl) && $chatset==1) {
-			echo "<br/><a href=\"$mathchaturl?uname=".urlencode($userfullname)."&amp;room=$cid&amp;roomname=".urlencode($coursename)."\"  target=\"chat\">Chat</a>  ($activechatters)";
+			echo "<br/><a href=\"$mathchaturl?uname=".urlencode($userfullname)."&amp;room=$cid&amp;roomname=".urlencode($coursename)."\"  target=\"chat\">", _('Chat'), "</a>  ($activechatters)";
 		}
 	?>
 			</p>
 			<p>
-			<a href="gradebook.php?cid=<?php echo $cid ?>">Gradebook</a> <?php if (($coursenewflag&1)==1) {echo '<span class="red">New</span>';}?>
+			<a href="gradebook.php?cid=<?php echo $cid ?>"><?php echo _('Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="red">', _('New'), '</span>';}?>
 			</p>
 			<p>
-			<a href="../actions.php?action=logout">Log Out</a><br/>   
-			<a href="<?php echo $imasroot ?>/help.php?section=usingimas">Help Using <?php echo $installname;?></a>
+			<a href="../actions.php?action=logout"><?php echo _('Log Out'); ?></a><br/>   
+			<a href="<?php echo $imasroot ?>/help.php?section=usingimas"><?php printf(_('Help Using %s'), $installname); ?></a>
 			</p>
 			<?php		  
 			if ($myrights > 5 && $allowunenroll==1) {
-				echo "<p><a href=\"../forms.php?action=unenroll&cid=$cid\">Unenroll From Course</a></p>\n";
+				echo "<p><a href=\"../forms.php?action=unenroll&cid=$cid\">", _('Unenroll From Course'), "</a></p>\n";
 			}
 			?>
 		</div>
@@ -552,12 +552,12 @@ if ($overwriteBody==1) {
 		<span class=column>
 <?php		 if ($msgset<4) {  ?>
 			<a href="<?php echo $imasroot ?>/msgs/msglist.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>">
-			Messages</a><?php echo $newmsgs ?> <br/>
+			<?php echo _('Messages'); ?></a><?php echo $newmsgs ?> <br/>
 <?php		 } ?>
 			<a href="<?php echo $imasroot ?>/forums/forums.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>">
-			Forums</a> <?php echo $newpostscnt ?>
+			<?php echo _('Forums'); ?></a> <?php echo $newpostscnt ?>
 	<?php if (isset($mathchaturl) && $chatset==1) {
-			echo "<br/><a href=\"$mathchaturl?uname=".urlencode($userfullname)."&amp;room=$cid&amp;roomname=".urlencode($coursename)."\"  target=\"chat\">Chat</a>  ($activechatters)";
+			echo "<br/><a href=\"$mathchaturl?uname=".urlencode($userfullname)."&amp;room=$cid&amp;roomname=".urlencode($coursename)."\"  target=\"chat\">", _('Chat'), "</a>  ($activechatters)";
 		}
 	?>
 		</span>
@@ -571,38 +571,38 @@ if ($overwriteBody==1) {
 	<div class=cp>
 		<span class=column>
 			<?php echo generateadditem($_GET['folder'], 'BB') ?>
-			<a href="listusers.php?cid=<?php echo $cid ?>">Roster</a><br/>
-			<a href="gradebook.php?cid=<?php echo $cid ?>">Show Gradebook</a> <?php if (($coursenewflag&1)==1) {echo '<span class="red">New</span>';}?><br/>
-			<a href="course.php?cid=<?php echo $cid ?>&stuview=0">Student View</a><br/>
-			<a href="course.php?cid=<?php echo $cid ?>&quickview=on">Quick View</a></span>
+			<a href="listusers.php?cid=<?php echo $cid ?>"><?php echo _('Roster'); ?></a><br/>
+			<a href="gradebook.php?cid=<?php echo $cid ?>"><?php echo _('Show Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="red">', _('New'), '</span>';}?><br/>
+			<a href="course.php?cid=<?php echo $cid ?>&stuview=0"><?php echo _('Student View'); ?></a><br/>
+			<a href="course.php?cid=<?php echo $cid ?>&quickview=on"><?php echo _('Quick View'); ?></a></span>
 			<span class=column>
-				<a href="manageqset.php?cid=<?php echo $cid ?>">Manage Question Set<br></a>
+				<a href="manageqset.php?cid=<?php echo $cid ?>"><?php echo _('Manage Question Set'); ?><br></a>
 <?php		
 			if ($allowcourseimport) {
 ?>
-				<a href="../admin/export.php?cid=<?php echo $cid ?>">Export Question Set<br></a>
-				<a href="../admin/import.php?cid=<?php echo $cid ?>">Import Question Set</a>
+				<a href="../admin/export.php?cid=<?php echo $cid ?>"><?php echo _('Export Question Set'); ?><br></a>
+				<a href="../admin/import.php?cid=<?php echo $cid ?>"><?php echo _('Import Question Set'); ?></a>
 			</span>
 			<span class=column>
-				<a href="managelibs.php?cid=<?php echo $cid ?>">Manage Libraries</a><br>
-				<a href="../admin/exportlib.php?cid=<?php echo $cid ?>">Export Libraries</a><br/>
-				<a href="../admin/importlib.php?cid=<?php echo $cid ?>">Import Libraries</a>
+				<a href="managelibs.php?cid=<?php echo $cid ?>"><?php echo _('Manage Libraries'); ?></a><br>
+				<a href="../admin/exportlib.php?cid=<?php echo $cid ?>"><?php echo _('Export Libraries'); ?></a><br/>
+				<a href="../admin/importlib.php?cid=<?php echo $cid ?>"><?php echo _('Import Libraries'); ?></a>
 			</span>
 			<span class=column>
-				<a href="copyitems.php?cid=<?php echo $cid ?>">Copy Course Items</a><br/>
-				<a href="managestugrps.php?cid=<?php echo $cid ?>">Student Groups</a><br/>
-				<a href="showcalendar.php?cid=<?php echo $cid ?>">Calendar</a>
+				<a href="copyitems.php?cid=<?php echo $cid ?>"><?php echo _('Copy Course Items'); ?></a><br/>
+				<a href="managestugrps.php?cid=<?php echo $cid ?>"><?php echo _('Student Groups'); ?></a><br/>
+				<a href="showcalendar.php?cid=<?php echo $cid ?>"><?php echo _('Calendar'); ?></a>
 			</span>
 <?php
 			} else {
 ?>
-			<a href="managelibs.php?cid=<?php echo $cid ?>">Manage Libraries</a><br>
-			<a href="copyitems.php?cid=<?php echo $cid ?>">Copy Course Items</a><br/>
-			<a href="showcalendar.php?cid=<?php echo $cid ?>">Calendar</a>
+			<a href="managelibs.php?cid=<?php echo $cid ?>"><?php echo _('Manage Libraries'); ?></a><br>
+			<a href="copyitems.php?cid=<?php echo $cid ?>"><?php echo _('Copy Course Items'); ?></a><br/>
+			<a href="showcalendar.php?cid=<?php echo $cid ?>"><?php echo _('Calendar'); ?></a>
 		</span>
 		<span class=column>
-			<a href="managestugrps.php?cid=<?php echo $cid ?>">Student Groups</a><br/>
-			<a href="../admin/forms.php?action=modify&id=<?php echo $cid ?>&cid=<?php echo $cid ?>">Course Settings</a>
+			<a href="managestugrps.php?cid=<?php echo $cid ?>"><?php echo _('Student Groups'); ?></a><br/>
+			<a href="../admin/forms.php?action=modify&id=<?php echo $cid ?>&cid=<?php echo $cid ?>"><?php echo _('Course Settings'); ?></a>
 		</span>
 <?php
 			}
@@ -613,34 +613,34 @@ if ($overwriteBody==1) {
 	   
 	   if (!isset($teacherid)) {
 ?>
-	<a href="showcalendar.php?cid=<?php echo $cid ?>">Calendar</a><br />
-	<a href="gradebook.php?cid=<?php echo $cid ?>">Gradebook</a> <?php if (($coursenewflag&1)==1) {echo '<span class="red">New</span>';}?><br/>
-	<a href="../actions.php?action=logout">Log Out</a><br/>   
-	<a href="<?php echo $imasroot ?>/help.php?section=usingimas">Help Using <?php echo $installname;?></a><br/> 
+	<a href="showcalendar.php?cid=<?php echo $cid ?>"><?php echo _('Calendar'); ?></a><br />
+	<a href="gradebook.php?cid=<?php echo $cid ?>"><?php echo _('Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="red">', _('New'), '</span>';}?><br/>
+	<a href="../actions.php?action=logout"><?php echo _('Log Out'); ?></a><br/>   
+	<a href="<?php echo $imasroot ?>/help.php?section=usingimas"><?php printf(_('Help Using %s'), $installname); ?></a><br/> 
 <?php		  
 			if ($myrights > 5 && $allowunenroll==1) {
-				echo "<p><a href=\"../forms.php?action=unenroll&cid=$cid\">Unenroll From Course</a></p>\n";
+				echo "<p><a href=\"../forms.php?action=unenroll&cid=$cid\">", _('Unenroll From Course'), "</a></p>\n";
 			}
 	   } else {
 ?>
 	<span class=column>
-		<a href="../actions.php?action=logout">Log Out</a><BR>
+		<a href="../actions.php?action=logout"><?php echo _('Log Out'); ?></a><BR>
 <?php
 			if ($allowcourseimport) {
-				echo "<a href=\"copyitems.php?cid=$cid\">Copy Course Items</a><br/>\n";
+				echo "<a href=\"copyitems.php?cid=$cid\">", _('Copy Course Items'), "</a><br/>\n";
 			}
 ?>			
-		<a href="../admin/exportitems.php?cid=<?php echo $cid ?>">Export Course Items</a><br/>
-		<a href="../admin/importitems.php?cid=<?php echo $cid ?>">Import Course Items</a><br/>
+		<a href="../admin/exportitems.php?cid=<?php echo $cid ?>"><?php echo _('Export Course Items'); ?></a><br/>
+		<a href="../admin/importitems.php?cid=<?php echo $cid ?>"><?php echo _('Import Course Items'); ?></a><br/>
 	</span>
 	<span class=column>
-		<a href="<?php echo $imasroot ?>/help.php?section=coursemanagement">Help</a><br/>
-		<a href="timeshift.php?cid=<?php echo $cid ?>">Shift all Course Dates</a><br/>
-		<a href="chgassessments.php?cid=<?php echo $cid ?>">Mass Change Assessments</a>
+		<a href="<?php echo $imasroot ?>/help.php?section=coursemanagement"><?php echo _('Help'); ?></a><br/>
+		<a href="timeshift.php?cid=<?php echo $cid ?>"><?php echo _('Shift all Course Dates'); ?></a><br/>
+		<a href="chgassessments.php?cid=<?php echo $cid ?>"><?php echo _('Mass Change Assessments'); ?></a>
 	</span>
 	<span class=column>
-		<a href="chgforums.php?cid=<?php echo $cid ?>">Mass Change Forums</a>
-		<a href="masschgdates.php?cid=<?php echo $cid ?>">Mass Change Dates</a>
+		<a href="chgforums.php?cid=<?php echo $cid ?>"><?php echo _('Mass Change Forums'); ?></a>
+		<a href="masschgdates.php?cid=<?php echo $cid ?>"><?php echo _('Mass Change Dates'); ?></a>
 	</span>
 <?php		
 		}
@@ -676,21 +676,21 @@ function makeTopMenu() {
 		} else {
 			echo 'class="buttoninactive buttoncurveleft"';
 		}
-		echo '>Normal</a>';
+		echo '>', _('Normal'), '</a>';
 		echo "<a href=\"course.php?cid=$cid&quickview=off&stuview=0\" ";
 		if ($previewshift>-1 && $quickview != 'on') {
 			echo 'class="buttonactive"';
 		} else {
 			echo 'class="buttoninactive"';
 		}
-		echo '>Student</a>';
+		echo '>', _('Student'), '</a>';
 		echo "<a href=\"course.php?cid=$cid&quickview=on&teachview=1\" ";
 		if ($previewshift==-1 && $quickview == 'on') {
 			echo 'class="buttonactive buttoncurveright"';
 		} else {
 			echo 'class="buttoninactive buttoncurveright"';
 		}
-		echo '>Quick</a>';
+		echo '>', _('Quick'), '</a>';
 		echo '</div>';
 		//echo '<br class="clear"/>';
 			
@@ -705,88 +705,88 @@ function makeTopMenu() {
 		}
 		echo "<div class=breadcrumb>";
 		if (!$useviewbuttons) {
-			echo "Quick View. <a href=\"course.php?cid=$cid&quickview=off\">Back to regular view</a>. ";
+			echo _('Quick View.'), " <a href=\"course.php?cid=$cid&quickview=off\">", _('Back to regular view'), "</a>. ";
 		} 
-		 echo 'Use colored boxes to drag-and-drop order.  <input type="button" id="recchg" disabled="disabled" value="Record Changes" onclick="submitChanges()"/>';
+		 echo _('Use colored boxes to drag-and-drop order.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Record Changes'), '" onclick="submitChanges()"/>';
 		 echo '<span id="submitnotice" style="color:red;"></span>';
 		 echo '</div>';
 		
 	}
 	if (($coursenewflag&1)==1) {
-		$gbnewflag = ' <span class="red">New</span>';
+		$gbnewflag = ' <span class="red">' . _('New') . '</span>';
 	} else {
 		$gbnewflag = '';
 	}
 	if (isset($teacherid) && count($topbar[1])>0 && $topbar[2]==0) {
 		echo '<div class=breadcrumb>';
 		if (in_array(0,$topbar[1]) && $msgset<4) { //messages
-			echo "<a href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a>$newmsgs &nbsp; ";
+			echo "<a href=\"$imasroot/msgs/msglist.php?cid=$cid\">", _('Messages'), "</a>$newmsgs &nbsp; ";
 		}
 		if (in_array(6,$topbar[1])) { //Calendar
-			echo "<a href=\"$imasroot/forums/forums.php?cid=$cid\">Forums</a>$newpostscnt &nbsp; ";
+			echo "<a href=\"$imasroot/forums/forums.php?cid=$cid\">", _('Forums'), "</a>$newpostscnt &nbsp; ";
 		}
 		if (in_array(1,$topbar[1])) { //Stu view
-			echo "<a href=\"course.php?cid=$cid&stuview=0\">Student View</a> &nbsp; ";
+			echo "<a href=\"course.php?cid=$cid&stuview=0\">", _('Student View'), "</a> &nbsp; ";
 		}
 		if (in_array(3,$topbar[1])) { //List stu
-			echo "<a href=\"listusers.php?cid=$cid\">Roster</a> &nbsp; \n";
+			echo "<a href=\"listusers.php?cid=$cid\">", _('Roster'), "</a> &nbsp; \n";
 		}
 		if (in_array(2,$topbar[1])) { //Gradebook
-			echo "<a href=\"gradebook.php?cid=$cid\">Gradebook</a>$gbnewflag &nbsp; ";
+			echo "<a href=\"gradebook.php?cid=$cid\">", _('Gradebook'), "</a>$gbnewflag &nbsp; ";
 		}
 		if (in_array(7,$topbar[1])) { //List stu
-			echo "<a href=\"managestugrps.php?cid=$cid\">Groups</a> &nbsp; \n";
+			echo "<a href=\"managestugrps.php?cid=$cid\">", _('Groups'), "</a> &nbsp; \n";
 		}
 		if (in_array(4,$topbar[1])) { //Calendar
-			echo "<a href=\"showcalendar.php?cid=$cid\">Calendar</a> &nbsp; \n";
+			echo "<a href=\"showcalendar.php?cid=$cid\">", _('Calendar'), "</a> &nbsp; \n";
 		}
 		if (in_array(5,$topbar[1])) { //Calendar
-			echo "<a href=\"course.php?cid=$cid&quickview=on\">Quick View</a> &nbsp; \n";
+			echo "<a href=\"course.php?cid=$cid&quickview=on\">", _('Quick View'), "</a> &nbsp; \n";
 		}
 		
 		if (in_array(9,$topbar[1])) { //Log out
-			echo "<a href=\"../actions.php?action=logout\">Log Out</a>";
+			echo "<a href=\"../actions.php?action=logout\">", _('Log Out'), "</a>";
 		}
 		echo '<div class=clear></div></div>';
 	} else if (!isset($teacherid) && ((count($topbar[0])>0 && $topbar[2]==0) || ($previewshift>-1 && !$useviewbuttons))) {
 		echo '<div class=breadcrumb>';
 		if ($topbar[2]==0) {
 			if (in_array(0,$topbar[0]) && $msgset<4) { //messages
-				echo "<a href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a>$newmsgs &nbsp; ";
+				echo "<a href=\"$imasroot/msgs/msglist.php?cid=$cid\">", _('Messages'), "</a>$newmsgs &nbsp; ";
 			}
 			if (in_array(3,$topbar[0])) { //forums
-				echo "<a href=\"$imasroot/forums/forums.php?cid=$cid\">Forums</a>$newpostscnt &nbsp; ";
+				echo "<a href=\"$imasroot/forums/forums.php?cid=$cid\">", _('Forums'), "</a>$newpostscnt &nbsp; ";
 			}
 			if (in_array(1,$topbar[0])) { //Gradebook
-				echo "<a href=\"gradebook.php?cid=$cid\">Show Gradebook</a>$gbnewflag &nbsp; ";
+				echo "<a href=\"gradebook.php?cid=$cid\">", _('Show Gradebook'), "</a>$gbnewflag &nbsp; ";
 			}
 			if (in_array(2,$topbar[0])) { //Calendar
-				echo "<a href=\"showcalendar.php?cid=$cid\">Calendar</a> &nbsp; \n";
+				echo "<a href=\"showcalendar.php?cid=$cid\">", _('Calendar'), "</a> &nbsp; \n";
 			}
 			if (in_array(9,$topbar[0])) { //Log out
-				echo "<a href=\"../actions.php?action=logout\">Log Out</a>";
+				echo "<a href=\"../actions.php?action=logout\">", _('Log Out'), "</a>";
 			}
 			if ($previewshift>-1 && count($topbar[0])>0) { echo '<br />';}
 		}
 		if ($previewshift>-1 && !$useviewbuttons) {
-			echo 'Showing student view. Show view: <select id="pshift" onchange="changeshift()">';
+			echo _('Showing student view. Show view:'), ' <select id="pshift" onchange="changeshift()">';
 			echo '<option value="0" ';
 			if ($previewshift==0) {echo "selected=1";}
-			echo '>Now</option>';
+			echo '>', _('Now'), '</option>';
 			echo '<option value="3600" ';
 			if ($previewshift==3600) {echo "selected=1";}
-			echo '>1 hour from now</option>';
+			echo '>', _('1 hour from now'), '</option>';
 			echo '<option value="14400" ';
 			if ($previewshift==14400) {echo "selected=1";}
-			echo '>4 hours from now</option>';
+			echo '>', _('4 hours from now'), '</option>';
 			echo '<option value="86400" ';
 			if ($previewshift==86400) {echo "selected=1";}
-			echo '>1 day from now</option>';
+			echo '>', _('1 day from now'), '</option>';
 			echo '<option value="604800" ';
 			if ($previewshift==604800) {echo "selected=1";}
-			echo '>1 week from now</option>';
+			echo '>', _('1 week from now'), '</option>';
 			echo '</select>';
-			echo " <a href=\"course.php?cid=$cid&teachview=1\">Back to instructor view</a>";
+			echo " <a href=\"course.php?cid=$cid&teachview=1\">", _('Back to instructor view'), "</a>";
 		}
 		echo '<div class=clear></div></div>';
 	}

@@ -173,7 +173,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	}
 	if ($qdata['qtype']=='conditional') {
 		if (!isset($showanswer)) {
-			$showanswer = 'Answers may vary';
+			$showanswer = _('Answers may vary');
 		}
 	}
 	
@@ -201,7 +201,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 					} else if (strpos($hintpart[$usenum],'button"')!==false) {
 						$hintloc[$iidx] = "<p>{$hintpart[$usenum]}</p>\n";
 					} else {
-						$hintloc[$iidx] = "<p><i>Hint:</i> {$hintpart[$usenum]}</p>\n";
+						$hintloc[$iidx] = "<p><i>" . _('Hint:') . "</i> {$hintpart[$usenum]}</p>\n";
 					}
 				}
 				
@@ -219,7 +219,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 				} else if (strpos($hints[$usenum],'button"')!==false) {
 					$hintloc = "<p>{$hints[$usenum]}</p>\n";
 				} else {
-					$hintloc = "<p><i>Hint:</i> {$hints[$usenum]}</p>\n";
+					$hintloc = "<p><i>" . _('Hint:') . "</i> {$hints[$usenum]}</p>\n";
 				}
 			}
 			
@@ -302,7 +302,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	}
 	if ($showhints && $qdata['extref']!='') {
 		$extref = explode('~~',$qdata['extref']);
-		echo '<div><p class="tips">Get help: ';
+		echo '<div><p class="tips">', _('Get help: ');
 		for ($i=0;$i<count($extref);$i++) {
 			$extrefpt = explode('!!',$extref[$i]);
 			if ($extrefpt[0]=='video' || strpos($extrefpt[1],'youtube.com/watch')!==false) {
@@ -323,19 +323,19 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		if ((!isset($hidetips) || (is_array($hidetips) && !isset($hidetips[$iidx])))&& !$seqinactive && $showtips>0) {
 			echo "<p class=\"tips\" ";
 			if ($showtips!=1) { echo 'style="display:none;" ';}
-			echo ">Box ".($iidx+1).": <span id=\"tips$qnidx-$iidx\">".filter($tip)."</span></p>";
+			echo ">", _('Box'), " ".($iidx+1).": <span id=\"tips$qnidx-$iidx\">".filter($tip)."</span></p>";
 		}
 		if ($doshowans && (!isset($showanswer) || (is_array($showanswer) && !isset($showanswer[$iidx]))) && $shanspt[$iidx]!=='') {
 			if ($nosabutton) {
-				echo filter("<div>Answer: {$shanspt[$iidx]} </div>\n");
+				echo filter("<div>" . _('Answer:') . " {$shanspt[$iidx]} </div>\n");
 			} else {
-				echo "<div><input class=\"sabtn\" type=button value=\"Show Answer\" onClick='javascript:document.getElementById(\"ans$qnidx-$iidx\").className=\"shown\";' />"; //AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
+				echo "<div><input class=\"sabtn\" type=button value=\"", _('Show Answer'), "\" onClick='javascript:document.getElementById(\"ans$qnidx-$iidx\").className=\"shown\";' />"; //AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
 				echo filter(" <span id=\"ans$qnidx-$iidx\" class=\"hidden\">{$shanspt[$iidx]}</span></div>\n");
 			}
 		} else if ($doshowans && isset($showanswer) && is_array($showanswer)) { //use part specific showanswer
 			if (isset($showanswer[$iidx])) {
 				if ($nosabutton) {
-					echo filter("<div>Answer: {$showanswer[$iidx]} </div>\n");
+					echo filter("<div>" .  _('Answer:') . " {$showanswer[$iidx]} </div>\n");
 				} else {
 					echo "<div><input class=\"sabtn\" type=button value=\"Show Answer\" onClick='javascript:document.getElementById(\"ans$qnidx-$iidx\").className=\"shown\";' />";// AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
 					echo filter(" <span id=\"ans$qnidx-$iidx\" class=\"hidden\">{$showanswer[$iidx]}</span></div>\n");
@@ -347,7 +347,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	
 	if ($doshowans && isset($showanswer) && !is_array($showanswer)) {  //single showanswer defined
 		if ($nosabutton) {
-			echo filter("<div>Answer: $showanswer </div>\n");	
+			echo filter("<div>" . _('Answer:') . " $showanswer </div>\n");	
 		} else {
 			echo "<div><input class=\"sabtn\" type=button value=\"Show Answer\" onClick='javascript:document.getElementById(\"ans$qnidx\").className=\"shown\"; AMprocessNode(document.getElementById(\"ans$qnidx\"));' />";
 			echo filter(" <span id=\"ans$qnidx\" class=\"hidden\">$showanswer </span></div>\n");
@@ -670,23 +670,23 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$rightb = '';
 		}
 		if ($answerformat=='list' || $answerformat=='exactlist' ||  $answerformat=='orderedlist') {
-			$tip = "Enter your answer as a list of whole or decimal numbers separated with commas: Examples: -4, 3, 2.5<br/>";
-			$shorttip = "Enter a list of whole or decimal numbers";
+			$tip = _('Enter your answer as a list of whole or decimal numbers separated with commas: Examples: -4, 3, 2.5') . "<br/>";
+			$shorttip = _('Enter a list of whole or decimal numbers');
 		} else {
-			$tip = "Enter your answer as a whole or decimal number.  Examples: 3, -4, 5.5<br/>";
-			$shorttip = "Enter a whole or decimal number";
+			$tip = _('Enter your answer as a whole or decimal number.  Examples: 3, -4, 5.5') . "<br/>";
+			$shorttip = _('Enter a whole or decimal number');
 		}
-		$tip .= "Enter DNE for Does Not Exist, oo for Infinity";
+		$tip .= _('Enter DNE for Does Not Exist, oo for Infinity');
 		if (isset($reqdecimals)) {
-			$tip .= "<br/>Your answer should be accurate to $reqdecimals decimal places.";
-			$shorttip .= ", accurate to $reqdecimals decimal places";
+			$tip .= "<br/>" . sprintf(_('Your answer should be accurate to %d decimal places.'), $reqdecimals);
+			$shorttip .= sprintf(_(", accurate to %d decimal places"), $reqdecimals);
 		}
 		if (isset($reqsigfigs)) {
 			if ($reqsigfigs{0}=='=') {
 				$reqsigfigs = substr($reqsigfigs,1);
 				$answer = prettysigfig($answer,$reqsigfigs);
-				$tip .= "<br/>Your answer should have exactly $reqsigfigs significant figures.";
-				$shorttip .= ", with exactly $reqsigfigs significant figures";
+				$tip .= "<br/>" . sprintf(_('Your answer should have exactly %d significant figures.'), $reqsigfigs);
+				$shorttip .= sprintf(_(', with exactly %d significant figures'), $reqsigfigs);
 			} else {
 				if ($answer!=0) {
 					$v = -1*floor(-log10(abs($answer))-1e-12) - $reqsigfigs;
@@ -694,8 +694,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				if ($answer!=0  && $v < 0 && strlen($answer) - strpos($answer,'.')-1 + $v < 0) { 
 					$answer = prettysigfig($answer,$reqsigfigs);
 				}
-				$tip .= "<br/>Your answer should have at least $reqsigfigs significant figures.";
-				$shorttip .= ", with at least $reqsigfigs significant figures";
+				$tip .= "<br/>" . sprintf(_('Your answer should have at least %d significant figures.'), $reqsigfigs);
+				$shorttip .= sprintf(_(', with at least %d significant figures'), $reqsigfigs);
 			}
 		}
 		$out .= "$leftb<input ";
@@ -724,7 +724,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$qn];} else {$noshuffle = $options['noshuffle'];}} else {$noshuffle = "none";}
 		
 		if (!is_array($questions)) {
-			echo "Eeek!  \$questions is not defined or needs to be an array";
+			echo _('Eeek!  $questions is not defined or needs to be an array');
 			return false;
 		}
 		
@@ -783,7 +783,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$msg = '?';
 			foreach ($questions as $qv) {
 				if (strlen($qv)>2 && !($qv{0}=='&' && $qv{strlen($qv)-1}==';')) {
-					$msg = 'Select an answer';
+					$msg = _('Select an answer');
 					break;
 				}
 			}
@@ -844,7 +844,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		} else if ($displayformat != 'select') {
 			$out .= "</div>";
 		}
-		$tip = "Select the best answer";
+		$tip = _('Select the best answer');
 		if (isset($answer)) {
 			$anss = explode(' or ',$answer);
 			$sapt = array();
@@ -860,7 +860,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$qn];} else {$displayformat = $options['displayformat'];}}
 		
 		if (!is_array($questions)) {
-			echo "Eeek!  \$questions is not defined or needs to be an array";
+			echo _('Eeek!  $questions is not defined or needs to be an array');
 			return false;
 		}
 		
@@ -947,7 +947,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		} else {
 			$out .= "</div>";
 		}
-		$tip = "Select all correct answers";
+		$tip = _('Select all correct answers');
 		if (isset($answers)) {
 			$akeys = explode(',',$answers);
 			foreach($akeys as $akey) {
@@ -970,7 +970,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$la = $la[0];
 		
 		if (!is_array($questions) || !is_array($answers)) {
-			echo "Eeek!  \$questions or \$answers is not defined or needs to be an array";
+			echo _('Eeek!  $questions or $answers is not defined or needs to be an array');
 			return false;
 		}
 		if (isset($matchlist)) { $matchlist = explode(',',$matchlist);}
@@ -1050,9 +1050,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if ($colorbox != '') {$out .= '</div>';}
 		//$tip = "In each box provided, type the letter (a, b, c, etc.) of the matching answer in the right-hand column";
 		if ($displayformat=="select") {
-			$tip = "In each pull-down, select the item that matches with the displayed item";
+			$tip = _('In each pull-down, select the item that matches with the displayed item');
 		} else {
-			$tip = "In each pull-down on the left, select the letter (a, b, c, etc.) of the matching answer in the right-hand column";
+			$tip = _('In each pull-down on the left, select the letter (a, b, c, etc.) of the matching answer in the right-hand column');
 		}
 		for ($i=0; $i<count($randqkeys);$i++) {
 			if (isset($matchlist)) {
@@ -1098,11 +1098,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		
 		$ansformats = explode(',',$answerformat);
 		if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
-			$tip = "Enter your answer as a list of values separated by commas: Example: -4, 3, 2<br/>";
-			$eword = "each value";
+			$tip = _('Enter your answer as a list of values separated by commas: Example: -4, 3, 2') . "<br/>";
+			$eword = _('each value');
 		} else {
 			$tip = '';
-			$eword = "your answer";
+			$eword = _('your answer');
 		}
 		list($longtip,$shorttip) = formathint($eword,$ansformats,'calculated',(in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)), 1);
 		$tip .= $longtip;
@@ -1171,12 +1171,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			}
 			$out .= "</table>\n";
 			$out .= '</td><td class="matrixright">&nbsp;</td></tr></table>';
-			$tip = "Enter each element of the matrix as  number (like 5, -3, 2.2)";
+			$tip = _('Enter each element of the matrix as  number (like 5, -3, 2.2)');
 		} else {
 			$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\" />\n";
-			$out .= "<input type=button class=btn value=Preview onclick=\"AMmathpreview('qn$qn','p$qn')\" /> &nbsp;\n";
+			$out .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"AMmathpreview('qn$qn','p$qn')\" /> &nbsp;\n";
 			$out .= "<span id=p$qn></span> ";
-			$tip = "Enter your answer as a matrix filled with numbers, like ((2,3,4),(3,4,5))";
+			$tip = _('Enter your answer as a matrix filled with numbers, like ((2,3,4),(3,4,5))');
 		}
 		if (isset($answer)) {
 			$sa = '`'.$answer.'`';
@@ -1220,18 +1220,18 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			}
 			$out .= "</table>\n";
 			$out .= '</td><td class="matrixright">&nbsp;</td></tr></table>';
-			if (!isset($hidepreview)) {$preview .= "<input type=button class=btn value=Preview onclick=\"matrixcalc('qn$qn','p$qn',{$answersize[0]},{$answersize[1]})\" /> &nbsp;\n";}
+			if (!isset($hidepreview)) {$preview .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"matrixcalc('qn$qn','p$qn',{$answersize[0]},{$answersize[1]})\" /> &nbsp;\n";}
 			$preview .= "<span id=p$qn></span>\n";
 			$out .= "<script type=\"text/javascript\">matcalctoproc[$qn] = 1; matsize[$qn]='{$answersize[0]},{$answersize[1]}';</script>\n";
-			$tip .= formathint('each element of the matrix',$ansformats,'calcmatrix');
+			$tip .= formathint(_('each element of the matrix'),$ansformats,'calcmatrix');
 			//$tip = "Enter each element of the matrix as  number (like 5, -3, 2.2) or as a calculation (like 5/3, 2^3, 5+4)";
 		} else {
 			$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\" />\n";
 			$out .= "<input type=button value=Preview onclick=\"matrixcalc('tc$qn','p$qn')\" /> &nbsp;\n";
 			$out .= "<span id=p$qn></span> \n";
 			$out .= "<script type=\"text/javascript\">matcalctoproc[$qn] = 1;</script>\n";
-			$tip = "Enter your answer as a matrix, like ((2,3,4),(1,4,5))";
-			$tip .= '<br/>'.formathint('each element of the matrix',$ansformats,'calcmatrix');
+			$tip = _('Enter your answer as a matrix, like ((2,3,4),(1,4,5))');
+			$tip .= '<br/>'.formathint(_('each element of the matrix'),$ansformats,'calcmatrix');
 		}
 		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
 		
@@ -1251,9 +1251,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($ansprompt)) {$out .= "<label for=\"tc$qn\">$ansprompt</label>";}
 		
 		if ($answerformat=="equation") {
-			$shorttip = 'Enter an algebraic equation';
+			$shorttip = _('Enter an algebraic equation');
 		} else {
-			$shorttip = 'Enter an algebraic expression';
+			$shorttip = _('Enter an algebraic expression');
 		}
 		$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=\"tc$qn\" id=\"tc$qn\" value=\"$la\" autocomplete=\"off\" ";
 		if ($showtips==2) { //eqntips: work in progress
@@ -1275,7 +1275,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
 		$out .= "<input type=\"hidden\" id=\"qn$qn-vals\" name=\"qn$qn-vals\" />";
 		
-		if (!isset($hidepreview)) {$preview .= "<input type=button class=btn value=Preview onclick=\"AMpreview('tc$qn','p$qn')\" /> &nbsp;\n";}
+		if (!isset($hidepreview)) {$preview .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"AMpreview('tc$qn','p$qn')\" /> &nbsp;\n";}
 		$preview .= "<span id=p$qn></span>\n";
 		
 		if (!isset($variables)) { $variables = "x";}
@@ -1316,9 +1316,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$out .= "<script type=\"text/javascript\">pts[$qn]=\"$points\";</script>\n";
 		if ($answerformat=="equation") {
 			$out .= "<script type=\"text/javascript\">iseqn[$qn] = 1;</script>\n";
-			$tip = "Enter your answer as an equation.  Example: y=3x^2+1, 2+x+y=3\n<br/>Be sure your variables match those in the question";
+			$tip = _('Enter your answer as an equation.  Example: y=3x^2+1, 2+x+y=3') . "\n<br/>" . _('Be sure your variables match those in the question');
 		} else {
-			$tip = "Enter your answer as an expression.  Example: 3x^2+1, x/5, (a+b)/c\n<br/>Be sure your variables match those in the question";
+			$tip = _('Enter your answer as an expression.  Example: 3x^2+1, x/5, (a+b)/c') . "\n<br/>" . _('Be sure your variables match those in the question');
 		}
 		if (isset($answer)) {
 			$sa = makeprettydisp($answer);
@@ -1333,25 +1333,25 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		
 		if ($displayformat == 'point') {
-			$tip = "Enter your answer as a point.  Example: (2,5.5)<br/>";
-			$shorttip = 'Enter a point';
+			$tip = _('Enter your answer as a point.  Example: (2,5.5)') . "<br/>";
+			$shorttip = _('Enter a point');
 		} else if ($displayformat == 'pointlist') {
-			$tip = "Enter your answer a list of points separated with commas.  Example: (1,2), (3.5,5)<br/>";
-			$shorttip = 'Enter a list of points';
+			$tip = _('Enter your answer a list of points separated with commas.  Example: (1,2), (3.5,5)') . "<br/>";
+			$shorttip = _('Enter a list of points');
 		} else if ($displayformat == 'vector') {
-			$tip = "Enter your answer as a vector.  Example: <2,5.5><br/>";
-			$shorttip = 'Enter a vector';
+			$tip = _('Enter your answer as a vector.  Example: <2,5.5>') . "<br/>";
+			$shorttip = _('Enter a vector');
 		} else if ($displayformat == 'vectorlist') {
-			$tip = "Enter your answer a list of vectors separated with commas.  Example: <1,2>, <3.5,5><br/>";
-			$shorttip = 'Enter a list of vectors';
+			$tip = _('Enter your answer a list of vectors separated with commas.  Example: <1,2>, <3.5,5>') . "<br/>";
+			$shorttip = _('Enter a list of vectors');
 		} else if ($displayformat == 'list') {
-			$tip = "Enter your answer as a list of n-tuples of numbers separated with commas: Example: (1,2),(3.5,4)<br/>";
-			$shorttip = 'Enter a list of n-tuples';
+			$tip = _('Enter your answer as a list of n-tuples of numbers separated with commas: Example: (1,2),(3.5,4)') . "<br/>";
+			$shorttip = _('Enter a list of n-tuples');
 		} else {
-			$tip = "Enter your answer as an n-tuple of numbers.  Example: (2,5.5)<br/>";
-			$shorttip = 'Enter an n-tuple';
+			$tip = _('Enter your answer as an n-tuple of numbers.  Example: (2,5.5)') . "<br/>";
+			$shorttip = _('Enter an n-tuple');
 		}
-		$tip .= "Enter DNE for Does Not Exist";
+		$tip .= _('Enter DNE for Does Not Exist');
 		
 		$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\" ";
 		if ($showtips==2) { //eqntips: work in progress
@@ -1380,23 +1380,23 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		
 		if ($displayformat == 'point') {
-			$tip = "Enter your answer as a point.  Example: (2,5.5)<br/>";
-			$shorttip = 'Enter a point';
+			$tip = _('Enter your answer as a point.  Example: (2,5.5)') . "<br/>";
+			$shorttip = _('Enter a point');
 		} else if ($displayformat == 'pointlist') {
-			$tip = "Enter your answer a list of points separated with commas.  Example: (1,2), (3.5,5)<br/>";
-			$shorttip = 'Enter a list of points';
+			$tip = _('Enter your answer a list of points separated with commas.  Example: (1,2), (3.5,5)') . "<br/>";
+			$shorttip = _('Enter a list of points');
 		} else if ($displayformat == 'vector') {
-			$tip = "Enter your answer as a vector.  Example: <2,5.5><br/>";
-			$shorttip = 'Enter a vector';
+			$tip = _('Enter your answer as a vector.  Example: <2,5.5>') . "<br/>";
+			$shorttip = _('Enter a vector');
 		} else if ($displayformat == 'vectorlist') {
-			$tip = "Enter your answer a list of vectors separated with commas.  Example: <1,2>, <3.5,5><br/>";
-			$shorttip = 'Enter a list of vectors';
+			$tip = _('Enter your answer a list of vectors separated with commas.  Example: <1,2>, <3.5,5>') . "<br/>";
+			$shorttip = _('Enter a list of vectors');
 		} else if ($displayformat == 'list') {
-			$tip = "Enter your answer as a list of n-tuples of numbers separated with commas: Example: (1,2),(3.5,4)<br/>";
-			$shorttip = 'Enter a list of n-tuples';
+			$tip = _('Enter your answer as a list of n-tuples of numbers separated with commas: Example: (1,2),(3.5,4)') . "<br/>";
+			$shorttip = _('Enter a list of n-tuples');
 		} else {
-			$tip = "Enter your answer as an n-tuple of numbers.  Example: (2,5.5)<br/>";
-			$shorttip = 'Enter an n-tuple';
+			$tip = _('Enter your answer as an n-tuple of numbers.  Example: (2,5.5)') . "<br/>";
+			$shorttip = _('Enter an n-tuple');
 		}
 		$tip .= formathint('each value',$ansformats,'calcntuple');
 		
@@ -1419,7 +1419,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
 		
 		if (!isset($hidepreview)) {
-			$preview .= "<input type=button class=btn value=Preview onclick=\"ntuplecalc('tc$qn','p$qn','$qn')\" /> &nbsp;\n";
+			$preview .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"ntuplecalc('tc$qn','p$qn','$qn')\" /> &nbsp;\n";
 		}
 		$preview .= "<span id=p$qn></span> ";
 		$out .= "<script type=\"text/javascript\">ntupletoproc[$qn] = 1; calcformat[$qn] = '$answerformat';</script>\n";
@@ -1438,14 +1438,14 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		
 		
 		if ($answerformat == "list") {
-			$tip = "Enter your answer as a list of complex numbers in a+bi form separated with commas.  Example: 2+5.5i,-3-4i<br/>";
-			$shorttip = 'Enter a list of complex numbers';
+			$tip = _('Enter your answer as a list of complex numbers in a+bi form separated with commas.  Example: 2+5.5i,-3-4i') . "<br/>";
+			$shorttip = _('Enter a list of complex numbers');
 		} else {
-			$tip = "Enter your answer as a complex number in a+bi form.  Example: 2+5.5i<br/>";
-			$shorttip = 'Enter a complex number';
+			$tip = _('Enter your answer as a complex number in a+bi form.  Example: 2+5.5i') . "<br/>";
+			$shorttip = _('Enter a complex number');
 		}
 		
-		$tip .= "Enter DNE for Does Not Exist";
+		$tip .= _('Enter DNE for Does Not Exist');
 		
 		$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\"  ";
 		if ($showtips==2) { //eqntips: work in progress
@@ -1475,11 +1475,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$ansformats = explode(',',$answerformat);
 		
 		if (in_array('list',$ansformats)) {
-			$tip = "Enter your answer as a list of complex numbers in a+bi form separated with commas.  Example: 2+5i,-3-4i<br/>";
-			$shorttip = 'Enter a list of complex numbers';
+			$tip = _('Enter your answer as a list of complex numbers in a+bi form separated with commas.  Example: 2+5i,-3-4i') . "<br/>";
+			$shorttip = _('Enter a list of complex numbers');
 		} else {
-			$tip = "Enter your answer as a complex number in a+bi form.  Example: 2+5i<br/>";
-			$shorttip = 'Enter a complex number';
+			$tip = _('Enter your answer as a complex number in a+bi form.  Example: 2+5i') . "<br/>";
+			$shorttip = _('Enter a complex number');
 		}
 		$tip .= formathint('each value',$ansformats,'calccomplex');
 		
@@ -1502,7 +1502,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
 		
 		if (!isset($hidepreview)) {
-			$preview .= "<input type=button class=btn value=Preview onclick=\"complexcalc('tc$qn','p$qn')\" /> &nbsp;\n";
+			$preview .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"complexcalc('tc$qn','p$qn')\" /> &nbsp;\n";
 		}
 		$preview .= "<span id=p$qn></span> ";
 		$out .= "<script type=\"text/javascript\">complextoproc[$qn] = 1;</script>\n";
@@ -1524,11 +1524,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
 		
 		if ($answerformat=='list') {
-			$tip = "Enter your answer as a list of text separated by commas.  Example:  dog, cat, rabbit.<br/>";
-			$shorttip = "Enter a list of text";
+			$tip = _('Enter your answer as a list of text separated by commas.  Example:  dog, cat, rabbit.') . "<br/>";
+			$shorttip = _('Enter a list of text');
 		} else {
-			$tip .= "Enter your answer as letters.  Examples: A B C, linear, a cat";
-			$shorttip = 'Enter text';
+			$tip .= _('Enter your answer as letters.  Examples: A B C, linear, a cat');
+			$shorttip = _('Enter text');
 		}
 		
 		$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" autocomplete=\"off\"  ";
@@ -1542,7 +1542,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		$out .= '/>';
 		if ($displayformat == 'usepreview') {
-			$preview .= "<input type=button class=btn value=Preview onclick=\"stringqpreview('qn$qn','p$qn','$answerformat')\" /> &nbsp;\n";
+			$preview .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"stringqpreview('qn$qn','p$qn','$answerformat')\" /> &nbsp;\n";
 			$preview .= "<span id=p$qn></span> ";
 		}
 		$sa .= $answer;
@@ -1618,7 +1618,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				//$out .= "<script type=\"text/javascript\">editornames[editornames.length] = \"qn$qn\";</script>";
 			}
 		} 
-		$tip .= "Enter your answer as text.  This question is not automatically graded.";
+		$tip .= _('Enter your answer as text.  This question is not automatically graded.');
 		$sa .= $answer;
 	} else if ($anstype == 'interval') {
 		if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$qn];} else {$ansprompt = $options['ansprompt'];}}
@@ -1632,22 +1632,22 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		
 		if ($answerformat=='normalcurve' && $GLOBALS['sessiondata']['graphdisp']!=0) {
-			$top = "Enter your answer by selecting the shade type, and by clicking and dragging the sliders on the normal curve";
-			$shorttip = "Adjust the sliders";
+			$top = _('Enter your answer by selecting the shade type, and by clicking and dragging the sliders on the normal curve');
+			$shorttip = _('Adjust the sliders');
 		} else {
 		
-			$tip = "Enter your answer using interval notation.  Example: [2.1,5.6) <br/>";
-			$tip .= "Use U for union to combine intervals.  Example: (-oo,2] U [4,oo)<br/>";
-			$tip .= "Enter DNE for an empty set, oo for Infinity";
+			$tip = _('Enter your answer using interval notation.  Example: [2.1,5.6)') . " <br/>";
+			$tip .= _('Use U for union to combine intervals.  Example: (-oo,2] U [4,oo)') . "<br/>";
+			$tip .= _('Enter DNE for an empty set, oo for Infinity');
 			if (isset($reqdecimals)) {
-				$tip .= "<br/>Your numbers should be accurate to $reqdecimals decimal places.";
+				$tip .= "<br/>" . sprintf(_('Your numbers should be accurate to %d decimal places.'), $reqdecimals);
 			}
-			$shorttip = 'Enter an interval using interval notation';
+			$shorttip = _('Enter an interval using interval notation');
 		}
 		if ($answerformat=='normalcurve' && $GLOBALS['sessiondata']['graphdisp']!=0) {
 			$out .=  '<div style="background:#fff;padding:10px;">';
-			$out .=  '<p style="margin:0px";>Shade: <select id="shaderegions'.$qn.'" onchange="chgnormtype(this.id.substring(12));"><option value="1L">Left of a value</option><option value="1R">Right of a value</option>';
-			$out .=  '<option value="2B">Between two values</option><option value="2O">2 regions</option></select>. Click and drag and arrows to adjust the values.';
+			$out .=  '<p style="margin:0px";>Shade: <select id="shaderegions'.$qn.'" onchange="chgnormtype(this.id.substring(12));"><option value="1L">' . _('Left of a value') . '</option><option value="1R">' . _('Right of a value') . '</option>';
+			$out .=  '<option value="2B">' . _('Between two values') . '</option><option value="2O">' . _('2 regions') . '</option></select>. ' . _('Click and drag and arrows to adjust the values.');
 			
 			$out .=  '<div style="position: relative; width: 500px; height:200px;padding:0px;">';
 			$out .=  '<div style="position: absolute; left:0; top:0; height:200px; width:0px; background:#00f;" id="normleft'.$qn.'">&nbsp;</div>';
@@ -1660,7 +1660,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .=  '</div></div>';
 			$out .=  '<script type="text/javascript">normslider.idnums.push('.$qn.');</script>';
 		} else if ($answerformat=='normalcurve') {
-			$out .= 'Enter an interval corresponding to the region to be shaded';
+			$out .= _('Enter an interval corresponding to the region to be shaded');
 		}
 		$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\"  ";
 		if ($answerformat=='normalcurve' && $GLOBALS['sessiondata']['graphdisp']!=0) {
@@ -1712,20 +1712,20 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		
 		if (in_array('inequality',$ansformats)) {
-			$tip = "Enter your answer using inequality notation.  Example: 3 <= $variables < 4 <br/>";
-			$tip .= "Use or to combine intervals.  Example: $variables < 2 or $variables >= 3<br/>";
-			$tip .= "Enter <i>all real numbers</i> for solutions of that type<br/>";
-			$shorttip = 'Enter an interval using inequalities';
+			$tip = sprintf(_('Enter your answer using inequality notation.  Example: 3 <= %d < 4'), $variables) . " <br/>";
+			$tip .= sprintf(_('Use or to combine intervals.  Example: %d < 2 or %d >= 3'), $variables, $variables) . "<br/>";
+			$tip .= _('Enter <i>all real numbers</i> for solutions of that type') . "<br/>";
+			$shorttip = _('Enter an interval using inequalities');
 		} else {
-			$tip = "Enter your answer using interval notation.  Example: [2.1,5.6) <br/>";
-			$tip .= "Use U for union to combine intervals.  Example: (-oo,2] U [4,oo)<br/>";
-			$shorttip = 'Enter an interval using interval notation';
+			$tip = _('Enter your answer using interval notation.  Example: [2.1,5.6)') . " <br/>";
+			$tip .= _('Use U for union to combine intervals.  Example: (-oo,2] U [4,oo)') . "<br/>";
+			$shorttip = _('Enter an interval using interval notation');
 		}
 		//$tip .= "Enter values as numbers (like 5, -3, 2.2) or as calculations (like 5/3, 2^3, 5+4)<br/>";
 		//$tip .= "Enter DNE for an empty set, oo for Infinity";
-		$tip .= formathint('each value',$ansformats,'calcinterval');
+		$tip .= formathint(_('each value'),$ansformats,'calcinterval');
 		if (isset($reqdecimals)) {
-			$tip .= "<br/>Your numbers should be accurate to $reqdecimals decimal places.";
+			$tip .= "<br/>" . sprintf(_('Your numbers should be accurate to %d decimal places.'), $reqdecimals);
 		}
 		
 		$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\"  ";
@@ -1747,7 +1747,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
 		
 		if (!isset($hidepreview)) {
-			$preview .= "<input type=button class=btn value=Preview onclick=\"intcalculate('tc$qn','p$qn','$answerformat')\" /> &nbsp;\n";
+			$preview .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"intcalculate('tc$qn','p$qn','$answerformat')\" /> &nbsp;\n";
 		}
 		$preview .= "<span id=p$qn></span> ";
 		$out .= "<script type=\"text/javascript\">intcalctoproc[$qn] = 1 ; calcformat[$qn] = '$answerformat';</script>\n";
@@ -1875,7 +1875,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$out .= "<canvas class=\"drawcanvas\" id=\"canvas$qn\" width=\"{$settings[6]}\" height=\"{$settings[7]}\"></canvas>";
 		if ($colorbox!='') { $out .= '</div>';}
 		$out .= "<div><span id=\"drawtools$qn\" class=\"drawtools\">";
-		$out .= "<span onclick=\"clearcanvas($qn)\">Clear All</span> Draw: ";
+		$out .= "<span onclick=\"clearcanvas($qn)\">" . _('Clear All') . "</span> " . _('Draw:') . " ";
 		if ($answerformat[0]=='inequality') {
 			$out .= "<img src=\"$imasroot/img/tpineq.gif\" onclick=\"settool(this,$qn,10)\" class=\"sel\"/>";
 			$out .= "<img src=\"$imasroot/img/tpineqdash.gif\" onclick=\"settool(this,$qn,10.2)\"/>";
@@ -1947,18 +1947,18 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					$out .= '<span ';
 				}
 				if ($answerformat[$i]=='line') {
-					$out .= "onclick=\"settool(this,$qn,0)\">Line</span>";
+					$out .= "onclick=\"settool(this,$qn,0)\">" . _('Line') . "</span>";
 				} else if ($answerformat[$i]=='lineseg') {
-					$out .= "onclick=\"settool(this,$qn,0.5)\">Line Segment</span>";
+					$out .= "onclick=\"settool(this,$qn,0.5)\">" . _('Line Segment') . "</span>";
 				} else if ($answerformat[$i]=='dot') {
-					$out .= "onclick=\"settool(this,$qn,1)\">Dot</span>";
+					$out .= "onclick=\"settool(this,$qn,1)\">" . _('Dot') . "</span>";
 				} else if ($answerformat[$i]=='opendot') {
-					$out .= "onclick=\"settool(this,$qn,2)\">Open Dot</span>";
+					$out .= "onclick=\"settool(this,$qn,2)\">" . _('Open Dot') . "</span>";
 				} else if ($answerformat[$i]=='polygon') {
-					$out .= "onclick=\"settool(this,$qn,0)\">Polygon</span>";
+					$out .= "onclick=\"settool(this,$qn,0)\">" . _('Polygon') . "</span>";
 					$dotline = 1;
 				} else if ($answerformat[$i]=='closedpolygon') {
-					$out .= "onclick=\"settool(this,$qn,0)\">Polygon</span>";
+					$out .= "onclick=\"settool(this,$qn,0)\">" . _('Polygon') . "</span>";
 					$dotline = 2;
 					$answerformat[$i] = 'polygon';
 				} 
@@ -1989,7 +1989,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$la = '[['.implode('],[',$la).']]';
 		
 		$out .= "drawla[$qn] = $la;</script>";
-		$tip = "Enter your answer by drawing on the graph.";
+		$tip = _('Enter your answer by drawing on the graph.');
 		if (isset($answers)) {
 			$saarr = array();
 			$ineqcolors = array("blue","red","green");
@@ -2108,7 +2108,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					$url = getasidfileurl($file);
 					$extension = substr($url,strrpos($url,'.')+1,3);
 					$filename = basename($file);
-					$out .= "<br/>Last file uploaded: <a href=\"$url\" target=\"_new\">$filename</a>";
+					$out .= "<br/>" . _('Last file uploaded:') . " <a href=\"$url\" target=\"_new\">$filename</a>";
 					$out .= "<input type=\"hidden\" name=\"lf$qn\" value=\"$file\"/>";
 					if (in_array(strtolower($extension),array('jpg','gif','png','bmp','jpe'))) {
 						$out .= " <span class=\"clickable\" id=\"filetog$qn\" onclick=\"toggleinlinebtn('img$qn','filetog$qn');\">[+]</span>";
@@ -2123,7 +2123,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$out .= "<br/>$la";
 			}
 		}
-		$tip .= "Select a file to upload";
+		$tip .= _('Select a file to upload');
 		$sa .= $answer;
 	}
 	
@@ -2342,7 +2342,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 		
 		if (!is_array($questions)) {
-			echo "Eeek!  \$questions is not defined or needs to be an array.  Make sure \$questions is defined in the Common Control section.";
+			echo _('Eeek!  $questions is not defined or needs to be an array.  Make sure $questions is defined in the Common Control section.');
 			return false;
 		}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
@@ -2385,7 +2385,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($options['scoremethod']))if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$qn];} else {$scoremethod = $options['scoremethod'];}
 		
 		if (!is_array($questions)) {
-			echo "Eeek!  \$questions is not defined or needs to be an array.  Make sure \$questions is defined in the Common Control section.";
+			echo _('Eeek!  $questions is not defined or needs to be an array.  Make sure $questions is defined in the Common Control section.');
 			return false;
 		}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
@@ -2441,7 +2441,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$qn];} else {$noshuffle = $options['noshuffle'];}}
 		
 		if (!is_array($questions) || !is_array($answers)) {
-			echo "Eeek!  \$questions or \$answers is not defined or needs to be an array.  Make sure both are defined in the Common Control section.";
+			echo _('Eeek!  $questions or $answers is not defined or needs to be an array.  Make sure both are defined in the Common Control section.');
 			return 0;
 		}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
@@ -2858,7 +2858,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				foreach ($aarr as $j=>$anans) {
 					if ($anans=='') {
 						if (isset($GLOBALS['teacherid'])) {
-							echo '<p>Debug info: empty, missingor invalid $answer </p>';
+							echo '<p>', _('Debug info: empty, missingor invalid $answer'), ' </p>';
 						}
 						return 0;
 					}
@@ -2875,7 +2875,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			foreach ($aarr as $j=>$anans) {
 				if ($anans=='') {
 					if (isset($GLOBALS['teacherid'])) {
-						echo '<p>Debug info: empty, missing, or invalid $answer </p>';
+						echo '<p>', _('Debug info: empty, missing, or invalid $answer'), ' </p>';
 					}
 					return 0;
 				}
@@ -3143,7 +3143,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				}
 			}
 			if ($cntnan==20 && isset($GLOBALS['teacherid'])) {
-				echo "<p>Debug info: function evaled to Not-a-number at all test points.  Check \$domain</p>";
+				echo "<p>", _('Debug info: function evaled to Not-a-number at all test points.  Check $domain'), "</p>";
 			}
 			if ($stunan>1) { //if more than 1 student NaN response
 				return 0;
@@ -4496,10 +4496,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($GLOBALS['scoremessages'] != '') {
 			$GLOBALS['scoremessages'] .= '<br/>';
 		}
-		$GLOBALS['scoremessages'] .= "Upload of $filename: ";
+		$GLOBALS['scoremessages'] .= sprintf(_('Upload of %s: '), $filename);
 		if (in_array($extension,$badextensions)) {
-			$GLOBALS['partlastanswer'] = "Error - Invalid file type";
-			$GLOBALS['scoremessages'] .= "Error - Invalid file type";
+			$GLOBALS['partlastanswer'] = _('Error - Invalid file type');
+			$GLOBALS['scoremessages'] .= _('Error - Invalid file type');
 			return 0;
 		}
 		//if($GLOBALS['isreview']) {echo 'TRUE';}
@@ -4513,13 +4513,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 			$s3asid = $GLOBALS['testsettings']['id']."/$randstr";
 		} else {
-			$GLOBALS['partlastanswer'] = "Error - no asid";
-			$GLOBALS['scoremessages'] .= "Error - no asid";
+			$GLOBALS['partlastanswer'] = _('Error - no asid');
+			$GLOBALS['scoremessages'] .= _('Error - no asid');
 			return 0;
 		}
 		if (is_numeric($s3asid) && $s3asid==0) {  //set in testquestion for preview
-			$GLOBALS['partlastanswer'] = "Error - File not uploaded in preview";
-			$GLOBALS['scoremessages'] .= "Error - File not uploaded in preview";
+			$GLOBALS['partlastanswer'] = _('Error - File not uploaded in preview');
+			$GLOBALS['scoremessages'] .= _('Error - File not uploaded in preview');
 			return 0;
 		}
 		/*
@@ -4539,18 +4539,18 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				}
 			} else {
 				//echo "Error storing file";
-				$GLOBALS['partlastanswer'] = "Error storing file";
-				$GLOBALS['scoremessages'] .= "Error storing file";
+				$GLOBALS['partlastanswer'] = _('Error storing file');
+				$GLOBALS['scoremessages'] .= _('Error storing file');
 			}
 			return 0;
 		} else {
 			//echo "Error uploading file";
 			if ($_FILES["qn$qn"]['error']==2 || $_FILES["qn$qn"]['error']==1) {
-				$GLOBALS['partlastanswer'] = "Error uploading file - file too big";
-				$GLOBALS['scoremessages'] .= "Error uploading file - file too big";
+				$GLOBALS['partlastanswer'] = _('Error uploading file - file too big');
+				$GLOBALS['scoremessages'] .= _('Error uploading file - file too big');
 			} else {
-				$GLOBALS['partlastanswer'] = "Error uploading file";
-				$GLOBALS['scoremessages'] .= "Error uploading file";
+				$GLOBALS['partlastanswer'] = _('Error uploading file');
+				$GLOBALS['scoremessages'] .= _('Error uploading file');
 			}
 			return 0;
 		}
@@ -4718,7 +4718,7 @@ function parsecomplex($v) {
 	//preg_match_all('/(\bi|i\b)/',$v,$matches,PREG_OFFSET_CAPTURE);
 	//if (count($matches[0])>1) {
 	if (substr_count($v,'i')>1) {
-		return 'error - more than 1 i in expression';
+		return _('error - more than 1 i in expression');
 	} else {
 		//$p = $matches[0][0][1];
 		$p = strpos($v,'i');
@@ -4753,14 +4753,14 @@ function parsecomplex($v) {
 			}
 			//which is bigger?
 			if ($p-$L>1 && $R-$p>1) {
-				return 'error - invalid form';
+				return _('error - invalid form');
 			} else if ($p-$L>1) {
 				$imag = substr($v,$L,$p-$L);
 				$real = substr($v,0,$L) . substr($v,$p+1);
 			} else if ($R-$p>1) {
 				if ($p>0) {
 					if ($v{$p-1}!='+' && $v{$p-1}!='-') {
-						return 'error - invalid form';
+						return _('error - invalid form');
 					}
 					$imag = $v{$p-1}.substr($v,$p+1+($v{$p+1}=='*'?1:0),$R-$p-1);
 					$real = substr($v,0,$p-1) . substr($v,$R);
@@ -4889,41 +4889,41 @@ function formathint($eword,$ansformats,$calledfrom, $islist=false,$doshort=false
 	$tip = '';
 	$shorttip = '';
 	if (in_array('fraction',$ansformats)) {
-		$tip .= "Enter $eword as a fraction (like 3/5 or 10/4) or as a whole number (like 4 or -2)";
-		$shorttip = $islist?'Enter a list of fractions or whole numbers':'Enter a fraction or whole number';
+		$tip .= sprintf(_('Enter %s as a fraction (like 3/5 or 10/4) or as a whole number (like 4 or -2)'), $eword);
+		$shorttip = $islist?_('Enter a list of fractions or whole numbers'):_('Enter a fraction or whole number');
 	} else if (in_array('reducedfraction',$ansformats)) {
-		$tip .= "Enter $eword as a reduced fraction (like 5/3, not 10/6) or as a whole number (like 4 or -2)";
-		$shorttip = $islist?'Enter a list of reduced fractions or whole numbers':'Enter a reduced fraction or whole number';
+		$tip .= sprintf(_('Enter %s as a reduced fraction (like 5/3, not 10/6) or as a whole number (like 4 or -2)'), $eword);
+		$shorttip = $islist?_('Enter a list of reduced fractions or whole numbers'):_('Enter a reduced fraction or whole number');
 	} else if (in_array('mixednumber',$ansformats)) {
-		$tip .= "Enter $eword as a reduced mixed number or as a whole number.  Example: 2 1/2 = 2 &frac12;";
-		$shorttip = $islist?'Enter a list of mixed numbers or whole numbers':'Enter a mixed number or whole number';
+		$tip .= sprintf(_('Enter %s as a reduced mixed number or as a whole number.  Example: 2 1/2 = 2 &frac12;'), $eword);
+		$shorttip = $islist?_('Enter a list of mixed numbers or whole numbers'):_('Enter a mixed number or whole number');
 	} else if (in_array('mixednumberorimproper',$ansformats)) {
-		$tip .= "Enter $eword as a reduced mixed number, reduced improper fraction, or as a whole number.  Example: 2 1/2 = 2 &frac12;";
-		$shorttip = $islist?'Enter a list of mixed numbers or whole numbers':'Enter a mixed number, improper fraction, or whole number';
+		$tip .= sprintf(_('Enter %s as a reduced mixed number, reduced improper fraction, or as a whole number.  Example: 2 1/2 = 2 &frac12;'), $eword);
+		$shorttip = $islist?_('Enter a list of mixed numbers or whole numbers'):_('Enter a mixed number, improper fraction, or whole number');
 	} else if (in_array('fracordec',$ansformats)) {
-		$tip .= "Enter $eword as a fraction (like 3/5 or 10/4), a whole number (like 4 or -2), or exact decimal (like 0.5 or 1.25)";
-		$shorttip = $islist?'Enter a list of fractions or exact decimals':'Enter a fraction or exact decimal';
+		$tip .= sprintf(_('Enter %s as a fraction (like 3/5 or 10/4), a whole number (like 4 or -2), or exact decimal (like 0.5 or 1.25)'), $eword);
+		$shorttip = $islist?_('Enter a list of fractions or exact decimals'):_('Enter a fraction or exact decimal');
 	} else if (in_array('scinot',$ansformats)) {
-		$tip .= "Enter $eword as in scientific notation.  Example: 3*10^2 = 3 &middot; 10<sup>2</sup>";
-		$shorttip = $islist?'Enter a list of numbers using scientific notation':'Enter a number using scientific notation';
+		$tip .= sprintf(_('Enter %s as in scientific notation.  Example: 3*10^2 = 3 &middot; 10<sup>2</sup>'), $eword);
+		$shorttip = $islist?_('Enter a list of numbers using scientific notation'):_('Enter a number using scientific notation');
 	} else {
-		$tip .= "Enter $eword as a number (like 5, -3, 2.2) or as a calculation (like 5/3, 2^3, 5+4)";
-		$shorttip = $islist?'Enter a list of mathematical expressions':'Enter a mathematical expression';
+		$tip .= sprintf(_('Enter %s as a number (like 5, -3, 2.2) or as a calculation (like 5/3, 2^3, 5+4)'), $eword);
+		$shorttip = $islist?_('Enter a list of mathematical expressions'):_('Enter a mathematical expression');
 	}
 	if ($calledfrom != 'calcmatrix') {
-		$tip .= "<br/>Enter DNE for Does Not Exist, oo for Infinity";
+		$tip .= "<br/>" . _('Enter DNE for Does Not Exist, oo for Infinity');
 	}
 	if (in_array('nodecimal',$ansformats)) {
-		$tip .= "<br/>Decimal values are not allowed";
+		$tip .= "<br/>" . _('Decimal values are not allowed');
 	} else if (isset($reqdecimals)) {
 		if ($reqdecimals == 0) {
-			$tip .= "<br/>Your answer should be accurate to the nearest whole number.";
+			$tip .= "<br/>" . _('Your answer should be accurate to the nearest whole number.');
 		} else {
-			$tip .= "<br/>Your answer should be accurate to $reqdecimals decimal places.";
+			$tip .= "<br/>" . sprintf(_('Your answer should be accurate to %d decimal places.'), $reqdecimals);
 		}
 	}
 	if (in_array('notrig',$ansformats)) {
-		$tip .= "<br/>Trig functions (sin,cos,etc.) are not allowed";
+		$tip .= "<br/>" . _('Trig functions (sin,cos,etc.) are not allowed');
 	} 	
 	if ($doshort) {
 		return array($tip,$shorttip);

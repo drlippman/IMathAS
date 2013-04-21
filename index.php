@@ -1,4 +1,5 @@
 <?php
+
 //IMathAS:  Alt main page
 //(c) 2010 David Lippman
 
@@ -246,18 +247,18 @@ require("header.php");
 $msgtotal = array_sum($newmsgcnt);
 echo '<div class="floatright" id="homelinkbox">';
 if ($myrights>5) {
-	echo "<a href=\"forms.php?action=chguserinfo\">Change User Info</a> | \n";
-	echo "<a href=\"forms.php?action=chgpwd\">Change Password</a> | \n";
+	echo "<a href=\"forms.php?action=chguserinfo\">", _('Change User Info'), "</a> | \n";
+	echo "<a href=\"forms.php?action=chgpwd\">", _('Change Password'), "</a> | \n";
 }
-echo '<a href="actions.php?action=logout">Log Out</a>';
-echo '<br/><a href="msgs/msglist.php?cid=0">Messages</a>';
+echo '<a href="actions.php?action=logout">', _('Log Out'), '</a>';
+echo '<br/><a href="msgs/msglist.php?cid=0">', _('Messages'), '</a>';
 if ($msgtotal>0) {
-	echo ' <a href="msgs/newmsglist.php?cid=0" class="newnote">New (' . $msgtotal . ')</a>';
+	echo ' <a href="msgs/newmsglist.php?cid=0" class="newnote">', sprintf(_('New (%d)'), $msgtotal), '</a>';
 }
 if ($myrights > 10) {
-	echo " | <a href=\"docs/docs.php\">Documentation</a>\n";
+	echo " | <a href=\"docs/docs.php\">", _('Documentation'), "</a>\n";
 } else if ($myrights > 9) {
-	echo " | <a href=\"help.php?section=usingimas\">Help</a>\n";
+	echo " | <a href=\"help.php?section=usingimas\">", _('Help'), "</a>\n";
 }
 		
 echo '</div>';
@@ -265,7 +266,7 @@ echo '<div class="pagetitle" id="headerhome"><h2>';
 if (isset($CFG['GEN']['hometitle'])) {
 	echo $CFG['GEN']['hometitle'];
 } else {
-	echo "Welcome to $installname, $userfullname";
+	echo _('Welcome to'), " $installname, $userfullname";
 }
 echo '</h2></div>';
 
@@ -284,14 +285,14 @@ for ($i=0; $i<3; $i++) {
 		switch ($pagelayout[$i][$j]) {
 			case 0: 
 				if ($myrights>10) {
-					printCourses($page_teacherCourseData,'Courses you\'re teaching','teach');
+					printCourses($page_teacherCourseData,_('Courses you\'re teaching'),'teach');
 				}
 				break;
 			case 1:
-				printCourses($page_tutorCourseData,'Courses you\'re tutoring','tutor');
+				printCourses($page_tutorCourseData,_('Courses you\'re tutoring'),'tutor');
 				break;
 			case 2: 
-				printCourses($page_studentCourseData,'Courses you\'re taking','take');
+				printCourses($page_studentCourseData,_('Courses you\'re taking'),'take');
 				break;
 			case 10:
 				printMessagesGadget();
@@ -319,47 +320,47 @@ function printCourses($data,$title,$type=null) {
 		echo '<li><a href="course/course.php?folder=0&cid='.$data[$i]['id'].'">';
 		echo $data[$i]['name'].'</a>';
 		if (isset($data[$i]['available']) && (($data[$i]['available']&1)==1)) {
-			echo ' <span style="color:green;">Hidden</span>';
+			echo ' <span style="color:green;">', _('Hidden'), '</span>';
 		}
 		if (isset($data[$i]['lockaid']) && $data[$i]['lockaid']>0) {
-			echo ' <span style="color:green;">Lockdown</span>';
+			echo ' <span style="color:green;">', _('Lockdown'), '</span>';
 		}
 		if ($shownewmsgnote && isset($newmsgcnt[$data[$i]['id']]) && $newmsgcnt[$data[$i]['id']]>0) {
-			echo ' <a class="newnote" href="msgs/msglist.php?cid='.$data[$i]['id'].'">Messages ('.$newmsgcnt[$data[$i]['id']].')</a>';
+			echo ' <a class="newnote" href="msgs/msglist.php?cid='.$data[$i]['id'].'">', sprintf(_('Messages (%d)'), $newmsgcnt[$data[$i]['id']]), '</a>';
 		}
 		if ($shownewpostnote && isset($newpostcnt[$data[$i]['id']]) && $newpostcnt[$data[$i]['id']]>0) {
-			echo ' <a class="newnote" href="forums/newthreads.php?cid='.$data[$i]['id'].'">Posts ('.$newpostcnt[$data[$i]['id']].')</a>';
+			echo ' <a class="newnote" href="forums/newthreads.php?cid='.$data[$i]['id'].'">', sprintf(_('Posts (%d)'), $newpostcnt[$data[$i]['id']]), '</a>';
 		}
 		
 		echo '</li>';
 	}
 	if ($type=='teach' && $myrights>39 && count($data)==0) {
-		echo '<li>To add a course, head to the Admin Page</li>';
+		echo '<li>', _('To add a course, head to the Admin Page'), '</li>';
 	}
 	echo '</ul>';
 	if ($type=='take') {
-		echo '<div class="center"><a class="abutton" href="forms.php?action=enroll">Enroll in a New Class</a></div>';
+		echo '<div class="center"><a class="abutton" href="forms.php?action=enroll">', _('Enroll in a New Class'), '</a></div>';
 	} else if ($type=='teach' && $myrights>39) {
-		echo '<div class="center"><a class="abutton" href="admin/admin.php">Admin Page</a></div>';
+		echo '<div class="center"><a class="abutton" href="admin/admin.php">', _('Admin Page'), '</a></div>';
 	}
 	echo '</div>';
 }
 
 function printMessagesGadget() {
 	global $page_newmessagelist, $page_coursenames;
-	echo '<div class="block"><h3>New messages</h3></div>';
+	echo '<div class="block"><h3>', _('New messages'), '</h3></div>';
 	echo '<div class="blockitems">';
 	if (count($page_newmessagelist)==0) {
-		echo '<p>No new messages</p>';
+		echo '<p>', _('No new messages'), '</p>';
 		echo '</div>';
 		return;
 	}
-	echo '<table class="gb" id="newmsglist"><thead><tr><th>Message</th><th>From</th><th>Course</th><th>Sent</th></tr></thead>';
+	echo '<table class="gb" id="newmsglist"><thead><tr><th>', _('Message'), '</th><th>', _('From'), '</th><th>', _('Course'), '</th><th>' ,_('Sent'), '</th></tr></thead>';
 	echo '<tbody>';
 	foreach ($page_newmessagelist as $line) {
 		echo '<tr>';
 		if (trim($line['title'])=='') {
-			$line['title'] = '[No Subject]';
+			$line['title'] = '['._('No Subject').']';
 		}
 		$n = 0;
 		while (strpos($line['title'],'Re: ')===0) {
@@ -387,10 +388,10 @@ function printMessagesGadget() {
 function printPostsGadget() {
 	global $page_newpostlist, $page_coursenames, $postthreads;
 	
-	echo '<div class="block"><h3>New forum posts</h3></div>';
+	echo '<div class="block"><h3>', _('New forum posts'), '</h3></div>';
 	echo '<div class="blockitems">';
 	if (count($page_newpostlist)==0) {
-		echo '<p>No new posts</p>';
+		echo '<p>', _('No new posts'), '</p>';
 		echo '</div>';
 		return;
 	}
@@ -403,13 +404,13 @@ function printPostsGadget() {
 		$threaddata[$tline['id']] = $tline;
 	}
 	
-	echo '<table class="gb" id="newpostlist"><thead><tr><th>Thread</th><th>Started By</th><th>Course</th><th>Last Post</th></tr></thead>';
+	echo '<table class="gb" id="newpostlist"><thead><tr><th>', _('Thread'), '</th><th>', _('Started By'), '</th><th>', _('Course'), '</th><th>', _('Last Post'), '</th></tr></thead>';
 	echo '<tbody>';
 	foreach ($page_newpostlist as $line) {
 		echo '<tr>';
 		$subject = $threaddata[$line['threadid']]['subject'];
 		if (trim($subject)=='') {
-			$subject = '[No Subject]';
+			$subject = '['._('No Subject').']';
 		}
 		$n = 0;
 		while (strpos($subject,'Re: ')===0) {
@@ -425,7 +426,7 @@ function printPostsGadget() {
 		echo $subject;
 		echo '</a></td>';
 		if ($threaddata[$line['threadid']]['isanon']==1) {
-			echo '<td>Anonymous</td>';
+			echo '<td>', _('Anonymous'), '</td>';
 		} else {
 			echo '<td>'.$threaddata[$line['threadid']]['LastName'].', '.$threaddata[$line['threadid']]['FirstName'].'</td>';
 		}

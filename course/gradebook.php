@@ -131,7 +131,7 @@ if ($isteacher) {
 		$calledfrom='gb';
 		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 		$curBreadcrumb .= "&gt; <a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; Confirm Change";
-		$pagetitle = "Unenroll Students";
+		$pagetitle = _('Unenroll Students');
 		include("unenroll.php");
 		include("../footer.php");
 		exit;
@@ -146,7 +146,7 @@ if ($isteacher) {
 		require("../header.php");
 		
 		echo '<div class="noPrint"><a href="#" onclick="window.print(); return false;">Print Reports</a> ';
-		echo '<a href="gradebook.php?'.$_SERVER['QUERY_STRING'].'">Back to Gradebook</a></div>';
+		echo '<a href="gradebook.php?'.$_SERVER['QUERY_STRING'].'">', _('Back to Gradebook'), '</a></div>';
 		if( isset($_POST['checked']) ) {
 			echo "<div id=\"tbl-container\">";
 			echo '<div id="bigcontmyTable"><div id="tblcontmyTable">';
@@ -382,7 +382,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	if (isset($studentid)) {
 		$stu = $userid;
 	}
-	$pagetitle = "Gradebook";
+	$pagetitle = _('Gradebook');
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 	$placeinhead .= '<script type="text/javascript">
 		function showhidefb(el,n) {
@@ -411,28 +411,28 @@ if (isset($studentid) || $stu!=0) { //show student view
 	
 	if (isset($_GET['from']) && $_GET['from']=="listusers") {
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-		echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt Student Grade Detail</div>\n";
+		echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt ", _('Student Grade Detail'), "</div>\n";
 	} else if ($isteacher || $istutor) {
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-		echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; Student Detail</div>";
+		echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; ", _('Student Detail'), "</div>";
 	} else {
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-		echo "&gt; Gradebook</div>";
+		echo "&gt; ", _('Gradebook'), "</div>";
 	}
 	if ($stu==-1) {
-		echo '<div id="headergradebook" class="pagetitle"><h2>Grade Book Averages </h2></div>';
+		echo '<div id="headergradebook" class="pagetitle"><h2>', _('Grade Book Averages'), ' </h2></div>';
 	} else {
-		echo '<div id="headergradebook" class="pagetitle"><h2>Grade Book Student Detail</h2></div>';
+		echo '<div id="headergradebook" class="pagetitle"><h2>', _('Grade Book Student Detail'), '</h2></div>';
 	}
 	if ($canviewall) {
 		echo "<div class=cpmid>";
-		echo 'Category: <select id="filtersel" onchange="chgfilter()">';
+		echo _('Category'), ': <select id="filtersel" onchange="chgfilter()">';
 		echo '<option value="-1" ';
 		if ($catfilter==-1) {echo "selected=1";}
-		echo '>All</option>';
+		echo '>', _('All'), '</option>';
 		echo '<option value="0" ';
 		if ($catfilter==0) { echo "selected=1";}
-		echo '>Default</option>';
+		echo '>', _('Default'), '</option>';
 		$query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid' ORDER BY name";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
@@ -442,28 +442,28 @@ if (isset($studentid) || $stu!=0) { //show student view
 		}
 		echo '<option value="-2" ';
 		if ($catfilter==-2) {echo "selected=1";}
-		echo '>Category Totals</option>';
+		echo '>', _('Category Totals'), '</option>';
 		echo '</select> | ';
-		echo "Not Counted: <select id=\"toggle2\" onchange=\"chgtoggle()\">";
-		echo "<option value=0 "; writeHtmlSelected($hidenc,0); echo ">Show all</option>";
-		echo "<option value=1 "; writeHtmlSelected($hidenc,1); echo ">Show stu view</option>";
-		echo "<option value=2 "; writeHtmlSelected($hidenc,2); echo ">Hide all</option>";
+		echo _('Not Counted:'), " <select id=\"toggle2\" onchange=\"chgtoggle()\">";
+		echo "<option value=0 "; writeHtmlSelected($hidenc,0); echo ">", _('Show all'), "</option>";
+		echo "<option value=1 "; writeHtmlSelected($hidenc,1); echo ">", _('Show stu view'), "</option>";
+		echo "<option value=2 "; writeHtmlSelected($hidenc,2); echo ">", _('Hide all'), "</option>";
 		echo "</select>";
-		echo " | Show: <select id=\"toggle3\" onchange=\"chgtoggle()\">";
-		echo "<option value=0 "; writeHtmlSelected($availshow,0); echo ">Past due</option>";
-		echo "<option value=3 "; writeHtmlSelected($availshow,3); echo ">Past &amp; Attempted</option>";
-		echo "<option value=4 "; writeHtmlSelected($availshow,4); echo ">Available Only</option>";
-		echo "<option value=1 "; writeHtmlSelected($availshow,1); echo ">Past &amp; Available</option>";
-		echo "<option value=2 "; writeHtmlSelected($availshow,2); echo ">All</option></select>";
-		echo " | Links: <select id=\"toggle1\" onchange=\"chgtoggle()\">";
-		echo "<option value=0 "; writeHtmlSelected($links,0); echo ">View/Edit</option>";
-		echo "<option value=1 "; writeHtmlSelected($links,1); echo ">Scores</option></select>";
+		echo " | ", _('Show:'), " <select id=\"toggle3\" onchange=\"chgtoggle()\">";
+		echo "<option value=0 "; writeHtmlSelected($availshow,0); echo ">", _('Past due'), "</option>";
+		echo "<option value=3 "; writeHtmlSelected($availshow,3); echo ">", _('Past &amp; Attempted'), "</option>";
+		echo "<option value=4 "; writeHtmlSelected($availshow,4); echo ">", _('Available Only'), "</option>";
+		echo "<option value=1 "; writeHtmlSelected($availshow,1); echo ">", _('Past &amp; Available'), "</option>";
+		echo "<option value=2 "; writeHtmlSelected($availshow,2); echo ">", _('All'), "</option></select>";
+		echo " | ", _('Links:'), " <select id=\"toggle1\" onchange=\"chgtoggle()\">";
+		echo "<option value=0 "; writeHtmlSelected($links,0); echo ">", _('View/Edit'), "</option>";
+		echo "<option value=1 "; writeHtmlSelected($links,1); echo ">", _('Scores'), "</option></select>";
 		echo '<input type="hidden" id="toggle4" value="'.$showpics.'" />';
 		echo '<input type="hidden" id="toggle5" value="'.$hidelocked.'" />';
 		echo "</div>";
 	}
 	gbstudisp($stu);
-	echo "<p>Meanings: IP-In Progress (some unattempted questions), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sub>d</sub> Dropped score.  <sup>e</sup> Has exception <sup>LP</sup> Used latepass  </p>\n";
+	echo "<p>", _('Meanings: IP-In Progress (some unattempted questions), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sub>d</sub> Dropped score.  <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "  </p>\n";
 	
 	require("../footer.php");
 	
@@ -487,10 +487,10 @@ if (isset($studentid) || $stu!=0) { //show student view
 	}
 	$placeinhead .= "\nfunction lockcol() { \n";
 	$placeinhead .= "var tog = ts.toggle(); ";
+	$placeinhead .= "document.cookie = 'gblhdr-$cid=1';\n document.getElementById(\"lockbtn\").value = \"" . _('Unlock headers') . "\"; ";
 	$placeinhead .= "if (tog==1) { "; //going to locked
-	$placeinhead .= "document.cookie = 'gblhdr-$cid=1';\n document.getElementById(\"lockbtn\").value = \"Unlock headers\"; ";
 	$placeinhead .= "} else {";
-	$placeinhead .= "document.cookie = 'gblhdr-$cid=0';\n document.getElementById(\"lockbtn\").value = \"Lock headers\"; ";
+	$placeinhead .= "document.cookie = 'gblhdr-$cid=0';\n document.getElementById(\"lockbtn\").value = \"" . _('Lock headers') . "\"; ";
 	//$placeinhead .= " var cont = document.getElementById(\"tbl-container\");\n";
 	//$placeinhead .= " if (cont.style.overflow == \"auto\") {\n";
 	//$placeinhead .= "   cont.style.height = \"auto\"; cont.style.overflow = \"visible\"; cont.style.border = \"0px\";";
@@ -500,7 +500,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	//$placeinhead .= "document.getElementById(\"myTable\").className = \"gbl\"; document.cookie = 'gblhdr-$cid=1'; ";
 	//$placeinhead .= "  document.getElementById(\"lockbtn\").value = \"Unlock headers\"; }";
 	$placeinhead .= "}}\n ";
-	$placeinhead .= "function cancellockcol() {document.cookie = 'gblhdr-$cid=0';\n document.getElementById(\"lockbtn\").value = \"Lock headers\";}\n"; 
+	$placeinhead .= "function cancellockcol() {document.cookie = 'gblhdr-$cid=0';\n document.getElementById(\"lockbtn\").value = \"" . _('Lock headers') . "\";}\n"; 
 	$placeinhead .= 'function highlightrow(el) { el.setAttribute("lastclass",el.className); el.className = "highlight";}';
 	$placeinhead .= 'function unhighlightrow(el) { el.className = el.getAttribute("lastclass");}';
 	$placeinhead .= "</script>\n";
@@ -508,40 +508,40 @@ if (isset($studentid) || $stu!=0) { //show student view
 	
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-	echo "&gt; Gradebook</div>";
+	echo "&gt; ", _('Gradebook'), "</div>";
 	echo "<form id=\"qform\" method=post action=\"gradebook.php?cid=$cid\">";
 	
-	echo '<div id="headergradebook" class="pagetitle"><h2>Gradebook <span class="red" id="newflag" style="font-size: 70%" >';
+	echo '<div id="headergradebook" class="pagetitle"><h2>', _('Gradebook'), ' <span class="red" id="newflag" style="font-size: 70%" >';
 	if (($coursenewflag&1)==1) {
-		echo 'New';
+		echo _('New');
 	}
 	echo '</span></h2></div>';
 	if ($isdiag) {
-		echo "<a href=\"gb-testing.php?cid=$cid\">View diagnostic gradebook</a>";
+		echo "<a href=\"gb-testing.php?cid=$cid\">", _('View diagnostic gradebook'), "</a>";
 	}
 	echo "<div class=cpmid>";
 	if ($isteacher) {
-		echo "Offline Grades: <a href=\"addgrades.php?cid=$cid&gbitem=new&grades=all\">Add</a>, ";
-		echo "<a href=\"chgoffline.php?cid=$cid\">Manage</a> | ";
+		echo _('Offline Grades:'), " <a href=\"addgrades.php?cid=$cid&gbitem=new&grades=all\">", _('Add'), "</a>, ";
+		echo "<a href=\"chgoffline.php?cid=$cid\">", _('Manage'), "</a> | ";
 		echo '<select id="exportsel" onchange="chgexport()">';
-		echo '<option value="0">Export to...</option>';
-		echo '<option value="1">... file</option>';
-		echo '<option value="2">... my email</option>';
-		echo '<option value="3">... other email</option></select> | ';
+		echo '<option value="0">', _('Export to...'), '</option>';
+		echo '<option value="1">', _('... file'), '</option>';
+		echo '<option value="2">', _('... my email'), '</option>';
+		echo '<option value="3">', _('... other email'), '</option></select> | ';
 		//echo "Export to <a href=\"gb-export.php?stu=$stu&cid=$cid&export=true\">File</a>, ";
 		//echo "<a href=\"gb-export.php?stu=$stu&cid=$cid&emailgb=me\">My Email</a>, or <a href=\"gb-export.php?stu=$stu&cid=$cid&emailgb=ask\">Other Email</a> | ";
-		echo "<a href=\"gbsettings.php?cid=$cid\">GB Settings</a> | ";
-		echo "<a href=\"gradebook.php?cid=$cid&stu=-1\">Averages</a> | ";
-		echo "<a href=\"gbcomments.php?cid=$cid&stu=0\">Comments</a> | ";
+		echo "<a href=\"gbsettings.php?cid=$cid\">", _('GB Settings'), "</a> | ";
+		echo "<a href=\"gradebook.php?cid=$cid&stu=-1\">", _('Averages'), "</a> | ";
+		echo "<a href=\"gbcomments.php?cid=$cid&stu=0\">", _('Comments'), "</a> | ";
 		echo "<input type=\"button\" id=\"lockbtn\" onclick=\"lockcol()\" value=\"";
 		if ($headerslocked) {
-			echo "Unlock headers";
+			echo _('Unlock headers');
 		} else {
-			echo "Lock headers";
+			echo _('Lock headers');
 		}
 		echo "\"/>";
-		echo ' | Color: <select id="colorsel" onchange="updateColors(this)">';
-		echo '<option value="0">None</option>';
+		echo ' | ', _('Color:'), ' <select id="colorsel" onchange="updateColors(this)">';
+		echo '<option value="0">', _('None'), '</option>';
 		for ($j=50;$j<90;$j+=($j<70?10:5)) {
 			for ($k=$j+($j<70?10:5);$k<100;$k+=($k<70?10:5)) {
 				echo "<option value=\"$j:$k\" ";
@@ -553,22 +553,22 @@ if (isset($studentid) || $stu!=0) { //show student view
 		}
 		echo '<option value="-1:-1" ';
 		if ($colorize == "-1:-1") { echo 'selected="selected" ';}
-		echo '>Active</option>';
+		echo '>', _('Active'), '</option>';
 		echo '</select>';
-		echo ' | <a href="#" onclick="chgnewflag(); return false;">NewFlag</a>';
+		echo ' | <a href="#" onclick="chgnewflag(); return false;">', _('NewFlag'), '</a>';
 		//echo '<input type="button" value="Pics" onclick="rotatepics()" />';
 		
 		echo "<br/>\n";
 		
 	}
 	
-	echo 'Category: <select id="filtersel" onchange="chgfilter()">';
+	echo _('Category:'), ' <select id="filtersel" onchange="chgfilter()">';
 	echo '<option value="-1" ';
 	if ($catfilter==-1) {echo "selected=1";}
-	echo '>All</option>';
+	echo '>', _('All'), '</option>';
 	echo '<option value="0" ';
 	if ($catfilter==0) { echo "selected=1";}
-	echo '>Default</option>';
+	echo '>', _('Default'), '</option>';
 	$query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid' ORDER BY name";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	while ($row = mysql_fetch_row($result)) {
@@ -578,33 +578,33 @@ if (isset($studentid) || $stu!=0) { //show student view
 	}
 	echo '<option value="-2" ';
 	if ($catfilter==-2) {echo "selected=1";}
-	echo '>Category Totals</option>';
+	echo '>', ('Category Totals'), '</option>';
 	echo '</select> | ';
-	echo "Not Counted: <select id=\"toggle2\" onchange=\"chgtoggle()\">";
-	echo "<option value=0 "; writeHtmlSelected($hidenc,0); echo ">Show all</option>";
-	echo "<option value=1 "; writeHtmlSelected($hidenc,1); echo ">Show stu view</option>";
-	echo "<option value=2 "; writeHtmlSelected($hidenc,2); echo ">Hide all</option>";
+	echo _('Not Counted:'), " <select id=\"toggle2\" onchange=\"chgtoggle()\">";
+	echo "<option value=0 "; writeHtmlSelected($hidenc,0); echo ">", _('Show all'), "</option>";
+	echo "<option value=1 "; writeHtmlSelected($hidenc,1); echo ">", _('Show stu view'), "</option>";
+	echo "<option value=2 "; writeHtmlSelected($hidenc,2); echo ">", _('Hide all'), "</option>";
 	echo "</select>";
-	echo " | Show: <select id=\"toggle3\" onchange=\"chgtoggle()\">";
-	echo "<option value=0 "; writeHtmlSelected($availshow,0); echo ">Past due</option>";
-	echo "<option value=3 "; writeHtmlSelected($availshow,3); echo ">Past &amp; Attempted</option>";
-	echo "<option value=4 "; writeHtmlSelected($availshow,4); echo ">Available Only</option>";
-	echo "<option value=1 "; writeHtmlSelected($availshow,1); echo ">Past &amp; Available</option>";
-	echo "<option value=2 "; writeHtmlSelected($availshow,2); echo ">All</option></select>";
-	echo " | Links: <select id=\"toggle1\" onchange=\"chgtoggle()\">";
-	echo "<option value=0 "; writeHtmlSelected($links,0); echo ">View/Edit</option>";
-	echo "<option value=1 "; writeHtmlSelected($links,1); echo ">Scores</option></select>";
-	echo " | Pics: <select id=\"toggle4\" onchange=\"chgtoggle()\">";
-	echo "<option value=0 "; writeHtmlSelected($showpics,0); echo ">None</option>";
-	echo "<option value=1 "; writeHtmlSelected($showpics,1); echo ">Small</option>";
-	echo "<option value=2 "; writeHtmlSelected($showpics,2); echo ">Big</option></select>";
+	echo " | ", _('Show:'), " <select id=\"toggle3\" onchange=\"chgtoggle()\">";
+	echo "<option value=0 "; writeHtmlSelected($availshow,0); echo ">", _('Past due'), "</option>";
+	echo "<option value=3 "; writeHtmlSelected($availshow,3); echo ">", _('Past &amp; Attempted'), "</option>";
+	echo "<option value=4 "; writeHtmlSelected($availshow,4); echo ">", _('Available Only'), "</option>";
+	echo "<option value=1 "; writeHtmlSelected($availshow,1); echo ">", _('Past &amp; Available'), "</option>";
+	echo "<option value=2 "; writeHtmlSelected($availshow,2); echo ">", _('All'), "</option></select>";
+	echo " | ", _('Links:'), " <select id=\"toggle1\" onchange=\"chgtoggle()\">";
+	echo "<option value=0 "; writeHtmlSelected($links,0); echo ">", _('View/Edit'), "</option>";
+	echo "<option value=1 "; writeHtmlSelected($links,1); echo ">", _('Scores'), "</option></select>";
+	echo " | ", _('Pics:'), " <select id=\"toggle4\" onchange=\"chgtoggle()\">";
+	echo "<option value=0 "; writeHtmlSelected($showpics,0); echo ">", _('None'), "</option>";
+	echo "<option value=1 "; writeHtmlSelected($showpics,1); echo ">", _('Small'), "</option>";
+	echo "<option value=2 "; writeHtmlSelected($showpics,2); echo ">", _('Big'), "</option></select>";
 	if (!$isteacher) {
 	
 		echo " | <input type=\"button\" id=\"lockbtn\" onclick=\"lockcol()\" value=\"";
 		if ($headerslocked) {
-			echo "Unlock headers";
+			echo _('Unlock headers');
 		} else {
-			echo "Lock headers";
+			echo _('Lock headers');
 		}
 		echo "\"/>\n";	
 	}
@@ -612,18 +612,18 @@ if (isset($studentid) || $stu!=0) { //show student view
 	echo "</div>";
 	
 	if ($isteacher) {
-		echo 'Check: <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',false)">None</a> ';
-		echo 'With Selected:  <input type="submit" name="posted" value="Print Report"/> <input type="submit" name="posted" value="E-mail"/> <input type="submit" name="posted" value="Message"/> ';
+		echo _('Check:'), ' <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',true)">', _('All'), '</a> <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',false)">', _('None'), '</a> ';
+		echo _('With Selected:'), '  <input type="submit" name="posted" value="', _('Print Report'), '"/> <input type="submit" name="posted" value="', _('E-mail'), '"/> <input type="submit" name="posted" value="', _('Message'), '"/> ';
 		if (!isset($CFG['GEN']['noInstrUnenroll'])) {
-			echo '<input type=submit name=posted value="Unenroll">';
+			echo '<input type=submit name=posted value="', _('Unenroll'), '">';
 		}
-		echo "<input type=submit name=posted value=\"Make Exception\"> ";
+		echo "<input type=submit name=posted value=\"", _('Make Exception'), "\"> ";
 	}
 	
 	$gbt = gbinstrdisp();
 	echo "</form>";
 	echo "</div>";
-	echo "Meanings:  IP-In Progress (some unattempted questions), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sup>*</sup> Has feedback, <sub>d</sub> Dropped score,  <sup>e</sup> Has exception <sup>LP</sup> Used latepass\n";
+	echo _('Meanings:  IP-In Progress (some unattempted questions), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sup>*</sup> Has feedback, <sub>d</sub> Dropped score,  <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "\n";
 	require("../footer.php");
 	
 	/*if ($isteacher) {
@@ -663,16 +663,17 @@ function gbstudisp($stu) {
 		echo '<div style="clear:both">';
 		if (mysql_num_rows($result)>0) {
 			if ($isteacher) {
-				echo '<a href="mailto:'.mysql_result($result,0,1).'">Email</a> | ';
-				echo "<a href=\"$imasroot/msgs/msglist.php?cid={$_GET['cid']}&add=new&to=$stu\">Message</a> | ";
-				echo "<a href=\"gradebook.php?cid={$_GET['cid']}&uid=$stu&massexception=1\">Make Exception</a> | ";
-				echo "<a href=\"listusers.php?cid={$_GET['cid']}&chgstuinfo=true&uid=$stu\">Change Info</a> | ";
-				echo "<a href=\"viewloginlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">Login Log</a> | ";
-				echo "<a href=\"#\" onclick=\"makeofflineeditable(this); return false;\">Edit Offline Scores</a>";
+				echo '<a href="mailto:'.mysql_result($result,0,1).'">', _('Email'), '</a> | ';
+				echo "<a href=\"$imasroot/msgs/msglist.php?cid={$_GET['cid']}&add=new&to=$stu\">", _('Message'), "</a> | ";
+				echo "<a href=\"gradebook.php?cid={$_GET['cid']}&uid=$stu&massexception=1\">", _('Make Exception'), "</a> | ";
+				echo "<a href=\"listusers.php?cid={$_GET['cid']}&chgstuinfo=true&uid=$stu\">", _('Change Info'), "</a> | ";
+				echo "<a href=\"viewloginlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Login Log'), "</a> | ";
+				echo "<a href=\"#\" onclick=\"makeofflineeditable(this); return false;\">", _('Edit Offline Scores'), "</a>";
 				
 			}
 			$gbcomment = mysql_result($result,0,0);
 			$latepasses = mysql_result($result,0,2);
+			//TODO i18n
 			if ($showlatepass==1) {
 				if ($latepasses==0) { $latepasses = 'No';}
 				if ($isteacher) {echo '<br/>';}
@@ -685,7 +686,7 @@ function gbstudisp($stu) {
 			if ($isteacher) {
 				echo "<form method=post action=\"gradebook.php?{$_SERVER['QUERY_STRING']}\">";
 				echo "<textarea name=\"usrcomments\" rows=3 cols=60>$gbcomment</textarea><br/>";
-				echo "<input type=submit value=\"Update Comment\">";
+				echo "<input type=submit value=\"", _('Update Comment'), "\">";
 				echo '</form>';
 			} else {
 				echo "<div class=\"item\">$gbcomment</div>";
@@ -700,12 +701,12 @@ function gbstudisp($stu) {
 	if ($stu>0 && $isteacher) {
 		echo '<th></th>';
 	}
-	echo '<th>Item</th><th>Possible</th><th>Grade</th><th>Percent</th>';
+	echo '<th>', _('Item'), '</th><th>', _('Possible'), '</th><th>', _('Grade'), '</th><th>', _('Percent'), '</th>';
 	if ($stu>0 && $isteacher) {
-		echo '<th>Time Spent (In Questions)</th>';
+		echo '<th>', _('Time Spent (In Questions)'), '</th>';
 	}
 	if ($stu>0) {
-		echo '<th>Feedback<br/><a href="#" class="small pointer" onclick="return showhideallfb(this);">[Show Feedback]</a></th>';
+		echo '<th>', _('Feedback'), '<br/><a href="#" class="small pointer" onclick="return showhideallfb(this);">', _('[Show Feedback]'), '</a></th>';
 	} 
 	echo '</tr></thead><tbody>';
 	if ($catfilter>-2) {
@@ -738,9 +739,9 @@ function gbstudisp($stu) {
 			echo '<td>';
 			
 			if ($gbt[0][1][$i][4]==0 || $gbt[0][1][$i][4]==3) {
-				echo $gbt[0][1][$i][2].' (Not Counted)';
+				echo $gbt[0][1][$i][2], ' ', _('(Not Counted)');
 			} else {
-				echo $gbt[0][1][$i][2].'&nbsp;pts';
+				echo $gbt[0][1][$i][2].'&nbsp;', _('pts');
 				if ($gbt[0][1][$i][4]==2) {
 					echo ' (EC)';
 				}
@@ -843,7 +844,7 @@ function gbstudisp($stu) {
 				if ($gbt[1][1][$i][1]=='') {
 					echo '<td></td>';
 				} else {
-					echo '<td><a href="#" class="small feedbacksh pointer" onclick="return showhidefb(this,'.$i.')">[Show Feedback]</a><span style="display:none;" id="feedbackholder'.$i.'">'.$gbt[1][1][$i][1].'</span></td>';
+					echo '<td><a href="#" class="small feedbacksh pointer" onclick="return showhidefb(this,'.$i.')">', _('[Show Feedback]'), '</a><span style="display:none;" id="feedbackholder'.$i.'">'.$gbt[1][1][$i][1].'</span></td>';
 				}
 			}
 			echo '</tr>';
@@ -856,24 +857,24 @@ function gbstudisp($stu) {
 		$show = mysql_result($result,0,0);
 		//echo '</tbody></table><br/>';
 		if ($isteacher && $stu>0) {
-			echo '<p><input type="submit" value="Save Changes" style="display:none"; id="savechgbtn" /> ';
-			echo 'Check: <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',false)">None</a> ';
-			echo 'With selected: <input type="submit" value="Make Exception" name="posted" /></p>';
+			echo '<p><input type="submit" value="', _('Save Changes'), '" style="display:none"; id="savechgbtn" /> ';
+			echo _('Check:'), ' <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',false)">', _('None'), '</a> ';
+			echo _('With selected:'), ' <input type="submit" value="', _('Make Exception'), '" name="posted" /></p>';
 		}
 		echo '<table class="gb"><thead>';
 		echo '<tr>';
-		echo '<th >Totals</th>';
+		echo '<th >', _('Totals'), '</th>';
 		if (($show&1)==1) {
-			echo '<th>Past Due</th>';
+			echo '<th>', _('Past Due'), '</th>';
 		}
 		if (($show&2)==2) {
-			echo '<th>Past Due and Attempted</th>';
+			echo '<th>', _('Past Due and Attempted'), '</th>';
 		} 
 		if (($show&4)==4) {
-			echo '<th>Past Due and Available</th>';
+			echo '<th>', _('Past Due and Available'), '</th>';
 		}
 		if (($show&8)==8) {
-			echo '<th>All</th>';
+			echo '<th>', _('All'), '</th>';
 		}
 		echo '</tr>';
 		echo '</thead><tbody>';
@@ -932,7 +933,7 @@ function gbstudisp($stu) {
 		if ($catfilter<0) {
 			echo '<tr class="grid">';
 			if (isset($gbt[0][3][0])) { //using points based
-				echo '<td>Total</td>';
+				echo '<td>', _('Total'), '</td>';
 				if (($show&1)==1) {
 					echo '<td>'.$gbt[1][3][0].'/'.$gbt[0][3][0].' ('.$gbt[1][3][3].'%)</td>';
 				}
@@ -947,7 +948,7 @@ function gbstudisp($stu) {
 				}
 				
 			} else {
-				echo '<td>Weighted Total</td>';
+				echo '<td>', _('Weighted Total'), '</td>';
 				if (($show&1)==1) { echo '<td>'.$gbt[1][3][0].'%</td>';}
 				if (($show&2)==2) {echo '<td>'.$gbt[1][3][6].'%</td>';}
 				if (($show&4)==4) {echo '<td>'.$gbt[1][3][1].'%</td>';}
@@ -1032,23 +1033,23 @@ function gbstudisp($stu) {
 		echo '</tbody></table><br/>';
 		echo '<p>';
 		if (($show&1)==1) {
-			echo '<b>Past Due</b> total only includes items whose due date has past.  Current assignments are not counted in this total.<br/>';
+			echo _('<b>Past Due</b> total only includes items whose due date has past.  Current assignments are not counted in this total.'), '<br/>';
 		}
 		if (($show&2)==2) {
-			echo '<b>Past Due and Attempted</b> total includes items whose due date has past, as well as currently available items you have started working on.<br/>';
+			echo _('<b>Past Due and Attempted</b> total includes items whose due date has past, as well as currently available items you have started working on.'), '<br/>';
 		} 
 		if (($show&4)==4) {
-			echo '<b>Past Due and Available</b> total includes items whose due date has past as well as currently available items, even if you haven\'t starting working on them yet.<br/>';
+			echo _('<b>Past Due and Available</b> total includes items whose due date has past as well as currently available items, even if you haven\'t starting working on them yet.'), '<br/>';
 		}
 		if (($show&8)==8) {
-			echo '<b>All</b> total includes all items: past, current, and future to-be-done items.';
+			echo _('<b>All</b> total includes all items: past, current, and future to-be-done items.');
 		}
 		echo '</p>';
 	}
 	
 	if ($hidepast && $isteacher && $stu>0) {
-		echo '<p><input type="submit" value="Save Changes" style="display:none"; id="savechgbtn" />';
-		echo '<input type="submit" value="Make Exception" name="massexception" /> for selected assessments</p>';
+		echo '<p><input type="submit" value="', _('Save Changes'), '" style="display:none"; id="savechgbtn" />';
+		echo '<input type="submit" value="', _('Make Exception'), '" name="massexception" /> ', _('for selected assessments'), '</p>';
 	}
 	
 	echo "</form>";
@@ -1094,7 +1095,7 @@ function gbinstrdisp() {
 		if (($gbt[0][0][$i]=='Section' || ($isdiag && $i==4)) && (!$istutor || $tutorsection=='')) {
 			echo "<br/><select id=\"secfiltersel\" onchange=\"chgsecfilter()\"><option value=\"-1\" ";
 			if ($secfilter==-1) {echo  'selected=1';}
-			echo  '>All</option>';
+			echo  '>', _('All'), '</option>';
 			$query = "SELECT DISTINCT section FROM imas_students WHERE courseid='$cid' ORDER BY section";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			while ($row = mysql_fetch_row($result)) {
@@ -1110,8 +1111,8 @@ function gbinstrdisp() {
 		} else if ($gbt[0][0][$i]=='Name') {
 			echo '<br/><span class="small">N='.(count($gbt)-2).'</span><br/>';
 			echo "<select id=\"toggle5\" onchange=\"chgtoggle()\">";
-			echo "<option value=0 "; writeHtmlSelected($hidelocked,0); echo ">Show Locked</option>";
-			echo "<option value=2 "; writeHtmlSelected($hidelocked,2); echo ">Hide Locked</option>";
+			echo "<option value=0 "; writeHtmlSelected($hidelocked,0); echo ">", _('Show Locked'), "</option>";
+			echo "<option value=2 "; writeHtmlSelected($hidelocked,2); echo ">", _('Hide Locked'), "</option>";
 			echo "</select>";
 		}
 		echo '</div></th>';
@@ -1122,11 +1123,11 @@ function gbinstrdisp() {
 		//total totals
 		if ($catfilter<0) {
 			if (isset($gbt[0][3][0])) { //using points based
-				echo '<th><div><span class="cattothdr">Total<br/>'.$gbt[0][3][$availshow].'&nbsp;pts</span></div></th>';
+				echo '<th><div><span class="cattothdr">', _('Total'), '<br/>'.$gbt[0][3][$availshow].'&nbsp;', _('pts'), '</span></div></th>';
 				echo '<th><div>%</div></th>';
 				$n+=2;
 			} else {
-				echo '<th><div><span class="cattothdr">Weighted Total %</span></div></th>';
+				echo '<th><div><span class="cattothdr">', _('Weighted Total %'), '</span></div></th>';
 				$n++;
 			}
 		}
@@ -1140,7 +1141,7 @@ function gbinstrdisp() {
 				echo '<th class="cat'.$gbt[0][2][$i][1].'"><div><span class="cattothdr">';
 				if ($availshow<3) {
 					echo $gbt[0][2][$i][0].'<br/>';
-					echo $gbt[0][2][$i][3+$availshow].'&nbsp;pts';
+					echo $gbt[0][2][$i][3+$availshow].'&nbsp;', _('pts');
 				} else if ($availshow==3) { //past and attempted
 					echo $gbt[0][2][$i][0];
 				}
@@ -1169,9 +1170,9 @@ function gbinstrdisp() {
 			//name and points
 			echo '<th class="cat'.$gbt[0][1][$i][1].'"><div>'.$gbt[0][1][$i][0].'<br/>';
 			if ($gbt[0][1][$i][4]==0 || $gbt[0][1][$i][4]==3) {
-				echo $gbt[0][1][$i][2].' (Not Counted)';
+				echo $gbt[0][1][$i][2], ' ', _('(Not Counted)');
 			} else {
-				echo $gbt[0][1][$i][2].'&nbsp;pts';
+				echo $gbt[0][1][$i][2].'&nbsp;', _('pts');
 				if ($gbt[0][1][$i][4]==2) {
 					echo ' (EC)';
 				}
@@ -1182,23 +1183,23 @@ function gbinstrdisp() {
 			//links
 			if ($gbt[0][1][$i][6]==0 ) { //online
 				if ($isteacher) {
-					echo "<br/><a class=small href=\"addassessment.php?id={$gbt[0][1][$i][7]}&amp;cid=$cid&amp;from=gb\">[Settings]</a>";
-					echo "<br/><a class=small href=\"isolateassessgrade.php?cid=$cid&amp;aid={$gbt[0][1][$i][7]}\">[Isolate]</a>";
+					echo "<br/><a class=small href=\"addassessment.php?id={$gbt[0][1][$i][7]}&amp;cid=$cid&amp;from=gb\">", _('[Settings]'), "</a>";
+					echo "<br/><a class=small href=\"isolateassessgrade.php?cid=$cid&amp;aid={$gbt[0][1][$i][7]}\">", _('[Isolate]'), "</a>";
 					if ($gbt[0][1][$i][10]==true) {
-						echo "<br/><a class=small href=\"isolateassessbygroup.php?cid=$cid&amp;aid={$gbt[0][1][$i][7]}\">[By Group]</a>";
+						echo "<br/><a class=small href=\"isolateassessbygroup.php?cid=$cid&amp;aid={$gbt[0][1][$i][7]}\">", _('[By Group]'), "</a>";
 					}
 				} else {
-					echo "<br/><a class=small href=\"isolateassessgrade.php?cid=$cid&amp;aid={$gbt[0][1][$i][7]}\">[Isolate]</a>";
+					echo "<br/><a class=small href=\"isolateassessgrade.php?cid=$cid&amp;aid={$gbt[0][1][$i][7]}\">", _('[Isolate]'), "</a>";
 				}
 			} else if ($gbt[0][1][$i][6]==1  && ($isteacher || ($istutor && $gbt[0][1][$i][8]==1))) { //offline
 				if ($isteacher) {
-					echo "<br/><a class=small href=\"addgrades.php?stu=$stu&amp;cid=$cid&amp;grades=all&amp;gbitem={$gbt[0][1][$i][7]}\">[Settings]</a>";
-					echo "<br/><a class=small href=\"addgrades.php?stu=$stu&amp;cid=$cid&amp;grades=all&amp;gbitem={$gbt[0][1][$i][7]}&amp;isolate=true\">[Isolate]</a>";
+					echo "<br/><a class=small href=\"addgrades.php?stu=$stu&amp;cid=$cid&amp;grades=all&amp;gbitem={$gbt[0][1][$i][7]}\">", _('[Settings]'), "</a>";
+					echo "<br/><a class=small href=\"addgrades.php?stu=$stu&amp;cid=$cid&amp;grades=all&amp;gbitem={$gbt[0][1][$i][7]}&amp;isolate=true\">", _('[Isolate]'), "</a>";
 				} else {
-					echo "<br/><a class=small href=\"addgrades.php?stu=$stu&amp;cid=$cid&amp;grades=all&amp;gbitem={$gbt[0][1][$i][7]}&amp;isolate=true\">[Scores]</a>";
+					echo "<br/><a class=small href=\"addgrades.php?stu=$stu&amp;cid=$cid&amp;grades=all&amp;gbitem={$gbt[0][1][$i][7]}&amp;isolate=true\">", _('[Scores]'), "</a>";
 				}
 			} else if ($gbt[0][1][$i][6]==2  && $isteacher) { //discussion
-				echo "<br/><a class=small href=\"addforum.php?id={$gbt[0][1][$i][7]}&amp;cid=$cid&amp;from=gb\">[Settings]</a>";
+				echo "<br/><a class=small href=\"addforum.php?id={$gbt[0][1][$i][7]}&amp;cid=$cid&amp;from=gb\">", _('[Settings]'), "</a>";
 			}
 			
 			echo '</div></th>';
@@ -1216,7 +1217,7 @@ function gbinstrdisp() {
 				echo '<th class="cat'.$gbt[0][2][$i][1].'"><div><span class="cattothdr">';
 				if ($availshow<3) {
 					echo $gbt[0][2][$i][0].'<br/>';
-					echo $gbt[0][2][$i][3+$availshow].'&nbsp;pts';
+					echo $gbt[0][2][$i][3+$availshow].'&nbsp;', _('pts');
 				} else if ($availshow==3) { //past and attempted
 					echo $gbt[0][2][$i][0];
 				}
@@ -1227,11 +1228,11 @@ function gbinstrdisp() {
 		//total totals
 		if ($catfilter<0) {
 			if (isset($gbt[0][3][0])) { //using points based
-				echo '<th><div><span class="cattothdr">Total<br/>'.$gbt[0][3][$availshow].'&nbsp;pts</span></div></th>';
+				echo '<th><div><span class="cattothdr">', _('Total'), '<br/>'.$gbt[0][3][$availshow].'&nbsp;', _('pts'), '</span></div></th>';
 				echo '<th><div>%</div></th>';
 				$n+=2;
 			} else {
-				echo '<th><div><span class="cattothdr">Weighted Total %</span></div></th>';
+				echo '<th><div><span class="cattothdr">', _('Weighted Total %'), '</span></div></th>';
 				$n++;
 			}
 		}
@@ -1305,7 +1306,7 @@ function gbinstrdisp() {
 						//echo '<td class="c">'.$gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)</td>';
 						echo '<td class="c">'.$insdiv;
 						if ($gbt[$i][0][0]=='Averages' && $availshow!=3) {
-							echo "<span onmouseover=\"tipshow(this,'5-number summary: {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
+							echo "<span onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
 						}
 						echo $gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)';
 	
@@ -1317,7 +1318,7 @@ function gbinstrdisp() {
 						//echo '<td class="c">'.$gbt[$i][2][$j][$availshow].'</td>';
 						echo '<td class="c">'.$insdiv;
 						if ($gbt[$i][0][0]=='Averages') {
-							echo "<span onmouseover=\"tipshow(this,'5-number summary: {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
+							echo "<span onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
 						}
 						if ($availshow==3) {
 							if ($gbt[$i][0][0]=='Averages') {
@@ -1369,7 +1370,7 @@ function gbinstrdisp() {
 							
 						} else if ($gbt[$i][1][$j][4]=='average') {
 							echo "<a href=\"gb-itemanalysis.php?stu=$stu&amp;cid=$cid&amp;asid={$gbt[$i][1][$j][4]}&amp;aid={$gbt[0][1][$j][7]}\" "; 
-							echo "onmouseover=\"tipshow(this,'5-number summary: {$gbt[0][1][$j][9]}')\" onmouseout=\"tipout()\" ";
+							echo "onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gbt[0][1][$j][9]}')\" onmouseout=\"tipout()\" ";
 							echo ">";
 						} else {
 							echo "<a href=\"gb-viewasid.php?stu=$stu&amp;cid=$cid&amp;asid={$gbt[$i][1][$j][4]}&amp;uid={$gbt[$i][4][0]}\">";
@@ -1419,7 +1420,7 @@ function gbinstrdisp() {
 					if ($isteacher) {
 						if ($gbt[$i][0][0]=='Averages') {
 							echo "<a href=\"addgrades.php?stu=$stu&amp;cid=$cid&amp;grades=all&amp;gbitem={$gbt[0][1][$j][7]}\" ";
-							echo "onmouseover=\"tipshow(this,'5-number summary: {$gbt[0][1][$j][9]}')\" onmouseout=\"tipout()\" ";
+							echo "onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gbt[0][1][$j][9]}')\" onmouseout=\"tipout()\" ";
 							echo ">";
 						} else {
 							echo "<a href=\"addgrades.php?stu=$stu&amp;cid=$cid&amp;grades={$gbt[$i][4][0]}&amp;gbitem={$gbt[0][1][$j][7]}\">";
@@ -1452,7 +1453,7 @@ function gbinstrdisp() {
 							echo $gbt[$i][1][$j][0];
 							echo '</a>';
 						} else {
-							echo "<span onmouseover=\"tipshow(this,'5-number summary: {$gbt[0][1][$j][9]}')\" onmouseout=\"tipout()\"> ";
+							echo "<span onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gbt[0][1][$j][9]}')\" onmouseout=\"tipout()\"> ";
 							echo $gbt[$i][1][$j][0];
 							echo '</span>';
 						}
@@ -1487,7 +1488,7 @@ function gbinstrdisp() {
 						//echo '<td class="c">'.$gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)</td>';
 						echo '<td class="c">'.$insdiv;
 						if ($gbt[$i][0][0]=='Averages' && $availshow!=3) {
-							echo "<span onmouseover=\"tipshow(this,'5-number summary: {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
+							echo "<span onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
 						}
 						echo $gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)';
 	
@@ -1499,7 +1500,7 @@ function gbinstrdisp() {
 						//echo '<td class="c">'.$gbt[$i][2][$j][$availshow].'</td>';
 						echo '<td class="c">'.$insdiv;
 						if ($gbt[$i][0][0]=='Averages' && $availshow<3) {
-							echo "<span onmouseover=\"tipshow(this,'5-number summary: {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
+							echo "<span onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
 						}
 						if ($availshow==3) {
 							if ($gbt[$i][0][0]=='Averages') {

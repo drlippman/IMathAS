@@ -79,12 +79,12 @@ function enditem($canedit) {
 				echo generatemoveselect($i,count($items),$parent,$blocklist);
 			}
 			if ($items[$i]['startdate']==0) {
-				$startdate = "Always";
+				$startdate = _('Always');
 			} else {
 				$startdate = formatdate($items[$i]['startdate']);
 			}
 			if ($items[$i]['enddate']==2000000000) {
-				$enddate = "Always";
+				$enddate = _('Always');
 			} else {
 				$enddate = formatdate($items[$i]['enddate']);
 			}
@@ -92,13 +92,13 @@ function enditem($canedit) {
 			$bnum = $i+1;
 			if (in_array($items[$i]['id'],$openblocks)) { $isopen=true;} else {$isopen=false;}
 			if (strlen($items[$i]['SH'])==1 || $items[$i]['SH'][1]=='O') {
-				$availbeh = "Expanded";
+				$availbeh = _('Expanded');
 			} else if ($items[$i]['SH'][1]=='F') {
-				$availbeh = "as Folder";
+				$availbeh = _('as Folder');
 			} else if ($items[$i]['SH'][1]=='T') {
-				$availbeh = "as TreeReader";
+				$availbeh = _('as TreeReader');
 			} else {
-				$availbeh = "Collapsed";
+				$availbeh = _('Collapsed');
 			}
 			if ($items[$i]['colors']=='') {
 				$titlebg = '';
@@ -114,9 +114,9 @@ function enditem($canedit) {
 					$isopen = true;
 				}
 				if ($items[$i]['avail']==2) {
-					$show = "Showing $availbeh Always";
+					$show = sprintf(_('Showing %s Always'), $availbeh);
 				} else {
-					$show = "Showing $availbeh $startdate until $enddate";
+					$show = sprintf(_('Showing %1$s %2$s until %3$s'), $availbeh, $startdate, $enddate);
 				}
 				if (strlen($items[$i]['SH'])>1 && $items[$i]['SH'][1]=='F') { //show as folder
 					if ($canedit) {
@@ -150,7 +150,7 @@ function enditem($canedit) {
 						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle><b>{$items[$i]['name']}</b></a> ";
 					}
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
-						echo "<span style=\"color:red;\">New</span>";
+						echo "<span style=\"color:red;\">", _('New'), "</span>";
 					}
 					if ($viewall) { 
 						echo '<span class="instrdates">';
@@ -159,9 +159,9 @@ function enditem($canedit) {
 					}
 					if ($canedit) {
 						echo '<span class="instronly">';
-						echo "<a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
-						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\" $astyle>Copy</a>";
-						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>NewFlag</a>";
+						echo "<a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>", _('Modify'), "</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>", _('Delete'), "</a>";
+						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\" $astyle>", _('Copy'), "</a>";
+						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>", _('NewFlag'), "</a>";
 						echo '</span>';
 					}
 					if (($hideicons&16)==0) {
@@ -203,7 +203,7 @@ function enditem($canedit) {
 						echo "<a href=\"treereader.php?cid=$cid&folder=$parent-$bnum\" $astyle><b>{$items[$i]['name']}</b></a> ";
 					}
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
-						echo "<span style=\"color:red;\">New</span>";
+						echo "<span style=\"color:red;\">", _('New'), "</span>";
 					}
 					if ($viewall) { 
 						echo '<span class="instrdates">';
@@ -212,9 +212,9 @@ function enditem($canedit) {
 					}
 					if ($canedit) {
 						echo '<span class="instronly">';
-						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>Edit Contents</a> | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
-						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\" $astyle>Copy</a>";
-						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>NewFlag</a>";
+						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>", _('Edit Contents'), "</a> | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>", _('Modify'), "</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>", _('Delete'), "</a>";
+						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\" $astyle>", _('Copy'), "</a>";
+						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>", _('NewFlag'), "</a>";
 						echo '</span>';
 					}
 					if (($hideicons&16)==0) {
@@ -245,19 +245,19 @@ function enditem($canedit) {
 					if (($hideicons&16)==0) {
 						echo "<span class=left>";
 						echo "<img alt=\"expand/collapse\" style=\"cursor:pointer;\" id=\"img{$items[$i]['id']}\" src=\"$imasroot/img/";
-						if ($isopen) {echo "collapse";} else {echo "expand";}
+						if ($isopen) {echo _('collapse');} else {echo _('expand');}
 						echo ".gif\" onClick=\"toggleblock('{$items[$i]['id']}','$parent-$bnum')\" /></span>";
 						echo "<div class=title>";
 					}
 					if (!$canedit) {
 						echo '<span class="right">';
-						echo "<a href=\"".($ispublic?"public":"course").".php?cid=$cid&folder=$parent-$bnum\" $astyle>Isolate</a>";
+						echo "<a href=\"".($ispublic?"public":"course").".php?cid=$cid&folder=$parent-$bnum\" $astyle>", _('Isolate'), "</a>";
 						echo '</span>';
 					}
 					echo "<span class=pointer onClick=\"toggleblock('{$items[$i]['id']}','$parent-$bnum')\">";
 					echo "<b><a href=\"#\" onclick=\"return false;\" $astyle>{$items[$i]['name']}</a></b></span> ";
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
-						echo "<span style=\"color:red;\">New</span>";
+						echo "<span style=\"color:red;\">", _('New'), "</span>";
 					}
 					if ($viewall) { 
 						echo '<span class="instrdates">';
@@ -266,9 +266,9 @@ function enditem($canedit) {
 					}
 					if ($canedit) {
 						echo '<span class="instronly">';
-						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>Isolate</a> | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
-						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\" $astyle>Copy</a>";
-						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>NewFlag</a>";
+						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>", _('Isolate'), "</a> | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>", _('Modify'), "</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>", _('Delete'), "</a>";
+						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\" $astyle>", _('Copy'), "</a>";
+						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>", _('NewFlag'), "</a>";
 						echo '</span>';
 					} 
 					if (($hideicons&16)==0) {
@@ -303,27 +303,27 @@ function enditem($canedit) {
 						showitems($items[$i]['items'],$parent.'-'.$bnum,$inpublic||$turnonpublic);
 						//if (isset($teacherid) && count($items[$i]['items'])>0) {echo generateadditem($parent.'-'.$bnum,'b');}
 					} else {
-						echo "Loading content...";
+						echo _('Loading content...');
 					}
 					
 					echo "</div>";
 				}
 			} else if ($viewall || ($items[$i]['SH'][0]=='S' && $items[$i]['avail']>0)) { //if "unavailable"
 				if ($items[$i]['avail']==0) {
-					$show = "Hidden";
+					$show = _('Hidden');
 				} else if ($items[$i]['SH'][0] == 'S') {
-					$show = "Currently Showing";
+					$show = _('Currently Showing');
 					if (strlen($items[$i]['SH'])>1 && $items[$i]['SH'][1]=='F') {
-						$show .= " as Folder. ";
+						$show .= _(' as Folder. ');
 					} else if (strlen($items[$i]['SH'])>1 && $items[$i]['SH'][1]=='T') {
-						$show .= " as TreeReader. ";
+						$show .= _(' as TreeReader. ');
 					} else {
-						$show .= " Collapsed. ";
+						$show .= _(' Collapsed. ');
 					}
-					$show .= "Showing $availbeh $startdate to $enddate";
+					$show .= sprintf(_('Showing %1$s %2$s to %3$s'), $availbeh, $startdate, $enddate);
 				} else { //currently hidden, using dates
 					$show = "Currently Hidden. ";
-					$show .= "Showing $availbeh $startdate to $enddate";
+					$show .= sprintf(_('Showing %1$s %2$s to %3$s'), $availbeh, $startdate, $enddate);
 				}
 				if (strlen($items[$i]['SH'])>1 && $items[$i]['SH'][1]=='F') { //show as folder
 					if ($canedit) {
@@ -349,7 +349,7 @@ function enditem($canedit) {
 					echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle><b>";
 					if ($items[$i]['SH'][0]=='S') {echo "{$items[$i]['name']}</b></a> ";} else {echo "<i>{$items[$i]['name']}</i></b></a>";}
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
-						echo " <span style=\"color:red;\">New</span>";
+						echo " <span style=\"color:red;\">", _('New'), "</span>";
 					}
 					if ($viewall) { 
 						echo '<span class="instrdates">';
@@ -358,9 +358,9 @@ function enditem($canedit) {
 					}
 					if ($canedit) {
 						echo '<span class="instronly">';
-						echo "<a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
-						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">Copy</a>";
-						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>NewFlag</a>";
+						echo "<a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>", _('Modify'), "</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>", _('Delete'), "</a>";
+						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">", _('Copy'), "</a>";
+						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>", _('NewFlag'), "</a>";
 						echo '</span>';
 					}
 					
@@ -396,7 +396,7 @@ function enditem($canedit) {
 					echo "<a href=\"treereader.php?cid=$cid&folder=$parent-$bnum\" $astyle><b>";
 					if ($items[$i]['SH'][0]=='S') {echo "{$items[$i]['name']}</b></a> ";} else {echo "<i>{$items[$i]['name']}</i></b></a>";}
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
-						echo " <span style=\"color:red;\">New</span>";
+						echo " <span style=\"color:red;\">", _('New'), "</span>";
 					}
 					if ($viewall) { 
 						echo '<span class="instrdates">';
@@ -405,9 +405,9 @@ function enditem($canedit) {
 					}
 					if ($canedit) {
 						echo '<span class="instronly">';
-						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>Edit Contents</a> | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
-						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">Copy</a>";
-						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>NewFlag</a>";
+						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>", _('Edit Contents'), "</a> | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>", _('Modify'), "</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>", _('Delete'), "</a>";
+						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">", _('Copy'), "</a>";
+						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>", _('NewFlag'), "</a>";
 						echo '</span>';
 					}
 					
@@ -438,13 +438,13 @@ function enditem($canedit) {
 					if (($hideicons&16)==0) {
 						echo "<span class=left>";
 						echo "<img alt=\"expand/collapse\" style=\"cursor:pointer;\" id=\"img{$items[$i]['id']}\" src=\"$imasroot/img/";
-						if ($isopen) {echo "collapse";} else {echo "expand";}
+						if ($isopen) {echo _('collapse');} else {echo _('expand');}
 						echo ".gif\" onClick=\"toggleblock('{$items[$i]['id']}','$parent-$bnum')\" /></span>";
 						echo "<div class=title>";
 					}
 					if (!$canedit) {
 						echo '<span class="right">';
-						echo "<a href=\"".($ispublic?"public":"course").".php?cid=$cid&folder=$parent-$bnum\" $astyle>Isolate</a>";
+						echo "<a href=\"".($ispublic?"public":"course").".php?cid=$cid&folder=$parent-$bnum\" $astyle>", _('Isolate'), "</a>";
 						echo '</span>';
 					}
 					echo "<span class=pointer onClick=\"toggleblock('{$items[$i]['id']}','$parent-$bnum')\">";
@@ -456,7 +456,7 @@ function enditem($canedit) {
 					}
 					echo "</b></span> ";
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
-						echo "<span style=\"color:red;\">New</span>";
+						echo "<span style=\"color:red;\">", _('New'), "</span>";
 					}
 					if ($viewall) {
 						echo '<span class="instrdates">';
@@ -465,10 +465,10 @@ function enditem($canedit) {
 					}
 					if ($canedit) {
 						echo '<span class="instronly">';
-						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>Isolate</a> | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>Modify</a>";
-						echo " | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>Delete</a>";
-						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">Copy</a>";
-						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>NewFlag</a>";
+						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>", _('Isolate'), "</a> | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>", _('Modify'), "</a>";
+						echo " | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>", _('Delete'), "</a>";
+						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">", _('Copy'), "</a>";
+						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>", _('NewFlag'), "</a>";
 						echo '</span>';
 					} 
 					if (($hideicons&16)==0) {
@@ -507,7 +507,7 @@ function enditem($canedit) {
 						
 						//if (isset($teacherid) && count($items[$i]['items'])>0) {echo generateadditem($parent.'-'.$bnum,'b');}
 					} else {
-						echo "Loading content...";
+						echo _('Loading content...');
 					}
 					echo "</div>";	
 				}
@@ -529,8 +529,8 @@ function enditem($canedit) {
 			   beginitem($canedit);
 			   if ($canedit) {
 				   echo '<span class="instronly">';
-				   echo "<a href=\"addcalendar.php?id={$items[$i]}&block=$parent&cid=$cid&remove=true\">Delete</a>";
-				   echo " | <a id=\"mcelink\" href=\"managecalitems.php?cid=$cid\">Manage Events</a>";
+				   echo "<a href=\"addcalendar.php?id={$items[$i]}&block=$parent&cid=$cid&remove=true\">", _('Delete'), "</a>";
+				   echo " | <a id=\"mcelink\" href=\"managecalitems.php?cid=$cid\">", _('Manage Events'), "</a>";
 				   echo '</span>';
 			   }
 			   showcalendar("course");
@@ -560,17 +560,17 @@ function enditem($canedit) {
 			   }
 			   
 			   if ($line['startdate']==0) {
-				   $startdate = "Always";
+				   $startdate = _('Always');
 			   } else {
 				   $startdate = formatdate($line['startdate']);
 			   }
 			   if ($line['enddate']==2000000000) {
-				   $enddate = "Never";
+				   $enddate = _('Never');
 			   } else {
 				   $enddate =formatdate($line['enddate']);
 			   }
 			   if ($line['reviewdate']==2000000000) {
-				   $reviewdate = "Always";
+				   $reviewdate = _('Always');
 			   } else {
 				   $reviewdate = formatdate($line['reviewdate']);
 			   }
@@ -597,9 +597,9 @@ function enditem($canedit) {
 					   }
 				   }
 				   if (substr($line['deffeedback'],0,8)=='Practice') {
-					   $endname = "Available until";
+					   $endname = _('Available until');
 				   } else {
-					   $endname = "Due";
+					   $endname = _('Due');
 				   }
 				   $line['timelimit'] = abs($line['timelimit']);
 				   if ($line['timelimit']>0) {
@@ -608,28 +608,28 @@ function enditem($canedit) {
 						$tlrem = $line['timelimit'] % 3600;
 						$tlmin = floor($tlrem/60);
 						$tlsec = $tlrem % 60;
-						$tlwrds = "$tlhrs hour";
+						$tlwrds = "$tlhrs " . _('hour');
 						if ($tlhrs > 1) { $tlwrds .= "s";}
-						if ($tlmin > 0) { $tlwrds .= ", $tlmin minute";}
+						if ($tlmin > 0) { $tlwrds .= ", $tlmin " . _('minute');}
 						if ($tlmin > 1) { $tlwrds .= "s";}
-						if ($tlsec > 0) { $tlwrds .= ", $tlsec second";}
+						if ($tlsec > 0) { $tlwrds .= ", $tlsec " . _('second');}
 						if ($tlsec > 1) { $tlwrds .= "s";}
 					} else if ($line['timelimit']>60) {
 						$tlmin = floor($line['timelimit']/60);
 						$tlsec = $line['timelimit'] % 60;
-						$tlwrds = "$tlmin minute";
+						$tlwrds = "$tlmin " . _('minute');
 						if ($tlmin > 1) { $tlwrds .= "s";}
-						if ($tlsec > 0) { $tlwrds .= ", $tlsec second";}
+						if ($tlsec > 0) { $tlwrds .= ", $tlsec " . _('second');}
 						if ($tlsec > 1) { $tlwrds .= "s";}
 					} else {
-						$tlwrds = $line['timelimit'] . " second(s)";
+						$tlwrds = $line['timelimit'] . _(' second(s)');
 					}
 				   } else {
 					   $tlwrds = '';
 				   }
 				   echo "<div class=title><b><a href=\"../assessment/showtest.php?id=$typeid&cid=$cid\" ";
 				   if ($tlwrds != '') {
-					   echo "onclick='return confirm(\"This assessment has a time limit of $tlwrds.  Click OK to start or continue working on the assessment.\")' ";
+					   echo "onclick='return confirm(\"", sprintf(_('This assessment has a time limit of %s.  Click OK to start or continue working on the assessment.'), $tlwrds), "\")' ";
 				   }
 				   echo ">{$line['name']}</a></b>";
 				   if ($line['enddate']!=2000000000) {
@@ -639,23 +639,23 @@ function enditem($canedit) {
 
 					echo '<span class="instronly">';
 					if ($line['allowlate']==1) {
-						echo ' <span onmouseover="tipshow(this,\'LatePasses Allowed\')" onmouseout="tipout()">LP</span> |';
+						echo ' <span onmouseover="tipshow(this,\'', _('LatePasses Allowed'), '\')" onmouseout="tipout()">', _('LP'), '</span> |';
 					}
-					echo " <i><a href=\"addquestions.php?aid=$typeid&cid=$cid\">Questions</a></i> | <a href=\"addassessment.php?id=$typeid&block=$parent&cid=$cid\">Settings</a></i> \n";
-					echo " | <a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
-					echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
-					echo " | <a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=$typeid\">Grades</a>";
+					echo " <i><a href=\"addquestions.php?aid=$typeid&cid=$cid\">", _('Questions'), "</a></i> | <a href=\"addassessment.php?id=$typeid&block=$parent&cid=$cid\">", _('Settings'), "</a></i> \n";
+					echo " | <a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
+					echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
+					echo " | <a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=$typeid\">", _('Grades'), "</a>";
 					echo '</span>';
 					
 				   } else if ($line['allowlate']==1 && $latepasses>0) {
-					echo " <a href=\"redeemlatepass.php?cid=$cid&aid=$typeid\">Use LatePass</a>";
+					echo " <a href=\"redeemlatepass.php?cid=$cid&aid=$typeid\">", _('Use LatePass'), "</a>";
 					if ($canundolatepass) {
-						 echo " | <a href=\"redeemlatepass.php?cid=$cid&aid=$typeid&undo=true\">Un-use LatePass</a>";
+						 echo " | <a href=\"redeemlatepass.php?cid=$cid&aid=$typeid&undo=true\">", _('Un-use LatePass'), "</a>";
 					}
 				   } else if ($line['allowlate']==1 && isset($sessiondata['stuview'])) {
-					echo " LatePass Allowed";
+					echo _(' LatePass Allowed');
 				   } else if ($line['allowlate']==1 && $canundolatepass) {
-				   	   echo " <a href=\"redeemlatepass.php?cid=$cid&aid=$typeid&undo=true\">Un-use LatePass</a>";
+				   	   echo " <a href=\"redeemlatepass.php?cid=$cid&aid=$typeid&undo=true\">", _('Un-use LatePass'), "</a>";
 				   }
 				   echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
 				   enditem($canedit); //echo "</div>\n";
@@ -669,31 +669,31 @@ function enditem($canedit) {
 						  echo "<div class=icon style=\"background-color: #99f;\">?</div>";
 					   }
 				   }
-				   echo "<div class=title><b><a href=\"../assessment/showtest.php?id=$typeid&cid=$cid\">{$line['name']}</a></b><BR> Past Due Date.  Showing as Review";
+				   echo "<div class=title><b><a href=\"../assessment/showtest.php?id=$typeid&cid=$cid\">{$line['name']}</a></b><BR> ", _('Past Due Date.  Showing as Review');
 				   if ($line['reviewdate']!=2000000000) { 
-					   echo " until $reviewdate \n";
+					   echo " ", _('until'), " $reviewdate \n";
 				   }
 				   if ($canedit) { 
 					echo '<span class="instronly">';
 					if ($line['allowlate']==1) {
-						echo ' <span onmouseover="tipshow(this,\'LatePasses Allowed\')" onmouseout="tipout()">LP</span> |';
+						echo ' <span onmouseover="tipshow(this,\'', _('LatePasses Allowed'), '\')" onmouseout="tipout()">LP</span> |';
 					}
-				   	echo " <i><a href=\"addquestions.php?aid=$typeid&cid=$cid\">Questions</a></i> | <a href=\"addassessment.php?id=$typeid&block=$parent&cid=$cid\">Settings</a>\n";
-					echo " | <a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
-					echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
-					echo " | <a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=$typeid\">Grades</a>";
+				   	echo " <i><a href=\"addquestions.php?aid=$typeid&cid=$cid\">", _('Questions'), "</a></i> | <a href=\"addassessment.php?id=$typeid&block=$parent&cid=$cid\">", _('Settings'), "</a>\n";
+					echo " | <a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
+					echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
+					echo " | <a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=$typeid\">", _('Grades'), "</a>";
 					echo '</span>';
 					
 				   } 
-				   echo filter("<br/><i>This assessment is in review mode - no scores will be saved</i></div><div class=itemsum>{$line['summary']}</div>\n");
+				   echo filter("<br/><i>" . _('This assessment is in review mode - no scores will be saved') . "</i></div><div class=itemsum>{$line['summary']}</div>\n");
 				   enditem($canedit); //echo "</div>\n";
 			   } else if ($viewall) { //not avail to stu
 				   if ($line['avail']==0) {
-					   $show = "Hidden";
+					   $show = _('Hidden');
 				   } else {
-					   $show = "Available $startdate until $enddate";
+					   $show = sprintf(_('Available %1$s until %2$s'), $startdate, $enddate);
 					   if ($line['reviewdate']>0 && $line['enddate']!=2000000000) {
-						   $show .= ", Review until $reviewdate";
+						   $show .= sprintf(_(', Review until %s'), $reviewdate);
 					   }
 				   }
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
@@ -713,12 +713,12 @@ function enditem($canedit) {
 					   
 					   echo '<span class="instronly">';
 					   if ($line['allowlate']==1) {
-						echo ' <span onmouseover="tipshow(this,\'LatePasses Allowed\')" onmouseout="tipout()">LP</span> |';
+						echo ' <span onmouseover="tipshow(this,\'', _('LatePasses Allowed'), '\')" onmouseout="tipout()">', _('LP'), '</span> |';
 					   }
-					   echo "<a href=\"addquestions.php?aid=$typeid&cid=$cid\">Questions</a> | <a href=\"addassessment.php?id=$typeid&cid=$cid\">Settings</a> | \n";
-					   echo "<a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
-					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
-					   echo " | <a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=$typeid\">Grades</a>";
+					   echo "<a href=\"addquestions.php?aid=$typeid&cid=$cid\">", _('Questions'), "</a> | <a href=\"addassessment.php?id=$typeid&cid=$cid\">", _('Settings'), "</a> | \n";
+					   echo "<a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
+					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
+					   echo " | <a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=$typeid\">", _('Grades'), "</a>";
 					   echo '</span>';
 				   }
 				   echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
@@ -736,21 +736,21 @@ function enditem($canedit) {
 				   $line['text'] = '<p>'.$line['text'].'</p>';
 			   }
 			   if ($line['startdate']==0) {
-				   $startdate = "Always";
+				   $startdate = _('Always');
 			   } else {
 				   $startdate = formatdate($line['startdate']);
 			   }
 			   if ($line['enddate']==2000000000) {
-				   $enddate = "Always";
+				   $enddate = _('Always');
 			   } else {
 				   $enddate = formatdate($line['enddate']);
 			   }
 			   if ($line['avail']==2 || ($line['startdate']<$now && $line['enddate']>$now && $line['avail']==1)) {
 				   if ($line['avail']==2) {
-					   $show = "Showing Always ";
+					   $show = _('Showing Always ');
 					   $color = '#0f0';
 				   } else {
-					   $show = "Showing until: $enddate ";
+					   $show = _('Showing until:') . " $enddate";
 					   $color = makecolor2($line['startdate'],$line['enddate'],$now);
 				   }
 				   beginitem($canedit,$items[$i]);// echo "<div class=item>\n";
@@ -770,9 +770,9 @@ function enditem($canedit) {
 					   }
 					   if ($canedit) {
 						   echo '<span class="instronly">';
-						   echo "<a href=\"addinlinetext.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
-						   echo "<a href=\"deleteinlinetext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
-						   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+						   echo "<a href=\"addinlinetext.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
+						   echo "<a href=\"deleteinlinetext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
+						   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _(Copy), "</a>";
 						   echo '</span>';
 					   }
 					   echo "</div>";
@@ -784,9 +784,9 @@ function enditem($canedit) {
 					   }
 					   if ($canedit) {
 						   echo '<span class="instronly">';
-						   echo "<a href=\"addinlinetext.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
-						   echo "<a href=\"deleteinlinetext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
-						   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+						   echo "<a href=\"addinlinetext.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
+						   echo "<a href=\"deleteinlinetext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
+						   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
 						   echo '</span>';
 					   } 
 					   
@@ -812,9 +812,9 @@ function enditem($canedit) {
 				   enditem($canedit); //echo "</div>\n";
 			   } else if ($viewall) {
 				   if ($line['avail']==0) {
-					   $show = "Hidden";
+					   $show = _('Hidden');
 				   } else {
-					   $show = "Showing $startdate until $enddate";
+					   $show = sprintf(_('Showing %1$s until %2$s'), $startdate, $enddate);
 				   }
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if ($line['title']!='##hidden##') {
@@ -832,9 +832,9 @@ function enditem($canedit) {
 				   echo '</span>';
 				   if ($canedit) {
 					   echo '<span class="instronly">';
-					   echo "<a href=\"addinlinetext.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
-					   echo "<a href=\"deleteinlinetext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
-					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+					   echo "<a href=\"addinlinetext.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
+					   echo "<a href=\"deleteinlinetext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
+					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
 					   echo '</span>';
 				   }
 				   echo filter("</div><div class=itemsum>{$line['text']}\n");
@@ -867,12 +867,12 @@ function enditem($canedit) {
 				   $line['summary'] = '<p>'.$line['summary'].'</p>';
 			   }
 			   if ($line['startdate']==0) {
-				   $startdate = "Always";
+				   $startdate = _('Always');
 			   } else {
 				   $startdate = formatdate($line['startdate']);
 			   }
 			   if ($line['enddate']==2000000000) {
-				   $enddate = "Always";
+				   $enddate = _('Always');
 			   } else {
 				   $enddate = formatdate($line['enddate']);
 			   }
@@ -882,10 +882,10 @@ function enditem($canedit) {
 			   
 			   if ($line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
 				   if ($line['avail']==2) {
-					   $show = "Showing Always ";
+					   $show = _('Showing Always ');
 					   $color = '#0f0';
 				   } else {
-					   $show = "Showing until: $enddate ";
+					   $show = _('Showing until:') . " $enddate";
 					   $color = makecolor2($line['startdate'],$line['enddate'],$now);
 				   }
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
@@ -905,10 +905,10 @@ function enditem($canedit) {
 				   }
 				   if ($canedit) {
 					   echo '<span class="instronly">';
-					   echo "<a href=\"adddrillassess.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
-					   echo "<a href=\"deletedrillassess.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
-					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
-					   echo " | <a href=\"gb-viewdrill.php?cid=$cid&daid=$typeid\">Scores</a>";
+					   echo "<a href=\"adddrillassess.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
+					   echo "<a href=\"deletedrillassess.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
+					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
+					   echo " | <a href=\"gb-viewdrill.php?cid=$cid&daid=$typeid\">", _('Scores'), "</a>";
 					
 					   echo '</span>';
 				   }
@@ -916,9 +916,9 @@ function enditem($canedit) {
 				   enditem($canedit); //echo "</div>\n";
 			   } else if ($viewall) {
 				   if ($line['avail']==0) {
-					   $show = "Hidden";
+					   $show = _('Hidden');
 				   } else {
-					   $show = "Showing $startdate until $enddate";
+					   $show = sprintf(_('Showing %1$s until %2$s'), $startdate, $enddate);
 				   }
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				  if ($graphicalicons) {
@@ -933,10 +933,10 @@ function enditem($canedit) {
 				   echo '</span>';
 				   if ($canedit) {
 					  echo '<span class="instronly">';
-					   echo "<a href=\"adddrillassess.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
-					   echo "<a href=\"deletedrillassess.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
-					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
-					   echo " | <a href=\"gb-viewdrill.php?cid=$cid&daid=$typeid\">Scores</a>";
+					   echo "<a href=\"adddrillassess.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
+					   echo "<a href=\"deletedrillassess.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
+					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
+					   echo " | <a href=\"gb-viewdrill.php?cid=$cid&daid=$typeid\">", _('Scores'), "</a>";
 					
 					   echo '</span>';
 				   }
@@ -953,12 +953,12 @@ function enditem($canedit) {
 				   $line['summary'] = '<p>'.$line['summary'].'</p>';
 			   }
 			   if ($line['startdate']==0) {
-				   $startdate = "Always";
+				   $startdate = _('Always');
 			   } else {
 				   $startdate = formatdate($line['startdate']);
 			   }
 			   if ($line['enddate']==2000000000) {
-				   $enddate = "Always";
+				   $enddate = _('Always');
 			   } else {
 				   $enddate = formatdate($line['enddate']);
 			   }
@@ -1012,10 +1012,10 @@ function enditem($canedit) {
 			   
 			   if ($line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
 				   if ($line['avail']==2) {
-					   $show = "Showing Always ";
+					   $show = _('Showing Always ');
 					   $color = '#0f0';
 				   } else {
-					   $show = "Showing until: $enddate ";
+					   $show = _('Showing until:') . " $enddate";
 					   $color = makecolor2($line['startdate'],$line['enddate'],$now);
 				   }
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
@@ -1035,18 +1035,18 @@ function enditem($canedit) {
 				   }
 				   if ($canedit) {
 					   echo '<span class="instronly">';
-					   echo "<a href=\"addlinkedtext.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
-					   echo "<a href=\"deletelinkedtext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
-					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+					   echo "<a href=\"addlinkedtext.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
+					   echo "<a href=\"deletelinkedtext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
+					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
 					   echo '</span>';
 				   }
 				   echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
 				   enditem($canedit); //echo "</div>\n";
 			   } else if ($viewall) {
 				   if ($line['avail']==0) {
-					   $show = "Hidden";
+					   $show = _('Hidden');
 				   } else {
-					   $show = "Showing $startdate until $enddate";
+					   $show = sprintf(_('Showing %1$s until %2$s'), $startdate, $enddate);
 				   }
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				  if ($graphicalicons) {
@@ -1061,9 +1061,9 @@ function enditem($canedit) {
 				   echo '</span>';
 				   if ($canedit) {
 					   echo '<span class="instronly">';
-					   echo "<a href=\"addlinkedtext.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
-					   echo "<a href=\"deletelinkedtext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
-					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+					   echo "<a href=\"addlinkedtext.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
+					   echo "<a href=\"deletelinkedtext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
+					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
 					   echo '</span>';
 				   }
 				   echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
@@ -1140,29 +1140,29 @@ function enditem($canedit) {
 				   $line['description'] = '<p>'.$line['description'].'</p>';
 			   }
 			   if ($line['startdate']==0) {
-				   $startdate = "Always";
+				   $startdate = _('Always');
 			   } else {
 				   $startdate = formatdate($line['startdate']);
 			   }
 			   if ($line['enddate']==2000000000) {
-				   $enddate = "Always";
+				   $enddate = _('Always');
 			   } else {
 				   $enddate = formatdate($line['enddate']);
 			   }
 			   if ($line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
 				   if ($line['avail']==2) {
-					   $show = "Showing Always ";
+					   $show = _('Showing Always ');
 					   $color = '#0f0';
 				   } else {
-					   $show = "Showing until: $enddate ";
+					   $show = _('Showing until:') . " $enddate";
 					   $color = makecolor2($line['startdate'],$line['enddate'],$now);
 				   }
 				   $duedates = "";
 				   if ($line['postby']>$now && $line['postby']!=2000000000) {
-					   $duedates .= "New Threads due ". formatdate($line['postby']) . ". ";
+					   $duedates .= sprintf(_('New Threads due %s. '), formatdate($line['postby']));
 				   }
 				   if ($line['replyby']>$now && $line['replyby']!=2000000000) {
-					   $duedates .= "Replies due ". formatdate($line['replyby']) . ". ";
+					   $duedates .= sprintf(_('Replies due %s. '), formatdate($line['replyby']));
 				   }
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if (($hideicons&8)==0) {
@@ -1175,7 +1175,7 @@ function enditem($canedit) {
 				   echo "<div class=title> ";
 				   echo "<b><a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}\">{$line['name']}</a></b>\n";
 				   if (isset($newpostcnts[$line['id']]) && $newpostcnts[$line['id']]>0 ) {
-					   echo " <a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}&page=-1\" style=\"color:red\">New Posts ({$newpostcnts[$line['id']]})</a>";
+					   echo " <a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}&page=-1\" style=\"color:red\">", sprintf(_('New Posts (%s)'), $newpostcnts[$line['id']]), "</a>";
 				   }
 				   if ($viewall) { 
 					   echo '<span class="instrdates">';
@@ -1184,9 +1184,9 @@ function enditem($canedit) {
 				   }
 				   if ($canedit) {
 					   echo '<span class="instronly">';
-					   echo "<a href=\"addforum.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
-					   echo "<a href=\"deleteforum.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
-					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+					   echo "<a href=\"addforum.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
+					   echo "<a href=\"deleteforum.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
+					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
 					   echo '</span>';
 				   }
 				   if ($duedates!='') {echo "<br/>$duedates";}
@@ -1194,9 +1194,9 @@ function enditem($canedit) {
 				   enditem($canedit); //echo "</div>\n";
 			   } else if ($viewall) {
 				   if ($line['avail']==0) {
-					   $show = "Hidden";
+					   $show = _('Hidden');
 				   } else {
-					   $show = "Showing $startdate until $enddate";
+					   $show = sprintf(_('Showing %1$s until %2$s'), $startdate, $enddate);
 				   }
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if ($graphicalicons) {
@@ -1206,7 +1206,7 @@ function enditem($canedit) {
 				   }   
 				   echo "<div class=title><i> <b><a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}\">{$line['name']}</a></b></i> ";
 				   if (isset($newpostcnts[$line['id']]) && $newpostcnts[$line['id']]>0 ) {
-					   echo " <a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}&page=-1\" style=\"color:red\">New Posts ({$newpostcnts[$line['id']]})</a>";
+					   echo " <a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}&page=-1\" style=\"color:red\">", sprintf(_('New Posts (%s)'), $newpostcnts[$line['id']]), "</a>";
 				   }
 				   echo '<span class="instrdates">';
 				   echo "<br/><i>$show </i>";
@@ -1214,9 +1214,9 @@ function enditem($canedit) {
 				    
 				   if ($canedit) {
 					   echo '<span class="instronly">';
-					   echo "<a href=\"addforum.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
-					   echo "<a href=\"deleteforum.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
-					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+					   echo "<a href=\"addforum.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
+					   echo "<a href=\"deleteforum.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
+					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
 					   echo '</span>';
 				   }
 				   echo filter("</div><div class=itemsum>{$line['description']}</div>\n");
@@ -1233,12 +1233,12 @@ function enditem($canedit) {
 				   $line['description'] = '<p>'.$line['description'].'</p>';
 			   }
 			   if ($line['startdate']==0) {
-				   $startdate = "Always";
+				   $startdate = _('Always');
 			   } else {
 				   $startdate = formatdate($line['startdate']);
 			   }
 			   if ($line['enddate']==2000000000) {
-				   $enddate = "Always";
+				   $enddate = _('Always');
 			   } else {
 				   $enddate = formatdate($line['enddate']);
 			   }
@@ -1276,15 +1276,15 @@ function enditem($canedit) {
 			   }   
 			   if ($line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
 				   if ($line['avail']==2) {
-					   $show = "Showing Always ";
+					   $show = _('Showing Always ');
 					   $color = '#0f0';
 				   } else {
-					   $show = "Showing until: $enddate ";
+					   $show = _('Showing until:') . " $enddate";
 					   $color = makecolor2($line['startdate'],$line['enddate'],$now);
 				   }
 				   $duedates = "";
 				   if ($line['editbydate']>$now && $line['editbydate']!=2000000000) {
-					   $duedates .= "Edits due by ". formatdate($line['editbydate']) . ". ";
+					   $duedates .= sprintf(_('Edits due by %s. '), formatdate($line['editbydate']));
 				   }
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if (($hideicons&8)==0) {
@@ -1300,7 +1300,7 @@ function enditem($canedit) {
 				   } else {
 				   	   echo "<b><a href=\"../wikis/viewwiki.php?cid=$cid&id={$line['id']}\">{$line['name']}</a></b>\n";
 				   	   if ($hasnew) {
-				   	    	    echo " <span style=\"color:red\">New Revisions</span>";
+				   	    	    echo " <span style=\"color:red\">", _('New Revisions'), "</span>";
 				   	   }
 				   }
 				   if ($viewall) { 
@@ -1310,9 +1310,9 @@ function enditem($canedit) {
 				   }
 				   if ($canedit) {
 					   echo '<span class="instronly">';
-					   echo "<a href=\"addwiki.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
-					   echo "<a href=\"deletewiki.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
-					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+					   echo "<a href=\"addwiki.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
+					   echo "<a href=\"deletewiki.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
+					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
 					   echo '</span>';
 				   }
 				   if ($duedates!='') {echo "<br/>$duedates";}
@@ -1320,9 +1320,9 @@ function enditem($canedit) {
 				   enditem($canedit); //echo "</div>\n";
 			   } else if ($viewall) {
 				   if ($line['avail']==0) {
-					   $show = "Hidden";
+					   $show = _('Hidden');
 				   } else {
-					   $show = "Showing $startdate until $enddate";
+					   $show = sprintf(_('Showing %1$s until %2$s'), $startdate, $enddate);
 				   }
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if ($graphicalicons) {
@@ -1332,16 +1332,16 @@ function enditem($canedit) {
 				   }   
 				   echo "<div class=title><i> <b><a href=\"../wikis/viewwiki.php?cid=$cid&id={$line['id']}\">{$line['name']}</a></b></i> ";
 				   if ($hasnew) {
-				   	   echo " <span style=\"color:red\">New Revisions</span>";
+				   	   echo " <span style=\"color:red\">", _('New Revisions'), "</span>";
 				   }
 				   echo '<span class="instrdates">';
 				   echo "<br/><i>$show </i>";
 				   echo '</span>';
 				   if ($canedit) {
 					   echo '<span class="instronly">';
-					   echo "<a href=\"addwiki.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
-					   echo "<a href=\"deletewiki.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
-					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+					   echo "<a href=\"addwiki.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
+					   echo "<a href=\"deletewiki.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
+					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
 					   echo '</span>';
 				   }
 				   echo filter("</div><div class=itemsum>{$line['description']}</div>\n");
@@ -1359,18 +1359,18 @@ function enditem($canedit) {
    	if (isset($CFG['CPS']['additemtype']) && $CFG['CPS']['additemtype'][0]=='links') {
    		if ($tb=='BB' || $tb=='LB') {$tb = 'b';}
    		if ($tb=='t' && $blk=='0') {
-   			$html = '<div id="topadditem" class="additembox"><span><b>Add here:</b> ';
+   			$html = '<div id="topadditem" class="additembox"><span><b>' . _('Add here:') . '</b> ';
    		} else if ($tb=='b' && $blk=='0') {
-   			$html = '<div id="bottomadditem" class="additembox"><span><b>Add here:</b> ';
+   			$html = '<div id="bottomadditem" class="additembox"><span><b>' . _('Add here:') . '</b> ';
    		} else {
-   			$html = '<div class="additembox"><span><b>Add here:</b> ';
+   			$html = '<div class="additembox"><span><b>' . _('Add here:') . '</b> ';
    		}
    		
 		$html .= "<a href=\"addassessment.php?block=$blk&tb=$tb&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['assess'])) {
 			$html .= "<img alt=\"assessment\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['assess']}\"/> ";
 		}
-		$html .= "Assessment</a> | ";
+		$html .= _('Assessment') ."</a> | ";
 		
 		/*$html .= "<a href=\"adddrillassess.php?block=$blk&tb=$tb&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['drill'])) {
@@ -1383,37 +1383,37 @@ function enditem($canedit) {
 		if (isset($CFG['CPS']['miniicons']['inline'])) {
 			$html .= "<img alt=\"inline text\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['inline']}\"/> ";
 		}
-		$html .= "Text</a> | ";
+		$html .= _('Text') . "</a> | ";
 		
 		$html .= "<a href=\"addlinkedtext.php?block=$blk&tb=$tb&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['linked'])) {
 			$html .= "<img alt=\"linked text\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['linked']}\"/> ";
 		}
-		$html .= "Link</a> | ";
+		$html .= _('Link') . "</a> | ";
 		
 		$html .= "<a href=\"addforum.php?block=$blk&tb=$tb&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['forum'])) {
 			$html .= "<img alt=\"forum\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['forum']}\"/> ";
 		}
-		$html .= "Forum</a> | ";
+		$html .= _('Forum') . "</a> | ";
 		
 		$html .= "<a href=\"addwiki.php?block=$blk&tb=$tb&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['wiki'])) {
 			$html .= "<img alt=\"wiki\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['wiki']}\"/> ";
 		}
-		$html .= "Wiki</a> | ";
+		$html .= _('Wiki') . "</a> | ";
 		
 		$html .= "<a href=\"addblock.php?block=$blk&tb=$tb&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['folder'])) {
 			$html .= "<img alt=\"folder\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['folder']}\"/> ";
 		}
-		$html .= "Block</a> | ";
+		$html .= _('Block') . "</a> | ";
 		
 		$html .= "<a href=\"addcalendar.php?block=$blk&tb=$tb&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['calendar'])) {
 			$html .= "<img alt=\"calendar\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['calendar']}\"/> ";
 		}
-		$html .= "Calendar</a>";
+		$html .= _('Calendar') . "</a>";
 		$html .= '</span>';
 		$html .= '</div>';
    		
@@ -1423,21 +1423,21 @@ function enditem($canedit) {
 			$html .= 'style="margin-bottom:5px;"';
 		}
 		$html .= ">\n";
-		$html .= "<option value=\"\">Add An Item...</option>\n";
-		$html .= "<option value=\"assessment\">Add Assessment</option>\n";
+		$html .= "<option value=\"\">" . _('Add An Item...') . "</option>\n";
+		$html .= "<option value=\"assessment\">" . _('Add Assessment') . "</option>\n";
 		//$html .= "<option value=\"drillassess\">Add Drill</option>\n";
-		$html .= "<option value=\"inlinetext\">Add Inline Text</option>\n";
-		$html .= "<option value=\"linkedtext\">Add Linked Text</option>\n";
-		$html .= "<option value=\"forum\">Add Forum</option>\n";
-		$html .= "<option value=\"wiki\">Add Wiki</option>\n";
-		$html .= "<option value=\"block\">Add Block</option>\n";
-		$html .= "<option value=\"calendar\">Add Calendar</option>\n";
+		$html .= "<option value=\"inlinetext\">" . _('Add Inline Text') . "</option>\n";
+		$html .= "<option value=\"linkedtext\">" . _('Add Linked Text') . "</option>\n";
+		$html .= "<option value=\"forum\">" . _('Add Forum') . "</option>\n";
+		$html .= "<option value=\"wiki\">" . _('Add Wiki') . "</option>\n";
+		$html .= "<option value=\"block\">" . _('Add Block') . "</option>\n";
+		$html .= "<option value=\"calendar\">" . _('Add Calendar') . "</option>\n";
 		$html .= "</select><BR>\n";
    		
    	}
 	return $html;
    }
-   
+    
    function generatemoveselect($num,$count,$blk,$blocklist) {
 	$num = $num+1;  //adjust indexing
 	$html = "<select class=\"mvsel\" id=\"$blk-$num\" onchange=\"moveitem($num,'$blk')\">\n";
@@ -1448,11 +1448,11 @@ function enditem($canedit) {
 	}
 	for ($i=0; $i<count($blocklist); $i++) {
 		if ($num!=$blocklist[$i]) {
-			$html .= "<option value=\"B-{$blocklist[$i]}\">Into {$blocklist[$i]}</option>\n";
+			$html .= "<option value=\"B-{$blocklist[$i]}\">" . sprintf(_('Into %s'),$blocklist[$i]) . "</option>\n";
 		}
 	}
 	if ($blk!='0') {
-		$html .= '<option value="O-' . $blk . '">Out of Block</option>';
+		$html .= '<option value="O-' . $blk . '">' . _('Out of Block') . '</option>';
 	}
 	$html .= "</select>\n";
 	return $html;
@@ -1604,29 +1604,29 @@ function enditem($canedit) {
 			$items[$i]['name'] = stripslashes($items[$i]['name']);
 			
 			if ($items[$i]['startdate']==0) {
-				$startdate = "Always";
+				$startdate = _('Always');
 			} else {
 				$startdate = formatdate($items[$i]['startdate']);
 			}
 			if ($items[$i]['enddate']==2000000000) {
-				$enddate = "Always";
+				$enddate = _('Always');
 			} else {
 				$enddate = formatdate($items[$i]['enddate']);
 			}
 			$bnum = $i+1;
 			if (strlen($items[$i]['SH'])==1 || $items[$i]['SH'][1]=='O') {
-				$availbeh = "Expanded";
+				$availbeh = _('Expanded');
 			} else if ($items[$i]['SH'][1]=='F') {
-				$availbeh = "as Folder";
+				$availbeh = _('as Folder');
 			} else {
-				$availbeh = "Collapsed";
+				$availbeh = _('Collapsed');
 			}
 			if ($items[$i]['avail']==2) {
-				$show = "Showing $availbeh Always";
+				$show = sprintf(('Showing %s Always'), $availbeh);
 			} else if ($items[$i]['avail']==0) {
-				$show = "Hidden";
+				$show = _('Hidden');
 			} else {
-				$show = "Showing $availbeh $startdate until $enddate";
+				$show = sprintf(_('Showing %1$s %2$s until %3$s'), $availbeh, $startdate, $enddate);
 			}
 			if ($items[$i]['avail']==2) {
 				$color = '#0f0';
@@ -1661,9 +1661,9 @@ function enditem($canedit) {
 			}
 			if ($showlinks) {
 				echo '<span class="links">';
-				echo " <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\">Modify</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\">Delete</a>";
-				echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">Copy</a>";
-				echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\">NewFlag</a>";
+				echo " <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\">", _('Modify'), "</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\">", _('Delete'), "</a>";
+				echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">", _('Copy'), "</a>";
+				echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\">", _('NewFlag'), "</a>";
 				echo '</span>';
 			}
 			if (count($items[$i]['items'])>0) {
@@ -1684,17 +1684,17 @@ function enditem($canedit) {
 			   $typeid = $itemtypes[$items[$i]][1];
 			   list($line['name'],$line['startdate'],$line['enddate'],$line['reviewdate'],$line['avail']) = $iteminfo['Assessment'][$typeid];
 			   if ($line['startdate']==0) {
-				   $startdate = "Always";
+				   $startdate = _('Always');
 			   } else {
 				   $startdate = formatdate($line['startdate']);
 			   }
 			   if ($line['enddate']==2000000000) {
-				   $enddate = "Always";
+				   $enddate = _('Always');
 			   } else {
 				   $enddate =formatdate($line['enddate']);
 			   }
 			   if ($line['reviewdate']==2000000000) {
-				   $reviewdate = "Always";
+				   $reviewdate = _('Always');
 			   } else {
 				   $reviewdate = formatdate($line['reviewdate']);
 			   }
@@ -1712,17 +1712,17 @@ function enditem($canedit) {
 			}
 			echo '<li id="'.$items[$i].'">'.$icon;
 			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
-				   $show = "Available until $enddate";
+				   $show = sprintf(_('Available until %s'), $enddate);
 				   echo '<b><span id="A'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
 				   //echo '<b>'.$line['name'].'</b> ';
 			   } else if ($line['avail']==1 && $line['startdate']<$now && $line['reviewdate']>$now) {
-				   $show = "Review until $reviewdate";
+				   $show = sprintf(_('Review until %s'), $reviewdate);
 				   //echo '<b>'.$line['name'].'</b> ';
 				   echo '<b><span id="A'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
 			   } else {
-				   $show = "Available $startdate to $enddate";
+				   $show = sprintf(_('Available %1$s to %2$s'), $startdate, $enddate);
 				   if ($line['reviewdate']>0 && $line['enddate']!=2000000000) {
-					   $show .= ", review until $reviewdate";
+					   $show .= sprintf(_(', review until %s'), $reviewdate);
 				   }
 				   //echo '<i><b>'.$line['name'].'</b></i> ';
 				   echo '<i><b><span id="A'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b></i>";
@@ -1732,10 +1732,10 @@ function enditem($canedit) {
 			   }
 			   if ($showlinks) {
 				   echo '<span class="links">';
-				    echo " <a href=\"addquestions.php?aid=$typeid&cid=$cid\">Questions</a> | <a href=\"addassessment.php?id=$typeid&cid=$cid\">Settings</a> | \n";
-				   echo "<a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
-				   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
-				   echo " | <a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=$typeid\">Grades</a>";
+				    echo " <a href=\"addquestions.php?aid=$typeid&cid=$cid\">", _('Questions'), "</a> | <a href=\"addassessment.php?id=$typeid&cid=$cid\">", _('Settings'), "</a> | \n";
+				   echo "<a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
+				   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
+				   echo " | <a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=$typeid\">", _('Grades'), "</a>";
 				   echo '</span>';
 			   }
 			   echo "</li>";
@@ -1747,12 +1747,12 @@ function enditem($canedit) {
 				   $line['name'] = strip_tags($line['text']);
 			   }
 			   if ($line['startdate']==0) {
-				   $startdate = "Always";
+				   $startdate = _('Always');
 			   } else {
 				   $startdate = formatdate($line['startdate']);
 			   }
 			   if ($line['enddate']==2000000000) {
-				   $enddate = "Always";
+				   $enddate = _('Always');
 			   } else {
 				   $enddate =formatdate($line['enddate']);
 			   }
@@ -1773,20 +1773,20 @@ function enditem($canedit) {
 				   echo '<b><span id="I'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
 				  // echo '<b>'.$line['name']. "</b>";
 				   if ($showdates) {
-					   echo " showing until $enddate";
+					   printf(_(' showing until %s'), $enddate);
 				   }
 			   } else {
 				   //echo '<i><b>'.$line['name']. "</b></i>";
 				   echo '<i><b><span id="I'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b></i>";
 				   if ($showdates) {
-					   echo " showing $startdate until $enddate";
+					   printf(_(' showing %1$s until %2$s'), $startdate, $enddate);
 				   }
 			   }
 			   if ($showlinks) {
 				   echo '<span class="links">';
-				   echo " <a href=\"addinlinetext.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
-				  echo "<a href=\"deleteinlinetext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
-				  echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+				   echo " <a href=\"addinlinetext.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
+				  echo "<a href=\"deleteinlinetext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
+				  echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
 				  echo '</span>';
 			   }
 			   echo '</li>';
@@ -1794,12 +1794,12 @@ function enditem($canedit) {
 			   $typeid = $itemtypes[$items[$i]][1];
 			   list($line['name'],$line['startdate'],$line['enddate'],$line['avail']) = $iteminfo['LinkedText'][$typeid];
 			   if ($line['startdate']==0) {
-				   $startdate = "Always";
+				   $startdate = _('Always');
 			   } else {
 				   $startdate = formatdate($line['startdate']);
 			   }
 			   if ($line['enddate']==2000000000) {
-				   $enddate = "Always";
+				   $enddate = _('Always');
 			   } else {
 				   $enddate =formatdate($line['enddate']);
 			   }
@@ -1820,20 +1820,20 @@ function enditem($canedit) {
 				   //echo '<b>'.$line['name']. "</b>";
 				   echo '<b><span id="L'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
 				   if ($showdates) {
-					   echo " showing until $enddate";
+					   printf(_(' showing until %s'), $enddate);
 				   }
 			   } else {
 				   //echo '<i><b>'.$line['name']. "</b></i>";
 				   echo '<i><b><span id="L'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b></i>";
 				   if ($showdates) {
-					   echo " showing $startdate until $enddate";
+					   printf(_(' showing %1$s until %2$s'), $startdate, $enddate);
 				   }
 			   }
 			   if ($showlinks) {
 				   echo '<span class="links">';
-				   echo " <a href=\"addlinkedtext.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
-				  echo "<a href=\"deletelinkedtext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
-				  echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+				   echo " <a href=\"addlinkedtext.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
+				  echo "<a href=\"deletelinkedtext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
+				  echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
 				  echo '</span>';
 			   }
 			   echo '</li>';
@@ -1841,12 +1841,12 @@ function enditem($canedit) {
 			   $typeid = $itemtypes[$items[$i]][1];
 			   list($line['name'],$line['startdate'],$line['enddate'],$line['avail']) = $iteminfo['Forum'][$typeid];
 			   if ($line['startdate']==0) {
-				   $startdate = "Always";
+				   $startdate = _('Always');
 			   } else {
 				   $startdate = formatdate($line['startdate']);
 			   }
 			   if ($line['enddate']==2000000000) {
-				   $enddate = "Always";
+				   $enddate = _('Always');
 			   } else {
 				   $enddate =formatdate($line['enddate']);
 			   }
@@ -1867,20 +1867,20 @@ function enditem($canedit) {
 				   //echo '<b>'.$line['name']. "</b>";
 				   echo '<b><span id="F'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
 				   if ($showdates) {
-					   echo " showing until $enddate";
+					   printf(_(' showing until %s'), $enddate);
 				   }
 			   } else {
 				   echo '<i><b><span id="F'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b></i>";
 				   //echo '<i><b>'.$line['name']. "</b></i>";
 				   if ($showdates) {
-					   echo " showing $startdate until $enddate";
+					   printf(_(' showing %1$s until %2$s'), $startdate, $enddate);
 				   }
 			   }
 			   if ($showlinks) {
 				   echo '<span class="links">';
-				   echo " <a href=\"addforum.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
-				  echo "<a href=\"deleteforum.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
-				  echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+				   echo " <a href=\"addforum.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
+				  echo "<a href=\"deleteforum.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
+				  echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
 				  echo '</span>';
 			   }
 			   echo '</li>';
@@ -1888,12 +1888,12 @@ function enditem($canedit) {
 			   $typeid = $itemtypes[$items[$i]][1];
 			   list($line['name'],$line['startdate'],$line['enddate'],$line['avail']) = $iteminfo['Wiki'][$typeid];
 			   if ($line['startdate']==0) {
-				   $startdate = "Always";
+				   $startdate = _('Always');
 			   } else {
 				   $startdate = formatdate($line['startdate']);
 			   }
 			   if ($line['enddate']==2000000000) {
-				   $enddate = "Always";
+				   $enddate = _('Always');
 			   } else {
 				   $enddate =formatdate($line['enddate']);
 			   }
@@ -1914,20 +1914,20 @@ function enditem($canedit) {
 				   //echo '<b>'.$line['name']. "</b>";
 				   echo '<b><span id="W'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
 				   if ($showdates) {
-					   echo " showing until $enddate";
+					   printf(_(' showing until %s'), $enddate);
 				   }
 			   } else {
 				   echo '<i><b><span id="W'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b></i>";
 				   //echo '<i><b>'.$line['name']. "</b></i>";
 				   if ($showdates) {
-					   echo " showing $startdate until $enddate";
+					   printf(_(' showing %1$s until %2$s'), $startdate, $enddate);
 				   }
 			   }
 			   if ($showlinks) {
 				   echo '<span class="links">';
-				   echo " <a href=\"addwiki.php?id=$typeid&block=$parent&cid=$cid\">Modify</a> | \n";
-				  echo "<a href=\"deletewiki.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">Delete</a>\n";
-				  echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">Copy</a>";
+				   echo " <a href=\"addwiki.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
+				  echo "<a href=\"deletewiki.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
+				  echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
 				  echo '</span>';
 			   }
 			   echo '</li>';
