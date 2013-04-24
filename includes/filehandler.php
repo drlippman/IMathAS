@@ -127,6 +127,7 @@ function storeuploadedcoursefile($id,$key,$sec="public-read") {
 	} else {
 		if (is_uploaded_file($_FILES[$id]['tmp_name'])) {	
 			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/course/files/';
+			$keydir = dirname($key); 
 			$dir = $base.dirname($key);
 			$fn = basename($key);
 			if (!is_dir($dir)) {
@@ -138,7 +139,7 @@ function storeuploadedcoursefile($id,$key,$sec="public-read") {
 				$t++;
 			}
 			if (move_uploaded_file($_FILES[$id]['tmp_name'],$dir.'/'.$fn)) {
-				return $dir.'/'.$fn;
+				return $keydir.'/'.$fn;
 			} else {
 				return false;
 			}
