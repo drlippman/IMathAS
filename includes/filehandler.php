@@ -138,7 +138,7 @@ function storeuploadedcoursefile($id,$key,$sec="public-read") {
 				$t++;
 			}
 			if (move_uploaded_file($_FILES[$id]['tmp_name'],$dir.'/'.$fn)) {
-				return $fn;
+				return $dir.'/'.$fn;
 			} else {
 				return false;
 			}
@@ -184,6 +184,7 @@ function storeuploadedqimage($id,$key,$sec="public-read") {
 				$t++;
 			}
 			if (move_uploaded_file($_FILES[$id]['tmp_name'],$dir.'/'.$fn)) {
+				//fix if every to directory-based qimages
 				return $fn;
 			} else {
 				return false;
