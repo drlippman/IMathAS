@@ -1,14 +1,15 @@
-var i18njs = {"not a valid fraction":
-"kein gültiger Fraktion",
+var i18njs = {
+"not a valid fraction":
+"kein gültiger Bruch",
 
 " invalid entry format":
-"Ungültige Eingabe-Format",
+" ungültiges Eingabeformat",
 
 "not a valid mixed number":
 "keine gültige gemischte Zahl",
 
 "not valid scientific notation":
-"nicht gültig wissenschaftliche Schreibweise",
+"keine gültige wissenschaftliche Schreibweise",
 
 "no trig functions allowed":
 "keine trigonometrischen Funktionen erlaubt",
@@ -23,37 +24,38 @@ var i18njs = {"not a valid fraction":
 "undefiniert",
 
 "unmatched parens":
-"unerreicht Klammern",
+"unvollständige Klammerung",
 
 "use $1 instead of $2":
-"$1 benutzt anstelle von $2",
+"benutzten Sie $1 anstelle von $2",
 
 "use function notation":
-"Funktion nutzen Notation",
+"benutzen Sie Funktionsnotation",
 
 "no answer given":
-"keine Antwort",
+"keine Antwort eingegeben",
 
 "syntax ok":
 "Syntax OK",
 
 "syntax error":
-"Syntax-Fehler",
+"Syntaxfehler",
 
 "warning":
 "Warnung",
 
 "syntax error: this is not an equation":
-"Syntax-Fehler: Dies ist nicht eine Gleichung",
+"Syntaxfehler: Dies ist keine Gleichung",
 
 "You have already submitted this page.  Please be patient while your submission is processed.":
-"Sie haben bereits diese Seite abgegeben Bitte gedulden, während die Vorlage bearbeitet wird.",
+"Sie haben diese Seite bereits abgegeben. Bitte gedulden Sie sich, während Ihre Eingabe bearbeitet wird.",
 
 "Submitting...":
-"Einreichen ...",
+"Verarbeitung läuft ...",
 
 "Error Submitting.":
-"Error Einreichen",
+"Fehler bei der Verarbeitung.",
 
 "Submission Error":
-"Error Einreichen"};
+"Verarbeitungfehler"
+};
