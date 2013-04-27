@@ -35,6 +35,12 @@ var imasroot = '<?php echo $imasroot; ?>';
 </script>
 <script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js?ver=011312"></script>
 <?php
+if (isset($CFG['locale'])) {
+	$lang = substr($CFG['locale'],0,2);
+	if (file_exists(rtrim(dirname(__FILE__), '/\\').'/i18n/locale/'.$lang.'/messages.js')) {
+		echo '<script type="text/javascript" src="'.$imasroot.'/i18n/locale/'.$lang.'/messages.js"></script>';
+	}
+}
 if (isset($coursetheme) && strpos($coursetheme,'_dark')!==false) {$mathdarkbg = true;} else {$mathdarkbg = false;}
 if (isset($ispublic) && $ispublic) {
 	echo "<script src=\"$imasroot/javascript/ASCIIMathMLwFallback.js?ver=082911\" type=\"text/javascript\"></script>\n";

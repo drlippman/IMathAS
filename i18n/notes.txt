@@ -1,0 +1,15 @@
+messages.po should contain all strings that have been set up 
+for internationalization.  After translation, it will need to 
+be compiled into a .mo file and put in an appropriate subdirectory
+for the /i18n/locale/ directory
+
+messages.js should contain all strings from javascript files that
+have been set up for internationalization.  After translation, but
+a copy of the file in the appropriate subdirectory of the /i18n/locale/ 
+directory.  This files does not need to be compiled.
+
+I have not yet automated the process for generating the messages.js
+file using xgettext or other utilizies.  I have included a
+getjsmessages.php script which extracts the javascript messages, but
+it doesn't not currently merge in existing translated messages.  
+Additional work needs to be done on this.

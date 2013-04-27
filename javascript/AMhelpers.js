@@ -91,7 +91,7 @@ function calculate(inputId,outputId,format) {
 					  str += "["+_("use $1 instead of $2","("+trg+"(x))^2", trg+"^2(x)")+"]";
 					//  "["+_("use")+" ("+trg+"(x))^2 "+_("instead of ")+trg+_("^2(x)]");
 				  } else if (errstuff!=null) {  
-					  str += "["+_("use function notation")+" - "+_("$1 instead of $2",errstuff[1]+"("+errstuff[2]+")",errstuff[0])+"]";
+					  str += "["+_("use function notation")+" - "+_("use $1 instead of $2",errstuff[1]+"("+errstuff[2]+")",errstuff[0])+"]";
 				  }
 			  }
 		  }
@@ -556,7 +556,7 @@ function AMpreview(inputId,outputId) {
 		  //err = _("syntax error")+": "+_("use")+" ("+trg+"(x))^2 "+_("instead of ")+trg+"^2(x)";
 		  err += _("syntax error")+": "+_("use $1 instead of $2","("+trg+"(x))^2", trg+"^2(x)");
 	  } else if (errstuff!=null) {  
-		  err += ": "+_("use")+" "+errstuff[1]+"("+errstuff[2]+"), "+_("not")+" "+errstuff[0];
+		  err += ": "+_("use $1 instead of $2", errstuff[1]+"("+errstuff[2]+")", errstuff[0]);
 	  } else {
 		  var Pdepth = 0; var Bdepth = 0;
 		  for (var i=0; i<str.length; i++) {
@@ -985,18 +985,4 @@ function assessbackgsubmitCallback(qn,noticetgt) {
     }
   } 
 }	
-
-function _(txt) {
-	if (typeof i18n != "undefined" && i18n[txt]) {
-		var outtxt = i18n[txt];
-	} else {
-		var outtxt = txt;
-	}
-	if (arguments.length>1) {
-		for (var i=1;i<arguments.length;i++) {
-			outtxt = outtxt.replace('$'+i,arguments[i]);
-		}
-	}
-	return outtxt;
-}
 	

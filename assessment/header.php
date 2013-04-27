@@ -39,6 +39,12 @@ var imasroot = '<?php echo $imasroot; ?>';
 <link rel="stylesheet" href="<?php echo $imasroot . "/assessment/mathtest.css?ver=092812";?>" type="text/css"/>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js" type="text/javascript"></script>
 <?php
+if (isset($CFG['locale'])) {
+	$lang = substr($CFG['locale'],0,2);
+	if (file_exists(rtrim(dirname(__FILE__), '/\\').'/../i18n/locale/'.$lang.'/messages.js')) {
+		echo '<script type="text/javascript" src="'.$imasroot.'/i18n/locale/'.$lang.'/messages.js"></script>';
+	}
+}
 echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/general.js?ver=011312\"></script>\n";
 if (isset($sessiondata['coursetheme'])) {
 	if (isset($flexwidth)) {
@@ -93,7 +99,7 @@ div { zoom: 1; }
 }
 </style> 
 <![endif]--> 
-<script src="<?php echo $imasroot . "/javascript/AMhelpers.js?v=021613";?>" type="text/javascript"></script>
+<script src="<?php echo $imasroot . "/javascript/AMhelpers_min.js?v=042713";?>" type="text/javascript"></script>
 <?php 
 if (isset($sessiondata['useflash'])) {
 	echo '<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>';
