@@ -1,9 +1,14 @@
 <?php
 require("config.php");
-if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
+if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https') || isset($CFG['GEN']['forcecanvashttps']))  {
 	 $urlmode = 'https://';
  } else {
  	 $urlmode = 'http://';
+ }
+ 
+ $host = $_SERVER['HTTP_HOST'];
+ if (isset($CFG['GEN']['addwww']) && substr($host,0,4)!='www.') {
+ 	$host = 'www.'.$host;
  }
 header("Content-type: text/xml;");
 echo '<?xml version="1.0" encoding="UTF-8"?>';
@@ -20,15 +25,15 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
     <blti:title><?php echo htmlentities($installname) ?></blti:title>
     <blti:description>Math Assessment</blti:description>
     <blti:extensions platform="canvas.instructure.com">
-      <lticm:property name="domain"><?php echo $_SERVER['HTTP_HOST']; ?></lticm:property>
+      <lticm:property name="domain"><?php echo $host; ?></lticm:property>
       <lticm:property name="tool_id">resource_selection</lticm:property>
       <lticm:property name="privacy_level">public</lticm:property>
       <lticm:options name="resource_selection">
-        <lticm:property name="url"><?php echo $urlmode.$_SERVER['HTTP_HOST'] . $imasroot . '/bltilaunch.php';?></lticm:property>
+        <lticm:property name="url"><?php echo $urlmode.$host . $imasroot . '/bltilaunch.php';?></lticm:property>
         <lticm:property name="text">Pick an Assessment</lticm:property>
         <lticm:property name="selection_width">500</lticm:property>
         <lticm:property name="selection_height">300</lticm:property>
       </lticm:options>
-      <lticm:property name="session_setup_url"><?php echo $urlmode.$_SERVER['HTTP_HOST'] . $imasroot . '/ltisessionsetup.php';?></lticm:property>
+      <lticm:property name="session_setup_url"><?php echo $urlmode.$host . $imasroot . '/ltisessionsetup.php';?></lticm:property>
     </blti:extensions>
   </cartridge_basiclti_link>
