@@ -11,7 +11,7 @@ if (isset($_GET['callength'])) {
 
 function showcalendar($refpage) {
 
-global $imasroot,$cid,$userid,$teacherid,$previewshift,$latepasses,$urlmode;
+global $imasroot,$cid,$userid,$teacherid,$previewshift,$latepasses,$urlmode, $latepasshrs;
 
 $now= time();
 if ($previewshift!=-1) {
@@ -96,20 +96,25 @@ $uppertime = mktime(0,0,0,$curmonum,$dayofmo - $dayofweek + 7*$callength,$curyr)
 
 $exceptions = array();
 if (!isset($teacherid)) {
-	$query = "SELECT assessmentid,startdate,enddate FROM imas_exceptions WHERE userid='$userid'";
+	$query = "SELECT assessmentid,startdate,enddate,islatepass FROM imas_exceptions WHERE userid='$userid'";
 	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 	while ($row = mysql_fetch_row($result)) {
-		$exceptions[$row[0]] = array($row[1],$row[2]);
+		$exceptions[$row[0]] = array($row[1],$row[2],$row[3]);
 	}
 }
 
 
 $byid = array();
 $k = 0;
+
 $query = "SELECT id,name,startdate,enddate,reviewdate,gbcategory,reqscore,reqscoreaid,timelimit,allowlate,caltag,calrtag FROM imas_assessments WHERE avail=1 AND courseid='$cid' AND enddate<2000000000 ORDER BY name";
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 while ($row = mysql_fetch_row($result)) {
+	$canundolatepass = false;
 	if (isset($exceptions[$row[0]])) {
+		if ($exceptions[$row[0]][2]>0 && ($now < $row[3] || $exceptions[$row[0]][1] > $now + $latepasshrs*60*60)) {
+			$canundolatepass = true;
+		}
 		$row[2] = $exceptions[$row[0]][0];
 		$row[3] = $exceptions[$row[0]][1];
 	}
@@ -168,12 +173,17 @@ while ($row = mysql_fetch_row($result)) {
 		} else {
 			$lp = 0;
 		}
+		if ($canundolatepass) {
+			$ulp = 1;
+		} else {
+			$ulp = 0;
+		}
 		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[3]));
 		$row[1] = str_replace('"','\"',$row[1]);
 		$colors = makecolor2($row[2],$row[3],$now);
 		$json = "{type:\"A\", time:\"$time\", ";
 		if ($now<$row[3] || $row[4]>$now || isset($teacherid)) { $json .= "id:\"$row[0]\",";}
-		$json .= "name:\"$row[1]\", color:\"".$colors."\", allowlate:\"$lp\", tag:\"$tag\"".(($row[8]!=0)?", timelimit:true":"").((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
+		$json .= "name:\"$row[1]\", color:\"".$colors."\", allowlate:\"$lp\", undolate:\"$ulp\", tag:\"$tag\"".(($row[8]!=0)?", timelimit:true":"").((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
 		$byid['A'.$row[0]] = array($moday,$tag,$colors,$json);
 	} 
 }

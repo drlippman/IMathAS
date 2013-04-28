@@ -138,6 +138,9 @@ function showcalcontentsid(elid) {
 				if (caleventsarr[elid].data[i].allowlate==1) {
 					html += ' <a href="redeemlatepass.php?cid='+cid+'&aid='+caleventsarr[elid].data[i].id+'">Use LatePass</a>';
 				}
+				if (caleventsarr[elid].data[i].undolate==1) {
+					html += ' <a href="redeemlatepass.php?cid='+cid+'&aid='+caleventsarr[elid].data[i].id+'&undo=true">Un-use LatePass</a>';
+				}
 				if (caleventsarr[elid].data[i].editlink!=null) {
 					html += ' <a href="addassessment.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Settings</a>';
 					html += ' <a href="addquestions.php?cid='+cid+'&aid='+caleventsarr[elid].data[i].id+'">Questions</a>';
