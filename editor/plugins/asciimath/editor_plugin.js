@@ -34,6 +34,7 @@
 					if (existing.indexOf('class=AM')==-1) { //existing does not contain an AM node, so turn it into one
 					       //strip out all existing html tags.
 					       existing = existing.replace(/<([^>]*)>/g,"");
+					       existing = existing.replace(/&(m|n)dash;/g,"-");
 					       existing = existing.replace(/&(.*?);/g,"$1");
 					       if (val) {
 						       existing = val;
@@ -112,6 +113,8 @@
 						if (existing.indexOf('class=AM')==-1) { //existing does not contain an AM node, so turn it into one
 						       //strip out all existing html tags.
 						       existing = existing.replace(/<([^>]*)>/g,"");
+						       existing = existing.replace(/&(m|n)dash;/g,"-");
+						       existing = existing.replace(/&(.*?);/g,"$1");
 						       entity = '<span class="AMedit">`'+existing+'<span id="removeme"></span>`</span> ';
 						       
 						       if (tinymce.isIE) ed.focus();
