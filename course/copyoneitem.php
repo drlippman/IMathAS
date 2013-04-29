@@ -17,9 +17,15 @@ if (!isset($teacherid)) {
 $tocopy = $_GET['copyid'];
 $_POST['append'] = " (Copy)";
 $_POST['ctc'] = $cid;
+$gbcats = array();
+$query = "SELECT id FROM imas_gbcats WHERE courseid='$cid'";
+$result = mysql_query($query) or die("Query failed : " . mysql_error());
+while ($row = mysql_fetch_row($result)) {
+	$gbcats[$row[0]] = $row[0];
+}
 
 function copysubone(&$items,$parent,$copyinside,&$addtoarr) {
-	global $blockcnt,$tocopy;
+	global $blockcnt,$tocopy, $gbcats;
 	foreach ($items as $k=>$item) {
 		if (is_array($item)) {
 			if (($parent.'-'.($k+1)==$tocopy) || $copyinside) { //copy block
@@ -51,7 +57,7 @@ function copysubone(&$items,$parent,$copyinside,&$addtoarr) {
 			}
 		} else {
 			if ($item==$tocopy || $copyinside) {
-				$newitem = copyitem($item,false);
+				$newitem = copyitem($item,$gbcats);
 				if (!$copyinside) {
 					array_splice($items,$k+1,0,$newitem);
 					return 0;

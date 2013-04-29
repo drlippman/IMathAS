@@ -129,6 +129,7 @@ switch($_GET['action']) {
 			$ltisecret = $line['ltisecret'];
 			$chatset = $line['chatset'];
 			$showlatepass = $line['showlatepass'];
+			$istemplate = $line['istemplate'];
 		} else {
 			$courseid = "Not yet set";
 			$name = "Enter course name here";
@@ -151,7 +152,7 @@ switch($_GET['action']) {
 			$theme = isset($CFG['CPS']['theme'])?$CFG['CPS']['theme'][0]:$defaultcoursetheme;
 			$chatset = isset($CFG['CPS']['chatset'])?$CFG['CPS']['chatset'][0]:0;
 			$showlatepass = isset($CFG['CPS']['showlatepass'])?$CFG['CPS']['showlatepass'][0]:0;
-			
+			$istemplate = 0;
 			$avail = 0;
 			$lockaid = 0;
 			$ltisecret = "";
@@ -418,12 +419,23 @@ switch($_GET['action']) {
 			}		
 			echo '</span></span><br class="form" />';
 		}
+		if ($myrights==100) {
+			echo '<span class="form">Mark course as template?</span>';	
+			echo '<span class="formright"><input type=checkbox name="istemplate" value="1" ';
+			if (($istemplate&1)==1) {echo 'checked="checked"';};
+			echo ' /> Mark as global template course<br/>';
+			echo '<input type=checkbox name="isselfenroll" value="4" ';
+			if (($istemplate&4)==4) {echo 'checked="checked"';};
+			echo ' /> Mark as self-enroll course';
+			echo '</span><br class="form" />';
+		}
 		
 		if (isset($CFG['CPS']['templateoncreate']) && $_GET['action']=='addcourse' ) {
 			echo '<span class="form">Use content from a template course:</span>';
 			echo '<span class="formright"><select name="usetemplate" onchange="templatepreviewupdate(this)">';
 			echo '<option value="0" selected="selected">Start with blank course</option>';
-			$query = "SELECT ic.id,ic.name,ic.copyrights FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$templateuser' ORDER BY ic.name";
+			//$query = "SELECT ic.id,ic.name,ic.copyrights FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$templateuser' ORDER BY ic.name";
+			$query = "SELECT id,name,copyrights FROM imas_courses WHERE (istemplate&1)=1 AND available<4 ORDER BY name";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			while ($row = mysql_fetch_row($result)) {
 				echo '<option value="'.$row[0].'">'.$row[1].'</option>';
