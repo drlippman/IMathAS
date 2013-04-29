@@ -233,7 +233,12 @@ function apportion_info($pop, $seats, $method) {
 		//if the next value is the same, then the divisor that adds $toadd additional
 		//seats would add $toadd+1 additional seats, so the method fails.
 		if ($toadd==0) {
-			$outdiv = '('.min($moddivs[1],$moddivs[2]).','.max($moddivs[1],$moddivs[2]).')';
+			foreach ($moddivs as $k=>$v) {
+				if ($v<$divisor) {
+					$outdiv = '('.$v.','.$moddivs[$k-1].')';
+					break;
+				}
+			}
 		} else if ($moddivs[$toadd-1]==$moddivs[$toadd]) {
 			$outdiv = "fail";
 		} else {
