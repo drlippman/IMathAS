@@ -1174,7 +1174,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 if ($res===false) {
 			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
-			 //1: global template.  2: group template.  4: self-enroll course
+			 //1: global template.  2: group template.  4: self-enroll course.  8: guest temp access
 			 if (isset($templateuser)) {
 			 	 $query = "UPDATE imas_courses SET istemplate=(istemplate | 1) WHERE id IN (SELECT courseid FROM imas_teachers WHERE userid=$templateuser)";
 			 	 $res = mysql_query($query);
@@ -1183,6 +1183,10 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 	 $query = "UPDATE imas_courses SET istemplate=(istemplate | 4) WHERE id IN (SELECT courseid FROM imas_teachers WHERE userid={$CFG['GEN']['selfenrolluser']})";
 			 	 $res = mysql_query($query);
 			 }
+			  if (isset($CFG['GEN']['guesttempaccts']) && count($CFG['GEN']['guesttempaccts'])>0) {
+			  	 $query = "UPDATE imas_courses SET istemplate=(istemplate | 8) WHERE id IN (".implode(',',$CFG['GEN']['guesttempaccts']).")";
+			 	 $res = mysql_query($query); 
+			  }
 		}
 		/*$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {

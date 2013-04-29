@@ -426,7 +426,12 @@ switch($_GET['action']) {
 			echo ' /> Mark as global template course<br/>';
 			echo '<input type=checkbox name="isselfenroll" value="4" ';
 			if (($istemplate&4)==4) {echo 'checked="checked"';};
-			echo ' /> Mark as self-enroll course';
+			echo ' /> Mark as self-enroll course';\
+			if (isset($CFG['GEN']['guesttempaccts'])) {
+				echo '<br/><input type=checkbox name="isguest" value="8" ';
+				if (($istemplate&8)==8) {echo 'checked="checked"';};
+				echo ' /> Mark as guest-access course';
+			}
 			echo '</span><br class="form" />';
 		}
 		

@@ -191,13 +191,17 @@ END;
 	 	mysql_query($query) or die("Query failed : " . mysql_error());
 	 	$userid = mysql_insert_id();
 	 	
-	 	if (is_array($CFG['GEN']['guesttempaccts']) && count($CFG['GEN']['guesttempaccts'])>0) {
-	 		$query = "INSERT INTO imas_students (userid,courseid) VALUES ";
-			foreach ($CFG['GEN']['guesttempaccts'] as $i=>$encid) {
+		$query = "SELECT id FROM imas_courses WHERE (istemplate&8)=8 AND available<4";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		if (mysql_num_rows($result)>0) {
+			$query = "INSERT INTO imas_students (userid,courseid) VALUES ";
+			$i = 0;
+			while ($row = mysql_fetch_row($result)) {
 				if ($i>0) { $query .= ',';}
-				$query .= "($userid,$encid)";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				$query .= "($userid,{$row[0]})";
+				$i++;
 			}
+			mysql_query($query) or die("Query failed : " . mysql_error());
 		}
 	 	
 	 	$line['id'] = $userid;

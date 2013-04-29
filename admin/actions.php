@@ -219,6 +219,9 @@ switch($_GET['action']) {
 			if (isset($_POST['isselfenroll'])) {
 				$istemplate += 4;
 			}
+			if (isset($_POST['isguest'])) {
+				$istemplate += 8;
+			}
 		}
 		
 		$_POST['ltisecret'] = trim($_POST['ltisecret']);
