@@ -1981,10 +1981,7 @@ if (!isset($_POST['embedpostback'])) {
 				$dovidcontrol = false;
 				showembedupdatescript();
 			}
-			if (!$sessiondata['istutorial'] && $testsettings['displaymethod'] != "VideoCue") {
-				$intro .= "<p>" . _('Total Points Possible: ') . totalpointspossible($qi) . "</p>";
-			}
-			
+						
 			for ($i = $qmin; $i < $qmax; $i++) {
 				if ($qi[$questions[$i]]['points']==0 || $qi[$questions[$i]]['withdrawn']==1) {
 					$intro = str_replace('[QUESTION '.($i+1).']','',$intro);
@@ -2042,13 +2039,31 @@ if (!isset($_POST['embedpostback'])) {
 				}
 				ob_start();
 				showqinfobar($i,true,false);
-				$quesout .= ob_get_clean();
+				$reviewbar = ob_get_clean();
+				if (!$sessiondata['istutorial']) {
+					$reviewbar = str_replace('<div class="review">','<div class="review">'._('Question').' '.($i+1).'. ', $reviewbar);
+				}
+				$quesout .= $reviewbar;
 				$quesout .= '</div>';
 				$intro = str_replace('[QUESTION '.($i+1).']',$quesout,$intro);
 			}
-			$intro = preg_replace('/<div class="intro">\s*<\/div>/','',$intro);
+			$intro = preg_replace('/<div class="intro">\s*(&nbsp;|<p>\s*<\/p>|<\/p>|\s*)\s*<\/div>/','',$intro);
 			echo $intro;
 			
+			if ($dopage==true) {
+				echo '<p>';
+				if ($_GET['page']>0) {
+					echo '<a href="showtest.php?page='.($_GET['page']-1).'">Previous Page</a> ';
+				}
+				if ($_GET['page']<(count($intropages)-1)/2-1) {
+					if ($_GET['page']>0) { echo '| ';}
+					echo '<a href="showtest.php?page='.($_GET['page']+1).'">Next Page</a>';
+				}
+				echo '</p>';
+			}
+			if (!$sessiondata['istutorial'] && $testsettings['displaymethod'] != "VideoCue") {
+				echo "<p>" . _('Total Points Possible: ') . totalpointspossible($qi) . "</p>";
+			}
 			if (!$sessiondata['istutorial']) {
 				echo "<p><a href=\"showtest.php?action=embeddone\">", _('Click here to finalize assessment and summarize score'), "</a></p>\n";
 			}
