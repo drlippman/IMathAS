@@ -1161,14 +1161,19 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 				`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 				`userid` INT(10) UNSIGNED NOT NULL, 
 				`courseid` INT(10) UNSIGNED NOT NULL, 
-				`type` VARCHAR(254) UNSIGNED NOT NULL, 
+				`type` VARCHAR(254) NOT NULL, 
 				`typeid` INT(10) UNSIGNED NOT NULL, 
 				`viewtime` INT(10) UNSIGNED NOT NULL,
+				`info` VARCHAR(254) NOT NULL, 
 				INDEX ( `courseid`) , INDEX( `userid`)
 				) ENGINE = InnoDB';
 			$res = mysql_query($query);
-			echo "Added imas_content_track table.<br/>";
-			
+			 if ($res===false) {
+			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 } else {
+			 	 echo "Added imas_content_track table.<br/>";
+			 }
+			 
 			$query = 'ALTER TABLE `imas_courses`  ADD `istemplate` TINYINT(1) NOT NULL DEFAULT \'0\'';
 			 $res = mysql_query($query);
 			 if ($res===false) {

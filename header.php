@@ -31,7 +31,7 @@ div.breadcrumb { display:none;}
 #headerlogo { display:none;}
 </style>
 <script type="text/javascript">
-var imasroot = '<?php echo $imasroot; ?>';
+var imasroot = '<?php echo $imasroot; ?>'; var cid = '<?php echo isset($cid)?$cid:0; ?>';
 </script>
 <script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js?ver=011312"></script>
 <?php

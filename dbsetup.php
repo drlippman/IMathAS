@@ -951,9 +951,10 @@ $sql = 'CREATE TABLE `imas_content_track` (
 	`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 	`userid` INT(10) UNSIGNED NOT NULL, 
 	`courseid` INT(10) UNSIGNED NOT NULL, 
-	`type` VARCHAR(254) UNSIGNED NOT NULL, 
+	`type` VARCHAR(254) NOT NULL, 
 	`typeid` INT(10) UNSIGNED NOT NULL, 
 	`viewtime` INT(10) UNSIGNED NOT NULL, 
+	`info` VARCHAR(254) NOT NULL, 
 	INDEX ( `courseid`) , INDEX( `userid`)
 	) ENGINE = InnoDB';
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());

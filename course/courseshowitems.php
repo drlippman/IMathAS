@@ -22,7 +22,7 @@ function enditem($canedit) {
 }
 
   function showitems($items,$parent,$inpublic=false) {
-	   global $teacherid,$tutorid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$myrights;
+	   global $teacherid,$tutorid,$studentid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$myrights;
 	   global $hideicons,$exceptions,$latepasses,$graphicalicons,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs;
 	   require_once("../includes/filehandler.php");
 	   
@@ -736,6 +736,10 @@ function enditem($canedit) {
 			   if (strpos($line['text'],'<p>')!==0) {
 				   $line['text'] = '<p>'.$line['text'].'</p>';
 			   }
+			   if (isset($studentid)) {
+			   	   $rec = "data-base=\"inlinetext-$typeid\" ";
+			   	   $line['text'] = str_replace('<a ','<a '.$rec, $line['text']);
+			   } 
 			   if ($line['startdate']==0) {
 				   $startdate = _('Always');
 			   } else {
@@ -956,6 +960,10 @@ function enditem($canedit) {
 			   if (strpos($line['summary'],'<p>')!==0) {
 				   $line['summary'] = '<p>'.$line['summary'].'</p>';
 			   }
+			   if (isset($studentid)) {
+			   	   $rec = "data-base=\"linkedsummary-$typeid\" ";
+			   	   $line['summary'] = str_replace('<a ','<a '.$rec, $line['summary']);
+			   } 
 			   if ($line['startdate']==0) {
 				   $startdate = _('Always');
 			   } else {
@@ -1012,7 +1020,11 @@ function enditem($canedit) {
 				   }
 				   $icon = 'html';
 			   }
-			   
+			   if (isset($studentid)) {
+			   	   $rec = "data-base=\"linkedtext-$typeid\"";
+			   } else {
+			   	   $rec = '';
+			   }
 			   
 			   if ($line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
 				   if ($line['avail']==2) {
@@ -1031,7 +1043,7 @@ function enditem($canedit) {
 					   }
 				   }
 				   echo "<div class=title>";
-				   echo "<b><a href=\"$alink\" $target>{$line['title']}</a></b>\n";
+				   echo "<b><a href=\"$alink\" $rec $target>{$line['title']}</a></b>\n";
 				   if ($viewall) { 
 					   echo '<span class="instrdates">';
 					   echo "<br/>$show ";
@@ -1059,7 +1071,7 @@ function enditem($canedit) {
 					   echo "<div class=icon style=\"background-color: #ccc;\">!</div>";
 				   }
 				   echo "<div class=title>";
-				   echo "<i> <b><a href=\"$alink\" $target>{$line['title']}</a></b> </i>";
+				   echo "<i> <b><a href=\"$alink\" onclick=\"$rec\" $target>{$line['title']}</a></b> </i>";
 				   echo '<span class="instrdates">';
 				   echo "<br/><i>$show</i> ";
 				   echo '</span>';
@@ -1302,7 +1314,12 @@ function enditem($canedit) {
 				   if ($ispublic) {
 				   	   echo "<b><a href=\"../wikis/viewwikipublic.php?cid=$cid&id={$line['id']}\">{$line['name']}</a></b>\n"; 
 				   } else {
-				   	   echo "<b><a href=\"../wikis/viewwiki.php?cid=$cid&id={$line['id']}\">{$line['name']}</a></b>\n";
+				   	   if (isset($studentid)) {
+						   $rec = "data-base=\"wiki-$typeid\"";
+					   } else {
+						   $rec = '';
+					   }
+				   	   echo "<b><a href=\"../wikis/viewwiki.php?cid=$cid&id={$line['id']}\" $rec>{$line['name']}</a></b>\n";
 				   	   if ($hasnew) {
 				   	    	    echo " <span style=\"color:red\">", _('New Revisions'), "</span>";
 				   	   }

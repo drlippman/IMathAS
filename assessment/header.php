@@ -34,7 +34,7 @@ function getlastanswer(qn, part) {
 //add require_once style script loader
 initstack = new Array();
 window.onload = init;
-var imasroot = '<?php echo $imasroot; ?>';
+var imasroot = '<?php echo $imasroot; ?>'; var cid = '<?php echo $cid; ?>';
 </script>
 <link rel="stylesheet" href="<?php echo $imasroot . "/assessment/mathtest.css?ver=092812";?>" type="text/css"/>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js" type="text/javascript"></script>
