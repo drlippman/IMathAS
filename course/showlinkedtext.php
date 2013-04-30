@@ -47,7 +47,7 @@
 	}
 	
 	if (isset($studentid)) {
-		$rec = "data-base=\"fromlinkedtext-{$_GET['id']}\" ";
+		$rec = "data-base=\"linkedintext-{$_GET['id']}\" ";
 		$text = str_replace('<a ','<a '.$rec, $text);
 	}
 	

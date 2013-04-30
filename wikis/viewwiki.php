@@ -192,7 +192,10 @@ if ($cid==0) {
 			$lastedittime = tzdate("F j, Y, g:i a",$row[2]);
 			$lasteditedby = $row[3].', '.$row[4];
 		}
-		
+		if (isset($studentid)) {
+			$rec = "data-base=\"wikiintext-$id\" ";
+			$text = str_replace('<a ','<a '.$rec, $text);
+		}
 		$query = "UPDATE imas_wiki_views SET lastview=$now WHERE userid='$userid' AND wikiid='$id' AND stugroupid='$groupid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		if (mysql_affected_rows()==0) {

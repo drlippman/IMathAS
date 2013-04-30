@@ -549,6 +549,10 @@ function enditem($canedit) {
 			   if (strpos($line['summary'],'<p>')!==0) {
 				   $line['summary'] = '<p>'.$line['summary'].'</p>';
 			   }
+			   if (isset($studentid)) {
+			   	   $rec = "data-base=\"assesssum-$typeid\" ";
+			   	   $line['summary'] = str_replace('<a ','<a '.$rec, $line['summary']);
+			   } 
 			   //check for exception
 			   $canundolatepass = false;
 			   if (isset($exceptions[$items[$i]])) {
@@ -961,7 +965,7 @@ function enditem($canedit) {
 				   $line['summary'] = '<p>'.$line['summary'].'</p>';
 			   }
 			   if (isset($studentid)) {
-			   	   $rec = "data-base=\"linkedsummary-$typeid\" ";
+			   	   $rec = "data-base=\"linkedsum-$typeid\" ";
 			   	   $line['summary'] = str_replace('<a ','<a '.$rec, $line['summary']);
 			   } 
 			   if ($line['startdate']==0) {
@@ -1021,7 +1025,7 @@ function enditem($canedit) {
 				   $icon = 'html';
 			   }
 			   if (isset($studentid)) {
-			   	   $rec = "data-base=\"linkedtext-$typeid\"";
+			   	   $rec = "data-base=\"linkedlink-$typeid\"";
 			   } else {
 			   	   $rec = '';
 			   }
