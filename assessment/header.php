@@ -34,7 +34,7 @@ function getlastanswer(qn, part) {
 //add require_once style script loader
 initstack = new Array();
 window.onload = init;
-var imasroot = '<?php echo $imasroot; ?>'; var cid = '<?php echo $cid; ?>';
+var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && is_numeric($cid))?$cid:0; ?>;
 </script>
 <link rel="stylesheet" href="<?php echo $imasroot . "/assessment/mathtest.css?ver=092812";?>" type="text/css"/>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js" type="text/javascript"></script>
@@ -45,7 +45,7 @@ if (isset($CFG['locale'])) {
 		echo '<script type="text/javascript" src="'.$imasroot.'/i18n/locale/'.$lang.'/messages.js"></script>';
 	}
 }
-echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/general.js?ver=011312\"></script>\n";
+echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/general.js?ver=043013\"></script>\n";
 if (isset($sessiondata['coursetheme'])) {
 	if (isset($flexwidth)) {
 		$coursetheme = str_replace('_fw','',$sessiondata['coursetheme']);
