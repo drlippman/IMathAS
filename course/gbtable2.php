@@ -153,6 +153,9 @@ function gbtable() {
 	list($useweights,$orderby,$defaultcat,$usersort) = mysql_fetch_row($result);
 	if ($useweights==2) {$useweights = 0;} //use 0 mode for calculation of totals
 	
+	if (isset($GLOBALS['setorderby'])) {
+		$orderby = $GLOBALS['setorderby'];
+	}
 	
 	//Build user ID headers 
 	$gb[0][0][0] = "Name";
