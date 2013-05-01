@@ -382,15 +382,16 @@ function recclick(type,typeid,info) {
 		});
 	}			
 }
-$(function() {
-		$('a').each(function(i,el) {
-			if ($(el).attr("data-base")) {
-				$(el).click(function() {
-					var inf = $(this).attr('data-base').split('-');
-					recclick(inf[0], inf[1], $(this).attr("href"));
-				});
-			}
+function setuptracklinks(i,el) {
+	if ($(el).attr("data-base")) {
+		$(el).click(function() {
+			var inf = $(this).attr('data-base').split('-');
+			recclick(inf[0], inf[1], $(this).attr("href"));
 		});
+	}
+}
+$(function() {
+		$('a').each(setuptracklinks);
 });
 
 function _(txt) {
