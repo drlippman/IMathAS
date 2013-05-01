@@ -2054,11 +2054,18 @@ function formpopup($label,$content,$width=600,$height=400,$type='link',$scroll='
 		$height = "'fit'";
 	}
 	if ($ref!='') {
+		if (strpos($ref,'-')!==false) {
+			$ref = explode('-',$ref);
+			$contentadd = 'Q'.$ref[1].': ';
+			$ref = $ref[0];
+		} else {
+			$contentadd = '';
+		}
 		if (strpos($content,'watchvid.php')!==false) {
 			$cp = explode('?url=',$content);
-			$rec = "recclick('extref',$ref,'".htmlentities(urldecode($cp[1]))."');";
+			$rec = "recclick('extref',$ref,'".$contentadd.htmlentities(urldecode($cp[1]))."');";
 		} else {
-			$rec = "recclick('extref',$ref,'".htmlentities($content)."');";
+			$rec = "recclick('extref',$ref,'".$contentadd.htmlentities($content)."');";
 		}
 		
 	} else {

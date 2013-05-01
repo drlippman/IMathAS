@@ -310,7 +310,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		for ($i=0;$i<count($extref);$i++) {
 			$extrefpt = explode('!!',$extref[$i]);
 			if (isset($GLOBALS['questions']) && (!isset($GLOBALS['sessiondata']['isteacher']) || $GLOBALS['sessiondata']['isteacher']==false)) {
-				$qref = $GLOBALS['questions'][$qnidx];
+				$qref = $GLOBALS['questions'][$qnidx].'-'.($qnidx+1);
 			} else {
 				$qref = '';
 			}

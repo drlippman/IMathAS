@@ -632,7 +632,11 @@ function enditem($canedit) {
 				   } else {
 					   $tlwrds = '';
 				   }
+				   
 				   echo "<div class=title><b><a href=\"../assessment/showtest.php?id=$typeid&cid=$cid\" ";
+				   if (isset($studentid)) {
+				   	   echo "data-base=\"assess-$typeid\" ";
+				   }
 				   if ($tlwrds != '') {
 					   echo "onclick='return confirm(\"", sprintf(_('This assessment has a time limit of %s.  Click OK to start or continue working on the assessment.'), $tlwrds), "\")' ";
 				   }
@@ -1016,7 +1020,6 @@ function enditem($canedit) {
 				   }
 						   	   
 			   } else {
-			   	  
 				   if ($ispublic) { 
 					   $alink = "showlinkedtextpublic.php?cid=$cid&id=$typeid";
 				   } else {
