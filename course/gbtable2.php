@@ -60,6 +60,7 @@ row[0][1][0][7] = assessmentid, gbitems.id, forumid
 row[0][1][0][8] = tutoredit: 0 no, 1 yes
 row[0][1][0][9] = 5 number summary, if not limuser-ed
 row[0][1][0][10] = 0 regular, 1 group
+row[0][1][0][11] = due date (if $includeduedate is set)
 
 row[0][2] category totals
 row[0][2][0][0] = "Category Name"
@@ -71,6 +72,7 @@ row[0][2][0][4] = total possible for past/current
 row[0][2][0][5] = total possible for all
 row[0][2][0][6-9] = 5 number summary
 row[0][2][0][10] = gbcat id
+row[0][2][0][11] = category weight (if weighted grades)
 
 row[0][3][0] = total possible past
 row[0][3][1] = total possible past&current
@@ -151,6 +153,9 @@ function gbtable() {
 	list($useweights,$orderby,$defaultcat,$usersort) = mysql_fetch_row($result);
 	if ($useweights==2) {$useweights = 0;} //use 0 mode for calculation of totals
 	
+	if (isset($GLOBALS['setorderby'])) {
+		$orderby = $GLOBALS['setorderby'];
+	}
 	
 	//Build user ID headers 
 	$gb[0][0][0] = "Name";
@@ -535,6 +540,9 @@ function gbtable() {
 					$gb[0][1][$pos][7] = $discuss[$k];
 					$discusscol[$discuss[$k]] = $pos;
 				}
+				if (isset($GLOBALS['includeduedate'])) {
+					$gb[0][1][$pos][11] = $enddate[$k];
+				}
 					
 				
 				$pos++;
@@ -581,7 +589,9 @@ function gbtable() {
 				$gb[0][1][$pos][7] = $discuss[$k];
 				$discusscol[$discuss[$k]] = $pos;
 			}
-			
+			if (isset($GLOBALS['includeduedate'])) {
+				$gb[0][1][$pos][11] = $enddate[$k];
+			}
 			$pos++;
 		}
 	} 
@@ -663,6 +673,9 @@ function gbtable() {
 			$gb[0][2][$pos][3] = $catposspast[$cat];
 			$gb[0][2][$pos][4] = $catposscur[$cat];
 			$gb[0][2][$pos][5] = $catpossfuture[$cat];
+		}
+		if ($useweights==1) {
+			$gb[0][2][$pos][11] = $cats[$cat][5];
 		}
 			
 		

@@ -373,6 +373,26 @@ function setselectbycookie() {
 }
 addLoadEvent(setselectbycookie);
 
+function recclick(type,typeid,info) {
+	if (cid>0) {
+		$.ajax({
+			type: "POST",
+			url: imasroot+'/course/rectrack.php?cid='+cid,
+			data: "type="+encodeURIComponent(type)+"&typeid="+encodeURIComponent(typeid)+"&info="+encodeURIComponent(info)
+		});
+	}			
+}
+$(function() {
+		$('a').each(function(i,el) {
+			if ($(el).attr("data-base")) {
+				$(el).click(function() {
+					var inf = $(this).attr('data-base').split('-');
+					recclick(inf[0], inf[1], $(this).attr("href"));
+				});
+			}
+		});
+});
+
 function _(txt) {
 	if (typeof i18njs != "undefined" && i18njs[txt]) {
 		var outtxt = i18njs[txt];

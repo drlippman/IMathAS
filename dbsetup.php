@@ -172,6 +172,8 @@ $sql = 'CREATE TABLE `imas_courses` ('
 	. ' `latepasshrs` SMALLINT(4) UNSIGNED NOT NULL DEFAULT \'24\', '
 	. ' `picicons` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\','
 	. ' `newflag` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\','
+	. ' `istemplate` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\','
+	. ' `ancestors` TEXT NOT NULL, '
 	. ' `ltisecret` VARCHAR(10) NOT NULL, '
 	. ' INDEX(`ownerid`), INDEX(`name`), INDEX(`available`)'
         . ' )'
@@ -225,6 +227,7 @@ $sql = 'CREATE TABLE `imas_assessments` ('
 	. ' `caltag` VARCHAR(254) NOT NULL DEFAULT \'?\', '
 	. ' `calrtag` VARCHAR(254) NOT NULL DEFAULT \'R\', '
 	. ' `tutoredit` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
+	. ' `ancestors` TEXT NOT NULL, '
         . ' INDEX (`courseid`), INDEX(`startdate`), INDEX(`enddate`),'
 	. ' INDEX(`cntingb`), INDEX(`reviewdate`), INDEX(`avail`)'
         . ' )'
@@ -943,6 +946,20 @@ $sql = 'CREATE TABLE `imas_bookmarks` (
 	) ENGINE = InnoDB';
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 echo 'imas_bookmarks created<br/>';
+
+$sql = 'CREATE TABLE `imas_content_track` (
+	`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+	`userid` INT(10) UNSIGNED NOT NULL, 
+	`courseid` INT(10) UNSIGNED NOT NULL, 
+	`type` VARCHAR(254) NOT NULL, 
+	`typeid` INT(10) UNSIGNED NOT NULL, 
+	`viewtime` INT(10) UNSIGNED NOT NULL, 
+	`info` VARCHAR(254) NOT NULL, 
+	INDEX ( `courseid`) , INDEX( `userid`)
+	) ENGINE = InnoDB';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+echo 'imas_content_track created<br/>';
+
 
 $sql = 'CREATE TABLE `imas_dbschema` (
 	`id` INT( 10 ) UNSIGNED NOT NULL PRIMARY KEY ,

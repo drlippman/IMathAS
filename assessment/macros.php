@@ -2045,7 +2045,7 @@ function formhoverover($label,$tip) {
 	}
 }
 
-function formpopup($label,$content,$width=600,$height=400,$type='link',$scroll='null',$id='popup') {
+function formpopup($label,$content,$width=600,$height=400,$type='link',$scroll='null',$id='popup',$ref='') {
 	global $urlmode;
 	if ($scroll != null) {
 		$scroll = ','.$scroll;
@@ -2053,18 +2053,29 @@ function formpopup($label,$content,$width=600,$height=400,$type='link',$scroll='
 	if ($height=='fit') {
 		$height = "'fit'";
 	}
+	if ($ref!='') {
+		if (strpos($content,'watchvid.php')!==false) {
+			$cp = explode('?url=',$content);
+			$rec = "recclick('extref',$ref,'".htmlentities(urldecode($cp[1]))."');";
+		} else {
+			$rec = "recclick('extref',$ref,'".htmlentities($content)."');";
+		}
+		
+	} else {
+		$rec = '';
+	}
 	if (strpos($label,'<img')!==false) {
-		return str_replace('<img', '<img class="clickable" onClick="popupwindow(\''.$id.'\',\''.str_replace('\'','\\\'',htmlentities($content)).'\','.$width.','.$height.$scroll.')"',$label);
+		return str_replace('<img', '<img class="clickable" onClick="'.$rec.'popupwindow(\''.$id.'\',\''.str_replace('\'','\\\'',htmlentities($content)).'\','.$width.','.$height.$scroll.')"',$label);
 	} else {
 		if ($type=='link') {
-			return '<span class="link" onClick="popupwindow(\''.$id.'\',\''.str_replace('\'','\\\'',htmlentities($content)).'\','.$width.','.$height.$scroll.')">'.$label.'</span>';
+			return '<span class="link" onClick="'.$rec.'popupwindow(\''.$id.'\',\''.str_replace('\'','\\\'',htmlentities($content)).'\','.$width.','.$height.$scroll.')">'.$label.'</span>';
 		} else if ($type=='button') {
 			if (substr($content,0,31)=='http://www.youtube.com/watch?v=') {
 				$content = $urlmode . $_SERVER['HTTP_HOST'] . "$imasroot/assessment/watchvid.php?url=".urlencode($content);
 				$width = 660;
 				$height = 525;
 			}
-			return '<span class="spanbutton" onClick="popupwindow(\''.$id.'\',\''.str_replace('\'','\\\'',htmlentities($content)).'\','.$width.','.$height.$scroll.')">'.$label.'</span>';
+			return '<span class="spanbutton" onClick="'.$rec.'popupwindow(\''.$id.'\',\''.str_replace('\'','\\\'',htmlentities($content)).'\','.$width.','.$height.$scroll.')">'.$label.'</span>';
 		}
 	}
 }

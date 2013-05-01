@@ -375,6 +375,10 @@
 	if ($testsettings['displaymethod']=='VideoCue' && $testsettings['viddata']=='') {
 		$testsettings['displaymethod']= 'Embed';
 	}
+	if (!$isteacher) {
+		$rec = "data-base=\"assessintro-{$line['assessmentid']}\" ";
+		$testsettings['intro'] = str_replace('<a ','<a '.$rec, $testsettings['intro']);
+	}
 	$timelimitkickout = ($testsettings['timelimit']<0);
 	$testsettings['timelimit'] = abs($testsettings['timelimit']);
 	//do time limit mult

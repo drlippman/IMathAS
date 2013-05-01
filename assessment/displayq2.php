@@ -309,14 +309,19 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		echo '<div><p class="tips">', _('Get help: ');
 		for ($i=0;$i<count($extref);$i++) {
 			$extrefpt = explode('!!',$extref[$i]);
+			if (isset($GLOBALS['questions']) && (!isset($GLOBALS['sessiondata']['isteacher']) || $GLOBALS['sessiondata']['isteacher']==false)) {
+				$qref = $GLOBALS['questions'][$qnidx];
+			} else {
+				$qref = '';
+			}
 			if ($extrefpt[0]=='video' || strpos($extrefpt[1],'youtube.com/watch')!==false) {
 				$extrefpt[1] = 'http://'. $_SERVER['HTTP_HOST'] . "$imasroot/assessment/watchvid.php?url=".urlencode($extrefpt[1]);
 				if ($extrefpt[0]=='video') {$extrefpt[0]='Video';}
-				echo formpopup($extrefpt[0],$extrefpt[1],660,530,"button",true,"video");
+				echo formpopup($extrefpt[0],$extrefpt[1],660,530,"button",true,"video",$qref);
 			} else if ($extrefpt[0]=='read') {
-				echo formpopup("Read",$extrefpt[1],730,500,"button",true,"text");
+				echo formpopup("Read",$extrefpt[1],730,500,"button",true,"text",$qref);
 			} else {
-				echo formpopup($extrefpt[0],$extrefpt[1],730,500,"button",true,"text");
+				echo formpopup($extrefpt[0],$extrefpt[1],730,500,"button",true,"text",$qref);
 			}
 		}
 		echo '</p></div>';

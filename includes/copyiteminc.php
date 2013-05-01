@@ -143,22 +143,44 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		//$query = "INSERT INTO imas_assessments (courseid,name,summary,intro,startdate,enddate,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle) ";
 		//$query .= "SELECT '$cid',name,summary,intro,startdate,enddate,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle FROM imas_assessments WHERE id='$typeid'";
 		//mysql_query($query) or die("Query failed : $query" . mysql_error());
-		$query = "SELECT name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,allowlate,exceptionpenalty,noprint,avail,groupmax,endmsg,deffeedbacktext,eqnhelper,caltag,calrtag,msgtoinstr,istutorial,viddata,reqscore,reqscoreaid FROM imas_assessments WHERE id='$typeid'";
+		$query = "SELECT name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,allowlate,exceptionpenalty,noprint,avail,groupmax,endmsg,deffeedbacktext,eqnhelper,caltag,calrtag,msgtoinstr,istutorial,viddata,reqscore,reqscoreaid,ancestors FROM imas_assessments WHERE id='$typeid'";
 
 		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-		$row = mysql_fetch_row($result);
+		$row = mysql_fetch_assoc($result);
+		if ($sethidden) {$row['avail'] = 0;}
+		if (isset($gbcats[$row['gbcategory']])) {
+			$row['gbcategory'] = $gbcats[$row['gbcategory']];
+		} else {
+			$row['gbcategory'] = 0;
+		}
+		if ($row['ancestors']=='') {
+			$row['ancestors'] = $typeid;
+		} else {
+			$row['ancestors'] = $typeid.','.$row['ancestors'];
+		}
+		$reqscoreaid = $row['reqscoreaid'];
+		unset($row['reqscoreaid']);
+		$row['name'] .= stripslashes($_POST['append']);
+		
+		$fields = implode(",",array_keys($row));
+		$vals = "'".implode("','",addslashes_deep(array_values($row)))."'";
+		
+		$query = "INSERT INTO imas_assessments (courseid,$fields) VALUES ('$cid',$vals)";
+		/*$row = mysql_fetch_row($result);
 		if ($sethidden) {$row[23] = 0;}
 		if (isset($gbcats[$row[14]])) {
 			$row[14] = $gbcats[$row[14]];
 		} else if ($_POST['ctc']!=$cid) {
 			$row[14] = 0;
 		}
+		
 		$reqscoreaid = array_pop($row);
 		$row[0] .= stripslashes($_POST['append']);
 		$row = "'".implode("','",addslashes_deep($row))."'";
 		$query = "INSERT INTO imas_assessments (courseid,name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,allowlate,exceptionpenalty,noprint,avail,groupmax,endmsg,deffeedbacktext,eqnhelper,caltag,calrtag,msgtoinstr,istutorial,viddata,reqscore) ";
 
 		$query .= "VALUES ('$cid',$row)";
+		*/
 		mysql_query($query) or die("Query failed : $query" . mysql_error());
 		$newtypeid = mysql_insert_id();
 		if ($reqscoreaid>0) {

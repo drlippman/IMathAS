@@ -211,18 +211,31 @@ switch($_GET['action']) {
 		
 		$avail = 3 - $_POST['stuavail'] - $_POST['teachavail'];
 		
+		$istemplate = 0;
+		if ($myrights==100) {
+			if (isset($_POST['istemplate'])) {
+				$istemplate += 1;
+			}
+			if (isset($_POST['isselfenroll'])) {
+				$istemplate += 4;
+			}
+			if (isset($_POST['isguest'])) {
+				$istemplate += 8;
+			}
+		}
+		
 		$_POST['ltisecret'] = trim($_POST['ltisecret']);
 		
 		if ($_GET['action']=='modify') {
 			$query = "UPDATE imas_courses SET name='{$_POST['coursename']}',enrollkey='{$_POST['ekey']}',hideicons='$hideicons',available='$avail',lockaid='{$_POST['lockaid']}',picicons='$picicons',chatset=$chatset,showlatepass=$showlatepass,";
-			$query .= "allowunenroll='$unenroll',copyrights='$copyrights',msgset='$msgset',toolset='$toolset',topbar='$topbar',cploc='$cploc',theme='$theme',ltisecret='{$_POST['ltisecret']}' WHERE id='{$_GET['id']}'";
+			$query .= "allowunenroll='$unenroll',copyrights='$copyrights',msgset='$msgset',toolset='$toolset',topbar='$topbar',cploc='$cploc',theme='$theme',ltisecret='{$_POST['ltisecret']}',istemplate=$istemplate WHERE id='{$_GET['id']}'";
 			if ($myrights<75) { $query .= " AND ownerid='$userid'";}
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		} else {
 			$blockcnt = 1;
 			$itemorder = addslashes(serialize(array()));
-			$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,toolset,chatset,showlatepass,itemorder,topbar,cploc,available,theme,ltisecret,blockcnt) VALUES ";
-			$query .= "('{$_POST['coursename']}','$userid','{$_POST['ekey']}','$hideicons','$picicons','$unenroll','$copyrights','$msgset',$toolset,$chatset,$showlatepass,'$itemorder','$topbar','$cploc','$avail','$theme','{$_POST['ltisecret']}','$blockcnt');";
+			$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,toolset,chatset,showlatepass,itemorder,topbar,cploc,available,istemplate,theme,ltisecret,blockcnt) VALUES ";
+			$query .= "('{$_POST['coursename']}','$userid','{$_POST['ekey']}','$hideicons','$picicons','$unenroll','$copyrights','$msgset',$toolset,$chatset,$showlatepass,'$itemorder','$topbar','$cploc','$avail',$istemplate,'$theme','{$_POST['ltisecret']}','$blockcnt');";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			$cid = mysql_insert_id();
 			//if ($myrights==40) {
@@ -257,15 +270,23 @@ switch($_GET['action']) {
 					$gbcats[$frid] = mysql_insert_id();
 				}
 				$copystickyposts = true;
-				$query = "SELECT itemorder FROM imas_courses WHERE id='{$_POST['usetemplate']}'";
+				$query = "SELECT itemorder,ancestors FROM imas_courses WHERE id='{$_POST['usetemplate']}'";
 				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-				$items = unserialize(mysql_result($result,0,0));
+				$r = mysql_fetch_row($result);
+				$items = unserialize($r[0]);
+				$ancestors = $r[1];
+				if ($ancestors=='') {
+					$ancestors = intval($_POST['usetemplate']);
+				} else {
+					$ancestors = intval($_POST['usetemplate']).','.$ancestors;
+				}
+				$ancestors = addslashes($ancestors);
 				$newitems = array();
 				require("../includes/copyiteminc.php");
 				copyallsub($items,'0',$newitems,$gbcats);
 				doaftercopy($_POST['usetemplate']);
 				$itemorder = addslashes(serialize($newitems));
-				$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt' WHERE id='$cid'";
+				$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt',ancestors='$ancestors' WHERE id='$cid'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				copyrubrics();
 			} 

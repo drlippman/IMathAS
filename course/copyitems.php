@@ -81,12 +81,17 @@ if (!(isset($teacherid))) {
 		exit;	
 	} else if (isset($_GET['action']) && $_GET['action']=="copy") {
 		if (isset($_POST['copycourseopt'])) {
-			$tocopy = 'hideicons,allowunenroll,copyrights,msgset,topbar,cploc,picicons,chatset,showlatepass,available,theme';
+			$tocopy = 'ancestors,hideicons,allowunenroll,copyrights,msgset,topbar,cploc,picicons,chatset,showlatepass,available,theme';
 			
 			$query = "SELECT $tocopy FROM imas_courses WHERE id='{$_POST['ctc']}'";
 			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 			$row = mysql_fetch_row($result);
 			$tocopyarr = explode(',',$tocopy);
+			if ($row[0]=='') {
+				$row[0] = intval($_POST['ctc']);
+			} else {
+				$row[0] = intval($_POST['ctc']).','.$row[0];
+			}
 			$sets = '';
 			for ($i=0; $i<count($tocopyarr); $i++) {
 				if ($i>0) {$sets .= ',';}
@@ -269,7 +274,8 @@ if (!(isset($teacherid))) {
 		$lastteacher = 0;
 		
 		
-		$query = "SELECT ic.id,ic.name,ic.copyrights FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$templateuser' AND ic.available<4 ORDER BY ic.name";
+		//$query = "SELECT ic.id,ic.name,ic.copyrights FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$templateuser' AND ic.available<4 ORDER BY ic.name";
+		$query = "SELECT id,name,copyrights FROM imas_courses WHERE (istemplate&1)=1 AND available<4 ORDER BY name";
 		$courseTemplateResults = mysql_query($query) or die("Query failed : " . mysql_error());
 	}
 }
@@ -590,7 +596,7 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 		echo "<li>Loading...</li>			</ul>\n		</li>\n";
 		
 //template courses
-		if (isset($templateuser)) {
+		if (mysql_num_rows($courseTemplateResults)>0) {
 ?>
 		<li class=lihdr>
 			<span class=dd>-</span>

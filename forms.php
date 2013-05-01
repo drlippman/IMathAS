@@ -39,13 +39,14 @@ switch($_GET['action']) {
 			echo "<span class=form><label for=\"agree\">I have read and agree to the Terms of Use (below)</label></span><span class=formright><input type=checkbox name=agree></span><br class=form />\n";
 		}
 		if (!$emailconfirmation) {
-			if (isset($CFG['GEN']['selfenrolluser'])) {
+			$query = "SELECT id,name FROM imas_courses WHERE (istemplate&4)=4 AND available<4 ORDER BY name";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$doselfenroll = false;
+			if (mysql_num_rows($result)>0) {//if (isset($CFG['GEN']['selfenrolluser'])) {
+				$doselfenroll = true;
 				echo '<p>Select the course you\'d like to enroll in</p>';
 				echo '<p><select id="courseselect" name="courseselect" onchange="courseselectupdate(this);">';
 				echo '<option value="0" selected="selected">My teacher gave me a course ID (enter below)</option>';
-				$query = "SELECT imas_courses.id,imas_courses.name FROM imas_courses JOIN imas_teachers ON ";
-				$query .= "imas_courses.id=imas_teachers.courseid WHERE imas_teachers.userid='{$CFG['GEN']['selfenrolluser']}' ORDER by imas_courses.name";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				while ($row = mysql_fetch_row($result)) {
 					echo '<option value="'.$row[0].'">'.$row[1].'</option>';
 				}
@@ -58,7 +59,7 @@ switch($_GET['action']) {
 			}
 			echo '<span class="form"><label for="courseid">Course ID:</label></span><input class="form" type="text" size="20" name="courseid"/><br class="form"/>';
 			echo '<span class="form"><label for="ekey">Enrollment Key:</label></span><input class="form" type="text" size="20" name="ekey"/><br class="form"/>';
-			if (isset($CFG['GEN']['selfenrolluser'])) {
+			if ($doselfenroll) {
 				echo '</div>';
 			}
 		}
@@ -205,13 +206,14 @@ switch($_GET['action']) {
 	case "enroll":
 		echo '<div id="headerforms" class="pagetitle"><h2>Enroll in a Course</h2></div>';
 		echo "<form method=post action=\"actions.php?action=enroll$gb\">";
-		if (isset($CFG['GEN']['selfenrolluser'])) {
+		$query = "SELECT id,name FROM imas_courses WHERE (istemplate&4)=4 AND available<4 ORDER BY name";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$doselfenroll = false;
+		if (mysql_num_rows($result)>0) {//if (isset($CFG['GEN']['selfenrolluser'])) {
+			$doselfenroll = true;
 			echo '<p>Select the course you\'d like to enroll in</p>';
 			echo '<p><select id="courseselect" name="courseselect" onchange="courseselectupdate(this);">';
 			echo '<option value="0" selected="selected">My teacher gave me a course ID (enter below)</option>';
-			$query = "SELECT imas_courses.id,imas_courses.name FROM imas_courses JOIN imas_teachers ON ";
-			$query .= "imas_courses.id=imas_teachers.courseid WHERE imas_teachers.userid='{$CFG['GEN']['selfenrolluser']}' ORDER by imas_courses.name";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			while ($row = mysql_fetch_row($result)) {
 				echo '<option value="'.$row[0].'">'.$row[1].'</option>';
 			}
@@ -224,7 +226,7 @@ switch($_GET['action']) {
 		}
 		echo '<span class="form"><label for="cid">Course ID:</label></span><input class="form" type="text" size="20" name="cid"/><br class="form"/>';
 		echo '<span class="form"><label for="ekey">Enrollment Key:</label></span><input class="form" type="text" size="20" name="ekey"/><br class="form"/>';
-		if (isset($CFG['GEN']['selfenrolluser'])) {
+		if ($doselfenroll) {
 			echo '</div>';
 		}
 		echo '<div class=submit><input type=submit value="Sign Up"></div></form>';

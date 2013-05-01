@@ -1,7 +1,7 @@
 <?php  
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 69;
+$latest = 70;
 
 
 @set_time_limit(0);
@@ -1144,6 +1144,54 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 } 
 			echo "Added imas_forum_likes table<br/>";
+		}
+		if ($last < 70) {
+			 $query = 'ALTER TABLE `imas_assessments`  ADD `ancestors` TEXT NOT NULL DEFAULT \'\'';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = 'ALTER TABLE `imas_courses`  ADD `ancestors` TEXT NOT NULL DEFAULT \'\'';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 echo "Added ancestor tracking, assessments and courses<br/>";
+			 $query = 'CREATE TABLE `imas_content_track` (
+				`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+				`userid` INT(10) UNSIGNED NOT NULL, 
+				`courseid` INT(10) UNSIGNED NOT NULL, 
+				`type` VARCHAR(254) NOT NULL, 
+				`typeid` INT(10) UNSIGNED NOT NULL, 
+				`viewtime` INT(10) UNSIGNED NOT NULL,
+				`info` VARCHAR(254) NOT NULL, 
+				INDEX ( `courseid`) , INDEX( `userid`)
+				) ENGINE = InnoDB';
+			$res = mysql_query($query);
+			 if ($res===false) {
+			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 } else {
+			 	 echo "Added imas_content_track table.<br/>";
+			 }
+			 
+			$query = 'ALTER TABLE `imas_courses`  ADD `istemplate` TINYINT(1) NOT NULL DEFAULT \'0\'';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 //1: global template.  2: group template.  4: self-enroll course.  8: guest temp access
+			 if (isset($templateuser)) {
+			 	 $query = "UPDATE imas_courses SET istemplate=(istemplate | 1) WHERE id IN (SELECT courseid FROM imas_teachers WHERE userid=$templateuser)";
+			 	 $res = mysql_query($query);
+			 }
+			 if (isset($CFG['GEN']['selfenrolluser'])) {
+			 	 $query = "UPDATE imas_courses SET istemplate=(istemplate | 4) WHERE id IN (SELECT courseid FROM imas_teachers WHERE userid={$CFG['GEN']['selfenrolluser']})";
+			 	 $res = mysql_query($query);
+			 }
+			  if (isset($CFG['GEN']['guesttempaccts']) && count($CFG['GEN']['guesttempaccts'])>0) {
+			  	 $query = "UPDATE imas_courses SET istemplate=(istemplate | 8) WHERE id IN (".implode(',',$CFG['GEN']['guesttempaccts']).")";
+			 	 $res = mysql_query($query); 
+			  }
 		}
 		/*$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {

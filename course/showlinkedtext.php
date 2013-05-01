@@ -26,7 +26,7 @@
 	$title = mysql_result($result,0,1);
 	$target = mysql_result($result,0,2);
 	$titlesimp = strip_tags($title);
-
+	
 	if (substr($text,0,8)=='exttool:') {
 		list($tool,$custom) = explode('~~',substr($text,8));
 		$param = "linkid={$_GET['id']}&cid=$cid";
@@ -46,6 +46,10 @@
 		}
 	}
 	
+	if (isset($studentid)) {
+		$rec = "data-base=\"linkedintext-{$_GET['id']}\" ";
+		$text = str_replace('<a ','<a '.$rec, $text);
+	}
 	
 	require("../header.php");
 	if ($shownav) {
