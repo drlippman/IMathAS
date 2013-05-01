@@ -419,18 +419,23 @@ switch($_GET['action']) {
 			}		
 			echo '</span></span><br class="form" />';
 		}
-		if ($myrights==100) {
-			echo '<span class="form">Mark course as template?</span>';	
-			echo '<span class="formright"><input type=checkbox name="istemplate" value="1" ';
-			if (($istemplate&1)==1) {echo 'checked="checked"';};
-			echo ' /> Mark as global template course<br/>';
-			echo '<input type=checkbox name="isselfenroll" value="4" ';
-			if (($istemplate&4)==4) {echo 'checked="checked"';};
-			echo ' /> Mark as self-enroll course';
-			if (isset($CFG['GEN']['guesttempaccts'])) {
-				echo '<br/><input type=checkbox name="isguest" value="8" ';
-				if (($istemplate&8)==8) {echo 'checked="checked"';};
-				echo ' /> Mark as guest-access course';
+		if ($myrights>=75) {
+			echo '<span class="form">Mark course as template?</span>';
+			echo '<span class="formright"><input type=checkbox name="isgrptemplate" value="2" ';
+			if (($istemplate&2)==2) {echo 'checked="checked"';};
+			echo ' /> Mark as group template course';
+			if ($myrights==100) {
+				echo '<br/><span class="formright"><input type=checkbox name="istemplate" value="1" ';
+				if (($istemplate&1)==1) {echo 'checked="checked"';};
+				echo ' /> Mark as global template course<br/>';
+				echo '<input type=checkbox name="isselfenroll" value="4" ';
+				if (($istemplate&4)==4) {echo 'checked="checked"';};
+				echo ' /> Mark as self-enroll course';
+				if (isset($CFG['GEN']['guesttempaccts'])) {
+					echo '<br/><input type=checkbox name="isguest" value="8" ';
+					if (($istemplate&8)==8) {echo 'checked="checked"';};
+					echo ' /> Mark as guest-access course';
+				}
 			}
 			echo '</span><br class="form" />';
 		}
@@ -440,11 +445,38 @@ switch($_GET['action']) {
 			echo '<span class="formright"><select name="usetemplate" onchange="templatepreviewupdate(this)">';
 			echo '<option value="0" selected="selected">Start with blank course</option>';
 			//$query = "SELECT ic.id,ic.name,ic.copyrights FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$templateuser' ORDER BY ic.name";
-			$query = "SELECT id,name,copyrights FROM imas_courses WHERE (istemplate&1)=1 AND available<4 ORDER BY name";
+			$globalcourse = array();
+			$groupcourse = array();
+			$query = "SELECT id,name,copyrights,istemplate FROM imas_courses WHERE (istemplate&1)=1 AND available<4 AND copyrights=2 ORDER BY name";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			while ($row = mysql_fetch_row($result)) {
-				echo '<option value="'.$row[0].'">'.$row[1].'</option>';
+				$globalcourse[$row[0]] = $row[1];
 			}
+			$query = "SELECT ic.id,ic.name,ic.copyrights FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE ";
+			$query .= "iu.groupid='$groupid' AND (ic.istemplate&2)=2 AND ic.copyrights>0 AND ic.available<4 ORDER BY ic.name";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				$groupcourse[$row[0]] = $row[1];
+			}
+			if (count($groupcourse)>0) {
+				echo '<optgroup label="Group Templates">';
+				foreach ($groupcourse as $id=>$name) {
+					echo '<option value="'.$id.'">'.$name.'</option>';
+				}
+				echo '</optgroup>';
+			}
+			if (count($globalcourse)>0) {
+				if (count($groupcourse)>0) {
+					echo '<optgroup label="System-wide Templates">';
+				}
+				foreach ($globalcourse as $id=>$name) {
+					echo '<option value="'.$id.'">'.$name.'</option>';
+				}
+				if (count($groupcourse)>0) {
+					echo '</optgroup>';
+				}
+			}
+			
 			echo '</select><span id="templatepreview"></span></span><br class="form" />';
 			echo '<script type="text/javascript"> function templatepreviewupdate(el) {';
 			echo '  var outel = document.getElementById("templatepreview");';

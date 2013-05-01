@@ -275,8 +275,12 @@ if (!(isset($teacherid))) {
 		
 		
 		//$query = "SELECT ic.id,ic.name,ic.copyrights FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$templateuser' AND ic.available<4 ORDER BY ic.name";
-		$query = "SELECT id,name,copyrights FROM imas_courses WHERE (istemplate&1)=1 AND available<4 ORDER BY name";
+		$query = "SELECT id,name,copyrights FROM imas_courses WHERE (istemplate&1)=1 AND copyrights=2 AND available<4 ORDER BY name";
 		$courseTemplateResults = mysql_query($query) or die("Query failed : " . mysql_error());
+		
+		$query = "SELECT ic.id,ic.name,ic.copyrights FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE ";
+		$query .= "iu.groupid='$groupid' AND (ic.istemplate&2)=2 AND ic.copyrights>0 AND ic.available<4 ORDER BY ic.name";
+		$groupTemplateResults = mysql_query($query) or die("Query failed : " . mysql_error());
 	}
 }
 /******* begin html output ********/
@@ -617,6 +621,38 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 					<?php echo $row[1] ?>
 					<?php 
 						if ($row[2]<2) {
+							echo "&copy;\n"; 
+						} else {
+							echo " <a href=\"course.php?cid={$row[0]}\" target=\"_blank\">Preview</a>";
+						}
+					?>
+				</li>
+
+<?php
+			}
+			echo "			</ul>\n		</li>\n";
+		}
+		if (mysql_num_rows($groupTemplateResults)>0) {
+?>
+		<li class=lihdr>
+			<span class=dd>-</span>
+			<span class=hdr onClick="toggle('gtemplate')">
+				<span class=btn id="bgtemplate">+</span>
+			</span>
+			<span class=hdr onClick="toggle('gtemplate')">
+				<span id="ngtemplate" >Group Template Courses</span>
+			</span>
+			<ul class=hide id="gtemplate">
+
+<?php			
+			while ($row = mysql_fetch_row($groupTemplateResults)) {
+?>			
+				<li>
+					<span class=dd>-</span>
+					<input type=radio name=ctc value="<?php echo $row[0] ?>">
+					<?php echo $row[1] ?>
+					<?php 
+						if ($row[2]<1) {
 							echo "&copy;\n"; 
 						} else {
 							echo " <a href=\"course.php?cid={$row[0]}\" target=\"_blank\">Preview</a>";

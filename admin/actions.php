@@ -216,6 +216,9 @@ switch($_GET['action']) {
 			if (isset($_POST['istemplate'])) {
 				$istemplate += 1;
 			}
+			if (isset($_POST['isgrptemplate'])) {
+				$istemplate += 2;
+			}
 			if (isset($_POST['isselfenroll'])) {
 				$istemplate += 4;
 			}
