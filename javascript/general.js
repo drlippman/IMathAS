@@ -195,7 +195,7 @@ function submitlimiter(e) {
 function setupFormLimiters() {
 	var el = document.getElementsByTagName("form");
 	for (var i=0;i<el.length;i++) {
-		if (typeof el[i].onsubmit != 'function') {
+		if (typeof el[i].onsubmit != 'function' && el[i].className!="nolimit") {
 			el[i].onsubmit = submitlimiter;
 		}
 	}

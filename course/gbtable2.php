@@ -130,7 +130,7 @@ cats[i]:  0: name, 1: scale, 2: scaletype, 3: chop, 4: dropn, 5: weight, 6: hidd
 ****/
 
 function gbtable() {
-	global $cid,$isteacher,$istutor,$tutorid,$userid,$catfilter,$secfilter,$timefilter,$lnfilter,$isdiag,$sel1name,$sel2name,$canviewall,$lastlogin,$hidelocked;
+	global $cid,$isteacher,$istutor,$tutorid,$userid,$catfilter,$secfilter,$timefilter,$lnfilter,$isdiag,$sel1name,$sel2name,$canviewall,$lastlogin,$logincnt,$hidelocked;
 	if ($canviewall && func_num_args()>0) {
 		$limuser = func_get_arg(0);
 	} else if (!$canviewall) {
@@ -140,6 +140,9 @@ function gbtable() {
 	}
 	if (!isset($lastlogin)) {
 		$lastlogin = 0;
+	}
+	if (!isset($logincnt)) {
+		$logincnt = 0;
 	}
 	
 	$category = array();
@@ -189,6 +192,9 @@ function gbtable() {
 	}
 	if ($lastlogin) {
 		$gb[0][0][] = "Last Login";
+	}
+	if ($logincnt) {
+		$gb[0][0][] = "Login Count";
 	}
 	
 	//orderby 10: course order (11 cat first), 12: course order rev (13 cat first)
@@ -758,9 +764,19 @@ function gbtable() {
 		if ($lastlogin) {
 			$gb[$ln][0][] = date("n/j/y",$line['lastaccess']);
 		}
+		
 		$sturow[$line['id']] = $ln;
 		$timelimitmult[$line['id']] = $line['timelimitmult'];
 		$ln++;
+	}
+	
+	//pull logincnt if needed
+	if ($logincnt==1) {
+		$query = "SELECT userid,count(*) FROM imas_login_log WHERE courseid='$cid' GROUP BY userid";
+		$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
+		while ($r = mysql_fetch_row($result2)) {
+			$gb[$sturow[$r[0]]][0][] = $r[1];
+		}
 	}
 	
 	//pull exceptions
