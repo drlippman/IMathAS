@@ -530,7 +530,8 @@ $sql = 'CREATE TABLE `imas_forum_likes` (
 	`userid` INT(10) UNSIGNED NOT NULL, 
 	`threadid` INT(10) UNSIGNED NOT NULL, 
 	`postid` INT(10) UNSIGNED NOT NULL, 
-	`type` TINYINT(1) UNSIGNED NOT NULL
+	`type` TINYINT(1) UNSIGNED NOT NULL,
+	INDEX (`userid`), INDEX(`threadid`), INDEX(`postid`)
 	) ENGINE = InnoDB';
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());	
 echo 'imas_forum_likes created<br/>';
