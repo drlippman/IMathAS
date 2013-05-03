@@ -383,16 +383,17 @@ function recclick(type,typeid,info) {
 	}			
 }
 function setuptracklinks(i,el) {
-	if ($(el).attr("data-base")) {
-		$(el).click(function() {
-			var inf = $(this).attr('data-base').split('-');
-			recclick(inf[0], inf[1], $(this).attr("href"));
+	if (jQuery(el).attr("data-base")) {
+		jQuery(el).click(function() {
+			var inf = jQuery(this).attr('data-base').split('-');
+			recclick(inf[0], inf[1], jQuery(this).attr("href"));
 		});
 	}
 }
-$(function() {
-		$('a').each(setuptracklinks);
-});
+
+(function($){
+	$('a').each(setuptracklinks);		
+})(jQuery);
 
 function _(txt) {
 	if (typeof i18njs != "undefined" && i18njs[txt]) {

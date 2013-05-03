@@ -1,8 +1,32 @@
 <?php
 //(c) 2013 David Lippman.  Part of IMathAS
 //Define course outcomes
+
 require("../validate.php");
-if (!isset($teacherid)) { exit;}
+if (!isset($teacherid)) { echo "You are not validated to view this page"; exit;}
+
+if (isset($_POST['order'])) {
+	//plan:  store order and outcome groups as serialized array (like blocks)
+	//array(name=>name, items=>array(outcome ids))
+	
+	//get list of existing outcomes
+	
+	//read in from order
+	
+	//add new outcomes
+	
+	//remove unused outcomes
+	
+	//detach unused outcomes from questions/content items
+	
+	echo 'OK';
+	exit;
+}
+
+
+
+//load existing outcomes
+
 
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n";
 

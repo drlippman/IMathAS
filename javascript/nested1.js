@@ -317,7 +317,7 @@ function submitChanges() {
   url = AHAHsaveurl;
   els = document.getElementsByTagName("input");
   for (var i=0; i<els.length; i++) {
-	  if (els[i].type=="hidden") {
+	  if (els[i].type=="hidden" || (els[i].type=="text" && els.style.display!='none')) {
 		  params += '&'+els[i].id.substring(5) + '=' + encodeURIComponent(els[i].value);
 	  }
   }
@@ -341,6 +341,7 @@ function submitChanges() {
 	req.send(params); 
   } 
 }  
+
 
 function NestedahahDone(url, target) { 
   if (req.readyState == 4) { // only if req is "loaded" 
