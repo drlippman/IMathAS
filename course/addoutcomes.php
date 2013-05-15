@@ -42,6 +42,7 @@ $placeinhead .= '<script type="text/javascript">
 		html += \'<input type="text" size="60" id="new\'+ocnt+\'"> \';
 		html += \'<a href="#" onclick="removeoutcome(this);return false\">'._("Delete").'</a></li>\';
 		j("#qviewtree").append(j(html));
+		j("#new"+ocnt).focus();
 		ocnt++;
 		if (!sortIt.haschanged) {
 			sortIt.haschanged = true;
@@ -54,6 +55,7 @@ $placeinhead .= '<script type="text/javascript">
 		html += \'<input type="text" size="60" id="newg\'+ocnt+\'"> \';
 		html += \'<a href="#" onclick="removeoutcomegrp(this);return false\">'._("Delete").'</a></li>\';
 		j("#qviewtree").append(j(html));
+		j("#newg"+ocnt).focus();
 		ocnt++;
 		if (!sortIt.haschanged) {
 			sortIt.haschanged = true;
