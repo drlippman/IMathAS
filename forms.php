@@ -203,7 +203,7 @@ switch($_GET['action']) {
 		}
 		echo "<div class=submit><input type=submit value='Update Info'></div>\n";
 		
-		echo '<p><a href="forms.php?action=googlegadget">Get Google Gadget</a> to monitor your messages and forum posts</p>';
+		//echo '<p><a href="forms.php?action=googlegadget">Get Google Gadget</a> to monitor your messages and forum posts</p>';
 		echo "</form>\n";
 		break;
 	case "enroll":
