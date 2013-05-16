@@ -317,8 +317,10 @@ function submitChanges() {
   url = AHAHsaveurl;
   els = document.getElementsByTagName("input");
   for (var i=0; i<els.length; i++) {
-	  if (els[i].type=="hidden" || (els[i].type=="text" && els.style.display!='none')) {
-		  params += '&'+els[i].id.substring(5) + '=' + encodeURIComponent(els[i].value);
+	  if (els[i].type=="hidden") {
+	  	  params += '&'+els[i].id.substring(5) + '=' + encodeURIComponent(els[i].value);
+	  } else if (els[i].type=="text" && els[i].className=="outcome") {
+		  params += '&'+els[i].id + '=' + encodeURIComponent(els[i].value);
 	  }
   }
 
