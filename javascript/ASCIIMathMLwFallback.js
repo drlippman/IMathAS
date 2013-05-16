@@ -98,14 +98,18 @@ function AMisMathMLavailable() {
 		   return AMnoMathMLNote();
 	   }
     }
-  else if (navigator.appName.slice(0,9)=="Microsoft")
-    try {
-        var ActiveX = new ActiveXObject("MathPlayer.Factory.1");
-        return null;
-    } catch (e) {
-        return AMnoMathMLNote();
-    }
-  else return AMnoMathMLNote();
+    else if (navigator.appName.slice(0,9)=="Microsoft") {
+    	    version = parseFloat(navigator.appVersion.split("MSIE")[1]);
+	    if (version >= 10) {
+	    	    return AMnoMathMLNote(); //IE 10 does not work with MathPlayer yet
+	    }
+	    try {
+		var ActiveX = new ActiveXObject("MathPlayer.Factory.1");
+		return null;
+	    } catch (e) {
+		return AMnoMathMLNote();
+	    }
+    } else return AMnoMathMLNote();
 }
 
 // character lists for Mozilla/Netscape fonts
