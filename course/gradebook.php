@@ -165,7 +165,7 @@ if ($isteacher) {
 		
 	}
 	if (isset($_POST['usrcomments']) && $stu>0) {
-			$query = "UPDATE imas_students SET gbcomment='{$_POST['usrcomments']}' WHERE userid='$stu'";
+			$query = "UPDATE imas_students SET gbcomment='{$_POST['usrcomments']}' WHERE userid='$stu' AND courseid='$cid'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			//echo "<p>Comment Updated</p>";
 	}
