@@ -6,7 +6,6 @@
 		exit;
 	}
 	if (isset($teacherid) && isset($_GET['scored'])) {
-		echo "scorediew";
 		$scoredview = true;
 	} else {
 		$scoredview = false;
@@ -22,8 +21,9 @@
 			});
 			</script>';
 	}
+	$sessiondata['coursetheme'] = $coursetheme;
 	require("header.php");
-	echo "<style type=\"text/css\" media=\"print\">p.tips {	display: none;}\n input.btn {display: none;}\n textarea {display: none;}\n input.sabtn {display: none;}</style>\n";
+	echo "<style type=\"text/css\" media=\"print\">.hideonprint {display:none;} p.tips {display: none;}\n input.btn {display: none;}\n textarea {display: none;}\n input.sabtn {display: none;} .question, .review {background-color:#fff;}</style>\n";
 	echo "<style type=\"text/css\">p.tips {	display: none;}\n </style>\n";
 	echo '<script type="text/javascript">function rendersa() { ';
 	echo '  el = document.getElementsByTagName("span"); ';
@@ -48,6 +48,7 @@
 	$scores = explode(",",$line['bestscores']);
 	$attempts = explode(",",$line['bestattempts']);
 	$lastanswers = explode("~",$line['bestlastanswers']);
+	$timesontask = explode("~",$line['timeontask']);
 
 	if ($isteacher) {
 		if ($line['userid']!=$userid) {
@@ -113,8 +114,8 @@
 	$showansduring = (($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework") && $testsettings['showans']!='N');
 	echo "<div class=breadcrumb>Print Ready Version</div>";
 	echo '<div class=intro>'.$testsettings['intro'].'</div>';
-	if ($isteacher) {
-		echo '<input type="button" class="btn" onclick="rendersa()" value="Show Answers" />';
+	if ($isteacher && !$scoredview) {
+		echo '<input type="button" class="btn" onclick="rendersa()" value="Show Answers" /> <a href="printtest?cid='.$cid.'&asid='.$testid.'&scored=true">Show Scored View</a>';
 	}
 	if ($testsettings['showans']=='N') {
 		$lastanswers = array_fill(0,count($questions),'');
@@ -144,7 +145,75 @@
 		}
 		if ($scoredview) {
 			$col = scorestocolors($scores[$i], $qi[$questions[$i]]['points'], $qi[$questions[$i]]['answeights']);
-			displayq($i, $qsetid,$seeds[$i],2,false,$attempts[$i],false,false,false,$col);	
+			displayq($i, $qsetid,$seeds[$i],2,false,$attempts[$i],false,false,false,$col);
+			
+			echo '<div class="review">';
+			$laarr = explode('##',$lastanswers[$i]);
+			
+			if (count($laarr)>1) {
+				echo "Previous Attempts:";
+				$cnt =1;
+				for ($k=0;$k<count($laarr)-1;$k++) {
+					if ($laarr[$k]=="ReGen") {
+						echo ' ReGen ';
+					} else {
+						echo "  <b>$cnt:</b> " ;
+						if (preg_match('/@FILE:(.+?)@/',$laarr[$k],$match)) {
+							$url = getasidfileurl($match[1]);
+							echo "<a href=\"$url\" target=\"_new\">".basename($match[1])."</a>";
+						} else {
+							if (strpos($laarr[$k],'$!$')) {
+								if (strpos($laarr[$k],'&')) { //is multipart q
+									$laparr = explode('&',$laarr[$k]);
+									foreach ($laparr as $lk=>$v) {
+										if (strpos($v,'$!$')) {
+											$tmp = explode('$!$',$v);
+											$laparr[$lk] = $tmp[0];
+										}
+									}
+									$laarr[$k] = implode('&',$laparr);
+								} else {
+									$tmp = explode('$!$',$laarr[$k]);
+									$laarr[$k] = $tmp[0];
+								}
+							}
+							if (strpos($laarr[$k],'$#$')) {
+								if (strpos($laarr[$k],'&')) { //is multipart q
+									$laparr = explode('&',$laarr[$k]);
+									foreach ($laparr as $lk=>$v) {
+										if (strpos($v,'$#$')) {
+											$tmp = explode('$#$',$v);
+											$laparr[$lk] = $tmp[0];
+										}
+									}
+									$laarr[$k] = implode('&',$laparr);
+								} else {
+									$tmp = explode('$#$',$laarr[$k]);
+									$laarr[$k] = $tmp[0];
+								}
+							}
+							
+							echo str_replace(array('&','%nbsp;'),array('; ','&nbsp;'),strip_tags($laarr[$k]));
+						}
+						$cnt++;
+					}
+
+				}
+				echo '. ';
+			}
+			if ($timesontask[$i]!='') {
+				echo 'Average time per submission: ';
+				$timesarr = explode('~',$timesontask[$i]);
+				$avgtime = array_sum($timesarr)/count($timesarr);
+				if ($avgtime<60) {
+					echo round($avgtime,1) . ' seconds ';
+				} else {
+					echo round($avgtime/60,1) . ' minutes ';
+				}
+				echo '<br/>';
+			}
+			echo '</div>';
+			
 		} else {
 			displayq($i,$qsetid,$seeds[$i],$showa,($testsettings['showhints']==1),$attempts[$i]);
 		}

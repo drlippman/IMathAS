@@ -8,9 +8,34 @@
 	
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	echo "<p>Student count: ".mysql_result($result,0,0);
+	
+	$date = $now - 60*60*24*30*10;  
+	echo "<p>Active enrollments in last 10 months</p>";
+	$query = "SELECT count(imas_students.id) FROM imas_users,imas_students WHERE ";
+	$query .= "imas_users.id=imas_students.userid AND imas_users.lastaccess>$date";
+	
+	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	echo "<p>Student count: ".mysql_result($result,0,0);
+	
+	$date = $now - 60*60*24*30*10;  
+	echo "<p>Active users in last 10 months</p>";
+	$query = "SELECT count(DISTINCT imas_users.id) FROM imas_users,imas_students WHERE ";
+	$query .= "imas_users.id=imas_students.userid AND imas_users.lastaccess>$date";
+	
+	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	echo "<p>Student count: ".mysql_result($result,0,0);
+	
 
 	$date = $now - 60*60*24*7;  
 	echo "<p>Active users in 7 Days</p>";
+	$query = "SELECT count(DISTINCT imas_users.id) FROM imas_users,imas_students WHERE ";
+	$query .= "imas_users.id=imas_students.userid AND imas_users.lastaccess>$date";
+	
+	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	echo "<p>Student count: ".mysql_result($result,0,0);
+	
+	$date = $now - 60*60*24*30;  
+	echo "<p>Active users in 30 Days</p>";
 	$query = "SELECT count(DISTINCT imas_users.id) FROM imas_users,imas_students WHERE ";
 	$query .= "imas_users.id=imas_students.userid AND imas_users.lastaccess>$date";
 	

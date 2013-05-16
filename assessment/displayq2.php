@@ -722,6 +722,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		
 		$out .= "class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\" />$rightb";
+		$out .= getcolormark($colorbox);
 		if ($displayformat=='hidden') { $out .= '<script type="text/javascript">imasprevans['.$qstr.'] = "'.$la.'";</script>';}
 		if (isset($answer)) {
 			$sa = $answer;
@@ -848,11 +849,13 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		} else {
 			$out .= "</ul>\n";
 		}
+		$out .= getcolormark($colorbox);
 		if ($displayformat == 'inline') {
 			$out .= "</span>";
 		} else if ($displayformat != 'select') {
 			$out .= "</div>";
 		}
+		
 		$tip = _('Select the best answer');
 		if (isset($answer)) {
 			$anss = explode(' or ',$answer);
@@ -951,6 +954,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		} else {
 			$out .= "</ul>\n";
 		}
+		$out .= getcolormark($colorbox);
 		if ($displayformat == 'inline') {
 			$out .= "</span>";
 		} else {
@@ -1056,6 +1060,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= "</div>";
 		}
 		$out .= "<input type=hidden name=\"qn$qn\" value=\"done\" /><div class=spacer>&nbsp;</div>";
+		$out .= getcolormark($colorbox);
 		if ($colorbox != '') {$out .= '</div>';}
 		//$tip = "In each box provided, type the letter (a, b, c, etc.) of the matching answer in the right-hand column";
 		if ($displayformat=="select") {
@@ -1131,6 +1136,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper)\" onblur=\"hideee();hideeedd();\" ";
 		}
 		$out .= "/>$rightb\n";
+		$out .= getcolormark($colorbox);
 		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
 		if (!isset($hidepreview)) {
 			$preview .= "<input type=button class=btn value=Preview onclick=\"calculate('tc$qn','p$qn','$answerformat')\" /> &nbsp;\n";
@@ -1179,10 +1185,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$out .= "</tr>";
 			}
 			$out .= "</table>\n";
+			$out .= getcolormark($colorbox);
 			$out .= '</td><td class="matrixright">&nbsp;</td></tr></table>';
 			$tip = _('Enter each element of the matrix as  number (like 5, -3, 2.2)');
 		} else {
 			$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\" />\n";
+			$out .= getcolormark($colorbox);
 			$out .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"AMmathpreview('qn$qn','p$qn')\" /> &nbsp;\n";
 			$out .= "<span id=p$qn></span> ";
 			$tip = _('Enter your answer as a matrix filled with numbers, like ((2,3,4),(3,4,5))');
@@ -1229,6 +1237,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			}
 			$out .= "</table>\n";
 			$out .= '</td><td class="matrixright">&nbsp;</td></tr></table>';
+			$out .= getcolormark($colorbox);
 			if (!isset($hidepreview)) {$preview .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"matrixcalc('qn$qn','p$qn',{$answersize[0]},{$answersize[1]})\" /> &nbsp;\n";}
 			$preview .= "<span id=p$qn></span>\n";
 			$out .= "<script type=\"text/javascript\">matcalctoproc[$qn] = 1; matsize[$qn]='{$answersize[0]},{$answersize[1]}';</script>\n";
@@ -1236,6 +1245,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			//$tip = "Enter each element of the matrix as  number (like 5, -3, 2.2) or as a calculation (like 5/3, 2^3, 5+4)";
 		} else {
 			$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\" />\n";
+			$out .= getcolormark($colorbox);
 			$out .= "<input type=button value=Preview onclick=\"matrixcalc('tc$qn','p$qn')\" /> &nbsp;\n";
 			$out .= "<span id=p$qn></span> \n";
 			$out .= "<script type=\"text/javascript\">matcalctoproc[$qn] = 1;</script>\n";
@@ -1283,7 +1293,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$out .= "/>\n";
 		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
 		$out .= "<input type=\"hidden\" id=\"qn$qn-vals\" name=\"qn$qn-vals\" />";
-		
+		$out .= getcolormark($colorbox);
 		if (!isset($hidepreview)) {$preview .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"AMpreview('tc$qn','p$qn')\" /> &nbsp;\n";}
 		$preview .= "<span id=p$qn></span>\n";
 		
@@ -1372,7 +1382,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
 		}
 		$out .= '/>';
-		
+		$out .= getcolormark($colorbox);
 		if (isset($answer)) {
 			$sa = $answer;
 		}
@@ -1426,7 +1436,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		$out .= "/>";
 		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
-		
+		$out .= getcolormark($colorbox);
 		if (!isset($hidepreview)) {
 			$preview .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"ntuplecalc('tc$qn','p$qn','$qn')\" /> &nbsp;\n";
 		}
@@ -1466,6 +1476,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
 		}
 		$out .= '/>';
+		$out .= getcolormark($colorbox);
 		if (isset($answer)) {
 			$sa = makepretty($answer);
 		}
@@ -1509,7 +1520,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		$out .= "/>";
 		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
-		
+		$out .= getcolormark($colorbox);
 		if (!isset($hidepreview)) {
 			$preview .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"complexcalc('tc$qn','p$qn')\" /> &nbsp;\n";
 		}
@@ -1550,6 +1561,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
 		}
 		$out .= '/>';
+		$out .= getcolormark($colorbox);
 		if ($displayformat == 'usepreview') {
 			$preview .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"stringqpreview('qn$qn','p$qn','$answerformat')\" /> &nbsp;\n";
 			$preview .= "<span id=p$qn></span> ";
@@ -1601,7 +1613,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$out .= "onclick=\"quicksetscore('$el',0)\" /></span>";
 			}
 				
-			$out .= filter($la)."</div>";
+			$out .= filter($la);
+			$out .= getcolormark($colorbox);
+			$out .= "</div>";
 		} else {
 			$la = stripslashes($la);
 			$la = preg_replace('/%(\w+;)/',"&$1",$la);
@@ -1612,6 +1626,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			}
 			if ($rows<2) {
 				$out .= "<input type=\"text $colorbox\" size=\"$cols\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" /> ";
+				$out .= getcolormark($colorbox);
 			} else {
 				if ($colorbox!='') { $out .= '<div class="'.$colorbox.'">';}
 				$out .= "<textarea rows=\"$rows\" name=\"qn$qn\" id=\"qn$qn\" ";
@@ -1621,6 +1636,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					$out .= "cols=\"$cols\" ";
 				}
 				$out .= ">$la</textarea>\n";
+				$out .= getcolormark($colorbox);
 				if ($colorbox!='') { $out .= '</div>';} 
 			} 
 			if ($displayformat=='editor' && $GLOBALS['useeditor']==1) {
@@ -1684,7 +1700,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
 		}
 		$out .= '/>';
-		
+		$out .= getcolormark($colorbox);
 		if (isset($answer)) {
 			if ($answerformat=='normalcurve' && $GLOBALS['sessiondata']['graphdisp']!=0) {
 				$sa .=  '<div style="position: relative; width: 500px; height:200px;padding:0px;background:#fff;">';
@@ -1754,7 +1770,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		$out .= '/>';
 		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
-		
+		$out .= getcolormark($colorbox);
 		if (!isset($hidepreview)) {
 			$preview .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"intcalculate('tc$qn','p$qn','$answerformat')\" /> &nbsp;\n";
 		}
@@ -1989,6 +2005,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		
 		if (strpos($snaptogrid,':')!==false) { $snaptogrid = "'$snaptogrid'";}
 		$out .= '</span></div>';
+		$out .= getcolormark($colorbox);
 		$out .= "<input type=\"hidden\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" />";
 		$out .= "<script type=\"text/javascript\">canvases[$qn] = [$qn,'$bg',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline,$locky,$snaptogrid];";
 		
@@ -2100,6 +2117,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		
 		if ($colorbox!='') { $out .= '<span class="'.$colorbox.'">';}
 		$out .= "<input type=\"file\" name=\"qn$qn\" id=\"qn$qn\" />\n";
+		$out .= getcolormark($colorbox);
 		if ($colorbox!='') { $out .= '</span>';}
 		if ($la!='') {
 			if (isset($GLOBALS['testsettings']) && isset($GLOBALS['sessiondata']['groupid']) && $GLOBALS['testsettings']>0 && $GLOBALS['sessiondata']['groupid']>0) {
@@ -4938,6 +4956,20 @@ function formathint($eword,$ansformats,$calledfrom, $islist=false,$doshort=false
 		return array($tip,$shorttip);
 	} else {
 		return $tip;
+	}
+}
+
+function getcolormark($c) {
+	global $imasroot;
+	
+	if ($c=='ansred') {
+		return '<img src="'.$imasroot.'/img/redx.gif"/>';
+	} else if ($c=='ansgrn') {
+		return '<img src="'.$imasroot.'/img/gchk.gif"/>';
+	} else if ($c=='ansyel') {
+		return '<img src="'.$imasroot.'/img/ychk.gif"/>';
+	} else {
+		return '';
 	}
 }
 
