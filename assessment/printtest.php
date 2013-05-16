@@ -5,9 +5,23 @@
 		echo "<html><body>Error. </body></html>\n";
 		exit;
 	}
+	if (isset($teacherid) && isset($_GET['scored'])) {
+		echo "scorediew";
+		$scoredview = true;
+	} else {
+		$scoredview = false;
+	}
 	
 	include("displayq2.php");
+	include("testutil.php");
 	$flexwidth = true; //tells header to use non _fw stylesheet
+	if ($scoredview) {
+		$placeinhead = '<script type="text/javascript">
+			$(function() {
+				$(\'input[value="Preview"]\').click().hide();
+			});
+			</script>';
+	}
 	require("header.php");
 	echo "<style type=\"text/css\" media=\"print\">p.tips {	display: none;}\n input.btn {display: none;}\n textarea {display: none;}\n input.sabtn {display: none;}</style>\n";
 	echo "<style type=\"text/css\">p.tips {	display: none;}\n </style>\n";
@@ -20,31 +34,7 @@
 	echo '     }';
 	echo '    }';
 	echo '} </script>';
-	function unans($sc) {
-		if (strpos($sc,'~')===false) {
-			return ($sc<0);
-		} else {
-			return (strpos($sc,'-1'));
-		}
-	}
-	function getpointspossible($qn,$defpts,$defatt) {
-		$query = "SELECT points,attempts FROM imas_questions WHERE id='$qn'";
-		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
-		 	if ($row[0] == 9999) {
-				$possible = $defpts;
-			} else {
-				$possible = $row[0];
-			}
-			if ($row[1] == 9999) {
-				$att = $defatt;
-			} else {
-				$att = $row[1];
-			}
-			if ($att==0) {$att = "unlimited";}
-		}
-		return array($possible,$att);
-	}
+	
 	if ($isteacher && isset($_GET['asid'])) {
 		$testid = $_GET['asid'];
 	} else {
@@ -55,9 +45,10 @@
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
 	$questions = explode(",",$line['questions']);
 	$seeds = explode(",",$line['seeds']);
-	$scores = explode(",",$line['scores']);
-	$attempts = explode(",",$line['attempts']);
-	$lastanswers = explode("~",$line['lastanswers']);
+	$scores = explode(",",$line['bestscores']);
+	$attempts = explode(",",$line['bestattempts']);
+	$lastanswers = explode("~",$line['bestlastanswers']);
+
 	if ($isteacher) {
 		if ($line['userid']!=$userid) {
 			$query = "SELECT LastName,FirstName FROM imas_users WHERE id='{$line['userid']}'";
@@ -73,9 +64,12 @@
 	$testsettings = mysql_fetch_array($result, MYSQL_ASSOC);
 	list($testsettings['testtype'],$testsettings['showans']) = explode('-',$testsettings['deffeedback']);
 	
+	$qi = getquestioninfo($questions,$testsettings);
+	
+	
 	$now = time();
 	$isreview = false;
-	if ($now < $testsettings['startdate'] || $testsettings['enddate']<$now) { //outside normal range for test
+	if (!$scoredview && ($now < $testsettings['startdate'] || $testsettings['enddate']<$now)) { //outside normal range for test
 		$query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='{$line['assessmentid']}'";
 		$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 		$row = mysql_fetch_row($result2);
@@ -126,7 +120,9 @@
 		$lastanswers = array_fill(0,count($questions),'');
 	}
 	for ($i = 0; $i < count($questions); $i++) {
-		list($qsetid,$cat) = getqsetid($questions[$i]);
+		//list($qsetid,$cat) = getqsetid($questions[$i]);
+		$qsetid = $qi[$questions[$i]]['questionsetid'];
+		$cat = $qi[$questions[$i]]['category'];
 		
 		$showa = $isteacher;
 		echo '<div class="nobreak">';
@@ -135,10 +131,23 @@
 			$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 			echo '<div>ID:'.$qsetid.', '.mysql_result($result,0,0).'</div>';
 		} else {
-			list($points,$qattempts) = getpointspossible($questions[$i],$testsettings['defpoints'],$testsettings['defattempts']);
-			echo "<div>#".($i+1)." Points possible: $points.  Total attempts: $qattempts</div>";
+			//list($points,$qattempts) = getpointspossible($questions[$i],$testsettings['defpoints'],$testsettings['defattempts']);
+			$points = $qi[$questions[$i]]['points'];
+			$qattempts = $qi[$questions[$i]]['attempts'];
+			if ($scoredview) {
+				echo "<div>#".($i+1)." ";
+				echo printscore($scores[$i], $i);
+				echo "</div>";
+			} else {
+				echo "<div>#".($i+1)." Points possible: $points.  Total attempts: $qattempts</div>";
+			}
 		}
-		displayq($i,$qsetid,$seeds[$i],$showa,($testsettings['showhints']==1),$attempts[$i]);
+		if ($scoredview) {
+			$col = scorestocolors($scores[$i], $qi[$questions[$i]]['points'], $qi[$questions[$i]]['answeights']);
+			displayq($i, $qsetid,$seeds[$i],2,false,$attempts[$i],false,false,false,$col);	
+		} else {
+			displayq($i,$qsetid,$seeds[$i],$showa,($testsettings['showhints']==1),$attempts[$i]);
+		}
 		echo "<hr />";	
 		echo '</div>';
 		
