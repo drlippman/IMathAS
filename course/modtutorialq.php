@@ -71,15 +71,21 @@ if (isset($_POST['text'])) {
 		}
 		if ($qtypes[$n] == 'choices' || $qtypes[$n] == 'number') {
 			$qparts[$n] = intval($_POST['qparts'.$n]);
+			$questions[$n] = array();
+			$partialans[$n] = array();
+			$feedbacktxt[$n] = array();
+			$partial[$n] = array();
 			for ($i=0;$i<$qparts[$n];$i++) {
+				if (trim($_POST['txt'.$n.'-'.$i])=='') {continue;}
 				if ($qtypes[$n] == 'choices') {
-					$questions[$n][$i] = $_POST['txt'.$n.'-'.$i];
+					$questions[$n][] = $_POST['txt'.$n.'-'.$i];
 				} else if ($qtypes[$n] == 'number') {
-					$partialans[$n][$i] = $_POST['txt'.$n.'-'.$i];
+					$partialans[$n][] = $_POST['txt'.$n.'-'.$i];
 				}
-				$feedbacktxt[$n][$i] = $_POST['fb'.$n.'-'.$i];
-				$partial[$n][$i] = floatval($_POST['pc'.$n.'-'.$i]);
+				$feedbacktxt[$n][] = $_POST['fb'.$n.'-'.$i];
+				$partial[$n][] = floatval($_POST['pc'.$n.'-'.$i]);
 			}
+			$qparts[$n] = count($feedbacktxt[$n]);
 		} else if ($qtypes[$n] == 'essay') {
 			$qparts[$n] = 0;
 			$feedbacktxtessay[$n] = $_POST['essay'.$n.'-fb'];	
@@ -684,8 +690,10 @@ echo '</div>';
 
 if ($editmsg != '' || $_GET['id']!='new') {
 	echo '<p>'.$editmsg;
-	if ($_GET['id']!='new') {
-		echo ' <a href="moddataset.php?'.$_SERVER['QUERY_STRING'].'">Open in the regular question editor</a>';
+	if ($id!='new') {
+		echo ' <a href="moddataset.php?cid='.$cid.'&id='.$id.'">Open in the regular question editor</a>';
+	} else {
+		echo ' <a href="moddataset.php?cid='.$cid.'">Open in the regular question editor</a>';
 	}
 	echo '</p>';
 }
