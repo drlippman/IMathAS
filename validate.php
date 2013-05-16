@@ -93,7 +93,7 @@
 			 require("header.php");
 			 echo "<h2>Browser check</h2>\n";
 			 echo "<p>For fastest, most accurate, and prettiest math and graph display, this system recommends:";
-			 echo "<ul><li>Windows: Firefox 1.5+, Internet Explorer 9 with MathPlayer, or Internet Explorer 6+ with MathPlayer and AdobeSVGViewer</li>\n";
+			 echo "<ul><li>Windows: Firefox 1.5+ or Internet Explorer 9 with MathPlayer</li>\n";
 			 echo "<li>Mac: Firefox 1.5+</li></ul>\n";
 			 echo "<form method=post action=\"{$_SERVER['PHP_SELF']}$querys\">\n";
 			 echo "<div id=settings></div>";
@@ -102,6 +102,13 @@
 	function preparenotices() {
 		setnode = document.getElementById("settings");
 		var html = "";
+		html += '<p><input type="checkbox" name="savesettings" checked="1"> Don\'t show me this screen again on this computer and browser.  If you update your browser, you can get back to this page by selecting Visual Display when you login.</p>';
+		if (AMnoMathML || ASnoSVG) {
+			html += '<p><input type="submit" name="recheck" value="Recheck Setup"><input type="submit" name="skip" value="Continue with image-based display"></p>';
+		} else {
+			html += '<p><input type="submit" name="isok" value="Browser setup OK - Continue"></p>';
+		}
+		
 		html += '<h4>Math Display</h4>';
 		if (AMnoMathML) {
 			if (AMisGecko && AMnoTeX) {
@@ -131,12 +138,7 @@
 			html += '<p><input type=hidden name="graphdisp" value="1">Your browser is set up for browser-based graph display.</p>';
 		}
 		
-		html += '<p><input type="checkbox" name="savesettings" checked="1"> Don\'t show me this screen again on this computer and browser.  If you update your browser, you can get back to this page by selecting Visual Display when you login.</p>';
-		if (AMnoMathML || ASnoSVG) {
-			html += '<p><input type="submit" name="recheck" value="Recheck Setup"><input type="submit" name="skip" value="Continue with image-based display"></p>';
-		} else {
-			html += '<p><input type="submit" name="isok" value="Browser setup OK - Continue"></p>';
-		}
+		
 			
 		setnode.innerHTML = html;
 	}

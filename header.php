@@ -2,7 +2,7 @@
 <html>
 <head>
 <title><?php echo $installname; if (isset($pagetitle)) { echo " - $pagetitle";}?></title>
-<meta http-equiv="X-UA-Compatible" content="IE=7, IE=9" />
+<meta http-equiv="X-UA-Compatible" content="IE=7, IE=Edge" />
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js" type="text/javascript"></script>
 <link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=112111";?>" type="text/css" />
@@ -53,7 +53,7 @@ if (isset($ispublic) && $ispublic) {
 } else {
 if (!isset($sessiondata['mathdisp'])) {
 	echo '<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false;</script>';
-	echo "<script src=\"$imasroot/javascript/mathgraphcheck.js?v=091311\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/mathgraphcheck.js?v=051313\" type=\"text/javascript\"></script>\n";
 } else if ($sessiondata['mathdisp']==1) {
 	echo "<script src=\"$imasroot/javascript/ASCIIMathML_min.js?v=100411\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIIMath = true;</script>";
@@ -76,6 +76,7 @@ if (isset($sessiondata['graphdisp']) && $sessiondata['graphdisp']==1) {
 	echo "<script type=\"text/javascript\">var usingASCIISvg = false; var ASnoSVg=true;</script>";
 }
 }
+
 
 $start_time = microtime(true); 
 if (isset($placeinhead)) {
