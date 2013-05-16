@@ -1199,14 +1199,14 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 if ($res===false) {
 			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
-			
-			$query = 'CREATE TABLE `imas_outcomes` (
+			 
+			 $query = 'CREATE TABLE `imas_outcomes` (
 				`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 				`courseid` INT(10) UNSIGNED NOT NULL, 
 				`name` VARCHAR(255) NOT NULL, 
 				INDEX ( `courseid`) 
 				) ENGINE = InnoDB';
-			$res = mysql_query($query);
+			 $res = mysql_query($query);
 			 if ($res===false) {
 			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 } 
@@ -1218,17 +1218,17 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 if ($res===false) {
 			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
-			 $query = 'ALTER TABLE `imas_linkedtext`  ADD `outcome` INT(10) UNSIGNED NOT NULL DEFAULT \'0\'';
+			 $query = 'ALTER TABLE `imas_linkedtext`  ADD `outcomes` TEXT NOT NULL';
 			 $res = mysql_query($query);
 			 if ($res===false) {
 			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
-			 $query = 'ALTER TABLE `imas_forums`  ADD `outcome` INT(10) UNSIGNED NOT NULL DEFAULT \'0\'';
+			 $query = 'ALTER TABLE `imas_forums`  ADD `outcomes`  TEXT NOT NULL';
 			 $res = mysql_query($query);
 			 if ($res===false) {
 			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
-			 $query = 'ALTER TABLE `imas_gbitems`  ADD `outcome` INT(10) UNSIGNED NOT NULL DEFAULT \'0\'';
+			 $query = 'ALTER TABLE `imas_gbitems`  ADD `outcomes`  TEXT NOT NULL';
 			 $res = mysql_query($query);
 			 if ($res===false) {
 			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
