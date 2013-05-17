@@ -11,9 +11,9 @@ function getquestioninfo($qns,$testsettings) {
 		$qns = array($qns);
 	} 
 	$qnlist = "'".implode("','",$qns)."'";	
-	$query = "SELECT iq.id,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,iq.withdrawn,iq.showhints,il.name,iqs.qtype,iqs.control ";
-	$query .= "FROM (imas_questions AS iq JOIN imas_questionset AS iqs ON iq.questionsetid=iqs.id) LEFT JOIN imas_libraries as il ";
-	$query .= "ON iq.category=il.id WHERE iq.id IN ($qnlist)";
+	$query = "SELECT iq.id,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,iq.withdrawn,iq.showhints,io.name,iqs.qtype,iqs.control ";
+	$query .= "FROM (imas_questions AS iq JOIN imas_questionset AS iqs ON iq.questionsetid=iqs.id) LEFT JOIN imas_outcomes as io ";
+	$query .= "ON iq.category=io.id WHERE iq.id IN ($qnlist)";
 	$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
 	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 		if ($line['name']!=null && is_numeric($line['category'])) {

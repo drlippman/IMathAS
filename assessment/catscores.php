@@ -21,14 +21,14 @@ function catscores($quests,$scores,$defptsposs) {
 		}
 	}
 	
-	$libnames = array();
-	$libnames[0] = "Uncategorized";
+	$outcomenames = array();
+	$outcomenames[0] = "Uncategorized";
 	if (count($tolookup)>0) {
 		$lulist = "'".implode("','",$tolookup)."'";
-		$query = "SELECT id,name FROM imas_libraries WHERE id IN ($lulist)";
+		$query = "SELECT id,name FROM imas_outcomes WHERE id IN ($lulist)";
 		$result = mysql_query($query) or die("Query failed : $query; " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
-			$libnames[$row[0]] = $row[1];
+			$outcomenames[$row[0]] = $row[1];
 		}
 	}
 	
@@ -45,7 +45,7 @@ function catscores($quests,$scores,$defptsposs) {
 	$alt = 0;
 	foreach (array_keys($catscore) as $category) {
 		if (is_numeric($category)) {
-			$catname = $libnames[$category];
+			$catname = $outcomenames[$category];
 		} else {
 			$catname = $category;
 		}
