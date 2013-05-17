@@ -11,13 +11,33 @@ function getquestioninfo($qns,$testsettings) {
 		$qns = array($qns);
 	} 
 	$qnlist = "'".implode("','",$qns)."'";	
-	$query = "SELECT iq.id,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,iq.withdrawn,iq.showhints,io.name,iqs.qtype,iqs.control ";
-	$query .= "FROM (imas_questions AS iq JOIN imas_questionset AS iqs ON iq.questionsetid=iqs.id) LEFT JOIN imas_outcomes as io ";
-	$query .= "ON iq.category=io.id WHERE iq.id IN ($qnlist)";
+	if ($testsettings['defoutcome']!=0) {
+		//we'll need to run two simpler queries rather than a single join query
+		$outcomenames = array();
+		$query = "SELECT id,name FROM imas_outcomes WHERE courseid='{$testsettings['courseid']}'";
+		$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			$outcomenames[$row[0]] = $row[1];
+		}
+		$query = "SELECT iq.id,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,iq.withdrawn,iq.showhints,iqs.qtype,iqs.control ";
+		$query .= "FROM imas_questions AS iq JOIN imas_questionset AS iqs ON iq.questionsetid=iqs.id WHERE iq.id IN ($qnlist)";
+	} else {
+		$query = "SELECT iq.id,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,iq.withdrawn,iq.showhints,io.name,iqs.qtype,iqs.control ";
+		$query .= "FROM (imas_questions AS iq JOIN imas_questionset AS iqs ON iq.questionsetid=iqs.id) LEFT JOIN imas_outcomes as io ";
+		$query .= "ON iq.category=io.id WHERE iq.id IN ($qnlist)";
+	}
 	$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
 	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
-		if ($line['name']!=null && is_numeric($line['category'])) {
-			$line['category'] = $line['name'];
+		if (is_numeric($line['category'])) {
+			if ($testsettings['defoutcome']!=0) {
+				if ($line['category']==0) {
+					$line['category'] = $outcomenames[$testsettings['defoutcome']];
+				} else {
+					$line['category'] = $outcomenames[$line['category']];
+				}
+			} else if ($line['name']!=null) {
+				$line['category'] = $line['name'];
+			}
 		}
 		unset($line['name']);
 		if ($line['points']==9999) {

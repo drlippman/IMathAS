@@ -358,7 +358,7 @@
 			mysql_query($query) or die("Query failed : $query " . mysql_error());
 		}
 		
-		$query = "SELECT imas_assessments.name,imas_assessments.timelimit,imas_assessments.defpoints,imas_assessments.tutoredit,";
+		$query = "SELECT imas_assessments.name,imas_assessments.timelimit,imas_assessments.defpoints,imas_assessments.tutoredit,imas_assessments.defoutcome,";
 		$query .= "imas_assessments.showhints,imas_assessments.deffeedback,imas_assessments.enddate,imas_assessment_sessions.* ";
 		$query .= "FROM imas_assessments,imas_assessment_sessions ";
 		$query .= "WHERE imas_assessments.id=imas_assessment_sessions.assessmentid AND imas_assessment_sessions.id='{$_GET['asid']}'";
@@ -828,7 +828,7 @@
 		$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
 		if (mysql_result($result,0,0)>0) {
 			include("../assessment/catscores.php");
-			catscores($questions,$scores,$line['defpoints']);
+			catscores($questions,$scores,$line['defpoints'], $line['defoutcome']);
 		}
 		require("../footer.php");
 		
@@ -845,7 +845,7 @@
 		$row = mysql_fetch_row($result);
 		echo "<h3>{$row[1]}, {$row[0]}</h3>\n";
 		
-		$query = "SELECT imas_assessments.name,imas_assessments.defpoints,imas_assessment_sessions.* ";
+		$query = "SELECT imas_assessments.name,imas_assessments.defpoints,imas_assessments.defoutcome,imas_assessment_sessions.* ";
 		$query .= "FROM imas_assessments,imas_assessment_sessions ";
 		$query .= "WHERE imas_assessments.id=imas_assessment_sessions.assessmentid AND imas_assessment_sessions.id='{$_GET['asid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -864,7 +864,7 @@
 		$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
 		if (mysql_result($result,0,0)>0) {
 			include("../assessment/catscores.php");
-			catscores(explode(',',$line['questions']),explode(',',$line['bestscores']),$line['defpoints']);
+			catscores(explode(',',$line['questions']),explode(',',$line['bestscores']),$line['defpoints'], $line['defoutcome']);
 		}
 		
 		$scores = array();

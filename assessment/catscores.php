@@ -2,15 +2,20 @@
 //IMathAS:  Function used to show category breakdown of scores
 //Called from showtest and gradebook
 //(c) 2006 David Lippman
-function catscores($quests,$scores,$defptsposs) {
+function catscores($quests,$scores,$defptsposs,$defoutcome=0) {
 	$qlist = "'" . implode("','",$quests) . "'";
 	$query = "SELECT id,category,points FROM imas_questions WHERE id IN ($qlist)";
  	$result = mysql_query($query) or die("Query failed : $query; " . mysql_error());
 	$cat = array();
 	$pospts = array();
-	$tolookup = array();
+	$tolookup = array($defoutcome);
 	while ($row = mysql_fetch_row($result)) {
-		$cat[$row[0]] = $row[1];
+		if ($row[1]==0 && $defoutcome!=0) {
+			$cat[$row[0]] = $defoutcome;
+		} else {
+			$cat[$row[0]] = $row[1];
+		}
+		
 		if (is_numeric($row[1]) && $row[1]>0) {
 			$tolookup[] = $row[1];
 		}

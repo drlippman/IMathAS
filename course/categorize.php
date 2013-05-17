@@ -109,13 +109,27 @@ END;
 			$extracats[] = $line['category'];
 		}
 	}
+	
+	$query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$row = mysql_fetch_row($result);
+	$itemarr = explode(',',$row[0]);
+	foreach ($itemarr as $k=>$v) {
+		if (($p=strpos($v,'~'))!==false) {
+			$itemarr[$k] = substr($v,$p+1);
+		}
+	}
+	$itemarr = implode(',',$itemarr);
+	$itemarr = str_replace('~',',',$itemarr);
+	$itemarr = explode(',', $itemarr);
+	
 	echo '<div id="headercategorize" class="pagetitle"><h2>Categorize Questions</h2></div>';
 	echo "<form method=post action=\"categorize.php?aid=$aid&cid=$cid&record=true\">";
 	echo 'Check: <a href="#" onclick="$(\'input[type=checkbox]\').prop(\'checked\',true);return false;">All</a> ';
 	echo '<a href="#" onclick="$(\'input[type=checkbox]\').prop(\'checked\',false);return false;">None</a>';
 	echo '<table class="gb"><thead><tr><th></th><th>Description</th><th>Category</th></tr></thead><tbody>';
 	
-	foreach(array_keys($category) as $qid) {
+	foreach($itemarr as $qid) {
 		echo "<tr><td><input type=\"checkbox\" id=\"c$qid\"/></td>";
 		echo "<td>{$descriptions[$qid]}</td><td>";
 		echo "<select id=\"$qid\" name=\"$qid\" class=\"qsel\">";
