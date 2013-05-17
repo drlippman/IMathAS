@@ -383,11 +383,19 @@ if ($overwriteBody==1) {
 	}
 ?>
 	<div class=breadcrumb>
-		<span class="padright">
-		<?php if (isset($guestid)) {
+		<?php 
+		if (isset($CFG['GEN']['logopad'])) {
+			echo '<span class="padright" style="padding-right:'.$CFG['GEN']['logopad'].'">';
+		} else {
+			echo '<span class="padright">';
+		}
+		if (isset($guestid)) {
 			echo '<span class="red">', _('Instructor Preview'), '</span> ';
-		}?>
-		<?php echo $userfullname ?>
+		}
+		if (!isset($usernameinheader)) {
+			echo $userfullname;
+		} else { echo '&nbsp;';}
+		?>
 		</span>
 		<?php echo $curBreadcrumb ?>
 		<div class=clear></div>
