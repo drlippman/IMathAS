@@ -39,6 +39,7 @@
 			echo "<span class=\"form\">Email Gradebook To:</span><span class=\"formright\"> <input type=text name=\"email\" size=\"30\"/></span> <br class=\"form\" />";
 		}
 		
+		echo '<span class="form">Locked students?</span><span class="formright"><input type="radio" name="locked" value="hide" checked="checked"> Hide <input type="radio" name="locked" value="show" > Show </span><br class="form" />';
 		echo '<span class="form">Separate header line for points possible?</span><span class="formright"><input type="radio" name="pointsln" value="0" checked="checked"> No <br/><input type="radio" name="pointsln" value="1"> Yes</span><br class="form" />';
 		echo '<span class="form">Assessment comments:</span><span class="formright"> <input type="radio" name="commentloc" value="-1" checked="checked"> Don\'t include <br/>  <input type="radio" name="commentloc" value="1"> Separate columns at end <br/><input type="radio" name="commentloc" value="0"> After scores</span><br class="form" />';
 		echo '<span class="form">Include last login date?</span><span class="formright"><input type="radio" name="lastlogin" value="0" checked="checked"> No <input type="radio" name="lastlogin" value="1" > Yes </span><br class="form" />';
@@ -70,6 +71,7 @@
 	$pointsln = $_POST['pointsln']; //0: on main, 1: separate line
 	$lastlogin = $_POST['lastlogin']; //0: no, 1 yes
 	$logincnt = $_POST['logincnt']; //0: no, 1 yes
+	$hidelocked = ($_POST['locked']=='hide')?true:false;
 	
 	$catfilter = -1;
 	$secfilter = -1;

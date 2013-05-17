@@ -478,6 +478,8 @@ switch($_GET['action']) {
 			
 			$query = "DELETE FROM imas_external_tools WHERE courseid='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$query = "DELETE FROM imas_content_track WHERE courseid='{$_GET['id']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		}	
 		break;
 	case "remteacher":

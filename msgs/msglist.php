@@ -124,6 +124,15 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			$pagetitle = "New Message";
 			$useeditor = "message";
 			$loadgraphfilter = true;
+			$placeinhead = '<script type="text/javascript">
+				function checkrecipient() {
+					if (document.getElementById("to").value=="0") {
+						alert("No recipient selected");
+						return false;
+					} else {
+						return true;
+					}
+				}</script>';
 			require("../header.php");
 			echo "<div class=breadcrumb>$breadcrumbbase ";
 			if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
@@ -205,7 +214,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				$courseid=$cid;
 			}
 			
-			echo "<form method=post action=\"msglist.php?page=$page&type=$type&cid=$cid&add={$_GET['add']}&replyto=$replyto\">\n";
+			echo "<form method=post action=\"msglist.php?page=$page&type=$type&cid=$cid&add={$_GET['add']}&replyto=$replyto\" onsubmit=\"return checkrecipient();\">\n";
 			echo "<span class=form>To:</span><span class=formright>\n";
 			if (isset($_GET['to'])) {
 				$query = "SELECT iu.LastName,iu.FirstName,iu.email,i_s.lastaccess,iu.hasuserimg FROM imas_users AS iu ";
@@ -240,7 +249,8 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 					}
 				}
 			} else {
-				echo "<select name=\"to\">";
+				echo "<select name=\"to\" id=\"to\">";
+				echo '<option value="0">Select a recipient...</option>';
 				if ($isteacher || $msgset<2) {
 					$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM ";
 					$query .= "imas_users,imas_teachers WHERE imas_users.id=imas_teachers.userid AND ";

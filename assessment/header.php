@@ -37,7 +37,7 @@ window.onload = init;
 var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && is_numeric($cid))?$cid:0; ?>;
 </script>
 <link rel="stylesheet" href="<?php echo $imasroot . "/assessment/mathtest.css?ver=092812";?>" type="text/css"/>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js" type="text/javascript"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script>
 <?php
 if (isset($CFG['locale'])) {
 	$lang = substr($CFG['locale'],0,2);

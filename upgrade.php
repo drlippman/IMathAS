@@ -1213,6 +1213,10 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 
 			 echo "Added imas_outcomes table<br/>";
 			
+			 //replace library category # with library name
+			 $query = 'UPDATE imas_questions AS iq, imas_libraries AS il SET iq.category=il.name WHERE iq.category=il.id AND il.name IS NOT NULL';
+			 mysql_query($query);
+			 
 			 $query = 'ALTER TABLE `imas_assessments`  ADD `defoutcome` INT(10) UNSIGNED NOT NULL DEFAULT \'0\'';
 			 $res = mysql_query($query);
 			 if ($res===false) {

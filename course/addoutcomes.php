@@ -144,7 +144,7 @@ function printoutcome($arr) {
 	foreach ($arr as $item) {
 		if (is_array($item)) { //is outcome group
 			echo '<li class="blockli" id="grp'.$cnt.'"><span class=icon style="background-color:#00f">G</span> ';
-			echo '<input class="outcome" type="text" size="60" id="g'.$cnt.'" value="'.htmlentities($item['name']).'"> ';
+			echo '<input class="outcome" type="text" size="60" id="g'.$cnt.'" value="'.htmlentities($item['name']).'" onkeyup="txtchg()"> ';
 			echo '<a href="#" onclick="removeoutcomegrp(this);return false">'._("Delete").'</a>';
 			if (count($item['outcomes'])>0) {
 				echo '<ul class="qview">';
@@ -154,7 +154,7 @@ function printoutcome($arr) {
 			echo '</li>';
 		} else { //individual outcome
 			echo '<li id="'.$item.'"><span class=icon style="background-color:#0f0">O</span> ';
-			echo '<input class="outcome" type="text" size="60" id="o'.$item.'" value="'.htmlentities($outcomeinfo[$item]).'"> ';
+			echo '<input class="outcome" type="text" size="60" id="o'.$item.'" value="'.htmlentities($outcomeinfo[$item]).'" onkeyup="txtchg()"> ';
 			echo '<a href="#" onclick="removeoutcome(this);return false">'._("Delete").'</a></li>';
 		}
 	}
@@ -176,9 +176,16 @@ $placeinhead .= "<script src=\"$imasroot/javascript/nested1.js?v=0122102\"></scr
 $placeinhead .= '<script type="text/javascript">
 	var ocnt = 0;
 	var unsavedmsg = "'._("You have unrecorded changes.  Are you sure you want to abandon your changes?").'";
+	function txtchg() {
+		if (!sortIt.haschanged) {
+			sortIt.haschanged = true;
+			sortIt.fireEvent(\'onFirstChange\', null);
+			window.onbeforeunload = function() {return unsavedmsg;}
+		}
+	}
 	function addoutcome() {
 		var html = \'<li id="new\'+ocnt+\'"><span class=icon style="background-color:#0f0">O</span> \';
-		html += \'<input class="outcome" type="text" size="60" id="newo\'+ocnt+\'"> \';
+		html += \'<input class="outcome" type="text" size="60" id="newo\'+ocnt+\'" onkeyup="txtchg()"> \';
 		html += \'<a href="#" onclick="removeoutcome(this);return false\">'._("Delete").'</a></li>\';
 		j("#qviewtree").append(html);
 		j("#new"+ocnt).focus();
@@ -191,7 +198,7 @@ $placeinhead .= '<script type="text/javascript">
 	}
 	function addoutcomegrp() {
 		var html = \'<li class="blockli" id="newgrp\'+ocnt+\'"><span class=icon style="background-color:#00f">G</span> \';
-		html += \'<input class="outcome" type="text" size="60" id="newg\'+ocnt+\'"> \';
+		html += \'<input class="outcome" type="text" size="60" id="newg\'+ocnt+\'" onkeyup="txtchg()"> \';
 		html += \'<a href="#" onclick="removeoutcomegrp(this);return false\">'._("Delete").'</a></li>\';
 		j("#qviewtree").append(html);
 		j("#newgrp"+ocnt).focus();
