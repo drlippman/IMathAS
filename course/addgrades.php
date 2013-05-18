@@ -63,14 +63,21 @@
 		}
 		$tutoredit = intval($_POST['tutoredit']);
 		$rubric = intval($_POST['rubric']);
+		$outcomes = array();
+		foreach ($_POST['outcomes'] as $o) {
+			if (is_numeric($o) && $o>0) {
+				$outcomes[] = intval($o);
+			}
+		}
+		$outcomes = implode(',',$outcomes);
 		if ($_GET['gbitem']=='new') {
-			$query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit,rubric) VALUES ";
-			$query .= "('$cid','{$_POST['name']}','{$_POST['points']}',$showdate,'{$_POST['gbcat']}','{$_POST['cntingb']}',$tutoredit,$rubric) ";
+			$query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit,rubric,outcomes) VALUES ";
+			$query .= "('$cid','{$_POST['name']}','{$_POST['points']}',$showdate,'{$_POST['gbcat']}','{$_POST['cntingb']}',$tutoredit,$rubric,'$outcomes') ";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			$_GET['gbitem'] = mysql_insert_id();
 			$isnewitem = true;
 		} else {
-			$query = "UPDATE imas_gbitems SET name='{$_POST['name']}',points='{$_POST['points']}',showdate=$showdate,gbcategory='{$_POST['gbcat']}',cntingb='{$_POST['cntingb']}',tutoredit=$tutoredit,rubric=$rubric ";
+			$query = "UPDATE imas_gbitems SET name='{$_POST['name']}',points='{$_POST['points']}',showdate=$showdate,gbcategory='{$_POST['gbcat']}',cntingb='{$_POST['cntingb']}',tutoredit=$tutoredit,rubric=$rubric,outcomes='$outcomes' ";
 			$query .= "WHERE id='{$_GET['gbitem']}'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			$isnewitem = false;
@@ -234,10 +241,16 @@
 			$cntingb = 1;
 			$tutoredit = 0;
 			$rubric = 0;
+			$gradeoutcomes = array();
 		} else {
-			$query = "SELECT name,points,showdate,gbcategory,cntingb,tutoredit,rubric FROM imas_gbitems WHERE id='{$_GET['gbitem']}'";
+			$query = "SELECT name,points,showdate,gbcategory,cntingb,tutoredit,rubric,outcomes FROM imas_gbitems WHERE id='{$_GET['gbitem']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			list($name,$points,$showdate,$gbcat,$cntingb,$tutoredit,$rubric) = mysql_fetch_row($result);
+			list($name,$points,$showdate,$gbcat,$cntingb,$tutoredit,$rubric,$gradeoutcomes) = mysql_fetch_row($result);
+			if ($gradeoutcomes != '') {
+				$gradeoutcomes = explode(',',$gradeoutcomes);
+			} else {
+				$gradeoutcomes = array();
+			}
 		}
 		if ($showdate!=0) {
 			$sdate = tzdate("m/d/Y",$showdate);
@@ -254,6 +267,36 @@
 			$rubric_vals[] = $row[0];
 			$rubric_names[] = $row[1];
 		}
+		$query = "SELECT id,name FROM imas_outcomes WHERE courseid='$cid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$outcomenames = array();
+		while ($row = mysql_fetch_row($result)) {
+			$outcomenames[$row[0]] = $row[1];
+		}
+		$query = "SELECT outcomes FROM imas_courses WHERE id='$cid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$row = mysql_fetch_row($result);
+		if ($row[0]=='') {
+			$outcomearr = array();
+		} else {
+			$outcomearr = unserialize($row[0]);
+		}
+		
+		$outcomes = array();
+		function flattenarr($ar) {
+			global $outcomes;
+			foreach ($ar as $v) {
+				if (is_array($v)) { //outcome group
+					$outcomes[] = array($v['name'], 1);
+					flattenarr($v['outcomes']);
+				} else {
+					$outcomes[] = array($v, 0);
+				}
+			}
+		}
+		flattenarr($outcomearr);
+		
+		
 ?>
 
 <span class=form>Name:</span><span class=formright><input type=text name="name" value="<?php echo $name;?>"/></span><br class="form"/>
@@ -311,9 +354,14 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 		echo "| <a href=\"addrubric.php?cid=$cid&amp;from=addg&amp;gbitem={$_GET['gbitem']}\">Edit rubrics</a> ";
 		echo '</span><br class="form"/>';
 		
+		if (count($outcomes)>0) {
+			echo '<span class="form">Associate Outcomes:</span></span class="formright">';
+			writeHtmlMultiSelect('outcomes',$outcomes,$outcomenames,$gradeoutcomes,'Select an outcome...');
+			echo '</span><br class="form"/>';
+		}
+		
 		if ($_GET['gbitem']!='new') {
-			echo "<span class=form></span><span class=formright><a href=\"addgrades.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=$cid&del={$_GET['gbitem']}\">Delete Item</a></span><br class=form />";
-			echo "<span class=form></span><span class=formright><input type=submit value=\"Submit\"/> </span><br class=form />";
+			echo "<br class=form /><div class=\"submit\"><input type=submit value=\"Submit\"/> <a href=\"addgrades.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=$cid&del={$_GET['gbitem']}\">Delete Item</a> </div><br class=form />";
 		} else {
 			echo "<span class=form>Upload grades?</span><span class=formright><input type=checkbox name=\"doupload\" /> <input type=submit value=\"Submit\"/></span><br class=form />";
 		}

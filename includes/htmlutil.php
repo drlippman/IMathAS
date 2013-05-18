@@ -22,6 +22,41 @@ function writeHtmlSelect ($name,$valList,$labelList,$selectedVal=null,$defaultLa
 	echo "</select>\n";	
 } 
 
+function writeHtmlMultiSelect($name,$valList,$labelList,$selectedVals=array(),$defaultLabel=null) {
+	echo "<div class=\"multisel\"><select name=\"{$name}[]\" id=\"$name\">";
+	if (isset($defaultLabel)) {
+		echo " <option value=\"null\" selected=\"selected\">$defaultLabel</option>\n";
+	}
+	if (is_array($valList[0])) {//has a group structure
+		$ingrp = false;
+		foreach ($valList as $oc) {
+			if ($oc[1]==1) {//is group
+				if ($ingrp) { echo '</optgroup>';}
+				echo '<optgroup label="'.htmlentities($oc[0]).'">';
+				$ingrp = true;
+			} else {
+				echo '<option value="'.$oc[0].'">'.$labelList[$oc[0]].'</option>';
+			}
+		}
+		if ($ingrp) { echo '</optgroup>';}	
+	} else {
+		$val = array();
+		for ($i=0;$i<count($valList);$i++) {
+			$val[$valList[$i]] = $labelList[$i];
+			echo "	<option value=\"$valList[$i]\">$labelList[$i]</option>\n";
+		}
+	}
+	echo '</select><input type="button" value="Add Another" onclick="addmultiselect(this,\''.$name.'\')"/>';
+	if (count($selectedVals)>0) {
+		foreach ($selectedVals as $v) {
+			echo '<div class="multiselitem"><span class="right"><a href="#" onclick="removemultiselect(this);return false;">Remove</a></span>';
+			echo '<input type="hidden" name="'.$name.'[]" value="'.$v.'"/>'.(is_array($valList[0])?$labelList[$v]:$val[$v]);
+			echo '</div>';
+		}		
+	}
+	echo '</div>';
+}
+
 //writeHtmlChecked is used for checking the appropriate radio box on html forms
 function writeHtmlChecked ($var,$test,$notEqual=null) {
 	if ((isset($notEqual)) && ($notEqual==1)) {

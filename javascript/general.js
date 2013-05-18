@@ -391,6 +391,22 @@ function setuptracklinks(i,el) {
 	}
 }
 
+function addmultiselect(el,n) {
+	var p = $(el).parent();
+	var val = $('#'+n).val();
+	var txt = $('#'+n+' option[value='+val+']').prop('disabled',true).html();
+	if (val != 'null') {
+		p.append('<div class="multiselitem"><span class="right"><a href="#" onclick="removemultiselect(this);return false;">Remove</a></span><input type="hidden" name="'+n+'[]" value="'+val+'"/>'+txt+'</div>');
+	}
+	$('#'+n).val('null');
+}
+function removemultiselect(el) {
+	var p = $(el).parent().parent();
+	var val = p.find('input').val();
+	p.parent().find('option[value='+val+']').prop('disabled',false);
+	p.remove();
+}
+
 (function($){
 	$('a').each(setuptracklinks);		
 })(jQuery);
