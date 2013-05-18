@@ -237,9 +237,9 @@ $placeinhead .= '<script type="text/javascript">
 	</script>';
 require("../header.php");
 
-echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt; '._("Define Course Outcomes").'</div>';
+echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt; '._("Course Outcomes").'</div>';
 
-echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>"._("Define Course Outcomes")."</h2></div>\n";
+echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>"._("Course Outcomes")."</h2></div>\n";
 
 echo '<div class="breadcrumb">'._('Use colored boxes to drag-and-drop order.').' <input type="button" id="recchg" disabled="disabled" value="', _('Record Changes'), '" onclick="submitChanges()"/><span id="submitnotice" style="color:red;"></span></div>';
 
@@ -248,6 +248,7 @@ printoutcome($outcomes);
 echo '</ul>';
 echo '<input type="button" onclick="addoutcomegrp()" value="'._('Add Outcome Group').'"/> ';
 echo '<input type="button" onclick="addoutcome()" value="'._('Add Outcome').'"/> ';
+echo '<p><a href="outcomemap.php?cid='.$cid.'">'._('View Outcomes Map').'</a></p>';
 require("../footer.php");
 
 ?>
