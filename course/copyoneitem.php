@@ -23,9 +23,16 @@ $result = mysql_query($query) or die("Query failed : " . mysql_error());
 while ($row = mysql_fetch_row($result)) {
 	$gbcats[$row[0]] = $row[0];
 }
+$outcomes = array();
+$query = "SELECT id FROM imas_outcomes WHERE courseid='$cid'";
+$result = mysql_query($query) or die("Query failed : " . mysql_error());
+while ($row = mysql_fetch_row($result)) {
+	$outcomes[$row[0]] = $row[0];
+}
+
 
 function copysubone(&$items,$parent,$copyinside,&$addtoarr) {
-	global $blockcnt,$tocopy, $gbcats;
+	global $blockcnt,$tocopy, $gbcats, $outcomes;
 	foreach ($items as $k=>$item) {
 		if (is_array($item)) {
 			if (($parent.'-'.($k+1)==$tocopy) || $copyinside) { //copy block

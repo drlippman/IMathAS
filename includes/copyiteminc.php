@@ -13,10 +13,13 @@ $qrubrictrack = array();
 $assessnewid = array();
 $exttooltrack = array();
 function copyitem($itemid,$gbcats,$sethidden=false) {
-	global $cid, $reqscoretrack, $assessnewid, $qrubrictrack, $copystickyposts,$userid, $exttooltrack;
+	global $cid, $reqscoretrack, $assessnewid, $qrubrictrack, $copystickyposts,$userid, $exttooltrack, $outcomes;
 	if (!isset($copystickyposts)) { $copystickyposts = false;}
 	if ($gbcats===false) {
 		$gbcats = array();
+	}
+	if (!isset($outcomes)) {
+		$outcomes = array();
 	}
 	if (strlen($_POST['append'])>0 && $_POST['append']{0}!=' ') {
 		$_POST['append'] = ' '.$_POST['append'];
@@ -143,7 +146,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		//$query = "INSERT INTO imas_assessments (courseid,name,summary,intro,startdate,enddate,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle) ";
 		//$query .= "SELECT '$cid',name,summary,intro,startdate,enddate,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle FROM imas_assessments WHERE id='$typeid'";
 		//mysql_query($query) or die("Query failed : $query" . mysql_error());
-		$query = "SELECT name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,allowlate,exceptionpenalty,noprint,avail,groupmax,endmsg,deffeedbacktext,eqnhelper,caltag,calrtag,msgtoinstr,istutorial,viddata,reqscore,reqscoreaid,ancestors FROM imas_assessments WHERE id='$typeid'";
+		$query = "SELECT name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,allowlate,exceptionpenalty,noprint,avail,groupmax,endmsg,deffeedbacktext,eqnhelper,caltag,calrtag,msgtoinstr,istutorial,viddata,reqscore,reqscoreaid,ancestors,defoutcome FROM imas_assessments WHERE id='$typeid'";
 
 		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$row = mysql_fetch_assoc($result);
@@ -152,6 +155,11 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 			$row['gbcategory'] = $gbcats[$row['gbcategory']];
 		} else {
 			$row['gbcategory'] = 0;
+		}
+		if (isset($outcomes[$row['defoutcome']])) {
+			$row['defoutcome'] = $outcomes[$row['defoutcome']];
+		} else {
+			$row['defoutcome'] = 0;
 		}
 		if ($row['ancestors']=='') {
 			$row['ancestors'] = $typeid;
@@ -197,12 +205,19 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 					///$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category) ";
 					///$query .= "SELECT '$newtypeid',questionsetid,points,attempts,penalty,category FROM imas_questions WHERE id='$aitem'";
 					//mysql_query($query) or die("Query failed :$query " . mysql_error());
-					$query = "SELECT questionsetid,points,attempts,penalty,category,rubric FROM imas_questions WHERE id='$aitem'";
+					$query = "SELECT questionsetid,points,attempts,penalty,category,regen,showans,showhints,rubric FROM imas_questions WHERE id='$aitem'";
 					$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 					$row = mysql_fetch_row($result);
+					if (is_numeric($row[4])) {
+						if (isset($outcomes[$row[4]])) {
+							$row[4] = $outcomes[$row[4]];
+						} else {
+							$row[4] = 0;
+						}
+					}
 					$rubric = array_pop($row);
 					$row = "'".implode("','",addslashes_deep($row))."'";
-					$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category) ";
+					$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category,regen,showans,showhints) ";
 					$query .= "VALUES ('$newtypeid',$row)";
 					mysql_query($query) or die("Query failed : $query" . mysql_error());
 					$newid = mysql_insert_id();
@@ -220,12 +235,19 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 						//$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category) ";
 						//$query .= "SELECT '$newtypeid',questionsetid,points,attempts,penalty,category FROM imas_questions WHERE id='$subi'";
 						//mysql_query($query) or die("Query failed : $query" . mysql_error());
-						$query = "SELECT questionsetid,points,attempts,penalty,category,rubric FROM imas_questions WHERE id='$subi'";
+						$query = "SELECT questionsetid,points,attempts,penalty,category,regen,showans,showhints,rubric FROM imas_questions WHERE id='$subi'";
 						$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 						$row = mysql_fetch_row($result);
+						if (is_numeric($row[4])) {
+							if (isset($outcomes[$row[4]])) {
+								$row[4] = $outcomes[$row[4]];
+							} else {
+								$row[4] = 0;
+							}
+						}
 						$rubric = array_pop($row);
 						$row = "'".implode("','",addslashes_deep($row))."'";
-						$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category) ";
+						$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category,regen,showans,showhints) ";
 						$query .= "VALUES ('$newtypeid',$row)";
 						mysql_query($query) or die("Query failed : $query" . mysql_error());
 						$newid = mysql_insert_id();

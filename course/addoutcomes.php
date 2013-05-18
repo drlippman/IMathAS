@@ -104,15 +104,15 @@ if (isset($_POST['order'])) {
 		$query = "UPDATE imas_assessments SET defoutcome=0 WHERE courseid='$cid' AND defoutcome IN ($unusedlist)";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		
-		$query = "UPDATE imas_linkedtext SET outcome=0 WHERE courseid='$cid' AND outcome IN ($unusedlist)";
+		/*$query = "UPDATE imas_linkedtext SET outcome=0 WHERE courseid='$cid' AND outcomes IN ($unusedlist)";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		
-		$query = "UPDATE imas_forums SET outcome=0 WHERE courseid='$cid' AND outcome IN ($unusedlist)";
+		$query = "UPDATE imas_forums SET outcome=0 WHERE courseid='$cid' AND outcomes IN ($unusedlist)";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		
-		$query = "UPDATE imas_gbitems SET outcome=0 WHERE courseid='$cid' AND outcome IN ($unusedlist)";
+		$query = "UPDATE imas_gbitems SET outcome=0 WHERE courseid='$cid' AND outcomes IN ($unusedlist)";
 		mysql_query($query) or die("Query failed : " . mysql_error());
-		
+		*/
 		$query = "UPDATE imas_questions SET category='' WHERE category IN ($unusedlist)";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 	}

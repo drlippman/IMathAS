@@ -10,7 +10,7 @@ function catscores($quests,$scores,$defptsposs,$defoutcome=0) {
 	$pospts = array();
 	$tolookup = array($defoutcome);
 	while ($row = mysql_fetch_row($result)) {
-		if ($row[1]==0 && $defoutcome!=0) {
+		if (is_numeric($row[1]) && $row[1]==0 && $defoutcome!=0) {
 			$cat[$row[0]] = $defoutcome;
 		} else {
 			$cat[$row[0]] = $row[1];
