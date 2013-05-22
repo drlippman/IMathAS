@@ -115,7 +115,7 @@
 	echo "<div class=breadcrumb>Print Ready Version</div>";
 	echo '<div class=intro>'.$testsettings['intro'].'</div>';
 	if ($isteacher && !$scoredview) {
-		echo '<input type="button" class="btn" onclick="rendersa()" value="Show Answers" /> <a href="printtest?cid='.$cid.'&asid='.$testid.'&scored=true">Show Scored View</a>';
+		echo '<input type="button" class="btn" onclick="rendersa()" value="Show Answers" /> <a href="printtest.php?cid='.$cid.'&asid='.$testid.'&scored=true">Show Scored View</a>';
 	}
 	if ($testsettings['showans']=='N') {
 		$lastanswers = array_fill(0,count($questions),'');
