@@ -521,7 +521,7 @@ if ($overwriteBody==1) {
 	</script>
 	<script type="text/javascript" src="<?php echo $imasroot ?>/javascript/tablesorter.js"></script>
 	<form id="qform" method=post action="listusers.php?cid=<?php echo $cid ?>">
-		Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
+		Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',true,'locked')">Non-locked</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
 		With Selected:  
 		<input type=submit name=submit value="E-mail">
 		<input type=submit name=submit value="Message"> 
@@ -574,7 +574,7 @@ if ($overwriteBody==1) {
 			$hasCodeData = ($hascode) ? "<td>{$line['code']}</td>" : "";
 			if ($alt==0) {echo "			<tr class=even>"; $alt=1;} else {echo "			<tr class=odd>"; $alt=0;}
 ?>			
-				<td><input type=checkbox name="checked[]" value="<?php echo $line['userid'] ?>"></td>
+				<td><input type=checkbox name="checked[]" value="<?php echo $line['userid'] ?>" <?php if ($line['locked']>0) echo 'class="locked"'?>></td>
 				<td>
 <?php
 	

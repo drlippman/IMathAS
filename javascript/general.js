@@ -246,12 +246,17 @@ function GB_hide() {
 	document.getElementById("GB_overlay").style.display = "none";
 }
 
-function chkAllNone(frmid, arr, mark) {
+function chkAllNone(frmid, arr, mark, skip) {
   var frm = document.getElementById(frmid);
   for (i = 0; i <= frm.elements.length; i++) {
    try{
      if ((arr=='all' && frm.elements[i].type=='checkbox') || frm.elements[i].name == arr) {
-       frm.elements[i].checked = mark;
+       if (skip && frm.elements[i].className==skip) {
+       	 frm.elements[i].checked = !mark;
+       } else {
+       	 frm.elements[i].checked = mark;      
+       }
+      
      }
    } catch(er) {}
   }
