@@ -387,8 +387,10 @@ if ($overwriteBody==1) {
 			<input type="hidden" name="MAX_FILE_SIZE" value="10000000" />
 			<span class="formright">
 			<?php if ($filename != '') {
+				require_once("../includes/filehandler.php");
 				echo '<input type="hidden" name="curfile" value="'.$filename.'"/>';
-				echo 'Current file: <a href="'.$imasroot.'/course/files/'.$filename.'">'.basename($filename).'</a><br/>Replace ';
+				$alink = getcoursefileurl($filename);
+				echo 'Current file: <a href="'.$alink.'">'.basename($filename).'</a><br/>Replace ';
 			} else {
 				echo 'Attach ';
 			}
