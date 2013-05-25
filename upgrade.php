@@ -1204,7 +1204,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 				`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 				`courseid` INT(10) UNSIGNED NOT NULL, 
 				`name` VARCHAR(255) NOT NULL, 
-				`ancestors` TEXT NOT NULL
+				`ancestors` TEXT NOT NULL,
 				INDEX ( `courseid`) 
 				) ENGINE = InnoDB';
 			 $res = mysql_query($query);
