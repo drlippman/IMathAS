@@ -1141,9 +1141,9 @@ msgstr ""
 
 #: assessment/displayq2.php:1715
 #, php-format
-msgid "Enter your answer using inequality notation.  Example: 3 <= %d < 4"
+msgid "Enter your answer using inequality notation.  Example: 3 <= %s < 4"
 msgstr ""
-"Geben Sie Ihre Antwort in Ungleichungsschreibweise ein.  Beispiel: 3 <= %d < "
+"Geben Sie Ihre Antwort in Ungleichungsschreibweise ein.  Beispiel: 3 <= %s < "
 "4"
 
 #: assessment/displayq2.php:1639 assessment/displayq2.php:1720
@@ -2538,9 +2538,9 @@ msgstr "Ziehen Sie die farbigen Boxen, um die Reihenfolge zu verändern."
 
 #: assessment/displayq2.php:1716
 #, php-format
-msgid "Use or to combine intervals.  Example: %d < 2 or %d >= 3"
+msgid "Use or to combine intervals.  Example: %s < 2 or %s >= 3"
 msgstr ""
-"Benutzen Sie or um Intervalle zu kombinieren.  Beispiel: %d < 2 or %d >= 3"
+"Benutzen Sie or um Intervalle zu kombinieren.  Beispiel: %s < 2 or %s >= 3"
 
 #: loginpage.php:87 loginpage.php:89 loginpage.php:88
 msgid "Use text-based display"

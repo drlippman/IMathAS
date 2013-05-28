@@ -24,6 +24,9 @@
 					$showhints = intval($_POST['showhints'.$qsetid]);
 					if ($points=='') { $points = 9999;}
 					if ($attempts=='') {$attempts = 9999;}
+					if ($points==9999 && isset($_POST['pointsforparts']) && $_POST['qparts'.$qsetid]>1) {
+						$points = intval($_POST['qparts'.$qsetid]);
+					}
 					$query = "INSERT INTO imas_questions (assessmentid,points,attempts,showhints,penalty,regen,showans,questionsetid) ";
 					$query .= "VALUES ('$aid','$points','$attempts',$showhints,9999,0,0,'$qsetid')";
 					$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -209,9 +212,15 @@ Leave items blank to use the assessment's default values<br/>
 			echo "<th>Description</th><th></th><th>Points</th><th>Attempts (0 for unlimited)</th><th>Show hints &amp; video buttons?</th><th>Number of Copies to Add</th></tr></thead>";
 			echo "<tbody>";
 			
-			$query = "SELECT id,description,extref FROM imas_questionset WHERE id IN ('".implode("','",$_POST['nchecked'])."')";
+			$query = "SELECT id,description,extref,qtype,control FROM imas_questionset WHERE id IN ('".implode("','",$_POST['nchecked'])."')";
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			while ($row = mysql_fetch_row($result)) {
+				if ($row[3]=='multipart') {
+					preg_match('/anstypes\s*=(.*)/',$row[4],$match);
+					$n = substr_count($match[1],',')+1;
+				} else {
+					$n = 1;
+				}
 				echo '<tr><td>'.$row[1].'</td>';
 				if ($row[2]!='') {
 					$extref = explode('~~',$row[2]);
@@ -233,7 +242,8 @@ Leave items blank to use the assessment's default values<br/>
 				} else {
 					echo '<td></td>';
 				}
-				echo "<td><input type=text size=4 name=\"points{$row[0]}\" value=\"\" /></td>";
+				echo "<td><input type=text size=4 name=\"points{$row[0]}\" value=\"\" />";
+				echo '<input type="hidden" name="qparts'.$row[0].'" value="'.$n.'"/></td>';
 				echo "<td><input type=text size=4 name=\"attempts{$row[0]}\" value=\"\" /></td>";
 				echo "<td><select name=\"showhints{$row[0]}\">";
 				echo '<option value="0" selected="selected">Use Default</option>';
@@ -247,6 +257,7 @@ Leave items blank to use the assessment's default values<br/>
 			echo '<input type=hidden name="add" value="true" />';
 			
 			echo '<p><input type=checkbox name="addasgroup" value="1" /> Add as group?</p>';
+			echo '<p><input type=checkbox name="pointsforparts" value="1" /> Set the points equal to the number of parts for multipart?</p>';
 			echo '<div class=submit><input type=submit value=Submit></div>';
 		}
 		echo '</form>';

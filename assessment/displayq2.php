@@ -1363,6 +1363,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		} else if ($displayformat == 'vectorlist') {
 			$tip = _('Enter your answer a list of vectors separated with commas.  Example: <1,2>, <3.5,5>') . "<br/>";
 			$shorttip = _('Enter a list of vectors');
+		} else if ($displayformat == 'set') {
+			$tip = _('Enter your answer as a set of numbers.  Example: {1,2,3}') . "<br/>";
+			$shorttip = _('Enter a set');
 		} else if ($displayformat == 'list') {
 			$tip = _('Enter your answer as a list of n-tuples of numbers separated with commas: Example: (1,2),(3.5,4)') . "<br/>";
 			$shorttip = _('Enter a list of n-tuples');
@@ -1410,6 +1413,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		} else if ($displayformat == 'vectorlist') {
 			$tip = _('Enter your answer a list of vectors separated with commas.  Example: <1,2>, <3.5,5>') . "<br/>";
 			$shorttip = _('Enter a list of vectors');
+		} else if ($displayformat == 'set') {
+			$tip = _('Enter your answer as a set of numbers.  Example: {1,2,3}') . "<br/>";
+			$shorttip = _('Enter a set');
 		} else if ($displayformat == 'list') {
 			$tip = _('Enter your answer as a list of n-tuples of numbers separated with commas: Example: (1,2),(3.5,4)') . "<br/>";
 			$shorttip = _('Enter a list of n-tuples');
@@ -1737,8 +1743,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		
 		if (in_array('inequality',$ansformats)) {
-			$tip = sprintf(_('Enter your answer using inequality notation.  Example: 3 <= %d < 4'), $variables) . " <br/>";
-			$tip .= sprintf(_('Use or to combine intervals.  Example: %d < 2 or %d >= 3'), $variables, $variables) . "<br/>";
+			$tip = sprintf(_('Enter your answer using inequality notation.  Example: 3 <= %s < 4'), $variables) . " <br/>";
+			$tip .= sprintf(_('Use or to combine intervals.  Example: %s < 2 or %s >= 3'), $variables, $variables) . "<br/>";
 			$tip .= _('Enter <i>all real numbers</i> for solutions of that type') . "<br/>";
 			$shorttip = _('Enter an interval using inequalities');
 		} else {
@@ -2680,12 +2686,12 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$answer = makepretty($answer);
 		for ($i=0; $i<strlen($answer); $i++) {
 			$dec = false;
-			if ($answer{$i}=='(' || $answer{$i}=='[' || $answer{$i}=='<') {
+			if ($answer{$i}=='(' || $answer{$i}=='[' || $answer{$i}=='<' || $answer{$i}=='{') {
 				if ($NCdepth==0) {
 					$lastcut = $i;
 				}
 				$NCdepth++;
-			} else if ($answer{$i}==')' || $answer{$i}==']' || $answer{$i}=='>') {
+			} else if ($answer{$i}==')' || $answer{$i}==']' || $answer{$i}=='>' || $answer{$i}=='}') {
 				$NCdepth--;
 				if ($NCdepth==0) {
 					$anarr[] = array('',$answer{$lastcut},substr($answer,$lastcut+1,$i-$lastcut-1),$answer{$i});
