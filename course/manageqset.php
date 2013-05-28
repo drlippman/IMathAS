@@ -754,7 +754,7 @@ if ($myrights<20) {
 				$extref = explode('~~',$line['extref']);
 				$hasvid = false;  $hasother = false;
 				foreach ($extref as $v) {
-					if (substr($v,0,5)=="Video" || strpos($v,'youtube.com')!==false) {
+					if (strtolower(substr($v,0,5))=="video" || strpos($v,'youtube.com')!==false || strpos($v,'youtu.be')!==false) {
 						$hasvid = true;
 					} else {
 						$hasother = true;
