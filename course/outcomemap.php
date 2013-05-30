@@ -129,6 +129,25 @@ while ($row = mysql_fetch_assoc($result)) {
 	$linknames[$row['id']] = $row['title'];
 }
 
+//load inlinetext items usage
+$inlinenames = array();
+$query = "SELECT id,title,outcomes FROM imas_inlinetext WHERE courseid='$cid' AND outcomes<>''";
+$result = mysql_query($query) or die("Query failed : " . mysql_error());
+while ($row = mysql_fetch_assoc($result)) {
+	$oc = explode(',',$row['outcomes']);
+	foreach ($oc as $o) {
+		if (!isset($outcomeassoc[$o])) {
+			$outcomeassoc[$o] = array();
+		} 
+		if (!isset($outcomeassoc[$o]['UG'])) {
+			$outcomeassoc[$o]['UG'] = array();
+		}
+		
+		$outcomeassoc[$o]['UG'][] = array('inline',$row['id']);
+	}
+	$inlinenames[$row['id']] = $row['title'];
+}
+
 $cats = array_unique(array_merge($offgbcat,$forumgbcat,$assessgbcat));
 $catnames = array();
 if (in_array(0, $cats)) {
@@ -161,12 +180,14 @@ echo '</tr></thead><tbody>';
 $n = count($catnames)+2;
 
 function printitems($items) {
-	global $assessnames, $forumnames, $offnames, $linknames;
+	global $assessnames, $forumnames, $offnames, $linknames, $inlinenames;
 	foreach ($items as $i=>$item) {
 		if ($i!=0) { echo '<br/>';}
 		if ($item[0]=='link') {
 			echo 'L: '.$linknames[$item[1]];
-		} else if ($item[0]=='assess') {
+		} else if ($item[0]=='inline') {
+			echo 'I: '.$inlinenames[$item[1]];
+		}else if ($item[0]=='assess') {
 			echo 'A: '.$assessnames[$item[1]];
 		} else if ($item[0]=='forum') {
 			echo 'F: '.$forumnames[$item[1]];
