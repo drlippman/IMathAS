@@ -170,10 +170,11 @@ if (isset($_POST['order'])) {
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n";
 
 $placeinhead = '<style type="text/css">.drag {color:red; background-color:#fcc;} .icon {cursor: pointer;} ul.qview li {padding: 3px}</style>';
-$placeinhead .=  "<script>var AHAHsaveurl = '$imasroot/course/addoutcomes.php?cid=$cid&save=save'; var noblockcookie=true; var j=jQuery.noConflict();</script>";
+$placeinhead .=  "<script>var AHAHsaveurl = '$imasroot/course/addoutcomes.php?cid=$cid&save=save'; var j=jQuery.noConflict();</script>";
 $placeinhead .= "<script src=\"$imasroot/javascript/mootools.js\"></script>";
 $placeinhead .= "<script src=\"$imasroot/javascript/nested1.js?v=0122102\"></script>";
 $placeinhead .= '<script type="text/javascript">
+ 	var noblockcookie=true; 
 	var ocnt = 0;
 	var unsavedmsg = "'._("You have unrecorded changes.  Are you sure you want to abandon your changes?").'";
 	function txtchg() {

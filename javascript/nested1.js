@@ -2,6 +2,7 @@
 // Date: 2007-01-25
 // Author: CrazyDave
 // Website: http://www.clanccc.co.uk/moo/nested.html
+var noblockcookie = false;
 var Nested = new Class({
 	getOptions: function() {
 		return {
