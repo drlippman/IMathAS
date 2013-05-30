@@ -938,7 +938,7 @@ msgstr ""
 
 #: assessment/displayq2.php:1715
 #, php-format
-msgid "Enter your answer using inequality notation.  Example: 3 <= %d < 4"
+msgid "Enter your answer using inequality notation.  Example: 3 <= %s < 4"
 msgstr ""
 
 #: assessment/displayq2.php:1639 assessment/displayq2.php:1720
@@ -2146,7 +2146,7 @@ msgstr ""
 
 #: assessment/displayq2.php:1716
 #, php-format
-msgid "Use or to combine intervals.  Example: %d < 2 or %d >= 3"
+msgid "Use or to combine intervals.  Example: %s < 2 or %s >= 3"
 msgstr ""
 
 #: loginpage.php:88
