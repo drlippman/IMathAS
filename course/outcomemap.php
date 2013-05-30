@@ -24,7 +24,6 @@ while ($row = mysql_fetch_row($result)) {
 
 $outcomeassoc = array();
 //load assessment usage count
-$assessoutcomes = array();
 $assessgbcat = array();  //will record gb category for assessment
 $assessnames = array();
 $assessqcnt = array();
@@ -41,23 +40,27 @@ while ($row = mysql_fetch_assoc($result)) {
 	} else {
 		$outc = $row['category'];
 	}
-	$assessoutcomes[$row['id']] = $outc;
 	if (!isset($assessqcnt[$row['id']])) {
-		$assessqcnt[$row['id']] = 1;
+		$assessqcnt[$row['id']] = array();
+	}
+	if (!isset($assessqcnt[$row['id']][$outc])) {
+		$assessqcnt[$row['id']][$outc] = 1;
 	} else {
-		$assessqcnt[$row['id']]++;
+		$assessqcnt[$row['id']][$outc]++;
 	}
 	$assessgbcat[$row['id']] = $row['gbcategory'];
 	$assessnames[$row['id']] = $row['name'];
 }
-foreach ($assessoutcomes as $id=>$o) {
-	if (!isset($outcomeassoc[$o])) {
-		$outcomeassoc[$o] = array();
-	} 
-	if (!isset($outcomeassoc[$o][$assessgbcat[$id]])) {
-		$outcomeassoc[$o][$assessgbcat[$id]] = array();
+foreach ($assessqcnt as $id=>$os) {
+	foreach ($os as $o=>$cnt) {
+		if (!isset($outcomeassoc[$o])) {
+			$outcomeassoc[$o] = array();
+		} 
+		if (!isset($outcomeassoc[$o][$assessgbcat[$id]])) {
+			$outcomeassoc[$o][$assessgbcat[$id]] = array();
+		}
+		$outcomeassoc[$o][$assessgbcat[$id]][] = array('assess',$id);
 	}
-	$outcomeassoc[$o][$assessgbcat[$id]][] = array('assess',$id);
 }
 
 //load offline grade usage

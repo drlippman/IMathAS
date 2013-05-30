@@ -18,9 +18,11 @@ row[0][1][#][2] = 0 past, 1 current
 row[0][1][#][3] = 1 count, 2 EC
 row[0][1][#][4] = 0 online, 1 offline, 2 discussion
 row[0][1][#][5] = assessmentid, gbitems.id, forumid 
+row[0][1][#][6][outc#] = set if outcome is used in this
 
 row[0][2] category totals
 row[0][2][#][0] = "Category Name"
+row[0][2][#][1][outc#] = set if outcome is used in this
 
 row[1] first student data row
 row[1][0] biographical
