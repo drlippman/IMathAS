@@ -34,6 +34,7 @@ $query .= "imas_assessments AS ia JOIN imas_questions AS iq ON ia.id=iq.assessme
 $query .= "WHERE ia.courseid='$cid' AND (ia.defoutcome>0 OR iq.category<>'0')";
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 while ($row = mysql_fetch_assoc($result)) {
+	
 	if (!is_numeric($row['category'])) {continue;}
 	if ($row['category']==0) {
 		$outc = $row['defoutcome'];
