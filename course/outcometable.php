@@ -13,16 +13,15 @@ row[0][0][0] = "Name"
 Will only included items that are counted in gradebook.  No EC. No PT
 row[0][1] scores
 row[0][1][#][0] = name
-row[0][1][#][1] = category
+row[0][1][#][1] = category color number
 row[0][1][#][2] = 0 past, 1 current
 row[0][1][#][3] = 1 count, 2 EC
 row[0][1][#][4] = 0 online, 1 offline, 2 discussion
 row[0][1][#][5] = assessmentid, gbitems.id, forumid 
-row[0][1][#][6][outc#] = set if outcome is used in this
 
 row[0][2] category totals
 row[0][2][#][0] = "Category Name"
-row[0][2][#][1][outc#] = set if outcome is used in this
+row[0][2][#][1] = category color number
 
 row[1] first student data row
 row[1][0] biographical
@@ -364,6 +363,7 @@ function outcometable() {
 					$gb[0][1][$pos][5] = $discuss[$k];
 					$discusscol[$discuss[$k]] = $pos;
 				}
+				$gb[0][1][$pos][6] = array();
 				$pos++;
 			}
 		}
@@ -413,6 +413,7 @@ function outcometable() {
 	$catorder = array_keys($cats);
 	foreach($catorder as $cat) {//foreach category
 		$gb[0][2][$pos][0] = $cats[$cat][0];
+		$gb[0][2][$pos][1] = $cats[$cat][7];
 		$pos++;
 	}
 	

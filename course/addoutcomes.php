@@ -248,7 +248,7 @@ printoutcome($outcomes);
 echo '</ul>';
 echo '<input type="button" onclick="addoutcomegrp()" value="'._('Add Outcome Group').'"/> ';
 echo '<input type="button" onclick="addoutcome()" value="'._('Add Outcome').'"/> ';
-echo '<p><a href="outcomemap.php?cid='.$cid.'">'._('View Outcomes Map').'</a></p>';
+echo '<p><a href="outcomemap.php?cid='.$cid.'">'._('View Outcomes Map').'</a> | <a href="outcomereport.php?cid='.$cid.'">'._('View Outcomes Report').'</a></p>';
 require("../footer.php");
 
 ?>

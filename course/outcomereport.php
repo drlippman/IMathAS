@@ -1,14 +1,14 @@
 <?php
-
-//FIX outcomemap on more than one outcome in an assessment
+//IMathAS:  Outcomes report generator
+//(c) 2013 David Lippman for Lumen Learning
 
 require("../validate.php");
+if (!isset($teacherid)) {echo "You're not validated to view this page."; exit;}
 
 require("outcometable.php");
 $canviewall = true;
 $catfilter = -1;
 $secfilter = -1;
-$t = outcometable();
 
 //load outcomes
 $query = "SELECT outcomes FROM imas_courses WHERE id='$cid'";
@@ -48,17 +48,24 @@ require("../header.php");
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a> &gt; ";
 $curBreadcrumb .= "<a href=\"addoutcomes.php?cid=$cid\">"._("Course Outcomes")."</a>\n";
 
-echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt; '._("Outcomes Report").'</div>';
-
-echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>"._("Outcomes Report")."</h2></div>\n";
-
-$report = 'overview';
+if (isset($_GET['stu'])) {
+	$stu = intval($_GET['stu']);
+	$report = 'onestu';
+} else if (isset($_GET['outcome'])) {
+	$outcome = intval($_GET['outcome']);
+	$report = 'oneoutcome';
+} else {
+	$report = 'overview';
+}
 
 if ($report=='overview') {
-
+	
+	echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt; '._("Outcomes Report").'</div>';
+	echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>"._("Outcomes Report")."</h2></div>\n";
+	
 	echo '<table class="gb"><thead><tr><th>'._('Name').'</th>';
 	foreach ($outc as $oc) {
-		echo '<th>'.$outcomeinfo[$oc].$oc.'</th>';
+		echo '<th><a href="outcomereport.php?cid='.$cid.'&amp;outcome='.$oc.'">'.$outcomeinfo[$oc].'</a></th>';
 	}
 	echo '</tr></thead><tbody>';
 	
@@ -66,7 +73,7 @@ if ($report=='overview') {
 	
 	for ($i=1;$i<count($ot);$i++) {
 		echo '<tr class="'.($i%2==0?'even':'odd').'">';
-		echo '<td>'.$ot[$i][0][0].'</td>';
+		echo '<td><a href="outcomereport.php?cid='.$cid.'&amp;stu='.$ot[$i][0][1].'">'.$ot[$i][0][0].'</a></td>';
 		foreach ($outc as $oc) {
 			echo '<td>'.round($ot[$i][3][$type][$oc]*100,1).'%</td>';
 		}
@@ -76,25 +83,114 @@ if ($report=='overview') {
 	
 	echo '<p>'._('Note:  The outcome performance in each gradebook category is weighted based on gradebook weights to produce these overview scores').'</p>';
 } else if ($report=='oneoutcome') {
-	$outcome = 14;
+	
+	echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt; <a href="outcomereport.php?cid='.$cid.'">'._("Outcomes Report").'</a> &gt; '._("Outcome Detail").'</div>';
+	
 	$ot = outcometable();
-	echo '<h3>'._('Report on outcome:').$outcomeinfo[$outcome].'<h3>';
+	
+	echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>"._("Outcomes Detail on Outcome: ").$outcomeinfo[$outcome]."</h2></div>\n";
+
 	echo '<table class="gb"><thead><tr><th>'._('Name').'</th>';
 	echo '<th>'._('Total').'</th>';
 	$catstolist = array();
-	foreach ($ot[0][2] as $i=>$catinf) {
-		if (isset($catinf[1][$outcome])) {
-			echo '<th>'.$catinf[0].'</th>';
-			$catstolist[] = $i;
-		}
-	}
 	$itemstolist = array();
-	foreach($ot[0][1] as $i=>$iteminf) {
-		if (isset($iteminf[6][$outcome])) {
-			echo '<th>'.$iteminf[0].'</th>';
-			$itemstolist[] = $i;
+	for ($i=1;$i<count($ot);$i++) {
+		for ($j=0;$j<count($ot[$i][1]);$j++) {
+			if (isset($itemstolist[$j])) {continue;} //already got it
+			if ($type==0 && $ot[0][1][$j][2]==1) {continue;} //only want past items
+			if (isset($ot[$i][1][$j][1][$outcome])) { //using outcome
+				$itemstolist[$j] = 1; //use it
+			}
+		}
+		for ($j=0;$j<count($ot[$i][2]);$j++) {
+			if (isset($ot[$i][2][$j][2*$type+1][$outcome]) && $ot[$i][2][$j][2*$type+1][$outcome]>0) { //using outcome
+				$catstolist[$j] = 1; //use it
+			}
 		}
 	}
+	
+	$catstolist = array_keys($catstolist);
+	$itemstolist = array_keys($itemstolist);
+	
+	foreach ($catstolist as $cat) {
+		echo '<th class="cat'.$ot[0][2][$cat][1].'"><span class="cattothdr">'.$ot[0][2][$cat][0].'</span></th>';
+	}
+	foreach ($itemstolist as $col) {
+		echo '<th class="cat'.$ot[0][1][$col][1].'">'.$ot[0][1][$col][0].'</th>';
+	}
+	
+	echo '</tr></thead><tbody>';
+	for ($i=1;$i<count($ot);$i++) {
+		echo '<tr class="'.($i%2==0?'even':'odd').'">';
+		echo '<td>'.$ot[$i][0][0].'</td>';
+		echo '<td>'.round(100*$ot[$i][3][$type][$outcome],1).'%</td>';
+		foreach ($catstolist as $col) {
+			if (isset($ot[$i][2][$col]) && isset($ot[$i][2][$col][2*$type][$outcome]) && $ot[$i][2][$col][2*$type+1][$outcome]>0) {
+				echo '<td>'.round(100*$ot[$i][2][$col][2*$type][$outcome]/$ot[$i][2][$col][2*$type+1][$outcome],1).'%</td>';	
+			} else {
+				echo '<td>0%</td>';
+			}
+		}
+		foreach ($itemstolist as $col) {
+			if (isset($ot[$i][1][$col]) && isset($ot[$i][1][$col][0][$outcome])) {
+				echo '<td>'.round(100*$ot[$i][1][$col][0][$outcome]/$ot[$i][1][$col][1][$outcome],1).'%</td>';	
+			} else {
+				echo '<td>-</td>';
+			}
+		}
+		echo '</tr>';
+	}
+	echo '</tbody></table>';
+} else if ($report=='onestu') {
+	echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt; <a href="outcomereport.php?cid='.$cid.'">'._("Outcomes Report").'</a> &gt; '._("Student Detail").'</div>';
+	
+	$ot = outcometable($stu);
+	
+	echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>"._("Outcomes Student Detail for: ").$ot[1][0][0]."</h2></div>\n";
+
+	echo '<table class="gb"><thead><tr><th>'._('Outcome').'</th>';
+	
+	echo '<th>'._('Total').'</th>';
+	$n = 2;
+	for ($i=0;$i<count($ot[0][2]);$i++) {
+		echo '<th class="cat'.$ot[0][2][$i][1].'"><span class="cattothdr">'.$ot[0][2][$i][0].'</span></th>';
+		$n++;
+	}
+	echo '</tr></thead><tbody>';
+	
+	$cnt = 0;
+	function printoutcomestu($arr,$ind) {
+		global $outcomeinfo, $cnt, $ot, $n, $type;
+		foreach ($arr as $oi) {
+			if ($cnt%2==0) {
+				$class = "even";
+			} else {
+				$class = "odd";
+			}
+			$cnt++;
+			if (is_array($oi)) { //is outcome group
+				echo '<tr class="'.$class.'" colspan="'.$n.'"><td>'.$ind.'<b>'.$oi['name'].'</b></td></tr>';
+				printoutcomestu($oi['outcomes'],$ind.'&nbsp;&nbsp;&nbsp;');
+			} else {
+				echo '<tr class="'.$class.'">';
+				echo '<td>'.$ind.$outcomeinfo[$oi].'</td>';
+				echo '<td>'.round(100*$ot[1][3][$type][$oi],1).'%</td>';
+				for ($i=0;$i<count($ot[0][2]);$i++) {
+					if (isset($ot[1][2][$i])) {
+						if ($ot[1][2][$i][2*$type+1]>0) {
+							echo '<td>'.round(100*$ot[1][2][$i][2*$type][$oi]/$ot[1][2][$i][2*$type+1][$oi],1).'%</td>';
+						} else {
+							echo '<td>0%</td>';
+						}
+					} else {
+						echo '<td>-</td>';
+					}
+				}
+				echo '</tr>';
+			}
+		}
+	}
+	printoutcomestu($outcomes,'');
 	
 	
 }
