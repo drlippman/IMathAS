@@ -2758,7 +2758,7 @@ function getscorenonzero() {
 	global $scores;
 	$out = array();
 	for ($i=0;$i<count($scores);$i++) {
-		if (strpos('~',$scores[$i])===false) {
+		if (strpos($scores[$i],'~')===false) {
 			$out[$i+1] = ($scores[$i]<0)?-1:(($scores[$i]>0)?1:0);
 		} else {
 			$sp = explode('~',$scores[$i]);

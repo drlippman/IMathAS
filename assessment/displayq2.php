@@ -83,7 +83,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 				}
 			} else {
 				//if (is_numeric($arv)) {
-				if ($arv==='') {
+				if ($arv==='' || $arv==='ReGen') {
 					$stuanswers[$i+1] = null;
 				} else {
 					if (strpos($arv,'$!$')) {
@@ -411,7 +411,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 				}
 			} else {
 				//if (is_numeric($arv)) {
-				if ($arv==='') {
+				if ($arv==='' || $arv==='ReGen') {
 					$stuanswers[$i+1] = null;
 				} else {
 					if (strpos($arv,'$!$')) {
