@@ -7,6 +7,7 @@
 	}
 	if (isset($teacherid) && isset($_GET['scored'])) {
 		$scoredview = true;
+		$showcolormark = true;
 	} else {
 		$scoredview = false;
 	}

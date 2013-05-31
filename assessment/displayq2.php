@@ -4968,6 +4968,8 @@ function formathint($eword,$ansformats,$calledfrom, $islist=false,$doshort=false
 function getcolormark($c) {
 	global $imasroot;
 	
+	if (!isset($GLOBALS['showcolormark'])) { return '';}
+	
 	if ($c=='ansred') {
 		return '<img src="'.$imasroot.'/img/redx.gif"/>';
 	} else if ($c=='ansgrn') {
