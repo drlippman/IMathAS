@@ -42,7 +42,7 @@ function flattenout($arr) {
 	}
 }
 flattenout($outcomes);
-
+$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 require("../header.php");
 
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a> &gt; ";
@@ -63,9 +63,11 @@ if ($report=='overview') {
 	echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt; '._("Outcomes Report").'</div>';
 	echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>"._("Outcomes Report")."</h2></div>\n";
 	
-	echo '<table class="gb"><thead><tr><th>'._('Name').'</th>';
+	echo '<table id="myTable" class="gb"><thead><tr><th>'._('Name').'</th>';
+	$sarr = '"S"';
 	foreach ($outc as $oc) {
-		echo '<th><a href="outcomereport.php?cid='.$cid.'&amp;outcome='.$oc.'">'.$outcomeinfo[$oc].'</a></th>';
+		echo '<th>'.$outcomeinfo[$oc].'<br/><a class="small" href="outcomereport.php?cid='.$cid.'&amp;outcome='.$oc.'">[Details]</a></th>';
+		$sarr .= ',"N"';
 	}
 	echo '</tr></thead><tbody>';
 	
@@ -80,7 +82,7 @@ if ($report=='overview') {
 		echo '</tr>';
 	}
 	echo '</tbody></table>';
-	
+	echo "<script>initSortTable('myTable',Array($sarr),true);</script>\n";
 	echo '<p>'._('Note:  The outcome performance in each gradebook category is weighted based on gradebook weights to produce these overview scores').'</p>';
 } else if ($report=='oneoutcome') {
 	
@@ -90,8 +92,9 @@ if ($report=='overview') {
 	
 	echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>"._("Outcomes Detail on Outcome: ").$outcomeinfo[$outcome]."</h2></div>\n";
 
-	echo '<table class="gb"><thead><tr><th>'._('Name').'</th>';
+	echo '<table id="myTable" class="gb"><thead><tr><th>'._('Name').'</th>';
 	echo '<th>'._('Total').'</th>';
+	$sarr = '"S","N"';
 	$catstolist = array();
 	$itemstolist = array();
 	for ($i=1;$i<count($ot);$i++) {
@@ -114,9 +117,11 @@ if ($report=='overview') {
 	
 	foreach ($catstolist as $cat) {
 		echo '<th class="cat'.$ot[0][2][$cat][1].'"><span class="cattothdr">'.$ot[0][2][$cat][0].'</span></th>';
+		$sarr .= ',"N"';
 	}
 	foreach ($itemstolist as $col) {
 		echo '<th class="cat'.$ot[0][1][$col][1].'">'.$ot[0][1][$col][0].'</th>';
+		$sarr .= ',"N"';
 	}
 	
 	echo '</tr></thead><tbody>';
@@ -141,6 +146,8 @@ if ($report=='overview') {
 		echo '</tr>';
 	}
 	echo '</tbody></table>';
+	
+	echo "<script>initSortTable('myTable',Array($sarr),true);</script>\n";
 } else if ($report=='onestu') {
 	echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt; <a href="outcomereport.php?cid='.$cid.'">'._("Outcomes Report").'</a> &gt; '._("Student Detail").'</div>';
 	
@@ -177,7 +184,7 @@ if ($report=='overview') {
 				echo '<td>'.round(100*$ot[1][3][$type][$oi],1).'%</td>';
 				for ($i=0;$i<count($ot[0][2]);$i++) {
 					if (isset($ot[1][2][$i])) {
-						if ($ot[1][2][$i][2*$type+1]>0) {
+						if ($ot[1][2][$i][2*$type+1][$oi]>0) {
 							echo '<td>'.round(100*$ot[1][2][$i][2*$type][$oi]/$ot[1][2][$i][2*$type+1][$oi],1).'%</td>';
 						} else {
 							echo '<td>0%</td>';

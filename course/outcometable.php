@@ -686,49 +686,53 @@ function outcometable() {
 		
 		foreach($catorder as $cat) {//foreach category
 			//add up scores for each outcome
-			foreach ($cattotpast[$ln][$cat] as $oc=>$scs) {
-				$cattotpast[$ln][$cat][$oc] = array_sum($scs);
-				if (isset($cattotpastec[$ln][$cat][$oc])) {
-					$cattotpast[$ln][$cat][$oc] += array_sum($cattotpastec[$ln][$cat][$oc]);
-				}
-				$catposspast[$ln][$cat][$oc] = array_sum($catposspast[$ln][$cat][$oc]);
-				
-				$gb[$ln][2][$pos][0][$oc] = $cattotpast[$ln][$cat][$oc];
-				$gb[$ln][2][$pos][1][$oc] = $catposspast[$ln][$cat][$oc];
-				
-				if (!isset($totpast[$oc])) {
-					$totpast[$oc] = 0;
-					$totposspast[$oc] = 0;
-				}
-				if ($useweights==1 && $catposspast[$ln][$cat][$oc]>0) {
-					$totposspast[$oc] += $cats[$cat][5]/100;
-					$totpast[$oc] += $cattotpast[$ln][$cat][$oc]*$cats[$cat][5]/(100*$catposspast[$ln][$cat][$oc]);
-				} else if ($useweights==0) {
-					$totposspast[$oc] += $catposspast[$ln][$cat][$oc];
-					$totpast[$oc] += $cattotpast[$ln][$cat][$oc];
+			if (isset($cattotpast[$ln][$cat])) { 
+				foreach ($cattotpast[$ln][$cat] as $oc=>$scs) {
+					$cattotpast[$ln][$cat][$oc] = array_sum($scs);
+					if (isset($cattotpastec[$ln][$cat][$oc])) {
+						$cattotpast[$ln][$cat][$oc] += array_sum($cattotpastec[$ln][$cat][$oc]);
+					}
+					$catposspast[$ln][$cat][$oc] = array_sum($catposspast[$ln][$cat][$oc]);
+					
+					$gb[$ln][2][$pos][0][$oc] = $cattotpast[$ln][$cat][$oc];
+					$gb[$ln][2][$pos][1][$oc] = $catposspast[$ln][$cat][$oc];
+					
+					if (!isset($totpast[$oc])) {
+						$totpast[$oc] = 0;
+						$totposspast[$oc] = 0;
+					}
+					if ($useweights==1 && $catposspast[$ln][$cat][$oc]>0) {
+						$totposspast[$oc] += $cats[$cat][5]/100;
+						$totpast[$oc] += $cattotpast[$ln][$cat][$oc]*$cats[$cat][5]/(100*$catposspast[$ln][$cat][$oc]);
+					} else if ($useweights==0) {
+						$totposspast[$oc] += $catposspast[$ln][$cat][$oc];
+						$totpast[$oc] += $cattotpast[$ln][$cat][$oc];
+					}
 				}
 			}
-			foreach ($cattotcur[$ln][$cat] as $oc=>$scs) {
-				$cattotcur[$ln][$cat][$oc] = array_sum($scs);
-				if (isset($cattotcurec[$ln][$cat][$oc])) {
-					$cattotcur[$ln][$cat][$oc] += array_sum($cattotcurec[$ln][$cat][$oc]);
-				}
-				
-				$catposscur[$ln][$cat][$oc] = array_sum($catposscur[$ln][$cat][$oc]);
-				
-				$gb[$ln][2][$pos][2][$oc] = $cattotcur[$ln][$cat][$oc];
-				$gb[$ln][2][$pos][3][$oc] = $catposscur[$ln][$cat][$oc];
-				
-				if (!isset($totcur[$oc])) {
-					$totcur[$oc] = 0;
-					$totposscur[$oc] = 0;
-				}
-				if ($useweights==1 && $catposscur[$ln][$cat][$oc]>0) {
-					$totposscur[$oc] += $cats[$cat][5]/100;
-					$totcur[$oc] += $cattotcur[$ln][$cat][$oc]*$cats[$cat][5]/(100*$catposscur[$ln][$cat][$oc]);
-				} else if ($useweights==0) {
-					$totposscur[$oc] += $catposscur[$ln][$cat][$oc];
-					$totcur[$oc] += $cattotcur[$ln][$cat][$oc];
+			if (isset($cattotcur[$ln][$cat])) { 
+				foreach ($cattotcur[$ln][$cat] as $oc=>$scs) {
+					$cattotcur[$ln][$cat][$oc] = array_sum($scs);
+					if (isset($cattotcurec[$ln][$cat][$oc])) {
+						$cattotcur[$ln][$cat][$oc] += array_sum($cattotcurec[$ln][$cat][$oc]);
+					}
+					
+					$catposscur[$ln][$cat][$oc] = array_sum($catposscur[$ln][$cat][$oc]);
+					
+					$gb[$ln][2][$pos][2][$oc] = $cattotcur[$ln][$cat][$oc];
+					$gb[$ln][2][$pos][3][$oc] = $catposscur[$ln][$cat][$oc];
+					
+					if (!isset($totcur[$oc])) {
+						$totcur[$oc] = 0;
+						$totposscur[$oc] = 0;
+					}
+					if ($useweights==1 && $catposscur[$ln][$cat][$oc]>0) {
+						$totposscur[$oc] += $cats[$cat][5]/100;
+						$totcur[$oc] += $cattotcur[$ln][$cat][$oc]*$cats[$cat][5]/(100*$catposscur[$ln][$cat][$oc]);
+					} else if ($useweights==0) {
+						$totposscur[$oc] += $catposscur[$ln][$cat][$oc];
+						$totcur[$oc] += $cattotcur[$ln][$cat][$oc];
+					}
 				}
 			}
 			$pos++;
