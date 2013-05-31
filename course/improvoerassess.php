@@ -55,6 +55,7 @@ while ($row = mysql_fetch_row($result)) {
 
 $numsubmissions = array();
 $numattempts = array();
+$timesonfirst = array();
 //pull assessment data to look at number of attempts
 $query = "SELECT ia.defattempts,ias.* FROM imas_assessment_sessions as ias JOIN imas_assessments as ia ON ias.assessmentid=ia.id AND ia.courseid='$cid'";
 $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -62,6 +63,7 @@ while ($row = mysql_fetch_assoc($result)) {
 	if (!isset($numsubmissions[$row['assessmentid']])) {
 		$numsubmissions[$row['assessmentid']] = 1;
 		$numattempts[$row['assessmentid']] = 0;
+		$timesonfirst[$row['assessmentid']] = 0;
 	} else {
 		$numsubmissions[$row['assessmentid']]++;
 	}
@@ -83,13 +85,22 @@ while ($row = mysql_fetch_assoc($result)) {
 	//this is the attempts per question value
 	$attcnt /= count($qparts);
 	$numattempts[$row['assessmentid']] += $attcnt;
+	
+	$timeparts = explode(',',$row['timeontask']);
+	foreach ($timeparts as $timeinf) {
+		$iteminf = explode('~',$timeinf);
+		$timesonfirst[$row['assessmentid']] += $iteminf[0]/count($timeparts);
+	}
 }
 
 $attemptratios = array();
+$timesratios = array();
 foreach ($numattempts as $aid=>$cnt) {
 	$attemptratios[$aid] = $cnt/$numsubmissions[$aid];
+	$timesratios[$aid] = log($timesonfirst[$aid]/$numsubmissions[$aid]);
 }
 $maxratio = max($attemptratios);
+$maxtimeratio = max($timesratios);
 
 $assessbadness = array();
 
@@ -131,24 +142,35 @@ foreach ($gbt[0][1] as $col=>$data) {
 	$assessmetrics[$col]['time'] = ($data[11]>$maxdate)?1:($data[11]-$mindate)/($maxdate-$mindate);
 	if ($data[6]==0) { //was online assessment
 		$assessmetrics[$col]['attemptratio'] = $attemptratios[$data[7]]/$maxratio;
+		$assessmetrics[$col]['timesratios'] = $timesratios[$data[7]]/$maxtimeratio;
 	} else {
 		$assessmetrics[$col]['attemptratio'] = 1/$maxratio;
+		$assessmetrics[$col]['timesratios'] = 0;
 	}
-	$assessbadness[$col] = 0.2*(0.25*(1-$assessmetrics[$col]['mean']) + 0.25*(1-$assessmetrics[$col]['median']));
-	$assessbadness[$col] += 0.2*(0.25*(1-$assessmetrics[$col]['q1']) + 0.25*(1-$assessmetrics[$col]['q3']));
-	$assessbadness[$col] += 0.2*$assessmetrics[$col]['late'] + 0.2*(1-$assessmetrics[$col]['subperc']);
-	$assessbadness[$col] += 0.2*$assessmetrics[$col]['time']+0.2*$assessmetrics[$col]['attemptratio'];
+	$weights = array('perf'=>0.25, 'late'=>0.15, 'sub'=>0.25, 'timein'=>0.05, 'attempt'=>0.20, 'times'=>0.1);
+	$assessbadness[$col] = $weights['perf']*(0.25*(1-$assessmetrics[$col]['mean']) + 0.25*(1-$assessmetrics[$col]['median']));
+	$assessbadness[$col] += $weights['perf']*(0.25*(1-$assessmetrics[$col]['q1']) + 0.25*(1-$assessmetrics[$col]['q3']));
+	$assessbadness[$col] += $weights['late']*$assessmetrics[$col]['late'] + $weights['sub']*(1-$assessmetrics[$col]['subperc']);
+	$assessbadness[$col] += $weights['timein']*$assessmetrics[$col]['time']+$weights['attempt']*$assessmetrics[$col]['attemptratio']+$weights['times']*$assessmetrics[$col]['timesratios'];
+	if ($assessmetrics[$col]['timesratios']==0) {
+		$assessbadness[$col] /= (1-$weights['times']);
+	}
 }
 
 arsort($assessbadness);
 
-
+$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 require("../header.php");
-echo '<table><thead><tr><th>Item Name</th><th>Badness</th>';
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> &gt; "._('Assessment Metric');
+echo '<div class=breadcrumb>'.$curBreadcrumb.'</div>';
+echo '<div id="headeraddlinkedtext" class="pagetitle"><h2>'._('Assessment Metric').'</h2></div>';
+
+echo '<table id="myTable" class="gb"><thead><tr><th>Item Name</th><th>Magic Metric</th>';
 echo '<th>Mean</th><th>Q1</th><th>Median</th><th>Q3</th><th>Percent Late</th><th>Percent Submitted</th>';
-echo '<th>Time in Term</th><th>Attempt Ratio</th></tr></thead><tbody>';
+echo '<th>Time in Term</th><th>Attempts</th><th>Times</th></tr></thead><tbody>';
+$c = 0;
 foreach ($assessbadness as $col=>$badness) {
-	echo '<tr>';
+	echo '<tr class="'.($c%2==0?'even':'odd').'">';  $c++;
 	echo '<td>'.$assessmetrics[$col]['name'].'</td>';
 	echo '<td>'.round(100*$badness,1).'</td>';
 	echo '<td>'.round(100*$assessmetrics[$col]['mean'],1).'%</td>';
@@ -159,8 +181,23 @@ foreach ($assessbadness as $col=>$badness) {
 	echo '<td>'.round(100*$assessmetrics[$col]['subperc'],1).'%</td>';
 	echo '<td>'.round(100*$assessmetrics[$col]['time'],1).'%</td>';
 	echo '<td>'.round(100*$assessmetrics[$col]['attemptratio'],1).'%</td>';
+	echo '<td>'.round(100*$assessmetrics[$col]['timesratios'],1).'%</td>';
 	echo '</tr>';
 }
-echo '</tbody></table>';
+echo '</tbody></table><br/>';
+echo "<script>initSortTable('myTable',Array('S','N','N','N','N','N','N','N','N','N','N'),true);</script>\n";
+?>
+<p>The "Magic Metric" is a lower-is-likely-better metric that:</p>
+<ul>
+<li>Decreases as performance metrics (mean, quartiles, median) increase. </li>
+<li>Increases with as the percentage of students who submit an assignment late increases (Percent Late).</li>
+<li>Decreases as the percentage of students who submit the assignment at all increases (Percent Submitted).</li>
+<li>Increases as the assignment position in the course increases (Time in Term).</li>
+<li>Increases as the number of attempts per question (normalized to percent of max) increases (Attempts).</li>
+<li>Increases as the time on the first attempt of each question (log, normalized to a percent of max)  increases (Times).</li>
+</ul>
+<p>This metric is intended to help you see, at a quick glance, which assessments might be the most problematic in your
+course.</p>
+<?php
 require("../footer.php");
 ?>
