@@ -79,7 +79,7 @@ while ($row = mysql_fetch_assoc($result)) {
 			}
 		} else {
 			//if not regen, count number of reattempts
-			$attcnt += substr_count($qans,'##')+1;
+			$attcnt += min(5,substr_count($qans,'##')+1);
 		}
 	}
 	//this is the attempts per question value
