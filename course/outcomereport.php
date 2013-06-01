@@ -99,7 +99,11 @@ if ($report=='overview') {
 		echo '<tr class="'.($i%2==0?'even':'odd').'">';
 		echo '<td><a href="outcomereport.php?cid='.$cid.'&amp;stu='.$ot[$i][0][1].'&amp;type='.$type.'">'.$ot[$i][0][0].'</a></td>';
 		foreach ($outc as $oc) {
-			echo '<td>'.round($ot[$i][3][$type][$oc]*100,1).'%</td>';
+			if (isset($ot[$i][3][$type]) && isset($ot[$i][3][$type][$oc])) {
+				echo '<td>'.round(100*$ot[$i][3][$type][$oc],1).'%</td>';	
+			} else {
+				echo '<td>-</td>';
+			}
 		}
 		echo '</tr>';
 	}
@@ -150,7 +154,12 @@ if ($report=='overview') {
 	for ($i=1;$i<count($ot);$i++) {
 		echo '<tr class="'.($i%2==0?'even':'odd').'">';
 		echo '<td>'.$ot[$i][0][0].'</td>';
-		echo '<td>'.round(100*$ot[$i][3][$type][$outcome],1).'%</td>';
+		if (isset($ot[$i][3][$type]) && isset($ot[$i][3][$type][$outcome])) {
+			echo '<td>'.round(100*$ot[$i][3][$type][$outcome],1).'%</td>';	
+		} else {
+			echo '<td>-</td>';
+		}
+		
 		foreach ($catstolist as $col) {
 			if (isset($ot[$i][2][$col]) && isset($ot[$i][2][$col][2*$type][$outcome]) && $ot[$i][2][$col][2*$type+1][$outcome]>0) {
 				echo '<td>'.round(100*$ot[$i][2][$col][2*$type][$outcome]/$ot[$i][2][$col][2*$type+1][$outcome],1).'%</td>';	
@@ -203,9 +212,13 @@ if ($report=='overview') {
 			} else {
 				echo '<tr class="'.$class.'">';
 				echo '<td>'.$ind.$outcomeinfo[$oi].'</td>';
-				echo '<td>'.round(100*$ot[1][3][$type][$oi],1).'%</td>';
+				if (isset($ot[1][3][$type]) && isset($ot[1][3][$type][$oi])) {
+					echo '<td>'.round(100*$ot[1][3][$type][$oi],1).'%</td>';	
+				} else {
+					echo '<td>-</td>';
+				}
 				for ($i=0;$i<count($ot[0][2]);$i++) {
-					if (isset($ot[1][2][$i])) {
+					if (isset($ot[1][2][$i]) && isset($ot[1][2][$i][2*$type+1][$oi])) {
 						if ($ot[1][2][$i][2*$type+1][$oi]>0) {
 							echo '<td>'.round(100*$ot[1][2][$i][2*$type][$oi]/$ot[1][2][$i][2*$type+1][$oi],1).'%</td>';
 						} else {

@@ -740,80 +740,85 @@ function outcometable() {
 		foreach ($totpast as $oc=>$v) {
 			if ($totposspast[$oc]>0) {
 				$gb[$ln][3][0][$oc] = $totpast[$oc]/$totposspast[$oc];
-			} else {
-				$gb[$ln][3][0][$oc] = 0;
-			}
+			} 
 		}
 		foreach ($totcur as $oc=>$v) {
 			if ($totposscur[$oc]>0) {
 				$gb[$ln][3][1][$oc] = $totcur[$oc]/$totposscur[$oc];
-			} else {
-				$gb[$ln][3][1][$oc] = 0;
-			}
+			} 
 		}
 	}
-	$gb[$ln][0][0] = "Averages";
-	$gb[$ln][0][1] = -1;
-	foreach ($gb[0][1] as $i=>$inf) {
-		$avg = array();  $avgposs = array();
-		for ($j=1;$j<$ln;$j++) {
-			if (isset($gb[$j][1][$i]) && isset($gb[$j][1][$i][0])) {
-				foreach ($gb[$j][1][$i][0] as $oc=>$sc) {
-					if (!isset($avg[$oc])) { $avg[$oc] = array(); $avgposs[$oc] = array();}
-					$avg[$oc][] = $sc;
-					$avgposs[$oc][] = $gb[$j][1][$i][1][$oc];
+	if ($limuser<1) {
+		$gb[$ln][0][0] = "Averages";
+		$gb[$ln][0][1] = -1;
+		foreach ($gb[0][1] as $i=>$inf) {
+			$avg = array();  $avgposs = array();
+			for ($j=1;$j<$ln;$j++) {
+				if (isset($gb[$j][1][$i]) && isset($gb[$j][1][$i][0])) {
+					foreach ($gb[$j][1][$i][0] as $oc=>$sc) {
+						if (!isset($avg[$oc])) { $avg[$oc] = array(); $avgposs[$oc] = array();}
+						$avg[$oc][] = $sc;
+						$avgposs[$oc][] = $gb[$j][1][$i][1][$oc];
+					}
 				}
 			}
+			foreach ($avg as $oc=>$scs) {
+				$gb[$ln][1][$i][0][$oc] = array_sum($avg[$oc])/count($avg[$oc]);
+				$gb[$ln][1][$i][1][$oc] = array_sum($avgposs[$oc])/count($avg[$oc]);
+			}
 		}
-		foreach ($avg as $oc=>$scs) {
-			$gb[$ln][1][$i][0][$oc] = array_sum($avg[$oc])/count($avg[$oc]);
-			$gb[$ln][1][$i][1][$oc] = array_sum($avgposs[$oc])/count($avg[$oc]);
-		}
-	}
-	foreach ($gb[0][2] as $i=>$inf) {
-		$avg = array();  $avgposs = array();
-		$avgatt = array();  $avgattposs = array();
-		for ($j=1;$j<$ln;$j++) {
-			if (isset($gb[$j][2][$i]) && isset($gb[$j][2][$i][0])) {
-				foreach ($gb[$j][2][$i][0] as $oc=>$sc) {
-					if (!isset($avg[$oc])) { $avg[$oc] = array(); $avgposs[$oc] = array();}
-					$avg[$oc][] = $sc;
-					$avgposs[$oc][] = $gb[$j][2][$i][1][$oc];
+		foreach ($gb[0][2] as $i=>$inf) {
+			$avg = array();  $avgposs = array();
+			$avgatt = array();  $avgattposs = array();
+			for ($j=1;$j<$ln;$j++) {
+				if (isset($gb[$j][2][$i]) && isset($gb[$j][2][$i][0])) {
+					foreach ($gb[$j][2][$i][0] as $oc=>$sc) {
+						if (!isset($avg[$oc])) { $avg[$oc] = array(); $avgposs[$oc] = array();}
+						$avg[$oc][] = $sc;
+						$avgposs[$oc][] = $gb[$j][2][$i][1][$oc];
+					}
+				}
+				if (isset($gb[$j][2][$i]) && isset($gb[$j][2][$i][2])) {
+					foreach ($gb[$j][2][$i][2] as $oc=>$sc) {
+						if (!isset($avgatt[$oc])) { $avgatt[$oc] = array(); $avgpossatt[$oc] = array();}
+						$avgatt[$oc][] = $sc;
+						$avgattposs[$oc][] = $gb[$j][2][$i][3][$oc];
+					}
 				}
 			}
-			if (isset($gb[$j][2][$i]) && isset($gb[$j][2][$i][2])) {
-				foreach ($gb[$j][2][$i][2] as $oc=>$sc) {
-					if (!isset($avgatt[$oc])) { $avgatt[$oc] = array(); $avgpossatt[$oc] = array();}
+			foreach ($avg as $oc=>$scs) {
+				$gb[$ln][2][$i][0][$oc] = array_sum($avg[$oc])/count($avg[$oc]);
+				$gb[$ln][2][$i][1][$oc] = array_sum($avgposs[$oc])/count($avg[$oc]);
+			}
+			foreach ($avgatt as $oc=>$scs) {
+				$gb[$ln][2][$i][2][$oc] = array_sum($avgatt[$oc])/count($avgatt[$oc]);
+				$gb[$ln][2][$i][3][$oc] = array_sum($avgattposs[$oc])/count($avgatt[$oc]);
+			}
+		}
+		$avg = array();  $avgatt = array();
+		for ($j=1;$j<$ln;$j++) {
+			if (isset($gb[$j][3][0])) {
+				foreach ($gb[$j][3][0] as $oc=>$sc) {
+					if (!isset($avg[$oc])) { $avg[$oc] = array();}
+					$avg[$oc][] = $sc;
+				}
+			}
+			if (isset($gb[$j][3][1])) {
+				foreach ($gb[$j][3][1] as $oc=>$sc) {
+					if (!isset($avgatt[$oc])) { $avgatt[$oc] = array();}
 					$avgatt[$oc][] = $sc;
-					$avgattposs[$oc][] = $gb[$j][2][$i][3][$oc];
 				}
 			}
 		}
 		foreach ($avg as $oc=>$scs) {
-			$gb[$ln][2][$i][0][$oc] = array_sum($avg[$oc])/count($avg[$oc]);
-			$gb[$ln][2][$i][1][$oc] = array_sum($avgposs[$oc])/count($avg[$oc]);
+			$gb[$ln][3][0][$oc] = array_sum($avg[$oc])/count($avg[$oc]);
 		}
 		foreach ($avgatt as $oc=>$scs) {
-			$gb[$ln][2][$i][2][$oc] = array_sum($avgatt[$oc])/count($avgatt[$oc]);
-			$gb[$ln][2][$i][3][$oc] = array_sum($avgattposs[$oc])/count($avgatt[$oc]);
+			$gb[$ln][3][1][$oc] = array_sum($avgatt[$oc])/count($avgatt[$oc]);
 		}
 	}
-	$avg = array();  $avgatt = array();
-	for ($j=1;$j<$ln;$j++) {
-		foreach ($gb[$j][3][0] as $oc=>$sc) {
-			if (!isset($avg[$oc])) { $avg[$oc] = array();}
-			$avg[$oc][] = $sc;
-		}
-		foreach ($gb[$j][3][1] as $oc=>$sc) {
-			if (!isset($avgatt[$oc])) { $avgatt[$oc] = array();}
-			$avgatt[$oc][] = $sc;
-		}
-	}
-	foreach ($avg as $oc=>$scs) {
-		$gb[$ln][3][0][$oc] = array_sum($avg[$oc])/count($avg[$oc]);
-	}
-	foreach ($avgatt as $oc=>$scs) {
-		$gb[$ln][3][1][$oc] = array_sum($avgatt[$oc])/count($avgatt[$oc]);
+	if ($limuser==-1) {
+		$gb[1] = $gb[$ln];
 	}
 	return $gb;
 
