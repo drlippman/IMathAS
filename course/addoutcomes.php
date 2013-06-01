@@ -143,7 +143,7 @@ function printoutcome($arr) {
 	global $outcomeinfo,$cnt;
 	foreach ($arr as $item) {
 		if (is_array($item)) { //is outcome group
-			echo '<li class="blockli" id="grp'.$cnt.'"><span class=icon style="background-color:#00f">G</span> ';
+			echo '<li class="blockli" id="grp'.$cnt.'"><span class=icon style="background-color:#66f">G</span> ';
 			echo '<input class="outcome" type="text" size="60" id="g'.$cnt.'" value="'.htmlentities($item['name']).'" onkeyup="txtchg()"> ';
 			echo '<a href="#" onclick="removeoutcomegrp(this);return false">'._("Delete").'</a>';
 			if (count($item['outcomes'])>0) {
@@ -198,7 +198,7 @@ $placeinhead .= '<script type="text/javascript">
 		}
 	}
 	function addoutcomegrp() {
-		var html = \'<li class="blockli" id="newgrp\'+ocnt+\'"><span class=icon style="background-color:#00f">G</span> \';
+		var html = \'<li class="blockli" id="newgrp\'+ocnt+\'"><span class=icon style="background-color:#66f">G</span> \';
 		html += \'<input class="outcome" type="text" size="60" id="newg\'+ocnt+\'" onkeyup="txtchg()"> \';
 		html += \'<a href="#" onclick="removeoutcomegrp(this);return false\">'._("Delete").'</a></li>\';
 		j("#qviewtree").append(html);
@@ -242,6 +242,8 @@ echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt; '._("Course Outcomes").'</di
 
 echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>"._("Course Outcomes")."</h2></div>\n";
 
+echo '<div class="cpmid"><a href="outcomemap.php?cid='.$cid.'">'._('View Outcomes Map').'</a> | <a href="outcomereport.php?cid='.$cid.'">'._('View Outcomes Report').'</a></div>';
+
 echo '<div class="breadcrumb">'._('Use colored boxes to drag-and-drop order.').' <input type="button" id="recchg" disabled="disabled" value="', _('Record Changes'), '" onclick="submitChanges()"/><span id="submitnotice" style="color:red;"></span></div>';
 
 echo '<ul id="qviewtree" class="qview">';
@@ -249,7 +251,6 @@ printoutcome($outcomes);
 echo '</ul>';
 echo '<input type="button" onclick="addoutcomegrp()" value="'._('Add Outcome Group').'"/> ';
 echo '<input type="button" onclick="addoutcome()" value="'._('Add Outcome').'"/> ';
-echo '<p><a href="outcomemap.php?cid='.$cid.'">'._('View Outcomes Map').'</a> | <a href="outcomereport.php?cid='.$cid.'">'._('View Outcomes Report').'</a></p>';
 require("../footer.php");
 
 ?>

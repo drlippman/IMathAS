@@ -162,7 +162,7 @@ if (count($cats)>0) {
 	}
 }
 natsort($catnames);
-
+$placeinhead .= '<style type="text/css"> td { line-height: 150%;} .icon {background-color: #0f0;}</style>';
 require("../header.php");
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a> &gt; ";
 $curBreadcrumb .= "<a href=\"addoutcomes.php?cid=$cid\">"._("Course Outcomes")."</a>\n";
@@ -184,15 +184,15 @@ function printitems($items) {
 	foreach ($items as $i=>$item) {
 		if ($i!=0) { echo '<br/>';}
 		if ($item[0]=='link') {
-			echo 'L: '.$linknames[$item[1]];
+			echo '<span class="icon iconlink" >L</span> '.$linknames[$item[1]];
 		} else if ($item[0]=='inline') {
-			echo 'I: '.$inlinenames[$item[1]];
+			echo '<span class="icon iconinline" >I</span> '.$inlinenames[$item[1]];
 		}else if ($item[0]=='assess') {
-			echo 'A: '.$assessnames[$item[1]];
+			echo '<span class="icon iconassess" >A</span> '.$assessnames[$item[1]];
 		} else if ($item[0]=='forum') {
-			echo 'F: '.$forumnames[$item[1]];
+			echo '<span class="icon iconforum" >F</span> '.$forumnames[$item[1]];
 		} else if ($item[0]=='offline') {
-			echo 'O: '.$offnames[$item[1]];
+			echo '<span class="icon iconoffline" >O</span> '.$offnames[$item[1]];
 		} 
 	}
 }
@@ -229,5 +229,6 @@ function printoutcome($arr,$ind) {
 }
 printoutcome($outcomes,'');
 echo '</tbody></table>';
+echo '<p>'._('Key:  L: Links, I: Inline Text, A: Assessments, F: Forums, O: Offline Grades').'</p>';
 require("../footer.php");
 ?>

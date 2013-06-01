@@ -27,8 +27,6 @@ while ($row = mysql_fetch_row($result)) {
 	$outcomeinfo[$row[0]] = $row[1];
 }
 
-//the overview report
-$type = 1; //0 past, 1 attempted
 
 $outc = array();
 function flattenout($arr) {
@@ -42,31 +40,55 @@ function flattenout($arr) {
 	}
 }
 flattenout($outcomes);
+
+if (isset($_GET['stu'])) {
+	$stu = intval($_GET['stu']);
+	$report = 'onestu';
+	$qs = '&stu='.$stu;
+} else if (isset($_GET['outcome'])) {
+	$outcome = intval($_GET['outcome']);
+	$report = 'oneoutcome';
+	$qs = '&outcome='.$outcome;
+} else {
+	$report = 'overview';
+	$qs = '';
+}
+if (isset($_GET['type'])) {
+	$type = intval($_GET['type']);
+} else {
+	$type = 1;  //0 past, 1 attempted
+}
+$typesel = _('Show for scores: ').'<select id="typesel" onchange="chgtype()">';
+$typesel .= '<option value="0" '.($type==0?'selected="selected"':'').'>'._('Past Due scores').'</option>';
+$typesel .= '<option value="1" '.($type==1?'selected="selected"':'').'>'._('Past Due and Attempted scores').'</option>';
+$typesel .= '</select>';
+
 $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
+$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/outcomereport.php?cid=$cid".$qs;
+	
+$placeinhead .= '<script type="text/javascript"> var selfaddr = "'.$address.'";
+	function chgtype() {
+		var type = document.getElementById("typesel").value;
+		window.location = selfaddr+"&type="+type;
+	}
+	</script>';
 require("../header.php");
 
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a> &gt; ";
 $curBreadcrumb .= "<a href=\"addoutcomes.php?cid=$cid\">"._("Course Outcomes")."</a>\n";
 
-if (isset($_GET['stu'])) {
-	$stu = intval($_GET['stu']);
-	$report = 'onestu';
-} else if (isset($_GET['outcome'])) {
-	$outcome = intval($_GET['outcome']);
-	$report = 'oneoutcome';
-} else {
-	$report = 'overview';
-}
+
 
 if ($report=='overview') {
 	
 	echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt; '._("Outcomes Report").'</div>';
 	echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>"._("Outcomes Report")."</h2></div>\n";
 	
+	echo '<div class="cpmid">'.$typesel.'</div>';
 	echo '<table id="myTable" class="gb"><thead><tr><th>'._('Name').'</th>';
 	$sarr = '"S"';
 	foreach ($outc as $oc) {
-		echo '<th>'.$outcomeinfo[$oc].'<br/><a class="small" href="outcomereport.php?cid='.$cid.'&amp;outcome='.$oc.'">[Details]</a></th>';
+		echo '<th>'.$outcomeinfo[$oc].'<br/><a class="small" href="outcomereport.php?cid='.$cid.'&amp;outcome='.$oc.'&amp;type='.$type.'">[Details]</a></th>';
 		$sarr .= ',"N"';
 	}
 	echo '</tr></thead><tbody>';
@@ -75,23 +97,23 @@ if ($report=='overview') {
 	
 	for ($i=1;$i<count($ot);$i++) {
 		echo '<tr class="'.($i%2==0?'even':'odd').'">';
-		echo '<td><a href="outcomereport.php?cid='.$cid.'&amp;stu='.$ot[$i][0][1].'">'.$ot[$i][0][0].'</a></td>';
+		echo '<td><a href="outcomereport.php?cid='.$cid.'&amp;stu='.$ot[$i][0][1].'&amp;type='.$type.'">'.$ot[$i][0][0].'</a></td>';
 		foreach ($outc as $oc) {
 			echo '<td>'.round($ot[$i][3][$type][$oc]*100,1).'%</td>';
 		}
 		echo '</tr>';
 	}
 	echo '</tbody></table>';
-	echo "<script>initSortTable('myTable',Array($sarr),true);</script>\n";
+	echo "<script>initSortTable('myTable',Array($sarr),true,false);</script>\n";
 	echo '<p>'._('Note:  The outcome performance in each gradebook category is weighted based on gradebook weights to produce these overview scores').'</p>';
 } else if ($report=='oneoutcome') {
 	
-	echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt; <a href="outcomereport.php?cid='.$cid.'">'._("Outcomes Report").'</a> &gt; '._("Outcome Detail").'</div>';
+	echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt; <a href="outcomereport.php?cid='.$cid.'&amp;type='.$type.'">'._("Outcomes Report").'</a> &gt; '._("Outcome Detail").'</div>';
 	
 	$ot = outcometable();
 	
 	echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>"._("Outcomes Detail on Outcome: ").$outcomeinfo[$outcome]."</h2></div>\n";
-
+	echo '<div class="cpmid">'.$typesel.'</div>';
 	echo '<table id="myTable" class="gb"><thead><tr><th>'._('Name').'</th>';
 	echo '<th>'._('Total').'</th>';
 	$sarr = '"S","N"';
@@ -133,7 +155,7 @@ if ($report=='overview') {
 			if (isset($ot[$i][2][$col]) && isset($ot[$i][2][$col][2*$type][$outcome]) && $ot[$i][2][$col][2*$type+1][$outcome]>0) {
 				echo '<td>'.round(100*$ot[$i][2][$col][2*$type][$outcome]/$ot[$i][2][$col][2*$type+1][$outcome],1).'%</td>';	
 			} else {
-				echo '<td>0%</td>';
+				echo '<td>-</td>';
 			}
 		}
 		foreach ($itemstolist as $col) {
@@ -147,14 +169,14 @@ if ($report=='overview') {
 	}
 	echo '</tbody></table>';
 	
-	echo "<script>initSortTable('myTable',Array($sarr),true);</script>\n";
+	echo "<script>initSortTable('myTable',Array($sarr),true,false);</script>\n";
 } else if ($report=='onestu') {
-	echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt; <a href="outcomereport.php?cid='.$cid.'">'._("Outcomes Report").'</a> &gt; '._("Student Detail").'</div>';
+	echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt; <a href="outcomereport.php?cid='.$cid.'&amp;type='.$type.'">'._("Outcomes Report").'</a> &gt; '._("Student Detail").'</div>';
 	
 	$ot = outcometable($stu);
 	
 	echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>"._("Outcomes Student Detail for: ").$ot[1][0][0]."</h2></div>\n";
-
+	echo '<div class="cpmid">'.$typesel.'</div>';
 	echo '<table class="gb"><thead><tr><th>'._('Outcome').'</th>';
 	
 	echo '<th>'._('Total').'</th>';
