@@ -94,7 +94,7 @@ if ($report=='overview') {
 	echo '</tr></thead><tbody>';
 	
 	$ot = outcometable();
-	
+
 	for ($i=1;$i<count($ot);$i++) {
 		echo '<tr class="'.($i%2==0?'even':'odd').'">';
 		echo '<td><a href="outcomereport.php?cid='.$cid.'&amp;stu='.$ot[$i][0][1].'&amp;type='.$type.'">'.$ot[$i][0][0].'</a></td>';

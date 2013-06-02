@@ -188,6 +188,14 @@ function outcometable() {
 				$qoutcome[$r[1]] = $line['defoutcome'];
 			}
 		}
+		$possible[$kcnt] = array();
+		foreach ($aitems as $k=>$q) {
+			if (!isset($qoutcome[$q])){ continue;}
+			if (!isset($possible[$kcnt][$qoutcome[$q]])) {
+				$possible[$kcnt][$qoutcome[$q]] = 0;
+			}
+			$possible[$kcnt][$qoutcome[$q]] += $aitemcnt[$k]*$qposs[$q];
+		}
 		$kcnt++;
 	}
 	
@@ -461,6 +469,7 @@ function outcometable() {
 		$gb[$ln][0][0] = "{$line['LastName']},&nbsp;{$line['FirstName']}";
 		$gb[$ln][0][1] = $line['id'];
 		$gb[$ln][0][2] = $line['locked'];
+		
 
 		$sturow[$line['id']] = $ln;
 		$ln++;
@@ -678,12 +687,50 @@ function outcometable() {
 	
 	//create category totals
 	for ($ln = 1; $ln<count($sturow)+1;$ln++) { //foreach student calculate category totals and total totals
+		
+		//zero out past due items
+		foreach($gb[0][1] as $col=>$inf) {
+			if ($gb[0][1][$col][2]>0 || count($gb[$ln][1][$col][1])>0) {continue;} //skip if current, or if already set
+			if ($inf[4]==0 && count($possible[$assessidx[$inf[5]]])==0) {continue;} //assess has no outcomes
+			
+			$gb[$ln][1][$col] = array();
+			$gb[$ln][1][$col][0] = array();
+			$gb[$ln][1][$col][1] = array();
+			if ($inf[4]==0) { //online item
+				$i = $assessidx[$inf[5]];
+				foreach ($possible[$i] as $oc=>$p) {
+					$gb[$ln][1][$col][0][$oc] = 0;
+					$gb[$ln][1][$col][1][$oc] = $p;	
+					$cattotpast[$ln][$category[$i]][$oc][$col] = 0;
+					$catposspast[$ln][$category[$i]][$oc][$col] = $p;
+					$cattotcur[$ln][$category[$i]][$oc][$col] = 0;
+					$catposscur[$ln][$category[$i]][$oc][$col] = $p;
+				}
+				$gb[$ln][1][$col][3] = 0;
+				$gb[$ln][1][$col][4] = 'new';
+			} else { //offline or discussion
+				if ($inf[4]==1) {
+					$i = $gradeidx[$inf[5]];
+				} else if ($inf[4]==2) {
+					$i = $discussidx[$inf[5]];
+				}
+				foreach ($itemoutcome[$i] as $oc) {
+					$gb[$ln][1][$col][0][$oc] = 0;
+					$gb[$ln][1][$col][1][$oc] = $possible[$i];	
+					$cattotpast[$ln][$category[$i]][$oc][$col] = 0;
+					$catposspast[$ln][$category[$i]][$oc][$col] = $possible[$i];
+					$cattotcur[$ln][$category[$i]][$oc][$col] = 0;
+					$catposscur[$ln][$category[$i]][$oc][$col] = $possible[$i];
+				}
+			}
+		}
+		
 		$totpast = array();
 		$totposspast = array();
 		$totcur = array();
 		$totposscur = array();
 		$pos = 0; //reset position for category totals
-		
+
 		foreach($catorder as $cat) {//foreach category
 			//add up scores for each outcome
 			if (isset($cattotpast[$ln][$cat])) { 
@@ -737,6 +784,7 @@ function outcometable() {
 			}
 			$pos++;
 		}
+
 		foreach ($totpast as $oc=>$v) {
 			if ($totposspast[$oc]>0) {
 				$gb[$ln][3][0][$oc] = $totpast[$oc]/$totposspast[$oc];
