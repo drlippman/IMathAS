@@ -2,6 +2,8 @@
 
 //IMathAS:  Core of the testing engine.  Displays and grades questions
 //(c) 2006 David Lippman
+//quadratic inequalities contributed by Cam Joyce
+
 $mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
 $allowedmacros = $mathfuncs;
 //require_once("mathphp.php");
@@ -1908,10 +1910,24 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$out .= "<div><span id=\"drawtools$qn\" class=\"drawtools\">";
 		$out .= "<span onclick=\"clearcanvas($qn)\">" . _('Clear All') . "</span> " . _('Draw:') . " ";
 		if ($answerformat[0]=='inequality') {
-			$out .= "<img src=\"$imasroot/img/tpineq.gif\" onclick=\"settool(this,$qn,10)\" class=\"sel\"/>";
-			$out .= "<img src=\"$imasroot/img/tpineqdash.gif\" onclick=\"settool(this,$qn,10.2)\"/>";
-			$def = 10;
-		} else if ($answerformat[0]=='twopoint') {
+            		if (in_array('both',$answerformat)) {
+               			$out .= "<img src=\"$imasroot/img/tpineq.gif\" onclick=\"settool(this,$qn,10)\" class=\"sel\"/>";
+            			$out .= "<img src=\"$imasroot/img/tpineqdash.gif\" onclick=\"settool(this,$qn,10.2)\"/>";
+            			$out .= "<img src=\"$imasroot/img/tpineqparab.gif\" onclick=\"settool(this,$qn,10.3)\"/>";
+                		$out .= "<img src=\"$imasroot/img/tpineqparabdash.gif\" onclick=\"settool(this,$qn,10.4)\"/>";
+                		$def = 10;
+            		}
+			else if (in_array('parab',$answerformat)) {
+               			$out .= "<img src=\"$imasroot/img/tpineqparab.gif\" onclick=\"settool(this,$qn,10.3)\" class=\"sel\"/>";
+                		$out .= "<img src=\"$imasroot/img/tpineqparabdash.gif\" onclick=\"settool(this,$qn,10.4)\"/>";
+                		$def = 10.3;
+            		}  
+			else {
+				$out .= "<img src=\"$imasroot/img/tpineq.gif\" onclick=\"settool(this,$qn,10)\" class=\"sel\"/>";
+            			$out .= "<img src=\"$imasroot/img/tpineqdash.gif\" onclick=\"settool(this,$qn,10.2)\"/>";
+                		$def = 10;
+          		}
+        	} else if ($answerformat[0]=='twopoint') {
 			if (count($answerformat)==1 || in_array('line',$answerformat)) {
 				$out .= "<img src=\"$imasroot/img/tpline.gif\" onclick=\"settool(this,$qn,5)\" ";
 				if (count($answerformat)==1 || $answerformat[1]=='line') { $out .= 'class="sel" '; $def = 5;}
@@ -4144,10 +4160,18 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			
 		} else if ($answerformat[0]=="inequality") {
 			list($lines,$dots,$odots,$tplines,$ineqlines) = explode(';;',$givenans);
-			$x1 = 1/3*$settings[0] + 2/3*$settings[1];
+			/*$x1 = 1/3*$settings[0] + 2/3*$settings[1];
 			$x2 = 2/3*$settings[0] + 1/3*$settings[1];
 			$x1p = ($x1 - $settings[0])*$pixelsperx + $imgborder;
 			$x2p = ($x2 - $settings[0])*$pixelsperx + $imgborder;
+			$ymid = ($settings[2]+$settings[3])/2;
+			$ymidp = $settings[7] - ($ymid-$settings[2])*$pixelspery - $imgborder;*/
+			$x1 = 1/4*$settings[1] + 3/4*$settings[0];
+			$x2 = 1/2*$settings[1] + 1/2*$settings[0];
+			$x3 = 3/4*$settings[1] + 1/4*$settings[0];
+			$x1p = ($x1 - $settings[0])*$pixelsperx + $imgborder;
+			$x2p = ($x2 - $settings[0])*$pixelsperx + $imgborder;
+			$x3p = ($x3 - $settings[0])*$pixelsperx + $imgborder;
 			$ymid = ($settings[2]+$settings[3])/2;
 			$ymidp = $settings[7] - ($ymid-$settings[2])*$pixelspery - $imgborder;
 			foreach ($answers as $key=>$function) {
@@ -4176,15 +4200,31 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					$func = create_function('$x', 'return ('.$func.');');
 					$y1 = $func($x1);
 					$y2 = $func($x2);
+					$y3 = $func($x3);
 					$y1p = $settings[7] - ($y1-$settings[2])*$pixelspery - $imgborder;
 					$y2p = $settings[7] - ($y2-$settings[2])*$pixelspery - $imgborder;
-					$slope = ($y2p-$y1p)/($x2p-$x1p);
-					if (abs($slope)>1.4) {
-						//use x value at ymid
-						$anslines[$key] = array('x',$dir,$type,$slope,$x1p+($ymidp-$y1p)/$slope);
-					} else {
-						//use y value at x2
-						$anslines[$key] = array('y',$dir,$type,$slope,$y2p);
+					$y3p = $settings[7] - ($y3-$settings[2])*$pixelspery - $imgborder;
+					$denom = ($x1p - $x2p)*($x1p - $x3p)*($x2p - $x3p);
+					$A = ($x3p * ($y2p - $y1p) + $x2p * ($y1p - $y3p) + $x1p * ($y3p - $y2p)) / $denom;						
+					if(abs($A)>1e-5){//quadratic inequality:  Contributed by Cam Joyce
+						if($type == 10){//switch to quadratic
+							$type = 10.3;
+						}
+						else{
+							$type = 10.4;
+						}
+						$B = ($x3p*$x3p * ($y1p - $y2p) + $x2p*$x2p * ($y3p - $y1p) + $x1p*$x1p * ($y2p - $y3p)) / $denom;
+						$C = ($x2p * $x3p * ($x2p - $x3p) * $y1p + $x3p * $x1p * ($x3p - $x1p) * $y2p + $x1p * $x2p * ($x1p - $x2p) * $y3p) / $denom;
+						$anslines[$key] = array('y',$dir,$type,$A,-$B/(2*$A),$C-$B*$B/(4*$A));
+					} else{//linear inequality
+						$slope = ($y2p-$y1p)/($x2p-$x1p);
+						if (abs($slope)>1.4) {
+							//use x value at ymid
+							$anslines[$key] = array('x',$dir,$type,$slope,$x1p+($ymidp-$y1p)/$slope);
+						} else {
+							//use y value at x2
+							$anslines[$key] = array('y',$dir,$type,$slope,$y2p);
+						}
 					}
 				}
 			}
@@ -4194,67 +4234,95 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$ineqlines = explode('),(', substr($ineqlines,1,strlen($ineqlines)-2));
 				foreach ($ineqlines as $k=>$val) {
 					$pts = explode(',',$val);
-					//line
-					if ($pts[3]==$pts[1]) {
-						$slope = 10000;
-					} else {
-						$slope = ($pts[4]-$pts[2])/($pts[3]-$pts[1]);
-					}
-					if (abs($slope)>50) {
-						if ($pts[5]>$pts[3]) {
-							$dir = '>';
+					if($pts[0]<10.3){//linear
+						if ($pts[3]==$pts[1]) {
+							$slope = 10000;
 						} else {
+							$slope = ($pts[4]-$pts[2])/($pts[3]-$pts[1]);
+						}
+						if (abs($slope)>50) {
+							if ($pts[5]>$pts[3]) {
+								$dir = '>';
+							} else {
+								$dir = '<';
+							}
+							$ineqlines[$k] = array('x',$dir,$pts[0],-10000,$pts[1]);
+							
+						} else {
+							
+							$yatpt5 = $slope*($pts[5] - $pts[1]) + $pts[2];
+							if ($yatpt5 < $pts[6]) {
+								$dir = '<';
+							} else {
+								$dir = '>';
+							}
+							if (abs($slope)>50) {$slope = -10000;}
+							if (abs($slope)>1) {
+								$ineqlines[$k] = array('x',$dir,$pts[0],$slope,$pts[1]+($ymidp-$pts[2])/$slope,$pts[2]+($x2p-$pts[1])*$slope);
+							} else {
+								$ineqlines[$k] = array('y',$dir,$pts[0],$slope,$pts[2]+($x2p-$pts[1])*$slope);
+							}
+						}
+					} else{//quadratic
+						$aUser = ($pts[4] - $pts[2])/(($pts[3]-$pts[1])*($pts[3]-$pts[1]));
+						$yatpt5 = $aUser*($pts[5]-$pts[1])*($pts[5]-$pts[1])+$pts[2];
+						if($yatpt5 < $pts[6]){
 							$dir = '<';
-						}
-						$ineqlines[$k] = array('x',$dir,$pts[0],-10000,$pts[1]);
-						
-					} else {
-						
-						$yatpt5 = $slope*($pts[5] - $pts[1]) + $pts[2];
-						if ($yatpt5 < $pts[6]) {
-							$dir = '<';
 						} else {
 							$dir = '>';
 						}
-						if (abs($slope)>50) {$slope = -10000;}
-						if (abs($slope)>1) {
-							$ineqlines[$k] = array('x',$dir,$pts[0],$slope,$pts[1]+($ymidp-$pts[2])/$slope,$pts[2]+($x2p-$pts[1])*$slope);
-						} else {
-							$ineqlines[$k] = array('y',$dir,$pts[0],$slope,$pts[2]+($x2p-$pts[1])*$slope);
-						}
+						$ineqlines[$k] = array('y',$dir,$pts[0],$aUser,$pts[1],$pts[2]);
 					}
 				}
 			}
 			$scores = array();
 			$deftol = .1;
 			$defpttol = 5;
+			
 			foreach ($anslines as $key=>$ansline) {
 				$scores[$key] = 0;
 				for ($i=0; $i<count($ineqlines); $i++) {
 					if ($ansline[2]!=$ineqlines[$i][2]) { continue;}
 					if ($ansline[1]!=$ineqlines[$i][1]) { continue;}
-					//check slope
-					$toladj = pow(10,-1-6*abs($ansline[3]));
-					$relerr = abs($ansline[3]-$ineqlines[$i][3])/(abs($ansline[3])+$toladj);
-					if ($relerr>$deftol*$reltolerance) {
-						continue;
-					}
-					if ($ansline[0]!=$ineqlines[$i][0]) {
-						if (abs(abs($ansline[3])-1)<.4) {
-							//check intercept
-							if (abs($ansline[4]-$ineqlines[$i][5])>$defpttol*$reltolerance) {
+					if($ansline[2] < 10.3){//linear inequality
+						//check slope
+						$toladj = pow(10,-1-6*abs($ansline[3]));
+						$relerr = abs($ansline[3]-$ineqlines[$i][3])/(abs($ansline[3])+$toladj);
+						if ($relerr>$deftol*$reltolerance) {
+							continue;
+						}
+						if ($ansline[0]!=$ineqlines[$i][0]) {
+							if (abs(abs($ansline[3])-1)<.4) {
+								//check intercept
+								if (abs($ansline[4]-$ineqlines[$i][5])>$defpttol*$reltolerance) {
+									continue;
+								}
+							} else {
 								continue;
 							}
 						} else {
+							if (abs($ansline[4]-$ineqlines[$i][4])>$defpttol*$reltolerance) {
+								continue;
+							}
+						}
+						$scores[$key] = 1;
+						break;
+					} else {//quadratic inequality
+						//check values in y = a(x-p)+q
+						$toladj = pow(10,-1-6*abs($ansline[3]));
+						$relerr = abs($ansline[3]-$ineqlines[$i][3])/(abs($ansline[3])+$toladj);
+						if ($relerr>$deftol*$reltolerance) {
 							continue;
 						}
-					} else {
 						if (abs($ansline[4]-$ineqlines[$i][4])>$defpttol*$reltolerance) {
 							continue;
 						}
+						if (abs($ansline[5]-$ineqlines[$i][5])>$defpttol*$reltolerance) {
+							continue;
+						}
+						$scores[$key] = 1;
+						break;
 					}
-					$scores[$key] = 1;
-					break;
 				}
 			}
 			$extrastuffpenalty = max((count($ineqlines)-count($answers))/(max(count($answers),count($ineqlines))),0);
