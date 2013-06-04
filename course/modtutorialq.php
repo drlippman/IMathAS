@@ -45,6 +45,7 @@ if (isset($_POST['text'])) {
 	$feedbacktxtdef = array();
 	$feedbacktxtessay = array();
 	$answerboxsize = array();
+	$scoremethod = array();
 	$useeditor = array();
 	$answer = array();
 	$partial = array();
@@ -66,6 +67,9 @@ if (isset($_POST['text'])) {
 			$answer[$n] = '"'.str_replace('"','\\"',$_POST['essay'.$n.'-fb']).'"';
 			if (isset($_POST['useeditor'.$n])) {
 				$useeditor[$n] = true;
+			}
+			if (isset($_POST['takeanything'.$n])) {
+				$scoremethod[$n] = 'takeanything';
 			}
 			$answerboxsize[$n] = intval($_POST['essayrows'.$n]);	
 		}
@@ -137,6 +141,9 @@ if (isset($_POST['text'])) {
 			if (isset($useeditor[0])) {
 				$code .= '$displayformat = "editor"'."\n";
 			}
+			if (isset($scoremethod[0])) {
+				$code .= '$scoremethod = "'.$scoremethod[0].'"'."\n";
+			}
 		}
 		$code .= '$answer = '.$answer[0]."\n\n";
 	} else {
@@ -173,6 +180,9 @@ if (isset($_POST['text'])) {
 				$code .= '$answerboxsize['.$n.'] = '.$answerboxsize[$n]."\n";
 				if (isset($useeditor[$n])) {
 					$code .= '$displayformat['.$n.'] = "editor"'."\n";
+				}
+				if (isset($scoremethod[$n])) {
+					$code .= '$scoremethod['.$n.'] = "'.$scoremethod[$n].'"'."\n";
 				}
 			}
 			$code .= '$answer['.$n.'] = '.$answer[$n]."\n\n";
@@ -398,7 +408,7 @@ function getqvalues($code,$type) {
 			}
 		}
 		
-		return array($nparts, $qtypes, $qparts, $nhints, $displayformat, $questions, $feedbacktxt, $feedbacktxtdef, $feedbacktxtessay, $answer, $hinttext, $partialcredit, $qtol, $qtold, $answerboxsize, $displayformat);
+		return array($nparts, $qtypes, $qparts, $nhints, $displayformat, $questions, $feedbacktxt, $feedbacktxtdef, $feedbacktxtessay, $answer, $hinttext, $partialcredit, $qtol, $qtold, $answerboxsize, $displayformat, $scoremethod);
 	} else {
 		if ($type=='number') {
 			if (isset($reltolerance)) {
@@ -414,7 +424,7 @@ function getqvalues($code,$type) {
 		}else if ($type=='essay') {
 			$qparts = array(0);
 		}
-		return array(1, array($type), $qparts, $nhints, array($displayformat), array($questions), array($feedbacktxt), array($feedbacktxtdef), array($feedbacktxtessay), array($answer), $hinttext, array($partialcredit), $qtol, $qtold, array($answerboxsize), array($displayformat));
+		return array(1, array($type), $qparts, $nhints, array($displayformat), array($questions), array($feedbacktxt), array($feedbacktxtdef), array($feedbacktxtessay), array($answer), $hinttext, array($partialcredit), $qtol, $qtold, array($answerboxsize), array($displayformat), array($scoremethod));
 	}
 }
 
@@ -547,7 +557,7 @@ if (isset($_GET['id']) && $_GET['id']!='new') {
 	$mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
 	$allowedmacros = $mathfuncs;
 	require_once("../assessment/interpret5.php");
-	list($nparts, $qtype, $qparts, $nhints, $qdisp, $questions, $feedbacktxt, $feedbacktxtdef, $feedbacktxtessay, $answer, $hinttext, $partialcredit, $qtol, $qtold, $answerboxsize, $displayformat) = getqvalues($code,$type);
+	list($nparts, $qtype, $qparts, $nhints, $qdisp, $questions, $feedbacktxt, $feedbacktxtdef, $feedbacktxtessay, $answer, $hinttext, $partialcredit, $qtol, $qtold, $answerboxsize, $displayformat, $scoremethod) = getqvalues($code,$type);
 	$partial = array();
 	
 	for ($n=0;$n<$nparts;$n++) {
@@ -580,6 +590,7 @@ if (isset($_GET['id']) && $_GET['id']!='new') {
 	$qdisp = array("vert","vert","vert","vert","vert");
 	$qtype = array_fill(0,5,"choices");
 	$displayformat = array();
+	$scoremethod = array();
 	$answerboxsize = array();
 	$nhints = 1;
 	$questions = array();
@@ -971,7 +982,12 @@ for ($n=0;$n<5;$n++) {
 	if (isset($displayformat[$n]) && $displayformat[$n]=='editor') {
 		echo 'checked="checked"';
 	}
-	echo '/> Use editor';
+	echo '/> Use editor.  ';
+	echo '<input type="checkbox" name="takeanything'.$n.'" ';
+	if (isset($scoremethod[$n]) && $scoremethod[$n]=='takeanything') {
+		echo 'checked="checked"';
+	}
+	echo '/> Give credit for any answer.  ';
 	
 	
 	echo '</span>';
