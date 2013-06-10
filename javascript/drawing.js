@@ -1715,7 +1715,8 @@ function dashedParabola(ctx,Vx,Vy,x,y,sw,sh){
             		else
                 		ctx.lineTo(px,py);
             
-            		px -= Math.sqrt(strokeSqr/(1+Math.pow(2*a*(px-Vx),2)));
+            		//px -= Math.sqrt(strokeSqr/(1+Math.pow(2*a*(px-Vx),2)));
+            		px -= Math.min(Math.sqrt(strokeSqr/(1+Math.pow(2*a*(px-Vx),2))), Math.sqrt(stroke/Math.abs(a)));
             		py = a*px*px+b*px+c;
             		counter++;
 		}
@@ -1729,7 +1730,8 @@ function dashedParabola(ctx,Vx,Vy,x,y,sw,sh){
             		else
                 		ctx.lineTo(px,py);
             
-            		px += Math.sqrt(strokeSqr/(1+Math.pow(2*a*(px-Vx),2)));
+            		//px += Math.sqrt(strokeSqr/(1+Math.pow(2*a*(px-Vx),2)));
+            		px += Math.min(Math.sqrt(strokeSqr/(1+Math.pow(2*a*(px-Vx),2))), Math.sqrt(stroke/Math.abs(a)));
             		py = a*px*px+b*px+c;
             		counter++;
         	}
