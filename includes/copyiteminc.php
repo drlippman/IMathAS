@@ -459,7 +459,7 @@ function copyrubrics($offlinerubrics=array()) {
 	$query = "SELECT id FROM imas_rubrics WHERE id IN ($list) AND NOT (ownerid='$userid' OR groupid='$groupid')";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	while ($row = mysql_fetch_row($result)) {
-		echo "handing {$row[0]} which I don't have access to<br/>";
+		//echo "handing {$row[0]} which I don't have access to<br/>";
 		$query = "SELECT name,rubrictype,rubric FROM imas_rubrics WHERE id={$row[0]}";
 		$r = mysql_query($query) or die("Query failed : " . mysql_error());
 		$rubrow = addslashes_deep(mysql_fetch_row($r));
@@ -467,21 +467,21 @@ function copyrubrics($offlinerubrics=array()) {
 		$rr = mysql_query($query) or die("Query failed : " . mysql_error());
 		if (mysql_num_rows($rr)>0) {
 			$newid = mysql_result($rr,0,0);
-			echo "found existing of mine, $newid<br/>";
+			//echo "found existing of mine, $newid<br/>";
 		} else {
 			$rub = "'".implode("','",$rubrow)."'";
 			$query = "INSERT INTO imas_rubrics (ownerid,groupid,name,rubrictype,rubric) VALUES ";
 			$query .= "($userid,-1,$rub)";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			$newid = mysql_insert_id();
-			echo "created $newid<br/>";
+			//echo "created $newid<br/>";
 		}
 		
 		$qfound = array_keys($qrubrictrack,$row[0]);
 		if (count($qfound)>0) {
 			foreach ($qfound as $qid) {
 				$query = "UPDATE imas_questions SET rubric=$newid WHERE id=$qid";
-				echo "updating imas_questions on qid $qid<br/>";
+				//echo "updating imas_questions on qid $qid<br/>";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 		}
