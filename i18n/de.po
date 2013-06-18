@@ -2490,16 +2490,16 @@ msgstr ""
 
 #: course/gradebook.php:618
 msgid "Unenroll"
-msgstr "Ausschreiben"
+msgstr "Austragen"
 
 #: course/course.php:497 course/course.php:622 course/course.php:498
 #: course/course.php:623
 msgid "Unenroll From Course"
-msgstr "Aus dem Kurs ausschreiben"
+msgstr "Aus dem Kurs austragen"
 
 #: course/gradebook.php:134
 msgid "Unenroll Students"
-msgstr "Studenten ausschreiben"
+msgstr "Studenten austragen"
 
 #: assessment/testutil.php:787
 msgid "Unlimited attempts"
