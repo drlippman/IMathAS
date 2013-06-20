@@ -226,8 +226,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		
 		require_once("../includes/htmLawed.php");
 		$htmlawedconfig = array('elements'=>'*-script');
-		$_POST['summary'] = addslashes(htmLawed(stripslashes($_POST['summary']),$htmlawedconfig));
-		$_POST['intro'] = addslashes(htmLawed(stripslashes($_POST['intro']),$htmlawedconfig));
+		if ($_POST['summary']=='<p>Enter summary here (shows on course page)</p>') {
+			$_POST['summary'] = '';
+		} else {
+			$_POST['summary'] = addslashes(htmLawed(stripslashes($_POST['summary']),$htmlawedconfig));
+		}
+		if ($_POST['intro']=='<p>Enter intro/instructions</p>') {
+			$_POST['intro'] = '';
+		} else {
+			$_POST['intro'] = addslashes(htmLawed(stripslashes($_POST['intro']),$htmlawedconfig));
+		}
 		if (isset($_GET['id'])) {  //already have id; update
 			if ($isgroup==0) { //set agroupid=0 if switching from groups to not groups
 				$query = "SELECT isgroup FROM imas_assessments WHERE id='{$_GET['id']}'";
@@ -342,6 +350,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else {
 				$usedeffb = true;
 				$deffb = $line['deffeedbacktext'];
+			}
+			if ($line['summary']=='') {
+				$line['summary'] = "<p>Enter summary here (shows on course page)</p>";
+			}
+			if ($line['intro']=='') {
+				$line['intro'] = "<p>Enter intro/instructions</p>";
 			}
 		} else {  //INITIAL LOAD IN ADD MODE
 			//set defaults

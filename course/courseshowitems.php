@@ -1455,7 +1455,7 @@ function enditem($canedit) {
 		$html .= "<option value=\"assessment\">" . _('Add Assessment') . "</option>\n";
 		//$html .= "<option value=\"drillassess\">Add Drill</option>\n";
 		$html .= "<option value=\"inlinetext\">" . _('Add Inline Text') . "</option>\n";
-		$html .= "<option value=\"linkedtext\">" . _('Add Linked Text') . "</option>\n";
+		$html .= "<option value=\"linkedtext\">" . _('Add Link') . "</option>\n";
 		$html .= "<option value=\"forum\">" . _('Add Forum') . "</option>\n";
 		$html .= "<option value=\"wiki\">" . _('Add Wiki') . "</option>\n";
 		$html .= "<option value=\"block\">" . _('Add Block') . "</option>\n";
