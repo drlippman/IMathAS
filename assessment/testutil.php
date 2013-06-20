@@ -39,13 +39,16 @@ function getquestioninfo($qns,$testsettings) {
 				
 			} 
 			if (!$foundweights) {
-				preg_match('/anstypes\s*=(.*)/',$line['control'],$match);
-				$n = substr_count($match[1],',')+1;
-				if ($n>1) {
-					$line['answeights'] = array_fill(0,$n-1,round(1/$n,5));
-					$line['answeights'][] = 1-array_sum($line['answeights']);
+				if (preg_match('/anstypes\s*=(.*)/',$line['control'],$match)) {
+					$n = substr_count($match[1],',')+1;
+					if ($n>1) {
+						$line['answeights'] = array_fill(0,$n-1,round(1/$n,5));
+						$line['answeights'][] = 1-array_sum($line['answeights']);
+					} else {
+						$line['answeights'] = array(1);
+					}
 				} else {
-					$line['answeights'] = array(1);
+					$line['answeights'] = getansweights($line['id'],$line['control']);
 				}
 			}
 		}
