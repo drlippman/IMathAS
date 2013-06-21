@@ -84,7 +84,12 @@ if ($_GET['target']=='new') {
 }
 $parms['launch_presentation_return_url'] = $urlmode . $_SERVER['HTTP_HOST'] . $imasroot . '/course/course.php?cid=' . $cid;
 
-$org_id = $_SERVER['HTTP_HOST'];
+if (isset($CFG['GEN']['LTIorgid'])) {
+	$org_id = $CFG['GEN']['LTIorgid'];
+} else {
+	$org_id = $_SERVER['HTTP_HOST'];
+}
+
 $org_desc = $installname;
 
 try {
