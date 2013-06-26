@@ -294,7 +294,7 @@ function scoreTchart($stua,$answer,$numrows,$leftentries,$rightentries, $sn) {
 				}
 			}
 			if (!$foundmatch) {
-				$answer[$sn+2*$i] = $stua[$sn+2*$i] + 50000;
+				$answer[$sn+2*$i+1] = $stua[$sn+2*$i+1] + 50000;
 			}
 		}
 	}
