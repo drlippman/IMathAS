@@ -1561,7 +1561,7 @@ function showdataarray($a,$n=1) {
 $ones = array( "", " one", " two", " three", " four", " five", " six", " seven", " eight", " nine", " ten", " eleven", " twelve", " thirteen", " fourteen", " fifteen", " sixteen", " seventeen", " eighteen", " nineteen");
 $onesth = array(""," first"," second", " third", " fourth", " fifth", " sixth", " seventh", " eighth", " ninth", "tenth"," eleventh", " twelfth", " thirteenth", " fourteenth"," fifteenth", " sixteenth", " seventeenth", " eighteenth"," nineteenth"); 
 $tens = array( "", "", " twenty", " thirty", " forty", " fifty", " sixty", " seventy", " eighty", " ninety");
-$tensth = array("","","twentieth", "thirtieth", "fortieth", "fiftieth", "sixtieth", "seventieth", "eightieth", "ninetieth");
+$tensth = array("",""," twentieth", " thirtieth", " fortieth", " fiftieth", " sixtieth", " seventieth", " eightieth", " ninetieth");
 $triplets = array( "", " thousand", " million", " billion", " trillion", " quadrillion", " quintillion", " sextillion", " septillion", " octillion", " nonillion");
 $placevals = array( "", "tenth", "hundredth", "thousandth", "ten-thousandth", "hundred-thousandth", "millionth", "ten-millionth", "hundred-millionth", "billionth");
  // recursive fn, converts three digits per pass
@@ -1592,10 +1592,10 @@ function convertTri($num, $tri, $doth=false) {
 		  if ($y%10==0) {
 			  $str .= $tensth[(int) ($y / 10)]; 
 		  } else {
-			  $str .= $tens[(int) ($y / 10)] . $onesth[$y % 10];
+			  $str .= $tens[(int) ($y / 10)] .'-'. trim($onesth[$y % 10]);
 		  }
 	  } else {
-		 $str .= $tens[(int) ($y / 10)] . $ones[$y % 10];
+	  	$str .= $tens[(int) ($y / 10)] .(($y%10==0)?'':'-'.trim($ones[$y % 10]));
 	  }
   }
   // add triplet modifier only if there
