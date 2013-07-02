@@ -644,7 +644,9 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 			$GLOBALS['questionmanualgrade'] = true;
 		}
 		$score = scorepart($qdata['qtype'],$qnidx,$givenans,$options,0);
-		
+		if (isset($scoremethod) && $scoremethod == "allornothing") {
+			if ($score<.98) {$score=0;}
+		}
 		if ($qdata['qtype']!='conditional') {
 			$GLOBALS['partlastanswer'] = str_replace('&','',$GLOBALS['partlastanswer']);
 			$GLOBALS['partlastanswer'] = preg_replace('/#+/','#',$GLOBALS['partlastanswer']);
@@ -4622,10 +4624,14 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			
 	} else if ($anstype == "file") {
 		if (isset($options['scoremethod']))if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$qn];} else {$scoremethod = $options['scoremethod'];}
+		if (isset($options['answer'])) {if ($multi>0) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
+		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 				
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$filename = basename($_FILES["qn$qn"]['name']);
 		$filename = preg_replace('/[^\w\.]/','',$filename);
+		$hasfile = false;
+		require_once("../includes/filehandler.php");
 		if (trim($filename)=='') {
 			$found = false;
 			if ($_POST["lf$qn"]!='') {
@@ -4641,78 +4647,131 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 			if ($found) {
 				$GLOBALS['partlastanswer'] = '@FILE:'.$_POST["lf$qn"].'@';
-				if (isset($scoremethod) && $scoremethod=='takeanything') {
-					return 1;
-				} else {
-					return 0;
+				if ($answerformat=='excel') {
+					$zip = new ZipArchive;
+					if ($zip->open(getasidfilepath($_POST["lf$qn"]))) {
+						$doc = new DOMDocument();
+						$doc->loadXML($zip->getFromName('xl/worksheets/sheet1.xml'));
+						$zip->close();
+					} else {
+						$GLOBALS['scoremessages'] .= _(' Unable to open Excel file');
+						return 0;
+					}
 				}
+				$hasfile = true;
 			} else {
 				$GLOBALS['partlastanswer'] = '';
 				return 0;
 			}
 		}
-		$extension = strtolower(strrchr($filename,"."));
-		$badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p",".exe");
-		if ($GLOBALS['scoremessages'] != '') {
-			$GLOBALS['scoremessages'] .= '<br/>';
-		}
-		$GLOBALS['scoremessages'] .= sprintf(_('Upload of %s: '), $filename);
-		if (in_array($extension,$badextensions)) {
-			$GLOBALS['partlastanswer'] = _('Error - Invalid file type');
-			$GLOBALS['scoremessages'] .= _('Error - Invalid file type');
-			return 0;
-		}
-		//if($GLOBALS['isreview']) {echo 'TRUE';}
-		if (isset($GLOBALS['asid'])) { //going to use assessmentid/random
-			$randstr = '';
-			for ($i=0; $i<6; $i++) {
-				$n = rand(0,61);
-				if ($n<10) { $randstr .= chr(48+$n);}
-				else if ($n<36) { $randstr .= chr(65 + $n-10);}
-				else { $randstr .= chr(97 + $n-36);}
+		if (!$hasfile) {
+			$extension = strtolower(strrchr($filename,"."));
+			$badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p",".exe");
+			if ($GLOBALS['scoremessages'] != '') {
+				$GLOBALS['scoremessages'] .= '<br/>';
 			}
-			$s3asid = $GLOBALS['testsettings']['id']."/$randstr";
-		} else {
-			$GLOBALS['partlastanswer'] = _('Error - no asid');
-			$GLOBALS['scoremessages'] .= _('Error - no asid');
-			return 0;
-		}
-		if (is_numeric($s3asid) && $s3asid==0) {  //set in testquestion for preview
-			$GLOBALS['partlastanswer'] = _('Error - File not uploaded in preview');
-			$GLOBALS['scoremessages'] .= _('Error - File not uploaded in preview');
-			return 0;
-		}
-		/*
-		not needed if each file is randomly coded
-		if (isset($GLOBALS['isreview']) && $GLOBALS['isreview']==true) {
-			$filename = 'rev-'.$filename;
-		}*/
-		if (is_uploaded_file($_FILES["qn$qn"]['tmp_name'])) {
-			require_once("../includes/filehandler.php");
-
-			$s3object = "adata/$s3asid/$filename";
-			if (storeuploadedfile("qn$qn",$s3object)) {
-				$GLOBALS['partlastanswer'] = "@FILE:$s3asid/$filename@";
-				$GLOBALS['scoremessages'] .= "Successful";
-				if (isset($scoremethod) && $scoremethod=='takeanything') {
-					return 1;
+			$GLOBALS['scoremessages'] .= sprintf(_('Upload of %s: '), $filename);
+			if (in_array($extension,$badextensions)) {
+				$GLOBALS['partlastanswer'] = _('Error - Invalid file type');
+				$GLOBALS['scoremessages'] .= _('Error - Invalid file type');
+				return 0;
+			}
+			//if($GLOBALS['isreview']) {echo 'TRUE';}
+			if (isset($GLOBALS['asid'])) { //going to use assessmentid/random
+				$randstr = '';
+				for ($i=0; $i<6; $i++) {
+					$n = rand(0,61);
+					if ($n<10) { $randstr .= chr(48+$n);}
+					else if ($n<36) { $randstr .= chr(65 + $n-10);}
+					else { $randstr .= chr(97 + $n-36);}
 				}
+				$s3asid = $GLOBALS['testsettings']['id']."/$randstr";
 			} else {
-				//echo "Error storing file";
-				$GLOBALS['partlastanswer'] = _('Error storing file');
-				$GLOBALS['scoremessages'] .= _('Error storing file');
+				$GLOBALS['partlastanswer'] = _('Error - no asid');
+				$GLOBALS['scoremessages'] .= _('Error - no asid');
+				return 0;
 			}
-			return 0;
+			if (is_numeric($s3asid) && $s3asid==0) {  //set in testquestion for preview
+				$GLOBALS['partlastanswer'] = _('Error - File not uploaded in preview');
+				$GLOBALS['scoremessages'] .= _('Error - File not uploaded in preview');
+				return 0;
+			}
+			/*
+			not needed if each file is randomly coded
+			if (isset($GLOBALS['isreview']) && $GLOBALS['isreview']==true) {
+				$filename = 'rev-'.$filename;
+			}*/
+			if (is_uploaded_file($_FILES["qn$qn"]['tmp_name'])) {
+				if ($answerformat=='excel') {
+					$zip = new ZipArchive;
+					if ($zip->open($_FILES["qn$qn"]['tmp_name'])) {
+						echo "opened excel";
+						$doc = new DOMDocument();
+						if ($doc->loadXML($zip->getFromName('xl/worksheets/sheet1.xml'))) {
+							echo "read into doc";
+						}
+						
+						$zip->close();
+					} else {
+						$GLOBALS['scoremessages'] .= _(' Unable to open Excel file');
+						return 0;
+					}
+				}
+	
+				$s3object = "adata/$s3asid/$filename";
+				if (storeuploadedfile("qn$qn",$s3object)) {
+					$GLOBALS['partlastanswer'] = "@FILE:$s3asid/$filename@";
+					$GLOBALS['scoremessages'] .= _("Successful");
+					$hasfile = true;
+				} else {
+					//echo "Error storing file";
+					$GLOBALS['partlastanswer'] = _('Error storing file');
+					$GLOBALS['scoremessages'] .= _('Error storing file');
+					return 0;
+				}
+				
+			} else {
+				//echo "Error uploading file";
+				if ($_FILES["qn$qn"]['error']==2 || $_FILES["qn$qn"]['error']==1) {
+					$GLOBALS['partlastanswer'] = _('Error uploading file - file too big');
+					$GLOBALS['scoremessages'] .= _('Error uploading file - file too big');
+				} else {
+					$GLOBALS['partlastanswer'] = _('Error uploading file');
+					$GLOBALS['scoremessages'] .= _('Error uploading file');
+				}
+				return 0;
+			}
+		}
+		if (isset($scoremethod) && $scoremethod=='takeanything') {
+			return 1;
 		} else {
-			//echo "Error uploading file";
-			if ($_FILES["qn$qn"]['error']==2 || $_FILES["qn$qn"]['error']==1) {
-				$GLOBALS['partlastanswer'] = _('Error uploading file - file too big');
-				$GLOBALS['scoremessages'] .= _('Error uploading file - file too big');
+			if ($answerformat=='excel') {
+				$doccells = array();
+				$els = $doc->getElementsByTagName('c');
+				foreach ($els as $el) {
+					$doccells[$el->getAttribute('r')] = $el->getElementsByTagName('v')->item(0)->nodeValue;
+				}
+				$pts = 0;
+				
+				foreach ($answer as $cell=>$val) {
+					if (!isset($doccells[$cell])) {continue;}
+					if (is_numeric($val)) {
+						if (abs($val-$doccells[$cell])<.01) {
+							$pts++;
+						} else {
+							$GLOBALS['scoremessages'] .= "<br/>Cell $cell incorrect";
+							echo "<br/>Cell $cell incorrect";
+						}
+					} else {
+						if (trim($val)==trim($doccells[$cell])) {
+							$pts++;
+						}
+					}
+				}
+				return $pts/count($answer);
 			} else {
-				$GLOBALS['partlastanswer'] = _('Error uploading file');
-				$GLOBALS['scoremessages'] .= _('Error uploading file');
+				return 0;
 			}
-			return 0;
 		}
 	} else if ($anstype == "conditional") {
 		$answer = $options['answer'];
