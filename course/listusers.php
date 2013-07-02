@@ -568,7 +568,7 @@ if ($overwriteBody==1) {
 			if ($line['locked']>0) {
 				$lastaccess = "locked";
 			} else {
-				$lastaccess = ($line['lastaccess']>0) ? date("n/j/y g:ia",$line['lastaccess']) : "never";
+				$lastaccess = ($line['lastaccess']>0) ? tzdate("n/j/y g:ia",$line['lastaccess']) : "never";
 			}
 			$hasSectionData = ($hassection) ? "<td>{$line['section']}</td>" : "";
 			$hasCodeData = ($hascode) ? "<td>{$line['code']}</td>" : "";
