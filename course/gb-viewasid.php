@@ -829,7 +829,7 @@
 		$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
 		if (mysql_result($result,0,0)>0) {
 			include("../assessment/catscores.php");
-			catscores($questions,$scores,$line['defpoints'], $line['defoutcome']);
+			catscores($questions,$scores,$line['defpoints'], $line['defoutcome'],$cid);
 		}
 		require("../footer.php");
 		
@@ -865,7 +865,7 @@
 		$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
 		if (mysql_result($result,0,0)>0) {
 			include("../assessment/catscores.php");
-			catscores(explode(',',$line['questions']),explode(',',$line['bestscores']),$line['defpoints'], $line['defoutcome']);
+			catscores(explode(',',$line['questions']),explode(',',$line['bestscores']),$line['defpoints'], $line['defoutcome'],$cid);
 		}
 		
 		$scores = array();

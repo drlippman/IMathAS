@@ -207,7 +207,7 @@ if ($report=='overview') {
 			}
 			$cnt++;
 			if (is_array($oi)) { //is outcome group
-				echo '<tr class="'.$class.'" colspan="'.$n.'"><td>'.$ind.'<b>'.$oi['name'].'</b></td></tr>';
+				echo '<tr class="'.$class.'"><td colspan="'.$n.'">'.$ind.'<b>'.$oi['name'].'</b></td></tr>';
 				printoutcomestu($oi['outcomes'],$ind.'&nbsp;&nbsp;&nbsp;');
 			} else {
 				echo '<tr class="'.$class.'">';

@@ -285,7 +285,7 @@
 	$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
 	if (mysql_result($result,0,0)>0) {
 		include("../assessment/catscores.php");
-		catscores($qs,$avgscore,$defpoints,$defoutcome);
+		catscores($qs,$avgscore,$defpoints,$defoutcome,$cid);
 	}
 	echo "<p><a href=\"gb-itemresults.php?cid=$cid&amp;aid=$aid\">Summary of assessment results</a> (only meaningful for non-randomized questions)</p>";
 	
