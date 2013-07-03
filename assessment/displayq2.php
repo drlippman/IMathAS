@@ -1054,7 +1054,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			if ($displayformat=="select") {
 				for ($j=0;$j<count($randakeys);$j++) {
 					$out .= "<option value=\"".$letters[$j]."\" ";
-					if (is_numeric($las[$i]) && $las[$i]==$j) {
+					if ($las[$i]==$letters[$j]) {
 						$out .= 'selected="1"';
 					}
 					$out .= ">{$answers[$randakeys[$j]]}</option>\n";
