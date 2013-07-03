@@ -111,7 +111,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		
 		require_once("../includes/htmLawed.php");
 		$htmlawedconfig = array('elements'=>'*-script');
-		$_POST['description'] = addslashes(htmLawed(stripslashes($_POST['description']),$htmlawedconfig));
+		if ($_POST['description']=='<p>Enter forum description here</p>') {
+			$_POST['description'] = '';
+		} else {
+			$_POST['description'] = addslashes(htmLawed(stripslashes($_POST['description']),$htmlawedconfig));
+		}
 				
 		if (isset($_GET['id'])) {  //already have id; update
 			$query = "SELECT groupsetid FROM imas_forums WHERE id='{$_GET['id']}';";
@@ -213,6 +217,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$gradeoutcomes = explode(',',$line['outcomes']);
 			} else {
 				$gradeoutcomes = array();
+			}
+			if ($line['description']=='') {
+				$line['description'] = "<p>Enter forum description here</p>";
 			}
 		} else {  //ADD MODE
 			//set defaults

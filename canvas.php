@@ -9,6 +9,8 @@ if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTT
  $host = $_SERVER['HTTP_HOST'];
  if (isset($CFG['GEN']['addwww']) && substr($host,0,4)!='www.') {
  	$host = 'www.'.$host;
+ } else if (substr($host,0,4)=='www.') { //strip www if not required - Canvas can match to higher domains.
+ 	 $host = substr($host,4);
  }
 header("Content-type: text/xml;");
 echo '<?xml version="1.0" encoding="UTF-8"?>';

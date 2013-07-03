@@ -23,11 +23,11 @@ $useeditor = "text,summary";
 
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 if (isset($_GET['id'])) {
-	$curBreadcrumb .= "&gt; Modify Linked Text\n";
-	$pagetitle = "Modify Linked Text";
+	$curBreadcrumb .= "&gt; Modify Link\n";
+	$pagetitle = "Modify Link";
 } else {
-	$curBreadcrumb .= "&gt; Add Linked Text\n";
-	$pagetitle = "Add Linked Text";
+	$curBreadcrumb .= "&gt; Add Link\n";
+	$pagetitle = "Add Link";
 }	
 if (isset($_GET['tb'])) {
 	$totb = $_GET['tb'];
@@ -168,7 +168,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		
 		require_once("../includes/htmLawed.php");
 		$htmlawedconfig = array('elements'=>'*-script' );
-		$_POST['summary'] = addslashes(htmLawed(stripslashes($_POST['summary']),$htmlawedconfig));
+		if ($_POST['summary']=='<p>Enter summary here (displays on course page)</p>') {
+			$_POST['summary'] = '';
+		} else {
+			$_POST['summary'] = addslashes(htmLawed(stripslashes($_POST['summary']),$htmlawedconfig));
+		}
 		$_POST['text'] = trim($_POST['text']);
 		$outcomes = array();
 		foreach ($_POST['outcomes'] as $o) {
@@ -288,6 +292,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$gradeoutcomes = explode(',',$line['outcomes']);
 			} else {
 				$gradeoutcomes = array();
+			}
+			if ($line['summary']=='') {
+				$line['summary'] = "<p>Enter summary here (displays on course page)</p>";
 			}
 		} else {
 			//set defaults

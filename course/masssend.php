@@ -143,7 +143,7 @@
 		}
 		exit;
 	} else {
-		$sendtype = $_POST['submit']; //E-mail or Message
+		$sendtype = (isset($_POST['posted']))?$_POST['posted']:$_POST['submit']; //E-mail or Message
 		$useeditor = "message";
 		$pagetitle = "Send Mass $sendtype";
 		require("../header.php");

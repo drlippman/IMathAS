@@ -27,6 +27,7 @@ var didMultiTouch = false;
 /* 
    Canvas-based function drawing script
    (c) David Lippman, part of www.imathas.com
+   Quadratic inequality code contributed by Cam Joyce
    GNU 2 Licensed - see license in IMathAS distribution
    
    HTML should have <canvas id="canvas##"></canvas>
@@ -70,6 +71,8 @@ var didMultiTouch = false;
    ineqtypes
    	10: linear >= or <=
    	10.2: linear < or >
+	10.3: quadratic <= or =>
+	10.4: quadratic < or >
 	
 */
 function clearcanvas(tarnum) {
@@ -161,7 +164,7 @@ function drawTarget(x,y) {
 			alert("Your browser does not support drawing answer entry.  Please try again using Internet Explorer 6+ (Windows), FireFox 1.5+ (Win/Mac), Safari 1.3+ (Mac), Opera 9+ (Win/Mac), or Camino (Mac)");
 		}
 	}
-	
+
 	ctx.fillStyle = "rgb(0,0,255)";
 	ctx.lineWidth = 2;
 	ctx.strokeStyle = "rgb(0,0,255)";
@@ -197,78 +200,121 @@ function drawTarget(x,y) {
 			//ctx.fillStyle = "rgba(0,0,255,0.4)";
 			//ctx.fillStyle = "rgb(0,255,0)";
 			ctx.beginPath();
-			if (x2!=ineqlines[curTarget][i][0][0]) {
-				var slope = (y2 - ineqlines[curTarget][i][0][1])/(x2-ineqlines[curTarget][i][0][0]);
-			}
-			if (Math.abs(x2-ineqlines[curTarget][i][0][0])<1 || Math.abs(slope)>100) {
-				ctx.moveTo(ineqlines[curTarget][i][0][0],0);
-				ctx.lineTo(ineqlines[curTarget][i][0][0],targets[curTarget].imgheight);
-				if (x3>x2) {//shade right
-					ctx.lineTo(targets[curTarget].imgwidth,targets[curTarget].imgheight);
-					ctx.lineTo(targets[curTarget].imgwidth,0);
-					ctx.closePath();
+
+			if(ineqtypes[curTarget][i] <= 10.2){//linear inequality
+				if (x2!=ineqlines[curTarget][i][0][0]) {
+					var slope = (y2 - ineqlines[curTarget][i][0][1])/(x2-ineqlines[curTarget][i][0][0]);
+				}
+				if (Math.abs(x2-ineqlines[curTarget][i][0][0])<1 || Math.abs(slope)>100) {
+					ctx.moveTo(ineqlines[curTarget][i][0][0],0);
+					ctx.lineTo(ineqlines[curTarget][i][0][0],targets[curTarget].imgheight);
+					if (x3>x2) {//shade right
+						ctx.lineTo(targets[curTarget].imgwidth,targets[curTarget].imgheight);
+						ctx.lineTo(targets[curTarget].imgwidth,0);
+						ctx.closePath();
+					} else {
+						ctx.lineTo(0,targets[curTarget].imgheight);
+						ctx.lineTo(0,0);
+						ctx.closePath();
+					}
 				} else {
-					ctx.lineTo(0,targets[curTarget].imgheight);
-					ctx.lineTo(0,0);
-					ctx.closePath();
+					var yb = slope*(x3 - x2) + y2;
+					var yleft = ineqlines[curTarget][i][0][1] - slope*ineqlines[curTarget][i][0][0];
+					var yright = ineqlines[curTarget][i][0][1] + slope*(targets[curTarget].imgwidth-ineqlines[curTarget][i][0][0]);
+					
+					ctx.moveTo(0,yleft);
+					ctx.lineTo(targets[curTarget].imgwidth,yright);	
+					if (y3 > yb) { //shade above
+						ctx.lineTo(targets[curTarget].imgwidth,targets[curTarget].imgheight);
+						ctx.lineTo(0,targets[curTarget].imgheight);
+						ctx.closePath();
+					} else { //shade below
+						ctx.lineTo(targets[curTarget].imgwidth,0);
+						ctx.lineTo(0,0);
+						ctx.closePath();
+					}
 				}
-			} else {
-				var yb = slope*(x3 - x2) + y2;
-				var yleft = ineqlines[curTarget][i][0][1] - slope*ineqlines[curTarget][i][0][0];
-				var yright = ineqlines[curTarget][i][0][1] + slope*(targets[curTarget].imgwidth-ineqlines[curTarget][i][0][0]);
-				
-				ctx.moveTo(0,yleft);
-				ctx.lineTo(targets[curTarget].imgwidth,yright);	
-				if (y3 > yb) { //shade above
-					ctx.lineTo(targets[curTarget].imgwidth,targets[curTarget].imgheight);
-					ctx.lineTo(0,targets[curTarget].imgheight);
-					ctx.closePath();
-				} else { //shade below
-					ctx.lineTo(targets[curTarget].imgwidth,0);
-					ctx.lineTo(0,0);
-					ctx.closePath();
-				}
+			} else {//quadratic inequality shading
+				shadeParabola(ctx,ineqlines[curTarget][i][0][0],ineqlines[curTarget][i][0][1],x2,y2,x3,y3,targets[curTarget].imgwidth,targets[curTarget].imgheight);
 			}
 			ctx.fill();
 			ctx.restore();	
 		}
 		ctx.beginPath();
+			
 		if (x2 != null) { //at least one point set
-			if (x2!=ineqlines[curTarget][i][0][0]) {
-				var slope = (y2 - ineqlines[curTarget][i][0][1])/(x2-ineqlines[curTarget][i][0][0]);
-			}
-			if (Math.abs(x2-ineqlines[curTarget][i][0][0])<1 || Math.abs(slope)>100) { //vert line
-				//document.getElementById("ans0-0").innerHTML = 'vert';
-				if (ineqtypes[curTarget][i]==10.2) {
-					if (dragObj != null && dragObj.mode>=10 && dragObj.mode<11 && dragObj.num==i && dragObj.subnum==0) {
-						ctx.dashedLine(ineqlines[curTarget][i][1][0],ineqlines[curTarget][i][1][1],ineqlines[curTarget][i][1][0],targets[curTarget].imgheight);
-						ctx.dashedLine(ineqlines[curTarget][i][1][0],ineqlines[curTarget][i][1][1],ineqlines[curTarget][i][1][0],0);
-					} else {
-						ctx.dashedLine(ineqlines[curTarget][i][0][0],ineqlines[curTarget][i][0][1],ineqlines[curTarget][i][0][0],targets[curTarget].imgheight);
-						ctx.dashedLine(ineqlines[curTarget][i][0][0],ineqlines[curTarget][i][0][1],ineqlines[curTarget][i][0][0],0);
-					}
-				} else {
-					ctx.moveTo(ineqlines[curTarget][i][0][0],0);
-					ctx.lineTo(ineqlines[curTarget][i][0][0],targets[curTarget].imgheight);
-					ctx.stroke();
+			if(ineqtypes[curTarget][i] <= 10.2){//linear inequality
+				if (x2!=ineqlines[curTarget][i][0][0]) {
+					var slope = (y2 - ineqlines[curTarget][i][0][1])/(x2-ineqlines[curTarget][i][0][0]);
 				}
-			} else {
-				//document.getElementById("ans0-0").innerHTML = slope;
-				var yleft = ineqlines[curTarget][i][0][1] - slope*ineqlines[curTarget][i][0][0];
-				var yright = ineqlines[curTarget][i][0][1] + slope*(targets[curTarget].imgwidth-ineqlines[curTarget][i][0][0]);
-				//TODO:  fix for very large slopes;
-				if (ineqtypes[curTarget][i]==10.2) {
-					if (dragObj != null && dragObj.mode>=10 && dragObj.mode<11 && dragObj.num==i && dragObj.subnum==0) {
-						ctx.dashedLine(ineqlines[curTarget][i][1][0],ineqlines[curTarget][i][1][1],targets[curTarget].imgwidth,yright);
-						ctx.dashedLine(ineqlines[curTarget][i][1][0],ineqlines[curTarget][i][1][1],0,yleft);
+				if (Math.abs(x2-ineqlines[curTarget][i][0][0])<1 || Math.abs(slope)>100) { //vert line
+					//document.getElementById("ans0-0").innerHTML = 'vert';
+					if(ineqtypes[curTarget][i]==10.2) {
+						if (dragObj != null && dragObj.mode>=10 && dragObj.mode<11 && dragObj.num==i && dragObj.subnum==0) {
+							ctx.dashedLine(ineqlines[curTarget][i][1][0],ineqlines[curTarget][i][1][1],ineqlines[curTarget][i][1][0],targets[curTarget].imgheight);
+							ctx.dashedLine(ineqlines[curTarget][i][1][0],ineqlines[curTarget][i][1][1],ineqlines[curTarget][i][1][0],0);
+						} else {
+							ctx.dashedLine(ineqlines[curTarget][i][0][0],ineqlines[curTarget][i][0][1],ineqlines[curTarget][i][0][0],targets[curTarget].imgheight);
+							ctx.dashedLine(ineqlines[curTarget][i][0][0],ineqlines[curTarget][i][0][1],ineqlines[curTarget][i][0][0],0);
+						}
 					} else {
-						ctx.dashedLine(ineqlines[curTarget][i][0][0],ineqlines[curTarget][i][0][1],targets[curTarget].imgwidth,yright);
-						ctx.dashedLine(ineqlines[curTarget][i][0][0],ineqlines[curTarget][i][0][1],0,yleft);
+						ctx.moveTo(ineqlines[curTarget][i][0][0],0);
+						ctx.lineTo(ineqlines[curTarget][i][0][0],targets[curTarget].imgheight);
+						ctx.stroke();
 					}
 				} else {
-					ctx.moveTo(0,yleft);
-					ctx.lineTo(targets[curTarget].imgwidth,yright);	
+					//document.getElementById("ans0-0").innerHTML = slope;
+					var yleft = ineqlines[curTarget][i][0][1] - slope*ineqlines[curTarget][i][0][0];
+					var yright = ineqlines[curTarget][i][0][1] + slope*(targets[curTarget].imgwidth-ineqlines[curTarget][i][0][0]);
+					//TODO:  fix for very large slopes;
+					if (ineqtypes[curTarget][i]==10.2) {
+						if (dragObj != null && dragObj.mode>=10 && dragObj.mode<11 && dragObj.num==i && dragObj.subnum==0) {
+							ctx.dashedLine(ineqlines[curTarget][i][1][0],ineqlines[curTarget][i][1][1],targets[curTarget].imgwidth,yright);
+							ctx.dashedLine(ineqlines[curTarget][i][1][0],ineqlines[curTarget][i][1][1],0,yleft);
+						} else {
+							ctx.dashedLine(ineqlines[curTarget][i][0][0],ineqlines[curTarget][i][0][1],targets[curTarget].imgwidth,yright);
+							ctx.dashedLine(ineqlines[curTarget][i][0][0],ineqlines[curTarget][i][0][1],0,yleft);
+						}
+					} else {
+						ctx.moveTo(0,yleft);
+						ctx.lineTo(targets[curTarget].imgwidth,yright);	
+						ctx.stroke();
+					}
+				}
+			}
+			else{//quadratic inequalities
+				if (ineqtypes[curTarget][i]==10.3) {//solid parabola		
+					if (x2 != ineqlines[curTarget][i][0][0]) {
+						if (y2==ineqlines[curTarget][i][0][1]) {
+							ctx.moveTo(0,y2);
+							ctx.lineTo(targets[curTarget].imgwidth,y2);					
+						} else {
+							var stretch = (y2 - ineqlines[curTarget][i][0][1])/((x2 - ineqlines[curTarget][i][0][0])*(x2 - ineqlines[curTarget][i][0][0]));
+							if (y2>ineqlines[curTarget][i][0][1]) {
+								//crosses at y=imgheight
+								var inta = Math.sqrt((targets[curTarget].imgheight - ineqlines[curTarget][i][0][1])/stretch)+ineqlines[curTarget][i][0][0];
+								var intb = -1*Math.sqrt((targets[curTarget].imgheight - ineqlines[curTarget][i][0][1])/stretch)+ineqlines[curTarget][i][0][0];
+								var cnty = ineqlines[curTarget][i][0][1] - (targets[curTarget].imgheight - ineqlines[curTarget][i][0][1]);
+								var qy = targets[curTarget].imgheight;
+							} else {
+								var inta = Math.sqrt((0 - ineqlines[curTarget][i][0][1])/stretch)+ineqlines[curTarget][i][0][0];
+								var intb = -1*Math.sqrt((0 - ineqlines[curTarget][i][0][1])/stretch)+ineqlines[curTarget][i][0][0];
+								var cnty = 2*ineqlines[curTarget][i][0][1];
+								var qy = 0;
+							}
+							var cp1x = inta + 2.0/3.0*(ineqlines[curTarget][i][0][0] - inta);  
+							var cp1y = qy + 2.0/3.0*(cnty - qy);  
+							var cp2x = cp1x + (intb - inta)/3.0;  
+							var cp2y = cp1y;
+							ctx.moveTo(inta,qy);
+							ctx.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,intb,qy);
+						}			
+					}
 					ctx.stroke();
+				} else {//10.4, dashed parabola
+					if(x2 != ineqlines[curTarget][i][0][0]){
+						dashedParabola(ctx,ineqlines[curTarget][i][0][0],ineqlines[curTarget][i][0][1],x2,y2,targets[curTarget].imgwidth,targets[curTarget].imgheight);						
+					}
 				}
 			}
 		}
@@ -1618,3 +1664,152 @@ function chgnormtype(id) {
 	normupdatevalues(id);
 }
 
+//a parabola given two points,
+//context to draw on - ctx 
+//the vertex - (Vx,Vy)
+//another point on the parabola - (x,y)
+//screen width - sw
+//screen height - sh
+function dashedParabola(ctx,Vx,Vy,x,y,sw,sh){
+
+	if (y==Vy) {//horizontal line across screen
+		ctx.moveTo(0,y);
+		ctx.dashedLine(0,y,sw,y);
+	}
+
+	else{
+		//find out where the parabola touches the edge of the screen
+        	var a = (y-Vy)/((x-Vx)*(x-Vx));
+		var b = -2*a*Vx;
+	    	var shift = 0;
+		if(y > Vy){//hits image height, not 0
+			shift = sh;
+		}
+        	var c = a*Vx*Vx+Vy - shift;
+        
+        	//calculate control points
+		var discr = Math.sqrt(b*b-4*a*c);
+		c += shift;
+        	var p0x = (-b - discr)/(2*a);
+		var p0y = a*p0x*p0x + b*p0x + c;
+
+		var p2x = (-b + discr)/(2*a);
+		var p2y = p0y;
+
+        	if(p2x < p0x){
+            		var temp = p0x;
+            		p0x = p2x;
+            		p2x = temp;
+        	}
+               
+        	var stroke = 8;//length of dashes
+        	var strokeSqr = stroke*stroke;
+		var xChange = p2x - p0x;
+		var px = Vx;
+        	var py = Vy;
+        	var counter = 0;       
+		while(px > p0x-5 && px>-5) {
+           
+			if(counter%2 == 0)
+                		ctx.moveTo(px,py);
+            		else
+                		ctx.lineTo(px,py);
+            
+            		//px -= Math.sqrt(strokeSqr/(1+Math.pow(2*a*(px-Vx),2)));
+            		px -= Math.min(Math.sqrt(strokeSqr/(1+Math.pow(2*a*(px-Vx),2))), Math.sqrt(stroke/Math.abs(a)));
+            		py = a*px*px+b*px+c;
+            		counter++;
+		}
+		
+        	px = Vx;
+        	py = Vy;
+        	counter = 0;
+        	while(px < p2x+5 && px < sw+5){
+           		if(counter%2 == 0)
+                		ctx.moveTo(px,py);
+            		else
+                		ctx.lineTo(px,py);
+            
+            		//px += Math.sqrt(strokeSqr/(1+Math.pow(2*a*(px-Vx),2)));
+            		px += Math.min(Math.sqrt(strokeSqr/(1+Math.pow(2*a*(px-Vx),2))), Math.sqrt(stroke/Math.abs(a)));
+            		py = a*px*px+b*px+c;
+            		counter++;
+        	}
+        	
+	}
+	ctx.stroke();
+}
+
+//a parabola given two points,
+//context to draw on - ctx 
+//the vertex - (Vx,Vy)
+//another point on the parabola - (x,y)
+//point to determine which side to shade (shX,shY)
+//screen width - sw
+//screen height - sh
+function shadeParabola(ctx,Vx,Vy,x,y,shX,shY,sw,sh){
+	ctx.beginPath();
+	if (y==Vy) {//horizontal line across screen
+		ctx.moveTo(0,y);
+		ctx.lineTo(sw,y);
+		if(shY < Vy){//top half
+			ctx.lineTo(sw,0);
+			ctx.lineTo(0,0);
+		}
+		else{
+			ctx.lineTo(sw,sh);
+			ctx.lineTo(0,sh);
+		}		
+	}
+	else {
+		//find out where the parabola touches the edge of the screen
+        	var a = (y-Vy)/((x-Vx)*(x-Vx));
+		var b = -2*a*Vx;
+	    	var shift = 0;
+		if(y > Vy){//hits image height, not 0
+			shift = sh;
+		}
+        	var c = a*Vx*Vx+Vy - shift;
+        
+        	//calculate control points
+		var discr = Math.sqrt(b*b-4*a*c);
+		c += shift;
+        	var p0x = (-b - discr)/(2*a);
+		var p0y = a*p0x*p0x + b*p0x + c;
+
+		var p2x = (-b + discr)/(2*a);
+		var p2y = p0y;
+
+        	if(p2x < p0x){
+            		var temp = p0x;
+            		p0x = p2x;
+            		p2x = temp;
+        	}
+
+		var m0 = 2*a*(p0x-Vx);
+		var b0 = p0y - m0*p0x;
+		var m2 = -m0;
+		var b2 = p2y - m2*p2x;
+	
+		var p1x = (b0-b2)/(m2-m0);
+		var p1y = m0*p1x+b0;//either line, but use p1x
+		
+		if(a<0 && shY < a*shX*shX+b*shX+c || a>0 && shY > a*shX*shX+b*shX+c){//shade inside parabola
+			ctx.moveTo(p0x,p0y);
+			ctx.quadraticCurveTo(p1x,p1y,p2x,p2y);
+		}
+		else{
+			var otherY = sh;
+			if(Math.abs(p0y-sh) < 2)
+				otherY = 0;
+
+			ctx.moveTo(0,p0y);
+			ctx.lineTo(p0x,p0y);
+			ctx.quadraticCurveTo(p1x,p1y,p2x,p2y);
+			ctx.lineTo(sw,p2y);
+			ctx.lineTo(sw,otherY);
+			ctx.lineTo(0,otherY);
+		}
+	}
+	ctx.closePath();
+}

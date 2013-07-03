@@ -2421,14 +2421,16 @@ drawn line from the correct line.
 	    $answerformat = "polygon" can be used for drawing a single polygon; give $answer as array of points in order joined with edges.<br/>
 	    $answerformat="inequality" will use a set of drawing tools for graphing linear inequalities in two variables.  Give $answers for non-vertical lines in form
 	       like "&gt;=3x+4", "&lt;5x+4", and "x&lt;=3" for vertical lines.<br/>
+	    $answerformat="inequality,parab" will use a set of drawing tools for graphing quadratic inequalities in two variables.  Give $answers in form
+	       like "&gt;=x^2-4", "&lt;x^2+1".  Use $answerformat="inequality,both" to turn on lines and parabolas.<br/>
 	    $answerformat="numberline" will use a set of drawing tools for graphing inequalities or points in one variable on a number line.  Give $answers as dots and
 	       line segments, or use the intervalstodraw function from the interval macro library to form the $answers array.<br/>
 	    $answerformat="twopoint" will use a different set of drawing tools for specific shapes that all use two
 	    control points to define the shape. 
 	      <ul>
 	        <li>$answerformat="twopoint" will use a default tool set of line, parabola, absolute value, circle, and dot tools</li>
-	        <li>You can limit or expand the tools by specifying them: e.g. $answerformat = "twopoint,line,parab".  Valid values are: line, parab,abs,circle,dot,sqrt,trig,vector</li>
-	        <li>For lines, parabolas, absolute values, square roots, sines, cosines, and dots, give $anwers in the normal way (as a function of x)</li>
+	        <li>You can limit or expand the tools by specifying them: e.g. $answerformat = "twopoint,line,parab".  Valid values are: line, parab,abs,circle,dot,sqrt,trig,vector,exp</li>
+	        <li>For lines, parabolas, absolute values, square roots, sines, cosines, exponentials and dots, give $answers in the normal way (as a function of x)</li>
 	        <li>For circles, use "circle,x,y,radius", like "circle,2,-1,3"</li>
 	        <li>For vertical lines use "x=number", like "x=3".</li>
 	        <li>For vectors, use "vector, x_start, y_start, x_end, y_end" for position vectors, or "vector, dx, dy" for displacement vectors</li>

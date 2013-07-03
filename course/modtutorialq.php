@@ -45,6 +45,7 @@ if (isset($_POST['text'])) {
 	$feedbacktxtdef = array();
 	$feedbacktxtessay = array();
 	$answerboxsize = array();
+	$scoremethod = array();
 	$useeditor = array();
 	$answer = array();
 	$partial = array();
@@ -66,6 +67,9 @@ if (isset($_POST['text'])) {
 			$answer[$n] = '"'.str_replace('"','\\"',$_POST['essay'.$n.'-fb']).'"';
 			if (isset($_POST['useeditor'.$n])) {
 				$useeditor[$n] = true;
+			}
+			if (isset($_POST['takeanything'.$n])) {
+				$scoremethod[$n] = 'takeanything';
 			}
 			$answerboxsize[$n] = intval($_POST['essayrows'.$n]);	
 		}
@@ -127,6 +131,7 @@ if (isset($_POST['text'])) {
 		}
 		if ($qtypes[0]=='choices') {
 			$code .= '$displayformat = "'.$_POST['qdisp0'].'"'."\n";
+			$code .= '$noshuffle = "'.$_POST['qshuffle0'].'"'."\n";
 		} else if ($qtypes[0]=='number') {
 			$code .= '$feedbacktxtdef = "'.str_replace('"','\\"',$feedbacktxtdef[0]).'"'."\n";
 			$code .= '$answerboxsize = '.$answerboxsize[0]."\n";
@@ -136,6 +141,9 @@ if (isset($_POST['text'])) {
 			$code .= '$answerboxsize = '.$answerboxsize[0]."\n";
 			if (isset($useeditor[0])) {
 				$code .= '$displayformat = "editor"'."\n";
+			}
+			if (isset($scoremethod[0])) {
+				$code .= '$scoremethod = "'.$scoremethod[0].'"'."\n";
 			}
 		}
 		$code .= '$answer = '.$answer[0]."\n\n";
@@ -164,6 +172,7 @@ if (isset($_POST['text'])) {
 			}
 			if ($qtypes[$n]=='choices') {
 				$code .= '$displayformat['.$n.'] = "'.$_POST['qdisp'.$n].'"'."\n";
+				$code .= '$noshuffle['.$n.'] = "'.$_POST['qshuffle'.$n].'"'."\n";
 			} else if ($qtypes[$n]=='number') {
 				$code .= '$feedbacktxtdef['.$n.'] = "'.str_replace('"','\\"',$feedbacktxtdef[$n]).'"'."\n";
 				$code .= '$answerboxsize['.$n.'] = '.$answerboxsize[$n]."\n";
@@ -173,6 +182,9 @@ if (isset($_POST['text'])) {
 				$code .= '$answerboxsize['.$n.'] = '.$answerboxsize[$n]."\n";
 				if (isset($useeditor[$n])) {
 					$code .= '$displayformat['.$n.'] = "editor"'."\n";
+				}
+				if (isset($scoremethod[$n])) {
+					$code .= '$scoremethod['.$n.'] = "'.$scoremethod[$n].'"'."\n";
 				}
 			}
 			$code .= '$answer['.$n.'] = '.$answer[$n]."\n\n";
@@ -184,7 +196,7 @@ if (isset($_POST['text'])) {
 	
 	$code .= "\n//end stored values - Tutorial Style question\n\n";
 	
-	$code .= '$noshuffle = "all"'."\n";
+	//$code .= '$noshuffle = "all"'."\n";
 	
 	//now we convert as needed
 	$qtextpre = '';
@@ -398,7 +410,7 @@ function getqvalues($code,$type) {
 			}
 		}
 		
-		return array($nparts, $qtypes, $qparts, $nhints, $displayformat, $questions, $feedbacktxt, $feedbacktxtdef, $feedbacktxtessay, $answer, $hinttext, $partialcredit, $qtol, $qtold, $answerboxsize, $displayformat);
+		return array($nparts, $qtypes, $qparts, $nhints, $displayformat, $questions, $feedbacktxt, $feedbacktxtdef, $feedbacktxtessay, $answer, $hinttext, $partialcredit, $qtol, $qtold, $answerboxsize, $displayformat, $scoremethod, $noshuffle);
 	} else {
 		if ($type=='number') {
 			if (isset($reltolerance)) {
@@ -414,7 +426,7 @@ function getqvalues($code,$type) {
 		}else if ($type=='essay') {
 			$qparts = array(0);
 		}
-		return array(1, array($type), $qparts, $nhints, array($displayformat), array($questions), array($feedbacktxt), array($feedbacktxtdef), array($feedbacktxtessay), array($answer), $hinttext, array($partialcredit), $qtol, $qtold, array($answerboxsize), array($displayformat));
+		return array(1, array($type), $qparts, $nhints, array($displayformat), array($questions), array($feedbacktxt), array($feedbacktxtdef), array($feedbacktxtessay), array($answer), $hinttext, array($partialcredit), $qtol, $qtold, array($answerboxsize), array($displayformat), array($scoremethod), array($noshuffle));
 	}
 }
 
@@ -547,7 +559,7 @@ if (isset($_GET['id']) && $_GET['id']!='new') {
 	$mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
 	$allowedmacros = $mathfuncs;
 	require_once("../assessment/interpret5.php");
-	list($nparts, $qtype, $qparts, $nhints, $qdisp, $questions, $feedbacktxt, $feedbacktxtdef, $feedbacktxtessay, $answer, $hinttext, $partialcredit, $qtol, $qtold, $answerboxsize, $displayformat) = getqvalues($code,$type);
+	list($nparts, $qtype, $qparts, $nhints, $qdisp, $questions, $feedbacktxt, $feedbacktxtdef, $feedbacktxtessay, $answer, $hinttext, $partialcredit, $qtol, $qtold, $answerboxsize, $displayformat, $scoremethod, $qshuffle) = getqvalues($code,$type);
 	$partial = array();
 	
 	for ($n=0;$n<$nparts;$n++) {
@@ -578,8 +590,10 @@ if (isset($_GET['id']) && $_GET['id']!='new') {
 	$qparts = array(4,4,4,4,4);
 	$answer = array(0,0,0,0,0);
 	$qdisp = array("vert","vert","vert","vert","vert");
+	$qshuffle = array("all","all","all","all","all");
 	$qtype = array_fill(0,5,"choices");
 	$displayformat = array();
+	$scoremethod = array();
 	$answerboxsize = array();
 	$nhints = 1;
 	$questions = array();
@@ -652,6 +666,9 @@ $qtypelbl = array("Multiple-choice","Numeric","Essay");
 
 $qtolval = array("abs","rel");
 $qtollbl = array("absolute","relative");
+
+$shuffleval = array("all","last","none");
+$shufflelbl = array("no shuffle","shuffle all but last","shuffle all");
 
 $useeditor = "text,popuptxt";
 $placeinhead = '<style type="text/css"> 
@@ -948,9 +965,11 @@ for ($n=0;$n<5;$n++) {
 	
 	//choices
 	echo '<span id="qti'.$n.'mc" ';
-	if ($qtype[$n]!='choices') {echo ' style="display:none;"';};
+	if (isset($qtype[$n]) && $qtype[$n]!='choices') {echo ' style="display:none;"';};
 	echo '> choices.  Display those ';
 	writeHtmlSelect("qdisp$n",$dispval,$displbl, $qdisp[$n]);
+	echo '. Shuffle: ';
+	writeHtmlSelect("qshuffle$n",$shuffleval,$shufflelbl, $qshuffle[$n]);
 	echo '</span>';
 	
 	//numeric
@@ -971,7 +990,12 @@ for ($n=0;$n<5;$n++) {
 	if (isset($displayformat[$n]) && $displayformat[$n]=='editor') {
 		echo 'checked="checked"';
 	}
-	echo '/> Use editor';
+	echo '/> Use editor.  ';
+	echo '<input type="checkbox" name="takeanything'.$n.'" ';
+	if (isset($scoremethod[$n]) && $scoremethod[$n]=='takeanything') {
+		echo 'checked="checked"';
+	}
+	echo '/> Give credit for any answer.  ';
 	
 	
 	echo '</span>';

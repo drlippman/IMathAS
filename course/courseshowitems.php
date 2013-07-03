@@ -546,7 +546,7 @@ function enditem($canedit) {
 			   if (isset($studentinfo['timelimitmult'])) {
 				$line['timelimit'] *= $studentinfo['timelimitmult'];
 	    		   }
-			   if (strpos($line['summary'],'<p>')!==0) {
+	    		   if (strpos($line['summary'],'<p>')!==0 && strpos($line['summary'],'<ul>')!==0 && strpos($line['summary'],'<ol>')!==0) {
 				   $line['summary'] = '<p>'.$line['summary'].'</p>';
 			   }
 			   if (isset($studentid)) {
@@ -741,7 +741,7 @@ function enditem($canedit) {
 			   $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			
-			   if (strpos($line['text'],'<p>')!==0) {
+			   if (strpos($line['text'],'<p>')!==0 && strpos($line['text'],'<ul>')!==0 && strpos($line['text'],'<ol>')!==0) {
 				   $line['text'] = '<p>'.$line['text'].'</p>';
 			   }
 			   if (isset($studentid)) {
@@ -965,7 +965,7 @@ function enditem($canedit) {
 			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			  
-			   if (strpos($line['summary'],'<p>')!==0) {
+			   if (strpos($line['summary'],'<p>')!==0 && strpos($line['summary'],'<ul>')!==0 && strpos($line['summary'],'<ol>')!==0) {
 				   $line['summary'] = '<p>'.$line['summary'].'</p>';
 			   }
 			   if (isset($studentid)) {
@@ -1455,7 +1455,7 @@ function enditem($canedit) {
 		$html .= "<option value=\"assessment\">" . _('Add Assessment') . "</option>\n";
 		//$html .= "<option value=\"drillassess\">Add Drill</option>\n";
 		$html .= "<option value=\"inlinetext\">" . _('Add Inline Text') . "</option>\n";
-		$html .= "<option value=\"linkedtext\">" . _('Add Linked Text') . "</option>\n";
+		$html .= "<option value=\"linkedtext\">" . _('Add Link') . "</option>\n";
 		$html .= "<option value=\"forum\">" . _('Add Forum') . "</option>\n";
 		$html .= "<option value=\"wiki\">" . _('Add Wiki') . "</option>\n";
 		$html .= "<option value=\"block\">" . _('Add Block') . "</option>\n";

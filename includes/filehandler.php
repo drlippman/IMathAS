@@ -205,6 +205,19 @@ function getasidfileurl($file) {
 		return $imasroot.'/filestore/adata/'.$file;
 	}
 }
+
+function getasidfilepath($file) {
+	global $imasroot;
+	if ($GLOBALS['filehandertype'] == 's3') {
+		$s3object = "adata/$file";
+		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		return $s3->queryStringGet($GLOBALS['AWSbucket'],$s3object,7200);
+	} else {
+		$base = rtrim(dirname(dirname(__FILE__)), '/\\');
+		return $base.'/filestore/adata/'.$file;
+	}
+}
+
 /*
 function deleteasidfilesfromstring($str) {
 	if ($GLOBALS['filehandertype'] =='s3') {
