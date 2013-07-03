@@ -2594,7 +2594,7 @@ if (!isset($_POST['embedpostback'])) {
 			}
 			if ($hascatset) {
 				include("../assessment/catscores.php");
-				catscores($questions,$bestscores,$testsettings['defpoints'],$testsettings['defoutcome']);
+				catscores($questions,$bestscores,$testsettings['defpoints'],$testsettings['defoutcome'],$testsettings['courseid']);
 			}
 		}
 		if ($reviewatend) {
