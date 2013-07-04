@@ -561,3 +561,7 @@ div.forumgrp img {
 	max-width: 90%;
 	height: auto;
 }
+.videoembedbtn {
+	color: #999;
+	cursor: pointer;
+}

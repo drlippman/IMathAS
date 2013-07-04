@@ -11,14 +11,29 @@ if (strpos($url,'youtube.com/watch')!==false) {
 	$vidid = substr($url,strrpos($url,'v=')+2);
 	if (strpos($vidid,'&')!==false) {
 		$vidid = substr($vidid,0,strpos($vidid,'&'));
+	}
+	if (strpos($vidid,'#')!==false) {
+		$vidid = substr($vidid,0,strpos($vidid,'#'));
 	} 
 	if (strpos($url,'t=')!==false) {
-		$timestart = '#'.substr($url,strrpos($url,'t='));
-		if (strpos($timestart,'&')!==false) {
-			$timestart = substr($timestart,0,strpos($timestart,'&'));
-		}
+		preg_match('/t=((\d+)m)?((\d+)s)?/',$url,$m);
+		$timestart = '?start='.((empty($m[2])?0:$m[2]*60) + (empty($m[4])?0:$m[4]*1));	
 	} else {
-		$timestart = '';
+		if (strpos($url,'start=')!==false) {
+			preg_match('/start=(\d+)/',$url,$m);
+			$timestart = '?'.$m[0];
+		} else {
+			$timestart = '';
+		}
+	}
+	
+	if (strpos($url,'end=')!==false) {
+		preg_match('/end=(\d+)/',$url,$m);
+		if ($timestart=='') {
+			$timestart = '?'.$m[0];
+		} else {
+			$timestart .= '&'.$m[0];
+		}
 	}
 	$doembed = true;
 	$out = '<iframe width="640" height="510" src="'.$urlmode.'www.youtube.com/embed/'.$vidid.$timestart.'" frameborder="0" allowfullscreen></iframe>';
@@ -26,13 +41,28 @@ if (strpos($url,'youtube.com/watch')!==false) {
 if (strpos($url,'youtu.be/')!==false) {
 	//youtube 	
 	$vidid = substr($url,strpos($url,'.be/')+4);
+	if (strpos($vidid,'#')!==false) {
+		$vidid = substr($vidid,0,strpos($vidid,'#'));
+	} 
 	if (strpos($url,'t=')!==false) {
-		$timestart = '#'.substr($url,strrpos($url,'t='));
-		if (strpos($timestart,'&')!==false) {
-			$timestart = substr($timestart,0,strpos($timestart,'&'));
-		}
+		preg_match('/t=((\d+)m)?((\d+)s)?/',$url,$m);
+		$timestart = '?start='.((empty($m[2])?0:$m[2]*60) + (empty($m[4])?0:$m[4]*1));	
 	} else {
-		$timestart = '';
+		if (strpos($url,'start=')!==false) {
+			preg_match('/start=(\d+)/',$url,$m);
+			$timestart = '?'.$m[0];
+		} else {
+			$timestart = '';
+		}
+	}
+	
+	if (strpos($url,'end=')!==false) {
+		preg_match('/end=(\d+)/',$url,$m);
+		if ($timestart=='') {
+			$timestart = '?'.$m[0];
+		} else {
+			$timestart .= '&'.$m[0];
+		}
 	}
 	$doembed = true;
 	$out = '<iframe width="640" height="510" src="'.$urlmode.'www.youtube.com/embed/'.$vidid.$timestart.'" frameborder="0" allowfullscreen></iframe>';
