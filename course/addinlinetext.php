@@ -90,11 +90,18 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		
 		$htmlawedconfig = array('elements'=>'*-script');
 		$_POST['text'] = addslashes(htmLawed(stripslashes($_POST['text']),$htmlawedconfig));
-
+		$outcomes = array();
+		foreach ($_POST['outcomes'] as $o) {
+			if (is_numeric($o) && $o>0) {
+				$outcomes[] = intval($o);
+			}
+		}
+		$outcomes = implode(',',$outcomes);
+		
 		$filestoremove = array();
 		if (isset($_GET['id'])) {  //already have id; update
 			$query = "UPDATE imas_inlinetext SET title='{$_POST['title']}',text='{$_POST['text']}',startdate=$startdate,enddate=$enddate,avail='{$_POST['avail']}',";
-			$query .= "oncal='$oncal',caltag='$caltag' ";
+			$query .= "oncal='$oncal',caltag='$caltag',outcomes='$outcomes' ";
 			$query .= "WHERE id='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//update attached files
@@ -120,8 +127,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$newtextid = $_GET['id'];
 		} else { //add new
 			
-			$query = "INSERT INTO imas_inlinetext (courseid,title,text,startdate,enddate,avail,oncal,caltag) VALUES ";
-			$query .= "('$cid','{$_POST['title']}','{$_POST['text']}',$startdate,$enddate,'{$_POST['avail']}','{$_POST['oncal']}','$caltag');";
+			$query = "INSERT INTO imas_inlinetext (courseid,title,text,startdate,enddate,avail,oncal,caltag,outcomes) VALUES ";
+			$query .= "('$cid','{$_POST['title']}','{$_POST['text']}',$startdate,$enddate,'{$_POST['avail']}','{$_POST['oncal']}','$caltag','$outcomes');";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			
 			$newtextid = mysql_insert_id();
@@ -247,6 +254,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
 			$altoncal = 0;
 		}
+		if ($line['outcomes']!='') {
+			$gradeoutcomes = explode(',',$line['outcomes']);
+		} else {
+			$gradeoutcomes = array();
+		}
 	} else {
 		//set defaults
 		$line['title'] = "Enter title here";
@@ -259,6 +271,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$enddate = time() + 7*24*60*60;
 		$hidetitle = false;
 		$fileorder = array();
+		$gradeoutcomes = array();
 	}   
 	if ($startdate!=0) {
 		$sdate = tzdate("m/d/Y",$startdate);
@@ -276,27 +289,56 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}    
 	
 	if (isset($_GET['id'])) {
-	$query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='{$_GET['id']}'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$page_fileorderCount = count($fileorder);
-	$i = 0;
-	$page_FileLinks = array();
-	if (mysql_num_rows($result)>0) {
-		while ($row = mysql_fetch_row($result)) {
-			$filedescr[$row[0]] = $row[1];
-			$filenames[$row[0]] = rawurlencode($row[2]);
+		$query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='{$_GET['id']}'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$page_fileorderCount = count($fileorder);
+		$i = 0;
+		$page_FileLinks = array();
+		if (mysql_num_rows($result)>0) {
+			while ($row = mysql_fetch_row($result)) {
+				$filedescr[$row[0]] = $row[1];
+				$filenames[$row[0]] = rawurlencode($row[2]);
+			}
+			foreach ($fileorder as $k=>$fid) {
+				$page_FileLinks[$k]['link'] = $filenames[$fid];
+				$page_FileLinks[$k]['desc'] = $filedescr[$fid];
+				$page_FileLinks[$k]['fid'] = $fid;
+	
+				//echo generatemoveselect(count($fileorder),$k);
+				//echo "<a href=\"$imasroot/course/files/{$filenames[$fid]}\" target=\"_blank\">View</a> ";
+				//echo "<input type=\"text\" name=\"filedescr-$fid\" value=\"{$filedescr[$fid]}\"/> Delete? <input type=checkbox name=\"delfile-$fid\"/><br/>";	
+			}
 		}
-		foreach ($fileorder as $k=>$fid) {
-			$page_FileLinks[$k]['link'] = $filenames[$fid];
-			$page_FileLinks[$k]['desc'] = $filedescr[$fid];
-			$page_FileLinks[$k]['fid'] = $fid;
-
-			//echo generatemoveselect(count($fileorder),$k);
-			//echo "<a href=\"$imasroot/course/files/{$filenames[$fid]}\" target=\"_blank\">View</a> ";
-			//echo "<input type=\"text\" name=\"filedescr-$fid\" value=\"{$filedescr[$fid]}\"/> Delete? <input type=checkbox name=\"delfile-$fid\"/><br/>";	
+		
+	} 
+	
+	$query = "SELECT id,name FROM imas_outcomes WHERE courseid='$cid'";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$outcomenames = array();
+	while ($row = mysql_fetch_row($result)) {
+		$outcomenames[$row[0]] = $row[1];
+	}
+	$query = "SELECT outcomes FROM imas_courses WHERE id='$cid'";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$row = mysql_fetch_row($result);
+	if ($row[0]=='') {
+		$outcomearr = array();
+	} else {
+		$outcomearr = unserialize($row[0]);
+	}
+	$outcomes = array();
+	function flattenarr($ar) {
+		global $outcomes;
+		foreach ($ar as $v) {
+			if (is_array($v)) { //outcome group
+				$outcomes[] = array($v['name'], 1);
+				flattenarr($v['outcomes']);
+			} else {
+				$outcomes[] = array($v, 0);
+			}
 		}
 	}
-} 
+	flattenarr($outcomearr);
 	
 $page_formActionTag .= (isset($_GET['id'])) ? "&id=" . $_GET['id'] : "";	
 }
@@ -414,6 +456,13 @@ function movefile(from) {
 			With tag: <input name="altcaltag" type=text size=1 value="<?php echo $line['caltag'];?>"/>
 		</span><BR class=form>
 		</div>
+<?php
+	if (count($outcomes)>0) {
+			echo '<span class="form">Associate Outcomes:</span></span class="formright">';
+			writeHtmlMultiSelect('outcomes',$outcomes,$outcomenames,$gradeoutcomes,'Select an outcome...');
+			echo '</span><br class="form"/>';
+	}
+?>
 		
 	</div>
 	<div class=submit><input type=submit name="submitbtn" value="Submit"></div>

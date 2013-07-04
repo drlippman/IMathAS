@@ -37,7 +37,7 @@ window.onload = init;
 var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && is_numeric($cid))?$cid:0; ?>;
 </script>
 <link rel="stylesheet" href="<?php echo $imasroot . "/assessment/mathtest.css?ver=092812";?>" type="text/css"/>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js" type="text/javascript"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script>
 <?php
 if (isset($CFG['locale'])) {
 	$lang = substr($CFG['locale'],0,2);
@@ -99,7 +99,7 @@ div { zoom: 1; }
 }
 </style> 
 <![endif]--> 
-<script src="<?php echo $imasroot . "/javascript/AMhelpers_min.js?v=042713";?>" type="text/javascript"></script>
+<script src="<?php echo $imasroot . "/javascript/AMhelpers_min.js?v=062013";?>" type="text/javascript"></script>
 <?php 
 if (isset($sessiondata['useflash'])) {
 	echo '<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>';

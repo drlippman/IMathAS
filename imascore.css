@@ -561,6 +561,13 @@ div.forumgrp img {
 	max-width: 90%;
 	height: auto;
 }
+div.multisel {
+	display: inline-block;
+}
+div.multiselitem {
+	background-color: #eee;
+	margin-bottom: 2px;
+}
 .videoembedbtn {
 	color: #999;
 	cursor: pointer;

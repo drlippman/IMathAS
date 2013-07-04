@@ -430,8 +430,8 @@ if ($overwriteBody==1) {
 			<a href="listusers.php?cid=<?php echo $cid ?>"><?php echo _('Roster'); ?></a><br/>
 			<a href="gradebook.php?cid=<?php echo $cid ?>"><?php echo _('Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="red">', _('New'), '</span>';}?><br/>
 			<a href="managestugrps.php?cid=<?php echo $cid ?>"><?php echo _('Groups'); ?></a><br/>
+			<a href="addoutcomes.php?cid=<?php echo $cid ?>"><?php echo _('Outcomes'); ?></a><br/>
 			<a href="showcalendar.php?cid=<?php echo $cid ?>"><?php echo _('Calendar'); ?></a>
-		
 		</p>
 	<?php
 	}

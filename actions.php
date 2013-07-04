@@ -350,7 +350,11 @@
 						$query = "INSERT INTO imas_students (userid,courseid) VALUES ('$userid','{$_POST['cid']}');";
 					}
 					mysql_query($query) or die("Query failed : " . mysql_error());
+					echo "<html><body>\n";
 					echo '<p>You have been enrolled in course ID '.$_POST['courseid'].'</p>';
+					echo "<p>Return to the <a href=\"index.php\">main page</a> and click on the course name to access the course</p>";
+					echo "</html></body>\n";
+					exit;
 				}
 				
 				

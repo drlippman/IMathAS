@@ -613,11 +613,12 @@ if (isset($studentid) || $stu!=0) { //show student view
 	
 	if ($isteacher) {
 		echo _('Check:'), ' <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',true)">', _('All'), '</a> <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',false)">', _('None'), '</a> ';
-		echo _('With Selected:'), '  <input type="submit" name="posted" value="', _('Print Report'), '"/> <input type="submit" name="posted" value="', _('E-mail'), '"/> <input type="submit" name="posted" value="', _('Message'), '"/> ';
+		echo _('With Selected:'), '  <button type="submit" name="posted" value="Print Report">',_('Print Report'),'</button> <button type="submit" name="posted" value="E-mail">',_('E-mail'),'</button> <button type="submit" name="posted" value="Message">',_('Message'),'</button> ';
+
 		if (!isset($CFG['GEN']['noInstrUnenroll'])) {
-			echo '<input type=submit name=posted value="', _('Unenroll'), '">';
+			echo '<button type="submit" name="posted" value="Unenroll">',_('Unenroll'),'</button> ';
 		}
-		echo "<input type=submit name=posted value=\"", _('Make Exception'), "\"> ";
+		echo '<button type="submit" name="posted" value="Make Exception">',_('Make Exception'),'</button> ';
 	}
 	
 	$gbt = gbinstrdisp();
@@ -861,9 +862,9 @@ function gbstudisp($stu) {
 		$show = mysql_result($result,0,0);
 		//echo '</tbody></table><br/>';
 		if ($isteacher && $stu>0) {
-			echo '<p><input type="submit" value="', _('Save Changes'), '" style="display:none"; id="savechgbtn" /> ';
+			echo '<p><button type="submit" value="Save Changes" style="display:none"; id="savechgbtn">', _('Save Changes'), '</button> ';
 			echo _('Check:'), ' <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',false)">', _('None'), '</a> ';
-			echo _('With selected:'), ' <input type="submit" value="', _('Make Exception'), '" name="posted" /></p>';
+			echo _('With selected:'), ' <button type="submit" value="Make Exception" name="posted">',_('Make Exception'),'</button></p>';
 		}
 		echo '<table class="gb"><thead>';
 		echo '<tr>';
@@ -1052,8 +1053,8 @@ function gbstudisp($stu) {
 	}
 	
 	if ($hidepast && $isteacher && $stu>0) {
-		echo '<p><input type="submit" value="', _('Save Changes'), '" style="display:none"; id="savechgbtn" />';
-		echo '<input type="submit" value="', _('Make Exception'), '" name="massexception" /> ', _('for selected assessments'), '</p>';
+		echo '<p><button type="submit" value="Save Changes" style="display:none"; id="savechgbtn">', _('Save Changes'), '</button>';
+		echo '<button type="submit" value="Make Exception" name="massexception" >', _('Make Exception'), '</button> ', _('for selected assessments'), '</p>';
 	}
 	
 	echo "</form>";

@@ -273,23 +273,57 @@ switch($_GET['action']) {
 					$gbcats[$frid] = mysql_insert_id();
 				}
 				$copystickyposts = true;
-				$query = "SELECT itemorder,ancestors FROM imas_courses WHERE id='{$_POST['usetemplate']}'";
+				$query = "SELECT itemorder,ancestors,outcomes FROM imas_courses WHERE id='{$_POST['usetemplate']}'";
 				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 				$r = mysql_fetch_row($result);
 				$items = unserialize($r[0]);
 				$ancestors = $r[1];
+				$outcomesarr = $r[2];
 				if ($ancestors=='') {
 					$ancestors = intval($_POST['usetemplate']);
 				} else {
 					$ancestors = intval($_POST['usetemplate']).','.$ancestors;
 				}
 				$ancestors = addslashes($ancestors);
+				$outcomes = array();
+				if ($outcomesarr!='') {
+					$query = "SELECT id,name,ancestors FROM imas_outcomes WHERE courseid='{$_POST['usetemplate']}'";
+					$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+					while ($row = mysql_fetch_row($result)) {
+						if ($row[2]=='') {
+							$row[2] = $row[0];
+						} else {
+							$row[2] = $row[0].','.$row[2];
+						}
+						$row[1] = addslashes($row[1]);
+						$query = "INSERT INTO imas_outcomes (courseid,name,ancestors) VALUES ";
+						$query .= "('$cid','{$row[1]}','{$row[2]}')";
+						mysql_query($query) or die("Query failed :$query " . mysql_error());
+						$outcomes[$row[0]] = mysql_insert_id();
+					}
+					function updateoutcomes(&$arr) {
+						global $outcomes;
+						foreach ($arr as $k=>$v) {
+							if (is_array($v)) {
+								updateoutcomes($arr[$k]['outcomes']);
+							} else {
+								$arr[$k] = $outcomes[$v];
+							}
+						}
+					}
+					$outcomesarr = unserialize($outcomesarr);
+					updateoutcomes($outcomesarr);
+					$newoutcomearr = addslashes(serialize($outcomesarr));
+				} else {
+					$newoutcomearr = '';
+				}
+				
 				$newitems = array();
 				require("../includes/copyiteminc.php");
 				copyallsub($items,'0',$newitems,$gbcats);
 				doaftercopy($_POST['usetemplate']);
 				$itemorder = addslashes(serialize($newitems));
-				$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt',ancestors='$ancestors' WHERE id='$cid'";
+				$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt',ancestors='$ancestors',outcomes='$newoutcomearr' WHERE id='$cid'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				copyrubrics();
 			} 

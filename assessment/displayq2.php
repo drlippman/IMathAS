@@ -11,6 +11,7 @@ require_once("mathphp2.php");
 require("interpret5.php");
 require("macros.php");
 function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false,$qcolors=array()) {
+	//$starttime = microtime(true);
 	global $imasroot, $myrights, $showtips, $urlmode;
 	if (!isset($_SESSION['choicemap'])) { $_SESSION['choicemap'] = array(); }
 	$GLOBALS['inquestiondisplay'] = true;
@@ -263,6 +264,19 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	
 	//echo $toevalqtext;
 	eval("\$evaledqtext = \"$toevalqtxt\";");
+	if (strpos($evaledqtext,'[AB')!==false) {
+		if (is_array($answerbox)) {
+			foreach($answerbox as $iidx=>$abox) {
+				if (strpos($evaledqtext,'[AB'.$iidx.']')!==false) {
+					$evaledqtext = str_replace('[AB'.$iidx.']', $abox, $evaledqtext);
+					$toevalqtxt .= '$answerbox['.$iidx.']';  //to prevent autoadd
+				}
+			}
+		} else {
+			$evaledqtext = str_replace('[AB]', $answerbox, $evaledqtext);
+			$toevalqtxt .= '$answerbox';
+		}
+	}
 	if ($returnqtxt) {
 		$returntxt = $evaledqtext;
 	} else if ($seqinactive) {
@@ -365,6 +379,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		}
 	}
 	echo "</div>\n";
+	//echo 'time: '.(microtime(true) - $starttime);
 	if ($qdata['qtype']=="multipart" ) {
 		return $anstypes;
 	} else {
@@ -605,7 +620,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 		$scores = Array();
 		foreach ($anstypes as $kidx=>$anstype) {
 			$partnum = ($qnidx+1)*1000 + $kidx;
-			$scores[$kidx] = round(scorepart($anstype,$kidx,$_POST["qn$partnum"],$options,$qnidx+1)*$answeights[$kidx],3);
+			$scores[$kidx] = round(scorepart($anstype,$kidx,$_POST["qn$partnum"],$options,$qnidx+1)*$answeights[$kidx],4);
 			$partla[$kidx] = $GLOBALS['partlastanswer'];
 		}
 		$partla = str_replace('&','',$partla);
@@ -629,7 +644,9 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 			$GLOBALS['questionmanualgrade'] = true;
 		}
 		$score = scorepart($qdata['qtype'],$qnidx,$givenans,$options,0);
-		
+		if (isset($scoremethod) && $scoremethod == "allornothing") {
+			if ($score<.98) {$score=0;}
+		}
 		if ($qdata['qtype']!='conditional') {
 			$GLOBALS['partlastanswer'] = str_replace('&','',$GLOBALS['partlastanswer']);
 			$GLOBALS['partlastanswer'] = preg_replace('/#+/','#',$GLOBALS['partlastanswer']);
@@ -710,9 +727,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			}
 		}
 		$out .= "$leftb<input ";
-		
+		$addlclass = '';
 		if ($displayformat=='alignright') { $out .= 'style="text-align: right;" ';}
 		else if ($displayformat=='hidden') { $out .= 'style="position: absolute; visibility: hidden; left: -5000px;" ';}
+		else if ($displayformat=='debit') { $out .= 'onkeyup="editdebit(this)" style="text-align: right;" ';}
+		else if ($displayformat=='credit') { $out .= 'onkeyup="editcredit(this)" style="text-align: right;" '; $addlclass=' creditbox';}
 		
 		if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
@@ -723,11 +742,15 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
 		}
 		
-		$out .= "class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\" />$rightb";
+		$out .= "class=\"text $colorbox$addlclass\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\" />$rightb";
 		$out .= getcolormark($colorbox);
 		if ($displayformat=='hidden') { $out .= '<script type="text/javascript">imasprevans['.$qstr.'] = "'.$la.'";</script>';}
 		if (isset($answer)) {
-			$sa = $answer;
+			if ($answerformat=='parenneg' && $answer < 0) {
+				$sa = '('.(-1*$answer).')';
+			} else {
+				$sa = $answer;
+			}
 		}
 	} else if ($anstype == "choices") {
 		if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$qn];} else {$displayformat = $options['displayformat'];}} else {$displayformat="vert";}
@@ -1031,7 +1054,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			if ($displayformat=="select") {
 				for ($j=0;$j<count($randakeys);$j++) {
 					$out .= "<option value=\"".$letters[$j]."\" ";
-					if (is_numeric($las[$i]) && $las[$i]==$j) {
+					if ($las[$i]==$letters[$j]) {
 						$out .= 'selected="1"';
 					}
 					$out .= ">{$answers[$randakeys[$j]]}</option>\n";
@@ -1137,9 +1160,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		} else if ($useeqnhelper) {
 			$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper)\" onblur=\"hideee();hideeedd();\" ";
 		}
-		$out .= "/>$rightb\n";
+		$out .= "/>$rightb";
 		$out .= getcolormark($colorbox);
-		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
+		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />\n";
 		if (!isset($hidepreview)) {
 			$preview .= "<input type=button class=btn value=Preview onclick=\"calculate('tc$qn','p$qn','$answerformat')\" /> &nbsp;\n";
 		}
@@ -1545,6 +1568,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
 		if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$qn];} else {$displayformat = $options['displayformat'];}}
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
+		if (is_array($options['questions'][$qn])) {$questions = $options['questions'][$qn];} else {$questions = $options['questions'];}
 		if (!isset($answerformat)) { $answerformat = '';}
 		
 		if ($multi>0) { $qn = $multi*1000+$qn;}
@@ -1559,7 +1583,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$shorttip = _('Enter text');
 		}
 		
-		$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" autocomplete=\"off\"  ";
+		$out .= "<input type=\"text\"  size=\"$sz\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" autocomplete=\"off\"  ";
+		
 		if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
 				$qnref = "$qn-0";
@@ -1568,11 +1593,39 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			}
 			$out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
 		}
+		$addlclass = '';
+		if ($displayformat=='debit') { $out .= 'onkeyup="editdebit(this)" style="text-align: right;" ';}
+		else if ($displayformat=='credit') { $out .= 'onkeyup="editcredit(this)" style="text-align: right;" '; $addlclass=' creditbox';}
+		else if ($displayformat=='alignright') { $out .= 'style="text-align: right;" ';}
+		$out .= "class=\"text $colorbox$addlclass\""; 
 		$out .= '/>';
 		$out .= getcolormark($colorbox);
 		if ($displayformat == 'usepreview') {
 			$preview .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"stringqpreview('qn$qn','p$qn','$answerformat')\" /> &nbsp;\n";
 			$preview .= "<span id=p$qn></span> ";
+		} else if ($displayformat == 'typeahead') {
+			if (!is_array($questions)) {
+				echo _('Eeek!  $questions is not defined or needs to be an array');
+			} else {
+				foreach ($questions as $i=>$v) {
+					$questions[$i] = htmlentities(trim($v));
+				}
+				
+				$out .= '<script type="text/javascript">';
+				$autosugglist = '["'.implode('","',$questions).'"]';
+				if (!isset($GLOBALS['autosuggestlists'])) {
+					$GLOBALS['autosuggestlists'] = array();
+				}
+				if (($k = array_search($autosugglist, $GLOBALS['autosuggestlists']))!==false) {
+					$asvar = 'autosuggestlist'.$k;
+				} else {
+					$GLOBALS['autosuggestlists'][] = $autosugglist;
+					$ascnt = count($GLOBALS['autosuggestlists'])-1;
+					$out .= 'var autosuggestlist'.$ascnt.' = '.$autosugglist.';';
+					$asvar = 'autosuggestlist'.$ascnt;
+				}
+				$out .= 'initstack.push(function(){ autosugg'.$qn.' = new AutoSuggest(document.getElementById("qn'.$qn.'"),'.$asvar.');});</script>';
+			}
 		}
 		$sa .= $answer;
 	} else if ($anstype == "essay") {
@@ -1906,7 +1959,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$dotline = 0;
 		if ($colorbox!='') { $out .= '<div class="'.$colorbox.'">';}
 		$out .= "<canvas class=\"drawcanvas\" id=\"canvas$qn\" width=\"{$settings[6]}\" height=\"{$settings[7]}\"></canvas>";
-		if ($colorbox!='') { $out .= '</div>';}
+		
 		$out .= "<div><span id=\"drawtools$qn\" class=\"drawtools\">";
 		$out .= "<span onclick=\"clearcanvas($qn)\">" . _('Clear All') . "</span> " . _('Draw:') . " ";
 		if ($answerformat[0]=='inequality') {
@@ -2028,6 +2081,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (strpos($snaptogrid,':')!==false) { $snaptogrid = "'$snaptogrid'";}
 		$out .= '</span></div>';
 		$out .= getcolormark($colorbox);
+		if ($colorbox!='') { $out .= '</div>';}
 		$out .= "<input type=\"hidden\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" />";
 		$out .= "<script type=\"text/javascript\">canvases[$qn] = [$qn,'$bg',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline,$locky,$snaptogrid];";
 		
@@ -2268,6 +2322,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($answerformat=='orderedlist') {
 			if (count($gamasterarr)!=count($anarr)) {
 				return 0;
+			}
+		}
+		if ($answerformat=='parenneg') {
+			foreach ($gaarr as $k=>$v) {
+				if ($v{0}=='(') {
+					$gaarr[$k] = -1*substr($v,1,-1);	
+				}
 			}
 		}
 		
@@ -4563,10 +4624,14 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			
 	} else if ($anstype == "file") {
 		if (isset($options['scoremethod']))if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$qn];} else {$scoremethod = $options['scoremethod'];}
+		if (isset($options['answer'])) {if ($multi>0) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
+		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 				
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$filename = basename($_FILES["qn$qn"]['name']);
 		$filename = preg_replace('/[^\w\.]/','',$filename);
+		$hasfile = false;
+		require_once("../includes/filehandler.php");
 		if (trim($filename)=='') {
 			$found = false;
 			if ($_POST["lf$qn"]!='') {
@@ -4582,78 +4647,131 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 			if ($found) {
 				$GLOBALS['partlastanswer'] = '@FILE:'.$_POST["lf$qn"].'@';
-				if (isset($scoremethod) && $scoremethod=='takeanything') {
-					return 1;
-				} else {
-					return 0;
+				if ($answerformat=='excel') {
+					$zip = new ZipArchive;
+					if ($zip->open(getasidfilepath($_POST["lf$qn"]))) {
+						$doc = new DOMDocument();
+						$doc->loadXML($zip->getFromName('xl/worksheets/sheet1.xml'));
+						$zip->close();
+					} else {
+						$GLOBALS['scoremessages'] .= _(' Unable to open Excel file');
+						return 0;
+					}
 				}
+				$hasfile = true;
 			} else {
 				$GLOBALS['partlastanswer'] = '';
 				return 0;
 			}
 		}
-		$extension = strtolower(strrchr($filename,"."));
-		$badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p",".exe");
-		if ($GLOBALS['scoremessages'] != '') {
-			$GLOBALS['scoremessages'] .= '<br/>';
-		}
-		$GLOBALS['scoremessages'] .= sprintf(_('Upload of %s: '), $filename);
-		if (in_array($extension,$badextensions)) {
-			$GLOBALS['partlastanswer'] = _('Error - Invalid file type');
-			$GLOBALS['scoremessages'] .= _('Error - Invalid file type');
-			return 0;
-		}
-		//if($GLOBALS['isreview']) {echo 'TRUE';}
-		if (isset($GLOBALS['asid'])) { //going to use assessmentid/random
-			$randstr = '';
-			for ($i=0; $i<6; $i++) {
-				$n = rand(0,61);
-				if ($n<10) { $randstr .= chr(48+$n);}
-				else if ($n<36) { $randstr .= chr(65 + $n-10);}
-				else { $randstr .= chr(97 + $n-36);}
+		if (!$hasfile) {
+			$extension = strtolower(strrchr($filename,"."));
+			$badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p",".exe");
+			if ($GLOBALS['scoremessages'] != '') {
+				$GLOBALS['scoremessages'] .= '<br/>';
 			}
-			$s3asid = $GLOBALS['testsettings']['id']."/$randstr";
-		} else {
-			$GLOBALS['partlastanswer'] = _('Error - no asid');
-			$GLOBALS['scoremessages'] .= _('Error - no asid');
-			return 0;
-		}
-		if (is_numeric($s3asid) && $s3asid==0) {  //set in testquestion for preview
-			$GLOBALS['partlastanswer'] = _('Error - File not uploaded in preview');
-			$GLOBALS['scoremessages'] .= _('Error - File not uploaded in preview');
-			return 0;
-		}
-		/*
-		not needed if each file is randomly coded
-		if (isset($GLOBALS['isreview']) && $GLOBALS['isreview']==true) {
-			$filename = 'rev-'.$filename;
-		}*/
-		if (is_uploaded_file($_FILES["qn$qn"]['tmp_name'])) {
-			require_once("../includes/filehandler.php");
-
-			$s3object = "adata/$s3asid/$filename";
-			if (storeuploadedfile("qn$qn",$s3object)) {
-				$GLOBALS['partlastanswer'] = "@FILE:$s3asid/$filename@";
-				$GLOBALS['scoremessages'] .= "Successful";
-				if (isset($scoremethod) && $scoremethod=='takeanything') {
-					return 1;
+			$GLOBALS['scoremessages'] .= sprintf(_('Upload of %s: '), $filename);
+			if (in_array($extension,$badextensions)) {
+				$GLOBALS['partlastanswer'] = _('Error - Invalid file type');
+				$GLOBALS['scoremessages'] .= _('Error - Invalid file type');
+				return 0;
+			}
+			//if($GLOBALS['isreview']) {echo 'TRUE';}
+			if (isset($GLOBALS['asid'])) { //going to use assessmentid/random
+				$randstr = '';
+				for ($i=0; $i<6; $i++) {
+					$n = rand(0,61);
+					if ($n<10) { $randstr .= chr(48+$n);}
+					else if ($n<36) { $randstr .= chr(65 + $n-10);}
+					else { $randstr .= chr(97 + $n-36);}
 				}
+				$s3asid = $GLOBALS['testsettings']['id']."/$randstr";
 			} else {
-				//echo "Error storing file";
-				$GLOBALS['partlastanswer'] = _('Error storing file');
-				$GLOBALS['scoremessages'] .= _('Error storing file');
+				$GLOBALS['partlastanswer'] = _('Error - no asid');
+				$GLOBALS['scoremessages'] .= _('Error - no asid');
+				return 0;
 			}
-			return 0;
+			if (is_numeric($s3asid) && $s3asid==0) {  //set in testquestion for preview
+				$GLOBALS['partlastanswer'] = _('Error - File not uploaded in preview');
+				$GLOBALS['scoremessages'] .= _('Error - File not uploaded in preview');
+				return 0;
+			}
+			/*
+			not needed if each file is randomly coded
+			if (isset($GLOBALS['isreview']) && $GLOBALS['isreview']==true) {
+				$filename = 'rev-'.$filename;
+			}*/
+			if (is_uploaded_file($_FILES["qn$qn"]['tmp_name'])) {
+				if ($answerformat=='excel') {
+					$zip = new ZipArchive;
+					if ($zip->open($_FILES["qn$qn"]['tmp_name'])) {
+						echo "opened excel";
+						$doc = new DOMDocument();
+						if ($doc->loadXML($zip->getFromName('xl/worksheets/sheet1.xml'))) {
+							echo "read into doc";
+						}
+						
+						$zip->close();
+					} else {
+						$GLOBALS['scoremessages'] .= _(' Unable to open Excel file');
+						return 0;
+					}
+				}
+	
+				$s3object = "adata/$s3asid/$filename";
+				if (storeuploadedfile("qn$qn",$s3object)) {
+					$GLOBALS['partlastanswer'] = "@FILE:$s3asid/$filename@";
+					$GLOBALS['scoremessages'] .= _("Successful");
+					$hasfile = true;
+				} else {
+					//echo "Error storing file";
+					$GLOBALS['partlastanswer'] = _('Error storing file');
+					$GLOBALS['scoremessages'] .= _('Error storing file');
+					return 0;
+				}
+				
+			} else {
+				//echo "Error uploading file";
+				if ($_FILES["qn$qn"]['error']==2 || $_FILES["qn$qn"]['error']==1) {
+					$GLOBALS['partlastanswer'] = _('Error uploading file - file too big');
+					$GLOBALS['scoremessages'] .= _('Error uploading file - file too big');
+				} else {
+					$GLOBALS['partlastanswer'] = _('Error uploading file');
+					$GLOBALS['scoremessages'] .= _('Error uploading file');
+				}
+				return 0;
+			}
+		}
+		if (isset($scoremethod) && $scoremethod=='takeanything') {
+			return 1;
 		} else {
-			//echo "Error uploading file";
-			if ($_FILES["qn$qn"]['error']==2 || $_FILES["qn$qn"]['error']==1) {
-				$GLOBALS['partlastanswer'] = _('Error uploading file - file too big');
-				$GLOBALS['scoremessages'] .= _('Error uploading file - file too big');
+			if ($answerformat=='excel') {
+				$doccells = array();
+				$els = $doc->getElementsByTagName('c');
+				foreach ($els as $el) {
+					$doccells[$el->getAttribute('r')] = $el->getElementsByTagName('v')->item(0)->nodeValue;
+				}
+				$pts = 0;
+				
+				foreach ($answer as $cell=>$val) {
+					if (!isset($doccells[$cell])) {continue;}
+					if (is_numeric($val)) {
+						if (abs($val-$doccells[$cell])<.01) {
+							$pts++;
+						} else {
+							$GLOBALS['scoremessages'] .= "<br/>Cell $cell incorrect";
+							echo "<br/>Cell $cell incorrect";
+						}
+					} else {
+						if (trim($val)==trim($doccells[$cell])) {
+							$pts++;
+						}
+					}
+				}
+				return $pts/count($answer);
 			} else {
-				$GLOBALS['partlastanswer'] = _('Error uploading file');
-				$GLOBALS['scoremessages'] .= _('Error uploading file');
+				return 0;
 			}
-			return 0;
 		}
 	} else if ($anstype == "conditional") {
 		$answer = $options['answer'];
@@ -5036,14 +5154,14 @@ function formathint($eword,$ansformats,$calledfrom, $islist=false,$doshort=false
 function getcolormark($c) {
 	global $imasroot;
 	
-	if (!isset($GLOBALS['showcolormark'])) { return '';}
+	if (isset($GLOBALS['nocolormark'])) { return '';}
 	
 	if ($c=='ansred') {
-		return '<img src="'.$imasroot.'/img/redx.gif"/>';
+		return '<img class="scoreboxicon" src="'.$imasroot.'/img/redx.gif" width="6" height="6"/>';
 	} else if ($c=='ansgrn') {
-		return '<img src="'.$imasroot.'/img/gchk.gif"/>';
+		return '<img class="scoreboxicon" src="'.$imasroot.'/img/gchk.gif" width="8" height="6"/>';
 	} else if ($c=='ansyel') {
-		return '<img src="'.$imasroot.'/img/ychk.gif"/>';
+		return '<img class="scoreboxicon" src="'.$imasroot.'/img/ychk.gif" width="8" height="6"/>';
 	} else {
 		return '';
 	}

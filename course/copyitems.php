@@ -135,6 +135,80 @@ if (!(isset($teacherid))) {
 				$gbcats[$row[0]] = $row[1];
 			}
 		}
+		if (isset($_POST['copyoutcomes'])) {
+			//load any existing outcomes
+			$outcomes = array();
+			$query = "SELECT tc.id,toc.id FROM imas_outcomes AS tc JOIN imas_outcomes AS toc ON tc.name=toc.name WHERE tc.courseid='{$_POST['ctc']}' AND ";
+			$query .= "toc.courseid='$cid'";
+			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+			if (mysql_num_rows($result)>0) {
+				$hasoutcomes = true;
+			} else {
+				$hasoutcomes = false;
+			}
+			while ($row = mysql_fetch_row($result)) {
+				$outcomes[$row[0]] = $row[1];
+			}
+			$newoutcomes = array();
+			$query = "SELECT id,name,ancestors FROM imas_outcomes WHERE courseid='{$_POST['ctc']}'";
+			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				if (isset($outcomes[$row[0]])) { continue;}
+				if ($row[2]=='') {
+					$row[2] = $row[0];
+				} else {
+					$row[2] = $row[0].','.$row[2];
+				}
+				$row[1] = addslashes($row[1]);
+				$query = "INSERT INTO imas_outcomes (courseid,name,ancestors) VALUES ";
+				$query .= "('$cid','{$row[1]}','{$row[2]}')";
+				mysql_query($query) or die("Query failed :$query " . mysql_error());
+				$outcomes[$row[0]] = mysql_insert_id();
+				$newoutcomes[] = $outcomes[$row[0]];
+			}
+			
+			if ($hasoutcomes) {
+				//already has outcomes, so we'll just add to the end of the existing list new outcomes
+				$query = "SELECT outcomes FROM imas_courses WHERE id='$cid'";
+				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+				$row = mysql_fetch_row($result);
+				$outcomesarr = unserialize($row[0]);
+				foreach ($newoutcomes as $o) {
+					$outcomesarr[] = $o;
+				}
+			} else {
+				//rewrite whole order
+				$query = "SELECT outcomes FROM imas_courses WHERE id='{$_POST['ctc']}'";
+				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+				$row = mysql_fetch_row($result);
+				function updateoutcomes(&$arr) {
+					global $outcomes;
+					foreach ($arr as $k=>$v) {
+						if (is_array($v)) {
+							updateoutcomes($arr[$k]['outcomes']);
+						} else {
+							$arr[$k] = $outcomes[$v];
+						}
+					}
+				}
+				$outcomesarr = unserialize($row[0]);
+				updateoutcomes($outcomesarr);
+			}
+			$newoutcomearr = addslashes(serialize($outcomesarr));
+			$query = "UPDATE imas_courses SET outcomes='$newoutcomearr' WHERE id='$cid'";
+			mysql_query($query) or die("Query failed :$query " . mysql_error());
+			
+		} else {
+			$outcomes = array();
+			$query = "SELECT tc.id,toc.id FROM imas_outcomes AS tc JOIN imas_outcomes AS toc ON tc.name=toc.name WHERE tc.courseid='{$_POST['ctc']}' AND ";
+			$query .= "toc.courseid='$cid'";
+			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				$outcomes[$row[0]] = $row[1];
+			}
+		}
+			
+		
 		if (isset($_POST['checked'])) {
 			$checked = $_POST['checked'];
 			$query = "SELECT blockcnt FROM imas_courses WHERE id='$cid'";
@@ -402,6 +476,7 @@ if ($overwriteBody==1) {
 	<tr><td class="r">Set all copied items as hidden to students?</td><td><input type="checkbox" name="copyhidden" value="1"/></td></tr>
 	<tr><td class="r">Copy offline grade items?</td><td> <input type=checkbox name="copyoffline"  value="1"/></td></tr>
 	<tr><td class="r">Copy rubrics? </td><td><input type=checkbox name="copyrubrics"  value="1" checked="checked"/></td></tr>
+	<tr><td class="r">Copy outcomes? </td><td><input type=checkbox name="copyoutcomes"  value="1" /></td></tr>
 	<tr><td class="r">Select calendar items to copy?</td><td> <input type=checkbox name="selectcalitems"  value="1"/></td></tr>
 	
 	<tr><td class="r">Copy "display at top" instructor forum posts? </td><td><input type=checkbox name="copystickyposts"  value="1" checked="checked"/></td></tr>

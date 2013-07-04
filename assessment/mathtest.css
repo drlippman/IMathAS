@@ -413,18 +413,20 @@ div.tips {
 }
 
 /*colors for answer highlighting*/
+div.ansred, div.ansgrn, div.ansyel {
+	padding: 2px;
+	display: inline-block;
+}
 .ansred {
 	border: 1px solid #f00;
-	padding: 2px;
 }
 .ansgrn {
 	border: 1px solid #0f0;
-	padding: 2px;
 }
 .ansyel {
 	border: 1px solid #fa0;
-	padding: 2px;
 }
+
 
 ul#navlist
 {
@@ -593,3 +595,46 @@ span.feedbackwrap.correct {
 span.feedbackwrap.incorrect {
 	background: #fee;
 }
+
+.suggestion_list
+ {
+ background: white;
+ border: 1px solid;
+ padding: 0px;
+ }
+
+ .suggestion_list ul
+ {
+ padding: 0;
+ margin: 0;
+ list-style-type: none;
+ }
+
+ .suggestion_list a
+ {
+ text-decoration: none;
+ color: navy;
+ padding: 5px;
+ }
+
+ .suggestion_list .selected
+ {
+ background: #99f;
+ }
+
+ tr#quickadd td {
+	 border-bottom: 1px solid #000;
+ }
+ 
+
+ #autosuggest
+ {
+ display: none;
+ }
+ 
+ input.iscredit {
+ 	 padding-left: 2em;
+ }
+ input.text {
+ 	 margin: 2px;
+ }

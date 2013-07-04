@@ -70,8 +70,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$settings = intval($_POST['settings']);
 		require_once("../includes/htmLawed.php");
 		$htmlawedconfig = array('elements'=>'*-script');
-		$_POST['description'] = addslashes(htmLawed(stripslashes($_POST['description']),$htmlawedconfig));
-		
+		if ($_POST['description']=='<p>Enter Wiki description here</p>') {
+			$_POST['description'] = '';
+		} else {
+			$_POST['description'] = addslashes(htmLawed(stripslashes($_POST['description']),$htmlawedconfig));
+		}
 		if (isset($_GET['id'])) {  //already have id - update
 			$query = "UPDATE imas_wikis SET name='{$_POST['name']}',description='{$_POST['description']}',startdate=$startdate,enddate=$enddate,";
 			$query .= "editbydate=$revisedate,avail='{$_POST['avail']}',groupsetid='{$_POST['groupsetid']}',settings=$settings ";
@@ -139,6 +142,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$started = true;
 			} else {
 				$started = false;
+			}
+			if ($line['description']=='') {
+				$line['description'] = "<p>Enter Wiki description here</p>";
 			}
 		} else {
 			$line['name'] = "Enter Wiki Name here";

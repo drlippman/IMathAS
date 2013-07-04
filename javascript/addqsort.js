@@ -9,12 +9,12 @@
 //output submitted via AHAH is new assessment itemorder in form:
 // item,item,n|w/wo~item~item,item
 
-
 function refreshTable() {
 	document.getElementById("curqtbl").innerHTML = generateTable();
 	 if (usingASCIIMath) {
 	      AMprocessNode(document.getElementById("curqtbl"));
          }
+         updateqgrpcookie();
 }
 function generateMoveSelect(num,cnt) {
 	num++; //adjust indexing
@@ -40,8 +40,8 @@ function moveitem2(from) {
 		if (from<to) {
 			to--;
 		}
-		if (itemarray[to-1].length==3) { //to is already group
-			if (tomove[0].length==3) { //if grouping a group
+		if (itemarray[to-1].length<5) { //to is already group
+			if (tomove[0].length<5) { //if grouping a group
 				for (var j=0; j<tomove[0][2].length; j++) {
 					itemarray[to-1][2].push(tomove[0][2][j]);
 				}
@@ -50,11 +50,11 @@ function moveitem2(from) {
 			}
 		} else { //to is not group
 			var existing = itemarray[to-1];
-			if (tomove[0].length==3) { //if grouping a group
+			if (tomove[0].length<5) { //if grouping a group
 				tomove[0][2].push(existing);
 				itemarray[to-1] = tomove[0];
 			} else {
-				itemarray[to-1] = [1,0,[existing,tomove[0]]];
+				itemarray[to-1] = [1,0,[existing,tomove[0]],1];
 			}
 		}
 	}
@@ -80,10 +80,18 @@ function removeitem(loc) {
 	return false;
 }
 
+function removegrp(loc) {
+	if (confirm("Are you sure you want to remove ALL questions in this group?")) {
+		doremoveitem(loc);
+		submitChanges();
+	}
+	return false;
+}
+
 function doremoveitem(loc) {
 	if (loc.indexOf("-")>-1) {
 		locparts = loc.split("-");
-		if (itemarray[locparts[0]].length==3) { //usual
+		if (itemarray[locparts[0]].length<5) { //usual
 			itemarray[locparts[0]][2].splice(locparts[1],1);
 			if (itemarray[locparts[0]][2].length==1) {
 				itemarray[locparts[0]] = itemarray[locparts[0]][2][0];
@@ -141,15 +149,15 @@ function groupSelected() {
 		return;
 	}
 	var to = grplist[grplist.length-1];
-	if (itemarray[to].length==3) {  //moving to existing group
+	if (itemarray[to].length<5) {  //moving to existing group
 		
 	} else {
 		var existing = itemarray[to];
-		itemarray[to] = [1,0,[existing]];
+		itemarray[to] = [1,0,[existing],1];
 	}
 	for (i=0; i<grplist.length-1; i++) { //going from last in current to first in current
 		tomove = itemarray.splice(grplist[i],1);
-		if (tomove[0].length==3) { //if grouping a group
+		if (tomove[0].length<5) { //if grouping a group
 			for (var j=0; j<tomove[0][2].length; j++) {
 				itemarray[to][2].push(tomove[0][2][j]);
 			}
@@ -184,7 +192,7 @@ function generateOutput() {
 		if (i!=0) {
 			out += ',';
 		}
-		if (itemarray[i].length==3) {  //is group
+		if (itemarray[i].length<5) {  //is group
 			out += itemarray[i][0]+'|'+itemarray[i][1];
 			for (var j=0; j<itemarray[i][2].length; j++) {
 				out += '~'+itemarray[i][2][j][0];
@@ -195,6 +203,30 @@ function generateOutput() {
 	}
 	return out;
 }
+
+function collapseqgrp(i) {
+	itemarray[i][3] = 0;
+	updateqgrpcookie();
+	refreshTable();
+} 
+function expandqgrp(i) {
+	itemarray[i][3] = 1;
+	updateqgrpcookie();
+	refreshTable();
+}
+function updateqgrpcookie() {
+	var closegrp = [];
+	for (var i=0; i<itemarray.length; i++) {
+		if (itemarray[i].length<5) {  //is group
+			if (itemarray[i][3]==0) {
+				closegrp.push(i);
+			}
+		}
+	}
+	document.cookie = 'closeqgrp-' +curaid+'='+ closegrp.join(',');	
+}
+
+
 function generateTable() {
 	olditemarray = itemarray;
 	itemcount = itemarray.length;
@@ -215,7 +247,7 @@ function generateTable() {
 	}
 	html += "</thead><tbody>";
 	for (var i=0; i<itemcount; i++) {
-		if (itemarray[i].length==3) { //is group
+		if (itemarray[i].length<5) { //is group
 			curitems = itemarray[i][2];
 			curisgroup = 1;
 		} else {  //not group
@@ -255,11 +287,16 @@ function generateTable() {
 					if (!curisgroup) {
 						html += "<input type=checkbox id=\"qc"+ln+"\" name=\"checked[]\" value=\""+(curisgroup?i+'-'+j:i)+":"+curitems[j][0]+"\"/></td><td>";
 					} else {
+						if (itemarray[i][3]==1) {
+							html += "<img src=\""+imasroot+"/img/collapse.gif\" onclick=\"collapseqgrp("+i+")\"/>";	
+						} else {
+							html += "<img src=\""+imasroot+"/img/expand.gif\" onclick=\"expandqgrp("+i+")\"/>";
+						}
 						html += '</td><td>';
 					}
 					html += ms;
 					if (curisgroup) {
-						html += "</td><td colspan='"+(beentaken?9:10)+"'><b>Group</b> ";
+						html += "</td><td colspan='"+(beentaken?8:9)+"'><b>Group</b> ";
 						html += "Select <input type='text' size='3' id='grpn"+i+"' value='"+itemarray[i][0]+"' onblur='updateGrpN("+i+")'/> from group of "+curitems.length;
 						html += " <select id='grptype"+i+"' onchange='updateGrpT("+i+")'><option value=0 ";
 						if (itemarray[i][1]==0) { 
@@ -270,7 +307,17 @@ function generateTable() {
 							html += "selected=1";
 						}
 						html += ">With</option></select> replacement";
-						html += "</td></tr><tr class="+curclass+"><td>";
+						html += "</td><td class=c><a href=\"#\" onclick=\"return removegrp('"+i+"');\">Remove</a></td></tr>";
+						if (itemarray[i][3]==0) { //collapsed group
+							if (curitems[0][4]==9999) { //points
+								curpt = defpoints;
+							} else {
+								curpt = curitems[0][4];
+							}
+							break;
+						}
+						html += "<tr class="+curclass+"><td>";
+						
 					}
 				}
 				if (curisgroup) {

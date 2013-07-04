@@ -1,7 +1,7 @@
 <?php  
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 70;
+$latest = 72;
 
 
 @set_time_limit(0);
@@ -1192,6 +1192,77 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			  	 $query = "UPDATE imas_courses SET istemplate=(istemplate | 8) WHERE id IN (".implode(',',$CFG['GEN']['guesttempaccts']).")";
 			 	 $res = mysql_query($query); 
 			  }
+		}
+		if ($last < 71) {
+			 $query = 'ALTER TABLE `imas_courses`  ADD `outcomes` TEXT NOT NULL DEFAULT \'\'';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 
+			 $query = 'CREATE TABLE `imas_outcomes` (
+				`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+				`courseid` INT(10) UNSIGNED NOT NULL, 
+				`name` VARCHAR(255) NOT NULL, 
+				`ancestors` TEXT NOT NULL,
+				INDEX ( `courseid`) 
+				) ENGINE = InnoDB';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 } 
+			 
+			 echo "Added imas_outcomes table<br/>";
+			
+			 //replace library category # with library name
+			 $query = 'UPDATE imas_questions AS iq, imas_libraries AS il SET iq.category=il.name WHERE iq.category=il.id AND il.name IS NOT NULL';
+			 mysql_query($query);
+			 
+			 $query = 'ALTER TABLE `imas_assessments`  ADD `defoutcome` INT(10) UNSIGNED NOT NULL DEFAULT \'0\'';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = 'ALTER TABLE `imas_linkedtext`  ADD `outcomes` TEXT NOT NULL';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = 'ALTER TABLE `imas_forums`  ADD `outcomes`  TEXT NOT NULL';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = 'ALTER TABLE `imas_gbitems`  ADD `outcomes`  TEXT NOT NULL';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			
+			//add indexes to forum_likes
+			 $query = "ALTER TABLE `imas_forum_likes` ADD INDEX(`userid`);"; 
+			 $res = mysql_query($query);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = "ALTER TABLE `imas_forum_likes` ADD INDEX(`postid`);"; 
+			 $res = mysql_query($query);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = "ALTER TABLE `imas_forum_likes` ADD INDEX(`threadid`);"; 
+			 $res = mysql_query($query);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			
+		}
+		if ($last<72) {
+			 $query = 'ALTER TABLE `imas_inlinetext`  ADD `outcomes` TEXT NOT NULL';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
 		}
 		/*$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {

@@ -2,6 +2,7 @@
 // Date: 2007-01-25
 // Author: CrazyDave
 // Website: http://www.clanccc.co.uk/moo/nested.html
+var noblockcookie = false;
 var Nested = new Class({
 	getOptions: function() {
 		return {
@@ -95,20 +96,30 @@ var Nested = new Class({
 		if (!el.moved) {
 			var sub = $E(this.options.parentTag, el);
 			if (sub) {
-				oblist = oblist.split(',');
-				var obn = el.getAttribute("obn");
-				var loc = arraysearch(obn,oblist);
-				if (sub.getStyle('display') == 'none') {
-					sub.setStyle('display', 'block');
-					el.removeClass(this.options.collapseClass);
-					if (loc==-1) {oblist.push(obn);}
+				if (noblockcookie) {
+					if (sub.getStyle('display') == 'none') {
+						sub.setStyle('display', 'block');
+						el.removeClass(this.options.collapseClass);
+					} else {
+						sub.setStyle('display', 'none');
+						el.addClass(this.options.collapseClass);
+					}
 				} else {
-					sub.setStyle('display', 'none');
-					el.addClass(this.options.collapseClass);
-					if (loc>-1) {oblist.splice(loc,1);}
+					oblist = oblist.split(',');
+					var obn = el.getAttribute("obn");
+					var loc = arraysearch(obn,oblist);
+					if (sub.getStyle('display') == 'none') {
+						sub.setStyle('display', 'block');
+						el.removeClass(this.options.collapseClass);
+						if (loc==-1) {oblist.push(obn);}
+					} else {
+						sub.setStyle('display', 'none');
+						el.addClass(this.options.collapseClass);
+						if (loc>-1) {oblist.splice(loc,1);}
+					}
+					oblist = oblist.join(',');
+					document.cookie = 'openblocks-' +cid+'='+ oblist;
 				}
-				oblist = oblist.join(',');
-				document.cookie = 'openblocks-' +cid+'='+ oblist;
 			}
 		}
 		event.stop();
@@ -308,7 +319,9 @@ function submitChanges() {
   els = document.getElementsByTagName("input");
   for (var i=0; i<els.length; i++) {
 	  if (els[i].type=="hidden") {
-		  params += '&'+els[i].id.substring(5) + '=' + encodeURIComponent(els[i].value);
+	  	  params += '&'+els[i].id.substring(5) + '=' + encodeURIComponent(els[i].value);
+	  } else if (els[i].type=="text" && els[i].className=="outcome") {
+		  params += '&'+els[i].id + '=' + encodeURIComponent(els[i].value);
 	  }
   }
 
@@ -332,12 +345,14 @@ function submitChanges() {
   } 
 }  
 
+
 function NestedahahDone(url, target) { 
   if (req.readyState == 4) { // only if req is "loaded" 
     if (req.status == 200) { // only if "OK" 
 	    if (req.responseText.substring(0,2)=='OK') {
 		    document.getElementById(target).innerHTML='';
 		    document.getElementById('recchg').disabled = true;
+		    window.onbeforeunload = null;
 		    setlinksdisp("");
 		    document.getElementById("qviewtree").innerHTML = req.responseText.substring(2);
 		    sortIt.haschanged = false;

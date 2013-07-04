@@ -23,11 +23,11 @@ $useeditor = "text,summary";
 
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 if (isset($_GET['id'])) {
-	$curBreadcrumb .= "&gt; Modify Linked Text\n";
-	$pagetitle = "Modify Linked Text";
+	$curBreadcrumb .= "&gt; Modify Link\n";
+	$pagetitle = "Modify Link";
 } else {
-	$curBreadcrumb .= "&gt; Add Linked Text\n";
-	$pagetitle = "Add Linked Text";
+	$curBreadcrumb .= "&gt; Add Link\n";
+	$pagetitle = "Add Link";
 }	
 if (isset($_GET['tb'])) {
 	$totb = $_GET['tb'];
@@ -168,8 +168,19 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		
 		require_once("../includes/htmLawed.php");
 		$htmlawedconfig = array('elements'=>'*-script' );
-		$_POST['summary'] = addslashes(htmLawed(stripslashes($_POST['summary']),$htmlawedconfig));
+		if ($_POST['summary']=='<p>Enter summary here (displays on course page)</p>') {
+			$_POST['summary'] = '';
+		} else {
+			$_POST['summary'] = addslashes(htmLawed(stripslashes($_POST['summary']),$htmlawedconfig));
+		}
 		$_POST['text'] = trim($_POST['text']);
+		$outcomes = array();
+		foreach ($_POST['outcomes'] as $o) {
+			if (is_numeric($o) && $o>0) {
+				$outcomes[] = intval($o);
+			}
+		}
+		$outcomes = implode(',',$outcomes);
 		if (isset($_GET['id'])) {  //already have id; update
 			$query = "SELECT text FROM imas_linkedtext WHERE id='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -190,13 +201,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				}
 			}
 			if (!$processingerror) {
-				$query = "UPDATE imas_linkedtext SET title='{$_POST['title']}',summary='{$_POST['summary']}',text='{$_POST['text']}',startdate=$startdate,enddate=$enddate,avail='{$_POST['avail']}',oncal='$oncal',caltag='$caltag',target='{$_POST['target']}' ";
+				$query = "UPDATE imas_linkedtext SET title='{$_POST['title']}',summary='{$_POST['summary']}',text='{$_POST['text']}',startdate=$startdate,enddate=$enddate,avail='{$_POST['avail']}',oncal='$oncal',caltag='$caltag',target='{$_POST['target']}',outcomes='$outcomes' ";
 				$query .= "WHERE id='{$_GET['id']}'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 		} else if (!$processingerror) { //add new
-			$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate,avail,oncal,caltag,target) VALUES ";
-			$query .= "('$cid','{$_POST['title']}','{$_POST['summary']}','{$_POST['text']}',$startdate,$enddate,'{$_POST['avail']}','$oncal','$caltag','{$_POST['target']}');";
+			$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate,avail,oncal,caltag,target,outcomes) VALUES ";
+			$query .= "('$cid','{$_POST['title']}','{$_POST['summary']}','{$_POST['text']}',$startdate,$enddate,'{$_POST['avail']}','$oncal','$caltag','{$_POST['target']}','$outcomes');";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			
 			$newtextid = mysql_insert_id();
@@ -277,6 +288,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else {
 				$type = 'text';
 			}
+			if ($line['outcomes']!='') {
+				$gradeoutcomes = explode(',',$line['outcomes']);
+			} else {
+				$gradeoutcomes = array();
+			}
+			if ($line['summary']=='') {
+				$line['summary'] = "<p>Enter summary here (displays on course page)</p>";
+			}
 		} else {
 			//set defaults
 			$line['title'] = "Enter title here";
@@ -290,6 +309,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$startdate = time();
 			$enddate = time() + 7*24*60*60;
 			$type = 'text';
+			$gradeoutcomes = array();
 		}   
 		if ($startdate!=0) {
 			$sdate = tzdate("m/d/Y",$startdate);
@@ -318,6 +338,34 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$type = 'text';
 			$line['text'] = "<p>Invalid tool was selected</p>";
 		}
+		
+		$query = "SELECT id,name FROM imas_outcomes WHERE courseid='$cid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$outcomenames = array();
+		while ($row = mysql_fetch_row($result)) {
+			$outcomenames[$row[0]] = $row[1];
+		}
+		$query = "SELECT outcomes FROM imas_courses WHERE id='$cid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$row = mysql_fetch_row($result);
+		if ($row[0]=='') {
+			$outcomearr = array();
+		} else {
+			$outcomearr = unserialize($row[0]);
+		}
+		$outcomes = array();
+		function flattenarr($ar) {
+			global $outcomes;
+			foreach ($ar as $v) {
+				if (is_array($v)) { //outcome group
+					$outcomes[] = array($v['name'], 1);
+					flattenarr($v['outcomes']);
+				} else {
+					$outcomes[] = array($v, 0);
+				}
+			}
+		}
+		flattenarr($outcomearr);
 			
 	}
 }
@@ -346,7 +394,6 @@ if ($overwriteBody==1) {
 	
 	<div class=breadcrumb><?php echo $curBreadcrumb  ?></div>
 	<div id="headeraddlinkedtext" class="pagetitle"><h2><?php echo $pagetitle ?></h2></div>
-
 
 	<form enctype="multipart/form-data" method=post action="<?php echo $page_formActionTag ?>">
 		<span class=form>Title: </span>
@@ -468,7 +515,13 @@ if ($overwriteBody==1) {
 			With tag: <input name="altcaltag" type=text size=1 value="<?php echo $line['caltag'];?>"/>
 		</span><BR class=form>
 		</div>
-		
+<?php
+	if (count($outcomes)>0) {
+			echo '<span class="form">Associate Outcomes:</span></span class="formright">';
+			writeHtmlMultiSelect('outcomes',$outcomes,$outcomenames,$gradeoutcomes,'Select an outcome...');
+			echo '</span><br class="form"/>';
+	}
+?>
 		<div class=submit><input type=submit value=Submit></div>	
 	</form>
 	

@@ -77,11 +77,11 @@
 	$attempts = array();
 	$regens = array();
 	
-	$query = "SELECT defpoints,name,itemorder FROM imas_assessments WHERE id='$aid'";
+	$query = "SELECT defpoints,name,itemorder,defoutcome FROM imas_assessments WHERE id='$aid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$defpoints = mysql_result($result,0,0);
-	echo mysql_result($result,0,1).'</h2></div>';
-	$itemorder = mysql_result($result,0,2);
+	list($defpoints, $aname, $itemorder, $defoutcome) = mysql_fetch_row($result);
+	echo $aname.'</h2></div>';
+	
 	$itemarr = array();
 	$itemnum = array();
 	foreach (explode(',',$itemorder) as $k=>$itel) {
@@ -285,7 +285,7 @@
 	$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
 	if (mysql_result($result,0,0)>0) {
 		include("../assessment/catscores.php");
-		catscores($qs,$avgscore,$defpoints);
+		catscores($qs,$avgscore,$defpoints,$defoutcome,$cid);
 	}
 	echo "<p><a href=\"gb-itemresults.php?cid=$cid&amp;aid=$aid\">Summary of assessment results</a> (only meaningful for non-randomized questions)</p>";
 	

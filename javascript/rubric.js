@@ -220,3 +220,7 @@ function quickgrade(qn,type,prefix,todo,vals) {
 function quicksetscore(el,score) {
 	document.getElementById(el).value = score;
 }
+
+function markallfullscore() {
+	$('.quickgrade').click();
+}

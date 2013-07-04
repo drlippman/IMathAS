@@ -101,10 +101,21 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
 			$rubric = 0;
 		}
+		$outcomes = array();
+		foreach ($_POST['outcomes'] as $o) {
+			if (is_numeric($o) && $o>0) {
+				$outcomes[] = intval($o);
+			}
+		}
+		$outcomes = implode(',',$outcomes);
 		
 		require_once("../includes/htmLawed.php");
 		$htmlawedconfig = array('elements'=>'*-script');
-		$_POST['description'] = addslashes(htmLawed(stripslashes($_POST['description']),$htmlawedconfig));
+		if ($_POST['description']=='<p>Enter forum description here</p>') {
+			$_POST['description'] = '';
+		} else {
+			$_POST['description'] = addslashes(htmLawed(stripslashes($_POST['description']),$htmlawedconfig));
+		}
 				
 		if (isset($_GET['id'])) {  //already have id; update
 			$query = "SELECT groupsetid FROM imas_forums WHERE id='{$_GET['id']}';";
@@ -117,13 +128,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			$query = "UPDATE imas_forums SET name='{$_POST['name']}',description='{$_POST['description']}',startdate=$startdate,enddate=$enddate,settings=$fsets,caltag='$caltag',";
 			$query .= "defdisplay='{$_POST['defdisplay']}',replyby=$replyby,postby=$postby,groupsetid='{$_POST['groupsetid']}',points='{$_POST['points']}',cntingb='{$_POST['cntingb']}',";
-			$query .= "gbcategory='{$_POST['gbcat']}',avail='{$_POST['avail']}',sortby='{$_POST['sortby']}',forumtype='{$_POST['forumtype']}',taglist='$taglist',rubric=$rubric ";
+			$query .= "gbcategory='{$_POST['gbcat']}',avail='{$_POST['avail']}',sortby='{$_POST['sortby']}',forumtype='{$_POST['forumtype']}',taglist='$taglist',rubric=$rubric,outcomes='$outcomes' ";
 			$query .= "WHERE id='{$_GET['id']}';";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$newforumid = $_GET['id'];
 		} else { //add new
-			$query = "INSERT INTO imas_forums (courseid,name,description,startdate,enddate,settings,defdisplay,replyby,postby,groupsetid,points,cntingb,gbcategory,avail,sortby,caltag,forumtype,taglist,rubric) VALUES ";
-			$query .= "('$cid','{$_POST['name']}','{$_POST['description']}',$startdate,$enddate,$fsets,'{$_POST['defdisplay']}',$replyby,$postby,'{$_POST['groupsetid']}','{$_POST['points']}','{$_POST['cntingb']}','{$_POST['gbcat']}','{$_POST['avail']}','{$_POST['sortby']}','$caltag','{$_POST['forumtype']}','$taglist',$rubric);";
+			$query = "INSERT INTO imas_forums (courseid,name,description,startdate,enddate,settings,defdisplay,replyby,postby,groupsetid,points,cntingb,gbcategory,avail,sortby,caltag,forumtype,taglist,rubric,outcomes) VALUES ";
+			$query .= "('$cid','{$_POST['name']}','{$_POST['description']}',$startdate,$enddate,$fsets,'{$_POST['defdisplay']}',$replyby,$postby,'{$_POST['groupsetid']}','{$_POST['points']}','{$_POST['cntingb']}','{$_POST['gbcat']}','{$_POST['avail']}','{$_POST['sortby']}','$caltag','{$_POST['forumtype']}','$taglist',$rubric,'$outcomes');";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			
 			$newforumid = mysql_insert_id();
@@ -202,6 +213,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$points = $line['points'];
 			$cntingb = $line['cntingb'];
 			$gbcat = $line['gbcategory'];
+			if ($line['outcomes']!='') {
+				$gradeoutcomes = explode(',',$line['outcomes']);
+			} else {
+				$gradeoutcomes = array();
+			}
+			if ($line['description']=='') {
+				$line['description'] = "<p>Enter forum description here</p>";
+			}
 		} else {  //ADD MODE
 			//set defaults
 			$line['name'] = "Enter Forum Name here";
@@ -211,6 +230,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$line['forumtype'] = 0;
 			$line['taglist'] = '';
 			$line['rubric'] = 0;
+			$gradeoutcomes = array();
 			$startdate = time();
 			$enddate = time() + 7*24*60*60;
 			$allowanon = false;
@@ -302,6 +322,33 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$rubric_vals[] = $row[0];
 			$rubric_names[] = $row[1];
 		}
+		$query = "SELECT id,name FROM imas_outcomes WHERE courseid='$cid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$outcomenames = array();
+		while ($row = mysql_fetch_row($result)) {
+			$outcomenames[$row[0]] = $row[1];
+		}
+		$query = "SELECT outcomes FROM imas_courses WHERE id='$cid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$row = mysql_fetch_row($result);
+		if ($row[0]=='') {
+			$outcomearr = array();
+		} else {
+			$outcomearr = unserialize($row[0]);
+		}
+		$outcomes = array();
+		function flattenarr($ar) {
+			global $outcomes;
+			foreach ($ar as $v) {
+				if (is_array($v)) { //outcome group
+					$outcomes[] = array($v['name'], 1);
+					flattenarr($v['outcomes']);
+				} else {
+					$outcomes[] = array($v, 0);
+				}
+			}
+		}
+		flattenarr($outcomearr);
 	}
 }
 
@@ -460,7 +507,7 @@ if ($overwriteBody==1) {
 	writeHtmlSelect("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],$gbcat,"Default",0);
 ?>
 		</span><br class=form>
-		
+
 		<span class=form>Use Scoring Rubric</span><span class=formright>
 <?php 
     writeHtmlSelect('rubric',$rubric_vals,$rubric_names,$line['rubric']);
@@ -468,6 +515,14 @@ if ($overwriteBody==1) {
     echo "| <a href=\"addrubric.php?cid=$cid&amp;from=addf&amp;fid={$_GET['id']}\">Edit rubrics</a> ";
 ?>
     		</span><br class="form"/>
+<?php
+	if (count($outcomes)>0) {
+			echo '<span class="form">Associate Outcomes:</span></span class="formright">';
+			writeHtmlMultiSelect('outcomes',$outcomes,$outcomenames,$gradeoutcomes,'Select an outcome...');
+			echo '</span><br class="form"/>';
+	}
+	
+?>
 		</div>
 		<span class="form">Forum type:</span>
 		<span class="formright">

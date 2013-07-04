@@ -411,7 +411,7 @@ switch($_GET['action']) {
 			echo '<a href="#" onclick="document.getElementById(\'ltiurl\').style.display=\'\'; return false;">LTI url/key?</a>';
 			echo '<span id="ltiurl" style="display:none;">';
 			if (isset($_GET['id'])) {
-				echo '<br/>URL: http://'. $_SERVER['HTTP_HOST'].$imasroot.'/bltilaunch.php<br/>';
+				echo '<br/>URL: '.$urlmode.$_SERVER['HTTP_HOST'].$imasroot.'/bltilaunch.php<br/>';
 				echo 'Key: placein_'.$_GET['id'].'_0 (to allow students to login directly to '.$installname.') or<br/>';
 				echo 'Key: placein_'.$_GET['id'].'_1 (to only allow access through the LMS )';
 			} else {

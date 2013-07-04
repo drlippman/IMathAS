@@ -221,6 +221,7 @@ $sql = 'CREATE TABLE `imas_assessments` ('
 	. ' `posttoforum` INT(10) UNSIGNED NOT NULL DEFAULT \'0\','
 	. ' `msgtoinstr` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\','
 	. ' `istutorial` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\','
+	. ' `defoutcome` INT(10) UNSIGNED NOT NULL DEFAULT \'0\','
 	. ' `ltisecret` VARCHAR(10) NOT NULL, '
 	. ' `endmsg` TEXT NOT NULL, '
 	. ' `viddata` TEXT NOT NULL, '
@@ -364,6 +365,7 @@ $sql = 'CREATE TABLE `imas_inlinetext` ('
 	. ' `avail` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'1\', '
 	. ' `oncal` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `caltag` VARCHAR(254) NOT NULL DEFAULT \'!\', '
+	. ' `outcomes` TEXT NOT NULL, '
         . ' INDEX (`courseid`), INDEX(`oncal`), INDEX(`avail`), INDEX(`startdate`), INDEX(`enddate`)'
         . ' )'
         . ' ENGINE = InnoDB'
@@ -395,6 +397,7 @@ $sql = 'CREATE TABLE `imas_linkedtext` ('
 	. ' `oncal` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `target` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `caltag` VARCHAR(254) NOT NULL DEFAULT \'!\', '
+	. ' `outcomes` TEXT NOT NULL, '
         . ' INDEX (`courseid`), INDEX(`oncal`), INDEX(`avail`), INDEX(`startdate`), INDEX(`enddate`)'
         . ' )'
         . ' ENGINE = InnoDB'
@@ -469,6 +472,7 @@ $sql = 'CREATE TABLE `imas_forums` ('
 	. ' `caltag` VARCHAR(254) NOT NULL DEFAULT \'FP--FR\', '
 	. ' `forumtype` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `taglist` TEXT NOT NULL, '
+	. ' `outcomes` TEXT NOT NULL, '
         . ' INDEX (`courseid`), INDEX(`points`), INDEX(`grpaid`), '
 	. ' INDEX(`avail`), INDEX(`startdate`), INDEX(`enddate`), INDEX(`replyby`), INDEX(`postby`) '
         . ' )'
@@ -530,7 +534,8 @@ $sql = 'CREATE TABLE `imas_forum_likes` (
 	`userid` INT(10) UNSIGNED NOT NULL, 
 	`threadid` INT(10) UNSIGNED NOT NULL, 
 	`postid` INT(10) UNSIGNED NOT NULL, 
-	`type` TINYINT(1) UNSIGNED NOT NULL
+	`type` TINYINT(1) UNSIGNED NOT NULL,
+	INDEX (`userid`), INDEX(`threadid`), INDEX(`postid`)
 	) ENGINE = InnoDB';
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());	
 echo 'imas_forum_likes created<br/>';
@@ -697,6 +702,7 @@ $sql = 'CREATE TABLE `imas_gbitems` ('
 	. ' `rubric` INT(10) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `cntingb` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'1\', '
 	. ' `tutoredit` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
+	. ' `outcomes` TEXT NOT NULL, '
         . ' INDEX (`courseid`), INDEX(`showdate`)'
         . ' )'
         . ' ENGINE = InnoDB'
@@ -782,6 +788,16 @@ $sql = 'CREATE TABLE `imas_stugroupmembers` ('
         . ' COMMENT = \'Student Group Members\';';
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 echo 'imas_stugroupmembers created<br/>';
+
+$sql = 'CREATE TABLE `imas_outcomes` (
+	`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+	`courseid` INT(10) UNSIGNED NOT NULL, 
+	`name` VARCHAR(255) NOT NULL, 
+	`ancestors` TEXT NOT NULL,
+	INDEX ( `courseid`) 
+	) ENGINE = InnoDB';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+echo 'imas_outcomes created<br/>';
 
 $sql = 'CREATE TABLE `imas_ltiusers` ('
         . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
