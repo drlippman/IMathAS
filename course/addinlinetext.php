@@ -91,9 +91,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$htmlawedconfig = array('elements'=>'*-script');
 		$_POST['text'] = addslashes(htmLawed(stripslashes($_POST['text']),$htmlawedconfig));
 		$outcomes = array();
-		foreach ($_POST['outcomes'] as $o) {
-			if (is_numeric($o) && $o>0) {
-				$outcomes[] = intval($o);
+		if (isset($_POST['outcomes'])) {
+			foreach ($_POST['outcomes'] as $o) {
+				if (is_numeric($o) && $o>0) {
+					$outcomes[] = intval($o);
+				}
 			}
 		}
 		$outcomes = implode(',',$outcomes);

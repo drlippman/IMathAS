@@ -64,9 +64,11 @@
 		$tutoredit = intval($_POST['tutoredit']);
 		$rubric = intval($_POST['rubric']);
 		$outcomes = array();
-		foreach ($_POST['outcomes'] as $o) {
-			if (is_numeric($o) && $o>0) {
-				$outcomes[] = intval($o);
+		if (isset($_POST['outcomes'])) {
+			foreach ($_POST['outcomes'] as $o) {
+				if (is_numeric($o) && $o>0) {
+					$outcomes[] = intval($o);
+				}
 			}
 		}
 		$outcomes = implode(',',$outcomes);
