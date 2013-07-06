@@ -445,6 +445,7 @@ function togglevideoembed() {
 	}	
 }
 function setupvideoembeds(i,el) {
+	
 	$('<span/>', {
 		text: " [+]",
 		title: _("Watch video here"),
@@ -471,11 +472,11 @@ function removemultiselect(el) {
 	p.remove();
 }
 
-(function($){
+jQuery(document).ready(function($) {
 	$('a').each(setuptracklinks);	
 	$('a[href*="youtu"]').each(setupvideoembeds);
 	$('a[href*="vimeo"]').each(setupvideoembeds);	
-})(jQuery);
+});
 
 function _(txt) {
 	if (typeof i18njs != "undefined" && i18njs[txt]) {
