@@ -112,7 +112,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if (isset($GLOBALS['scores'])) {
 		$scorenonzero = getscorenonzero();
 	}
-	
+
 	eval(interpret('control',$qdata['qtype'],$qdata['control']));
 	eval(interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
 	$toevalqtxt = interpret('qtext',$qdata['qtype'],$qdata['qtext']);
@@ -623,6 +623,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 			$scores[$kidx] = round(scorepart($anstype,$kidx,$_POST["qn$partnum"],$options,$qnidx+1)*$answeights[$kidx],4);
 			$partla[$kidx] = $GLOBALS['partlastanswer'];
 		}
+		
 		$partla = str_replace('&','',$partla);
 		$partla = preg_replace('/#+/','#',$partla);
 		
@@ -2948,7 +2949,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
+		
 		$GLOBALS['partlastanswer'] = $_POST["tc$qn"].'$#$'.$givenans;
+		
 		if ($givenans == null) {return 0;}
 		
 		if (checkreqtimes($_POST["tc$qn"],$requiretimes)==0) {
@@ -4788,7 +4791,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		foreach ($anstypes as $i=>$anst) {
 			$qnt = 1000*($qn+1)+$i;
 			if (isset($_POST["tc$qnt"])) {
-				$la[$i] = $_POST["tc$qnt"];
+				if ($anst=='calculated') {
+					$la[$i] = $_POST["tc$qnt"].'$#$'.$_POST["qn$qnt"];
+				} else {
+					$la[$i] = $_POST["tc$qnt"];
+				}
 			} else {
 				$la[$i] = $_POST["qn$qnt"];
 			}
