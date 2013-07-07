@@ -151,8 +151,8 @@ while ($row = mysql_fetch_row($result)) {
 	}
 	if ($row[4]<$uppertime && $row[4]>0 && $now>$row[3]) { //has review, and we're past enddate
 		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[4]));
-		$row[1] = str_replace('"','\"',$row[1]);
-		$tag = $row[11];
+		$row[1] = htmlentities($row[1]);
+		$tag = htmlentities($row[11]);
 		if ($now<$row[4]) { $colors = '#99f';} else {$colors = '#ccc';}
 		$json = "{type:\"AR\", time:\"$time\", tag:\"$tag\", ";
 		if ($now<$row[4] || isset($teacherid)) { $json .= "id:\"$row[0]\",";}
@@ -167,7 +167,7 @@ while ($row = mysql_fetch_row($result)) {
 		} else {
 			$tag = '?';
 		}*/
-		$tag = $row[10];
+		$tag = htmlentities($row[10]);
 		if ($row[9]==1 && $latepasses>0 && $now < $row[3]) {
 			$lp = 1;
 		} else {
@@ -179,7 +179,7 @@ while ($row = mysql_fetch_row($result)) {
 			$ulp = 0;
 		}
 		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[3]));
-		$row[1] = str_replace('"','\"',$row[1]);
+		$row[1] = htmlentities($row[1]);
 		$colors = makecolor2($row[2],$row[3],$now);
 		$json = "{type:\"A\", time:\"$time\", ";
 		if ($now<$row[3] || $row[4]>$now || isset($teacherid)) { $json .= "id:\"$row[0]\",";}
@@ -212,13 +212,14 @@ while ($row = mysql_fetch_row($result)) {
 	} else {
 		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[2]));
 	}
-	$row[1] = str_replace('"','\"',$row[1]);
+	$row[1] = htmlentities($row[1]);
 	$colors = makecolor2($row[4],$row[2],$now);
 	if ($row[7]==2) {
 		$colors = "#0f0";
 	}
-	$json = "{type:\"I\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors."\", tag:\"{$row[6]}\"".((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
-	$tag = $row[6];
+	$tag = htmlentities($row[6]);
+	$json = "{type:\"I\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors."\", tag:\"$tag\"".((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
+	
 	$byid['I'.$row[0]] = array($moday,$tag,$colors,$json);
 	
 }
@@ -237,7 +238,7 @@ while ($row = mysql_fetch_row($result)) {
 	} else {
 		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[2]));
 	}
-	$row[1] = str_replace('"','\"',$row[1]);
+	$row[1] = htmlentities($row[1]);
 	 if ((substr($row[3],0,4)=="http") && (strpos($row[3]," ")===false)) { //is a web link
 		   $alink = trim($row[3]);
 	   } else if (substr($row[3],0,5)=="file:") {
@@ -254,8 +255,9 @@ while ($row = mysql_fetch_row($result)) {
 	if (isset($teacherid) || ($now<$row[2] && $now>$row[4]) || $row[7]==2) {
 		$json .= "id:\"$row[0]\", ";
 	}
-	$json .= "name:\"$row[1]\", link:\"$alink\", color:\"".$colors."\", tag:\"{$row[6]}\"".((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
-	$tag = $row[6];
+	$tag = htmlentities($row[6]);
+	$json .= "name:\"$row[1]\", link:\"$alink\", color:\"".$colors."\", tag:\"$tag\"".((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
+	
 	$byid['L'.$row[0]] = array($moday,$tag,$colors,$json);
 }
 $query = "SELECT id,name,postby,replyby,startdate,caltag FROM imas_forums WHERE enddate>$exlowertime AND ((postby>$exlowertime AND postby<$uppertime) OR (replyby>$exlowertime AND replyby<$uppertime)) AND avail>0 AND courseid='$cid' ORDER BY name";
@@ -265,9 +267,11 @@ while ($row = mysql_fetch_row($result)) {
 		continue;
 	}
 	list($posttag,$replytag) = explode('--',$row[5]);
+	$posttag = htmlentities($posttag);
+	$replytag = htmlentities($replytag);
 	if ($row[2]!=2000000000) { //($row[2]>$now || isset($teacherid))
 		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[2]));
-		$row[1] = str_replace('"','\"',$row[1]);
+		$row[1] = htmlentities($row[1]);
 		$colors = makecolor2($row[4],$row[2],$now);
 		$json = "{type:\"FP\", time:\"$time\", ";
 		if ($row[2]>$now || isset($teacherid)) {
@@ -360,7 +364,8 @@ $query = "SELECT title,tag,date FROM imas_calitems WHERE date>$exlowertime AND d
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 while ($row = mysql_fetch_row($result)) {
 	list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[2]));
-	$row[0] = str_replace('"','\"',$row[0]);
+	$row[0] = htmlentities($row[0]);
+	$row[1] = htmlentities($row[1]);
 	$assess[$moday][$k] = "{type:\"C\", time:\"$time\", tag:\"$row[1]\", name:\"$row[0]\"}";
 	$tags[$k] = $row[1];
 	$k++;
