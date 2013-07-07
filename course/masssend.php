@@ -102,6 +102,7 @@
 			$sessiondata['graphdisp']=2;
 			require("../filter/filter.php");
 			$message = filter($message);
+			$message = preg_replace('/<img([^>])*src="\//','<img $1 src="'.$urlmode  . $_SERVER['HTTP_HOST'].'/',$message);
 			$headers  = 'MIME-Version: 1.0' . "\r\n";
 			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 			$query = "SELECT FirstName,LastName,email FROM imas_users WHERE id='$userid'";
