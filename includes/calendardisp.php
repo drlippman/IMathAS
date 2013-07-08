@@ -11,7 +11,7 @@ if (isset($_GET['callength'])) {
 
 function showcalendar($refpage) {
 
-global $imasroot,$cid,$userid,$teacherid,$previewshift,$latepasses,$urlmode, $latepasshrs;
+global $imasroot,$cid,$userid,$teacherid,$previewshift,$latepasses,$urlmode, $latepasshrs, $myrights, $tzoffset;
 
 $now= time();
 if ($previewshift!=-1) {
@@ -40,7 +40,8 @@ $dayofweek = tzdate('w',$today);
 $curmonum = tzdate('n',$today);
 $dayofmo = tzdate('j',$today);
 $curyr = tzdate('Y',$today);
-$midtoday = mktime(12,0,0,$curmonum,$dayofmo,$curyr);
+$serveroffset = date('Z') + $tzoffset*60;
+$midtoday = mktime(12,0,0,$curmonum,$dayofmo,$curyr)+$serveroffset;
 
 
 $hdrs = array();
