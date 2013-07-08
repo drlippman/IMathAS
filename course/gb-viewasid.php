@@ -572,7 +572,7 @@
 			$rubric[$r[0]] = $r[5];
 			if ($r[3]=='multipart') {
 				//if (preg_match('/answeights\s*=\s*("|\')([\d\.\,\s]+)/',$line['control'],$match)) {
-				if (($p = strpos($r[4],'answeights'))!==false) {
+				/*if (($p = strpos($r[4],'answeights'))!==false) {
 					$p = strpos($r[4],"\n",$p);
 					$answeights[$r[0]] = getansweights($r[0],$r[4]);
 				} else {
@@ -585,6 +585,8 @@
 						$answeights[$r[0]] = array(1);
 					}
 				}
+				*/
+				$answeights[$r[0]] = getansweights($r[0],$r[4]);
 				for ($i=0; $i<count($answeights[$r[0]])-1; $i++) {
 					$answeights[$r[0]][$i] = round($answeights[$r[0]][$i]*$pts[$r[0]],2);
 				}
@@ -969,7 +971,14 @@ function getansweights($qi,$code) {
 
 function sandboxgetweights($code,$seed) {
 	srand($seed);
-	eval(interpret('control','multipart',$code));
+	$code = interpret('control','multipart',$code);
+	if (strpos($code,'answeights')!==false) {
+		$code = str_replace("\n",';if(isset($answeights)){return;};'."\n",$code);
+	} else {
+		$code = str_replace("\n",';if(isset($anstypes)){return;};'."\n",$code);
+	}
+	
+	eval($code);
 	if (!isset($answeights)) {
 		if (!is_array($anstypes)) {
 			$anstypes = explode(",",$anstypes);
