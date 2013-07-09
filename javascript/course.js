@@ -23,6 +23,8 @@ function ahahDone(url, target) {
 	      setTimeout("drawPics()",100);
       }
       $('#'+target+' a').each(setuptracklinks);
+      $('#'+target+' a[href*="youtu"]').each(setupvideoembeds);
+      $('#'+target+' a[href*="vimeo"]').each(setupvideoembeds);
       
       var x = document.getElementById(target).getElementsByTagName("script"); 
       for(var i=0;i<x.length;i++) {

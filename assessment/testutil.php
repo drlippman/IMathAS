@@ -48,7 +48,7 @@ function getquestioninfo($qns,$testsettings) {
 		}
 		if ($line['qtype']=='multipart') {
 			//if (preg_match('/answeights\s*=\s*("|\')([\d\.\,\s]+)/',$line['control'],$match)) {
-			$foundweights = false;
+			/*$foundweights = false;
 			if (($p = strpos($line['control'],'answeights'))!==false || strpos($line['control'],'anstypes')===false) {
 				$p = strpos($line['control'],"\n",$p);
 				$weights = getansweights($line['id'],$line['control']);
@@ -71,6 +71,8 @@ function getquestioninfo($qns,$testsettings) {
 					$line['answeights'] = getansweights($line['id'],$line['control']);
 				}
 			}
+			*/
+			$line['answeights'] = getansweights($line['id'],$line['control']);
 		}
 		$line['allowregen'] = 1-floor($line['regen']/3);  //0 if no, 1 if use default
 		$line['regen'] = $line['regen']%3;
@@ -91,7 +93,13 @@ function getansweights($qi,$code) {
 
 function sandboxgetweights($code,$seed) {
 	srand($seed);
-	eval(interpret('control','multipart',$code));
+	$code = interpret('control','multipart',$code);
+	if (strpos($code,'answeights')!==false) {
+		$code = str_replace("\n",';if(isset($answeights)){return;};'."\n",$code);
+	} else {
+		$code = str_replace("\n",';if(isset($anstypes)){return;};'."\n",$code);
+	}
+	eval($code);
 	if (!isset($answeights)) {
 		if (!is_array($anstypes)) {
 			$anstypes = explode(",",$anstypes);

@@ -417,7 +417,7 @@
 			$teacherreview = $line['userid'];
 			
 			if ($qtype=='multipart') {
-				if (($p = strpos($qcontrol,'answeights'))!==false) {
+				/*if (($p = strpos($qcontrol,'answeights'))!==false) {
 					$p = strpos($qcontrol,"\n",$p);
 					$answeights = getansweights($loc,substr($qcontrol,0,$p));
 				} else {
@@ -430,6 +430,8 @@
 						$answeights = array(1);
 					}
 				}
+				*/
+				$answeights = getansweights($loc,$qcontrol);
 				for ($i=0; $i<count($answeights)-1; $i++) {
 					$answeights[$i] = round($answeights[$i]*$points,2);
 				}
@@ -609,7 +611,13 @@ function getansweights($qi,$code) {
 
 function sandboxgetweights($code,$seed) {
 	srand($seed);
-	eval(interpret('control','multipart',$code));
+	$code = interpret('control','multipart',$code);
+	if (strpos($code,'answeights')!==false) {
+		$code = str_replace("\n",';if(isset($answeights)){return;};'."\n",$code);
+	} else {
+		$code = str_replace("\n",';if(isset($anstypes)){return;};'."\n",$code);
+	}
+	eval($code);
 	if (!isset($answeights)) {
 		if (!is_array($anstypes)) {
 			$anstypes = explode(",",$anstypes);

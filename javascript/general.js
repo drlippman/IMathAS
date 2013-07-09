@@ -395,6 +395,66 @@ function setuptracklinks(i,el) {
 		});
 	}
 }
+var videoembedcounter = 0;
+function togglevideoembed() {
+	var id = this.id.substr(13);
+	var els = $('#videoiframe'+id);
+	if (els.length>0) {
+		if (els.css('display')=='none') {
+			els.show();
+			$(this).text(' [-]');
+			$(this).attr('title',_("Hide video"));
+		} else {
+			els.hide();
+			$(this).text(' [+]');
+			$(this).attr('title',_("Watch video here"));
+		}
+	} else {
+		var href = $(this).prev().attr('href');
+		if (href.match(/youtube\.com/)) {
+			var vidid = href.split('v=')[1].split(/[#&]/)[0];
+			var vidsrc = 'www.youtube.com/embed/';
+		} else if (href.match(/youtu\.be/)) {
+			var vidid = href.split('.be/')[1].split(/[#&]/)[0];
+			var vidsrc = 'www.youtube.com/embed/';
+		} else if (href.match(/vimeo/)) {
+			var vidid = href.split('.com/')[1].split(/[#&]/)[0];
+			var vidsrc = 'player.vimeo.com/video/';
+		}
+		var m = href.match(/.*t=((\d+)m)?((\d+)s)?.*/);
+		if (m == null) {
+			var timeref = '';
+		} else {
+			var timeref = '?start='+((m[2]?m[2]*60:0) + (m[4]?m[4]*1:0));
+		}
+		$('<iframe/>', {
+			id: 'videoiframe'+id,
+			width: 640,
+			height: 510,
+			src: location.protocol+'//'+vidsrc+vidid+timeref,
+			frameborder: 0,
+			allowfullscreen: 1
+		}).insertAfter($(this));
+		$('<br/>').insertAfter($(this));
+		$(this).text(' [-]');
+		$(this).attr('title',_("Hide video"));
+		if ($(this).prev().attr("data-base")) {
+			var inf = $(this).prev().attr('data-base').split('-');
+			recclick(inf[0], inf[1], href);
+		}
+	}	
+}
+function setupvideoembeds(i,el) {
+	
+	$('<span/>', {
+		text: " [+]",
+		title: _("Watch video here"),
+		id: 'videoembedbtn'+videoembedcounter,
+		click: togglevideoembed,
+		class: "videoembedbtn"
+	}).insertAfter(el);
+	videoembedcounter++;
+}
 
 function addmultiselect(el,n) {
 	var p = $(el).parent();
@@ -426,9 +486,11 @@ function hidefromcourselist(el,cid) {
 	}
 }
 
-(function($){
-	$('a').each(setuptracklinks);		
-})(jQuery);
+jQuery(document).ready(function($) {
+	$('a').each(setuptracklinks);	
+	$('a[href*="youtu"]').each(setupvideoembeds);
+	$('a[href*="vimeo"]').each(setupvideoembeds);	
+});
 
 function _(txt) {
 	if (typeof i18njs != "undefined" && i18njs[txt]) {

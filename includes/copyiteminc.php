@@ -122,7 +122,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 			$row[14] = implode(',',$newoutcomes);
 		}
 		$row = "'".implode("','",addslashes_deep($row))."'";
-		$query = "INSERT INTO imas_forums (courseid,name,description,startdate,enddate,settings,defdisplay,replyby,postby,avail,points,cntingb,gbcategory,forumtype,taglist) ";
+		$query = "INSERT INTO imas_forums (courseid,name,description,startdate,enddate,settings,defdisplay,replyby,postby,avail,points,cntingb,gbcategory,forumtype,taglist,outcomes) ";
 		$query .= "VALUES ('$cid',$row)";
 		mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$newtypeid = mysql_insert_id();
