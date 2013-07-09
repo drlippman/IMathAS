@@ -61,14 +61,14 @@ function catscores($quests,$scores,$defptsposs,$defoutcome=0,$cid) {
 		$out = '';
 		foreach ($arr as $oi) {
 			if (is_array($oi)) {
-				$outc = printoutcomes($oi['outcomes'],$ind.'&nbsp;&nbsp;&nbsp;',$outcomenames,$catscore, $catposs);
+				$outc = printoutcomes($oi['outcomes'],$ind+1,$outcomenames,$catscore, $catposs);
 				if ($outc!='') {
-					$out .= '<tr><td colspan="2">'.$ind.'<b>'.$oi['name'].'</b></td></tr>';
+					$out .= '<tr><td colspan="2"><span class="ind'.$ind.'"><b>'.$oi['name'].'</b></span></td></tr>';
 					$out .= $outc;
 				}
 			} else {
 				if (isset($catscore[$oi])) {
-					$out .= '<tr><td>'.$ind.$outcomenames[$oi].'</td>';
+					$out .= '<tr><td><span class="ind'.$ind.'">'.$outcomenames[$oi].'</span></td>';
 					$pc = round(100*$catscore[$oi]/$catposs[$oi],1);
 					$out .= "<td>{$catscore[$oi]} / {$catposs[$oi]} ($pc %)</td></tr>\n";
 				}
@@ -77,7 +77,7 @@ function catscores($quests,$scores,$defptsposs,$defoutcome=0,$cid) {
 		return $out;
 	}
 	if (count($tolookup)>0) {
-		$outc = preg_split('/<tr/',printoutcomes($outcomes, '', $outcomenames, $catscore, $catposs));
+		$outc = preg_split('/<tr/',printoutcomes($outcomes, 0, $outcomenames, $catscore, $catposs));
 		for ($i=1;$i<count($outc);$i++) {
 			if ($alt==0) {echo '<tr class="even"'; $alt=1;} else {echo '<tr class="odd"'; $alt=0;}
 			echo $outc[$i];

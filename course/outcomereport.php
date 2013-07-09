@@ -207,11 +207,11 @@ if ($report=='overview') {
 			}
 			$cnt++;
 			if (is_array($oi)) { //is outcome group
-				echo '<tr class="'.$class.'"><td colspan="'.$n.'">'.$ind.'<b>'.$oi['name'].'</b></td></tr>';
-				printoutcomestu($oi['outcomes'],$ind.'&nbsp;&nbsp;&nbsp;');
+				echo '<tr class="'.$class.'"><td colspan="'.$n.'"><span class="ind'.$ind.'"><b>'.$oi['name'].'</b></span></td></tr>';
+				printoutcomestu($oi['outcomes'],$ind+1);
 			} else {
 				echo '<tr class="'.$class.'">';
-				echo '<td>'.$ind.$outcomeinfo[$oi].'</td>';
+				echo '<td><span class="ind'.$ind.'">'.$outcomeinfo[$oi].'</span></td>';
 				if (isset($ot[1][3][$type]) && isset($ot[1][3][$type][$oi])) {
 					echo '<td>'.round(100*$ot[1][3][$type][$oi],1).'%</td>';	
 				} else {
@@ -232,7 +232,7 @@ if ($report=='overview') {
 			}
 		}
 	}
-	printoutcomestu($outcomes,'');
+	printoutcomestu($outcomes,0);
 	
 	
 }

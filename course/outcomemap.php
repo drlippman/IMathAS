@@ -207,11 +207,11 @@ function printoutcome($arr,$ind) {
 		}
 		$cnt++;
 		if (is_array($oi)) { //is outcome group
-			echo '<tr class="'.$class.'" colspan="'.$n.'"><td>'.$ind.'<b>'.$oi['name'].'</b></td></tr>';
-			printoutcome($oi['outcomes'],$ind.'&nbsp;&nbsp;&nbsp;');
+			echo '<tr class="'.$class.'" colspan="'.$n.'"><td><span class="ind'.$ind.'"><b>'.$oi['name'].'</b></span></td></tr>';
+			printoutcome($oi['outcomes'],$ind+1);
 		} else {
 			echo '<tr class="'.$class.'">';
-			echo '<td>'.$ind.$outcomeinfo[$oi].'</td><td>';
+			echo '<td><span class="ind'.$ind.'">'.$outcomeinfo[$oi].'</span></td><td>';
 			if (isset($outcomeassoc[$oi]['UG'])) {
 				printitems($outcomeassoc[$oi]['UG']);
 			}
@@ -227,7 +227,7 @@ function printoutcome($arr,$ind) {
 		}
 	}
 }
-printoutcome($outcomes,'');
+printoutcome($outcomes,0);
 echo '</tbody></table>';
 echo '<p>'._('Key:  L: Links, I: Inline Text, A: Assessments, F: Forums, O: Offline Grades').'</p>';
 require("../footer.php");

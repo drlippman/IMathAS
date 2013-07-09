@@ -568,3 +568,22 @@ div.multiselitem {
 	background-color: #eee;
 	margin-bottom: 2px;
 }
+.ind1 {
+	margin-left: .75em;
+}
+.ind2 {
+	margin-left: 1.5em;
+}
+.ind3 {
+	margin-left: 2.25em;
+}
+.ind4 {
+	margin-left: 3em;
+}
+.delx {
+	font-family: sans-serif;
+	color: #999;
+	float: right;
+	cursor: pointer;
+}
+	

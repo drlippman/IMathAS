@@ -412,6 +412,20 @@ function removemultiselect(el) {
 	p.remove();
 }
 
+function hidefromcourselist(el,cid) {
+	if (confirm("Are you SURE you want to hide this course from your course list?")) {
+		$.ajax({
+				type: "GET",
+				url: imasroot+'/admin/hidefromcourselist.php?cid='+cid
+		}).done(function(msg) {
+			if (msg=='OK') {
+				$(el).parent().slideUp();
+				$('#unhidelink').show();
+			}
+		});
+	}
+}
+
 (function($){
 	$('a').each(setuptracklinks);		
 })(jQuery);

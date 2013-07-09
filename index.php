@@ -83,18 +83,23 @@ if ($showmessagesgadget) {
 $page_studentCourseData = array();
 
 // check to see if the user is enrolled as a student
-$query = "SELECT imas_courses.name,imas_courses.id FROM imas_students,imas_courses ";
+$query = "SELECT imas_courses.name,imas_courses.id,imas_students.hidefromcourselist FROM imas_students,imas_courses ";
 $query .= "WHERE imas_students.courseid=imas_courses.id AND imas_students.userid='$userid' ";
 $query .= "AND (imas_courses.available=0 OR imas_courses.available=2) ORDER BY imas_courses.name";
 $result = mysql_query($query) or die("Query failed : " . mysql_error());
+$stuhashiddencourses = false;
 if (mysql_num_rows($result)==0) {
 	$noclass = true;
 } else {
-	$noclass = false;
 	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
-		$page_studentCourseData[] = $line;	
-		$page_coursenames[$line['id']] = $line['name'];
-		$postcheckstucids[] = $line['id'];
+		if ($line['hidefromcourselist']==1) {
+			$stuhashiddencourses = true;
+		} else {
+			$noclass = false;
+			$page_studentCourseData[] = $line;	
+			$page_coursenames[$line['id']] = $line['name'];
+			$postcheckstucids[] = $line['id'];
+		}
 	}
 }
 
@@ -311,13 +316,17 @@ require('./footer.php');
 
 
 function printCourses($data,$title,$type=null) {
-	global $shownewmsgnote, $shownewpostnote;
+	global $shownewmsgnote, $shownewpostnote, $stuhashiddencourses;
 	if (count($data)==0 && $type=='tutor') {return;}
 	global $myrights,$showmessagesgadget,$showpostsgadget,$newmsgcnt,$newpostcnt;
 	echo '<div class="block"><h3>'.$title.'</h3></div>';
 	echo '<div class="blockitems"><ul class="nomark courselist">';
 	for ($i=0; $i<count($data); $i++) {
-		echo '<li><a href="course/course.php?folder=0&cid='.$data[$i]['id'].'">';
+		echo '<li>';
+		if ($type=='take') {
+			echo '<span class="delx" onclick="return hidefromcourselist(this,'.$data[$i]['id'].');">x</span>';
+		}
+		echo '<a href="course/course.php?folder=0&cid='.$data[$i]['id'].'">';
 		echo $data[$i]['name'].'</a>';
 		if (isset($data[$i]['available']) && (($data[$i]['available']&1)==1)) {
 			echo ' <span style="color:green;">', _('Hidden'), '</span>';
@@ -339,7 +348,9 @@ function printCourses($data,$title,$type=null) {
 	}
 	echo '</ul>';
 	if ($type=='take') {
-		echo '<div class="center"><a class="abutton" href="forms.php?action=enroll">', _('Enroll in a New Class'), '</a></div>';
+		echo '<div class="center"><a class="abutton" href="forms.php?action=enroll">', _('Enroll in a New Class'), '</a>';
+		echo '<br><a id="unhidelink" '.($stuhashiddencourses?'':'style="display:none"').' class="small" href="admin/unhidefromcourselist.php">Unhide hidden courses</a>';
+		echo '</div>';
 	} else if ($type=='teach' && $myrights>39) {
 		echo '<div class="center"><a class="abutton" href="admin/admin.php">', _('Admin Page'), '</a></div>';
 	}
