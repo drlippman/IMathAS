@@ -4213,7 +4213,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					if (abs($aabs[1]-$abs[$i][1])>$defpttol*$reltolerance) {
 						continue;
 					}
-					if (abs($aabs[2]-$abs[$i][2])>$defpttol*$reltolerance) {
+					//check slope
+					$toladj = pow(10,-1-6*abs($aabs[2]));
+					if (abs($aabs[2]-$abs[$i][2])/(abs($aabs[2])+$toladj)>$deftol*$reltolerance) {
 						continue;
 					}
 					$scores[$key] = 1;
