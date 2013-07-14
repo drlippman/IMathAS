@@ -423,9 +423,9 @@ function togglevideoembed() {
 		}
 		var m = href.match(/.*t=((\d+)m)?((\d+)s)?.*/);
 		if (m == null) {
-			var timeref = '';
+			var timeref = '?rel=0';
 		} else {
-			var timeref = '?start='+((m[2]?m[2]*60:0) + (m[4]?m[4]*1:0));
+			var timeref = '?rel=0&start='+((m[2]?m[2]*60:0) + (m[4]?m[4]*1:0));
 		}
 		$('<iframe/>', {
 			id: 'videoiframe'+id,
