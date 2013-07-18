@@ -164,6 +164,8 @@ ul.nomark li { margin-top: .7em;}
 ol.lalpha {list-style-type: lower-alpha;}
 ol.lalpha li { margin-top: .7em;}
 
+.spaced li { margin-bottom: .3em;}
+
 ul.nomark {
 	padding-left: 40px;
 }

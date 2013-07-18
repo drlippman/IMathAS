@@ -95,7 +95,6 @@
 			reRowText = /.*sortby([\d\.]+).*/;
 			a = a.replace(reRowText,"$1");
 			b = b.replace(reRowText,"$1");
-			console.log (a + ","+b);
 			if (!isNaN(a/1) && !isNaN(b/1)) {
 				return a/1 - b/1;
 			}

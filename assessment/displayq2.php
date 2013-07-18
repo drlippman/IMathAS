@@ -1031,10 +1031,15 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$itempercol = ceil(count($randqkeys)/$ncol);
 			$displayformat = 'select';
 		}
+		if (substr($displayformat,0,8)=="limwidth") {
+			$divstyle = 'style="max-width:'.substr($displayformat,8).'px;"';
+		} else {
+			$divstyle = '';
+		}
 		if ($colorbox != '') {$out .= '<div class="'.$colorbox.'">';}
-		$out .= "<div class=match>\n";
-		$out .= "<p class=centered>$questiontitle</p>\n";
-		$out .= "<ul class=nomark>\n";
+		$out .= "<div class=\"match\" $divstyle>\n";
+		$out .= "<p class=\"centered\">$questiontitle</p>\n";
+		$out .= "<ul class=\"nomark\">\n";
 		$las = explode("|",$la);
 		$letters = array_slice(explode(',','a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z'),0,count($answers));
 		
@@ -1075,7 +1080,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$out .= "</div>";
 		
 		if (!isset($displayformat) || $displayformat!="select") {
-			$out .= "<div class=match>\n";
+			$out .= "<div class=\"match\" $divstyle>\n";
 			$out .= "<p class=centered>$answertitle</p>\n";
 			
 			$out .= "<ol class=lalpha>\n";
@@ -1583,49 +1588,60 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$tip .= _('Enter your answer as letters.  Examples: A B C, linear, a cat');
 			$shorttip = _('Enter text');
 		}
-		
-		$out .= "<input type=\"text\"  size=\"$sz\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" autocomplete=\"off\"  ";
-		
-		if ($showtips==2) { //eqntips: work in progress
-			if ($multi==0) {
-				$qnref = "$qn-0";
-			} else {
-				$qnref = ($multi-1).'-'.($qn%1000);
+		if ($displayformat=='select') {
+			$out .= "<select name=\"qn$qn\" id=\"qn$qn\" style=\"margin-right:20px\"><option value=\"\"> </option>";
+			foreach ($questions as $i=>$v) {
+				$out .= '<option value="'.htmlentities($v).'"';
+				if ($v==$la) {
+					$out .= ' selected="selected"';
+				}
+				$out .= '>'.htmlentities($v).'</option>';
 			}
-			$out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
-		}
-		$addlclass = '';
-		if ($displayformat=='debit') { $out .= 'onkeyup="editdebit(this)" style="text-align: right;" ';}
-		else if ($displayformat=='credit') { $out .= 'onkeyup="editcredit(this)" style="text-align: right;" '; $addlclass=' creditbox';}
-		else if ($displayformat=='alignright') { $out .= 'style="text-align: right;" ';}
-		$out .= "class=\"text $colorbox$addlclass\""; 
-		$out .= '/>';
-		$out .= getcolormark($colorbox);
-		if ($displayformat == 'usepreview') {
-			$preview .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"stringqpreview('qn$qn','p$qn','$answerformat')\" /> &nbsp;\n";
-			$preview .= "<span id=p$qn></span> ";
-		} else if ($displayformat == 'typeahead') {
-			if (!is_array($questions)) {
-				echo _('Eeek!  $questions is not defined or needs to be an array');
-			} else {
-				foreach ($questions as $i=>$v) {
-					$questions[$i] = htmlentities(trim($v));
-				}
-				
-				$out .= '<script type="text/javascript">';
-				$autosugglist = '["'.implode('","',$questions).'"]';
-				if (!isset($GLOBALS['autosuggestlists'])) {
-					$GLOBALS['autosuggestlists'] = array();
-				}
-				if (($k = array_search($autosugglist, $GLOBALS['autosuggestlists']))!==false) {
-					$asvar = 'autosuggestlist'.$k;
+			$out .= '</select>';
+		} else {
+			$out .= "<input type=\"text\"  size=\"$sz\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" autocomplete=\"off\"  ";
+			
+			if ($showtips==2) { //eqntips: work in progress
+				if ($multi==0) {
+					$qnref = "$qn-0";
 				} else {
-					$GLOBALS['autosuggestlists'][] = $autosugglist;
-					$ascnt = count($GLOBALS['autosuggestlists'])-1;
-					$out .= 'var autosuggestlist'.$ascnt.' = '.$autosugglist.';';
-					$asvar = 'autosuggestlist'.$ascnt;
+					$qnref = ($multi-1).'-'.($qn%1000);
 				}
-				$out .= 'initstack.push(function(){ autosugg'.$qn.' = new AutoSuggest(document.getElementById("qn'.$qn.'"),'.$asvar.');});</script>';
+				$out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
+			}
+			$addlclass = '';
+			if ($displayformat=='debit') { $out .= 'onkeyup="editdebit(this)" style="text-align: right;" ';}
+			else if ($displayformat=='credit') { $out .= 'onkeyup="editcredit(this)" style="text-align: right;" '; $addlclass=' creditbox';}
+			else if ($displayformat=='alignright') { $out .= 'style="text-align: right;" ';}
+			$out .= "class=\"text $colorbox$addlclass\""; 
+			$out .= '/>';
+			$out .= getcolormark($colorbox);
+			if ($displayformat == 'usepreview') {
+				$preview .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"stringqpreview('qn$qn','p$qn','$answerformat')\" /> &nbsp;\n";
+				$preview .= "<span id=p$qn></span> ";
+			} else if ($displayformat == 'typeahead') {
+				if (!is_array($questions)) {
+					echo _('Eeek!  $questions is not defined or needs to be an array');
+				} else {
+					foreach ($questions as $i=>$v) {
+						$questions[$i] = htmlentities(trim($v));
+					}
+					
+					$out .= '<script type="text/javascript">';
+					$autosugglist = '["'.implode('","',$questions).'"]';
+					if (!isset($GLOBALS['autosuggestlists'])) {
+						$GLOBALS['autosuggestlists'] = array();
+					}
+					if (($k = array_search($autosugglist, $GLOBALS['autosuggestlists']))!==false) {
+						$asvar = 'autosuggestlist'.$k;
+					} else {
+						$GLOBALS['autosuggestlists'][] = $autosugglist;
+						$ascnt = count($GLOBALS['autosuggestlists'])-1;
+						$out .= 'var autosuggestlist'.$ascnt.' = '.$autosugglist.';';
+						$asvar = 'autosuggestlist'.$ascnt;
+					}
+					$out .= 'initstack.push(function(){ autosugg'.$qn.' = new AutoSuggest(document.getElementById("qn'.$qn.'"),'.$asvar.');});</script>';
+				}
 			}
 		}
 		$sa .= $answer;
@@ -2299,7 +2315,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				}
 			}
 		} else {
-			$gaarr = array(str_replace(',','',$givenans));
+			$gaarr = array(str_replace(array('$',','),'',$givenans));
 			if (strpos($answer,'[')===false && strpos($answer,'(')===false) {
 				$anarr = array(str_replace(',','',$answer));
 			} else {
