@@ -760,11 +760,14 @@ function MQtoAM(tex) {
 			tex = tex.substring(0,i) + tex.substring(i+4);
 		}
 	}
+	tex = tex.replace(/_{([\d\.]+)}/g,'_$1');
 	tex = tex.replace(/{/g,'(');
 	tex = tex.replace(/}/g,')');
 	tex = tex.replace(/\(([\d\.]+)\)\/\(([\d\.]+)\)/g,'$1/$2');  //change (2)/(3) to 2/3
 	tex = tex.replace(/\/\(([\d\.]+)\)/g,'/$1');  //change /(3) to /3
-	tex = tex.replace(/_{(\d+)}/g,'_$1');
+	tex = tex.replace(/\(([\d\.]+)\)\//g,'$1/');  //change (3)/ to 3/
+	tex = tex.replace(/\/\(([\a-zA-Z])\)/g,'/$1');  //change /(x) to /x
+	tex = tex.replace(/\(([\a-zA-Z])\)\//g,'$1/');  //change (x)/ to x/
 	tex = tex.replace(/\^\(-1\)/g,'^-1');
 	tex = tex.replace(/\^\((-?[\d\.]+)\)/g,'^$1');
 	return tex;

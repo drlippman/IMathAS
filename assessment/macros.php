@@ -589,11 +589,21 @@ function showarrays() {
 		}
 		$alist = $newalist;
 	}
-	$out = '<table class=stats><thead><tr>';
+	$out = '<table class=stats>';
+	$hashdr = false;
 	for ($i = 0; $i<floor(count($alist)/2); $i++) {
-		$out .= "<th scope=\"col\">{$alist[2*$i]}</th>";
+		if ($alist[2*$i]!='') {
+			$hashdr = true; break;
+		}
 	}
-	$out .= "</tr></thead><tbody>";
+	if ($hashdr) {
+		$out .= '<thead><tr>';
+		for ($i = 0; $i<floor(count($alist)/2); $i++) {
+			$out .= "<th scope=\"col\">{$alist[2*$i]}</th>";
+		}
+		$out .= "</tr></thead>";
+	}
+	$out .= "<tbody>";
 	for ($j = 0; $j<count($alist[1]); $j++) {
 		$out .="<tr>";
 		for ($i = 0; $i<floor(count($alist)/2); $i++) {

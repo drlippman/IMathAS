@@ -84,7 +84,7 @@ function calculate(inputId,outputId,format) {
 				  }
 				  trg = str.match(/(sin|cos|tan|sec|csc|cot)\^/);
 				  reg = new RegExp("(sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs)([^\(])");
-				  errstuff = str.match(reg)
+				  errstuff = str.match(reg);
 				  if (trg!=null) {
 					  trg = trg[1];
 					  //str += "["+_("use")+" ("+trg+"(x))^2 "+_("instead of ")+trg+_("^2(x)]");

@@ -516,6 +516,29 @@ img {
 	border: 0 none;
 }
 
+table.tchart {
+	border-collapse: collapse;
+}
+table.tchart td {
+	min-width: 3em;
+}
+table.acctstatement {
+	border-collapse: collapse;
+}
+table.acctstatement th, table.acctstatement td {
+	border: 1px solid #eee;
+	background-color: #fff;
+	padding: 1px 5px;
+}
+
+table.acctstatement thead th {
+	text-align: center;
+	z-index: 20;
+	background-color: #eef;
+	font-weight: bold;
+	border-bottom: 2px solid #333;
+	padding: 5px;
+}
 
 table.gridded {
 	border-collapse: collapse;

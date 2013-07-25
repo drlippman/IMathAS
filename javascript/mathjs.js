@@ -104,6 +104,7 @@ function mathjs(st,varlist) {
   st = st.replace(/\s/g,"");
   st = st.replace(/(Sin|Cos|Tan|Sec|Csc|Cot|Arc|Abs|Log|Ln|Sqrt)/g, matchtolower);
   st = st.replace(/log_([\d\.]+)\(/g,"nthlog($1,");
+  st = st.replace(/log_\(([\d\.]+)\)\(/g,"nthlog($1,");
   st = st.replace(/log/g,"logten");
   if (st.indexOf("^-1")!=-1) {
     st = st.replace(/sin\^-1/g,"arcsin");
