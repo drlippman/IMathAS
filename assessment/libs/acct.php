@@ -4,7 +4,7 @@
 //June 2013
 
 global $allowedmacros;
-array_push($allowedmacros,"makejournal","scorejournal","makeaccttable","makeaccttable2","makeTchart","scoreTchart","makestatement","scorestatement","makeinventory","makeTchartsfromjournal","scoreTchartsfromjournal","makeledgerfromjournal","maketrialbalance","maketrialbalancefromjournal","scoretrialbalance","scoretrialbalancefromjournal","totalsfromjournal");
+array_push($allowedmacros,"makejournal","scorejournal","makeaccttable","makeaccttable2","makeTchart","scoreTchart","makestatement","scorestatement","makeinventory","makeTchartsfromjournal","scoreTchartsfromjournal","makeledgerfromjournal","maketrialbalance","maketrialbalancefromjournal","scoretrialbalance","scoretrialbalancefromjournal","totalsfromjournal","prettyacct");
 
 //makestatement(statement array, start number, options, $anstypes, $questions, $answer, $showanswer, $displayformat, $answerformat, $answerboxsize)
 //statement array form:
@@ -12,6 +12,7 @@ array_push($allowedmacros,"makejournal","scorejournal","makeaccttable","makeacct
 //$statement[#]['header'] = "title", or array ("title", value) if fixed value is associated
 //$statement[#]['headerops'] = array of options for header.  If not set, header is fixed.  Can't use with header with value.
 //$statement[#]['elements'] = array("Title",amount,"title",amount)
+//$statement[#]['explanation'] = array(explanation for each line of elements)
 //$statement[#]['indent'] = number of indent for elements group.  If >0, then header and tottitle will be indented one less
 //$statement[#]['fixed'] = array(index into elements to have fixed - first col only)
 //$statement[#]['totrows'] = total number of entry rows to show. optional, defaults to number of elements
@@ -25,26 +26,31 @@ array_push($allowedmacros,"makejournal","scorejournal","makeaccttable","makeacct
 //$statement[#]['totalindent'] = number of indent for totaltotal entry.  0 if not set
 //$statement[#]['dblunder'] = true if double-underline under the totaltotal entry
 function makestatement($s, $sn, $ops, &$anstypes, &$questions, &$answer, &$showanswer, &$displayformat,  &$answerformat,  &$answerboxsize) {
+	$debug = false;
 	if ($anstypes === null) { $anstypes = array();}
 	if ($questions === null) { $questions = array();}
 	if ($answer === null) { $answer = array();}
 	if ($showanswer === null) { $showanswer = '';}
 	if ($displayformat === null) { $displayformat = array();}
 	if ($answerformat === null) { $answerformat = array();}
-	natsort($ops);
+	
 	if ($ops[0] == 'pulldowns') {
 		array_shift($ops);
 		$disptype = 'select';
 	} else {
 		$disptype = 'typeahead';
 	}
+	natsort($ops);
 	$maxind = 0;
 		 
 	
-	$maxsizedescr = 0;  $maxsizeentry = 0; $hasdecimals = false;
+	$maxsizedescr = 0;  $maxsizeentry = 0; $hasdecimals = false;  $hasexp = false; $expspan = 0; $blankexp = '';
 	foreach ($s as $ix=>$jd) {
 		if (!isset($jd['elements'])) {continue;}
 		for ($i=0;$i<count($jd['elements']);$i+=2) {
+			if ($debug && !in_array($jd['elements'][$i], $ops) && !(isset($jd['fixed']) && in_array($i, $jd['fixed']))) {
+				echo "Eek: ".$jd['elements'][$i]." not in options array<br/>";
+			}
 			$sl = strlen($jd['elements'][$i]);
 			if ($sl>$maxsizedescr) { $maxsizedescr = $sl;}
 			$sl = strlen($jd['elements'][$i+1]);
@@ -56,6 +62,9 @@ function makestatement($s, $sn, $ops, &$anstypes, &$questions, &$answer, &$showa
 		}
 		if (isset($jd['totalindent']) && $jd['totalindent']>$maxind) {
 			$maxind = $jd['totalindent'];
+		}
+		if (isset($jd['explanation'])) {
+			$hasexp = true; $expspan = 1; $blankexp = '<td></td>';
 		}
 	}
 	foreach ($ops as $op) {
@@ -83,10 +92,11 @@ function makestatement($s, $sn, $ops, &$anstypes, &$questions, &$answer, &$showa
 	$maxsizeentry += 3;
 	if (isset($s[0]['bigtitle'])) {
 		$out = '<table class="acctstatement"><thead><tr><th colspan="'.($maxind+2).'" class="c"><b>'.$s[0]['bigtitle'].'</b></th></tr><thead><tbody>';
+		$sa = '<table class="acctstatement"><thead><tr><th colspan="'.($maxind+2+$expspan).'" class="c"><b>'.$s[0]['bigtitle'].'</b></th></tr><thead><tbody>';
 	} else {
 		$out = '<table class="acctstatement"><tbody>';
+		$sa = '<table class="acctstatement"><tbody>';
 	}
-	$sa = $out;
 	$grouptots = array();  $addspacer = false;
 	foreach ($s as $ix=>$sg) {
 		if (isset($sg['indent']) && $sg['indent']>0) {
@@ -95,15 +105,15 @@ function makestatement($s, $sn, $ops, &$anstypes, &$questions, &$answer, &$showa
 		} else {
 			$hdrindent = 0;  $ind =0;
 		}
-		if ($addspacer) {
+		if ($addspacer && !isset($sg['nospacer'])) {
 			$out .= '<tr><td colspan="'.($maxind+2).'">&nbsp;</td></tr>';
-			$sa .= '<tr><td colspan="'.($maxind+2).'">&nbsp;</td></tr>';
+			$sa .= '<tr><td colspan="'.($maxind+2+$expspan).'">&nbsp;</td></tr>';
 		}
 		if (isset($sg['header'])) {
 			$addspacer = false;
 			if (is_array($sg['header'])) { 
 				$out .= '<tr><td style="padding-left:'.($hdrindent+.5).'em;"><b>'.$sg['header'][0].'</b></td>'.$pre[$hdrindent].'<td class="r">'.$sg['header'][1].'</td>'.$post[$hdrindent].'</tr>';
-				$sa .= '<tr><td style="padding-left:'.($hdrindent+.5).'em;"><b>'.$sg['header'][0].'</b></td>'.$pre[$hdrindent].'<td class="r">'.$sg['header'][1].'</td>'.$post[$hdrindent].'</tr>';
+				$sa .= '<tr><td style="padding-left:'.($hdrindent+.5).'em;"><b>'.$sg['header'][0].'</b></td>'.$pre[$hdrindent].'<td class="r">'.$sg['header'][1].'</td>'.$post[$hdrindent].$blankexp.'</tr>';
 			} else {
 				if (isset($sg['headerops'])) {
 					if ($sg['headerops'][0] == 'pulldowns') {
@@ -113,13 +123,16 @@ function makestatement($s, $sn, $ops, &$anstypes, &$questions, &$answer, &$showa
 						$tdisptype = 'typeahead';
 					}
 					natsort($sg['headerops']);
+					if ($debug && !in_array($sg['header'], $sg['headerops'])) {
+						echo "Eek: ".$sg['header']." not in header options array<br/>";
+					}
 					$anstypes[$sn] = 'string'; $displayformat[$sn] = $tdisptype; $questions[$sn] = $sg['headerops'];  $answer[$sn] = $sg['header']; $answerboxsize[$sn] = 40;
 					$out .= '<tr><td colspan="'.($maxind+2).' style="padding-left:'.($hdrindent+.5).'em;"">[AB'.$sn.']</td></tr>';
-					$sa .= '<tr><td colspan="'.($maxind+2).'" style="padding-left:'.($hdrindent+.5).'em;"><b>'.$sg['header'].'</b></td></tr>';
+					$sa .= '<tr><td colspan="'.($maxind+2+$expspan).'" style="padding-left:'.($hdrindent+.5).'em;"><b>'.$sg['header'].'</b></td></tr>';
 					$sn++;
 				} else {
 					$out .= '<tr><td colspan="'.($maxind+2).'" style="padding-left:'.($hdrindent+.5).'em;"><b>'.$sg['header'].'</b></td></tr>';
-					$sa .= '<tr><td colspan="'.($maxind+2).'" style="padding-left:'.($hdrindent+.5).'em;"><b>'.$sg['header'].'</b></td></tr>';
+					$sa .= '<tr><td colspan="'.($maxind+2+$expspan).'" style="padding-left:'.($hdrindent+.5).'em;"><b>'.$sg['header'].'</b></td></tr>';
 				}
 			}
 		}
@@ -140,7 +153,12 @@ function makestatement($s, $sn, $ops, &$anstypes, &$questions, &$answer, &$showa
 				}
 				$out .= $pre[$ind].'<td>[AB'.($sn+1).']</td>'.$post[$ind].'</tr>';
 				$sg['elements'][$i+1] = str_replace(array('$',',',' '),'',$sg['elements'][$i+1])*1;
-				$sa .= '<tr><td style="padding-left:'.($ind+.5).'em;">'.$sg['elements'][$i].'</td>'.$pre[$ind].'<td class="r">'.($hasdecimals?number_format($sg['elements'][$i+1],2,'.',','):number_format($sg['elements'][$i+1])).'</td>'.$post[$ind].'</tr>';
+				$sa .= '<tr><td style="padding-left:'.($ind+.5).'em;">'.$sg['elements'][$i].'</td>'.$pre[$ind].'<td class="r">'.($hasdecimals?number_format($sg['elements'][$i+1],2,'.',','):number_format($sg['elements'][$i+1])).'</td>'.$post[$ind];
+				if (isset($sg['explanation'])) {
+					$sa .= '<td>'.$sg['explanation'][$i/2].'</td></tr>';
+				} else {
+					$sa .= $blankexp.'</tr>';
+				}
 				$anstypes[$sn+1] = 'number'; $displayformat[$sn+1] = 'alignright'; $answerformat[$sn+1] = 'parenneg'; $answer[$sn+1] = $sg['elements'][$i+1]; $answerboxsize[$sn+1] = $maxsizeentry;
 				$tot += $sg['elements'][$i+1]*(isset($sg['totsigns'])?$sg['totsigns'][$i/2]:1);
 				$sn += 2;
@@ -179,17 +197,20 @@ function makestatement($s, $sn, $ops, &$anstypes, &$questions, &$answer, &$showa
 						} else {
 							$tdisptype = 'typeahead';
 						}
+						if ($debug && !in_array($sg['tottitle'], $sg['tottitleops'])) {
+							echo "Eek: ".$sg['tottitle']." not in total options array<br/>";
+						}
 						natsort($sg['tottitleops']);
-						$anstypes[$sn] = 'string'; $displayformat[$sn] = $tdisptype; $questions[$sn] = $sg['tottitleops'];  $answer[$sn] = $sg['tottitle'][0]; $answerboxsize[$sn] = $maxsizedescr;
+						$anstypes[$sn] = 'string'; $displayformat[$sn] = $tdisptype; $questions[$sn] = $sg['tottitleops'];  $answer[$sn] = $sg['tottitle']; $answerboxsize[$sn] = $maxsizedescr;
 						$out .= '<tr><td style="padding-left:'.($hdrindent+.5).'em;">[AB'.$sn.']</td>';
-						$sa .= '<tr><td style="padding-left:'.($hdrindent+.5).'em;"><b>'.$sg['totaltotal'][0].'</b></td>';
+						$sa .= '<tr><td style="padding-left:'.($hdrindent+.5).'em;"><b>'.$sg['tottitle'].'</b></td>';
 						$sn++;
 					} else {
 						$out .= '<tr><td style="padding-left:'.($hdrindent+.5).'em;"><b>'.$sg['tottitle'].'</b></td>';
 						$sa .= '<tr><td style="padding-left:'.($hdrindent+.5).'em;"><b>'.$sg['tottitle'].'</b></td>';
 					}
 					$out .= $pre[$hdrindent].'<td>[AB'.$sn.']</td>'.$post[$hdrindent].'</tr>';
-					$sa .= $pre[$hdrindent].'<td class="r">'.($hasdecimals?number_format($tot,2,'.',','):number_format($tot)).'</td>'.$post[$hdrindent].'</tr>';
+					$sa .= $pre[$hdrindent].'<td class="r">'.($hasdecimals?number_format($tot,2,'.',','):number_format($tot)).'</td>'.$post[$hdrindent].$blankexp.'</tr>';
 					
 				}
 				$anstypes[$sn] = 'number'; $displayformat[$sn] = 'alignright'; $answerformat[$sn] = 'parenneg'; $answer[$sn] = $tot; $answerboxsize[$sn] = $maxsizeentry;
@@ -223,6 +244,9 @@ function makestatement($s, $sn, $ops, &$anstypes, &$questions, &$answer, &$showa
 				} else {
 					$tdisptype = 'typeahead';
 				}
+				if ($debug && !in_array( $sg['totaltotal'][0], $sg['totaltotalops'])) {
+					echo "Eek: ".$sg['totaltotal'][0]." not in total options array<br/>";
+				}
 				natsort($sg['totaltotalops']);
 				$anstypes[$sn] = 'string'; $displayformat[$sn] = $tdisptype; $questions[$sn] = $sg['totaltotalops'];  $answer[$sn] = $sg['totaltotal'][0]; $answerboxsize[$sn] = $maxsizedescr;
 				$out .= '<tr><td style="padding-left:'.($totind+.5).'em;">[AB'.$sn.']</td>';
@@ -238,7 +262,7 @@ function makestatement($s, $sn, $ops, &$anstypes, &$questions, &$answer, &$showa
 				$under = '';
 			}
 			$out .= $pre[$totind].'<td'.$under.'>[AB'.$sn.']</td>'.$post[$totind].'</tr>';
-			$sa .= $pre[$totind].'<td class="r"'.$under.'>'.($hasdecimals?number_format($tottot,2,'.',','):number_format($tottot)).'</td>'.$post[$totind].'</tr>';
+			$sa .= $pre[$totind].'<td class="r"'.$under.'>'.($hasdecimals?number_format($tottot,2,'.',','):number_format($tottot)).'</td>'.$post[$totind].$blankexp.'</tr>';
 			$anstypes[$sn] = 'number'; $displayformat[$sn] = 'alignright'; $answerformat[$sn] = 'parenneg'; $answer[$sn] = $tottot; $answerboxsize[$sn] = $maxsizeentry;
 			$sn++;
 		}
@@ -260,48 +284,47 @@ function scorestatement($stua, $answer, $s, $sn) {
 	//any total and totaltotal entries will be fine.  Just need to handle multiple orders within a group.
 	if ($stua == null) {return $answer;}
 	
-	$newans = $answer;
 	foreach ($s as $ix=>$sg) {
+		if (isset($sg['header']) && isset($sg['headerops'])) { //there's a header to score.  Only one answer, so no work to do but advance $sn
+			$sn++;
+		}
 		if (isset($sg['elements'])) {
 			$n = count($sg['elements'])/2;
-			for ($k=0;$k<count($sg['elements']);$k+=2) {
-				$sg['elements'][$k+1] = str_replace(array('$',',',' '),'',$sg['elements'][$k+1])*1;
-			}
+			$usedans = array();
 			for ($i=$sn;$i<$sn+2*$n;$i+=2) {
-				$matchtype = -1;  $matchall = -1;
-				for ($k=0;$k<count($sg['elements']);$k+=2) {
-					if (trim(strtolower($stua[$i]))==trim(strtolower($sg['elements'][$k]))) {
+				$matchtype = -1;  $matchval = -1;
+				for ($k=$sn;$k<$sn+2*$n;$k+=2) {
+					if (trim(strtolower($stua[$i]))==trim(strtolower($answer[$k]))) { 
 						$matchtype = $k;
-						$stua[$i+1] = str_replace(array('$',',',' '),'',$stua[$i+1]);
-						if ($stua[$i+1]{0}=='(') {
-							$stua[$i+1] = -1*substr($stua[$i+1],1,-1);	
-						}
-						if (abs($stua[$i+1] - $sg['elements'][$k+1])<.01) {
-							$matchall = $k;
-							break;
-						}
+						break;					
+					} else if (abs($stua[$i+1]-$answer[$k+1])<.01) {
+						$matchval = $k;	
 					}
 				}
-				if ($matchall>-1) {
-					$newans[$i] = $sg['elements'][$matchall];
-					$newans[$i+1] = $sg['elements'][$matchall+1];
-					$locbak = $sn + 2*$matchall/2;
-					//echo "ix: $ix, i: $i, loc: $loc, locbak: $locbak<br/>";
+				if ($matchtype > -1 && !in_array($matchtype,$usedans)) {
+					$tmp = array();
 					for ($k=0;$k<2;$k++) {
-						$newans[$locbak+$k] = $answer[$i+$k];
+						$tmp[$k] = $answer[$i+$k];
 					}
-				} else if ($matchtype>-1) {
-					$newans[$i] = $sg['elements'][$matchtype];
-					$newans[$i+1] = $sg['elements'][$matchtype+1];
-					$locbak = $sn + 2*$matchtype/2;
-					//echo "ix: $ix, i: $i, loc: $loc, locbak: $locbak<br/>";
 					for ($k=0;$k<2;$k++) {
-						$newans[$locbak+$k] = $answer[$i+$k];
+						$answer[$i+$k] = $answer[$matchtype+$k];
 					}
-				} else {
-					"no find $i";
+					for ($k=0;$k<2;$k++) {
+						$answer[$matchtype+$k] = $tmp[$k];
+					}
+					$usedans[] = $i;
+				} else if ($matchval > -1 && !in_array($matchval,$usedans)) {
+					$tmp = array();
+					for ($k=0;$k<2;$k++) {
+						$tmp[$k] = $answer[$i+$k];
+					}
+					for ($k=0;$k<2;$k++) {
+						$answer[$i+$k] = $answer[$matchval+$k];
+					}
+					for ($k=0;$k<2;$k++) {
+						$answer[$matchval+$k] = $tmp[$k];
+					}
 				}
-				
 			}
 			$sn += 2*count($sg['elements'])/2;
 		}
@@ -309,13 +332,19 @@ function scorestatement($stua, $answer, $s, $sn) {
 			$sn += 2*($sg['totrows'] - $n);
 		}
 		if (isset($sg['tottitle'])) {
+			if (isset($sg['tottitleops'])) {
+				$sn++;
+			}
 			$sn++;
 		}
 		if (isset($sg['totaltotal'])) {
+			if (isset($sg['totaltotalops'])) {
+				$sn++;
+			}
 			$sn++;
 		}
 	}
-	return $newans;
+	return $answer;
 }
 
 //makejournal(journal array, start number, options, $anstypes, $questions, $answer, $showanswer, $displayformat, $answerboxsize)
@@ -331,10 +360,12 @@ function scorestatement($stua, $answer, $s, $sn) {
 //
 //for $anstypes through $displayformat, just pass the variable through.
 function makejournal($j, $sn, $ops, &$anstypes, &$questions, &$answer, &$showanswer, &$displayformat, &$answerboxsize) {
+	$debug = false;
 	if (isset($j['date'])) {//not multiple date
 		$new = array($j);
 		$j = $new;
 	}
+	
 	if ($anstypes === null) { $anstypes = array();}
 	if ($questions === null) { $questions = array();}
 	if ($answer === null) { $answer = array();}
@@ -347,10 +378,7 @@ function makejournal($j, $sn, $ops, &$anstypes, &$questions, &$answer, &$showans
 	} else {
 		$disptype = 'typeahead';
 	}
-	foreach ($ops as $op) {
-		$sl = strlen($op);
-		if ($sl>$maxsizedescr) { $maxsizedescr = $sl;}
-	}
+	
 	$maxsizedescr = 0;  $maxsizeentry = 0; $hasdecimals = false;
 	foreach ($j as $ix=>$jd) {
 		for ($i=0;$i<count($jd['debits']);$i+=2) {
@@ -359,6 +387,9 @@ function makejournal($j, $sn, $ops, &$anstypes, &$questions, &$answer, &$showans
 			$sl = strlen($jd['debits'][$i+1]);
 			if ($sl>$maxsizeentry) { $maxsizeentry = $sl;}
 			if (!$hasdecimals && strpos($jd['debits'][$i+1],'.')!==false) { $hasdecimals = true;}
+			if ($debug && !in_array($jd['debits'][$i], $ops)) {
+				echo "Eek: ".$jd['debits'][$i]." not in options array<br/>";
+			}
 		}
 		for ($i=0;$i<count($jd['credits']);$i+=2) {
 			$sl = strlen($jd['credits'][$i]);
@@ -366,12 +397,19 @@ function makejournal($j, $sn, $ops, &$anstypes, &$questions, &$answer, &$showans
 			$sl = strlen($jd['credits'][$i+1]);
 			if ($sl>$maxsizeentry) { $maxsizeentry = $sl;}
 			if (!$hasdecimals && strpos($jd['credits'][$i+1],'.')!==false) { $hasdecimals = true;}
+			if ($debug && !in_array($jd['credits'][$i], $ops)) {
+				echo "Eek: ".$jd['credits'][$i]." not in options array<br/>";
+			}
 		}
 	}
-	
+	foreach ($ops as $op) {
+		$sl = strlen($op);
+		if ($sl>$maxsizedescr) { $maxsizedescr = $sl;}
+	}
 	natsort($ops);
 	$maxsizedescr += 6;
 	$maxsizeentry += 3;
+	$maxsizeentry = max($maxsizeentry,10);
 	$out = '<table class="acctstatement"><thead><tr><th>Date</th><th>Description</th><th>Debit</th><th>Credit</th></tr><thead><tbody>';
 	$sa = $out;
 	foreach ($j as $ix=>$jd) {
@@ -384,9 +422,8 @@ function makejournal($j, $sn, $ops, &$anstypes, &$questions, &$answer, &$showans
 			$out .= '<tr><td>'.($dateset?'':$jd['date']).'</td>';
 			$sa .= '<tr><td>'.($dateset?'':$jd['date']).'</td>';
 			$dateset = true;
-			
 			$out .= '<td>[AB'.$sn.']</td><td>[AB'.($sn+1).']</td><td>[AB'.($sn+2).']</td></tr>';
-			$anstypes[$sn] = 'string'; $displayformat[$sn] = $disptype; $questions[$sn] = $ops;  $answer[$sn] = $jd['debits'][$i]; $answerboxsize[$sn] = $maxsizedescr;
+			$anstypes[$sn] = 'string'; $displayformat[$sn] = $disptype; $questions[$sn] = $ops; $answer[$sn] = $jd['debits'][$i]; $answerboxsize[$sn] = $maxsizedescr;
 			
 			if ($jd['debits'][$i+1]=='') {
 				$anstypes[$sn+1] = 'string'; $displayformat[$sn+1] = 'debit'; $answer[$sn+1] = ''; $answerboxsize[$sn+1] = $maxsizeentry;
@@ -452,79 +489,75 @@ function scorejournal($stua, $answer, $j, $sn) {
 		$new = array($j);
 		$j = $new;
 	}
-	$newans = $answer;
+	//$newans = $answer;
 	foreach ($j as $ix=>$jd) {
 		$n = (count($jd['debits']) + count($jd['credits']))/2;
+		$usedans = array();
 		for ($i=$sn;$i<$sn+3*$n;$i+=3) {
-			$matchtype = array('n',-1); $matchall = array('n',-1);
-			for ($k=0;$k<count($jd['debits'])/2;$k+=2) {
-				$jd['debits'][$k+1] = str_replace(array('$',',',' '),'',$jd['debits'][$k+1])*1;
-				if (trim(strtolower($stua[$i]))==trim(strtolower($jd['debits'][$k]))) {
-					$matchtype = array('d',$k);
-					if (abs(trim($stua[$i+1]) - $jd['debits'][$k+1])<.01 && trim($stua[$i+2])=='') {
-						$matchall = array('d',$k);
-						break;
+			$matchtype = -1;  $matchval = -1;
+			for ($k=$sn;$k<$sn+3*$n;$k+=3) {
+				if (trim(strtolower($stua[$i]))==trim(strtolower($answer[$k]))) { 
+					$matchtype = $k;
+					break;					
+				} else if (($answer[$k+1]=='' && $stua[$i+1]=='' &&  abs($stua[$i+2]-$answer[$k+2])<.01) || ($answer[$k+2]=='' && $stua[$i+2]=='' && abs($stua[$i+1]-$answer[$k+1])<.01)) {
+					$matchval = $k;	
+				}
+			}
+			if ($matchtype > -1 && !in_array($matchtype,$usedans)) {
+				$tmp = array();
+				for ($k=0;$k<3;$k++) {
+					$tmp[$k] = $answer[$i+$k];
+				}
+				for ($k=0;$k<3;$k++) {
+					$answer[$i+$k] = $answer[$matchtype+$k];
+				}
+				for ($k=0;$k<3;$k++) {
+					$answer[$matchtype+$k] = $tmp[$k];
+				}
+				$usedans[] = $i;
+			} else if ($matchval > -1 && !in_array($matchval,$usedans)) {
+				$tmp = array();
+				for ($k=0;$k<3;$k++) {
+					$tmp[$k] = $answer[$i+$k];
+				}
+				for ($k=0;$k<3;$k++) {
+					$answer[$i+$k] = $answer[$matchval+$k];
+				}
+				for ($k=0;$k<3;$k++) {
+					$answer[$matchval+$k] = $tmp[$k];
+				}
+			}
+		}
+		//look at order:  look for debits after credits, and credits before debits
+		//mark wrong the less harmful ones
+		$debaftercred = array();  $firstcred = false;
+		for ($i=$sn;$i<$sn+3*$n;$i+=3) {
+			if ($stua[$i+1]!='' && $stua[$i+2]=='' && $firstcred) { $debaftercred[] = $i;}
+			if ($stua[$i+1]=='' && $stua[$i+2]!='') { $firstcred = true; }
+		}
+		$credbeforedeb = array();  $firstdeb = false;
+		for ($i=$sn+3*$n-3;$i>=$sn;$i-=3) {
+			if ($stua[$i+1]!='' && $stua[$i+2]=='') { $firstdeb = true;}
+			if ($stua[$i+1]=='' && $stua[$i+2]!='' && $firstdeb) { $credbeforedeb[] = $i; }
+		}
+		if (count($debaftercred)+count($credbeforedeb) > 0) {
+			if (count($credbeforedeb) > count($debaftercred)) {
+				foreach ($debaftercred as $i) {
+					for ($k=0;$k<3;$k++) {
+						$answer[$i+$k] = $answer[$i+$k].'50000';
+					}
+				}
+			} else {
+				foreach ($credbeforedeb as $i) {
+					for ($k=0;$k<3;$k++) {
+						$answer[$i+$k] = $answer[$i+$k].'50000';
 					}
 				}
 			}
-			if ($matchall[0]=='n') {
-				for ($k=0;$k<count($jd['credits'])/2;$k+=2) {
-					$jd['credits'][$k+1] = str_replace(array('$',',',' '),'',$jd['credits'][$k+1])*1;
-					if (trim(strtolower($stua[$i]))==trim(strtolower($jd['credits'][$k]))) {
-						$matchtype = array('c',$k);
-						if (abs(trim($stua[$i+2]) - $jd['credits'][$k+1])<.01 && trim($stua[$i+1])=='') {
-							$matchall = array('c',$k);
-							break;
-						}
-					}
-				}
-			}
-			if ($matchall[0]=='d') {
-				$loc = $matchall[1];
-				$newans[$i] = $jd['debits'][$loc];
-				$newans[$i+1] = $jd['debits'][$loc+1];
-				$newans[$i+2] = '';
-				$locbak = $sn + 3*$loc/2;
-				//echo "ix: $ix, i: $i, loc: $loc, locbak: $locbak<br/>";
-				for ($k=0;$k<3;$k++) {
-					$newans[$locbak+$k] = $answer[$i+$k];
-				}
-			} else if ($matchall[0]=='c') {
-				$loc = $matchall[1];
-				$newans[$i] = $jd['credits'][$loc];
-				$newans[$i+2] = $jd['credits'][$loc+1];
-				$newans[$i+1] = '';
-				$locbak = $sn + 3*count($jd['debits'])/2 + 3*$loc/2;
-				//echo "ix: $ix, i: $i, loc: $loc, locbak: $locbak<br/>";
-				for ($k=0;$k<3;$k++) {
-					$newans[$locbak+$k] = $answer[$i+$k];
-				}
-			} else if ($matchtype=='d') {
-				$loc = $matchtype[1];
-				$newans[$i] = $jd['debits'][$loc];
-				$newans[$i+1] = $jd['debits'][$loc+1];
-				$newans[$i+2] = '';
-				$locbak = $sn + 3*$loc/2;
-				//echo "ix: $ix, i: $i, loc: $loc, locbak: $locbak<br/>";
-				for ($k=0;$k<3;$k++) {
-					$newans[$locbak+$k] = $answer[$i+$k];
-				}
-			} else if ($matchtype[0]=='c') {
-				$loc = $matchtype[1];
-				$newans[$i] = $jd['credits'][$loc];
-				$newans[$i+2] = $jd['credits'][$loc+1];
-				$newans[$i+1] = '';
-				$locbak = $sn + 3*count($jd['debits'])/2 + 3*$loc/2;
-				//echo "ix: $ix, i: $i, loc: $loc, locbak: $locbak<br/>";
-				for ($k=0;$k<3;$k++) {
-					$newans[$locbak+$k] = $answer[$i+$k];
-				}
-			}
-			//TODO:  Add a matchvalue
 		}
 		$sn += 3*(count($jd['debits']) + count($jd['credits']))/2 + 3*$jd['extrarows'];
 	}
-	return $newans;
+	return $answer;
 }
 
 //makeaccttable(headers, $rows, $anshead, $ansarray, start number, &$anstypes, &$answer, &$showanswer, &$displayformat, &$answerboxsize)
@@ -712,50 +745,7 @@ function makeaccttable2($headers, $coltypes, $fixedrows, $cols, $sn, &$anstypes,
 	
 }
 
-//function scoreTchart($stua,$answer,$numrows,$leftentries,$rightentries, $sn)
-//returns a new answer array
-function scoreTchart($stua,$answer,$numrows,$leftentries,$rightentries, $sn) {
-	if ($stua == null) {return $answer;}
-	for ($i=0;$i<count($leftentries);$i++) {
-		$leftentries[$i] = str_replace(array('$',','),'',$leftentries[$i]) * 1;
-	}
-	for ($i=0;$i<count($rightentries);$i++) {
-		$rightentries[$i] = str_replace(array('$',','),'',$rightentries[$i]) * 1;
-	}
-	$cntleft = count($leftentries);
-	$cntright = count($rightentries);
-	for ($i=0;$i<$numrows;$i++) {
-		if ($i<$cntleft && trim($stua[$sn+2*$i])!='') { //if should be entry and there's a stuans
-			$foundmatch = false;
-			foreach($leftentries as $loc=>$val) {
-				if (abs($stua[$sn+2*$i] - $val)<.01) {
-					$answer[$sn+2*$i] = $val;
-					unset($leftentries[$loc]);
-					$foundmatch = true;
-					break; //from foreach
-				}
-			}
-			if (!$foundmatch) {
-				$answer[$sn+2*$i] = $stua[$sn+2*$i] + 50000;
-			}
-		}
-		if ($i<$cntright && trim($stua[$sn+2*$i+1])!='') { //if should be entry and there's a stuans
-			$foundmatch = false;
-			foreach($rightentries as $loc=>$val) {
-				if (abs($stua[$sn+2*$i+1] - $val)<.01) {
-					$answer[$sn+2*$i+1] = $val;
-					unset($rightentries[$loc]);
-					$foundmatch = true;
-					break; //from foreach
-				}
-			}
-			if (!$foundmatch) {
-				$answer[$sn+2*$i+1] = $stua[$sn+2*$i+1] + 50000;
-			}
-		}
-	}
-	return $answer;
-}
+
 
 //makeTchartsfromjournal($j, $order, $sn, $anstypes, $answer, $showanswer, $displayformat, $answerboxsize)
 function makeTchartsfromjournal($j, $order, $sn, &$anstypes, &$answer, &$showanswer, &$displayformat, &$answerboxsize, $showtotal=true) {
@@ -829,7 +819,7 @@ function scoreTchartsfromjournal($stua,$answer,$j,$order,$sn) {
 	return $answer;
 }
 
-//makeTchart(title,numrows,leftentries,rightentries, start number, &$anstypes, &$answer, &$showanswer, &$displayformat, &$answerboxsize, [dofloat, showtotal])
+//makeTchart(title,numrows,leftentries,rightentries, start number, $anstypes, $answer, $showanswer, $displayformat, $answerboxsize, [dofloat, showtotal])
 //num rows, leftentries, and rightentries should not include the total - that will be automatically added
 function makeTchart($title,$numrows,$leftentries,$rightentries, $sn, &$anstypes, &$answer, &$showanswer, &$displayformat, &$answerboxsize, $dofloat = false, $showtotal=true) {
 	$out = '<table class="tchart" '.($dofloat?'style="float:left;margin:10px;"':'').'><thead><tr><td colspan="2" class="c" style="border-bottom:5px solid #000;">'.$title.'</td></tr></thead><tbody>';
@@ -951,6 +941,51 @@ function makeTchart($title,$numrows,$leftentries,$rightentries, $sn, &$anstypes,
 	return $out;
 }
 
+//function scoreTchart($stua,$answer,$numrows,$leftentries,$rightentries, $sn)
+//returns a new answer array
+function scoreTchart($stua,$answer,$numrows,$leftentries,$rightentries, $sn) {
+	if ($stua == null) {return $answer;}
+	for ($i=0;$i<count($leftentries);$i++) {
+		$leftentries[$i] = str_replace(array('$',','),'',$leftentries[$i]) * 1;
+	}
+	for ($i=0;$i<count($rightentries);$i++) {
+		$rightentries[$i] = str_replace(array('$',','),'',$rightentries[$i]) * 1;
+	}
+	$cntleft = count($leftentries);
+	$cntright = count($rightentries);
+	for ($i=0;$i<$numrows;$i++) {
+		if ($i<$cntleft && trim($stua[$sn+2*$i])!='') { //if should be entry and there's a stuans
+			$foundmatch = false;
+			foreach($leftentries as $loc=>$val) {
+				if (abs($stua[$sn+2*$i] - $val)<.01) {
+					$answer[$sn+2*$i] = $val;
+					unset($leftentries[$loc]);
+					$foundmatch = true;
+					break; //from foreach
+				}
+			}
+			if (!$foundmatch) {
+				$answer[$sn+2*$i] = $stua[$sn+2*$i] + 50000;
+			}
+		}
+		if ($i<$cntright && trim($stua[$sn+2*$i+1])!='') { //if should be entry and there's a stuans
+			$foundmatch = false;
+			foreach($rightentries as $loc=>$val) {
+				if (abs($stua[$sn+2*$i+1] - $val)<.01) {
+					$answer[$sn+2*$i+1] = $val;
+					unset($rightentries[$loc]);
+					$foundmatch = true;
+					break; //from foreach
+				}
+			}
+			if (!$foundmatch) {
+				$answer[$sn+2*$i+1] = $stua[$sn+2*$i+1] + 50000;
+			}
+		}
+	}
+	return $answer;
+}
+
 //types:  1 if debits add to balance, -1 if debits subtract from balance
 //start: starting balance
 //makeledgerfromjournal($j, $start, $order, $types, $sn, $anstypes, $answer, $questions, $showanswer, $displayformat, $answerboxsize)
@@ -1044,78 +1079,149 @@ function makeledgerfromjournal($j, $start, $order, $types, $sn, &$anstypes, &$an
 	return $out;
 }
 
-
-//makeinventory($invs, $type, $rowper, $sn, &$anstypes, &$answer, &$showanswer, &$displayformat, &$answerformat, &$answerboxsize) {
-function makeinventory($invs, $type, $rowper, $sn, &$anstypes, &$answer, &$showanswer, &$displayformat, &$answerformat, &$answerboxsize) {
-	$str = array();
+//makeinventory($invs, $type, $rowper, $sn, &$anstypes, $questions, &$answer, &$showanswer, &$displayformat, &$answerformat, &$answerboxsize, $get) {
+//invs has form array(array('type','date',quantity, value)), where type is 'init','purch',or 'sale'
+//get can be set to 'journal' or 'totals', but defaults to 'rec', which generates a perpetual inventory record
+//'journal' returns array(journal record, journal display)
+//type is FIFO, LIFO, or WA, or SPEC
+//if SPEC, then the form of $invs changes for sales, and should be 'sale','date',array(quantity, purchase#, quantity, purchase #, ...)) where
+//init is purchase #0.
+//rowsper sets the number of rows for each date.  Will get extended for a particular date if needed
+function makeinventory($invs, $type, $rowper, $sn, &$anstypes, &$questions, &$answer, &$showanswer, &$displayformat, &$answerformat, &$answerboxsize, $get='rec') {
+	$str = array();  $jc = 0; $totsales = 0; 
 	$dates = array();
 	foreach($invs as $inv) {
+		$thisrowper = $rowper;
 		if ($inv[0]=='init') {
 			$pq = array(""); $pu = array(""); $pt = array("");
 			$sq = array(""); $su = array(""); $st = array("");
 			$iq = array($inv[2]); $iu = array($inv[3]); $it = array($inv[2]*$inv[3]);
 			$str[0] = array($inv[2],$inv[3]); //quantity, unit cost
+			if ($get=='journal') {
+				$j[$jc]['date'] = $inv[1];
+				$j[$jc]['debits'] = array("No journal entry required","");
+				$j[$jc]['extrarows'] = 1;
+				$jc++;
+			}
 		} else if ($inv[0]=='purch') {
-			$str[] = array($inv[2],$inv[3]);
+			if ($type=='WA') {
+				$newq = $inv[2] + $str[0][0];
+				$newu = ($inv[2]*$inv[3] + $str[0][0]*$str[0][1])/$newq;
+				$str[0] = array($newq, $newu);
+			} else {
+				$str[] = array($inv[2],$inv[3]);
+			}
 			$pq[] = $inv[2]; $pu[] = $inv[3]; $pt[] = $inv[2]*$inv[3];
 			$sq[] = ""; $su[] = ""; $st[] = "";
-			for($i=1;$i<$rowper;$i++) {
+			$sc = 0;
+			foreach ($str as $s) {
+				if ($s[0]==0) {continue;}
+				$sc++;
+				$iq[] = $s[0];  $iu[] = $s[1]; $it[] = $s[0]*$s[1];
+			}
+			
+			$thisrowper = max($sc,$rowper);
+			
+			for($i=1;$i<$thisrowper;$i++) {
 				$pq[] = "nobox"; $pu[] = "nobox"; $pt[] = "nobox";
 				$sq[] = ""; $su[] = ""; $st[] = "";
 			}
-			foreach ($str as $s) {
-				$iq[] = $s[0];  $iu[] = $s[1]; $it[] = $s[0]*$s[1];
-			}
-			for ($i=count($str);$i<$rowper;$i++) {
+			
+			for ($i=$sc;$i<$thisrowper;$i++) {
 				$iq[] = "";  $iu[] = ""; $it[] = "";
 			}
+			if ($get=='journal') {
+				$j[$jc]['date'] = $inv[1];
+				$j[$jc]['debits'] = array("Inventory", $inv[2]*$inv[3]);
+				$j[$jc]['credits'] = array("Accounts Payable", $inv[2]*$inv[3]);
+				$jc++;
+			}
 		} else if ($inv[0]=='sale') {
-			$q = $inv[2];
-			$c = 0;
-			while($q>0) {
-				if (count($str)==0) {echo "Trying to sell more than we have"; break;}
-				if ($type=='FIFO') {
-					if ($str[0][0]<=$q) { //not enough in stream - depleat it
-						//transaction:  sell $str[0][0] units 
-						$sq[] = $str[0][0];  $su[] = $str[0][1];  $st[] = $str[0][0] * $str[0][1];  $c++;
-						$q -= $str[0][0];
-						array_shift($str);  //remove entry
-					} else { //got enough in stream 
-						$sq[] = $q;  $su[] = $str[0][1];  $st[] = $q * $str[0][1];  $c++;
+			$c = 0;  $cogs = 0; $thiscalc = '';
+			if ($type=='SPEC') {
+				for ($i=0;$i<count($inv[2]);$i+=2) {
+					if (isset($inv[3])) { $totsales += $inv[2][$i]*$inv[3];}
+					$loc = $inv[2][$i+1];
+					if ($str[$loc][0]<$inv[2][$i]) {echo "Trying to sell more than we have: {$inv[2][$i]} from $loc which has {$str[$loc][0]}. "; break;}
+					$sq[] = $inv[2][$i];  $su[] = $str[$loc][1];  $st[] = $inv[2][$i] * $str[$loc][1];  $cogs += $inv[2][$i] * $str[$loc][1]; $c++;
+					$thiscalc .= $inv[2][$i].' units @ $'.$str[$loc][1].'; ';
+					$str[$loc][0] -= $inv[2][$i];
+				}
+			} else {
+				$q = $inv[2];
+				if (isset($inv[3])) { $totsales += $inv[2]*$inv[3];}
+				while($q>0) {
+					if (count($str)==0) {echo "Trying to sell more than we have"; break;}
+					if ($type=='FIFO') {
+						if ($str[0][0]<=$q) { //not enough in stream - depleat it
+							//transaction:  sell $str[0][0] units 
+							$sq[] = $str[0][0];  $su[] = $str[0][1];  $st[] = $str[0][0] * $str[0][1];  $cogs += $str[0][0] * $str[0][1]; $c++;
+							$q -= $str[0][0];
+							$thiscalc .= $str[0][0].' units @ $'.$str[0][1].'; ';
+							array_shift($str);  //remove entry
+						} else { //got enough in stream 
+							$sq[] = $q;  $su[] = $str[0][1];  $st[] = $q * $str[0][1]; $cogs += $q * $str[0][1]; $c++;
+							$str[0][0] -= $q;
+							$thiscalc .= $q.' units @ $'.$str[0][1].'; ';
+							$q -= $q;
+							
+						}
+					} else if ($type=='LIFO') {
+						$n = count($str)-1;
+						if ($str[$n][0]<=$q) { //not enough in stream - depleat it
+							//transaction:  sell $str[$n][0] units at $str[$n][1]
+							$sq[] = $str[$n][0];  $su[] = $str[$n][1];  $st[] = $str[$n][0] * $str[$n][1]; $cogs += $str[$n][0] * $str[$n][1]; $c++;
+							$q -= $str[$n][0];
+							$thiscalc .= $str[$n][0].' units @ $'.$str[$n][1].'; ';
+							array_pop($str);  //remove entry
+						} else { //got enough in stream 
+							$sq[] = $q;  $su[] = $str[$n][1];  $st[] = $q * $str[$n][1]; $cogs += $q * $str[$n][1]; $c++;
+							$str[$n][0] -= $q;
+							$thiscalc .= $q.' units @ $'.$str[$n][1].'; ';
+							$q -= $q;
+							
+						}
+					} else if ($type=='WA') {
+						if ($q>$str[0][0]) {echo "Trying to sell more than we have"; break;}
+						$sq[] = $q; $su[] = $str[0][1]; $st[] = round($q*$str[0][1],2); $cogs += round($q*$str[0][1],2); $c++;
 						$str[0][0] -= $q;
 						$q -= $q;
-					}
-				} else if ($type=='LIFO') {
-					$n = count($str)-1;
-					if ($str[$n][0]<=$q) { //not enough in stream - depleat it
-						//transaction:  sell $str[$n][0] units at $str[$n][1]
-						$sq[] = $str[$n][0];  $su[] = $str[$n][1];  $st[] = $str[$n][0] * $str[$n][1];  $c++;
-						$q -= $str[$n][0];
-						array_pop($str);  //remove entry
-					} else { //got enough in stream 
-						$sq[] = $q;  $su[] = $str[$n][1];  $st[] = $q * $str[$n][1];  $c++;
-						$str[$n][0] -= $q;
-						$q -= $q;
-					}
+						$thiscalc .= $q.' units @ '.round($str[0][1],2);
+					} 
 				}
 			}
-			for ($i=$c;$i<$rowper;$i++) {
+			$thisrowper = max($rowper,$c);
+			for ($i=$c;$i<$thisrowper;$i++) {
 				$sq[] = ""; $su[] = ""; $st[] = "";
 			}
 			$pq[] = ""; $pu[] = ""; $pt[] = "";
-			for ($i=1;$i<$rowper;$i++) {
+			for ($i=1;$i<$thisrowper;$i++) {
 				$pq[] = "nobox"; $pu[] = "nobox"; $pt[] = "nobox";
 			}
+			$sc = 0;
 			foreach ($str as $s) {
+				if ($s[0]==0) {continue;}
+				$sc++;
 				$iq[] = $s[0];  $iu[] = $s[1]; $it[] = $s[0]*$s[1];
 			}
-			for ($i=count($str);$i<$rowper;$i++) {
+			for ($i=$sc;$i<$thisrowper;$i++) {
 				$iq[] = "";  $iu[] = ""; $it[] = "";
+			}
+			if ($get=='journal') {
+				$j[$jc]['date'] = $inv[1];
+				$j[$jc]['debits'] = array("Accounts Receivable", $inv[2]*$inv[3]);
+				$j[$jc]['credits'] = array("Sales", $inv[2]*$inv[3]);
+				$j[$jc]['explanation'] = $inv[2].' units * $'.$inv[3].' sales price';
+				$jc++;
+				$j[$jc]['debits'] = array("Cost of Goods Sold", $cogs);
+				$j[$jc]['credits'] = array("Inventory", $cogs);
+				$j[$jc]['explanation'] = $thiscalc;
+				$jc++;
 			}
 		}
 		$dates[] = $inv[1];
 		if ($inv[0] != 'init') {
-			for ($i=1;$i<$rowper;$i++) {
+			for ($i=1;$i<$thisrowper;$i++) {
 				$dates[] = "";
 			}
 		}
@@ -1124,25 +1230,48 @@ function makeinventory($invs, $type, $rowper, $sn, &$anstypes, &$answer, &$showa
 	$headers[0] = array("",1,"Purchases",3,"Cost of Goods Sold",3,"Inventory on Hand",3);
 	$headers[1] = array("Dates","Quantity","Unit Cost","Total Cost","Quantity","Unit Cost","Total Cost","Quantity","Unit Cost","Total Cost");
 	
-	
-	return makeaccttable2($headers, array(0, 1,1,1, 1,1,1, 1,1,1), array(), array($dates, $pq,$pu,$pt, $sq,$su,$st, $iq,$iu,$it), $sn, $anstypes, $answer, $showanswer, $displayformat, $answerformat, $answerboxsize);
+	if ($get=='totals') {
+		$cogs = 0;
+		foreach ($st as $stv) {
+			if ($stv!=='') {
+				$cogs += $stv;
+			}
+		}
+		$totinv = 0; $totinvval = 0;
+		foreach ($str as $s) {
+			$totinv += $s[0];
+			$totinvval += round($s[0]*$s[1],2);
+		}
+		return array($cogs, $totinv, $totinvval, $totsales);
+	} else if ($get=='journal') {
+		return array($j,makejournal($j, $sn, array("Accounts Receivable","Sales","Cost of Goods Sold","Inventory","Accounts Payable","No journal entry required"), $anstypes, $questions, $answer, $showanswer, $displayformat, $answerboxsize));
+	} else {
+		return makeaccttable2($headers, array(0, 1,1,1, 1,1,1, 1,1,1), array(), array($dates, $pq,$pu,$pt, $sq,$su,$st, $iq,$iu,$it), $sn, $anstypes, $answer, $showanswer, $displayformat, $answerformat, $answerboxsize);
+	}
 }
 
 //maketrialbalancefromjournal($j, $groups, $sn, $numrows, $ops, $bigtitle, &$anstypes, &$answer, &$questions,  &$showanswer, &$displayformat, &$answerboxsize)
 //j is journal
 //groups is array(array of assets, liab, equity, revenue, expenses)
 function maketrialbalancefromjournal($j, $groups, $sn, $numrows, $ops, $bigtitle, &$anstypes, &$answer, &$questions,  &$showanswer, &$displayformat, &$answerboxsize) {
+	$debug = false;
 	$out = '';
-	$totals = array();
+	$totals = array(); 
 	foreach ($j as $jd) {
 		for ($i=0;$i<count($jd['debits']);$i+=2) {
 			if ($jd['debits'][$i+1]=='') {continue;}
 			if (!isset($totals[$jd['debits'][$i]])) { $totals[$jd['debits'][$i]] = 0;}
 			$totals[$jd['debits'][$i]] -= $jd['debits'][$i+1];
+			if ($debug && !in_array($jd['debits'][$i], $ops)) {
+				echo "Eek: ".$jd['debits'][$i]." not in options array<br/>";
+			}
 		}
 		for ($i=0;$i<count($jd['credits']);$i+=2) {
 			if (!isset($totals[$jd['credits'][$i]])) { $totals[$jd['credits'][$i]] = 0;}
 			$totals[$jd['credits'][$i]] += $jd['credits'][$i+1];
+			if ($debug && !in_array($jd['credits'][$i], $ops)) {
+				echo "Eek: ".$jd['credits'][$i]." not in options array<br/>";
+			}
 		}
 	}
 	$types = array('assets','liabilities','equity','revenue','expenses');
@@ -1161,21 +1290,6 @@ function maketrialbalancefromjournal($j, $groups, $sn, $numrows, $ops, $bigtitle
 	return maketrialbalance($data, $sn, $numrows, $ops, $bigtitle, $anstypes, $answer, $questions, $showanswer, $displayformat, $answerboxsize);
 }
 
-function totalsfromjournal($j) {
-	$totals = array();
-	foreach ($j as $jd) {
-		for ($i=0;$i<count($jd['debits']);$i+=2) {
-			if ($jd['debits'][$i+1]=='') {continue;}
-			if (!isset($totals[$jd['debits'][$i]])) { $totals[$jd['debits'][$i]] = 0;}
-			$totals[$jd['debits'][$i]] -= $jd['debits'][$i+1];
-		}
-		for ($i=0;$i<count($jd['credits']);$i+=2) {
-			if (!isset($totals[$jd['credits'][$i]])) { $totals[$jd['credits'][$i]] = 0;}
-			$totals[$jd['credits'][$i]] += $jd['credits'][$i+1];
-		}
-	}
-	return $totals;
-}
 
 function scoretrialbalancefromjournal($stua, $answer, $j, $groups, $numrows, $sn) {
 	if ($stua == null) {return $answer;}
@@ -1212,10 +1326,10 @@ function scoretrialbalancefromjournal($stua, $answer, $j, $groups, $numrows, $sn
 //$data['assets'] = array(account, value, account, value)
 //['liabilities'], [equity],[revenue],[expenses]
 function maketrialbalance($data, $sn, $numrows, $ops, $bigtitle, &$anstypes, &$answer, &$questions, &$showanswer, &$displayformat, &$answerboxsize) {
-	$out .= '<table class="acctstatement"><thead><tr><th colspan="3">'.$bigtitle.'</th></tr><tr><th>Accounts</th><th>Debits</th><th>Credits</th></tr></thead><tbody>';
-	$sa .= '<table class="acctstatement"><thead><tr><th colspan="3">'.$bigtitle.'</th></tr><tr><th>Accounts</th><th>Debits</th><th>Credits</th></tr></thead><tbody>';
+	$out .= '<table class="acctstatement noborder"><thead><tr><th colspan="3">'.$bigtitle.'</th></tr><tr><th>Accounts</th><th>Debits</th><th>Credits</th></tr></thead><tbody>';
+	$sa .= '<table class="acctstatement noborder"><thead><tr><th colspan="3">'.$bigtitle.'</th></tr><tr><th>Accounts</th><th>Debits</th><th>Credits</th></tr></thead><tbody>';
 	$allaccts = array();
-	$maxsizedescr = 4;
+	$maxsizedescr = 4; $hasdecimals = false;
 	foreach ($data as $t=>$dt) {
 		for ($i=0;$i<count($dt);$i+=2) {
 			if (!in_array($dt[$i],$ops)) {
@@ -1223,6 +1337,7 @@ function maketrialbalance($data, $sn, $numrows, $ops, $bigtitle, &$anstypes, &$a
 			}
 			$sl = strlen($dt[$i]);
 			if ($sl>$maxsizedescr) { $maxsizedescr = $sl;}
+			if (!$hasdecimals && strpos($dt[$i+1],'.')!==false) { $hasdecimals = true;}
 		}
 	}
 	$c = 0; $totdeb = 0; $totcred = 0; $maxsizedescr += 6;
@@ -1267,14 +1382,14 @@ function maketrialbalance($data, $sn, $numrows, $ops, $bigtitle, &$anstypes, &$a
 		$anstypes[$sn] = 'string'; $displayformat[$sn] = 'alignright'; $answer[$sn] = ''; $answerboxsize[$sn] = 8;
 		$sn++;
 	}
-	$out .= '<tr><td><b>Total</b></td>';
-	$sa .= '<tr><td><b>Total</b></td>';
-	$out .= '<td>[AB'.$sn.']</td>';
-	$sa .= '<td class="r">'.($hasdecimals?number_format($totdeb,2,'.',','):number_format($totdeb)).'</td>';
+	$out .= '<tr><td class="r"><b>Total</b></td>';
+	$sa .= '<tr><td class="r"><b>Total</b></td>';
+	$out .= '<td style="border-top:1px solid;border-bottom:3px double;">[AB'.$sn.']</td>';
+	$sa .= '<td class="r" style="border-top:1px solid;border-bottom:3px double;">'.($hasdecimals?number_format($totdeb,2,'.',','):number_format($totdeb)).'</td>';
 	$anstypes[$sn] = 'number'; $displayformat[$sn] = 'alignright'; $answer[$sn] = $totdeb; $answerboxsize[$sn] = 8;
 	$sn++;
-	$out .= '<td>[AB'.$sn.']</td>';
-	$sa .= '<td class="r">'.($hasdecimals?number_format($totcred,2,'.',','):number_format($totcred)).'</td>';
+	$out .= '<td style="border-top:1px solid;border-bottom:3px double;">[AB'.$sn.']</td>';
+	$sa .= '<td class="r" style="border-top:1px solid;border-bottom:3px double;">'.($hasdecimals?number_format($totcred,2,'.',','):number_format($totcred)).'</td>';
 	$anstypes[$sn] = 'number'; $displayformat[$sn] = 'alignright'; $answer[$sn] = $totcred; $answerboxsize[$sn] = 8;
 	$sn++;
 	$out .= '</tbody></table>';
@@ -1357,6 +1472,31 @@ function scoretrialbalance($stua, $answer, $data, $numrows, $sn) {
 	}
 	
 	return $answer;
+}
+
+
+function totalsfromjournal($j) {
+	$totals = array();
+	foreach ($j as $jd) {
+		for ($i=0;$i<count($jd['debits']);$i+=2) {
+			if ($jd['debits'][$i+1]=='') {continue;}
+			if (!isset($totals[$jd['debits'][$i]])) { $totals[$jd['debits'][$i]] = 0;}
+			$totals[$jd['debits'][$i]] -= $jd['debits'][$i+1];
+		}
+		for ($i=0;$i<count($jd['credits']);$i+=2) {
+			if (!isset($totals[$jd['credits'][$i]])) { $totals[$jd['credits'][$i]] = 0;}
+			$totals[$jd['credits'][$i]] += $jd['credits'][$i+1];
+		}
+	}
+	return $totals;
+}
+
+function prettyacct($v) {
+	if (strpos($v,'.')!==false) { 
+		return number_format($v,2,'.',',');
+	} else {
+		return number_format($v);
+	}
 }
 
 ?>

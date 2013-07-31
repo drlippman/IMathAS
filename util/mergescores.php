@@ -54,7 +54,12 @@ if (isset($_POST['assess'])) {
         while ($row = mysql_fetch_row($result)) {
 		$adata[$row[0]] = array();
 		$adata[$row[0]]['seeds'] = explode(',',$row[1]);
-		$adata[$row[0]]['scores'] = explode(',',$row[2]);
+		$sp = explode(';', $row[2]);
+		$adata[$row[0]]['scores'] = explode(',',$sp[0]);
+		if (count($sp)>1) {
+			$adata[$row[0]]['rawscore'] = explode(',',$sp[1]);
+			$adata[$row[0]]['firstscore'] = explode(',',$sp[1]);
+		}
 		$adata[$row[0]]['attempts'] = explode(',',$row[3]);
 		$adata[$row[0]]['la'] = explode('~',$row[4]);
 	}
@@ -63,12 +68,21 @@ if (isset($_POST['assess'])) {
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	while ($row = mysql_fetch_row($result)) {
 		$seeds = explode(',',$row[1]);
-		$scores = explode(',',$row[2]);
+		$sp = explode(';', $row[2]);
+		$scores = explode(',',$sp[0]);
+		if (count($sp)>1) {
+			$rawscore = explode(',',$sp[1]);
+			$firstscore = explode(',',$sp[1]);
+		}
 		$att = explode(',',$row[3]);
 		$la = explode(',',$row[4]);
 		foreach ($scores as $k=>$v) {
 			if (getpts($v)>getpts($adata[$row[0]]['scores'][$k])) {
 				$adata[$row[0]]['scores'][$k] = $scores[$k];
+				if (isset($rawscore) && isset($rawscore[$k])) {
+					$adata[$row[0]]['rawscore'][$k] = $rawscore[$k];
+					$adata[$row[0]]['firstscore'][$k] = $firstscore[$k];
+				}
 				$adata[$row[0]]['seeds'][$k] = $seeds[$k];
 				$adata[$row[0]]['attempts'][$k] = $attempts[$k];
 				$adata[$row[0]]['la'][$k] = $la[$k];
@@ -77,6 +91,9 @@ if (isset($_POST['assess'])) {
 	}
 	foreach ($adata as $uid=>$val) {
 		$bestscorelist = implode(',',$val['scores']);
+		if (isset($val['rawscore'])) {
+			$bestscorelist .= ';'.implode(',',$val['rawscore']).';'.implode(',',$val['firstscore']);
+		}
 		$bestattemptslist = implode(',',$val['attempts']);
 		$bestseedslist = implode(',',$val['seeds']);
 		$bestlalist = implode('~',$val['la']);

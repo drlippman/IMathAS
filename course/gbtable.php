@@ -547,7 +547,8 @@ function gbtable() {
 		$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($l = mysql_fetch_array($result2, MYSQL_ASSOC)) {
 			$asid[$l['assessmentid']] = $l['id'];
-			$scores = explode(",",$l['bestscores']);
+			$sp = explode(';',$l['bestscores']);
+			$scores = explode(',',$sp[0]);
 			$total = 0;
 			for ($i=0;$i<count($scores);$i++) {
 				$total += getpts($scores[$i]);

@@ -109,7 +109,8 @@
 		$query = "SELECT userid,bestscores FROM imas_assessment_sessions WHERE assessmentid='{$_POST['assesssnapaid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while($row = mysql_fetch_row($result)) {
-			$sc = explode(',',$row[1]);
+			$sp = explode(';',$row[1]);
+			$sc = explode(',',$sp[0]);
 			$tot = 0;
 			$att = 0;
 			foreach ($sc as $v) {

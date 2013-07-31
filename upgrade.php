@@ -1271,6 +1271,20 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
 		}
+		/*
+		 $query = 'CREATE TABLE `imas_firstscores` (
+				`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+				`courseid` INT(10) UNSIGNED NOT NULL, 
+				`qsetid` INT(10) UNSIGNED NOT NULL,
+				`score` TINYINT(3) UNSIGNED NOT NULL,
+				`timespent` SMALLINT(5) UNSIGNED NOT NULL,
+				INDEX ( `courseid`), INDEX(`qsetid`) 
+				) ENGINE = InnoDB';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 */
 		/*$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {
 			echo '<p>Error: unable open upgradecounter.txt for writing</p>';

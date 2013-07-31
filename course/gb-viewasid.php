@@ -77,7 +77,7 @@
 			//$starttime = time();
 			foreach ($stugroupmem as $uid) {
 				$query = "INSERT INTO imas_assessment_sessions (userid,agroupid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers,reviewscores,reviewattempts,reviewseeds,reviewlastanswers) ";
-				$query .= "VALUES ('$uid','$agroupid','$aid','$qlist','$seedlist','$scorelist','$attemptslist','$lalist',0,'$scorelist','$attemptslist','$seedlist','$lalist','$scorelist','$attemptslist','$reviewseedlist','$lalist');";
+				$query .= "VALUES ('$uid','$agroupid','$aid','$qlist','$seedlist','$scorelist;$scorelist','$attemptslist','$lalist',0,'$scorelist;$scorelist;$scorelist','$attemptslist','$seedlist','$lalist','$scorelist;$scorelist','$attemptslist','$reviewseedlist','$lalist');";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				$asid = mysql_insert_id();
 			}												
@@ -177,8 +177,8 @@
 			$bestseedslist = implode(',',$seeds);
 			$bestlalist = implode('~',$lastanswers);
 			
-			$query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',lastanswers='$lalist',reattempting='',";
-			$query .= "bestscores='$bestscorelist',bestattempts='$bestattemptslist',bestseeds='$bestseedslist',bestlastanswers='$bestlalist' ";
+			$query = "UPDATE imas_assessment_sessions SET scores='$scorelist;$scorelist',attempts='$attemptslist',lastanswers='$lalist',reattempting='',";
+			$query .= "bestscores='$bestscorelist;$bestscorelist;$bestscorelist',bestattempts='$bestattemptslist',bestseeds='$bestseedslist',bestlastanswers='$bestlalist' ";
 			$query .= $whereqry;//"WHERE id='{$_GET['asid']}'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			//unset($_GET['asid']);
@@ -207,12 +207,24 @@
 			$query = "SELECT attempts,lastanswers,reattempting,scores,bestscores,bestattempts,bestlastanswers,lti_sourcedid FROM imas_assessment_sessions $whereqry"; //WHERE id='{$_GET['asid']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$line = mysql_fetch_array($result, MYSQL_ASSOC);
-			
-			$scores = explode(",",$line['scores']);
+			if (strpos($line['scores'],';')===false) {
+				$noraw = true;
+				$scores = explode(",",$line['scores']);
+				$bestscores = explode(",",$line['bestscores']);
+			} else {
+				$sp = explode(';',$line['scores']);
+				$scores = explode(',', $sp[0]);
+				$rawscores = explode(',', $sp[1]);
+				$sp = explode(';',$line['bestscores']);
+				$bestscores = explode(',', $sp[0]);
+				$bestrawscores = explode(',', $sp[1]);
+				$firstrawscores = explode(',', $sp[2]);
+				$noraw = false;
+			}
+				
 			$attempts = explode(",",$line['attempts']);
 			$lastanswers = explode("~",$line['lastanswers']);
 			$reattempting = explode(',',$line['reattempting']);
-			$bestscores = explode(",",$line['bestscores']);
 			$bestattempts = explode(",",$line['bestattempts']);
 			$bestlastanswers = explode("~",$line['bestlastanswers']);
 			
@@ -225,17 +237,29 @@
 				$bestscores[$clearid] = -1;
 				$bestattempts[$clearid] = 0;
 				$bestlastanswers[$clearid] = '';
+				if (!$noraw) {
+					$rawscores[$clearid] = -1;
+					$bestrawscores[$clearid] = -1;
+					$firstscores[$clearid] = -1;
+				}
+				
 				$loc = array_search($clearid,$reattempting);
 				if ($loc!==false) {
 					array_splice($reattempting,$loc,1);
 				}
 				
-				$scorelist = implode(",",$scores);
+				if (!$noraw) {
+					$scorelist = implode(",",$scores).';'.implode(",",$rawscores);
+					$bestscorelist = implode(',',$bestscores).';'.implode(",",$bestrawscores).';'.implode(",",$firstscores);
+				} else {
+					$scorelist = implode(",",$scores);
+					$bestscorelist = implode(',',$bestscores);
+				}
 				$attemptslist = implode(",",$attempts);
 				$lalist = addslashes(implode("~",$lastanswers));
-				$bestscorelist = implode(',',$scores);
-				$bestattemptslist = implode(',',$attempts);
-				$bestlalist = addslashes(implode('~',$lastanswers));
+				
+				$bestattemptslist = implode(',',$bestattempts);
+				$bestlalist = addslashes(implode('~',$bestlastanswers));
 				$reattemptinglist = implode(',',$reattempting);
 				
 				$query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',lastanswers='$lalist',";
@@ -279,6 +303,11 @@
 		require("../assessment/displayq2.php");
 		if (isset($_GET['update']) && ($isteacher || $istutor)) {
 			if (isoktorec()) {
+				$query = "SELECT bestscores FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$bestscores = mysql_result($result,0,0);
+				$bsp = explode(';',$bestscores);
+				
 				$scores = array();
 				$i = 0;
 				while (isset($_POST[$i]) || isset($_POST["$i-0"])) {
@@ -305,6 +334,9 @@
 					$i++;
 				}
 				$scorelist = implode(",",$scores);
+				if (count($bsp)>1) { //tack on rawscores and firstscores
+					$scorelist .= ';'.$bsp[1].';'.$bsp[2];
+				}
 				$feedback = $_POST['feedback'];
 				$query = "UPDATE imas_assessment_sessions SET bestscores='$scorelist',feedback='$feedback'";
 				if (isset($_POST['updategroup'])) {
@@ -523,7 +555,8 @@
 		}
 		if (isset($_GET['lastver'])) {
 			$seeds = explode(",",$line['seeds']);
-			$scores = explode(",",$line['scores']);
+			$sp = explode(";",$line['scores']);
+			$scores = explode(",",$sp[0]);
 			$attempts = explode(",",$line['attempts']);
 			$lastanswers = explode("~",$line['lastanswers']);
 			echo "<p>";
@@ -533,7 +566,8 @@
 			echo "</p>";
 		} else if (isset($_GET['reviewver'])) {
 			$seeds = explode(",",$line['reviewseeds']);
-			$scores = explode(",",$line['reviewscores']);
+			$sp = explode(";",$line['reviewscores']);
+			$scores = explode(",",$sp[0]);
 			$attempts = explode(",",$line['reviewattempts']);
 			$lastanswers = explode("~",$line['reviewlastanswers']);
 			echo "<p>";
@@ -543,7 +577,8 @@
 			echo "</p>";
 		}else {
 			$seeds = explode(",",$line['bestseeds']);
-			$scores = explode(",",$line['bestscores']);
+			$sp = explode(";",$line['bestscores']);
+			$scores = explode(",",$sp[0]);
 			$attempts = explode(",",$line['bestattempts']);
 			$lastanswers = explode("~",$line['bestlastanswers']);
 			echo "<p><b>Showing Scored Attempts</b> | ";
@@ -867,12 +902,14 @@
 		$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
 		if (mysql_result($result,0,0)>0) {
 			include("../assessment/catscores.php");
-			catscores(explode(',',$line['questions']),explode(',',$line['bestscores']),$line['defpoints'], $line['defoutcome'],$cid);
+			$sp = explode(';',$line['bestscores']);
+			catscores(explode(',',$line['questions']),explode(',',$sp[0]),$line['defpoints'], $line['defoutcome'],$cid);
 		}
 		
 		$scores = array();
 		$qs = explode(',',$line['questions']);
-		foreach(explode(',',$line['bestscores']) as $k=>$score) {
+		$sp = explode(';',$line['bestscores']);
+		foreach(explode(',',$sp[0]) as $k=>$score) {
 			$scores[$qs[$k]] = getpts($score);
 		}
 		

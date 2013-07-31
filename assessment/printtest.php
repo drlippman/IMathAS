@@ -46,7 +46,8 @@
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
 	$questions = explode(",",$line['questions']);
 	$seeds = explode(",",$line['seeds']);
-	$scores = explode(",",$line['bestscores']);
+	$sp = explode(';',$line['bestscores']);
+	$scores = explode(",",$sp[0]);
 	$attempts = explode(",",$line['bestattempts']);
 	$lastanswers = explode("~",$line['bestlastanswers']);
 	$timesontask = explode("~",$line['timeontask']);

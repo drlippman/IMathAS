@@ -4,7 +4,7 @@
 
 
 array_push($allowedmacros,"exp","sec","csc","cot","sech","csch","coth","nthlog","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif","in_array","prettyint","prettyreal","prettysigfig","arraystodots","subarray","showdataarray","arraystodoteqns","array_flip","arrayfindindex","fillarray","array_reverse","root","getsnapwidthheight");
-array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","randcity","randcities","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction","ifthen","multicalconarray","htmlentities","formhoverover","formpopup","connectthedots","jointsort","stringpos","stringlen","stringclean","substr","substr_count","str_replace","makexxpretty","makexxprettydisp","forminlinebutton","makenumberrequiretimes","comparenumbers","comparefunctions","getnumbervalue","showrecttable","htmldisp","getstuans","checkreqtimes","stringtopolyterms","getfeedbacktxt","getfeedbacktxtessay","getfeedbacktxtnumber","explode","gettwopointlinedata","getdotsdata","gettwopointdata","getlinesdata","adddrawcommand","array_unique","ABarray");
+array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","randcity","randcities","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction","ifthen","multicalconarray","htmlentities","formhoverover","formpopup","connectthedots","jointsort","stringpos","stringlen","stringclean","substr","substr_count","str_replace","makexxpretty","makexxprettydisp","forminlinebutton","makenumberrequiretimes","comparenumbers","comparefunctions","getnumbervalue","showrecttable","htmldisp","getstuans","checkreqtimes","stringtopolyterms","getfeedbacktxt","getfeedbacktxtessay","getfeedbacktxtnumber","explode","gettwopointlinedata","getdotsdata","gettwopointdata","getlinesdata","adddrawcommand","array_unique","ABarray","scoremultiorder");
 function mergearrays($a,$b) {
 	if (!is_array($a)) {
 		$a = array($a);
@@ -2792,5 +2792,47 @@ function ABarray($s,$n) {
 	return $out;
 }
 
+//scoremultiorder($stua, $answer, $swap, [$type='string'])
+//allows groups of questions to be scored in different orders
+//only works if $stua and $answer are directly comparable (i.e. basic string type or exact number)
+//$swap is an array of entries of the form "1,2,3;4,5,6"  says to treat 1,2,3 as a group of questions.
+//comparison is made on first entry in group
+function scoremultiorder($stua, $answer, $swap, $type='string') {
+	if ($stua == null) {return $answer;}
+	$newans = $answer;
+	foreach ($swap as $k=>$sw) {
+		$swap[$k] = explode(';', $sw);
+		foreach ($swap[$k] as $i=>$s) {
+			$swap[$k][$i] = explode(',', $s);
+		}
+	}
+	foreach ($swap as $sw) {
+		for ($i=0;$i<count($sw);$i++) {
+			$tofind = $stua[$sw[$i][0]];
+			$loc = -1;
+			for ($k=0;$k<count($sw);$k++) {
+				if ($type=='string' && trim(strtolower($tofind))==trim(strtolower($newans[$sw[$k][0]]))) {
+					$loc = $k; break;
+				} else if ($type=='number' && abs($tofind - $newans[$sw[$k][0]])<0.01) {
+					$loc = $k; break;
+				}
+			}
+			if ($loc>-1 && $i!=$loc) {
+				//want to swap entries from $sw[$loc] with sw[$i] and swap $answer values
+				$tmp = array();
+				foreach ($sw[$i] as $k=>$v) {
+					$tmp[$k] = $newans[$v];
+				}
+				foreach ($sw[$loc] as $k=>$v) {
+					$newans[$sw[$i][$k]] = $newans[$v];
+				}
+				foreach ($tmp as $k=>$v) {
+					$newans[$sw[$loc][$k]] = $tmp[$k];
+				}
+			}	
+		}
+	}
+	return $newans;
+}
 			
 ?>

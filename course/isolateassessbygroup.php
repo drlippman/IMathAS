@@ -121,7 +121,8 @@
 			$line = $scoredata[$gid];
 		}
 		$total = 0;
-		$scores = explode(",",$line['bestscores']);
+		$sp = explode(';',$line['bestscores']);
+		$scores = explode(",",$sp[0]);
 		if (in_array(-1,$scores)) { $IP=1;} else {$IP=0;}
 		for ($i=0;$i<count($scores);$i++) {
 			$total += getpts($scores[$i]);

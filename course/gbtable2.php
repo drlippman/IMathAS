@@ -807,8 +807,8 @@ function gbtable() {
 		
 		$gb[$row][1][$col][4] = $l['id'];; //assessment session id
 		
-		
-		$scores = explode(",",$l['bestscores']);
+		$sp = explode(';',$l['bestscores']);
+		$scores = explode(',',$sp[0]);
 		$pts = 0;
 		for ($j=0;$j<count($scores);$j++) {
 			$pts += getpts($scores[$j]);

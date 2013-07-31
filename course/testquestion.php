@@ -5,7 +5,8 @@
 /*** master php includes *******/
 require("../validate.php");
 require("../assessment/displayq2.php");
-	
+require("../assessment/testutil.php");	
+
  //set some page specific variables and counters
 $overwriteBody = 0;
 $body = "";
@@ -52,7 +53,7 @@ if ($myrights<20) {
 	$lastanswers = array('');
 
 	if (isset($_POST['seed'])) {
-		$score = scoreq(0,$_GET['qsetid'],$_POST['seed'],$_POST['qn0']);
+		list($score,$rawscores) = scoreq(0,$_GET['qsetid'],$_POST['seed'],$_POST['qn0']);
 		$scores[0] = $score;
 		$lastanswers[0] = stripslashes($lastanswers[0]);
 		$page_scoreMsg =  "<p>Score on last answer: $score/1</p>\n";
@@ -234,7 +235,12 @@ if ($overwriteBody==1) {
 	echo "<input type=hidden name=seed value=\"$seed\">\n";
 	echo "<input type=hidden name=attempt value=\"$attempt\">\n";
 
-	displayq(0,$_GET['qsetid'],$seed,true,true,$attempt);
+	if (isset($rawscores)) {
+		$colors = scorestocolors(implode('~',$rawscores),1,0,false);
+	} else {
+		$colors = array();
+	}
+	displayq(0,$_GET['qsetid'],$seed,true,true,$attempt,false,false,false,$colors);
 	echo "<input type=submit value=\"Submit\"><input type=submit name=\"regen\" value=\"Submit and Regen\">\n";
 	echo "<input type=button value=\"White Background\" onClick=\"whiteout()\"/>";
 	echo "<input type=button value=\"Show HTML\" onClick=\"document.getElementById('qhtml').style.display='';\"/>";

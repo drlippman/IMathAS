@@ -31,7 +31,7 @@ if (isset($_GET['noregen'])) {
 
 $showans = false;
 if (isset($_POST['seed'])) {
-	$score = scoreq(0,$qsetid,$_POST['seed'],$_POST['qn0']);
+	list($score,$rawscores) = scoreq(0,$qsetid,$_POST['seed'],$_POST['qn0']);
 	if (strpos($score,'~')===false) {
 		$after = round($score,1);
 		if ($after < 0) { $after = 0;}

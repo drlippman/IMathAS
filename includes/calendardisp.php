@@ -144,8 +144,8 @@ while ($row = mysql_fetch_row($result)) {
 		   if (mysql_num_rows($r2)==0) {
 			   continue;
 		   } else {
-			   $scores = mysql_result($r2,0,0);
-			   if (getpts($scores)<$row[6]) {
+			   $scores = explode(';',mysql_result($r2,0,0));
+			   if (getpts($scores[0])<$row[6]) {
 				   continue;
 			   }
 		   }

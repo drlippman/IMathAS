@@ -618,10 +618,21 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 				$answeights = array(1);
 			}
 		}
-		$scores = Array();
+		$scores = array();  $raw = array(); $accpts = 0;
 		foreach ($anstypes as $kidx=>$anstype) {
 			$partnum = ($qnidx+1)*1000 + $kidx;
-			$scores[$kidx] = round(scorepart($anstype,$kidx,$_POST["qn$partnum"],$options,$qnidx+1)*$answeights[$kidx],4);
+			$raw[$kidx] = scorepart($anstype,$kidx,$_POST["qn$partnum"],$options,$qnidx+1);
+			if (isset($scoremethod) && $scoremethod=='acct') {
+				if ($anstype=='string' && $answer[$kidx]==='') {
+					$scores[$kidx] = $raw[$kidx]-1;  //0 if correct, -1 if wrong
+				} else {
+					$scores[$kidx] = $raw[$kidx];
+					$accpts++;
+				}
+			} else {
+				$scores[$kidx] = round($raw[$kidx]*$answeights[$kidx],4);
+			}
+			$raw[$kidx] = round($raw[$kidx],2);
 			$partla[$kidx] = $GLOBALS['partlastanswer'];
 		}
 		
@@ -635,11 +646,14 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 		}
 		//return array_sum($scores);
 		if (isset($scoremethod) && $scoremethod == "singlescore") {
-			return round(array_sum($scores),3);
+			return array(round(array_sum($scores),3),$raw);
 		} else if (isset($scoremethod) && $scoremethod == "allornothing") {
-			if (array_sum($scores)<.98) { return 0; } else { return 1;}
+			if (array_sum($scores)<.98) { return array(0,$raw); } else { return array(1,$raw);}
+		} else if (isset($scoremethod) && $scoremethod == "acct") {
+			$sc = round($qnpointval*array_sum($scores)/$accpts,3);
+			return (array($sc, $raw));
 		} else {
-			return implode('~',$scores);
+			return array(implode('~',$scores),$raw);
 		}
 	} else {
 		if ($qdata['qtype']=='essay' || $qdata['qtype']=='file') {
@@ -658,7 +672,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 		} else {
 			$GLOBALS['lastanswers'][$qnidx] .= '##'.$GLOBALS['partlastanswer'];
 		}
-		return round($score,3);
+		return array(round($score,3),round($score,2));
 	}
 	
 	
@@ -1590,7 +1604,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$shorttip = _('Enter text');
 		}
 		if ($displayformat=='select') {
-			$out .= "<select name=\"qn$qn\" id=\"qn$qn\" style=\"margin-right:20px\"><option value=\"\"> </option>";
+			$out .= "<select name=\"qn$qn\" id=\"qn$qn\" style=\"margin-right:20px\" class=\"$colorbox\"><option value=\"\"> </option>";
 			foreach ($questions as $i=>$v) {
 				$out .= '<option value="'.htmlentities($v).'"';
 				if ($v==$la) {
@@ -1599,6 +1613,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$out .= '>'.htmlentities($v).'</option>';
 			}
 			$out .= '</select>';
+			$out .= getcolormark($colorbox);
 		} else {
 			$out .= "<input type=\"text\"  size=\"$sz\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" autocomplete=\"off\"  ";
 			
@@ -2288,6 +2303,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$GLOBALS['partlastanswer'] = $givenans;
+		if ($answer==='' && $givenans==='') { return 1;}
 		if ($givenans == null) {return 0;}
 		if ($answerformat=='exactlist') {
 			$gaarr = explode(',',$givenans);

@@ -115,7 +115,8 @@
 	$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
 	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 		$questions = explode(',',$line['questions']);
-		$scores = explode(',',$line['bestscores']);
+		$sp = explode(';', $line['bestscores']);
+		$scores = explode(',', $sp[0]);
 		$attp = explode(',',$line['bestattempts']);
 		$bla = explode('~',$line['bestlastanswers']);
 		$timeot = explode(',',$line['timeontask']);

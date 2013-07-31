@@ -1171,7 +1171,7 @@ function AutoSuggest(elem, suggestions)
 			this.elem.value = this.eligible[this.highlighted];
 			this.hideDiv();
 		} else {
-			this.elem.value = '';
+			//this.elem.value = '';
 			this.hideDiv();
 		}
 	};

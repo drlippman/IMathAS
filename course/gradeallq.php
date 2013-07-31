@@ -73,7 +73,8 @@
 		$cnt = 0;
 		while($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 			if ((!$onepergroup && isset($allscores[$line['id']])) || ($onepergroup && isset($grpscores[$line['agroupid']]))) {//if (isset($locs[$line['id']])) {
-				$scores = explode(",",$line['bestscores']);
+				$sp = explode(';',$line['bestscores']);
+				$scores = explode(",",$sp[0]);
 				if ($onepergroup) {
 					if ($line['agroupid']==0) { continue;}
 					foreach ($grpscores[$line['agroupid']] as $loc=>$sv) {
@@ -95,6 +96,9 @@
 					$feedback = $_POST['feedback-'.$line['id']];
 				}
 				$scorelist = implode(",",$scores);
+				if (count($sp)>1) {
+					$scorelist .= ';'.$sp[1].';'.$sp[2];
+				}
 				
 				$query = "UPDATE imas_assessment_sessions SET bestscores='$scorelist',feedback='$feedback' WHERE id='{$line['id']}'";
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -368,7 +372,8 @@
 			$s3asid = $asid;
 		}
 		$questions = explode(',',$line['questions']);
-		$scores = explode(",",$line['bestscores']);
+		$sp = explode(';', $line['bestscores']);
+		$scores = explode(",",$sp[0]);
 		$attempts = explode(",",$line['bestattempts']);
 		if ($ver=='graded') {
 			$seeds = explode(",",$line['bestseeds']);

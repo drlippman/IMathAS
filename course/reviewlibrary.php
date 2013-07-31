@@ -261,7 +261,7 @@ if ($myrights<20) {
 		$seed = rand(0,10000);
 		require("../assessment/displayq2.php");
 		if (isset($_POST['seed'])) {
-			$score = scoreq(0,$qsetid,$_POST['seed'],$_POST['qn0']);
+			list($score,$rawscores) = scoreq(0,$qsetid,$_POST['seed'],$_POST['qn0']);
 			$page_lastScore = "<p>Score on last answer: $score/1</p>\n";
 		}
 		

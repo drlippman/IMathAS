@@ -586,8 +586,8 @@ function enditem($canedit) {
 				   if (mysql_num_rows($result)==0) {
 					   $nothidden = false;
 				   } else {
-					   $scores = mysql_result($result,0,0);
-					   if (round(getpts($scores),1)+.02<$line['reqscore']) {
+					   $scores = explode(';',mysql_result($result,0,0));
+					   if (round(getpts($scores[0]),1)+.02<$line['reqscore']) {
 					   	   $nothidden = false;
 					   }
 				   }

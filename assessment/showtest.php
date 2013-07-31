@@ -150,7 +150,8 @@
 				exit;
 			} 
 			
-			$bestscorelist = $scorelist;
+			$bestscorelist = $scorelist.';'.$scorelist.';'.$scorelist;  //bestscores;bestrawscores;firstscores
+			$scorelist = $scorelist.';'.$scorelist;  //scores;rawscores  - also used as reviewscores;rawreviewscores
 			$bestattemptslist = $attemptslist;
 			$bestseedslist = $seedlist;
 			$bestlalist = $lalist;
@@ -341,7 +342,17 @@
 	$questions = explode(",",$line['questions']);
 
 	$seeds = explode(",",$line['seeds']);
-	$scores = explode(",",$line['scores']);
+	if (strpos($line['scores'],';')===false) {
+		$scores = explode(",",$line['scores']);
+		$noraw = true;
+		$rawscores = $scores;
+	} else {
+		$sp = explode(';',$line['scores']);
+		$scores = explode(',', $sp[0]);
+		$rawscores = explode(',', $sp[1]);
+		$noraw = false;
+	}
+		
 	$attempts = explode(",",$line['attempts']);
 	$lastanswers = explode("~",$line['lastanswers']);
 	if ($line['timeontask']=='') {
@@ -358,7 +369,16 @@
 	}
 
 	$bestseeds = explode(",",$line['bestseeds']);
-	$bestscores = explode(",",$line['bestscores']);
+	if ($noraw) {
+		$bestscores = explode(',',$line['bestscores']);
+		$bestrawscores = $bestscores;
+		$firstrawscores = $bestscores;
+	} else {
+		$sp = explode(';',$line['bestscores']);
+		$bestscores = explode(',', $sp[0]);
+		$bestrawscores = explode(',', $sp[1]);
+		$firstrawscores = explode(',', $sp[2]);
+	}
 	$bestattempts = explode(",",$line['bestattempts']);
 	$bestlastanswers = explode("~",$line['bestlastanswers']);
 	$starttime = $line['starttime'];
@@ -469,7 +489,18 @@
 		$testsettings['showans'] = '0';
 		
 		$seeds = explode(",",$line['reviewseeds']);
-		$scores = explode(",",$line['reviewscores']);
+		
+		if (strpos($line['reviewscores'],';')===false) {
+			$reviewscores = explode(",",$line['reviewscores']);
+			$noraw = true;
+			$reviewrawscores = $reviewscores;
+		} else {
+			$sp = explode(';',$line['reviewscores']);
+			$reviewscores = explode(',', $sp[0]);
+			$reviewrawscores = explode(',', $sp[1]);
+			$noraw = false;
+		}
+		
 		$attempts = explode(",",$line['reviewattempts']);
 		$lastanswers = explode("~",$line['reviewlastanswers']);
 		if (trim($line['reviewreattempting'])=='') {
@@ -501,6 +532,7 @@
 	for ($i=0; $i<count($questions); $i++) {
 		if ($qi[$questions[$i]]['withdrawn']==1 && $qi[$questions[$i]]['points']>0) {
 			$bestscores[$i] = $qi[$questions[$i]]['points'];
+			$bestrawscores[$i] = 1;
 		}
 	}
 	
@@ -522,6 +554,7 @@
 					//$scores[$i] = -1;
 					if ($noindivscores) { //clear scores if 
 						$bestscores[$i] = -1;
+						$bestrawscores[$i] = -1;
 					}
 					if (!in_array($i,$reattempting)) {
 						$reattempting[] = $i;
@@ -574,6 +607,7 @@
 		$toregen = $_GET['regen'];
 		$seeds[$toregen] = rand(1,9999);
 		$scores[$toregen] = -1;
+		$rawscores[$toregen] = -1;
 		$attempts[$toregen] = 0;
 		$newla = array();
 		deletefilesifnotused($lastanswers[$toregen],$bestlastanswers[$toregen]);
@@ -600,6 +634,7 @@
 			for ($i = 0; $i<count($questions); $i++) {
 				if (getpts($scores[$i])<$qi[$questions[$i]]['points'] && $qi[$questions[$i]]['allowregen']==1) { 
 					$scores[$i] = -1;
+					$rawscores[$i] = -1;
 					$attempts[$i] = 0;
 					$seeds[$i] = rand(1,9999);
 					$newla = array();
@@ -627,6 +662,7 @@
 					continue;
 				}
 				$scores[$i] = -1;
+				$rawscores[$i] = -1;
 				$attempts[$i] = 0;
 				$seeds[$i] = rand(1,9999);
 				$newla = array();
@@ -662,6 +698,7 @@
 		$attempts[$tojump]=$qi[$questions[$tojump]]['attempts'];
 		if ($scores[$tojump]<0){
 			$scores[$tojump] = 0;
+			$rawscores[$tojump] = 0;
 		}
 		recordtestdata();
 		$reloadqi = true;
@@ -1234,6 +1271,15 @@ if (!isset($_POST['embedpostback'])) {
 					$GLOBALS['questionmanualgrade'] = false;
 					$rawscore = scorequestion($qn);
 					
+					$immediatereattempt = false;
+					if (!$superdone && $showeachscore && hasreattempts($qn)) {
+						if (!(($regenonreattempt && $qi[$questions[$toclear]]['regen']==0) || $qi[$questions[$toclear]]['regen']==1)) {
+							if (!in_array($qn,$reattempting)) {
+								//$reattempting[] = $qn;
+								$immediatereattempt = true;
+							}
+						}
+					}
 					//record score
 					recordtestdata();
 				}
@@ -1246,7 +1292,7 @@ if (!isset($_POST['embedpostback'])) {
 				if ($GLOBALS['scoremessages'] != '') {
 					echo '<p>'.$GLOBALS['scoremessages'].'</p>';
 				}
-				$reattemptsremain = false;
+				
 				if ($showeachscore) {
 					$possible = $qi[$questions[$qn]]['points'];
 					if (getpts($rawscore)!=getpts($scores[$qn])) {
@@ -1266,25 +1312,40 @@ if (!isset($_POST['embedpostback'])) {
 					}
 										
 					
-				}
-				if (hasreattempts($qn)) {
-					//if ($showeachscore) {
-						echo "<p><a href=\"showtest.php?action=skip&amp;to=$qn&amp;reattempt=$qn\">", _('Reattempt last question'), "</a></p>\n";
-					//}
-					$reattemptsremain = true;
-				}
-				if ($allowregen && $qi[$questions[$qn]]['allowregen']==1) {
-					echo "<p><a href=\"showtest.php?action=skip&amp;to=$qn&amp;regen=$qn\">", _('Try another similar question'), "</a></p>\n";
+				} else {
+					echo '<p>'._('Question Scored').'</p>';
 				}
 				
-				echo "<p>", _('Question scored.'), " ";
-				if ($lefttodo > 0) {
-					echo '<b>', _('Select another question'), '</b></p>';
-				} else {
-					echo '</p>';
+				$reattemptsremain = false;
+				if (hasreattempts($qn)) {
+					$reattemptsremain = true;
 				}
-				if ($reattemptsremain == false && $showeachscore) {
+				
+				if ($allowregen && $qi[$questions[$qn]]['allowregen']==1) {
+					echo '<p>';
+					if ($reattemptsremain && !$immediatereattempt) {
+						echo "<a href=\"showtest.php?action=skip&amp;to=$qn&amp;reattempt=$qn\">", _('Reattempt last question'), "</a>, ";
+					}
+					echo "<a href=\"showtest.php?action=skip&amp;to=$qn&amp;regen=$qn\">", _('Try another similar question'), "</a>";
+					if ($immediatereattempt) {
+						echo _(", reattempt last question below, or select another question.");
+					} else {
+						echo _(", or select another question");
+					}
+					echo "</p>\n";
+				} else if ($reattemptsremain && !$immediatereattempt) {
+					echo "<p><a href=\"showtest.php?action=skip&amp;to=$qn&amp;reattempt=$qn\">", _('Reattempt last question'), "</a>";
+					if ($lefttodo > 0) {
+						echo  _(", or select another question");
+					}
+					echo '</p>';
+				} else if ($lefttodo > 0) {
+					echo "<p>"._('Select another question').'</p>';
+				}
+				
+				if ($reattemptsremain == false && $showeachscore && $testsettings['showans']!='N') {
 					//TODO i18n
+					
 					echo "<p>This question, with your last answer";
 					if (($showansafterlast && $qi[$questions[$qn]]['showans']=='0') || $qi[$questions[$qn]]['showans']=='F' || $qi[$questions[$qn]]['showans']=='J') {
 						echo " and correct answer";
@@ -1295,19 +1356,52 @@ if (!isset($_POST['embedpostback'])) {
 					} else {
 						$showcorrectnow = false;
 					}
-					if ($showcorrectnow) {
-						echo ', is displayed below</p>';
-						
-						displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],2,false,$attempts[$qn],false,false);
+					
+					echo ', is displayed below</p>';
+					if (!$noraw && $showeachscore && $GLOBALS['questionmanualgrade'] != true) {
+						$colors = scorestocolors($rawscores[$qn], '', '', $noraw);
 					} else {
-						echo ", can be viewed by clicking on the question number again.</p>";
+						$colors = array();
 					}
-				} 
-				if ($lefttodo > 0) {
-					echo "<p>or click <a href=\"showtest.php?action=skip&amp;done=true\">here</a> to finalize assessment and summarize score</p>\n";
-				} else {
-					echo "<a href=\"showtest.php?action=skip&amp;done=true\">Click here to finalize assessment and summarize score</a>\n";
+					if ($showcorrectnow) {
+						displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],2,false,$attempts[$qn],false,false,false,$colors);
+					} else {
+						displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],false,false,$attempts[$qn],false,false,false,$colors);
+					}
+					
+				} else if ($immediatereattempt) {
+					$next = $qn;
+					if (isset($intropieces)) {
+						foreach ($introdividers as $k=>$v) {
+							if ($v[1]<=$next+1 && $next+1<=$v[2]) {//right divider
+								if ($next+1==$v[1]) {
+									echo '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;">', _('Hide Question Information'), '</a></div>';
+									echo '<div class="intro" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';										
+								} else {
+									echo '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;">', _('Show Question Information'), '</a></div>';
+									echo '<div class="intro" style="display:none;" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';	
+								}
+								break;
+							}
+						}
+					}
+					echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=skip&amp;score=$next\" onsubmit=\"return doonsubmit(this)\">\n";
+					echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
+					echo '<input type="hidden" name="disptime" value="'.time().'" />';
+					echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
+					echo "<a name=\"beginquestions\"></a>\n";
+					basicshowq($next);
+					showqinfobar($next,true,true);
+					echo '<input type="submit" class="btn" value="Submit" />';
+					if (($testsettings['showans']=='J' && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='J') {
+						echo ' <input type="button" class="btn" value="', _('Jump to Answer'), '" onclick="if (confirm(\'', _('If you jump to the answer, you must generate a new version to earn credit'), '\')) {window.location = \'showtest.php?action=skip&amp;jumptoans='.$next.'&amp;to='.$next.'\'}"/>';
+					}
+					echo "</form>\n";
+					
 				}
+				
+				echo "<br/><p>When you're done, <a href=\"showtest.php?action=skip&amp;done=true\">click here to see a summary of your score</a>.</p>\n";
+				
 				echo "</div>\n";
 			    }
 			} else if (isset($_GET['to'])) { //jump to a problem
@@ -1373,11 +1467,16 @@ if (!isset($_POST['embedpostback'])) {
 					if (!$reattemptsremain && $testsettings['showans']!='N') {// && $showeachscore) {
 						echo "<p>", _('Question with last attempt is displayed for your review only'), "</p>";
 						
+						if (!$noraw && $showeachscore) {
+							$colors = scorestocolors($rawscores[$next], '', '', $noraw);
+						} else {
+							$colors = array();
+						}
 						$qshowans = ((($showansafterlast && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='F' || $qi[$questions[$next]]['showans']=='J') || ($showansduring && $qi[$questions[$next]]['showans']=='0' && $attempts[$next]>=$testsettings['showans']));
 						if ($qshowans) {
-							displayq($next,$qi[$questions[$next]]['questionsetid'],$seeds[$next],2,false,$attempts[$next],false,false);
+							displayq($next,$qi[$questions[$next]]['questionsetid'],$seeds[$next],2,false,$attempts[$next],false,false,false,$colors);
 						} else {
-							displayq($next,$qi[$questions[$next]]['questionsetid'],$seeds[$next],false,false,$attempts[$next],false,false);
+							displayq($next,$qi[$questions[$next]]['questionsetid'],$seeds[$next],false,false,$attempts[$next],false,false,false,$colors);
 						}
 					}
 					echo "</div>\n";
@@ -1612,7 +1711,7 @@ if (!isset($_POST['embedpostback'])) {
 					}
 				}
 				if ($showeachscore && $GLOBALS['questionmanualgrade'] != true) {
-					$colors = scorestocolors($rawscore,$qi[$questions[$qn]]['points'],$qi[$questions[$qn]]['answeights']);
+					$colors = scorestocolors($noraw?$scores[$qn]:$rawscores[$qn],$qi[$questions[$qn]]['points'],$qi[$questions[$qn]]['answeights'],$noraw);
 				}
 				
 				
@@ -1623,7 +1722,6 @@ if (!isset($_POST['embedpostback'])) {
 			if (hasreattempts($qn)) {
 				if ($divopen) { echo '</div>';}
 					
-		
 				ob_start();
 				basicshowq($qn,false,$colors);
 				$quesout = ob_get_clean();
@@ -2604,7 +2702,7 @@ if (!isset($_POST['embedpostback'])) {
 			
 			for ($i=0; $i<count($questions); $i++) {
 				echo '<div>';
-				$col = scorestocolors($scores[$i], $qi[$questions[$i]]['points'], $qi[$questions[$i]]['answeights']);
+				$col = scorestocolors($noraw?$scores[$qn]:$rawscores[$qn], $qi[$questions[$i]]['points'], $qi[$questions[$i]]['answeights'],$noraw);
 				displayq($i, $qi[$questions[$i]]['questionsetid'],$seeds[$i],$showa,false,$attempts[$i],false,false,false,$col);
 				echo "<div class=review>", _('Question')." ".($i+1).". ", _('Last Attempt:');
 				echo printscore($scores[$i], $i);

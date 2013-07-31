@@ -71,7 +71,7 @@ if (mysql_num_rows($result)==0) {
 //score a submitted question
 $showans = false;
 if (isset($_GET['score'])) {
-	$score = scoreq(0,$curitemid,$seed,$_POST['qn0']);
+	list($score,$rawscores) = scoreq(0,$curitemid,$seed,$_POST['qn0']);
 	$lastanswers[0] = stripslashes($lastanswers[0]);
 	$page_scoreMsg =  printscore($score,$curitemid,$seed);
 	if (getpts($score)<.99 && $sa==0) {

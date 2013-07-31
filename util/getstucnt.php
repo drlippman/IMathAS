@@ -9,33 +9,20 @@
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	echo "<p>Student count: ".mysql_result($result,0,0);
 	
-	$date = $now - 60*60*24*30*10;  
-	echo "<p>Active enrollments in last 10 months</p>";
+	if (isset($_GET['days'])) {
+		$days = intval($_GET['days']);
+	} else {
+		$days = 30;
+	}
+	$date = $now - 60*60*24*$days;  
+	echo "<p>Active enrollments in $days Days</p>";
 	$query = "SELECT count(imas_students.id) FROM imas_users,imas_students WHERE ";
 	$query .= "imas_users.id=imas_students.userid AND imas_users.lastaccess>$date";
 	
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	echo "<p>Student count: ".mysql_result($result,0,0);
 	
-	$date = $now - 60*60*24*30*10;  
-	echo "<p>Active users in last 10 months</p>";
-	$query = "SELECT count(DISTINCT imas_users.id) FROM imas_users,imas_students WHERE ";
-	$query .= "imas_users.id=imas_students.userid AND imas_users.lastaccess>$date";
-	
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	echo "<p>Student count: ".mysql_result($result,0,0);
-	
-
-	$date = $now - 60*60*24*7;  
-	echo "<p>Active users in 7 Days</p>";
-	$query = "SELECT count(DISTINCT imas_users.id) FROM imas_users,imas_students WHERE ";
-	$query .= "imas_users.id=imas_students.userid AND imas_users.lastaccess>$date";
-	
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	echo "<p>Student count: ".mysql_result($result,0,0);
-	
-	$date = $now - 60*60*24*30;  
-	echo "<p>Active users in 30 Days</p>";
+	echo "<p>Active users in $days Days</p>";
 	$query = "SELECT count(DISTINCT imas_users.id) FROM imas_users,imas_students WHERE ";
 	$query .= "imas_users.id=imas_students.userid AND imas_users.lastaccess>$date";
 	
@@ -52,15 +39,21 @@
 	$query .= "ON s.courseid=t.courseid AND s.lastaccess>$date  JOIN imas_users as u  ";
 	$query .= "ON u.id=t.userid JOIN imas_groups AS g ON g.id=u.groupid GROUP BY u.id ORDER BY g.name";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	$lastgroup = '';
+	$lastgroup = '';  $grpcnt = 0; $grpdata = '';
 	while ($row = mysql_fetch_row($result)) {
 		if ($row[0] != $lastgroup) {
-			echo "<b>{$row[0]}</b><br/>";
+			if ($lastgroup != '') {
+				echo "<b>$lastgroup</b>: $grpcnt<br/>";
+				echo $grpdata;
+			}
+			$grpcnt = 0;  $grpdata = '';
 			$lastgroup = $row[0];
 		}
-		echo "{$row[1]}:  {$row[2]}<br/>";
+		$grpdata .= "{$row[1]}:  {$row[2]}<br/>";
+		$grpcnt += $row[2];
 	}
-	
+	echo "<b>$lastgroup</b>: $grpcnt<br/>";
+	echo $grpdata;
 	
 	echo "<p>Active students last hour: ";
 	$date = $now - 60*60;
