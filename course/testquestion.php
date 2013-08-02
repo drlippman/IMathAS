@@ -59,7 +59,7 @@ if ($myrights<20) {
 		$page_scoreMsg =  "<p>Score on last answer: $score/1</p>\n";
 	} else {
 		$page_scoreMsg = "";
-		$scores = array(-1);
+		$scores = array(-1); 
 		$_SESSION['choicemap'] = array();
 	}
 	
@@ -236,7 +236,7 @@ if ($overwriteBody==1) {
 	echo "<input type=hidden name=attempt value=\"$attempt\">\n";
 
 	if (isset($rawscores)) {
-		$colors = scorestocolors(implode('~',$rawscores),1,0,false);
+		$colors = scorestocolors($rawscores,1,0,false);
 	} else {
 		$colors = array();
 	}

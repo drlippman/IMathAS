@@ -646,14 +646,14 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 		}
 		//return array_sum($scores);
 		if (isset($scoremethod) && $scoremethod == "singlescore") {
-			return array(round(array_sum($scores),3),$raw);
+			return array(round(array_sum($scores),3),implode('~',$raw));
 		} else if (isset($scoremethod) && $scoremethod == "allornothing") {
-			if (array_sum($scores)<.98) { return array(0,$raw); } else { return array(1,$raw);}
+			if (array_sum($scores)<.98) { return array(0,implode('~',$raw)); } else { return array(1,implode('~',$raw));}
 		} else if (isset($scoremethod) && $scoremethod == "acct") {
 			$sc = round($qnpointval*array_sum($scores)/$accpts,3);
-			return (array($sc, $raw));
+			return (array($sc, implode('~',$raw)));
 		} else {
-			return array(implode('~',$scores),$raw);
+			return array(implode('~',$scores),implode('~',$raw));
 		}
 	} else {
 		if ($qdata['qtype']=='essay' || $qdata['qtype']=='file') {

@@ -570,7 +570,7 @@ function enditem($canedit) {
 				   $startdate = formatdate($line['startdate']);
 			   }
 			   if ($line['enddate']==2000000000) {
-				   $enddate = _('Never');
+				   $enddate =  _('Always');
 			   } else {
 				   $enddate =formatdate($line['enddate']);
 			   }

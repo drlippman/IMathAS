@@ -4,7 +4,7 @@
 //June 2013
 
 global $allowedmacros;
-array_push($allowedmacros,"makejournal","scorejournal","makeaccttable","makeaccttable2","makeTchart","scoreTchart","makestatement","scorestatement","makeinventory","makeTchartsfromjournal","scoreTchartsfromjournal","makeledgerfromjournal","maketrialbalance","maketrialbalancefromjournal","scoretrialbalance","scoretrialbalancefromjournal","totalsfromjournal","prettyacct");
+array_push($allowedmacros,"makejournal","scorejournal","makeaccttable","makeaccttable2","makeTchart","scoreTchart","makestatement","scorestatement","makeinventory","scoreinventory","makeTchartsfromjournal","scoreTchartsfromjournal","makeledgerfromjournal","maketrialbalance","maketrialbalancefromjournal","scoretrialbalance","scoretrialbalancefromjournal","totalsfromjournal","prettyacct");
 
 //makestatement(statement array, start number, options, $anstypes, $questions, $answer, $showanswer, $displayformat, $answerformat, $answerboxsize)
 //statement array form:
@@ -1079,6 +1079,68 @@ function makeledgerfromjournal($j, $start, $order, $types, $sn, &$anstypes, &$an
 	return $out;
 }
 
+//scoreinventory($stua, $answer, $invs, $rowper, $sn)
+function scoreinventory($stua, $answer, $invs, $rowper, $sn) {
+	foreach($invs as $inv) {
+		if ($inv[0]=='init') {
+			$sn += 9;
+		} else {
+			$sn += 3; //skip past purch
+			for ($i=$sn+3;$i<$sn+$rowper*6;$i+=6) {  //start on inventory
+				if ($stua[$i]=='') {continue;}
+				$foundmatch = false;
+				for ($j=$sn+3;$j<$sn+$rowper*6;$j+=6) {
+					if (trim($stua[$i])==$answer[$j] && trim($stua[$i+1])==$answer[$j+1]) {
+						$foundmatch = true;
+						$matchloc = $j;
+						break;
+					}
+				}
+				if ($foundmatch && $i != $matchloc) {
+					$tmp = array();
+					for ($k=0;$k<3;$k++) {
+						$tmp[$k] = $answer[$i+$k];
+					}
+					for ($k=0;$k<3;$k++) {
+						$answer[$i+$k] = $answer[$matchloc+$k];
+					}
+					for ($k=0;$k<3;$k++) {
+						$answer[$matchloc+$k] = $tmp[$k];
+					}
+				}
+			}
+			if ($inv[0]=='sale') {
+				for ($i=$sn;$i<$sn+$rowper*6;$i+=6) {  //do cogs
+					if ($stua[$i]=='') {continue;}
+					$foundmatch = false;
+					for ($j=$sn;$j<$sn+$rowper*6;$j+=6) {
+						if (trim($stua[$i])==$answer[$j] && trim($stua[$i+1])==$answer[$j+1]) {
+							$foundmatch = true;
+							$matchloc = $j;
+							break;
+						}
+					}
+					if ($foundmatch && $i != $matchloc) {
+						$tmp = array();
+						for ($k=0;$k<3;$k++) {
+							$tmp[$k] = $answer[$i+$k];
+						}
+						for ($k=0;$k<3;$k++) {
+							$answer[$i+$k] = $answer[$matchloc+$k];
+						}
+						for ($k=0;$k<3;$k++) {
+							$answer[$matchloc+$k] = $tmp[$k];
+						}
+					}
+				}
+			}
+			$sn += $rowper*6;
+		}
+		
+	}
+	return $answer;
+}
+
 //makeinventory($invs, $type, $rowper, $sn, &$anstypes, $questions, &$answer, &$showanswer, &$displayformat, &$answerformat, &$answerboxsize, $get) {
 //invs has form array(array('type','date',quantity, value)), where type is 'init','purch',or 'sale'
 //get can be set to 'journal' or 'totals', but defaults to 'rec', which generates a perpetual inventory record
@@ -1437,24 +1499,24 @@ function scoretrialbalance($stua, $answer, $data, $numrows, $sn) {
 		}
 	}
 	//now score by groups.  We know stua is in the right order
-	for ($i=$sn;$i<$sn+$nq*3;$i+=3) {
+	for ($j=$sn;$j<$sn+$numrows*3;$j+=3) {
+		if ($stua[$j]=='') {continue;}
 		$foundmatch = false;
-		for ($j=$sn;$j<$sn+$numrows*3;$j+=3) {
-			if ($stua[$j]=='') {continue;}
+		for ($i=$sn;$i<$sn+$nq*3;$i+=3) {
 			if (trim(strtolower($stua[$j]))==trim(strtolower($answer[$i]))) {
 				$foundmatch = true;
-				$matchloc = $j;
+				$matchloc = $i;
 				break; //from stua loop
 			}
 		}
-		if ($foundmatch && $matchloc != $i) {
+		if ($foundmatch && $matchloc != $j) {
 			//swap answer from $answer[$i] to $answer[$j] 
 			$tmp = array();
 			for ($k=0;$k<3;$k++) {
-				$tmp[$k] = $answer[$i+$k];
+				$tmp[$k] = $answer[$j+$k];
 			}
 			for ($k=0;$k<3;$k++) {
-				$answer[$i+$k] = $answer[$matchloc+$k];
+				$answer[$j+$k] = $answer[$matchloc+$k];
 			}
 			for ($k=0;$k<3;$k++) {
 				$answer[$matchloc+$k] = $tmp[$k];

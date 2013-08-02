@@ -1186,7 +1186,7 @@ if ($overwriteBody==1) {
 				if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 ?>
 
-				<td><input type=checkbox name='achecked[]' value='<?php echo $page_assessmentList[$i]['id'] ?>' checked=1></td>
+				<td><input type=checkbox name='achecked[]' value='<?php echo $page_assessmentList[$i]['id'] ?>'></td>
 				<td><?php echo $page_assessmentList[$i]['name'] ?></td>
 				<td><?php echo $page_assessmentList[$i]['summary'] ?></td>
 			</tr>

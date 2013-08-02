@@ -429,9 +429,6 @@ function scorequestion($qn) {
 	
 	$rawscore = calcpointsafterpenalty($rawscore,$qi[$questions[$qn]],$testsettings,0); //possible
 	
-	if (is_array($rawscores[$qn])) { 
-		$rawscores[$qn] = implode('~', $rawscores[$qn]);
-	}
 	//work in progress
 	//need to rework canimprove
 	if (!$regenonreattempt && $attempts[$qn]>0 && strpos($afterpenalty,'~')!==false) {
