@@ -283,17 +283,34 @@ Date.prototype.getWeekDays = function(d) {
 	  var globd = getFieldDate(dateField.value);
 	  document.getElementById(dateField.id.substring(0,2)+dateField.id.substring(5)).innerHTML = globd.SHORTDAYS[globd.getDay()];
   }
-	  
+  var availnames = [_("Hidden"),_("By Dates"),_("Always")];
   function MCDtoggle(type,cnt) {
-	var typeinput = document.getElementById(type+"datetype"+cnt);
-	if (typeinput.value==0) { //swap from A/N to date
-		document.getElementById(type+"span0"+cnt).className="hide";
-		document.getElementById(type+"span1"+cnt).className="show";
-		typeinput.value = 1;
-	} else { //swap from date to A/N
-		document.getElementById(type+"span0"+cnt).className="show";
-		document.getElementById(type+"span1"+cnt).className="hide";
-		typeinput.value = 0;
+  	if (type=='a') {
+		var curval = $('#avail'+cnt).val();
+		if (baserdates[cnt]=='NA') {
+			curval = (curval+1)%3;	
+		} else {
+			curval = 1-curval;
+		}
+		
+		$('#avail'+cnt).val(curval);
+		if (curval==1) {
+			$('#avail'+cnt).parent().parent().find('td.togdis').removeClass('dis');
+		} else {
+			$('#avail'+cnt).parent().parent().find('td.togdis').addClass('dis');
+		}
+		$('#availname'+cnt).text(availnames[curval]);
+	} else {
+		var typeinput = document.getElementById(type+"datetype"+cnt);
+		if (typeinput.value==0) { //swap from A/N to date
+			document.getElementById(type+"span0"+cnt).className="hide";
+			document.getElementById(type+"span1"+cnt).className="show";
+			typeinput.value = 1;
+		} else { //swap from date to A/N
+			document.getElementById(type+"span0"+cnt).className="show";
+			document.getElementById(type+"span1"+cnt).className="hide";
+			typeinput.value = 0;
+		}
 	}
 	  
   }
@@ -305,19 +322,31 @@ Date.prototype.getWeekDays = function(d) {
 		  if (els[i].type=='checkbox' && els[i].checked && els[i].id!='ca') {
 			var cnt = els[i].value;
 			try {
-				if (to=="dates") { //swap from A/N to date
-					document.getElementById(type+"span0"+cnt).className="hide";
-					document.getElementById(type+"span1"+cnt).className="show";
-					document.getElementById(type+"datetype"+cnt).value = 1;
-				} else { //swap from date to A/N
-					document.getElementById(type+"span0"+cnt).className="show";
-					document.getElementById(type+"span1"+cnt).className="hide";
-					document.getElementById(type+"datetype"+cnt).value = 0;
-					if (type=='r') {
-						if (to=='always') {
-							document.getElementById("rdateanA"+cnt).checked=true;
-						} else {
-							document.getElementById("rdateanN"+cnt).checked=true;
+				if (type=='a') {
+					$('#avail'+cnt).val((baserdates[cnt]!='NA' && to==2)?1:to);
+					if (to==1 || (baserdates[cnt]!='NA' && to==2)) {
+						$(els[i]).parent().parent().find('td.togdis').removeClass('dis');
+						$('#availname'+cnt).text(availnames[1]);
+					} else {
+						$(els[i]).parent().parent().find('td.togdis').addClass('dis');
+						$('#availname'+cnt).text(availnames[to]);
+					}
+					
+				} else {
+					if (to=="dates") { //swap from A/N to date
+						document.getElementById(type+"span0"+cnt).className="hide";
+						document.getElementById(type+"span1"+cnt).className="show";
+						document.getElementById(type+"datetype"+cnt).value = 1;
+					} else { //swap from date to A/N
+						document.getElementById(type+"span0"+cnt).className="show";
+						document.getElementById(type+"span1"+cnt).className="hide";
+						document.getElementById(type+"datetype"+cnt).value = 0;
+						if (type=='r') {
+							if (to=='always') {
+								document.getElementById("rdateanA"+cnt).checked=true;
+							} else {
+								document.getElementById("rdateanN"+cnt).checked=true;
+							}
 						}
 					}
 				}
@@ -342,6 +371,7 @@ Date.prototype.getWeekDays = function(d) {
   	var cnt = document.getElementById("chgcnt").value;
   	for (var i=0;i<cnt;i++) {
   		var out = [];
+
   		if (document.getElementById("sdatetype"+i).value == 0) {
   			out.push(0);
   		} else { 
@@ -368,6 +398,7 @@ Date.prototype.getWeekDays = function(d) {
   		
   		out.push(document.getElementById("type"+i).value);
   		out.push(document.getElementById("id"+i).value);
+  		out.push(document.getElementById("avail"+i).value);
   		var newel = document.createElement("input");
   		newel.name = "data"+i;
   		newel.type = "hidden";
@@ -379,12 +410,19 @@ Date.prototype.getWeekDays = function(d) {
   function chgswaptype(el) {
   	  var elout = document.getElementById("swapselected");
   	  elout.options.length = 0;
-  	  elout.options[elout.options.length] = new Option('Always','always',false,false);
-  	  
-  	  if (el.value=='r') {
-  	  	  elout.options[elout.options.length] = new Option('Never','never',false,false);
+  	 
+  	  if (el.value=='a') {
+  	  	   elout.options[elout.options.length] = new Option('Hidden','0',false,false);
+  	  	   elout.options[elout.options.length] = new Option('By Dates','1',false,false);
+  	  	   elout.options[elout.options.length] = new Option('Always/By Dates','2',false,false);
+  	  } else {
+  	  	   elout.options[elout.options.length] = new Option('Always','always',false,false);
+		  if (el.value=='r') {
+			  elout.options[elout.options.length] = new Option('Never','never',false,false);
+		  }
+		  elout.options[elout.options.length] = new Option('Dates','dates',false,false);
   	  }
-  	  elout.options[elout.options.length] = new Option('Dates','dates',false,false);
+
   }
   
   	//TODO: separately calculate day difference (using daysBetween and getWeekDays) and time difference separately

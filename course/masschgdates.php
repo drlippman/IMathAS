@@ -82,29 +82,30 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			
 			$type = $data[3]; // $_POST['type'.$i];
 			$id = $data[4]; // $_POST['id'.$i];
+			$avail = intval($data[5]);
 			if ($type=='Assessment') {
 				if ($id>0) {
-					$query = "UPDATE imas_assessments SET startdate='$startdate',enddate='$enddate',reviewdate='$reviewdate' WHERE id='$id'";
+					$query = "UPDATE imas_assessments SET startdate='$startdate',enddate='$enddate',reviewdate='$reviewdate',avail='$avail' WHERE id='$id'";
 					mysql_query($query) or die("Query failed : " . mysql_error());
 				}
 			} else if ($type=='Forum') {
 				if ($id>0) {
-					$query = "UPDATE imas_forums SET startdate='$startdate',enddate='$enddate' WHERE id='$id'";
+					$query = "UPDATE imas_forums SET startdate='$startdate',enddate='$enddate',avail='$avail' WHERE id='$id'";
 					mysql_query($query) or die("Query failed : " . mysql_error());
 				}
 			} else if ($type=='Wiki') {
 				if ($id>0) {
-					$query = "UPDATE imas_wikis SET startdate='$startdate',enddate='$enddate' WHERE id='$id'";
+					$query = "UPDATE imas_wikis SET startdate='$startdate',enddate='$enddate',avail='$avail' WHERE id='$id'";
 					mysql_query($query) or die("Query failed : " . mysql_error());
 				}
 			} else if ($type=='InlineText') {
 				if ($id>0) {
-					$query = "UPDATE imas_inlinetext SET startdate='$startdate',enddate='$enddate' WHERE id='$id'";
+					$query = "UPDATE imas_inlinetext SET startdate='$startdate',enddate='$enddate',avail='$avail' WHERE id='$id'";
 					mysql_query($query) or die("Query failed : " . mysql_error());
 				}
 			} else if ($type=='LinkedText') {
 				if ($id>0) {
-					$query = "UPDATE imas_linkedtext SET startdate='$startdate',enddate='$enddate' WHERE id='$id'";
+					$query = "UPDATE imas_linkedtext SET startdate='$startdate',enddate='$enddate',avail='$avail' WHERE id='$id'";
 					mysql_query($query) or die("Query failed : " . mysql_error());
 				}
 			} else if ($type=='Block') {
@@ -118,6 +119,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$sub =& $sub[$blocktree[$j]-1];
 				$sub['startdate'] = $startdate;
 				$sub['enddate'] = $enddate;
+				$sub['avail'] = $avail;
 				$blockchg++;
 			}
 			
@@ -133,8 +135,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		exit;
 	} else { //DEFAULT DATA MANIPULATION
 		$pagetitle = "Mass Change Dates";
-		$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/masschgdates.js?v=112612\"></script>";
-		$placeinhead .= "<style>.show {display:inline;} \n .hide {display:none;} img {cursor:pointer;}\n</style>";
+		$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/masschgdates.js?v=080113\"></script>";
+		$placeinhead .= "<style>.show {display:inline;} \n .hide {display:none;} img {cursor:pointer;}\n td.dis {color:#ccc;opacity:0.5;}\n td.dis input {color: #ccc;}</style>";
 	}
 }	
 
@@ -153,6 +155,7 @@ if ($overwriteBody==1) {
 		return $shortdays[date('w',$atime)];
 	}
 	
+	$availnames = array(_("Hidden"),_("By Dates"),_("Always"));
 
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";	
 	echo "&gt; Mass Change Dates</div>\n";
@@ -228,17 +231,17 @@ if ($overwriteBody==1) {
 	echo "difference to all rows below.  You can select <i>Copy down time</i> or <i>Copy down date &amp; time</i>to copy the same time/date to all rows below.  ";
 	echo "If you click the checkboxes on the left, you can limit the update to those items. ";
 	echo "Click the <img src=\"$imasroot/img/swap.gif\"> icon in each cell to swap from ";
-	echo "Always/Never to Dates.  Swaps to/from Always/Never cannot be sent down the list.</p>";
+	echo "Always/Never to Dates.  Swaps to/from Always/Never and Show changes cannot be sent down the list, but you can use the checkboxes and the pulldowns to change those settings for many items at once.</p>";
 	echo "<form id=\"qform\">";
 	
 	echo 'Check: <a href="#" onclick="return chkAllNone(\'qform\',\'all\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'all\',false)">None</a> ';
 
 	//echo '<p>Check/Uncheck All: <input type="checkbox" name="ca" value="1" onClick="chkAll(this.form, this.checked)"/>. ';
-	echo 'Change selected items <select id="swaptype" onchange="chgswaptype(this)"><option value="s">Start Date</option><option value="e">End Date</option><option value="r">Review Date</option></select>';
+	echo 'Change selected items <select id="swaptype" onchange="chgswaptype(this)"><option value="s">Start Date</option><option value="e">End Date</option><option value="r">Review Date</option><option value="a">Show</option></select>';
 	echo ' to <select id="swapselected"><option value="always">Always</option><option value="dates">Dates</option></select>';
 	echo ' <input type="button" value="Go" onclick="MCDtoggleselected(this.form)" />';
 	
-	echo '<table class=gb><thead><tr><th>Name</th><th>Type</th><th>Start Date</th><th>End Date</th><th>Review Date</th><th>Send Date Chg / Copy Down List</th></thead><tbody>';
+	echo '<table class=gb><thead><tr><th>Name</th><th>Type</th><th>Show</th><th>Start Date</th><th>End Date</th><th>Review Date</th><th>Send Date Chg / Copy Down List</th></thead><tbody>';
 	
 	if ($orderby==3) {  //course page order
 		$itemsassoc = array();
@@ -354,7 +357,7 @@ if ($overwriteBody==1) {
 		$items = unserialize(mysql_result($result,0,0));
 		
 		function getblockinfo($items,$parent) {
-			global $ids,$types,$names,$startdates,$enddates,$reviewdates,$ids,$itemscourseorder,$courseorder,$orderby;
+			global $ids,$types,$names,$startdates,$enddates,$reviewdates,$ids,$itemscourseorder,$courseorder,$orderby,$avails;
 			foreach($items as $k=>$item) {
 				if (is_array($item)) {
 					$ids[] = $parent.'-'.($k+1);
@@ -408,16 +411,17 @@ if ($overwriteBody==1) {
 		echo "{$types[$i]}<input type=hidden id=\"type$cnt\" value=\"{$types[$i]}\"/>";
 		if ($types[$i]=='Assessment') {
 			if ($now>$startdates[$i] && $now<$enddates[$i]) {
-				echo " <i><a href=\"addquestions.php?aid={$ids[$i]}&cid=$cid\">Q</a></i>";	
+				echo " <i><a href=\"addquestions.php?aid={$ids[$i]}&cid=$cid\" title=\""._("Add/Remove Questions")."\">Q</a></i>";	
 			} else {
-				echo " <a href=\"addquestions.php?aid={$ids[$i]}&cid=$cid\">Q</a>";
+				echo " <a href=\"addquestions.php?aid={$ids[$i]}&cid=$cid\" title=\""._("Add/Remove Questions")."\">Q</a>";
 			}
-			echo " <a href=\"addassessment.php?id={$ids[$i]}&cid=$cid&from=mcd\">S</a>\n";
+			echo " <a href=\"addassessment.php?id={$ids[$i]}&cid=$cid&from=mcd\" title=\""._("Settings")."\">S</a>\n";
 		}
 		echo "</td>";
 		
+		echo '<td><img src="'.$imasroot.'/img/swap.gif" onclick="MCDtoggle(\'a\','.$cnt.')"/><span id="availname'.$cnt.'">'.$availnames[$avails[$i]].'</span><input type="hidden" id="avail'.$cnt.'" value="'.$avails[$i].'"/></td>';
 		
-		echo "<td><img src=\"$imasroot/img/swap.gif\" onclick=\"MCDtoggle('s',$cnt)\"/>";
+		echo "<td class=\"togdis".($avails[$i]!=1?' dis':'')."\"><img src=\"$imasroot/img/swap.gif\" onclick=\"MCDtoggle('s',$cnt)\"/>";
 		if ($startdates[$i]==0) {
 			echo "<input type=hidden id=\"sdatetype$cnt\" name=\"sdatetype$cnt\" value=\"0\"/>";
 		} else {
@@ -447,7 +451,7 @@ if ($overwriteBody==1) {
 		echo " at <input type=text size=8 id=\"stime$cnt\" name=\"stime$cnt\" value=\"$stime\">";
 		echo '</span></td>';
 		
-		echo "<td><img src=\"$imasroot/img/swap.gif\"  onclick=\"MCDtoggle('e',$cnt)\"/>";
+		echo "<td class=\"togdis".($avails[$i]!=1?' dis':'')."\"><img src=\"$imasroot/img/swap.gif\"  onclick=\"MCDtoggle('e',$cnt)\"/>";
 		if ($enddates[$i]==2000000000) {
 			echo "<input type=hidden id=\"edatetype$cnt\" name=\"edatetype$cnt\" value=\"0\"/>";
 		} else {
@@ -477,7 +481,7 @@ if ($overwriteBody==1) {
 		echo " at <input type=text size=8 id=\"etime$cnt\" name=\"etime$cnt\" value=\"$etime\">";
 		echo '</span></td>';
 				
-		echo "<td>";
+		echo "<td class=\"togdis".($avails[$i]!=1?' dis':'')."\">";
 		if ($types[$i]=='Assessment') {
 			echo "<img src=\"$imasroot/img/swap.gif\"  onclick=\"MCDtoggle('r',$cnt)\"/>";
 			if ($reviewdates[$i]==0 || $reviewdates[$i]==2000000000) {
