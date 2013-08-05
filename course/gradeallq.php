@@ -610,6 +610,9 @@
 	}
 function getansweights($qi,$code) {
 	global $seeds,$questions;	
+	if (preg_match('/scoremethod\s*=\s*"(singlescore|acct|allornothing)"/', $code)) {
+		return array(1);
+	}
 	$i = array_search($qi,$questions);
 	return sandboxgetweights($code,$seeds[$i]);
 }
@@ -617,10 +620,23 @@ function getansweights($qi,$code) {
 function sandboxgetweights($code,$seed) {
 	srand($seed);
 	$code = interpret('control','multipart',$code);
-	if (strpos($code,'answeights')!==false) {
-		$code = str_replace("\n",';if(isset($answeights)){return;};'."\n",$code);
+	if (($p=strrpos($code,'answeights'))!==false) {
+		$np = strpos($code,"\n",$p);
+		if ($np !== false) {
+			$code = substr($code,0,$np).';if(isset($answeights)){return;};'.substr($code,$np);
+		} else {
+			$code .= ';if(isset($answeights)){return;};';
+		}
+		//$code = str_replace("\n",';if(isset($answeights)){return;};'."\n",$code);
 	} else {
-		$code = str_replace("\n",';if(isset($anstypes)){return;};'."\n",$code);
+		$p=strrpos($code,'answeights');
+		$np = strpos($code,"\n",$p);
+		if ($np !== false) {
+			$code = substr($code,0,$np).';if(isset($anstypes)){return;};'.substr($code,$np);
+		} else {
+			$code .= ';if(isset($answeights)){return;};';
+		}
+		//$code = str_replace("\n",';if(isset($anstypes)){return;};'."\n",$code);
 	}
 	eval($code);
 	if (!isset($answeights)) {
