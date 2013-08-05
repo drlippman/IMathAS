@@ -522,7 +522,7 @@ function recordtestdata($limit=false) {
 			$query = "UPDATE imas_assessment_sessions SET reviewlastanswers='$lalist' ";
 		} else {
 			$query = "UPDATE imas_assessment_sessions SET reviewscores='$scorelist',reviewattempts='$attemptslist',reviewseeds='$seedslist',reviewlastanswers='$lalist',";
-			$query .= "endtime=$now,reviewreattempting='$reattemptinglist' ";
+			$query .= "reviewreattempting='$reattemptinglist' ";
 		}
 	} else {
 		if ($limit) {
