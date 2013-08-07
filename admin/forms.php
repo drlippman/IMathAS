@@ -407,7 +407,7 @@ switch($_GET['action']) {
 		
 		if (isset($enablebasiclti) && $enablebasiclti==true) {
 			echo '<span class="form">LTI access secret (max 10 chars; blank to not use)</span>';
-			echo '<span class="formright"><input name="ltisecret" type="text" value="'.$ltisecret.'" /> ';
+			echo '<span class="formright"><input name="ltisecret" type="text" value="'.$ltisecret.'" maxlength="10"/> ';
 			echo '<a href="#" onclick="document.getElementById(\'ltiurl\').style.display=\'\'; return false;">LTI url/key?</a>';
 			echo '<span id="ltiurl" style="display:none;">';
 			if (isset($_GET['id'])) {

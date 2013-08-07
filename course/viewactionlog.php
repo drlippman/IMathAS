@@ -98,7 +98,7 @@ foreach ($actions as $r) {
 		if ($r[3]==$r[1] || (strpos($r[3],'showlinkedtext')!==false && strpos($r[3],'id='.$r[1])!==false)) {
 			echo 'Opened linked text item '.$linames[$r[1]];
 		} else {
-			echo 'Clicked linked item '.$linames[$r[1]].' link to '.$r[3];
+			echo 'Clicked linked item <a href="'.$r[3].'">'.$linames[$r[1]].'</a>';
 		}
 		break;
 	case 'linkedintext':
@@ -108,7 +108,8 @@ foreach ($actions as $r) {
 		echo 'Via calendar, clicked linked item '.$linames[$r[1]].' link to '.$r[3];
 		break;
 	case 'extref':
-		echo 'In assessment '.$exnames[$r[1]].', clicked help '.$r[3];
+		$p = explode(':',$r[3]);
+		echo 'In assessment '.$exnames[$r[1]].', clicked help for <a href="'.$p[0].'">'.$p[1].'</a>';
 		break;
 	case 'assessintro':
 		echo 'In assessment '.$asnames[$r[1]].' intro, clicked link to '.$r[3];

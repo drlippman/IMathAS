@@ -451,7 +451,7 @@ function setupvideoembeds(i,el) {
 		title: _("Watch video here"),
 		id: 'videoembedbtn'+videoembedcounter,
 		click: togglevideoembed,
-		class: "videoembedbtn"
+		"class": "videoembedbtn"
 	}).insertAfter(el);
 	videoembedcounter++;
 }

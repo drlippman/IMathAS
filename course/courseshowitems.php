@@ -678,7 +678,12 @@ function enditem($canedit) {
 						  echo "<div class=icon style=\"background-color: #99f;\">?</div>";
 					   }
 				   }
-				   echo "<div class=title><b><a href=\"../assessment/showtest.php?id=$typeid&cid=$cid\">{$line['name']}</a></b><BR> ", _('Past Due Date.  Showing as Review');
+				   echo "<div class=title><b><a href=\"../assessment/showtest.php?id=$typeid&cid=$cid\"";
+				   if (isset($studentid)) {
+				   	   echo " data-base=\"assess-$typeid\"";
+				   }
+				   
+				   echo ">{$line['name']}</a></b><BR> ", _('Past Due Date.  Showing as Review');
 				   if ($line['reviewdate']!=2000000000) { 
 					   echo " ", _('until'), " $reviewdate \n";
 				   }
