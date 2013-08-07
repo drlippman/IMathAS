@@ -103,6 +103,11 @@ if (isset($_GET['launch'])) {
 		$query = "SELECT courseid FROM imas_assessments WHERE id='$aid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$cid = mysql_result($result,0,0);
+		if ($sessiondata['ltirole'] == 'learner') {
+			$query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime,info) VALUES ";
+			$query .= "('$userid','$cid','assesslti','$aid',$now,'')";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+		}
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id=$aid");
 	} else if ($sessiondata['ltiitemtype']==1) { //is cid
 		$cid = $sessiondata['ltiitemid'];
@@ -934,6 +939,11 @@ if (!$promptforsettings && !$createnewsession && !($keyparts[0]=='aid' && $tlwrd
 	mysql_query($query) or die("Query failed : " . mysql_error());
 	
 	if ($keyparts[0]=='aid') { //is aid
+		if ($sessiondata['ltirole'] == 'learner') {
+			$query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime,info) VALUES ";
+			$query .= "('$userid','$cid','assesslti','$aid',$now,'')";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+		}
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id=$aid&ltilaunch=true");
 	} else if ($keyparts[0]=='cid') { //is cid
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");

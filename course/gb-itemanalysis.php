@@ -77,10 +77,11 @@
 	$attempts = array();
 	$regens = array();
 	
-	$query = "SELECT defpoints,name,itemorder,defoutcome FROM imas_assessments WHERE id='$aid'";
+	$query = "SELECT defpoints,name,itemorder,defoutcome,showhints FROM imas_assessments WHERE id='$aid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	list($defpoints, $aname, $itemorder, $defoutcome) = mysql_fetch_row($result);
+	list($defpoints, $aname, $itemorder, $defoutcome, $showhints) = mysql_fetch_row($result);
 	echo $aname.'</h2></div>';
+	
 	
 	$itemarr = array();
 	$itemnum = array();
@@ -144,23 +145,42 @@
 			$timetaken[] = $line['endtime']-$line['starttime'];
 		}
 	}
+	
+	$vidcnt = array();
+	$qlist = implode(',', array_keys($qcnt));
+	$query = "SELECT ict.typeid,COUNT(DISTINCT ict.userid) FROM imas_content_track AS ict JOIN imas_students AS ims ON ict.userid=ims.userid WHERE ims.courseid='$cid' AND ict.courseid='$cid' AND ict.type='extref' AND ict.typeid IN ($qlist)";
+	if ($secfilter!=-1) {
+		$query .= " AND ims.section='$secfilter' ";
+	}
+	$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
+	while ($row = mysql_fetch_row($result)) {
+		if (!isset($vidcnt[$row[0]])) { $vidcnt[$row[0]]=0;}
+		$vidcnt[$row[0]] += 1;
+	}
+	
 	$notstarted = ($totstucnt - count($timetaken));
 	$nonstartedper = round(100*$notstarted/$totstucnt,1);
 	if ($notstarted==0) {
-		echo '<p>All students have started this assessment</p>';
+		echo '<p>All students have started this assessment. ';
 	} else {
-		echo "<p>$notstarted students ($nonstartedper%) have not started this assessment.  They are not included in the numbers below</p>";
+		echo "<p><a href=\"#\" onclick=\"GB_show('Not Started','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=notstart',500,300);return false;\">$notstarted student".($notstarted>1?'s':'')."</a> ($nonstartedper%) ".($notstarted>1?'have':'has')." not started this assessment.  They are not included in the numbers below. ";
 	}
+	echo '<a href="isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'">View Score List</a>.</p>';
 	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 	echo "<table class=gb id=myTable><thead>"; //<tr><td>Name</td>\n";
 	echo "<tr><th>#</th><th scope=\"col\">Question</th><th>Grade</th><th scope=\"col\">Average Score<br/>All</th>";
-	echo "<th scope=\"col\">Average Score<br/>Attempted</th><th scope=\"col\">Average Attempts<br/>(Regens)</th><th scope=\"col\">% Incomplete</th><th scope=\"col\">Time per student<br/> (per attempt)</th><th scope=\"col\">Preview</th></tr></thead>\n";
+	echo "<th scope=\"col\">Average Score<br/>Attempted</th><th scope=\"col\">Average Attempts<br/>(Regens)</th><th scope=\"col\">% Incomplete</th>";
+	echo "<th scope=\"col\">Time per student<br/> (per attempt)</th>";
+	if ($showhints==1) {
+		echo '<th scope="col">Clicked on Help</th>';
+	}
+	echo "<th scope=\"col\">Preview</th></tr></thead>\n";
 	echo "<tbody>";
 	if (count($qtotal)>0) {
 		$i = 1;
 		//$qs = array_keys($qtotal);
 		$qslist = implode(',',$itemarr);
-		$query = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questionset.id,imas_questions.withdrawn,imas_questionset.qtype,imas_questionset.control ";
+		$query = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questionset.id,imas_questions.withdrawn,imas_questionset.qtype,imas_questionset.control,imas_questions.showhints,imas_questionset.extref ";
 		$query .= "FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
 		$query .= " AND imas_questions.id IN ($qslist)";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -169,6 +189,7 @@
 		$withdrawn = array();
 		$qsetids = array();
 		$needmanualgrade = array();
+		$showextref = array();
 		while ($row = mysql_fetch_row($result)) {
 			$descrips[$row[1]] = $row[0];
 			$points[$row[1]] = $row[2];
@@ -178,10 +199,15 @@
 				$needmanualgrade[$row[1]] = true;
 			} else if ($row[5]=='multipart') {
 				if (preg_match('/anstypes.*?(".*?"|array\(.*?\))/',$row[6],$matches)) {
-					if (strpos($matches[1],'essay')!==false || strpos($matches[1],'essay')!==false) {
+					if (strpos($matches[1],'essay')!==false || strpos($matches[1],'file')!==false) {
 						$needmanualgrade[$row[1]] = true;
 					}
 				}
+			}
+			if ($row[8]!='' && ($row[7]==2 || ($row[7]==0 && $showhints==1))) {
+				$showextref[$row[1]] = true;
+			} else {
+				$showextref[$row[1]] = false;
 			}
 		}
 		
@@ -255,7 +281,17 @@
 				echo 'class="manualgrade" ';
 			}
 			echo ">Grade</a></td>";
-			echo "<td>$avg/$pts ($pc%)</td><td>$avg2/$pts ($pc2%)</td><td>$avgatt ($avgreg)</td><td>$pi</td><td>$avgtot ($avgtota)</td>";
+			echo "<td>$avg/$pts ($pc%)</td><td class=\"pointer\" onclick=\"GB_show('Low Scores','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=score',500,300);return false;\">$avg2/$pts ($pc2%)</td>";
+			echo "<td class=\"pointer\" onclick=\"GB_show('Most Attempts and Regens','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=att',500,300);return false;\">$avgatt ($avgreg)</td>";
+			echo "<td class=\"pointer\" onclick=\"GB_show('Incomplete','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=incomp',500,300);return false;\">$pi</td>";
+			echo "<td class=\"pointer\" onclick=\"GB_show('Most Time','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=time',500,300);return false;\">$avgtot ($avgtota)</td>";
+			if ($showhints==1) {
+				if ($showextref[$qid]) {
+					echo "<td class=\"pointer\" onclick=\"GB_show('Got Help','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=help',500,300);return false;\">".round(100*$vidcnt[$qid]/($qcnt[$qid] - $qincomplete[$qid])).'%</td>';
+				} else {
+					echo '<td>N/A</td>';
+				}
+			}
 			echo "<td><input type=button value=\"Preview\" onClick=\"previewq({$qsetids[$qid]})\"/></td>\n";
 			
 			echo "</tr>\n";

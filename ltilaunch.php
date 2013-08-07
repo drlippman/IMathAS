@@ -1,5 +1,5 @@
 <?php
-//LTI Launch
+//Simple LTI Launch - *DEPRECATED*
 //Called from iframe using URL produced during LTIlaunchrequest.php negotiation
 
 if (isset($_GET['stuerr'])) {

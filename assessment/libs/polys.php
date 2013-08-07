@@ -3,7 +3,7 @@
 
 
 global $allowedmacros;
-array_push($allowedmacros,"formpoly","formpolyfromroots","writepoly","addpolys","subtpolys","multpolys","scalepoly","quadroot","getcoef","polypower");
+array_push($allowedmacros,"formpoly","formpolyfromroots","writepoly","addpolys","subtpolys","multpolys","scalepoly","roundpoly","quadroot","getcoef","polypower");
 
 
 //formpoly(coefficients,powers or degree)
@@ -93,6 +93,14 @@ function writepoly($poly,$var="x",$sz=false) {
 	return $po;
 }
 
+//roundpoly(poly, d)
+//rounds the coefficients in the poly to d places
+function roundpoly($poly, $d) {
+	for ($i=0;$i<count($poly);$i++) {
+		$poly[$i][0] = round($poly[$i][0],$d);
+	}
+	return $poly;
+}
 
 //addpolys(poly1,poly2)
 //Adds polynomials, arranging terms from highest to lowest powers

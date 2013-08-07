@@ -22,4 +22,5 @@ if (isset($studentid)) {
 	$query .= "('$userid','$cid','{$_POST['type']}','{$_POST['typeid']}',$now,'{$_POST['info']}')";
 	mysql_query($query) or die("Query failed : " . mysql_error());
 } 
+
 ?>

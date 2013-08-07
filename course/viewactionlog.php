@@ -19,16 +19,18 @@ if (isset($teacherid)) {
 		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> ";
 	}
 }
-$curBreadcrumb .= "&gt; View Action Log\n";	
-$pagetitle = "View Action Log";
+$curBreadcrumb .= "&gt; View Activity Log\n";	
+$pagetitle = "View Activity Log";
 require("../header.php");
 echo "<div class=\"breadcrumb\">$curBreadcrumb</div>";
 echo '<div id="headerloginlog" class="pagetitle"><h2>'.$pagetitle. '</h2></div>';
 
+echo '<p><a href="viewloginlog.php?cid='.$cid.'&uid='.$uid.'">View Log Log</a></p>';
+
 $query = "SELECT LastName,FirstName FROM imas_users WHERE id='$uid'";
 $result = mysql_query($query) or die("Query failed : " . mysql_error());
 $row = mysql_fetch_row($result);
-echo '<h3>Action Log for '.$row[1].', '.$row[0].'</h3>';
+echo '<h3>Activity Log for '.$row[1].', '.$row[0].'</h3>';
 
 
 $actions = array();
@@ -105,11 +107,15 @@ foreach ($actions as $r) {
 		echo 'In linked text '.$linames[$r[1]].', clicked link to '.$r[3];
 		break;
 	case 'linkedviacal':
-		echo 'Via calendar, clicked linked item '.$linames[$r[1]].' link to '.$r[3];
+		if ($r[3]==$r[1] || (strpos($r[3],'showlinkedtext')!==false && strpos($r[3],'id='.$r[1])!==false)) {
+			echo 'Via calendar, opened linked text item '.$linames[$r[1]];
+		} else {
+			echo 'Via calendar, clicked linked item <a href="'.$r[3].'">'.$linames[$r[1]].'</a>';
+		}
 		break;
 	case 'extref':
-		$p = explode(':',$r[3]);
-		echo 'In assessment '.$exnames[$r[1]].', clicked help for <a href="'.$p[0].'">'.$p[1].'</a>';
+		$p = explode(': ',$r[3]);
+		echo 'In assessment '.$exnames[$r[1]].', clicked help for <a href="'.$p[1].'">'.$p[0].'</a>';
 		break;
 	case 'assessintro':
 		echo 'In assessment '.$asnames[$r[1]].' intro, clicked link to '.$r[3];
@@ -119,6 +125,9 @@ foreach ($actions as $r) {
 		break;
 	case 'assess':
 		echo 'Opened assessment '.$asnames[$r[1]];
+		break;
+	case 'assesslti':
+		echo 'Opened assessment '.$asnames[$r[1]].' via LTI';
 		break;
 	case 'assessviacal':
 		echo 'Via calendar, opened assessment '.$asnames[$r[1]];

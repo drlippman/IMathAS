@@ -1,5 +1,5 @@
 <?php
-//SimpleLTI producer launch negotiation
+//SimpleLTI producer launch negotiation - *DEPRECATED*
 
 //TODO:  do we need to check launch_targets?
 
