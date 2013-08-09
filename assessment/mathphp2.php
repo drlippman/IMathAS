@@ -128,7 +128,7 @@ function mathphpinterpretline($str,$vars,$ignorestrings) {
 			$bits = array();
 		} else if ($type==1) { //is var
 			//implict 3$a and $a $b and (3-4)$a
-			if ($lasttype==3 || $lasttype==1 || $lasttype==4) {
+			if ($lasttype==3 || $lasttype==1 || $lasttype==4 || $lasttype==2) {
 				$bits[] = '*';
 			}
 		} else if ($type==2) { //is func
@@ -138,13 +138,13 @@ function mathphpinterpretline($str,$vars,$ignorestrings) {
 			}
 		} else if ($type==3) { //is num
 			//implicit 2 pi and $var pi
-			if ($lasttype==3 || $lasttype == 1 || $lasttype==4) {
+			if ($lasttype==3 || $lasttype == 1 || $lasttype==4 || $lasttype==2) {
 				$bits[] = '*';
 			}
 			
 		} else if ($type==4) { //is parens
-			//implicit 3(4) (5)(3)  $v(2)
-			if ($lasttype==3 || $lasttype==4 || $lasttype==1) {
+			//implicit 3(4) (5)(3)  $v(2)  sin(4)(3)
+			if ($lasttype==3 || $lasttype==4 || $lasttype==1 || $lasttype==2) {
 				$bits[] = '*';
 			}
 		} else if ($type==9) {//is error
