@@ -10,10 +10,11 @@ ini_set("memory_limit", "104857600");
 //(c) 2008 David Lippman
 $reqscoretrack = array();
 $qrubrictrack = array();
+$frubrictrack = array();
 $assessnewid = array();
 $exttooltrack = array();
 function copyitem($itemid,$gbcats,$sethidden=false) {
-	global $cid, $reqscoretrack, $assessnewid, $qrubrictrack, $copystickyposts,$userid, $exttooltrack, $outcomes;
+	global $cid, $reqscoretrack, $assessnewid, $qrubrictrack, $frubrictrack, $copystickyposts,$userid, $exttooltrack, $outcomes;
 	if (!isset($copystickyposts)) { $copystickyposts = false;}
 	if ($gbcats===false) {
 		$gbcats = array();
@@ -101,7 +102,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		//$query = "INSERT INTO imas_forums (courseid,name,summary,startdate,enddate) ";
 		//$query .= "SELECT '$cid',name,summary,startdate,enddate FROM imas_forums WHERE id='$typeid'";
 		//mysql_query($query) or die("Query failed : $query" . mysql_error());
-		$query = "SELECT name,description,startdate,enddate,settings,defdisplay,replyby,postby,avail,points,cntingb,gbcategory,forumtype,taglist,outcomes FROM imas_forums WHERE id='$typeid'";
+		$query = "SELECT name,description,startdate,enddate,settings,defdisplay,replyby,postby,avail,points,cntingb,gbcategory,forumtype,taglist,outcomes,rubric FROM imas_forums WHERE id='$typeid'";
 		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$row = mysql_fetch_row($result);
 		if ($sethidden) {$row[8] = 0;}
@@ -110,6 +111,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		} else if ($_POST['ctc']!=$cid) {
 			$row[11] = 0;
 		}
+		$rubric = array_pop($row);
 		$row[0] .= stripslashes($_POST['append']);
 		if ($row[14]!='') {
 			$curoutcomes = explode(',',$row[14]);
@@ -126,6 +128,9 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		$query .= "VALUES ('$cid',$row)";
 		mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$newtypeid = mysql_insert_id();
+		if ($rubric != 0) {
+			$frubrictrack[$newtypeid] = $rubric;
+		}
 		if ($copystickyposts) {
 			//copy instructor sticky posts
 			$query = "SELECT subject,message,posttype,isanon,replyby FROM imas_forum_posts WHERE forumid='$typeid' AND posttype>0";
@@ -473,9 +478,9 @@ function buildexistblocks($items,$parent) {
 }
 
 function copyrubrics($offlinerubrics=array()) {
-	global $userid,$groupid,$qrubrictrack;
-	if (count($qrubrictrack)==0 && count($offlinerubrics)==0) { return;}
-	$list = implode(',',array_merge($qrubrictrack,$offlinerubrics));
+	global $userid,$groupid,$qrubrictrack,$frubrictrack;
+	if (count($qrubrictrack)==0 && count($frubrictrack)==0 && count($offlinerubrics)==0) { return;}
+	$list = implode(',',array_merge($qrubrictrack,$frubrictrack,$offlinerubrics));
 	
 	//handle rubrics which I already have access to
 	$query = "SELECT id FROM imas_rubrics WHERE id IN ($list) AND (ownerid='$userid' OR groupid='$groupid')";
@@ -492,6 +497,13 @@ function copyrubrics($offlinerubrics=array()) {
 		if (count($ofound)>0) {
 			foreach ($ofound as $oid) {
 				$query = "UPDATE imas_gbitems SET rubric={$row[0]} WHERE id=$oid";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+		}
+		$ffound = array_keys($frubrictrack,$row[0]);
+		if (count($ffound)>0) {
+			foreach ($ffound as $fid) {
+				$query = "UPDATE imas_forums SET rubric={$row[0]} WHERE id=$fid";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 		}
@@ -524,6 +536,13 @@ function copyrubrics($offlinerubrics=array()) {
 			foreach ($qfound as $qid) {
 				$query = "UPDATE imas_questions SET rubric=$newid WHERE id=$qid";
 				//echo "updating imas_questions on qid $qid<br/>";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+		}
+		$ffound = array_keys($frubrictrack,$row[0]);
+		if (count($ffound)>0) {
+			foreach ($ffound as $fid) {
+				$query = "UPDATE imas_forums SET rubric=$newid WHERE id=$fid";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 		}
