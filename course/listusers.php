@@ -201,6 +201,11 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			} else {
 				$locked = 0;
 			}
+			if (isset($_POST['hidefromcourselist'])) {
+				$hide = 1;
+			} else {
+				$hide = 0;
+			}
 			$timelimitmult = floatval($_POST['timelimitmult']);
 			//echo $timelimitmult;
 			if ($timelimitmult <= 0) {
@@ -209,10 +214,10 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			//echo $timelimitmult;
 			
 			if ($locked==0) {
-				$query = "UPDATE imas_students SET code=$code,section=$section,locked=$locked,timelimitmult='$timelimitmult' WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
+				$query = "UPDATE imas_students SET code=$code,section=$section,locked=$locked,timelimitmult='$timelimitmult',hidefromcourselist=$hide WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			} else {
-				$query = "UPDATE imas_students SET code=$code,section=$section,timelimitmult='$timelimitmult' WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
+				$query = "UPDATE imas_students SET code=$code,section=$section,timelimitmult='$timelimitmult',hidefromcourselist=hide WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				$query = "UPDATE imas_students SET locked=$locked WHERE userid='{$_GET['uid']}' AND courseid='$cid' AND locked=0";
 				mysql_query($query) or die("Query failed : " . mysql_error());
@@ -252,7 +257,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			//header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
 			exit;
 		} else {
-			$query = "SELECT imas_users.*,imas_students.code,imas_students.section,imas_students.locked,imas_students.timelimitmult FROM imas_users,imas_students ";
+			$query = "SELECT imas_users.*,imas_students.code,imas_students.section,imas_students.locked,imas_students.timelimitmult,imas_students.hidefromcourselist FROM imas_users,imas_students ";
 			$query .= "WHERE imas_users.id=imas_students.userid AND imas_users.id='{$_GET['uid']}' AND imas_students.courseid='$cid'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$lineStudent = mysql_fetch_array($result, MYSQL_ASSOC);
@@ -467,6 +472,8 @@ if ($overwriteBody==1) {
 			<span class=formright><input type="text" name="timelimitmult" value="<?php echo $lineStudent['timelimitmult'] ?>"/></span><br class=form>
 			<span class=form>Lock out of course?:</span>
 			<span class=formright><input type="checkbox" name="locked" value="1" <?php if ($lineStudent['locked']>0) {echo ' checked="checked" ';} ?>/></span><br class=form>
+			<span class="form">Student has course hidden from course list?:</span>
+			<span class="formright"><input type="checkbox" name="hidefromcourselist" value="1" <?php if ($lineStudent['hidefromcourselist']>0) {echo ' checked="checked" ';} ?>/></span><br class=form>
 			<span class=form>Reset password?</span>
 			<span class=formright>
 				<input type=checkbox name="doresetpw" value="1" /> Reset to: 
