@@ -90,6 +90,12 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			mysql_query($query) or die("Query failed : $query " . mysql_error());
 			$sendemail = true;	
 			
+			if (isset($studentid)) {
+				$query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime,info) VALUES ";
+				$query .= "('$userid','$cid','forumpost','$threadid',$now,'$forumid')";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+			
 			$_GET['modify'] = $threadid;
 			$files = array();
 		} else if ($_GET['modify']=="reply") { //new reply post
@@ -118,6 +124,12 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				
 				$query = "UPDATE imas_forum_threads SET lastposttime=$now,lastpostuser='$userid' WHERE id='$threadid'";
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
+				
+				if (isset($studentid)) {
+					$query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime,info) VALUES ";
+					$query .= "('$userid','$cid','forumreply','{$_GET['modify']}',$now,'$forumid;$threadid')";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+				}
 				
 				if ($isteacher && isset($_POST['points']) && trim($_POST['points'])!='') {
 					$query = "SELECT id FROM imas_grades WHERE gradetype='forum' AND refid='{$_GET['replyto']}'";
@@ -152,6 +164,13 @@ if (isset($_GET['modify'])) { //adding or modifying post
 					mysql_query($query) or die("Query failed : $query " . mysql_error());
 				}
 			}
+			
+			if (isset($studentid)) {
+				$query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime,info) VALUES ";
+				$query .= "('$userid','$cid','forummod','{$_GET['modify']}',$now,'$forumid;$threadid')";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+			
 			$sendemail = false;
 			$query = "SELECT files FROM imas_forum_posts WHERE id='{$_GET['modify']}'";
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());

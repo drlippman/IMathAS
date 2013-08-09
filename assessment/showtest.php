@@ -1024,7 +1024,8 @@ if (!isset($_POST['embedpostback'])) {
 	$restrictedtimelimit = false;
 	if ($testsettings['timelimit']>0 && !$isreview && !$superdone) {
 		$now = time();
-		$remaining = $testsettings['timelimit']-($now - $starttime);
+		$totremaining = $testsettings['timelimit']-($now - $starttime);
+		$remaining = $totremaining;
 		if ($timebeforedue < $remaining) {
 			$remaining = $timebeforedue - 5;	
 			$restrictedtimelimit = true;
@@ -1062,15 +1063,15 @@ if (!isset($_POST['embedpostback'])) {
 			$remaining = $remaining - 60*$minutes;
 		} else {$minutes=0;}
 		$seconds = $remaining;
-		echo "<div class=right id=timelimitholder>", _('Timelimit'), ": $tlwrds. ";
+		echo "<div class=right id=timelimitholder><span id=\"timercontent\">", _('Timelimit'), ": $tlwrds. ";
 		if (!isset($_GET['action']) && $restrictedtimelimit) {
 			echo '<span style="color:#0a0;">', _('Time limit shortened because of due date'), '</span> ';
 		}
-		echo "<span id=timeremaining ";
-		if ($remaining<300) {
+		echo "<span id=\"timerwrap\"><span id=timeremaining ";
+		if ($totremaining<300) {
 			echo 'style="color:#f00;" ';
 		}
-		echo ">$hours:$minutes:$seconds</span> ", _('remaining'), ". </div>\n";
+		echo ">$hours:$minutes:$seconds</span> ", _('remaining'), ".</span></span> <span onclick=\"toggletimer()\" style=\"color:#aaa;\" class=\"clickable\" id=\"timerhide\" title=\"",_('Hide'),"\">[x]</span></div>\n";
 		echo "<script type=\"text/javascript\">\n";
 		echo " hours = $hours; minutes = $minutes; seconds = $seconds; done=false;\n";	
 		echo " function updatetime() {\n";
@@ -1110,6 +1111,29 @@ if (!isset($_POST['embedpostback'])) {
 		echo "    if (!done) {setTimeout(\"updatetime()\",1000);}\n";
 		echo " }\n";
 		echo " updatetime();\n";
+		echo ' $(document).ready(function() {
+			var s = $("#timerwrap");
+			var pos = s.position();                   
+			$(window).scroll(function() {
+			   var windowpos = $(window).scrollTop();
+			   if (windowpos >= pos.top) {
+			     s.addClass("sticky");
+			   } else {
+			     s.removeClass("sticky");
+			   }
+			   });
+			   });';
+		echo ' function toggletimer() {
+				if ($("#timerhide").text()=="[x]") {
+					$("#timercontent").hide();
+					$("#timerhide").text("['._("Show Timer").']");
+					$("#timerhide").attr("title","'._("Show Timer").'");
+				} else {
+					$("#timercontent").show();
+					$("#timerhide").text("[x]");
+					$("#timerhide").attr("title","'._("Hide").'");
+				}
+			}';
 		echo "</script>\n";
 		}
 	} else if ($isreview) {

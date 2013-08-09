@@ -13,6 +13,9 @@ assessviacal	Link to assessment via calendar	imas_assessments.id
 assesssum	Link in assessment summary	imas_assessments.id
 wiki		Link to wiki			imas_wikis.id
 wikiintext	Link in wiki text		imas_wikis.id
+forumpost	new forum post			imas_forum_posts.id/imas_forum_threads.id,  info has imas_forums.id 
+forumreply	new forum reply			imas_forum_posts.id,  info has imas_forums.id ; imas_forum_threads.id 
+forummod	modify form post/reply		imas_forum_posts.id,  info has imas_forums.id ; imas_forum_threads.id 
 */
 
 require("../validate.php");

@@ -458,7 +458,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$safesearch = str_replace(' and ', ' ',$safesearch);
 			$search = stripslashes($safesearch);
 			$search = str_replace('"','&quot;',$search);
-			$sessiondata['lastsearch'.$cid] = str_replace(" ","+",$safesearch);
+			$sessiondata['lastsearch'.$cid] = $safesearch; ///str_replace(" ","+",$safesearch);
 			if (isset($_POST['searchall'])) {
 				$searchall = 1;
 			} else {
@@ -478,7 +478,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$sessiondata['searchmine'.$cid] = $searchmine;
 			writesessiondata();
 		} else if (isset($sessiondata['lastsearch'.$cid])) {
-			$safesearch = str_replace("+"," ",$sessiondata['lastsearch'.$cid]);
+			$safesearch = $sessiondata['lastsearch'.$cid]; //str_replace("+"," ",$sessiondata['lastsearch'.$cid]);
 			$search = stripslashes($safesearch);
 			$search = str_replace('"','&quot;',$search);
 			$searchall = $sessiondata['searchall'.$cid];
@@ -492,14 +492,19 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (trim($safesearch)=='') {
 			$searchlikes = '';
 		} else {
-			$searchterms = explode(" ",$safesearch);
-			$searchlikes = "((imas_questionset.description LIKE '%".implode("%' AND imas_questionset.description LIKE '%",$searchterms)."%') ";
-			if (substr($safesearch,0,3)=='id=') {
-				$searchlikes = "imas_questionset.id='".substr($safesearch,3)."' AND ";
-			} else if (is_numeric($safesearch)) {
-				$searchlikes .= "OR imas_questionset.id='$safesearch') AND ";
+			if (substr($safesearch,0,6)=='regex:') {
+				$safesearch = substr($safesearch,6);
+				$searchlikes = "imas_questionset.description REGEXP '$safesearch' AND ";
 			} else {
-				$searchlikes .= ") AND";
+				$searchterms = explode(" ",$safesearch);
+				$searchlikes = "((imas_questionset.description LIKE '%".implode("%' AND imas_questionset.description LIKE '%",$searchterms)."%') ";
+				if (substr($safesearch,0,3)=='id=') {
+					$searchlikes = "imas_questionset.id='".substr($safesearch,3)."' AND ";
+				} else if (is_numeric($safesearch)) {
+					$searchlikes .= "OR imas_questionset.id='$safesearch') AND ";
+				} else {
+					$searchlikes .= ") AND";
+				}
 			}
 		}
 		
@@ -966,6 +971,7 @@ if ($overwriteBody==1) {
 ?>	
 	<p>
 		<input type=button value="Done" onClick="window.location='course.php?cid=<?php echo $cid ?>'"> 
+		<input type=button value="Assessment Settings" onClick="window.location='addassessment.php?cid=<?php echo $cid ?>&id=<?php echo $aid ?>'"> 
 		<input type=button value="Categorize Questions" onClick="window.location='categorize.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'"> 
 		<input type=button value="Create Print Version" onClick="window.location='printtest.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'"> 
 		<input type=button value="Define End Messages" onClick="window.location='assessendmsg.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'">

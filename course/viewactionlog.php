@@ -34,7 +34,7 @@ echo '<h3>Activity Log for '.$row[1].', '.$row[0].'</h3>';
 
 
 $actions = array();
-$lookups = array('as'=>array(), 'in'=>array(), 'li'=>array(), 'ex'=>array(), 'wi'=>array());
+$lookups = array('as'=>array(), 'in'=>array(), 'li'=>array(), 'ex'=>array(), 'wi'=>array(), 'fo'=>array(), 'forums'=>array());
 
 $query = "SELECT type,typeid,viewtime,info FROM imas_content_track WHERE userid='$uid' AND courseid='$cid' ORDER BY viewtime DESC";
 $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -42,10 +42,14 @@ while ($row = mysql_fetch_row($result)) {
 	$actions[] = $row;
 	$t = substr($row[0],0,2);
 	$lookups[$t][] = intval($row[1]);
+	if ($t=='fo') {
+		$ip = explode(';',$row[3]);
+		$lookups['forums'][] = $ip[0];
+	}
 }
 $asnames = array();
 if (count($lookups['as'])>0) {
-	$query = 'SELECT id,name FROM imas_assessments WHERE id IN ('.implode(',',$lookups['as']).')';
+	$query = 'SELECT id,name FROM imas_assessments WHERE id IN ('.implode(',',array_unique($lookups['as'])).')';
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	while ($row = mysql_fetch_row($result)) {
 		$asnames[$row[0]] = $row[1];
@@ -53,7 +57,7 @@ if (count($lookups['as'])>0) {
 }
 $innames = array();
 if (count($lookups['in'])>0) {
-	$query = 'SELECT id,title FROM imas_inlinetext WHERE id IN ('.implode(',',$lookups['in']).')';
+	$query = 'SELECT id,title FROM imas_inlinetext WHERE id IN ('.implode(',',array_unique($lookups['in'])).')';
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	while ($row = mysql_fetch_row($result)) {
 		$innames[$row[0]] = $row[1];
@@ -61,7 +65,7 @@ if (count($lookups['in'])>0) {
 }
 $linames = array();
 if (count($lookups['li'])>0) {
-	$query = 'SELECT id,title FROM imas_linkedtext WHERE id IN ('.implode(',',$lookups['li']).')';
+	$query = 'SELECT id,title FROM imas_linkedtext WHERE id IN ('.implode(',',array_unique($lookups['li'])).')';
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	while ($row = mysql_fetch_row($result)) {
 		$linames[$row[0]] = $row[1];
@@ -69,7 +73,7 @@ if (count($lookups['li'])>0) {
 }
 $winames = array();
 if (count($lookups['wi'])>0) {
-	$query = 'SELECT id,name FROM imas_wikis WHERE id IN ('.implode(',',$lookups['wi']).')';
+	$query = 'SELECT id,name FROM imas_wikis WHERE id IN ('.implode(',',array_unique($lookups['wi'])).')';
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	while ($row = mysql_fetch_row($result)) {
 		$winames[$row[0]] = $row[1];
@@ -77,10 +81,26 @@ if (count($lookups['wi'])>0) {
 }
 $exnames = array();
 if (count($lookups['ex'])>0) {
-	$query = 'SELECT id,assessmentid FROM imas_questions WHERE id IN ('.implode(',',$lookups['ex']).')';
+	$query = 'SELECT id,assessmentid FROM imas_questions WHERE id IN ('.implode(',',array_unique($lookups['ex'])).')';
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	while ($row = mysql_fetch_row($result)) {
 		$exnames[$row[0]] = $asnames[$row[1]];
+	}
+}
+$fpnames = array();
+if (count($lookups['fo'])>0) {
+	$query = 'SELECT id,subject FROM imas_forum_posts WHERE id IN ('.implode(',',array_unique($lookups['fo'])).')';
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	while ($row = mysql_fetch_row($result)) {
+		$fpnames[$row[0]] = $row[1];
+	}
+}
+$forumnames = array();
+if (count($lookups['forums'])>0) {
+	$query = 'SELECT id,name FROM imas_forums WHERE id IN ('.implode(',',array_unique($lookups['forums'])).')';
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	while ($row = mysql_fetch_row($result)) {
+		$forumnames[$row[0]] = $row[1];
 	}
 }
 
@@ -100,7 +120,7 @@ foreach ($actions as $r) {
 		if ($r[3]==$r[1] || (strpos($r[3],'showlinkedtext')!==false && strpos($r[3],'id='.$r[1])!==false)) {
 			echo 'Opened linked text item '.$linames[$r[1]];
 		} else {
-			echo 'Clicked linked item <a href="'.$r[3].'">'.$linames[$r[1]].'</a>';
+			echo 'Clicked linked item <a target="_blank" href="'.$r[3].'">'.$linames[$r[1]].'</a>';
 		}
 		break;
 	case 'linkedintext':
@@ -110,12 +130,12 @@ foreach ($actions as $r) {
 		if ($r[3]==$r[1] || (strpos($r[3],'showlinkedtext')!==false && strpos($r[3],'id='.$r[1])!==false)) {
 			echo 'Via calendar, opened linked text item '.$linames[$r[1]];
 		} else {
-			echo 'Via calendar, clicked linked item <a href="'.$r[3].'">'.$linames[$r[1]].'</a>';
+			echo 'Via calendar, clicked linked item <a target="_blank" href="'.$r[3].'">'.$linames[$r[1]].'</a>';
 		}
 		break;
 	case 'extref':
 		$p = explode(': ',$r[3]);
-		echo 'In assessment '.$exnames[$r[1]].', clicked help for <a href="'.$p[1].'">'.$p[0].'</a>';
+		echo 'In assessment '.$exnames[$r[1]].', clicked help for <a target="_blank" href="'.$p[1].'">'.$p[0].'</a>';
 		break;
 	case 'assessintro':
 		echo 'In assessment '.$asnames[$r[1]].' intro, clicked link to '.$r[3];
@@ -138,7 +158,21 @@ foreach ($actions as $r) {
 	case 'wikiintext':
 		echo 'In wiki '.$winames[$r[1]].', clicked link to '.$r[3];
 		break;
+	case 'forumpost':
+		$fp = explode(';',$r[3]);
+		echo 'New post <a target="_blank" href="../forums/posts.php?cid='.$cid.'&forum='.$fp[0].'&thread='.$r[1].'">'.$fpnames[$r[1]].'</a> in forum '.$forumnames[$fp[0]];
+		break;
+	case 'forumreply':
+		$fp = explode(';',$r[3]);
+		echo 'New reply <a target="_blank" href="../forums/posts.php?cid='.$cid.'&forum='.$fp[0].'&thread='.$fp[1].'">'.$fpnames[$r[1]].'</a> in forum '.$forumnames[$fp[0]];
+		break;
+	case 'forummod':
+		$fp = explode(';',$r[3]);
+		echo 'Modified post/reply <a target="_blank" href="../forums/posts.php?cid='.$cid.'&forum='.$fp[0].'&thread='.$fp[1].'">'.$fpnames[$r[1]].'</a> in forum '.$forumnames[$fp[0]];
+		break;
 	}
+	
+	
 	echo '</td>';
 	echo '</tr>';
 }

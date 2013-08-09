@@ -222,9 +222,11 @@ function GB_show(caption,url,width,height) {
 		var btnhtml = '<span class="floatright"><input type="button" value="Use Libraries" onClick="document.getElementById(\'GB_frame\').contentWindow.setlib()" /> ';
 		btnhtml += '<span class="pointer" onclick="GB_hide()">[X]</span>&nbsp;</span>Select Libraries<div class="clear"></div>';
 		document.getElementById("GB_caption").innerHTML = btnhtml;
+		var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
 	} else {
 		document.getElementById("GB_caption").innerHTML = '<span class="floatright"><span class="pointer" onclick="GB_hide()">[X]</span></span>'+caption;
 		document.getElementById("GB_caption").onclick = GB_hide;
+		var h = height;
 	}
 	document.getElementById("GB_window").style.display = "block";
 	document.getElementById("GB_overlay").style.display = "block";
@@ -232,7 +234,7 @@ function GB_show(caption,url,width,height) {
 	
 	var de = document.documentElement;
 	var w = self.innerWidth || (de&&de.clientWidth) || document.body.clientWidth;
-	var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
+	
 	document.getElementById("GB_window").style.width = width + "px";
 	document.getElementById("GB_window").style.height = (h-30) + "px";
 	document.getElementById("GB_window").style.left = ((w - width)/2)+"px";

@@ -665,3 +665,11 @@ span.feedbackwrap.incorrect {
  input.text {
  	 margin: 2px;
  }
+ .sticky {
+ 	 position: fixed;
+ 	 top: 0px;
+ 	 right: 0px;
+ 	 padding: 5px;
+ 	 display: block;
+ 	 background: #fff;
+ }

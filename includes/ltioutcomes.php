@@ -147,7 +147,7 @@ function sendOAuthBodyPOST($method, $endpoint, $oauth_consumer_key, $oauth_consu
     	if ($sessiondata['debugmode']==true) {
     		throw new Exception("Problem reading data from $endpoint, $php_errormsg");
     	} else {
-    		echo "Unable to update score via LTI.";
+    		//echo "Unable to update score via LTI.";
     	}
     }
     return $response;

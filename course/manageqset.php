@@ -591,7 +591,7 @@ if ($myrights<20) {
 			$safesearch = str_replace(' and ', ' ',$safesearch);
 			$search = stripslashes($safesearch);
 			$search = str_replace('"','&quot;',$search);
-			$sessiondata['lastsearch'.$cid] = str_replace(" ","+",$safesearch);
+			$sessiondata['lastsearch'.$cid] = $safesearch; //str_replace(" ","+",$safesearch);
 			if (isset($_POST['searchmine'])) {
 				$searchmine = 1;
 			} else {
@@ -612,7 +612,7 @@ if ($myrights<20) {
 			
 			writesessiondata();
 		} else if (isset($sessiondata['lastsearch'.$cid])) {
-			$safesearch = str_replace("+"," ",$sessiondata['lastsearch'.$cid]);
+			$safesearch = $sessiondata['lastsearch'.$cid]; //str_replace("+"," ",$sessiondata['lastsearch'.$cid]);
 			$search = stripslashes($safesearch);
 			$search = str_replace('"','&quot;',$search);
 			$searchall = $sessiondata['searchall'.$cid];
@@ -626,14 +626,18 @@ if ($myrights<20) {
 		if (trim($safesearch)=='') {
 			$searchlikes = '';
 		} else {
-			$searchterms = explode(" ",$safesearch);
-			$searchlikes = "((imas_questionset.description LIKE '%".implode("%' AND imas_questionset.description LIKE '%",$searchterms)."%') ";
-			if (substr($safesearch,0,3)=='id=') {
-				$searchlikes = "imas_questionset.id='".substr($safesearch,3)."' AND ";
-			} else if (is_numeric($safesearch)) {
-				$searchlikes .= "OR imas_questionset.id='$safesearch') AND ";
-			} else {
-				$searchlikes .= ") AND";
+			if (substr($safesearch,0,6)=='regex:') {
+				$safesearch = substr($safesearch,6);
+				$searchlikes = "imas_questionset.description REGEXP '$safesearch' AND ";
+			} else {$searchterms = explode(" ",$safesearch);
+				$searchlikes = "((imas_questionset.description LIKE '%".implode("%' AND imas_questionset.description LIKE '%",$searchterms)."%') ";
+				if (substr($safesearch,0,3)=='id=') {
+					$searchlikes = "imas_questionset.id='".substr($safesearch,3)."' AND ";
+				} else if (is_numeric($safesearch)) {
+					$searchlikes .= "OR imas_questionset.id='$safesearch') AND ";
+				} else {
+					$searchlikes .= ") AND";
+				}
 			}
 		}
 		
