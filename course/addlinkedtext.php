@@ -296,7 +296,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$gradeoutcomes = array();
 			}
 			if ($line['summary']=='') {
-				$line['summary'] = "<p>Enter summary here (displays on course page)</p>";
+				//$line['summary'] = "<p>Enter summary here (displays on course page)</p>";
 			}
 		} else {
 			//set defaults

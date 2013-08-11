@@ -221,7 +221,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$gradeoutcomes = array();
 			}
 			if ($line['description']=='') {
-				$line['description'] = "<p>Enter forum description here</p>";
+				//$line['description'] = "<p>Enter forum description here</p>";
 			}
 		} else {  //ADD MODE
 			//set defaults

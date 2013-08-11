@@ -144,7 +144,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$started = false;
 			}
 			if ($line['description']=='') {
-				$line['description'] = "<p>Enter Wiki description here</p>";
+				//$line['description'] = "<p>Enter Wiki description here</p>";
 			}
 		} else {
 			$line['name'] = "Enter Wiki Name here";

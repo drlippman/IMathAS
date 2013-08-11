@@ -353,10 +353,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$deffb = $line['deffeedbacktext'];
 			}
 			if ($line['summary']=='') {
-				$line['summary'] = "<p>Enter summary here (shows on course page)</p>";
+			//	$line['summary'] = "<p>Enter summary here (shows on course page)</p>";
 			}
 			if ($line['intro']=='') {
-				$line['intro'] = "<p>Enter intro/instructions</p>";
+			//	$line['intro'] = "<p>Enter intro/instructions</p>";
 			}
 		} else {  //INITIAL LOAD IN ADD MODE
 			//set defaults
