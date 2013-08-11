@@ -171,7 +171,7 @@ if ($overwriteBody==1) {
 	} else if (isset($sessiondata['mcdorderby'.$cid])) {
 		$orderby = $sessiondata['mcdorderby'.$cid];
 	} else {
-		$orderby = 0;
+		$orderby = 3;
 	}
 	if (isset($_GET['filter'])) {
 		$filter = $_GET['filter'];
