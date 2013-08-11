@@ -17,7 +17,7 @@ function ahahDone(url, target) {
     if (req.status == 200) { // only if "OK" 
       document.getElementById(target).innerHTML = req.responseText; 
       if (usingASCIIMath) {
-	      AMprocessNode(document.getElementById(target));
+	      rendermathnode(document.getElementById(target));
       }
       if (usingASCIISvg) {
 	      setTimeout("drawPics()",100);

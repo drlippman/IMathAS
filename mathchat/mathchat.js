@@ -108,7 +108,7 @@ function ahahDone() {
 	   
 	      //alert(document.getElementById("msgbody").innerHTML);
 	      if (newmsgs) {
-		      AMprocessNode(newdiv);
+		      rendermathnode(newdiv);
 		      setTimeout("drawPics()",100);
 		      
 		      msgbody.scrollTop = msgbody.scrollHeight;

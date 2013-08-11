@@ -33,9 +33,10 @@ div.breadcrumb { display:none;}
 <script type="text/javascript">
 var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && is_numeric($cid))?$cid:0; ?>;
 </script>
-<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js?ver=080613"></script>
+<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js?ver=081013"></script>
 <?php
 //$sessiondata['mathdisp'] = 3;
+//writesessiondata();
 if (isset($CFG['locale'])) {
 	$lang = substr($CFG['locale'],0,2);
 	if (file_exists(rtrim(dirname(__FILE__), '/\\').'/i18n/locale/'.$lang.'/messages.js')) {
@@ -73,7 +74,7 @@ if (!isset($sessiondata['mathdisp'])) {
 		echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=122912\" type=\"text/javascript\"></script>\n";
 	}
 	echo '<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_HTMLorMML"></script>';
-	echo '<script type="text/javascript">noMathRender = false; function rendermathnode(node) { MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]); }</script>'; 
+	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = false; function rendermathnode(node) { MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]); }</script>'; 
 	echo '<style type="text/css">span.AM { font-size: 105%;}</style>';
 }
 if (isset($sessiondata['graphdisp']) && $sessiondata['graphdisp']==1) {

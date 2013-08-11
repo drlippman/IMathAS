@@ -12,7 +12,7 @@
 function refreshTable() {
 	document.getElementById("curqtbl").innerHTML = generateTable();
 	 if (usingASCIIMath) {
-	      AMprocessNode(document.getElementById("curqtbl"));
+	      rendermathnode(document.getElementById("curqtbl"));
          }
          updateqgrpcookie();
 }

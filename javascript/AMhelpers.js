@@ -105,7 +105,7 @@ function calculate(inputId,outputId,format) {
     outnode.removeChild(outnode.firstChild);
   outnode.appendChild(document.createTextNode(fullstr));
   if (!noMathRender) {
-	  AMprocessNode(outnode);
+	  rendermathnode(outnode);
   }
 }
 
@@ -249,7 +249,7 @@ function intcalculate(inputId,outputId,format) {
     outnode.removeChild(outnode.firstChild);
   outnode.appendChild(document.createTextNode(fullstr));
   if (!noMathRender) {
-	  AMprocessNode(outnode);
+	  rendermathnode(outnode);
   }
 	
 }
@@ -306,7 +306,7 @@ function ntuplecalc(inputId,outputId) {
 		 }
 		 outnode.appendChild(document.createTextNode(outstr));
 		 if (!noMathRender) {
-			  AMprocessNode(outnode);
+			  rendermathnode(outnode);
 		 }
 	}
 	 return outcalced;
@@ -353,7 +353,7 @@ function complexcalc(inputId,outputId) {
 		 }
 		 outnode.appendChild(document.createTextNode(outstr));
 		 if (!noMathRender) {
-			  AMprocessNode(outnode);
+			  rendermathnode(outnode);
 		 }
 	}
 	 return outcalced;
@@ -432,7 +432,7 @@ function matrixcalc(inputId,outputId,rows,cols) {
 			outnode.removeChild(outnode.firstChild);
 		outnode.appendChild(document.createTextNode(str));
 		if (!noMathRender) {
-			AMprocessNode(outnode);
+			rendermathnode(outnode);
 		}
 	}
 	return calcstr;
@@ -452,7 +452,7 @@ function stringqpreview(inputId,outputId) {
 		outnode.removeChild(outnode.firstChild);
 	outnode.appendChild(document.createTextNode('`'+str+'`'));
 	if (!noMathRender) {
-		AMprocessNode(outnode);
+		rendermathnode(outnode);
 	}
 }
 
@@ -510,7 +510,7 @@ function AMpreview(inputId,outputId) {
     outnode.removeChild(outnode.firstChild);
     outnode.appendChild(document.createTextNode('`'+dispstr+'`'));
     if (!noMathRender) {
-	AMprocessNode(outnode);
+	rendermathnode(outnode);
     }
   //outnode.appendChild(AMparseMath(dispstr));
   
@@ -615,7 +615,7 @@ function AMmathpreview(inputId,outputId) {
   //outnode.appendChild(AMparseMath(str));
    outnode.appendChild(document.createTextNode('`'+str+'`'));
     if (!noMathRender) {
-	AMprocessNode(outnode);
+	rendermathnode(outnode);
     }
  
 }
@@ -936,7 +936,7 @@ function assessbackgsubmitCallback(qn,noticetgt) {
 			
 		    document.getElementById("embedqwrapper"+qn).innerHTML = resptxt;
 		    if (usingASCIIMath) {
-			    AMprocessNode( document.getElementById("embedqwrapper"+qn));
+			    rendermathnode( document.getElementById("embedqwrapper"+qn));
 		    }
 		    if (usingASCIISvg) {
 			    setTimeout("drawPics()",100);

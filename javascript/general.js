@@ -80,7 +80,7 @@ function tipshow(el,tip) {
 	
 	if (typeof AMnoMathML!='undefined' && typeof noMathRender != 'undefined') {
 		if (!AMnoMathML && !noMathRender) {
-			AMprocessNode(tipobj);
+			rendermathnode(tipobj);
 		}
 	}
 	var p = findPos(el);

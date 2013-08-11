@@ -261,6 +261,10 @@ END;
 			 $sessiondata['graphdisp'] = 2;
 			 $sessiondata['useed'] = checkeditorok(); 
 			 $enc = base64_encode(serialize($sessiondata));
+		 } else if ($_POST['access']==5) { //mathjax experimental
+		 	 $sessiondata['mathdisp'] = 3;
+			 $sessiondata['graphdisp'] = $_POST['graphdisp'];
+			 $sessiondata['useed'] = checkeditorok(); 
 		 } else if ($_POST['isok']) {
 			 $sessiondata['mathdisp'] = 1;  
 			 $sessiondata['graphdisp'] = 1;
@@ -274,7 +278,7 @@ END;
 		 } else {
 			 $enc = 0; //give warning
 		 }
-		
+		 
 		 $query = "INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,sessiondata) VALUES ('$sessionid','$userid',$now,'{$_POST['tzoffset']}','$enc')";
 		 $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		 
@@ -347,6 +351,10 @@ END;
 			$sessiondata['debugmode'] = true;
 			writesessiondata();
 		}
+	}
+	if (isset($_GET['mathjax'])) {
+		$sessiondata['mathdisp'] = 3;
+		writesessiondata();
 	}
 	if (isset($_GET['useflash'])) {
 		$sessiondata['useflash'] = true;

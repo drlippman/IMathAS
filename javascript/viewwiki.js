@@ -156,7 +156,7 @@ function initwiki() {
 
 function wikirendermath() {
 	if (usingASCIIMath) {
-		AMprocessNode(contentdiv);
+		rendermathnode(contentdiv);
 	}
 	if (usingASCIISvg) {
 		setTimeout("drawPics()",100);
