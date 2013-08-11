@@ -59,7 +59,7 @@ if ($isdiag) {
 } else {
 	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/assessment/print.css\" media=\"print\"/>\n";
 }
-$sessiondata['mathdisp'] = 3;
+//$sessiondata['mathdisp'] = 3;
 if (!isset($sessiondata['mathdisp'])) {
 	echo '<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false; function rendermathnode(el) {AMprocessNode(el);}</script>';
 	echo "<script src=\"$imasroot/javascript/mathgraphcheck.js?v=091311\" type=\"text/javascript\"></script>\n";
