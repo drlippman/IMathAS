@@ -52,6 +52,9 @@ function reporterror($err) {
 if (isset($sessionpath)) { session_save_path($sessionpath);}
 ini_set('session.gc_maxlifetime',86400);
 ini_set('auto_detect_line_endings',true);
+if ($_SERVER['HTTP_HOST'] != 'localhost') {
+	 session_set_cookie_params(0, '/', '.'.implode('.',array_slice(explode('.',$_SERVER['HTTP_HOST']),isset($CFG['GEN']['domainlevel'])?$CFG['GEN']['domainlevel']:-2)));
+}
 session_start();
 $sessionid = session_id();
 
