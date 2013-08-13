@@ -1459,12 +1459,13 @@ function prettysigfig($a,$sigfig,$comma=',',$choptrailing=false) {
 	if ($v+$sigfig <= 0) {
 		return $sign.number_format(round($a,$v+$sigfig),0,'.',$comma);
 	} else {
+		$nv = round($a, $v+$sigfig);
 		$n = number_format($a,$v+$sigfig);
 		if ($choptrailing && ($v+$sigfig > 0) && abs($a - round($a,$v+$sigfig))<1e-12) {
 			$n = rtrim($n,'0');
 			$n = rtrim($n,'.');
 		} else {
-			if (floor(-log10($n)-1e-12) != $v) {  //adjust for .009 -> .010 1 sig
+			if (floor(-log10($nv)-1e-12) != $v) {  //adjust for .009 -> .010 1 sig
 				$n = substr($n,0,-1);
 			}
 			$n = rtrim($n,'.');
