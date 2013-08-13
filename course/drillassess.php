@@ -518,7 +518,11 @@ function printscore($sc,$qsetid,$seed) {
 
 function getpts($sc,$poss=1) {
 	if (strpos($sc,'~')===false) {
-		return $sc*$poss;
+		if ($sc>0) {
+			return $sc*$poss;
+		} else {
+			return 0;
+		}
 	} else {
 		$sc = explode('~',$sc);
 		$tot = 0;

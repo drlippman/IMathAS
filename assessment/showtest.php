@@ -1176,7 +1176,7 @@ if (!isset($_POST['embedpostback'])) {
 					if ($_POST['verattempts'][$i]!=$attempts[$i]) {
 						echo sprintf(_('Question %d has been submitted since you viewed it.  Your answer just submitted was not scored or recorded.'), ($i+1)), "<br/>";
 					} else {
-						scorequestion($i);
+						scorequestion($i,false);
 					}
 				//}
 			}

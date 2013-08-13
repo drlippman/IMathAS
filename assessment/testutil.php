@@ -263,7 +263,11 @@ function getallremainingpossible($qi,$questions,$testsettings,$attempts) {
 //calculates points based on return from scoreq
 function getpts($sc) {
 	if (strpos($sc,'~')===false) {
-		return $sc;
+		if ($sc>0) {
+			return $sc;
+		} else {
+			return 0;
+		}
 	} else {
 		$sc = explode('~',$sc);
 		$tot = 0;
@@ -435,7 +439,7 @@ function printscore2($sc) {
 //scores a question
 //qn: question index in questions array
 //qi: getquestioninfo[qid]
-function scorequestion($qn) { 
+function scorequestion($qn, $rectime=true) { 
 	global $questions,$scores,$seeds,$testsettings,$qi,$attempts,$lastanswers,$isreview,$bestseeds,$bestscores,$bestattempts,$bestlastanswers, $reattempting, $rawscores, $bestrawscores, $firstrawscores;
 	global $regenonreattempt;
 	//list($qsetid,$cat) = getqsetid($questions[$qn]);
@@ -465,6 +469,16 @@ function scorequestion($qn) {
 	}
 	if (!$isreview && $attempts[$qn]==0 && strpos($lastanswers[$qn],'##')===false) {
 		$firstrawscores[$qn] = $rawscores[$qn];
+		if ($rectime) {
+			global $timesontask;
+			$time = explode('~',$timesontask[$qn]);
+			$time = $time[0];
+		} else {
+			$time = 0;  //for all at once display, where time is not useful info
+		}
+		$query = "INSERT INTO imas_firstscores (courseid,qsetid,score,scoredet,timespent) VALUES ";
+		$query .= "('".addslashes($testsettings['courseid'])."','".$qi[$questions[$qn]]['questionsetid']."','".round(100*getpts($rawscore))."','".$rawscores[$qn]."','$time')";
+		mysql_query($query) or die("Query failed : " . mysql_error());
 	}
 	
 	//$scores[$qn] = $afterpenalty;
