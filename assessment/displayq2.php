@@ -650,7 +650,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 		} else if (isset($scoremethod) && $scoremethod == "allornothing") {
 			if (array_sum($scores)<.98) { return array(0,implode('~',$raw)); } else { return array(1,implode('~',$raw));}
 		} else if (isset($scoremethod) && $scoremethod == "acct") {
-			$sc = round($qnpointval*array_sum($scores)/$accpts,3);
+			$sc = round(array_sum($scores)/$accpts,3);
 			return (array($sc, implode('~',$raw)));
 		} else {
 			return array(implode('~',$scores),implode('~',$raw));
