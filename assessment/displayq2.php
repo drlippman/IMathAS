@@ -630,7 +630,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 					$accpts++;
 				}
 			} else {
-				$scores[$kidx] = round($raw[$kidx]*$answeights[$kidx],4);
+				$scores[$kidx] = ($raw[$kidx]<0)?0:round($raw[$kidx]*$answeights[$kidx],4);
 			}
 			$raw[$kidx] = round($raw[$kidx],2);
 			$partla[$kidx] = $GLOBALS['partlastanswer'];
@@ -3483,8 +3483,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($options['scoremethod']))if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$qn];} else {$scoremethod = $options['scoremethod'];}
 		if (isset($scoremethod) && $scoremethod=='takeanything'  && trim($givenans)!='') {
 			return 1;
+		} else if (trim($givenans)=='') {
+			return 0;
+		} else {
+			return -2;
 		}
-		return 0;
 	} else if ($anstype == 'interval' || $anstype == 'calcinterval') {
 		if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}
 		if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$qn];} else {$reltolerance = $options['reltolerance'];}}
@@ -4808,7 +4811,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				}
 				return $pts/count($answer);
 			} else {
-				return 0;
+				return -2;
 			}
 		}
 	} else if ($anstype == "conditional") {

@@ -1332,7 +1332,7 @@ if (!isset($_POST['embedpostback'])) {
 					echo printscore($bestscores[$qn],$qn);
 					echo "</p>";
 					if ($GLOBALS['questionmanualgrade'] == true) {
-						echo '<p><strong>', _('Note:'), '</strong> ', _('This question contains parts that can not be auto-graded.  Those parts will show a score of 0 until they are graded by your instructor'), '</p>';
+						echo '<p><strong>', _('Note:'), '</strong> ', _('This question contains parts that can not be auto-graded.  Those parts will count as a score of 0 until they are graded by your instructor'), '</p>';
 					}
 										
 					
@@ -1725,7 +1725,7 @@ if (!isset($_POST['embedpostback'])) {
 						echo _('Score in gradebook: ');
 						echo printscore($bestscores[$qn],$qn);
 						if ($GLOBALS['questionmanualgrade'] == true) {
-							echo '<br/><strong>', _('Note:'), '</strong> ', _('This question contains parts that can not be auto-graded.  Those parts will show a score of 0 until they are graded by your instructor');
+							echo '<br/><strong>', _('Note:'), '</strong> ', _('This question contains parts that can not be auto-graded.  Those parts will count as a score of 0 until they are graded by your instructor');
 						} 
 						echo "</p>";
 						

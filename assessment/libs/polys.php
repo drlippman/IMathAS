@@ -3,7 +3,7 @@
 
 
 global $allowedmacros;
-array_push($allowedmacros,"formpoly","formpolyfromroots","writepoly","addpolys","subtpolys","multpolys","scalepoly","roundpoly","quadroot","getcoef","polypower");
+array_push($allowedmacros,"formpoly","formpolyfromroots","writepoly","addpolys","subtpolys","multpolys","scalepoly","roundpoly","quadroot","getcoef","polypower","checkpolypowerorder");
 
 
 //formpoly(coefficients,powers or degree)
@@ -234,6 +234,35 @@ function getcoef($p,$deg) {
 	}
 	return $coef;
 }
+
+//checkpolypowerorder(polystring,[order])
+//checks to make sure the degree order of polynomial powers is decreasing
+//set order='inc' to instead check if they're increasing
+//only works for integer powers
+//typical use would be:
+// $correctorder = checkpolypowerorder($stuanswers[$thisq])
+// $answer = $stuanswers[$thisq] + 1000 if (!$correctorder) //forces a wrong answer
+function checkpolypowerorder($p,$ord='dec') {
+	if ($p=='' || $p==null) {return false;}
+	$pp = preg_split('/[+\-]/',$p);
+	$lastpower = ($ord=='dec')?100000000:-10000000;
+	for ($i=0;$i<count($pp);$i++) {
+		if (($p=strpos($pp[$i],'^'))===false) {
+			if (!is_numeric($pp[$i])) {
+				$pow = 1;
+			} else {
+				$pow = 0;
+			}
+		} else {
+			$pow = intval(str_replace(array('(',')'),'',substr($pp[$i],$p+1)));
+		}
+		if ($ord=='dec' && $pow>$lastpower) { return false;}
+		else if ($ord=='inc' && $pow<$lastpower) { return false;}
+		$lastpower = $pow;
+	}
+	return true;
+}
+
 
 
 ?>
