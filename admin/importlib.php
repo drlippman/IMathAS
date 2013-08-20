@@ -345,6 +345,9 @@ if (!(isset($teacherid)) && $myrights<75) {
 		$newli = 0;
 		$updateq = 0;
 		$newq = 0;
+		
+		mysql_query("START TRANSACTION") or die("Query failed :$query " . mysql_error());
+		
 		foreach ($libstoadd as $libid) {
 			if ($parents[$libid]==0) {  //use given root parent
 				$parent = $root;
@@ -447,6 +450,8 @@ if (!(isset($teacherid)) && $myrights<75) {
 				unset($existingli);
 			}
 		}
+		
+		mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
 		
 		unlink($filename);
 		$page_uploadSuccessMsg = "Import Successful.<br>\n";

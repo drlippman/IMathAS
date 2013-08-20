@@ -255,6 +255,7 @@ switch($_GET['action']) {
 			
 			
 			if (isset($CFG['CPS']['templateoncreate']) && isset($_POST['usetemplate']) && $_POST['usetemplate']>0) {
+				mysql_query("START TRANSACTION") or die("Query failed :$query " . mysql_error());
 				$query = "SELECT useweights,orderby,defaultcat,defgbmode,stugbmode FROM imas_gbscheme WHERE courseid='{$_POST['usetemplate']}'";
 				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 				$row = mysql_fetch_row($result);
@@ -326,6 +327,7 @@ switch($_GET['action']) {
 				$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt',ancestors='$ancestors',outcomes='$newoutcomearr' WHERE id='$cid'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				copyrubrics();
+				mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
 			} 
 			
 		}

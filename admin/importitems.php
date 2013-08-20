@@ -461,12 +461,17 @@ if (!(isset($teacherid))) {
 		$newitems = array();
 		$missingfiles = array();
 		
+		mysql_query("START TRANSACTION") or die("Query failed :$query " . mysql_error());
+				
 		copysub($items,'0',$newitems);
 		
 		array_splice($ciditemorder,count($ciditemorder),0,$newitems);
 		$itemorder = addslashes(serialize($ciditemorder));
 		$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt' WHERE id='$cid'";
 		mysql_query($query) or die("Query failed : $query" . mysql_error());
+		
+		mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
+			
 		if (count($missingfiles)>0) {
 			echo "These files pointed to by inline text items were not found and will need to be reuploaded:<br/>";
 			foreach ($missingfiles as $file) {

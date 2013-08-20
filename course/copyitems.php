@@ -80,6 +80,7 @@ if (!(isset($teacherid))) {
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
 		exit;	
 	} else if (isset($_GET['action']) && $_GET['action']=="copy") {
+		mysql_query("START TRANSACTION") or die("Query failed :$query " . mysql_error());
 		if (isset($_POST['copycourseopt'])) {
 			$tocopy = 'ancestors,hideicons,allowunenroll,copyrights,msgset,topbar,cploc,picicons,chatset,showlatepass,available,theme';
 			
@@ -271,6 +272,7 @@ if (!(isset($teacherid))) {
 		if (isset($_POST['copyrubrics'])) {
 			copyrubrics($offlinerubrics);
 		}
+		mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
 		if (isset($_POST['selectcalitems'])) {
 			$_GET['action']='selectcalitems';
 			$calitems = array();

@@ -199,31 +199,75 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		$vals = "'".implode("','",addslashes_deep(array_values($row)))."'";
 		
 		$query = "INSERT INTO imas_assessments (courseid,$fields) VALUES ('$cid',$vals)";
-		/*$row = mysql_fetch_row($result);
-		if ($sethidden) {$row[23] = 0;}
-		if (isset($gbcats[$row[14]])) {
-			$row[14] = $gbcats[$row[14]];
-		} else if ($_POST['ctc']!=$cid) {
-			$row[14] = 0;
-		}
-		
-		$reqscoreaid = array_pop($row);
-		$row[0] .= stripslashes($_POST['append']);
-		$row = "'".implode("','",addslashes_deep($row))."'";
-		$query = "INSERT INTO imas_assessments (courseid,name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,allowlate,exceptionpenalty,noprint,avail,groupmax,endmsg,deffeedbacktext,eqnhelper,caltag,calrtag,msgtoinstr,istutorial,viddata,reqscore) ";
-
-		$query .= "VALUES ('$cid',$row)";
-		*/
 		mysql_query($query) or die("Query failed : $query" . mysql_error());
 		$newtypeid = mysql_insert_id();
 		if ($reqscoreaid>0) {
 			$reqscoretrack[$newtypeid] = $reqscoreaid;
 		}
 		$assessnewid[$typeid] = $newtypeid;
+	
 		$query = "SELECT itemorder FROM imas_assessments WHERE id='$typeid'";
 		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-		if (trim(mysql_result($result,0,0))!='') {
-			$aitems = explode(',',mysql_result($result,0,0));
+		$itemorder = mysql_result($result,0,0);
+		if (trim($itemorder)!='') {
+			$flat = preg_replace('/\d+\|\d+~/','',$itemorder);
+			$flat = str_replace('~',',',$itemorder);
+			
+			$query = "SELECT id,questionsetid,points,attempts,penalty,category,regen,showans,showhints,rubric FROM imas_questions WHERE id IN ($flat)";
+			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+			$inss = array();
+			$insorder = array();
+			while ($row = mysql_fetch_assoc($result)) {
+				if (is_numeric($row['category'])) {
+					if (isset($outcomes[$row['category']])) {
+						$row['category'] = $outcomes[$row['category']];
+					} else {
+						$row['category'] = 0;
+					}
+				}
+				$toins = array($row['questionsetid'],$row['points'],$row['attempts'],$row['penalty'],$row['category'],$row['regen'],$row['showans'],$row['showhints']);
+				$rubric[$row['id']] = $row['rubric'];
+				$inss[] = "('$newtypeid','".implode("','",addslashes_deep($toins))."')";
+				$insorder[] = $row['id'];
+			}
+			$idtoorder = array_flip($insorder);
+			
+			$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category,regen,showans,showhints) ";
+			$query .= "VALUES ".implode(',',$inss);
+			mysql_query($query) or die("Query failed : $query" . mysql_error());
+			$firstnewid = mysql_insert_id();
+			
+			$aitems = explode(',',$itemorder);
+			$newaitems = array();
+			foreach ($aitems as $k=>$aitem) {
+				if (strpos($aitem,'~')===FALSE) {
+					if ($rubric[$aitem]!=0) {
+						$qrubrictrack[$firstnewid+$idtoorder[$aitem]] = $rubric[$aitem];
+					}
+					$newaitems[] = $firstnewid+$idtoorder[$aitem];
+				} else {
+					$sub = explode('~',$aitem);
+					$newsub = array();
+					if (strpos($sub[0],'|')!==false) { //true except for bwards compat 
+						$newsub[] = array_shift($sub);
+					}
+					foreach ($sub as $subi) {
+						if ($rubric[$subi]!=0) {
+							$qrubrictrack[$firstnewid+$idtoorder[$subi]] = $rubric[$subi];
+						}
+						$newsub[] = $firstnewid+$idtoorder[$subi];
+					}
+					$newaitems[] = implode('~',$newsub);
+				}
+			}
+			$newitemorder = implode(',',$newaitems);
+			$query = "UPDATE imas_assessments SET itemorder='$newitemorder' WHERE id='$newtypeid'";
+			mysql_query($query) or die("Query failed : $query" . mysql_error());
+			
+			
+
+			/*
+			$aitems = explode(',',$itemorder);
 			$newaitems = array();
 			foreach ($aitems as $k=>$aitem) {
 				if (strpos($aitem,'~')===FALSE) {
@@ -287,6 +331,8 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 			$newitemorder = implode(',',$newaitems);
 			$query = "UPDATE imas_assessments SET itemorder='$newitemorder' WHERE id='$newtypeid'";
 			mysql_query($query) or die("Query failed : $query" . mysql_error());
+			*/
+			
 		}
 	} else if ($itemtype == "Calendar") {
 		$newtypeid = 0;	
