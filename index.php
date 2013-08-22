@@ -246,6 +246,14 @@ if ($showpostsgadget && count($postcheckstucids)>0) {
 		$newpostcnt[$row[0]] = $row[1];
 	}
 }
+if ($myrights==100) {
+	$query = "SELECT userights,COUNT(id) FROM imas_questionset WHERE broken=1 GROUP BY userights";
+	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+	$brokencnt = array();
+	while ($row = mysql_fetch_row($result)) {
+		$brokencnt[$row[0]] = $row[1];
+	}
+}
 
 /*** done pulling stuff.  Time to display something ***/
 require("header.php");
@@ -273,7 +281,12 @@ if (isset($CFG['GEN']['hometitle'])) {
 } else {
 	echo _('Welcome to'), " $installname, $userfullname";
 }
-echo '</h2></div>';
+echo '</h2>';
+if ($myrights==100 && count($brokencnt)>0) {
+	echo '<span class="red">'.array_sum($brokencnt).'</span> questions, '.(array_sum($brokencnt)-$brokencnt[0]).' public, reported broken systemwide';
+}
+echo '</div>';
+
 
 for ($i=0; $i<3; $i++) {
 	if ($i==0) {

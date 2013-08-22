@@ -629,6 +629,8 @@ if ($myrights<20) {
 			if (substr($safesearch,0,6)=='regex:') {
 				$safesearch = substr($safesearch,6);
 				$searchlikes = "imas_questionset.description REGEXP '$safesearch' AND ";
+			} else if ($safesearch=='isbroken') {
+				$searchlikes = "imas_questionset.broken=1 AND ";	
 			} else {$searchterms = explode(" ",$safesearch);
 				$searchlikes = "((imas_questionset.description LIKE '%".implode("%' AND imas_questionset.description LIKE '%",$searchterms)."%') ";
 				if (substr($safesearch,0,3)=='id=') {
