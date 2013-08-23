@@ -85,7 +85,7 @@ if (isset($sessiondata['graphdisp']) && $sessiondata['graphdisp']==1) {
 	//echo "<script src=\"$imasroot/course/editor/plugins/AsciiSvg/ASCIIsvgAddon.js\" type=\"text/javascript\"></script>\n";
 } else if (isset($sessiondata['graphdisp'])) {
 	echo "<script src=\"$imasroot/javascript/mathjs.js\" type=\"text/javascript\"></script>\n";
-	echo "<script type=\"text/javascript\">var usingASCIISvg = false; var ASnoSVg=true;</script>";
+	echo "<script type=\"text/javascript\">var usingASCIISvg = false; var ASnoSVG=true;</script>";
 }
 }
 
