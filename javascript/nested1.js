@@ -400,11 +400,15 @@ function editinplace(el) {
 function editinplaceun() {
 	el = document.getElementById(this.id.substring(6));
 	input =  document.getElementById('input'+this.id.substring(6));
-	el.innerHTML = this.value;
-	//input.parentNode.removeChild(input);
-	input.value = this.value;
+	if (el.innerHTML != this.value) {
+		el.innerHTML = this.value;
+		//input.parentNode.removeChild(input);
+		input.value = this.value;
+		document.getElementById('recchg').disabled = false;
+		setlinksdisp("none");
+	}
 	el.style.display = 'inline';
 	this.style.display = "none";
 	
-	document.getElementById('recchg').disabled = false;
+	
 }

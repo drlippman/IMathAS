@@ -247,7 +247,7 @@ if ($showpostsgadget && count($postcheckstucids)>0) {
 	}
 }
 if ($myrights==100) {
-	$query = "SELECT userights,COUNT(id) FROM imas_questionset WHERE broken=1 GROUP BY userights";
+	$query = "SELECT userights,COUNT(id) FROM imas_questionset WHERE broken=1 AND deleted=0 GROUP BY userights";
 	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 	$brokencnt = array();
 	while ($row = mysql_fetch_row($result)) {
