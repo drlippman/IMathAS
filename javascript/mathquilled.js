@@ -5,13 +5,13 @@ $(function() {
   
   $(window).load(function() {
         var hasTouch = 'ontouchstart' in document.documentElement;
-  	mqarea = $('.mathquill-editable');
+        mqarea = $('.mathquill-editable');
 	$('.mathquill-rendered-math').mathquill('redraw');
   	mqarea.find('textarea').focus();
   	$('input,textarea').attr('autocapitalize', 'off');
 
   	
-  	if (!hasTouch) {
+  //	if (!hasTouch) {
   		$('#mqee td.mqeebtn').bind('mouseover mouseup', function() {
 			if (!$(this).hasClass("mqeeactive")) {
 				$(this).addClass("mqeehighlight");	
@@ -23,6 +23,7 @@ $(function() {
 		}).bind('mouseup', function () {
 			$(this).removeClass("mqeeclick");
 		}).bind('click',mqeeinsert);
+		$('#mqeeclosebutton').bind('click',hideee);
   		$('#mqeetopbar').mousedown(function(evt) {
 			mqmousebase = {left:evt.pageX, top: evt.pageY};
 			$("body").bind('mousemove',mqeemousemove);
@@ -34,13 +35,17 @@ $(function() {
 				$(this).unbind(event);
 			});
 		});
-  	} else {
-  		$('#mqee td.mqeebtn').bind('touchstart', function () {
+  	//} else {
+  		$('#mqee td.mqeebtn').bind('touchstart', function (e) {
+  			if (e.preventDefault) {e.preventDefault()};
 			$(this).addClass("mqeeclick");	
-		}).bind('touchend', function () {
+		}).bind('touchend', function (e) {
+			if (e.preventDefault) {e.preventDefault()};
 			$(this).delay(500).removeClass("mqeeclick");
 		}).bind('touchend', mqeeinsert);
+		$('#mqeeclosebutton').bind('touchend',function(e) {if (e.preventDefault) {e.preventDefault()}; hideee()});
 		$('#mqeetopbar').bind('touchstart', function(evt) {
+			if (evt.preventDefault) {evt.preventDefault()};
 			var touch = evt.originalEvent.changedTouches[0] || evt.originalEvent.touches[0];
 			mqmousebase = {left:touch.pageX, top: touch.pageY};
 			$("body").bind('touchmove',mqeetouchmove);
@@ -52,7 +57,13 @@ $(function() {
 				$(this).unbind(event);
 			});	
 		});
-  	}
+  //	}
+  	/* prevents stuff outside of mathquill from getting clicked, but also prevents
+  	   selecting text in touch mode
+  		$('#mqeeinsides').bind("touchstart", function (evt) {
+  			if (evt.preventDefault) {evt.preventDefault()};
+  			if (evt.stopPropagation) {evt.stopPropagation()};
+		});*/
   	
   });
 
@@ -123,6 +134,8 @@ function mqPrepTabs(type,extras) {   //type: 0 basic, 1 advanced.  extras = 'int
 function mqeemousemove(evt) {
 	$('#mqee').css('left', (evt.pageX - mqmousebase.left) + lasteepos.left)
 	  .css('top', (evt.pageY - mqmousebase.top) + lasteepos.top);
+	if (evt.preventDefault) {evt.preventDefault()};
+	if (evt.stopPropagation) {evt.stopPropagation()};
 	return false;
 }
 function mqeetouchmove(evt) {
@@ -130,12 +143,15 @@ function mqeetouchmove(evt) {
   		
 	$('#mqee').css('left', (touch.pageX - mqmousebase.left) + lasteepos.left)
 	  .css('top', (touch.pageY - mqmousebase.top) + lasteepos.top);
-	  evt.preventDefault();
+	if (evt.preventDefault) {evt.preventDefault()};
+	if (evt.stopPropagation) {evt.stopPropagation()};
 
 	return false;
 }
 
-function mqeeinsert() {
+function mqeeinsert(e) {
+	if (e.preventDefault) {e.preventDefault()};
+	if (e.stopPropagation) {e.stopPropagation()};
 	var t = $(this).attr("btntext");
         var type = $(this).attr("btntype");
         t = t.replace('\\\\','\\');
@@ -152,6 +168,7 @@ function mqeeinsert() {
 	} else if (type==5) {
 		mqarea.mathquill('movecursor', t).find('textarea').focus();
 	}
+	return false;
 }
 
 var mqeeddclosetimer = null;
