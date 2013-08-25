@@ -263,7 +263,11 @@ function getallremainingpossible($qi,$questions,$testsettings,$attempts) {
 //calculates points based on return from scoreq
 function getpts($sc) {
 	if (strpos($sc,'~')===false) {
-		return $sc;
+		if ($sc>0) {
+			return $sc;
+		} else {
+			return 0;
+		}
 	} else {
 		$sc = explode('~',$sc);
 		$tot = 0;
@@ -279,7 +283,7 @@ function getpts($sc) {
 //determines if a question has not been attempted
 function unans($sc) {
 	if (strpos($sc,'~')===false) {
-		return ($sc<0);
+		return ($sc==-1);
 	} else {
 		return (strpos($sc,'-1')!==FALSE);
 	}
@@ -342,10 +346,20 @@ function scorestocolors($sc,$pts,$answ,$noraw) {
 
 //creates display of score  (chg from previous: does not echo self)
 function printscore($sc,$qn) {
-	global $qi,$questions,$imasroot;
+	global $qi,$questions,$imasroot,$rawscores;
+	$hasmanual = false;
+	if (isset($rawscores) && isset($rawscores[$qn])) {
+		$thisraw = $rawscores[$qn];
+	} else {
+		$thisraw = '';
+	}
 	$poss = $qi[$questions[$qn]]['points'];
 	if (strpos($sc,'~')===false) {
 		$sc = str_replace('-1','N/A',$sc);
+		if ($sc==0 && strpos($thisraw,'-2')!==false) {
+			$hasmanual = true;
+			$sc = '*';
+		}
 		$out =  "$sc out of $poss";
 		$pts = $sc;
 		if (!is_numeric($pts)) { $pts = 0;}
@@ -361,8 +375,18 @@ function printscore($sc,$qn) {
 		
 		$pts = getpts($sc);
 		$sc = str_replace('-1','N/A',$sc);
+
 		//$sc = str_replace('~',', ',$sc);
 		$scarr = explode('~',$sc);
+		if (strpos($thisraw,'-2')!==false) {
+			$rawarr = explode('~',$thisraw);
+			foreach ($rawarr as $k=>$v) {
+				if ($scarr[$k]==0 && $v==-2) {
+					$scarr[$k] = '*';
+					$hasmanual = true;
+				}
+			}
+		}
 		foreach ($scarr as $k=>$v) {
 			if ($ptposs[$k]==0) {
 				$pm = 'gchk';
@@ -393,12 +417,18 @@ function printscore($sc,$qn) {
 			//$scarr[$k] = $bar.$v;
 			*/
 			$bar = "<img src=\"$imasroot/img/$pm.gif\" />";
+			if ($v=='*') {
+				$bar = '';
+			}
 			$scarr[$k] = "$bar $v/{$ptposs[$k]}";
 		}
 		$sc = implode(', ',$scarr);
 		//$ptposs = implode(', ',$ptposs); 
 		$out =  "$pts out of $poss (parts: $sc)";
 	}	
+	if ($hasmanual) {
+		$out .= _(' (* not auto-graded)');
+	}
 	$bar = '<span class="scorebarholder">';
 	if ($poss==0) {
 		$w = 30;
@@ -435,14 +465,14 @@ function printscore2($sc) {
 //scores a question
 //qn: question index in questions array
 //qi: getquestioninfo[qid]
-function scorequestion($qn) { 
+function scorequestion($qn, $rectime=true) { 
 	global $questions,$scores,$seeds,$testsettings,$qi,$attempts,$lastanswers,$isreview,$bestseeds,$bestscores,$bestattempts,$bestlastanswers, $reattempting, $rawscores, $bestrawscores, $firstrawscores;
 	global $regenonreattempt;
 	//list($qsetid,$cat) = getqsetid($questions[$qn]);
 	list($rawscore,$rawscores[$qn]) = scoreq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$_POST["qn$qn"],$qi[$questions[$qn]]['points']);
 	
 	$afterpenalty = calcpointsafterpenalty($rawscore,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
-	
+
 	$rawscore = calcpointsafterpenalty($rawscore,$qi[$questions[$qn]],$testsettings,0); //possible
 	
 	//work in progress
@@ -465,6 +495,16 @@ function scorequestion($qn) {
 	}
 	if (!$isreview && $attempts[$qn]==0 && strpos($lastanswers[$qn],'##')===false) {
 		$firstrawscores[$qn] = $rawscores[$qn];
+		if ($rectime) {
+			global $timesontask;
+			$time = explode('~',$timesontask[$qn]);
+			$time = $time[0];
+		} else {
+			$time = 0;  //for all at once display, where time is not useful info
+		}
+		$query = "INSERT INTO imas_firstscores (courseid,qsetid,score,scoredet,timespent) VALUES ";
+		$query .= "('".addslashes($testsettings['courseid'])."','".$qi[$questions[$qn]]['questionsetid']."','".round(100*getpts($rawscore))."','".$rawscores[$qn]."','$time')";
+		mysql_query($query) or die("Query failed : " . mysql_error());
 	}
 	
 	//$scores[$qn] = $afterpenalty;
@@ -660,7 +700,7 @@ function basicshowq($qn,$seqinactive=false,$colors=array()) {
 	
 	$regen = ((($regenonreattempt && $qi[$questions[$qn]]['regen']==0) || $qi[$questions[$qn]]['regen']==1)&&amreattempting($qn));
 	$thisshowhints = ($qi[$questions[$qn]]['showhints']==2 || ($qi[$questions[$qn]]['showhints']==0 && $showhints));
-	if (!$noraw && $showeachscore && $GLOBALS['questionmanualgrade'] != true) {
+	if (!$noraw && $showeachscore) { //&& $GLOBALS['questionmanualgrade'] != true) {
 		$colors = scorestocolors($rawscores[$qn], '', '', $noraw);
 	}
 	if (!$seqinactive) {

@@ -39,7 +39,7 @@
 					       if (val) {
 						       existing = val;
 					       }
-					       entity = '<span class=AMedit>`'+existing+'<span id="removeme"></span>`</span> ';
+					       entity = '<span class=AMedit>`'+existing+'<span id="removeme"></span>`</span>&nbsp;';
 					    
 					       if (tinymce.isIE) ed.focus();
 					   
@@ -115,7 +115,7 @@
 						       existing = existing.replace(/<([^>]*)>/g,"");
 						       existing = existing.replace(/&(m|n)dash;/g,"-");
 						       existing = existing.replace(/&(.*?);/g,"$1");
-						       entity = '<span class="AMedit">`'+existing+'<span id="removeme"></span>`</span> ';
+						       entity = '<span class="AMedit">`'+existing+'<span id="removeme"></span>`</span>&nbsp;';
 						       
 						       if (tinymce.isIE) ed.focus();
 						   
@@ -262,6 +262,18 @@
 						if (p.parentNode.lastChild==p) {
 							//not working 
 							//p.parentNode.appendChild(document.createTextNode(" "));
+						}
+						if (t.justinserted==null && p.parentNode.innerHTML.match(/<span[^>]*class="AMedit"[^<]*?<\/span>(\s*<br>)?\s*$/)) {
+							while (p.parentNode.lastChild.nodeName.toLowerCase()!='span') {
+								p.parentNode.removeChild(p.parentNode.lastChild);
+							}
+							p.parentNode.appendChild(ed.dom.doc.createTextNode("\u00A0"));
+						}
+						if (t.justinserted==null && p.parentNode.innerHTML.match(/^\s*<span[^>]*class="AMedit"/)) {
+							while (p.parentNode.firstChild.nodeName.toLowerCase()!='span') {
+								p.parentNode.removeChild(p.parentNode.firstChild);
+							}
+							p.parentNode.insertBefore(ed.dom.doc.createTextNode("\u00A0"),p.parentNode.firstChild);
 						}
 						if (t.justinserted==null) {
 							ed.selection.setCursorLocation(p,0);

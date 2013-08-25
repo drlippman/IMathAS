@@ -155,7 +155,7 @@ this.preinit = function(try2) {
 			nodes[1].firstChild.style.height = max + "px";
 		}
 		
-		if (tblbrowser=='gecko') {
+		if (tblbrowser=='gecko' || tblbrowser=='safari') {
 			vertadj = 0;
 		} else {
 			vertadj = 0;
@@ -192,7 +192,7 @@ this.preinit = function(try2) {
 scrollhandler = function(e) {
 	if (e.target.nodeName=="DIV") {
 		var el = e.target;	
-		if (tblbrowser=='gecko') {
+		if (tblbrowser=='gecko' || tblbrowser=='safari') {
 			thr.style.left = (-1*el.scrollLeft + margleft) + "px";
 			leftth.style.left = (el.scrollLeft -margleft)+ "px";
 		} else {
@@ -330,7 +330,7 @@ this.lock = function() {
 		//gecko lets us take the top-left cell and remove it
 		//independently from the flow.  Safari doesn't, so we put
 		//a div over the top-left cell to cover it.
-		if (tblbrowser=='gecko') {
+		if (tblbrowser=='gecko' || tblbrowser=='safari') {
 			thr.style.left = margleft + "px";
 			leftth.style.position = "absolute";
 			leftth.style.zIndex = 40;
@@ -400,7 +400,8 @@ this.unlock = function() {
 	if (tblbrowser=='gecko') {
 		leftth.style.position = "";
 	} else {
-		upleftdiv.style.visibility = "hidden";
+		//upleftdiv.style.visibility = "hidden";
+		leftth.style.position = "static";
 		//Safari has an issue - this resets page layout
 		tblcont.innerHTML = tblcont.innerHTML + " ";	
 		locktds.length = 0;

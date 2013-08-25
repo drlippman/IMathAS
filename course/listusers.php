@@ -217,7 +217,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				$query = "UPDATE imas_students SET code=$code,section=$section,locked=$locked,timelimitmult='$timelimitmult',hidefromcourselist=$hide WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			} else {
-				$query = "UPDATE imas_students SET code=$code,section=$section,timelimitmult='$timelimitmult',hidefromcourselist=hide WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
+				$query = "UPDATE imas_students SET code=$code,section=$section,timelimitmult='$timelimitmult',hidefromcourselist=$hide WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				$query = "UPDATE imas_students SET locked=$locked WHERE userid='{$_GET['uid']}' AND courseid='$cid' AND locked=0";
 				mysql_query($query) or die("Query failed : " . mysql_error());

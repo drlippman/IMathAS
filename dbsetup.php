@@ -121,6 +121,8 @@ $sql = 'CREATE TABLE `imas_students` ('
 	. ' `locked` INT(10) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `hidefromcourselist` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `timelimitmult` DECIMAL(3,2) UNSIGNED NOT NULL DEFAULT \'1.0\', '
+	. ' `stutype` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
+	. ' `custominfo` TEXT NOT NULL, '
         . ' INDEX (`userid`), INDEX (`courseid`), '
 	. ' INDEX(`code`), INDEX(`section`)'
         . ' )'
@@ -341,6 +343,18 @@ $sql = 'CREATE TABLE `imas_assessment_sessions` ('
         . ' COMMENT = \'Assessment Sessions\';';
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 echo 'imas_assessment_sessions created<br/>';
+
+$sql = 'CREATE TABLE `imas_firstscores` (
+	`id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+	`courseid` INT(10) UNSIGNED NOT NULL, 
+	`qsetid` INT(10) UNSIGNED NOT NULL,
+	`score` TINYINT(3) UNSIGNED NOT NULL,
+	`scoredet` TEXT NOT NULL,
+	`timespent` SMALLINT(5) UNSIGNED NOT NULL,
+	INDEX ( `courseid`), INDEX(`qsetid`) 
+	) ENGINE = InnoDB';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+echo 'imas_firstscores created<br/>';
 
 $sql = 'CREATE TABLE `imas_sessions` ('
         . ' `sessionid` VARCHAR(32) NOT NULL, '
@@ -589,6 +603,7 @@ echo 'imas_wiki_views created<br/>';
 
 $sql = 'CREATE TABLE `imas_groups` ('
         . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
+        . ' `grouptype` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\','
         . ' `name` VARCHAR(255) NOT NULL'
         . ' )'
         . ' ENGINE = InnoDB;';

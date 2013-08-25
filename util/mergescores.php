@@ -127,7 +127,11 @@ require("../footer.php");
 
 function getpts($sc) {
 	if (strpos($sc,'~')===false) {
-		return $sc;
+		if ($sc>0) {
+			return $sc;
+		} else {
+			return 0;
+		}
 	} else {
 		$sc = explode('~',$sc);
 		$tot = 0;

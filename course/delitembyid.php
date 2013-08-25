@@ -49,9 +49,29 @@ function delitembyid($itemid) {
 		$query = "DELETE FROM imas_forums WHERE id='$typeid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		
+		$query = "SELECT id FROM imas_forum_posts WHERE forumid='$typeid' AND files<>''";
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			deleteallpostfiles($row[0]);
+		}
+		
+		$query = "DELETE FROM imas_forum_subscriptions WHERE forumid='$typeid'";
+		mysql_query($query) or die("Query failed : " . mysql_error());
+		
+		$query = "DELETE FROM imas_forum_views WHERE threadid IN (SELECT id FROM imas_forum_threads WHERE forumid='$typeid')";
+		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		
 		$query = "DELETE FROM imas_forum_posts WHERE forumid='$typeid'";
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		
+		$query = "DELETE FROM imas_forum_threads WHERE forumid='$typeid'";
+		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		
+		
 	} else if ($itemtype == "Assessment") {
+		
+		deleteallaidfiles($typeid);
+		
 		$query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='$typeid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		$query = "DELETE FROM imas_questions WHERE assessmentid='$typeid'";
@@ -63,6 +83,16 @@ function delitembyid($itemid) {
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		$query = "DELETE FROM imas_drillassess WHERE id='$typeid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
+	} else if ($itemtype == 'Wiki') {
+		$query = "DELETE FROM imas_wikis WHERE id='$typeid'";
+		mysql_query($query) or die("Query failed : " . mysql_error());
+		
+		$query = "DELETE FROM imas_wiki_revisions WHERE wikiid='$typeid'";
+		mysql_query($query) or die("Query failed : " . mysql_error());
+		
+		$query = "DELETE FROM imas_wiki_views WHERE wikiid='$typeid'";
+		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		
 	}
 	$query = "DELETE FROM imas_items WHERE id='$itemid'";
 	mysql_query($query) or die("Query failed : " . mysql_error());

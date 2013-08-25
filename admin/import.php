@@ -173,6 +173,9 @@ if (!(isset($teacherid)) && $myrights<75) {
 		$newli = 0;
 		$now = time();
 		$allqids = array();
+		
+		mysql_query("START TRANSACTION") or die("Query failed :$query " . mysql_error());
+		
 		foreach ($checked as $qn) {
 			if (!empty($qdata[$qn]['qimgs'])) {
 				$hasimg = 1;
@@ -292,6 +295,8 @@ if (!(isset($teacherid)) && $myrights<75) {
 				mysql_query($query) or die("error on: $query: " . mysql_error());
 			}
 		}
+		
+		mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
 
 		if ($isadmin || $isgrpadmin) {
 			$page_importSuccessMsg = "<a href=\"".$urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/admin.php\">Return to Admin page</a>";

@@ -81,6 +81,8 @@ $result = mysql_query($query) or die("Query failed : " . mysql_error());
 $blockcnt = mysql_result($result,0,0);
 $items = unserialize(mysql_result($result,0,1));
 
+mysql_query("START TRANSACTION") or die("Query failed :$query " . mysql_error());
+
 $notimportant = array();
 copysubone($items,'0',false,$notimportant);
 copyrubrics();
@@ -89,5 +91,7 @@ $itemorder = addslashes(serialize($items));
 $query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt' WHERE id='$cid'";
 mysql_query($query) or die("Query failed : $query" . mysql_error());
 
+mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
+		
 header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
 ?>

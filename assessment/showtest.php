@@ -744,7 +744,7 @@ if (!isset($_POST['embedpostback'])) {
 				</style><![endif]-->';
 		}
 		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquill_min.js?v=030112\"></script>";
-		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquilled.js?v=030112\"></script>";
+		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquilled.js?v=082513\"></script>";
 		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/AMtoMQ.js?v=030112\"></script>";
 		$placeinhead .= '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
 		
@@ -1176,7 +1176,7 @@ if (!isset($_POST['embedpostback'])) {
 					if ($_POST['verattempts'][$i]!=$attempts[$i]) {
 						echo sprintf(_('Question %d has been submitted since you viewed it.  Your answer just submitted was not scored or recorded.'), ($i+1)), "<br/>";
 					} else {
-						scorequestion($i);
+						scorequestion($i,false);
 					}
 				//}
 			}
@@ -1332,7 +1332,7 @@ if (!isset($_POST['embedpostback'])) {
 					echo printscore($bestscores[$qn],$qn);
 					echo "</p>";
 					if ($GLOBALS['questionmanualgrade'] == true) {
-						echo '<p><strong>', _('Note:'), '</strong> ', _('This question contains parts that can not be auto-graded.  Those parts will show a score of 0 until they are graded by your instructor'), '</p>';
+						echo '<p><strong>', _('Note:'), '</strong> ', _('This question contains parts that can not be auto-graded.  Those parts will count as a score of 0 until they are graded by your instructor'), '</p>';
 					}
 										
 					
@@ -1725,7 +1725,7 @@ if (!isset($_POST['embedpostback'])) {
 						echo _('Score in gradebook: ');
 						echo printscore($bestscores[$qn],$qn);
 						if ($GLOBALS['questionmanualgrade'] == true) {
-							echo '<br/><strong>', _('Note:'), '</strong> ', _('This question contains parts that can not be auto-graded.  Those parts will show a score of 0 until they are graded by your instructor');
+							echo '<br/><strong>', _('Note:'), '</strong> ', _('This question contains parts that can not be auto-graded.  Those parts will count as a score of 0 until they are graded by your instructor');
 						} 
 						echo "</p>";
 						

@@ -265,6 +265,7 @@ END;
 		 	 $sessiondata['mathdisp'] = 3;
 			 $sessiondata['graphdisp'] = $_POST['graphdisp'];
 			 $sessiondata['useed'] = checkeditorok(); 
+			 $enc = base64_encode(serialize($sessiondata));
 		 } else if ($_POST['isok']) {
 			 $sessiondata['mathdisp'] = 1;  
 			 $sessiondata['graphdisp'] = 1;

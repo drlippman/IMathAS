@@ -1150,7 +1150,7 @@ function scoreinventory($stua, $answer, $invs, $rowper, $sn) {
 //init is purchase #0.
 //rowsper sets the number of rows for each date.  Will get extended for a particular date if needed
 function makeinventory($invs, $type, $rowper, $sn, &$anstypes, &$questions, &$answer, &$showanswer, &$displayformat, &$answerformat, &$answerboxsize, $get='rec') {
-	$str = array();  $jc = 0; $totsales = 0; 
+	$str = array();  $jc = 0; $totsales = 0; $salesexp = array();
 	$dates = array();
 	foreach($invs as $inv) {
 		$thisrowper = $rowper;
@@ -1202,7 +1202,7 @@ function makeinventory($invs, $type, $rowper, $sn, &$anstypes, &$questions, &$an
 			$c = 0;  $cogs = 0; $thiscalc = '';
 			if ($type=='SPEC') {
 				for ($i=0;$i<count($inv[2]);$i+=2) {
-					if (isset($inv[3])) { $totsales += $inv[2][$i]*$inv[3];}
+					if (isset($inv[3])) { $totsales += $inv[2][$i]*$inv[3]; $salesexp[] = $inv[2][$i].' @ $'.$inv[3];}
 					$loc = $inv[2][$i+1];
 					if ($str[$loc][0]<$inv[2][$i]) {echo "Trying to sell more than we have: {$inv[2][$i]} from $loc which has {$str[$loc][0]}. "; break;}
 					$sq[] = $inv[2][$i];  $su[] = $str[$loc][1];  $st[] = $inv[2][$i] * $str[$loc][1];  $cogs += $inv[2][$i] * $str[$loc][1]; $c++;

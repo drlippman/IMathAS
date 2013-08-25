@@ -80,15 +80,15 @@ if ($myrights < 40) {
 	
 	//get list of teachers for the select box
 	if ($myrights==75) {
-		$query = "SELECT id,LastName,FirstName FROM imas_users WHERE rights>10 AND groupid='$groupid' ORDER BY LastName,FirstName";
+		$query = "SELECT id,LastName,FirstName,SID FROM imas_users WHERE rights>10 AND groupid='$groupid' ORDER BY LastName,FirstName";
 	} else if ($myrights==100) {
-		$query = "SELECT id,LastName,FirstName FROM imas_users WHERE rights>10 ORDER BY LastName,FirstName";
+		$query = "SELECT id,LastName,FirstName,SID FROM imas_users WHERE rights>10 ORDER BY LastName,FirstName";
 	}
 	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 	$i=0;
 	while ($row = mysql_fetch_row($result)) {
 		$page_teacherSelectVal[$i] = $row[0];
-		$page_teacherSelectLabel[$i] = $row[1] . ", " . $row[2];
+		$page_teacherSelectLabel[$i] = $row[1] . ", " . $row[2]. ' ('.$row[3].')';
 		$i++;
 	}
 	
