@@ -157,6 +157,7 @@
 			cellStartObjArray.push(tableObj.rows[no].cells[indexThis]);
 		}
 		for(var no=1+skipfirst;no<tableObj.rows.length-skiplast;no++){
+			if (indexThis>=tableObj.rows[no].cells.length) {continue;}
 			var content= tableObj.rows[no].cells[indexThis].innerHTML+'';
 			cellArray.push(content);
 			cellObjArray.push(tableObj.rows[no].cells[indexThis]);
