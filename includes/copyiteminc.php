@@ -13,8 +13,19 @@ $qrubrictrack = array();
 $frubrictrack = array();
 $assessnewid = array();
 $exttooltrack = array();
+if (!isset($replacebyarr)) {
+	$replacebyarr = array();
+}
+if (isset($removewithdrawn) && $removewithdrawn) {
+	$removewithdrawn = true;
+} else {
+	$removewithdrawn = false;
+}
+
+
+
 function copyitem($itemid,$gbcats,$sethidden=false) {
-	global $cid, $reqscoretrack, $assessnewid, $qrubrictrack, $frubrictrack, $copystickyposts,$userid, $exttooltrack, $outcomes;
+	global $cid, $reqscoretrack, $assessnewid, $qrubrictrack, $frubrictrack, $copystickyposts,$userid, $exttooltrack, $outcomes, $removewithdrawn, $replacebyarr;
 	if (!isset($copystickyposts)) { $copystickyposts = false;}
 	if ($gbcats===false) {
 		$gbcats = array();
@@ -205,7 +216,8 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 			$reqscoretrack[$newtypeid] = $reqscoreaid;
 		}
 		$assessnewid[$typeid] = $newtypeid;
-	
+		$thiswithdrawn = array();
+		
 		$query = "SELECT itemorder FROM imas_assessments WHERE id='$typeid'";
 		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 		$itemorder = mysql_result($result,0,0);
@@ -213,11 +225,18 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 			$flat = preg_replace('/\d+\|\d+~/','',$itemorder);
 			$flat = str_replace('~',',',$itemorder);
 			
-			$query = "SELECT id,questionsetid,points,attempts,penalty,category,regen,showans,showhints,rubric FROM imas_questions WHERE id IN ($flat)";
+			$query = "SELECT id,questionsetid,points,attempts,penalty,category,regen,showans,showhints,rubric,withdrawn FROM imas_questions WHERE id IN ($flat)";
 			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 			$inss = array();
 			$insorder = array();
 			while ($row = mysql_fetch_assoc($result)) {
+				if ($row['withdrawn']>0 && $removewithdrawn) {
+					$thiswithdrawn[$row['id']] = 1;
+					continue;
+				}
+				if (isset($replacebyarr[$row['questionsetid']])) {
+					$row['questionsetid'] = $replacebyarr[$row['questionsetid']];
+				}
 				if (is_numeric($row['category'])) {
 					if (isset($outcomes[$row['category']])) {
 						$row['category'] = $outcomes[$row['category']];
@@ -241,6 +260,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 			$newaitems = array();
 			foreach ($aitems as $k=>$aitem) {
 				if (strpos($aitem,'~')===FALSE) {
+					if (isset($thiswithdrawn[$aitem])) { continue;}
 					if ($rubric[$aitem]!=0) {
 						$qrubrictrack[$firstnewid+$idtoorder[$aitem]] = $rubric[$aitem];
 					}
@@ -248,16 +268,25 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 				} else {
 					$sub = explode('~',$aitem);
 					$newsub = array();
+					$front = 0;
 					if (strpos($sub[0],'|')!==false) { //true except for bwards compat 
 						$newsub[] = array_shift($sub);
+						$front = 1;
 					}
 					foreach ($sub as $subi) {
+						if (isset($thiswithdrawn[$subi])) { continue;}
 						if ($rubric[$subi]!=0) {
 							$qrubrictrack[$firstnewid+$idtoorder[$subi]] = $rubric[$subi];
 						}
 						$newsub[] = $firstnewid+$idtoorder[$subi];
 					}
-					$newaitems[] = implode('~',$newsub);
+					if (count($newsub)==$front) {
+						
+					} else if (count($newsub)==$front+1) {
+						$newaitems[] = $newsub[$front];
+					} else {
+						$newaitems[] = implode('~',$newsub);
+					}
 				}
 			}
 			$newitemorder = implode(',',$newaitems);

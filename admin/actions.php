@@ -287,6 +287,16 @@ switch($_GET['action']) {
 				}
 				$ancestors = addslashes($ancestors);
 				$outcomes = array();
+				
+				$query = 'SELECT imas_questionset.id,imas_questionset.replaceby FROM imas_questionset JOIN ';
+				$query .= 'imas_questions ON imas_questionset.id=imas_questions.questionsetid JOIN ';
+				$query .= 'imas_assessments ON imas_assessments.id=imas_questions.assessmentid WHERE ';
+				$query .= "imas_assessments.courseid='{$_POST['usetemplate']}' AND imas_questionset.replaceby>0";
+				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+				while ($row = mysql_fetch_row($result)) {
+					$replacebyarr[$row[0]] = $row[1];  
+				}
+				
 				if ($outcomesarr!='') {
 					$query = "SELECT id,name,ancestors FROM imas_outcomes WHERE courseid='{$_POST['usetemplate']}'";
 					$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
@@ -318,7 +328,8 @@ switch($_GET['action']) {
 				} else {
 					$newoutcomearr = '';
 				}
-				
+				$removewithdrawn = true;
+				$usereplaceby = "all";
 				$newitems = array();
 				require("../includes/copyiteminc.php");
 				copyallsub($items,'0',$newitems,$gbcats);

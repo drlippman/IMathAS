@@ -7,7 +7,7 @@
 //$deloffline = delete offline items from gradebook
 //$unwithdraw = unset any withdrawn questions
 //$delwikirev = delete wiki revisions, 1: all, 2: group wikis only
-function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwithdraw=false,$delwikirev=false) {
+function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwithdraw=false,$delwikirev=false,$usereplaceby=false) {
 	$forums = array();
 	$threads = array();
 	$query = "SELECT id FROM imas_forums WHERE courseid='$cid'";
@@ -61,6 +61,9 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 	}
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	require_once("$curdir/filehandler.php");
+	if ($withwithdrawn=='remove' || $usereplaceby) {
+		require_once("$curdir/updateassess.php");
+	}
 	if (count($tounenroll)>0) {
 		$gbitems = array();
 		$query = "SELECT id FROM imas_gbitems WHERE courseid='$cid'";
@@ -149,9 +152,10 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 			$query = "UPDATE imas_questions SET withdrawn=0 WHERE assessmentid='$aid'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		}*/
-	} else if ($withwithdraw=='remove' && count($assesses)>0) {
-		
-	}
+	} 
+	
+	$msg = updateassess($cid, $withwithdraw=='remove', $usereplaceby); 
+	
 	if (count($tounenroll)>0) {
 		$query = "DELETE FROM imas_students WHERE userid IN ($stulist) AND courseid='$cid'";
 		mysql_query($query) or die("Query failed : $query" . mysql_error());

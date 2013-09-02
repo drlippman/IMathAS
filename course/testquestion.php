@@ -78,7 +78,7 @@ if ($myrights<20) {
 	}
 	
 	
-	$query = "SELECT imas_users.email,imas_questionset.author,imas_questionset.description,imas_questionset.lastmoddate,imas_questionset.ancestors,imas_questionset.deleted,imas_questionset.ownerid,imas_questionset.broken ";
+	$query = "SELECT imas_users.email,imas_questionset.author,imas_questionset.description,imas_questionset.lastmoddate,imas_questionset.ancestors,imas_questionset.deleted,imas_questionset.ownerid,imas_questionset.broken,imas_questionset.replaceby ";
 	$query .= "FROM imas_users,imas_questionset WHERE imas_users.id=imas_questionset.ownerid AND imas_questionset.id='{$_GET['qsetid']}'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$email = mysql_result($result,0,0);
@@ -89,6 +89,7 @@ if ($myrights<20) {
 	$deleted = mysql_result($result,0,5);
 	$ownerid = mysql_result($result,0,6);
 	$broken = mysql_result($result,0,7);
+	$replaceby = mysql_result($result,0,8);
 	if (isset($CFG['AMS']['showtips'])) {
 		$showtips = $CFG['AMS']['showtips'];
 	} else {
@@ -264,6 +265,10 @@ if ($overwriteBody==1) {
 	if ($deleted==1) {
 		echo '<p style="color:red;">This question has been marked for deletion.  This might indicate there is an error in the question. ';
 		echo 'It is recommended you discontinue use of this question when possible</p>';
+	}
+	if ($replaceby>0) {
+		echo '<p style="color:red;">This message has been marked as deprecated, and it is recommended you use question ID '.$replaceby.' instead.  You can find this question ';
+		echo 'by searching all libraries with the ID number as the search term</p>';
 	}
 	
 	echo '<p id="brokenmsgbad" style="color:red;display:'.(($broken==1)?"block":"none").'">This message has been marked as broken.  This indicates ';
