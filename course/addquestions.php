@@ -500,6 +500,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$searchlikes = "((imas_questionset.description LIKE '%".implode("%' AND imas_questionset.description LIKE '%",$searchterms)."%') ";
 				if (substr($safesearch,0,3)=='id=') {
 					$searchlikes = "imas_questionset.id='".substr($safesearch,3)."' AND ";
+				} else if (substr($safesearch,0,7)=='childof') { 
+					$searchlikes = "imas_questionset.ancestors REGEXP '[[:<:]]".substr($safesearch,8)."[[:>:]]' AND ";	
 				} else if (is_numeric($safesearch)) {
 					$searchlikes .= "OR imas_questionset.id='$safesearch') AND ";
 				} else {

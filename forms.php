@@ -50,13 +50,15 @@ switch($_GET['action']) {
 				echo '<p>Select the course you\'d like to enroll in</p>';
 				echo '<p><select id="courseselect" name="courseselect" onchange="courseselectupdate(this);">';
 				echo '<option value="0" selected="selected">My teacher gave me a course ID (enter below)</option>';
+				echo '<optgroup label="Self-study courses">';
 				while ($row = mysql_fetch_row($result)) {
 					echo '<option value="'.$row[0].'">'.$row[1].'</option>';
 				}
+				echo '</optgroup>';
 				echo '</select></p>';
 				echo '<div id="courseinfo">';
-				echo '<script type="text/javascript"> function courseselectupdate(el) { var c = document.getElementById("courseinfo"); ';
-				echo 'if (el.value==0) {c.style.display="";} else {c.style.display="none";}}</script>';
+				echo '<script type="text/javascript"> function courseselectupdate(el) { var c = document.getElementById("courseinfo"); var c2 = document.getElementById("selfenrollwarn"); ';
+				echo 'if (el.value==0) {c.style.display="";c2.style.display="none";} else {c.style.display="none";c2.style.display="";}}</script>';
 			} else {
 				echo '<p>If you already know your course ID, you can enter it now.  Otherwise, leave this blank and you can enroll later.</p>';
 			}
@@ -64,6 +66,10 @@ switch($_GET['action']) {
 			echo '<span class="form"><label for="ekey">Enrollment Key:</label></span><input class="form" type="text" size="20" name="ekey"/><br class="form"/>';
 			if ($doselfenroll) {
 				echo '</div>';
+				echo '<div id="selfenrollwarn" style="color:red;display:none;">Warning: You have selected a non-credit self-study course. ';
+				echo 'If you are using '.$installname.' with an instructor-led course, this is NOT what you want; nothing you do in the self-study ';
+				echo 'course will be viewable by your instructor or count towards your course.  For an instructor-led ';
+				echo 'course, you need to enter the course ID and key provided by your instructor.</div>';
 			}
 		}
 		echo "<div class=submit><input type=submit value='Sign Up'></div>\n";
@@ -217,13 +223,15 @@ switch($_GET['action']) {
 			echo '<p>Select the course you\'d like to enroll in</p>';
 			echo '<p><select id="courseselect" name="courseselect" onchange="courseselectupdate(this);">';
 			echo '<option value="0" selected="selected">My teacher gave me a course ID (enter below)</option>';
+			echo '<optgroup label="Self-study courses">';
 			while ($row = mysql_fetch_row($result)) {
 				echo '<option value="'.$row[0].'">'.$row[1].'</option>';
 			}
+			echo '</optgroup>';
 			echo '</select></p>';
 			echo '<div id="courseinfo">';
-			echo '<script type="text/javascript"> function courseselectupdate(el) { var c = document.getElementById("courseinfo"); ';
-			echo 'if (el.value==0) {c.style.display="";} else {c.style.display="none";}}</script>';
+			echo '<script type="text/javascript"> function courseselectupdate(el) { var c = document.getElementById("courseinfo"); var c2 = document.getElementById("selfenrollwarn"); ';
+			echo 'if (el.value==0) {c.style.display="";c2.style.display="none";} else {c.style.display="none";c2.style.display="";}}</script>';
 		} else {
 			echo '<p>If you already know your course ID, you can enter it now.  Otherwise, leave this blank and you can enroll later.</p>';
 		}
@@ -231,6 +239,10 @@ switch($_GET['action']) {
 		echo '<span class="form"><label for="ekey">Enrollment Key:</label></span><input class="form" type="text" size="20" name="ekey"/><br class="form"/>';
 		if ($doselfenroll) {
 			echo '</div>';
+			echo '<div id="selfenrollwarn" style="color:red;display:none;">Warning: You have selected a non-credit self-study course. ';
+			echo 'If you are using '.$installname.' with an instructor-led course, this is NOT what you want; nothing you do in the self-study ';
+			echo 'course will be viewable by your instructor or count towards your course.  For an instructor-led ';
+			echo 'course, you need to enter the course ID and key provided by your instructor.</div>';
 		}
 		echo '<div class=submit><input type=submit value="Sign Up"></div></form>';
 		break;
