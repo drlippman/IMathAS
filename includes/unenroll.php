@@ -154,7 +154,10 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 		}*/
 	} 
 	
-	$msg = updateassess($cid, $withwithdraw=='remove', $usereplaceby); 
+	if ($withwithdrawn=='remove' || $usereplaceby) {
+		$msg = updateassess($cid, $withwithdraw=='remove', $usereplaceby); 
+	}
+	
 	
 	if (count($tounenroll)>0) {
 		$query = "DELETE FROM imas_students WHERE userid IN ($stulist) AND courseid='$cid'";
