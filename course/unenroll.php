@@ -37,7 +37,9 @@ ini_set("max_execution_time", "600");
 		} else {
 			$withwithdraw = false;
 		}
-		unenrollstu($cid,$tounenroll,($_GET['uid']=="all" || isset($_POST['delforumposts'])),($_GET['uid']=="all" && isset($_POST['removeoffline'])),$withwithdraw,$delwikirev);
+		mysql_query("START TRANSACTION") or die("Query failed :$query " . mysql_error());
+		unenrollstu($cid,$tounenroll,($_GET['uid']=="all" || isset($_POST['delforumposts'])),($_GET['uid']=="all" && isset($_POST['removeoffline'])),$withwithdraw,$delwikirev, isset($_POST['usereplaceby']));
+		mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
 		
 		
 		if ($calledfrom=='lu') {
@@ -125,11 +127,20 @@ ini_set("max_execution_time", "600");
 			<p>Also remove all offline grade items from gradebook? 
 				<input type=checkbox name="removeoffline" value="1" />
 			</p>
+			<p>Also remove any withdrawn questions? 
+				<input type=checkbox name="removewithdrawn" value="1" checked="checked"/>
+			</p>
+			<p>Also use any suggested replacements for old questions?
+				<input type=checkbox name="usereplaceby" value="1" checked="checked"/>
+			</p>
 			<p>Also remove wiki revisions: <input type="radio" name="delwikirev" value="1" />All wikis, 
 				<input  type="radio" name="delwikirev" value="2" checked="checked" />Group wikis only
 			</p>
 			
 <?php
+			//<p>Also remove any withdrawn questions? <input type="checkbox" name="removewithdrawn" value="1" checked="checked"/></p>
+			//<p>Use any suggested replacements for old questions? <input type="checkbox" name="usereplaceby" value="1" checked="checked"/></p>
+			
 			//<p>Also remove any withdrawn questions from assessments?
 			//	<input type=checkbox name="removewithdrawn" value="1" />
 			//</p>

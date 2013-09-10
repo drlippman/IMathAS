@@ -152,7 +152,7 @@ if ($overwriteBody==1) {
 	$shortdays = array("Su","M","Tu","W","Th","F","Sa");
 	function getshortday($atime) {
 		global $shortdays;
-		return $shortdays[date('w',$atime)];
+		return $shortdays[tzdate('w',$atime)];
 	}
 	
 	$availnames = array(_("Hidden"),_("By Dates"),_("Always"));

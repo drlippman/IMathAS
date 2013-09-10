@@ -208,7 +208,21 @@ if (!(isset($teacherid))) {
 				$outcomes[$row[0]] = $row[1];
 			}
 		}
-			
+		
+		if (isset($_POST['removewithdrawn'])) {
+			$removewithdrawn = true;
+		}
+		if (isset($_POST['usereplaceby'])) {
+			$usereplaceby = "all";
+			$query = 'SELECT imas_questionset.id,imas_questionset.replaceby FROM imas_questionset JOIN ';
+			$query .= 'imas_questions ON imas_questionset.id=imas_questions.questionsetid JOIN ';
+			$query .= 'imas_assessments ON imas_assessments.id=imas_questions.assessmentid WHERE ';
+			$query .= "imas_assessments.courseid='{$_POST['ctc']}' AND imas_questionset.replaceby>0";
+			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				$replacebyarr[$row[0]] = $row[1];  
+			}
+		}
 		
 		if (isset($_POST['checked'])) {
 			$checked = $_POST['checked'];
@@ -477,6 +491,8 @@ if ($overwriteBody==1) {
 		<input type=checkbox name="copygbsetup" value="1"/></td></tr>
 	<tr><td class="r">Set all copied items as hidden to students?</td><td><input type="checkbox" name="copyhidden" value="1"/></td></tr>
 	<tr><td class="r">Copy offline grade items?</td><td> <input type=checkbox name="copyoffline"  value="1"/></td></tr>
+	<tr><td class="r">Remove any withdrawn questions from assessments?</td><td> <input type=checkbox name="removewithdrawn"  value="1" checked="checked"/></td></tr>
+	<tr><td class="r">Use any suggested replacements for old questions?</td><td> <input type=checkbox name="usereplaceby"  value="1" checked="checked"/></td></tr>
 	<tr><td class="r">Copy rubrics? </td><td><input type=checkbox name="copyrubrics"  value="1" checked="checked"/></td></tr>
 	<tr><td class="r">Copy outcomes? </td><td><input type=checkbox name="copyoutcomes"  value="1" /></td></tr>
 	<tr><td class="r">Select calendar items to copy?</td><td> <input type=checkbox name="selectcalitems"  value="1"/></td></tr>

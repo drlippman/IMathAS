@@ -91,6 +91,11 @@
 			$newextref[] = $_POST['helptype'].'!!'.$_POST['helpurl'];
 		}
 		$extref = implode('~~',$newextref);
+		if (isset($_POST['doreplaceby'])) {
+			$replaceby = intval($_POST['replaceby']);
+		} else {
+			$replaceby = 0;
+		}
 		
 		if (isset($_GET['id'])) { //modifying existing
 			$qsetid = $_GET['id'];
@@ -121,7 +126,7 @@
 			}
 			$query = "UPDATE imas_questionset SET description='{$_POST['description']}',author='{$_POST['author']}',userights='{$_POST['userights']}',";
 			$query .= "qtype='{$_POST['qtype']}',control='{$_POST['control']}',qcontrol='{$_POST['qcontrol']}',";
-			$query .= "qtext='{$_POST['qtext']}',answer='{$_POST['answer']}',lastmoddate=$now,extref='$extref' ";
+			$query .= "qtext='{$_POST['qtext']}',answer='{$_POST['answer']}',lastmoddate=$now,extref='$extref',replaceby=$replaceby ";
 			$query .= "WHERE id='{$_GET['id']}'";
 			//checked separately above now
 			//if (!$isadmin && !$isgrpadmin) { $query .= " AND (ownerid='$userid' OR userights>2);";}
@@ -182,9 +187,9 @@
 					$ancestors = $_GET['templateid'];
 				}
 			}
-			$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,description,ownerid,author,userights,qtype,control,qcontrol,qtext,answer,hasimg,ancestors,extref) VALUES ";
+			$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,description,ownerid,author,userights,qtype,control,qcontrol,qtext,answer,hasimg,ancestors,extref,replaceby) VALUES ";
 			$query .= "($uqid,$now,$now,'{$_POST['description']}','$userid','{$_POST['author']}','{$_POST['userights']}','{$_POST['qtype']}','{$_POST['control']}',";
-			$query .= "'{$_POST['qcontrol']}','{$_POST['qtext']}','{$_POST['answer']}','{$_POST['hasimg']}','$ancestors','$extref');";
+			$query .= "'{$_POST['qcontrol']}','{$_POST['qtext']}','{$_POST['answer']}','{$_POST['hasimg']}','$ancestors','$extref',$replaceby);";
 			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 			$qsetid = mysql_insert_id();
 			$_GET['id'] = $qsetid;			
@@ -494,6 +499,7 @@
 			$line['answer'] = '';
 			$line['hasimg'] = 0;
 			$line['deleted'] = 0;
+			$line['replaceby'] = 0;
 			if (isset($_GET['aid']) && isset($sessiondata['lastsearchlibs'.$_GET['aid']])) {
 				$inlibs = $sessiondata['lastsearchlibs'.$_GET['aid']];
 			} else if (isset($sessiondata['lastsearchlibs'.$cid])) {
@@ -615,6 +621,7 @@
 		echo '<p style="color:red;">This question has been marked for deletion.  This might indicate there is an error in the question. ';
 		echo 'It is recommended you discontinue use of this question when possible</p>';
 	}
+	
 	if (isset($inusecnt) && $inusecnt>0) {
 		echo '<p style="color:red;">This question is currently being used in ';
 		if ($inusecnt>1) {
@@ -816,6 +823,17 @@ if (count($extref)>0) {
 		$extrefpt = explode('!!',$extref[$i]);
 		echo 'Type: '.$extrefpt[0].', URL: <a href="'.$extrefpt[1].'">'.$extrefpt[1]."</a>.  Delete? <input type=\"checkbox\" name=\"delhelp-$i\"/><br/>";	
 	}	
+}
+if ($myrights==100) {
+	echo '<p>Mark question as deprecated and suggest alternative? <input type="checkbox" name="doreplaceby" ';
+	if ($line['replaceby']!=0) {
+		echo 'checked="checked"';
+	}
+	echo '/> Suggested replacement ID: <input type="text" size="5" name="replaceby" value="';
+	if ($line['replaceby']>0) {
+		echo $line['replaceby'];
+	} 
+	echo '"/>.  <i>Do not use this unless you know what you\'re doing</i></p>';
 }
 ?>
 </div>
