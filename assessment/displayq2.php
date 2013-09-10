@@ -1610,7 +1610,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= "<select name=\"qn$qn\" id=\"qn$qn\" style=\"margin-right:20px\" class=\"$colorbox\"><option value=\"\"> </option>";
 			foreach ($questions as $i=>$v) {
 				$out .= '<option value="'.htmlentities($v).'"';
-				if ($v==$la) {
+				//This is a hack.  Need to figure a better way to deal with & in answers
+				if (str_replace('&','',$v)==$la) {
 					$out .= ' selected="selected"';
 				}
 				$out .= '>'.htmlentities($v).'</option>';
