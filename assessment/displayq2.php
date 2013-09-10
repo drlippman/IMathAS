@@ -1065,7 +1065,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					$out .= '</ul></div><div class="match"><ul class=nomark>';
 				}
 			}
-			$out .= '<li>';
+			if (strpos($questions[$randqkeys[$i]],' ')===false || strlen($questions[$randqkeys[$i]])<12) {
+				$out .= '<li class="nowrap">';
+			} else {
+				$out .= '<li>';
+			}
 			$out .= "<select name=\"qn$qn-$i\">";
 			$out .= '<option value="-" ';
 			if ($las[$i]=='-' || $las[$i]=='') {
@@ -1089,7 +1093,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					$out .= ">$v</option>";
 				}
 			}
-			$out .= "</select> {$questions[$randqkeys[$i]]}</li>\n";
+			$out .= "</select>&nbsp;{$questions[$randqkeys[$i]]}</li>\n";
 		}
 		$out .= "</ul>\n";
 		$out .= "</div>";
