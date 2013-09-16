@@ -130,6 +130,8 @@ switch($_GET['action']) {
 			$chatset = $line['chatset'];
 			$showlatepass = $line['showlatepass'];
 			$istemplate = $line['istemplate'];
+			$deflatepass = $line['deflatepass'];
+			$deftime = $line['deftime'];
 		} else {
 			$courseid = "Not yet set";
 			$name = "Enter course name here";
@@ -155,8 +157,15 @@ switch($_GET['action']) {
 			$istemplate = 0;
 			$avail = 0;
 			$lockaid = 0;
+			$deftime = isset($CFG['CPS']['deftime'])?$CFG['CPS']['deftime'][0]:600;
+			$deflatepass = isset($CFG['CPS']['deflatepass'])?$CFG['CPS']['deflatepass'][0]:0;
 			$ltisecret = "";
 		}
+		$hr = floor($deftime/60)%12;
+		$min = $deftime%60;
+		$am = ($deftime<12*60)?'am':'pm';
+		$deftimedisp = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
+		
 		if (isset($_GET['cid'])) {
 			$cid = $_GET['cid'];
 			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Course Settings</div>";
@@ -190,6 +199,12 @@ switch($_GET['action']) {
 				echo ">{$row[1]}</option>";
 			}
 			echo '</select></span><br class="form"/>';
+		}
+		
+		if (!isset($CFG['CPS']['deftime']) || $CFG['CPS']['deftime'][1]==1) {
+			echo "<span class=form>Default start/end time for new items:</span><span class=formright>";
+			echo '<input name="deftime" type="text" size="8" value="'.$deftimedisp.'"/>';
+			echo '</span><br class="form"/>';
 		}
 		
 		if (!isset($CFG['CPS']['theme']) || $CFG['CPS']['theme'][1]==1) {
@@ -334,6 +349,10 @@ switch($_GET['action']) {
 				if ($chatset==1) {echo 'checked="checked"';};
 				echo ' /></span><br class="form" />';
 			}
+		}
+		if (!isset($CFG['CPS']['deflatepass']) || $CFG['CPS']['deflatepass'][1]==1) {
+			echo '<span class="form">Auto-assign LatePasses on course enroll:</span><span class="formright">';
+			echo '<input type="text" size="3" name="deflatepass" value="'.$deflatepass.'"/> LatePasses</span><br class="form" />';
 		}
 		if (!isset($CFG['CPS']['showlatepass']) || $CFG['CPS']['showlatepass'][1]==1) {
 			echo '<span class="form">Show remaining LatePasses on student gradebook page:</span><span class="formright">';

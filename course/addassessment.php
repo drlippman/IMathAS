@@ -412,34 +412,46 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
 			$minscoretype = 0; //points;
 		}
+		$hr = floor($coursedeftime/60)%12;
+		$min = $coursedeftime%60;
+		$am = ($coursedeftime<12*60)?'am':'pm';
+		$deftime = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
+		
 		// ALL BELOW IS COMMON TO MODIFY OR ADD MODE
 		if ($startdate!=0) {
 			$sdate = tzdate("m/d/Y",$startdate);
 			$stime = tzdate("g:i a",$startdate);
 		} else {
 			$sdate = tzdate("m/d/Y",time());
-			$stime = tzdate("g:i a",time());
+			$stime = $deftime; //$stime = tzdate("g:i a",time());
 		}
 		if ($enddate!=2000000000) {
 			$edate = tzdate("m/d/Y",$enddate);
 			$etime = tzdate("g:i a",$enddate);	
 		} else {
 			$edate = tzdate("m/d/Y",time()+7*24*60*60);
-			$etime = tzdate("g:i a",time()+7*24*60*60);
-		}
+			$etime = $deftime; //tzdate("g:i a",time()+7*24*60*60);
+		}	
 		
 		if ($line['reviewdate'] > 0) {
 			if ($line['reviewdate']=='2000000000') {
 				$rdate = tzdate("m/d/Y",$line['enddate']+7*24*60*60);
-				$rtime = tzdate("g:i a",$line['enddate']+7*24*60*60);
+				$rtime = $deftime; //tzdate("g:i a",$line['enddate']+7*24*60*60);
 			} else {
 				$rdate = tzdate("m/d/Y",$line['reviewdate']);
 				$rtime = tzdate("g:i a",$line['reviewdate']);
 			}
 		} else {
 			$rdate = tzdate("m/d/Y",$line['enddate']+7*24*60*60);
-			$rtime = tzdate("g:i a",$line['enddate']+7*24*60*60);
+			$rtime = $deftime; //tzdate("g:i a",$line['enddate']+7*24*60*60);
 		}
+		
+		if (!isset($_GET['id'])) {
+			$stime = $deftime;
+			$etime = $deftime;
+			$rtime = $deftime;
+		}
+		
 		if ($line['defpenalty']{0}==='L') {
 			$line['defpenalty'] = substr($line['defpenalty'],1);
 			$skippenalty=10;

@@ -134,7 +134,7 @@
 				if (!is_numeric($_POST['courseid'])) {
 					$error = 'Invalid course id';
 				} else {
-					$query = "SELECT enrollkey,allowunenroll FROM imas_courses WHERE id = '{$_POST['courseid']}' AND available<4";
+					$query = "SELECT enrollkey,allowunenroll,deflatepass FROM imas_courses WHERE id = '{$_POST['courseid']}' AND available<4";
 					$result = mysql_query($query) or die("Query failed : " . mysql_error());
 					$line = mysql_fetch_array($result, MYSQL_ASSOC);
 					if ($line==null) {
@@ -149,9 +149,9 @@
 							$error = 'Incorrect enrollment key';
 						} else {
 							if (count($keylist)>1) {
-								$query = "INSERT INTO imas_students (userid,courseid,section) VALUES ('$newuserid','{$_POST['courseid']}','{$_POST['ekey']}');";
+								$query = "INSERT INTO imas_students (userid,courseid,section,latepass) VALUES ('$newuserid','{$_POST['courseid']}','{$_POST['ekey']}','{$line['deflatepass']}');";
 							} else {
-								$query = "INSERT INTO imas_students (userid,courseid) VALUES ('$newuserid','{$_POST['courseid']}');";
+								$query = "INSERT INTO imas_students (userid,courseid,latepass) VALUES ('$newuserid','{$_POST['courseid']}','{$line['deflatepass']}');";
 							}
 							mysql_query($query) or die("Query failed : " . mysql_error());
 							echo '<p>You have been enrolled in course ID '.$_POST['courseid'].'</p>';
@@ -291,7 +291,7 @@
 			echo "</html></body>\n";
 			exit;
 		}
-		$query = "SELECT enrollkey,allowunenroll FROM imas_courses WHERE id = '{$_POST['cid']}'";
+		$query = "SELECT enrollkey,allowunenroll,deflatepass FROM imas_courses WHERE id = '{$_POST['cid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$line = mysql_fetch_array($result, MYSQL_ASSOC);
 		if ($line == null) {
@@ -345,9 +345,9 @@
 					exit;
 				} else {
 					if (count($keylist)>1) {
-						$query = "INSERT INTO imas_students (userid,courseid,section) VALUES ('$userid','{$_POST['cid']}','{$_POST['ekey']}');";
+						$query = "INSERT INTO imas_students (userid,courseid,section,latepass) VALUES ('$userid','{$_POST['cid']}','{$_POST['ekey']}','{$line['deflatepass']}');";
 					} else {
-						$query = "INSERT INTO imas_students (userid,courseid) VALUES ('$userid','{$_POST['cid']}');";
+						$query = "INSERT INTO imas_students (userid,courseid,latepass) VALUES ('$userid','{$_POST['cid']}','{$line['deflatepass']}');";
 					}
 					mysql_query($query) or die("Query failed : " . mysql_error());
 					echo "<html><body>\n";
