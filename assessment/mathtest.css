@@ -673,3 +673,6 @@ span.feedbackwrap.incorrect {
  	 display: block;
  	 background: #fff;
  }
+.nowrap {
+	white-space: nowrap;
+}
