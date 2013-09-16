@@ -162,26 +162,37 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . $_GET['id'] : "";
 		$page_formActionTag .= "&tb=$totb";
 		
+		$hr = floor($coursedeftime/60)%12;
+		$min = $coursedeftime%60;
+		$am = ($coursedeftime<12*60)?'am':'pm';
+		$deftime = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
+	
 		if ($startdate!=0) {
 			$sdate = tzdate("m/d/Y",$startdate);
 			$stime = tzdate("g:i a",$startdate);
 		} else {
 			$sdate = tzdate("m/d/Y",time());
-			$stime = tzdate("g:i a",time());
+			$stime = $deftime; //tzdate("g:i a",time());
 		}
 		if ($enddate!=2000000000) {
 			$edate = tzdate("m/d/Y",$enddate);
 			$etime = tzdate("g:i a",$enddate);	
 		} else {
 			$edate = tzdate("m/d/Y",time()+7*24*60*60);
-			$etime = tzdate("g:i a",time()+7*24*60*60);
+			$etime = $deftime; //tzdate("g:i a",time()+7*24*60*60);
 		}  
 		if ($revisedate<2000000000 && $revisedate>0) {
 			$rdate = tzdate("m/d/Y",$revisedate);
 			$rtime = tzdate("g:i a",$revisedate);	
 		} else {
 			$rdate = tzdate("m/d/Y",time()+7*24*60*60);
-			$rtime = tzdate("g:i a",time()+7*24*60*60);
+			$rtime = $deftime; //tzdate("g:i a",time()+7*24*60*60);
+		}
+		
+		if (!isset($_GET['id'])) {
+			$stime = $deftime;
+			$etime = $deftime;
+			$rtime = $deftime;
 		}
 		
 		$query = "SELECT id,name FROM imas_stugroupset WHERE courseid='$cid' ORDER BY name";

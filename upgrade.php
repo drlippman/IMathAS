@@ -1,7 +1,7 @@
 <?php  
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 75;
+$latest = 76;
 
 
 @set_time_limit(0);
@@ -1308,6 +1308,23 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 $res = mysql_query($query);
 			 if ($res===false) {
 			  echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+		}
+		if ($last<76) {
+			$query = 'ALTER TABLE `imas_questions`  ADD `extracredit` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\'';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = 'ALTER TABLE `imas_courses`  ADD `deflatepass` TINYINT(2) UNSIGNED NOT NULL DEFAULT \'0\'';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = 'ALTER TABLE `imas_courses`  ADD `deftime` SMALLINT(4) UNSIGNED NOT NULL DEFAULT \'600\'';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
 		}
 		/*$handle = fopen("upgradecounter.txt",'w');

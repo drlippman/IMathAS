@@ -275,19 +275,25 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$fileorder = array();
 		$gradeoutcomes = array();
 	}   
+	
+	$hr = floor($coursedeftime/60)%12;
+	$min = $coursedeftime%60;
+	$am = ($coursedeftime<12*60)?'am':'pm';
+	$deftime = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
+	
 	if ($startdate!=0) {
 		$sdate = tzdate("m/d/Y",$startdate);
 		$stime = tzdate("g:i a",$startdate);
 	} else {
 		$sdate = tzdate("m/d/Y",time());
-		$stime = tzdate("g:i a",time());
+		$stime = $deftime; //tzdate("g:i a",time());
 	}
 	if ($enddate!=2000000000) {
 		$edate = tzdate("m/d/Y",$enddate);
 		$etime = tzdate("g:i a",$enddate);	
 	} else {
 		$edate = tzdate("m/d/Y",time()+7*24*60*60);
-		$etime = tzdate("g:i a",time()+7*24*60*60);
+		$etime = $deftime; //tzdate("g:i a",time()+7*24*60*60);
 	}    
 	
 	if (isset($_GET['id'])) {
@@ -312,7 +318,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 		}
 		
-	} 
+	} else {
+		$stime = $deftime;
+		$etime = $deftime;
+	}
 	
 	$query = "SELECT id,name FROM imas_outcomes WHERE courseid='$cid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());

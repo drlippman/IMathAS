@@ -255,33 +255,45 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . $_GET['id'] : "";
 		$page_formActionTag .= "&tb=$totb";
 		
+		$hr = floor($coursedeftime/60)%12;
+		$min = $coursedeftime%60;
+		$am = ($coursedeftime<12*60)?'am':'pm';
+		$deftime = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
+	
 		if ($startdate!=0) {
 			$sdate = tzdate("m/d/Y",$startdate);
 			$stime = tzdate("g:i a",$startdate);
 		} else {
 			$sdate = tzdate("m/d/Y",time());
-			$stime = tzdate("g:i a",time());
+			$stime = $deftime; // tzdate("g:i a",time());
 		}
 		if ($enddate!=2000000000) {
 			$edate = tzdate("m/d/Y",$enddate);
 			$etime = tzdate("g:i a",$enddate);	
 		} else {
 			$edate = tzdate("m/d/Y",time()+7*24*60*60);
-			$etime = tzdate("g:i a",time()+7*24*60*60);
+			$etime = $deftime; // tzdate("g:i a",time()+7*24*60*60);
 		}  
 		if ($replyby<2000000000 && $replyby>0) {
 			$replybydate = tzdate("m/d/Y",$replyby);
 			$replybytime = tzdate("g:i a",$replyby);	
 		} else {
 			$replybydate = tzdate("m/d/Y",time()+7*24*60*60);
-			$replybytime = tzdate("g:i a",time()+7*24*60*60);
+			$replybytime = $deftime; // tzdate("g:i a",time()+7*24*60*60);
 		}
 		if ($postby<2000000000 && $postby>0) {
 			$postbydate = tzdate("m/d/Y",$postby);
 			$postbytime = tzdate("g:i a",$postby);	
 		} else {
 			$postbydate = tzdate("m/d/Y",time()+7*24*60*60);
-			$postbytime = tzdate("g:i a",time()+7*24*60*60);
+			$postbytime = $deftime; // tzdate("g:i a",time()+7*24*60*60);
+		}
+		
+		if (!isset($_GET['id'])) {
+			$stime = $deftime;
+			$etime = $deftime;
+			$replybytime = $deftime;
+			$postbytime = $deftime;
 		}
 		
 		/*

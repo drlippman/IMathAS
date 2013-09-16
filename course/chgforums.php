@@ -178,10 +178,16 @@ if (mysql_num_rows($result)>0) {
 	}
 }
 
+$hr = floor($coursedeftime/60)%12;
+$min = $coursedeftime%60;
+$am = ($coursedeftime<12*60)?'am':'pm';
+$deftime = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
+	
+
 $replybydate = tzdate("m/d/Y",time()+7*24*60*60);
-$replybytime = tzdate("g:i a",time()+7*24*60*60);
+$replybytime = $deftime; //tzdate("g:i a",time()+7*24*60*60);
 $postbydate = tzdate("m/d/Y",time()+7*24*60*60);
-$postbytime = tzdate("g:i a",time()+7*24*60*60);
+$postbytime = $deftime; //tzdate("g:i a",time()+7*24*60*60);
 
 
 //HTML output
