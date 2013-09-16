@@ -42,7 +42,7 @@
 		if ($adata['avail']==0 && !isset($teacherid) && !isset($tutorid)) {
 			$assessmentclosed = true;
 		}
-	
+		
 		if (!$actas) { 
 			$query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid'";
 			$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -83,7 +83,9 @@
 				if ($sa!='N') {
 					$query = "SELECT id FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='$aid'";
 					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-					echo '<p><a href="../course/gb-viewasid.php?cid='.$cid.'&asid='.mysql_result($result,0,0).'">', _('View your assessment'), '</p>';
+					if (mysql_num_rows($result)>0) {
+						echo '<p><a href="../course/gb-viewasid.php?cid='.$cid.'&asid='.mysql_result($result,0,0).'">', _('View your assessment'), '</p>';
+					}
 				}
 			}
 			require("../footer.php");

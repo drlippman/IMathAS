@@ -2413,7 +2413,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 										$v = -1*floor(-log10(abs($anans))-1e-12) - $reqsigfigs;
 									}
 									//this line will reject 0.25 if the answer is 0.250 with 3 sigfigs
-									if ($anans != 0 && $v < 0 && strlen($givenans) - strpos($givenans,'.')-1 + $v < 0) { continue; } //not enough decimal places
+									$gadploc = strpos($givenans,'.');
+									if ($gadploc===false) {$gadploc = strlen($givenans);}
+									if ($anans != 0 && $v < 0 && strlen($givenans) - $gadploc-1 + $v < 0) { continue; } //not enough decimal places
 									
 									if (abs($anans-$givenans)< pow(10,$v)/2+1E-12) {$correct += 1; $foundloc = $j; break 2;}
 								} else {
