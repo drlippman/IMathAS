@@ -143,6 +143,8 @@
 		}
 		if ($line['endtime'] >0 && $line['starttime'] > 0) {
 			$timetaken[] = $line['endtime']-$line['starttime'];
+		} else {
+			$timetaken[] = 0;
 		}
 	}
 	
@@ -154,8 +156,8 @@
 	}
 	$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
 	while ($row = mysql_fetch_row($result)) {
-		if (!isset($vidcnt[$row[0]])) { $vidcnt[$row[0]]=0;}
-		$vidcnt[$row[0]] += 1;
+		if (!isset($vidcnt[$row[0]])) { $vidcnt[$row[0]]=$row[1];}
+		$vidcnt[$row[0]] += $row[1];
 	}
 	
 	$notstarted = ($totstucnt - count($timetaken));
@@ -168,7 +170,8 @@
 	echo '<a href="isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'">View Score List</a>.</p>';
 	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 	echo "<table class=gb id=myTable><thead>"; //<tr><td>Name</td>\n";
-	echo "<tr><th>#</th><th scope=\"col\">Question</th><th>Grade</th><th scope=\"col\">Average Score<br/>All</th>";
+	echo "<tr><th>#</th><th scope=\"col\">Question</th><th>Grade</th>";
+	//echo "<th scope=\"col\">Average Score<br/>All</th>";
 	echo "<th scope=\"col\">Average Score<br/>Attempted</th><th scope=\"col\">Average Attempts<br/>(Regens)</th><th scope=\"col\">% Incomplete</th>";
 	echo "<th scope=\"col\">Time per student<br/> (per attempt)</th>";
 	if ($showhints==1) {
@@ -281,13 +284,14 @@
 				echo 'class="manualgrade" ';
 			}
 			echo ">Grade</a></td>";
-			echo "<td>$avg/$pts ($pc%)</td><td class=\"pointer\" onclick=\"GB_show('Low Scores','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=score',500,300);return false;\">$avg2/$pts ($pc2%)</td>";
-			echo "<td class=\"pointer\" onclick=\"GB_show('Most Attempts and Regens','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=att',500,300);return false;\">$avgatt ($avgreg)</td>";
-			echo "<td class=\"pointer\" onclick=\"GB_show('Incomplete','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=incomp',500,300);return false;\">$pi</td>";
-			echo "<td class=\"pointer\" onclick=\"GB_show('Most Time','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=time',500,300);return false;\">$avgtot ($avgtota)</td>";
+			//echo "<td>$avg/$pts ($pc%)</td>";
+			echo "<td class=\"pointer\" onclick=\"GB_show('Low Scores','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=score',500,500);return false;\">$avg2/$pts ($pc2%)</td>"; 
+			echo "<td class=\"pointer\" onclick=\"GB_show('Most Attempts and Regens','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=att',500,500);return false;\">$avgatt ($avgreg)</td>";
+			echo "<td class=\"pointer\" onclick=\"GB_show('Incomplete','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=incomp',500,500);return false;\">$pi</td>";
+			echo "<td class=\"pointer\" onclick=\"GB_show('Most Time','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=time',500,500);return false;\">$avgtot ($avgtota)</td>";
 			if ($showhints==1) {
 				if ($showextref[$qid]) {
-					echo "<td class=\"pointer\" onclick=\"GB_show('Got Help','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=help',500,300);return false;\">".round(100*$vidcnt[$qid]/($qcnt[$qid] - $qincomplete[$qid])).'%</td>';
+					echo "<td class=\"pointer\" onclick=\"GB_show('Got Help','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=help',500,500);return false;\">".round(100*$vidcnt[$qid]/($qcnt[$qid] - $qincomplete[$qid])).'%</td>';
 				} else {
 					echo '<td>N/A</td>';
 				}
