@@ -16,10 +16,14 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 	//fwrite($handle,$latest);
 	//fclose($handle);	
 } else { //doing upgrade
-	require("validate.php");
-	if ($myrights<100) {
-		echo "No rights, aborting";
-		exit;
+	if (php_sapi_name() == 'cli') { //allow direct calling from command line
+		require("config.php");
+	} else {
+		require("validate.php");
+		if ($myrights<100) {
+			echo "No rights, aborting";
+			exit;
+		}
 	}
 	$query = "SELECT ver FROM imas_dbschema WHERE id=1";
 	$result = mysql_query($query);
