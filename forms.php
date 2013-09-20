@@ -31,7 +31,7 @@ switch($_GET['action']) {
 		echo "<span class=form><label for=\"SID\">$longloginprompt:</label></span> <input class=\"form\" type=\"text\" size=12 id=SID name=SID><BR class=\"form\">\n";
 		echo "<span class=\"form\"><label for=\"pw1\">Choose a password:</label></span><input class=\"form\" type=\"password\" size=20 id=pw1 name=pw1><BR class=\"form\">\n";
 		echo "<span class=\"form\"><label for=\"pw2\">Confirm password:</label></span> <input class=\"form\" type=\"password\" size=20 id=pw2 name=pw2><BR class=\"form\">\n";
-		echo "<span class=\"form\"><label for=\"firstname\">Enter First Name:</label></span> <input class=\"form\" type=\"text\" size=20 id=firstnam name=firstname><BR class=\"form\">\n";
+		echo "<span class=\"form\"><label for=\"firstname\">Enter First Name:</label></span> <input class=\"form\" type=\"text\" size=20 id=firstname name=firstname><BR class=\"form\">\n";
 		echo "<span class=\"form\"><label for=\"lastname\">Enter Last Name:</label></span> <input class=\"form\" type=\"text\" size=20 id=lastname name=lastname><BR class=\"form\">\n";
 		echo "<span class=\"form\"><label for=\"email\">Enter E-mail address:</label></span>  <input class=\"form\" type=\"text\" size=60 id=email name=email><BR class=\"form\">\n";
 		echo "<span class=form><label for=\"msgnot\">Notify me by email when I receive a new message:</label></span><span class=formright><input type=checkbox id=msgnot name=msgnot checked=\"checked\" /></span><BR class=form>\n";
