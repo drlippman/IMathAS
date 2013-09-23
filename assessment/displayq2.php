@@ -2386,7 +2386,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$anss = explode(' or ',$answer);
 				foreach ($anss as $anans) {
 					if (!is_numeric($anans)) {
-						if (preg_match('/(\(|\[)([\d\.]+)\,([\d\.]+)(\)|\])/',$anans,$matches)) {
+						if (preg_match('/(\(|\[)(-?[\d\.]+|-oo)\,(-?[\d\.]+|oo)(\)|\])/',$anans,$matches)) {
+							if ($matches[2]=='-oo') {$matches[2] = -1e99;}
+							if ($matches[3]=='oo') {$matches[3] = 1e99;}
 							if (($matches[1]=="(" && $givenans>$matches[2]) || ($matches[1]=="[" && $givenans>=$matches[2])) {
 								if (($matches[4]==")" && $givenans<$matches[3]) || ($matches[4]=="]" && $givenans<=$matches[3])) {
 									$correct += 1;
