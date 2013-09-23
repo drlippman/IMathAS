@@ -22,8 +22,6 @@
 //    lis_person_name_given
 //    lis_person_name_family
 //    lis_person_contact_email_primary
-//    tool_consumer_instance_guid  (LMS domain name)
-
 
 header('P3P: CP="ALL CUR ADM OUR"');
 include("config.php");
@@ -524,7 +522,9 @@ if (isset($_GET['launch'])) {
 	
 	
 	//look if we know this student
-	$query = "SELECT userid FROM imas_ltiusers WHERE org='$ltiorg' AND ltiuserid='$ltiuserid'";
+	$orgparts = explode(':',$ltiorg);  //THIS was added to avoid issues when GUID change, while still storing it
+	$shortorg = $orgparts[0];
+	$query = "SELECT userid FROM imas_ltiusers WHERE org LIKE '$shortorg:%' AND ltiuserid='$ltiuserid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	if (mysql_num_rows($result) > 0) { //yup, we know them
 		$userid = mysql_result($result,0,0);
@@ -618,16 +618,18 @@ if ($askforuserinfo == true) {
 $now = time();
 
 //general placement or common catridge placement - look for placement, or create if know info
+$orgparts = explode(':',$_SESSION['ltiorg']);  //THIS was added to avoid issues when GUID change, while still storing it
+$shortorg = $orgparts[0];
 if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltirole']!='instructor') || $_SESSION['lti_keytype']=='cc-g' || $_SESSION['lti_keytype']=='cc-c') { 
 	$query = "SELECT placementtype,typeid FROM imas_lti_placements WHERE ";
 	$query .= "contextid='{$_SESSION['lti_context_id']}' AND linkid='{$_SESSION['lti_resource_link_id']}' ";
-	$query .= "AND org='{$_SESSION['ltiorg']}'";
+	$query .= "AND org LIKE '$shortorg:%'"; //='{$_SESSION['ltiorg']}'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	if (mysql_num_rows($result)==0) {
 		if (isset($_SESSION['place_aid'])) {
 			//look to see if we've already linked this context_id with a course
 			$query = "SELECT courseid FROM imas_lti_courses WHERE contextid='{$_SESSION['lti_context_id']}' ";
-			$query .= "AND org='{$_SESSION['ltiorg']}'";
+			$query .= "AND org LIKE '$shortorg:%'"; //='{$_SESSION['ltiorg']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (mysql_num_rows($result)==0) {
 				if ($_SESSION['lti_keytype']=='cc-g') {
