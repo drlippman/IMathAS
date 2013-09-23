@@ -82,7 +82,7 @@ function post_socket_xml($endpoint, $data, $moreheaders=false) {
   // echo("\n"); echo($headers); echo("\n");
     // echo("PORT=".$url['port']);
     try {
-      $fp = fsockopen($url['host'], $url['port'], $errno, $errstr, 30);
+      $fp = fsockopen((($url['scheme'] == 'https') ? 'ssl://':'').$url['host'], $url['port'], $errno, $errstr, 30);
       if($fp) {
         fputs($fp, $headers);
         $result = '';

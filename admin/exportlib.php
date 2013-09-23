@@ -69,6 +69,7 @@ if (!(isset($teacherid)) && $myrights<20) {
 		if ($nonpriv) {
 			$query .= " AND userights>0";
 		}
+		$query .= " ORDER BY uniqueid";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
 			if (!in_array($row[2],$rootlibs)) { //don't export children here
@@ -96,6 +97,7 @@ if (!(isset($teacherid)) && $myrights<20) {
 			if ($nonpriv) {
 				$query .= " AND userights>0";
 			}
+			$query .= " ORDER BY uniqueid";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (mysql_num_rows($result)>0) {
 				while ($row = mysql_fetch_row($result)) {
@@ -191,6 +193,7 @@ if (!(isset($teacherid)) && $myrights<20) {
 		if ($nonpriv) {
 			$query .= " AND imas_questionset.userights>0";
 		}
+		$query .= " ORDER BY imas_questionset.uniqueid";
 		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 			$line['control'] = preg_replace('/includecodefrom\((\d+)\)/e','"includecodefrom(UID".$includedbackref["\\1"].")"',$line['control']);
