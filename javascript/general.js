@@ -391,9 +391,12 @@ function recclick(type,typeid,info) {
 }
 function setuptracklinks(i,el) {
 	if (jQuery(el).attr("data-base")) {
-		jQuery(el).click(function() {
+		jQuery(el).click(function(e) {
+			e.preventDefault();
 			var inf = jQuery(this).attr('data-base').split('-');
 			recclick(inf[0], inf[1], jQuery(this).attr("href"));
+			setTimeout('window.location.href = "'+$(this).attr('href')+'"',100);
+			return false;
 		});
 	}
 }

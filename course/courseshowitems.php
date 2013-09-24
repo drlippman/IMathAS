@@ -552,7 +552,8 @@ function enditem($canedit) {
 			   if (isset($studentid)) {
 			   	   $rec = "data-base=\"assesssum-$typeid\" ";
 			   	   $line['summary'] = str_replace('<a ','<a '.$rec, $line['summary']);
-			   } 
+			   }
+			   
 			   //check for exception
 			   $canundolatepass = false;
 			   if (isset($exceptions[$items[$i]])) {
@@ -634,9 +635,9 @@ function enditem($canedit) {
 				   }
 				   
 				   echo "<div class=title><b><a href=\"../assessment/showtest.php?id=$typeid&cid=$cid\" ";
-				   if (isset($studentid)) {
+				   /*if (isset($studentid)) {
 				   	   echo "data-base=\"assess-$typeid\" ";
-				   }
+				   }*/ //moved to showtest
 				   if ($tlwrds != '') {
 					   echo "onclick='return confirm(\"", sprintf(_('This assessment has a time limit of %s.  Click OK to start or continue working on the assessment.'), $tlwrds), "\")' ";
 				   }
@@ -679,9 +680,9 @@ function enditem($canedit) {
 					   }
 				   }
 				   echo "<div class=title><b><a href=\"../assessment/showtest.php?id=$typeid&cid=$cid\"";
-				   if (isset($studentid)) {
+				   /*if (isset($studentid)) {
 				   	   echo " data-base=\"assess-$typeid\"";
-				   }
+				   }*/ //moved to showtest
 				   
 				   echo ">{$line['name']}</a></b><BR> ", _('Past Due Date.  Showing as Review');
 				   if ($line['reviewdate']!=2000000000) { 
