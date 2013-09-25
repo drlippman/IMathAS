@@ -639,17 +639,25 @@ if ($overwriteBody==1) {
 
 	<div class=cp>
 	<?php
-	echo "<a href=\"listusers.php?cid=$cid&enroll=student\">Enroll Student with known username</a><br/>";
-	if ($CFG['GEN']['allowinstraddstus']) { 
-		echo "<a href=\"$imasroot/admin/importstu.php?cid=$cid\">Import Students from File</a><br/>";
-		echo "<a href=\"listusers.php?cid=$cid&newstu=new\">Create and Enroll new student</a><br/>";
-		echo "<a href=\"enrollfromothercourse.php?cid=$cid\">Enroll students from another course</a><br/>";
-	}
+	echo '<span class="column" style="width:auto;">';
+	echo "<a href=\"logingrid.php?cid=$cid\">View Login Grid</a><br/>";
+	echo '</span>';
+	echo '<span class="column" style="width:auto;">';
 	echo "<a href=\"listusers.php?cid=$cid&assigncode=1\">Assign Sections and/or Codes</a><br/>";
 	echo "<a href=\"latepasses.php?cid=$cid\">Manage LatePasses</a>";
 	if ($CFG['GEN']['allowinstraddtutors']) {
 		echo "<br/><a href=\"managetutors.php?cid=$cid\">Manage Tutors</a>";
 	}
+	echo '</span>';
+	echo '<span class="column" style="width:auto;">';
+	echo "<a href=\"listusers.php?cid=$cid&enroll=student\">Enroll Student with known username</a><br/>";
+	echo "<a href=\"enrollfromothercourse.php?cid=$cid\">Enroll students from another course</a><br/>";
+	if ($CFG['GEN']['allowinstraddstus']) { 
+		echo "<a href=\"$imasroot/admin/importstu.php?cid=$cid\">Import Students from File</a><br/>";
+		echo "<a href=\"listusers.php?cid=$cid&newstu=new\">Create and Enroll new student</a><br/>";
+	}
+	echo '</span>';
+	echo '<br class="clear"/>';
 	?>
 	</div>
 	<p></p>

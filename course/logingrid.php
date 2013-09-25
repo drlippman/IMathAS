@@ -16,7 +16,7 @@ if (isset($_GET['secfilter'])) {
 }
 
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a> ";
-$curBreadcrumb .= "&gt; <a href=\"listusers.php?cid=$cid\">Roster</a> ";
+$curBreadcrumb .= "&gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Login Grid";
 
 $overwriteBody = 0;
 $body = "";
@@ -129,6 +129,8 @@ if ($overwriteBody==1) {
 ?>
 	</tbody>
 	</table>
+	<p>Note:  Be aware that login sessions last for 24 hours, so if a student logins in Wednesday at 7pm and never
+	closes their browser, they can continue using the same session on the same computer until 7pm Thursday.</p>
 <?php
 }
 require("../footer.php");
