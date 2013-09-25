@@ -8,8 +8,7 @@ linkedintext	In Linked text test		imas_linkedtext.id
 linkedviacal	Linked text via Calendar	imas_linkedtext.id
 extref		Button click in question	imas_questions.id
 assessintro	Link in assessment intro	imas_assessments.id
-assess		Link to assessment		imas_assessments.id
-assessviacal	Link to assessment via calendar	imas_assessments.id
+assess		Link to assessment		imas_assessments.id		
 assesssum	Link in assessment summary	imas_assessments.id
 wiki		Link to wiki			imas_wikis.id
 wikiintext	Link in wiki text		imas_wikis.id

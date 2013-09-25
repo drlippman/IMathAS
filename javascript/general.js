@@ -380,20 +380,23 @@ function setselectbycookie() {
 }
 addLoadEvent(setselectbycookie);
 
-function recclick(type,typeid,info) {
+function recclick(type,typeid,info,txt) {
 	if (cid>0) {
 		$.ajax({
 			type: "POST",
 			url: imasroot+'/course/rectrack.php?cid='+cid,
-			data: "type="+encodeURIComponent(type)+"&typeid="+encodeURIComponent(typeid)+"&info="+encodeURIComponent(info)
+			data: "type="+encodeURIComponent(type)+"&typeid="+encodeURIComponent(typeid)+"&info="+encodeURIComponent(info+'::'+txt)
 		});
 	}			
 }
 function setuptracklinks(i,el) {
 	if (jQuery(el).attr("data-base")) {
-		jQuery(el).click(function() {
+		jQuery(el).click(function(e) {
+			e.preventDefault();
 			var inf = jQuery(this).attr('data-base').split('-');
-			recclick(inf[0], inf[1], jQuery(this).attr("href"));
+			recclick(inf[0], inf[1], jQuery(this).attr("href"), jQuery(this).text());
+			setTimeout('window.location.href = "'+$(this).attr('href')+'"',100);
+			return false;
 		});
 	}
 }

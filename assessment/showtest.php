@@ -44,6 +44,12 @@
 		}
 		
 		if (!$actas) { 
+			if (isset($studentid)) {
+				$query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime) VALUES ";
+				$query .= "('$userid','$cid','assess','$aid',$now)";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
+			
 			$query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid'";
 			$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 			$row = mysql_fetch_row($result2);
