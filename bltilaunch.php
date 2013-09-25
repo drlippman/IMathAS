@@ -524,7 +524,7 @@ if (isset($_GET['launch'])) {
 	//look if we know this student
 	$orgparts = explode(':',$ltiorg);  //THIS was added to avoid issues when GUID change, while still storing it
 	$shortorg = $orgparts[0];
-	$query = "SELECT userid FROM imas_ltiusers WHERE org LIKE '$shortorg:%' AND ltiuserid='$ltiuserid'";
+	$query = "SELECT userid FROM imas_ltiusers WHERE org LIKE '$shortorg:%' AND ltiuserid='$ltiuserid' ORDER BY id";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	if (mysql_num_rows($result) > 0) { //yup, we know them
 		$userid = mysql_result($result,0,0);
