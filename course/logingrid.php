@@ -72,6 +72,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 	
 /******* begin html output ********/	
 $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+$placeinhead .= '<style type="text/css"> table.logingrid td {text-align: center; border-right:1px solid #ccc;} table.logingrid td.left {text-align: left;}</style>';
 require("../header.php");
 if ($overwriteBody==1) {
 	echo $body;
@@ -98,7 +99,7 @@ if ($overwriteBody==1) {
 	<input type="submit" name="daterange" value="Go"/></p>
 	</form>
 	
-	<table class="gb" id="myTable">
+	<table class="gb logingrid" id="myTable">
 	<thead>
 	<tr>
 	<th>Name</th>
@@ -114,13 +115,13 @@ if ($overwriteBody==1) {
 	$n = count($dates);
 	foreach ($stus as $stu) {
 		if ($alt==0) {echo '<tr class="even">'; $alt=1;} else {echo '<tr class="odd">'; $alt=0;}
-		echo '<td>'.$stu[0].'</td>';
+		echo '<td class="left"><a href="viewloginlog.php?cid='.$cid.'&uid='.$stu[1].'">'.$stu[0].'</a></td>';
 		for ($i=0;$i<$n;$i++) {
 			echo '<td>';
 			if (isset($logins[$stu[1]][$i])) {
 				echo $logins[$stu[1]][$i];
 			} else {
-				echo '-';
+				echo ' ';
 			}
 			echo '</td>';
 		}

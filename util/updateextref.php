@@ -31,7 +31,8 @@ if (isset($_POST['data'])) {
 		}
 	}
 } else {
-	echo '<html><body><form method="post"><textarea name="data" rows="30" cols="80"></textarea>';
+	echo '<html><body><b>Do NOT use this unless you know what you are doing.</b>';
+	echo '<form method="post"><textarea name="data" rows="30" cols="80"></textarea>';
 	echo '<input type="submit"></form></body></html>';
 }
 ?>
