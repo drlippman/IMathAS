@@ -3520,23 +3520,37 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			if (checkreqtimes($_POST["tc$qn"],$requiretimes)==0) {
 				return 0;
 			}
-			$orarr = explode('U',$_POST["tc$qn"]);
-			foreach ($orarr as $opt) {
-				$opt = trim($opt);
-				$opts = explode(',',substr($opt,1,strlen($opt)-2));
-				if (strpos($opts[0],'oo')===false &&  !checkanswerformat($opts[0],$ansformats)) {
-					return 0;
-				}
-				if (strpos($opts[1],'oo')===false &&  !checkanswerformat($opts[1],$ansformats)) {
-					return 0;
-				}
-			}
-			
+					
 			if (in_array('inequality',$ansformats)) {
 				preg_match_all('/[a-zA-Z]+/',$_POST["tc$qn"],$matches);
 				foreach ($matches[0] as $var) {
 					if (in_array($var,$mathfuncs)) { continue;}
 					if ($var!= 'or' && $var!='and' && $var != $variables && $_POST["qn$qn"]!="(-oo,oo)") {
+						return 0;
+					}
+				}
+				$orarr = explode(' or ',$_POST["tc$qn"]);
+				foreach ($orarr as $opt) {
+					$opt = trim($opt);
+					if ($opt=='DNE' || $givenans=='(-oo,oo)') {continue;} //DNE or all real numbers
+					$opts = preg_split('/(<=?|>=?)/',$opt);
+					foreach ($opts as $optp) {
+						$optp = trim($optp);
+						if ($optp==$variables) {continue;}
+						if (!checkanswerformat($optp,$ansformats)) {
+							return 0;
+						}
+					}
+				}
+			} else {
+				$orarr = explode('U',$_POST["tc$qn"]);
+				foreach ($orarr as $opt) {
+					$opt = trim($opt);
+					$opts = explode(',',substr($opt,1,strlen($opt)-2));
+					if (strpos($opts[0],'oo')===false &&  !checkanswerformat($opts[0],$ansformats)) {
+						return 0;
+					}
+					if (strpos($opts[1],'oo')===false &&  !checkanswerformat($opts[1],$ansformats)) {
 						return 0;
 					}
 				}

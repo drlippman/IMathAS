@@ -226,15 +226,15 @@ function intcalculate(inputId,outputId,format) {
 				 origstr = origstr.replace(/>=/g,'ge');
 				 origstr = origstr.replace(/</g,'lt');
 				 origstr = origstr.replace(/>/g,'gt');
-				 if (format.indexOf('noval')!=-1) {
+				 if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1 || format.indexOf('scinot')!=-1 || format.indexOf('noval')!=-1) {
 				 	 fullstr = '`'+origstr + '`';
 				 } else {
 				 	 fullstr = '`'+origstr + '= ' + calcstrarr.join(' \\ "or" \\ ')+'`';
 				 }
 			 }
 		 } else {
-		 	 if (format.indexOf('noval')!=-1) {
-				 fullstr = '`'+strarr.join('uu') + '`';	 
+		 	 if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1 || format.indexOf('scinot')!=-1 || format.indexOf('noval')!=-1) {
+				  fullstr = '`'+strarr.join('uu') + '`';	 
 			 } else {
 			 	 fullstr = '`'+strarr.join('uu') + '` = ' + calcstrarr.join(' U ');
 			 }
