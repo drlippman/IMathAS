@@ -812,8 +812,15 @@ if ($overwriteBody==1) {
 			<span class="formright">
 				<select name="eqnhelper">
 					<option value="0" <?php writeHtmlSelected($line['eqnhelper'],0) ?>>No</option>
+				<?php
+					//start phasing these out; don't show as option if not used.
+					if ($line['eqnhelper']==1 || $line['eqnhelper']==2) {
+				?>
 					<option value="1" <?php writeHtmlSelected($line['eqnhelper'],1) ?>>Yes, simple form (no logs or trig)</option>
 					<option value="2" <?php writeHtmlSelected($line['eqnhelper'],2) ?>>Yes, advanced form</option>
+				<?php
+					}
+				?>
 					<option value="3" <?php writeHtmlSelected($line['eqnhelper'],3) ?>>MathQuill, simple form</option>
 					<option value="4" <?php writeHtmlSelected($line['eqnhelper'],4) ?>>MathQuill, advanced form</option>
 				</select>
