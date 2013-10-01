@@ -4,6 +4,7 @@
 <title><?php echo $installname; if (isset($pagetitle)) { echo " - $pagetitle";}?></title>
 <meta http-equiv="X-UA-Compatible" content="IE=7, IE=Edge" />
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script>
 <link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=071313";?>" type="text/css" />
 <?php if (isset($coursetheme)) { 
@@ -12,6 +13,8 @@
 	}
 	?>
 <link rel="stylesheet" href="<?php echo $imasroot . "/themes/$coursetheme?v=012810";?>" type="text/css" />
+<link rel="stylesheet" href="<?php echo $imasroot;?>/handheld.css" media="handheld,only screen and (max-device-width:480px)"/>
+
 <?php } ?>
 <link rel="shortcut icon" href="/favicon.ico" />
 <!--[if lte IE 6]> 

@@ -728,7 +728,12 @@ function makeTopMenu() {
 		if (!$useviewbuttons) {
 			echo _('Quick View.'), " <a href=\"course.php?cid=$cid&quickview=off\">", _('Back to regular view'), "</a>. ";
 		} 
-		 echo _('Use colored boxes to drag-and-drop order.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Record Changes'), '" onclick="submitChanges()"/>';
+		if (isset($CFG['CPS']['miniicons'])) {
+			echo _('Use icons to drag-and-drop order.'),' ',_('Click the icon next to a block to expand or collapse it. Click an item title to edit it in place.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Record Changes'), '" onclick="submitChanges()"/>';
+		
+		} else {
+			echo _('Use colored boxes to drag-and-drop order.'),' ',_('Click the B next to a block to expand or collapse it. Click an item title to edit it in place.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Record Changes'), '" onclick="submitChanges()"/>';
+		}
 		 echo '<span id="submitnotice" style="color:red;"></span>';
 		 echo '</div>';
 		

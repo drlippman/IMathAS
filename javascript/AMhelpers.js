@@ -525,7 +525,8 @@ function AMpreview(inputId,outputId) {
   ptlist = pts[qn].split(",");
   var tstpt = 0; var res = NaN; var isnoteqn = false;
   if (iseqn[qn]==1) {
-  	  if (!str.match(/=/)) {isnoteqn = true;}
+  	if (!str.match(/=/)) {isnoteqn = true;}
+  	else if (str.match(/=/g).length>1) {isnoteqn = true;}
 	str = str.replace(/(.*)=(.*)/,"$1-($2)");
   }
   if (fl!='') {

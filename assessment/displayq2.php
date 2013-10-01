@@ -3229,7 +3229,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$answer = preg_replace('/[^\w\*\/\+\=\-\(\)\[\]\{\}\,\.\^\$\!]+/','',$answer);
 	
 			if ($answerformat=="equation") {
-				if (strpos($_POST["tc$qn"],'=')===false) {
+				if (substr_count($_POST["tc$qn"], '=')!=1) {
 					return 0;
 				}
 				$answer = preg_replace('/(.*)=(.*)/','$1-($2)',$answer);

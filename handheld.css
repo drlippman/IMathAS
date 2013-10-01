@@ -1,0 +1,60 @@
+div#headercontent, div#navlistcont, .footerwrapper, div#navlistwrapper, .midwrapper {
+	width: auto;
+}
+
+div#leftcolumn, div#rightcolumn  {
+	float: none;
+	width: auto;
+}
+
+div#leftcontent {
+	display:none;
+}
+span.instronly {
+	font-size: 80%;
+}
+div#centercontent {
+	margin-left: 0px;
+	padding-left: 0px;
+}
+
+div.navbar {
+	float:none;
+	position:relative;
+	width: auto;
+	margin-right:0px;
+	left: 0px;
+	margin-left: 0px;
+}
+div.navbar h4 {
+	margin-bottom: 5px;
+}
+div.navbar p {
+	display: inline;
+	padding-right: 2em;
+}
+ul.qlist li {
+	display: inline;
+	white-space: nowrap;
+	margin-left: 0px;
+	margin-top: 0px;
+}
+div.inset {
+	margin-left: 0px;
+	margin-right: 0px;
+}
+div#headercontent {
+	display:none;
+}
+div#navlistcont {
+	height: auto !important;
+}
+div.headerwrapper {	
+	height: auto !important;
+}
+div.inactivewrapper span.instronly {
+	visibility: visible !important;
+}
+div.breadcrumb {
+	height: auto !important;
+}

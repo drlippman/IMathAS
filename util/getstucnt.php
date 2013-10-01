@@ -14,10 +14,26 @@
 	} else {
 		$days = 30;
 	}
+	
+	if (isset($CFG['GEN']['guesttempaccts'])) {
+		$skipcid = $CFG['GEN']['guesttempaccts'];
+	} else {
+		$skipcid = array();
+	}
+	$query = "SELECT id FROM imas_courses WHERE (istemplate&4)=4";
+	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	while ($row = mysql_fetch_row($result)) {
+		$skipcid[] = $row[0];
+	}
+	$skipcids = implode(',',$skipcid);
+	
 	$date = $now - 60*60*24*$days;  
 	echo "<p>Active enrollments in $days Days</p>";
 	$query = "SELECT count(imas_students.id) FROM imas_users,imas_students WHERE ";
 	$query .= "imas_users.id=imas_students.userid AND imas_users.lastaccess>$date";
+	if (count($skipcid)>0) {
+		$query .= " AND imas_students.courseid NOT IN ($skipcids)";
+	}
 	
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	echo "<p>Student count: ".mysql_result($result,0,0);
@@ -25,12 +41,18 @@
 	echo "<p>Active users in $days Days</p>";
 	$query = "SELECT count(DISTINCT imas_users.id) FROM imas_users,imas_students WHERE ";
 	$query .= "imas_users.id=imas_students.userid AND imas_users.lastaccess>$date";
+	if (count($skipcid)>0) {
+		$query .= " AND imas_students.courseid NOT IN ($skipcids)";
+	}
 	
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	echo "<p>Student count: ".mysql_result($result,0,0);
 	
 	$query = "SELECT count(DISTINCT imas_users.id) FROM imas_users,imas_teachers WHERE ";
 	$query .= "imas_users.id=imas_teachers.userid AND imas_users.lastaccess>$date";
+	if (count($skipcid)>0) {
+		$query .= " AND imas_teachers.courseid NOT IN ($skipcids)";
+	}
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	echo "</p><p>Teacher count: ".mysql_result($result,0,0)."</p>";
 

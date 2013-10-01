@@ -53,6 +53,7 @@ if (isset($_GET['form'])) {
 					echo '<p><b>'.$row['LastName'].', '.$row['FirstName'].'</b></p>';
 					echo '<form method="post" action="../admin/actions.php?action=resetpwd&id='.$row['id'].'">';
 					echo '<ul><li>Username: '.$row['SID'].'</li>';
+					echo '<li>ID: '.$row['id'].'</li>';
 					echo '<li>Email: '.$row['email'].'</li>';
 					echo '<li>Last Login: '.tzdate("n/j/y g:ia", $row['lastaccess']).'</li>';
 					echo '<li>Rights: '.$row['rights'].'</li>';
