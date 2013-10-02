@@ -504,7 +504,7 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	
 		while ($row = mysql_fetch_row($result)) {
-			if ($row[4]==1) {
+			if ($row[4]>0) {
 				echo '<tr><td style="text-decoration: line-through;">';
 			} else {
 				echo '<tr><td>';

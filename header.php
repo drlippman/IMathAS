@@ -36,7 +36,7 @@ div.breadcrumb { display:none;}
 <script type="text/javascript">
 var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && is_numeric($cid))?$cid:0; ?>;
 </script>
-<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js?ver=092413"></script>
+<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js?ver=100113"></script>
 <?php
 //$sessiondata['mathdisp'] = 3;
 //writesessiondata();
@@ -132,7 +132,7 @@ if (!isset($flexwidth)) {
 if (isset($CFG['GEN']['headerinclude']) && !isset($flexwidth)) {
 	require("$curdir/{$CFG['GEN']['headerinclude']}");
 }
-$didnavlist = false;
+$didnavlist = false;  $essentialsnavcnt = 0;
 function getactivetab() {
 	$t = 10; $s = 10;
 	$path = $_SERVER['PHP_SELF'];
@@ -157,21 +157,26 @@ if (isset($cid) && isset($teacherid) && $coursetopbar[2]==1 && count($coursetopb
 	$a = array_fill(0,11,"");
 	$c = getactivetab();
 	$a[$c[0]] = 'class="activetab"';
+
 	echo "<li><a {$a[10]} href=\"$imasroot/course/course.php?cid=$cid\">Course</a></li> ";
 	if (in_array(0,$coursetopbar[1]) && $msgset<4) { //messages
 		echo "<li><a {$a[0]} href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a></li> ";
+		$essentialsnavcnt++;
 	}
 	if (in_array(6,$coursetopbar[1]) && (($coursetoolset&2)==0 || !isset($CFG['CPS']['topbar']) || $CFG['CPS']['topbar'][1]==1)) { //forums
 		echo "<li><a {$a[6]} href=\"$imasroot/forums/forums.php?cid=$cid\">Forums</a></li>";
+		$essentialsnavcnt++;
 	}
 	if (in_array(1,$coursetopbar[1])) { //Stu view
 		echo "<li><a href=\"$imasroot/course/course.php?cid=$cid&stuview=0\">Student View</a></li>";
 	}
 	if (in_array(3,$coursetopbar[1])) { //List stu
 		echo "<li><a {$a[3]} href=\"$imasroot/course/listusers.php?cid=$cid\">Roster</a></li>\n";
+		$essentialsnavcnt++;
 	}
 	if (in_array(2,$coursetopbar[1])) { //Gradebook
 		echo "<li><a {$a[2]} href=\"$imasroot/course/gradebook.php?cid=$cid\">Gradebook</a>$gbnewflag</li>";
+		$essentialsnavcnt++;
 	}
 	if (in_array(7,$coursetopbar[1])) { //Groups
 		echo "<li><a {$a[7]} href=\"$imasroot/course/managestugrps.php?cid=$cid\">Groups</a></li>\n";
@@ -200,12 +205,15 @@ if (isset($cid) && isset($teacherid) && $coursetopbar[2]==1 && count($coursetopb
 	echo "<li><a {$a[10]} href=\"$imasroot/course/course.php?cid=$cid\">Course</a></li> ";
 	if (in_array(0,$coursetopbar[0]) && $msgset<4) { //messages
 		echo "<li><a {$a[0]} href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a></li> ";
+		$essentialsnavcnt++;
 	}
 	if (in_array(3,$coursetopbar[0])) { //forums
 		echo "<li><a {$a[3]} href=\"$imasroot/forums/forums.php?cid=$cid\">Forums</a></li> ";
+		$essentialsnavcnt++;
 	}
 	if (in_array(1,$coursetopbar[0])) { //Gradebook
 		echo "<li><a {$a[1]} href=\"$imasroot/course/gradebook.php?cid=$cid\">Gradebook</a></li> ";
+		$essentialsnavcnt++;
 	}
 	if (in_array(2,$coursetopbar[0])) { //Calendar
 		echo "<li><a {$a[2]} href=\"$imasroot/course/showcalendar.php?cid=$cid\">Calendar</a></li>\n";

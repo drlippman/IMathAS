@@ -440,6 +440,7 @@ function togglevideoembed() {
 			frameborder: 0,
 			allowfullscreen: 1
 		}).insertAfter($(this));
+		$(this).parent().fitVids();
 		$('<br/>').insertAfter($(this));
 		$(this).text(' [-]');
 		$(this).attr('title',_("Hide video"));
@@ -495,6 +496,7 @@ jQuery(document).ready(function($) {
 	$('a').each(setuptracklinks);	
 	$('a[href*="youtu"]').each(setupvideoembeds);
 	$('a[href*="vimeo"]').each(setupvideoembeds);	
+	$('body').fitVids();
 });
 
 function _(txt) {
@@ -510,3 +512,41 @@ function _(txt) {
 	}
 	return outtxt;
 }
+
+//https://github.com/davatron5000/FitVids.js
+(function( $ ){
+
+  "use strict";
+
+  $.fn.fitVids = function( ) {
+  
+    return this.each(function(){
+      var selectors = [
+        "iframe[src*='player.vimeo.com']",
+        "iframe[src*='youtube.com']",
+        "iframe[src*='youtube-nocookie.com']",
+        "object",
+        "embed"
+      ];
+
+      var $allVideos = $(this).find(selectors.join(','));
+      $allVideos = $allVideos.not("object object"); // SwfObj conflict patch
+
+      $allVideos.each(function(){
+        var $this = $(this);
+        if (this.tagName.toLowerCase() === 'embed' && $this.parent('object').length || $this.parent('.fluid-width-video-wrapper').length) { return; }
+        var height = ( this.tagName.toLowerCase() === 'object' || ($this.attr('height') && !isNaN(parseInt($this.attr('height'), 10))) ) ? parseInt($this.attr('height'), 10) : $this.height(),
+            width = !isNaN(parseInt($this.attr('width'), 10)) ? parseInt($this.attr('width'), 10) : $this.width(),
+            aspectRatio = height / width;
+        if(!$this.attr('id')){
+          var videoID = 'fitvid' + Math.floor(Math.random()*999999);
+          $this.attr('id', videoID);
+        }
+        $this.wrap('<div class="fluid-width-video-wrapper"></div>').parent('.fluid-width-video-wrapper').css('padding-top', (aspectRatio * 100)+"%")
+        	.wrap('<div class="video-wrapper-wrapper"></div>').parent('.video-wrapper-wrapper').css('max-width',width+'px');
+        $this.removeAttr('height').removeAttr('width').css('height','').css('width','');
+      });
+    });
+  };
+// Works with either jQuery or Zepto
+})( window.jQuery || window.Zepto );

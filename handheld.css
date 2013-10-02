@@ -10,6 +10,22 @@ div#leftcolumn, div#rightcolumn  {
 div#leftcontent {
 	display:none;
 }
+div#leftcontent.needed {
+	display:block;
+	position: relative;
+	width: auto;
+}
+div#leftcontent.needed * {
+	display:none;
+}
+
+div#leftcontent.needed p {
+	display:inline;
+}	
+div#leftcontent.needed *.essen {
+	display: inline;
+	padding-right: 1em;
+}
 span.instronly {
 	font-size: 80%;
 }
@@ -58,3 +74,4 @@ div.inactivewrapper span.instronly {
 div.breadcrumb {
 	height: auto !important;
 }
+

@@ -404,7 +404,7 @@ if ($overwriteBody==1) {
 <?php  
 	if ($useleftbar && isset($teacherid)) {
 ?>	
-	<div id="leftcontent">
+	<div id="leftcontent" <?php if ($essentialsnavcnt<4) {echo 'class="needed"';}?>>
 	<?php
 		if (isset($CFG['CPS']['additemtype']) && $CFG['CPS']['additemtype'][0]=='links') {
 		} else {
@@ -413,9 +413,9 @@ if ($overwriteBody==1) {
 	?>
 		<p>
 		<b><?php echo _('Communication'); ?></b><br/>
-			<a href="<?php echo $imasroot ?>/msgs/msglist.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>">
+			<a href="<?php echo $imasroot ?>/msgs/msglist.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>" class="essen">
 			<?php echo _('Messages'); ?></a> <?php echo $newmsgs ?> <br/>
-			<a href="<?php echo $imasroot ?>/forums/forums.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>">
+			<a href="<?php echo $imasroot ?>/forums/forums.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>" class="essen">
 			<?php echo _('Forums'); ?></a> <?php echo $newpostscnt ?>
 <?php 
 		if (isset($mathchaturl) &&  $chatset==1) {
@@ -427,8 +427,8 @@ if ($overwriteBody==1) {
 	if (!isset($CFG['CPS']['leftnavtools']) || $CFG['CPS']['leftnavtools']!==false) {
 	?>
 		<p><b><?php echo _('Tools'); ?></b><br/>
-			<a href="listusers.php?cid=<?php echo $cid ?>"><?php echo _('Roster'); ?></a><br/>
-			<a href="gradebook.php?cid=<?php echo $cid ?>"><?php echo _('Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="red">', _('New'), '</span>';}?><br/>
+			<a href="listusers.php?cid=<?php echo $cid ?>" class="essen"><?php echo _('Roster'); ?></a><br/>
+			<a href="gradebook.php?cid=<?php echo $cid ?>" class="essen"><?php echo _('Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="red">', _('New'), '</span>';}?><br/>
 			<a href="managestugrps.php?cid=<?php echo $cid ?>"><?php echo _('Groups'); ?></a><br/>
 			<a href="addoutcomes.php?cid=<?php echo $cid ?>"><?php echo _('Outcomes'); ?></a><br/>
 			<a href="showcalendar.php?cid=<?php echo $cid ?>"><?php echo _('Calendar'); ?></a>
@@ -482,19 +482,19 @@ if ($overwriteBody==1) {
 <?php	
 	} else if ($useleftstubar && !isset($teacherid)) {
 ?>
-		<div id="leftcontent">
+		<div id="leftcontent" <?php if ($essentialsnavcnt<4) {echo 'class="needed"';}?>>
 			<p>
 <?php
 		if ($msgset<4) {		
-			echo '<a href="'.$imasroot.'/msgs/msglist.php?cid='.$cid.'&amp;folder='.$_GET['folder'].'">';
+			echo '<a href="'.$imasroot.'/msgs/msglist.php?cid='.$cid.'&amp;folder='.$_GET['folder'].'" class="essen"> ';
 			echo _('Messages').'</a> '.$newmsgs .' <br/>';
 		}
 		if (($toolset&2)==0) {
-			echo '<a href="'.$imasroot.'/forums/forums.php?cid='.$cid.'&amp;folder='.$_GET['folder'].'">';
+			echo '<a href="'.$imasroot.'/forums/forums.php?cid='.$cid.'&amp;folder='.$_GET['folder'].'" class="essen">';
 			echo _('Forums').'</a> '.$newpostscnt.'<br/>';
 		}
 		if (($toolset&1)==0) {	
-			echo '<a href="showcalendar.php?cid='.$cid.'">'._('Calendar').'</a>';
+			echo '<a href="showcalendar.php?cid='.$cid.'" class="essen">'._('Calendar').'</a>';
 		}
 		if (isset($mathchaturl) && $chatset==1) {
 			echo "<br/><a href=\"$mathchaturl?uname=".urlencode($userfullname)."&amp;room=$cid&amp;roomname=".urlencode($coursename)."\"  target=\"chat\">", _('Chat'), "</a>  ($activechatters)";
