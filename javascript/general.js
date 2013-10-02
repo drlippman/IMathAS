@@ -407,10 +407,12 @@ function togglevideoembed() {
 	if (els.length>0) {
 		if (els.css('display')=='none') {
 			els.show();
+			els.parent('.fluid-width-video-wrapper').show();
 			$(this).text(' [-]');
 			$(this).attr('title',_("Hide video"));
 		} else {
 			els.hide();
+			els.parent('.fluid-width-video-wrapper').hide();
 			$(this).text(' [+]');
 			$(this).attr('title',_("Watch video here"));
 		}

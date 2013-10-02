@@ -194,6 +194,7 @@ END;
 	 	$userid = mysql_insert_id();
 	 	
 		$query = "SELECT id FROM imas_courses WHERE (istemplate&8)=8 AND available<4";
+		if (isset($_GET['cid'])) { $query.= ' AND id='.intval($_GET['cid']); }
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		if (mysql_num_rows($result)>0) {
 			$query = "INSERT INTO imas_students (userid,courseid) VALUES ";
