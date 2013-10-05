@@ -19,7 +19,7 @@
 		$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/infopages.css\" type=\"text/css\">\n";
 		require("../header.php");
 		$pagetitle = "Diagnostics";
-		require("../infoheader.php");
+		require((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'../')."infoheader.php");
 		echo <<<END
 <img class="floatleft" src="$imasroot/img/ruler.jpg"/>
 <div class="content">
@@ -294,14 +294,14 @@ if (isset($_POST['SID'])) {
 <body>
 */
 //allow custom login page for specific diagnostics
-if (file_exists("diag$diagid.php")) {
-	require("diag$diagid.php");
+if (file_exists((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'')."diag$diagid.php")) {
+	require((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'')."diag$diagid.php");
 } else {
 $nologo = true;
 $placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/infopages.css\" type=\"text/css\">\n";
 require("../header.php");
 $pagetitle =$line['name'];
-require("../infoheader.php");
+require((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'../')."infoheader.php");
 ?>
 <div style="margin-left: 30px">
 <form method=post action="index.php?id=<?php echo $diagid; ?>">

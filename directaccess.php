@@ -173,8 +173,8 @@
 		
 		$cid = intval($_GET['cid']);
 		$curdir = rtrim(dirname(__FILE__), '/\\');
-		if (file_exists("$curdir/directaccess$cid.html")) {
-			require("directaccess$cid.html");
+		if (file_exists("$curdir/".(isset($CFG['GEN']['directaccessincludepath'])?$CFG['GEN']['directaccessincludepath']:'')."directaccess$cid.html")) {
+			require("$curdir/".(isset($CFG['GEN']['directaccessincludepath'])?$CFG['GEN']['directaccessincludepath']:'')."directaccess$cid.html");
 		} 
 		
 		$query = "SELECT enrollkey FROM imas_courses WHERE id='{$_GET['cid']}'";
