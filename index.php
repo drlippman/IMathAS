@@ -259,12 +259,14 @@ if ($myrights==100) {
 require("header.php");
 $msgtotal = array_sum($newmsgcnt);
 echo '<div class="floatright" id="homelinkbox">';
-if ($myrights>5) {
-	echo "<a href=\"forms.php?action=chguserinfo\">", _('Change User Info'), "</a> | \n";
-	echo "<a href=\"forms.php?action=chgpwd\">", _('Change Password'), "</a> | \n";
+if (!isset($CFG['GEN']['hidedefindexmenu'])) {
+	if ($myrights>5) {
+		echo "<a href=\"forms.php?action=chguserinfo\">", _('Change User Info'), "</a> | \n";
+		echo "<a href=\"forms.php?action=chgpwd\">", _('Change Password'), "</a> | \n";
+	}
+	echo '<a href="actions.php?action=logout">', _('Log Out'), '</a><br/>';
 }
-echo '<a href="actions.php?action=logout">', _('Log Out'), '</a>';
-echo '<br/><a href="msgs/msglist.php?cid=0">', _('Messages'), '</a>';
+echo '<a href="msgs/msglist.php?cid=0">', _('Messages'), '</a>';
 if ($msgtotal>0) {
 	echo ' <a href="msgs/newmsglist.php?cid=0" class="newnote">', sprintf(_('New (%d)'), $msgtotal), '</a>';
 }
