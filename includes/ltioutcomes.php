@@ -119,7 +119,25 @@ function sendOAuthBodyPOST($method, $endpoint, $oauth_consumer_key, $oauth_consu
 
     $header = $acc_req->to_header();
     $header = $header . "\r\nContent-Type: " . $content_type . "\r\n";
-
+    
+    $disabled = explode(', ', ini_get('disable_functions'));
+    if (function_exists('exec') && !in_array('exec', $disabled)) {
+	    try {
+		$cmd = "curl -X POST";
+		$headers = explode("\r\n",$header);
+		foreach ($headers as $hdr) {
+			if (strlen($hdr)<2) {continue;}
+			$cmd .= " -H '$hdr'";
+		}
+		$cmd .= " -d '" . str_replace("'","\\'",$body) . "' " . "'" . $endpoint . "'";
+		$cmd .= " > /dev/null 2>&1 &";
+		@exec($cmd, $output, $exit);
+		return ($exit == 0);	    
+	    } catch (Exception $e) {
+		//continue below
+	    }
+    }
+    
     $response = post_socket_xml($endpoint,$body,$header);
     if ( $response !== false && strlen($response) > 0) return $response;
 
