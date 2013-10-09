@@ -292,12 +292,11 @@ Date.prototype.getWeekDays = function(d) {
 		} else {
 			curval = 1-curval;
 		}
-		
 		$('#avail'+cnt).val(curval);
 		if (curval==1) {
-			$('#avail'+cnt).parent().parent().find('td.togdis').removeClass('dis');
+			$('#avail'+cnt).parent().parent().parent().find('td.togdis').removeClass('dis');
 		} else {
-			$('#avail'+cnt).parent().parent().find('td.togdis').addClass('dis');
+			$('#avail'+cnt).parent().parent().parent().find('td.togdis').addClass('dis');
 		}
 		$('#availname'+cnt).text(availnames[curval]);
 	} else {
@@ -351,10 +350,33 @@ Date.prototype.getWeekDays = function(d) {
 					}
 				}
 			} catch (e) { };
-			els[i].checked = false;
+			//els[i].checked = false;
 		  }
 	  }
   }
+  var MCDrepeatcounter = 0;
+  function MCDselectblockgrp(el,lvl) {
+  	if (MCDrepeatcounter==0) {setTimeout(function() {MCDrepeatcounter=0;},500);}
+  	MCDrepeatcounter++;
+  	if (MCDrepeatcounter>2) {return;}
+  	
+  	var val = el.checked;
+  	var thisid = parseInt(el.id.substr(2));
+  	var els = el.form.getElementsByTagName("input");
+	  for (var i=0; i<els.length; i++) {
+		  if (els[i].type=='checkbox' && els[i].id.match(/cb/)) { 
+		  	  curid = parseInt(els[i].id.substr(2));
+		  	  if (curid>thisid) {
+		  	  	if (els[i].value > lvl) {
+		  	  		els[i].checked = val;
+		  	  	} else {
+		  	  		break;
+		  	  	} 
+		  	  }
+		  }
+  	}
+  }
+  
   function chkAll(frm, mark) {  
   	var els = frm.getElementsByTagName("input");
 	  for (var i=0; i<els.length; i++) {
