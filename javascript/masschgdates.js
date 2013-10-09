@@ -389,6 +389,11 @@ Date.prototype.getWeekDays = function(d) {
 		  }
   	}
   }
+  function submittheform() {
+  	  var form = document.getElementById("realform");
+  	  prepforsubmit(form);
+  	  form.submit();
+  }
   function prepforsubmit(frm) {
   	var cnt = document.getElementById("chgcnt").value;
   	for (var i=0;i<cnt;i++) {

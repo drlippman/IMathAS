@@ -22,6 +22,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$cid = $_GET['cid'];
 	
 	if (isset($_POST['chgcnt'])) {
+
 		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$items = unserialize(mysql_result($result,0,0));
@@ -30,6 +31,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$blockchg = 0;
 		for ($i=0; $i<$cnt; $i++) {
 			require_once("parsedatetime.php");
+			
 			$data = explode(',',$_POST['data'.$i]);
 			
 			if ($data[0] == '0') {
@@ -103,7 +105,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$query = "UPDATE imas_inlinetext SET startdate='$startdate',enddate='$enddate',avail='$avail' WHERE id='$id'";
 					mysql_query($query) or die("Query failed : " . mysql_error());
 				}
-			} else if ($type=='LinkedText') {
+			} else if ($type=='Link') {
 				if ($id>0) {
 					$query = "UPDATE imas_linkedtext SET startdate='$startdate',enddate='$enddate',avail='$avail' WHERE id='$id'";
 					mysql_query($query) or die("Query failed : " . mysql_error());
@@ -129,7 +131,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid';";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		}
-		
+
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
 			
 		exit;
@@ -237,12 +239,13 @@ if ($overwriteBody==1) {
 	echo "Always/Never to Dates.  Swaps to/from Always/Never and Show changes cannot be sent down the list, but you can use the checkboxes and the pulldowns to change those settings for many items at once.</p>";
 	echo "<form id=\"qform\">";
 	
-	echo 'Check: <a href="#" onclick="return chkAllNone(\'qform\',\'all\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'all\',false)">None</a> ';
+	echo '<p>Check: <a href="#" onclick="return chkAllNone(\'qform\',\'all\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'all\',false)">None</a>. ';
 
 	//echo '<p>Check/Uncheck All: <input type="checkbox" name="ca" value="1" onClick="chkAll(this.form, this.checked)"/>. ';
 	echo 'Change selected items <select id="swaptype" onchange="chgswaptype(this)"><option value="s">Start Date</option><option value="e">End Date</option><option value="r">Review Date</option><option value="a">Show</option></select>';
 	echo ' to <select id="swapselected"><option value="always">Always</option><option value="dates">Dates</option></select>';
-	echo ' <input type="button" value="Go" onclick="MCDtoggleselected(this.form)" />';
+	echo ' <input type="button" value="Go" onclick="MCDtoggleselected(this.form)" /> &nbsp;';
+	echo ' <button type="button" onclick="submittheform()">'._("Save Changes").'</button></p>';
 	
 	echo '<table class=gb><thead><tr><th></th><th>Name</th><th>Type</th><th>Show</th><th>Start Date</th><th>End Date</th><th>Review Date</th><th>Send Date Chg / Copy Down List</th></thead><tbody>';
 	$prefix = array();
