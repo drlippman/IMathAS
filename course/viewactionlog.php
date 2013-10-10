@@ -25,12 +25,12 @@ require("../header.php");
 echo "<div class=\"breadcrumb\">$curBreadcrumb</div>";
 echo '<div id="headerloginlog" class="pagetitle"><h2>'.$pagetitle. '</h2></div>';
 
-echo '<p><a href="viewloginlog.php?cid='.$cid.'&uid='.$uid.'">View Log Log</a></p>';
+echo '<p><a href="viewloginlog.php?cid='.$cid.'&uid='.$uid.'">View Login Log</a></p>';
 
 $query = "SELECT LastName,FirstName FROM imas_users WHERE id='$uid'";
 $result = mysql_query($query) or die("Query failed : " . mysql_error());
 $row = mysql_fetch_row($result);
-echo '<h3>Activity Log for '.$row[1].', '.$row[0].'</h3>';
+echo '<h3>Activity Log for '.$row[0].', '.$row[1].'</h3>';
 
 
 $actions = array();

@@ -28,7 +28,7 @@ echo '<p><a href="viewactionlog.php?cid='.$cid.'&uid='.$uid.'">View Activity Log
 $query = "SELECT LastName,FirstName FROM imas_users WHERE id='$uid'";
 $result = mysql_query($query) or die("Query failed : " . mysql_error());
 $row = mysql_fetch_row($result);
-echo '<h3>Login Log for '.$row[1].', '.$row[0].'</h3>';
+echo '<h3>Login Log for '.$row[0].', '.$row[1].'</h3>';
 echo '<ul class="nomark">';
 
 $query = "SELECT logintime,lastaction FROM imas_login_log WHERE userid='$uid' AND courseid='$cid' ORDER BY logintime DESC";
