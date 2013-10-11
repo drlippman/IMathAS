@@ -26,6 +26,9 @@ if (!isset($imasroot)) {
 		}
 		krsort($msgarr);
 		$endmsg['msgs'] = $msgarr;
+		require_once("../includes/htmLawed.php");
+		$htmlawedconfig = array('elements'=>'*-script');
+		$endmsg['commonmsg'] = htmLawed(stripslashes($_POST['commonmsg']),$htmlawedconfig);
 		$msgstr = addslashes(serialize($endmsg));
 		if (isset($_POST['aid'])) {
 			$query = "UPDATE imas_assessments SET endmsg='$msgstr' WHERE id='{$_POST['aid']}'";
@@ -41,6 +44,7 @@ if (!isset($imasroot)) {
 	}
 	
 	$pagetitle = "End of Assessment Messages";
+	$useeditor = "commonmsg";
 	
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
@@ -68,6 +72,7 @@ if (!isset($imasroot)) {
 		$endmsg['def'] = '';
 		$endmsg['type'] = 0;
 		$endmsg['msgs'] = array();
+		$endmsg['commonmsg'] = '';
 	}
 	echo '<div id="headerassessendmsg" class="pagetitle"><h2>End of Assessment Messages</h2></div>';
 	echo "<form method=\"post\" action=\"assessendmsg.php?cid=$cid&amp;record=true\" />";
@@ -99,8 +104,11 @@ if (!isset($imasroot)) {
 	echo "<tr><td>Otherwise, show:</td>";
 	echo "<td><input type=\"text\" size=\"80\" name=\"msg[0]\" value=\"{$endmsg['def']}\" /></td></tr>";
 	echo '</tbody></table>';
-	
-	echo '<input type="submit" value="Submit" />';
+	echo '<p>After the score-specific message, display this text to everyone:</p>';
+	echo '<div class=editor><textarea cols="50" rows="10" name="commonmsg" style="width: 100%">';
+	echo htmlentities($endmsg['commonmsg']);
+	echo '</textarea></div>';
+	echo '<p><input type="submit" value="Submit" /></p>';
 	echo '</form>';
 ?>
 <p>Order of entries is not important; the message with highest applicable score will be reported.  

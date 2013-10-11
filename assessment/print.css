@@ -28,7 +28,7 @@ div.nobreak {
 	page-break-inside:avoid;
 }
 .headerwrapper {
-	height: 0px;
+	display:none;
 }
 .drawtools {
 	display:none;

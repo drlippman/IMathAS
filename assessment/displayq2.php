@@ -2715,14 +2715,15 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		//$answer = preg_replace_callback('/([^\[\(\)\]\,]+)/',"preg_mathphp_callback",$answer);
 		//$answerlist = explode(",",preg_replace('/[^\d\.,\-E]/','',$answer));
 		if (isset($answersize)) {
+			$GLOBALS['partlastanswer'] = implode("|",$givenanslist);
+			$GLOBALS['partlastanswer'] .= '$#$'.str_replace(',','|',str_replace(array('(',')','[',']'),'',$givenans));
+			
 			for ($i=0; $i<count($answerlist); $i++) {
 				$givenanslist[$i] = $_POST["qn$qn-$i"];
 				if (!checkanswerformat($givenanslist[$i],$ansformats)) {
 					return 0; //perhaps should just elim bad answer rather than all?
 				} 
 			}
-			$GLOBALS['partlastanswer'] = implode("|",$givenanslist);
-			$GLOBALS['partlastanswer'] .= '$#$'.str_replace(',','|',str_replace(array('(',')','[',']'),'',$givenans));
 			
 		} else {
 			$_POST["tc$qn"] = preg_replace('/\)\s*,\s*\(/','),(',$_POST["tc$qn"]);
@@ -2769,6 +2770,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		if (!isset($answerformat)) { $answerformat = '';}
 		$ansformats = explode(',',$answerformat);
+		$answer = str_replace(' ','',$answer);
 		
 		if ($anstype=='ntuple') {
 			$GLOBALS['partlastanswer'] = $givenans;
@@ -2783,14 +2785,16 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$tocheck = substr($tocheck,1,strlen($tocheck)-2);
 			$tocheck = explode(',',$tocheck);
 			
-			foreach($tocheck as $chkme) {
-				if (!checkanswerformat($chkme,$ansformats)) {
-					return 0; //perhaps should just elim bad answer rather than all?
-				} 
+			if ($answer != 'DNE' && $answer != 'oo') {
+				foreach($tocheck as $chkme) {
+					if (!checkanswerformat($chkme,$ansformats)) {
+						return 0; //perhaps should just elim bad answer rather than all?
+					} 
+				}
 			}
 		}
 		if ($givenans == null) {return 0;}
-		$answer = str_replace(' ','',$answer);
+		
 		$givenans = str_replace(' ','',$givenans);
 		
 		if ($answer=='DNE' && strtoupper($givenans)=='DNE') {
@@ -2911,7 +2915,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						$cpts[1] = substr($cpts[1],1);
 					}
 					//echo $cpts[0].','.$cpts[1].'<br/>';
-					if (!checkanswerformat($cpts[0],$ansformats) || !checkanswerformat($cpts[1],$ansformats)) {
+					if ($answer!='DNE' && (!checkanswerformat($cpts[0],$ansformats) || !checkanswerformat($cpts[1],$ansformats))) {
 						return 0;
 					}
 				}

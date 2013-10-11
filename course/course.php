@@ -747,6 +747,7 @@ function makeTopMenu() {
 			echo _('Use colored boxes to drag-and-drop order.'),' ',_('Click the B next to a block to expand or collapse it. Click an item title to edit it in place.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Record Changes'), '" onclick="submitChanges()"/>';
 		}
 		 echo '<span id="submitnotice" style="color:red;"></span>';
+		 echo '<div class="clear"></div>';
 		 echo '</div>';
 		
 	}

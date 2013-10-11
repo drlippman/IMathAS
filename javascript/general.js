@@ -437,7 +437,7 @@ function togglevideoembed() {
 		$('<iframe/>', {
 			id: 'videoiframe'+id,
 			width: 640,
-			height: 510,
+			height: 400,
 			src: location.protocol+'//'+vidsrc+vidid+timeref,
 			frameborder: 0,
 			allowfullscreen: 1
@@ -526,19 +526,14 @@ function _(txt) {
       var selectors = [
         "iframe[src*='player.vimeo.com']",
         "iframe[src*='youtube.com']",
-        "iframe[src*='youtube-nocookie.com']",
-        "object",
-        "embed"
+        "iframe[src*='youtube-nocookie.com']"
       ];
 
       var $allVideos = $(this).find(selectors.join(','));
-      $allVideos = $allVideos.not("object object"); // SwfObj conflict patch
-
+      
       $allVideos.each(function(){
         var $this = $(this);
-        if (this.tagName.toLowerCase() === 'embed' && $this.parent('object').length || $this.parent('.fluid-width-video-wrapper').length) { return; }
-        if (this.tagName.toLowerCase() === 'embed' && this.type.match(/svg/)) {return;}
-        var height = ( this.tagName.toLowerCase() === 'object' || ($this.attr('height') && !isNaN(parseInt($this.attr('height'), 10))) ) ? parseInt($this.attr('height'), 10) : $this.height(),
+        var height = ($this.attr('height') && !isNaN(parseInt($this.attr('height'), 10))) ? parseInt($this.attr('height'), 10) : $this.height(),
             width = !isNaN(parseInt($this.attr('width'), 10)) ? parseInt($this.attr('width'), 10) : $this.width(),
             aspectRatio = height / width;
         if(!$this.attr('id')){

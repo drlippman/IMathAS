@@ -149,15 +149,17 @@
 	}
 	
 	$vidcnt = array();
-	$qlist = implode(',', array_keys($qcnt));
-	$query = "SELECT ict.typeid,COUNT(DISTINCT ict.userid) FROM imas_content_track AS ict JOIN imas_students AS ims ON ict.userid=ims.userid WHERE ims.courseid='$cid' AND ict.courseid='$cid' AND ict.type='extref' AND ict.typeid IN ($qlist)";
-	if ($secfilter!=-1) {
-		$query .= " AND ims.section='$secfilter' ";
-	}
-	$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
-	while ($row = mysql_fetch_row($result)) {
-		if (!isset($vidcnt[$row[0]])) { $vidcnt[$row[0]]=$row[1];}
-		$vidcnt[$row[0]] += $row[1];
+	if (count($qcnt)>0) {
+		$qlist = implode(',', array_keys($qcnt));
+		$query = "SELECT ict.typeid,COUNT(DISTINCT ict.userid) FROM imas_content_track AS ict JOIN imas_students AS ims ON ict.userid=ims.userid WHERE ims.courseid='$cid' AND ict.courseid='$cid' AND ict.type='extref' AND ict.typeid IN ($qlist)";
+		if ($secfilter!=-1) {
+			$query .= " AND ims.section='$secfilter' ";
+		}
+		$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			if (!isset($vidcnt[$row[0]])) { $vidcnt[$row[0]]=$row[1];}
+			$vidcnt[$row[0]] += $row[1];
+		}
 	}
 	
 	$notstarted = ($totstucnt - count($timetaken));

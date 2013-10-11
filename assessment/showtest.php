@@ -2591,6 +2591,8 @@ if (!isset($_POST['embedpostback'])) {
 				if ($outmsg=='') {
 					$outmsg = $endmsg['def'];
 				}
+				if (!isset($endmsg['commonmsg'])) {$endmsg['commonmsg']='';}
+					
 				if (strpos($outmsg,'redirectto:')!==false) {
 					$redirecturl = trim(substr($outmsg,11));
 					echo "<input type=\"button\" value=\"", _('Continue'), "\" onclick=\"window.location.href='$redirecturl'\"/>";
@@ -2662,11 +2664,11 @@ if (!isset($_POST['embedpostback'])) {
 			
 			echo "$average % </b></p>\n";	
 			
-			if ($outmsg=='') {
-				$outmsg = $endmsg['def'];
-			}
 			if ($outmsg!='') {
 				echo "<p style=\"color:red;font-weight: bold;\">$outmsg</p>";
+				if ($endmsg['commonmsg']!='' && $endmsg['commonmsg']!='<p></p>') {
+					echo $endmsg['commonmsg'];
+				}
 			}
 			
 			//if ($total<$testsettings['minscore']) {

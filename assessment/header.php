@@ -200,7 +200,7 @@ if (isset($cid) && !isset($flexwidth) && (!isset($sessiondata['intreereader']) |
 	echo '</ul>';
 	echo '<br class="clear" />';
 	echo '</div>';
-} else if (isset($cid) && !isset($flexwidth)  && (!isset($sessiondata['intreereader']) || $sessiondata['intreereader']==false) && $sessiondata['isteacher'] && $coursetopbar[2]==1 && count($coursetopbar[0])>0) {
+} else if (isset($cid) && !isset($flexwidth)  && (!isset($sessiondata['intreereader']) || $sessiondata['intreereader']==false) && !$sessiondata['isteacher'] && $coursetopbar[2]==1 && count($coursetopbar[0])>0) {
 	echo '<div id="navlistcont">';
 	echo '<ul id="navlist">';
 	echo "<li><a href=\"$imasroot/course/course.php?cid=$cid\">Course</a></li> ";

@@ -22,6 +22,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$cid = $_GET['cid'];
 	
 	if (isset($_POST['chgcnt'])) {
+
 		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$items = unserialize(mysql_result($result,0,0));
@@ -30,6 +31,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$blockchg = 0;
 		for ($i=0; $i<$cnt; $i++) {
 			require_once("parsedatetime.php");
+			
 			$data = explode(',',$_POST['data'.$i]);
 			
 			if ($data[0] == '0') {
@@ -103,7 +105,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$query = "UPDATE imas_inlinetext SET startdate='$startdate',enddate='$enddate',avail='$avail' WHERE id='$id'";
 					mysql_query($query) or die("Query failed : " . mysql_error());
 				}
-			} else if ($type=='LinkedText') {
+			} else if ($type=='Link') {
 				if ($id>0) {
 					$query = "UPDATE imas_linkedtext SET startdate='$startdate',enddate='$enddate',avail='$avail' WHERE id='$id'";
 					mysql_query($query) or die("Query failed : " . mysql_error());
@@ -129,13 +131,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid';";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		}
-		
+
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
 			
 		exit;
 	} else { //DEFAULT DATA MANIPULATION
 		$pagetitle = "Mass Change Dates";
-		$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/masschgdates.js?v=080113\"></script>";
+		$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/masschgdates.js?v=100813\"></script>";
 		$placeinhead .= "<style>.show {display:inline;} \n .hide {display:none;} img {cursor:pointer;}\n td.dis {color:#ccc;opacity:0.5;}\n td.dis input {color: #ccc;}</style>";
 	}
 }	
@@ -143,6 +145,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 /******* begin html output ********/
 $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+$placeinhead .= '<style type="text/css">.mcind1 {padding-left: .9em; text-indent:-.5em;} .mcind2 {padding-left: 1.4em; text-indent:-1em;}
+		.mcind3 {padding-left: 1.9em; text-indent:-1.5em; .mcind4 {padding-left: 2.4em; text-indent:-2em; .mcind5, mcind6 {padding-left: 2.9em; text-indent:-2.5em;} 
+		td {padding: .1em .4em;}</style>';
 require("../header.php");
 
 if ($overwriteBody==1) {
@@ -234,15 +239,16 @@ if ($overwriteBody==1) {
 	echo "Always/Never to Dates.  Swaps to/from Always/Never and Show changes cannot be sent down the list, but you can use the checkboxes and the pulldowns to change those settings for many items at once.</p>";
 	echo "<form id=\"qform\">";
 	
-	echo 'Check: <a href="#" onclick="return chkAllNone(\'qform\',\'all\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'all\',false)">None</a> ';
+	echo '<p>Check: <a href="#" onclick="return chkAllNone(\'qform\',\'all\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'all\',false)">None</a>. ';
 
 	//echo '<p>Check/Uncheck All: <input type="checkbox" name="ca" value="1" onClick="chkAll(this.form, this.checked)"/>. ';
 	echo 'Change selected items <select id="swaptype" onchange="chgswaptype(this)"><option value="s">Start Date</option><option value="e">End Date</option><option value="r">Review Date</option><option value="a">Show</option></select>';
 	echo ' to <select id="swapselected"><option value="always">Always</option><option value="dates">Dates</option></select>';
-	echo ' <input type="button" value="Go" onclick="MCDtoggleselected(this.form)" />';
+	echo ' <input type="button" value="Go" onclick="MCDtoggleselected(this.form)" /> &nbsp;';
+	echo ' <button type="button" onclick="submittheform()">'._("Save Changes").'</button></p>';
 	
-	echo '<table class=gb><thead><tr><th>Name</th><th>Type</th><th>Show</th><th>Start Date</th><th>End Date</th><th>Review Date</th><th>Send Date Chg / Copy Down List</th></thead><tbody>';
-	
+	echo '<table class=gb><thead><tr><th></th><th>Name</th><th>Type</th><th>Show</th><th>Start Date</th><th>End Date</th><th>Review Date</th><th>Send Date Chg / Copy Down List</th></thead><tbody>';
+	$prefix = array();
 	if ($orderby==3) {  //course page order
 		$itemsassoc = array();
 		$query = "SELECT id,typeid,itemtype FROM imas_items WHERE courseid='$cid'";
@@ -255,23 +261,25 @@ if ($overwriteBody==1) {
 		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 		$itemorder = unserialize(mysql_result($result,0,0));
 		$itemsimporder = array();
-		function flattenitems($items,&$addto,$parent) {
-			global $itemsimporder,$itemsassoc;
+		
+		function flattenitems($items,&$addto,$parent,$pre) {
+			global $itemsimporder,$itemsassoc,$prefix;
 			foreach ($items as $k=>$item) {
 				if (is_array($item)) {
 					$addto[] = 'Block'.$parent.'-'.($k+1);
-					flattenitems($item['items'],$addto,$parent.'-'.($k+1));
+					$prefix['Block'.$parent.'-'.($k+1)] = $pre;
+					flattenitems($item['items'],$addto,$parent.'-'.($k+1),$pre.'-');
 				} else {
 					$addto[] = $itemsassoc[$item];
+					$prefix[$itemsassoc[$item]] = $pre;
 				}
 			}
 		}
-		flattenitems($itemorder,$itemscourseorder,'0');
+		flattenitems($itemorder,$itemscourseorder,'0','');
 		$itemscourseorder = array_flip($itemscourseorder);
 	}
 		
 		
-	
 	$names = Array();
 	$startdates = Array();
 	$enddates = Array();
@@ -280,6 +288,7 @@ if ($overwriteBody==1) {
 	$avails = array();
 	$types = Array();
 	$courseorder = Array();
+	$pres = array();
 	
 	if ($filter=='all' || $filter=='assessments') {
 		$query = "SELECT name,startdate,enddate,reviewdate,id,avail FROM imas_assessments WHERE courseid='$cid' ";
@@ -292,6 +301,7 @@ if ($overwriteBody==1) {
 			$reviewdates[] = $row[3];
 			$ids[] = $row[4];
 			$avails[] = $row[5];
+			if (isset($prefix['Assessment'.$row[4]])) {$pres[] = $prefix['Assessment'.$row[4]];} else {$pres[] = '';}
 			if ($orderby==3) {$courseorder[] = $itemscourseorder['Assessment'.$row[4]];}
 		}
 	}
@@ -306,6 +316,7 @@ if ($overwriteBody==1) {
 			$reviewdates[] = -1;
 			$ids[] = $row[3];
 			$avails[] = $row[4];
+			if (isset($prefix['InlineText'.$row[3]])) {$pres[] = $prefix['InlineText'.$row[3]];} else {$pres[] = '';}
 			if ($orderby==3) {$courseorder[] = $itemscourseorder['InlineText'.$row[3]];}
 		}
 	}
@@ -313,13 +324,14 @@ if ($overwriteBody==1) {
 		$query = "SELECT title,startdate,enddate,id,avail FROM imas_linkedtext WHERE courseid='$cid' ";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
-			$types[] = "LinkedText";
+			$types[] = "Link";
 			$names[] = $row[0];
 			$startdates[] = $row[1];
 			$enddates[] = $row[2];
 			$reviewdates[] = -1;
 			$ids[] = $row[3];
 			$avails[] = $row[4];
+			if (isset($prefix['LinkedText'.$row[3]])) {$pres[] = $prefix['LinkedText'.$row[3]];} else {$pres[] = '';}
 			if ($orderby==3) {$courseorder[] = $itemscourseorder['LinkedText'.$row[3]];}
 		}
 	}
@@ -334,6 +346,7 @@ if ($overwriteBody==1) {
 			$reviewdates[] = -1;
 			$ids[] = $row[3];
 			$avails[] = $row[4];
+			if (isset($prefix['Forum'.$row[3]])) {$pres[] = $prefix['Forum'.$row[3]];} else {$pres[] = '';}
 			if ($orderby==3) {$courseorder[] = $itemscourseorder['Forum'.$row[3]];}
 		}
 	}
@@ -348,6 +361,7 @@ if ($overwriteBody==1) {
 			$reviewdates[] = -1;
 			$ids[] = $row[3];
 			$avails[] = $row[4];
+			if (isset($prefix['Wiki'.$row[3]])) {$pres[] = $prefix['Wiki'.$row[3]];} else {$pres[] = '';}
 			if ($orderby==3) {$courseorder[] = $itemscourseorder['Wiki'.$row[3]];}
 		}
 	}
@@ -357,7 +371,7 @@ if ($overwriteBody==1) {
 		$items = unserialize(mysql_result($result,0,0));
 		
 		function getblockinfo($items,$parent) {
-			global $ids,$types,$names,$startdates,$enddates,$reviewdates,$ids,$itemscourseorder,$courseorder,$orderby,$avails;
+			global $ids,$types,$names,$startdates,$enddates,$reviewdates,$ids,$itemscourseorder,$courseorder,$orderby,$avails,$pres,$prefix;
 			foreach($items as $k=>$item) {
 				if (is_array($item)) {
 					$ids[] = $parent.'-'.($k+1);
@@ -368,6 +382,7 @@ if ($overwriteBody==1) {
 					$enddates[] = $item['enddate'];
 					$avails[] = $item['avail'];
 					$reviewdates[] = -1;
+					if (isset($prefix['Block'.$parent.'-'.($k+1)])) {$pres[] = $prefix['Block'.$parent.'-'.($k+1)];} else {$pres[] = '';}
 					if (count($item['items'])>0) {
 						getblockinfo($item['items'],$parent.'-'.($k+1));
 					}
@@ -376,6 +391,7 @@ if ($overwriteBody==1) {
 		}
 		getblockinfo($items,'0');
 	}
+	
 	$cnt = 0;
 	$now = time();
 	if ($orderby==0) {
@@ -394,9 +410,11 @@ if ($overwriteBody==1) {
 	foreach ($keys as $i) {
 		echo '<tr class=grid>';
 		echo '<td>';
-		echo "<input type=\"checkbox\" id=\"cb$cnt\" value=\"$cnt\" /> ";
-		
-		echo "{$names[$i]}<input type=hidden id=\"id$cnt\" value=\"{$ids[$i]}\"/>";
+		echo "<input type=\"checkbox\" id=\"cb$cnt\" value=\"".strlen($pres[$i])."\" ";
+		if ($types[$i]=='Block') {echo 'onchange="MCDselectblockgrp(this,'.strlen($pres[$i]).')"';}
+		echo "/></td>";
+		echo '<td class="mcind'.strlen($pres[$i]).'">';
+		echo "{$pres[$i]} {$names[$i]}<input type=hidden id=\"id$cnt\" value=\"{$ids[$i]}\"/>";
 		echo "<script> basesdates[$cnt] = ";
 		//if ($startdates[$i]==0) { echo '"NA"';} else {echo $startdates[$i];}
 		echo $startdates[$i];
@@ -409,17 +427,17 @@ if ($overwriteBody==1) {
 		echo ";</script>";
 		echo "</td><td>";
 		echo "{$types[$i]}<input type=hidden id=\"type$cnt\" value=\"{$types[$i]}\"/>";
-		if ($types[$i]=='Assessment') {
+		/*if ($types[$i]=='Assessment') {
 			if ($now>$startdates[$i] && $now<$enddates[$i]) {
 				echo " <i><a href=\"addquestions.php?aid={$ids[$i]}&cid=$cid\" title=\""._("Add/Remove Questions")."\">Q</a></i>";	
 			} else {
 				echo " <a href=\"addquestions.php?aid={$ids[$i]}&cid=$cid\" title=\""._("Add/Remove Questions")."\">Q</a>";
 			}
 			echo " <a href=\"addassessment.php?id={$ids[$i]}&cid=$cid&from=mcd\" title=\""._("Settings")."\">S</a>\n";
-		}
+		}*/
 		echo "</td>";
 		
-		echo '<td><img src="'.$imasroot.'/img/swap.gif" onclick="MCDtoggle(\'a\','.$cnt.')"/><span id="availname'.$cnt.'">'.$availnames[$avails[$i]].'</span><input type="hidden" id="avail'.$cnt.'" value="'.$avails[$i].'"/></td>';
+		echo '<td><span class="nowrap"><img src="'.$imasroot.'/img/swap.gif" onclick="MCDtoggle(\'a\','.$cnt.')"/><span id="availname'.$cnt.'">'.$availnames[$avails[$i]].'</span><input type="hidden" id="avail'.$cnt.'" value="'.$avails[$i].'"/></span></td>';
 		
 		echo "<td class=\"togdis".($avails[$i]!=1?' dis':'')."\"><img src=\"$imasroot/img/swap.gif\" onclick=\"MCDtoggle('s',$cnt)\"/>";
 		if ($startdates[$i]==0) {
