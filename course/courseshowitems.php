@@ -23,7 +23,7 @@ function enditem($canedit) {
 
   function showitems($items,$parent,$inpublic=false) {
 	   global $teacherid,$tutorid,$studentid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$myrights;
-	   global $hideicons,$exceptions,$latepasses,$graphicalicons,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs;
+	   global $hideicons,$exceptions,$latepasses,$graphicalicons,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs,$hasstats;
 	   require_once("../includes/filehandler.php");
 	   
 	   if (!isset($CFG['CPS']['itemicons'])) {
@@ -655,6 +655,9 @@ function enditem($canedit) {
 					echo " | <a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 					echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
 					echo " | <a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=$typeid\">", _('Grades'), "</a>";
+					if (isset($hasstats['a'.$typeid])) {
+						echo " | <a href=\"contentstats.php?cid=$cid&type=A&id=$typeid\">",_('Stats'),'</a>';
+					}
 					echo '</span>';
 					
 				   } else if ($line['allowlate']==1 && $latepasses>0) {
@@ -697,6 +700,9 @@ function enditem($canedit) {
 					echo " | <a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 					echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
 					echo " | <a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=$typeid\">", _('Grades'), "</a>";
+					if (isset($hasstats['a'.$typeid])) {
+						echo " | <a href=\"contentstats.php?cid=$cid&type=A&id=$typeid\">",_('Stats'),'</a>';
+					}
 					echo '</span>';
 					
 				   } 
@@ -734,6 +740,9 @@ function enditem($canedit) {
 					   echo "<a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
 					   echo " | <a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=$typeid\">", _('Grades'), "</a>";
+					   if (isset($hasstats['a'.$typeid])) {
+						echo " | <a href=\"contentstats.php?cid=$cid&type=A&id=$typeid\">",_('Stats'),'</a>';
+					   }
 					   echo '</span>';
 				   }
 				   echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
@@ -791,7 +800,10 @@ function enditem($canedit) {
 						   echo '<span class="instronly">';
 						   echo "<a href=\"addinlinetext.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
 						   echo "<a href=\"deleteinlinetext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
-						   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _(Copy), "</a>";
+						   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
+						   if (isset($hasstats['i'.$typeid])) {
+						   	   echo " | <a href=\"contentstats.php?cid=$cid&type=I&id=$typeid\">",_('Stats'),'</a>';
+						   }
 						   echo '</span>';
 					   }
 					   echo "</div>";
@@ -855,6 +867,9 @@ function enditem($canedit) {
 					   echo "<a href=\"addinlinetext.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
 					   echo "<a href=\"deleteinlinetext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
+					   if (isset($hasstats['i'.$typeid])) {
+						   echo " | <a href=\"contentstats.php?cid=$cid&type=I&id=$typeid\">",_('Stats'),'</a>';
+					   }
 					   echo '</span>';
 				   }
 				   echo filter("</div><div class=itemsum>{$line['text']}\n");
@@ -1067,6 +1082,9 @@ function enditem($canedit) {
 					   echo "<a href=\"addlinkedtext.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
 					   echo "<a href=\"deletelinkedtext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
+					   if (isset($hasstats['l'.$typeid])) {
+						    echo " | <a href=\"contentstats.php?cid=$cid&type=L&id=$typeid\">",_('Stats'),'</a>';
+					   }
 					   echo '</span>';
 				   }
 				   echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
@@ -1093,6 +1111,9 @@ function enditem($canedit) {
 					   echo "<a href=\"addlinkedtext.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
 					   echo "<a href=\"deletelinkedtext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
+					   if (isset($hasstats['l'.$typeid])) {
+						    echo " | <a href=\"contentstats.php?cid=$cid&type=L&id=$typeid\">",_('Stats'),'</a>';
+					   }
 					   echo '</span>';
 				   }
 				   echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
@@ -1216,6 +1237,9 @@ function enditem($canedit) {
 					   echo "<a href=\"addforum.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
 					   echo "<a href=\"deleteforum.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
+					   if (isset($hasstats['f'.$typeid])) {
+						    echo " | <a href=\"contentstats.php?cid=$cid&type=F&id=$typeid\">",_('Stats'),'</a>';
+					   }
 					   echo '</span>';
 				   }
 				   if ($duedates!='') {echo "<br/>$duedates";}
@@ -1246,6 +1270,9 @@ function enditem($canedit) {
 					   echo "<a href=\"addforum.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
 					   echo "<a href=\"deleteforum.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
+					   if (isset($hasstats['f'.$typeid])) {
+						    echo " | <a href=\"contentstats.php?cid=$cid&type=F&id=$typeid\">",_('Stats'),'</a>';
+					   }
 					   echo '</span>';
 				   }
 				   echo filter("</div><div class=itemsum>{$line['description']}</div>\n");
@@ -1347,6 +1374,9 @@ function enditem($canedit) {
 					   echo "<a href=\"addwiki.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
 					   echo "<a href=\"deletewiki.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
+					   if (isset($hasstats['w'.$typeid])) {
+						    echo " | <a href=\"contentstats.php?cid=$cid&type=W&id=$typeid\">",_('Stats'),'</a>';
+					   }
 					   echo '</span>';
 				   }
 				   if ($duedates!='') {echo "<br/>$duedates";}
@@ -1376,6 +1406,9 @@ function enditem($canedit) {
 					   echo "<a href=\"addwiki.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
 					   echo "<a href=\"deletewiki.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
+					   if (isset($hasstats['w'.$typeid])) {
+						    echo " | <a href=\"contentstats.php?cid=$cid&type=W&id=$typeid\">",_('Stats'),'</a>';
+					   }
 					   echo '</span>';
 				   }
 				   echo filter("</div><div class=itemsum>{$line['description']}</div>\n");
