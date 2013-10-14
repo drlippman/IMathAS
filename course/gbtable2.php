@@ -50,7 +50,7 @@ row[0][0][1] = "SID"
 row[0][1] scores
 row[0][1][0] first score
 row[0][1][0][0] = "Assessment name"
-row[0][1][0][1] = "Category"
+row[0][1][0][1] = category color #
 row[0][1][0][2] = points possible
 row[0][1][0][3] = 0 past, 1 current, 2 future
 row[0][1][0][4] = 0 no count and hide, 1 count, 2 EC, 3 no count
@@ -73,6 +73,7 @@ row[0][2][0][5] = total possible for all
 row[0][2][0][6-9] = 5 number summary
 row[0][2][0][10] = gbcat id
 row[0][2][0][11] = category weight (if weighted grades)
+row[0][2][0][12] = default show (0 expanded, 2 collapsed)
 
 row[0][3][0] = total possible past
 row[0][3][1] = total possible past&current
@@ -644,6 +645,7 @@ function gbtable() {
 		$gb[0][2][$pos][0] = $cats[$cat][0];
 		$gb[0][2][$pos][1] = $cats[$cat][7];
 		$gb[0][2][$pos][10] = $cat;
+		$gb[0][2][$pos][12] = $cats[$cat][6];
 		if ($catposspast[$cat]>0 || count($catposspastec[$cat])>0) {
 			$gb[0][2][$pos][2] = 0; //scores in past
 			$cattotweightpast += $cats[$cat][5];

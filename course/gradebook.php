@@ -76,6 +76,17 @@ if ($canviewall) {
 			$secfilter = -1;
 		}
 	}
+	if (isset($sessiondata[$cid.'catcollapse'])) {
+		$overridecollapse = $sessiondata[$cid.'catcollapse'];
+	} else {
+		$overridecollapse = array();
+	}
+	if (isset($_GET['catcollapse'])) {
+		$overridecollapse[$_GET['cat']] = $_GET['catcollapse'];
+		$sessiondata[$cid.'catcollapse'] = $overridecollapse;
+		writesessiondata();
+	}
+	
 	//Gbmode : Links NC Dates
 	$showpics = floor($gbmode/10000)%10 ; //0 none, 1 small, 2 big
 	$totonleft = ((floor($gbmode/1000)%10)&1) ; //0 right, 1 left
@@ -233,6 +244,7 @@ if ($canviewall) {
 	$placeinhead .= "	var toopen = '$address' + altgbmode;\n";
 	$placeinhead .= "  	window.location = toopen; \n";
 	$placeinhead .= "}\n";
+	$placeinhead .= '$(function() { $("th a, th select").bind("click", function(e) { e.stopPropagation(); }); });';
 	if ($isteacher) {
 		$placeinhead .= 'function chgexport() { ';
 		$placeinhead .= "	var type = document.getElementById(\"exportsel\").value; ";
@@ -1075,7 +1087,8 @@ function gbstudisp($stu) {
 }
 
 function gbinstrdisp() {
-	global $hidenc,$showpics,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection,$avgontop,$hidelocked,$colorize,$urlmode;
+	global $hidenc,$showpics,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection,$avgontop,$hidelocked,$colorize,$urlmode,$overridecollapse;
+
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	if ($availshow==4) {
 		$availshow=1;
@@ -1124,6 +1137,21 @@ function gbinstrdisp() {
 		
 		$n++;
 	}
+	
+	//get collapsed gb cat info
+	if (count($gbt[0][2])>1) {
+
+		$collapsegbcat = array();
+		for ($i=0;$i<count($gbt[0][2]);$i++) {
+			
+			if (isset($overridecollapse[$gbt[0][2][$i][10]])) {
+				$collapsegbcat[$gbt[0][2][$i][1]] = $overridecollapse[$gbt[0][2][$i][10]];
+			} else {
+				$collapsegbcat[$gbt[0][2][$i][1]] = $gbt[0][2][$i][12];
+			}
+		}
+	}
+	
 	if ($totonleft && !$hidepast) {
 		//total totals
 		if ($catfilter<0) {
@@ -1146,9 +1174,18 @@ function gbinstrdisp() {
 				echo '<th class="cat'.$gbt[0][2][$i][1].'"><div><span class="cattothdr">';
 				if ($availshow<3) {
 					echo $gbt[0][2][$i][0].'<br/>';
-					echo $gbt[0][2][$i][3+$availshow].'&nbsp;', _('pts');
+					if (isset($gbt[0][3][0])) { //using points based
+						echo $gbt[0][2][$i][3+$availshow].'&nbsp;', _('pts');
+					} else {
+						echo $gbt[0][2][$i][11].'%';
+					}
 				} else if ($availshow==3) { //past and attempted
 					echo $gbt[0][2][$i][0];
+				}
+				if ($collapsegbcat[$gbt[0][2][$i][1]]==0) {
+					echo "<br/><a class=small href=\"gradebook.php?cid=$cid&amp;cat={$gbt[0][2][$i][10]}&amp;catcollapse=2\">", _('[Collapse]'), "</a>";
+				} else {
+					echo "<br/><a class=small href=\"gradebook.php?cid=$cid&amp;cat={$gbt[0][2][$i][10]}&amp;catcollapse=0\">", _('[Expand]'), "</a>";
 				}
 				echo '</span></div></th>';
 				$n++;
@@ -1170,6 +1207,9 @@ function gbinstrdisp() {
 				continue;
 			}
 			if ($hidepast && $gbt[0][1][$i][3]==0) {
+				continue;
+			}
+			if ($collapsegbcat[$gbt[0][1][$i][1]]==2) {
 				continue;
 			}
 			//name and points
@@ -1222,9 +1262,18 @@ function gbinstrdisp() {
 				echo '<th class="cat'.$gbt[0][2][$i][1].'"><div><span class="cattothdr">';
 				if ($availshow<3) {
 					echo $gbt[0][2][$i][0].'<br/>';
-					echo $gbt[0][2][$i][3+$availshow].'&nbsp;', _('pts');
+					if (isset($gbt[0][3][0])) { //using points based
+						echo $gbt[0][2][$i][3+$availshow].'&nbsp;', _('pts');
+					} else {
+						echo $gbt[0][2][$i][11].'%';
+					}
 				} else if ($availshow==3) { //past and attempted
 					echo $gbt[0][2][$i][0];
+				}
+				if ($collapsegbcat[$gbt[0][2][$i][1]]==0) {
+					echo "<br/><a class=small href=\"gradebook.php?cid=$cid&amp;cat={$gbt[0][2][$i][10]}&amp;catcollapse=2\">", _('[Collapse]'), "</a>";
+				} else {
+					echo "<br/><a class=small href=\"gradebook.php?cid=$cid&amp;cat={$gbt[0][2][$i][10]}&amp;catcollapse=0\">", _('[Expand]'), "</a>";
 				}
 				echo '</span></div></th>';
 				$n++;
@@ -1371,6 +1420,9 @@ function gbinstrdisp() {
 					continue;
 				}
 				if ($hidepast && $gbt[0][1][$j][3]==0) {
+					continue;
+				}
+				if ($collapsegbcat[$gbt[0][1][$j][1]]==2) {
 					continue;
 				}
 				//if online, not average, and either score exists and active, or score doesn't exist and assess is current,

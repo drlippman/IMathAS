@@ -61,11 +61,13 @@
 					$weight = 0;
 				}
 			}
-			if (isset($_POST['hide'][$id])) {
+			/*if (isset($_POST['hide'][$id])) {
 				$hide = 1;
 			} else {
 				$hide = 0;
-			}
+			}*/
+			$hide = intval($_POST['hide'][$id]);
+			
 			if (substr($id,0,3)=='new') {
 				if (trim($name)!='') {
 					$query = "INSERT INTO imas_gbcats (courseid,name,scale,scaletype,chop,dropn,weight,hidden) VALUES ";
@@ -108,7 +110,12 @@
 		tr.appendChild(td);
 		
 		var td = document.createElement("td");
-		td.innerHTML = \'<input name="hide[new\'+addrowcnt+\']" value="1" type="checkbox">\';
+		td.innerHTML = \'<select name="hide[new\'+addrowcnt+\']"> \' +
+			\'<option value="1">Hidden</option>\' +
+			\'<option value="0" selected="selected">Expanded</option>\' +
+			\'<option value="2">Collapsed</option>\' +
+			\'</select>\';
+		//td.innerHTML = \'<input name="hide[new\'+addrowcnt+\']" value="1" type="checkbox">\';
 		tr.appendChild(td);
 		
 		var td = document.createElement("td");
@@ -170,6 +177,9 @@
 		}
 	}
 	
+	$hideval = array(1,0,2);
+	$hidelabel = array(_("Hidden"),_("Expanded"),_("Collapsed"));
+
 ?>
 	<form method=post action="gbsettings.php?cid=<?php echo $cid;?>">
 	
@@ -254,7 +264,7 @@
 	array_unshift($row,"Default");
 	echo "Categories";
 	echo "<table class=gb><thead>";
-	echo "<tr><th>Category Name</th><th>Hide</th><th>Scale (optional)</th><th>Drops</th><th id=weighthdr>";
+	echo "<tr><th>Category Name</th><th>Display<sup>*</sup></th><th>Scale (optional)</th><th>Drops</th><th id=weighthdr>";
 	if ($useweights==0) {
 		echo "Fixed Category Point Total (optional)";
 	} else if ($useweights==1) {
@@ -275,11 +285,14 @@
 	echo '<p><input type="button" value="Add New Category" onclick="addcat()" />';
 	echo '<input type=submit name=submit value="Update"/></p>';
 	echo "</form>";
+	echo '<p><sup>*</sup>When a category is set to Expanded, both the category total and all items in the category are displayed. ';
+	echo 'When a category is set to Collapsed, only the category total is displayed, but all the items are still counted normally. ';
+	echo 'When a category is set to Hidden, nothing is displayed, and no items from the category are counted in the grade total. </p>';
+	
 	//echo "<p><a href=\"gbsettings.php?cid=$cid&addnew=1\">Add New Category</a></p>";
 	
-	
 	function disprow($id,$row) {
-		global $cid;
+		global $cid, $hidelabel, $hideval;
 		//name,scale,scaletype,chop,drop,weight
 		echo "<tr class=grid><td>";
 		if ($id>0) {
@@ -288,9 +301,13 @@
 			echo $row[0];
 		}
 		"</td>";
-		echo "<td><input type=\"checkbox\" name=\"hide[$id]\" value=\"1\" ";
-		writeHtmlChecked($row[6],1);
-		echo "/></td>";
+		
+		echo '<td>';
+		writeHtmlSelect("hide[$id]",$hideval,$hidelabel,$row[6]);
+		echo '</td>'; 
+		//echo "<td><input type=\"checkbox\" name=\"hide[$id]\" value=\"1\" ";
+		//writeHtmlChecked($row[6],1);
+		//echo "/></td>";
 		echo "<td>Scale <input type=text size=3 name=\"scale[$id]\" value=\"";
 		if ($row[1]>0) {
 			echo $row[1];
