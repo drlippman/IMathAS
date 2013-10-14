@@ -89,24 +89,26 @@
 	//PROCESS ANY TODOS
 	if (isset($_GET['clearattempt']) && isset($_GET['asid']) && $isteacher) {
 		if ($_GET['clearattempt']=="confirmed") {
-			$query = "SELECT assessmentid,lti_sourcedid FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
+			$query = "SELECT ias.assessmentid,ias.lti_sourcedid FROM imas_assessment_sessions AS ias ";
+			$query .= "JOIN imas_assessments AS ia ON ias.assessmentid=ia.id WHERE ias.id='{$_GET['asid']}' AND ia.courseid='$cid'";
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-			$aid = mysql_result($result,0,0);
-			$ltisourcedid = mysql_result($result,0,1);
-			if (strlen($ltisourcedid)>1) {
-				require_once("../includes/ltioutcomes.php");
-				updateLTIgrade('delete',$ltisourcedid,$aid);
+			if (mysql_num_rows($result)>0) {  
+				$aid = mysql_result($result,0,0);
+				$ltisourcedid = mysql_result($result,0,1);
+				if (strlen($ltisourcedid)>1) {
+					require_once("../includes/ltioutcomes.php");
+					updateLTIgrade('delete',$ltisourcedid,$aid);
+				}
+				
+				$qp = getasidquery($_GET['asid']);
+				deleteasidfilesbyquery2($qp[0],$qp[1],$qp[2],1);
+				//deleteasidfilesbyquery(array($qp[0]=>$qp[1]),1);
+				
+				$query = "DELETE FROM imas_assessment_sessions";// WHERE id='{$_GET['asid']}'";
+				$query .= " WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}'";
+				//$query .= getasidquery($_GET['asid']);
+				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
-			
-			$qp = getasidquery($_GET['asid']);
-			deleteasidfilesbyquery2($qp[0],$qp[1],$qp[2],1);
-			//deleteasidfilesbyquery(array($qp[0]=>$qp[1]),1);
-			
-			$query = "DELETE FROM imas_assessment_sessions";// WHERE id='{$_GET['asid']}'";
-			$query .= " WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}'";
-			//$query .= getasidquery($_GET['asid']);
-			mysql_query($query) or die("Query failed : " . mysql_error());
-			
 			if ($from=='isolate') {
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/isolateassessgrade.php?stu=$stu&cid={$_GET['cid']}&aid=$aid&gbmode=$gbmode");
 			} else if ($from=='gisolate') {
@@ -151,37 +153,41 @@
 	if (isset($_GET['clearscores']) && isset($_GET['asid']) && $isteacher) {
 		if ($_GET['clearscores']=="confirmed") {
 			
-			//$whereqry = getasidquery($_GET['asid']);
-			$qp = getasidquery($_GET['asid']);
-			//deleteasidfilesbyquery(array($qp[0]=>$qp[1]),1);
-			deleteasidfilesbyquery2($qp[0],$qp[1],$qp[2],1);
-			$whereqry = " WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}'";
-			$query = "SELECT seeds,lti_sourcedid FROM imas_assessment_sessions $whereqry";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$seeds = explode(',',mysql_result($result,0,0));
-			$ltisourcedid = mysql_result($result,0,1);
-			if (strlen($ltisourcedid)>1) {
-				require_once("../includes/ltioutcomes.php");
-				updateLTIgrade('update',$ltisourcedid,$aid,0);
+			$query = "SELECT ias.assessmentid FROM imas_assessment_sessions AS ias ";
+			$query .= "JOIN imas_assessments AS ia ON ias.assessmentid=ia.id WHERE ias.id='{$_GET['asid']}' AND ia.courseid='$cid'";
+			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			if (mysql_num_rows($result)>0) { //check that is the right cid
+				//$whereqry = getasidquery($_GET['asid']);
+				$qp = getasidquery($_GET['asid']);
+				//deleteasidfilesbyquery(array($qp[0]=>$qp[1]),1);
+				deleteasidfilesbyquery2($qp[0],$qp[1],$qp[2],1);
+				$whereqry = " WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}'";
+				$query = "SELECT seeds,lti_sourcedid FROM imas_assessment_sessions $whereqry";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$seeds = explode(',',mysql_result($result,0,0));
+				$ltisourcedid = mysql_result($result,0,1);
+				if (strlen($ltisourcedid)>1) {
+					require_once("../includes/ltioutcomes.php");
+					updateLTIgrade('update',$ltisourcedid,$aid,0);
+				}
+				
+				
+				$scores = array_fill(0,count($seeds),-1);
+				$attempts = array_fill(0,count($seeds),0);
+				$lastanswers = array_fill(0,count($seeds),'');
+				$scorelist = implode(",",$scores);
+				$attemptslist = implode(",",$attempts);
+				$lalist = implode("~",$lastanswers);
+				$bestscorelist = implode(',',$scores);
+				$bestattemptslist = implode(',',$attempts);
+				$bestseedslist = implode(',',$seeds);
+				$bestlalist = implode('~',$lastanswers);
+				
+				$query = "UPDATE imas_assessment_sessions SET scores='$scorelist;$scorelist',attempts='$attemptslist',lastanswers='$lalist',reattempting='',";
+				$query .= "bestscores='$bestscorelist;$bestscorelist;$bestscorelist',bestattempts='$bestattemptslist',bestseeds='$bestseedslist',bestlastanswers='$bestlalist' ";
+				$query .= $whereqry;//"WHERE id='{$_GET['asid']}'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
-			
-			
-			$scores = array_fill(0,count($seeds),-1);
-			$attempts = array_fill(0,count($seeds),0);
-			$lastanswers = array_fill(0,count($seeds),'');
-			$scorelist = implode(",",$scores);
-			$attemptslist = implode(",",$attempts);
-			$lalist = implode("~",$lastanswers);
-			$bestscorelist = implode(',',$scores);
-			$bestattemptslist = implode(',',$attempts);
-			$bestseedslist = implode(',',$seeds);
-			$bestlalist = implode('~',$lastanswers);
-			
-			$query = "UPDATE imas_assessment_sessions SET scores='$scorelist;$scorelist',attempts='$attemptslist',lastanswers='$lalist',reattempting='',";
-			$query .= "bestscores='$bestscorelist;$bestscorelist;$bestscorelist',bestattempts='$bestattemptslist',bestseeds='$bestseedslist',bestlastanswers='$bestlalist' ";
-			$query .= $whereqry;//"WHERE id='{$_GET['asid']}'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-			//unset($_GET['asid']);
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') ."/gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&from=$from&cid=$cid&uid={$_GET['uid']}");
 		} else {
 			$isgroup = isasidgroup($_GET['asid']);
