@@ -3281,10 +3281,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				if ($answerformat=="equation") {  //if equation, store ratios
 					if (abs($realans)>.000001 && is_numeric($myans[$i])) {
 						$ratios[] = $myans[$i]/$realans;
-						if ($myans[$i]==0 && $realans!=0) {
+						if ($myans[$i]<=.00000001 && $realans!=0) {
 							$cntzero++;
 						}
-					} else if (abs($realans)<=.000001 && is_numeric($myans[$i]) && $myans[$i]==0) {
+					} else if (abs($realans)<=.000001 && is_numeric($myans[$i]) && $myans[$i]<=.00000001) {
 						$cntbothzero++;
 					}
 				} else if ($answerformat=="toconst") {
