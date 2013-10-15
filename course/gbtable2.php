@@ -796,7 +796,7 @@ function gbtable() {
 	//Get assessment scores
 	$assessidx = array_flip($assessments);
 	$query = "SELECT ias.id,ias.assessmentid,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,ias.userid,ia.timelimit FROM imas_assessment_sessions AS ias,imas_assessments AS ia ";
-	$query .= "WHERE ia.id=ias.assessmentid AND ia.courseid='$cid'";
+	$query .= "WHERE ia.id=ias.assessmentid AND ia.courseid='$cid' ORDER BY ias.id";
 	if ($limuser>0) { $query .= " AND ias.userid='$limuser' ";}
 	$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 	while ($l = mysql_fetch_array($result2, MYSQL_ASSOC)) {
@@ -806,6 +806,8 @@ function gbtable() {
 		$i = $assessidx[$l['assessmentid']];
 		$row = $sturow[$l['userid']];
 		$col = $assesscol[$l['assessmentid']];
+		
+		if (isset($gb[$row][1][$col][4])) { continue;} //skip if two asids for same stu/assess. Shouldn't happen
 		
 		$gb[$row][1][$col][4] = $l['id'];; //assessment session id
 		

@@ -46,7 +46,7 @@
 	if ($_GET['asid']=="new" && $isteacher) {
 		$aid = $_GET['aid'];
 		//student could have started, so better check to make sure it still doesn't exist
-		$query = "SELECT id FROM imas_assessment_sessions WHERE userid='{$_GET['uid']}' AND assessmentid='$aid'";
+		$query = "SELECT id FROM imas_assessment_sessions WHERE userid='{$_GET['uid']}' AND assessmentid='$aid' ORDER BY id";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		if (mysql_num_rows($result)>0) {
 			$_GET['asid'] = mysql_result($result,0,0);
@@ -210,7 +210,7 @@
 			$whereqry = " WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}'";
 			//$whereqry = getasidquery($_GET['asid']);
 			
-			$query = "SELECT attempts,lastanswers,reattempting,scores,bestscores,bestattempts,bestlastanswers,lti_sourcedid FROM imas_assessment_sessions $whereqry"; //WHERE id='{$_GET['asid']}'";
+			$query = "SELECT attempts,lastanswers,reattempting,scores,bestscores,bestattempts,bestlastanswers,lti_sourcedid FROM imas_assessment_sessions $whereqry ORDER BY id"; //WHERE id='{$_GET['asid']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$line = mysql_fetch_array($result, MYSQL_ASSOC);
 			if (strpos($line['scores'],';')===false) {
