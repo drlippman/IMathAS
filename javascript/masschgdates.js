@@ -169,6 +169,8 @@ Date.prototype.getWeekDays = function(d) {
   function copydownsub(type,basearr,st,usecb,ctype) {  //type: s,e,r
 	  if (document.getElementById(type+"datetype"+st).value==1) {
 		   var newstartdate = document.getElementById(type+"date"+st).value;
+		   globd.setTime(Date.parse(newstartdate));
+		   var shortd = globd.SHORTDAYS[globd.getDay()]
 		   if (newstartdate!=0 && newstartdate!=2000000000 && basearr[st]!="NA") {
 			  var newstarttime = document.getElementById(type+"time"+st).value; 
 			  for (var i=st+1;i<basearr.length;i++) {
@@ -178,6 +180,7 @@ Date.prototype.getWeekDays = function(d) {
 				  if (basearr[i]!="NA" && document.getElementById(type+"datetype"+i).value==1) {
 					  if (ctype==1) {document.getElementById(type+"date"+i).value = newstartdate;}
 					  document.getElementById(type+"time"+i).value = newstarttime;
+					  document.getElementById(type+"d"+i).innerHTML = shortd ;
 				  }
 			  }
 		   }
