@@ -23,7 +23,9 @@ if (!(isset($teacherid))) {
 
 /******* begin html output ********/
 $placeinhead = "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/assessment/mathtest.css\"/>\n";
-$placeinhead .= "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/assessment/print.css?v=100213\"/>\n";
+if (isset($_POST['versions'])) {
+	$placeinhead .= "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/assessment/print.css?v=100213\"/>\n";
+}
 $placeinhead .= "<script src=\"$imasroot/javascript/AMhelpers.js\" type=\"text/javascript\"></script>\n";
 
 $nologo = true;
@@ -51,6 +53,8 @@ if ($overwriteBody==1) {
 } if (!isset($_POST['versions'])) {
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
 	echo "&gt; Print Test</div>\n";
+	
+	//echo '<div class="cpmid"><a href="printtest.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for printing</a></div>';
 	
 	echo "<h2>Copy-and-paste Print Version</h2>";
 		

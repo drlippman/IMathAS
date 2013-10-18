@@ -30,6 +30,9 @@ if ($overwriteBody==1) {
 	
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
 	echo "&gt; Print Test</div>\n";
+	if (!isset($_POST['heights'])) {
+		echo '<div class="cpmid"><a href="printlayoutbare.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for cut-and-paste</a></div>';
+	}
 	echo '<div id="headerprinttest" class="pagetitle"><h2>Print Test</h2></div>';
 	
 	if (!isset($_POST['heights'])) {
