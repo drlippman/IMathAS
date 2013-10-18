@@ -9,6 +9,8 @@ ini_set("memory_limit", "104857600");
 //IMathAS:  Copy Items utility functions
 //(c) 2008 David Lippman
 $reqscoretrack = array();
+$posttoforumtrack = array();
+$forumtrack = array();
 $qrubrictrack = array();
 $frubrictrack = array();
 $assessnewid = array();
@@ -26,6 +28,7 @@ if (isset($removewithdrawn) && $removewithdrawn) {
 
 function copyitem($itemid,$gbcats,$sethidden=false) {
 	global $cid, $reqscoretrack, $assessnewid, $qrubrictrack, $frubrictrack, $copystickyposts,$userid, $exttooltrack, $outcomes, $removewithdrawn, $replacebyarr;
+	global $posttoforumtrack, $forumtrack;
 	if (!isset($copystickyposts)) { $copystickyposts = false;}
 	if ($gbcats===false) {
 		$gbcats = array();
@@ -139,6 +142,9 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		$query .= "VALUES ('$cid',$row)";
 		mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$newtypeid = mysql_insert_id();
+		if ($_POST['ctc']!=$cid) {
+			$forumtrack[$typeid] = $newtypeid;
+		}
 		if ($rubric != 0) {
 			$frubrictrack[$newtypeid] = $rubric;
 		}
@@ -182,14 +188,14 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		//$query = "INSERT INTO imas_assessments (courseid,name,summary,intro,startdate,enddate,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle) ";
 		//$query .= "SELECT '$cid',name,summary,intro,startdate,enddate,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle FROM imas_assessments WHERE id='$typeid'";
 		//mysql_query($query) or die("Query failed : $query" . mysql_error());
-		$query = "SELECT name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,allowlate,exceptionpenalty,noprint,avail,groupmax,endmsg,deffeedbacktext,eqnhelper,caltag,calrtag,msgtoinstr,istutorial,viddata,reqscore,reqscoreaid,ancestors,defoutcome FROM imas_assessments WHERE id='$typeid'";
+		$query = "SELECT name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,allowlate,exceptionpenalty,noprint,avail,groupmax,endmsg,deffeedbacktext,eqnhelper,caltag,calrtag,tutoredit,posttoforum,msgtoinstr,istutorial,viddata,reqscore,reqscoreaid,ancestors,defoutcome,posttoforum FROM imas_assessments WHERE id='$typeid'";
 
 		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$row = mysql_fetch_assoc($result);
 		if ($sethidden) {$row['avail'] = 0;}
 		if (isset($gbcats[$row['gbcategory']])) {
 			$row['gbcategory'] = $gbcats[$row['gbcategory']];
-		} else {
+		} else if ($_POST['ctc']!=$cid) {
 			$row['gbcategory'] = 0;
 		}
 		if (isset($outcomes[$row['defoutcome']])) {
@@ -202,6 +208,11 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		} else {
 			$row['ancestors'] = $typeid.','.$row['ancestors'];
 		}
+		if ($_POST['ctc']!=$cid) {
+			$forumtopostto = $row['posttoforum'];
+			unset($row['posttoforum']);
+		}
+		
 		$reqscoreaid = $row['reqscoreaid'];
 		unset($row['reqscoreaid']);
 		$row['name'] .= stripslashes($_POST['append']);
@@ -214,6 +225,9 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		$newtypeid = mysql_insert_id();
 		if ($reqscoreaid>0) {
 			$reqscoretrack[$newtypeid] = $reqscoreaid;
+		}
+		if ($_POST['ctc']!=$cid && $forumtopostto>0) {
+			$posttoforumtrack[$newtypeid] = $forumtopostto;
 		}
 		$assessnewid[$typeid] = $newtypeid;
 		$thiswithdrawn = array();
@@ -410,7 +424,7 @@ function copysub($items,$parent,&$addtoarr,$gbcats,$sethidden=false) {
 }	
 
 function doaftercopy($sourcecid) {
-	global $cid,$reqscoretrack,$assessnewid;
+	global $cid,$reqscoretrack,$assessnewid,$forumtrack,$posttoforumtrack;
 	if (intval($cid)==intval($sourcecid)) {
 		$samecourse = true;
 	} else {
@@ -425,6 +439,17 @@ function doaftercopy($sourcecid) {
 				mysql_query($query) or die("Query failed : $query" . mysql_error());
 			} else if (!$samecourse) {
 				$query = "UPDATE imas_assessments SET reqscore=0 WHERE id='$newid'";
+				mysql_query($query) or die("Query failed : $query" . mysql_error());
+			}
+		}
+	}
+	if (count($posttoforumtrack)>0) {
+		foreach ($posttoforumtrack as $newaid=>$oldforumid) {
+			if (isset($forumtrack[$oldforumid])) {
+				$query = "UPDATE imas_assessments SET posttoforum='{$forumtrack[$oldforumid]}' WHERE id='$newaid'";	
+				mysql_query($query) or die("Query failed : $query" . mysql_error());
+			} else {
+				$query = "UPDATE imas_assessments SET posttoforum=0 WHERE id='$newaid'";	
 				mysql_query($query) or die("Query failed : $query" . mysql_error());
 			}
 		}
