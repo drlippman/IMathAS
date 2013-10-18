@@ -474,8 +474,10 @@ if ($overwriteBody==1) {
 ?>
 		<p><b><?php echo _('Course Items'); ?></b><br/>
 			<a href="copyitems.php?cid=<?php echo $cid ?>"><?php echo _('Copy'); ?></a><br/>
-			<a href="../admin/exportitems.php?cid=<?php echo $cid ?>"><?php echo _('Export'); ?></a><br/>
-			<a href="../admin/importitems.php?cid=<?php echo $cid ?>"><?php echo _('Import'); ?></a>
+			<a href="../admin/ccexport.php?cid=<?php echo $cid ?>"><?php echo _('Export'); ?></a>
+		<?php if (!isset($CFG['GEN']['noimathasimportfornonadmins']) || $myrights>=75) { ?>
+			<br/><a href="../admin/importitems.php?cid=<?php echo $cid ?>"><?php echo _('Import'); ?></a>
+		<?php } ?>
 		</p>
 		
 		<p><b><?php echo _('Mass Change'); ?></b><br/>

@@ -27,6 +27,7 @@ if (!(isset($teacherid))) {
 } else {
 
 	$cid = $_GET['cid'];
+	$oktocopy = 1;
 	
 	if (isset($_GET['action'])) {
 		$query = "SELECT imas_courses.id FROM imas_courses,imas_teachers WHERE imas_courses.id=imas_teachers.courseid";
@@ -54,323 +55,343 @@ if (!(isset($teacherid))) {
 					if (!isset($_POST['ekey']) || $ekey != $_POST['ekey']) {
 						$overwriteBody = 1;
 						$body = "Invalid enrollment key entered.  <a href=\"copyitems.php?cid=$cid\">Try Again</a>";
+					} else {
+						$oktocopy = 1;
 					}
 				}
 			}
 		}
-	}
-	if (isset($_GET['action']) && $_GET['action']=="copycalitems") {
-		if (isset($_POST['clearexisting'])) {
-			$query = "DELETE FROM imas_calitems WHERE courseid='$cid'";
-			mysql_query($query) or die("Query failed :$query " . mysql_error());
-		}
-		if (isset($_POST['checked']) && count($_POST['checked'])>0) {
-			$checked = $_POST['checked'];
-			$chklist = "'".implode("','",$checked)."'";
-			$query = "SELECT date,tag,title FROM imas_calitems WHERE id IN ($chklist) AND courseid='{$_POST['ctc']}'";
-			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-			$insarr = array();
-			while ($row = mysql_fetch_row($result)) {
-				$insarr[] = "('$cid','".implode("','",addslashes_deep($row))."')";
-			}
-			$query = "INSERT INTO imas_calitems (courseid,date,tag,title) VALUES ";
-			$query .= implode(',',$insarr);
-			mysql_query($query) or die("Query failed :$query " . mysql_error());
-		}
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
-		exit;	
-	} else if (isset($_GET['action']) && $_GET['action']=="copy") {
-		mysql_query("START TRANSACTION") or die("Query failed :$query " . mysql_error());
-		if (isset($_POST['copycourseopt'])) {
-			$tocopy = 'ancestors,hideicons,allowunenroll,copyrights,msgset,topbar,cploc,picicons,chatset,showlatepass,available,theme';
-			
-			$query = "SELECT $tocopy FROM imas_courses WHERE id='{$_POST['ctc']}'";
-			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-			$row = mysql_fetch_row($result);
-			$tocopyarr = explode(',',$tocopy);
-			if ($row[0]=='') {
-				$row[0] = intval($_POST['ctc']);
-			} else {
-				$row[0] = intval($_POST['ctc']).','.$row[0];
-			}
-			$sets = '';
-			for ($i=0; $i<count($tocopyarr); $i++) {
-				if ($i>0) {$sets .= ',';}
-				$sets .= $tocopyarr[$i] . "='" . addslashes($row[$i])."'";
-			}
-			$query = "UPDATE imas_courses SET $sets WHERE id='$cid'";
-			mysql_query($query) or die("Query failed :$query " . mysql_error());
-		}
-		if (isset($_POST['copygbsetup'])) {
-			$query = "SELECT useweights,orderby,defaultcat,defgbmode,stugbmode,colorize FROM imas_gbscheme WHERE courseid='{$_POST['ctc']}'";
-			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-			$row = mysql_fetch_row($result);
-			$query = "UPDATE imas_gbscheme SET useweights='{$row[0]}',orderby='{$row[1]}',defaultcat='{$row[2]}',defgbmode='{$row[3]}',stugbmode='{$row[4]}',colorize='{$row[5]}' WHERE courseid='$cid'";
-			mysql_query($query) or die("Query failed :$query " . mysql_error());
-			
-			$query = "SELECT id,name,scale,scaletype,chop,dropn,weight,hidden FROM imas_gbcats WHERE courseid='{$_POST['ctc']}'";
-			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-			while ($row = mysql_fetch_row($result)) {
-				$query = "SELECT id FROM imas_gbcats WHERE courseid='$cid' AND name='{$row[1]}'";
-				$r2 = mysql_query($query) or die("Query failed :$query " . mysql_error());
-				if (mysql_num_rows($r2)==0) {
-					$query = "INSERT INTO imas_gbcats (courseid,name,scale,scaletype,chop,dropn,weight,hidden) VALUES ";
-					$frid = array_shift($row);
-					$irow = "'".implode("','",addslashes_deep($row))."'";
-					$query .= "('$cid',$irow)";
-					mysql_query($query) or die("Query failed :$query " . mysql_error());
-					$gbcats[$frid] = mysql_insert_id();
-				} else {
-					$rpid = mysql_result($r2,0,0);
-					$query = "UPDATE imas_gbcats SET scale='{$row[2]}',scaletype='{$row[3]}',chop='{$row[4]}',dropn='{$row[5]}',weight='{$row[6]}',hidden='{$row[7]}' ";
-					$query .= "WHERE id='$rpid'";
-					$gbcats[$row[0]] = $rpid;
-				}
-			}
-		} else {
-			$gbcats = array();
-			$query = "SELECT tc.id,toc.id FROM imas_gbcats AS tc JOIN imas_gbcats AS toc ON tc.name=toc.name WHERE tc.courseid='{$_POST['ctc']}' AND ";
-			$query .= "toc.courseid='$cid'";
-			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-			while ($row = mysql_fetch_row($result)) {
-				$gbcats[$row[0]] = $row[1];
-			}
-		}
-		if (isset($_POST['copyoutcomes'])) {
-			//load any existing outcomes
-			$outcomes = array();
-			$query = "SELECT tc.id,toc.id FROM imas_outcomes AS tc JOIN imas_outcomes AS toc ON tc.name=toc.name WHERE tc.courseid='{$_POST['ctc']}' AND ";
-			$query .= "toc.courseid='$cid'";
-			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-			if (mysql_num_rows($result)>0) {
-				$hasoutcomes = true;
-			} else {
-				$hasoutcomes = false;
-			}
-			while ($row = mysql_fetch_row($result)) {
-				$outcomes[$row[0]] = $row[1];
-			}
-			$newoutcomes = array();
-			$query = "SELECT id,name,ancestors FROM imas_outcomes WHERE courseid='{$_POST['ctc']}'";
-			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-			while ($row = mysql_fetch_row($result)) {
-				if (isset($outcomes[$row[0]])) { continue;}
-				if ($row[2]=='') {
-					$row[2] = $row[0];
-				} else {
-					$row[2] = $row[0].','.$row[2];
-				}
-				$row[1] = addslashes($row[1]);
-				$query = "INSERT INTO imas_outcomes (courseid,name,ancestors) VALUES ";
-				$query .= "('$cid','{$row[1]}','{$row[2]}')";
+	} 
+	if ($oktocopy == 1) {
+		if (isset($_GET['action']) && $_GET['action']=="copycalitems") {
+			if (isset($_POST['clearexisting'])) {
+				$query = "DELETE FROM imas_calitems WHERE courseid='$cid'";
 				mysql_query($query) or die("Query failed :$query " . mysql_error());
-				$outcomes[$row[0]] = mysql_insert_id();
-				$newoutcomes[] = $outcomes[$row[0]];
 			}
-			
-			if ($hasoutcomes) {
-				//already has outcomes, so we'll just add to the end of the existing list new outcomes
-				$query = "SELECT outcomes FROM imas_courses WHERE id='$cid'";
+			if (isset($_POST['checked']) && count($_POST['checked'])>0) {
+				$checked = $_POST['checked'];
+				$chklist = "'".implode("','",$checked)."'";
+				$query = "SELECT date,tag,title FROM imas_calitems WHERE id IN ($chklist) AND courseid='{$_POST['ctc']}'";
+				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+				$insarr = array();
+				while ($row = mysql_fetch_row($result)) {
+					$insarr[] = "('$cid','".implode("','",addslashes_deep($row))."')";
+				}
+				$query = "INSERT INTO imas_calitems (courseid,date,tag,title) VALUES ";
+				$query .= implode(',',$insarr);
+				mysql_query($query) or die("Query failed :$query " . mysql_error());
+			}
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+			exit;	
+		} else if (isset($_GET['action']) && $_GET['action']=="copy") {
+			if ($_POST['whattocopy']=='all') {
+				$_POST['copycourseopt'] = 1;
+				$_POST['copygbsetup'] = 1;
+				$_POST['removewithdrawn'] = 1;
+				$_POST['usereplaceby'] = 1;
+				$_POST['copyrubrics'] = 1;
+				$_POST['copyoutcomes'] = 1;
+				$_POST['copystickyposts'] = 1;
+				$_POST['append'] = '';
+				$_POST['addto'] = 'none';
+			}
+			mysql_query("START TRANSACTION") or die("Query failed :$query " . mysql_error());
+			if (isset($_POST['copycourseopt'])) {
+				$tocopy = 'ancestors,hideicons,allowunenroll,copyrights,msgset,topbar,cploc,picicons,chatset,showlatepass,available,theme';
+				
+				$query = "SELECT $tocopy FROM imas_courses WHERE id='{$_POST['ctc']}'";
 				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 				$row = mysql_fetch_row($result);
-				$outcomesarr = unserialize($row[0]);
-				foreach ($newoutcomes as $o) {
-					$outcomesarr[] = $o;
+				$tocopyarr = explode(',',$tocopy);
+				if ($row[0]=='') {
+					$row[0] = intval($_POST['ctc']);
+				} else {
+					$row[0] = intval($_POST['ctc']).','.$row[0];
+				}
+				$sets = '';
+				for ($i=0; $i<count($tocopyarr); $i++) {
+					if ($i>0) {$sets .= ',';}
+					$sets .= $tocopyarr[$i] . "='" . addslashes($row[$i])."'";
+				}
+				$query = "UPDATE imas_courses SET $sets WHERE id='$cid'";
+				mysql_query($query) or die("Query failed :$query " . mysql_error());
+			}
+			if (isset($_POST['copygbsetup'])) {
+				$query = "SELECT useweights,orderby,defaultcat,defgbmode,stugbmode,colorize FROM imas_gbscheme WHERE courseid='{$_POST['ctc']}'";
+				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+				$row = mysql_fetch_row($result);
+				$query = "UPDATE imas_gbscheme SET useweights='{$row[0]}',orderby='{$row[1]}',defaultcat='{$row[2]}',defgbmode='{$row[3]}',stugbmode='{$row[4]}',colorize='{$row[5]}' WHERE courseid='$cid'";
+				mysql_query($query) or die("Query failed :$query " . mysql_error());
+				
+				$query = "SELECT id,name,scale,scaletype,chop,dropn,weight,hidden FROM imas_gbcats WHERE courseid='{$_POST['ctc']}'";
+				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+				while ($row = mysql_fetch_row($result)) {
+					$query = "SELECT id FROM imas_gbcats WHERE courseid='$cid' AND name='{$row[1]}'";
+					$r2 = mysql_query($query) or die("Query failed :$query " . mysql_error());
+					if (mysql_num_rows($r2)==0) {
+						$query = "INSERT INTO imas_gbcats (courseid,name,scale,scaletype,chop,dropn,weight,hidden) VALUES ";
+						$frid = array_shift($row);
+						$irow = "'".implode("','",addslashes_deep($row))."'";
+						$query .= "('$cid',$irow)";
+						mysql_query($query) or die("Query failed :$query " . mysql_error());
+						$gbcats[$frid] = mysql_insert_id();
+					} else {
+						$rpid = mysql_result($r2,0,0);
+						$query = "UPDATE imas_gbcats SET scale='{$row[2]}',scaletype='{$row[3]}',chop='{$row[4]}',dropn='{$row[5]}',weight='{$row[6]}',hidden='{$row[7]}' ";
+						$query .= "WHERE id='$rpid'";
+						$gbcats[$row[0]] = $rpid;
+					}
 				}
 			} else {
-				//rewrite whole order
-				$query = "SELECT outcomes FROM imas_courses WHERE id='{$_POST['ctc']}'";
+				$gbcats = array();
+				$query = "SELECT tc.id,toc.id FROM imas_gbcats AS tc JOIN imas_gbcats AS toc ON tc.name=toc.name WHERE tc.courseid='{$_POST['ctc']}' AND ";
+				$query .= "toc.courseid='$cid'";
 				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-				$row = mysql_fetch_row($result);
-				function updateoutcomes(&$arr) {
-					global $outcomes;
-					foreach ($arr as $k=>$v) {
-						if (is_array($v)) {
-							updateoutcomes($arr[$k]['outcomes']);
-						} else {
-							$arr[$k] = $outcomes[$v];
+				while ($row = mysql_fetch_row($result)) {
+					$gbcats[$row[0]] = $row[1];
+				}
+			}
+			if (isset($_POST['copyoutcomes'])) {
+				//load any existing outcomes
+				$outcomes = array();
+				$query = "SELECT tc.id,toc.id FROM imas_outcomes AS tc JOIN imas_outcomes AS toc ON tc.name=toc.name WHERE tc.courseid='{$_POST['ctc']}' AND ";
+				$query .= "toc.courseid='$cid'";
+				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+				if (mysql_num_rows($result)>0) {
+					$hasoutcomes = true;
+				} else {
+					$hasoutcomes = false;
+				}
+				while ($row = mysql_fetch_row($result)) {
+					$outcomes[$row[0]] = $row[1];
+				}
+				$newoutcomes = array();
+				$query = "SELECT id,name,ancestors FROM imas_outcomes WHERE courseid='{$_POST['ctc']}'";
+				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+				while ($row = mysql_fetch_row($result)) {
+					if (isset($outcomes[$row[0]])) { continue;}
+					if ($row[2]=='') {
+						$row[2] = $row[0];
+					} else {
+						$row[2] = $row[0].','.$row[2];
+					}
+					$row[1] = addslashes($row[1]);
+					$query = "INSERT INTO imas_outcomes (courseid,name,ancestors) VALUES ";
+					$query .= "('$cid','{$row[1]}','{$row[2]}')";
+					mysql_query($query) or die("Query failed :$query " . mysql_error());
+					$outcomes[$row[0]] = mysql_insert_id();
+					$newoutcomes[] = $outcomes[$row[0]];
+				}
+				
+				if ($hasoutcomes) {
+					//already has outcomes, so we'll just add to the end of the existing list new outcomes
+					$query = "SELECT outcomes FROM imas_courses WHERE id='$cid'";
+					$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+					$row = mysql_fetch_row($result);
+					$outcomesarr = unserialize($row[0]);
+					foreach ($newoutcomes as $o) {
+						$outcomesarr[] = $o;
+					}
+				} else {
+					//rewrite whole order
+					$query = "SELECT outcomes FROM imas_courses WHERE id='{$_POST['ctc']}'";
+					$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+					$row = mysql_fetch_row($result);
+					function updateoutcomes(&$arr) {
+						global $outcomes;
+						foreach ($arr as $k=>$v) {
+							if (is_array($v)) {
+								updateoutcomes($arr[$k]['outcomes']);
+							} else {
+								$arr[$k] = $outcomes[$v];
+							}
 						}
 					}
+					$outcomesarr = unserialize($row[0]);
+					updateoutcomes($outcomesarr);
 				}
-				$outcomesarr = unserialize($row[0]);
-				updateoutcomes($outcomesarr);
-			}
-			$newoutcomearr = addslashes(serialize($outcomesarr));
-			$query = "UPDATE imas_courses SET outcomes='$newoutcomearr' WHERE id='$cid'";
-			mysql_query($query) or die("Query failed :$query " . mysql_error());
-			
-		} else {
-			$outcomes = array();
-			$query = "SELECT tc.id,toc.id FROM imas_outcomes AS tc JOIN imas_outcomes AS toc ON tc.name=toc.name WHERE tc.courseid='{$_POST['ctc']}' AND ";
-			$query .= "toc.courseid='$cid'";
-			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-			while ($row = mysql_fetch_row($result)) {
-				$outcomes[$row[0]] = $row[1];
-			}
-		}
-		
-		if (isset($_POST['removewithdrawn'])) {
-			$removewithdrawn = true;
-		}
-		if (isset($_POST['usereplaceby'])) {
-			$usereplaceby = "all";
-			$query = 'SELECT imas_questionset.id,imas_questionset.replaceby FROM imas_questionset JOIN ';
-			$query .= 'imas_questions ON imas_questionset.id=imas_questions.questionsetid JOIN ';
-			$query .= 'imas_assessments ON imas_assessments.id=imas_questions.assessmentid WHERE ';
-			$query .= "imas_assessments.courseid='{$_POST['ctc']}' AND imas_questionset.replaceby>0";
-			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-			while ($row = mysql_fetch_row($result)) {
-				$replacebyarr[$row[0]] = $row[1];  
-			}
-		}
-		
-		if (isset($_POST['checked'])) {
-			$checked = $_POST['checked'];
-			$query = "SELECT blockcnt FROM imas_courses WHERE id='$cid'";
-			$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-			$blockcnt = mysql_result($result,0,0);
-			
-			$query = "SELECT itemorder FROM imas_courses WHERE id='{$_POST['ctc']}'";
-			$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-			$items = unserialize(mysql_result($result,0,0));
-			$newitems = array();
-			
-			if (isset($_POST['copystickyposts'])) {
-				$copystickyposts = true;
+				$newoutcomearr = addslashes(serialize($outcomesarr));
+				$query = "UPDATE imas_courses SET outcomes='$newoutcomearr' WHERE id='$cid'";
+				mysql_query($query) or die("Query failed :$query " . mysql_error());
+				
 			} else {
-				$copystickyposts = false;
+				$outcomes = array();
+				$query = "SELECT tc.id,toc.id FROM imas_outcomes AS tc JOIN imas_outcomes AS toc ON tc.name=toc.name WHERE tc.courseid='{$_POST['ctc']}' AND ";
+				$query .= "toc.courseid='$cid'";
+				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+				while ($row = mysql_fetch_row($result)) {
+					$outcomes[$row[0]] = $row[1];
+				}
 			}
 			
-			copysub($items,'0',$newitems,$gbcats,isset($_POST['copyhidden']));
-			doaftercopy($_POST['ctc']);
+			if (isset($_POST['removewithdrawn'])) {
+				$removewithdrawn = true;
+			}
+			if (isset($_POST['usereplaceby'])) {
+				$usereplaceby = "all";
+				$query = 'SELECT imas_questionset.id,imas_questionset.replaceby FROM imas_questionset JOIN ';
+				$query .= 'imas_questions ON imas_questionset.id=imas_questions.questionsetid JOIN ';
+				$query .= 'imas_assessments ON imas_assessments.id=imas_questions.assessmentid WHERE ';
+				$query .= "imas_assessments.courseid='{$_POST['ctc']}' AND imas_questionset.replaceby>0";
+				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+				while ($row = mysql_fetch_row($result)) {
+					$replacebyarr[$row[0]] = $row[1];  
+				}
+			}
+			
+			if (isset($_POST['checked']) || $_POST['whattocopy']=='all') {
+				$checked = $_POST['checked'];
+				$query = "SELECT blockcnt FROM imas_courses WHERE id='$cid'";
+				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+				$blockcnt = mysql_result($result,0,0);
+				
+				$query = "SELECT itemorder FROM imas_courses WHERE id='{$_POST['ctc']}'";
+				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+				$items = unserialize(mysql_result($result,0,0));
+				$newitems = array();
+				
+				if (isset($_POST['copystickyposts'])) {
+					$copystickyposts = true;
+				} else {
+					$copystickyposts = false;
+				}
+				
+				if ($_POST['whattocopy']=='all') {
+					copyallsub($items,'0',$newitems,$gbcats);
+				} else {
+					copysub($items,'0',$newitems,$gbcats,isset($_POST['copyhidden']));
+				}
+				doaftercopy($_POST['ctc']);
+				
+				$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+				$items = unserialize(mysql_result($result,0,0));
+				if ($_POST['addto']=="none") {
+					array_splice($items,count($items),0,$newitems);
+				} else {
+					$blocktree = explode('-',$_POST['addto']);
+					$sub =& $items;
+					for ($i=1;$i<count($blocktree);$i++) {
+						$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
+					}
+					array_splice($sub,count($sub),0,$newitems);
+				}
+				$itemorder = addslashes(serialize($items));
+				if ($itemorder!='') {
+					$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt' WHERE id='$cid'";
+					mysql_query($query) or die("Query failed : $query" . mysql_error());
+				}
+			}	
+			$offlinerubrics = array();
+			if (isset($_POST['copyoffline'])) {
+				$query = "SELECT name,points,showdate,gbcategory,cntingb,tutoredit,rubric FROM imas_gbitems WHERE courseid='{$_POST['ctc']}'";
+				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+				$insarr = array();
+				while ($row = mysql_fetch_row($result)) {
+					$rubric = array_pop($row);
+					if (isset($gbcats[$row[3]])) {
+						$row[3] = $gbcats[$row[3]];
+					} else {
+						$row[3] = 0;
+					}
+					$ins = "('$cid','".implode("','",addslashes_deep($row))."')";
+					$query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit) VALUES $ins";
+					mysql_query($query) or die("Query failed :$query " . mysql_error());
+					if ($rubric>0) {
+						$offlinerubrics[mysql_insert_id()] = $rubric;
+					}
+				}
+			}
+			if (isset($_POST['copyrubrics'])) {
+				copyrubrics($offlinerubrics);
+			}
+			mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
+			if (isset($_POST['selectcalitems'])) {
+				$_GET['action']='selectcalitems';
+				$calitems = array();
+				$query = "SELECT id,date,tag,title FROM imas_calitems WHERE courseid='{$_POST['ctc']}' ORDER BY date";
+				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+				while ($row = mysql_fetch_row($result)) {
+					$calitems[] = $row;
+				}
+			} else {
+				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+		
+				exit;
+			}
+			
+		} elseif (isset($_GET['action']) && $_GET['action']=="select") { //DATA MANIPULATION FOR second option
+		
+			$query = "SELECT itemorder FROM imas_courses WHERE id='{$_POST['ctc']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		
+			$items = unserialize(mysql_result($result,0,0));
+			$ids = array();
+			$types = array();
+			$names = array();
+			$sums = array();
+			$parents = array();
+			getsubinfo($items,'0','');
 			
 			$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-			$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$items = unserialize(mysql_result($result,0,0));
-			if ($_POST['addto']=="none") {
-				array_splice($items,count($items),0,$newitems);
-			} else {
-				$blocktree = explode('-',$_POST['addto']);
-				$sub =& $items;
-				for ($i=1;$i<count($blocktree);$i++) {
-					$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
+			$existblocks = array();
+		
+			buildexistblocks($items,'0');
+			
+			$i=0;
+			$page_blockSelect = array();
+			
+			foreach ($existblocks as $k=>$name) {
+				$page_blockSelect['val'][$i] = $k;
+				$page_blockSelect['label'][$i] = $name;
+				$i++;
+			}
+			
+		} else if (isset($_GET['loadothers'])) {
+			$query = "SELECT id,name FROM imas_groups";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			if (mysql_num_rows($result)>0) {
+				$page_hasGroups=true;
+				$grpnames = array();
+				$grpnames[0] = "Default Group";
+				while ($row = mysql_fetch_row($result)) {
+					$grpnames[$row[0]] = $row[1];
 				}
-				array_splice($sub,count($sub),0,$newitems);
-			}
-			$itemorder = addslashes(serialize($items));
-			if ($itemorder!='') {
-				$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt' WHERE id='$cid'";
-				mysql_query($query) or die("Query failed : $query" . mysql_error());
-			}
-		}	
-		$offlinerubrics = array();
-		if (isset($_POST['copyoffline'])) {
-			$query = "SELECT name,points,showdate,gbcategory,cntingb,tutoredit,rubric FROM imas_gbitems WHERE courseid='{$_POST['ctc']}'";
-			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-			$insarr = array();
+			}	
+			
+			$query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid,iu.groupid FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu,imas_groups WHERE ";
+			$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid=imas_groups.id AND iu.groupid<>'$groupid' AND iu.id<>'$userid' AND ic.available<4 ORDER BY imas_groups.name,iu.LastName,iu.FirstName,ic.name";
+			$courseGroupResults = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+			
+			
+		} else { //DATA MANIPULATION FOR DEFAULT LOAD
+		
+			$query = "SELECT ic.id,ic.name FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$userid' and ic.id<>'$cid' AND ic.available<4 ORDER BY ic.name";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$i=0;
+			$page_mineList = array();
 			while ($row = mysql_fetch_row($result)) {
-				$rubric = array_pop($row);
-				if (isset($gbcats[$row[3]])) {
-					$row[3] = $gbcats[$row[3]];
-				} else {
-					$row[3] = 0;
-				}
-				$ins = "('$cid','".implode("','",addslashes_deep($row))."')";
-				$query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit) VALUES $ins";
-				mysql_query($query) or die("Query failed :$query " . mysql_error());
-				if ($rubric>0) {
-					$offlinerubrics[mysql_insert_id()] = $rubric;
-				}
-			}
+				$page_mineList['val'][$i] = $row[0];
+				$page_mineList['label'][$i] = $row[1];
+				$i++;
+			}	
+			
+			$query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu WHERE ";
+			$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid='$groupid' AND iu.id<>'$userid' AND ic.available<4 ORDER BY iu.LastName,iu.FirstName,ic.name";
+			$courseTreeResult = mysql_query($query) or die("Query failed : " . mysql_error());
+			$lastteacher = 0;
+			
+			
+			//$query = "SELECT ic.id,ic.name,ic.copyrights FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$templateuser' AND ic.available<4 ORDER BY ic.name";
+			$query = "SELECT id,name,copyrights FROM imas_courses WHERE (istemplate&1)=1 AND copyrights=2 AND available<4 ORDER BY name";
+			$courseTemplateResults = mysql_query($query) or die("Query failed : " . mysql_error());
+			
+			$query = "SELECT ic.id,ic.name,ic.copyrights FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE ";
+			$query .= "iu.groupid='$groupid' AND (ic.istemplate&2)=2 AND ic.copyrights>0 AND ic.available<4 ORDER BY ic.name";
+			$groupTemplateResults = mysql_query($query) or die("Query failed : " . mysql_error());
 		}
-		if (isset($_POST['copyrubrics'])) {
-			copyrubrics($offlinerubrics);
-		}
-		mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
-		if (isset($_POST['selectcalitems'])) {
-			$_GET['action']='selectcalitems';
-			$calitems = array();
-			$query = "SELECT id,date,tag,title FROM imas_calitems WHERE courseid='{$_POST['ctc']}' ORDER BY date";
-			$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-			while ($row = mysql_fetch_row($result)) {
-				$calitems[] = $row;
-			}
-		} else {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
-	
-			exit;
-		}
-	} elseif (isset($_GET['action']) && $_GET['action']=="select") { //DATA MANIPULATION FOR second option
-	
-		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_POST['ctc']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	
-		$items = unserialize(mysql_result($result,0,0));
-		$ids = array();
-		$types = array();
-		$names = array();
-		$sums = array();
-		$parents = array();
-		getsubinfo($items,'0','');
-		
-		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$items = unserialize(mysql_result($result,0,0));
-		$existblocks = array();
-	
-		buildexistblocks($items,'0');
-		
-		$i=0;
-		$page_blockSelect = array();
-		
-		foreach ($existblocks as $k=>$name) {
-			$page_blockSelect['val'][$i] = $k;
-			$page_blockSelect['label'][$i] = $name;
-			$i++;
-		}
-		
-	} else if (isset($_GET['loadothers'])) {
-		$query = "SELECT id,name FROM imas_groups";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		if (mysql_num_rows($result)>0) {
-			$page_hasGroups=true;
-			$grpnames = array();
-			$grpnames[0] = "Default Group";
-			while ($row = mysql_fetch_row($result)) {
-				$grpnames[$row[0]] = $row[1];
-			}
-		}	
-		
-		$query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid,iu.groupid FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu,imas_groups WHERE ";
-		$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid=imas_groups.id AND iu.groupid<>'$groupid' AND iu.id<>'$userid' AND ic.available<4 ORDER BY imas_groups.name,iu.LastName,iu.FirstName,ic.name";
-		$courseGroupResults = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-		
-		
-	} else { //DATA MANIPULATION FOR DEFAULT LOAD
-	
-		$query = "SELECT ic.id,ic.name FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$userid' and ic.id<>'$cid' AND ic.available<4 ORDER BY ic.name";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$i=0;
-		$page_mineList = array();
-		while ($row = mysql_fetch_row($result)) {
-			$page_mineList['val'][$i] = $row[0];
-			$page_mineList['label'][$i] = $row[1];
-			$i++;
-		}	
-		
-		$query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu WHERE ";
-		$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid='$groupid' AND iu.id<>'$userid' AND ic.available<4 ORDER BY iu.LastName,iu.FirstName,ic.name";
-		$courseTreeResult = mysql_query($query) or die("Query failed : " . mysql_error());
-		$lastteacher = 0;
-		
-		
-		//$query = "SELECT ic.id,ic.name,ic.copyrights FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$templateuser' AND ic.available<4 ORDER BY ic.name";
-		$query = "SELECT id,name,copyrights FROM imas_courses WHERE (istemplate&1)=1 AND copyrights=2 AND available<4 ORDER BY name";
-		$courseTemplateResults = mysql_query($query) or die("Query failed : " . mysql_error());
-		
-		$query = "SELECT ic.id,ic.name,ic.copyrights FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE ";
-		$query .= "iu.groupid='$groupid' AND (ic.istemplate&2)=2 AND ic.copyrights>0 AND ic.available<4 ORDER BY ic.name";
-		$groupTemplateResults = mysql_query($query) or die("Query failed : " . mysql_error());
 	}
 }
 /******* begin html output ********/
@@ -378,7 +399,13 @@ if (!(isset($teacherid))) {
 if (!isset($_GET['loadothers'])) {
 $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/libtree.js\"></script>\n";
 $placeinhead .= "<style type=\"text/css\">\n<!--\n@import url(\"$imasroot/course/libtree.css\");\n-->\n</style>\n";
-
+$placeinhead .= '<script type="text/javascript">
+	function updatetocopy(el) {
+		if (el.value=="all") {
+			$("#selectitemstocopy").hide();$("#allitemsnote").show();
+		} else {
+			$("#selectitemstocopy").show();$("#allitemsnote").hide();
+		} }</script>';
 require("../header.php");
 }
 if ($overwriteBody==1) {
@@ -449,6 +476,13 @@ if ($overwriteBody==1) {
 	<form id="qform" method=post action="copyitems.php?cid=<?php echo $cid ?>&action=copy">
 	<input type=hidden name=ekey id=ekey value="<?php echo $_POST['ekey'] ?>">
 	<input type=hidden name=ctc id=ctc value="<?php echo $_POST['ctc'] ?>">
+	What to copy: <select name="whattocopy" onchange="updatetocopy(this)">
+		<option value="all">Copy whole course</option>
+		<option value="select">Select items to copy</option>
+	</select>
+	<p id="allitemsnote">Copying the whole course will also copy (and overwrite) course settings, gradebook categories, outcomes, and rubrics.  
+	  For options, choose "Select items to copy" instead.</p>
+	<div id="selectitemstocopy" style="display:none;">
 	<h4>Select Items to Copy</h4>
 	Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
 	
@@ -510,6 +544,7 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 	</td></tr>
 	</tbody>
 	</table>
+	</div>
 	<p><input type=submit value="Copy Items"></p>
 	</form>
 <?php

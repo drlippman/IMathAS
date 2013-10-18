@@ -178,6 +178,7 @@ if ($overwriteBody==1) {
 		function toggleBrokenFlagmsg(tagged) {
 			document.getElementById("brokenmsgbad").style.display = (tagged==1)?"block":"none";
 			document.getElementById("brokenmsgok").style.display = (tagged==1)?"none":"block";
+			if (tagged==1) {alert("Make sure you also contact the question author or support so they know why you marked the question as broken");}
 		}
 	</script>
 	<?php

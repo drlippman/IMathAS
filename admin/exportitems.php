@@ -439,7 +439,10 @@ if ($overwriteBody==1) {
 ?>
 
 	<?php echo $curBreadcrumb; ?>
-	<h3>Export Course Items</h3>
+	<div class="cpmid"><a href="ccexport.php?cid=<?php echo $cid ?>">Export for another Learning Management System</a></div>
+	
+	<h2>Export Course Items</h2>
+	
 	<p>This page will let you export your course items for backup or transfer to
 	another server running this software.</p>
 	

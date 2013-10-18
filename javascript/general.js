@@ -418,9 +418,16 @@ function togglevideoembed() {
 		}
 	} else {
 		var href = $(this).prev().attr('href');
+		var qsconn = '?';
 		if (href.match(/youtube\.com/)) {
-			var vidid = href.split('v=')[1].split(/[#&]/)[0];
-			var vidsrc = 'www.youtube.com/embed/';
+			if (href.indexOf('playlist?list=')>-1) {
+				var vidid = href.split('list=')[1].split(/[#&]/)[0];
+				var vidsrc = 'www.youtube.com/embed/videoseries?list=';
+				qsconn = '&'
+			} else {
+				var vidid = href.split('v=')[1].split(/[#&]/)[0];
+				var vidsrc = 'www.youtube.com/embed/';
+			}
 		} else if (href.match(/youtu\.be/)) {
 			var vidid = href.split('.be/')[1].split(/[#&]/)[0];
 			var vidsrc = 'www.youtube.com/embed/';
@@ -430,9 +437,9 @@ function togglevideoembed() {
 		}
 		var m = href.match(/.*t=((\d+)m)?((\d+)s)?.*/);
 		if (m == null) {
-			var timeref = '?rel=0';
+			var timeref = qsconn+'rel=0';
 		} else {
-			var timeref = '?rel=0&start='+((m[2]?m[2]*60:0) + (m[4]?m[4]*1:0));
+			var timeref = qsconn+'rel=0&start='+((m[2]?m[2]*60:0) + (m[4]?m[4]*1:0));
 		}
 		$('<iframe/>', {
 			id: 'videoiframe'+id,

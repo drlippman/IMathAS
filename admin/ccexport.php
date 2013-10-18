@@ -16,7 +16,11 @@ $loadgraphfilter = 1;
 	
 require("../header.php");
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Common Cartridge Export</div>\n";
-	
+
+if (!isset($CFG['GEN']['noimathasexportfornonadmins']) || $myrights>=75) {
+	echo '<div class="cpmid"><a href="exportitems.php?cid='.$cid.'">Export for another IMathAS system or as a backup for this system</a></div>';
+}
+
 $path = realpath("../course/files");
 
 if (isset($_GET['delete'])) {
@@ -537,10 +541,15 @@ if (isset($_GET['delete'])) {
 	echo 'does, assessments are exported as LTI (learning tools interoperability) placements back to this system.  Not all LMSs ';
 	echo 'support this standard yet, so your assessments may not transfer.  If they do, you will need to set up the LTI tool on your LMS ';
 	echo 'to work with this system by supplying an LTI key and secret.  If this system and your LMS have domain credentials set up, you may not have to do ';
-	echo 'anything.  Otherwise, you can use the LTI key you set in your course settings, along with the key placein_###_0 (if you want students ';
+	echo 'anything.  Otherwise, you can use the LTI secret you set in your course settings, along with the key placein_###_0 (if you want students ';
 	echo 'to create an account on this system) or placein_###_1 (if you want students to only be able to log in through the LMS), where ### is ';
-	echo 'replaced with your course key.  If you do not see the LTI key setting in your course settings, then your system administrator does ';
+	echo 'replaced with your course key.  <b>Important:</b> The key form placein_###_1 is necessary if you want grades from '.$installname.' to be ';
+	echo 'reported back to the LMS automatically.  ';
+	echo 'If you do not see the LTI key setting in your course settings, then your system administrator does ';
 	echo 'not have LTI enabled on your system, and you cannot use this feature.</p>';
+	if ($enablebasiclti==false) {
+		echo '<p style="color:red">Note: Your system does not currenltly have LTI enabled.  Contact your system administrator</p>';
+	}
 	echo "<p><a href=\"ccexport.php?cid=$cid&create=true&type=custom\">Create CC Export</a> with LTI placements as custom fields (works in BlackBoard)</p>";
 	echo "<p><a href=\"ccexport.php?cid=$cid&create=true&type=url\">Create CC Export</a> with LTI placements in URLs (works in Moodle)</p>";
 	echo "<p><a href=\"ccexport.php?cid=$cid&create=true&type=canvas\">Create CC+custom Export</a> (works in Canvas)</p>";

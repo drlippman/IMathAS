@@ -289,10 +289,10 @@ switch($_GET['action']) {
 				mysql_query($query) or die("Query failed :$query " . mysql_error());
 				
 				$gbcats = array();
-				$query = "SELECT id,name,scale,scaletype,chop,dropn,weight FROM imas_gbcats WHERE courseid='{$_POST['usetemplate']}'";
+				$query = "SELECT id,name,scale,scaletype,chop,dropn,weight,hidden FROM imas_gbcats WHERE courseid='{$_POST['usetemplate']}'";
 				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 				while ($row = mysql_fetch_row($result)) {
-					$query = "INSERT INTO imas_gbcats (courseid,name,scale,scaletype,chop,dropn,weight) VALUES ";
+					$query = "INSERT INTO imas_gbcats (courseid,name,scale,scaletype,chop,dropn,weight,hidden) VALUES ";
 					$frid = array_shift($row);
 					$irow = "'".implode("','",addslashes_deep($row))."'";
 					$query .= "('$cid',$irow)";
