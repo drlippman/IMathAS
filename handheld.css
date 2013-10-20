@@ -74,4 +74,12 @@ div.inactivewrapper span.instronly {
 div.breadcrumb {
 	height: auto !important;
 }
-
+ul#navlist {
+	width: 100% !important;
+	margin: 0px !important;
+}
+ul#navlist a {
+	padding-top: 0.3em !important;
+	padding-bottom: 0.3em !important;
+	border-bottom: 1px solid #fff;
+}
