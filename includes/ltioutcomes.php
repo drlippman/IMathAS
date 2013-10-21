@@ -268,11 +268,15 @@ function updateLTIgrade($action,$sourcedid,$aid,$grade=0) {
 					}
 				}
 			} else if ($keytype=='c') {
-				if (!isset($testsettings)) {
+				/*if (!isset($testsettings)) {
 					$qr = "SELECT ltisecret FROM imas_courses WHERE id='$cid'"; //if from gb-viewasid
 				} else {
 					$qr = "SELECT ltisecret FROM imas_courses WHERE id='{$testsettings['courseid']}'";
-				}
+				}*/
+				//change to use launched key rather than key from course in case someone uses material
+				//from multiple imathas courses in one LMS course.
+				$keyparts = explode('_',$ltikey);
+				$qr = "SELECT ltisecret FROM imas_courses WHERE id=".intval($keyparts[1]);
 				$res= mysql_query($qr) or die("Query failed : $qr" . mysql_error());
 				if (mysql_num_rows($res)>0) {
 					$secret = mysql_result($res,0,0);
