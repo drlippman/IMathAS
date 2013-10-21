@@ -3,7 +3,7 @@ require("../validate.php");
 if ($myrights<100) {
 	exit;
 }
-if (isset($_GET['cid'])) {
+if (isset($_REQUEST['cid'])) {
 	$query = "SELECT itemorder,blockcnt FROM imas_courses WHERE id='{$_GET['cid']}'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$items = unserialize(mysql_result($result,0,0));
