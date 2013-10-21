@@ -741,7 +741,7 @@ if (!isset($_POST['embedpostback'])) {
 		$placeinhead .= '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
 		
 	} else if ($testsettings['eqnhelper']==3 || $testsettings['eqnhelper']==4) {
-		$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/assessment/mathquill.css?v=030212\" type=\"text/css\" />";
+		$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/assessment/mathquill.css?v=102113\" type=\"text/css\" />";
 		if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE')!==false) {
 			$placeinhead .= '<!--[if lte IE 7]><style style="text/css">
 				.mathquill-editable.empty { width: 0.5em; }
@@ -751,9 +751,9 @@ if (!isset($_POST['embedpostback'])) {
 				.mathquill-rendered-math .denominator { clear: both;width: auto;float: left;}
 				</style><![endif]-->';
 		}
-		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquill_min.js?v=030112\"></script>";
-		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquilled.js?v=082513\"></script>";
-		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/AMtoMQ.js?v=030112\"></script>";
+		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquill_min.js?v=102113\"></script>";
+		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquilled.js?v=102113\"></script>";
+		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/AMtoMQ.js?v=102113\"></script>";
 		$placeinhead .= '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
 		
 	} 

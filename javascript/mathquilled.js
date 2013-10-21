@@ -7,7 +7,7 @@ $(function() {
         var hasTouch = 'ontouchstart' in document.documentElement;
         mqarea = $('.mathquill-editable');
 	$('.mathquill-rendered-math').mathquill('redraw');
-  	mqarea.find('textarea').focus();
+  	mqarea.find('input,textarea').focus();
   	$('input,textarea').attr('autocapitalize', 'off');
 
   	
@@ -20,11 +20,14 @@ $(function() {
 			$(this).addClass("mqeeclick");	
 		}).bind('mouseout', function () {
 			$(this).removeClass("mqeehighlight");
+			$(this).removeClass("mqeeclick");
 		}).bind('mouseup', function () {
 			$(this).removeClass("mqeeclick");
 		}).bind('click',mqeeinsert);
 		$('#mqeeclosebutton').bind('click',hideee);
   		$('#mqeetopbar').mousedown(function(evt) {
+  			if (evt.preventDefault) {evt.preventDefault()};
+  			$("body").addClass("unselectable");
 			mqmousebase = {left:evt.pageX, top: evt.pageY};
 			$("body").bind('mousemove',mqeemousemove);
 			$("body").mouseup(function(event) {
@@ -32,6 +35,7 @@ $(function() {
 				lasteepos.left = p.left;
 				lasteepos.top = p.top;
 				$("body").unbind('mousemove',mqeemousemove);
+				$("body").removeClass("unselectable");
 				$(this).unbind(event);
 			});
 		});
@@ -48,12 +52,14 @@ $(function() {
 			if (evt.preventDefault) {evt.preventDefault()};
 			var touch = evt.originalEvent.changedTouches[0] || evt.originalEvent.touches[0];
 			mqmousebase = {left:touch.pageX, top: touch.pageY};
+			$("body").addClass("unselectable");
 			$("body").bind('touchmove',mqeetouchmove);
 			$("body").bind('touchend', function(event) {
 				var p = $('#mqee').offset();
 				lasteepos.left = p.left;
 				lasteepos.top = p.top;
 				$("body").unbind('touchmove',mqeetouchmove);
+				$("body").removeClass("unselectable");
 				$(this).unbind(event);
 			});	
 		});
@@ -156,17 +162,21 @@ function mqeeinsert(e) {
         var type = $(this).attr("btntype");
         t = t.replace('\\\\','\\');
         if (type==0) {
-		mqarea.mathquill('cmd', t).find('textarea').focus();
+		mqarea.mathquill('cmd', t).find('input,textarea').focus();
 	} else if (type==1) {
-		mqarea.mathquill('write', t).find('textarea').focus();
+		mqarea.mathquill('write', t).find('input,textarea').focus();
 	} else if (type==2) {
-		mqarea.mathquill('writesimpfunc', t).find('textarea').focus();
+		mqarea.mathquill('writesimpfunc', t).find('input,textarea').focus();
 	} else if (type==3) {
-		mqarea.mathquill('writefunc', t).find('textarea').focus();
+		mqarea.mathquill('writefunc', t).find('input,textarea').focus();
 	} else if (type==4) {
-		mqarea.mathquill('writeint', t).find('textarea').focus();
+		mqarea.mathquill('writeint', t).find('input,textarea').focus();
 	} else if (type==5) {
-		mqarea.mathquill('movecursor', t).find('textarea').focus();
+		mqarea.mathquill('movecursor', t).find('input,textarea').focus();
+	} else if (type==6) {
+		mqarea.mathquill('writebracket', t).find('input,textarea').focus();
+	} else if (type==7) {
+		mqarea.mathquill('writefrac', t).find('input,textarea').focus();
 	}
 	return false;
 }
@@ -203,7 +213,7 @@ function mqeetoggleactive(n) {
 		}
 	}
 	mqeeactivetab = n;
-	mqarea.find('textarea').focus();
+	mqarea.find('input,textarea').focus();
 }
 
 function showee() {
@@ -223,7 +233,7 @@ function showee() {
 	}
 	mqee.css('left',lasteepos.left).css('top',lasteepos.top).show();
 	mqarea.mathquill('latex', AMtoMQ($("#"+cureedd.id).val()));
-	mqarea.find('textarea').focus();
+	mqarea.find('input,textarea').focus();
 	
 }
 function hideee() {
