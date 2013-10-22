@@ -91,9 +91,9 @@ echo '<a href="'.$refpage.'.php?calpageshift='.($pageshift+1).'&cid='.$cid.'">&g
 echo '</div> ';
 echo "<table class=\"cal\" >";  //onmouseout=\"makenorm()\"
 
-$exlowertime = mktime(0,0,0,$curmonum,$dayofmo - $dayofweek,$curyr);
+$exlowertime = mktime(0,0,0,$curmonum,$dayofmo - $dayofweek,$curyr)+$serveroffset;
 $lowertime = max($now,$exlowertime);
-$uppertime = mktime(0,0,0,$curmonum,$dayofmo - $dayofweek + 7*$callength,$curyr);
+$uppertime = mktime(0,0,0,$curmonum,$dayofmo - $dayofweek + 7*$callength,$curyr)+$serveroffset;
 
 $exceptions = array();
 if (!isset($teacherid)) {
@@ -219,7 +219,7 @@ while ($row = mysql_fetch_row($result)) {
 		$colors = "#0f0";
 	}
 	$tag = htmlentities($row[6]);
-	$json = "{type:\"I\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors."\", tag:\"$tag\"".((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
+	$json = "{type:\"I\", folder:\"@@@\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors."\", tag:\"$tag\"".((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
 	
 	$byid['I'.$row[0]] = array($moday,$tag,$colors,$json);
 	
@@ -296,8 +296,9 @@ $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 $itemorder = unserialize(mysql_result($result,0,0));
 $itemsimporder = array();
+$itemfolder = array();
 
-flattenitems($itemorder,$itemsimporder);
+flattenitems($itemorder,$itemsimporder,$itemfolder,'0');
 
 $itemsassoc = array();
 $query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid='$cid'";
@@ -346,7 +347,11 @@ foreach ($itemsimporder as $item) {
 			$moday = $byid['I'.$itemsassoc[$item][1]][0];
 			$tags[$k] = $byid['I'.$itemsassoc[$item][1]][1];
 			$colors[$k] = $byid['I'.$itemsassoc[$item][1]][2];
-			$assess[$moday][$k] = $byid['I'.$itemsassoc[$item][1]][3];
+			if (isset($itemfolder[$item])) {
+				$assess[$moday][$k] = str_replace('@@@',$itemfolder[$item],$byid['I'.$itemsassoc[$item][1]][3]);
+			} else {
+				$assess[$moday][$k] = str_replace('"@@@"','null',$byid['I'.$itemsassoc[$item][1]][3]);
+			}
 			$k++;
 		}
 	} else if ($itemsassoc[$item][0]=='LinkedText') {
@@ -434,13 +439,17 @@ if ($pageshift==0) {
 }
 
 }
-function flattenitems($items,&$addto) {
-	global $itemsimporder;
-	foreach ($items as $item) {
+function flattenitems($items,&$addto,&$folderholder,$folder,$avail=true) {
+	foreach ($items as $k=>$item) {
 		if (is_array($item)) {
-			flattenitems($item['items'],$addto);
+			$now = time();
+			$avail = ($avail && ($item['avail']==2 || ($item['avail']==1 && $item['startdate']<$now && $item['enddate']>$now)));
+			flattenitems($item['items'],$addto,$folderholder,$folder.'-'.($k+1),$avail);
 		} else {
 			$addto[] = $item;
+			if ($avail) {
+				$folderholder[$item] = $folder;
+			}
 		}
 	}
 }

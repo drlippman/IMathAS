@@ -782,6 +782,7 @@ function enditem($canedit) {
 					   $color = makecolor2($line['startdate'],$line['enddate'],$now);
 				   }
 				   beginitem($canedit,$items[$i]);// echo "<div class=item>\n";
+				   echo '<a name="inline'.$typeid.'"></a>';
 				   if ($line['title']!='##hidden##') {
 					   if (($hideicons&2)==0) {			   
 						   if ($graphicalicons) {
