@@ -2078,9 +2078,9 @@ function formpopup($label,$content,$width=600,$height=400,$type='link',$scroll='
 		}
 		if (strpos($content,'watchvid.php')!==false) {
 			$cp = explode('?url=',$content);
-			$rec = "recclick('extref',$ref,'".$contentadd.htmlentities(urldecode($cp[1]))."');";
+			$rec = "recclick('extref',$ref,'".$contentadd.trim(htmlentities(urldecode($cp[1])))."');";
 		} else {
-			$rec = "recclick('extref',$ref,'".$contentadd.htmlentities($content)."');";
+			$rec = "recclick('extref',$ref,'".$contentadd.trim(htmlentities($content))."');";
 		}
 		
 	} else {
