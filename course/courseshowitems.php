@@ -549,7 +549,7 @@ function enditem($canedit) {
 	    		   if (strpos($line['summary'],'<p>')!==0 && strpos($line['summary'],'<ul>')!==0 && strpos($line['summary'],'<ol>')!==0) {
 				   $line['summary'] = '<p>'.$line['summary'].'</p>';
 			   }
-			   if (isset($studentid)) {
+			   if (isset($studentid) && !isset($sessiondata['stuview'])) {
 			   	   $rec = "data-base=\"assesssum-$typeid\" ";
 			   	   $line['summary'] = str_replace('<a ','<a '.$rec, $line['summary']);
 			   }
@@ -759,7 +759,7 @@ function enditem($canedit) {
 			   if (strpos($line['text'],'<p>')!==0 && strpos($line['text'],'<ul>')!==0 && strpos($line['text'],'<ol>')!==0) {
 				   $line['text'] = '<p>'.$line['text'].'</p>';
 			   }
-			   if (isset($studentid)) {
+			   if (isset($studentid) && !isset($sessiondata['stuview'])) {
 			   	   $rec = "data-base=\"inlinetext-$typeid\" ";
 			   	   $line['text'] = str_replace('<a ','<a '.$rec, $line['text']);
 			   } 
@@ -782,6 +782,7 @@ function enditem($canedit) {
 					   $color = makecolor2($line['startdate'],$line['enddate'],$now);
 				   }
 				   beginitem($canedit,$items[$i]);// echo "<div class=item>\n";
+				   echo '<a name="inline'.$typeid.'"></a>';
 				   if ($line['title']!='##hidden##') {
 					   if (($hideicons&2)==0) {			   
 						   if ($graphicalicons) {
@@ -989,7 +990,7 @@ function enditem($canedit) {
 			   if (strpos($line['summary'],'<p>')!==0 && strpos($line['summary'],'<ul>')!==0 && strpos($line['summary'],'<ol>')!==0) {
 				   $line['summary'] = '<p>'.$line['summary'].'</p>';
 			   }
-			   if (isset($studentid)) {
+			   if (isset($studentid) && !isset($sessiondata['stuview'])) {
 			   	   $rec = "data-base=\"linkedsum-$typeid\" ";
 			   	   $line['summary'] = str_replace('<a ','<a '.$rec, $line['summary']);
 			   } 
@@ -1048,7 +1049,7 @@ function enditem($canedit) {
 				   }
 				   $icon = 'html';
 			   }
-			   if (isset($studentid)) {
+			   if (isset($studentid) && !isset($sessiondata['stuview'])) {
 			   	   $rec = "data-base=\"linkedlink-$typeid\"";
 			   } else {
 			   	   $rec = '';
@@ -1354,7 +1355,7 @@ function enditem($canedit) {
 				   if ($ispublic) {
 				   	   echo "<b><a href=\"../wikis/viewwikipublic.php?cid=$cid&id={$line['id']}\">{$line['name']}</a></b>\n"; 
 				   } else {
-				   	   if (isset($studentid)) {
+				   	   if (isset($studentid) && !isset($sessiondata['stuview'])) {
 						   $rec = "data-base=\"wiki-$typeid\"";
 					   } else {
 						   $rec = '';

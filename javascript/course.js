@@ -171,7 +171,12 @@ function showcalcontentsid(elid) {
 				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type=='I') {
 				html += '<li><span class="calitem" style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+ caleventsarr[elid].data[i].tag+'</span> ';
-				html += caleventsarr[elid].data[i].name;
+				if (caleventsarr[elid].data[i].folder != null) {
+					html += '<a href="../course/course.php?cid='+cid+'&folder='+caleventsarr[elid].data[i].folder+'#inline'+caleventsarr[elid].data[i].id+'">';
+					html += caleventsarr[elid].data[i].name + '</a>';
+				} else {
+					html += caleventsarr[elid].data[i].name;
+				}
 				if (caleventsarr[elid].data[i].editlink!=null) {
 					html += ' <a href="addinlinetext.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Modify</a>';
 				}
