@@ -72,6 +72,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 						if (strpos($arvp,'$!$')) {
 							$arvp = explode('$!$',$arvp);
 							$arvp = $arvp[1];
+							if (is_numeric($arvp)) { $arvp = intval($arvp);}
 						}
 						if (strpos($arvp,'$#$')) {
 							$tmp = explode('$#$',$arvp);
@@ -92,6 +93,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 					if (strpos($arv,'$!$')) {
 						$arv = explode('$!$',$arv);
 						$arv = $arv[1];
+						if (is_numeric($arv)) { $arv = intval($arv);}
 					}
 					if (strpos($arv,'$#$')) {
 						$tmp = explode('$#$',$arv);
@@ -112,7 +114,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if (isset($GLOBALS['scores'])) {
 		$scorenonzero = getscorenonzero();
 	}
-
+	
 	eval(interpret('control',$qdata['qtype'],$qdata['control']));
 	eval(interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
 	$toevalqtxt = interpret('qtext',$qdata['qtype'],$qdata['qtext']);
@@ -415,6 +417,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 						if (strpos($arvp,'$!$')) {
 							$arvp = explode('$!$',$arvp);
 							$arvp = $arvp[1];
+							if (is_numeric($arvp)) { $arvp = intval($arvp);}
 						}
 						if (strpos($arvp,'$#$')) {
 							$tmp = explode('$#$',$arvp);
@@ -435,6 +438,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 					if (strpos($arv,'$!$')) {
 						$arv = explode('$!$',$arv);
 						$arv = $arv[1];
+						if (is_numeric($arv)) { $arv = intval($arv);}
 					}
 					if (strpos($arv,'$#$')) {
 						$tmp = explode('$#$',$arv);
@@ -457,7 +461,10 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 			$partnum = ($qnidx+1)*1000 + $kidx;
 			if (isset($_POST["tc$partnum"])) {
 				$stuanswers[$qnidx+1][$kidx] = stripslashes($_POST["tc$partnum"]);
-				if (is_numeric($_POST["qn$partnum"])) {
+				if ($_POST["qn$partnum"]==='') {
+					$stuanswersval[$qnidx+1][$kidx] = null;
+					$stuanswers[$qnidx+1][$kidx] = null;
+				} else if (is_numeric($_POST["qn$partnum"])) {
 					$stuanswersval[$qnidx+1][$kidx] = floatval($_POST["qn$partnum"]);
 				} else if (substr($_POST["qn$partnum"],0,2)=='[(') { //calcmatrix
 					$stuav = stripslashes(str_replace(array('(',')','[',']'),'',$_POST["qn$partnum"]));	
@@ -476,7 +483,10 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 					$stuanswersval[$qnidx+1][$kidx] = str_replace(',','|',$stuav);
 				} else {
 					$stuanswers[$qnidx+1][$kidx] = stripslashes_deep($_POST["qn$partnum"]); //preg_replace('/\W+/','',stripslashes($_POST["qn$partnum"]));
-					if (is_numeric($_POST["qn$partnum"])) {
+					if ($_POST["qn$partnum"]==='') {
+						$stuanswersval[$qnidx+1][$kidx] = null;
+						$stuanswers[$qnidx+1][$kidx] = null;
+					} else if (is_numeric($_POST["qn$partnum"])) {
 						$stuanswersval[$qnidx+1][$kidx] = floatval($_POST["qn$partnum"]);
 					}
 					if (isset($_SESSION['choicemap'][$partnum])) {
@@ -486,7 +496,10 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 							}
 							$stuanswers[$qnidx+1][$kidx] = implode('|',$stuanswers[$qnidx+1][$kidx]);
 						} else {
-							$stuanswers[$qnidx+1][$kidx] = $_SESSION['choicemap'][$partnum][$stuanswers[$qnidx+1][$kidx]];	
+							$stuanswers[$qnidx+1][$kidx] = $_SESSION['choicemap'][$partnum][$stuanswers[$qnidx+1][$kidx]];
+							if ($stuanswers[$qnidx+1][$kidx]===null) {
+								$stuanswers[$qnidx+1][$kidx] = 'NA';
+							}
 						}	
 					}
 				}
@@ -550,7 +563,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 	eval(interpret('control',$qdata['qtype'],$qdata['control']));
 	srand($seed+1);
 	eval(interpret('answer',$qdata['qtype'],$qdata['answer']));
-	
+
 	if (isset($choices) && !isset($questions)) {
 		$questions =& $choices;
 	}
@@ -2513,7 +2526,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$randkeys = array_rand($questions,count($questions));
 			shuffle($randkeys);
 		}
-		if ($givenans==='NA' || $givenans == null) {
+		if ($givenans==='NA' || $givenans === null) {
 			$GLOBALS['partlastanswer'] = $givenans;
 		} else {
 			$GLOBALS['partlastanswer'] = $givenans.'$!$'.$randkeys[$givenans];
@@ -4856,6 +4869,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$anstypes = explode(',',$anstypes);
 		}
 		$la = array();
+		
 		foreach ($anstypes as $i=>$anst) {
 			$qnt = 1000*($qn+1)+$i;
 			if (isset($_POST["tc$qnt"])) {
@@ -4864,6 +4878,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				} else {
 					$la[$i] = $_POST["tc$qnt"];
 				}
+			} else if (isset($_SESSION['choicemap'][$qnt]) && isset($_SESSION['choicemap'][$qnt][$_POST["qn$qnt"]])) {
+				$la[$i] = $_POST["qn$qnt"] . '$!$' . $_SESSION['choicemap'][$qnt][$_POST["qn$qnt"]];
 			} else {
 				$la[$i] = $_POST["qn$qnt"];
 			}
