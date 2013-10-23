@@ -100,7 +100,7 @@ function mqPrepTabs(type,extras) {   //type: 0 basic, 1 advanced.  extras = 'int
 	$(".tab_content").hide();
 	$("ul.tabs li").removeClass("active").each(function(index,el) {
 		if (index==0) {  	
-			if (type==0) { 
+			if (true || type==0) { 
 				$(el).addClass("active").show();
 				var activeTab = $(el).find("a").attr("href"); //Find the href attribute value to identify the active tab + content
 				$(activeTab).show();
@@ -108,7 +108,7 @@ function mqPrepTabs(type,extras) {   //type: 0 basic, 1 advanced.  extras = 'int
 				$(el).hide();
 			}
 		} else if (index==1) {  	
-			if (type==1) { 
+			if (false && type==1) { 
 				$(el).addClass("active").show();
 				var activeTab = $(el).find("a").attr("href"); //Find the href attribute value to identify the active tab + content
 				$(activeTab).show();
