@@ -66,6 +66,9 @@
 		echo "&gt; <a href=\"isolateassessbygroup.php?cid=$cid&aid=$aid\">View Group Scores</a> ";
 	}
 	echo "&gt; Item Analysis</div>";
+	
+	echo '<div class="cpmid"><a href="isolateassessgrade.php?cid='.$cid.'&amp;aid='.$aid.'">View Score List</a></div>';
+	
 	echo '<div id="headergb-itemanalysis" class="pagetitle"><h2>Item Analysis: ';
 	
 	$qtotal = array();
@@ -169,7 +172,8 @@
 	} else {
 		echo "<p><a href=\"#\" onclick=\"GB_show('Not Started','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=notstart',500,300);return false;\">$notstarted student".($notstarted>1?'s':'')."</a> ($nonstartedper%) ".($notstarted>1?'have':'has')." not started this assessment.  They are not included in the numbers below. ";
 	}
-	echo '<a href="isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'">View Score List</a>.</p>';
+	echo '</p>';
+	//echo '<a href="isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'">View Score List</a>.</p>';
 	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 	echo "<table class=gb id=myTable><thead>"; //<tr><td>Name</td>\n";
 	echo "<tr><th>#</th><th scope=\"col\">Question</th><th>Grade</th>";
