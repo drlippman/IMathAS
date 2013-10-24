@@ -41,7 +41,12 @@ if ($typeid==0 || !in_array($type,array('I','L','A','W','F'))) {
 		$type = $row['type'];
 		if (!isset($descrips[$ident])) {
 			if (in_array($type,array('inlinetext','linkedsum','linkedintext','assessintro','assesssum','wikiintext'))) {
-				$desc = 'In-item link to '.$row['info'];
+				$parts = explode('::',$row['info']);
+				if (count($parts)>1) {
+					$desc = 'In-item link to <a href="'.$parts[0].'">'.$parts[1].'</a>';
+				} else {
+					$desc = 'In-item link to '.$row['info'];
+				}
 			} else if (in_array($type,array('linkedlink','linkedviacal','wiki','assess'))) {
 				$desc = 'Link to item';
 			} else if ($type=='forumpost') {

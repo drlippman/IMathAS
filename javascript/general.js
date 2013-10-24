@@ -540,9 +540,13 @@ function _(txt) {
       
       $allVideos.each(function(){
         var $this = $(this);
+        $this.parentsUntil(".intro","table").each(function() {
+        	$(this).css('width','100%');
+        });
         var height = ($this.attr('height') && !isNaN(parseInt($this.attr('height'), 10))) ? parseInt($this.attr('height'), 10) : $this.height(),
             width = !isNaN(parseInt($this.attr('width'), 10)) ? parseInt($this.attr('width'), 10) : $this.width(),
             aspectRatio = height / width;
+       
         if(!$this.attr('id')){
           var videoID = 'fitvid' + Math.floor(Math.random()*999999);
           $this.attr('id', videoID);
