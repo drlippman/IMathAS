@@ -756,7 +756,7 @@ function enditem($canedit) {
 			   $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			
-			   $isvideo = (preg_match_all('/youtu/',$line['text'])>1);
+			   $isvideo = false;///(preg_match_all('/youtu/',$line['text'])>1);
 			   if ($isvideo) {
 			   	   $json = array();
 			   	   preg_match_all('/<a[^>]*(youtube\.com|youtu\.be)(.*?)"[^>]*?>(.*?)<\/a>/',$line['text'],$matches, PREG_SET_ORDER);
