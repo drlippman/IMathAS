@@ -217,6 +217,7 @@ if (isset($cid) && isset($teacherid) && $coursetopbar[2]==1 && count($coursetopb
 	}
 	if (in_array(2,$coursetopbar[0])) { //Calendar
 		echo "<li><a {$a[2]} href=\"$imasroot/course/showcalendar.php?cid=$cid\">Calendar</a></li>\n";
+		$essentialsnavcnt++;
 	}
 	if (in_array(9,$coursetopbar[0])) { //Log out
 		echo "<li><a href=\"$imasroot/actions.php?action=logout\">Log Out</a></li>";

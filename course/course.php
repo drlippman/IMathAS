@@ -495,8 +495,13 @@ if ($overwriteBody==1) {
 	<div id="centercontent">
 <?php	
 	} else if ($useleftstubar && !isset($teacherid)) {
+		$neededtools = 0;
+		if ($msgset<4) {$neededtools++;}
+		if (($toolset&2)==0) {$neededtools++;}
+		if (($toolset&1)==0) {$neededtools++;}
+		
 ?>
-		<div id="leftcontent" <?php if ($essentialsnavcnt<4) {echo 'class="needed"';}?>>
+		<div id="leftcontent" <?php if ($essentialsnavcnt<$neededtools+1) {echo 'class="needed"';}?>>
 			<p>
 <?php
 		if ($msgset<4) {		
@@ -738,7 +743,7 @@ function makeTopMenu() {
 		if ($useviewbuttons) {
 			echo '<br class="clear"/>';
 		}
-		echo "<div class=breadcrumb>";
+		echo '<div class="cpmid">';
 		if (!$useviewbuttons) {
 			echo _('Quick View.'), " <a href=\"course.php?cid=$cid&quickview=off\">", _('Back to regular view'), "</a>. ";
 		} 

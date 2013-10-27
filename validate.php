@@ -354,6 +354,14 @@ END;
 			writesessiondata();
 		}
 	}
+	if (isset($_GET['fullwidth'])) {
+		$sessiondata['usefullwidth'] = true;
+		$usefullwidth = true;
+		writesessiondata();
+	} else if (isset($sessiondata['usefullwidth'])) {
+		$usefullwidth = true;
+	}
+	
 	if (isset($_GET['mathjax'])) {
 		$sessiondata['mathdisp'] = 3;
 		writesessiondata();

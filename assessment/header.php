@@ -48,7 +48,7 @@ if (isset($CFG['locale'])) {
 }
 echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/general.js?ver=102313b\"></script>\n";
 if (isset($sessiondata['coursetheme'])) {
-	if (isset($flexwidth)) {
+	if (isset($flexwidth) || isset($usefullwidth)) {
 		$coursetheme = str_replace('_fw','',$sessiondata['coursetheme']);
 	} else {
 		$coursetheme = $sessiondata['coursetheme'];
