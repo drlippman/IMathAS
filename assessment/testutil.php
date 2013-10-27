@@ -469,11 +469,11 @@ function scorequestion($qn, $rectime=true) {
 	global $questions,$scores,$seeds,$testsettings,$qi,$attempts,$lastanswers,$isreview,$bestseeds,$bestscores,$bestattempts,$bestlastanswers, $reattempting, $rawscores, $bestrawscores, $firstrawscores;
 	global $regenonreattempt;
 	//list($qsetid,$cat) = getqsetid($questions[$qn]);
-	list($rawscore,$rawscores[$qn]) = scoreq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$_POST["qn$qn"],$qi[$questions[$qn]]['points']);
+	list($unitrawscore,$rawscores[$qn]) = scoreq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$_POST["qn$qn"],$qi[$questions[$qn]]['points']);
 	
-	$afterpenalty = calcpointsafterpenalty($rawscore,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
+	$afterpenalty = calcpointsafterpenalty($unitrawscore,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
 
-	$rawscore = calcpointsafterpenalty($rawscore,$qi[$questions[$qn]],$testsettings,0); //possible
+	$rawscore = calcpointsafterpenalty($unitrawscore,$qi[$questions[$qn]],$testsettings,0); //possible
 	
 	//work in progress
 	//need to rework canimprove
@@ -503,7 +503,7 @@ function scorequestion($qn, $rectime=true) {
 			$time = 0;  //for all at once display, where time is not useful info
 		}
 		$query = "INSERT INTO imas_firstscores (courseid,qsetid,score,scoredet,timespent) VALUES ";
-		$query .= "('".addslashes($testsettings['courseid'])."','".$qi[$questions[$qn]]['questionsetid']."','".round(100*getpts($rawscore))."','".$rawscores[$qn]."','$time')";
+		$query .= "('".addslashes($testsettings['courseid'])."','".$qi[$questions[$qn]]['questionsetid']."','".round(100*getpts($unitrawscore))."','".$rawscores[$qn]."','$time')";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 	}
 	
