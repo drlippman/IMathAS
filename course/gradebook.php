@@ -685,8 +685,12 @@ function gbstudisp($stu) {
 				echo "<a href=\"gradebook.php?cid={$_GET['cid']}&uid=$stu&massexception=1\">", _('Make Exception'), "</a> | ";
 				echo "<a href=\"listusers.php?cid={$_GET['cid']}&chgstuinfo=true&uid=$stu\">", _('Change Info'), "</a> | ";
 				echo "<a href=\"viewloginlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Login Log'), "</a> | ";
+				echo "<a href=\"viewactionlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Activity Log'), "</a> | ";
 				echo "<a href=\"#\" onclick=\"makeofflineeditable(this); return false;\">", _('Edit Offline Scores'), "</a>";
 				
+			} else if ($istutor) {
+				echo "<a href=\"viewloginlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Login Log'), "</a> | ";
+				echo "<a href=\"viewactionlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Activity Log'), "</a>";
 			}
 			$gbcomment = mysql_result($result,0,0);
 			$latepasses = mysql_result($result,0,2);

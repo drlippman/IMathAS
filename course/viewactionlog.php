@@ -4,7 +4,7 @@
 
 require("../validate.php");
 $cid = intval($_GET['cid']);
-if (!isset($teacherid)) {
+if (!isset($teacherid) && !isset($tutorid)) {
 	$uid = $userid;
 } else {
 	$uid = intval($_GET['uid']);
