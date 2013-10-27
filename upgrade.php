@@ -1,7 +1,7 @@
 <?php  
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 76;
+$latest = 78;
 
 
 @set_time_limit(0);
@@ -1331,6 +1331,24 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
 		}
+		if ($last<77) {
+			$query = 'ALTER TABLE imas_assessment_sessions add unique index(userid, assessmentid)';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+		}
+		if ($last<78) {
+			//fix for firstscore bug
+			$query = 'UPDATE imas_firstscores SET score=100 WHERE score>0';
+			$res = mysql_query($query);
+			$query = 'UPDATE imas_firstscores SET score=100*scoredet WHERE scoredet NOT LIKE \'%~%\'';
+			$res = mysql_query($query);
+			$query = "UPDATE imas_firstscores SET score=round(100*length(replace(replace(scoredet,'~',''),'0',''))/length(replace(scoredet,'~',''))) ";
+			$query .= "WHERE scoredet LIKE '%~%' AND scoredet LIKE '%0%' AND scoredet LIKE '%1%' AND scoredet NOT LIKE '%.%'";
+			$res = mysql_query($query);
+		}
+			
 		/*$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {
 			echo '<p>Error: unable open upgradecounter.txt for writing</p>';

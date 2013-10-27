@@ -756,7 +756,44 @@ function enditem($canedit) {
 			   $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			
-			   if (strpos($line['text'],'<p>')!==0 && strpos($line['text'],'<ul>')!==0 && strpos($line['text'],'<ol>')!==0) {
+			   $isvideo = false;///(preg_match_all('/youtu/',$line['text'])>1);
+			   if ($isvideo) {
+			   	   $json = array();
+			   	   preg_match_all('/<a[^>]*(youtube\.com|youtu\.be)(.*?)"[^>]*?>(.*?)<\/a>/',$line['text'],$matches, PREG_SET_ORDER);
+			   	   foreach ($matches as $k=>$m) {
+			   	   	if ($m[1]=='youtube.com') {
+			   	   		$p = explode('v=',$m[2]);
+			   	   		$p2 = preg_split('/[#&]/',$p[1]);
+			   	   	} else if ($m[1]=='youtu.be') {
+			   	   		$p2 = preg_split('/[#&]/',substr($p[1],1));
+			   	   	}
+			   	   	$vidid = $p2[0];
+			   	   	if (preg_match('/.*t=((\d+)m)?((\d+)s)?.*/',$m[2],$tm)) {
+			   	   		$start = ($tm[2]?$tm[2]*60:0) + ($tm[4]?$tm[4]*1:0);
+			   	   	} else if (preg_match('/start=(\d+)/',$m[2],$tm)) {
+			   	   		$start = $tm[1];
+			   	   	} else {
+			   	   		$start = 0;
+			   	   	}
+			   	   	if (preg_match('/end=(\d+)/',$m[2],$tm)) {
+			   	   		$end = $tm[1];
+			   	   	} else {
+			   	   		$end = 0;
+			   	   	}
+			   	   	$json[] = '{"name":"'.str_replace('"','\\"',$m[3]).'", "vidid":"'.str_replace('"','\\"',$vidid).'", "start":'.$start.', "end":'.$end.'}';
+			   	   	$line['text'] = str_replace($m[0],'<a href="#" onclick="playliststart('.$typeid.','.$k.');return false;">'.$m[3].'</a>',$line['text']);
+			   	   }
+			   	   
+			   	   $playlist = '<div class="playlistbar" id="playlistbar'.$typeid.'"><div class="vidtracksA"></div> <span> Playlist</span> ';
+			   	   $playlist .= '<div class="vidplay" style="margin-left:1em;" onclick="playliststart('.$typeid.',0)"></div>';
+			   	   $playlist .= '<div class="vidrewI" style="display:none;"></div><div class="vidff" style="display:none;margin-right:1em;"></div> ';
+			   	   $playlist .= '<span class="playlisttitle"></span></div>';
+			   	   $playlist .= '<div class="playlistwrap" id="playlistwrap'.$typeid.'">';
+			   	   $playlist .= '<div class="playlisttext">'.$line['text'].'</div><div class="playlistvid"></div></div>';
+			   	   $playlist .= '<script type="text/javascript">playlist['.$typeid.'] = ['.implode(',',$json).'];</script>'; 
+			   	   $line['text'] = $playlist;
+			   	   
+			   } else if (strpos($line['text'],'<p>')!==0 && strpos($line['text'],'<ul>')!==0 && strpos($line['text'],'<ol>')!==0) {
 				   $line['text'] = '<p>'.$line['text'].'</p>';
 			   }
 			   if (isset($studentid) && !isset($sessiondata['stuview'])) {

@@ -727,7 +727,17 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						while ($row = mysql_fetch_row($result)) {
 							$page_questionTable[$row[0]]['times'] = $row[1];
 						}
+						//pull firstscores data
+						$query = "SELECT qsetid,count(id),AVG(score),AVG(timespent) FROM imas_firstscores WHERE qsetid IN ($allusedqids) AND timespent>1 AND timespent<600 GROUP BY qsetid";
+						$result = mysql_query($query) or die("Query failed : " . mysql_error());
+						while ($row = mysql_fetch_row($result)) {
+							if ($row[1]>10) {
+								$page_questionTable[$row[0]]['qdata'] = array($row[2],$row[3]);
+							}
+						}
 					}
+						
+						
 					
 					//sort alpha sorted libraries
 					foreach ($page_libstouse as $libid) {
@@ -1069,8 +1079,17 @@ if ($overwriteBody==1) {
 <?php
 						}
 ?>
-					<td class=c><?php echo $page_questionTable[$qid]['times'] ?></td>
-					<?php if ($page_useavgtimes) {?><td class="c"><?php echo $page_questionTable[$qid]['avgtime'] ?></td> <?php }?>
+					<td class=c><?php 
+					echo $page_questionTable[$qid]['times']; ?>
+					</td>
+					<?php if ($page_useavgtimes) {?><td class="c"><?php 
+					if (isset($page_questionTable[$qid]['qdata'])) {
+						echo '<span onmouseover="tipshow(this,\'Avg score on first try: '.round($page_questionTable[$qid]['qdata'][0]).'%';
+						echo '<br/>Avg time on first try: '.round($page_questionTable[$qid]['qdata'][1]/60,1).' min\')" onmouseout="tipout()">';
+					} else {
+						echo '<span>';
+					}
+					echo $page_questionTable[$qid]['avgtime'].'</span>'; ?></td> <?php }?>
 					<td><?php echo $page_questionTable[$qid]['mine'] ?></td>
 					<td class=c><?php echo $page_questionTable[$qid]['add'] ?></td>
 					<td><?php echo $page_questionTable[$qid]['src'] ?></td>
