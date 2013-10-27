@@ -1,7 +1,7 @@
 <?php  
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 76;
+$latest = 77;
 
 
 @set_time_limit(0);
@@ -1326,6 +1326,13 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
 			 $query = 'ALTER TABLE `imas_courses`  ADD `deftime` SMALLINT(4) UNSIGNED NOT NULL DEFAULT \'600\'';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+		}
+		if ($last<77) {
+			$query = 'ALTER TABLE imas_assessment_sessions add unique index(userid, assessmentid)';
 			 $res = mysql_query($query);
 			 if ($res===false) {
 			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
