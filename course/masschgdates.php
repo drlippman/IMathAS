@@ -137,7 +137,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		exit;
 	} else { //DEFAULT DATA MANIPULATION
 		$pagetitle = "Mass Change Dates";
-		$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/masschgdates.js?v=100813\"></script>";
+		$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/masschgdates.js?v=102813\"></script>";
 		$placeinhead .= "<style>.show {display:inline;} \n .hide {display:none;} img {cursor:pointer;}\n td.dis {color:#ccc;opacity:0.5;}\n td.dis input {color: #ccc;}</style>";
 	}
 }	

@@ -322,7 +322,7 @@ Date.prototype.getWeekDays = function(d) {
 	  var els = form.getElementsByTagName("input");
 	  for (var i=0; i<els.length; i++) {
 		  if (els[i].type=='checkbox' && els[i].checked && els[i].id!='ca') {
-			var cnt = els[i].value;
+			var cnt = els[i].id.substr(2);
 			try {
 				if (type=='a') {
 					$('#avail'+cnt).val((baserdates[cnt]!='NA' && to==2)?1:to);
@@ -330,6 +330,7 @@ Date.prototype.getWeekDays = function(d) {
 						$(els[i]).parent().parent().find('td.togdis').removeClass('dis');
 						$('#availname'+cnt).text(availnames[1]);
 					} else {
+						console.log("cnt"+cnt+": "+availnames[to]);
 						$(els[i]).parent().parent().find('td.togdis').addClass('dis');
 						$('#availname'+cnt).text(availnames[to]);
 					}
