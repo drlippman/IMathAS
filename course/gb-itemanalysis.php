@@ -161,8 +161,7 @@
 		$query .= " GROUP BY ict.typeid";
 		$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
-			if (!isset($vidcnt[$row[0]])) { $vidcnt[$row[0]]=$row[1];}
-			$vidcnt[$row[0]] += $row[1];
+			$vidcnt[$row[0]]=$row[1];
 		}
 	}
 	
