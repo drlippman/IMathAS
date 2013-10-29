@@ -23,9 +23,12 @@ $curBreadcrumb .= "&gt; View Activity Log\n";
 $pagetitle = "View Activity Log";
 require("../header.php");
 echo "<div class=\"breadcrumb\">$curBreadcrumb</div>";
+
+echo '<div class="cpmid"><a href="viewloginlog.php?cid='.$cid.'&uid='.$uid.'">View Login Log</a></div>';
+
 echo '<div id="headerloginlog" class="pagetitle"><h2>'.$pagetitle. '</h2></div>';
 
-echo '<p><a href="viewloginlog.php?cid='.$cid.'&uid='.$uid.'">View Login Log</a></p>';
+
 
 $query = "SELECT LastName,FirstName FROM imas_users WHERE id='$uid'";
 $result = mysql_query($query) or die("Query failed : " . mysql_error());
