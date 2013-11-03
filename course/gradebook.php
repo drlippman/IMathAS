@@ -697,7 +697,7 @@ function gbstudisp($stu) {
 			//TODO i18n
 			if ($showlatepass==1) {
 				if ($latepasses==0) { $latepasses = 'No';}
-				if ($isteacher) {echo '<br/>';}
+				if ($isteacher || $istutor) {echo '<br/>';}
 				echo "$latepasses LatePass".($latepasses!=1?"es":"").' available';
 			}
 		} else {
