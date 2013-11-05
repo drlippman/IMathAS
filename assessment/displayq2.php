@@ -2728,11 +2728,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		//$answer = preg_replace_callback('/([^\[\(\)\]\,]+)/',"preg_mathphp_callback",$answer);
 		//$answerlist = explode(",",preg_replace('/[^\d\.,\-E]/','',$answer));
 		if (isset($answersize)) {
+			for ($i=0; $i<count($answerlist); $i++) {
+				$givenanslist[$i] = $_POST["qn$qn-$i"];
+			}
 			$GLOBALS['partlastanswer'] = implode("|",$givenanslist);
 			$GLOBALS['partlastanswer'] .= '$#$'.str_replace(',','|',str_replace(array('(',')','[',']'),'',$givenans));
 			
 			for ($i=0; $i<count($answerlist); $i++) {
-				$givenanslist[$i] = $_POST["qn$qn-$i"];
 				if (!checkanswerformat($givenanslist[$i],$ansformats)) {
 					return 0; //perhaps should just elim bad answer rather than all?
 				} 

@@ -9,6 +9,8 @@ if (isset($_GET['callength'])) {
 	$_COOKIE["callength".$_GET['cid']] = $_GET['callength'];
 }
 
+require_once("filehandler.php");
+
 function showcalendar($refpage) {
 
 global $imasroot,$cid,$userid,$teacherid,$previewshift,$latepasses,$urlmode, $latepasshrs, $myrights, $tzoffset;
@@ -243,8 +245,8 @@ while ($row = mysql_fetch_row($result)) {
 	 if ((substr($row[3],0,4)=="http") && (strpos($row[3]," ")===false)) { //is a web link
 		   $alink = trim($row[3]);
 	   } else if (substr($row[3],0,5)=="file:") {
-		   $filename = substr($row[3],5);
-		   $alink = $imasroot . "/course/files/".$filename;
+		   $filename = substr(strip_tags($row[3]),5);
+		   $alink = getcoursefileurl($filename);//$alink = $imasroot . "/course/files/".$filename;
 	   } else {
 		   $alink = '';
 	   }
