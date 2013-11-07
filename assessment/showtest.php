@@ -1800,7 +1800,7 @@ if (!isset($_POST['embedpostback'])) {
 					
 			}
 			
-			showqinfobar($qn,true,false);
+			showqinfobar($qn,true,false,true);
 			
 			echo '<script type="text/javascript">document.getElementById("disptime").value = '.time().';';
 			if (strpos($testsettings['intro'],'[PAGE')!==false || $sessiondata['intreereader']) {
