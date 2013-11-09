@@ -148,10 +148,14 @@
 	
 	
 	if (isset($_GET['uid']) || count($_POST['checked'])==1) {
-		$query = "SELECT LastName,FirstName FROM imas_users WHERE id=$tolist";
+		$query = "SELECT iu.LastName,iu.FirstName,istu.section FROM imas_users AS iu JOIN imas_students AS istu ON iu.id=istu.userid WHERE iu.id=$tolist";
 		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$row = mysql_fetch_row($result);
-		echo "<h2>{$row[0]}, {$row[1]}</h2>";
+		echo "<h2>{$row[0]}, {$row[1]}";
+		if ($row[2]!='') {
+			echo ' <span class="small">(Section: '.$row[2].')</span>';
+		}
+		echo "</h2>";
 	}
 	
 	$query = "SELECT ie.id,iu.LastName,iu.FirstName,ia.name,iu.id,ia.id,ie.startdate,ie.enddate FROM imas_exceptions AS ie,imas_users AS iu,imas_assessments AS ia ";

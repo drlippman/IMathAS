@@ -673,36 +673,41 @@ function gbstudisp($stu) {
 				}
 			} 
 		}
-		echo '<h3>' . strip_tags($gbt[1][0][0]) . ' <span class="small">('.$gbt[1][0][1].')</span></h3>';
-		$query = "SELECT imas_students.gbcomment,imas_users.email,imas_students.latepass FROM imas_students,imas_users WHERE ";
+		echo '<h3>' . strip_tags($gbt[1][0][0]) . ' <span class="small">('.$gbt[1][0][1].')</span>';
+		$query = "SELECT imas_students.gbcomment,imas_users.email,imas_students.latepass,imas_students.section FROM imas_students,imas_users WHERE ";
 		$query .= "imas_students.userid=imas_users.id AND imas_users.id='$stu' AND imas_students.courseid='{$_GET['cid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		echo '<div style="clear:both">';
-		if (mysql_num_rows($result)>0) {
-			if ($isteacher) {
-				echo '<a href="mailto:'.mysql_result($result,0,1).'">', _('Email'), '</a> | ';
-				echo "<a href=\"$imasroot/msgs/msglist.php?cid={$_GET['cid']}&add=new&to=$stu\">", _('Message'), "</a> | ";
-				echo "<a href=\"gradebook.php?cid={$_GET['cid']}&uid=$stu&massexception=1\">", _('Make Exception'), "</a> | ";
-				echo "<a href=\"listusers.php?cid={$_GET['cid']}&chgstuinfo=true&uid=$stu\">", _('Change Info'), "</a> | ";
-				echo "<a href=\"viewloginlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Login Log'), "</a> | ";
-				echo "<a href=\"viewactionlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Activity Log'), "</a> | ";
-				echo "<a href=\"#\" onclick=\"makeofflineeditable(this); return false;\">", _('Edit Offline Scores'), "</a>";
-				
-			} else if ($istutor) {
-				echo "<a href=\"viewloginlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Login Log'), "</a> | ";
-				echo "<a href=\"viewactionlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Activity Log'), "</a>";
-			}
-			$gbcomment = mysql_result($result,0,0);
-			$latepasses = mysql_result($result,0,2);
-			//TODO i18n
-			if ($showlatepass==1) {
-				if ($latepasses==0) { $latepasses = 'No';}
-				if ($isteacher || $istutor) {echo '<br/>';}
-				echo "$latepasses LatePass".($latepasses!=1?"es":"").' available';
-			}
-		} else {
-			$gbcomment = '';
+		if (mysql_num_rows($result)==0) { //shouldn't happen
+			echo 'Invalid student id';
+			require("../footer.php");
+			exit;
 		}
+		list($gbcomment,$stuemail,$latepasses,$stusection) = mysql_fetch_row($result);
+		if ($stusection!='') {
+			echo ' <span class="small">Section: '.$stusection.'</span>';
+		}
+		echo '</h3>';
+		echo '<div style="clear:both">';
+		if ($isteacher) {
+			echo '<a href="mailto:'.$stuemail.'">', _('Email'), '</a> | ';
+			echo "<a href=\"$imasroot/msgs/msglist.php?cid={$_GET['cid']}&add=new&to=$stu\">", _('Message'), "</a> | ";
+			echo "<a href=\"gradebook.php?cid={$_GET['cid']}&uid=$stu&massexception=1\">", _('Make Exception'), "</a> | ";
+			echo "<a href=\"listusers.php?cid={$_GET['cid']}&chgstuinfo=true&uid=$stu\">", _('Change Info'), "</a> | ";
+			echo "<a href=\"viewloginlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Login Log'), "</a> | ";
+			echo "<a href=\"viewactionlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Activity Log'), "</a> | ";
+			echo "<a href=\"#\" onclick=\"makeofflineeditable(this); return false;\">", _('Edit Offline Scores'), "</a>";
+			
+		} else if ($istutor) {
+			echo "<a href=\"viewloginlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Login Log'), "</a> | ";
+			echo "<a href=\"viewactionlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Activity Log'), "</a>";
+		}
+		//TODO i18n
+		if ($showlatepass==1) {
+			if ($latepasses==0) { $latepasses = 'No';}
+			if ($isteacher || $istutor) {echo '<br/>';}
+			echo "$latepasses LatePass".($latepasses!=1?"es":"").' available';
+		}
+		
 		if (trim($gbcomment)!='' || $isteacher) {
 			if ($isteacher) {
 				echo "<form method=post action=\"gradebook.php?{$_SERVER['QUERY_STRING']}\">";
