@@ -145,16 +145,16 @@
 	}
 		
 	if ($haspoints) {
-		$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,imas_grades.score,imas_grades.feedback FROM ";
-		$query .= "imas_forum_posts JOIN imas_users ON imas_forum_posts.userid=imas_users.id LEFT JOIN imas_grades ON imas_grades.gradetype='forum' AND imas_grades.refid=imas_forum_posts.id ";
+		$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,imas_grades.score,imas_grades.feedback,imas_students.section FROM ";
+		$query .= "imas_forum_posts JOIN imas_users ON imas_forum_posts.userid=imas_users.id JOIN imas_students ON (imas_users.id=imas_students.userid AND imas_students.courseid='$cid') LEFT JOIN imas_grades ON imas_grades.gradetype='forum' AND imas_grades.refid=imas_forum_posts.id ";
 		$query .= "WHERE (imas_forum_posts.id='$threadid' OR imas_forum_posts.threadid='$threadid') ORDER BY imas_forum_posts.id";
 	} else {
-		$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg from imas_forum_posts,imas_users ";
-		$query .= "WHERE imas_forum_posts.userid=imas_users.id AND (imas_forum_posts.id='$threadid' OR imas_forum_posts.threadid='$threadid') ORDER BY imas_forum_posts.id";	
+		$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,imas_students.section from imas_forum_posts,imas_users,imas_students ";
+		$query .= "WHERE imas_forum_posts.userid=imas_users.id AND imas_users.id=imas_students.userid AND imas_students.courseid='$cid' AND (imas_forum_posts.id='$threadid' OR imas_forum_posts.threadid='$threadid') ORDER BY imas_forum_posts.id";	
 	}
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$children = array(); $date = array(); $subject = array(); $message = array(); $posttype = array(); $likes = array(); $mylikes = array();
-	$ownerid = array(); $files = array(); $points= array(); $feedback= array(); $poster= array(); $email= array(); $hasuserimg = array();
+	$ownerid = array(); $files = array(); $points= array(); $feedback= array(); $poster= array(); $email= array(); $hasuserimg = array(); $section = array();
 	while ($line =  mysql_fetch_array($result, MYSQL_ASSOC)) {
 		if ($line['parent']==0) {
 			if ($line['replyby']!=null) {
@@ -201,6 +201,7 @@
 			$ownerid[$line['id']] = 0;
 		} else {
 			$poster[$line['id']] = $line['FirstName'] . ' ' . $line['LastName'];
+			$section[$line['id']] = $line['section'];
 			$email[$line['id']] = $line['email'];
 		}
 		$likes[$line['id']] = array(0,0,0);
@@ -400,7 +401,7 @@
 		$curdir = rtrim(dirname(__FILE__), '/\\');
 		global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points;
 		global $feedback,$posttype,$lastview,$bcnt,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$allowlikes,$view,$page,$allowmsg;
-		global $haspoints,$imasroot,$postby,$replyby,$files,$CFG,$rubric,$pointsposs,$hasuserimg,$urlmode,$likes,$mylikes;
+		global $haspoints,$imasroot,$postby,$replyby,$files,$CFG,$rubric,$pointsposs,$hasuserimg,$urlmode,$likes,$mylikes,$section;
 		if (!isset($CFG['CPS']['itemicons'])) {
 	   	   $itemicons = array('web'=>'web.png', 'doc'=>'doc.png', 'wiki'=>'wiki.png',
 			'html'=>'html.png', 'forum'=>'forum.png', 'pdf'=>'pdf.png',
@@ -543,7 +544,11 @@
 				//	echo "<a href=\"mailto:{$email[$child]}\">";
 				//} else if ($allowmsg && $ownerid[$child]!=0) {
 				if (($isteacher || $allowmsg) && $ownerid[$child]!=0) {
-					echo "<a href=\"../msgs/msglist.php?cid=$cid&add=new&to={$ownerid[$child]}\">";
+					echo "<a href=\"../msgs/msglist.php?cid=$cid&add=new&to={$ownerid[$child]}\" ";
+					if ($section[$child]!='') {
+						echo 'title="Section: '.$section[$child].'"';
+					}
+					echo ">";
 				}
 				echo $poster[$child];
 				if (($isteacher || $allowmsg) && $ownerid[$child]!=0) {

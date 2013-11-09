@@ -79,8 +79,9 @@
 			
 	
 	$msgid = $_GET['msgid'];
-	$query = "SELECT imas_msgs.*,imas_users.LastName,imas_users.FirstName,imas_users.email,imas_users.hasuserimg ";
-	$query .= "FROM imas_msgs,imas_users WHERE imas_msgs.msgfrom=imas_users.id AND imas_msgs.id='$msgid' ";
+	$query = "SELECT imas_msgs.*,imas_users.LastName,imas_users.FirstName,imas_users.email,imas_users.hasuserimg,imas_students.section ";
+	$query .= "FROM imas_msgs,imas_users,imas_students WHERE imas_students.userid=imas_users.id AND imas_students.courseid='$cid' ";
+	$query .= "AND imas_msgs.msgfrom=imas_users.id AND imas_msgs.id='$msgid' ";
 	if ($type!='allstu' || !$isteacher) {
 		$query .= "AND (imas_msgs.msgto='$userid' OR imas_msgs.msgfrom='$userid')";
 	}
@@ -102,6 +103,9 @@
 	}
 	echo "<table class=gb ><tbody>";
 	echo "<tr><td><b>From:</b></td><td>{$line['LastName']}, {$line['FirstName']}";
+	if ($line['section']!='') {
+		echo ' <span class="small">(Section: '.$line['section'].')</span>';
+	}
 	if (isset($teacherof[$line['courseid']])) {
 		echo " <a href=\"mailto:{$line['email']}\">email</a> | ";
 		echo " <a href=\"$imasroot/course/gradebook.php?cid={$line['courseid']}&stu={$line['msgfrom']}\" target=\"_popoutgradebook\">gradebook</a>";
