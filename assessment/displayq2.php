@@ -3738,7 +3738,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (!is_array($answers)) {
 			settype($answers,"array");
 		}
-		if ($answerformat[0]=="polygon") {
+		if ($answerformat[0]=="polygon" || $answerformat[0]=='closedpolygon') {
 			foreach ($answers as $key=>$function) {
 				$function = explode(',',$function);
 				$pixx = ($function[0] - $settings[0])*$pixelsperx + $imgborder;
