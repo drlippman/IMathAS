@@ -146,6 +146,7 @@ function printoutcome($arr) {
 			echo '<li class="blockli" id="grp'.$cnt.'"><span class=icon style="background-color:#66f">G</span> ';
 			echo '<input class="outcome" type="text" size="60" id="g'.$cnt.'" value="'.htmlentities($item['name']).'" onkeyup="txtchg()"> ';
 			echo '<a href="#" onclick="removeoutcomegrp(this);return false">'._("Delete").'</a>';
+			$cnt++;
 			if (count($item['outcomes'])>0) {
 				echo '<ul class="qview">';
 				printoutcome($item['outcomes']);

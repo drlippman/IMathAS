@@ -711,11 +711,14 @@ function basicshowq($qn,$seqinactive=false,$colors=array()) {
 }
 
 //shows basic points possible, attempts remaining bar
-function showqinfobar($qn,$inreview,$single) {
+function showqinfobar($qn,$inreview,$single,$isembed=false) {
 	global $qi,$questions,$attempts,$seeds,$testsettings,$noindivscores,$showeachscore,$scores,$bestscores,$sessiondata,$imasroot;
 	if (!$sessiondata['istutorial']) {
 		if ($inreview) {
 			echo '<div class="review">';
+		}
+		if ($isembed) {
+			echo _('Question').' '.($qn+1).'. ';
 		}
 		if ($qi[$questions[$qn]]['withdrawn']==1) {
 			echo '<span class="red">', _('Question Withdrawn'), '</span> ';
@@ -725,7 +728,7 @@ function showqinfobar($qn,$inreview,$single) {
 			if ($pointsremaining == $qi[$questions[$qn]]['points']) {
 				echo _('Points possible: '), $qi[$questions[$qn]]['points'], '<br/>';
 			} else {
-				echo sprintf(_('Points available on this attempt: %1$d of original %2$d'), $pointsremaining, $qi[$questions[$qn]]['points']), '<br/>';
+				echo sprintf(_('Points available on this attempt: %1$g of original %2$g'), $pointsremaining, $qi[$questions[$qn]]['points']), '<br/>';
 			}
 		}
 		
