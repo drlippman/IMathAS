@@ -337,6 +337,9 @@ function scorestatement($stua, $answer, $s, $sn) {
 			}
 			$sn++;
 		}
+		if (isset($sg['tottitleline'])) {
+			$sn++;
+		}
 		if (isset($sg['totaltotal'])) {
 			if (isset($sg['totaltotalops'])) {
 				$sn++;
