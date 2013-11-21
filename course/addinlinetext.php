@@ -85,6 +85,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (isset($_POST['hidetitle'])) {
 			$_POST['title']='##hidden##';
 		}
+		if (isset($_POST['isplaylist'])) {
+			$isplaylist = 1;
+		} else {
+			$isplaylist = 0;
+		}
 
 		require_once("../includes/htmLawed.php");
 		
@@ -103,7 +108,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$filestoremove = array();
 		if (isset($_GET['id'])) {  //already have id; update
 			$query = "UPDATE imas_inlinetext SET title='{$_POST['title']}',text='{$_POST['text']}',startdate=$startdate,enddate=$enddate,avail='{$_POST['avail']}',";
-			$query .= "oncal='$oncal',caltag='$caltag',outcomes='$outcomes' ";
+			$query .= "oncal='$oncal',caltag='$caltag',outcomes='$outcomes',isplaylist=$isplaylist ";
 			$query .= "WHERE id='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//update attached files
@@ -129,8 +134,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$newtextid = $_GET['id'];
 		} else { //add new
 			
-			$query = "INSERT INTO imas_inlinetext (courseid,title,text,startdate,enddate,avail,oncal,caltag,outcomes) VALUES ";
-			$query .= "('$cid','{$_POST['title']}','{$_POST['text']}',$startdate,$enddate,'{$_POST['avail']}','{$_POST['oncal']}','$caltag','$outcomes');";
+			$query = "INSERT INTO imas_inlinetext (courseid,title,text,startdate,enddate,avail,oncal,caltag,outcomes,isplaylist) VALUES ";
+			$query .= "('$cid','{$_POST['title']}','{$_POST['text']}',$startdate,$enddate,'{$_POST['avail']}','{$_POST['oncal']}','$caltag','$outcomes',$isplaylist);";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			
 			$newtextid = mysql_insert_id();
@@ -415,6 +420,12 @@ function movefile(from) {
 		Description: <input type="text" name="newfiledescr"/><br/>
 		<input type=submit name="submitbtn" value="Add / Update Files"/>
 	</span><br class=form>
+	
+	<span class="form">List of YouTube videos</span>
+	<span class="formright">
+		<input type="checkbox" name="isplaylist" value="1" <?php writeHtmlChecked($line['isplaylist'],1);?>/> Show as embedded playlist
+	</span>
+	<br class="form"/>
 	
 	<div>
 		<span class=form>Show:</span>

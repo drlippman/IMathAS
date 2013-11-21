@@ -752,11 +752,11 @@ function enditem($canedit) {
 		   } else if ($line['itemtype']=="InlineText") {
 		
 			   $typeid = $line['typeid'];
-			   $query = "SELECT title,text,startdate,enddate,fileorder,avail FROM imas_inlinetext WHERE id='$typeid'";
+			   $query = "SELECT title,text,startdate,enddate,fileorder,avail,isplaylist FROM imas_inlinetext WHERE id='$typeid'";
 			   $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			
-			   $isvideo = false;///(preg_match_all('/youtu/',$line['text'])>1);
+			   $isvideo = (preg_match_all('/youtu/',$line['text'])>1) && ($line['isplaylist']>0);
 			   if ($isvideo) {
 			   	   $json = array();
 			   	   preg_match_all('/<a[^>]*(youtube\.com|youtu\.be)(.*?)"[^>]*?>(.*?)<\/a>/',$line['text'],$matches, PREG_SET_ORDER);

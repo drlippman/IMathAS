@@ -47,15 +47,15 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		//$query = "INSERT INTO imas_inlinetext (courseid,title,text,startdate,enddate) ";
 		//$query .= "SELECT '$cid',title,text,startdate,enddate FROM imas_inlinetext WHERE id='$typeid'";
 		//mysql_query($query) or die("Query failed :$query " . mysql_error());
-		$query = "SELECT title,text,startdate,enddate,avail,oncal,caltag,fileorder FROM imas_inlinetext WHERE id='$typeid'";
+		$query = "SELECT title,text,startdate,enddate,avail,oncal,caltag,isplaylist,fileorder FROM imas_inlinetext WHERE id='$typeid'";
 		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$row = mysql_fetch_row($result);
 		if ($sethidden) {$row[4] = 0;}
 		$row[0] .= stripslashes($_POST['append']);
-		$fileorder = $row[7];
+		$fileorder = $row[8];
 		array_pop($row);
 		$row = "'".implode("','",addslashes_deep($row))."'";
-		$query = "INSERT INTO imas_inlinetext (courseid,title,text,startdate,enddate,avail,oncal,caltag) ";
+		$query = "INSERT INTO imas_inlinetext (courseid,title,text,startdate,enddate,avail,oncal,caltag,isplaylist) ";
 		$query .= "VALUES ('$cid',$row)";
 		mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$newtypeid = mysql_insert_id();

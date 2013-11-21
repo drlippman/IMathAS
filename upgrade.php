@@ -1,7 +1,7 @@
 <?php  
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 78;
+$latest = 79;
 
 
 @set_time_limit(0);
@@ -1347,6 +1347,14 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			$query = "UPDATE imas_firstscores SET score=round(100*length(replace(replace(scoredet,'~',''),'0',''))/length(replace(scoredet,'~',''))) ";
 			$query .= "WHERE scoredet LIKE '%~%' AND scoredet LIKE '%0%' AND scoredet LIKE '%1%' AND scoredet NOT LIKE '%.%'";
 			$res = mysql_query($query);
+		}
+		if ($last<79) {
+			$query = 'ALTER TABLE imas_inlinetext ADD `isplaylist` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\'';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			
 		}
 			
 		/*$handle = fopen("upgradecounter.txt",'w');
