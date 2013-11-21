@@ -841,7 +841,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if ($displayformat == 'inline') {
 			$out .= "<span $style>";
 		} else if ($displayformat != 'select') {
-			$out .= "<div $style>";
+			$out .= "<div $style style=\"display:block\">";
 		}
 		if ($displayformat == "select") { 
 			$msg = '?';
@@ -961,7 +961,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if ($displayformat == 'inline') {
 			$out .= "<span $style>";
 		} else  {
-			$out .= "<div $style>";
+			$out .= "<div $style style=\"display:block\">";
 		}
 		if ($displayformat == "horiz") {
 			
@@ -1064,7 +1064,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		} else {
 			$divstyle = '';
 		}
-		if ($colorbox != '') {$out .= '<div class="'.$colorbox.'">';}
+		if ($colorbox != '') {$out .= '<div class="'.$colorbox.'" style="display:block">';}
 		$out .= "<div class=\"match\" $divstyle>\n";
 		$out .= "<p class=\"centered\">$questiontitle</p>\n";
 		$out .= "<ul class=\"nomark\">\n";
@@ -2324,7 +2324,12 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$GLOBALS['partlastanswer'] = $givenans;
-		if ($answer==='' && $givenans==='') { return 1;}
+		if ($answer==='') {
+			if (trim($givenans)==='') { return 1;} else { return 0;}
+		}
+		if ($answer==='0 or ') {
+			if (trim($givenans)==='' || trim($givenans)==='0') { return 1;} else { return 0;}
+		}
 		if ($givenans == null) {return 0;}
 		if ($answerformat=='exactlist') {
 			$gaarr = explode(',',$givenans);
@@ -3738,7 +3743,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (!is_array($answers)) {
 			settype($answers,"array");
 		}
-		if ($answerformat[0]=="polygon") {
+		if ($answerformat[0]=="polygon" || $answerformat[0]=='closedpolygon') {
 			foreach ($answers as $key=>$function) {
 				$function = explode(',',$function);
 				$pixx = ($function[0] - $settings[0])*$pixelsperx + $imgborder;

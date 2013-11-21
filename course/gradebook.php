@@ -327,8 +327,9 @@ if ($canviewall) {
 					} else {
 						var v = tds[i].textContent;
 					}
-					v = v.replace(/\(.*?\)/g,"");
-					if (k = v.match(/([\d\.]+)\/(\d+)/)) {
+					if (k = v.match(/\(([\d\.]+)%\)/)) {
+						var perc = k[1]/100;
+					} else if (k = v.match(/([\d\.]+)\/(\d+)/)) {
 						if (k[2]==0) { var perc = 0;} else { var perc= k[1]/k[2];}
 					} else {
 						v = v.replace(/[^\d\.]/g,"");
@@ -1588,7 +1589,15 @@ function gbinstrdisp() {
 								echo $gbt[$i][2][$j][3].'/'.$gbt[$i][2][$j][4];
 							}
 						} else {
-							echo $gbt[$i][2][$j][$availshow];
+							if (isset($gbt[$i][3][8])) { //using points based
+								echo $gbt[$i][2][$j][$availshow];
+							} else {
+								if ($gbt[0][2][$j][3+$availshow]>0) {
+									echo round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][3+$availshow],1).'%';
+								} else {
+									echo '0%';
+								}
+							}
 						}
 						if ($gbt[$i][0][0]=='Averages' && $availshow<3) {
 							echo '</span>';

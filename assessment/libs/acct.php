@@ -337,6 +337,9 @@ function scorestatement($stua, $answer, $s, $sn) {
 			}
 			$sn++;
 		}
+		if (isset($sg['tottitleline'])) {
+			$sn++;
+		}
 		if (isset($sg['totaltotal'])) {
 			if (isset($sg['totaltotalops'])) {
 				$sn++;
@@ -861,7 +864,7 @@ function makeTchart($title,$numrows,$leftentries,$rightentries, $sn, &$anstypes,
 			$answer[$sn] = $leftentries[$i];
 			$tot += $answer[$sn];
 		} else {
-			$anstypes[$sn] = 'string';
+			$anstypes[$sn] = 'number';
 			$answer[$sn] = '';
 		}
 		$sn++;
@@ -884,7 +887,7 @@ function makeTchart($title,$numrows,$leftentries,$rightentries, $sn, &$anstypes,
 			$answer[$sn] = $rightentries[$i];
 			$tot -= $answer[$sn];
 		} else {
-			$anstypes[$sn] = 'string';
+			$anstypes[$sn] = 'number';
 			$answer[$sn] = '';
 		}
 		$sn++;
@@ -925,8 +928,8 @@ function makeTchart($title,$numrows,$leftentries,$rightentries, $sn, &$anstypes,
 			$sa .= '</td></tr>';
 		} else {
 			$sa .= '<td style="border-top: 3px double;">&nbsp;</td></tr>';
-			$anstypes[$sn] = 'string';
-			$answer[$sn] = '';
+			$anstypes[$sn] = 'number';
+			$answer[$sn] = '0 or ';
 		}
 		$sn++;
 	}
@@ -945,6 +948,7 @@ function makeTchart($title,$numrows,$leftentries,$rightentries, $sn, &$anstypes,
 //returns a new answer array
 function scoreTchart($stua,$answer,$numrows,$leftentries,$rightentries, $sn) {
 	if ($stua == null) {return $answer;}
+	$origstua = $stua;
 	for ($i=0;$i<count($leftentries);$i++) {
 		$leftentries[$i] = str_replace(array('$',','),'',$leftentries[$i]) * 1;
 	}
@@ -953,35 +957,56 @@ function scoreTchart($stua,$answer,$numrows,$leftentries,$rightentries, $sn) {
 	}
 	$cntleft = count($leftentries);
 	$cntright = count($rightentries);
+	//change blanks to zeros
 	for ($i=0;$i<$numrows;$i++) {
-		if ($i<$cntleft && trim($stua[$sn+2*$i])!='') { //if should be entry and there's a stuans
-			$foundmatch = false;
-			foreach($leftentries as $loc=>$val) {
-				if (abs($stua[$sn+2*$i] - $val)<.01) {
-					$answer[$sn+2*$i] = $val;
-					unset($leftentries[$loc]);
-					$foundmatch = true;
-					break; //from foreach
-				}
-			}
-			if (!$foundmatch) {
-				$answer[$sn+2*$i] = $stua[$sn+2*$i] + 50000;
+		if (trim($stua[$sn+2*$i])=='') {
+			$stua[$sn+2*$i] = 0;
+		}
+		if (trim($stua[$sn+2*$i+1])=='') {
+			$stua[$sn+2*$i+1] = 0;
+		}
+	}
+	//fill out leftentries and rightentries with zeros
+	for ($i=$cntleft;$i<$numrows;$i++) {
+		$leftentries[] = 0;
+	}
+	for ($i=$cntright;$i<$numrows;$i++) {
+		$rightentries[] = 0;
+	}
+	for ($i=0;$i<$numrows;$i++) {
+		//look for match in left column
+		$foundmatch = false;
+		foreach($leftentries as $loc=>$val) {
+			if (abs($stua[$sn+2*$i] - $val)<.01) {
+				$answer[$sn+2*$i] = $val;
+				unset($leftentries[$loc]);
+				$foundmatch = true;
+				break; //from foreach
 			}
 		}
-		if ($i<$cntright && trim($stua[$sn+2*$i+1])!='') { //if should be entry and there's a stuans
-			$foundmatch = false;
-			foreach($rightentries as $loc=>$val) {
-				if (abs($stua[$sn+2*$i+1] - $val)<.01) {
-					$answer[$sn+2*$i+1] = $val;
-					unset($rightentries[$loc]);
-					$foundmatch = true;
-					break; //from foreach
-				}
-			}
-			if (!$foundmatch) {
-				$answer[$sn+2*$i+1] = $stua[$sn+2*$i+1] + 50000;
+		
+		if (!$foundmatch) {
+			$answer[$sn+2*$i] = $stua[$sn+2*$i] + 50000;
+		} else if (trim($origstua[$sn+2*$i])=='') {
+			$answer[$sn+2*$i] = '';
+		}
+		
+		//look for match in right column
+		$foundmatch = false;
+		foreach($rightentries as $loc=>$val) {
+			if (abs($stua[$sn+2*$i+1] - $val)<.01) {
+				$answer[$sn+2*$i+1] = $val;
+				unset($rightentries[$loc]);
+				$foundmatch = true;
+				break; //from foreach
 			}
 		}
+		if (!$foundmatch) {
+			$answer[$sn+2*$i+1] = $stua[$sn+2*$i+1] + 50000;
+		} else if (trim($origstua[$sn+2*$i+1])=='') {
+			$answer[$sn+2*$i+1] = '';
+		}
+		
 	}
 	return $answer;
 }
@@ -1159,12 +1184,12 @@ function makeinventory($invs, $type, $rowper, $sn, &$anstypes, &$questions, &$an
 			$sq = array(""); $su = array(""); $st = array("");
 			$iq = array($inv[2]); $iu = array($inv[3]); $it = array($inv[2]*$inv[3]);
 			$str[0] = array($inv[2],$inv[3]); //quantity, unit cost
-			if ($get=='journal') {
+			/*if ($get=='journal') {
 				$j[$jc]['date'] = $inv[1];
 				$j[$jc]['debits'] = array("No journal entry required","");
 				$j[$jc]['extrarows'] = 1;
 				$jc++;
-			}
+			}*/
 		} else if ($inv[0]=='purch') {
 			if ($type=='WA') {
 				$newq = $inv[2] + $str[0][0];
