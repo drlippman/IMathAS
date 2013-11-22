@@ -55,7 +55,7 @@
 		
 	}
 	if (isset($_POST['name']) && $isteacher) {
-		require_once("parsedatetime.php");
+		require_once("../includes/parsedatetime.php");
 		if ($_POST['sdatetype']=='0') {
 			$showdate = 0;
 		} else {

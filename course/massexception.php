@@ -13,7 +13,7 @@
 		mysql_query($query) or die("Query failed :$query " . mysql_error());	
 	}
 	if (isset($_POST['addexc'])) {
-		require_once("parsedatetime.php");
+		require_once("../includes/parsedatetime.php");
 		$startdate = parsedatetime($_POST['sdate'],$_POST['stime']);
 		$enddate = parsedatetime($_POST['edate'],$_POST['etime']);
 		

@@ -46,7 +46,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			} else if ($_POST['replyby']=="Never") {
 				$replyby = 0;
 			} else {
-				require_once("../course/parsedatetime.php");
+				require_once("../includes/parsedatetime.php");
 				$replyby = parsedatetime($_POST['replybydate'],$_POST['replybytime']);
 			}
 		} else {

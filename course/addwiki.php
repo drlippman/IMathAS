@@ -45,7 +45,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 	} else if ($_POST['name']!= null) { //FORM SUBMITTED, DATA PROCESSING
 		if ($_POST['avail']==1) {
-			require_once("parsedatetime.php");
+			require_once("../includes/parsedatetime.php");
 			if ($_POST['sdatetype']=='0') {
 				$startdate = 0;
 			} else {

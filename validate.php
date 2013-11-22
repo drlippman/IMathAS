@@ -49,16 +49,23 @@
 	exit;	 
  }
  $sessiondata = array();
- $query = "SELECT userid,tzoffset,sessiondata,time FROM imas_sessions WHERE sessionid='$sessionid'";
+ $query = "SELECT * FROM imas_sessions WHERE sessionid='$sessionid'";
  $result = mysql_query($query) or die("Query failed : " . mysql_error());
  if (mysql_num_rows($result)>0) {
-	 $userid = mysql_result($result,0,0);
-	 $tzoffset = mysql_result($result,0,1);
-	 $enc = mysql_result($result,0,2);
+ 	 $line = mysql_fetch_assoc($result);
+ 	 $userid = $line['userid'];
+ 	 $tzoffset = $line['tzoffset'];
+ 	 $tzname = '';
+ 	 if (isset($line['tzname']) && $line['tzname']!='') {
+ 	 	if (date_default_timezone_set($line['tzname'])) {
+ 	 		$tzname = $line['tzname'];
+ 	 	}
+ 	 }
+ 	 $enc = $line['sessiondata'];
 	 if ($enc!='0') {
 		 $sessiondata = unserialize(base64_decode($enc));
 		 //delete own session if old and not posting
-		 if ((time()-mysql_result($result,0,3))>24*60*60 && (!isset($_POST) || count($_POST)==0)) {
+		 if ((time()-$line['time'])>24*60*60 && (!isset($_POST) || count($_POST)==0)) {
 			$query = "DELETE FROM imas_sessions WHERE userid='$userid'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			unset($userid);
@@ -281,7 +288,11 @@ END;
 			 $enc = 0; //give warning
 		 }
 		 
-		 $query = "INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,sessiondata) VALUES ('$sessionid','$userid',$now,'{$_POST['tzoffset']}','$enc')";
+		 if (isset($_POST['tzname']) && strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
+		 	 $query = "INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,tzname,sessiondata) VALUES ('$sessionid','$userid',$now,'{$_POST['tzoffset']}','{$_POST['tzname']}','$enc')";
+		 } else {
+		 	 $query = "INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,sessiondata) VALUES ('$sessionid','$userid',$now,'{$_POST['tzoffset']}','$enc')";
+		 }
 		 $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		 
 		 $query = "UPDATE imas_users SET lastaccess=$now WHERE id=$userid";
@@ -527,11 +538,15 @@ END;
  }
  
  function tzdate($string,$time) {
-	  global $tzoffset;
+	  global $tzoffset, $tzname;
 	  //$dstoffset = date('I',time()) - date('I',$time);
-	  //return gmdate($string, $time-60*($tzoffset+60*$dstoffset));	
-	  $serveroffset = date('Z') + $tzoffset*60;
-	  return date($string, $time-$serveroffset);
+	  //return gmdate($string, $time-60*($tzoffset+60*$dstoffset));
+	  if ($tzname != '') {
+	  	  return date($string, $time);
+	  } else {
+		  $serveroffset = date('Z') + $tzoffset*60;
+		  return date($string, $time-$serveroffset);
+	  }
 	  //return gmdate($string, $time-60*$tzoffset);
   }
   

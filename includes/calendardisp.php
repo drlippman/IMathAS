@@ -13,7 +13,7 @@ require_once("filehandler.php");
 
 function showcalendar($refpage) {
 
-global $imasroot,$cid,$userid,$teacherid,$previewshift,$latepasses,$urlmode, $latepasshrs, $myrights, $tzoffset;
+global $imasroot,$cid,$userid,$teacherid,$previewshift,$latepasses,$urlmode, $latepasshrs, $myrights, $tzoffset, $tzname;
 
 $now= time();
 if ($previewshift!=-1) {
@@ -42,7 +42,11 @@ $dayofweek = tzdate('w',$today);
 $curmonum = tzdate('n',$today);
 $dayofmo = tzdate('j',$today);
 $curyr = tzdate('Y',$today);
-$serveroffset = date('Z') + $tzoffset*60;
+if ($tzname=='') {
+	$serveroffset = date('Z') + $tzoffset*60;
+} else {
+	$serveroffset = 0; //don't need this if user's timezone has been set
+}
 $midtoday = mktime(12,0,0,$curmonum,$dayofmo,$curyr)+$serveroffset;
 
 

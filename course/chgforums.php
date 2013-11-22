@@ -14,7 +14,7 @@ $cid = $_GET['cid'];
 
 if (isset($_POST['checked'])) { //form submitted
 	$checked = $_POST['checked'];
-	require_once("parsedatetime.php");
+	require_once("../includes/parsedatetime.php");
 	$checkedlist = "'".implode("','",$checked)."'";
 	$sets = array();
 	if (isset($_POST['chgavail'])) {

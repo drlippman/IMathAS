@@ -30,7 +30,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$cnt = $_POST['chgcnt'];
 		$blockchg = 0;
 		for ($i=0; $i<$cnt; $i++) {
-			require_once("parsedatetime.php");
+			require_once("../includes/parsedatetime.php");
 			
 			$data = explode(',',$_POST['data'.$i]);
 			

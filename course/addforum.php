@@ -40,7 +40,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$block = $_GET['block'];
 	
 	if ($_POST['name']!= null) { //FORM SUBMITTED, DATA PROCESSING
-		require_once("parsedatetime.php");
+		require_once("../includes/parsedatetime.php");
 		if ($_POST['avail']==1) {
 			if ($_POST['sdatetype']=='0') {
 				$startdate = 0;

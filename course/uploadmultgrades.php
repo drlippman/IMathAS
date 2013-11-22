@@ -31,7 +31,7 @@ if (!(isset($teacherid))) {
 			$useridarr[$row[1]] = $row[0];
 		}
 		$coltoadd = $_POST['addcol'];
-		require_once("parsedatetime.php");
+		require_once("../includes/parsedatetime.php");
 		if ($_POST['sdatetype']=='0') {
 			$showdate = 0;
 		} else {

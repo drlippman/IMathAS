@@ -1,7 +1,7 @@
 <?php  
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 79;
+$latest = 80;
 
 
 @set_time_limit(0);
@@ -1353,8 +1353,18 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 $res = mysql_query($query);
 			 if ($res===false) {
 			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }	
+		}
+		if ($last<80) {
+			$query = 'ALTER TABLE imas_sessions ADD `tzname` VARCHAR(255) NOT NULL DEFAULT \'\'';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
-			
+			 echo "<p><b>Important</b>: This update adds improved timezone handling, fixing issues that ";
+			 echo "were occurring on servers set for UTC. Utilizing the improvements requires PHP 5.1 or higher ";
+			 echo "and requires updating your local loginpage.php file. See changes to loginpage.php.dist; changes are "
+			 echo "on lines 9, 69, and 75-76.</p>";
 		}
 			
 		/*$handle = fopen("upgradecounter.txt",'w');

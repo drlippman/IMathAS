@@ -47,7 +47,7 @@ if (isset($_POST['checked'])) { //form submitted
 			exit;
 		}		
 	} else {
-		require_once("parsedatetime.php");
+		require_once("../includes/parsedatetime.php");
 		$checkedlist = "'".implode("','",$checked)."'";
 		$sets = array();
 		if (isset($_POST['chgshowafter'])) {
