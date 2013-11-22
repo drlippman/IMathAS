@@ -146,11 +146,18 @@
 		
 	if ($haspoints) {
 		$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,imas_grades.score,imas_grades.feedback,imas_students.section FROM ";
-		$query .= "imas_forum_posts JOIN imas_users ON imas_forum_posts.userid=imas_users.id JOIN imas_students ON (imas_users.id=imas_students.userid AND imas_students.courseid='$cid') LEFT JOIN imas_grades ON imas_grades.gradetype='forum' AND imas_grades.refid=imas_forum_posts.id ";
+		$query .= "imas_forum_posts JOIN imas_users ON imas_forum_posts.userid=imas_users.id ";
+		$query .= "LEFT JOIN imas_students ON imas_students.userid=imas_forum_posts.userid AND imas_students.courseid='$cid' ";
+		$query .= "LEFT JOIN imas_grades ON imas_grades.gradetype='forum' AND imas_grades.refid=imas_forum_posts.id ";
 		$query .= "WHERE (imas_forum_posts.id='$threadid' OR imas_forum_posts.threadid='$threadid') ORDER BY imas_forum_posts.id";
 	} else {
-		$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,imas_students.section from imas_forum_posts,imas_users,imas_students ";
-		$query .= "WHERE imas_forum_posts.userid=imas_users.id AND imas_users.id=imas_students.userid AND imas_students.courseid='$cid' AND (imas_forum_posts.id='$threadid' OR imas_forum_posts.threadid='$threadid') ORDER BY imas_forum_posts.id";	
+		$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,imas_students.section FROM ";
+		$query .= "imas_forum_posts JOIN imas_users ON imas_forum_posts.userid=imas_users.id ";
+		$query .= "LEFT JOIN imas_students ON imas_students.userid=imas_forum_posts.userid AND imas_students.courseid='$cid' ";
+		$query .= "WHERE (imas_forum_posts.id='$threadid' OR imas_forum_posts.threadid='$threadid') ORDER BY imas_forum_posts.id";
+		
+		//$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg from imas_forum_posts,imas_users ";
+		//$query .= "WHERE imas_forum_posts.userid=imas_users.id AND (imas_forum_posts.id='$threadid' OR imas_forum_posts.threadid='$threadid') ORDER BY imas_forum_posts.id";	
 	}
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$children = array(); $date = array(); $subject = array(); $message = array(); $posttype = array(); $likes = array(); $mylikes = array();
