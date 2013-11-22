@@ -147,6 +147,15 @@ if ($isteacher) {
 		include("../footer.php");
 		exit;
 	}
+	if ((isset($_POST['posted']) && $_POST['posted']=="Lock") || (isset($_GET['action']) && $_GET['action']=="lock" )) {
+		$calledfrom='gb';
+		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+		$curBreadcrumb .= "&gt; <a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; Confirm Change";
+		$pagetitle = _('Lock Students');
+		include("lockstu.php");
+		include("../footer.php");
+		exit;
+	}
 	if (isset($_POST['posted']) && $_POST['posted']=='Print Report') {
 		//based on a contribution by Cam Joyce
 		require_once("gbtable2.php");
@@ -631,6 +640,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 		if (!isset($CFG['GEN']['noInstrUnenroll'])) {
 			echo '<button type="submit" name="posted" value="Unenroll">',_('Unenroll'),'</button> ';
 		}
+		echo '<button type="submit" name="posted" value="Lock">',_('Lock'),'</button> ';
 		echo '<button type="submit" name="posted" value="Make Exception">',_('Make Exception'),'</button> ';
 	}
 	

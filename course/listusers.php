@@ -40,6 +40,9 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 	if (isset($_POST['submit']) && $_POST['submit']=="Unenroll") {
 		$_GET['action'] = "unenroll";
 	}
+	if (isset($_POST['submit']) && $_POST['submit']=="Lock") {
+		$_GET['action'] = "lock";
+	}
 	
 	if (isset($_GET['assigncode'])) {
 		
@@ -296,6 +299,14 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$overwriteBody = 1;
 		$fileToInclude = "unenroll.php";
 		
+	} elseif (isset($_GET['action']) && $_GET['action']=="lock") {
+		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n"; 
+		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Confirm Change\n";
+		$pagetitle = "LockStudents";		
+		$calledfrom='lu';
+		$overwriteBody = 1;
+		$fileToInclude = "lockstu.php";
+		
 	} else { //DEFAULT DATA MANIPULATION HERE
 	 
 		$curBreadcrumb .= " &gt; Roster\n";
@@ -543,6 +554,7 @@ if ($overwriteBody==1) {
 			echo '<input type=submit name=submit value="Unenroll">';
 		}
 		?>
+		<input type=submit name=submit value="Lock">
 		<input type=submit name=submit value="Make Exception">
 		<input type=submit name=submit value="Copy Emails">
 		<input type="button" value="Pictures" onclick="rotatepics()" />
