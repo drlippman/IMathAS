@@ -2604,7 +2604,7 @@ function stringtopolyterms($str) {
 
 function getfeedbacktxt($stu,$fbtxt,$ans) {
 	global $imasroot;
-	if ($stu==null) {
+	if ($stu===null) {
 		return " ";
 	} else if ($stu==='NA') {
 		return '<span class="feedbackwrap"><img src="'.$imasroot.'/img/redx.gif"/> No answer selected. Try again.</span>';
