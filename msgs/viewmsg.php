@@ -79,9 +79,11 @@
 			
 	
 	$msgid = $_GET['msgid'];
+	
 	$query = "SELECT imas_msgs.*,imas_users.LastName,imas_users.FirstName,imas_users.email,imas_users.hasuserimg,imas_students.section ";
-	$query .= "FROM imas_msgs,imas_users,imas_students WHERE imas_students.userid=imas_users.id AND imas_students.courseid='$cid' ";
-	$query .= "AND imas_msgs.msgfrom=imas_users.id AND imas_msgs.id='$msgid' ";
+	$query .= "FROM imas_msgs JOIN imas_users ON imas_msgs.msgfrom=imas_users.id LEFT JOIN imas_students ON imas_students.userid=imas_users.id AND imas_students.courseid='$cid' ";
+	$query .= "WHERE imas_msgs.id='$msgid' ";
+	
 	if ($type!='allstu' || !$isteacher) {
 		$query .= "AND (imas_msgs.msgto='$userid' OR imas_msgs.msgfrom='$userid')";
 	}
