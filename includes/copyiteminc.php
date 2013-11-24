@@ -265,48 +265,49 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 			}
 			$idtoorder = array_flip($insorder);
 			
-			$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category,regen,showans,showhints) ";
-			$query .= "VALUES ".implode(',',$inss);
-			mysql_query($query) or die("Query failed : $query" . mysql_error());
-			$firstnewid = mysql_insert_id();
-			
-			$aitems = explode(',',$itemorder);
-			$newaitems = array();
-			foreach ($aitems as $k=>$aitem) {
-				if (strpos($aitem,'~')===FALSE) {
-					if (isset($thiswithdrawn[$aitem])) { continue;}
-					if ($rubric[$aitem]!=0) {
-						$qrubrictrack[$firstnewid+$idtoorder[$aitem]] = $rubric[$aitem];
-					}
-					$newaitems[] = $firstnewid+$idtoorder[$aitem];
-				} else {
-					$sub = explode('~',$aitem);
-					$newsub = array();
-					$front = 0;
-					if (strpos($sub[0],'|')!==false) { //true except for bwards compat 
-						$newsub[] = array_shift($sub);
-						$front = 1;
-					}
-					foreach ($sub as $subi) {
-						if (isset($thiswithdrawn[$subi])) { continue;}
-						if ($rubric[$subi]!=0) {
-							$qrubrictrack[$firstnewid+$idtoorder[$subi]] = $rubric[$subi];
+			if (count($inss)>0) {
+				$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category,regen,showans,showhints) ";
+				$query .= "VALUES ".implode(',',$inss);
+				mysql_query($query) or die("Query failed : $query" . mysql_error());
+				$firstnewid = mysql_insert_id();
+				
+				$aitems = explode(',',$itemorder);
+				$newaitems = array();
+				foreach ($aitems as $k=>$aitem) {
+					if (strpos($aitem,'~')===FALSE) {
+						if (isset($thiswithdrawn[$aitem])) { continue;}
+						if ($rubric[$aitem]!=0) {
+							$qrubrictrack[$firstnewid+$idtoorder[$aitem]] = $rubric[$aitem];
 						}
-						$newsub[] = $firstnewid+$idtoorder[$subi];
-					}
-					if (count($newsub)==$front) {
-						
-					} else if (count($newsub)==$front+1) {
-						$newaitems[] = $newsub[$front];
+						$newaitems[] = $firstnewid+$idtoorder[$aitem];
 					} else {
-						$newaitems[] = implode('~',$newsub);
+						$sub = explode('~',$aitem);
+						$newsub = array();
+						$front = 0;
+						if (strpos($sub[0],'|')!==false) { //true except for bwards compat 
+							$newsub[] = array_shift($sub);
+							$front = 1;
+						}
+						foreach ($sub as $subi) {
+							if (isset($thiswithdrawn[$subi])) { continue;}
+							if ($rubric[$subi]!=0) {
+								$qrubrictrack[$firstnewid+$idtoorder[$subi]] = $rubric[$subi];
+							}
+							$newsub[] = $firstnewid+$idtoorder[$subi];
+						}
+						if (count($newsub)==$front) {
+							
+						} else if (count($newsub)==$front+1) {
+							$newaitems[] = $newsub[$front];
+						} else {
+							$newaitems[] = implode('~',$newsub);
+						}
 					}
 				}
+				$newitemorder = implode(',',$newaitems);
+				$query = "UPDATE imas_assessments SET itemorder='$newitemorder' WHERE id='$newtypeid'";
+				mysql_query($query) or die("Query failed : $query" . mysql_error());
 			}
-			$newitemorder = implode(',',$newaitems);
-			$query = "UPDATE imas_assessments SET itemorder='$newitemorder' WHERE id='$newtypeid'";
-			mysql_query($query) or die("Query failed : $query" . mysql_error());
-			
 			
 
 			/*
