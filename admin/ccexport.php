@@ -363,6 +363,47 @@ if (isset($_GET['delete'])) {
 						$resitem .= '</resource>';
 						$res[] = $resitem;
 					}
+				} else if ($iteminfo[$item][0]=='Wiki') {
+					$query = "SELECT name FROM imas_wikis WHERE id='{$iteminfo[$item][1]}'";
+					$r = mysql_query($query) or die("Query failed : " . mysql_error());
+					$row = mysql_fetch_row($r);
+					$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
+					$out .= $ind.'  <title>'.htmlentities($row[0]).'</title>'."\n";
+					$out .= $ind.'</item>'."\n";
+					$canvout .= '<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
+					$canvout .= '<content_type>WikiPage</content_type>';
+					$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
+					$canvout .= '<title>'.htmlentities($row[0]).'</title>'."\n";
+					$canvout .= "<position>$ccnt</position> <indent>".(strlen($ind)/2 - 1)."</indent> </item>";
+					$ccnt++;
+					
+					$fp = fopen($newdir.'/'.$htmldir.'wikitext'.$iteminfo[$item][1].'.html','w');
+					fwrite($fp,'<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8">');
+					fwrite($fp,'<title>'.htmlentities($row[0]).'</title>');
+					fwrite($fp,'<meta name="identifier" content="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'"/>');
+					if ($linktype=="canvas") {
+						fwrite($fp,'<meta name="editing_roles" content="teachers"/>');
+					}
+					fwrite($fp,"</head><body>");
+					
+					$query = "SELECT revision FROM imas_wiki_revisions WHERE wikiid='{$iteminfo[$item][1]}' AND stugroupid=0 ORDER BY id DESC LIMIT 1";
+					$r = mysql_query($query) or die("Query failed : " . mysql_error());
+					if (mysql_num_rows($r)>0) {
+						$row = mysql_fetch_row($r);
+						$text = $row[0];
+						if (strlen($text)>6 && substr($text,0,6)=='**wver') {
+							$wikiver = substr($text,6,strpos($text,'**',6)-6);
+							$text = substr($text,strpos($text,'**',6)+2);
+						}
+						fwrite($fp,filtercapture($text,$res));
+					}
+					
+					fwrite($fp,'</body></html>');
+					fclose($fp);
+					$resitem =  '<resource href="'.$htmldir.'wikitext'.$iteminfo[$item][1].'.html" identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" type="webcontent">'."\n";
+					$resitem .= '  <file href="'.$htmldir.'wikitext'.$iteminfo[$item][1].'.html" />'."\n";
+					$resitem .= '</resource>';
+					$res[] = $resitem;
 				}
 				$module_meta .= $canvout;
 			}
