@@ -273,7 +273,7 @@ var AMsymbols = [
 {input:"csc",  tag:"mo", output:"csc", tex:null, ttype:UNARY, func:true},
 {input:"log",  tag:"mo", output:"log", tex:null, ttype:UNARY, func:true},
 {input:"ln",   tag:"mo", output:"ln",  tex:null, ttype:UNARY, func:true},
-{input:"abs",   tag:"mo", output:"abs",  tex:null, ttype:UNARY, func:true},
+{input:"abs",   tag:"mo", output:"abs",  tex:null, ttype:UNARY}, //, func:true
 {input:"Sin",  tag:"mo", output:"sin", tex:null, ttype:UNARY, func:true},
 {input:"Cos",  tag:"mo", output:"cos", tex:null, ttype:UNARY, func:true},
 {input:"Tan",  tag:"mo", output:"tan", tex:null, ttype:UNARY, func:true},
@@ -567,6 +567,11 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
       AMremoveBrackets(result[0]);
       if (symbol.input == "sqrt") {           // sqrt
         return [AMcreateMmlNode(symbol.tag,result[0]),result[1]];
+      } else  if (symbol.input == "abs") {           // abs
+         node = AMcreateMmlNode("mrow", AMcreateMmlNode("mo",document.createTextNode('|')));
+         node.appendChild(result[0]);
+         node.appendChild(AMcreateMmlNode("mo",document.createTextNode('|')));
+         return [node,result[1]];
       } else if (typeof symbol.acc == "boolean" && symbol.acc) {   // accent
         node = AMcreateMmlNode(symbol.tag,result[0]);
 	node.setAttribute("accent","true");

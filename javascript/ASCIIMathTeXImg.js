@@ -219,7 +219,7 @@ var AMsymbols = [
 {input:"csc",  tag:"mo", output:"csc", tex:null, ttype:UNARY, func:true},
 {input:"log",  tag:"mo", output:"log", tex:null, ttype:UNARY, func:true},
 {input:"ln",   tag:"mo", output:"ln",  tex:null, ttype:UNARY, func:true},
-{input:"abs",   tag:"mo", output:"abs",  tex:"text{abs}", ttype:UNARY, func:true, notexcopy:true},
+{input:"abs",   tag:"mo", output:"abs",  tex:"text{abs}", ttype:UNARY, notexcopy:true}, //, func:true
 
 {input:"Sin",  tag:"mo", output:"sin", tex:null, ttype:UNARY, func:true},
 {input:"Cos",  tag:"mo", output:"cos", tex:null, ttype:UNARY, func:true},
@@ -533,6 +533,8 @@ function AMTparseSexpr(str) { //parses str and returns [node,tailstr]
       result[0] = AMTremoveBrackets(result[0]);
       if (symbol.input == "sqrt") {           // sqrt
 	      return ['\\sqrt{'+result[0]+'}',result[1]];
+      } else if (symbol.input == "abs") {           // abs
+	      return ['{\\left|'+result[0]+'\\right|}',result[1]];
       } else if (typeof symbol.acc == "boolean" && symbol.acc) {   // accent
 	      return ['{'+AMTgetTeXsymbol(symbol)+'{'+result[0]+'}}',result[1]];
       } else {                        // font change command  

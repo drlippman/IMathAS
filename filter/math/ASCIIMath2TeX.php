@@ -211,7 +211,7 @@ array( 'input'=>'Sech', 'output'=>'sech', 'definition'=>TRUE),
 array( 'input'=>'Csch', 'output'=>'csch', 'definition'=>TRUE),
 array( 'input'=>'Log', 'output'=>'log', 'definition'=>TRUE),
 array( 'input'=>'Ln', 'output'=>'ln', 'definition'=>TRUE),
-array( 'input'=>'abs', 'tex'=>'text{abs}', 'notexcopy'=>TRUE, 'unary'=>TRUE, 'func'=>TRUE),
+array( 'input'=>'abs', 'tex'=>'text{abs}', 'notexcopy'=>TRUE, 'unary'=>TRUE), //, 'func'=>TRUE
 array( 'input'=>'Abs', 'tex'=>'text{abs}', 'notexcopy'=>TRUE, 'unary'=>TRUE, 'func'=>TRUE),
 array( 'input'=>'det', 'unary'=>TRUE, 'func'=>TRUE),
 array( 'input'=>'exp', 'unary'=>TRUE, 'func'=>TRUE),
@@ -550,6 +550,8 @@ function AMTparseSexpr($str) {
 		$result[0] = $this->AMTremoveBrackets($result[0]);
 		if ($symbol['input']=='sqrt') {
 			return array('\\sqrt{'.$result[0].'}',$result[1]);
+		} else if ($symbol['input']=='abs') {
+			return array('{\\left|'.$result[0].'\\right|}',$result[1]);
 		} else if (isset($symbol['acc'])) {
 			return array('{'.$this->AMTgetTeXsymbol($symbol).'{'.$result[0].'}}',$result[1]);
 		} else {
