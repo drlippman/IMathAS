@@ -1363,7 +1363,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 }
 			 echo "<p><b>Important</b>: This update adds improved timezone handling, fixing issues that ";
 			 echo "were occurring on servers set for UTC. Utilizing the improvements requires PHP 5.1 or higher ";
-			 echo "and requires updating your local loginpage.php file. See changes to loginpage.php.dist; changes are "
+			 echo "and requires updating your local loginpage.php file. See changes to loginpage.php.dist; changes are ";
 			 echo "on lines 9, 69, and 75-76.</p>";
 		}
 			
