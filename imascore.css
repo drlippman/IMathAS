@@ -530,6 +530,9 @@ table.gridded {
 	border-collapse: collapse;
 	margin: 0px;
 }
+table.gridded.centered {
+	margin: 0px auto;
+}
 
 table.gridded thead th, table.gridded thead td {
 	text-align: center;

@@ -283,7 +283,7 @@ function initeditor(edmode,edids) {
 	    content_css : imasroot+'/imascore.css,'+imasroot+'/themes/'+coursetheme,
 	    popup_css_add : imasroot+'/themes/'+coursetheme,
 	    theme_advanced_resizing : true,
-	    table_styles: "Gridded=gridded",
+	    table_styles: "Gridded=gridded;Gridded Centered=gridded centered",
 	    cleanup_callback : "imascleanup",
 	    AScgiloc : imasroot+'/filter/graph/svgimg.php',
 	    ASdloc : imasroot+'/javascript/d.svg',
