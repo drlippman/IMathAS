@@ -18,6 +18,7 @@
 		$nologo = true;
 		$infopath = isset($CFG['GEN']['directaccessincludepath'])?$CFG['GEN']['directaccessincludepath']:'';
 		$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/{$infopath}infopages.css\" type=\"text/css\">\n";
+		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
 		require("../header.php");
 		$pagetitle = "Diagnostics";
 		require((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'../')."infoheader.php");
@@ -236,8 +237,13 @@ if (isset($_POST['SID'])) {
 			$sessiondata['useed'] = 1;
 			$sessiondata['isdiag'] = $diagid;
 			$enc = base64_encode(serialize($sessiondata));
-			$query = "INSERT INTO imas_sessions VALUES ('$sessionid','$userid',$now,'{$_POST['tzoffset']}','$enc')";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			if (!empty($_POST['tzname'])) {
+				$tzname = $_POST['tzname'];
+			} else {
+				$tzname = '';
+			}
+			$query = "INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,tzname,sessiondata) VALUES ('$sessionid','$userid',$now,'{$_POST['tzoffset']}','$tzname','$enc')";
+			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			$aids = explode(',',$line['aidlist']);
 			$paid = $aids[$_POST['course']];
 			if ((intval($line['forceregen']) & (1<<intval($_POST['course'])))>0) {
@@ -359,10 +365,13 @@ for ($i=0;$i<count($sel1);$i++) {
 		echo "<span class=form>Access password:</span>  <input class=form type=password size=40 name=passwd><BR class=form>";
 	}
 ?>
-<input type=hidden id=tzoffset name=tzoffset value="">
+<input type="hidden" id="tzoffset" name="tzoffset" value=""> 
+<input type="hidden" id="tzname" name="tzname" value=""> 
 <script>
   var thedate = new Date();  
   document.getElementById("tzoffset").value = thedate.getTimezoneOffset();  
+  var tz = jstz.determine(); 
+  document.getElementById("tzname").value = tz.name();
 </script>	
 <div id="submit" class="submit" style="display:none"><input type=submit value='Access Diagnostic'></div>
 <input type=hidden name="mathdisp" id="mathdisp" value="2" />
