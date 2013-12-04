@@ -7,6 +7,12 @@ require("../validate.php");
 require("../includes/htmlutil.php");
 require("../includes/parsedatetime.php");
 require("../includes/filehandler.php");
+@set_time_limit(0);
+ini_set("max_input_time", "600");
+ini_set("max_execution_time", "600");
+ini_set("memory_limit", "104857600");
+ini_set("upload_max_filesize", "10485760");
+ini_set("post_max_size", "10485760");
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -415,7 +421,7 @@ function movefile(from) {
 	} 
 ?>
 
-		<input type="hidden" name="MAX_FILE_SIZE" value="2000000" />
+		<input type="hidden" name="MAX_FILE_SIZE" value="10000000" />
 		New file<sup>*</sup>: <input type="file" name="userfile"/><br/>
 		Description: <input type="text" name="newfiledescr"/><br/>
 		<input type=submit name="submitbtn" value="Add / Update Files"/>
