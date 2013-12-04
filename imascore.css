@@ -420,9 +420,9 @@ a.abutton {
 	border: 1px solid #000;
 	padding: 2px 15px;	
 	background-color: #fff;
-	min-width: 100px;
 	color: #000;
 	border-radius: 4px;
+	white-space: nowrap;
 }
 a.abutton:hover {
 	background-color: #ccf;
@@ -432,7 +432,7 @@ a.abutton:hover {
 .newnote {
 	color: #f00;
 }
-div#leftcolumn {float: left; width: 25%;}
+div#leftcolumn {float: left; width: 25%; min-width: 200px;}
 div#rightcolumn {float: right; width: 74%; min-width: 250px;}
 ul.courselist {
 	margin: 5px;

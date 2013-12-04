@@ -122,7 +122,7 @@ function reducequadraticform($a,$n,$rootnum,$d,$format="string") {
 	//reduce to (a+n sqrt(in))/d
 	list($rootA,$in) = reduceradical($rootnum,$root,"parts");
 	$n *= $rootA;
-	if ($in==1) {
+	if ($in==1 && !$iscomplex) {
 		$n += $a;
 		$a = 0;
 	}
