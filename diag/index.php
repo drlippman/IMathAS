@@ -277,7 +277,12 @@ if (isset($_POST['SID'])) {
 	$sessiondata['useed'] = 1;
 	$sessiondata['isdiag'] = $diagid;
 	$enc = base64_encode(serialize($sessiondata));
-	$query = "INSERT INTO imas_sessions VALUES ('$sessionid','$userid',$now,'{$_POST['tzoffset']}','$enc')";
+	if (!empty($_POST['tzname'])) {
+		$tzname = $_POST['tzname'];
+	} else {
+		$tzname = '';
+	}
+	$query = "INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,tzname,sessiondata) VALUES ('$sessionid','$userid',$now,'{$_POST['tzoffset']}','$tzname','$enc')";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$aids = explode(',',$line['aidlist']);
 	$paid = $aids[$_POST['course']];
@@ -307,6 +312,7 @@ if (file_exists((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludep
 $nologo = true;
 $infopath = isset($CFG['GEN']['directaccessincludepath'])?$CFG['GEN']['directaccessincludepath']:'';
 $placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/{$infopath}infopages.css\" type=\"text/css\">\n";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
 require("../header.php");
 $pagetitle =$line['name'];
 require((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'../')."infoheader.php");

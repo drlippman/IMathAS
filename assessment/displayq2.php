@@ -2255,6 +2255,22 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			} else if (isset($GLOBALS['asid'])) {
 				$s3asid = $GLOBALS['asid'];
 			} 
+			if (isset($GLOBALS['questionscoreref'])) {
+				if ($multi==0) {
+					$el = $GLOBALS['questionscoreref'][0];
+					$sc = $GLOBALS['questionscoreref'][1];
+				} else {
+					$el = $GLOBALS['questionscoreref'][0].'-'.($qn%1000);
+					$sc = $GLOBALS['questionscoreref'][1][$qn%1000];
+				}
+				$out .= '<span style="float:right;">';
+				$out .= '<img class="scoreicon" src="'.$imasroot.'/img/q_fullbox.gif" ';
+				$out .= "onclick=\"quicksetscore('$el',$sc)\" />";
+				$out .= '<img class="scoreicon" src="'.$imasroot.'/img/q_halfbox.gif" ';
+				$out .= "onclick=\"quicksetscore('$el',.5*$sc)\" />";
+				$out .= '<img class="scoreicon" src="'.$imasroot.'/img/q_emptybox.gif" ';
+				$out .= "onclick=\"quicksetscore('$el',0)\" /></span>";
+			}
 			if (!empty($s3asid)) {
 				require_once("../includes/filehandler.php");
 				
