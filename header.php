@@ -190,7 +190,7 @@ if (isset($cid) && isset($teacherid) && $coursetopbar[2]==1 && count($coursetopb
 		echo "<li><a {$a[5]} href=\"$imasroot/course/course.php?cid=$cid&quickview=on\">Quick View</a></li>\n";
 	}
 	
-	if (in_array(9,$coursetopbar[1])) { //Log out
+	if (in_array(9,$coursetopbar[1]) && !isset($haslogout)) { //Log out
 		echo "<li><a href=\"$imasroot/actions.php?action=logout\">Log Out</a></li>";
 	}
 	echo '</ul>';
@@ -222,7 +222,7 @@ if (isset($cid) && isset($teacherid) && $coursetopbar[2]==1 && count($coursetopb
 		$essentialsnavcnt++;
 	}
 	
-	if (in_array(9,$coursetopbar[0])) { //Log out
+	if (in_array(9,$coursetopbar[0]) && !isset($haslogout)) { //Log out
 		echo "<li><a href=\"$imasroot/actions.php?action=logout\">Log Out</a></li>";
 	}
 	echo '</ul>';

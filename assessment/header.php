@@ -194,7 +194,7 @@ if (isset($cid) && !isset($flexwidth) && (!isset($sessiondata['intreereader']) |
 		echo "<li><a href=\"$imasroot/course/course.php?cid=$cid&quickview=on\">Quick View</a></li>\n";
 	}
 	
-	if (in_array(9,$coursetopbar[1])) { //Log out
+	if (in_array(9,$coursetopbar[1]) && !isset($haslogout)) { //Log out
 		echo "<li><a href=\"$imasroot/actions.php?action=logout\">Log Out</a></li>";
 	}
 	echo '</ul>';
@@ -216,7 +216,7 @@ if (isset($cid) && !isset($flexwidth) && (!isset($sessiondata['intreereader']) |
 	if (in_array(1,$coursetopbar[0])) { //Gradebook
 		echo "<li><a href=\"$imasroot/course/gradebook.php?cid=$cid\">Gradebook</a></li> ";
 	}
-	if (in_array(9,$coursetopbar[0])) { //Log out
+	if (in_array(9,$coursetopbar[0]) && !isset($haslogout)) { //Log out
 		echo "<li><a href=\"$imasroot/actions.php?action=logout\">Log Out</a></li>";
 	}
 	echo '</ul>';
