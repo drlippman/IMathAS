@@ -436,7 +436,7 @@ if ($overwriteBody==1) {
 ?>
 		</p>
 	<?php
-	if (isset($CFG['CPS']['leftnavtools']) || $CFG['CPS']['leftnavtools']=='limited') {
+	if (isset($CFG['CPS']['leftnavtools']) && $CFG['CPS']['leftnavtools']=='limited') {
 	?>
 		<p><b><?php echo _('Tools'); ?></b><br/>
 			<a href="managestugrps.php?cid=<?php echo $cid ?>"><?php echo _('Groups'); ?></a><br/>

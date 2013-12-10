@@ -226,7 +226,11 @@ function GB_show(caption,url,width,height) {
 	} else {
 		document.getElementById("GB_caption").innerHTML = '<span class="floatright"><span class="pointer" onclick="GB_hide()">[X]</span></span>'+caption;
 		document.getElementById("GB_caption").onclick = GB_hide;
-		var h = height;
+		if (height=='auto') {
+			var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
+		} else {
+			var h = height;
+		}
 	}
 	document.getElementById("GB_window").style.display = "block";
 	document.getElementById("GB_overlay").style.display = "block";
