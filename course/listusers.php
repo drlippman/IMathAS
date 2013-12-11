@@ -43,6 +43,10 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 	if (isset($_POST['submit']) && $_POST['submit']=="Lock") {
 		$_GET['action'] = "lock";
 	}
+	if (isset($_POST['lockinstead'])) {
+		$_GET['action'] = "lock";
+		$_POST['tolock'] = $_POST['tounenroll'];
+	}
 	
 	if (isset($_GET['assigncode'])) {
 		
@@ -307,6 +311,20 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$overwriteBody = 1;
 		$fileToInclude = "lockstu.php";
 		
+	} elseif (isset($_GET['action']) && $_GET['action']=="lockone" && is_numeric($_GET['uid'])) {
+		$now = time();
+		$query = "UPDATE imas_students SET locked='$now' WHERE courseid='$cid' AND userid=".intval($_GET['uid']);
+		mysql_query($query) or die("Query failed : " . mysql_error());
+	
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
+		exit;
+	} elseif (isset($_GET['action']) && $_GET['action']=="unlockone" && is_numeric($_GET['uid'])) {
+		$now = time();
+		$query = "UPDATE imas_students SET locked=0 WHERE courseid='$cid' AND userid=".intval($_GET['uid']);
+		mysql_query($query) or die("Query failed : " . mysql_error());
+	
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
+		exit;
 	} else { //DEFAULT DATA MANIPULATION HERE
 	 
 		$curBreadcrumb .= " &gt; Roster\n";
@@ -574,11 +592,7 @@ if ($overwriteBody==1) {
 			<th>Grades</th>
 			<th>Due Dates</th>
 			<th>Chg Info</th>
-			<?php 
-			if (!isset($CFG['GEN']['noInstrUnenroll'])) {
-				echo '<th>Unenroll</th>';
-			}
-			?>
+			<th>Lock Out</th>
 		</tr>
 		</thead>
 		<tbody>	
@@ -591,7 +605,7 @@ if ($overwriteBody==1) {
 			}
 			$numstu++;
 			if ($line['locked']>0) {
-				$lastaccess = "locked";
+				$lastaccess = "Is locked out";
 			} else {
 				$lastaccess = ($line['lastaccess']>0) ? tzdate("n/j/y g:ia",$line['lastaccess']) : "never";
 			}
@@ -629,9 +643,14 @@ if ($overwriteBody==1) {
 				<td><a href="listusers.php?cid=<?php echo $cid ?>&uid=<?php echo $line['userid'] ?>&massexception=1">Exception</a></td>
 				<td><a href="listusers.php?cid=<?php echo $cid ?>&chgstuinfo=true&uid=<?php echo $line['userid'] ?>">Chg</a></td>
 				<?php
-				if (!isset($CFG['GEN']['noInstrUnenroll'])) {
-					echo '<td><a href="listusers.php?cid='.$cid.'&action=unenroll&uid='.$line['userid'].'">Unenroll</a></td>';
+				if ($line['locked']>0) {
+					echo '<td><a href="listusers.php?cid='.$cid.'&action=unlockone&uid='.$line['userid'].'">Unlock</a></td>';
+				} else {
+					echo '<td><a href="listusers.php?cid='.$cid.'&action=lockone&uid='.$line['userid'].'" onclick="return confirm(\'Are you SURE you want to lock this student out of the course?\');">Lock</a></td>';
 				}
+				/*if (!isset($CFG['GEN']['noInstrUnenroll'])) {
+					echo '<td><a href="listusers.php?cid='.$cid.'&action=unenroll&uid='.$line['userid'].'">Unenroll</a></td>';
+				}*/
 				?>
 			</tr>
 <?php

@@ -130,6 +130,10 @@ if ($isteacher) {
 		} 
 		exit;
 	}
+	if (isset($_POST['lockinstead'])) {
+		$_GET['action'] = "lock";
+		$_POST['tolock'] = $_POST['tounenroll'];
+	}
 	if ((isset($_POST['posted']) && ($_POST['posted']=="E-mail" || $_POST['posted']=="Message"))|| isset($_GET['masssend']))  {
 		$calledfrom='gb';
 		include("masssend.php");

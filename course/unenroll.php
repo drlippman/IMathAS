@@ -115,6 +115,8 @@ ini_set("max_execution_time", "600");
 		
 			if ($_GET['uid']=="all") {
 ?>			
+			<p><b style="color:red">Warning!</b>: This will delete ALL course data about these students.  This action <b>cannot be undone</b>.
+			If you have a student who isn't attending but may return, use the Lock Out of course option instead of unenrolling them.</p>
 			<p>Are you SURE you want to unenroll ALL students?</p>
 			<ul>
 <?php
@@ -152,7 +154,9 @@ ini_set("max_execution_time", "600");
 
 				} else {
 ?>				
-		Are you SURE you want to unenroll the selected students?
+		<p><b style="color:red">Warning!</b>: This will delete ALL course data about these students.  This action <b>cannot be undone</b>.
+		If you have a student who isn't attending but may return, use the Lock Out of course option instead of unenrolling them.</p>
+		<p>Are you SURE you want to unenroll the selected students?</p>
 		<ul>
 <?php
 					while ($row = mysql_fetch_row($resultUserList)) {
@@ -171,7 +175,8 @@ ini_set("max_execution_time", "600");
 ?>
 
 		<p>
-			<input type=submit value="Yes, I'm Sure">
+			<input type=submit value="Unenroll">
+			<input type=submit name="lockinstead" value="Lock Students Out Instead">
 <?php
 			if ($calledfrom=='lu') {
 				echo "<input type=button value=\"Nevermind\" onclick=\"window.location='listusers.php?cid=$cid'\">";
