@@ -387,6 +387,12 @@ $address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']
 $placeinhead .= "       var toopen = '$address&secfilter=' + sec;\n";
 $placeinhead .= "  	window.location = toopen; \n";
 $placeinhead .= "}\n";
+$placeinhead .= '$(function() { $(".lal").attr("title","View login log"); 
+	$(".gl").attr("title","View student grades");
+	$(".ex").attr("title","Set due date exceptions");
+	$(".ui").attr("title","Change student profile info");
+	$(".ll").attr("title","Lock student out of the course");
+	$(".ull").attr("title","Allow student access to the course");});';
 $placeinhead .= "</script>";
 
 require("../header.php");
@@ -562,20 +568,43 @@ if ($overwriteBody==1) {
 	}
 	</script>
 	<script type="text/javascript" src="<?php echo $imasroot ?>/javascript/tablesorter.js"></script>
+	<div class="cpmid">
+	<?php
+	echo '<span class="column" style="width:auto;">';
+	echo "<a href=\"logingrid.php?cid=$cid\">View Login Grid</a><br/>";
+	echo "<a href=\"listusers.php?cid=$cid&assigncode=1\">Assign Sections and/or Codes</a><br/>";
+	echo '</span>';
+	echo '<span class="column" style="width:auto;">';
+	echo "<a href=\"latepasses.php?cid=$cid\">Manage LatePasses</a>";
+	if ($CFG['GEN']['allowinstraddtutors']) {
+		echo "<br/><a href=\"managetutors.php?cid=$cid\">Manage Tutors</a>";
+	}
+	echo '</span>';
+	echo '<span class="column" style="width:auto;">';
+	echo "<a href=\"listusers.php?cid=$cid&enroll=student\">Enroll Student with known username</a><br/>";
+	echo "<a href=\"enrollfromothercourse.php?cid=$cid\">Enroll students from another course</a><br/>";
+	if ($CFG['GEN']['allowinstraddstus']) { 
+		echo "<a href=\"$imasroot/admin/importstu.php?cid=$cid\">Import Students from File</a><br/>";
+		echo "<a href=\"listusers.php?cid=$cid&newstu=new\">Create and Enroll new student</a><br/>";
+	}
+	echo '</span>';
+	echo '<br class="clear"/>';
+	?>
+	</div>
 	<form id="qform" method=post action="listusers.php?cid=<?php echo $cid ?>">
-		Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',true,'locked')">Non-locked</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
+		<p>Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',true,'locked')">Non-locked</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
 		With Selected:  
-		<input type=submit name=submit value="E-mail">
-		<input type=submit name=submit value="Message"> 
+		<input type=submit name=submit value="E-mail" title="Send e-mail to the selected students">
+		<input type=submit name=submit value="Message" title="Send a message to the selected students"> 
 		<?php 
 		if (!isset($CFG['GEN']['noInstrUnenroll'])) {
-			echo '<input type=submit name=submit value="Unenroll">';
+			echo '<input type=submit name=submit value="Unenroll" title="Unenroll the selected students">';
 		}
 		?>
-		<input type=submit name=submit value="Lock">
-		<input type=submit name=submit value="Make Exception">
-		<input type=submit name=submit value="Copy Emails">
-		<input type="button" value="Pictures" onclick="rotatepics()" />
+		<input type=submit name=submit value="Lock" title="Lock selected students out of the course">
+		<input type=submit name=submit value="Make Exception" title="Make due date exceptions for selected students">
+		<input type=submit name=submit value="Copy Emails" title="Get copyable list of email addresses for selected students">
+		<input type="button" value="Pictures" onclick="rotatepics()" title="View/hide student pictures, if available"/></p>
 		
 	<table class=gb id=myTable>
 		<thead>
@@ -638,15 +667,15 @@ if ($overwriteBody==1) {
 				?>
 				<td><a href="mailto:<?php echo $line['email'] ?>"><?php echo $line['email'] ?></a></td>
 				<td><?php echo $line['SID'] ?></td>
-				<td><a href="viewloginlog.php?cid=<?php echo $cid ?>&uid=<?php echo $line['userid'] ?>"><?php echo $lastaccess ?></a></td>
-				<td><a href="gradebook.php?cid=<?php echo $cid ?>&stu=<?php echo $line['userid'] ?>&from=listusers">Grades</a></td>
-				<td><a href="listusers.php?cid=<?php echo $cid ?>&uid=<?php echo $line['userid'] ?>&massexception=1">Exception</a></td>
-				<td><a href="listusers.php?cid=<?php echo $cid ?>&chgstuinfo=true&uid=<?php echo $line['userid'] ?>">Chg</a></td>
+				<td><a href="viewloginlog.php?cid=<?php echo $cid ?>&uid=<?php echo $line['userid'] ?>" class="lal"><?php echo $lastaccess ?></a></td>
+				<td><a href="gradebook.php?cid=<?php echo $cid ?>&stu=<?php echo $line['userid'] ?>&from=listusers" class="gl">Grades</a></td>
+				<td><a href="listusers.php?cid=<?php echo $cid ?>&uid=<?php echo $line['userid'] ?>&massexception=1" class="ex">Exception</a></td>
+				<td><a href="listusers.php?cid=<?php echo $cid ?>&chgstuinfo=true&uid=<?php echo $line['userid'] ?>" class="ui">Chg</a></td>
 				<?php
 				if ($line['locked']>0) {
-					echo '<td><a href="listusers.php?cid='.$cid.'&action=unlockone&uid='.$line['userid'].'">Unlock</a></td>';
+					echo '<td><a href="listusers.php?cid='.$cid.'&action=unlockone&uid='.$line['userid'].'" class="ull">Unlock</a></td>';
 				} else {
-					echo '<td><a href="listusers.php?cid='.$cid.'&action=lockone&uid='.$line['userid'].'" onclick="return confirm(\'Are you SURE you want to lock this student out of the course?\');">Lock</a></td>';
+					echo '<td><a href="listusers.php?cid='.$cid.'&action=lockone&uid='.$line['userid'].'" onclick="return confirm(\'Are you SURE you want to lock this student out of the course?\');" class="ll">Lock</a></td>';
 				}
 				/*if (!isset($CFG['GEN']['noInstrUnenroll'])) {
 					echo '<td><a href="listusers.php?cid='.$cid.'&action=unenroll&uid='.$line['userid'].'">Unenroll</a></td>';
@@ -668,29 +697,7 @@ if ($overwriteBody==1) {
 	</form>
 		
 
-	<div class=cp>
-	<?php
-	echo '<span class="column" style="width:auto;">';
-	echo "<a href=\"logingrid.php?cid=$cid\">View Login Grid</a><br/>";
-	echo '</span>';
-	echo '<span class="column" style="width:auto;">';
-	echo "<a href=\"listusers.php?cid=$cid&assigncode=1\">Assign Sections and/or Codes</a><br/>";
-	echo "<a href=\"latepasses.php?cid=$cid\">Manage LatePasses</a>";
-	if ($CFG['GEN']['allowinstraddtutors']) {
-		echo "<br/><a href=\"managetutors.php?cid=$cid\">Manage Tutors</a>";
-	}
-	echo '</span>';
-	echo '<span class="column" style="width:auto;">';
-	echo "<a href=\"listusers.php?cid=$cid&enroll=student\">Enroll Student with known username</a><br/>";
-	echo "<a href=\"enrollfromothercourse.php?cid=$cid\">Enroll students from another course</a><br/>";
-	if ($CFG['GEN']['allowinstraddstus']) { 
-		echo "<a href=\"$imasroot/admin/importstu.php?cid=$cid\">Import Students from File</a><br/>";
-		echo "<a href=\"listusers.php?cid=$cid&newstu=new\">Create and Enroll new student</a><br/>";
-	}
-	echo '</span>';
-	echo '<br class="clear"/>';
-	?>
-	</div>
+	
 	<p></p>
 <?php
 	}
