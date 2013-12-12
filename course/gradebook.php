@@ -639,13 +639,15 @@ if (isset($studentid) || $stu!=0) { //show student view
 	
 	if ($isteacher) {
 		echo _('Check:'), ' <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',true)">', _('All'), '</a> <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',false)">', _('None'), '</a> ';
-		echo _('With Selected:'), '  <button type="submit" name="posted" value="Print Report">',_('Print Report'),'</button> <button type="submit" name="posted" value="E-mail">',_('E-mail'),'</button> <button type="submit" name="posted" value="Message">',_('Message'),'</button> ';
+		echo _('With Selected:'), '  <button type="submit" name="posted" value="Print Report" title="',_("Generate printable grade reports"),'">',_('Print Report'),'</button> ';
+		echo '<button type="submit" name="posted" value="E-mail" title="',_("Send e-mail to the selected students"),'">',_('E-mail'),'</button> ';
+		echo '<button type="submit" name="posted" value="Message" title="',_("Send a message to the selected students"),'">',_('Message'),'</button> ';
 
 		if (!isset($CFG['GEN']['noInstrUnenroll'])) {
-			echo '<button type="submit" name="posted" value="Unenroll">',_('Unenroll'),'</button> ';
+			echo '<button type="submit" name="posted" value="Unenroll" title="',_("Unenroll the selected students"),'">',_('Unenroll'),'</button> ';
 		}
-		echo '<button type="submit" name="posted" value="Lock">',_('Lock'),'</button> ';
-		echo '<button type="submit" name="posted" value="Make Exception">',_('Make Exception'),'</button> ';
+		echo '<button type="submit" name="posted" value="Lock" title="',_("Lock selected students out of the course"),'">',_('Lock'),'</button> ';
+		echo '<button type="submit" name="posted" value="Make Exception" title="',_("Make due date exceptions for selected students"),'">',_('Make Exception'),'</button> ';
 	}
 	
 	$gbt = gbinstrdisp();
