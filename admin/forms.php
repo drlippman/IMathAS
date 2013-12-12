@@ -444,7 +444,7 @@ switch($_GET['action']) {
 			if (($istemplate&2)==2) {echo 'checked="checked"';};
 			echo ' /> Mark as group template course';
 			if ($myrights==100) {
-				echo '<br/><span class="formright"><input type=checkbox name="istemplate" value="1" ';
+				echo '<br/><input type=checkbox name="istemplate" value="1" ';
 				if (($istemplate&1)==1) {echo 'checked="checked"';};
 				echo ' /> Mark as global template course<br/>';
 				echo '<input type=checkbox name="isselfenroll" value="4" ';
