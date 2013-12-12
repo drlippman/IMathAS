@@ -405,7 +405,18 @@ $placeinhead .= '<script type="text/javascript">
 			$("#selectitemstocopy").hide();$("#allitemsnote").show();
 		} else {
 			$("#selectitemstocopy").show();$("#allitemsnote").hide();
-		} }</script>';
+		} }
+		
+	$(function() {
+		$("input:radio").change(function() {
+			if ($(this).hasClass("copyr")) {
+				$("#ekeybox").show();
+			} else {
+				$("#ekeybox").hide();
+			}
+		});
+	});	
+		</script>';
 require("../header.php");
 }
 if ($overwriteBody==1) {
@@ -595,14 +606,14 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 	?>
 						<li>
 							<span class=dd>-</span>
-							<input type=radio name=ctc value="<?php echo $line['id'] ?>">
-							<?php echo $line['name'] ?>
-							<?php 
-								if ($line['copyrights']<2) {
-									echo "&copy;\n"; 
-								} else {
-									echo " <a href=\"course.php?cid={$line['id']}\" target=\"_blank\">Preview</a>";
-								}
+							<?php
+							echo '<input type="radio" name="ctc" value="'.$line['id'].'" '.(($line['copyrights']<2)?'class="copyr"':'').'>';
+							echo $line['name'];
+							if ($line['copyrights']<2) {
+								echo "&copy;\n"; 
+							} else {
+								echo " <a href=\"course.php?cid={$line['id']}\" target=\"_blank\">Preview</a>";
+							}
 							?>  
 						</li>
 	<?php
@@ -627,7 +638,17 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 	var ahahurl = '<?php echo $imasroot?>/course/copyitems.php?cid=<?php echo $cid ?>&loadothers=true';
 	function loadothers() {
 		if (!othersloaded) {
-			basicahah(ahahurl, "other");
+			//basicahah(ahahurl, "other");
+			$.ajax({url:ahahurl, dataType:"html"}).done(function(resp) {
+				$('#other').html(resp);
+				$("#other input:radio").change(function() {
+					if ($(this).hasClass("copyr")) {
+						$("#ekeybox").show();
+					} else {
+						$("#ekeybox").hide();
+					}
+				});
+			});
 			othersloaded = true;
 		}
 	}
@@ -695,15 +716,15 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 ?>
 							<li>
 								<span class=dd>-</span>
-								<input type=radio name=ctc value="<?php echo $line['id'] ?>">
-								<?php echo $line['name'] ?>
-								<?php 
-									if ($line['copyrights']<1) {
-										echo "&copy;\n"; 
-									} else {
-										echo " <a href=\"course.php?cid={$line['id']}\" target=\"_blank\">Preview</a>";
-									}
-								?>
+								<?php
+								echo '<input type="radio" name="ctc" value="'.$line['id'].'" '.(($line['copyrights']<2)?'class="copyr"':'').'>';
+								echo $line['name'];
+								if ($line['copyrights']<1) {
+									echo "&copy;\n"; 
+								} else {
+									echo " <a href=\"course.php?cid={$line['id']}\" target=\"_blank\">Preview</a>";
+								}
+								?>  
 							</li>
 <?php
 			}
@@ -745,14 +766,14 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 ?>			
 				<li>
 					<span class=dd>-</span>
-					<input type=radio name=ctc value="<?php echo $row[0] ?>">
-					<?php echo $row[1] ?>
-					<?php 
-						if ($row[2]<2) {
-							echo "&copy;\n"; 
-						} else {
-							echo " <a href=\"course.php?cid={$row[0]}\" target=\"_blank\">Preview</a>";
-						}
+					<?php
+					echo '<input type="radio" name="ctc" value="'.$row[0].'" '.(($row[2]<2)?'class="copyr"':'').'>';
+					echo $row[1];
+					if ($row[2]<2) {
+						echo "&copy;\n"; 
+					} else {
+						echo " <a href=\"course.php?cid={$row[0]}\" target=\"_blank\">Preview</a>";
+					}
 					?>
 				</li>
 
@@ -795,9 +816,11 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 ?>		
 		</ul>
 		
-		<p>For courses marked with &copy;, you must supply the course enrollment key.<br/>
+		<p id="ekeybox" style="display:none;">
+		For courses marked with &copy;, you must supply the course enrollment key to show permission to copy the course.<br/>
 		Enrollment key: <input type=text name=ekey id=ekey size=30></p>
 		<input type=submit value="Select Course Items">
+		<p>&nbsp;</p>
 	</form>
 
 <?php		
