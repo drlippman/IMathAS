@@ -34,7 +34,6 @@ switch($_GET['action']) {
 			$md5pw =md5("password");
 		}
 		$query = "UPDATE imas_users SET password='$md5pw' WHERE id='{$_GET['id']}'";
-		echo $query;
 		if ($myrights < 100) { $query .= " AND groupid='$groupid' AND rights<100"; }
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		exit;
