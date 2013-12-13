@@ -196,7 +196,27 @@ $placeinhead .= '<style type="text/css">
 table td {
 	border-bottom: 1px solid #ccf;	
 }
-</style>';
+</style>
+<script type="text/javascript">
+function valform() {
+	if ($("#mainform input:checkbox[name=\'checked[]\']:checked").length == 0) {
+		if (!confirm("No forums are selected to be changed. Cancel to go back and select some forums, or click OK to make no changes")) {
+			return false;
+		}
+	}
+	if ($(".chgbox:checked").length == 0) {
+		if (!confirm("No settings have been selected to be changed. Use the checkboxes along the left to indicate that you want to change that setting. Click Cancel to go back and select some settings to change, or click OK to make no changes")) {
+			return false;
+		}
+	}
+	return true;
+}
+$(function() {
+	$(".chgbox").change(function() {
+			$(this).parents("tr").toggleClass("odd");
+	});	
+})
+</script>';
 
 require("../header.php");
 
@@ -204,7 +224,7 @@ echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid
 echo "&gt; Mass Change Forums</div>";
 echo '<div id="headerchgforums" class="pagetitle"><h2>Mass Change Forums</h2></div>';
 
-echo "<form id=\"mainform\" method=post action=\"chgforums.php?cid=$cid\">";
+echo "<form id=\"mainform\" method=post action=\"chgforums.php?cid=$cid\" onsubmit=\"return valform();\">";
 
 
 if (count($forumitems)==0) {
@@ -234,7 +254,7 @@ foreach($forumitems as $id=>$name) {
 </thead>
 <tbody>
 <tr class="coptr">
-	<td><input type="checkbox" name="chgavail"/></td>
+	<td><input type="checkbox" name="chgavail" class="chgbox"/></td>
 	<td class="r">Show:</td>
 	<td>
 	<input type=radio name="avail" value="0" />Hide<br/>
@@ -244,7 +264,7 @@ foreach($forumitems as $id=>$name) {
 </tr>
 
 <tr class="coptr">
-	<td><input type="checkbox" name="chgpostby" /></td>
+	<td><input type="checkbox" name="chgpostby" class="chgbox" /></td>
 	<td class="r">Students can create new threads:</td>
 	<td>  
 	<input type=radio name="postby" value="Always" checked="checked"/>Always<br/>
@@ -259,7 +279,7 @@ foreach($forumitems as $id=>$name) {
 </tr>
 
 <tr class="coptr">
-	<td><input type="checkbox" name="chgreplyby" /></td>
+	<td><input type="checkbox" name="chgreplyby" class="chgbox" /></td>
 	<td class="r">Students can reply to posts:</td>
 	<td>  
 	<input type=radio name="replyby" value="Always" checked="checked"/>Always<br/>
@@ -273,7 +293,7 @@ foreach($forumitems as $id=>$name) {
 	</td>
 </tr>
 <tr class="coptr">
-	<td><input type="checkbox" name="chgcaltag" /></td>
+	<td><input type="checkbox" name="chgcaltag" class="chgbox" /></td>
 	<td class="r">Calendar icon:</td>
 	<td> 
 	New Threads: <input name="caltagpost" type=text size=1 value="FP"/>, 
@@ -283,35 +303,35 @@ foreach($forumitems as $id=>$name) {
 		
 
 <tr class="coptr">
-	<td><input type="checkbox" name="chgallowanon"/></td>
+	<td><input type="checkbox" name="chgallowanon" class="chgbox"/></td>
 	<td class="r">Allow anonymous posts: </td>
 	<td>
 		<input type=checkbox name="allowanon" value="1"/>
 	</td>
 </tr>
 <tr class="coptr">
-	<td><input type="checkbox" name="chgallowmod"/></td>
+	<td><input type="checkbox" name="chgallowmod" class="chgbox"/></td>
 	<td class="r">Allow students to modify posts: </td>
 	<td>
 		<input type=checkbox name="allowmod" value="1" checked="checked"/>
 	</td>
 </tr>
 <tr class="coptr">
-	<td><input type="checkbox" name="chgallowdel"/></td>
+	<td><input type="checkbox" name="chgallowdel" class="chgbox"/></td>
 	<td class="r">Allow students to delete own posts (if no replies): </td>
 	<td>
 		<input type=checkbox name="allowdel" value="1"/>
 	</td>
 </tr>
 <tr class="coptr">
-	<td><input type="checkbox" name="chgallowlikes"/></td>
+	<td><input type="checkbox" name="chgallowlikes" class="chgbox"/></td>
 	<td class="r">Turn on "liking" posts: </td>
 	<td>
 		<input type=checkbox name="allowlikes" value="1"/>
 	</td>
 </tr>
 <tr class="coptr">
-	<td><input type="checkbox" name="chgsubscribe"/></td>
+	<td><input type="checkbox" name="chgsubscribe" class="chgbox"/></td>
 	<td class="r">Get email notify of new posts: </td>
 	<td>
 		<input type=checkbox name="subscribe" value="1"/>
@@ -319,7 +339,7 @@ foreach($forumitems as $id=>$name) {
 </tr>
 
 <tr class="coptr">
-	<td><input type="checkbox" name="chgdefdisplay"/></td>
+	<td><input type="checkbox" name="chgdefdisplay" class="chgbox"/></td>
 	<td class="r">Default display: </td>
 	<td>
 	<select name="defdisplay">
@@ -331,7 +351,7 @@ foreach($forumitems as $id=>$name) {
 </tr>
 
 <tr class="coptr">
-	<td><input type="checkbox" name="chgsortby"/></td>
+	<td><input type="checkbox" name="chgsortby" class="chgbox"/></td>
 	<td class="r">Sort threads by: </td>
 	<td>
 	<input type="radio" name="sortby" value="0" checked="checked"/> Thread start date<br/>
@@ -340,7 +360,7 @@ foreach($forumitems as $id=>$name) {
 </tr>
 
 <tr class="coptr">
-	<td><input type="checkbox" name="chgcntingb"/></td>
+	<td><input type="checkbox" name="chgcntingb" class="chgbox"/></td>
 	<td class="r">Count: </td>
 	<td><input name="cntingb" value="0" checked="checked" type="radio"> No<br/>
 	<input name="cntingb" value="1" type="radio"> Yes<br/>
@@ -349,7 +369,7 @@ foreach($forumitems as $id=>$name) {
 	</td>
 </tr>
 <tr class="coptr">
-	<td><input type="checkbox" name="chggbcat"/></td>
+	<td><input type="checkbox" name="chggbcat" class="chgbox"/></td>
 	<td class="r">Gradebook category: </td>
 	<td>
 <?php 
@@ -358,7 +378,7 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 	</td>
 </tr>
 <tr class="coptr">
-	<td><input type="checkbox" name="chgforumtype"/></td>
+	<td><input type="checkbox" name="chgforumtype" class="chgbox"/></td>
 	<td class="r">Gradebook category: </td>
 	<td>
 		<input type=radio name="forumtype" value="0" checked="checked"/>Regular forum<br/>
@@ -366,7 +386,7 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 	</td>
 </tr>
 <tr class="coptr">
-	<td><input type="checkbox" name="chgtaglist"/></td>
+	<td><input type="checkbox" name="chgtaglist" class="chgbox"/></td>
 	<td class="r">Categorize posts?: </td>
 	<td>
 		<input type=checkbox name="usetags" value="1" <?php if ($line['taglist']!='') { echo "checked=1";}?> 
@@ -381,7 +401,7 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 </tbody>
 </table>
 </fieldset>
-<input type="submit" name="submit" value="Submit Changes" />
+<div class="submit"><input type="submit" name="submit" value="<?php echo _('Apply Changes')?>" /></div>
 </form>
 <?php
 require("../footer.php");

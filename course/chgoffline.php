@@ -29,6 +29,9 @@ if (isset($_POST['checked'])) { //form submitted
 		} else {
 			$checkedlist = implode(',',$checked);
 			require("../header.php");
+			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+			echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
+			echo "&gt; <a href=\"chgoffline.php?cid=$cid\">Manage Offline Grades</a> &gt; Confirm Delete</div>";
 			echo "<form id=\"mainform\" method=post action=\"chgoffline.php?cid=$cid&confirm=true\">";
 			echo '<input type="hidden" name="submit" value="Delete" />';
 			echo '<input type="hidden" name="checked" value="'.$checkedlist.'"/>';
@@ -186,7 +189,7 @@ writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],
 </tbody>
 </table>
 </fieldset>
-<input type="submit" name="submit" value="Submit Changes" />
+<div class="submit"><input type="submit" name="submit" value="<?php echo _('Apply Changes')?>" /></div>
 </form>
 <?php
 require("../footer.php");

@@ -888,8 +888,11 @@ if ($overwriteBody==1) {
 	</script>
 	<script type="text/javascript" src="<?php echo $imasroot ?>/javascript/tablesorter.js"></script>
 
-	<div class="breadcrumb"><?php echo $curBreadcrumb ?></div>
+	<div class="breadcrumb"><?php echo $curBreadcrumb ?></div>	
 
+	<div id="headeraddquestions" class="pagetitle"><h2>Add/Remove Questions 
+		<img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=addingquestionstoanassessment','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
+	</h2></div>
 <?php	
 	if ($beentaken) {
 ?>	
@@ -902,11 +905,7 @@ if ($overwriteBody==1) {
 	</p>
 <?php
 	}
-?>	
-
-	<div id="headeraddquestions" class="pagetitle"><h2>Add/Remove Questions 
-		<img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=addingquestionstoanassessment','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
-	</h2></div>
+?>
 	<h3>Questions in Assessment - <?php echo $page_assessmentName ?></h3>
 
 <?php	
@@ -982,15 +981,16 @@ if ($overwriteBody==1) {
 	}
 ?>	
 	<p>
-		<input type=button value="Done" onClick="window.location='course.php?cid=<?php echo $cid ?>'"> 
-		<input type=button value="Assessment Settings" onClick="window.location='addassessment.php?cid=<?php echo $cid ?>&id=<?php echo $aid ?>'"> 
-		<input type=button value="Categorize Questions" onClick="window.location='categorize.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'"> 
+		<input type=button value="Done" title="Exit back to course page" onClick="window.location='course.php?cid=<?php echo $cid ?>'"> 
+		<input type=button value="Assessment Settings" title="Modify assessment settings" onClick="window.location='addassessment.php?cid=<?php echo $cid ?>&id=<?php echo $aid ?>'"> 
+		<input type=button value="Categorize Questions" title="Categorize questions by outcome or other groupings" onClick="window.location='categorize.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'"> 
 		<input type=button value="Create Print Version" onClick="window.location='printtest.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'"> 
-		<input type=button value="Define End Messages" onClick="window.location='assessendmsg.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'">
-		<input type=button value="Preview" onClick="window.open('<?php echo $imasroot;?>/assessment/showtest.php?cid=<?php echo $cid ?>&id=<?php echo $aid ?>','Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20))"> 
+		<input type=button value="Define End Messages" title="Customize messages to display based on the assessment score" onClick="window.location='assessendmsg.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'">
+		<input type=button value="Preview" title="Preview this assessment" onClick="window.open('<?php echo $imasroot;?>/assessment/showtest.php?cid=<?php echo $cid ?>&id=<?php echo $aid ?>','Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20))"> 
 	</p>
 		
-<?php	//<input type=button value="Select Libraries" onClick="libselect()">
+<?php	
+//<input type=button value="Select Libraries" onClick="libselect()">
 		
 	//POTENTIAL QUESTIONS
 	if ($sessiondata['selfrom'.$aid]=='lib') { //selecting from libraries

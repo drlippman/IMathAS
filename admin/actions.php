@@ -226,7 +226,7 @@ switch($_GET['action']) {
 		if (isset($CFG['CPS']['toolset']) && $CFG['CPS']['toolset'][1]==0) {
 			$toolset = $CFG['CPS']['toolset'][0];
 		} else {
-			$toolset = 1*!isset($_POST['toolset-cal']) + 2*!isset($_POST['toolset-forum']);
+			$toolset = 1*!isset($_POST['toolset-cal']) + 2*!isset($_POST['toolset-forum'])+ 4*!isset($_POST['toolset-reord']);
 		}
 		
 		if (isset($CFG['CPS']['cploc']) && $CFG['CPS']['cploc'][1]==0) {
@@ -365,8 +365,25 @@ switch($_GET['action']) {
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				copyrubrics();
 				mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
-			} 
+			}
 			
+			require("../header.php");
+			echo '<div class="breadcrumb">'.$breadcrumbbase.'<a href="admin.php">Admin</a> &gt; Course Creation Confirmation</div>';
+			echo '<h2>Your course has been created!</h2>';
+			echo '<p>For students to enroll in this course, you will need to provide them two things:<ol>';
+			echo '<li>The course ID: <b>'.$cid.'</b></li>';
+			if (trim($_POST['ekey'])=='') {
+				echo '<li>Tell them to leave the enrollment key blank, since you didn\'t specify one.  The enrollment key acts like a course ';
+				echo 'password to prevent random strangers from enrolling in your course.  If you want to set an enrollment key, ';
+				echo '<a href="forms.php?action=modify&id='.$cid.'">modify your course settings</a></li>';
+			} else {
+				echo '<li>The enrollment key: <b>'.$_POST['ekey'].'</b></li>';
+			}
+			echo '</ol></p>';
+			echo '<p>If you forget these later, you can find them by viewing your course settings.</p>';
+			echo '<a href="../course/course.php?cid='.$cid.'">Enter the Course</a>';
+			require("../footer.php");
+			exit;
 		}
 		break;
 	case "delete":

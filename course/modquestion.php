@@ -218,11 +218,8 @@ Leave items blank to use the assessment's default values<br/>
 	} else if (!$beentaken) {
 		echo "<span class=form>Number, if any, of additional copies to add to assessment:</span><span class=formright><input type=text size=4 name=copies value=\"0\"/></span><br class=form />";
 	}
-?>
 
-<div class=submit><input type=submit value=Submit></div>
-
-<?php
+	echo '<div class="submit"><input type="submit" value="'._('Save Settings').'"></div>';
 }
 
 require("../footer.php");

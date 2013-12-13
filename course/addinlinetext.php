@@ -272,6 +272,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
 			$gradeoutcomes = array();
 		}
+		$savetitle = _("Save Changes");
 	} else {
 		//set defaults
 		$line['title'] = "Enter title here";
@@ -285,6 +286,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$hidetitle = false;
 		$fileorder = array();
 		$gradeoutcomes = array();
+		$savetitle = _("Create Item");
 	}   
 	
 	$hr = floor($coursedeftime/60)%12;
@@ -493,7 +495,7 @@ function movefile(from) {
 ?>
 		
 	</div>
-	<div class=submit><input type=submit name="submitbtn" value="Submit"></div>
+	<div class=submit><input type=submit name="submitbtn" value="<?php echo $savetitle;?>"></div>
 	</form>
 	<p><sup>*</sup>Avoid quotes in the filename</p>
 <?php

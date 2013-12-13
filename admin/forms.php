@@ -27,7 +27,7 @@ switch($_GET['action']) {
 		echo "<span class=form>Enter old password:</span>  <input class=form type=password name=oldpw size=40> <BR class=form>\n";
 		echo "<span class=form>Enter new password:</span> <input class=form type=password name=newpw1 size=40> <BR class=form>\n";
 		echo "<span class=form>Verify new password:</span>  <input class=form type=password name=newpw2 size=40> <BR class=form>\n";
-		echo "<div class=submit><input type=submit value=Submit></div></form>\n";
+		echo '<div class=submit><input type="submit" value="'._('Save').'"></div></form>';
 		break;
 	
 	case "chgrights":
@@ -97,7 +97,7 @@ switch($_GET['action']) {
 			echo "</select><br class=form />\n";
 		}
 		
-		echo "<div class=submit><input type=submit value=Submit></div></form>\n";
+		echo "<div class=submit><input type=submit value=Save></div></form>\n";
 		break;
 	case "modify":
 	case "addcourse":
@@ -340,6 +340,11 @@ switch($_GET['action']) {
 			echo '> Forum List';
 			
 			echo '</span><br class=form />';
+			
+			/*echo '<span class="form">Pull-downs for course item reordering</span>';
+			echo '<span class="formright"><input type="checkbox" name="toolset-reord" value="4" ';
+			if (($toolset&4)==0) { echo 'checked="checked"';}
+			echo '> Show</span><br class="form"/>';*/
 		}
 		
 		if (!isset($CFG['CPS']['chatset']) || $CFG['CPS']['chatset'][1]==1) {
@@ -424,10 +429,10 @@ switch($_GET['action']) {
 			echo ' /> Left side bar</span><br class=form />';
 		}
 		
-		if (isset($enablebasiclti) && $enablebasiclti==true) {
+		if (isset($enablebasiclti) && $enablebasiclti==true && isset($_GET['id'])) {
 			echo '<span class="form">LTI access secret (max 10 chars; blank to not use)</span>';
 			echo '<span class="formright"><input name="ltisecret" type="text" value="'.$ltisecret.'" maxlength="10"/> ';
-			echo '<a href="#" onclick="document.getElementById(\'ltiurl\').style.display=\'\'; return false;">LTI url/key?</a>';
+			echo '<button type="button" onclick="document.getElementById(\'ltiurl\').style.display=\'\';this.parentNode.removeChild(this);">'._('Show LTI key and URL').'</button>';
 			echo '<span id="ltiurl" style="display:none;">';
 			if (isset($_GET['id'])) {
 				echo '<br/>URL: '.$urlmode.$_SERVER['HTTP_HOST'].$imasroot.'/bltilaunch.php<br/>';
@@ -518,7 +523,7 @@ switch($_GET['action']) {
 		
 		echo "<h4>Current Teachers:</h4>\n";
 		$query = "SELECT imas_users.FirstName,imas_users.LastName,imas_teachers.id,imas_teachers.userid ";
-		$query .= "FROM imas_users,imas_teachers WHERE imas_teachers.courseid='{$_GET['id']}' AND ";
+		$query .= "FROM imas_users,imas_teachers WHERE imas_teachers.courseid='{$_GET['id']}' AND " ;
 		$query .= "imas_teachers.userid=imas_users.id ORDER BY imas_users.LastName;";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$num = mysql_num_rows($result);
@@ -527,6 +532,7 @@ switch($_GET['action']) {
 		echo "<table cellpadding=5>\n";
 		$onlyone = ($num==1);
 		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+			
 			if ($onlyone) {
 				echo '<tr><td></td>';
 			} else {
@@ -554,6 +560,7 @@ switch($_GET['action']) {
 		echo 'With Selected: <input type="submit" value="Add as Teacher"/>';
 		echo "<table cellpadding=5>\n";
 		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+			if (trim($line['LastName'])=='' && trim($line['FirstName'])=='') {continue;}
 			if ($used[$line['id']]!=true) {
 				//if ($line['rights']<20) { $type = "Tutor/TA/Proctor";} else {$type = "Teacher";}
 				echo '<tr><td><input type="checkbox" name="atid[]" value="'.$line['id'].'"/></td>';
@@ -600,7 +607,7 @@ switch($_GET['action']) {
 		echo "<h3>Transfer Course Ownership</h3>\n";
 		echo '</div>';
 		echo "<form method=post action=\"actions.php?action=transfer&id={$_GET['id']}\">\n";
-		echo "Transfer to: <select name=newowner>\n";
+		echo "Transfer course ownership to: <select name=newowner>\n";
 		$query = "SELECT id,FirstName,LastName FROM imas_users WHERE rights>19";
 		if ($myrights < 100) {
 			$query .= " AND groupid='$groupid'";

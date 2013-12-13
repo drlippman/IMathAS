@@ -296,6 +296,7 @@ window.onDomReady(function() {
 		onFirstChange: function(el) {
 			document.getElementById('recchg').disabled = false;
 			setlinksdisp("none");
+			window.onbeforeunload = function() {return unsavedmsg;}
 		}
 	});
 });
@@ -406,6 +407,7 @@ function editinplaceun() {
 		input.value = this.value;
 		document.getElementById('recchg').disabled = false;
 		setlinksdisp("none");
+		window.onbeforeunload = function() {return unsavedmsg;}
 	}
 	el.style.display = 'inline';
 	this.style.display = "none";

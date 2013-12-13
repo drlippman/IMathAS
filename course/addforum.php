@@ -134,6 +134,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query .= "WHERE id='{$_GET['id']}';";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$newforumid = $_GET['id'];
+			
 		} else { //add new
 			$query = "INSERT INTO imas_forums (courseid,name,description,startdate,enddate,settings,defdisplay,replyby,postby,groupsetid,points,cntingb,gbcategory,avail,sortby,caltag,forumtype,taglist,rubric,outcomes) VALUES ";
 			$query .= "('$cid','{$_POST['name']}','{$_POST['description']}',$startdate,$enddate,$fsets,'{$_POST['defdisplay']}',$replyby,$postby,'{$_POST['groupsetid']}','{$_POST['points']}','{$_POST['cntingb']}','{$_POST['gbcat']}','{$_POST['avail']}','{$_POST['sortby']}','$caltag','{$_POST['forumtype']}','$taglist',$rubric,'$outcomes');";
@@ -223,6 +224,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			if ($line['description']=='') {
 				//$line['description'] = "<p>Enter forum description here</p>";
 			}
+			$savetitle = _("Save Changes");
 		} else {  //ADD MODE
 			//set defaults
 			$line['name'] = "Enter Forum Name here";
@@ -247,6 +249,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$gbcat = 0;
 			$sortby = 0;
 			$cntingb = 0;
+			$savetitle = _("Create Forum");
 		}   
 		
 		list($posttag,$replytag) = explode('--',$line['caltag']);
@@ -553,7 +556,7 @@ if ($overwriteBody==1) {
 			  </span>
 		</span><br class="form"/>
 		
-		<div class=submit><input type=submit value=Submit></div>
+		<div class=submit><input type=submit value="<?php echo $savetitle;?>"></div>
 	</form>	
 	<p>&nbsp;</p>
 	<p>&nbsp;</p>

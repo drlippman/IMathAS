@@ -446,14 +446,14 @@ $(function() {
 	</h2></div>
 
 	<p>This form will allow you to change the assessment settings for several or all assessments at once.
-	 <b>Beware</b> that changing default points or penalty after an assessment has been 
+	<br/><b>Be aware</b> that changing default points or penalty after an assessment has been 
 	 taken will not change the scores of students who have already completed the assessment.</p>
 
 	<form id="qform" method=post action="chgassessments.php?cid=<?php echo $cid; ?>" onsubmit="return valform();">
 		<h3>Assessments to Change</h3>
 
 		Check: <a href="#" onclick="document.getElementById('selbygbcat').selectedIndex=0;return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="document.getElementById('selbygbcat').selectedIndex=0;return chkAllNone('qform','checked[]',false)">None</a>
-		Check by catgory: 
+		Check by gradebook category: 
 		<?php 
 		writeHtmlSelect ("selbygbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],null,"Select...",-1,' onchange="chkgbcat(this.value);" id="selbygbcat" ');
 		?>
@@ -852,7 +852,7 @@ writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],
 		</tbody>
 		</table>
 	</fieldset>
-	<div class=submit><input type=submit value=Submit></div>
+	<div class=submit><input type=submit value="<?php echo _('Apply Changes')?>"></div>
 
 <?php
 }

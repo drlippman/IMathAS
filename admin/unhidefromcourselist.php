@@ -6,7 +6,7 @@ $curBreadcrumb = "$breadcrumbbase Unhide Courses\n";
 require("../header.php");
 
 echo '<div class=breadcrumb>'.$curBreadcrumb.'</div>';
-echo '<h2>Unhide Courses from Course List</h2>';
+echo '<h2>Return Hidden Courses to Course List</h2>';
 
 if (isset($_GET['cid'])) {
 	$cid = intval($_GET['cid']);

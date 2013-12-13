@@ -298,6 +298,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			if ($line['summary']=='') {
 				//$line['summary'] = "<p>Enter summary here (displays on course page)</p>";
 			}
+			$savetitle = _("Save Changes");
 		} else {
 			//set defaults
 			$line['title'] = "Enter title here";
@@ -312,6 +313,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$enddate = time() + 7*24*60*60;
 			$type = 'text';
 			$gradeoutcomes = array();
+			$savetitle = _("Create Item");
 		}   
 		
 		$hr = floor($coursedeftime/60)%12;
@@ -536,7 +538,7 @@ if ($overwriteBody==1) {
 			echo '</span><br class="form"/>';
 	}
 ?>
-		<div class=submit><input type=submit value=Submit></div>	
+		<div class=submit><input type=submit value="<?php echo $savetitle;?>"></div>	
 	</form>
 	
 	<p><sup>*</sup>Avoid quotes in the filename</p>

@@ -15,7 +15,7 @@
    }
    $cid = $_GET['cid'];
    require("../filter/filter.php");
-   $query = "SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,topbar,cploc,latepasshrs FROM imas_courses WHERE id='$cid'";
+   $query = "SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,topbar,cploc,latepasshrs,toolset FROM imas_courses WHERE id='$cid'";
    $result = mysql_query($query) or die("Query failed : " . mysql_error());
    $line = mysql_fetch_array($result, MYSQL_ASSOC);
    if ($line == null) {
@@ -31,6 +31,7 @@
    $latepasshrs = $line['latepasshrs'];
    $useleftbar = ($line['cploc']==1);
    $topbar = explode('|',$line['topbar']);
+   $toolset = $line['toolset'];
    $topbar[0] = explode(',',$topbar[0]);
    $topbar[1] = explode(',',$topbar[1]);
    if ($topbar[0][0] == null) {unset($topbar[0][0]);}

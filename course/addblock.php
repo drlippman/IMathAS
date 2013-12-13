@@ -216,7 +216,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		$fixedheight = $blockitems[$existingid]['fixedheight'];
 		$grouplimit = $blockitems[$existingid]['grouplimit'];
-		
+		$savetitle = _("Save Changes");
 			
 
 	} else { //teacher adding new block, load form with default data
@@ -237,6 +237,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$items = unserialize(mysql_result($result,0,0));
+		$savetitle = _("Create Block");
 	}
 
 	//set some default data for use with either the add or modify form
@@ -422,7 +423,7 @@ if ($overwriteBody==1) {
 	</span>
 	<br class="form"/>
 	
-	<div class=submit><input type=submit value=Submit></div>
+	<div class=submit><input type=submit value="<?php echo $savetitle?>"></div>
 </form>
 <p><sup>*</sup>If a parent block is set to be publicly accessible, this block will automatically be publicly accessible, regardless of your selection here.<br/>
 Items from publicly accessible blocks can viewed without logging in at http://<?php echo $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') ?>/public.php?cid=<?php echo $_GET['cid'];?>. </p>

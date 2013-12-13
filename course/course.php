@@ -564,7 +564,9 @@ if ($overwriteBody==1) {
 	   	   
 	   if ($quickview=='on' && isset($teacherid)) {
 		   echo '<style type="text/css">.drag {color:red; background-color:#fcc;} .icon {cursor: pointer;}</style>';
-		   echo "<script>var AHAHsaveurl = '$imasroot/course/savequickreorder.php?cid=$cid';</script>";
+		   echo "<script>var AHAHsaveurl = '$imasroot/course/savequickreorder.php?cid=$cid';";
+		   echo 'var unsavedmsg = "'._("You have unrecorded changes.  Are you sure you want to abandon your changes?").'";';
+		   echo "</script>";
 		   echo "<script src=\"$imasroot/javascript/mootools.js\"></script>";
 		   echo "<script src=\"$imasroot/javascript/nested1.js?v=0122102\"></script>";
 		   echo '<ul id=qviewtree class=qview>';
@@ -574,12 +576,15 @@ if ($overwriteBody==1) {
 	   } else {
 		   showitems($items,$_GET['folder']);
 	   }
-	    
-	 
-	  
-	
+
    } else {
-	   if (isset($teacherid)) {echo generateadditem($_GET['folder'],'t');}
+	   if (isset($teacherid)) {
+	   	echo '<p><b>Welcome to your course!</b></p>';
+	   	echo '<p>To start by copying from another course, use the <a href="copyitems.php?cid='.$cid.'">Course Items: Copy</a> ';
+	   	echo 'link along the left side of the screen.</p><p>If you want to build from scratch, use the "Add An Item" pulldown below to get started.</p><p>&nbsp;</p>';
+	   	
+	   	echo generateadditem($_GET['folder'],'t');
+	   }
    }
    if (isset($backlink)) {
 	   echo $backlink;
@@ -755,10 +760,10 @@ function makeTopMenu() {
 			echo _('Quick View.'), " <a href=\"course.php?cid=$cid&quickview=off\">", _('Back to regular view'), "</a>. ";
 		} 
 		if (isset($CFG['CPS']['miniicons'])) {
-			echo _('Use icons to drag-and-drop order.'),' ',_('Click the icon next to a block to expand or collapse it. Click an item title to edit it in place.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Record Changes'), '" onclick="submitChanges()"/>';
+			echo _('Use icons to drag-and-drop order.'),' ',_('Click the icon next to a block to expand or collapse it. Click an item title to edit it in place.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges()"/>';
 		
 		} else {
-			echo _('Use colored boxes to drag-and-drop order.'),' ',_('Click the B next to a block to expand or collapse it. Click an item title to edit it in place.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Record Changes'), '" onclick="submitChanges()"/>';
+			echo _('Use colored boxes to drag-and-drop order.'),' ',_('Click the B next to a block to expand or collapse it. Click an item title to edit it in place.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges()"/>';
 		}
 		 echo '<span id="submitnotice" style="color:red;"></span>';
 		 echo '<div class="clear"></div>';

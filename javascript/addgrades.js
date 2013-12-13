@@ -565,11 +565,16 @@ function sendtoall(w,type) {
 	document.getElementById("toallgrade").value = '';
 } 
 
+var quickaddshowing = false;
 function togglequickadd(el) {
-	if (el.checked) {
+	if (!quickaddshowing) {
 		document.getElementById("quickadd").style.display = "";
+		$(el).html(_("Hide Quicksearch Entry"));
+		quickaddshowing = true
 	} else {
 		document.getElementById("quickadd").style.display = "none";
+		$(el).html(_("Show Quicksearch Entry"));
+		quickaddshowing = false;
 	}
 }
 

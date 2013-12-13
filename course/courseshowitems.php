@@ -23,7 +23,7 @@ function enditem($canedit) {
 
   function showitems($items,$parent,$inpublic=false) {
 	   global $teacherid,$tutorid,$studentid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$myrights;
-	   global $hideicons,$exceptions,$latepasses,$graphicalicons,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs,$hasstats;
+	   global $hideicons,$exceptions,$latepasses,$graphicalicons,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs,$hasstats,$toolset;
 	   require_once("../includes/filehandler.php");
 	   
 	   if (!isset($CFG['CPS']['itemicons'])) {
@@ -75,7 +75,7 @@ function enditem($canedit) {
 					continue;
 				}
 			}  
-			$items[$i]['name'] = stripslashes($items[$i]['name']);
+			$items[$i]['name'] = stripslashes($items[$i]['name']);;
 			if ($canedit) {
 				echo generatemoveselect($i,count($items),$parent,$blocklist);
 			}
@@ -1544,6 +1544,8 @@ function enditem($canedit) {
    }
     
    function generatemoveselect($num,$count,$blk,$blocklist) {
+   	   global $toolset;
+   	   if (($toolset&4)==4) {return '';}
 	$num = $num+1;  //adjust indexing
 	$html = "<select class=\"mvsel\" id=\"$blk-$num\" onchange=\"moveitem($num,'$blk')\">\n";
 	for ($i = 1; $i <= $count; $i++) {
