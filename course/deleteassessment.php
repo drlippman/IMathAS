@@ -11,7 +11,7 @@ require("../validate.php");
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Delete Assessment";
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; Modify Assessment";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; Delete Assessment";
 
 if (!(isset($teacherid))) {  
 	$overwriteBody = 1;
@@ -84,7 +84,7 @@ if ($overwriteBody==1) {
 	<h3><?php echo $itemname; ?></h3>
 	Are you <b>SURE</b> you want to delete this assessment and all associated student attempts?
 	<p>
-	<input type=button value="Yes, Remove" onClick="window.location='deleteassessment.php?cid=<?php echo $_GET['cid'] ?>&block=<?php echo $block ?>&id=<?php echo $_GET['id'] ?>&remove=really'">
+	<input type=button value="Yes, Delete" onClick="window.location='deleteassessment.php?cid=<?php echo $_GET['cid'] ?>&block=<?php echo $block ?>&id=<?php echo $_GET['id'] ?>&remove=really'">
 	<input type=button value="Nevermind" onClick="window.location='course.php?cid=<?php echo $_GET['cid'] ?>'">
 	</p>
 

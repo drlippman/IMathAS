@@ -11,7 +11,7 @@ require("../validate.php");
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Delete Course Block";
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; Remove Block";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; Delete Block";
 
 if (!(isset($_GET['cid']))) { //if the cid is missing go back to the index page
 	$overwriteBody = 1;
@@ -92,7 +92,7 @@ if ($overwriteBody==1) {
 	<p>Are you SURE you want to delete this Block?</p>
 	<p><input type=radio name="delcontents" value="0" checked="checked"/>Move all items out of block<br/>
 	<input type=radio name="delcontents" value="1"/>Also Delete all items in block</p>
-	<p><input type=submit value="Yes, Remove">
+	<p><input type=submit value="Yes, Delete">
 	<input type=button value="Nevermind" onClick="window.location='course.php?cid=<?php echo $_GET['cid'] ?>'"></p>
 <?php
 }
