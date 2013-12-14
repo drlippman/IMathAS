@@ -495,7 +495,10 @@
 			echo "Not Submitted</p>\n";
 		} else {
 			echo "Last change: " . tzdate("F j, Y, g:i a",$line['endtime']) . "<br/>";
-			echo "Time spent: ". round(($line['endtime']-$line['starttime'])/60) . " minutes<br/>\n";
+			$timespent = round(($line['endtime']-$line['starttime'])/60);
+			if ($timespent<250) {
+				echo "Time spent: ". $timespent . " minutes<br/>\n";
+			}
 			$timeontask = array_sum(explode(',',str_replace('~',',',$line['timeontask'])));
 			if ($timeontask>0) {
 				echo "Total time questions were on-screen: ". round($timeontask/60,1) . " minutes.\n";
@@ -514,10 +517,13 @@
 		}
 		
 		if ($isteacher) {
-			echo "<p>Due Date: ". tzdate("F j, Y, g:i a",$line['enddate']);
-			echo " | <a href=\"exception.php?cid=$cid&aid={$line['assessmentid']}&uid={$_GET['uid']}&asid={$_GET['asid']}\">Make/Edit Exception</a>";
 			if (isset($exped) && $exped!=$line['enddate']) {
-				echo "<br/>Has exception, with due date: ".tzdate("F j, Y, g:i a",$exped);
+				echo "<p>Has exception, with due date: ".tzdate("F j, Y, g:i a",$exped);
+				echo "  <button type=\"button\" onclick=\"window.location.href='exception.php?cid=$cid&aid={$line['assessmentid']}&uid={$_GET['uid']}&asid={$_GET['asid']}'\">Edit Exception</button>";
+				echo "<br/>Original Due Date: ". tzdate("F j, Y, g:i a",$line['enddate']);
+			} else {
+				echo "<p>Due Date: ". tzdate("F j, Y, g:i a",$line['enddate']);
+				echo "  <button type=\"button\" onclick=\"window.location.href='exception.php?cid=$cid&aid={$line['assessmentid']}&uid={$_GET['uid']}&asid={$_GET['asid']}'\">Make Exception</button>";
 			}
 			echo "</p>";
 		}
@@ -530,14 +536,14 @@
 		echo "<form id=\"mainform\" method=post action=\"gb-viewasid.php?stu=$stu&cid=$cid&from=$from&asid={$_GET['asid']}&update=true\">\n";
 		
 		if ($isteacher) {
-			echo "<p><a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid={$_GET['asid']}&from=$from&uid={$_GET['uid']}&clearattempt=true\" onmouseover=\"tipshow(this,'Clear everything, resetting things like the student never started.  Student will get new versions of questions.')\" onmouseout=\"tipout()\">Clear Attempt</a> | ";
+			echo "<div class=\"cpmid\"><a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid={$_GET['asid']}&from=$from&uid={$_GET['uid']}&clearattempt=true\" onmouseover=\"tipshow(this,'Clear everything, resetting things like the student never started.  Student will get new versions of questions.')\" onmouseout=\"tipout()\">Clear Attempt</a> | ";
 			echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid={$_GET['asid']}&from=$from&uid={$_GET['uid']}&clearscores=true\" onmouseover=\"tipshow(this,'Clear scores and attempts, but keep same versions of questions')\" onmouseout=\"tipout()\">Clear Scores</a> | ";
 			echo "<a href=\"#\" onclick=\"markallfullscore();$('#uppersubmit').show();return false;\" onmouseover=\"tipshow(this,'Change all scores to full credit')\" onmouseout=\"tipout()\">All Full Credit</a> ";
 			echo '<input style="display:none;" id="uppersubmit" type="submit" value="Record Changed Grades"> | ';
 			echo "<a href=\"$imasroot/assessment/showtest.php?cid=$cid&id={$line['assessmentid']}&actas={$_GET['uid']}\" onmouseover=\"tipshow(this,'Take on role of this student, bypassing date restrictions, to submit answers')\" onmouseout=\"tipout()\">View as student</a> | ";
 			echo "<a href=\"$imasroot/assessment/printtest.php?cid=$cid&asid={$_GET['asid']}\" target=\"_blank\" onmouseover=\"tipshow(this,'Pull up a print version of this student\'s assessment')\" onmouseout=\"tipout()\">Print Version</a> ";
 			
-			echo "</p>\n";
+			echo "</div>\n";
 		}
 		
 		if (($line['timelimit']>0) && ($line['endtime'] - $line['starttime'] > $line['timelimit'])) {
@@ -646,6 +652,35 @@
 				}
 			}
 		}
+		echo '<script type="text/javascript">
+			function hidecorrect() {
+				var butn = $("#hctoggle");
+				if (!butn.hasClass("hchidden")) {
+					butn.html("'._('Show Questions with Perfect Scores').'");
+					butn.addClass("hchidden");
+				} else {
+					butn.html("'._('Hide Questions with Perfect Scores').'");
+					butn.removeClass("hchidden");
+				}
+				$(".iscorrect").toggle();
+			}
+			function hideNA() {
+				var butn = $("#hnatoggle");
+				if (!butn.hasClass("hnahidden")) {
+					butn.html("'._('Show Unanswered Questions').'");
+					butn.addClass("hnahidden");
+				} else {
+					butn.html("'._('Hide Unanswered Questions').'");
+					butn.removeClass("hnahidden");
+				}
+				$(".notanswered").toggle();
+			}
+			function showallans() {
+				$("span[id^=\'ans\']").removeClass("hidden");
+				$(".sabtn").replaceWith("<span>Answer: </span>");
+			}
+			</script>';
+		/*
 		echo '<script type="text/javascript">';
 		echo 'function hidecorrect() {';
 		echo '   var butn = document.getElementById("hctoggle");';
@@ -684,9 +719,10 @@
 		echo '    }';
 		echo '}';
 		echo '</script>';
-		echo '<input type=button id="hctoggle" value="Hide Perfect Score Questions" onclick="hidecorrect()" />';
-		echo ' <input type=button id="hnatoggle" value="Hide Not Answered Questions" onclick="hideNA()" />';
-		
+		*/
+		echo '<p><button type="button" id="hctoggle"onclick="hidecorrect()">'._('Hide Questions with Perfect Scores').'</button>';
+		echo ' <button type="button" id="hnatoggle" onclick="hideNA()">'._('Hide Unanswered Questions').'</button>';
+		echo ' <button type="button" id="hnatoggle" onclick="showallans()">'._('Show All Answers').'</button></p>';
 		$total = 0;
 		
 		for ($i=0; $i<count($questions);$i++) {
@@ -746,28 +782,36 @@
 				echo '(parts: '.implode(', ',$answeights[$questions[$i]]).')';
 			}
 			echo "in {$attempts[$i]} attempt(s)\n";
-			if ($canedit && $parts!='') {
-				$togr = array();
-				foreach ($qtypes as $k=>$t) {
-					if ($t=='essay' || $t=='file') {
-						$togr[] = $k;
-					}
-				}
-				
-				echo '<br/>Quick grade: <a href="#" class="quickgrade" onclick="quickgrade('.$i.',0,\'scorebox\','.count($prts).',['.implode(',',$answeights[$questions[$i]]).']);return false;">Full credit all parts</a>';
-				if (count($togr)>0) {
-					$togr = implode(',',$togr);
-					echo ' | <a href="#" onclick="quickgrade('.$i.',1,\'scorebox\',['.$togr.'],['.implode(',',$answeights[$questions[$i]]).']);return false;">Full credit all manually-graded parts</a>';
-				}
-			} else if ($canedit) {
-				echo '<br/>Quick grade: <a class="quickgrade" href="#" onclick="quicksetscore(\'scorebox'.$i.'\','.$pts[$questions[$i]].');return false;">Full credit</a>';	
-			}
-			$laarr = explode('##',$lastanswers[$i]);
-			
-			if ($attempts[$i]!=count($laarr)) {
-				//echo " (clicked \"Jump to answer\")";
-			}
 			if ($isteacher || $istutor) {
+				if ($canedit && getpts($scores[$i])==$pts[$questions[$i]]) {
+					echo '<div class="iscorrect">';
+				} else if ($scores[$i]==='N/A') {
+					echo '<div class="notanswered">';	
+				} else {
+					echo $scores[$i];
+					echo '<div>';
+				}
+				if ($canedit && $parts!='') {
+					$togr = array();
+					foreach ($qtypes as $k=>$t) {
+						if ($t=='essay' || $t=='file') {
+							$togr[] = $k;
+						}
+					}
+					
+					echo 'Quick grade: <a href="#" class="quickgrade" onclick="quickgrade('.$i.',0,\'scorebox\','.count($prts).',['.implode(',',$answeights[$questions[$i]]).']);return false;">Full credit all parts</a>';
+					if (count($togr)>0) {
+						$togr = implode(',',$togr);
+						echo ' | <a href="#" onclick="quickgrade('.$i.',1,\'scorebox\',['.$togr.'],['.implode(',',$answeights[$questions[$i]]).']);return false;">Full credit all manually-graded parts</a>';
+					}
+				} else if ($canedit) {
+					echo 'Quick grade: <a class="quickgrade" href="#" onclick="quicksetscore(\'scorebox'.$i.'\','.$pts[$questions[$i]].');return false;">Full credit</a>';	
+				}
+				$laarr = explode('##',$lastanswers[$i]);
+				
+				if ($attempts[$i]!=count($laarr)) {
+					//echo " (clicked \"Jump to answer\")";
+				}
 				if (count($laarr)>1) {
 					echo "<br/>Previous Attempts:";
 					$cnt =1;
@@ -828,18 +872,19 @@
 					}
 					echo '<br/>';
 				}
-			}
-			if ($isteacher) {
-				echo "<br/><a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid=$cid&add=new&quoteq=$i-$qsetid-{$seeds[$i]}&to={$_GET['uid']}\">Use in Msg</a>";
-				echo " &nbsp; <a href=\"gb-viewasid.php?stu=$stu&cid=$cid&from=$from&asid={$_GET['asid']}&uid={$_GET['uid']}&clearq=$i\">Clear Score</a> ";
-				echo "(Question ID: <a href=\"$imasroot/course/moddataset.php?id=$qsetid&cid=$cid&qid={$questions[$i]}&aid=$aid\">$qsetid</a>)";
-				if (isset($extref[$questions[$i]])) {
-					echo "&nbsp; Had help available: ";
-					foreach ($extref[$questions[$i]] as $v) {
-						$extrefpt = explode('!!',$v);
-						echo '<a href="'.$extrefpt[1].'" target="_blank">'.$extrefpt[0].'</a> ';
+				if ($isteacher) {
+					echo "<br/><a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid=$cid&add=new&quoteq=$i-$qsetid-{$seeds[$i]}&to={$_GET['uid']}\">Use in Msg</a>";
+					echo " | <a href=\"gb-viewasid.php?stu=$stu&cid=$cid&from=$from&asid={$_GET['asid']}&uid={$_GET['uid']}&clearq=$i\">Clear Score</a> ";
+					echo "(Question ID: <a href=\"$imasroot/course/moddataset.php?id=$qsetid&cid=$cid&qid={$questions[$i]}&aid=$aid\">$qsetid</a>)";
+					if (isset($extref[$questions[$i]])) {
+						echo "&nbsp; Had help available: ";
+						foreach ($extref[$questions[$i]] as $v) {
+							$extrefpt = explode('!!',$v);
+							echo '<a href="'.$extrefpt[1].'" target="_blank">'.$extrefpt[0].'</a> ';
+						}
 					}
-				}	
+				}
+				echo '</div>';
 			}
 			echo "</div>\n";
 			
@@ -850,7 +895,10 @@
 			if ($line['agroupid']>0) {
 				echo "<p>Update grade for all group members? <input type=checkbox name=\"updategroup\" checked=\"checked\" /></p>";
 			}
-			echo "<p><input type=submit value=\"Record Changed Grades\"></p>\n";
+			echo "<p><input type=submit value=\"Record Changed Grades\"> ";
+			if (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0) {
+				echo "<a href=\"gradebook.php?stu=$stu&cid=$cid\">Return to GradeBook without saving</a></p>\n";
+			}
 			/*
 			if ($line['agroupid']>0) {
 				$q2 = "SELECT i_u.LastName,i_u.FirstName FROM imas_assessment_sessions AS i_a_s,imas_users AS i_u WHERE ";
@@ -866,11 +914,13 @@
 				
 		} else if (trim($line['feedback'])!='') {
 			echo "<p>Instructor Feedback:<div class=\"intro\">{$line['feedback']}</div></p>";
+			if (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0) {
+				echo "<p><a href=\"gradebook.php?stu=$stu&cid=$cid\">Return to GradeBook</a></p>\n";
+			}
 		}
 		echo "</form>";
-		if (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0) {
-			echo "<p><a href=\"gradebook.php?stu=$stu&cid=$cid\">Return to GradeBook</a></p>\n";
-		}
+		echo '<p>&nbsp;</p>';
+		
 		
 		$query = "SELECT COUNT(id) from imas_questions WHERE assessmentid='{$line['assessmentid']}' AND category<>'0'";
 		$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());

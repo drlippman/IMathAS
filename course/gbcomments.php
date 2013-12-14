@@ -181,7 +181,7 @@
 	while ($row = mysql_fetch_row($result)) {
 		echo "<span class=form>{$row[1]}, {$row[2]}</span><span class=formright><textarea cols=50 rows=3 name=\"{$row[0]}\">{$row[3]}</textarea></span><br class=form>";
 	}
-	echo "<div class=\"submit\"><input type=submit value=\"Submit\"/></div>";
+	echo '<div class="submit"><input type="submit" value="'._('Save Comments').'"/></div>';
 	echo "</form>";
 	require("../footer.php");
 	
