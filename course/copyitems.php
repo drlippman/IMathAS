@@ -322,16 +322,16 @@ if (!(isset($teacherid))) {
 			
 		} elseif (isset($_GET['action']) && $_GET['action']=="select") { //DATA MANIPULATION FOR second option
 		
-			$query = "SELECT itemorder FROM imas_courses WHERE id='{$_POST['ctc']}'";
+			$query = "SELECT itemorder,picicons FROM imas_courses WHERE id='{$_POST['ctc']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		
-			$items = unserialize(mysql_result($result,0,0));
+			list($itemorder,$picicons) = mysql_fetch_row($result);
+			$items = unserialize($itemorder);
 			$ids = array();
 			$types = array();
 			$names = array();
 			$sums = array();
 			$parents = array();
-			getsubinfo($items,'0','');
+			getsubinfo($items,'0','',false,'<img src="'.$imasroot.'/img/blank.gif" width="18"/>');
 			
 			$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -499,11 +499,29 @@ if ($overwriteBody==1) {
 	
 	<table cellpadding=5 class=gb>
 		<thead>
-		<tr><th></th><th>Type</th><th>Title</th><th>Summary</th></tr>
+		<?php
+		if ($picicons) {
+			echo '<tr><th></th><th>Title</th><th>Summary</th></tr>';
+		} else {
+			echo '<tr><th></th><th>Type</th><th>Title</th><th>Summary</th></tr>';
+		}
+		?>
+		
 		</thead>
 		<tbody>
 <?php	
 		$alt=0;
+		if ($picicons && !isset($CFG['CPS']['miniicons'])) {
+			$CFG['CPS']['miniicons'] = array( 
+				 'assess'=>'assess_tiny.png',
+				 'drill'=>'assess_tiny.png',
+				 'inline'=>'inline_tiny.png',
+				 'linked'=>'html_tiny.png',
+				 'forum'=>'forum_tiny.png',
+				 'wiki'=>'wiki_tiny.png',
+				 'folder'=>'folder_tiny.png',
+				 'calendar'=>'1day.png');
+		}
 		for ($i = 0 ; $i<(count($ids)); $i++) {
 			if ($alt==0) {echo "		<tr class=even>"; $alt=1;} else {echo "		<tr class=odd>"; $alt=0;}
 			echo '<td>';
@@ -517,8 +535,26 @@ if ($overwriteBody==1) {
 			}
 ?>
 			</td>
-			<td class="nowrap"><?php echo $types[$i] ?></td>
-			<td><?php echo $names[$i] ?></td>
+			
+		<?php
+			if ($picicons) {
+				echo '<td>'.$prespace[$i].'<img alt="'.$types[$i].'" title="'.$types[$i].'" src="'.$imasroot.'/img/';
+				switch ($types[$i]) {
+					case 'Calendar': echo $CFG['CPS']['miniicons']['calendar']; break;
+					case 'InlineText': echo $CFG['CPS']['miniicons']['inline']; break;
+					case 'LinkedText': echo $CFG['CPS']['miniicons']['linked']; break;
+					case 'Forum': echo $CFG['CPS']['miniicons']['forum']; break;
+					case 'Wiki': echo $CFG['CPS']['miniicons']['wiki']; break;
+					case 'Block': echo $CFG['CPS']['miniicons']['folder']; break;
+					case 'Assessment': echo $CFG['CPS']['miniicons']['assess']; break;
+					case 'Drill': echo $CFG['CPS']['miniicons']['drill']; break;
+				}
+				echo '"/>&nbsp; '.$names[$i].'</td>';
+			} else {
+				echo '<td>'.$prespace[$i].$names[$i].'</td>';
+				echo '<td>'.$types[$i].'</td>';
+			}
+		?>
 			<td><?php echo $sums[$i] ?></td>
 		</tr>
 <?php
@@ -527,8 +563,8 @@ if ($overwriteBody==1) {
 		
 		</tbody>
 	</table>
-	
-	<p><b>Options</b></p>
+	<p> </p>
+	<fieldset><legend>Options</legend>
 	<table>
 	<tbody>
 	<tr><td class="r">Copy course settings?</td><td><input type=checkbox name="copycourseopt"  value="1"/></td></tr>
@@ -544,7 +580,7 @@ if ($overwriteBody==1) {
 	
 	<tr><td class="r">Copy "display at top" instructor forum posts? </td><td><input type=checkbox name="copystickyposts"  value="1" checked="checked"/></td></tr>
 	
-	<tr><td class="r">Append text to titles?:</td><td> <input type="text" name="append"></td></tr>
+	<tr><td class="r">Append text to titles?</td><td> <input type="text" name="append"></td></tr>
 	<tr><td class="r">Add to block:</td><td>
 
 <?php
@@ -555,6 +591,7 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 	</td></tr>
 	</tbody>
 	</table>
+	</fieldset>
 	</div>
 	<p><input type=submit value="Copy Items"></p>
 	</form>

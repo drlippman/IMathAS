@@ -300,7 +300,8 @@ if (!(isset($teacherid))) {
 		$sums = array();
 		$parents = array();
 		$agbcats = array();
-		getsubinfo($items,'0','','Assessment');
+		$prespace = array();
+		getsubinfo($items,'0','','Assessment','&nbsp;&nbsp;');
 		
 		$query = "SELECT id,name,gbcategory FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -467,7 +468,7 @@ $(function() {
 				$blockout = "<input type=checkbox name='checked[]' value='0' id='{$parents[$i]}' checked=checked ";
 				$blockout .= "onClick=\"chkgrp(this.form, '{$ids[$i]}', this.checked);\" ";
 				$blockout .='/>';
-				$blockout .= '<i>'.$names[$i].'</i>';
+				$blockout .= '<i>'.$prespace[$i].$names[$i].'</i>';
 				$blockid = $ids[$i];
 				
 			} else {
@@ -482,7 +483,7 @@ $(function() {
 				if ($pos!==false) {
 					echo substr($types[$i],0,$pos+1).' ';
 				}
-				echo $names[$i];
+				echo $prespace[$i].$names[$i];
 				echo '</li>';
 			}
 			
