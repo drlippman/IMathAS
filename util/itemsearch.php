@@ -1,10 +1,10 @@
 <?php
 require("../validate.php");
 if ($myrights<100) {exit;}
-if (isset($_POST['submit']) && $_POST['submit']=="Message") {
+if ((isset($_POST['submit']) && $_POST['submit']=="Message") || isset($_GET['masssend'])) {
 	$cid = $CFG['GEN']['sendquestionproblemsthroughcourse'];
 	$teacherid = true;
-	$calledfrom = "lu";
+	$calledfrom = "itemsearch";
 	require("../course/masssend.php");
 	exit;
 }
