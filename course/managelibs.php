@@ -542,7 +542,7 @@ if ($overwriteBody==1) {
 ?>		
 	<form method=post action="managelibs.php?cid=<?php echo $cid ?>">
 		<input type=hidden name=transfer value="<?php echo $tlist ?>">
-		Transfer to: 
+		Transfer library ownership to: 
 		<?php writeHtmlSelect ("newowner",$page_newOwnerList['val'],$page_newOwnerList['label'],$selectedVal=null,$defaultLabel=null,$defaultVal=null,$actions=null) ?>
 
 		<p>
@@ -555,7 +555,7 @@ if ($overwriteBody==1) {
 ?>		
 	<form method=post action="managelibs.php?cid=<?php echo $cid ?>">
 		<input type=hidden name=chgrights value="<?php echo $tlist ?>">
-		<span class=form>Rights: </span>
+		<span class=form>Library use rights: </span>
 		<span class=formright>
 			<?php writeHtmlSelect ("newrights",$page_libRights['val'],$page_libRights['label'],$rights,$defaultLabel=null,$defaultVal=null,$actions=null) ?>
 		</span><br class=form>
@@ -609,7 +609,7 @@ if ($overwriteBody==1) {
 	} else if (isset($_GET['transfer'])) {
 ?>
 	<form method=post action="managelibs.php?cid=<?php echo $cid ?>&transfer=<?php echo $_GET['transfer'] ?>">
-		Transfer to:
+		Transfer library ownership to:
 		<?php	
 		writeHtmlSelect ("newowner",$page_newOwnerList['val'],$page_newOwnerList['label'],$selectedVal=null,$defaultLabel=null,$defaultVal=null,$actions=null) ;
 		?>
@@ -642,7 +642,7 @@ if ($overwriteBody==1) {
 			<input type=button value="Select Library" onClick="libselect()">
 		</span><br class=form>
 		<div class=submit>
-			<input type=submit value="Update">
+			<input type=submit value="Save Changes">
 			<input type=button value="Never Mind" onclick="window.location='managelibs.php?cid=<?php echo $cid ?>'">
 		</div>
 	</form>
@@ -669,10 +669,10 @@ if ($overwriteBody==1) {
 	<form id="qform" method=post action="managelibs.php?cid=<?php echo $cid ?>">
 		<div>
 			Check: <a href="#" onclick="return chkAllNone('qform','nchecked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','nchecked[]',false)">None</a>
-			With Selected: <input type=submit name="transfer" value="Transfer">
-			<input type=submit name="remove" value="Delete">
-			<input type=submit name="setparent" value="Change Parent">
-			<input type=submit name="chgrights" value="Change Rights">
+			With Selected: <input type=submit name="transfer" value="Transfer" title="Transfer library ownership">
+			<input type=submit name="remove" value="Delete" title="Delete library">
+			<input type=submit name="setparent" value="Change Parent" title="Change the parent library">
+			<input type=submit name="chgrights" value="Change Rights" title="Change library use rights">
 			<?php echo $page_appliesToMsg ?>
 		
 		</div>
