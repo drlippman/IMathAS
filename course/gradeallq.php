@@ -177,79 +177,54 @@
 	echo "&gt; Grading a Question</div>";
 	echo "<div id=\"headergradeallq\" class=\"pagetitle\"><h2>Grading a Question in $aname</h2></div>";
 	echo "<p><b>Warning</b>: This page may not work correctly if the question selected is part of a group of questions</p>";
+	echo '<div class="cpmid">';
 	if ($page==-1) {
-		echo "<p><a href=\"gradeallq.php?stu=$stu&gbmode=$gbmode&cid=$cid&aid=$aid&qid=$qid&page=0\">Grade one student at a time</a> (Do not use for group assignments)</p>";
+		echo "<a href=\"gradeallq.php?stu=$stu&gbmode=$gbmode&cid=$cid&aid=$aid&qid=$qid&page=0\">Grade one student at a time</a> (Do not use for group assignments)";
 	} else {
-		echo "<p><a href=\"gradeallq.php?stu=$stu&gbmode=$gbmode&cid=$cid&aid=$aid&qid=$qid&page=-1\">Grade all students at once</a></p>";
+		echo "<a href=\"gradeallq.php?stu=$stu&gbmode=$gbmode&cid=$cid&aid=$aid&qid=$qid&page=-1\">Grade all students at once</a>";
 	}
+	echo '</div>';
 	echo "<p>Note: Feedback is for whole assessment, not the individual question.</p>";
-?>
+	echo '
 	<script type="text/javascript">
 	function hidecorrect() {
-	   var butn = document.getElementById("hctoggle");
-	   if (butn.value=="Hide Perfect Score Questions") {
-	      butn.value = "Show Perfect Score Questions";
-	      var setdispto = "block";
-	   } else { 
-	      butn.value = "Hide Perfect Score Questions";
-	      var setdispto = "none";
-	   }
-	   var divs = document.getElementsByTagName("div");
-	   for (var i=0;i<divs.length;i++) {
-	     if (divs[i].className=="iscorrect") { 
-	         if (divs[i].style.display=="none") {
-	               divs[i].style.display = "block";
-	         } else { divs[i].style.display = "none"; }
-	     }
-	    }
+		var butn = $("#hctoggle");
+		if (!butn.hasClass("hchidden")) {
+			butn.html("'._('Show Questions with Perfect Scores').'");
+			butn.addClass("hchidden");
+		} else {
+			butn.html("'._('Hide Questions with Perfect Scores').'");
+			butn.removeClass("hchidden");
+		}
+		$(".iscorrect").toggle();
 	}
 	function hidenonzero() {
-	   var butn = document.getElementById("nztoggle");
-	   if (butn.value=="Hide Nonzero Score Questions") {
-	      butn.value = "Show Nonzero Score Questions";
-	      var setdispto = "block";
-	   } else { 
-	      butn.value = "Hide Nonzero Score Questions";
-	      var setdispto = "none";
-	   }
-	   var divs = document.getElementsByTagName("div");
-	   for (var i=0;i<divs.length;i++) {
-	     if (divs[i].className=="isnonzero") { 
-	         if (divs[i].style.display=="none") {
-	               divs[i].style.display = "block";
-	         } else { divs[i].style.display = "none"; }
-	     }
-	    }
+		var butn = $("#nztoggle");
+		if (!butn.hasClass("nzhidden")) {
+			butn.html("'._('Show Nonzero Score Questions').'");
+			butn.addClass("nzhidden");
+		} else {
+			butn.html("'._('Hide Nonzero Score Questions').'");
+			butn.removeClass("nzhidden");
+		}
+		$(".isnonzero").toggle();
 	}
 	function hideNA() {
-	   var butn = document.getElementById("hnatoggle");
-	   if (butn.value=="Hide Not Answered Questions") {
-	      butn.value = "Show Not Answered Questions";
-	      var setdispto = "block";
-	   } else { 
-	      butn.value = "Hide Not Answered Questions";
-	      var setdispto = "none";
-	   }
-	   var divs = document.getElementsByTagName("div");
-	   for (var i=0;i<divs.length;i++) {
-	     if (divs[i].className=="notanswered") { 
-	         if (divs[i].style.display=="none") {
-	               divs[i].style.display = "block";
-	         } else { divs[i].style.display = "none"; }
-	     }
-	    }
-	}
-	function preprint() {
-		var els = document.getElementsByTagName("input");
-		for (var i=0; i<els.length; i++) {
-			if (els[i].type=='button' && els[i].value=='Preview') {
-				els[i].click();
-			} else if (els[i].type=='button' && els[i].value=='Show Answer') {
-				els[i].click();
-				els[i].parentNode.insertBefore(document.createTextNode('Answer: '),els[i]);
-				els[i].style.display = 'none';
-			}
+		var butn = $("#hnatoggle");
+		if (!butn.hasClass("hnahidden")) {
+			butn.html("'._('Show Unanswered Questions').'");
+			butn.addClass("hnahidden");
+		} else {
+			butn.html("'._('Hide Unanswered Questions').'");
+			butn.removeClass("hnahidden");
 		}
+		$(".notanswered").toggle();
+	}';
+?>
+	function preprint() {
+		$("span[id^='ans']").removeClass("hidden");
+		$(".sabtn").replaceWith("<span>Answer: </span>");
+		$('input[value="Preview"]').trigger('click').remove();
 		document.getElementById("preprint").style.display = "none";
 	}
 	function hidegroupdup(el) {  //el.checked = one per group
@@ -303,10 +278,10 @@
 		echo printrubrics(array(mysql_fetch_row($result)));
 	}
 	if ($page==-1) {
-		echo '<input type=button id="hctoggle" value="Hide Perfect Score Questions" onclick="hidecorrect()" />';
-		echo '<input type=button id="nztoggle" value="Hide Nonzero Score Questions" onclick="hidenonzero()" />';
-		echo ' <input type=button id="hnatoggle" value="Hide Not Answered Questions" onclick="hideNA()" />';
-		echo ' <input type="button" id="preprint" value="Prepare for Printing (Slow)" onclick="preprint()" />';
+		echo '<button type=button id="hctoggle" onclick="hidecorrect()">'._('Hide Questions with Perfect Scores').'</button>';
+		echo '<button type=button id="nztoggle" onclick="hidenonzero()">'._('Hide Nonzero Score Questions').'</button>';
+		echo ' <button type=button id="hnatoggle" onclick="hideNA()">'._('Hide Unanswered Questions').'</button>';
+		echo ' <button type="button" id="preprint" onclick="preprint()">'._('Prepare for Printing (Slow)').'</button>';
 	}
 	echo ' <input type="button" id="clrfeedback" value="Clear all feedback" onclick="clearfeedback()" />';
 	if ($deffbtext != '') {
@@ -319,12 +294,12 @@
 	
 	echo "<p>";
 	if ($ver=='graded') {
-		echo "Showing Graded Attempts.  ";
+		echo "<b>Showing Graded Attempts.</b>  ";
 		echo "<a href=\"gradeallq.php?stu=$stu&gbmode=$gbmode&cid=$cid&aid=$aid&qid=$qid&ver=last\">Show Last Attempts</a>";
 	} else if ($ver=='last') {
 		echo "<a href=\"gradeallq.php?stu=$stu&gbmode=$gbmode&cid=$cid&aid=$aid&qid=$qid&ver=graded\">Show Graded Attempts</a>.  ";
-		echo "Showing Last Attempts.  ";
-		echo "<br/><b>Note:</b> Grades and number of attempt used are for the Graded Attempt.  Part points might be inaccurate.";
+		echo "<b>Showing Last Attempts.</b>  ";
+		echo "<br/><b>Note:</b> Grades and number of attempts used are for the Graded Attempt.  Part points might be inaccurate.";
 	}
 	echo "</p>";
 	
@@ -570,13 +545,14 @@
 			$cnt++;
 		}
 	}
-	echo "<input type=submit value=\"Save Changes\"/>";
+	echo "<input type=\"submit\" value=\"Save Changes\"/> ";
 	}
+	
 	echo "</form>";
-
+	echo '<p>&nbsp;</p>';
 	
 
-	echo "<p><a href=\"gb-itemanalysis.php?stu=$stu&cid=$cid&aid=$aid&asid=average\">Back to Gradebook Item Analysis</a></p>";
+	
 
 	require("../footer.php");
 	function getpts($sc) {
