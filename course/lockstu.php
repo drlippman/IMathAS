@@ -90,7 +90,7 @@ ini_set("max_execution_time", "600");
 ?>
 
 		<p>
-			<input type=submit value="Yes, I'm Sure">
+			<input type=submit value="Yes, Lock Out Student">
 <?php
 			if ($calledfrom=='lu') {
 				echo "<input type=button value=\"Nevermind\" onclick=\"window.location='listusers.php?cid=$cid'\">";

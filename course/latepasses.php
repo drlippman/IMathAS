@@ -128,8 +128,9 @@ function sendtoall(type) {
 		$query = "SELECT latepasshrs FROM imas_courses WHERE id='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$hours = mysql_result($result,0,0);
+		echo '<p>Students can redeem LatePasses for automatic extensions to assessments where allowed by the instructor.  Students must redeem the LatePass before the Due Date.</p>'; 
 		echo "<p>Late Passes extend the due date by <input type=text size=3 name=\"hours\" id=\"hours\" value=\"$hours\"/> hours</p>";
-		echo "<p>To all:  <input type=\"text\" value=\"1\" id=\"toall\"/> ";
+		echo "<p>To all students:  <input type=\"text\" size=\"3\" value=\"1\" id=\"toall\"/> ";
 		echo '<input type=button value="Add" onClick="sendtoall(0);"/> <input type=button value="Replace" onclick="sendtoall(1)"/><p>';
 		echo "<table id=myTable><thead><tr><th>Name</th>";
 		if ($hassection) {
@@ -163,10 +164,11 @@ function sendtoall(type) {
 		if ($hassection) {
 			echo "<script> initSortTable('myTable',Array('S','S',false),false);</script>";
 		} 
-
+		
+		echo '<div class="submit"><input type="submit" value="'._('Save Changes').'"></div>';
 	
 ?>
-<div class=submit><input type=submit value="Submit"></div>
+
 </form>
 
 <?php

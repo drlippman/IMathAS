@@ -322,7 +322,7 @@
 	} else {
 		echo '</tbody></table>';
 	}
-	echo "<p><a href=\"gradebook.php?stu=$stu&cid=$cid\">Return to GradeBook</a></p>\n";
+	//echo "<p><a href=\"gradebook.php?stu=$stu&cid=$cid\">Return to GradeBook</a></p>\n";
 	
 	echo '<p>Items with grade link <span class="manualgrade">highlighted</span> require manual grading.<br/>';
 	echo "Note: Average Attempts, Regens, and Time only counts those who attempted the problem<br/>";
