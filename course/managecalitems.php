@@ -66,16 +66,17 @@ if ($from=="cal") {
 }
 echo "&gt; Manage Calendar Items</div>\n";
 echo '<div id="headermanagecalitems" class="pagetitle"><h2>Manage Calendar Items</h2></div>';
-echo "<p>This page allows you to add items only to the calendar.  Course items automatically place themselves on the calendar</p>";
+echo "<p>This page allows you to add events to the calendar.  Course items automatically place themselves on the calendar.</p>";
 	
 $query = "SELECT id,date,title,tag FROM imas_calitems WHERE courseid='$cid' ORDER BY date";
 $result = mysql_query($query) or die("Query failed : " . mysql_error());
 
 ?>
 <form method=post action="managecalitems.php?cid=<?php echo $cid.'&amp;from='.$from;?>">
-<table>
+<h4>Manage Events</h4>
+<table class="gb">
 <thead>
-<tr><th>Delete?</th><th>Date</th><th>Tag</th><th>Text</th></tr>
+<tr><th>Delete?</th><th>Date</th><th>Tag</th><th>Event Details</th></tr>
 </thead>
 <tbody>
 <?php
@@ -91,14 +92,23 @@ while ($row = mysql_fetch_row($result)) {
 	echo '<td><input name="txt['.$row[0].']" type=text size=80 value="'.str_replace('"','&quot;',$row[2]).'" /></td>';
 	echo '<tr/>';
 }
+echo '</tbody></table>';
+echo '<p><button type="submit" name="submit" value="Save">'._('Save Changes').'</button></p>';
+echo '<h4>Add New Events</h4>';
+echo '<table class="gb">
+<thead>
+<tr><th>Date</th><th>Tag</th><th>Event Details</th></tr>
+</thead>
+<tbody>';
 $now = time();
 echo '<tr>';
-echo '<td></td>';
+//echo '<td></td>';
 if (isset($_GET['addto'])) {
 	$date = tzdate("m/d/Y",$_GET['addto']); 
 } else if (isset($datenew)) {
+	echo "datenew";
 	$date = tzdate("m/d/Y",$datenew);
-} else if (!isset($date)) {
+} else  {
 	$date = tzdate("m/d/Y",$now);
 }
 echo "<td><input type=text size=10 id=\"datenew\" name=\"datenew\" value=\"$date\"/> ";	
@@ -112,8 +122,8 @@ echo '<tr/>';
 </thead>
 </table>
 
-<input type=submit name="submit" value="Save and Add another" />
-<input type=submit name="submit" value="Save" />
+<button type="submit" name="submit" value="SaveAndAdd"><?php echo _('Save and Add another') ?></button> 
+<button type="submit" name="submit" value="Save"><?php echo _('Save Changes') ?></button>
 </form>
 
 <?php
