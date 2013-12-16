@@ -40,7 +40,17 @@
 	 $defaultcoursetheme = "default.css";
  }
  $coursetheme = $defaultcoursetheme; //will be overwritten later if set
- 
+ if (!isset($CFG['CPS']['miniicons'])) {
+	$CFG['CPS']['miniicons'] = array( 
+		 'assess'=>'assess_tiny.png',
+		 'drill'=>'assess_tiny.png',
+		 'inline'=>'inline_tiny.png',
+		 'linked'=>'html_tiny.png',
+		 'forum'=>'forum_tiny.png',
+		 'wiki'=>'wiki_tiny.png',
+		 'folder'=>'folder_tiny.png',
+		 'calendar'=>'1day.png');
+ }
  
  //check for bad sessionids.  
  if (strlen($sessionid)<10) { 
@@ -478,7 +488,7 @@ END;
 		
 			}
 		}
-		$query = "SELECT imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme,imas_courses.newflag,imas_courses.msgset,imas_courses.topbar,imas_courses.toolset,imas_courses.deftime ";
+		$query = "SELECT imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme,imas_courses.newflag,imas_courses.msgset,imas_courses.topbar,imas_courses.toolset,imas_courses.deftime,imas_courses.picicons ";
 		$query .= "FROM imas_courses,imas_users WHERE imas_courses.id='{$_GET['cid']}' AND imas_users.id=imas_courses.ownerid";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		if (mysql_num_rows($result)>0) {
@@ -492,6 +502,7 @@ END;
 			$coursetopbar[1] = explode(',',$coursetopbar[1]);
 			$coursetoolset = $crow[9];
 			$coursedeftime = $crow[10];
+			$picicons = $crow[11];
 			if (!isset($coursetopbar[2])) { $coursetopbar[2] = 0;}
 			if ($coursetopbar[0][0] == null) {unset($coursetopbar[0][0]);}
 			if ($coursetopbar[1][0] == null) {unset($coursetopbar[1][0]);}

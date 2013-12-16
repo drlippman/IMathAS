@@ -511,17 +511,7 @@ if ($overwriteBody==1) {
 		<tbody>
 <?php	
 		$alt=0;
-		if ($picicons && !isset($CFG['CPS']['miniicons'])) {
-			$CFG['CPS']['miniicons'] = array( 
-				 'assess'=>'assess_tiny.png',
-				 'drill'=>'assess_tiny.png',
-				 'inline'=>'inline_tiny.png',
-				 'linked'=>'html_tiny.png',
-				 'forum'=>'forum_tiny.png',
-				 'wiki'=>'wiki_tiny.png',
-				 'folder'=>'folder_tiny.png',
-				 'calendar'=>'1day.png');
-		}
+	
 		for ($i = 0 ; $i<(count($ids)); $i++) {
 			if ($alt==0) {echo "		<tr class=even>"; $alt=1;} else {echo "		<tr class=odd>"; $alt=0;}
 			echo '<td>';
