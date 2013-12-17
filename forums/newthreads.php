@@ -83,7 +83,7 @@
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; New Forum Topics</div>\n";
 	echo '<div id="headernewthreads" class="pagetitle"><h2>New Forum Posts</h2></div>';
-	echo "<p><a href=\"newthreads.php?cid=$cid&markallread=true\">Mark all Read</a></p>";
+	echo "<p><button type=\"button\" onclick=\"window.location.href='newthreads.php?cid=$cid&markallread=true'\">"._('Mark all Read')."</button></p>";
 
 	if (count($lastpost)>0) {
 		$threadids = implode(',',array_keys($lastpost));

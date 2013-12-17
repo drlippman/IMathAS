@@ -502,7 +502,13 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				echo '<span class="form">Points for message you\'re replying to:</span><span class="formright">';
 				echo '<input type="text" size="4" name="points" value="'.$points.'" /></span><br class="form" />';
 			}
-			echo "<div class=submit><input type=submit value='Submit'></div>\n";
+			if ($_GET['modify']=='reply') {
+				echo "<div class=submit><input type=submit value='Post Reply'></div>\n";
+			} else if ($_GET['modify']=='new') { 
+				echo "<div class=submit><input type=submit value='Post Thread'></div>\n";
+			} else {
+				echo "<div class=submit><input type=submit value='Save Changes'></div>\n";
+			}
 	
 			if ($_GET['modify']=='reply') {
 				echo "<p>Replying to:</p>";
