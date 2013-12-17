@@ -237,6 +237,9 @@ function showcalcontentsid(elid) {
 	}
 	return html;
 }
+jQuery(document).ready(function($) {
+	$(".caldl").attr("title",_("Bring this day to top"));		
+});
 
 function changecallength(el) {
 	window.location = calcallback + '&callength=' + el.value;

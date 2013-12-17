@@ -464,8 +464,7 @@ if ($overwriteBody==1) {
 		<span class=form>Default display:</span>
 		<span class=formright>
 			<select name="defdisplay">
-				<option value="0" <?php if ($defdisplay==0) {echo "selected=1";}?>>Expanded</option>
-				<option value="1" <?php if ($defdisplay==1) {echo "selected=1";}?>>Collapsed</option>
+				<option value="0" <?php if ($defdisplay==0 || $defdisplay==1) {echo "selected=1";}?>>Expanded</option>
 				<option value="2" <?php if ($defdisplay==2) {echo "selected=1";}?>>Condensed</option>
 			</select>
 		</span><br class="form" />
