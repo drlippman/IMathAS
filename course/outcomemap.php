@@ -22,6 +22,7 @@ while ($row = mysql_fetch_row($result)) {
 	$outcomeinfo[$row[0]] = $row[1];
 }
 
+$outcomelinks = 0;
 $outcomeassoc = array();
 //load assessment usage count
 $assessgbcat = array();  //will record gb category for assessment
@@ -50,6 +51,7 @@ while ($row = mysql_fetch_assoc($result)) {
 	}
 	$assessgbcat[$row['id']] = $row['gbcategory'];
 	$assessnames[$row['id']] = $row['name'];
+	$outcomelinks++;
 }
 foreach ($assessqcnt as $id=>$os) {
 	foreach ($os as $o=>$cnt) {
@@ -79,6 +81,7 @@ while ($row = mysql_fetch_assoc($result)) {
 		}
 		
 		$outcomeassoc[$o][$row['gbcategory']][] = array('offline',$row['id']);
+		$outcomelinks++;
 	}
 	$offgbcat[$row['id']] = $row['gbcategory'];
 	$offnames[$row['id']] = $row['name'];
@@ -105,6 +108,7 @@ while ($row = mysql_fetch_assoc($result)) {
 		}
 		
 		$outcomeassoc[$o][$row['gbcategory']][] = array('forum',$row['id']);
+		$outcomelinks++;
 	}
 	
 	$forumnames[$row['id']] = $row['name'];
@@ -125,6 +129,7 @@ while ($row = mysql_fetch_assoc($result)) {
 		}
 		
 		$outcomeassoc[$o]['UG'][] = array('link',$row['id']);
+		$outcomelinks++;
 	}
 	$linknames[$row['id']] = $row['title'];
 }
@@ -144,6 +149,7 @@ while ($row = mysql_fetch_assoc($result)) {
 		}
 		
 		$outcomeassoc[$o]['UG'][] = array('inline',$row['id']);
+		$outcomelinks++;
 	}
 	$inlinenames[$row['id']] = $row['title'];
 }
@@ -171,6 +177,11 @@ echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt; '._("Outcomes Map").'</div>'
 
 echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>"._("Outcomes Map")."</h2></div>\n";
 
+if ($outcomelinks==0) {
+	echo '<p>No items have been associated with outcomes yet</p>';
+	require("../footer.php");
+	exit;
+}
 
 echo '<table class="gb"><thead><tr><th>'._('Outcome').'</th><th>'._('Not Graded').'</th>';
 foreach ($catnames as $cn) {

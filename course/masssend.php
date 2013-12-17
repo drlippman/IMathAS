@@ -185,8 +185,8 @@
 		echo "<p><i>Note:</i> <b>FirstName</b> and <b>LastName</b> can be used as form-mail fields that will autofill with each students' first/last name</p>";
 		echo "<span class=form><label for=\"self\">Send copy to:</label></span>";
 		echo "<span class=formright><input type=radio name=self id=self value=\"none\">Only Students<br/> ";
-		echo "<input type=radio name=self id=self value=\"self\" checked=checked>Self<br/> ";
-		echo "<input type=radio name=self id=self value=\"allt\">All instructors of this course</span><br class=form>\n";
+		echo "<input type=radio name=self id=self value=\"self\" checked=checked>Students and you<br/> ";
+		echo "<input type=radio name=self id=self value=\"allt\">Students and all instructors of this course</span><br class=form>\n";
 		if ($sendtype=='Message') {
 			echo '<span class="form"><label for="savesent">Save in sent messages?</label></span>';
 			echo '<span class="formright"><input type="checkbox" name="savesent" checked="checked" /></span><br class="form" />';
