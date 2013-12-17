@@ -87,14 +87,15 @@
 
 	if (count($lastpost)>0) {
 		$threadids = implode(',',array_keys($lastpost));
-		$query = "SELECT imas_forum_posts.*,imas_users.LastName,imas_users.FirstName FROM imas_forum_posts,imas_users ";
-		$query .= "WHERE imas_forum_posts.userid=imas_users.id AND imas_forum_posts.threadid IN ($threadids) AND imas_forum_posts.parent=0 ORDER BY imas_forum_posts.forumid";
+		$query = "SELECT imas_forum_posts.*,imas_users.LastName,imas_users.FirstName,imas_forum_threads.lastposttime FROM imas_forum_posts,imas_users,imas_forum_threads ";
+		$query .= "WHERE imas_forum_posts.userid=imas_users.id AND imas_forum_posts.threadid=imas_forum_threads.id AND ";
+		$query .= "imas_forum_posts.threadid IN ($threadids) AND imas_forum_posts.parent=0 ORDER BY imas_forum_posts.forumid, imas_forum_threads.lastposttime DESC";
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 
 		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 			if ($forumname[$line['threadid']]!=$lastforum) {
 				if ($lastforum!='') { echo '</tbody></table>';}
-				echo "<h4>Forum: <a href=\"thread.php?cid=$cid&forum={$forumids[$line['threadid']]}\">".$forumname[$line['threadid']].'</a></h4><table class="forum"><thead><th>Topic</th><th>Last Post Date</th></thead><tbody>';
+				echo "<h4>Forum: <a href=\"thread.php?cid=$cid&forum={$forumids[$line['threadid']]}\">".$forumname[$line['threadid']].'</a></h4><table class="gb"><thead><th>Topic</th><th>Started By</th><th>Last Post Date</th></thead><tbody>';
 				$lastforum = $forumname[$line['threadid']];
 			}
 			if ($line['isanon']==1) {
@@ -102,7 +103,7 @@
 			} else {
 				$name = "{$line['LastName']}, {$line['FirstName']}";
 			}
-			echo "<tr><td><a href=\"posts.php?cid=$cid&forum={$forumids[$line['threadid']]}&thread={$line['threadid']}&page=-3\">{$line['subject']}</a></b>: $name</td>";
+			echo "<tr><td><a href=\"posts.php?cid=$cid&forum={$forumids[$line['threadid']]}&thread={$line['threadid']}&page=-3\">{$line['subject']}</a></b></td><td>$name</td>";
 			echo "<td>{$lastpost[$line['threadid']]}</td></tr>";
 		}
 		if ($lastforum!='') { echo '</tbody></table>';}
