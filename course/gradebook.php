@@ -681,16 +681,17 @@ function gbstudisp($stu) {
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$showlatepass = mysql_result($result,0,0);
 		
+		echo '<h3>';
 		if ($isteacher) {
 			if ($gbt[1][4][2]==1) {
 				if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-					echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$gbt[1][4][0]}.jpg\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
+					echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$gbt[1][4][0]}.jpg\" onclick=\"togglepic(this)\" class=\"mida\"/> ";
 				} else {
-					echo "<img src=\"$imasroot/course/files/userimg_sm{$gbt[1][4][0]}.jpg\" style=\"float: left; padding-right:5px;\" onclick=\"togglepic(this)\"/>";
+					echo "<img src=\"$imasroot/course/files/userimg_sm{$gbt[1][4][0]}.jpg\" style=\"float: left; padding-right:5px;\" onclick=\"togglepic(this)\" class=\"mida\"/>";
 				}
 			} 
 		}
-		echo '<h3>' . strip_tags($gbt[1][0][0]) . ' <span class="small">('.$gbt[1][0][1].')</span>';
+		echo strip_tags($gbt[1][0][0]) . ' <span class="small">('.$gbt[1][0][1].')</span>';
 		$query = "SELECT imas_students.gbcomment,imas_users.email,imas_students.latepass,imas_students.section FROM imas_students,imas_users WHERE ";
 		$query .= "imas_students.userid=imas_users.id AND imas_users.id='$stu' AND imas_students.courseid='{$_GET['cid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -728,8 +729,8 @@ function gbstudisp($stu) {
 		if (trim($gbcomment)!='' || $isteacher) {
 			if ($isteacher) {
 				echo "<form method=post action=\"gradebook.php?{$_SERVER['QUERY_STRING']}\">";
-				echo "<textarea name=\"usrcomments\" rows=3 cols=60>$gbcomment</textarea><br/>";
-				echo "<input type=submit value=\"", _('Update Comment'), "\">";
+				echo _('Gradebook Comment').': '.  "<input type=submit value=\"", _('Update Comment'), "\"><br/>";
+				echo "<textarea name=\"usrcomments\" rows=3 cols=60>$gbcomment</textarea>";
 				echo '</form>';
 			} else {
 				echo "<div class=\"item\">$gbcomment</div>";
@@ -739,6 +740,11 @@ function gbstudisp($stu) {
 	}
 	echo "<form method=\"post\" id=\"qform\" action=\"gradebook.php?{$_SERVER['QUERY_STRING']}&uid=$stu\">";
 	//echo "<input type='button' onclick='conditionalColor(\"myTable\",1,50,80);' value='Color'/>";
+	if ($isteacher && $stu>0) {
+		echo '<p><button type="submit" value="Save Changes" style="display:none"; id="savechgbtn">', _('Save Changes'), '</button> ';
+		echo _('Check:'), ' <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',false)">', _('None'), '</a> ';
+		echo _('With selected:'), ' <button type="submit" value="Make Exception" name="posted">',_('Make Exception'),'</button></p>';
+	}
 	echo '<table id="myTable" class="gb" style="position:relative;">';
 	echo '<thead><tr>';
 	if ($stu>0 && $isteacher) {
@@ -893,17 +899,13 @@ function gbstudisp($stu) {
 			echo '</tr>';
 		}
 	}
-	echo '</tbody></table>';	
+	echo '</tbody></table><br/>';	
 	if (!$hidepast) {
 		$query = "SELECT stugbmode FROM imas_gbscheme WHERE courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$show = mysql_result($result,0,0);
 		//echo '</tbody></table><br/>';
-		if ($isteacher && $stu>0) {
-			echo '<p><button type="submit" value="Save Changes" style="display:none"; id="savechgbtn">', _('Save Changes'), '</button> ';
-			echo _('Check:'), ' <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',false)">', _('None'), '</a> ';
-			echo _('With selected:'), ' <button type="submit" value="Make Exception" name="posted">',_('Make Exception'),'</button></p>';
-		}
+		
 		echo '<table class="gb"><thead>';
 		echo '<tr>';
 		echo '<th >', _('Totals'), '</th>';

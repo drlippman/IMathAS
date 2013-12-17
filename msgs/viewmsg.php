@@ -164,14 +164,16 @@
 			$cansendmsgs = true;
 		}
 		if ($cansendmsgs) {
-			echo "<a href=\"msglist.php?cid=$cid&filtercid=$filtercid&page=$page&type=$type&add=new&to={$line['msgfrom']}&toquote=$msgid\">Reply</a> | ";
+			echo "<button type=\"button\" onclick=\"window.location.href='msglist.php?cid=$cid&filtercid=$filtercid&page=$page&type=$type&add=new&to={$line['msgfrom']}&toquote=$msgid'\">"._('Reply')."</button> | ";
 		}
-		echo "<a href=\"msghistory.php?cid=$cid&filtercid=$filtercid&page=$page&msgid=$msgid&type=$type\">View Conversation</a> | ";
-		echo "<a href=\"msglist.php?cid=$cid&filtercid=$filtercid&page=$page&removeid=$msgid&type=$type\">Delete</a>";
+		echo "<button type=\"button\" onclick=\"if(confirm('"._('Are you SURE you want to delete this message?')."')){window.location.href='msglist.php?cid=$cid&filtercid=$filtercid&page=$page&removeid=$msgid&type=$type'}\">"._('Delete')."</button>";
+		echo " | <button type=\"button\" onclick=\"window.location.href='viewmsg.php?markunread=true&cid=$cid&filtercid=$filtercid&page=$page&msgid=$msgid&type=$type'\">"._('Mark Unread')."</button>";
+		
+		echo " | <a href=\"msghistory.php?cid=$cid&filtercid=$filtercid&page=$page&msgid=$msgid&type=$type\">View Conversation</a> ";
 		if ($isteacher && $line['courseid']==$cid) {
 			echo " | <a href=\"$imasroot/course/gradebook.php?cid={$line['courseid']}&stu={$line['msgfrom']}\">Gradebook</a>";
 		}
-		echo " | <a href=\"viewmsg.php?markunread=true&cid=$cid&filtercid=$filtercid&page=$page&msgid=$msgid&type=$type\">Mark Unread</a>";
+		
 	} else if ($type=='sent' && $type!='allstu') {
 		echo "<a href=\"msghistory.php?cid=$cid&filtercid=$filtercid&page=$page&msgid=$msgid&type=$type\">View Conversation</a>";
 		

@@ -356,6 +356,35 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 	echo " Message List</div>";
 	echo '<div id="headermsglist" class="pagetitle"><h2>Messages</h2></div>';
 
+	if ($myrights > 5 && $cid>0) {
+		$query = "SELECT msgset FROM imas_courses WHERE id='$cid'";
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$msgset = mysql_result($result,0,0);
+		$msgmonitor = (floor($msgset/5)&1);
+		$msgset = $msgset%5;
+		if ($msgset<3 || $isteacher) {
+			$cansendmsgs = true;
+		}
+	}	
+	$actbar = array();
+	
+	if ($cansendmsgs) {
+		$actbar[] = "<button type=\"button\" onclick=\"window.location.href='msglist.php?page=$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid&add=new'\">"._('Send New Message')."</button>";
+	}
+	if ($page==-2) {
+		$actbar[] = "<a href=\"msglist.php?page=1&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">Show All</a>";
+	} else {
+		$actbar[] = "<a href=\"msglist.php?page=-2&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">Limit to Tagged</a>";
+	}
+	$actbar[] = "<a href=\"sentlist.php?cid=$cid\">Sent Messages</a>";
+	
+	if ($isteacher && $cid>0 && $msgmonitor==1) {
+		$actbar[] = "<a href=\"allstumsglist.php?cid=$cid\">Student Messages</a>";
+	}
+	$actbar[] = '<input type="button" value="Pictures" onclick="rotatepics()" title="View/hide student pictures, if available" />';
+	echo '<div class="cpmid">'.implode(' | ',$actbar).'</div>';
+	
+	
 	$query = "SELECT COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND (isread&2)=0";
 	if ($filtercid>0) {
 		$query .= " AND courseid='$filtercid'";
@@ -426,26 +455,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 	}
 	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/msglist.php?cid=$cid&filtercid=";
 	
-	if ($myrights > 5 && $cid>0) {
-		$query = "SELECT msgset FROM imas_courses WHERE id='$cid'";
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		$msgset = mysql_result($result,0,0);
-		$msgmonitor = (floor($msgset/5)&1);
-		$msgset = $msgset%5;
-		if ($msgset<3 || $isteacher) {
-			$cansendmsgs = true;
-		}
-	}	
-	if ($page==-2) {
-		$limitmsg = "<a href=\"msglist.php?page=1&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">Show All</a>";
-	} else {
-		$limitmsg = "<a href=\"msglist.php?page=-2&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">Limit to Tagged</a>";
-	}
-	if ($cansendmsgs) {
-		echo "<p><a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid&add=new\">Send New Message</a> | $limitmsg</p>\n";
-	} else {
-		echo "<p>$limitmsg</p>\n";
-	}
+	
 ?>
 <script type="text/javascript">
 function chgfilter() {
@@ -499,7 +509,7 @@ function chgfilter() {
 	With Selected: <input type=submit name="unread" value="Mark as Unread">
 	<input type=submit name="markread" value="Mark as Read">
 	<input type=submit name="remove" value="Delete">
-	<input type="button" value="Pictures" onclick="rotatepics()" />
+	
 			
 	<table class=gb id="myTable">
 	<thead>
@@ -597,16 +607,10 @@ function chgfilter() {
 		echo "<p>$prevnext</p>";
 	}
 	if ($cansendmsgs) {
-		echo "<p><a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid&add=new\">Send New Message</a> | $limitmsg</p>\n";
-	} else {
-		echo "<p>$limitmsg</p>\n";
-	}
-	echo "<p><a href=\"sentlist.php?cid=$cid\">Sent Messages</a></p>";
-	
-	if ($isteacher && $cid>0 && $msgmonitor==1) {
-		echo "<p><a href=\"allstumsglist.php?cid=$cid\">Student Messages</a></p>";
+		echo "<p><button type=\"button\" onclick=\"window.location.href='msglist.php?page=$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid&add=new'\">"._('Send New Message')."</button></p>";
 	}
 	
+	echo '<p>&nbsp;</p>';
 	require("../footer.php");
 ?>
 		
