@@ -475,7 +475,20 @@ div#viewbuttoncont a.buttoninactive {
 div#viewbuttoncont a.buttoninactive:hover {
 	background-color: #036;
 }
-	
+input[type=submit],input[type=button], button {
+	color: #000;
+	background-color: #eee;
+	border-radius: 4px;
+	border: 1px solid #ccc;
+	padding:3px 8px;
+	margin: 2px 4px;
+}
+input[type=submit].secondarybtn,input[type=button].secondarybtn, button.secondarybtn {
+	background-color: #f9f9f9;
+}
+input[type=submit]:hover, button:hover,input[type=button]:hover {
+	background-color: #c9c9c9;
+}
 #GB_overlay {
   position: fixed;
   margin: auto;
