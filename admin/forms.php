@@ -551,9 +551,9 @@ switch($_GET['action']) {
 		
 		echo "<h4>Potential Teachers:</h4>\n";
 		if ($myrights<100) {
-			$query = "SELECT id,FirstName,LastName,rights FROM imas_users WHERE rights>19 AND rights<>76 AND groupid='$groupid' ORDER BY LastName;";
+			$query = "SELECT id,FirstName,LastName,rights FROM imas_users WHERE rights>19 AND (rights<76 or rights>78) AND groupid='$groupid' ORDER BY LastName;";
 		} else if ($myrights==100) {
-			$query = "SELECT id,FirstName,LastName,rights FROM imas_users WHERE rights>19 AND rights<>76 ORDER BY LastName;";
+			$query = "SELECT id,FirstName,LastName,rights FROM imas_users WHERE rights>19 AND (rights<76 or rights>78) ORDER BY LastName;";
 		}
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		echo '<form method="post" action="actions.php?action=addteacher&cid='.$_GET['id'].'">';
@@ -639,7 +639,7 @@ switch($_GET['action']) {
 		echo "<h3>Modify LTI Domain Credentials</h3>\n";
 		echo '</div>';
 		echo "<table><tr><th>Domain</th><th>Key</th><th>Can create Instructors?</th><th>Modify</th><th>Delete</th></tr>\n";
-		$query = "SELECT id,email,SID,rights FROM imas_users WHERE rights=11 OR rights=76";
+		$query = "SELECT id,email,SID,rights FROM imas_users WHERE rights=11 OR rights=76 OR rights=77";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
 			echo "<tr><td>{$row[1]}</td><td>{$row[2]}</td>";
@@ -663,7 +663,7 @@ switch($_GET['action']) {
 		echo "Key: <input type=text name=\"ltikey\" size=20><br/>\n";
 		echo "Secret: <input type=text name=\"ltisecret\" size=20><br/>\n";
 		echo "Can create instructors: <select name=\"createinstr\"><option value=\"11\" selected=\"selected\">No</option>";
-		echo "<option value=\"76\">Yes</option></select><br/>\n";
+		echo "<option value=\"76\">Yes, and creates $installname login</option><option value=\"77\">Yes, with access via LMS only</option></select><br/>\n";
 		echo "<input type=submit value=\"Add LTI Credentials\"></p>\n";
 		echo "</form>\n";
 		break;

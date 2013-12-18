@@ -3,12 +3,15 @@
 //(c) David Lippman 2009
 //
 //
-//launches with four types of key/secrets
+//launches with 5 types of key/secrets
 //   username     : of a user with rights 11 or 76 (has to manually entered into database, along with a plaintext password as the secret)
 //   aid_###      : launches assessment with given id.  secret is course's ltisecret
 //   cid_###      : launches course with given id.  secret is course's ltisecret
-//   sso_username : launches single signon using given userid w/ rights 11 or 76. 
-//                 secret value stored in DB password field.  Currently must be manually editted in DB
+//   placein_###  : launches a content linkage selector. In Canvas, uses resource selection return.
+//		    in others, links to resource id (which is lost on LMS course copy)
+//   sso_username : launches single signon to home page using given userid w/ rights 11 or 76. 
+//                  secret value stored in DB password field.  Currently must be manually editted in DB
+//   username	  : like sso_username, but triggers course/item connection  
 //   aid_, cid_, and sso_ types accept additional _0 or _1  :  0 is default, and links LMS account with a local account
 //                                      1 using LMS for validation, does not ask for local account info
 //
@@ -204,7 +207,7 @@ if (isset($_GET['launch'])) {
 	} else if (count($keyparts)>2 && $keyparts[2]==1 && $ltirole=='learner') {
 		$name_only = true;
 	}
-	if ($ltirole=='learner' || $_SESSION['lti_keyrights']==76) {
+	if ($ltirole=='learner' || $_SESSION['lti_keyrights']==76 || $_SESSION['lti_keyrights']==77) {
 		$allow_acctcreation = true;
 	} else {
 		$allow_acctcreation = false;

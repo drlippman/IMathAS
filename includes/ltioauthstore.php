@@ -20,9 +20,9 @@ class IMathASLTIOAuthDataStore extends OAuthDataStore {
 		$query = "SELECT ic.ltisecret FROM imas_courses AS ic JOIN imas_assessments AS ia ON ";
 		$query .= "ic.id=ia.courseid WHERE ia.id='{$keyparts[1]}'";
 	} else if ($keyparts[0]=='sso') {
-		$query = "SELECT password,rights FROM imas_users WHERE SID='{$keyparts[1]}' AND (rights=11 OR rights=76)";
+		$query = "SELECT password,rights FROM imas_users WHERE SID='{$keyparts[1]}' AND (rights=11 OR rights=76 OR rights=77)";
 	} else {
-		$query = "SELECT password,rights FROM imas_users WHERE SID='{$keyparts[0]}' AND (rights=11 OR rights=76)";
+		$query = "SELECT password,rights FROM imas_users WHERE SID='{$keyparts[0]}' AND (rights=11 OR rights=76 OR rights=77)";
 	}
 	
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
