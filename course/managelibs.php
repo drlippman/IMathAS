@@ -534,7 +534,7 @@ if ($overwriteBody==1) {
 		<input type=hidden name=remove value="<?php echo $rlist ?>">
 		<p>
 			<input type=submit value="Really Delete">
-			<input type=button value="Never Mind" onclick="window.location='managelibs.php?cid=<?php echo $cid ?>'">
+			<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='managelibs.php?cid=<?php echo $cid ?>'">
 		</p>
 	</form>	
 <?php
@@ -547,7 +547,7 @@ if ($overwriteBody==1) {
 
 		<p>
 			<input type=submit value="Transfer">
-			<input type=button value="Never Mind" onclick="window.location='managelibs.php?cid=<?php echo $cid ?>'">
+			<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='managelibs.php?cid=<?php echo $cid ?>'">
 		</p>
 	</form>
 <?php			
@@ -561,7 +561,7 @@ if ($overwriteBody==1) {
 		</span><br class=form>
 		<p>
 			<input type=submit value="Change Rights">
-			<input type=button value="Never Mind" onclick="window.location='managelibs.php?cid=<?php echo $cid ?>'">
+			<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='managelibs.php?cid=<?php echo $cid ?>'">
 		</p>
 	</form>
 <?php			
@@ -578,7 +578,7 @@ if ($overwriteBody==1) {
 	
 		<p>
 			<input type=submit value="Set Parent">
-			<input type=button value="Never Mind" onclick="window.location='managelibs.php?cid=<?php echo $cid ?>'">
+			<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='managelibs.php?cid=<?php echo $cid ?>'">
 		</p>
 	</form>
 <?php
@@ -600,7 +600,7 @@ if ($overwriteBody==1) {
 		</p>
 		<p>
 			<input type=submit value="Really Delete">
-			<input type=button value="Never Mind" onclick="window.location='managelibs.php?cid=<?php echo $cid ?>'">
+			<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='managelibs.php?cid=<?php echo $cid ?>'">
 		</p>
 	</form>
 <?php
@@ -615,7 +615,7 @@ if ($overwriteBody==1) {
 		?>
 		<p>
 			<input type=submit value="Transfer">
-			<input type=button value="Never Mind" onclick="window.location='managelibs.php?cid=<?php echo $cid ?>'">
+			<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='managelibs.php?cid=<?php echo $cid ?>'">
 		</p>
 	</form>
 <?php	
@@ -643,7 +643,7 @@ if ($overwriteBody==1) {
 		</span><br class=form>
 		<div class=submit>
 			<input type=submit value="Save Changes">
-			<input type=button value="Never Mind" onclick="window.location='managelibs.php?cid=<?php echo $cid ?>'">
+			<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='managelibs.php?cid=<?php echo $cid ?>'">
 		</div>
 	</form>
 		

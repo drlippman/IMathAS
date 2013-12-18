@@ -44,7 +44,7 @@ if (isset($_POST['checked'])) { //form submitted
 				echo $row[0].'<br/>';
 			}
 			echo '<p><p><input type="submit" value="Yes, Delete"/>';
-			echo '<input type=button value="Nevermind" onClick="window.location=\'gradebook.php?cid='.$cid.'\'"></p>';
+			echo '<input type=button value="Nevermind" class="secondarybtn" onClick="window.location=\'gradebook.php?cid='.$cid.'\'"></p>';
 			echo '</form>';
 			require("../footer.php");
 			exit;

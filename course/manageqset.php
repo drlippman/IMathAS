@@ -932,7 +932,7 @@ function getnextprev(formn,loc) {
 			<input type=hidden name=remove value="<?php echo $rlist ?>">
 			<p>
 				<input type=submit value="Really Delete">
-				<input type=button value="Never Mind" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
+				<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
 			</p>
 		</form>	
 <?php
@@ -946,7 +946,7 @@ function getnextprev(formn,loc) {
 		
 			<p>
 				<input type=submit value="Transfer">
-				<input type=button value="Never Mind" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
+				<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
 			</p>
 		</form>
 <?php
@@ -992,7 +992,7 @@ function getnextprev(formn,loc) {
 			
 			<p>
 				<input type=submit value="Make Changes">
-				<input type=button value="Never Mind" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
+				<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
 			</p>
 		</form>		
 <?php		
@@ -1014,7 +1014,7 @@ function getnextprev(formn,loc) {
 			
 			<p>
 				<input type=submit value="Template Questions">
-				<input type=button value="Never Mind" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
+				<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
 			</p>
 		</form>
 <?php		
@@ -1039,7 +1039,7 @@ function getnextprev(formn,loc) {
 			
 			<p>
 				<input type=submit value="Change Rights">
-				<input type=button value="Never Mind" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
+				<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
 			</p>
 		</form>
 <?php		
@@ -1049,7 +1049,7 @@ function getnextprev(formn,loc) {
 		to all users.  If it is currently being used in an assessment, it will mess up that assessment.
 		<p>
 			<input type=button onclick="window.location='manageqset.php?cid=<?php echo $cid ?>&remove=<?php echo $_GET['remove'] ?>&confirmed=true'" value="Really Delete">
-			<input type=button value="Never Mind" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
+			<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
 		</p>
 <?php
 	} else if (isset($_GET['transfer'])) {
@@ -1061,7 +1061,7 @@ function getnextprev(formn,loc) {
 
 			<p>
 				<input type=submit value="Transfer">
-				<input type=button value="Never Mind" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
+				<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
 			</p>
 		</form>
 <?php	

@@ -532,7 +532,7 @@ if ($overwriteBody==1) {
 		
 		<p>
 			<input type=submit value="Yes, I'm Sure">
-			<input type=button value="Nevermind" onclick="window.location='listusers.php?cid=<?php echo $cid ?>'">
+			<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='listusers.php?cid=<?php echo $cid ?>'">
 		</p>
 	</form>
 

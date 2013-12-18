@@ -332,7 +332,7 @@ if ($overwriteBody==1) {
 	<form method=post action="reviewlibrary.php?cid=<?php echo $cid ?>&source=<?php echo $source ?>&offset=<?php echo $offset ?>&lib=<?php echo $lib ?>">
 		<?php echo $page_ConfirmMsg; ?>
 		<p><input type=submit name="confirm" value="Yes, I'm Sure">
-		<input type=button value="Never Mind" onclick="window.location='reviewlibrary.php?cid=<?php echo $cid ?>&source=<?php echo $source ?>&offset=<?php echo $offset ?>&lib=<?php echo $lib ?>'"></p>
+		<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='reviewlibrary.php?cid=<?php echo $cid ?>&source=<?php echo $source ?>&offset=<?php echo $offset ?>&lib=<?php echo $lib ?>'"></p>
 	</form>
 
 <?php

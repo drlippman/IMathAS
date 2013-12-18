@@ -636,7 +636,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		}
 		
 		echo "<p><input type=button value=\"Yes, Remove\" onClick=\"window.location='$returnurl&remove={$_GET['remove']}&confirm=true'\">\n";
-		echo "<input type=button value=\"Nevermind\" onClick=\"window.location='$returnurl'\"></p>\n";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='$returnurl'\"></p>\n";
 		require("../footer.php");
 		exit;
 	}
@@ -771,7 +771,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		echo '</div>';
 		
 		echo "<p><input type=submit value=\"Move\">\n";
-		echo "<input type=button value=\"Nevermind\" onClick=\"window.location='$returnurl'\"></p>\n";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='$returnurl'\"></p>\n";
 		echo "</form>";
 		require("../footer.php");
 		exit;

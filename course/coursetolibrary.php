@@ -37,7 +37,7 @@ END;
 			echo "<input type=button value=\"Select Library\" onClick=\"libselect()\"></span><br class=form> ";
 			
 			echo "<p><input type=submit value=\"Copy Questions to Library\">\n";
-			echo "<input type=button value=\"Never Mind\" onclick=\"window.location='course.php?cid=$cid'\"></p>\n";
+			echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='course.php?cid=$cid'\"></p>\n";
 			echo "</form>\n";
 			require("../footer.php");
 			exit;

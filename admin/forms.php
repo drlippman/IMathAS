@@ -14,12 +14,12 @@ switch($_GET['action']) {
 		echo '<div id="headerforms" class="pagetitle"><h2>Delete Course</h2></div>';
 		echo "<p>Are you sure you want to delete the course <b>$name</b>?</p>\n";
 		echo "<p><input type=button value=\"Delete\" onclick=\"window.location='actions.php?action=delete&id={$_GET['id']}'\">\n";
-		echo "<input type=button value=\"Nevermind\" onclick=\"window.location='admin.php'\"></p>\n";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='admin.php'\"></p>\n";
 		break;
 	case "deladmin":
 		echo "<p>Are you sure you want to delete this user?</p>\n";
 		echo "<p><input type=button value=\"Delete\" onclick=\"window.location='actions.php?action=deladmin&id={$_GET['id']}'\">\n";
-		echo "<input type=button value=\"Nevermind\" onclick=\"window.location='admin.php'\"></p>\n";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='admin.php'\"></p>\n";
 		break;
 	case "chgpwd":
 		echo '<div id="headerforms" class="pagetitle"><h2>Change Your Password</h2></div>';
@@ -619,7 +619,7 @@ switch($_GET['action']) {
 		}
 		echo "</select>\n";
 		echo "<p><input type=submit value=\"Transfer\">\n";
-		echo "<input type=button value=\"Nevermind\" onclick=\"window.location='admin.php'\"></p>\n";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='admin.php'\"></p>\n";
 		echo "</form>\n";
 		break;
 	case "deloldusers":
@@ -725,7 +725,7 @@ switch($_GET['action']) {
 	case "removediag":
 		echo "<p>Are you sure you want to delete this diagnostic?  This does not delete the connected course and does not remove students or their scores.</p>\n";
 		echo "<p><input type=button value=\"Delete\" onclick=\"window.location='actions.php?action=removediag&id={$_GET['id']}'\">\n";
-		echo "<input type=button value=\"Nevermind\" onclick=\"window.location='admin.php'\"></p>\n";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='admin.php'\"></p>\n";
 		break;
 }
 

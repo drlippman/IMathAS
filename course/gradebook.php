@@ -705,8 +705,8 @@ function gbstudisp($stu) {
 			echo ' <span class="small">Section: '.$stusection.'</span>';
 		}
 		echo '</h3>';
-		echo '<div style="clear:both">';
 		if ($isteacher) {
+			echo '<div style="clear:both;display:inline-block" class="cpmid secondary">';
 			echo '<a href="mailto:'.$stuemail.'">', _('Email'), '</a> | ';
 			echo "<a href=\"$imasroot/msgs/msglist.php?cid={$_GET['cid']}&add=new&to=$stu\">", _('Message'), "</a> | ";
 			echo "<a href=\"gradebook.php?cid={$_GET['cid']}&uid=$stu&massexception=1\">", _('Make Exception'), "</a> | ";
@@ -714,16 +714,12 @@ function gbstudisp($stu) {
 			echo "<a href=\"viewloginlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Login Log'), "</a> | ";
 			echo "<a href=\"viewactionlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Activity Log'), "</a> | ";
 			echo "<a href=\"#\" onclick=\"makeofflineeditable(this); return false;\">", _('Edit Offline Scores'), "</a>";
-			
+			echo '</div>';	
 		} else if ($istutor) {
+			echo '<div style="clear:both;display:inline-block" class="cpmid">';
 			echo "<a href=\"viewloginlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Login Log'), "</a> | ";
 			echo "<a href=\"viewactionlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Activity Log'), "</a>";
-		}
-		//TODO i18n
-		if ($showlatepass==1) {
-			if ($latepasses==0) { $latepasses = 'No';}
-			if ($isteacher || $istutor) {echo '<br/>';}
-			echo "$latepasses LatePass".($latepasses!=1?"es":"").' available';
+			echo '</div>';	
 		}
 		
 		if (trim($gbcomment)!='' || $isteacher) {
@@ -733,17 +729,26 @@ function gbstudisp($stu) {
 				echo "<textarea name=\"usrcomments\" rows=3 cols=60>$gbcomment</textarea>";
 				echo '</form>';
 			} else {
-				echo "<div class=\"item\">$gbcomment</div>";
+				echo "<div style=\"clear:both;display:inline-block\" class=\"cpmid\">$gbcomment</div><br/>";
 			}
 		}
-		echo '</div>';
+		//TODO i18n
+		if ($showlatepass==1) {
+			if ($latepasses==0) { $latepasses = 'No';}
+			if ($isteacher || $istutor) {echo '<br/>';}
+			$lpmsg = "$latepasses LatePass".($latepasses!=1?"es":"").' available';
+		}
+		if (!$isteacher && !$istutor) {
+			echo $lpmsg;
+		}
+		
 	}
 	echo "<form method=\"post\" id=\"qform\" action=\"gradebook.php?{$_SERVER['QUERY_STRING']}&uid=$stu\">";
 	//echo "<input type='button' onclick='conditionalColor(\"myTable\",1,50,80);' value='Color'/>";
 	if ($isteacher && $stu>0) {
-		echo '<p><button type="submit" value="Save Changes" style="display:none"; id="savechgbtn">', _('Save Changes'), '</button> ';
+		echo '<button type="submit" value="Save Changes" style="display:none"; id="savechgbtn">', _('Save Changes'), '</button> ';
 		echo _('Check:'), ' <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',false)">', _('None'), '</a> ';
-		echo _('With selected:'), ' <button type="submit" value="Make Exception" name="posted">',_('Make Exception'),'</button></p>';
+		echo _('With selected:'), ' <button type="submit" value="Make Exception" name="posted">',_('Make Exception'),'</button> '.$lpmsg.'';
 	}
 	echo '<table id="myTable" class="gb" style="position:relative;">';
 	echo '<thead><tr>';

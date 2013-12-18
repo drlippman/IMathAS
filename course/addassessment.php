@@ -71,7 +71,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$body .= "<h3>$assessmentname</h3>";
 			$body .= "<p>Are you SURE you want to delete all attempts (grades) for this assessment?</p>";
 			$body .= "<p><input type=button value=\"Yes, Clear\" onClick=\"window.location='addassessment.php?cid={$_GET['cid']}&id={$_GET['id']}&clearattempts=confirmed'\">\n";
-			$body .= "<input type=button value=\"Nevermind\" onClick=\"window.location='addassessment.php?cid={$_GET['cid']}&id={$_GET['id']}'\"></p>\n";
+			$body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='addassessment.php?cid={$_GET['cid']}&id={$_GET['id']}'\"></p>\n";
 		}
 	} elseif ($_POST['name']!= null) { //if the form has been submitted
 		

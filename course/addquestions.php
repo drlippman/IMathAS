@@ -129,7 +129,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$body .= "<h3>$assessmentname</h3>";
 			$body .= "<p>Are you SURE you want to delete all attempts (grades) for this assessment?</p>";
 			$body .= "<p><input type=button value=\"Yes, Clear\" onClick=\"window.location='addquestions.php?cid=$cid&aid=$aid&clearattempts=confirmed'\">\n";
-			$body .= "<input type=button value=\"Nevermind\" onClick=\"window.location='addquestions.php?cid=$cid&aid=$aid';\"></p>\n";
+			$body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='addquestions.php?cid=$cid&aid=$aid';\"></p>\n";
 		}
 	}
 	if (isset($_GET['clearqattempts'])) {
@@ -204,7 +204,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$body .= "<p>This will allow you to safely change points and penalty for a question, or give students another attempt ";
 			$body .= "on a question that needed fixing.  This will NOT allow you to remove the question from the assessment.</p>";
 			$body .= "<p><input type=button value=\"Yes, Clear\" onClick=\"window.location='addquestions.php?cid=$cid&aid=$aid&clearqattempts={$_GET['clearqattempts']}&confirmed=1'\">\n";
-			$body .= "<input type=button value=\"Nevermind\" onClick=\"window.location='addquestions.php?cid=$cid&aid=$aid'\"></p>\n";
+			$body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='addquestions.php?cid=$cid&aid=$aid'\"></p>\n";
 		}
 	}
 	if (isset($_GET['withdraw'])) {
@@ -317,7 +317,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			$body .= '<p>This action can <b>not</b> be undone.</p>';
 			$body .= '<p><input type=submit value="Withdraw Question">';
-			$body .= "<input type=button value=\"Nevermind\" onClick=\"window.location='addquestions.php?cid=$cid&aid=$aid'\"></p>\n";
+			$body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='addquestions.php?cid=$cid&aid=$aid'\"></p>\n";
 			
 			$body .= '</form>';
 		}

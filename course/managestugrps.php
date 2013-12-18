@@ -418,7 +418,7 @@ if ($overwriteBody==1) {
 		echo "<form method=\"post\" action=\"managestugrps.php?cid=$cid&addgrpset=true\">";
 		echo '<p>New group set name: <input name="grpsetname" type="text" /></p>';
 		echo '<p><input type="submit" value="Create" />';
-		echo "<input type=button value=\"Nevermind\" onClick=\"window.location='managestugrps.php?cid=$cid'\" /></p>";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid'\" /></p>";
 		echo '</form>';
 	} else if (isset($_GET['delgrpset'])) {
 		echo '<h4>Delete student group set</h4>';
@@ -446,14 +446,14 @@ if ($overwriteBody==1) {
 			echo '<p>This set of groups is not currently being used</p>';
 		}
 		echo "<p><input type=button value=\"Yes, Delete\" onClick=\"window.location='managestugrps.php?cid=$cid&delgrpset={$_GET['delgrpset']}&confirm=true'\" /> ";
-		echo "<input type=button value=\"Nevermind\" onClick=\"window.location='managestugrps.php?cid=$cid'\" /></p>";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid'\" /></p>";
 		
 	} else if (isset($_GET['rengrpset'])) {
 		echo '<h4>Rename student group set</h4>';
 		echo "<form method=\"post\" action=\"managestugrps.php?cid=$cid&rengrpset={$_GET['rengrpset']}\">";
 		echo '<p>New group set name: <input name="grpsetname" type="text" value="'.$page_grpsetname.'"/></p>';
 		echo '<p><input type="submit" value="Rename" />';
-		echo "<input type=button value=\"Nevermind\" onClick=\"window.location='managestugrps.php?cid=$cid'\" /></p>";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid'\" /></p>";
 		echo '</form>';
 	} else if (isset($_GET['addgrp'])) {
 		//add new group set
@@ -464,7 +464,7 @@ if ($overwriteBody==1) {
 		}
 		echo '<p>New group name: <input name="grpname" type="text" /></p>';
 		echo '<p><input type="submit" value="Create" />';
-		echo "<input type=button value=\"Nevermind\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid'\" /></p>";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid'\" /></p>";
 		echo '</form>';
 	} else if (isset($_GET['delgrp'])) {
 		echo '<h4>Delete student group</h4>';
@@ -475,7 +475,7 @@ if ($overwriteBody==1) {
 		echo '<input type="radio" name="delposts" value="0" /> Make group forum posts non-group-specific posts</p>';
 		echo '<p><input type="submit" value="Yes, Delete"> ';
 		//echo "<p><input type=button value=\"Yes, Delete\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid&delgrp={$_GET['delgrp']}&confirm=true'\" /> ";
-		echo "<input type=button value=\"Nevermind\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid'\" /></p>";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid'\" /></p>";
 		echo '</form>';
 		
 	} else if (isset($_GET['rengrp'])) {
@@ -483,18 +483,18 @@ if ($overwriteBody==1) {
 		echo "<form method=\"post\" action=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&rengrp={$_GET['rengrp']}\">";
 		echo '<p>New group name: <input name="grpname" type="text" value="'.$page_grpname.'"/></p>';
 		echo '<p><input type="submit" value="Rename" />';
-		echo "<input type=button value=\"Nevermind\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid'\" /></p>";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid'\" /></p>";
 		echo '</form>';
 	} else if (isset($_GET['removeall'])) {
 		echo '<h4>Remove ALL group members</h4>';
 		echo "<p>Are you SURE you want to remove <b>ALL</b> members of the student group <b>$page_grpname</b>?</p>";
 		echo "<p><input type=button value=\"Yes, Remove\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid&removeall={$_GET['removeall']}&confirm=true'\" /> ";
-		echo "<input type=button value=\"Nevermind\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid'\" /></p>";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid'\" /></p>";
 	} else if (isset($_GET['remove']) && $_GET['grpid']) {
 		echo '<h4>Remove group member</h4>';
 		echo "<p>Are you SURE you want to remove <b>$page_stuname</b> from the student group <b>$page_grpname</b>?</p>";
 		echo "<p><input type=button value=\"Yes, Remove\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid&grpid={$_GET['grpid']}&remove={$_GET['remove']}&confirm=true'\" /> ";
-		echo "<input type=button value=\"Nevermind\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid'\" /></p>";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid'\" /></p>";
 	} else if (isset($_GET['grpsetid'])) {
 		?>
 		<script type="text/javascript">

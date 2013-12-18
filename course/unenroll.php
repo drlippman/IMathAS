@@ -175,13 +175,13 @@ ini_set("max_execution_time", "600");
 ?>
 
 		<p>
-			<input type=submit value="Unenroll">
+			<input type=submit class="secondarybtn" value="Unenroll">
 			<input type=submit name="lockinstead" value="Lock Students Out Instead">
 <?php
 			if ($calledfrom=='lu') {
-				echo "<input type=button value=\"Nevermind\" onclick=\"window.location='listusers.php?cid=$cid'\">";
+				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='listusers.php?cid=$cid'\">";
 			} else if ($calledfrom=='gb') {
-				echo "<input type=button value=\"Nevermind\" onclick=\"window.location='gradebook.php?cid=$cid&gbmode={$_GET['gbmode']}'\">";
+				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gradebook.php?cid=$cid&gbmode={$_GET['gbmode']}'\">";
 			}
 ?>
 		</p>

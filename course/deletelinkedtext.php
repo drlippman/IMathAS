@@ -99,7 +99,7 @@ if ($overwriteBody==1) {
 	<h3><?php echo $itemname; ?></h3>
 	Are you SURE you want to delete this link item?
 	<p><input type=button value="Yes, Delete" onClick="window.location='deletelinkedtext.php?cid=<?php echo $_GET['cid'] ?>&block=<?php echo $block ?>&id=<?php echo $_GET['id'] ?>&remove=really'">
-	<input type=button value="Nevermind" onClick="window.location='course.php?cid=<?php echo $_GET['cid'] ?>'"></p>
+	<input type=button value="Nevermind" class="secondarybtn" onClick="window.location='course.php?cid=<?php echo $_GET['cid'] ?>'"></p>
 
 <?php
 }

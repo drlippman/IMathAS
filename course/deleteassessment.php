@@ -85,7 +85,7 @@ if ($overwriteBody==1) {
 	Are you <b>SURE</b> you want to delete this assessment and all associated student attempts?
 	<p>
 	<input type=button value="Yes, Delete" onClick="window.location='deleteassessment.php?cid=<?php echo $_GET['cid'] ?>&block=<?php echo $block ?>&id=<?php echo $_GET['id'] ?>&remove=really'">
-	<input type=button value="Nevermind" onClick="window.location='course.php?cid=<?php echo $_GET['cid'] ?>'">
+	<input type=button value="Nevermind" class="secondarybtn" onClick="window.location='course.php?cid=<?php echo $_GET['cid'] ?>'">
 	</p>
 
 <?php
