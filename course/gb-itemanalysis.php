@@ -50,11 +50,12 @@
 	
 	$pagetitle = "Gradebook";
 	$placeinhead = '<script type="text/javascript">';
+	$placeinhead .= '$(function() {$("a[href*=\'gradeallq\']").attr("title","'._('Grade this question for all students').'");});';
 	$placeinhead .= 'function previewq(qn) {';
 	$placeinhead .= "var addr = '$imasroot/course/testquestion.php?cid=$cid&qsetid='+qn;";
 	$placeinhead .= "window.open(addr,'Testing','width=400,height=300,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));";
 	$placeinhead .= "}\n</script>";
-	$placeinhead .= '<style type="text/css"> .manualgrade { background: #ff6;}</style>';
+	$placeinhead .= '<style type="text/css"> .manualgrade { background: #ff6;} td.pointer:hover {text-decoration: underline;}</style>';
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
@@ -178,10 +179,10 @@
 	echo "<table class=gb id=myTable><thead>"; //<tr><td>Name</td>\n";
 	echo "<tr><th>#</th><th scope=\"col\">Question</th><th>Grade</th>";
 	//echo "<th scope=\"col\">Average Score<br/>All</th>";
-	echo "<th scope=\"col\">Average Score<br/>Attempted</th><th scope=\"col\">Average Attempts<br/>(Regens)</th><th scope=\"col\">% Incomplete</th>";
-	echo "<th scope=\"col\">Time per student<br/> (per attempt)</th>";
+	echo "<th scope=\"col\" title=\"Average score for all students who attempted this question\">Average Score<br/>Attempted</th><th title=\"Average number of attempts and regens (new versions)\" scope=\"col\">Average Attempts<br/>(Regens)</th><th scope=\"col\" title=\"Percentage of students who have not started this question yet\">% Incomplete</th>";
+	echo "<th scope=\"col\" title=\"Average time a student worked on this question, and average time per attempt on this question\">Time per student<br/> (per attempt)</th>";
 	if ($showhints==1) {
-		echo '<th scope="col">Clicked on Help</th>';
+		echo '<th scope="col" title="Percentage of students who clicked on help resources in the question, if available">Clicked on Help</th>';
 	}
 	echo "<th scope=\"col\">Preview</th></tr></thead>\n";
 	echo "<tbody>";
@@ -291,9 +292,9 @@
 			}
 			echo ">Grade</a></td>";
 			//echo "<td>$avg/$pts ($pc%)</td>";
-			echo "<td class=\"pointer\" onclick=\"GB_show('Low Scores','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=score',500,500);return false;\">$avg2/$pts ($pc2%)</td>"; 
+			echo "<td class=\"pointer\" onclick=\"GB_show('Low Scores','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=score',500,500);return false;\"><b>$pc2%</b></td>"; 
 			echo "<td class=\"pointer\" onclick=\"GB_show('Most Attempts and Regens','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=att',500,500);return false;\">$avgatt ($avgreg)</td>";
-			echo "<td class=\"pointer\" onclick=\"GB_show('Incomplete','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=incomp',500,500);return false;\">$pi</td>";
+			echo "<td class=\"pointer\" onclick=\"GB_show('Incomplete','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=incomp',500,500);return false;\">$pi%</td>";
 			echo "<td class=\"pointer\" onclick=\"GB_show('Most Time','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=time',500,500);return false;\">$avgtot ($avgtota)</td>";
 			if ($showhints==1) {
 				if ($showextref[$qid]) {
