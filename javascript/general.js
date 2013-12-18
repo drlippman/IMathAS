@@ -218,6 +218,7 @@ function GB_show(caption,url,width,height) {
 		GB_loaded  = true;
 	}
 	document.getElementById("GB_frameholder").innerHTML = '<iframe onload="GB_doneload()" id="GB_frame" src="'+url+'"></iframe>';
+	jQuery("#GB_frameholder").isolatedScroll();
 	if (url.match(/libtree/)) {
 		var btnhtml = '<span class="floatright"><input type="button" value="Use Libraries" onClick="document.getElementById(\'GB_frame\').contentWindow.setlib()" /> ';
 		btnhtml += '<span class="pointer" onclick="GB_hide()">[X]</span>&nbsp;</span>Select Libraries<div class="clear"></div>';
@@ -511,6 +512,19 @@ jQuery(document).ready(function($) {
 	$('a[href*="vimeo"]').each(setupvideoembeds);	
 	$('body').fitVids();
 });
+
+$.fn.isolatedScroll = function() {
+    this.bind('mousewheel DOMMouseScroll', function (e) {
+        var delta = e.wheelDelta || (e.originalEvent && e.originalEvent.wheelDelta) || -e.detail,
+            bottomOverflow = this.scrollTop + $(this).outerHeight() - this.scrollHeight >= 0,
+            topOverflow = this.scrollTop <= 0;
+
+        if ((delta < 0 && bottomOverflow) || (delta > 0 && topOverflow)) {
+            e.preventDefault();
+        }
+    });
+    return this;
+};
 
 function _(txt) {
 	if (typeof i18njs != "undefined" && i18njs[txt]) {
