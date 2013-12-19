@@ -431,7 +431,11 @@ Items from publicly accessible blocks can viewed without logging in at http://<?
 <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
 
 <?php
+if (isset($blockitems)) {
+	echo '<input type="hidden" name="blockid" value="'.$blockitems[$existingid]['id'].'"/>';
 }
+}
+
 	require("../footer.php");
 
 /**** end html code ******/

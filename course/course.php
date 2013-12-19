@@ -156,7 +156,12 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	if ($quickview=="on") {
 		$_GET['folder'] = '0';
 	}
-	
+	if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==3) {
+		$useleftstubar = false;
+		$useleftbar = false;
+		$nocoursenav = true;
+		$usernameinheader = false;
+	}
 	//get exceptions
 	$now = time() + $previewshift;
 	$exceptions = array();
@@ -211,22 +216,48 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	
 	$curBreadcrumb = $breadcrumbbase;
 	if (isset($backtrack) && count($backtrack)>0) {
-		$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder=0\">$coursename</a> ";
-		for ($i=0;$i<count($backtrack);$i++) {
-			$curBreadcrumb .= "&gt; ";
-			if ($i!=count($backtrack)-1) {
-				$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">";
+		if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==3) {
+			$curBreadcrumb = '';
+			$sendcrumb = '';
+			$depth = substr_count($sessiondata['ltiitemid'][1],'-');
+			for ($i=$depth-1;$i<count($backtrack);$i++) {
+				if ($i>$depth-1) {
+					$curBreadcrumb .= " &gt; ";
+					$sendcrumb .= " &gt; ";
+				}
+				if ($i!=count($backtrack)-1) {
+					$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">";
+				}
+				$sendcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">".stripslashes($backtrack[$i][0]).'</a>';
+				$curBreadcrumb .= stripslashes($backtrack[$i][0]);
+				if ($i!=count($backtrack)-1) {
+					$curBreadcrumb .= "</a>";
+				}
 			}
-			$curBreadcrumb .= stripslashes($backtrack[$i][0]);
-			if ($i!=count($backtrack)-1) {
-				$curBreadcrumb .= "</a>";
+			$curname = $backtrack[count($backtrack)-1][0];
+			if (count($backtrack)>$depth) {
+				$backlink = "<span class=right><a href=\"course.php?cid=$cid&folder=".$backtrack[count($backtrack)-2][1]."\">" . _('Back') . "</a></span><br class=\"form\" />";
 			}
-		}
-		$curname = $backtrack[count($backtrack)-1][0];
-		if (count($backtrack)==1) {
-			$backlink =  "<span class=right><a href=\"course.php?cid=$cid&folder=0\">" . _('Back') . "</a></span><br class=\"form\" />";
+			$_SESSION['backtrack'] = array($sendcrumb,$backtrack[count($backtrack)-1][1]);
+			
 		} else {
-			$backlink = "<span class=right><a href=\"course.php?cid=$cid&folder=".$backtrack[count($backtrack)-2][1]."\">" . _('Back') . "</a></span><br class=\"form\" />";
+			$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder=0\">$coursename</a> ";
+			for ($i=0;$i<count($backtrack);$i++) {
+				$curBreadcrumb .= " &gt; ";
+				if ($i!=count($backtrack)-1) {
+					$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">";
+				}
+				$curBreadcrumb .= stripslashes($backtrack[$i][0]);
+				if ($i!=count($backtrack)-1) {
+					$curBreadcrumb .= "</a>";
+				}
+			}
+			$curname = $backtrack[count($backtrack)-1][0];
+			if (count($backtrack)==1) {
+				$backlink =  "<span class=right><a href=\"course.php?cid=$cid&folder=0\">" . _('Back') . "</a></span><br class=\"form\" />";
+			} else {
+				$backlink = "<span class=right><a href=\"course.php?cid=$cid&folder=".$backtrack[count($backtrack)-2][1]."\">" . _('Back') . "</a></span><br class=\"form\" />";
+			}
 		}
 	} else {
 		$curBreadcrumb .= $coursename;
@@ -592,7 +623,7 @@ if ($overwriteBody==1) {
    
    if (($useleftbar && isset($teacherid)) || ($useleftstubar && !isset($teacherid))) {
 	   echo "</div>";
-   } else {
+   } else if (!isset($nocoursenav)) {
 	  
 ?>	   
 	<div class=cp>

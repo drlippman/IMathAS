@@ -53,15 +53,24 @@
 	
 	require("../header.php");
 	if ($shownav) {
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-		echo "&gt; $titlesimp</div>";
-		echo '<div id="headershowlinkedtext" class="pagetitle"><h2>'.$titlesimp.'</h2></div>';
+		if (isset($_SESSION['backtrack'])) {
+			echo '<div class="breadcrumb">'.$_SESSION['backtrack'][0];
+			echo " &gt; $titlesimp</div>";
+		} else {
+			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+			echo "&gt; $titlesimp</div>";
+			echo '<div id="headershowlinkedtext" class="pagetitle"><h2>'.$titlesimp.'</h2></div>';
+		}
 	}
-	echo '<div style="padding-left:10px; padding-right: 10px;">';
+	echo '<div class="linkedtextholder" style="padding-left:10px; padding-right: 10px;">';
 	echo filter($text);
 	echo '</div>';
 	if ($shownav) {
-		echo "<div class=right><a href=\"course.php?cid={$_GET['cid']}\">Return to Course Page</a></div>\n";
+		if (isset($_SESSION['backtrack'])) {
+			echo "<div class=right><a href=\"course.php?cid={$_GET['cid']}&folder=".$_SESSION['backtrack'][1]."\">Back</a></div>\n";
+		} else {
+			echo "<div class=right><a href=\"course.php?cid={$_GET['cid']}\">Return to Course Page</a></div>\n";
+		}
 	}
 	require("../footer.php");	
 
