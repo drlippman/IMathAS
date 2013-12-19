@@ -1083,13 +1083,13 @@ function gbstudisp($stu) {
 		echo '</tbody></table><br/>';
 		echo '<p>';
 		if (($show&1)==1) {
-			echo _('<b>Past Due</b> total only includes items whose due date has past.  Current assignments are not counted in this total.'), '<br/>';
+			echo _('<b>Past Due</b> total only includes items whose due date has passed.  Current assignments are not counted in this total.'), '<br/>';
 		}
 		if (($show&2)==2) {
-			echo _('<b>Past Due and Attempted</b> total includes items whose due date has past, as well as currently available items you have started working on.'), '<br/>';
+			echo _('<b>Past Due and Attempted</b> total includes items whose due date has passed, as well as currently available items you have started working on.'), '<br/>';
 		} 
 		if (($show&4)==4) {
-			echo _('<b>Past Due and Available</b> total includes items whose due date has past as well as currently available items, even if you haven\'t starting working on them yet.'), '<br/>';
+			echo _('<b>Past Due and Available</b> total includes items whose due date has passed as well as currently available items, even if you haven\'t starting working on them yet.'), '<br/>';
 		}
 		if (($show&8)==8) {
 			echo _('<b>All</b> total includes all items: past, current, and future to-be-done items.');

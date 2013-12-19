@@ -13,7 +13,7 @@ function beginitem($canedit,$aname=0) {
 	 }
 }
 function enditem($canedit) {
-	//echo '<div class="clear"></div>';
+	echo '<div class="clear"></div>';
 	echo "</div>\n";
 	if ($canedit) {
 		echo '</div>'; //itemwrapper
@@ -168,7 +168,7 @@ function enditem($canedit) {
 					if (($hideicons&16)==0) {
 						echo "</div>";
 					}
-					echo '<br class="clear" />';
+					echo '<div class="clear"></div>';
 					echo "</div>";
 					if ($canedit) {
 						echo '</div>'; //itemwrapper
@@ -221,7 +221,7 @@ function enditem($canedit) {
 					if (($hideicons&16)==0) {
 						echo "</div>";
 					}
-					echo '<br class="clear" />';
+					echo '<div class="clear"></div>';
 					echo "</div>";
 					if ($canedit) {
 						echo '</div>'; //itemwrapper
@@ -368,7 +368,7 @@ function enditem($canedit) {
 					if (($hideicons&16)==0) {
 						echo "</div>";
 					}
-					echo '<br class="clear" />';
+					echo '<div class="clear"></div>';
 					echo "</div>";
 					if ($canedit) {
 						echo '</div>'; //itemwrapper
@@ -415,7 +415,7 @@ function enditem($canedit) {
 					if (($hideicons&16)==0) {
 						echo "</div>";
 					}
-					echo '<br class="clear" />';
+					echo '<div class="clear"></div>';
 					echo "</div>";
 					if ($canedit) {
 						echo '</div>'; //itemwrapper
@@ -548,6 +548,9 @@ function enditem($canedit) {
 	    		   }
 	    		   if (strpos($line['summary'],'<p>')!==0 && strpos($line['summary'],'<ul>')!==0 && strpos($line['summary'],'<ol>')!==0) {
 				   $line['summary'] = '<p>'.$line['summary'].'</p>';
+				   if (preg_match('/^\s*<p[^>]*>\s*<\/p>\s*$/',$line['summary'])) {
+				   	   $line['summary'] = '';
+				   }
 			   }
 			   if (isset($studentid) && !isset($sessiondata['stuview'])) {
 			   	   $rec = "data-base=\"assesssum-$typeid\" ";
@@ -795,6 +798,9 @@ function enditem($canedit) {
 			   	   
 			   } else if (strpos($line['text'],'<p>')!==0 && strpos($line['text'],'<ul>')!==0 && strpos($line['text'],'<ol>')!==0) {
 				   $line['text'] = '<p>'.$line['text'].'</p>';
+				   if (preg_match('/^\s*<p[^>]*>\s*<\/p>\s*$/',$line['text'])) {
+				   	   $line['text'] = '';
+				   }
 			   }
 			   if (isset($studentid) && !isset($sessiondata['stuview'])) {
 			   	   $rec = "data-base=\"inlinetext-$typeid\" ";
@@ -940,6 +946,9 @@ function enditem($canedit) {
 			  
 			   if (strpos($line['summary'],'<p>')!==0) {
 				   $line['summary'] = '<p>'.$line['summary'].'</p>';
+				   if (preg_match('/^\s*<p[^>]*>\s*<\/p>\s*$/',$line['summary'])) {
+				   	   $line['summary'] = '';
+				   }
 			   }
 			   if ($line['startdate']==0) {
 				   $startdate = _('Always');
@@ -1026,6 +1035,9 @@ function enditem($canedit) {
 			  
 			   if (strpos($line['summary'],'<p>')!==0 && strpos($line['summary'],'<ul>')!==0 && strpos($line['summary'],'<ol>')!==0) {
 				   $line['summary'] = '<p>'.$line['summary'].'</p>';
+				   if (preg_match('/^\s*<p[^>]*>\s*<\/p>\s*$/',$line['summary'])) {
+				   	   $line['summary'] = '';
+				   } 
 			   }
 			   if (isset($studentid) && !isset($sessiondata['stuview'])) {
 			   	   $rec = "data-base=\"linkedsum-$typeid\" ";
@@ -1226,6 +1238,9 @@ function enditem($canedit) {
 			  
 			   if (strpos($line['description'],'<p>')!==0) {
 				   $line['description'] = '<p>'.$line['description'].'</p>';
+				   if (preg_match('/^\s*<p[^>]*>\s*<\/p>\s*$/',$line['description'])) {
+				   	   $line['description'] = '';
+				   }
 			   }
 			   if ($line['startdate']==0) {
 				   $startdate = _('Always');
@@ -1325,6 +1340,9 @@ function enditem($canedit) {
 			   if ($ispublic && $line['groupsetid']>0) { continue;}
 			   if (strpos($line['description'],'<p>')!==0) {
 				   $line['description'] = '<p>'.$line['description'].'</p>';
+				   if (preg_match('/^\s*<p[^>]*>\s*<\/p>\s*$/',$line['description'])) {
+				   	   $line['description'] = '';
+				   }
 			   }
 			   if ($line['startdate']==0) {
 				   $startdate = _('Always');

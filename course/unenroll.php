@@ -126,14 +126,14 @@ ini_set("max_execution_time", "600");
 ?>					
 		</ul>
 			<p>This will also clear all regular posts from all class forums</p>
-			<p>Also remove all offline grade items from gradebook? 
-				<input type=checkbox name="removeoffline" value="1" />
+			<p><input type=checkbox name="removeoffline" value="1" /> Also remove all offline grade items from gradebook? 
+				
 			</p>
-			<p>Also remove any withdrawn questions? 
-				<input type=checkbox name="removewithdrawn" value="1" checked="checked"/>
+			<p><input type=checkbox name="removewithdrawn" value="1" checked="checked"/> Also remove any withdrawn questions? 
+				
 			</p>
-			<p>Also use any suggested replacements for old questions?
-				<input type=checkbox name="usereplaceby" value="1" checked="checked"/>
+			<p><input type=checkbox name="usereplaceby" value="1" checked="checked"/> Also use any suggested replacements for old questions?
+				
 			</p>
 			<p>Also remove wiki revisions: <input type="radio" name="delwikirev" value="1" />All wikis, 
 				<input  type="radio" name="delwikirev" value="2" checked="checked" />Group wikis only
