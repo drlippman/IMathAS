@@ -372,7 +372,9 @@ div.tips {
 a {
 	outline: none;
 }
-
+a:link:focus {
+	text-decoration: underline;
+}
 ul#navlist
 {
 clear: both;
@@ -400,7 +402,7 @@ text-decoration: none;
 border-right: 1px solid #fff;
 }
 
-ul#navlist li a:hover
+ul#navlist li a:hover, ul#navlist li a:focus
 {
 background-color: #369;
 color: #fff;
@@ -424,7 +426,7 @@ a.abutton {
 	border-radius: 4px;
 	white-space: nowrap;
 }
-a.abutton:hover {
+a.abutton:hover, a.abutton:focus {
 	background-color: #ccf;
 	text-decoration: none;
 }
@@ -460,7 +462,7 @@ div#viewbuttoncont a {
 	padding: 3px 5px;
 	margin-left: 2px;
 }
-div#viewbuttoncont a:hover {
+div#viewbuttoncont a:hover, div#viewbuttoncont a:focus {
 	text-decoration: none;
 }
 div#viewbuttoncont a.buttonactive {
