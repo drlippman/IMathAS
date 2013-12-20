@@ -108,15 +108,15 @@
 		echo '<p>&nbsp;</p>';
 		if ($thisitemloc>0) {
 			$p = $itemdata[$flatlist[$thisitemloc-1]];
-			echo '<div class="floatleft" style="max-width:45%;height:auto;"><button type="button" onclick="window.location.href=\'showlinkedtext.php?cid='.$cid.'&id='.$p['id'].'\'">&lt; '._('Previous');
-			echo ': '.$p['title'];
+			echo '<div class="floatleft" style="max-width:45%;height:auto;text-align:center"><button type="button" onclick="window.location.href=\'showlinkedtext.php?cid='.$cid.'&id='.$p['id'].'\'">&lt; '._('Previous');
+			echo '<br/>'.$p['title'];
 			echo '</button></div>';
 		}
 		if ($thisitemloc<count($flatlist)-2) {
 			$p = $itemdata[$flatlist[$thisitemloc+1]];
-			echo '<div class="floatright" style="max-width:45%;height:auto;"><button type="button" onclick="window.location.href=\'showlinkedtext.php?cid='.$cid.'&id='.$p['id'].'\'">'._('Next');
-			echo ': '.$p['title'];
-			echo ' &gt;</button></div>';
+			echo '<div class="floatright" style="max-width:45%;height:auto;text-align:center"><button type="button" onclick="window.location.href=\'showlinkedtext.php?cid='.$cid.'&id='.$p['id'].'\'">'._('Next');
+			echo ' &gt;<br/>'.$p['title'];
+			echo '</button></div>';
 		}
 		echo '<div class="clear"></div>';
 	}
