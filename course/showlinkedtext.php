@@ -66,6 +66,21 @@
 	echo filter($text);
 	echo '</div>';
 	if ($shownav) {
+		if (isset($_GET['prev'])) {
+			echo '<div class="floatleft" style="max-width:40%;height:auto;"><button type="button" onclick="window.location.href=\'showlinkedtext.php?cid='.$cid.'&id='.$_GET['prev'].'\'">&lt; '._('Previous');
+			if (isset($_GET['prevtitle'])) {
+				echo ': '.$_GET['prevtitle'];
+			}
+			echo '</button></div>';
+		}
+		if (isset($_GET['next'])) {
+			echo '<div class="floatright style="max-width:40%;height:auto;"><button type="button" onclick="window.location.href=\'showlinkedtext.php?cid='.$cid.'&id='.$_GET['next'].'\'">'._('Next');
+			if (isset($_GET['nexttitle'])) {
+				echo ': '.$_GET['nexttitle'];
+			}
+			echo ' &gt;</button></div>';
+		}
+		echo '<div class="clear"></div>';
 		if (isset($_SESSION['backtrack'])) {
 			echo "<div class=right><a href=\"course.php?cid={$_GET['cid']}&folder=".$_SESSION['backtrack'][1]."\">Back</a></div>\n";
 		} else {

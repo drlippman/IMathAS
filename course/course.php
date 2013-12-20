@@ -368,7 +368,25 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 }
   
 $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/course.js?v=092413\"></script>";
-
+if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==3) {
+	$placeinhead .= '<script type="text/javascript">
+		jQuery(function() {
+			var linkedlist = [];
+			jQuery("a[href*=\'showlinkedtext\']").each(function(i,el) {
+				linkedlist.push(jQuery(el).data("base").substr(10));
+			});
+			jQuery("a[href*=\'showlinkedtext\']").each(function(i,el) {
+				var cururl = jQuery(el).attr("href");
+				if (i>0) {
+					cururl += "&prev="+linkedlist[i-1];
+				}
+				if (i<linkedlist.length-2) {
+					cururl += "&next="+linkedlist[i+1];
+				}
+			});
+		});
+		</script>';
+}
 /******* begin html output ********/
 require("../header.php");
 

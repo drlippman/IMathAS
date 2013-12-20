@@ -299,7 +299,7 @@ function enditem($canedit) {
 						echo "style=\"$style\" ";
 					}
 					echo "id=\"block{$items[$i]['id']}\">";
-					if ($isopen) {
+					if ($isopen || (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==3)) {
 						//if (isset($teacherid)) {echo generateadditem($parent.'-'.$bnum,'t');}
 						showitems($items[$i]['items'],$parent.'-'.$bnum,$inpublic||$turnonpublic);
 						//if (isset($teacherid) && count($items[$i]['items'])>0) {echo generateadditem($parent.'-'.$bnum,'b');}
