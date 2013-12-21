@@ -292,15 +292,15 @@
 			}
 			echo ">Grade</a></td>";
 			//echo "<td>$avg/$pts ($pc%)</td>";
-			echo "<td class=\"pointer\" onclick=\"GB_show('Low Scores','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=score',500,500);return false;\"><b>$pc2%</b></td>"; 
+			echo "<td class=\"pointer c\" onclick=\"GB_show('Low Scores','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=score',500,500);return false;\"><b>$pc2%</b></td>"; 
 			echo "<td class=\"pointer\" onclick=\"GB_show('Most Attempts and Regens','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=att',500,500);return false;\">$avgatt ($avgreg)</td>";
-			echo "<td class=\"pointer\" onclick=\"GB_show('Incomplete','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=incomp',500,500);return false;\">$pi%</td>";
+			echo "<td class=\"pointer c\" onclick=\"GB_show('Incomplete','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=incomp',500,500);return false;\">$pi%</td>";
 			echo "<td class=\"pointer\" onclick=\"GB_show('Most Time','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=time',500,500);return false;\">$avgtot ($avgtota)</td>";
 			if ($showhints==1) {
 				if ($showextref[$qid]) {
-					echo "<td class=\"pointer\" onclick=\"GB_show('Got Help','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=help',500,500);return false;\">".round(100*$vidcnt[$qid]/($qcnt[$qid] - $qincomplete[$qid])).'%</td>';
+					echo "<td class=\"pointer c\" onclick=\"GB_show('Got Help','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=help',500,500);return false;\">".round(100*$vidcnt[$qid]/($qcnt[$qid] - $qincomplete[$qid])).'%</td>';
 				} else {
-					echo '<td>N/A</td>';
+					echo '<td class="c">N/A</td>';
 				}
 			}
 			echo "<td><input type=button value=\"Preview\" onClick=\"previewq({$qsetids[$qid]})\"/></td>\n";

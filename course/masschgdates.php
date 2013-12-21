@@ -148,9 +148,13 @@ $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/Dat
 //$placeinhead .= '<style type="text/css">.mcind1 {padding-left: .9em; text-indent:-.5em;} .mcind2 {padding-left: 1.4em; text-indent:-1em;}
 //		.mcind3 {padding-left: 1.9em; text-indent:-1.5em; .mcind4 {padding-left: 2.4em; text-indent:-2em; .mcind5, mcind6 {padding-left: 2.9em; text-indent:-2.5em;} 
 //		td {padding: .1em .4em;}</style>';
-$placeinhead .= '<style type="text/css">.mcind0 {padding-left:20px;text-indent:-16px;} .mcind1 {padding-left:36px;text-indent:-16px;} .mcind2 {padding-left:52px;text-indent:-16px;}
-		.mcind3 {padding-left:68px;text-indent:-16px;} .mcind4 {padding-left:84px;text-indent:-16px;} .mcind5, mcind6 {padding-left:100px;text-indent:-16px;} 
-		td {padding: .1em .4em;}</style>';
+$placeinhead .= '<style type="text/css">
+		td {padding: .1em 4px;}
+		.mcind1 {padding-left:20px} .mcind2 {padding-left:36px} .mcind3 {padding-left:52px;}
+		.mcind4 {padding-left:66px;} .mcind5 {padding-left:84px;} mcind6 {padding-left:100px;}
+		.mcind0 img, .mcind1 img, .mcind2 img, .mcind3 img, .mcind4 img, .mcind5 img, .mcind6 img {float: left;}
+		.mcind0 div, .mcind1 div, .mcind2 div, .mcind3 div, .mcind4 div, .mcind5 div, .mcind6 div {margin-left: 21px;}
+		</style>';
 require("../header.php");
 
 if ($overwriteBody==1) {
@@ -436,9 +440,9 @@ if ($overwriteBody==1) {
 				case 'Assessment': echo $CFG['CPS']['miniicons']['assess']; break;
 				case 'Drill': echo $CFG['CPS']['miniicons']['drill']; break;
 			}
-			echo '"/>&nbsp;';
+			echo '"/><div>';
 		}
-		echo " {$names[$i]}<input type=hidden id=\"id$cnt\" value=\"{$ids[$i]}\"/>";
+		echo "{$names[$i]}<input type=hidden id=\"id$cnt\" value=\"{$ids[$i]}\"/></div>";
 		echo "<script> basesdates[$cnt] = ";
 		//if ($startdates[$i]==0) { echo '"NA"';} else {echo $startdates[$i];}
 		echo $startdates[$i];

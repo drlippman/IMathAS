@@ -331,7 +331,7 @@ if (!(isset($teacherid))) {
 			$names = array();
 			$sums = array();
 			$parents = array();
-			getsubinfo($items,'0','',false,'<img src="'.$imasroot.'/img/blank.gif" width="18"/>');
+			getsubinfo($items,'0','',false,' ');
 			
 			$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -527,8 +527,10 @@ if ($overwriteBody==1) {
 			</td>
 			
 		<?php
+			$tdpad = 16*strlen($prespace[$i]);
+			
 			if ($picicons) {
-				echo '<td>'.$prespace[$i].'<img alt="'.$types[$i].'" title="'.$types[$i].'" src="'.$imasroot.'/img/';
+				echo '<td style="padding-left:'.$tdpad.'px"><img alt="'.$types[$i].'" title="'.$types[$i].'" src="'.$imasroot.'/img/';
 				switch ($types[$i]) {
 					case 'Calendar': echo $CFG['CPS']['miniicons']['calendar']; break;
 					case 'InlineText': echo $CFG['CPS']['miniicons']['inline']; break;
@@ -539,8 +541,9 @@ if ($overwriteBody==1) {
 					case 'Assessment': echo $CFG['CPS']['miniicons']['assess']; break;
 					case 'Drill': echo $CFG['CPS']['miniicons']['drill']; break;
 				}
-				echo '"/>&nbsp; '.$names[$i].'</td>';
+				echo '" class="floatleft"/><div style="margin-left:21px">'.$names[$i].'</div></td>';
 			} else {
+				
 				echo '<td>'.$prespace[$i].$names[$i].'</td>';
 				echo '<td>'.$types[$i].'</td>';
 			}
