@@ -19,12 +19,14 @@ class OAuthConsumer {
   public $key;
   public $secret;
   public $rights;
+  public $groupid;
 
-  function __construct($key, $secret, $callback_url=NULL, $rights=0) {
+  function __construct($key, $secret, $callback_url=NULL, $rights=0,$groupid=0) {
     $this->key = $key;
     $this->secret = $secret;
     $this->callback_url = $callback_url;
     $this->rights = $rights;
+    $this->groupid = $groupid;
   }
 
   function __toString() {

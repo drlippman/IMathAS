@@ -140,6 +140,10 @@
    if ($firstload) {
 	   echo "<script>document.cookie = 'openblocks-$cid=' + oblist;</script>\n";
    }
+   if (isset($tutorid) && isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==3) {
+	echo '<script type="text/javascript">$(".instrdates").hide();</script>';
+   }
+
       
 
 ?>

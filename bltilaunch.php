@@ -283,11 +283,15 @@ if (isset($_GET['launch'])) {
 					} else {
 						$rights = 40;
 					}
+					$newgroupid = intval($_SESSION['lti_keygroupid']);
+					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify,groupid) VALUES ";
+					$query .= "('{$_POST['SID']}','$md5pw',$rights,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot,$newgroupid)";
 				} else {
 					$rights = 10;
+					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify) VALUES ";
+					$query .= "('{$_POST['SID']}','$md5pw',$rights,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot)";
 				}
-				$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify) VALUES ";
-				$query .= "('{$_POST['SID']}','$md5pw',$rights,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot)";
+				
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				$userid = mysql_insert_id();	
 			}
@@ -526,11 +530,10 @@ if (isset($_GET['launch'])) {
 	$_SESSION['lti_key'] = $ltikey;
 	$_SESSION['lti_keytype'] = $keytype;
 	$_SESSION['lti_keyrights'] = $requestinfo[0]->rights;
+	$_SESSION['lti_keygroupid'] = intval($requestinfo[0]->groupid);
 	if (isset($_REQUEST['selection_directive']) && $_REQUEST['selection_directive']=='select_link') {
 		$_SESSION['selection_return'] = $_REQUEST['launch_presentation_return_url'];
 	}
-	
-	
 	
 	//look if we know this student
 	$orgparts = explode(':',$ltiorg);  //THIS was added to avoid issues when GUID change, while still storing it
@@ -546,8 +549,9 @@ if (isset($_GET['launch'])) {
 		//has name information (should we skip?)
 		//domain level placement and (student or instructor with acceptable key rights)
 		//a _1 type placement and (student or instructor with acceptable key rights)
+	
 		if (((!empty($_REQUEST['lis_person_name_given']) && !empty($_REQUEST['lis_person_name_family'])) || !empty($_REQUEST['lis_person_name_full'])) &&
-		   ((count($keyparts)==1 && $ltirole=='learner') || (count($keyparts)==1 && $keytype=='cc-vf') ||
+		   ((count($keyparts)==1 && $ltirole=='learner') || (count($keyparts)==1 && $keytype=='cc-vf' && $_SESSION['lti_keyrights']>75) ||
 		   (count($keyparts)>2 && $keyparts[2]==1 && $ltirole=='learner'))) {
 			if (!empty($_REQUEST['lis_person_name_given']) && !empty($_REQUEST['lis_person_name_family'])) {
 				$firstname = $_REQUEST['lis_person_name_given'];
@@ -575,11 +579,15 @@ if (isset($_GET['launch'])) {
 					} else {
 						$rights = 40;
 					}
+					$newgroupid = intval($_SESSION['lti_keygroupid']);
+					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify,groupid) VALUES ";
+					$query .= "('{$_POST['SID']}','$md5pw',$rights,'$firstname','$lastname','$email',0,'$newgroupid')";
 				} else {
 					$rights = 10;
+					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify) VALUES ";
+					$query .= "('{$_POST['SID']}','$md5pw',$rights,'$firstname','$lastname','$email',0)";
 				}
-				$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify) VALUES ";
-				$query .= "('{$_POST['SID']}','$md5pw',$rights,'$firstname','$lastname','$email',0)";
+				
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				$userid = mysql_insert_id();	
 			}

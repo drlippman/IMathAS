@@ -853,13 +853,13 @@ switch($_GET['action']) {
 	case "modltidomaincred":
 		if ($myrights <100) { echo "You don't have the authority for this action"; break;}
 		if ($_GET['id']=='new') {
-			$query = "INSERT INTO imas_users (email,SID,password,rights) VALUES ";
+			$query = "INSERT INTO imas_users (email,SID,password,rights,groupid) VALUES ";
 			$query .= "('{$_POST['ltidomain']}','{$_POST['ltikey']}',";
-			$query .= "'{$_POST['ltisecret']}','{$_POST['createinstr']}')";
+			$query .= "'{$_POST['ltisecret']}','{$_POST['createinstr']}','{$_POST['groupid']}')";
 		} else {
 			$query = "UPDATE imas_users SET email='{$_POST['ltidomain']}',";
 			$query .= "SID='{$_POST['ltikey']}',password='{$_POST['ltisecret']}',";
-			$query .= "rights='{$_POST['createinstr']}' WHERE id='{$_GET['id']}'";
+			$query .= "rights='{$_POST['createinstr']}',groupid='{$_POST['groupid']}' WHERE id='{$_GET['id']}'";
 		}
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		break;

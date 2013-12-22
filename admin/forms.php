@@ -663,7 +663,16 @@ switch($_GET['action']) {
 		echo "Key: <input type=text name=\"ltikey\" size=20><br/>\n";
 		echo "Secret: <input type=text name=\"ltisecret\" size=20><br/>\n";
 		echo "Can create instructors: <select name=\"createinstr\"><option value=\"11\" selected=\"selected\">No</option>";
-		echo "<option value=\"76\">Yes, and creates $installname login</option><option value=\"77\">Yes, with access via LMS only</option></select><br/>\n";
+		echo "<option value=\"76\">Yes, and creates $installname login</option>";
+		//echo "<option value=\"77\">Yes, with access via LMS only</option>
+		echo "</select><br/>\n";
+		echo 'Associate with group <select name="groupid"><option value="0">Default</option>';
+		$query = "SELECT id,name FROM imas_groups ORDER BY name";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			echo '<option value="'.$row[0].'">'.$row[1].'</option>';
+		}
+		echo '</select><br/>';
 		echo "<input type=submit value=\"Add LTI Credentials\"></p>\n";
 		echo "</form>\n";
 		break;
@@ -672,7 +681,7 @@ switch($_GET['action']) {
 		echo '<div id="headerforms" class="pagetitle">';
 		echo "<h3>Modify LTI Domain Credentials</h3>\n";
 		echo '</div>';
-		$query = "SELECT id,email,SID,password,rights FROM imas_users WHERE id='{$_GET['id']}'";
+		$query = "SELECT id,email,SID,password,rights,groupid FROM imas_users WHERE id='{$_GET['id']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$row = mysql_fetch_row($result);
 		echo "<form method=post action=\"actions.php?action=modltidomaincred&id={$row[0]}\">\n";
@@ -685,6 +694,15 @@ switch($_GET['action']) {
 		echo ">No</option><option value=\"76\" ";
 		if ($row[4]==76) {echo 'selected="selected"';}
 		echo ">Yes</option></select><br/>\n";
+		echo 'Associate with group <select name="groupid"><option value="0">Default</option>';
+		$query = "SELECT id,name FROM imas_groups ORDER BY name";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		while ($r = mysql_fetch_row($result)) {
+			echo '<option value="'.$r[0].'"';
+			if ($r[0]==$row[5]) { echo ' selected="selected"';}
+			echo '>'.$r[1].'</option>';
+		}
+		echo '</select><br/>';
 		echo "<input type=submit value=\"Update LTI Credentials\">\n";
 		echo "</form>\n";
 		break;

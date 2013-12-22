@@ -20,9 +20,9 @@ class IMathASLTIOAuthDataStore extends OAuthDataStore {
 		$query = "SELECT ic.ltisecret FROM imas_courses AS ic JOIN imas_assessments AS ia ON ";
 		$query .= "ic.id=ia.courseid WHERE ia.id='{$keyparts[1]}'";
 	} else if ($keyparts[0]=='sso') {
-		$query = "SELECT password,rights FROM imas_users WHERE SID='{$keyparts[1]}' AND (rights=11 OR rights=76 OR rights=77)";
+		$query = "SELECT password,rights,groupid FROM imas_users WHERE SID='{$keyparts[1]}' AND (rights=11 OR rights=76 OR rights=77)";
 	} else {
-		$query = "SELECT password,rights FROM imas_users WHERE SID='{$keyparts[0]}' AND (rights=11 OR rights=76 OR rights=77)";
+		$query = "SELECT password,rights,groupid FROM imas_users WHERE SID='{$keyparts[0]}' AND (rights=11 OR rights=76 OR rights=77)";
 	}
 	
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -30,14 +30,16 @@ class IMathASLTIOAuthDataStore extends OAuthDataStore {
 		$secret = mysql_result($result,0,0);
 		if ($keyparts[0]=='cid' || $keyparts[0]=='aid' || $keyparts[0]=='placein') {
 			$rights = 11;
+			$groupid = 0;
 		} else {
 			$rights = mysql_result($result,0,1);
+			$groupid = mysql_result($result,0,2);
 		}
 		if ($secret=='') {
 			//if secret isn't set, don't use blank as secret
 			return NULL;
 		}
-		 $consumer = new OAuthConsumer($consumer_key,$secret, NULL,$rights);
+		 $consumer = new OAuthConsumer($consumer_key,$secret, NULL,$rights,$groupid);
 		 return $consumer;
         }
         return NULL;

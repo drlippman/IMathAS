@@ -392,12 +392,18 @@ function setselectbycookie() {
 }
 addLoadEvent(setselectbycookie);
 
+var recordedunload = false;
 function recclick(type,typeid,info,txt) {
 	if (cid>0) {
+		var extradata = '',m;
+		if ((m = window.location.href.match(/showlinkedtext.*?&id=(\d+)/)) !== null && recordedunload==false) {
+			extradata = '&unloadinglinked='+m[1];
+			recordedunload = true;
+		}
 		jQuery.ajax({
 			type: "POST",
 			url: imasroot+'/course/rectrack.php?cid='+cid,
-			data: "type="+encodeURIComponent(type)+"&typeid="+encodeURIComponent(typeid)+"&info="+encodeURIComponent(info+'::'+txt)
+			data: "type="+encodeURIComponent(type)+"&typeid="+encodeURIComponent(typeid)+"&info="+encodeURIComponent(info+'::'+txt)+extradata
 		});
 	}			
 }

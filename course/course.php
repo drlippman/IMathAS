@@ -368,6 +368,10 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 }
   
 $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/course.js?v=092413\"></script>";
+if (isset($tutorid) && isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==3) {
+	$placeinhead .= '<script type="text/javascript">$(function(){$(".instrdates").hide();});</script>';
+}
+	
 /******* begin html output ********/
 require("../header.php");
 

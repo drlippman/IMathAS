@@ -417,20 +417,6 @@ div.additembox span {
 	padding: 0 10px;
 }
 
-a.abutton {
-	text-align: center;
-	border: 1px solid #000;
-	padding: 2px 15px;	
-	background-color: #fff;
-	color: #000;
-	border-radius: 4px;
-	white-space: nowrap;
-}
-a.abutton:hover, a.abutton:focus {
-	background-color: #ccf;
-	text-decoration: none;
-}
-
 .newnote {
 	color: #f00;
 }
@@ -477,7 +463,14 @@ div#viewbuttoncont a.buttoninactive {
 div#viewbuttoncont a.buttoninactive:hover {
 	background-color: #036;
 }
-input[type=submit],input[type=button], button {
+a.abutton {
+	padding: 3px 8px;
+	display: inline-block;
+}
+a.abutton, a.abutton:hover, a.abutton:focus {
+	text-decoration: none;
+}
+input[type=submit],input[type=button], button, a.abutton {
 	color: #000;
 	background-color: #eee;
 	border-radius: 4px;
@@ -490,7 +483,10 @@ input[type=submit],input[type=button], button {
 input[type=submit].secondarybtn,input[type=button].secondarybtn, button.secondarybtn {
 	background-color: #f9f9f9;
 }
-input[type=submit]:hover, button:hover,input[type=button]:hover {
+input[type=submit]:hover, button:hover,input[type=button]:hover, a.abutton:hover {
+	background-color: #e3e3ff;
+}
+input[type=submit]:focus, button:focus,input[type=button]:focus, a.abutton:focus {
 	background-color: #e3e3ff;
 }
 #GB_overlay {

@@ -20,9 +20,21 @@ forummod	modify form post/reply		imas_forum_posts.id,  info has imas_forums.id ;
 require("../validate.php");
 if (isset($studentid)) {
 	$now = time();
-	$query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime,info) VALUES ";
-	$query .= "('$userid','$cid','{$_POST['type']}','{$_POST['typeid']}',$now,'{$_POST['info']}')";
-	mysql_query($query) or die("Query failed : " . mysql_error());
+	if (isset($_POST['unloadinglinked'])) {
+		$typeid = intval($_POST['unloadinglinked']);
+		$query = "SELECT id FROM imas_content_track WHERE courseid='$cid' AND userid='$userid' AND type='linkedlink' AND typeid='$typeid' ORDER BY viewtime DESC LIMIT 1";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		if (mysql_num_rows($result)>0) {
+			$row = mysql_fetch_row($result);
+			$query = "UPDATE imas_content_track SET info=CONCAT(info,'::$now') WHERE id=".$row[0];
+			mysql_query($query) or die("Query failed : " . mysql_error());
+		}
+	} 
+	if (isset($_POST['type'])) {
+		$query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime,info) VALUES ";
+		$query .= "('$userid','$cid','{$_POST['type']}','{$_POST['typeid']}',$now,'{$_POST['info']}')";
+		mysql_query($query) or die("Query failed : " . mysql_error());
+	}
 } 
 
 ?>
