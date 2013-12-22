@@ -612,11 +612,12 @@ if ($overwriteBody==1) {
 	   }
 
    } else {
-	   if (isset($teacherid)) {
-	   	echo '<p><b>Welcome to your course!</b></p>';
-	   	echo '<p>To start by copying from another course, use the <a href="copyitems.php?cid='.$cid.'">Course Items: Copy</a> ';
-	   	echo 'link along the left side of the screen.</p><p>If you want to build from scratch, use the "Add An Item" pulldown below to get started.</p><p>&nbsp;</p>';
-	   	
+	   if (isset($teacherid) && $quickview!='on') {
+	   	   if ($_GET['folder']=='0') {
+			echo '<p><b>Welcome to your course!</b></p>';
+			echo '<p>To start by copying from another course, use the <a href="copyitems.php?cid='.$cid.'">Course Items: Copy</a> ';
+			echo 'link along the left side of the screen.</p><p>If you want to build from scratch, use the "Add An Item" pulldown below to get started.</p><p>&nbsp;</p>';
+	   	   }
 	   	echo generateadditem($_GET['folder'],'t');
 	   }
    }

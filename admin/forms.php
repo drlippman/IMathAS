@@ -341,10 +341,10 @@ switch($_GET['action']) {
 			
 			echo '</span><br class=form />';
 			
-			/*echo '<span class="form">Pull-downs for course item reordering</span>';
+			echo '<span class="form">Pull-downs for course item reordering</span>';
 			echo '<span class="formright"><input type="checkbox" name="toolset-reord" value="4" ';
 			if (($toolset&4)==0) { echo 'checked="checked"';}
-			echo '> Show</span><br class="form"/>';*/
+			echo '> Show</span><br class="form"/>';
 		}
 		
 		if (!isset($CFG['CPS']['chatset']) || $CFG['CPS']['chatset'][1]==1) {

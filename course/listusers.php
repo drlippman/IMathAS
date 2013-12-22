@@ -582,10 +582,11 @@ if ($overwriteBody==1) {
 	echo '</span>';
 	echo '<span class="column" style="width:auto;">';
 	echo "<a href=\"listusers.php?cid=$cid&enroll=student\">Enroll Student with known username</a><br/>";
-	echo "<a href=\"enrollfromothercourse.php?cid=$cid\">Enroll students from another course</a><br/>";
+	echo "<a href=\"enrollfromothercourse.php?cid=$cid\">Enroll students from another course</a>";
 	if ($CFG['GEN']['allowinstraddstus']) { 
+		echo '</span><span class="column" style="width:auto;">';
 		echo "<a href=\"$imasroot/admin/importstu.php?cid=$cid\">Import Students from File</a><br/>";
-		echo "<a href=\"listusers.php?cid=$cid&newstu=new\">Create and Enroll new student</a><br/>";
+		echo "<a href=\"listusers.php?cid=$cid&newstu=new\">Create and Enroll new student</a>";
 	}
 	echo '</span>';
 	echo '<br class="clear"/>';
