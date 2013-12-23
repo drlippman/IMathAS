@@ -388,6 +388,10 @@ END;
 		$sessiondata['mathdisp'] = 3;
 		writesessiondata();
 	}
+	if (isset($_GET['readernavon'])) {
+		$sessiondata['readernavon'] = true;
+		writesessiondata();
+	}
 	if (isset($_GET['useflash'])) {
 		$sessiondata['useflash'] = true;
 		writesessiondata();

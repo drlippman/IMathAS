@@ -23,6 +23,8 @@ if (!(isset($_GET['cid']))) { //if the cid is missing go back to the index page
 	if ($_GET['remove']=="really") { // the request has been confirmed, delete the block
 		$blocktree = explode('-',$_GET['id']);
 		$blockid = array_pop($blocktree) - 1; //-1 adjust for 1-index
+		
+		mysql_query("START TRANSACTION") or die("Query failed :$query " . mysql_error());
 			
 		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -51,6 +53,9 @@ if (!(isset($_GET['cid']))) { //if the cid is missing go back to the index page
 		$itemlist = addslashes(serialize($items));
 		$query = "UPDATE imas_courses SET itemorder='$itemlist' WHERE id='{$_GET['cid']}'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
+		
+		mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
+		
 		$obarr = explode(',',$_COOKIE['openblocks-'.$_GET['cid']]);
 		$obloc = array_search($obid,$obarr);
 		array_splice($obarr,$obloc,1);
