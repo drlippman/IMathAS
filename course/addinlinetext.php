@@ -495,7 +495,7 @@ function movefile(from) {
 ?>
 		
 	</div>
-	<div class=submit><input type=submit name="submitbtn" value="<?php echo $savetitle;?>"></div>
+	<div class=submit><button type=submit name="submitbtn" value="Submit"><?php echo $savetitle; ?></button></div>
 	</form>
 	<p><sup>*</sup>Avoid quotes in the filename</p>
 <?php
