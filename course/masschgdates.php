@@ -429,6 +429,7 @@ if ($overwriteBody==1) {
 			echo '<td class="togdishid'.($avails[$i]==0?' dis':'').'">';
 		}
 		if ($picicons>0) {
+			echo "<input type=hidden id=\"type$cnt\" value=\"{$types[$i]}\"/>";
 			echo '<img alt="'.$types[$i].'" title="'.$types[$i].'" src="'.$imasroot.'/img/';
 			switch ($types[$i]) {
 				case 'Calendar': echo $CFG['CPS']['miniicons']['calendar']; break;
