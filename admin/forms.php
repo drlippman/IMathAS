@@ -720,7 +720,7 @@ switch($_GET['action']) {
 			if ($row[0]==0) {
 				echo "<td></td>";
 			} else {
-				echo "<td><a href=\"actions.php?action=delgroup&id={$row[0]}\">Delete</a></td>\n";
+				echo "<td><a href=\"actions.php?action=delgroup&id={$row[0]}\" onclick=\"return confirm('Are you SURE you want to delete this group?');\">Delete</a></td>\n";
 			}
 			echo "</tr>\n";
 		}
