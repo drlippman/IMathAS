@@ -853,11 +853,11 @@ switch($_GET['action']) {
 	case "modltidomaincred":
 		if ($myrights <100) { echo "You don't have the authority for this action"; break;}
 		if ($_GET['id']=='new') {
-			$query = "INSERT INTO imas_users (email,SID,password,rights,groupid) VALUES ";
-			$query .= "('{$_POST['ltidomain']}','{$_POST['ltikey']}',";
+			$query = "INSERT INTO imas_users (email,FirstName,LastName,SID,password,rights,groupid) VALUES ";
+			$query .= "('{$_POST['ltidomain']}','{$_POST['ltidomain']}','LTIcredential','{$_POST['ltikey']}',";
 			$query .= "'{$_POST['ltisecret']}','{$_POST['createinstr']}','{$_POST['groupid']}')";
 		} else {
-			$query = "UPDATE imas_users SET email='{$_POST['ltidomain']}',";
+			$query = "UPDATE imas_users SET email='{$_POST['ltidomain']}',FirstName='{$_POST['ltidomain']}',LastName='LTIcredential',";
 			$query .= "SID='{$_POST['ltikey']}',password='{$_POST['ltisecret']}',";
 			$query .= "rights='{$_POST['createinstr']}',groupid='{$_POST['groupid']}' WHERE id='{$_GET['id']}'";
 		}

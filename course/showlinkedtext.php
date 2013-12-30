@@ -45,7 +45,7 @@
 			exit;
 		}
 	}
-	
+	$placeinhead = '';
 	if (isset($studentid)) {
 		$rec = "data-base=\"linkedintext-{$_GET['id']}\" ";
 		$text = str_replace('<a ','<a '.$rec, $text);
@@ -64,19 +64,31 @@
 			window.onunload = window.onbeforeunload = recunload;
 		 </script>';
 	}
+	$placeinhead .= '<script type="text/javascript"> $(function() {
+	$(".im_glossterm").addClass("hoverdef").each(function(i,el) { 
+		$(el).attr("title",$(el).next(".im_glossdef").text());
+	   });
+	});
+	</script>';
 	require("../header.php");
+	if ((isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==3)) {
+		$fixbc = 'style="position:fixed;top:0;width:100%"';
+		$pad = 'padding-top: 25px;';
+	} else {
+		$fixbc = '';  $pad = '';
+	}
 	if ($shownav) {
 		if (isset($_SESSION['backtrack'])) {
-			echo '<div class="breadcrumb">'.$_SESSION['backtrack'][0];
+			echo '<div class="breadcrumb" '.$fixbc.'>'.$_SESSION['backtrack'][0];
 			echo " &gt; $titlesimp</div>";
 		} else {
-			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+			echo "<div class=breadcrumb $fixbc>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 			echo "&gt; $titlesimp</div>";
 			echo '<div id="headershowlinkedtext" class="pagetitle"><h2>'.$titlesimp.'</h2></div>';
 		}
 	}
-	echo '<div class="linkedtextholder" style="padding-left:10px; padding-right: 10px;">';
-	echo filter($text);
+	echo '<div class="linkedtextholder" style="padding-left:10px; padding-right: 10px;'.$pad.'">';
+	$navbuttons = '';
 	if ((isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==3) || isset($sessiondata['readernavon'])) {
 		$now = time();
 		$query = "SELECT il.id,il.title,il.avail,il.startdate,il.enddate,ii.id AS itemid 
@@ -118,7 +130,7 @@
 		$row = mysql_fetch_row($result);
 		getflatlinkeditemlist(unserialize($row[0]));
 		
-		echo '<p>&nbsp;</p>';
+		$navbuttons .= '<p>&nbsp;</p>';
 		if ($thisitemloc>0) {
 			$p = $itemdata[$flatlist[$thisitemloc-1]];
 			if (isset($studentid) && !isset($sessiondata['stuview'])) {
@@ -126,9 +138,9 @@
 			} else {
 				$rec = '';
 			}
-			echo '<div class="floatleft" style="max-width:45%"><a '.$rec.' class="abutton" style="height:auto;text-align:center" href="showlinkedtext.php?cid='.$cid.'&id='.$p['id'].'">&lt; '._('Previous');
-			echo '<br/>'.$p['title'];
-			echo '</a></div>';
+			$navbuttons .= '<div class="floatleft" style="width:45%;text-align:center"><a '.$rec.' class="abutton" style="width:100%;padding:4px 0;height:auto;" href="showlinkedtext.php?cid='.$cid.'&id='.$p['id'].'">&lt; '._('Previous');
+			$navbuttons .= '</a><p class="small" style="line-height:1.4em">'.$p['title'];
+			$navbuttons .= '</p></div>';
 		}
 		if ($thisitemloc<count($flatlist)-2) {
 			$p = $itemdata[$flatlist[$thisitemloc+1]];
@@ -137,12 +149,16 @@
 			} else {
 				$rec = '';
 			}
-			echo '<div class="floatright" style="max-width:45%"><a '.$rec.' class="abutton" style="height:auto;text-align:center" href="showlinkedtext.php?cid='.$cid.'&id='.$p['id'].'"> '._('Next');
-			echo ' &gt;<br/>'.$p['title'];
-			echo '</a></div>';
+			$navbuttons .= '<div class="floatright" style="width:45%;text-align:center"><a '.$rec.' class="abutton" style="width:100%;padding:4px 0;height:auto;" href="showlinkedtext.php?cid='.$cid.'&id='.$p['id'].'"> '._('Next');
+			$navbuttons .= ' &gt;</a><p class="small" style="line-height:1.4em">'.$p['title'];
+			$navbuttons .= '</p></div>';
 		}
-		echo '<div class="clear"></div>';
+		$navbuttons .= '<div class="clear"></div>';
 	}
+	if ($navbuttons != '') {
+		$text = preg_replace('/(<hr[^>]*>\s*<div[^>]*smallattr[^>]*>)/sm', $navbuttons.'$1', $text);
+	}
+	echo filter($text);
 	echo '</div>';
 	if ($shownav) {
 		if (isset($_SESSION['backtrack'])) {
