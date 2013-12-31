@@ -12,10 +12,12 @@
 	}
 	$cid = $_GET['cid'];
 	
-	if (isset($_POST['latepass'])) {
-		foreach ($_POST['latepass'] as $uid=>$lp) {
-			$query = "UPDATE imas_students SET latepass='$lp' WHERE userid='$uid' AND courseid='$cid'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+	if (isset($_POST['hours'])) {
+		if (isset($_POST['latepass'])) {
+			foreach ($_POST['latepass'] as $uid=>$lp) {
+				$query = "UPDATE imas_students SET latepass='$lp' WHERE userid='$uid' AND courseid='$cid'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			}
 		}
 		$query = "UPDATE imas_courses SET latepasshrs='{$_POST['hours']}' WHERE id='$cid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
