@@ -93,7 +93,7 @@ function calculate(inputId,outputId,format) {
 				  } else if (errstuff!=null) {  
 					  str += "["+_("use function notation")+" - "+_("use $1 instead of $2",errstuff[1]+"("+errstuff[2]+")",errstuff[0])+"]";
 				  }
-				  if (str.match("|")) {
+				  if (str.match(/\|/)) {
 				  	  str += _(" Use abs(x) instead of |x| for absolute values");
 				  }
 			  }
@@ -588,7 +588,7 @@ function AMpreview(inputId,outputId) {
 			 
 			if (errstuff!=null && errstuff[2]!='h') {
 				err =_("syntax error")+": "+_("use function notation")+" - "+errstuff[1]+"(x)";
-			} else if (str.match("|")) {
+			} else if (str.match(/\|/)) {
 				err = _("syntax error")+": "+_(" Use abs(x) instead of |x| for absolute values");
 			} else {
 				err = _("syntax error");

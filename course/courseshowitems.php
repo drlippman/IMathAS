@@ -768,10 +768,10 @@ function enditem($canedit) {
 			   	   		$p = explode('v=',$m[2]);
 			   	   		$p2 = preg_split('/[#&]/',$p[1]);
 			   	   	} else if ($m[1]=='youtu.be') {
-			   	   		$p2 = preg_split('/[#&]/',substr($p[1],1));
+			   	   		$p2 = preg_split('/[#&?]/',substr($m[2],1));
 			   	   	}
 			   	   	$vidid = $p2[0];
-			   	   	if (preg_match('/.*t=((\d+)m)?((\d+)s)?.*/',$m[2],$tm)) {
+			   	   	if (preg_match('/.*[^r]t=((\d+)m)?((\d+)s)?.*/',$m[2],$tm)) {
 			   	   		$start = ($tm[2]?$tm[2]*60:0) + ($tm[4]?$tm[4]*1:0);
 			   	   	} else if (preg_match('/start=(\d+)/',$m[2],$tm)) {
 			   	   		$start = $tm[1];

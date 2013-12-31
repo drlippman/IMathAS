@@ -19,11 +19,9 @@ if (strpos($url,'youtube.com/watch')!==false) {
 	if (strpos($url,'start=')!==false) {
 		preg_match('/start=(\d+)/',$url,$m);
 		$timestart .= '&'.$m[0];
-	} else {
-		if (strpos($url,'t=')!==false) {
-			preg_match('/t=((\d+)m)?((\d+)s)?/',$url,$m);
-			$timestart .= '&start='.((empty($m[2])?0:$m[2]*60) + (empty($m[4])?0:$m[4]*1));	
-		} 
+	} else if (strpos($url,'t=')!==false) {
+		preg_match('/t=((\d+)m)?((\d+)s)?/',$url,$m);
+		$timestart .= '&start='.((empty($m[2])?0:$m[2]*60) + (empty($m[4])?0:$m[4]*1));	
 	}
 	
 	if (strpos($url,'end=')!==false) {
@@ -39,25 +37,21 @@ if (strpos($url,'youtu.be/')!==false) {
 	if (strpos($vidid,'#')!==false) {
 		$vidid = substr($vidid,0,strpos($vidid,'#'));
 	} 
-	if (strpos($url,'t=')!==false) {
+	if (strpos($vidid,'?')!==false) {
+		$vidid = substr($vidid,0,strpos($vidid,'?'));
+	}
+	$timestart = '?rel=0';
+	if (strpos($url,'start=')!==false) {
+		preg_match('/start=(\d+)/',$url,$m);
+		$timestart .= '&'.$m[0];
+	} else if (strpos($url,'t=')!==false) {
 		preg_match('/t=((\d+)m)?((\d+)s)?/',$url,$m);
-		$timestart = '?start='.((empty($m[2])?0:$m[2]*60) + (empty($m[4])?0:$m[4]*1));	
-	} else {
-		if (strpos($url,'start=')!==false) {
-			preg_match('/start=(\d+)/',$url,$m);
-			$timestart = '?'.$m[0];
-		} else {
-			$timestart = '';
-		}
+		$timestart .= '&start='.((empty($m[2])?0:$m[2]*60) + (empty($m[4])?0:$m[4]*1));	
 	}
 	
 	if (strpos($url,'end=')!==false) {
 		preg_match('/end=(\d+)/',$url,$m);
-		if ($timestart=='') {
-			$timestart = '?'.$m[0];
-		} else {
-			$timestart .= '&'.$m[0];
-		}
+		$timestart .= '&'.$m[0];
 	}
 	$doembed = true;
 	$out = '<iframe width="640" height="510" src="'.$urlmode.'www.youtube.com/embed/'.$vidid.$timestart.'" frameborder="0" allowfullscreen></iframe>';
