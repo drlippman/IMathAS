@@ -23,7 +23,7 @@ function enditem($canedit) {
 
   function showitems($items,$parent,$inpublic=false) {
 	   global $teacherid,$tutorid,$studentid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$myrights;
-	   global $hideicons,$exceptions,$latepasses,$graphicalicons,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs,$hasstats,$toolset;
+	   global $hideicons,$exceptions,$latepasses,$graphicalicons,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs,$hasstats,$toolset,$readlinkeditems;
 	   require_once("../includes/filehandler.php");
 	   
 	   if (!isset($CFG['CPS']['itemicons'])) {
@@ -1121,7 +1121,12 @@ function enditem($canedit) {
 					   }
 				   }
 				   echo "<div class=title>";
-				   echo "<b><a href=\"$alink\" $rec $target>{$line['title']}</a></b>\n";
+				   if (isset($readlinkeditems[$typeid])) {
+				   	   echo '<b class="readitem">';
+				   } else {
+				   	   echo '<b>';
+				   }
+				   echo "<a href=\"$alink\" $rec $target>{$line['title']}</a></b>\n";
 				   if ($viewall) { 
 					   echo '<span class="instrdates">';
 					   echo "<br/>$show ";

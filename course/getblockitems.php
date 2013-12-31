@@ -120,6 +120,16 @@
 		}
 	}	
 	
+	//get read linked items
+	$readlinkeditems = array();
+	if ($coursetheme=='otbsreader.css' && isset($studentid)) {
+		$query = "SELECT DISTINCT typeid FROM imas_content_track WHERE userid='$userid' AND type='linkedlink' AND courseid='$cid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			$readlinkeditems[$row[0]] = true;	
+		}
+	}
+	
    if (isset($teacherid)) {
 	   //echo generateadditem($_GET['folder'],'t');
    }
