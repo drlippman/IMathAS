@@ -788,7 +788,7 @@ function enditem($canedit) {
 			   	   }
 			   	   
 			   	   $playlist = '<div class="playlistbar" id="playlistbar'.$typeid.'"><div class="vidtracksA"></div> <span> Playlist</span> ';
-			   	   $playlist .= '<div class="vidplay" style="margin-left:1em;" onclick="playliststart('.$typeid.',0)"></div>';
+			   	   $playlist .= '<div class="vidplay" style="margin-left:1em;cursor:pointer" onclick="playliststart('.$typeid.',0)"></div>';
 			   	   $playlist .= '<div class="vidrewI" style="display:none;"></div><div class="vidff" style="display:none;margin-right:1em;"></div> ';
 			   	   $playlist .= '<span class="playlisttitle"></span></div>';
 			   	   $playlist .= '<div class="playlistwrap" id="playlistwrap'.$typeid.'">';

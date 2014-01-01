@@ -269,14 +269,17 @@ function playlistprevvid() {
 function playlisttogglelist() {
 	var id = $(this).parents('.playlistbar').get(0).id.substr(11);
 	var wrap = $('#playlistwrap'+id);
+	var bar = $('#playlistbar'+id);
 	if (wrap.find('.playlisttext').css('display')=='none') {
 		//show list	
 		wrap.find('.playlisttext').show();
 		wrap.find('.playlistvid').hide();
+		bar.find('.vidtracks').removeClass("vidtracks").addClass("vidtracksA");
 	} else {
 		//show vid
 		wrap.find('.playlisttext').hide();
 		wrap.find('.playlistvid').show();
+		bar.find('.vidtracksA').removeClass("vidtracksA").addClass("vidtracks");
 	}
 	
 }
@@ -323,15 +326,15 @@ function playliststart(id,vidk,el) {
 			}});
 		}*/
 		bar.find('.vidplay').hide();
-		bar.find('.vidff').show().bind('click',playlistnextvid);
-		bar.find('.vidrewI').show().bind('click',playlistprevvid);
-		bar.find('.vidtracksA').removeClass('vidtracksA').addClass('vidtracks')
-			.bind('click',playlisttogglelist).next().css('cursor','default').bind('click', playlisttogglelist);
+		bar.find('.vidff').show().bind('click',playlistnextvid).css('cursor','pointer');
+		bar.find('.vidrewI').show().bind('click',playlistprevvid).css('cursor','pointer');
+		bar.find('.vidtracksA').removeClass('vidtracksA').addClass('vidtracks').css('cursor','pointer')
+			.bind('click',playlisttogglelist).next().css('cursor','pointer').bind('click', playlisttogglelist);
 	} else {
 		wrap.find('iframe').attr('src',url);	
 	}
 	
-	bar.find('.playlisttitle').html(playlist[id][vidk].name);
+	bar.find('.playlisttitle').html(playlist[id][vidk].name+' <a target="_blank" href="http://www.youtube.com/watch?v='+playlist[id][vidk].vidid+'"><img src="'+imasroot+'/img/extlink.png"/></a>');
 	if (vidk==0) {
 		bar.find('.vidrew,.vidrewI').removeClass("vidrew").addClass("vidrewI");
 	} else {

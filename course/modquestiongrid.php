@@ -173,6 +173,7 @@ Leave items blank to use the assessment's default values<br/>
 				}
 				
 				echo '<tr><td>'.$row[1].'</td>';
+				echo '<td>';
 				if ($row[5]!='') {
 					$extref = explode('~~',$row[5]);
 					$hasvid = false;  $hasother = false;
@@ -185,14 +186,13 @@ Leave items blank to use the assessment's default values<br/>
 					}
 					$page_questionTable[$i]['extref'] = '';
 					if ($hasvid) {
-						echo "<td><img src=\"$imasroot/img/video_tiny.png\"/></td>";
+						echo "<img src=\"$imasroot/img/video_tiny.png\"/>";
 					}
 					if ($hasother) {
-						echo "<td><img src=\"$imasroot/img/html_tiny.png\"/></td>";
+						echo "<img src=\"$imasroot/img/html_tiny.png\"/>";
 					}
-				} else {
-					echo '<td></td>';
-				}
+				} 
+				echo '</td>';
 				echo "<td><input type=text size=4 name=\"points{$row[0]}\" value=\"{$row[2]}\" /></td>";
 				echo "<td><input type=text size=4 name=\"attempts{$row[0]}\" value=\"{$row[3]}\" /></td>";
 				echo "<td><select name=\"showhints{$row[0]}\">";

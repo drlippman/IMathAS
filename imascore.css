@@ -628,8 +628,10 @@ div.multiselitem {
 .vidplay { background: url(img/vidicons.png) no-repeat 0px -120px; width:24px; height:20px; display: inline-block;}
 .vidplay:hover { background: url(img/vidicons.png) no-repeat -24px -120px; width:24px; height:20px; display: inline-block;}
 .vidplayI { background: url(img/vidicons.png) no-repeat -48px -120px; width:24px; height:20px; display: inline-block;}	
-.vidtracks { background: url(img/vidicons.png) no-repeat 0px -144px; width:24px; height:20px; margin-right: 5px; display: inline-block;}
-.vidtracks:hover,.vidtracksA { background: url(img/vidicons.png) no-repeat -24px -144px; width:24px; height:20px; margin-right: 5px; display: inline-block;}
+.vidtracksA { background: url(img/vidicons.png) no-repeat 0px -144px; width:24px; height:20px; margin-right: 5px; display: inline-block;}
+.vidtracksA:hover { background: url(img/vidicons.png) no-repeat -24px -144px; width:24px; height:20px; margin-right: 5px; display: inline-block;}
+.vidtracks { background: url(img/vidicons.png) no-repeat 0px -168px; width:24px; height:20px; margin-right: 5px; display: inline-block;}
+.vidtracks:hover { background: url(img/vidicons.png) no-repeat -24px -168px; width:24px; height:20px; margin-right: 5px; display: inline-block;}
 .vidtracksI { background: url(img/vidicons.png) no-repeat -48px -144px; width:24px; height:20px; margin-right: 5px; display: inline-block;}	
 
 .playlistbar { background-color: #ccc; padding: 3px;}
