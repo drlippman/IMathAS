@@ -348,7 +348,6 @@ Date.prototype.getWeekDays = function(d) {
 						$(els[i]).parent().parent().find('td.togdis').removeClass('dis');
 						$('#availname'+cnt).text(availnames[1]);
 					} else {
-						console.log("cnt"+cnt+": "+availnames[to]);
 						$(els[i]).parent().parent().find('td.togdis').addClass('dis');
 						$('#availname'+cnt).text(availnames[to]);
 					}
