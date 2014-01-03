@@ -73,6 +73,7 @@ function AStoIMG($w=200, $h=200) {
 	$this->markerfill = 'green'; $this->gridcolor = 'gray'; $this->axescolor = 'black';
 	$this->strokewidth = 1; $this->dotradius=8; $this->ticklength=4;
 	$this->fontsize = 12; $this->fontfill=''; $this->fontbackground='';
+	$this->isinit = false;
 	
 	if ($w<=0) {$w=200;}
 	if ($h<=0) {$h=200;}
@@ -252,6 +253,7 @@ function processScript($script) {
 }
 	
 function ASsetdash() {
+	if (!$this->isinit) {$this->ASinitPicture();}
 	if (func_num_args()>0) {
 		$dash = func_get_arg(0);
 		$this->curdash = $dash;
@@ -283,6 +285,7 @@ function ASsetdash() {
 	}
 }
 function AStext($arg) {
+	if (!$this->isinit) {$this->ASinitPicture();}
 	$pos = '';  $angle = 0;
 	if (func_num_args()>1) {
 		$p = $this->pt2arr($arg);
@@ -306,6 +309,7 @@ function AStext($arg) {
 	$this->AStextInternal($p,$st,$pos,$angle);
 }
 function AStextAbs($arg) {
+	if (!$this->isinit) {$this->ASinitPicture();}
 	$pos = '';  $angle = 0;
 	if (func_num_args()>1) {
 		$pt = $arg;
@@ -480,8 +484,11 @@ function ASinitPicture($arg) {
 	$this->winxmax = min($this->width - $this->border[2] + 5, $this->width);
 	$this->winymin = max($this->border[3] -5,0);
 	$this->winymax = min($this->height - $this->border[1] + 5 , $this->height);
+	
+	$this->isinit = true;
 }
 function ASaxes($arg) {
+	if (!$this->isinit) {$this->ASinitPicture();}
 	//$arg = explode(',',$arg);
 	$xscl = 0; $yscl = 0; $xgrid = 0; $ygrid = 0; $dolabels = false; $dogrid = false; $dosmallticks = false;
 	$dox = true;
@@ -729,6 +736,7 @@ function ASaxes($arg) {
 }
 
 function ASline($arg) {
+	if (!$this->isinit) {$this->ASinitPicture();}
 	//$arg = explode('],[',$arg);
 	if (count($arg)<2) { return;}
 	$p = $this->pt2arr($arg[0]);
@@ -748,6 +756,7 @@ function ASline($arg) {
 	}
 }
 function ASpath($arg) {
+	if (!$this->isinit) {$this->ASinitPicture();}
 	$arg = str_replace(array('[',']'),'',$arg[0]);
 	$arg = explode(',',$arg);
 	if (count($arg)<4) { return;}
@@ -772,11 +781,13 @@ function ASpath($arg) {
 	}
 }
 function AScircle($arg) {
+	if (!$this->isinit) {$this->ASinitPicture();}
 	//$arg = explode(',',$arg);
 	//$this->ASellipse("[{$arg[0]},{$arg[1]}],{$arg[2]},{$arg[2]}");
 	$this->ASellipse(array($arg[0],$arg[1],$arg[1]));
 }
 function ASellipse($arg) {
+	if (!$this->isinit) {$this->ASinitPicture();}
 	//$arg = explode(',',$arg);
 	//$p = $this->pt2arr($arg[0].','.$arg[1]);
 	$p = $this->pt2arr($arg[0]);
@@ -796,6 +807,7 @@ function ASellipse($arg) {
 	}
 }
 function ASrect($arg) {
+	if (!$this->isinit) {$this->ASinitPicture();}
 	//$arg = explode(',',$arg);
 	$p = $this->pt2arr($arg[0]);
 	$q = $this->pt2arr($arg[1]);
@@ -816,6 +828,7 @@ function ASrect($arg) {
 	}
 }
 function ASsector($arg) {
+	if (!$this->isinit) {$this->ASinitPicture();}
 	list($cx,$cy) = $this->pt2arr($arg[0]);
 	$r = $this->evalifneeded($arg[1]);
 	$origstart = $this->evalifneeded($arg[2]);
@@ -848,6 +861,7 @@ function ASsector($arg) {
 	
 }
 function ASarc($arg) {
+	if (!$this->isinit) {$this->ASinitPicture();}
 	$p = $this->pt2arr($arg[0]);
 	$q = $this->pt2arr($arg[1]);
 	$r = $this->evalifneeded($arg[2]);
@@ -884,6 +898,7 @@ function ASarc($arg) {
 }
 
 function ASdot($pt,$r) {
+	if (!$this->isinit) {$this->ASinitPicture();}
 	if ($this->markerfill!='none') {
 		$color = $this->markerfill;
 		if ($this->usegd2) {
@@ -896,6 +911,7 @@ function ASdot($pt,$r) {
 	imageellipse($this->img,$pt[0],$pt[1],$r,$r,$this->$color);
 }
 function ASdot2($arg) {
+	if (!$this->isinit) {$this->ASinitPicture();}
 	$pt = $this->pt2arr($arg[0]);
 	$color = $this->stroke;
 	if (isset($arg[1]) && $arg[1]=='closed') {
@@ -947,6 +963,7 @@ function ASdot2($arg) {
 }
 //function ASarrowhead($v,$w) {
 function ASarrowhead($p,$q) {
+	if (!$this->isinit) {$this->ASinitPicture();}
 	$v = $this->pt2arr($p);
 	$w = $this->pt2arr($q);
 	$u = array($w[0]-$v[0],$w[1]-$v[1]);
@@ -960,6 +977,7 @@ function ASarrowhead($p,$q) {
 	}
 }
 function ASslopefield($arg) {
+	if (!$this->isinit) {$this->ASinitPicture();}
 	$func = $arg[0];
 	if (count($arg)>1) {
 		$dx = $arg[1];
@@ -1001,6 +1019,7 @@ function ASslopefield($arg) {
 }
 
 function ASplot($function) {
+	if (!$this->isinit) {$this->ASinitPicture();}
 	$funcstr = implode(',',$function);
 	/*  safety check now in mathphp
 	preg_match_all('/[a-zA-Z]+/',$funcstr,$matches,PREG_PATTERN_ORDER);
