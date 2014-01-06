@@ -69,6 +69,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (isset($_POST['allowlikes']) && $_POST['allowlikes']==1) {
 			$fsets += 8;
 		}
+		if (isset($_POST['viewafterpost']) && $_POST['viewafterpost']==1) {
+			$fsets += 16;
+		}
 		if ($_POST['replyby']=="Always") {
 			$replyby = 2000000000;
 		} else if ($_POST['replyby']=="Never") {
@@ -199,6 +202,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$allowmod = (($line['settings']&2)==2);
 			$allowdel = (($line['settings']&4)==4);
 			$allowlikes = (($line['settings']&8)==8);
+			$viewafterpost = (($line['settings']&16)==16);
 			$sortby = $line['sortby'];
 			$defdisplay = $line['defdisplay'];
 			$replyby = $line['replyby'];
@@ -241,6 +245,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$allowmod = true;
 			$allowdel = false;
 			$allowlikes = false;
+			$viewafterpost = false;
 			$replyby = 2000000000;
 			$postby = 2000000000;
 			$hassubscrip = false;
@@ -454,6 +459,11 @@ if ($overwriteBody==1) {
 		<span class=form>Turn on "liking" posts:</span>
 		<span class=formright>
 			<input type=checkbox name="allowlikes" value="1" <?php if ($allowlikes) { echo "checked=1";}?>/>
+		</span><br class="form"/>
+		
+		<span class=form>Viewing before posting:</span>
+		<span class=formright>
+			<input type=checkbox name="viewafterpost" value="1" <?php if ($viewafterpost) { echo "checked=1";}?>/> Prevent students from viewing posts until they have created a thread.<br/><i>You will likely also want to disable modifying posts</i>
 		</span><br class="form"/>
 		
 		<span class=form>Get email notify of new posts:</span>

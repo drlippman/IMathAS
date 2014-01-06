@@ -80,6 +80,15 @@ if (isset($_POST['checked'])) { //form submitted
 			$sops[] = " & ~8";
 		}
 	}
+	if (isset($_POST['chgviewafterpost'])) {
+		if (isset($_POST['viewafterpost']) && $_POST['viewafterpost']==1) {
+			//turn on 8's bit
+			$sops[] = " | 16";
+		} else {
+			//turn off 8's bit
+			$sops[] = " & ~16";
+		}
+	}
 	if (count($sops)>0) {
 		$out = "settings";
 		foreach ($sops as $op) {
@@ -328,6 +337,13 @@ foreach($forumitems as $id=>$name) {
 	<td class="r">Turn on "liking" posts: </td>
 	<td>
 		<input type=checkbox name="allowlikes" value="1"/>
+	</td>
+</tr>
+<tr class="coptr">
+	<td><input type="checkbox" name="chgviewafterpost" class="chgbox"/></td>
+	<td class="r">Viewing before posting:</td>
+	<td>
+		<input type=checkbox name="viewafterpost" value="1"/> Prevent students from viewing posts until they have created a thread.<br/><i>You will likely also want to disable modifying posts</i>
 	</td>
 </tr>
 <tr class="coptr">

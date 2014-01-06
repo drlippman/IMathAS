@@ -105,7 +105,7 @@ div { zoom: 1; }
 <script src="<?php echo $imasroot . "/javascript/AMhelpers_min.js?v=112513";?>" type="text/javascript"></script>
 <?php 
 if (isset($sessiondata['useflash'])) {
-	echo '<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>';
+	echo '<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>';
 }
 ?>
 <script src="<?php echo $imasroot . "/javascript/confirmsubmit.js";?>" type="text/javascript"></script>
