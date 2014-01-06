@@ -199,13 +199,13 @@
 		<input type=radio name=orderby value="2" <?php writeHtmlChecked($orderby&~1,2);?>/> Order alphabetically<br/> 
 	</span><br class=form />
 	
+	<fieldset><legend>Default gradebook view:</legend>
 	<span class=form>Default user order:</span>
 	<span class=formright>
 		<input type=radio name=usersort value="0" <?php writeHtmlChecked($usersort,0);?>/> Order by section (if used), then Last name<br/> 
 		<input type=radio name=usersort value="1" <?php writeHtmlChecked($usersort,1);?>/> Order by Last name
 	</span><br class=form />
 	
-	<p>Default gradebook view:</p>
 	<span class=form>Links show:</span>
 	<span class=formright>
 		<input type=radio name="gbmode100" value="0"  <?php writeHtmlChecked($links,0);?>/> Full Test <br/>
@@ -259,10 +259,11 @@
 		<input type="checkbox" name="stugbmode4" value="4" <?php writeHtmlChecked(($stugbmode)&4,4);?>/> Past Due and Available<br/>
 		<input type="checkbox" name="stugbmode8" value="8" <?php writeHtmlChecked(($stugbmode)&8,8);?>/> All (including future)<br/>
 	</span><br class="form" />
+	</fieldset>
+	<fieldset><legend>Gradebook Categories</legend>
 <?php	
 	$row = explode(',',$defaultcat);
 	array_unshift($row,"Default");
-	echo "Categories";
 	echo "<table class=gb><thead>";
 	echo "<tr><th>Category Name</th><th>Display<sup>*</sup></th><th>Scale (optional)</th><th>Drops</th><th id=weighthdr>";
 	if ($useweights==0) {
@@ -282,8 +283,9 @@
 	
 	echo "</tbody></table>";
 	//echo "<p><input type=submit name=addnew value=\"Add New Category\"/></p>";
-	echo '<p><input type="button" value="Add New Category" onclick="addcat()" />';
-	echo '<input type=submit name=submit value="Update"/></p>';
+	echo '<p><input type="button" value="Add New Category" onclick="addcat()" /></p>';
+	echo '</fieldset>';
+	echo '<div class="submit"><input type=submit name=submit value="'._('Save Changes').'"/></div>';
 	echo "</form>";
 	echo '<p><sup>*</sup>When a category is set to Expanded, both the category total and all items in the category are displayed. ';
 	echo 'When a category is set to Collapsed, only the category total is displayed, but all the items are still counted normally. ';

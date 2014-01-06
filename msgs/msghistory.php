@@ -1,5 +1,5 @@
 <?php
-	//Displays forums posts
+	//Displays message history as conversation
 	//(c) 2006 David Lippman
 	
 	require("../validate.php");
@@ -14,11 +14,7 @@
 	} else {
 		$isteacher = false;
 	}
-	if (isset($_GET['view'])) {
-		$view = $_GET['view'];
-	} else {
-		$view = 0;  //0: expanded, 1: collapsed, 2: condensed
-	}
+
 	if (isset($_GET['filtercid'])) {
 		$filtercid = $_GET['filtercid'];
 	} else if ($cid!='admin' && $cid>0) {
@@ -26,6 +22,7 @@
 	} else {
 		$filtercid = 0;
 	}
+	$view = 0;
 	
 	$cid = $_GET['cid'];
 	$msgid = $_GET['msgid'];
@@ -141,13 +138,10 @@
 	echo '<div id="headermsghistory" class="pagetitle"><h2>Message Conversation</h2></div>';
 	echo "<p><a href=\"viewmsg.php?page=$page&cid=$cid&msgid=$msgid&type=$type&filtercid=$filtercid\">Back to Message</a></p>";
 	//echo "<p><b>Message: {$subject[$msgid]}</b></p>\n";
-	echo "<input type=button value=\"Expand All\" onclick=\"showall()\"/>";
+	echo "<input type=button value=\"Expand All\" onclick=\"expandall()\"/>";
 	echo "<input type=button value=\"Collapse All\" onclick=\"collapseall()\"/>";
-	if ($view==2) {
-		echo "<a href=\"msghistory.php?view=$view&cid=$cid&page=$page&msgid=$msgid&view=0\">View Expanded</a>";
-	} else {
-		echo "<a href=\"msghistory.php?view=$view&cid=$cid&page=$page&msgid=$msgid&view=2\">View Condensed</a>";
-	}
+	echo " <input type=button value=\"Show All\" onclick=\"showall()\"/>";
+	echo "<input type=button value=\"Hide All\" onclick=\"hideall()\"/> ";
 	
 ?>	
 	<script type="text/javascript">
@@ -283,8 +277,8 @@
 					if ($ownerid[$child]!=$userid && $cansendmsgs) {
 						echo "<a href=\"msglist.php?cid=$cid&filtercid=$filtercid&page=$page&type=$type&add=new&to={$ownerid[$child]}&toquote=$child\">Reply</a> ";
 					}
-					echo "<input type=button id=\"buti$icnt\" value=\"Hide\" onClick=\"toggleitem($icnt)\">\n";
 				}
+				echo "<input type=button id=\"buti$icnt\" value=\"Hide\" onClick=\"toggleitem($icnt)\">\n";
 				
 				echo "</span>\n";
 				echo "<b>{$subject[$child]}</b><br/>Posted by: ";
@@ -327,7 +321,7 @@
 	printchildren(0);
 	
 	echo "<script type=\"text/javascript\">";
-	echo "var bcnt =".$bcnt.";\n";
+	echo "var bcnt =".$bcnt."; var icnt = $icnt;\n";
 	echo "</script>";
 	require("../footer.php");
 ?>

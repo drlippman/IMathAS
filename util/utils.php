@@ -119,7 +119,8 @@ if (isset($_GET['form'])) {
 	echo '<a href="updateextref.php">Update ExtRefs</a><br/>';
 	echo '<a href="listwronglibs.php">List WrongLibFlags</a><br/>';
 	echo '<a href="updatewronglibs.php">Update WrongLibFlags</a><br/>';
-	
+	echo '<a href="blocksearch.php">Search Block titles</a><br/>';
+	echo '<a href="itemsearch.php">Search inline/linked items</a><br/>';
 	require("../footer.php");
 }
 ?>

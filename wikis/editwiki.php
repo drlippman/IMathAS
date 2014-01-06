@@ -215,7 +215,7 @@ if (isset($lasteditedby)) {
 	<?php echo htmlentities($revisiontext);?></textarea>
 	</div>
 	
-	<div class=submit><input type=submit value=Submit></div>
+	<div class=submit><input type=submit value="<?php echo _("Save Revision");?>"></div>
 	</form>		
 <?php
 }

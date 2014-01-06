@@ -156,7 +156,12 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	if ($quickview=="on") {
 		$_GET['folder'] = '0';
 	}
-	
+	if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==3) {
+		$useleftstubar = false;
+		$useleftbar = false;
+		$nocoursenav = true;
+		$usernameinheader = false;
+	}
 	//get exceptions
 	$now = time() + $previewshift;
 	$exceptions = array();
@@ -211,22 +216,48 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	
 	$curBreadcrumb = $breadcrumbbase;
 	if (isset($backtrack) && count($backtrack)>0) {
-		$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder=0\">$coursename</a> ";
-		for ($i=0;$i<count($backtrack);$i++) {
-			$curBreadcrumb .= "&gt; ";
-			if ($i!=count($backtrack)-1) {
-				$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">";
+		if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==3) {
+			$curBreadcrumb = '';
+			$sendcrumb = '';
+			$depth = substr_count($sessiondata['ltiitemid'][1],'-');
+			for ($i=$depth-1;$i<count($backtrack);$i++) {
+				if ($i>$depth-1) {
+					$curBreadcrumb .= " &gt; ";
+					$sendcrumb .= " &gt; ";
+				}
+				if ($i!=count($backtrack)-1) {
+					$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">";
+				}
+				$sendcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">".stripslashes($backtrack[$i][0]).'</a>';
+				$curBreadcrumb .= stripslashes($backtrack[$i][0]);
+				if ($i!=count($backtrack)-1) {
+					$curBreadcrumb .= "</a>";
+				}
 			}
-			$curBreadcrumb .= stripslashes($backtrack[$i][0]);
-			if ($i!=count($backtrack)-1) {
-				$curBreadcrumb .= "</a>";
+			$curname = $backtrack[count($backtrack)-1][0];
+			if (count($backtrack)>$depth) {
+				$backlink = "<span class=right><a href=\"course.php?cid=$cid&folder=".$backtrack[count($backtrack)-2][1]."\">" . _('Back') . "</a></span><br class=\"form\" />";
 			}
-		}
-		$curname = $backtrack[count($backtrack)-1][0];
-		if (count($backtrack)==1) {
-			$backlink =  "<span class=right><a href=\"course.php?cid=$cid&folder=0\">" . _('Back') . "</a></span><br class=\"form\" />";
+			$_SESSION['backtrack'] = array($sendcrumb,$backtrack[count($backtrack)-1][1]);
+			
 		} else {
-			$backlink = "<span class=right><a href=\"course.php?cid=$cid&folder=".$backtrack[count($backtrack)-2][1]."\">" . _('Back') . "</a></span><br class=\"form\" />";
+			$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder=0\">$coursename</a> ";
+			for ($i=0;$i<count($backtrack);$i++) {
+				$curBreadcrumb .= " &gt; ";
+				if ($i!=count($backtrack)-1) {
+					$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">";
+				}
+				$curBreadcrumb .= stripslashes($backtrack[$i][0]);
+				if ($i!=count($backtrack)-1) {
+					$curBreadcrumb .= "</a>";
+				}
+			}
+			$curname = $backtrack[count($backtrack)-1][0];
+			if (count($backtrack)==1) {
+				$backlink =  "<span class=right><a href=\"course.php?cid=$cid&folder=0\">" . _('Back') . "</a></span><br class=\"form\" />";
+			} else {
+				$backlink = "<span class=right><a href=\"course.php?cid=$cid&folder=".$backtrack[count($backtrack)-2][1]."\">" . _('Back') . "</a></span><br class=\"form\" />";
+			}
 		}
 	} else {
 		$curBreadcrumb .= $coursename;
@@ -300,6 +331,16 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		}
 	}
 	
+	//get read linked items
+	$readlinkeditems = array();
+	if ($coursetheme=='otbsreader.css' && isset($studentid)) {
+		$query = "SELECT DISTINCT typeid FROM imas_content_track WHERE userid='$userid' AND type='linkedlink' AND courseid='$cid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			$readlinkeditems[$row[0]] = true;	
+		}
+	}
+	
 	//get active chatters
 	if (isset($mathchaturl) &&  $chatset==1) {
 		if (substr($mathchaturl,0,4)=='http') {
@@ -337,7 +378,10 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 }
   
 $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/course.js?v=092413\"></script>";
-
+if (isset($tutorid) && isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==3) {
+	$placeinhead .= '<script type="text/javascript">$(function(){$(".instrdates").hide();});</script>';
+}
+	
 /******* begin html output ********/
 require("../header.php");
 
@@ -436,7 +480,14 @@ if ($overwriteBody==1) {
 ?>
 		</p>
 	<?php
-	if (!isset($CFG['CPS']['leftnavtools']) || $CFG['CPS']['leftnavtools']!==false) {
+	if (isset($CFG['CPS']['leftnavtools']) && $CFG['CPS']['leftnavtools']=='limited') {
+	?>
+		<p><b><?php echo _('Tools'); ?></b><br/>
+			<a href="managestugrps.php?cid=<?php echo $cid ?>"><?php echo _('Groups'); ?></a><br/>
+			<a href="addoutcomes.php?cid=<?php echo $cid ?>"><?php echo _('Outcomes'); ?></a><br/>
+		</p>
+	<?php
+	} else if (!isset($CFG['CPS']['leftnavtools']) || $CFG['CPS']['leftnavtools']!==false) {
 	?>
 		<p><b><?php echo _('Tools'); ?></b><br/>
 			<a href="listusers.php?cid=<?php echo $cid ?>" class="essen"><?php echo _('Roster'); ?></a><br/>
@@ -557,7 +608,9 @@ if ($overwriteBody==1) {
 	   	   
 	   if ($quickview=='on' && isset($teacherid)) {
 		   echo '<style type="text/css">.drag {color:red; background-color:#fcc;} .icon {cursor: pointer;}</style>';
-		   echo "<script>var AHAHsaveurl = '$imasroot/course/savequickreorder.php?cid=$cid';</script>";
+		   echo "<script>var AHAHsaveurl = '$imasroot/course/savequickreorder.php?cid=$cid';";
+		   echo 'var unsavedmsg = "'._("You have unrecorded changes.  Are you sure you want to abandon your changes?").'";';
+		   echo "</script>";
 		   echo "<script src=\"$imasroot/javascript/mootools.js\"></script>";
 		   echo "<script src=\"$imasroot/javascript/nested1.js?v=0122102\"></script>";
 		   echo '<ul id=qviewtree class=qview>';
@@ -567,12 +620,16 @@ if ($overwriteBody==1) {
 	   } else {
 		   showitems($items,$_GET['folder']);
 	   }
-	    
-	 
-	  
-	
+
    } else {
-	   if (isset($teacherid)) {echo generateadditem($_GET['folder'],'t');}
+	   if (isset($teacherid) && $quickview!='on') {
+	   	   if ($_GET['folder']=='0') {
+			echo '<p><b>Welcome to your course!</b></p>';
+			echo '<p>To start by copying from another course, use the <a href="copyitems.php?cid='.$cid.'">Course Items: Copy</a> ';
+			echo 'link along the left side of the screen.</p><p>If you want to build from scratch, use the "Add An Item" pulldown below to get started.</p><p>&nbsp;</p>';
+	   	   }
+	   	echo generateadditem($_GET['folder'],'t');
+	   }
    }
    if (isset($backlink)) {
 	   echo $backlink;
@@ -580,7 +637,7 @@ if ($overwriteBody==1) {
    
    if (($useleftbar && isset($teacherid)) || ($useleftstubar && !isset($teacherid))) {
 	   echo "</div>";
-   } else {
+   } else if (!isset($nocoursenav)) {
 	  
 ?>	   
 	<div class=cp>
@@ -748,10 +805,10 @@ function makeTopMenu() {
 			echo _('Quick View.'), " <a href=\"course.php?cid=$cid&quickview=off\">", _('Back to regular view'), "</a>. ";
 		} 
 		if (isset($CFG['CPS']['miniicons'])) {
-			echo _('Use icons to drag-and-drop order.'),' ',_('Click the icon next to a block to expand or collapse it. Click an item title to edit it in place.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Record Changes'), '" onclick="submitChanges()"/>';
+			echo _('Use icons to drag-and-drop order.'),' ',_('Click the icon next to a block to expand or collapse it. Click an item title to edit it in place.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges()"/>';
 		
 		} else {
-			echo _('Use colored boxes to drag-and-drop order.'),' ',_('Click the B next to a block to expand or collapse it. Click an item title to edit it in place.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Record Changes'), '" onclick="submitChanges()"/>';
+			echo _('Use colored boxes to drag-and-drop order.'),' ',_('Click the B next to a block to expand or collapse it. Click an item title to edit it in place.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges()"/>';
 		}
 		 echo '<span id="submitnotice" style="color:red;"></span>';
 		 echo '<div class="clear"></div>';

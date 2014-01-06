@@ -61,10 +61,10 @@ if ($overwriteBody==1) {
 		echo "the print layout, you will be given the chance to specify additional print options.</p>\n";
 		echo "<p>Longer questions, such as those with graphs, may appear cut off in the print layout page.  Be sure to resize those questions ";
 		echo "to show the entire question.</p>\n";
+		echo '<p>Be warned that this feature does not work well for long assessments.</p>';
 		echo "<input type=submit value=\"Continue\">\n";
 		echo "<p><sup>*</sup><em>Note: FireFox prints high-quality math, but has a bug that prevents it from printing graphs with text (such as axes labels) correctly</em></p>\n";
 		echo "</form>\n";
-		echo "<p>To generate versions to cut-and-paste, use <a href=\"printlayoutbare.php?cid=$cid&aid=$aid\">this page</a></p>";
 	} else {
 		echo "<form method=post action=\"printlayout.php?cid=$cid&aid=$aid&final=1\">\n";
 		echo "<input type=hidden name=heights value=\"{$_POST['heights']}\">\n";

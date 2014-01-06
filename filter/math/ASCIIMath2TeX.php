@@ -778,6 +778,7 @@ function AMTparseAMtoTeX($str) {
 	$this->AMnestingDepth = 0;
 	$str = str_replace(array('&nbsp;','&gt;','&lt;'),array('','>','<'),$str);
 	$str = preg_replace('/^\s+/','',$str);
+	if (trim($str)=='') {return '';}
 	
 	$result = $this->AMTparseExpr($str, false);
 	$result[0] = '\\displaystyle'.str_replace('$','\\$',$result[0]);

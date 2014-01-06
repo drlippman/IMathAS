@@ -34,10 +34,8 @@ switch($_GET['action']) {
 			$md5pw =md5("password");
 		}
 		$query = "UPDATE imas_users SET password='$md5pw' WHERE id='{$_GET['id']}'";
-		echo $query;
 		if ($myrights < 100) { $query .= " AND groupid='$groupid' AND rights<100"; }
 		mysql_query($query) or die("Query failed : " . mysql_error());
-		exit;
 		break;
 	case "deladmin":
 		if ($myrights < 75) { echo "You don't have the authority for this action"; break;}
@@ -226,7 +224,7 @@ switch($_GET['action']) {
 		if (isset($CFG['CPS']['toolset']) && $CFG['CPS']['toolset'][1]==0) {
 			$toolset = $CFG['CPS']['toolset'][0];
 		} else {
-			$toolset = 1*!isset($_POST['toolset-cal']) + 2*!isset($_POST['toolset-forum']);
+			$toolset = 1*!isset($_POST['toolset-cal']) + 2*!isset($_POST['toolset-forum']) + 4*!isset($_POST['toolset-reord']);
 		}
 		
 		if (isset($CFG['CPS']['cploc']) && $CFG['CPS']['cploc'][1]==0) {
@@ -365,8 +363,25 @@ switch($_GET['action']) {
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				copyrubrics();
 				mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
-			} 
+			}
 			
+			require("../header.php");
+			echo '<div class="breadcrumb">'.$breadcrumbbase.'<a href="admin.php">Admin</a> &gt; Course Creation Confirmation</div>';
+			echo '<h2>Your course has been created!</h2>';
+			echo '<p>For students to enroll in this course, you will need to provide them two things:<ol>';
+			echo '<li>The course ID: <b>'.$cid.'</b></li>';
+			if (trim($_POST['ekey'])=='') {
+				echo '<li>Tell them to leave the enrollment key blank, since you didn\'t specify one.  The enrollment key acts like a course ';
+				echo 'password to prevent random strangers from enrolling in your course.  If you want to set an enrollment key, ';
+				echo '<a href="forms.php?action=modify&id='.$cid.'">modify your course settings</a></li>';
+			} else {
+				echo '<li>The enrollment key: <b>'.$_POST['ekey'].'</b></li>';
+			}
+			echo '</ol></p>';
+			echo '<p>If you forget these later, you can find them by viewing your course settings.</p>';
+			echo '<a href="../course/course.php?cid='.$cid.'">Enter the Course</a>';
+			require("../footer.php");
+			exit;
 		}
 		break;
 	case "delete":
@@ -837,13 +852,13 @@ switch($_GET['action']) {
 	case "modltidomaincred":
 		if ($myrights <100) { echo "You don't have the authority for this action"; break;}
 		if ($_GET['id']=='new') {
-			$query = "INSERT INTO imas_users (email,SID,password,rights) VALUES ";
-			$query .= "('{$_POST['ltidomain']}','{$_POST['ltikey']}',";
-			$query .= "'{$_POST['ltisecret']}','{$_POST['createinstr']}')";
+			$query = "INSERT INTO imas_users (email,FirstName,LastName,SID,password,rights,groupid) VALUES ";
+			$query .= "('{$_POST['ltidomain']}','{$_POST['ltidomain']}','LTIcredential','{$_POST['ltikey']}',";
+			$query .= "'{$_POST['ltisecret']}','{$_POST['createinstr']}','{$_POST['groupid']}')";
 		} else {
-			$query = "UPDATE imas_users SET email='{$_POST['ltidomain']}',";
+			$query = "UPDATE imas_users SET email='{$_POST['ltidomain']}',FirstName='{$_POST['ltidomain']}',LastName='LTIcredential',";
 			$query .= "SID='{$_POST['ltikey']}',password='{$_POST['ltisecret']}',";
-			$query .= "rights='{$_POST['createinstr']}' WHERE id='{$_GET['id']}'";
+			$query .= "rights='{$_POST['createinstr']}',groupid='{$_POST['groupid']}' WHERE id='{$_GET['id']}'";
 		}
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		break;

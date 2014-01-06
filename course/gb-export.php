@@ -40,20 +40,19 @@
 		}
 		
 		echo '<span class="form">Locked students?</span><span class="formright"><input type="radio" name="locked" value="hide" checked="checked"> Hide <input type="radio" name="locked" value="show" > Show </span><br class="form" />';
-		echo '<span class="form">Separate header line for points possible?</span><span class="formright"><input type="radio" name="pointsln" value="0" checked="checked"> No <br/><input type="radio" name="pointsln" value="1"> Yes</span><br class="form" />';
-		echo '<span class="form">Assessment comments:</span><span class="formright"> <input type="radio" name="commentloc" value="-1" checked="checked"> Don\'t include <br/>  <input type="radio" name="commentloc" value="1"> Separate columns at end <br/><input type="radio" name="commentloc" value="0"> After scores</span><br class="form" />';
+		echo '<span class="form">Separate header line for points possible?</span><span class="formright"><input type="radio" name="pointsln" value="0" checked="checked"> No <input type="radio" name="pointsln" value="1"> Yes</span><br class="form" />';
+		echo '<span class="form">Assessment comments:</span><span class="formright"> <input type="radio" name="commentloc" value="-1" checked="checked"> Don\'t include comments <br/>  <input type="radio" name="commentloc" value="1"> Separate set of columns at the end <br/><input type="radio" name="commentloc" value="0"> After each score column</span><br class="form" />';
 		echo '<span class="form">Include last login date?</span><span class="formright"><input type="radio" name="lastlogin" value="0" checked="checked"> No <input type="radio" name="lastlogin" value="1" > Yes </span><br class="form" />';
 		echo '<span class="form">Include total number of logins?</span><span class="formright"><input type="radio" name="logincnt" value="0" checked="checked"> No <input type="radio" name="logincnt" value="1" > Yes </span><br class="form" />';
 		
 		
 		if (isset($_GET['export'])) {
-			echo '<div class="submit"><input type=submit name="submit" value="Download Gradebook as CSV" /> <input type=submit name="submit" value="Download Gradebook for Excel" /></div>';
+			echo '<p><input type=submit name="submit" value="Download Gradebook as CSV" /> <input type=submit name="submit" value="Download Gradebook for Excel" /> <a href="gradebook.php?cid='.$cid.'">Return to gradebook</a></p>';
 			echo '<p>When you click the <b>Download Gradebook</b> button, your browser will probably ask if you want to save or ';
 			echo 'open the file.  Click <b>Save</b> to save the file to your computer, or <b>Open</b> to open the gradebook in Excel ';
 			echo 'or whatever program your computer has set to open .csv spreadsheet files</p>';
 			echo '<p>A CSV (comma separated values) file will just contain data, and can be opened in most spreadsheet programs</p>';
 			echo '<p>Using the Download for Excel button will generate an HTML file that Excel can open, and will most likely preserve coloring and other formatting</p>';
-			echo '<p><a href="gradebook.php?cid='.$cid.'">Return to gradebook</a></p>';
 		} else {
 			echo '<div class="submit"><input type=submit value="Email Gradebook" /></div>';
 		}

@@ -173,6 +173,7 @@ Leave items blank to use the assessment's default values<br/>
 				}
 				
 				echo '<tr><td>'.$row[1].'</td>';
+				echo '<td>';
 				if ($row[5]!='') {
 					$extref = explode('~~',$row[5]);
 					$hasvid = false;  $hasother = false;
@@ -185,14 +186,13 @@ Leave items blank to use the assessment's default values<br/>
 					}
 					$page_questionTable[$i]['extref'] = '';
 					if ($hasvid) {
-						echo "<td><img src=\"$imasroot/img/video_tiny.png\"/></td>";
+						echo "<img src=\"$imasroot/img/video_tiny.png\"/>";
 					}
 					if ($hasother) {
-						echo "<td><img src=\"$imasroot/img/html_tiny.png\"/></td>";
+						echo "<img src=\"$imasroot/img/html_tiny.png\"/>";
 					}
-				} else {
-					echo '<td></td>';
-				}
+				} 
+				echo '</td>';
 				echo "<td><input type=text size=4 name=\"points{$row[0]}\" value=\"{$row[2]}\" /></td>";
 				echo "<td><input type=text size=4 name=\"attempts{$row[0]}\" value=\"{$row[3]}\" /></td>";
 				echo "<td><select name=\"showhints{$row[0]}\">";
@@ -206,7 +206,7 @@ Leave items blank to use the assessment's default values<br/>
 			echo '<input type=hidden name="qids" value="'.implode(',',$qids).'" />';
 			echo '<input type=hidden name="mod" value="true" />';
 			
-			echo '<div class=submit><input type=submit value=Submit></div>';
+			echo '<div class="submit"><input type="submit" value="'._('Save Settings').'"></div>';
 			
 		} else { //adding new questions
 			echo "<th>Description</th><th></th><th>Points</th><th>Attempts (0 for unlimited)</th><th>Show hints &amp; video buttons?</th><th>Number of Copies to Add</th></tr></thead>";
@@ -256,9 +256,9 @@ Leave items blank to use the assessment's default values<br/>
 			echo '<input type=hidden name="qsetids" value="'.implode(',',$_POST['nchecked']).'" />';
 			echo '<input type=hidden name="add" value="true" />';
 			
-			echo '<p><input type=checkbox name="addasgroup" value="1" /> Add as group?</p>';
+			echo '<p><input type=checkbox name="addasgroup" value="1" /> Add as a question group?</p>';
 			echo '<p><input type=checkbox name="pointsforparts" value="1" /> Set the points equal to the number of parts for multipart?</p>';
-			echo '<div class=submit><input type=submit value=Submit></div>';
+			echo '<div class="submit"><input type="submit" value="'._('Add Questions').'"></div>';
 		}
 		echo '</form>';
 		require("../footer.php");

@@ -108,7 +108,7 @@ if (!isset($imasroot)) {
 	echo '<div class=editor><textarea cols="50" rows="10" name="commonmsg" style="width: 100%">';
 	echo htmlentities($endmsg['commonmsg']);
 	echo '</textarea></div>';
-	echo '<p><input type="submit" value="Submit" /></p>';
+	echo '<div class="submit"><input type="submit" value="'._('Save').'" /></div>';
 	echo '</form>';
 ?>
 <p>Order of entries is not important; the message with highest applicable score will be reported.  

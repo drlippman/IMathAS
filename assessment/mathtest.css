@@ -9,10 +9,10 @@ a:hover {
 }
 
 html {
-	height: 100%;
+	
 }                                
 body {
-	height: 100%;
+	
 	margin: 10px;
 	padding: 0px;
 }
@@ -38,7 +38,13 @@ div.breadcrumb {
 	margin-bottom: 10px;
 	padding: 5px;
 }
-
+div.cpmid {
+	min-height: 1%;
+	padding: 5px;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	border-radius: 4px;
+}
 div.question {
 	/*position: relative;*/
 	font-family: "Times New Roman", Times, serif;
@@ -469,6 +475,22 @@ div.pagetitle h2 {
 	clear: both;
 }
 
+input[type=submit],input[type=button], button {
+	color: #000;
+	background-color: #eee;
+	border-radius: 4px;
+	border: 1px solid #ccc;
+	font: inherit;
+	height:1.5em;
+	padding: 0 8px;
+	margin: 2px 3px;
+}
+input[type=submit].secondarybtn,input[type=button].secondarybtn, button.secondarybtn {
+	background-color: #f9f9f9;
+}
+input[type=submit]:hover, button:hover,input[type=button]:hover {
+	background-color: #e3e3ff;
+}
 #GB_overlay {
   position: fixed;
   margin: auto;

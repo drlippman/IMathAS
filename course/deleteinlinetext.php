@@ -13,7 +13,7 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = "Delete Inline Text";
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
-$curBreadcrumb .= " &gt; Modify Inline Text\n";
+$curBreadcrumb .= " &gt; Delete Inline Text\n";
 
 if (!(isset($teacherid))) {  
 	$overwriteBody = 1;
@@ -93,8 +93,8 @@ if ($overwriteBody==1) {
 <div class=breadcrumb><?php echo $curBreadcrumb; ?></div>
 <h3><?php echo $itemname; ?></h3>
 Are you SURE you want to delete this text item?
-	<p><input type=button value="Yes, Remove" onClick="window.location='deleteinlinetext.php?cid=<?php echo $cid ?>&block=<?php echo $block ?>&id=<?php echo $_GET['id'] ?>&remove=really'">
-	<input type=button value="Nevermind" onClick="window.location='course.php?cid=<?php echo $cid ?>'"></p>
+	<p><input type=button value="Yes, Delete" onClick="window.location='deleteinlinetext.php?cid=<?php echo $cid ?>&block=<?php echo $block ?>&id=<?php echo $_GET['id'] ?>&remove=really'">
+	<input type=button value="Nevermind" class="secondarybtn" onClick="window.location='course.php?cid=<?php echo $cid ?>'"></p>
 
 <?php
 }

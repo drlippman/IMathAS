@@ -528,21 +528,23 @@ function getiteminfo($itemid) {
 	return array($itemtype,$name,$summary,$typeid);
 }
 
-function getsubinfo($items,$parent,$pre,$itemtypelimit=false) {
-	global $ids,$types,$names,$sums,$parents,$gitypeids;
+function getsubinfo($items,$parent,$pre,$itemtypelimit=false,$spacer='|&nbsp;&nbsp;') {
+	global $ids,$types,$names,$sums,$parents,$gitypeids,$prespace,$CFG;
 	if (!isset($gitypeids)) {
 		$gitypeids = array();
 	}
+	
 	foreach($items as $k=>$item) {
 		if (is_array($item)) {
 			$ids[] = $parent.'-'.($k+1);
-			$types[] = $pre."Block";
+			$types[] = "Block";
 			$names[] = stripslashes($item['name']);
+			$prespace[] = $pre;
 			$parents[] = $parent;
 			$gitypeids[] = '';
 			$sums[] = '';
 			if (count($item['items'])>0) {
-				getsubinfo($item['items'],$parent.'-'.($k+1),$pre.'-&nbsp;',$itemtypelimit);
+				getsubinfo($item['items'],$parent.'-'.($k+1),$pre.$spacer,$itemtypelimit,$spacer);
 			}
 		} else {
 			if ($item==null || $item=='') {
@@ -554,8 +556,9 @@ function getsubinfo($items,$parent,$pre,$itemtypelimit=false) {
 			}
 			$ids[] = $item;
 			$parents[] = $parent;
-			$types[] = $pre.$arr[0];
+			$types[] = $arr[0];
 			$names[] = $arr[1];
+			$prespace[] = $pre;
 			$gitypeids[] = $arr[3];
 			$arr[2] = strip_tags($arr[2]);
 			if (strlen($arr[2])>100) {
@@ -566,13 +569,13 @@ function getsubinfo($items,$parent,$pre,$itemtypelimit=false) {
 	}
 }	
 
-function buildexistblocks($items,$parent) {
+function buildexistblocks($items,$parent,$pre='') {
 	global $existblocks;
 	foreach ($items as $k=>$item) {
 		if (is_array($item)) {
-			$existblocks[$parent.'-'.($k+1)] = $item['name'];
+			$existblocks[$parent.'-'.($k+1)] = $pre.$item['name'];
 			if (count($item['items'])>0) {
-				buildexistblocks($item['items'],$parent.'-'.($k+1));
+				buildexistblocks($item['items'],$parent.'-'.($k+1),$pre.'&nbsp;&nbsp;');
 			}
 		}
 	}

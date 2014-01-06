@@ -142,7 +142,7 @@ if ($overwriteBody==1) {
 			<input type=text size=4 name="fullnamecol" value="1" />
 		</span><br class="form" />
 	
-		<div class=submit><input type=submit value="Submit"></div>
+		<div class=submit><input type=submit value="Upload Grades"></div>
 
 	</form>
 	

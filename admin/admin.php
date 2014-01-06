@@ -73,8 +73,8 @@ if ($myrights < 40) {
 		} else {
 			$minrights = 40;
 		}
-		$page_courseList[$i]['addRemove'] = ($myrights<$minrights) ? "" : "<a href=\"forms.php?action=chgteachers&id={$line['id']}\">Add/Remove</a>";
-		$page_courseList[$i]['transfer'] = ($line['ownerid']!=$userid && $myrights <75) ? "" : "<a href=\"forms.php?action=transfer&id={$line['id']}\">Transfer</a>";
+		$page_courseList[$i]['addRemove'] = ($myrights<$minrights) ? "" : "<a href=\"forms.php?action=chgteachers&id={$line['id']}\" class=\"artl\">Add/Remove</a>";
+		$page_courseList[$i]['transfer'] = ($line['ownerid']!=$userid && $myrights <75) ? "" : "<a href=\"forms.php?action=transfer&id={$line['id']}\" class=\"trl\">Transfer</a>";
 		$i++;
 	} 
 	
@@ -182,7 +182,10 @@ $placeinhead .= "}\n";
 $placeinhead .= "function showgroupusers() { ";
 $placeinhead .= "  var grpid=document.getElementById(\"selgrpid\").value; ";
 $placeinhead .= "  window.location='admin.php?showusers='+grpid;";
-$placeinhead .= "}</script>";
+$placeinhead .= "}";
+$placeinhead .= '$(function() {$(".artl").attr("title","'._("Add or remove additional teachers").'");';
+$placeinhead .= '$(".sl").attr("title","'._("Modify course settings").'");$(".trl").attr("title","'._("Transfer course ownership to someone else").'");});';
+$placeinhead .= '</script>';
  
  /******* begin html output ********/
  require("../header.php");
@@ -201,7 +204,7 @@ $placeinhead .= "}</script>";
 	<div class=item>
 	<table class=gb border=0 width="90%">
 		<thead>
-			<tr><th>Name</th><th>Course ID</th><th>Owner</th><th>Modify</th><th>Teachers</th><th>Transfer</th><th>Delete</th>
+			<tr><th>Name</th><th>Course ID</th><th>Owner</th><th>Settings</th><th>Teachers</th><th>Transfer</th><th>Delete</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -237,7 +240,7 @@ $placeinhead .= "}</script>";
 				</td>
 				<td class=c><?php echo $page_courseList[$i]['id'] ?></td>
 				<td><?php echo $page_courseList[$i]['LastName'] ?>, <?php echo $page_courseList[$i]['FirstName'] ?></td>
-				<td class=c><a href="forms.php?action=modify&id=<?php echo $page_courseList[$i]['id'] ?>">Modify</a></td>
+				<td class=c><a href="forms.php?action=modify&id=<?php echo $page_courseList[$i]['id'] ?>" class="sl">Settings</a></td>
 				<td class=c><?php echo $page_courseList[$i]['addRemove'] ?></td> 
 				<td class=c><?php echo $page_courseList[$i]['transfer'] ?></td>
 				<td class=c><a href="forms.php?action=delete&id=<?php echo $page_courseList[$i]['id'] ?>">Delete</a></td>

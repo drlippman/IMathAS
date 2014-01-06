@@ -190,7 +190,7 @@ END;
 	
 	echo "<p>Add new category to lists: <input type=type id=\"newcat\" size=40> ";
 	echo "<input type=button value=\"Add Category\" onclick=\"addcategory()\"></p>\n";
-	echo '<p><input type=submit value="Record Categorizations"> and return to the course page.  <input type="button" value="Reset" onclick="resetcat()"/></p>';
+	echo '<p><input type=submit value="Record Categorizations"> and return to the course page.  <input type="button" class="secondarybtn" value="Reset" onclick="resetcat()"/></p>';
 	echo "</form>\n";
 	
 	

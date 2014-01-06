@@ -251,21 +251,21 @@ if ($overwriteBody==1) {
 	if (isset($_GET['delall']) && isset($teacherid)) {
 		echo '<p>Are you SURE you want to delete all contents and history for '.$grpnote.' Wiki page?</p>';
 		
-		echo "<p><a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid&delall=true\">Yes, I'm Sure</a> | ";
-		echo "<a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid\">Nevermind</a></p>";
+		echo "<p><button type=\"button\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid&delall=true'\">Yes, I'm Sure</button> | ";
+		echo "<button type=\"button\" class=\"secondarybtn\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid'\">Nevermind</button></p>";
 		
 	} else if (isset($_GET['delrev']) && isset($teacherid)) {
 		echo '<p>Are you SURE you want to delete all revision history for '.$grpnote.' Wiki page?  The current version will be retained.</p>';
 		
-		echo "<p><a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid&delrev=true\">Yes, I'm Sure</a> | ";
-		echo "<a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid\">Nevermind</a></p>";
+		echo "<p><button type=\"button\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid&delrev=true'\">Yes, I'm Sure</button> | ";
+		echo "<button type=\"button\" class=\"secondarybtn\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid'\">Nevermind</button></p>";
 	} else if (isset($_GET['revert'])) {
 		$torev = $_GET['torev'];
 		$disprev = $_GET['disprev'];
 		echo '<p>Are you SURE you want to revert to revision '.$disprev.' of '.$grpnote.' Wiki page?  All changes after that revision will be deleted.</p>';
 		
-		echo "<p><a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid&torev=$torev&revert=true\">Yes, I'm Sure</a> | ";
-		echo "<a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid\">Nevermind</a></p>";
+		echo "<p><button type=\"button\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid&torev=$torev&revert=true'\">Yes, I'm Sure</button> | ";
+		echo "<button type=\"button\" class=\"secondarybtn\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid'\">Nevermind</button></p>";
 		
 	} else if (isset($_GET['snapshot'])) {
 		echo "<p>Current Version Code.  <a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid\">Back</a></p>";
@@ -283,13 +283,13 @@ if ($overwriteBody==1) {
 ?>
 <?php
 if (isset($teacherid)) {
-	echo '<p>';
+	echo '<div class="cpmid">';
 	if ($isgroup) {
 		$grpnote = "For this group's wiki: ";
 	}
-	echo "<a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid&delall=ask\">Clear Page Contents</a> | ";
-	echo "<a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid&delrev=ask\">Clear Page History</a> | ";
-	echo "<a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid&snapshot=true\">Current Version Snapshot</a></p>";
+	echo "<button type=\"button\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid&delall=ask'\">Clear Page Contents</button> | ";
+	echo "<button type=\"button\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid&delrev=ask'\">Clear Page History</button> | ";
+	echo "<a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid&snapshot=true\">Current Version Snapshot</a></div>";
 }
 echo '<p><span id="revisioninfo">Revision '.$numrevisions;
 if ($numrevisions>0) {
@@ -312,7 +312,7 @@ if ($numrevisions>1) {
 	<div class="editor">
 <?php
 if ($canedit) {
-	echo "<a href=\"editwiki.php?cid=$cid&id=$id&grp=$groupid\">Edit this page</a>";
+	echo "<button type=\"button\" onclick=\"window.location.href='editwiki.php?cid=$cid&id=$id&grp=$groupid'\">Edit this page</button>";
 }
 ?>	
 	<div class="wikicontent" id="wikicontent"><?php echo filter($text); ?></div></div>

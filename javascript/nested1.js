@@ -296,6 +296,7 @@ window.onDomReady(function() {
 		onFirstChange: function(el) {
 			document.getElementById('recchg').disabled = false;
 			setlinksdisp("none");
+			window.onbeforeunload = function() {return unsavedmsg;}
 		}
 	});
 });
@@ -315,8 +316,8 @@ function toSimpleJSON(a) {
 
 function submitChanges() { 
   var params = 'order='+toSimpleJSON(sortIt.serialize());
-  url = AHAHsaveurl;
-  els = document.getElementsByTagName("input");
+  var url = AHAHsaveurl;
+  var els = document.getElementsByTagName("input");
   for (var i=0; i<els.length; i++) {
 	  if (els[i].type=="hidden") {
 	  	  params += '&'+els[i].id.substring(5) + '=' + encodeURIComponent(els[i].value);
@@ -367,7 +368,7 @@ function NestedahahDone(url, target) {
 }
 
 function setlinksdisp(disp) {
-	el = document.getElementsByTagName("span");
+	var el = document.getElementsByTagName("span");
 	for (var i=0; i<el.length; i++) {
 		if (el[i].className=='links') {
 			el[i].style.display = disp;
@@ -376,7 +377,7 @@ function setlinksdisp(disp) {
 }
 
 function editinplace(el) {
-	inputh = document.getElementById('input'+el.id);
+	var inputh = document.getElementById('input'+el.id);
 	if (inputh==null) {
 		var inputh = document.createElement("input");
 		inputh.id = 'input'+el.id;
@@ -398,15 +399,17 @@ function editinplace(el) {
 }
 
 function editinplaceun() {
-	el = document.getElementById(this.id.substring(6));
-	input =  document.getElementById('input'+this.id.substring(6));
+	var el = document.getElementById(this.id.substring(6));
+	var input =  document.getElementById('input'+this.id.substring(6));
 	if (el.innerHTML != this.value) {
 		el.innerHTML = this.value;
 		//input.parentNode.removeChild(input);
 		input.value = this.value;
 		document.getElementById('recchg').disabled = false;
 		setlinksdisp("none");
+		window.onbeforeunload = function() {return unsavedmsg;}
 	}
+
 	el.style.display = 'inline';
 	this.style.display = "none";
 	

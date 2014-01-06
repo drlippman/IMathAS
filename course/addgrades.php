@@ -176,7 +176,7 @@
 	}
 	
 	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addgrades.js?v=050310\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addgrades.js?v=121213\"></script>";
 	$placeinhead .= '<style type="text/css">	
 		 .suggestion_list
 		 {
@@ -444,8 +444,8 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 		}
 		*/
 		echo '<div id="gradeboxes">';
-		echo '<input type=button value="Expand Feedback Boxes" onClick="togglefeedback(this)"/>';
-		echo ' Use quicksearch entry? <input type="checkbox" id="useqa" onclick="togglequickadd(this)" />';
+		echo '<input type=button value="Expand Feedback Boxes" onClick="togglefeedback(this)"/> ';
+		echo '<button type="button" id="useqa" onclick="togglequickadd(this)">'._("Use Quicksearch Entry").'</button>';
 		if ($hassection) {
 			echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 		}
@@ -455,7 +455,7 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 			echo "<span class=form>Add/Replace to all feedback:</span><span class=formright><input type=text size=40 id=\"toallfeedback\"/>";
 			echo ' <input type=button value="Append" onClick="sendtoall(1,0);"/> <input type=button value="Prepend" onclick="sendtoall(1,1)"/> <input type=button value="Replace" onclick="sendtoall(1,2)"/></span><br class="form"/>';
 		}
-	
+		echo '<div class="clear"></div>';
 		echo "<table id=myTable><thead><tr><th>Name</th>";
 		if ($hassection) {
 			echo '<th>Section</th>';
@@ -525,7 +525,7 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 				echo printrubriclink($rubric,$points,"score{$row[0]}","feedback{$row[0]}");
 			}
 			echo "</td>";
-			echo "<td><textarea style=\"display:hidden;\" cols=40 rows=1 id=\"feedback{$row[0]}\" name=\"feedback[{$row[0]}]\">{$feedback[$row[0]]}</textarea></td>";
+			echo "<td><textarea cols=60 rows=1 id=\"feedback{$row[0]}\" name=\"feedback[{$row[0]}]\">{$feedback[$row[0]]}</textarea></td>";
 			echo "</tr>";
 		}
 		

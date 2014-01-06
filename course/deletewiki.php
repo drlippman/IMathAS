@@ -11,7 +11,7 @@ require("../validate.php");
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Delete Wiki";
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; Remove Wiki";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; Delete Wiki";
 	
 if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missing go back to the index page
 	$overwriteBody = 1;
@@ -82,8 +82,8 @@ if ($overwriteBody==1) {
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
 		<h3><?php echo $itemname; ?></h3>
 		Are you SURE you want to delete this Wiki and all associated revisions?
-		<p><input type=button value="Yes, Remove" onClick="window.location='deletewiki.php?cid=<?php echo $_GET['cid'] ?>&block=<?php echo $block ?>&id=<?php echo $_GET['id'] ?>&remove=really'">
-		<input type=button value="Nevermind" onClick="window.location='course.php?cid=<?php echo $_GET['cid'] ?>'">
+		<p><input type=button value="Yes, Delete" onClick="window.location='deletewiki.php?cid=<?php echo $_GET['cid'] ?>&block=<?php echo $block ?>&id=<?php echo $_GET['id'] ?>&remove=really'">
+		<input type=button value="Nevermind" class="secondarybtn" onClick="window.location='course.php?cid=<?php echo $_GET['cid'] ?>'">
 		</p>
 
 <?php

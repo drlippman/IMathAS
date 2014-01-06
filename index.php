@@ -339,7 +339,7 @@ function printCourses($data,$title,$type=null) {
 	for ($i=0; $i<count($data); $i++) {
 		echo '<li>';
 		if ($type=='take') {
-			echo '<span class="delx" onclick="return hidefromcourselist(this,'.$data[$i]['id'].');">x</span>';
+			echo '<span class="delx" onclick="return hidefromcourselist(this,'.$data[$i]['id'].');" title="'._("Hide from course list").'">x</span>';
 		}
 		echo '<a href="course/course.php?folder=0&cid='.$data[$i]['id'].'">';
 		echo $data[$i]['name'].'</a>';

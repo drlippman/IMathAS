@@ -119,7 +119,7 @@ if ($overwriteBody==1) { //NO AUTHORITY
 	} else if (isset($_GET['delete'])) {
 		echo "<p>Are you sure you want to delete all one-time passwords for this diagnostic?</p>\n";
 		echo "<p><input type=button value=\"Delete\" onclick=\"window.location='diagonetime.php?id=$diag&delete=true'\">\n";
-		echo "<input type=button value=\"Nevermind\" onclick=\"window.location='admin.php'\"></p>\n";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='admin.php'\"></p>\n";
 	} else {
 		echo "<b>All one-time passwords</b> <a href=\"diagonetime.php?id=$diag&generate=true\">Generate</a> <a href=\"diagonetime.php?id=$diag&delete=check\">Delete all</a>";
 		echo '<table><thead><tr><th>Codes</th><th>Good For</th><th>Created</th></tr></thead><tbody>';

@@ -418,7 +418,7 @@ if ($overwriteBody==1) {
 		echo "<form method=\"post\" action=\"managestugrps.php?cid=$cid&addgrpset=true\">";
 		echo '<p>New group set name: <input name="grpsetname" type="text" /></p>';
 		echo '<p><input type="submit" value="Create" />';
-		echo "<input type=button value=\"Nevermind\" onClick=\"window.location='managestugrps.php?cid=$cid'\" /></p>";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid'\" /></p>";
 		echo '</form>';
 	} else if (isset($_GET['delgrpset'])) {
 		echo '<h4>Delete student group set</h4>';
@@ -446,14 +446,14 @@ if ($overwriteBody==1) {
 			echo '<p>This set of groups is not currently being used</p>';
 		}
 		echo "<p><input type=button value=\"Yes, Delete\" onClick=\"window.location='managestugrps.php?cid=$cid&delgrpset={$_GET['delgrpset']}&confirm=true'\" /> ";
-		echo "<input type=button value=\"Nevermind\" onClick=\"window.location='managestugrps.php?cid=$cid'\" /></p>";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid'\" /></p>";
 		
 	} else if (isset($_GET['rengrpset'])) {
 		echo '<h4>Rename student group set</h4>';
 		echo "<form method=\"post\" action=\"managestugrps.php?cid=$cid&rengrpset={$_GET['rengrpset']}\">";
 		echo '<p>New group set name: <input name="grpsetname" type="text" value="'.$page_grpsetname.'"/></p>';
 		echo '<p><input type="submit" value="Rename" />';
-		echo "<input type=button value=\"Nevermind\" onClick=\"window.location='managestugrps.php?cid=$cid'\" /></p>";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid'\" /></p>";
 		echo '</form>';
 	} else if (isset($_GET['addgrp'])) {
 		//add new group set
@@ -464,7 +464,7 @@ if ($overwriteBody==1) {
 		}
 		echo '<p>New group name: <input name="grpname" type="text" /></p>';
 		echo '<p><input type="submit" value="Create" />';
-		echo "<input type=button value=\"Nevermind\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid'\" /></p>";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid'\" /></p>";
 		echo '</form>';
 	} else if (isset($_GET['delgrp'])) {
 		echo '<h4>Delete student group</h4>';
@@ -475,7 +475,7 @@ if ($overwriteBody==1) {
 		echo '<input type="radio" name="delposts" value="0" /> Make group forum posts non-group-specific posts</p>';
 		echo '<p><input type="submit" value="Yes, Delete"> ';
 		//echo "<p><input type=button value=\"Yes, Delete\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid&delgrp={$_GET['delgrp']}&confirm=true'\" /> ";
-		echo "<input type=button value=\"Nevermind\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid'\" /></p>";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid'\" /></p>";
 		echo '</form>';
 		
 	} else if (isset($_GET['rengrp'])) {
@@ -483,24 +483,31 @@ if ($overwriteBody==1) {
 		echo "<form method=\"post\" action=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&rengrp={$_GET['rengrp']}\">";
 		echo '<p>New group name: <input name="grpname" type="text" value="'.$page_grpname.'"/></p>';
 		echo '<p><input type="submit" value="Rename" />';
-		echo "<input type=button value=\"Nevermind\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid'\" /></p>";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid'\" /></p>";
 		echo '</form>';
 	} else if (isset($_GET['removeall'])) {
 		echo '<h4>Remove ALL group members</h4>';
 		echo "<p>Are you SURE you want to remove <b>ALL</b> members of the student group <b>$page_grpname</b>?</p>";
 		echo "<p><input type=button value=\"Yes, Remove\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid&removeall={$_GET['removeall']}&confirm=true'\" /> ";
-		echo "<input type=button value=\"Nevermind\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid'\" /></p>";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid'\" /></p>";
 	} else if (isset($_GET['remove']) && $_GET['grpid']) {
 		echo '<h4>Remove group member</h4>';
 		echo "<p>Are you SURE you want to remove <b>$page_stuname</b> from the student group <b>$page_grpname</b>?</p>";
 		echo "<p><input type=button value=\"Yes, Remove\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid&grpid={$_GET['grpid']}&remove={$_GET['remove']}&confirm=true'\" /> ";
-		echo "<input type=button value=\"Nevermind\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid'\" /></p>";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid'\" /></p>";
 	} else if (isset($_GET['grpsetid'])) {
 		?>
 		<script type="text/javascript">
 		var picsize = 0;
-		function rotatepics() {
+		function rotatepics(el) {
 			picsize = (picsize+1)%3;
+			if (picsize==0) {
+				$(el).html("<?php echo _('View Pictures'); ?>");
+			} else if (picsize==1) {
+				$(el).html("<?php echo _('View Big Pictures'); ?>");
+			} else {
+				$(el).html("<?php echo _('Hide Pictures'); ?>");
+			}
 			picshow(picsize);
 		}
 		function picshow(size) {
@@ -528,8 +535,17 @@ if ($overwriteBody==1) {
 		$curdir = rtrim(dirname(__FILE__), '/\\');
 
 		//groupset selected - list members
-		echo "<h4>Managing groups in set $page_grpsetname</h4>";
+		echo "<h3>Managing groups in set $page_grpsetname</h3>";
 		echo '<div id="myTable">';
+		echo "<p><button type=\"button\" onclick=\"window.location.href='managestugrps.php?cid=$cid&grpsetid=$grpsetid&addgrp=true'\">"._('Add New Group').'</button> ';
+		if (array_sum($hasuserimg)>0) {
+			echo ' <button type="button" onclick="rotatepics(this)" >'._('View Pictures').'</button><br/>';
+		}
+		echo '</p>';
+		
+		if (count($page_grps)==0) {
+			echo '<p>No student groups have been created yet</p>';
+		}
 		foreach ($page_grps as $grpid=>$grpname) {
 			echo "<b>Group: $grpname</b> | ";
 			echo "<a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&rengrp=$grpid\">Rename</a> | ";
@@ -553,12 +569,9 @@ if ($overwriteBody==1) {
 			}
 			echo '</ul>';
 		}
+			
 		
-		echo "<p><a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&addgrp=true\">Add New Group</a> ";
-		echo ' <input type="button" value="Pictures" onclick="rotatepics()" /></p>';
-		
-		
-		echo '<h4>Students not in a group</h4>';
+		echo '<h3>Students not in a group yet</h3>';
 		if (count($page_ungrpstu)>0) {
 			echo "<form method=\"post\" action=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&addstutogrp=true\">";
 			echo 'With selected, add to group ';
@@ -595,19 +608,19 @@ if ($overwriteBody==1) {
 			echo '<p>No existing sets of groups</p>';
 		} else {
 			echo '<p>Select a set of groups to modify the groups in that set</p>';
-			echo '<ul>';
+			echo '<table><tbody><tr>';
 			foreach ($page_groupsets as $gs) {
-				echo "<li><a href=\"managestugrps.php?cid=$cid&grpsetid={$gs[0]}\">{$gs[1]}</a> | ";
+				echo "<td><a href=\"managestugrps.php?cid=$cid&grpsetid={$gs[0]}\">{$gs[1]}</a></td><td class=small>";
 				echo "<a href=\"managestugrps.php?cid=$cid&rengrpset={$gs[0]}\">Rename</a> | ";
-				echo "<a href=\"managestugrps.php?cid=$cid&copygrpset={$gs[0]}\">Copy</a> |";
+				echo "<a href=\"managestugrps.php?cid=$cid&copygrpset={$gs[0]}\">Copy</a> | ";
 				echo "<a href=\"managestugrps.php?cid=$cid&delgrpset={$gs[0]}\">Delete</a>";
 				
-				echo '</li>';
+				echo '</td></tr>';
 			}
-			echo '</ul>';
+			echo '</body></table>';
 		}
 		
-		echo "<p><a href=\"managestugrps.php?cid=$cid&addgrpset=ask\">Add new set of groups</a></p>";
+		echo '<p><button type="button" onclick="window.location.href=\'managestugrps.php?cid='.$cid.'&addgrpset=ask\'">'._('Add new set of groups').'</button></p>';
 	}
 	
 }

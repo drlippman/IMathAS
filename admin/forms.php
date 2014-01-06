@@ -14,12 +14,12 @@ switch($_GET['action']) {
 		echo '<div id="headerforms" class="pagetitle"><h2>Delete Course</h2></div>';
 		echo "<p>Are you sure you want to delete the course <b>$name</b>?</p>\n";
 		echo "<p><input type=button value=\"Delete\" onclick=\"window.location='actions.php?action=delete&id={$_GET['id']}'\">\n";
-		echo "<input type=button value=\"Nevermind\" onclick=\"window.location='admin.php'\"></p>\n";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='admin.php'\"></p>\n";
 		break;
 	case "deladmin":
 		echo "<p>Are you sure you want to delete this user?</p>\n";
 		echo "<p><input type=button value=\"Delete\" onclick=\"window.location='actions.php?action=deladmin&id={$_GET['id']}'\">\n";
-		echo "<input type=button value=\"Nevermind\" onclick=\"window.location='admin.php'\"></p>\n";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='admin.php'\"></p>\n";
 		break;
 	case "chgpwd":
 		echo '<div id="headerforms" class="pagetitle"><h2>Change Your Password</h2></div>';
@@ -27,7 +27,7 @@ switch($_GET['action']) {
 		echo "<span class=form>Enter old password:</span>  <input class=form type=password name=oldpw size=40> <BR class=form>\n";
 		echo "<span class=form>Enter new password:</span> <input class=form type=password name=newpw1 size=40> <BR class=form>\n";
 		echo "<span class=form>Verify new password:</span>  <input class=form type=password name=newpw2 size=40> <BR class=form>\n";
-		echo "<div class=submit><input type=submit value=Submit></div></form>\n";
+		echo '<div class=submit><input type="submit" value="'._('Save').'"></div></form>';
 		break;
 	
 	case "chgrights":
@@ -97,7 +97,7 @@ switch($_GET['action']) {
 			echo "</select><br class=form />\n";
 		}
 		
-		echo "<div class=submit><input type=submit value=Submit></div></form>\n";
+		echo "<div class=submit><input type=submit value=Save></div></form>\n";
 		break;
 	case "modify":
 	case "addcourse":
@@ -340,6 +340,11 @@ switch($_GET['action']) {
 			echo '> Forum List';
 			
 			echo '</span><br class=form />';
+			
+			echo '<span class="form">Pull-downs for course item reordering</span>';
+			echo '<span class="formright"><input type="checkbox" name="toolset-reord" value="4" ';
+			if (($toolset&4)==0) { echo 'checked="checked"';}
+			echo '> Show</span><br class="form"/>';
 		}
 		
 		if (!isset($CFG['CPS']['chatset']) || $CFG['CPS']['chatset'][1]==1) {
@@ -424,10 +429,10 @@ switch($_GET['action']) {
 			echo ' /> Left side bar</span><br class=form />';
 		}
 		
-		if (isset($enablebasiclti) && $enablebasiclti==true) {
+		if (isset($enablebasiclti) && $enablebasiclti==true && isset($_GET['id'])) {
 			echo '<span class="form">LTI access secret (max 10 chars; blank to not use)</span>';
 			echo '<span class="formright"><input name="ltisecret" type="text" value="'.$ltisecret.'" maxlength="10"/> ';
-			echo '<a href="#" onclick="document.getElementById(\'ltiurl\').style.display=\'\'; return false;">LTI url/key?</a>';
+			echo '<button type="button" onclick="document.getElementById(\'ltiurl\').style.display=\'\';this.parentNode.removeChild(this);">'._('Show LTI key and URL').'</button>';
 			echo '<span id="ltiurl" style="display:none;">';
 			if (isset($_GET['id'])) {
 				echo '<br/>URL: '.$urlmode.$_SERVER['HTTP_HOST'].$imasroot.'/bltilaunch.php<br/>';
@@ -444,7 +449,7 @@ switch($_GET['action']) {
 			if (($istemplate&2)==2) {echo 'checked="checked"';};
 			echo ' /> Mark as group template course';
 			if ($myrights==100) {
-				echo '<br/><span class="formright"><input type=checkbox name="istemplate" value="1" ';
+				echo '<br/><input type=checkbox name="istemplate" value="1" ';
 				if (($istemplate&1)==1) {echo 'checked="checked"';};
 				echo ' /> Mark as global template course<br/>';
 				echo '<input type=checkbox name="isselfenroll" value="4" ';
@@ -518,7 +523,7 @@ switch($_GET['action']) {
 		
 		echo "<h4>Current Teachers:</h4>\n";
 		$query = "SELECT imas_users.FirstName,imas_users.LastName,imas_teachers.id,imas_teachers.userid ";
-		$query .= "FROM imas_users,imas_teachers WHERE imas_teachers.courseid='{$_GET['id']}' AND ";
+		$query .= "FROM imas_users,imas_teachers WHERE imas_teachers.courseid='{$_GET['id']}' AND " ;
 		$query .= "imas_teachers.userid=imas_users.id ORDER BY imas_users.LastName;";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$num = mysql_num_rows($result);
@@ -527,6 +532,7 @@ switch($_GET['action']) {
 		echo "<table cellpadding=5>\n";
 		$onlyone = ($num==1);
 		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+			
 			if ($onlyone) {
 				echo '<tr><td></td>';
 			} else {
@@ -545,15 +551,16 @@ switch($_GET['action']) {
 		
 		echo "<h4>Potential Teachers:</h4>\n";
 		if ($myrights<100) {
-			$query = "SELECT id,FirstName,LastName,rights FROM imas_users WHERE rights>19 AND rights<>76 AND groupid='$groupid' ORDER BY LastName;";
+			$query = "SELECT id,FirstName,LastName,rights FROM imas_users WHERE rights>19 AND (rights<76 or rights>78) AND groupid='$groupid' ORDER BY LastName;";
 		} else if ($myrights==100) {
-			$query = "SELECT id,FirstName,LastName,rights FROM imas_users WHERE rights>19 AND rights<>76 ORDER BY LastName;";
+			$query = "SELECT id,FirstName,LastName,rights FROM imas_users WHERE rights>19 AND (rights<76 or rights>78) ORDER BY LastName;";
 		}
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		echo '<form method="post" action="actions.php?action=addteacher&cid='.$_GET['id'].'">';
 		echo 'With Selected: <input type="submit" value="Add as Teacher"/>';
 		echo "<table cellpadding=5>\n";
 		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+			if (trim($line['LastName'])=='' && trim($line['FirstName'])=='') {continue;}
 			if ($used[$line['id']]!=true) {
 				//if ($line['rights']<20) { $type = "Tutor/TA/Proctor";} else {$type = "Teacher";}
 				echo '<tr><td><input type="checkbox" name="atid[]" value="'.$line['id'].'"/></td>';
@@ -600,7 +607,7 @@ switch($_GET['action']) {
 		echo "<h3>Transfer Course Ownership</h3>\n";
 		echo '</div>';
 		echo "<form method=post action=\"actions.php?action=transfer&id={$_GET['id']}\">\n";
-		echo "Transfer to: <select name=newowner>\n";
+		echo "Transfer course ownership to: <select name=newowner>\n";
 		$query = "SELECT id,FirstName,LastName FROM imas_users WHERE rights>19";
 		if ($myrights < 100) {
 			$query .= " AND groupid='$groupid'";
@@ -612,7 +619,7 @@ switch($_GET['action']) {
 		}
 		echo "</select>\n";
 		echo "<p><input type=submit value=\"Transfer\">\n";
-		echo "<input type=button value=\"Nevermind\" onclick=\"window.location='admin.php'\"></p>\n";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='admin.php'\"></p>\n";
 		echo "</form>\n";
 		break;
 	case "deloldusers":
@@ -632,7 +639,7 @@ switch($_GET['action']) {
 		echo "<h3>Modify LTI Domain Credentials</h3>\n";
 		echo '</div>';
 		echo "<table><tr><th>Domain</th><th>Key</th><th>Can create Instructors?</th><th>Modify</th><th>Delete</th></tr>\n";
-		$query = "SELECT id,email,SID,rights FROM imas_users WHERE rights=11 OR rights=76";
+		$query = "SELECT id,email,SID,rights FROM imas_users WHERE rights=11 OR rights=76 OR rights=77";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
 			echo "<tr><td>{$row[1]}</td><td>{$row[2]}</td>";
@@ -656,7 +663,16 @@ switch($_GET['action']) {
 		echo "Key: <input type=text name=\"ltikey\" size=20><br/>\n";
 		echo "Secret: <input type=text name=\"ltisecret\" size=20><br/>\n";
 		echo "Can create instructors: <select name=\"createinstr\"><option value=\"11\" selected=\"selected\">No</option>";
-		echo "<option value=\"76\">Yes</option></select><br/>\n";
+		echo "<option value=\"76\">Yes, and creates $installname login</option>";
+		//echo "<option value=\"77\">Yes, with access via LMS only</option>
+		echo "</select><br/>\n";
+		echo 'Associate with group <select name="groupid"><option value="0">Default</option>';
+		$query = "SELECT id,name FROM imas_groups ORDER BY name";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		while ($row = mysql_fetch_row($result)) {
+			echo '<option value="'.$row[0].'">'.$row[1].'</option>';
+		}
+		echo '</select><br/>';
 		echo "<input type=submit value=\"Add LTI Credentials\"></p>\n";
 		echo "</form>\n";
 		break;
@@ -665,7 +681,7 @@ switch($_GET['action']) {
 		echo '<div id="headerforms" class="pagetitle">';
 		echo "<h3>Modify LTI Domain Credentials</h3>\n";
 		echo '</div>';
-		$query = "SELECT id,email,SID,password,rights FROM imas_users WHERE id='{$_GET['id']}'";
+		$query = "SELECT id,email,SID,password,rights,groupid FROM imas_users WHERE id='{$_GET['id']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$row = mysql_fetch_row($result);
 		echo "<form method=post action=\"actions.php?action=modltidomaincred&id={$row[0]}\">\n";
@@ -678,6 +694,15 @@ switch($_GET['action']) {
 		echo ">No</option><option value=\"76\" ";
 		if ($row[4]==76) {echo 'selected="selected"';}
 		echo ">Yes</option></select><br/>\n";
+		echo 'Associate with group <select name="groupid"><option value="0">Default</option>';
+		$query = "SELECT id,name FROM imas_groups ORDER BY name";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		while ($r = mysql_fetch_row($result)) {
+			echo '<option value="'.$r[0].'"';
+			if ($r[0]==$row[5]) { echo ' selected="selected"';}
+			echo '>'.$r[1].'</option>';
+		}
+		echo '</select><br/>';
 		echo "<input type=submit value=\"Update LTI Credentials\">\n";
 		echo "</form>\n";
 		break;
@@ -695,7 +720,7 @@ switch($_GET['action']) {
 			if ($row[0]==0) {
 				echo "<td></td>";
 			} else {
-				echo "<td><a href=\"actions.php?action=delgroup&id={$row[0]}\">Delete</a></td>\n";
+				echo "<td><a href=\"actions.php?action=delgroup&id={$row[0]}\" onclick=\"return confirm('Are you SURE you want to delete this group?');\">Delete</a></td>\n";
 			}
 			echo "</tr>\n";
 		}
@@ -718,7 +743,7 @@ switch($_GET['action']) {
 	case "removediag":
 		echo "<p>Are you sure you want to delete this diagnostic?  This does not delete the connected course and does not remove students or their scores.</p>\n";
 		echo "<p><input type=button value=\"Delete\" onclick=\"window.location='actions.php?action=removediag&id={$_GET['id']}'\">\n";
-		echo "<input type=button value=\"Nevermind\" onclick=\"window.location='admin.php'\"></p>\n";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='admin.php'\"></p>\n";
 		break;
 }
 

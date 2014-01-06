@@ -18,7 +18,7 @@ $url = $_GET['url'];
 $type = $_GET['type'];
 $w = $_GET['w'];
 $h = $_GET['h'];
-if ($type=='tegrity') {
+if ($type=='tegrity' && substr($url,0,18)=='https://tegr.it/y/') {
 	echo '<script type="text/javascript" src="'.$url.'"></script>';
 } else if ($type=='cdf') {
   	echo '<script type="text/javascript" src="'.$urlmode.'www.wolfram.com/cdf-player/plugin/v2.1/cdfplugin.js"></script>';

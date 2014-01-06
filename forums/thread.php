@@ -235,6 +235,7 @@
 	$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/thread.js\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savetagged.php?cid=$cid';";
+	$placeinhead .= '$(function() {$("img[src*=\'flag\']").attr("title","Flag Message");});';
 	$placeinhead .= "var tagfilterurl = '" . $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$pages&cid=$cid&forum=$forumid';</script>";
 	require("../header.php");
 	
@@ -391,7 +392,7 @@
 	echo '<p>';
 	$toshow = array();
 	if (($myrights > 5 && time()<$postby) || $isteacher) {
-		$toshow[] =  "<a href=\"thread.php?page=$page&cid=$cid&forum=$forumid&modify=new\">Add New Thread</a>\n";
+		$toshow[] =  "<button type=\"button\" onclick=\"window.location.href='thread.php?page=$page&cid=$cid&forum=$forumid&modify=new'\">"._('Add New Thread')."</button>";
 	}
 	if ($isteacher) {
 		$toshow[] =  "<a href=\"postsbyname.php?page=$page&cid=$cid&forum=$forumid\">List Posts by Name</a>";
@@ -426,7 +427,7 @@
 		
 	} 
 	if (count($newpost)>0) {
-		$toshow[] =  "<a href=\"thread.php?page=$page&cid=$cid&forum=$forumid&markallread=true\">Mark all Read</a>";
+		$toshow[] =  "<button type=\"button\" onclick=\"window.location.href='thread.php?page=$page&cid=$cid&forum=$forumid&markallread=true'\">"._('Mark all Read')."</button>";
 	}
 	
 	echo implode(' | ',$toshow);
@@ -434,7 +435,7 @@
 	echo "</p>";
 	
 ?>
-	<table class=forum>
+	<table class="forum gb">
 	<thead>
 	<tr><th>Topic</th>
 <?php
@@ -442,7 +443,7 @@
 		echo '<th>Group</th>';
 	}
 ?>
-	<th>Replies</th><th>Views (Unique)</th><th>Last Post Date</th></tr>
+	<th>Replies</th><th>Views (Unique)</th><th>Last Post</th></tr>
 	</thead>
 	<tbody>
 <?php
@@ -504,7 +505,7 @@
 			echo "class=tagged";
 		}
 		echo "><td>";
-		echo "<span class=right>\n";
+		echo "<span class=\"right\">\n";
 		if ($line['tag']!='') { //category tags
 			echo '<span class="forumcattag">'.$line['tag'].'</span> ';
 		}
@@ -548,7 +549,7 @@
 	</table>
 <?php
 	if (($myrights > 5 && time()<$postby) || $isteacher) {
-		echo "<p><a href=\"thread.php?page=$page&cid=$cid&forum=$forumid&modify=new\">Add New Thread</a></p>\n";
+		echo "<p><button type=\"button\" onclick=\"window.location.href='thread.php?page=$page&cid=$cid&forum=$forumid&modify=new'\">"._('Add New Thread')."</button></p>\n";
 	}
 	if ($prevnext!='') {
 		echo "<p>$prevnext</p>";

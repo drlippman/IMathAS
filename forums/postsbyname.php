@@ -179,7 +179,8 @@
 	$laststu = -1;
 	$cnt = 0;
 	echo "<input type=\"button\" value=\"Expand All\" onclick=\"toggleshowall()\" id=\"toggleall\"/> ";
-	echo "<a href=\"postsbyname.php?cid=$cid&forum=$forumid&markallread=true\">Mark all Read</a><br/>";
+
+	echo "<button type=\"button\" onclick=\"window.location.href='postsbyname.php?cid=$cid&forum=$forumid&markallread=true'\">"._('Mark all Read')."</button><br/>";
 	
 	if ($isteacher && $haspoints) {
 		echo "<form method=post action=\"thread.php?cid=$cid&forum=$forumid&page=$page&score=true\" onsubmit=\"onsubmittoggle()\">";

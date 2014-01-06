@@ -141,6 +141,8 @@
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
 		} else if ($calledfrom=='gb') {
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid=$cid");
+		} else if ($calledfrom=='itemsearch') {
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/admin.php");
 		}
 		exit;
 	} else {
@@ -153,6 +155,8 @@
 			echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Send Mass $sendtype</div>\n";
 		} else if ($calledfrom=='gb') {
 			echo "&gt; <a href=\"gradebook.php?cid=$cid&gbmode={$_GET['gbmode']}\">Gradebook</a> &gt; Send Mass $sendtype</div>\n";
+		} else if ($calledfrom=='itemsearch') {
+			echo "&gt; Send Mass $sendtype</div>\n";
 		}
 		if (count($_POST['checked'])==0) {
 			echo "No users selected.  ";
@@ -171,6 +175,8 @@
 			echo "<form method=post action=\"listusers.php?cid=$cid&masssend=$sendtype\">\n";
 		} else if ($calledfrom=='gb') {
 			echo "<form method=post action=\"gradebook.php?cid=$cid&gbmode={$_GET['gbmode']}&masssend=$sendtype\">\n";
+		} else if ($calledfrom=='itemsearch') {
+			echo "<form method=post action=\"itemsearch.php?masssend=$sendtype\">\n";
 		}
 		echo "<span class=form><label for=\"subject\">Subject:</label></span>";
 		echo "<span class=formright><input type=text size=50 name=subject id=subject value=\"{$line['subject']}\"></span><br class=form>\n";
@@ -179,8 +185,8 @@
 		echo "<p><i>Note:</i> <b>FirstName</b> and <b>LastName</b> can be used as form-mail fields that will autofill with each students' first/last name</p>";
 		echo "<span class=form><label for=\"self\">Send copy to:</label></span>";
 		echo "<span class=formright><input type=radio name=self id=self value=\"none\">Only Students<br/> ";
-		echo "<input type=radio name=self id=self value=\"self\" checked=checked>Self<br/> ";
-		echo "<input type=radio name=self id=self value=\"allt\">All instructors of this course</span><br class=form>\n";
+		echo "<input type=radio name=self id=self value=\"self\" checked=checked>Students and you<br/> ";
+		echo "<input type=radio name=self id=self value=\"allt\">Students and all instructors of this course</span><br class=form>\n";
 		if ($sendtype=='Message') {
 			echo '<span class="form"><label for="savesent">Save in sent messages?</label></span>';
 			echo '<span class="formright"><input type="checkbox" name="savesent" checked="checked" /></span><br class="form" />';

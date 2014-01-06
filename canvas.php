@@ -9,8 +9,9 @@ if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTT
  $host = $_SERVER['HTTP_HOST'];
  if (isset($CFG['GEN']['addwww']) && substr($host,0,4)!='www.') {
  	$host = 'www.'.$host;
- } else if (substr($host,0,4)=='www.') { //strip www if not required - Canvas can match to higher domains.
- 	 $host = substr($host,4);
+ } 
+ if (substr($host,0,4)=='www.') { //strip www if not required - Canvas can match to higher domains.
+ 	 $shorthost = substr($host,4);
  }
 header("Content-type: text/xml;");
 echo '<?xml version="1.0" encoding="UTF-8"?>';
@@ -27,7 +28,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
     <blti:title><?php echo htmlentities($installname) ?></blti:title>
     <blti:description>Math Assessment</blti:description>
     <blti:extensions platform="canvas.instructure.com">
-      <lticm:property name="domain"><?php echo $host; ?></lticm:property>
+      <lticm:property name="domain"><?php echo $shorthost; ?></lticm:property>
       <lticm:property name="tool_id">resource_selection</lticm:property>
       <lticm:property name="privacy_level">public</lticm:property>
       <lticm:options name="resource_selection">

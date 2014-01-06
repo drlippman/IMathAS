@@ -322,16 +322,16 @@ if (!(isset($teacherid))) {
 			
 		} elseif (isset($_GET['action']) && $_GET['action']=="select") { //DATA MANIPULATION FOR second option
 		
-			$query = "SELECT itemorder FROM imas_courses WHERE id='{$_POST['ctc']}'";
+			$query = "SELECT itemorder,picicons FROM imas_courses WHERE id='{$_POST['ctc']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		
-			$items = unserialize(mysql_result($result,0,0));
+			list($itemorder,$picicons) = mysql_fetch_row($result);
+			$items = unserialize($itemorder);
 			$ids = array();
 			$types = array();
 			$names = array();
 			$sums = array();
 			$parents = array();
-			getsubinfo($items,'0','');
+			getsubinfo($items,'0','',false,' ');
 			
 			$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -405,7 +405,18 @@ $placeinhead .= '<script type="text/javascript">
 			$("#selectitemstocopy").hide();$("#allitemsnote").show();
 		} else {
 			$("#selectitemstocopy").show();$("#allitemsnote").hide();
-		} }</script>';
+		} }
+		
+	$(function() {
+		$("input:radio").change(function() {
+			if ($(this).hasClass("copyr")) {
+				$("#ekeybox").show();
+			} else {
+				$("#ekeybox").hide();
+			}
+		});
+	});	
+		</script>';
 require("../header.php");
 }
 if ($overwriteBody==1) {
@@ -488,11 +499,19 @@ if ($overwriteBody==1) {
 	
 	<table cellpadding=5 class=gb>
 		<thead>
-		<tr><th></th><th>Type</th><th>Title</th><th>Summary</th></tr>
+		<?php
+		if ($picicons) {
+			echo '<tr><th></th><th>Title</th><th>Summary</th></tr>';
+		} else {
+			echo '<tr><th></th><th>Type</th><th>Title</th><th>Summary</th></tr>';
+		}
+		?>
+		
 		</thead>
 		<tbody>
 <?php	
 		$alt=0;
+	
 		for ($i = 0 ; $i<(count($ids)); $i++) {
 			if ($alt==0) {echo "		<tr class=even>"; $alt=1;} else {echo "		<tr class=odd>"; $alt=0;}
 			echo '<td>';
@@ -506,8 +525,29 @@ if ($overwriteBody==1) {
 			}
 ?>
 			</td>
-			<td class="nowrap"><?php echo $types[$i] ?></td>
-			<td><?php echo $names[$i] ?></td>
+			
+		<?php
+			$tdpad = 16*strlen($prespace[$i]);
+			
+			if ($picicons) {
+				echo '<td style="padding-left:'.$tdpad.'px"><img alt="'.$types[$i].'" title="'.$types[$i].'" src="'.$imasroot.'/img/';
+				switch ($types[$i]) {
+					case 'Calendar': echo $CFG['CPS']['miniicons']['calendar']; break;
+					case 'InlineText': echo $CFG['CPS']['miniicons']['inline']; break;
+					case 'LinkedText': echo $CFG['CPS']['miniicons']['linked']; break;
+					case 'Forum': echo $CFG['CPS']['miniicons']['forum']; break;
+					case 'Wiki': echo $CFG['CPS']['miniicons']['wiki']; break;
+					case 'Block': echo $CFG['CPS']['miniicons']['folder']; break;
+					case 'Assessment': echo $CFG['CPS']['miniicons']['assess']; break;
+					case 'Drill': echo $CFG['CPS']['miniicons']['drill']; break;
+				}
+				echo '" class="floatleft"/><div style="margin-left:21px">'.$names[$i].'</div></td>';
+			} else {
+				
+				echo '<td>'.$prespace[$i].$names[$i].'</td>';
+				echo '<td>'.$types[$i].'</td>';
+			}
+		?>
 			<td><?php echo $sums[$i] ?></td>
 		</tr>
 <?php
@@ -516,8 +556,8 @@ if ($overwriteBody==1) {
 		
 		</tbody>
 	</table>
-	
-	<p><b>Options</b></p>
+	<p> </p>
+	<fieldset><legend>Options</legend>
 	<table>
 	<tbody>
 	<tr><td class="r">Copy course settings?</td><td><input type=checkbox name="copycourseopt"  value="1"/></td></tr>
@@ -533,7 +573,7 @@ if ($overwriteBody==1) {
 	
 	<tr><td class="r">Copy "display at top" instructor forum posts? </td><td><input type=checkbox name="copystickyposts"  value="1" checked="checked"/></td></tr>
 	
-	<tr><td class="r">Append text to titles?:</td><td> <input type="text" name="append"></td></tr>
+	<tr><td class="r">Append text to titles?</td><td> <input type="text" name="append"></td></tr>
 	<tr><td class="r">Add to block:</td><td>
 
 <?php
@@ -544,6 +584,7 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 	</td></tr>
 	</tbody>
 	</table>
+	</fieldset>
 	</div>
 	<p><input type=submit value="Copy Items"></p>
 	</form>
@@ -595,14 +636,14 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 	?>
 						<li>
 							<span class=dd>-</span>
-							<input type=radio name=ctc value="<?php echo $line['id'] ?>">
-							<?php echo $line['name'] ?>
-							<?php 
-								if ($line['copyrights']<2) {
-									echo "&copy;\n"; 
-								} else {
-									echo " <a href=\"course.php?cid={$line['id']}\" target=\"_blank\">Preview</a>";
-								}
+							<?php
+							echo '<input type="radio" name="ctc" value="'.$line['id'].'" '.(($line['copyrights']<2)?'class="copyr"':'').'>';
+							echo $line['name'];
+							if ($line['copyrights']<2) {
+								echo "&copy;\n"; 
+							} else {
+								echo " <a href=\"course.php?cid={$line['id']}\" target=\"_blank\">Preview</a>";
+							}
 							?>  
 						</li>
 	<?php
@@ -627,7 +668,17 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 	var ahahurl = '<?php echo $imasroot?>/course/copyitems.php?cid=<?php echo $cid ?>&loadothers=true';
 	function loadothers() {
 		if (!othersloaded) {
-			basicahah(ahahurl, "other");
+			//basicahah(ahahurl, "other");
+			$.ajax({url:ahahurl, dataType:"html"}).done(function(resp) {
+				$('#other').html(resp);
+				$("#other input:radio").change(function() {
+					if ($(this).hasClass("copyr")) {
+						$("#ekeybox").show();
+					} else {
+						$("#ekeybox").hide();
+					}
+				});
+			});
 			othersloaded = true;
 		}
 	}
@@ -695,15 +746,15 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 ?>
 							<li>
 								<span class=dd>-</span>
-								<input type=radio name=ctc value="<?php echo $line['id'] ?>">
-								<?php echo $line['name'] ?>
-								<?php 
-									if ($line['copyrights']<1) {
-										echo "&copy;\n"; 
-									} else {
-										echo " <a href=\"course.php?cid={$line['id']}\" target=\"_blank\">Preview</a>";
-									}
-								?>
+								<?php
+								echo '<input type="radio" name="ctc" value="'.$line['id'].'" '.(($line['copyrights']<2)?'class="copyr"':'').'>';
+								echo $line['name'];
+								if ($line['copyrights']<1) {
+									echo "&copy;\n"; 
+								} else {
+									echo " <a href=\"course.php?cid={$line['id']}\" target=\"_blank\">Preview</a>";
+								}
+								?>  
 							</li>
 <?php
 			}
@@ -745,14 +796,14 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 ?>			
 				<li>
 					<span class=dd>-</span>
-					<input type=radio name=ctc value="<?php echo $row[0] ?>">
-					<?php echo $row[1] ?>
-					<?php 
-						if ($row[2]<2) {
-							echo "&copy;\n"; 
-						} else {
-							echo " <a href=\"course.php?cid={$row[0]}\" target=\"_blank\">Preview</a>";
-						}
+					<?php
+					echo '<input type="radio" name="ctc" value="'.$row[0].'" '.(($row[2]<2)?'class="copyr"':'').'>';
+					echo $row[1];
+					if ($row[2]<2) {
+						echo "&copy;\n"; 
+					} else {
+						echo " <a href=\"course.php?cid={$row[0]}\" target=\"_blank\">Preview</a>";
+					}
 					?>
 				</li>
 
@@ -795,9 +846,11 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 ?>		
 		</ul>
 		
-		<p>For courses marked with &copy;, you must supply the course enrollment key.<br/>
+		<p id="ekeybox" style="display:none;">
+		For courses marked with &copy;, you must supply the course enrollment key to show permission to copy the course.<br/>
 		Enrollment key: <input type=text name=ekey id=ekey size=30></p>
 		<input type=submit value="Select Course Items">
+		<p>&nbsp;</p>
 	</form>
 
 <?php		

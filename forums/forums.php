@@ -65,6 +65,9 @@
 	//get general forum info and page order
 	$now = time();
 	$query = "SELECT * FROM imas_forums WHERE imas_forums.courseid='$cid'";
+	if (!$isteacher) {
+		$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now AND imas_forums.enddate>$now)) ";
+	}
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$forumdata = array();
 	$anyforumsgroup = false;
@@ -323,6 +326,9 @@ if ($searchtype == 'thread') {
 	
 	$query .= " ORDER BY imas_forum_posts.postdate DESC";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	if (mysql_num_rows($result)==0) {
+		echo '<p>No results</p>';
+	}
 	while ($line =  mysql_fetch_array($result, MYSQL_ASSOC)) {
 		echo "<div class=block>";
 		echo "<b>{$line['subject']}</b>";
@@ -364,6 +370,13 @@ if ($searchtype == 'thread') {
 	}
 	
 } else {
+	if (count($forumdata)==0) {
+		if ($isteacher) {
+			echo '<p>There are no forums in this class yet.  You can add forums from the course page.</p>';
+		} else {
+			echo '<p>There are no active forums at this time.</p>';
+		}
+	} else {
 	//default display
 
 ?>
@@ -477,7 +490,7 @@ if ($searchtype == 'thread') {
 	</tbody>
 	</table>
 <?php
-
+	}
 }
 	require("../footer.php");
 ?>

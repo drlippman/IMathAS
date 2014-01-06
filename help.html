@@ -1833,6 +1833,10 @@ These macros are fairly general purpose:
 <li><b>makenumberrequiretimes(array/list)</b>:  Takes an array or list of numbers and generates a string suitable for use as a $requiretimes.  Writes
   the string so that every number in the array must show up in the student answer.  Automatically detects and adjusts for number overlaps
   (like 2 appearing in 32).</li>
+<li><b>ABarray(start, num)</b>: Produces an array of strings of the form [AB#] which will get replaced with answerboxes if placed in the question text. 
+  start is the first value used, and num indicates the number of entries to create.
+  ABarray(5,2) will output array("[AB5]","[AB6]").  
+  This macro is often used in conjunction with the showarrays macro.</li>
 </ul>
 </div>
 <div class=h2>
@@ -2857,7 +2861,8 @@ This type of question can contain multiple parts, where each part is one of the 
 	to the first element of $anstypes.  Likewise, to set the variables for the "numfunc" type, you'd set $variables[5] = "x".</dd>
 <dt>$answerbox[partnum] (In Question Text)</dt>
 	<dd>The array $answerbox will contain the entry boxes for each answer type.  In the question text, you will need to position
-	these boxes within the question.  For example:  "Enter a number: $answerbox[0].  Now a function: $answerbox[5]"</dd>
+	these boxes within the question.  For example:  "Enter a number: $answerbox[0].  Now a function: $answerbox[1]".  Alternatively, you 
+	can use [AB#]: "Enter a number: [AB0].  Now a function: [AB1]" </dd>
 </dl>
 </p>
 <p><b>Optional Variables</b><BR>

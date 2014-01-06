@@ -3,12 +3,15 @@
 //(c) David Lippman 2009
 //
 //
-//launches with four types of key/secrets
+//launches with 5 types of key/secrets
 //   username     : of a user with rights 11 or 76 (has to manually entered into database, along with a plaintext password as the secret)
 //   aid_###      : launches assessment with given id.  secret is course's ltisecret
 //   cid_###      : launches course with given id.  secret is course's ltisecret
-//   sso_username : launches single signon using given userid w/ rights 11 or 76. 
-//                 secret value stored in DB password field.  Currently must be manually editted in DB
+//   placein_###  : launches a content linkage selector. In Canvas, uses resource selection return.
+//		    in others, links to resource id (which is lost on LMS course copy)
+//   sso_username : launches single signon to home page using given userid w/ rights 11 or 76. 
+//                  secret value stored in DB password field.  Currently must be manually editted in DB
+//   username	  : like sso_username, but triggers course/item connection  
 //   aid_, cid_, and sso_ types accept additional _0 or _1  :  0 is default, and links LMS account with a local account
 //                                      1 using LMS for validation, does not ask for local account info
 //
@@ -29,6 +32,7 @@ if (!get_magic_quotes_gpc()) {
 	$_REQUEST = array_map('addslashes_deep', $_REQUEST);
 }
 
+
  if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
 	 $urlmode = 'https://';
  } else {
@@ -40,6 +44,7 @@ if ($enablebasiclti!=true) {
 }
 
 function reporterror($err) {
+	global $imasroot;
 	require("header.php");
 	echo "<p>$err</p>";
 	require("footer.php");
@@ -204,7 +209,7 @@ if (isset($_GET['launch'])) {
 	} else if (count($keyparts)>2 && $keyparts[2]==1 && $ltirole=='learner') {
 		$name_only = true;
 	}
-	if ($ltirole=='learner' || $_SESSION['lti_keyrights']==76) {
+	if ($ltirole=='learner' || $_SESSION['lti_keyrights']==76 || $_SESSION['lti_keyrights']==77) {
 		$allow_acctcreation = true;
 	} else {
 		$allow_acctcreation = false;
@@ -278,11 +283,15 @@ if (isset($_GET['launch'])) {
 					} else {
 						$rights = 40;
 					}
+					$newgroupid = intval($_SESSION['lti_keygroupid']);
+					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify,groupid) VALUES ";
+					$query .= "('{$_POST['SID']}','$md5pw',$rights,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot,$newgroupid)";
 				} else {
 					$rights = 10;
+					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify) VALUES ";
+					$query .= "('{$_POST['SID']}','$md5pw',$rights,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot)";
 				}
-				$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify) VALUES ";
-				$query .= "('{$_POST['SID']}','$md5pw',$rights,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot)";
+				
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				$userid = mysql_insert_id();	
 			}
@@ -491,6 +500,11 @@ if (isset($_GET['launch'])) {
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$sourcecid = mysql_result($result,0,0);
 			$_SESSION['place_aid'] = array($sourcecid,$_REQUEST['custom_place_aid']);
+		} else if (isset($_REQUEST['custom_view_folder'])) {
+			$keytype = 'cc-vf';
+			$parts = explode('-',$_REQUEST['custom_view_folder']);
+			$sourcecid = $parts[0];
+			$_SESSION['view_folder'] = array($sourcecid,$parts[1]);
 		}
 	}
 	
@@ -505,6 +519,7 @@ if (isset($_GET['launch'])) {
 	} else {
 		$ltirole = 'learner';
 	}
+
 	$_SESSION['ltirole'] = $ltirole;
 	$_SESSION['lti_context_id'] = $_REQUEST['context_id'];
 	$_SESSION['lti_context_label'] = (!empty($_REQUEST['context_label']))?$_REQUEST['context_label']:$_REQUEST['context_id'];
@@ -515,11 +530,10 @@ if (isset($_GET['launch'])) {
 	$_SESSION['lti_key'] = $ltikey;
 	$_SESSION['lti_keytype'] = $keytype;
 	$_SESSION['lti_keyrights'] = $requestinfo[0]->rights;
+	$_SESSION['lti_keygroupid'] = intval($requestinfo[0]->groupid);
 	if (isset($_REQUEST['selection_directive']) && $_REQUEST['selection_directive']=='select_link') {
 		$_SESSION['selection_return'] = $_REQUEST['launch_presentation_return_url'];
 	}
-	
-	
 	
 	//look if we know this student
 	$orgparts = explode(':',$ltiorg);  //THIS was added to avoid issues when GUID change, while still storing it
@@ -535,8 +549,9 @@ if (isset($_GET['launch'])) {
 		//has name information (should we skip?)
 		//domain level placement and (student or instructor with acceptable key rights)
 		//a _1 type placement and (student or instructor with acceptable key rights)
+	
 		if (((!empty($_REQUEST['lis_person_name_given']) && !empty($_REQUEST['lis_person_name_family'])) || !empty($_REQUEST['lis_person_name_full'])) &&
-		   ((count($keyparts)==1 && $ltirole=='learner') ||
+		   ((count($keyparts)==1 && $ltirole=='learner') || (count($keyparts)==1 && $keytype=='cc-vf' && $_SESSION['lti_keyrights']>75) ||
 		   (count($keyparts)>2 && $keyparts[2]==1 && $ltirole=='learner'))) {
 			if (!empty($_REQUEST['lis_person_name_given']) && !empty($_REQUEST['lis_person_name_family'])) {
 				$firstname = $_REQUEST['lis_person_name_given'];
@@ -564,11 +579,15 @@ if (isset($_GET['launch'])) {
 					} else {
 						$rights = 40;
 					}
+					$newgroupid = intval($_SESSION['lti_keygroupid']);
+					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify,groupid) VALUES ";
+					$query .= "('{$_POST['SID']}','$md5pw',$rights,'$firstname','$lastname','$email',0,'$newgroupid')";
 				} else {
 					$rights = 10;
+					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify) VALUES ";
+					$query .= "('{$_POST['SID']}','$md5pw',$rights,'$firstname','$lastname','$email',0)";
 				}
-				$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify) VALUES ";
-				$query .= "('{$_POST['SID']}','$md5pw',$rights,'$firstname','$lastname','$email',0)";
+				
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				$userid = mysql_insert_id();	
 			}
@@ -620,7 +639,7 @@ $now = time();
 //general placement or common catridge placement - look for placement, or create if know info
 $orgparts = explode(':',$_SESSION['ltiorg']);  //THIS was added to avoid issues when GUID change, while still storing it
 $shortorg = $orgparts[0];
-if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltirole']!='instructor') || $_SESSION['lti_keytype']=='cc-g' || $_SESSION['lti_keytype']=='cc-c') { 
+if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltirole']!='instructor' && $_SESSION['lti_keytype']!='cc-vf') || $_SESSION['lti_keytype']=='cc-g' || $_SESSION['lti_keytype']=='cc-c') { 
 	$query = "SELECT placementtype,typeid FROM imas_lti_placements WHERE ";
 	$query .= "contextid='{$_SESSION['lti_context_id']}' AND linkid='{$_SESSION['lti_resource_link_id']}' ";
 	$query .= "AND org LIKE '$shortorg:%'"; //='{$_SESSION['ltiorg']}'";
@@ -740,7 +759,9 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 		
 	}
 }
-
+if ($_SESSION['lti_keytype']=='cc-vf') {
+	$keyparts = array('folder',$_SESSION['view_folder'][0],$_SESSION['view_folder'][1]);
+}
 //is course level placement
 if ($keyparts[0]=='cid' || $keyparts[0]=='placein') {
 	$cid = intval($keyparts[1]);
@@ -792,12 +813,49 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein') {
 		}
 		
 	}
+} else if ($keyparts[0]=='folder') {
+	$query = "SELECT itemorder FROM imas_courses WHERE id='".intval($keyparts[1])."'";
+	$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
+	if (mysql_num_rows($result2)==0) {
+		reporterror("invalid course identifier in folder view launch");
+	} else {
+		$cid = intval($keyparts[1]);
+		$usid = explode('_',$_SESSION['ltiorigkey']);
+		$query = "SELECT imas_tutors.id FROM imas_tutors JOIN imas_users ON imas_tutors.userid=imas_users.id WHERE ";
+		$query .= "imas_tutors.courseid='$cid' AND imas_users.SID='".addslashes($usid[0])."'";
+		$r3 = mysql_query($query) or die("Query failed : " . mysql_error());
+		if (mysql_num_rows($r3)==0) {
+			reporterror("not authorized to view folders in this course");
+		}
+		$row = mysql_fetch_row($result2);
+		$items = unserialize($row[0]);
+		function findfolder($items,$n,$loc) {
+			foreach ($items as $k=>$b) {
+				if (is_array($b)) {
+					if ($b['id']==$n) {
+						return $loc.'-'.($k+1);
+					} else {
+						$out = findfolder($b['items'],$n,$loc.'-'.($k+1));
+						if ($out != '') {
+							return $out;
+						}
+					}
+				}
+			}
+			return '';
+		}
+		$loc = findfolder($items, $keyparts[2], '0');
+		if ($loc=='') {
+			reporterror("invalid folder identifier in folder view launch");
+		}
+		$keyparts[3] = $loc;
+	}
 } else if ($keyparts[0]!='sso' && $_SESSION['ltirole']!='instructor') {
 	reporterror("invalid key. unknown action type");
 } 
 
 //see if student is enrolled, if appropriate to action type
-if ($keyparts[0]=='cid' || $keyparts[0]=='aid' || $keyparts[0]=='placein') {
+if ($keyparts[0]=='cid' || $keyparts[0]=='aid' || $keyparts[0]=='placein' || $keyparts[0]=='folder') {
 	if ($_SESSION['ltirole']=='instructor') {
 		$query = "SELECT id FROM imas_teachers WHERE userid='$userid' AND courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -903,6 +961,9 @@ if ($keyparts[0]=='aid') {
 	$sessiondata['ltiitemid'] = $cid;
 } else if ($keyparts[0]=='sso') { //is sso
 	$sessiondata['ltiitemtype']=2;
+} else if ($keyparts[0]=='folder') { //is folder content view
+	$sessiondata['ltiitemtype']=3;
+	$sessiondata['ltiitemid'] = array($keyparts[2],$keyparts[3]);
 } else {
 	$sessiondata['ltiitemtype']=-1;
 }
@@ -929,6 +990,11 @@ if (isset($setstuviewon) && $setstuviewon==true) {
 if ($_SESSION['lti_keytype']=='gc') {
 	$sessiondata['lti_launch_get']['cid'] = $keyparts[1];
 }
+if ($_SESSION['lti_keytype']=='cc-vf') {
+	$sessiondata['mathdisp'] = 0;
+	$sessiondata['graphdisp'] = 2;
+	$sessiondata['tzoffset'] = 0;
+}
 
 $enc = base64_encode(serialize($sessiondata));
 if ($createnewsession) {
@@ -937,7 +1003,7 @@ if ($createnewsession) {
 	$query = "UPDATE imas_sessions SET sessiondata='$enc',userid='$userid' WHERE sessionid='$sessionid'";
 }
 mysql_query($query) or die("Query failed : " . mysql_error());
-if (!$promptforsettings && !$createnewsession && !($keyparts[0]=='aid' && $tlwrds != '')) { 
+if ($_SESSION['lti_keytype']=='cc-vf' || (!$promptforsettings && !$createnewsession && !($keyparts[0]=='aid' && $tlwrds != ''))) { 
 	//redirect now if already have session and no timelimit
 	$now = time();
 	$query = "UPDATE imas_users SET lastaccess='$now' WHERE id='$userid'";
@@ -954,6 +1020,8 @@ if (!$promptforsettings && !$createnewsession && !($keyparts[0]=='aid' && $tlwrd
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
 	} else if ($keyparts[0]=='sso') {
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/index.php");
+	} else if ($keyparts[0]=='folder') {
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid&folder=".$keyparts[3]);
 	} else { //will only be instructors hitting this option
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/ltihome.php");
 	}

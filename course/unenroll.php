@@ -115,6 +115,8 @@ ini_set("max_execution_time", "600");
 		
 			if ($_GET['uid']=="all") {
 ?>			
+			<p><b style="color:red">Warning!</b>: This will delete ALL course data about these students.  This action <b>cannot be undone</b>.
+			If you have a student who isn't attending but may return, use the Lock Out of course option instead of unenrolling them.</p>
 			<p>Are you SURE you want to unenroll ALL students?</p>
 			<ul>
 <?php
@@ -124,14 +126,14 @@ ini_set("max_execution_time", "600");
 ?>					
 		</ul>
 			<p>This will also clear all regular posts from all class forums</p>
-			<p>Also remove all offline grade items from gradebook? 
-				<input type=checkbox name="removeoffline" value="1" />
+			<p><input type=checkbox name="removeoffline" value="1" /> Also remove all offline grade items from gradebook? 
+				
 			</p>
-			<p>Also remove any withdrawn questions? 
-				<input type=checkbox name="removewithdrawn" value="1" checked="checked"/>
+			<p><input type=checkbox name="removewithdrawn" value="1" checked="checked"/> Also remove any withdrawn questions? 
+				
 			</p>
-			<p>Also use any suggested replacements for old questions?
-				<input type=checkbox name="usereplaceby" value="1" checked="checked"/>
+			<p><input type=checkbox name="usereplaceby" value="1" checked="checked"/> Also use any suggested replacements for old questions?
+				
 			</p>
 			<p>Also remove wiki revisions: <input type="radio" name="delwikirev" value="1" />All wikis, 
 				<input  type="radio" name="delwikirev" value="2" checked="checked" />Group wikis only
@@ -152,7 +154,9 @@ ini_set("max_execution_time", "600");
 
 				} else {
 ?>				
-		Are you SURE you want to unenroll the selected students?
+		<p><b style="color:red">Warning!</b>: This will delete ALL course data about these students.  This action <b>cannot be undone</b>.
+		If you have a student who isn't attending but may return, use the Lock Out of course option instead of unenrolling them.</p>
+		<p>Are you SURE you want to unenroll the selected students?</p>
 		<ul>
 <?php
 					while ($row = mysql_fetch_row($resultUserList)) {
@@ -171,12 +175,13 @@ ini_set("max_execution_time", "600");
 ?>
 
 		<p>
-			<input type=submit value="Yes, I'm Sure">
+			<input type=submit class="secondarybtn" value="Unenroll">
+			<input type=submit name="lockinstead" value="Lock Students Out Instead">
 <?php
 			if ($calledfrom=='lu') {
-				echo "<input type=button value=\"Nevermind\" onclick=\"window.location='listusers.php?cid=$cid'\">";
+				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='listusers.php?cid=$cid'\">";
 			} else if ($calledfrom=='gb') {
-				echo "<input type=button value=\"Nevermind\" onclick=\"window.location='gradebook.php?cid=$cid&gbmode={$_GET['gbmode']}'\">";
+				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gradebook.php?cid=$cid&gbmode={$_GET['gbmode']}'\">";
 			}
 ?>
 		</p>

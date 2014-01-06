@@ -300,7 +300,8 @@ if (!(isset($teacherid))) {
 		$sums = array();
 		$parents = array();
 		$agbcats = array();
-		getsubinfo($items,'0','','Assessment');
+		$prespace = array();
+		getsubinfo($items,'0','','Assessment','&nbsp;&nbsp;');
 		
 		$query = "SELECT id,name,gbcategory FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -412,6 +413,32 @@ function chkgbcat(cat) {
 		  }
 	}	
 }
+function valform() {
+	if ($("#qform input:checkbox[name='checked[]']:checked").length == 0) {
+		if (!confirm("No assessments are selected to be changed. Cancel to go back and select some assessments, or click OK to make no changes")) {
+			return false;
+		}
+	}
+	if ($(".chgbox:checked").length == 0) {
+		if (!confirm("No settings have been selected to be changed. Use the checkboxes along the left to indicate that you want to change that setting. Click Cancel to go back and select some settings to change, or click OK to make no changes")) {
+			return false;
+		}
+	}
+	return true;
+}
+$(function() {
+	$(".chgbox").change(function() {
+			$(this).parents("tr").toggleClass("odd");
+			/*
+		var chk = $(this).is(':checked');
+		if (chk) {
+			$(this).parents("tr").addClass("odd");
+		} else {
+			$(this).parents("tr").removeClass("odd");
+		}*/
+	});
+		
+})
 </script>
 
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
@@ -420,14 +447,14 @@ function chkgbcat(cat) {
 	</h2></div>
 
 	<p>This form will allow you to change the assessment settings for several or all assessments at once.
-	 <b>Beware</b> that changing default points or penalty after an assessment has been 
+	<br/><b>Be aware</b> that changing default points or penalty after an assessment has been 
 	 taken will not change the scores of students who have already completed the assessment.</p>
 
-	<form id="qform" method=post action="chgassessments.php?cid=<?php echo $cid; ?>">
+	<form id="qform" method=post action="chgassessments.php?cid=<?php echo $cid; ?>" onsubmit="return valform();">
 		<h3>Assessments to Change</h3>
 
 		Check: <a href="#" onclick="document.getElementById('selbygbcat').selectedIndex=0;return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="document.getElementById('selbygbcat').selectedIndex=0;return chkAllNone('qform','checked[]',false)">None</a>
-		Check by catgory: 
+		Check by gradebook category: 
 		<?php 
 		writeHtmlSelect ("selbygbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],null,"Select...",-1,' onchange="chkgbcat(this.value);" id="selbygbcat" ');
 		?>
@@ -441,7 +468,7 @@ function chkgbcat(cat) {
 				$blockout = "<input type=checkbox name='checked[]' value='0' id='{$parents[$i]}' checked=checked ";
 				$blockout .= "onClick=\"chkgrp(this.form, '{$ids[$i]}', this.checked);\" ";
 				$blockout .='/>';
-				$blockout .= '<i>'.$names[$i].'</i>';
+				$blockout .= '<i>'.$prespace[$i].$names[$i].'</i>';
 				$blockid = $ids[$i];
 				
 			} else {
@@ -456,7 +483,7 @@ function chkgbcat(cat) {
 				if ($pos!==false) {
 					echo substr($types[$i],0,$pos+1).' ';
 				}
-				echo $names[$i];
+				echo $prespace[$i].$names[$i];
 				echo '</li>';
 			}
 			
@@ -478,7 +505,7 @@ function chkgbcat(cat) {
 			</thead>
 			<tbody>
 			<tr>
-				<td><input type="checkbox" name="chgsummary"/></td>
+				<td><input type="checkbox" name="chgsummary" class="chgbox"/></td>
 				<td class="r">Summary:</td>
 				<td>Copy from: 
 <?php
@@ -488,7 +515,7 @@ function chkgbcat(cat) {
 				</td>
 			</tr>
 			<tr>
-				<td><input type="checkbox" name="chgintro"/></td>
+				<td><input type="checkbox" name="chgintro" class="chgbox"/></td>
 				<td class="r">Instructions:</td>
 				<td>Copy from: 
 <?php
@@ -498,7 +525,7 @@ function chkgbcat(cat) {
 				</td>
 			</tr>
 			<tr>
-				<td><input type="checkbox" name="chgdates"/></td>
+				<td><input type="checkbox" name="chgdates" class="chgbox"/></td>
 				<td class="r">Dates and Times:</td>
 				<td>Copy from:
 <?php
@@ -507,7 +534,7 @@ function chkgbcat(cat) {
 				</td>
 			</tr>
 			<tr>
-				<td><input type="checkbox" name="chgavail"/></td>
+				<td><input type="checkbox" name="chgavail" class="chgbox"/></td>
 				<td class="r">Show:</td>
 				<td>
 				<input type=radio name="avail" value="0" />Hide<br/>
@@ -534,12 +561,12 @@ function chkgbcat(cat) {
 				</td>
 			</tr>
 			<tr class="coptr">
-				<td><input type="checkbox" name="chgpassword"/></td>
+				<td><input type="checkbox" name="chgpassword" class="chgbox"/></td>
 				<td class="r">Require Password (blank for none):</td>
 				<td><input type=text name=password value=""></td>
 			</tr>
 			<tr class="coptr">
-				<td><input type="checkbox" name="chgtimelimit"/></td>
+				<td><input type="checkbox" name="chgtimelimit" class="chgbox"/></td>
 				<td class="r">Time Limit (minutes, 0 for no time limit): </td>
 				<td><input type=text size=4 name="timelimit" value="0" />
 				   <input type="checkbox" name="timelimitkickout" /> Kick student out at timelimit
@@ -547,7 +574,7 @@ function chkgbcat(cat) {
 			</tr>
 
 			<tr class="coptr">
-				<td><input type="checkbox" name="chgdisplaymethod"/></td>
+				<td><input type="checkbox" name="chgdisplaymethod" class="chgbox"/></td>
 				<td class="r">Display method: </td>
 				<td>
 				<select name="displaymethod">
@@ -561,12 +588,12 @@ function chkgbcat(cat) {
 			</tr>
 
 			<tr class="coptr">
-				<td><input type="checkbox" name="chgdefpoints"/></td>
+				<td><input type="checkbox" name="chgdefpoints" class="chgbox"/></td>
 				<td class="r">Default points per problem: </td>
 				<td><input type=text size=4 name=defpoints value="<?php echo $line['defpoints'];?>" ></td>
 			</tr>
 			<tr class="coptr">
-				<td><input type="checkbox" name="chgdefattempts"/></td>
+				<td><input type="checkbox" name="chgdefattempts" class="chgbox"/></td>
 				<td class="r">Default attempts per problem (0 for unlimited): </td>
 				<td>
 					<input type=text size=4 name=defattempts value="<?php echo $line['defattempts'];?>" >
@@ -575,7 +602,7 @@ function chkgbcat(cat) {
 				</td>
 			</tr>
 			<tr class="coptr">
-				<td><input type="checkbox" name="chgdefpenalty"/></td>
+				<td><input type="checkbox" name="chgdefpenalty" class="chgbox"/></td>
 				<td class="r">Default penalty:</td>
 				<td><input type=text size=4 name=defpenalty value="<?php echo $line['defpenalty'];?>" <?php if ($taken) {echo 'disabled=disabled';}?>>% 
    					<select name="skippenalty" <?php if ($taken) {echo 'disabled=disabled';}?>>
@@ -591,7 +618,7 @@ function chkgbcat(cat) {
 				</td>
 			</tr>
 			<tr class="coptr">
-				<td><input type="checkbox" name="chgfeedback"/></td>
+				<td><input type="checkbox" name="chgfeedback" class="chgbox"/></td>
 				<td class="r">Feedback method:<br/>and Show Answers: </td>
 				<td>
 					<select id="deffeedback" name="deffeedback" onChange="chgfb()" >
@@ -631,7 +658,7 @@ function chkgbcat(cat) {
 			</tr>
 			
 			<tr class="coptr">
-				<td><input type="checkbox" name="chgeqnhelper"/></td>
+				<td><input type="checkbox" name="chgeqnhelper" class="chgbox"/></td>
 				<td class="r">Use equation helper?</td>
 				<td>
 				<select name="eqnhelper">
@@ -651,28 +678,28 @@ function chkgbcat(cat) {
 				</td>
 			</tr>
 			<tr class="coptr">
-				<td><input type="checkbox" name="chghints"/></td>
+				<td><input type="checkbox" name="chghints" class="chgbox"/></td>
 				<td class="r">Show hints and video/text buttons when available? </td>
 				<td>
 				<input type="checkbox" name="showhints" <?php writeHtmlChecked($line['showhints'],1); ?>>
 				</td>
 			</tr>
 			<tr class="coptr">
-				<td><input type="checkbox" name="chgmsgtoinstr"/></td>
+				<td><input type="checkbox" name="chgmsgtoinstr" class="chgbox"/></td>
 				<td class="r">Show "Message instructor about this question" links</td>
 				<td>
 				<input type="checkbox" name="msgtoinstr" <?php writeHtmlChecked($line['msgtoinstr'],1); ?>/>
 				</td>
 			</tr>
 			<tr class="coptr">
-				<td><input type="checkbox" name="chgposttoforum"/></td>
+				<td><input type="checkbox" name="chgposttoforum" class="chgbox"/></td>
 				<td class="r">Show "Post this question to forum" links?</td>
 				<td>
 				<input type="checkbox" name="doposttoforum" <?php writeHtmlChecked($line['posttoforum'],0,true); ?>/> To forum <?php writeHtmlSelect("posttoforum",$page_forumSelect['val'],$page_forumSelect['label'],$line['posttoforum']); ?>
 				</td>
 			</tr>
 			<tr class="coptr">
-				<td><input type="checkbox" name="chgshowtips"/></td>
+				<td><input type="checkbox" name="chgshowtips" class="chgbox"/></td>
 				<td class="r">Show answer entry tips?</td>
 				<td>
 				<select name="showtips">
@@ -683,21 +710,21 @@ function chkgbcat(cat) {
 				</td>
 			</tr>
 			<tr class="coptr">
-				<td><input type="checkbox" name="chgallowlate"/></td>
+				<td><input type="checkbox" name="chgallowlate" class="chgbox"/></td>
 				<td class="r">Allow use of LatePasses?: </td>
 				<td>
 				<input type="checkbox" name="allowlate" <?php writeHtmlChecked($line['allowlate'],1); ?>>
 				</td>
 			</tr>
 			<tr class="coptr">
-				<td><input type="checkbox" name="chgnoprint"/></td>
+				<td><input type="checkbox" name="chgnoprint" class="chgbox"/></td>
 				<td class="r">Make hard to print?: </td>
 				<td>
 				<input type="radio" value="0" name="noprint" <?php writeHtmlChecked($line['noprint'],0); ?>/> No <input type="radio" value="1" name="noprint" <?php writeHtmlChecked($line['noprint'],1); ?>/> Yes 
 				</td>
 			</tr>
 			<tr class="coptr">
-				<td><input type="checkbox" name="chgshuffle"/></td>
+				<td><input type="checkbox" name="chgshuffle" class="chgbox"/></td>
 				<td class="r">Shuffle item order: </td>
 				<td>
 				<span class=formright><input type="checkbox" name="shuffle" <?php writeHtmlChecked($line['shuffle']&1,1); ?>>
@@ -706,7 +733,7 @@ function chkgbcat(cat) {
 			
 			
 			<tr class="coptr">
-				<td><input type="checkbox" name="chggbcat"/></td>
+				<td><input type="checkbox" name="chggbcat" class="chgbox"/></td>
 				<td class="r">Gradebook category: </td>
 				<td>
 <?php 
@@ -716,7 +743,7 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 				</td>
 			</tr>
 			<tr class="coptr">
-				<td><input type="checkbox" name="chgtutoredit"/></td>
+				<td><input type="checkbox" name="chgtutoredit" class="chgbox"/></td>
 				<td class="r">Tutor Access: </td>
 				<td>
 <?php
@@ -729,7 +756,7 @@ writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],
 			</tr>
 				
 			<tr class="coptr">
-				<td style="border-bottom: 1px solid #000"><input type="checkbox" name="chgcntingb"/></td>
+				<td style="border-bottom: 1px solid #000"><input type="checkbox" name="chgcntingb" class="chgbox"/></td>
 				<td class="r" style="border-bottom: 1px solid #000">Count: </td>
 				<td style="border-bottom: 1px solid #000"><input name="cntingb" value="1" checked="checked" type="radio"> Count in Gradebook<br>
 				<input name="cntingb" value="0" type="radio"> Don't count in grade total and hide from students<br>
@@ -740,14 +767,14 @@ writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],
 			
 			
 			<tr class="coptr">
-				<td><input type="checkbox" name="chgcaltag"/></td>
+				<td><input type="checkbox" name="chgcaltag" class="chgbox"/></td>
 				<td class="r">Calendar icon:</td>
 				<td>
 				Active: <input name="caltagact" type=text size=1 value="<?php echo $line['caltag'];?>"/>, 
 				Review: <input name="caltagrev" type=text size=1 value="<?php echo $line['calrtag'];?>"/>
 				</td>
 			<tr class="coptr">
-				<td><input type="checkbox" name="chgminscore"/></td>
+				<td><input type="checkbox" name="chgminscore" class="chgbox"/></td>
 				<td class="r">Minimum score to receive credit: </td>
 				<td>
 				<input type=text size=4 name=minscore value="<?php echo $line['minscore'];?>">
@@ -757,29 +784,29 @@ writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],
 				</td>
 			</tr>
 			<tr class="coptr">
-				<td><input type="checkbox" name="chgdeffb"/></td>
+				<td><input type="checkbox" name="chgdeffb" class="chgbox"/></td>
 				<td class="r">Default Feedback Text: </td>
 				<td>Use? <input type="checkbox" name="usedeffb"><br/>
 				Text: <input type="text" size="60" name="deffb" value="This assessment contains items that not automatically graded.  Your grade may be inaccurate until your instructor grades these items." /></td>
 			</tr>
 			<tr class="coptr">
-				<td><input type="checkbox" name="chgreqscore"/></td>
+				<td><input type="checkbox" name="chgreqscore" class="chgbox"/></td>
 				<td class="r">Clear "show based on another assessment" settings.</td>
 				<td></td>
 			</tr>
 			<tr class="coptr">
-				<td><input type="checkbox" name="chgsameseed"/></td>
+				<td><input type="checkbox" name="chgsameseed" class="chgbox"/></td>
 				<td class="r">All items same random seed: </td>
 				<td><input type="checkbox" name="sameseed"></td>
 			</tr>
 			<tr class="coptr">
-				<td><input type="checkbox" name="chgsamever"/></td>
+				<td><input type="checkbox" name="chgsamever" class="chgbox"/></td>
 				<td class="r">All students same version of questions: </td>
 				<td><input type="checkbox" name="samever"></td>
 			</tr>
 			
 			<tr class="coptr">
-				<td><input type="checkbox" name="chgexcpen"/></td>
+				<td><input type="checkbox" name="chgexcpen" class="chgbox"/></td>
 				<td class="r">Penalty for questions done while in exception/LatePass: </td>
 				<td>
 				<input type=text size=4 name="exceptionpenalty" value="<?php echo $line['exceptionpenalty'];?>">%
@@ -806,7 +833,7 @@ writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],
 */
 ?>
 			<tr class="coptr">
-				<td ><input type="checkbox" name="chgshowqcat"/></td>
+				<td ><input type="checkbox" name="chgshowqcat" class="chgbox"/></td>
 				<td class="r" >Show question categories: </td>
 				<td ><input name="showqcat" value="0" checked="checked" type="radio">No <br/>
 				<input name="showqcat" value="1" type="radio">In Points Possible bar <br/>
@@ -816,17 +843,17 @@ writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],
 			<tr>	
 				<td style="border-top: 1px solid #000"></td>
 				<td class="r" style="border-top: 1px solid #000">Define end of assessment messages?</td>
-				<td style="border-top: 1px solid #000"><input type="checkbox" name="chgendmsg" /> You will be taken to a page to change these after you hit submit</td>
+				<td style="border-top: 1px solid #000"><input type="checkbox" name="chgendmsg" class="chgbox"/> You will be taken to a page to change these after you hit submit</td>
 			</tr>
 			<tr>
 				<td></td>
 				<td class="r">Remove per-question settings (points, attempts, etc.) for all questions in these assessments?</td>
-				<td><input type="checkbox" name="removeperq" /></td>
+				<td><input type="checkbox" name="removeperq" class="chgbox" /></td>
 			</tr>
 		</tbody>
 		</table>
 	</fieldset>
-	<div class=submit><input type=submit value=Submit></div>
+	<div class=submit><input type=submit value="<?php echo _('Apply Changes')?>"></div>
 
 <?php
 }

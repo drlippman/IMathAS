@@ -102,6 +102,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		mysql_query($query) or die("Query failed :$query " . mysql_error());
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-viewasid.php?cid=$cid&asid=$asid&uid=$uid");
 	} elseif (isset($_GET['aid']) && $_GET['aid']!='') {
+		$query = "SELECT LastName,FirstName FROM imas_users WHERE id='{$_GET['uid']}'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$stuname = implode(', ', mysql_fetch_row($result));
+		
 		$query = "SELECT startdate,enddate FROM imas_assessments WHERE id='{$_GET['aid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$row = mysql_fetch_row($result);
@@ -115,8 +119,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$erow = mysql_fetch_row($result);
 		$page_isExceptionMsg = "";
+		$savetitle = _('Create Exception');
 		if ($erow != null) {
-			$page_isExceptionMsg = "<p>Exception exists.  <a href=\"exception.php?cid=$cid&aid={$_GET['aid']}&uid={$_GET['uid']}&clear={$erow[0]}&asid=$asid\">Clear Exception</a></p>\n";
+			$savetitle = _('Save Changes');
+			$page_isExceptionMsg = "<p>An exception already exists.  <button type=\"button\" onclick=\"window.location.href='exception.php?cid=$cid&aid={$_GET['aid']}&uid={$_GET['uid']}&clear={$erow[0]}&asid=$asid'\">"._("Clear Exception").'</button> or modify below.</p>';
 			$sdate = tzdate("m/d/Y",$erow[1]);
 			$edate = tzdate("m/d/Y",$erow[2]);
 			$stime = tzdate("g:i a",$erow[1]);
@@ -163,13 +169,15 @@ if ($overwriteBody==1) {
 	<div id="headerexception" class="pagetitle"><h2>Make Start/Due Date Exception</h2></div>
 
 <?php 
-	writeHtmlSelect ("aidselect",$page_courseSelect['val'],$page_courseSelect['label'],$_GET['aid'],"Select an assessment","", " onchange='nextpage()'"); 
+	echo '<h3>'.$stuname.'</h3>';
+	echo $page_isExceptionMsg;
+	echo '<p><span class="form">Assessment:</span><span class="formright">';
+	writeHtmlSelect ("aidselect",$page_courseSelect['val'],$page_courseSelect['label'],$_GET['aid'],"Select an assessment","", " onchange='nextpage()'");
+	echo '</span><br class="form"/></p>';
 
 	if (isset($_GET['aid']) && $_GET['aid']!='') {
-		echo $page_isExceptionMsg;
 ?>		
 	<form method=post action="exception.php?cid=<?php echo $cid ?>&aid=<?php echo $_GET['aid'] ?>&uid=<?php echo $_GET['uid'] ?>&asid=<?php echo $asid;?>">
-		<span class=form>For this student:</span><br class=form>
 		<span class=form>Available After:</span>
 		<span class=formright>
 			<input type=text size=10 name=sdate value="<?php echo $sdate ?>"> 
@@ -184,11 +192,13 @@ if ($overwriteBody==1) {
 			<img src="../img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=etime value="<?php echo $etime ?>">
 		</span><BR class=form>
-
-		<div class=submit><input type=submit value="Submit"></div>
-		<p><input type="checkbox" name="forceregen"/> Force student to work on new versions of all questions?  Students 
-		will keep any scores earned, but must work new versions of questions to improve score.</p>
-		<p><input type="checkbox" name="eatlatepass"/> Deduct <input type="input" name="latepassn" size="1" value="1"/> LatePass(es).  Student currently has <?php echo $latepasses;?> latepasses.</p>
+		<span class="form"><input type="checkbox" name="forceregen"/></span>
+		<span class="formright">Force student to work on new versions of all questions?  Students 
+		   will keep any scores earned, but must work new versions of questions to improve score.</span><br class="form"/>
+		<span class="form"><input type="checkbox" name="eatlatepass"/></span>
+		<span class="formright">Deduct <input type="input" name="latepassn" size="1" value="1"/> LatePass(es).  
+		   Student currently has <?php echo $latepasses;?> latepasses.</span><br class="form"/>
+		<div class=submit><input type=submit value="<?php echo $savetitle;?>"></div>
 	</form>
 
 <?php

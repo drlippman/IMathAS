@@ -502,7 +502,13 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				echo '<span class="form">Points for message you\'re replying to:</span><span class="formright">';
 				echo '<input type="text" size="4" name="points" value="'.$points.'" /></span><br class="form" />';
 			}
-			echo "<div class=submit><input type=submit value='Submit'></div>\n";
+			if ($_GET['modify']=='reply') {
+				echo "<div class=submit><input type=submit value='Post Reply'></div>\n";
+			} else if ($_GET['modify']=='new') { 
+				echo "<div class=submit><input type=submit value='Post Thread'></div>\n";
+			} else {
+				echo "<div class=submit><input type=submit value='Save Changes'></div>\n";
+			}
 	
 			if ($_GET['modify']=='reply') {
 				echo "<p>Replying to:</p>";
@@ -630,7 +636,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		}
 		
 		echo "<p><input type=button value=\"Yes, Remove\" onClick=\"window.location='$returnurl&remove={$_GET['remove']}&confirm=true'\">\n";
-		echo "<input type=button value=\"Nevermind\" onClick=\"window.location='$returnurl'\"></p>\n";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='$returnurl'\"></p>\n";
 		require("../footer.php");
 		exit;
 	}
@@ -765,7 +771,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		echo '</div>';
 		
 		echo "<p><input type=submit value=\"Move\">\n";
-		echo "<input type=button value=\"Nevermind\" onClick=\"window.location='$returnurl'\"></p>\n";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='$returnurl'\"></p>\n";
 		echo "</form>";
 		require("../footer.php");
 		exit;

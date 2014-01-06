@@ -84,6 +84,8 @@ Read   Deleted   Deleted by Sender   Tagged
 	}
 	echo " Sent Message List</div>";
 	echo '<div id="headersentlist" class="pagetitle"><h2>Sent Messages</h2></div>';
+	
+	echo "<div class=\"cpmid\"><a href=\"msglist.php?cid=$cid\">Received Messages</a></div>";
 
 	$query = "SELECT COUNT(id) FROM imas_msgs WHERE msgfrom='$userid' AND (isread&4)=0";
 	if ($filtercid>0) {
@@ -262,7 +264,6 @@ function chgfilter() {
 	if ($prevnext != '') {
 		echo "<p>$prevnext</p>";
 	}
-	echo "<p><a href=\"msglist.php?cid=$cid\">Back to Messages</a></p>";
 	
 	require("../footer.php");
 ?>

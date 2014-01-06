@@ -130,6 +130,10 @@ if ($isteacher) {
 		} 
 		exit;
 	}
+	if (isset($_POST['lockinstead'])) {
+		$_GET['action'] = "lock";
+		$_POST['tolock'] = $_POST['tounenroll'];
+	}
 	if ((isset($_POST['posted']) && ($_POST['posted']=="E-mail" || $_POST['posted']=="Message"))|| isset($_GET['masssend']))  {
 		$calledfrom='gb';
 		include("masssend.php");
@@ -635,13 +639,15 @@ if (isset($studentid) || $stu!=0) { //show student view
 	
 	if ($isteacher) {
 		echo _('Check:'), ' <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',true)">', _('All'), '</a> <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',false)">', _('None'), '</a> ';
-		echo _('With Selected:'), '  <button type="submit" name="posted" value="Print Report">',_('Print Report'),'</button> <button type="submit" name="posted" value="E-mail">',_('E-mail'),'</button> <button type="submit" name="posted" value="Message">',_('Message'),'</button> ';
+		echo _('With Selected:'), '  <button type="submit" name="posted" value="Print Report" title="',_("Generate printable grade reports"),'">',_('Print Report'),'</button> ';
+		echo '<button type="submit" name="posted" value="E-mail" title="',_("Send e-mail to the selected students"),'">',_('E-mail'),'</button> ';
+		echo '<button type="submit" name="posted" value="Message" title="',_("Send a message to the selected students"),'">',_('Message'),'</button> ';
 
 		if (!isset($CFG['GEN']['noInstrUnenroll'])) {
-			echo '<button type="submit" name="posted" value="Unenroll">',_('Unenroll'),'</button> ';
+			echo '<button type="submit" name="posted" value="Unenroll" title="',_("Unenroll the selected students"),'">',_('Unenroll'),'</button> ';
 		}
-		echo '<button type="submit" name="posted" value="Lock">',_('Lock'),'</button> ';
-		echo '<button type="submit" name="posted" value="Make Exception">',_('Make Exception'),'</button> ';
+		echo '<button type="submit" name="posted" value="Lock" title="',_("Lock selected students out of the course"),'">',_('Lock'),'</button> ';
+		echo '<button type="submit" name="posted" value="Make Exception" title="',_("Make due date exceptions for selected students"),'">',_('Make Exception'),'</button> ';
 	}
 	
 	$gbt = gbinstrdisp();
@@ -675,16 +681,17 @@ function gbstudisp($stu) {
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$showlatepass = mysql_result($result,0,0);
 		
+		echo '<h3>';
 		if ($isteacher) {
 			if ($gbt[1][4][2]==1) {
 				if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-					echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$gbt[1][4][0]}.jpg\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
+					echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$gbt[1][4][0]}.jpg\" onclick=\"togglepic(this)\" class=\"mida\"/> ";
 				} else {
-					echo "<img src=\"$imasroot/course/files/userimg_sm{$gbt[1][4][0]}.jpg\" style=\"float: left; padding-right:5px;\" onclick=\"togglepic(this)\"/>";
+					echo "<img src=\"$imasroot/course/files/userimg_sm{$gbt[1][4][0]}.jpg\" style=\"float: left; padding-right:5px;\" onclick=\"togglepic(this)\" class=\"mida\"/>";
 				}
 			} 
 		}
-		echo '<h3>' . strip_tags($gbt[1][0][0]) . ' <span class="small">('.$gbt[1][0][1].')</span>';
+		echo strip_tags($gbt[1][0][0]) . ' <span class="small">('.$gbt[1][0][1].')</span>';
 		$query = "SELECT imas_students.gbcomment,imas_users.email,imas_students.latepass,imas_students.section FROM imas_students,imas_users WHERE ";
 		$query .= "imas_students.userid=imas_users.id AND imas_users.id='$stu' AND imas_students.courseid='{$_GET['cid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -698,8 +705,8 @@ function gbstudisp($stu) {
 			echo ' <span class="small">Section: '.$stusection.'</span>';
 		}
 		echo '</h3>';
-		echo '<div style="clear:both">';
 		if ($isteacher) {
+			echo '<div style="clear:both;display:inline-block" class="cpmid secondary">';
 			echo '<a href="mailto:'.$stuemail.'">', _('Email'), '</a> | ';
 			echo "<a href=\"$imasroot/msgs/msglist.php?cid={$_GET['cid']}&add=new&to=$stu\">", _('Message'), "</a> | ";
 			echo "<a href=\"gradebook.php?cid={$_GET['cid']}&uid=$stu&massexception=1\">", _('Make Exception'), "</a> | ";
@@ -707,32 +714,42 @@ function gbstudisp($stu) {
 			echo "<a href=\"viewloginlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Login Log'), "</a> | ";
 			echo "<a href=\"viewactionlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Activity Log'), "</a> | ";
 			echo "<a href=\"#\" onclick=\"makeofflineeditable(this); return false;\">", _('Edit Offline Scores'), "</a>";
-			
+			echo '</div>';	
 		} else if ($istutor) {
+			echo '<div style="clear:both;display:inline-block" class="cpmid">';
 			echo "<a href=\"viewloginlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Login Log'), "</a> | ";
 			echo "<a href=\"viewactionlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Activity Log'), "</a>";
-		}
-		//TODO i18n
-		if ($showlatepass==1) {
-			if ($latepasses==0) { $latepasses = 'No';}
-			if ($isteacher || $istutor) {echo '<br/>';}
-			echo "$latepasses LatePass".($latepasses!=1?"es":"").' available';
+			echo '</div>';	
 		}
 		
 		if (trim($gbcomment)!='' || $isteacher) {
 			if ($isteacher) {
 				echo "<form method=post action=\"gradebook.php?{$_SERVER['QUERY_STRING']}\">";
-				echo "<textarea name=\"usrcomments\" rows=3 cols=60>$gbcomment</textarea><br/>";
-				echo "<input type=submit value=\"", _('Update Comment'), "\">";
+				echo _('Gradebook Comment').': '.  "<input type=submit value=\"", _('Update Comment'), "\"><br/>";
+				echo "<textarea name=\"usrcomments\" rows=3 cols=60>$gbcomment</textarea>";
 				echo '</form>';
 			} else {
-				echo "<div class=\"item\">$gbcomment</div>";
+				echo "<div style=\"clear:both;display:inline-block\" class=\"cpmid\">$gbcomment</div><br/>";
 			}
 		}
-		echo '</div>';
+		//TODO i18n
+		if ($showlatepass==1) {
+			if ($latepasses==0) { $latepasses = 'No';}
+			if ($isteacher || $istutor) {echo '<br/>';}
+			$lpmsg = "$latepasses LatePass".($latepasses!=1?"es":"").' available';
+		}
+		if (!$isteacher && !$istutor) {
+			echo $lpmsg;
+		}
+		
 	}
 	echo "<form method=\"post\" id=\"qform\" action=\"gradebook.php?{$_SERVER['QUERY_STRING']}&uid=$stu\">";
 	//echo "<input type='button' onclick='conditionalColor(\"myTable\",1,50,80);' value='Color'/>";
+	if ($isteacher && $stu>0) {
+		echo '<button type="submit" value="Save Changes" style="display:none"; id="savechgbtn">', _('Save Changes'), '</button> ';
+		echo _('Check:'), ' <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',false)">', _('None'), '</a> ';
+		echo _('With selected:'), ' <button type="submit" value="Make Exception" name="posted">',_('Make Exception'),'</button> '.$lpmsg.'';
+	}
 	echo '<table id="myTable" class="gb" style="position:relative;">';
 	echo '<thead><tr>';
 	if ($stu>0 && $isteacher) {
@@ -887,17 +904,13 @@ function gbstudisp($stu) {
 			echo '</tr>';
 		}
 	}
-	echo '</tbody></table>';	
+	echo '</tbody></table><br/>';	
 	if (!$hidepast) {
 		$query = "SELECT stugbmode FROM imas_gbscheme WHERE courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$show = mysql_result($result,0,0);
 		//echo '</tbody></table><br/>';
-		if ($isteacher && $stu>0) {
-			echo '<p><button type="submit" value="Save Changes" style="display:none"; id="savechgbtn">', _('Save Changes'), '</button> ';
-			echo _('Check:'), ' <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',false)">', _('None'), '</a> ';
-			echo _('With selected:'), ' <button type="submit" value="Make Exception" name="posted">',_('Make Exception'),'</button></p>';
-		}
+		
 		echo '<table class="gb"><thead>';
 		echo '<tr>';
 		echo '<th >', _('Totals'), '</th>';
@@ -1070,13 +1083,13 @@ function gbstudisp($stu) {
 		echo '</tbody></table><br/>';
 		echo '<p>';
 		if (($show&1)==1) {
-			echo _('<b>Past Due</b> total only includes items whose due date has past.  Current assignments are not counted in this total.'), '<br/>';
+			echo _('<b>Past Due</b> total only includes items whose due date has passed.  Current assignments are not counted in this total.'), '<br/>';
 		}
 		if (($show&2)==2) {
-			echo _('<b>Past Due and Attempted</b> total includes items whose due date has past, as well as currently available items you have started working on.'), '<br/>';
+			echo _('<b>Past Due and Attempted</b> total includes items whose due date has passed, as well as currently available items you have started working on.'), '<br/>';
 		} 
 		if (($show&4)==4) {
-			echo _('<b>Past Due and Available</b> total includes items whose due date has past as well as currently available items, even if you haven\'t starting working on them yet.'), '<br/>';
+			echo _('<b>Past Due and Available</b> total includes items whose due date has passed as well as currently available items, even if you haven\'t starting working on them yet.'), '<br/>';
 		}
 		if (($show&8)==8) {
 			echo _('<b>All</b> total includes all items: past, current, and future to-be-done items.');

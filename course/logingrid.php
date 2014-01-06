@@ -30,6 +30,9 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		require("../includes/parsedatetime.php");
 		$start = parsedatetime($_POST['sdate'],'12:00am');
 		$end = parsedatetime($_POST['edate'],'11:59pm');
+		if (($end-$start)/86400>365) {
+			$start = $end-365*24*60*60;
+		}
 	} else if (isset($_GET['start']) && $_GET['start']+7*24*60*60<=$now) {
 		$start = intval($_GET['start']);
 		$end = $start + 7*24*60*60;
@@ -82,7 +85,7 @@ if ($overwriteBody==1) {
 	<div id="headerlogingrid" class="pagetitle"><h2>Login Grid View</h2></div>
 	
 	<form method="post" action="logingrid.php?cid=<?php echo $cid;?>">
-	<p>Showing Login Activity <?php echo "$starttime through $endtime";?></p>
+	<p>Showing Number of Logins <?php echo "$starttime through $endtime";?></p>
 	<p>
 <?php
 	echo '<a href="logingrid.php?cid='.$cid.'&start='.($start-7*24*60*60).'">Show previous week</a>. ';

@@ -126,7 +126,14 @@ Date.prototype.getWeekDays = function(d) {
         return days;
     };
 
-
+ $(function() {
+ 	$('img[src*="swap.gif"]').css("cursor","pointer");	
+ 	$('span[id^="availname"]').css("cursor","pointer").each(function(i,el) {
+ 		$(el).on('click',function() {
+ 			MCDtoggle("a",el.id.substring(9));		
+ 		});
+ 	});
+ });
 
   function leadingZero(nr) {
 	  if (nr < 10) nr = "0" + nr;
@@ -149,6 +156,12 @@ Date.prototype.getWeekDays = function(d) {
 	 document.getElementById(el.id.substring(0,2)+el.id.substring(5)).innerHTML = globd.SHORTDAYS[globd.getDay()];
   }
   function senddownselect(el) {
+  	  if ($("input[id^='cb']:checked").length==0) {
+  	  	  if (!confirm(_("No items have been selected. This action will apply to ALL items below this item"))) {
+  	  	  	  el.selectedIndex= 0;
+  	  	  	  return;
+  	  	  }
+  	  }
 	  var ln = el.id.substr(3)*1;
 	  var val = el.value*1;
 	  if (val==1) {
@@ -301,6 +314,11 @@ Date.prototype.getWeekDays = function(d) {
 		} else {
 			$('#avail'+cnt).parent().parent().parent().find('td.togdis').addClass('dis');
 		}
+		if (curval!=0) {
+			$('#avail'+cnt).parent().parent().parent().find('td.togdishid').removeClass('dis');
+		} else {
+			$('#avail'+cnt).parent().parent().parent().find('td.togdishid').addClass('dis');
+		}
 		$('#availname'+cnt).text(availnames[curval]);
 	} else {
 		var typeinput = document.getElementById(type+"datetype"+cnt);
@@ -330,7 +348,6 @@ Date.prototype.getWeekDays = function(d) {
 						$(els[i]).parent().parent().find('td.togdis').removeClass('dis');
 						$('#availname'+cnt).text(availnames[1]);
 					} else {
-						console.log("cnt"+cnt+": "+availnames[to]);
 						$(els[i]).parent().parent().find('td.togdis').addClass('dis');
 						$('#availname'+cnt).text(availnames[to]);
 					}

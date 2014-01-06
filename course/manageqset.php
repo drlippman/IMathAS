@@ -808,7 +808,7 @@ if ($myrights<20) {
 			} else {
 				$page_questionTable[$i]['action'] .= '<option value="mod">View Code</option>';
 			}
-			$page_questionTable[$i]['action'] .= '<option value="temp">Template</option>';
+			$page_questionTable[$i]['action'] .= '<option value="temp">Template (copy)</option>';
 			if ($isadmin || ($isgrpadmin && $line['groupid']==$groupid) || $line['ownerid']==$userid) {
 				$page_questionTable[$i]['action'] .= '<option value="del">Delete</option>';
 				$page_questionTable[$i]['action'] .= '<option value="tr">Transfer</option>';
@@ -846,8 +846,9 @@ if ($myrights<20) {
 
 /******* begin html output ********/
 $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/junkflag.js\"></script>";
-$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '".$urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savelibassignflag.php';</script>";
-	
+$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '".$urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savelibassignflag.php';";
+$placeinhead .= '$(function(){$(".wlf").attr("title","'.('Flag a question if it is in the wrong library').'");});</script>';
+
 require("../header.php");
 
 $address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
@@ -931,7 +932,7 @@ function getnextprev(formn,loc) {
 			<input type=hidden name=remove value="<?php echo $rlist ?>">
 			<p>
 				<input type=submit value="Really Delete">
-				<input type=button value="Never Mind" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
+				<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
 			</p>
 		</form>	
 <?php
@@ -939,13 +940,13 @@ function getnextprev(formn,loc) {
 ?>
 		<form method=post action="manageqset.php?cid=<?php echo $cid ?>">
 			<input type=hidden name=transfer value="<?php echo $tlist ?>">
-			Transfer to: 
+			Transfer question ownership to: 
 		
 			<?php writeHtmlSelect("newowner",$page_transferUserList['val'],$page_transferUserList['label']); ?>
 		
 			<p>
 				<input type=submit value="Transfer">
-				<input type=button value="Never Mind" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
+				<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
 			</p>
 		</form>
 <?php
@@ -991,7 +992,7 @@ function getnextprev(formn,loc) {
 			
 			<p>
 				<input type=submit value="Make Changes">
-				<input type=button value="Never Mind" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
+				<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
 			</p>
 		</form>		
 <?php		
@@ -1013,7 +1014,7 @@ function getnextprev(formn,loc) {
 			
 			<p>
 				<input type=submit value="Template Questions">
-				<input type=button value="Never Mind" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
+				<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
 			</p>
 		</form>
 <?php		
@@ -1038,7 +1039,7 @@ function getnextprev(formn,loc) {
 			
 			<p>
 				<input type=submit value="Change Rights">
-				<input type=button value="Never Mind" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
+				<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
 			</p>
 		</form>
 <?php		
@@ -1048,7 +1049,7 @@ function getnextprev(formn,loc) {
 		to all users.  If it is currently being used in an assessment, it will mess up that assessment.
 		<p>
 			<input type=button onclick="window.location='manageqset.php?cid=<?php echo $cid ?>&remove=<?php echo $_GET['remove'] ?>&confirmed=true'" value="Really Delete">
-			<input type=button value="Never Mind" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
+			<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
 		</p>
 <?php
 	} else if (isset($_GET['transfer'])) {
@@ -1060,7 +1061,7 @@ function getnextprev(formn,loc) {
 
 			<p>
 				<input type=submit value="Transfer">
-				<input type=button value="Never Mind" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
+				<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
 			</p>
 		</form>
 <?php	
@@ -1080,7 +1081,7 @@ function getnextprev(formn,loc) {
 		if ($searchmine==1) {echo "checked=1";}
 		echo "/>Mine only ";
 		
-		echo "<input type=submit value=Search>\n";
+		echo '<input type=submit value="Search" title="List or search selected libraries">';
 		echo "<input type=button value=\"Add New Question\" onclick=\"window.location='moddataset.php?cid=$cid'\">\n";
 		echo "</form>";
 		
@@ -1089,11 +1090,11 @@ function getnextprev(formn,loc) {
 		//echo "Check/Uncheck All: <input type=\"checkbox\" name=\"ca2\" value=\"1\" onClick=\"chkAll(this.form, 'nchecked[]', this.checked)\">\n";
 		echo 'Check: <a href="#" onclick="return chkAllNone(\'selform\',\'nchecked[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'selform\',\'nchecked[]\',false)">None</a> ';
 
-		echo "With Selected: <input type=submit name=\"transfer\" value=\"Transfer\">\n";
+		echo "With Selected: <input type=submit name=\"transfer\" value=\"Transfer\" title=\"Transfer question ownership\">\n";
 		echo "<input type=submit name=\"remove\" value=\"Delete\">\n";
-		echo "<input type=submit name=\"chglib\" value=\"Library Assignment\">\n";
-		echo "<input type=submit name=\"chgrights\" value=\"Chg Rights\">\n";
-		echo "<input type=submit name=\"template\" value=\"Template\">\n";
+		echo "<input type=submit name=\"chglib\" value=\"Library Assignment\" title=\"Change library assignments\">\n";
+		echo "<input type=submit name=\"chgrights\" value=\"Change Rights\" title=\"Change use rights\">\n";
+		echo "<input type=submit name=\"template\" value=\"Template\" title=\"Make a copy of all selected questions\">\n";
 		if (!$isadmin && !$isgrpadmin) { 
 			echo "<br/>(Delete and Transfer only applies to your questions)\n";
 		} else if ($isgrpadmin) {
@@ -1135,9 +1136,9 @@ function getnextprev(formn,loc) {
 					echo '<td>'.$page_questionTable[$qid]['lib'].'</td>';
 				} else if ($searchall==0) {
 					if ($page_questionTable[$qid]['junkflag']==1) {
-						echo "<td class=c><img class=\"pointer\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" /></td>";
+						echo "<td class=c><img class=\"pointer wlf\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" /></td>";
 					} else {
-						echo "<td class=c><img class=\"pointer\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" /></td>";
+						echo "<td class=c><img class=\"pointer wlf\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" /></td>";
 					}
 				} 
 				$ln++;

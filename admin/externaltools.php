@@ -110,7 +110,7 @@ if (isset($_POST['tname'])) {
 		echo '<p>Are you SURE you want to delete the tool <b>'.$name.'</b>?  Doing so will break ALL placements of this tool.</p>';
 		echo '<form method="post" action="externaltools.php?cid='.$cid.$ltfrom.'&amp;id='.$_GET['id'].'&amp;delete=true">';
 		echo '<input type=submit value="Yes, I\'m Sure">';
-		echo '<input type=button value="Nevermind" onclick="window.location=\'externaltools.php?cid='.$cid.'\'">';
+		echo '<input type=button value="Nevermind" class="secondarybtn" onclick="window.location=\'externaltools.php?cid='.$cid.'\'">';
 		echo '</form>';
 		
 	} else if (isset($_GET['id'])) {

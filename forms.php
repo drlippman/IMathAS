@@ -252,7 +252,7 @@ switch($_GET['action']) {
 		
 		echo "Are you SURE you want to unenroll from this course?  All assessment attempts will be deleted.\n";
 		echo "<p><input type=button onclick=\"window.location='actions.php?action=unenroll&cid={$_GET['cid']}'\" value=\"Really Unenroll\">\n";
-		echo "<input type=button value=\"Never Mind\" onclick=\"window.location='./course/course.php?cid={$_GET['cid']}'\"></p>\n";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='./course/course.php?cid={$_GET['cid']}'\"></p>\n";
 		break;
 	case "resetpw":
 		echo '<div id="headerforms" class="pagetitle"><h2>Reset Password</h2></div>';

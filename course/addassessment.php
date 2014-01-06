@@ -71,7 +71,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$body .= "<h3>$assessmentname</h3>";
 			$body .= "<p>Are you SURE you want to delete all attempts (grades) for this assessment?</p>";
 			$body .= "<p><input type=button value=\"Yes, Clear\" onClick=\"window.location='addassessment.php?cid={$_GET['cid']}&id={$_GET['id']}&clearattempts=confirmed'\">\n";
-			$body .= "<input type=button value=\"Nevermind\" onClick=\"window.location='addassessment.php?cid={$_GET['cid']}&id={$_GET['id']}'\"></p>\n";
+			$body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='addassessment.php?cid={$_GET['cid']}&id={$_GET['id']}'\"></p>\n";
 		}
 	} elseif ($_POST['name']!= null) { //if the form has been submitted
 		
@@ -358,6 +358,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			if ($line['intro']=='') {
 			//	$line['intro'] = "<p>Enter intro/instructions</p>";
 			}
+			$savetitle = _("Save Changes");
 		} else {  //INITIAL LOAD IN ADD MODE
 			//set defaults
 			$line['name'] = "Enter assessment name";
@@ -405,6 +406,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$line['msgtoinstr'] = isset($CFG['AMS']['msgtoinstr'])?$CFG['AMS']['msgtoinstr']:0;
 			$line['defoutcome'] = 0;
 			$taken = false;
+			
+			$savetitle = _("Create Assessment");
 		}
 		if ($line['minscore']>10000) {
 			$line['minscore'] -= 10000;
@@ -694,7 +697,7 @@ if ($overwriteBody==1) {
 		
 		<span class=form></span>
 		<span class=formright>
-			<input type=submit value="Submit Now"> or continue below for Assessment Options
+			<input type=submit value="<?php echo $savetitle;?>"> now or continue below for Assessment Options
 		</span><br class=form>
 	
 		<fieldset><legend>Assessment Options</legend>
@@ -1010,7 +1013,7 @@ if ($overwriteBody==1) {
 			</fieldset>
 		</div>
 	</fieldset>
-	<div class=submit><input type=submit value=Submit></div>
+	<div class=submit><input type=submit value="<?php echo $savetitle;?>"></div>
 
 <?php
 }

@@ -119,7 +119,7 @@ function plot3d($func,$umin,$umax,$vmin,$vmax) {
 		  }
 		  $url = $GLOBALS['urlmode']  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . (isset($_SERVER['QUERY_STRING'])?'?'.$_SERVER['QUERY_STRING'].'&useflash=true':'?useflash=true');
 				 
-		  $html .= "Not seeing the 3D graph?  <a href=\"$url\">Try Alternate</a></applet>\n";
+		  $html .= "</applet><br/>Not seeing the 3D graph?  <a href=\"$url\">Try Flash Alternate</a>\n";
 	  }
 	  return $html;
 	

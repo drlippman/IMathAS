@@ -146,6 +146,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			if ($line['description']=='') {
 				//$line['description'] = "<p>Enter Wiki description here</p>";
 			}
+			$savetitle = _("Save Changes");
 		} else {
 			$line['name'] = "Enter Wiki Name here";
 			$line['description'] = "<p>Enter Wiki description here</p>";
@@ -156,6 +157,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$revisedate  = 2000000000;
 			$settings = 0;
 			$started = false;
+			$savetitle = _("Create Wiki");
 		}
 		
 		$page_formActionTag = "?block=$block&cid=$cid&folder=" . $_GET['folder'];
@@ -301,7 +303,7 @@ if ($started) {
 			at <input type=text size=10 name=rtime value="<?php echo $rtime;?>">
 		</span><br class="form" />
 		
-		<div class=submit><input type=submit value=Submit></div>
+		<div class=submit><input type=submit value="<?php echo $savetitle;?>"></div>
 	</form>	
 
 <?php

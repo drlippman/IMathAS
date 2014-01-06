@@ -409,7 +409,7 @@ for ($i=0;$i<count($hdrs);$i++) {
 			echo '<td id="'.$ids[$i][$j].'" onclick="showcalcontents(this)" class="today"><div class="td"><span class=day>'.$hdrs[$i][$j]."</span><div class=center>";
 		} else {
 			$addr = $refpage.".php?cid=$cid&calstart=". ($midtoday + $i*7*24*60*60 + ($j - $dayofweek)*24*60*60);
-			echo '<td id="'.$ids[$i][$j].'" onclick="showcalcontents(this)" ><div class="td"><span class=day><a href="'.$addr.'">'.$hdrs[$i][$j]."</a></span><div class=center>";
+			echo '<td id="'.$ids[$i][$j].'" onclick="showcalcontents(this)" ><div class="td"><span class=day><a href="'.$addr.'" class="caldl">'.$hdrs[$i][$j]."</a></span><div class=center>";
 		}
 		if (isset($assess[$ids[$i][$j]])) {
 			foreach ($assess[$ids[$i][$j]] as $k=>$info) {

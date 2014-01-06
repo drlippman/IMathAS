@@ -6,13 +6,13 @@
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script>
-<link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=112613";?>" type="text/css" />
+<link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=121713";?>" type="text/css" />
 <?php if (isset($coursetheme)) { 
 	if (isset($flexwidth) || isset($usefullwidth)) {
 		$coursetheme = str_replace('_fw','',$coursetheme);
 	}
 	?>
-<link rel="stylesheet" href="<?php echo $imasroot . "/themes/$coursetheme?v=012810";?>" type="text/css" />
+<link rel="stylesheet" href="<?php echo $imasroot . "/themes/$coursetheme?v=121713";?>" type="text/css" />
 <link rel="stylesheet" href="<?php echo $imasroot;?>/handheld.css" media="handheld,only screen and (max-device-width:480px)"/>
 
 <?php } ?>
@@ -36,7 +36,7 @@ div.breadcrumb { display:none;}
 <script type="text/javascript">
 var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && is_numeric($cid))?$cid:0; ?>;
 </script>
-<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js?ver=112613"></script>
+<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js?ver=121713"></script>
 <?php
 //$sessiondata['mathdisp'] = 3;
 //writesessiondata();
@@ -174,6 +174,9 @@ if (isset($cid) && isset($teacherid) && $coursetopbar[2]==1 && count($coursetopb
 		echo "<li><a {$a[3]} href=\"$imasroot/course/listusers.php?cid=$cid\">Roster</a></li>\n";
 		$essentialsnavcnt++;
 	}
+	if (in_array(4,$coursetopbar[1])  && (($coursetoolset&1)==0 || !isset($CFG['CPS']['topbar']) || $CFG['CPS']['topbar'][1]==1)) { //Calendar
+		echo "<li><a {$a[4]} href=\"$imasroot/course/showcalendar.php?cid=$cid\">Calendar</a></li>\n";
+	}
 	if (in_array(2,$coursetopbar[1])) { //Gradebook
 		echo "<li><a {$a[2]} href=\"$imasroot/course/gradebook.php?cid=$cid\">Gradebook</a>$gbnewflag</li>";
 		$essentialsnavcnt++;
@@ -181,14 +184,13 @@ if (isset($cid) && isset($teacherid) && $coursetopbar[2]==1 && count($coursetopb
 	if (in_array(7,$coursetopbar[1])) { //Groups
 		echo "<li><a {$a[7]} href=\"$imasroot/course/managestugrps.php?cid=$cid\">Groups</a></li>\n";
 	}
-	if (in_array(4,$coursetopbar[1])  && (($coursetoolset&1)==0 || !isset($CFG['CPS']['topbar']) || $CFG['CPS']['topbar'][1]==1)) { //Calendar
-		echo "<li><a {$a[4]} href=\"$imasroot/course/showcalendar.php?cid=$cid\">Calendar</a></li>\n";
-	}
+	
+	
 	if (in_array(5,$coursetopbar[1])) { //Quick view
 		echo "<li><a {$a[5]} href=\"$imasroot/course/course.php?cid=$cid&quickview=on\">Quick View</a></li>\n";
 	}
 	
-	if (in_array(9,$coursetopbar[1])) { //Log out
+	if (in_array(9,$coursetopbar[1]) && !isset($haslogout)) { //Log out
 		echo "<li><a href=\"$imasroot/actions.php?action=logout\">Log Out</a></li>";
 	}
 	echo '</ul>';
@@ -207,19 +209,20 @@ if (isset($cid) && isset($teacherid) && $coursetopbar[2]==1 && count($coursetopb
 		echo "<li><a {$a[0]} href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a></li> ";
 		$essentialsnavcnt++;
 	}
-	if (in_array(3,$coursetopbar[0])) { //forums
+	if (in_array(3,$coursetopbar[0]) && (($coursetoolset&2)==0 || !isset($CFG['CPS']['topbar']) || $CFG['CPS']['topbar'][1]==1)) { //forums
 		echo "<li><a {$a[3]} href=\"$imasroot/forums/forums.php?cid=$cid\">Forums</a></li> ";
+		$essentialsnavcnt++;
+	}
+	if (in_array(2,$coursetopbar[0]) && (($coursetoolset&1)==0 || !isset($CFG['CPS']['topbar']) || $CFG['CPS']['topbar'][1]==1)) { //Calendar
+		echo "<li><a {$a[2]} href=\"$imasroot/course/showcalendar.php?cid=$cid\">Calendar</a></li>\n";
 		$essentialsnavcnt++;
 	}
 	if (in_array(1,$coursetopbar[0])) { //Gradebook
 		echo "<li><a {$a[1]} href=\"$imasroot/course/gradebook.php?cid=$cid\">Gradebook</a></li> ";
 		$essentialsnavcnt++;
 	}
-	if (in_array(2,$coursetopbar[0])) { //Calendar
-		echo "<li><a {$a[2]} href=\"$imasroot/course/showcalendar.php?cid=$cid\">Calendar</a></li>\n";
-		$essentialsnavcnt++;
-	}
-	if (in_array(9,$coursetopbar[0])) { //Log out
+	
+	if (in_array(9,$coursetopbar[0]) && !isset($haslogout)) { //Log out
 		echo "<li><a href=\"$imasroot/actions.php?action=logout\">Log Out</a></li>";
 	}
 	echo '</ul>';
@@ -240,7 +243,7 @@ require_once("$curdir/filter/filter.php");
 
 if (!isset($nologo)) {
 	echo '<div id="headerlogo" ';
-	if ($myrights>10 && !$ispublic) {
+	if ($myrights>10 && !$ispublic && !isset($sessiondata['ltiitemtype'])) {
 		echo 'onclick="mopen(\'homemenu\',';
 		if (isset($cid) && is_numeric($cid)) {
 			echo $cid;
@@ -250,7 +253,7 @@ if (!isset($nologo)) {
 		echo ')" onmouseout="mclosetime()"';
 	}
 	echo '>'.$smallheaderlogo.'</div>';
-	if ($myrights>10 && !$ispublic) {
+	if ($myrights>10 && !$ispublic && !isset($sessiondata['ltiitemtype'])) {
 		echo '<div id="homemenu" class="ddmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">';
 		echo '</div>';
 	}

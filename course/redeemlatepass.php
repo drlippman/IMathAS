@@ -114,9 +114,9 @@
 			echo "extension on this assessment.  Are you sure you want to redeem a LatePass?</p>";
 			echo "<input type=submit value=\"Yes, Redeem LatePass\"/>";
 			if ((!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
-				echo "<input type=button value=\"Nevermind\" onclick=\"window.location='course.php?cid=$cid'\"/>";
+				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='course.php?cid=$cid'\"/>";
 			} else {
-				echo "<input type=button value=\"Nevermind\" onclick=\"window.location='../assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}'\"/>";
+				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='../assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}'\"/>";
 			}
 			echo "</form>";
 		}

@@ -46,33 +46,34 @@ if (isset($_POST['mathdisp']) && $_POST['mathdisp']=='textandimg') {
 }
 
 $sessiondata['graphdisp'] = 2;
-require("../assessment/header.php");
+
 
 if ($overwriteBody==1) {
 	echo $body;
 } if (!isset($_POST['versions'])) {
+	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
 	echo "&gt; Print Test</div>\n";
 	
-	//echo '<div class="cpmid"><a href="printtest.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for printing</a></div>';
+	echo '<div class="cpmid"><a href="printtest.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for in-browser printing</a></div>';
 	
-	echo "<h2>Copy-and-paste Print Version</h2>";
+	echo "<h2>Copy-and-Paste Print Version</h2>";
 		
 	echo '<p>This page will help you create a copy of this assessment that you should be able to cut and ';
 	echo 'paste into Word or another word processor and adjust layout for printing</p>';
 	
 	echo "<form method=post action=\"printlayoutbare.php?cid=$cid&aid=$aid\">\n";
-	echo "<p>Number of different versions to generate: <input type=text name=versions value=\"1\"></p>\n";
-	echo '<p>Format?  <input type="radio" name="format" value="trad" checked="checked" /> Form A: 1 2 3 Form B: 1 2 3 <input type="radio" name="format" value="inter"/> 1a 1b 2a 2b</p>';
-	echo "<p>Generate answer keys? <input type=radio name=keys value=0>No <input type=radio name=keys value=1 checked=1>Yes</p>\n";
-	echo "<p>Question separator:  <input type=text name=\"qsep\" value=\"\" /></p>";
-	echo "<p>Version separator: <input type=text name=\"vsep\" value=\"+++++++++++++++\" /> </p>";
-	echo '<p>Math display: <input type="radio" name="mathdisp" value="img" checked="checked" /> Images <input type="radio" name="mathdisp" value="text"/> Text <input type="radio" name="mathdisp" value="tex"/> TeX <input type="radio" name="mathdisp" value="textandimg"/> Images, then again in text</p>';
-	echo '<p>Include question numbers and point values: <input type="checkbox" name="showqn" checked="checked" /> </p>';
-	echo "<p><input type=submit value=\"Continue\"></p></form>\n";
+	echo '<span class="form">Number of different versions to generate:</span><span class="formright"><input type=text name=versions value="1" size="3"></span><br class="form"/>';
+	echo '<span class="form">Format?</span><span class="formright"><input type="radio" name="format" value="trad" checked="checked" /> Form A: 1 2 3, Form B: 1 2 3<br/><input type="radio" name="format" value="inter"/> 1a 1b 2a 2b</span><br class="form"/>';
+	echo '<span class="form">Generate answer keys?</span><span class="formright"> <input type=radio name=keys value=1 checked=1>Yes <input type=radio name=keys value=0>No</span><br class="form"/>';
+	echo '<span class="form">Question separator:</span><span class="formright"><input type=text name="qsep" value="" /></span><br class="form"/>';
+	echo '<span class="form">Version separator:</span><span class="formright"><input type=text name="vsep" value="+++++++++++++++" /> </span><br class="form"/>';
+	echo '<span class="form">Math display:</span><span class="formright"><input type="radio" name="mathdisp" value="img" checked="checked" /> Images <input type="radio" name="mathdisp" value="text"/> Text <input type="radio" name="mathdisp" value="tex"/> TeX <input type="radio" name="mathdisp" value="textandimg"/> Images, then again in text</span><br class="form"/>';
+	echo '<span class="form">Include question numbers and point values:</span><span class="formright"><input type="checkbox" name="showqn" checked="checked" /> </span><br class="form"/>';
+	echo '<div class="submit"><input type=submit value="Continue"></div></form>';
 	
 } else {		
-
+	require("../assessment/header.php");
 	$query = "SELECT itemorder,shuffle,defpoints,name,intro FROM imas_assessments WHERE id='$aid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);

@@ -9,13 +9,20 @@ function mopen(id,cid) {
 		homemenuloaded = 1;
 	}
 	mcancelclosetime();
-	if(ddmenuitem) ddmenuitem.style.visibility = 'hidden';
-	ddmenuitem = document.getElementById(id);
-	ddmenuitem.style.visibility = 'visible';
+	if(ddmenuitem) { 
+		ddmenuitem.style.visibility = 'hidden';
+		ddmenuitem = null;
+	}else {
+		ddmenuitem = document.getElementById(id);
+		ddmenuitem.style.visibility = 'visible';
+	}
 }
 // close showed layer
 function mclose() {
-	if(ddmenuitem) ddmenuitem.style.visibility = 'hidden';
+	if(ddmenuitem) {
+		ddmenuitem.style.visibility = 'hidden';
+		ddmenuitem = null;
+	}
 }
 // go close timer
 function mclosetime() {
@@ -218,6 +225,7 @@ function GB_show(caption,url,width,height) {
 		GB_loaded  = true;
 	}
 	document.getElementById("GB_frameholder").innerHTML = '<iframe onload="GB_doneload()" id="GB_frame" src="'+url+'"></iframe>';
+	jQuery("#GB_frameholder").isolatedScroll();
 	if (url.match(/libtree/)) {
 		var btnhtml = '<span class="floatright"><input type="button" value="Use Libraries" onClick="document.getElementById(\'GB_frame\').contentWindow.setlib()" /> ';
 		btnhtml += '<span class="pointer" onclick="GB_hide()">[X]</span>&nbsp;</span>Select Libraries<div class="clear"></div>';
@@ -226,7 +234,11 @@ function GB_show(caption,url,width,height) {
 	} else {
 		document.getElementById("GB_caption").innerHTML = '<span class="floatright"><span class="pointer" onclick="GB_hide()">[X]</span></span>'+caption;
 		document.getElementById("GB_caption").onclick = GB_hide;
-		var h = height;
+		if (height=='auto') {
+			var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
+		} else {
+			var h = height;
+		}
 	}
 	document.getElementById("GB_window").style.display = "block";
 	document.getElementById("GB_overlay").style.display = "block";
@@ -380,12 +392,18 @@ function setselectbycookie() {
 }
 addLoadEvent(setselectbycookie);
 
+var recordedunload = false;
 function recclick(type,typeid,info,txt) {
 	if (cid>0) {
-		$.ajax({
+		var extradata = '',m;
+		if ((m = window.location.href.match(/showlinkedtext.*?&id=(\d+)/)) !== null && recordedunload==false) {
+			extradata = '&unloadinglinked='+m[1];
+			recordedunload = true;
+		}
+		jQuery.ajax({
 			type: "POST",
 			url: imasroot+'/course/rectrack.php?cid='+cid,
-			data: "type="+encodeURIComponent(type)+"&typeid="+encodeURIComponent(typeid)+"&info="+encodeURIComponent(info+'::'+txt)
+			data: "type="+encodeURIComponent(type)+"&typeid="+encodeURIComponent(typeid)+"&info="+encodeURIComponent(info+'::'+txt)+extradata
 		});
 	}			
 }
@@ -395,7 +413,7 @@ function setuptracklinks(i,el) {
 			e.preventDefault();
 			var inf = jQuery(this).attr('data-base').split('-');
 			recclick(inf[0], inf[1], jQuery(this).attr("href"), jQuery(this).text());
-			setTimeout('window.location.href = "'+$(this).attr('href')+'"',100);
+			setTimeout('window.location.href = "'+jQuery(this).attr('href')+'"',100);
 			return false;
 		});
 	}
@@ -403,21 +421,21 @@ function setuptracklinks(i,el) {
 var videoembedcounter = 0;
 function togglevideoembed() {
 	var id = this.id.substr(13);
-	var els = $('#videoiframe'+id);
+	var els = jQuery('#videoiframe'+id);
 	if (els.length>0) {
 		if (els.css('display')=='none') {
 			els.show();
 			els.parent('.fluid-width-video-wrapper').show();
-			$(this).text(' [-]');
-			$(this).attr('title',_("Hide video"));
+			jQuery(this).text(' [-]');
+			jQuery(this).attr('title',_("Hide video"));
 		} else {
 			els.hide();
 			els.parent('.fluid-width-video-wrapper').hide();
-			$(this).text(' [+]');
-			$(this).attr('title',_("Watch video here"));
+			jQuery(this).text(' [+]');
+			jQuery(this).attr('title',_("Watch video here"));
 		}
 	} else {
-		var href = $(this).prev().attr('href');
+		var href = jQuery(this).prev().attr('href');
 		var qsconn = '?';
 		if (href.match(/youtube\.com/)) {
 			if (href.indexOf('playlist?list=')>-1) {
@@ -441,27 +459,27 @@ function togglevideoembed() {
 		} else {
 			var timeref = qsconn+'rel=0&start='+((m[2]?m[2]*60:0) + (m[4]?m[4]*1:0));
 		}
-		$('<iframe/>', {
+		jQuery('<iframe/>', {
 			id: 'videoiframe'+id,
 			width: 640,
 			height: 400,
 			src: location.protocol+'//'+vidsrc+vidid+timeref,
 			frameborder: 0,
 			allowfullscreen: 1
-		}).insertAfter($(this));
-		$(this).parent().fitVids();
-		$('<br/>').insertAfter($(this));
-		$(this).text(' [-]');
-		$(this).attr('title',_("Hide video"));
-		if ($(this).prev().attr("data-base")) {
-			var inf = $(this).prev().attr('data-base').split('-');
+		}).insertAfter(jQuery(this));
+		jQuery(this).parent().fitVids();
+		jQuery('<br/>').insertAfter(jQuery(this));
+		jQuery(this).text(' [-]');
+		jQuery(this).attr('title',_("Hide video"));
+		if (jQuery(this).prev().attr("data-base")) {
+			var inf = jQuery(this).prev().attr('data-base').split('-');
 			recclick(inf[0], inf[1], href);
 		}
 	}	
 }
 function setupvideoembeds(i,el) {
 	
-	$('<span/>', {
+	jQuery('<span/>', {
 		text: " [+]",
 		title: _("Watch video here"),
 		id: 'videoembedbtn'+videoembedcounter,
@@ -472,16 +490,16 @@ function setupvideoembeds(i,el) {
 }
 
 function addmultiselect(el,n) {
-	var p = $(el).parent();
-	var val = $('#'+n).val();
-	var txt = $('#'+n+' option[value='+val+']').prop('disabled',true).html();
+	var p = jQuery(el).parent();
+	var val = jQuery('#'+n).val();
+	var txt = jQuery('#'+n+' option[value='+val+']').prop('disabled',true).html();
 	if (val != 'null') {
 		p.append('<div class="multiselitem"><span class="right"><a href="#" onclick="removemultiselect(this);return false;">Remove</a></span><input type="hidden" name="'+n+'[]" value="'+val+'"/>'+txt+'</div>');
 	}
-	$('#'+n).val('null');
+	jQuery('#'+n).val('null');
 }
 function removemultiselect(el) {
-	var p = $(el).parent().parent();
+	var p = jQuery(el).parent().parent();
 	var val = p.find('input').val();
 	p.parent().find('option[value='+val+']').prop('disabled',false);
 	p.remove();
@@ -489,13 +507,13 @@ function removemultiselect(el) {
 
 function hidefromcourselist(el,cid) {
 	if (confirm("Are you SURE you want to hide this course from your course list?")) {
-		$.ajax({
+		jQuery.ajax({
 				type: "GET",
 				url: imasroot+'/admin/hidefromcourselist.php?cid='+cid
 		}).done(function(msg) {
 			if (msg=='OK') {
-				$(el).parent().slideUp();
-				$('#unhidelink').show();
+				jQuery(el).parent().slideUp();
+				jQuery('#unhidelink').show();
 			}
 		});
 	}
@@ -506,7 +524,25 @@ jQuery(document).ready(function($) {
 	$('a[href*="youtu"]').each(setupvideoembeds);
 	$('a[href*="vimeo"]').each(setupvideoembeds);	
 	$('body').fitVids();
+	$('a[target="_blank"]').each(function() {
+		if (!this.href.match(/youtu/) && !this.href.match(/vimeo/)) {
+		   $(this).append(' <img src="'+imasroot+'/img/extlink.png"/>')
+		}
+	});
 });
+
+jQuery.fn.isolatedScroll = function() {
+    this.bind('mousewheel DOMMouseScroll', function (e) {
+        var delta = e.wheelDelta || (e.originalEvent && e.originalEvent.wheelDelta) || -e.detail,
+            bottomOverflow = this.scrollTop + jQuery(this).outerHeight() - this.scrollHeight >= 0,
+            topOverflow = this.scrollTop <= 0;
+
+        if ((delta < 0 && bottomOverflow) || (delta > 0 && topOverflow)) {
+            e.preventDefault();
+        }
+    });
+    return this;
+};
 
 function _(txt) {
 	if (typeof i18njs != "undefined" && i18njs[txt]) {
