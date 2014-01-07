@@ -17,6 +17,7 @@ if (isset($_POST['data'])) {
 	$valarray = array();
 	$tot = 0;
 	foreach ($lines as $line) {
+		$line = str_replace(array("\r","\t"," "),'',$line);
 		list($uqid,$ulibid) = explode('@',$line);
 		$valarray[] = "('$uqid','$ulibid')";
 		if (count($valarray)==500) {

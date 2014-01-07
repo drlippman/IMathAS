@@ -7,6 +7,7 @@ if (isset($_POST['data'])) {
 	$lines = explode("\n",$_POST['data']);
 	foreach ($lines as $line) {
 		list($uid,$lastm,$extref) = explode('@',$line);
+		$extref = str_replace(array("\r","\t"," "),'',$extref);
 		$info[$uid] = array($lastm,$extref);
 	}
 	$query = "SELECT id,uniqueid,lastmoddate,extref FROM imas_questionset WHERE 1";
