@@ -15,6 +15,7 @@ if (strpos($url,'youtube.com/watch')!==false) {
 	if (strpos($vidid,'#')!==false) {
 		$vidid = substr($vidid,0,strpos($vidid,'#'));
 	} 
+	$vidid = str_replace(array(" ","\n","\r","\t"),'',$vidid);
 	$timestart = '?rel=0';
 	if (strpos($url,'start=')!==false) {
 		preg_match('/start=(\d+)/',$url,$m);
@@ -40,6 +41,7 @@ if (strpos($url,'youtu.be/')!==false) {
 	if (strpos($vidid,'?')!==false) {
 		$vidid = substr($vidid,0,strpos($vidid,'?'));
 	}
+	$vidid = str_replace(array(" ","\n","\r","\t"),'',$vidid);
 	$timestart = '?rel=0';
 	if (strpos($url,'start=')!==false) {
 		preg_match('/start=(\d+)/',$url,$m);
