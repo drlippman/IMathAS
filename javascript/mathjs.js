@@ -26,7 +26,12 @@ var arccsch = function(x) { return arcsinh(1/x) };
 var arccoth = function(x) { return arctanh(1/x) };
 var sign = function(x) { return (x==0?0:(x<0?-1:1)) };
 var logten = function(x) { return (Math.LOG10E*Math.log(x)) };
-
+var sinn = function(n,x) {return Math.pow(Math.sin(x),n)};
+var cosn = function(n,x) {return Math.pow(Math.cos(x),n)};
+var tann = function(n,x) {return Math.pow(Math.tan(x),n)};
+var cscn = function(n,x) {return 1/Math.pow(Math.sin(x),n)};
+var secn = function(n,x) {return 1/Math.pow(Math.cos(x),n)};
+var cotn = function(n,x) {return 1/Math.pow(Math.tan(x),n)};
 
 function factorial(x,n) {
   if (n==null) n=1;
@@ -120,7 +125,7 @@ function mathjs(st,varlist) {
     st = st.replace(/csch\^-1/g,"arccsch");
     st = st.replace(/coth\^-1/g,"arccoth");
   }
-  
+  st = st.replace(/(sin|cos|tan|sec|csc|cot)\^(\d+)\(/g,"$1n($2,");
   st = st.replace(/root\((\d+)\)\(/g,"nthroot($1,");
   //st = st.replace(/E/g,"(EE)");
   st = st.replace(/([0-9])E([\-0-9])/g,"$1(EE)$2");

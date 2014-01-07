@@ -83,10 +83,10 @@ if (!isset($sessiondata['mathdisp'])) {
 }
 
 if ($sessiondata['graphdisp']==1) {
-	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?v=072213\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?v=010714\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIISvg = true;</script>";
 } else {
-	echo "<script src=\"$imasroot/javascript/mathjs.js?v=072213\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/mathjs.js?v=010714\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIISvg = false;</script>";
 }
 ?>
