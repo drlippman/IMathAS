@@ -111,10 +111,10 @@ foreach ($actions as $r) {
 	if (isset($r[3])) {
 		$r3pts = explode('::',$r[3]);
 		if (count($r3pts)==2) {
-			$link = '<a href="'.$r3pts[0].'" target="_blank">'.$r3pts[1].'</a>';
+			$thelink = '<a href="'.$r3pts[0].'" target="_blank">'.$r3pts[1].'</a>';
 			$href = $r3pts[0];
 		} else {
-			$link = $r[3];
+			$thelink = $r[3];
 			$href = $r[3];
 		}
 	}
@@ -123,10 +123,10 @@ foreach ($actions as $r) {
 	echo '<td>';
 	switch ($r[0]) {
 	case 'inlinetext':
-		echo 'In inline text item '.$innames[$r[1]].', clicked link to '.$link;
+		echo 'In inline text item '.$innames[$r[1]].', clicked link to '.$thelink;
 		break;
 	case 'linkedsum':
-		echo 'From linked item '.$linames[$r[1]].' summary, clicked link to '.$link;
+		echo 'From linked item '.$linames[$r[1]].' summary, clicked link to '.$thelink;
 		break;
 	case 'linkedlink':
 		if ($r[3]==$r[1] || (strpos($href,'showlinkedtext')!==false && strpos($href,'id='.$r[1])!==false)) {
@@ -136,7 +136,7 @@ foreach ($actions as $r) {
 		}
 		break;
 	case 'linkedintext':
-		echo 'In linked text '.$linames[$r[1]].', clicked link to '.$link;
+		echo 'In linked text '.$linames[$r[1]].', clicked link to '.$thelink;
 		break;
 	case 'linkedviacal':
 		if ($r[3]==$r[1] || (strpos($href,'showlinkedtext')!==false && strpos($href,'id='.$r[1])!==false)) {
@@ -150,10 +150,10 @@ foreach ($actions as $r) {
 		echo 'In assessment '.$exnames[$r[1]].', clicked help for <a target="_blank" href="'.$p[1].'">'.$p[0].'</a>';
 		break;
 	case 'assessintro':
-		echo 'In assessment '.$asnames[$r[1]].' intro, clicked link to '.$link;
+		echo 'In assessment '.$asnames[$r[1]].' intro, clicked link to '.$thelink;
 		break;
 	case 'assesssum':
-		echo 'In assessment '.$asnames[$r[1]].' summary, clicked link to '.$link;
+		echo 'In assessment '.$asnames[$r[1]].' summary, clicked link to '.$thelink;
 		break;
 	case 'assess':
 		echo 'Opened assessment '.$asnames[$r[1]];
@@ -168,7 +168,7 @@ foreach ($actions as $r) {
 		echo 'Opened wiki '.$winames[$r[1]];
 		break;
 	case 'wikiintext':
-		echo 'In wiki '.$winames[$r[1]].', clicked link to '.$link;
+		echo 'In wiki '.$winames[$r[1]].', clicked link to '.$thelink;
 		break;
 	case 'forumpost':
 		$fp = explode(';',$r[3]);

@@ -878,7 +878,10 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='aid' || $keyparts[0]=='placein' || $ke
 				$query = "SELECT id FROM imas_tutors WHERE userid='$userid' AND courseid='$cid'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				if (mysql_num_rows($result) == 0) { //nope, not a tutor either.  Add new student
-					$query = "INSERT INTO imas_students (userid,courseid,section) VALUES ('$userid','$cid','{$_SESSION['lti_context_label']}')";
+					$query = "SELECT deflatepass FROM imas_courses WHERE id='$cid'";
+					$result = mysql_query($query) or die("Query failed : " . mysql_error());
+					$deflatepass = mysql_result($result,0,0);
+					$query = "INSERT INTO imas_students (userid,courseid,section,latepass) VALUES ('$userid','$cid','{$_SESSION['lti_context_label']}','$deflatepass')";
 					mysql_query($query) or die("Query failed : " . mysql_error());
 				}
 			} else {
