@@ -2835,3 +2835,29 @@ msgstr "bis"
 #: assessment/displayq2.php:1105
 msgid "your answer"
 msgstr "Ihre Antwort"
+
+#: embedq.php:69
+msgid "Score on last question:"
+msgstr "Punkte für letzte Frage:"
+
+#: embedq.php:75
+msgid "Displaying last question with solution"
+msgstr "Stelle letzte Frage mit Lösung dar"
+
+#: embedq.php:75
+msgid "New Question"
+msgstr "Neue Frage"
+
+#: embedq.php:83
+msgid "Check Answer"
+msgstr "Antwort prüfen"
+
+#: embedq.php:129
+#, php-format
+msgid "%1$s out of %2$s"
+msgstr "%1$s von %2$s"
+
+#: embedq.php:164
+#, php-format
+msgid "%1$s out of %2$s (parts: %3$s)"
+msgstr "%1$s von %2$s (Teile: %3$s)"
