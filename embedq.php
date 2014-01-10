@@ -66,13 +66,13 @@ $useeditor = 1;
 require("./assessment/header.php");
 
 if ($page_scoreMsg != '' && !isset($_GET['noscores'])) {
-	echo '<div class="review">Score on last question: '.$page_scoreMsg;
+	echo '<div class="review">' . _('Score on last question:') . $page_scoreMsg;
 	echo '</div>';
 }
 
 if ($showans) {
 	echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit()\">\n";
-	echo "<p>Displaying last question with solution <input type=submit name=\"next\" value=\"New Question\"/></p>\n";
+	echo "<p>" . _('Displaying last question with solution') . " <input type=submit name=\"next\" value=\"" . _('New Question') . "\"/></p>\n";
 	displayq(0,$qsetid,$seed,2,true,0);
 	echo "</form>\n";
 } else {
@@ -80,7 +80,7 @@ if ($showans) {
 	echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit()\">\n";
 	echo "<input type=\"hidden\" name=\"seed\" value=\"$seed\" />";
 	displayq(0,$qsetid,$seed,$doshowans,true,0);
-	echo "<input type=submit name=\"check\" value=\"Check Answer\">\n";
+	echo "<input type=submit name=\"check\" value=\"" . _('Check Answer') . "\">\n";
 	echo "</form>\n";
 }
 
@@ -126,7 +126,7 @@ function printscore($sc,$qsetid,$seed) {
 	$poss = 1;
 	if (strpos($sc,'~')===false) {
 		$sc = str_replace('-1','N/A',$sc);
-		$out =  "$sc out of $poss";
+		$out = sprintf(_('%1$s out of %2$s'), $sc, $poss);
 		$pts = $sc;
 		if (!is_numeric($pts)) { $pts = 0;}
 	} else {
@@ -161,7 +161,7 @@ function printscore($sc,$qsetid,$seed) {
 		}
 		$sc = implode(', ',$scarr);
 		//$ptposs = implode(', ',$ptposs); 
-		$out =  "$pts out of $poss (parts: $sc)";
+		$out = sprintf(_('%1$s out of %2$s (parts: %3$s)'), $pts, $poss, $sc);
 	}	
 	$bar = '<span class="scorebarholder">';
 	if ($poss==0) {
