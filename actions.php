@@ -487,6 +487,14 @@
 				exit;
 			}
 		}
+
+		if (isset($_POST['settimezone'])) {
+			if (date_default_timezone_set($_POST['settimezone'])) {
+				$tzname = $_POST['settimezone'];
+				$query = "UPDATE imas_sessions SET tzname='$tzname' WHERE sessionid='$sessionid'";
+				mysql_query($query) or die("Query failed : " . mysql_error()); 
+			}
+		}
 	} else if ($_GET['action']=="forumwidgetsettings") {
 		$checked = $_POST['checked'];
 		$all = explode(',',$_POST['allcourses']);
