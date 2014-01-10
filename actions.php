@@ -487,6 +487,17 @@
 				exit;
 			}
 		}
+	} else if ($_GET['action']=="forumwidgetsettings") {
+		$checked = $_POST['checked'];
+		$all = explode(',',$_POST['allcourses']);
+		foreach ($all as $k=>$v) {
+			$all[$k] = intval($v);
+		}
+		$tohide = array_diff($all,$checked);
+		$hidelist = implode(',', $tohide);
+		$query = "UPDATE imas_users SET hideonpostswidget='$hidelist' WHERE id='$userid'";
+		mysql_query($query) or die("Query failed : " . mysql_error()); 
+		
 	} else if ($_GET['action']=="googlegadget") {
 		if (isset($_GET['clear'])) {
 			$query = "UPDATE imas_users SET remoteaccess='' WHERE id='$userid'";
