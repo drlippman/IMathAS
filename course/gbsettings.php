@@ -196,7 +196,9 @@
 		<input type=radio name=orderby value="4" <?php writeHtmlChecked($orderby&~1,4);?>/> Order by end date, new to old<br/> 
 		<input type=radio name=orderby value="6" <?php writeHtmlChecked($orderby&~1,6);?>/> Order by start date, old to new<br/> 
 		<input type=radio name=orderby value="8" <?php writeHtmlChecked($orderby&~1,8);?>/> Order by start date, new to old<br/> 
-		<input type=radio name=orderby value="2" <?php writeHtmlChecked($orderby&~1,2);?>/> Order alphabetically<br/> 
+		<input type=radio name=orderby value="2" <?php writeHtmlChecked($orderby&~1,2);?>/> Order alphabetically<br/>
+		<input type=radio name=orderby value="10" <?php writeHtmlChecked($orderby&~1,10);?>/> Order by course page order, offline at end<br/> 
+		<input type=radio name=orderby value="12" <?php writeHtmlChecked($orderby&~1,12);?>/> Order by course page order reversed, offline at start<br/> 
 	</span><br class=form />
 	
 	<fieldset><legend>Default gradebook view:</legend>
