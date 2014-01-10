@@ -111,7 +111,7 @@
 			if ($pwfail) {
 				require("../header.php");
 				if (!$isdiag && strpos($_SERVER['HTTP_REFERER'],'treereader')===false && !(isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0)) {
-					echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid={$_GET['cid']}\">$coursename</a> ";
+					echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid={$_GET['cid']}\">{$sessiondata['coursename']}</a> ";
 					echo '&gt; ', _('Assessment'), '</div>';
 				}
 				echo $out;
@@ -244,6 +244,7 @@
 			
 			$query = "SELECT name,theme,topbar,msgset,toolset FROM imas_courses WHERE id='{$_GET['cid']}'";
 			$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+			$sessiondata['courseid'] = intval($_GET['cid']);
 			$sessiondata['coursename'] = mysql_result($result,0,0);
 			$sessiondata['coursetheme'] = mysql_result($result,0,1);
 			$sessiondata['coursetopbar'] =  mysql_result($result,0,2);
@@ -254,6 +255,7 @@
 			} else {
 				$sessiondata['timelimitmult'] = 1.0;
 			}
+			
 			writesessiondata();
 			session_write_close();
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/showtest.php");
@@ -308,6 +310,7 @@
 		
 			$query = "SELECT name,theme,topbar,msgset,toolset FROM imas_courses WHERE id='{$_GET['cid']}'";
 			$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+			$sessiondata['courseid'] = intval($_GET['cid']);
 			$sessiondata['coursename'] = mysql_result($result,0,0);
 			$sessiondata['coursetheme'] = mysql_result($result,0,1);
 			$sessiondata['coursetopbar'] =  mysql_result($result,0,2);
