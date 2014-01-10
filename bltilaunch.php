@@ -60,7 +60,7 @@ if ($_SERVER['HTTP_HOST'] != 'localhost') {
 }
 session_start();
 $sessionid = session_id();
-
+$atstarthasltiuserid = isset($_SESSION['ltiuserid']);
 $askforuserinfo = false;
 
 //check to see if accessiblity page is posting back
@@ -903,7 +903,8 @@ $SESS = $_SESSION;
 if (mysql_num_rows($result)>0) {
 	//check that same userid, and that we're not jumping on someone else's 
 	//existing session.  If so, then we need to create a new session.
-	if (mysql_result($result,0,0)!=$userid) {
+	//also, if session did not have ltiuserid already, must be jumping non-LTI to LTI
+	if (mysql_result($result,0,0)!=$userid || !$atstarthasltiuserid) {
 		session_destroy();
 		session_start();
 		session_regenerate_id();
