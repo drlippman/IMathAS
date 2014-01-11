@@ -553,27 +553,34 @@ if ($overwriteBody==1) {
 		
 ?>
 		<div id="leftcontent" <?php if ($essentialsnavcnt<$neededtools+1) {echo 'class="needed"';}?>>
-			<p>
+			
 <?php
-		if ($msgset<4) {		
-			echo '<a href="'.$imasroot.'/msgs/msglist.php?cid='.$cid.'&amp;folder='.$_GET['folder'].'" class="essen"> ';
-			echo _('Messages').'</a> '.$newmsgs .' <br/>';
-		}
-		if (($toolset&2)==0) {
-			echo '<a href="'.$imasroot.'/forums/forums.php?cid='.$cid.'&amp;folder='.$_GET['folder'].'" class="essen">';
-			echo _('Forums').'</a> '.$newpostscnt.'<br/>';
-		}
-		if (($toolset&1)==0) {	
-			echo '<a href="showcalendar.php?cid='.$cid.'" class="essen">'._('Calendar').'</a>';
-		}
-		if (isset($mathchaturl) && $chatset==1) {
-			echo "<br/><a href=\"$mathchaturl?uname=".urlencode($userfullname)."&amp;room=$cid&amp;roomname=".urlencode($coursename)."\"  target=\"chat\">", _('Chat'), "</a>  ($activechatters)";
+		if ($msgset<4 || ($toolset&2)==0 || ($toolset&1)==0) {
+			echo '<p>';
+			if ($msgset<4) {		
+				echo '<a href="'.$imasroot.'/msgs/msglist.php?cid='.$cid.'&amp;folder='.$_GET['folder'].'" class="essen"> ';
+				echo _('Messages').'</a> '.$newmsgs .' <br/>';
+			}
+			if (($toolset&2)==0) {
+				echo '<a href="'.$imasroot.'/forums/forums.php?cid='.$cid.'&amp;folder='.$_GET['folder'].'" class="essen">';
+				echo _('Forums').'</a> '.$newpostscnt.'<br/>';
+			}
+			if (($toolset&1)==0) {	
+				echo '<a href="showcalendar.php?cid='.$cid.'" class="essen">'._('Calendar').'</a>';
+			}
+			if (isset($mathchaturl) && $chatset==1) {
+				echo "<br/><a href=\"$mathchaturl?uname=".urlencode($userfullname)."&amp;room=$cid&amp;roomname=".urlencode($coursename)."\"  target=\"chat\">", _('Chat'), "</a>  ($activechatters)";
+			}
+			echo '</p>';
 		}
 	?>
-			</p>
+			
 			<p>
 			<a href="gradebook.php?cid=<?php echo $cid ?>"><?php echo _('Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="red">', _('New'), '</span>';}?>
 			</p>
+	<?php
+		if (!isset($sessiondata['ltiitemtype'])) { //don't show in LTI embed
+	?>
 			<p>
 			<a href="../actions.php?action=logout"><?php echo _('Log Out'); ?></a><br/>   
 			<a href="<?php echo $imasroot ?>/help.php?section=usingimas"><?php printf(_('Help Using %s'), $installname); ?></a>
@@ -582,6 +589,7 @@ if ($overwriteBody==1) {
 			if ($myrights > 5 && $allowunenroll==1) {
 				echo "<p><a href=\"../forms.php?action=unenroll&cid=$cid\">", _('Unenroll From Course'), "</a></p>\n";
 			}
+		}
 			?>
 		</div>
 		<div id="centercontent">
