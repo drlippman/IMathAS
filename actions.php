@@ -144,8 +144,8 @@
 					} else if ($_POST['ekey']=="" && $line['enrollkey'] != '') {
 						$error = 'No enrollment key provided';
 					} else {
-						$keylist = array_map('trim',explode(';',$line['enrollkey']));
-						if (!in_array($_POST['ekey'], $keylist)) {
+						$keylist = array_map('strtolower',array_map('trim',explode(';',$line['enrollkey'])));
+						if (!in_array(strtolower(trim($_POST['ekey'])), $keylist)) {
 							$error = 'Incorrect enrollment key';
 						} else {
 							if (count($keylist)>1) {
@@ -337,8 +337,8 @@
 				echo "</html></body>\n";
 				exit;
 			} else {
-				$keylist = array_map('trim',explode(';',$line['enrollkey']));
-				if (!in_array($_POST['ekey'], $keylist)) {
+				$keylist = array_map('strtolower',array_map('trim',explode(';',$line['enrollkey'])));
+				if (!in_array(strtolower(trim($_POST['ekey'])), $keylist)) {		
 					echo "<html><body>\n";
 					echo "Incorrect Enrollment Key.  <a href=\"forms.php?action=enroll$gb\">Try Again</a>\n";
 					echo "</html></body>\n";
@@ -351,7 +351,7 @@
 					}
 					mysql_query($query) or die("Query failed : " . mysql_error());
 					echo "<html><body>\n";
-					echo '<p>You have been enrolled in course ID '.$_POST['courseid'].'</p>';
+					echo '<p>You have been enrolled in course ID '.$_POST['cid'].'</p>';
 					echo "<p>Return to the <a href=\"index.php\">main page</a> and click on the course name to access the course</p>";
 					echo "</html></body>\n";
 					exit;
