@@ -131,7 +131,7 @@ function showcalcontentsid(elid) {
 				if (caleventsarr[elid].data[i].id!=null) { 
 					html += '<a href="../assessment/showtest.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'"';
 					if (caleventsarr[elid].data[i].timelimit!=null) {
-						html += 'return confirm(\'This assessment has a time limit. Click OK to start or continue working on the assessment.\')" ';
+						html += 'onclick="return confirm(\'This assessment has a time limit. Click OK to start or continue working on the assessment.\')" ';
 						//html += 'onclick="recclick(\'assessviacal\','+caleventsarr[elid].data[i].id+',\''+caleventsarr[elid].data[i].id+'\');return confirm(\'This assessment has a time limit. Click OK to start or continue working on the assessment.\')" ';
 					} else {
 						//html += 'onclick="recclick(\'assessviacal\','+caleventsarr[elid].data[i].id+',\''+caleventsarr[elid].data[i].id+'\');" ';	

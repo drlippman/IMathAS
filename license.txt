@@ -1,6 +1,6 @@
 *********************************************************
 **   Internet Mathematics Assessment System (IMathAS)  ** 
-**   (c) David Lippman, 2006-2013		       **
+**   (c) David Lippman, 2006-2014		       **
 *********************************************************
 
 See readme.html for installation information.

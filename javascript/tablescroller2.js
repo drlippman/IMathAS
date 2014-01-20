@@ -101,7 +101,13 @@ this.preinit = function(try2) {
 		tblbrowser = 'gecko';
 		thetable.style.position = 'static';
 	} else if (navigator.appName.slice(0,9)=="Microsoft") {
-		tblbrowser = 'ie';;
+		version = parseFloat(navigator.appVersion.split("MSIE")[1]);
+		if (version >= 7) {
+			tblbrowser = 'gecko';
+			thetable.style.position = 'static';
+		} else {
+			tblbrowser = 'ie';
+		}
 	} 
 	if (tblbrowser == 'ie') {
 		
@@ -112,7 +118,7 @@ this.preinit = function(try2) {
 		//create scroll, we don't have to worry about different wrapping.
 		var trs = document.getElementsByTagName("tr");
 		var theads = trs[0].getElementsByTagName("th");
-		if (trs.length > 100 || theads.length * trs.length > 3000) {
+		if (trs.length > 130 || theads.length * trs.length > 8000) {
 			if (try2!=true) {
 				return;
 			} else {
@@ -128,8 +134,12 @@ this.preinit = function(try2) {
 		var first = trs[1].getElementsByTagName("td");
 		//fix column widths by injecting fixed-width div in thead tr th's and 
 		//first tbody tr td's
+		var offsets = [];
 		for (var i=0; i<theads.length; i++) {
-			var max = theads[i].offsetWidth;
+			offsets[i] = theads[i].offsetWidth;
+		}
+		for (var i=0; i<theads.length; i++) {
+			var max = offsets[i];
 			if (i==0) {
 				max += 30;
 			}
@@ -145,7 +155,9 @@ this.preinit = function(try2) {
 		for (var i=0;i<trs.length;i++) {
 			var nodes = trs[i].getElementsByTagName((i==0?"th":"td"));
 			
-			var max = nodes[0].offsetHeight;
+			if (i<2) {
+				var max = nodes[0].offsetHeight;
+			}
 			if (i==0) {
 				margtop = max;
 			} else {
@@ -198,9 +210,9 @@ scrollhandler = function(e) {
 		} else {
 			thr.style.left = (-1*el.scrollLeft) + "px";
 		}
-		
+		var offset = -el.scrollTop + vertadj;
 		for (var i=0; i<locktds.length; i++) {
-			locktds[i].style.top = (parseInt(locktds[i].getAttribute("origtop")) - el.scrollTop + vertadj ) + "px";
+			locktds[i].style.top = (parseInt(locktds[i].getAttribute("origtop")) + offset ) + "px";
 		}
 	}
 }
