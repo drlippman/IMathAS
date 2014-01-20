@@ -93,6 +93,9 @@ if (!(isset($teacherid))) {
 				$_POST['copyoutcomes'] = 1;
 				$_POST['copystickyposts'] = 1;
 				$_POST['append'] = '';
+				if (isset($_POST['copyofflinewhole'])) {
+					$_POST['copyoffline'] = 1;
+				}
 				$_POST['addto'] = 'none';
 			}
 			mysql_query("START TRANSACTION") or die("Query failed :$query " . mysql_error());
@@ -491,8 +494,12 @@ if ($overwriteBody==1) {
 		<option value="all">Copy whole course</option>
 		<option value="select">Select items to copy</option>
 	</select>
-	<p id="allitemsnote">Copying the whole course will also copy (and overwrite) course settings, gradebook categories, outcomes, and rubrics.  
-	  For options, choose "Select items to copy" instead.</p>
+	<div id="allitemsnote">
+	<p><input type=checkbox name="copyofflinewhole"  value="1"/> Copy offline grade items </p>
+	<p>Copying the whole course will also copy (and overwrite) course settings, gradebook categories, outcomes, and rubrics.  
+	   To change these options, choose "Select items to copy" instead.</p>
+	  
+	</div>
 	<div id="selectitemstocopy" style="display:none;">
 	<h4>Select Items to Copy</h4>
 	Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>

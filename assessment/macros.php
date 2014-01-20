@@ -1273,7 +1273,7 @@ function lcm($n, $m) //least common multiple
 } 
 
 function dispreducedfraction($n,$d,$dblslash=false,$varinnum=false) {
-	return '`'.makereducedfraction($n,$d,$dblslash).'`';
+	return '`'.makereducedfraction($n,$d,$dblslash,$varinnum).'`';
 }
 
 function makereducedfraction($n,$d,$dblslash=false,$varinnum=false) {

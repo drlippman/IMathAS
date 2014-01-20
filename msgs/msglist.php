@@ -296,7 +296,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			echo htmlentities($message);
 			echo "</textarea></div></span><br class=form>\n";
 			
-			echo "<div class=submit><input type=submit value='Submit'></div>\n";
+			echo "<div class=submit><input type=submit value='Send Message'></div>\n";
 			
 			if ($msgmonitor==1) {
 				echo "<p><span class=red>Note</span>: Student-to-student messages may be monitored by your instructor</p>";
