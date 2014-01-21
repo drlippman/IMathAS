@@ -2155,10 +2155,12 @@ function intervaltoineq($str,$var) {
 }
 
 function cleanbytoken($str,$funcs = array()) {
-	$parts = explode('=',$str); 
+	$parts = preg_split('/([=\,])/',$str,-1,PREG_SPLIT_DELIM_CAPTURE);
 	$finalout = array();
-	foreach ($parts as $substr) {
-		if (trim($substr)=='') {$finalout[] = ''; continue;}
+	for ($k=0;$k<count($parts);$k+=2) {
+		$finalout = array();
+		$substr = $parts[$k];
+		if (trim($substr)=='') {$parts[$k] = ''; continue;}
 		$tokens = cleantokenize(trim($substr),$funcs);
 		//print_r($tokens);
 		$out = array();
@@ -2248,8 +2250,9 @@ function cleanbytoken($str,$funcs = array()) {
 		} else {
 			$finalout[] = implode('',$out);
 		}
+		$parts[$k] = implode('',$finalout);
 	}
-	return implode('=',$finalout);
+	return implode('',$parts);
 }
 
 
