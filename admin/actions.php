@@ -360,7 +360,26 @@ switch($_GET['action']) {
 				doaftercopy($_POST['usetemplate']);
 				$itemorder = addslashes(serialize($newitems));
 				$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt',ancestors='$ancestors',outcomes='$newoutcomearr' WHERE id='$cid'";
+				//copy offline
+				$offlinerubrics = array();
 				mysql_query($query) or die("Query failed : " . mysql_error());
+				$query = "SELECT name,points,showdate,gbcategory,cntingb,tutoredit,rubric FROM imas_gbitems WHERE courseid='{$_POST['usetemplate']}'";
+				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+				$insarr = array();
+				while ($row = mysql_fetch_row($result)) {
+					$rubric = array_pop($row);
+					if (isset($gbcats[$row[3]])) {
+						$row[3] = $gbcats[$row[3]];
+					} else {
+						$row[3] = 0;
+					}
+					$ins = "('$cid','".implode("','",addslashes_deep($row))."')";
+					$query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit) VALUES $ins";
+					mysql_query($query) or die("Query failed :$query " . mysql_error());
+					if ($rubric>0) {
+						$offlinerubrics[mysql_insert_id()] = $rubric;
+					}
+				}
 				copyrubrics();
 				mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
 			}

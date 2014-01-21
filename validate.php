@@ -424,9 +424,14 @@ END;
 	} else {
 		$breadcrumbbase = "<a href=\"$imasroot/index.php\">Home</a> &gt; ";
 	}
-	if (isset($_GET['cid']) && $_GET['cid']!="admin" && $_GET['cid']>0) {
-		$cid = $_GET['cid'];
-		$query = "SELECT id,locked,timelimitmult,section FROM imas_students WHERE userid='$userid' AND courseid='{$_GET['cid']}'";
+
+	if ((isset($_GET['cid']) && $_GET['cid']!="admin" && $_GET['cid']>0) || (isset($sessiondata['courseid']) && strpos(basename($_SERVER['PHP_SELF']),'showtest.php')!==false)) {
+		if (isset($_GET['cid'])) {
+			$cid = $_GET['cid'];
+		} else {
+			$cid = $sessiondata['courseid'];
+		}
+		$query = "SELECT id,locked,timelimitmult,section FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$line = mysql_fetch_array($result, MYSQL_ASSOC);
 		if ($line != null) {
@@ -455,7 +460,7 @@ END;
 				}
 			}
 		} else {
-			$query = "SELECT id FROM imas_teachers WHERE userid='$userid' AND courseid='{$_GET['cid']}'";
+			$query = "SELECT id FROM imas_teachers WHERE userid='$userid' AND courseid='$cid'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$line = mysql_fetch_array($result, MYSQL_ASSOC);
 			if ($line != null) {
@@ -482,7 +487,7 @@ END;
 				$adminasteacher = true;
 			} else {
 				
-				$query = "SELECT id,section FROM imas_tutors WHERE userid='$userid' AND courseid='{$_GET['cid']}'";
+				$query = "SELECT id,section FROM imas_tutors WHERE userid='$userid' AND courseid='$cid'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				$line = mysql_fetch_array($result, MYSQL_ASSOC);
 				if ($line != null) {
@@ -493,7 +498,7 @@ END;
 			}
 		}
 		$query = "SELECT imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme,imas_courses.newflag,imas_courses.msgset,imas_courses.topbar,imas_courses.toolset,imas_courses.deftime,imas_courses.picicons ";
-		$query .= "FROM imas_courses,imas_users WHERE imas_courses.id='{$_GET['cid']}' AND imas_users.id=imas_courses.ownerid";
+		$query .= "FROM imas_courses,imas_users WHERE imas_courses.id='$cid' AND imas_users.id=imas_courses.ownerid";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		if (mysql_num_rows($result)>0) {
 			$crow = mysql_fetch_row($result);
@@ -519,9 +524,9 @@ END;
 				if (strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) {
 					require("header.php");
 					echo '<p>This course is currently locked for an assessment</p>';
-					echo "<p><a href=\"$imasroot/assessment/showtest.php?cid={$_GET['cid']}&id=$lockaid\">Go to Assessment</a> | <a href=\"$imasroot/index.php\">Go Back</a></p>";
+					echo "<p><a href=\"$imasroot/assessment/showtest.php?cid=$cid&id=$lockaid\">Go to Assessment</a> | <a href=\"$imasroot/index.php\">Go Back</a></p>";
 					require("footer.php");
-					//header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid={$_GET['cid']}&id=$lockaid");
+					//header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id=$lockaid");
 					exit;
 				}
 			}

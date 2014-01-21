@@ -1,0 +1,212 @@
+<?php
+//A collection of chemistry routines
+//
+//Version 0.1 June 7 2012
+
+global $allowedmacros;
+array_push($allowedmacros,"chem_getsymbol","chem_getname","chem_getweight","chem_getmeltingpoint","chem_getboilingpoint","chem_getfamily","chem_randelementbyfamily"," chem_diffrandelementsbyfamily");
+
+//chem_getsymbol(atomic number)
+//returns the chemical symbol given the atomic number
+function chem_getsymbol($n) {
+	global $chem_periodic_table;
+	return $chem_periodic_table[$n][0];
+}
+
+//chem_getname(atomic number)
+//returns the chemical name given the atomic number
+function chem_getname($n) {
+	global $chem_periodic_table;
+	return $chem_periodic_table[$n][1];
+}
+
+//chem_getweight(atomic number)
+//returns the chemical standard atomic weight given the atomic number
+function chem_getweight($n) {
+	global $chem_periodic_table;
+	return $chem_periodic_table[$n][3];
+}
+
+//chem_getmeltingpoint(atomic number)
+//returns the melting point given the atomic number
+//beware: some elements return weird non-numeric values
+function chem_getmeltingpoint($n) {
+	global $chem_periodic_table;
+	return $chem_periodic_table[$n][4];
+}
+
+//chem_getboilingpoint(atomic number)
+//returns the boiling point given the atomic number
+//beware: some elements return weird non-numeric values
+function chem_getboilingpoint($n) {
+	global $chem_periodic_table;
+	return $chem_periodic_table[$n][5];
+}
+
+//chem_getfamily(atomic number)
+//returns the family given the atomic number
+//Values may be:  "", "Noble gas", "Alkaline", "Alkaline Earth", "Halogen", 
+//    "Transition Metal", "Lanthanide",  or "Actinide"
+function chem_getfamily($n) {
+	global $chem_periodic_table;
+	return $chem_periodic_table[$n][6];
+}
+
+//chem_randelementbyfamily(family)
+//returns the atomic number of a random element from a family
+//Valid families are: "Other", "Noble gas", "Alkaline", "Alkaline Earth", 
+//    "Halogen", "Transition Metal", "Lanthanide", or "Actinide"
+function chem_randelementbyfamily($f) {
+	global $chem_families;
+	$f = strtolower($f);
+	if (!isset($chem_families[$f])) {
+		echo 'Family not valid';
+		return 0;
+	}
+	$c = count($chem_families[$f]);
+	return $chem_families[$f][rand(0,$c-1)];
+}
+
+//chem_diffrandelementsbyfamily(family, n)
+//returns an array of n atomic numbers for random elements from a family
+//Valid families are: "Other", "Noble gas", "Alkaline", "Alkaline Earth", 
+//    "Halogen", "Transition Metal", "Lanthanide", or "Actinide"
+function chem_diffrandelementsbyfamily($f, $n) {
+	global $chem_families;
+	$f = strtolower($f);
+	if (!isset($chem_families[$f])) {
+		echo 'Family not valid';
+		return 0;
+	}
+	$c = count($chem_families[$f]);
+	$i = diffrands(0,$c-1,$n);
+	$out = array();
+	for ($j=0;$j<$n;$j++) {
+		$out[] = $chem_families[$f][$i[$j]];
+	}
+	return $out;
+}
+
+$GLOBALS['chem_periodic_table'] = array(
+	1=>array("H", "Hydrogen", 1,1.0079, "-255.34", "-252.87", ""),
+        2=>array("He", "Helium", 2,4.00260, "< -272.2", "-268.934", "Noble gas"),
+        3=>array("Li", "Lithium", 3,6.941, "180.54", "1342", "Alkaline"),
+        4=>array("Be", "Beryllium", 4,9.01218, "1278", "2970", "Alkaline Earth"),
+        5=>array("B", "Boron", 5,10.81, "2079", "2550", ""),
+        6=>array("C", "Carbon", 6,12.011, "3550", "4827", ""),
+        7=>array("N", "Nitrogen", 7,14.0067, "-209.86", "-195.8", ""),
+        8=>array("O", "Oxygen", 8,15.9994, "-218.4", "-182.962", ""),
+        9=>array("F", "Fluorine", 9,18.9984, "-219.62", "-188", "Halogen"),
+        10=>array("Ne", "Neon", 10,20.179, "-248.67", "-246.048", "Noble gas"),
+        11=>array("Na", "Sodium", 11,22.9898, "97.81", "882.9", "Alkaline"),
+        12=>array("Mg", "Magnesium", 12,24.305, "648.8", "1090", "Alkaline Earth"),
+        13=>array("Al", "Aluminum", 13,26.9815, "660.37", "2467", ""),
+        14=>array("Si", "Silicon", 14,28.0855, "1410", "2355", ""),
+        15=>array("P", "Phosphorus", 15,30.9738, "44.1", "280", ""),
+        16=>array("S", "Sulfur", 16,32.06, "112.8 (rhombic), 119.0 (monoclinic)", "4.6", ""),
+        17=>array("Cl", "Chlorine", 17,35.453, "-100.98", "-34", "Halogen"),
+        18=>array("Ar", "Argon", 18,39.948, "-189.2", "-185.7", "Noble gas"),
+        19=>array("K", "Potassium", 19,39.0983, "63.25", "759.9", "Alkaline"),
+        20=>array("Ca", "Calcium", 20,40.078, "839", "1484", "Alkaline Earth"),
+        21=>array("Sc", "Scandium", 21,44.9579, "1541", "2836", "Transition Metal"),
+        22=>array("Ti", "Titanium", 22,47.88, "1660", "3287", "Transition Metal"),
+        23=>array("V", "Vanadium", 23,50.9415, "1890", "3380", "Transition Metal"),
+        24=>array("Cr", "Chromium", 24,51.996, "1857", "2672", "Transition Metal"),
+        25=>array("Mn", "Manganese", 25,54.9380, "1244", "1962", "Transition Metal"),
+        26=>array("Fe", "Iron", 26,55.847, "1535", "2750", "Transition Metal"),
+        27=>array("Co", "Cobalt", 27,58.9332, "1857", "2672", "Transition Metal"),
+        28=>array("Ni", "Nickel", 28,58.69, "1453", "2732", "Transition Metal"),
+        29=>array("Cu", "Copper", 29,63.546, "1083", "2567", "Transition Metal"),
+        30=>array("Zn", "Zinc", 30,65.38, "419.58", "907", "Transition Metal"),
+        31=>array("Ga", "Gallium", 31,69.72, "29.78", "2403", ""),
+        32=>array("Ge", "Germanium", 32,72.59, "937.4", "2830", ""),
+        33=>array("As", "Arsenic", 33,74.9216, "817", "613", ""),
+        34=>array("Se", "Selenium", 34,78.96, "50 (amorphous), 217 (gray form)", "685", ""),
+        35=>array("Br", "Bromine", 35,79.904, "-7.2", "58.78", "Halogen"),
+        36=>array("Kr", "Krypton", 36,83.80, "-156.6", "-152.30", "Noble gas"),
+        37=>array("Rb", "Rubidium", 37,85.4678, "38.89", "686", "Alkaline"),
+        38=>array("Sr", "Strontium", 38,87.62, "769", "1384", "Alkaline Earth"),
+        39=>array("Y", "Yttrium", 39,88.9059, "1522", "5338", "Transition Metal"),
+        40=>array("Zr", "Zirconium", 40,91.22, "1852", "4377", "Transition Metal"),
+        41=>array("Nb", "Niobium", 41,92.9064, "2468", "4742", "Transition Metal"),
+        42=>array("Mo", "Molybdenum", 42,95.94, "2617", "4612", "Transition Metal"),
+        43=>array("Tc", "Technetium", 43,97.9072, "2172", "4877", "Transition Metal"),
+        44=>array("Ru", "Ruthenium", 44,101.07, "2310", "3900", "Transition Metal"),
+        45=>array("Rh", "Rhodium", 45,102.9055, "1966", "3727", "Transition Metal"),
+        46=>array("Pd", "Palladium", 46,106.42, "1554", "3140", "Transition Metal"),
+        47=>array("Ag", "Silver", 47,107.8682, "961.93", "2212", "Transition Metal"),
+        48=>array("Cd", "Cadmium", 48,112.41, "320.9", "765", "Transition Metal"),
+        49=>array("In", "Indium", 49,114.82, "156.61", "2080", ""),
+        50=>array("Sn", "Tin", 50,118.69, "231.97", "2270", ""),
+        51=>array("Sb", "Antimony", 51,121.79, "630.74", "1750", ""),
+        52=>array("Te", "Tellurium", 52,127.60, "449.5", "4877", ""),
+        53=>array("I", "Iodine", 53,126.9045, "113.5", "184.35", "Halogen"),
+        54=>array("Xe", "Xenon", 54,131.29, "-111.9", "-107.1", "Noble gas"),
+        55=>array("Cs", "Cesium", 55,132.9054, "28.40", "669.3", "Alkaline"),
+        56=>array("Ba", "Barium", 56,137.33, "725", "1640", "Alkaline Earth"),
+        57=>array("La", "Lanthanum", 57,138.9055, "918", "3464", "Lanthanide"),
+        58=>array("Ce", "Cerium", 58,140.12, "798", "3443", "Lanthanide"),
+        59=>array("Pr", "Praseodymium", 59,140.9077, "931", "3520", "Lanthanide"),
+        60=>array("Nd", "Neodymium", 60,144.24, "1021", "3074", "Lanthanide"),
+        61=>array("Pm", "Promethium", 61,144.9127, "1042", "3000", "Lanthanide"),
+        62=>array("Sm", "Samarium", 62,150.36, "1074", "1794", "Lanthanide"),
+        63=>array("Eu", "Europium", 63,151.96, "822", "1527", "Lanthanide"),
+        64=>array("Gd", "Gadolinium", 64,157.27, "1313", "3273", "Lanthanide"),
+        65=>array("Tb", "Terbium", 65,158.9254, "1356", "3230", "Lanthanide"),
+        66=>array("Dy", "Dysprosium", 66,162.50, "1412", "2567", "Lanthanide"),
+        67=>array("Ho", "Holmium", 67,164.9304, "1474", "2700", "Lanthanide"),
+        68=>array("Er", "Erbium", 68,167.26, "1529", "2868", "Lanthanide"),
+        69=>array("Tm", "Thulium", 69,168.9342, "1545", "1950", "Lanthanide"),
+        70=>array("Yb", "Ytterbium", 70,172.04, "819", "1196", "Lanthanide"),
+        71=>array("Lu", "Lutetium", 71,174.967, "1663", "3402", "Lanthanide"),
+        72=>array("Hf", "Hafnium", 72,178.49, "2227", "4602", "Transition Metal"),
+        73=>array("Ta", "Tantalum", 73,180.9479, "2996", "5425", "Transition Metal"),
+        74=>array("W", "Tungsten", 74,183.85, "3410", "5660", "Transition Metal"),
+        75=>array("Re", "Rhenium", 75,186.207, "3180", "5627", "Transition Metal"),
+        76=>array("Os", "Osmium", 76,190.2, "3054", "5027", "Transition Metal"),
+        77=>array("Ir", "Iridium", 77,192.22, "2410", "4130", "Transition Metal"),
+        78=>array("Pt", "Platinum", 78,195.08, "1772", "3827", "Transition Metal"),
+        79=>array("Au", "Gold", 79,196.9665, "1064.4", "2808", "Transition Metal"),
+        80=>array("Hg", "Mercury", 80,200.59, "-38.87", "356.58", "Transition Metal"),
+        81=>array("Tl", "Thallium", 81,204.383, "303.5", "1457", ""),
+        82=>array("Pb", "Lead", 82,207.2, "327.502", "1740", ""),
+        83=>array("Bi", "Bismuth", 83,208.9804, "271.3", "1560", ""),
+        84=>array("Po", "Polonium", 84,208.9824, "254", "962", ""),
+        85=>array("At", "Astatine", 85,209.9871, "302", "337", "Halogen"),
+        86=>array("Rn", "Radon", 86,222.0176, "-71", "-62", "Noble gas"),
+        87=>array("Fr", "Francium", 87,223.0197, "27", "677", "Alkaline"),
+        88=>array("Ra", "Radium", 88,226.0254, "700", "1140", "Alkaline Earth"),
+        89=>array("Ac", "Actinium", 89,227.0278, "1050", "3200", "Actinide"),
+        90=>array("Th", "Thorium", 90,232.0381, "1750", "3800", "Actinide"),
+        91=>array("Pa", "Protactinium", 91,231.0359, "1600", "unknown", "Actinide"),
+        92=>array("U", "Uranium", 92,238.0289, "1132", "3818", "Actinide"),
+        93=>array("Np", "Neptunium", 93,237.0482, "640", "3902", "Actinide"),
+        94=>array("Pu", "Plutonium", 94,244.0642, "641", "3232", "Actinide"),
+        95=>array("Am", "Americium", 95,243.0614, "994", "2607", "Actinide"),
+        96=>array("Cm", "Curium", 96,247.0703, "1340", "unknown", "Actinide"),
+        97=>array("Bk", "Berkelium", 97,247.0703, "unknown", "unknown", "Actinide"),
+        98=>array("Cf", "Californium", 98,251.0796, "unknown", "unknown", "Actinide"),
+        99=>array("Es", "Einsteinium", 99,252.083, "unknown", "unknown", "Actinide"),
+        100=>array("Fm", "Fermium", 100,257.0951, "unknown", "unknown", "Actinide"),
+        101=>array("Md", "Mendelevium", 101,258.10, "unknown", "unknown", "Actinide"),
+        102=>array("No", "Nobelium", 102,259.1009, "unknown", "unknown", "Actinide"),
+        103=>array("Lr", "Lawrencium", 103,262.11, "unknown", "unknown", "Actinide"),
+        105=>array("Unq (Rf)", "Unnilquadium (Rutherfordium)", 104,261.11, "unknown", "unknown", ""),
+        106=>array("Unp (Db)", "Unnilpentium (Dubnium)", 105,262.114, "unknown", "unknown", ""),
+        107=>array("Unh (Sg)", "Unnilhexium (Seaborgium)", 106,263.118, "unknown", "unknown", ""),
+        108=>array("Uns (Bh)", "Unnilseptium (Bohrium)", 107,262.12, "unknown", "unknown", ""),
+        109=>array("Uno (Hs)", "Unniloctium (Hassium)", 108,-1, "unknown", "unknown", ""),
+        110=>array("Une (Mt)", "Unnilennium (Meitnerium)", 109,-1, "unknown", "unknown", "")
+    );
+
+$GLOBALS['chem_families'] = array(
+	'other'=>array(1,5,6,7,8,13,14,15,16,31,32,33,34,49,50,51,52,81,82,83,84,105,106,107,108,109,110),
+	'noble gas'=>array(2,10,18,36,54,86),
+	'alkaline'=>array(3,11,19,37,55,87),
+	'alkaline earth'=>array(4,12,20,38,56,88),
+	'halogen'=>array(9,17,35,53,85),
+	'transition metal'=>array(21,22,23,24,25,26,27,28,29,30,39,40,41,42,43,44,45,46,47,48,72,73,74,75,76,77,78,79,80),
+	'lanthanide'=>array(57,58,59,60,61,62,63,64,65,66,67,68,69,70,71),
+	'actinide'=>array(89,90,91,92,93,94,95,96,97,98,99,100,101,102,103)
+	);
+  

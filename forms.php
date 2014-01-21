@@ -207,6 +207,20 @@ switch($_GET['action']) {
 			echo '</fieldset>';
 			
 		}
+		if ($tzname!='') {
+			echo '<fieldset><legend>Timezone</legend>';
+			echo '<p>Due Dates and other times are being shown to you correct for the <b>'.$tzname.'</b> timezone.</p>';
+			echo '<p>You may change the timezone the dates display based on if you would like. This change will only last until you close your browser or log out.</p>';
+			echo '<p>Set timezone to: <select name="settimezone" id="settimezone">';
+			$timezones = array('Etc/GMT+12', 'Pacific/Pago_Pago', 'America/Adak', 'Pacific/Honolulu', 'Pacific/Marquesas', 'Pacific/Gambier', 'America/Anchorage', 'America/Los_Angeles', 'Pacific/Pitcairn', 'America/Phoenix', 'America/Denver', 'America/Guatemala', 'America/Chicago', 'Pacific/Easter', 'America/Bogota', 'America/New_York', 'America/Caracas', 'America/Halifax', 'America/Santo_Domingo', 'America/Santiago', 'America/St_Johns', 'America/Godthab', 'America/Argentina/Buenos_Aires', 'America/Montevideo', 'Etc/GMT+2', 'Etc/GMT+2', 'Atlantic/Azores', 'Atlantic/Cape_Verde', 'Etc/UTC', 'Europe/London', 'Europe/Berlin', 'Africa/Lagos', 'Africa/Windhoek', 'Asia/Beirut', 'Africa/Johannesburg', 'Asia/Baghdad', 'Europe/Moscow', 'Asia/Tehran', 'Asia/Dubai', 'Asia/Baku', 'Asia/Kabul', 'Asia/Yekaterinburg', 'Asia/Karachi', 'Asia/Kolkata', 'Asia/Kathmandu', 'Asia/Dhaka', 'Asia/Omsk', 'Asia/Rangoon', 'Asia/Krasnoyarsk', 'Asia/Jakarta', 'Asia/Shanghai', 'Asia/Irkutsk', 'Australia/Eucla', 'Australia/Eucla', 'Asia/Yakutsk', 'Asia/Tokyo', 'Australia/Darwin', 'Australia/Adelaide', 'Australia/Brisbane', 'Asia/Vladivostok', 'Australia/Sydney', 'Australia/Lord_Howe', 'Asia/Kamchatka', 'Pacific/Noumea', 'Pacific/Norfolk', 'Pacific/Auckland', 'Pacific/Tarawa', 'Pacific/Chatham', 'Pacific/Tongatapu', 'Pacific/Apia', 'Pacific/Kiritimati');
+			foreach ($timezones as $tz) {
+				echo '<option value="'.$tz.'" '.($tz==$tzname?'selected':'').'>'.$tz.'</option>';
+			}
+			echo '</select></p>';
+			echo '</fieldset>';
+			
+			
+		}
 		echo "<div class=submit><input type=submit value='Update Info'></div>\n";
 		
 		//echo '<p><a href="forms.php?action=googlegadget">Get Google Gadget</a> to monitor your messages and forum posts</p>';
@@ -268,6 +282,55 @@ switch($_GET['action']) {
 		echo "If you can't remember your username, enter your email address below.  An email will be sent to your email address with your username. ";
 		echo "<p>Email: <input type=text name=\"email\"/></p>";
 		echo "<p><input type=submit value=\"Submit\" /></p></form>";
+		break;
+	case "forumwidgetsettings":
+		$query = "SELECT hideonpostswidget FROM imas_users WHERE id='$userid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$hidelist = explode(',', mysql_result($result,0,0));
+		
+		echo '<div id="headerforms" class="pagetitle"><h2>Forum Widget Settings</h2></div>';
+		echo '<p>The most recent 10 posts from each course show in the New Forum Posts widget.  Select the courses you want to show in the widget.</p>';
+		echo "<form method=post action=\"actions.php?action=forumwidgetsettings$gb\">\n";
+		$allcourses = array();
+		$query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_teachers AS it ON ic.id=it.courseid WHERE it.userid='$userid' ORDER BY ic.name";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		if (mysql_num_rows($result)>0) {
+			echo '<p><b>Courses you\'re teaching:</b> Check: <a href="#" onclick="$(\'.teaching\').prop(\'checked\',true);return false;">All</a> <a href="#" onclick="$(\'.teaching\').prop(\'checked\',false);return false;">None</a>';
+			while ($row = mysql_fetch_row($result)) {
+				$allcourses[] = $row[0];
+				echo '<br/><input type="checkbox" name="checked[]" class="teaching" value="'.$row[0].'" ';
+				if (!in_array($row[0],$hidelist)) {echo 'checked="checked"';}
+				echo '/> '.$row[1]; 	
+			}
+			echo '</p>';
+		}
+		$query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_tutors AS it ON ic.id=it.courseid WHERE it.userid='$userid' ORDER BY ic.name";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		if (mysql_num_rows($result)>0) {
+			echo '<p><b>Courses you\'re tutoring:</b> Check: <a href="#" onclick="$(\'.tutoring\').prop(\'checked\',true);return false;">All</a> <a href="#" onclick="$(\'.tutoring\').prop(\'checked\',false);return false;">None</a>';
+			while ($row = mysql_fetch_row($result)) {
+				$allcourses[] = $row[0];
+				echo '<br/><input type="checkbox" name="checked[]" class="tutoring" value="'.$row[0].'" ';
+				if (!in_array($row[0],$hidelist)) {echo 'checked="checked"';}
+				echo '/> '.$row[1]; 	
+			}
+			echo '</p>';
+		}
+		$query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_students AS it ON ic.id=it.courseid WHERE it.userid='$userid' ORDER BY ic.name";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		if (mysql_num_rows($result)>0) {
+			echo '<p><b>Courses you\'re taking:</b> Check: <a href="#" onclick="$(\'.taking\').prop(\'checked\',true);return false;">All</a> <a href="#" onclick="$(\'.taking\').prop(\'checked\',false);return false;">None</a>';
+			while ($row = mysql_fetch_row($result)) {
+				$allcourses[] = $row[0];
+				echo '<br/><input type="checkbox" name="checked[]" class="taking" value="'.$row[0].'" ';
+				if (!in_array($row[0],$hidelist)) {echo 'checked="checked"';}
+				echo '/> '.$row[1]; 	
+			}
+			echo '</p>';
+		}
+		echo '<input type="hidden" name="allcourses" value="'.implode(',',$allcourses).'"/>';
+		echo '<input type="submit" value="Save Changes"/>';
+		echo '</form>';
 		break;
 	case "googlegadget":
 		$query = "SELECT remoteaccess FROM imas_users WHERE id='$userid'";

@@ -60,7 +60,7 @@ if ($_SERVER['HTTP_HOST'] != 'localhost') {
 }
 session_start();
 $sessionid = session_id();
-
+$atstarthasltiuserid = isset($_SESSION['ltiuserid']);
 $askforuserinfo = false;
 
 //check to see if accessiblity page is posting back
@@ -100,7 +100,12 @@ if (isset($_GET['launch'])) {
 	$query = "UPDATE imas_users SET lastaccess='$now' WHERE id='$userid'";
 	mysql_query($query) or die("Query failed : " . mysql_error());
 	
-	$query = "UPDATE imas_sessions SET sessiondata='$enc',tzoffset='{$_POST['tzoffset']}' WHERE sessionid='$sessionid'";
+	if (isset($_POST['tzname'])) {
+		$tzname = $_POST['tzname'];
+	} else {
+		$tzname = '';
+	}
+	$query = "UPDATE imas_sessions SET sessiondata='$enc',tzoffset='{$_POST['tzoffset']}',tzname='$tzname' WHERE sessionid='$sessionid'";
 	mysql_query($query) or die("Query failed : " . mysql_error());
 	
 	$keyparts = explode('_',$_SESSION['ltikey']);
@@ -144,9 +149,11 @@ if (isset($_GET['launch'])) {
 			 $pref = 2;
 		 }	 
 	}
+	$flexwidth = true;
 	$nologo = true;
+	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
 	require("header.php");
-	echo "<h4>Logging in to $installname</h4>";
+	echo "<h4>Connecting to $installname</h4>";
 	echo "<form method=\"post\" action=\"{$_SERVER['PHP_SELF']}?launch=true\" ";
 	if ($sessiondata['ltiitemtype']==0 && $sessiondata['ltitlwrds'] != '') {
 		echo "onsubmit='return confirm(\"This assessment has a time limit of {$sessiondata['ltitlwrds']}.  Click OK to start or continue working on the assessment.\")' >";
@@ -157,7 +164,8 @@ if (isset($_GET['launch'])) {
 	?>
 	<div id="settings"><noscript>JavaScript is not enabled.  JavaScript is required for <?php echo $installname; ?>.  
 	Please enable JavaScript and reload this page</noscript></div>
-	<input type="hidden" id="tzoffset" name="tzoffset" value="" /> 
+	<input type="hidden" id="tzoffset" name="tzoffset" value="" />
+	<input type="hidden" id="tzname" name="tzname" value=""> 
 	<script type="text/javascript"> 
 		 function updateloginarea() {
 			setnode = document.getElementById("settings"); 
@@ -183,7 +191,9 @@ if (isset($_GET['launch'])) {
 			html += '<div class="textright"><input type="submit" value="Login" /><\/div>';
 			setnode.innerHTML = html; 
 			var thedate = new Date();  
-			document.getElementById("tzoffset").value = thedate.getTimezoneOffset(); 
+			document.getElementById("tzoffset").value = thedate.getTimezoneOffset();
+			var tz = jstz.determine(); 
+			document.getElementById("tzname").value = tz.name();
 		}
 		var existingonload = window.onload;
 		if (existingonload) {
@@ -903,7 +913,8 @@ $SESS = $_SESSION;
 if (mysql_num_rows($result)>0) {
 	//check that same userid, and that we're not jumping on someone else's 
 	//existing session.  If so, then we need to create a new session.
-	if (mysql_result($result,0,0)!=$userid) {
+	//also, if session did not have ltiuserid already, must be jumping non-LTI to LTI
+	if (mysql_result($result,0,0)!=$userid || !$atstarthasltiuserid) {
 		session_destroy();
 		session_start();
 		session_regenerate_id();

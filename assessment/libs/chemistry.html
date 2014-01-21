@@ -1,0 +1,48 @@
+<html><body>
+<h1>Macro Library chemistry</h1>
+A collection of chemistry routines
+<BR>
+<BR>Version 0.1 June 7 2012
+<BR><ul>
+<li><a href="#chem_getsymbol">chem_getsymbol</a></li>
+<li><a href="#chem_getname">chem_getname</a></li>
+<li><a href="#chem_getweight">chem_getweight</a></li>
+<li><a href="#chem_getmeltingpoint">chem_getmeltingpoint</a></li>
+<li><a href="#chem_getboilingpoint">chem_getboilingpoint</a></li>
+<li><a href="#chem_getfamily">chem_getfamily</a></li>
+<li><a href="#chem_randelementbyfamily">chem_randelementbyfamily</a></li>
+<li><a href="#chem_diffrandelementsbyfamily">chem_diffrandelementsbyfamily</a></li>
+</ul>
+<h3><a name="chem_getsymbol">chem_getsymbol</a></h3>
+chem_getsymbol(atomic number)
+<BR>returns the chemical symbol given the atomic number
+<BR><h3><a name="chem_getname">chem_getname</a></h3>
+chem_getname(atomic number)
+<BR>returns the chemical name given the atomic number
+<BR><h3><a name="chem_getweight">chem_getweight</a></h3>
+chem_getweight(atomic number)
+<BR>returns the chemical standard atomic weight given the atomic number
+<BR><h3><a name="chem_getmeltingpoint">chem_getmeltingpoint</a></h3>
+chem_getmeltingpoint(atomic number)
+<BR>returns the melting point given the atomic number
+<BR>beware: some elements return weird non-numeric values
+<BR><h3><a name="chem_getboilingpoint">chem_getboilingpoint</a></h3>
+chem_getboilingpoint(atomic number)
+<BR>returns the boiling point given the atomic number
+<BR>beware: some elements return weird non-numeric values
+<BR><h3><a name="chem_getfamily">chem_getfamily</a></h3>
+chem_getfamily(atomic number)
+<BR>returns the family given the atomic number
+<BR>Values may be:  "", "Noble gas", "Alkaline", "Alkaline Earth", "Halogen", 
+<BR>    "Transition Metal", "Lanthanide",  or "Actinide"
+<BR><h3><a name="chem_randelementbyfamily">chem_randelementbyfamily</a></h3>
+chem_randelementbyfamily(family)
+<BR>returns the atomic number of a random element from a family
+<BR>Valid families are: "Other", "Noble gas", "Alkaline", "Alkaline Earth", 
+<BR>    "Halogen", "Transition Metal", "Lanthanide", or "Actinide"
+<BR><h3><a name="chem_diffrandelementsbyfamily">chem_diffrandelementsbyfamily</a></h3>
+chem_diffrandelementsbyfamily(family, n)
+<BR>returns an array of n atomic numbers for random elements from a family
+<BR>Valid families are: "Other", "Noble gas", "Alkaline", "Alkaline Earth", 
+<BR>    "Halogen", "Transition Metal", "Lanthanide", or "Actinide"
+<BR>

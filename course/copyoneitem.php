@@ -15,7 +15,11 @@ if (!isset($teacherid)) {
 }
 
 $tocopy = $_GET['copyid'];
-$_POST['append'] = " (Copy)";
+if (isset($_GET['noappend'])) {
+	$_POST['append'] = "";
+} else {
+	$_POST['append'] = " (Copy)";
+}
 $_POST['ctc'] = $cid;
 $gbcats = array();
 $query = "SELECT id FROM imas_gbcats WHERE courseid='$cid'";
@@ -42,6 +46,7 @@ function copysubone(&$items,$parent,$copyinside,&$addtoarr) {
 				$blockcnt++;
 				$newblock['startdate'] = $item['startdate'];
 				$newblock['enddate'] = $item['enddate'];
+				$newblock['avail'] = $item['avail'];
 				$newblock['SH'] = $item['SH'];
 				$newblock['colors'] = $item['colors'];
 				$newblock['fixedheight'] = $item['fixedheight'];

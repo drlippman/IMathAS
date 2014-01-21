@@ -14,9 +14,14 @@ require("./validate.php");
 
 //pagelayout:  array of arrays.  pagelayout[0] = fullwidth header, [1] = left bar 25%, [2] = rigth bar 75%
 //[3]: 0 for newmsg note next to courses, 1 for newpost note next to courses
-$query = "SELECT homelayout FROM imas_users WHERE id='$userid'";
+$query = "SELECT homelayout,hideonpostswidget FROM imas_users WHERE id='$userid'";
 $result = mysql_query($query) or die("Query failed : " . mysql_error());
-$homelayout = mysql_result($result,0,0);
+list($homelayout,$hideonpostswidget) = mysql_fetch_row($result);
+if ($hideonpostswidget!='') {
+	$hideonpostswidget = explode(',',$hideonpostswidget);
+} else {
+	$hideonpostswidget = array();
+}
 
 $pagelayout = explode('|',$homelayout);
 foreach($pagelayout as $k=>$v) {
@@ -98,7 +103,9 @@ if (mysql_num_rows($result)==0) {
 			$noclass = false;
 			$page_studentCourseData[] = $line;	
 			$page_coursenames[$line['id']] = $line['name'];
-			$postcheckstucids[] = $line['id'];
+			if (!in_array($line['id'],$hideonpostswidget)) {
+				$postcheckstucids[] = $line['id'];
+			}
 		}
 	}
 }
@@ -119,7 +126,9 @@ if ($myrights>10) {
 		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 			$page_teacherCourseData[] = $line;	
 			$page_coursenames[$line['id']] = $line['name'];
-			$postcheckcids[] = $line['id'];
+			if (!in_array($line['id'],$hideonpostswidget)) {
+				$postcheckstucids[] = $line['id'];
+			}
 		}
 	}
 }
@@ -138,7 +147,9 @@ if (mysql_num_rows($result)==0) {
 	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 		$page_tutorCourseData[] = $line;	
 		$page_coursenames[$line['id']] = $line['name'];
-		$postcheckstucids[] = $line['id'];
+		if (!in_array($line['id'],$hideonpostswidget)) {
+			$postcheckstucids[] = $line['id'];
+		}
 	}
 }
 
@@ -412,9 +423,13 @@ function printMessagesGadget() {
 	
 }
 function printPostsGadget() {
-	global $page_newpostlist, $page_coursenames, $postthreads;
+	global $page_newpostlist, $page_coursenames, $postthreads,$imasroot;
 	
-	echo '<div class="block"><h3>', _('New forum posts'), '</h3></div>';
+	echo '<div class="block">';
+	//echo "<span class=\"floatright\"><a href=\"#\" onclick=\"GB_show('Forum Widget Settings','$imasroot/forms.php?action=forumwidgetsettings&greybox=true',800,'auto')\" title=\"Forum Widget Settings\"><img style=\"vertical-align:top\" src=\"$imasroot/img/gears.png\"/></a></span>";
+	echo "<span class=\"floatright\"><a href=\"forms.php?action=forumwidgetsettings\"><img style=\"vertical-align:top\" src=\"$imasroot/img/gears.png\"/></a></span>";
+	
+	echo '<h3>', _('New forum posts'), '</h3></div>';
 	echo '<div class="blockitems">';
 	if (count($page_newpostlist)==0) {
 		echo '<p>', _('No new posts'), '</p>';

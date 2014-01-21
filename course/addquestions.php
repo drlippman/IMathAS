@@ -850,21 +850,38 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 		} else {  //choose assessments
 
-			$query = "SELECT id,name,summary FROM imas_assessments WHERE courseid='$cid' AND id<>'$aid' ORDER BY enddate,name";
+			$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$items = unserialize(mysql_result($result,0,0));
+			
+			$itemassoc = array();
+			$query = "SELECT ii.id AS itemid,ia.id,ia.name,ia.summary FROM imas_items AS ii JOIN imas_assessments AS ia ";
+			$query .= "ON ii.typeid=ia.id AND ii.itemtype='Assessment' WHERE ii.courseid='$cid' AND ia.id<>'$aid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			while ($row = mysql_fetch_assoc($result)) {
+				$itemassoc[$row['itemid']] = $row;
+			}
+			
 			$i=0;
 			$page_assessmentList = array();
-			while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
-				$page_assessmentList[$i]['id'] = $line['id'];
-				$page_assessmentList[$i]['name'] = $line['name'];
-				$line['summary'] = strip_tags($line['summary']);
-				if (strlen($line['summary'])>100) {
-					$line['summary'] = substr($line['summary'],0,97).'...';
+			function addtoassessmentlist($items) {
+				global $page_assessmentList, $itemassoc, $i;
+				foreach ($items as $item) {
+					if (is_array($item)) {
+						addtoassessmentlist($item['items']);
+					} else if (isset($itemassoc[$item])) {
+						$page_assessmentList[$i]['id'] = $itemassoc[$item]['id'];
+						$page_assessmentList[$i]['name'] = $itemassoc[$item]['name'];
+						$itemassoc[$item]['summary'] = strip_tags($itemassoc[$item]['summary']);
+						if (strlen($itemassoc[$item]['summary'])>100) {
+							$itemassoc[$item]['summary'] = substr($itemassoc[$item]['summary'],0,97).'...';
+						}
+						$page_assessmentList[$i]['summary'] = $itemassoc[$item]['summary'];
+						$i++;
+					}
 				}
-				$page_assessmentList[$i]['summary'] = $line['summary'];
-				
-				$i++;
 			}
+			addtoassessmentlist($items);
 		}
 	}
 }

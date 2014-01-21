@@ -2411,3 +2411,29 @@ msgstr ""
 #: assessment/displayq2.php:1105
 msgid "your answer"
 msgstr ""
+
+#: embedq.php:69
+msgid "Score on last question:"
+msgstr ""
+
+#: embedq.php:75
+msgid "Displaying last question with solution"
+msgstr ""
+
+#: embedq.php:75
+msgid "New Question"
+msgstr ""
+
+#: embedq.php:83
+msgid "Check Answer"
+msgstr ""
+
+#: embedq.php:129
+#, php-format
+msgid "%1$s out of %2$s"
+msgstr ""
+
+#: embedq.php:164
+#, php-format
+msgid "%1$s out of %2$s (parts: %3$s)"
+msgstr ""

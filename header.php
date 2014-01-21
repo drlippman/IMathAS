@@ -159,7 +159,7 @@ if (isset($cid) && isset($teacherid) && $coursetopbar[2]==1 && count($coursetopb
 	$a[$c[0]] = 'class="activetab"';
 
 	echo "<li><a {$a[10]} href=\"$imasroot/course/course.php?cid=$cid\">Course</a></li> ";
-	if (in_array(0,$coursetopbar[1]) && $msgset<4) { //messages
+	if (in_array(0,$coursetopbar[1]) && $coursemsgset<4) { //messages
 		echo "<li><a {$a[0]} href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a></li> ";
 		$essentialsnavcnt++;
 	}
@@ -205,7 +205,7 @@ if (isset($cid) && isset($teacherid) && $coursetopbar[2]==1 && count($coursetopb
 	$c = getactivetab();
 	$a[$c[1]] = 'class="activetab"';
 	echo "<li><a {$a[10]} href=\"$imasroot/course/course.php?cid=$cid\">Course</a></li> ";
-	if (in_array(0,$coursetopbar[0]) && $msgset<4) { //messages
+	if (in_array(0,$coursetopbar[0]) && $coursemsgset<4) { //messages
 		echo "<li><a {$a[0]} href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a></li> ";
 		$essentialsnavcnt++;
 	}

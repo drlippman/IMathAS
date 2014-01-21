@@ -148,7 +148,7 @@
 	
 	
 	if (isset($_GET['uid']) || count($_POST['checked'])==1) {
-		$query = "SELECT iu.LastName,iu.FirstName,istu.section FROM imas_users AS iu JOIN imas_students AS istu ON iu.id=istu.userid WHERE iu.id=$tolist";
+		$query = "SELECT iu.LastName,iu.FirstName,istu.section FROM imas_users AS iu JOIN imas_students AS istu ON iu.id=istu.userid WHERE iu.id=$tolist AND istu.courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$row = mysql_fetch_row($result);
 		echo "<h2>{$row[0]}, {$row[1]}";

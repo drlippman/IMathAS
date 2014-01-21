@@ -219,15 +219,15 @@ function gbtable() {
 		$query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
-			if (!isset($courseitemsimporder[$row[1]])) { //error catch items not in course.itemorder
+			if (!isset($courseitemsimporder[$row[0]])) { //error catch items not in course.itemorder
 				$courseitemsassoc[$row[1].$row[2]] = 999+count($courseitemsassoc);
 			} else {
-				$courseitemsassoc[$row[1].$row[2]] = $courseitemsimporder[$row[1]];
+				$courseitemsassoc[$row[1].$row[2]] = $courseitemsimporder[$row[0]];
 			}
 		}
 		
 	}
-	
+
 	//Pull Assessment Info
 	$now = time();
 	$query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail,groupsetid FROM imas_assessments WHERE courseid='$cid' AND avail>0 ";
@@ -266,6 +266,9 @@ function gbtable() {
 	$courseorder = array();
 	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 		$assessments[$kcnt] = $line['id'];
+		if (isset($courseitemsassoc)) {
+			$courseorder[$kcnt] = $courseitemsassoc['Assessment'.$line['id']];
+		}
 		$timelimits[$kcnt] = $line['timelimit'];
 		$minscores[$kcnt] = $line['minscore'];
 		$deffeedback = explode('-',$line['deffeedback']);
@@ -356,6 +359,9 @@ function gbtable() {
 		$name[$kcnt] = $line['name'];
 		$cntingb[$kcnt] = $line['cntingb'];
 		$tutoredit[$kcnt] = $line['tutoredit'];
+		if (isset($courseitemsassoc)) {
+			$courseorder[$kcnt] = 2000+$kcnt;
+		}
 		$kcnt++;
 	}
 	
@@ -404,6 +410,9 @@ function gbtable() {
 		$possible[$kcnt] = $line['points'];
 		$name[$kcnt] = $line['name'];
 		$cntingb[$kcnt] = $line['cntingb'];
+		if (isset($courseitemsassoc)) {
+			$courseorder[$kcnt] = $courseitemsassoc['Forum'.$line['id']];
+		}
 		$kcnt++;
 	}
 	
@@ -483,6 +492,20 @@ function gbtable() {
 		natcasesort($name);//asort($name);
 		$newcategory = array();
 		foreach ($name as $k=>$v) {
+			$newcategory[$k] = $category[$k];
+		}
+		$category = $newcategory;
+	} else if ($orderby==11) { //order $category courseorder
+		asort($courseorder,SORT_NUMERIC);
+		$newcategory = array();
+		foreach ($courseorder as $k=>$v) {
+			$newcategory[$k] = $category[$k];
+		}
+		$category = $newcategory;
+	} else if ($orderby==13) { //order $category courseorder rev
+		arsort($courseorder,SORT_NUMERIC);
+		$newcategory = array();
+		foreach ($courseorder as $k=>$v) {
 			$newcategory[$k] = $category[$k];
 		}
 		$category = $newcategory;
@@ -572,6 +595,12 @@ function gbtable() {
 		} else if ($orderby==8) { //startdate reverse
 			arsort($startdate,SORT_NUMERIC);
 			$itemorder = array_keys($startdate);
+		} else if ($orderby==10) { //courseorder
+			asort($courseorder,SORT_NUMERIC);
+			$itemorder = array_keys($courseorder);
+		} else if ($orderby==12) { //courseorder rev
+			arsort($courseorder,SORT_NUMERIC);
+			$itemorder = array_keys($courseorder);
 		}
 		
 		foreach ($itemorder as $k) {

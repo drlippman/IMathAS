@@ -380,7 +380,7 @@
 		$useeditor='review';
 		$sessiondata['coursetheme'] = $coursetheme;
 		$sessiondata['isteacher'] = $isteacher;
-		if ($isteacher) {
+		if ($isteacher || $istutor) {
 			$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=070113"></script>';
 			require("../includes/rubric.php");
 		}
@@ -436,20 +436,7 @@
 		$row = mysql_fetch_row($result);
 		echo "<h3>{$row[1]}, {$row[0]}</h3>\n";
 		
-		if ($isteacher) {
-			$query = "SELECT id,rubrictype,rubric FROM imas_rubrics WHERE id IN ";
-			$query .= "(SELECT DISTINCT rubric FROM imas_questions WHERE assessmentid={$line['assessmentid']} AND rubric>0)";
-			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-			if (mysql_num_rows($result)>0) {
-				$rubrics = array();
-				while ($row = mysql_fetch_row($result)) {
-					$rubrics[] = $row;
-				}
-				echo printrubrics($rubrics);
-			}
-			unset($rubrics);
-		}
-		
+			
 		//do time limit mult
 		$timelimitmult = $row[2];
 		$line['timelimit'] *= $timelimitmult;
@@ -461,6 +448,20 @@
 			$canedit = 1;
 		} else {
 			$canedit = 0;
+		}
+		
+		if ($canedit) {
+			$query = "SELECT id,rubrictype,rubric FROM imas_rubrics WHERE id IN ";
+			$query .= "(SELECT DISTINCT rubric FROM imas_questions WHERE assessmentid={$line['assessmentid']} AND rubric>0)";
+			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			if (mysql_num_rows($result)>0) {
+				$rubrics = array();
+				while ($row = mysql_fetch_row($result)) {
+					$rubrics[] = $row;
+				}
+				echo printrubrics($rubrics);
+			}
+			unset($rubrics);
 		}
 		
 		list($testtype,$showans) = explode('-',$line['deffeedback']);
@@ -573,6 +574,7 @@
 			$seeds = explode(",",$line['seeds']);
 			$sp = explode(";",$line['scores']);
 			$scores = explode(",",$sp[0]);
+			if (isset($sp[1])) {$rawscores = explode(",",$sp[1]);}
 			$attempts = explode(",",$line['attempts']);
 			$lastanswers = explode("~",$line['lastanswers']);
 			echo "<p>";
@@ -584,6 +586,7 @@
 			$seeds = explode(",",$line['reviewseeds']);
 			$sp = explode(";",$line['reviewscores']);
 			$scores = explode(",",$sp[0]);
+			if (isset($sp[1])) {$rawscores = explode(",",$sp[1]);}
 			$attempts = explode(",",$line['reviewattempts']);
 			$lastanswers = explode("~",$line['reviewlastanswers']);
 			echo "<p>";
@@ -595,6 +598,7 @@
 			$seeds = explode(",",$line['bestseeds']);
 			$sp = explode(";",$line['bestscores']);
 			$scores = explode(",",$sp[0]);
+			if (isset($sp[1])) {$rawscores = explode(",",$sp[1]);}
 			$attempts = explode(",",$line['bestattempts']);
 			$lastanswers = explode("~",$line['bestlastanswers']);
 			echo "<p><b>Showing Scored Attempts</b> | ";
@@ -744,7 +748,14 @@
 			} else {
 				$GLOBALS['questionscoreref'] = array("scorebox$i",$pts[$questions[$i]]);
 			}
-			$qtypes = displayq($i,$qsetid,$seeds[$i],$showa,false,$attempts[$i]);
+		
+			if (isset($rawscores[$i])) {
+				$colors = scorestocolors($rawscores[$i],$pts[$questions[$i]],$answeights[$questions[$i]],false);
+			} else {
+				$colors = array();
+			}
+		
+			$qtypes = displayq($i,$qsetid,$seeds[$i],$showa,false,$attempts[$i],false,false,false,$colors);
 			echo '</div>';
 			
 			if ($scores[$i]==-1) { $scores[$i]="N/A";} else {$total+=getpts($scores[$i]);}
@@ -1148,5 +1159,54 @@ function isoktorec() {
 		}
 	}	
 	return $oktorec;
+}
+function scorestocolors($sc,$pts,$answ,$noraw) {
+	if (!$noraw) {
+		$pts = 1;
+	}
+	if (trim($sc)=='') {return '';}
+	if (strpos($sc,'~')===false) {
+		if ($pts==0) {
+			$color = 'ansgrn';
+		} else if ($sc<0) {
+			$color = '';
+		} else if ($sc==0) {
+			$color = 'ansred';
+		} else if ($pts-$sc<.011) {
+			$color = 'ansgrn';
+		} else {
+			$color = 'ansyel';
+		}
+		return array($color);
+	} else {
+		$scarr = explode('~',$sc);
+		if ($noraw) {
+			for ($i=0; $i<count($answ)-1; $i++) {
+				$answ[$i] = round($answ[$i]*$pts,2);
+			}
+			//adjust for rounding
+			$diff = $pts - array_sum($answ);
+			$answ[count($answ)-1] += $diff;
+		} else {
+			$answ = array_fill(0,count($scarr),1);
+		}
+		
+		$out = array();
+		foreach ($scarr as $k=>$v) {
+			if ($answ[$k]==0) {
+				$color = 'ansgrn';
+			} else if ($v < 0) {
+				$color = '';
+			} else if ($v==0) { 
+				$color = 'ansred';
+			} else if ($answ[$k]-$v < .011) {
+				$color = 'ansgrn';
+			} else {
+				$color = 'ansyel';
+			}
+			$out[$k] = $color;
+		}
+		return $out;
+	}
 }
 ?>

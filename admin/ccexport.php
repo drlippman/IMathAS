@@ -87,28 +87,34 @@ if (isset($_GET['delete'])) {
 	}
 	
 	$ccnt = 1;
-	$module_meta = '<?xml version="1.0" encoding="UTF-8"?>
-		<modules xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://canvas.instructure.com/xsd/cccv1p0">
-		<module identifier="imported">
-		<title>Imported Content</title>
-		<items>';
+	$module_meta = '';
 		
-	
-		
+	$toplevelitems = '';	
+	$inmodule = false;
 	
 	function getorg($it,$parent,&$res,$ind) {
-		global $iteminfo,$newdir,$installname,$urlmode,$linktype,$urlmode,$imasroot,$ccnt,$module_meta,$htmldir,$filedir;
+		global $iteminfo,$newdir,$installname,$urlmode,$linktype,$urlmode,$imasroot,$ccnt,$module_meta,$htmldir,$filedir, $toplevelitems, $inmodule;
 		$out = '';
 		
 		foreach ($it as $k=>$item) {
 			$canvout = '';
 			if (is_array($item)) {
-				$canvout .= '<item identifier="BLOCK'.$item['id'].'">'."\n";
-				$canvout .= '<content_type>ContextModuleSubHeader</content_type>';
-				$canvout .= '<title>'.htmlentities($item['name']).'</title>'."\n";
-				$canvout .= "<position>$ccnt</position> <indent>".(strlen($ind)/2 - 1)."</indent> </item>";
-				$ccnt++;
-				$module_meta .= $canvout;
+				if (strlen($ind)>2) {
+					$canvout .= '<item identifier="BLOCK'.$item['id'].'">'."\n";
+					$canvout .= '<content_type>ContextModuleSubHeader</content_type>';
+					$canvout .= '<title>'.htmlentities($item['name']).'</title>'."\n";
+					$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
+					$ccnt++;
+					$module_meta .= $canvout;
+				} else {
+					if ($inmodule) {
+						$module_meta .= '</items></module>';
+					}
+					$inmodule = true;
+					$module_meta .= '<module identifier="BLOCK'.$item['id'].'">
+						<title>'.htmlentities($item['name']).'</title>
+						<items>';
+					}
 				$out .= $ind.'<item identifier="BLOCK'.$item['id'].'">'."\n";
 				$out .= $ind.'  <title>'.htmlentities($item['name']).'</title>'."\n";
 				$out .= $ind.getorg($item['items'],$parent.'-'.($k+1),$res,$ind.'  ');
@@ -141,7 +147,7 @@ if (isset($_GET['delete'])) {
 					$canvout .= '<content_type>WikiPage</content_type>';
 					$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
 					$canvout .= '<title>'.htmlentities($row[0]).'</title>'."\n";
-					$canvout .= "<position>$ccnt</position> <indent>".(strlen($ind)/2 - 1)."</indent> </item>";
+					$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
 					$ccnt++;
 					
 					$fp = fopen($newdir.'/'.$htmldir.'inlinetext'.$iteminfo[$item][1].'.html','w');
@@ -186,7 +192,7 @@ if (isset($_GET['delete'])) {
 						$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
 						$canvout .= '<title>'.htmlentities($row[0]).'</title>'."\n";
 						$canvout .= '<url>'.$alink.'</url>';
-						$canvout .= "<position>$ccnt</position> <indent>".(strlen($ind)/2 - 1)."</indent> </item>";
+						$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
 						$ccnt++;
 						$resitem =  '<resource identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" type="imswl_xmlv1p1">'."\n";
 						$resitem .= '  <file href="weblink'.$iteminfo[$item][1].'.xml" />'."\n";
@@ -204,7 +210,7 @@ if (isset($_GET['delete'])) {
 						$canvout .= '<content_type>Attachment</content_type>';
 						$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
 						$canvout .= '<title>'.htmlentities($row[0]).'</title>'."\n";
-						$canvout .= "<position>$ccnt</position> <indent>".(strlen($ind)/2 - 1)."</indent> </item>";
+						$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
 						$ccnt++;
 						$resitem =  '<resource href="'.$filedir.basename($filename).'" identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" type="webcontent">'."\n";
 						$resitem .= '  <file href="'.$filedir.basename($filename).'" />'."\n";
@@ -218,7 +224,7 @@ if (isset($_GET['delete'])) {
 						$canvout .= '<content_type>WikiPage</content_type>';
 						$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
 						$canvout .= '<title>'.htmlentities($row[0]).'</title>'."\n";
-						$canvout .= "<position>$ccnt</position> <indent>".(strlen($ind)/2 - 1)."</indent> </item>";
+						$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
 						$ccnt++;
 						$fp = fopen($newdir.'/'.$htmldir.'linkedtext'.$iteminfo[$item][1].'.html','w');
 						fwrite($fp,'<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8">');
@@ -247,7 +253,7 @@ if (isset($_GET['delete'])) {
 					$canvout .= '<content_type>DiscussionTopic</content_type>';
 					$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
 					$canvout .= '<title>'.htmlentities($row[0]).'</title>'."\n";
-					$canvout .= "<position>$ccnt</position> <indent>".(strlen($ind)/2 - 1)."</indent> </item>";
+					$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
 					$ccnt++;
 					$fp = fopen($newdir.'/forum'.$iteminfo[$item][1].'.xml','w');
 					fwrite($fp,'<topic xmlns="http://www.imsglobal.org/xsd/imsccv1p1/imsdt_v1p1">');
@@ -292,7 +298,7 @@ if (isset($_GET['delete'])) {
 						$canvout .= '<content_type>Assignment</content_type>';
 						$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
 						$canvout .= '<title>'.htmlentities($row[0]).'</title>'."\n";
-						$canvout .= "<position>$ccnt</position> <indent>".(strlen($ind)/2 - 1)."</indent> </item>";
+						$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
 						$ccnt++;
 						$aitems = explode(',',$row[3]);
 						foreach ($aitems as $k=>$v) {
@@ -374,7 +380,7 @@ if (isset($_GET['delete'])) {
 					$canvout .= '<content_type>WikiPage</content_type>';
 					$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
 					$canvout .= '<title>'.htmlentities($row[0]).'</title>'."\n";
-					$canvout .= "<position>$ccnt</position> <indent>".(strlen($ind)/2 - 1)."</indent> </item>";
+					$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
 					$ccnt++;
 					
 					$fp = fopen($newdir.'/'.$htmldir.'wikitext'.$iteminfo[$item][1].'.html','w');
@@ -405,7 +411,11 @@ if (isset($_GET['delete'])) {
 					$resitem .= '</resource>';
 					$res[] = $resitem;
 				}
-				$module_meta .= $canvout;
+				if (strlen($ind)>2) {
+					$module_meta .= $canvout;
+				} else {
+					$toplevelitems .= $canvout;
+				}
 			}
 		}
 		return $out;
@@ -420,9 +430,17 @@ if (isset($_GET['delete'])) {
     	}
 	$manifestorg = getorg($items,'0',$manifestres,'  ');
 	
+	
 	if ($linktype=='canvas') {
-		$module_meta .= '</items>  </module> </modules>';
-		
+		if ($toplevelitems != '') {
+			$module_meta = '<module identifier="imported">
+			<title>Imported Content</title>
+			<items>' . $toplevelitems . '</items></module>' . $module_meta;
+		}
+		$module_meta = '<?xml version="1.0" encoding="UTF-8"?>
+		<modules xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://canvas.instructure.com/xsd/cccv1p0">
+		'.$module_meta . '</items>  </module> </modules>';
+	
 		$fp = fopen($newdir.'/bltiimathas.xml','w');
 		fwrite($fp,'<cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0">');
 		fwrite($fp,'<blti:title>'.htmlentities($installname).'</blti:title>');
