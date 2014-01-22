@@ -875,7 +875,7 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
   if (doy==null) {doy = true;}
   if (dox=="off" || dox==0) { dox = false;} else {dox = true;}
   if (doy=="off" || doy==0) { doy = false;} else {doy = true;}
- 
+
 //alert(null)
   dx = (dx==null?xunitlength:dx*xunitlength);
   dy = (dy==null?dx:dy*yunitlength);
@@ -883,7 +883,7 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
   ticklength = fontsize/4;
   if (xgrid!=null) gdx = xgrid;
   if (ygrid!=null) gdy = ygrid;
-  if (gdx!=null) {
+  if (gdx!=null && gdx>0) {
     if (smallticks!=null && smallticks==1) {
     	  var gridymin = origin[1] + .7*ticklength;
 	  var gridymax = origin[1] - .7*ticklength;

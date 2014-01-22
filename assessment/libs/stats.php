@@ -465,7 +465,7 @@ function boxplot($arr,$label) {
 	$dw = $bigmax-$bigmin;
 
 	if ($dw>100) {$step = 20;} else if ($dw > 50) { $step = 10; } else if ($dw > 20) { $step = 5;} else {$step=1;}
-	$outst .= "axes($step,100,1,0,0,1,'off');";
+	$outst .= "axes($step,100,1,null,null,1,'off');";
 	$outst .= "text([". ($bigmin+.5*$dw) . ",-3],\"$label\");";
 	if (isset($dlbls)) {
 		for ($i=0;$i<$multi;$i++) {

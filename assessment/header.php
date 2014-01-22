@@ -77,13 +77,22 @@ if (!isset($sessiondata['mathdisp'])) {
 } else if ($sessiondata['mathdisp']==3) {
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
 	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=112313\" type=\"text/javascript\"></script>\n";
-	echo '<script type="text/javascript" src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=AM_HTMLorMML"></script>';
+	echo '<script type="text/x-mathjax-config">MathJax.Hub.Config({ 
+		config: ["MMLorHTML.js"],
+		jax: ["input/TeX","input/AsciiMath","output/HTML-CSS","output/NativeMML"],
+		extensions: ["tex2jax.js","mml2jax.js","asciimath2jax.js","MathMenu.js","MathZoom.js"],
+		TeX: { extensions: ["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"] },
+		"HTML-CSS": {preferredFont: "TeX"},
+		"asciimath2jax": { delimiters: [["`","`"]] },
+		"tex2jax": { inlineMath: [["\\\\(","\\\\)"]], displayMath: [["\\\\[","\\\\]"]]}
+		});</script>';
+	echo '<script type="text/javascript" src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js"></script>';
 	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = false; function rendermathnode(node) { MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]); } </script>'; 
 	echo '<style type="text/css">span.MathJax { font-size: 105%;}</style>';
 }
 
 if ($sessiondata['graphdisp']==1) {
-	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?v=010714\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?v=012114\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIISvg = true;</script>";
 } else {
 	echo "<script src=\"$imasroot/javascript/mathjs.js?v=010714\" type=\"text/javascript\"></script>\n";
