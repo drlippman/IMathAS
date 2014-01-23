@@ -56,6 +56,18 @@ function nthroot(n,base) {
 function nthlogten(n,v) {
 	return ((Math.log(v))/(Math.log(n)));
 }
+function functoindex(match) {
+	var func = "sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root".split("|");
+	for (var i=0;i<func.length;i++) {
+		if (func[i]==match) {
+			return '@'+i+'@';
+		}
+	}
+}
+function indextofunc(match, contents) {
+	var func = "sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root".split("|");
+	return func[contents];
+}
 
 function safepow(base,power) {
 	if (base<0 && Math.floor(power)!=power) {
@@ -86,8 +98,9 @@ function mathjs(st,varlist) {
   st = st.replace("[","(");
   st = st.replace("]",")");
   st = st.replace(/arc(sin|cos|tan|sec|csc|cot|sinh|cosh|tanh|sech|csch|coth)/gi,"$1^-1");
-  st = st.replace(/(Sin|Cos|Tan|Sec|Csc|Cot|Arc|Abs|Log|Ln|Sqrt)/g, matchtolower);
+  st = st.replace(/(Sin|Cos|Tan|Sec|Csc|Cot|Arc|Abs|Log|Ln|Sqrt)/gi, matchtolower);
   if (varlist != null) {
+  	  st = st.replace(/(sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root)/g, functoindex);
 	  var reg = new RegExp("(sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root)[\(]","g");
 	  st = st.replace(reg,"$1#(");
 	  var reg = new RegExp("("+varlist+")("+varlist+")$","g");
@@ -104,6 +117,7 @@ function mathjs(st,varlist) {
 	  st = st.replace(reg,"($1)$2");
 	  var reg = new RegExp("([^a-df-zA-Z])("+varlist+")$","g");
 	  st = st.replace(reg,"$1($2)");
+	  st = st.replace(/@(\d+)@/g, indextofunc);
   }
   st = st.replace(/#/g,"");
   st = st.replace(/\s/g,"");
