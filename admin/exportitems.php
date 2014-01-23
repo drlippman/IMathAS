@@ -317,79 +317,81 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 		echo "END QSET\n";
 	}
 	*/
-	$qstoexportlist = implode(',',$qsettoexport);
-	//first, lets pull any questions that have include__from so we can lookup backrefs
-	$query = "SELECT * FROM imas_questionset WHERE id IN ($qstoexportlist)";
-	$query .= " AND (control LIKE '%includecodefrom%' OR qtext LIKE '%includeqtextfrom%')";
-	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-	$includedqs = array();
-	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
-		if (preg_match_all('/includecodefrom\((\d+)\)/',$line['control'],$matches,PREG_PATTERN_ORDER) >0) {
-			$includedqs = array_merge($includedqs,$matches[1]);
-		}
-		if (preg_match_all('/includeqtextfrom\((\d+)\)/',$line['qtext'],$matches,PREG_PATTERN_ORDER) >0) {
-			$includedqs = array_merge($includedqs,$matches[1]);
-		}
-	}
-	$includedbackref = array();
-	if (count($includedqs)>0) {
-		$includedlist = implode(',',$includedqs);
-		$query = "SELECT id,uniqueid FROM imas_questionset WHERE id IN ($includedlist)";
-		$result = mysql_query($query) or die("Query failed : $query"  . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
-			$includedbackref[$row[0]] = $row[1];		
-		}
-	}
-	$imgfiles = array();
-	$query = "SELECT * FROM imas_questionset WHERE id IN ($qstoexportlist)";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$qcnt = 0;
-	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
-		$line['control'] = preg_replace('/includecodefrom\((\d+)\)/e','"includecodefrom(UID".$includedbackref["\\1"].")"',$line['control']);
-		$line['qtext'] = preg_replace('/includeqtextfrom\((\d+)\)/e','"includeqtextfrom(UID".$includedbackref["\\1"].")"',$line['qtext']);
-		echo "BEGIN QSET\n";
-		echo "\nUNIQUEID\n";
-		echo rtrim($line['uniqueid']) . "\n";
-		echo "\nLASTMOD\n";
-		echo rtrim($line['lastmoddate']) . "\n";
-		echo "\nDESCRIPTION\n";
-		echo rtrim($line['description']) . "\n";
-		echo "\nAUTHOR\n";
-		echo rtrim($line['author']) . "\n";
-		echo "\nCONTROL\n";
-		echo rtrim($line['control']) . "\n";
-		echo "\nQCONTROL\n";
-		echo rtrim($line['qcontrol']) . "\n";
-		echo "\nQTYPE\n";
-		echo rtrim($line['qtype']) . "\n";
-		echo "\nQTEXT\n";
-		echo rtrim($line['qtext']) . "\n";
-		echo "\nANSWER\n";
-		echo rtrim($line['answer']) . "\n";
-		echo "\nEXTREF\n";
-		echo rtrim($line['extref']) . "\n";
-		//no static file handling happening here yet just export the info
-		if ($line['hasimg']==1) {
-			echo "\nQIMGS\n";
-			$query = "SELECT var,filename FROM imas_qimages WHERE qsetid='{$line['id']}'";
-			$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-			while ($row = mysql_fetch_row($r2)) {
-				echo $row[0].','.$row[1]. "\n";
-				
+	if (count($qsettoexport)>0) {
+		$qstoexportlist = implode(',',$qsettoexport);
+		//first, lets pull any questions that have include__from so we can lookup backrefs
+		$query = "SELECT * FROM imas_questionset WHERE id IN ($qstoexportlist)";
+		$query .= " AND (control LIKE '%includecodefrom%' OR qtext LIKE '%includeqtextfrom%')";
+		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+		$includedqs = array();
+		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+			if (preg_match_all('/includecodefrom\((\d+)\)/',$line['control'],$matches,PREG_PATTERN_ORDER) >0) {
+				$includedqs = array_merge($includedqs,$matches[1]);
+			}
+			if (preg_match_all('/includeqtextfrom\((\d+)\)/',$line['qtext'],$matches,PREG_PATTERN_ORDER) >0) {
+				$includedqs = array_merge($includedqs,$matches[1]);
 			}
 		}
-		echo "END QSET\n";
-	}
-	
-	include("../includes/filehandler.php");
-	
-	$query = "SELECT DISTINCT filename FROM imas_qimages WHERE qsetid IN ($qstoexportlist)";
-	$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($row = mysql_fetch_row($r2)) {
-		if ($GLOBALS['filehandertypecfiles'] == 's3') {
-			copyqimage($row[0], realpath("../assessment/qimages").DIRECTORY_SEPARATOR. trim($row[0]));
+		$includedbackref = array();
+		if (count($includedqs)>0) {
+			$includedlist = implode(',',$includedqs);
+			$query = "SELECT id,uniqueid FROM imas_questionset WHERE id IN ($includedlist)";
+			$result = mysql_query($query) or die("Query failed : $query"  . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				$includedbackref[$row[0]] = $row[1];		
+			}
 		}
-		$imgfiles[] = realpath("../assessment/qimages").DIRECTORY_SEPARATOR. trim($row[0]);
+		$imgfiles = array();
+		$query = "SELECT * FROM imas_questionset WHERE id IN ($qstoexportlist)";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$qcnt = 0;
+		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+			$line['control'] = preg_replace('/includecodefrom\((\d+)\)/e','"includecodefrom(UID".$includedbackref["\\1"].")"',$line['control']);
+			$line['qtext'] = preg_replace('/includeqtextfrom\((\d+)\)/e','"includeqtextfrom(UID".$includedbackref["\\1"].")"',$line['qtext']);
+			echo "BEGIN QSET\n";
+			echo "\nUNIQUEID\n";
+			echo rtrim($line['uniqueid']) . "\n";
+			echo "\nLASTMOD\n";
+			echo rtrim($line['lastmoddate']) . "\n";
+			echo "\nDESCRIPTION\n";
+			echo rtrim($line['description']) . "\n";
+			echo "\nAUTHOR\n";
+			echo rtrim($line['author']) . "\n";
+			echo "\nCONTROL\n";
+			echo rtrim($line['control']) . "\n";
+			echo "\nQCONTROL\n";
+			echo rtrim($line['qcontrol']) . "\n";
+			echo "\nQTYPE\n";
+			echo rtrim($line['qtype']) . "\n";
+			echo "\nQTEXT\n";
+			echo rtrim($line['qtext']) . "\n";
+			echo "\nANSWER\n";
+			echo rtrim($line['answer']) . "\n";
+			echo "\nEXTREF\n";
+			echo rtrim($line['extref']) . "\n";
+			//no static file handling happening here yet just export the info
+			if ($line['hasimg']==1) {
+				echo "\nQIMGS\n";
+				$query = "SELECT var,filename FROM imas_qimages WHERE qsetid='{$line['id']}'";
+				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+				while ($row = mysql_fetch_row($r2)) {
+					echo $row[0].','.$row[1]. "\n";
+					
+				}
+			}
+			echo "END QSET\n";
+		}
+		
+		include("../includes/filehandler.php");
+		
+		$query = "SELECT DISTINCT filename FROM imas_qimages WHERE qsetid IN ($qstoexportlist)";
+		$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+		while ($row = mysql_fetch_row($r2)) {
+			if ($GLOBALS['filehandertypecfiles'] == 's3') {
+				copyqimage($row[0], realpath("../assessment/qimages").DIRECTORY_SEPARATOR. trim($row[0]));
+			}
+			$imgfiles[] = realpath("../assessment/qimages").DIRECTORY_SEPARATOR. trim($row[0]);
+		}
 	}
 	// need to work on
 	include("../includes/tar.class.php");
