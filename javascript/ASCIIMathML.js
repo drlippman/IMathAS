@@ -554,7 +554,7 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
                              document.createTextNode(symbol.output)),str];
       if (typeof symbol.func == "boolean" && symbol.func) { // functions hack
         st = str.charAt(0);
-        if (st=="^" || st=="_" || st=="/" || st=="|" || st==",") {
+        if (st=="^" || st=="_" || st=="/" || st=="|" || st=="," || (symbol.input.length==1 && st!="(")) {
           return [AMcreateMmlNode(symbol.tag,
                     document.createTextNode(symbol.output)),str];
         } else {
