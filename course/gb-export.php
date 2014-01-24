@@ -86,6 +86,8 @@
 	if ($_POST['submit']=="Download Gradebook for Excel") {
 		header('Content-type: application/vnd.ms-excel');
 		header('Content-Disposition: attachment; filename="gradebook-'.$cid.'.xls"');
+		header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+		header('Pragma: public');
 		echo '<html><head>';
 		echo '<style type="text/css">';
 		require("../imascore.css");
@@ -99,6 +101,8 @@
 		if (isset($_GET['export']) && $_GET['export']=="true") {
 			header('Content-type: text/csv');
 			header("Content-Disposition: attachment; filename=\"gradebook-$cid.csv\"");
+			header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+			header('Pragma: public');
 			foreach ($gb as $gbline) {
 				$line = '';
 				foreach ($gbline as $val) {
