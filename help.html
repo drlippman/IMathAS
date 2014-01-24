@@ -1863,6 +1863,7 @@ These macros are used to test various conditions.  They typically return true or
 <li><b>comparefunctions(a,b,[vars,tol,domain])</b>: Compares functions a and b to see if they are algebraically equivalent.  Set
   vars to a list of variables (defaults to 'x').  Set tol to specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance.
   Set domain to "xmin,xmax" to specify a domain for comparison.</li>
+<li><b>is_numeric(str)</b>:  Checks if the string represents an integer or decimal number.</li>
 </ul>
 </div>
 <div class=h2>
@@ -2136,6 +2137,9 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 	the symbol "^" would be required to show up exactly 3 times, and "cos" would be required to show up less than 2 times. <br/> 
 	You can	use "#" in the symbol location to match any number (including decimal values); 3.2^5 would match twice.<br/>
 	You can use a regular expression by putting in the symbol location "regex:expression"</dd>
+<dt>$requiretimeslistpart = a list, in the same format as $requiretimes (In Common Control)</dt>
+	<dd>Similar to $requiretimes, but this check is applied to each element of the answer list when a list $answerformat is used, 
+	where $requiretimes would be applied to the entire list of answers.</dd>
 <dt>$ansprompt = string (In Common Control)</dt>
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="y="</dd>
 <dt>$displayformat = "point" or "vector" (In Common Control) *deprecated - use calculated ntuple question type instead*</dt>
