@@ -17,6 +17,15 @@ $useeditor = "wikicontent";
 $cid = intval($_GET['cid']);
 $id = intval($_GET['id']);
 
+if (isset($_GET['framed'])) {
+	$flexwidth = true;
+	$shownav = false;
+	$framed = "&framed=true";
+} else {
+	$shownav = true;
+	$framed = '';
+}
+
 if ($cid==0) {
 	$overwriteBody=1;
 	$body = "You need to access this page with a course id";
@@ -147,7 +156,7 @@ if ($cid==0) {
 				
 			}
 			if (!$inconflict) {
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewwiki.php?cid=$cid&id=$id&grp=$groupid");
+				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed");
 				exit;
 			}
 				
@@ -187,8 +196,10 @@ if ($cid==0) {
 if ($overwriteBody==1) {
 	echo $body;
 } else {  // DISPLAY 	
+	if ($shownav) {
+		echo '<div class="breadcrumb">'.$curBreadcrumb.'</div>';
+	}
 ?>
-	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
 	<div id="headereditwiki" class="pagetitle"><h2><?php echo $pagetitle ?></h2></div>
 
 <?php
@@ -208,7 +219,7 @@ if (isset($lasteditedby)) {
 	echo "<p>Last Edited by $lasteditedby on $lastedittime</p>";
 }
 ?>
-	<form method=post action="editwiki.php?cid=<?php echo $cid;?>&id=<?php echo $id;?>&grp=<?php echo $groupid;?>">
+	<form method=post action="editwiki.php?cid=<?php echo $cid;?>&id=<?php echo $id;?>&grp=<?php echo $groupid.$framed;?>">
 	<input type="hidden" name="baserevision" value="<?php echo $revisionid;?>" />
 	<div class="editor">
 	<textarea cols=60 rows=30 id="wikicontent" name="wikicontent" style="width: 100%">
