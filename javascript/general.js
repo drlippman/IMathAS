@@ -277,7 +277,8 @@ function chkAllNone(frmid, arr, mark, skip) {
   return false;
 }
 
-function initeditor(edmode,edids) {
+function initeditor(edmode,edids,css) {
+	var cssmode = css || 0;
 	var edsetup = {
 	    mode : edmode,
 	    theme : "advanced",
@@ -292,7 +293,7 @@ function initeditor(edmode,edids) {
 	    plugins : 'asciimath,asciisvg,dataimage,table,inlinepopups,paste,media,advlist'+((fileBrowserCallBackFunc != null)?",attach":""),
 	    gecko_spellcheck : true,
 	    extended_valid_elements : 'iframe[src|width|height|name|align],param[name|value],@[sscr]',
-	    content_css : imasroot+'/imascore.css,'+imasroot+'/themes/'+coursetheme,
+	    content_css : imasroot+(cssmode==1?'/assessment/mathtest.css,':'/imascore.css,')+imasroot+'/themes/'+coursetheme,
 	    popup_css_add : imasroot+'/themes/'+coursetheme,
 	    theme_advanced_resizing : true,
 	    table_styles: "Gridded=gridded;Gridded Centered=gridded centered",

@@ -572,7 +572,7 @@
 	        qtextbox.rows += 3;
 		qtextbox.value = qtextbox.value.replace(/<span\s+class="AM"[^>]*>(.*?)<\\/span>/,"$1");
 	        qtextbox.value = qtextbox.value.replace(/`(.*?)`/,\'<span class="AM" title="$1">`$1`</span>\');
-	        initeditor("exact","qtext");
+	        initeditor("exact","qtext",1);
 	     } else {
 		tinyMCE.execCommand("mceRemoveControl",true,"qtext");
 		qtextbox.rows -= 3;
