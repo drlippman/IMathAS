@@ -112,7 +112,8 @@
 		echo " <a href=\"mailto:{$line['email']}\">email</a> | ";
 		echo " <a href=\"$imasroot/course/gradebook.php?cid={$line['courseid']}&stu={$line['msgfrom']}\" target=\"_popoutgradebook\">gradebook</a>";
 		if (preg_match('/Question\s+about\s+#(\d+)\s+in\s+(.*)\s*$/',$line['title'],$matches)) {
-			$query = "SELECT id FROM imas_assessments WHERE name='{$matches[2]}' AND courseid='{$line['courseid']}'";
+			$aname = addslashes($matches[2]);
+			$query = "SELECT id FROM imas_assessments WHERE name='$aname' AND courseid='{$line['courseid']}'";
 			$res = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			if (mysql_num_rows($res)>0) {
 				$aid = mysql_result($res,0,0);
