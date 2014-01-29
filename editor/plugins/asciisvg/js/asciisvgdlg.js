@@ -22,9 +22,10 @@ var AsciisvgDialog = {
 			document.getElementById("preview").innerHTML = '<img id="previewimg" style="width:'+this.width+'px; height: '+this.height+'px; vertical-align: middle; float: none;" src="'+ this.AScgiloc + '?sscr='+encodeURIComponent(this.sscr)+'" script=" " />';
 		} else {
 			document.getElementById("previewsvg").setAttribute("sscr",this.sscr);
+			switchTo("previewsvg");
 		}
 		this.getsscr(this.sscr);
-		
+		if (!ASnoSVG) {this.graphit();}
 		
 	},
 
