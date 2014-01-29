@@ -461,12 +461,6 @@ if ($overwriteBody==1) {
 	if ($useleftbar && isset($teacherid)) {
 ?>	
 	<div id="leftcontent" <?php if ($essentialsnavcnt<4) {echo 'class="needed"';}?>>
-	<?php
-		if (isset($CFG['CPS']['additemtype']) && $CFG['CPS']['additemtype'][0]=='links') {
-		} else {
-			echo '<p>'.generateadditem($_GET['folder'],'LB').'</p>';
-		}
-	?>
 		<p>
 		<b><?php echo _('Communication'); ?></b><br/>
 			<a href="<?php echo $imasroot ?>/msgs/msglist.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>" class="essen">
@@ -781,7 +775,7 @@ function makeTopMenu() {
 		} else {
 			echo 'class="buttoninactive buttoncurveleft"';
 		}
-		echo '>', _('Normal'), '</a>';
+		echo '>', _('Instructor'), '</a>';
 		echo "<a href=\"course.php?cid=$cid&quickview=off&stuview=0\" ";
 		if ($previewshift>-1 && $quickview != 'on') {
 			echo 'class="buttonactive"';
@@ -795,7 +789,7 @@ function makeTopMenu() {
 		} else {
 			echo 'class="buttoninactive buttoncurveright"';
 		}
-		echo '>', _('Quick'), '</a>';
+		echo '>', _('Quick Rearrange'), '</a>';
 		echo '</div>';
 		//echo '<br class="clear"/>';
 			

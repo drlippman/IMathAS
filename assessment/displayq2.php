@@ -590,7 +590,8 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 	if (isset($answersize)) {$options['answersize'] = $answersize;}
 	if (isset($variables)) {$options['variables'] = $variables;}
 	if (isset($domain)) {$options['domain'] = $domain;}
-	if (isset($requiretimes)) {$options['requiretimes'] = $requiretimes;}	
+	if (isset($requiretimes)) {$options['requiretimes'] = $requiretimes;}
+	if (isset($requiretimeslistpart)) {$options['requiretimeslistpart'] = $requiretimeslistpart;}	
 	if (isset($scoremethod)) {$options['scoremethod'] = $scoremethod;}	
 	if (isset($strflags)) {$options['strflags'] = $strflags;}
 	if (isset($matchlist)) {$options['matchlist'] = $matchlist;}
@@ -2921,6 +2922,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$qn];} else {$abstolerance = $options['abstolerance'];}}
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$qn];} else {$requiretimes = $options['requiretimes'];}}
+		if (isset($options['requiretimeslistpart'])) {if (is_array($options['requiretimeslistpart'])) {$requiretimeslistpart = $options['requiretimeslistpart'][$qn];} else {$requiretimeslistpart = $options['requiretimeslistpart'];}}
 		
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
@@ -2952,6 +2954,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					}
 					//echo $cpts[0].','.$cpts[1].'<br/>';
 					if ($answer!='DNE' && (!checkanswerformat($cpts[0],$ansformats) || !checkanswerformat($cpts[1],$ansformats))) {
+						return 0;
+					}
+					if ($answer!='DNE' && isset($requiretimeslistpart) && checkreqtimes($tchk,$requiretimeslistpart)==0) {
 						return 0;
 					}
 				}
@@ -3031,6 +3036,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$qn];} else {$abstolerance = $options['abstolerance'];}}
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$qn];} else {$requiretimes = $options['requiretimes'];}}
+		if (isset($options['requiretimeslistpart'])) {if (is_array($options['requiretimeslistpart'])) {$requiretimeslistpart = $options['requiretimeslistpart'][$qn];} else {$requiretimeslistpart = $options['requiretimeslistpart'];}}
 		
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
@@ -3146,6 +3152,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				if (!checkanswerformat($orarr[$j],$ansformats)) {
 					continue;
 				} 
+				if (isset($requiretimeslistpart) && checkreqtimes($orarr[$j],$requiretimeslistpart)==0) {
+					continue;
+				}
 				//removed - done above already
 				//$anss = explode(' or ',$answer);  
 				foreach ($anss as $anans) {
@@ -4996,6 +5005,9 @@ function isNaN( $var ) {
 }
 
 function checkreqtimes($tocheck,$rtimes) {
+	if ($tocheck=='DNE' || $tocheck=='oo' || $tocheck=='+oo' || $tocheck=='-oo') {
+		return 1;
+	}
 	$cleanans = preg_replace('/[^\w\*\/\+\-\(\)\[\],\.\^]+/','',$tocheck);
 	//if entry used pow or exp, we want to replace them with their asciimath symbols for requiretimes purposes
 	$cleanans = str_replace("pow","^",$cleanans);

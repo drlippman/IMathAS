@@ -263,19 +263,19 @@ function printlist($items) {
 				 	 $foundopenitem = '/forums/thread.php?cid='.$cid.'&amp;forum='.$typeid; $isopen = true;
 				 }
 				 $out .=  '<li><img src="'.$imasroot.'/img/forum_tiny.png"> <a href="'.$imasroot.'/forums/thread.php?cid='.$cid.'&amp;forum='.$typeid.'" onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')" target="readerframe">'.$line['name'].'</a></li>';
-			} else if ($line['itemtype']=='Wiki') {
+			} */else if ($line['itemtype']=='Wiki') {
 				//TODO check availability, etc.
 				 $query = "SELECT id,name,description,startdate,enddate,editbydate,avail,settings,groupsetid FROM imas_wikis WHERE id='$typeid'";
 				 $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				 $line = mysql_fetch_array($result, MYSQL_ASSOC);
 				 if ($openitem=='' && $foundfirstitem=='') {
-				 	 $foundfirstitem = '/wikis/viewwiki.php?cid='.$cid.'&amp;id='.$typeid; $isopen = true;
+				 	 $foundfirstitem = '/wikis/viewwiki.php?cid='.$cid.'&amp;id='.$typeid.'&framed=true'; $isopen = true;
 				 }
 				 if ($itemtype.$typeid===$openitem) {
-				 	 $foundopenitem = '/wikis/viewwiki.php?cid='.$cid.'&amp;id='.$typeid; $isopen = true;
+				 	 $foundopenitem = '/wikis/viewwiki.php?cid='.$cid.'&amp;id='.$typeid.'&framed=true'; $isopen = true;
 				 }
-				 $out .=  '<li><img src="'.$imasroot.'/img/wiki_tiny.png"> <a href="'.$imasroot.'/wikis/viewwiki.php?cid='.$cid.'&amp;id='.$typeid.'"  onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')" target="readerframe">'.$line['name'].'</a></li>';
-			} */
+				 $out .=  '<li><img src="'.$imasroot.'/img/wiki_tiny.png"> <a href="'.$imasroot.'/wikis/viewwiki.php?cid='.$cid.'&amp;id='.$typeid.'&framed=true"  onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')" target="readerframe">'.$line['name'].'</a></li>';
+			} 
 			
 		}
 	}

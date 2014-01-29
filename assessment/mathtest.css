@@ -45,6 +45,11 @@ div.cpmid {
 	margin-bottom: 10px;
 	border-radius: 4px;
 }
+.mceContentBody {
+	font-family: "Times New Roman", Times, serif;
+	font-size: medium;
+	margin: 10px;
+}
 div.question {
 	/*position: relative;*/
 	font-family: "Times New Roman", Times, serif;

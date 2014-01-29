@@ -58,7 +58,7 @@ function findPos(obj) { //from quirksmode.org
 	return [curleft,curtop];
 }
 */
-function tablescroller(id,lockonload) {
+function tablescroller(id,lockonload,showpics) {
 	var t = this;
 	var thetable;
 	var tblcont;
@@ -76,6 +76,7 @@ function tablescroller(id,lockonload) {
 	var toggletracker = 0;
 	var locktds = new Array();
 	var ispreinited = false;
+	var haspics = (showpics>0);
 	
 //preinit is called onload
 //fixes column widths and heights by injecting div's 
@@ -155,7 +156,7 @@ this.preinit = function(try2) {
 		for (var i=0;i<trs.length;i++) {
 			var nodes = trs[i].getElementsByTagName((i==0?"th":"td"));
 			
-			if (i<2) {
+			if (i<2 || haspics) {
 				var max = nodes[0].offsetHeight;
 			}
 			if (i==0) {

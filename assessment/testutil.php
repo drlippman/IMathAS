@@ -717,6 +717,9 @@ function showqinfobar($qn,$inreview,$single,$isembed=false) {
 		if ($inreview) {
 			echo '<div class="review">';
 		}
+		if ($sessiondata['isteacher']) {
+			echo '<span style="float:right;font-size:70%">'._('Question ID: ').$qi[$questions[$qn]]['questionsetid'].'</span>';
+		}
 		if ($isembed) {
 			echo _('Question').' '.($qn+1).'. ';
 		}
@@ -760,6 +763,7 @@ function showqinfobar($qn,$inreview,$single,$isembed=false) {
 				echo _('Out of:'), " ($ptposs)";
 			}
 		}
+		
 		//if (!$noindivscores) {
 		//	echo "<br/>Score in gradebook: ".printscore2($bestscores[$qn]).".";
 		//}
