@@ -2207,15 +2207,16 @@ function cleanbytoken($str,$funcs = array()) {
 			} else if ($token[1]==3 && $token[0]==='1') {
 				$dontuse = false;
 				if ($lastout>-1) { //if not first character
-					if ($out[$lastout] != '^' && $out[$lastout]!='+' && $out[$lastout]!='-') {
+					echo $out[$lastout];
+					if ($out[$lastout] != '^' && $out[$lastout] != '/' && $out[$lastout]!='+' && $out[$lastout]!='-') {
 						//( )1, x1,*1
 						if ($out[$lastout]=='*') { //elim *
 							array_pop($out);
 						}
 						$dontuse = true;
-					} else if ($out[$lastout] == '^') {
+					} else if ($out[$lastout] == '^' || $out[$lastout] == '/' ) {
 						if ($lastout>=1) {
-							//4+x^1 -> 4+x, 4x^1 -> 4x
+							//4+x^1 -> 4+x, 4x^1 -> 4x,   x/1 -> x
 							array_pop($out);
 							$dontuse = true;
 						}
