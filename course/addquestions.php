@@ -278,7 +278,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				for ($i=0; $i<count($qarr); $i++) {
 					if (in_array($qarr[$i],$qids)) {
 						if ($_POST['withdrawtype']=='zero' || $_POST['withdrawtype']=='groupzero') {
-							$sarr[$i] = 0;
+							$bestscores[$i] = 0;
 						} else if ($_POST['withdrawtype']=='full' || $_POST['withdrawtype']=='groupfull') {
 							$bestscores[$i] = $poss[$qarr[$i]];
 						}
