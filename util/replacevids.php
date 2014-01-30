@@ -39,7 +39,7 @@ echo '<h3>Replace video links</h3>';
 echo '<p>This will replace video links or question button links anywhere on the system</p>';
 echo '<form method="post">';
 echo '<p>Replace video ID <input type="text" name="from" size="11"/> with video ID <input type="text" name="to" size="11"/></p>';
-echo '<p><input type="submit" value="Search"/></p>';
+echo '<p><input type="submit" value="Replace"/></p>';
 echo '</form>';
 
 ?>
