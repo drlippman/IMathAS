@@ -2317,7 +2317,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if (isset($options['reqsigfigs'])) {if (is_array($options['reqsigfigs'])) {$reqsigfigs = $options['reqsigfigs'][$qn];} else {$reqsigfigs = $options['reqsigfigs'];}}
 		if (is_array($options['partialcredit'][$qn]) || ($multi>0 && is_array($options['partialcredit']))) {$partialcredit = $options['partialcredit'][$qn];} else {$partialcredit = $options['partialcredit'];}
-		
+		$givenans = str_replace('∞', 'oo', $givenans);
 		if (isset($partialcredit)) {
 			if (!is_array($partialcredit)) {
 				$partialcredit = explode(',',$partialcredit);
@@ -2806,6 +2806,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		if (!isset($answerformat)) { $answerformat = '';}
+		$givenans = str_replace('∞', 'oo', $givenans);
 		$ansformats = explode(',',$answerformat);
 		$answer = str_replace(' ','',$answer);
 		
@@ -3040,7 +3041,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
-		
+		$givenans = str_replace('∞', 'oo', $givenans);
 		$GLOBALS['partlastanswer'] = $_POST["tc$qn"].'$#$'.$givenans;
 		
 		if ($givenans == null) {return 0;}
@@ -3560,6 +3561,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$ansformats = explode(',',$answerformat);
+		$givenans = str_replace('∞', 'oo', $givenans);
 		
 		if ($anstype == 'interval') {
 			$GLOBALS['partlastanswer'] = $givenans;
