@@ -25,7 +25,7 @@ function reduceradical($in,$root=2,$format="string") {
 	$max = 	pow($in,1/$root);
 	$out = 1;
 	//look for biggest perfect power first
-	for ($i=floor($max);$i>1;$i--) {
+	for ($i=floor($max+.01);$i>1;$i--) {
 		if ($in%(pow($i,$root))==0) {
 			$out *= $i;
 			$in /= pow($i,$root);

@@ -609,6 +609,14 @@ if ($myrights<20) {
 				$body = "Must provide a search term when searching all libraries <a href=\"manageqset.php\">Try again</a>";
 				$searchall = 0;
 			} 
+			if ($isadmin) {
+				if (isset($_POST['hidepriv'])) {
+					$hidepriv = 1;
+				} else {
+					$hidepriv = 0;
+				}
+				$sessiondata['hidepriv'.$cid] = $hidepriv;
+			}
 			
 			writesessiondata();
 		} else if (isset($sessiondata['lastsearch'.$cid])) {
@@ -617,6 +625,9 @@ if ($myrights<20) {
 			$search = str_replace('"','&quot;',$search);
 			$searchall = $sessiondata['searchall'.$cid];
 			$searchmine = $sessiondata['searchmine'.$cid];
+			if ($isadmin) {
+				$hidepriv = $sessiondata['hidepriv'.$cid];
+			}
 		} else {
 			$search = '';
 			$searchall = 0;
@@ -633,8 +644,16 @@ if ($myrights<20) {
 				$searchlikes = "imas_questionset.broken=1 AND ";	
 			} else if (substr($safesearch,0,7)=='childof') { 
 				$searchlikes = "imas_questionset.ancestors REGEXP '[[:<:]]".substr($safesearch,8)."[[:>:]]' AND ";	
-			} else {$searchterms = explode(" ",$safesearch);
-				$searchlikes = "((imas_questionset.description LIKE '%".implode("%' AND imas_questionset.description LIKE '%",$searchterms)."%') ";
+			} else {
+				$searchterms = explode(" ",$safesearch);
+				$searchlikes = '';
+				foreach ($searchterms as $k=>$v) {
+					if (substr($v,0,5) == 'type=') {
+						$searchlikes .= "imas_questionset.qtype='".substr($v,5)."' AND ";
+						unset($searchterms[$k]);
+					}
+				}
+				$searchlikes .= "((imas_questionset.description LIKE '%".implode("%' AND imas_questionset.description LIKE '%",$searchterms)."%') ";
 				if (substr($safesearch,0,3)=='id=') {
 					$searchlikes = "imas_questionset.id='".substr($safesearch,3)."' AND ";
 				} else if (is_numeric($safesearch)) {
@@ -695,7 +714,7 @@ if ($myrights<20) {
 		}
 		*/
 		
-		$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.ownerid,imas_questionset.description,imas_questionset.userights,imas_questionset.lastmoddate,imas_questionset.extref,";
+		$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.ownerid,imas_questionset.description,imas_questionset.userights,imas_questionset.lastmoddate,imas_questionset.extref,imas_questionset.replaceby,";
 		$query .= "imas_questionset.qtype,imas_users.firstName,imas_users.lastName,imas_users.groupid,imas_library_items.libid,imas_library_items.junkflag, imas_library_items.id AS libitemid ";
 		$query .= "FROM imas_questionset,imas_library_items,imas_users WHERE imas_questionset.deleted=0 AND $searchlikes ";
 		$query .= "imas_library_items.qsetid=imas_questionset.id AND imas_questionset.ownerid=imas_users.id ";
@@ -703,6 +722,9 @@ if ($myrights<20) {
 		if ($isadmin) {
 			if ($searchall==0) {
 				$query .= "AND imas_library_items.libid IN ($llist)";
+			}
+			if ($hidepriv==1) {
+				$query .= " AND imas_questionset.userights>0";
 			}
 			if ($searchmine==1) {
 				$query .= " AND imas_questionset.ownerid='$userid'";
@@ -726,7 +748,7 @@ if ($myrights<20) {
 				$query .= " AND imas_questionset.ownerid='$userid'";
 			}
 		}
-		$query.= " ORDER BY imas_library_items.libid,imas_library_items.junkflag,imas_questionset.id LIMIT 500";
+		$query.= " ORDER BY imas_library_items.libid,imas_library_items.junkflag,imas_questionset.replaceby,imas_questionset.id LIMIT 500";
 		$resultLibs = mysql_query($query) or die("Query failed : " . mysql_error());
 		
 		$page_questionTable = array();
@@ -754,6 +776,8 @@ if ($myrights<20) {
 			$page_questionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . $line['id'] . "' id='qo$ln'>";
 			if ($line['userights']==0) {
 				$page_questionTable[$i]['desc'] = '<span class="red">'.filter($line['description']).'</span>';
+			} else if ($line['replaceby']>0 || $line['junkflag']>0) {
+				$page_questionTable[$i]['desc'] = '<span style="color:#ccc"><i>'.filter($line['description']).'</i></span>';	
 			} else {
 				$page_questionTable[$i]['desc'] = filter($line['description']);
 			}
@@ -1080,6 +1104,11 @@ function getnextprev(formn,loc) {
 		echo "/>Search all libs <input type=checkbox name=\"searchmine\" value=\"1\" ";
 		if ($searchmine==1) {echo "checked=1";}
 		echo "/>Mine only ";
+		if ($isadmin) {
+			echo "<input type=checkbox name=\"hidepriv\" value=\"1\" ";
+			if ($hidepriv==1) {echo "checked=1";}
+			echo "/>Hide Private ";	
+		}
 		
 		echo '<input type=submit value="Search" title="List or search selected libraries">';
 		echo "<input type=button value=\"Add New Question\" onclick=\"window.location='moddataset.php?cid=$cid'\">\n";

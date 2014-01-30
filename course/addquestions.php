@@ -497,11 +497,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$searchlikes = "imas_questionset.description REGEXP '$safesearch' AND ";
 			} else {
 				$searchterms = explode(" ",$safesearch);
-				$searchlikes = "((imas_questionset.description LIKE '%".implode("%' AND imas_questionset.description LIKE '%",$searchterms)."%') ";
+				$searchlikes = '';
+				foreach ($searchterms as $k=>$v) {
+					if (substr($v,0,5) == 'type=') {
+						$searchlikes .= "imas_questionset.qtype='".substr($v,5)."' AND ";
+						unset($searchterms[$k]);
+					}
+				}
+				$searchlikes .= "((imas_questionset.description LIKE '%".implode("%' AND imas_questionset.description LIKE '%",$searchterms)."%') ";
 				if (substr($safesearch,0,3)=='id=') {
 					$searchlikes = "imas_questionset.id='".substr($safesearch,3)."' AND ";
-				} else if (substr($safesearch,0,7)=='childof') { 
-					$searchlikes = "imas_questionset.ancestors REGEXP '[[:<:]]".substr($safesearch,8)."[[:>:]]' AND ";	
 				} else if (is_numeric($safesearch)) {
 					$searchlikes .= "OR imas_questionset.id='$safesearch') AND ";
 				} else {
@@ -576,7 +581,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			if (isset($search)) {
 				$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.avgtime,imas_library_items.junkflag, imas_library_items.id AS libitemid,imas_users.groupid ";
 				$query .= "FROM imas_questionset JOIN imas_library_items ON imas_library_items.qsetid=imas_questionset.id ";
-				$query .= "JOIN imas_users ON imas_questionset.ownerid=imas_users.id WHERE imas_questionset.deleted=0 AND $searchlikes "; //imas_questionset.description LIKE '%$safesearch%' ";
+				$query .= "JOIN imas_users ON imas_questionset.ownerid=imas_users.id WHERE imas_questionset.deleted=0 AND imas_questionset.replaceby=0 AND $searchlikes "; //imas_questionset.description LIKE '%$safesearch%' ";
 				$query .= " (imas_questionset.ownerid='$userid' OR imas_questionset.userights>0)";
 		
 				if ($searchall==0) {
@@ -599,6 +604,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						JOIN imas_questionset  ON a.questionsetid=imas_questionset.id
 						AND (imas_questionset.ownerid='$userid' OR imas_questionset.userights>0)
 						AND imas_questionset.deleted=0
+						AND imas_questionset.replaceby=0
 						WHERE a.questionsetid NOT IN ($existingqlist)
 						GROUP BY a.questionsetid ORDER BY qcnt DESC LIMIT 100";
 				}
