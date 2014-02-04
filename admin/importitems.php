@@ -195,9 +195,28 @@ function additem($itemtoadd,$item,$questions,$qset) {
 		}
 		
 		//recreate itemorder 
-		$item[$itemtoadd]['questions'] = preg_replace("/(\d+)/e",'$questions[\\1]["systemid"]',$item[$itemtoadd]['questions']);
+		//$item[$itemtoadd]['questions'] = preg_replace("/(\d+)/e",'$questions[\\1]["systemid"]',$item[$itemtoadd]['questions']);
+		$qs = explode(',',$item[$itemtoadd]['questions']);
+		$newqorder = array();
+		foreach ($qs as $q) {
+			if (strpos($q,'~')===FALSE) {
+				$newqorder[] = $questions[$q]["systemid"];
+			} else {
+				$newsub = array();
+				$subs = explode('~',$q);
+				if (strpos($subs[0],'|')!==false) {
+					$newsub[] = $subs[0];
+					array_shift($subs);
+				}
+				foreach($subs as $subq) {
+					$newsub[] = $questions[$subq]["systemid"];
+				}
+				$newqorder[] = implode('~',$newsub);
+			}	
+		}
+		$itemorder = addslashes(implode(',',$newqorder));
 		//write itemorder to db
-		$query = "UPDATE imas_assessments SET itemorder='{$item[$itemtoadd]['questions']}' WHERE id=$typeid";
+		$query = "UPDATE imas_assessments SET itemorder='$itemorder' WHERE id=$typeid";
 		mysql_query($query) or die("error on: $query: " . mysql_error());
 	} else if ($item[$itemtoadd]['type'] == "Forum") {
 		$settings = explode("\n",$item[$itemtoadd]['settings']);

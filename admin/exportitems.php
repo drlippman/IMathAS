@@ -245,6 +245,10 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 					} else {
 						unset($newsub);
 						$subs = explode('~',$q);
+						if (strpos($subs[0],'|')!==false) {
+							$newsub[] = $subs[0];
+							array_shift($subs);
+						}
 						foreach($subs as $subq) {
 							$qtoexport[$qcnt] = $subq;
 							$newsub[] = $qcnt;
