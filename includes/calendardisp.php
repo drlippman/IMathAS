@@ -79,7 +79,7 @@ $address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']
 	
 echo '<script type="text/javascript">var calcallback = "'.$address.'";</script>';
 echo '<div class="floatright">Show <select id="callength" onchange="changecallength(this)">';
-for ($i=2;$i<16;$i++) {
+for ($i=2;$i<26;$i++) {
 	echo '<option value="'.$i.'" ';
 	if ($i==$callength) {echo 'selected="selected"';}
 	echo '>'.$i.'</option>';
