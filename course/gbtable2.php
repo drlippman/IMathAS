@@ -295,20 +295,33 @@ function gbtable() {
 			$cntingb[$kcnt] = 3;
 		}
 		$aitems = explode(',',$line['itemorder']);
-		foreach ($aitems as $k=>$v) {
+		$k = 0;
+		$atofind = array();
+		foreach ($aitems as $v) {
 			if (strpos($v,'~')!==FALSE) {
 				$sub = explode('~',$v);
 				if (strpos($sub[0],'|')===false) { //backwards compat
-					$aitems[$k] = $sub[0];
+					$atofind[$k] = $sub[0];
 					$aitemcnt[$k] = 1;
-					
+					$k++;
 				} else {
 					$grpparts = explode('|',$sub[0]);
-					$aitems[$k] = $sub[1];
-					$aitemcnt[$k] = $grpparts[0];
+					if ($grpparts[0]==count($sub)-1) { //handle diff point values in group if n=count of group
+						for ($i=1;$i<count($sub);$i++) {
+							$atofind[$k] = $sub[$i];
+							$aitemcnt[$k] = 1;
+							$k++;
+						}
+					} else {
+						$atofind[$k] = $sub[1];
+						$aitemcnt[$k] = $grpparts[0];
+						$k++;
+					}
 				}
 			} else {
+				$atofind[$k] = $v;
 				$aitemcnt[$k] = 1;
+				$k++;
 			}
 		}
 		
@@ -316,7 +329,7 @@ function gbtable() {
 		$result2 = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 		$totalpossible = 0;
 		while ($r = mysql_fetch_row($result2)) {
-			if (($k = array_search($r[1],$aitems))!==false) { //only use first item from grouped questions for total pts	
+			if (($k = array_search($r[1],$atofind))!==false) { //only use first item from grouped questions for total pts	
 				if ($r[0]==9999) {
 					$totalpossible += $aitemcnt[$k]*$line['defpoints']; //use defpoints
 				} else {
