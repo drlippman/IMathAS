@@ -141,9 +141,6 @@
 	}
 	
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-	echo "&gt; <a href=\"gradebook.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid\">Gradebook</a> &gt; Gradebook Comments</div>";
-	
 	echo '<script type="text/javascript">function sendtoall(type) {'."\n";
 	echo '  var form=document.getElementById("mainform");'."\n";
 	echo '  for (var e = 0; e<form.elements.length; e++) {'."\n";
@@ -156,14 +153,19 @@
 	echo '   }'."\n";
 	echo ' } </script>'."\n";
 	
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+		
 	if ($comtype=='stu') {
+		echo "&gt; <a href=\"gradebook.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid\">Gradebook</a> &gt; Gradebook Comments</div>";
+		echo "<div class=\"cpmid\"><a href=\"gbcomments.php?cid=$cid&stu={$_GET['stu']}&comtype=instr\">View/Edit Instructor notes</a></div>";
 		echo '<h2>Modify Gradebook Comments</h2>';
-		echo "<p>These comments will display at the top of the student's gradebook score list.<br/>";
-		echo "<a href=\"gbcomments.php?cid=$cid&stu={$_GET['stu']}&comtype=instr\">View/Edit Instructor notes</a></p>";
+		echo "<p>These comments will display at the top of the student's gradebook score list.</p>";
+		
 	} else if ($comtype=='instr') {
+		echo "&gt; <a href=\"gradebook.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid\">Gradebook</a> &gt; Instructor Notes</div>";
+		echo "<div class=\"cpmid\"><a href=\"gbcomments.php?cid=$cid&stu={$_GET['stu']}&comtype=stu\">View/Edit Student comments</a></div>";
 		echo '<h2>Modify Instructor Notes</h2>';
-		echo "<p>These notes will only display on this page and gradebook exports.<br/>";
-		echo "<a href=\"gbcomments.php?cid=$cid&stu={$_GET['stu']}&comtype=stu\">View/Edit Student comments</a></p>";
+		echo "<p>These notes will only display on this page and gradebook exports.  They will not be visible to students.</p>";
 	}
 	echo "<p><a href=\"gbcomments.php?cid=$cid&stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&upload=true&comtype=$comtype\">Upload comments</a></p>";
 	
