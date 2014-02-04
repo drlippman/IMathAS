@@ -134,7 +134,7 @@
 				if (!is_numeric($_POST['courseid'])) {
 					$error = 'Invalid course id';
 				} else {
-					$query = "SELECT enrollkey,allowunenroll,deflatepass FROM imas_courses WHERE id = '{$_POST['courseid']}' AND available<4";
+					$query = "SELECT enrollkey,allowunenroll,deflatepass FROM imas_courses WHERE id = '{$_POST['courseid']}' AND (available=0 OR available=2)";
 					$result = mysql_query($query) or die("Query failed : " . mysql_error());
 					$line = mysql_fetch_array($result, MYSQL_ASSOC);
 					if ($line==null) {
@@ -291,7 +291,7 @@
 			echo "</html></body>\n";
 			exit;
 		}
-		$query = "SELECT enrollkey,allowunenroll,deflatepass FROM imas_courses WHERE id = '{$_POST['cid']}'";
+		$query = "SELECT enrollkey,allowunenroll,deflatepass FROM imas_courses WHERE id = '{$_POST['cid']}' AND (available=0 OR available=2)";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$line = mysql_fetch_array($result, MYSQL_ASSOC);
 		if ($line == null) {
