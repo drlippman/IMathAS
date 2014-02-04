@@ -114,7 +114,7 @@ if (isset($_GET['addto'])) {
 echo "<td><input type=text size=10 id=\"datenew\" name=\"datenew\" value=\"$date\"/> ";	
 echo "<a href=\"#\" onClick=\"displayDatePicker('datenew', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a></td>";
 $cnt++;
-echo '<td><input name="tagnew" type=text size=4 value="!" /></td>';
+echo '<td><input name="tagnew" type=text size=8 value="!" /></td>';
 echo '<td><input name="txtnew" type=text size=80 value="" /></td>';
 echo '<tr/>';
 

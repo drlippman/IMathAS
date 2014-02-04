@@ -22,11 +22,9 @@ if (!(isset($teacherid))) {
 }
 
 /******* begin html output ********/
-$placeinhead = "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/assessment/mathtest.css\"/>\n";
 if (isset($_POST['versions'])) {
-	$placeinhead .= "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/assessment/print.css?v=100213\"/>\n";
+	$placeinhead = "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/assessment/print.css?v=100213\"/>\n";
 }
-$placeinhead .= "<script src=\"$imasroot/javascript/AMhelpers.js\" type=\"text/javascript\"></script>\n";
 
 $nologo = true;
 $cid = $_GET['cid'];
