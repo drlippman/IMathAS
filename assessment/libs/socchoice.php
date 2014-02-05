@@ -213,7 +213,10 @@ function apportion_info($pop, $seats, $method) {
 			foreach ($quotas as $s=>$q) {
 				if (floor($q)==0) {continue;}
 				for ($i=0;$i<4;$i++) {
-					$tochange[] = $pop[$s]/(sqrt((floor($q)+$i)*(floor($q)+$i+1))+.0001); //what to get it over GM?
+					 $newq = $pop[$s]/(sqrt((floor($q)+$i)*(floor($q)+$i+1))+.0001); //what to get it over GM?
+					 if ($newq<$divisor) {
+					 	 $tochange[] = $newq;
+					 }
 				}
 			}
 			arsort($tochange);
@@ -222,8 +225,11 @@ function apportion_info($pop, $seats, $method) {
 			//need to remove seats, so increase the divisor
 			foreach ($quotas as $s=>$q) {
 				if (floor($q)==0) {continue;}
-				for ($i=0;$i<4;$i++) {
-					$tochange[] = $pop[$s]/(sqrt((floor($q)+$i)*(floor($q)+$i+1))-.0001); //what to get it under GM?
+				for ($i=0;$i<min(floor($q),4);$i++) {
+					$newq = $pop[$s]/(sqrt((floor($q)-$i)*(floor($q)-$i+1))-.0001); //what to get it under GM?
+					if ($newq>$divisor) {
+						$tochange[] = $newq; 
+					}
 				}
 			}
 			asort($tochange);
