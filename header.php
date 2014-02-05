@@ -48,7 +48,7 @@ if (isset($CFG['locale'])) {
 }
 if (isset($coursetheme) && strpos($coursetheme,'_dark')!==false) {$mathdarkbg = true;} else {$mathdarkbg = false;}
 if (isset($ispublic) && $ispublic) {
-	echo "<script src=\"$imasroot/javascript/ASCIIMathMLwFallback.js?ver=012314\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIMathMLwFallback.js?ver=020514\" type=\"text/javascript\"></script>\n";
 	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?ver=012314\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIIMath = true; var usingASCIISvg = true;</script>"; 
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'"; function rendermathnode(el) {AMprocessNode(el);} ';
@@ -67,7 +67,7 @@ if (!isset($sessiondata['mathdisp'])) {
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";';
 	if ($mathdarkbg) {echo 'var mathbg = "dark";';}
 	echo '</script>'; 
-	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=012314\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=020514\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; function rendermathnode(el) {AMprocessNode(el);}</script>";
 } else if ($sessiondata['mathdisp']==2) {
 	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; function rendermathnode(el) {AMprocessNode(el);}</script>";

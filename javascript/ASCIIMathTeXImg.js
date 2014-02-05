@@ -523,7 +523,7 @@ function AMTparseSexpr(str) { //parses str and returns [node,tailstr]
       if (result[0]==null) return ['{'+AMTgetTeXsymbol(symbol)+'}',str];
       if (typeof symbol.func == "boolean" && symbol.func) { // functions hack
         st = str.charAt(0);
-        if (st=="^" || st=="_" || st=="/" || st=="|" || st=="," || (symbol.input.length==1 && st!="(")) {
+        if (st=="^" || st=="_" || st=="/" || st=="|" || st=="," || ((symbol.input=="f" || symbol.input=="g") && st!="(")) {
           return ['{'+AMTgetTeXsymbol(symbol)+'}',str];
         } else {
 		node = '{'+AMTgetTeXsymbol(symbol)+'{'+result[0]+'}}';

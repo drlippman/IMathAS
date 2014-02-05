@@ -540,7 +540,7 @@ function AMTparseSexpr($str) {
 		}
 		if (isset($symbol['func'])) {
 			$st = $str{0};
-			if ($st=='^' || $st=='_' || $st=='/' || $st=='|' || $st==',' || (strlen($symbol['input'])==1 && $st!='(')) {
+			if ($st=='^' || $st=='_' || $st=='/' || $st=='|' || $st==',' || (($symbol['input']=='f' || $symbol['input']=='g')  && $st!='(')) {
 				return array('{'.$this->AMTgetTeXsymbol($symbol).'}',$str);
 			} else {
 				$node = '{'.$this->AMTgetTeXsymbol($symbol).'{'.$result[0].'}}';

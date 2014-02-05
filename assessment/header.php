@@ -66,17 +66,17 @@ if (!isset($sessiondata['mathdisp'])) {
 	echo '<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false; function rendermathnode(el) {AMprocessNode(el);}</script>';
 	echo "<script src=\"$imasroot/javascript/mathgraphcheck.js?v=091311\" type=\"text/javascript\"></script>\n";
 } else if ($sessiondata['mathdisp']==1) {
-	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/ASCIIMathML_min.js?v=012314\"></script>\n";
+	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/ASCIIMathML_min.js?v=020514\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIIMath = true; function rendermathnode(el) {AMprocessNode(el);}</script>";
 } else if ($sessiondata['mathdisp']==2) {
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>'; 
-	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?v=012314\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?v=020514\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIIMath = false;function rendermathnode(el) {AMprocessNode(el);}</script>";
 } else if ($sessiondata['mathdisp']==0) {
 	echo '<script type="text/javascript">var noMathRender = true; var usingASCIIMath = false; function rendermathnode(el) {}</script>';	
 } else if ($sessiondata['mathdisp']==3) {
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
-	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=012314\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=020514\" type=\"text/javascript\"></script>\n";
 	echo '<script type="text/x-mathjax-config">MathJax.Hub.Config({ 
 		config: ["MMLorHTML.js"],
 		jax: ["input/TeX","input/AsciiMath","output/HTML-CSS","output/NativeMML"],
