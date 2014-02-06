@@ -4,6 +4,8 @@
 	if (isset($_GET['greybox'])) {
 		$isgb = true;
 		$gb = '&greybox=true';
+		$flexwidth = true;
+		$nologo = true;
 	} else {
 		$isgb = false;
 		$gb = '';
@@ -15,47 +17,41 @@
 	}
 	if ($_GET['action']=="newuser") {
 		require_once("config.php");
+		$error = '';
 		if (isset($studentTOS) && !isset($_POST['agree'])) {
-			echo "<html><body>\n";
-			echo "<p>You must agree to the Terms and Conditions to set up an account</p>";
-			echo "<p><a href=\"forms.php?action=newuser$gb\">Try Again</a></p>\n";
-			echo "</html></body>\n";
-			exit;
+			$error = "<p>You must agree to the Terms and Conditions to set up an account</p>";
 		}
 		$_POST['SID'] = trim($_POST['SID']);
 		if ($loginformat!='' && !preg_match($loginformat,$_POST['SID'])) {
-			echo "<html><body>\n";
-			echo "$loginprompt is invalid.  <a href=\"forms.php?action=newuser$gb\">Try Again</a>\n";
-			echo "</html></body>\n";
-			exit;
+			$error .= "<p>$loginprompt is invalid.</p>";
 		}
 		$query = "SELECT id FROM imas_users WHERE SID='{$_POST['SID']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		if (mysql_num_rows($result)>0) {
-			echo "<html><body>\n";
-			echo "$loginprompt '{$_POST['SID']}' is used.  <a href=\"forms.php?action=newuser$gb\">Try Again</a>\n";
-			echo "</html></body>\n";
-			exit;
+			$error .= "<p>$loginprompt '{$_POST['SID']}' is used. </p>";
 		}
 		//
 		if (!preg_match('/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/',$_POST['email'])) {
-			echo "<html><body>\n";
-			echo "Invalid email address.  <a href=\"forms.php?action=newuser$gb\">Try Again</a>\n";
-			echo "</html></body>\n";
-			exit;
+			$error .= "<p>Invalid email address.</p>";
 		}
 		if ($_POST['pw1'] != $_POST['pw2']) {
-			echo "<html><body>\n";
-			echo "Passwords don't match.  <a href=\"forms.php?action=newuser$gb\">Try Again</a>\n";
-			echo "</html></body>\n";
-			exit;
+			$error .= "<p>Passwords don't match. </p>";
 		}
 		if ($_POST['SID']=="" || $_POST['firstname']=="" || $_POST['lastname']=="" || $_POST['email']=="" || $_POST['pw1']=="") {
-			echo "<html><body>\n";
-			echo "Please include all information.  <a href=\"forms.php?action=newuser$gb\">Try Again</a>\n";
-			echo "</html></body>\n";
+			$error .= "<p>Please include all information.</p>";
+		}
+		if ($error != '') {
+			require("header.php");
+			if ($gb == '') {
+				echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; New User Signup</div>\n";
+			}
+			echo '<div id="headerforms" class="pagetitle"><h2>New User Signup</h2></div>';
+			echo $error;
+			echo '<p><a href="forms.php?action=newuser">Try Again</a></p>';
+			require("footer.php");
 			exit;
 		}
+		
 		$md5pw = md5($_POST['pw1']);
 		if ($emailconfirmation) {$initialrights = 0;} else {$initialrights = 10;}
 		if (isset($_POST['msgnot'])) {
@@ -115,16 +111,20 @@
 			$message .= "<a href=\"" . $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=confirm&id=$id\">";
 			$message .= $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=confirm&id=$id</a>\r\n";
 			mail($_POST['email'],'IMathAS Confirmation',$message,$headers);
-			echo "<html><body>\n";
+			require("header.php");
+			if ($gb == '') {
+				echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; New User Signup</div>\n";
+			}
+			echo '<div id="headerforms" class="pagetitle"><h2>New User Signup</h2></div>';
 			echo "Registration recorded.  You should shortly receive an email with confirmation instructions.";
 			echo "<a href=\"$imasroot/index.php\">Back to main login page</a>\n";
-			echo "</body></html>\n";
+			require("footer.php");
 			exit;
 			
 		} else {
 			$pagetitle = 'Account Created';
 			require("header.php");
-			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Form</div>\n";
+			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; New User Signup</div>\n";
 			echo '<div id="headerforms" class="pagetitle"><h2>New User Signup</h2></div>';
 			echo "<p>Your account with username <b>{$_POST['SID']}</b> has been created.  If you forget your password, you can ask your ";
 			echo "instructor to reset your password or use the forgotten password link on the login page.</p>\n";
@@ -160,7 +160,7 @@
 				}
 				if ($error != '') {
 					echo "<p>$error, so we were not able to enroll you in your course.  After you log in, you can ";
-					echo 'try enrolling again.  You do <b>not</b> need to create another account</p>';
+					echo 'try enrolling again.  You do <b>not</b> need to create another account.</p>';
 				}
 			}
 					
@@ -177,14 +177,14 @@
 		$query = "UPDATE imas_users SET rights=10 WHERE id='{$_GET['id']}' AND rights=0";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		if (mysql_affected_rows()>0) {
-			echo "<html><body>\n";
+			require("header.php");
 			echo "Confirmed.  Please <a href=\"index.php\">Log In</a>\n";
-			echo "</html></body>\n";	
+			require("footer.php");	
 			exit;
 		} else {
-			echo "<html><body>\n";
+			require("header.php");
 			echo "Error.\n";
-			echo "</html></body>\n";
+			require("footer.php");
 		}
 	} else if ($_GET['action']=="resetpw") {
 		require_once("config.php");
@@ -285,63 +285,76 @@
 			$_POST['cid'] = $_POST['courseselect'];
 			$_POST['ekey'] = '';
 		}
+		$pagetopper = '';
+		if ($gb == '') {
+			$pagetopper .= "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Enroll in a Course</div>\n";
+		}
+		$pagetopper .= '<div id="headerforms" class="pagetitle"><h2>Enroll in a Course</h2></div>';
 		if ($_POST['cid']=="" || !is_numeric($_POST['cid'])) {
-			echo "<html><body>\n";
+			require("header.php");
+			echo $pagetopper;
 			echo "Please include Course ID.  <a href=\"forms.php?action=enroll$gb\">Try Again</a>\n";
-			echo "</html></body>\n";
+			require("footer.php");
 			exit;
 		}
 		$query = "SELECT enrollkey,allowunenroll,deflatepass FROM imas_courses WHERE id = '{$_POST['cid']}' AND (available=0 OR available=2)";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$line = mysql_fetch_array($result, MYSQL_ASSOC);
 		if ($line == null) {
-			echo "<html><body>\n";
+			require("header.php");
+			echo $pagetopper;
 			echo "Course not found.  <a href=\"forms.php?action=enroll$gb\">Try Again</a>\n";
-			echo "</html></body>\n";
+			require("footer.php");
 			exit;
 		} else if (($line['allowunenroll']&2)==2) {
-			echo "<html><body>\n";
+			require("header.php");
+			echo $pagetopper;
 			echo "Course is closed for self enrollment.  Contact your instructor for access.  <a href=\"index.php\">Return to home page.</a>\n";
-			echo "</html></body>\n";
+			require("footer.php");
 			exit;
 		} else if ($_POST['ekey']=="" && $line['enrollkey'] != '') {
-			echo "<html><body>\n";
+			require("header.php");
+			echo $pagetopper;
 			echo "Please include Enrollment Key.  <a href=\"forms.php?action=enroll$gb\">Try Again</a>\n";
-			echo "</html></body>\n";
+			require("footer.php");
 			exit;
 		}  else {
 			$query = "SELECT * FROM imas_teachers WHERE userid='$userid' AND courseid='{$_POST['cid']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (mysql_num_rows($result)>0) {
-				echo "<html><body>\n";
+				require("header.php");
+				echo $pagetopper;
 				echo "You are a teacher for this course, and can't enroll as a student.  Use Student View to see ";
 				echo "the class from a student's perspective, or create a dummy student account.  ";
 				echo "Click on the course name on the <a href=\"index.php\">main page</a> to access the course\n";
-				echo "</html></body>\n";
+				require("footer.php");
 				exit;
 			}
 			$query = "SELECT * FROM imas_tutors WHERE userid='$userid' AND courseid='{$_POST['cid']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (mysql_num_rows($result)>0) {
-				echo "<html><body>\n";
+				require("header.php");
+				echo $pagetopper;
 				echo "You are a tutor for this course, and can't enroll as a student. ";
 				echo "Click on the course name on the <a href=\"index.php\">main page</a> to access the course\n";
-				echo "</html></body>\n";
+				require("footer.php");
 				exit;
 			}
 			$query = "SELECT * FROM imas_students WHERE userid='$userid' AND courseid='{$_POST['cid']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (mysql_num_rows($result)>0) {
-				echo "<html><body>\n";
+				require("header.php");
+				echo $pagetopper;
 				echo "You are already enrolled in the course.  Click on the course name on the <a href=\"index.php\">main page</a> to access the course\n";
-				echo "</html></body>\n";
+				require("footer.php");
 				exit;
 			} else {
 				$keylist = array_map('strtolower',array_map('trim',explode(';',$line['enrollkey'])));
 				if (!in_array(strtolower(trim($_POST['ekey'])), $keylist)) {		
-					echo "<html><body>\n";
+					require("header.php");
+					echo $pagetopper;
 					echo "Incorrect Enrollment Key.  <a href=\"forms.php?action=enroll$gb\">Try Again</a>\n";
-					echo "</html></body>\n";
+					require("footer.php");
 					exit;
 				} else {
 					if (count($keylist)>1) {
@@ -350,10 +363,11 @@
 						$query = "INSERT INTO imas_students (userid,courseid,latepass) VALUES ('$userid','{$_POST['cid']}','{$line['deflatepass']}');";
 					}
 					mysql_query($query) or die("Query failed : " . mysql_error());
-					echo "<html><body>\n";
+					require("header.php");
+					echo $pagetopper;
 					echo '<p>You have been enrolled in course ID '.$_POST['cid'].'</p>';
 					echo "<p>Return to the <a href=\"index.php\">main page</a> and click on the course name to access the course</p>";
-					echo "</html></body>\n";
+					require("footer.php");
 					exit;
 				}
 				
@@ -368,9 +382,9 @@
 			exit;
 		}
 		if (!isset($_GET['cid'])) {
-			echo "<html><body>\n";
+			require("header.php");
 			echo "Course ID not specified.  <a href=\"index.php\">Try Again</a>\n";
-			echo "</html></body>\n";
+			require("footer.php");
 			exit;
 		}
 		$cid = $_GET['cid'];
@@ -409,6 +423,11 @@
 			}
 		}
 	} else if ($_GET['action']=="chguserinfo") {
+		$pagetopper = '';
+		if ($gb == '') {
+			$pagetopper .= "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Modify User Profile</div>\n";
+		}
+		$pagetopper .= '<div id="headerforms" class="pagetitle"><h2>Modify User Profile</h2></div>';
 		require('includes/userpics.php');
 		if (isset($_POST['msgnot'])) {
 			$msgnot = 1;
@@ -482,8 +501,10 @@
 				$query = "UPDATE imas_users SET password='$md5pw' WHERE id='$userid'";
 				mysql_query($query) or die("Query failed : " . mysql_error()); 
 			} else {
-				echo "<html><body>Password change failed.  <A HREF=\"forms.php?action=chguserinfo$gb\">Try Again</a>\n";
-				echo "</body></html>\n";
+				require("header.php");
+				echo $pagetopper;
+				echo "Password change failed.  <a href=\"forms.php?action=chguserinfo$gb\">Try Again</a>\n";
+				require("footer.php");
 				exit;
 			}
 		}

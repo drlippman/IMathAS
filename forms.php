@@ -20,11 +20,12 @@ if (isset($_GET['greybox'])) {
 	$gb = '';
 }
 require("header.php");	
-if ($gb == '') {
-	echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Form</div>\n";
-}
+
 switch($_GET['action']) {
 	case "newuser":
+		if ($gb == '') {
+			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; New User Signup</div>\n";
+		}
 		echo '<div id="headerforms" class="pagetitle"><h2>New User Signup</h2></div>';
 		//echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/validateform.js\"></script>\n";
 		echo "<form method=post action=\"actions.php?action=newuser$gb\" onsubmit=\"return validateForm(this)\">\n";
@@ -79,6 +80,9 @@ switch($_GET['action']) {
 		}
 		break;
 	case "chgpwd":
+		if ($gb == '') {
+			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Change Password</div>\n";
+		}
 		echo '<div id="headerforms" class="pagetitle"><h2>Change Your Password</h2></div>';
 		echo "<form method=post action=\"actions.php?action=chgpwd$gb\">\n";
 		echo "<span class=form><label for=\"oldpw\">Enter old password:</label></span> <input class=form type=password id=oldpw name=oldpw size=40 /> <BR class=form>\n";
@@ -91,8 +95,10 @@ switch($_GET['action']) {
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$line = mysql_fetch_array($result, MYSQL_ASSOC);
 		echo '<script type="text/javascript">function togglechgpw(val) { if (val) {document.getElementById("pwinfo").style.display="";} else {document.getElementById("pwinfo").style.display="none";} } </script>';
-		
-		echo '<div id="headerforms" class="pagetitle"><h2>User Info</h2></div>';
+		if ($gb == '') {
+			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Modify User Profile</div>\n";
+		}
+		echo '<div id="headerforms" class="pagetitle"><h2>User Profile</h2></div>';
 		echo "<form enctype=\"multipart/form-data\" method=post action=\"actions.php?action=chguserinfo$gb\">\n";
 		echo '<fieldset id="userinfoprofile"><legend>Profile Settings</legend>';
 		echo "<span class=form><label for=\"firstname\">Enter First Name:</label></span> <input class=form type=text size=20 id=firstname name=firstname value=\"{$line['FirstName']}\" /><br class=\"form\" />\n";
@@ -227,6 +233,9 @@ switch($_GET['action']) {
 		echo "</form>\n";
 		break;
 	case "enroll":
+		if ($gb == '') {
+			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Enroll in a Course</div>\n";
+		}
 		echo '<div id="headerforms" class="pagetitle"><h2>Enroll in a Course</h2></div>';
 		echo "<form method=post action=\"actions.php?action=enroll$gb\">";
 		$query = "SELECT id,name FROM imas_courses WHERE (istemplate&4)=4 AND available<4 ORDER BY name";
@@ -262,6 +271,9 @@ switch($_GET['action']) {
 		break;
 	case "unenroll":
 		if (!isset($_GET['cid'])) { echo "Course ID not specified\n"; break;}
+		if ($gb == '') {
+			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Unenroll</div>\n";
+		}
 		echo '<div id="headerforms" class="pagetitle"><h2>Unenroll</h2></div>';
 		
 		echo "Are you SURE you want to unenroll from this course?  All assessment attempts will be deleted.\n";
@@ -269,6 +281,9 @@ switch($_GET['action']) {
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='./course/course.php?cid={$_GET['cid']}'\"></p>\n";
 		break;
 	case "resetpw":
+		if ($gb == '') {
+			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Password Reset</div>\n";
+		}
 		echo '<div id="headerforms" class="pagetitle"><h2>Reset Password</h2></div>';
 		echo "<form method=post action=\"actions.php?action=resetpw$gb\">\n";
 		echo "<p>Enter your User Name below and click Submit.  An email will be sent to your email address on file.  A link in that email will ";
@@ -277,6 +292,9 @@ switch($_GET['action']) {
 		echo "<p><input type=submit value=\"Submit\" /></p></form>";
 		break;
 	case "lookupusername":
+		if ($gb == '') {
+			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Username Lookup</div>\n";
+		}
 		echo '<div id="headerforms" class="pagetitle"><h2>Lookup Username</h2></div>';
 		echo "<form method=post action=\"actions.php?action=lookupusername$gb\">\n"; 
 		echo "If you can't remember your username, enter your email address below.  An email will be sent to your email address with your username. ";
@@ -287,7 +305,9 @@ switch($_GET['action']) {
 		$query = "SELECT hideonpostswidget FROM imas_users WHERE id='$userid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$hidelist = explode(',', mysql_result($result,0,0));
-		
+		if ($gb == '') {
+			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Forum Widget Settings</div>\n";
+		}
 		echo '<div id="headerforms" class="pagetitle"><h2>Forum Widget Settings</h2></div>';
 		echo '<p>The most recent 10 posts from each course show in the New Forum Posts widget.  Select the courses you want to show in the widget.</p>';
 		echo "<form method=post action=\"actions.php?action=forumwidgetsettings$gb\">\n";

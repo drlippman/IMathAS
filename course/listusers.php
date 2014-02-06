@@ -177,7 +177,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		}
 		
 	} elseif (isset($_GET['chgstuinfo'])) {
-		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Enroll Students\n";	
+		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Change User Info\n";	
 		$pagetitle = "Change Student Info";
 		
 		if (isset($_POST['firstname'])) {
@@ -255,6 +255,8 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			
 			
 			require("../header.php");
+			echo '<div class="breadcrumb">'.$curBreadcrumb.'</div>';
+			echo '<div id="headerlistusers" class="pagetitle"><h2>'.$pagetitle.'</h2></div>';
 			echo "<p>User info updated. ";
 			if ($updateusername) {
 				echo "User login changed to $un.";
