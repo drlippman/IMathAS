@@ -780,7 +780,17 @@ if (!isset($_POST['embedpostback'])) {
 	      	   link.innerHTML = link.innerHTML.replace("Show","Hide");
 		   content.style.display = "block";
 	      }
-	     }</script>';
+	     }
+	     function togglemainintroshow(el) {
+	     	if ($("#intro").hasClass("hidden")) {
+	     		$(el).html("'._("Hide Intro/Instructions").'");
+	     		$("#intro").removeClass("hidden").addClass("intro");
+	     	} else {
+	     		$("#intro").addClass("hidden");
+	     		$(el).html("'._("Show Intro/Instructions").'");
+	     	}
+	     }
+	     </script>';
 
 	$cid = $testsettings['courseid'];
 	if ($testsettings['displaymethod'] == "VideoCue") {
@@ -1180,7 +1190,8 @@ if (!isset($_POST['embedpostback'])) {
 	}
 	if (isset($_GET['action'])) {
 		if ($_GET['action']=="skip" || $_GET['action']=="seq") {
-			echo "<div class=right><span onclick=\"document.getElementById('intro').className='intro';\"><a href=\"#\">", _('Show Instructions'), "</a></span></div>\n";
+			echo '<div class="right"><a href="#" onclick="togglemainintroshow(this);return false;">'._("Show Intro/Instructions").'</a></div>';
+			//echo "<div class=right><span onclick=\"document.getElementById('intro').className='intro';\"><a href=\"#\">", _('Show Instructions'), "</a></span></div>\n";
 		}
 		if ($_GET['action']=="scoreall") {
 			//score test
@@ -1397,7 +1408,7 @@ if (!isset($_POST['embedpostback'])) {
 					
 					echo ', is displayed below</p>';
 					if (!$noraw && $showeachscore && $GLOBALS['questionmanualgrade'] != true) {
-						$colors = scorestocolors($rawscores[$qn], '', '', $noraw);
+						$colors = scorestocolors($rawscores[$qn], '', $qi[$questions[$qn]]['answeights'], $noraw);
 					} else {
 						$colors = array();
 					}
@@ -1506,7 +1517,7 @@ if (!isset($_POST['embedpostback'])) {
 						echo "<p>", _('Question with last attempt is displayed for your review only'), "</p>";
 						
 						if (!$noraw && $showeachscore) {
-							$colors = scorestocolors($rawscores[$next], '', '', $noraw);
+							$colors = scorestocolors($rawscores[$next], '', $qi[$questions[$next]]['answeights'], $noraw);
 						} else {
 							$colors = array();
 						}
@@ -2310,7 +2321,7 @@ if (!isset($_POST['embedpostback'])) {
 		global $imasroot,$scores,$bestscores,$showeachscore,$qi,$questions,$testsettings;
 		echo "<a href=\"#beginquestions\"><img class=skipnav src=\"$imasroot/img/blank.gif\" alt=\"", _('Skip Navigation'), "\" /></a>\n";
 		
-		echo '<div class="navbar" style="width:125px">';
+		echo '<div class="navbar fixedonscroll" style="width:125px">';
 		echo "<h4>", _('Pages'), "</h4>\n";
 		echo '<ul class="qlist" style="margin-left:-10px">';
 		$jsonbits = array();

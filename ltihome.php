@@ -180,7 +180,7 @@ if (isset($_POST['createcourse'])) {
 }
 
 if ($hasplacement && $placementtype=='course') {
-	if (!isset($_GET['showhome'])) {
+	if (!isset($_GET['showhome']) && !isset($_GET['chgplacement'])) {
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
 		exit;
 	} 
