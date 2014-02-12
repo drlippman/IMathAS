@@ -2207,7 +2207,6 @@ function cleanbytoken($str,$funcs = array()) {
 			} else if ($token[1]==3 && $token[0]==='1') {
 				$dontuse = false;
 				if ($lastout>-1) { //if not first character
-					echo $out[$lastout];
 					if ($out[$lastout] != '^' && $out[$lastout] != '/' && $out[$lastout]!='+' && $out[$lastout]!='-') {
 						//( )1, x1,*1
 						if ($out[$lastout]=='*') { //elim *

@@ -690,7 +690,7 @@ function enditem($canedit) {
 				   	   echo " data-base=\"assess-$typeid\"";
 				   }*/ //moved to showtest
 				   
-				   echo ">{$line['name']}</a></b><BR> ", _('Past Due Date.  Showing as Review');
+				   echo ">{$line['name']}</a></b><BR> ", sprintf(_('Past Due Date of %s.  Showing as Review'), $enddate);
 				   if ($line['reviewdate']!=2000000000) { 
 					   echo " ", _('until'), " $reviewdate \n";
 				   }
