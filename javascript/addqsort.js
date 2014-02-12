@@ -169,12 +169,14 @@ function groupSelected() {
 }
 
 function updateGrpN(num) {
-	
-	if (document.getElementById("grpn"+num).value != itemarray[num][0]) {
-		itemarray[num][0] = document.getElementById("grpn"+num).value;	
+	var nval = Math.floor(document.getElementById("grpn"+num).value*1);
+	console.log(nval);
+	if (nval<1 || isNaN(nval)) { nval = 1;} 
+	document.getElementById("grpn"+num).value = nval;
+	if (nval != itemarray[num][0]) {
+		itemarray[num][0] = nval;	
 		submitChanges();
 	}
-	
 }
 
 function updateGrpT(num) {
