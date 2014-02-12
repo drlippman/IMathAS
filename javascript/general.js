@@ -545,6 +545,30 @@ jQuery.fn.isolatedScroll = function() {
     return this;
 };
 
+jQuery(document).ready(function($) {
+	var fixedonscrollel = $('.fixedonscroll');
+	var initialtop = [];
+	for (var i=0;i<fixedonscrollel.length;i++) {
+		initialtop[i] = $(fixedonscrollel[i]).offset().top;
+		if ($(fixedonscrollel[i]).height()>$(window).height()) { //skip if element is taller than window
+			initialtop[i] = -1;
+		}
+	}
+	if (fixedonscrollel.length>0) {
+		$(window).scroll(function() {
+			var winscrolltop = $(window).scrollTop();
+			for (var i=0;i<fixedonscrollel.length;i++) {
+				if (winscrolltop > initialtop[i] && initialtop[i]>0) {
+					$(fixedonscrollel[i]).css('position','fixed').css('top','5px');
+				} else {
+					$(fixedonscrollel[i]).css('position','static');
+				}
+			}
+		});
+	}
+});
+
+
 function _(txt) {
 	if (typeof i18njs != "undefined" && i18njs[txt]) {
 		var outtxt = i18njs[txt];

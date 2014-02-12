@@ -322,12 +322,13 @@ function scorestocolors($sc,$pts,$answ,$noraw) {
 			$diff = $pts - array_sum($answ);
 			$answ[count($answ)-1] += $diff;
 		} else {
+			$origansw = $answ;
 			$answ = array_fill(0,count($scarr),1);
 		}
 		
 		$out = array();
 		foreach ($scarr as $k=>$v) {
-			if ($answ[$k]==0) {
+			if ($answ[$k]==0 || (!$noraw && $origansw[$k]==0)) {
 				$color = 'ansgrn';
 			} else if ($v < 0) {
 				$color = '';
@@ -701,7 +702,7 @@ function basicshowq($qn,$seqinactive=false,$colors=array()) {
 	$regen = ((($regenonreattempt && $qi[$questions[$qn]]['regen']==0) || $qi[$questions[$qn]]['regen']==1)&&amreattempting($qn));
 	$thisshowhints = ($qi[$questions[$qn]]['showhints']==2 || ($qi[$questions[$qn]]['showhints']==0 && $showhints));
 	if (!$noraw && $showeachscore) { //&& $GLOBALS['questionmanualgrade'] != true) {
-		$colors = scorestocolors($rawscores[$qn], '', '', $noraw);
+		$colors = scorestocolors($rawscores[$qn], '', $qi[$questions[$qn]]['answeights'], $noraw);
 	}
 	if (!$seqinactive) {
 		displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$showa,$thisshowhints,$attempts[$qn],false,$regen,$seqinactive,$colors);
