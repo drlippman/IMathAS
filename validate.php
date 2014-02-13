@@ -183,7 +183,12 @@ END;
  	 $_POST['mathdisp'] = 0;
  	 $_POST['graphdisp'] = 2;
  }
- 
+ if (isset($_GET['checksess']) && !$hasusername) {
+ 	echo '<html><body>';
+ 	echo 'Unable to establish a session. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again.';
+ 	echo '</body></html>';
+ 	exit;
+ }
  $verified = false; 
  //Just put in username and password, trying to log in
  if ($haslogin && !$hasusername) {
