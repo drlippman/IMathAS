@@ -1408,7 +1408,12 @@ if (!isset($_POST['embedpostback'])) {
 					
 					echo ', is displayed below</p>';
 					if (!$noraw && $showeachscore && $GLOBALS['questionmanualgrade'] != true) {
-						$colors = scorestocolors($rawscores[$qn], '', $qi[$questions[$qn]]['answeights'], $noraw);
+						//$colors = scorestocolors($rawscores[$qn], '', $qi[$questions[$qn]]['answeights'], $noraw);
+						if (strpos($rawscores[$qn],'~')!==false) {
+							$colors = explode('~',$rawscores[$qn]);
+						} else {
+							$colors = array($rawscores[$qn]);
+						}
 					} else {
 						$colors = array();
 					}
@@ -1517,7 +1522,12 @@ if (!isset($_POST['embedpostback'])) {
 						echo "<p>", _('Question with last attempt is displayed for your review only'), "</p>";
 						
 						if (!$noraw && $showeachscore) {
-							$colors = scorestocolors($rawscores[$next], '', $qi[$questions[$next]]['answeights'], $noraw);
+							//$colors = scorestocolors($rawscores[$next], '', $qi[$questions[$next]]['answeights'], $noraw);
+							if (strpos($rawscores[$next],'~')!==false) {
+								$colors = explode('~',$rawscores[$next]);
+							} else {
+								$colors = array($rawscores[$next]);
+							}
 						} else {
 							$colors = array();
 						}

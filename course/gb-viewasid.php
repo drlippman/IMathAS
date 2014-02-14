@@ -750,7 +750,12 @@
 			}
 		
 			if (isset($rawscores[$i])) {
-				$colors = scorestocolors($rawscores[$i],$pts[$questions[$i]],$answeights[$questions[$i]],false);
+				//$colors = scorestocolors($rawscores[$i],$pts[$questions[$i]],$answeights[$questions[$i]],false);
+				if (strpos($rawscores[$i],'~')!==false) {
+					$colors = explode('~',$rawscores[$i]);
+				} else {
+					$colors = array($rawscores[$i]); 
+				}
 			} else {
 				$colors = array();
 			}
@@ -885,6 +890,11 @@
 				}
 				if ($isteacher) {
 					echo "<br/><a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid=$cid&add=new&quoteq=$i-$qsetid-{$seeds[$i]}&to={$_GET['uid']}\">Use in Msg</a>";
+					//having issues with greybox in assessments
+					//echo '<br/>';
+					//echo "<a href=\"#\" onclick=\"GB_show('Send Message','$imasroot/course/sendmsgmodal.php?sendtype=msg&cid=$cid&quoteq=$i-$qsetid-{$seeds[$i]}&to={$_GET['uid']}',800,'auto')\" title=\"Send Message\">", _('Use in Message'), "</a>";
+			
+					
 					echo " | <a href=\"gb-viewasid.php?stu=$stu&cid=$cid&from=$from&asid={$_GET['asid']}&uid={$_GET['uid']}&clearq=$i\">Clear Score</a> ";
 					echo "(Question ID: <a href=\"$imasroot/course/moddataset.php?id=$qsetid&cid=$cid&qid={$questions[$i]}&aid=$aid\">$qsetid</a>)";
 					if (isset($extref[$questions[$i]])) {

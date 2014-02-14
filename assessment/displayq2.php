@@ -171,14 +171,36 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		if (!is_array($anstypes)) {
 			$anstypes = explode(",",$anstypes);
 		}
-
+		if ($qdata['qtype']=="multipart") {
+			if (isset($answeights)) {
+				if (!is_array($answeights)) {
+					$answeights = explode(",",$answeights);
+				}
+				$sum = array_sum($answeights);
+				if ($sum==0) {$sum = 1;}
+				foreach ($answeights as $k=>$v) {
+					$answeights[$k] = $v/$sum;
+				}
+			} else {
+				if (count($anstypes)>1) {
+					if ($qnpointval==0) {$qnpointval=1;}
+					$answeights = array_fill(0,count($anstypes)-1,round($qnpointval/count($anstypes),2));
+					$answeights[] = $qnpointval-array_sum($answeights);
+					foreach ($answeights as $k=>$v) {
+						$answeights[$k] = $v/$qnpointval;
+					}
+				} else {
+					$answeights = array(1);
+				}
+			}
+		}
 		$laparts = explode("&",$la);
 		foreach ($anstypes as $kidx=>$anstype) {
-			$qcol = isset($qcolors[$kidx])?$qcolors[$kidx]:'';
+			$qcol = isset($qcolors[$kidx])?(is_numeric($qcolors[$kidx])?rawscoretocolor($qcolors[$kidx],$answeights[$kidx]):$qcolors[$kidx]):'';
 			list($answerbox[$kidx],$tips[$kidx],$shanspt[$kidx],$previewloc[$kidx]) = makeanswerbox($anstype,$kidx,$laparts[$kidx],$options,$qnidx+1,$qcol);
 		}
 	} else {
-		$qcol = isset($qcolors[0])?$qcolors[0]:'';
+		$qcol = isset($qcolors[0])?(is_numeric($qcolors[0])?rawscoretocolor($qcolors[0],1):$qcolors[0]):'';
 		list($answerbox,$tips[0],$shanspt[0],$previewloc) = makeanswerbox($qdata['qtype'],$qnidx,$la,$options,0,$qcol);
 	}
 	if ($qdata['qtype']=='conditional') {
@@ -3044,6 +3066,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$givenans = str_replace('∞', 'oo', $givenans);
 		$GLOBALS['partlastanswer'] = $_POST["tc$qn"].'$#$'.$givenans;
 		
+		if ($answer==='') {
+			if (trim($_POST["tc$qn"])==='') { return 1;} else { return 0;}
+		}
+		
 		if ($givenans == null) {return 0;}
 		
 		if (checkreqtimes($_POST["tc$qn"],$requiretimes)==0) {
@@ -5293,6 +5319,20 @@ function getcolormark($c) {
 	} else {
 		return '';
 	}
+}
+
+function rawscoretocolor($sc,$aw) {
+	if ($aw==0) {
+		return '';
+	} else if ($sc<0) {
+		return '';
+	} else if ($sc==0) {
+		return 'ansred';
+	} else if ($sc>.98) {
+		return 'ansgrn';
+	} else {
+		return 'ansyel';
+	}	
 }
 
 if (!function_exists('stripslashes_deep')) {

@@ -238,7 +238,11 @@ if ($overwriteBody==1) {
 	echo "<input type=hidden name=attempt value=\"$attempt\">\n";
 
 	if (isset($rawscores)) {
-		$colors = scorestocolors($rawscores,1,0,false);
+		if (strpos($rawscores,'~')!==false) {
+			$colors = explode('~',$rawscores);
+		} else {
+			$colors = array($rawscores); //scorestocolors($rawscores,1,0,false);
+		}
 	} else {
 		$colors = array();
 	}

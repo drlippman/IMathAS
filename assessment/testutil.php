@@ -301,7 +301,7 @@ function scorestocolors($sc,$pts,$answ,$noraw) {
 	if (trim($sc)=='') {return '';}
 	if (strpos($sc,'~')===false) {
 		if ($pts==0) {
-			$color = 'ansgrn';
+			$color = '';
 		} else if ($sc<0) {
 			$color = '';
 		} else if ($sc==0) {
@@ -329,7 +329,7 @@ function scorestocolors($sc,$pts,$answ,$noraw) {
 		$out = array();
 		foreach ($scarr as $k=>$v) {
 			if ($answ[$k]==0 || (!$noraw && $origansw[$k]==0)) {
-				$color = 'ansgrn';
+				$color = '';
 			} else if ($v < 0) {
 				$color = '';
 			} else if ($v==0) { 
@@ -749,7 +749,7 @@ function showqinfobar($qn,$inreview,$single,$isembed=false) {
 		}
 		if ($attempts[$qn]>0 && $showeachscore) {
 			if (strpos($scores[$qn],'~')===false) {
-				echo "<br/>", _('Score on last attempt:'), " {$scores[$qn]}.  ", _('Score in gradebook:'), " {$bestscores[$qn]}";
+				echo "<br/>", _('Score on last attempt:'). " ".($scores[$qn]<0?'N/A':$scores[$qn]).". ". _('Score in gradebook:'), " ".($bestscores[$qn]<0?'N/A':$bestscores[$qn]);
 			} else {
 				echo "<br/>", _('Score on last attempt:'), " (" . str_replace('~', ', ',$scores[$qn]) . '), ';
 				echo _('Score in gradebook:'), " (" . str_replace('~', ', ',$bestscores[$qn]) . '), ';
