@@ -316,10 +316,7 @@ if ($canviewall) {
 				if (poss[i]==0) {poss[i]=.0000001;}
 			} else {
 				poss[i] = 100;
-				if(ths[i].innerHTML.match(/Section/)) {
-					startat++;
-				}
-				if(ths[i].innerHTML.match(/Code/)) {
+				if(ths[i].className.match(/nocolorize/)) {
 					startat++;
 				}
 			}
@@ -796,7 +793,7 @@ function gbstudisp($stu) {
 			echo '<td>';
 			
 			if ($gbt[0][1][$i][4]==0 || $gbt[0][1][$i][4]==3) {
-				echo $gbt[0][1][$i][2], ' ', _('(Not Counted)');
+				echo $gbt[0][1][$i][2].'&nbsp;', _('pts'), ' ', _('(Not Counted)');
 			} else {
 				echo $gbt[0][1][$i][2].'&nbsp;', _('pts');
 				if ($gbt[0][1][$i][4]==2) {
@@ -1145,7 +1142,12 @@ function gbinstrdisp() {
 	for ($i=0;$i<count($gbt[0][0]);$i++) { //biographical headers
 		if ($i==1) {echo '<th><div>&nbsp;</div></th>';} //for pics
 		if ($i==1 && $gbt[0][0][1]!='ID') { continue;}
-		echo '<th><div>'.$gbt[0][0][$i];
+		if ($gbt[0][0][$i]=='Section' || $gbt[0][0][$i]=='Code') {
+			echo '<th class="nocolorize"><div>';
+		} else {
+			echo '<th><div>';
+		}
+		echo $gbt[0][0][$i];
 		if (($gbt[0][0][$i]=='Section' || ($isdiag && $i==4)) && (!$istutor || $tutorsection=='')) {
 			echo "<br/><select id=\"secfiltersel\" onchange=\"chgsecfilter()\"><option value=\"-1\" ";
 			if ($secfilter==-1) {echo  'selected=1';}
@@ -1251,7 +1253,7 @@ function gbinstrdisp() {
 			//name and points
 			echo '<th class="cat'.$gbt[0][1][$i][1].'"><div>'.$gbt[0][1][$i][0].'<br/>';
 			if ($gbt[0][1][$i][4]==0 || $gbt[0][1][$i][4]==3) {
-				echo $gbt[0][1][$i][2], ' ', _('(Not Counted)');
+				echo $gbt[0][1][$i][2].'&nbsp;', _('pts'), ' ', _('(Not Counted)');
 			} else {
 				echo $gbt[0][1][$i][2].'&nbsp;', _('pts');
 				if ($gbt[0][1][$i][4]==2) {
