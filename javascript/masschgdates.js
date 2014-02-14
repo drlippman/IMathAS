@@ -344,11 +344,14 @@ Date.prototype.getWeekDays = function(d) {
 			try {
 				if (type=='a') {
 					$('#avail'+cnt).val((baserdates[cnt]!='NA' && to==2)?1:to);
-					if (to==1 || (baserdates[cnt]!='NA' && to==2)) {
+					if (to==0) {
+						$(els[i]).parent().parent().find('td.togdis').addClass('dis');
+					} else {
 						$(els[i]).parent().parent().find('td.togdis').removeClass('dis');
+					}
+					if (to==1 || (baserdates[cnt]!='NA' && to==2)) {
 						$('#availname'+cnt).text(availnames[1]);
 					} else {
-						$(els[i]).parent().parent().find('td.togdis').addClass('dis');
 						$('#availname'+cnt).text(availnames[to]);
 					}
 					
