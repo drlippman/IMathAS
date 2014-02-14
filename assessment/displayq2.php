@@ -176,18 +176,18 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 				if (!is_array($answeights)) {
 					$answeights = explode(",",$answeights);
 				}
-				$sum = array_sum($answeights);
-				if ($sum==0) {$sum = 1;}
-				foreach ($answeights as $k=>$v) {
-					$answeights[$k] = $v/$sum;
+				$localsum = array_sum($answeights);
+				if ($localsum==0) {$localsum = 1;}
+				foreach ($answeights as $kidx=>$vval) {
+					$answeights[$kidx] = $vval/$localsum;
 				}
 			} else {
 				if (count($anstypes)>1) {
 					if ($qnpointval==0) {$qnpointval=1;}
 					$answeights = array_fill(0,count($anstypes)-1,round($qnpointval/count($anstypes),2));
 					$answeights[] = $qnpointval-array_sum($answeights);
-					foreach ($answeights as $k=>$v) {
-						$answeights[$k] = $v/$qnpointval;
+					foreach ($answeights as $kidx=>$vval) {
+						$answeights[$kidx] = $vval/$qnpointval;
 					}
 				} else {
 					$answeights = array(1);
@@ -595,9 +595,9 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 	if (isset($reqdecimals) && !is_array($reqdecimals) && !isset($abstolerance) && !isset($reltolerance)) {
 		$abstolerance = 0.5/(pow(10,$reqdecimals));
 	} else if (isset($reqdecimals) && is_array($reqdecimals)) {
-		foreach ($reqdecimals as $k=>$v) {
-			if (!isset($abstolerance[$k]) && !isset($reltolerance[$k])) {
-				$abstolerance[$k] = 0.5/(pow(10,$v));
+		foreach ($reqdecimals as $kidx=>$vval) {
+			if (!isset($abstolerance[$kidx]) && !isset($reltolerance[$kidx])) {
+				$abstolerance[$kidx] = 0.5/(pow(10,$vval));
 			}
 		}
 	}
@@ -637,18 +637,18 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 			if (!is_array($answeights)) {
 				$answeights = explode(",",$answeights);
 			}
-			$sum = array_sum($answeights);
-			if ($sum==0) {$sum = 1;}
-			foreach ($answeights as $k=>$v) {
-				$answeights[$k] = $v/$sum;
+			$localsum = array_sum($answeights);
+			if ($localsum==0) {$localsum = 1;}
+			foreach ($answeights as $kidx=>$vval) {
+				$answeights[$kidx] = $vval/$localsum;
 			}
 		} else {
 			if (count($anstypes)>1) {
 				if ($qnpointval==0) {$qnpointval=1;}
 				$answeights = array_fill(0,count($anstypes)-1,round($qnpointval/count($anstypes),2));
 				$answeights[] = $qnpointval-array_sum($answeights);
-				foreach ($answeights as $k=>$v) {
-					$answeights[$k] = $v/$qnpointval;
+				foreach ($answeights as $kidx=>$vval) {
+					$answeights[$kidx] = $vval/$qnpointval;
 				}
 			} else {
 				$answeights = array(1);
