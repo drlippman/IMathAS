@@ -22,7 +22,7 @@
 		require_once("../includes/htmLawed.php");
 		$htmlawedconfig = array('elements'=>'*-script');
 		$_POST['message'] = addslashes(htmLawed(stripslashes($_POST['message']),$htmlawedconfig));
-		$_POST['subject'] = strip_tags($_POST['subject']);
+		$_POST['subject'] = addslashes(strip_tags(stripslashes($_POST['subject'])));
 		if ($_GET['masssend']=="Message") {
 			$now = time();
 			$tolist = "'".implode("','",explode(",",$_POST['tolist']))."'";

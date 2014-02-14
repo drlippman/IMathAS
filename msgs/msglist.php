@@ -301,7 +301,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			if ($msgmonitor==1) {
 				echo "<p><span class=red>Note</span>: Student-to-student messages may be monitored by your instructor</p>";
 			}
-			
+			echo '</form>';
 			require("../footer.php");
 			exit;
 		}
