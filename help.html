@@ -1651,14 +1651,14 @@ The following macros create graphs or tables:
 	<li><b>funcstrings</b> is a single string or an array of strings each having at least the first of the following list:<BR>
 	"function,color,min,max,startmarker,endmarker,width,dash"</li>
 		<ul>
-		<li><b>Function</b>: a single function of x, like cos(x), or a parametric function of t, entered like [sin(t),cos(t)]</li>
+		<li><b>Function</b>: a single function of x, like cos(x), or a parametric function of t, entered like [sin(t),cos(t)], or x=c for a vertical line, entered like x=1</li>
 		<li><b>color</b>: a color designator: black,red,orange,yellow,green,blue,purple</li>
 		<li><b>min,max</b>: the min and max values for the input variable for which you wish to see this graph.  You can also exclude
 		    point discontinuities; for example -5,5!0!2 for min,max would include all values from -5 to 5, excluding 0 and 2.</li>
 		<li><b>startmarker,endmarker</b>: can be "open" or "closed" (dots), or anything else for none</li>
 		<li><b>width</b>: a pixel width for the line</li>
 		<li><b>dash</b>: enter "dash" if you want a dashed line, otherwise the line is solid</li>
-		<li><b>Examples</b>: "cos(x),red" or "x^2,,-2,2,open,closed" or "[t^2,t/3],blue,0,5,,,2,dash" or "1/x,black,-5,5!0"</li>
+		<li><b>Examples</b>: "cos(x),red" or "x^2,,-2,2,open,closed" or "[t^2,t/3],blue,0,5,,,2,dash" or "1/x,black,-5,5!0" or "x=1,red,,,,,,dash"</li>
 		</ul>
 	<li><b>xmin,xmax,ymin,ymax</b>: Graphing window.  Defaults to -5 to 5 for both</li>
 	<li><b>labels</b>: spacing of axes labels.  Defaults to 1. Set to "off" or 0 for none.  Use "xlbl:ylbl" for different spacing on each axis.</li>
