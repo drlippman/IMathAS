@@ -22,7 +22,7 @@ function addGeogebra($url,$width=400,$height=200,$commands=array(),$params=array
 	if ($GLOBALS['inquestiondisplay'] == false) {return '';}
 	if (!isset($GLOBALS['geogebracount'])) {
 		$GLOBALS['geogebracount'] = 0;
-		$out .= '<script type="text/javascript" src="http://www.geogebra.org/web/4.2/web/web.nocache.js"></script>';
+		$out .= '<script type="text/javascript" src="//www.geogebra.org/web/4.2/web/web.nocache.js"></script>';
 	}
 	$out .= ' <article class="geogebraweb" id="geogebra'.$GLOBALS['geogebracount'].'" ';
 	$out .= 'data-param-ggbOnInitParam="'.$GLOBALS['geogebracount'].'" data-param-id="ggbApplet'.$GLOBALS['geogebracount'].'" '; 

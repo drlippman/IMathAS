@@ -4829,7 +4829,18 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					else if ($n<36) { $randstr .= chr(65 + $n-10);}
 					else { $randstr .= chr(97 + $n-36);}
 				}
-				$s3asid = $GLOBALS['testsettings']['id']."/$randstr";
+				//in case "same random seed" is selected, students can overwrite their own
+				//files. Avoid this.
+				if (($GLOBALS['testsettings']['shuffle']&4)==4 || ($GLOBALS['testsettings']['shuffle']&2)==2) {
+					//if same random seed is set, need to check for duplicates
+					$n = 0;
+					do {
+						$n++;
+						$s3asid = $GLOBALS['testsettings']['id']."/$n";
+					} while (doesfileexist('assess',"adata/$s3asid/$filename"));
+				} else {
+					$s3asid = $GLOBALS['testsettings']['id']."/$randstr";
+				}
 			} else {
 				$GLOBALS['partlastanswer'] = _('Error - no asid');
 				$GLOBALS['scoremessages'] .= _('Error - no asid');
@@ -4840,11 +4851,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$GLOBALS['scoremessages'] .= _('Error - File not uploaded in preview');
 				return 0;
 			}
-			/*
-			not needed if each file is randomly coded
-			if (isset($GLOBALS['isreview']) && $GLOBALS['isreview']==true) {
-				$filename = 'rev-'.$filename;
-			}*/
+		
 			if (is_uploaded_file($_FILES["qn$qn"]['tmp_name'])) {
 				if ($answerformat=='excel') {
 					$zip = new ZipArchive;
