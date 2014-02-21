@@ -296,7 +296,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				$y = round($evalyfunc($t),3);//round(eval("return ($yfunc);"),3);
 				$alt .= "<tr><td>$x</td><td>$y</td></tr>";
 			} else {
-				$x = $xmin + $dx*$i + 1E-10 - ($domainlimited?0:5*($xmax-$xmin)/$settings[6]);
+				$x = $xmin + $dx*$i + (($i<$stopat/2)?1E-10:-1E-10) - ($domainlimited?0:5*($xmax-$xmin)/$settings[6]);
 				if (in_array($x,$avoid)) { continue;}
 				//echo $func.'<br/>';
 				$y = round($evalfunc($x),3);//round(eval("return ($func);"),3);

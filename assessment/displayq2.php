@@ -2406,16 +2406,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 		
 		
-		/*  should students get an answer right by leaving it blank?
-		if ($answerformat=='exactlist' || $answerformat=='orderedlist' || $answerformat=='list') {
-			if (trim($answer)=='') {
-				if (trim($givenans)=='') {
-					return 1;
-				} else {
-					return 0;
-				}
-			}
-		}*/
 		$extrapennum = count($gaarr)+count($anarr);
 		
 		if ($answerformat=='orderedlist') {
