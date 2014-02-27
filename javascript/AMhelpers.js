@@ -744,7 +744,7 @@ function doonsubmit(form,type2,skipconfirm) {
 				try {
 					with (Math) var res = eval(mathjs(str));
 				} catch(e) {
-					err = _("syntax incomplete");
+					var res = '';
 				}
 			}
 			strarr[sc] = res;
