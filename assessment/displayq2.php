@@ -5177,7 +5177,7 @@ function parsecomplex($v) {
 function checkanswerformat($tocheck,$ansformats) {
 	$tocheck = trim($tocheck);
 	$tocheck = str_replace(',','',$tocheck);
-	if ($tocheck=='DNE' || $tocheck=='oo' || $tocheck=='+oo' || $tocheck=='-oo') {
+	if (strtoupper($tocheck)=='DNE' || $tocheck=='oo' || $tocheck=='+oo' || $tocheck=='-oo') {
 		return true;
 	}
 	if (in_array("fraction",$ansformats) || in_array("reducedfraction",$ansformats) || in_array("fracordec",$ansformats)) {
