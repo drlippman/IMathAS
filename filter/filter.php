@@ -73,6 +73,9 @@
 	
 	function filter($str) {
 		global $sessiondata,$userfullname,$urlmode,$imasroot;
+		if ($urlmode == 'https://') {
+			$str = str_replace(array('http://www.youtube.com','http://youtu.be'),array('https://www.youtube.com','https://youtu.be'), $str);
+		}
 		if (strip_tags($str)==$str) {
 			$str = str_replace("\n","<br/>\n",$str);
 		}
