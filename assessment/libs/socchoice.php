@@ -208,12 +208,37 @@ function apportion_info($pop, $seats, $method) {
 			if ($q>$other[$s]) { $luq[$s]++;}
 		}
 		$toadd = $seats - array_sum($luq);
-		if ($toadd>=0) {
+		if ($toadd==0) {
+			$tochange = array();
+			foreach ($quotas as $s=>$q) {
+				if (floor($q)==0) {continue;}
+				for ($i=0;$i<min(floor($q),1);$i++) {
+					 $newq = $pop[$s]/(sqrt((floor($q)+$i)*(floor($q)+$i+1))+.0001); //what to get it over GM?
+					 if ($newq<$divisor) {
+					 	 $tochange[] = $newq;
+					 }
+				}
+			}
+			rsort($tochange);
+			$quotamin = $tochange[0];
+			$tochange = array();
+			foreach ($quotas as $s=>$q) {
+				if (floor($q)==0) {continue;}
+				for ($i=0;$i<min(floor($q),1);$i++) {
+					$newq = $pop[$s]/(sqrt((floor($q)-$i)*(floor($q)-$i+1))-.000001); //what to get it under GM?
+					if ($newq>$divisor) {
+						$tochange[] = $newq; 
+					}
+				}
+			}
+			sort($tochange);
+			$quotamax = $tochange[0];
+		} else if ($toadd>0) {
 			//need to add seats, so lower the divisor
 			foreach ($quotas as $s=>$q) {
 				if (floor($q)==0) {continue;}
-				for ($i=0;$i<4;$i++) {
-					 $newq = $pop[$s]/(sqrt((floor($q)+$i)*(floor($q)+$i+1))+.0001); //what to get it over GM?
+				for ($i=0;$i<min(floor($q),4);$i++) {
+					 $newq = $pop[$s]/(sqrt((floor($q)+$i)*(floor($q)+$i+1))+.000001); //what to get it over GM?
 					 if ($newq<$divisor) {
 					 	 $tochange[] = $newq;
 					 }
@@ -236,21 +261,17 @@ function apportion_info($pop, $seats, $method) {
 		}
 		$sk = array_keys($tochange);
 		$moddivs = array_values($tochange);
-		//if the next value is the same, then the divisor that adds $toadd additional
-		//seats would add $toadd+1 additional seats, so the method fails.
+		
 		if ($toadd==0) {
-			foreach ($moddivs as $k=>$v) {
-				if ($v<$divisor) {
-					$outdiv = '('.$v.','.$moddivs[$k-1].')';
-					break;
-				}
-			}
+			$outdiv = "($quotamin,$quotamax)";
 		} else if ($moddivs[$toadd-1]==$moddivs[$toadd]) {
+			//if the next value is the same, then the divisor that adds $toadd additional
+			//seats would add $toadd+1 additional seats, so the method fails.
 			$outdiv = "fail";
 		} else {
 			$outdiv = '('.min($moddivs[$toadd-1],$moddivs[$toadd]).','.max($moddivs[$toadd-1],$moddivs[$toadd]).')';
 		}
-		
+
 	} else if ($method=='lowndes') {
 		foreach ($quotas as $s=>$q) {
 			$luq[$s] = floor($q);
