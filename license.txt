@@ -45,6 +45,10 @@ AsciiMath and AsciiSvg Plugins for TinyMCE
 Based on code by David Lippman and Peter Jipsen
 LGPL License
 
+MathJax
+(c) The MathJax Consortium
+Apache License
+
 TinyMCE File manager
 Adapted from work by TadejK
 http://sourceforge.net/tracker/index.php?func=detail&aid=1698519&group_id=103281&atid=738747

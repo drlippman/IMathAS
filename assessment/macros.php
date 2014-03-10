@@ -2155,7 +2155,7 @@ function intervaltoineq($str,$var) {
 }
 
 function cleanbytoken($str,$funcs = array()) {
-	$parts = preg_split('/([=\,])/',$str,-1,PREG_SPLIT_DELIM_CAPTURE);
+	$parts = preg_split('/(<=|>=|=|,|<|>)/',$str,-1,PREG_SPLIT_DELIM_CAPTURE);
 	$finalout = array();
 	for ($k=0;$k<count($parts);$k+=2) {
 		$finalout = array();

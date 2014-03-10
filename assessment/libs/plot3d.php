@@ -59,18 +59,23 @@ function plot3d($func,$umin,$umax,$vmin,$vmax) {
 	$count = 0;
 	$du = ($umax-$umin)/($disc-1);
 	$dv = ($vmax-$vmin)/($disc-1);
+	$urnd = max(floor(-log10($du)-1e-12)+3,2);
+	$vrnd = max(floor(-log10($dv)-1e-12)+3,2);
+	$zrnd = max($urnd,$vrnd);
 	for ($i=0; $i<$disc;$i++) {
 		  for ($j=0;$j<$disc;$j++) {
 			  if ($count > 0) { $verts .= '~';}
 			  $u = $umin+$du*$i;
 			  $v = $vmin+$dv*$j;
 			  if ($isparam) {
-				  $x = $usefunc[0]($u,$v);
-				  $y = $usefunc[1]($u,$v);
-				  $z = $usefunc[2]($u,$v);
+				  $x = round($usefunc[0]($u,$v),$urnd);
+				  $y = round($usefunc[1]($u,$v),$vrnd);
+				  $z = round($usefunc[2]($u,$v),$zrnd);
 				  $verts .= "$x,$y,$z";
 			  } else {
-				  $z = $zfunc($u,$v);
+				  $z = round($zfunc($u,$v),$zrnd);
+				  $u = round($u,$urnd);
+				  $v = round($v,$vrnd);
 				  $verts .= "$u,$v,$z";
 			  }
 			  $count++;
@@ -88,8 +93,19 @@ function plot3d($func,$umin,$umax,$vmin,$vmax) {
 			  $count++;
 		  }
 	  }
+	  
+	  $useragent = $_SERVER['HTTP_USER_AGENT'];
+	  $oldschool = false;
 	  if (isset($GLOBALS['sessiondata']['useflash'])) {
-		  if (!isset($GLOBALS['3dplotcnt'])) {
+		$oldschool = true;
+	  } else if (preg_match('/MSIE\s*(\d+)/i',$useragent,$matches)) {
+		if ($matches[1]<9) {
+			$oldschool =true;
+		}
+	  }
+	  
+	  if ($oldschool || isset($GLOBALS['sessiondata']['useflash'])) {
+	  	  if (!isset($GLOBALS['3dplotcnt'])) {
 			  $r = 1;
 		  } else {
 			  $r = $GLOBALS['3dplotcnt']+1;
@@ -106,6 +122,21 @@ function plot3d($func,$umin,$umax,$vmin,$vmax) {
 		  $html .= "  swfobject.embedSWF(\"$imasroot/assessment/libs/viewer3d.swf\", \"plot3d$r\", \"$width\", \"$height\", \"9.0.0\", \"$imasroot/assessment/libs/expressInstall.swf\",FlashVars);";
 		  $html .= '</script>';
 	  } else {
+	  	 if (!isset($GLOBALS['3dplotcnt'])) {
+			  $r = 1;
+			  $html .= '<script type="text/javascript" src="'.$imasroot.'/javascript/3dviewer.js"></script>';
+		  } else {
+			  $r = $GLOBALS['3dplotcnt']+1;
+		  } 
+	  	  $GLOBALS['3dplotcnt'] = $r;
+	  	  $html .= "<canvas id=\"plot3d$r\" width=\"$width\" height=\"$height\">";
+	  	  $url = $GLOBALS['urlmode']  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . (isset($_SERVER['QUERY_STRING'])?'?'.$_SERVER['QUERY_STRING'].'&useflash=true':'?useflash=true');		 
+		  $html .= "Not seeing the 3D graph?  <a href=\"$url\">Try Flash Alternate</a>";
+	  	  $html .= "</canvas>";
+	  	  $html .= "<script type=\"text/javascript\">$(window).on('load',function() {var plot3d$r = new Viewer3D({verts: '$verts', faces: '$faces', width: '$width', height:'$height'}, 'plot3d$r');});</script>";
+	  } 
+	/*	  
+	  } else {
 		  $html .= "<applet codebase=\"{$GLOBALS['imasroot']}/assessment/libs\" code=\"Viewer.class\" width=$width height=$height>\n";
 		  $html .= "<param name=\"verts\" value=\"$verts\">\n";
 		  $html .= "<param name=\"faces\" value=\"$faces\">\n";
@@ -121,6 +152,7 @@ function plot3d($func,$umin,$umax,$vmin,$vmax) {
 				 
 		  $html .= "</applet><br/>Not seeing the 3D graph?  <a href=\"$url\">Try Flash Alternate</a>\n";
 	  }
+	  */
 	  return $html;
 	
 }
@@ -156,49 +188,59 @@ function spacecurve($func,$tmin,$tmax) {
 		$bounds = array_slice(func_get_args(),7,6);
 	}
 	
-	
-	$func = str_replace('[','',$func);
-	$func = str_replace(']','',$func);
-	$func = explode(',',$func);
-	$func[0] = "(1+.01*cos(u))*({$func[0]})";
-	$func[1] = "(1+.01*cos(u))*({$func[1]})";
-	$func[2] = "(1+.01*sin(u))*({$func[2]})";
-	foreach ($func as $k=>$v) {
-		$func[$k] = mathphp($v,'u|t');
-		$func[$k] = str_replace('(u)','($u)',$func[$k]);
-		$func[$k] = str_replace('(t)','($t)',$func[$k]);
-		$usefunc[$k] = create_function('$u,$t','return('.$func[$k].');');
+	$useragent = $_SERVER['HTTP_USER_AGENT'];
+	$oldschool = false;
+	if (isset($GLOBALS['sessiondata']['useflash'])) {
+		$oldschool = true;
+	} else if (preg_match('/MSIE\s*(\d+)/i',$useragent,$matches)) {
+		if ($matches[1]<9) {
+			$oldschool =true;
+		}
 	}
 	
-	$count = 0;
-	$dt = ($tmax-$tmin)/($disc-1);
-	for ($i=0; $i<4;$i++) {
-		  for ($j=0;$j<$disc;$j++) {
-			  if ($count > 0) { $verts .= '~';}
-			  $u = 1.571*$i;
-			  $t = $vmin+$dt*$j;
-			  
-			  $x = $usefunc[0]($u,$t);
-			  $y = $usefunc[1]($u,$t);
-			  $z = $usefunc[2]($u,$t);
-			  $verts .= "$x,$y,$z";
-			  
-			  $count++;
+	if ($oldschool) {
+
+		$func = str_replace('[','',$func);
+		$func = str_replace(']','',$func);
+		$func = explode(',',$func);
+		$func[0] = "(1+.01*cos(u))*({$func[0]})";
+		$func[1] = "(1+.01*cos(u))*({$func[1]})";
+		$func[2] = "(1+.01*sin(u))*({$func[2]})";
+		foreach ($func as $k=>$v) {
+			$func[$k] = mathphp($v,'u|t');
+			$func[$k] = str_replace('(u)','($u)',$func[$k]);
+			$func[$k] = str_replace('(t)','($t)',$func[$k]);
+			$usefunc[$k] = create_function('$u,$t','return('.$func[$k].');');
+		}
+		
+		$count = 0;
+		$dt = ($tmax-$tmin)/($disc-1);
+		for ($i=0; $i<4;$i++) {
+			  for ($j=0;$j<$disc;$j++) {
+				  if ($count > 0) { $verts .= '~';}
+				  $u = 1.571*$i;
+				  $t = $vmin+$dt*$j;
+				  
+				  $x = $usefunc[0]($u,$t);
+				  $y = $usefunc[1]($u,$t);
+				  $z = $usefunc[2]($u,$t);
+				  $verts .= "$x,$y,$z";
+				  
+				  $count++;
+			  }
 		  }
-	  }
-	  $count = 0;
-	  for ($i=0; $i<3;$i++) {
-		  for ($j=0;$j<$disc-1;$j++) {
-			  if ($count > 0) { $faces .= '~';}
-			  $faces .= ($i*$disc+$j) . ',' ;
-			  $faces .= (($i+1)*$disc+$j) . ',';
-			  $faces .= (($i+1)*$disc+$j+1) . ',';
-			  $faces .= ($i*$disc+$j+1);
-			 
-			  $count++;
+		  $count = 0;
+		  for ($i=0; $i<3;$i++) {
+			  for ($j=0;$j<$disc-1;$j++) {
+				  if ($count > 0) { $faces .= '~';}
+				  $faces .= ($i*$disc+$j) . ',' ;
+				  $faces .= (($i+1)*$disc+$j) . ',';
+				  $faces .= (($i+1)*$disc+$j+1) . ',';
+				  $faces .= ($i*$disc+$j+1);
+				 
+				  $count++;
+			  }
 		  }
-	  }
-	  if (isset($GLOBALS['sessiondata']['useflash'])) {
 		  if (!isset($GLOBALS['3dplotcnt'])) {
 			  $r = 1;
 		  } else {
@@ -215,23 +257,64 @@ function spacecurve($func,$tmin,$tmax) {
 		  $html .= "  width: $width, height: $height };";
 		  $html .= "  swfobject.embedSWF(\"$imasroot/assessment/libs/viewer3d.swf\", \"plot3d$r\", \"$width\", \"$height\", \"9.0.0\", \"$imasroot/assessment/libs/expressInstall.swf\",FlashVars);";
 		  $html .= '</script>';
-	  } else {
-		  $html = "<applet codebase=\"{$GLOBALS['imasroot']}/assessment/libs\" code=\"Viewer.class\" width=$width height=$height>\n";
-		  $html .= "<param name=\"verts\" value=\"$verts\">\n";
-		  $html .= "<param name=\"faces\" value=\"$faces\">\n";
-		  if ($axes==1) {
-			  $html .= "<param name=\"axes\" value=\"show\">\n";
+		  /*if (isset($GLOBALS['sessiondata']['useflash'])) {
+			  
 		  } else {
-			  $html .= "<param name=\"axes\" value=\"hide\">\n";
-		  }
-		  $html .= "<param name=\"edges\" value=\"hide\">\n";
-		  if (isset($bounds)) {
-			  $html .= "<param name=\"bounds\" value=\"" . implode(',',$bounds) . "\">\n";
-		  }
-		  $url = $GLOBALS['urlmode']  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . (isset($_SERVER['QUERY_STRING'])?'?'.$_SERVER['QUERY_STRING'].'&useflash=true':'?useflash=true');
-				 
-		  $html .= "Not seeing the 3D graph?  <a href=\"$url\">Try Alternate</a></applet>\n";
-	  } 
+			  $html = "<applet codebase=\"{$GLOBALS['imasroot']}/assessment/libs\" code=\"Viewer.class\" width=$width height=$height>\n";
+			  $html .= "<param name=\"verts\" value=\"$verts\">\n";
+			  $html .= "<param name=\"faces\" value=\"$faces\">\n";
+			  if ($axes==1) {
+				  $html .= "<param name=\"axes\" value=\"show\">\n";
+			  } else {
+				  $html .= "<param name=\"axes\" value=\"hide\">\n";
+			  }
+			  $html .= "<param name=\"edges\" value=\"hide\">\n";
+			  if (isset($bounds)) {
+				  $html .= "<param name=\"bounds\" value=\"" . implode(',',$bounds) . "\">\n";
+			  }
+			  $url = $GLOBALS['urlmode']  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . (isset($_SERVER['QUERY_STRING'])?'?'.$_SERVER['QUERY_STRING'].'&useflash=true':'?useflash=true');
+					 
+			  $html .= "Not seeing the 3D graph?  <a href=\"$url\">Try Alternate</a></applet>\n";
+		  } */
+	} else {
+		//new approach
+		$func = str_replace('[','',$func);
+		$func = str_replace(']','',$func);
+		$func = explode(',',$func);
+		foreach ($func as $k=>$v) {
+			$func[$k] = mathphp($v,'t');
+			$func[$k] = str_replace('(t)','($t)',$func[$k]);
+			$usefunc[$k] = create_function('$t','return('.$func[$k].');');
+		}
+		
+		$count = 0;
+		$dt = ($tmax-$tmin)/($disc-1);
+		for ($j=0;$j<$disc;$j++) {
+			  if ($count > 0) { $verts .= '~';}
+			  $t = $vmin+$dt*$j;
+			  
+			  $x = $usefunc[0]($t);
+			  $y = $usefunc[1]($t);
+			  $z = $usefunc[2]($t);
+			  $verts .= "$x,$y,$z";
+			  
+			  $count++;
+		 }
+		  
+	  	 if (!isset($GLOBALS['3dplotcnt'])) {
+			  $r = 1;
+			  $html .= '<script type="text/javascript" src="'.$imasroot.'/javascript/3dviewer.js"></script>';
+		 } else {
+			  $r = $GLOBALS['3dplotcnt']+1;
+		 } 
+	  	 $GLOBALS['3dplotcnt'] = $r;
+	  	 $html .= "<canvas id=\"plot3d$r\" width=\"$width\" height=\"$height\">";
+	  	 $url = $GLOBALS['urlmode']  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . (isset($_SERVER['QUERY_STRING'])?'?'.$_SERVER['QUERY_STRING'].'&useflash=true':'?useflash=true');
+		 $html .= "Not seeing the 3D graph?  <a href=\"$url\">Try Alternate</a>";
+	  	 $html .= "</canvas>";
+	  	 $html .= "<script type=\"text/javascript\">$(window).on('load',function() {var plot3d$r = new Viewer3D({verts: '$verts', curves: true, width: '$width', height:'$height'}, 'plot3d$r');});</script>";
+	}
+	  
 	  return $html;
 	
 }

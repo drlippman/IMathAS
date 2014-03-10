@@ -1057,7 +1057,7 @@ echo 'enter <b>$feedback[0]</b> to indicate where the feedback for Part 0 should
 ?>
 
 <div class=editor>
-	<textarea cols="60" rows="20" id="text" name="text" style="width: 100%"><?php echo htmlentities($qtext);?></textarea>
+	<textarea cols="60" rows="20" id="text" name="text" style="width: 100%"><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$qtext);?></textarea>
 </div>
 
 <div class="editor" id="GB_window" style="display:none; position: absolute; height: auto;">
