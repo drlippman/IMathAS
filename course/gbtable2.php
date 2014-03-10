@@ -750,7 +750,7 @@ function gbtable() {
 	//$query .= "FROM imas_users,imas_teachers WHERE imas_users.id=imas_teachers.userid AND imas_teachers.courseid='$cid' ";
 	//if (!$isteacher && !isset($tutorid)) {$query .= "AND imas_users.id='$userid' ";}
 	if ($limuser>0) { $query .= "AND imas_users.id='$limuser' ";}
-	if ($secfilter!=-1) {
+	if ($secfilter!=-1 && $limuser<=0) {
 		$query .= "AND imas_students.section='$secfilter' ";
 	}
 	if ($hidelocked) {
