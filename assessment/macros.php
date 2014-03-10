@@ -1277,6 +1277,7 @@ function dispreducedfraction($n,$d,$dblslash=false,$varinnum=false) {
 }
 
 function makereducedfraction($n,$d,$dblslash=false,$varinnum=false) {
+	if ($n==0) {return '0';}
 	$g = gcd($n,$d);
 	$n = $n/$g;
 	$d = $d/$g;	
