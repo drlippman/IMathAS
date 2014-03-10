@@ -79,6 +79,7 @@ if ($showans) {
 	$doshowans = 0;
 	echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit()\">\n";
 	echo "<input type=\"hidden\" name=\"seed\" value=\"$seed\" />";
+	$lastanswers = array();
 	displayq(0,$qsetid,$seed,$doshowans,true,0);
 	echo "<input type=submit name=\"check\" value=\"" . _('Check Answer') . "\">\n";
 	echo "</form>\n";

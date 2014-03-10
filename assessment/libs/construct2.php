@@ -29,7 +29,7 @@ function addConstruct2($url,$width=400,$height=200,$params=array(),$qn=null,$par
 	} else {
 		$GLOBALS['construct2count']++;
 	}
-	if ($qn != null) {
+	if ($qn !== null) {
 		if ($part !== null) {$qn = 1000*($qn)+$part;} else {$qn--;}
 		$params['imathasqn'] = $qn;
 	}
