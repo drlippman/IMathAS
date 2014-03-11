@@ -252,7 +252,7 @@ if ($canviewall) {
 		$placeinhead .= "}\n";
 	}
 	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid=$cid&stu=";
-	$placeinhead .= "function chgstu(el) { window.location = '$address' + el.value;	}";
+	$placeinhead .= "function chgstu(el) { 	\$(el).after('<img src=\"$imasroot/img/updating.gif\"/>'); window.location = '$address' + el.value;}";
 	$placeinhead .= 'function chgtoggle() { ';
 	$placeinhead .= "	var altgbmode = 10000*document.getElementById(\"toggle4\").value + 1000*($totonleft+$avgontop) + 100*(document.getElementById(\"toggle1\").value*1+ document.getElementById(\"toggle5\").value*1) + 10*document.getElementById(\"toggle2\").value + 1*document.getElementById(\"toggle3\").value; ";
 	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid&gbmode=";
@@ -682,6 +682,14 @@ function gbstudisp($stu) {
 		
 		echo '<div style="font-size:1.1em;font-weight:bold">';
 		if ($isteacher || $istutor) {
+			if ($gbt[1][0][1] != '') {
+				$query = "SELECT usersort FROM imas_gbscheme WHERE courseid='$cid'";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$usersort = mysql_result($result,0,0);
+			} else {
+				$usersort = 1;
+			}
+			
 			if ($gbt[1][4][2]==1) {
 				if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
 					echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$gbt[1][4][0]}.jpg\" onclick=\"togglepic(this)\" class=\"mida\"/> ";
@@ -689,16 +697,28 @@ function gbstudisp($stu) {
 					echo "<img src=\"$imasroot/course/files/userimg_sm{$gbt[1][4][0]}.jpg\" style=\"float: left; padding-right:5px;\" onclick=\"togglepic(this)\" class=\"mida\"/>";
 				}
 			} 
-			$query = "SELECT iu.id,iu.FirstName,iu.LastName FROM imas_users AS iu JOIN imas_students as istu ON iu.id=istu.userid WHERE istu.courseid='$cid' ORDER BY iu.LastName,iu.FirstName";
+			$query = "SELECT iu.id,iu.FirstName,iu.LastName,istu.section FROM imas_users AS iu JOIN imas_students as istu ON iu.id=istu.userid WHERE istu.courseid='$cid' ";
+			if ($usersort==0) {
+				$query .= "ORDER BY istu.section,iu.LastName,iu.FirstName";
+			} else {
+				$query .= "ORDER BY iu.LastName,iu.FirstName";
+			}
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			echo '<select id="userselect" style="border:0;font-size:1.1em;font-weight:bold" onchange="chgstu(this)">';
+			$lastsec = '';
 			while ($row = mysql_fetch_row($result)) {
+				if ($row[3]!='' && $row[3]!=$lastsec && $usersort==0) {
+					if ($lastsec=='') {echo '</optgroup>';}
+					echo '<optgroup label="Section '.htmlentities($row[3]).'">';
+					$lastsec = $row[3];
+				}
 				echo '<option value="'.$row[0].'"';
 				if ($row[0]==$stu) {
 					echo ' selected="selected"';
 				}
 				echo '>'.$row[2].', '.$row[1].'</option>';
 			}
+			if ($lastsec!='') {echo '</optgroup>';}
 			echo '</select>';
 			echo ' <span class="small">('.$gbt[1][0][1].')</span>';
 		} else {
