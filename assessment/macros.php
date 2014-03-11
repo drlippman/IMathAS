@@ -2504,7 +2504,7 @@ function comparenumbers($a,$b,$tol='.001') {
 	return false;
 }
 
-function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
+function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10',$type='expression') {
 	if ($a=='' || $b=='') { return false;}
 	//echo "comparing $a and $b";
 	if ($tol{0}=='|') {
@@ -2524,6 +2524,13 @@ function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
 			}
 		}
 	}
+	if ($type=='equation') {
+		if (substr_count($a, '=')!=1) {return false;}
+		$a = preg_replace('/(.*)=(.*)/','$1-($2)',$a);
+		if (substr_count($b, '=')!=1) {return false;}
+		$b = preg_replace('/(.*)=(.*)/','$1-($2)',$b);
+	}
+	
 	$a = mathphp(makepretty(mathphppre($a)), $vlist);
 	$b = mathphp(makepretty(mathphppre($b)), $vlist);
 	//echo "pretty: $a, $b";
@@ -2534,6 +2541,7 @@ function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
 	$cntnana = 0;
 	$cntnanb = 0;
 	$correct = true;
+	$ratios = array();
 	for ($i = 0; $i < 20; $i++) {
 		for($j=0; $j < count($variables); $j++) {
 			$tp[$j] = $tps[$i][$j];
@@ -2544,10 +2552,21 @@ function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
 		if (isNaN($ansa)) {$cntnana++; continue;} //avoid NaN problems
 		if (isNaN($ansb)) {$cntnanb++; continue;}
 		
-		if (isset($abstolerance)) {
-			if (abs($ansa-$ansb) > $abstolerance-1E-12) {$correct = false; break;}	
+		if ($type=='equation') {
+			if (abs($ansa)>.000001 && is_numeric($ansb)) {
+				$ratios[] = $ansb/$ansa;
+				if (abs($ansb)<=.00000001 && $ansa!=0) {
+					$cntzero++;
+				}
+			} else if (abs($ansa)<=.000001 && is_numeric($ansb) && abs($ansb)<=.00000001) {
+				$cntbothzero++;
+			}
 		} else {
-			if ((abs($ansa-$ansb)/(abs($ansa)+.0001) > $tol-1E-12)) {$correct = false; break;}
+			if (isset($abstolerance)) {
+				if (abs($ansa-$ansb) > $abstolerance-1E-12) {$correct = false; break;}	
+			} else {
+				if ((abs($ansa-$ansb)/(abs($ansa)+.0001) > $tol-1E-12)) {$correct = false; break;}
+			}
 		}
 		
 	}
@@ -2558,6 +2577,26 @@ function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
 	}
 	if (abs($cntnana - $cntnanb)>1) {
 		return false;
+	}
+	if ($type=="equation") {
+		if ($cntbothzero>18) {
+			$correct = true;
+		} else if (count($ratios)>0) {
+			if (count($ratios)==$cntzero) {
+				$correct = false;
+			} else {
+				$meanratio = array_sum($ratios)/count($ratios);
+				for ($i=0; $i<count($ratios); $i++) {
+					if (isset($abstolerance)) {
+						if (abs($ratios[$i]-$meanratio) > $abstolerance-1E-12) {$correct = false; break;}	
+					} else {
+						if ((abs($ratios[$i]-$meanratio)/(abs($meanratio)+.0001) > $tol-1E-12)) {$correct = false; break;}
+					}
+				}
+			}
+		} else {
+			$correct = false;
+		}
 	}
 	if ($correct) {
 		return true;
