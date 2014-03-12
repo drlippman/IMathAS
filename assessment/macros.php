@@ -2504,11 +2504,15 @@ function comparenumbers($a,$b,$tol='.001') {
 	return false;
 }
 
-function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10',$type='expression') {
+function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
 	if ($a=='' || $b=='') { return false;}
 	//echo "comparing $a and $b";
 	if ($tol{0}=='|') {
 		$abstolerance = floatval(substr($tol,1));
+	}
+	$type = "expression";
+	if (strpos($a, '=')!==false && strpos($b, '=')!==false) {
+		$type = "equation";
 	}
 	$fromto = explode(',',$domain);
 	$variables = explode(',',$vars);
