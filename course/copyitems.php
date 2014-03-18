@@ -494,6 +494,9 @@ if ($overwriteBody==1) {
 		<option value="all">Copy whole course</option>
 		<option value="select">Select items to copy</option>
 	</select>
+	<?php
+		if ($_POST['ekey']=='') { echo '&nbsp;<a class="small" target="_blank" href="course.php?cid='.$_POST['ctc'].'">Preview source course</a>';}
+	?>
 	<div id="allitemsnote">
 	<p><input type=checkbox name="copyofflinewhole"  value="1"/> Copy offline grade items </p>
 	<p>Copying the whole course will also copy (and overwrite) course settings, gradebook categories, outcomes, and rubrics.  
@@ -502,6 +505,7 @@ if ($overwriteBody==1) {
 	</div>
 	<div id="selectitemstocopy" style="display:none;">
 	<h4>Select Items to Copy</h4>
+	
 	Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
 	
 	<table cellpadding=5 class=gb>
@@ -523,11 +527,11 @@ if ($overwriteBody==1) {
 			if ($alt==0) {echo "		<tr class=even>"; $alt=1;} else {echo "		<tr class=odd>"; $alt=0;}
 			echo '<td>';
 			if (strpos($types[$i],'Block')!==false) {		
-				echo "<input type=checkbox name='checked[]' value='{$ids[$i]}' id='{$parents[$i]}' checked=checked ";
+				echo "<input type=checkbox name='checked[]' value='{$ids[$i]}' id='{$parents[$i]}' ";
 				echo "onClick=\"chkgrp(this.form, '{$ids[$i]}', this.checked);\" ";
 				echo '/>';
 			} else {
-				echo "<input type=checkbox name='checked[]' value='{$ids[$i]}' id='{$parents[$i]}.{$ids[$i]}' checked=checked ";
+				echo "<input type=checkbox name='checked[]' value='{$ids[$i]}' id='{$parents[$i]}.{$ids[$i]}' ";
 				echo '/>';
 			}
 ?>
