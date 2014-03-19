@@ -252,7 +252,7 @@ if ($canviewall) {
 		$placeinhead .= "}\n";
 	}
 	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid=$cid&stu=";
-	$placeinhead .= "function chgstu(el) { 	\$(el).after('<img src=\"$imasroot/img/updating.gif\"/>'); window.location = '$address' + el.value;}";
+	$placeinhead .= "function chgstu(el) { 	\$('#updatingicon').show(); window.location = '$address' + el.value;}";
 	$placeinhead .= 'function chgtoggle() { ';
 	$placeinhead .= "	var altgbmode = 10000*document.getElementById(\"toggle4\").value + 1000*($totonleft+$avgontop) + 100*(document.getElementById(\"toggle1\").value*1+ document.getElementById(\"toggle5\").value*1) + 10*document.getElementById(\"toggle2\").value + 1*document.getElementById(\"toggle3\").value; ";
 	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid&gbmode=";
@@ -720,6 +720,7 @@ function gbstudisp($stu) {
 			}
 			if ($lastsec!='') {echo '</optgroup>';}
 			echo '</select>';
+			echo '<img id="updatingicon" style="display:none" src="'.$imasroot.'/img/updating.gif"/>';
 			echo ' <span class="small">('.$gbt[1][0][1].')</span>';
 		} else {
 			echo strip_tags($gbt[1][0][0]) . ' <span class="small">('.$gbt[1][0][1].')</span>';
