@@ -630,6 +630,7 @@
 						echo " <span id=\"likecnt$child\">".($likecnt>0?$likecnt:'').' </span> ';
 						echo '</div>';
 					}
+					echo '<div class="clear"></div>';
 					echo "</div>\n";
 					if ($view==2) {
 						echo "<div class=hidden id=\"item$icnt\">";

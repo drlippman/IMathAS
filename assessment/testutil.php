@@ -702,7 +702,12 @@ function basicshowq($qn,$seqinactive=false,$colors=array()) {
 	$regen = ((($regenonreattempt && $qi[$questions[$qn]]['regen']==0) || $qi[$questions[$qn]]['regen']==1)&&amreattempting($qn));
 	$thisshowhints = ($qi[$questions[$qn]]['showhints']==2 || ($qi[$questions[$qn]]['showhints']==0 && $showhints));
 	if (!$noraw && $showeachscore) { //&& $GLOBALS['questionmanualgrade'] != true) {
-		$colors = scorestocolors($rawscores[$qn], '', $qi[$questions[$qn]]['answeights'], $noraw);
+		//$colors = scorestocolors($rawscores[$qn], '', $qi[$questions[$qn]]['answeights'], $noraw);
+		if (strpos($rawscores[$qn],'~')!==false) {
+			$colors = explode('~',$rawscores[$qn]);
+		} else {
+			$colors = array($rawscores[$qn]);
+		}
 	}
 	if (!$seqinactive) {
 		displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$showa,$thisshowhints,$attempts[$qn],false,$regen,$seqinactive,$colors);

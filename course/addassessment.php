@@ -603,9 +603,11 @@ if ($overwriteBody==1) {
 		if (document.getElementById("deffeedback").value=="Practice" || document.getElementById("deffeedback").value=="Homework") {
 			document.getElementById("showanspracspan").className = "show";
 			document.getElementById("showansspan").className = "hidden";
+			document.getElementById("showreattdiffver").className = "hidden";
 		} else {
 			document.getElementById("showanspracspan").className = "hidden";
 			document.getElementById("showansspan").className = "show";
+			document.getElementById("showreattdiffver").className = "show";
 		}
 		if (document.getElementById("deffeedback").value=="Practice") {
 			document.getElementById("stdcntingb").className = "hidden";
@@ -753,8 +755,10 @@ if ($overwriteBody==1) {
 			<span class=form>Default attempts per problem (0 for unlimited): </span>
 			<span class=formright>
 				<input type=text size=4 name=defattempts value="<?php echo $line['defattempts'];?>" > 
+				<span id="showreattdiffver" class="<?php if ($testtype!="Practice" && $testtype!="Homework") {echo "show";} else {echo "hidden";} ?>">
 	 			<input type=checkbox name="reattemptsdiffver" <?php writeHtmlChecked($line['shuffle']&8,8); ?> />
-	 			Reattempts different versions</span><BR class=form>
+	 			Reattempts different versions</span>
+	 		</span><BR class=form>
 	
 			<span class=form>Default penalty:</span>
 			<span class=formright>
