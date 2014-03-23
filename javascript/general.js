@@ -411,11 +411,13 @@ function recclick(type,typeid,info,txt) {
 function setuptracklinks(i,el) {
 	if (jQuery(el).attr("data-base")) {
 		jQuery(el).click(function(e) {
-			e.preventDefault();
 			var inf = jQuery(this).attr('data-base').split('-');
 			recclick(inf[0], inf[1], jQuery(this).attr("href"), jQuery(this).text());
-			setTimeout('window.location.href = "'+jQuery(this).attr('href')+'"',100);
-			return false;
+			if (typeof(jQuery(el).attr("target"))=="undefined") {
+				e.preventDefault();
+				setTimeout('window.location.href = "'+jQuery(this).attr('href')+'"',100);
+				return false;
+			}
 		});
 	}
 }

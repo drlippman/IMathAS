@@ -209,7 +209,11 @@ function gbinstrexport() {
 					continue;
 				}
 				if ($availshow<3) {
-					$gbo[0][$n] = $gbt[0][2][$i][0].': '.$gbt[0][2][$i][3+$availshow].' pts';
+					if (isset($gbt[0][3][0])) { //using points based
+						$gbo[0][$n] = $gbt[0][2][$i][0].': '.$gbt[0][2][$i][3+$availshow].' pts';
+					} else {
+						$gbo[0][$n] = $gbt[0][2][$i][0].': '.$gbt[0][2][$i][11].'%';
+					}
 				} else if ($availshow==3) {
 					$gbo[0][$n] = $gbt[0][2][$i][0];
 				}
@@ -561,7 +565,17 @@ function gbinstrdisp() {
 				} else {
 					echo '&nbsp;';
 				}
-				echo $gbt[0][2][$i][3+$availshow].'&nbsp;pts';
+				if ($availshow<3) {
+					if (isset($gbt[0][3][0])) { //using points based
+						echo $gbt[0][2][$i][3+$availshow].'&nbsp;', _('pts');
+					} else {
+						echo $gbt[0][2][$i][11].'%';
+					}
+				} else {
+					if (isset($gbt[0][2][$i][11])) {
+						echo $gbt[0][2][$i][11].'%';
+					}
+				}
 				echo '</span></th>';
 				$n++;
 			}
@@ -626,7 +640,17 @@ function gbinstrdisp() {
 				} else {
 					echo '&nbsp;';
 				}
-				echo $gbt[0][2][$i][3+$availshow].'&nbsp;pts';
+				if ($availshow<3) {
+					if (isset($gbt[0][3][0])) { //using points based
+						echo $gbt[0][2][$i][3+$availshow].'&nbsp;', _('pts');
+					} else {
+						echo $gbt[0][2][$i][11].'%';
+					}
+				} else {
+					if (isset($gbt[0][2][$i][11])) {
+						echo $gbt[0][2][$i][11].'%';
+					}
+				}
 				echo '</span></th>';
 				$n++;
 			}
@@ -696,11 +720,21 @@ function gbinstrdisp() {
 		if ($totonleft && !$hidepast) {
 			//total totals
 			if ($catfilter<0) {
-				if (isset($gbt[0][3][0])) { //using points based
-					echo '<td class="c">'.$gbt[$i][3][$availshow].'</td>';
-					echo '<td class="c">'.$gbt[$i][3][$availshow+3] .'%</td>';
+				if ($availshow==3) {
+					if (isset($gbt[$i][3][8])) { //using points based
+						echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'/'.$gbt[$i][3][7].$enddiv.'</td>';
+						echo '<td class="c">'.$insdiv.$gbt[$i][3][8] .'%'.$enddiv .'</td>';
+						
+					} else {
+						echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'%'.$enddiv .'</td>';
+					}
 				} else {
-					echo '<td class="c">'.$gbt[$i][3][$availshow].'%</td>';
+					if (isset($gbt[0][3][0])) { //using points based
+						echo '<td class="c">'.$gbt[$i][3][$availshow].'</td>';
+						echo '<td class="c">'.$gbt[$i][3][$availshow+3] .'%</td>';
+					} else {
+						echo '<td class="c">'.$gbt[$i][3][$availshow].'%</td>';
+					}
 				}
 			}
 			//category totals
@@ -711,10 +745,24 @@ function gbinstrdisp() {
 					} else if ($availshow==2 && $gbt[0][2][$j][2]==3) {
 						continue;
 					}
-					if ($catfilter!=-1 && $gbt[0][2][$j][$availshow+3]>0) {
+					if ($catfilter!=-1 && $availshow<3 && $gbt[0][2][$j][$availshow+3]>0) {
 						echo '<td class="c">'.$gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)</td>';
 					} else {
-						echo '<td class="c">'.$gbt[$i][2][$j][$availshow].'</td>';
+						echo '<td class="c">';
+						if ($availshow==3) {
+							echo $gbt[$i][2][$j][3].' of '.$gbt[$i][2][$j][4];
+						} else {
+							if (isset($gbt[$i][3][8])) { //using points based
+								echo $gbt[$i][2][$j][$availshow];
+							} else {
+								if ($gbt[0][2][$j][3+$availshow]>0) {
+									echo round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][3+$availshow],1).'%';
+								} else {
+									echo '0%';
+								}
+							}
+						}
+						echo '</td>';
 					}
 				}
 			}
@@ -754,14 +802,22 @@ function gbinstrdisp() {
 							echo ' (PT)';
 						} 
 						
-						if (isset($gbt[$i][1][$j][6]) ) {
-							echo '<sup>e</sup></span>';
-						}
 					} else { //no score
 						if ($gbt[$i][0][0]=='Averages') {
 							echo '-';
 						} else {
 							echo '-';
+						}
+					}
+					if (isset($gbt[$i][1][$j][6]) ) {
+						if ($gbt[$i][1][$j][6]>1) {
+							if ($gbt[$i][1][$j][6]>2) {
+								echo '<sup>LP ('.($gbt[$i][1][$j][6]-1).')</sup>';
+							} else {
+								echo '<sup>LP</sup>';
+							}
+						} else {
+							echo '<sup>e</sup>';
 						}
 					}
 				} else if ($gbt[0][1][$j][6]==1) { //offline
@@ -808,21 +864,45 @@ function gbinstrdisp() {
 					} else if ($availshow==2 && $gbt[0][2][$j][2]==3) {
 						continue;
 					}
-					if ($catfilter!=-1 && $gbt[0][2][$j][$availshow+3]>0) {
+					if ($catfilter!=-1 && $availshow<3 && $gbt[0][2][$j][$availshow+3]>0) {
 						echo '<td class="c">'.$gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)</td>';
 					} else {
-						echo '<td class="c">'.$gbt[$i][2][$j][$availshow].'</td>';
+						echo '<td class="c">';
+						if ($availshow==3) {
+							echo $gbt[$i][2][$j][3].' of '.$gbt[$i][2][$j][4];
+						} else {
+							if (isset($gbt[$i][3][8])) { //using points based
+								echo $gbt[$i][2][$j][$availshow];
+							} else {
+								if ($gbt[0][2][$j][3+$availshow]>0) {
+									echo round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][3+$availshow],1).'%';
+								} else {
+									echo '0%';
+								}
+							}
+						}
+						echo '</td>';
 					}
 				}
 			}
 			
 			//total totals
 			if ($catfilter<0) {
-				if (isset($gbt[0][3][0])) { //using points based
-					echo '<td class="c">'.$gbt[$i][3][$availshow].'</td>';
-					echo '<td class="c">'.$gbt[$i][3][$availshow+3] .'%</td>';
+				if ($availshow==3) {
+					if (isset($gbt[$i][3][8])) { //using points based
+						echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'/'.$gbt[$i][3][7].$enddiv.'</td>';
+						echo '<td class="c">'.$insdiv.$gbt[$i][3][8] .'%'.$enddiv .'</td>';
+						
+					} else {
+						echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'%'.$enddiv .'</td>';
+					}
 				} else {
-					echo '<td class="c">'.$gbt[$i][3][$availshow].'%</td>';
+					if (isset($gbt[0][3][0])) { //using points based
+						echo '<td class="c">'.$gbt[$i][3][$availshow].'</td>';
+						echo '<td class="c">'.$gbt[$i][3][$availshow+3] .'%</td>';
+					} else {
+						echo '<td class="c">'.$gbt[$i][3][$availshow].'%</td>';
+					}
 				}
 			}
 		}

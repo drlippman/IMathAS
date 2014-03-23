@@ -647,6 +647,9 @@ var pts = {};
 var iseqn = {};
 
 function doonsubmit(form,type2,skipconfirm) {
+	for (var qn in callbackstack) {
+		callbackstack[qn](qn);
+	}
 	if (form!=null) {
 		if (form.className == 'submitted') {
 			alert(_("You have already submitted this page.  Please be patient while your submission is processed."));
@@ -669,9 +672,7 @@ function doonsubmit(form,type2,skipconfirm) {
 			}
 		}
 	}
-	for (var qn in callbackstack) {
-		callbackstack[qn](qn);
-	}
+	
 	for (var qn in intcalctoproc) { //i=0; i<intcalctoproc.length; i++) {
 		qn = parseInt(qn);
 		

@@ -1255,6 +1255,9 @@ function gbinstrdisp() {
 					}
 				} else if ($availshow==3) { //past and attempted
 					echo $gbt[0][2][$i][0];
+					if (isset($gbt[0][2][$i][11])) {
+						echo '<br/>'.$gbt[0][2][$i][11].'%';
+					}
 				}
 				if ($collapsegbcat[$gbt[0][2][$i][1]]==0) {
 					echo "<br/><a class=small href=\"gradebook.php?cid=$cid&amp;cat={$gbt[0][2][$i][10]}&amp;catcollapse=2\">", _('[Collapse]'), "</a>";
