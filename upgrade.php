@@ -1,7 +1,7 @@
 <?php  
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 81;
+$latest = 83;
 
 
 @set_time_limit(0);
@@ -1368,6 +1368,20 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 		}
 		if ($last<81) {
 			$query = 'ALTER TABLE imas_users ADD `hideonpostswidget` TEXT NOT NULL';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }	
+		}
+		if ($last<82) {
+			 $query = 'ALTER TABLE imas_questionset ADD `solution` TEXT NOT NULL';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }	
+		}
+		if ($last<83) {
+			 $query = 'ALTER TABLE imas_questionset ADD `solutionopts` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\'';
 			 $res = mysql_query($query);
 			 if ($res===false) {
 			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";

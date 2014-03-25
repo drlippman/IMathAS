@@ -92,6 +92,7 @@
 			 $sessiondata['mathdisp'] = $_POST['mathdisp'];
 			 $sessiondata['graphdisp'] = $_POST['graphdisp'];
 			 $sessiondata['useed'] = checkeditorok();
+			 $sessiondata['secsalt'] = generaterandstring();
 			 if (isset($_POST['savesettings'])) {
 				 setcookie('mathgraphprefs',$_POST['mathdisp'].'-'.$_POST['graphdisp'],2000000000);
 			 }
@@ -264,6 +265,7 @@ END;
 		 //$sessiondata['useed'] = $_POST['useed'];
 		 $sessiondata['useragent'] = $_SERVER['HTTP_USER_AGENT'];
 		 $sessiondata['ip'] = $_SERVER['REMOTE_ADDR'];
+		 $sessiondata['secsalt'] = generaterandstring();
 		 if ($_POST['access']==1) { //text-based
 			 $sessiondata['mathdisp'] = $_POST['mathdisp'];
 			 $sessiondata['graphdisp'] = 0;
@@ -608,5 +610,12 @@ END;
   if (!isset($coursename)) {
 	  $coursename = "Course Page";
   } 
- 
+  function generaterandstring() {
+  	$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+	$pass = '';
+	for ($i=0;$i<10;$i++) {
+		$pass .= substr($chars,rand(0,61),1);
+	}	
+	return $pass;
+  }
 ?>
