@@ -40,7 +40,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		$seqinactive = false;
 	}*/
 	
-	$query = "SELECT qtype,control,qcontrol,qtext,answer,hasimg,extref FROM imas_questionset WHERE id='$qidx'";
+	$query = "SELECT qtype,control,qcontrol,qtext,answer,hasimg,extref,solution,solutionopts FROM imas_questionset WHERE id='$qidx'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$qdata = mysql_fetch_array($result, MYSQL_ASSOC);
 	
@@ -120,6 +120,11 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	$toevalqtxt = interpret('qtext',$qdata['qtype'],$qdata['qtext']);
 	$toevalqtxt = str_replace('\\','\\\\',$toevalqtxt);
 	$toevalqtxt = str_replace(array('\\\\n','\\\\"','\\\\$','\\\\{'),array('\\n','\\"','\\$','\\{'),$toevalqtxt);
+	
+	$toevalsoln = interpret('qtext',$qdata['qtype'],$qdata['solution']);
+	$toevalsoln = str_replace('\\','\\\\',$toevalsoln);
+	$toevalsoln = str_replace(array('\\\\n','\\\\"','\\\\$','\\\\{'),array('\\n','\\"','\\$','\\{'),$toevalsoln);
+	
 	//$toevalqtxt = str_replace('"','\\"',$toevalqtxt);
 	//echo "toeval: $toevalqtxt";
 	if ($doshowans) {
@@ -289,6 +294,16 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	
 	//echo $toevalqtext;
 	eval("\$evaledqtext = \"$toevalqtxt\";");
+	eval("\$evaledsoln = \"$toevalsoln\";");
+	if ($returnqtxt===2) {
+		return '<div id="writtenexample" class="review">'.$evaledsoln.'</div>';
+	} else if ($returnqtxt===3) {
+		return '<div class="question">'.$evaledqtext.'</div><div id="writtenexample" class="review">'.$evaledsoln.'</div>';
+	}
+	if (($qdata['solutionopts']&1)==0) {
+		$evaledsoln = '<i>'._('This solution is for a similar problem, not your specific version').'</i><br/>'.$evaledsoln;
+	}
+	
 	if (strpos($evaledqtext,'[AB')!==false) {
 		if (is_array($answerbox)) {
 			foreach($answerbox as $iidx=>$abox) {
@@ -345,30 +360,39 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if (isset($helptext) &&  $showhints) {
 		echo '<div><p class="tips">'.filter($helptext).'</p></div>';
 	}
-	if ($showhints && $qdata['extref']!='') {
-		$extref = explode('~~',$qdata['extref']);
+	if ($showhints && ($qdata['extref']!='' || (($qdata['solutionopts']&2)==2 && $qdata['solution']!=''))) {
 		echo '<div><p class="tips">', _('Get help: ');
-		for ($i=0;$i<count($extref);$i++) {
-			$extrefpt = explode('!!',$extref[$i]);
+		if ($qdata['extref']!= '') {
+			$extref = explode('~~',$qdata['extref']);
+		
 			if (isset($GLOBALS['questions']) && (!isset($GLOBALS['sessiondata']['isteacher']) || $GLOBALS['sessiondata']['isteacher']==false) && !isset($GLOBALS['sessiondata']['stuview'])) {
 				$qref = $GLOBALS['questions'][$qnidx].'-'.($qnidx+1);
 			} else {
 				$qref = '';
 			}
-			if ($extrefpt[0]=='video' || strpos($extrefpt[1],'youtube.com/watch')!==false) {
-				$extrefpt[1] = 'http://'. $_SERVER['HTTP_HOST'] . "$imasroot/assessment/watchvid.php?url=".urlencode($extrefpt[1]);
-				if ($extrefpt[0]=='video') {$extrefpt[0]='Video';}
-				echo formpopup($extrefpt[0],$extrefpt[1],660,530,"button",true,"video",$qref);
-			} else if ($extrefpt[0]=='read') {
-				echo formpopup("Read",$extrefpt[1],730,500,"button",true,"text",$qref);
-			} else {
-				echo formpopup($extrefpt[0],$extrefpt[1],730,500,"button",true,"text",$qref);
+			for ($i=0;$i<count($extref);$i++) {
+				$extrefpt = explode('!!',$extref[$i]);
+				if ($extrefpt[0]=='video' || strpos($extrefpt[1],'youtube.com/watch')!==false) {
+					$extrefpt[1] = $urlmode . $_SERVER['HTTP_HOST'] . "$imasroot/assessment/watchvid.php?url=".urlencode($extrefpt[1]);
+					if ($extrefpt[0]=='video') {$extrefpt[0]='Video';}
+					echo formpopup($extrefpt[0],$extrefpt[1],660,530,"button",true,"video",$qref);
+				} else if ($extrefpt[0]=='read') {
+					echo formpopup("Read",$extrefpt[1],730,500,"button",true,"text",$qref);
+				} else {
+					echo formpopup($extrefpt[0],$extrefpt[1],730,500,"button",true,"text",$qref);
+				}
 			}
+		}
+		if (($qdata['solutionopts']&2)==2 && $qdata['solution']!='') {
+			$addr = $urlmode. $_SERVER['HTTP_HOST'] . "$imasroot/assessment/showsoln.php?id=".$qidx.'&sig='.md5($qidx.$GLOBALS['sessiondata']['secsalt']);
+			$addr .= '&t='.($qdata['solutionopts']&1).'&cid='.$GLOBALS['cid'];
+			echo formpopup("Written Example",$addr,730,500,"button",true,"soln",$qref);	
 		}
 		echo '</p></div>';
 	}
 	
 	echo "<div>";
+	
 	foreach($tips as $iidx=>$tip) {
 		if ((!isset($hidetips) || (is_array($hidetips) && !isset($hidetips[$iidx])))&& !$seqinactive && $showtips>0) {
 			echo "<p class=\"tips\" ";
@@ -387,7 +411,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 				if ($nosabutton) {
 					echo filter("<div>" .  _('Answer:') . " {$showanswer[$iidx]} </div>\n");
 				} else {
-					echo "<div><input class=\"sabtn\" type=button value=\"Show Answer\" onClick='javascript:document.getElementById(\"ans$qnidx-$iidx\").className=\"shown\";' />";// AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
+					echo "<div><input class=\"sabtn\" type=button value=\""._('Show Answer')."\" onClick='javascript:document.getElementById(\"ans$qnidx-$iidx\").className=\"shown\";' />";// AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
 					echo filter(" <span id=\"ans$qnidx-$iidx\" class=\"hidden\">{$showanswer[$iidx]}</span></div>\n");
 				}
 			}
@@ -399,8 +423,16 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		if ($nosabutton) {
 			echo filter("<div>" . _('Answer:') . " $showanswer </div>\n");	
 		} else {
-			echo "<div><input class=\"sabtn\" type=button value=\"Show Answer\" onClick='javascript:document.getElementById(\"ans$qnidx\").className=\"shown\"; rendermathnode(document.getElementById(\"ans$qnidx\"));' />";
+			echo "<div><input class=\"sabtn\" type=button value=\""._('Show Answer')."\" onClick='javascript:document.getElementById(\"ans$qnidx\").className=\"shown\"; rendermathnode(document.getElementById(\"ans$qnidx\"));' />";
 			echo filter(" <span id=\"ans$qnidx\" class=\"hidden\">$showanswer </span></div>\n");
+		}
+	}
+	if ($doshowans && ($qdata['solutionopts']&4)==4 && $qdata['solution']!='') {
+		if ($nosabutton) {
+			echo filter("<div><p>" . _('Detailed Solution').'</p>'. $evaledsoln .'</div>');
+		} else {
+			echo "<div><input class=\"sabtn\" type=button value=\""._('Show Detailed Solution')."\" onClick='javascript:$(\"#soln$qnidx\").removeClass(\"hidden\"); rendermathnode(document.getElementById(\"soln$qnidx\"));' />";
+			echo filter(" <div id=\"soln$qnidx\" class=\"hidden review\" style=\"margin-top:5px;margin-bottom:5px;\">$evaledsoln </div></div>\n");
 		}
 	}
 	echo "</div>\n";

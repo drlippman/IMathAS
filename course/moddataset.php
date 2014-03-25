@@ -56,6 +56,10 @@
 		$_POST['qtext'] = stripsmartquotes(stripslashes($_POST['qtext']));
 		$_POST['control'] = addslashes(stripsmartquotes(stripslashes($_POST['control'])));
 		$_POST['qcontrol'] = addslashes(stripsmartquotes(stripslashes($_POST['qcontrol'])));
+		$_POST['solution'] = addslashes(stripsmartquotes(stripslashes($_POST['solution'])));
+		if (trim($_POST['solution'])=='<p></p>') {
+			$_POST['solution'] = '';
+		}
 		
 		if (strpos($_POST['qtext'],'data:image')!==false) {
 			require("../includes/htmLawed.php");
@@ -96,13 +100,26 @@
 		} else {
 			$replaceby = 0;
 		}
+		$solutionopts = 0;
+		if (isset($_POST['usesrand'])) {
+			$solutionopts += 1;
+		}
+		if (isset($_POST['useashelp'])) {
+			$solutionopts += 2;
+		}
+		if (isset($_POST['usewithans'])) {
+			$solutionopts += 4;
+		}
+		$_POST['qtext'] = preg_replace('/<([^<>]+?)>/',"&&&L$1&&&G",$_POST['qtext']);
+		$_POST['qtext'] = str_replace(array("<",">"),array("&lt;","&gt;"),$_POST['qtext']);
+		$_POST['qtext'] = str_replace(array("&&&L","&&&G"),array("<",">"),$_POST['qtext']);
+		$_POST['solution'] = preg_replace('/<([^<>]+?)>/',"&&&L$1&&&G",$_POST['solution']);
+		$_POST['solution'] = str_replace(array("<",">"),array("&lt;","&gt;"),$_POST['solution']);
+		$_POST['solution'] = str_replace(array("&&&L","&&&G"),array("<",">"),$_POST['solution']);
+		$_POST['description'] = str_replace(array("<",">"),array("&lt;","&gt;"),$_POST['description']);
 		
 		if (isset($_GET['id'])) { //modifying existing
 			$qsetid = $_GET['id'];
-			$_POST['qtext'] = preg_replace('/<([^<>]+?)>/',"&&&L$1&&&G",$_POST['qtext']);
-			$_POST['qtext'] = str_replace(array("<",">"),array("&lt;","&gt;"),$_POST['qtext']);
-			$_POST['qtext'] = str_replace(array("&&&L","&&&G"),array("<",">"),$_POST['qtext']);
-			$_POST['description'] = str_replace(array("<",">"),array("&lt;","&gt;"),$_POST['description']);
 			$isok = true;
 			if ($isgrpadmin) {
 				$query = "SELECT iq.id FROM imas_questionset AS iq,imas_users ";
@@ -125,8 +142,8 @@
 				}
 			}
 			$query = "UPDATE imas_questionset SET description='{$_POST['description']}',author='{$_POST['author']}',userights='{$_POST['userights']}',";
-			$query .= "qtype='{$_POST['qtype']}',control='{$_POST['control']}',qcontrol='{$_POST['qcontrol']}',";
-			$query .= "qtext='{$_POST['qtext']}',answer='{$_POST['answer']}',lastmoddate=$now,extref='$extref',replaceby=$replaceby ";
+			$query .= "qtype='{$_POST['qtype']}',control='{$_POST['control']}',qcontrol='{$_POST['qcontrol']}',solution='{$_POST['solution']}',";
+			$query .= "qtext='{$_POST['qtext']}',answer='{$_POST['answer']}',lastmoddate=$now,extref='$extref',replaceby=$replaceby,solutionopts=$solutionopts ";
 			$query .= "WHERE id='{$_GET['id']}'";
 			//checked separately above now
 			//if (!$isadmin && !$isgrpadmin) { $query .= " AND (ownerid='$userid' OR userights>2);";}
@@ -170,10 +187,6 @@
 			}
 			
 		} else { //adding new
-			$_POST['qtext'] = preg_replace('/<([^<>]+?)>/',"&&&L$1&&&G",$_POST['qtext']);
-			$_POST['qtext'] = str_replace(array("<",">"),array("&lt;","&gt;"),$_POST['qtext']);
-			$_POST['qtext'] = str_replace(array("&&&L","&&&G"),array("<",">"),$_POST['qtext']);
-			$_POST['description'] = str_replace(array("<",">"),array("&lt;","&gt;"),$_POST['description']);
 			$mt = microtime();
 			$uqid = substr($mt,11).substr($mt,2,6);
 			$ancestors = '';
@@ -187,9 +200,9 @@
 					$ancestors = $_GET['templateid'];
 				}
 			}
-			$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,description,ownerid,author,userights,qtype,control,qcontrol,qtext,answer,hasimg,ancestors,extref,replaceby) VALUES ";
+			$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,description,ownerid,author,userights,qtype,control,qcontrol,qtext,answer,hasimg,ancestors,extref,replaceby,solution,solutionopts) VALUES ";
 			$query .= "($uqid,$now,$now,'{$_POST['description']}','$userid','{$_POST['author']}','{$_POST['userights']}','{$_POST['qtype']}','{$_POST['control']}',";
-			$query .= "'{$_POST['qcontrol']}','{$_POST['qtext']}','{$_POST['answer']}','{$_POST['hasimg']}','$ancestors','$extref',$replaceby);";
+			$query .= "'{$_POST['qcontrol']}','{$_POST['qtext']}','{$_POST['answer']}','{$_POST['hasimg']}','$ancestors','$extref',$replaceby,'{$_POST['solution']}',$solutionopts);";
 			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 			$qsetid = mysql_insert_id();
 			$_GET['id'] = $qsetid;			
@@ -497,6 +510,8 @@
 			$line['qcontrol'] = '';
 			$line['qtext'] = '';
 			$line['answer'] = '';
+			$line['solution'] = '';
+			$line['solutionopts'] = 6;
 			$line['hasimg'] = 0;
 			$line['deleted'] = 0;
 			$line['replaceby'] = 0;
@@ -558,7 +573,7 @@
 	}
 	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/editor/tiny_mce.js?v=082911"></script>';
 	$placeinhead .= '<script type="text/javascript">
-	  var editoron = 0;
+	  var editoron = 0; var seditoron = 0;
 	  var coursetheme = "'.$coursetheme.'";';
 	if (!isset($CFG['GEN']['noFileBrowser'])) {
 		$placeinhead .= 'var fileBrowserCallBackFunc = "fileBrowserCallBack";';
@@ -566,22 +581,28 @@
 		$placeinhead .= 'var fileBrowserCallBackFunc = null;';
 	}
 
-	$placeinhead .= 'function toggleeditor() {
-	     var qtextbox =  document.getElementById("qtext");
-	     if (editoron==0) {
+	$placeinhead .= 'function toggleeditor(el) {
+	     var qtextbox =  document.getElementById(el);
+	     if ((el=="qtext" && editoron==0) || (el=="solution" && seditoron==0)) {
 	        qtextbox.rows += 3;
 		qtextbox.value = qtextbox.value.replace(/<span\s+class="AM"[^>]*>(.*?)<\\/span>/,"$1");
 	        qtextbox.value = qtextbox.value.replace(/`(.*?)`/,\'<span class="AM" title="$1">`$1`</span>\');
-	        initeditor("exact","qtext",1);
+	        initeditor("exact",el,1);
 	     } else {
-		tinyMCE.execCommand("mceRemoveControl",true,"qtext");
+		tinyMCE.execCommand("mceRemoveControl",true,el);
 		qtextbox.rows -= 3;
 		qtextbox.value = qtextbox.value.replace(/<span\s+class="AM"[^>]*>(.*?)<\\/span>/,"$1");
 	     }
-	     editoron = 1 - editoron;
-	     document.cookie = "qeditoron="+editoron;
+	     if (el=="qtext") {
+	     	editoron = 1 - editoron;
+	     	document.cookie = "qeditoron="+editoron;
+	     } else if (el=="solution") {
+	     	seditoron = 1 - seditoron;
+	     	sdocument.cookie = "seditoron="+seditoron;
+	     }
 	   }
-	   addLoadEvent(function(){if (document.cookie.match(/qeditoron=1/)) {toggleeditor();}});
+	   addLoadEvent(function(){if (document.cookie.match(/qeditoron=1/)) {toggleeditor("qtext");}});
+	   addLoadEvent(function(){if (document.cookie.match(/seditoron=1/)) {toggleeditor("solution");}});
 	   </script>';
 	
 	require("../header.php");
@@ -781,7 +802,7 @@ Question Control: <span class=pointer onclick="incboxsize('qcontrol')">[+]</span
 </div>
 <div id=qtbox>
 Question Text: <span class=pointer onclick="incboxsize('qtext')">[+]</span><span class=pointer onclick="decboxsize('qtext')">[-]</span>
-<input type="button" onclick="toggleeditor()" value="Toggle Editor"/>
+<input type="button" onclick="toggleeditor('qtext')" value="Toggle Editor"/>
 <input type=submit value="Save">
 <input type=submit name=test value="Save and Test Question"><BR>
 <textarea style="width: 100%" cols=60 rows=<?php echo min(35,max(10,substr_count($line['qtext'],"\n")+1));?> id="qtext" name="qtext" <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$line['qtext']);?></textarea>
@@ -791,6 +812,31 @@ Answer: <span class=pointer onclick="incboxsize('answer')">[+]</span><span class
 <input type=submit value="Save">
 <input type=submit name=test value="Save and Test Question"><BR>
 <textarea style="width: 100%" cols=60 rows=10 id=answer name=answer <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $line['answer'];?></textarea>
+</div>
+<?php
+if ($line['solution']=='') {
+	echo '<p><a href="#" onclick="$(this).parent().hide();$(\'#solutionwrapper\').show();return false;">Add a detailed solution</a></p>';
+	echo '<div id="solutionwrapper" style="display:none;">';
+} else {
+	echo '<div id="solutionwrapper">';
+}
+?>
+Detailed Solution: 
+<span class=pointer onclick="incboxsize('solution')">[+]</span><span class=pointer onclick="decboxsize('solution')">[-]</span>
+<input type="button" onclick="toggleeditor('solution')" value="Toggle Editor"/>
+<input type=submit value="Save">
+<input type=submit name=test value="Save and Test Question"><br/>
+<input type="checkbox" name="usesrand" value="1" <?php if (($line['solutionopts']&1)==1) {echo 'checked="checked"';};?>
+   onclick="$('#userandnote').toggle()">
+Uses random variables from the question. 
+ <span id="userandnote" <?php if (($line['solutionopts']&1)==1) {echo 'style="display:none;"';}?>>
+   <i>Be sure to include the question you are solving in the text</i>
+ </span><br/>
+<input type="checkbox" name="useashelp" value="2" <?php if (($line['solutionopts']&2)==2) {echo 'checked="checked"';};?>>
+Use this as a "written example" help button<br/>
+<input type="checkbox" name="usewithans" value="4" <?php if (($line['solutionopts']&4)==4) {echo 'checked="checked"';};?>>
+Display with the "Show Answer"<br/>
+<textarea style="width: 100%" cols=60 rows=<?php echo min(35,max(10,substr_count($line['solution'],"\n")+1));?> id="solution" name="solution" <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$line['solution']);?></textarea>
 </div>
 <div id=imgbox>
 <input type="hidden" name="MAX_FILE_SIZE" value="500000" />
