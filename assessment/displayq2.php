@@ -296,7 +296,12 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	eval("\$evaledqtext = \"$toevalqtxt\";");
 	eval("\$evaledsoln = \"$toevalsoln\";");
 	if ($returnqtxt===2) {
-		return $evaledsoln;
+		return '<div id="writtenexample" class="review">'.$evaledsoln.'</div>';
+	} else if ($returnqtxt===3) {
+		return '<div class="question">'.$evaledqtext.'</div><div id="writtenexample" class="review">'.$evaledsoln.'</div>';
+	}
+	if (($qdata['solutionopts']&1)==0) {
+		$evaledsoln = '<i>'._('This solution is for a similar problem, not your specific version').'</i><br/>'.$evaledsoln;
 	}
 	
 	if (strpos($evaledqtext,'[AB')!==false) {
@@ -380,6 +385,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		}
 		if (($qdata['solutionopts']&2)==2 && $qdata['solution']!='') {
 			$addr = $urlmode. $_SERVER['HTTP_HOST'] . "$imasroot/assessment/showsoln.php?id=".$qidx.'&sig='.md5($qidx.$GLOBALS['sessiondata']['secsalt']);
+			$addr .= '&t='.($qdata['solutionopts']&1).'&cid='.$GLOBALS['cid'];
 			echo formpopup("Written Example",$addr,730,500,"button",true,"soln",$qref);	
 		}
 		echo '</p></div>';
@@ -425,8 +431,8 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		if ($nosabutton) {
 			echo filter("<div><p>" . _('Detailed Solution').'</p>'. $evaledsoln .'</div>');
 		} else {
-			echo "<div><input class=\"sabtn\" type=button value=\""._('Show Detailed Solution')."\" onClick='javascript:document.getElementById(\"soln$qnidx\").className=\"shown\"; rendermathnode(document.getElementById(\"ans$qnidx\"));' />";
-			echo filter(" <div id=\"soln$qnidx\" class=\"hidden\">$evaledsoln </div></div>\n");
+			echo "<div><input class=\"sabtn\" type=button value=\""._('Show Detailed Solution')."\" onClick='javascript:$(\"#soln$qnidx\").removeClass(\"hidden\"); rendermathnode(document.getElementById(\"soln$qnidx\"));' />";
+			echo filter(" <div id=\"soln$qnidx\" class=\"hidden review\" style=\"margin-top:5px;margin-bottom:5px;\">$evaledsoln </div></div>\n");
 		}
 	}
 	echo "</div>\n";
