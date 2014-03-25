@@ -1,10 +1,43 @@
 <?php
-//Some solving algorithms.  Version 1.0 Oct 6, 2009
+//Some solving algorithms.  Version 1.1 March 25, 2014
+//You should ALMOST NEVER need to use these - in most cases it is better
+//to construct an equation from a known solution
 
 global $allowedmacros;
-array_push($allowedmacros, "discretenewtons");
+array_push($allowedmacros, "discretenewtons", "bisectionsolve");
 
-
+//bisectionsolve(function, xmin, xmax)
+//applies bisection to find a root of hte function on the interval [xmin, xmax]
+//this function only works if there is exactly one root in the interval.
+function bisectionsolve($func, $xmin, $xmax) {
+	if ($xmin >= $xmax) {
+		echo "error: need $xmin < $xmax";
+		return null;
+	}
+	$left = $xmin;  $right = $xmax;
+	
+	$func = makepretty($func);
+	$func = mathphp($func,"x");
+	$func = str_replace("(x)",'($x)',$func);
+	$f = create_function('$x','return ('.$func.');');
+	$fleft = $f($left);
+	if ($fleft*$f($right)>0) {
+		echo "error: function is same sign at both endpoints";
+		return null;
+	}
+	
+	do {
+		$x = ($left + $right)/2;
+		$y = $f($x);
+		if ($fleft*$y>0) { //same sign as fleft - $x becomes new left
+			$left = $x;
+		} else {
+			$right = $x;
+		}
+	} while (abs($left - $right)>1e-7);
+	
+	return $x;
+}
 	
 //discretenewtons(function,xmin,xmax,[guess]) 
 //applies a discrete form of Newton's method to find a root of the function
