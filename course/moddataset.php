@@ -101,9 +101,9 @@
 			$replaceby = 0;
 		}
 		$solutionopts = 0;
-		//if (isset($_POST['usesrand'])) {
-		//	$solutionopts += 1;
-		//}
+		if (isset($_POST['usesrand'])) {
+			$solutionopts += 1;
+		}
 		if (isset($_POST['useashelp'])) {
 			$solutionopts += 2;
 		}
@@ -826,6 +826,12 @@ Detailed Solution:
 <input type="button" onclick="toggleeditor('solution')" value="Toggle Editor"/>
 <input type=submit value="Save">
 <input type=submit name=test value="Save and Test Question"><br/>
+<input type="checkbox" name="usesrand" value="1" <?php if (($line['solutionopts']&1)==1) {echo 'checked="checked"';};?>
+   onclick="$('#userandnote').toggle()">
+Uses random variables from the question. 
+ <span id="userandnote" <?php if (($line['solutionopts']&1)==1) {echo 'style="display:none;"';}?>>
+   <i>Be sure to include the question you are solving in the text</i>
+ </span><br/>
 <input type="checkbox" name="useashelp" value="2" <?php if (($line['solutionopts']&2)==2) {echo 'checked="checked"';};?>>
 Use this as a "written example" help button<br/>
 <input type="checkbox" name="usewithans" value="4" <?php if (($line['solutionopts']&4)==4) {echo 'checked="checked"';};?>>
