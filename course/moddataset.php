@@ -56,7 +56,10 @@
 		$_POST['qtext'] = stripsmartquotes(stripslashes($_POST['qtext']));
 		$_POST['control'] = addslashes(stripsmartquotes(stripslashes($_POST['control'])));
 		$_POST['qcontrol'] = addslashes(stripsmartquotes(stripslashes($_POST['qcontrol'])));
-		$_POST['solution'] = addslashes(stripsmartquotes(stripslashes($_POST['solution'])));
+		$_POST['solution'] = stripsmartquotes(stripslashes($_POST['solution']));
+		$_POST['qtext'] = preg_replace('/<span\s+class="AM"[^>]*>(.*?)<\/span>/sm','$1', $_POST['qtext']);
+		$_POST['solution'] = preg_replace('/<span\s+class="AM"[^>]*>(.*?)<\/span>/sm','$1', $_POST['solution']);
+		
 		if (trim($_POST['solution'])=='<p></p>') {
 			$_POST['solution'] = '';
 		}
@@ -66,6 +69,7 @@
 			$_POST['qtext'] = convertdatauris($_POST['qtext']);
 		}
 		$_POST['qtext'] = addslashes($_POST['qtext']);
+		$_POST['solution'] = addslashes($_POST['solution']);
 		
 		//handle help references
 		if (isset($_GET['id']) || isset($_GET['templateid'])) {
@@ -598,11 +602,17 @@
 	     	document.cookie = "qeditoron="+editoron;
 	     } else if (el=="solution") {
 	     	seditoron = 1 - seditoron;
-	     	sdocument.cookie = "seditoron="+seditoron;
+	     	document.cookie = "seditoron="+seditoron;
 	     }
 	   }
-	   addLoadEvent(function(){if (document.cookie.match(/qeditoron=1/)) {toggleeditor("qtext");}});
-	   addLoadEvent(function(){if (document.cookie.match(/seditoron=1/)) {toggleeditor("solution");}});
+	   addLoadEvent(function(){if (document.cookie.match(/qeditoron=1/)) {
+	   	var val = document.getElementById("qtext").value; 
+	   	if (val.length<3 || val.match(/<.*?>/)) {toggleeditor("qtext");}
+	   }});
+	   addLoadEvent(function(){if (document.cookie.match(/seditoron=1/)) {
+	   	var val = document.getElementById("solution").value; 
+	   	if (val.length<3 || val.match(/<.*?>/)) {toggleeditor("solution");}
+	   }});
 	   </script>';
 	
 	require("../header.php");
