@@ -167,7 +167,21 @@ function intcalculate(inputId,outputId,format) {
 	  } else {
 		  fullstr = fullstr.replace(/\s+/g,'');
 	  }
-	  var strarr = fullstr.split(/U/);
+	  if (format.indexOf('list')!=-1) {
+	  	var lastpos = 0; var strarr = [];
+		for (var pos = 1; pos<fullstr.length-1; pos++) {
+			if (fullstr.charAt(pos)==',') {
+				if ((fullstr.charAt(pos-1)==')' || fullstr.charAt(pos-1)==']')
+					&& (fullstr.charAt(pos+1)=='(' || fullstr.charAt(pos+1)=='[')) {
+					strarr.push(fullstr.substring(lastpos,pos));
+					lastpos = pos+1;
+				}
+			}
+		}
+		strarr.push(fullstr.substring(lastpos));
+	  } else {
+	  	  var strarr = fullstr.split(/U/);
+	  }
 	  var isok = true;
 	  for (i=0; i<strarr.length; i++) {
 		  str = strarr[i];
@@ -239,7 +253,11 @@ function intcalculate(inputId,outputId,format) {
 		 	 if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1 || format.indexOf('scinot')!=-1 || format.indexOf('noval')!=-1) {
 				  fullstr = '`'+strarr.join('uu') + '`';	 
 			 } else {
-			 	 fullstr = '`'+strarr.join('uu') + '` = ' + calcstrarr.join(' U ');
+			 	 if (format.indexOf('list')!=-1) {
+			 	 	 fullstr = '`'+strarr.join(',') + '` = ' + calcstrarr.join(' , '); 
+			 	 } else {
+			 	 	 fullstr = '`'+strarr.join('uu') + '` = ' + calcstrarr.join(' U ');
+			 	 }
 			 }
 		 }
 	 }
@@ -685,7 +703,21 @@ function doonsubmit(form,type2,skipconfirm) {
 			  if (calcformat[qn].indexOf('inequality')!=-1) {
 				  fullstr = ineqtointerval(fullstr);
 			  }
-			  strarr = fullstr.split(/U/);
+			  if (calcformat[qn].indexOf('list')!=-1) {
+				var lastpos = 0; var strarr = [];
+				for (var pos = 1; pos<fullstr.length-1; pos++) {
+					if (fullstr.charAt(pos)==',') {
+						if ((fullstr.charAt(pos-1)==')' || fullstr.charAt(pos-1)==']')
+							&& (fullstr.charAt(pos+1)=='(' || fullstr.charAt(pos+1)=='[')) {
+							strarr.push(fullstr.substring(lastpos,pos));
+							lastpos = pos+1;
+						}
+					}
+				}
+				strarr.push(fullstr.substring(lastpos));
+			  } else {
+				  var strarr = fullstr.split(/U/);
+			  }
 			  for (k=0; k<strarr.length; k++) {
 				  str = strarr[k];
 				  if (str.length>0 && str.match(/,/)) {
@@ -710,7 +742,11 @@ function doonsubmit(form,type2,skipconfirm) {
 					  strarr[k] = sm + vals[0] + ',' + vals[1] + em;
 				  }
 			 }
-			 fullstr = strarr.join('U');
+			 if (calcformat[qn].indexOf('list')!=-1) {
+			 	 fullstr = strarr.join(',');
+			 } else {
+			 	 fullstr = strarr.join('U');
+			 }
 		  }
 		  document.getElementById("qn" + qn).value = fullstr;
 	}

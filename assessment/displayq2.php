@@ -1913,8 +1913,14 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$shorttip = _('Enter an interval using inequalities');
 		} else {
 			$tip = _('Enter your answer using interval notation.  Example: [2.1,5.6)') . " <br/>";
-			$tip .= _('Use U for union to combine intervals.  Example: (-oo,2] U [4,oo)') . "<br/>";
-			$shorttip = _('Enter an interval using interval notation');
+			if (in_array('list',$ansformats)) {
+				$tip .= _('Separate intervals by a comma.  Example: (-oo,2],[4,oo)') . "<br/>";
+				$shorttip = _('Enter a list of intervals using interval notation');
+			} else {
+				$tip .= _('Use U for union to combine intervals.  Example: (-oo,2] U [4,oo)') . "<br/>";
+				$shorttip = _('Enter an interval using interval notation');
+			}
+			
 		}
 		//$tip .= "Enter values as numbers (like 5, -3, 2.2) or as calculations (like 5/3, 2^3, 5+4)<br/>";
 		//$tip .= "Enter DNE for an empty set, oo for Infinity";
@@ -3642,7 +3648,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					}
 				}
 			} else {
-				$orarr = explode('U',$_POST["tc$qn"]);
+				if (in_array('list',$ansformats)) {
+					$orarr = preg_split('/(?<=[\)\]]),(?=[\(\[])/',$_POST["tc$qn"]);
+				} else {
+					$orarr = explode('U',$_POST["tc$qn"]);
+				}
 				foreach ($orarr as $opt) {
 					$opt = trim($opt);
 					$opts = explode(',',substr($opt,1,strlen($opt)-2));
@@ -3671,8 +3681,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					continue;
 				}
 			}
-			$aarr = explode('U',$anans);
-			$gaarr = explode('U',$givenans);
+			if (in_array('list',$ansformats)) {
+				$aarr = preg_split('/(?<=[\)\]]),(?=[\(\[])/',$anans);
+				$gaarr = preg_split('/(?<=[\)\]]),(?=[\(\[])/',$givenans);
+			} else {
+				$aarr = explode('U',$anans);
+				$gaarr = explode('U',$givenans);
+			}
 			if (count($aarr)!=count($gaarr)) {
 				continue;
 			}
