@@ -92,7 +92,7 @@ if (isset($_POST['mergefrom'])) {
 		if (isset($_POST['nameasheader'])) {
 			$thisintro = '<h3>'.$thisname.'</h3>'.$thisintro;
 		}
-		if ($_POST['mergetype']==0) {
+		if ($_POST['mergetype']==0 || $_POST['mergetype']==3) {
 			$thisintro = preg_replace_callback('/\[QUESTION\s*(\d+)\s*\]/','incrementqnum',$thisintro);
 			$intro .= $thisintro;
 		} else if ($_POST['mergetype']==1) {
@@ -109,6 +109,41 @@ if (isset($_POST['mergefrom'])) {
 			$intro .= $thisintro;
 		}
 		$qcnt += $thisqcnt;
+	}
+	if ($_POST['mergetype']==3) {
+		$text = preg_replace('/<p[^>]*>(\s|&nbsp;)*(\[QUESTION.*?\])(\s|&nbsp;)*<\/p>/sm', ' $2 ', $intro);
+		$text = preg_replace('/<p[^>]*>(\s|&nbsp;)*(\[PAGE.*?\])(\s|&nbsp;)*<\/p>/sm', '', $text);
+		$text = preg_replace('/<p[^>]*>(\s|&nbsp;)*<span[^>]*>(\s|&nbsp;)*(\[QUESTION.*?\])(\s|&nbsp;)*<\/span>(\s|&nbsp;)*<\/p>/sm', ' $3 ', $text);
+		$text = preg_replace('/<p[^>]*>(\s|&nbsp;)*<span[^>]*>(\s|&nbsp;)*(\[PAGE.*?\])(\s|&nbsp;)*<\/span>(\s|&nbsp;)*<\/p>/sm', '', $text);
+		
+		$sp = preg_split('/\[QUESTION\s*(\d+)\]/', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
+		
+		$n = 0;
+		$out = '';
+		
+		while (isset($sp[$n])) {
+			$text = trim($sp[$n]);
+			$qn = array($sp[$n+1]);
+			$n+=2;
+			while (isset($sp[$n]) && trim($sp[$n])=='' && isset($sp[$n+1])) {
+				$qn[1] = $sp[$n+1];
+				$n+=2;
+			}
+			if (isset($sp[$n]) && !isset($sp[$n+1])) { //last item in the set
+				$text .= trim($sp[$n]);
+				$n++;
+			}
+			$out .= '<p>';
+			if (count($qn)==1) {
+				$out .= '[Q '.$qn[0].']';
+			} else {
+				$out .= '[Q '.implode('-',$qn).']';
+			}
+			$out .= '</p>';
+			
+			$out .= $text;
+		}	
+		$intro = $out;
 	}
 	$intro = addslashes($intro);
 	$newitemorder = implode(',',$newaitems);
@@ -192,6 +227,7 @@ if (isset($_POST['mergefrom'])) {
 	echo '<p>Intro merge type:<br/><input type="radio" name="mergetype" value="0" checked="checked" />Just merge text (and adjust existing [QUESTION #] tags) ';
 	echo '<br/><input type="radio" name="mergetype" value="1" /> Add Embed [QUESTION #] tags ';
 	echo ' <br/><input type="radio" name="mergetype" value="2" /> Add Skip Around [Q #] tags ';
+	echo ' <br/><input type="radio" name="mergetype" value="3" /> Merge text, convert [QUESTION #] tags to Skip Around [Q #] tags ';
 	echo ' <br/><input type="checkbox" name="addpages" value="1" />Add Page [PAGE] tags </p> ';
 	echo '<input type="submit" value="Go">';
 	echo '</form>';
