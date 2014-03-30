@@ -40,7 +40,7 @@ switch($_GET['action']) {
 			echo "<span class=form>First Name:</span> <input class=form type=text size=40 name=firstname><BR class=form>\n";
 			echo "<span class=form>Last Name:</span> <input class=form type=text size=40 name=lastname><BR class=form>\n";
 			echo "<span class=form>Email:</span> <input class=form type=text size=40 name=email><BR class=form>\n";
-			echo "<span class=form>Password will default to: </span><span class=formright>password</span><BR class=form>\n";
+			echo '<span class="form">Password:</span> <input class="form" type="text" size="40" name="password"/><br class="form"/>';
 			$oldgroup = 0;
 			$oldrights = 10;
 		} else {

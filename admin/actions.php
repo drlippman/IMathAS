@@ -94,7 +94,7 @@ switch($_GET['action']) {
 			exit;
 		}
 		
-		$md5pw =md5("password");
+		$md5pw =md5($_POST['password']);
 		if ($myrights < 100) {
 			$newgroup = $groupid;
 		} else if ($myrights == 100) {
@@ -107,6 +107,15 @@ switch($_GET['action']) {
 		}
 		$query = "INSERT INTO imas_users (SID,password,FirstName,LastName,rights,email,groupid,homelayout) VALUES ('{$_POST['adminname']}','$md5pw','{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['newrights']}','{$_POST['email']}','$newgroup','$homelayout');";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$newuserid = mysql_insert_id();
+		if (isset($CFG['GEN']['enrollonnewinstructor'])) {
+			$valbits = array();
+			foreach ($CFG['GEN']['enrollonnewinstructor'] as $ncid) {
+				$valbits[] = "('$newuserid','$ncid')";
+			}
+			$query = "INSERT INTO imas_students (userid,courseid) VALUES ".implode(',',$valbits);
+			mysql_query($query) or die("Query failed : " . mysql_error());
+		}
 		break;
 	case "logout":
 		$sessionid = session_id();

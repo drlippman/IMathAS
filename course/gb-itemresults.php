@@ -73,11 +73,11 @@ while ($row = mysql_fetch_row($result)) {
 		$qatt = explode('&',$qatt);
 		$qscore = explode('~',$scores[$k]);
 		foreach ($qatt as $kp=>$lav) {
-			if (strpos($lav,'$!$')) {
+			if (strpos($lav,'$!$')!==false) {
 				$tmp = explode('$!$',$lav);
 				$qatt[$kp] = $tmp[1];
 			}
-			if (strpos($lav,'$#$')) {
+			if (strpos($lav,'$#$')!==false) {
 				$tmp = explode('$#$',$lav);
 				$qatt[$kp] = $tmp[0];
 			}
