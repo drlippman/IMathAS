@@ -896,7 +896,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if ($displayformat == 'inline') {
 			$out .= "<span $style>";
 		} else if ($displayformat != 'select') {
-			$out .= "<div $style style=\"display:block\">";
+			$out .= "<div $style style=\"display:block\" class=\"clearfix\">";
 		}
 		if ($displayformat == "select") { 
 			$msg = '?';
@@ -948,11 +948,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			}
 		}
 		if ($displayformat == "horiz") {
-			$out .= "<div class=spacer>&nbsp;</div>\n";
+			//$out .= "<div class=spacer>&nbsp;</div>\n";
 		} else if ($displayformat == "select") {
 			$out .= "</select>\n";
 		} else if ($displayformat == 'column') {
-			$out .= "</ul></div><div class=spacer>&nbsp;</div>\n";
+			$out .= "</ul></div>";//<div class=spacer>&nbsp;</div>\n";
 		} else if ($displayformat == "inline") {
 			
 		} else {
@@ -1016,7 +1016,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if ($displayformat == 'inline') {
 			$out .= "<span $style>";
 		} else  {
-			$out .= "<div $style style=\"display:block\">";
+			$out .= "<div $style style=\"display:block\" class=\"clearfix\">";
 		}
 		if ($displayformat == "horiz") {
 			
@@ -1055,11 +1055,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			}
 		}
 		if ($displayformat == "horiz") {
-			$out .= "<div class=spacer>&nbsp;</div>\n";
+			//$out .= "<div class=spacer>&nbsp;</div>\n";
 		} else if ($displayformat == "inline") {
 			
 		} else if ($displayformat == 'column') {
-			$out .= "</ul></div><div class=spacer>&nbsp;</div>\n";
+			$out .= "</ul></div>";//<div class=spacer>&nbsp;</div>\n";
 		} else {
 			$out .= "</ul>\n";
 		}
