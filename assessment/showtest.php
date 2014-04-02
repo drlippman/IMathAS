@@ -1176,6 +1176,7 @@ if (!isset($_POST['embedpostback'])) {
 	//identify question-specific  intro/instruction 
 	//comes in format [Q 1-3] in intro
 	if (strpos($testsettings['intro'],'[Q')!==false) {
+		$testsettings['intro'] = preg_replace('/((<span|<strong|<em)[^>]*>)?\[Q\s+(\d+(\-(\d+))?)\s*\]((<\/span|<\/strong|<\/em)[^>]*>)?/','[Q $3]',$testsettings['intro']);
 		if(preg_match_all('/\<p[^>]*>\s*\[Q\s+(\d+)(\-(\d+))?\s*\]\s*<\/p>/',$testsettings['intro'],$introdividers,PREG_SET_ORDER)) {
 			$intropieces = preg_split('/\<p[^>]*>\s*\[Q\s+(\d+)(\-(\d+))?\s*\]\s*<\/p>/',$testsettings['intro']);
 			foreach ($introdividers as $k=>$v) {

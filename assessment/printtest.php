@@ -115,6 +115,31 @@
 	$showeachscore = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="AsGo" || $testsettings['testtype']=="Homework");
 	$showansduring = (($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework") && $testsettings['showans']!='N');
 	echo "<div class=breadcrumb>Print Ready Version</div>";
+	
+	$endtext = '';  $intropieces = array();
+	if (strpos($testsettings['intro'], '[QUESTION')!==false) {
+		//embedded type	
+		$intro = preg_replace('/<p>((<span|<strong|<em)[^>]*>)?\[QUESTION\s+(\d+)\s*\]((<\/span|<\/strong|<\/em)[^>]*>)?<\/p>/','[QUESTION $3]',$testsettings['intro']);
+		$introsplit = preg_split('/\[QUESTION\s+(\d+)\]/', $intro, -1, PREG_SPLIT_DELIM_CAPTURE);
+		
+		for ($i=1;$i<count($introsplit);$i+=2) {
+			$intropieces[$introsplit[$i]] = $introsplit[$i-1];
+		}
+		//no specific start text - will just go before first question
+		$testsettings['intro'] = '';
+		$endtext = $introsplit[count($introsplit)-1];
+	} else if (strpos($testsettings['intro'], '[Q ')!==false) {
+		//question info type
+		$intro = preg_replace('/<p>((<span|<strong|<em)[^>]*>)?\[Q\s+(\d+(\-(\d+))?)\s*\]((<\/span|<\/strong|<\/em)[^>]*>)?<\/p>/','[Q $3]',$testsettings['intro']);
+		$introsplit = preg_split('/\[Q\s+(.*?)\]/', $intro, -1, PREG_SPLIT_DELIM_CAPTURE);
+		$testsettings['intro'] = $introsplit[0];
+		for ($i=1;$i<count($introsplit);$i+=2) {
+			$p = explode('-',$introsplit[$i]);
+			$intropieces[$p[0]] = $introsplit[$i+1];
+		}
+	}
+	
+	
 	echo '<div class=intro>'.$testsettings['intro'].'</div>';
 	if ($isteacher && !$scoredview) {
 		echo '<input type="button" class="btn" onclick="rendersa()" value="Show Answers" /> <a href="printtest.php?cid='.$cid.'&asid='.$testid.'&scored=true">Show Scored View</a>';
@@ -128,6 +153,9 @@
 		$cat = $qi[$questions[$i]]['category'];
 		
 		$showa = $isteacher;
+		if (isset($intropieces[$i+1])) {
+			echo '<div class="intro">'.$intropieces[$i+1].'</div>';	
+		}
 		echo '<div class="nobreak">';
 		if (isset($_GET['descr'])) {
 			$query = "SELECT description FROM imas_questionset WHERE id='$qsetid'";
@@ -222,5 +250,8 @@
 		echo "<hr />";	
 		echo '</div>';
 		
+	}
+	if ($endtext != '') {
+		echo '<div class="intro">'.$endtext.'</div>';
 	}
 ?>
