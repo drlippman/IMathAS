@@ -2107,6 +2107,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				if (count($answerformat)>1 && $answerformat[1]=='lineseg') { $out .= 'class="sel" '; $def = 5.3;}
 				$out .= "/>";
 			}
+			if (in_array('ray',$answerformat)) {
+				$out .= "<img src=\"$imasroot/img/tpline2.gif\" onclick=\"settool(this,$qn,5.2)\" ";
+				if (count($answerformat)>1 && $answerformat[1]=='ray') { $out .= 'class="sel" '; $def = 5.2;}
+				$out .= "/>";
+			}
 			if (count($answerformat)==1 || in_array('parab',$answerformat)) {
 				$out .= "<img src=\"$imasroot/img/tpparab.png\" onclick=\"settool(this,$qn,6)\" ";
 				if (count($answerformat)>1 && $answerformat[1]=='parab') { $out .= 'class="sel" '; $def = 6;}
@@ -2138,6 +2143,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			if (count($answerformat)==1 || in_array('dot',$answerformat)) {
 				$out .= "<img src=\"$imasroot/img/tpdot.gif\" onclick=\"settool(this,$qn,1)\" ";
 				if (count($answerformat)>1 && $answerformat[1]=='dot') { $out .= 'class="sel" '; $def = 1;}
+				$out .= '/>';
+			}
+			if (in_array('opendot',$answerformat)) {
+				$out .= "<img src=\"$imasroot/img/tpodot.gif\" onclick=\"settool(this,$qn,2)\" ";
+				if (count($answerformat)>1 && $answerformat[1]=='opendot') { $out .= 'class="sel" '; $def = 2;}
 				$out .= '/>';
 			}
 			if (in_array('trig',$answerformat)) {
@@ -2254,6 +2264,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					} else { //is function
 						$saarr[$k] = $function[0].',blue';
 						if (count($function)>2) {
+							if ($function[1] == '-oo') { $function[1] = $settings[0]-.1*($settings[1]-$settings[0]);}
+							if ($function[2] == 'oo') { $function[2] = $settings[1]+.1*($settings[1]-$settings[0]);}
 							$saarr[$k] .= ','.$function[1].','.$function[2];
 							if ($locky==1) {
 								$saarr[$k] .=',,,3';
@@ -3965,14 +3977,24 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					$anscircs[$key] = array(($function[1] - $settings[0])*$pixelsperx + $imgborder,$settings[7] - ($function[2]-$settings[2])*$pixelspery - $imgborder,$function[3]*$pixelsperx);
 				} else if (substr($function[0],0,2)=='x=') {
 					$anslines[$key] = array('x',10000,(substr($function[0],2)- $settings[0])*$pixelsperx + $imgborder );
-				} else if (count($function)==3) { //line segment
+				} else if (count($function)==3) { //line segment or ray
 					$func = makepretty($function[0]);
 					$func = mathphp($func,'x');
 					$func = str_replace("(x)",'($x)',$func);
 					$func = create_function('$x', 'return ('.$func.');');
-					$y1p = $ytopix($func(floatval($function[1])));
-					$y2p = $ytopix($func(floatval($function[2])));
-					$ansvecs[$key] = array('ls', $xtopix($function[1]), $y1p, $xtopix($function[2]), $y2p);
+					if ($function[1]=='-oo') { //ray to left
+						$y1p = $ytopix($func(floatval($function[2])-1));
+						$y2p = $ytopix($func(floatval($function[2])));
+						$ansvecs[$key] = array('r', $xtopix($function[2]), $y2p, $xtopix($function[1]-1), $y1p);
+					} else if ($function[2]=='oo') { //ray to right
+						$y1p = $ytopix($func(floatval($function[1])));
+						$y2p = $ytopix($func(floatval($function[1])+1));
+						$ansvecs[$key] = array('r', $xtopix($function[1]), $y1p, $xtopix($function[1]+1), $y2p);
+					} else { //line seg
+						$y1p = $ytopix($func(floatval($function[1])));
+						$y2p = $ytopix($func(floatval($function[2])));
+						$ansvecs[$key] = array('ls', $xtopix($function[1]), $y1p, $xtopix($function[2]), $y2p);
+					}
 				} else {
 					$func = makepretty($function[0]);
 					$func = mathphp($func,'x');
@@ -4120,6 +4142,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 								$lines[] = array('y',$slope,$pts[2]+($x2p-$pts[1])*$slope);
 							}
 						}
+					} else if ($pts[0]==5.2) {
+						$vecs[] = array($pts[1],$pts[2],$pts[3],$pts[4],'r');	
 					} else if ($pts[0]==5.3) {
 						$vecs[] = array($pts[1],$pts[2],$pts[3],$pts[4],'ls');	
 					} else if ($pts[0]==5.4) {
@@ -4191,11 +4215,29 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					$dots[$k] = explode(',',$pt);
 				}
 			}
+			if ($odots=='') {
+				$odots = array();
+			} else {
+				$odots = explode('),(', substr($odots,1,strlen($odots)-2));
+				foreach ($odots as $k=>$pt) {
+					$odots[$k] = explode(',',$pt);
+				}
+			}
+
 			$scores = array();
 			foreach ($ansdots as $key=>$ansdot) {
 				$scores[$key] = 0;
 				for ($i=0; $i<count($dots); $i++) {
 					if (($dots[$i][0]-$ansdot[0])*($dots[$i][0]-$ansdot[0]) + ($dots[$i][1]-$ansdot[1])*($dots[$i][1]-$ansdot[1]) <= 25*max(1,$reltolerance)) {
+						$scores[$key] = 1;
+						break;
+					}
+				}
+			}
+			foreach ($ansodots as $key=>$ansodot) {
+				$scores[$key] = 0;
+				for ($i=0; $i<count($odots); $i++) {
+					if (($odots[$i][0]-$ansodot[0])*($odots[$i][0]-$ansodot[0]) + ($odots[$i][1]-$ansodot[1])*($odots[$i][1]-$ansodot[1]) <= 25*max(1,$reltolerance)) {
 						$scores[$key] = 1;
 						break;
 					}
@@ -4245,7 +4287,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					break;
 				}
 			}
-			
+
 			foreach ($ansvecs as $key=>$ansvec) {
 				$scores[$key] = 0;
 				if ($ansvec[0]=='p') {  //point
@@ -4263,6 +4305,46 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						if (abs($ansvec[4]-$vecs[$i][3])>$defpttol*$reltolerance) {
 							continue;
 						}
+						$scores[$key] = 1;
+						break;
+					}
+				} else if ($ansvec[0]=='r') {  //ray
+					for ($i=0; $i<count($vecs); $i++) {
+						if ($vecs[$i][4]!='r') {continue;}
+						//make sure base point matches
+						if (abs($ansvec[1]-$vecs[$i][0])>$defpttol*$reltolerance) {
+							continue;
+						}
+						if (abs($ansvec[2]-$vecs[$i][1])>$defpttol*$reltolerance) {
+							continue;
+						}
+						//compare slopes
+						$correctdx = $ansvec[3] - $ansvec[1];
+						$correctdy = $ansvec[4] - $ansvec[2];
+						$studx = $vecs[$i][2] - $vecs[$i][0];
+						$study = $vecs[$i][3] - $vecs[$i][1];
+						
+						//find angle between correct ray and stu ray
+						$cosang = ($studx*$correctdx+$study*$correctdy)/(sqrt($studx*$studx+$study*$study)*sqrt($correctdx*$correctdx+$correctdy*$correctdy));
+						$ang = acos($cosang)*57.2957795;
+						if (abs($ang)>1.4*$reltolerance) {
+							continue;
+						}
+						
+						/*
+						slope based grading
+						if (abs($correctdy)>abs($correctdx)) {
+							$m = $correctdx/$correctdy;
+							$stum = $studx/$study;
+						} else {
+							$m = $correctdy/$correctdx;
+							$stum =$study/$studx;
+						}
+						$toladj = pow(10,-1-6*abs($m));
+						if (abs($m-$stum)/abs($m+$toladj)>$deftol*$reltolerance) {
+							continue;
+						}
+						*/
 						$scores[$key] = 1;
 						break;
 					}

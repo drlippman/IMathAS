@@ -147,6 +147,8 @@ function settool(curel,tarnum,mode) {
 	curel.className = "sel";
 	
 	setDrawMode(tarnum,mode);
+	curTarget = tarnum;
+	drawTarget();
 }
 function setDrawMode(tarnum,mode) {
 	targets[tarnum].mode = mode;
@@ -602,12 +604,6 @@ function drawTarget(x,y) {
 			}
 		}
 		ctx.stroke();
-		for (var j=0; j<tplines[curTarget][i].length; j++) {
-			ctx.fillRect(tplines[curTarget][i][j][0]-3,tplines[curTarget][i][j][1]-3,6,6);
-		}
-		if (tplines[curTarget][i].length==1 && x!=null && curTPcurve==i) {
-			ctx.fillRect(x-3,y-3,6,6);
-		}
 		ctx.beginPath();
 	}
 	var linefirstx, linefirsty, linelastx, linelasty;
@@ -687,15 +683,18 @@ function drawTarget(x,y) {
 		}
 		ctx.fill();
 	}
-	//ctx.beginPath();
-	
+		
 	ctx.fillStyle = "rgb(255,255,255)";
 	ctx.beginPath();
 	for (var i=0; i<odots[curTarget].length; i++) {
 		ctx.moveTo(odots[curTarget][i][0]+5,odots[curTarget][i][1]);
 		ctx.arc(odots[curTarget][i][0],odots[curTarget][i][1],4,0,Math.PI*2,true);
 	}
-	ctx.fill();
+	if (targets[curTarget].mode<3) {
+		ctx.fill();
+	} else {
+		ctx.stroke();
+	}
 	ctx.lineWidth = 2;
 	ctx.beginPath();
 	for (var i=0; i<odots[curTarget].length; i++) {
@@ -703,6 +702,20 @@ function drawTarget(x,y) {
 		ctx.arc(odots[curTarget][i][0],odots[curTarget][i][1],4,0,Math.PI*2,true);
 	}
 	ctx.stroke();
+	
+	for (var i=0;i<tplines[curTarget].length; i++) {
+		//draw control points
+		if (tptypes[curTarget][i]==targets[curTarget].mode) {
+			ctx.fillStyle = "rgb(255,0,0)";
+			for (var j=0; j<tplines[curTarget][i].length; j++) {
+				ctx.fillRect(tplines[curTarget][i][j][0]-3,tplines[curTarget][i][j][1]-3,6,6);
+			}
+			if (tplines[curTarget][i].length==1 && x!=null && curTPcurve==i) {
+				ctx.fillRect(x-3,y-3,6,6);
+			}
+			ctx.fillStyle = "rgb(0,0,255)";
+		}
+	}
 	
 	encodeDraw();
 	//targetOuts[curTarget].value =  php_serialize(lines[curTarget]) + ';;'+php_serialize(dots[curTarget])+ ';;'+php_serialize(odots[curTarget]);

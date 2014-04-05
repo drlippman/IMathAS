@@ -68,6 +68,8 @@ if ($overwriteBody==1) {
 	echo '<span class="form">Version separator:</span><span class="formright"><input type=text name="vsep" value="+++++++++++++++" /> </span><br class="form"/>';
 	echo '<span class="form">Math display:</span><span class="formright"><input type="radio" name="mathdisp" value="img" checked="checked" /> Images <input type="radio" name="mathdisp" value="text"/> Text <input type="radio" name="mathdisp" value="tex"/> TeX <input type="radio" name="mathdisp" value="textandimg"/> Images, then again in text</span><br class="form"/>';
 	echo '<span class="form">Include question numbers and point values:</span><span class="formright"><input type="checkbox" name="showqn" checked="checked" /> </span><br class="form"/>';
+	echo '<span class="form">Hide text entry lines?</span><span class="formright"><input type=checkbox name=hidetxtboxes ></span><br class="form"/>';
+		
 	echo '<div class="submit"><input type=submit value="Continue"></div></form>';
 	
 } else {		

@@ -114,7 +114,7 @@ div { zoom: 1; }
 <!--[if lt IE 9]>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
 <script type="text/javascript" src="<?php echo $imasroot;?>/javascript/excanvas_min.js?v=120811"></script><![endif]-->
-<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/drawing_min.js?v=060213"></script>
+<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/drawing_min.js?v=040514"></script>
 <?php
 echo "<script type=\"text/javascript\">imasroot = '$imasroot';</script>";
 if (isset($useeditor) && $sessiondata['useed']==1) {
