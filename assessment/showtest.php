@@ -2714,7 +2714,7 @@ if (!isset($_POST['embedpostback'])) {
 				} else {
 					$reqscore = ($testsettings['minscore']-10000).'%';
 				}
-				echo "<p><span style=\"color:red;\"><b>", sprintf(_('A score of %d is required to receive credit for this assessment'), $reqscore), "<br/>", _('Grade in Gradebook: No Credit (NC)'), "</span></p> ";	
+				echo "<p><span style=\"color:red;\"><b>", sprintf(_('A score of %s is required to receive credit for this assessment'), $reqscore), "<br/>", _('Grade in Gradebook: No Credit (NC)'), "</span></p> ";	
 			}
 		} else {
 			echo "<p><b>", _('Your scores have been recorded for this assessment.'), "</b></p>";
