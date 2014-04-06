@@ -3985,11 +3985,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					if ($function[1]=='-oo') { //ray to left
 						$y1p = $ytopix($func(floatval($function[2])-1));
 						$y2p = $ytopix($func(floatval($function[2])));
-						$ansvecs[$key] = array('r', $xtopix($function[2]), $y2p, $xtopix($function[1]-1), $y1p);
+						$ansvecs[$key] = array('r', $xtopix($function[2]), $y2p, $xtopix(floatval($function[2])-1), $y1p);
 					} else if ($function[2]=='oo') { //ray to right
 						$y1p = $ytopix($func(floatval($function[1])));
 						$y2p = $ytopix($func(floatval($function[1])+1));
-						$ansvecs[$key] = array('r', $xtopix($function[1]), $y1p, $xtopix($function[1]+1), $y2p);
+						$ansvecs[$key] = array('r', $xtopix($function[1]), $y1p, $xtopix(floatval($function[1])+1), $y2p);
 					} else { //line seg
 						$y1p = $ytopix($func(floatval($function[1])));
 						$y2p = $ytopix($func(floatval($function[2])));
@@ -4318,6 +4318,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						if (abs($ansvec[2]-$vecs[$i][1])>$defpttol*$reltolerance) {
 							continue;
 						}
+				
 						//compare slopes
 						$correctdx = $ansvec[3] - $ansvec[1];
 						$correctdy = $ansvec[4] - $ansvec[2];
