@@ -37,7 +37,7 @@ function calculate(inputId,outputId,format) {
 			  str = str.replace(/_/,' ');
 		  } else if (format.indexOf('scinot')!=-1) {
 			  str = str.replace(/\s/g,'');
-			  str = str.replace("x","xx");
+			  str = str.replace(/(x|X|\u00D7)/,"xx");
 			  if (!str.match(/^\-?[1-9](\.\d*)?(\*|xx)10\^(\(?\-?\d+\)?)$/)) {
 				err += _("not valid scientific notation");  
 			  }
@@ -765,7 +765,7 @@ function doonsubmit(form,type2,skipconfirm) {
 			
 			str = str.replace(/,/g,"");
 			if (calcformat[qn].indexOf('scinot')!=-1) {
-				str = str.replace("x","*");
+				str = str.replace(/(x|X|\u00D7)/,"*");
 			}
 			str = str.replace(/(\d+)\s*_\s*(\d+\s*\/\s*\d+)/,"($1+$2)");
 			if (calcformat[qn].indexOf('mixednumber')!=-1 || calcformat[qn].indexOf('allowmixed')!=-1) {
