@@ -28,7 +28,7 @@ $aid = intval($_GET['aid']);
 $sessiondata['texdisp'] = true;
 $sessiondata['texdoubleescape'] = true;
 
-$sessiondata['graphdisp'] = 2;
+$sessiondata['graphdisp'] = 1;
 $sessiondata['mathdisp'] = 2;
 
 
@@ -37,24 +37,18 @@ if ($overwriteBody==1) {
 	require("../header.php");
 	echo $body;
 } if (!isset($_REQUEST['versions'])) {
-	$placeinhead = '<script type="text/javascript">
-	    function doprint() {
-	      var url = "printlayoutword.php?cid='.$cid.'&aid='.$aid.'&"+$("form").serialize();
-	      console.log(url);
-	      $("#submitiframe").attr("src",url);
-	    }
-	    </script>';
+	
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
 	echo "&gt; Print Test</div>\n";
 	
 	echo '<div class="cpmid"><a href="printtest.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for in-browser printing</a> | <a href="printlayoutbare.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for cut-and-paste</a></div>';
 	
-	echo "<h2>Generate Word Version</h2>";
+	echo "<h2>"._('Generate Word Version')."</h2>";
 		
 	echo '<p>This page will help you create a copy of this assessment as a Word 2007+ file that you can then edit for printing.</p>';
 	    
-	echo "<form class=\"nolimit\">\n";
+	echo "<form method=\"post\" action=\"printlayoutword.php?cid=$cid&aid=$aid\" class=\"nolimit\">\n";
 	echo '<span class="form">Number of different versions to generate:</span><span class="formright"><input type=text name=versions value="1" size="3"></span><br class="form"/>';
 	echo '<span class="form">Format?</span><span class="formright"><input type="radio" name="format" value="trad" checked="checked" /> Form A: 1 2 3, Form B: 1 2 3<br/><input type="radio" name="format" value="inter"/> 1a 1b 2a 2b</span><br class="form"/>';
 	echo '<span class="form">Generate answer keys?</span><span class="formright"> <input type=radio name=keys value=1 checked=1>Yes <input type=radio name=keys value=0>No</span><br class="form"/>';
@@ -66,8 +60,8 @@ if ($overwriteBody==1) {
 	echo '<p>NOTE: In some versions of Word, variables equations may appear incorrectly at first.  To fix this, ';
 	echo 'select everything (Control-A), then under the Equation Tools menu, click Linear then Professional.</p>';
 	
-	echo '<div class="submit"><button type="button" onclick="doprint()">Download</button></div></form>';
-	echo '<iframe id="submitiframe" style="visibility:hidden"></iframe>';
+	echo '<div class="submit"><input type="submit" value="Download"/></div></form>';
+
 	
 } else {		
 	//load filter
@@ -248,26 +242,36 @@ if ($overwriteBody==1) {
 	$out .= '</body></html>';
 	
 	$out = preg_replace('|(<img[^>]*?)src="/|', '$1 src="'.$urlmode.$_SERVER['HTTP_HOST'].'/', $out);
-	echo '<html><body onload="dosubmit()">';
-	echo '<form id="theform" method="post" action="http://'.$CFG['GEN']['pandocserver'].'/html2docx.php">';
-	echo '<textarea name="html">'.htmlentities($out).'</textarea>';
-	echo '</form>';
-	echo '<script type="text/javascript">function dosubmit() {document.getElementById("theform").submit();}</script>';
-	echo '</html>';
 	
-/*	
+	require("../header.php");
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+	echo "&gt; Print Test</div>\n";
+	
+	echo '<div class="cpmid"><a href="printtest.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for in-browser printing</a> | <a href="printlayoutbare.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for cut-and-paste</a></div>';
+	
+	echo "<h2>"._('Generate Word Version')."</h2>";
+	echo '<p>'._('Assessment is prepared, and ready for conversion').'.</p>';
+	echo '<form id="theform" method="post" action="http://'.$CFG['GEN']['pandocserver'].'/html2docx.php">';
+	echo '<input type="submit" value="'._("Convert to Word").'"/> ';
+	echo '<a href="printlayoutword.php?cid='.$cid.'&amp;aid='.$aid.'">'._('Change print settings').'</a>';
+	echo '<textarea name="html" style="visibility:hidden">'.htmlentities($out).'</textarea>';
+	echo '</form>';
+	
+	/*
+	
 	$data = 'html='.urlencode($out);
 	
 	$params = array (
             'http' => array (
                     'method' => 'POST',
                     'content' => $data,
+                    'timeout' => 4.0,
                     'header' => "Content-type: application/x-www-form-urlencoded\r\n" .
                     "Content-Length: " . strlen ( $data ) . "\r\n" 
             ) 
         );
         $ctx = stream_context_create ( $params );
-        $fp = fopen ( 'http://ec2-54-244-86-106.us-west-2.compute.amazonaws.com/html2docx.php', 'rb', false, $ctx );
+        $fp = fopen ( 'http://'.$CFG['GEN']['pandocserver'].'/html2docx.php', 'rb', false, $ctx );
         
         header("Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document");
 	header('Content-Disposition: attachment; filename="print'.$aid.'.docx"');
