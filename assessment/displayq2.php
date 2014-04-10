@@ -69,6 +69,10 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 					if ($arvp==='') {
 						$stuanswers[$i+1][$k] = null;
 					} else {
+						if (strpos($arvp,'$f$')) {
+							$tmp = explode('$f$',$arvp);
+							$arvp = $tmp[0];
+						}
 						if (strpos($arvp,'$!$')) {
 							$arvp = explode('$!$',$arvp);
 							$arvp = $arvp[1];
@@ -90,6 +94,10 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 				if ($arv==='' || $arv==='ReGen') {
 					$stuanswers[$i+1] = null;
 				} else {
+					if (strpos($arvp,'$f$')) {
+						$tmp = explode('$f$',$arv);
+						$arv = $tmp[0];
+					}
 					if (strpos($arv,'$!$')) {
 						$arv = explode('$!$',$arv);
 						$arv = $arv[1];
@@ -1383,8 +1391,16 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($options['hidepreview'])) {if (is_array($options['hidepreview'])) {$hidepreview = $options['hidepreview'][$qn];} else {$hidepreview = $options['hidepreview'];}}
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}	
 		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
+		
 		if (!isset($sz)) { $sz = 20;}
-		if ($multi>0) { $qn = $multi*1000+$qn;} 
+		if ($multi>0) { $qn = $multi*1000+$qn;}
+		
+		$lap = explode('$f$',$la);
+		if (isset($lap[1])) {
+			$rightanswrongformat = true;
+		}
+		$la = $lap[0];
+		
 		if (isset($ansprompt)) {$out .= "<label for=\"tc$qn\">$ansprompt</label>";}
 		
 		if ($answerformat=="equation") {
@@ -1412,6 +1428,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
 		$out .= "<input type=\"hidden\" id=\"qn$qn-vals\" name=\"qn$qn-vals\" />";
 		$out .= getcolormark($colorbox);
+		//if (!isset($GLOBALS['nocolormark']) && isset($rightanswrongformat) && (!isset($GLOBALS['noformatfeedback']) || $GLOBALS['noformatfeedback']==false)) {
+		//	$out .= ' '.formhoverover('<span style="color:red;font-size:80%">(Format)</span>','Your answer is equivalent to the correct answer, but is not simplified or is in the wrong format');
+		//}
 		if (!isset($hidepreview)) {$preview .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"AMpreview('tc$qn','p$qn')\" /> &nbsp;\n";}
 		$preview .= "<span id=p$qn></span>\n";
 		
@@ -3334,10 +3353,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 		}
 		
-		//test for correct format, if specified
-		if (checkreqtimes(str_replace(',','',$_POST["tc$qn"]),$requiretimes)==0) {
-			return 0; //$correct = false;
-		}
 		
 		$ansarr = explode(' or ',$answer);
 		foreach ($ansarr as $answer) {
@@ -3461,8 +3476,16 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					}
 				}
 			}
-			if ($correct == true) {return 1;}// else { return 0;}
+			if ($correct == true) {
+				//test for correct format, if specified
+				if (checkreqtimes(str_replace(',','',$_POST["tc$qn"]),$requiretimes)==0) {
+					$GLOBALS['partlastanswer'] .= '$f$1';
+					return 0; //$correct = false;
+				}
+				return 1;
+			}
 		}
+		
 		return 0;
 		
 	} else if ($anstype == "string") {

@@ -840,6 +840,21 @@
 								$url = getasidfileurl($match[1]);
 								echo "<a href=\"$url\" target=\"_new\">".basename($match[1])."</a>";
 							} else {
+								if (strpos($laarr[$k],'$f$')) {
+									if (strpos($laarr[$k],'&')) { //is multipart q
+										$laparr = explode('&',$laarr[$k]);
+										foreach ($laparr as $lk=>$v) {
+											if (strpos($v,'$f$')) {
+												$tmp = explode('$f$',$v);
+												$laparr[$lk] = $tmp[0];
+											}
+										}
+										$laarr[$k] = implode('&',$laparr);
+									} else {
+										$tmp = explode('$f$',$laarr[$k]);
+										$laarr[$k] = $tmp[0];
+									}
+								}
 								if (strpos($laarr[$k],'$!$')) {
 									if (strpos($laarr[$k],'&')) { //is multipart q
 										$laparr = explode('&',$laarr[$k]);
