@@ -515,6 +515,11 @@ if (isset($_GET['launch'])) {
 			$parts = explode('-',$_REQUEST['custom_view_folder']);
 			$sourcecid = $parts[0];
 			$_SESSION['view_folder'] = array($sourcecid,$parts[1]);
+		} else if (isset($_REQUEST['custom_open_folder'])) {
+			$keytype = 'cc-of';
+			$parts = explode('-',$_REQUEST['custom_open_folder']);
+			$sourcecid = $parts[0];
+			$_SESSION['view_folder'] = array($sourcecid,$parts[1]);
 		}
 	}
 	
@@ -649,7 +654,7 @@ $now = time();
 //general placement or common catridge placement - look for placement, or create if know info
 $orgparts = explode(':',$_SESSION['ltiorg']);  //THIS was added to avoid issues when GUID change, while still storing it
 $shortorg = $orgparts[0];
-if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltirole']!='instructor' && $_SESSION['lti_keytype']!='cc-vf') || $_SESSION['lti_keytype']=='cc-g' || $_SESSION['lti_keytype']=='cc-c') { 
+if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltirole']!='instructor' && $_SESSION['lti_keytype']!='cc-vf' && $_SESSION['lti_keytype']!='cc-of') || $_SESSION['lti_keytype']=='cc-g' || $_SESSION['lti_keytype']=='cc-c') { 
 	$query = "SELECT placementtype,typeid FROM imas_lti_placements WHERE ";
 	$query .= "contextid='{$_SESSION['lti_context_id']}' AND linkid='{$_SESSION['lti_resource_link_id']}' ";
 	$query .= "AND org LIKE '$shortorg:%'"; //='{$_SESSION['ltiorg']}'";
@@ -769,7 +774,7 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 		
 	}
 }
-if ($_SESSION['lti_keytype']=='cc-vf') {
+if ($_SESSION['lti_keytype']=='cc-vf' || $_SESSION['lti_keytype']=='cc-of') {
 	$keyparts = array('folder',$_SESSION['view_folder'][0],$_SESSION['view_folder'][1]);
 }
 //is course level placement
