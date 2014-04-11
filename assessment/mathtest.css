@@ -157,8 +157,10 @@ span.done {
 
 div.inset {
 	padding: 0px;
-	margin-left: 175px;
+	margin-left: 155px;
 	margin-right: 10px;
+	padding-left: 20px;
+	overflow: hidden;
 }
 
 div.right {
@@ -425,7 +427,7 @@ div.tips {
 }
 
 /*colors for answer highlighting*/
-div.ansred, div.ansgrn, div.ansyel {
+div.ansred, div.ansgrn, div.ansyel, div.ansorg {
 	padding: 2px;
 	display: inline-block;
 }
@@ -436,7 +438,10 @@ div.ansred, div.ansgrn, div.ansyel {
 	border: 1px solid #0f0;
 }
 .ansyel {
-	border: 1px solid #fa0;
+	border: 1px solid #fc0;
+}
+.ansorg {
+	border: 1px solid #f60;
 }
 
 

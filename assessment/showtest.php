@@ -559,6 +559,9 @@
 	$showhints = ($testsettings['showhints']==1);
 	$showtips = $testsettings['showtips'];
 	$regenonreattempt = (($testsettings['shuffle']&8)==8);
+	if ($regenonreattempt) {
+		$nocolormark = true;
+	}
 	
 	$reloadqi = false;
 	if (isset($_GET['reattempt'])) {
@@ -575,6 +578,11 @@
 					}
 					if (($regenonreattempt && $qi[$questions[$i]]['regen']==0) || $qi[$questions[$i]]['regen']==1) {
 						$seeds[$i] = rand(1,9999);
+						if (!$isreview) {
+							if (newqfromgroup($i)) {
+								$reloadqi = true;
+							}
+						}
 						if (isset($qi[$questions[$i]]['answeights'])) {
 							$reloadqi = true;
 						}
@@ -592,6 +600,11 @@
 						}
 						if (($regenonreattempt && $qi[$questions[$i]]['regen']==0) || $qi[$questions[$i]]['regen']==1) {
 							$seeds[$i] = rand(1,9999);
+							if (!$isreview) {
+								if (newqfromgroup($i)) {
+									$reloadqi = true;
+								}
+							}
 							if (isset($qi[$questions[$i]]['answeights'])) {
 								$reloadqi = true;
 							}
@@ -608,6 +621,11 @@
 				}
 				if (($regenonreattempt && $qi[$questions[$toclear]]['regen']==0) || $qi[$questions[$toclear]]['regen']==1) {
 					$seeds[$toclear] = rand(1,9999);
+					if (!$isreview) {
+						if (newqfromgroup($toclear)) {
+							$reloadqi = true;
+						}
+					}
 					if (isset($qi[$questions[$toclear]]['answeights'])) {
 						$reloadqi = true;
 					}
@@ -636,6 +654,11 @@
 		$loc = array_search($toregen,$reattempting);
 		if ($loc!==false) {
 			array_splice($reattempting,$loc,1);
+		}
+		if (!$isreview) {
+			if (newqfromgroup($toregen)) {
+				$reloadqi = true;
+			}
 		}
 		if (isset($qi[$questions[$toregen]]['answeights'])) {
 			$reloadqi = true;

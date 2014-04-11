@@ -530,7 +530,7 @@ function scorequestion($qn, $rectime=true) {
 //records everything but questions array
 //if limit=true, only records lastanswers
 function recordtestdata($limit=false) { 
-	global $isreview,$bestscores,$bestattempts,$bestseeds,$bestlastanswers,$scores,$attempts,$seeds,$lastanswers,$testid,$testsettings,$sessiondata,$reattempting,$timesontask,$lti_sourcedid,$qi,$noraw,$rawscores,$bestrawscores,$firstrawscores;
+	global $isreview,$questions,$bestscores,$bestattempts,$bestseeds,$bestlastanswers,$scores,$attempts,$seeds,$lastanswers,$testid,$testsettings,$sessiondata,$reattempting,$timesontask,$lti_sourcedid,$qi,$noraw,$rawscores,$bestrawscores,$firstrawscores;
 	
 	if ($noraw) {
 		$bestscorelist = implode(',',$bestscores);
@@ -556,6 +556,7 @@ function recordtestdata($limit=false) {
 	$timeslist = implode(',',$timesontask);
 	
 	$reattemptinglist = implode(',',$reattempting);
+	$questionlist = implode(',', $questions);
 	
 	$now = time();
 	if ($isreview) {
@@ -571,7 +572,7 @@ function recordtestdata($limit=false) {
 		} else {
 			$query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',seeds='$seedslist',lastanswers='$lalist',";
 			$query .= "bestseeds='$bestseedslist',bestattempts='$bestattemptslist',bestscores='$bestscorelist',bestlastanswers='$bestlalist',";
-			$query .= "endtime=$now,reattempting='$reattemptinglist',timeontask='$timeslist' ";
+			$query .= "endtime=$now,reattempting='$reattemptinglist',timeontask='$timeslist',questions='$questionlist' ";
 		}
 		if (isset($lti_sourcedid) && strlen($lti_sourcedid)>0 && $sessiondata['ltiitemtype']==0) { 
 			//update lti record.  We only do this for single assessment placements
@@ -1006,6 +1007,41 @@ function embedshowicon($qn) {
 		} else {
 			echo "<img class=\"embedicon\" src=\"$imasroot/img/q_emptybox.gif\"/> ";
 		}
+	}
+}
+
+//pull a new question from a question group on regen, if not in review mode
+function newqfromgroup($qn) {
+	global $testsettings, $questions;
+	//find existing question or group
+	preg_match('/(^|,)([^,]*'.$questions[$qn].'[^,]*)($|,)/', $testsettings['itemorder'], $matches);
+	$q = $matches[2];
+	
+	if (strpos($q,'~')!==false) {
+		//grouped.  Repick
+		$sub = explode('~',$q);
+		if (strpos($sub[0],'|')===false) { //backwards compat
+			$newq = $sub[array_rand($sub,1)];
+		} else {
+			$grpparts = explode('|',$sub[0]);
+			array_shift($sub);
+			if ($grpparts[1]==1) { // With replacement
+				$newq = $sub[array_rand($sub,1)];
+			} else { //Without replacement
+				//look for unused questions
+				$notused = array_diff($sub, $questions);
+				if (count($notused)>0) {
+					$newq = $notused[array_rand($notused,1)];
+				} else {
+					$newq = $sub[array_rand($sub,1)];
+				}
+			}
+		}
+		$questions[$qn] = $newq;
+		return true;
+	} else {
+		//not grouped
+		return false;
 	}
 }
 ?>

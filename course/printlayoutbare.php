@@ -53,7 +53,11 @@ if ($overwriteBody==1) {
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
 	echo "&gt; Print Test</div>\n";
 	
-	echo '<div class="cpmid"><a href="printtest.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for in-browser printing</a></div>';
+	echo '<div class="cpmid"><a href="printtest.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for in-browser printing</a>';
+	if (isset($CFG['GEN']['pandocserver'])) {
+		echo ' | <a href="printlayoutword.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for Word</a>';
+	}
+	echo '</div>';
 	
 	echo "<h2>Copy-and-Paste Print Version</h2>";
 		

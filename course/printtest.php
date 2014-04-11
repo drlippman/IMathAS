@@ -31,7 +31,11 @@ if ($overwriteBody==1) {
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
 	echo "&gt; Print Test</div>\n";
 	if (!isset($_POST['heights'])) {
-		echo '<div class="cpmid"><a href="printlayoutbare.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for cut-and-paste</a></div>';
+		echo '<div class="cpmid"><a href="printlayoutbare.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for cut-and-paste</a>';
+		if (isset($CFG['GEN']['pandocserver'])) {
+			echo ' | <a href="printlayoutword.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for Word</a>';
+		}
+		echo '</div>';
 	}
 	echo '<div id="headerprinttest" class="pagetitle"><h2>Print Test</h2></div>';
 	

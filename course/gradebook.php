@@ -37,7 +37,7 @@ if ($canviewall) {
 		$gbmode = $_GET['gbmode'];
 		$sessiondata[$cid.'gbmode'] = $gbmode;
 		writesessiondata();
-	} else if (isset($sessiondata[$cid.'gbmode'])) {
+	} else if (isset($sessiondata[$cid.'gbmode']) && !isset($_GET['refreshdef'])) {
 		$gbmode =  $sessiondata[$cid.'gbmode'];
 	} else {
 		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
@@ -46,7 +46,7 @@ if ($canviewall) {
 		
 		
 	}
-	if (isset($_COOKIE["colorize-$cid"])) {
+	if (isset($_COOKIE["colorize-$cid"]) && !isset($_GET['refreshdef'])) {
 		$colorize = $_COOKIE["colorize-$cid"];
 	} else {
 		$query = "SELECT colorize FROM imas_gbscheme WHERE courseid='$cid'";
@@ -75,6 +75,10 @@ if ($canviewall) {
 		} else {
 			$secfilter = -1;
 		}
+	}
+	if (isset($_GET['refreshdef']) && isset($sessiondata[$cid.'catcollapse'])) {
+		unset($sessiondata[$cid.'catcollapse']);
+		writesessiondata();
 	}
 	if (isset($sessiondata[$cid.'catcollapse'])) {
 		$overridecollapse = $sessiondata[$cid.'catcollapse'];
