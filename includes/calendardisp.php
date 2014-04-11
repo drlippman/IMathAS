@@ -263,6 +263,7 @@ while ($row = mysql_fetch_row($result)) {
 		$json .= "id:\"$row[0]\", ";
 	}
 	$tag = htmlentities($row[6]);
+	$alink = htmlentities($alink);
 	$json .= "name:\"$row[1]\", link:\"$alink\", color:\"".$colors."\", tag:\"$tag\"".((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
 	
 	$byid['L'.$row[0]] = array($moday,$tag,$colors,$json);
