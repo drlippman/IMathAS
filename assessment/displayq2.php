@@ -181,7 +181,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if (isset($snaptogrid)) {$options['snaptogrid'] = $snaptogrid;}
 	if (isset($background)) {$options['background'] = $background;}
 	
-	if ($qdata['qtype']=='conditional') {
+	if ($qdata['qtype']=='conditional' || isset($GLOBALS['nocolormark'])) {
 		$qcolors = array(); //no colors for conditional type
 	}
 	if ($qdata['qtype']=="multipart" || $qdata['qtype']=='conditional') {
