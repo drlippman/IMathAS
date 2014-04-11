@@ -86,7 +86,7 @@
 		$query = "UPDATE imas_gbscheme SET useweights='$useweights',orderby='$orderby',usersort='$usersort',defaultcat='$defaultcat',defgbmode='$defgbmode',stugbmode='$stugbmode',colorize='{$_POST['colorize']}' WHERE courseid='$cid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		if (isset($_POST['submit'])) {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid={$_GET['cid']}&gbmode=$defgbmode");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid={$_GET['cid']}&refreshdef=true");
 			exit;
 		}
 	}
@@ -176,6 +176,8 @@
 			$colorlabel[] = "red &le; $j%, green &ge; $k%";
 		}
 	}
+	$colorval[] = "-1:-1";
+	$colorlabel[] = "Active";
 	
 	$hideval = array(1,0,2);
 	$hidelabel = array(_("Hidden"),_("Expanded"),_("Collapsed"));
