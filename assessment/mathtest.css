@@ -425,7 +425,7 @@ div.tips {
 }
 
 /*colors for answer highlighting*/
-div.ansred, div.ansgrn, div.ansyel {
+div.ansred, div.ansgrn, div.ansyel, div.ansorg {
 	padding: 2px;
 	display: inline-block;
 }
@@ -436,7 +436,10 @@ div.ansred, div.ansgrn, div.ansyel {
 	border: 1px solid #0f0;
 }
 .ansyel {
-	border: 1px solid #fa0;
+	border: 1px solid #fc0;
+}
+.ansorg {
+	border: 1px solid #f60;
 }
 
 
