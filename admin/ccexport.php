@@ -181,7 +181,7 @@ if (isset($_GET['delete'])) {
 						$fp = fopen($newdir.'/weblink'.$iteminfo[$item][1].'.xml','w');
 						fwrite($fp,'<webLink xmlns="http://www.imsglobal.org/xsd/imsccv1p1/imswl_v1p1">');
 						fwrite($fp,' <title>'.htmlentities($row[0],ENT_XML1).'</title>');
-						fwrite($fp,' <url href="'.$alink.'" target="_blank"/>');
+						fwrite($fp,' <url href="'.htmlentities($alink,ENT_XML1).'" target="_blank"/>');
 						fwrite($fp,'</webLink>');
 						fclose($fp);
 						$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
@@ -191,7 +191,7 @@ if (isset($_GET['delete'])) {
 						$canvout .= '<content_type>ExternalUrl</content_type>';
 						$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
 						$canvout .= '<title>'.htmlentities($row[0],ENT_XML1).'</title>'."\n";
-						$canvout .= '<url>'.$alink.'</url>';
+						$canvout .= '<url>'.htmlentities($alink,ENT_XML1).'</url>';
 						$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
 						$ccnt++;
 						$resitem =  '<resource identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" type="imswl_xmlv1p1">'."\n";
