@@ -1013,23 +1013,10 @@ function embedshowicon($qn) {
 //pull a new question from a question group on regen, if not in review mode
 function newqfromgroup($qn) {
 	global $testsettings, $questions;
-	$ioquestions = explode(",",$testsettings['itemorder']);
-	$cnt = 0;
-	foreach ($ioquestions as $q) {
-		if (strpos($q,'~')!==false) {
-			if (strpos($q,'|')===false) { //backwards compat
-				$cnt++;
-			} else {
-				$grpparts = explode('|',$q);
-				$cnt += $grpparts[0];
-			}
-		} else {
-			$cnt++;
-		}
-		if ($cnt>$qn) {
-			break;
-		}
-	}
+	//find existing question or group
+	preg_match('/(^|,)([^,]*'.$questions[$qn].'[^,]*)($|,)/', $testsettings['itemorder'], $matches);
+	$q = $matches[2];
+	
 	if (strpos($q,'~')!==false) {
 		//grouped.  Repick
 		$sub = explode('~',$q);
