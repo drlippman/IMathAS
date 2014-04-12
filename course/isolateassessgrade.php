@@ -131,7 +131,7 @@
 	if ($hassection) {
 		echo '<th>Section</th>';
 	}
-	echo "<th>Grade</th><th>%</th><th>Time Spent (In Questions)</th><th>Feedback</th></tr></thead><tbody>";
+	echo "<th>Grade</th><th>%</th><th>Last Change</th><th>Time Spent (In Questions)</th><th>Feedback</th></tr></thead><tbody>";
 	$now = time();
 	$lc = 1;
 	$n = 0;
@@ -165,7 +165,7 @@
 		$timeontask = round(array_sum(explode(',',str_replace('~',',',$line['timeontask'])))/60,1);
 		
 		if ($line['id']==null) {
-			echo "<td><a href=\"gb-viewasid.php?gbmode=$gbmode&cid=$cid&asid=new&uid={$line['userid']}&from=isolate&aid=$aid\">-</a></td><td>-</td><td></td><td></td>";		
+			echo "<td><a href=\"gb-viewasid.php?gbmode=$gbmode&cid=$cid&asid=new&uid={$line['userid']}&from=isolate&aid=$aid\">-</a></td><td>-</td><td></td><td></td><td></td>";		
 		} else {
 			if (isset($exceptions[$line['userid']])) {
 				$thisenddate = $exceptions[$line['userid']][0];
@@ -207,6 +207,15 @@
 			} else {
 				echo '<td>&nbsp;</td>';
 			}
+			if ($line['endtime']==0) {
+				if ($line['starttime']==0) {
+					echo '<td>Never started</td>';
+				} else {
+					echo '<td>Never submitted</td>';
+				}
+			} else {
+				echo '<td>'.tzdate("n/j/y g:ia",$line['endtime']).'</td>';
+			}
 			if ($line['endtime']==0 || $line['starttime']==0) {
 				echo '<td>&nbsp;</td>';
 			} else {
@@ -242,7 +251,7 @@
 	} else {
 		$timeavg = '-';
 	}
-	echo "</a></td><td>$pct</td><td>$timeavg</td><td></td></tr>";
+	echo "</a></td><td>$pct</td><td></td><td>$timeavg</td><td></td></tr>";
 	echo "</tbody></table>";
 	if ($hassection) {
 		echo "<script> initSortTable('myTable',Array('S','S','N'),true);</script>";

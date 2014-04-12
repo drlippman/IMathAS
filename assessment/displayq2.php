@@ -13,6 +13,7 @@ require("macros.php");
 function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false,$qcolors=array()) {
 	//$starttime = microtime(true);
 	global $imasroot, $myrights, $showtips, $urlmode;
+	
 	if (!isset($_SESSION['choicemap'])) { $_SESSION['choicemap'] = array(); }
 	$GLOBALS['inquestiondisplay'] = true;
 	
@@ -304,6 +305,37 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		}
 	}
 	
+	if ($doshowans && isset($showanswer) && !is_array($showanswer)) {  //single showanswer defined
+		if ($nosabutton) {
+			$showanswerloc = filter(_('Answer:') . " $showanswer\n");	
+		} else {
+			$showanswerloc = "<input class=\"sabtn\" type=button value=\""._('Show Answer')."\" onClick='javascript:document.getElementById(\"ans$qnidx\").className=\"shown\"; rendermathnode(document.getElementById(\"ans$qnidx\"));' />";
+			$showanswerloc .= filter(" <span id=\"ans$qnidx\" class=\"hidden\">$showanswer </span>\n");
+		}
+	} else {
+		$showanswerloc = array();
+		foreach($tips as $iidx=>$tip) {
+			if ($doshowans && (!isset($showanswer) || (is_array($showanswer) && !isset($showanswer[$iidx]))) && $shanspt[$iidx]!=='') {
+				if ($nosabutton) {
+					$showanswerloc[$iidx] = filter(_('Answer:') . " {$shanspt[$iidx]}\n");
+				} else {
+					$showanswerloc[$iidx] = "<input class=\"sabtn\" type=button value=\"". _('Show Answer'). "\" onClick='javascript:document.getElementById(\"ans$qnidx-$iidx\").className=\"shown\";' />"; //AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
+					$showanswerloc[$iidx] .= filter(" <span id=\"ans$qnidx-$iidx\" class=\"hidden\">{$shanspt[$iidx]}</span>\n");
+				}
+			} else if ($doshowans && isset($showanswer) && is_array($showanswer)) { //use part specific showanswer
+				if (isset($showanswer[$iidx])) {
+					if ($nosabutton) {
+						$showanswerloc[$iidx] = filter(_('Answer:') . " {$showanswer[$iidx]}\n");
+					} else {
+						$showanswerloc[$iidx] = "<input class=\"sabtn\" type=button value=\""._('Show Answer')."\" onClick='javascript:document.getElementById(\"ans$qnidx-$iidx\").className=\"shown\";' />";// AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
+						$showanswerloc[$iidx] .= filter(" <span id=\"ans$qnidx-$iidx\" class=\"hidden\">{$showanswer[$iidx]}</span>\n");
+					}
+				}
+			}
+			
+		}
+	}
+	
 	//echo $toevalqtext;
 	eval("\$evaledqtext = \"$toevalqtxt\";");
 	eval("\$evaledsoln = \"$toevalsoln\";");
@@ -411,7 +443,10 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			if ($showtips!=1) { echo 'style="display:none;" ';}
 			echo ">", _('Box'), " ".($iidx+1).": <span id=\"tips$qnidx-$iidx\">".filter($tip)."</span></p>";
 		}
-		if ($doshowans && (!isset($showanswer) || (is_array($showanswer) && !isset($showanswer[$iidx]))) && $shanspt[$iidx]!=='') {
+		if ($doshowans && strpos($toevalqtxt,'$showanswerloc')===false && is_array($showanswerloc) && isset($showanswerloc[$iidx])) {
+			echo '<div>'.$showanswerloc[$iidx].'</div>';
+		}
+		/*if ($doshowans && (!isset($showanswer) || (is_array($showanswer) && !isset($showanswer[$iidx]))) && $shanspt[$iidx]!=='') {
 			if ($nosabutton) {
 				echo filter("<div>" . _('Answer:') . " {$shanspt[$iidx]} </div>\n");
 			} else {
@@ -427,17 +462,19 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 					echo filter(" <span id=\"ans$qnidx-$iidx\" class=\"hidden\">{$showanswer[$iidx]}</span></div>\n");
 				}
 			}
-		}
+		}*/
 	}
 	echo "</div>\n";
 	
-	if ($doshowans && isset($showanswer) && !is_array($showanswer)) {  //single showanswer defined
-		if ($nosabutton) {
+	if ($doshowans && isset($showanswer) && !is_array($showanswer) && strpos($toevalqtxt,'$showanswerloc')===false) {  //single showanswer defined
+		/*if ($nosabutton) {
 			echo filter("<div>" . _('Answer:') . " $showanswer </div>\n");	
 		} else {
 			echo "<div><input class=\"sabtn\" type=button value=\""._('Show Answer')."\" onClick='javascript:document.getElementById(\"ans$qnidx\").className=\"shown\"; rendermathnode(document.getElementById(\"ans$qnidx\"));' />";
 			echo filter(" <span id=\"ans$qnidx\" class=\"hidden\">$showanswer </span></div>\n");
-		}
+		}*/
+		echo '<div>'.$showanswerloc.'</div>';
+		
 	}
 	if ($doshowans && ($qdata['solutionopts']&4)==4 && $qdata['solution']!='') {
 		if ($nosabutton) {
