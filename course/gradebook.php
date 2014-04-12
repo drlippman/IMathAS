@@ -95,8 +95,10 @@ if ($canviewall) {
 	$showpics = floor($gbmode/10000)%10 ; //0 none, 1 small, 2 big
 	$totonleft = ((floor($gbmode/1000)%10)&1) ; //0 right, 1 left
 	$avgontop = ((floor($gbmode/1000)%10)&2) ; //0 bottom, 2 top
+	$lastlogin = (((floor($gbmode/1000)%10)&4)==4) ; //0 hide, 2 show last login column
 	$links = ((floor($gbmode/100)%10)&1); //0: view/edit, 1 q breakdown
 	$hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
+	$includeduedate = (((floor($gbmode/100)%10)&4)==4); //0: hide due date, 4: show due date
 	$hidenc = floor($gbmode/10)%10; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
 	$availshow = $gbmode%10; //0: past, 1 past&cur, 2 all, 3 past and attempted, 4=current only
 
@@ -111,6 +113,8 @@ if ($canviewall) {
 	$totonleft = 0;
 	$avgontop = 0;
 	$hidelocked = 0;
+	$lastlogin = false;
+	$includeduedate = false;
 }
 
 if ($canviewall && isset($_GET['stu'])) {
