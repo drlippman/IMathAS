@@ -115,6 +115,7 @@ if ($canviewall) {
 	$hidelocked = 0;
 	$lastlogin = false;
 	$includeduedate = false;
+	$includelastchange = false;
 }
 
 if ($canviewall && isset($_GET['stu'])) {
@@ -260,9 +261,19 @@ if ($canviewall) {
 		$placeinhead .= "}\n";
 	}
 	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid=$cid&stu=";
-	$placeinhead .= "function chgstu(el) { 	\$('#updatingicon').show(); window.location = '$address' + el.value;}";
+	$placeinhead .= "function chgstu(el) { 	\$('#updatingicon').show(); window.location = '$address' + el.value;}\n";
 	$placeinhead .= 'function chgtoggle() { ';
 	$placeinhead .= "	var altgbmode = 10000*document.getElementById(\"toggle4\").value + 1000*($totonleft+$avgontop) + 100*(document.getElementById(\"toggle1\").value*1+ document.getElementById(\"toggle5\").value*1) + 10*document.getElementById(\"toggle2\").value + 1*document.getElementById(\"toggle3\").value; ";
+	if ($includelastchange) {
+		$placeinhead .= "     altgbmode += 40;";
+	}
+	if ($lastlogin) {
+		$placeinhead .= "     altgbmode += 4000;";
+	}
+	if ($includeduedate) {
+		$placeinhead .= "     altgbmode += 400;\n";
+	}
+	
 	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid&gbmode=";
 	$placeinhead .= "	var toopen = '$address' + altgbmode;\n";
 	$placeinhead .= "  	window.location = toopen; \n";
