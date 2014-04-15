@@ -97,6 +97,8 @@
 			}
 		}
 		$defgbmode = $_POST['gbmode1'] + 10*$_POST['gbmode10'] + 100*($_POST['gbmode100']+$_POST['gbmode200']) + 1000*$_POST['gbmode1000'] + 1000*$_POST['gbmode1002'];
+		if (isset($_POST['gbmode4000'])) {$defgbmode += 4000;}
+		if (isset($_POST['gbmode400'])) {$defgbmode += 400;}
 		$stugbmode = $_POST['stugbmode1'] + $_POST['stugbmode2'] + $_POST['stugbmode4'] + $_POST['stugbmode8'];
 		$query = "UPDATE imas_gbscheme SET useweights='$useweights',orderby='$orderby',usersort='$usersort',defaultcat='$defaultcat',defgbmode='$defgbmode',stugbmode='$stugbmode',colorize='{$_POST['colorize']}' WHERE courseid='$cid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
@@ -302,6 +304,12 @@
 	<span class=formright>
 		<input type=radio name="gbmode1002" value="0" id="avgloc0" <?php writeHtmlChecked($avgontop,0);?>/><label for="avgloc0">Bottom</label> 
 		<input type=radio name="gbmode1002" value="2" id="avgloc2" <?php writeHtmlChecked($avgontop,2);?>/><label for="avgloc2">Top</label> 
+	</span><br class=form />
+	
+	<span class=form>Include details:</span>
+	<span class=formright>
+		<input type="checkbox" name="gbmode4000" value="4" id="llcol" <?php writeHtmlChecked($lastlogin,true);?>/><label for="llcol">Last Login column</label><br/>
+		<input type="checkbox" name="gbmode400" value="4" id="duedate" <?php writeHtmlChecked($includeduedate,true);?>/><label for="duedate">Due Date in column headers</label>
 	</span><br class=form />
 	
 	<span class="form">Totals to show students:</span>
