@@ -973,7 +973,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		
 		for ($i=0; $i < count($randkeys); $i++) {
 			if ($displayformat == "horiz") {
-				$out .= "<div class=choice >{$questions[$randkeys[$i]]}<br/><input type=radio name=qn$qn value=$i ";
+				$out .= "<div class=choice ><label for=\"qn$qn-$i\">{$questions[$randkeys[$i]]}</label><br/><input type=radio id=\"qn$qn-$i\" name=qn$qn value=$i ";
 				if (($la!='') && ($la == $i)) { $out .= "CHECKED";}
 				$out .= " /></div>\n";
 			} else if ($displayformat == "select") {
@@ -981,9 +981,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				if (($la!='') && ($la!='NA') && ($la == $i)) { $out .= "selected=1";}
 				$out .= ">{$questions[$randkeys[$i]]}</option>\n";
 			} else if ($displayformat == "inline") {
-				$out .= "<input type=radio name=qn$qn value=$i ";
+				$out .= "<input type=radio name=qn$qn value=$i id=\"qn$qn-$i\" ";
 				if (($la!='') && ($la == $i)) { $out .= "CHECKED";}
-				$out .= " />{$questions[$randkeys[$i]]}";
+				$out .= " /><label for=\"qn$qn-$i\">{$questions[$randkeys[$i]]}</label>";
 			} else if ($displayformat == 'column') {
 				if ($i%$itempercol==0) {
 					if ($i>0) {
@@ -991,13 +991,13 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					}
 					$out .= '<div class="match"><ul class=nomark>';
 				}
-				$out .= "<li><input type=radio name=qn$qn value=$i ";
+				$out .= "<li><input type=radio name=qn$qn value=$i id=\"qn$qn-$i\" ";
 				if (($la!='') && ($la == $i)) { $out .= "CHECKED";}
-				$out .= " />{$questions[$randkeys[$i]]}</li> \n";
+				$out .= " /><label for=\"qn$qn-$i\">{$questions[$randkeys[$i]]}<label></li> \n";
 			} else {
-				$out .= "<li><input class=\"unind\" type=radio name=qn$qn value=$i ";
+				$out .= "<li><input class=\"unind\" type=radio name=qn$qn value=$i id=\"qn$qn-$i\" ";
 				if (($la!='') && ($la == $i)) { $out .= "CHECKED";}
-				$out .= " />{$questions[$randkeys[$i]]}</li> \n";
+				$out .= " /><label for=\"qn$qn-$i\">{$questions[$randkeys[$i]]}<label></li> \n";
 			}
 		}
 		if ($displayformat == "horiz") {
@@ -1083,14 +1083,14 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		
 		for ($i=0; $i < count($randkeys); $i++) {
 			if ($displayformat == "horiz") {
-				$out .= "<div class=choice>{$questions[$randkeys[$i]]}<br/>";
-				$out .= "<input type=checkbox name=\"qn$qn"."[$i]\" value=$i ";
+				$out .= "<div class=choice><label for=\"qn$qn-$i\">{$questions[$randkeys[$i]]}</label><br/>";
+				$out .= "<input type=checkbox name=\"qn$qn"."[$i]\" value=$i id=\"qn$qn-$i\" ";
 				if (isset($labits[$i]) && ($labits[$i]!='') && ($labits[$i] == $i)) { $out .= "CHECKED";}
 				$out .= " /></div> \n";
 			} else if ($displayformat == "inline") {
-				$out .= "<input type=checkbox name=\"qn$qn"."[$i]\" value=$i ";
+				$out .= "<input type=checkbox name=\"qn$qn"."[$i]\" value=$i id=\"qn$qn-$i\" ";
 				if (isset($labits[$i]) && ($labits[$i]!='') && ($labits[$i] == $i)) { $out .= "CHECKED";}
-				$out .= " />{$questions[$randkeys[$i]]} ";
+				$out .= " /><label for=\"qn$qn-$i\">{$questions[$randkeys[$i]]}</label> ";
 			} else if ($displayformat == 'column') {
 				if ($i%$itempercol==0) {
 					if ($i>0) {
@@ -1098,13 +1098,13 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					}
 					$out .= '<div class="match"><ul class=nomark>';
 				}
-				$out .= "<li><input type=checkbox name=\"qn$qn"."[$i]\" value=$i ";
+				$out .= "<li><input type=checkbox name=\"qn$qn"."[$i]\" value=$i id=\"qn$qn-$i\" ";
 				if (isset($labits[$i]) && ($labits[$i]!='') && ($labits[$i] == $i)) { $out .= "CHECKED";}
-				$out .= " />{$questions[$randkeys[$i]]}</li> \n";
+				$out .= " /><label for=\"qn$qn-$i\">{$questions[$randkeys[$i]]}</label></li> \n";
 			} else {
-				$out .= "<li><input class=\"unind\" type=checkbox name=\"qn$qn"."[$i]\" value=$i ";
+				$out .= "<li><input class=\"unind\" type=checkbox name=\"qn$qn"."[$i]\" value=$i id=\"qn$qn-$i\" ";
 				if (isset($labits[$i]) && ($labits[$i]!='') && ($labits[$i] == $i)) { $out .= "CHECKED";}
-				$out .= " />{$questions[$randkeys[$i]]}</li> \n";
+				$out .= " /><label for=\"qn$qn-$i\">{$questions[$randkeys[$i]]}</label></li> \n";
 			}
 		}
 		if ($displayformat == "horiz") {
