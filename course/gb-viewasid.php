@@ -683,6 +683,24 @@
 				$("span[id^=\'ans\']").removeClass("hidden");
 				$(".sabtn").replaceWith("<span>Answer: </span>");
 			}
+			var focuscolorlock = false;
+			$(function() {
+				$(".review input[name*=\'-\']").each(function(i, el) {
+					var idparts = $(el).attr("name").split("-");
+					var qn = (idparts[0]*1+1)*1000+idparts[1]*1;
+					$(el).on("mouseover", function () {
+						if (!focuscolorlock) {$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn).css("background-color","yellow")};
+					}).on("mouseout", function () {
+						if (!focuscolorlock) {$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn).css("background-color","")};
+					}).on("focus", function () {
+						focuscolorlock = true;
+						$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn).css("background-color","yellow");
+					}).on("blur", function () {
+						focuscolorlock = false;
+						$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn).css("background-color","");
+					});
+				});
+			});
 			</script>';
 		/*
 		echo '<script type="text/javascript">';

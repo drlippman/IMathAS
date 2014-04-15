@@ -906,9 +906,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if ($colorbox != '') {$style .= ' class="'.$colorbox.'" ';} else {$style='';}
 		
 		if ($displayformat == 'inline') {
-			$out .= "<span $style>";
+			$out .= "<span $style id=\"qnwrap$qn\">";
 		} else if ($displayformat != 'select') {
-			$out .= "<div $style style=\"display:block\" class=\"clearfix\">";
+			$out .= "<div $style id=\"qnwrap$qn\" style=\"display:block\" class=\"clearfix\">";
 		}
 		if ($displayformat == "select") { 
 			$msg = '?';
@@ -918,7 +918,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					break;
 				}
 			}
-			$out = "<select name=\"qn$qn\" $style><option value=\"NA\">$msg</option>\n";
+			$out = "<select name=\"qn$qn\" id=\"qn$qn\" $style><option value=\"NA\">$msg</option>\n";
 		} else if ($displayformat == "horiz") {
 			
 		} else if ($displayformat == "inline") {
@@ -1026,9 +1026,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if ($colorbox != '') {$style .= ' class="'.$colorbox.'" ';} else {$style='';}
 		
 		if ($displayformat == 'inline') {
-			$out .= "<span $style>";
+			$out .= "<span $style id=\"qnwrap$qn\">";
 		} else  {
-			$out .= "<div $style style=\"display:block\" class=\"clearfix\">";
+			$out .= "<div $style id=\"qnwrap$qn\" style=\"display:block\" class=\"clearfix\">";
 		}
 		if ($displayformat == "horiz") {
 			
@@ -1131,7 +1131,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		} else {
 			$divstyle = '';
 		}
-		if ($colorbox != '') {$out .= '<div class="'.$colorbox.'" style="display:block">';}
+		if ($colorbox != '') {$out .= '<div class="'.$colorbox.'" id="qnwrap'.$qn.'" style="display:block">';}
 		$out .= "<div class=\"match\" $divstyle>\n";
 		$out .= "<p class=\"centered\">$questiontitle</p>\n";
 		$out .= "<ul class=\"nomark\">\n";
@@ -1313,9 +1313,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($ansprompt)) {$out .= $ansprompt;}
 		if (isset($answersize)) {
 			if ($colorbox=='') {
-				$out .= '<table>';
+				$out .= '<table id="qnwrap'.$qn.'">';
 			} else {
-				$out .= '<table class="'.$colorbox.'">';
+				$out .= '<table class="'.$colorbox.'" id="qnwrap'.$qn.'">';
 			}
 			$out .= '<tr><td class="matrixleft">&nbsp;</td><td>';
 			$answersize = explode(",",$answersize);
@@ -1365,9 +1365,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($answersize)) {
 			$answersize = explode(",",$answersize);
 			if ($colorbox=='') {
-				$out .= '<table>';
+				$out .= '<table id="qnwrap'.$qn.'">';
 			} else {
-				$out .= '<table class="'.$colorbox.'">';
+				$out .= '<table class="'.$colorbox.'" id="qnwrap'.$qn.'">';
 			}
 			$out .= '<tr><td class="matrixleft">&nbsp;</td><td>';
 			$out .= "<table>";
@@ -1804,9 +1804,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$la = preg_replace('/\n/','<br/>',$la);
 			} 
 			if ($colorbox=='') {
-				$out .= '<div class="intro">';
+				$out .= '<div class="intro" id="qnwrap'.$qn.'">';
 			} else {
-				$out .= '<div class="intro '.$colorbox.'">';
+				$out .= '<div class="intro '.$colorbox.'" id="qnwrap'.$qn.'">';
 			}
 			if (isset($GLOBALS['questionscoreref'])) {
 				if ($multi==0) {
@@ -2114,7 +2114,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		$bg = getgraphfilename($plot);
 		$dotline = 0;
-		if ($colorbox!='') { $out .= '<div class="'.$colorbox.'">';}
+		if ($colorbox!='') { $out .= '<div class="'.$colorbox.'" id="qnwrap'.$qn.'">';}
 		$out .= "<canvas class=\"drawcanvas\" id=\"canvas$qn\" width=\"{$settings[6]}\" height=\"{$settings[7]}\"></canvas>";
 		
 		$out .= "<div><span id=\"drawtools$qn\" class=\"drawtools\">";
