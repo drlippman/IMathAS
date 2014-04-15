@@ -686,62 +686,56 @@
 			var focuscolorlock = false;
 			$(function() {
 				$(".review input[name*=\'-\']").each(function(i, el) {
-					var idparts = $(el).attr("name").split("-");
+					var partname = $(el).attr("name");
+					var idparts = partname.split("-");
 					var qn = (idparts[0]*1+1)*1000+idparts[1]*1;
 					$(el).on("mouseover", function () {
-						if (!focuscolorlock) {$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn).css("background-color","yellow")};
+						if (!focuscolorlock) {$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn+", #showansbtn"+partname+", #scorebox"+partname).css("background-color","yellow")};
 					}).on("mouseout", function () {
-						if (!focuscolorlock) {$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn).css("background-color","")};
+						if (!focuscolorlock) {$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn+", #showansbtn"+partname+", #scorebox"+partname).css("background-color","")};
 					}).on("focus", function () {
 						focuscolorlock = true;
-						$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn).css("background-color","yellow");
+						$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn+", #showansbtn"+partname+", #scorebox"+partname).css("background-color","yellow");
 					}).on("blur", function () {
 						focuscolorlock = false;
-						$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn).css("background-color","");
+						$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn+", #showansbtn"+partname+", #scorebox"+partname).css("background-color","");
 					});
+				});
+				$("input[id^=\'showansbtn\']").each(function(i, el) {
+					var partname = $(el).attr("id").substring(10);
+					var idparts = partname.split("-");
+					var qn = (idparts[0]*1+1)*1000+idparts[1]*1;
+					$(el).on("mouseover", function () {
+						if (!focuscolorlock) {$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn+", #showansbtn"+partname+", #scorebox"+partname).css("background-color","yellow")};
+					}).on("mouseout", function () {
+						if (!focuscolorlock) {$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn+", #showansbtn"+partname+", #scorebox"+partname).css("background-color","")};
+					});
+				});
+				$("input[id^=\'qn\'], input[id^=\'tc\'], select[id^=\'qn\'], div[id^=\'qnwrap\'], span[id^=\'qnwrap\']").each(function(i,el) {
+					var qn = $(el).attr("id");
+					if (qn.length>6 && qn.substring(0,6)=="qnwrap") {
+						qn = qn.substring(6)*1;
+					} else {
+						qn = qn.substring(2)*1;
+					}
+					if (qn>1000) {
+						var partname = (Math.floor(qn/1000)-1)+"-"+(qn%1000);
+						$(el).on("mouseover", function () {
+							if (!focuscolorlock) {$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn+", #showansbtn"+partname+", #scorebox"+partname).css("background-color","yellow")};
+						}).on("mouseout", function () {
+							if (!focuscolorlock) {$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn+", #showansbtn"+partname+", #scorebox"+partname).css("background-color","")};
+						}).on("focus", function () {
+							focuscolorlock = true;
+							$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn+", #showansbtn"+partname+", #scorebox"+partname).css("background-color","yellow");
+						}).on("blur", function () {
+							focuscolorlock = false;
+							$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn+", #showansbtn"+partname+", #scorebox"+partname).css("background-color","");
+						});
+					}
 				});
 			});
 			</script>';
-		/*
-		echo '<script type="text/javascript">';
-		echo 'function hidecorrect() {';
-		echo '   var butn = document.getElementById("hctoggle");';
-		echo '   if (butn.value=="Hide Perfect Score Questions") {';
-		echo '      butn.value = "Show Perfect Score Questions";';
-		echo '      var setdispto = "block";';
-		echo '   } else { ';
-		echo '      butn.value = "Hide Perfect Score Questions";';
-		echo '      var setdispto = "none";';
-		echo '   }';
-		echo '   var divs = document.getElementsByTagName("div");';
-		echo '   for (var i=0;i<divs.length;i++) {';
-		echo '     if (divs[i].className=="iscorrect") { ';
-		echo '         if (divs[i].style.display=="none") {';
-		echo '               divs[i].style.display = "block";';
-		echo '         } else { divs[i].style.display = "none"; }';
-		echo '     }';
-		echo '    }';
-		echo '}';
-		echo 'function hideNA() {';
-		echo '   var butn = document.getElementById("hnatoggle");';
-		echo '   if (butn.value=="Hide Not Answered Questions") {';
-		echo '      butn.value = "Show Not Answered Questions";';
-		echo '      var setdispto = "block";';
-		echo '   } else { ';
-		echo '      butn.value = "Hide Not Answered Questions";';
-		echo '      var setdispto = "none";';
-		echo '   }';
-		echo '   var divs = document.getElementsByTagName("div");';
-		echo '   for (var i=0;i<divs.length;i++) {';
-		echo '     if (divs[i].className=="notanswered") { ';
-		echo '         if (divs[i].style.display=="none") {';
-		echo '               divs[i].style.display = "block";';
-		echo '         } else { divs[i].style.display = "none"; }';
-		echo '     }';
-		echo '    }';
-		echo '}';
-		echo '</script>';
-		*/
+		
 		echo '<p><button type="button" id="hctoggle"onclick="hidecorrect()">'._('Hide Questions with Perfect Scores').'</button>';
 		echo ' <button type="button" id="hnatoggle" onclick="hideNA()">'._('Hide Unanswered Questions').'</button>';
 		echo ' <button type="button" id="hnatoggle" onclick="showallans()">'._('Show All Answers').'</button></p>';

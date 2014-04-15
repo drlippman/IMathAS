@@ -317,17 +317,17 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		foreach($tips as $iidx=>$tip) {
 			if ($doshowans && (!isset($showanswer) || (is_array($showanswer) && !isset($showanswer[$iidx]))) && $shanspt[$iidx]!=='') {
 				if ($nosabutton) {
-					$showanswerloc[$iidx] = filter(_('Answer:') . " {$shanspt[$iidx]}\n");
+					$showanswerloc[$iidx] = "<span id=\"showansbtn$qnidx-$iidx\">".filter(_('Answer:') . " {$shanspt[$iidx]}</span>\n");
 				} else {
-					$showanswerloc[$iidx] = "<input class=\"sabtn\" type=button value=\"". _('Show Answer'). "\" onClick='javascript:document.getElementById(\"ans$qnidx-$iidx\").className=\"shown\";' />"; //AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
+					$showanswerloc[$iidx] = "<input id=\"showansbtn$qnidx-$iidx\" class=\"sabtn\" type=button value=\"". _('Show Answer'). "\" onClick='javascript:document.getElementById(\"ans$qnidx-$iidx\").className=\"shown\";' />"; //AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
 					$showanswerloc[$iidx] .= filter(" <span id=\"ans$qnidx-$iidx\" class=\"hidden\">{$shanspt[$iidx]}</span>\n");
 				}
 			} else if ($doshowans && isset($showanswer) && is_array($showanswer)) { //use part specific showanswer
 				if (isset($showanswer[$iidx])) {
 					if ($nosabutton) {
-						$showanswerloc[$iidx] = filter(_('Answer:') . " {$showanswer[$iidx]}\n");
+						$showanswerloc[$iidx] = "<span id=\"showansbtn$qnidx-$iidx\">".filter(_('Answer:') . " {$showanswer[$iidx]}</span>\n");
 					} else {
-						$showanswerloc[$iidx] = "<input class=\"sabtn\" type=button value=\""._('Show Answer')."\" onClick='javascript:document.getElementById(\"ans$qnidx-$iidx\").className=\"shown\";' />";// AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
+						$showanswerloc[$iidx] = "<input id=\"showansbtn$qnidx-$iidx\" class=\"sabtn\" type=button value=\""._('Show Answer')."\" onClick='javascript:document.getElementById(\"ans$qnidx-$iidx\").className=\"shown\";' />";// AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
 						$showanswerloc[$iidx] .= filter(" <span id=\"ans$qnidx-$iidx\" class=\"hidden\">{$showanswer[$iidx]}</span>\n");
 					}
 				}
