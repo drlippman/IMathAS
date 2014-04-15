@@ -583,7 +583,7 @@ function gbtable() {
 					$gb[0][1][$pos][7] = $discuss[$k];
 					$discusscol[$discuss[$k]] = $pos;
 				}
-				if (isset($GLOBALS['includeduedate'])) {
+				if (isset($GLOBALS['includeduedate']) && $GLOBALS['includeduedate']==true) {
 					$gb[0][1][$pos][11] = $enddate[$k];
 				}
 					
