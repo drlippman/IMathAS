@@ -99,7 +99,8 @@ if ($canviewall) {
 	$links = ((floor($gbmode/100)%10)&1); //0: view/edit, 1 q breakdown
 	$hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
 	$includeduedate = (((floor($gbmode/100)%10)&4)==4); //0: hide due date, 4: show due date
-	$hidenc = floor($gbmode/10)%10; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
+	$hidenc = (floor($gbmode/10)%10)%3; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
+	$includelastchange = (((floor($gbmode/10)%10)&4)==4);  //: hide last change, 4: show last change
 	$availshow = $gbmode%10; //0: past, 1 past&cur, 2 all, 3 past and attempted, 4=current only
 	
 } else {
@@ -655,7 +656,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 		echo '<button type="submit" name="posted" value="Lock" title="',_("Lock selected students out of the course"),'">',_('Lock'),'</button> ';
 		echo '<button type="submit" name="posted" value="Make Exception" title="',_("Make due date exceptions for selected students"),'">',_('Make Exception'),'</button> ';
 	}
-	
+	$includelastchange = false;  //don't need it for instructor view
 	$gbt = gbinstrdisp();
 	echo "</form>";
 	echo "</div>";
@@ -674,7 +675,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 }
 
 function gbstudisp($stu) {
-	global $hidenc,$cid,$gbmode,$availshow,$isteacher,$istutor,$catfilter,$imasroot,$canviewall,$urlmode;
+	global $hidenc,$cid,$gbmode,$availshow,$isteacher,$istutor,$catfilter,$imasroot,$canviewall,$urlmode,$includeduedate, $includelastchange;
 	if ($availshow==4) {
 		$availshow=1;
 		$hidepast = true;
@@ -802,6 +803,12 @@ function gbstudisp($stu) {
 	echo '<th>', _('Item'), '</th><th>', _('Possible'), '</th><th>', _('Grade'), '</th><th>', _('Percent'), '</th>';
 	if ($stu>0 && $isteacher) {
 		echo '<th>', _('Time Spent (In Questions)'), '</th>';
+		if ($includelastchange) {
+			echo '<th>'._('Last Changed').'</th>';
+		}
+		if ($includeduedate) {
+			echo '<th>'._('Due Date').'</th>';
+		}
 	}
 	if ($stu>0) {
 		echo '<th>', _('Feedback'), '<br/><a href="#" class="small pointer" onclick="return showhideallfb(this);">', _('[Show Feedback]'), '</a></th>';
@@ -936,7 +943,20 @@ function gbstudisp($stu) {
 				} else {
 					echo '<td></td>';
 				}
-				
+				if ($includelastchange) {
+					if ($gbt[1][1][$i][9]>0) {
+						echo '<td>'.tzdate('n/j/y g:ia', $gbt[1][1][$i][9]);
+					} else {
+						echo '<td></td>';
+					}
+				}
+				if ($includeduedate) {
+					if ($gbt[0][1][$i][11]<2000000000) {
+						echo '<td>'.tzdate('n/j/y g:ia',$gbt[0][1][$i][11]);
+					} else {
+						echo '<td>-</td>';
+					}
+				}
 			}
 			if ($stu>0) {
 				if ($gbt[1][1][$i][1]=='') {

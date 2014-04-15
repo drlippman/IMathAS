@@ -99,6 +99,7 @@
 		$defgbmode = $_POST['gbmode1'] + 10*$_POST['gbmode10'] + 100*($_POST['gbmode100']+$_POST['gbmode200']) + 1000*$_POST['gbmode1000'] + 1000*$_POST['gbmode1002'];
 		if (isset($_POST['gbmode4000'])) {$defgbmode += 4000;}
 		if (isset($_POST['gbmode400'])) {$defgbmode += 400;}
+		if (isset($_POST['gbmode40'])) {$defgbmode += 40;}
 		$stugbmode = $_POST['stugbmode1'] + $_POST['stugbmode2'] + $_POST['stugbmode4'] + $_POST['stugbmode8'];
 		$query = "UPDATE imas_gbscheme SET useweights='$useweights',orderby='$orderby',usersort='$usersort',defaultcat='$defaultcat',defgbmode='$defgbmode',stugbmode='$stugbmode',colorize='{$_POST['colorize']}' WHERE courseid='$cid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
@@ -205,8 +206,10 @@
 	$links = ((floor($defgbmode/100)%10)&1); //0: view/edit, 1 q breakdown
 	$hidelocked = ((floor($defgbmode/100)%10)&2); //0: show 2: hide locked
 	$includeduedate = (((floor($defgbmode/100)%10)&4)==4); //0: hide due date, 4: show due date
-	$hidenc = floor($defgbmode/10)%10; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
+	$hidenc = (floor($defgbmode/10)%10)%3; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
+	$includelastchange = (((floor($defgbmode/10)%10)&4)==4);  //: hide last change, 4: show last change
 	$availshow = $defgbmode%10; //0: past, 1 past&cur, 2 all
+	
 	
 	$colorval = array(0);
 	$colorlabel = array("No Color");
@@ -251,7 +254,7 @@
 		<?php
 		$orderval = array(0,1);
 		$orderlabel = array('Order by section (if used), then Last name','Order by Last name');
-		writeHtmlSelect("orderby", $orderval, $orderlabel, $usersort);
+		writeHtmlSelect("usersort", $orderval, $orderlabel, $usersort);
 		?>
 	</span><br class=form />
 	
@@ -260,7 +263,7 @@
 		<?php
 		$orderval = array(0,1);
 		$orderlabel = array('Full Test','Question Breakdown');
-		writeHtmlSelect("orderby", $orderval, $orderlabel, $gbmode100);
+		writeHtmlSelect("gbmode100", $orderval, $orderlabel, $links);
 		?>
 	</span><br class=form />
 	
@@ -269,7 +272,7 @@
 		<?php
 		$orderval = array(0,3,4,1,2);
 		$orderlabel = array('Past Due Items','Past &amp; Attempted Items','Available Items Only','Past &amp; Available Items','All Items');
-		writeHtmlSelect("orderby", $orderval, $orderlabel, $availshow);
+		writeHtmlSelect("gbmode1", $orderval, $orderlabel, $availshow);
 		?>
 	</span><br class=form>
 	
@@ -278,7 +281,7 @@
 		<?php
 		$orderval = array(0,1,2);
 		$orderlabel = array('Show NC items','Show NC items not hidden from students','Hide NC items');
-		writeHtmlSelect("orderby", $orderval, $orderlabel, $gbmode10);
+		writeHtmlSelect("gbmode10", $orderval, $orderlabel, $hidenc);
 		?>
 	</span><br class=form>
 	
@@ -309,7 +312,8 @@
 	<span class=form>Include details:</span>
 	<span class=formright>
 		<input type="checkbox" name="gbmode4000" value="4" id="llcol" <?php writeHtmlChecked($lastlogin,true);?>/><label for="llcol">Last Login column</label><br/>
-		<input type="checkbox" name="gbmode400" value="4" id="duedate" <?php writeHtmlChecked($includeduedate,true);?>/><label for="duedate">Due Date in column headers</label>
+		<input type="checkbox" name="gbmode400" value="4" id="duedate" <?php writeHtmlChecked($includeduedate,true);?>/><label for="duedate">Due Date in column headers, and column in single-student view</label><br/>
+		<input type="checkbox" name="gbmode40" value="4" id="lastchg" <?php writeHtmlChecked($includelastchange,true);?>/><label for="lastchg">Last Change column in single-student view</label>
 	</span><br class=form />
 	
 	<span class="form">Totals to show students:</span>
