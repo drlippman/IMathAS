@@ -425,15 +425,17 @@ if ($overwriteBody==1) {
 	
 	<div class=submit><input type=submit value="<?php echo $savetitle?>"></div>
 </form>
-<p><sup>*</sup>If a parent block is set to be publicly accessible, this block will automatically be publicly accessible, regardless of your selection here.<br/>
-Items from publicly accessible blocks can viewed without logging in at http://<?php echo $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') ?>/public.php?cid=<?php echo $_GET['cid'];?>. </p>
+<p class="small"><sup>*</sup>If a parent block is set to be publicly accessible, this block will automatically be publicly accessible, regardless of your selection here.<br/>
+Items from publicly accessible blocks can viewed without logging in at <?php echo $urlmode.$_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') ?>/public.php?cid=<?php echo $_GET['cid'];?>. </p>
 
-<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+
 
 <?php
 if (isset($blockitems)) {
 	echo '<input type="hidden" name="blockid" value="'.$blockitems[$existingid]['id'].'"/>';
+	echo '<p class="small">Block ID: '.$blockitems[$existingid]['id'].'</p>';
 }
+echo '<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>';
 }
 
 	require("../footer.php");
