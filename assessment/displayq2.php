@@ -306,32 +306,36 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	}
 	
 	if ($doshowans && isset($showanswer) && !is_array($showanswer)) {  //single showanswer defined
+		$showanswerloc = (isset($showanswerstyle) && $showanswerstyle=='inline')?'<span>':'<div>';
 		if ($nosabutton) {
-			$showanswerloc = filter(_('Answer:') . " $showanswer\n");	
+			$showanswerloc .= filter(_('Answer:') . " $showanswer\n");	
 		} else {
-			$showanswerloc = "<input class=\"sabtn\" type=button value=\""._('Show Answer')."\" onClick='javascript:document.getElementById(\"ans$qnidx\").className=\"shown\"; rendermathnode(document.getElementById(\"ans$qnidx\"));' />";
+			$showanswerloc .= "<input class=\"sabtn\" type=button value=\""._('Show Answer')."\" onClick='javascript:document.getElementById(\"ans$qnidx\").className=\"shown\"; rendermathnode(document.getElementById(\"ans$qnidx\"));' />";
 			$showanswerloc .= filter(" <span id=\"ans$qnidx\" class=\"hidden\">$showanswer </span>\n");
 		}
+		$showanswerloc .= (isset($showanswerstyle) && $showanswerstyle=='inline')?'</span>':'</div>';
 	} else {
 		$showanswerloc = array();
 		foreach($tips as $iidx=>$tip) {
+			$showanswerloc[$iidx] = (isset($showanswerstyle) && $showanswerstyle=='inline')?'<span>':'<div>';
 			if ($doshowans && (!isset($showanswer) || (is_array($showanswer) && !isset($showanswer[$iidx]))) && $shanspt[$iidx]!=='') {
 				if ($nosabutton) {
-					$showanswerloc[$iidx] = filter(_('Answer:') . " {$shanspt[$iidx]}\n");
+					$showanswerloc[$iidx] .= "<span id=\"showansbtn$qnidx-$iidx\">".filter(_('Answer:') . " {$shanspt[$iidx]}</span>\n");
 				} else {
-					$showanswerloc[$iidx] = "<input class=\"sabtn\" type=button value=\"". _('Show Answer'). "\" onClick='javascript:document.getElementById(\"ans$qnidx-$iidx\").className=\"shown\";' />"; //AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
+					$showanswerloc[$iidx] .= "<input id=\"showansbtn$qnidx-$iidx\" class=\"sabtn\" type=button value=\"". _('Show Answer'). "\" onClick='javascript:document.getElementById(\"ans$qnidx-$iidx\").className=\"shown\";' />"; //AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
 					$showanswerloc[$iidx] .= filter(" <span id=\"ans$qnidx-$iidx\" class=\"hidden\">{$shanspt[$iidx]}</span>\n");
 				}
 			} else if ($doshowans && isset($showanswer) && is_array($showanswer)) { //use part specific showanswer
 				if (isset($showanswer[$iidx])) {
 					if ($nosabutton) {
-						$showanswerloc[$iidx] = filter(_('Answer:') . " {$showanswer[$iidx]}\n");
+						$showanswerloc[$iidx] .= "<span id=\"showansbtn$qnidx-$iidx\">".filter(_('Answer:') . " {$showanswer[$iidx]}</span>\n");
 					} else {
-						$showanswerloc[$iidx] = "<input class=\"sabtn\" type=button value=\""._('Show Answer')."\" onClick='javascript:document.getElementById(\"ans$qnidx-$iidx\").className=\"shown\";' />";// AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
+						$showanswerloc[$iidx] .= "<input id=\"showansbtn$qnidx-$iidx\" class=\"sabtn\" type=button value=\""._('Show Answer')."\" onClick='javascript:document.getElementById(\"ans$qnidx-$iidx\").className=\"shown\";' />";// AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
 						$showanswerloc[$iidx] .= filter(" <span id=\"ans$qnidx-$iidx\" class=\"hidden\">{$showanswer[$iidx]}</span>\n");
 					}
 				}
 			}
+			$showanswerloc[$iidx] .= (isset($showanswerstyle) && $showanswerstyle=='inline')?'</span>':'</div>';
 			
 		}
 	}
@@ -969,7 +973,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		
 		for ($i=0; $i < count($randkeys); $i++) {
 			if ($displayformat == "horiz") {
-				$out .= "<div class=choice >{$questions[$randkeys[$i]]}<br/><input type=radio name=qn$qn value=$i ";
+				$out .= "<div class=choice ><label for=\"qn$qn-$i\">{$questions[$randkeys[$i]]}</label><br/><input type=radio id=\"qn$qn-$i\" name=qn$qn value=$i ";
 				if (($la!='') && ($la == $i)) { $out .= "CHECKED";}
 				$out .= " /></div>\n";
 			} else if ($displayformat == "select") {
@@ -977,9 +981,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				if (($la!='') && ($la!='NA') && ($la == $i)) { $out .= "selected=1";}
 				$out .= ">{$questions[$randkeys[$i]]}</option>\n";
 			} else if ($displayformat == "inline") {
-				$out .= "<input type=radio name=qn$qn value=$i ";
+				$out .= "<input type=radio name=qn$qn value=$i id=\"qn$qn-$i\" ";
 				if (($la!='') && ($la == $i)) { $out .= "CHECKED";}
-				$out .= " />{$questions[$randkeys[$i]]}";
+				$out .= " /><label for=\"qn$qn-$i\">{$questions[$randkeys[$i]]}</label>";
 			} else if ($displayformat == 'column') {
 				if ($i%$itempercol==0) {
 					if ($i>0) {
@@ -987,13 +991,13 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					}
 					$out .= '<div class="match"><ul class=nomark>';
 				}
-				$out .= "<li><input type=radio name=qn$qn value=$i ";
+				$out .= "<li><input type=radio name=qn$qn value=$i id=\"qn$qn-$i\" ";
 				if (($la!='') && ($la == $i)) { $out .= "CHECKED";}
-				$out .= " />{$questions[$randkeys[$i]]}</li> \n";
+				$out .= " /><label for=\"qn$qn-$i\">{$questions[$randkeys[$i]]}<label></li> \n";
 			} else {
-				$out .= "<li><input class=\"unind\" type=radio name=qn$qn value=$i ";
+				$out .= "<li><input class=\"unind\" type=radio name=qn$qn value=$i id=\"qn$qn-$i\" ";
 				if (($la!='') && ($la == $i)) { $out .= "CHECKED";}
-				$out .= " />{$questions[$randkeys[$i]]}</li> \n";
+				$out .= " /><label for=\"qn$qn-$i\">{$questions[$randkeys[$i]]}<label></li> \n";
 			}
 		}
 		if ($displayformat == "horiz") {
@@ -1079,14 +1083,14 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		
 		for ($i=0; $i < count($randkeys); $i++) {
 			if ($displayformat == "horiz") {
-				$out .= "<div class=choice>{$questions[$randkeys[$i]]}<br/>";
-				$out .= "<input type=checkbox name=\"qn$qn"."[$i]\" value=$i ";
+				$out .= "<div class=choice><label for=\"qn$qn-$i\">{$questions[$randkeys[$i]]}</label><br/>";
+				$out .= "<input type=checkbox name=\"qn$qn"."[$i]\" value=$i id=\"qn$qn-$i\" ";
 				if (isset($labits[$i]) && ($labits[$i]!='') && ($labits[$i] == $i)) { $out .= "CHECKED";}
 				$out .= " /></div> \n";
 			} else if ($displayformat == "inline") {
-				$out .= "<input type=checkbox name=\"qn$qn"."[$i]\" value=$i ";
+				$out .= "<input type=checkbox name=\"qn$qn"."[$i]\" value=$i id=\"qn$qn-$i\" ";
 				if (isset($labits[$i]) && ($labits[$i]!='') && ($labits[$i] == $i)) { $out .= "CHECKED";}
-				$out .= " />{$questions[$randkeys[$i]]} ";
+				$out .= " /><label for=\"qn$qn-$i\">{$questions[$randkeys[$i]]}</label> ";
 			} else if ($displayformat == 'column') {
 				if ($i%$itempercol==0) {
 					if ($i>0) {
@@ -1094,13 +1098,13 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					}
 					$out .= '<div class="match"><ul class=nomark>';
 				}
-				$out .= "<li><input type=checkbox name=\"qn$qn"."[$i]\" value=$i ";
+				$out .= "<li><input type=checkbox name=\"qn$qn"."[$i]\" value=$i id=\"qn$qn-$i\" ";
 				if (isset($labits[$i]) && ($labits[$i]!='') && ($labits[$i] == $i)) { $out .= "CHECKED";}
-				$out .= " />{$questions[$randkeys[$i]]}</li> \n";
+				$out .= " /><label for=\"qn$qn-$i\">{$questions[$randkeys[$i]]}</label></li> \n";
 			} else {
-				$out .= "<li><input class=\"unind\" type=checkbox name=\"qn$qn"."[$i]\" value=$i ";
+				$out .= "<li><input class=\"unind\" type=checkbox name=\"qn$qn"."[$i]\" value=$i id=\"qn$qn-$i\" ";
 				if (isset($labits[$i]) && ($labits[$i]!='') && ($labits[$i] == $i)) { $out .= "CHECKED";}
-				$out .= " />{$questions[$randkeys[$i]]}</li> \n";
+				$out .= " /><label for=\"qn$qn-$i\">{$questions[$randkeys[$i]]}</label></li> \n";
 			}
 		}
 		if ($displayformat == "horiz") {
