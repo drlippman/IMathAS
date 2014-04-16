@@ -835,12 +835,14 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein') {
 		reporterror("invalid course identifier in folder view launch");
 	} else {
 		$cid = intval($keyparts[1]);
-		$usid = explode('_',$_SESSION['ltiorigkey']);
-		$query = "SELECT imas_tutors.id FROM imas_tutors JOIN imas_users ON imas_tutors.userid=imas_users.id WHERE ";
-		$query .= "imas_tutors.courseid='$cid' AND imas_users.SID='".addslashes($usid[0])."'";
-		$r3 = mysql_query($query) or die("Query failed : " . mysql_error());
-		if (mysql_num_rows($r3)==0) {
-			reporterror("not authorized to view folders in this course");
+		if ($_SESSION['lti_keytype']=='cc-vf') {
+			$usid = explode('_',$_SESSION['ltiorigkey']);
+			$query = "SELECT imas_tutors.id FROM imas_tutors JOIN imas_users ON imas_tutors.userid=imas_users.id WHERE ";
+			$query .= "imas_tutors.courseid='$cid' AND imas_users.SID='".addslashes($usid[0])."'";
+			$r3 = mysql_query($query) or die("Query failed : " . mysql_error());
+			if (mysql_num_rows($r3)==0) {
+				reporterror("not authorized to view folders in this course");
+			}
 		}
 		$row = mysql_fetch_row($result2);
 		$items = unserialize($row[0]);
