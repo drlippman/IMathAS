@@ -736,9 +736,9 @@
 			});
 			</script>';
 		
-		echo '<p><button type="button" id="hctoggle"onclick="hidecorrect()">'._('Hide Questions with Perfect Scores').'</button>';
+		echo '<p><button type="button" id="hctoggle" onclick="hidecorrect()">'._('Hide Questions with Perfect Scores').'</button>';
 		echo ' <button type="button" id="hnatoggle" onclick="hideNA()">'._('Hide Unanswered Questions').'</button>';
-		echo ' <button type="button" id="hnatoggle" onclick="showallans()">'._('Show All Answers').'</button></p>';
+		echo ' <button type="button" id="showanstoggle" onclick="showallans()">'._('Show All Answers').'</button></p>';
 		$total = 0;
 		
 		for ($i=0; $i<count($questions);$i++) {
