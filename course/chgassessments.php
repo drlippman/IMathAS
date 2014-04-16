@@ -472,7 +472,11 @@ $(function() {
 	$inblock = 0;
 	for ($i = 0 ; $i<(count($ids)); $i++) {
 			
-			if (strpos($types[$i],'Block')!==false) {	
+			if (strpos($types[$i],'Block')!==false) {
+				if ($blockout!='' && $blockid==$parents[$i]) {
+					echo "<li>$blockout</li>";
+					$blockout = '';
+				}
 				$blockout = "<input type=checkbox name='checked[]' value='0' id='{$parents[$i]}' checked=checked ";
 				$blockout .= "onClick=\"chkgrp(this.form, '{$ids[$i]}', this.checked);\" ";
 				$blockout .='/>';
@@ -560,7 +564,7 @@ $(function() {
 				</td>
 			</tr>
 			<tr>
-				<td><input type="checkbox" name="docopyopt" onClick="copyfromtoggle(this.form,this.checked)"/></td>
+				<td><input type="checkbox" name="docopyopt" class="chgbox" onClick="copyfromtoggle(this.form,this.checked)"/></td>
 				<td class="r">Copy remaining options</td>
 				<td>Copy from:
 <?php
