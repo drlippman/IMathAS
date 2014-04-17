@@ -1,16 +1,35 @@
 <?php
 //A collection of chemistry routines
 //
-//Version 0.1 June 7 2012
+//Version 0.2 April 16, 2014
 
 global $allowedmacros;
-array_push($allowedmacros,"chem_getsymbol","chem_getname","chem_getweight","chem_getmeltingpoint","chem_getboilingpoint","chem_getfamily","chem_randelementbyfamily"," chem_diffrandelementsbyfamily");
+array_push($allowedmacros,"chem_disp","chem_mathdisp","chem_getsymbol","chem_getnumber","chem_getname","chem_getweight","chem_getmeltingpoint","chem_getboilingpoint","chem_getfamily","chem_randelementbyfamily"," chem_diffrandelementsbyfamily", "chem_getrandcompound", "chem_getdiffrandcompounds","chem_decomposecompound","chem_getcompoundmolmass");
 
+//chem_disp(compound) 
+//formats a compound for display in as HTML
+function chem_disp($c) {
+	$c = preg_replace('/_(\d+)/','<sub>$1</sub>',$c);
+	return str_replace(' ','',$c);	
+}
+
+//chem_mathdisp(compound) 
+//formats a compound for better display in math mode
+function chem_mathdisp($c) {
+	return preg_replace('/([a-zA-Z]+)/','"$1"',$c);	
+}
 //chem_getsymbol(atomic number)
 //returns the chemical symbol given the atomic number
 function chem_getsymbol($n) {
 	global $chem_periodic_table;
 	return $chem_periodic_table[$n][0];
+}
+
+//chem_getnumber(symbol)
+//returns the atomic number given the chemical symbol 
+function chem_getnumber($s) {
+	global $chem_numberbyatom;
+	return $chem_numberbyatom[$s];
 }
 
 //chem_getname(atomic number)
@@ -87,6 +106,97 @@ function chem_diffrandelementsbyfamily($f, $n) {
 	return $out;
 }
 
+//chem_getrandcompound(type)
+//returns an array of (compound name, compound formula)
+//valid types are: twobasic, twosub, threeplus, parens
+//if type is not supplied, compound is chosen randomly from all
+function chem_getrandcompound($type="twobasic,twosub,threeplus,parens") {
+	global $chem_compounds;
+	$types = explode(',',$type);
+	$n = array();
+	foreach ($types as $v) {
+		$n[] = count($chem_compounds[$v]);
+	}
+	$r = rand(0,array_sum($n)-1);
+	foreach ($types as $i=>$v) {
+		if ($r<$n[$i]) {
+			return $chem_compounds[$v][$r];	
+		} else {
+			$r -= $n[$i];
+		} 
+	}		
+}
+
+//chem_getdiffrandcompounds(n,type)
+//returns an array n arrays of (compound name, compound formula)
+//valid types are: twobasic, twosub, threeplus, parens
+//if type is not supplied, compound is chosen randomly from all
+function chem_getdiffrandcompounds($c, $type="twobasic,twosub,threeplus,parens") {
+	global $chem_compounds;
+	$types = explode(',',$type);
+	$n = array();
+	foreach ($types as $v) {
+		$n[] = count($chem_compounds[$v]);
+	}
+	$r = diffrands(0, array_sum($n)-1, $c);
+	$out = array();
+	foreach ($types as $i=>$v) {
+		foreach ($r as $k=>$rv) {
+			if ($rv<$n[$i]) {
+				$out[] = $chem_compounds[$v][$rv];
+				unset($r[$k]);
+			} else {
+				$r[$k] -= $n[$i];
+			} 
+		}
+	}
+	return $out;
+}
+
+//chem_decomposecompound(compound)
+//breaks a compound into an array of element=>atom count
+function chem_decomposecompound($c) {
+	$cout = array();
+	if (preg_match('/\(([^\)]*)\)_(\d+)/',$c,$matches)) {
+		$p = explode(' ',$matches[1]);
+		foreach ($p as $cb) {
+			$cbp = explode('_',$cb);
+			if (!isset($cout[$cbp[0]])) { $cout[$cbp[0]] = 0;}
+			if (count($cbp)==1) {
+				$cout[$cbp[0]] += $matches[2];
+			} else {
+				$cout[$cbp[0]] += $matches[2]*$cbp[1];
+			}
+		}
+		$c = str_replace($matches[0],'',$c);
+	}
+	$p = explode(' ',trim($c));
+	foreach ($p as $cb) {
+		if ($cb=='') {continue;}
+		$cbp = explode('_',$cb);
+		if (!isset($cout[$cbp[0]])) { $cout[$cbp[0]] = 0;}
+		if (count($cbp)==1) {
+			$cout[$cbp[0]] += 1;
+		} else {
+			$cout[$cbp[0]] += $cbp[1];
+		}
+	}
+	return $cout;
+}
+
+//chem_getcompoundmolmass(compound)
+//gets the molecular mass of the given compound
+function chem_getcompoundmolmass($c) {
+	global $chem_periodic_table, $chem_numberbyatom;
+	$dc = chem_decomposecompound($c);
+	$molmass = 0;
+	foreach ($dc as $el=>$cnt) {
+		$molmass += $chem_periodic_table[$chem_numberbyatom[$el]][3]*$cnt;
+	}
+	return $molmass;
+}
+	
+	
 $GLOBALS['chem_periodic_table'] = array(
 	1=>array("H", "Hydrogen", 1,1.0079, "-255.34", "-252.87", ""),
         2=>array("He", "Helium", 2,4.00260, "< -272.2", "-268.934", "Noble gas"),
@@ -209,4 +319,368 @@ $GLOBALS['chem_families'] = array(
 	'lanthanide'=>array(57,58,59,60,61,62,63,64,65,66,67,68,69,70,71),
 	'actinide'=>array(89,90,91,92,93,94,95,96,97,98,99,100,101,102,103)
 	);
-  
+
+$GLOBALS['chem_numberbyatom'] = array(
+	'H'=>1,'He'=>2,'Li'=>3,'Be'=>4,'B'=>5,'C'=>6,'N'=>7,'O'=>8,'F'=>9,'Ne'=>10,'Na'=>11,'Mg'=>12,'Al'=>13,'Si'=>14,'P'=>15,'S'=>16,'Cl'=>17,
+	'Ar'=>18,'K'=>19,'Ca'=>20,'Sc'=>21,'Ti'=>22,'V'=>23,'Cr'=>24,'Mn'=>25,'Fe'=>26,'Co'=>27,'Ni'=>28,'Cu'=>29,'Zn'=>30,'Ga'=>31,'Ge'=>32,'As'=>33,
+	'Se'=>34,'Br'=>35,'Kr'=>36,'Rb'=>37,'Sr'=>38,'Y'=>39,'Zr'=>40,'Nb'=>41,'Mo'=>42,'Tc'=>43,'Ru'=>44,'Rh'=>45,'Pd'=>46,'Ag'=>47,'Cd'=>48,'In'=>49,'Sn'=>50,
+	'Sb'=>51,'Te'=>52,'I'=>53,'Xe'=>54,'Cs'=>55,'Ba'=>56,'La'=>57,'Ce'=>58,'Pr'=>59,'Nd'=>60,'Pm'=>61,'Sm'=>62,'Eu'=>63,'Gd'=>64,
+	'Tb'=>65,'Dy'=>66,'Ho'=>67,'Er'=>68,'Tm'=>69,'Yb'=>70,'Lu'=>71,'Hf'=>72,'Ta'=>73,'W'=>74,'Re'=>75,'Os'=>76,'Ir'=>77,'Pt'=>78,'Au'=>79,'Hg'=>80,'Tl'=>81,'Pb'=>82,
+	'Bi'=>83,'Po'=>84,'At'=>85,'Rn'=>86,'Fr'=>87,'Ra'=>88,'Ac'=>89,'Th'=>90,'Pa'=>91,'U'=>92,'Np'=>93,'Pu'=>94,'Am'=>95,
+	'Cm'=>96,'Bk'=>97,'Cf'=>98,'Es'=>99,'Fm'=>100,'Md'=>101,'No'=>102,'Lr'=>103);
+
+$GLOBALS['chem_compounds'] = array(
+	'twobasic' => array(
+		array('Silver bromide','Ag Br'),
+		array('Silver chloride','Ag Cl'),
+		array('Silver iodide','Ag I'),
+		array('Aluminium nitride','Al N'),
+		array('Aluminium phosphide','Al P'),
+		array('Boron nitride','B N'),
+		array('Barium oxide','Ba O'),
+		array('Beryllium oxide','Be O'),
+		array('Carbon monoxide','C O'),
+		array('Chlorine monoxide','Cl O'),
+		array('Caesium chloride','Cs Cl'),
+		array('Caesium fluoride','Cs F'),
+		array('Gallium nitride','Ga N'),
+		array('Gallium phosphide','Ga P'),
+		array('Hydrogen bromide','H Br'),
+		array('Hydrochloric acid','H Cl'),
+		array('Hydrogen fluoride','H F'),
+		array('Iodine monochloride','I Cl'),
+		array('Cyanogen iodide','I CN'),
+		array('Indium nitride','In N'),
+		array('Potassium bromide','K Br'),
+		array('Potassium chloride','K Cl'),
+		array('Potassium cyanide','K CN'),
+		array('Potassium iodide','K I'),
+		array('Lithium bromide','Li Br'),
+		array('Lithium chloride','Li Cl'),
+		array('Lithium hydride','Li H'),
+		array('Lithium iodide','Li I'),
+		array('Nitric oxide','N O'),
+		array('Sodium bromide','Na Br'),
+		array('Sodium chloride','Na Cl'),
+		array('Sodium hydride','Na H'),
+		array('Sodium iodide','Na I'),
+		array('Rubidium bromide','Rb Br'),
+		array('Rubidium chloride','Rb Cl'),
+		array('Rubidium fluoride','Rb F'),
+		array('Rubidium iodide','Rb I'),
+		array('Silicon carbide','Si C'),
+		array('Strontium oxide','Sr O'),
+		array('Tantalum carbide','Ta C'),
+		array('Titanium carbide','Ti C'),
+		array('Titanium nitride','Ti N'),
+		array('Vanadium carbide','V C'),
+		array('Tungsten carbide','W C'),
+		array('Zinc sulfide','Zn S'),
+		array('Zirconium carbide','Zr C'),
+		array('Silver azide','Ag N_3'),
+		array('Silver oxide','Ag_2 O'),
+		array('Silver sulfide','Ag_2 S'),
+		array('Silver nitride','Ag_3 N'),
+		array('Aluminium chloride','Al Cl_3'),
+		array('Aluminium fluoride','Al F_3'),
+		array('Arsine','As H_3'),
+		array('Boron trichloride','B Cl_3'),
+		array('Boron trifluoride','B F_3'),
+		array('Boron carbide','B_4 C'),
+		array('Boron suboxide','B_6 O'),
+		array('Barium chloride','Ba Cl_2'),
+		array('Barium fluoride','Ba F_2'),
+		array('Barium iodide','Ba I_2'),
+		array('Barium peroxide','Ba O_2'),
+		array('Beryllium bromide','Be Br_2'),
+		array('Beryllium chloride','Be Cl_2'),
+		array('Beryllium fluoride','Be F_2'),
+		array('Beryllium hydride','Be H_2'),
+		array('Beryllium iodide','Be I_2'),
+		array('Bromine trifluoride','Br F_3'),
+		array('Carbon tetraiodide','C I_4'),
+		array('Carbon dioxide','C O_2'),
+		array('Calcium carbide','Ca C_2'),
+		array('Calcium chloride','Ca Cl_2'),
+		array('Calcium fluoride','Ca F_2'),
+		array('Calcium hydride','Ca H_2'),
+		array('Cadmium bromide','Cd Br_2'),
+		array('Cadmium chloride','Cd Cl_2'),
+		array('Cadmium fluoride','Cd F_2'),
+		array('Cadmium iodide','Cd I_2'),
+		array('Chlorine dioxide','Cl O_2'),
+		array('Chlorine trioxide','Cl O_3'),
+		array('Gallium trichloride','Ga Cl_3'),
+		array('Germane','Ge H_4'),
+		array('Hydrazoic acid','H N_3'),
+		array('Hydrogen sulfide','H_2 S'),
+		array('Sulfane','H_2 S'),
+		array('Iodine trichloride','I Cl_3'),
+		array('Magnesium chloride','Mg Cl_2'),
+		array('Ammonia','N H_3'),
+		array('Nitrous oxide','N_2 O'),
+		array('Nitrogen dioxide','N O_2'),
+		array('Sodium azide','Na N_3'),
+		array('Sodium dioxide','Na O_2'),
+		array('Sodium oxide','Na_2 O'),
+		array('Sodium sulfide','Na_2 S'),
+		array('Phosphorus tribromide','P Br_3'),
+		array('Phosphorus trifluoride','P F_3'),
+		array('Phosphine','P H_3'),
+		array('Phosphorus triiodide','P I_3'),
+		array('Radium chloride','Ra Cl_2'),
+		array('Sulfur tetrafluoride','S F_4'),
+		array('Sulfur hexafluoride','S F_6'),
+		array('Sulfur dioxide','S O_2'),
+		array('Antimony hydride','Sb H_3'),
+		array('Stibine','Sb H_3'),
+		array('Selenium tetrafluoride','Se F_4'),
+		array('Selenium hexafluoride','Se F_6'),
+		array('Selenium dioxide','Se O_2'),
+		array('Silane','Si H_4'),
+		array('Silicon dioxide','Si O_2'),
+		array('Strontium chloride','Sr Cl_2'),
+		array('Uranium pentafluoride','U F_5'),
+		array('Zinc bromide','Zn Br_2'),
+		array('Zinc chloride','Zn Cl_2'),
+		array('Aluminium oxide','Al_2 O_3'),
+		array('Diborane','B_2 H_6'),
+		array('Boron oxide','B_2 O_3'),
+		array('Pentaborane','B_5 H_9'),
+		array('Beryllium nitride','Be_3 N_2'),
+		array('Acetylene','C_2 H_2'),
+		array('Ethylene','C_2 H_4'),
+		array('Ethane','C_2 H_6'),
+		array('Propane','C_3 H_8'),
+		array('Butane','C_4 H_10'),
+		array('Cyclobutane','C_4 H_8'),
+		array('Dichlorine trioxide','Cl_2 O_3'),
+		array('Dichlorine hexoxide','Cl_2 O_6'),
+		array('Dichlorine heptoxide','Cl_2 O_7'),
+		array('Digermane','Ge_2 H_6'),
+		array('Hydrogen peroxide','H_2 O_2'),
+		array('Lithium peroxide','Li_2 O_2'),
+		array('Hydrazine','N_2 H_4'),
+		array('Sodium carbide','Na_2 C_2'),
+		array('Sodium peroxide','Na_2 O_2'),
+		array('Disulfur dichloride','S_2 Cl_2'),
+		array('Antimony trioxide','Sb_2 O_3'),
+		array('Disilane','Si_2 H_6')	
+	),
+	'twosub'=> array(
+		array('Silver azide','Ag N_3'),
+		array('Silver oxide','Ag_2 O'),
+		array('Silver sulfide','Ag_2 S'),
+		array('Silver nitride','Ag_3 N'),
+		array('Aluminium chloride','Al Cl_3'),
+		array('Aluminium fluoride','Al F_3'),
+		array('Arsine','As H_3'),
+		array('Boron trichloride','B Cl_3'),
+		array('Boron trifluoride','B F_3'),
+		array('Boron carbide','B_4 C'),
+		array('Boron suboxide','B_6 O'),
+		array('Barium chloride','Ba Cl_2'),
+		array('Barium fluoride','Ba F_2'),
+		array('Barium iodide','Ba I_2'),
+		array('Barium peroxide','Ba O_2'),
+		array('Beryllium bromide','Be Br_2'),
+		array('Beryllium chloride','Be Cl_2'),
+		array('Beryllium fluoride','Be F_2'),
+		array('Beryllium hydride','Be H_2'),
+		array('Beryllium iodide','Be I_2'),
+		array('Bromine trifluoride','Br F_3'),
+		array('Carbon tetraiodide','C I_4'),
+		array('Carbon dioxide','C O_2'),
+		array('Calcium carbide','Ca C_2'),
+		array('Calcium chloride','Ca Cl_2'),
+		array('Calcium fluoride','Ca F_2'),
+		array('Calcium hydride','Ca H_2'),
+		array('Cadmium bromide','Cd Br_2'),
+		array('Cadmium chloride','Cd Cl_2'),
+		array('Cadmium fluoride','Cd F_2'),
+		array('Cadmium iodide','Cd I_2'),
+		array('Chlorine dioxide','Cl O_2'),
+		array('Chlorine trioxide','Cl O_3'),
+		array('Gallium trichloride','Ga Cl_3'),
+		array('Germane','Ge H_4'),
+		array('Hydrazoic acid','H N_3'),
+		array('Hydrogen sulfide','H_2 S'),
+		array('Sulfane','H_2 S'),
+		array('Iodine trichloride','I Cl_3'),
+		array('Magnesium chloride','Mg Cl_2'),
+		array('Ammonia','N H_3'),
+		array('Nitrous oxide','N_2 O'),
+		array('Nitrogen dioxide','N O_2'),
+		array('Sodium azide','Na N_3'),
+		array('Sodium dioxide','Na O_2'),
+		array('Sodium oxide','Na_2 O'),
+		array('Sodium sulfide','Na_2 S'),
+		array('Phosphorus tribromide','P Br_3'),
+		array('Phosphorus trifluoride','P F_3'),
+		array('Phosphine','P H_3'),
+		array('Phosphorus triiodide','P I_3'),
+		array('Radium chloride','Ra Cl_2'),
+		array('Sulfur tetrafluoride','S F_4'),
+		array('Sulfur hexafluoride','S F_6'),
+		array('Sulfur dioxide','S O_2'),
+		array('Antimony hydride','Sb H_3'),
+		array('Stibine','Sb H_3'),
+		array('Selenium tetrafluoride','Se F_4'),
+		array('Selenium hexafluoride','Se F_6'),
+		array('Selenium dioxide','Se O_2'),
+		array('Silane','Si H_4'),
+		array('Silicon dioxide','Si O_2'),
+		array('Strontium chloride','Sr Cl_2'),
+		array('Uranium pentafluoride','U F_5'),
+		array('Zinc bromide','Zn Br_2'),
+		array('Zinc chloride','Zn Cl_2'),
+		array('Aluminium oxide','Al_2 O_3'),
+		array('Diborane','B_2 H_6'),
+		array('Boron oxide','B_2 O_3'),
+		array('Pentaborane','B_5 H_9'),
+		array('Beryllium nitride','Be_3 N_2'),
+		array('Acetylene','C_2 H_2'),
+		array('Ethylene','C_2 H_4'),
+		array('Ethane','C_2 H_6'),
+		array('Propane','C_3 H_8'),
+		array('Butane','C_4 H_10'),
+		array('Cyclobutane','C_4 H_8'),
+		array('Dichlorine trioxide','Cl_2 O_3'),
+		array('Dichlorine hexoxide','Cl_2 O_6'),
+		array('Dichlorine heptoxide','Cl_2 O_7'),
+		array('Digermane','Ge_2 H_6'),
+		array('Hydrogen peroxide','H_2 O_2'),
+		array('Lithium peroxide','Li_2 O_2'),
+		array('Hydrazine','N_2 H_4'),
+		array('Sodium carbide','Na_2 C_2'),
+		array('Sodium peroxide','Na_2 O_2'),
+		array('Disulfur dichloride','S_2 Cl_2'),
+		array('Antimony trioxide','Sb_2 O_3'),
+		array('Disilane','Si_2 H_6')
+	),
+	'threeplus' => array(
+		array('Silver fluoroborate','Ag B F_4'),
+		array('Silver bromate','Ag Br O_3'),
+		array('Silver chlorate','Ag Cl O_3'),
+		array('Silver perchlorate','Ag Cl O_4'),
+		array('Silver nitrate','Ag N O_3'),
+		array('Silver hydroxide','Ag O H'),
+		array('Silver chromate','Ag_2 Cr O_4'),
+		array('Silver sulfate','Ag_2 S O_4'),
+		array('Barium carbonate','Ba C O_3'),
+		array('Barium chromate','Ba Cr O_4'),
+		array('Barium sulfate','Ba S O_4'),
+		array('Beryllium carbonate','Be C O_3'),
+		array('Beryllium sulfite','Be S O_3'),
+		array('Beryllium sulfate','Be S O_4'),
+		array('Freon-11','C F Cl_3'),
+		array('Aspartame','C_14 H_18 N_2 O_5'),
+		array('Stearic acid','C_18 H_36 O_2'),
+		array('Acetic acid','C_2 H_4 O_2'),
+		array('Glycine','C_2 H_5 N H_2'),
+		array('Glutamine','C_5 H_10 N_2 O_3'),
+		array('Citric acid','C_6 H_8 O_7'),
+		array('Calcium cyanamide','Ca C N_2'),
+		array('Calcium chromate','Ca Cr O_4'),
+		array('Cadmium sulfate','Cd S O_4'),
+		array('Chromyl chloride','Cr O_2 Cl_2'),
+		array('Chromyl fluoride','Cr O_2 F_2'),
+		array('Caesium carbonate','Cs_2 C O_3'),
+		array('Caesium chromate','Cs_2 Cr O_4'),
+		array('Hypochlorous acid','H Cl O'),
+		array('Chloric acid','H Cl O_3'),
+		array('Perchloric acid','H Cl O_4'),
+		array('Carbonic acid','H_2 C O_3'),
+		array('Sulfurous acid','H_2 S O_3'),
+		array('Sulfuric acid','H_2 S O_4'),
+		array('Pyrosulfuric acid','H_2 S_2 O_7'),
+		array('Selenious acid','H_2 Se O_3'),
+		array('Selenic acid','H_2 Se O_4'),
+		array('Hypophosphorous acid','H_3 P O_2'),
+		array('Phosphoric acid','H_3 P O_4'),
+		array('Potassium cyanide','K C N'),
+		array('Potassium chlorate','K Cl O_3'),
+		array('Potassium perchlorate','K Cl O_4'),
+		array('Potassium carbonate','K_2 C O_3'),
+		array('Potassium sulfate','K_2 S O_4'),
+		array('Lithium aluminium hydride','Li Al H_4'),
+		array('Lithium borohydride','Li B H_4'),
+		array('Lithium hypochlorite','Li Cl O'),
+		array('Lithium chlorate','Li Cl O_3'),
+		array('Lithium perchlorate','Li Cl O_4'),
+		array('Lithium cobalt oxide','Li Co O_2'),
+		array('Lithium nitrate','Li N O_3'),
+		array('Lithium hydroxide','Li O H'),
+		array('Lithium sulfate','Li_2 S O_4'),
+		array('Magnesium carbonate','Mg C O_3'),
+		array('Magnesium sulfate','Mg S O_4'),
+		array('Ammonium cyanide','N H_4 C N'),
+		array('Ammonium chloride','N H_4 Cl'),
+		array('Ammonium chlorate','N H_4 Cl O_3'),
+		array('Ammonium perchlorate','N H_4 Cl O_4'),
+		array('Ammonium bicarbonate','N H_4 H CO_3'),
+		array('Ammonium nitrate','N H_4 N O_3'),
+		array('Ammonium hydroxide','N H_4 O H'),
+		array('Sodium borohydride','Na B H_4'),
+		array('Sodium hypobromite','Na Br O'),
+		array('Sodium bromite','Na Br O_2'),
+		array('Sodium bromate','Na Br O_3'),
+		array('Sodium perbromate','Na Br O_4'),
+		array('Sodium cyanide','Na C N'),
+		array('Sodium chlorite','Na Cl O_2'),
+		array('Sodium chlorate','Na Cl O_3'),
+		array('Sodium perchlorate','Na Cl O_4'),
+		array('Sodium iodate','Na I O_3'),
+		array('Sodium periodate','Na I O_4'),
+		array('Sodamide','Na N H_2'),
+		array('Sodium nitrite','Na N O_2'),
+		array('Sodium nitrate','Na N O_3'),
+		array('Sodium hypochlorite','Na O Cl'),
+		array('Sodium hydroxide','Na O H'),
+		array('Sodium thiocyanate','Na S CN'),
+		array('Sodium hydrosulfide','Na S H'),
+		array('Sodium carbonate','Na_2 C O_3'),
+		array('Sodium sulfite','Na_2 S O_3'),
+		array('Sodium sulfate','Na_2 S O_4'),
+		array('Sodium thiocyanate','Na_2 S_2 O_3'),
+		array('Sodium thiosulfate','Na_2 S_2 O_3'),
+		array('Sodium persulfate','Na_2 S_2 O_8'),
+		array('Sodium selenite','Na_2 Se O_3'),
+		array('Niobium oxychloride','Nb O Cl_3'),
+		array('Rubidium nitrate','Rb N O_3'),
+		array('Rubidium hydroxide','Rb O H'),
+		array('Sulfuryl chloride','S O_2 Cl_2'),
+		array('Selenium oxybromide','Se O Br_2'),
+		array('Selenium oxydichloride','Se O Cl_2'),
+		array('Selenoyl fluoride','Se O_2 F_2'),
+		array('Strontium carbonate','Sr C O_3'),
+		array('Uranyl chloride','U O_2 Cl_2'),
+		array('Uranyl fluoride','U O_2 F_2'),
+		array('Zinc sulfate','Zn S O_4')
+	),
+	'parens'=> array(
+		array('Aluminium hydroxide','Al (O H)_3'),
+		array('Aluminium nitrate','Al (N O_3)_3'),
+		array('Ammonium chromate','(N H_4)_2 Cr O_4'),
+		array('Ammonium dichromate','(N H_4)_2 Cr_2 O_7'),
+		array('Ammonium persulfate','(N H_4)_2 S_2 O_8'),
+		array('Ammonium sulfate','(N H_4)_2 S O_4'),
+		array('Ammonium sulfide','(N H_4)_2 S'),
+		array('Ammonium sulfite','(N H_4)_2 S O_3'),
+		array('Barium chlorate','Ba (Cl O_3)_2'),
+		array('Barium hydroxide','Ba (O H)_2'),
+		array('Barium nitrate','Ba (N O_3)_2'),
+		array('Beryllium hydroxide','Be (O H)_2'),
+		array('Beryllium nitrate','Be (N O_3)_2'),
+		array('Boric acid','B (O H)_3'),
+		array('Cadmium nitrate','Cd (N O_3)_2'),
+		array('Calcium chlorate','Ca (Cl O_3)_2'),
+		array('Calcium hydroxide','Ca (O H)_2'),
+		array('Strontium nitrate','Sr (N O_3)_2'),
+		array('Uranyl hydroxide','U O_2(O H)_2'),
+		array('Uranyl hydroxide','(U O_2)_2(O H)_4'),
+		array('Uranyl nitrate','U O_2(N O_3)_2'),
+		array('Zinc cyanide','Zn (C N)_2')
+	)
+);
+	
