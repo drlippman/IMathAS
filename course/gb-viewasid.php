@@ -718,7 +718,7 @@
 					} else {
 						qn = qn.substring(2)*1;
 					}
-					if (qn>1000) {
+					if (qn>999) {
 						var partname = (Math.floor(qn/1000)-1)+"-"+(qn%1000);
 						$(el).on("mouseover", function () {
 							if (!focuscolorlock) {$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn+", #showansbtn"+partname+", #scorebox"+partname).css("background-color","yellow")};
