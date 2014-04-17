@@ -268,7 +268,7 @@ function printlist($items) {
 					   $tlwrds = '';
 				 }
 				 if ($tlwrds != '') {
-				 	$onclick = 'onclick="if(confirm(\''. sprintf(_('This assessment has a time limit of %s.  Click OK to start or continue working on the assessment.'), $tlwrds). '\')){recordlasttreeview(\''.$itemtype.$typeid.'\')}else{return false;}"';
+				 	 $onclick = 'onclick="return confirm(\''. sprintf(_('This assessment has a time limit of %s.  Click OK to start or continue working on the assessment.'), $tlwrds). '\')"';
 				 } else {
 				 	 $onclick = 'onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')"';
 				 }
