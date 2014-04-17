@@ -5,7 +5,6 @@
 		echo "Need course id";
 		exit;
 	}
-	$cid = $_GET['cid'];
 	
 	if (isset($_GET['from'])) {
 		$pubcid = $cid;  //swap out cid's before calling validate
@@ -25,6 +24,7 @@
 		$fcid = 0;
 		require("../config.php");
 	}
+	$cid = intval($_GET['cid']);
 			
 	function findinpublic($items,$id) {
 		foreach ($items as $k=>$item) {
