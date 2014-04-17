@@ -5,18 +5,19 @@
 		echo "Need course id";
 		exit;
 	}
+	$cid = intval($_GET['cid']);
 	
 	if (isset($_GET['from'])) {
 		$pubcid = $cid;  //swap out cid's before calling validate
-		$cid = $_GET['from'];
-		$_GET['cid'] = $_GET['from'];
+		$cid = intval($_GET['from']);
+		$_GET['cid'] = intval($_GET['from']);
 		require("../validate.php");
 		$fcid = $cid;
 		$cid = $pubcid;
 	} else if (preg_match('/cid=(\d+)/',$_SERVER['HTTP_REFERER'],$matches) && $matches[1]!=$cid) {
 		$pubcid = $cid;  //swap out cid's before calling validate
-		$cid = $matches[1];
-		$_GET['cid'] = $matches[1];
+		$cid = intval($matches[1]);
+		$_GET['cid'] = intval($matches[1]);
 		require("../validate.php");
 		$fcid = $cid;
 		$cid = $pubcid;
@@ -24,7 +25,6 @@
 		$fcid = 0;
 		require("../config.php");
 	}
-	$cid = intval($_GET['cid']);
 			
 	function findinpublic($items,$id) {
 		foreach ($items as $k=>$item) {
