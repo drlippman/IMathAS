@@ -234,7 +234,12 @@ END;
 	 	$line['rights'] = 5;
 	 	$line['groupid'] = 0;
 	 	$_POST['password'] = 'temp';
-	 	$line['password'] = md5('temp');
+	 	if (isset($CFG['GEN']['newpasswords'])) {
+	 		require_once("includes/password.php");		
+	 		$line['password'] =  password_hash($_POST['temp'], PASSWORD_DEFAULT);
+	 	} else {
+	 		$line['password'] = md5('temp');
+	 	}
 	 	$_POST['usedetected'] = true;
 	 } else {
 		 $query = "SELECT id,password,rights,groupid FROM imas_users WHERE SID = '{$_POST['username']}'";
@@ -242,7 +247,12 @@ END;
 		 $line = mysql_fetch_array($result, MYSQL_ASSOC);
 	 }
 	// if (($line != null) && ($line['password'] == md5($_POST['password']))) {
-	 if (($line != null) && ((md5($line['password'].$_SESSION['challenge']) == $_POST['password']) ||($line['password'] == md5($_POST['password'])) )) {
+	if (isset($CFG['GEN']['newpasswords'])) {
+	 	require_once("includes/password.php");		
+	}
+	if (($line != null) && (
+	  ((!isset($CFG['GEN']['newpasswords']) || $CFG['GEN']['newpasswords']!='only') && ((md5($line['password'].$_SESSION['challenge']) == $_POST['password']) ||($line['password'] == md5($_POST['password']))))
+	  || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['password'],$line['password']))	)) {
 		 unset($_SESSION['challenge']); //challenge is used up - forget it.
 		 $userid = $line['id'];
 		 $groupid = $line['groupid'];
@@ -312,7 +322,12 @@ END;
 		 }
 		 $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		 
-		 $query = "UPDATE imas_users SET lastaccess=$now WHERE id=$userid";
+		 if (isset($CFG['GEN']['newpasswords']) && strlen($line['password'])==32) { //old password - rehash it
+		 	 $hashpw = password_hash($_POST['password'], PASSWORD_DEFAULT);
+		 	 $query = "UPDATE imas_users SET lastaccess=$now,password='$hashpw' WHERE id=$userid";
+		 } else {
+		 	 $query = "UPDATE imas_users SET lastaccess=$now WHERE id=$userid";
+		 }
 		 $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		 
 		 if (isset($_SERVER['QUERY_STRING'])) {
@@ -328,6 +343,8 @@ END;
 	 } else {
 		 if (empty($_SESSION['challenge'])) {
 			 $badsession = true;
+		 } else {
+		 	 $badsession = false;
 		 }
 		 /*  For login error tracking - requires add'l table
 		 if ($line==null) {

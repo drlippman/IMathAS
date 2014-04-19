@@ -5,7 +5,6 @@ if (!isset($imasroot)) { //don't allow direct access to loginpage.php
 }
 //any extra CSS, javascript, etc needed for login page
 	$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/infopages.css\" type=\"text/css\" />\n";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/md5.js\" ></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
 	$nologo = true;
 	require("header.php");
@@ -41,7 +40,7 @@ if (!isset($imasroot)) { //don't allow direct access to loginpage.php
 
 
 <div id="loginbox">
-<form method="post" action="<?php echo $_SERVER['PHP_SELF'].$querys;?>" onsubmit="hashpw()">
+<form method="post" action="<?php echo $_SERVER['PHP_SELF'].$querys;?>">
 <?php
 	if ($haslogin) {
 		if ($badsession) {
@@ -58,7 +57,7 @@ if (!isset($imasroot)) { //don't allow direct access to loginpage.php
 <b>Login</b>
 <table>
 <tr><td><?php echo $loginprompt;?>:</td><td><input type="text" size="15" id="username" name="username" /></td></tr>
-<tr><td>Password:</td><td><input type="password" size="15" id="passwordentry" /></td></tr>
+<tr><td>Password:</td><td><input type="password" size="15" name="password" /></td></tr>
 </table>
 <div id="settings">JavaScript is not enabled.  JavaScript is required for <?php echo $installname; ?>.  Please enable JavaScript and reload this page</div>
 <div class="textright"><a href="<?php echo $imasroot; ?>/forms.php?action=newuser">Register as a new student</a></div>
@@ -68,7 +67,6 @@ if (!isset($imasroot)) { //don't allow direct access to loginpage.php
 <input type="hidden" id="tzoffset" name="tzoffset" value=""> 
 <input type="hidden" id="tzname" name="tzname" value=""> 
 <input type="hidden" id="challenge" name="challenge" value="<?php echo $challenge; ?>" />
-<input type="hidden" id="password" name="password" value="" />
 <script type="text/javascript">        
         var thedate = new Date();  
         document.getElementById("tzoffset").value = thedate.getTimezoneOffset();

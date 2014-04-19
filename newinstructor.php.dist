@@ -11,6 +11,10 @@
 	if (isset($_POST['firstname'])) {
 		if (!isset($_POST['agree'])) {
 			echo "<p>You must agree to the Terms and Conditions to set up an account</p>";
+		} else if ($loginformat!='' && !preg_match($loginformat,$_POST['username'])) {
+			echo "<p>Username is invalid</p>";
+		} else if (!preg_match('/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/',$_POST['email'])) {
+			echo '<p>Invalid email address</p>';
 		} else if ($_POST['firstname']=='' || $_POST['lastname']=='' || $_POST['email']=='' || $_POST['school']=='' || $_POST['phone']=='' || $_POST['username']=='' || $_POST['password']=='') {
 			echo "<p>Please provide all requested information</p>";
 
@@ -25,10 +29,15 @@
 				if (isset($CFG['GEN']['homelayout'])) {
 					$homelayout = $CFG['GEN']['homelayout'];
 				} else {
-					$homelayout = '|0,2,3||0,1';
+					$homelayout = '|0,1,2||0,1';
 				}
 				$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, homelayout) ";
-				$md5pw = md5($_POST['password']);
+				if (isset($CFG['GEN']['newpasswords'])) {
+					require_once("../includes/password.php");
+					$md5pw = password_hash($_POST['password'], PASSWORD_DEFAULT);
+				} else {
+					$md5pw = md5($_POST['password']);
+				}
 				$query .= "VALUES ('{$_POST['username']}','$md5pw',0,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}','$homelayout');";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				$newuserid = mysql_insert_id();

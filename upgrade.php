@@ -1,7 +1,7 @@
 <?php  
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 83;
+$latest = 84;
 
 
 @set_time_limit(0);
@@ -1386,6 +1386,31 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 if ($res===false) {
 			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }	
+		}
+		if ($last<84) {
+			 $query = 'ALTER TABLE `imas_users` CHANGE `password` `password` VARCHAR(254) NOT NULL';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $hash = '$2y$04$usesomesillystringfore7hnbRJHxXVLeakoG8K30oukPsA.ztMG';
+			 $test = crypt("password", $hash);
+			 $pass = ($test == $hash);
+			 echo '<p>This update adds more secure password hashing, but must be manually enabled, since it requires loginpage changes.  To enable it:</p> <ul>';
+			 if (!$pass) {
+			 	 echo '<li>Upgrade to PHP 5.3.8 or later</li>';
+			 }
+			 echo '<li>Update your loginpage.php.  Compare to loginpage.php.dist. Note: <ul>';
+			 echo   '<li>Remove md5.js script load</li>';
+			 echo   '<li>Remove onsubmit from form</li>';
+			 echo   '<li>Change id="passwordentry" to name="password" in the password entry box</li>';
+			 echo   '<li>Remove the hidden password input</li></ul></li>';
+			 echo '<li>Update your newinstructor.php.  Compare to newinstructor.php.dist</li>';
+			 echo '<li>Add to your config.php: <ul>';
+			 echo   '<li>If you want a nondisruptive transition: $CFG[\'GEN\'][\'newpasswords\'] = "transition";</li>';
+			 echo   '<li>If you want to invalidate all current passwords: $CFG[\'GEN\'][\'newpasswords\'] = "only";</li></ul></li>';
+			 echo '<p>Note: Enabling this change also means that passwords not be hashed client-side anymore, which means that if you are not ';
+			 echo   'using TLS/SSL, then passwords are being sent in plaintext.  That is bad.  Get SSL - it is the only way to protect both passwords and student data.</p>';
 		}
 		/*$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {

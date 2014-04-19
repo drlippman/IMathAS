@@ -61,7 +61,12 @@
 		}	
 		
 		if ($page_newaccounterror=='') {//no error
-			$md5pw = md5($_POST['pw1']);
+			if (isset($CFG['GEN']['newpasswords'])) {
+				require_once("../includes/password.php");
+				$md5pw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
+			} else {
+				$md5pw = md5($_POST['pw1']);
+			}
 			if ($emailconfirmation) {$initialrights = 0;} else {$initialrights = 10;}
 			if (isset($_POST['msgnot'])) {
 				$msgnot = 1;
@@ -163,7 +168,6 @@
 			$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/infopages.css\" type=\"text/css\">\n";
 		}
 		//$placeinhead = "<style type=\"text/css\">div#header {clear: both;height: 75px;background-color: #9C6;margin: 0px;padding: 0px;border-left: 10px solid #036;border-bottom: 5px solid #036;} \n.vcenter {font-family: sans-serif;font-size: 28px;margin: 0px;margin-left: 30px;padding-top: 25px;color: #fff;}</style>";
-		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/md5.js\" ></script>";
 		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
 		$pagetitle = $coursename;
 		 if (isset($_SESSION['challenge'])) {
@@ -188,7 +192,7 @@
 		$enrollkey = mysql_result($result,0,0);
 		
 ?>
-<form method="post" action="<?php echo $_SERVER['PHP_SELF'].$querys;?>" onsubmit="hashpw()">
+<form method="post" action="<?php echo $_SERVER['PHP_SELF'].$querys;?>">
 
 <h3 style="color:#036;">Already have an account?</h3>
 <p><b>Login</b>.  If you have an account on <?php echo $installname;?> but are not enrolled in this course, you will be able to enroll in this course.</p>
