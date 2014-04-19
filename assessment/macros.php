@@ -1910,18 +1910,19 @@ function evalfunc($farr) {
 		foreach ($vars as $i=>$var) {
 			$func = str_replace("($var)","({$args[$i]})",$func);
 		}
+		
 		$reg = '/^\((\d*?\.?\d*?)\)([^\d\.])/';
 		$func= preg_replace($reg,"$1$2",$func);
 		$reg = '/^\(([a-zA-Z])\)([^a-zA-Z])/';
 		$func= preg_replace($reg,"$1$2",$func);
 		
-		$reg = '/([^\d\.])\((\d*?\.?\d*?)\)$/';
-		$func= preg_replace($reg,"$1$2",$func);
+		//$reg = '/([^\d\.])\((\d*?\.?\d*?)\)$/';
+		//$func= preg_replace($reg,"$1$2",$func);
 		$reg = '/([^a-zA-Z])\(([a-zA-Z])\)$/';
 		$func= preg_replace($reg,"$1$2",$func);
 		
-		$reg = '/([^\d\.])\((\d*?\.?\d*?)\)([^\d\.])/';
-		$func= preg_replace($reg,"$1$2$3",$func);
+		//$reg = '/([^\d\.])\((\d*?\.?\d*?)\)([^\d\.])/';
+		//$func= preg_replace($reg,"$1$2$3",$func);
 		$reg = '/([^a-zA-Z])\(([a-zA-Z])\)([^a-zA-Z])/';
 		$func= preg_replace($reg,"$1$2$3",$func);
 		

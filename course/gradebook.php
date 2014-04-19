@@ -1195,7 +1195,7 @@ function gbstudisp($stu) {
 }
 
 function gbinstrdisp() {
-	global $hidenc,$showpics,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection,$avgontop,$hidelocked,$colorize,$urlmode,$overridecollapse,$includeduedate;
+	global $hidenc,$showpics,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection,$avgontop,$hidelocked,$colorize,$urlmode,$overridecollapse,$includeduedate,$lastlogin;
 
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	if ($availshow==4) {
@@ -1213,9 +1213,10 @@ function gbinstrdisp() {
 	echo '<div id="bigcontmyTable"><div id="tblcontmyTable">';
 	
 	echo '<table class="gb" id="myTable"><thead><tr>';
-	$n=0;
+	
+	$sortarr = array();
 	for ($i=0;$i<count($gbt[0][0]);$i++) { //biographical headers
-		if ($i==1) {echo '<th><div>&nbsp;</div></th>';} //for pics
+		if ($i==1) {echo '<th><div>&nbsp;</div></th>'; $sortarr[] = 'false';} //for pics
 		if ($i==1 && $gbt[0][0][1]!='ID') { continue;}
 		if ($gbt[0][0][$i]=='Section' || $gbt[0][0][$i]=='Code' || $gbt[0][0][$i]=='Last Login') {
 			echo '<th class="nocolorize"><div>';
@@ -1247,13 +1248,13 @@ function gbinstrdisp() {
 			echo "</select>";
 		}
 		echo '</div></th>';
-		
-		$n++;
+		if ($gbt[0][0][$i]=='Last Login') {
+			$sortarr[] = "'D'";
+		} else if ($i != 1) {
+			$sortarr[] = "'S'";
+		}
 	}
-	if ($lastlogin) {
-		echo '<th>'._('Last Login').'</th>';
-		$n++;
-	}
+	$n=0;
 	
 	//get collapsed gb cat info
 	if (count($gbt[0][2])>1) {
@@ -1753,12 +1754,10 @@ function gbinstrdisp() {
 	}
 	echo "</tbody></table></div></div>";
 	if ($n>1) {
-		$sarr = array_fill(0,$n-1,"'N'");
+		$sarr = array_merge($sortarr, array_fill(0,$n,"'N'"));
 	} else {
 		$sarr = array();
 	}
-	array_unshift($sarr,"false");
-	array_unshift($sarr,"'S'");
 	
 	$sarr = implode(",",$sarr);
 	if (count($gbt)<500) {
