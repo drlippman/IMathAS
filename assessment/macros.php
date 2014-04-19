@@ -1859,9 +1859,13 @@ function evalfunc($farr) {
 		$varlist = array_shift($args);
 		//$skipextracleanup = false;
 	}
+	$skipextracleanup = false;
 	$func = makepretty($func);
 	$vars = explode(',',$varlist);
-	if (count($vars)!=count($args)) {
+	if (count($args)==count($vars)+1) {
+		$skipextracleanup = true;
+		array_pop($args);
+	} else if (count($vars)!=count($args)) {
 		echo "Number of inputs to function doesn't match number of variables";
 	}
 	$isnum = true;
@@ -1911,21 +1915,22 @@ function evalfunc($farr) {
 			$func = str_replace("($var)","({$args[$i]})",$func);
 		}
 		
-		$reg = '/^\((\d*?\.?\d*?)\)([^\d\.])/';
-		$func= preg_replace($reg,"$1$2",$func);
-		$reg = '/^\(([a-zA-Z])\)([^a-zA-Z])/';
-		$func= preg_replace($reg,"$1$2",$func);
-		
-		//$reg = '/([^\d\.])\((\d*?\.?\d*?)\)$/';
-		//$func= preg_replace($reg,"$1$2",$func);
-		$reg = '/([^a-zA-Z])\(([a-zA-Z])\)$/';
-		$func= preg_replace($reg,"$1$2",$func);
-		
-		//$reg = '/([^\d\.])\((\d*?\.?\d*?)\)([^\d\.])/';
-		//$func= preg_replace($reg,"$1$2$3",$func);
-		$reg = '/([^a-zA-Z])\(([a-zA-Z])\)([^a-zA-Z])/';
-		$func= preg_replace($reg,"$1$2$3",$func);
-		
+		if (!$skipextracleanup) {
+			$reg = '/^\((\d*?\.?\d*?)\)([^\d\.])/';
+			$func= preg_replace($reg,"$1$2",$func);
+			$reg = '/^\(([a-zA-Z])\)([^a-zA-Z])/';
+			$func= preg_replace($reg,"$1$2",$func);
+			
+			//$reg = '/([^\d\.])\((\d*?\.?\d*?)\)$/';
+			//$func= preg_replace($reg,"$1$2",$func);
+			$reg = '/([^a-zA-Z])\(([a-zA-Z])\)$/';
+			$func= preg_replace($reg,"$1$2",$func);
+			
+			//$reg = '/([^\d\.])\((\d*?\.?\d*?)\)([^\d\.])/';
+			//$func= preg_replace($reg,"$1$2$3",$func);
+			$reg = '/([^a-zA-Z])\(([a-zA-Z])\)([^a-zA-Z])/';
+			$func= preg_replace($reg,"$1$2$3",$func);
+		}
 		return $func;
 	}
 }
@@ -2552,11 +2557,13 @@ function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
 	
 	$a = mathphp(makepretty(mathphppre($a)), $vlist);
 	$b = mathphp(makepretty(mathphppre($b)), $vlist);
+	
 	//echo "pretty: $a, $b";
 	for($i=0; $i < count($variables); $i++) {
 		$a = str_replace("(".$variables[$i].")",'($tp['.$i.'])',$a);
 		$b = str_replace("(".$variables[$i].")",'($tp['.$i.'])',$b);
 	}
+	
 	$cntnana = 0;
 	$cntnanb = 0;
 	$correct = true;
@@ -2567,8 +2574,8 @@ function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
 		}
 		$ansa = @eval("return ($a);");
 		$ansb = @eval("return ($b);");
-		//echo "real: $realans, my: {$myans[$i]},rel: ". (abs($myans[$i]-$realans)/abs($realans))  ."<br/>";
-		if (isNaN($ansa)) {$cntnana++; continue;} //avoid NaN problems
+		//echo "real: $ansa, my: $ansb <br/>";
+		if (isNaN($ansa)) {$cntnana++; if (isNaN($ansb)) {$cntnanb++;}; continue;} //avoid NaN problems
 		if (isNaN($ansb)) {$cntnanb++; continue;}
 		
 		if ($type=='equation') {
@@ -2587,8 +2594,8 @@ function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
 				if ((abs($ansa-$ansb)/(abs($ansa)+.0001) > $tol-1E-12)) {$correct = false; break;}
 			}
 		}
-		
 	}
+	//echo "$i, $ansa, $ansb, $cntnana, $cntnanb";
 	if (($cntnana==20 || $cntnanb==20) && isset($GLOBALS['teacherid'])) {
 		echo "<p>Debug info: one function evaled to Not-a-number at all test points.  Check \$domain</p>";
 		echo "<p>Funcs: $a and $b</p>";
