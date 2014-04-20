@@ -247,7 +247,7 @@ if (isset($_GET['launch'])) {
 				} else {
 					$realpw = mysql_result($result,0,0);
 					if (((!isset($CFG['GEN']['newpasswords']) || $CFG['GEN']['newpasswords']!='only') && ($realpw == md5($_POST['curPW'])))
-					  || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['curPW']$realpw)) ) {
+					  || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['curPW'],$realpw)) ) {
 						$userid=mysql_result($result,0,1);
 					} else {
 						$infoerr = 'Existing username/password provided are not valid.';
