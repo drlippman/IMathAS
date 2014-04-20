@@ -944,12 +944,13 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$itempercol = ceil(count($randkeys)/$ncol);
 			$displayformat = 'column';
 		}
-		if ($colorbox != '') {$style .= ' class="'.$colorbox.'" ';} else {$style='';}
 		
 		if ($displayformat == 'inline') {
+			if ($colorbox != '') {$style .= ' class="'.$colorbox.'" ';} else {$style='';}
 			$out .= "<span $style id=\"qnwrap$qn\">";
 		} else if ($displayformat != 'select') {
-			$out .= "<div $style id=\"qnwrap$qn\" style=\"display:block\" class=\"clearfix\">";
+			if ($colorbox != '') {$style .= ' class="'.$colorbox.' clearfix" ';} else {$style=' class="clearfix" ';}
+			$out .= "<div $style id=\"qnwrap$qn\" style=\"display:block\">";
 		}
 		if ($displayformat == "select") { 
 			$msg = '?';
@@ -959,6 +960,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					break;
 				}
 			}
+			if ($colorbox != '') {$style .= ' class="'.$colorbox.'" ';} else {$style='';}
 			$out = "<select name=\"qn$qn\" id=\"qn$qn\" $style><option value=\"NA\">$msg</option>\n";
 		} else if ($displayformat == "horiz") {
 			
@@ -1064,12 +1066,13 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$itempercol = ceil(count($randkeys)/$ncol);
 			$displayformat = 'column';
 		}
-		if ($colorbox != '') {$style .= ' class="'.$colorbox.'" ';} else {$style='';}
 		
 		if ($displayformat == 'inline') {
+			if ($colorbox != '') {$style .= ' class="'.$colorbox.'" ';} else {$style='';}
 			$out .= "<span $style id=\"qnwrap$qn\">";
 		} else  {
-			$out .= "<div $style id=\"qnwrap$qn\" style=\"display:block\" class=\"clearfix\">";
+			if ($colorbox != '') {$style .= ' class="'.$colorbox.' clearfix" ';} else {$style=' class="clearfix" ';}
+			$out .= "<div $style id=\"qnwrap$qn\" style=\"display:block\">";
 		}
 		if ($displayformat == "horiz") {
 			
