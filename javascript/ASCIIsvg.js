@@ -875,8 +875,21 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
   if (doy==null) {doy = true;}
   if (dox=="off" || dox==0) { dox = false;} else {dox = true;}
   if (doy=="off" || doy==0) { doy = false;} else {doy = true;}
-
+ 
 //alert(null)
+    if ((xmax-xmin)/gdx > width) {
+    	    gdx = xmax-xmin;
+    }
+    if ((ymax-ymin)/gdy > height) {
+    	    gdy = ymax-ymin;
+    }
+    if ((xmax-xmin)/dx > width) {
+    	    dx = xmax-xmin;
+    }
+    if ((ymax-ymin)/dy > height) {
+    	    dy = ymax-ymin;
+    }
+
   dx = (dx==null?xunitlength:dx*xunitlength);
   dy = (dy==null?dx:dy*yunitlength);
   fontsize = Math.floor(Math.min(dx/1.5,dy/1.5,16));//alert(fontsize)
@@ -895,18 +908,7 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
 	  var gridxmin = winxmin;
 	  var gridxmax = winxmax;
     }
-    if ((xmax-xmin)/gdx > width) {
-    	    gdx = xmax-xmin;
-    }
-    if ((ymax-ymin)/gdy > height) {
-    	    gdy = ymax-ymin;
-    }
-    if ((xmax-xmin)/dx > width) {
-    	    dx = xmax-xmin;
-    }
-    if ((ymax-ymin)/dy > height) {
-    	    dy = ymax-ymin;
-    }
+
     gdx = (typeof gdx=="string"?dx:gdx*xunitlength);
     gdy = (gdy==null?dy:gdy*yunitlength);
     pnode = myCreateElementSVG("path");
@@ -917,6 +919,7 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
 	    for (x = origin[0]-gdx; x>=winxmin; x = x-gdx)
 	      if (x<=winxmax) st += " M"+x+","+gridymin+" "+x+","+gridymax;
     }
+   
     if (doy && gdy>0) {
 	    for (y = height-origin[1]; y<=winymax; y = y+gdy)
 	      if (y>=winymin) st += " M"+gridxmin+","+y+" "+gridxmax+","+y;

@@ -2390,7 +2390,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				if ($dotline==2) {
 					$cmd = 'fill="transblue";path([['.implode('],[',$answers).']]);fill="blue";';
 				} else {
-					$cmd = 'path([['.implode('],[',$answers).']]);';
+					$cmd = 'stroke="blue";path([['.implode('],[',$answers).']]);';
 				}
 				for($i=0;$i<count($answers)-1;$i++) {
 					$cmd .= 'dot(['.$answers[$i].']);';
@@ -3740,6 +3740,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 					
 			if (in_array('inequality',$ansformats)) {
+				$_POST["tc$qn"] = str_replace('or', ' or ', $_POST["tc$qn"]);
 				preg_match_all('/[a-zA-Z]+/',$_POST["tc$qn"],$matches);
 				foreach ($matches[0] as $var) {
 					if (in_array($var,$mathfuncs)) { continue;}
