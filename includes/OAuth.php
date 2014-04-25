@@ -620,10 +620,10 @@ class OAuthServer {
     );
 
     if (!$valid_sig) {
-      $ex_text = "Invalid signature";
+      $ex_text = "Invalid signature: check your LTI secret. ";
       if ( $OAuth_last_computed_signature ) {
           $ex_text = $ex_text . " ours= $OAuth_last_computed_signature yours=$signature";
-          print_r($request);
+          //print_r($request);
       }
       throw new OAuthException($ex_text);
     }

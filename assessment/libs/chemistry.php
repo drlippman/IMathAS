@@ -154,7 +154,7 @@ function chem_getdiffrandcompounds($c, $type="twobasic,twosub,threeplus,parens")
 }
 
 //chem_decomposecompound(compound)
-//breaks a compound into an array of element=>atom count
+//breaks a compound into an array of elements and an array of atom counts
 function chem_decomposecompound($c) {
 	$cout = array();
 	if (preg_match('/\(([^\)]*)\)_(\d+)/',$c,$matches)) {
@@ -181,17 +181,18 @@ function chem_decomposecompound($c) {
 			$cout[$cbp[0]] += $cbp[1];
 		}
 	}
-	return $cout;
+	return array(array_keys($cout),array_values($cout));
 }
+
 
 //chem_getcompoundmolmass(compound)
 //gets the molecular mass of the given compound
 function chem_getcompoundmolmass($c) {
 	global $chem_periodic_table, $chem_numberbyatom;
-	$dc = chem_decomposecompound($c);
+	list($els,$cnt) = chem_decomposecompound($c);
 	$molmass = 0;
-	foreach ($dc as $el=>$cnt) {
-		$molmass += $chem_periodic_table[$chem_numberbyatom[$el]][3]*$cnt;
+	foreach ($els as $k=>$el) {
+		$molmass += $chem_periodic_table[$chem_numberbyatom[$el]][3]*$cnt[$k];
 	}
 	return $molmass;
 }
