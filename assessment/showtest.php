@@ -2078,7 +2078,11 @@ if (!isset($_POST['embedpostback'])) {
 			if (!isset($_GET['page'])) { $_GET['page'] = 0;}
 			$intro = filter("<div class=\"intro\">{$testsettings['intro']}</div>\n");
 			if ($testsettings['displaymethod'] == "VideoCue") {
-				echo $intro;
+				echo substr(trim($intro),0,-6);
+				if (!$sessiondata['istutorial']) {
+					echo "<p><a href=\"showtest.php?action=embeddone\">", _('When you are done, click here to see a summary of your score'), "</a></p>\n";
+				}
+				echo '</div>';
 				$intro = '';
 			}
 			echo '<script type="text/javascript">var assesspostbackurl="' .$urlmode. $_SERVER['HTTP_HOST'] . $imasroot . '/assessment/showtest.php?embedpostback=true&action=scoreembed&page='.$_GET['page'].'";</script>';
@@ -2153,7 +2157,7 @@ if (!isset($_POST['embedpostback'])) {
 				  //tag.src = "//www.youtube.com/iframe_api";
 				showvideoembednavbar($viddata);
 				$dovidcontrol = true;
-				echo '<div class="inset" style="position: relative; margin-left: 225px;">';
+				echo '<div class="inset" style="position: relative; margin-left: 225px; overflow: visible;">';
 				echo "<a name=\"beginquestions\"></a>\n";
 				echo '<div id="playerwrapper"><div id="player"></div></div>';
 				$outarr = array();
@@ -2257,11 +2261,12 @@ if (!isset($_POST['embedpostback'])) {
 			if (!$sessiondata['istutorial'] && $testsettings['displaymethod'] != "VideoCue") {
 				echo "<p>" . _('Total Points Possible: ') . totalpointspossible($qi) . "</p>";
 			}
-			if (!$sessiondata['istutorial']) {
-				echo "<p><a href=\"showtest.php?action=embeddone\">", _('When you are done, click here to see a summary of your score'), "</a></p>\n";
-			}
+			
 			
 			echo '</div>'; //ends either inset or formcontents div
+			if (!$sessiondata['istutorial'] && $testsettings['displaymethod'] != "VideoCue") {
+				echo "<p><a href=\"showtest.php?action=embeddone\">", _('When you are done, click here to see a summary of your score'), "</a></p>\n";
+			}
 			echo '</form>';
 			
 					
