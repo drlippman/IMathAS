@@ -352,7 +352,7 @@ if (isset($_GET['delete'])) {
 						$fp = fopen($newdir.'/blti'.$iteminfo[$item][1].'.xml','w');
 						fwrite($fp,'<cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0">');
 						fwrite($fp,'<blti:title>'.htmlentities($row[0],ENT_XML1).'</blti:title>');
-						fwrite($fp,'<blti:description>'.htmlentities($row[1],ENT_XML1).'</blti:description>');
+						fwrite($fp,'<blti:description>'.htmlentities(html_entity_decode($row[1]),ENT_XML1).'</blti:description>');
 						if ($linktype=='url') {
 							$urladd = '?custom_place_aid='.$iteminfo[$item][1];
 						} else {
