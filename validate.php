@@ -236,7 +236,7 @@ END;
 	 	$_POST['password'] = 'temp';
 	 	if (isset($CFG['GEN']['newpasswords'])) {
 	 		require_once("includes/password.php");		
-	 		$line['password'] =  password_hash($_POST['temp'], PASSWORD_DEFAULT);
+	 		$line['password'] =  password_hash('temp', PASSWORD_DEFAULT);
 	 	} else {
 	 		$line['password'] = md5('temp');
 	 	}

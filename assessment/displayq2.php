@@ -912,6 +912,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			shuffle($randkeys);
 		}
 		$_SESSION['choicemap'][$qn] = $randkeys;
+		if (isset($GLOBALS['capturechoices'])) {
+			if (!isset($GLOBALS['choicesdata'])) {
+				$GLOBALS['choicesdata'] = array();
+			}
+			$GLOBALS['choicesdata'][$qn] = array($anstype, $questions);
+		}
 		
 		//trim out unshuffled showans
 		$la = explode('$!$',$la);
@@ -1057,6 +1063,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			shuffle($randkeys);
 		}
 		$_SESSION['choicemap'][$qn] = $randkeys;
+		if (isset($GLOBALS['capturechoices'])) {
+			if (!isset($GLOBALS['choicesdata'])) {
+				$GLOBALS['choicesdata'] = array();
+			}
+			$GLOBALS['choicesdata'][$qn] = array($anstype, $questions);
+		}
 		
 		$labits = explode('|',$la);
 		if ($displayformat == 'column') { $displayformat = '2column';}
@@ -1164,6 +1176,14 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$randakeys = array_rand($answers,count($answers));
 			shuffle($randakeys);
 		}
+		
+		if (isset($GLOBALS['capturechoices'])) {
+			if (!isset($GLOBALS['choicesdata'])) {
+				$GLOBALS['choicesdata'] = array();
+			}
+			$GLOBALS['choicesdata'][$qn] = array($anstype, $randakeys);
+		}
+		
 		$ncol = 1;
 		if (substr($displayformat,1)=='columnselect') {
 			$ncol = $displayformat{0};

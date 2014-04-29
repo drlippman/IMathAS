@@ -771,7 +771,8 @@
 			} else {
 				$colors = array();
 			}
-		
+			$capturechoices = true;
+			$choicesdata = array();
 			$qtypes = displayq($i,$qsetid,$seeds[$i],$showa,false,$attempts[$i],false,false,false,$colors);
 			echo '</div>';
 			
@@ -789,6 +790,7 @@
 			} else {
 				echo $pt;
 			}
+	
 			if ($parts!='') {
 				if ($canedit) {
 					echo " (parts: ";
@@ -872,16 +874,23 @@
 										$laparr = explode('&',$laarr[$k]);
 										foreach ($laparr as $lk=>$v) {
 											if (strpos($v,'$!$')) {
+												$qn = ($i+1)*1000+$lk;
 												$tmp = explode('$!$',$v);
-												$laparr[$lk] = $tmp[0];
+												//$laparr[$lk] = $tmp[0];
+												$laparr[$lk] = prepchoicedisp($choicesdata[$qn][0]=='matching'?$tmp[0]:$tmp[1], $choicesdata[$qn]);
 											}
 										}
 										$laarr[$k] = implode('&',$laparr);
 									} else {
 										$tmp = explode('$!$',$laarr[$k]);
-										$laarr[$k] = $tmp[0];
+										//$laarr[$k] = $tmp[0];
+										$laarr[$k] = prepchoicedisp($choicesdata[$i][0]=='matching'?$tmp[0]:$tmp[1], $choicesdata[$i]);
 									}
+								} else {
+									$laarr[$k] = strip_tags($laarr[$k]);
 								}
+								
+									
 								if (strpos($laarr[$k],'$#$')) {
 									if (strpos($laarr[$k],'&')) { //is multipart q
 										$laparr = explode('&',$laarr[$k]);
@@ -898,7 +907,7 @@
 									}
 								}
 								
-								echo str_replace(array('&','%nbsp;'),array('; ','&nbsp;'),strip_tags($laarr[$k]));
+								echo str_replace(array('&','%nbsp;','%%'),array('; ','&nbsp;','&'), $laarr[$k]);
 							}
 							$cnt++;
 						}
@@ -1245,5 +1254,33 @@ function scorestocolors($sc,$pts,$answ,$noraw) {
 		}
 		return $out;
 	}
+}
+
+function prepchoicedisp($v,$choicesdata) {
+	if ($v=='') {return '';}
+	foreach ($choicesdata[1] as $k=>$c) {
+		$sh = strip_tags($c);
+		if (trim($sh)=='') {
+			$sh = "[view]";
+		} else if (strlen($sh)>15) {
+			$sh = substr($sh,0,15).'...';
+		}
+		if ($sh!=$c) {
+			$choicesdata[1][$k] = '<span onmouseover="tipshow(this,\''.str_replace('&','%%',htmlentities($c,ENT_QUOTES|ENT_HTML401)).'\')" onmouseout="tipout()">'.$sh.'</span>';
+		}
+	}
+	if ($choicesdata[0]=='choices') {
+		return ($choicesdata[1][$v]);	
+	} else if ($choicesdata[0]=='multans') {
+		$p = explode('|',$v);
+		$out = array();
+		foreach ($p as $pv) {
+			$out[] = $choicesdata[1][$pv];
+		}
+		return 'Selected: '.implode(', ',$out);
+	} else if ($choicesdata[0]=='matching') {
+		return $v;
+	}
+	
 }
 ?>
