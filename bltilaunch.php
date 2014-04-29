@@ -125,6 +125,10 @@ if (isset($_GET['launch'])) {
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
 	} else if ($sessiondata['ltiitemtype']==2) {
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/index.php");
+	} else if ($sessiondata['ltiitemtype']==3) {
+		$cid = $sessiondata['ltiitemid'][2];
+		$folder = $sessiondata['ltiitemid'][1];
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid&folder=".$folder);
 	} else { //will only be instructors hitting this option
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/ltihome.php");
 	}
@@ -992,7 +996,7 @@ if ($keyparts[0]=='aid') {
 	$sessiondata['ltiitemtype']=2;
 } else if ($keyparts[0]=='folder') { //is folder content view
 	$sessiondata['ltiitemtype']=3;
-	$sessiondata['ltiitemid'] = array($keyparts[2],$keyparts[3]);
+	$sessiondata['ltiitemid'] = array($keyparts[2],$keyparts[3],$cid);
 } else {
 	$sessiondata['ltiitemtype']=-1;
 }
