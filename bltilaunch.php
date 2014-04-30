@@ -739,11 +739,16 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 				//aid is in destination course - just make placement
 				$aid = $_SESSION['place_aid'][1];
 			} else {
-				//aid is in source course.  Let's look and see if there's an assessment in destination with the same title.
+				/*//aid is in source course.  Let's look and see if there's an assessment in destination with the same title.
 				$query = "SELECT name FROM imas_assessments WHERE id='{$_SESSION['place_aid'][1]}'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				$sourceassessname = addslashes(mysql_result($result,0,0));
 				$query = "SELECT id FROM imas_assessments WHERE name='$sourceassessname' AND courseid='$destcid'";
+				*/
+				//CHECK ME
+				//aid is in source course.  Let's see if we already copied it.
+				$query = "SELECT id FROM imas_assessments WHERE ancestors REGEXP '^".intval($_SESSION['place_aid'][1])."[[:>:]]' AND courseid=".intval($destcid);
+				
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				if (mysql_num_rows($result)>0) {
 					$aid = mysql_result($result,0,0);
