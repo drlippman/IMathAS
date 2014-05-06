@@ -157,8 +157,10 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		$_GET['folder'] = '0';
 	}
 	if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==3) {
-		$useleftstubar = false;
-		$useleftbar = false;
+		if ($sessiondata['lti_keytype']!='cc-of') {
+			$useleftbar = false;
+			$useleftstubar = false;
+		}
 		$nocoursenav = true;
 		$usernameinheader = false;
 	}
