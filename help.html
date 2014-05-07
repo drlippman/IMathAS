@@ -2368,6 +2368,8 @@ A student is asked to enter a string (a word or list of letters).
 		<li>allow_diff=n: gives full credit for answers with Levenshtein distance between strings &le; n </li>
 		<li>in_answer: gives credit if $answer is contained anywhere in the student answer</li>
 		<li>special_or: use <b>*or*</b> for separating answers rather than <b>or</b>.</li>
+		<li>ignore_symbol=sym: Unlike the other flags, this is not an on/off flag. Set this equal to a symbol to ignore that
+		    symbol in student answers.  This flag can be used multiple times with different symbols.</li>
 		</ul>
 		By default, compress_whitespace and ignore_case are On.  Only one of
 		partial_credit, allow_diff, or in_answer may be used at a time.</dd>

@@ -10,35 +10,42 @@ if (!isset($teacherid) && !isset($tutorid)) {
 	$overwritebody = true;
 	$body = 'You do not have authorization to view this page'; 
 }
-$type = $_GET['type'];
+$stype = $_GET['type'];
 $typeid = intval($_GET['id']);
 
-if ($typeid==0 || !in_array($type,array('I','L','A','W','F'))) {
+if ($typeid==0 || !in_array($stype,array('I','L','A','W','F'))) {
 	$overwritebody = true;
 	$body = 'Invalid request';
 } else {
 	$data = array();
 	$descrips = array();
-	if ($type=='I') {
+	if ($stype=='I') {
 		$query = "SELECT userid,type,info FROM imas_content_track WHERE courseid='$cid' AND type='inlinetext' AND typeid='$typeid'";
 		$q2 = "SELECT title FROM imas_inlinetext WHERE id='$typeid'";
-	} else if ($type=='L') {
+	} else if ($stype=='L') {
 		$query = "SELECT userid,type,info FROM imas_content_track WHERE courseid='$cid' AND type IN ('linkedsum','linkedlink','linkedintext','linkedvviacal') AND typeid='$typeid'";
 		$q2 = "SELECT title FROM imas_linkedtext WHERE id='$typeid'";
-	} else if ($type=='A') {
+	} else if ($stype=='A') {
 		$query = "SELECT userid,type,info FROM imas_content_track WHERE courseid='$cid' AND type IN ('assessintro','assessum','assess') AND typeid='$typeid'";
 		$q2 = "SELECT name FROM imas_assessments WHERE id='$typeid'";
-	} else if ($type=='W') {
+	} else if ($stype=='W') {
 		$query = "SELECT userid,type,info FROM imas_content_track WHERE courseid='$cid' AND type IN ('wiki','wikiintext') AND typeid='$typeid'";
 		$q2 = "SELECT name FROM imas_wikis WHERE id='$typeid'";
-	} else if ($type=='F') {
+	} else if ($stype=='F') {
 		$query = "SELECT userid,type,info FROM imas_content_track WHERE courseid='$cid' AND type IN ('forumpost','forumreply') AND info='$typeid'";
 		$q2 = "SELECT name FROM imas_forums WHERE id='$typeid'";
 	} 
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	while ($row = mysql_fetch_assoc($result)) {
-		$ident = $row['type'].'::'.$row['info'];
 		$type = $row['type'];
+		if ($type=='linkedviacal') {
+			$type = 'linkedlink';
+		}
+		if ($stype=='F') {
+			$ident = $type.'::'.$row['info'];
+		} else {
+			$ident = $type;
+		}
 		if (!isset($descrips[$ident])) {
 			if (in_array($type,array('inlinetext','linkedsum','linkedintext','assessintro','assesssum','wikiintext'))) {
 				$parts = explode('::',$row['info']);

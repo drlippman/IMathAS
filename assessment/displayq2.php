@@ -3610,8 +3610,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 		$strflags = str_replace(' ','',$strflags);
 		$strflags = explode(",",$strflags);
+		$torem = array();
 		foreach($strflags as $flag) {
 			$pc = explode('=',$flag);
+			if ($pc[0]=='ignore_symbol') {
+				$torem[] = $pc[1];
+				continue;
+			}
 			if ($pc[1]==='true' || $pc[1]==='1' || $pc[1]===1) {
 				$pc[1] = true;
 			}
@@ -3632,6 +3637,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			foreach($gaarr as $j=>$givenans) {
 				$givenans = trim($givenans);
 		
+				if (count($torem)>0) {
+					$givenans = str_replace($torem,'',$givenans);
+				}
 				if ($flags['ignore_commas']===true) {
 					$givenans = str_replace(',','',$givenans);
 					$answer = str_replace(',','',$answer);

@@ -138,7 +138,7 @@
 							list ($url,$w,$h) = $respt;
 						}
 					}
-					$url = str_replace('"','',$url);
+					$url = trim(str_replace(array('"','&nbsp;'),'',$url));
 					if (substr($url,0,18)=='https://tegr.it/y/') {
 						$url = preg_replace('/[^\w:\/\.]/','',$url);
 						//$tag = '<script type="text/javascript" src="'.$url.'"></script>';
