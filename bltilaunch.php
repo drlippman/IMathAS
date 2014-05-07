@@ -143,7 +143,7 @@ if (isset($_GET['launch'])) {
 	$sessiondata = unserialize(base64_decode($enc));
 	//time to output a postback to capture tzoffset and math/graph settings
 	$pref = 0;
-	if (isset($_COOKIE['mathgraphprefs'])) {
+	/*if (isset($_COOKIE['mathgraphprefs'])) {
 		 $prefparts = explode('-',$_COOKIE['mathgraphprefs']);
 		 if ($prefparts[0]==2 && $prefparts[1]==2) { //img all
 			$pref = 3;	 
@@ -152,7 +152,7 @@ if (isset($_GET['launch'])) {
 		 } else if ($prefparts[1]==2) { //img graph
 			 $pref = 2;
 		 }	 
-	}
+	}*/
 	$flexwidth = true;
 	$nologo = true;
 	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
@@ -176,12 +176,11 @@ if (isset($_GET['launch'])) {
 			var html = ""; 
 			html += 'Accessibility: ';
 			html += "<a href='#' onClick=\"window.open('<?php echo $imasroot;?>/help.php?section=loggingin','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\">Help<\/a>";
-			html += '<br/><input type="radio" name="access" value="0" <?php if ($pref==0) {echo "checked=1";} ?> />Detect my settings<br/>';
-			html += '<input type="radio" name="access" value="2" <?php if ($pref==2) {echo "checked=1";} ?> />Force image-based graphs<br/>';
-			html += '<input type="radio" name="access" value="4" <?php if ($pref==4) {echo "checked=1";} ?> />Force image-based math<br/>';
-			html += '<input type="radio" name="access" value="3" <?php if ($pref==3) {echo "checked=1";} ?> />Force image based display<br/>';
-			html += '<input type="radio" name="access" value="1">Use text-based display';
-			
+			html += '<div style="margin-top: 0px;margin-right:0px;text-align:right;padding:0px"><select name="access"><option value="0" <?php if ($pref==0) {echo 'selected="selected"';} ?> />Use defaults</option>';
+			html += '<option value="3" <?php if ($pref==3) {echo 'selected="selected"';} ?> />Force image-based display</option>';
+			html += '<option value="5" <?php if ($pref==5) {echo 'selected="selected"';} ?> />MathJax display (experimental)</option>';
+			html += '<option value="1">Use text-based display</option></select></div>';
+		
 			if (AMnoMathML) {
 				html += '<input type="hidden" name="mathdisp" value="0" />';
 			} else {
@@ -192,7 +191,7 @@ if (isset($_GET['launch'])) {
 			} else {
 				html += '<input type="hidden" name="graphdisp" value="1" />';
 			}
-			html += '<div class="textright"><input type="submit" value="Login" /><\/div>';
+			html += '<div class="textright"><input type="submit" value="Continue" /><\/div>';
 			setnode.innerHTML = html; 
 			var thedate = new Date();  
 			document.getElementById("tzoffset").value = thedate.getTimezoneOffset();
