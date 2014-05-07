@@ -2519,6 +2519,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$GLOBALS['partlastanswer'] = $givenans;
+		
 		if ($answer==='') {
 			if (trim($givenans)==='') { return 1;} else { return 0;}
 		}
@@ -5527,8 +5528,13 @@ function formathint($eword,$ansformats,$calledfrom, $islist=false,$doshort=false
 		$tip .= sprintf(_('Enter %s as a fraction (like 3/5 or 10/4) or as a whole number (like 4 or -2)'), $eword);
 		$shorttip = $islist?_('Enter a list of fractions or whole numbers'):_('Enter a fraction or whole number');
 	} else if (in_array('reducedfraction',$ansformats)) {
-		$tip .= sprintf(_('Enter %s as a reduced fraction (like 5/3, not 10/6) or as a whole number (like 4 or -2)'), $eword);
-		$shorttip = $islist?_('Enter a list of reduced fractions or whole numbers'):_('Enter a reduced fraction or whole number');
+		if (in_array('fracordec',$ansformats)) {
+			$tip .= sprintf(_('Enter %s as a reduced fraction (like 5/3, not 10/6), as a whole number (like 4 or -2), or as an exact decimal (like 0.5 or 1.25)'), $eword);
+			$shorttip = $islist?_('Enter a list of reduced fractions, whole numbers, or exact decimals'):_('Enter a reduced fraction, whole number, or exact decimal');
+		} else {
+			$tip .= sprintf(_('Enter %s as a reduced fraction (like 5/3, not 10/6) or as a whole number (like 4 or -2)'), $eword);
+			$shorttip = $islist?_('Enter a list of reduced fractions or whole numbers'):_('Enter a reduced fraction or whole number');
+		}
 	} else if (in_array('mixednumber',$ansformats)) {
 		$tip .= sprintf(_('Enter %s as a reduced mixed number or as a whole number.  Example: 2 1/2 = 2 &frac12;'), $eword);
 		$shorttip = $islist?_('Enter a list of mixed numbers or whole numbers'):_('Enter a mixed number or whole number');
