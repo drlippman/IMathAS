@@ -50,14 +50,14 @@ if ($overwriteBody==1) {
 	    
 	echo "<form method=\"post\" action=\"printlayoutword.php?cid=$cid&aid=$aid\" class=\"nolimit\">\n";
 	echo '<span class="form">Number of different versions to generate:</span><span class="formright"><input type=text name=versions value="1" size="3"></span><br class="form"/>';
-	echo '<span class="form">Format?</span><span class="formright"><input type="radio" name="format" value="trad" checked="checked" /> Form A: 1 2 3, Form B: 1 2 3<br/><input type="radio" name="format" value="inter"/> 1a 1b 2a 2b</span><br class="form"/>';
+	echo '<span class="form">Format?</span><span class="formright"><input type="radio" name="format" value="trad" checked="checked" /> Multiple forms of the whole assessment - Form A: 1 2 3, Form B: 1 2 3<br/><input type="radio" name="format" value="inter"/> Multiple forms grouped by question - 1a 1b 2a 2b</span><br class="form"/>';
 	echo '<span class="form">Generate answer keys?</span><span class="formright"> <input type=radio name=keys value=1 checked=1>Yes <input type=radio name=keys value=0>No</span><br class="form"/>';
 	echo '<span class="form">Question separator:</span><span class="formright"><input type=text name="qsep" value="" /></span><br class="form"/>';
 	echo '<span class="form">Version separator:</span><span class="formright"><input type=text name="vsep" value="+++++++++++++++" /> </span><br class="form"/>';
 	echo '<span class="form">Include question numbers and point values:</span><span class="formright"><input type="checkbox" name="showqn" checked="checked" /> </span><br class="form"/>';
 	echo '<span class="form">Hide text entry lines?</span><span class="formright"><input type=checkbox name=hidetxtboxes checked="checked" ></span><br class="form"/>';
 	
-	echo '<p>NOTE: In some versions of Word, variables equations may appear incorrectly at first.  To fix this, ';
+	echo '<p>NOTE: In some versions of Word, variables in equations may appear incorrectly at first.  To fix this, ';
 	echo 'select everything (Control-A), then under the Equation Tools menu, click Linear then Professional.</p>';
 	
 	echo '<div class="submit"><input type="submit" value="Download"/></div></form>';
