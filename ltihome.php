@@ -69,7 +69,7 @@ if (isset($_POST['createcourse'])) {
 	$query = "SELECT courseid FROM imas_teachers WHERE courseid='{$_POST['createcourse']}' AND userid='$userid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	if (mysql_num_rows($result)>0) {
-		$cid = $_POST['createcourse'];
+		$cid = intval($_POST['createcourse']);
 	} else {
 		//creating a copy of a template course
 		$blockcnt = 1;
@@ -138,10 +138,13 @@ if (isset($_POST['createcourse'])) {
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		copyrubrics();
 	}
-	
-	$query = "INSERT INTO imas_lti_courses (org,contextid,courseid) VALUES ";
-	$query .= "('{$sessiondata['ltiorg']}','{$sessiondata['lti_context_id']}',$cid)";
+	$query = "UPDATE imas_lti_courses SET courseid=$cid WHERE org='{$sessiondata['ltiorg']}' AND contextid='{$sessiondata['lti_context_id']}'";
 	mysql_query($query) or die("Query failed : " . mysql_error());
+	if (mysql_affected_rows()==0) {
+		$query = "INSERT INTO imas_lti_courses (org,contextid,courseid) VALUES ";
+		$query .= "('{$sessiondata['ltiorg']}','{$sessiondata['lti_context_id']}',$cid)";
+		mysql_query($query) or die("Query failed : " . mysql_error());
+	}
 	$hascourse = true;
 	
 } else if (isset($_POST['setplacement'])) {
@@ -189,12 +192,12 @@ if ($hasplacement && $placementtype=='course') {
 //HTML Output
 $pagetitle = "LTI Home";
 require("header.php");
-if (!$hascourse) {
+if (!$hascourse || isset($_GET['chgcourselink'])) {
 	echo '<h3>Link courses</h3>';
 	echo '<form method="post" action="ltihome.php">';
 	echo "<p>This course on your LMS has not yet been linked to a course on $installname.";
 	echo 'Select a course to link with.  If it is a template course, a copy will be created for you:<br/> <select name="createcourse"> ';
-	$query = "SELECT ic.id,ic.name FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$userid' ORDER BY ic.name";
+	$query = "SELECT ic.id,ic.name FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$userid' AND ic.available<4 ORDER BY ic.name";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	if (mysql_num_rows($result)>0) {
 		echo '<optgroup label="Your Courses">';
@@ -203,17 +206,17 @@ if (!$hascourse) {
 		}
 		echo '</optgroup>';
 	}
-	if (isset($templateuser)) {
-		$query = "SELECT ic.id,ic.name,ic.copyrights FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$templateuser' ORDER BY ic.name";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		if (mysql_num_rows($result)>0) {
-			echo '<optgroup label="Template Courses">';
-			while ($row = mysql_fetch_row($result)) {
-				echo '<option value="'.$row[0].'">'.$row[1].'</option>';
-			}
-			echo '</optgroup>';
+	
+	$query = "SELECT id,name,copyrights FROM imas_courses WHERE (istemplate&1)=1 AND copyrights=2 AND available<4 ORDER BY name";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	if (mysql_num_rows($result)>0) {
+		echo '<optgroup label="Template Courses">';
+		while ($row = mysql_fetch_row($result)) {
+			echo '<option value="'.$row[0].'">'.$row[1].'</option>';
 		}
+		echo '</optgroup>';
 	}
+	
 	echo '</select>';
 	echo '<input type="Submit" value="Create"/>';
 	echo "<p>If you want to create a new course, log directly into $installname to create new courses</p>";
@@ -245,6 +248,8 @@ if (!$hascourse) {
 	echo '</select>';
 	echo '<input type="Submit" value="Make Placement"/>';
 	echo "<p>If you want to create new assessments, log directly into $installname</p>";
+	echo "<p>If your LMS course is linked with the wrong course on $installname, ";
+	echo '<a href="ltihome.php?chgcourselink=true" onclick="return confirm(\'Are you SURE you want to do this? This may break existing placements.\');">Change course link</a></p>';
 	echo '</form>';
 } else if ($placementtype=='course') {
 	echo '<h3>LTI Placement of whole course</h3>';
