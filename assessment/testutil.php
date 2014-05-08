@@ -482,15 +482,19 @@ function scorequestion($qn, $rectime=true) {
 		$appts = explode('~',$afterpenalty);
 		$prepts = explode('~',$rawscore);
 		$curs = explode('~',$scores[$qn]);
-		for ($k=0;$k<count($curs);$k++) {
-			if ($appts[$k]>$curs[$k]) { //part after penalty better than orig, replace
-				$curs[$k] = $appts[$k];
+		if (count($appts) != count($curs)) { //number of parts has changed - ignore previous work
+			$scores[$qn] = $afterpenalty;
+		} else {
+			for ($k=0;$k<count($curs);$k++) {
+				if ($appts[$k]>$curs[$k]) { //part after penalty better than orig, replace
+					$curs[$k] = $appts[$k];
+				}
+				if ($prepts[$k]<$curs[$k]) { //changed correct to incorrect, take away pts
+					$curs[$k] = $appts[$k];
+				}
 			}
-			if ($prepts[$k]<$curs[$k]) { //changed correct to incorrect, take away pts
-				$curs[$k] = $appts[$k];
-			}
+			$scores[$qn] = implode('~',$curs);
 		}
-		$scores[$qn] = implode('~',$curs);
 	} else {
 		$scores[$qn] = $afterpenalty;
 	}
