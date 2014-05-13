@@ -145,7 +145,7 @@ if (!(isset($teacherid))) {
 				$sets[] = "exceptionpenalty='{$_POST['exceptionpenalty']}'";
 			}
 			if (isset($_POST['chgpassword'])) {
-				$sets[] = "password='{$_POST['password']}'";
+				$sets[] = "password='{$_POST['assmpassword']}'";
 			}
 			if (isset($_POST['chghints'])) {
 				$sets[] = "showhints='$showhints'";
@@ -575,7 +575,7 @@ $(function() {
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgpassword" class="chgbox"/></td>
 				<td class="r">Require Password (blank for none):</td>
-				<td><input type=text name=password value=""></td>
+				<td><input type=text name="assmpassword" value=""></td>
 			</tr>
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgtimelimit" class="chgbox"/></td>
