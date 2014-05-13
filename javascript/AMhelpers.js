@@ -339,7 +339,7 @@ function ntuplecalc(inputId,outputId,format) {
 }
 
 //preview for calccomplex
-function complexcalc(inputId,outputId) {
+function complexcalc(inputId,outputId,format) {
 	var fullstr = document.getElementById(inputId).value;
 	fullstr = fullstr.replace(/\s+/g,'');
 	if (fullstr.match(/DNE/i)) {
@@ -369,7 +369,11 @@ function complexcalc(inputId,outputId) {
 				break;
 			}
 		}
-		outstr = '`'+fullstr+'` = '+outcalced;
+		if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1 || format.indexOf('scinot')!=-1 || format.indexOf('noval')!=-1) {
+			outstr = '`'+fullstr+'`';
+		} else {
+			outstr = '`'+fullstr+'` = '+outcalced;
+		}
 	}
 	if (outputId != null) {
 		 var outnode = document.getElementById(outputId);
@@ -805,7 +809,7 @@ function doonsubmit(form,type2,skipconfirm) {
 	}
 	for (var qn in complextoproc) { //i=0; i<complextoproc.length; i++) {
 		qn = parseInt(qn);
-		str = complexcalc("tc"+qn,null);
+		str = complexcalc("tc"+qn,null,'');
 		document.getElementById("qn" + qn).value = str;
 	}
 	for (var qn in functoproc) { //fcnt=0; fcnt<functoproc.length; fcnt++) {

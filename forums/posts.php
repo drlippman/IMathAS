@@ -182,6 +182,7 @@
 					$allowreply = ($isteacher || (time()<$line['replyby']));
 				}
 			}
+			
 			if ($line['id']==$threadid) {
 				$newviews = $line['views']+1;
 			}

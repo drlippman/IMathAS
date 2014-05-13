@@ -153,7 +153,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				$files = array();
 			}
 		} else {
-			$query = "UPDATE imas_forum_posts SET subject='{$_POST['subject']}',message='{$_POST['message']}',isanon='$isanon',tag='$tag',posttype='$type' ";
+			$query = "UPDATE imas_forum_posts SET subject='{$_POST['subject']}',message='{$_POST['message']}',isanon='$isanon',tag='$tag',posttype='$type',replyby=$replyby ";
 			$query .= "WHERE id='{$_GET['modify']}'";
 			if (!$isteacher) { $query .= " AND userid='$userid'";}
 			mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -262,6 +262,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			$query = "SELECT * from imas_forum_posts WHERE id='{$_GET['modify']}'";
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			$line = mysql_fetch_array($result, MYSQL_ASSOC);
+			$replyby = $line['replyby'];
 			echo '<div id="headerposthandler" class="pagetitle"><h2>Modify Post</h2></div>';
 		} else {
 			if ($_GET['modify']=='reply') {
@@ -275,6 +276,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				$line['subject'] = "Re: $sub";
 				$line['message'] = "";
 				$line['files'] = '';
+				$replyby = $line['replyby'];
 				$points = mysql_result($result,0,1);
 				if ($isteacher) {
 					$query = "SELECT points FROM imas_forums WHERE id='$forumid'";
@@ -383,7 +385,6 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		}
 		$forumtype = mysql_result($result,0,2);
 		$taglist = mysql_result($result,0,3);
-		
 		if ($replyby!=null && $replyby<2000000000 && $replyby>0) {
 			$replybydate = tzdate("m/d/Y",$replyby);
 			$replybytime = tzdate("g:i a",$replyby);	
@@ -463,7 +464,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				if ($line['posttype']==3) { echo "checked=1";}
 				echo ">Displayed at top and students can only see their own replies\n";
 				echo "</span><br class=form>";
-				echo "<span class=form>Allow replies:</span><span class=formright>\n";
+				echo "<span class=form>Allow replies: </span><span class=formright>\n";
 				echo "<input type=radio name=replyby value=\"null\" ";
 				if ($line['replyby']==null) { echo "checked=1";}
 				echo "/>Use default<br/>";
@@ -474,7 +475,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				if ($line['replyby']==='0') { echo "checked=1";}
 				echo "/>Never<br/>";
 				echo "<input type=radio name=replyby value=\"Date\" ";
-				if ($line['replyby']<2000000000 && $line['replyby']>0) { echo "checked=1";}
+				if ($line['replyby']!==null && $line['replyby']<2000000000 && $line['replyby']>0) { echo "checked=1";}
 				echo "/>Before: "; 
 				echo "<input type=text size=10 name=replybydate value=\"$replybydate\"/>";
 				echo '<a href="#" onClick="displayDatePicker(\'replybydate\', this); return false">';
