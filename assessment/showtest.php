@@ -852,7 +852,14 @@ if (!isset($_POST['embedpostback'])) {
 			} 
 			echo '</a> ';
 		}
-		if ($testsettings['allowlate']==1 && $sessiondata['latepasses']>0 && !$isreview) {
+		$latepasscnt = 0;
+		if ($testsettings['allowlate']>1 && isset($exceptionduedate) && $exceptionduedate>0) {
+			$query = "SELECT latepasshrs FROM imas_courses WHERE id='".$testsettings['courseid']."'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$latepasshrs = mysql_result($result,0,0);
+			$latepasscnt = round(($exceptionduedate - $testsettings['enddate'])/(3600*$latepasshrs));
+		}
+		if (($testsettings['allowlate']==1 || $testsettings['allowlate']-1>$latepasscnt) && $sessiondata['latepasses']>0 && !$isreview) {
 			echo "<a href=\"$imasroot/course/redeemlatepass.php?cid=$cid&aid={$testsettings['id']}\" onclick=\"return confirm('", _('This will discard any unsaved work.'), "');\">", _('Redeem LatePass'), "</a> ";
 		}
 		
