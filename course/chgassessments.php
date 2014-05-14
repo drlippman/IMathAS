@@ -77,11 +77,7 @@ if (!(isset($teacherid))) {
 				}
 			}
 			if (isset($_POST['chgallowlate'])) {
-				if (isset($_POST['allowlate'])) {
-					$allowlate = 1;
-				} else {
-					$allowlate = 0;
-				}
+				$allowlate = intval($_POST['allowlate']);
 			}
 			if (isset($_POST['chghints'])) {
 				if (isset($_POST['showhints'])) {
@@ -347,6 +343,16 @@ if (!(isset($teacherid))) {
 		while ($row = mysql_fetch_row($result)) {
 			$page_forumSelect['val'][] = $row[0];
 			$page_forumSelect['label'][] = $row[1];
+		}
+		
+		$page_allowlateSelect = array();
+		$page_allowlateSelect['val'][0] = 0;
+		$page_allowlateSelect['label'][0] = "None";
+		$page_allowlateSelect['val'][1] = 1;
+		$page_allowlateSelect['label'][1] = "Unlimited";
+		for ($k=1;$k<9;$k++) {
+			$page_allowlateSelect['val'][] = $k+1;
+			$page_allowlateSelect['label'][] = "Up to $k";
 		}
 
 		
@@ -726,7 +732,9 @@ $(function() {
 				<td><input type="checkbox" name="chgallowlate" class="chgbox"/></td>
 				<td class="r">Allow use of LatePasses?: </td>
 				<td>
-				<input type="checkbox" name="allowlate" <?php writeHtmlChecked($line['allowlate'],1); ?>>
+				<?php
+				writeHtmlSelect("allowlate",$page_allowlateSelect['val'],$page_allowlateSelect['label'],1);
+				?>
 				</td>
 			</tr>
 			<tr class="coptr">

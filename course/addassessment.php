@@ -126,11 +126,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		
 		$tutoredit = intval($_POST['tutoredit']);
 		
-		if (isset($_POST['allowlate'])) {
-			$_POST['allowlate'] = 1;
-		} else {
-			$_POST['allowlate'] = 0;
-		}
+		$_POST['allowlate'] = intval($_POST['allowlate']);
 		
 		$timelimit = $_POST['timelimit']*60;
 		if (isset($_POST['timelimitkickout'])) {
@@ -573,6 +569,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$page_forumSelect['label'][] = $row[1];
 		}
 		
+		$page_allowlateSelect = array();
+		$page_allowlateSelect['val'][0] = 0;
+		$page_allowlateSelect['label'][0] = "None";
+		$page_allowlateSelect['val'][1] = 1;
+		$page_allowlateSelect['label'][1] = "Unlimited";
+		for ($k=1;$k<9;$k++) {
+			$page_allowlateSelect['val'][] = $k+1;
+			$page_allowlateSelect['label'][] = "Up to $k";
+		}
+		
 	} //END INITIAL LOAD BLOCK
 	
 }
@@ -854,7 +860,9 @@ if ($overwriteBody==1) {
 			
 			<span class=form>Allow use of LatePasses?: </span>
 			<span class=formright>
-				<input type="checkbox" name="allowlate" <?php writeHtmlChecked($line['allowlate'],1); ?>>
+				<?php
+				writeHtmlSelect("allowlate",$page_allowlateSelect['val'],$page_allowlateSelect['label'],$line['allowlate']);
+				?>
 			</span><BR class=form>
 			
 			<span class=form>Make hard to print?</span>
@@ -917,7 +925,7 @@ if ($overwriteBody==1) {
 				<input type=text size=4 name=reqscore value="<?php echo $line['reqscore'];?>">
 		   		points is obtained on 
 <?php 
-	writeHtmlSelect ("reqscoreaid",$page_copyFromSelect['val'],$page_copyFromSelect['label'],$selectedVal=$line['reqscoreaid'],$defaultLabel="Dont Use",$defaultVal=0,$actions=null); 
+	writeHtmlSelect ("reqscoreaid",$page_copyFromSelect['val'],$page_copyFromSelect['label'],$line['reqscoreaid'],"Dont Use",0,null); 
 ?>				
 			</span><br class=form>
 			<span class="form">Default Feedback Text:</span>
