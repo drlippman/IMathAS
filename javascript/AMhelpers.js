@@ -12,7 +12,7 @@ function calculate(inputId,outputId,format) {
   }
   for (var sc=0;sc<strarr.length;sc++) {
 	  str = strarr[sc];
-	  str = str.replace(/,/g,"");
+	  str = str.replace(/(\d)\s*,\s*(\d)/g,"$1$2");
 	  var err = "";
 	  if (str.match(/DNE/i)) {
 		  str = str.toUpperCase();
@@ -41,7 +41,9 @@ function calculate(inputId,outputId,format) {
 			  if (!str.match(/^\-?[1-9](\.\d*)?(\*|xx)10\^(\(?\-?\d+\)?)$/)) {
 				err += _("not valid scientific notation");  
 			  }
-		  } 
+		  } else {
+		  	  str = str.replace(/\s/g,'');
+		  }
 		  if (format.indexOf('notrig')!=-1 && str.match(/(sin|cos|tan|cot|sec|csc)/)) {
 			  str = _("no trig functions allowed");
 		  } else if (format.indexOf('nodecimal')!=-1 && str.indexOf('.')!=-1) {
