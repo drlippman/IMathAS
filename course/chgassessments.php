@@ -581,7 +581,7 @@ $(function() {
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgpassword" class="chgbox"/></td>
 				<td class="r">Require Password (blank for none):</td>
-				<td><input type=text name="assmpassword" value=""></td>
+				<td><input type=text name="assmpassword" value="" autocomplete="off"></td>
 			</tr>
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgtimelimit" class="chgbox"/></td>
