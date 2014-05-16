@@ -262,6 +262,7 @@ var AMsymbols = [
 
 //commands with argument
 AMsqrt, AMroot, AMfrac, AMdiv, AMover, AMsub, AMsup,
+{input:"cancel", tag:"menclose", output:"cancel", tex:null, ttype:UNARY},
 {input:"Sqrt", tag:"msqrt", output:"sqrt", tex:null, ttype:UNARY},
 {input:"hat", tag:"mover", output:"\u005E", tex:null, ttype:UNARY, acc:true},
 {input:"bar", tag:"mover", output:"\u00AF", tex:"overline", ttype:UNARY, acc:true},
@@ -533,6 +534,8 @@ function AMTparseSexpr(str) { //parses str and returns [node,tailstr]
       result[0] = AMTremoveBrackets(result[0]);
       if (symbol.input == "sqrt") {           // sqrt
 	      return ['\\sqrt{'+result[0]+'}',result[1]];
+      } else if (symbol.input == "cancel") {           // cancel
+	      return ['\\cancel{'+result[0]+'}',result[1]];
       } else if (symbol.input == "abs") {           // abs
 	      return ['{\\left|'+result[0]+'\\right|}',result[1]];
       } else if (typeof symbol.acc == "boolean" && symbol.acc) {   // accent
@@ -549,7 +552,7 @@ function AMTparseSexpr(str) { //parses str and returns [node,tailstr]
     if (result2[0]==null) return ['{'+AMTgetTeXsymbol(symbol)+'}',str];
     result2[0] = AMTremoveBrackets(result2[0]);
     if (symbol.input=="color") {
-    	newFrag = '{\\color{'+result[0].replace(/[\{\}]/g,'')+'}'+result2[0]+'}}';    
+    	newFrag = '{\\color{'+result[0].replace(/[\{\}]/g,'')+'}'+result2[0]+'}';    
     }
     if (symbol.input=="root" || symbol.input=="stackrel") {
 	    if (symbol.input=="root") {
