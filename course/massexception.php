@@ -31,13 +31,14 @@
 				mysql_query($query) or die("Query failed :$query " . mysql_error());	
 				if (isset($_POST['forceregen'])) {
 					//this is not group-safe
-					$query = "SELECT id,questions,lastanswers FROM imas_assessment_sessions WHERE userid='$stu' AND assessmentid='$aid'";
+					$query = "SELECT id,questions,lastanswers,scores FROM imas_assessment_sessions WHERE userid='$stu' AND assessmentid='$aid'";
 					$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 					if (mysql_num_rows($result)>0) {
 						$row = mysql_fetch_row($result);
 						$questions = explode(',',$row[1]);
 						$lastanswers = explode('~',$row[2]);
-						$scores = array(); $attempts = array(); $seeds = array();
+						$curscorelist = $row[3];
+						$scores = array(); $attempts = array(); $seeds = array(); $reattempting = array();
 						for ($i=0; $i<count($questions); $i++) {
 							$scores[$i] = -1;
 							$attempts[$i] = 0;
@@ -53,9 +54,11 @@
 							}
 							$newla[] = "ReGen";
 							$lastanswers[$i] = implode('##',$newla);
-							$reattempting = array();
 						}
 						$scorelist = implode(',',$scores);
+						if (strpos($curscorelist,';')!==false) {
+							$scorelist = $scorelist.';'.$scorelist;
+						}
 						$attemptslist = implode(',',$attempts);
 						$seedslist = implode(',',$seeds);
 						$lastanswers = str_replace('~','',$lastanswers);
