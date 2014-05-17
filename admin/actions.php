@@ -2,6 +2,7 @@
 //IMathAS:  Admin actions
 //(c) 2006 David Lippman
 require("../validate.php");
+require_once("../includes/password.php");
 
 switch($_GET['action']) {
 	case "emulateuser":
@@ -29,9 +30,17 @@ switch($_GET['action']) {
 	case "resetpwd":
 		if ($myrights < 75) { echo "You don't have the authority for this action"; break;}
 		if (isset($_POST['newpw'])) {
-			$md5pw = md5($_POST['newpw']);
+			if (isset($CFG['GEN']['newpasswords'])) {
+				$md5pw = password_hash($_POST['newpw'], PASSWORD_DEFAULT);
+			} else {
+				$md5pw = md5($_POST['newpw']);
+			}
 		} else {
-			$md5pw =md5("password");
+			if (isset($CFG['GEN']['newpasswords'])) {
+				$md5pw = password_hash("password", PASSWORD_DEFAULT);
+			} else {
+				$md5pw =md5("password");
+			}
 		}
 		$query = "UPDATE imas_users SET password='$md5pw' WHERE id='{$_GET['id']}'";
 		if ($myrights < 100) { $query .= " AND groupid='$groupid' AND rights<100"; }
@@ -71,7 +80,7 @@ switch($_GET['action']) {
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$line = mysql_fetch_array($result, MYSQL_ASSOC);
 	
-		if ((md5($_POST['oldpw'])==$line['password']) && ($_POST['newpw1'] == $_POST['newpw2'])) {
+		if ((md5($_POST['oldpw'])==$line['password'] || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['oldpw'], $line['password'])) ) && ($_POST['newpw1'] == $_POST['newpw2'])) {
 			$md5pw =md5($_POST['newpw1']);
 			$query = "UPDATE imas_users SET password='$md5pw' WHERE id='$userid'";
 			mysql_query($query) or die("Query failed : " . mysql_error()); 
@@ -93,8 +102,11 @@ switch($_GET['action']) {
 			echo "<a href=\"forms.php?action=chgrights&id={$row[0]}\">Change rights for existing user</a></body></html>\n";
 			exit;
 		}
-		
-		$md5pw =md5("password");
+		if (isset($CFG['GEN']['newpasswords'])) {
+			$md5pw = password_hash($_POST['password'], PASSWORD_DEFAULT);
+		} else {
+			$md5pw =md5($_POST['password']);
+		}
 		if ($myrights < 100) {
 			$newgroup = $groupid;
 		} else if ($myrights == 100) {
@@ -107,6 +119,15 @@ switch($_GET['action']) {
 		}
 		$query = "INSERT INTO imas_users (SID,password,FirstName,LastName,rights,email,groupid,homelayout) VALUES ('{$_POST['adminname']}','$md5pw','{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['newrights']}','{$_POST['email']}','$newgroup','$homelayout');";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$newuserid = mysql_insert_id();
+		if (isset($CFG['GEN']['enrollonnewinstructor'])) {
+			$valbits = array();
+			foreach ($CFG['GEN']['enrollonnewinstructor'] as $ncid) {
+				$valbits[] = "('$newuserid','$ncid')";
+			}
+			$query = "INSERT INTO imas_students (userid,courseid) VALUES ".implode(',',$valbits);
+			mysql_query($query) or die("Query failed : " . mysql_error());
+		}
 		break;
 	case "logout":
 		$sessionid = session_id();

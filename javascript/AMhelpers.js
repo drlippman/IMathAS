@@ -12,7 +12,7 @@ function calculate(inputId,outputId,format) {
   }
   for (var sc=0;sc<strarr.length;sc++) {
 	  str = strarr[sc];
-	  str = str.replace(/,/g,"");
+	  str = str.replace(/(\d)\s*,(?=\s*\d{3}\b)/g,"$1");
 	  var err = "";
 	  if (str.match(/DNE/i)) {
 		  str = str.toUpperCase();
@@ -37,11 +37,13 @@ function calculate(inputId,outputId,format) {
 			  str = str.replace(/_/,' ');
 		  } else if (format.indexOf('scinot')!=-1) {
 			  str = str.replace(/\s/g,'');
-			  str = str.replace("x","xx");
+			  str = str.replace(/(x|X|\u00D7)/,"xx");
 			  if (!str.match(/^\-?[1-9](\.\d*)?(\*|xx)10\^(\(?\-?\d+\)?)$/)) {
 				err += _("not valid scientific notation");  
 			  }
-		  } 
+		  } else {
+		  	  str = str.replace(/\s/g,'');
+		  }
 		  if (format.indexOf('notrig')!=-1 && str.match(/(sin|cos|tan|cot|sec|csc)/)) {
 			  str = _("no trig functions allowed");
 		  } else if (format.indexOf('nodecimal')!=-1 && str.indexOf('.')!=-1) {
@@ -167,7 +169,21 @@ function intcalculate(inputId,outputId,format) {
 	  } else {
 		  fullstr = fullstr.replace(/\s+/g,'');
 	  }
-	  var strarr = fullstr.split(/U/);
+	  if (format.indexOf('list')!=-1) {
+	  	var lastpos = 0; var strarr = [];
+		for (var pos = 1; pos<fullstr.length-1; pos++) {
+			if (fullstr.charAt(pos)==',') {
+				if ((fullstr.charAt(pos-1)==')' || fullstr.charAt(pos-1)==']')
+					&& (fullstr.charAt(pos+1)=='(' || fullstr.charAt(pos+1)=='[')) {
+					strarr.push(fullstr.substring(lastpos,pos));
+					lastpos = pos+1;
+				}
+			}
+		}
+		strarr.push(fullstr.substring(lastpos));
+	  } else {
+	  	  var strarr = fullstr.split(/U/);
+	  }
 	  var isok = true;
 	  for (i=0; i<strarr.length; i++) {
 		  str = strarr[i];
@@ -239,7 +255,11 @@ function intcalculate(inputId,outputId,format) {
 		 	 if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1 || format.indexOf('scinot')!=-1 || format.indexOf('noval')!=-1) {
 				  fullstr = '`'+strarr.join('uu') + '`';	 
 			 } else {
-			 	 fullstr = '`'+strarr.join('uu') + '` = ' + calcstrarr.join(' U ');
+			 	 if (format.indexOf('list')!=-1) {
+			 	 	 fullstr = '`'+strarr.join(',') + '` = ' + calcstrarr.join(' , '); 
+			 	 } else {
+			 	 	 fullstr = '`'+strarr.join('uu') + '` = ' + calcstrarr.join(' U ');
+			 	 }
 			 }
 		 }
 	 }
@@ -321,7 +341,7 @@ function ntuplecalc(inputId,outputId,format) {
 }
 
 //preview for calccomplex
-function complexcalc(inputId,outputId) {
+function complexcalc(inputId,outputId,format) {
 	var fullstr = document.getElementById(inputId).value;
 	fullstr = fullstr.replace(/\s+/g,'');
 	if (fullstr.match(/DNE/i)) {
@@ -351,7 +371,11 @@ function complexcalc(inputId,outputId) {
 				break;
 			}
 		}
-		outstr = '`'+fullstr+'` = '+outcalced;
+		if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1 || format.indexOf('scinot')!=-1 || format.indexOf('noval')!=-1) {
+			outstr = '`'+fullstr+'`';
+		} else {
+			outstr = '`'+fullstr+'` = '+outcalced;
+		}
 	}
 	if (outputId != null) {
 		 var outnode = document.getElementById(outputId);
@@ -647,6 +671,9 @@ var pts = {};
 var iseqn = {};
 
 function doonsubmit(form,type2,skipconfirm) {
+	for (var qn in callbackstack) {
+		callbackstack[qn](qn);
+	}
 	if (form!=null) {
 		if (form.className == 'submitted') {
 			alert(_("You have already submitted this page.  Please be patient while your submission is processed."));
@@ -669,9 +696,7 @@ function doonsubmit(form,type2,skipconfirm) {
 			}
 		}
 	}
-	for (var qn in callbackstack) {
-		callbackstack[qn](qn);
-	}
+	
 	for (var qn in intcalctoproc) { //i=0; i<intcalctoproc.length; i++) {
 		qn = parseInt(qn);
 		
@@ -684,7 +709,21 @@ function doonsubmit(form,type2,skipconfirm) {
 			  if (calcformat[qn].indexOf('inequality')!=-1) {
 				  fullstr = ineqtointerval(fullstr);
 			  }
-			  strarr = fullstr.split(/U/);
+			  if (calcformat[qn].indexOf('list')!=-1) {
+				var lastpos = 0; var strarr = [];
+				for (var pos = 1; pos<fullstr.length-1; pos++) {
+					if (fullstr.charAt(pos)==',') {
+						if ((fullstr.charAt(pos-1)==')' || fullstr.charAt(pos-1)==']')
+							&& (fullstr.charAt(pos+1)=='(' || fullstr.charAt(pos+1)=='[')) {
+							strarr.push(fullstr.substring(lastpos,pos));
+							lastpos = pos+1;
+						}
+					}
+				}
+				strarr.push(fullstr.substring(lastpos));
+			  } else {
+				  var strarr = fullstr.split(/U/);
+			  }
 			  for (k=0; k<strarr.length; k++) {
 				  str = strarr[k];
 				  if (str.length>0 && str.match(/,/)) {
@@ -709,7 +748,11 @@ function doonsubmit(form,type2,skipconfirm) {
 					  strarr[k] = sm + vals[0] + ',' + vals[1] + em;
 				  }
 			 }
-			 fullstr = strarr.join('U');
+			 if (calcformat[qn].indexOf('list')!=-1) {
+			 	 fullstr = strarr.join(',');
+			 } else {
+			 	 fullstr = strarr.join('U');
+			 }
 		  }
 		  document.getElementById("qn" + qn).value = fullstr;
 	}
@@ -728,7 +771,7 @@ function doonsubmit(form,type2,skipconfirm) {
 			
 			str = str.replace(/,/g,"");
 			if (calcformat[qn].indexOf('scinot')!=-1) {
-				str = str.replace("x","*");
+				str = str.replace(/(x|X|\u00D7)/,"*");
 			}
 			str = str.replace(/(\d+)\s*_\s*(\d+\s*\/\s*\d+)/,"($1+$2)");
 			if (calcformat[qn].indexOf('mixednumber')!=-1 || calcformat[qn].indexOf('allowmixed')!=-1) {
@@ -768,7 +811,7 @@ function doonsubmit(form,type2,skipconfirm) {
 	}
 	for (var qn in complextoproc) { //i=0; i<complextoproc.length; i++) {
 		qn = parseInt(qn);
-		str = complexcalc("tc"+qn,null);
+		str = complexcalc("tc"+qn,null,'');
 		document.getElementById("qn" + qn).value = str;
 	}
 	for (var qn in functoproc) { //fcnt=0; fcnt<functoproc.length; fcnt++) {

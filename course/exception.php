@@ -57,15 +57,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//this is not group-safe
 			$stu = $_GET['uid'];
 			$aid = $_GET['aid'];
-			$query = "SELECT id,questions,lastanswers FROM imas_assessment_sessions WHERE userid='$stu' AND assessmentid='$aid'";
+			$query = "SELECT id,questions,lastanswers,scores FROM imas_assessment_sessions WHERE userid='$stu' AND assessmentid='$aid'";
 			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 			if (mysql_num_rows($result)>0) {
 				$row = mysql_fetch_row($result);
 				$questions = explode(',',$row[1]);
 				$lastanswers = explode('~',$row[2]);
-				$scores = array(); $attempts = array(); $seeds = array();
+				$curscorelist = $row[3];
+				$scores = array(); $attempts = array(); $seeds = array(); $reattempting = array();
 				for ($i=0; $i<count($questions); $i++) {
-					$scores[$i] = -1;
+					$scores[$i] = -1;  
 					$attempts[$i] = 0;
 					$seeds[$i] = rand(1,9999);
 					$newla = array();
@@ -79,9 +80,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 					$newla[] = "ReGen";
 					$lastanswers[$i] = implode('##',$newla);
-					$reattempting = array();
 				}
 				$scorelist = implode(',',$scores);
+				if (strpos($curscorelist,';')!==false) {
+					$scorelist = $scorelist.';'.$scorelist;
+				}
 				$attemptslist = implode(',',$attempts);
 				$seedslist = implode(',',$seeds);
 				$lastanswers = str_replace('~','',$lastanswers);

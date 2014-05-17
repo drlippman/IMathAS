@@ -317,6 +317,7 @@ var AMsymbols = [
 //commands with argument
 AMsqrt, AMroot, AMfrac, AMdiv, AMover, AMsub, AMsup,
 {input:"Sqrt", tag:"msqrt", output:"sqrt", tex:null, ttype:UNARY},
+{input:"cancel", tag:"menclose", output:"cancel", tex:null, ttype:UNARY},
 {input:"hat", tag:"mover", output:"\u005E", tex:null, ttype:UNARY, acc:true},
 {input:"bar", tag:"mover", output:"\u00AF", tex:"overline", ttype:UNARY, acc:true},
 {input:"vec", tag:"mover", output:"\u2192", tex:null, ttype:UNARY, acc:true},
@@ -572,6 +573,10 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
          node.appendChild(result[0]);
          node.appendChild(AMcreateMmlNode("mo",document.createTextNode('|')));
          return [node,result[1]];
+      } else if (symbol.input == "cancel") {   // cancel
+        node = AMcreateMmlNode(symbol.tag,result[0]);
+	node.setAttribute("notation","updiagonalstrike");
+	return [node,result[1]];
       } else if (typeof symbol.acc == "boolean" && symbol.acc) {   // accent
         node = AMcreateMmlNode(symbol.tag,result[0]);
 	node.setAttribute("accent","true");

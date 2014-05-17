@@ -29,6 +29,13 @@
 	 } else {
 		$latepasses = 0;
 	 }
+	 
+	 $query = "SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,toolset,chatset,topbar,cploc,latepasshrs FROM imas_courses WHERE id='$cid'";
+	 $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	 $line = mysql_fetch_array($result, MYSQL_ASSOC);
+	 $latepasshrs = $line['latepasshrs']; 
+	 $msgset = $line['msgset']%5;
+	 
 	 showcalendar("showcalendar");
 	
 	 require("../footer.php");	

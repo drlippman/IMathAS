@@ -125,6 +125,10 @@ if (isset($_GET['launch'])) {
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
 	} else if ($sessiondata['ltiitemtype']==2) {
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/index.php");
+	} else if ($sessiondata['ltiitemtype']==3) {
+		$cid = $sessiondata['ltiitemid'][2];
+		$folder = $sessiondata['ltiitemid'][1];
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid&folder=".$folder);
 	} else { //will only be instructors hitting this option
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/ltihome.php");
 	}
@@ -139,7 +143,7 @@ if (isset($_GET['launch'])) {
 	$sessiondata = unserialize(base64_decode($enc));
 	//time to output a postback to capture tzoffset and math/graph settings
 	$pref = 0;
-	if (isset($_COOKIE['mathgraphprefs'])) {
+	/*if (isset($_COOKIE['mathgraphprefs'])) {
 		 $prefparts = explode('-',$_COOKIE['mathgraphprefs']);
 		 if ($prefparts[0]==2 && $prefparts[1]==2) { //img all
 			$pref = 3;	 
@@ -148,7 +152,7 @@ if (isset($_GET['launch'])) {
 		 } else if ($prefparts[1]==2) { //img graph
 			 $pref = 2;
 		 }	 
-	}
+	}*/
 	$flexwidth = true;
 	$nologo = true;
 	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
@@ -172,12 +176,11 @@ if (isset($_GET['launch'])) {
 			var html = ""; 
 			html += 'Accessibility: ';
 			html += "<a href='#' onClick=\"window.open('<?php echo $imasroot;?>/help.php?section=loggingin','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\">Help<\/a>";
-			html += '<br/><input type="radio" name="access" value="0" <?php if ($pref==0) {echo "checked=1";} ?> />Detect my settings<br/>';
-			html += '<input type="radio" name="access" value="2" <?php if ($pref==2) {echo "checked=1";} ?> />Force image-based graphs<br/>';
-			html += '<input type="radio" name="access" value="4" <?php if ($pref==4) {echo "checked=1";} ?> />Force image-based math<br/>';
-			html += '<input type="radio" name="access" value="3" <?php if ($pref==3) {echo "checked=1";} ?> />Force image based display<br/>';
-			html += '<input type="radio" name="access" value="1">Use text-based display';
-			
+			html += '<div style="margin-top: 0px;margin-right:0px;text-align:right;padding:0px"><select name="access"><option value="0" <?php if ($pref==0) {echo 'selected="selected"';} ?> />Use defaults</option>';
+			html += '<option value="3" <?php if ($pref==3) {echo 'selected="selected"';} ?> />Force image-based display</option>';
+			html += '<option value="5" <?php if ($pref==5) {echo 'selected="selected"';} ?> />MathJax display (experimental)</option>';
+			html += '<option value="1">Use text-based display</option></select></div>';
+		
 			if (AMnoMathML) {
 				html += '<input type="hidden" name="mathdisp" value="0" />';
 			} else {
@@ -188,7 +191,7 @@ if (isset($_GET['launch'])) {
 			} else {
 				html += '<input type="hidden" name="graphdisp" value="1" />';
 			}
-			html += '<div class="textright"><input type="submit" value="Login" /><\/div>';
+			html += '<div class="textright"><input type="submit" value="Continue" /><\/div>';
 			setnode.innerHTML = html; 
 			var thedate = new Date();  
 			document.getElementById("tzoffset").value = thedate.getTimezoneOffset();
@@ -225,6 +228,9 @@ if (isset($_GET['launch'])) {
 		$allow_acctcreation = false;
 	}
 	if ($_GET['userinfo']=='set') {	
+		if (isset($CFG['GEN']['newpasswords'])) {
+			require_once("includes/password.php");
+		}
 		//check input
 		$infoerr = '';
 		unset($userid);
@@ -237,13 +243,14 @@ if (isset($_GET['launch'])) {
 		} else {
 			if (!empty($_POST['curSID']) && !empty($_POST['curPW'])) {
 				//provided current SID/PW pair
-				$md5pw = md5($_POST['curPW']);
 				$query = "SELECT password,id FROM imas_users WHERE SID='{$_POST['curSID']}'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				if (mysql_num_rows($result)==0) {
 					$infoerr = 'Username (key) is not valid';
 				} else {
-					if (mysql_result($result,0,0)==$md5pw) {
+					$realpw = mysql_result($result,0,0);
+					if (((!isset($CFG['GEN']['newpasswords']) || $CFG['GEN']['newpasswords']!='only') && ($realpw == md5($_POST['curPW'])))
+					  || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['curPW'],$realpw)) ) {
 						$userid=mysql_result($result,0,1);
 					} else {
 						$infoerr = 'Existing username/password provided are not valid.';
@@ -274,7 +281,11 @@ if (isset($_GET['launch'])) {
 				} else {
 					$msgnot = 0;
 				}
-				$md5pw = md5($_POST['pw1']);
+				if (isset($CFG['GEN']['newpasswords'])) {
+					$md5pw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
+				} else {
+					$md5pw = md5($_POST['pw1']);
+				}
 			}
 		}
 		if ($infoerr=='') { // no error, so create!
@@ -515,6 +526,11 @@ if (isset($_GET['launch'])) {
 			$parts = explode('-',$_REQUEST['custom_view_folder']);
 			$sourcecid = $parts[0];
 			$_SESSION['view_folder'] = array($sourcecid,$parts[1]);
+		} else if (isset($_REQUEST['custom_open_folder'])) {
+			$keytype = 'cc-of';
+			$parts = explode('-',$_REQUEST['custom_open_folder']);
+			$sourcecid = $parts[0];
+			$_SESSION['view_folder'] = array($sourcecid,$parts[1]);
 		}
 	}
 	
@@ -536,7 +552,6 @@ if (isset($_GET['launch'])) {
 	$_SESSION['lti_resource_link_id'] = $_REQUEST['resource_link_id'];
 	$_SESSION['lti_lis_result_sourcedid'] = $_REQUEST['lis_result_sourcedid'];
 	$_SESSION['lti_outcomeurl'] = $_REQUEST['lis_outcome_service_url'];
-	$_SESSION['lti_context_label'] = $_REQUEST['context_label'];
 	$_SESSION['lti_key'] = $ltikey;
 	$_SESSION['lti_keytype'] = $keytype;
 	$_SESSION['lti_keyrights'] = $requestinfo[0]->rights;
@@ -649,7 +664,7 @@ $now = time();
 //general placement or common catridge placement - look for placement, or create if know info
 $orgparts = explode(':',$_SESSION['ltiorg']);  //THIS was added to avoid issues when GUID change, while still storing it
 $shortorg = $orgparts[0];
-if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltirole']!='instructor' && $_SESSION['lti_keytype']!='cc-vf') || $_SESSION['lti_keytype']=='cc-g' || $_SESSION['lti_keytype']=='cc-c') { 
+if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltirole']!='instructor' && $_SESSION['lti_keytype']!='cc-vf' && $_SESSION['lti_keytype']!='cc-of') || $_SESSION['lti_keytype']=='cc-g' || $_SESSION['lti_keytype']=='cc-c') { 
 	$query = "SELECT placementtype,typeid FROM imas_lti_placements WHERE ";
 	$query .= "contextid='{$_SESSION['lti_context_id']}' AND linkid='{$_SESSION['lti_resource_link_id']}' ";
 	$query .= "AND org LIKE '$shortorg:%'"; //='{$_SESSION['ltiorg']}'";
@@ -722,11 +737,16 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 				//aid is in destination course - just make placement
 				$aid = $_SESSION['place_aid'][1];
 			} else {
-				//aid is in source course.  Let's look and see if there's an assessment in destination with the same title.
+				/*//aid is in source course.  Let's look and see if there's an assessment in destination with the same title.
 				$query = "SELECT name FROM imas_assessments WHERE id='{$_SESSION['place_aid'][1]}'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				$sourceassessname = addslashes(mysql_result($result,0,0));
 				$query = "SELECT id FROM imas_assessments WHERE name='$sourceassessname' AND courseid='$destcid'";
+				*/
+				//CHECK ME
+				//aid is in source course.  Let's see if we already copied it.
+				$query = "SELECT id FROM imas_assessments WHERE ancestors REGEXP '^".intval($_SESSION['place_aid'][1])."[[:>:]]' AND courseid=".intval($destcid);
+				
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				if (mysql_num_rows($result)>0) {
 					$aid = mysql_result($result,0,0);
@@ -769,7 +789,7 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 		
 	}
 }
-if ($_SESSION['lti_keytype']=='cc-vf') {
+if ($_SESSION['lti_keytype']=='cc-vf' || $_SESSION['lti_keytype']=='cc-of') {
 	$keyparts = array('folder',$_SESSION['view_folder'][0],$_SESSION['view_folder'][1]);
 }
 //is course level placement
@@ -830,12 +850,14 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein') {
 		reporterror("invalid course identifier in folder view launch");
 	} else {
 		$cid = intval($keyparts[1]);
-		$usid = explode('_',$_SESSION['ltiorigkey']);
-		$query = "SELECT imas_tutors.id FROM imas_tutors JOIN imas_users ON imas_tutors.userid=imas_users.id WHERE ";
-		$query .= "imas_tutors.courseid='$cid' AND imas_users.SID='".addslashes($usid[0])."'";
-		$r3 = mysql_query($query) or die("Query failed : " . mysql_error());
-		if (mysql_num_rows($r3)==0) {
-			reporterror("not authorized to view folders in this course");
+		if ($_SESSION['lti_keytype']=='cc-vf') {
+			$usid = explode('_',$_SESSION['ltiorigkey']);
+			$query = "SELECT imas_tutors.id FROM imas_tutors JOIN imas_users ON imas_tutors.userid=imas_users.id WHERE ";
+			$query .= "imas_tutors.courseid='$cid' AND imas_users.SID='".addslashes($usid[0])."'";
+			$r3 = mysql_query($query) or die("Query failed : " . mysql_error());
+			if (mysql_num_rows($r3)==0) {
+				reporterror("not authorized to view folders in this course");
+			}
 		}
 		$row = mysql_fetch_row($result2);
 		$items = unserialize($row[0]);
@@ -977,7 +999,7 @@ if ($keyparts[0]=='aid') {
 	$sessiondata['ltiitemtype']=2;
 } else if ($keyparts[0]=='folder') { //is folder content view
 	$sessiondata['ltiitemtype']=3;
-	$sessiondata['ltiitemid'] = array($keyparts[2],$keyparts[3]);
+	$sessiondata['ltiitemid'] = array($keyparts[2],$keyparts[3],$cid);
 } else {
 	$sessiondata['ltiitemtype']=-1;
 }

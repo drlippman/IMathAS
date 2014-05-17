@@ -97,6 +97,9 @@ if (!(isset($teacherid)) && $myrights<100) {
 	
 	//FORM HAS BEEN POSTED, STEP 3 DATA MANIPULATION
 	if (isset($_POST['process'])) {
+		if (isset($CFG['GEN']['newpasswords'])) {
+			require_once("../includes/password.php");
+		}
 		$filename = rtrim(dirname(__FILE__), '/\\') .'/import/' . $_POST['filename'];
 		$handle = fopen($filename,'r');
 		if ($_POST['hdr']==1) {
@@ -119,20 +122,40 @@ if (!(isset($teacherid)) && $myrights<100) {
 				echo "Username {$arr[0]} already existed in system; using existing<br/>\n";
 			} else {
 				if (($_POST['pwtype']==0 || $_POST['pwtype']==1) && strlen($arr[0])<4) {
-					$pw = md5($arr[0]);
+					if (isset($CFG['GEN']['newpasswords'])) {
+						$pw = password_hash($arr[0], PASSWORD_DEFAULT);
+					} else {
+						$pw = md5($arr[0]);
+					}
 				} else {
 					if ($_POST['pwtype']==0) {
-						$pw = md5(substr($arr[0],0,4));
+						if (isset($CFG['GEN']['newpasswords'])) {
+							$pw = password_hash($arr[0], PASSWORD_DEFAULT);
+						} else {
+							$pw = md5(substr($arr[0],0,4));
+						}
 					} else if ($_POST['pwtype']==1) {
-						$pw = md5(substr($arr[0],-4));
+						if (isset($CFG['GEN']['newpasswords'])) {
+							$pw = password_hash($arr[0], PASSWORD_DEFAULT);
+						} else {
+							$pw = md5(substr($arr[0],-4));
+						}
 					} else if ($_POST['pwtype']==2) {
-						$pw = md5($_POST['defpw']);
+						if (isset($CFG['GEN']['newpasswords'])) {
+							$pw = password_hash($_POST['defpw'], PASSWORD_DEFAULT);
+						} else {
+							$pw = md5($_POST['defpw']);
+						}
 					} else if ($_POST['pwtype']==3) {
 						if (trim($arr[6])=='') {
 							echo "Password for {$arr[0]} is blank; skipping import<br/>";
 							continue;
 						}
-						$pw = md5($arr[6]);
+						if (isset($CFG['GEN']['newpasswords'])) {
+							$pw = password_hash($arr[6], PASSWORD_DEFAULT);
+						} else {
+							$pw = md5($arr[6]);
+						}
 					}
 				}
 				$query = "INSERT INTO imas_users (SID,FirstName,LastName,email,rights,password) VALUES ('$arr[0]','$arr[1]','$arr[2]','$arr[3]',10,'$pw')";

@@ -245,6 +245,7 @@ array( 'input'=>'hArr', 'tex'=>'Leftrightarrow'),
 // Commands with argument
 array( 'input'=>'sqrt', 'unary'=>TRUE ),
 array( 'input'=>'Sqrt', 'unary'=>TRUE ),
+array( 'input'=>'cancel', 'unary'=>TRUE ),
 array( 'input'=>'root', 'binary'=>TRUE ),
 array( 'input'=>'frac', 'binary'=>TRUE),
 array( 'input'=>'/', 'infix'=>TRUE),
@@ -550,6 +551,8 @@ function AMTparseSexpr($str) {
 		$result[0] = $this->AMTremoveBrackets($result[0]);
 		if ($symbol['input']=='sqrt') {
 			return array('\\sqrt{'.$result[0].'}',$result[1]);
+		} else if ($symbol['input']=='cancel') {
+			return array('\\cancel{'.$result[0].'}',$result[1]);
 		} else if ($symbol['input']=='abs') {
 			return array('{\\left|'.$result[0].'\\right|}',$result[1]);
 		} else if (isset($symbol['acc'])) {

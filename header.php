@@ -6,6 +6,9 @@
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+  if (!window.jQuery) {  document.write('<script src="<?php echo $imasroot;?>/javascript/jquery.min.js"><\/script>');}
+</script>
 <link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=121713";?>" type="text/css" />
 <?php if (isset($coursetheme)) { 
 	if (isset($flexwidth) || isset($usefullwidth)) {
@@ -79,10 +82,12 @@ if (!isset($sessiondata['mathdisp'])) {
 		echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=012314\" type=\"text/javascript\"></script>\n";
 	}
 	echo '<script type="text/x-mathjax-config">MathJax.Hub.Config({ 
-		"HTML-CSS": {preferredFont: "STIX"}
-		});</script>';
-	echo '<script type="text/javascript" src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=AM_HTMLorMML"></script>';
-	echo '<script>window.MathJax || document.write(\'<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="'.$imasroot.'/mathjax/MathJax.js?config=AM_HTMLorMML"><\/script>\')</script>';
+		"HTML-CSS": {preferredFont: "STIX", imageFont:null}
+		});
+		</script>';
+	//echo '<script type="text/javascript" src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=AM_HTMLorMML"></script>';
+	//echo '<script>window.MathJax || document.write(\'<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="'.$imasroot.'/mathjax/MathJax.js?config=AM_HTMLorMML"><\/script>\')</script>';
+	echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_HTMLorMML"></script>';
 	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = false; function rendermathnode(node) { MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]); }</script>'; 
 	echo '<style type="text/css">span.AM { font-size: 105%;}</style>';
 }

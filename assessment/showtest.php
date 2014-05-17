@@ -559,6 +559,9 @@
 	$showhints = ($testsettings['showhints']==1);
 	$showtips = $testsettings['showtips'];
 	$regenonreattempt = (($testsettings['shuffle']&8)==8);
+	if ($regenonreattempt) {
+		$nocolormark = true;
+	}
 	
 	$reloadqi = false;
 	if (isset($_GET['reattempt'])) {
@@ -575,6 +578,11 @@
 					}
 					if (($regenonreattempt && $qi[$questions[$i]]['regen']==0) || $qi[$questions[$i]]['regen']==1) {
 						$seeds[$i] = rand(1,9999);
+						if (!$isreview) {
+							if (newqfromgroup($i)) {
+								$reloadqi = true;
+							}
+						}
 						if (isset($qi[$questions[$i]]['answeights'])) {
 							$reloadqi = true;
 						}
@@ -592,6 +600,11 @@
 						}
 						if (($regenonreattempt && $qi[$questions[$i]]['regen']==0) || $qi[$questions[$i]]['regen']==1) {
 							$seeds[$i] = rand(1,9999);
+							if (!$isreview) {
+								if (newqfromgroup($i)) {
+									$reloadqi = true;
+								}
+							}
 							if (isset($qi[$questions[$i]]['answeights'])) {
 								$reloadqi = true;
 							}
@@ -608,6 +621,11 @@
 				}
 				if (($regenonreattempt && $qi[$questions[$toclear]]['regen']==0) || $qi[$questions[$toclear]]['regen']==1) {
 					$seeds[$toclear] = rand(1,9999);
+					if (!$isreview) {
+						if (newqfromgroup($toclear)) {
+							$reloadqi = true;
+						}
+					}
 					if (isset($qi[$questions[$toclear]]['answeights'])) {
 						$reloadqi = true;
 					}
@@ -636,6 +654,11 @@
 		$loc = array_search($toregen,$reattempting);
 		if ($loc!==false) {
 			array_splice($reattempting,$loc,1);
+		}
+		if (!$isreview) {
+			if (newqfromgroup($toregen)) {
+				$reloadqi = true;
+			}
 		}
 		if (isset($qi[$questions[$toregen]]['answeights'])) {
 			$reloadqi = true;
@@ -829,7 +852,14 @@ if (!isset($_POST['embedpostback'])) {
 			} 
 			echo '</a> ';
 		}
-		if ($testsettings['allowlate']==1 && $sessiondata['latepasses']>0 && !$isreview) {
+		$latepasscnt = 0;
+		if ($testsettings['allowlate']>1 && isset($exceptionduedate) && $exceptionduedate>0) {
+			$query = "SELECT latepasshrs FROM imas_courses WHERE id='".$testsettings['courseid']."'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$latepasshrs = mysql_result($result,0,0);
+			$latepasscnt = round(($exceptionduedate - $testsettings['enddate'])/(3600*$latepasshrs));
+		}
+		if (($testsettings['allowlate']==1 || $testsettings['allowlate']-1>$latepasscnt) && $sessiondata['latepasses']>0 && !$isreview) {
 			echo "<a href=\"$imasroot/course/redeemlatepass.php?cid=$cid&aid={$testsettings['id']}\" onclick=\"return confirm('", _('This will discard any unsaved work.'), "');\">", _('Redeem LatePass'), "</a> ";
 		}
 		
@@ -855,14 +885,18 @@ if (!isset($_POST['embedpostback'])) {
 			$rowgrptest = addslashes_deep($rowgrptest);
 			$insrow = "'".implode("','",$rowgrptest)."'";
 			$loginfo = "$userfullname creating group. ";
+			if (isset($CFG['GEN']['newpasswords'])) {
+				require_once("../includes/password.php");
+			}
 			for ($i=1;$i<$testsettings['groupmax'];$i++) {
 				if (isset($_POST['user'.$i]) && $_POST['user'.$i]!=0) {
 					$query = "SELECT password,LastName,FirstName FROM imas_users WHERE id='{$_POST['user'.$i]}'";
 					$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
 					$thisusername = mysql_result($result,0,2) . ' ' . mysql_result($result,0,1);	
 					if ($testsettings['isgroup']==1) {
+						$actualpw = mysql_result($result,0,0);
 						$md5pw = md5($_POST['pw'.$i]);
-						if (mysql_result($result,0,0)!=$md5pw) {
+						if (!($actualpw==$md5pw || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['pw'.$i],$actualpw)))) {
 							echo "<p>$thisusername: ", _('password incorrect'), "</p>";
 							$errcnt++;
 							continue;
@@ -1176,6 +1210,7 @@ if (!isset($_POST['embedpostback'])) {
 	//identify question-specific  intro/instruction 
 	//comes in format [Q 1-3] in intro
 	if (strpos($testsettings['intro'],'[Q')!==false) {
+		$testsettings['intro'] = preg_replace('/((<span|<strong|<em)[^>]*>)?\[Q\s+(\d+(\-(\d+))?)\s*\]((<\/span|<\/strong|<\/em)[^>]*>)?/','[Q $3]',$testsettings['intro']);
 		if(preg_match_all('/\<p[^>]*>\s*\[Q\s+(\d+)(\-(\d+))?\s*\]\s*<\/p>/',$testsettings['intro'],$introdividers,PREG_SET_ORDER)) {
 			$intropieces = preg_split('/\<p[^>]*>\s*\[Q\s+(\d+)(\-(\d+))?\s*\]\s*<\/p>/',$testsettings['intro']);
 			foreach ($introdividers as $k=>$v) {
@@ -1770,7 +1805,15 @@ if (!isset($_POST['embedpostback'])) {
 					}
 				}
 				if ($showeachscore && $GLOBALS['questionmanualgrade'] != true) {
-					$colors = scorestocolors($noraw?$scores[$qn]:$rawscores[$qn],$qi[$questions[$qn]]['points'],$qi[$questions[$qn]]['answeights'],$noraw);
+					if (!$noraw) {
+						if (strpos($rawscores[$qn],'~')!==false) {
+							$colors = explode('~',$rawscores[$qn]);
+						} else {
+							$colors = array($rawscores[$qn]);
+						}
+					} else {
+						$colors = scorestocolors($noraw?$scores[$qn]:$rawscores[$qn],$qi[$questions[$qn]]['points'],$qi[$questions[$qn]]['answeights'],$noraw);
+					}
 				}
 				
 				
@@ -2042,7 +2085,11 @@ if (!isset($_POST['embedpostback'])) {
 			if (!isset($_GET['page'])) { $_GET['page'] = 0;}
 			$intro = filter("<div class=\"intro\">{$testsettings['intro']}</div>\n");
 			if ($testsettings['displaymethod'] == "VideoCue") {
-				echo $intro;
+				echo substr(trim($intro),0,-6);
+				if (!$sessiondata['istutorial']) {
+					echo "<p><a href=\"showtest.php?action=embeddone\">", _('When you are done, click here to see a summary of your score'), "</a></p>\n";
+				}
+				echo '</div>';
 				$intro = '';
 			}
 			echo '<script type="text/javascript">var assesspostbackurl="' .$urlmode. $_SERVER['HTTP_HOST'] . $imasroot . '/assessment/showtest.php?embedpostback=true&action=scoreembed&page='.$_GET['page'].'";</script>';
@@ -2117,7 +2164,7 @@ if (!isset($_POST['embedpostback'])) {
 				  //tag.src = "//www.youtube.com/iframe_api";
 				showvideoembednavbar($viddata);
 				$dovidcontrol = true;
-				echo '<div class="inset" style="position: relative; margin-left: 225px;">';
+				echo '<div class="inset" style="position: relative; margin-left: 225px; overflow: visible;">';
 				echo "<a name=\"beginquestions\"></a>\n";
 				echo '<div id="playerwrapper"><div id="player"></div></div>';
 				$outarr = array();
@@ -2221,11 +2268,12 @@ if (!isset($_POST['embedpostback'])) {
 			if (!$sessiondata['istutorial'] && $testsettings['displaymethod'] != "VideoCue") {
 				echo "<p>" . _('Total Points Possible: ') . totalpointspossible($qi) . "</p>";
 			}
-			if (!$sessiondata['istutorial']) {
-				echo "<p><a href=\"showtest.php?action=embeddone\">", _('When you are done, click here to see a summary of your score'), "</a></p>\n";
-			}
+			
 			
 			echo '</div>'; //ends either inset or formcontents div
+			if (!$sessiondata['istutorial'] && $testsettings['displaymethod'] != "VideoCue") {
+				echo "<p><a href=\"showtest.php?action=embeddone\">", _('When you are done, click here to see a summary of your score'), "</a></p>\n";
+			}
 			echo '</form>';
 			
 					
@@ -2705,7 +2753,7 @@ if (!isset($_POST['embedpostback'])) {
 				} else {
 					$reqscore = ($testsettings['minscore']-10000).'%';
 				}
-				echo "<p><span style=\"color:red;\"><b>", sprintf(_('A score of %d is required to receive credit for this assessment'), $reqscore), "<br/>", _('Grade in Gradebook: No Credit (NC)'), "</span></p> ";	
+				echo "<p><span style=\"color:red;\"><b>", sprintf(_('A score of %s is required to receive credit for this assessment'), $reqscore), "<br/>", _('Grade in Gradebook: No Credit (NC)'), "</span></p> ";	
 			}
 		} else {
 			echo "<p><b>", _('Your scores have been recorded for this assessment.'), "</b></p>";
@@ -2763,7 +2811,15 @@ if (!isset($_POST['embedpostback'])) {
 			
 			for ($i=0; $i<count($questions); $i++) {
 				echo '<div>';
-				$col = scorestocolors($noraw?$scores[$qn]:$rawscores[$qn], $qi[$questions[$i]]['points'], $qi[$questions[$i]]['answeights'],$noraw);
+				if (!$noraw) {
+					if (strpos($rawscores[$qn],'~')!==false) {
+						$col = explode('~',$rawscores[$qn]);
+					} else {
+						$col = array($rawscores[$qn]);
+					}
+				} else {
+					$col = scorestocolors($noraw?$scores[$qn]:$rawscores[$qn], $qi[$questions[$i]]['points'], $qi[$questions[$i]]['answeights'],$noraw);
+				}
 				displayq($i, $qi[$questions[$i]]['questionsetid'],$seeds[$i],$showa,false,$attempts[$i],false,false,false,$col);
 				echo "<div class=review>", _('Question')." ".($i+1).". ", _('Last Attempt:');
 				echo printscore($scores[$i], $i);

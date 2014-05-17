@@ -37,7 +37,7 @@ if ($canviewall) {
 		$gbmode = $_GET['gbmode'];
 		$sessiondata[$cid.'gbmode'] = $gbmode;
 		writesessiondata();
-	} else if (isset($sessiondata[$cid.'gbmode'])) {
+	} else if (isset($sessiondata[$cid.'gbmode']) && !isset($_GET['refreshdef'])) {
 		$gbmode =  $sessiondata[$cid.'gbmode'];
 	} else {
 		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
@@ -46,7 +46,7 @@ if ($canviewall) {
 		
 		
 	}
-	if (isset($_COOKIE["colorize-$cid"])) {
+	if (isset($_COOKIE["colorize-$cid"]) && !isset($_GET['refreshdef'])) {
 		$colorize = $_COOKIE["colorize-$cid"];
 	} else {
 		$query = "SELECT colorize FROM imas_gbscheme WHERE courseid='$cid'";
@@ -76,6 +76,10 @@ if ($canviewall) {
 			$secfilter = -1;
 		}
 	}
+	if (isset($_GET['refreshdef']) && isset($sessiondata[$cid.'catcollapse'])) {
+		unset($sessiondata[$cid.'catcollapse']);
+		writesessiondata();
+	}
 	if (isset($sessiondata[$cid.'catcollapse'])) {
 		$overridecollapse = $sessiondata[$cid.'catcollapse'];
 	} else {
@@ -91,11 +95,13 @@ if ($canviewall) {
 	$showpics = floor($gbmode/10000)%10 ; //0 none, 1 small, 2 big
 	$totonleft = ((floor($gbmode/1000)%10)&1) ; //0 right, 1 left
 	$avgontop = ((floor($gbmode/1000)%10)&2) ; //0 bottom, 2 top
+	$lastlogin = (((floor($gbmode/1000)%10)&4)==4) ; //0 hide, 2 show last login column
 	$links = ((floor($gbmode/100)%10)&1); //0: view/edit, 1 q breakdown
 	$hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
-	$hidenc = floor($gbmode/10)%10; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
+	$includeduedate = (((floor($gbmode/100)%10)&4)==4); //0: hide due date, 4: show due date
+	$hidenc = (floor($gbmode/10)%10)%3; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
+	$includelastchange = (((floor($gbmode/10)%10)&4)==4);  //: hide last change, 4: show last change
 	$availshow = $gbmode%10; //0: past, 1 past&cur, 2 all, 3 past and attempted, 4=current only
-
 	
 } else {
 	$secfilter = -1;
@@ -107,6 +113,9 @@ if ($canviewall) {
 	$totonleft = 0;
 	$avgontop = 0;
 	$hidelocked = 0;
+	$lastlogin = false;
+	$includeduedate = false;
+	$includelastchange = false;
 }
 
 if ($canviewall && isset($_GET['stu'])) {
@@ -252,9 +261,19 @@ if ($canviewall) {
 		$placeinhead .= "}\n";
 	}
 	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid=$cid&stu=";
-	$placeinhead .= "function chgstu(el) { 	\$(el).after('<img src=\"$imasroot/img/updating.gif\"/>'); window.location = '$address' + el.value;}";
+	$placeinhead .= "function chgstu(el) { 	\$('#updatingicon').show(); window.location = '$address' + el.value;}\n";
 	$placeinhead .= 'function chgtoggle() { ';
 	$placeinhead .= "	var altgbmode = 10000*document.getElementById(\"toggle4\").value + 1000*($totonleft+$avgontop) + 100*(document.getElementById(\"toggle1\").value*1+ document.getElementById(\"toggle5\").value*1) + 10*document.getElementById(\"toggle2\").value + 1*document.getElementById(\"toggle3\").value; ";
+	if ($includelastchange) {
+		$placeinhead .= "     altgbmode += 40;";
+	}
+	if ($lastlogin) {
+		$placeinhead .= "     altgbmode += 4000;";
+	}
+	if ($includeduedate) {
+		$placeinhead .= "     altgbmode += 400;\n";
+	}
+	
 	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid&gbmode=";
 	$placeinhead .= "	var toopen = '$address' + altgbmode;\n";
 	$placeinhead .= "  	window.location = toopen; \n";
@@ -648,7 +667,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 		echo '<button type="submit" name="posted" value="Lock" title="',_("Lock selected students out of the course"),'">',_('Lock'),'</button> ';
 		echo '<button type="submit" name="posted" value="Make Exception" title="',_("Make due date exceptions for selected students"),'">',_('Make Exception'),'</button> ';
 	}
-	
+	$includelastchange = false;  //don't need it for instructor view
 	$gbt = gbinstrdisp();
 	echo "</form>";
 	echo "</div>";
@@ -667,7 +686,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 }
 
 function gbstudisp($stu) {
-	global $hidenc,$cid,$gbmode,$availshow,$isteacher,$istutor,$catfilter,$imasroot,$canviewall,$urlmode;
+	global $hidenc,$cid,$gbmode,$availshow,$isteacher,$istutor,$catfilter,$imasroot,$canviewall,$urlmode,$includeduedate, $includelastchange;
 	if ($availshow==4) {
 		$availshow=1;
 		$hidepast = true;
@@ -720,11 +739,12 @@ function gbstudisp($stu) {
 			}
 			if ($lastsec!='') {echo '</optgroup>';}
 			echo '</select>';
+			echo '<img id="updatingicon" style="display:none" src="'.$imasroot.'/img/updating.gif"/>';
 			echo ' <span class="small">('.$gbt[1][0][1].')</span>';
 		} else {
 			echo strip_tags($gbt[1][0][0]) . ' <span class="small">('.$gbt[1][0][1].')</span>';
 		}
-		$query = "SELECT imas_students.gbcomment,imas_users.email,imas_students.latepass,imas_students.section FROM imas_students,imas_users WHERE ";
+		$query = "SELECT imas_students.gbcomment,imas_users.email,imas_students.latepass,imas_students.section,imas_students.lastaccess FROM imas_students,imas_users WHERE ";
 		$query .= "imas_students.userid=imas_users.id AND imas_users.id='$stu' AND imas_students.courseid='{$_GET['cid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		if (mysql_num_rows($result)==0) { //shouldn't happen
@@ -732,10 +752,11 @@ function gbstudisp($stu) {
 			require("../footer.php");
 			exit;
 		}
-		list($gbcomment,$stuemail,$latepasses,$stusection) = mysql_fetch_row($result);
+		list($gbcomment,$stuemail,$latepasses,$stusection,$lastaccess) = mysql_fetch_row($result);
 		if ($stusection!='') {
-			echo ' <span class="small">Section: '.$stusection.'</span>';
+			echo ' <span class="small">Section: '.$stusection.'.</span>';
 		}
+		echo ' <span class="small">'._('Last Login: ').tzdate('D n/j/y g:ia', $lastaccess).'.</span>';
 		echo '</div>';
 		if ($isteacher) {
 			echo '<div style="clear:both;display:inline-block" class="cpmid secondary">';
@@ -793,6 +814,12 @@ function gbstudisp($stu) {
 	echo '<th>', _('Item'), '</th><th>', _('Possible'), '</th><th>', _('Grade'), '</th><th>', _('Percent'), '</th>';
 	if ($stu>0 && $isteacher) {
 		echo '<th>', _('Time Spent (In Questions)'), '</th>';
+		if ($includelastchange) {
+			echo '<th>'._('Last Changed').'</th>';
+		}
+		if ($includeduedate) {
+			echo '<th>'._('Due Date').'</th>';
+		}
 	}
 	if ($stu>0) {
 		echo '<th>', _('Feedback'), '<br/><a href="#" class="small pointer" onclick="return showhideallfb(this);">', _('[Show Feedback]'), '</a></th>';
@@ -927,7 +954,20 @@ function gbstudisp($stu) {
 				} else {
 					echo '<td></td>';
 				}
-				
+				if ($includelastchange) {
+					if ($gbt[1][1][$i][9]>0) {
+						echo '<td>'.tzdate('n/j/y g:ia', $gbt[1][1][$i][9]);
+					} else {
+						echo '<td></td>';
+					}
+				}
+				if ($includeduedate) {
+					if ($gbt[0][1][$i][11]<2000000000) {
+						echo '<td>'.tzdate('n/j/y g:ia',$gbt[0][1][$i][11]);
+					} else {
+						echo '<td>-</td>';
+					}
+				}
 			}
 			if ($stu>0) {
 				if ($gbt[1][1][$i][1]=='') {
@@ -1155,7 +1195,7 @@ function gbstudisp($stu) {
 }
 
 function gbinstrdisp() {
-	global $hidenc,$showpics,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection,$avgontop,$hidelocked,$colorize,$urlmode,$overridecollapse;
+	global $hidenc,$showpics,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection,$avgontop,$hidelocked,$colorize,$urlmode,$overridecollapse,$includeduedate,$lastlogin;
 
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	if ($availshow==4) {
@@ -1173,11 +1213,12 @@ function gbinstrdisp() {
 	echo '<div id="bigcontmyTable"><div id="tblcontmyTable">';
 	
 	echo '<table class="gb" id="myTable"><thead><tr>';
-	$n=0;
+	
+	$sortarr = array();
 	for ($i=0;$i<count($gbt[0][0]);$i++) { //biographical headers
-		if ($i==1) {echo '<th><div>&nbsp;</div></th>';} //for pics
+		if ($i==1) {echo '<th><div>&nbsp;</div></th>'; $sortarr[] = 'false';} //for pics
 		if ($i==1 && $gbt[0][0][1]!='ID') { continue;}
-		if ($gbt[0][0][$i]=='Section' || $gbt[0][0][$i]=='Code') {
+		if ($gbt[0][0][$i]=='Section' || $gbt[0][0][$i]=='Code' || $gbt[0][0][$i]=='Last Login') {
 			echo '<th class="nocolorize"><div>';
 		} else {
 			echo '<th><div>';
@@ -1207,9 +1248,13 @@ function gbinstrdisp() {
 			echo "</select>";
 		}
 		echo '</div></th>';
-		
-		$n++;
+		if ($gbt[0][0][$i]=='Last Login') {
+			$sortarr[] = "'D'";
+		} else if ($i != 1) {
+			$sortarr[] = "'S'";
+		}
 	}
+	$n=0;
 	
 	//get collapsed gb cat info
 	if (count($gbt[0][2])>1) {
@@ -1254,6 +1299,9 @@ function gbinstrdisp() {
 					}
 				} else if ($availshow==3) { //past and attempted
 					echo $gbt[0][2][$i][0];
+					if (isset($gbt[0][2][$i][11])) {
+						echo '<br/>'.$gbt[0][2][$i][11].'%';
+					}
 				}
 				if ($collapsegbcat[$gbt[0][2][$i][1]]==0) {
 					echo "<br/><a class=small href=\"gradebook.php?cid=$cid&amp;cat={$gbt[0][2][$i][10]}&amp;catcollapse=2\">", _('[Collapse]'), "</a>";
@@ -1297,6 +1345,9 @@ function gbinstrdisp() {
 			}
 			if ($gbt[0][1][$i][5]==1 && $gbt[0][1][$i][6]==0) {
 				echo ' (PT)';
+			}
+			if ($includeduedate && $gbt[0][1][$i][11]<2000000000 && $gbt[0][1][$i][11]>0) {
+				echo '<br/><span class="small">'.tzdate('n/j/y&\n\b\s\p;g:ia', $gbt[0][1][$i][11]).'</span>';
 			}
 			//links
 			if ($gbt[0][1][$i][6]==0 ) { //online
@@ -1399,6 +1450,7 @@ function gbinstrdisp() {
 		for ($j=($gbt[0][0][1]=='ID'?1:2);$j<count($gbt[0][0]);$j++) {
 			echo '<td class="c">'.$insdiv.$gbt[$i][0][$j].$enddiv .'</td>';	
 		}
+		
 		if ($totonleft && !$hidepast) {
 			//total totals
 			if ($catfilter<0) {
@@ -1702,12 +1754,10 @@ function gbinstrdisp() {
 	}
 	echo "</tbody></table></div></div>";
 	if ($n>1) {
-		$sarr = array_fill(0,$n-1,"'N'");
+		$sarr = array_merge($sortarr, array_fill(0,$n,"'N'"));
 	} else {
 		$sarr = array();
 	}
-	array_unshift($sarr,"false");
-	array_unshift($sarr,"'S'");
 	
 	$sarr = implode(",",$sarr);
 	if (count($gbt)<500) {

@@ -6,6 +6,11 @@ require("./config.php");
 header('P3P: CP="ALL CUR ADM OUR"');
 $public = '?public=true';
 $publica = '&public=true';
+if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
+ 	 $urlmode = 'https://';
+ } else {
+ 	 $urlmode = 'http://';
+ }
 
 require("./assessment/displayq2.php");
 

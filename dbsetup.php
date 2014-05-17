@@ -84,7 +84,7 @@ $email = $_POST['email'];
 $sql = 'CREATE TABLE `imas_users` ('
         . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
         . ' `SID` VARCHAR(50) NOT NULL, '
-        . ' `password` VARCHAR(32) NOT NULL, '
+        . ' `password` VARCHAR(254) NOT NULL, '
 	. ' `rights` SMALLINT(4) UNSIGNED NOT NULL DEFAULT \'0\', ' 
         . ' `FirstName` VARCHAR(20) NOT NULL, '
         . ' `LastName` VARCHAR(20) NOT NULL, '
@@ -1013,7 +1013,12 @@ $sql = 'INSERT INTO imas_dbschema (id,ver) VALUES (2,0)';  //initialize guest ac
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 echo 'imas_dbschema created<br/>';
 
-$md5pw = md5($password);
+if (isset($CFG['GEN']['newpasswords'])) {
+	require_once("includes/password.php");
+	$md5pw = password_hash($password, PASSWORD_DEFAULT);
+} else {
+	$md5pw = md5($password);
+}
 $now = time();
 $sql = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email) VALUES ('$username','$md5pw',100,'$firstname','$lastname','$email')";
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());

@@ -15,6 +15,8 @@
 	} else {
 		 $urlmode = 'http://';
 	}
+	require_once("includes/password.php");
+	
 	if ($_GET['action']=="newuser") {
 		require_once("config.php");
 		$error = '';
@@ -52,7 +54,11 @@
 			exit;
 		}
 		
-		$md5pw = md5($_POST['pw1']);
+		if (isset($CFG['GEN']['newpasswords'])) {
+			$md5pw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
+		} else {
+			$md5pw = md5($_POST['pw1']);
+		}
 		if ($emailconfirmation) {$initialrights = 0;} else {$initialrights = 10;}
 		if (isset($_POST['msgnot'])) {
 			$msgnot = 1;
@@ -189,40 +195,87 @@
 	} else if ($_GET['action']=="resetpw") {
 		require_once("config.php");
 		if (isset($_POST['username'])) {
-			$query = "SELECT password,id,email FROM imas_users WHERE SID='{$_POST['username']}'";
+			$query = "SELECT id,email,rights FROM imas_users WHERE SID='{$_POST['username']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (mysql_num_rows($result)>0) {
-				$code = mysql_result($result,0,0);
-				$id = mysql_result($result,0,1);
+				list($id,$email,$rights) = mysql_fetch_row($result);
+				
+				$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+				$code = '';
+				for ($i=0;$i<10;$i++) {
+					$code .= substr($chars,rand(0,61),1);
+				}	
+				$query = "UPDATE imas_users SET remoteaccess='$code' WHERE id=$id";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+				
 				$headers  = 'MIME-Version: 1.0' . "\r\n";
 				$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 				$headers .= "From: $sendfrom\r\n";
 				$message  = "<h4>This is an automated message from $installname.  Do not respond to this email</h4>\r\n";
 				$message .= "<p>Your username was entered in the Reset Password page.  If you did not do this, you may ignore and delete this message. ";
-				$message .= "If you did request a password reset, click the link below, or copy and paste it into your browser's address bar.  Your ";
-				$message .= "password will then be reset to: password.</p>";
+				$message .= "If you did request a password reset, click the link below, or copy and paste it into your browser's address bar.  You ";
+				$message .= "will then be prompted to choose a new password.</p>";
 				$message .= "<a href=\"" .$urlmode. $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=resetpw&id=$id&code=$code\">";
 				$message .= $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=resetpw&id=$id&code=$code</a>\r\n";
 				mail(mysql_result($result,0,2),'Password Reset Request',$message,$headers);
+				
+				require("header.php");
+				echo '<p>An email with a password reset link has been sent your email address on record: <b>'.$email.'.</b><br/> ';
+				echo 'If you do not see it in a few minutes, check your spam or junk box to see if the email ended up there.<br/>';
+				echo 'It may help to add <b>'.$sendfrom.'</b> to your contacts list.</p>';
+				echo '<p>If you still have trouble or the wrong email address is on file, contact your instructor - they can reset your password for you.</p>';
+				require("footer.php");
+				exit;
 			} else {
 				echo "Invalid Username.  <a href=\"index.php$gb\">Try again</a>";
 				exit;
 			}
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php");
-		} else if (isset($_GET['code'])) {
-			$query = "SELECT password FROM imas_users WHERE id='{$_GET['id']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			if (mysql_num_rows($result)>0 && $_GET['code']===mysql_result($result,0,0)) {
-				$newpw = md5("password");
-				$query = "UPDATE imas_users SET password='$newpw' WHERE id='{$_GET['id']}' LIMIT 1";
-				mysql_query($query) or die("Query failed : " . mysql_error());
-				echo "Password Reset.  ";
-				echo "<a href=\"index.php\">Login with password: password</a>";
-				echo "<p>After logging in, select Change User Info to change your password</p>";
+		} else if (isset($_POST['pw1'])) {
+			if ($_POST['pw1']!=$_POST['pw2']) {
+				echo 'Passwords do not match.  <a href="actions.php?action=resetpw&code='.$_POST['code'].'&id='.$_POST['id'].'">Try again</a>';
 				exit;
 			}
+			$query = "SELECT remoteaccess FROM imas_users WHERE id='{$_POST['id']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$realcode = mysql_result($result,0,0);
+			if (mysql_num_rows($result)>0 && $_POST['code']===$realcode && $realcode!='') {
+				if (isset($CFG['GEN']['newpasswords'])) {
+					$newpw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
+				} else {
+					$newpw = md5("password");
+				}
+				$query = "UPDATE imas_users SET password='$newpw',remoteaccess='' WHERE id='{$_POST['id']}' LIMIT 1";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+				echo "Password Reset.  ";
+				echo "<a href=\"index.php\">Login with your new password</a>";
+			} else {
+				echo 'Invalid code';
+			}
+			exit;
+		} else if (isset($_GET['code'])) {
+			$query = "SELECT remoteaccess FROM imas_users WHERE id='{$_GET['id']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$realcode = mysql_result($result,0,0);
+			if (mysql_num_rows($result)>0 && $_GET['code']===$realcode && $realcode!='') {
+				echo '<html><body><form method="post" action="actions.php?action=resetpw">';
+				echo '<input type="hidden" name="code" value="'.$_GET['code'].'"/>';
+				echo '<input type="hidden" name="id" value="'.$_GET['id'].'"/>';
+				echo '<p>Please select a new password:</p>';
+				echo '<p>Enter new password:  <input type="password" size="25" name="pw1"/><br/>';
+				echo '<p>Verify new password:  <input type="password" size="25" name="pw2"/></p>';
+				echo '<p><input type="submit" value="Submit"/></p>';
+				echo '</form>';
+				echo '</body></html>';
+				exit;
+			} else {
+				echo '<html><body>Invalid reset code.  If you have requested a password reset multiple times, you need the link from ';
+				echo 'the most recent email.</body></html>';
+				exit;
+			}
+				
 		}
-	} else if ($_GET['action']=="lookupusername") {
+	} else if ($_GET['action']=="lookupusername") {    
 		require_once("config.php");
 		$query = "SELECT SID,lastaccess FROM imas_users WHERE email='{$_POST['email']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -265,9 +318,13 @@
 	} else if ($_GET['action']=="chgpwd") {
 		$query = "SELECT password FROM imas_users WHERE id = '$userid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$line = mysql_fetch_array($result, MYSQL_ASSOC);
-		if ((md5($_POST['oldpw'])==$line['password']) && ($_POST['newpw1'] == $_POST['newpw2']) && $myrights>5) {
-			$md5pw =md5($_POST['newpw1']);
+		$line = mysql_fetch_array($result, MYSQL_ASSOC);  
+		if ((md5($_POST['oldpw'])==$line['password'] || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['oldpw'],$line['password']))) && ($_POST['newpw1'] == $_POST['newpw2']) && $myrights>5) {
+			if (isset($CFG['GEN']['newpasswords'])) {
+				$md5pw = password_hash($_POST['newpw1'], PASSWORD_DEFAULT);
+			} else {
+				$md5pw =md5($_POST['newpw1']);
+			}
 			$query = "UPDATE imas_users SET password='$md5pw' WHERE id='$userid'";
 			mysql_query($query) or die("Query failed : " . mysql_error()); 
 		} else {
@@ -496,8 +553,12 @@
 			$query = "SELECT password FROM imas_users WHERE id = '$userid'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$line = mysql_fetch_array($result, MYSQL_ASSOC);
-			if ((md5($_POST['oldpw'])==$line['password']) && ($_POST['newpw1'] == $_POST['newpw2']) && $myrights>5) {
-				$md5pw =md5($_POST['newpw1']);
+			if ((md5($_POST['oldpw'])==$line['password'] || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['oldpw'],$line['password']))) && ($_POST['newpw1'] == $_POST['newpw2']) && $myrights>5) {
+				if (isset($CFG['GEN']['newpasswords'])) {
+					$md5pw = password_hash($_POST['newpw1'], PASSWORD_DEFAULT);
+				} else {
+					$md5pw =md5($_POST['newpw1']);
+				}
 				$query = "UPDATE imas_users SET password='$md5pw' WHERE id='$userid'";
 				mysql_query($query) or die("Query failed : " . mysql_error()); 
 			} else {

@@ -95,6 +95,7 @@ row[1][1][0][5] = bitwise for dropped: 1 in past & 2 in cur & 4 in future & 8 at
 row[1][1][0][6] = 1 if had exception, = 2 if was latepass
 row[1][1][0][7] = time spent (minutes)
 row[1][1][0][8] = time on task (time displayed)
+row[1][1][0][9] = last change time (if $includelastchange is set)
 
 row[1][1][1] = offline
 row[1][1][1][0] = score
@@ -583,7 +584,7 @@ function gbtable() {
 					$gb[0][1][$pos][7] = $discuss[$k];
 					$discusscol[$discuss[$k]] = $pos;
 				}
-				if (isset($GLOBALS['includeduedate'])) {
+				if (isset($GLOBALS['includeduedate']) && $GLOBALS['includeduedate']==true) {
 					$gb[0][1][$pos][11] = $enddate[$k];
 				}
 					
@@ -638,7 +639,7 @@ function gbtable() {
 				$gb[0][1][$pos][7] = $discuss[$k];
 				$discusscol[$discuss[$k]] = $pos;
 			}
-			if (isset($GLOBALS['includeduedate'])) {
+			if (isset($GLOBALS['includeduedate']) && $GLOBALS['includeduedate']==true) {
 				$gb[0][1][$pos][11] = $enddate[$k];
 			}
 			$pos++;
@@ -872,6 +873,9 @@ function gbtable() {
 			$gb[$row][1][$col][8] = "N/A";
 		} else {
 			$gb[$row][1][$col][8] = round($timeontask/60,1);
+		}
+		if (isset($GLOBALS['includelastchange']) && $GLOBALS['includelastchange']==true) {
+			$gb[$row][1][$col][9] =	$l['endtime'];
 		}
 		if (in_array(-1,$scores)) { 
 			$IP=1; 

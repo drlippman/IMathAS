@@ -559,11 +559,13 @@ function enditem($canedit) {
 			   
 			   //check for exception
 			   $canundolatepass = false;
+			   $latepasscnt = 0;
 			   if (isset($exceptions[$items[$i]])) {
 			   	   //if latepass and it's before original due date or exception is for more than a latepass past now
 			   	   if ($exceptions[$items[$i]][2]>0 && ($now < $line['enddate'] || $exceptions[$items[$i]][1] > $now + $latepasshrs*60*60)) {
 			   	   	   $canundolatepass = true;
 			   	   }
+			   	   $latepasscnt = round(($exceptions[$items[$i]][1] - $line['enddate'])/($latepasshrs*3600));
 				   $line['startdate'] = $exceptions[$items[$i]][0];
 				   $line['enddate'] = $exceptions[$items[$i]][1];
 			   }
@@ -648,10 +650,11 @@ function enditem($canedit) {
 				   if ($line['enddate']!=2000000000) {
 					   echo "<BR> $endname $enddate \n";
 				   }
+				   
 				   if ($canedit) { 
 
 					echo '<span class="instronly">';
-					if ($line['allowlate']==1) {
+					if ($line['allowlate']>0) {
 						echo ' <span onmouseover="tipshow(this,\'', _('LatePasses Allowed'), '\')" onmouseout="tipout()">', _('LP'), '</span> |';
 					}
 					echo " <i><a href=\"addquestions.php?aid=$typeid&cid=$cid\">", _('Questions'), "</a></i> | <a href=\"addassessment.php?id=$typeid&block=$parent&cid=$cid\">", _('Settings'), "</a></i> \n";
@@ -663,14 +666,14 @@ function enditem($canedit) {
 					}
 					echo '</span>';
 					
-				   } else if ($line['allowlate']==1 && $latepasses>0) {
+				   } else if (($line['allowlate']==1 || $line['allowlate']-1>$latepasscnt) && $latepasses>0) {
 					echo " <a href=\"redeemlatepass.php?cid=$cid&aid=$typeid\">", _('Use LatePass'), "</a>";
 					if ($canundolatepass) {
 						 echo " | <a href=\"redeemlatepass.php?cid=$cid&aid=$typeid&undo=true\">", _('Un-use LatePass'), "</a>";
 					}
-				   } else if ($line['allowlate']==1 && isset($sessiondata['stuview'])) {
+				   } else if ($line['allowlate']>0 && isset($sessiondata['stuview'])) {
 					echo _(' LatePass Allowed');
-				   } else if ($line['allowlate']==1 && $canundolatepass) {
+				   } else if ($line['allowlate']>0 && $canundolatepass) {
 				   	   echo " <a href=\"redeemlatepass.php?cid=$cid&aid=$typeid&undo=true\">", _('Un-use LatePass'), "</a>";
 				   }
 				   echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
@@ -696,7 +699,7 @@ function enditem($canedit) {
 				   }
 				   if ($canedit) { 
 					echo '<span class="instronly">';
-					if ($line['allowlate']==1) {
+					if ($line['allowlate']>0) {
 						echo ' <span onmouseover="tipshow(this,\'', _('LatePasses Allowed'), '\')" onmouseout="tipout()">LP</span> |';
 					}
 				   	echo " <i><a href=\"addquestions.php?aid=$typeid&cid=$cid\">", _('Questions'), "</a></i> | <a href=\"addassessment.php?id=$typeid&block=$parent&cid=$cid\">", _('Settings'), "</a>\n";
@@ -736,7 +739,7 @@ function enditem($canedit) {
 				   if ($canedit) {
 					   
 					   echo '<span class="instronly">';
-					   if ($line['allowlate']==1) {
+					   if ($line['allowlate']>0) {
 						echo ' <span onmouseover="tipshow(this,\'', _('LatePasses Allowed'), '\')" onmouseout="tipout()">', _('LP'), '</span> |';
 					   }
 					   echo "<a href=\"addquestions.php?aid=$typeid&cid=$cid\">", _('Questions'), "</a> | <a href=\"addassessment.php?id=$typeid&cid=$cid\">", _('Settings'), "</a> | \n";

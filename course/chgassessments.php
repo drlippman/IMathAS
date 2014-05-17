@@ -77,11 +77,7 @@ if (!(isset($teacherid))) {
 				}
 			}
 			if (isset($_POST['chgallowlate'])) {
-				if (isset($_POST['allowlate'])) {
-					$allowlate = 1;
-				} else {
-					$allowlate = 0;
-				}
+				$allowlate = intval($_POST['allowlate']);
 			}
 			if (isset($_POST['chghints'])) {
 				if (isset($_POST['showhints'])) {
@@ -99,6 +95,12 @@ if (!(isset($teacherid))) {
 			}
 			if ($_POST['deffeedback']=="Practice" || $_POST['deffeedback']=="Homework") {
 				$deffeedback = $_POST['deffeedback'].'-'.$_POST['showansprac'];
+				if (($turnoffshuffle&8)!=8) {
+					$turnoffshuffle += 8;
+				}
+				if (($turnonshuffle&8)==8) {
+					$turnonshuffle -= 8;
+				}
 			} else {
 				$deffeedback = $_POST['deffeedback'].'-'.$_POST['showans'];
 			}
@@ -139,7 +141,7 @@ if (!(isset($teacherid))) {
 				$sets[] = "exceptionpenalty='{$_POST['exceptionpenalty']}'";
 			}
 			if (isset($_POST['chgpassword'])) {
-				$sets[] = "password='{$_POST['password']}'";
+				$sets[] = "password='{$_POST['assmpassword']}'";
 			}
 			if (isset($_POST['chghints'])) {
 				$sets[] = "showhints='$showhints'";
@@ -342,6 +344,16 @@ if (!(isset($teacherid))) {
 			$page_forumSelect['val'][] = $row[0];
 			$page_forumSelect['label'][] = $row[1];
 		}
+		
+		$page_allowlateSelect = array();
+		$page_allowlateSelect['val'][0] = 0;
+		$page_allowlateSelect['label'][0] = "None";
+		$page_allowlateSelect['val'][1] = 1;
+		$page_allowlateSelect['label'][1] = "Unlimited";
+		for ($k=1;$k<9;$k++) {
+			$page_allowlateSelect['val'][] = $k+1;
+			$page_allowlateSelect['label'][] = "Up to $k";
+		}
 
 		
 	}
@@ -370,9 +382,11 @@ function chgfb() {
 	if (document.getElementById("deffeedback").value=="Practice" || document.getElementById("deffeedback").value=="Homework") {
 		document.getElementById("showanspracspan").className = "show";
 		document.getElementById("showansspan").className = "hidden";
+		document.getElementById("showreattdiffver").className = "hidden";
 	} else {
 		document.getElementById("showanspracspan").className = "hidden";
 		document.getElementById("showansspan").className = "show";
+		document.getElementById("showreattdiffver").className = "show";
 	}
 }
 
@@ -464,7 +478,11 @@ $(function() {
 	$inblock = 0;
 	for ($i = 0 ; $i<(count($ids)); $i++) {
 			
-			if (strpos($types[$i],'Block')!==false) {	
+			if (strpos($types[$i],'Block')!==false) {
+				if ($blockout!='' && $blockid==$parents[$i]) {
+					echo "<li>$blockout</li>";
+					$blockout = '';
+				}
 				$blockout = "<input type=checkbox name='checked[]' value='0' id='{$parents[$i]}' checked=checked ";
 				$blockout .= "onClick=\"chkgrp(this.form, '{$ids[$i]}', this.checked);\" ";
 				$blockout .='/>';
@@ -552,7 +570,7 @@ $(function() {
 				</td>
 			</tr>
 			<tr>
-				<td><input type="checkbox" name="docopyopt" onClick="copyfromtoggle(this.form,this.checked)"/></td>
+				<td><input type="checkbox" name="docopyopt" class="chgbox" onClick="copyfromtoggle(this.form,this.checked)"/></td>
 				<td class="r">Copy remaining options</td>
 				<td>Copy from:
 <?php
@@ -563,7 +581,7 @@ $(function() {
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgpassword" class="chgbox"/></td>
 				<td class="r">Require Password (blank for none):</td>
-				<td><input type=text name=password value=""></td>
+				<td><input type=text name="assmpassword" value="" autocomplete="off"></td>
 			</tr>
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgtimelimit" class="chgbox"/></td>
@@ -597,8 +615,9 @@ $(function() {
 				<td class="r">Default attempts per problem (0 for unlimited): </td>
 				<td>
 					<input type=text size=4 name=defattempts value="<?php echo $line['defattempts'];?>" >
- 					<input type=checkbox name="reattemptsdiffver" />
-						Reattempts different versions
+ 					<span id="showreattdiffver" class="<?php if ($testtype!="Practice" && $testtype!="Homework") {echo "show";} else {echo "hidden";} ?>">
+ 					<input type=checkbox name="reattemptsdiffver" <?php writeHtmlChecked($line['shuffle']&8,8); ?> />
+ 					Reattempts different versions</span>
 				</td>
 			</tr>
 			<tr class="coptr">
@@ -713,7 +732,9 @@ $(function() {
 				<td><input type="checkbox" name="chgallowlate" class="chgbox"/></td>
 				<td class="r">Allow use of LatePasses?: </td>
 				<td>
-				<input type="checkbox" name="allowlate" <?php writeHtmlChecked($line['allowlate'],1); ?>>
+				<?php
+				writeHtmlSelect("allowlate",$page_allowlateSelect['val'],$page_allowlateSelect['label'],1);
+				?>
 				</td>
 			</tr>
 			<tr class="coptr">

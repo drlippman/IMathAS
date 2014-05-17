@@ -53,7 +53,11 @@ if ($overwriteBody==1) {
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
 	echo "&gt; Print Test</div>\n";
 	
-	echo '<div class="cpmid"><a href="printtest.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for in-browser printing</a></div>';
+	echo '<div class="cpmid"><a href="printtest.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for in-browser printing</a>';
+	if (isset($CFG['GEN']['pandocserver'])) {
+		echo ' | <a href="printlayoutword.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for Word</a>';
+	}
+	echo '</div>';
 	
 	echo "<h2>Copy-and-Paste Print Version</h2>";
 		
@@ -68,6 +72,8 @@ if ($overwriteBody==1) {
 	echo '<span class="form">Version separator:</span><span class="formright"><input type=text name="vsep" value="+++++++++++++++" /> </span><br class="form"/>';
 	echo '<span class="form">Math display:</span><span class="formright"><input type="radio" name="mathdisp" value="img" checked="checked" /> Images <input type="radio" name="mathdisp" value="text"/> Text <input type="radio" name="mathdisp" value="tex"/> TeX <input type="radio" name="mathdisp" value="textandimg"/> Images, then again in text</span><br class="form"/>';
 	echo '<span class="form">Include question numbers and point values:</span><span class="formright"><input type="checkbox" name="showqn" checked="checked" /> </span><br class="form"/>';
+	echo '<span class="form">Hide text entry lines?</span><span class="formright"><input type=checkbox name=hidetxtboxes ></span><br class="form"/>';
+		
 	echo '<div class="submit"><input type=submit value="Continue"></div></form>';
 	
 } else {		

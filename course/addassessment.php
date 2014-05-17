@@ -126,11 +126,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		
 		$tutoredit = intval($_POST['tutoredit']);
 		
-		if (isset($_POST['allowlate'])) {
-			$_POST['allowlate'] = 1;
-		} else {
-			$_POST['allowlate'] = 0;
-		}
+		$_POST['allowlate'] = intval($_POST['allowlate']);
 		
 		$timelimit = $_POST['timelimit']*60;
 		if (isset($_POST['timelimitkickout'])) {
@@ -165,7 +161,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if ($_POST['copyfrom']!=0) {
 			$query = "SELECT timelimit,minscore,displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,showcat,intro,startdate,enddate,reviewdate,isgroup,groupmax,groupsetid,showhints,reqscore,reqscoreaid,noprint,allowlate,eqnhelper,endmsg,caltag,calrtag,deffeedbacktext,showtips,exceptionpenalty,ltisecret,msgtoinstr,posttoforum,istutorial,defoutcome FROM imas_assessments WHERE id='{$_POST['copyfrom']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			list($timelimit,$_POST['minscore'],$_POST['displaymethod'],$_POST['defpoints'],$_POST['defattempts'],$_POST['defpenalty'],$deffeedback,$shuffle,$_POST['gbcat'],$_POST['password'],$_POST['cntingb'],$tutoredit,$_POST['showqcat'],$cpintro,$cpstartdate,$cpenddate,$cpreviewdate,$isgroup,$_POST['groupmax'],$_POST['groupsetid'],$showhints,$_POST['reqscore'],$_POST['reqscoreaid'],$_POST['noprint'],$_POST['allowlate'],$_POST['eqnhelper'],$endmsg,$_POST['caltagact'],$_POST['caltagrev'],$deffb,$_POST['showtips'],$_POST['exceptionpenalty'],$_POST['ltisecret'],$_POST['msgtoinstr'],$_POST['posttoforum'],$istutorial,$_POST['defoutcome']) = addslashes_deep(mysql_fetch_row($result));
+			list($timelimit,$_POST['minscore'],$_POST['displaymethod'],$_POST['defpoints'],$_POST['defattempts'],$_POST['defpenalty'],$deffeedback,$shuffle,$_POST['gbcat'],$_POST['assmpassword'],$_POST['cntingb'],$tutoredit,$_POST['showqcat'],$cpintro,$cpstartdate,$cpenddate,$cpreviewdate,$isgroup,$_POST['groupmax'],$_POST['groupsetid'],$showhints,$_POST['reqscore'],$_POST['reqscoreaid'],$_POST['noprint'],$_POST['allowlate'],$_POST['eqnhelper'],$endmsg,$_POST['caltagact'],$_POST['caltagrev'],$deffb,$_POST['showtips'],$_POST['exceptionpenalty'],$_POST['ltisecret'],$_POST['msgtoinstr'],$_POST['posttoforum'],$istutorial,$_POST['defoutcome']) = addslashes_deep(mysql_fetch_row($result));
 			if (isset($_POST['copyinstr'])) {
 				$_POST['intro'] = $cpintro;
 			}
@@ -249,7 +245,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			
 			$query = "UPDATE imas_assessments SET name='{$_POST['name']}',summary='{$_POST['summary']}',intro='{$_POST['intro']}',timelimit='$timelimit',minscore='{$_POST['minscore']}',isgroup='$isgroup',showhints='$showhints',tutoredit=$tutoredit,eqnhelper='{$_POST['eqnhelper']}',showtips='{$_POST['showtips']}',";
-			$query .= "displaymethod='{$_POST['displaymethod']}',defattempts='{$_POST['defattempts']}',deffeedback='$deffeedback',shuffle='$shuffle',gbcategory='{$_POST['gbcat']}',password='{$_POST['password']}',cntingb='{$_POST['cntingb']}',showcat='{$_POST['showqcat']}',caltag='$caltag',calrtag='$calrtag',$updategroupset";
+			$query .= "displaymethod='{$_POST['displaymethod']}',defattempts='{$_POST['defattempts']}',deffeedback='$deffeedback',shuffle='$shuffle',gbcategory='{$_POST['gbcat']}',password='{$_POST['assmpassword']}',cntingb='{$_POST['cntingb']}',showcat='{$_POST['showqcat']}',caltag='$caltag',calrtag='$calrtag',$updategroupset";
 			$query .= "reqscore='{$_POST['reqscore']}',reqscoreaid='{$_POST['reqscoreaid']}',noprint='{$_POST['noprint']}',avail='{$_POST['avail']}',groupmax='{$_POST['groupmax']}',allowlate='{$_POST['allowlate']}',exceptionpenalty='{$_POST['exceptionpenalty']}',ltisecret='{$_POST['ltisecret']}',deffeedbacktext='$deffb',";
 			$query .= "msgtoinstr='{$_POST['msgtoinstr']}',posttoforum='{$_POST['posttoforum']}',istutorial=$istutorial,defoutcome='{$_POST['defoutcome']}'";
 			
@@ -282,7 +278,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query .= "showcat,eqnhelper,showtips,caltag,calrtag,isgroup,groupmax,groupsetid,showhints,reqscore,reqscoreaid,noprint,avail,allowlate,exceptionpenalty,ltisecret,endmsg,deffeedbacktext,msgtoinstr,posttoforum,istutorial,defoutcome) VALUES ";
 			$query .= "('$cid','{$_POST['name']}','{$_POST['summary']}','{$_POST['intro']}',$startdate,$enddate,$reviewdate,'$timelimit','{$_POST['minscore']}',";
 			$query .= "'{$_POST['displaymethod']}','{$_POST['defpoints']}','{$_POST['defattempts']}',";
-			$query .= "'{$_POST['defpenalty']}','$deffeedback','$shuffle','{$_POST['gbcat']}','{$_POST['password']}','{$_POST['cntingb']}',$tutoredit,'{$_POST['showqcat']}','{$_POST['eqnhelper']}','{$_POST['showtips']}','$caltag','$calrtag',";
+			$query .= "'{$_POST['defpenalty']}','$deffeedback','$shuffle','{$_POST['gbcat']}','{$_POST['assmpassword']}','{$_POST['cntingb']}',$tutoredit,'{$_POST['showqcat']}','{$_POST['eqnhelper']}','{$_POST['showtips']}','$caltag','$calrtag',";
 			$query .= "'$isgroup','{$_POST['groupmax']}','{$_POST['groupsetid']}','$showhints','{$_POST['reqscore']}','{$_POST['reqscoreaid']}',";
 			$query .= "'{$_POST['noprint']}','{$_POST['avail']}','{$_POST['allowlate']}','{$_POST['exceptionpenalty']}','{$_POST['ltisecret']}','$endmsg','$deffb','{$_POST['msgtoinstr']}','{$_POST['posttoforum']}',$istutorial,'{$_POST['defoutcome']}');";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -573,6 +569,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$page_forumSelect['label'][] = $row[1];
 		}
 		
+		$page_allowlateSelect = array();
+		$page_allowlateSelect['val'][0] = 0;
+		$page_allowlateSelect['label'][0] = "None";
+		$page_allowlateSelect['val'][1] = 1;
+		$page_allowlateSelect['label'][1] = "Unlimited";
+		for ($k=1;$k<9;$k++) {
+			$page_allowlateSelect['val'][] = $k+1;
+			$page_allowlateSelect['label'][] = "Up to $k";
+		}
+		
 	} //END INITIAL LOAD BLOCK
 	
 }
@@ -603,9 +609,11 @@ if ($overwriteBody==1) {
 		if (document.getElementById("deffeedback").value=="Practice" || document.getElementById("deffeedback").value=="Homework") {
 			document.getElementById("showanspracspan").className = "show";
 			document.getElementById("showansspan").className = "hidden";
+			document.getElementById("showreattdiffver").className = "hidden";
 		} else {
 			document.getElementById("showanspracspan").className = "hidden";
 			document.getElementById("showansspan").className = "show";
+			document.getElementById("showreattdiffver").className = "show";
 		}
 		if (document.getElementById("deffeedback").value=="Practice") {
 			document.getElementById("stdcntingb").className = "hidden";
@@ -625,7 +633,7 @@ if ($overwriteBody==1) {
 		}
 	}
 	function apwshowhide(s) {
-		var el = document.getElementById("password");
+		var el = document.getElementById("assmpassword");
 		if (el.type == "password") {
 			el.type = "text";
 			s.innerHTML = "Hide";
@@ -731,7 +739,7 @@ if ($overwriteBody==1) {
 		<div id="customoptions" class="show">
 			<fieldset><legend>Core Options</legend>
 			<span class=form>Require Password (blank for none):</span>
-			<span class=formright><input type="password" name="password" id="password" value="<?php echo $line['password'];?>"> <a href="#" onclick="apwshowhide(this);return false;">Show</a></span><br class=form />
+			<span class=formright><input type="password" name="assmpassword" id="assmpassword" value="<?php echo $line['password'];?>" autocomplete="off"> <a href="#" onclick="apwshowhide(this);return false;">Show</a></span><br class=form />
 			<span class=form>Time Limit (minutes, 0 for no time limit): </span>
 			<span class=formright><input type=text size=4 name=timelimit value="<?php echo abs($timelimit);?>">
 				<input type="checkbox" name="timelimitkickout" <?php if ($timelimit<0) echo 'checked="checked"';?> /> Kick student out at timelimit</span><BR class=form>
@@ -753,8 +761,10 @@ if ($overwriteBody==1) {
 			<span class=form>Default attempts per problem (0 for unlimited): </span>
 			<span class=formright>
 				<input type=text size=4 name=defattempts value="<?php echo $line['defattempts'];?>" > 
+				<span id="showreattdiffver" class="<?php if ($testtype!="Practice" && $testtype!="Homework") {echo "show";} else {echo "hidden";} ?>">
 	 			<input type=checkbox name="reattemptsdiffver" <?php writeHtmlChecked($line['shuffle']&8,8); ?> />
-	 			Reattempts different versions</span><BR class=form>
+	 			Reattempts different versions</span>
+	 		</span><BR class=form>
 	
 			<span class=form>Default penalty:</span>
 			<span class=formright>
@@ -850,7 +860,9 @@ if ($overwriteBody==1) {
 			
 			<span class=form>Allow use of LatePasses?: </span>
 			<span class=formright>
-				<input type="checkbox" name="allowlate" <?php writeHtmlChecked($line['allowlate'],1); ?>>
+				<?php
+				writeHtmlSelect("allowlate",$page_allowlateSelect['val'],$page_allowlateSelect['label'],$line['allowlate']);
+				?>
 			</span><BR class=form>
 			
 			<span class=form>Make hard to print?</span>
@@ -913,7 +925,7 @@ if ($overwriteBody==1) {
 				<input type=text size=4 name=reqscore value="<?php echo $line['reqscore'];?>">
 		   		points is obtained on 
 <?php 
-	writeHtmlSelect ("reqscoreaid",$page_copyFromSelect['val'],$page_copyFromSelect['label'],$selectedVal=$line['reqscoreaid'],$defaultLabel="Dont Use",$defaultVal=0,$actions=null); 
+	writeHtmlSelect ("reqscoreaid",$page_copyFromSelect['val'],$page_copyFromSelect['label'],$line['reqscoreaid'],"Dont Use",0,null); 
 ?>				
 			</span><br class=form>
 			<span class="form">Default Feedback Text:</span>

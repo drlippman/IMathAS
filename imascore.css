@@ -638,3 +638,15 @@ div.multiselitem {
 .playlistbar > * {vertical-align: top;}
 .playlistwrap { border: 1px solid #ccc; padding: 10px; position:relative;}
 .playlistbar, .playlistwrap {margin-left: -15px;}
+
+.clearfix:before,
+.clearfix:after {
+    content: " ";
+    display: table;
+}
+.clearfix:after {
+    clear: both;
+}
+.clearfix {
+    *zoom: 1;
+}

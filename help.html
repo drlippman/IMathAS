@@ -1630,6 +1630,7 @@ Array randomizers (return multiple results):
     it behaves identically to diffrandsfrom</li>
 <li><b>randnames(n),randmalenames(n),randfemalenames(n)</b>:  Returns n random first names</li>
 <li><b>randcity(),randcities(n)</b>:  Returns one or n random city names</li>
+<li><b>randstate(),randstates(n)</b>:  Returns one or n random US state names</li>
 </ul>
 
 </div>
@@ -1848,6 +1849,8 @@ These macros are used for mathematical calculations:
 <li><b>abs(v)</b>: Absolute value</li>
 <li><b>gcd(a,b)</b>: Greatest common divisor of a and b</li>
 <li><b>lcm(a,b)</b>: Least common multiple of a and b</li>
+<li><b>sign(a,[option])</b>:  Returns the sign of a, as 1 or -1.  If option is set to true, returns a string "+" or "-" instead. If option
+  is set to "onlyneg", it returns the string "-" if a is negative, or "" otherwise.</li>
 <li><b>v!</b>: Factorial, like $a = $b!</li>
 <li><b>evalfunc(func,vars,val1,val2,..)</b>: Evaluates a function given the variables and values for each variable.
   for example evalfunc("x^2*y","x,y",2,3) will evaluate x^2*y with x=2, y=3</li>
@@ -2080,7 +2083,9 @@ The answer is compared to a given tolerance.  Can also accept DNE, oo (Infinity)
 	<dd>The answer to show to students (if option if available).  Defaults to $answer.  Use this to give a detailed answer,
 	or a rounded off answer.</dd>
 <dt>$hidetips = true (In Common Control)</dt>
-	<dd>Hides the question entry tips that display by default</dd>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
 </dl>
 </p>
 
@@ -2153,7 +2158,9 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 <dt>$previewloc (In Question Text)</dt>
 	<dd>Where you want the preview button to be located.  Defaults to after the entry box if not placed in question text.</dd>
 <dt>$hidetips = true (In Common Control)</dt>
-	<dd>Hides the question entry tips that display by default</dd>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
 </dl>
 </p>
 
@@ -2190,7 +2197,9 @@ of choices is automatically randomized.
 	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
 	Use this to substitute a detailed answer.</dd>
 <dt>$hidetips = true (In Common Control)</dt>
-	<dd>Hides the question entry tips that display by default</dd>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
 </dl>
 </p>
 
@@ -2226,7 +2235,9 @@ of choices is automatically randomized.
 	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answers.  
 	Use this to substitute a detailed answer.</dd>
 <dt>$hidetips = true (In Common Control)</dt>
-	<dd>Hides the question entry tips that display by default</dd>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
 </dl>
 </p>
 
@@ -2266,7 +2277,9 @@ A student is asked to match answers with questions
 	<dd>The answer to show to students (if option if available).  Defaults to the list of correct matches.  
 	Use this to substitute a detailed answer.</dd>
 <dt>$hidetips = true (In Common Control)</dt>
-	<dd>Hides the question entry tips that display by default</dd>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
 </dl>
 </p>
 
@@ -2322,7 +2335,9 @@ A student is asked to enter a function
 <dt>$previewloc (In Question Text)</dt>
 	<dd>Where you want the preview button to be located.  Defaults to after the entry box if not placed in question text.</dd>
 <dt>$hidetips = true (In Common Control)</dt>
-	<dd>Hides the question entry tips that display by default</dd>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
 </dl>
 </p>	
 
@@ -2353,6 +2368,8 @@ A student is asked to enter a string (a word or list of letters).
 		<li>allow_diff=n: gives full credit for answers with Levenshtein distance between strings &le; n </li>
 		<li>in_answer: gives credit if $answer is contained anywhere in the student answer</li>
 		<li>special_or: use <b>*or*</b> for separating answers rather than <b>or</b>.</li>
+		<li>ignore_symbol=sym: Unlike the other flags, this is not an on/off flag. Set this equal to a symbol to ignore that
+		    symbol in student answers.  This flag can be used multiple times with different symbols.</li>
 		</ul>
 		By default, compress_whitespace and ignore_case are On.  Only one of
 		partial_credit, allow_diff, or in_answer may be used at a time.</dd>
@@ -2373,7 +2390,9 @@ A student is asked to enter a string (a word or list of letters).
 	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
 	Use this to substitute a detailed answer.</dd>
 <dt>$hidetips = true (In Common Control)</dt>
-	<dd>Hides the question entry tips that display by default</dd>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
 </dl>
 </p>
 
@@ -2400,7 +2419,9 @@ None - the essay type is not computer graded.
 	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
 	Use this to substitute a detailed answer.</dd>
 <dt>$hidetips = true (In Common Control)</dt>
-	<dd>Hides the question entry tips that display by default</dd>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
 </dl>
 </p>
 
@@ -2472,7 +2493,9 @@ drawn line from the correct line.
 	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
 	Use this to substitute a detailed answer.</dd>
 <dt>$hidetips = true (In Common Control)</dt>
-	<dd>Hides the question entry tips that display by default</dd>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
 </dl>
 </p>
 
@@ -2507,7 +2530,9 @@ This can be used for coordinate points, vectors, or any other n-tuple of numbers
 	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
 	Use this to substitute a detailed answer.</dd>
 <dt>$hidetips = true (In Common Control)</dt>
-	<dd>Hides the question entry tips that display by default</dd>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
 </dl>
 </p>
 
@@ -2550,7 +2575,9 @@ rather than just numbers, such as (5/3, 2/3).
 	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
 	Use this to substitute a detailed answer.</dd>
 <dt>$hidetips = true (In Common Control)</dt>
-	<dd>Hides the question entry tips that display by default</dd>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
 </dl>
 </p>
 
@@ -2582,7 +2609,9 @@ Complex questions require the student to enter a complex number in a+bi form.
 	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
 	Use this to substitute a detailed answer.</dd>
 <dt>$hidetips = true (In Common Control)</dt>
-	<dd>Hides the question entry tips that display by default</dd>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
 </dl>
 </p>
 
@@ -2621,7 +2650,9 @@ rather than just numbers, such as 1/3+sqrt(2)i.
 	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
 	Use this to substitute a detailed answer.</dd>
 <dt>$hidetips = true (In Common Control)</dt>
-	<dd>Hides the question entry tips that display by default</dd>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
 </dl>
 </p>
 
@@ -2661,7 +2692,9 @@ The entries are compared to a given tolerance.
 	<dd>The answer to show to students (if option if available).  Defaults to $answer.  
 	Use this to substitute a detailed answer.</dd>
 <dt>$hidetips = true (In Common Control)</dt>
-	<dd>Hides the question entry tips that display by default</dd>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
 </dl>
 </p>
 
@@ -2709,7 +2742,9 @@ The entries are compared to a given tolerance.
 <dt>$previewloc (In Question Text)</dt>
 	<dd>Where you want the preview button to be located.  Defaults to after the entry box if not placed in question text.</dd>
 <dt>$hidetips = true (In Common Control)</dt>
-	<dd>Hides the question entry tips that display by default</dd>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
 </dl>
 </p>
 	
@@ -2747,7 +2782,9 @@ A student is asked to enter an interval notation answer. Example: (2,5]U(7,oo)
 	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
 	Use this to substitute a detailed answer.</dd>
 <dt>$hidetips = true (In Common Control)</dt>
-	<dd>Hides the question entry tips that display by default</dd>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
 </dl>
 </p>
 
@@ -2796,7 +2833,9 @@ invertal notation.
 <dt>$previewloc (In Question Text)</dt>
 	<dd>Where you want the preview button to be located.  Defaults to after the entry box if not placed in question text.</dd>
 <dt>$hidetips = true (In Common Control)</dt>
-	<dd>Hides the question entry tips that display by default</dd>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
 </dl>
 </p>
 
@@ -2818,7 +2857,9 @@ None - the file upload type is not computer graded.
 <dt>$showanswer (In Common Control)</dt>
 	<dd>The answer to show to students (if option if available).</dd>
 <dt>$hidetips = true (In Common Control)</dt>
-	<dd>Hides the question entry tips that display by default</dd>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
 </dl>
 </p>
 </div>
@@ -2880,6 +2921,11 @@ This type of question can contain multiple parts, where each part is one of the 
 <dt>$showanswer (In Common Control)</dt>
 	<dd>You can either define $showanswer for individual question parts (ie, $showanswer[1]="`x^2`"), or you can set one 
 	$showanswer, which will be the only answer shown for the problem (ie, $showanswer = "x=$answer[0], y=$answer[1]")</dd>
+<dt>$showanswerloc (In Question Text)</dt>
+	<dd>Optionally, you can use $showanswerloc to place a single $showanswer "Show Answer" button, 
+	or $showanswerloc[part] to place "Show Answer" buttons for each part.  Note that if you use this to place one
+	Show Answer button, you must place all of them, or else the remainder will not show.  Use $showanswerstyle = 'inline' to 
+	allow Show Answer to be placed inline with text rather than on its own line.</dd>
 </dl>
 </p>
 	
@@ -2959,16 +3005,13 @@ When you click "Sign Up", you will be taken back to the Login page so you can lo
 At the Login page, you will be asked to supply your login credidentials (username and password).  
 You will also be able to select Viewing/Accessibility options:
 <ul>
-<li>Use visual display, for accurate rendering of math and graphs.  Uses browser-based display if available.</li>
-<li>Force image-based graphs, for browsers without built-in graph display, this option forces use of image-based graph display.</li>
-<li>Force image-based math, for browsers without built-in math display, this option forces use of image-based math display.</li>
-<li>Force image-based display, for browsers without built-in math or graph display, this forces use of image-based display for both</li>
+<li>Most of the time, select Use defaults.  This will detect what your browser is capable of, and use the best option available.</li>
+<li>Force image-based display will force the use of images for math and graph display. This can be helpful if the default display is 
+    not working correctly for you, or if you want to be able to copy-and-paste math and graphs.</li>
+<li>MathJax display uses MathJax for math display, and detects the best settings for graphs.</li>
 <li>Use text-based display, for screen readers or older browsers.</li>
 </ul>
-<p>If you choose visual display and your browser does not support browser-based visual display, you be brought to a page explaining how to
-download the necessary plugins (for Windows Internet Explorer), download a compatible browser, or continue with image-based display.</p>
-<p><b>If you're not sure what to choose:</b> Pick "Use visual display", then if the Browser Check page shows,
-click "Continue with image-based display", leaving the "Don't show this screen again on this computer" box checked.</p>
+<p><b>If you're not sure what to choose:</b> Pick "Use defaults"</p>
 <p>
 The options are set for your current session only, so you can set them differently depending on the support offered by the
 computer you're currently working at.

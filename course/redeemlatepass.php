@@ -69,13 +69,23 @@
 		$query = "SELECT allowlate,enddate,startdate FROM imas_assessments WHERE id='$aid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		list($allowlate,$enddate,$startdate) =mysql_fetch_row($result);
-		if ($allowlate==1) {
+		
+		$query = "SELECT enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$hasexception = false;
+		if (mysql_num_rows($result)==0) {
+			$usedlatepasses = 0;
+		} else {
+			$r = mysql_fetch_row($result);
+			$usedlatepasses = round(($r[0] - $enddate)/($hours*3600));
+			$hasexception = true;
+		}
+		
+		if ($allowlate==1 || $allowlate-1>$usedlatepasses) {
 			$query = "UPDATE imas_students SET latepass=latepass-1 WHERE userid='$userid' AND courseid='$cid' AND latepass>0";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (mysql_affected_rows()>0) {
-				$query = "SELECT enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				if (mysql_num_rows($result)>0) { //already have exception
+				if ($hasexception) { //already have exception
 					$query = "UPDATE imas_exceptions SET enddate=enddate+$addtime,islatepass=islatepass+1 WHERE userid='$userid' AND assessmentid='$aid'";
 					mysql_query($query) or die("Query failed : " . mysql_error());
 				} else {
@@ -105,11 +115,29 @@
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$numlatepass = mysql_result($result,0,0);
 		
-		if ($numlatepass==0) { //shouldn't get here if 0
-			echo "<p>You have no late passes remaining</p>";
+		$query = "SELECT allowlate,enddate,startdate FROM imas_assessments WHERE id='$aid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		list($allowlate,$enddate,$startdate) =mysql_fetch_row($result);
+		
+		$query = "SELECT enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$hasexception = false;
+		if (mysql_num_rows($result)==0) {
+			$usedlatepasses = 0;
 		} else {
+			$r = mysql_fetch_row($result);
+			$usedlatepasses = round(($r[0] - $enddate)/($hours*3600));
+			$hasexception = true;
+		}
+		
+		if ($numlatepass==0) { //shouldn't get here if 0
+			echo "<p>You have no late passes remaining.</p>";
+		} else if ($allowlate==1 || $usedlatepasses<$allowlate-1) {
 			echo '<div id="headerredeemlatepass" class="pagetitle"><h2>Redeem LatePass</h2></div>';
 			echo "<form method=post action=\"redeemlatepass.php?cid=$cid&aid=$aid&confirm=true\">";
+			if ($allowlate>1) {
+				echo '<p>You may use up to '.($allowlate-1-$usedlatepasses).' more LatePass(es) on this assessment.</p>';
+			}
 			echo "<p>You have $numlatepass LatePass(es) remaining.  You can redeem one LatePass for a $hours hour ";
 			echo "extension on this assessment.  Are you sure you want to redeem a LatePass?</p>";
 			echo "<input type=submit value=\"Yes, Redeem LatePass\"/>";
@@ -119,6 +147,8 @@
 				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='../assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}'\"/>";
 			}
 			echo "</form>";
+		} else {
+			echo "<p>You are not allowed to use additional latepasses on this assessment.</p>";
 		}
 		require("../footer.php");
 	}

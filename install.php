@@ -64,6 +64,16 @@ $contents .= "';
 
 ";
 
+$hash = '$2y$04$usesomesillystringfore7hnbRJHxXVLeakoG8K30oukPsA.ztMG';
+$test = crypt("password", $hash);
+$pass = ($test == $hash);
+if ($pass) {
+	$contents .= "//use more secure password hashes? requires PHP 5.3.7+
+\$CFG['GEN']['newpasswords'] = 'only';
+
+";
+}
+	
 if ($_POST['mathchaturl']==0) {
 	$contents .= "//Math chat disabled \n//\$mathchaturl = \"\$imasroot/mathchat/index.php\";\n\n";	
 } else if ($_POST['mathchaturl']==1) {

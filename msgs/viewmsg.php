@@ -113,15 +113,25 @@
 		echo " <a href=\"$imasroot/course/gradebook.php?cid={$line['courseid']}&stu={$line['msgfrom']}\" target=\"_popoutgradebook\">gradebook</a>";
 		if (preg_match('/Question\s+about\s+#(\d+)\s+in\s+(.*)\s*$/',$line['title'],$matches)) {
 			$aname = addslashes($matches[2]);
-			$query = "SELECT id FROM imas_assessments WHERE name='$aname' AND courseid='{$line['courseid']}'";
+			$query = "SELECT id,enddate FROM imas_assessments WHERE name='$aname' AND courseid='{$line['courseid']}'";
 			$res = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			if (mysql_num_rows($res)>0) {
-				$aid = mysql_result($res,0,0);
+				list($aid,$due) = mysql_fetch_row($res);
+				$query = "SELECT enddate FROM imas_exceptions WHERE userid='{$line['msgfrom']}' AND assessmentid='$aid'";
+				$res = mysql_query($query) or die("Query failed : $query " . mysql_error());          
+				if (mysql_num_rows($res)>0) {
+					$due = mysql_result($res,0,0);
+				}
+				$duedate = tzdate('D m/d/Y g:i a',$due);
+			
 				$query = "SELECT id FROM imas_assessment_sessions WHERE assessmentid='$aid' AND userid='{$line['msgfrom']}'";
-				$res = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				$res = mysql_query($query) or die("Query failed : $query " . mysql_error());                               
 				if (mysql_num_rows($res)>0) {
 					$asid = mysql_result($res,0,0);
 					echo " | <a href=\"$imasroot/course/gb-viewasid.php?cid={$line['courseid']}&uid={$line['msgfrom']}&asid=$asid\" target=\"_popoutgradebook\">assignment</a>";
+					if ($due<2000000000) {
+						echo ' <span class="small">Due '.$duedate.'</span>';
+					}
 				}
 			}
 		}

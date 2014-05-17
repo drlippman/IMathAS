@@ -26,7 +26,11 @@
 				$tex = '\\reverse '.$tex;
 			}
 			if ($sessiondata['texdisp']==true) {
-				return htmlentities($tex);
+				if (isset($sessiondata['texdoubleescape'])) {
+					return '\\\\('.htmlentities($tex).'\\\\)';
+				} else {
+					return htmlentities($tex);
+				}
 			} else {
 				return ('<img style="vertical-align: middle;" src="'.$mathimgurl.'?'.rawurlencode($tex).'" alt="'.str_replace('"','&quot;',$arr[1]).'">');
 			}
@@ -134,7 +138,7 @@
 							list ($url,$w,$h) = $respt;
 						}
 					}
-					$url = str_replace('"','',$url);
+					$url = trim(str_replace(array('"','&nbsp;'),'',$url));
 					if (substr($url,0,18)=='https://tegr.it/y/') {
 						$url = preg_replace('/[^\w:\/\.]/','',$url);
 						//$tag = '<script type="text/javascript" src="'.$url.'"></script>';
@@ -230,11 +234,18 @@
 		$str = preg_replace('/<canvas.*?\'(\w+\.png)\'.*?\/script>/','<div><img src="'.$imasroot.'/filter/graph/imgs/$1"/></div>',$str);
 		$str = preg_replace('/<script.*?\/script>/','',$str);  //strip scripts
 		$str = preg_replace('/<input[^>]*Preview[^>]*>/','',$str); //strip preview buttons
-		$str = preg_replace('/<input[^>]*text[^>]*>/','__________________',$str);
-		$str = preg_replace('/<input[^>]*(radio|checkbox)[^>]*>/','__',$str);
+		if (isset($_POST['hidetxtboxes'])) {
+			$str = preg_replace('/<input[^>]*text[^>]*>/','',$str);
+			$str = preg_replace('/<input[^>]*(radio|checkbox)[^>]*>/','',$str);
+			$str = preg_replace('/<select.*?\/select>/','',$str);
+		} else {
+			$str = preg_replace('/<input[^>]*text[^>]*>/','__________________',$str);
+			$str = preg_replace('/<input[^>]*(radio|checkbox)[^>]*>/','__',$str);
+			$str = preg_replace('/<select.*?\/select>/','____',$str);
+		}
 		$str = preg_replace('/<table/','<table cellspacing="0"',$str);
 		$str = preg_replace('/`\s*(\w)\s*`/','<i>$1</i>',$str);
-		$str = preg_replace('/<select.*?\/select>/','____',$str);
+		
 		$str = preg_replace('/<input[^>]*hidden[^>]*>/','',$str); //strip hidden fields
 		if (strpos($str,'`')!==FALSE) {
 			$str = preg_replace_callback('/`(.*?)`/s', 'mathentitycleanup', $str);

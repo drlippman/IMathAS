@@ -192,6 +192,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				$message = preg_replace('/(`[^`]*`)/',"<span class=\"AM\">$1</span>",$message);
 				
 				$message = '<p> </p><br/><hr/>'.$message;
+				//$message .= '<span class="hidden">QREF::'.htmlentities($_GET['quoteq']).'</span>';
 				$courseid = $cid;
 				if (isset($parts[3])) {  //sending to instructor
 					$query = "SELECT name FROM imas_assessments WHERE id='".intval($parts[3])."'";

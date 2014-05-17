@@ -33,7 +33,7 @@
 		//Gbmode : Links NC Dates
 		$totonleft = floor($gbmode/1000)%10 ; //0 right, 1 left
 		$links = ((floor($gbmode/100)%10)&1); //0: view/edit, 1 q breakdown
-		$hidenc = floor($gbmode/10)%10; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
+		$hidenc = (floor($gbmode/10)%10)%3; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
 		$availshow = $gbmode%10; //0: past, 1 past&cur, 2 all
 	} else {
 		$links = 0;
@@ -683,50 +683,62 @@
 				$("span[id^=\'ans\']").removeClass("hidden");
 				$(".sabtn").replaceWith("<span>Answer: </span>");
 			}
+			var focuscolorlock = false;
+			$(function() {
+				$(".review input[name*=\'-\']").each(function(i, el) {
+					var partname = $(el).attr("name");
+					var idparts = partname.split("-");
+					var qn = (idparts[0]*1+1)*1000+idparts[1]*1;
+					$(el).on("mouseover", function () {
+						if (!focuscolorlock) {$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn+", #showansbtn"+partname+", #scorebox"+partname).css("background-color","yellow")};
+					}).on("mouseout", function () {
+						if (!focuscolorlock) {$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn+", #showansbtn"+partname+", #scorebox"+partname).css("background-color","")};
+					}).on("focus", function () {
+						focuscolorlock = true;
+						$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn+", #showansbtn"+partname+", #scorebox"+partname).css("background-color","yellow");
+					}).on("blur", function () {
+						focuscolorlock = false;
+						$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn+", #showansbtn"+partname+", #scorebox"+partname).css("background-color","");
+					});
+				});
+				$("input[id^=\'showansbtn\']").each(function(i, el) {
+					var partname = $(el).attr("id").substring(10);
+					var idparts = partname.split("-");
+					var qn = (idparts[0]*1+1)*1000+idparts[1]*1;
+					$(el).on("mouseover", function () {
+						if (!focuscolorlock) {$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn+", #showansbtn"+partname+", #scorebox"+partname).css("background-color","yellow")};
+					}).on("mouseout", function () {
+						if (!focuscolorlock) {$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn+", #showansbtn"+partname+", #scorebox"+partname).css("background-color","")};
+					});
+				});
+				$("input[id^=\'qn\'], input[id^=\'tc\'], select[id^=\'qn\'], div[id^=\'qnwrap\'], span[id^=\'qnwrap\']").each(function(i,el) {
+					var qn = $(el).attr("id");
+					if (qn.length>6 && qn.substring(0,6)=="qnwrap") {
+						qn = qn.substring(6)*1;
+					} else {
+						qn = qn.substring(2)*1;
+					}
+					if (qn>999) {
+						var partname = (Math.floor(qn/1000)-1)+"-"+(qn%1000);
+						$(el).on("mouseover", function () {
+							if (!focuscolorlock) {$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn+", #showansbtn"+partname+", #scorebox"+partname).css("background-color","yellow")};
+						}).on("mouseout", function () {
+							if (!focuscolorlock) {$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn+", #showansbtn"+partname+", #scorebox"+partname).css("background-color","")};
+						}).on("focus", function () {
+							focuscolorlock = true;
+							$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn+", #showansbtn"+partname+", #scorebox"+partname).css("background-color","yellow");
+						}).on("blur", function () {
+							focuscolorlock = false;
+							$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn+", #showansbtn"+partname+", #scorebox"+partname).css("background-color","");
+						});
+					}
+				});
+			});
 			</script>';
-		/*
-		echo '<script type="text/javascript">';
-		echo 'function hidecorrect() {';
-		echo '   var butn = document.getElementById("hctoggle");';
-		echo '   if (butn.value=="Hide Perfect Score Questions") {';
-		echo '      butn.value = "Show Perfect Score Questions";';
-		echo '      var setdispto = "block";';
-		echo '   } else { ';
-		echo '      butn.value = "Hide Perfect Score Questions";';
-		echo '      var setdispto = "none";';
-		echo '   }';
-		echo '   var divs = document.getElementsByTagName("div");';
-		echo '   for (var i=0;i<divs.length;i++) {';
-		echo '     if (divs[i].className=="iscorrect") { ';
-		echo '         if (divs[i].style.display=="none") {';
-		echo '               divs[i].style.display = "block";';
-		echo '         } else { divs[i].style.display = "none"; }';
-		echo '     }';
-		echo '    }';
-		echo '}';
-		echo 'function hideNA() {';
-		echo '   var butn = document.getElementById("hnatoggle");';
-		echo '   if (butn.value=="Hide Not Answered Questions") {';
-		echo '      butn.value = "Show Not Answered Questions";';
-		echo '      var setdispto = "block";';
-		echo '   } else { ';
-		echo '      butn.value = "Hide Not Answered Questions";';
-		echo '      var setdispto = "none";';
-		echo '   }';
-		echo '   var divs = document.getElementsByTagName("div");';
-		echo '   for (var i=0;i<divs.length;i++) {';
-		echo '     if (divs[i].className=="notanswered") { ';
-		echo '         if (divs[i].style.display=="none") {';
-		echo '               divs[i].style.display = "block";';
-		echo '         } else { divs[i].style.display = "none"; }';
-		echo '     }';
-		echo '    }';
-		echo '}';
-		echo '</script>';
-		*/
-		echo '<p><button type="button" id="hctoggle"onclick="hidecorrect()">'._('Hide Questions with Perfect Scores').'</button>';
+		
+		echo '<p><button type="button" id="hctoggle" onclick="hidecorrect()">'._('Hide Questions with Perfect Scores').'</button>';
 		echo ' <button type="button" id="hnatoggle" onclick="hideNA()">'._('Hide Unanswered Questions').'</button>';
-		echo ' <button type="button" id="hnatoggle" onclick="showallans()">'._('Show All Answers').'</button></p>';
+		echo ' <button type="button" id="showanstoggle" onclick="showallans()">'._('Show All Answers').'</button></p>';
 		$total = 0;
 		
 		for ($i=0; $i<count($questions);$i++) {
@@ -759,7 +771,8 @@
 			} else {
 				$colors = array();
 			}
-		
+			$capturechoices = true;
+			$choicesdata = array();
 			$qtypes = displayq($i,$qsetid,$seeds[$i],$showa,false,$attempts[$i],false,false,false,$colors);
 			echo '</div>';
 			
@@ -777,6 +790,7 @@
 			} else {
 				echo $pt;
 			}
+	
 			if ($parts!='') {
 				if ($canedit) {
 					echo " (parts: ";
@@ -840,21 +854,43 @@
 								$url = getasidfileurl($match[1]);
 								echo "<a href=\"$url\" target=\"_new\">".basename($match[1])."</a>";
 							} else {
-								if (strpos($laarr[$k],'$!$')) {
+								if (strpos($laarr[$k],'$f$')) {
 									if (strpos($laarr[$k],'&')) { //is multipart q
 										$laparr = explode('&',$laarr[$k]);
 										foreach ($laparr as $lk=>$v) {
-											if (strpos($v,'$!$')) {
-												$tmp = explode('$!$',$v);
+											if (strpos($v,'$f$')) {
+												$tmp = explode('$f$',$v);
 												$laparr[$lk] = $tmp[0];
 											}
 										}
 										$laarr[$k] = implode('&',$laparr);
 									} else {
-										$tmp = explode('$!$',$laarr[$k]);
+										$tmp = explode('$f$',$laarr[$k]);
 										$laarr[$k] = $tmp[0];
 									}
 								}
+								if (strpos($laarr[$k],'$!$')) {
+									if (strpos($laarr[$k],'&')) { //is multipart q
+										$laparr = explode('&',$laarr[$k]);
+										foreach ($laparr as $lk=>$v) {
+											if (strpos($v,'$!$')) {
+												$qn = ($i+1)*1000+$lk;
+												$tmp = explode('$!$',$v);
+												//$laparr[$lk] = $tmp[0];
+												$laparr[$lk] = prepchoicedisp($choicesdata[$qn][0]=='matching'?$tmp[0]:$tmp[1], $choicesdata[$qn]);
+											}
+										}
+										$laarr[$k] = implode('&',$laparr);
+									} else {
+										$tmp = explode('$!$',$laarr[$k]);
+										//$laarr[$k] = $tmp[0];
+										$laarr[$k] = prepchoicedisp($choicesdata[$i][0]=='matching'?$tmp[0]:$tmp[1], $choicesdata[$i]);
+									}
+								} else {
+									$laarr[$k] = strip_tags($laarr[$k]);
+								}
+								
+									
 								if (strpos($laarr[$k],'$#$')) {
 									if (strpos($laarr[$k],'&')) { //is multipart q
 										$laparr = explode('&',$laarr[$k]);
@@ -871,7 +907,7 @@
 									}
 								}
 								
-								echo str_replace(array('&','%nbsp;'),array('; ','&nbsp;'),strip_tags($laarr[$k]));
+								echo str_replace(array('&','%nbsp;','%%'),array('; ','&nbsp;','&'), $laarr[$k]);
 							}
 							$cnt++;
 						}
@@ -1218,5 +1254,33 @@ function scorestocolors($sc,$pts,$answ,$noraw) {
 		}
 		return $out;
 	}
+}
+
+function prepchoicedisp($v,$choicesdata) {
+	if ($v=='') {return '';}
+	foreach ($choicesdata[1] as $k=>$c) {
+		$sh = strip_tags($c);
+		if (trim($sh)=='') {
+			$sh = "[view]";
+		} else if (strlen($sh)>15) {
+			$sh = substr($sh,0,15).'...';
+		}
+		if ($sh!=$c) {
+			$choicesdata[1][$k] = '<span onmouseover="tipshow(this,\''.str_replace('&','%%',htmlentities($c,ENT_QUOTES|ENT_HTML401)).'\')" onmouseout="tipout()">'.$sh.'</span>';
+		}
+	}
+	if ($choicesdata[0]=='choices') {
+		return ($choicesdata[1][$v]);	
+	} else if ($choicesdata[0]=='multans') {
+		$p = explode('|',$v);
+		$out = array();
+		foreach ($p as $pv) {
+			$out[] = $choicesdata[1][$pv];
+		}
+		return 'Selected: '.implode(', ',$out);
+	} else if ($choicesdata[0]=='matching') {
+		return $v;
+	}
+	
 }
 ?>

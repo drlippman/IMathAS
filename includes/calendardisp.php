@@ -118,10 +118,12 @@ $query = "SELECT id,name,startdate,enddate,reviewdate,gbcategory,reqscore,reqsco
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 while ($row = mysql_fetch_row($result)) {
 	$canundolatepass = false;
+	$latepasscnt = 0;
 	if (isset($exceptions[$row[0]])) {
 		if ($exceptions[$row[0]][2]>0 && ($now < $row[3] || $exceptions[$row[0]][1] > $now + $latepasshrs*60*60)) {
 			$canundolatepass = true;
 		}
+		$latepasscnt = round(($exceptions[$row[0]][1] - $row[3])/($latepasshrs*3600));		   
 		$row[2] = $exceptions[$row[0]][0];
 		$row[3] = $exceptions[$row[0]][1];
 	}
@@ -175,7 +177,7 @@ while ($row = mysql_fetch_row($result)) {
 			$tag = '?';
 		}*/
 		$tag = htmlentities($row[10]);
-		if ($row[9]==1 && $latepasses>0 && $now < $row[3]) {
+		if (($row[9]==1 || $row[9]-1>$latepasscnt) && $latepasses>0 && $now < $row[3]) {
 			$lp = 1;
 		} else {
 			$lp = 0;
@@ -263,6 +265,7 @@ while ($row = mysql_fetch_row($result)) {
 		$json .= "id:\"$row[0]\", ";
 	}
 	$tag = htmlentities($row[6]);
+	$alink = htmlentities($alink);
 	$json .= "name:\"$row[1]\", link:\"$alink\", color:\"".$colors."\", tag:\"$tag\"".((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
 	
 	$byid['L'.$row[0]] = array($moday,$tag,$colors,$json);

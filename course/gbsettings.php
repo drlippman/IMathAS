@@ -16,7 +16,7 @@
 		$query = "INSERT INTO imas_gbcats (courseid) VALUES ('$cid')";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 	}*/
-	if (isset($_GET['remove'])) {
+	if (isset($_GET['remove'])) {  //LEGACY
 		$query = "UPDATE imas_assessments SET gbcategory=0 WHERE gbcategory='{$_GET['remove']}'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		$query = "UPDATE imas_gbitems SET gbcategory=0 WHERE gbcategory='{$_GET['remove']}'";
@@ -25,6 +25,21 @@
 		mysql_query($query) or die("Query failed : " . mysql_error());
 	}
 	if (isset($_POST['submit']) ) {  //|| isset($_POST['addnew'])
+		if (isset($_POST['deletecatonsubmit'])) {
+			foreach ($_POST['deletecatonsubmit'] as $i=>$cattodel) {
+				$_POST['deletecatonsubmit'][$i] = intval($cattodel);
+			}
+			$catlist = implode(',', $_POST['deletecatonsubmit']);
+			
+			$query = "UPDATE imas_assessments SET gbcategory=0 WHERE gbcategory IN ($catlist)";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			$query = "UPDATE imas_forums SET gbcategory=0 WHERE gbcategory IN ($catlist)";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			$query = "UPDATE imas_gbitems SET gbcategory=0 WHERE gbcategory IN ($catlist)";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+			$query = "DELETE FROM imas_gbcats WHERE id IN ($catlist)";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+		}
 		//WORK ON ME
 		$useweights = $_POST['useweights'];
 		$orderby = $_POST['orderby'];
@@ -82,11 +97,14 @@
 			}
 		}
 		$defgbmode = $_POST['gbmode1'] + 10*$_POST['gbmode10'] + 100*($_POST['gbmode100']+$_POST['gbmode200']) + 1000*$_POST['gbmode1000'] + 1000*$_POST['gbmode1002'];
+		if (isset($_POST['gbmode4000'])) {$defgbmode += 4000;}
+		if (isset($_POST['gbmode400'])) {$defgbmode += 400;}
+		if (isset($_POST['gbmode40'])) {$defgbmode += 40;}
 		$stugbmode = $_POST['stugbmode1'] + $_POST['stugbmode2'] + $_POST['stugbmode4'] + $_POST['stugbmode8'];
 		$query = "UPDATE imas_gbscheme SET useweights='$useweights',orderby='$orderby',usersort='$usersort',defaultcat='$defaultcat',defgbmode='$defgbmode',stugbmode='$stugbmode',colorize='{$_POST['colorize']}' WHERE courseid='$cid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		if (isset($_POST['submit'])) {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid={$_GET['cid']}&gbmode=$defgbmode");
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid={$_GET['cid']}&refreshdef=true");
 			exit;
 		}
 	}
@@ -144,9 +162,30 @@
 		
 		document.getElementById("cattbody").appendChild(tr);
 	}
+	function removeexistcat(id) {
+		if (confirm("Are you SURE you want to delete this category?")) { 
+			$("#theform").append(\'<input type="hidden" name="deletecatonsubmit[]" value="\'+id+\'"/>\');
+			var torem = document.getElementById("catrow"+id);
+			document.getElementById("cattbody").removeChild(torem);
+		}
+	}
 	function removecat(n) {
 		var torem = document.getElementById("newrow"+n);
 		document.getElementById("cattbody").removeChild(torem);
+	}
+	function toggleadv(el) {
+		if ($("#viewfield").is(":hidden")) {
+			$(el).html("Hide view settings");
+			$("#viewfield").slideDown();
+		} else {
+			$(el).html("Edit view settings");
+			$("#viewfield").slideUp();
+		}
+	}
+	function prepforsubmit() {
+		if ($("#viewfield").is(":hidden")) {
+			$("#viewfield").css("visibility","hidden").css("position","absolute").show();
+		}
 	}
 		
 	</script>';
@@ -163,10 +202,14 @@
 	list($useweights,$orderby,$defaultcat,$defgbmode,$usersort,$stugbmode,$colorize) = mysql_fetch_row($result);
 	$totonleft = ((floor($defgbmode/1000)%10)&1) ; //0 right, 1 left
 	$avgontop = ((floor($defgbmode/1000)%10)&2) ; //0 bottom, 2 top
+	$lastlogin = (((floor($defgbmode/1000)%10)&4)==4) ; //0 hide, 2 show last login column
 	$links = ((floor($defgbmode/100)%10)&1); //0: view/edit, 1 q breakdown
-	$hidelocked = ((floor($defgbmode/100)%10)&2); //0: show 1: hide locked
-	$hidenc = floor($defgbmode/10)%10; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
+	$hidelocked = ((floor($defgbmode/100)%10)&2); //0: show 2: hide locked
+	$includeduedate = (((floor($defgbmode/100)%10)&4)==4); //0: hide due date, 4: show due date
+	$hidenc = (floor($defgbmode/10)%10)%3; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
+	$includelastchange = (((floor($defgbmode/10)%10)&4)==4);  //: hide last change, 4: show last change
 	$availshow = $defgbmode%10; //0: past, 1 past&cur, 2 all
+	
 	
 	$colorval = array(0);
 	$colorlabel = array("No Color");
@@ -176,64 +219,76 @@
 			$colorlabel[] = "red &le; $j%, green &ge; $k%";
 		}
 	}
+	$colorval[] = "-1:-1";
+	$colorlabel[] = "Active";
 	
 	$hideval = array(1,0,2);
 	$hidelabel = array(_("Hidden"),_("Expanded"),_("Collapsed"));
 
 ?>
-	<form method=post action="gbsettings.php?cid=<?php echo $cid;?>">
+	<form id="theform" method=post action="gbsettings.php?cid=<?php echo $cid;?>" onsubmit="prepforsubmit()">
 	
 	<span class=form>Calculate total using:</span>
 	<span class=formright>
-		<input type=radio name=useweights value="0" <?php writeHtmlChecked($useweights,0);?> onclick="swapweighthdr(0)"/> points earned / possible<br/>
-		<input type=radio name=useweights value="1" <?php writeHtmlChecked($useweights,1);?> onclick="swapweighthdr(1)"/> category weights
+		<input type=radio name=useweights value="0" id="usew0" <?php writeHtmlChecked($useweights,0);?> onclick="swapweighthdr(0)"/><label for="usew0">points earned / possible</label><br/>
+		<input type=radio name=useweights value="1" id="usew1" <?php writeHtmlChecked($useweights,1);?> onclick="swapweighthdr(1)"/><label for="usew1">category weights</label>
 	</span><br class=form />
+	
+	<p><a href="#" onclick="toggleadv(this);return false">Edit view settings</a></p>
+	<fieldset style="display:none;" id="viewfield"><legend>Default gradebook view:</legend>
 	
 	<span class=form>Gradebook display:</span>
 	<span class=formright>
-		<input type="checkbox" name="grouporderby" value="1" <?php writeHtmlChecked($orderby&1,1);?>/> Group by category first<br/> 
-		<input type=radio name=orderby value="0" <?php writeHtmlChecked($orderby&~1,0);?>/> Order by end date, old to new<br/> 
-		<input type=radio name=orderby value="4" <?php writeHtmlChecked($orderby&~1,4);?>/> Order by end date, new to old<br/> 
-		<input type=radio name=orderby value="6" <?php writeHtmlChecked($orderby&~1,6);?>/> Order by start date, old to new<br/> 
-		<input type=radio name=orderby value="8" <?php writeHtmlChecked($orderby&~1,8);?>/> Order by start date, new to old<br/> 
-		<input type=radio name=orderby value="2" <?php writeHtmlChecked($orderby&~1,2);?>/> Order alphabetically<br/>
-		<input type=radio name=orderby value="10" <?php writeHtmlChecked($orderby&~1,10);?>/> Order by course page order, offline at end<br/> 
-		<input type=radio name=orderby value="12" <?php writeHtmlChecked($orderby&~1,12);?>/> Order by course page order reversed, offline at start<br/> 
+		<?php
+		$orderval = array(0,4,6,8,2,10,12);
+		$orderlabel = array('by end date, old to new', 'by end date, new to old', 'by start date, old to new', 'start date, new to old', 'alphabetically', 'by course page order, offline at end', 'by course page order reversed, offline at start');
+		echo 'Order: ';
+		writeHtmlSelect("orderby", $orderval, $orderlabel, $orderby&~1);
+		?>
+		<br/>
+		<input type="checkbox" name="grouporderby" value="1" id="grouporderby" <?php writeHtmlChecked($orderby&1,1);?>/><label for="grouporderby">Group by category first</label>
 	</span><br class=form />
 	
-	<fieldset><legend>Default gradebook view:</legend>
 	<span class=form>Default user order:</span>
 	<span class=formright>
-		<input type=radio name=usersort value="0" <?php writeHtmlChecked($usersort,0);?>/> Order by section (if used), then Last name<br/> 
-		<input type=radio name=usersort value="1" <?php writeHtmlChecked($usersort,1);?>/> Order by Last name
+		<?php
+		$orderval = array(0,1);
+		$orderlabel = array('Order by section (if used), then Last name','Order by Last name');
+		writeHtmlSelect("usersort", $orderval, $orderlabel, $usersort);
+		?>
 	</span><br class=form />
 	
 	<span class=form>Links show:</span>
 	<span class=formright>
-		<input type=radio name="gbmode100" value="0"  <?php writeHtmlChecked($links,0);?>/> Full Test <br/>
-		<input type=radio name="gbmode100" value="1"  <?php writeHtmlChecked($links,1);?>/> Question Breakdown
+		<?php
+		$orderval = array(0,1);
+		$orderlabel = array('Full Test','Question Breakdown');
+		writeHtmlSelect("gbmode100", $orderval, $orderlabel, $links);
+		?>
 	</span><br class=form />
 	
-	<span class=form>Default Show items: </span>
+	<span class=form>Default show by availability: </span>
 	<span class=formright>
-		<input type=radio name="gbmode1" value="0" <?php writeHtmlChecked($availshow,0);?>/> Past Due Items <br/>
-		<input type=radio name="gbmode1" value="3" <?php writeHtmlChecked($availshow,3);?>/> Past &amp; Attempted Items <br/>
-		<input type=radio name="gbmode1" value="4" <?php writeHtmlChecked($availshow,4);?>/> Available Items Only <br/>
-		<input type=radio name="gbmode1" value="1" <?php writeHtmlChecked($availshow,1);?>/> Past &amp; Available Items <br/>
-		<input type=radio name="gbmode1" value="2" <?php writeHtmlChecked($availshow,2);?>/> All Items 
+		<?php
+		$orderval = array(0,3,4,1,2);
+		$orderlabel = array('Past Due Items','Past &amp; Attempted Items','Available Items Only','Past &amp; Available Items','All Items');
+		writeHtmlSelect("gbmode1", $orderval, $orderlabel, $availshow);
+		?>
 	</span><br class=form>
 	
-	<span class=form>Not Counted items: </span>
+	<span class=form>Not Counted (NC) items: </span>
 	<span class=formright>
-		<input type=radio name="gbmode10" value="0" <?php writeHtmlChecked($hidenc,0);?>/> Show All<br/>
-		<input type=radio name="gbmode10" value="1" <?php writeHtmlChecked($hidenc,1);?>/> Show NC Items not hidden from students<br/>
-		<input type=radio name="gbmode10" value="2" <?php writeHtmlChecked($hidenc,2);?>/> Hide All
+		<?php
+		$orderval = array(0,1,2);
+		$orderlabel = array('Show NC items','Show NC items not hidden from students','Hide NC items');
+		writeHtmlSelect("gbmode10", $orderval, $orderlabel, $hidenc);
+		?>
 	</span><br class=form>
 	
 	<span class=form>Locked Students:</span>
 	<span class=formright>
-		<input type=radio name="gbmode200" value="0"  <?php writeHtmlChecked($hidelocked,0);?>/> Show <br/>
-		<input type=radio name="gbmode200" value="2"  <?php writeHtmlChecked($hidelocked,2);?>/> Hide
+		<input type=radio name="gbmode200" value="0"  id="lockstu0" <?php writeHtmlChecked($hidelocked,0);?>/><label for="lockstu0">Show</label> 
+		<input type=radio name="gbmode200" value="2"  id="lockstu2" <?php writeHtmlChecked($hidelocked,2);?>/><label for="lockstu2">Hide</label> 
 	</span><br class=form />
 	
 	<span class=form>Default Colorization:</span>
@@ -244,22 +299,29 @@
 	</span><br class=form />
 	<span class=form>Totals columns show on:</span>
 	<span class=formright>
-		<input type=radio name="gbmode1000" value="0" <?php writeHtmlChecked($totonleft,0);?>/> Right<br/>
-		<input type=radio name="gbmode1000" value="1" <?php writeHtmlChecked($totonleft,1);?>/> Left
+		<input type=radio name="gbmode1000" value="0" id="totside0" <?php writeHtmlChecked($totonleft,0);?>/><label for="totside0">Right</label> 
+		<input type=radio name="gbmode1000" value="1" id="totside1" <?php writeHtmlChecked($totonleft,1);?>/><label for="totside1">Left</label> 
 	</span><br class=form />
 	
 	<span class=form>Average row shows on:</span>
 	<span class=formright>
-		<input type=radio name="gbmode1002" value="0" <?php writeHtmlChecked($avgontop,0);?>/> Bottom<br/>
-		<input type=radio name="gbmode1002" value="2" <?php writeHtmlChecked($avgontop,2);?>/> Top
+		<input type=radio name="gbmode1002" value="0" id="avgloc0" <?php writeHtmlChecked($avgontop,0);?>/><label for="avgloc0">Bottom</label> 
+		<input type=radio name="gbmode1002" value="2" id="avgloc2" <?php writeHtmlChecked($avgontop,2);?>/><label for="avgloc2">Top</label> 
+	</span><br class=form />
+	
+	<span class=form>Include details:</span>
+	<span class=formright>
+		<input type="checkbox" name="gbmode4000" value="4" id="llcol" <?php writeHtmlChecked($lastlogin,true);?>/><label for="llcol">Last Login column</label><br/>
+		<input type="checkbox" name="gbmode400" value="4" id="duedate" <?php writeHtmlChecked($includeduedate,true);?>/><label for="duedate">Due Date in column headers, and column in single-student view</label><br/>
+		<input type="checkbox" name="gbmode40" value="4" id="lastchg" <?php writeHtmlChecked($includelastchange,true);?>/><label for="lastchg">Last Change column in single-student view</label>
 	</span><br class=form />
 	
 	<span class="form">Totals to show students:</span>
 	<span class=formright>
-		<input type="checkbox" name="stugbmode1" value="1" <?php writeHtmlChecked(($stugbmode)&1,1);?>/> Past Due<br/>
-		<input type="checkbox" name="stugbmode2" value="2" <?php writeHtmlChecked(($stugbmode)&2,2);?>/> Past Due and Attempted<br/>
-		<input type="checkbox" name="stugbmode4" value="4" <?php writeHtmlChecked(($stugbmode)&4,4);?>/> Past Due and Available<br/>
-		<input type="checkbox" name="stugbmode8" value="8" <?php writeHtmlChecked(($stugbmode)&8,8);?>/> All (including future)<br/>
+		<input type="checkbox" name="stugbmode1" value="1" id="totshow1" <?php writeHtmlChecked(($stugbmode)&1,1);?>/><label for="totshow1">Past Due</label><br/>
+		<input type="checkbox" name="stugbmode2" value="2" id="totshow2" <?php writeHtmlChecked(($stugbmode)&2,2);?>/><label for="totshow2">Past Due and Attempted</label><br/>
+		<input type="checkbox" name="stugbmode4" value="4" id="totshow4" <?php writeHtmlChecked(($stugbmode)&4,4);?>/><label for="totshow4">Past Due and Available</label><br/>
+		<input type="checkbox" name="stugbmode8" value="8" id="totshow8" <?php writeHtmlChecked(($stugbmode)&8,8);?>/><label for="totshow8">All (including future)</label><br/>
 	</span><br class="form" />
 	</fieldset>
 	<fieldset><legend>Gradebook Categories</legend>
@@ -269,7 +331,7 @@
 	echo "<table class=gb><thead>";
 	echo "<tr><th>Category Name</th><th>Display<sup>*</sup></th><th>Scale (optional)</th><th>Drops</th><th id=weighthdr>";
 	if ($useweights==0) {
-		echo "Fixed Category Point Total (optional)";
+		echo "Fixed Category Point Total (optional)<br/>Blank to use point sum";
 	} else if ($useweights==1) {
 		echo "Category Weight (%)";
 	}
@@ -289,8 +351,8 @@
 	echo '</fieldset>';
 	echo '<div class="submit"><input type=submit name=submit value="'._('Save Changes').'"/></div>';
 	echo "</form>";
-	echo '<p><sup>*</sup>When a category is set to Expanded, both the category total and all items in the category are displayed. ';
-	echo 'When a category is set to Collapsed, only the category total is displayed, but all the items are still counted normally. ';
+	echo '<p class="small"><sup>*</sup>When a category is set to Expanded, both the category total and all items in the category are displayed.<br/> ';
+	echo 'When a category is set to Collapsed, only the category total is displayed, but all the items are still counted normally.<br/>';
 	echo 'When a category is set to Hidden, nothing is displayed, and no items from the category are counted in the grade total. </p>';
 	
 	//echo "<p><a href=\"gbsettings.php?cid=$cid&addnew=1\">Add New Category</a></p>";
@@ -298,7 +360,7 @@
 	function disprow($id,$row) {
 		global $cid, $hidelabel, $hideval;
 		//name,scale,scaletype,chop,drop,weight
-		echo "<tr class=grid><td>";
+		echo "<tr class=grid id=\"catrow$id\"><td>";
 		if ($id>0) {
 			echo "<input type=text name=\"name[$id]\" value=\"{$row[0]}\"/>";
 		} else {
@@ -357,7 +419,7 @@
 		}
 		echo "\"/></td>";
 		if ($id!=0) {
-			echo "<td><a href=\"gbsettings.php?cid=$cid&remove=$id\">Remove</a></td></tr>";
+			echo "<td><a href=\"#\" onclick=\"removeexistcat($id);return false;\">Remove</a></td></tr>";
 		} else {
 			echo "<td></td></tr>";
 		}

@@ -29,10 +29,12 @@ if (isset($_GET['form'])) {
 		require("../header.php");
 		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; User Lookup</div>';
 		
-		if (!empty($_POST['FirstName']) || !empty($_POST['LastName']) || !empty($_POST['SID'])) {
+		if (!empty($_POST['FirstName']) || !empty($_POST['LastName']) || !empty($_POST['SID']) || !empty($_POST['email'])) {
 			if (!empty($_POST['SID'])) {
 				$query = "SELECT * FROM imas_users WHERE SID='{$_POST['SID']}'";
-			} else {
+			} else if (!empty($_POST['email'])) {
+				$query = "SELECT * FROM imas_users WHERE email='{$_POST['email']}'";
+			} else  {
 				$query = "SELECT * FROM imas_users WHERE ";
 				if (!empty($_POST['LastName'])) {
 					$query .= "LastName='{$_POST['LastName']}' ";
@@ -92,7 +94,7 @@ if (isset($_GET['form'])) {
 			
 		} else {
 			echo '<form method="post" action="utils.php?form=lookup">';
-			echo 'Look up user:  LastName: <input type="text" name="LastName" />, FirstName: <input type="text" name="FirstName" />, or username: <input type="text" name="SID"/>';
+			echo 'Look up user:  LastName: <input type="text" name="LastName" />, FirstName: <input type="text" name="FirstName" />, or username: <input type="text" name="SID"/>, or email: <input type="text" name="email"/>';
 			echo '<input type="submit" value="Go"/>';
 			
 		}

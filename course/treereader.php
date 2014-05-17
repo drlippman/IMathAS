@@ -181,7 +181,7 @@ while ($row = mysql_fetch_row($result)) {
 		
 
 function printlist($items) {
-	global $cid,$imasroot,$foundfirstitem, $foundopenitem, $openitem, $astatus;
+	global $cid,$imasroot,$foundfirstitem, $foundopenitem, $openitem, $astatus, $studentinfo;
 	$out = '';
 	$isopen = false;
 	foreach ($items as $item) {
@@ -238,7 +238,41 @@ function printlist($items) {
 						 $out .= '<img id="aimg'.$typeid.'" src="'.$imasroot.'/img/q_emptybox.gif" /> ';
 					 }
 				 }
-				 $out .= '<a href="'.$imasroot.'/assessment/showtest.php?cid='.$cid.'&amp;id='.$typeid.'"  onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')" target="readerframe">'.$line['name'].'</a></li>';
+				 if (isset($studentinfo['timelimitmult'])) {
+				 	 $line['timelimit'] *= $studentinfo['timelimitmult'];
+				 }
+				 $line['timelimit'] = abs($line['timelimit']);
+				 if ($line['timelimit']>0) {
+					   if ($line['timelimit']>3600) {
+						$tlhrs = floor($line['timelimit']/3600);
+						$tlrem = $line['timelimit'] % 3600;
+						$tlmin = floor($tlrem/60);
+						$tlsec = $tlrem % 60;
+						$tlwrds = "$tlhrs " . _('hour');
+						if ($tlhrs > 1) { $tlwrds .= "s";}
+						if ($tlmin > 0) { $tlwrds .= ", $tlmin " . _('minute');}
+						if ($tlmin > 1) { $tlwrds .= "s";}
+						if ($tlsec > 0) { $tlwrds .= ", $tlsec " . _('second');}
+						if ($tlsec > 1) { $tlwrds .= "s";}
+					} else if ($line['timelimit']>60) {
+						$tlmin = floor($line['timelimit']/60);
+						$tlsec = $line['timelimit'] % 60;
+						$tlwrds = "$tlmin " . _('minute');
+						if ($tlmin > 1) { $tlwrds .= "s";}
+						if ($tlsec > 0) { $tlwrds .= ", $tlsec " . _('second');}
+						if ($tlsec > 1) { $tlwrds .= "s";}
+					} else {
+						$tlwrds = $line['timelimit'] . _(' second(s)');
+					}
+				 } else {
+					   $tlwrds = '';
+				 }
+				 if ($tlwrds != '') {
+				 	 $onclick = 'onclick="return confirm(\''. sprintf(_('This assessment has a time limit of %s.  Click OK to start or continue working on the assessment.'), $tlwrds). '\')"';
+				 } else {
+				 	 $onclick = 'onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')"';
+				 }
+				 $out .= '<a href="'.$imasroot.'/assessment/showtest.php?cid='.$cid.'&amp;id='.$typeid.'" '.$onclick.' target="readerframe">'.$line['name'].'</a></li>';
 			} else if ($line['itemtype']=='LinkedText') {
 				//TODO check availability, etc.
 				 $query = "SELECT title,summary,text,startdate,enddate,avail,target FROM imas_linkedtext WHERE id='$typeid'";
