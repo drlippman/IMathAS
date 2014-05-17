@@ -12,7 +12,7 @@ function calculate(inputId,outputId,format) {
   }
   for (var sc=0;sc<strarr.length;sc++) {
 	  str = strarr[sc];
-	  str = str.replace(/(\d)\s*,\s*(\d)/g,"$1$2");
+	  str = str.replace(/(\d)\s*,(?=\s*\d{3}\b)/g,"$1");
 	  var err = "";
 	  if (str.match(/DNE/i)) {
 		  str = str.toUpperCase();
