@@ -331,7 +331,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		var addqaddr = '$address';
 		</script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addquestions.js\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=081013\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=051714\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/junkflag.js\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savelibassignflag.php';</script>";
 	
@@ -395,7 +395,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 		} 
 		for ($j=0;$j<count($subs);$j++) {
-			$query = "SELECT imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn,imas_questionset.extref,imas_users.groupid,imas_questions.showhints FROM imas_questions,imas_questionset,imas_users ";
+			$query = "SELECT imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn,imas_questionset.extref,imas_users.groupid,imas_questions.showhints,imas_questionset.solution,imas_questionset.solutionopts FROM imas_questions,imas_questionset,imas_users ";
 			$query .= "WHERE imas_questions.id='{$subs[$j]}' AND imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id ";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$line = mysql_fetch_array($result, MYSQL_ASSOC);
@@ -412,6 +412,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			$jsarr .= ','.$line['withdrawn'];
 			$extrefval = 0;
+			if (($line['showhints']==0 && $showhintsdef==1) || $line['showhints']==2) {
+				$extrefval += 1;
+			}
 			if ($line['extref']!='') {
 				$extref = explode('~~',$line['extref']);
 				$hasvid = false;  $hasother = false;
@@ -423,14 +426,15 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 				}
 				$page_questionTable[$i]['extref'] = '';
-				if ($hasvid && (($line['showhints']==0 && $showhintsdef==1) || $line['showhints']==2)) {
-					$extrefval += 1;
-				} else if ($hasvid) {
+				if ($hasvid) {
 					$extrefval += 4;
 				}
 				if ($hasother) {
 					$extrefval += 2;
 				}
+			}
+			if ($line['solution']!='' && ($line['solutionopts']&2)==2) {
+				$extrefval += 8;
 			}
 			$jsarr .= ','.$extrefval;
 			$jsarr .= ']';
