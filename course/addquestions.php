@@ -583,7 +583,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$page_libRowHeader = ($searchall==1) ? "<th>Library</th>" : "";
 			
 			if (isset($search)) {
-				$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.avgtime,imas_library_items.junkflag, imas_library_items.id AS libitemid,imas_users.groupid ";
+				$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.avgtime,imas_questionset.solution,imas_questionset.solutionopts,imas_library_items.junkflag, imas_library_items.id AS libitemid,imas_users.groupid ";
 				$query .= "FROM imas_questionset JOIN imas_library_items ON imas_library_items.qsetid=imas_questionset.id ";
 				$query .= "JOIN imas_users ON imas_questionset.ownerid=imas_users.id WHERE imas_questionset.deleted=0 AND imas_questionset.replaceby=0 AND $searchlikes "; //imas_questionset.description LIKE '%$safesearch%' ";
 				$query .= " (imas_questionset.ownerid='$userid' OR imas_questionset.userights>0)";
@@ -678,6 +678,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 							$page_questionTable[$i]['junkflag'] = $line['junkflag'];
 							$page_questionTable[$i]['libitemid'] = $line['libitemid'];
 						}
+						$page_questionTable[$i]['extref'] = '';
 						if ($line['extref']!='') {
 							$extref = explode('~~',$line['extref']);
 							$hasvid = false;  $hasother = false;
@@ -688,7 +689,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 									$hasother = true;
 								}
 							}
-							$page_questionTable[$i]['extref'] = '';
 							if ($hasvid) {
 								$page_questionTable[$i]['extref'] .= "<img src=\"$imasroot/img/video_tiny.png\"/>";
 							}
@@ -696,7 +696,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 								$page_questionTable[$i]['extref'] .= "<img src=\"$imasroot/img/html_tiny.png\"/>";
 							}
 						}
-						
+						if ($line['solution']!='' && ($line['solutionopts']&2)==2) {
+							$page_questionTable[$i]['extref'] .= "<img src=\"$imasroot/img/assess_tiny.png\"/>";
+						}
 						/*$query = "SELECT COUNT(id) FROM imas_questions WHERE questionsetid='{$line['id']}'";
 						$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 						$times = mysql_result($result2,0,0);
