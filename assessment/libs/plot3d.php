@@ -130,10 +130,15 @@ function plot3d($func,$umin,$umax,$vmin,$vmax) {
 		  } 
 	  	  $GLOBALS['3dplotcnt'] = $r;
 	  	  $html .= "<canvas id=\"plot3d$r\" width=\"$width\" height=\"$height\">";
+	  	  if (isset($bounds)) {
+			  $bndtxt = 'bounds:"' . implode(',',$bounds) . '",';
+		  } else {
+		  	  $bndtxt='';
+		  }
 	  	  $url = $GLOBALS['urlmode']  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . (isset($_SERVER['QUERY_STRING'])?'?'.$_SERVER['QUERY_STRING'].'&useflash=true':'?useflash=true');		 
 		  $html .= "Not seeing the 3D graph?  <a href=\"$url\">Try Flash Alternate</a>";
 	  	  $html .= "</canvas>";
-	  	  $html .= "<script type=\"text/javascript\">$(window).on('load',function() {var plot3d$r = new Viewer3D({verts: '$verts', faces: '$faces', width: '$width', height:'$height'}, 'plot3d$r');});</script>";
+	  	  $html .= "<script type=\"text/javascript\">$(window).on('load',function() {var plot3d$r = new Viewer3D({verts: '$verts', faces: '$faces', $bndtxt width: '$width', height:'$height'}, 'plot3d$r');});</script>";
 	  } 
 	/*	  
 	  } else {
