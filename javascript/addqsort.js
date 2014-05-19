@@ -332,13 +332,19 @@ function generateTable() {
 			html += "<td><input type=hidden name=\"curq[]\" id=\"oqc"+ln+"\" value=\""+curitems[j][1]+"\"/>"+curitems[j][2]+"</td>"; //description
 			html += "<td class=\"nowrap\">";
 			if ((curitems[j][7]&1) == 1) {
-				html += '<img src="'+imasroot+'/img/video_tiny.png"/>';
-			} else if ((curitems[j][7]&4) == 4) {
-				html += '<img src="'+imasroot+'/img/video_tiny_no.png"/>';
+				var showicons = "";
+			} else {
+				var showicons = "_no";
+			}
+			if ((curitems[j][7]&4) == 4) {
+				html += '<img src="'+imasroot+'/img/video_tiny'+showicons+'.png"/>';
 			}
 			if ((curitems[j][7]&2) == 2) {
-				html += '<img src="'+imasroot+'/img/html_tiny.png"/>';
+				html += '<img src="'+imasroot+'/img/html_tiny'+showicons+'.png"/>';
 			}
+			if ((curitems[j][7]&8) == 8) {
+				html += '<img src="'+imasroot+'/img/assess_tiny'+showicons+'.png"/>';
+			}  
 			html += "</td>";
 			html += "<td>"+curitems[j][1]+"</td>";
 			if (beentaken) {

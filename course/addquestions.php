@@ -331,7 +331,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		var addqaddr = '$address';
 		</script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addquestions.js\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=081013\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=051714\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/junkflag.js\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savelibassignflag.php';</script>";
 	
@@ -395,7 +395,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 		} 
 		for ($j=0;$j<count($subs);$j++) {
-			$query = "SELECT imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn,imas_questionset.extref,imas_users.groupid,imas_questions.showhints FROM imas_questions,imas_questionset,imas_users ";
+			$query = "SELECT imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn,imas_questionset.extref,imas_users.groupid,imas_questions.showhints,imas_questionset.solution,imas_questionset.solutionopts FROM imas_questions,imas_questionset,imas_users ";
 			$query .= "WHERE imas_questions.id='{$subs[$j]}' AND imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id ";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$line = mysql_fetch_array($result, MYSQL_ASSOC);
@@ -412,6 +412,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			$jsarr .= ','.$line['withdrawn'];
 			$extrefval = 0;
+			if (($line['showhints']==0 && $showhintsdef==1) || $line['showhints']==2) {
+				$extrefval += 1;
+			}
 			if ($line['extref']!='') {
 				$extref = explode('~~',$line['extref']);
 				$hasvid = false;  $hasother = false;
@@ -423,14 +426,15 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 				}
 				$page_questionTable[$i]['extref'] = '';
-				if ($hasvid && (($line['showhints']==0 && $showhintsdef==1) || $line['showhints']==2)) {
-					$extrefval += 1;
-				} else if ($hasvid) {
+				if ($hasvid) {
 					$extrefval += 4;
 				}
 				if ($hasother) {
 					$extrefval += 2;
 				}
+			}
+			if ($line['solution']!='' && ($line['solutionopts']&2)==2) {
+				$extrefval += 8;
 			}
 			$jsarr .= ','.$extrefval;
 			$jsarr .= ']';
@@ -579,7 +583,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$page_libRowHeader = ($searchall==1) ? "<th>Library</th>" : "";
 			
 			if (isset($search)) {
-				$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.avgtime,imas_library_items.junkflag, imas_library_items.id AS libitemid,imas_users.groupid ";
+				$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.avgtime,imas_questionset.solution,imas_questionset.solutionopts,imas_library_items.junkflag, imas_library_items.id AS libitemid,imas_users.groupid ";
 				$query .= "FROM imas_questionset JOIN imas_library_items ON imas_library_items.qsetid=imas_questionset.id ";
 				$query .= "JOIN imas_users ON imas_questionset.ownerid=imas_users.id WHERE imas_questionset.deleted=0 AND imas_questionset.replaceby=0 AND $searchlikes "; //imas_questionset.description LIKE '%$safesearch%' ";
 				$query .= " (imas_questionset.ownerid='$userid' OR imas_questionset.userights>0)";
@@ -674,6 +678,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 							$page_questionTable[$i]['junkflag'] = $line['junkflag'];
 							$page_questionTable[$i]['libitemid'] = $line['libitemid'];
 						}
+						$page_questionTable[$i]['extref'] = '';
 						if ($line['extref']!='') {
 							$extref = explode('~~',$line['extref']);
 							$hasvid = false;  $hasother = false;
@@ -684,7 +689,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 									$hasother = true;
 								}
 							}
-							$page_questionTable[$i]['extref'] = '';
 							if ($hasvid) {
 								$page_questionTable[$i]['extref'] .= "<img src=\"$imasroot/img/video_tiny.png\"/>";
 							}
@@ -692,7 +696,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 								$page_questionTable[$i]['extref'] .= "<img src=\"$imasroot/img/html_tiny.png\"/>";
 							}
 						}
-						
+						if ($line['solution']!='' && ($line['solutionopts']&2)==2) {
+							$page_questionTable[$i]['extref'] .= "<img src=\"$imasroot/img/assess_tiny.png\"/>";
+						}
 						/*$query = "SELECT COUNT(id) FROM imas_questions WHERE questionsetid='{$line['id']}'";
 						$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 						$times = mysql_result($result2,0,0);
