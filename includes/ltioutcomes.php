@@ -240,7 +240,7 @@ function calcandupdateLTIgrade($sourcedid,$aid,$scores) {
 	for ($i =0; $i < count($scores);$i++) {
 		if (getpts($scores[$i])>0) { $total += getpts($scores[$i]);}
 	}
-	$grade = round($total/$aidtotalpossible[$aid],4);
+	$grade = number_format($total/$aidtotalpossible[$aid],4);
 	return updateLTIgrade('update',$sourcedid,$aid,$grade);
 }
 
@@ -249,6 +249,7 @@ function updateLTIgrade($action,$sourcedid,$aid,$grade=0) {
 	global $sessiondata,$testsettings,$cid;
 	
 	list($lti_sourcedid,$ltiurl,$ltikey,$keytype) = explode(':|:',$sourcedid);
+	
 	if (strlen($lti_sourcedid)>1 && strlen($ltiurl)>1 && strlen($ltikey)>1) {
 		if (isset($sessiondata[$ltikey.'-'.$aid.'-secret'])) {
 			$secret = $sessiondata[$ltikey.'-'.$aid.'-secret'];

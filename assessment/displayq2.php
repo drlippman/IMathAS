@@ -3767,11 +3767,12 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			if (checkreqtimes($_POST["tc$qn"],$requiretimes)==0) {
 				return 0;
 			}
-					
 			if (in_array('inequality',$ansformats)) {
 				$_POST["tc$qn"] = str_replace('or', ' or ', $_POST["tc$qn"]);
-				preg_match_all('/[a-zA-Z]+/',$_POST["tc$qn"],$matches);
+			
+				preg_match_all('/([a-zA-Z]\(\s*[a-zA-Z]\s*\)|[a-zA-Z]+)/',$_POST["tc$qn"],$matches);
 				foreach ($matches[0] as $var) {
+					$var = str_replace(' ','',$var);
 					if (in_array($var,$mathfuncs)) { continue;}
 					if ($var!= 'or' && $var!='and' && $var != $variables && $_POST["qn$qn"]!="(-oo,oo)") {
 						return 0;
