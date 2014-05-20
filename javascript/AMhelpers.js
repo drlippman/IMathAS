@@ -114,30 +114,30 @@ function calculate(inputId,outputId,format) {
   }
 }
 
-//not used yet.  Function to convert inequalities into interval notation
+//Function to convert inequalities into interval notation
 function ineqtointerval(strw) {
 	var strpts = strw.split(/or/);
 	for (i=0; i<strpts.length; i++) {
 		str = strpts[i];
 		var out = '';	
-		if (pat = str.match(/^([^<]+)\s*(<=?)\s*[a-zA-Z]\s*(<=?)([^<]+)$/)) {
+		if (pat = str.match(/^([^<]+)\s*(<=?)\s*([a-zA-Z]\(\s*[a-zA-Z]\s*\)|[a-zA-Z]+)\s*(<=?)([^<]+)$/)) {
 			if (pat[2]=='<=') {out += '[';} else {out += '(';}
-			out += pat[1] + ',' + pat[4];
-			if (pat[3]=='<=') {out += ']';} else {out += ')';}
-		} else if (pat = str.match(/^([^>]+)\s*(>=?)\s*[a-zA-Z]\s*(>=?)([^>]+)$/)) {
-			if (pat[3]=='>=') {out += '[';} else {out += '(';}
-			out += pat[4] + ',' + pat[1];
+			out += pat[1] + ',' + pat[5];
+			if (pat[4]=='<=') {out += ']';} else {out += ')';}
+		} else if (pat = str.match(/^([^>]+)\s*(>=?)\s*([a-zA-Z]\(\s*[a-zA-Z]\s*\)|[a-zA-Z]+)\s*(>=?)([^>]+)$/)) {
+			if (pat[4]=='>=') {out += '[';} else {out += '(';}
+			out += pat[5] + ',' + pat[1];
 			if (pat[2]=='>=') {out += ']';} else {out += ')';}
-		} else if (pat = str.match(/^([^><]+)\s*([><]=?)\s*[a-zA-Z]\s*$/)) {
+		} else if (pat = str.match(/^([^><]+)\s*([><]=?)\s*([a-zA-Z]\(\s*[a-zA-Z]\s*\)|[a-zA-Z]+)\s*$/)) {
 			if (pat[2]=='>') { out = '(-oo,'+pat[1]+')';} else
 			if (pat[2]=='>=') { out = '(-oo,'+pat[1]+']';} else
 			if (pat[2]=='<') { out = '('+pat[1]+',oo)';} else
 			if (pat[2]=='<=') { out = '['+pat[1]+',oo)';}
-		} else if (pat = str.match(/^\s*[a-zA-Z]\s*([><]=?)\s*([^><]+)$/)) {
-			if (pat[1]=='<') { out = '(-oo,'+pat[2]+')';} else
-			if (pat[1]=='<=') { out = '(-oo,'+pat[2]+']';} else
-			if (pat[1]=='>') { out = '('+pat[2]+',oo)';} else
-			if (pat[1]=='>=') { out = '['+pat[2]+',oo)';}
+		} else if (pat = str.match(/^\s*([a-zA-Z]\(\s*[a-zA-Z]\s*\)|[a-zA-Z]+)\s*([><]=?)\s*([^><]+)$/)) {
+			if (pat[2]=='<') { out = '(-oo,'+pat[3]+')';} else
+			if (pat[2]=='<=') { out = '(-oo,'+pat[3]+']';} else
+			if (pat[2]=='>') { out = '('+pat[3]+',oo)';} else
+			if (pat[2]=='>=') { out = '['+pat[3]+',oo)';}
 		} else if (str.match(/all\s*real/i)) {
 			out = '(-oo,oo)';
 		} else {
@@ -163,8 +163,8 @@ function intcalculate(inputId,outputId,format) {
 		fullstr = fullstr.replace(/or/g,' or ');
 		var origstr = fullstr;
 		fullstr = ineqtointerval(fullstr);
-		var pats = str.match(/\b([a-zA-Z])\b/);
-		var pat = str.match(/([a-zA-Z]+)/);
+		var pats = str.match(/\b([a-zA-Z]\(\s*[a-zA-Z]\s*\)|[a-zA-Z]+\b)/);
+		var pat = str.match(/([a-zA-Z]\(\s*[a-zA-Z]\s*\)|[a-zA-Z]+)/);
 		var ineqvar = (pats != null)?pats[1]:((pat != null)?pat[1]:'');
 	  } else {
 		  fullstr = fullstr.replace(/\s+/g,'');
@@ -360,6 +360,10 @@ function complexcalc(inputId,outputId,format) {
 			} catch(e) {
 			    err = _("syntax incomplete");
 			}
+			if (real=="synerr" || imag=="synerr") {
+			    err = _("syntax incomplete");
+			    real = NaN;
+			}
 			if (!isNaN(real) && real!="Infinity" && !isNaN(imag) && imag!="Infinity") {
 				imag -= real;
 				if (cnt!=0) {
@@ -367,7 +371,7 @@ function complexcalc(inputId,outputId,format) {
 				}
 				outcalced += real+(imag>=0?'+':'')+imag+'i';
 			} else {
-				outcalced = err;
+				outcalced += err;
 				break;
 			}
 		}
@@ -576,6 +580,9 @@ function AMpreview(inputId,outputId) {
 	    with (Math) var res = scopedeval(totest);
 	  } catch(e) {
 	    err = _("syntax error");
+	  }
+	  if (res=="synerr") {
+	  	  err = _("syntax error");
 	  }
 	  tstpt++;
   }
@@ -868,6 +875,9 @@ function doonsubmit(form,type2,skipconfirm) {
 			} catch (e) {
 				vals[fj] = NaN;
 			}	
+			if (vals[fj]=="synerr") {
+				vals[fj] = NaN;
+			}
 		}
 		document.getElementById("qn" + qn+"-vals").value = vals.join(",");
 	}
@@ -876,8 +886,12 @@ function doonsubmit(form,type2,skipconfirm) {
 
 function scopedeval(c) {
 	var res;
-	with (Math) res = eval(c); 
-	return res;
+	try {
+		with (Math) res = eval(c);
+		return res;
+	} catch(e) {
+		return "synerr";
+	}
 }
 
 function arraysearch(needle,hay) {
