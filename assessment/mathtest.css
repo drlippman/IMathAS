@@ -319,6 +319,9 @@ td.matrixright {
 	margin: 0px;
 	padding: 0px;
 }
+table.paddedtable td, table.paddedtable th {
+	padding: 2px 5px;
+}
 td.c, table.stats tbody td.c {
 	text-align: center;
 }

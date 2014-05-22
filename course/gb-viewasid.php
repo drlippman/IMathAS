@@ -818,7 +818,6 @@
 				} else if ($scores[$i]==='N/A') {
 					echo '<div class="notanswered">';	
 				} else {
-					echo $scores[$i];
 					echo '<div>';
 				}
 				if ($canedit && $parts!='') {
