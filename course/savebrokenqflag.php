@@ -14,6 +14,12 @@ $query = "UPDATE imas_questionset SET broken='{$_GET['flag']}' WHERE id='{$_GET[
 mysql_query($query) or die("Query failed : $query " . mysql_error());
 if (mysql_affected_rows()>0) {
 	$ischanged = true;
+	if ($_GET['flag']==1) {
+		$now = time();
+		$msg = addslashes('Question '.intval($_GET['qsetid']).' marked broken by '.$userfullname);
+		$query = "INSERT INTO imas_log (time,log) VALUES($now,'$msg')";
+		mysql_query($query) or die("Query failed : $query " . mysql_error());
+	}
 }
 
 if ($ischanged) {
