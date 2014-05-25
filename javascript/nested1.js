@@ -319,7 +319,7 @@ function submitChanges() {
   var url = AHAHsaveurl;
   var els = document.getElementsByTagName("input");
   for (var i=0; i<els.length; i++) {
-	  if (els[i].type=="hidden") {
+	  if (els[i].type=="hidden" && els[i].value!="") {
 	  	  params += '&'+els[i].id.substring(5) + '=' + encodeURIComponent(els[i].value);
 	  } else if (els[i].type=="text" && els[i].className=="outcome") {
 		  params += '&'+els[i].id + '=' + encodeURIComponent(els[i].value);
@@ -412,6 +412,4 @@ function editinplaceun() {
 
 	el.style.display = 'inline';
 	this.style.display = "none";
-	
-	
 }
