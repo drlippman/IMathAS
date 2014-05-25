@@ -642,6 +642,10 @@ div.question img {
 	height: auto;
 }
 
+div.question td img, div.question th img {
+	max-width: 100%;
+}
+
 span.inlinebtn {
 	cursor: pointer;
 	border: 1px solid #000; 

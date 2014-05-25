@@ -244,7 +244,11 @@
 	$sdate = tzdate("m/d/Y",$now);
 	$edate = tzdate("m/d/Y",$wk);
 	$stime = tzdate("g:i a",$now);
-	$etime = tzdate("g:i a",$wk);
+	$hr = floor($coursedeftime/60)%12;
+	$min = $coursedeftime%60;
+	$am = ($coursedeftime<12*60)?'am':'pm';
+	$etime = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
+	//$etime = tzdate("g:i a",$wk);
 	echo "<span class=form>Available After:</span><span class=formright><input type=text size=10 name=sdate value=\"$sdate\">\n"; 
 	echo "<a href=\"#\" onClick=\"displayDatePicker('sdate', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></A>\n";
 	echo "at <input type=text size=10 name=stime value=\"$stime\"></span><BR class=form>\n";

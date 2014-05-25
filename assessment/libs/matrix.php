@@ -120,12 +120,19 @@ function matrixdisplaytable() {
   //
   // style sheets
   
-  $nopad = 'style="padding:0"';
+  $nopad = 'style="padding:0;"';
   $leftborder = "style='border-left:1px solid #999;padding-left:10px'";
   $preaug = 'style="padding-right:10px"';
   $preaugSimplex = 'style="padding-right:10px;border-top:1px solid #999;"';
   $Simplex = "style='border-top:1px solid #999;'";
   $leftborderSimplex = "style='border-left:1px solid #999;border-top:1px solid #999;'";
+  
+  $mbtopleft = "style='border-left:1px solid black;border-top:1px solid black;padding:0;'";
+  $mbleft = "style='border-left:1px solid black;padding:0;'";
+  $mbbotleft = "style='border-left:1px solid black;border-bottom:1px solid black;padding:0;'";
+  $mbtopright = "style='border-right:1px solid black;border-top:1px solid black;padding:0;'";
+  $mbright = "style='border-right:1px solid black;padding:0;'";
+  $mbbotright = "style='border-right:1px solid black;border-bottom:1px solid black;padding:0;'";
   
   // counts
   $rows = count($m);
@@ -142,25 +149,28 @@ function matrixdisplaytable() {
 	$Tableau .= "<tr>\n";
 	if($rloop==0) { 
 		if($matrixname!="") {
-		if(count($header)>0) { $matricnamerows = $rows+1; } else { $matricnamerows = $rows; }
-		$Tableau.= "<td rowspan='$matricnamerows'> $matrixname </td>\n";
+			if(count($header)>0) { $matricnamerows = $rows+1; } else { $matricnamerows = $rows; }
+			$Tableau.= "<td rowspan='$matricnamerows'> $matrixname </td>\n";
+		}
+		if(count($header)>0)  {
+			$Tableau.= "<td $nopad>&nbsp;</td>\n"; // for the left table border
+			for ($cloop=0;$cloop<$cols; $cloop++) {
+			  if(isset($header[$cloop])&&($header[$cloop]!=null)&&($header[$cloop]!="")) {
+			    $Tableau.= "<td>".$ticks.$header[$cloop].$ticks."</td>";
+			  } else {
+			    $Tableau.= "<td>&nbsp;</td>";
+			  }
+			}
+			$Tableau.= "<td $nopad>&nbsp;</td></tr>\n<tr>\n";  // for the right table border
+		}
+		
+		//add left matrix bracket
+		$Tableau.= "<td $mbtopleft>&nbsp;</td>";
+	} else if ($rloop==$lastrow) {
+		$Tableau.= "<td $mbbotleft>&nbsp;</td>";
+	} else {
+		$Tableau.= "<td $mbleft>&nbsp;</td>";
 	}
-	
-	if(count($header)>0)  {
-	$Tableau.= "<td $nopad>&nbsp;</td>\n"; // for the left table border
-	for ($cloop=0;$cloop<$cols; $cloop++) {
-	  if(isset($header[$cloop])&&($header[$cloop]!=null)&&($header[$cloop]!="")) {
-	    $Tableau.= "<td>".$ticks.$header[$cloop].$ticks."</td>";
-	  } else {
-	    $Tableau.= "<td>&nbsp;</td>";
-	  }
-	}
-	$Tableau.= "<td $nopad>&nbsp;</td></tr>\n<tr>\n";  // for the right table border
-	}
-	
-	//add left matrix bracket
-	$Tableau.= "<td rowspan='$rows' class='matrixleft' $nopad>&nbsp;</td>";
-	} // matrix name and headers
 	
 	for ($cloop=0;$cloop<$cols; $cloop++) {
 		$index =$rloop*$ctemp + $cloop;
@@ -189,7 +199,11 @@ function matrixdisplaytable() {
 	}
 	//add right matrix bracket
 	if($rloop==0) {
-		$Tableau.= "<td rowspan='$rows' class='matrixright' $nopad>&nbsp;</td>";  
+		$Tableau.= "<td $mbtopright>&nbsp;</td>"; 
+	} else if ($rloop==$lastrow) {
+		$Tableau.= "<td $mbbotright>&nbsp;</td>";
+	} else {
+		$Tableau.= "<td $mbright>&nbsp;</td>";
 	}
 	$Tableau.= "</tr>\n";
   }
