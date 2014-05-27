@@ -3637,6 +3637,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$correct = 0;
 		foreach($anarr as $i=>$answer) {
 			$foundloc = -1;
+			if (count($torem)>0) {
+				$answer = str_replace($torem,'',$answer);
+			}
 			foreach($gaarr as $j=>$givenans) {
 				$givenans = trim($givenans);
 		

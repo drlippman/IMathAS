@@ -658,16 +658,16 @@ span.inlinebtn {
 span.inlinebtn:hover {
 	background: #dfd;
 }
-span.feedbackwrap {
+.feedbackwrap {
 	display: block;
 	padding: 5px;
 	background: #fff;
 	border: 1px solid #ccc;
 }
-span.feedbackwrap.correct {
+.feedbackwrap.correct {
 	background: #efe;
 }
-span.feedbackwrap.incorrect {
+.feedbackwrap.incorrect {
 	background: #fee;
 }
 

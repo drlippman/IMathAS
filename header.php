@@ -82,7 +82,7 @@ if (!isset($sessiondata['mathdisp'])) {
 		echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=012314\" type=\"text/javascript\"></script>\n";
 	}
 	echo '<script type="text/x-mathjax-config">MathJax.Hub.Config({ 
-		"HTML-CSS": {preferredFont: "STIX", imageFont:null}
+		"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", imageFont:null}
 		});
 		</script>';
 	//echo '<script type="text/javascript" src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=AM_HTMLorMML"></script>';
