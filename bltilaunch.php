@@ -745,7 +745,7 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 				*/
 				//CHECK ME
 				//aid is in source course.  Let's see if we already copied it.
-				$query = "SELECT id FROM imas_assessments WHERE ancestors REGEXP '^".intval($_SESSION['place_aid'][1])."[[:>:]]' AND courseid=".intval($destcid);
+				$query = "SELECT id FROM imas_assessments WHERE ancestors REGEXP '[[:<:]]".intval($_SESSION['place_aid'][1])."[[:>:]]' AND courseid=".intval($destcid);
 				
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				if (mysql_num_rows($result)>0) {
