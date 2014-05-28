@@ -49,7 +49,7 @@ if (isset($_POST['mergefrom'])) {
 			foreach ($aitems as $k=>$aitem) {
 				if (strpos($aitem,'~')===FALSE) {
 					///$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category) ";
-					///$query .= "SELECT '$newtypeid',questionsetid,points,attempts,penalty,category FROM imas_questions WHERE id='$aitem'";
+					///$query .= "SELECT '$newaid',questionsetid,points,attempts,penalty,category FROM imas_questions WHERE id='$aitem'";
 					//mysql_query($query) or die("Query failed :$query " . mysql_error());
 					$query = "SELECT questionsetid,points,attempts,penalty,category,rubric FROM imas_questions WHERE id='$aitem'";
 					$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
@@ -57,7 +57,7 @@ if (isset($_POST['mergefrom'])) {
 					$rubric = array_pop($row);
 					$row = "'".implode("','",addslashes_deep($row))."'";
 					$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category) ";
-					$query .= "VALUES ('$newtypeid',$row)";
+					$query .= "VALUES ('$newaid',$row)";
 					mysql_query($query) or die("Query failed : $query" . mysql_error());
 					$newid = mysql_insert_id();
 					$newaitems[] = $newid;
@@ -72,7 +72,7 @@ if (isset($_POST['mergefrom'])) {
 					}
 					foreach ($sub as $subi) {
 						//$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category) ";
-						//$query .= "SELECT '$newtypeid',questionsetid,points,attempts,penalty,category FROM imas_questions WHERE id='$subi'";
+						//$query .= "SELECT '$newaid',questionsetid,points,attempts,penalty,category FROM imas_questions WHERE id='$subi'";
 						//mysql_query($query) or die("Query failed : $query" . mysql_error());
 						$query = "SELECT questionsetid,points,attempts,penalty,category,rubric FROM imas_questions WHERE id='$subi'";
 						$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
@@ -80,7 +80,7 @@ if (isset($_POST['mergefrom'])) {
 						$rubric = array_pop($row);
 						$row = "'".implode("','",addslashes_deep($row))."'";
 						$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category) ";
-						$query .= "VALUES ('$newtypeid',$row)";
+						$query .= "VALUES ('$newaid',$row)";
 						mysql_query($query) or die("Query failed : $query" . mysql_error());
 						$newid = mysql_insert_id();
 						$newsub[] = $newid;
