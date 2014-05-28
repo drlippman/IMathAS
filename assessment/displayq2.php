@@ -2117,7 +2117,15 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			}
 			for ($i=0; $i<count($grid); $i++) {
 				if ($grid[$i]!='') {
-					$settings[$i] = evalbasic($grid[$i]);
+					if (strpos($grid[$i],':')!==false) {
+						$pts = explode(':',$grid[$i]);
+						foreach ($pts as $k=>$v) {
+							$pts[$k] = evalbasic($v);
+						}
+						$settings[$i] = implode(':',$pts);
+					} else {
+						$settings[$i] = evalbasic($grid[$i]);
+					}
 				}
 			}
 			if (strpos($grid[4],'pi')!==false) {
