@@ -677,7 +677,7 @@
 								echo $feedback[$child];
 							}
 							echo "</textarea>";
-						} else if ($ownerid[$child]==$userid && $points[$child]!=null) {
+						} else if ($ownerid[$child]==$userid && $points[$child]!==null) {
 							echo '<div class="signup">Score: ';
 							echo "<span class=red>{$points[$child]} points</span><br/> ";
 							if ($feedback[$child]!==null && $feedback[$child]!='') {
