@@ -17,9 +17,36 @@ $cid = $_GET['cid'];
 $asid = $_GET['asid'];
 $aid = $_GET['aid'];
 $uid = $_GET['uid'];
+if (isset($_GET['stu'])) {
+	$stu = $_GET['stu'];
+} else {
+	$stu=0;
+}
+if (isset($_GET['from'])) {
+	$from = $_GET['from'];
+} else {
+	$from = 'gb';
+}
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a>";
-$curBreadcrumb .= "&gt; <a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; <a href=\"gb-viewasid.php?cid=$cid&asid=$asid&uid=$uid\">Assessment Detail</a> &gt Make Exception\n";
+$curBreadcrumb = $breadcrumbbase;
+if (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0) {
+	$curBreadcrumb .= "<a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; ";
+	if ($stu>0) {
+		$curBreadcrumb .= "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
+		$curBreadcrumb .= "&gt; <a href=\"gradebook.php?stu=$stu&cid=$cid\">Student Detail</a> &gt; ";
+	} else if ($_GET['from']=="isolate") {
+		$curBreadcrumb .= " <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
+		$curBreadcrumb .= "&gt; <a href=\"isolateassessgrade.php?cid=$cid&aid=$aid\">View Scores</a> &gt; ";	
+	} else if ($_GET['from']=="gisolate") {
+		$curBreadcrumb .= "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
+		$curBreadcrumb .= "&gt; <a href=\"isolateassessbygroup.php?cid=$cid&aid=$aid\">View Group Scores</a> &gt; ";	
+	}else if ($_GET['from']=='stugrp') {
+		$curBreadcrumb .= "<a href=\"managestugrps.php?cid=$cid&aid=$aid\">Student Groups</a> &gt; ";	
+	} else {
+		$curBreadcrumb .= "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; ";
+	}
+}
+$curBreadcrumb .= "<a href=\"gb-viewasid.php?cid=$cid&asid=$asid&uid=$uid\">Assessment Detail</a> &gt Make Exception\n";
 
 if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
@@ -98,12 +125,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			
 		}
 		
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-viewasid.php?cid=$cid&asid=$asid&uid=$uid");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-viewasid.php?cid=$cid&asid=$asid&uid=$uid&stu=$stu&from=$from");
 		
 	} else if (isset($_GET['clear'])) {
 		$query = "DELETE FROM imas_exceptions WHERE id='{$_GET['clear']}'";
 		mysql_query($query) or die("Query failed :$query " . mysql_error());
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-viewasid.php?cid=$cid&asid=$asid&uid=$uid");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-viewasid.php?cid=$cid&asid=$asid&uid=$uid&stu=$stu&from=$from");
 	} elseif (isset($_GET['aid']) && $_GET['aid']!='') {
 		$query = "SELECT LastName,FirstName FROM imas_users WHERE id='{$_GET['uid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -125,7 +152,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$savetitle = _('Create Exception');
 		if ($erow != null) {
 			$savetitle = _('Save Changes');
-			$page_isExceptionMsg = "<p>An exception already exists.  <button type=\"button\" onclick=\"window.location.href='exception.php?cid=$cid&aid={$_GET['aid']}&uid={$_GET['uid']}&clear={$erow[0]}&asid=$asid'\">"._("Clear Exception").'</button> or modify below.</p>';
+			$page_isExceptionMsg = "<p>An exception already exists.  <button type=\"button\" onclick=\"window.location.href='exception.php?cid=$cid&aid={$_GET['aid']}&uid={$_GET['uid']}&clear={$erow[0]}&asid=$asid&stu=$stu&from=$from'\">"._("Clear Exception").'</button> or modify below.</p>';
 			$sdate = tzdate("m/d/Y",$erow[1]);
 			$edate = tzdate("m/d/Y",$erow[2]);
 			$stime = tzdate("g:i a",$erow[1]);
@@ -133,7 +160,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}	
 	} 
 	//DEFAULT LOAD DATA MANIPULATION
-	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/exception.php?cid={$_GET['cid']}&uid={$_GET['uid']}&asid=$asid";
+	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/exception.php?cid={$_GET['cid']}&uid={$_GET['uid']}&asid=$asid&stu=$stu&from=$from";
 
 	$query = "SELECT id,name from imas_assessments WHERE courseid='$cid' ORDER BY name";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -180,7 +207,7 @@ if ($overwriteBody==1) {
 
 	if (isset($_GET['aid']) && $_GET['aid']!='') {
 ?>		
-	<form method=post action="exception.php?cid=<?php echo $cid ?>&aid=<?php echo $_GET['aid'] ?>&uid=<?php echo $_GET['uid'] ?>&asid=<?php echo $asid;?>">
+	<form method=post action="exception.php?cid=<?php echo $cid ?>&aid=<?php echo $_GET['aid'] ?>&uid=<?php echo $_GET['uid'] ?>&asid=<?php echo $asid;?>&from=<?php echo $from;?>">
 		<span class=form>Available After:</span>
 		<span class=formright>
 			<input type=text size=10 name=sdate value="<?php echo $sdate ?>"> 
