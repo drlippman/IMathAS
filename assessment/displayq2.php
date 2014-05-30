@@ -3462,6 +3462,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 		}
 		
+		if ($answerformat!="equation" && strpos($answer,'=')!==false) {
+			echo 'Your $answer contains an equal sign, but you do not have $answerformat="equation" set. This question probably will not work right.';
+		}
 		
 		$ansarr = explode(' or ',$answer);
 		foreach ($ansarr as $answer) {

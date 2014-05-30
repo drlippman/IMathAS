@@ -48,6 +48,7 @@ function fractiondiffdrandsfrom($list,$n) {
 //fractionparse(fraction)
 //converts a fraction into an array(num, denom)
 function fractionparse($f) {
+	if (is_array($f)) {return $f;}
 	$p = explode('/',trim($f));
 	if (count($p)==1) {
 		return array($p[0],1);
