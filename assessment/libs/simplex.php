@@ -689,7 +689,7 @@ function simplexcreateinequalities() {
     }
     
     // does the user want the inequality symbol included in the output?
-    if($includeinequalities==1) {$simplexestring[$r] .= $constraints[$r][1]." ".$constraints[$r][2]; }
+    if($includeinequalities==1) {$simplexestring[$row] .= $constraints[$r][1]." ".$constraints[$r][2]; }
     $simplexestring[$row] .= $tick;
   }
   
