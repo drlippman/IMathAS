@@ -2575,7 +2575,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				}
 			}
 		} else {
-			$gaarr = array(str_replace(array('$',','),'',$givenans));
+			$gaarr = array(str_replace(array('$',',',' '),'',$givenans));
 			if (strpos($answer,'[')===false && strpos($answer,'(')===false) {
 				$anarr = array(str_replace(',','',$answer));
 			} else {
@@ -2631,7 +2631,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 							$correct += 1; $foundloc = $j; break 2;
 						}
 					} else {//{if (is_numeric($givenans)) {
-						$givenans = preg_replace('/[^\-\d\.eE]/','',$givenans); //strip out units, dollar signs, whatever
+						//$givenans = preg_replace('/[^\-\d\.eE]/','',$givenans); //strip out units, dollar signs, whatever
+						$givenans = preg_replace('/^(\d*\.?\d*E?\d*).*$/','$1',trim($givenans)); //strip out units
 						if (is_numeric($givenans)) {
 							if (isset($reqsigfigs)) {
 								if ($givenans*$anans < 0) { continue;} //move on if opposite signs
