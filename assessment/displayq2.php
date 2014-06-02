@@ -3168,7 +3168,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		
 		$gaarr = explode(',',$givenans);
 		$anarr = explode(',',$answer);
-		
+	
 		if (count($gaarr)==0) {
 			return 0;
 		}
@@ -3177,15 +3177,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		foreach ($anarr as $i=>$answer) {
 			$cparts = parsecomplex($answer);
 			if (!is_array($cparts)) {
-				//echo $cparts;
+				$ansparts = parsesloppycomplex($answer);
 			} else {
 				$ansparts[0] = eval('return ('.mathphp($cparts[0],null).');');
 				$ansparts[1] = eval('return ('.mathphp($cparts[1],null).');');
-			
-				//eval('$ansparts[0] = '.$cparts[0].';');
-				//eval('$ansparts[1] = '.$cparts[1].';');
 			}
 			$foundloc = -1;
+			
 			foreach ($gaarr as $j=>$givenans) {
 				$cparts = parsecomplex($givenans);
 				if (!is_array($cparts)) {
@@ -5372,6 +5370,14 @@ function checkreqtimes($tocheck,$rtimes) {
 		}
 	}
 	return 1;
+}
+
+function parsesloppycomplex($v) {
+	$v = mathphp($v,'i');
+	$v = str_replace('(i)','($i)',$v);
+	$a = eval('$i=0;return ('.$v.');');
+	$apb = eval('$i=1;return ('.$v.');');
+	return array($a,$apb-$a);
 }
 
 //parses complex numbers.  Can handle anything, but only with
