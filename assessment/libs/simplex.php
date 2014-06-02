@@ -2,10 +2,10 @@
 // Simplex method functions
 // Mike Jenck, Originally developed May 16-26, 2014
 // licensed under GPL version 2
-
+// 2014-06-02 Bug fixes and added simplexreadtoanswerarray
 
 global $allowedmacros;
-array_push($allowedmacros, "simplex", "simplexcreateanswerboxentrytable", "simplexcreateinequalities", "simplexconverttodecimals", "simplexconverttofraction", "simplexdebug", "simplexdefaultheaders",  "simplexdisplaytable", "simplexfindpivotpoint", "simplexgetentry", "simplexpivot", "simplexsolve", "simplexreadsolution" );
+array_push($allowedmacros, "simplex", "simplexcreateanswerboxentrytable", "simplexreadtoanswerarray", "simplexcreateinequalities", "simplexconverttodecimals", "simplexconverttofraction", "simplexdebug", "simplexdefaultheaders",  "simplexdisplaytable", "simplexfindpivotpoint", "simplexgetentry", "simplexpivot", "simplexsolve", "simplexreadsolution" );
 
 
 include_once("fractions.php");  // fraction routine
@@ -370,6 +370,26 @@ function simplex($type,$objective,$constraints) {
   $sm[$lastrow][$slackend] = array(0,1); //createsimplexelement(0);
   
   return $sm;
+}
+
+//function simplexreadtoanswerarray(sm, [startnumber, answer]) 
+// Create an array of values read by rows for the simplex matrix starting at startnumber
+// sm:          simplex martix to read
+// startnumber: starting number of the array.  Default is 0 
+// answer: pass $answer if extending an existing $answer array
+function simplexreadtoanswerarray($sm, $startnumber=0, $ans=array()) {
+  
+  $rows = count($sm);
+  $cols = count($sm[0]);
+  
+  for ($r=0; $r<$rows; $r++) {
+    for ($c=0;$c<$cols; $c++) {
+        $index = $r*$cols+$c + $startnumber;
+        $ans[$index] = simplexgetentry($sm,$r,$c);
+    }
+  }
+  
+  return $ans;
 }
 
 //function simplexcreateanswerboxentrytable(rows, cols, [startnumber, matrixname, linemode, header, tablestyle]) 
@@ -1223,20 +1243,20 @@ function simplexfindpivotpoint($sm) {
   return array($pivotcondition, $pivotpoints);
 }
 
-//matrixgetentry(simplexmatrix,row,col)
+//simplexgetentry(simplexmatrix,row,col)
 //get entry from a simplex matrix at given row and col
 //rows and cols are 0 indexed (first row is row 0)
 function simplexgetentry($sm,$r,$c) {
-  if ($r<0 || $r>=count($m)) {
+  if ($r<0 || $r>=count($sm)) {
     echo "$r is an invalid row.<br/>\r\n";
     return 0;
   } 
   
-  if ($c<0 || $c>=count($m[0])) {
+  if ($c<0 || $c>=count($sm[0])) {
     echo "$c is an invalid column.<br/>\r\n";
 	return 0;
   } 
-  return fractionreduce($m[$r][$c]);
+  return fractionreduce($sm[$r][$c]);
 }
 
 // $sm[0]($m,$pivotpoint)

@@ -3,6 +3,7 @@
 &nbsp;Simplex method functions
 <BR>&nbsp;Mike Jenck, Originally developed May 16-26, 2014
 <BR>&nbsp;licensed under GPL version 2
+<BR>&nbsp;2014-06-02 Bug fixes and added simplexreadtoanswerarray
 <BR><ul>
 <li><a href="#createsimplexelement">createsimplexelement</a></li>
 <li><a href="#simplextoarray">simplextoarray</a></li>
@@ -12,6 +13,7 @@
 <li><a href="#verifyconstraints">verifyconstraints</a></li>
 <li><a href="#simplexdebug">simplexdebug</a></li>
 <li><a href="#simplex">simplex</a></li>
+<li><a href="#simplexreadtoanswerarray">simplexreadtoanswerarray</a></li>
 <li><a href="#simplexcreateanswerboxentrytable">simplexcreateanswerboxentrytable</a></li>
 <li><a href="#simplexcreateinequalities">simplexcreateinequalities</a></li>
 <li><a href="#simplexdefaultheaders">simplexdefaultheaders</a></li>
@@ -87,6 +89,12 @@ function simplexdebug(sm)
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;first part: array(3,0,1) or "3,0,1"
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;second part: "<="
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;third part: 35
+<BR><h3><a name="simplexreadtoanswerarray">simplexreadtoanswerarray</a></h3>
+function simplexreadtoanswerarray(sm, [startnumber, answer]) 
+<BR>&nbsp;Create an array of values read by rows for the simplex matrix starting at startnumber
+<BR>&nbsp;sm:          simplex martix to read
+<BR>&nbsp;startnumber: starting number of the array.  Default is 0 
+<BR>&nbsp;answer: pass $answer if extending an existing $answer array
 <BR><h3><a name="simplexcreateanswerboxentrytable">simplexcreateanswerboxentrytable</a></h3>
 function simplexcreateanswerboxentrytable(rows, cols, [startnumber, matrixname, linemode, header, tablestyle]) 
 <BR>&nbsp;Create a string that is a valid HTML table syntax for displaying answerboxes.
@@ -164,7 +172,7 @@ simplexdisplaytable(simplexmatrix, [simplexmatrixname, displayASCIIticks, linemo
 <BR>&nbsp;$tablestyle: for any additional styles for the table that you may want.  like "color:#40B3DF;"
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default none
 <BR><h3><a name="simplexgetentry">simplexgetentry</a></h3>
-matrixgetentry(simplexmatrix,row,col)
+simplexgetentry(simplexmatrix,row,col)
 <BR>get entry from a simplex matrix at given row and col
 <BR>rows and cols are 0 indexed (first row is row 0)
 <BR><h3><a name="simplexpivot">simplexpivot</a></h3>
