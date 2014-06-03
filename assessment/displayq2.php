@@ -3825,6 +3825,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				}
 				foreach ($orarr as $opt) {
 					$opt = trim($opt);
+					if ($opt=='DNE') {continue;}
 					$opts = explode(',',substr($opt,1,strlen($opt)-2));
 					if (strpos($opts[0],'oo')===false &&  !checkanswerformat($opts[0],$ansformats)) {
 						return 0;
@@ -3836,6 +3837,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 			
 		}
+
 		if ($givenans == null) {return 0;}
 		$correct = 0;
 		$ansar = explode(' or ',$answer);
