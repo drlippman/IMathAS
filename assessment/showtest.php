@@ -2546,35 +2546,35 @@ if (!isset($_POST['embedpostback'])) {
 			}
 			if ((unans($scores[$i]) && $attempts[$i]==0) || ($noindivscores && amreattempting($i))) {
 				if (isset($CFG['TE']['navicons'])) {
-					echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['untried']}\"/> ";
+					echo "<img alt=\"untried\" src=\"$imasroot/img/{$CFG['TE']['navicons']['untried']}\"/> ";
 				} else {
-				echo "<img src=\"$imasroot/img/q_fullbox.gif\"/> ";
+				echo "<img alt=\"untried\" src=\"$imasroot/img/q_fullbox.gif\"/> ";
 				}
 			} else if (canimprove($i) && !$noindivscores) {
 				if (isset($CFG['TE']['navicons'])) {
 					if ($thisscore==0 || $noindivscores) {
-						echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['canretrywrong']}\"/> ";
+						echo "<img alt=\"incorrect - can retry\" src=\"$imasroot/img/{$CFG['TE']['navicons']['canretrywrong']}\"/> ";
 					} else {
-						echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['canretrypartial']}\"/> ";
+						echo "<img alt=\"partially correct - can retry\" src=\"$imasroot/img/{$CFG['TE']['navicons']['canretrypartial']}\"/> ";
 					}
 				} else {
-				echo "<img src=\"$imasroot/img/q_halfbox.gif\"/> ";
+				echo "<img alt=\"can retry\" src=\"$imasroot/img/q_halfbox.gif\"/> ";
 				}
 			} else {
 				if (isset($CFG['TE']['navicons'])) {
 					if (!$showeachscore) {
-						echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['noretry']}\"/> ";
+						echo "<img alt=\"cannot retry\" src=\"$imasroot/img/{$CFG['TE']['navicons']['noretry']}\"/> ";
 					} else {
 						if ($thisscore == $qi[$questions[$i]]['points']) {
-							echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['correct']}\"/> ";
+							echo "<img alt=\"correct\" src=\"$imasroot/img/{$CFG['TE']['navicons']['correct']}\"/> ";
 						} else if ($thisscore==0) { 
-							echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['wrong']}\"/> ";
+							echo "<img alt=\"incorrect - cannot retry\" src=\"$imasroot/img/{$CFG['TE']['navicons']['wrong']}\"/> ";
 						} else {
-							echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['partial']}\"/> ";
+							echo "<img alt=\"partially correct - cannot retry\" src=\"$imasroot/img/{$CFG['TE']['navicons']['partial']}\"/> ";
 						}
 					}
 				} else {
-					echo "<img src=\"$imasroot/img/q_emptybox.gif\"/> ";
+					echo "<img alt=\"cannot retry\" src=\"$imasroot/img/q_emptybox.gif\"/> ";
 				}
 			}
 			
