@@ -20,7 +20,11 @@ function calculate(inputId,outputId,format) {
 		  str = "`"+str+"`";
 	  } else {
 		  err += singlevalsyntaxcheck(str,format);
-		  str = str.replace(/\s/g,'');
+		  if (format.indexOf('mixednumber')!=-1) {
+		  	  str = str.replace(/_/,' ');
+		  } else {
+		  	  str = str.replace(/\s/g,'');
+		  }
 		  err += syntaxcheckexpr(str,format);
 		  try {
 			  var evalstr = str;
@@ -147,6 +151,11 @@ function intcalculate(inputId,outputId,format) {
 				  var err = "";
 				  res = NaN;
 				  err += singlevalsyntaxcheck(vals[j], format);
+				  if (format.indexOf('mixednumber')!=-1) {
+					  vals[j] = vals[j].replace(/_/,' ');
+				  } else {
+					  vals[j] = vals[j].replace(/\s/g,'');
+				  }
 				  err += syntaxcheckexpr(vals[j], format);
 				  
 				  if (err=='') {
@@ -269,6 +278,11 @@ function ntuplecalc(inputId,outputId,format) {
 				    err += _("syntax incomplete")+". ";
 				}
 				err += singlevalsyntaxcheck(sub, format);
+				if (format.indexOf('mixednumber')!=-1) {
+					  sub = sub.replace(/_/,' ');
+				  } else {
+					  sub = sub.replace(/\s/g,'');
+				  }
 				err += syntaxcheckexpr(sub, format);
 				if (!isNaN(res) && res!="Infinity") {
 					outcalced += res;
