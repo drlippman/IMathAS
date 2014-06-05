@@ -319,6 +319,20 @@ td.matrixright {
 	margin: 0px;
 	padding: 0px;
 }
+
+table.paddedtable tr.onepixel { line-height: 1px;}
+table.paddedtable td.matrixtopborder {border-top:1px solid black;padding:0;}
+table.paddedtable td.matrixtopleftborder { border-left:1px solid black;border-top:1px solid black;padding:0;width:5px; }
+table.paddedtable td.matrixtoprightborder { border-right:1px solid black;border-top:1px solid black;padding:0;width:5px; }
+table.paddedtable td.matrixleftborder { border-left:1px solid black;padding:0;width:5px; }
+table.paddedtable td.matrixrightborder { border-right:1px solid black;padding:0;width:5px; }
+table.paddedtable td.matrixbottomleftborder { border-left:1px solid black;border-bottom:1px solid black;padding:0;width:5px; }
+table.paddedtable td.matrixbottomrightborder { border-right:1px solid black;border-bottom:1px solid black;padding:0;width:5px; }
+table.paddedtable td.nopad { padding:0;	width: 5px;}
+
+table.paddedtable td, table.paddedtable th {
+	padding: 2px 5px;
+}
 td.c, table.stats tbody td.c {
 	text-align: center;
 }
@@ -639,6 +653,10 @@ div.question img {
 	height: auto;
 }
 
+div.question td img, div.question th img {
+	max-width: 100%;
+}
+
 span.inlinebtn {
 	cursor: pointer;
 	border: 1px solid #000; 
@@ -651,16 +669,16 @@ span.inlinebtn {
 span.inlinebtn:hover {
 	background: #dfd;
 }
-span.feedbackwrap {
+.feedbackwrap {
 	display: block;
 	padding: 5px;
 	background: #fff;
 	border: 1px solid #ccc;
 }
-span.feedbackwrap.correct {
+.feedbackwrap.correct {
 	background: #efe;
 }
-span.feedbackwrap.incorrect {
+.feedbackwrap.incorrect {
 	background: #fee;
 }
 

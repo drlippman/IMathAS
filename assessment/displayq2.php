@@ -182,8 +182,8 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if (isset($snaptogrid)) {$options['snaptogrid'] = $snaptogrid;}
 	if (isset($background)) {$options['background'] = $background;}
 	
-	if ($qdata['qtype']=='conditional' || isset($GLOBALS['nocolormark'])) {
-		$qcolors = array(); //no colors for conditional type
+	if (isset($GLOBALS['nocolormark'])) {  //no colors 
+		$qcolors = array();
 	}
 	if ($qdata['qtype']=="multipart" || $qdata['qtype']=='conditional') {
 		if (!is_array($anstypes)) {
@@ -214,7 +214,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		}
 		$laparts = explode("&",$la);
 		foreach ($anstypes as $kidx=>$anstype) {
-			$qcol = isset($qcolors[$kidx])?(is_numeric($qcolors[$kidx])?rawscoretocolor($qcolors[$kidx],$answeights[$kidx]):$qcolors[$kidx]):'';
+			$qcol = ($qdata['qtype']=="multipart" && isset($qcolors[$kidx]))?(is_numeric($qcolors[$kidx])?rawscoretocolor($qcolors[$kidx],$answeights[$kidx]):$qcolors[$kidx]):'';
 			list($answerbox[$kidx],$tips[$kidx],$shanspt[$kidx],$previewloc[$kidx]) = makeanswerbox($anstype,$kidx,$laparts[$kidx],$options,$qnidx+1,$qcol);
 		}
 	} else {
@@ -222,6 +222,10 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		list($answerbox,$tips[0],$shanspt[0],$previewloc) = makeanswerbox($qdata['qtype'],$qnidx,$la,$options,0,$qcol);
 	}
 	if ($qdata['qtype']=='conditional') {
+		$qcol = isset($qcolors[0])?(is_numeric($qcolors[0])?rawscoretocolor($qcolors[0],1):$qcolors[0]):'';
+		if ($qcol!='') {
+			$toevalqtxt = '<div class=\\"'.$qcol.'\\">'.$toevalqtxt.str_replace('"','\\"',getcolormark($qcol)).'</div>';
+		}
 		if (!isset($showanswer)) {
 			$showanswer = _('Answers may vary');
 		}
@@ -1805,7 +1809,13 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				} else {
 					$qnref = ($multi-1).'-'.($qn%1000);
 				}
-				$out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
+				if ($useeqnhelper && $displayformat == 'usepreview') {
+					$out .= "onfocus=\"showeedd('qn$qn',$useeqnhelper);showehdd('qn$qn','$shorttip','$qnref');\" onblur=\"hideee();hideeedd();hideeh();\" onclick=\"reshrinkeh('qn$qn')\" ";
+				} else {
+					$out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" onclick=\"reshrinkeh('qn$qn')\" ";
+				}
+			} else if ($useeqnhelper && $displayformat == 'usepreview') {
+				$out .= "onfocus=\"showeedd('qn$qn',$useeqnhelper)\" onblur=\"hideee();hideeedd();\" ";
 			}
 			$addlclass = '';
 			if ($displayformat=='debit') { $out .= 'onkeyup="editdebit(this)" style="text-align: right;" ';}
@@ -1814,6 +1824,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= "class=\"text $colorbox$addlclass\""; 
 			$out .= '/>';
 			$out .= getcolormark($colorbox);
+			
 			if ($displayformat == 'usepreview') {
 				$preview .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"stringqpreview('qn$qn','p$qn','$answerformat')\" /> &nbsp;\n";
 				$preview .= "<span id=p$qn></span> ";
@@ -2117,7 +2128,15 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			}
 			for ($i=0; $i<count($grid); $i++) {
 				if ($grid[$i]!='') {
-					$settings[$i] = evalbasic($grid[$i]);
+					if (strpos($grid[$i],':')!==false) {
+						$pts = explode(':',$grid[$i]);
+						foreach ($pts as $k=>$v) {
+							$pts[$k] = evalbasic($v);
+						}
+						$settings[$i] = implode(':',$pts);
+					} else {
+						$settings[$i] = evalbasic($grid[$i]);
+					}
 				}
 			}
 			if (strpos($grid[4],'pi')!==false) {
@@ -2318,7 +2337,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		
 		$la = str_replace(array('(',')'),array('[',']'),$la);
 		$la = explode(';;',$la);
-		$la[0] = '['.str_replace(';','],[',$la[0]).']';
+		if ($la[0]!='') {
+			$la[0] = '['.str_replace(';','],[',$la[0]).']';
+		}
 		$la = '[['.implode('],[',$la).']]';
 		
 		$out .= "drawla[$qn] = $la;</script>";
@@ -2554,7 +2575,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				}
 			}
 		} else {
-			$gaarr = array(str_replace(array('$',','),'',$givenans));
+			$gaarr = array(str_replace(array('$',',',' '),'',$givenans));
 			if (strpos($answer,'[')===false && strpos($answer,'(')===false) {
 				$anarr = array(str_replace(',','',$answer));
 			} else {
@@ -2610,7 +2631,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 							$correct += 1; $foundloc = $j; break 2;
 						}
 					} else {//{if (is_numeric($givenans)) {
-						$givenans = preg_replace('/[^\-\d\.eE]/','',$givenans); //strip out units, dollar signs, whatever
+						//$givenans = preg_replace('/[^\-\d\.eE]/','',$givenans); //strip out units, dollar signs, whatever
+						$givenans = preg_replace('/^(-?\d*\.?\d*E?\d*).*$/','$1',trim($givenans)); //strip out units
 						if (is_numeric($givenans)) {
 							if (isset($reqsigfigs)) {
 								if ($givenans*$anans < 0) { continue;} //move on if opposite signs
@@ -3146,7 +3168,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		
 		$gaarr = explode(',',$givenans);
 		$anarr = explode(',',$answer);
-		
+	
 		if (count($gaarr)==0) {
 			return 0;
 		}
@@ -3155,15 +3177,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		foreach ($anarr as $i=>$answer) {
 			$cparts = parsecomplex($answer);
 			if (!is_array($cparts)) {
-				//echo $cparts;
+				$ansparts = parsesloppycomplex($answer);
 			} else {
 				$ansparts[0] = eval('return ('.mathphp($cparts[0],null).');');
 				$ansparts[1] = eval('return ('.mathphp($cparts[1],null).');');
-			
-				//eval('$ansparts[0] = '.$cparts[0].';');
-				//eval('$ansparts[1] = '.$cparts[1].';');
 			}
 			$foundloc = -1;
+			
 			foreach ($gaarr as $j=>$givenans) {
 				$cparts = parsecomplex($givenans);
 				if (!is_array($cparts)) {
@@ -3452,6 +3472,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 		}
 		
+		if ($answerformat!="equation" && strpos($answer,'=')!==false) {
+			echo 'Your $answer contains an equal sign, but you do not have $answerformat="equation" set. This question probably will not work right.';
+		}
 		
 		$ansarr = explode(' or ',$answer);
 		foreach ($ansarr as $answer) {
@@ -3635,6 +3658,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$correct = 0;
 		foreach($anarr as $i=>$answer) {
 			$foundloc = -1;
+			if (count($torem)>0) {
+				$answer = str_replace($torem,'',$answer);
+			}
 			foreach($gaarr as $j=>$givenans) {
 				$givenans = trim($givenans);
 		
@@ -3799,6 +3825,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				}
 				foreach ($orarr as $opt) {
 					$opt = trim($opt);
+					if ($opt=='DNE') {continue;}
 					$opts = explode(',',substr($opt,1,strlen($opt)-2));
 					if (strpos($opts[0],'oo')===false &&  !checkanswerformat($opts[0],$ansformats)) {
 						return 0;
@@ -3810,6 +3837,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 			
 		}
+
 		if ($givenans == null) {return 0;}
 		$correct = 0;
 		$ansar = explode(' or ',$answer);
@@ -3926,6 +3954,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$reltolerance = 1; 
 			}
 		}
+
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$GLOBALS['partlastanswer'] = $givenans;
 		
@@ -4003,7 +4032,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					array_pop($line);
 				}
 			}
-			
 			
 			$matchstu = array();
 			for ($i=0; $i<count($ansdots); $i++) {
@@ -5344,6 +5372,14 @@ function checkreqtimes($tocheck,$rtimes) {
 		}
 	}
 	return 1;
+}
+
+function parsesloppycomplex($v) {
+	$v = mathphp($v,'i');
+	$v = str_replace('(i)','($i)',$v);
+	$a = eval('$i=0;return ('.$v.');');
+	$apb = eval('$i=1;return ('.$v.');');
+	return array($a,$apb-$a);
 }
 
 //parses complex numbers.  Can handle anything, but only with

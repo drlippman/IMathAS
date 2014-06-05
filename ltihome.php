@@ -3,6 +3,10 @@
 //(c) 2011 David Lippman
 
 require("validate.php");
+if (!isset($sessiondata['ltirole']) || $sessiondata['ltirole']!='instructor') {
+	echo "Not authorized to view this page";
+	exit;
+}
 //decide what we need to display
 if ($sessiondata['ltiitemtype']==0) {
 	$hascourse = true;

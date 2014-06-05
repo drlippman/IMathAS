@@ -39,7 +39,7 @@ div.breadcrumb { display:none;}
 <script type="text/javascript">
 var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && is_numeric($cid))?$cid:0; ?>;
 </script>
-<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js?ver=121713"></script>
+<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js?ver=060414"></script>
 <?php
 //$sessiondata['mathdisp'] = 3;
 //writesessiondata();
@@ -82,7 +82,7 @@ if (!isset($sessiondata['mathdisp'])) {
 		echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=012314\" type=\"text/javascript\"></script>\n";
 	}
 	echo '<script type="text/x-mathjax-config">MathJax.Hub.Config({ 
-		"HTML-CSS": {preferredFont: "STIX", imageFont:null}
+		"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", imageFont:null}
 		});
 		</script>';
 	//echo '<script type="text/javascript" src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=AM_HTMLorMML"></script>';

@@ -591,13 +591,13 @@
 	     var qtextbox =  document.getElementById(el);
 	     if ((el=="qtext" && editoron==0) || (el=="solution" && seditoron==0)) {
 	        qtextbox.rows += 3;
-		qtextbox.value = qtextbox.value.replace(/<span\s+class="AM"[^>]*>(.*?)<\\/span>/,"$1");
-	        qtextbox.value = qtextbox.value.replace(/`(.*?)`/,\'<span class="AM" title="$1">`$1`</span>\');
+		qtextbox.value = qtextbox.value.replace(/<span\s+class="AM"[^>]*>(.*?)<\\/span>/g,"$1");
+	        qtextbox.value = qtextbox.value.replace(/`(.*?)`/g,\'<span class="AM" title="$1">`$1`</span>\');
 	        initeditor("exact",el,1);
 	     } else {
 		tinyMCE.execCommand("mceRemoveControl",true,el);
 		qtextbox.rows -= 3;
-		qtextbox.value = qtextbox.value.replace(/<span\s+class="AM"[^>]*>(.*?)<\\/span>/,"$1");
+		qtextbox.value = qtextbox.value.replace(/<span\s+class="AM"[^>]*>(.*?)<\\/span>/g,"$1");
 	     }
 	     if (el=="qtext") {
 	     	editoron = 1 - editoron;

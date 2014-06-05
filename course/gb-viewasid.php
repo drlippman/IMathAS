@@ -33,7 +33,7 @@
 		//Gbmode : Links NC Dates
 		$totonleft = floor($gbmode/1000)%10 ; //0 right, 1 left
 		$links = ((floor($gbmode/100)%10)&1); //0: view/edit, 1 q breakdown
-		$hidenc = (floor($gbmode/10)%10)%3; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
+		$hidenc = (floor($gbmode/10)%10)%4; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
 		$availshow = $gbmode%10; //0: past, 1 past&cur, 2 all
 	} else {
 		$links = 0;
@@ -520,11 +520,11 @@
 		if ($isteacher) {
 			if (isset($exped) && $exped!=$line['enddate']) {
 				echo "<p>Has exception, with due date: ".tzdate("F j, Y, g:i a",$exped);
-				echo "  <button type=\"button\" onclick=\"window.location.href='exception.php?cid=$cid&aid={$line['assessmentid']}&uid={$_GET['uid']}&asid={$_GET['asid']}'\">Edit Exception</button>";
+				echo "  <button type=\"button\" onclick=\"window.location.href='exception.php?cid=$cid&aid={$line['assessmentid']}&uid={$_GET['uid']}&asid={$_GET['asid']}&from=$from&stu=$stu'\">Edit Exception</button>";
 				echo "<br/>Original Due Date: ". tzdate("F j, Y, g:i a",$line['enddate']);
 			} else {
 				echo "<p>Due Date: ". tzdate("F j, Y, g:i a",$line['enddate']);
-				echo "  <button type=\"button\" onclick=\"window.location.href='exception.php?cid=$cid&aid={$line['assessmentid']}&uid={$_GET['uid']}&asid={$_GET['asid']}'\">Make Exception</button>";
+				echo "  <button type=\"button\" onclick=\"window.location.href='exception.php?cid=$cid&aid={$line['assessmentid']}&uid={$_GET['uid']}&asid={$_GET['asid']}&from=$from&stu=$stu'\">Make Exception</button>";
 			}
 			echo "</p>";
 		}
@@ -660,10 +660,10 @@
 			function hidecorrect() {
 				var butn = $("#hctoggle");
 				if (!butn.hasClass("hchidden")) {
-					butn.html("'._('Show Questions with Perfect Scores').'");
+					butn.html("'._('Show Correct Questions').'");
 					butn.addClass("hchidden");
 				} else {
-					butn.html("'._('Hide Questions with Perfect Scores').'");
+					butn.html("'._('Hide Correct Questions').'");
 					butn.removeClass("hchidden");
 				}
 				$(".iscorrect").toggle();
@@ -736,14 +736,14 @@
 			});
 			</script>';
 		
-		echo '<p><button type="button" id="hctoggle" onclick="hidecorrect()">'._('Hide Questions with Perfect Scores').'</button>';
+		echo '<p><button type="button" id="hctoggle" onclick="hidecorrect()">'._('Hide Correct Questions').'</button>';
 		echo ' <button type="button" id="hnatoggle" onclick="hideNA()">'._('Hide Unanswered Questions').'</button>';
 		echo ' <button type="button" id="showanstoggle" onclick="showallans()">'._('Show All Answers').'</button></p>';
 		$total = 0;
 		
 		for ($i=0; $i<count($questions);$i++) {
 			echo "<div ";
-			if (getpts($scores[$i])==$pts[$questions[$i]]) {
+			if ($canedit && ((isset($rawscores) && isperfect($rawscores[$i])) || getpts($scores[$i])==$pts[$questions[$i]])) {
 				echo 'class="iscorrect"';	
 			} else if ($scores[$i]==-1) {
 				echo 'class="notanswered"';	
@@ -813,12 +813,11 @@
 			}
 			echo "in {$attempts[$i]} attempt(s)\n";
 			if ($isteacher || $istutor) {
-				if ($canedit && getpts($scores[$i])==$pts[$questions[$i]]) {
+				if ($canedit && ((isset($rawscores) && isperfect($rawscores[$i])) || getpts($scores[$i])==$pts[$questions[$i]])) {
 					echo '<div class="iscorrect">';
 				} else if ($scores[$i]==='N/A') {
 					echo '<div class="notanswered">';	
 				} else {
-					echo $scores[$i];
 					echo '<div>';
 				}
 				if ($canedit && $parts!='') {
@@ -1085,6 +1084,16 @@ function getpts($sc) {
 		}
 		return round($tot,1);
 	}
+}
+function isperfect($sc) {
+	if (strpos($sc,'~')===false) {
+		if ($sc==1) {
+			return true;
+		}
+	} else if (strpos($sc,'.')===false && strpos($sc,'0')===false) {
+		return true;
+	}
+	return false;
 }
 function getasidquery($asid) {
 	$query = "SELECT agroupid,assessmentid FROM imas_assessment_sessions WHERE id='$asid'";

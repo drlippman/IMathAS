@@ -4,6 +4,7 @@ Matrix functions.  Version 1.4, Nov 22, 2008
 <BR><ul>
 <li><a href="#matrix">matrix</a></li>
 <li><a href="#matrixformat">matrixformat</a></li>
+<li><a href="#matrixdisplaytable">matrixdisplaytable</a></li>
 <li><a href="#matrixsystemdisp">matrixsystemdisp</a></li>
 <li><a href="#matrixgetentry">matrixgetentry</a></li>
 <li><a href="#matrixgetrow">matrixgetrow</a></li>
@@ -23,7 +24,9 @@ Matrix functions.  Version 1.4, Nov 22, 2008
 <li><a href="#matrixrandinvertible">matrixrandinvertible</a></li>
 <li><a href="#matrixrandunreduce">matrixrandunreduce</a></li>
 <li><a href="#matrixinverse">matrixinverse</a></li>
+<li><a href="#matrixinversefrac">matrixinversefrac</a></li>
 <li><a href="#matrixsolve">matrixsolve</a></li>
+<li><a href="#matrixsolvefrac">matrixsolvefrac</a></li>
 <li><a href="#polyregression">polyregression</a></li>
 </ul>
 <h3><a name="matrix">matrix</a></h3>
@@ -37,6 +40,25 @@ matrix(vals,rows,cols)
 <BR><h3><a name="matrixformat">matrixformat</a></h3>
 matrixformat(matrix)
 <BR>Formats a matrix item into an ASCIIMath string for display or $answer
+<BR><h3><a name="matrixdisplaytable">matrixdisplaytable</a></h3>
+matrixdisplaytable(matrix, [matrixname, displayASCIIticks, linemode, header, tablestyle]) 
+<BR> Create a string that is a valid HTML table syntax for display.
+<BR> matrix: a matrix to be displayed in a HTML table
+<BR> matrixname: a string that holds the matrix name, like A or B.  This does not contain 
+<BR>   tick marks - if you want them you need to supply them.
+<BR>     default empty string
+<BR> displayASCIIticks: put tick marks around each element of the table, either 0 or 1.  
+<BR>   Use 0 if you are building an answerbox matrix.
+<BR>     0 do not use math ticks (default)
+<BR>     1 use math ticks
+<BR> linemode: Show none, augments, or simplex, value is either 0, 1 or 2
+<BR>    0 show no lines  (default)
+<BR>    1 show aumented line
+<BR>    2 show simplex  lines
+<BR> header: list or array of the variables "x1,x2,x3" that are used for the column titles.
+<BR>     default none
+<BR> tablestyle: for any additional styles for the table that you may want.  like "color:#40B3DF;"
+<BR>     default none
 <BR><h3><a name="matrixsystemdisp">matrixsystemdisp</a></h3>
 matrixsystemdisp(matrix,[variables])
 <BR>Writes out a matrix as an equivalent system of equations
@@ -104,12 +126,25 @@ matrixrandunreduce(m,n)
 <BR><h3><a name="matrixinverse">matrixinverse</a></h3>
 matrixinverse(m)
 <BR>Finds the inverse of nxn matrices.
+<BR><h3><a name="matrixinversefrac">matrixinversefrac</a></h3>
+matrixinversefrac(m)
+<BR>Finds the inverse of nxn matrices, with the resulting entries as fractions
+<BR>the fraction entries are strings, so do NOT try to use the result of this
+<BR>for calculations.
 <BR><h3><a name="matrixsolve">matrixsolve</a></h3>
 matrixsolve(A,b)
 <BR>solves the matrix equation Ax = b
 <BR>A and b are both matrices
 <BR>A is nxn, b is nxm
 <BR>returns nxm matrix x so Ax = b
+<BR><h3><a name="matrixsolvefrac">matrixsolvefrac</a></h3>
+matrixsolverac(A,b)
+<BR>solves the matrix equation Ax = b
+<BR>A and b are both matrices
+<BR>A is nxn, b is nxm
+<BR>returns nxm matrix x so Ax = b
+<BR>entries may be fractions (as strings), so don't 
+<BR>try to use the result in calculations. 
 <BR><h3><a name="polyregression">polyregression</a></h3>
 polyregression(x,y,n)
 <BR>find a nth degree polynomial that best fits the data 

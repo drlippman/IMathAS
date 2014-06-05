@@ -737,13 +737,6 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 				//aid is in destination course - just make placement
 				$aid = $_SESSION['place_aid'][1];
 			} else {
-				/*//aid is in source course.  Let's look and see if there's an assessment in destination with the same title.
-				$query = "SELECT name FROM imas_assessments WHERE id='{$_SESSION['place_aid'][1]}'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				$sourceassessname = addslashes(mysql_result($result,0,0));
-				$query = "SELECT id FROM imas_assessments WHERE name='$sourceassessname' AND courseid='$destcid'";
-				*/
-				//CHECK ME
 				//aid is in source course.  Let's see if we already copied it.
 				$query = "SELECT id FROM imas_assessments WHERE ancestors REGEXP '^".intval($_SESSION['place_aid'][1])."[[:>:]]' AND courseid=".intval($destcid);
 				
@@ -751,22 +744,33 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 				if (mysql_num_rows($result)>0) {
 					$aid = mysql_result($result,0,0);
 				} else {
-				// no assessment with same title - need to copy assessment from destination to source course
-					require("includes/copyiteminc.php");
-					$query = "SELECT id FROM imas_items WHERE itemtype='Assessment' AND typeid='{$_SESSION['place_aid'][1]}'";
+					//aid is in source course.  Let's look and see if there's an assessment in destination with the same title.
+					//THIS SHOULD BE REMOVED - only included to accomodate people doing things the wrong way.
+					$query = "SELECT name FROM imas_assessments WHERE id=".intval($_SESSION['place_aid'][1]);
 					$result = mysql_query($query) or die("Query failed : " . mysql_error());
-					$cid = $destcid;
-					$newitem = copyitem(mysql_result($result,0,0),array());
-					$query = "SELECT typeid FROM imas_items WHERE id=$newitem";
+					$sourceassessname = addslashes(mysql_result($result,0,0));
+					$query = "SELECT id FROM imas_assessments WHERE name='$sourceassessname' AND courseid='$destcid'";
 					$result = mysql_query($query) or die("Query failed : " . mysql_error());
-					$aid = mysql_result($result,0,0);
-					$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-					$result = mysql_query($query) or die("Query failed : " . mysql_error());
-					$items = unserialize(mysql_result($result,0,0));
-					$items[] = $newitem;
-					$items = addslashes(serialize($items));
-					$query = "UPDATE imas_courses SET itemorder='$items' WHERE id='$cid'";
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					if (mysql_num_rows($result)>0) {
+						$aid = mysql_result($result,0,0);
+					} else {
+						// no assessment with same title - need to copy assessment from destination to source course
+						require("includes/copyiteminc.php");
+						$query = "SELECT id FROM imas_items WHERE itemtype='Assessment' AND typeid='{$_SESSION['place_aid'][1]}'";
+						$result = mysql_query($query) or die("Query failed : " . mysql_error());
+						$cid = $destcid;
+						$newitem = copyitem(mysql_result($result,0,0),array());
+						$query = "SELECT typeid FROM imas_items WHERE id=$newitem";
+						$result = mysql_query($query) or die("Query failed : " . mysql_error());
+						$aid = mysql_result($result,0,0);
+						$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+						$result = mysql_query($query) or die("Query failed : " . mysql_error());
+						$items = unserialize(mysql_result($result,0,0));
+						$items[] = $newitem;
+						$items = addslashes(serialize($items));
+						$query = "UPDATE imas_courses SET itemorder='$items' WHERE id='$cid'";
+						mysql_query($query) or die("Query failed : " . mysql_error());
+					}
 				}
 			}	
 			$query = "INSERT INTO imas_lti_placements (org,contextid,linkid,placementtype,typeid) VALUES ";
