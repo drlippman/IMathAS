@@ -1572,6 +1572,10 @@ if (!isset($_POST['embedpostback'])) {
 						} else {
 							displayq($next,$qi[$questions[$next]]['questionsetid'],$seeds[$next],false,false,$attempts[$next],false,false,false,$colors);
 						}
+						$contactlinks = showquestioncontactlinks($next);
+						if ($contactlinks!='') {
+							echo '<div class="review">'.$contactlinks.'</div>';
+						}
 					}
 					echo "</div>\n";
 				}

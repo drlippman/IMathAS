@@ -785,16 +785,29 @@ function showqinfobar($qn,$inreview,$single,$isembed=false) {
 		echo "<input type=hidden id=\"verattempts$qn\" name=\"verattempts[$qn]\" value=\"{$attempts[$qn]}\" />";
 	}
 	if (!$sessiondata['istutorial']) {
-		if ($testsettings['msgtoinstr']==1) {
-			echo "<br/><a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid={$testsettings['courseid']}&add=new&quoteq=$qn-{$qi[$questions[$qn]]['questionsetid']}-{$seeds[$qn]}-{$testsettings['id']}&to=instr\">", _('Message instructor about this question'), "</a>";
-		}
-		if ($testsettings['posttoforum']>0) {
-			echo "<br/><a target=\"_blank\" href=\"$imasroot/forums/thread.php?cid={$testsettings['courseid']}&forum={$testsettings['posttoforum']}&modify=new&quoteq=$qn-{$qi[$questions[$qn]]['questionsetid']}-{$seeds[$qn]}-{$testsettings['id']}\">", _('Post this question to forum'), "</a>";
+		$contactlinks = showquestioncontactlinks($qn);
+		if ($contactlinks!='') {
+			echo '<br/>'.$contactlinks;
 		}
 		if ($inreview) {
 			echo '</div>';
 		}
 	}
+}
+
+function showquestioncontactlinks($qn) {
+	global $testsettings,$imasroot,$qi,$seeds,$questions;
+	$out = '';
+	if ($testsettings['msgtoinstr']==1) {
+		$out .= "<a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid={$testsettings['courseid']}&add=new&quoteq=$qn-{$qi[$questions[$qn]]['questionsetid']}-{$seeds[$qn]}-{$testsettings['id']}&to=instr\">". _('Message instructor about this question'). "</a>";
+	}
+	if ($testsettings['posttoforum']>0) {
+		if ($out != '') {
+			$out .= "<br/>";
+		}
+		$out .= "<a target=\"_blank\" href=\"$imasroot/forums/thread.php?cid={$testsettings['courseid']}&forum={$testsettings['posttoforum']}&modify=new&quoteq=$qn-{$qi[$questions[$qn]]['questionsetid']}-{$seeds[$qn]}-{$testsettings['id']}\">". _('Post this question to forum'). "</a>";
+	}
+	return $out;
 }
 
 //shows top info bar for seq mode
@@ -920,11 +933,9 @@ function seqshowqinfobar($qn,$toshow) {
 	if ($testsettings['showcat']>0 && $qi[$questions[$qn]]['category']!='0') {
 		echo "  ", _('Category:'), " {$qi[$questions[$qn]]['category']}.";
 	}
-	if ($testsettings['msgtoinstr']==1) {
-		echo "<br/><a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid={$testsettings['courseid']}&add=new&quoteq=$qn-{$qi[$questions[$qn]]['questionsetid']}-{$seeds[$qn]}-{$testsettings['id']}&to=instr\">", _('Message instructor about this question'), "</a>";
-	}
-	if ($testsettings['posttoforum']>0) {
-		echo "<br/><a target=\"_blank\" href=\"$imasroot/forums/thread.php?cid={$testsettings['courseid']}&forum={$testsettings['posttoforum']}&modify=new&quoteq=$qn-{$qi[$questions[$qn]]['questionsetid']}-{$seeds[$qn]}-{$testsettings['id']}-1\">", _('Post this question to forum'), "</a>";
+	$contactlinks = showquestioncontactlinks($qn);
+	if ($contactlinks!='') {
+		echo '<br/>'.$contactlinks;
 	}
 	echo '</div>';
 	return $qavail;
