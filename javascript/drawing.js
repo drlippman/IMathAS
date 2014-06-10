@@ -534,12 +534,8 @@ function drawTarget(x,y) {
 			}
 			if (x2 != null && x2!=tplines[curTarget][i][0][0]) {
 				if (y2==tplines[curTarget][i][0][1]) {
-					ctx.moveTo(tplines[curTarget][i][0][0],y2);
-					if (x2 > tplines[curTarget][i][0][0]) {
-						ctx.lineTo(targets[curTarget].imgwidth,y2);
-					} else {
-						ctx.lineTo(0,y2);
-					}
+					ctx.moveTo(0,y2);
+					ctx.lineTo(targets[curTarget].imgwidth,y2);
 				} else {
 					// (x1, y1) (x2, y2)  
 					// b^(x2-x1) = y2/y1
@@ -555,6 +551,8 @@ function drawTarget(x,y) {
 						var cury = 0;
 						for (var curx=0;curx < targets[curTarget].imgwidth+4;curx += 3) {
 							cury = originy - stretch*safepow(expbase,curx);
+							if (cury<-100) { cury = -100;}
+							if (cury>targets[curTarget].imgheight+100) { cury=targets[curTarget].imgheight+100;}
 							if (curx==0) {
 								ctx.moveTo(curx,cury); 
 							} else {
