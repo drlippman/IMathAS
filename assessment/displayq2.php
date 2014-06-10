@@ -4352,7 +4352,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 							} else {
 								$str = $adjy2/safepow($base,$pts[3]-$xop);
 							}
-							$exps[] = array($str,$base);
+							//$exps[] = array($str,$base);
+							$exps[] = array($pts[1]-$xop, $adjy1, $pts[3]-$xop, $adjy2, $base);
 						}
 					} else if ($pts[0]==9 || $pts[0]==9.1) {
 						if ($pts[0]==9.1) {
@@ -4594,12 +4595,21 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			foreach ($ansexps as $key=>$ansexp) {
 				$scores[$key] = 0;
 				for ($i=0; $i<count($exps); $i++) {
-					if (abs($ansexp[0]-$exps[$i][0])>$defpttol*$reltolerance) {
+					//if (abs($ansexp[0]-$exps[$i][0])>$defpttol*$reltolerance) {
+					//	continue;
+					//}
+					if (abs($ansexp[1]-$exps[$i][4])/(abs($ansexp[1]-1)+1e-18)>$deftol*$reltolerance) {
 						continue;
 					}
-					if (abs($ansexp[1]-$exps[$i][1])/(abs($ansexp[1]-1)+1e-18)>$deftol*$reltolerance) {
+					//check left point if base>1
+					if ($ansexp[1]>1 && abs($ansexp[0]*safepow($ansexp[1],$exps[$i][0]) - $exps[$i][1]) >$defpttol*$reltolerance) {
+						continue;
+					}  
+					//check right point if base<=
+					if ($ansexp[1]<=1 && abs($ansexp[0]*safepow($ansexp[1],$exps[$i][2]) - $exps[$i][3]) >$defpttol*$reltolerance) {
 						continue;
 					}
+					
 					$scores[$key] = 1;
 					break;
 				}

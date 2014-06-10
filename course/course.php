@@ -443,9 +443,9 @@ if ($overwriteBody==1) {
 	<div class=breadcrumb>
 		<?php 
 		if (isset($CFG['GEN']['logopad'])) {
-			echo '<span class="padright" style="padding-right:'.$CFG['GEN']['logopad'].'">';
+			echo '<span class="padright hideinmobile" style="padding-right:'.$CFG['GEN']['logopad'].'">';
 		} else {
-			echo '<span class="padright">';
+			echo '<span class="padright hideinmobile">';
 		}
 		if (isset($guestid)) {
 			echo '<span class="red">', _('Instructor Preview'), '</span> ';
@@ -572,7 +572,7 @@ if ($overwriteBody==1) {
 	?>
 			
 			<p>
-			<a href="gradebook.php?cid=<?php echo $cid ?>"><?php echo _('Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="red">', _('New'), '</span>';}?>
+			<a href="gradebook.php?cid=<?php echo $cid ?>" class="essen"><?php echo _('Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="red">', _('New'), '</span>';}?>
 			</p>
 	<?php
 		if (!isset($sessiondata['ltiitemtype'])) { //don't show in LTI embed
