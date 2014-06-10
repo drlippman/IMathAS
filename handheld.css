@@ -85,3 +85,9 @@ ul#navlist a {
 	padding-bottom: 0.3em !important;
 	border-bottom: 1px solid #fff;
 }
+.hideinmobile {
+	display:none;
+}
+#homelinkbox {
+	font-size: 90%;
+}
