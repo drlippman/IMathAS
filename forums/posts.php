@@ -584,7 +584,7 @@
 						 echo " <a class=\"small\" href=\"$imasroot/course/gradebook.php?cid=$cid&stu={$ownerid[$child]}\" target=\"_popoutgradebook\">[GB]</a>";
 					}
 					echo ', ';
-					echo tzdate("F j, Y, g:i a",$date[$child]);
+					echo tzdate("D, M j, Y, g:i a",$date[$child]);
 					
 					if ($date[$child]>$lastview) {
 						echo " <span style=\"color:red;\">New</span>\n";
