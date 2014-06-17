@@ -169,7 +169,7 @@ function frequency($a,$start,$cw) {
 	sort($a, SORT_NUMERIC);
 	$x = $start;
 	$curr = 0;
-	while ($x <= $a[count($a)-1]) {
+	while ($x <= $a[count($a)-1]+1e-10) {
 		$x += $cw;
 		$i = $curr;
 		while (($a[$i] < $x) && ($i < count($a))) {

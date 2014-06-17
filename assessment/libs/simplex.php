@@ -2,15 +2,19 @@
 // Simplex method functions
 // Mike Jenck, Originally developed May 16-26, 2014
 // licensed under GPL version 2
+//
+// 2014-06-06 Updated, sorted, and fixed help file information
 // 2014-06-02 Bug fixes and added simplexreadtoanswerarray
 
+
 global $allowedmacros;
-array_push($allowedmacros, "simplex", "simplexcreateanswerboxentrytable", "simplexreadtoanswerarray", "simplexcreateinequalities", "simplexconverttodecimals", "simplexconverttofraction", "simplexdebug", "simplexdefaultheaders",  "simplexdisplaytable", "simplexfindpivotpoint", "simplexgetentry", "simplexpivot", "simplexsolve", "simplexreadsolution" );
+array_push($allowedmacros, "simplex", "simplexcreateanswerboxentrytable", "simplexcreateinequalities",
+"simplexconverttodecimals", "simplexconverttofraction", "simplexdebug", "simplexdefaultheaders", "simplexdisplaytable", "simplexfindpivotpoint", "simplexgetentry", "simplexpivot", "simplexreadtoanswerarray", "simplexreadsolution", "simplexsolve" );
 
 
 include_once("fractions.php");  // fraction routine
 
-
+/*
 // utility functions needed for this module
 //
 // createsimplexelement
@@ -19,10 +23,10 @@ include_once("fractions.php");  // fraction routine
 // verifyconstraints
 //
 //
-
 //function createsimplexelement($value)  
 // returns an array in the form of (numerator, denominator) that is calculated from $value
 // $value can be any valid real number, that will be converted into a fraction (proper or improper).
+*/
 function createsimplexelement($value) {
 	if (is_array($value)) {return $value;}
 	if (is_numeric($value) && floor($value)!=$value) {
@@ -34,11 +38,13 @@ function createsimplexelement($value) {
 	    // creat an array of (numerator, denominator)
 }
 
-
+/*
 //function simplextoarray(sm)
 // this function takes the simplex matrix and verifies that each entry is a
 // array in the form of (numerator, denominator)
 // then returns the verified simplex matrix.
+*/
+
 function simplextoarray($sm){
   
   for($r=0;$r<count($sm);$r++) {
@@ -50,39 +56,11 @@ function simplextoarray($sm){
   return $sm;
 }
 
-//function simplexconverttofraction(sm)
-//
-// this function takes the simplex matrix and converts it to fractions for displaying
-//
-function simplexconverttofraction($sm){
-  
-  for($r=0;$r<count($sm);$r++) {
-    for($c=0;$c<count($sm[0]);$c++) {
-      $sm[$r][$c] = fractionreduce($sm[$r][$c]);
-    }
-  }
-  
-  return $sm;
-}
-
-//function simplexconverttodecimals(sm)
-//
-// this function takes the simplex matrix and converts it to fractions for displaying
-//
-function simplexconverttodecimals($sm){
-  
-  for($r=0;$r<count($sm);$r++) {
-    for($c=0;$c<count($sm[0]);$c++) {
-      $sm[$r][$c] = fractiontodecimal($sm[$r][$c]);
-    }
-  }
-  
-  return $sm;
-}
-
+/*
 // the followiung are the verify functions to verify user input
 // the from is a string of the calling function, then the input to be 
 // verified, then the program supplied default value
+*/
 function verifytype($from,$type,$default) {
    if(($type!="max")&&($type!="min"))   {
     echo "In $from - Type of <b>$type</b> is not valid.  Valid values are <b>'min'</b> or <b>'max'</b>.<br/>\r\n";
@@ -139,6 +117,7 @@ function verifyASCIIticks($from,$displayASCII,$default) {
     } 
 }
 
+/*
 //function verifyconstraints(type, constraints)
 //
 // This function verifies that all of the constraints are vaild inequalities
@@ -146,6 +125,7 @@ function verifyASCIIticks($from,$displayASCII,$default) {
 // type:        max or min
 // constraints: the constraints to be verified
 //
+*/
 function verifyconstraints($type,$constraints) {
   
   $type = verifytype("verifyconstraints",$type,null);
@@ -190,28 +170,6 @@ function verifyconstraints($type,$constraints) {
 	    }
     }
     return $constraints;
-}
-
-//function simplexdebug(sm)
-// a raw dump of the contents of the simplex matrix
-//
-// Not intended to be used in question.  This is to allow the end user to see what the raw values are
-// for each field
-//
-function simplexdebug($sm){
-  
-  for($r=0;$r<count($sm);$r++){
-    for($c=0;$c<count($sm[0]);$c++) {
-		if(count($frac)==1) {
-		  echo $sm[$r][$c];
-		} 
-		else {
-		  echo $sm[$r][$c][0]."|".$sm[$r][$c][1];
-		}
-      if($c!=(count($sm[0])-1)) echo " , ";  
-    }
-    echo "<br/>\r\n";
-  }
 }
 
 // function simplex(type, objective, constraints)
@@ -372,25 +330,6 @@ function simplex($type,$objective,$constraints) {
   return $sm;
 }
 
-//function simplexreadtoanswerarray(sm, [startnumber, answer]) 
-// Create an array of values read by rows for the simplex matrix starting at startnumber
-// sm:          simplex martix to read
-// startnumber: starting number of the array.  Default is 0 
-// answer: pass $answer if extending an existing $answer array
-function simplexreadtoanswerarray($sm, $startnumber=0, $ans=array()) {
-  
-  $rows = count($sm);
-  $cols = count($sm[0]);
-  
-  for ($r=0; $r<$rows; $r++) {
-    for ($c=0;$c<$cols; $c++) {
-        $index = $r*$cols+$c + $startnumber;
-        $ans[$index] = simplexgetentry($sm,$r,$c);
-    }
-  }
-  
-  return $ans;
-}
 
 //function simplexcreateanswerboxentrytable(rows, cols, [startnumber, matrixname, linemode, header, tablestyle]) 
 // Create a string that is a valid HTML table syntax for displaying answerboxes.
@@ -479,6 +418,7 @@ function simplexcreateanswerboxentrytable() {
 
     return simplexdisplaytable($matrixans, $matrixname, 0, $mode, -1, null, $headers, $tablestyle);
 }
+
 
 // function simplexcreateinequalities(type, objectivevariable, objective, constraints, [headers, displayASCIIticks, showfractions, includeinequalities] )
 // Creates and returns an array of string that correspond to each line of the simple inequalities
@@ -716,6 +656,58 @@ function simplexcreateinequalities() {
   return $simplexestring;
 }
 
+
+//function simplexconverttodecimals(sm)
+//
+// this function takes the simplex matrix and converts it to fractions for displaying
+//
+function simplexconverttodecimals($sm){
+  
+  for($r=0;$r<count($sm);$r++) {
+    for($c=0;$c<count($sm[0]);$c++) {
+      $sm[$r][$c] = fractiontodecimal($sm[$r][$c]);
+    }
+  }
+  
+  return $sm;
+}
+
+//function simplexconverttofraction(sm)
+//
+// this function takes the simplex matrix and converts it to fractions for displaying
+//
+function simplexconverttofraction($sm){
+  
+  for($r=0;$r<count($sm);$r++) {
+    for($c=0;$c<count($sm[0]);$c++) {
+      $sm[$r][$c] = fractionreduce($sm[$r][$c]);
+    }
+  }
+  
+  return $sm;
+}
+
+//function simplexdebug(sm)
+// a raw dump of the contents of the simplex matrix
+//
+// Not intended to be used in question.  This is to allow the question writer the ability to see what the 
+// raw values are for each field.  all values should have a "|" between them, in the form of
+// numerator | denominator.
+function simplexdebug($sm){
+  
+  for($r=0;$r<count($sm);$r++){
+    for($c=0;$c<count($sm[0]);$c++) {
+		if(count($frac)==1) {
+		  echo $sm[$r][$c];
+		} 
+		else {
+		  echo $sm[$r][$c][0]."|".$sm[$r][$c][1];
+		}
+      if($c!=(count($sm[0])-1)) echo " , ";  
+    }
+    echo "<br/>\r\n";
+  }
+}
 
 // function simplexdefaultheaders(sm,type)
 // creates the default header (x1,x2, ...,s1,s2,...) for max and
@@ -1019,7 +1011,7 @@ define("PivotPointNoSolution", -1);
 define("PivotPointFoundList", 0);
 define("PivotPointNone", 1);
 define("PivotPointFoundMultipleSolutionList", 2);
-/*
+
 //simplexfindpivotpoint($sm)
 // $sm a simplex matrix
 //
@@ -1034,7 +1026,6 @@ define("PivotPointFoundMultipleSolutionList", 2);
 //              found.  both are ZERO based.
 //              $pivotpoints[0] = (0,1)
 //              $pivotpoints[1] = (1,2)
-*/
 function simplexfindpivotpoint($sm) {
   
   // variables used for loops and conditions
@@ -1259,11 +1250,12 @@ function simplexgetentry($sm,$r,$c) {
   return fractionreduce($sm[$r][$c]);
 }
 
-// $sm[0]($m,$pivotpoint)
+// simplexpivot($sm,$pivotpoint)
 // pivots the simplex matrix on the given point
-// $m the matrix
+// $sm:         simplex matrix
 // $pivotpoint: list or array that contains the point to be pivoted on. 
 //              Both row and column are ZERO based.
+//              this ALWAYS picks $pivotpoint[0] as the pivot point
 // returns  a pivoted simplex matrix
 function simplexpivot($sma,$pivotpoint) {
     
@@ -1314,11 +1306,48 @@ function simplexpivot($sma,$pivotpoint) {
   return $sma;
 }
 
-//simplexreadsolution($sm)
+//function simplexreadtoanswerarray(sm, [startnumber, answer]) 
+// Create an array of values read by rows for the simplex matrix starting at startnumber
+// sm:          simplex martix to read
+// startnumber: starting number of the array.  Default is 0 
+// answer: pass $answer if extending an existing $answer array
+function simplexreadtoanswerarray($sm, $startnumber=0, $ans=array()) {
+  
+  $rows = count($sm);
+  $cols = count($sm[0]);
+  
+  for ($r=0; $r<$rows; $r++) {
+    for ($c=0;$c<$cols; $c++) {
+        $index = $r*$cols+$c + $startnumber;
+        $ans[$index] = simplexgetentry($sm,$r,$c);
+    }
+  }
+  
+  return $ans;
+}
+
+//simplexreadsolution($sm,$type,$showfractions=1)
 // This reads the simplex matrix to find the current solution to the optimization problem.  It returns
 // an array that contains the solution.
-// $sm a simplex matrix
-// type: a string that contains either "max" or "min"
+//
+// array(solution values for sm, IsOptimized)
+//
+// For Max solutions the solution is an array in the form of:
+//
+// x1,  x2, etc,  s1,  s2,  etc.,  f,  IsOptimized
+// where f contains the maximum value
+// IsOptimized contains either a Yes or a No (objective has been reached)
+//
+//
+// For Min solutions the solution is an array in the form of:
+//
+// x1,  x2, etc,  y1,  y2,  etc.,  g,  IsOptimized
+// where g contains the minimium value
+// IsOptimized contains either a Yes or a No (objective has been reached)
+//
+//
+// $sm:           a simplex matrix
+// type:          a string that contains either "max" or "min"
 // showfractions: either 0 or 1
 //                0 shows decimals
 //        default 1 shows fractions
@@ -1459,8 +1488,8 @@ function simplexreadsolutionarray($sma,$type,$showfractions=1) {
 // 
 // solutionlist: an array of solutions (in the case of multiple solutions).   In the form of
 //            
-//            solutionlist[0] = array(IsOptimized, solution values for matrix[0])
-//            solutionlist[1] = array(IsOptimized, solution values for matrix[1])
+//            solutionlist[0] = array(solution values for matrix[0], IsOptimized)
+//            solutionlist[1] = array(solution values for matrix[1], IsOptimized)
 //            etc.
 // smlist:    an array of simplex matrix with 
 //            sma[0] = initial simplex matrix
