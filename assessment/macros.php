@@ -2277,7 +2277,7 @@ function cleanbytoken($str,$funcs = array()) {
 		}
 		$parts[$k] = implode('',$finalout);
 	}
-	return implode('',$parts);
+	return implode(' ',$parts);
 }
 
 
