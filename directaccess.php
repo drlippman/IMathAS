@@ -62,7 +62,7 @@
 		
 		if ($page_newaccounterror=='') {//no error
 			if (isset($CFG['GEN']['newpasswords'])) {
-				require_once("../includes/password.php");
+				require_once("includes/password.php");
 				$md5pw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
 			} else {
 				$md5pw = md5($_POST['pw1']);

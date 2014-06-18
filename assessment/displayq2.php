@@ -5588,8 +5588,8 @@ function formathint($eword,$ansformats,$calledfrom, $islist=false,$doshort=false
 		$tip .= sprintf(_('Enter %s as a reduced mixed number or as a whole number.  Example: 2 1/2 = 2 &frac12;'), $eword);
 		$shorttip = $islist?_('Enter a list of mixed numbers or whole numbers'):_('Enter a mixed number or whole number');
 	} else if (in_array('mixednumberorimproper',$ansformats)) {
-		$tip .= sprintf(_('Enter %s as a reduced mixed number, reduced improper fraction, or as a whole number.  Example: 2 1/2 = 2 &frac12;'), $eword);
-		$shorttip = $islist?_('Enter a list of mixed numbers or whole numbers'):_('Enter a mixed number, improper fraction, or whole number');
+		$tip .= sprintf(_('Enter %s as a reduced mixed number, reduced proper or improper fraction, or as a whole number.  Example: 2 1/2 = 2 &frac12;'), $eword);
+		$shorttip = $islist?_('Enter a list of mixed numbers or whole numbers'):_('Enter a reduced mixed number, proper or improper fraction, or whole number');
 	} else if (in_array('fracordec',$ansformats)) {
 		$tip .= sprintf(_('Enter %s as a fraction (like 3/5 or 10/4), a whole number (like 4 or -2), or exact decimal (like 0.5 or 1.25)'), $eword);
 		$shorttip = $islist?_('Enter a list of fractions or exact decimals'):_('Enter a fraction or exact decimal');
