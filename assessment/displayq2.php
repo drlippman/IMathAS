@@ -12,7 +12,7 @@ require("interpret5.php");
 require("macros.php");
 function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false,$qcolors=array()) {
 	//$starttime = microtime(true);
-	global $imasroot, $myrights, $showtips, $urlmode;
+	global $imasroot, $myrights, $showtips, $urlmode, $CFG;
 	
 	if (!isset($_SESSION['choicemap'])) { $_SESSION['choicemap'] = array(); }
 	$GLOBALS['inquestiondisplay'] = true;
@@ -375,7 +375,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		echo "<div class=inactive>";
 		echo filter($evaledqtext);
 	} else {
-		echo "<div class=question><div>\n";
+		echo "<div class=\"question\"><div>\n";
 		echo filter($evaledqtext);
 		echo "</div>\n";
 	}
@@ -406,6 +406,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			}
 		}	
 	} 
+	
 	if ($returnqtxt) {
 		return $returntxt;
 	}
@@ -492,6 +493,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			echo filter(" <div id=\"soln$qnidx\" class=\"hidden review\" style=\"margin-top:5px;margin-bottom:5px;\">$evaledsoln </div></div>\n");
 		}
 	}
+
 	echo "</div>\n";
 	//echo 'time: '.(microtime(true) - $starttime);
 	if ($qdata['qtype']=="multipart" ) {

@@ -726,10 +726,13 @@ function showqinfobar($qn,$inreview,$single,$isembed=false) {
 	global $qi,$questions,$attempts,$seeds,$testsettings,$noindivscores,$showeachscore,$scores,$bestscores,$sessiondata,$imasroot;
 	if (!$sessiondata['istutorial']) {
 		if ($inreview) {
-			echo '<div class="review">';
+			echo '<div class="review clearfix">';
 		}
 		if ($sessiondata['isteacher']) {
-			echo '<span style="float:right;font-size:70%">'._('Question ID: ').$qi[$questions[$qn]]['questionsetid'].'</span>';
+			echo '<span style="float:right;font-size:70%;text-align:right;">'._('Question ID: ').$qi[$questions[$qn]]['questionsetid'];
+			echo '<br/><a target="license" href="'.$imasroot.'/course/showlicense.php?id='.$qn.'">'._('License').'</a></span>';
+		} else {
+			echo '<span style="float:right;font-size:70%"><a target="license" href="'.$imasroot.'/course/showlicense.php?id='.$qn.'">'._('License').'</a></span>';
 		}
 		if ($isembed) {
 			echo _('Question').' '.($qn+1).'. ';
@@ -1059,4 +1062,5 @@ function newqfromgroup($qn) {
 		return false;
 	}
 }
+
 ?>

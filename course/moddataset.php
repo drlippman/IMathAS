@@ -1,6 +1,13 @@
 <?php
 //IMathAS:  Modify a question's code
 //(c) 2006 David Lippman
+//
+//license options:
+//0 - contains copywrited content
+//1 - IMathAS community license (GPL + CC-BY)
+//2 - Public domain
+//3 - CC-BY-SA-NC
+
 	require("../validate.php");
 	
 	if ($myrights<20) {
@@ -145,8 +152,8 @@
 					$isok = false;
 				}
 			}
-			$query = "UPDATE imas_questionset SET description='{$_POST['description']}',author='{$_POST['author']}',userights='{$_POST['userights']}',";
-			$query .= "qtype='{$_POST['qtype']}',control='{$_POST['control']}',qcontrol='{$_POST['qcontrol']}',solution='{$_POST['solution']}',";
+			$query = "UPDATE imas_questionset SET description='{$_POST['description']}',author='{$_POST['author']}',userights='{$_POST['userights']}',license='{$_POST['license']}',";
+			$query .= "otherattribution='{$_POST['addattr']}',qtype='{$_POST['qtype']}',control='{$_POST['control']}',qcontrol='{$_POST['qcontrol']}',solution='{$_POST['solution']}',";
 			$query .= "qtext='{$_POST['qtext']}',answer='{$_POST['answer']}',lastmoddate=$now,extref='$extref',replaceby=$replaceby,solutionopts=$solutionopts ";
 			$query .= "WHERE id='{$_GET['id']}'";
 			//checked separately above now
@@ -193,20 +200,23 @@
 		} else { //adding new
 			$mt = microtime();
 			$uqid = substr($mt,11).substr($mt,2,6);
-			$ancestors = '';
+			$ancestors = ''; $ancestorauthors = '';
 			if (isset($_GET['templateid'])) {
-				$query = "SELECT ancestors FROM imas_questionset WHERE id='{$_GET['templateid']}'";
+				$query = "SELECT ancestors,author,ancestorauthors FROM imas_questionset WHERE id='{$_GET['templateid']}'";
 				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-				$ancestors = mysql_result($result,0,0);
+				list($ancestors,$lastauthor,$ancestorauthors) = mysql_fetch_row($result);
 				if ($ancestors!='') {
-					$ancestors = $_GET['templateid'] . ','. $ancestors;
+					$ancestors = intval($_GET['templateid']) . ','. $ancestors;
+					$ancestorauthors = $lastauthor.'; '.$ancestorauthors;
 				} else {
-					$ancestors = $_GET['templateid'];
+					$ancestors = intval($_GET['templateid']);
+					$ancestorauthors = $lastauthor;
 				}
 			}
-			$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,description,ownerid,author,userights,qtype,control,qcontrol,qtext,answer,hasimg,ancestors,extref,replaceby,solution,solutionopts) VALUES ";
-			$query .= "($uqid,$now,$now,'{$_POST['description']}','$userid','{$_POST['author']}','{$_POST['userights']}','{$_POST['qtype']}','{$_POST['control']}',";
-			$query .= "'{$_POST['qcontrol']}','{$_POST['qtext']}','{$_POST['answer']}','{$_POST['hasimg']}','$ancestors','$extref',$replaceby,'{$_POST['solution']}',$solutionopts);";
+			$ancestorauthors = addslashes($ancestorauthors);
+			$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,description,ownerid,author,userights,license,otherattribution,qtype,control,qcontrol,qtext,answer,hasimg,ancestors,ancestorauthors,extref,replaceby,solution,solutionopts) VALUES ";
+			$query .= "($uqid,$now,$now,'{$_POST['description']}','$userid','{$_POST['author']}','{$_POST['userights']}','{$_POST['license']}','{$_POST['addattr']}','{$_POST['qtype']}','{$_POST['control']}',";
+			$query .= "'{$_POST['qcontrol']}','{$_POST['qtext']}','{$_POST['answer']}','{$_POST['hasimg']}','$ancestors','$ancestorauthors','$extref',$replaceby,'{$_POST['solution']}',$solutionopts);";
 			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 			$qsetid = mysql_insert_id();
 			$_GET['id'] = $qsetid;			
@@ -509,6 +519,8 @@
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			$line['userights'] = mysql_result($result,0,0);
 			
+			$line['license'] = isset($CFG['GEN']['deflicense'])?$CFG['GEN']['deflicense']:1;
+			
 			$line['qtype'] = "number";
 			$line['control'] = '';
 			$line['qcontrol'] = '';
@@ -586,6 +598,12 @@
 	} else {
 		$placeinhead .= 'var fileBrowserCallBackFunc = null;';
 	}
+	
+	if (isset($_GET['id'])) {
+		$placeinhead .= 'var originallicense = '.$line['license'].';';
+	} else {
+		$placeinhead .= 'var originallicense = -1;';
+	}
 
 	$placeinhead .= 'function toggleeditor(el) {
 	     var qtextbox =  document.getElementById(el);
@@ -615,6 +633,20 @@
 	   	var val = document.getElementById("solution").value; 
 	   	if (val.length<3 || val.match(/<.*?>/)) {toggleeditor("solution");}
 	   }});
+	   
+	   function checklicense() {
+	   	var lic = $("#license").val();
+	   	console.log(lic+","+originallicense);
+	   	var warn = "";
+	   	if (originallicense>-1) {
+	   		if (originallicense==0 && lic != 0) {
+	   			warn = "'._('If the original question contained copyrighted material, you should not change the license unless you have removed all the copyrighted material').'";
+	   		} else if ((originallicense == 1 ||  originallicense == 3) && lic != originallicense) {
+	   			warn = "'._('The original license REQUIRES that all derivative versions be kept under the same license. You should only be changing the license if you are the creator of this questions and all questions it was derived from').'";
+	   		}
+	   	}
+	   	$("#licensewarn").html("<br/>"+warn);
+	   }
 	   </script>';
 	
 	require("../header.php");
@@ -704,22 +736,40 @@ Author: <?php echo $line['author']; ?> <input type="hidden" name="author" value=
 <p>
 <?php
 if (!isset($line['ownerid']) || isset($_GET['template']) || $line['ownerid']==$userid || ($line['userights']==3 && $line['groupid']==$groupid) || $isadmin || ($isgrpadmin && $line['groupid']==$groupid)) {
-	echo "Use Rights <select name=userights>\n";
+	echo 'Use Rights: <select name="userights" id="userights">';
 	echo "<option value=\"0\" ";
 	if ($line['userights']==0) {echo "SELECTED";}
 	echo ">Private</option>\n";
 	echo "<option value=\"2\" ";
 	if ($line['userights']==2) {echo "SELECTED";}
-	echo ">Allow use, use as template, no modifications</option>\n";
+	echo ">Allow use by all</option>\n";
 	echo "<option value=\"3\" ";
 	if ($line['userights']==3) {echo "SELECTED";}
 	echo ">Allow use by all and modifications by group</option>\n";
 	echo "<option value=\"4\" ";
 	if ($line['userights']==4) {echo "SELECTED";}
-	echo ">Allow use and modifications by all</option>\n";
+	echo ">Allow use by all and modifications by all</option>\n";
+	echo '</select><br/>';
+	echo 'License: <select name="license" id="license" onchange="checklicense()">';
+	echo '<option value="0" '.($line['license']==0?'selected':'').'>Copyrighted</option>';
+	echo '<option value="1" '.($line['license']==1?'selected':'').'>IMathAS / WAMAP / MyOpenMath Community License</option>';
+	echo '<option value="2" '.($line['license']==2?'selected':'').'>Public Domain</option>';
+	echo '<option value="3" '.($line['license']==3?'selected':'').'>Creative Commons Attribution-NonCommercial-ShareAlike</option>';
+	echo '</select><span id="licensewarn" style="color:red;font-size:80%;"></span>';
+	if ($line['otherattribution']=='') {
+		echo '<br/><a href="#" onclick="$(\'#addattrspan\').show();$(this).hide();return false;">Add additional attribution</a>';
+		echo '<span id="addattrspan" style="display:none;">';
+	} else {
+		echo '<br/><span id="addattrspan">';
+	}
+	echo 'Additional Attribution: <input type="text" size="80" name="addattr" value="'.htmlentities($line['otherattribution']).'"/>';
+	if ($line['otherattribution']!='') {
+		echo '<br/><span style="color:red;font-size:80%">You should only modify the attribution if you are SURE you are removing all portions that require the attribution</span>';
+	}
+	echo '</span>';
+	
 }
 ?>
-</select>
 </p>
 <script>
 var curlibs = '<?php echo $inlibs;?>';

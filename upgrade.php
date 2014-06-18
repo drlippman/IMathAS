@@ -1,7 +1,7 @@
 <?php  
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 84;
+$latest = 86;
 
 
 @set_time_limit(0);
@@ -1411,6 +1411,59 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 echo   '<li>If you want to invalidate all current passwords: $CFG[\'GEN\'][\'newpasswords\'] = "only";</li></ul></li>';
 			 echo '<p>Note: Enabling this change also means that passwords not be hashed client-side anymore, which means that if you are not ';
 			 echo   'using TLS/SSL, then passwords are being sent in plaintext.  That is bad.  Get SSL - it is the only way to protect both passwords and student data.</p>';
+		}
+		if ($last<85) {
+			 if (isset($CFG['GEN']['deflicense'])) {
+			 	 $license = intval($CFG['GEN']['deflicense']);
+			 } else {
+			 	 $license = 1;
+			 }
+			 $query = 'ALTER TABLE imas_questionset ADD `license` TINYINT(1) UNSIGNED NOT NULL DEFAULT \''.$license.'\'';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }	
+			 
+			 $query = 'ALTER TABLE  `imas_questionset` CHANGE  `author`  `author` TEXT NOT NULL';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = 'ALTER TABLE imas_questionset ADD `ancestorauthors` TEXT NOT NULL';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+		}
+		if ($last<86) {
+			$query = 'ALTER TABLE imas_questionset ADD `importuid` VARCHAR(254) NOT NULL DEFAULT \'\'';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }	
+			 $query = 'ALTER TABLE imas_questionset ADD `otherattribution` TEXT NOT NULL';
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			$query = "SELECT id,ancestors,author FROM imas_questionset WHERE ancestors<>''";
+			$res = mysql_query($query);
+			if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			}
+			while ($row = mysql_fetch_row($res)) {
+				$query = "SELECT author FROM imas_questionset WHERE id IN ({$row[1]})";
+				$res2 = mysql_query($query);
+				$thisauthor = array();
+				while ($r = mysql_fetch_row($res2)) {
+					if ($r[0] != $row[2] && !in_array($r[0],$thisauthor)) {
+						$thisauthor[] = $r[0];
+					}
+				}
+				$query = "UPDATE imas_questionset SET ancestorauthors='".addslashes(implode('; ',$thisauthor))."' WHERE id='{$row[0]}'";
+				mysql_query($query);
+			}
+			
 		}
 		/*$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {

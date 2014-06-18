@@ -78,18 +78,13 @@ if ($myrights<20) {
 	}
 	
 	
-	$query = "SELECT imas_users.email,imas_questionset.author,imas_questionset.description,imas_questionset.lastmoddate,imas_questionset.ancestors,imas_questionset.deleted,imas_questionset.ownerid,imas_questionset.broken,imas_questionset.replaceby ";
+	$query = "SELECT imas_users.email,imas_questionset.* ";
 	$query .= "FROM imas_users,imas_questionset WHERE imas_users.id=imas_questionset.ownerid AND imas_questionset.id='{$_GET['qsetid']}'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$email = mysql_result($result,0,0);
-	$author = mysql_result($result,0,1);
-	$descr = mysql_result($result,0,2);
-	$lastmod = date("m/d/y g:i a",mysql_result($result,0,3));
-	$ancestors = mysql_result($result,0,4);
-	$deleted = mysql_result($result,0,5);
-	$ownerid = mysql_result($result,0,6);
-	$broken = mysql_result($result,0,7);
-	$replaceby = mysql_result($result,0,8);
+	$line = mysql_fetch_assoc($result);
+	
+	$lastmod = date("m/d/y g:i a",$line['lastmoddate']);
+	
 	if (isset($CFG['AMS']['showtips'])) {
 		$showtips = $CFG['AMS']['showtips'];
 	} else {
@@ -261,25 +256,32 @@ if ($overwriteBody==1) {
 	echo '</code>';
 				
 	if (isset($CFG['GEN']['sendquestionproblemsthroughcourse'])) {
-		echo "<p>Question id: {$_GET['qsetid']}.  <a href=\"$imasroot/msgs/msglist.php?add=new&cid={$CFG['GEN']['sendquestionproblemsthroughcourse']}&to=$ownerid&title=Problem%20with%20question%20id%20{$_GET['qsetid']}\" target=\"_blank\">Message owner</a> to report problems</p>";
+		echo "<p>Question id: {$_GET['qsetid']}.  <a href=\"$imasroot/msgs/msglist.php?add=new&cid={$CFG['GEN']['sendquestionproblemsthroughcourse']}&to={$line['ownerid']}&title=Problem%20with%20question%20id%20{$_GET['qsetid']}\" target=\"_blank\">Message owner</a> to report problems</p>";
 	} else {
-		echo "<p>Question id: {$_GET['qsetid']}.  <a href=\"mailto:$email?subject=Problem%20with%20question%20id%20{$_GET['qsetid']}\">E-mail owner</a> to report problems</p>";
+		echo "<p>Question id: {$_GET['qsetid']}.  <a href=\"mailto:{$line['email']}?subject=Problem%20with%20question%20id%20{$_GET['qsetid']}\">E-mail owner</a> to report problems</p>";
 	}
-	echo "<p>Description: $descr</p><p>Author: $author</p>";
+	echo "<p>Description: {$line['description']}</p><p>Author: {$line['author']}</p>";
 	echo "<p>Last Modified: $lastmod</p>";
-	if ($deleted==1) {
+	if ($line['deleted']==1) {
 		echo '<p style="color:red;">This question has been marked for deletion.  This might indicate there is an error in the question. ';
 		echo 'It is recommended you discontinue use of this question when possible</p>';
 	}
-	if ($replaceby>0) {
-		echo '<p style="color:red;">This message has been marked as deprecated, and it is recommended you use question ID '.$replaceby.' instead.  You can find this question ';
+	if ($line['replaceby']>0) {
+		echo '<p style="color:red;">This message has been marked as deprecated, and it is recommended you use question ID '.$line['replaceby'].' instead.  You can find this question ';
 		echo 'by searching all libraries with the ID number as the search term</p>';
 	}
 	
-	echo '<p id="brokenmsgbad" style="color:red;display:'.(($broken==1)?"block":"none").'">This message has been marked as broken.  This indicates ';
+	echo '<p id="brokenmsgbad" style="color:red;display:'.(($line['broken']==1)?"block":"none").'">This message has been marked as broken.  This indicates ';
 	echo 'there might be an error with this question.  Use with caution.  <a href="#" onclick="submitBrokenFlag(0);return false;">Unmark as broken</a></p>';
-	echo '<p id="brokenmsgok" style="display:'.(($broken==0)?"block":"none").'"><a href="#" onclick="submitBrokenFlag(1);return false;">Mark as broken</a> if there appears to be an error with the question.</p>';
-	
+	echo '<p id="brokenmsgok" style="display:'.(($line['broken']==0)?"block":"none").'"><a href="#" onclick="submitBrokenFlag(1);return false;">Mark as broken</a> if there appears to be an error with the question.</p>';
+
+	echo '<p>'._('License').': ';
+	$license = array('Copyrighted','IMathAS Community License','Public Domain','Creative Commons Attribution-NonCommercial-ShareAlike');
+	echo $license[$line['license']];
+	if ($line['otherattribution']!='') {
+		echo '<br/>Other Attribution: '.$line['otherattribution'];
+	}
+	echo '</p>';	
 
 	echo '<p>Question is in these libraries:';
 	echo '<ul>';
@@ -291,8 +293,13 @@ if ($overwriteBody==1) {
 		echo '</li>';
 	}
 	echo '</ul></p>';
-	if ($ancestors!='') {
-		echo "<p>Derived from: $ancestors</p>";
+	
+	if ($line['ancestors']!='') {
+		echo "<p>Derived from: {$line['ancestors']}";
+		if ($line['ancestorauthors']!='') {
+			echo '<br/>Created by: '.$line['ancestorauthors'];	
+		}
+		echo "</p>";
 	}
 }
 require("../footer.php");
