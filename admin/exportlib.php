@@ -4,6 +4,7 @@
 
 /*** master php includes *******/
 require("../validate.php");
+require("../includes/filehandler.php");
 
 /*** pre-html data manipulation, including function code *******/
  
@@ -136,7 +137,7 @@ if (!(isset($teacherid)) && $myrights<20) {
 		//$libitems is newlibid=>newqsetid
 		$query = "SELECT imas_library_items.qsetid,imas_library_items.libid FROM imas_library_items ";
 		$query .= "JOIN imas_questionset ON imas_library_items.qsetid=imas_questionset.id ";
-		$query .= "WHERE imas_library_items.libid IN ($liblist) AND imas_library_items.junkflag=0 ";
+		$query .= "WHERE imas_library_items.libid IN ($liblist) AND imas_library_items.junkflag=0 AND imas_questionset.deleted=0 ";
 		if ($nonpriv) {
 			$query .= " AND imas_questionset.userights>0";
 		}
@@ -145,9 +146,8 @@ if (!(isset($teacherid)) && $myrights<20) {
 		$libitems = Array();
 		$qcnt = 0;
 		while ($row = mysql_fetch_row($result)) {
-			if (!isset($qassoc[$row[0]])) {$qassoc[$row[0]] = $qcnt;}
-			$libitems[$libs[$row[1]]][] = $qcnt;
-			$qcnt++;
+			if (!isset($qassoc[$row[0]])) {$qassoc[$row[0]] = $qcnt; $qcnt++;}
+			$libitems[$libs[$row[1]]][] = $qassoc[$row[0]];
 		}
 		
 		foreach ($libs as $newid) {
@@ -161,13 +161,15 @@ if (!(isset($teacherid)) && $myrights<20) {
 		}
 		
 		$imgfiles = array();
+		$qlist = implode(',',array_unique(array_keys($qassoc)));
 		//first, lets pull any questions that have include__from so we can lookup backrefs
-		$query = "SELECT imas_questionset.* FROM imas_questionset,imas_library_items ";
-		$query .= "WHERE imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid IN ($liblist) AND imas_library_items.junkflag=0 ";
+		$query = "SELECT * FROM imas_questionset WHERE id IN ($qlist)";
+		//$query = "SELECT imas_questionset.* FROM imas_questionset,imas_library_items ";
+		//$query .= "WHERE imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid IN ($liblist) AND imas_library_items.junkflag=0 ";
 		if ($nonpriv) {
-			$query .= " AND imas_questionset.userights>0";
+			$query .= " AND userights>0";
 		}
-		$query .= " AND (imas_questionset.control LIKE '%includecodefrom%' OR imas_questionset.qtext LIKE '%includeqtextfrom%')";
+		$query .= " AND (control LIKE '%includecodefrom%' OR qtext LIKE '%includeqtextfrom%')";
 		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 		$includedqs = array();
 		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
@@ -188,12 +190,13 @@ if (!(isset($teacherid)) && $myrights<20) {
 			}
 		}
 		
-		$query = "SELECT imas_questionset.* FROM imas_questionset,imas_library_items ";
-		$query .= "WHERE imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid IN ($liblist) AND imas_library_items.junkflag=0";
+		//$query = "SELECT imas_questionset.* FROM imas_questionset,imas_library_items ";
+		//$query .= "WHERE imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid IN ($liblist) AND imas_library_items.junkflag=0 AND imas_questionset.deleted=0 ";
+		$query = "SELECT * FROM imas_questionset WHERE id IN ($qlist)";
 		if ($nonpriv) {
-			$query .= " AND imas_questionset.userights>0";
+			$query .= " AND userights>0";
 		}
-		$query .= " ORDER BY imas_questionset.uniqueid";
+		$query .= " ORDER BY uniqueid";
 		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 			$line['control'] = preg_replace('/includecodefrom\((\d+)\)/e','"includecodefrom(UID".$includedbackref["\\1"].")"',$line['control']);
@@ -226,7 +229,11 @@ if (!(isset($teacherid)) && $myrights<20) {
 				$query = "SELECT var,filename FROM imas_qimages WHERE qsetid='{$line['id']}'";
 				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 				while ($row = mysql_fetch_row($r2)) {
+					$row[1] = trim($row[1]);
 					echo $row[0].','.$row[1]. "\n";
+					if ($GLOBALS['filehandertypecfiles'] == 's3') {
+						copyqimage($row[1],realpath("../assessment/qimages").DIRECTORY_SEPARATOR.$row[1]);
+					}
 					$imgfiles[] = realpath("../assessment/qimages").DIRECTORY_SEPARATOR.$row[1];
 				}
 			}
