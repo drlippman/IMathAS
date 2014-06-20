@@ -207,7 +207,10 @@
 				list($ancestors,$lastauthor,$ancestorauthors) = mysql_fetch_row($result);
 				if ($ancestors!='') {
 					$ancestors = intval($_GET['templateid']) . ','. $ancestors;
-					$ancestorauthors = $lastauthor.'; '.$ancestorauthors;
+					$aaarr = explode('; ',$ancestorauthors);
+					if (!in_array($lastauthor,$aaarr)) {
+						$ancestorauthors = $lastauthor.'; '.$ancestorauthors;
+					}
 				} else {
 					$ancestors = intval($_GET['templateid']);
 					$ancestorauthors = $lastauthor;

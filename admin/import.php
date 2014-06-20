@@ -64,8 +64,23 @@ function parsefile($file) {
 		} else if ($line == "ANSWER") {
 			$part = 'answer';
 			continue;
+		} else if ($line == "SOLUTION") {
+			$part = 'solution';
+			continue;
+		} else if ($line == "SOLUTIONOPTS") {
+			$part = 'solutionopts';
+			continue;
 		} else if ($line == "EXTREF") {
 			$part = 'extref';
+			continue;
+		} else if ($line == "LICENSE") {
+			$part = 'license';
+			continue;
+		} else if ($line == "ANCESTORAUTHORS") {
+			$part = 'ancestorauthors';
+			continue;
+		} else if ($line == "OTHERATTRIBUTION") {
+			$part = 'otherattribution';
 			continue;
 		} else if ($line == "QIMGS") {
 			$part = 'qimgs';
@@ -195,15 +210,18 @@ if (!(isset($teacherid)) && $myrights<75) {
 						//$query .= " AND imas_questionset.ownerid=imas_users.id AND imas_users.groupid='$groupid'";
 							$query = "UPDATE imas_questionset SET description='{$qdata[$qn]['description']}',author='{$qdata[$qn]['author']}',";
 							$query .= "qtype='{$qdata[$qn]['qtype']}',control='{$qdata[$qn]['control']}',qcontrol='{$qdata[$qn]['qcontrol']}',qtext='{$qdata[$qn]['qtext']}',";
-							$query .= "answer='{$qdata[$qn]['answer']}',extref='{$qdata[$qn]['extref']}',adddate=$now,lastmodddate=$now,hasimg=$hasimg WHERE id='$qsetid'";
+							$query .= "answer='{$qdata[$qn]['answer']}',extref='{$qdata[$qn]['extref']}',license='{$qdata[$qn]['license']}',ancestorauthors='{$qdata[$qn]['ancestorauthors']}',otherattribution='{$qdata[$qn]['otherattribution']}',";
+							$query .= "solution='{$qdata[$qn]['solution']}',solutionopts='{$qdata[$qn]['solutionopts']}',";
+							$query .= "adddate=$now,lastmoddate=$now,hasimg=$hasimg WHERE id='$qsetid'";
 						} else {
 							continue;
 						}
 					} else {
-					
 						$query = "UPDATE imas_questionset SET description='{$qdata[$qn]['description']}',author='{$qdata[$qn]['author']}',";
 						$query .= "qtype='{$qdata[$qn]['qtype']}',control='{$qdata[$qn]['control']}',qcontrol='{$qdata[$qn]['qcontrol']}',qtext='{$qdata[$qn]['qtext']}',";
-						$query .= "answer='{$qdata[$qn]['answer']}',extref='{$qdata[$qn]['extref']}',lastmoddate=$now,adddate=$now,hasimg=$hasimg WHERE id='$qsetid'";
+						$query .= "answer='{$qdata[$qn]['answer']}',extref='{$qdata[$qn]['extref']}',license='{$qdata[$qn]['license']}',ancestorauthors='{$qdata[$qn]['ancestorauthors']}',otherattribution='{$qdata[$qn]['otherattribution']}',";
+						$query .= "solution='{$qdata[$qn]['solution']}',solutionopts='{$qdata[$qn]['solutionopts']}',";
+						$query .= "adddate=$now,lastmoddate=$now,hasimg=$hasimg WHERE id='$qsetid'";
 						if (!$isadmin) {
 							$query .= " AND (ownerid='$userid' OR userights>3)";
 						}
@@ -229,12 +247,16 @@ if (!(isset($teacherid)) && $myrights<75) {
 			} else if (isset($exists[$qdata[$qn]['uqid']]) && $_POST['merge']==-1) {
 				$qsetid = $exists[$qdata[$qn]['uqid']];
 			} else {
-				if ($qdata[$qn]['uqid']==0 || (isset($exists[$qdata[$qn]['uqid']]) && $_POST['merge']==0)) {
+				$importuidstr = '';
+				$importuidval = '';
+				if ($qdata[$qn]['uqid']=='0' || (isset($exists[$qdata[$qn]['uqid']]) && $_POST['merge']==0)) {
+					$importuidstr = ',importuid';
+					$importuidval = ','.$qdata[$qn]['uqid'];
 					$qdata[$qn]['uqid'] = substr($mt,11).substr($mt,2,2).$qn;
 				}
-				$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,ownerid,userights,description,author,qtype,control,qcontrol,qtext,answer,extref,hasimg) VALUES ";
+				$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,ownerid,userights,description,author,solution,solutionopts,qtype,control,qcontrol,qtext,answer,extref,license,ancestorauthors,otherattribution,hasimg$importuidstr) VALUES ";
 				$query .= "('{$qdata[$qn]['uqid']}',$now,$now,'$userid','$rights','{$qdata[$qn]['description']}','{$qdata[$qn]['author']}','{$qdata[$qn]['qtype']}','{$qdata[$qn]['control']}','{$qdata[$qn]['qcontrol']}',";
-				$query .= "'{$qdata[$qn]['qtext']}','{$qdata[$qn]['answer']}','{$qdata[$qn]['extref']}',$hasimg)";
+				$query .= "'{$qdata[$qn]['qtext']}','{$qdata[$qn]['answer']}','{$qdata[$qn]['solution']}','{$qdata[$qn]['solutionopts']}','{$qdata[$qn]['extref']}','{$qdata[$qn]['license']}','{$qdata[$qn]['ancestorauthors']}','{$qdata[$qn]['otherattribution']}',$hasimg$importuidval)";
 				mysql_query($query) or die("Import failed on {$qdata[$qn]['description']}: $query:" . mysql_error());
 				$qsetid = mysql_insert_id();
 				if (!empty($qdata[$qn]['qimgs'])) {

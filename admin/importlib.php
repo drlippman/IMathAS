@@ -9,7 +9,7 @@ ini_set("max_execution_time", "900");
 ini_set("memory_limit", "104857600");
 ini_set("upload_max_filesize", "10485760");
 ini_set("post_max_size", "10485760");
-
+                                         
 /*** master php includes *******/
 require("../validate.php");
 
@@ -62,16 +62,19 @@ function parseqs($file,$touse,$rights) {
 					$query = "SELECT imas_questionset.id FROM imas_questionset,imas_users WHERE WHERE imas_questionset.id='$qsetid' AND imas_questionset.ownerid=imas_users.id AND imas_users.groupid='$groupid'";
 					$result = mysql_query($query) or die("Query failed : " . mysql_error());
 					if (mysql_num_rows($result)>0) {
-						$query = "UPDATE imas_questionset SET description='{$qdata[$qn]['description']}',author='{$qdata[$qn]['author']}',";
-						$query .= "qtype='{$qdata[$qn]['qtype']}',control='{$qdata[$qn]['control']}',qcontrol='{$qdata[$qn]['qcontrol']}',qtext='{$qdata[$qn]['qtext']}',";
-						$query .= "answer='{$qdata[$qn]['answer']}',extref='{$qdata[$qn]['extref']}',adddate=$now,lastmodddate=$now,hasimg=$hasimg WHERE id='$qsetid'";
+						$query = "UPDATE imas_questionset SET description='{$qd['description']}',author='{$qd['author']}',";
+						$query .= "qtype='{$qd['qtype']}',control='{$qd['control']}',qcontrol='{$qd['qcontrol']}',qtext='{$qd['qtext']}',";
+						$query .= "answer='{$qd['answer']}',extref='{$qd['extref']}',license='{$qd['license']}',ancestorauthors='{$qd['ancestorauthors']}',otherattribution='{$qd['otherattribution']}',";
+						$query .= "solution='{$qd['solution']}',solutionopts='{$qd['solutionopts']}',";
+						$query .= "adddate=$now,lastmoddate=$now,hasimg=$hasimg WHERE id='$qsetid'";
 					} else {
 						return $qsetid;
 					}
 				} else {
 					$query = "UPDATE imas_questionset SET description='{$qd['description']}',author='{$qd['author']}',";
 					$query .= "qtype='{$qd['qtype']}',control='{$qd['control']}',qcontrol='{$qd['qcontrol']}',qtext='{$qd['qtext']}',";
-					$query .= "answer='{$qd['answer']}',extref='{$qd['extref']}',lastmoddate=$now,adddate=$now,hasimg=$hasimg WHERE id='$qsetid'";
+					$query .= "answer='{$qd['answer']}',extref='{$qd['extref']}',license='{$qd['license']}',ancestorauthors='{$qd['ancestorauthors']}',otherattribution='{$qd['otherattribution']}',";
+					$query .= "solution='{$qd['solution']}',solutionopts='{$qd['solutionopts']}',adddate=$now,lastmoddate=$now,hasimg=$hasimg WHERE id='$qsetid'";
 					if (!$isadmin) {
 						$query .= " AND ownerid=$userid";
 					}
@@ -96,7 +99,11 @@ function parseqs($file,$touse,$rights) {
 		} else if ($exists && $_POST['merge']==-1) {
 			return $qsetid;	
 		} else {
-			if ($qd['uqid']==0 || ($exists && $_POST['merge']==0)) {
+			$importuidstr = '';
+			$importuidval = '';
+			if ($qd['uqid']=='0' || ($exists && $_POST['merge']==0)) {
+				$importuidstr = ',importuid';
+				$importuidval = ','.$qd['uqid'];
 				$mt = microtime();
 				$qd['uqid'] = substr($mt,11).substr($mt,2,2).$qn;
 			}
@@ -105,9 +112,9 @@ function parseqs($file,$touse,$rights) {
 			} else {
 				$hasimg = 0;
 			}
-			$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,ownerid,userights,description,author,qtype,control,qcontrol,qtext,answer,extref,hasimg) VALUES ";
+			$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,ownerid,userights,description,author,qtype,control,qcontrol,qtext,answer,solution,solutionopts,extref,license,ancestorauthors,otherattribution,hasimg$importuidstr) VALUES ";
 			$query .= "('{$qd['uqid']}',$now,$now,'$userid','$rights','{$qd['description']}','{$qd['author']}','{$qd['qtype']}','{$qd['control']}','{$qd['qcontrol']}',";
-			$query .= "'{$qd['qtext']}','{$qd['answer']}','{$qd['extref']}',$hasimg)";
+			$query .= "'{$qd['qtext']}','{$qd['answer']}','{$qd['solution']}','{$qd['solutionopts']}','{$qd['extref']}','{$qd['license']}','{$qd['ancestorauthors']}','{$qd['otherattribution']}',$hasimg$importuidval)";
 			mysql_query($query) or die("Import failed on $query: " . mysql_error());
 			$newq++;
 			$qsetid = mysql_insert_id();
@@ -185,8 +192,23 @@ function parseqs($file,$touse,$rights) {
 		} else if ($line == "ANSWER") {
 			$part = 'answer';
 			continue;
+		} else if ($line == "SOLUTION") {
+			$part = 'solution';
+			continue;
+		} else if ($line == "SOLUTIONOPTS") {
+			$part = 'solutionopts';
+			continue;
 		} else if ($line == "EXTREF") {
 			$part = 'extref';
+			continue;
+		} else if ($line == "LICENSE") {
+			$part = 'license';
+			continue;
+		} else if ($line == "ANCESTORAUTHORS") {
+			$part = 'ancestorauthors';
+			continue;
+		} else if ($line == "OTHERATTRIBUTION") {
+			$part = 'otherattribution';
 			continue;
 		} else if ($line == "QIMGS") {
 			$part = 'qimgs';

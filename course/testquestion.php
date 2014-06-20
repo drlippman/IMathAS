@@ -300,7 +300,9 @@ if ($overwriteBody==1) {
 			echo '<br/>Created by: '.$line['ancestorauthors'];	
 		}
 		echo "</p>";
-	}
+	} else if ($line['ancestorauthors']!='') {
+		echo '<p>Derived from work by: '.$line['ancestorauthors'].'</p>';	
+	} 
 }
 require("../footer.php");
 	

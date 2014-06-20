@@ -205,8 +205,18 @@ if (!(isset($teacherid)) && $myrights<75) {
 			echo rtrim($line['qtext']) . "\n";
 			echo "\nANSWER\n";
 			echo rtrim($line['answer']) . "\n";
+			echo "\nSOLUTION\n";
+			echo rtrim($line['solution']) . "\n";
+			echo "\nSOLUTIONOPTS\n";
+			echo rtrim($line['solutionopts']) . "\n";
 			echo "\nEXTREF\n";
 			echo rtrim($line['extref']) . "\n";
+			echo "\nLICENSE\n";
+			echo rtrim($line['license']) . "\n";
+			echo "\nANCESTORAUTHORS\n";
+			echo rtrim($line['ancestorauthors']) . "\n";
+			echo "\nOTHERATTRIBUTION\n";
+			echo rtrim($line['otherattribution']) . "\n";
 			if ($line['hasimg']==1) {
 				echo "\nQIMGS\n";
 				$query = "SELECT var,filename FROM imas_qimages WHERE qsetid='{$line['id']}'";
