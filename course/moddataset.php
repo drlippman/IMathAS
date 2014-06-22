@@ -207,9 +207,12 @@
 				list($ancestors,$lastauthor,$ancestorauthors) = mysql_fetch_row($result);
 				if ($ancestors!='') {
 					$ancestors = intval($_GET['templateid']) . ','. $ancestors;
-					$ancestorauthors = $lastauthor.'; '.$ancestorauthors;
 				} else {
 					$ancestors = intval($_GET['templateid']);
+				}
+				if ($ancestorauthors!='') {
+					$ancestorauthors = $lastauthor.'; '.$ancestorauthors;
+				} else {
 					$ancestorauthors = $lastauthor;
 				}
 			}
@@ -764,7 +767,7 @@ if (!isset($line['ownerid']) || isset($_GET['template']) || $line['ownerid']==$u
 	}
 	echo 'Additional Attribution: <input type="text" size="80" name="addattr" value="'.htmlentities($line['otherattribution']).'"/>';
 	if ($line['otherattribution']!='') {
-		echo '<br/><span style="color:red;font-size:80%">You should only modify the attribution if you are SURE you are removing all portions that require the attribution</span>';
+		echo '<br/><span style="color:red;font-size:80%">You should only modify the attribution if you are SURE you are removing all portions of the question that require the attribution</span>';
 	}
 	echo '</span>';
 	
