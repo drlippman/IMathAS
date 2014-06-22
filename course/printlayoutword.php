@@ -238,7 +238,8 @@ if ($overwriteBody==1) {
 			$out .= "</ol>\n";	
 		}
 	}
-	
+	$licurl = $urlmode.$_SERVER['HTTP_HOST'].$imasroot.'/course/showlicense.php?id='.implode('-',$qn);
+	$out .= '<hr/><p style="font-size:70%">License info at: <a href="'.$licurl.'">'.$licurl.'</a></p>';
 	$out .= '</body></html>';
 	
 	$out = preg_replace('|(<img[^>]*?)src="/|', '$1 src="'.$urlmode.$_SERVER['HTTP_HOST'].'/', $out);

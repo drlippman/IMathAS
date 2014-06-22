@@ -280,6 +280,9 @@ if ($overwriteBody==1) {
 			}
 		}
 	}
+	$licurl = $urlmode.$_SERVER['HTTP_HOST'].$imasroot.'/course/showlicense.php?id='.implode('-',$qn);
+	echo '<hr/><p style="font-size:70%">License info at: <a href="'.$licurl.'">'.$licurl.'</a></p>';
+	
 	echo "<div class=cbutn><a href=\"course.php?cid=$cid\">Return to course page</a></div>\n";
 	
 

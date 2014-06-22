@@ -371,8 +371,18 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 			echo rtrim($line['qtext']) . "\n";
 			echo "\nANSWER\n";
 			echo rtrim($line['answer']) . "\n";
+			echo "\nSOLUTION\n";
+			echo rtrim($line['solution']) . "\n";
+			echo "\nSOLUTIONOPTS\n";
+			echo rtrim($line['solutionopts']) . "\n";
 			echo "\nEXTREF\n";
 			echo rtrim($line['extref']) . "\n";
+			echo "\nLICENSE\n";
+			echo rtrim($line['license']) . "\n";
+			echo "\nANCESTORAUTHORS\n";
+			echo rtrim($line['ancestorauthors']) . "\n";
+			echo "\nOTHERATTRIBUTION\n";
+			echo rtrim($line['otherattribution']) . "\n";
 			//no static file handling happening here yet just export the info
 			if ($line['hasimg']==1) {
 				echo "\nQIMGS\n";

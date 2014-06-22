@@ -95,6 +95,8 @@ function additem($itemtoadd,$item,$questions,$qset) {
 					$query .= "author='{$qset['author'][$n]}',qtype='{$qset['qtype'][$n]}',";
 					$query .= "control='{$qset['control'][$n]}',qcontrol='{$qset['qcontrol'][$n]}',";
 					$query .= "qtext='{$qset['qtext'][$n]}',answer='{$qset['answer'][$n]}',";
+					$query .= "solution='{$qset['solution'][$n]}',solutionopts='{$qset['solutionopts'][$n]}',";
+					$query .= "license='{$qset['license'][$n]}',ancestorauthors='{$qset['ancestorauthors'][$n]}',otherattribution='{$qset['otherattribution'][$n]}',";
 					$query .= "extref='{$qset['extref'][$n]}',lastmoddate=$now,adddate=$now,hasimg=$hasimg ";
 					$query .= " WHERE id='{$questions[$qid]['qsetid']}' AND (ownerid='$userid' OR userights>3)";
 					mysql_query($query) or die("error on: $query: " . mysql_error());
@@ -114,7 +116,11 @@ function additem($itemtoadd,$item,$questions,$qset) {
 				$questions[$qid]['qsetid'] = mysql_result($result,0,0);
 			} else { //add question, and assign to default library
 				$n = array_search($questions[$qid]['uqid'],$qset['uniqueid']);
+				$importuidstr = '';
+				$importuidval = '';
 				if ($questionexists && $_POST['merge']==0) {
+					$importuidstr = ',importuid';
+					$importuidval = ','.$questions[$qid]['uqid'];
 					$questions[$qid]['uqid'] = substr($mt,11).substr($mt,2,2).$qid;
 					$qset['uniqueid'][$n] = $questions[$qid]['uqid'];
 				}
@@ -125,11 +131,12 @@ function additem($itemtoadd,$item,$questions,$qset) {
 					$hasimg = 0;
 				}
 				$query = "INSERT INTO imas_questionset (adddate,lastmoddate,uniqueid,ownerid,";
-				$query .= "author,userights,description,qtype,control,qcontrol,qtext,answer,extref,hasimg) ";
+				$query .= "author,userights,description,qtype,control,qcontrol,qtext,answer,solution,solutionopts,extref,license,ancestorauthors,otherattribution,hasimg$importuidstr) ";
 				$query .= "VALUES ($now,'{$qset['lastmod'][$n]}','{$qset['uniqueid'][$n]}',";
 				$query .= "'$userid','{$qset['author'][$n]}','$userights',";
 				$query .= "'{$qset['description'][$n]}','{$qset['qtype'][$n]}','{$qset['control'][$n]}',";
-				$query .= "'{$qset['qcontrol'][$n]}','{$qset['qtext'][$n]}','{$qset['answer'][$n]}','{$qset['extref'][$n]}',$hasimg)";
+				$query .= "'{$qset['qcontrol'][$n]}','{$qset['qtext'][$n]}','{$qset['answer'][$n]}','{$qset['solution'][$n]}','{$qset['solutionopts'][$n]}','{$qset['extref'][$n]}',";
+				$query .= "'{$qset['license'][$n]}','{$qset['ancestorauthors'][$n]}','{$qset['otherattribution'][$n]}',$hasimg$importuidval)";
 				mysql_query($query) or die("error on: $query: " . mysql_error());
 				$questions[$qid]['qsetid'] = mysql_insert_id();
 				if ($hasimg==1) {
@@ -388,7 +395,12 @@ function parsefile($file) {
 			case  "QCONTROL":
 			case  "QTEXT":
 			case  "QTYPE":
+			case  "SOLUTION":
+			case  "SOLUTIONOPTS":
 			case  "EXTREF":
+			case  "LICENSE":
+			case  "ANCESTORAUTHORS":
+			case  "OTHERATTRIBUTION":
 			case  "QIMGS":
 			case  "ANSWER":
 				if (isset($part)) {

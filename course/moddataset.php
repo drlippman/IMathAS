@@ -211,8 +211,11 @@
 					$ancestors = intval($_GET['templateid']);
 				}
 				if ($ancestorauthors!='') {
-					$ancestorauthors = $lastauthor.'; '.$ancestorauthors;
-				} else {
+					$aaarr = explode('; ',$ancestorauthors);
+					if (!in_array($lastauthor,$aaarr)) {
+						$ancestorauthors = $lastauthor.'; '.$ancestorauthors;
+					}
+				} else if ($lastauthor != $_POST['author']) {
 					$ancestorauthors = $lastauthor;
 				}
 			}
