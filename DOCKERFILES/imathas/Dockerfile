@@ -7,6 +7,7 @@
 # Adapted from example from https://registry.hub.docker.com/u/tutum/apache-php/
 FROM tutum/apache-php:latest
 RUN rm -fr /app && git clone https://github.com/mfrellum/IMathAS.git /app
+#RUN rm -fr /app && git clone --single-branch https://github.com/mfrellum/IMathAS.git /app
 EXPOSE 80
 
 CMD ['/run.sh'] 
