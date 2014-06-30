@@ -3,65 +3,26 @@
 &nbsp;Simplex method functions
 <BR>&nbsp;Mike Jenck, Originally developed May 16-26, 2014
 <BR>&nbsp;licensed under GPL version 2
+<BR>
+<BR>&nbsp;2014-06-06 Updated, sorted, and fixed help file information
 <BR>&nbsp;2014-06-02 Bug fixes and added simplexreadtoanswerarray
 <BR><ul>
-<li><a href="#createsimplexelement">createsimplexelement</a></li>
-<li><a href="#simplextoarray">simplextoarray</a></li>
-<li><a href="#simplexconverttofraction">simplexconverttofraction</a></li>
-<li><a href="#simplexconverttodecimals">simplexconverttodecimals</a></li>
-<li><a href="#verifytype">verifytype</a></li>
-<li><a href="#verifyconstraints">verifyconstraints</a></li>
-<li><a href="#simplexdebug">simplexdebug</a></li>
 <li><a href="#simplex">simplex</a></li>
-<li><a href="#simplexreadtoanswerarray">simplexreadtoanswerarray</a></li>
 <li><a href="#simplexcreateanswerboxentrytable">simplexcreateanswerboxentrytable</a></li>
 <li><a href="#simplexcreateinequalities">simplexcreateinequalities</a></li>
+<li><a href="#simplexconverttodecimals">simplexconverttodecimals</a></li>
+<li><a href="#simplexconverttofraction">simplexconverttofraction</a></li>
+<li><a href="#simplexdebug">simplexdebug</a></li>
 <li><a href="#simplexdefaultheaders">simplexdefaultheaders</a></li>
 <li><a href="#simplexdisplaytable">simplexdisplaytable</a></li>
+<li><a href="#simplexfindpivotpoint">simplexfindpivotpoint</a></li>
 <li><a href="#simplexgetentry">simplexgetentry</a></li>
 <li><a href="#simplexpivot">simplexpivot</a></li>
+<li><a href="#simplexreadtoanswerarray">simplexreadtoanswerarray</a></li>
 <li><a href="#simplexreadsolution">simplexreadsolution</a></li>
 <li><a href="#simplexsolve">simplexsolve</a></li>
 </ul>
-<h3><a name="createsimplexelement">createsimplexelement</a></h3>
-function createsimplexelement($value)  
-<BR>&nbsp;returns an array in the form of (numerator, denominator) that is calculated from $value
-<BR>&nbsp;$value can be any valid real number, that will be converted into a fraction (proper or improper).
-<BR><h3><a name="simplextoarray">simplextoarray</a></h3>
-function simplextoarray(sm)
-<BR>&nbsp;this function takes the simplex matrix and verifies that each entry is a
-<BR>&nbsp;array in the form of (numerator, denominator)
-<BR>&nbsp;then returns the verified simplex matrix.
-<BR><h3><a name="simplexconverttofraction">simplexconverttofraction</a></h3>
-function simplexconverttofraction(sm)
-<BR>
-<BR>&nbsp;this function takes the simplex matrix and converts it to fractions for displaying
-<BR>
-<BR><h3><a name="simplexconverttodecimals">simplexconverttodecimals</a></h3>
-function simplexconverttodecimals(sm)
-<BR>
-<BR>&nbsp;this function takes the simplex matrix and converts it to fractions for displaying
-<BR>
-<BR><h3><a name="verifytype">verifytype</a></h3>
-&nbsp;the followiung are the verify functions to verify user input
-<BR>&nbsp;the from is a string of the calling function, then the input to be 
-<BR>&nbsp;verified, then the program supplied default value
-<BR><h3><a name="verifyconstraints">verifyconstraints</a></h3>
-function verifyconstraints(type, constraints)
-<BR>
-<BR>&nbsp;This function verifies that all of the constraints are vaild inequalities
-<BR>&nbsp;Currently no mixed constraint problems are supported.
-<BR>&nbsp;type:        max or min
-<BR>&nbsp;constraints: the constraints to be verified
-<BR>
-<BR><h3><a name="simplexdebug">simplexdebug</a></h3>
-function simplexdebug(sm)
-<BR>&nbsp;a raw dump of the contents of the simplex matrix
-<BR>
-<BR>&nbsp;Not intended to be used in question.  This is to allow the end user to see what the raw values are
-<BR>&nbsp;for each field
-<BR>
-<BR><h3><a name="simplex">simplex</a></h3>
+<h3><a name="simplex">simplex</a></h3>
 &nbsp;function simplex(type, objective, constraints)
 <BR>&nbsp;Creates and returns a new simplex matrix.  entries are fractions 
 <BR>&nbsp;stored in the form of an array(numerator, denominator).
@@ -89,12 +50,6 @@ function simplexdebug(sm)
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;first part: array(3,0,1) or "3,0,1"
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;second part: "<="
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;third part: 35
-<BR><h3><a name="simplexreadtoanswerarray">simplexreadtoanswerarray</a></h3>
-function simplexreadtoanswerarray(sm, [startnumber, answer]) 
-<BR>&nbsp;Create an array of values read by rows for the simplex matrix starting at startnumber
-<BR>&nbsp;sm:          simplex martix to read
-<BR>&nbsp;startnumber: starting number of the array.  Default is 0 
-<BR>&nbsp;answer: pass $answer if extending an existing $answer array
 <BR><h3><a name="simplexcreateanswerboxentrytable">simplexcreateanswerboxentrytable</a></h3>
 function simplexcreateanswerboxentrytable(rows, cols, [startnumber, matrixname, linemode, header, tablestyle]) 
 <BR>&nbsp;Create a string that is a valid HTML table syntax for displaying answerboxes.
@@ -138,6 +93,23 @@ function simplexcreateanswerboxentrytable(rows, cols, [startnumber, matrixname, 
 <BR>&nbsp;includeinequalities: either 0 or 1
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 does append the inequality and right hand sinde number ("<=",35)
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default 1 include the full inequality
+<BR><h3><a name="simplexconverttodecimals">simplexconverttodecimals</a></h3>
+function simplexconverttodecimals(sm)
+<BR>
+<BR>&nbsp;this function takes the simplex matrix and converts it to fractions for displaying
+<BR>
+<BR><h3><a name="simplexconverttofraction">simplexconverttofraction</a></h3>
+function simplexconverttofraction(sm)
+<BR>
+<BR>&nbsp;this function takes the simplex matrix and converts it to fractions for displaying
+<BR>
+<BR><h3><a name="simplexdebug">simplexdebug</a></h3>
+function simplexdebug(sm)
+<BR>&nbsp;a raw dump of the contents of the simplex matrix
+<BR>
+<BR>&nbsp;Not intended to be used in question.  This is to allow the question writer the ability to see what the 
+<BR>&nbsp;raw values are for each field.  all values should have a "|" between them, in the form of
+<BR>&nbsp;numerator | denominator.
 <BR><h3><a name="simplexdefaultheaders">simplexdefaultheaders</a></h3>
 &nbsp;function simplexdefaultheaders(sm,type)
 <BR>&nbsp;creates the default header (x1,x2, ...,s1,s2,...) for max and
@@ -171,23 +143,62 @@ simplexdisplaytable(simplexmatrix, [simplexmatrixname, displayASCIIticks, linemo
 <BR>&nbsp;&nbsp;&nbsp;default none
 <BR>&nbsp;$tablestyle: for any additional styles for the table that you may want.  like "color:#40B3DF;"
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default none
+<BR><h3><a name="simplexfindpivotpoint">simplexfindpivotpoint</a></h3>
+simplexfindpivotpoint($sm)
+<BR>&nbsp;$sm a simplex matrix
+<BR>
+<BR>&nbsp;returns array(condition, pivotpoints )
+<BR>&nbsp;where 
+<BR>&nbsp;condition: -1 means No Solution
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 found pivot point(s)
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1 means no pivot points found
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2 found possible multiple solution pivot point(s)
+<BR>
+<BR>&nbsp;pivotpoints: an array where the entries are the row, column where the pivot point was
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;found.  both are ZERO based.
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$pivotpoints[0] = (0,1)
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$pivotpoints[1] = (1,2)
 <BR><h3><a name="simplexgetentry">simplexgetentry</a></h3>
 simplexgetentry(simplexmatrix,row,col)
 <BR>get entry from a simplex matrix at given row and col
 <BR>rows and cols are 0 indexed (first row is row 0)
 <BR><h3><a name="simplexpivot">simplexpivot</a></h3>
-&nbsp;$sm[0]($m,$pivotpoint)
+&nbsp;simplexpivot($sm,$pivotpoint)
 <BR>&nbsp;pivots the simplex matrix on the given point
-<BR>&nbsp;$m the matrix
+<BR>&nbsp;$sm:         simplex matrix
 <BR>&nbsp;$pivotpoint: list or array that contains the point to be pivoted on. 
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Both row and column are ZERO based.
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this ALWAYS picks $pivotpoint[0] as the pivot point
 <BR>&nbsp;returns  a pivoted simplex matrix
+<BR><h3><a name="simplexreadtoanswerarray">simplexreadtoanswerarray</a></h3>
+function simplexreadtoanswerarray(sm, [startnumber, answer]) 
+<BR>&nbsp;Create an array of values read by rows for the simplex matrix starting at startnumber
+<BR>&nbsp;sm:          simplex martix to read
+<BR>&nbsp;startnumber: starting number of the array.  Default is 0 
+<BR>&nbsp;answer: pass $answer if extending an existing $answer array
 <BR><h3><a name="simplexreadsolution">simplexreadsolution</a></h3>
-simplexreadsolution($sm)
+simplexreadsolution($sm,$type,$showfractions=1)
 <BR>&nbsp;This reads the simplex matrix to find the current solution to the optimization problem.  It returns
 <BR>&nbsp;an array that contains the solution.
-<BR>&nbsp;$sm a simplex matrix
-<BR>&nbsp;type: a string that contains either "max" or "min"
+<BR>
+<BR>&nbsp;array(solution values for sm, IsOptimized)
+<BR>
+<BR>&nbsp;For Max solutions the solution is an array in the form of:
+<BR>
+<BR>&nbsp;x1,  x2, etc,  s1,  s2,  etc.,  f,  IsOptimized
+<BR>&nbsp;where f contains the maximum value
+<BR>&nbsp;IsOptimized contains either a Yes or a No (objective has been reached)
+<BR>
+<BR>
+<BR>&nbsp;For Min solutions the solution is an array in the form of:
+<BR>
+<BR>&nbsp;x1,  x2, etc,  y1,  y2,  etc.,  g,  IsOptimized
+<BR>&nbsp;where g contains the minimium value
+<BR>&nbsp;IsOptimized contains either a Yes or a No (objective has been reached)
+<BR>
+<BR>
+<BR>&nbsp;$sm:           a simplex matrix
+<BR>&nbsp;type:          a string that contains either "max" or "min"
 <BR>&nbsp;showfractions: either 0 or 1
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 shows decimals
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default 1 shows fractions
@@ -204,8 +215,8 @@ simplexsolve($sm,$type)
 <BR>&nbsp;
 <BR>&nbsp;solutionlist: an array of solutions (in the case of multiple solutions).   In the form of
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;solutionlist[0] = array(IsOptimized, solution values for matrix[0])
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;solutionlist[1] = array(IsOptimized, solution values for matrix[1])
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;solutionlist[0] = array(solution values for matrix[0], IsOptimized)
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;solutionlist[1] = array(solution values for matrix[1], IsOptimized)
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;etc.
 <BR>&nbsp;smlist:    an array of simplex matrix with 
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sma[0] = initial simplex matrix
