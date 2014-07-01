@@ -18,7 +18,7 @@ function getquestionlicense($row) {
 	if ($row['license']==0) {
 		$license .= '. This work is copyrighted, or contains copyright material.';
 	} else if ($row['license']==1) {
-		$license .= '. This work is licensed under the <a href="http://www.imathas.com/communitylicense.html">IMathAS Community License</a>.<br/>';
+		$license .= '. This work is licensed under the <a href="http://www.imathas.com/communitylicense.html">IMathAS Community License (GPL + CC-BY)</a>.<br/>';
 		$license .= 'The code that generated this question can be obtained by instructors by ';
 		if (isset($CFG['GEN']['meanstogetcode'])) {
 			$licence .= $CFG['GEN']['meanstogetcode'];

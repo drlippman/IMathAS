@@ -937,7 +937,10 @@ if ($myrights<20) {
 $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/junkflag.js\"></script>";
 $placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '".$urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savelibassignflag.php';";
 $placeinhead .= '$(function(){$(".wlf").attr("title","'.('Flag a question if it is in the wrong library').'");});</script>';
-
+if ($_POST['chglib']) {
+	$placeinhead .= '<link rel="stylesheet" href="'.$imasroot.'/course/libtree.css" type="text/css" />';
+	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/libtree2.js?v=031111"></script>';
+}
 require("../header.php");
 
 $address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
