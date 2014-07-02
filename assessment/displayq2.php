@@ -876,13 +876,27 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		else if ($displayformat=='debit') { $out .= 'onkeyup="editdebit(this)" style="text-align: right;" ';}
 		else if ($displayformat=='credit') { $out .= 'onkeyup="editcredit(this)" style="text-align: right;" '; $addlclass=' creditbox';}
 		
-		if ($showtips==2) { //eqntips: work in progress
+		/*if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
 				$qnref = "$qn-0";
 			} else {
 				$qnref = ($multi-1).'-'.($qn%1000);
 			}
 			$out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
+		}*/
+		if ($showtips==2) { //eqntips: work in progress
+			if ($multi==0) {
+				$qnref = "$qn-0";
+			} else {
+				$qnref = ($multi-1).'-'.($qn%1000);
+			}
+			if ($useeqnhelper && $useeqnhelper>2) {
+				$out .= "onfocus=\"showeebasicdd('qn$qn',0);showehdd('qn$qn','$shorttip','$qnref');\" onblur=\"hideebasice();hideebasicedd();hideeh();\" onclick=\"reshrinkeh('qn$qn')\" ";
+			} else {
+				$out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" onclick=\"reshrinkeh('qn$qn')\" ";
+			}
+		} else if ($useeqnhelper) {
+			$out .= "onfocus=\"showeebasicdd('qn$qn',0)\" onblur=\"hideebasice();hideebasicedd();\" ";
 		}
 		
 		$out .= "class=\"text $colorbox$addlclass\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\" />$rightb";
@@ -1978,15 +1992,29 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\"  ";
 		if ($answerformat=='normalcurve' && $GLOBALS['sessiondata']['graphdisp']!=0) {
-			$out .= 'style="position:absolute;left:-2000px;" ';
+			$out .= 'style="position:absolute;visibility:hidden;" ';
 		}
-		if ($showtips==2) { //eqntips: work in progress
+		/*if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
 				$qnref = "$qn-0";
 			} else {
 				$qnref = ($multi-1).'-'.($qn%1000);
 			}
 			$out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
+		}*/
+		if ($showtips==2) { //eqntips: work in progress
+			if ($multi==0) {
+				$qnref = "$qn-0";
+			} else {
+				$qnref = ($multi-1).'-'.($qn%1000);
+			}
+			if ($useeqnhelper && $useeqnhelper>2) {
+				$out .= "onfocus=\"showeebasicdd('qn$qn',1);showehdd('qn$qn','$shorttip','$qnref');\" onblur=\"hideebasice();hideebasicedd();hideeh();\" onclick=\"reshrinkeh('qn$qn')\" ";
+			} else {
+				$out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" onclick=\"reshrinkeh('qn$qn')\" ";
+			}
+		} else if ($useeqnhelper) {
+			$out .= "onfocus=\"showeebasicdd('qn$qn',1)\" onblur=\"hideebasice();hideebasicedd();\" ";
 		}
 		$out .= '/>';
 		$out .= getcolormark($colorbox);
