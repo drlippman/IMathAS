@@ -252,6 +252,8 @@ if ($overwriteBody==1) {
 	
 	echo "<h2>"._('Generate Word Version')."</h2>";
 	echo '<p>'._('Assessment is prepared, and ready for conversion').'.</p>';
+	echo '<p>NOTE: In some versions of Word, variables in equations may appear incorrectly at first.  To fix this, ';
+	echo 'select everything (Control-A), then under the Equation Tools menu, click Linear then Professional.</p>';
 	echo '<form id="theform" method="post" action="http://'.$CFG['GEN']['pandocserver'].'/html2docx.php">';
 	echo '<input type="submit" value="'._("Convert to Word").'"/> ';
 	echo '<a href="printlayoutword.php?cid='.$cid.'&amp;aid='.$aid.'">'._('Change print settings').'</a>';

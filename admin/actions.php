@@ -679,7 +679,12 @@ switch($_GET['action']) {
 					while (!feof($handle)) {
 						$buffer = fgets($handle, 4096);
 						if (strpos($buffer,"//")===0) {
-							$comments .= preg_replace('/^( +)/e', 'str_repeat("&nbsp;", strlen("$1"))', substr($buffer,2)) .  "<BR>";
+							$trimmed = trim(substr($buffer,2));
+							if ($trimmed{0}!='<' && substr($trimmed,-1)!='>') {
+								$comments .= preg_replace('/^( +)/e', 'str_repeat("&nbsp;", strlen("$1"))', substr($buffer,2)) .  "<BR>";
+							} else {
+								$comments .= trim(substr($buffer,2));
+							}
 						} else if (strpos($buffer,"function")===0) {
 							$func = substr($buffer,9,strpos($buffer,"(")-9);
 							if ($comments!='') {
