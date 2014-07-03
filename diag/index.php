@@ -291,20 +291,7 @@ if (isset($_POST['SID'])) {
 	exit;
 }
 
-/*
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html>
-<head>
-<title><?php echo $line['name']; ?></title>
-<style type="text/css">
-<!--
-@import url("../imas.css");
--->
-</style>
-<script src="<?php echo $imasroot;?>/javascript/mathgraphcheck.js" type="text/javascript"></script>
-</head>
-<body>
-*/
+
 //allow custom login page for specific diagnostics
 if (file_exists((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'')."diag$diagid.php")) {
 	require((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'')."diag$diagid.php");
