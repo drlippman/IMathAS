@@ -79,7 +79,8 @@ function fractiontomixed($fp) {
 	if ($fp[1]==1) {
 		return $fp[0];
 	} else if (abs($fp[0])>abs($fp[1])) {
-		$w = floor(abs($fp[0])/abs($fp[1]))*sign($fp[0]);
+		$w = floor(abs($fp[0])/abs($fp[1]));
+		if ($fp[0]<0) { $w *= -1;}
 		$fp[0] -= $w*$fp[1];
 		return $w.' '.abs($fp[0]).'/'.$fp[1];
 	} else {
