@@ -72,12 +72,17 @@ function fractiontomixed($fp) {
 	if (!is_array($fp)) {
 		$fp = fractionparse($fp);
 	}
+	if ($fp[1]<0) {
+		$fp[1] *= -1;
+		$fp[0] *= -1;
+	}
 	if ($fp[1]==1) {
 		return $fp[0];
-	} else if ($fp[0]>$fp[1]) {
-		$w = floor($fp[0]/$fp[1]);
+	} else if (abs($fp[0])>abs($fp[1])) {
+		$w = floor(abs($fp[0])/abs($fp[1]));
+		if ($fp[0]<0) { $w *= -1;}
 		$fp[0] -= $w*$fp[1];
-		return $w.' '.$fp[0].'/'.$fp[1];
+		return $w.' '.abs($fp[0]).'/'.$fp[1];
 	} else {
 		return $fp[0].'/'.$fp[1];
 	} 

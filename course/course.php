@@ -617,7 +617,10 @@ if ($overwriteBody==1) {
 		   echo 'var unsavedmsg = "'._("You have unrecorded changes.  Are you sure you want to abandon your changes?").'";';
 		   echo "</script>";
 		   echo "<script src=\"$imasroot/javascript/mootools.js\"></script>";
-		   echo "<script src=\"$imasroot/javascript/nested1.js?v=052414\"></script>";
+		   echo "<script src=\"$imasroot/javascript/nested1.js?v=070214\"></script>";
+		   echo '<p><button type="button" onclick="quickviewexpandAll()">'._("Expand All").'</button> ';
+		   echo '<button type="button" onclick="quickviewcollapseAll()">'._("Collapse All").'</button></p>';
+		   
 		   echo '<ul id=qviewtree class=qview>';
 		   quickview($items,0);
 		   echo '</ul>';

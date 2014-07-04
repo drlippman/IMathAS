@@ -419,13 +419,29 @@ if ($myrights<20) {
 			$row = mysql_fetch_row($result);
 			$myname = $row[1].','.$row[0];
 			foreach ($qtochg as $k=>$qid) {
-				$query = "SELECT description,userights,qtype,control,qcontrol,qtext,answer,hasimg FROM imas_questionset WHERE id='$qid'";
+				$ancestors = ''; $ancestorauthors = '';
+				$query = "SELECT description,userights,qtype,control,qcontrol,qtext,answer,hasimg,ancestors,ancestorauthors,license,author FROM imas_questionset WHERE id='$qid'";
 				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 				$row = mysql_fetch_row($result);
+				$lastauthor = array_pop($row);
+				$ancestors = $row[8];
+				$ancestorauthors = $row[9];
+				if ($ancestors!='') {
+					$ancestors = $qid . ','. $ancestors;
+				} else {
+					$ancestors = $qid;
+				}
+				if ($ancestorauthors!='') {
+					$ancestorauthors = $lastauthor.'; '.$ancestorauthors;
+				} else {
+					$ancestorauthors = $lastauthor;
+				}
+				$row[8] = $ancestors;
+				$row[9] = $ancestorauthors;
 				$row[0] .= " (copy by $userfullname)";
 				$mt = microtime();
 				$uqid = substr($mt,11).substr($mt,2,3).$k;
-				$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,ownerid,author,description,userights,qtype,control,qcontrol,qtext,answer,hasimg) VALUES ";
+				$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,ownerid,author,description,userights,qtype,control,qcontrol,qtext,answer,hasimg,ancestors,ancestorauthors,license) VALUES ";
 				$query .= "('$uqid','$now','$now','$userid','$myname','".implode("','",addslashes_deep($row))."')";
 				mysql_query($query) or die("Query failed : $query" . mysql_error());
 				$nqid = mysql_insert_id();
@@ -450,6 +466,55 @@ if ($myrights<20) {
 			
 			$clist = implode(",",$_POST['nchecked']);
 			$selecttype = "radio";
+			
+			if (!isset($_POST['nchecked'])) {
+				$overwriteBody = 1;
+				$body = "No questions selected.  <a href=\"manageqset.php?cid=$cid\">Go back</a>\n";
+			}
+		}
+		
+	} else if (isset($_POST['license'])) {
+		if (isset($_POST['qtochg'])) {
+			$qtochg = explode(',',$_POST['qtochg']);
+			foreach ($qtochg as $k=>$qid) {
+				$qtochg[$k] = intval($qid);
+			}
+			if ($_POST['sellicense']!=-1) {
+				$query = "UPDATE imas_questionset SET license=".intval($_POST['sellicense'])." WHERE id IN (".implode(',',$qtochg).")";
+				if (!$isadmin) {
+					$query .= " AND ownerid='$userid'";
+				}
+				mysql_query($query) or die("Query failed : $query" . mysql_error());
+			}
+			if ($_POST['otherattribtype']!=-1) {
+				if ($_POST['otherattribtype']==0) {
+					$query = "UPDATE imas_questionset SET otherattribution='".$_POST['addattr']."' WHERE id IN (".implode(',',$qtochg).")";
+					if (!$isadmin) {
+						$query .= " AND ownerid='$userid'";
+					}
+					mysql_query($query) or die("Query failed : $query" . mysql_error());
+				} else {
+					$query = "SELECT id,otherattribution FROM imas_questionset WHERE id IN (".implode(',',$qtochg).")";
+					if (!$isadmin) {
+						$query .= " AND ownerid='$userid'";
+					}
+					$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+					while ($row = mysql_fetch_row($result)) {
+						$attr = addslashes($row[1]) . $_POST['addattr'];
+						$query = "UPDATE imas_questionset SET otherattribution='$attr' WHERE id={$row[0]}";
+						mysql_query($query) or die("Query failed : $query" . mysql_error());
+					}
+				}
+			}
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/manageqset.php?cid=$cid");
+			
+			exit;
+		} else {
+			$pagetitle = _("Change Question License/Attribution");
+			$curBreadcrumb .= " &gt; <a href=\"manageqset.php?cid=$cid\">Manage Question Set </a>";
+			$curBreadcrumb .= " &gt; "._("Change Question License/Attribution");
+			
+			$clist = implode(",",$_POST['nchecked']);
 			
 			if (!isset($_POST['nchecked'])) {
 				$overwriteBody = 1;
@@ -872,7 +937,10 @@ if ($myrights<20) {
 $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/junkflag.js\"></script>";
 $placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '".$urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savelibassignflag.php';";
 $placeinhead .= '$(function(){$(".wlf").attr("title","'.('Flag a question if it is in the wrong library').'");});</script>';
-
+if ($_POST['chglib']) {
+	$placeinhead .= '<link rel="stylesheet" href="'.$imasroot.'/course/libtree.css" type="text/css" />';
+	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/libtree2.js?v=031111"></script>';
+}
 require("../header.php");
 
 $address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
@@ -1042,6 +1110,51 @@ function getnextprev(formn,loc) {
 			</p>
 		</form>
 <?php		
+	} else if (isset($_POST['license'])) {
+?>
+
+	<form method=post action="manageqset.php?cid=<?php echo $cid ?>">
+		<input type=hidden name="license" value="true">
+		
+		<input type=hidden name=qtochg value="<?php echo $clist ?>">
+		
+		<p>This will allow you to change the license or attribution on questions, if you have the rights to change them</p>
+		
+		<p>Note:  Be cautious when changing licenses or attribution on questions.  Some important things to note:
+		<ul>
+		 <li>If questions are currently copyrighted or contain copyrighted content, you CAN NOT change the license
+		     unless you have removed all copyrighted material from the question.</li>
+		 <li>If questions are licensed under the IMathAS Community License or a Creative Commons license, you CAN NOT
+		     change the license unless you are the creator of the questions and all questions it was previously derived from.</li>
+		 <li>If the question currently has additional attribution listed, you CAN NOT remove that attribution unless
+		     you have removed from the question all parts that require the attribution.</li>
+		</ul>
+		<p style="color:red;">
+		  In short, you should only be changing license if the questions are your original works, not built on top of existing
+		  community work.
+		<p>
+		<p>
+		License: <select name="sellicense">
+			<option value="-1">Do not change license</option>
+			<option value="0">Copyrighted</option>
+			<option value="1">IMathAS / WAMAP / MyOpenMath Community License</option>
+			<option value="2">Public Domain</option>
+			<option value="3">Creative Commons Attribution-NonCommercial-ShareAlike</option>
+		</select>
+		</p>
+		<p>Other Attribution: <select name="otherattribtype">
+			<option value="-1">Do not change attribution</option>
+			<option value="0">Replace existing attribution</option>
+			<option value="1">Append to existing attribution</option>
+			</select><br/>
+			Additional Attribution: <input type="text" size="80" name="addattr" />
+		</p>
+	
+			<input type=submit value="Change License / Attribution">
+			<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
+		</p>
+	</form>
+<?php		
 	} else if (isset($_POST['chgrights'])) {
 ?>
 		<form method=post action="manageqset.php?cid=<?php echo $cid ?>">
@@ -1123,7 +1236,8 @@ function getnextprev(formn,loc) {
 		echo "<input type=submit name=\"remove\" value=\"Delete\">\n";
 		echo "<input type=submit name=\"chglib\" value=\"Library Assignment\" title=\"Change library assignments\">\n";
 		echo "<input type=submit name=\"chgrights\" value=\"Change Rights\" title=\"Change use rights\">\n";
-		echo "<input type=submit name=\"template\" value=\"Template\" title=\"Make a copy of all selected questions\">\n";
+		//echo "<input type=submit name=\"template\" value=\"Template\" title=\"Make a copy of all selected questions\">\n";
+		echo "<input type=submit name=\"license\" value=\"License\" title=\"Change license or attribution\">\n";
 		if (!$isadmin && !$isgrpadmin) { 
 			echo "<br/>(Delete and Transfer only applies to your questions)\n";
 		} else if ($isgrpadmin) {

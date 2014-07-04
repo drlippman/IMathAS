@@ -18,7 +18,7 @@ function getquestionlicense($row) {
 	if ($row['license']==0) {
 		$license .= '. This work is copyrighted, or contains copyright material.';
 	} else if ($row['license']==1) {
-		$license .= '. This work is licensed under the <a href="http://www.imathas.com/communitylicense.html">IMathAS Community License</a>.<br/>';
+		$license .= '. This work is licensed under the <a href="http://www.imathas.com/communitylicense.html">IMathAS Community License (GPL + CC-BY)</a>.<br/>';
 		$license .= 'The code that generated this question can be obtained by instructors by ';
 		if (isset($CFG['GEN']['meanstogetcode'])) {
 			$licence .= $CFG['GEN']['meanstogetcode'];
@@ -26,10 +26,12 @@ function getquestionlicense($row) {
 			global $sendfrom;
 			$license .= 'emailing '.$sendfrom;
 		}
-	} else if ($row['license']==1) {
-		$license .= '. This work has been placed in the <a href="https://creativecommons.org/publicdomain/zero/1.0/">Public Domain</a>. ';
 	} else if ($row['license']==2) {
+		$license .= '. This work has been placed in the <a href="https://creativecommons.org/publicdomain/zero/1.0/">Public Domain</a>. ';
+	} else if ($row['license']==3) {
 		$license .= '. This work, both code and generated output, is licensed under the <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike</a> license. ';
+	} else if ($row['license']==4) {
+		$license .= '. This work, both code and generated output, is licensed under the <a href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike</a> license. ';
 	}
 	if ($row['otherattribution']!='') {
 		$license .= '. '.$row['otherattribution'];

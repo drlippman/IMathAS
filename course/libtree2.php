@@ -17,12 +17,12 @@
 			}
 		}
 		echo <<<END
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 <html>
 <head>
 <title>IMathAS Library Selection</title>
 END;
-	}
+	
 	if (isset($coursetheme)) { 
 		$coursetheme = str_replace('_fw','',$coursetheme);
 		echo '<link rel="stylesheet" href="'."$imasroot/themes/$coursetheme?v=012810\" type=\"text/css\" />";
@@ -32,9 +32,6 @@ END;
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script>
 <script type="text/javascript" src="$imasroot/javascript/general.js?v=031111"></script>
 <script type="text/javascript" src="$imasroot/javascript/libtree2.js?v=031111"></script>
-END;
-	if (isset($_GET['libtree']) && $_GET['libtree']=="popup") {
-		echo <<<END
 </head>
 <body>
 <form id="libselectform">

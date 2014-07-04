@@ -232,7 +232,7 @@
 	}
 	
 	$pagetitle = "Threads";
-	$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
+	$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\"); td.pointer:hover {text-decoration: underline;}\n</style>\n";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/thread.js\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savetagged.php?cid=$cid';";
 	$placeinhead .= '$(function() {$("img[src*=\'flag\']").attr("title","Flag Message");});';
@@ -538,7 +538,14 @@
 			echo '<td class=c>'.$groupnames[$line['stugroupid']].'</td>';
 		}
 		
-		echo "<td class=c>$posts</td><td class=c>{$line['tviews']} ({$uniqviews[$line['id']]})</td><td class=c>$lastpost ";
+		echo "<td class=c>$posts</td>";
+		
+		if ($isteacher) {
+			echo '<td class="pointer c" onclick="GB_show(\''._('Thread Views').'\',\'listviews.php?cid='.$cid.'&amp;thread='.$line['id'].'\',500,500);">';
+		} else {
+			echo '<td class="c">';
+		}
+		echo "{$line['tviews']} ({$uniqviews[$line['id']]})</td><td class=c>$lastpost ";
 		if ($lastpost=='' || $maxdate[$line['id']]>$lastview[$line['id']]) {
 			echo "<span style=\"color: red;\">New</span>";
 		}

@@ -7,6 +7,7 @@
 //1 - IMathAS community license (GPL + CC-BY)
 //2 - Public domain
 //3 - CC-BY-SA-NC
+//4 - CC-BY-SA
 
 	require("../validate.php");
 	
@@ -207,12 +208,15 @@
 				list($ancestors,$lastauthor,$ancestorauthors) = mysql_fetch_row($result);
 				if ($ancestors!='') {
 					$ancestors = intval($_GET['templateid']) . ','. $ancestors;
+				} else {
+					$ancestors = intval($_GET['templateid']);
+				}
+				if ($ancestorauthors!='') {
 					$aaarr = explode('; ',$ancestorauthors);
 					if (!in_array($lastauthor,$aaarr)) {
 						$ancestorauthors = $lastauthor.'; '.$ancestorauthors;
 					}
-				} else {
-					$ancestors = intval($_GET['templateid']);
+				} else if ($lastauthor != $_POST['author']) {
 					$ancestorauthors = $lastauthor;
 				}
 			}
@@ -755,9 +759,10 @@ if (!isset($line['ownerid']) || isset($_GET['template']) || $line['ownerid']==$u
 	echo '</select><br/>';
 	echo 'License: <select name="license" id="license" onchange="checklicense()">';
 	echo '<option value="0" '.($line['license']==0?'selected':'').'>Copyrighted</option>';
-	echo '<option value="1" '.($line['license']==1?'selected':'').'>IMathAS / WAMAP / MyOpenMath Community License</option>';
+	echo '<option value="1" '.($line['license']==1?'selected':'').'>IMathAS / WAMAP / MyOpenMath Community License (GPL + CC-BY)</option>';
 	echo '<option value="2" '.($line['license']==2?'selected':'').'>Public Domain</option>';
 	echo '<option value="3" '.($line['license']==3?'selected':'').'>Creative Commons Attribution-NonCommercial-ShareAlike</option>';
+	echo '<option value="3" '.($line['license']==4?'selected':'').'>Creative Commons Attribution-ShareAlike</option>';
 	echo '</select><span id="licensewarn" style="color:red;font-size:80%;"></span>';
 	if ($line['otherattribution']=='') {
 		echo '<br/><a href="#" onclick="$(\'#addattrspan\').show();$(this).hide();return false;">Add additional attribution</a>';
@@ -767,7 +772,7 @@ if (!isset($line['ownerid']) || isset($_GET['template']) || $line['ownerid']==$u
 	}
 	echo 'Additional Attribution: <input type="text" size="80" name="addattr" value="'.htmlentities($line['otherattribution']).'"/>';
 	if ($line['otherattribution']!='') {
-		echo '<br/><span style="color:red;font-size:80%">You should only modify the attribution if you are SURE you are removing all portions that require the attribution</span>';
+		echo '<br/><span style="color:red;font-size:80%">You should only modify the attribution if you are SURE you are removing all portions of the question that require the attribution</span>';
 	}
 	echo '</span>';
 	

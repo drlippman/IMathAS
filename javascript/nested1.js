@@ -346,6 +346,12 @@ function submitChanges() {
   } 
 }  
 
+function quickviewexpandAll() {
+	jQuery("#qviewtree li.blockli.nCollapse").removeClass("nCollapse").children("ul").show();
+}
+function quickviewcollapseAll() {
+	jQuery("#qviewtree li.blockli:not(.nCollapse)").addClass("nCollapse").children("ul").hide();
+}
 
 function NestedahahDone(url, target) { 
   if (req.readyState == 4) { // only if req is "loaded" 

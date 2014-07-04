@@ -595,6 +595,7 @@
 						$icon = (in_array($child,$mylikes))?'liked':'likedgray';
 						$likemsg = 'Liked by ';
 						$likecnt = 0;
+						$likeclass = '';
 						if ($likes[$child][0]>0) {
 							$likeclass = ' liked';
 							$likemsg .= $likes[$child][0].' ' . ($likes[$child][0]==1?'student':'students');
@@ -628,7 +629,7 @@
 						
 						echo '<div class="likewrap">';
 						echo "<img id=\"likeicon$child\" class=\"likeicon$likeclass\" src=\"$imasroot/img/$icon.png\" title=\"$likemsg\" onclick=\"savelike(this)\">";
-						echo " <span id=\"likecnt$child\">".($likecnt>0?$likecnt:'').' </span> ';
+						echo " <span class=\"pointer\" id=\"likecnt$child\" onclick=\"GB_show('"._('Post Likes')."','listlikes.php?cid=$cid&amp;post=$child',500,500);\">".($likecnt>0?$likecnt:'').' </span> ';
 						echo '</div>';
 					}
 					echo '<div class="clear"></div>';
