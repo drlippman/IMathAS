@@ -238,6 +238,8 @@ if ($myrights<60) {
 	$page_entryType['label'][0] = 'Letters or numbers';
 	$page_entryType['val'][1] = 'D';
 	$page_entryType['label'][1] = 'Numbers';
+	$page_entryType['val'][2] = 'E';
+	$page_entryType['label'][2] = 'Email address';
 	$page_entryTypeSelected = $entrytype;
 	
 	

@@ -115,24 +115,30 @@ if (isset($_POST['SID'])) {
 		$pattern .= '\w';
 	} else if ($entrytype=='D') {
 		$pattern .= '\d';
+	} else if ($entrytype=='E') {
+		$pattern .= '[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}';
 	}
-	if ($entrydig==0) {
-		$pattern .= '+';
-	} else {
-		$pattern .= '{'.$entrydig.'}';
+	if ($entrytype!='E') {
+		if ($entrydig==0) {
+			$pattern .= '+';
+		} else {
+			$pattern .= '{'.$entrydig.'}';
+		}
 	}
-	$pattern .= '$/';
+	$pattern .= '$/i';
 	if (!preg_match($pattern,$_POST['SID'])) {
 		echo "<html><body>Your ID is not valid.  It should contain ";
-		if ($entrydig>0) {
+		if ($entrydig>0 && $entrytype!='E') {
 			echo $entrydig.' ';
 		}
 		if ($entrytype=='C') {
-			echo 'letters or numbers';
+			echo _('letters or numbers');
 		} else if ($entrytype=='D') {
-			echo 'numbers';
+			echo _('numbers)';
+		} else if ($entrytype=='E') {
+			echo _('an email address');
 		}
-		echo " <a href=\"index.php?id=$diagid\">Try Again</a>\n";
+		echo " <a href=\"index.php?id=$diagid\">"._('Try Again')."</a>\n";
 		exit;
 	}
 	
