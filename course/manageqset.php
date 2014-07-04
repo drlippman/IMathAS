@@ -1140,6 +1140,7 @@ function getnextprev(formn,loc) {
 			<option value="1">IMathAS / WAMAP / MyOpenMath Community License</option>
 			<option value="2">Public Domain</option>
 			<option value="3">Creative Commons Attribution-NonCommercial-ShareAlike</option>
+			<option value="4">Creative Commons Attribution-ShareAlike</option>
 		</select>
 		</p>
 		<p>Other Attribution: <select name="otherattribtype">

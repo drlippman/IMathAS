@@ -3,6 +3,7 @@
 //(c) 2010 David Lippman
 
 require("./config.php");
+require("i18n/i18n.php");
 header('P3P: CP="ALL CUR ADM OUR"');
 $public = '?public=true';
 $publica = '&public=true';

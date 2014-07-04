@@ -1369,7 +1369,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />\n";
 		if (!isset($hidepreview)) {
-			$preview .= "<input type=button class=btn value=Preview onclick=\"calculate('tc$qn','p$qn','$answerformat')\" /> &nbsp;\n";
+			$preview .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"calculate('tc$qn','p$qn','$answerformat')\" /> &nbsp;\n";
 		}
 		$preview .= "$leftb<span id=p$qn></span>$rightb ";
 		$out .= "<script type=\"text/javascript\">calctoproc[$qn] = 1; calcformat[$qn] = '$answerformat';</script>\n";
@@ -1476,7 +1476,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		} else {
 			$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\" />\n";
 			$out .= getcolormark($colorbox);
-			$out .= "<input type=button value=Preview onclick=\"matrixcalc('tc$qn','p$qn')\" /> &nbsp;\n";
+			$out .= "<input type=button value=\"" . _('Preview') . "\" onclick=\"matrixcalc('tc$qn','p$qn')\" /> &nbsp;\n";
 			$out .= "<span id=p$qn></span> \n";
 			$out .= "<script type=\"text/javascript\">matcalctoproc[$qn] = 1;</script>\n";
 			$tip = _('Enter your answer as a matrix, like ((2,3,4),(1,4,5))');

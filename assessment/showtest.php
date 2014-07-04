@@ -1482,7 +1482,7 @@ if (!isset($_POST['embedpostback'])) {
 					echo "<a name=\"beginquestions\"></a>\n";
 					basicshowq($next);
 					showqinfobar($next,true,true);
-					echo '<input type="submit" class="btn" value="Submit" />';
+					echo '<input type="submit" class="btn" value="'. _('Submit'). '" />';
 					if (($testsettings['showans']=='J' && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='J') {
 						echo ' <input type="button" class="btn" value="', _('Jump to Answer'), '" onclick="if (confirm(\'', _('If you jump to the answer, you must generate a new version to earn credit'), '\')) {window.location = \'showtest.php?action=skip&amp;jumptoans='.$next.'&amp;to='.$next.'\'}"/>';
 					}
@@ -1522,7 +1522,7 @@ if (!isset($_POST['embedpostback'])) {
 					echo "<a name=\"beginquestions\"></a>\n";
 					basicshowq($next);
 					showqinfobar($next,true,true);
-					echo '<input type="submit" class="btn" value="Submit" />';
+					echo '<input type="submit" class="btn" value="'. _('Submit'). '" />';
 					if (($testsettings['showans']=='J' && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='J') {
 						echo ' <input type="button" class="btn" value="', _('Jump to Answer'), '" onclick="if (confirm(\'', _('If you jump to the answer, you must generate a new version to earn credit'), '\')) {window.location = \'showtest.php?action=skip&amp;jumptoans='.$next.'&amp;to='.$next.'\'}"/>';
 					}
@@ -2205,7 +2205,7 @@ if (!isset($_POST['embedpostback'])) {
 					
 					basicshowq($i,false);
 					$quesout .= ob_get_clean();
-					$quesout = substr($quesout,0,-7).'<br/><input type="button" class="btn" value="Submit" onclick="assessbackgsubmit('.$i.',\'submitnotice'.$i.'\')" /><span id="submitnotice'.$i.'"></span></div>';
+					$quesout = substr($quesout,0,-7).'<br/><input type="button" class="btn" value="'. _('Submit'). '" onclick="assessbackgsubmit('.$i.',\'submitnotice'.$i.'\')" /><span id="submitnotice'.$i.'"></span></div>';
 					
 				} else {
 					if (!$sessiondata['istutorial']) {

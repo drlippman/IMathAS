@@ -648,7 +648,7 @@
 	   	if (originallicense>-1) {
 	   		if (originallicense==0 && lic != 0) {
 	   			warn = "'._('If the original question contained copyrighted material, you should not change the license unless you have removed all the copyrighted material').'";
-	   		} else if ((originallicense == 1 ||  originallicense == 3) && lic != originallicense) {
+	   		} else if ((originallicense == 1 ||  originallicense == 3 ||  originallicense == 4) && lic != originallicense) {
 	   			warn = "'._('The original license REQUIRES that all derivative versions be kept under the same license. You should only be changing the license if you are the creator of this questions and all questions it was derived from').'";
 	   		}
 	   	}
