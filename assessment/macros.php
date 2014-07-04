@@ -1292,10 +1292,11 @@ function makereducedmixednumber($n,$d) {
 	if ($d==1) {
 		return "$n";
 	} else {
-		if ($n>$d) {
-			$w = floor($n/$d);
+		if (abs($n)>$d) {
+			$w = floor(abs($n)/$d);
+			if ($n<0) { $w *= -1;}
 			$n -= $w*$d;
-			return "$w $n/$d";
+			return "$w ".abs($n)."/$d";
 		} else {
 			return "$n/$d";
 		}
