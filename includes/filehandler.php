@@ -65,6 +65,24 @@ function relocatecoursefileifneeded($file, $key, $sec="public") {
 	}
 }
 
+function relocatefileifneeded($file, $key, $sec="public") {
+	if ($GLOBALS['filehandertypecfiles'] == 's3') {
+		if ($sec=="public" || $sec=="public-read") {
+			$sec = "public-read";
+		} else {
+			$sec = "private";
+		}
+		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		if ($s3->putObjectFile($file,$GLOBALS['AWSbucket'],$key,$sec)) {
+			return getuserfileurl($key);
+		} else {
+			return false;
+		}
+	} else {
+		return true;
+	}
+}
+
 function storeuploadedfile($id,$key,$sec="private") {
 	if ($GLOBALS['filehandertype'] == 's3') {
 		if ($sec=="public" || $sec=="public-read") {
