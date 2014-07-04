@@ -68,6 +68,7 @@ if ($doembed) {
 	echo '<html><head><title>Video</title>';
 	echo '<meta name="viewport" content="width=660, initial-scale=1">';
 	echo '<style type="text/css"> html, body {margin: 0px} html {padding:0px} body {padding: 10px;}</style>';
+	echo '<script type="text/javascript">childTimer = window.setInterval(function(){try{window.opener.popupwins[\'video\'] = window;} catch(e){}}, 300);</script>';
 	echo '</head>';
 	echo '<body>'.$out.'</body></html>';
 } else {

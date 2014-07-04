@@ -332,6 +332,13 @@ if (isset($_GET['modify'])) { //adding or modifying post
 					}
 					$message = displayq($parts[0],$parts[1],$parts[2],$showa,false,0,true);
 					$message = printfilter(forcefiltergraph($message));
+					if (isset($CFG['GEN']['AWSforcoursefiles']) && $CFG['GEN']['AWSforcoursefiles'] == true) {
+						require_once("../includes/filehandler.php");
+						$message = preg_replace_callback('|'.$imasroot.'/filter/graph/imgs/([^\.]*?\.png)|', function ($matches) {
+							$curdir = rtrim(dirname(__FILE__), '/\\');
+							return relocatefileifneeded($curdir.'/../filter/graph/imgs/'.$matches[1], 'gimgs/'.$matches[1]);
+						    }, $message);
+					}
 					$message = preg_replace('/(`[^`]*`)/',"<span class=\"AM\">$1</span>",$message);
 					
 					$line['message'] = '<p> </p><br/><hr/>'.$message;
