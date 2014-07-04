@@ -276,7 +276,7 @@ if ($overwriteBody==1) {
 	echo '<p id="brokenmsgok" style="display:'.(($line['broken']==0)?"block":"none").'"><a href="#" onclick="submitBrokenFlag(1);return false;">Mark as broken</a> if there appears to be an error with the question.</p>';
 
 	echo '<p>'._('License').': ';
-	$license = array('Copyrighted','IMathAS Community License','Public Domain','Creative Commons Attribution-NonCommercial-ShareAlike');
+	$license = array('Copyrighted','IMathAS Community License','Public Domain','Creative Commons Attribution-NonCommercial-ShareAlike','Creative Commons Attribution-ShareAlike');
 	echo $license[$line['license']];
 	if ($line['otherattribution']!='') {
 		echo '<br/>Other Attribution: '.$line['otherattribution'];

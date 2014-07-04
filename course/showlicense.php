@@ -26,10 +26,12 @@ function getquestionlicense($row) {
 			global $sendfrom;
 			$license .= 'emailing '.$sendfrom;
 		}
-	} else if ($row['license']==1) {
-		$license .= '. This work has been placed in the <a href="https://creativecommons.org/publicdomain/zero/1.0/">Public Domain</a>. ';
 	} else if ($row['license']==2) {
+		$license .= '. This work has been placed in the <a href="https://creativecommons.org/publicdomain/zero/1.0/">Public Domain</a>. ';
+	} else if ($row['license']==3) {
 		$license .= '. This work, both code and generated output, is licensed under the <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike</a> license. ';
+	} else if ($row['license']==4) {
+		$license .= '. This work, both code and generated output, is licensed under the <a href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike</a> license. ';
 	}
 	if ($row['otherattribution']!='') {
 		$license .= '. '.$row['otherattribution'];

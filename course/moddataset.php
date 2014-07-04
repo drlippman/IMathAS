@@ -7,6 +7,7 @@
 //1 - IMathAS community license (GPL + CC-BY)
 //2 - Public domain
 //3 - CC-BY-SA-NC
+//4 - CC-BY-SA
 
 	require("../validate.php");
 	
@@ -761,6 +762,7 @@ if (!isset($line['ownerid']) || isset($_GET['template']) || $line['ownerid']==$u
 	echo '<option value="1" '.($line['license']==1?'selected':'').'>IMathAS / WAMAP / MyOpenMath Community License (GPL + CC-BY)</option>';
 	echo '<option value="2" '.($line['license']==2?'selected':'').'>Public Domain</option>';
 	echo '<option value="3" '.($line['license']==3?'selected':'').'>Creative Commons Attribution-NonCommercial-ShareAlike</option>';
+	echo '<option value="3" '.($line['license']==4?'selected':'').'>Creative Commons Attribution-ShareAlike</option>';
 	echo '</select><span id="licensewarn" style="color:red;font-size:80%;"></span>';
 	if ($line['otherattribution']=='') {
 		echo '<br/><a href="#" onclick="$(\'#addattrspan\').show();$(this).hide();return false;">Add additional attribution</a>';
