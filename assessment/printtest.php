@@ -6,9 +6,11 @@
 		exit;
 	}
 	if (isset($teacherid) && isset($_GET['scored'])) {
+		$scoredtype = $_GET['scored'];
 		$scoredview = true;
 		$showcolormark = true;
 	} else {
+		$scoredtype = 'last';
 		$scoredview = false;
 	}
 	
@@ -45,11 +47,22 @@
 	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
 	$questions = explode(",",$line['questions']);
-	$seeds = explode(",",$line['seeds']);
-	$sp = explode(';',$line['bestscores']);
-	$scores = explode(",",$sp[0]);
-	$attempts = explode(",",$line['bestattempts']);
-	$lastanswers = explode("~",$line['bestlastanswers']);
+	if ($scoredtype=='last') {
+		$seeds = explode(",",$line['seeds']);
+		$sp = explode(';',$line['scores']);
+		$scores = explode(",",$sp[0]);
+		$rawscores = explode(',', $sp[1]);
+		$attempts = explode(",",$line['attempts']);
+		$lastanswers = explode("~",$line['lastanswers']);	
+	} else {
+		$seeds = explode(",",$line['bestseeds']);
+		$sp = explode(';',$line['bestscores']);
+		$scores = explode(",",$sp[0]);
+		$rawscores = explode(',', $sp[1]);
+		$attempts = explode(",",$line['bestattempts']);
+		$lastanswers = explode("~",$line['bestlastanswers']);	
+	}
+	
 	$timesontask = explode("~",$line['timeontask']);
 
 	if ($isteacher) {
@@ -142,7 +155,14 @@
 	
 	echo '<div class=intro>'.$testsettings['intro'].'</div>';
 	if ($isteacher && !$scoredview) {
-		echo '<input type="button" class="btn" onclick="rendersa()" value="Show Answers" /> <a href="printtest.php?cid='.$cid.'&asid='.$testid.'&scored=true">Show Scored View</a>';
+		echo '<p>'._('Showing Current Versions').'<br/><button type="button" class="btn" onclick="rendersa()">'._("Show Answers").'</button> <a href="printtest.php?cid='.$cid.'&asid='.$testid.'&scored=best">'._('Show Scored View').'</a> <a href="printtest.php?cid='.$cid.'&asid='.$testid.'&scored=last">'._('Show Last Attempts').'</a></p>';
+	} else if ($isteacher) {
+		if ($scoredtype=='last') {
+			echo '<p>'._('Showing Last Attempts').' <a href="printtest.php?cid='.$cid.'&asid='.$testid.'&scored=best">'._('Show Scored View').'</a></p>';
+		} else {
+			echo '<p>'._('Showing Scored View').' <a href="printtest.php?cid='.$cid.'&asid='.$testid.'&scored=last">'._('Show Last Attempts').'</a></p>';
+		}
+	
 	}
 	if ($testsettings['showans']=='N') {
 		$lastanswers = array_fill(0,count($questions),'');
@@ -174,8 +194,18 @@
 			}
 		}
 		if ($scoredview) {
-			$col = scorestocolors($scores[$i], $qi[$questions[$i]]['points'], $qi[$questions[$i]]['answeights']);
-			displayq($i, $qsetid,$seeds[$i],2,false,$attempts[$i],false,false,false,$col);
+			//$col = scorestocolors($scores[$i], $qi[$questions[$i]]['points'], $qi[$questions[$i]]['answeights']);
+			if (isset($rawscores[$i])) {
+				//$colors = scorestocolors($rawscores[$i],$pts[$questions[$i]],$answeights[$questions[$i]],false);
+				if (strpos($rawscores[$i],'~')!==false) {
+					$colors = explode('~',$rawscores[$i]);
+				} else {
+					$colors = array($rawscores[$i]); 
+				}
+			} else {
+				$colors = array();
+			}
+			displayq($i, $qsetid,$seeds[$i],2,false,$attempts[$i],false,false,false,$colors);
 			
 			echo '<div class="review">';
 			$laarr = explode('##',$lastanswers[$i]);
