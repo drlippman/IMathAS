@@ -21,7 +21,7 @@
  *  
  *  ---------------------------------------------------------------------
  *  
- *  Copyright (c) 2012-2013 The MathJax Consortium
+ *  Copyright (c) 2012-2014 The MathJax Consortium
  * 
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -95,7 +95,7 @@
     MML.mbase.Augment({
       firstChild: null,
       lastChild: null,
-      nodeValue: "",
+      nodeValue: null,
       nextSibling: null,
       Init: function () {
         var obj = MBASEINIT.apply(this,arguments) || this;
@@ -117,7 +117,6 @@
           if (!this.firstChild) {this.firstChild = node}
           this.Append(node);
           this.lastChild = node;
-          this.nodeValue += node.nodeValue;
         }
         return node;
       },
@@ -132,9 +131,6 @@
             else {this.lastChild = this.childNodes[this.childNodes.length-1]}
         }
         if (i) {this.childNodes[i-1].nextSibling = node.nextSibling}
-        this.nodeValue = "";
-        for (i = 0, m = this.childNodes.length; i < m; i++)
-          {this.nodeValue += this.childNodes[i].nodeValue}
         node.nextSibling = node.parent = null;
         return node;
       },
@@ -145,9 +141,6 @@
         if (i) {this.childNodes[i-1].nextSibling = node} else {this.firstChild = node}
         if (i >= m-1) {this.lastChild = node}
         this.SetData(i,node); node.nextSibling = old.nextSibling;
-        this.nodeValue = "";
-        for (i = 0, m = this.childNodes.length; i < m; i++)
-          {this.nodeValue += this.childNodes[i].nodeValue}
         old.nextSibling = old.parent = null;
         return old;
       },
@@ -167,7 +160,11 @@
   //
   var document = {
     getElementById: true,
-    createElementNS: function (ns,type) {return MML[type]()},
+    createElementNS: function (ns,type) {
+      var node = MML[type]();
+      if (type === "mo" && ASCIIMATH.config.useMathMLspacing) {node.useMMLspacing = 0x80}
+      return node;
+    },
     createTextNode: function (text) {return MML.chars(text).With({nodeValue:text})},
     createDocumentFragment: function () {return DOCFRAG()}
   };
@@ -373,17 +370,13 @@ var AMsymbols = [
 {input:"!=",  tag:"mo", output:"\u2260", tex:"ne", ttype:CONST},
 {input:":=",  tag:"mo", output:":=",     tex:null, ttype:CONST},
 {input:"lt",  tag:"mo", output:"<",      tex:null, ttype:CONST},
-{input:"gt",  tag:"mo", output:">",      tex:null, ttype:CONST},
 {input:"<=",  tag:"mo", output:"\u2264", tex:"le", ttype:CONST},
 {input:"lt=", tag:"mo", output:"\u2264", tex:"leq", ttype:CONST},
-{input:"gt=",  tag:"mo", output:"\u2265", tex:"geq", ttype:CONST},
 {input:">=",  tag:"mo", output:"\u2265", tex:"ge", ttype:CONST},
 {input:"geq", tag:"mo", output:"\u2265", tex:null, ttype:CONST},
 {input:"-<",  tag:"mo", output:"\u227A", tex:"prec", ttype:CONST},
 {input:"-lt", tag:"mo", output:"\u227A", tex:null, ttype:CONST},
 {input:">-",  tag:"mo", output:"\u227B", tex:"succ", ttype:CONST},
-{input:"-<=", tag:"mo", output:"\u2AAF", tex:"preceq", ttype:CONST},
-{input:">-=", tag:"mo", output:"\u2AB0", tex:"succeq", ttype:CONST},
 {input:"in",  tag:"mo", output:"\u2208", tex:null, ttype:CONST},
 {input:"!in", tag:"mo", output:"\u2209", tex:"notin", ttype:CONST},
 {input:"sub", tag:"mo", output:"\u2282", tex:"subset", ttype:CONST},
@@ -460,7 +453,6 @@ var AMsymbols = [
 {input:"ZZ",  tag:"mo", output:"\u2124", tex:null, ttype:CONST},
 {input:"f",   tag:"mi", output:"f",      tex:null, ttype:UNARY, func:true},
 {input:"g",   tag:"mi", output:"g",      tex:null, ttype:UNARY, func:true},
-{input:"'",  tag:"mo", output:"\u2032", tex:"prime", ttype:CONST}, 
 
 //standard functions
 {input:"lim",  tag:"mo", output:"lim", tex:null, ttype:UNDEROVER},
@@ -468,38 +460,15 @@ var AMsymbols = [
 {input:"sin",  tag:"mo", output:"sin", tex:null, ttype:UNARY, func:true},
 {input:"cos",  tag:"mo", output:"cos", tex:null, ttype:UNARY, func:true},
 {input:"tan",  tag:"mo", output:"tan", tex:null, ttype:UNARY, func:true},
-{input:"arcsin",  tag:"mo", output:"arcsin", tex:null, ttype:UNARY, func:true},
-{input:"arccos",  tag:"mo", output:"arccos", tex:null, ttype:UNARY, func:true},
-{input:"arctan",  tag:"mo", output:"arctan", tex:null, ttype:UNARY, func:true},
 {input:"sinh", tag:"mo", output:"sinh", tex:null, ttype:UNARY, func:true},
 {input:"cosh", tag:"mo", output:"cosh", tex:null, ttype:UNARY, func:true},
 {input:"tanh", tag:"mo", output:"tanh", tex:null, ttype:UNARY, func:true},
-{input:"coth",  tag:"mo", output:"coth", tex:null, ttype:UNARY, func:true},
-{input:"sech",  tag:"mo", output:"sech", tex:null, ttype:UNARY, func:true},
-{input:"csch",  tag:"mo", output:"csch", tex:null, ttype:UNARY, func:true},
 {input:"cot",  tag:"mo", output:"cot", tex:null, ttype:UNARY, func:true},
 {input:"sec",  tag:"mo", output:"sec", tex:null, ttype:UNARY, func:true},
 {input:"csc",  tag:"mo", output:"csc", tex:null, ttype:UNARY, func:true},
 {input:"log",  tag:"mo", output:"log", tex:null, ttype:UNARY, func:true},
 {input:"ln",   tag:"mo", output:"ln",  tex:null, ttype:UNARY, func:true},
-{input:"abs",   tag:"mo", output:"abs",  tex:null, ttype:UNARY}, //, func:true
-{input:"Sin",  tag:"mo", output:"sin", tex:null, ttype:UNARY, func:true},
-{input:"Cos",  tag:"mo", output:"cos", tex:null, ttype:UNARY, func:true},
-{input:"Tan",  tag:"mo", output:"tan", tex:null, ttype:UNARY, func:true},
-{input:"Arcsin",  tag:"mo", output:"arcsin", tex:null, ttype:UNARY, func:true},
-{input:"Arccos",  tag:"mo", output:"arccos", tex:null, ttype:UNARY, func:true},
-{input:"Arctan",  tag:"mo", output:"arctan", tex:null, ttype:UNARY, func:true},
-{input:"Sinh", tag:"mo", output:"sinh", tex:null, ttype:UNARY, func:true},
-{input:"Sosh", tag:"mo", output:"cosh", tex:null, ttype:UNARY, func:true},
-{input:"Tanh", tag:"mo", output:"tanh", tex:null, ttype:UNARY, func:true},
-{input:"Cot",  tag:"mo", output:"cot", tex:null, ttype:UNARY, func:true},
-{input:"Sec",  tag:"mo", output:"sec", tex:null, ttype:UNARY, func:true},
-{input:"Csc",  tag:"mo", output:"csc", tex:null, ttype:UNARY, func:true},
-{input:"Log",  tag:"mo", output:"log", tex:null, ttype:UNARY, func:true},
-{input:"Ln",   tag:"mo", output:"ln",  tex:null, ttype:UNARY, func:true},
-{input:"Abs",   tag:"mo", output:"abs",  tex:null, ttype:UNARY, func:true},
 {input:"det",  tag:"mo", output:"det", tex:null, ttype:UNARY, func:true},
-{input:"exp",  tag:"mo", output:"exp", tex:null, ttype:UNARY, func:true},
 {input:"dim",  tag:"mo", output:"dim", tex:null, ttype:CONST},
 {input:"mod",  tag:"mo", output:"mod", tex:null, ttype:CONST},
 {input:"gcd",  tag:"mo", output:"gcd", tex:null, ttype:UNARY, func:true},
@@ -1224,7 +1193,36 @@ mathcolor = "";
 //  Add some missing symbols
 //
 AMsymbols.push(
-  {input:"tilde", tag:"mover", output:"~", tex:null, ttype:UNARY, acc:true}
+  {input:"gt",  tag:"mo", output:">",      tex:null, ttype:CONST},
+  {input:"gt=", tag:"mo", output:"\u2265", tex:"geq", ttype:CONST},
+  {input:"-<=", tag:"mo", output:"\u2AAF", tex:"preceq", ttype:CONST},
+  {input:">-=", tag:"mo", output:"\u2AB0", tex:"succeq", ttype:CONST},
+  {input:"'",   tag:"mo", output:"\u2032", tex:"prime", ttype:CONST},
+  {input:"arcsin",  tag:"mi", output:"arcsin", tex:null, ttype:UNARY, func:true},
+  {input:"arccos",  tag:"mi", output:"arccos", tex:null, ttype:UNARY, func:true},
+  {input:"arctan",  tag:"mi", output:"arctan", tex:null, ttype:UNARY, func:true},
+  {input:"coth",  tag:"mi", output:"coth", tex:null, ttype:UNARY, func:true},
+  {input:"sech",  tag:"mi", output:"sech", tex:null, ttype:UNARY, func:true},
+  {input:"csch",  tag:"mi", output:"csch", tex:null, ttype:UNARY, func:true},
+  {input:"tilde", tag:"mover", output:"~", tex:null, ttype:UNARY, acc:true},
+  //added/modified DL
+ {input:"abs",   tag:"mo", output:"abs",  tex:null, ttype:UNARY}, //, func:true
+ {input:"Sin",  tag:"mo", output:"sin", tex:null, ttype:UNARY, func:true},
+ {input:"Cos",  tag:"mo", output:"cos", tex:null, ttype:UNARY, func:true},
+ {input:"Tan",  tag:"mo", output:"tan", tex:null, ttype:UNARY, func:true},
+ {input:"Arcsin",  tag:"mo", output:"arcsin", tex:null, ttype:UNARY, func:true},
+ {input:"Arccos",  tag:"mo", output:"arccos", tex:null, ttype:UNARY, func:true},
+ {input:"Arctan",  tag:"mo", output:"arctan", tex:null, ttype:UNARY, func:true},
+ {input:"Sinh", tag:"mo", output:"sinh", tex:null, ttype:UNARY, func:true},
+ {input:"Sosh", tag:"mo", output:"cosh", tex:null, ttype:UNARY, func:true},
+ {input:"Tanh", tag:"mo", output:"tanh", tex:null, ttype:UNARY, func:true},
+ {input:"Cot",  tag:"mo", output:"cot", tex:null, ttype:UNARY, func:true},
+ {input:"Sec",  tag:"mo", output:"sec", tex:null, ttype:UNARY, func:true},
+ {input:"Csc",  tag:"mo", output:"csc", tex:null, ttype:UNARY, func:true},
+ {input:"Log",  tag:"mo", output:"log", tex:null, ttype:UNARY, func:true},
+ {input:"Ln",   tag:"mo", output:"ln",  tex:null, ttype:UNARY, func:true},
+ {input:"Abs",   tag:"mo", output:"abs",  tex:null, ttype:UNARY, func:true},
+ {input:"exp",  tag:"mo", output:"exp", tex:null, ttype:UNARY, func:true}
 )
 
 //
@@ -1237,6 +1235,13 @@ ASCIIMATH.Augment({
       // Old versions use the "decimal" option, so take it into account if it
       // is defined by the user. See issue 384.
       decimalsign  = (ASCIIMATH.config.decimal || ASCIIMATH.config.decimalsign);
+      // fix phi and varphi, if requested
+      if (ASCIIMATH.config.fixphi) {
+        for (var i = 0, m = AMsymbols.length; i < m; i++) {
+          if (AMsymbols[i].input === "phi")    {AMsymbols[i].output = "\u03D5"}
+          if (AMsymbols[i].input === "varphi") {AMsymbols[i].output = "\u03C6"; i = m}
+        }
+      }
       INITASCIIMATH();
       AMinitSymbols();
     },
@@ -1310,6 +1315,7 @@ junk = null;
   
   ASCIIMATH.Augment({
     sourceMenuTitle: /*_(MathMenu)*/ ["AsciiMathInput","AsciiMath Input"],
+    annotationEncoding: "text/x-asciimath",
 
     prefilterHooks:    MathJax.Callback.Hooks(true),   // hooks to run before processing AsciiMath
     postfilterHooks:   MathJax.Callback.Hooks(true),   // hooks to run after processing AsciiMath
