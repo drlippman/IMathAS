@@ -74,6 +74,7 @@ row[0][2][0][6-9] = 5 number summary
 row[0][2][0][10] = gbcat id
 row[0][2][0][11] = category weight (if weighted grades)
 row[0][2][0][12] = default show (0 expanded, 2 collapsed)
+row[0][2][0][13] = calctype
 
 row[0][3][0] = total possible past
 row[0][3][1] = total possible past&current
@@ -127,7 +128,7 @@ row[1][4][0] = userid
 row[1][4][1] = locked?
 row[1][4][2] = hasuserimg
 
-cats[i]:  0: name, 1: scale, 2: scaletype, 3: chop, 4: dropn, 5: weight, 6: hidden
+cats[i]:  0: name, 1: scale, 2: scaletype, 3: chop, 4: dropn, 5: weight, 6: hidden, 7: calctype
 
 ****/
 
@@ -433,16 +434,19 @@ function gbtable() {
 	
 	$cats = array();
 	$catcolcnt = 0;
-	//Pull Categories:  Name, scale, scaletype, chop, drop, weight
+	//Pull Categories:  Name, scale, scaletype, chop, drop, weight, calctype
 	if (in_array(0,$category)) {  //define default category, if used
-		$cats[0] = explode(',',$defaultcat); 
+		$cats[0] = explode(',',$defaultcat);
+		if (!isset($cats[6])) {
+			$cats[6] = ($cats[4]==0)?0:1;
+		}
 		array_unshift($cats[0],"Default");
 		array_push($cats[0],$catcolcnt);
 		$catcolcnt++;
 		
 	}
 	
-	$query = "SELECT id,name,scale,scaletype,chop,dropn,weight,hidden FROM imas_gbcats WHERE courseid='$cid' ";
+	$query = "SELECT id,name,scale,scaletype,chop,dropn,weight,hidden,calctype FROM imas_gbcats WHERE courseid='$cid' ";
 	$query .= "ORDER BY name";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	while ($row = mysql_fetch_row($result)) {
@@ -560,7 +564,7 @@ function gbtable() {
 			if (($orderby&1)==1) {  //display item header if displaying by category
 				//$cathdr[$pos] = $cats[$cat][6];
 				$gb[0][1][$pos][0] = $name[$k]; //item name
-				$gb[0][1][$pos][1] = $cats[$cat][7]; //item category number
+				$gb[0][1][$pos][1] = $cats[$cat][8]; //item category number
 				$gb[0][1][$pos][2] = $possible[$k]; //points possible
 				$gb[0][1][$pos][3] = $avail[$k]; //0 past, 1 current, 2 future
 				$gb[0][1][$pos][4] = $cntingb[$k]; //0 no count and hide, 1 count, 2 EC, 3 no count
@@ -686,9 +690,10 @@ function gbtable() {
 		
 		
 		$gb[0][2][$pos][0] = $cats[$cat][0];
-		$gb[0][2][$pos][1] = $cats[$cat][7];
+		$gb[0][2][$pos][1] = $cats[$cat][8];
 		$gb[0][2][$pos][10] = $cat;
 		$gb[0][2][$pos][12] = $cats[$cat][6];
+		$gb[0][2][$pos][13] = $cats[$cat][7];
 		if ($catposspast[$cat]>0 || count($catposspastec[$cat])>0) {
 			$gb[0][2][$pos][2] = 0; //scores in past
 			$cattotweightpast += $cats[$cat][5];
@@ -1219,8 +1224,9 @@ function gbtable() {
 		
 		foreach($catorder as $cat) {//foreach category
 			if (isset($cattotpast[$ln][$cat])) {  //past items
-				//cats: name,scale,scaletype,chop,drop,weight
-				if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotpast[$ln][$cat])) { //if drop is set and have enough items
+				//cats: name,scale,scaletype,chop,drop,weight,calctype
+				//if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotpast[$ln][$cat])) { //if drop is set and have enough items
+				if ($cats[$cat][7]==1) {
 					foreach($cattotpast[$ln][$cat] as $col=>$v) {
 						if ($gb[0][1][$col][2] == 0) {
 							$cattotpast[$ln][$cat][$col] = 0;
@@ -1228,28 +1234,32 @@ function gbtable() {
 							$cattotpast[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	//convert to percents
 						}
 					}
-					asort($cattotpast[$ln][$cat],SORT_NUMERIC);
-					if ($cats[$cat][4]<0) {  //doing keep n
-						$ntodrop = count($cattotpast[$ln][$cat])+$cats[$cat][4];
-					} else {  //doing drop n
-						$ntodrop = $cats[$cat][4] - ($catitemcntpast[$cat]-count($cattotpast[$ln][$cat]));
-					}
-					
-					if ($ntodrop>0) {
-						$ndropcnt = 0;
-						foreach ($cattotpast[$ln][$cat] as $col=>$v) {
-							$gb[$ln][1][$col][5] = 1; //mark as dropped
-							$ndropcnt++;
-							if ($ndropcnt==$ntodrop) { break;}
+					if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotpast[$ln][$cat])) {
+						asort($cattotpast[$ln][$cat],SORT_NUMERIC);
+						if ($cats[$cat][4]<0) {  //doing keep n
+							$ntodrop = count($cattotpast[$ln][$cat])+$cats[$cat][4];
+						} else {  //doing drop n
+							$ntodrop = $cats[$cat][4] - ($catitemcntpast[$cat]-count($cattotpast[$ln][$cat]));
 						}
+						
+						if ($ntodrop>0) {
+							$ndropcnt = 0;
+							foreach ($cattotpast[$ln][$cat] as $col=>$v) {
+								$gb[$ln][1][$col][5] = 1; //mark as dropped
+								$ndropcnt++;
+								if ($ndropcnt==$ntodrop) { break;}
+							}
+						}
+						
+						while (count($cattotpast[$ln][$cat])<$catitemcntpast[$cat]) {
+							array_unshift($cattotpast[$ln][$cat],0);
+						}
+						$cattotpast[$ln][$cat] = array_slice($cattotpast[$ln][$cat],$cats[$cat][4]);
+						$tokeep = ($cats[$cat][4]<0)? abs($cats[$cat][4]) : ($catitemcntpast[$cat] - $cats[$cat][4]);
+						$cattotpast[$ln][$cat] = round($catposspast[$cat]*array_sum($cattotpast[$ln][$cat])/($tokeep),1);
+					} else {
+						$cattotpast[$ln][$cat] = round($catposspast[$cat]*array_sum($cattotpast[$ln][$cat])/count($cattotpast[$ln][$cat]),2);
 					}
-					
-					while (count($cattotpast[$ln][$cat])<$catitemcntpast[$cat]) {
-						array_unshift($cattotpast[$ln][$cat],0);
-					}
-					$cattotpast[$ln][$cat] = array_slice($cattotpast[$ln][$cat],$cats[$cat][4]);
-					$tokeep = ($cats[$cat][4]<0)? abs($cats[$cat][4]) : ($catitemcntpast[$cat] - $cats[$cat][4]);
-					$cattotpast[$ln][$cat] = round($catposspast[$cat]*array_sum($cattotpast[$ln][$cat])/($tokeep),1);
 				} else {
 					$cattotpast[$ln][$cat] = array_sum($cattotpast[$ln][$cat]);
 				}
@@ -1292,10 +1302,9 @@ function gbtable() {
 			}
 			if (isset($cattotcur[$ln][$cat])) {  //cur items
 				
-				
-				
-				//cats: name,scale,scaletype,chop,drop,weight
-				if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotcur[$ln][$cat])) { //if drop is set and have enough items
+				//cats: name,scale,scaletype,chop,drop,weight,calctype
+				//if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotcur[$ln][$cat])) { //if drop is set and have enough items
+				if ($cats[$cat][7]==1) {
 					foreach($cattotcur[$ln][$cat] as $col=>$v) {
 						if ($gb[0][1][$col][2] == 0) {
 							$cattotcur[$ln][$cat][$col] = 0;
@@ -1303,30 +1312,34 @@ function gbtable() {
 							$cattotcur[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	//convert to percents
 						}
 					}
-					asort($cattotcur[$ln][$cat],SORT_NUMERIC);
-					
-					if ($cats[$cat][4]<0) {  //doing keep n
-						$ntodrop = count($cattotcur[$ln][$cat])+$cats[$cat][4];
-					} else {  //doing drop n
-						$ntodrop = $cats[$cat][4] - ($catitemcntcur[$cat]-count($cattotcur[$ln][$cat]));
-					}
-					
-					if ($ntodrop>0) {
-						$ndropcnt = 0;
-						foreach ($cattotcur[$ln][$cat] as $col=>$v) {
-							$gb[$ln][1][$col][5] += 2; //mark as dropped
-							$ndropcnt++;
-							if ($ndropcnt==$ntodrop) { break;}
+					if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotcur[$ln][$cat])) {
+						asort($cattotcur[$ln][$cat],SORT_NUMERIC);
+						
+						if ($cats[$cat][4]<0) {  //doing keep n
+							$ntodrop = count($cattotcur[$ln][$cat])+$cats[$cat][4];
+						} else {  //doing drop n
+							$ntodrop = $cats[$cat][4] - ($catitemcntcur[$cat]-count($cattotcur[$ln][$cat]));
 						}
+						
+						if ($ntodrop>0) {
+							$ndropcnt = 0;
+							foreach ($cattotcur[$ln][$cat] as $col=>$v) {
+								$gb[$ln][1][$col][5] += 2; //mark as dropped
+								$ndropcnt++;
+								if ($ndropcnt==$ntodrop) { break;}
+							}
+						}
+						
+						while (count($cattotcur[$ln][$cat])<$catitemcntcur[$cat]) {
+							array_unshift($cattotcur[$ln][$cat],0);
+						}
+						
+						$cattotcur[$ln][$cat] = array_slice($cattotcur[$ln][$cat],$cats[$cat][4]);
+						$tokeep = ($cats[$cat][4]<0)? abs($cats[$cat][4]) : ($catitemcntcur[$cat] - $cats[$cat][4]);
+						$cattotcur[$ln][$cat] = round($catposscur[$cat]*array_sum($cattotcur[$ln][$cat])/($tokeep),1);
+					} else {
+						$cattotcur[$ln][$cat] = round($catposscur[$cat]*array_sum($cattotcur[$ln][$cat])/count($cattotcur[$ln][$cat]),2);
 					}
-					
-					while (count($cattotcur[$ln][$cat])<$catitemcntcur[$cat]) {
-						array_unshift($cattotcur[$ln][$cat],0);
-					}
-					
-					$cattotcur[$ln][$cat] = array_slice($cattotcur[$ln][$cat],$cats[$cat][4]);
-					$tokeep = ($cats[$cat][4]<0)? abs($cats[$cat][4]) : ($catitemcntcur[$cat] - $cats[$cat][4]);
-					$cattotcur[$ln][$cat] = round($catposscur[$cat]*array_sum($cattotcur[$ln][$cat])/($tokeep),1);
 				} else {
 					$cattotcur[$ln][$cat] = array_sum($cattotcur[$ln][$cat]);
 				}
@@ -1370,8 +1383,9 @@ function gbtable() {
 			
 			
 			if (isset($cattotfuture[$ln][$cat])) {  //future items
-				//cats: name,scale,scaletype,chop,drop,weight
-				if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotfuture[$ln][$cat])) { //if drop is set and have enough items
+				//cats: name,scale,scaletype,chop,drop,weight,calctype
+				//if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotfuture[$ln][$cat])) { //if drop is set and have enough items
+				if ($cats[$cat][7]==1) {
 					foreach($cattotfuture[$ln][$cat] as $col=>$v) {
 						if ($gb[0][1][$col][2] == 0) {
 							$cattotfuture[$ln][$cat][$col] = 0;
@@ -1379,29 +1393,33 @@ function gbtable() {
 							$cattotfuture[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	//convert to percents
 						}
 					}
-					asort($cattotfuture[$ln][$cat],SORT_NUMERIC);
-					
-					if ($cats[$cat][4]<0) {  //doing keep n
-						$ntodrop = count($cattotfuture[$ln][$cat])+$cats[$cat][4];
-					} else {  //doing drop n
-						$ntodrop = $cats[$cat][4] - ($catitemcntfuture[$cat]-count($cattotfuture[$ln][$cat]));
-					}
-					
-					if ($ntodrop>0) {
-						$ndropcnt = 0;
-						foreach ($cattotfuture[$ln][$cat] as $col=>$v) {
-							$gb[$ln][1][$col][5] += 4; //mark as dropped
-							$ndropcnt++;
-							if ($ndropcnt==$ntodrop) { break;}
+					if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotfuture[$ln][$cat])) {
+						asort($cattotfuture[$ln][$cat],SORT_NUMERIC);
+						
+						if ($cats[$cat][4]<0) {  //doing keep n
+							$ntodrop = count($cattotfuture[$ln][$cat])+$cats[$cat][4];
+						} else {  //doing drop n
+							$ntodrop = $cats[$cat][4] - ($catitemcntfuture[$cat]-count($cattotfuture[$ln][$cat]));
 						}
+						
+						if ($ntodrop>0) {
+							$ndropcnt = 0;
+							foreach ($cattotfuture[$ln][$cat] as $col=>$v) {
+								$gb[$ln][1][$col][5] += 4; //mark as dropped
+								$ndropcnt++;
+								if ($ndropcnt==$ntodrop) { break;}
+							}
+						}
+						
+						while (count($cattotfuture[$ln][$cat])<$catitemcntfuture[$cat]) {
+							array_unshift($cattotfuture[$ln][$cat],0);
+						}
+						$cattotfuture[$ln][$cat] = array_slice($cattotfuture[$ln][$cat],$cats[$cat][4]);
+						$tokeep = ($cats[$cat][4]<0)? abs($cats[$cat][4]) : ($catitemcntfuture[$cat] - $cats[$cat][4]);
+						$cattotfuture[$ln][$cat] = round($catpossfuture[$cat]*array_sum($cattotfuture[$ln][$cat])/($tokeep),1);
+					} else {
+						$cattotfuture[$ln][$cat] = round($catpossfuture[$cat]*array_sum($cattotfuture[$ln][$cat])/count($cattotfuture[$ln][$cat]),2);
 					}
-					
-					while (count($cattotfuture[$ln][$cat])<$catitemcntfuture[$cat]) {
-						array_unshift($cattotfuture[$ln][$cat],0);
-					}
-					$cattotfuture[$ln][$cat] = array_slice($cattotfuture[$ln][$cat],$cats[$cat][4]);
-					$tokeep = ($cats[$cat][4]<0)? abs($cats[$cat][4]) : ($catitemcntfuture[$cat] - $cats[$cat][4]);
-					$cattotfuture[$ln][$cat] = round($catpossfuture[$cat]*array_sum($cattotfuture[$ln][$cat])/($tokeep),1);
 				} else {
 					$cattotfuture[$ln][$cat] = array_sum($cattotfuture[$ln][$cat]);
 				}

@@ -22,6 +22,7 @@ if (mysql_num_rows($result)==0) {
 	exit;
 }
 $flexwidth = true;
+$nologo = true;
 require("../header.php");
 
 echo '<h4>'._('Thread Views').'</h4>';

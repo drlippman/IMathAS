@@ -69,6 +69,7 @@
 				$drop = -1*$_POST['droph'][$id];
 			}
 			$weight = $_POST['weight'][$id];
+			$calctype = intval($_POST['calctype'][$id]);
 			if (trim($weight)=='') {
 				if ($useweights==0) {
 					$weight = -1;
@@ -85,14 +86,14 @@
 			
 			if (substr($id,0,3)=='new') {
 				if (trim($name)!='') {
-					$query = "INSERT INTO imas_gbcats (courseid,name,scale,scaletype,chop,dropn,weight,hidden) VALUES ";
-					$query .= "('$cid','$name','$scale','$st','$chop','$drop','$weight',$hide)";
+					$query = "INSERT INTO imas_gbcats (courseid,name,scale,scaletype,chop,dropn,weight,hidden,calctype) VALUES ";
+					$query .= "('$cid','$name','$scale','$st','$chop','$drop','$weight',$hide,$calctype)";
 					mysql_query($query) or die("Query failed : " . mysql_error());
 				}
 			} else if ($id==0) {
-				$defaultcat = "$scale,$st,$chop,$drop,$weight,$hide";
+				$defaultcat = "$scale,$st,$chop,$drop,$weight,$hide,$calctype";
 			} else {
-				$query = "UPDATE imas_gbcats SET name='$name',scale='$scale',scaletype='$st',chop='$chop',dropn='$drop',weight='$weight',hidden=$hide WHERE id='$id'";
+				$query = "UPDATE imas_gbcats SET name='$name',scale='$scale',scaletype='$st',chop='$chop',dropn='$drop',weight='$weight',hidden=$hide,calctype=$calctype WHERE id='$id'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 		}
@@ -145,10 +146,13 @@
 		tr.appendChild(td);
 		
 		var td = document.createElement("td");
-		td.innerHTML = \'<input name="droptype[new\'+addrowcnt+\']" value="0" checked="1" type="radio">Keep All<br/>\' +
-			\'<input name="droptype[new\'+addrowcnt+\']" value="1" type="radio">Drop lowest \' +
+		td.innerHTML = \'Calc total: <select name="calctype[new\'+addrowcnt+\']" id="calctypenew\'+addrowcnt+\'">\' +
+			\'<option value="0" selected="selected">point total</option>\' +
+			\'<option value="1">averaged percents</option></select><br/>\' +
+			\'<input name="droptype[new\'+addrowcnt+\']" value="0" checked="1" type="radio" onclick="calctypechange(\\\'new\'+addrowcnt+\'\\\',0)">Keep All<br/>\' +
+			\'<input name="droptype[new\'+addrowcnt+\']" value="1" type="radio" onclick="calctypechange(\\\'new\'+addrowcnt+\'\\\',1)">Drop lowest \' +
 			\'<input size="2" name="dropl[new\'+addrowcnt+\']" value="0" type="text"> scores<br/> \' +
-			\'<input name="droptype[new\'+addrowcnt+\']" value="2" type="radio">Keep highest \' +
+			\'<input name="droptype[new\'+addrowcnt+\']" value="2" type="radio" onclick="calctypechange(\\\'new\'+addrowcnt+\'\\\',1)">Keep highest \' +
 			\'<input size="2" name="droph[new\'+addrowcnt+\']" value="0" type="text"> scores\';
 		tr.appendChild(td);
 		
@@ -186,6 +190,11 @@
 		if ($("#viewfield").is(":hidden")) {
 			$("#viewfield").css("visibility","hidden").css("position","absolute").show();
 		}
+		$("select:disabled").prop("disabled",false);
+	}
+	function calctypechange(id,val) {
+		$("#calctype"+id).val(val);
+		$("#calctype"+id).prop("disabled", val>0);
 	}
 		
 	</script>';
@@ -326,10 +335,22 @@
 	</fieldset>
 	<fieldset><legend>Gradebook Categories</legend>
 <?php	
-	$row = explode(',',$defaultcat);
-	array_unshift($row,"Default");
+	$r = explode(',',$defaultcat);
+	$row['name'] = 'Default';
+	$row['scale'] = $r[0];
+	$row['scaletype'] = $r[1];
+	$row['chop'] = $r[2];
+	$row['dropn'] = $r[3];
+	$row['weight'] = $r[4];
+	$row['hidden'] = $r[5];
+	if (isset($r[6])) {
+		$row['calctype'] = $r[6];
+	} else {
+		$row['calctype'] = $row['dropn']==0?0:1;
+	}
+	
 	echo "<table class=gb><thead>";
-	echo "<tr><th>Category Name</th><th>Display<sup>*</sup></th><th>Scale (optional)</th><th>Drops</th><th id=weighthdr>";
+	echo "<tr><th>Category Name</th><th>Display<sup>*</sup></th><th>Scale (optional)</th><th>Drops &amp; Category total</th><th id=weighthdr>";
 	if ($useweights==0) {
 		echo "Fixed Category Point Total (optional)<br/>Blank to use point sum";
 	} else if ($useweights==1) {
@@ -338,10 +359,10 @@
 	echo '</th><th>Remove</th></tr></thead><tbody id="cattbody">';
 	
 	disprow(0,$row);
-	$query = "SELECT id,name,scale,scaletype,chop,dropn,weight,hidden FROM imas_gbcats WHERE courseid='$cid'";
+	$query = "SELECT id,name,scale,scaletype,chop,dropn,weight,hidden,calctype FROM imas_gbcats WHERE courseid='$cid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($row = mysql_fetch_row($result)) {
-		$id = array_shift($row);
+	while ($row = mysql_fetch_assoc($result)) {
+		$id = $row['id'];
 		disprow($id,$row);
 	}
 	
@@ -354,6 +375,8 @@
 	echo '<p class="small"><sup>*</sup>When a category is set to Expanded, both the category total and all items in the category are displayed.<br/> ';
 	echo 'When a category is set to Collapsed, only the category total is displayed, but all the items are still counted normally.<br/>';
 	echo 'When a category is set to Hidden, nothing is displayed, and no items from the category are counted in the grade total. </p>';
+	echo '<p class="small"><sup>*</sup>If you drop any items, a calc type of "average percents" is required. If you are using a points earned / possible ';
+	echo 'scoring system and use the "average percents" method in a category, the points for the category may be a somewhat arbitrary value.</p>';
 	
 	//echo "<p><a href=\"gbsettings.php?cid=$cid&addnew=1\">Add New Category</a></p>";
 	
@@ -362,60 +385,69 @@
 		//name,scale,scaletype,chop,drop,weight
 		echo "<tr class=grid id=\"catrow$id\"><td>";
 		if ($id>0) {
-			echo "<input type=text name=\"name[$id]\" value=\"{$row[0]}\"/>";
+			echo "<input type=text name=\"name[$id]\" value=\"{$row['name']}\"/>";
 		} else {
-			echo $row[0];
+			echo $row['name'];
 		}
 		"</td>";
 		
 		echo '<td>';
-		writeHtmlSelect("hide[$id]",$hideval,$hidelabel,$row[6]);
+		writeHtmlSelect("hide[$id]",$hideval,$hidelabel,$row['hidden']);
 		echo '</td>'; 
 		//echo "<td><input type=\"checkbox\" name=\"hide[$id]\" value=\"1\" ";
-		//writeHtmlChecked($row[6],1);
+		//writeHtmlChecked($row['hidden'],1);
 		//echo "/></td>";
 		echo "<td>Scale <input type=text size=3 name=\"scale[$id]\" value=\"";
-		if ($row[1]>0) {
-			echo $row[1];
+		if ($row['scale']>0) {
+			echo $row['scale'];
 		}
 		echo "\"/> (<input type=radio name=\"st[$id]\" value=0 ";
-		if ($row[2]==0) {
+		if ($row['scaletype']==0) {
 			echo "checked=1 ";
 		}
 		echo "/>points ";
 		echo "<input type=radio name=\"st[$id]\" value=1 ";
-		if ($row[2]==1) {
+		if ($row['scaletype']==1) {
 			echo "checked=1 ";
 		}
 		echo "/>percent)<br/>to perfect score<br/>";
 		echo "<input type=checkbox name=\"chop[$id]\" value=1 ";
-		if ($row[3]>0) {
+		if ($row['chop']>0) {
 			echo "checked=1 ";
 		}
 		echo "/> no total over <input type=text size=3 name=\"chopto[$id]\" value=\"";
-		if ($row[3]>0) {
-			echo round($row[3]*100);
+		if ($row['chop']>0) {
+			echo round($row['chop']*100);
 		} else {
 			echo "100";
 		}
 		echo "\"/>%</td>";
-		echo "<td><input type=radio name=\"droptype[$id]\" value=0 ";
-		if ($row[4]==0) {
+		echo "<td>";
+		echo 'Calc total: <select name="calctype['.$id.']" id="calctype'.$id.'" ';
+		if ($row['dropn']!=0) { echo 'disabled="true"';}
+		echo '><option value="0" ';
+		if ($row['calctype']==0) {echo 'selected="selected"';}
+		echo '>point total</option><option value="1" ';
+		if ($row['calctype']==1) {echo 'selected="selected"';}
+		echo '>averaged percents</option></select><br/>';
+		
+		echo "<input type=radio name=\"droptype[$id]\" value=0 onclick=\"calctypechange($id,0)\" ";
+		if ($row['dropn']==0) {
 			echo "checked=1 ";
 		}
-		echo "/>Keep All<br/><input type=radio name=\"droptype[$id]\" value=1 ";
-		if ($row[4]>0) {
+		echo "/>Keep All<br/><input type=radio name=\"droptype[$id]\" value=1 onclick=\"calctypechange($id,1)\" ";
+		if ($row['dropn']>0) {
 			echo "checked=1 ";
 		}
-		$absr4=abs($row[4]);
-		echo "/>Drop lowest <input type=text size=2 name=\"dropl[$id]\" value=\"$absr4\"/> scores<br/> <input type=radio name=\"droptype[$id]\" value=2 ";
-		if ($row[4]<0) {
+		$absr4=abs($row['dropn']);
+		echo "/>Drop lowest <input type=text size=2 name=\"dropl[$id]\" value=\"$absr4\"/> scores<br/> <input type=radio name=\"droptype[$id]\" value=2 onclick=\"calctypechange($id,1)\" ";
+		if ($row['dropn']<0) {
 			echo "checked=1 ";
 		}
 		echo "/>Keep highest <input type=text size=2 name=\"droph[$id]\" value=\"$absr4\"/> scores</td>";
 		echo "<td><input type=text size=3 name=\"weight[$id]\" value=\"";
-		if ($row[5]>-1) {
-			echo $row[5];
+		if ($row['weight']>-1) {
+			echo $row['weight'];
 		}
 		echo "\"/></td>";
 		if ($id!=0) {

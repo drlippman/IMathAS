@@ -1028,35 +1028,68 @@ function gbstudisp($stu) {
 				//}
 				echo '<td class="cat'.$gbt[0][2][$i][1].'"><span class="cattothdr">'.$gbt[0][2][$i][0].'</span></td>';
 				if (($show&1)==1) {
-					echo '<td>'.$gbt[1][2][$i][0].'/'.$gbt[0][2][$i][3].' (';
+					echo '<td>';
+					//show points if not averaging or if points possible scoring
+					if ($gbt[0][2][$i][13]==0 || isset($gbt[0][3][0])) {
+						echo $gbt[1][2][$i][0].'/'.$gbt[0][2][$i][3].' (';
+					}
 					if ($gbt[0][2][$i][3]>0) {
-						echo round(100*$gbt[1][2][$i][0]/$gbt[0][2][$i][3],1).'%)</td>';
+						echo round(100*$gbt[1][2][$i][0]/$gbt[0][2][$i][3],1).'%';
 					} else {
-						echo '0%)</td>';
+						echo '0%';
+					}
+					if ($gbt[0][2][$i][13]==0 || isset($gbt[0][3][0])) {
+						echo ')</td>';
+					} else {
+						echo '</td>';
 					}
 				}
 				if (($show&2)==2) {
-					echo '<td>'.$gbt[1][2][$i][3].'/'.$gbt[1][2][$i][4].' (';
+					echo '<td>';
+					if ($gbt[0][2][$i][13]==0 || isset($gbt[0][3][0])) {
+						echo $gbt[1][2][$i][3].'/'.$gbt[1][2][$i][4].' (';
+					}
 					if ($gbt[1][2][$i][4]>0) {
-						echo round(100*$gbt[1][2][$i][3]/$gbt[1][2][$i][4],1).'%)</td>';
+						echo round(100*$gbt[1][2][$i][3]/$gbt[1][2][$i][4],1).'%';
 					} else {
-						echo '0%)</td>';
+						echo '0%';
+					}
+					if ($gbt[0][2][$i][13]==0 || isset($gbt[0][3][0])) {
+						echo ')</td>';
+					} else {
+						echo '</td>';
 					}
 				}
 				if (($show&4)==4) {
-					echo '<td>'.$gbt[1][2][$i][1].'/'.$gbt[0][2][$i][4].' (';
+					echo '<td>';
+					if ($gbt[0][2][$i][13]==0 || isset($gbt[0][3][0])) {
+						echo $gbt[1][2][$i][1].'/'.$gbt[0][2][$i][4].' (';
+					}
 					if ($gbt[0][2][$i][4]>0) {
-						echo round(100*$gbt[1][2][$i][1]/$gbt[0][2][$i][4],1).'%)</td>';
+						echo round(100*$gbt[1][2][$i][1]/$gbt[0][2][$i][4],1).'%';
 					} else {
-						echo '0%)</td>';
+						echo '0%';
+					}
+					if ($gbt[0][2][$i][13]==0 || isset($gbt[0][3][0])) {
+						echo ')</td>';
+					} else {
+						echo '</td>';
 					}
 				}
 				if (($show&8)==8) {
-					echo '<td>'.$gbt[1][2][$i][2].'/'.$gbt[0][2][$i][5].' (';
+					echo '<td>';
+					if ($gbt[0][2][$i][13]==0 || isset($gbt[0][3][0])) {
+						echo $gbt[1][2][$i][2].'/'.$gbt[0][2][$i][5].' (';
+					}
 					if ($gbt[0][2][$i][5]>0) {
-						echo round(100*$gbt[1][2][$i][2]/$gbt[0][2][$i][5],1).'%)</td>';
+						echo round(100*$gbt[1][2][$i][2]/$gbt[0][2][$i][5],1).'%';
 					} else {
-						echo '0%)</td>';
+						echo '0%';
+					}
+					if ($gbt[0][2][$i][13]==0 || isset($gbt[0][3][0])) {
+						echo ')</td>';
+					} else {
+						echo '</td>';
 					}
 				}
 				
