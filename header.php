@@ -70,7 +70,7 @@ if (!isset($sessiondata['mathdisp'])) {
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";';
 	if ($mathdarkbg) {echo 'var mathbg = "dark";';}
 	echo '</script>'; 
-	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=020514\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=070714\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; function rendermathnode(el) {AMprocessNode(el);}</script>";
 } else if ($sessiondata['mathdisp']==2) {
 	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; function rendermathnode(el) {AMprocessNode(el);}</script>";

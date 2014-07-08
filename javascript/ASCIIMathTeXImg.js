@@ -2,9 +2,24 @@
 ASCIIMathTeXImg.js
 Based on ASCIIMathML, Version 1.4.7 Aug 30, 2005, (c) Peter Jipsen http://www.chapman.edu/~jipsen
 Modified with TeX conversion for IMG rendering Sept 6, 2006 (c) David Lippman http://www.pierce.ctc.edu/dlippman
-Licensed under GNU General Public License (at http://www.gnu.org/copyleft/gpl.html) 
+  Updated to match ver 2.2 Mar 3, 2014
+  Latest at https://github.com/mathjax/asciimathml
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License (LGPL) as 
+published by the Free Software Foundation; either version 2.1 of the 
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT 
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License 
+(at http://www.gnu.org/licences/lgpl.html) for more details.
 */
 
+var noMathRender = false;
+
+(function() {
+var translateOnLoad = false;	//true to autotranslate
 var mathcolor = "";       // defaults to back, or specify any other color
 var displaystyle = true;      // puts limits above and below large operators
 var showasciiformulaonhover = true; // helps students learn ASCIIMath
@@ -14,11 +29,6 @@ var AMusedelimiter2 = false; 		//whether to use second delimiter below
 var AMdelimiter2 = "$", AMescape2 = "\\\\\\$", AMdelimiter2regexp = "\\$";
 var doubleblankmathdelimiter = false; // if true,  x+1  is equal to `x+1`
                                       // for IE this works only in <!--   -->
-var noMathRender = false;
-// character lists for Mozilla/Netscape fonts
-var AMcal = [0xEF35,0x212C,0xEF36,0xEF37,0x2130,0x2131,0xEF38,0x210B,0x2110,0xEF39,0xEF3A,0x2112,0x2133,0xEF3B,0xEF3C,0xEF3D,0xEF3E,0x211B,0xEF3F,0xEF40,0xEF41,0xEF42,0xEF43,0xEF44,0xEF45,0xEF46];
-var AMfrk = [0xEF5D,0xEF5E,0x212D,0xEF5F,0xEF60,0xEF61,0xEF62,0x210C,0x2111,0xEF63,0xEF64,0xEF65,0xEF66,0xEF67,0xEF68,0xEF69,0xEF6A,0x211C,0xEF6B,0xEF6C,0xEF6D,0xEF6E,0xEF6F,0xEF70,0xEF71,0x2128];
-var AMbbb = [0xEF8C,0xEF8D,0x2102,0xEF8E,0xEF8F,0xEF90,0xEF91,0x210D,0xEF92,0xEF93,0xEF94,0xEF95,0xEF96,0x2115,0xEF97,0x2119,0x211A,0x211D,0xEF98,0xEF99,0xEF9A,0xEF9B,0xEF9C,0xEF9D,0xEF9E,0x2124];
 
 var CONST = 0, UNARY = 1, BINARY = 2, INFIX = 3, LEFTBRACKET = 4, 
     RIGHTBRACKET = 5, SPACE = 6, UNDEROVER = 7, DEFINITION = 8,
@@ -51,6 +61,8 @@ var AMsymbols = [
 {input:"kappa",  tag:"mi", output:"\u03BA", tex:null, ttype:CONST},
 {input:"lambda", tag:"mi", output:"\u03BB", tex:null, ttype:CONST},
 {input:"Lambda", tag:"mo", output:"\u039B", tex:null, ttype:CONST},
+{input:"lamda",   tag:"mi", output:"lambda", tex:null, ttype:DEFINITION},
+{input:"Lamda",   tag:"mi", output:"Lambda", tex:null, ttype:DEFINITION},
 {input:"mu",     tag:"mi", output:"\u03BC", tex:null, ttype:CONST},
 {input:"nu",     tag:"mi", output:"\u03BD", tex:null, ttype:CONST},
 {input:"omega",  tag:"mi", output:"\u03C9", tex:null, ttype:CONST},
@@ -76,7 +88,8 @@ var AMsymbols = [
 
 //binary operation symbols
 {input:"*",  tag:"mo", output:"\u22C5", tex:"cdot", ttype:CONST},
-{input:"**", tag:"mo", output:"\u22C6", tex:"star", ttype:CONST},
+{input:"**", tag:"mo", output:"\u2217", tex:"ast", ttype:CONST},
+{input:"***", tag:"mo", output:"\u22C6", tex:"star", ttype:CONST},
 {input:"//", tag:"mo", output:"/",      tex:null, ttype:CONST},
 {input:"\\\\", tag:"mo", output:"\\",   tex:"backslash", ttype:CONST},
 {input:"setminus", tag:"mo", output:"\\", tex:null, ttype:CONST},
@@ -107,7 +120,6 @@ var AMsymbols = [
 {input:"lt=", tag:"mo", output:"\u2264", tex:"leq", ttype:CONST},
 {input:"gt=",  tag:"mo", output:"\u2265", tex:"geq", ttype:CONST},
 {input:">=",  tag:"mo", output:"\u2265", tex:"ge", ttype:CONST},
-{input:"geq", tag:"mo", output:"\u2265", tex:null, ttype:CONST},
 {input:"-<",  tag:"mo", output:"\u227A", tex:"prec", ttype:CONST},
 {input:"-lt", tag:"mo", output:"\u227A", tex:null, ttype:CONST},
 {input:">-",  tag:"mo", output:"\u227B", tex:"succ", ttype:CONST},
@@ -173,6 +185,7 @@ var AMsymbols = [
 {input:"...",  tag:"mo", output:"...",    tex:"ldots", ttype:CONST},
 {input:":.",  tag:"mo", output:"\u2234",  tex:"therefore", ttype:CONST},
 {input:"/_",  tag:"mo", output:"\u2220",  tex:"angle", ttype:CONST},
+{input:"/_\\",  tag:"mo", output:"\u25B3",  tex:"triangle", ttype:CONST},
 {input:"\\ ",  tag:"mo", output:"\u00A0", tex:null, ttype:CONST, val:true},
 {input:"quad", tag:"mo", output:"\u00A0\u00A0", tex:null, ttype:CONST},
 {input:"qquad", tag:"mo", output:"\u00A0\u00A0\u00A0\u00A0", tex:null, ttype:CONST},
@@ -253,6 +266,9 @@ var AMsymbols = [
 {input:"darr", tag:"mo", output:"\u2193", tex:"downarrow", ttype:CONST},
 {input:"rarr", tag:"mo", output:"\u2192", tex:"rightarrow", ttype:CONST},
 {input:"->",   tag:"mo", output:"\u2192", tex:"to", ttype:CONST},
+{input:">->",   tag:"mo", output:"\u21A3", tex:"rightarrowtail", ttype:CONST},
+{input:"->>",   tag:"mo", output:"\u21A0", tex:"twoheadrightarrow", ttype:CONST},
+{input:">->>",   tag:"mo", output:"\u2916", tex:"twoheadrightarrowtail", ttype:CONST},
 {input:"|->",  tag:"mo", output:"\u21A6", tex:"mapsto", ttype:CONST},
 {input:"larr", tag:"mo", output:"\u2190", tex:"leftarrow", ttype:CONST},
 {input:"harr", tag:"mo", output:"\u2194", tex:"leftrightarrow", ttype:CONST},
@@ -274,18 +290,18 @@ AMsqrt, AMroot, AMfrac, AMdiv, AMover, AMsub, AMsup,
 AMtext, AMmbox, AMquote,
 //{input:"var", tag:"mstyle", atname:"fontstyle", atval:"italic", output:"var", tex:null, ttype:UNARY},
 {input:"color", tag:"mstyle", ttype:BINARY},
-{input:"bb", tag:"mstyle", atname:"fontweight", atval:"bold", output:"bb", tex:"mathbf", ttype:UNARY, notexcopy:true},
-{input:"mathbf", tag:"mstyle", atname:"fontweight", atval:"bold", output:"mathbf", tex:null, ttype:UNARY},
-{input:"sf", tag:"mstyle", atname:"fontfamily", atval:"sans-serif", output:"sf", tex:"mathsf", ttype:UNARY, notexcopy:true},
-{input:"mathsf", tag:"mstyle", atname:"fontfamily", atval:"sans-serif", output:"mathsf", tex:null, ttype:UNARY},
-{input:"bbb", tag:"mstyle", atname:"mathvariant", atval:"double-struck", output:"bbb", tex:"mathbb", ttype:UNARY, codes:AMbbb, notexcopy:true},
-{input:"mathbb", tag:"mstyle", atname:"mathvariant", atval:"double-struck", output:"mathbb", tex:null, ttype:UNARY, codes:AMbbb},
-{input:"cc",  tag:"mstyle", atname:"mathvariant", atval:"script", output:"cc", tex:"mathcal", ttype:UNARY, codes:AMcal, notexcopy:true},
-{input:"mathcal", tag:"mstyle", atname:"mathvariant", atval:"script", output:"mathcal", tex:null, ttype:UNARY, codes:AMcal},
-{input:"tt",  tag:"mstyle", atname:"fontfamily", atval:"monospace", output:"tt", tex:"mathtt", ttype:UNARY, notexcopy:true},
-{input:"mathtt", tag:"mstyle", atname:"fontfamily", atval:"monospace", output:"mathtt", tex:null, ttype:UNARY},
-{input:"fr",  tag:"mstyle", atname:"mathvariant", atval:"fraktur", output:"fr", tex:"mathfrak", ttype:UNARY, codes:AMfrk, notexcopy:true},
-{input:"mathfrak",  tag:"mstyle", atname:"mathvariant", atval:"fraktur", output:"mathfrak", tex:null, ttype:UNARY, codes:AMfrk}
+{input:"bb", tag:"mstyle", atname:"mathvariant", atval:"bold", output:"bb", tex:"mathbf", ttype:UNARY, notexcopy:true},
+{input:"mathbf", tag:"mstyle", atname:"mathvariant", atval:"bold", output:"mathbf", tex:null, ttype:UNARY},
+{input:"sf", tag:"mstyle", atname:"mathvariant", atval:"sans-serif", output:"sf", tex:"mathsf", ttype:UNARY, notexcopy:true},
+{input:"mathsf", tag:"mstyle", atname:"mathvariant", atval:"sans-serif", output:"mathsf", tex:null, ttype:UNARY},
+{input:"bbb", tag:"mstyle", atname:"mathvariant", atval:"double-struck", output:"bbb", tex:"mathbb", ttype:UNARY, notexcopy:true},
+{input:"mathbb", tag:"mstyle", atname:"mathvariant", atval:"double-struck", output:"mathbb", tex:null, ttype:UNARY},
+{input:"cc",  tag:"mstyle", atname:"mathvariant", atval:"script", output:"cc", tex:"mathcal", ttype:UNARY, notexcopy:true},
+{input:"mathcal", tag:"mstyle", atname:"mathvariant", atval:"script", output:"mathcal", tex:null, ttype:UNARY},
+{input:"tt",  tag:"mstyle", atname:"mathvariant", atval:"monospace", output:"tt", tex:"mathtt", ttype:UNARY, notexcopy:true},
+{input:"mathtt", tag:"mstyle", atname:"mathvariant", atval:"monospace", output:"mathtt", tex:null, ttype:UNARY},
+{input:"fr",  tag:"mstyle", atname:"mathvariant", atval:"fraktur", output:"fr", tex:"mathfrak", ttype:UNARY, notexcopy:true},
+{input:"mathfrak",  tag:"mstyle", atname:"mathvariant", atval:"fraktur", output:"mathfrak", tex:null, ttype:UNARY}
 ];
 
 function compareNames(s1,s2) {
@@ -895,8 +911,61 @@ function AMprocessNode(n, linebreaks, spanclassAM) {
   }
 }
 
+function translate(spanclassAM) {
+  if (!AMtranslated) { // run this only once
+    AMtranslated = true;
+    var body = document.getElementsByTagName("body")[0];
+    var processN = document.getElementById(AMdocumentId);
+    AMprocessNode((processN!=null?processN:body), false, spanclassAM);
+  }
+}
+
 var AMbody;
 var AMtranslated = false;
 var AMnoMathML = true;
 
 AMinitSymbols();
+
+window.translate = translate;
+window.AMprocessNode = AMprocessNode;
+window.AMparseMath = AMparseMath;
+window.AMTparseMath = AMparseMath;
+window.AMTparseAMtoTeX = AMTparseAMtoTeX;
+
+function generic(){
+  if (translateOnLoad) {
+      translate();
+  }
+};
+//setup onload function
+if(typeof window.addEventListener != 'undefined'){
+  //.. gecko, safari, konqueror and standard
+  window.addEventListener('load', generic, false);
+}
+else if(typeof document.addEventListener != 'undefined'){
+  //.. opera 7
+  document.addEventListener('load', generic, false);
+}
+else if(typeof window.attachEvent != 'undefined'){
+  //.. win/ie
+  window.attachEvent('onload', generic);
+}else{
+  //.. mac/ie5 and anything else that gets this far
+  //if there's an existing onload function
+  if(typeof window.onload == 'function'){
+    //store it
+    var existing = onload;
+    //add new onload handler
+    window.onload = function(){
+      //call existing onload function
+      existing();
+      //call generic onload function
+      generic();
+    };
+  }else{
+    window.onload = generic;
+  }
+}
+
+
+})();
