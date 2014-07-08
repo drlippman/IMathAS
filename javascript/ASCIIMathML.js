@@ -17,6 +17,7 @@ var AMdelimiter1 = "`", AMescape1 = "\\\\`"; // can use other characters
 //var AMdelimiter2 = "$", AMescape2 = "\\\\\\$", AMdelimiter2regexp = "\\$";
 var doubleblankmathdelimiter = false; // if true,  x+1  is equal to `x+1`
                                       // for IE this works only in <!--   -->
+var fixphi = true;  		//false to return to legacy phi/varphi mapping
 				      
 var noMathRender = false;
 //var separatetokens;// has been removed (email me if this is a problem)
@@ -112,12 +113,14 @@ var AMsymbols = [
 {input:"kappa",  tag:"mi", output:"\u03BA", tex:null, ttype:CONST},
 {input:"lambda", tag:"mi", output:"\u03BB", tex:null, ttype:CONST},
 {input:"Lambda", tag:"mo", output:"\u039B", tex:null, ttype:CONST},
+{input:"lamda", tag:"mi", output:"\u03BB", tex:null, ttype:CONST},
+{input:"Lamda", tag:"mo", output:"\u039B", tex:null, ttype:CONST},
 {input:"mu",     tag:"mi", output:"\u03BC", tex:null, ttype:CONST},
 {input:"nu",     tag:"mi", output:"\u03BD", tex:null, ttype:CONST},
 {input:"omega",  tag:"mi", output:"\u03C9", tex:null, ttype:CONST},
 {input:"Omega",  tag:"mo", output:"\u03A9", tex:null, ttype:CONST},
-{input:"phi",    tag:"mi", output:"\u03C6", tex:null, ttype:CONST},
-{input:"varphi", tag:"mi", output:"\u03D5", tex:null, ttype:CONST},
+{input:"phi",    tag:"mi", output:fixphi?"\u03D5":"\u03C6", tex:null, ttype:CONST},
+{input:"varphi", tag:"mi", output:fixphi?"\u03C6":"\u03D5", tex:null, ttype:CONST},
 {input:"Phi",    tag:"mo", output:"\u03A6", tex:null, ttype:CONST},
 {input:"pi",     tag:"mi", output:"\u03C0", tex:null, ttype:CONST},
 {input:"Pi",     tag:"mo", output:"\u03A0", tex:null, ttype:CONST},
@@ -137,7 +140,8 @@ var AMsymbols = [
 
 //binary operation symbols
 {input:"*",  tag:"mo", output:"\u22C5", tex:"cdot", ttype:CONST},
-{input:"**", tag:"mo", output:"\u22C6", tex:"star", ttype:CONST},
+{input:"**", tag:"mo", output:"\u2217", tex:"ast", ttype:CONST},
+{input:"***", tag:"mo", output:"\u22C6", tex:"star", ttype:CONST},
 {input:"//", tag:"mo", output:"/",      tex:null, ttype:CONST},
 {input:"\\\\", tag:"mo", output:"\\",   tex:"backslash", ttype:CONST},
 {input:"setminus", tag:"mo", output:"\\", tex:null, ttype:CONST},
@@ -168,7 +172,6 @@ var AMsymbols = [
 {input:"lt=", tag:"mo", output:"\u2264", tex:"leq", ttype:CONST},
 {input:"gt=",  tag:"mo", output:"\u2265", tex:"geq", ttype:CONST},
 {input:">=",  tag:"mo", output:"\u2265", tex:"ge", ttype:CONST},
-{input:"geq", tag:"mo", output:"\u2265", tex:null, ttype:CONST},
 {input:"-<",  tag:"mo", output:"\u227A", tex:"prec", ttype:CONST},
 {input:"-lt", tag:"mo", output:"\u227A", tex:null, ttype:CONST},
 {input:">-",  tag:"mo", output:"\u227B", tex:"succ", ttype:CONST},
@@ -309,6 +312,9 @@ var AMsymbols = [
 {input:"rarr", tag:"mo", output:"\u2192", tex:"rightarrow", ttype:CONST},
 {input:"->",   tag:"mo", output:"\u2192", tex:"to", ttype:CONST},
 {input:"|->",  tag:"mo", output:"\u21A6", tex:"mapsto", ttype:CONST},
+{input:">->",   tag:"mo", output:"\u21A3", tex:"rightarrowtail", ttype:CONST},
+{input:"->>",   tag:"mo", output:"\u21A0", tex:"twoheadrightarrow", ttype:CONST},
+{input:">->>",   tag:"mo", output:"\u2916", tex:"twoheadrightarrowtail", ttype:CONST},
 {input:"larr", tag:"mo", output:"\u2190", tex:"leftarrow", ttype:CONST},
 {input:"harr", tag:"mo", output:"\u2194", tex:"leftrightarrow", ttype:CONST},
 {input:"rArr", tag:"mo", output:"\u21D2", tex:"Rightarrow", ttype:CONST},

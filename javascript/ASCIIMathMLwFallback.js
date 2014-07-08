@@ -148,6 +148,8 @@ var AMsymbols = [
 {input:"kappa",  tag:"mi", output:"\u03BA", tex:null, ttype:CONST},
 {input:"lambda", tag:"mi", output:"\u03BB", tex:null, ttype:CONST},
 {input:"Lambda", tag:"mo", output:"\u039B", tex:null, ttype:CONST},
+{input:"lamda", tag:"mi", output:"\u03BB", tex:null, ttype:CONST},
+{input:"Lamda", tag:"mo", output:"\u039B", tex:null, ttype:CONST},
 {input:"mu",     tag:"mi", output:"\u03BC", tex:null, ttype:CONST},
 {input:"nu",     tag:"mi", output:"\u03BD", tex:null, ttype:CONST},
 {input:"omega",  tag:"mi", output:"\u03C9", tex:null, ttype:CONST},
@@ -985,7 +987,7 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
                              document.createTextNode(symbol.output)),str];
       if (typeof symbol.func == "boolean" && symbol.func) { // functions hack
         st = str.charAt(0);
-        if (st=="^" || st=="_" || st=="/" || st=="|" || st==",") {
+        if (st=="^" || st=="_" || st=="/" || st=="|" || st=="," || ((symbol.input=="f" || symbol.input=="g") && st!="(")) {
           return [AMcreateMmlNode(symbol.tag,
                     document.createTextNode(symbol.output)),str];
         } else {
@@ -1197,6 +1199,7 @@ function AMparseExpr(str,rightbracket) {
                 pos[i][pos[i].length]=j;
           if (matrix && i>1) matrix = pos[i].length == pos[i-2].length;
         }
+        matrix = matrix && (pos.length>1 || pos[0].length>0);
         if (matrix) {
           var row, frag, n, k, table = document.createDocumentFragment();
           for (i=0; i<m; i=i+2) {
