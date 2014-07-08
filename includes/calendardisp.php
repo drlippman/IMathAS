@@ -177,7 +177,8 @@ while ($row = mysql_fetch_row($result)) {
 			$tag = '?';
 		}*/
 		$tag = htmlentities($row[10]);
-		if (($row[9]==1 || $row[9]-1>$latepasscnt) && $latepasses>0 && $now < $row[3]) {
+		if (($row[9]%10==1 || $row[9]%10-1>$latepasscnt) && $latepasses>0 && 
+		   ($now < $row[3] || ($row[9]>10 && $now-$row[3]<$latepasshrs*3600))) {
 			$lp = 1;
 		} else {
 			$lp = 0;
@@ -191,7 +192,8 @@ while ($row = mysql_fetch_row($result)) {
 		$row[1] = htmlentities($row[1]);
 		$colors = makecolor2($row[2],$row[3],$now);
 		$json = "{type:\"A\", time:\"$time\", ";
-		if ($now<$row[3] || $row[4]>$now || isset($teacherid)) { $json .= "id:\"$row[0]\",";}
+		if ($now<$row[3] || $row[4]>$now || isset($teacherid) || $lp==1) { $json .= "id:\"$row[0]\",";}
+		if ($now>$row[3] && $now>$row[4] && !isset($teacherid)) { $json .= 'inactive:true,';}
 		$json .= "name:\"$row[1]\", color:\"".$colors."\", allowlate:\"$lp\", undolate:\"$ulp\", tag:\"$tag\"".(($row[8]!=0)?", timelimit:true":"").((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
 		$byid['A'.$row[0]] = array($moday,$tag,$colors,$json);
 	} 

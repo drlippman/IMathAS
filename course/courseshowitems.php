@@ -666,7 +666,7 @@ function enditem($canedit) {
 					}
 					echo '</span>';
 					
-				   } else if (($line['allowlate']==1 || $line['allowlate']-1>$latepasscnt) && $latepasses>0) {
+				   } else if (($line['allowlate']%10==1 || $line['allowlate']%10-1>$latepasscnt) && $latepasses>0) {
 					echo " <a href=\"redeemlatepass.php?cid=$cid&aid=$typeid\">", _('Use LatePass'), "</a>";
 					if ($canundolatepass) {
 						 echo " | <a href=\"redeemlatepass.php?cid=$cid&aid=$typeid&undo=true\">", _('Un-use LatePass'), "</a>";
