@@ -7,7 +7,7 @@
 	$isteacher = isset($teacherid);
 	$istutor = isset($tutorid);
 	$cid = $_GET['cid'];
-	$asid = $_GET['asid'];
+	$asid = intval($_GET['asid']);
 	if (!isset($_GET['uid']) && !$isteacher && !$istutor) {
 		$_GET['uid'] = $userid;
 	}
@@ -39,6 +39,10 @@
 		$links = 0;
 		$stu = 0;
 		$from = 'gb';
+		$now = time();
+		$query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime) VALUES ";
+		$query .= "($userid,'$cid','gbviewasid','$asid',$now)";
+		mysql_query($query) or die("Query failed : " . mysql_error());
 	}
 	
 	

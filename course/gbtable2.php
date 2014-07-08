@@ -97,6 +97,7 @@ row[1][1][0][6] = 1 if had exception, = 2 if was latepass
 row[1][1][0][7] = time spent (minutes)
 row[1][1][0][8] = time on task (time displayed)
 row[1][1][0][9] = last change time (if $includelastchange is set)
+row[1][1][0][10] = allow latepass use on this item 
 
 row[1][1][1] = offline
 row[1][1][1][0] = score
@@ -133,7 +134,7 @@ cats[i]:  0: name, 1: scale, 2: scaletype, 3: chop, 4: dropn, 5: weight, 6: hidd
 ****/
 
 function gbtable() {
-	global $cid,$isteacher,$istutor,$tutorid,$userid,$catfilter,$secfilter,$timefilter,$lnfilter,$isdiag,$sel1name,$sel2name,$canviewall,$lastlogin,$logincnt,$hidelocked;
+	global $cid,$isteacher,$istutor,$tutorid,$userid,$catfilter,$secfilter,$timefilter,$lnfilter,$isdiag,$sel1name,$sel2name,$canviewall,$lastlogin,$logincnt,$hidelocked,$latepasshrs;
 	if ($canviewall && func_num_args()>0) {
 		$limuser = func_get_arg(0);
 	} else if (!$canviewall) {
@@ -232,7 +233,7 @@ function gbtable() {
 
 	//Pull Assessment Info
 	$now = time();
-	$query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail,groupsetid FROM imas_assessments WHERE courseid='$cid' AND avail>0 ";
+	$query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail,groupsetid,allowlate FROM imas_assessments WHERE courseid='$cid' AND avail>0 ";
 	if (!$canviewall) {
 		$query .= "AND cntingb>0 ";
 	}
@@ -266,6 +267,7 @@ function gbtable() {
 	$name = array();
 	$possible = array();
 	$courseorder = array();
+	$allowlate = array();
 	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 		$assessments[$kcnt] = $line['id'];
 		if (isset($courseitemsassoc)) {
@@ -297,6 +299,9 @@ function gbtable() {
 			$cntingb[$kcnt] = 3;
 		}
 		$aitems = explode(',',$line['itemorder']);
+		if ($line['allowlate']>0) {
+			$allowlate[$kcnt] = $line['allowlate'];
+		}
 		$k = 0;
 		$atofind = array();
 		foreach ($aitems as $v) {
@@ -588,10 +593,12 @@ function gbtable() {
 					$gb[0][1][$pos][7] = $discuss[$k];
 					$discusscol[$discuss[$k]] = $pos;
 				}
-				if (isset($GLOBALS['includeduedate']) && $GLOBALS['includeduedate']==true) {
+				if ((isset($GLOBALS['includeduedate']) && $GLOBALS['includeduedate']==true) || isset($allowlate[$k])) {
 					$gb[0][1][$pos][11] = $enddate[$k];
 				}
-					
+				if (isset($allowlate[$k])) {
+					$gb[0][1][$pos][12] = $allowlate[$k];
+				}
 				
 				$pos++;
 			}
@@ -643,8 +650,11 @@ function gbtable() {
 				$gb[0][1][$pos][7] = $discuss[$k];
 				$discusscol[$discuss[$k]] = $pos;
 			}
-			if (isset($GLOBALS['includeduedate']) && $GLOBALS['includeduedate']==true) {
+			if (isset($GLOBALS['includeduedate']) && $GLOBALS['includeduedate']==true|| isset($allowlate[$k])) {
 				$gb[0][1][$pos][11] = $enddate[$k];
+			}
+			if (isset($allowlate[$k])) {
+				$gb[0][1][$pos][12] = $allowlate[$k];
 			}
 			$pos++;
 		}
@@ -893,6 +903,7 @@ function gbtable() {
 			$gb[$row][1][$col][6] = ($exceptions[$l['assessmentid']][$l['userid']][1]>0)?2:1; //had exception
 		}
 		*/
+		$latepasscnt = 0;
 		if (isset($exceptions[$l['assessmentid']][$l['userid']])) {// && $now>$enddate[$i] && $now<$exceptions[$l['assessmentid']][$l['userid']]) {
 			if ($enddate[$i]>$exceptions[$l['assessmentid']][$l['userid']][0] && $assessmenttype[$i]=="NoScores") {
 				//if exception set for earlier, and NoScores is set, use later date to hide score until later
@@ -908,10 +919,22 @@ function gbtable() {
 				}
 			}
 			$inexception = true;
+			if ($enddate[$i]<$exceptions[$l['assessmentid']][$l['userid']][0] && $latepasshrs>0) {
+				$latepasscnt = round(($exceptions[$l['assessmentid']][$l['userid']][0] - $enddate[$i])/($latepasshrs*3600));
+			}
 		} else {
 			$thised = $enddate[$i];
 			$inexception = false;
 		}
+		$allowlatethis = false;
+		if (isset($allowlate[$i]) && ($allowlate[$i]%10==1 || $latepasscnt<$allowlate[$i]%10-1)) {
+			if ($now<$thised) {
+				$allowlatethis = true;
+			} else if ($allowlate[$i]>10 && ($now - $thised)<$latepasshrs*3600) {
+				$allowlatethis = true;
+			}
+		}
+		$gb[$row][1][$col][10] = $allowlatethis;
 		
 		if ($canviewall || $sa[$i]=="I" || ($sa[$i]!="N" && $now>$thised)) { //|| $assessmenttype[$i]=="Practice" 
 			$gb[$row][1][$col][2] = 1; //show link

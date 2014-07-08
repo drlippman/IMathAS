@@ -695,19 +695,20 @@ if (isset($studentid) || $stu!=0) { //show student view
 }
 
 function gbstudisp($stu) {
-	global $hidenc,$cid,$gbmode,$availshow,$isteacher,$istutor,$catfilter,$imasroot,$canviewall,$urlmode,$includeduedate, $includelastchange;
+	global $hidenc,$cid,$gbmode,$availshow,$isteacher,$istutor,$catfilter,$imasroot,$canviewall,$urlmode,$includeduedate, $includelastchange,$latepasshrs;
 	if ($availshow==4) {
 		$availshow=1;
 		$hidepast = true;
+	}
+	if ($stu>0) {
+		$query = "SELECT showlatepass,latepasshrs FROM imas_courses WHERE id='$cid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		list($showlatepass,$latepasshrs) = mysql_fetch_row($result);
 	}
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	$gbt = gbtable($stu);
 	
 	if ($stu>0) {
-		$query = "SELECT showlatepass FROM imas_courses WHERE id='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$showlatepass = mysql_result($result,0,0);
-		
 		echo '<div style="font-size:1.1em;font-weight:bold">';
 		if ($isteacher || $istutor) {
 			if ($gbt[1][0][1] != '') {
@@ -752,6 +753,14 @@ function gbstudisp($stu) {
 			echo ' <span class="small">('.$gbt[1][0][1].')</span>';
 		} else {
 			echo strip_tags($gbt[1][0][0]) . ' <span class="small">('.$gbt[1][0][1].')</span>';
+			
+			$viewedassess = array();
+			$query = "SELECT typeid FROM imas_content_track WHERE courseid='$cid' AND userid='$stu' AND type='gbviewasid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				$viewedassess[] = $row[0];
+			}
+			$now = time();
 		}
 		$query = "SELECT imas_students.gbcomment,imas_users.email,imas_students.latepass,imas_students.section,imas_students.lastaccess FROM imas_students,imas_users WHERE ";
 		$query .= "imas_students.userid=imas_users.id AND imas_users.id='$stu' AND imas_students.courseid='{$_GET['cid']}'";
@@ -860,7 +869,17 @@ function gbstudisp($stu) {
 				}
 			}
 			
-			echo '<td class="cat'.$gbt[0][1][$i][1].'">'.$gbt[0][1][$i][0].'</td>';
+			echo '<td class="cat'.$gbt[0][1][$i][1].'">'.$gbt[0][1][$i][0];
+			if (!$isteacher && !$istutor && $latepasses>0 &&	(
+				(isset($gbt[1][1][$i][10]) && $gbt[1][1][$i][10]>0 && !in_array($gbt[1][1][$i][4],$viewedassess)) ||  //started, and already figured it's ok
+				(!isset($gbt[1][1][$i][10]) && $now<$gbt[0][1][$i][11]) || //not started, before due date
+				(!isset($gbt[1][1][$i][10]) && $now-$gbt[0][1][$i][11]<$latepasshrs*3600 && !in_array($gbt[1][1][$i][4],$viewedassess)) //not started, within one latepass
+			    )) {
+				echo ' <span class="small"><a href="redeemlatepass?cid='.$cid.'&aid='.$gbt[0][1][$i][7].'">[';
+				echo _('Use LatePass').']</a></span>';
+			}
+			
+			echo '</td>';
 			echo '<td>';
 			
 			if ($gbt[0][1][$i][4]==0 || $gbt[0][1][$i][4]==3) {
