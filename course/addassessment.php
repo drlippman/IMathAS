@@ -127,6 +127,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$tutoredit = intval($_POST['tutoredit']);
 		
 		$_POST['allowlate'] = intval($_POST['allowlate']);
+		if (isset($_POST['latepassafterdue']) && $_POST['allowlate']>0) {
+			$_POST['allowlate'] += 10;
+		}
 		
 		$timelimit = $_POST['timelimit']*60;
 		if (isset($_POST['timelimitkickout'])) {
@@ -861,9 +864,10 @@ if ($overwriteBody==1) {
 			<span class=form>Allow use of LatePasses?: </span>
 			<span class=formright>
 				<?php
-				writeHtmlSelect("allowlate",$page_allowlateSelect['val'],$page_allowlateSelect['label'],$line['allowlate']);
+				writeHtmlSelect("allowlate",$page_allowlateSelect['val'],$page_allowlateSelect['label'],$line['allowlate']%10);
 				?>
-			</span><BR class=form>
+				<label><input type="checkbox" name="latepassafterdue" <?php writeHtmlChecked($line['allowlate']>10,true); ?>> Allow LatePasses after due date, within 1 LatePass period</label>
+			</span><BR class=form> 
 			
 			<span class=form>Make hard to print?</span>
 			<span class=formright>

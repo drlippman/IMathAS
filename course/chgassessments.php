@@ -78,6 +78,9 @@ if (!(isset($teacherid))) {
 			}
 			if (isset($_POST['chgallowlate'])) {
 				$allowlate = intval($_POST['allowlate']);
+				if (isset($_POST['latepassafterdue']) && $allowlate>0) {
+					$allowlate += 10;
+				}
 			}
 			if (isset($_POST['chghints'])) {
 				if (isset($_POST['showhints'])) {
@@ -735,6 +738,7 @@ $(function() {
 				<?php
 				writeHtmlSelect("allowlate",$page_allowlateSelect['val'],$page_allowlateSelect['label'],1);
 				?>
+				<label><input type="checkbox" name="latepassafterdue"> Allow LatePasses after due date, within 1 LatePass period</label>
 				</td>
 			</tr>
 			<tr class="coptr">

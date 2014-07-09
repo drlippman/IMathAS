@@ -110,6 +110,7 @@ if (!isset($teacherid)) {
 	}
 }
 
+$havecalcedviewedassess = false;
 
 $byid = array();
 $k = 0;
@@ -177,12 +178,24 @@ while ($row = mysql_fetch_row($result)) {
 			$tag = '?';
 		}*/
 		$tag = htmlentities($row[10]);
+		
+		if (!$havecalcedviewedassess && $now>$row[3] && $row[9]>10) {
+			$havecalcedviewedassess = true;
+			$viewedassess = array();
+			$query = "SELECT typeid FROM imas_content_track WHERE courseid='$cid' AND userid='$userid' AND type='gbviewasid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			while ($r = mysql_fetch_row($result)) {
+				$viewedassess[] = $r[0];
+			}
+		} 
 		if (($row[9]%10==1 || $row[9]%10-1>$latepasscnt) && $latepasses>0 && 
-		   ($now < $row[3] || ($row[9]>10 && $now-$row[3]<$latepasshrs*3600))) {
+		   ($now < $row[3] || ($row[9]>10 && $now-$row[3]<$latepasshrs*3600 && !in_array($row[0],$viewedassess)))) {
 			$lp = 1;
 		} else {
 			$lp = 0;
 		}
+		
+		
 		if ($canundolatepass) {
 			$ulp = 1;
 		} else {
