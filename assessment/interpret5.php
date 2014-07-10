@@ -629,12 +629,16 @@ function loadlibrary($str) {
 }
 
 //sets question seed
-function setseed($ns) {
+function setseed($ns,$ref=0) {
 	if ($ns=="userid") {
 		if (isset($GLOBALS['teacherid']) && isset($GLOBALS['teacherreview'])) { //reviewing in gradebook
 			srand($GLOBALS['teacherreview']);	
 		} else { //in assessment
 			srand($GLOBALS['userid']); 
+		}
+	} else if ($ns=="from") {
+		if (isset($GLOBALS['seeds']) && isset($GLOBALS['seeds'][$ref-1])) {
+			srand($GLOBALS['seeds'][$ref-1]);
 		}
 	} else {
 		srand($ns);
