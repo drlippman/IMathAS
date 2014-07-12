@@ -155,8 +155,11 @@
 			}
 			$query = "UPDATE imas_questionset SET description='{$_POST['description']}',author='{$_POST['author']}',userights='{$_POST['userights']}',license='{$_POST['license']}',";
 			$query .= "otherattribution='{$_POST['addattr']}',qtype='{$_POST['qtype']}',control='{$_POST['control']}',qcontrol='{$_POST['qcontrol']}',solution='{$_POST['solution']}',";
-			$query .= "qtext='{$_POST['qtext']}',answer='{$_POST['answer']}',lastmoddate=$now,extref='$extref',replaceby=$replaceby,solutionopts=$solutionopts ";
-			$query .= "WHERE id='{$_GET['id']}'";
+			$query .= "qtext='{$_POST['qtext']}',answer='{$_POST['answer']}',lastmoddate=$now,extref='$extref',replaceby=$replaceby,solutionopts=$solutionopts";
+			if (isset($_POST['undelete'])) {
+				$query .= ',deleted=0';
+			}
+			$query .= " WHERE id='{$_GET['id']}'";
 			//checked separately above now
 			//if (!$isadmin && !$isgrpadmin) { $query .= " AND (ownerid='$userid' OR userights>2);";}
 			if ($isok) {
@@ -950,6 +953,9 @@ if ($myrights==100) {
 		echo $line['replaceby'];
 	} 
 	echo '"/>.  <i>Do not use this unless you know what you\'re doing</i></p>';
+}
+if ($line['deleted']==1 && ($myrights==100 || $ownerid==$userid)) {
+	echo '<p>This question is currently marked as deleted. <label><input type="checkbox" name="undelete"> Un-delete question</p>';
 }
 ?>
 </div>
