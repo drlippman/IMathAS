@@ -13,6 +13,7 @@ array_push($allowedmacros,"plot3d","spacecurve");
 //bounds: xmin,xmax,ymin,ymax,zmin,zmax
 function plot3d($func,$umin,$umax,$vmin,$vmax) {
 	global $imasroot;
+	if ($GLOBALS['inquestiondisplay'] == false) {return '';}
 	if (func_num_args()>5) {
 		$disc = func_get_arg(5);
 		if (!is_numeric($disc)) {
@@ -169,6 +170,7 @@ function plot3d($func,$umin,$umax,$vmin,$vmax) {
 //bounds: xmin,xmax,ymin,ymax,zmin,zmax
 function spacecurve($func,$tmin,$tmax) {
 	global $imasroot;
+	if ($GLOBALS['inquestiondisplay'] == false) {return '';}
 	if (func_num_args()>3) {
 		$disc = func_get_arg(3);
 		if (!is_numeric($disc)) {
