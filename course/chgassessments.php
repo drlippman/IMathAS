@@ -463,9 +463,10 @@ $(function() {
 		<img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
 	</h2></div>
 
-	<p>This form will allow you to change the assessment settings for several or all assessments at once.
-	<br/><b>Be aware</b> that changing default points or penalty after an assessment has been 
-	 taken will not change the scores of students who have already completed the assessment.</p>
+	<p>This form will allow you to change the assessment settings for several or all assessments at once.</p>
+	<p><b>Be aware</b> that changing default points or penalty after an assessment has been 
+	 taken will not change the scores of students who have already completed the assessment.<br/>
+	 This page will <i>always</i> show the system default settings; it does not show the current settings for your assessments.</p>
 
 	<form id="qform" method=post action="chgassessments.php?cid=<?php echo $cid; ?>" onsubmit="return valform();">
 		<h3>Assessments to Change</h3>

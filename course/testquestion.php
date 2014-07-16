@@ -303,6 +303,9 @@ if ($overwriteBody==1) {
 	} else if ($line['ancestorauthors']!='') {
 		echo '<p>Derived from work by: '.$line['ancestorauthors'].'</p>';	
 	} 
+	if ($myrights==100) {
+		echo '<p>UniqueID: '.$line['uniqueid'].'</p>';
+	}
 }
 require("../footer.php");
 	
