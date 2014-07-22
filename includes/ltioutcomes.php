@@ -287,7 +287,11 @@ function updateLTIgrade($action,$sourcedid,$aid,$grade=0) {
 					$secret = '';
 				}
 			} else {
-				$qr = "SELECT password FROM imas_users WHERE SID='{$sessiondata['lti_origkey']}' AND (rights=11 OR rights=76 OR rights=77)";
+				if (isset($sessiondata['lti_origkey'])) {
+					$qr = "SELECT password FROM imas_users WHERE SID='{$sessiondata['lti_origkey']}' AND (rights=11 OR rights=76 OR rights=77)";
+				} else {
+					$qr = "SELECT password FROM imas_users WHERE SID='".addslashes($ltikey)."' AND (rights=11 OR rights=76 OR rights=77)";
+				}
 				$res= mysql_query($qr) or die("Query failed : $qr" . mysql_error());
 				if (mysql_num_rows($res)>0) {
 					$secret = mysql_result($res,0,0);
