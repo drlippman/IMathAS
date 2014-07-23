@@ -93,6 +93,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$_POST['gbcat'] = 0;
 		} else {
 			$tutoredit = intval($_POST['tutoredit']);
+			if ($_POST['cntingb']==4) {
+				$_POST['cntingb'] = 0;
+			}
 		}
 		
 		if (intval($_POST['points'])==0) {
@@ -529,9 +532,10 @@ if ($overwriteBody==1) {
 		<span class="formright">
 			<input type=radio name="cntingb" value="0" <?php if ($cntingb==0) { echo 'checked=1';}?> onclick="toggleGBdetail(false)"/>No<br/>
 			<input type=radio name="cntingb" value="1" <?php if ($cntingb==1) { echo 'checked=1';}?> onclick="toggleGBdetail(true)"/>Yes<br/>
+			<input type=radio name="cntingb" value="4" <?php if ($cntingb==0 && $points>0) { echo 'checked=1';}?> onclick="toggleGBdetail(true)"/>Yes, but hide from students for now<br/>
 			<input type=radio name="cntingb" value="2" <?php if ($cntingb==2) { echo 'checked=1';}?> onclick="toggleGBdetail(true)"/>Yes, as extra credit<br/>
 		</span><br class="form"/>
-		<div id="gbdetail" <?php if ($cntingb==0) { echo 'style="display:none;"';}?>>
+		<div id="gbdetail" <?php if ($cntingb==0 && $points==0) { echo 'style="display:none;"';}?>>
 		<span class="form">Points:</span>
 		<span class="formright">
 			<input type=text size=4 name="points" value="<?php echo $points;?>"/> points
