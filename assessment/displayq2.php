@@ -70,16 +70,16 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 					if ($arvp==='') {
 						$stuanswers[$i+1][$k] = null;
 					} else {
-						if (strpos($arvp,'$f$')) {
+						if (strpos($arvp,'$f$')!==false) {
 							$tmp = explode('$f$',$arvp);
 							$arvp = $tmp[0];
 						}
-						if (strpos($arvp,'$!$')) {
+						if (strpos($arvp,'$!$')!==false) {
 							$arvp = explode('$!$',$arvp);
 							$arvp = $arvp[1];
 							if (is_numeric($arvp)) { $arvp = intval($arvp);}
 						}
-						if (strpos($arvp,'$#$')) {
+						if (strpos($arvp,'$#$')!==false) {
 							$tmp = explode('$#$',$arvp);
 							$arvp = $tmp[0];
 							$stuanswersval[$i+1][$k] = $tmp[1];
@@ -95,16 +95,16 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 				if ($arv==='' || $arv==='ReGen') {
 					$stuanswers[$i+1] = null;
 				} else {
-					if (strpos($arvp,'$f$')) {
+					if (strpos($arvp,'$f$')!==false) {
 						$tmp = explode('$f$',$arv);
 						$arv = $tmp[0];
 					}
-					if (strpos($arv,'$!$')) {
+					if (strpos($arv,'$!$')!==false) {
 						$arv = explode('$!$',$arv);
 						$arv = $arv[1];
 						if (is_numeric($arv)) { $arv = intval($arv);}
 					}
-					if (strpos($arv,'$#$')) {
+					if (strpos($arv,'$#$')!==false) {
 						$tmp = explode('$#$',$arv);
 						$arv = $tmp[0];
 						$stuanswersval[$i+1] = $tmp[1];
@@ -527,12 +527,12 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 					if ($arvp==='') {
 						$stuanswers[$i+1][$k] = null;
 					} else {
-						if (strpos($arvp,'$!$')) {
+						if (strpos($arvp,'$!$')!==false) {
 							$arvp = explode('$!$',$arvp);
 							$arvp = $arvp[1];
 							if (is_numeric($arvp)) { $arvp = intval($arvp);}
 						}
-						if (strpos($arvp,'$#$')) {
+						if (strpos($arvp,'$#$')!==false) {
 							$tmp = explode('$#$',$arvp);
 							$arvp = $tmp[0];
 							$stuanswersval[$i+1][$k] = $tmp[1];
@@ -548,12 +548,12 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 				if ($arv==='' || $arv==='ReGen') {
 					$stuanswers[$i+1] = null;
 				} else {
-					if (strpos($arv,'$!$')) {
+					if (strpos($arv,'$!$')!==false) {
 						$arv = explode('$!$',$arv);
 						$arv = $arv[1];
 						if (is_numeric($arv)) { $arv = intval($arv);}
 					}
-					if (strpos($arv,'$#$')) {
+					if (strpos($arv,'$#$')!==false) {
 						$tmp = explode('$#$',$arv);
 						$arv = $tmp[0];
 						$stuanswersval[$i+1] = $tmp[1];
