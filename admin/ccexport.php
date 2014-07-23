@@ -233,7 +233,7 @@ if (isset($_GET['delete'])) {
 						if ($linktype=="canvas") {
 							fwrite($fp,'<meta name="editing_roles" content="teachers"/>');
 						}
-						fwrite($fp,"</body></html>");
+						fwrite($fp,"</head><body>");
 						fwrite($fp,filtercapture($row[1],$res));
 						fwrite($fp,'</body></html>');
 						fclose($fp);
