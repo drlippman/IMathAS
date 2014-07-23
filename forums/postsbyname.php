@@ -3,7 +3,7 @@
 	//(c) 2006 David Lippman
 	
 	require("../validate.php");
-	if (!isset($teacherid)) {
+	if (!isset($teacherid) && !isset($tutorid)) {
 	   require("../header.php");
 	   echo "You must be a teacher to access this page\n";
 	   require("../footer.php");
@@ -36,16 +36,18 @@
 		}
 	}
 	
-	$query = "SELECT settings,replyby,defdisplay,name,points,rubric FROM imas_forums WHERE id='$forumid'";
+	$query = "SELECT settings,replyby,defdisplay,name,points,rubric,tutoredit FROM imas_forums WHERE id='$forumid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	$forumsettings = mysql_result($result,0,0);
-	$allowreply = ($isteacher || (time()<mysql_result($result,0,1)));
+	list($forumsettings, $replyby, $defdisplay, $forumname, $pointspos, $rubric, $tutoredit) = mysql_fetch_row($result);
 	$allowanon = (($forumsettings&1)==1);
 	$allowmod = ($isteacher || (($forumsettings&2)==2));
 	$allowdel = ($isteacher || (($forumsettings&4)==4));
-	$pointspos = mysql_result($result,0,4);
 	$haspoints = ($pointspos>0);
-	$rubric = mysql_result($result,0,5);
+	
+	$canviewall = (isset($teacherid) || isset($tutorid));
+	$caneditscore = (isset($teacherid) || (isset($tutorid) && $tutoredit==1));
+	$canviewscore = (isset($teacherid) || (isset($tutorid) && $tutoredit<2));
+	$allowreply = ($canviewall || (time()<$replyby));
 	
 	$caller = "byname";
 	include("posthandler.php");
@@ -57,10 +59,6 @@
 	}
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; <a href=\"thread.php?cid=$cid&forum=$forumid&page=$page\">Forum Topics</a> &gt; Posts by Name</div>\n";
-	
-	$query = "SELECT name FROM imas_forums WHERE id='$forumid'";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	$forumname = mysql_result($result,0,0);
 	
 	echo '<div id="headerpostsbyname" class="pagetitle">';
 	echo "<h2>Posts by Name - $forumname</h2>\n";
@@ -182,7 +180,7 @@
 
 	echo "<button type=\"button\" onclick=\"window.location.href='postsbyname.php?cid=$cid&forum=$forumid&markallread=true'\">"._('Mark all Read')."</button><br/>";
 	
-	if ($isteacher && $haspoints) {
+	if ($caneditscore && $haspoints) {
 		echo "<form method=post action=\"thread.php?cid=$cid&forum=$forumid&page=$page&score=true\" onsubmit=\"onsubmittoggle()\">";
 	}
 	$curdir = rtrim(dirname(__FILE__), '/\\');
@@ -209,7 +207,7 @@
 		
 		echo '<span class="right">';
 		if ($haspoints) {
-			if ($isteacher) {
+			if ($caneditscore) {
 				echo "<input type=text size=2 name=\"score[{$line['id']}]\" id=\"score{$line['id']}\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" value=\"";
 				if (isset($scores[$line['id']])) {
 					echo $scores[$line['id']];
@@ -219,8 +217,8 @@
 				if ($rubric != 0) {
 					echo printrubriclink($rubric,$pointspos,"score{$line['id']}", "feedback{$line['id']}").' ';
 				}
-			} else if ($line['ownerid']==$userid && isset($scores[$line['id']])) {
-				echo "<span class=red>{$points[$child]}</span> ";
+			} else if (($line['ownerid']==$userid || $canviewscore) && isset($scores[$line['id']])) {
+				echo "<span class=red>{$scores[$line['id']]} pts</span> ";
 			}
 		}
 		echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread={$line['threadid']}\">Thread</a> ";
@@ -247,14 +245,14 @@
 		echo '</div>';
 		echo "<div id=\"m$cnt\" class=\"hidden\">".filter($line['message']);
 		if ($haspoints) {
-			if ($isteacher && $ownerid[$child]!=$userid) {
+			if ($caneditscore && $ownerid[$child]!=$userid) {
 				echo '<hr/>';
 				echo "Private Feedback: <textarea cols=\"50\" rows=\"2\" name=\"feedback[{$line['id']}]\" id=\"feedback{$line['id']}\">";
 				if ($feedback[$line['id']]!==null) {
 					echo $feedback[$line['id']];
 				}
 				echo "</textarea>";
-			} else if ($ownerid[$child]==$userid && $feedback[$line['id']]!=null) {
+			} else if (($ownerid[$child]==$userid || $canviewscore) && $feedback[$line['id']]!=null) {
 				echo '<div class="signup">Private Feedback: ';
 				echo $feedback[$line['id']];
 				echo '</div>';
@@ -265,7 +263,7 @@
 	}
 	echo '</div>';
 	echo "<script>var bcnt = $cnt;</script>";
-	if ($isteacher && $haspoints) {
+	if ($caneditscore && $haspoints) {
 		echo "<div><input type=submit value=\"Save Grades\" /></div>";
 		echo "</form>";
 	}

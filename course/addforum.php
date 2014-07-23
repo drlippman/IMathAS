@@ -89,10 +89,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		
 		if ($_POST['cntingb']==0) {
 			$_POST['points'] = 0;
+			$tutoredit = 0;
+			$_POST['gbcat'] = 0;
+		} else {
+			$tutoredit = intval($_POST['tutoredit']);
 		}
+		
 		if (intval($_POST['points'])==0) {
 			$_POST['cntingb'] = 0;
-		}
+		} 
+		
 		$caltag = $_POST['caltagpost'].'--'.$_POST['caltagreply'];
 		if (isset($_POST['usetags'])) {
 			$taglist = trim($_POST['taglist']);
@@ -132,15 +138,15 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 			$query = "UPDATE imas_forums SET name='{$_POST['name']}',description='{$_POST['description']}',startdate=$startdate,enddate=$enddate,settings=$fsets,caltag='$caltag',";
-			$query .= "defdisplay='{$_POST['defdisplay']}',replyby=$replyby,postby=$postby,groupsetid='{$_POST['groupsetid']}',points='{$_POST['points']}',cntingb='{$_POST['cntingb']}',";
+			$query .= "defdisplay='{$_POST['defdisplay']}',replyby=$replyby,postby=$postby,groupsetid='{$_POST['groupsetid']}',points='{$_POST['points']}',cntingb='{$_POST['cntingb']}',tutoredit=$tutoredit,";
 			$query .= "gbcategory='{$_POST['gbcat']}',avail='{$_POST['avail']}',sortby='{$_POST['sortby']}',forumtype='{$_POST['forumtype']}',taglist='$taglist',rubric=$rubric,outcomes='$outcomes' ";
 			$query .= "WHERE id='{$_GET['id']}';";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$newforumid = $_GET['id'];
 			
 		} else { //add new
-			$query = "INSERT INTO imas_forums (courseid,name,description,startdate,enddate,settings,defdisplay,replyby,postby,groupsetid,points,cntingb,gbcategory,avail,sortby,caltag,forumtype,taglist,rubric,outcomes) VALUES ";
-			$query .= "('$cid','{$_POST['name']}','{$_POST['description']}',$startdate,$enddate,$fsets,'{$_POST['defdisplay']}',$replyby,$postby,'{$_POST['groupsetid']}','{$_POST['points']}','{$_POST['cntingb']}','{$_POST['gbcat']}','{$_POST['avail']}','{$_POST['sortby']}','$caltag','{$_POST['forumtype']}','$taglist',$rubric,'$outcomes');";
+			$query = "INSERT INTO imas_forums (courseid,name,description,startdate,enddate,settings,defdisplay,replyby,postby,groupsetid,points,cntingb,tutoredit,gbcategory,avail,sortby,caltag,forumtype,taglist,rubric,outcomes) VALUES ";
+			$query .= "('$cid','{$_POST['name']}','{$_POST['description']}',$startdate,$enddate,$fsets,'{$_POST['defdisplay']}',$replyby,$postby,'{$_POST['groupsetid']}','{$_POST['points']}','{$_POST['cntingb']}',$tutoredit,'{$_POST['gbcat']}','{$_POST['avail']}','{$_POST['sortby']}','$caltag','{$_POST['forumtype']}','$taglist',$rubric,'$outcomes');";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			
 			$newforumid = mysql_insert_id();
@@ -254,6 +260,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$gbcat = 0;
 			$sortby = 0;
 			$cntingb = 0;
+			$line['tutoredit'] = 0;
 			$savetitle = _("Create Forum");
 		}   
 		
@@ -371,6 +378,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 		}
 		flattenarr($outcomearr);
+		
+		$page_tutorSelect['label'] = array("No access to scores","View Scores","View and Edit Scores");
+		$page_tutorSelect['val'] = array(2,0,1);
 	}
 }
 
@@ -533,6 +543,12 @@ if ($overwriteBody==1) {
 	writeHtmlSelect("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],$gbcat,"Default",0);
 ?>
 		</span><br class=form>
+		<span class="form">Tutor Access:</span>
+			<span class="formright">
+<?php
+	writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],$line['tutoredit']);
+?>			
+		</span><br class="form" />
 
 		<span class=form>Use Scoring Rubric</span><span class=formright>
 <?php 

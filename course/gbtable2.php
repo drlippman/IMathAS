@@ -390,6 +390,9 @@ function gbtable() {
 	if (!$canviewall) {
 		$query .= "AND startdate<$now ";
 	}
+	if ($istutor) {
+		$query .= "AND tutoredit<2 ";
+	}
 	if ($catfilter>-1) {
 		$query .= "AND gbcategory='$catfilter' ";
 	}

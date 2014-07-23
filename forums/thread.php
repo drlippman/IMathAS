@@ -25,7 +25,16 @@
 		$page = $_GET['page'];
 	}
 	
-	if ($isteacher && isset($_POST['score'])) {
+	if (($isteacher || isset($tutorid)) && isset($_POST['score'])) {
+		if (isset($tutorid)) {
+			$query = "SELECT tutoredit FROM imas_forums WHERE id='$forumid'";
+			$res = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			$row = mysql_fetch_row($res);
+			if ($row[0] != 1) {
+				//no rights to edit score
+				exit;
+			}
+		}
 		$existingscores = array();
 		$query = "SELECT refid,id FROM imas_grades WHERE gradetype='forum' AND gradetypeid='$forumid'";
 		$res = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -71,13 +80,10 @@
 	}
 	$query = "SELECT name,postby,settings,groupsetid,sortby,taglist FROM imas_forums WHERE id='$forumid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	$forumname = mysql_result($result,0,0);
-	$postby = mysql_result($result,0,1);
-	$allowmod = ((mysql_result($result,0,2)&2)==2);
-	$allowdel = (((mysql_result($result,0,2)&4)==4) || $isteacher);
-	$groupsetid = mysql_result($result,0,3);
-	$sortby = mysql_result($result,0,4);
-	$taglist = mysql_result($result,0,5);
+	list($forumname, $postby, $forumsettings, $groupsetid, $sortby, $taglist) = mysql_fetch_row($result);
+	
+	$allowmod = (($forumsettings&2)==2);
+	$allowdel = ((($forumsettings&4)==4) || $isteacher);
 	$dofilter = false;
 	$now = time();
 	$grpqs = '';
@@ -394,7 +400,7 @@
 	if (($myrights > 5 && time()<$postby) || $isteacher) {
 		$toshow[] =  "<button type=\"button\" onclick=\"window.location.href='thread.php?page=$page&cid=$cid&forum=$forumid&modify=new'\">"._('Add New Thread')."</button>";
 	}
-	if ($isteacher) {
+	if ($isteacher || isset($tutorid)) {
 		$toshow[] =  "<a href=\"postsbyname.php?page=$page&cid=$cid&forum=$forumid\">List Posts by Name</a>";
 	}
 	

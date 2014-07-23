@@ -10,16 +10,26 @@
 	} else {
 		$isteacher = false;
 	}
+	$istutor = isset($tutorid);
+	
 	$stu = intval($_GET['stu']);
 	
-	if ($isteacher) {
+	if ($isteacher || $istutor) {
 		$uid = intval($_GET['uid']);	
 	} else {
 		$uid = $userid;
 	}
 	$forumid = intval($_GET['fid']);
 	
-	if ($isteacher && (isset($_POST['score']) || isset($_POST['newscore']))) {
+	if (($isteacher || $istutor) && (isset($_POST['score']) || isset($_POST['newscore']))) {
+		if ($istutor) {
+			$query = "SELECT tutoredit FROM imas_forums WHERE id='$forumid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$row = mysql_fetch_row($result);
+			if ($row[0]!=1) {
+				exit; //not auth for score change
+			}
+		}
 		//check for grades marked as newscore that aren't really new
 		//shouldn't happen, but could happen if two browser windows open
 		if (isset($_POST['newscore'])) {
@@ -71,15 +81,22 @@
 	echo "&gt; <a href=\"gradebook.php?stu=$stu&cid=$cid\">Gradebook</a> ";
 	echo "&gt; View Forum Grade</div>";
 	
-	$query = "SELECT iu.LastName,iu.FirstName,i_f.name,i_f.points FROM imas_users AS iu, imas_forums as i_f ";
+	$query = "SELECT iu.LastName,iu.FirstName,i_f.name,i_f.points,i_f.tutoredit FROM imas_users AS iu, imas_forums as i_f ";
 	$query .= "WHERE iu.id='$uid' AND i_f.id='$forumid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$row = mysql_fetch_row($result);
 	$possiblepoints = $row[3];
+	$tutoredit = $row[4];
+	$caneditscore = (isset($teacherid) || (isset($tutorid) && $tutoredit==1));
 	
 	echo '<div id="headerviewforumgrade" class="pagetitle"><h2>View Forum Grade</h2></div>';
 	echo "<p>Grades on forum <b>{$row[2]}</b> for <b>{$row[1]} {$row[0]}</b></p>";
 	
+	if ($istutor && $tutoredit==2) {
+		echo '<p>No access to scores for this forum</p>';
+		require("../footer.php");
+		exit;
+	}
 	
 	$scores = array();
 	$query = "SELECT score,feedback,refid FROM imas_grades WHERE gradetype='forum' AND gradetypeid='$forumid' AND userid='$uid'";
@@ -96,7 +113,7 @@
 		echo "<p>Total:  $totalpts out of $possiblepoints</p>";
 	}
 	
-	if ($isteacher) {
+	if ($caneditscore) {
 		echo "<form method=\"post\" action=\"viewforumgrade.php?cid=$cid&fid=$forumid&stu=$stu&uid=$uid\">";
 	}
 	
@@ -105,7 +122,7 @@
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	while ($row = mysql_fetch_row($result)) {
 		echo "<tr><td><a href=\"$imasroot/forums/posts.php?cid=$cid&forum=$forumid&thread={$row[1]}\">{$row[2]}</a></td>";
-		if ($isteacher) {
+		if ($caneditscore) {
 			if (isset($scores[$row[0]])) {
 				echo "<td><input type=text size=3 name=\"score[{$row[0]}]\" id=\"score{$row[0]}\" value=\"";
 				echo $scores[$row[0]][0];
@@ -124,9 +141,9 @@
 		} 
 		echo "</tr>";
 	}
-	if ($isteacher || isset($scores[0])) {
+	if ($caneditscore || isset($scores[0])) {
 		echo '<tr><td>Additional score</td>';
-		if ($isteacher) {
+		if ($caneditscore) {
 			if (isset($scores[0])) {
 				echo "<td><input type=text size=3 name=\"score[0]\" id=\"score0\" value=\"";
 				echo $scores[0][0];
@@ -142,7 +159,7 @@
 		echo "</tr>";
 	}
 	echo '</tbody></table>';
-	if ($isteacher) {
+	if ($caneditscore) {
 		echo '<p><input type="submit" value="Save Scores" /></p>';
 		echo '</form>';
 	}
