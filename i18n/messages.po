@@ -2437,3 +2437,99 @@ msgstr ""
 #, php-format
 msgid "%1$s out of %2$s (parts: %3$s)"
 msgstr ""
+
+#: diag/index.php:28
+msgid "Available Diagnostics"
+msgstr ""
+
+#: diag/index.php:31
+msgid "No diagnostics are available through this page at this time"
+msgstr ""
+
+#: diag/index.php:57
+msgid "This diagnostic is not currently available to be taken"
+msgstr ""
+
+#: diag/index.php:98
+msgid "Please enter your ID, first name, and lastname."
+msgstr ""
+
+#: diag/index.php:98 diag/index.php:134 diag/index.php:139 diag/index.php:197
+msgid "Try Again"
+msgstr ""
+
+#: diag/index.php:125
+msgid "Your ID is not valid.  It should contain"
+msgstr ""
+
+#: diag/index.php:130
+msgid "letters or numbers"
+msgstr ""
+
+#: diag/index.php:132
+msgid "numbers"
+msgstr ""
+
+#: diag/index.php:139
+#, php-format
+msgid "Please select a %1$s and %2$s."
+msgstr ""
+
+#: diag/index.php:197
+msgid "Error, password incorrect or expired."
+msgstr ""
+
+#: diag/index.php:218
+msgid "You've already taken this diagnostic."
+msgstr ""
+
+#: diag/index.php:224
+msgid "Your window to complete this diagnostic has expired."
+msgstr ""
+
+#: diag/index.php:322
+msgid "Enter First Name:"
+msgstr ""
+
+#: diag/index.php:323
+msgid "Enter Last Name:"
+msgstr ""
+
+#: diag/index.php:352 diag/index.php:362
+#, php-format
+msgid "Select your %s"
+msgstr ""
+
+#: diag/index.php:354
+#, php-format
+msgid "Select a %s"
+msgstr ""
+
+#: diag/index.php:364
+#, php-format
+msgid "Select a %s first"
+msgstr ""
+
+#: diag/index.php:369
+msgid ""
+"This test can only be accessed from this location with an access password"
+msgstr ""
+
+#: diag/index.php:370
+msgid "Access password:"
+msgstr ""
+
+#: diag/index.php:381
+msgid "Access Diagnostic"
+msgstr ""
+
+#: diag/index.php:388
+msgid ""
+"No access code is required for this diagnostic.  However, if your testing "
+"window has expired, a proctor can enter a password to allow reaccess to this "
+"test."
+msgstr ""
+
+#: diag/index.php:389
+msgid "Override password"
+msgstr ""

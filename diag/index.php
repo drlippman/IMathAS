@@ -1,5 +1,6 @@
 <?php
 	require("../config.php");
+	require("../i18n/i18n.php");
 	if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
 		 $urlmode = 'https://';
 	 } else {
@@ -22,14 +23,12 @@
 		require("../header.php");
 		$pagetitle = "Diagnostics";
 		require((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'../')."infoheader.php");
-		echo <<<END
-<img class="floatleft" src="$imasroot/img/ruler.jpg"/>
-<div class="content">
-<div id="headerdiagindex" class="pagetitle"><h2>Available Diagnostics</h2></div>
-<ul class="nomark">
-END;
+		echo "<img class=\"floatleft\" src=\"$imasroot/img/ruler.jpg\"/>
+		<div class=\"content\">
+		<div id=\"headerdiagindex\" class=\"pagetitle\"><h2>", _('Available Diagnostics'), "</h2></div>
+		<ul class=\"nomark\">";
 		if (mysql_num_rows($result)==0) {
-			echo "<li>No diagnostics are available through this page at this time</li>";
+			echo "<li>", _('No diagnostics are available through this page at this time'), "</li>";
 		}
 		while ($row = mysql_fetch_row($result)) {
 			echo "<li><a href=\"$imasroot/diag/index.php?id={$row[0]}\">{$row[1]}</a></li>";
@@ -55,7 +54,7 @@ END;
 	$sel1 = explode(',',$line['sel1list']);
 	
 	if (!($line['public']&1)) {
-		echo "<html><body>This diagnostic is not currently available to be taken</body></html>";
+		echo "<html><body>", _('This diagnostic is not currently available to be taken'), "</body></html>";
 		exit;
 	}
 	$userip = $_SERVER['REMOTE_ADDR'];
@@ -96,7 +95,7 @@ END;
 if (isset($_POST['SID'])) {
 	$_POST['SID'] = trim(str_replace('-','',$_POST['SID']));
 	if (trim($_POST['SID'])=='' || trim($_POST['firstname'])=='' || trim($_POST['lastname'])=='') {
-		echo "<html><body>Please enter your ID, first name, and lastname.  <a href=\"index.php?id=$diagid\">Try Again</a>\n";
+		echo "<html><body>", _('Please enter your ID, first name, and lastname.'), "  <a href=\"index.php?id=$diagid\">", _('Try Again'), "</a>\n";
 			exit; 
 	}
 	$query = "SELECT entryformat,sel1list from imas_diags WHERE id='$diagid'";
@@ -127,23 +126,23 @@ if (isset($_POST['SID'])) {
 	}
 	$pattern .= '$/i';
 	if (!preg_match($pattern,$_POST['SID'])) {
-		echo "<html><body>Your ID is not valid.  It should contain ";
+		echo "<html><body>", _('Your ID is not valid.  It should contain'), " ";
 		if ($entrydig>0 && $entrytype!='E') {
 			echo $entrydig.' ';
 		}
 		if ($entrytype=='C') {
 			echo _('letters or numbers');
 		} else if ($entrytype=='D') {
-			echo _('numbers)';
+			echo _('numbers');
 		} else if ($entrytype=='E') {
 			echo _('an email address');
 		}
-		echo " <a href=\"index.php?id=$diagid\">"._('Try Again')."</a>\n";
+		echo " <a href=\"index.php?id=$diagid\">", _('Try Again'), "</a>\n";
 		exit;
 	}
 	
 	if ($_POST['course']==-1) {
-		echo "<html><body>Please select a {$line['sel1name']} and {$line['sel2name']}.  <a href=\"index.php?id=$diagid\">Try Again</a>\n";
+		echo "<html><body>", sprintf(_('Please select a %1$s and %2$s.'), $line['sel1name'], $line['sel2name']), "  <a href=\"index.php?id=$diagid\">", _('Try Again'), "</a>\n";
 			exit; 
 	}
 	$pws = explode(';',$line['pws']);
@@ -201,7 +200,7 @@ if (isset($_POST['SID'])) {
 				if (mysql_num_rows($result)>0 && strtoupper(mysql_result($result,0,0))==strtoupper($_POST['passwd'])) {
 					
 				} else {
-					echo "<html><body>Error, password incorrect or expired.  <a href=\"index.php?id=$diagid\">Try Again</a>\n";
+					echo "<html><body>", _('Error, password incorrect or expired.'), "  <a href=\"index.php?id=$diagid\">", _('Try Again'), "</a>\n";
 					exit;
 				}
 			}
@@ -222,13 +221,13 @@ if (isset($_POST['SID'])) {
 			$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (mysql_num_rows($r2)>0) {
 				if (!$allowreentry) {
-					echo "You've already taken this diagnostic.  <a href=\"index.php?id=$diagid\">Back</a>\n";
+					echo _("You've already taken this diagnostic."), "  <a href=\"index.php?id=$diagid\">", _('Back'), "</a>\n";
 					exit;
 				} else {
 					$d = mysql_fetch_row($r2);
 					$now = time();
 					if ($now - $d[1] > 60*$line['reentrytime']) {
-						echo "Your window to complete this diagnostic has expired.  <a href=\"index.php?id=$diagid\">Back</a>\n";
+						echo _('Your window to complete this diagnostic has expired.'), "  <a href=\"index.php?id=$diagid\">", _('Back'), "</a>\n";
 						exit;
 					}
 				}
@@ -297,7 +296,20 @@ if (isset($_POST['SID'])) {
 	exit;
 }
 
-
+/*
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+<title><?php echo $line['name']; ?></title>
+<style type="text/css">
+<!--
+@import url("../imas.css");
+-->
+</style>
+<script src="<?php echo $imasroot;?>/javascript/mathgraphcheck.js" type="text/javascript"></script>
+</head>
+<body>
+*/
 //allow custom login page for specific diagnostics
 if (file_exists((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'')."diag$diagid.php")) {
 	require((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'')."diag$diagid.php");
@@ -313,8 +325,8 @@ require((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'.
 <div style="margin-left: 30px">
 <form method=post action="index.php?id=<?php echo $diagid; ?>">
 <span class=form><?php echo $line['idprompt']; ?></span> <input class=form type=text size=12 name=SID><BR class=form>
-<span class=form>Enter First Name:</span> <input class=form type=text size=20 name=firstname><BR class=form>
-<span class=form>Enter Last Name:</span> <input class=form type=text size=20 name=lastname><BR class=form>
+<span class=form><?php _('Enter First Name:'); ?></span> <input class=form type=text size=20 name=firstname><BR class=form>
+<span class=form><?php _('Enter Last Name:'); ?></span> <input class=form type=text size=20 name=lastname><BR class=form>
 
 <script type="text/javascript">
 var teach = new Array();
@@ -343,9 +355,9 @@ function getteach() {
 
 </script>
 
-<span class=form>Select your <?php echo $line['sel1name']; ?></span><span class=formright>
+<span class=form><?php printf(_('Select your %s'), $line['sel1name']); ?></span><span class=formright>
 <select name="course" id="course" onchange="getteach()">
-<option value="-1">Select a <?php echo $line['sel1name']; ?></option>
+<option value="-1"><?php printf(_('Select a %s'), $line['sel1name']); ?></option>
 <?php
 for ($i=0;$i<count($sel1);$i++) {
 	echo "<option value=\"$i\">{$sel1[$i]}</option>\n";
@@ -353,15 +365,15 @@ for ($i=0;$i<count($sel1);$i++) {
 ?>
 </select></span><br class=form>
 
-<span class=form>Select your <?php echo $line['sel2name']; ?></span><span class=formright>
+<span class=form><?php printf(_('Select your %s'), $line['sel2name']); ?></span><span class=formright>
 <select name="teachers" id="teachers">
-<option value="not selected">Select a <?php echo $line['sel1name']; ?> first</option>
+<option value="not selected"><?php printf(_('Select a %s first'), $line['sel1name']); ?></option>
 </select></span><br class=form>
 
 <?php
 	if (!$noproctor) {
-		echo "<b>This test can only be accessed from this location with an access password</b></br>\n";
-		echo "<span class=form>Access password:</span>  <input class=form type=password size=40 name=passwd><BR class=form>";
+		echo "<b>", _('This test can only be accessed from this location with an access password'), "</b></br>\n";
+		echo "<span class=form>", _('Access password:'), "</span>  <input class=form type=password size=40 name=passwd><BR class=form>";
 	}
 ?>
 <input type="hidden" id="tzoffset" name="tzoffset" value=""> 
@@ -372,15 +384,15 @@ for ($i=0;$i<count($sel1);$i++) {
   var tz = jstz.determine(); 
   document.getElementById("tzname").value = tz.name();
 </script>	
-<div id="submit" class="submit" style="display:none"><input type=submit value='Access Diagnostic'></div>
+<div id="submit" class="submit" style="display:none"><input type=submit value='<?php _('Access Diagnostic'); ?>'></div>
 <input type=hidden name="mathdisp" id="mathdisp" value="2" />
 <input type=hidden name="graphdisp" id="graphdisp" value="2" />
 <?php
 $allowreentry = ($line['public']&4);
 $pws = explode(';',$line['pws']);
 if ($noproctor && count($pws)>1 && trim($pws[1])!='' && (!$allowreentry || $line['reentrytime']>0)) {
-	echo "<p>No access code is required for this diagnostic.  However, if your testing window has expired, a proctor can enter a password to allow reaccess to this test.</br>\n";
-	echo "<span class=form>Override password:</span>  <input class=form type=password size=40 name=passwd><BR class=form>";
+	echo "<p>", _('No access code is required for this diagnostic.  However, if your testing window has expired, a proctor can enter a password to allow reaccess to this test.'), "</br>\n";
+	echo "<span class=form>", _('Override password'), ":</span>  <input class=form type=password size=40 name=passwd><BR class=form>";
 }
 ?>
 </form>
