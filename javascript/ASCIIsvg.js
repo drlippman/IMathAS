@@ -877,10 +877,10 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
   if (doy=="off" || doy==0) { doy = false;} else {doy = true;}
  
 //alert(null)
-    if ((xmax-xmin)/gdx > width) {
+    if (gdx!=null && gdx>0 && (xmax-xmin)/gdx > width) {
     	    gdx = xmax-xmin;
     }
-    if ((ymax-ymin)/gdy > height) {
+    if (gdy!=null && gdy>0 && (ymax-ymin)/gdy > height) {
     	    gdy = ymax-ymin;
     }
     if ((xmax-xmin)/dx > width) {
@@ -940,6 +940,7 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
   if (doy) {
 	  st += " M"+origin[0]+","+winymin+" "+origin[0]+","+winymax;
   }
+  
   if (dox) {
 	  for (x = origin[0]; x<winxmax; x = x+dx)
 	    if (x>=winymin) st += " M"+x+","+(height-origin[1]+ticklength)+" "+x+","+
