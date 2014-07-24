@@ -738,6 +738,11 @@ span.inlinebtn:hover {
 .fluid-width-video-wrapper{width:100%;position:relative;padding:0;}.fluid-width-video-wrapper iframe,.fluid-width-video-wrapper object,.fluid-width-video-wrapper embed {position:absolute;top:0;left:0;width:100%;height:100%;}
 .video-wrapper-wrapper{width:100%;padding:0;}
 
+.videoembedbtn {
+	color: #999;
+	cursor: pointer;
+}
+
 .clearfix:before,
 .clearfix:after {
     content: " ";
