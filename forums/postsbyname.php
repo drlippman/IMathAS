@@ -3,12 +3,12 @@
 	//(c) 2006 David Lippman
 	
 	require("../validate.php");
-	if (!isset($teacherid) && !isset($tutorid)) {
+	/*if (!isset($teacherid) && !isset($tutorid)) {
 	   require("../header.php");
 	   echo "You must be a teacher to access this page\n";
 	   require("../footer.php");
 	   exit;
-	}
+	}*/
 	if (isset($teacherid)) {
 		$isteacher = true;	
 	} else {
@@ -36,12 +36,13 @@
 		}
 	}
 	
-	$query = "SELECT settings,replyby,defdisplay,name,points,rubric,tutoredit FROM imas_forums WHERE id='$forumid'";
+	$query = "SELECT settings,replyby,defdisplay,name,points,rubric,tutoredit, groupsetid FROM imas_forums WHERE id='$forumid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	list($forumsettings, $replyby, $defdisplay, $forumname, $pointspos, $rubric, $tutoredit) = mysql_fetch_row($result);
+	list($forumsettings, $replyby, $defdisplay, $forumname, $pointspos, $rubric, $tutoredit, $groupsetid) = mysql_fetch_row($result);
 	$allowanon = (($forumsettings&1)==1);
 	$allowmod = ($isteacher || (($forumsettings&2)==2));
 	$allowdel = ($isteacher || (($forumsettings&4)==4));
+	$postbeforeview = (($forumsettings&16)==16);
 	$haspoints = ($pointspos>0);
 	
 	$canviewall = (isset($teacherid) || isset($tutorid));
@@ -53,7 +54,7 @@
 	include("posthandler.php");
 	
 	$placeinhead = '<link rel="stylesheet" href="'.$imasroot.'/forums/forums.css?ver=082911" type="text/css" />';
-	if ($haspoints && $rubric != 0) {
+	if ($haspoints && $caneditscore && $rubric != 0) {
 		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=120311"></script>';
 		require("../includes/rubric.php");
 	}
@@ -63,6 +64,15 @@
 	echo '<div id="headerpostsbyname" class="pagetitle">';
 	echo "<h2>Posts by Name - $forumname</h2>\n";
 	echo '</div>';
+	if (!$canviewall && $postbeforeview) {
+		$query = "SELECT id FROM imas_forum_posts WHERE forumid='$forumid' AND parent=0 AND userid='$userid' LIMIT 1";
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		if (mysql_num_rows($result)==0) {
+			echo '<p>This page is blocked. In this forum, you must post your own thread before you can read those posted by others.</p>';
+			require("../footer.php");
+			exit;
+		}
+	}
 ?>
 	<script type="text/javascript">
 	function toggleshow(bnum) {
@@ -150,7 +160,7 @@
 	</script>
 <?php
 
-	if ($haspoints && $rubric != 0) {
+	if ($haspoints && $caneditscore && $rubric != 0) {
 		$query = "SELECT id,rubrictype,rubric FROM imas_rubrics WHERE id=$rubric";
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		if (mysql_num_rows($result)>0) {
@@ -169,10 +179,37 @@
 			$feedback[$row[0]] = $row[2];
 		}
 	}
+	$dofilter = false;
+	if (!$canviewall && $groupsetid>0) {
+		$query = 'SELECT i_sg.id FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';
+		$query .= "WHERE i_sgm.userid='$userid' AND i_sg.groupsetid='$groupsetid'";
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		if (mysql_num_rows($result)>0) {
+			$groupid = mysql_result($result,0,0);
+		} else {
+			$groupid=0;
+		}
+		$dofilter = true;
+		$query = "SELECT id FROM imas_forum_threads WHERE stugroupid=0 OR stugroupid='$groupid'";
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$limthreads = array();
+		while ($row = mysql_fetch_row($result)) {
+			$limthreads[] = $row[0];
+		}
+		if (count($limthreads)==0) {
+			$limthreads = '0';
+		} else {
+			$limthreads = implode(',',$limthreads);
+		}
+	}
+	
 	$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,ifv.lastview from imas_forum_posts JOIN imas_users ";
 	$query .= "ON imas_forum_posts.userid=imas_users.id LEFT JOIN (SELECT DISTINCT threadid,lastview FROM imas_forum_views WHERE userid='$userid') AS ifv ON ";
-	$query .= "ifv.threadid=imas_forum_posts.threadid WHERE imas_forum_posts.forumid='$forumid' AND imas_forum_posts.isanon=0 ORDER BY ";
-	$query .= "imas_users.LastName,imas_users.FirstName,imas_forum_posts.postdate DESC";
+	$query .= "ifv.threadid=imas_forum_posts.threadid WHERE imas_forum_posts.forumid='$forumid' AND imas_forum_posts.isanon=0 ";
+	if ($dofilter) {
+		$query .= "AND imas_forum_posts.threadid IN ($limthreads) ";
+	}
+	$query .= "ORDER BY imas_users.LastName,imas_users.FirstName,imas_forum_posts.postdate DESC";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$laststu = -1;
 	$cnt = 0;

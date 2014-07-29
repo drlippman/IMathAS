@@ -400,9 +400,9 @@
 	if (($myrights > 5 && time()<$postby) || $isteacher) {
 		$toshow[] =  "<button type=\"button\" onclick=\"window.location.href='thread.php?page=$page&cid=$cid&forum=$forumid&modify=new'\">"._('Add New Thread')."</button>";
 	}
-	if ($isteacher || isset($tutorid)) {
+	//if ($isteacher || isset($tutorid)) {
 		$toshow[] =  "<a href=\"postsbyname.php?page=$page&cid=$cid&forum=$forumid\">List Posts by Name</a>";
-	}
+	//}
 	
 	if ($page<0) {
 		$toshow[] =  "<a href=\"thread.php?cid=$cid&forum=$forumid&page=1\">Show All</a>";
