@@ -325,8 +325,8 @@ require((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'.
 <div style="margin-left: 30px">
 <form method=post action="index.php?id=<?php echo $diagid; ?>">
 <span class=form><?php echo $line['idprompt']; ?></span> <input class=form type=text size=12 name=SID><BR class=form>
-<span class=form><?php _('Enter First Name:'); ?></span> <input class=form type=text size=20 name=firstname><BR class=form>
-<span class=form><?php _('Enter Last Name:'); ?></span> <input class=form type=text size=20 name=lastname><BR class=form>
+<span class=form><?php echo _('Enter First Name:'); ?></span> <input class=form type=text size=20 name=firstname><BR class=form>
+<span class=form><?php echo _('Enter Last Name:'); ?></span> <input class=form type=text size=20 name=lastname><BR class=form>
 
 <script type="text/javascript">
 var teach = new Array();
@@ -384,7 +384,7 @@ for ($i=0;$i<count($sel1);$i++) {
   var tz = jstz.determine(); 
   document.getElementById("tzname").value = tz.name();
 </script>	
-<div id="submit" class="submit" style="display:none"><input type=submit value='<?php _('Access Diagnostic'); ?>'></div>
+<div id="submit" class="submit" style="display:none"><input type=submit value='<?php echo _('Access Diagnostic'); ?>'></div>
 <input type=hidden name="mathdisp" id="mathdisp" value="2" />
 <input type=hidden name="graphdisp" id="graphdisp" value="2" />
 <?php
@@ -421,7 +421,7 @@ if (existingonload) {
 	window.onload = determinesetup;
 }
 </script>
-<hr/><div class=right style="font-size:70%;">Built on <a href="http://imathas.sourceforge.net">IMathAS</a> &copy; 2006-2009 David Lippman</div>
+<hr/><div class=right style="font-size:70%;">Built on <a href="http://www.imathas.com">IMathAS</a> &copy; 2006-2014 David Lippman</div>
 </div>
 </body>
 </html>
