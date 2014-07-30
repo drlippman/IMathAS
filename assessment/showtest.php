@@ -1458,6 +1458,10 @@ if (!isset($_POST['embedpostback'])) {
 					} else {
 						displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],false,false,$attempts[$qn],false,false,false,$colors);
 					}
+					$contactlinks = showquestioncontactlinks($qn);
+					if ($contactlinks!='' && !$sessiondata['istutorial']) {
+						echo '<div class="review">'.$contactlinks.'</div>';
+					}
 					
 				} else if ($immediatereattempt) {
 					$next = $qn;
