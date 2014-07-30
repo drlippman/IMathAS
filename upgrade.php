@@ -1,7 +1,7 @@
 <?php  
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 88;
+$latest = 89;
 
 
 @set_time_limit(0);
@@ -1476,6 +1476,10 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 		}
 		if ($last<88) {
 			$query = "ALTER TABLE `imas_forums` ADD `tutoredit` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0';";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+		}
+		if ($last<89) {
+			$query = "ALTER TABLE `imas_linkedtext` ADD `points` SMALLINT( 4 ) UNSIGNED NOT NULL DEFAULT '0';";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		}
 		/*$handle = fopen("upgradecounter.txt",'w');

@@ -52,6 +52,13 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 	}
 	$drilllist =  implode(',',$drills);
 	
+	$exttools = array();
+	$query = "SELECT id FROM imas_linkedtext WHERE courseid='$cid' AND points>0";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	while ($row = mysql_fetch_row($result)) {
+		$exttools[] = $row[0];
+	}
+	$exttoolslist =  implode(',',$exttools);
 	
 	$stugroups = array();
 	$query = "SELECT imas_stugroups.id FROM imas_stugroups JOIN imas_stugroupset ON imas_stugroups.groupsetid=imas_stugroupset.id WHERE imas_stugroupset.courseid='$cid'";
@@ -84,6 +91,10 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 		}
 		if (count($drills)>0) {
 			$query = "DELETE FROM imas_drillassess_sessions WHERE drillassessid IN ($drilllist) AND userid IN ($stulist)";
+			mysql_query($query) or die("Query failed : $query" . mysql_error());
+		}
+		if (count($exttools)>0) {
+			$query = "DELETE FROM imas_grades WHERE gradetype='exttool' AND gradetypeid IN ($exttoolslist) AND userid IN ($stulist)";
 			mysql_query($query) or die("Query failed : $query" . mysql_error());
 		}
 		if (count($gbitems)>0) {

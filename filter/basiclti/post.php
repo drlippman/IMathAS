@@ -5,11 +5,23 @@ if (empty($_GET['linkid'])) {
 	echo "no link id provided";
 	exit;
 }
-$query = "SELECT text,title FROM imas_linkedtext WHERE id='{$_GET['linkid']}'";
+$query = "SELECT text,title,points FROM imas_linkedtext WHERE id='{$_GET['linkid']}'";
 $result = mysql_query($query) or die("Query failed : " . mysql_error());
-$text = mysql_result($result, 0,0);
-$title = mysql_result($result,0,1);
-list($tool,$linkcustom) = explode('~~',substr($text,8));
+list($text,$title,$points) = mysql_fetch_row($result);
+$toolparts = explode('~~',substr($text,8));
+$tool = $toolparts[0];
+$linkcustom = $toolparts[1];
+if (isset($toolparts[2]) && $toolparts[2]!="") {
+	$toolcustomurl = $toolparts[2];
+} else {
+	$toolcustomurl = '';
+}
+if (isset($toolparts[3])) {
+	$gbcat = $toolparts[3];
+	$cntingb = $toolparts[4];
+	$tutoredit = $toolparts[5];
+	$gradesecret = $toolparts[6];
+} 
 $tool = intval($tool);
 
 $query = "SELECT * from imas_external_tools WHERE id=$tool AND (courseid='$cid' OR (courseid=0 AND (groupid='$groupid' OR groupid=0)))";
@@ -67,6 +79,13 @@ $parms['context_title'] = trim($coursename);
 $parms['context_label'] = trim($coursename);
 $parms['context_type'] = 'CourseSection';
 $parms['resource_link_id'] = $cid.'-'.$_GET['linkid'];
+
+if ($points>0 && isset($studentid)) {
+	$sig = sha1($gradesecret.'::'.$parms['resource_link_id'].'::'.$userid);
+	$parms['lis_result_sourcedid'] = $sig.'::'.$parms['resource_link_id'].'::'.$userid;
+	$parms['lis_outcome_service_url'] = $urlmode . $_SERVER['HTTP_HOST'] . $imasroot . '/admin/ltioutcomeservice.php';
+}
+
 $parms['resource_link_title'] = $title;
 $parms['tool_consumer_info_product_family_code'] = 'IMathAS';
 $parms['tool_consumer_info_version'] = 'LTI 1.0';
@@ -91,6 +110,10 @@ if (isset($CFG['GEN']['LTIorgid'])) {
 }
 
 $org_desc = $installname;
+
+if ($toolcustomurl!='') {
+	$line['url'] = $toolcustomurl;
+}
 
 try {
 	$parms = signParameters($parms, $line['url'], "POST", $line['ltikey'], $line['secret'], null, $org_id, $org_desc);

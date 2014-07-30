@@ -939,6 +939,11 @@ function gbstudisp($stu) {
 						echo "<a href=\"viewforumgrade.php?cid=$cid&stu=$stu&uid={$gbt[1][4][0]}&fid={$gbt[0][1][$i][7]}\">";
 						$haslink = true;
 					}
+				} else if ($gbt[0][1][$i][6]==3) {//exttool
+					if ($isteacher || ($istutor && $gbt[0][1][$i][8]==1)) {
+						echo "<a href=\"edittoolscores.php?cid=$cid&stu=$stu&uid={$gbt[1][4][0]}&lid={$gbt[0][1][$i][7]}\">";
+						$haslink = true;
+					}
 				}
 			}
 			if (isset($gbt[1][1][$i][0])) {
@@ -1438,6 +1443,9 @@ function gbinstrdisp() {
 				}
 			} else if ($gbt[0][1][$i][6]==2  && $isteacher) { //discussion
 				echo "<br/><a class=small href=\"addforum.php?id={$gbt[0][1][$i][7]}&amp;cid=$cid&amp;from=gb\">", _('[Settings]'), "</a>";
+			} else if ($gbt[0][1][$i][6]==3  && $isteacher) { //exttool
+				echo "<br/><a class=small href=\"addlinkedtext.php?id={$gbt[0][1][$i][7]}&amp;cid=$cid&amp;from=gb\">", _('[Settings]'), "</a>";
+				echo "<br/><a class=small href=\"edittoolscores.php?stu=$stu&amp;cid=$cid&amp;uid=all&amp;lid={$gbt[0][1][$i][7]}&amp;isolate=true\">", _('[Isolate]'), "</a>";
 			}
 			
 			echo '</div></th>';
@@ -1732,6 +1740,36 @@ function gbinstrdisp() {
 						}
 					}
 					
+				} else if ($gbt[0][1][$j][6]==3) { //exttool
+					if ($isteacher) {
+						if ($gbt[$i][0][0]=='Averages') {
+							echo "<a href=\"edittoolscores.php?stu=$stu&amp;cid=$cid&amp;uid=all&amp;lid={$gbt[0][1][$j][7]}\" ";
+							echo "onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gbt[0][1][$j][9]}')\" onmouseout=\"tipout()\" ";
+							echo ">";
+						} else {
+							echo "<a href=\"edittoolscores.php?stu=$stu&amp;cid=$cid&amp;uid={$gbt[$i][4][0]}&amp;lid={$gbt[0][1][$j][7]}\">";
+						}
+					} else if ($istutor && $gbt[0][1][$j][8]==1) {
+						if ($gbt[$i][0][0]=='Averages') {
+							echo "<a href=\"edittoolscores.php?stu=$stu&amp;cid=$cid&amp;uid=all&amp;lid={$gbt[0][1][$j][7]}\">";
+						} else {
+							echo "<a href=\"edittoolscores.php?stu=$stu&amp;cid=$cid&amp;uid={$gbt[$i][4][0]}&amp;lid={$gbt[0][1][$j][7]}\">";
+						}
+					}
+					if (isset($gbt[$i][1][$j][0])) {
+						echo $gbt[$i][1][$j][0];
+						if ($gbt[$i][1][$j][3]==1) {
+							echo ' (NC)';
+						}
+					} else {
+						echo '-';
+					}
+					if ($isteacher || ($istutor && $gbt[0][1][$j][8]==1)) {
+						echo '</a>';
+					}
+					if ($gbt[$i][1][$j][1]==1) {
+						echo '<sup>*</sup>';
+					}
 				}
 				if (isset($gbt[$i][1][$j][5]) && ($gbt[$i][1][$j][5]&(1<<$availshow)) && !$hidepast) {
 					echo '<sub>d</sub></span>';

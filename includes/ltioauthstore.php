@@ -9,7 +9,18 @@ require_once  'OAuth.php';
 class IMathASLTIOAuthDataStore extends OAuthDataStore {
    
     function lookup_consumer($consumer_key) {
-        	
+        if (isset($GLOBALS['LTImode']) && $GLOBALS['LTImode']=="consumer") {
+        	$query = "SELECT secret FROM imas_external_tools WHERE ltikey='".addslashes($consumer_key)."'";
+        	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+        	if (mysql_num_rows($result)==0) {
+        		return NULL;
+        	}
+        	$row = mysql_fetch_row($result);
+        	$secret = $row[0];
+        	$consumer = new OAuthConsumer($consumer_key,$secret);
+		return $consumer;
+        }
+    	    
 	$keyparts = explode('_',$consumer_key);
 	
 	if ($keyparts[0]=='cid' || $keyparts[0]=='placein') {

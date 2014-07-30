@@ -85,7 +85,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		//$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate) ";
 		//$query .= "SELECT '$cid',title,summary,text,startdate,enddate FROM imas_linkedtext WHERE id='$typeid'";
 		//mysql_query($query) or die("Query failed :$query " . mysql_error());
-		$query = "SELECT title,summary,text,startdate,enddate,avail,oncal,caltag,target,outcomes FROM imas_linkedtext WHERE id='$typeid'";
+		$query = "SELECT title,summary,text,startdate,enddate,avail,oncal,caltag,target,outcomes,points FROM imas_linkedtext WHERE id='$typeid'";
 		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$row = mysql_fetch_row($result);
 		$istool = (substr($row[2],0,8)=='exttool:');
@@ -105,7 +105,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 			$row[9] = implode(',',$newoutcomes);
 		}
 		$row = "'".implode("','",addslashes_deep($row))."'";
-		$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate,avail,oncal,caltag,target,outcomes) ";
+		$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate,avail,oncal,caltag,target,outcomes,points) ";
 		$query .= "VALUES ('$cid',$row)";
 		mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$newtypeid = mysql_insert_id();

@@ -49,6 +49,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$page_formActionTag .= "&tb=$totb";
 	$uploaderror = false;
 	$caltag = $_POST['caltag'];
+	$points = 0;
 	
 	if ($_POST['title']!= null) { //if the form has been submitted
 		if ($_POST['avail']==1) {
@@ -162,8 +163,20 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			if ($_POST['tool']==0) {
 				$processingerror = true;
 			} else {
-				$_POST['text'] = 'exttool:'.$_POST['tool'].'~~'.$_POST['toolcustom'];
+				//tool~~custom~~customurl~~gbcategory~~cntingb~~tutoredit~~gradesecret
+				$_POST['text'] = 'exttool:'.$_POST['tool'].'~~'.$_POST['toolcustom'].'~~'.$_POST['toolcustomurl'];
+				if ($_POST['usegbscore']==0 || $_POST['points']==0) {
+					$points = 0;
+				} else {
+					$_POST['text'] .= '~~'.$_POST['gbcat'].'~~'.$_POST['cntingb'].'~~'.$_POST['tutoredit'].'~~'.$_POST['gradesecret'];
+					$points = intval($_POST['points']);
+				}
 			}
+		}
+		
+		if ($points==0 && isset($_POST['hadpoints']) && isset($_GET['id'])) {
+			$query = "DELETE FROM imas_grades WHERE gradetypeid='{$_GET['id']}' AND gradetype='exttool'";
+			mysql_query($query) or die("Query failed : " . mysql_error());
 		}
 		
 		require_once("../includes/htmLawed.php");
@@ -203,13 +216,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				}
 			}
 			if (!$processingerror) {
-				$query = "UPDATE imas_linkedtext SET title='{$_POST['title']}',summary='{$_POST['summary']}',text='{$_POST['text']}',startdate=$startdate,enddate=$enddate,avail='{$_POST['avail']}',oncal='$oncal',caltag='$caltag',target='{$_POST['target']}',outcomes='$outcomes' ";
+				$query = "UPDATE imas_linkedtext SET title='{$_POST['title']}',summary='{$_POST['summary']}',text='{$_POST['text']}',startdate=$startdate,enddate=$enddate,avail='{$_POST['avail']}',oncal='$oncal',caltag='$caltag',target='{$_POST['target']}',outcomes='$outcomes',points=$points ";
 				$query .= "WHERE id='{$_GET['id']}'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 		} else if (!$processingerror) { //add new
-			$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate,avail,oncal,caltag,target,outcomes) VALUES ";
-			$query .= "('$cid','{$_POST['title']}','{$_POST['summary']}','{$_POST['text']}',$startdate,$enddate,'{$_POST['avail']}','$oncal','$caltag','{$_POST['target']}','$outcomes');";
+			$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate,avail,oncal,caltag,target,outcomes,points) VALUES ";
+			$query .= "('$cid','{$_POST['title']}','{$_POST['summary']}','{$_POST['text']}',$startdate,$enddate,'{$_POST['avail']}','$oncal','$caltag','{$_POST['target']}','$outcomes',$points);";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			
 			$newtextid = mysql_insert_id();
@@ -270,6 +283,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$line = mysql_fetch_array($result, MYSQL_ASSOC);
 			$startdate = $line['startdate'];
 			$enddate = $line['enddate'];
+			$gbcat = 0;
+			$cntingb = 1;
+			$tutoredit = 0;
+			$gradesecret = uniqid();
 			if ($line['avail']==2 && $startdate>0) {
 				$altoncal = 1;
 			} else {
@@ -285,7 +302,21 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$line['text'] = "<p>Enter text here</p>";
 			} else if (substr($line['text'],0,8)=='exttool:') {
 				$type = 'tool';
-				list($selectedtool,$toolcustom) = explode('~~',substr($line['text'],8));
+				$points= $line['points'];
+				$toolparts = explode('~~',substr($line['text'],8));
+				$selectedtool = $toolparts[0];
+				$toolcustom = $toolparts[1];
+				if (isset($toolparts[2])) {
+					$toolcustomurl = $toolparts[2];
+				} else {
+					$toolcustomurl = '';
+				}
+				if (isset($toolparts[3])) {
+					$gbcat = $toolparts[3];
+					$cntingb = $toolparts[4];
+					$tutoredit = $toolparts[5];
+					$gradesecret = $toolparts[6];
+				} 
 				$line['text'] = "<p>Enter text here</p>";
 			} else {
 				$type = 'text';
@@ -314,6 +345,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$type = 'text';
 			$gradeoutcomes = array();
 			$savetitle = _("Create Item");
+			$selectedgbitem = 0;
+			$points = 0;
+			$cntingb = 1;
+			$gbcat = 0;
+			$tutoredit = 0;
+			$gradesecret = uniqid();
 		}   
 		
 		$hr = floor($coursedeftime/60)%12;
@@ -354,6 +391,20 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$type = 'text';
 			$line['text'] = "<p>Invalid tool was selected</p>";
 		}
+		
+		$query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$page_gbcatSelect = array();
+		$i=0;
+		if (mysql_num_rows($result)>0) {
+			while ($row = mysql_fetch_row($result)) {
+				$page_gbcatSelect['val'][$i] = $row[0];
+				$page_gbcatSelect['label'][$i] = $row[1];
+				$i++;
+			}
+		}
+		$page_tutorSelect['label'] = array("No access to scores","View Scores","View and Edit Scores");
+		$page_tutorSelect['val'] = array(2,0,1);
 		
 		$query = "SELECT id,name FROM imas_outcomes WHERE courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -401,6 +452,8 @@ $placeinhead .= '<script type="text/javascript">
 	}
  }
  </script>';
+ $placeinhead .= '<script type="text/javascript"> function toggleGBdetail(v) { document.getElementById("gbdetail").style.display = v?"block":"none";}</script>';
+ 
  require("../header.php");
 
 if ($overwriteBody==1) {
@@ -468,6 +521,7 @@ if ($overwriteBody==1) {
 			if (count($toolvals)>0) {
 				writeHtmlSelect('tool',$toolvals,$toollabels,$selectedtool);
 				echo '<br/>Custom parameters: <input type="text" name="toolcustom" size="40" value="'.htmlentities($toolcustom).'" /><br/>';
+				echo 'Custom launch URL: <input type="text" name="toolcustomurl" size="40" value="'.htmlentities($toolcustomurl).'" /><br/>';
 			} else {
 				echo 'No Tools defined yet<br/>';
 			}
@@ -475,7 +529,39 @@ if ($overwriteBody==1) {
 				echo '<a href="../admin/externaltools.php?cid='.$cid.'&amp;ltfrom='.$_GET['id'].'">Add or edit an external tool</a>';
 			}
 			?>
-			</span><br class="form">
+			</span><br class="form"/>
+			<span class="form">If this tool returns scores, do you want to record them?</span>
+			<span class="formright">
+			<input type=radio name="usegbscore" value="0" <?php if ($points==0) { echo 'checked=1';}?> onclick="toggleGBdetail(false)"/>No<br/>
+			<input type=radio name="usegbscore" value="1" <?php if ($points>0) { echo 'checked=1';}?> onclick="toggleGBdetail(true)"/>Yes
+			</span><br class="form"/>
+			<div id="gbdetail" <?php if ($points==0) { echo 'style="display:none;"';}?>>
+			<span class="form">Points:</span>
+			<span class="formright">
+				<input type=text size=4 name="points" value="<?php echo $points;?>"/> points
+			</span><br class="form"/>
+			<span class=form>Gradebook Category:</span>
+				<span class=formright>
+			
+	<?php
+		writeHtmlSelect("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],$gbcat,"Default",0);
+	?>
+			</span><br class=form>
+			<span class=form>Count: </span>
+			<span class="formright">
+				<input type=radio name="cntingb" value="1" <?php writeHtmlChecked($cntingb,1,0); ?> /> Count in Gradebook<br/>
+				<input type=radio name="cntingb" value="0" <?php writeHtmlChecked($cntingb,0,0); ?> /> Don't count in grade total and hide from students<br/>
+				<input type=radio name="cntingb" value="3" <?php writeHtmlChecked($cntingb,3,0); ?> /> Don't count in grade total<br/>
+				<input type=radio name="cntingb" value="2" <?php writeHtmlChecked($cntingb,2,0); ?> /> Count as Extra Credit
+			</span><br class=form>
+			<span class="form">Tutor Access:</span>
+				<span class="formright">
+	<?php
+		writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],$tutoredit);
+		echo '<input type="hidden" name="gradesecret" value="'.$gradesecret.'"/>';
+	?>			
+			</span><br class="form" />
+			</div>
 		</div>
 		
 		<span class="form">Open page in:</span>
@@ -536,6 +622,9 @@ if ($overwriteBody==1) {
 			echo '<span class="form">Associate Outcomes:</span></span class="formright">';
 			writeHtmlMultiSelect('outcomes',$outcomes,$outcomenames,$gradeoutcomes,'Select an outcome...');
 			echo '</span><br class="form"/>';
+	}
+	if ($points>0) {
+		echo '<input type="hidden" name="hadpoints" value="true"/>';
 	}
 ?>
 		<div class=submit><input type=submit value="<?php echo $savetitle;?>"></div>	

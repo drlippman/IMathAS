@@ -28,7 +28,6 @@
 	$titlesimp = strip_tags($title);
 	
 	if (substr($text,0,8)=='exttool:') {
-		list($tool,$custom) = explode('~~',substr($text,8));
 		$param = "linkid={$_GET['id']}&cid=$cid";
 		
 		if ($target==0) {

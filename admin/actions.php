@@ -549,7 +549,7 @@ switch($_GET['action']) {
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			
 			//delete linked text files
-			$query = "SELECT text FROM imas_linkedtext WHERE courseid='{$_GET['id']}' AND text LIKE 'file:%'";
+			$query = "SELECT text,points,id FROM imas_linkedtext WHERE courseid='{$_GET['id']}' AND text LIKE 'file:%'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			while ($row = mysql_fetch_row($result)) {
 				$safetext = addslashes($row[0]);
@@ -561,7 +561,12 @@ switch($_GET['action']) {
 					//unlink($uploaddir . $filename);
 					deletecoursefile($filename);
 				}
+				if ($row[1]>0) {
+					$query = "DELETE FROM imas_grades WHERE gradetypeid={$row[2]} AND gradetype='exttool'";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+				}
 			}
+			
 			
 			$query = "DELETE FROM imas_linkedtext WHERE courseid='{$_GET['id']}'";
 			mysql_query($query) or die("Query failed : " . mysql_error());

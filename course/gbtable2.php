@@ -55,8 +55,8 @@ row[0][1][0][2] = points possible
 row[0][1][0][3] = 0 past, 1 current, 2 future
 row[0][1][0][4] = 0 no count and hide, 1 count, 2 EC, 3 no count
 row[0][1][0][5] = 0 regular, 1 practice test  
-row[0][1][0][6] = 0 online, 1 offline, 2 discussion
-row[0][1][0][7] = assessmentid, gbitems.id, forumid 
+row[0][1][0][6] = 0 online, 1 offline, 2 discussion, 3 exttool
+row[0][1][0][7] = assessmentid, gbitems.id, forumid, linkedtext.id
 row[0][1][0][8] = tutoredit: 0 no, 1 yes
 row[0][1][0][9] = 5 number summary, if not limuser-ed
 row[0][1][0][10] = 0 regular, 1 group
@@ -254,6 +254,7 @@ function gbtable() {
 	$assessments = array();
 	$grades = array();
 	$discuss = array();
+	$exttools = array();
 	$timelimits = array();
 	$minscores = array();
 	$assessmenttype = array();
@@ -439,6 +440,59 @@ function gbtable() {
 		$kcnt++;
 	}
 	
+	//Pull External Tools info
+	$query = "SELECT id,title,text,startdate,enddate,points,avail FROM imas_linkedtext WHERE courseid='$cid' AND points>0 AND avail>0 ";
+	if (!$canviewall) {
+		$query .= "AND startdate<$now ";
+	}
+	/*if ($istutor) {
+		$query .= "AND tutoredit<2 ";
+	}
+	if ($catfilter>-1) {
+		$query .= "AND gbcategory='$catfilter' ";
+	}*/
+	$query .= "ORDER BY enddate,startdate";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+		if (substr($line['text'],0,8)!='exttool:') {
+			continue;
+		}
+		$toolparts = explode('~~',substr($line['text'],8));
+		if (isset($toolparts[3])) {
+			$thisgbcat = $toolparts[3];
+			$thiscntingb = $toolparts[4];
+			$thistutoredit = $toolparts[5];
+		} else {
+			continue;
+		}
+		if ($istutor && $thistutoredit==2) { continue;}
+		if ($catfilter>-1 && $thisgbcat != $catfilter) {continue;}
+		
+		$exttools[$kcnt] = $line['id'];
+		$assessmenttype[$kcnt] = "External Tool";
+		$category[$kcnt] = $thisgbcat;
+		if ($line['avail']==2) {
+			$line['startdate'] = 0;
+			$line['enddate'] = 2000000000;
+		}
+		$enddate[$kcnt] = $line['enddate'];
+		$startdate[$kcnt] = $line['startdate'];
+		if ($now < $line['startdate']) {
+			$avail[$kcnt] = 2;
+		} else if ($now < $line['enddate']) {
+			$avail[$kcnt] = 1;
+		} else {
+			$avail[$kcnt] = 0;
+		}
+		$possible[$kcnt] = $line['points'];
+		$name[$kcnt] = $line['title'];
+		$cntingb[$kcnt] = $thiscntingb;
+		if (isset($courseitemsassoc)) {
+			$courseorder[$kcnt] = $courseitemsassoc['LinkedText'.$line['id']];
+		}
+		$kcnt++;
+	}
+	
 	
 	$cats = array();
 	$catcolcnt = 0;
@@ -486,6 +540,7 @@ function gbtable() {
 	$assesscol = array();
 	$gradecol = array();
 	$discusscol = array();
+	$exttoolcol = array();
 	if ($orderby==1) { //order $category by enddate
 		asort($enddate,SORT_NUMERIC);
 		$newcategory = array();
@@ -595,6 +650,10 @@ function gbtable() {
 					$gb[0][1][$pos][6] = 2; //0 online, 1 offline, 2 discuss
 					$gb[0][1][$pos][7] = $discuss[$k];
 					$discusscol[$discuss[$k]] = $pos;
+				} else if (isset($exttools[$k])) {
+					$gb[0][1][$pos][6] = 3; //0 online, 1 offline, 2 discuss, 3 exttool
+					$gb[0][1][$pos][7] = $exttools[$k];
+					$exttoolcol[$exttools[$k]] = $pos;
 				}
 				if ((isset($GLOBALS['includeduedate']) && $GLOBALS['includeduedate']==true) || isset($allowlate[$k])) {
 					$gb[0][1][$pos][11] = $enddate[$k];
@@ -652,6 +711,10 @@ function gbtable() {
 				$gb[0][1][$pos][6] = 2; //0 online, 1 offline, 2 discuss
 				$gb[0][1][$pos][7] = $discuss[$k];
 				$discusscol[$discuss[$k]] = $pos;
+			} else if (isset($exttools[$k])) {
+				$gb[0][1][$pos][6] = 3; //0 online, 1 offline, 2 discuss, 3 exttool
+				$gb[0][1][$pos][7] = $exttools[$k];
+				$exttoolcol[$exttools[$k]] = $pos;
 			}
 			if (isset($GLOBALS['includeduedate']) && $GLOBALS['includeduedate']==true|| isset($allowlate[$k])) {
 				$gb[0][1][$pos][11] = $enddate[$k];
@@ -1012,6 +1075,7 @@ function gbtable() {
 	unset($gradeid); unset($opts);
 	unset($discusspts);
 	$discussidx = array_flip($discuss);
+	$exttoolidx = array_flip($exttools);
 	$gradetypeselects = array();
 	if (count($grades)>0) {
 		$gradeidlist = implode(',',$grades);
@@ -1020,6 +1084,10 @@ function gbtable() {
 	if (count($discuss)>0) {
 		$forumidlist = implode(',',$discuss);
 		$gradetypeselects[] = "(gradetype='forum' AND gradetypeid IN ($forumidlist))";
+	}
+	if (count($exttools)>0) {
+		$linkedlist = implode(',',$exttools);
+		$gradetypeselects[] = "(gradetype='exttool' AND gradetypeid IN ($linkedlist))";
 	}
 	if (count($gradetypeselects)>0) {
 		$sel = implode(' OR ',$gradetypeselects);
@@ -1103,6 +1171,43 @@ function gbtable() {
 					$cattotcur[$row][$category[$i]][$col] = $gb[$row][1][$col][0];
 				}
 				$cattotfuture[$row][$category[$i]][$col] = $gb[$row][1][$col][0];
+			} else if ($l['gradetype']=='exttool') {
+				if (!isset($exttoolidx[$l['gradetypeid']]) || !isset($sturow[$l['userid']]) || !isset($exttoolcol[$l['gradetypeid']])) {
+					continue;
+				}
+				$i = $exttoolidx[$l['gradetypeid']];
+				$row = $sturow[$l['userid']];
+				$col = $exttoolcol[$l['gradetypeid']];
+				
+				$gb[$row][1][$col][2] = $l['id'];
+				if ($l['score']!=null) {
+					$gb[$row][1][$col][0] = 1*$l['score'];
+				}
+				if ($limuser>0 || (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments'])) {
+					$gb[$row][1][$col][1] =  $l['feedback']; //the feedback (for students)
+				} else if ($limuser==0 && $l['feedback']!='') { //feedback
+					$gb[$row][1][$col][1] = 1; //yes it has it (for teachers)
+				} else {
+					$gb[$row][1][$col][1] = 0; //no feedback
+				}
+				
+				if ($cntingb[$i] == 1) {
+					if ($gb[0][1][$col][3]<1) { //past
+						$cattotpast[$row][$category[$i]][$col] = 1*$l['score'];
+					} 
+					if ($gb[0][1][$col][3]<2) { //past or cur
+						$cattotcur[$row][$category[$i]][$col] = 1*$l['score'];
+					}
+					$cattotfuture[$row][$category[$i]][$col] = 1*$l['score'];		
+				} else if ($cntingb[$i]==2) {
+					if ($gb[0][1][$col][3]<1) { //past
+						$cattotpastec[$row][$category[$i]][$col] = 1*$l['score'];
+					} 
+					if ($gb[0][1][$col][3]<2) { //past or cur
+						$cattotcurec[$row][$category[$i]][$col] = 1*$l['score'];
+					}
+					$cattotfutureec[$row][$category[$i]][$col] = 1*$l['score'];	
+				}
 			}
 		}
 	}

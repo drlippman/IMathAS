@@ -56,7 +56,7 @@ if (isset($_GET['launch'])) {
 	$query = "UPDATE imas_users SET lastaccess='$now' WHERE id='$userid'";
 	mysql_query($query) or die("Query failed : " . mysql_error());
 	
-	$query = "UPDATE imas_sessions SET sessiondata='$enc',tzoffset='{$_POST['tzoffset']}'";
+	$query = "UPDATE imas_sessions SET sessiondata='$enc',tzoffset='{$_POST['tzoffset']}' WHERE sessionid='$sessionid'";
 	mysql_query($query) or die("Query failed : " . mysql_error());
 	if ($sessiondata['ltiitemtype']==0) { //is aid
 		$aid = $sessiondata['ltiitemid'];

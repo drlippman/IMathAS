@@ -587,18 +587,18 @@ if (isset($_GET['id']) && $_GET['id']!='new') {
 	$id = 'new';
 	//new question
 	$nparts = 1;
-	$qparts = array(4,4,4,4,4);
-	$answer = array(0,0,0,0,0);
-	$qdisp = array("vert","vert","vert","vert","vert");
-	$qshuffle = array("all","all","all","all","all");
-	$qtype = array_fill(0,5,"choices");
+	$qparts = array(4,4,4,4,4,4,4,4,4,4);
+	$answer = array(0,0,0,0,0,0,0,0,0,0);
+	$qdisp = array("vert","vert","vert","vert","vert","vert","vert","vert","vert","vert");
+	$qshuffle = array("all","all","all","all","all","all","all","all","all","all");
+	$qtype = array_fill(0,10,"choices");
 	$displayformat = array();
 	$scoremethod = array();
 	$answerboxsize = array();
 	$nhints = 1;
 	$questions = array();
 	$feedbacktxt = array();
-	$feedbacktxtdef = array_fill(0,5,"Incorrect");
+	$feedbacktxtdef = array_fill(0,10,"Incorrect");
 	$hinttext = array();
 	$qtol = array_fill(0,1,"abs");
 	$qtext = "";
@@ -742,7 +742,7 @@ if (!$myq) {
 <script type="text/javascript">
 function changenparts(el) {
 	var np = el.value;
-	for (var i=0;i<5;i++) {
+	for (var i=0;i<10;i++) {
 		if (i<np) { 
 			document.getElementById("partwrapper"+i).style.display="";
 		} else {
@@ -938,12 +938,12 @@ My library assignments: <span id="libnames"><?php echo $lnames;?></span><input t
 
 <p>This question has 
 <?php
-	writeHtmlSelect("nparts",range(1,5),range(1,5), $nparts,null,null,'onchange="changenparts(this)"');
+	writeHtmlSelect("nparts",range(1,10),range(1,10), $nparts,null,null,'onchange="changenparts(this)"');
 ?>
 parts.</p>
 
 <?php
-for ($n=0;$n<5;$n++) {
+for ($n=0;$n<10;$n++) {
 	if (!isset($qparts[$n])) { $qparts[$n] = 4;}
 	echo '<div id="partwrapper'.$n.'"';
 	if ($n>=$nparts) {echo ' style="display:none;"';};

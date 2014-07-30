@@ -39,9 +39,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$query = "DELETE FROM imas_items WHERE id='$itemid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		
-		$query = "SELECT text FROM imas_linkedtext WHERE id='$textid'";
+		$query = "SELECT text,points FROM imas_linkedtext WHERE id='$textid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$text = trim(mysql_result($result,0,0));
+		$row = mysql_fetch_row($result);
+		$text = trim($row[0]);
+		$points = $row[1];
 		if (substr($text,0,5)=='file:') { //delete file if not used
 			$safetext = addslashes($text);
 			$query = "SELECT id FROM imas_linkedtext WHERE text='$safetext'"; //any others using file?
@@ -54,6 +56,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				}*/
 				deletecoursefile(substr($text,5));
 			}
+		}
+		if ($points>0) {
+			$query = "DELETE FROM imas_grades WHERE gradetypeid='$textid' AND gradetype='exttool'";
+			mysql_query($query) or die("Query failed : " . mysql_error());
 		}
 		
 		$query = "DELETE FROM imas_linkedtext WHERE id='$textid'";
