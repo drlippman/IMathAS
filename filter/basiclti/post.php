@@ -115,6 +115,11 @@ if ($toolcustomurl!='') {
 	$line['url'] = $toolcustomurl;
 }
 
+if ($line['url']=='') {
+	echo '<html><body>This tool does not have a default launch URL.  Custom launch URL is required.</body></html>';
+	exit;
+}
+
 try {
 	$parms = signParameters($parms, $line['url'], "POST", $line['ltikey'], $line['secret'], null, $org_id, $org_desc);
 	$content = postLaunchHTML($parms, $line['url'],isset($parms['custom_debug']));

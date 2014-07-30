@@ -41,7 +41,7 @@ if (isset($_POST['tname'])) {
 	$_POST['custom'] = str_replace("\n",'&',$_POST['custom']);
 	$_POST['custom'] = preg_replace('/\s/','',$_POST['custom']);
 	
-	if (!empty($_POST['tname']) && !empty($_POST['key']) && !empty($_POST['secret']) && !empty($_POST['url'])) {
+	if (!empty($_POST['tname']) && !empty($_POST['key']) && !empty($_POST['secret'])) {
 		$query = '';
 		if ($_GET['id']=='new') {
 			$query = "INSERT INTO imas_external_tools (name,url,ltikey,secret,custom,privacy,groupid,courseid) VALUES ";
