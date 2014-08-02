@@ -302,7 +302,7 @@ if ($overwriteBody==1) {
 require("../footer.php");
 
 function printq($qn,$qsetid,$seed,$pts,$showpts) {
-	global $isfinal,$imasroot;
+	global $isfinal,$imasroot,$urlmode;
 	srand($seed);
 
 	$query = "SELECT qtype,control,qcontrol,qtext,answer,hasimg FROM imas_questionset WHERE id='$qsetid'";
@@ -313,7 +313,11 @@ function printq($qn,$qsetid,$seed,$pts,$showpts) {
 		$query = "SELECT var,filename,alttext FROM imas_qimages WHERE qsetid='$qsetid'";
 		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
-			${$row[0]} = "<img src=\"$imasroot/assessment/qimages/{$row[1]}\" alt=\"{$row[2]}\" />";	
+			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
+				${$row[0]} = "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/qimages/{$row[1]}\" alt=\"".htmlentities($row[2],ENT_QUOTES)."\" />";
+			} else {
+				${$row[0]} = "<img src=\"$imasroot/assessment/qimages/{$row[1]}\" alt=\"".htmlentities($row[2],ENT_QUOTES)."\" />";
+			}	
 		}
 	}
 	eval(interpret('control',$qdata['qtype'],$qdata['control']));

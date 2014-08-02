@@ -272,7 +272,7 @@ function vmsetupfractioncompare($state="",$qn=null,$part=null) {
 }
 
 //vmgetfractioncompareval(stuans)
-//return array(numerator, denominator)
+//return array(upper line numerator, upper line denominator, lower line numerator, lower line denominator)
 function vmgetfractioncompareval($state) {
 	return explode(',',$state);
 }
