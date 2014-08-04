@@ -13,7 +13,10 @@ if (!isset($teacherid)) {
 $pagetitle = "CC Export";
 $loadmathfilter = 1;
 $loadgraphfilter = 1;
-	
+if (!defined('ENT_XML1')) {
+	define('ENT_XML1',ENT_QUOTES);	
+}
+
 require("../header.php");
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Common Cartridge Export</div>\n";
 
@@ -290,6 +293,7 @@ if (isset($_GET['delete'])) {
 					$query = "SELECT name,summary,defpoints,itemorder FROM imas_assessments WHERE id='{$iteminfo[$item][1]}'";
 					$r = mysql_query($query) or die("Query failed : " . mysql_error());
 					$row = mysql_fetch_row($r);
+					echo "encoding {$row[0]} as ".htmlentities($row[0],ENT_XML1).'<br/>';
 					$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
 					$out .= $ind.'  <title>'.htmlentities($row[0],ENT_XML1).'</title>'."\n";
 					$out .= $ind.'</item>'."\n";
