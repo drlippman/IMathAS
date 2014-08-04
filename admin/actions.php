@@ -261,14 +261,16 @@ switch($_GET['action']) {
 			if (isset($_POST['istemplate'])) {
 				$istemplate += 1;
 			}
-			if (isset($_POST['isgrptemplate'])) {
-				$istemplate += 2;
-			}
 			if (isset($_POST['isselfenroll'])) {
 				$istemplate += 4;
 			}
 			if (isset($_POST['isguest'])) {
 				$istemplate += 8;
+			}
+		}
+		if ($myrights>=75) {
+			if (isset($_POST['isgrptemplate'])) {
+				$istemplate += 2;
 			}
 		}
 		
