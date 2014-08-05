@@ -672,8 +672,8 @@ if ($overwriteBody==1) {
 				echo $hasSectionData; 
 				echo $hasCodeData;
 				if ($line['locked']>0) {
-					echo '<td><span style="text-decoration: line-through;">'.$line['LastName'].'</span></td>';
-					echo '<td><span style="text-decoration: line-through;">'.$line['FirstName'].'</span></td>';
+					echo '<td><span class="greystrike">'.$line['LastName'].'</span></td>';
+					echo '<td><span class="greystrike">'.$line['FirstName'].'</span></td>';
 				} else {
 					echo '<td>'.$line['LastName'].'</td><td>'.$line['FirstName'].'</td>';
 				}

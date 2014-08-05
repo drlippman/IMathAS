@@ -1512,7 +1512,7 @@ function gbinstrdisp() {
 		}
 		echo "<a href=\"gradebook.php?cid=$cid&amp;stu={$gbt[$i][4][0]}\">";
 		if ($gbt[$i][4][1]>0) {
-			echo '<span style="text-decoration: line-through;">'.$gbt[$i][0][0].'</span>';
+			echo '<span class="greystrike">'.$gbt[$i][0][0].'</span>';
 		} else {
 			echo $gbt[$i][0][0];
 		}

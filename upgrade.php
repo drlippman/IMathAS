@@ -1482,6 +1482,10 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			$query = "ALTER TABLE `imas_linkedtext` ADD `points` SMALLINT( 4 ) UNSIGNED NOT NULL DEFAULT '0';";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		}
+		if ($last<90) {
+			$query = "ALTER TABLE  `imas_students` CHANGE  `code`  `code` VARCHAR( 32 ) NULL DEFAULT NULL";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+		}
 		/*$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {
 			echo '<p>Error: unable open upgradecounter.txt for writing</p>';
