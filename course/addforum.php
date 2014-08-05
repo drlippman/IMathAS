@@ -123,6 +123,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		$outcomes = implode(',',$outcomes);
 		
+		$_POST['name'] = addslashes(htmlentities(stripslashes($_POST['name'])));
+		
 		require_once("../includes/htmLawed.php");
 		$htmlawedconfig = array('elements'=>'*-script');
 		if ($_POST['description']=='<p>Enter forum description here</p>') {

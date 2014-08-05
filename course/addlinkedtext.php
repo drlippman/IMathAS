@@ -179,6 +179,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		}
 		
+		$_POST['title'] = addslashes(htmlentities(stripslashes($_POST['title'])));
+		
 		require_once("../includes/htmLawed.php");
 		$htmlawedconfig = array('elements'=>'*-script' );
 		if ($_POST['summary']=='<p>Enter summary here (displays on course page)</p>') {

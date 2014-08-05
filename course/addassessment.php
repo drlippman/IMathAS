@@ -223,6 +223,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$caltag = $_POST['caltagact'];
 		$calrtag = $_POST['caltagrev'];
 		
+		$_POST['name'] = addslashes(htmlentities(stripslashes($_POST['name'])));
+		
 		require_once("../includes/htmLawed.php");
 		$htmlawedconfig = array('elements'=>'*-script');
 		if ($_POST['summary']=='<p>Enter summary here (shows on course page)</p>') {

@@ -70,7 +70,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			require_once("../includes/htmLawed.php");
 			$htmlawedconfig = array('elements'=>'*-script');
 			$_POST['message'] = addslashes(htmLawed(stripslashes($_POST['message']),$htmlawedconfig));
-			$_POST['subject'] = strip_tags($_POST['subject']);
+			$_POST['subject'] = addslashes(htmlentities(stripslashes($_POST['subject'])));
 			
 			$query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
 			$now = time();
