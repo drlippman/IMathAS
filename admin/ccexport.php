@@ -293,7 +293,7 @@ if (isset($_GET['delete'])) {
 					$query = "SELECT name,summary,defpoints,itemorder FROM imas_assessments WHERE id='{$iteminfo[$item][1]}'";
 					$r = mysql_query($query) or die("Query failed : " . mysql_error());
 					$row = mysql_fetch_row($r);
-					echo "encoding {$row[0]} as ".htmlentities($row[0],ENT_XML1,'UTF-8',false).'<br/>';
+					//echo "encoding {$row[0]} as ".htmlentities($row[0],ENT_XML1,'UTF-8',false).'<br/>';
 					$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
 					$out .= $ind.'  <title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
 					$out .= $ind.'</item>'."\n";
