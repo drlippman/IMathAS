@@ -103,8 +103,17 @@ if (isset($_POST['checked'])) { //form submitted
 		$sets[] = 'sortby='.intval($_POST['sortby']);
 	}
 	if (isset($_POST['chgcntingb'])) {
+		if (is_numeric($_POST['points']) && $_POST['points'] == 0) {
+			$_POST['cntingb'] = 0;
+		} else if ($_POST['cntingb'] == 0) {
+			$_POST['points'] = 0;
+		} else if ($_POST['cntingb'] == 4) {
+			$_POST['cntingb'] = 0;
+		}
 		$sets[] = 'cntingb='.intval($_POST['cntingb']);
-		$sets[] = 'points='.intval($_POST['points']);
+		if (is_numeric($_POST['points'])) {
+			$sets[] = 'points='.intval($_POST['points']);
+		}
 	}
 	if (isset($_POST['chggbcat'])) {
 		$sets[] = "gbcategory='{$_POST['gbcat']}'";
@@ -380,8 +389,9 @@ foreach($forumitems as $id=>$name) {
 	<td class="r">Count: </td>
 	<td><input name="cntingb" value="0" checked="checked" type="radio"> No<br/>
 	<input name="cntingb" value="1" type="radio"> Yes<br/>
+	<input name="cntingb" value="4" type="radio"> Yes, but hide from students for now<br/>
 	<input name="cntingb" value="2" type="radio"> Yes, as extra credit<br/>
-	If yes, for: <input type=text size=4 name="points" value="0"/> points
+	If yes, for: <input type=text size=4 name="points" value=""/> points (leave blank to not change)
 	</td>
 </tr>
 <tr class="coptr">
@@ -395,7 +405,7 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 </tr>
 <tr class="coptr">
 	<td><input type="checkbox" name="chgforumtype" class="chgbox"/></td>
-	<td class="r">Gradebook category: </td>
+	<td class="r">Forum Type: </td>
 	<td>
 		<input type=radio name="forumtype" value="0" checked="checked"/>Regular forum<br/>
 		<input type=radio name="forumtype" value="1"/>File sharing forum

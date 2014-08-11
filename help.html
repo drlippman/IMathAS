@@ -225,6 +225,8 @@ For new courses, the course ID will display when you return to the Admin page.</
 
 <p>Other option:
 <ul>
+<li><b>Enrollment Key</b>:  A entry password for students to self-enroll in the course. If you provide a semicolon-separated 
+  list of keys, students can enroll with any of them, and the key will get recorded as the student's section</li>
 <li><b>Available</b>:  Whether course is available to students, and whether it should display on the instructor's
   home page</li>
 <li><b>Lock for Assessment</b>:  Shuts down access to the course except for the specified assessment.  Intended for
@@ -2780,6 +2782,9 @@ A student is asked to enter an interval notation answer. Example: (2,5]U(7,oo)
 	<dd>Defines the decimal accuracy required (ie 2 for two decimal places).  This will put a message in the answer tips stating the
 	decimals required.  If neither $abstolerance or $reltolerance is set, this will set the tolerance, otherwise the provided tolerance
 	will be used (even if it doesn't agree with the $reqdecimal setting).</dd>
+<dt>$answerformat = "normalcurve" (In Common Control)</dt>
+	<dd>Changes the question to use a "shade the area under the normal curve" widget. Define $answer using the interval that should be
+	shaded. Note that the shading tool only allows selection of z-values to 1 decimal place.</dd>
 <dt>$ansprompt = string (In Common Control)</dt>
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="`x in`"</dd>
 <dt>$answerboxsize = number (In Common Control)</dt>

@@ -417,15 +417,18 @@ function gbtable() {
 				if ($line['postby'] > 0 && $line['postby'] < 2000000000) {
 					if ($now>$line['replyby'] && $now>$line['postby']) {
 						$avail[$kcnt] = 0;
+						$enddate[$kcnt] = max($line['replyby'], $line['postby']);
 					}
 				} else {
 					if ($now>$line['replyby']) {
 						$avail[$kcnt] = 0;
+						$enddate[$kcnt] = $line['replyby'];
 					}
 				}
 			} else if ($line['postby'] > 0 && $line['postby'] < 2000000000) {
 				if ($now>$line['postby']) {
 					$avail[$kcnt] = 0;
+					$enddate[$kcnt] = $line['postby'];
 				}
 			}
 		} else {

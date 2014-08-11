@@ -2,6 +2,14 @@
 //IMathAS:  Main admin page
 //(c) 2006 David Lippman
 
+//boost operation time
+@set_time_limit(0);
+ini_set("max_input_time", "900");
+ini_set("max_execution_time", "900");
+ini_set("memory_limit", "104857600");
+ini_set("upload_max_filesize", "10485760");
+ini_set("post_max_size", "10485760");
+                                        
 /*** master php includes *******/
 require("../validate.php");
 require("../includes/filehandler.php");

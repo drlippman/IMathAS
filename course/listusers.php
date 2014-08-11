@@ -368,7 +368,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$hascode = false;
 		}	
 		
-		$query = "SELECT imas_students.id,imas_students.userid,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.SID,imas_students.lastaccess,imas_students.section,imas_students.code,imas_students.locked,imas_users.hasuserimg ";
+		$query = "SELECT imas_students.id,imas_students.userid,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.SID,imas_students.lastaccess,imas_students.section,imas_students.code,imas_students.locked,imas_users.hasuserimg,imas_students.timelimitmult ";
 		$query .= "FROM imas_students,imas_users WHERE imas_students.courseid='$cid' AND imas_students.userid=imas_users.id ";
 		if ($secfilter>-1) {
 			$query .= "AND imas_students.section='$secfilter' ";			
@@ -672,8 +672,8 @@ if ($overwriteBody==1) {
 				echo $hasSectionData; 
 				echo $hasCodeData;
 				if ($line['locked']>0) {
-					echo '<td><span style="text-decoration: line-through;">'.$line['LastName'].'</span></td>';
-					echo '<td><span style="text-decoration: line-through;">'.$line['FirstName'].'</span></td>';
+					echo '<td><span class="greystrike">'.$line['LastName'].'</span></td>';
+					echo '<td><span class="greystrike">'.$line['FirstName'].'</span></td>';
 				} else {
 					echo '<td>'.$line['LastName'].'</td><td>'.$line['FirstName'].'</td>';
 				}
@@ -683,10 +683,15 @@ if ($overwriteBody==1) {
 				<td><a href="viewloginlog.php?cid=<?php echo $cid ?>&uid=<?php echo $line['userid'] ?>" class="lal"><?php echo $lastaccess ?></a></td>
 				<td><a href="gradebook.php?cid=<?php echo $cid ?>&stu=<?php echo $line['userid'] ?>&from=listusers" class="gl">Grades</a></td>
 				<td><a href="listusers.php?cid=<?php echo $cid ?>&uid=<?php echo $line['userid'] ?>&massexception=1" class="ex">Exception</a></td>
-				<td><a href="listusers.php?cid=<?php echo $cid ?>&chgstuinfo=true&uid=<?php echo $line['userid'] ?>" class="ui">Chg</a></td>
+				<td><a href="listusers.php?cid=<?php echo $cid ?>&chgstuinfo=true&uid=<?php echo $line['userid'] ?>" class="ui">Chg</a>
+				<?php if ($line['timelimitmult']!=1) {
+					echo '<img src="../img/time.png" alt="'._('Has a time limit multiplier set').'" title="'._('Has a time limit multiplier set').'"/> ';	
+				}
+				?>
+				</td>
 				<?php
 				if ($line['locked']>0) {
-					echo '<td><a href="listusers.php?cid='.$cid.'&action=unlockone&uid='.$line['userid'].'" class="ull">Unlock</a></td>';
+					echo '<td><img src="../img/lock.png"/> <a href="listusers.php?cid='.$cid.'&action=unlockone&uid='.$line['userid'].'" class="ull">Unlock</a></td>';
 				} else {
 					echo '<td><a href="listusers.php?cid='.$cid.'&action=lockone&uid='.$line['userid'].'" onclick="return confirm(\'Are you SURE you want to lock this student out of the course?\');" class="ll">Lock</a></td>';
 				}

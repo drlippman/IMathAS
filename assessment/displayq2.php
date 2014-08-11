@@ -3693,13 +3693,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		foreach($anarr as $i=>$answer) {
 			$foundloc = -1;
 			if (count($torem)>0) {
-				$answer = str_replace($torem,'',$answer);
+				$answer = str_replace($torem,' ',$answer);
 			}
 			foreach($gaarr as $j=>$givenans) {
 				$givenans = trim($givenans);
 		
 				if (count($torem)>0) {
-					$givenans = str_replace($torem,'',$givenans);
+					$givenans = str_replace($torem,' ',$givenans);
 				}
 				if ($flags['ignore_commas']===true) {
 					$givenans = str_replace(',','',$givenans);
@@ -3720,7 +3720,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				if ($flags['special_or']===true) {
 					$specialor = true;
 				}
-				
 				if ($flags['ignore_case']===true) {
 					$givenans = strtoupper($givenans);
 					$answer = strtoupper($answer);

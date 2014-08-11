@@ -67,7 +67,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
 			$revisedate = parsedatetime($_POST['rdate'],$_POST['rtime']);
 		}
+		
 		$settings = intval($_POST['settings']);
+		
+		$_POST['name'] = addslashes(htmlentities(stripslashes($_POST['name'])));
+		
 		require_once("../includes/htmLawed.php");
 		$htmlawedconfig = array('elements'=>'*-script');
 		if ($_POST['description']=='<p>Enter Wiki description here</p>') {

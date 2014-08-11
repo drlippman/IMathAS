@@ -58,6 +58,9 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		} else {
 			$tag = '';
 		}
+		
+		$_POST['subject'] = addslashes(htmlentities(stripslashes($_POST['subject'])));
+		
 		require_once("../includes/htmLawed.php");
 		$htmlawedconfig = array('elements'=>'*-script-form');
 		$_POST['message'] = addslashes(htmLawed(stripslashes($_POST['message']),$htmlawedconfig));

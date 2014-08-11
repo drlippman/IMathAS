@@ -10,6 +10,7 @@ A library of Stats functions.  Version 1.9, March 30, 2008
 <li><a href="#percentile">percentile</a></li>
 <li><a href="#quartile">quartile</a></li>
 <li><a href="#TIquartile">TIquartile</a></li>
+<li><a href="#Excelquartile">Excelquartile</a></li>
 <li><a href="#median">median</a></li>
 <li><a href="#freqdist">freqdist</a></li>
 <li><a href="#frequency">frequency</a></li>
@@ -64,6 +65,10 @@ quartile(array,quartile)
 TIquartile(array,quartile)
 <BR>finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
 <BR>array of numbers.  Calculates using the TI-84 method.
+<BR><h3><a name="Excelquartile">Excelquartile</a></h3>
+Excelquartile(array,quartile)
+<BR>finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
+<BR>array of numbers.  Calculates using the Excel method.
 <BR><h3><a name="median">median</a></h3>
 median(array)
 <BR>returns the median of an array of numbers
@@ -71,42 +76,42 @@ median(array)
 freqdist(array,label,start,classwidth)
 <BR>display macro.  Returns an HTML table that is a frequency distribution of
 <BR>the data
-<BR> array: array of data values
-<BR> label: name of data values
-<BR> start: first lower class limit
-<BR> classwidth: width of the classes
+<BR>&nbsp;array: array of data values
+<BR>&nbsp;label: name of data values
+<BR>&nbsp;start: first lower class limit
+<BR>&nbsp;classwidth: width of the classes
 <BR><h3><a name="frequency">frequency</a></h3>
 frequency(array,start,classwidth)
 <BR>Returns an array of frequencies for the data grouped into classes
-<BR> array: array of data values
-<BR> start: first lower class limit
-<BR> classwidth: width of the classes
+<BR>&nbsp;array: array of data values
+<BR>&nbsp;start: first lower class limit
+<BR>&nbsp;classwidth: width of the classes
 <BR><h3><a name="countif">countif</a></h3>
 countif(array,condition)
 <BR>Returns count of items in array that meet condition
-<BR> array: array of data values
-<BR> condition: a condition, using x for data values
+<BR>&nbsp;array: array of data values
+<BR>&nbsp;condition: a condition, using x for data values
 <BR>Example: countif($a,"x<3 && x>2")
 <BR><h3><a name="histogram">histogram</a></h3>
 histogram(array,label,start,classwidth,[labelstart,upper,width,height])
 <BR>display macro.  Creates a histogram from a data set
-<BR> array: array of data values
-<BR> label: name of data values
-<BR> start: first lower class limit
-<BR> classwidth: width of the classes
-<BR> labelstart (optional): value to start axis labeling at.  Defaults to start
-<BR> upper (optional): first upper class limit.  Defaults to start+classwidth
-<BR> width,height (optional): width and height in pixels of graph
+<BR>&nbsp;array: array of data values
+<BR>&nbsp;label: name of data values
+<BR>&nbsp;start: first lower class limit
+<BR>&nbsp;classwidth: width of the classes
+<BR>&nbsp;labelstart (optional): value to start axis labeling at.  Defaults to start
+<BR>&nbsp;upper (optional): first upper class limit.  Defaults to start+classwidth
+<BR>&nbsp;width,height (optional): width and height in pixels of graph
 <BR><h3><a name="fdhistogram">fdhistogram</a></h3>
 fdhistogram(freqarray,label,start,cw,[labelstart,upper,width,height])
 <BR>display macro.  Creates a histogram from frequency array
-<BR> freqarray: array of frequencies
-<BR> label: name of data values
-<BR> start: first lower class limit
-<BR> classwidth: width of the classes
-<BR> labelstart (optional): value to start axis labeling at.  Defaults to start
-<BR> upper (optional): first upper class limit.  Defaults to start+classwidth
-<BR> width,height (optional): width and height in pixels of graph
+<BR>&nbsp;freqarray: array of frequencies
+<BR>&nbsp;label: name of data values
+<BR>&nbsp;start: first lower class limit
+<BR>&nbsp;classwidth: width of the classes
+<BR>&nbsp;labelstart (optional): value to start axis labeling at.  Defaults to start
+<BR>&nbsp;upper (optional): first upper class limit.  Defaults to start+classwidth
+<BR>&nbsp;width,height (optional): width and height in pixels of graph
 <BR><h3><a name="fdbargraph">fdbargraph</a></h3>
 fdbargraph(barlabels,freqarray,label,[width,height])
 <BR>barlabels: array of labels for the bars
@@ -143,13 +148,13 @@ tcdf(t,df,[dec])
 invnormalcdf(p,[dec])
 <BR>Inverse Normal CDF
 <BR>finds the z-value with a left-tail area of p, to dec decimals (default 5)
-<BR> from Odeh & Evans. 1974. AS 70. Applied Statistics. 23: 96-97
+<BR>&nbsp;from Odeh & Evans. 1974. AS 70. Applied Statistics. 23: 96-97
 <BR><h3><a name="invtcdf">invtcdf</a></h3>
 invtcdf(p,df,[dec])
 <BR>the inverse Student's t-distribution 
 <BR>computes the t-value with a left-tail probability of p, with df degrees of freedom
 <BR>to dec decimal places (default 4)
-<BR> from Algorithm 396: Student's t-quantiles by G.W. Hill  Comm. A.C.M., vol.13(10), 619-620, October 1970
+<BR>&nbsp;from Algorithm 396: Student's t-quantiles by G.W. Hill  Comm. A.C.M., vol.13(10), 619-620, October 1970
 <BR><h3><a name="linreg">linreg</a></h3>
 linreg(xarray,yarray)
 <BR>Computes the linear correlation coefficient, and slope and intercept of
@@ -215,6 +220,6 @@ mosaicplot(rowlabels, columnlabels, count matrix, [width, height])
 <BR>rowlabels: an array of labels for the rows of the display
 <BR>columnlabels: an array of labels for the columns of the display
 <BR>count matrix: a 2-dimensional array.  $m[1][5] will give the count for
-<BR>  rowlabel[1] and columnlabel[5]
+<BR>&nbsp;&nbsp;rowlabel[1] and columnlabel[5]
 <BR>width and height are optional, default to 300 by 300.  Does not include labels
 <BR>

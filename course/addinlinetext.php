@@ -99,6 +99,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 		require_once("../includes/htmLawed.php");
 		
+		$_POST['title'] = addslashes(htmlentities(stripslashes($_POST['title'])));
+		
 		$htmlawedconfig = array('elements'=>'*-script');
 		$_POST['text'] = addslashes(htmLawed(stripslashes($_POST['text']),$htmlawedconfig));
 		$outcomes = array();
