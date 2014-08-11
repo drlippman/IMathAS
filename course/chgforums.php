@@ -405,7 +405,7 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 </tr>
 <tr class="coptr">
 	<td><input type="checkbox" name="chgforumtype" class="chgbox"/></td>
-	<td class="r">Gradebook category: </td>
+	<td class="r">Forum Type: </td>
 	<td>
 		<input type=radio name="forumtype" value="0" checked="checked"/>Regular forum<br/>
 		<input type=radio name="forumtype" value="1"/>File sharing forum
