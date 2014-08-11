@@ -568,12 +568,12 @@ class OAuthServer {
   private function get_consumer(&$request) {
     $consumer_key = @$request->get_parameter("oauth_consumer_key");
     if (!$consumer_key) {
-      throw new OAuthException("Invalid consumer key");
+      throw new OAuthException("Invalid consumer key - no LTI key sepecified");
     }
 
     $consumer = $this->data_store->lookup_consumer($consumer_key);
     if (!$consumer) {
-      throw new OAuthException("Invalid consumer");
+      throw new OAuthException("Invalid consumer - your LTI tool is not configured correctly. Check your LTI key and secret.");
     }
 
     return $consumer;
