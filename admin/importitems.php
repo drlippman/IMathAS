@@ -36,10 +36,12 @@ function getsubinfo($items,$parent,$pre) {
 	}
 }
 
+$newqcnt = 0;
+$updateqcnt = 0;
 function additem($itemtoadd,$item,$questions,$qset) {
 	
 	global $newlibs;
-	global $userid, $userights, $cid, $missingfiles;
+	global $userid, $userights, $cid, $missingfiles, $newqcnt, $updateqcnt;
 	$mt = microtime();
 	if ($item[$itemtoadd]['type'] == "Assessment") {
 		//add assessment.  set $typeid
@@ -112,6 +114,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 							mysql_query($query) or die("Import failed on $query: " . mysql_error());
 						}
 					}
+					$updateqcnt++;
 				}
 			} else if ($questionexists && $_POST['merge']==-1) {
 				$questions[$qid]['qsetid'] = mysql_result($result,0,0);
@@ -153,6 +156,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 					$query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES ('$lib','{$questions[$qid]['qsetid']}','$userid')";
 					mysql_query($query) or die("error on: $query: " . mysql_error());
 				}
+				$newqcnt++;
 			}
 			$allqids[] = $questions[$qid]['qsetid'];
 			
@@ -509,6 +513,9 @@ if (!(isset($teacherid))) {
 			foreach ($missingfiles as $file) {
 				echo "$file <br/>";
 			}
+			echo "<p><a href=\"$imasroot/course/course.php?cid=$cid\">Done</a></p>";
+		} else if ($myrights==100) {
+			echo "<p>$updateqcnt questions updated, $newqcnt questions added.</p>";
 			echo "<p><a href=\"$imasroot/course/course.php?cid=$cid\">Done</a></p>";
 		} else {
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
