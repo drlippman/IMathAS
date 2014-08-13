@@ -233,7 +233,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 							//not efficient, but sufficient :)
 							$query = "DELETE FROM imas_qimages WHERE qsetid='$qsetid'";
 							mysql_query($query) or die("Import failed on $query: " . mysql_error());
-							$qimgs = explode("\n",$qdata[$qn]['qimgs']);
+							$qimgs = explode("\n",trim($qdata[$qn]['qimgs']));
 							foreach($qimgs as $qimg) {
 								$p = explode(',',$qimg);
 								$query = "INSERT INTO imas_qimages (qsetid,var,filename) VALUES ($qsetid,'{$p[0]}','{$p[1]}')";

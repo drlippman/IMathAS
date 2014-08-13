@@ -81,10 +81,10 @@ function additem($itemtoadd,$item,$questions,$qset) {
 			$result = mysql_query($query) or die("error on: $query: " . mysql_error());
 			$questionexists = (mysql_num_rows($result)>0);
 			
-			if ($questionexists && $_POST['merge']==1) {
+			if ($questionexists && ($_POST['merge']==1 || $_POST['merge']==2)) {
 				$questions[$qid]['qsetid'] = mysql_result($result,0,0);
 				$n = array_search($questions[$qid]['uqid'],$qset['uniqueid']);
-				if ($qset['lastmod'][$n]>mysql_result($result,0,1)) { //if old question
+				if ($qset['lastmod'][$n]>mysql_result($result,0,1) || $_POST['merge']==2) { //if old question
 					$now = time();
 					if (!empty($qset['qimgs'][$n])) {
 						$hasimg = 1;
@@ -104,9 +104,10 @@ function additem($itemtoadd,$item,$questions,$qset) {
 						//not efficient, but sufficient :)
 						$query = "DELETE FROM imas_qimages WHERE qsetid='{$questions[$qid]['qsetid']}'";
 						mysql_query($query) or die("Import failed on $query: " . mysql_error());
-						$qimgs = explode("\n",$qset['qimgs'][$n]);
+						$qimgs = explode("\n",trim($qset['qimgs'][$n]));
 						foreach($qimgs as $qimg) {
 							$p = explode(',',$qimg);
+							if (count($p)<2) {continue;}
 							$query = "INSERT INTO imas_qimages (qsetid,var,filename) VALUES ('{$questions[$qid]['qsetid']}','{$p[0]}','{$p[1]}')";
 							mysql_query($query) or die("Import failed on $query: " . mysql_error());
 						}
@@ -609,6 +610,9 @@ function chkgrp(frm, arr, mark) {
 			<input type=radio name=merge value="1" CHECKED>Update existing questions, 
 			<input type=radio name=merge value="0">Add as new question, 
 			<input type=radio name=merge value="-1">Keep existing questions
+			<?php if ($myrights==100) {
+				echo '<input type=radio name=merge value="2">Force update';
+			}?>
 		</p>
 		<p>
 			For Added Questions, Set Question Use Rights to 
