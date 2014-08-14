@@ -1887,7 +1887,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if ($displayformat=='editor') {
 			$rows += 5;
 		}
-		if ($GLOBALS['useeditor']=='review') {
+		if ($GLOBALS['useeditor']=='review' || ($GLOBALS['useeditor']=='reviewifneeded' && trim($la)=='')) {
 			$la = str_replace('&quot;','"',$la);
 			$la = preg_replace('/%(\w+;)/',"&$1",$la);
 			//$la = str_replace('nbsp;','&nbsp;',$la);
