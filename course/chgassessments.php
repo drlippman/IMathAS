@@ -487,7 +487,7 @@ $(function() {
 					echo "<li>$blockout</li>";
 					$blockout = '';
 				}
-				$blockout = "<input type=checkbox name='checked[]' value='0' id='{$parents[$i]}' checked=checked ";
+				$blockout = "<input type=checkbox name='checked[]' value='0' id='{$parents[$i]}' ";
 				$blockout .= "onClick=\"chkgrp(this.form, '{$ids[$i]}', this.checked);\" ";
 				$blockout .='/>';
 				$blockout .= '<i>'.$prespace[$i].$names[$i].'</i>';
