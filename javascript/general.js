@@ -625,3 +625,15 @@ function _(txt) {
   };
 // Works with either jQuery or Zepto
 })( window.jQuery || window.Zepto );
+
+//code for selectors
+jQuery(document).ready(function($) {
+	$(".alts").on('change', function() {
+		var groupValue = this.value.split(':');
+		if (groupValue.length > 1) {
+			console.log($(this).parents("altWrap"));
+			$(this).parents(".altWrap").find(".altContentOn").removeClass("altContentOn").addClass("altContentOff");
+			$(this).parents(".altWrap").find("."+groupValue[1]).addClass("altContentOn").removeClass("altContentOff");
+		}
+	});
+});

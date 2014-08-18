@@ -754,3 +754,6 @@ span.inlinebtn:hover {
 .clearfix {
     *zoom: 1;
 }
+.altContentOff {
+	display:none;
+}

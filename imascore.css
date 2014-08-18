@@ -655,3 +655,6 @@ div.multiselitem {
 	text-decoration: line-through;
 	color:#999;	
 }
+.altContentOff {
+	display:none;
+}
