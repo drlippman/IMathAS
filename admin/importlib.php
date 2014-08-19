@@ -47,8 +47,8 @@ function parseqs($file,$touse,$rights) {
 			$exists = false;
 		}
 		
-		if ($exists && $_POST['merge']==1) {
-			if ($qd['lastmod']>$adddate) { //only update if changed
+		if ($exists && ($_POST['merge']==1 || $_POST['merge']==2)) {
+			if ($qd['lastmod']>$adddate || $_POST['merge']==2) { //only update if changed
 				if (!empty($qd['qimgs'])) {
 					$hasimg = 1;
 				} else {
@@ -86,9 +86,10 @@ function parseqs($file,$touse,$rights) {
 						//not efficient, but sufficient :)
 						$query = "DELETE FROM imas_qimages WHERE qsetid='$qsetid'";
 						mysql_query($query) or die("Import failed on $query: " . mysql_error());
-						$qimgs = explode("\n",$qd['qimgs']);
+						$qimgs = explode("\n",trim($qd['qimgs']));
 						foreach($qimgs as $qimg) {
 							$p = explode(',',$qimg);
+							if (count($p)<2) {continue;}
 							$query = "INSERT INTO imas_qimages (qsetid,var,filename) VALUES ($qsetid,'{$p[0]}','{$p[1]}')";
 							mysql_query($query) or die("Import failed on $query: " . mysql_error());
 						}
@@ -618,7 +619,11 @@ if ($overwriteBody==1) {
 			<p>If a library or question already exists on this system, do you want to:<br/>
 				<input type=radio name=merge value="1" CHECKED>Update existing, 
 				<input type=radio name=merge value="0">import as new, or 
-				<input type=radio name=merge value="-1">Keep existing<br/>
+				<input type=radio name=merge value="-1">Keep existing
+				<?php if ($myrights==100) {
+					echo '<input type=radio name=merge value="2">Force update';
+				}?>
+				<br/>
 				Note that updating existing libraries will not place those imported libraries 
 				in the parent selected above.
 			</p>

@@ -127,6 +127,7 @@
 	$allowregen = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework");
 	$showeachscore = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="AsGo" || $testsettings['testtype']=="Homework");
 	$showansduring = (($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework") && $testsettings['showans']!='N');
+	$GLOBALS['useeditor']='reviewifneeded';
 	echo "<div class=breadcrumb>Print Ready Version</div>";
 	
 	$endtext = '';  $intropieces = array();

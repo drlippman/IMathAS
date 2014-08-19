@@ -726,8 +726,16 @@ function AMparseIexpr(str) {
       node = AMcreateMmlNode(symbol.tag,node);
       node.appendChild(result[0]);
     }
-  } 
-  
+    if (typeof sym1.func == "boolean" && sym1.func) {
+  	  var symbol = AMgetSymbol(str);
+  	  if (symbol.ttype != INFIX) {
+  	  	var node = AMcreateMmlNode("mrow",node);
+  	  	result = AMparseSexpr(str);
+  	  	node.appendChild(result[0]);
+  	  	str = result[1];
+  	  }
+    }
+  }
   return [node,str];
 }
 

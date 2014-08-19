@@ -470,15 +470,19 @@ function scorequestion($qn, $rectime=true) {
 	global $questions,$scores,$seeds,$testsettings,$qi,$attempts,$lastanswers,$isreview,$bestseeds,$bestscores,$bestattempts,$bestlastanswers, $reattempting, $rawscores, $bestrawscores, $firstrawscores;
 	global $regenonreattempt;
 	//list($qsetid,$cat) = getqsetid($questions[$qn]);
+	$lastrawscore = $rawscores[$qn];
+	
 	list($unitrawscore,$rawscores[$qn]) = scoreq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$_POST["qn$qn"],$qi[$questions[$qn]]['points']);
 	
 	$afterpenalty = calcpointsafterpenalty($unitrawscore,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
 
 	$rawscore = calcpointsafterpenalty($unitrawscore,$qi[$questions[$qn]],$testsettings,0); //possible
 	
+	$noscores = ($testsettings['testtype']=="NoScores");
+	
 	//work in progress
 	//need to rework canimprove
-	if (!$regenonreattempt && $attempts[$qn]>0 && strpos($afterpenalty,'~')!==false) {
+	if (!$regenonreattempt && $attempts[$qn]>0 && strpos($afterpenalty,'~')!==false && !$noscores) {
 		$appts = explode('~',$afterpenalty);
 		$prepts = explode('~',$rawscore);
 		$curs = explode('~',$scores[$qn]);
@@ -519,7 +523,7 @@ function scorequestion($qn, $rectime=true) {
 	if ($loc!==false) {
 		array_splice($reattempting,$loc,1);
 	}
-	if (getpts($scores[$qn])>=getpts($bestscores[$qn]) && !$isreview) {
+	if ((getpts($scores[$qn])>=getpts($bestscores[$qn]) || ($noscores && ($lastrawscore!=$rawscores[$qn] || $rawscore==0))) && !$isreview) {
 		$bestseeds[$qn] = $seeds[$qn];
 		$bestscores[$qn] = $scores[$qn];
 		$bestrawscores[$qn] = $rawscores[$qn];
