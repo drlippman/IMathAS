@@ -232,8 +232,9 @@ var AMsymbols = [
 {input:"csc",  tag:"mo", output:"csc", tex:null, ttype:UNARY, func:true},
 {input:"log",  tag:"mo", output:"log", tex:null, ttype:UNARY, func:true},
 {input:"ln",   tag:"mo", output:"ln",  tex:null, ttype:UNARY, func:true},
-{input:"abs",   tag:"mo", output:"abs",  tex:"text{abs}", ttype:UNARY, notexcopy:true}, //, func:true
-
+{input:"abs",   tag:"mo", output:"abs",  tex:null, ttype:UNARY, notexcopy:true, rewriteleftright:["|","|"]}, 
+{input:"floor",   tag:"mo", output:"floor",  tex:null, ttype:UNARY, notexcopy:true, rewriteleftright:["\\lfloor","\\rfloor"]}, 
+{input:"ceil",   tag:"mo", output:"ceil",  tex:null, ttype:UNARY, notexcopy:true, rewriteleftright:["\\lceil","\\rceil"]}, 
 {input:"Sin",  tag:"mo", output:"sin", tex:null, ttype:UNARY, func:true},
 {input:"Cos",  tag:"mo", output:"cos", tex:null, ttype:UNARY, func:true},
 {input:"Tan",  tag:"mo", output:"tan", tex:null, ttype:UNARY, func:true},
@@ -248,7 +249,7 @@ var AMsymbols = [
 {input:"Csc",  tag:"mo", output:"csc", tex:null, ttype:UNARY, func:true},
 {input:"Log",  tag:"mo", output:"log", tex:null, ttype:UNARY, func:true},
 {input:"Ln",   tag:"mo", output:"ln",  tex:null, ttype:UNARY, func:true},
-{input:"Abs",   tag:"mo", output:"abs",  tex:"text{abs}", ttype:UNARY, func:true, notexcopy:true},
+{input:"Abs",   tag:"mo", output:"abs",  tex:null, ttype:UNARY, notexcopy:true, rewriteleftright:["|","|"]},
 
 {input:"det",  tag:"mo", output:"det", tex:null, ttype:UNARY, func:true},
 {input:"exp",  tag:"mo", output:"exp", tex:null, ttype:UNARY, func:true},
@@ -287,6 +288,8 @@ AMsqrt, AMroot, AMfrac, AMdiv, AMover, AMsub, AMsup,
 {input:"dot", tag:"mover", output:".",      tex:null, ttype:UNARY, acc:true},
 {input:"ddot", tag:"mover", output:"..",    tex:null, ttype:UNARY, acc:true},
 {input:"ul", tag:"munder", output:"\u0332", tex:"underline", ttype:UNARY, acc:true},
+{input:"ubrace", tag:"munder", output:"\u23DF", tex:"underbrace", ttype:UNARY, acc:true},
+{input:"obrace", tag:"mover", output:"\u23DE", tex:"overbrace", ttype:UNARY, acc:true},
 AMtext, AMmbox, AMquote,
 //{input:"var", tag:"mstyle", atname:"fontstyle", atval:"italic", output:"var", tex:null, ttype:UNARY},
 {input:"color", tag:"mstyle", ttype:BINARY},
@@ -314,9 +317,11 @@ var AMnames = []; //list of input symbols
 function AMinitSymbols() {
   var texsymbols = [], i;
   for (i=0; i<AMsymbols.length; i++)
-    if (AMsymbols[i].tex && !(typeof AMsymbols[i].notexcopy == "boolean" && AMsymbols[i].notexcopy)) 
-      texsymbols[texsymbols.length] = {input:AMsymbols[i].tex, 
-        tag:AMsymbols[i].tag, output:AMsymbols[i].output, ttype:AMsymbols[i].ttype};
+    if (AMsymbols[i].tex && !(typeof AMsymbols[i].notexcopy == "boolean" && AMsymbols[i].notexcopy)) {
+       texsymbols[texsymbols.length] = {input:AMsymbols[i].tex, 
+        tag:AMsymbols[i].tag, output:AMsymbols[i].output, ttype:AMsymbols[i].ttype,
+        acc:(AMsymbols[i].acc||false)};
+    }
   AMsymbols = AMsymbols.concat(texsymbols);
   AMsymbols.sort(compareNames);
   for (i=0; i<AMsymbols.length; i++) AMnames[i] = AMsymbols[i].input;
@@ -552,10 +557,11 @@ function AMTparseSexpr(str) { //parses str and returns [node,tailstr]
 	      return ['\\sqrt{'+result[0]+'}',result[1]];
       } else if (symbol.input == "cancel") {           // cancel
 	      return ['\\cancel{'+result[0]+'}',result[1]];
-      } else if (symbol.input == "abs") {           // abs
-	      return ['{\\left|'+result[0]+'\\right|}',result[1]];
+      } else if (typeof symbol.rewriteleftright != "undefined") {  // abs, floor, ceil
+	      return ['{\\left'+symbol.rewriteleftright[0]+result[0]+'\\right'+symbol.rewriteleftright[1]+'}',result[1]];
       } else if (typeof symbol.acc == "boolean" && symbol.acc) {   // accent
-	      return ['{'+AMTgetTeXsymbol(symbol)+'{'+result[0]+'}}',result[1]];
+	      //return ['{'+AMTgetTeXsymbol(symbol)+'{'+result[0]+'}}',result[1]];
+	      return [AMTgetTeXsymbol(symbol)+'{'+result[0]+'}',result[1]];
       } else {                        // font change command  
 	    return ['{'+AMTgetTeXsymbol(symbol)+'{'+result[0]+'}}',result[1]];
       }
@@ -644,8 +650,17 @@ function AMTparseIexpr(str) {
         node += '_{'+result[0]+'}';
       }
     } else { //must be ^
-      node = '{'+node+'}^{'+result[0]+'}';
+      //node = '{'+node+'}^{'+result[0]+'}';
+      node = node+'^{'+result[0]+'}';
     }
+    if (typeof sym1.func != 'undefined' && sym1.func) {
+    	sym2 = AMgetSymbol(str);
+    	if (sym2.ttype != INFIX && sym2.ttype != RIGHTBRACKET) {
+    		result = AMTparseIexpr(str);
+    		node = '{'+node+result[0]+'}';
+    		str = result[1];
+    	}
+    } 
   } 
   
   return [node,str];

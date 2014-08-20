@@ -268,6 +268,8 @@ array( 'input'=>'tilde', 'unary'=>TRUE, 'acc'=>TRUE),
 array( 'input'=>'dot', 'unary'=>TRUE, 'acc'=>TRUE),
 array( 'input'=>'ddot', 'unary'=>TRUE, 'acc'=>TRUE),
 array( 'input'=>'ul', 'tex'=>'underline', 'unary'=>TRUE, 'acc'=>TRUE),
+array( 'input'=>'ubrace', 'tex'=>'underbrace', 'unary'=>TRUE, 'acc'=>TRUE),
+array( 'input'=>'obrace', 'tex'=>'overbrace', 'unary'=>TRUE, 'acc'=>TRUE),
 array( 'input'=>'text', 'text'=>TRUE),
 array( 'input'=>'mbox', 'text'=>TRUE),
 array( 'input'=>'"', 'text'=>TRUE),
@@ -304,10 +306,9 @@ function AMcompareNames($a,$b) {
 
 //original version
 function AMinitSymbols() {
-	
-	$tsymb = array();
 	for ($i=0; $i<count($this->AMsymbols); $i++) {
 		if (isset($this->AMsymbols[$i]['tex']) && !isset($this->AMsymbols[$i]['notexcopy'])) {
+			$tsymb = array();
 			foreach($this->AMsymbols[$i] as $k=>$v) {
 				if ($k!='tex') { $tsymb[$k]=$v;}
 			}
@@ -546,9 +547,11 @@ function AMTparseSexpr($str) {
 	} else if (isset($symbol['unary'])) {
 		$str = $this->AMremoveCharsAndBlanks($str,strlen($symbol['input']));
 		$result = $this->AMTparseSexpr($str);
+		
 		if ($result[0]==null) {
 			return array('{'.$this->AMTgetTeXsymbol($symbol).'}',$str);
 		}
+		
 		if (isset($symbol['func'])) {
 			$st = $str{0};
 			if ($st=='^' || $st=='_' || $st=='/' || $st=='|' || $st==',' || (($symbol['input']=='f' || $symbol['input']=='g')  && $st!='(')) {
@@ -558,7 +561,9 @@ function AMTparseSexpr($str) {
 				return array($node,$result[1]);
 			}
 		}
+
 		$result[0] = $this->AMTremoveBrackets($result[0]);
+		
 		if ($symbol['input']=='sqrt') {
 			return array('\\sqrt{'.$result[0].'}',$result[1]);
 		} else if ($symbol['input']=='cancel') {
@@ -566,7 +571,8 @@ function AMTparseSexpr($str) {
 		} else if (isset($symbol['rewriteleftright'])) {
 			return array('{\\left'.$symbol['rewriteleftright'][0].$result[0].'\\right'.$symbol['rewriteleftright'][1].'}',$result[1]);
 		} else if (isset($symbol['acc'])) {
-			return array('{'.$this->AMTgetTeXsymbol($symbol).'{'.$result[0].'}}',$result[1]);
+			//return array('{'.$this->AMTgetTeXsymbol($symbol).'{'.$result[0].'}}',$result[1]);
+			return array($this->AMTgetTeXsymbol($symbol).'{'.$result[0].'}',$result[1]);
 		} else {
 			return array('{'.$this->AMTgetTeXsymbol($symbol).'{'.$result[0].'}}',$result[1]);
 		}
@@ -629,7 +635,7 @@ function AMTparseSexpr($str) {
 
 function AMTparseIexpr($str) {
 	$str = $this->AMremoveCharsAndBlanks($str,0);
-	$syml = $this->AMgetSymbol($str);
+	$sym1 = $this->AMgetSymbol($str);
 	$result = $this->AMTparseSexpr($str);
 	$node = $result[0];
 	$str = $result[1];
@@ -645,7 +651,7 @@ function AMTparseIexpr($str) {
 		$str = $result[1];
 		if ($symbol['input']=='_') {
 			$sym2 = $this->AMgetSymbol($str);
-			$underover = isset($syml['underover']);
+			$underover = isset($sym1['underover']);
 			if ($sym2['input']=='^') {
 				$str = $this->AMremoveCharsAndBlanks($str,strlen($sym2['input']));
 				$res2 = $this->AMTparseSexpr($str);
@@ -659,7 +665,16 @@ function AMTparseIexpr($str) {
 				$node .= '_{'.$result[0].'}';
 			}
 		} else {
-			$node = '{'.$node.'}^{'.$result[0].'}';
+			//$node = '{'.$node.'}^{'.$result[0].'}';
+			$node = $node.'^{'.$result[0].'}';
+		}
+		if (isset($sym1['func']) && $sym1['func']) {
+			$sym2 = $this->AMgetSymbol($str);
+			if (!isset($sym2['infix']) && !isset($sym2['rightbracket'])) {
+				$result = $this->AMTparseIexpr($str);
+				$node = '{'.$node.$result[0].'}';
+				$str = $result[1];
+			}
 		}
 	}
 	
