@@ -52,7 +52,7 @@ if (!(isset($teacherid))) {
 				}
 				if ($oktocopy==0) {
 					$ekey = mysql_result($result,0,0);
-					if (!isset($_POST['ekey']) || $ekey != $_POST['ekey']) {
+					if (!isset($_POST['ekey']) || strtolower(trim($ekey)) != strtolower(trim($_POST['ekey']))) {
 						$overwriteBody = 1;
 						$body = "Invalid enrollment key entered.  <a href=\"copyitems.php?cid=$cid\">Try Again</a>";
 					} else {
