@@ -84,6 +84,8 @@
 	$query .= "FROM imas_msgs JOIN imas_users ON imas_msgs.msgfrom=imas_users.id LEFT JOIN imas_students ON imas_students.userid=imas_users.id AND imas_students.courseid='$cid' ";
 	$query .= "WHERE imas_msgs.id='$msgid' ";
 	
+	$isteacher = isset($teacherof[$line['courseid']]);
+	
 	if ($type!='allstu' || !$isteacher) {
 		$query .= "AND (imas_msgs.msgto='$userid' OR imas_msgs.msgfrom='$userid')";
 	}
