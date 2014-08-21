@@ -233,88 +233,50 @@
 			}
 			
 			echo '</span>';
-			if ($view==2) {
-				echo "<span class=right>";
-				if ($ownerid[$child]!=$userid && $cansendmsgs) {
-					echo "<a href=\"msglist.php?cid=$cid&filtercid=$filtercid&page=$page&type=$type&add=new&to={$ownerid[$child]}&toquote=$child\">Reply</a> ";
-				}
-				echo "<input type=button id=\"buti$icnt\" value=\"Show\" onClick=\"toggleitem($icnt)\">\n";
-				
-				echo "</span>";
-				/*if (isset($children[$child])) {
-					echo "<input type=button id=\"butb$bcnt\" value=\"-\" onClick=\"toggleshow($bcnt)\">\n";
-				}*/
-				echo "<b>{$subject[$child]}</b> Posted by: ";
-				if ($isteacher && $ownerid[$child]!=0) {
-					echo "<a href=\"mailto:{$email[$child]}\">";
-				} else if ($allowmsg && $ownerid[$child]!=0) {
-					echo "<a href=\"../msgs/msglist.php?cid=$cid&add=new&to={$ownerid[$child]}\">";
-				}
-				echo $poster[$child];
-				if (($isteacher || $allowmsg) && $ownerid[$child]!=0) {
-					echo "</a>";
-				}
-				echo ', ';
-				echo tzdate("F j, Y, g:i a",$date[$child]);
-								
-				echo "</div>\n";
-				echo "<div class=hidden id=\"item$icnt\">";
-				
-				
-				echo filter($message[$child]);
-				echo "</div>\n";
-				$icnt++;
-				if (isset($children[$child]) && ($posttype[$child]!=3 || $isteacher)) { //if has children
-					echo "<div class=forumgrp id=\"block$bcnt\">\n";
-					$bcnt++;
-					printchildren($child);
-					echo "</div>\n";
-				}
-			} else {
-				echo "<span class=right>";
-				
-				if (isset($children[$child])) {
-					if ($ownerid[$child]!=$userid && $cansendmsgs) {
-						echo "<a href=\"msglist.php?cid=$cid&filtercid=$filtercid&page=$page&type=$type&add=new&to={$ownerid[$child]}&toquote=$child\">Reply</a> ";
-					}
-				}
-				echo "<input type=button id=\"buti$icnt\" value=\"Hide\" onClick=\"toggleitem($icnt)\">\n";
-				
-				echo "</span>\n";
-				echo "<b>{$subject[$child]}</b><br/>Posted by: ";
-				if ($isteacher && $ownerid[$child]!=0) {
-					echo "<a href=\"mailto:{$email[$child]}\">";
-				} else if ($allowmsg && $ownerid[$child]!=0) {
-					echo "<a href=\"../msgs/msglist.php?cid=$cid&add=new&to={$ownerid[$child]}\">";
-				}
-				echo $poster[$child];
-				if (($isteacher || $allowmsg) && $ownerid[$child]!=0) {
-					echo "</a>";
-				}
-				echo ', ';
-				echo tzdate("F j, Y, g:i a",$date[$child]);
-				if ($date[$child]>$lastview) {
-					echo " <span style=\"color:red;\">New</span>\n";
-				}
-				
-				echo "</div>\n";
-				echo "<div class=\"blockitems\" id=\"item$icnt\">";
-				$icnt++;
-				echo filter($message[$child]);
-				echo "</div>\n";
-				if (isset($children[$child]) && ($posttype[$child]!=3 || $isteacher)) { //if has children
-					echo "<div class=";
-					if ($view==0) {
-						echo '"forumgrp"';
-					} else if ($view==1) {
-						echo '"hidden"';
-					}
-					echo " id=\"block$bcnt\">\n";
-					$bcnt++;
-					printchildren($child);
-					echo "</div>\n";
-				}
+			
+			echo "<span class=right>";
+			
+			if ($ownerid[$child]!=$userid && $cansendmsgs) {
+				echo "<a href=\"msglist.php?cid=$cid&filtercid=$filtercid&page=$page&type=$type&add=new&to={$ownerid[$child]}&toquote=$child\">Reply</a> ";
 			}
+			
+			echo "<input type=button id=\"buti$icnt\" value=\"Hide\" onClick=\"toggleitem($icnt)\">\n";
+			
+			echo "</span>\n";
+			echo "<b>{$subject[$child]}</b><br/>Posted by: ";
+			if ($isteacher && $ownerid[$child]!=0) {
+				echo "<a href=\"mailto:{$email[$child]}\">";
+			} else if ($allowmsg && $ownerid[$child]!=0) {
+				echo "<a href=\"../msgs/msglist.php?cid=$cid&add=new&to={$ownerid[$child]}\">";
+			}
+			echo $poster[$child];
+			if (($isteacher || $allowmsg) && $ownerid[$child]!=0) {
+				echo "</a>";
+			}
+			echo ', ';
+			echo tzdate("F j, Y, g:i a",$date[$child]);
+			if ($date[$child]>$lastview) {
+				echo " <span style=\"color:red;\">New</span>\n";
+			}
+			
+			echo "</div>\n";
+			echo "<div class=\"blockitems\" id=\"item$icnt\">";
+			$icnt++;
+			echo filter($message[$child]);
+			echo "</div>\n";
+			if (isset($children[$child]) && ($posttype[$child]!=3 || $isteacher)) { //if has children
+				echo "<div class=";
+				if ($view==0) {
+					echo '"forumgrp"';
+				} else if ($view==1) {
+					echo '"hidden"';
+				}
+				echo " id=\"block$bcnt\">\n";
+				$bcnt++;
+				printchildren($child);
+				echo "</div>\n";
+			}
+			
 		}
 	}
 	

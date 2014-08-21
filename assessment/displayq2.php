@@ -2605,7 +2605,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				}
 			}
 		} else {
-			$gaarr = array(str_replace(array('$',',',' '),'',$givenans));
+			$gaarr = array(str_replace(array('$',',',' ','/','^'),'',$givenans));
 			if (strpos($answer,'[')===false && strpos($answer,'(')===false) {
 				$anarr = array(str_replace(',','',$answer));
 			} else {

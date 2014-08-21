@@ -876,7 +876,7 @@ function gbstudisp($stu) {
 				(!isset($gbt[1][1][$i][10]) && $now<$gbt[0][1][$i][11]) || //not started, before due date
 				(!isset($gbt[1][1][$i][10]) && $now-$gbt[0][1][$i][11]<$latepasshrs*3600 && !in_array($gbt[0][1][$i][7],$viewedassess)) //not started, within one latepass
 			    )) {
-				echo ' <span class="small"><a href="redeemlatepass?cid='.$cid.'&aid='.$gbt[0][1][$i][7].'">[';
+				echo ' <span class="small"><a href="redeemlatepass.php?cid='.$cid.'&aid='.$gbt[0][1][$i][7].'">[';
 				echo _('Use LatePass').']</a></span>';
 				if ($now>$gbt[0][1][$i][11]) {
 					$afterduelatepass = true;
