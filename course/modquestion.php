@@ -51,8 +51,11 @@ if (!(isset($teacherid))) {
 			$showhints = intval($_POST['showhints']);
 		}
 		if (isset($_GET['id'])) { //already have id - updating
-			$query = "UPDATE imas_questions SET points='$points',attempts='$attempts',penalty='$penalty',regen='$regen',showans='$showans',rubric=$rubric,showhints=$showhints ";
-			$query .= "WHERE id='{$_GET['id']}'";
+			$query = "UPDATE imas_questions SET points='$points',attempts='$attempts',penalty='$penalty',regen='$regen',showans='$showans',rubric=$rubric,showhints=$showhints";
+			if (isset($_POST['replacementid']) && $_POST['replacementid']!='' && intval($_POST['replacementid'])!=0) {
+				$query .= ',questionsetid='.intval($_POST['replacementid']);
+			}
+			$query .= " WHERE id='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (isset($_POST['copies']) && $_POST['copies']>0) {
 				$query = "SELECT questionsetid FROM imas_questions WHERE id='{$_GET['id']}'";
@@ -217,6 +220,15 @@ Leave items blank to use the assessment's default values<br/>
 		echo "<span class=form>Number of copies of question to add:</span><span class=formright><input type=text size=4 name=copies value=\"1\"/></span><br class=form />";
 	} else if (!$beentaken) {
 		echo "<span class=form>Number, if any, of additional copies to add to assessment:</span><span class=formright><input type=text size=4 name=copies value=\"0\"/></span><br class=form />";
+	}
+	
+	if ($beentaken) {
+		echo '<span class="form"><a href="#" onclick="$(this).hide();$(\'#advanced\').show();return false">Advanced</a></span><br class="form"/>';
+		echo '<div id="advanced" style="display:none;">';
+		echo '<span class="form">Replace this question with question ID: <br/>';
+		echo '<span style="color:red">WARNING: This is NOT recommended. It will mess up the question for any student who has already attempted it, and any work they have done may look garbled when you view it</span></span>';
+		echo '<span class="formright"><input size="7" name="replacementid"/></span><br class="form"/>';
+		echo '</div>';
 	}
 
 	echo '<div class="submit"><input type="submit" value="'._('Save Settings').'"></div>';

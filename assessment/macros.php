@@ -2288,7 +2288,11 @@ function cleanbytoken($str,$funcs = array()) {
 				}
 			} else {
 				$out[] = $token[0];	
-			}	
+			}
+			if ($i<$lasti && (($token[1]==3 && $tokens[$i+1][1]==3) || ($token[1]==4 && $tokens[$i+1][1]==4))) {
+				$out[] = ' ';
+			}
+			
 		}
 		if ($out[0]=='+') {
 			array_shift($out);
