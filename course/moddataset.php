@@ -131,7 +131,7 @@
 		$_POST['description'] = str_replace(array("<",">"),array("&lt;","&gt;"),$_POST['description']);
 		
 		if (isset($_GET['id'])) { //modifying existing
-			$qsetid = $_GET['id'];
+			$qsetid = intval($_GET['id']);
 			$isok = true;
 			if ($isgrpadmin) {
 				$query = "SELECT iq.id FROM imas_questionset AS iq,imas_users ";
@@ -199,6 +199,11 @@
 						mysql_query($query) or die("Query failed :$query " . mysql_error());
 					}
 				}
+			}
+			if ($replaceby!=0) {
+				$query = 'UPDATE imas_questions LEFT JOIN imas_assessment_sessions ON imas_questions.assessmentid = imas_assessment_sessions.assessmentid ';
+				$query .= "SET imas_questions.questionsetid='$replaceby' WHERE imas_assessment_sessions.id IS NULL AND imas_questions.questionsetid='$qsetid'";
+				mysql_query($query) or die("Query failed :$query " . mysql_error());
 			}
 			
 		} else { //adding new
