@@ -44,7 +44,15 @@
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . '/filter/basiclti/post.php?'.$param);
 			exit;
 		}
+	} else if ((substr($text,0,4)=="http") && (strpos(trim($text)," ")===false)) { //is a web link
+		$text = '<p><a href="'.$text.'" target="_blank">'.$title.'</a> (will open in a new tab or window)</p>';
+	} else if (substr(strip_tags($text),0,5)=="file:") {
+		$filename = substr(strip_tags($text),5);
+		require_once("../includes/filehandler.php");
+		$alink = getcoursefileurl($filename);//$imasroot . "/course/files/".$filename;
+		$text = '<p>Download file: <a href="'.$alink.'">'.$title.'</a></p>';
 	}
+						   	   
 	$placeinhead = '';
 	if (isset($studentid)) {
 		$rec = "data-base=\"linkedintext-{$_GET['id']}\" ";
