@@ -11,9 +11,12 @@ if (isset($_GET['callength'])) {
 
 require_once("filehandler.php");
 
+$havecalcedviewedassess = false;
+$viewedassess = array();
+
 function showcalendar($refpage) {
 
-global $imasroot,$cid,$userid,$teacherid,$previewshift,$latepasses,$urlmode, $latepasshrs, $myrights, $tzoffset, $tzname;
+global $imasroot,$cid,$userid,$teacherid,$previewshift,$latepasses,$urlmode, $latepasshrs, $myrights, $tzoffset, $tzname, $havecalcedviewedassess, $viewedassess;
 
 $now= time();
 if ($previewshift!=-1) {
@@ -109,8 +112,6 @@ if (!isset($teacherid)) {
 		$exceptions[$row[0]] = array($row[1],$row[2],$row[3]);
 	}
 }
-
-$havecalcedviewedassess = false;
 
 $byid = array();
 $k = 0;

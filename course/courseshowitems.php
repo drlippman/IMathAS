@@ -23,7 +23,7 @@ function enditem($canedit) {
 
   function showitems($items,$parent,$inpublic=false) {
 	   global $teacherid,$tutorid,$studentid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$myrights;
-	   global $hideicons,$exceptions,$latepasses,$graphicalicons,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs,$hasstats,$toolset,$readlinkeditems;
+	   global $hideicons,$exceptions,$latepasses,$graphicalicons,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs,$hasstats,$toolset,$readlinkeditems, $havecalcedviewedassess, $viewedassess;
 	   require_once("../includes/filehandler.php");
 	   
 	   if (!isset($CFG['CPS']['itemicons'])) {
@@ -598,6 +598,16 @@ function enditem($canedit) {
 					   }
 				   }
 			   }
+			   if (!$havecalcedviewedassess && $line['avail']>0 && $line['enddate']<$now && $line['allowlate']>10) {
+				$havecalcedviewedassess = true;
+				$viewedassess = array();
+				$query = "SELECT typeid FROM imas_content_track WHERE courseid='$cid' AND userid='$userid' AND type='gbviewasid'";
+				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+				while ($r = mysql_fetch_row($r2)) {
+					$viewedassess[] = $r[0];
+				}
+			   }
+			   	  
 			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now && $nothidden) { //regular show
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if (($hideicons&1)==0) {
@@ -696,6 +706,9 @@ function enditem($canedit) {
 				   echo ">{$line['name']}</a></b><BR> ", sprintf(_('Past Due Date of %s.  Showing as Review'), $enddate);
 				   if ($line['reviewdate']!=2000000000) { 
 					   echo " ", _('until'), " $reviewdate \n";
+				   }
+				   if ($line['allowlate']>10 && ($now - $line['enddate'])<$latepasshrs*3600 && !in_array($typeid,$viewedassess)) { 
+				   	   echo " <a href=\"redeemlatepass.php?cid=$cid&aid=$typeid\">", _('Use LatePass'), "</a>";
 				   }
 				   if ($canedit) { 
 					echo '<span class="instronly">';
