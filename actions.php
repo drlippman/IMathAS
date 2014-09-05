@@ -243,7 +243,7 @@
 				if (isset($CFG['GEN']['newpasswords'])) {
 					$newpw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
 				} else {
-					$newpw = md5("password");
+					$newpw = md5($_POST['pw1']);
 				}
 				$query = "UPDATE imas_users SET password='$newpw',remoteaccess='' WHERE id='{$_POST['id']}' LIMIT 1";
 				mysql_query($query) or die("Query failed : " . mysql_error());
