@@ -301,6 +301,7 @@ function initeditor(edmode,edids,css) {
 	    theme_advanced_resizing : true,
 	    table_styles: "Gridded=gridded;Gridded Centered=gridded centered",
 	    cleanup_callback : "imascleanup",
+	    convert_urls: false,
 	    AScgiloc : imasroot+'/filter/graph/svgimg.php',
 	    ASdloc : imasroot+'/javascript/d.svg',
 	    file_browser_callback : fileBrowserCallBackFunc

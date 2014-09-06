@@ -217,7 +217,7 @@
 				$message .= "will then be prompted to choose a new password.</p>";
 				$message .= "<a href=\"" .$urlmode. $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=resetpw&id=$id&code=$code\">";
 				$message .= $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=resetpw&id=$id&code=$code</a>\r\n";
-				mail(mysql_result($result,0,2),'Password Reset Request',$message,$headers);
+				mail( $email,'Password Reset Request',$message,$headers);
 				
 				require("header.php");
 				echo '<p>An email with a password reset link has been sent your email address on record: <b>'.$email.'.</b><br/> ';
@@ -243,7 +243,7 @@
 				if (isset($CFG['GEN']['newpasswords'])) {
 					$newpw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
 				} else {
-					$newpw = md5("password");
+					$newpw = md5($_POST['pw1']);
 				}
 				$query = "UPDATE imas_users SET password='$newpw',remoteaccess='' WHERE id='{$_POST['id']}' LIMIT 1";
 				mysql_query($query) or die("Query failed : " . mysql_error());
