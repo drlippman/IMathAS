@@ -506,6 +506,16 @@
 				}
 				if ($isteacher && $ownerid[$child]!=0 && $ownerid[$child]!=$userid) {
 					 echo " <a class=\"small\" href=\"$imasroot/course/gradebook.php?cid=$cid&stu={$ownerid[$child]}\" target=\"_popoutgradebook\">[GB]</a>";
+					 if ($base==0 && preg_match('/Question\s+about\s+#(\d+)\s+in\s+(.*)\s*$/',$subject[$child],$matches)) {
+					 	 $query = "SELECT ias.id FROM imas_assessment_sessions AS ias JOIN imas_assessments AS ia ON ia.id=ias.assessmentid ";
+					 	 $aname = addslashes($matches[2]);
+					 	 $query .= "WHERE ia.name='$aname' AND ias.userid=".intval($ownerid[$child]);
+					 	 $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+					 	 if (mysql_num_rows($result)>0) {
+					 	 	 $r = mysql_fetch_row($result);
+					 	 	 echo " <a class=\"small\" href=\"$imasroot/course/gb-viewasid.php?cid=$cid&uid={$ownerid[$child]}&asid={$r[0]}\" target=\"_popoutgradebook\">[assignment]</a>";
+					 	 }
+					 }
 				}
 				echo ', ';
 				echo tzdate("D, M j, Y, g:i a",$date[$child]);

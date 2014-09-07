@@ -614,7 +614,7 @@
 			echo "</p>";
 		}
 		
-		$query = "SELECT iq.id,iq.points,iq.withdrawn,iqs.qtype,iqs.control,iq.rubric,iq.showhints,iqs.extref ";
+		$query = "SELECT iq.id,iq.points,iq.withdrawn,iqs.qtype,iqs.control,iq.rubric,iq.showhints,iqs.extref,iqs.ownerid ";
 		$query .= "FROM imas_questions AS iq, imas_questionset AS iqs ";
 		$query .= "WHERE iq.questionsetid=iqs.id AND iq.assessmentid='{$line['assessmentid']}'";
 		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
@@ -623,6 +623,7 @@
 		$withdrawn = array();
 		$rubric = array();
 		$extref = array();
+		$owners = array();
 		while ($r = mysql_fetch_row($result)) {
 			if ($r[1]==9999) {
 				$pts[$r[0]] = $line['defpoints'];  //use defpoints
@@ -662,6 +663,7 @@
 					$extref[$r[0]] = explode('~~',$r[7]);
 				}
 			}
+			$owners[$r[0]] = $r[8];
 		}
 		echo '<script type="text/javascript">
 			function hidecorrect() {
@@ -938,7 +940,13 @@
 			
 					
 					echo " | <a href=\"gb-viewasid.php?stu=$stu&cid=$cid&from=$from&asid={$_GET['asid']}&uid={$_GET['uid']}&clearq=$i\">Clear Score</a> ";
-					echo "(Question ID: <a href=\"$imasroot/course/moddataset.php?id=$qsetid&cid=$cid&qid={$questions[$i]}&aid=$aid\">$qsetid</a>)";
+					echo "(Question ID: <a href=\"$imasroot/course/moddataset.php?id=$qsetid&cid=$cid&qid={$questions[$i]}&aid=$aid\">$qsetid</a>";
+					if (isset($CFG['GEN']['sendquestionproblemsthroughcourse'])) {
+						echo ". <a href=\"$imasroot/msgs/msglist.php?add=new&cid={$CFG['GEN']['sendquestionproblemsthroughcourse']}&to={$owners[$questions[$i]]}&title=Problem%20with%20question%20id%20$qsetid\" target=\"_blank\">Message owner</a> to report problems.";
+					} 
+					echo ')';
+					
+					
 					if (isset($extref[$questions[$i]])) {
 						echo "&nbsp; Had help available: ";
 						foreach ($extref[$questions[$i]] as $v) {
