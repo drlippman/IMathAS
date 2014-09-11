@@ -3,6 +3,17 @@
 //(c) 2006 David Lippman
 
 	require("../validate.php");
+	if (!isset($CFG['TE']['navicons'])) {
+		 $CFG['TE']['navicons'] = array(
+			 'untried'=>'te_blue_arrow.png',
+			 'canretrywrong'=>'te_red_redo.png',
+			 'canretrypartial'=>'te_yellow_redo.png',
+			 'noretry'=>'te_blank.gif',
+			 'correct'=>'te_green_check.png',
+			 'wrong'=>'te_red_ex.png',
+			 'partial'=>'te_yellow_check.png');
+			
+	}
 	if (isset($guestid)) {
 		$teacherid=$guestid;
 	}

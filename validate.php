@@ -412,6 +412,10 @@ END;
 		$sessiondata['mathdisp'] = 3;
 		writesessiondata();
 	}
+	if ($sessiondata['mathdisp']==1 && isset($CFG['GEN']['mathjaxonly'])) {
+		$sessiondata['mathdisp'] = 3;
+		writesessiondata();
+	}
 	if (isset($_GET['readernavon'])) {
 		$sessiondata['readernavon'] = true;
 		writesessiondata();
