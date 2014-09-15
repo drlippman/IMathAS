@@ -707,7 +707,7 @@ function enditem($canedit) {
 				   if ($line['reviewdate']!=2000000000) { 
 					   echo " ", _('until'), " $reviewdate \n";
 				   }
-				   if ($line['allowlate']>10 && ($now - $line['enddate'])<$latepasshrs*3600 && !in_array($typeid,$viewedassess)) { 
+				   if ($line['allowlate']>10 && ($now - $line['enddate'])<$latepasshrs*3600 && !in_array($typeid,$viewedassess) && $latepasses>0 && !isset($sessiondata['stuview'])) { 
 				   	   echo " <a href=\"redeemlatepass.php?cid=$cid&aid=$typeid\">", _('Use LatePass'), "</a>";
 				   }
 				   if ($canedit) { 

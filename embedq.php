@@ -52,6 +52,19 @@ if (isset($_POST['seed'])) {
 	}
 	$lastanswers[0] = stripslashes($lastanswers[0]);
 	$page_scoreMsg =  printscore($after,$qsetid,$_POST['seed']);
+	$pts = getpts($after);
+	$page_scoreMsg .= '<script type="text/javascript">
+	function inIframe() {
+	 try {
+        	return window.self !== window.top;
+         } catch (e) {
+        	return true;
+         }
+	}
+	if (inIframe()) {
+		window.parent.postMessage('.$pts.',"*");
+	}
+	</script>';
 	if (isset($_GET['noregen'])) {
 		$seed = $_POST['seed'];
 	} else if (getpts($score)<1) {

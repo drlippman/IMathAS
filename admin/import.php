@@ -254,7 +254,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 					$importuidval = ','.$qdata[$qn]['uqid'];
 					$qdata[$qn]['uqid'] = substr($mt,11).substr($mt,2,2).$qn;
 				}
-				$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,ownerid,userights,description,author,solution,solutionopts,qtype,control,qcontrol,qtext,answer,extref,license,ancestorauthors,otherattribution,hasimg$importuidstr) VALUES ";
+				$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,ownerid,userights,description,author,qtype,control,qcontrol,qtext,answer,solution,solutionopts,extref,license,ancestorauthors,otherattribution,hasimg$importuidstr) VALUES ";
 				$query .= "('{$qdata[$qn]['uqid']}',$now,$now,'$userid','$rights','{$qdata[$qn]['description']}','{$qdata[$qn]['author']}','{$qdata[$qn]['qtype']}','{$qdata[$qn]['control']}','{$qdata[$qn]['qcontrol']}',";
 				$query .= "'{$qdata[$qn]['qtext']}','{$qdata[$qn]['answer']}','{$qdata[$qn]['solution']}','{$qdata[$qn]['solutionopts']}','{$qdata[$qn]['extref']}','{$qdata[$qn]['license']}','{$qdata[$qn]['ancestorauthors']}','{$qdata[$qn]['otherattribution']}',$hasimg$importuidval)";
 				mysql_query($query) or die("Import failed on {$qdata[$qn]['description']}: $query:" . mysql_error());

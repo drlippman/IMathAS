@@ -130,7 +130,7 @@ function sendtoall(type) {
 		$query = "SELECT latepasshrs FROM imas_courses WHERE id='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$hours = mysql_result($result,0,0);
-		echo '<p>Students can redeem LatePasses for automatic extensions to assessments where allowed by the instructor.  Students must redeem the LatePass before the Due Date.</p>'; 
+		echo '<p>Students can redeem LatePasses for automatic extensions to assessments where allowed by the instructor.  Students must redeem the LatePass before the Due Date, unless you opt in your assessment settings to allow use after the due date (but within 1 LatePass period, specified below).</p>'; 
 		echo "<p>Late Passes extend the due date by <input type=text size=3 name=\"hours\" id=\"hours\" value=\"$hours\"/> hours</p>";
 		echo "<p>To all students:  <input type=\"text\" size=\"3\" value=\"1\" id=\"toall\"/> ";
 		echo '<input type=button value="Add" onClick="sendtoall(0);"/> <input type=button value="Replace" onclick="sendtoall(1)"/><p>';

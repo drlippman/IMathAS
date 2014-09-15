@@ -4,10 +4,10 @@
  *   David Lippman and Peter Jipsen
  *
  * @author David Lippman
- * @copyright Copyright © 2008 David Lippman.
+ * @copyright Copyright (c) 2008 David Lippman.
  *
  * Plugin format based on code that is:
- * @copyright Copyright © 2004-2008, Moxiecode Systems AB, All rights reserved.
+ * @copyright Copyright (c) 2004-2008, Moxiecode Systems AB, All rights reserved.
  */
 
 (function() {
@@ -77,7 +77,7 @@
 
 			// Add a node change handler, selects the button in the UI when a image is selected
 			ed.onNodeChange.add(function(ed, cm, n) {
-				cm.setActive('asciisvg', n.nodeName == 'IMG' && (ed.dom.getAttrib(n,"sscr")!='' || ed.dom.getAttrib(el,"src").match(/sscr=/)));				
+				cm.setActive('asciisvg', n.nodeName == 'IMG' && (ed.dom.getAttrib(n,"sscr")!='' || ed.dom.getAttrib(n,"src").match(/sscr=/)));				
 			});
 			
 			
