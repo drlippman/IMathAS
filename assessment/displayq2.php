@@ -3817,6 +3817,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$ansformats = explode(',',$answerformat);
 		$givenans = str_replace('∞', 'oo', $givenans);
+		$givenans = str_replace(array('（','）'), array('(',')'), $givenans);
+		
 		
 		if ($anstype == 'interval') {
 			$GLOBALS['partlastanswer'] = $givenans;

@@ -46,9 +46,9 @@
 			$page_newaccounterror .= "Passwords don't match. ";
 		} 
 		
-		$query = "SELECT enrollkey FROM imas_courses WHERE id = '{$_GET['cid']}'";
+		$query = "SELECT enrollkey,deflatepass FROM imas_courses WHERE id = '{$_GET['cid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$enrollkey = mysql_result($result,0,0);
+		list($enrollkey,$deflatepass) = mysql_fetch_row($result);
 		if (strlen($enrollkey)>0 && trim($_POST['ekey2'])=='') {
 			$page_newaccounterror .= "Please provide the enrollment key";
 		} else if (strlen($enrollkey)>0) {
@@ -78,11 +78,16 @@
 			} else {
 				$code = '';
 			}
-			$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, msgnotify) ";
-			$query .= "VALUES ('{$_POST['SID']}','$md5pw',$initialrights,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot);";
+			if (isset($CFG['GEN']['homelayout'])) {
+				$homelayout = $CFG['GEN']['homelayout'];
+			} else {
+				$homelayout = '|0,1,2||0,1';
+			}
+			$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, msgnotify, homelayout) ";
+			$query .= "VALUES ('{$_POST['SID']}','$md5pw',$initialrights,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot,'$homelayout');";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			$newuserid = mysql_insert_id();
-			$query = "INSERT INTO imas_students (userid,courseid,gbcomment) VALUES ('$newuserid','{$_GET['cid']}','$code');";
+			$query = "INSERT INTO imas_students (userid,courseid,gbcomment,latepass) VALUES ('$newuserid','{$_GET['cid']}','$code','$deflatepass');";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			if ($emailconfirmation) {
 				$id = mysql_insert_id();
@@ -115,15 +120,15 @@
 	
 	if ($verified) { //already have session
 		if (!isset($studentid) && !isset($teacherid) && !isset($tutorid)) {  //have account, not a student
-			$query = "SELECT name,enrollkey FROM imas_courses WHERE id='{$_GET['cid']}'";
+			$query = "SELECT name,enrollkey,deflatepass FROM imas_courses WHERE id='{$_GET['cid']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			list($coursename,$enrollkey) = mysql_fetch_row($result);
+			list($coursename,$enrollkey,$deflatepass) = mysql_fetch_row($result);
 			$keylist = array_map('trim',explode(';',$enrollkey));
 			if (strlen($enrollkey)==0 || (isset($_REQUEST['ekey']) && in_array($_REQUEST['ekey'], $keylist))) {
 				if (count($keylist)>1) {
-					$query = "INSERT INTO imas_students (userid,courseid,section) VALUES ('$userid','{$_GET['cid']}','{$_REQUEST['ekey']}');";		
+					$query = "INSERT INTO imas_students (userid,courseid,section,latepass) VALUES ('$userid','{$_GET['cid']}','{$_REQUEST['ekey']}','$deflatepass');";		
 				} else {
-					$query = "INSERT INTO imas_students (userid,courseid) VALUES ('$userid','{$_GET['cid']}');";
+					$query = "INSERT INTO imas_students (userid,courseid,latepass) VALUES ('$userid','{$_GET['cid']}','$deflatepass');";
 				}
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . '/course/course.php?cid='. $_GET['cid']);

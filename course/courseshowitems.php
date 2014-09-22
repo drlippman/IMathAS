@@ -703,7 +703,7 @@ function enditem($canedit) {
 				   	   echo " data-base=\"assess-$typeid\"";
 				   }*/ //moved to showtest
 				   
-				   echo ">{$line['name']}</a></b><BR> ", sprintf(_('Past Due Date of %s.  Showing as Review'), $enddate);
+				   echo ">{$line['name']}</a></b><BR> ", sprintf(_('Past Due Date of %s.  Showing as Review'), $enddate).'.';
 				   if ($line['reviewdate']!=2000000000) { 
 					   echo " ", _('until'), " $reviewdate \n";
 				   }
@@ -724,7 +724,9 @@ function enditem($canedit) {
 					}
 					echo '</span>';
 					
-				   } 
+				   } else if (isset($sessiondata['stuview']) && $line['allowlate']>10 && ($now - $line['enddate'])<$latepasshrs*3600) {
+					echo _(' LatePass Allowed');
+				   }
 				   echo filter("<br/><i>" . _('This assessment is in review mode - no scores will be saved') . "</i></div><div class=itemsum>{$line['summary']}</div>\n");
 				   enditem($canedit); //echo "</div>\n";
 			   } else if ($viewall) { //not avail to stu

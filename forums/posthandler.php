@@ -68,8 +68,8 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		if (trim($_POST['subject'])=='') {
 			$_POST['subject']= '(none)';
 		}
+		$now = time();
 		if ($_GET['modify']=="new") { //new thread
-			$now = time();
 			if ($groupsetid>0) {
 				if ($isteacher) {
 					if (isset($_POST['stugroup'])) {
@@ -119,7 +119,6 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			} else {
 				$uid = mysql_result($result,0,0);
 				
-				$now = time();
 				$query = "INSERT INTO imas_forum_posts (forumid,threadid,subject,message,userid,postdate,parent,posttype,isanon) VALUES ";
 				$query .= "('$forumid','$threadid','{$_POST['subject']}','{$_POST['message']}','$userid',$now,'{$_GET['replyto']}',0,'$isanon')";
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -171,7 +170,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			if (isset($studentid)) {
 				$query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime,info) VALUES ";
 				$query .= "('$userid','$cid','forummod','{$_GET['modify']}',$now,'$forumid;$threadid')";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				mysql_query($query) or die("Query failed : $query " . mysql_error());
 			}
 			
 			$sendemail = false;

@@ -646,6 +646,34 @@
 		recordtestdata();
 	}
 	if (isset($_GET['regen']) && $allowregen && $qi[$questions[$_GET['regen']]]['allowregen']==1) {
+		if (!isset($sessiondata['regendelay'])) {
+			$sessiondata['regendelay'] = 2;
+		}
+		$doexit = false;
+		if (isset($sessiondata['lastregen'])) {
+			if ($now-$sessiondata['lastregen']<$sessiondata['regendelay']) {
+				$sessiondata['regendelay'] = 5;
+				echo '<html><body><p>Hey, about slowing down and trying the problem before hitting regen?  Wait 5 seconds before trying again.</p><p></body></html>';
+				$query = "INSERT INTO imas_log (time,log) VALUES ($now,'Quickregen triggered by $userid')";
+				mysql_query($query) or die("Query failed : $query: " . mysql_error());
+				if (!isset($sessiondata['regenwarnings'])) {
+					$sessiondata['regenwarnings'] = 1;
+				} else {
+					$sessiondata['regenwarnings']++;
+				}
+				if ($sessiondata['regenwarnings']>10) {
+					$query = "INSERT INTO imas_log (time,log) VALUES ($now,'Over 10 regen warnings triggered by $userid')";
+					mysql_query($query) or die("Query failed : $query: " . mysql_error());
+				}
+				$doexit = true;
+			}
+			if ($now - $sessiondata['lastregen'] > 20) {
+				$sessiondata['regendelay'] = 2;
+			}
+		}
+		$sessiondata['lastregen'] = $now;
+		writesessiondata();
+		if ($doexit) { exit;}
 		srand();
 		$toregen = $_GET['regen'];
 		$seeds[$toregen] = rand(1,9999);
