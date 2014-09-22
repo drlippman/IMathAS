@@ -437,6 +437,7 @@ function togglevideoembed() {
 			jQuery(this).attr('title',_("Hide video"));
 		} else {
 			els.hide();
+			els.get(0).contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}','*');
 			els.parent('.fluid-width-video-wrapper').hide();
 			jQuery(this).text(' [+]');
 			jQuery(this).attr('title',_("Watch video here"));
@@ -463,9 +464,18 @@ function togglevideoembed() {
 		var m = href.match(/.*t=((\d+)m)?((\d+)s)?.*/);
 		if (m == null) {
 			var timeref = qsconn+'rel=0';
+			m = href.match(/.*start=(\d+)/);
+			if (m != null) {
+				timeref += '&start='+m[1];
+			}
 		} else {
 			var timeref = qsconn+'rel=0&start='+((m[2]?m[2]*60:0) + (m[4]?m[4]*1:0));
 		}
+		m = href.match(/.*end=(\d+)/);
+		if (m != null) {
+			timeref += '&end='+m[1];
+		}
+		timeref += '&enablejsapi=1';
 		jQuery('<iframe/>', {
 			id: 'videoiframe'+id,
 			width: 640,
