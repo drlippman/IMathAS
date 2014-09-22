@@ -46,7 +46,7 @@ function getstunames($a) {
 $stus = array();
 if ($type=='notstart') {
 	$query = "SELECT ims.userid FROM imas_students AS ims LEFT JOIN imas_assessment_sessions AS ias ON ims.userid=ias.userid AND ias.assessmentid='$aid'";
-	$query .= "WHERE ias.id IS NULL AND ims.courseid='$cid'";
+	$query .= "WHERE ias.id IS NULL AND ims.courseid='$cid' AND ims.locked=0 ";
 	if ($secfilter!=-1) {
 		$query .= " AND ims.section='$secfilter' ";
 	}
@@ -62,7 +62,7 @@ if ($type=='notstart') {
 	}
 	echo '</ul>';
 } else if ($type=='help') {
-	$query = "SELECT DISTINCT ict.userid FROM imas_content_track AS ict JOIN imas_students AS ims ON ict.userid=ims.userid WHERE ims.courseid='$cid' AND ict.courseid='$cid' AND ict.type='extref' AND ict.typeid='$qid'";
+	$query = "SELECT DISTINCT ict.userid FROM imas_content_track AS ict JOIN imas_students AS ims ON ict.userid=ims.userid WHERE ims.courseid='$cid' AND ict.courseid='$cid' AND ict.type='extref' AND ict.typeid='$qid' AND ims.locked=0 ";
 	if ($secfilter!=-1) {
 		$query .= " AND ims.section='$secfilter' ";
 	}
@@ -79,7 +79,7 @@ if ($type=='notstart') {
 	echo '</ul>';
 } else {
 	$query = "SELECT ias.questions,ias.bestscores,ias.bestattempts,ias.bestlastanswers,ias.starttime,ias.endtime,ias.timeontask,ias.userid FROM imas_assessment_sessions AS ias,imas_students ";
-	$query .= "WHERE ias.userid=imas_students.userid AND imas_students.courseid='$cid' AND ias.assessmentid='$aid'";
+	$query .= "WHERE ias.userid=imas_students.userid AND imas_students.courseid='$cid' AND ias.assessmentid='$aid' AND imas_students.locked=0";
 	if ($secfilter!=-1) {
 		$query .= " AND imas_students.section='$secfilter' ";
 	}

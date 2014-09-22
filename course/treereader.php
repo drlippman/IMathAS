@@ -7,6 +7,11 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	echo "You are not enrolled in this course. Please return to the <a href=\"../index.php\">Home Page</a> and enroll";
 	exit;
 }
+if (isset($teacherid) || isset($tutorid)) {
+	$viewall = true;
+} else {
+	$viewall = false;
+}
 if ((!isset($_GET['folder']) || $_GET['folder']=='') && !isset($sessiondata['folder'.$cid])) {
 	$_GET['folder'] = '0';  
 	$sessiondata['folder'.$cid] = '0';
@@ -161,47 +166,66 @@ $foundfirstitem = '';
 $foundopenitem = '';
 
 $astatus = array();
-$query = "SELECT ia.id,ias.bestscores FROM imas_assessments AS ia JOIN imas_assessment_sessions AS ias ON ia.id=ias.assessmentid ";
-$query .= "WHERE ia.courseid='$cid' AND ias.userid='$userid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-while ($row = mysql_fetch_row($result)) {
-	if (strpos($row[1],'-1')===false) {
-		$astatus[$row[0]] = 2; //completed
-	} else { //at least some undone
-		$p = explode(',',$row[1]);
-		foreach ($p as $v) {
-			if (strpos($v,'-1')===false) {
-				$astatus[$row[0]] = 1; //at least some is done	
-				continue 2;
+if (!$viewall) {
+	$query = "SELECT ia.id,ias.bestscores FROM imas_assessments AS ia JOIN imas_assessment_sessions AS ias ON ia.id=ias.assessmentid ";
+	$query .= "WHERE ia.courseid='$cid' AND ias.userid='$userid'";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	while ($row = mysql_fetch_row($result)) {
+		if (strpos($row[1],'-1')===false) {
+			$astatus[$row[0]] = 2; //completed
+		} else { //at least some undone
+			$p = explode(',',$row[1]);
+			foreach ($p as $v) {
+				if (strpos($v,'-1')===false) {
+					$astatus[$row[0]] = 1; //at least some is done	
+					continue 2;
+				}
 			}
+			$astatus[$row[0]] = 0; //unstarted
 		}
-		$astatus[$row[0]] = 0; //unstarted
+	}
+	$exceptions = array();
+	if (!isset($teacherid) && !isset($tutorid)) {
+		$query = "SELECT items.id,ex.startdate,ex.enddate,ex.islatepass FROM ";
+		$query .= "imas_exceptions AS ex,imas_items as items,imas_assessments as i_a WHERE ex.userid='$userid' AND ";
+		$query .= "ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment') ";
+		// $query .= "AND (($now<i_a.startdate AND ex.startdate<$now) OR ($now>i_a.enddate AND $now<ex.enddate))";
+		//$query .= "AND (ex.startdate<$now AND $now<ex.enddate)";
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+			$exceptions[$line['id']] = array($line['startdate'],$line['enddate'],$line['islatepass']);
+		}
+	}
+	//update block start/end dates to show blocks containing items with exceptions
+	if (count($exceptions)>0) {
+		upsendexceptions($items);
 	}
 }
 		
-
 function printlist($items) {
-	global $cid,$imasroot,$foundfirstitem, $foundopenitem, $openitem, $astatus, $studentinfo;
+	global $cid,$imasroot,$foundfirstitem, $foundopenitem, $openitem, $astatus, $studentinfo, $now, $viewall, $exceptions;
 	$out = '';
 	$isopen = false;
 	foreach ($items as $item) {
 		if (is_array($item)) { //is block
 			//TODO check that it's available
-			list($subcontent,$bisopen) = printlist($item['items']);
-			if ($bisopen) {
-				$isopen = true;
+			if ($viewall || $item['avail']==2 || ($item['avail']==1 && $item['startdate']<$now && $item['enddate']>$now)) {
+				list($subcontent,$bisopen) = printlist($item['items']);
+				if ($bisopen) {
+					$isopen = true;
+				}
+				if ($bisopen) {
+					$out .=  "<li class=lihdr><span class=hdr onClick=\"toggle({$item['id']})\"><span class=btn id=\"b{$item['id']}\">-</span> <img src=\"$imasroot/img/folder_tiny.png\"> ";
+					$out .=  "{$item['name']}</span>\n";
+					$out .=  '<ul class="show nomark" id="'.$item['id'].'">';
+				} else {
+					$out .=  "<li class=lihdr><span class=hdr onClick=\"toggle({$item['id']})\"><span class=btn id=\"b{$item['id']}\">+</span> <img src=\"$imasroot/img/folder_tiny.png\"> ";
+					$out .=  "{$item['name']}</span>\n";
+					$out .=  '<ul class="hide nomark" id="'.$item['id'].'">';
+				}
+				$out .= $subcontent;
+				$out .=  '</ul></li>';
 			}
-			if ($bisopen) {
-				$out .=  "<li class=lihdr><span class=hdr onClick=\"toggle({$item['id']})\"><span class=btn id=\"b{$item['id']}\">-</span> <img src=\"$imasroot/img/folder_tiny.png\"> ";
-				$out .=  "{$item['name']}</span>\n";
-				$out .=  '<ul class="show nomark" id="'.$item['id'].'">';
-			} else {
-				$out .=  "<li class=lihdr><span class=hdr onClick=\"toggle({$item['id']})\"><span class=btn id=\"b{$item['id']}\">+</span> <img src=\"$imasroot/img/folder_tiny.png\"> ";
-				$out .=  "{$item['name']}</span>\n";
-				$out .=  '<ul class="hide nomark" id="'.$item['id'].'">';
-			}
-			$out .= $subcontent;
-			$out .=  '</ul></li>';
 		} else {
 			$query = "SELECT itemtype,typeid FROM imas_items WHERE id='$item'";
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -217,74 +241,83 @@ function printlist($items) {
 			} else*/
 			if ($line['itemtype']=='Assessment') {
 				//TODO check availability, timelimit, etc.
+				//TODO: reqscoreaid, latepasses
 				 $query = "SELECT name,summary,startdate,enddate,reviewdate,deffeedback,reqscore,reqscoreaid,avail,allowlate,timelimit,displaymethod FROM imas_assessments WHERE id='$typeid'";
 				 $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				 $line = mysql_fetch_array($result, MYSQL_ASSOC);
-				 if ($openitem=='' && $foundfirstitem=='') {
-				 	 $foundfirstitem = '/assessment/showtest.php?cid='.$cid.'&amp;id='.$typeid; $isopen = true;
+				 if (isset($exceptions[$item])) {
+					$line['startdate'] = $exceptions[$item][0];
+					$line['enddate'] = $exceptions[$item][1];
 				 }
-				 if ($itemtype.$typeid===$openitem) {
-				 	 $foundopenitem = '/assessment/showtest.php?cid='.$cid.'&amp;id='.$typeid; $isopen = true;
-				 }
-				 $out .= '<li>';
-				 if ($line['displaymethod']!='Embed') {
-				 	 $out .=  '<img src="'.$imasroot.'/img/assess_tiny.png"> ';
-				 } else {
-					 if (!isset($astatus[$typeid]) || $astatus[$typeid]==0) {
-						 $out .= '<img id="aimg'.$typeid.'" src="'.$imasroot.'/img/q_fullbox.gif" /> ';
-					 } else if ($astatus[$typeid]==1) {
-						 $out .= '<img id="aimg'.$typeid.'" src="'.$imasroot.'/img/q_halfbox.gif" /> ';
-					 } else {
-						 $out .= '<img id="aimg'.$typeid.'" src="'.$imasroot.'/img/q_emptybox.gif" /> ';
+				 if ($viewall || ($line['avail']==1 && ($line['startdate']<$now || $line['reviewdate']<$now) && $line['enddate']>$now)) {
+					 if ($openitem=='' && $foundfirstitem=='') {
+						 $foundfirstitem = '/assessment/showtest.php?cid='.$cid.'&amp;id='.$typeid; $isopen = true;
 					 }
+					 if ($itemtype.$typeid===$openitem) {
+						 $foundopenitem = '/assessment/showtest.php?cid='.$cid.'&amp;id='.$typeid; $isopen = true;
+					 }
+					 $out .= '<li>';
+					 if ($line['displaymethod']!='Embed') {
+						 $out .=  '<img src="'.$imasroot.'/img/assess_tiny.png"> ';
+					 } else {
+						 if (!isset($astatus[$typeid]) || $astatus[$typeid]==0) {
+							 $out .= '<img id="aimg'.$typeid.'" src="'.$imasroot.'/img/q_fullbox.gif" /> ';
+						 } else if ($astatus[$typeid]==1) {
+							 $out .= '<img id="aimg'.$typeid.'" src="'.$imasroot.'/img/q_halfbox.gif" /> ';
+						 } else {
+							 $out .= '<img id="aimg'.$typeid.'" src="'.$imasroot.'/img/q_emptybox.gif" /> ';
+						 }
+					 }
+					 if (isset($studentinfo['timelimitmult'])) {
+						 $line['timelimit'] *= $studentinfo['timelimitmult'];
+					 }
+					 $line['timelimit'] = abs($line['timelimit']);
+					 if ($line['timelimit']>0) {
+						   if ($line['timelimit']>3600) {
+							$tlhrs = floor($line['timelimit']/3600);
+							$tlrem = $line['timelimit'] % 3600;
+							$tlmin = floor($tlrem/60);
+							$tlsec = $tlrem % 60;
+							$tlwrds = "$tlhrs " . _('hour');
+							if ($tlhrs > 1) { $tlwrds .= "s";}
+							if ($tlmin > 0) { $tlwrds .= ", $tlmin " . _('minute');}
+							if ($tlmin > 1) { $tlwrds .= "s";}
+							if ($tlsec > 0) { $tlwrds .= ", $tlsec " . _('second');}
+							if ($tlsec > 1) { $tlwrds .= "s";}
+						} else if ($line['timelimit']>60) {
+							$tlmin = floor($line['timelimit']/60);
+							$tlsec = $line['timelimit'] % 60;
+							$tlwrds = "$tlmin " . _('minute');
+							if ($tlmin > 1) { $tlwrds .= "s";}
+							if ($tlsec > 0) { $tlwrds .= ", $tlsec " . _('second');}
+							if ($tlsec > 1) { $tlwrds .= "s";}
+						} else {
+							$tlwrds = $line['timelimit'] . _(' second(s)');
+						}
+					 } else {
+						   $tlwrds = '';
+					 }
+					 if ($tlwrds != '') {
+						 $onclick = 'onclick="return confirm(\''. sprintf(_('This assessment has a time limit of %s.  Click OK to start or continue working on the assessment.'), $tlwrds). '\')"';
+					 } else {
+						 $onclick = 'onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')"';
+					 }
+					 $out .= '<a href="'.$imasroot.'/assessment/showtest.php?cid='.$cid.'&amp;id='.$typeid.'" '.$onclick.' target="readerframe">'.$line['name'].'</a></li>';
 				 }
-				 if (isset($studentinfo['timelimitmult'])) {
-				 	 $line['timelimit'] *= $studentinfo['timelimitmult'];
-				 }
-				 $line['timelimit'] = abs($line['timelimit']);
-				 if ($line['timelimit']>0) {
-					   if ($line['timelimit']>3600) {
-						$tlhrs = floor($line['timelimit']/3600);
-						$tlrem = $line['timelimit'] % 3600;
-						$tlmin = floor($tlrem/60);
-						$tlsec = $tlrem % 60;
-						$tlwrds = "$tlhrs " . _('hour');
-						if ($tlhrs > 1) { $tlwrds .= "s";}
-						if ($tlmin > 0) { $tlwrds .= ", $tlmin " . _('minute');}
-						if ($tlmin > 1) { $tlwrds .= "s";}
-						if ($tlsec > 0) { $tlwrds .= ", $tlsec " . _('second');}
-						if ($tlsec > 1) { $tlwrds .= "s";}
-					} else if ($line['timelimit']>60) {
-						$tlmin = floor($line['timelimit']/60);
-						$tlsec = $line['timelimit'] % 60;
-						$tlwrds = "$tlmin " . _('minute');
-						if ($tlmin > 1) { $tlwrds .= "s";}
-						if ($tlsec > 0) { $tlwrds .= ", $tlsec " . _('second');}
-						if ($tlsec > 1) { $tlwrds .= "s";}
-					} else {
-						$tlwrds = $line['timelimit'] . _(' second(s)');
-					}
-				 } else {
-					   $tlwrds = '';
-				 }
-				 if ($tlwrds != '') {
-				 	 $onclick = 'onclick="return confirm(\''. sprintf(_('This assessment has a time limit of %s.  Click OK to start or continue working on the assessment.'), $tlwrds). '\')"';
-				 } else {
-				 	 $onclick = 'onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')"';
-				 }
-				 $out .= '<a href="'.$imasroot.'/assessment/showtest.php?cid='.$cid.'&amp;id='.$typeid.'" '.$onclick.' target="readerframe">'.$line['name'].'</a></li>';
 			} else if ($line['itemtype']=='LinkedText') {
 				//TODO check availability, etc.
 				 $query = "SELECT title,summary,text,startdate,enddate,avail,target FROM imas_linkedtext WHERE id='$typeid'";
 				 $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				 $line = mysql_fetch_array($result, MYSQL_ASSOC);
-				 if ($openitem=='' && $foundfirstitem=='') {
-				 	 $foundfirstitem = '/course/showlinkedtext.php?cid='.$cid.'&amp;id='.$typeid; $isopen = true;
+				 if ($viewall || $line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
+					 if ($openitem=='' && $foundfirstitem=='') {
+						 $foundfirstitem = '/course/showlinkedtext.php?cid='.$cid.'&amp;id='.$typeid; $isopen = true;
+					 }
+					 if ($itemtype.$typeid===$openitem) {
+						 $foundopenitem = '/course/showlinkedtext.php?cid='.$cid.'&amp;id='.$typeid; $isopen = true;
+					 }
+					 $out .=  '<li><img src="'.$imasroot.'/img/html_tiny.png"> <a href="showlinkedtext.php?cid='.$cid.'&amp;id='.$typeid.'"  onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')"  target="readerframe">'.$line['title'].'</a></li>';
 				 }
-				 if ($itemtype.$typeid===$openitem) {
-				 	 $foundopenitem = '/course/showlinkedtext.php?cid='.$cid.'&amp;id='.$typeid; $isopen = true;
-				 }
-				 $out .=  '<li><img src="'.$imasroot.'/img/html_tiny.png"> <a href="showlinkedtext.php?cid='.$cid.'&amp;id='.$typeid.'"  onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')"  target="readerframe">'.$line['title'].'</a></li>';
 			} /*else if ($line['itemtype']=='Forum') {
 				//TODO check availability, etc.
 				 $query = "SELECT id,name,description,startdate,enddate,groupsetid,avail,postby,replyby FROM imas_forums WHERE id='$typeid'";
@@ -302,19 +335,53 @@ function printlist($items) {
 				 $query = "SELECT id,name,description,startdate,enddate,editbydate,avail,settings,groupsetid FROM imas_wikis WHERE id='$typeid'";
 				 $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				 $line = mysql_fetch_array($result, MYSQL_ASSOC);
-				 if ($openitem=='' && $foundfirstitem=='') {
-				 	 $foundfirstitem = '/wikis/viewwiki.php?cid='.$cid.'&amp;id='.$typeid.'&framed=true'; $isopen = true;
+				 if ($viewall || $line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
+					 if ($openitem=='' && $foundfirstitem=='') {
+						 $foundfirstitem = '/wikis/viewwiki.php?cid='.$cid.'&amp;id='.$typeid.'&framed=true'; $isopen = true;
+					 }
+					 if ($itemtype.$typeid===$openitem) {
+						 $foundopenitem = '/wikis/viewwiki.php?cid='.$cid.'&amp;id='.$typeid.'&framed=true'; $isopen = true;
+					 }
+					 $out .=  '<li><img src="'.$imasroot.'/img/wiki_tiny.png"> <a href="'.$imasroot.'/wikis/viewwiki.php?cid='.$cid.'&amp;id='.$typeid.'&framed=true"  onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')" target="readerframe">'.$line['name'].'</a></li>';
 				 }
-				 if ($itemtype.$typeid===$openitem) {
-				 	 $foundopenitem = '/wikis/viewwiki.php?cid='.$cid.'&amp;id='.$typeid.'&framed=true'; $isopen = true;
-				 }
-				 $out .=  '<li><img src="'.$imasroot.'/img/wiki_tiny.png"> <a href="'.$imasroot.'/wikis/viewwiki.php?cid='.$cid.'&amp;id='.$typeid.'&framed=true"  onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')" target="readerframe">'.$line['name'].'</a></li>';
 			} 
 			
 		}
 	}
 	return array($out,$isopen);
 }
+function upsendexceptions(&$items) {
+	   global $exceptions;
+	   $minsdate = 9999999999;
+	   $maxedate = 0;
+	   foreach ($items as $k=>$item) {
+		   if (is_array($item)) {
+			  $hasexc = upsendexceptions($items[$k]['items']);
+			  if ($hasexc!=FALSE) {
+				  if ($hasexc[0]<$items[$k]['startdate']) {
+					  $items[$k]['startdate'] = $hasexc[0];
+				  }
+				  if ($hasexc[1]>$items[$k]['enddate']) {
+					  $items[$k]['enddate'] = $hasexc[1];
+				  }
+				//return ($hasexc);
+				if ($hasexc[0]<$minsdate) { $minsdate = $hasexc[0];}
+				if ($hasexc[1]>$maxedate) { $maxedate = $hasexc[1];}
+			  }
+		   } else {
+			   if (isset($exceptions[$item])) {
+				  // return ($exceptions[$item]);
+				   if ($exceptions[$item][0]<$minsdate) { $minsdate = $exceptions[$item][0];}
+				   if ($exceptions[$item][1]>$maxedate) { $maxedate = $exceptions[$item][1];}
+			   }
+		   }
+	   }
+	   if ($minsdate<9999999999 || $maxedate>0) {
+		   return (array($minsdate,$maxedate));
+	   } else {
+		   return false;
+	   }
+   }
 ?>
 <div class="breadcrumb">
 	<span class="padright">

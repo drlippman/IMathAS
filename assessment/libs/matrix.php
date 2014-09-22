@@ -515,9 +515,28 @@ function matrixrandunreduce($m,$c) {
 		list($sr,$er) = diffrands(0,$n-1,2);
 		$m = matrixrowswap($m,$sr,$er);
 	}
+	$c = 0;
+	while (hasallzerorow($m) && $c<20) {
+		$r = diffrands(0,$n-1,3);
+		$m = matrixrowcombine3($m,$r[0],-2,$r[1],1,$r[2],3,$r[0]);
+		$c++;
+	}
 	return $m;
 }
 
+function hasallzerorow($m) {
+	$n = count($m);
+	$nc = count($m[0]);
+	for ($i=0;$i<$n;$i++) {
+		for ($j=0;$j<$nc;$j++) {
+			if ($m[$i][$j]!=0) {
+				continue 2;
+			}
+		}
+		return true;
+	}
+	return false;
+}
 //matrixinverse(m)
 //Finds the inverse of nxn matrices.
 function matrixinverse($m) {

@@ -708,7 +708,7 @@ function singlevalsyntaxcheck(str,format) {
 		  }
 	} else if (format.indexOf('fracordec')!=-1) {
 		  str = str.replace(/\s/g,'');
-		  if (!str.match(/^\s*\-?\(?\d+\s*\/\s*\-?\d+\)?\s*$/) && !str.match(/^\s*?\-?\d+\s*$/) && !str.match(/^(\d+|\d+\.\d*|\d*\.\d+)$/)) {
+		  if (!str.match(/^\-?\(?\d+\s*\/\s*\-?\d+\)?$/) && !str.match(/^?\-?\d+$/) && !str.match(/^\-?(\d+|\d+\.\d*|\d*\.\d+)$/)) {
 			return (_(" invalid entry format")+". ");  
 		  }
 	} else if (format.indexOf('mixednumber')!=-1) {

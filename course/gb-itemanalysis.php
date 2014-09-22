@@ -113,7 +113,7 @@
 	$totstucnt = mysql_result($result,0,0);
 	
 	$query = "SELECT ias.questions,ias.bestscores,ias.bestattempts,ias.bestlastanswers,ias.starttime,ias.endtime,ias.timeontask FROM imas_assessment_sessions AS ias,imas_students ";
-	$query .= "WHERE ias.userid=imas_students.userid AND imas_students.courseid='$cid' AND ias.assessmentid='$aid'";
+	$query .= "WHERE ias.userid=imas_students.userid AND imas_students.courseid='$cid' AND ias.assessmentid='$aid' AND imas_students.locked=0 ";
 	if ($secfilter!=-1) {
 		$query .= " AND imas_students.section='$secfilter' ";
 	}
