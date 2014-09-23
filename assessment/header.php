@@ -73,13 +73,13 @@ if (!isset($sessiondata['mathdisp'])) {
 	echo "<script type=\"text/javascript\">var usingASCIIMath = true; function rendermathnode(el) {AMprocessNode(el);}</script>";
 } else if ($sessiondata['mathdisp']==2) {
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>'; 
-	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?v=082014\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?v=092314\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIIMath = false;function rendermathnode(el) {AMprocessNode(el);}</script>";
 } else if ($sessiondata['mathdisp']==0) {
 	echo '<script type="text/javascript">var noMathRender = true; var usingASCIIMath = false; function rendermathnode(el) {}</script>';	
 } else if ($sessiondata['mathdisp']==3) {
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
-	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=020514\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=092314\" type=\"text/javascript\"></script>\n";
 	echo '<script type="text/x-mathjax-config">MathJax.Hub.Config({ 
 		"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", imageFont:null}
 		});
