@@ -94,8 +94,10 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				$body .= "or <a href=\"listusers.php?cid=$cid&newstu=new\">create and enroll a new student</a>";
 			} else {
 				$id = mysql_result($result,0,0);
-				if ($id==$userid) {
-					echo "Instructors can't enroll themselves as students.  Use Student View.";
+				$query = "SELECT id FROM imas_teachers WHERE userid='$id' AND courseid='$cid'";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				if (mysql_num_rows($result)>0) {
+					echo "Teachers can't be enrolled as students - use Student View, or create a separate student account.";
 					exit;
 				}
 				$query = "SELECT id FROM imas_tutors WHERE userid='$id' AND courseid='$cid'";
@@ -104,7 +106,12 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 					echo "Tutors can't be enrolled as students.";
 					exit;
 				}
-				
+				$query = "SELECT id FROM imas_students WHERE userid='$id' AND courseid='$cid'";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				if (mysql_num_rows($result)>0) {
+					echo "This username is already enrolled in the class.";
+					exit;
+				}
 				$query = "SELECT deflatepass FROM imas_courses WHERE id='$cid'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				$row = mysql_fetch_row($result);

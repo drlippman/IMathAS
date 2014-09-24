@@ -130,13 +130,13 @@ if (!(isset($teacherid)) && $myrights<100) {
 				} else {
 					if ($_POST['pwtype']==0) {
 						if (isset($CFG['GEN']['newpasswords'])) {
-							$pw = password_hash($arr[0], PASSWORD_DEFAULT);
+							$pw = password_hash(substr($arr[0],0,4), PASSWORD_DEFAULT);
 						} else {
 							$pw = md5(substr($arr[0],0,4));
 						}
 					} else if ($_POST['pwtype']==1) {
 						if (isset($CFG['GEN']['newpasswords'])) {
-							$pw = password_hash($arr[0], PASSWORD_DEFAULT);
+							$pw = password_hash(substr($arr[0],-4), PASSWORD_DEFAULT);
 						} else {
 							$pw = md5(substr($arr[0],-4));
 						}

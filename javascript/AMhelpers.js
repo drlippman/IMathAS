@@ -4,6 +4,7 @@
 //handles preview button for calculated type
 function calculate(inputId,outputId,format) {
   var fullstr = document.getElementById(inputId).value;
+  fullstr = fullstr.replace(/=/,'');
   if (format.indexOf('list')!=-1) {
 	  var strarr = fullstr.split(/,/);
   } else {
