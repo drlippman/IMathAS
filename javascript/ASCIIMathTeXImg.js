@@ -232,7 +232,8 @@ var AMsymbols = [
 {input:"csc",  tag:"mo", output:"csc", tex:null, ttype:UNARY, func:true},
 {input:"log",  tag:"mo", output:"log", tex:null, ttype:UNARY, func:true},
 {input:"ln",   tag:"mo", output:"ln",  tex:null, ttype:UNARY, func:true},
-{input:"abs",   tag:"mo", output:"abs",  tex:null, ttype:UNARY, notexcopy:true, rewriteleftright:["|","|"]}, 
+{input:"abs",   tag:"mo", output:"abs",  tex:null, ttype:UNARY, notexcopy:true, rewriteleftright:["|","|"]},
+{input:"norm",   tag:"mo", output:"norm",  tex:null, ttype:UNARY, notexcopy:true, rewriteleftright:["\\|","\\|"]},
 {input:"floor",   tag:"mo", output:"floor",  tex:null, ttype:UNARY, notexcopy:true, rewriteleftright:["\\lfloor","\\rfloor"]}, 
 {input:"ceil",   tag:"mo", output:"ceil",  tex:null, ttype:UNARY, notexcopy:true, rewriteleftright:["\\lceil","\\rceil"]}, 
 {input:"Sin",  tag:"mo", output:"sin", tex:null, ttype:UNARY, func:true},
@@ -455,14 +456,6 @@ function AMTremoveBrackets(node) {
     	    	    node = node.substr(0,node.length-14)+'}';
     	    } 
     }
-    /*st = node.substr(1,12);
-    if (st=="\\left\\lbrace" || st=="\\left\\langle") {
-    	    st = node.substr(node.length-8,7)
-    	    if (st=="\\rbrace" || st=="\\rangle") {
-    	    	    node = '{'+node.substr(13);
-    	    	    node = node.substr(0,node.length-14) + '}';
-    	    }
-    } */
   }
   return node;
 }
@@ -644,7 +637,7 @@ function AMTparseSexpr(str) { //parses str and returns [node,tailstr]
 }
 
 function AMTparseIexpr(str) {
-  var symbol, sym1, sym2, node, result, underover;
+  var symbol, sym1, sym2, node, result;
   str = AMremoveCharsAndBlanks(str,0);
   sym1 = AMgetSymbol(str);
   result = AMTparseSexpr(str);
@@ -662,7 +655,6 @@ function AMTparseIexpr(str) {
 //    if (symbol.input == "/") AMTremoveBrackets(node);
     if (symbol.input == "_") {
       sym2 = AMgetSymbol(str);
-      underover = (sym1.ttype == UNDEROVER);
       if (sym2.input == "^") {
         str = AMremoveCharsAndBlanks(str,sym2.input.length);
         var res2 = AMTparseSexpr(str);
@@ -686,7 +678,7 @@ function AMTparseIexpr(str) {
     		node = '{'+node+result[0]+'}';
     		str = result[1];
     	}
-    } 
+    }
   } 
   
   return [node,str];

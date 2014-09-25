@@ -140,7 +140,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$query .= "FROM imas_assessment_sessions WHERE assessmentid='$aid'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
-					$questions = explode(',',$line['questions']);
+					if (strpos($line['questions'],';')===false) {
+						$questions = explode(",",$line['questions']);
+						$bestquestions = $questions;
+					} else {
+						list($questions,$bestquestions) = explode(";",$line['questions']);
+						$questions = explode(",",$questions);
+						$bestquestions = explode(",",$bestquestions);
+					}
 					$qloc = array_search($clearid,$questions);
 					if ($qloc!==false) {
 						$attempts = explode(',',$line['attempts']);

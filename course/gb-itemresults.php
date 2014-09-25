@@ -51,7 +51,14 @@ $result = mysql_query($query) or die("Query failed : " . mysql_error());
 $sessioncnt = 0;
 $qdata = array();
 while ($row = mysql_fetch_row($result)) {
-	$questions = explode(',',$row[0]);
+	if (strpos($row[0],';')===false) {
+		$questions = explode(",",$row[0]);
+		$bestquestions = $questions;
+	} else {
+		list($questions,$bestquestions) = explode(";",$row[0]);
+		$questions = explode(",",$questions);
+		$bestquestions = explode(",",$bestquestions);
+	}
 	$scores = explode(',',$row[3]);
 	$seeds = explode(',',$row[1]);
 	$attempts = explode('~',$row[2]);

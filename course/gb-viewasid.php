@@ -571,7 +571,14 @@
 		
 		
 		
-		$questions = explode(",",$line['questions']);
+		if (strpos($line['questions'],';')===false) {
+			$questions = explode(",",$line['questions']);
+			$bestquestions = $questions;
+		} else {
+			list($questions,$bestquestions) = explode(";",$line['questions']);
+			$questions = explode(",",$questions);
+			$bestquestions = explode(",",$bestquestions);
+		}
 		if ($line['timeontask']=='') {
 			$timesontask = array_fill(0,count($questions),'');
 		} else {

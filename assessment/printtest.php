@@ -46,7 +46,14 @@
 	$query = "SELECT * FROM imas_assessment_sessions WHERE id='$testid'";
 	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
-	$questions = explode(",",$line['questions']);
+	if (strpos($line['questions'],';')===false) {
+		$questions = explode(",",$line['questions']);
+		$bestquestions = $questions;
+	} else {
+		list($questions,$bestquestions) = explode(";",$line['questions']);
+		$questions = explode(",",$questions);
+		$bestquestions = explode(",",$bestquestions);
+	}
 	if ($scoredtype=='last') {
 		$seeds = explode(",",$line['seeds']);
 		$sp = explode(';',$line['scores']);
