@@ -68,6 +68,7 @@
 		$rawscores = explode(',', $sp[1]);
 		$attempts = explode(",",$line['bestattempts']);
 		$lastanswers = explode("~",$line['bestlastanswers']);	
+		$questions = $bestquestions;
 	}
 	
 	$timesontask = explode("~",$line['timeontask']);

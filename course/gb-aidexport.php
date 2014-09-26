@@ -190,8 +190,7 @@ if (isset($_POST['options'])) {
 			$bestquestions = $questions;
 		} else {
 			list($questions,$bestquestions) = explode(";",$line['questions']);
-			$questions = explode(",",$questions);
-			$bestquestions = explode(",",$bestquestions);
+			$questions = explode(",",$bestquestions);
 		}
 		$sp = explode(';', $line['bestscores']);
 		$scores = explode(',',$sp[0]);

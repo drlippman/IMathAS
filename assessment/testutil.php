@@ -467,7 +467,7 @@ function printscore2($sc) {
 //qn: question index in questions array
 //qi: getquestioninfo[qid]
 function scorequestion($qn, $rectime=true) { 
-	global $questions,$scores,$seeds,$testsettings,$qi,$attempts,$lastanswers,$isreview,$bestseeds,$bestscores,$bestattempts,$bestlastanswers, $reattempting, $rawscores, $bestrawscores, $firstrawscores;
+	global $questions,$scores,$seeds,$testsettings,$qi,$attempts,$lastanswers,$isreview,$bestquestions,$bestseeds,$bestscores,$bestattempts,$bestlastanswers, $reattempting, $rawscores, $bestrawscores, $firstrawscores;
 	global $regenonreattempt;
 	//list($qsetid,$cat) = getqsetid($questions[$qn]);
 	$lastrawscore = $rawscores[$qn];
@@ -530,6 +530,7 @@ function scorequestion($qn, $rectime=true) {
 		$bestattempts[$qn] = $attempts[$qn];
 		deletefilesifnotused($bestlastanswers[$qn],$lastanswers[$qn]);
 		$bestlastanswers[$qn] = $lastanswers[$qn];
+		$bestquestions[$qn] = $questions[$qn];
 	}
 	
 	return $rawscore;
@@ -538,7 +539,7 @@ function scorequestion($qn, $rectime=true) {
 //records everything but questions array
 //if limit=true, only records lastanswers
 function recordtestdata($limit=false) { 
-	global $isreview,$questions,$bestscores,$bestattempts,$bestseeds,$bestlastanswers,$scores,$attempts,$seeds,$lastanswers,$testid,$testsettings,$sessiondata,$reattempting,$timesontask,$lti_sourcedid,$qi,$noraw,$rawscores,$bestrawscores,$firstrawscores;
+	global $isreview,$questions,$bestquestions,$bestscores,$bestattempts,$bestseeds,$bestlastanswers,$scores,$attempts,$seeds,$lastanswers,$testid,$testsettings,$sessiondata,$reattempting,$timesontask,$lti_sourcedid,$qi,$noraw,$rawscores,$bestrawscores,$firstrawscores;
 	
 	if ($noraw) {
 		$bestscorelist = implode(',',$bestscores);
@@ -565,6 +566,10 @@ function recordtestdata($limit=false) {
 	
 	$reattemptinglist = implode(',',$reattempting);
 	$questionlist = implode(',', $questions);
+	$bestquestionlist = implode(',', $bestquestions);
+	if ($questionlist!=$bestquestionlist) {
+		$questionlist .= ';'.$bestquestionlist;
+	}
 	
 	$now = time();
 	if ($isreview) {

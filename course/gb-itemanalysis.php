@@ -121,11 +121,9 @@
 	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 		if (strpos($line['questions'],';')===false) {
 			$questions = explode(",",$line['questions']);
-			$bestquestions = $questions;
 		} else {
 			list($questions,$bestquestions) = explode(";",$line['questions']);
-			$questions = explode(",",$questions);
-			$bestquestions = explode(",",$bestquestions);
+			$questions = explode(",",$bestquestions);
 		}
 		$sp = explode(';', $line['bestscores']);
 		$scores = explode(',', $sp[0]);

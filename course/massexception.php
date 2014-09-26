@@ -37,11 +37,9 @@
 						$row = mysql_fetch_row($result);
 						if (strpos($row[1],';')===false) {
 							$questions = explode(",",$row[1]);
-							$bestquestions = $questions;
 						} else {
 							list($questions,$bestquestions) = explode(";",$row[1]);
 							$questions = explode(",",$questions);
-							$bestquestions = explode(",",$bestquestions);
 						}
 						$lastanswers = explode('~',$row[2]);
 						$curscorelist = $row[3];
