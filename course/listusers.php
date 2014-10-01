@@ -156,8 +156,13 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				$newuserid = mysql_insert_id();
 				//$query = "INSERT INTO imas_students (userid,courseid) VALUES ($newuserid,'$cid')";
-				$vals = "$newuserid,'$cid'";
-				$query = "INSERT INTO imas_students (userid,courseid";
+				$query = "SELECT deflatepass FROM imas_courses WHERE id='$cid'";
+				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$row = mysql_fetch_row($result);
+				$deflatepass = $row[0];
+				
+				$vals = "$newuserid,'$cid','$deflatepass'";
+				$query = "INSERT INTO imas_students (userid,courseid,latepass";
 				if (trim($_POST['section'])!='') {
 					$query .= ",section";
 					$vals .= ",'".$_POST['section']."'";
