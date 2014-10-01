@@ -654,6 +654,11 @@ if ($overwriteBody==1) {
 	
 	<div class=breadcrumb><?php echo $curBreadcrumb  ?></div>
 	<?php echo $formTitle ?>
+	<?php
+	if (isset($_GET['id'])) {
+		echo '<div class="cp"><a href="addquestions.php?aid='.$_GET['id'].'&amp;cid='.$cid.'" onclick="return confirm(\''._('This will discard any changes you have made on this page').'\');">'._('Add/Remove Questions').'</a></div>';	
+	}
+	?>
 	<?php echo $page_isTakenMsg ?>
 	
 	<form method=post action="<?php echo $page_formActionTag ?>">
