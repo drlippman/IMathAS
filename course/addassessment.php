@@ -162,11 +162,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$_POST['defpenalty'] = 'S'.$_POST['skippenalty'].$_POST['defpenalty'];
 		}
 		if ($_POST['copyfrom']!=0) {
-			$query = "SELECT timelimit,minscore,displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,showcat,intro,startdate,enddate,reviewdate,isgroup,groupmax,groupsetid,showhints,reqscore,reqscoreaid,noprint,allowlate,eqnhelper,endmsg,caltag,calrtag,deffeedbacktext,showtips,exceptionpenalty,ltisecret,msgtoinstr,posttoforum,istutorial,defoutcome FROM imas_assessments WHERE id='{$_POST['copyfrom']}'";
+			$query = "SELECT timelimit,minscore,displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,showcat,intro,summary,startdate,enddate,reviewdate,isgroup,groupmax,groupsetid,showhints,reqscore,reqscoreaid,noprint,allowlate,eqnhelper,endmsg,caltag,calrtag,deffeedbacktext,showtips,exceptionpenalty,ltisecret,msgtoinstr,posttoforum,istutorial,defoutcome FROM imas_assessments WHERE id='{$_POST['copyfrom']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			list($timelimit,$_POST['minscore'],$_POST['displaymethod'],$_POST['defpoints'],$_POST['defattempts'],$_POST['defpenalty'],$deffeedback,$shuffle,$_POST['gbcat'],$_POST['assmpassword'],$_POST['cntingb'],$tutoredit,$_POST['showqcat'],$cpintro,$cpstartdate,$cpenddate,$cpreviewdate,$isgroup,$_POST['groupmax'],$_POST['groupsetid'],$showhints,$_POST['reqscore'],$_POST['reqscoreaid'],$_POST['noprint'],$_POST['allowlate'],$_POST['eqnhelper'],$endmsg,$_POST['caltagact'],$_POST['caltagrev'],$deffb,$_POST['showtips'],$_POST['exceptionpenalty'],$_POST['ltisecret'],$_POST['msgtoinstr'],$_POST['posttoforum'],$istutorial,$_POST['defoutcome']) = addslashes_deep(mysql_fetch_row($result));
+			list($timelimit,$_POST['minscore'],$_POST['displaymethod'],$_POST['defpoints'],$_POST['defattempts'],$_POST['defpenalty'],$deffeedback,$shuffle,$_POST['gbcat'],$_POST['assmpassword'],$_POST['cntingb'],$tutoredit,$_POST['showqcat'],$cpintro,$cpsummary,$cpstartdate,$cpenddate,$cpreviewdate,$isgroup,$_POST['groupmax'],$_POST['groupsetid'],$showhints,$_POST['reqscore'],$_POST['reqscoreaid'],$_POST['noprint'],$_POST['allowlate'],$_POST['eqnhelper'],$endmsg,$_POST['caltagact'],$_POST['caltagrev'],$deffb,$_POST['showtips'],$_POST['exceptionpenalty'],$_POST['ltisecret'],$_POST['msgtoinstr'],$_POST['posttoforum'],$istutorial,$_POST['defoutcome']) = addslashes_deep(mysql_fetch_row($result));
 			if (isset($_POST['copyinstr'])) {
 				$_POST['intro'] = $cpintro;
+			}
+			if (isset($_POST['copysummary'])) {
+				$_POST['summary'] = $cpsummary;
 			}
 			if (isset($_POST['copydates'])) {
 				$startdate = $cpstartdate;
@@ -731,6 +734,7 @@ if ($overwriteBody==1) {
 		<div id="copyfromoptions" class="hidden">
 		<span class=form>Also copy:</span>
 		<span class=formright>
+			<input type=checkbox name="copysummary" /> Summary<br/>
 			<input type=checkbox name="copyinstr" /> Instructions<br/>
 			<input type=checkbox name="copydates" /> Dates <br/>
 			<input type=checkbox name="copyendmsg" /> End of Assessment Messages
