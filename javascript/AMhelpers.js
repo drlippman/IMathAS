@@ -5,6 +5,7 @@
 function calculate(inputId,outputId,format) {
   var fullstr = document.getElementById(inputId).value;
   fullstr = fullstr.replace(/=/,'');
+  fullstr = fullstr.replace(/(\d)\s*,(?=\s*\d{3}\b)/g,"$1");
   if (format.indexOf('list')!=-1) {
 	  var strarr = fullstr.split(/,/);
   } else {
@@ -13,7 +14,7 @@ function calculate(inputId,outputId,format) {
   }
   for (var sc=0;sc<strarr.length;sc++) {
 	  str = strarr[sc];
-	  str = str.replace(/(\d)\s*,(?=\s*\d{3}\b)/g,"$1");
+	  //str = str.replace(/(\d)\s*,(?=\s*\d{3}\b)/g,"$1");
 	  var err = "";
 	  if (str.match(/DNE/i)) {
 		  str = str.toUpperCase();
@@ -21,6 +22,10 @@ function calculate(inputId,outputId,format) {
 		  str = "`"+str+"`";
 	  } else {
 		  err += singlevalsyntaxcheck(str,format);
+		  if (str.match(/,/)) {
+		  	  err += _("Invalid use of a comma - it will be ignored and this expression may not evaluate as intended.");
+		  	  str = str.replace(/,/g,'');
+		  }
 		  if (format.indexOf('mixednumber')!=-1) {
 		  	  str = str.replace(/_/,' ');
 		  } else {
