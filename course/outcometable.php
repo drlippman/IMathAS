@@ -504,11 +504,9 @@ function outcometable() {
 		
 		if (strpos($l['questions'],';')===false) {
 			$questions = explode(",",$l['questions']);
-			$bestquestions = $questions;
 		} else {
 			list($questions,$bestquestions) = explode(";",$l['questions']);
-			$questions = explode(",",$questions);
-			$bestquestions = explode(",",$bestquestions);
+			$questions = explode(",",$bestquestions);
 		}
 		$sp = explode(';',$l['bestscores']);
 		$scores = explode(",",$sp[0]);

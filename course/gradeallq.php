@@ -360,6 +360,7 @@
 		if ($ver=='graded') {
 			$seeds = explode(",",$line['bestseeds']);
 			$la = explode("~",$line['bestlastanswers']);
+			$questions = $bestquestions;
 		} else if ($ver=='last') {
 			$seeds = explode(",",$line['seeds']);
 			$la = explode("~",$line['lastanswers']);

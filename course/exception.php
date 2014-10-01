@@ -94,7 +94,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				} else {
 					list($questions,$bestquestions) = explode(";",$row[1]);
 					$questions = explode(",",$questions);
-					$bestquestions = explode(",",$bestquestions);
 				}
 				$lastanswers = explode('~',$row[2]);
 				$curscorelist = $row[3];
