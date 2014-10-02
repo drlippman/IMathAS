@@ -4,6 +4,7 @@
 //handles preview button for calculated type
 function calculate(inputId,outputId,format) {
   var fullstr = document.getElementById(inputId).value;
+  fullstr = fullstr.replace(/\u2013|\u2014|\u2015/g, "-");
   fullstr = fullstr.replace(/=/,'');
   fullstr = fullstr.replace(/(\d)\s*,(?=\s*\d{3}\b)/g,"$1");
   if (format.indexOf('list')!=-1) {
@@ -105,7 +106,7 @@ function ineqtointerval(strw) {
 //preview for calcinterval type 
 function intcalculate(inputId,outputId,format) {
   var fullstr = document.getElementById(inputId).value;
-  
+  fullstr = fullstr.replace(/\u2013|\u2014|\u2015/g, "-");
   if (fullstr.match(/DNE/i)) {
 	  fullstr = fullstr.toUpperCase();
   } else if (fullstr.replace(/\s+/g,'')=='') {
@@ -252,6 +253,7 @@ function intcalculate(inputId,outputId,format) {
 //preview for calcntuple
 function ntuplecalc(inputId,outputId,format) {
 	var fullstr = document.getElementById(inputId).value;
+	fullstr = fullstr.replace(/\u2013|\u2014|\u2015/g, "-");
 	fullstr = fullstr.replace(/\s+/g,'');
 	if (fullstr.match(/DNE/i)) {
 		fullstr = fullstr.toUpperCase();
@@ -582,6 +584,7 @@ function AMpreview(inputId,outputId) {
   
   var str = document.getElementById(inputId).value;
   str = str.replace(/,/g,"");
+  str = str.replace(/\u2013|\u2014|\u2015/g, "-");
    var dispstr = str;
    
   for (var i=0; i<vars.length; i++) {
@@ -816,7 +819,7 @@ function doonsubmit(form,type2,skipconfirm) {
 		
 		fullstr = document.getElementById("tc"+qn).value;
 		fullstr = fullstr.replace(/\s+/g,'');
-		
+		fullstr = fullstr.replace(/\u2013|\u2014|\u2015/g, "-");
 		if (fullstr.match(/DNE/i)) {
 			  fullstr = fullstr.toUpperCase();
 		  } else {
@@ -874,6 +877,7 @@ function doonsubmit(form,type2,skipconfirm) {
 		qn = parseInt(qn);
 		
 		str = document.getElementById("tc"+qn).value;
+		str = str.replace(/\u2013|\u2014|\u2015/g, "-");
 		if (calcformat[qn].indexOf('list')!=-1) {
 			strarr = str.split(/,/);
 		} else {
@@ -932,6 +936,7 @@ function doonsubmit(form,type2,skipconfirm) {
 		qn = parseInt(qn);
 		str = document.getElementById("tc"+qn).value;
 		str = str.replace(/,/g,"");
+		str = str.replace(/\u2013|\u2014|\u2015/g, "-");
 		if (iseqn[qn]==1) {
 			str = str.replace(/(.*)=(.*)/,"$1-($2)");
 		}
