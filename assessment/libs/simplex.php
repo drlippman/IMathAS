@@ -3,13 +3,14 @@
 // Mike Jenck, Originally developed May 16-26, 2014
 // licensed under GPL version 2
 //
+// 2014-09-18 Added simplexsetentry and correct help file typos.
 // 2014-06-06 Updated, sorted, and fixed help file information
 // 2014-06-02 Bug fixes and added simplexreadtoanswerarray
 
 
 global $allowedmacros;
 array_push($allowedmacros, "simplex", "simplexcreateanswerboxentrytable", "simplexcreateinequalities",
-"simplexconverttodecimals", "simplexconverttofraction", "simplexdebug", "simplexdefaultheaders", "simplexdisplaytable", "simplexfindpivotpoint", "simplexgetentry", "simplexpivot", "simplexreadtoanswerarray", "simplexreadsolution", "simplexsolve" );
+"simplexconverttodecimals", "simplexconverttofraction", "simplexdebug", "simplexdefaultheaders", "simplexdisplaytable", "simplexfindpivotpoint", "simplexgetentry", "simplexsetentry", "simplexpivot", "simplexreadtoanswerarray", "simplexreadsolution", "simplexsolve" );
 
 
 include_once("fractions.php");  // fraction routine
@@ -335,6 +336,7 @@ function simplex($type,$objective,$constraints) {
 // Create a string that is a valid HTML table syntax for displaying answerboxes.
 // rows: number of rows to make
 // cols: number of columns to make
+// optional
 // startnumber: the starting number for the answerbox.  Default is 0 
 // matrixname: a string that holds the matrix name, like A or B.  This does not contain 
 //             tick marks - if you want them you need to supply them.
@@ -424,7 +426,7 @@ function simplexcreateanswerboxentrytable() {
 // Creates and returns an array of string that correspond to each line of the simple inequalities
 //
 // type:        a string that contains either "max" or "min"
-// $objectivevariable: the name of the objective function, like f of g.
+// objectivevariable: the name of the objective function, like f of g.
 // objective:   list or array of the coefficeients 
 // constraints: an array that contains the inequality information. Constraints are in the
 //              form of array(array(3,1,0),"<=",35)
@@ -657,7 +659,9 @@ function simplexcreateinequalities() {
 }
 
 
-//function simplexconverttodecimals(sm)
+//function simplexconverttodecimals(simplexmatrix)
+//
+// simplexmatrix: a valid simplex matrix.
 //
 // this function takes the simplex matrix and converts it to fractions for displaying
 //
@@ -672,7 +676,9 @@ function simplexconverttodecimals($sm){
   return $sm;
 }
 
-//function simplexconverttofraction(sm)
+//function simplexconverttofraction(simplexmatrix)
+//
+// simplexmatrix: a valid simplex matrix.
 //
 // this function takes the simplex matrix and converts it to fractions for displaying
 //
@@ -687,8 +693,11 @@ function simplexconverttofraction($sm){
   return $sm;
 }
 
-//function simplexdebug(sm)
-// a raw dump of the contents of the simplex matrix
+//function simplexdebug(simplexmatrix)
+//
+// simplexmatrix: a valid simplex matrix.
+//
+// a raw echo dump of the contents of the simplex matrix
 //
 // Not intended to be used in question.  This is to allow the question writer the ability to see what the 
 // raw values are for each field.  all values should have a "|" between them, in the form of
@@ -709,7 +718,11 @@ function simplexdebug($sm){
   }
 }
 
-// function simplexdefaultheaders(sm,type)
+// function simplexdefaultheaders(simplexmatrix,type)
+//
+// simplexmatrix: a valid simplex matrix.
+// type: a string that contains either "max" or "min" 
+//
 // creates the default header (x1,x2, ...,s1,s2,...) for max and
 //   (x1,x2, ...,y1,y2,...) for min.
 //
@@ -755,28 +768,30 @@ function simplexdefaultheaders($sm, $type){
 
 //simplexdisplaytable(simplexmatrix, [simplexmatrixname, displayASCIIticks, linemode, showentriesfractions=1, $pivot = array(-1,-1 ["blue","black"]), $header = array(), $tablestyle = ""]) 
 // Create a string that is a valid HTML table syntax for display.
-//$m = simplex matrix
-//$matrixname: a string that holds the matrix name, like A or B.  You should leave balnk if you
+// simplexmatrix: a valid simplex matrix.
+//
+// optional
+// simplexmatrixname: a string that holds the matrix name, like A or B.  You should leave balnk if you
 //             are creating a simoplex display
-// $displayASCII: either 0 or 1
+// displayASCII: either 0 or 1
 //                0 do not use math ticks
 //        default 1        use math ticks
-// $mode: either 0, 1 or 2
+// mode: either 0, 1 or 2
 //        0 show no lines
 //        1 show aumented line
 //        2 show simplex  lines
-// $showfractions: either -1, 0 or 1
+// showfractions: either -1, 0 or 1
 //                -1 show as string 
 //                 0 convert simplex element to a decimal
 //         default 1 convert simplex element to a fraction
-// $pivot: list or array that contains the row, column, border color, and text color.  This puts a  
+// pivot: list or array that contains the row, column, border color, and text color.  This puts a  
 //         border around the cell at (row,col). Both row and column are ZERO based.
 //    default point none
 //    default border color = blue
 //    default text  color  = black
-// $headers: list or array of the variables "x1,x2,x3" that are used for the column titles.
+// headers: list or array of the variables "x1,x2,x3" that are used for the column titles.
 //   default none
-// $tablestyle: for any additional styles for the table that you may want.  like "color:#40B3DF;"
+// tablestyle: for any additional styles for the table that you may want.  like "color:#40B3DF;"
 //      default none
 function simplexdisplaytable() {
     
@@ -1012,8 +1027,9 @@ define("PivotPointFoundList", 0);
 define("PivotPointNone", 1);
 define("PivotPointFoundMultipleSolutionList", 2);
 
-//simplexfindpivotpoint($sm)
-// $sm a simplex matrix
+//simplexfindpivotpoint(simplexmatrix)
+//
+// simplexmatrix: a valid simplex matrix.
 //
 // returns array(condition, pivotpoints )
 // where 
@@ -1235,8 +1251,13 @@ function simplexfindpivotpoint($sm) {
 }
 
 //simplexgetentry(simplexmatrix,row,col)
-//get entry from a simplex matrix at given row and col
-//rows and cols are 0 indexed (first row is row 0)
+//
+// simplexmatrix: a valid simplex matrix.
+// row: row number (zero based - first row is row 0)
+// col: column number (zero based - first row is row 0)
+//
+// get entry from a simplex matrix at given row and col
+//
 function simplexgetentry($sm,$r,$c) {
   if ($r<0 || $r>=count($sm)) {
     echo "$r is an invalid row.<br/>\r\n";
@@ -1250,25 +1271,60 @@ function simplexgetentry($sm,$r,$c) {
   return fractionreduce($sm[$r][$c]);
 }
 
-// simplexpivot($sm,$pivotpoint)
-// pivots the simplex matrix on the given point
-// $sm:         simplex matrix
-// $pivotpoint: list or array that contains the point to be pivoted on. 
+//simplexsetentry(simplexmatrix,row,col,numerator,denominator)
+//
+// simplexmatrix: a valid simplex matrix.
+// row: row number (zero based - first row is row 0)
+// col: column number (zero based - first row is row 0)
+//
+// set entry for the simplex matrix at the given row and col with the given numerator and denominator.
+//
+function simplexsetentry($sm,$r,$c,$n,$d) {
+  if ($r<0 || $r>=count($sm)) {
+    echo "$r is an invalid row.<br/>\r\n";
+    return 0;
+  } 
+  
+  if ($c<0 || $c>=count($sm[0])) {
+    echo "$c is an invalid column.<br/>\r\n";
+	return 0;
+  }
+  if ($d==0) {
+    echo "$d is an invalid denominator.<br/>\r\n";
+	return 0;
+  }
+  if ($d<0) {
+    // make denominator positive
+    $d*=-1;
+    $n*=-1;
+  }
+  $sm[$r][$c][0] = $n;
+  $sm[$r][$c][1] = $d;
+  return 1;
+}
+
+// simplexpivot(simplexmatrix,pivotpoint)
+//
+// simplexmatrix: a valid simplex matrix.
+// pivotpoint:  list or array that contains the point to be pivoted on. 
 //              Both row and column are ZERO based.
 //              this ALWAYS picks $pivotpoint[0] as the pivot point
-// returns  a pivoted simplex matrix
-function simplexpivot($sma,$pivotpoint) {
+//
+// this function pivots the simplex matrix on the given point
+//
+// returns:  the pivoted simplex matrix
+function simplexpivot($sm,$pivotpoint) {
     
   if (!is_array($pivotpoint)) { $pivotpoint=explode(',',$pivotpoint); }
   $Pivotrow = $pivotpoint[0];
   $Pivotcol = $pivotpoint[1];
   
-  $PivotValue = $sma[$Pivotrow][$Pivotcol];
+  $PivotValue = $sm[$Pivotrow][$Pivotcol];
   
   // change pivot point to a one
-  for ($j=0; $j<count($sma[$Pivotrow]); $j++) {
-  	$top = $sma[$Pivotrow][$j][0]*$PivotValue[1];
-  	$bot = $sma[$Pivotrow][$j][1]*$PivotValue[0];
+  for ($j=0; $j<count($sm[$Pivotrow]); $j++) {
+  	$top = $sm[$Pivotrow][$j][0]*$PivotValue[1];
+  	$bot = $sm[$Pivotrow][$j][1]*$PivotValue[0];
   	if($bot < 0) {
 		$top*=-1;
 		$bot*=-1;  // must be positive
@@ -1276,21 +1332,21 @@ function simplexpivot($sma,$pivotpoint) {
   	$gcf = gcd($top,$bot);
   	$top /= $gcf;
   	$bot /= $gcf;
-    $sma[$Pivotrow][$j]= array($top,$bot);  // divide by $PivotValue    
+    $sm[$Pivotrow][$j]= array($top,$bot);  // divide by $PivotValue    
   }
   
   // now zero out all other values in that row
-  for ($r=0; $r<count($sma); $r++) {
+  for ($r=0; $r<count($sm); $r++) {
     if($r!=$Pivotrow) {
-      $PivotValue = array(-$sma[$r][$Pivotcol][0],$sma[$r][$Pivotcol][1]);
-      for ($c=0; $c<count($sma[$r]); $c++) {
+      $PivotValue = array(-$sm[$r][$Pivotcol][0],$sm[$r][$Pivotcol][1]);
+      for ($c=0; $c<count($sm[$r]); $c++) {
        	    // multiplication
-      	    $top = $PivotValue[0]*$sma[$Pivotrow][$c][0];
-  	    $bot = $PivotValue[1]*$sma[$Pivotrow][$c][1];
+      	    $top = $PivotValue[0]*$sm[$Pivotrow][$c][0];
+  	    $bot = $PivotValue[1]*$sm[$Pivotrow][$c][1];
   	        
   	    // addition
-  	    $top = $top*$sma[$r][$c][1] + $sma[$r][$c][0]*$bot;
-  	    $bot = $bot*$sma[$r][$c][1];
+  	    $top = $top*$sm[$r][$c][1] + $sm[$r][$c][0]*$bot;
+  	    $bot = $bot*$sm[$r][$c][1];
       	    if($bot < 0) {
     		    $top*=-1;
 		        $bot*=-1;  // must be positive
@@ -1298,7 +1354,7 @@ function simplexpivot($sma,$pivotpoint) {
       	    $gcf = gcd($top,$bot);
       	    $top /= $gcf;
             $bot /= $gcf;
-            $sma[$r][$c]= array($top,$bot);
+            $sm[$r][$c]= array($top,$bot);
       }
     }
   } 
@@ -1306,11 +1362,16 @@ function simplexpivot($sma,$pivotpoint) {
   return $sma;
 }
 
-//function simplexreadtoanswerarray(sm, [startnumber, answer]) 
-// Create an array of values read by rows for the simplex matrix starting at startnumber
-// sm:          simplex martix to read
+//function simplexreadtoanswerarray(simplexmatrix, [startnumber, answer]) 
+//
+// simplexmatrix: a valid simplex matrix.
+//
+// optional 
 // startnumber: starting number of the array.  Default is 0 
 // answer: pass $answer if extending an existing $answer array
+//
+// Create an array of values read by rows for the simplex matrix starting at startnumber
+//
 function simplexreadtoanswerarray($sm, $startnumber=0, $ans=array()) {
   
   $rows = count($sm);
@@ -1326,7 +1387,14 @@ function simplexreadtoanswerarray($sm, $startnumber=0, $ans=array()) {
   return $ans;
 }
 
-//simplexreadsolution($sm,$type,$showfractions=1)
+//simplexreadsolution(simplexmatrix,type,showfractions)
+//
+// simplexmatrix: a valid simplex matrix.
+//  type: a string that contains either "max" or "min" 
+//  showfractions: either 0 or 1
+//                0 shows decimals
+//        default 1 shows fractions 
+//
 // This reads the simplex matrix to find the current solution to the optimization problem.  It returns
 // an array that contains the solution.
 //
@@ -1345,14 +1413,8 @@ function simplexreadtoanswerarray($sm, $startnumber=0, $ans=array()) {
 // where g contains the minimium value
 // IsOptimized contains either a Yes or a No (objective has been reached)
 //
-//
-// $sm:           a simplex matrix
-// type:          a string that contains either "max" or "min"
-// showfractions: either 0 or 1
-//                0 shows decimals
-//        default 1 shows fractions
 function simplexreadsolution($sm,$type,$showfractions=1) {
-    // as the end user will be supplinfg this it will be in fraction form
+    // as the end user will be suppling this it will be in fraction form
     // convert to an array()	
     $sma = simplextoarray($sm);
     return simplexreadsolutionarray($sma,$type,$showfractions);
@@ -1476,14 +1538,16 @@ function simplexreadsolutionarray($sma,$type,$showfractions=1) {
     return $solution;
 }
 
-//simplexsolve($sm,$type)
+//simplexsolve(simplexmatrix,type)
+//
+// simplexmatrix: a valid simplex matrix.
+//  type: a string that contains either "max" or "min" 
+//
 // this method solves the standard maximization problem which has the following conditions
 // 1) The objective function is to be maximized.
 // 2) All variables are nonnegative.
 // 3) The constraints are of the form: a1x1+ a2x2+ ... + anxn <= b  where b >0
 //
-// $sm:   a simplex matrix
-// $type: max or min (used to read the solution)
 // returns array(solutionlist, smlist, pivotlist)
 // 
 // solutionlist: an array of solutions (in the case of multiple solutions).   In the form of
@@ -1505,8 +1569,9 @@ function simplexreadsolutionarray($sma,$type,$showfractions=1) {
 //            pivotlist[2][0] = the pivot used for the third pivot
 //            etc.
 function simplexsolve($sm,$type,$showfractions=1) {
-	$starttime = microtime(true);
-	 // process arguments -----------------------------------------------
+    $starttime = microtime(true);  //  for function timing
+
+    // process arguments -----------------------------------------------
     $type = verifytype("simplexsolve",$type,"max");
     if(is_null($type)) return null;   
     
@@ -1578,7 +1643,7 @@ function simplexsolve($sm,$type,$showfractions=1) {
             $loopcount++;   // add one to the counter
         } while ($loopcount < $loopmax);
     }  
-    //echo (microtime(true)-$starttime);
+    //echo (microtime(true)-$starttime); //  for function timing
     return array($solutionlist, $smlist, $pivotlist);
 }
 
