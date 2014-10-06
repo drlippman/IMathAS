@@ -1090,6 +1090,7 @@ function diffrrands($min,$max,$p,$n, $nonzero=false) {
 	if (($q = strpos((string) $min,'.'))!==false) { $rn = max($rn, strlen((string) $min) - $q - 1); }
 	
 	$maxi = ($max-$min)/$p;
+
 	if ($n<.1*$maxi) {
 		$out = array();
 		
@@ -1106,7 +1107,7 @@ function diffrrands($min,$max,$p,$n, $nonzero=false) {
 			$r = array_merge($r,$r);
 		}
 		if ($nonzero) {
-			if ($min < 0 && $max > 0) {
+			if ($min <= 0 && $max >= 0) {
 				array_splice($r,-1*$min/$p,1);
 			}
 		}
@@ -1139,7 +1140,7 @@ function nonzerodiffrands($min,$max,$n) {
 		return $out;
 	} else {
 		$r = range($min,$max);
-		if ($min < 0 && $max > 0) {
+		if ($min <= 0 && $max >= 0) {
 			array_splice($r,-1*$min,1);
 		}
 		shuffle($r);
