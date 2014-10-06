@@ -162,7 +162,7 @@ function addGeogebraJava($url,$width=400,$height=200,$commands=array(),$params=a
 	$params['ggbOnInitParam'] = $GLOBALS['geogebracount'];
 	$out = ' <applet code="geogebra.GeoGebraApplet" ';
 	$out .= 'id="geogebra'.$GLOBALS['geogebracount'].'" name="geogebra'.$GLOBALS['geogebracount'].'" ';
-	$out .= 'codebase="http://jars.geogebra.org/webstart/4.2/" ';
+	$out .= 'codebase="http://jars.geogebra.org/webstart/4.4/" ';
 	$out .= "archive=\"geogebra.jar\" ";
 	$out .= 'width="'.$width.'" height="'.$height.'" mayscript="true">';
 	if ($url != '') {

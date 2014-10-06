@@ -126,13 +126,13 @@ if (!(isset($teacherid))) {
 				$query = "UPDATE imas_gbscheme SET useweights='{$row[0]}',orderby='{$row[1]}',defaultcat='{$row[2]}',defgbmode='{$row[3]}',stugbmode='{$row[4]}',colorize='{$row[5]}' WHERE courseid='$cid'";
 				mysql_query($query) or die("Query failed :$query " . mysql_error());
 				
-				$query = "SELECT id,name,scale,scaletype,chop,dropn,weight,hidden FROM imas_gbcats WHERE courseid='{$_POST['ctc']}'";
+				$query = "SELECT id,name,scale,scaletype,chop,dropn,weight,hidden,calctype FROM imas_gbcats WHERE courseid='{$_POST['ctc']}'";
 				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 				while ($row = mysql_fetch_row($result)) {
 					$query = "SELECT id FROM imas_gbcats WHERE courseid='$cid' AND name='{$row[1]}'";
 					$r2 = mysql_query($query) or die("Query failed :$query " . mysql_error());
 					if (mysql_num_rows($r2)==0) {
-						$query = "INSERT INTO imas_gbcats (courseid,name,scale,scaletype,chop,dropn,weight,hidden) VALUES ";
+						$query = "INSERT INTO imas_gbcats (courseid,name,scale,scaletype,chop,dropn,weight,hidden,calctype) VALUES ";
 						$frid = array_shift($row);
 						$irow = "'".implode("','",addslashes_deep($row))."'";
 						$query .= "('$cid',$irow)";
@@ -140,7 +140,7 @@ if (!(isset($teacherid))) {
 						$gbcats[$frid] = mysql_insert_id();
 					} else {
 						$rpid = mysql_result($r2,0,0);
-						$query = "UPDATE imas_gbcats SET scale='{$row[2]}',scaletype='{$row[3]}',chop='{$row[4]}',dropn='{$row[5]}',weight='{$row[6]}',hidden='{$row[7]}' ";
+						$query = "UPDATE imas_gbcats SET scale='{$row[2]}',scaletype='{$row[3]}',chop='{$row[4]}',dropn='{$row[5]}',weight='{$row[6]}',hidden='{$row[7]}',calctype='{$row[8]}' ";
 						$query .= "WHERE id='$rpid'";
 						$gbcats[$row[0]] = $rpid;
 					}

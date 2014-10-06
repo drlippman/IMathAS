@@ -1,7 +1,7 @@
 <?php  
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 89;
+$latest = 91;
 
 
 @set_time_limit(0);
@@ -1484,6 +1484,10 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 		}
 		if ($last<90) {
 			$query = "ALTER TABLE  `imas_students` CHANGE  `code`  `code` VARCHAR( 32 ) NULL DEFAULT NULL";
+			mysql_query($query) or die("Query failed : " . mysql_error());
+		}
+		if ($last<91) {
+			$query = 'UPDATE imas_gbcats SET calctype=1 WHERE dropn<>0';
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		}
 		/*$handle = fopen("upgradecounter.txt",'w');
