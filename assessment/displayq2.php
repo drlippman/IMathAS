@@ -3588,6 +3588,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					}
 				}
 			}
+			
 			if ($cntnan==20 && isset($GLOBALS['teacherid'])) {
 				echo "<p>", _('Debug info: function evaled to Not-a-number at all test points.  Check $domain'), "</p>";
 			}
@@ -3597,7 +3598,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			if ($answerformat=="equation") {
 				if ($cntbothzero>18) {
 					$correct = true;
-				} else if (count($ratios)>0) {
+				} else if (count($ratios)>1) {
 					if (count($ratios)==$cntzero) {
 						$correct = false; return 0;
 					} else {
