@@ -2,7 +2,7 @@
 //Vector functions.  Version 1.0, April 4, 2006
 
 global $allowedmacros;
-array_push($allowedmacros,"dotp","crossp","vecnorm","vecsum","vecdiff","vecprod");
+array_push($allowedmacros,"dotp","crossp","vecnorm","vecsum","vecdiff","vecprod","veccompareset","veccomparesamespan");
 
 //dotp(a,b)
 //dot product of vectors a and b
@@ -81,4 +81,66 @@ function vecprod($a,$c) {
 	}
 	return $prod;
 }
+
+
+//veccompareset(a,b)
+//a and b are both arrays of vectors, e.g. $a = array(array(1,2,3),array(3,4,5))
+//returns a value between 0 (no overlap) and 1 (sets are equivalent)
+//calculated as n(a intersect b)/max(n(a),n(b))
+function veccompareset($a,$b) {
+	if ($b===null) { return 0;}
+	foreach ($b as $k=>$bv) {
+		if (is_array($bv)) {continue;}
+		if ($bv{0} == '[') { //in matrix notation
+			$b[$k] = explode(',',str_replace(array('[',']','(',')'),'',$bv));
+		} else { //in compressed notation
+			$b[$k] = explode('|',$bv);
+		}
+	}
+	$usedb = array();
+	$matches = 0; 
+	foreach ($a as $av) {
+		foreach ($b as $k=>$bv) {
+			if (isset($usedb[$k])) {continue;}
+			foreach ($bv as $i=>$bvv) {
+				if (abs($bvv - $av[$i])>.001) {
+					continue 2;
+				}
+			}
+			$matches++;
+			$usedb[$k] = true;
+			continue 2;
+		}
+	}
+	return $matches/max(count($a),count($b));
+}
+
+//veccomparesamespan(A,B)
+//determins if span(A) = span(B), where A is a linearly independent set.
+//a and b are both arrays of vectors, e.g. $A = array(array(1,2,3),array(3,4,5))
+//Note that if you want to use the columns of a matrix as A, you'll need to
+//  transpose the matrix 
+//Returns true or false
+function veccomparesamespan($a,$b) {
+	if (count($a)!=count($b)) {return false;}
+	include_once("matrix.php");
+	if ($b===null) { return 0;}
+	foreach ($b as $k=>$bv) {
+		if (is_array($bv)) {continue;}
+		if ($bv{0} == '[') { //in matrix notation
+			$b[$k] = explode(',',str_replace(array('[',']','(',')'),'',$bv));
+		} else { //in compressed notation
+			$b[$k] = explode('|',$bv);
+		}
+	}
+	foreach ($a as $av) {
+		$b[] = $av;
+	}
+
+	$s = matrixreduce(matrixtranspose($b),true);
+	$n = matrixnumsolutions($s, count($a));
+	return (count($a)==$n);
+}
+
+
 ?>
