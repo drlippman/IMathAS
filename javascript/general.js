@@ -85,8 +85,8 @@ function tipshow(el,tip) {
 	tipobj.style.left = "5px";
 	tipobj.style.display = "block";
 	
-	if (typeof AMnoMathML!='undefined' && typeof noMathRender != 'undefined') {
-		if (!AMnoMathML && !noMathRender) {
+	if (typeof usingASCIIMath!='undefined' && typeof noMathRender != 'undefined') {
+		if (usingASCIIMath && !noMathRender) {
 			rendermathnode(tipobj);
 		}
 	}

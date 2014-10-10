@@ -64,7 +64,7 @@ if (!isset($sessiondata['mathdisp'])) {
 	echo "<script src=\"$imasroot/javascript/mathgraphcheck.js?v=051313\" type=\"text/javascript\"></script>\n";
 } else if ($sessiondata['mathdisp']==1) {
 	echo "<script src=\"$imasroot/javascript/ASCIIMathML_min.js?v=012314\" type=\"text/javascript\"></script>\n";
-	echo "<script type=\"text/javascript\">var usingASCIIMath = true; function rendermathnode(el) {AMprocessNode(el);}</script>";
+	echo "<script type=\"text/javascript\">var AMnoMathML = false;var usingASCIIMath = true; function rendermathnode(el) {AMprocessNode(el);}</script>";
 } else if ($sessiondata['mathdisp']==2 && isset($useeditor) && $sessiondata['useed']==1) {
 	//these scripts are used by the editor to make image-based math work in the editor
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";';
@@ -92,7 +92,7 @@ if (!isset($sessiondata['mathdisp'])) {
 	//echo '<script type="text/javascript" src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=AM_HTMLorMML"></script>';
 	//echo '<script>window.MathJax || document.write(\'<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="'.$imasroot.'/mathjax/MathJax.js?config=AM_HTMLorMML"><\/script>\')</script>';
 	echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_HTMLorMML"></script>';
-	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = false; function rendermathnode(node) { MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]); }</script>'; 
+	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; function rendermathnode(node) { MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]); }</script>'; 
 	echo '<style type="text/css">span.AM { font-size: 105%;}</style>';
 }
 if (isset($sessiondata['graphdisp']) && $sessiondata['graphdisp']==1) {
