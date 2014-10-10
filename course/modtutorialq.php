@@ -21,6 +21,7 @@ if (!isset($_GET['aid'])) {
 	if ($_GET['cid']=="admin") {
 		if ($myrights == 100) {
 			$isadmin = true;
+			$cid = 'admin';
 		} else if ($myrights==75) {
 			$isgrpadmin = true;
 		}
@@ -864,7 +865,7 @@ function rubrictouchmove(evt) {
 </script>
 
 <form enctype="multipart/form-data" method=post action="modtutorialq.php?process=true<?php 
-	if (isset($_GET['cid'])) {
+	if (isset($cid)) {
 		echo "&cid=$cid";
 	} 
 	if (isset($_GET['aid'])) {

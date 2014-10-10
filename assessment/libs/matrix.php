@@ -1,8 +1,8 @@
 <?php
-//Matrix functions.  Version 1.4, Nov 22, 2008
+//Matrix functions.  Version 1.5, Oct 8, 2014
 
 global $allowedmacros;
-array_push($allowedmacros,"matrix","matrixformat","matrixsystemdisp","matrixsum","matrixdiff","matrixscalar","matrixprod","matrixaugment","matrixrowscale","matrixrowswap","matrixrowcombine","matrixrowcombine3","matrixidentity","matrixtranspose","matrixrandinvertible","matrixrandunreduce","matrixinverse","matrixinversefrac","matrixsolve","matrixsolvefrac","polyregression","matrixgetentry","matrixgetrow","matrixgetcol","matrixgetsubmatrix","matrixdisplaytable");
+array_push($allowedmacros,"matrix","matrixformat","matrixsystemdisp","matrixsum","matrixdiff","matrixscalar","matrixprod","matrixaugment","matrixrowscale","matrixrowswap","matrixrowcombine","matrixrowcombine3","matrixidentity","matrixtranspose","matrixrandinvertible","matrixrandunreduce","matrixinverse","matrixinversefrac","matrixsolve","matrixsolvefrac","polyregression","matrixgetentry","matrixgetrow","matrixgetcol","matrixgetsubmatrix","matrixdisplaytable","matrixreduce","matrixnumsolutions");
 
 //matrix(vals,rows,cols)
 //Creates a new matrix item.  
@@ -564,7 +564,7 @@ function matrixinversefrac($m) {
 //A and b are both matrices
 //A is nxn, b is nxm
 //returns nxm matrix x so Ax = b
-function matrixsolve($A, $b) {    
+function matrixsolve($A, $b, $silenterror=false) {    
 	if (count($A) != count($A[0])) {
 		echo "can only solve for square matrices A, sorry"; return $b;
 	}
@@ -587,7 +587,13 @@ function matrixsolve($A, $b) {
       $t    = $b[$p]; $b[$p] = $b[$max]; $b[$max] = $t;
      
       // check if matrix is singular
-      if (abs($A[$p][$p]) <= 1e-10) {echo("Solve failed: Matrix is singular or nearly singular"); return $b;}
+      if (abs($A[$p][$p]) <= 1e-10) {
+      	      if ($silenterror) {
+      	      	      return false;
+      	      } else {
+      	      	      echo("Solve failed: Matrix is singular or nearly singular"); return $b;
+      	      }
+      }
 
       // pivot within A and b
       for ($i = $p+1; $i < $N; $i++) {
@@ -617,7 +623,7 @@ function matrixsolve($A, $b) {
 
 }
 
-//matrixsolverac(A,b)
+//matrixsolvefrac(A,b)
 //solves the matrix equation Ax = b
 //A and b are both matrices
 //A is nxn, b is nxm
@@ -696,6 +702,106 @@ function matrixsolvefrac($A, $b, $asString=true) {
     }
     return matrixtranspose($x);
 }
+
+//matrixreduce(A,[rref,frac])
+//reduces the matrix A to echelon or reduced echelon form
+//A is a matrix
+//rref = true for rref, false for echelon (default)
+//frac = true for fraction output, false for decimal output (default)
+//  if true, entries may be fractions (as strings), so don't 
+//  try to use the result in calculations. 
+//NOTE:  In most cases, using matrixrandunreduce is a better option than using this!
+function matrixreduce($A, $rref = false, $frac = false) {    
+	include_once("fractions.php");
+    // number of rows
+    $N  = count($A);
+    $M = count($A[0]);
+    $pivots = array();
+    
+    for ($r=0;$r<$N;$r++) {
+    	    for ($c=0;$c<$M;$c++) {
+    	    	    $A[$r][$c] = fractionparse($A[$r][$c]);
+    	    }
+    }
+   
+    $r = 0;  $c = 0;
+    
+    while ($r < $N && $c < $M) {
+    	    if ($A[$r][$c][0]==0) { //swap only if there's a 0 entry
+		    $max = $p;
+		    for ($i = $r+1; $i < $N; $i++) {
+			    if (abs($A[$i][$c][0]/$A[$i][$c][1]) > abs($A[$max][$c][0]/$A[$max][$c][1])) {
+				$max = $i;
+			    }
+		    }
+		    if ($max != $p) { 
+			$temp = $A[$r]; $A[$r] = $A[$max]; $A[$max] = $temp;
+		    }
+    	    }
+    	    
+    	    if (abs($A[$r][$c][0]/$A[$r][$c][1]) <= 1e-10) {
+    	    	    $c++;
+    	    	    continue;
+    	    }
+    	    
+    	    //scale pivot row
+    	    if ($rref) {
+		    $divisor = $A[$r][$c];
+		    for ($j = $c; $j < $M; $j++) {
+			    $A[$r][$j] = fractiondivide($A[$r][$j],$divisor);
+		    }
+    	    }
+ 
+    	    for ($i = ($rref?0:$r+1); $i < $N; $i++) {
+    	    	    if ($i==$r) {continue;}
+    	    	    $mult = fractiondivide($A[$i][$c],$A[$r][$c]);
+    	    	    if ($mult[0]==0) {continue;}
+    	    	    for ($j = $c; $j < $M; $j++) {
+    	    	    	    //echo "Entry $i,$j:  ".fractionreduce($A[$i][$j]).' - '.fractionreduce( $mult).'*'.fractionreduce($A[$r][$j]).'<br/>';
+    	    	    	    $A[$i][$j] = fractionsubtract($A[$i][$j], fractionmultiply($mult,$A[$r][$j]));
+    	    	    }
+    	    }
+    	 
+    	    $r++; $c++;
+    }
+    
+    for ($r=0;$r<$N;$r++) {
+    	    for ($c=0;$c<$M;$c++) {
+    	    	    if ($frac) {
+    	    	    	    $A[$r][$c] = fractionreduce($A[$r][$c]);
+    	    	    } else {
+    	    	    	    $A[$r][$c] = $A[$r][$c][0]/$A[$r][$c][1];
+    	    	    }
+    	    }
+    }
+    return $A;
+}
+
+//matrixnumsolutions(A,n)
+//A is an arbitrary coefficient matrix augmented with n columns, after
+// being row reduced to reduced echelon form (see matrixreduce)
+//Returns the number of Ax=b equations that have at least one solution
+function matrixnumsolutions($A,$n=0) {
+	$c = count($A[0]);
+	$Ac = $c - $n;
+	$r = count($A);
+	$nosolution = array();
+	for ($i=0; $i<$r; $i++) {
+		for ($j=0; $j<$Ac; $j++) {
+			if (abs($A[$i][$j])>1e-10) {
+				continue 2;
+			}
+		}
+		//is all zeros on left
+		for ($j=$Ac;$j<$c;$j++) {
+			if (abs($A[$i][$j])>1e-10) {
+				$nosolution[$j] = 1;
+			}
+		}
+	}
+	return ($n - count($nosolution));
+}
+
 
 //polyregression(x,y,n)
 //find a nth degree polynomial that best fits the data 
