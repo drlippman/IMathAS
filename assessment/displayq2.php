@@ -2664,7 +2664,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						//$givenans = preg_replace('/[^\-\d\.eE]/','',$givenans); //strip out units, dollar signs, whatever
 						$givenans = preg_replace('/^(-?\d*\.?\d*E?\-?\d*).*$/','$1',trim($givenans)); //strip out units
 						if (is_numeric($givenans)) {
-							echo $givenans;
 							if (isset($reqsigfigs)) {
 								if ($givenans*$anans < 0) { continue;} //move on if opposite signs
 								

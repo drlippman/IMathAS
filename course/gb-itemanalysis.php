@@ -131,6 +131,7 @@
 		$bla = explode('~',$line['bestlastanswers']);
 		$timeot = explode(',',$line['timeontask']);
 		foreach ($questions as $k=>$ques) {
+			if (trim($ques)=='') {continue;}
 
 			if (!isset($qincomplete[$ques])) { $qincomplete[$ques]=0;}
 			if (!isset($qtotal[$ques])) { $qtotal[$ques]=0;}

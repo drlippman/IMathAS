@@ -769,7 +769,7 @@ class S3 {
 		$expires = time() + $expires;
 		$stringToSign = "GET\n\n\n$expires\n/$bucket/$key";
 		$signature = urlencode(self::__getSign($stringToSign));
-		$queryString = "http://s3.amazonaws.com/$bucket/$key?AWSAccessKeyId=".self::$__accessKey."&Expires=$expires&Signature=$signature";
+		$queryString = "http://$bucket.s3.amazonaws.com/$key?AWSAccessKeyId=".self::$__accessKey."&Expires=$expires&Signature=$signature";
 		return $queryString;
 	}
 }
