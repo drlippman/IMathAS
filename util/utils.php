@@ -142,6 +142,7 @@ if (isset($_GET['form'])) {
 	echo '<a href="updatewronglibs.php">Update WrongLibFlags</a><br/>';
 	echo '<a href="blocksearch.php">Search Block titles</a><br/>';
 	echo '<a href="itemsearch.php">Search inline/linked items</a><br/>';
+	echo '<a href="../calcqtimes.php">Update question usage data (slow)</a><br/>';
 	require("../footer.php");
 }
 ?>

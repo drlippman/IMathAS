@@ -284,7 +284,7 @@ $sql = 'CREATE TABLE `imas_questionset` ('
 	. ' `extref` TEXT NOT NULL, '
 	. ' `hasimg` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `deleted` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
-	. ' `avgtime` SMALLINT(5) UNSIGNED NOT NULL DEFAULT \'0\', '
+	. ' `avgtime` VARCHAR(254) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `ancestors` TEXT NOT NULL, '
 	. ' `ancestorauthors` TEXT NOT NULL, '
 	. ' `otherattribution` TEXT NOT NULL, '
@@ -1013,7 +1013,7 @@ echo 'imas_content_track created<br/>';
 
 $sql = 'CREATE TABLE `imas_dbschema` (
 	`id` INT( 10 ) UNSIGNED NOT NULL PRIMARY KEY ,
-	`ver` SMALLINT( 4 ) UNSIGNED NOT NULL
+	`ver` INT( 10 ) UNSIGNED NOT NULL
 	) ENGINE = InnoDB';
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $sql = 'INSERT INTO imas_dbschema (id,ver) VALUES (2,0)';  //initialize guest account counter

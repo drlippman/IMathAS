@@ -1,7 +1,7 @@
 <?php  
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 91;
+$latest = 93;
 
 
 @set_time_limit(0);
@@ -1473,22 +1473,54 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			}
 			$query = 'UPDATE imas_gbcats SET calctype=1 WHERE dropn<>0';
 			$res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
 		}
 		if ($last<88) {
 			$query = "ALTER TABLE `imas_forums` ADD `tutoredit` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0';";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			$res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
 		}
 		if ($last<89) {
 			$query = "ALTER TABLE `imas_linkedtext` ADD `points` SMALLINT( 4 ) UNSIGNED NOT NULL DEFAULT '0';";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			$res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
 		}
 		if ($last<90) {
 			$query = "ALTER TABLE  `imas_students` CHANGE  `code`  `code` VARCHAR( 32 ) NULL DEFAULT NULL";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			$res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
 		}
 		if ($last<91) {
 			$query = 'UPDATE imas_gbcats SET calctype=1 WHERE dropn<>0';
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			$res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+		}
+		if ($last<92) {
+			$query = "ALTER TABLE  `imas_questionset` CHANGE  `avgtime`  `avgtime` VARCHAR( 254 ) NOT NULL DEFAULT '0'";
+			$res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+		}
+		if ($last<93) {
+			$query = "ALTER TABLE  `imas_dbschema` CHANGE  `ver`  `ver` INT(10) NOT NULL";
+			$res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 echo '<p>Question usage data (average time per attempt, avg first score) is now pre-computed. ';
+			 echo 'Run "Update question usage data" from the Admin utilities menu to update (at least once a term ';
+			 echo 'is recommended)</p>';
 		}
 		/*$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {

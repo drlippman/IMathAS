@@ -682,12 +682,27 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						}
 						$page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selq','qo$ln',{$line['id']},true,false)\"/>";
 						$page_questionTable[$i]['type'] = $line['qtype'];
-						if ($line['avgtime']>0) {
+						//avgtime, avgtimefirst, avgscorefirst, ndatapoints
+						$avgtimepts = explode(',', $line['avgtime']);
+						if ($avgtimepts[0]>0) {
 							$page_useavgtimes = true;
-							$page_questionTable[$i]['avgtime'] = round($line['avgtime']/60,1);
+							$page_questionTable[$i]['avgtime'] = round($avgtimepts[0]/60,1);
 						} else {
 							$page_questionTable[$i]['avgtime'] = '';
 						}
+						if (isset($avgtimepts[3]) && $avgtimepts[3]>10) {
+							$page_questionTable[$i]['qdata'] = array($avgtimepts[2],$avgtimepts[1]);
+						}
+						/*
+						//pull firstscores data
+						$query = "SELECT qsetid,count(id),AVG(score),AVG(timespent) FROM imas_firstscores WHERE qsetid IN ($allusedqids) AND timespent>1 AND timespent<600 GROUP BY qsetid";
+						$result = mysql_query($query) or die("Query failed : " . mysql_error());
+						while ($row = mysql_fetch_row($result)) {
+							if ($row[1]>10) {
+								$page_questionTable[$row[0]]['qdata'] = array($row[2],$row[3]);
+							}
+						}
+						*/
 						if ($searchall==1) {
 							$page_questionTable[$i]['lib'] = "<a href=\"addquestions.php?cid=$cid&aid=$aid&listlib={$line['libid']}\">List lib</a>";
 						} else {
@@ -751,17 +766,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					if (count($page_questionTable)>0) {
 						$allusedqids = implode(',', array_keys($page_questionTable));
 						$query = "SELECT questionsetid,COUNT(id) FROM imas_questions WHERE questionsetid IN ($allusedqids) GROUP BY questionsetid";
-						$result = mysql_query($query) or die("Query failed : " . mysql_error());
+						$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 						while ($row = mysql_fetch_row($result)) {
 							$page_questionTable[$row[0]]['times'] = $row[1];
-						}
-						//pull firstscores data
-						$query = "SELECT qsetid,count(id),AVG(score),AVG(timespent) FROM imas_firstscores WHERE qsetid IN ($allusedqids) AND timespent>1 AND timespent<600 GROUP BY qsetid";
-						$result = mysql_query($query) or die("Query failed : " . mysql_error());
-						while ($row = mysql_fetch_row($result)) {
-							if ($row[1]>10) {
-								$page_questionTable[$row[0]]['qdata'] = array($row[2],$row[3]);
-							}
 						}
 					}
 						

@@ -468,7 +468,7 @@ function printscore2($sc) {
 //qi: getquestioninfo[qid]
 function scorequestion($qn, $rectime=true) { 
 	global $questions,$scores,$seeds,$testsettings,$qi,$attempts,$lastanswers,$isreview,$bestquestions,$bestseeds,$bestscores,$bestattempts,$bestlastanswers, $reattempting, $rawscores, $bestrawscores, $firstrawscores;
-	global $regenonreattempt;
+	global $regenonreattempt, $sessiondata;
 	//list($qsetid,$cat) = getqsetid($questions[$qn]);
 	$lastrawscore = $rawscores[$qn];
 	
@@ -502,7 +502,7 @@ function scorequestion($qn, $rectime=true) {
 	} else {
 		$scores[$qn] = $afterpenalty;
 	}
-	if (!$isreview && $attempts[$qn]==0 && strpos($lastanswers[$qn],'##')===false) {
+	if (!$isreview && $attempts[$qn]==0 && strpos($lastanswers[$qn],'##')===false && !$sessiondata['isteacher']) {
 		$firstrawscores[$qn] = $rawscores[$qn];
 		if ($rectime) {
 			global $timesontask;
