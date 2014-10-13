@@ -178,7 +178,8 @@
 			} else {
 				echo $total;
 			}
-			if ($total<$minscore) {
+			//if ($total<$minscore) {
+			if (($minscore<10000 && $total<$minscore) || ($minscore>10000 && $total<($minscore-10000)/100*$totalpossible)) {
 				echo "&nbsp;(NC)";
 			} else 	if ($IP==1 && $thisenddate>$now) {
 				echo "&nbsp;(IP)";
