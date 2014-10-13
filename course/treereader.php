@@ -249,7 +249,7 @@ function printlist($items) {
 					$line['startdate'] = $exceptions[$item][0];
 					$line['enddate'] = $exceptions[$item][1];
 				 }
-				 if ($viewall || ($line['avail']==1 && ($line['startdate']<$now || $line['reviewdate']<$now) && $line['enddate']>$now)) {
+				 if ($viewall || ($line['avail']==1 && $line['startdate']<$now && ($line['enddate']>$now || $line['reviewdate']>$now))) {
 					 if ($openitem=='' && $foundfirstitem=='') {
 						 $foundfirstitem = '/assessment/showtest.php?cid='.$cid.'&amp;id='.$typeid; $isopen = true;
 					 }
