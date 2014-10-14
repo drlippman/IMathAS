@@ -133,7 +133,8 @@
 			echo "<td><a href=\"gb-viewasid.php?gbmode=$gbmode&cid=$cid&asid=new&uid={$line['userid']}&from=gisolate&aid=$aid\">-</a></td><td>-</td><td></td>";		
 		} else {
 			echo "<td><a href=\"gb-viewasid.php?gbmode=$gbmode&cid=$cid&asid={$line['id']}&uid={$line['userid']}&from=gisolate&aid=$aid\">";
-			if ($total<$minscore) {
+			//if ($total<$minscore) {
+			if (($minscore<10000 && $total<$minscore) || ($minscore>10000 && $total<($minscore-10000)/100*$totalpossible)) {
 				echo "{$total}&nbsp;(NC)";
 			} else 	if ($IP==1 && $enddate>$now) {
 				echo "{$total}&nbsp;(IP)";

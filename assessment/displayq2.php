@@ -57,7 +57,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		}
 	}
 	if (isset($GLOBALS['lastanswers'])) {
-		foreach ($GLOBALS['lastanswers'] as $i=>$ar) {
+		foreach ($GLOBALS['lastanswers'] as $iidx=>$ar) {
 			$arv = explode('##',$ar);
 			$arv = $arv[count($arv)-1];
 			$arv = explode('&',$arv);
@@ -65,10 +65,10 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 				$arv = $arv[0];
 			}
 			if (is_array($arv)) {
-				foreach ($arv as $k=>$arvp) {
+				foreach ($arv as $kidx=>$arvp) {
 					//if (is_numeric($arvp)) {
 					if ($arvp==='') {
-						$stuanswers[$i+1][$k] = null;
+						$stuanswers[$iidx+1][$kidx] = null;
 					} else {
 						if (strpos($arvp,'$f$')!==false) {
 							$tmp = explode('$f$',$arvp);
@@ -82,18 +82,18 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 						if (strpos($arvp,'$#$')!==false) {
 							$tmp = explode('$#$',$arvp);
 							$arvp = $tmp[0];
-							$stuanswersval[$i+1][$k] = $tmp[1];
+							$stuanswersval[$iidx+1][$kidx] = $tmp[1];
 						}
-						$stuanswers[$i+1][$k] = $arvp;
+						$stuanswers[$iidx+1][$kidx] = $arvp;
 					}
 					//} else {
-					//	$stuanswers[$i+1][$k] = preg_replace('/\W+/','',$arvp);
+					//	$stuanswers[$iidx+1][$kidx] = preg_replace('/\W+/','',$arvp);
 					//}
 				}
 			} else {
 				//if (is_numeric($arv)) {
 				if ($arv==='' || $arv==='ReGen') {
-					$stuanswers[$i+1] = null;
+					$stuanswers[$iidx+1] = null;
 				} else {
 					if (strpos($arvp,'$f$')!==false) {
 						$tmp = explode('$f$',$arv);
@@ -107,12 +107,12 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 					if (strpos($arv,'$#$')!==false) {
 						$tmp = explode('$#$',$arv);
 						$arv = $tmp[0];
-						$stuanswersval[$i+1] = $tmp[1];
+						$stuanswersval[$iidx+1] = $tmp[1];
 					}
-					$stuanswers[$i+1] = $arv;
+					$stuanswers[$iidx+1] = $arv;
 				}
 				//} else {
-				//	$stuanswers[$i+1] = preg_replace('/\W+/','',$arv);
+				//	$stuanswers[$iidx+1] = preg_replace('/\W+/','',$arv);
 				//}
 			}
 				
@@ -514,7 +514,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 	$qdata = mysql_fetch_array($result, MYSQL_ASSOC);
 
 	if (isset($GLOBALS['lastanswers'])) {
-		foreach ($GLOBALS['lastanswers'] as $i=>$ar) {
+		foreach ($GLOBALS['lastanswers'] as $iidx=>$ar) {
 			$arv = explode('##',$ar);
 			$arv = $arv[count($arv)-1];
 			$arv = explode('&',$arv);
@@ -522,10 +522,10 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 				$arv = $arv[0];
 			}
 			if (is_array($arv)) {
-				foreach ($arv as $k=>$arvp) {
+				foreach ($arv as $kidx=>$arvp) {
 					//if (is_numeric($arvp)) {
 					if ($arvp==='') {
-						$stuanswers[$i+1][$k] = null;
+						$stuanswers[$iidx+1][$kidx] = null;
 					} else {
 						if (strpos($arvp,'$!$')!==false) {
 							$arvp = explode('$!$',$arvp);
@@ -535,18 +535,18 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 						if (strpos($arvp,'$#$')!==false) {
 							$tmp = explode('$#$',$arvp);
 							$arvp = $tmp[0];
-							$stuanswersval[$i+1][$k] = $tmp[1];
+							$stuanswersval[$iidx+1][$kidx] = $tmp[1];
 						}
-						$stuanswers[$i+1][$k] = $arvp;
+						$stuanswers[$iidx+1][$kidx] = $arvp;
 					}
 					//} else {
-					//	$stuanswers[$i+1][$k] = preg_replace('/\W+/','',$arvp);
+					//	$stuanswers[$iidx+1][$kidx] = preg_replace('/\W+/','',$arvp);
 					//}
 				}
 			} else {
 				//if (is_numeric($arv)) {
 				if ($arv==='' || $arv==='ReGen') {
-					$stuanswers[$i+1] = null;
+					$stuanswers[$iidx+1] = null;
 				} else {
 					if (strpos($arv,'$!$')!==false) {
 						$arv = explode('$!$',$arv);
@@ -556,12 +556,12 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 					if (strpos($arv,'$#$')!==false) {
 						$tmp = explode('$#$',$arv);
 						$arv = $tmp[0];
-						$stuanswersval[$i+1] = $tmp[1];
+						$stuanswersval[$iidx+1] = $tmp[1];
 					}
-					$stuanswers[$i+1] = $arv;
+					$stuanswers[$iidx+1] = $arv;
 				}
 				//} else {
-				//	$stuanswers[$i+1] = preg_replace('/\W+/','',$arv);
+				//	$stuanswers[$iidx+1] = preg_replace('/\W+/','',$arv);
 				//}
 			}
 		}
