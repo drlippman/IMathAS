@@ -683,15 +683,19 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						$page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selq','qo$ln',{$line['id']},true,false)\"/>";
 						$page_questionTable[$i]['type'] = $line['qtype'];
 						//avgtime, avgtimefirst, avgscorefirst, ndatapoints
+						//initial avgtime might be 0 if not populated
 						$avgtimepts = explode(',', $line['avgtime']);
 						if ($avgtimepts[0]>0) {
 							$page_useavgtimes = true;
 							$page_questionTable[$i]['avgtime'] = round($avgtimepts[0]/60,1);
+						} else if (isset($avgtimepts[1]) && isset($avgtimepts[3]) && $avgtimepts[3]>10) {
+							$page_useavgtimes = true;
+							$page_questionTable[$i]['avgtime'] = round($avgtimepts[1]/60,1);
 						} else {
 							$page_questionTable[$i]['avgtime'] = '';
 						}
 						if (isset($avgtimepts[3]) && $avgtimepts[3]>10) {
-							$page_questionTable[$i]['qdata'] = array($avgtimepts[2],$avgtimepts[1]);
+							$page_questionTable[$i]['qdata'] = array($avgtimepts[2],$avgtimepts[1],$avgtimepts[3]);
 						}
 						/*
 						//pull firstscores data
@@ -1138,7 +1142,7 @@ if ($overwriteBody==1) {
 					<?php if ($page_useavgtimes) {?><td class="c"><?php 
 					if (isset($page_questionTable[$qid]['qdata'])) {
 						echo '<span onmouseover="tipshow(this,\'Avg score on first try: '.round($page_questionTable[$qid]['qdata'][0]).'%';
-						echo '<br/>Avg time on first try: '.round($page_questionTable[$qid]['qdata'][1]/60,1).' min\')" onmouseout="tipout()">';
+						echo '<br/>Avg time on first try: '.round($page_questionTable[$qid]['qdata'][1]/60,1).' min<br/>N='.$page_questionTable[$qid]['qdata'][2].'\')" onmouseout="tipout()">';
 					} else {
 						echo '<span>';
 					}
