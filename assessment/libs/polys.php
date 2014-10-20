@@ -186,6 +186,9 @@ function scalepoly($poly,$c) {
 	for ($i=0; $i<count($poly); $i++) {
 		$poly[$i][0] *= $c;
 	}
+	for ($i=0; $i<count($poly); $i++) {
+		$poly[$i][0] = round($poly[$i][0],10);
+	}
 	return $poly;
 }
 

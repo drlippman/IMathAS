@@ -2,17 +2,17 @@
 //IMathAS:  Utility script to update question average times
 //(c) 2014 David Lippman
 //Is not currently part of the GUI
+
+require("validate.php");
+if ($myrights<100) {
+	exit;
+}
 ini_set('display_errors',1);
 error_reporting(E_ALL);
 @set_time_limit(0);
 ini_set("max_input_time", "600");
 ini_set("max_execution_time", "600");
 ini_set("memory_limit", "712857600");
-
-require("validate.php");
-if ($myrights<100) {
-	exit;
-}
 
 //get last updated time
 $query = "SELECT id,ver FROM imas_dbschema WHERE id=3 OR id=4";
@@ -88,65 +88,78 @@ if ($doslowmethod) {
 	}
 }
 
-$query = "SELECT qsetid,score,timespent FROM imas_firstscores WHERE timespent>0 AND timespent<1200 AND id>$lastfirstupdate";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-while ($row = mysql_fetch_row($result)) {
-	if (isset($qsfirsttimes[$row[0]])) {
-		$qsfirsttimes[$row[0]][] = $row[2];
-	} else {
-		$qsfirsttimes[$row[0]] = array($row[2]);
-	}
-	if (isset($qsfirstscores[$row[0]])) {
-		$qsfirstscores[$row[0]][] = $row[1];
-	} else {
-		$qsfirstscores[$row[0]] = array($row[1]);
-	}
-}
-
 $avgfirsttime = array();
 $avgfirstscore = array();
 $n = array();
-foreach ($qsfirsttimes as $qsid=>$times) {
-	sort($times, SORT_NUMERIC);
-	$trimn = floor($trim*count($times));
-	$times = array_slice($times,$trimn,count($times)-2*$trimn);
-	$avgfirsttime[$qsid] = round(array_sum($times)/count($times));
+
+$thistimes = array();
+$thisscores = array();
+$lastq = -1;
+$query = "SELECT qsetid,score,timespent FROM imas_firstscores WHERE timespent>0 AND timespent<1200 AND id>$lastfirstupdate ORDER BY qsetid";
+$result = mysql_unbuffered_query($query) or die("Query failed : " . mysql_error());
+while ($row = mysql_fetch_row($result)) {
+	if ($row[0] != $lastq && $lastq>0) {
+		$n[$lastq] = count($thisscores);
+		sort($thistimes, SORT_NUMERIC);
+		$trimn = floor($trim*count($thistimes));
+		$thistimes = array_slice($thistimes,$trimn,count($thistimes)-2*$trimn);
+		$avgfirsttime[$lastq] = round(array_sum($thistimes)/count($thistimes));
+		$avgfirstscore[$lastq] = round(array_sum($thisscores)/count($thisscores));
+		$thistimes = array();
+		$thisscores = array();
+	} 
+	$thistimes[] = $row[2];
+	$thisscores[] = $row[1];
+	if ($row[0] != $lastq) {
+		$lastq = $row[0];
+	}
 }
-foreach ($qsfirstscores as $qsid=>$scores) {
-	$n[$qsid] = count($scores);
-	/*skip trimmed mean for scores
-	sort($scores, SORT_NUMERIC);
-	$trimn = floor($trim*count($scores));
-	$scores = array_slice($scores,$trimn,count($scores)-2*$trimn);
-	*/
-	$avgfirstscore[$qsid] = round(array_sum($scores)/count($scores));
+if (count($thistimes)>0) {
+	$n[$lastq] = count($thisscores);
+	sort($thistimes, SORT_NUMERIC);
+	$trimn = floor($trim*count($thistimes));
+	$thistimes = array_slice($thistimes,$trimn,count($thistimes)-2*$trimn);
+	$avgfirsttime[$lastq] = round(array_sum($thistimes)/count($thistimes));
+	$avgfirstscore[$lastq] = round(array_sum($thisscores)/count($thisscores));	
 }
 
 $nq = count($n);
 $totn = array_sum($n);
 
-$query = "SELECT id,avgtime FROM imas_questionset";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-while ($row = mysql_fetch_row($result)) {
-	$qsid = $row[0];
-	if (!isset($avgfirsttime[$qsid]) || $n[$qsid]==0) {continue;}
-	
-	if (strpos($row[1],',')!==false) {
-		list($oldavgtime,$oldfirsttime,$oldfirstscore,$oldn) = explode(',',$row[1]);
+if ($lastfirstupdate==0) {
+	foreach ($n as $qsid=>$nval) {
 		if ($doslowmethod) {
-			$avgtime[$qsid] = round(($avgtime[$qsid]*$n[$qsid] + $oldavgtime*$oldn)/($n[$qsid]+$oldn));
+			$avg = addslashes($avgtime[$qsid].','.$avgfirsttime[$qsid].','.$avgfirstscore[$qsid].','.$n[$qsid]);
+		} else {
+			$avg = addslashes('0,'.$avgfirsttime[$qsid].','.$avgfirstscore[$qsid].','.$n[$qsid]);
 		}
-		$avgfirsttime[$qsid] = round(($avgfirsttime[$qsid]*$n[$qsid] + $oldfirsttime*$oldn)/($n[$qsid]+$oldn));
-		$avgfirstscore[$qsid] = round(($avgfirstscore[$qsid]*$n[$qsid] + $oldfirstscore*$oldn)/($n[$qsid]+$oldn));
-		$n[$qsid] += $oldn;
+		$query = "UPDATE imas_questionset SET avgtime='$avg' WHERE id=$qsid";
+		mysql_query($query) or die("Query failed : " . mysql_error());
 	}
-	if ($doslowmethod) {
-		$avg = addslashes($avgtime[$qsid].','.$avgfirsttime[$qsid].','.$avgfirstscore[$qsid].','.$n[$qsid]);
-	} else {
-		$avg = addslashes('0,'.$avgfirsttime[$qsid].','.$avgfirstscore[$qsid].','.$n[$qsid]);
+} else {
+	$query = "SELECT id,avgtime FROM imas_questionset";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	while ($row = mysql_fetch_row($result)) {
+		$qsid = $row[0];
+		if (!isset($avgfirsttime[$qsid]) || $n[$qsid]==0) {continue;}
+		
+		if (strpos($row[1],',')!==false) {
+			list($oldavgtime,$oldfirsttime,$oldfirstscore,$oldn) = explode(',',$row[1]);
+			if ($doslowmethod) {
+				$avgtime[$qsid] = round(($avgtime[$qsid]*$n[$qsid] + $oldavgtime*$oldn)/($n[$qsid]+$oldn));
+			}
+			$avgfirsttime[$qsid] = round(($avgfirsttime[$qsid]*$n[$qsid] + $oldfirsttime*$oldn)/($n[$qsid]+$oldn));
+			$avgfirstscore[$qsid] = round(($avgfirstscore[$qsid]*$n[$qsid] + $oldfirstscore*$oldn)/($n[$qsid]+$oldn));
+			$n[$qsid] += $oldn;
+		}
+		if ($doslowmethod) {
+			$avg = addslashes($avgtime[$qsid].','.$avgfirsttime[$qsid].','.$avgfirstscore[$qsid].','.$n[$qsid]);
+		} else {
+			$avg = addslashes('0,'.$avgfirsttime[$qsid].','.$avgfirstscore[$qsid].','.$n[$qsid]);
+		}
+		$query = "UPDATE imas_questionset SET avgtime='$avg' WHERE id=$qsid";
+		mysql_query($query) or die("Query failed : " . mysql_error());
 	}
-	$query = "UPDATE imas_questionset SET avgtime='$avg' WHERE id=$qsid";
-	mysql_query($query) or die("Query failed : " . mysql_error());
 }
 
 $query = "SELECT max(id) FROM imas_firstscores";
@@ -171,6 +184,7 @@ if ($lastfirstupdate == 0) {
 }
 
 echo "Done: updated $nq questions with a total of $totn new datapoints";
+echo '<br/>Max memory: '.memory_get_peak_usage().', '.memory_get_peak_usage(true);
 ?>
 	
 	
