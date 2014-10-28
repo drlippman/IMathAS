@@ -30,6 +30,7 @@ function calculate(inputId,outputId,format) {
 		  if (format.indexOf('mixednumber')!=-1) {
 		  	  str = str.replace(/_/,' ');
 		  } else {
+		  	  str = str.replace(/([0-9])\s+([0-9])/g,"$1*$2");
 		  	  str = str.replace(/\s/g,'');
 		  }
 		  err += syntaxcheckexpr(str,format);

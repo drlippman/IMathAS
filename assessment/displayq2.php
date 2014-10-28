@@ -3513,7 +3513,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$ansarr = explode(' or ',$answer);
 		foreach ($ansarr as $answer) {
 			$correct = true;
-			$answer = preg_replace('/[^\w\*\/\+\=\-\(\)\[\]\{\}\,\.\^\$\!]+/','',$answer);
+			$answer = preg_replace('/[^\w\*\/\+\=\-\(\)\[\]\{\}\,\.\^\$\!\s]+/','',$answer);
 	
 			if ($answerformat=="equation") {
 				if (substr_count($_POST["tc$qn"], '=')!=1) {
@@ -3530,6 +3530,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			if ($answer == '') {
 				return 0;
 			}
+			
 			$answer = mathphppre($answer);
 			$answer = makepretty($answer);
 			$answer = mathphp($answer,$vlist);

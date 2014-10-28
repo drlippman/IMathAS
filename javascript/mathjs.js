@@ -119,6 +119,7 @@ function mathjs(st,varlist) {
 	  st = st.replace(reg,"$1($2)");
 	  st = st.replace(/@(\d+)@/g, indextofunc);
   }
+  st = st.replace(/([0-9])\s+([0-9])/g,"$1*$2");
   st = st.replace(/#/g,"");
   st = st.replace(/\s/g,"");
   st = st.replace(/log_([\d\.]+)\(/g,"nthlog($1,");
