@@ -3,6 +3,7 @@
 // Mike Jenck, Originally developed May 16-26, 2014
 // licensed under GPL version 2
 //
+// 2014-10-22 Fixed: simplexpivot typo ($sma --> $sm)
 // 2014-09-18 Added simplexsetentry and correct help file typos.
 // 2014-06-06 Updated, sorted, and fixed help file information
 // 2014-06-02 Bug fixes and added simplexreadtoanswerarray
@@ -1359,7 +1360,7 @@ function simplexpivot($sm,$pivotpoint) {
     }
   } 
     
-  return $sma;
+  return $sm;
 }
 
 //function simplexreadtoanswerarray(simplexmatrix, [startnumber, answer]) 

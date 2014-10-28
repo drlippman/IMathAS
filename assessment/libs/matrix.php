@@ -390,6 +390,12 @@ function matrixprod($m,$n) {
 		echo 'matrix sizes do not allow product';
 		return $m;
 	}
+	if (count($m)>10 || count($m[0])>10) {
+		global $myrights;
+		if ($myrights>10) {
+			echo "You really shouldn't use matrixprod for matrices bigger than 10x10.";
+		}
+	}
 	$o = array();
 	$o = array();
 	for ($i=0;$i<count($m); $i++) {
@@ -574,7 +580,12 @@ function matrixsolve($A, $b, $silenterror=false) {
     // number of rows
     $N  = count($b);
     $M = count($b[0]); //number of cols in $b
-    
+    if ($N>10) {
+	global $myrights;
+	if ($myrights>10) {
+		echo "You really shouldn't use matrixsolve for matrices bigger than 10 rows.";
+	}
+    }
     // forward elimination
     for ($p=0; $p<$N; $p++) {
 
@@ -641,7 +652,12 @@ function matrixsolvefrac($A, $b, $asString=true) {
     // number of rows
     $N  = count($b);
     $M = count($b[0]); //number of cols in $b
-    
+    if ($N>10) {
+	global $myrights;
+	if ($myrights>10) {
+		echo "You really shouldn't use matrixsolvefrac for matrices bigger than 10 rows.";
+	}
+    }
     for ($r=0;$r<$N;$r++) {
     	    for ($c=0;$c<$N;$c++) {
     	    	    $A[$r][$c] = fractionparse($A[$r][$c]);
@@ -717,7 +733,12 @@ function matrixreduce($A, $rref = false, $frac = false) {
     $N  = count($A);
     $M = count($A[0]);
     $pivots = array();
-    
+    if ($N>10) {
+	global $myrights;
+	if ($myrights>10) {
+		echo "You really shouldn't use matrixreduce for matrices bigger than 10 rows.";
+	}
+    }
     for ($r=0;$r<$N;$r++) {
     	    for ($c=0;$c<$M;$c++) {
     	    	    $A[$r][$c] = fractionparse($A[$r][$c]);
