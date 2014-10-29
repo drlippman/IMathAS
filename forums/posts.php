@@ -60,9 +60,16 @@
 		}
 		exit;
 	}
-	$query = "SELECT settings,replyby,defdisplay,name,points,groupsetid,postby,rubric,tutoredit FROM imas_forums WHERE id='$forumid'";
+	$query = "SELECT settings,replyby,defdisplay,name,points,groupsetid,postby,rubric,tutoredit,enddate FROM imas_forums WHERE id='$forumid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	list($forumsettings, $replyby, $defdisplay, $forumname, $pointsposs, $groupset, $postby, $rubric, $tutoredit) = mysql_fetch_row($result);
+	list($forumsettings, $replyby, $defdisplay, $forumname, $pointsposs, $groupset, $postby, $rubric, $tutoredit, $enddate) = mysql_fetch_row($result);
+	
+	if (isset($studentid) && time()>$enddate) {
+		require("../header.php");
+		echo '<p>This forum is closed.  <a href="course.php?cid='.$cid.'">Return to the course page</a></p>';
+		require("../footer.php");
+		exit;
+	}
 	
 	$allowreply = ($isteacher || (time()<$replyby));
 	$allowanon = (($forumsettings&1)==1);

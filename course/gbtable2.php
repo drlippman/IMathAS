@@ -1168,6 +1168,7 @@ function gbtable() {
 						$gb[$row][1][$col][1] = 1; //yes it has it (for teachers)
 					} 
 				}
+				$gb[$row][1][$col][2] = 1; //show link
 				$gb[$row][1][$col][3] = 0; //is counted
 				if ($gb[0][1][$col][3]<1) { //past
 					$cattotpast[$row][$category[$i]][$col] = $gb[$row][1][$col][0];
