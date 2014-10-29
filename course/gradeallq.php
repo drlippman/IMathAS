@@ -269,6 +269,10 @@
 			}
 		}
 	}
+	function showallans() {
+		$("span[id^=\'ans\']").removeClass("hidden");
+		$(".sabtn").replaceWith("<span>Answer: </span>");
+	}
 	</script>
 <?php
 	$query = "SELECT imas_rubrics.id,imas_rubrics.rubrictype,imas_rubrics.rubric FROM imas_rubrics JOIN imas_questions ";
@@ -282,6 +286,7 @@
 		echo '<button type=button id="nztoggle" onclick="hidenonzero()">'._('Hide Nonzero Score Questions').'</button>';
 		echo ' <button type=button id="hnatoggle" onclick="hideNA()">'._('Hide Unanswered Questions').'</button>';
 		echo ' <button type="button" id="preprint" onclick="preprint()">'._('Prepare for Printing (Slow)').'</button>';
+		echo ' <button type="button" id="showanstoggle" onclick="showallans()">'._('Show All Answers').'</button>';
 	}
 	echo ' <input type="button" id="clrfeedback" value="Clear all feedback" onclick="clearfeedback()" />';
 	if ($deffbtext != '') {
