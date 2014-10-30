@@ -2684,9 +2684,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 								}
 								
 							} else if (isset($abstolerance)) {
-								if (abs($anans-$givenans) < $abstolerance + 1E-12) {$correct += 1; $foundloc = $j; break 2;} 	
+								if (abs($anans-$givenans) < $abstolerance + (($anans==0||$anans>1)?1E-12:(abs($anans)*1E-12))) {$correct += 1; $foundloc = $j; break 2;} 	
 							} else {
-								if (abs($anans - $givenans)/(abs($anans)+.0001) < $reltolerance+ 1E-12) {$correct += 1; $foundloc = $j; break 2;} 
+								if ($anans==0) {
+									if (abs($anans - $givenans) <= $reltolerance/1000) {$correct += 1; $foundloc = $j; break 2;}
+								} else {
+									if (abs($anans - $givenans)/(abs($anans)+($anans>1?1E-12:(abs($anans)*1E-12))) < $reltolerance+ 1E-12) {$correct += 1; $foundloc = $j; break 2;}
+								}
 							}
 						}
 					}
@@ -3425,9 +3429,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						}*/
 					} else if (is_numeric($givenans)) {
 						if (isset($abstolerance)) {
-							if (abs($anans-$givenans) < $abstolerance+1E-12) {if ($partformatok) {$correct += 1;}; $foundloc = $j; break 2;} 	
+							if (abs($anans-$givenans) < $abstolerance+(($anans==0||$anans>1)?1E-12:(abs($anans)*1E-12))) {if ($partformatok) {$correct += 1;}; $foundloc = $j; break 2;} 	
 						} else {
-							if (abs($anans - $givenans)/(abs($anans)+.0001) < $reltolerance+1E-12) {if ($partformatok) {$correct += 1;}; $foundloc = $j; break 2;} 
+							if ($anans==0) {
+								if (abs($anans - $givenans) <= $reltolerance/1000) {if ($partformatok) {$correct += 1;}; $foundloc = $j; break 2;}
+							} else {
+								if (abs($anans - $givenans)/(abs($anans)+($anans>1?1E-12:(abs($anans)*1E-12))) < $reltolerance+1E-12) {if ($partformatok) {$correct += 1;}; $foundloc = $j; break 2;}
+							}
 						}
 					}
 				}
