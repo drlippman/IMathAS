@@ -317,7 +317,7 @@
 	
 		echo "</tbody></table>\n";
 		echo "<script type=\"text/javascript\">\n";		
-		echo "initSortTable('myTable',Array('S','N','N'),true);\n";
+		echo "initSortTable('myTable',Array('N','S',false,'N','N','N','N','N',false),true);\n";
 		echo "</script>\n";
 		echo "<p>Average time taken on this assessment: ";
 		if (count($timetaken)>0) {
