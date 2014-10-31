@@ -45,10 +45,10 @@ foreach ($ids as $k=>$id) {
 }
 $idlist = implode(',',$ids);
 
-$query = "SELECT id,author,ancestorauthors,license,otherattribution FROM imas_questionset WHERE id IN ($idlist)";
+$query = "SELECT id,uniqueid,author,ancestorauthors,license,otherattribution FROM imas_questionset WHERE id IN ($idlist)";
 $result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
 while ($row = mysql_fetch_assoc($result)) {
-	echo "<p>Question ID ".$row['id'].'</p>';
+	echo "<p>Question ID ".$row['id'].' (Universal ID '.$row['uniqueid'].')</p>';
 	echo '<p style="margin-left:20px">';
 	echo getquestionlicense($row);
 	echo '</p>';

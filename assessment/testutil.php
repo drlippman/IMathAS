@@ -739,9 +739,9 @@ function showqinfobar($qn,$inreview,$single,$isembed=false) {
 		}
 		if ($sessiondata['isteacher']) {
 			echo '<span style="float:right;font-size:70%;text-align:right;">'._('Question ID: ').$qi[$questions[$qn]]['questionsetid'];
-			echo '<br/><a target="license" href="'.$imasroot.'/course/showlicense.php?id='.$qn.'">'._('License').'</a></span>';
+			echo '<br/><a target="license" href="'.$imasroot.'/course/showlicense.php?id='.$qi[$questions[$qn]]['questionsetid'].'">'._('License').'</a></span>';
 		} else {
-			echo '<span style="float:right;font-size:70%"><a target="license" href="'.$imasroot.'/course/showlicense.php?id='.$qn.'">'._('License').'</a></span>';
+			echo '<span style="float:right;font-size:70%"><a target="license" href="'.$imasroot.'/course/showlicense.php?id='.$qi[$questions[$qn]]['questionsetid'].'">'._('License').'</a></span>';
 		}
 		if ($isembed) {
 			echo _('Question').' '.($qn+1).'. ';
