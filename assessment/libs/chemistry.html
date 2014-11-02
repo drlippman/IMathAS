@@ -19,6 +19,9 @@ A collection of chemistry routines
 <li><a href="#chem_getdiffrandcompounds">chem_getdiffrandcompounds</a></li>
 <li><a href="#chem_decomposecompound">chem_decomposecompound</a></li>
 <li><a href="#chem_getcompoundmolmass">chem_getcompoundmolmass</a></li>
+<li><a href="#chem_randcation">chem_randcation</a></li>
+<li><a href="#chem_randanion">chem_randanion</a></li>
+<li><a href="#chem_makeioniccompound">chem_makeioniccompound</a></li>
 </ul>
 <h3><a name="chem_disp">chem_disp</a></h3>
 chem_disp(compound) 
@@ -50,17 +53,17 @@ chem_getboilingpoint(atomic number)
 chem_getfamily(atomic number)
 <BR>returns the family given the atomic number
 <BR>Values may be:  "", "Noble gas", "Alkaline", "Alkaline Earth", "Halogen", 
-<BR>    "Transition Metal", "Lanthanide",  or "Actinide"
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;"Transition Metal", "Lanthanide",  or "Actinide"
 <BR><h3><a name="chem_randelementbyfamily">chem_randelementbyfamily</a></h3>
 chem_randelementbyfamily(family)
 <BR>returns the atomic number of a random element from a family
 <BR>Valid families are: "Other", "Noble gas", "Alkaline", "Alkaline Earth", 
-<BR>    "Halogen", "Transition Metal", "Lanthanide", or "Actinide"
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;"Halogen", "Transition Metal", "Lanthanide", or "Actinide"
 <BR><h3><a name="chem_diffrandelementsbyfamily">chem_diffrandelementsbyfamily</a></h3>
 chem_diffrandelementsbyfamily(family, n)
 <BR>returns an array of n atomic numbers for random elements from a family
 <BR>Valid families are: "Other", "Noble gas", "Alkaline", "Alkaline Earth", 
-<BR>    "Halogen", "Transition Metal", "Lanthanide", or "Actinide"
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;"Halogen", "Transition Metal", "Lanthanide", or "Actinide"
 <BR><h3><a name="chem_getrandcompound">chem_getrandcompound</a></h3>
 chem_getrandcompound(type)
 <BR>returns an array of (compound name, compound formula)
@@ -73,8 +76,25 @@ chem_getdiffrandcompounds(n,type)
 <BR>if type is not supplied, compound is chosen randomly from all
 <BR><h3><a name="chem_decomposecompound">chem_decomposecompound</a></h3>
 chem_decomposecompound(compound)
-<BR>breaks a compound into an array of element=>atom count
+<BR>breaks a compound into an array of elements and an array of atom counts
 <BR><h3><a name="chem_getcompoundmolmass">chem_getcompoundmolmass</a></h3>
 chem_getcompoundmolmass(compound)
 <BR>gets the molecular mass of the given compound
+<BR><h3><a name="chem_randcation">chem_randcation</a></h3>
+chem_randcation([group,name type,include uncommon])
+<BR>group name:  simple, basic (simple + NH_4), polyvalent, or all. Default = all
+<BR>name type: "common" (iron (II)) or "alternate" (ferrous)  default = common
+<BR>include uncommon: set true to include francium, radium, cadmium, etc.
+<BR>returns array(symbol, charge, name)
+<BR><h3><a name="chem_randanion">chem_randanion</a></h3>
+chem_randanion([group,name type,include uncommon])
+<BR>group name:  simple, polyatomic, or all. Default = all
+<BR>name type: "common" (bicarbonate) or "alternate" (hydrogen carbonate)  default = common
+<BR>include uncommon: set true to include selenide, peroxide
+<BR>returns array(symbol, charge, name)
+<BR><h3><a name="chem_makeioniccompound">chem_makeioniccompound</a></h3>
+chem_makeioniccompound(cation, anion)
+<BR>takes a cation and anion
+<BR>&nbsp;&nbsp;these are the array returned by chem_randcation and chem_randanion
+<BR>returns array(formula, name)
 <BR>

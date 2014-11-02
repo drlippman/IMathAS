@@ -4,6 +4,8 @@
 <BR>&nbsp;Mike Jenck, Originally developed May 16-26, 2014
 <BR>&nbsp;licensed under GPL version 2
 <BR>
+<BR>&nbsp;2014-10-22 Fixed: simplexpivot typo ($sma --> $sm)
+<BR>&nbsp;2014-09-18 Added simplexsetentry and correct help file typos.
 <BR>&nbsp;2014-06-06 Updated, sorted, and fixed help file information
 <BR>&nbsp;2014-06-02 Bug fixes and added simplexreadtoanswerarray
 <BR><ul>
@@ -17,6 +19,7 @@
 <li><a href="#simplexdisplaytable">simplexdisplaytable</a></li>
 <li><a href="#simplexfindpivotpoint">simplexfindpivotpoint</a></li>
 <li><a href="#simplexgetentry">simplexgetentry</a></li>
+<li><a href="#simplexsetentry">simplexsetentry</a></li>
 <li><a href="#simplexpivot">simplexpivot</a></li>
 <li><a href="#simplexreadtoanswerarray">simplexreadtoanswerarray</a></li>
 <li><a href="#simplexreadsolution">simplexreadsolution</a></li>
@@ -55,6 +58,7 @@ function simplexcreateanswerboxentrytable(rows, cols, [startnumber, matrixname, 
 <BR>&nbsp;Create a string that is a valid HTML table syntax for displaying answerboxes.
 <BR>&nbsp;rows: number of rows to make
 <BR>&nbsp;cols: number of columns to make
+<BR>&nbsp;optional
 <BR>&nbsp;startnumber: the starting number for the answerbox.  Default is 0 
 <BR>&nbsp;matrixname: a string that holds the matrix name, like A or B.  This does not contain 
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tick marks - if you want them you need to supply them.
@@ -72,7 +76,7 @@ function simplexcreateanswerboxentrytable(rows, cols, [startnumber, matrixname, 
 <BR>&nbsp;Creates and returns an array of string that correspond to each line of the simple inequalities
 <BR>
 <BR>&nbsp;type:        a string that contains either "max" or "min"
-<BR>&nbsp;$objectivevariable: the name of the objective function, like f of g.
+<BR>&nbsp;objectivevariable: the name of the objective function, like f of g.
 <BR>&nbsp;objective:   list or array of the coefficeients 
 <BR>&nbsp;constraints: an array that contains the inequality information. Constraints are in the
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;form of array(array(3,1,0),"<=",35)
@@ -94,24 +98,35 @@ function simplexcreateanswerboxentrytable(rows, cols, [startnumber, matrixname, 
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 does append the inequality and right hand sinde number ("<=",35)
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default 1 include the full inequality
 <BR><h3><a name="simplexconverttodecimals">simplexconverttodecimals</a></h3>
-function simplexconverttodecimals(sm)
+function simplexconverttodecimals(simplexmatrix)
+<BR>
+<BR>&nbsp;simplexmatrix: a valid simplex matrix.
 <BR>
 <BR>&nbsp;this function takes the simplex matrix and converts it to fractions for displaying
 <BR>
 <BR><h3><a name="simplexconverttofraction">simplexconverttofraction</a></h3>
-function simplexconverttofraction(sm)
+function simplexconverttofraction(simplexmatrix)
+<BR>
+<BR>&nbsp;simplexmatrix: a valid simplex matrix.
 <BR>
 <BR>&nbsp;this function takes the simplex matrix and converts it to fractions for displaying
 <BR>
 <BR><h3><a name="simplexdebug">simplexdebug</a></h3>
-function simplexdebug(sm)
-<BR>&nbsp;a raw dump of the contents of the simplex matrix
+function simplexdebug(simplexmatrix)
+<BR>
+<BR>&nbsp;simplexmatrix: a valid simplex matrix.
+<BR>
+<BR>&nbsp;a raw echo dump of the contents of the simplex matrix
 <BR>
 <BR>&nbsp;Not intended to be used in question.  This is to allow the question writer the ability to see what the 
 <BR>&nbsp;raw values are for each field.  all values should have a "|" between them, in the form of
 <BR>&nbsp;numerator | denominator.
 <BR><h3><a name="simplexdefaultheaders">simplexdefaultheaders</a></h3>
-&nbsp;function simplexdefaultheaders(sm,type)
+&nbsp;function simplexdefaultheaders(simplexmatrix,type)
+<BR>
+<BR>&nbsp;simplexmatrix: a valid simplex matrix.
+<BR>&nbsp;type: a string that contains either "max" or "min" 
+<BR>
 <BR>&nbsp;creates the default header (x1,x2, ...,s1,s2,...) for max and
 <BR>&nbsp;&nbsp;&nbsp;(x1,x2, ...,y1,y2,...) for min.
 <BR>
@@ -120,32 +135,35 @@ function simplexdebug(sm)
 <BR><h3><a name="simplexdisplaytable">simplexdisplaytable</a></h3>
 simplexdisplaytable(simplexmatrix, [simplexmatrixname, displayASCIIticks, linemode, showentriesfractions=1, $pivot = array(-1,-1 ["blue","black"]), $header = array(), $tablestyle = ""]) 
 <BR>&nbsp;Create a string that is a valid HTML table syntax for display.
-<BR>$m = simplex matrix
-<BR>$matrixname: a string that holds the matrix name, like A or B.  You should leave balnk if you
+<BR>&nbsp;simplexmatrix: a valid simplex matrix.
+<BR>
+<BR>&nbsp;optional
+<BR>&nbsp;simplexmatrixname: a string that holds the matrix name, like A or B.  You should leave balnk if you
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;are creating a simoplex display
-<BR>&nbsp;$displayASCII: either 0 or 1
+<BR>&nbsp;displayASCII: either 0 or 1
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 do not use math ticks
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default 1        use math ticks
-<BR>&nbsp;$mode: either 0, 1 or 2
+<BR>&nbsp;mode: either 0, 1 or 2
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 show no lines
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1 show aumented line
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2 show simplex  lines
-<BR>&nbsp;$showfractions: either -1, 0 or 1
+<BR>&nbsp;showfractions: either -1, 0 or 1
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-1 show as string 
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 convert simplex element to a decimal
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default 1 convert simplex element to a fraction
-<BR>&nbsp;$pivot: list or array that contains the row, column, border color, and text color.  This puts a  
+<BR>&nbsp;pivot: list or array that contains the row, column, border color, and text color.  This puts a  
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;border around the cell at (row,col). Both row and column are ZERO based.
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;default point none
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;default border color = blue
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;default text  color  = black
-<BR>&nbsp;$headers: list or array of the variables "x1,x2,x3" that are used for the column titles.
+<BR>&nbsp;headers: list or array of the variables "x1,x2,x3" that are used for the column titles.
 <BR>&nbsp;&nbsp;&nbsp;default none
-<BR>&nbsp;$tablestyle: for any additional styles for the table that you may want.  like "color:#40B3DF;"
+<BR>&nbsp;tablestyle: for any additional styles for the table that you may want.  like "color:#40B3DF;"
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default none
 <BR><h3><a name="simplexfindpivotpoint">simplexfindpivotpoint</a></h3>
-simplexfindpivotpoint($sm)
-<BR>&nbsp;$sm a simplex matrix
+simplexfindpivotpoint(simplexmatrix)
+<BR>
+<BR>&nbsp;simplexmatrix: a valid simplex matrix.
 <BR>
 <BR>&nbsp;returns array(condition, pivotpoints )
 <BR>&nbsp;where 
@@ -160,24 +178,53 @@ simplexfindpivotpoint($sm)
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$pivotpoints[1] = (1,2)
 <BR><h3><a name="simplexgetentry">simplexgetentry</a></h3>
 simplexgetentry(simplexmatrix,row,col)
-<BR>get entry from a simplex matrix at given row and col
-<BR>rows and cols are 0 indexed (first row is row 0)
+<BR>
+<BR>&nbsp;simplexmatrix: a valid simplex matrix.
+<BR>&nbsp;row: row number (zero based - first row is row 0)
+<BR>&nbsp;col: column number (zero based - first row is row 0)
+<BR>
+<BR>&nbsp;get entry from a simplex matrix at given row and col
+<BR>
+<BR><h3><a name="simplexsetentry">simplexsetentry</a></h3>
+simplexsetentry(simplexmatrix,row,col,numerator,denominator)
+<BR>
+<BR>&nbsp;simplexmatrix: a valid simplex matrix.
+<BR>&nbsp;row: row number (zero based - first row is row 0)
+<BR>&nbsp;col: column number (zero based - first row is row 0)
+<BR>
+<BR>&nbsp;set entry for the simplex matrix at the given row and col with the given numerator and denominator.
+<BR>
 <BR><h3><a name="simplexpivot">simplexpivot</a></h3>
-&nbsp;simplexpivot($sm,$pivotpoint)
-<BR>&nbsp;pivots the simplex matrix on the given point
-<BR>&nbsp;$sm:         simplex matrix
-<BR>&nbsp;$pivotpoint: list or array that contains the point to be pivoted on. 
+&nbsp;simplexpivot(simplexmatrix,pivotpoint)
+<BR>
+<BR>&nbsp;simplexmatrix: a valid simplex matrix.
+<BR>&nbsp;pivotpoint:  list or array that contains the point to be pivoted on. 
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Both row and column are ZERO based.
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this ALWAYS picks $pivotpoint[0] as the pivot point
-<BR>&nbsp;returns  a pivoted simplex matrix
+<BR>
+<BR>&nbsp;this function pivots the simplex matrix on the given point
+<BR>
+<BR>&nbsp;returns:  the pivoted simplex matrix
 <BR><h3><a name="simplexreadtoanswerarray">simplexreadtoanswerarray</a></h3>
-function simplexreadtoanswerarray(sm, [startnumber, answer]) 
-<BR>&nbsp;Create an array of values read by rows for the simplex matrix starting at startnumber
-<BR>&nbsp;sm:          simplex martix to read
+function simplexreadtoanswerarray(simplexmatrix, [startnumber, answer]) 
+<BR>
+<BR>&nbsp;simplexmatrix: a valid simplex matrix.
+<BR>
+<BR>&nbsp;optional 
 <BR>&nbsp;startnumber: starting number of the array.  Default is 0 
 <BR>&nbsp;answer: pass $answer if extending an existing $answer array
+<BR>
+<BR>&nbsp;Create an array of values read by rows for the simplex matrix starting at startnumber
+<BR>
 <BR><h3><a name="simplexreadsolution">simplexreadsolution</a></h3>
-simplexreadsolution($sm,$type,$showfractions=1)
+simplexreadsolution(simplexmatrix,type,showfractions)
+<BR>
+<BR>&nbsp;simplexmatrix: a valid simplex matrix.
+<BR>&nbsp;&nbsp;type: a string that contains either "max" or "min" 
+<BR>&nbsp;&nbsp;showfractions: either 0 or 1
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 shows decimals
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default 1 shows fractions 
+<BR>
 <BR>&nbsp;This reads the simplex matrix to find the current solution to the optimization problem.  It returns
 <BR>&nbsp;an array that contains the solution.
 <BR>
@@ -196,21 +243,17 @@ simplexreadsolution($sm,$type,$showfractions=1)
 <BR>&nbsp;where g contains the minimium value
 <BR>&nbsp;IsOptimized contains either a Yes or a No (objective has been reached)
 <BR>
-<BR>
-<BR>&nbsp;$sm:           a simplex matrix
-<BR>&nbsp;type:          a string that contains either "max" or "min"
-<BR>&nbsp;showfractions: either 0 or 1
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 shows decimals
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default 1 shows fractions
 <BR><h3><a name="simplexsolve">simplexsolve</a></h3>
-simplexsolve($sm,$type)
+simplexsolve(simplexmatrix,type)
+<BR>
+<BR>&nbsp;simplexmatrix: a valid simplex matrix.
+<BR>&nbsp;&nbsp;type: a string that contains either "max" or "min" 
+<BR>
 <BR>&nbsp;this method solves the standard maximization problem which has the following conditions
 <BR>&nbsp;1) The objective function is to be maximized.
 <BR>&nbsp;2) All variables are nonnegative.
 <BR>&nbsp;3) The constraints are of the form: a1x1+ a2x2+ ... + anxn <= b  where b >0
 <BR>
-<BR>&nbsp;$sm:   a simplex matrix
-<BR>&nbsp;$type: max or min (used to read the solution)
 <BR>&nbsp;returns array(solutionlist, smlist, pivotlist)
 <BR>&nbsp;
 <BR>&nbsp;solutionlist: an array of solutions (in the case of multiple solutions).   In the form of
