@@ -187,12 +187,26 @@ function chem_decomposecompound($c) {
 
 //chem_getcompoundmolmass(compound)
 //gets the molecular mass of the given compound
-function chem_getcompoundmolmass($c) {
+// round: decimals to round the individual atoms' molecular mass to during calculuations
+//        default: no additional rounding (4 decimal place accuracy)
+//        special value: .5.  Rounds all values to whole numbers, except Cl and Cu to nearest .5 
+function chem_getcompoundmolmass($c,$round=4) {
 	global $chem_periodic_table, $chem_numberbyatom;
 	list($els,$cnt) = chem_decomposecompound($c);
 	$molmass = 0;
 	foreach ($els as $k=>$el) {
-		$molmass += $chem_periodic_table[$chem_numberbyatom[$el]][3]*$cnt[$k];
+		if ($round==.5) {
+			echo abs(round(2*$chem_periodic_table[$chem_numberbyatom[$el]][3])/2 - $chem_periodic_table[$chem_numberbyatom[$el]][3]).'<br/>';
+			if (abs(round(2*$chem_periodic_table[$chem_numberbyatom[$el]][3])/2 - $chem_periodic_table[$chem_numberbyatom[$el]][3]) < .05) {
+				$molmass += round(2*$chem_periodic_table[$chem_numberbyatom[$el]][3])/2*$cnt[$k];
+			} else {
+				$molmass += round($chem_periodic_table[$chem_numberbyatom[$el]][3])*$cnt[$k];
+			}
+		} else if ($round<4) {
+			$molmass += round($chem_periodic_table[$chem_numberbyatom[$el]][3],$round)*$cnt[$k];	
+		} else {
+			$molmass += $chem_periodic_table[$chem_numberbyatom[$el]][3]*$cnt[$k];
+		}
 	}
 	return $molmass;
 }
