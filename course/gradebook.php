@@ -826,21 +826,28 @@ function gbstudisp($stu) {
 	}
 	echo '<table id="myTable" class="gb" style="position:relative;">';
 	echo '<thead><tr>';
+	$sarr = array();
 	if ($stu>0 && $isteacher) {
 		echo '<th></th>';
 	}
 	echo '<th>', _('Item'), '</th><th>', _('Possible'), '</th><th>', _('Grade'), '</th><th>', _('Percent'), '</th>';
 	if ($stu>0 && $isteacher) {
 		echo '<th>', _('Time Spent (In Questions)'), '</th>';
+		$sarr = "false,'S','N','N','N','N'";
 		if ($includelastchange) {
 			echo '<th>'._('Last Changed').'</th>';
+			$sarr .= ",'D'";
 		}
 		if ($includeduedate) {
 			echo '<th>'._('Due Date').'</th>';
+			$sarr .= ",'D'";
 		}
+	} else {
+		$sarr = "'S','N','N','N'";
 	}
 	if ($stu>0) {
 		echo '<th>', _('Feedback'), '<br/><a href="#" class="small pointer" onclick="return showhideallfb(this);">', _('[Show Feedback]'), '</a></th>';
+		$sarr .= ",'N'";
 	} 
 	echo '</tr></thead><tbody>';
 	if ($catfilter>-2) {
@@ -1253,10 +1260,7 @@ function gbstudisp($stu) {
 	}
 	
 	echo "</form>";
-	$sarr = "'S','N','N','N'";
-	if ($stu>0) {
-		$sarr .= ",'N','S'";
-	}
+	
 	echo "<script>initSortTable('myTable',Array($sarr),false);</script>\n";
 	/*
 	if ($hidepast) {

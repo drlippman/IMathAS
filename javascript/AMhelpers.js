@@ -759,9 +759,9 @@ function syntaxcheckexpr(str,format,vl) {
 		  err += " ("+_("unmatched parens")+"). ";
 	  }
 	  if (vl) {
-	  	  reg = new RegExp("(sqrt|ln|log|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs)("+vl+"|\\d+)");
+	  	  reg = new RegExp("(sqrt|ln|log|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs)\s*("+vl+"|\\d+)");
 	  } else {
-	  	  reg = new RegExp("(sqrt|ln|log|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs)(\\d+)");
+	  	  reg = new RegExp("(sqrt|ln|log|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs)\s*(\\d+)");
 	  }
 	  errstuff = str.match(reg);
 	  if (errstuff!=null) {  
