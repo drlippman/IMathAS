@@ -80,7 +80,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			
 			if ($_GET['replyto']>0) {
 				$query = "UPDATE imas_msgs SET replied=1";
-				if ($_POST['submit']=='sendunread') {
+				if (isset($_POST['sendunread'])) {
 					$query .= ',isread=(isread&~1)';
 				}
 				$query .= " WHERE id='{$_GET['replyto']}'";
@@ -307,11 +307,11 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			echo "<span class=left><div class=editor><textarea id=message name=message style=\"width: 100%;\" rows=20 cols=70>";
 			echo htmlentities($message);
 			echo "</textarea></div></span><br class=form>\n";
-			
-			echo "<p><span class=\"form\"></span><span class=\"formright\"><button type=\"submit\" name=\"submit\" value=\"send\">"._('Send Message')."</button>";
 			if ($replyto>0) {
-				echo ' <button type="submit" name="submit" value="sendunread">'._('Send Message and Mark Unread').'</button>';
+				echo '<span class="form"></span><span class="formright"><input type="checkbox" name="sendunread" value="1"/> '._('Mark original message unread').'</span><br class="form"/>';
 			}
+			echo '<div class="submit"><button type="submit" name="submit" value="send">'._('Send Message').'</button></div>';
+
 			echo "</span></p>\n";
 			
 			if ($msgmonitor==1) {
