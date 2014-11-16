@@ -679,11 +679,24 @@
 				if (!butn.hasClass("hchidden")) {
 					butn.html("'._('Show Correct Questions').'");
 					butn.addClass("hchidden");
+					$(".iscorrect").hide();
 				} else {
 					butn.html("'._('Hide Correct Questions').'");
 					butn.removeClass("hchidden");
+					$(".iscorrect").show();
 				}
-				$(".iscorrect").toggle();
+			}
+			function hideperfect() {
+				var butn = $("#hptoggle");
+				if (!butn.hasClass("hphidden")) {
+					butn.html("'._('Show Perfect Questions').'");
+					butn.addClass("hphidden");
+					$(".isperfect").hide();
+				} else {
+					butn.html("'._('Hide Perfect Questions').'");
+					butn.removeClass("hphidden");
+					$(".isperfect").show();
+				}
 			}
 			function hideNA() {
 				var butn = $("#hnatoggle");
@@ -754,13 +767,16 @@
 			</script>';
 		
 		echo '<p><button type="button" id="hctoggle" onclick="hidecorrect()">'._('Hide Correct Questions').'</button>';
+		echo ' <button type="button" id="hptoggle" onclick="hideperfect()">'._('Hide Perfect Questions').'</button>';
 		echo ' <button type="button" id="hnatoggle" onclick="hideNA()">'._('Hide Unanswered Questions').'</button>';
 		echo ' <button type="button" id="showanstoggle" onclick="showallans()">'._('Show All Answers').'</button></p>';
 		$total = 0;
 		
 		for ($i=0; $i<count($questions);$i++) {
 			echo "<div ";
-			if ($canedit && ((isset($rawscores) && isperfect($rawscores[$i])) || getpts($scores[$i])==$pts[$questions[$i]])) {
+			if ($canedit && getpts($scores[$i])==$pts[$questions[$i]]) {
+				echo 'class="iscorrect isperfect"';
+			} else if ($canedit && ((isset($rawscores) && isperfect($rawscores[$i])) || getpts($scores[$i])==$pts[$questions[$i]])) {
 				echo 'class="iscorrect"';	
 			} else if ($scores[$i]==-1) {
 				echo 'class="notanswered"';	
@@ -835,7 +851,9 @@
 			}
 			echo "in {$attempts[$i]} attempt(s)\n";
 			if ($isteacher || $istutor) {
-				if ($canedit && ((isset($rawscores) && isperfect($rawscores[$i])) || getpts($scores[$i])==$pts[$questions[$i]])) {
+				if ($canedit && getpts($scores[$i])==$pts[$questions[$i]]) {
+					echo '<div class="iscorrect isperfect">';
+				} else if ($canedit && ((isset($rawscores) && isperfect($rawscores[$i])) || getpts($scores[$i])==$pts[$questions[$i]])) {
 					echo '<div class="iscorrect">';
 				} else if ($scores[$i]==='N/A') {
 					echo '<div class="notanswered">';	
