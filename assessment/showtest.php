@@ -1921,7 +1921,7 @@ if (!isset($_POST['embedpostback'])) {
 				}
 					
 			}
-			
+			                           
 			showqinfobar($qn,true,false,true);
 			
 			echo '<script type="text/javascript">document.getElementById("disptime").value = '.time().';';
@@ -2297,7 +2297,7 @@ if (!isset($_POST['embedpostback'])) {
 					$quesout .= ob_get_clean();
 				}
 				ob_start();
-				showqinfobar($i,true,false);
+				showqinfobar($i,true,false,true);
 				$reviewbar = ob_get_clean();
 				if (!$sessiondata['istutorial']) {
 					$reviewbar = str_replace('<div class="review">','<div class="review">'._('Question').' '.($i+1).'. ', $reviewbar);
