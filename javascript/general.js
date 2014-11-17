@@ -662,4 +662,12 @@ jQuery(document).ready(function($) {
 			setAltSelectors(groupValue[0], groupValue[1]);
 		}
 	});
+	$(document).on("keydown", function (e) {
+	    if (e.which === 8 && !$(e.target).is("input[type='text']:not([readonly]), textarea")) {
+		e.preventDefault();
+	    }
+	});
+	
 });
+
+
