@@ -24,10 +24,11 @@
 			array("'", "'", '"', '"', '-', '--', '...'),
 			$text);
 		// Next, replace their Windows-1252 equivalents.
-		$text = str_replace(
+		//removed - was messing with unicode
+		/*$text = str_replace(
 			array(chr(145), chr(146), chr(147), chr(148), chr(150), chr(151), chr(133)),
 			array("'", "'", '"', '"', '-', '--', '...'),
-			$text);
+			$text);*/
 		return $text;
  	}
  	
