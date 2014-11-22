@@ -3264,9 +3264,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
-		$givenans = str_replace('∞', 'oo', $givenans);
+		$givenans = str_replace(array('∞','⁄ '), array('oo','/'), $givenans);
+
 		$GLOBALS['partlastanswer'] = $_POST["tc$qn"].'$#$'.$givenans;
-		
+		$_POST["tc$qn"] = str_replace(array('∞','⁄ '), array('oo','/'),$_POST["tc$qn"]);
 		if ($answer==='') {
 			if (trim($_POST["tc$qn"])==='') { return 1;} else { return 0;}
 		}
