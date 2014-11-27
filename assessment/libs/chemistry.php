@@ -185,7 +185,7 @@ function chem_decomposecompound($c) {
 }
 
 
-//chem_getcompoundmolmass(compound)
+//chem_getcompoundmolmass(compound, [round])
 //gets the molecular mass of the given compound
 // round: decimals to round the individual atoms' molecular mass to during calculuations
 //        default: no additional rounding (4 decimal place accuracy)

@@ -78,8 +78,11 @@ chem_getdiffrandcompounds(n,type)
 chem_decomposecompound(compound)
 <BR>breaks a compound into an array of elements and an array of atom counts
 <BR><h3><a name="chem_getcompoundmolmass">chem_getcompoundmolmass</a></h3>
-chem_getcompoundmolmass(compound)
+chem_getcompoundmolmass(compound, [round])
 <BR>gets the molecular mass of the given compound
+<BR>&nbsp;round: decimals to round the individual atoms' molecular mass to during calculuations
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default: no additional rounding (4 decimal place accuracy)
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;special value: .5.  Rounds all values to whole numbers, except Cl and Cu to nearest .5 
 <BR><h3><a name="chem_randcation">chem_randcation</a></h3>
 chem_randcation([group,name type,include uncommon])
 <BR>group name:  simple, basic (simple + NH_4), polyvalent, or all. Default = all
