@@ -196,7 +196,6 @@ function chem_getcompoundmolmass($c,$round=4) {
 	$molmass = 0;
 	foreach ($els as $k=>$el) {
 		if ($round==.5) {
-			echo abs(round(2*$chem_periodic_table[$chem_numberbyatom[$el]][3])/2 - $chem_periodic_table[$chem_numberbyatom[$el]][3]).'<br/>';
 			if (abs(round(2*$chem_periodic_table[$chem_numberbyatom[$el]][3])/2 - $chem_periodic_table[$chem_numberbyatom[$el]][3]) < .05) {
 				$molmass += round(2*$chem_periodic_table[$chem_numberbyatom[$el]][3])/2*$cnt[$k];
 			} else {
@@ -484,7 +483,7 @@ $GLOBALS['chem_cations'] = array(
 	array('Ba',2,'barium','','s'), //common
 	array('Zn',2,'zinc','','s'), //common
 	array('Ag',1,'silver','','s'), //common
-	array('Al',3,'aluminium','','s'), //common
+	array('Al',3,'aluminum','','s'), //common
 	array('N H_4',1,'ammonium','','pa'), //common  13
 	array('Cd',2,'cadmium','','s'),
 	array('Fr',1,'francium','','s'),
