@@ -511,7 +511,7 @@ $GLOBALS['chem_cations'] = array(
 );
 $GLOBALS['chem_anions'] = array(
 	array('F',1,'fluoride','','s'), //common 0
-	array('Cl',1,'cholide','','s'), //common
+	array('Cl',1,'chloride','','s'), //common
 	array('Br',1,'bromide','','s'), //common
 	array('I',1,'iodide','','s'), //common
 	array('O',2,'oxide','','s'), //common
@@ -554,8 +554,8 @@ $GLOBALS['chem_compounds'] = array(
 		array('Silver bromide','Ag Br'),
 		array('Silver chloride','Ag Cl'),
 		array('Silver iodide','Ag I'),
-		array('Aluminium nitride','Al N'),
-		array('Aluminium phosphide','Al P'),
+		array('Aluminum nitride','Al N'),
+		array('Aluminum phosphide','Al P'),
 		array('Boron nitride','B N'),
 		array('Barium oxide','Ba O'),
 		array('Beryllium oxide','Be O'),
@@ -603,8 +603,8 @@ $GLOBALS['chem_compounds'] = array(
 		array('Silver oxide','Ag_2 O'),
 		array('Silver sulfide','Ag_2 S'),
 		array('Silver nitride','Ag_3 N'),
-		array('Aluminium chloride','Al Cl_3'),
-		array('Aluminium fluoride','Al F_3'),
+		array('Aluminum chloride','Al Cl_3'),
+		array('Aluminum fluoride','Al F_3'),
 		array('Arsine','As H_3'),
 		array('Boron trichloride','B Cl_3'),
 		array('Boron trifluoride','B F_3'),
@@ -665,7 +665,7 @@ $GLOBALS['chem_compounds'] = array(
 		array('Uranium pentafluoride','U F_5'),
 		array('Zinc bromide','Zn Br_2'),
 		array('Zinc chloride','Zn Cl_2'),
-		array('Aluminium oxide','Al_2 O_3'),
+		array('Aluminum oxide','Al_2 O_3'),
 		array('Diborane','B_2 H_6'),
 		array('Boron oxide','B_2 O_3'),
 		array('Pentaborane','B_5 H_9'),
@@ -734,7 +734,7 @@ $GLOBALS['chem_compounds'] = array(
 		array('Potassium perchlorate','K Cl O_4'),
 		array('Potassium carbonate','K_2 C O_3'),
 		array('Potassium sulfate','K_2 S O_4'),
-		array('Lithium aluminium hydride','Li Al H_4'),
+		array('Lithium Aluminum hydride','Li Al H_4'),
 		array('Lithium borohydride','Li B H_4'),
 		array('Lithium hypochlorite','Li Cl O'),
 		array('Lithium chlorate','Li Cl O_3'),
@@ -790,8 +790,8 @@ $GLOBALS['chem_compounds'] = array(
 		array('Zinc sulfate','Zn S O_4')
 	),
 	'parens'=> array(
-		array('Aluminium hydroxide','Al (O H)_3'),
-		array('Aluminium nitrate','Al (N O_3)_3'),
+		array('Aluminum hydroxide','Al (O H)_3'),
+		array('Aluminum nitrate','Al (N O_3)_3'),
 		array('Ammonium chromate','(N H_4)_2 Cr O_4'),
 		array('Ammonium dichromate','(N H_4)_2 Cr_2 O_7'),
 		array('Ammonium persulfate','(N H_4)_2 S_2 O_8'),
