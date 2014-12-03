@@ -490,14 +490,14 @@ $GLOBALS['chem_cations'] = array(
 	array('Ra',2,'radium','','s'),  //16
 	array('Cr',2,'chromium (II)','chromous','pv'), //common 17
 	array('Cr',3,'chromium (III)','chromic','pv'), //common
-	array('Mn',2,'manganese (II)','mananous','pv'), //common
+	array('Mn',2,'manganese (II)','manganous','pv'), //common
 	array('Mn',3,'manganese (III)','manganic','pv'), //common
 	array('Fe',2,'iron (II)','ferrous','pv'), //common
 	array('Fe',3,'iron (III)','ferric','pv'), //common
 	array('Co',2,'cobalt (II)','cobaltous','pv'), //common
 	array('Co',3,'cobalt (III)','cobaltic','pv'), //common
 	array('Ni',2,'nickel (II)','nickelous','pv'), //common
-	array('Ni',3,'nickel (III)','nicklic','pv'), //common
+	array('Ni',3,'nickel (III)','nickelic','pv'), //common
 	array('Cu',1,'copper (I)','cupperous','pv'), //common
 	array('Cu',2,'copper (II)','cupric','pv'), //common
 	array('Au',1,'gold (I)','aurous','pv'), //common
