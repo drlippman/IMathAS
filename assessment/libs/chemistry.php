@@ -498,7 +498,7 @@ $GLOBALS['chem_cations'] = array(
 	array('Co',3,'cobalt (III)','cobaltic','pv'), //common
 	array('Ni',2,'nickel (II)','nickelous','pv'), //common
 	array('Ni',3,'nickel (III)','nickelic','pv'), //common
-	array('Cu',1,'copper (I)','cupperous','pv'), //common
+	array('Cu',1,'copper (I)','cuprous','pv'), //common
 	array('Cu',2,'copper (II)','cupric','pv'), //common
 	array('Au',1,'gold (I)','aurous','pv'), //common
 	array('Au',3,'gold (III)','auric','pv'), //common

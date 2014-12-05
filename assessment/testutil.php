@@ -731,7 +731,7 @@ function basicshowq($qn,$seqinactive=false,$colors=array()) {
 }
 
 //shows basic points possible, attempts remaining bar
-function showqinfobar($qn,$inreview,$single,$isembed=false) {
+function showqinfobar($qn,$inreview,$single,$showqnum=0) {
 	global $qi,$questions,$attempts,$seeds,$testsettings,$noindivscores,$showeachscore,$scores,$bestscores,$sessiondata,$imasroot;
 	if (!$sessiondata['istutorial']) {
 		if ($inreview) {
@@ -743,8 +743,10 @@ function showqinfobar($qn,$inreview,$single,$isembed=false) {
 		} else {
 			echo '<span style="float:right;font-size:70%"><a target="license" href="'.$imasroot.'/course/showlicense.php?id='.$qi[$questions[$qn]]['questionsetid'].'">'._('License').'</a></span>';
 		}
-		if ($isembed) {
+		if ($showqnum==1) {
 			echo _('Question').' '.($qn+1).'. ';
+		} else if ($showqnum==2) {
+			echo sprintf(_('Question %d of %d'), $qn+1, count($questions)+1).'<br/>';
 		}
 		if ($qi[$questions[$qn]]['withdrawn']==1) {
 			echo '<span class="red">', _('Question Withdrawn'), '</span> ';

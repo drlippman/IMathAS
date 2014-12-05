@@ -1374,12 +1374,15 @@ if (!isset($_POST['embedpostback'])) {
 			}
 			
 			if (!$done) { //can show next
+				echo '<div class="right"><a href="#" onclick="togglemainintroshow(this);return false;">'._("Show Intro/Instructions").'</a></div>';
+				echo filter("<div id=\"intro\" class=\"hidden\">{$testsettings['intro']}</div>\n");
+				
 				echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=shownext&amp;score=$toshow\" onsubmit=\"return doonsubmit(this)\">\n";
 				echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
 				echo '<input type="hidden" name="disptime" value="'.time().'" />';
 				echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
 				basicshowq($toshow);
-				showqinfobar($toshow,true,true);
+				showqinfobar($toshow,true,true,2);
 				echo '<input type="submit" class="btn" value="', _('Continue'), '" />';
 			} else { //are all done
 				$shown = showscores($questions,$attempts,$testsettings);
@@ -2008,7 +2011,7 @@ if (!isset($_POST['embedpostback'])) {
 			for ($i = 0; $i < count($questions); $i++) {
 				if (unans($scores[$i]) || amreattempting($i)) {
 					basicshowq($i);
-					showqinfobar($i,true,false);
+					showqinfobar($i,true,false,1);
 					$numdisplayed++;
 				}
 			}
@@ -2040,7 +2043,7 @@ if (!isset($_POST['embedpostback'])) {
 				echo '<input type="hidden" name="disptime" value="'.time().'" />';
 				echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
 				basicshowq($i);
-				showqinfobar($i,true,true);
+				showqinfobar($i,true,true,2);
 				echo '<input type="submit" class="btn" value="', _('Next'), '" />';
 				echo "</form>\n";
 			}
