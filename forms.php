@@ -103,6 +103,12 @@ switch($_GET['action']) {
 		echo '<fieldset id="userinfoprofile"><legend>Profile Settings</legend>';
 		echo "<span class=form><label for=\"firstname\">Enter First Name:</label></span> <input class=form type=text size=20 id=firstname name=firstname value=\"{$line['FirstName']}\" /><br class=\"form\" />\n";
 		echo "<span class=form><label for=\"lastname\">Enter Last Name:</label></span> <input class=form type=text size=20 id=lastname name=lastname value=\"{$line['LastName']}\"><BR class=form>\n";
+		if ($myrights>10 && $groupid>0) {
+			$query = "SELECT name FROM imas_groups WHERE id=".intval($groupid);
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$r = mysql_fetch_row($result);
+			echo '<span class="form">'._('Group').':</span><span class="formright">'.$r[0].'</span><br class="form"/>';
+		}
 		echo '<span class="form"><label for="dochgpw">Change Password?</label></span> <span class="formright"><input type="checkbox" name="dochgpw" onclick="togglechgpw(this.checked)" /></span><br class="form" />';
 		echo '<div style="display:none" id="pwinfo">';
 		echo "<span class=form><label for=\"oldpw\">Enter old password:</label></span> <input class=form type=password id=oldpw name=oldpw size=40 /> <BR class=form>\n";

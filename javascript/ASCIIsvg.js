@@ -1052,6 +1052,8 @@ function mathjs(st,varlist) {
 	 // var reg = new RegExp("("+varlist+")("+varlist+")(\w*[^\(#])","g");
 	  //st = st.replace(reg,"($1)($2)$3"); //get xysin
 	  var reg = new RegExp("([^a-df-zA-Z#])("+varlist+")([^a-df-zA-Z#])","g");
+	  st = st.replace(reg,"$1($2)$3");
+	  var reg = new RegExp("([^a-df-zA-Z#\(])("+varlist+")([^a-df-zA-Z#\)])","g"); //do second time for overlap, like 5x+f(3)
 	  st = st.replace(reg,"$1($2)$3");	  
 	  var reg = new RegExp("^("+varlist+")([^a-df-zA-Z])","g");
 	  st = st.replace(reg,"($1)$2");
