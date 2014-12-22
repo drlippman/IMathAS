@@ -215,11 +215,11 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		$laparts = explode("&",$la);
 		foreach ($anstypes as $kidx=>$anstype) {
 			$qcol = ($qdata['qtype']=="multipart" && isset($qcolors[$kidx]))?(is_numeric($qcolors[$kidx])?rawscoretocolor($qcolors[$kidx],$answeights[$kidx]):$qcolors[$kidx]):'';
-			list($answerbox[$kidx],$tips[$kidx],$shanspt[$kidx],$previewloc[$kidx]) = makeanswerbox($anstype,$kidx,$laparts[$kidx],$options,$qnidx+1,$qcol);
+			list($answerbox[$kidx],$entryTips[$kidx],$shanspt[$kidx],$previewloc[$kidx]) = makeanswerbox($anstype,$kidx,$laparts[$kidx],$options,$qnidx+1,$qcol);
 		}
 	} else {
 		$qcol = isset($qcolors[0])?(is_numeric($qcolors[0])?rawscoretocolor($qcolors[0],1):$qcolors[0]):'';
-		list($answerbox,$tips[0],$shanspt[0],$previewloc) = makeanswerbox($qdata['qtype'],$qnidx,$la,$options,0,$qcol);
+		list($answerbox,$entryTips[0],$shanspt[0],$previewloc) = makeanswerbox($qdata['qtype'],$qnidx,$la,$options,0,$qcol);
 	}
 	if ($qdata['qtype']=='conditional') {
 		$qcol = isset($qcolors[0])?(is_numeric($qcolors[0])?rawscoretocolor($qcolors[0],1):$qcolors[0]):'';
@@ -320,7 +320,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		$showanswerloc .= (isset($showanswerstyle) && $showanswerstyle=='inline')?'</span>':'</div>';
 	} else {
 		$showanswerloc = array();
-		foreach($tips as $iidx=>$tip) {
+		foreach($entryTips as $iidx=>$entryTip) {
 			$showanswerloc[$iidx] = (isset($showanswerstyle) && $showanswerstyle=='inline')?'<span>':'<div>';
 			if ($doshowans && (!isset($showanswer) || (is_array($showanswer) && !isset($showanswer[$iidx]))) && $shanspt[$iidx]!=='') {
 				if ($nosabutton) {
@@ -446,11 +446,11 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	
 	echo "<div>";
 	
-	foreach($tips as $iidx=>$tip) {
+	foreach($entryTips as $iidx=>$entryTip) {
 		if ((!isset($hidetips) || (is_array($hidetips) && !isset($hidetips[$iidx])))&& !$seqinactive && $showtips>0) {
 			echo "<p class=\"tips\" ";
 			if ($showtips!=1) { echo 'style="display:none;" ';}
-			echo ">", _('Box'), " ".($iidx+1).": <span id=\"tips$qnidx-$iidx\">".filter($tip)."</span></p>";
+			echo ">", _('Box'), " ".($iidx+1).": <span id=\"tips$qnidx-$iidx\">".filter($entryTip)."</span></p>";
 		}
 		if ($doshowans && strpos($toevalqtxt,'$showanswerloc')===false && is_array($showanswerloc) && isset($showanswerloc[$iidx])) {
 			echo '<div>'.$showanswerloc[$iidx].'</div>';
