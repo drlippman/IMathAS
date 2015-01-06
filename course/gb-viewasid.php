@@ -946,7 +946,7 @@
 									}
 								}
 								
-								echo str_replace(array('&','%nbsp;','%%'),array('; ','&nbsp;','&'), $laarr[$k]);
+								echo str_replace(array('&','%nbsp;','%%','<','>'),array('; ','&nbsp;','&','&lt;','&gt;'), $laarr[$k]);
 							}
 							$cnt++;
 						}

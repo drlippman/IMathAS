@@ -555,7 +555,7 @@
 									$laarr[$k] = $tmp[0];
 								}
 							}
-							echo str_replace(array('&','%nbsp;'),array('; ','&nbsp;'),strip_tags($laarr[$k]));
+							echo str_replace(array('&','%nbsp;','%%','<','>'),array('; ','&nbsp;','&','&lt;','&gt;'),strip_tags($laarr[$k]));
 						}
 						$cntb++;
 					}

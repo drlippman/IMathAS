@@ -473,7 +473,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$page_isTakenMsg .=  "have been disabled.  If you want to change these settings, you should clear all existing assessment attempts</p>\n";
 			$page_isTakenMsg .= "<p><input type=button value=\"Clear Assessment Attempts\" onclick=\"window.location='addassessment.php?cid={$_GET['cid']}&id={$_GET['id']}&clearattempts=ask'\"></p>\n";
 		} else {
-			$page_isTakenMsg = "";
+			$page_isTakenMsg = "<p>&nbsp;</p>";
 		}
 		
 		if (isset($_GET['id'])) {

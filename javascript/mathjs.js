@@ -109,6 +109,8 @@ function mathjs(st,varlist) {
 	  st = st.replace(reg,"($1)$2");
 	  var reg = new RegExp("("+varlist+")("+varlist+")([^a-df-zA-Z#])","g"); // 10/25/10 re-removed \( for x(1+x); moved f() handling to AMhelpers;  6/1/09 readded \( for f(350/x)
 	  st = st.replace(reg,"($1)($2)$3"); //get xy3
+	  var reg = new RegExp("([^a-df-zA-Z#\(])("+varlist+")([^a-df-zA-Z#\)])","g"); //do second time for overlap, like 5x+f(3)
+	  st = st.replace(reg,"$1($2)$3");	  
 	 // var reg = new RegExp("("+varlist+")("+varlist+")(\w*[^\(#])","g");
 	  //st = st.replace(reg,"($1)($2)$3"); //get xysin
 	  var reg = new RegExp("([^a-df-zA-Z#])("+varlist+")([^a-df-zA-Z#])","g");

@@ -648,10 +648,9 @@ function AMpreview(inputId,outputId) {
   if (fl!='') {
 	  reg = new RegExp("("+fl+")\\(","g");
 	  str = str.replace(reg,"$1*sin($1+");
-	  vl = vl+'|'+fl;
   }
   vars = vl.split('|');
-  var totesteqn = mathjs(str,vl); 
+  var totesteqn = mathjs(str,vl);
   	  
   while (tstpt<ptlist.length && (isNaN(res) || res=="Infinity")) {
 	  var totest = '';
@@ -963,12 +962,11 @@ function doonsubmit(form,type2,skipconfirm) {
 		if (fl!='') {
 			reg = new RegExp("("+fl+")\\(","g");
 			str = str.replace(reg,"$1*sin($1+");
-			varlist = varlist+'|'+fl;
 		}
 		vars = varlist.split("|");
 		var nh = document.getElementById("qn" + qn);
 		nh.value = mathjs(str,varlist);
-
+		
 		ptlist = pts[qn].split(",");
 		vals= new Array();
 		for (var fj=0; fj<ptlist.length;fj++) { //for each set of inputs
