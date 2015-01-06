@@ -130,6 +130,9 @@ $curdir = rtrim(dirname(__FILE__), '/\\');
 if (isset($CFG['GEN']['headerscriptinclude'])) {
 	require("$curdir/{$CFG['GEN']['headerscriptinclude']}");
 }
+if (isset($CFG['GEN']['translatewidgetID'])) {
+	echo '<meta name="google-translate-customization" content="'.$CFG['GEN']['translatewidgetID'].'"></meta>';
+}
 echo "</head>\n";
 echo "<body>\n";
 
