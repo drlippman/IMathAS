@@ -328,10 +328,13 @@
 		}
 		//echo "<br/><b style=\"font-size: 120%\">Post: {$subject[$threadid]}</b><br/>\n";
 		//echo "<b style=\"font-size: 100%\">Forum: $forumname</b></p>";
-		echo " | <input type=button value=\"Expand All\" onclick=\"expandall()\"/>";
-		echo "<input type=button value=\"Collapse All\" onclick=\"collapseall()\"/> | ";
-		echo " <input type=button value=\"Show All\" onclick=\"showall()\"/>";
-		echo "<input type=button value=\"Hide All\" onclick=\"hideall()\"/> ";
+		
+		echo '| <button onclick="expandall()">'._('Expand All').'</button>';
+		echo '<button onclick="collapseall()">'._('Collapse All').'</button> | ';
+		echo '<button onclick="showall()">'._('Show All').'</button>';
+		echo '<button onclick="hideall()">'._('Hide All').'</button>';
+		
+		
 		/*if ($view==2) {
 			echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&page=$page&thread=$threadid&view=0\">View Expanded</a>";
 		} else {

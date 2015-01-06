@@ -138,10 +138,11 @@
 	echo '<div id="headermsghistory" class="pagetitle"><h2>Message Conversation</h2></div>';
 	echo "<p><a href=\"viewmsg.php?page=$page&cid=$cid&msgid=$msgid&type=$type&filtercid=$filtercid\">Back to Message</a></p>";
 	//echo "<p><b>Message: {$subject[$msgid]}</b></p>\n";
-	echo "<input type=button value=\"Expand All\" onclick=\"expandall()\"/>";
-	echo "<input type=button value=\"Collapse All\" onclick=\"collapseall()\"/>";
-	echo " <input type=button value=\"Show All\" onclick=\"showall()\"/>";
-	echo "<input type=button value=\"Hide All\" onclick=\"hideall()\"/> ";
+	echo '<button onclick="expandall()">'._('Expand All').'</button>';
+	echo '<button onclick="collapseall()">'._('Collapse All').'</button>';
+	echo '<button onclick="showall()">'._('Show All').'</button>';
+	echo '<button onclick="hideall()">'._('Hide All').'</button>';
+
 	
 ?>	
 	<script type="text/javascript">
