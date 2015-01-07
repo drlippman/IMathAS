@@ -91,6 +91,12 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		$istool = (substr($row[2],0,8)=='exttool:');
 		if ($istool) {
 			$tool = explode('~~',substr($row[2],8));
+			if (isset($tool[3]) && isset($gbcats[$tool[3]])) {
+				$tool[3] = $gbcats[$tool[3]];
+			} else if ($_POST['ctc']!=$cid) {
+				$tool[3] = 0;
+			}
+			$row[2] = 'exttool:'.implode('~~',$tool);
 		}
 		if ($sethidden) {$row[5] = 0;}
 		$row[0] .= stripslashes($_POST['append']);
