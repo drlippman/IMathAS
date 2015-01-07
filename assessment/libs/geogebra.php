@@ -10,13 +10,16 @@ array_push($allowedmacros,"addGeogebra","addGeogebraJava");
 // Ctrl+Shift+B), or include the "Material ID" after uploading to Geogebratube
 //if commands array is provided, execute these javascript commands
 //  (see http://wiki.geogebra.org/en/Reference:JavaScript
-//  for available commands)
+//  for available commands).  For example:
+//    array('setValue("a",'.$a.')','setValue("b",'.$b.')')
 //params should be key=>value array of parameters, like 
 //  array('framePossible'=>'true','showToolBar'=>'true')
 //  (see http://wiki.geogebra.org/en/Reference:Applet_Parameters for options)
 //if you want to pull values from Geogebra on submit, provide an array of 
-//  geogebra commands to callback with and provide question number 
-//  (1-indexed - usually use $thisq) and if multipart, part number (0-indexed)
+//  geogebra commands to callback with.  For example:
+//      array('getValue("a")','getValue("b")')
+//  if doing callbacks, make sure to provide qn (the question number 
+//  (1-indexed) - usually use $thisq) and if multipart, part number (0-indexed)
 function addGeogebra($url,$width=400,$height=200,$commands=array(),$params=array(),$callback=null,$qn=null,$part=null) {
 	$out = '';
 	if ($GLOBALS['inquestiondisplay'] == false) {return '';}
