@@ -277,7 +277,7 @@
 		}
 	} else if ($_GET['action']=="lookupusername") {    
 		require_once("config.php");
-		$query = "SELECT SID,lastaccess FROM imas_users WHERE email='{$_POST['email']}'";
+		$query = "SELECT SID,lastaccess FROM imas_users WHERE email='{$_POST['email']}' AND SID NOT LIKE 'lti-%'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		if (mysql_num_rows($result)>0) {
 			echo mysql_num_rows($result);
@@ -300,7 +300,13 @@
 			mail($_POST['email'],"$installname Username Request",$message,$headers);
 			exit;
 		} else {
-			echo "No usernames match this email address.  <a href=\"index.php\">Return to login page</a>";
+			$query = "SELECT SID,lastaccess FROM imas_users WHERE email='{$_POST['email']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			if (mysql_num_rows($result)>0) {
+				echo "Your account can only be accessed through your school's learning management system. <a href=\"index.php\">Return to login page</a>";
+			} else {
+				echo "No usernames match this email address <a href=\"index.php\">Return to login page</a>";
+			}
 			exit;
 		}
 	}
