@@ -427,6 +427,19 @@
 	if ($testsettings['displaymethod']=='VideoCue' && $testsettings['viddata']=='') {
 		$testsettings['displaymethod']= 'Embed';
 	}
+	if (preg_match('/ImportFrom:\s*([a-zA-Z]+)(\d+)/',$testsettings['intro'],$matches)==1) {
+		if (strtolower($matches[1])=='link') {
+			$query = 'SELECT text FROM imas_linkedtext WHERE id='.intval($matches[2]);
+			$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+			$vals = mysql_fetch_row($result);
+			$testsettings['intro'] = str_replace($matches[0], $vals[0], $testsettings['intro']); 
+		} else if (strtolower($matches[1])=='assessment') {
+			$query = 'SELECT intro FROM imas_assessments WHERE id='.intval($matches[2]);
+			$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+			$vals = mysql_fetch_row($result);
+			$testsettings['intro'] = str_replace($matches[0], $vals[0], $testsettings['intro']); 
+		}
+	}
 	if (!$isteacher) {
 		$rec = "data-base=\"assessintro-{$line['assessmentid']}\" ";
 		$testsettings['intro'] = str_replace('<a ','<a '.$rec, $testsettings['intro']);

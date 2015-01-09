@@ -177,6 +177,16 @@ switch($_GET['action']) {
 			echo '</span><br class="form" />';
 			
 		}
+		if (isset($CFG['GEN']['translatewidgetID'])) {
+			echo '<span class="form">Attempt to translate pages into another language:</span>';
+			echo '<span class="formright">';
+			echo '<div id="google_translate_element"></div><script type="text/javascript">';
+			echo ' function googleTranslateElementInit() {';
+			echo '  new google.translate.TranslateElement({pageLanguage: "en", layout: google.translate.TranslateElement.InlineLayout.HORIZONTAL}, "google_translate_element");';
+			echo ' }</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>';
+			echo '<br class="form"/>';
+			unset($CFG['GEN']['translatewidgetID']);
+		}
 		echo '</fieldset>';
 		
 		if ($myrights>19) {
