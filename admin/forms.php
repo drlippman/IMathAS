@@ -133,7 +133,7 @@ switch($_GET['action']) {
 			$deflatepass = $line['deflatepass'];
 			$deftime = $line['deftime'];
 		} else {
-			$courseid = "Not yet set";
+			$courseid = _("Will be assigned when the course is created");
 			$name = "Enter course name here";
 			$ekey = "Enter enrollment key here";
 			$hideicons = isset($CFG['CPS']['hideicons'])?$CFG['CPS']['hideicons'][0]:0;
