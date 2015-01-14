@@ -1128,7 +1128,13 @@ if (!isset($_POST['embedpostback'])) {
 			if ($timebeforedue>3599) {
 				$duetimenote .= floor($timebeforedue/3600). " " . _('hours') . ", ";
 			}
-			$duetimenote .= ceil(($timebeforedue%3600)/60). " " . _('minutes') . "</span>";
+			$duetimenote .= ceil(($timebeforedue%3600)/60). " " . _('minutes');
+			$duetimenote .= '. ';
+			if ($exceptionduedate > 0) {
+				$duetimenote .= _('Due') . " " . tzdate('D m/d/Y g:i a',$exceptionduedate);
+			} else {
+				$duetimenote .= _('Due') . " " . tzdate('D m/d/Y g:i a',$testsettings['enddate']);
+			}
 		} else {
 			if ($testsettings['enddate']==2000000000) {
 				$duetimenote = '';
