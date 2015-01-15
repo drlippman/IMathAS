@@ -408,6 +408,10 @@ if ($overwriteBody==1) {
 	$min = $coursedeftime%60;
 	$am = ($coursedeftime<12*60)?'am':'pm';
 	$deftime = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
+	$hr = floor($coursedefstime/60)%12;
+	$min = $coursedefstime%60;
+	$am = ($coursedefstime<12*60)?'am':'pm';
+	$defstime = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
 	
 	if ($orderby==0) {
 		asort($startdates);
@@ -488,7 +492,7 @@ if ($overwriteBody==1) {
 		if ($startdates[$i]==0) {
 			$startdates[$i] = time();
 			$sdate = tzdate("m/d/Y",$startdates[$i]);
-			$stime = $deftime;
+			$stime = $defstime;
 		} else {
 			$sdate = tzdate("m/d/Y",$startdates[$i]);
 			$stime = tzdate("g:i a",$startdates[$i]);
