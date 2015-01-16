@@ -1,5 +1,8 @@
 <?php
 	require("../validate.php");
+	if ($myrights<40) {
+		exit;
+	}
 	$now = time();
 	$date = mktime(0,0,0,7,10,2011);  
 	echo "<p>Active users since 7/10/11</p>";
