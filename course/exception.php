@@ -56,6 +56,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$body = "You need to access this page from the course page menu";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$cid = $_GET['cid'];
+	$waivereqscore = (isset($_POST['waivereqscore']))?1:0;
 	
 	if (isset($_POST['sdate'])) {
 		$startdate = parsedatetime($_POST['sdate'],$_POST['stime']);
@@ -66,11 +67,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$row = mysql_fetch_row($result);
 		if ($row != null) {
-			$query = "UPDATE imas_exceptions SET startdate=$startdate,enddate=$enddate,islatepass=0 WHERE id='{$row[0]}'";
+			$query = "UPDATE imas_exceptions SET startdate=$startdate,enddate=$enddate,islatepass=0,waivereqscore=$waivereqscore WHERE id='{$row[0]}'";
 			mysql_query($query) or die("Query failed :$query " . mysql_error());
 		} else {
-			$query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate) VALUES ";
-			$query .= "('{$_GET['uid']}','{$_GET['aid']}',$startdate,$enddate)";
+			$query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,waivereqscore) VALUES ";
+			$query .= "('{$_GET['uid']}','{$_GET['aid']}',$startdate,$enddate,$waivereqscore)";
 			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		}
 		if (isset($_POST['eatlatepass'])) {
@@ -234,6 +235,8 @@ if ($overwriteBody==1) {
 		<span class="form"><input type="checkbox" name="eatlatepass"/></span>
 		<span class="formright">Deduct <input type="input" name="latepassn" size="1" value="1"/> LatePass(es).  
 		   Student currently has <?php echo $latepasses;?> latepasses.</span><br class="form"/>
+		<span class="form"><input type="checkbox" name="waivereqscore"/></span>
+		<span class="formright">Waive "show based on an another assessment" requirements, if applicable.</span><br class="form"/>
 		<div class=submit><input type=submit value="<?php echo $savetitle;?>"></div>
 	</form>
 

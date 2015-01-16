@@ -106,10 +106,10 @@ $uppertime = mktime(0,0,0,$curmonum,$dayofmo - $dayofweek + 7*$callength,$curyr)
 
 $exceptions = array();
 if (!isset($teacherid)) {
-	$query = "SELECT assessmentid,startdate,enddate,islatepass FROM imas_exceptions WHERE userid='$userid'";
+	$query = "SELECT assessmentid,startdate,enddate,islatepass,waivereqscore FROM imas_exceptions WHERE userid='$userid'";
 	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 	while ($row = mysql_fetch_row($result)) {
-		$exceptions[$row[0]] = array($row[1],$row[2],$row[3]);
+		$exceptions[$row[0]] = array($row[1],$row[2],$row[3],$row[4]);
 	}
 }
 
@@ -148,7 +148,7 @@ while ($row = mysql_fetch_row($result)) {
 		//continue;
 	}
 	
-	if (!isset($teacherid) && $row[6]>0 && $row[7]>0) {
+	if (!isset($teacherid) && $row[6]>0 && $row[7]>0 && (!isset($exceptions[$row[0]]) || $exceptions[$row[0]][3]==0)) {
 		$query = "SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid='{$row[7]}' AND userid='$userid'";
 		   $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 		   if (mysql_num_rows($r2)==0) {

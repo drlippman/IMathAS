@@ -586,7 +586,8 @@ function enditem($canedit) {
 				   $reviewdate = formatdate($line['reviewdate']);
 			   }
 			   $nothidden = true;
-			   if ($line['reqscore']>0 && $line['reqscoreaid']>0 && !$viewall && $line['enddate']>$now ) {
+			   if ($line['reqscore']>0 && $line['reqscoreaid']>0 && !$viewall && $line['enddate']>$now
+			   	   && (!isset($exceptions[$items[$i]]) || $exceptions[$items[$i]][3]==0)) {
 				   $query = "SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid='{$line['reqscoreaid']}' AND userid='$userid'";
 				   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				   if (mysql_num_rows($result)==0) {

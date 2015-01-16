@@ -279,13 +279,17 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$min = $coursedeftime%60;
 		$am = ($coursedeftime<12*60)?'am':'pm';
 		$deftime = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
+		$hr = floor($coursedefstime/60)%12;
+		$min = $coursedefstime%60;
+		$am = ($coursedefstime<12*60)?'am':'pm';
+		$defstime = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
 	
 		if ($startdate!=0) {
 			$sdate = tzdate("m/d/Y",$startdate);
 			$stime = tzdate("g:i a",$startdate);
 		} else {
 			$sdate = tzdate("m/d/Y",time());
-			$stime = $deftime; // tzdate("g:i a",time());
+			$stime = $defstime; // tzdate("g:i a",time());
 		}
 		if ($enddate!=2000000000) {
 			$edate = tzdate("m/d/Y",$enddate);
@@ -310,7 +314,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		
 		if (!isset($_GET['id'])) {
-			$stime = $deftime;
+			$stime = $defstime;
 			$etime = $deftime;
 			$replybytime = $deftime;
 			$postbytime = $deftime;

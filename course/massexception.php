@@ -16,17 +16,18 @@
 		require_once("../includes/parsedatetime.php");
 		$startdate = parsedatetime($_POST['sdate'],$_POST['stime']);
 		$enddate = parsedatetime($_POST['edate'],$_POST['etime']);
+		$waivereqscore = (isset($_POST['waivereqscore']))?1:0;
 		
 		foreach(explode(',',$_POST['tolist']) as $stu) {
 			foreach($_POST['addexc'] as $aid) {
 				$query = "SELECT id FROM imas_exceptions WHERE userid='$stu' AND assessmentid='$aid'";
 				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 				if (mysql_num_rows($result)==0) {
-					$query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate) VALUES ";
-					$query .= "('$stu','$aid',$startdate,$enddate)";
+					$query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,waivereqscore) VALUES ";
+					$query .= "('$stu','$aid',$startdate,$enddate,$waivereqscore)";
 				} else {
 					$eid = mysql_result($result,0,0);
-					$query = "UPDATE imas_exceptions SET startdate=$startdate,enddate=$enddate,islatepass=0 WHERE id=$eid";
+					$query = "UPDATE imas_exceptions SET startdate=$startdate,enddate=$enddate,islatepass=0,waivereqscore=$waivereqscore WHERE id=$eid";
 				}
 				mysql_query($query) or die("Query failed :$query " . mysql_error());	
 				if (isset($_POST['forceregen'])) {
@@ -166,7 +167,7 @@
 		echo "</h2>";
 	}
 	
-	$query = "SELECT ie.id,iu.LastName,iu.FirstName,ia.name,iu.id,ia.id,ie.startdate,ie.enddate FROM imas_exceptions AS ie,imas_users AS iu,imas_assessments AS ia ";
+	$query = "SELECT ie.id,iu.LastName,iu.FirstName,ia.name,iu.id,ia.id,ie.startdate,ie.enddate,ie.waivereqscore FROM imas_exceptions AS ie,imas_users AS iu,imas_assessments AS ia ";
 	$query .= "WHERE ie.assessmentid=ia.id AND ie.userid=iu.id AND ia.courseid='$cid' AND iu.id IN ($tolist) ";
 	if ($isall) {
 		$query .= "ORDER BY ia.name,iu.LastName,iu.FirstName";
@@ -190,7 +191,11 @@
 					echo "<li>{$row[3]} <ul>";
 					$lasta = $row[5];
 				}
-				echo "<li><input type=checkbox name=\"clears[]\" value=\"{$row[0]}\" />{$row[1]}, {$row[2]} ($sdate - $edate)</li>";
+				echo "<li><input type=checkbox name=\"clears[]\" value=\"{$row[0]}\" />{$row[1]}, {$row[2]} ($sdate - $edate)";
+				if ($row[8]==1) {
+					echo ' <i>('._('waives prereq').')</i>';
+				}
+				echo "</li>";
 			}
 			echo "</ul></li>";
 		} else {
@@ -212,6 +217,10 @@
 					$lasts = $row[4];
 				}
 				$assessarr[$row[0]] = "{$row[3]} ($sdate - $edate)";
+				if ($row[8]==1) {
+					$assessarr[$row[0]] .= ' <i>('._('waives prereq').')</i>';
+				}
+				
 			}
 			natsort($assessarr);
 			foreach ($assessarr as $id=>$val) {
@@ -283,8 +292,10 @@
 	echo 'will keep any scores earned, but must work new versions of questions to improve score.</p>';
 	echo '<p><input type="checkbox" name="forceclear"/> Clear student\'s attempts?  Students ';
 	echo 'will <b>not</b> keep any scores earned, and must rework all problems.</p>';
-	
+
 	echo '<p><input type="checkbox" name="eatlatepass"/> Deduct <input type="input" name="latepassn" size="1" value="1"/> LatePass(es) from each student. '.$lpmsg.'</p>';
+	
+	echo '<p><input type="checkbox" name="waivereqscore"/> Waive "show based on an another assessment" requirements, if applicable.</p>';
 	
 	echo '<p><input type="checkbox" name="sendmsg"/> Send message to these students?</p>';
 	

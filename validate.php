@@ -540,7 +540,12 @@ END;
 			$coursetopbar[0] = explode(',',$coursetopbar[0]);
 			$coursetopbar[1] = explode(',',$coursetopbar[1]);
 			$coursetoolset = $crow[9];
-			$coursedeftime = $crow[10];
+			$coursedeftime = $crow[10]%10000;
+			if ($crow[10]>10000) {
+				$coursedefstime = floor($crow[10]/10000);
+			} else {
+				$coursedefstime = $coursedeftime;
+			}
 			$picicons = $crow[11];
 			if (!isset($coursetopbar[2])) { $coursetopbar[2] = 0;}
 			if ($coursetopbar[0][0] == null) {unset($coursetopbar[0][0]);}

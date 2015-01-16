@@ -1521,7 +1521,11 @@ function gbinstrdisp() {
 		} else {
 			echo $gbt[$i][0][0];
 		}
-		echo '</a></div></td>';
+		echo '</a>';
+		if ($gbt[$i][4][3]==1) {
+			echo '<sup>*</sup>';
+		}
+		echo '</div></td>';
 		if ($showpics==1 && $gbt[$i][4][2]==1) { //file_exists("$curdir//files/userimg_sm{$gbt[$i][4][0]}.jpg")) {
 			echo "<td>{$insdiv}<div class=\"trld\"><img src=\"$userimgbase/userimg_sm{$gbt[$i][4][0]}.jpg\"/></div></td>";
 		} else if ($showpics==2 && $gbt[$i][4][2]==1) {

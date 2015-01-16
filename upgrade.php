@@ -1,7 +1,7 @@
 <?php  
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 93;
+$latest = 95;
 
 
 @set_time_limit(0);
@@ -1521,6 +1521,26 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 echo '<p>Question usage data (average time per attempt, avg first score) is now pre-computed. ';
 			 echo 'Run "Update question usage data" from the Admin utilities menu to update (at least once a term ';
 			 echo 'is recommended)</p>';
+		}
+		if ($last<94) {
+			$query = "ALTER TABLE `imas_exceptions` ADD `waivereqscore` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0';";
+			$res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = "ALTER TABLE `imas_assessments` ADD INDEX (ancestors(10)) ";
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			
+		}
+		if ($last<95) {
+			$query = "ALTER TABLE  `imas_courses` CHANGE  `deftime`  `deftime` INT(10) NOT NULL";
+			$res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
 		}
 		/*$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {

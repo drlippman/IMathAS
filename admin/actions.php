@@ -206,6 +206,16 @@ switch($_GET['action']) {
 			$tmatches[1] = $tmatches[1]%12;
 			if($tmatches[3]=="pm") {$tmatches[1]+=12; }
 			$deftime = $tmatches[1]*60 + $tmatches[2];
+			
+			preg_match('/(\d+)\s*:(\d+)\s*(\w+)/',$_POST['defstime'],$tmatches);
+			if (count($tmatches)==0) {
+				preg_match('/(\d+)\s*([a-zA-Z]+)/',$_POST['defstime'],$tmatches);
+				$tmatches[3] = $tmatches[2];
+				$tmatches[2] = 0;
+			}
+			$tmatches[1] = $tmatches[1]%12;
+			if($tmatches[3]=="pm") {$tmatches[1]+=12; }
+			$deftime += 10000*($tmatches[1]*60 + $tmatches[2]);
 		}
 		
 		if (isset($CFG['CPS']['deflatepass']) && $CFG['CPS']['deflatepass'][1]==0) {
