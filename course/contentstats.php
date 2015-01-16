@@ -41,7 +41,7 @@ if ($typeid==0 || !in_array($stype,array('I','L','A','W','F'))) {
 		if ($type=='linkedviacal') {
 			$type = 'linkedlink';
 		}
-		if ($stype=='F') {
+		if ($stype=='F' ||in_array($type,array('inlinetext','linkedsum','linkedintext','assessintro','assesssum','wikiintext'))) {
 			$ident = $type.'::'.$row['info'];
 		} else {
 			$ident = $type;
