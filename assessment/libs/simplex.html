@@ -4,12 +4,14 @@
 <BR>&nbsp;Mike Jenck, Originally developed May 16-26, 2014
 <BR>&nbsp;licensed under GPL version 2
 <BR>
+<BR>&nbsp;2015-01-09 Added simplexnumberofsolutions and simplexchecksolution
 <BR>&nbsp;2014-10-22 Fixed: simplexpivot typo ($sma --> $sm)
 <BR>&nbsp;2014-09-18 Added simplexsetentry and correct help file typos.
 <BR>&nbsp;2014-06-06 Updated, sorted, and fixed help file information
 <BR>&nbsp;2014-06-02 Bug fixes and added simplexreadtoanswerarray
 <BR><ul>
 <li><a href="#simplex">simplex</a></li>
+<li><a href="#simplexchecksolution">simplexchecksolution</a></li>
 <li><a href="#simplexcreateanswerboxentrytable">simplexcreateanswerboxentrytable</a></li>
 <li><a href="#simplexcreateinequalities">simplexcreateinequalities</a></li>
 <li><a href="#simplexconverttodecimals">simplexconverttodecimals</a></li>
@@ -20,6 +22,7 @@
 <li><a href="#simplexfindpivotpoint">simplexfindpivotpoint</a></li>
 <li><a href="#simplexgetentry">simplexgetentry</a></li>
 <li><a href="#simplexsetentry">simplexsetentry</a></li>
+<li><a href="#simplexnumberofsolutions">simplexnumberofsolutions</a></li>
 <li><a href="#simplexpivot">simplexpivot</a></li>
 <li><a href="#simplexreadtoanswerarray">simplexreadtoanswerarray</a></li>
 <li><a href="#simplexreadsolution">simplexreadsolution</a></li>
@@ -53,6 +56,21 @@
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;first part: array(3,0,1) or "3,0,1"
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;second part: "<="
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;third part: 35
+<BR><h3><a name="simplexchecksolution">simplexchecksolution</a></h3>
+&nbsp;simplexchecksolution(solutionlist,stuanswer)
+<BR>
+<BR>&nbsp;solutionlist: an array of solutions (in the case of multiple solutions).   In the form of
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;solutionlist[0] = array(solution values for matrix[0], IsOptimized)
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;solutionlist[1] = array(solution values for matrix[1], IsOptimized)
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;etc.
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is returned from simplexsolve
+<BR>
+<BR>
+<BR>&nbsp;stuanswer: the answer the student submitted
+<BR>
+<BR>
+<BR>&nbsp;returns:  0 if no match is found, 1 if a match is found
 <BR><h3><a name="simplexcreateanswerboxentrytable">simplexcreateanswerboxentrytable</a></h3>
 function simplexcreateanswerboxentrytable(rows, cols, [startnumber, matrixname, linemode, header, tablestyle]) 
 <BR>&nbsp;Create a string that is a valid HTML table syntax for displaying answerboxes.
@@ -194,6 +212,17 @@ simplexsetentry(simplexmatrix,row,col,numerator,denominator)
 <BR>
 <BR>&nbsp;set entry for the simplex matrix at the given row and col with the given numerator and denominator.
 <BR>
+<BR><h3><a name="simplexnumberofsolutions">simplexnumberofsolutions</a></h3>
+&nbsp;simplexnumberofsolutions(solutionlist)
+<BR>
+<BR>&nbsp;solutionlist: an array of solutions (in the case of multiple solutions).   In the form of
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;solutionlist[0] = array(solution values for matrix[0], IsOptimized)
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;solutionlist[1] = array(solution values for matrix[1], IsOptimized)
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;etc.
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is returned from simplexsolve
+<BR>
+<BR>&nbsp;returns:  the number of solutions
 <BR><h3><a name="simplexpivot">simplexpivot</a></h3>
 &nbsp;simplexpivot(simplexmatrix,pivotpoint)
 <BR>
