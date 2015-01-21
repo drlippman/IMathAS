@@ -53,6 +53,9 @@ function imasrubric_show(rubricid,pointsposs,scoreboxid,feedbackid,qn,width) {
 		
 	}
 	var html = "<div style='margin: 10px;'><form id='imasrubricform'><table><tbody>";
+	if (imasrubrics[rubricid].type<2) {
+		html += '<tr><td></td><td colspan="3"><a href="#" onclick="imasrubric_fullcredit();return false;">'+_('Full Credit')+'</a></td></tr>';
+	}
 	for (var i=0;i<imasrubrics[rubricid].data.length; i++) {
 		if (imasrubrics[rubricid].type==0 || imasrubrics[rubricid].type==1 ) {  //score breakdown or score and feedback
 			html += "<tr><td>"+imasrubrics[rubricid].data[i][0];
@@ -197,6 +200,9 @@ function imasrubric_chgtype() {
 	}	
 }
 
+function imasrubric_fullcredit() {
+	$("#imasrubricform tr").find("input:radio:first").attr('checked',true);	
+}
 function getRadioValue(theRadioGroup) {
 	var els = document.getElementsByName(theRadioGroup);
 	for (var i = 0; i <  els.length; i++) {
