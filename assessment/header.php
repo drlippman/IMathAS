@@ -116,7 +116,7 @@ div { zoom: 1; }
 </style> 
 <![endif]--> 
 <script src="<?php echo $imasroot . "/javascript/AMhelpers_min.js?v=121514";?>" type="text/javascript"></script>
-<script src="<?php echo $imasroot . "/javascript/confirmsubmit.js";?>" type="text/javascript"></script>
+<script src="<?php echo $imasroot . "/javascript/confirmsubmit.js?v=012115";?>" type="text/javascript"></script>
 <!--[if lt IE 9]>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
 <script type="text/javascript" src="<?php echo $imasroot;?>/javascript/excanvas_min.js?v=120811"></script><![endif]-->
