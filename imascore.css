@@ -422,6 +422,14 @@ div.additembox span {
 }
 div#leftcolumn {float: left; width: 25%; min-width: 200px;}
 div#rightcolumn {float: right; width: 74%; min-width: 250px;}
+
+@media (max-width:805px) {
+	div#leftcolumn, div#rightcolumn  {
+		float: none;
+		width: auto;
+	}	
+}
+
 ul.courselist {
 	margin: 5px;
 	margin-left: 0px;
