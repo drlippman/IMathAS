@@ -651,7 +651,6 @@ function AMpreview(inputId,outputId) {
   }
   vars = vl.split('|');
   var totesteqn = mathjs(str,vl);
-  	  
   while (tstpt<ptlist.length && (isNaN(res) || res=="Infinity")) {
 	  var totest = '';
 	  testvals = ptlist[tstpt].split("~");
@@ -947,13 +946,13 @@ function doonsubmit(form,type2,skipconfirm) {
 		for (var j=0; j<vars.length; j++) {
 			  if (vars[j].charCodeAt(0)>96) { //lowercase
 				  if (arraysearch(vars[j].toUpperCase(),vars)==-1) {
-					  vars[j] = vars[j].toLowerCase();
+					 // vars[j] = vars[j].toLowerCase();
 					  str = str.replace(new RegExp(vars[j],"gi"),vars[j]);	  
 				  }
 			  } else {
 				  if (arraysearch(vars[j].toLowerCase(),vars)==-1) {
-					vars[j] = vars[j].toLowerCase();
-					str = str.replace(new RegExp(vars[j],"gi"),vars[j]);	  
+					//vars[j] = vars[j].toLowerCase();
+					str = str.replace(new RegExp(vars[j],"gi"),vars[j]);
 				  }
 			  }
 		  }
@@ -966,7 +965,7 @@ function doonsubmit(form,type2,skipconfirm) {
 		vars = varlist.split("|");
 		var nh = document.getElementById("qn" + qn);
 		nh.value = mathjs(str,varlist);
-		
+
 		ptlist = pts[qn].split(",");
 		vals= new Array();
 		for (var fj=0; fj<ptlist.length;fj++) { //for each set of inputs
