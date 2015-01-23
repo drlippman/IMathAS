@@ -331,12 +331,13 @@ switch($_GET['action']) {
 					$gbcats[$frid] = mysql_insert_id();
 				}
 				$copystickyposts = true;
-				$query = "SELECT itemorder,ancestors,outcomes FROM imas_courses WHERE id='{$_POST['usetemplate']}'";
+				$query = "SELECT itemorder,ancestors,outcomes,latepasshrs FROM imas_courses WHERE id='{$_POST['usetemplate']}'";
 				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 				$r = mysql_fetch_row($result);
 				$items = unserialize($r[0]);
 				$ancestors = $r[1];
 				$outcomesarr = $r[2];
+				$latepasshrs = $r[3];
 				if ($ancestors=='') {
 					$ancestors = intval($_POST['usetemplate']);
 				} else {
@@ -392,7 +393,7 @@ switch($_GET['action']) {
 				copyallsub($items,'0',$newitems,$gbcats);
 				doaftercopy($_POST['usetemplate']);
 				$itemorder = addslashes(serialize($newitems));
-				$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt',ancestors='$ancestors',outcomes='$newoutcomearr' WHERE id='$cid'";
+				$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt',ancestors='$ancestors',outcomes='$newoutcomearr',latepasshrs='$latepasshrs' WHERE id='$cid'";
 				//copy offline
 				$offlinerubrics = array();
 				mysql_query($query) or die("Query failed : " . mysql_error());

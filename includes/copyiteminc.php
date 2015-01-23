@@ -116,7 +116,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		//$query = "INSERT INTO imas_forums (courseid,name,summary,startdate,enddate) ";
 		//$query .= "SELECT '$cid',name,summary,startdate,enddate FROM imas_forums WHERE id='$typeid'";
 		//mysql_query($query) or die("Query failed : $query" . mysql_error());
-		$query = "SELECT name,description,startdate,enddate,settings,defdisplay,replyby,postby,avail,points,cntingb,gbcategory,forumtype,taglist,outcomes,rubric FROM imas_forums WHERE id='$typeid'";
+		$query = "SELECT name,description,startdate,enddate,settings,defdisplay,replyby,postby,avail,points,cntingb,gbcategory,forumtype,taglist,outcomes,caltag,rubric FROM imas_forums WHERE id='$typeid'";
 		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$row = mysql_fetch_row($result);
 		if ($sethidden) {$row[8] = 0;}
@@ -138,7 +138,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 			$row[14] = implode(',',$newoutcomes);
 		}
 		$row = "'".implode("','",addslashes_deep($row))."'";
-		$query = "INSERT INTO imas_forums (courseid,name,description,startdate,enddate,settings,defdisplay,replyby,postby,avail,points,cntingb,gbcategory,forumtype,taglist,outcomes) ";
+		$query = "INSERT INTO imas_forums (courseid,name,description,startdate,enddate,settings,defdisplay,replyby,postby,avail,points,cntingb,gbcategory,forumtype,taglist,outcomes,caltag) ";
 		$query .= "VALUES ('$cid',$row)";
 		mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$newtypeid = mysql_insert_id();
