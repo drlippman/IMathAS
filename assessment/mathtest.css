@@ -12,15 +12,15 @@ html {
 	
 }                                
 body {
-	margin: 0px;
+	margin: 10px;
 	padding: 0px;
+	position: inherit!important;
+	min-height: 0!important;
+	height: auto!important;
 }
 div {
 	margin: 0px;
 	padding: 0px;
-}
-div.midwrapper {
-	margin: 10px;
 }
 form {
 	margin: 0px;
