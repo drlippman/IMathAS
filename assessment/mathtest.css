@@ -12,13 +12,15 @@ html {
 	
 }                                
 body {
-	
-	margin: 10px;
+	margin: 0px;
 	padding: 0px;
 }
 div {
 	margin: 0px;
 	padding: 0px;
+}
+div.midwrapper {
+	margin: 10px;
 }
 form {
 	margin: 0px;
