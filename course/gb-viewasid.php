@@ -946,7 +946,7 @@
 									}
 								}
 								
-								echo str_replace(array('&','%nbsp;','%%','<','>'),array('; ','&nbsp;','&','&lt;','&gt;'), $laarr[$k]);
+								echo str_replace(array('&','%nbsp;','%%'),array('; ','&nbsp;','&'), $laarr[$k]);
 							}
 							$cnt++;
 						}
@@ -1320,14 +1320,15 @@ function scorestocolors($sc,$pts,$answ,$noraw) {
 function prepchoicedisp($v,$choicesdata) {
 	if ($v=='') {return '';}
 	foreach ($choicesdata[1] as $k=>$c) {
+		$c = str_replace('&','%%',$c);
 		$sh = strip_tags($c);
-		if (trim($sh)=='') {
+		if (trim($sh)=='' || strpos($c,'<table')!==false) {
 			$sh = "[view]";
 		} else if (strlen($sh)>15) {
 			$sh = substr($sh,0,15).'...';
 		}
 		if ($sh!=$c) {
-			$choicesdata[1][$k] = '<span onmouseover="tipshow(this,\''.str_replace('&','%%',htmlentities($c,ENT_QUOTES|ENT_HTML401)).'\')" onmouseout="tipout()">'.$sh.'</span>';
+			$choicesdata[1][$k] = '<span onmouseover="tipshow(this,\''.trim(str_replace('&','%%',htmlentities($c,ENT_QUOTES|ENT_HTML401))).'\')" onmouseout="tipout()">'.$sh.'</span>';
 		}
 	}
 	if ($choicesdata[0]=='choices') {
