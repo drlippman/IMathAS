@@ -125,7 +125,7 @@ $sql = 'CREATE TABLE `imas_students` ('
 	. ' `stutype` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `custominfo` TEXT NOT NULL, '
         . ' INDEX (`userid`), INDEX (`courseid`), '
-	. ' INDEX(`code`), INDEX(`section`)'
+	. ' INDEX(`code`), INDEX(`section`), INDEX(`locked`)'
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Which courses each student is enrolled in\';';
@@ -1006,7 +1006,8 @@ $sql = 'CREATE TABLE `imas_content_track` (
 	`typeid` INT(10) UNSIGNED NOT NULL, 
 	`viewtime` INT(10) UNSIGNED NOT NULL, 
 	`info` VARCHAR(254) NOT NULL, 
-	INDEX ( `courseid`) , INDEX( `userid`)
+	INDEX ( `courseid`) , INDEX( `userid`),
+	INDEX ( `typeid`) 
 	) ENGINE = InnoDB';
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 echo 'imas_content_track created<br/>';
