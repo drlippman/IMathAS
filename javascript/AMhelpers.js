@@ -108,6 +108,9 @@ function ineqtointerval(strw) {
 function intcalculate(inputId,outputId,format) {
   var fullstr = document.getElementById(inputId).value;
   fullstr = fullstr.replace(/\u2013|\u2014|\u2015/g, "-").replace(/\u2044/g, "/");
+  fullstr = fullstr.replace("∞","oo");
+  fullstr = fullstr.replace("≤","<=");
+  fullstr = fullstr.replace("≥",">=");
   if (fullstr.match(/DNE/i)) {
 	  fullstr = fullstr.toUpperCase();
   } else if (fullstr.replace(/\s+/g,'')=='') {
@@ -819,6 +822,9 @@ function doonsubmit(form,type2,skipconfirm) {
 		fullstr = document.getElementById("tc"+qn).value;
 		fullstr = fullstr.replace(/\s+/g,'');
 		fullstr = fullstr.replace(/\u2013|\u2014|\u2015/g, "-").replace(/\u2044/g, "/");
+		fullstr = fullstr.replace("∞","oo");
+		fullstr = fullstr.replace("≤","<=");
+		fullstr = fullstr.replace("≥",">=");
 		if (fullstr.match(/DNE/i)) {
 			  fullstr = fullstr.toUpperCase();
 		  } else {
