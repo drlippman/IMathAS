@@ -617,7 +617,7 @@
 	$reviewatend = ($testsettings['testtype']=="EndReview");
 	$showhints = ($testsettings['showhints']==1);
 	$showtips = $testsettings['showtips'];
-	$regenonreattempt = (($testsettings['shuffle']&8)==8);
+	$regenonreattempt = (($testsettings['shuffle']&8)==8 && !$allowregen);
 	if ($regenonreattempt) {
 		$nocolormark = true;
 	}

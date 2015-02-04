@@ -969,7 +969,7 @@
 					echo '<br/>';
 				}
 				if ($isteacher) {
-					echo "<br/><a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid=$cid&add=new&quoteq=$i-$qsetid-{$seeds[$i]}&to={$_GET['uid']}\">Use in Msg</a>";
+					echo "<br/><a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid=$cid&add=new&quoteq=$i-$qsetid-{$seeds[$i]}-{$line['assessmentid']}&to={$_GET['uid']}\">Use in Msg</a>";
 					//having issues with greybox in assessments
 					//echo '<br/>';
 					//echo "<a href=\"#\" onclick=\"GB_show('Send Message','$imasroot/course/sendmsgmodal.php?sendtype=msg&cid=$cid&quoteq=$i-$qsetid-{$seeds[$i]}&to={$_GET['uid']}',800,'auto')\" title=\"Send Message\">", _('Use in Message'), "</a>";

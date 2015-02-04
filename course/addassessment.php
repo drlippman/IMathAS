@@ -104,7 +104,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (isset($_POST['shuffle'])) { $shuffle = 1;} else {$shuffle = 0;}
 		if (isset($_POST['sameseed'])) { $shuffle += 2;}
 		if (isset($_POST['samever'])) { $shuffle += 4;}
-		if (isset($_POST['reattemptsdiffver'])) { $shuffle += 8;}
+		if (isset($_POST['reattemptsdiffver']) && $_POST['deffeedback']!="Practice" && $_POST['deffeedback']!="Homework") { 
+			$shuffle += 8;
+		}
 		
 		if ($_POST['minscoretype']==1 && trim($_POST['minscore'])!='' && $_POST['minscore']>0) {
 			$_POST['minscore'] = intval($_POST['minscore'])+10000;

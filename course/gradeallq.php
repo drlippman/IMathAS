@@ -565,7 +565,8 @@
 			//echo " <a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid=$cid&add=new&quoteq=$i-$qsetid-{$seeds[$i]}&to={$_GET['uid']}\">Use in Msg</a>";
 			//echo " &nbsp; <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$line['id']}&clearq=$i\">Clear Score</a>";
 			echo "<br/>Feedback: <textarea cols=50 rows=".($page==-1?1:3)." id=\"feedback-{$line['id']}\" name=\"feedback-{$line['id']}\">{$line['feedback']}</textarea>";
-			echo ' Question #'.($loc+1);
+			echo '<br/>Question #'.($loc+1);
+			echo ". <a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid=$cid&add=new&quoteq=$loc-$qsetid-{$seeds[$loc]}-$aid&to={$line['userid']}\">Use in Msg</a>";
 			echo "</div>\n";
 			if ($groupdup) {
 				echo '</div>';
