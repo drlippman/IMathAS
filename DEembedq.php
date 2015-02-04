@@ -34,11 +34,19 @@ $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mat
 $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquilled.js?v=070214\"></script>";
 $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/AMtoMQ.js?v=102113\"></script>";
 $placeinhead .= '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
+$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqntips.js?v=032810\"></script>";
+
+if (isset($_GET['jssubmit']) && $_GET['jssubmit']==1) {
+	$jssubmit = true;
+} else {
+	$jssubmit = false;
+}
 
 if (empty($_GET['id'])) {
 	echo 'Need to supply an id';
 	exit;
 }
+
 $qsetid=intval($_GET['id']);
 $sessiondata['coursetheme'] = $coursetheme;
 
@@ -54,6 +62,7 @@ require("./assessment/header.php");
 if (isset($_GET['redisplay'])) {
 	//DE is requesting that the question be redisplayed
 	list($params, $auth, $sig) = parse_params($_SERVER['QUERY_STRING']);
+	/*
 	if ($auth=='') {
 		echo 'Error - need to provide auth= for redisplay';
 		exit;
@@ -69,6 +78,7 @@ if (isset($_GET['redisplay'])) {
 		echo 'Error - invalid signature';
 		exit;
 	}
+	*/
 	$showans = (!isset($params['showans']) || $params['showans']=='true');
 	
 	$lastanswers = array();
@@ -118,27 +128,26 @@ if (isset($_GET['redisplay'])) {
 	
 	$pts = getpts($after);
 	
+	$params = array('action'=>'updatescore', 'id'=>$qsetid, 'score'=>$pts, 'redisplay'=>"$seed;;$rawafter;;{$lastanswers[0]}");
+		
 	if (isset($_POST['auth'])) {
-		
-		$params = array('action'=>'updatescore', 'id'=>$qsetid, 'score'=>$pts, 'redisplay'=>"$seed;;$rawafter;;{$lastanswers[0]}");
-		
 		$query = "SELECT password FROM imas_users WHERE SID='".stripslashes($_POST['auth'])."'";
 		$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
 		$row = mysql_fetch_row($result);
-		
-		$signed = build_signed_querystring($params, $row[0]);
-		
-		echo '<script type="text/javascript">
-		$(function() {
-			window.parent.postMessage("'.$signed.'","*");
-		});
-		</script>';
-
-		echo '<p>Saving score... <img src="img/updating.gif"/></p>';
+		$sig = $row[0];
 	} else {
-		echo "Question scored, but no auth provided, so nothing's going to happen now, sorry";
-		exit;
+		$sig = '';
 	}
+	$signed = build_signed_querystring($params, $sig);
+	
+	echo '<script type="text/javascript">
+	$(function() {
+		window.parent.postMessage("'.$signed.'","*");
+	});
+	</script>';
+
+	echo '<p>Saving score... <img src="img/updating.gif"/></p>';
+	
 } else {
 	$seed = rand(1,9999);
 	$doshowans = 0;
@@ -155,7 +164,20 @@ if (isset($_GET['redisplay'])) {
 		
 	$lastanswers = array();
 	displayq(0, $qsetid, $seed, $doshowans, $showhints, 0);
-	echo "<input type=submit name=\"check\" value=\"" . _('Submit') . "\">\n";
+	if ($jssubmit) {
+		echo '<input type="submit" id="submitbutton" style="display:none;"/>';
+		echo '<script type="text/javascript">
+		$(function() {
+			$(window).on("message", function(e) {
+				var data = e.originalEvent.data;
+				if (data=="submit") {
+					$("#submitbutton").click();
+				}});
+		});
+		</script>';
+	} else {
+		echo "<input type=submit name=\"check\" value=\"" . _('Submit') . "\">\n";
+	}
 	echo "</form>\n";
 	echo '<script type="text/javascript">
 		$(function() {

@@ -152,14 +152,13 @@ Leave items blank to use the assessment's default values<br/>
 <thead><tr>
 <?php
 		if (isset($_POST['checked'])) { //modifying existing questions
-			echo "<th>Description</th><th></th><th>Points</th><th>Attempts (0 for unlimited)</th><th>Show hints &amp; video buttons?</th><th>Additional Copies to Add</th></tr></thead>";
-			echo "<tbody>";
-
+			
 			$qids = array();
 			foreach ($_POST['checked'] as $k=>$v) {
 				$v = explode(':',$v);
 				$qids[] = $v[1];
 			}
+			$qrows = array();
 			$query = "SELECT imas_questions.id,imas_questionset.description,imas_questions.points,imas_questions.attempts,imas_questions.showhints,imas_questionset.extref ";
 			$query .= "FROM imas_questions,imas_questionset WHERE imas_questionset.id=imas_questions.questionsetid AND ";
 			$query .= "imas_questions.id IN ('".implode("','",$qids)."')";
@@ -172,8 +171,8 @@ Leave items blank to use the assessment's default values<br/>
 					$row[3] = '';
 				}
 				
-				echo '<tr><td>'.$row[1].'</td>';
-				echo '<td>';
+				$qrows[$row[0]] = '<tr><td>'.$row[1].'</td>';
+				$qrows[$row[0]] .= '<td>';
 				if ($row[5]!='') {
 					$extref = explode('~~',$row[5]);
 					$hasvid = false;  $hasother = false;
@@ -186,22 +185,44 @@ Leave items blank to use the assessment's default values<br/>
 					}
 					$page_questionTable[$i]['extref'] = '';
 					if ($hasvid) {
-						echo "<img src=\"$imasroot/img/video_tiny.png\"/>";
+						$qrows[$row[0]] .= "<img src=\"$imasroot/img/video_tiny.png\"/>";
 					}
 					if ($hasother) {
-						echo "<img src=\"$imasroot/img/html_tiny.png\"/>";
+						$qrows[$row[0]] .= "<img src=\"$imasroot/img/html_tiny.png\"/>";
 					}
 				} 
-				echo '</td>';
-				echo "<td><input type=text size=4 name=\"points{$row[0]}\" value=\"{$row[2]}\" /></td>";
-				echo "<td><input type=text size=4 name=\"attempts{$row[0]}\" value=\"{$row[3]}\" /></td>";
-				echo "<td><select name=\"showhints{$row[0]}\">";
-				echo '<option value="0" '.(($row[4]==0)?'selected="selected"':'').'>Use Default</option>';
-				echo '<option value="1" '.(($row[4]==1)?'selected="selected"':'').'>No</option>';
-				echo '<option value="2" '.(($row[4]==2)?'selected="selected"':'').'>Yes</option></select></td>';
-				echo "<td><input type=text size=4 name=\"copies{$row[0]}\" value=\"0\" /></td>";
-				echo '</tr>';
+				$qrows[$row[0]] .= '</td>';
+				$qrows[$row[0]] .= "<td><input type=text size=4 name=\"points{$row[0]}\" value=\"{$row[2]}\" /></td>";
+				$qrows[$row[0]] .= "<td><input type=text size=4 name=\"attempts{$row[0]}\" value=\"{$row[3]}\" /></td>";
+				$qrows[$row[0]] .= "<td><select name=\"showhints{$row[0]}\">";
+				$qrows[$row[0]] .= '<option value="0" '.(($row[4]==0)?'selected="selected"':'').'>Use Default</option>';
+				$qrows[$row[0]] .= '<option value="1" '.(($row[4]==1)?'selected="selected"':'').'>No</option>';
+				$qrows[$row[0]] .= '<option value="2" '.(($row[4]==2)?'selected="selected"':'').'>Yes</option></select></td>';
+				$qrows[$row[0]] .= "<td><input type=text size=4 name=\"copies{$row[0]}\" value=\"0\" /></td>";
+				$qrows[$row[0]] .= '</tr>';
 			} 
+			echo "<th>Description</th><th></th><th>Points</th><th>Attempts (0 for unlimited)</th><th>Show hints &amp; video buttons?</th><th>Additional Copies to Add</th></tr></thead>";
+			echo "<tbody>";
+
+			$query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$itemorder = explode(',', mysql_result($result,0,0));
+			foreach ($itemorder as $item) {
+				if (strpos($item,'~')!==false) {
+					$subs = explode('~',$item);
+					if (strpos($subs[0],'|')!==false) {
+						array_shift($subs);
+					}
+					foreach ($subs as $sub) {
+						if (isset($qrows[$sub])) {
+							echo $qrows[$sub];
+						}
+					}
+				} else if (isset($qrows[$item])) {
+					echo $qrows[$item];
+				}	
+			}
+			
 			echo '</tbody></table>';
 			echo '<input type=hidden name="qids" value="'.implode(',',$qids).'" />';
 			echo '<input type=hidden name="mod" value="true" />';
