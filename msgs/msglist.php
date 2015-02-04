@@ -205,10 +205,14 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				$message = '<p> </p><br/><hr/>'.$message;
 				//$message .= '<span class="hidden">QREF::'.htmlentities($_GET['quoteq']).'</span>';
 				$courseid = $cid;
-				if (isset($parts[3])) {  //sending to instructor
+				if (isset($parts[3])) {  //sending out of assessment instructor
 					$query = "SELECT name FROM imas_assessments WHERE id='".intval($parts[3])."'";
 					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-					$title = 'Question about #'.($parts[0]+1).' in '.str_replace('"','&quot;',mysql_result($result,0,0));
+					if (isset($teacherid) || isset($tutorid)) {
+						$title = 'Question #'.($parts[0]+1).' in '.str_replace('"','&quot;',mysql_result($result,0,0));
+					} else {
+						$title = 'Question about #'.($parts[0]+1).' in '.str_replace('"','&quot;',mysql_result($result,0,0));
+					}
 					if ($_GET['to']=='instr') {
 						unset($_GET['to']);
 						$msgset = 1; //force instructor only list
