@@ -2545,8 +2545,17 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$qn];} else {$abstolerance = $options['abstolerance'];}}
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if (isset($options['reqsigfigs'])) {if (is_array($options['reqsigfigs'])) {$reqsigfigs = $options['reqsigfigs'][$qn];} else {$reqsigfigs = $options['reqsigfigs'];}}
+		if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$qn];} else {$requiretimes = $options['requiretimes'];}}
+		if (isset($options['requiretimeslistpart'])) {if (is_array($options['requiretimeslistpart'])) {$requiretimeslistpart = $options['requiretimeslistpart'][$qn];} else {$requiretimeslistpart = $options['requiretimeslistpart'];}}
+		
 		if (is_array($options['partialcredit'][$qn]) || ($multi>0 && is_array($options['partialcredit']))) {$partialcredit = $options['partialcredit'][$qn];} else {$partialcredit = $options['partialcredit'];}
 		$givenans = str_replace('∞', 'oo', $givenans);
+		$GLOBALS['partlastanswer'] = $givenans;
+		
+		if (isset($requiretimes) && checkreqtimes($givenans,$requiretimes)==0) {
+			return 0;
+		}
+		
 		if (isset($partialcredit)) {
 			if (!is_array($partialcredit)) {
 				$partialcredit = explode(',',$partialcredit);
@@ -2569,7 +2578,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 		
 		if ($multi>0) { $qn = $multi*1000+$qn;}
-		$GLOBALS['partlastanswer'] = $givenans;
 		
 		if ($answer==='') {
 			if (trim($givenans)==='') { return 1;} else { return 0;}
@@ -2638,6 +2646,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			
 			foreach($gaarr as $j=>$givenans) {
 				$givenans = trim($givenans);
+				if (isset($requiretimeslistpart) && checkreqtimes($givenans,$requiretimeslistpart)==0) {
+					continue;
+				}
 				$anss = explode(' or ',$answer);
 				foreach ($anss as $anans) {
 					if (!is_numeric($anans)) {
