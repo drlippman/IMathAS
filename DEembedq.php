@@ -59,8 +59,8 @@ $placeinhead .= '<style type="text/css">div.question {width: auto;} div.review {
 $useeditor = 1;
 require("./assessment/header.php");
 
-if (isset($_GET['redisplay'])) {
-	//DE is requesting that the question be redisplayed
+if (isset($_GET['showscored'])) {
+	//DE is requesting that the question be redisplayed with right/wrong markers
 	list($params, $auth, $sig) = parse_params($_SERVER['QUERY_STRING']);
 	/*
 	if ($auth=='') {
@@ -82,7 +82,7 @@ if (isset($_GET['redisplay'])) {
 	$showans = (!isset($params['showans']) || $params['showans']=='true');
 	
 	$lastanswers = array();
-	list($seed, $rawscores, $lastanswers[0]) = explode(';;', $params['redisplay']);
+	list($seed, $rawscores, $lastanswers[0]) = explode(';;', $params['showscored']);
 	$rawscores = explode('~',$rawscores);
 	$seed = intval($seed);
 	
@@ -149,7 +149,15 @@ if (isset($_GET['redisplay'])) {
 	echo '<p>Saving score... <img src="img/updating.gif"/></p>';
 	
 } else {
-	$seed = rand(1,9999);
+	$lastanswers = array();
+	if (isset($_GET['redisplay'])) {
+		//DE is requesting that the question be redisplayed
+		list($params, $auth, $sig) = parse_params($_SERVER['QUERY_STRING']);
+		list($seed, $rawscores, $lastanswers[0]) = explode(';;', $params['redisplay']);
+		$rawscores = array();
+	} else {
+		$seed = rand(1,9999);
+	}
 	$doshowans = 0;
 	echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit()\">\n";
 	echo "<input type=\"hidden\" name=\"seed\" value=\"$seed\" />";
@@ -162,7 +170,6 @@ if (isset($_GET['redisplay'])) {
 		$showhints = true;
 	}
 		
-	$lastanswers = array();
 	displayq(0, $qsetid, $seed, $doshowans, $showhints, 0);
 	if ($jssubmit) {
 		echo '<input type="submit" id="submitbutton" style="display:none;"/>';

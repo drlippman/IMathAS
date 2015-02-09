@@ -908,6 +908,9 @@ if (!isset($_POST['embedpostback'])) {
 		//$placeinhead .= '<script src="'.$urlmode.'www.youtube.com/player_api"></script>';
 		$placeinhead .= '<script src="'.$imasroot.'/javascript/ytapi.js"></script>';
 	}
+	if ($sessiondata['intreereader']) {
+		$flexwidth = true;
+	}
 	require("header.php");
 	if ($testsettings['noprint'] == 1) {
 		echo '<style type="text/css" media="print"> div.question, div.todoquestion, div.inactive { display: none;} </style>';
