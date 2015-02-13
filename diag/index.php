@@ -296,20 +296,7 @@ if (isset($_POST['SID'])) {
 	exit;
 }
 
-/*
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html>
-<head>
-<title><?php echo $line['name']; ?></title>
-<style type="text/css">
-<!--
-@import url("../imas.css");
--->
-</style>
-<script src="<?php echo $imasroot;?>/javascript/mathgraphcheck.js" type="text/javascript"></script>
-</head>
-<body>
-*/
+
 //allow custom login page for specific diagnostics
 if (file_exists((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'')."diag$diagid.php")) {
 	require((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'')."diag$diagid.php");
@@ -402,12 +389,12 @@ if ($noproctor && count($pws)>1 && trim($pws[1])!='' && (!$allowreentry || $line
 <script type="text/javascript">
 function determinesetup() {
 	document.getElementById("submit").style.display = "block";
-	if (!AMnoMathML && !ASnoSVG) {
+	if (MathJaxCompatible && !ASnoSVG) {
 		document.getElementById("bsetup").innerHTML = "Browser setup OK";
 	} else {
 		document.getElementById("bsetup").innerHTML = "Using image-based display";
 	}
-	if (!AMnoMathML) {
+	if (MathJaxCompatible) {
 		document.getElementById("mathdisp").value = "1";
 	} 
 	if (!ASnoSVG) {

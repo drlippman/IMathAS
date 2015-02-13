@@ -4,10 +4,10 @@
  *   David Lippman & Peter Jipsen
  *
  * @author David Lippman
- * @copyright Copyright © 2008 David Lippman.
+ * @copyright Copyright ï¿½ 2008 David Lippman.
  *
  * Plugin format based on code that is:
- * @copyright Copyright © 2004-2008, Moxiecode Systems AB, All rights reserved.
+ * @copyright Copyright ï¿½ 2004-2008, Moxiecode Systems AB, All rights reserved.
  */
 
 (function() {
@@ -357,12 +357,9 @@
 			if (tinymce.isIE) {
 				  var str = outnode.innerHTML.replace(/\`/g,"");
 				  str.replace(/\"/,"&quot;");
-				   var newAM = document.createElement("span");
-				  if (AMnoMathML) {
-					  newAM.appendChild(AMTparseMath(str));
-				  } else {
-					  newAM.appendChild(AMparseMath(str));
-				  }
+				  var newAM = document.createElement("span");
+				  newAM.appendChild(AMTparseMath(str));
+				  
 				  outnode.innerHTML = newAM.innerHTML;    
 				  outnode.title=str;  //add title to <span class="AM"> with equation for cut-and-paste
 			  } else {

@@ -1,7 +1,7 @@
 <?php  
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 96;
+$latest = 97;
 
 
 @set_time_limit(0);
@@ -1553,6 +1553,11 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 if ($res===false) {
 			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
+		}
+		if ($last<97) {
+			echo "<p>Use of AsciiMathML for display has been removed from the system, and AsciiMath rendering via MathJax ";
+			echo "is now the default math display option.  It is recommended you compare your loginpage.php against ";
+			echo "loginpage.php.dist, and update the accessibility options.</p>";
 		}
 		/*$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {

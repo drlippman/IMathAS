@@ -238,7 +238,7 @@ if (strlen($enrollkey)>0) {
 		html += '<input type="radio" name="access" value="3" <?php if ($pref==3) {echo "checked=1";} ?> />Force image based display<br/>';
 		html += '<input type="radio" name="access" value="1">Use text-based display</span><br class=form>';
 		
-		if (AMnoMathML) {
+		if (!MathJaxCompatible) {
 			html += '<input type=hidden name="mathdisp" value="0">';
 		} else {
 			html += '<input type=hidden name="mathdisp" value="1">';
@@ -248,7 +248,7 @@ if (strlen($enrollkey)>0) {
 		} else {
 			html += '<input type=hidden name="graphdisp" value="1">';
 		}
-		if (!AMnoMathML && !ASnoSVG) {
+		if (MathJaxCompatible && !ASnoSVG) {
 			html += '<input type=hidden name="isok" value=1>';
 		} 
 		html += '<div class=submit><input name="submit" type="submit" value="Login"></div>';
