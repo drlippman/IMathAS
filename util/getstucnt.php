@@ -77,7 +77,8 @@
 		$grpdata .= "{$row[1]}:  {$row[2]}<br/>";
 		$grpcnt += $row[2];
 	}
-	echo "<b>$lastgroup</b>: $grpcnt<br/>";
+	
+	echo "<b>" . $lastgroup . "</b>:" . $grpcnt;
 	echo $grpdata;
 	
 	echo "<p>Active students last hour: ";
