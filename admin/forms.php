@@ -133,7 +133,7 @@ switch($_GET['action']) {
 			$deflatepass = $line['deflatepass'];
 			$deftime = $line['deftime'];
 		} else {
-			$courseid = "Not yet set";
+			$courseid = _("Will be assigned when the course is created");
 			$name = "Enter course name here";
 			$ekey = "Enter enrollment key here";
 			$hideicons = isset($CFG['CPS']['hideicons'])?$CFG['CPS']['hideicons'][0]:0;
@@ -161,10 +161,20 @@ switch($_GET['action']) {
 			$deflatepass = isset($CFG['CPS']['deflatepass'])?$CFG['CPS']['deflatepass'][0]:0;
 			$ltisecret = "";
 		}
-		$hr = floor($deftime/60)%12;
-		$min = $deftime%60;
-		$am = ($deftime<12*60)?'am':'pm';
+		$defetime = $deftime%10000;
+		$hr = floor($defetime/60)%12;
+		$min = $defetime%60;
+		$am = ($defetime<12*60)?'am':'pm';
 		$deftimedisp = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
+		if ($deftime>10000) {
+			$defstime = floor($deftime/10000);
+			$hr = floor($defstime/60)%12;
+			$min = $defstime%60;
+			$am = ($defstime<12*60)?'am':'pm';
+			$defstimedisp = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
+		} else {
+			$defstimedisp = $deftimedisp;
+		}
 		
 		if (isset($_GET['cid'])) {
 			$cid = $_GET['cid'];
@@ -203,7 +213,8 @@ switch($_GET['action']) {
 		
 		if (!isset($CFG['CPS']['deftime']) || $CFG['CPS']['deftime'][1]==1) {
 			echo "<span class=form>Default start/end time for new items:</span><span class=formright>";
-			echo '<input name="deftime" type="text" size="8" value="'.$deftimedisp.'"/>';
+			echo 'Start: <input name="defstime" type="text" size="8" value="'.$defstimedisp.'"/>, ';
+			echo 'end: <input name="deftime" type="text" size="8" value="'.$deftimedisp.'"/>';
 			echo '</span><br class="form"/>';
 		}
 		

@@ -44,7 +44,7 @@
 		$aid = $_GET['id'];
 		$isreview = false;
 		
-		$query = "SELECT deffeedback,startdate,enddate,reviewdate,shuffle,itemorder,password,avail,isgroup,groupsetid,deffeedbacktext,timelimit,courseid,istutorial,name FROM imas_assessments WHERE id='$aid'";
+		$query = "SELECT deffeedback,startdate,enddate,reviewdate,shuffle,itemorder,password,avail,isgroup,groupsetid,deffeedbacktext,timelimit,courseid,istutorial,name,allowlate FROM imas_assessments WHERE id='$aid'";
 		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 		$adata = mysql_fetch_array($result, MYSQL_ASSOC);
 		$now = time();
@@ -64,6 +64,7 @@
 			$query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid'";
 			$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 			$row = mysql_fetch_row($result2);
+
 			if ($row!=null) {
 				if ($now<$row[0] || $row[1]<$now) { //outside exception dates
 					if ($now > $adata['startdate'] && $now<$adata['reviewdate']) {
@@ -94,14 +95,41 @@
 		if ($assessmentclosed) {
 			require("header.php");
 			echo '<p>', _('This assessment is closed'), '</p>';
-			if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0 && $sessiondata['ltiitemid']==$aid) {
-				//in LTI and right item
-				list($atype,$sa) = explode('-',$adata['deffeedback']);
-				if ($sa!='N') {
-					$query = "SELECT id FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='$aid' ORDER BY id LIMIT 1";
+			if ($adata['avail']>0) {
+				$viewedassess = array();
+				if ($adata['enddate']<$now && $adata['allowlate']>10 && !$actas && !isset($sessiondata['stuview'])) {
+					$query = "SELECT typeid FROM imas_content_track WHERE courseid='$cid' AND userid='$userid' AND type='gbviewasid'";
+					$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+					while ($r = mysql_fetch_row($r2)) {
+						$viewedassess[] = $r[0];
+					}
+				}
+							
+				if (!isset($teacherid) && !isset($tutorid) && !$actas && !isset($sessiondata['stuview'])) {
+					$query = "SELECT latepasshrs FROM imas_courses WHERE id='".$cid."'";
+					$result = mysql_query($query) or die("Query failed : " . mysql_error());
+					$latepasshrs = mysql_result($result,0,0);
+				
+					$query = "SELECT latepass FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
 					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-					if (mysql_num_rows($result)>0) {
-						echo '<p><a href="../course/gb-viewasid.php?cid='.$cid.'&asid='.mysql_result($result,0,0).'">', _('View your assessment'), '</p>';
+					$latepasses = mysql_result($result,0,0);
+				} else {
+					$latepasses = 0;
+					$latepasshrs = 0;
+				}
+				if ($adata['allowlate']>10 && ($now - $adata['enddate'])<$latepasshrs*3600 && !in_array($aid,$viewedassess) && $latepasses>0 && !isset($sessiondata['stuview']) && !$actas ) { 
+					echo "<p><a href=\"$imasroot/course/redeemlatepass.php?cid=$cid&aid=$aid\">", _('Use LatePass'), "</a></p>";
+				}
+			
+				if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0 && $sessiondata['ltiitemid']==$aid) {
+					//in LTI and right item
+					list($atype,$sa) = explode('-',$adata['deffeedback']);
+					if ($sa!='N') {
+						$query = "SELECT id FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='$aid' ORDER BY id LIMIT 1";
+						$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+						if (mysql_num_rows($result)>0) {
+							echo '<p><a href="../course/gb-viewasid.php?cid='.$cid.'&asid='.mysql_result($result,0,0).'">', _('View your assessment'), '</p>';
+						}
 					}
 				}
 			}
@@ -589,7 +617,7 @@
 	$reviewatend = ($testsettings['testtype']=="EndReview");
 	$showhints = ($testsettings['showhints']==1);
 	$showtips = $testsettings['showtips'];
-	$regenonreattempt = (($testsettings['shuffle']&8)==8);
+	$regenonreattempt = (($testsettings['shuffle']&8)==8 && !$allowregen);
 	if ($regenonreattempt) {
 		$nocolormark = true;
 	}
@@ -880,6 +908,9 @@ if (!isset($_POST['embedpostback'])) {
 		//$placeinhead .= '<script src="'.$urlmode.'www.youtube.com/player_api"></script>';
 		$placeinhead .= '<script src="'.$imasroot.'/javascript/ytapi.js"></script>';
 	}
+	if ($sessiondata['intreereader']) {
+		$flexwidth = true;
+	}
 	require("header.php");
 	if ($testsettings['noprint'] == 1) {
 		echo '<style type="text/css" media="print"> div.question, div.todoquestion, div.inactive { display: none;} </style>';
@@ -921,6 +952,20 @@ if (!isset($_POST['embedpostback'])) {
 		}
 		if (($testsettings['allowlate']%10==1 || $testsettings['allowlate']%10-1>$latepasscnt) && $sessiondata['latepasses']>0 && !$isreview) {
 			echo "<a href=\"$imasroot/course/redeemlatepass.php?cid=$cid&aid={$testsettings['id']}\" onclick=\"return confirm('", _('This will discard any unsaved work.'), "');\">", _('Redeem LatePass'), "</a> ";
+		}
+		if ($isreview && !(isset($exceptionduedate) && $exceptionduedate>0) && $testsettings['allowlate']>10 && $sessiondata['latepasses']>0 && !isset($sessiondata['stuview']) && !$actas) {
+			$query = "SELECT latepasshrs FROM imas_courses WHERE id='".$testsettings['courseid']."'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$latepasshrs = mysql_result($result,0,0);
+			$viewedassess = array();
+			$query = "SELECT typeid FROM imas_content_track WHERE courseid='".$testsettings['courseid']."' AND userid='$userid' AND type='gbviewasid'";
+			$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+			while ($r = mysql_fetch_row($r2)) {
+				$viewedassess[] = $r[0];
+			}
+			if ((time() - $testsettings['enddate'])<$latepasshrs*3600 && !in_array($testsettings['id'],$viewedassess)) {
+				echo "<a href=\"$imasroot/course/redeemlatepass.php?cid=$cid&aid={$testsettings['id']}\" onclick=\"return confirm('", _('This will discard any unsaved work.'), "');\">", _('Redeem LatePass'), "</a> ";
+			}
 		}
 		
 		
@@ -1128,7 +1173,13 @@ if (!isset($_POST['embedpostback'])) {
 			if ($timebeforedue>3599) {
 				$duetimenote .= floor($timebeforedue/3600). " " . _('hours') . ", ";
 			}
-			$duetimenote .= ceil(($timebeforedue%3600)/60). " " . _('minutes') . "</span>";
+			$duetimenote .= ceil(($timebeforedue%3600)/60). " " . _('minutes');
+			$duetimenote .= '. ';
+			if ($exceptionduedate > 0) {
+				$duetimenote .= _('Due') . " " . tzdate('D m/d/Y g:i a',$exceptionduedate);
+			} else {
+				$duetimenote .= _('Due') . " " . tzdate('D m/d/Y g:i a',$testsettings['enddate']);
+			}
 		} else {
 			if ($testsettings['enddate']==2000000000) {
 				$duetimenote = '';

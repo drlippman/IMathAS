@@ -131,6 +131,7 @@ if (isset($_GET['form'])) {
 	}
 	echo '<a href="utils.php?form=lookup">User lookup</a><br/>';
 	echo '<a href="getstucnt.php">Get Student Count</a><br/>';
+	echo '<a href="getstucntdet.php">Get Detailed Student Count</a><br/>';
 	echo '<a href="'.$imasroot.'/admin/approvepending.php">Approve Pending Instructor Accounts</a><br/>';
 	echo '<a href="utils.php?debug=true">Enable Debug Mode</a><br/>';
 	echo '<a href="replacevids.php">Replace YouTube videos</a><br/>';

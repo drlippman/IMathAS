@@ -1,10 +1,20 @@
 //IMathAS:  Handles preview buttons and pre-submit calculations for assessments
 //(c) 2006 David Lippman
 
+function normalizemathunicode(str) {
+	str = str.replace(/\u2013|\u2014|\u2015|\u2212/g, "-");
+	str = str.replace(/\u2044|\u2215/g, "/");
+	str = str.replace("∞","oo").replace("≤","<=").replace("≥",">=");
+	str = str.replace("±","+-").replace("÷","/");
+	str = str.replace("√","sqrt").replace("∛","root(3)");
+	str = str.replace("²","^2").replace("³","^3");
+	return str;
+}
+
 //handles preview button for calculated type
 function calculate(inputId,outputId,format) {
   var fullstr = document.getElementById(inputId).value;
-  fullstr = fullstr.replace(/\u2013|\u2014|\u2015/g, "-").replace(/\u2044/g, "/");
+  fullstr = normalizemathunicode(fullstr);
   fullstr = fullstr.replace(/=/,'');
   fullstr = fullstr.replace(/(\d)\s*,(?=\s*\d{3}\b)/g,"$1");
   if (format.indexOf('list')!=-1) {
@@ -107,7 +117,7 @@ function ineqtointerval(strw) {
 //preview for calcinterval type 
 function intcalculate(inputId,outputId,format) {
   var fullstr = document.getElementById(inputId).value;
-  fullstr = fullstr.replace(/\u2013|\u2014|\u2015/g, "-").replace(/\u2044/g, "/");
+  fullstr = normalizemathunicode(fullstr);
   if (fullstr.match(/DNE/i)) {
 	  fullstr = fullstr.toUpperCase();
   } else if (fullstr.replace(/\s+/g,'')=='') {
@@ -254,7 +264,7 @@ function intcalculate(inputId,outputId,format) {
 //preview for calcntuple
 function ntuplecalc(inputId,outputId,format) {
 	var fullstr = document.getElementById(inputId).value;
-	fullstr = fullstr.replace(/\u2013|\u2014|\u2015/g, "-").replace(/\u2044/g, "/");
+	fullstr = normalizemathunicode(fullstr);
 	fullstr = fullstr.replace(/\s+/g,'');
 	if (fullstr.match(/DNE/i)) {
 		fullstr = fullstr.toUpperCase();
@@ -585,7 +595,7 @@ function AMpreview(inputId,outputId) {
   
   var str = document.getElementById(inputId).value;
   str = str.replace(/,/g,"");
-  str = str.replace(/\u2013|\u2014|\u2015/g, "-").replace(/\u2044/g, "/");
+  str = normalizemathunicode(str);
    var dispstr = str;
    
   for (var i=0; i<vars.length; i++) {
@@ -651,7 +661,6 @@ function AMpreview(inputId,outputId) {
   }
   vars = vl.split('|');
   var totesteqn = mathjs(str,vl);
-  	  
   while (tstpt<ptlist.length && (isNaN(res) || res=="Infinity")) {
 	  var totest = '';
 	  testvals = ptlist[tstpt].split("~");
@@ -819,7 +828,7 @@ function doonsubmit(form,type2,skipconfirm) {
 		
 		fullstr = document.getElementById("tc"+qn).value;
 		fullstr = fullstr.replace(/\s+/g,'');
-		fullstr = fullstr.replace(/\u2013|\u2014|\u2015/g, "-").replace(/\u2044/g, "/");
+		fullstr = normalizemathunicode(fullstr);
 		if (fullstr.match(/DNE/i)) {
 			  fullstr = fullstr.toUpperCase();
 		  } else {
@@ -877,7 +886,7 @@ function doonsubmit(form,type2,skipconfirm) {
 		qn = parseInt(qn);
 		
 		str = document.getElementById("tc"+qn).value;
-		str = str.replace(/\u2013|\u2014|\u2015/g, "-").replace(/\u2044/g, "/");
+		str = normalizemathunicode(str);
 		if (calcformat[qn].indexOf('list')!=-1) {
 			strarr = str.split(/,/);
 		} else {
@@ -936,7 +945,7 @@ function doonsubmit(form,type2,skipconfirm) {
 		qn = parseInt(qn);
 		str = document.getElementById("tc"+qn).value;
 		str = str.replace(/,/g,"");
-		str = str.replace(/\u2013|\u2014|\u2015/g, "-").replace(/\u2044/g, "/");
+		str = normalizemathunicode(str);
 		if (iseqn[qn]==1) {
 			str = str.replace(/(.*)=(.*)/,"$1-($2)");
 		}
@@ -947,13 +956,13 @@ function doonsubmit(form,type2,skipconfirm) {
 		for (var j=0; j<vars.length; j++) {
 			  if (vars[j].charCodeAt(0)>96) { //lowercase
 				  if (arraysearch(vars[j].toUpperCase(),vars)==-1) {
-					  vars[j] = vars[j].toLowerCase();
+					 // vars[j] = vars[j].toLowerCase();
 					  str = str.replace(new RegExp(vars[j],"gi"),vars[j]);	  
 				  }
 			  } else {
 				  if (arraysearch(vars[j].toLowerCase(),vars)==-1) {
-					vars[j] = vars[j].toLowerCase();
-					str = str.replace(new RegExp(vars[j],"gi"),vars[j]);	  
+					//vars[j] = vars[j].toLowerCase();
+					str = str.replace(new RegExp(vars[j],"gi"),vars[j]);
 				  }
 			  }
 		  }
@@ -966,7 +975,7 @@ function doonsubmit(form,type2,skipconfirm) {
 		vars = varlist.split("|");
 		var nh = document.getElementById("qn" + qn);
 		nh.value = mathjs(str,varlist);
-		
+
 		ptlist = pts[qn].split(",");
 		vals= new Array();
 		for (var fj=0; fj<ptlist.length;fj++) { //for each set of inputs

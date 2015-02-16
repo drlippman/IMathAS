@@ -445,7 +445,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	if ($GLOBALS['sessiondata']['graphdisp']==0) {
 		return $alt;
 	} else {
-		return "<embed type='image/svg+xml' align='middle' width='$settings[6]' height='$settings[7]' src='{$GLOBALS['imasroot']}/javascript/d.svg' script='$commands' />\n";
+		return "<embed type='image/svg+xml' align='middle' width='$settings[6]' height='$settings[7]' script='$commands' />\n";
 	}
 }
 
@@ -572,7 +572,7 @@ function showasciisvg($script) {
 		$width = 200; $height = 200;
 	}
 	$script = str_replace("'",'"',$script);
-	return "<embed type='image/svg+xml' align='middle' width='$width' height='$height' src='{$GLOBALS['imasroot']}/javascript/d.svg' script='$script' />\n";
+	return "<embed type='image/svg+xml' align='middle' width='$width' height='$height' script='$script' />\n";
 }
 
 

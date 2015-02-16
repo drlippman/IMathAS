@@ -92,6 +92,7 @@ function apportion_info($pop, $seats, $method) {
 	foreach ($pop as $s=>$p) {
 		$quotas[$s] = $p/$divisor;
 	}
+	
 	$outdiv = '';
 	$luq = array();
 	$other = array();
@@ -112,6 +113,7 @@ function apportion_info($pop, $seats, $method) {
 		$toadd = $seats - array_sum($luq);
 		arsort($toraiseup);
 		$moddivs = array_values($toraiseup);
+
 		//if the next value is the same, then the divisor that adds $toadd additional
 		//seats would add $toadd+1 additional seats, so the method fails.
 		if ($toadd==0) {
@@ -126,7 +128,7 @@ function apportion_info($pop, $seats, $method) {
 		} else if ($moddivs[$toadd-1]==$moddivs[$toadd]) {
 			$outdiv = "fail";
 		} else {
-			$outdiv = '('.$moddivs[$toadd].','.$moddivs[$toadd-1].')';
+			$outdiv = '('.$moddivs[$toadd].','.$moddivs[$toadd-1].']';
 		}
 
 	} else if ($method=='adams') {
@@ -156,7 +158,7 @@ function apportion_info($pop, $seats, $method) {
 		} else if ($moddivs[$tosub-1]==$moddivs[$tosub]) {
 			$outdiv = "fail";
 		} else {
-			$outdiv = '('.$moddivs[$tosub-1].','.$moddivs[$tosub].')';
+			$outdiv = '['.$moddivs[$tosub-1].','.$moddivs[$tosub].')';
 		}
 	} else if ($method=='webster') {
 		$tolowerdown = array();

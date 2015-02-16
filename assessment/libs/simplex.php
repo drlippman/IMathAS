@@ -3,6 +3,7 @@
 // Mike Jenck, Originally developed May 16-26, 2014
 // licensed under GPL version 2
 //
+// 2015-01-09 Added simplexnumberofsolutions and simplexchecksolution
 // 2014-10-22 Fixed: simplexpivot typo ($sma --> $sm)
 // 2014-09-18 Added simplexsetentry and correct help file typos.
 // 2014-06-06 Updated, sorted, and fixed help file information
@@ -11,7 +12,7 @@
 
 global $allowedmacros;
 array_push($allowedmacros, "simplex", "simplexcreateanswerboxentrytable", "simplexcreateinequalities",
-"simplexconverttodecimals", "simplexconverttofraction", "simplexdebug", "simplexdefaultheaders", "simplexdisplaytable", "simplexfindpivotpoint", "simplexgetentry", "simplexsetentry", "simplexpivot", "simplexreadtoanswerarray", "simplexreadsolution", "simplexsolve" );
+"simplexconverttodecimals", "simplexconverttofraction", "simplexdebug", "simplexdefaultheaders", "simplexdisplaytable", "simplexfindpivotpoint", "simplexgetentry", "simplexsetentry", "simplexpivot", "simplexreadtoanswerarray", "simplexreadsolution", "simplexsolve", "simplexnumberofsolutions", "simplexchecksolution" );
 
 
 include_once("fractions.php");  // fraction routine
@@ -330,6 +331,43 @@ function simplex($type,$objective,$constraints) {
   $sm[$lastrow][$slackend] = array(0,1); //createsimplexelement(0);
   
   return $sm;
+}
+
+// simplexchecksolution(solutionlist,stuanswer)
+//
+// solutionlist: an array of solutions (in the case of multiple solutions).   In the form of
+//            
+//            solutionlist[0] = array(solution values for matrix[0], IsOptimized)
+//            solutionlist[1] = array(solution values for matrix[1], IsOptimized)
+//            etc.
+//            This is returned from simplexsolve
+//
+//
+// stuanswer: the answer the student submitted
+//
+//
+// returns:  0 if no match is found, 1 if a match is found
+function simplexchecksolution($solutionlist,$stuanswer) {
+
+  $IsOptimizedcol = count($solutionlist[0])-1; // set Yes/No column index
+  $OptimizedValuecol = $IsOptimizedcol -1;     // the Optimized Value (f/g))
+  $match = 0;  // set to no match
+  
+  for($r=0;$r<count($solutionlist);$r++) {
+    if($solutionlist[$r][$IsOptimizedcol]=="Yes") {
+      $match = 1;  // found a possible solution
+      for($c=0;$c<$OptimizedValuecol;$c++) {
+        // now check to see if this solution matches the student
+        if($solutionlist[$r][$c]!=$stuanswer[$c]) {
+           $match = 0;  // not a solution
+           break;
+        }
+      }
+      if($match==1) break;
+    }
+  }
+  
+  return $match;
 }
 
 
@@ -1303,6 +1341,30 @@ function simplexsetentry($sm,$r,$c,$n,$d) {
   $sm[$r][$c][1] = $d;
   return 1;
 }
+
+
+// simplexnumberofsolutions(solutionlist)
+//
+// solutionlist: an array of solutions (in the case of multiple solutions).   In the form of
+//            
+//            solutionlist[0] = array(solution values for matrix[0], IsOptimized)
+//            solutionlist[1] = array(solution values for matrix[1], IsOptimized)
+//            etc.
+//            This is returned from simplexsolve
+//
+// returns:  the number of solutions
+function simplexnumberofsolutions($solutionlist) {
+  $solutioncount = 0;
+  for($r=0;$r<count($solutionlist);$r++) {
+      $IsOptimizedcol = count($solutionlist[$r])-1;
+      if($solutionlist[$r][$IsOptimizedcol]=="Yes") {
+      	  $solutioncount++;
+      }
+  }
+  
+  return $solutioncount;
+}
+
 
 // simplexpivot(simplexmatrix,pivotpoint)
 //

@@ -125,7 +125,7 @@ $sql = 'CREATE TABLE `imas_students` ('
 	. ' `stutype` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `custominfo` TEXT NOT NULL, '
         . ' INDEX (`userid`), INDEX (`courseid`), '
-	. ' INDEX(`code`), INDEX(`section`)'
+	. ' INDEX(`code`), INDEX(`section`), INDEX(`locked`)'
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Which courses each student is enrolled in\';';
@@ -178,7 +178,7 @@ $sql = 'CREATE TABLE `imas_courses` ('
 	. ' `newflag` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\','
 	. ' `istemplate` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\','
 	. ' `deflatepass` TINYINT(2) UNSIGNED NOT NULL DEFAULT \'0\','
-	. ' `deftime` SMALLINT(4) UNSIGNED NOT NULL DEFAULT \'600\','
+	. ' `deftime` INT(10) UNSIGNED NOT NULL DEFAULT \'600\','
 	. ' `outcomes` TEXT NOT NULL, '
 	. ' `ancestors` TEXT NOT NULL, '
 	. ' `ltisecret` VARCHAR(10) NOT NULL, '
@@ -237,7 +237,7 @@ $sql = 'CREATE TABLE `imas_assessments` ('
 	. ' `tutoredit` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `ancestors` TEXT NOT NULL, '
         . ' INDEX (`courseid`), INDEX(`startdate`), INDEX(`enddate`),'
-	. ' INDEX(`cntingb`), INDEX(`reviewdate`), INDEX(`avail`)'
+	. ' INDEX(`cntingb`), INDEX(`reviewdate`), INDEX(`avail`), INDEX(`ancestors`(10))'
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Assessment info\';';
@@ -443,6 +443,7 @@ $sql = 'CREATE TABLE `imas_exceptions` ('
         . ' `startdate` INT(10) UNSIGNED NOT NULL, '
         . ' `enddate` INT(10) UNSIGNED NOT NULL, '
 	. ' `islatepass` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
+	. ' `waivereqscore` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
         . ' INDEX (`userid`), INDEX(`assessmentid`)'
         . ' )'
         . ' ENGINE = InnoDB'
@@ -1005,7 +1006,8 @@ $sql = 'CREATE TABLE `imas_content_track` (
 	`typeid` INT(10) UNSIGNED NOT NULL, 
 	`viewtime` INT(10) UNSIGNED NOT NULL, 
 	`info` VARCHAR(254) NOT NULL, 
-	INDEX ( `courseid`) , INDEX( `userid`)
+	INDEX ( `courseid`) , INDEX( `userid`),
+	INDEX ( `typeid`) 
 	) ENGINE = InnoDB';
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 echo 'imas_content_track created<br/>';

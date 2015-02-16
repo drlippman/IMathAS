@@ -404,6 +404,15 @@ if ($overwriteBody==1) {
 	
 	$cnt = 0;
 	$now = time();
+	$hr = floor($coursedeftime/60)%12;
+	$min = $coursedeftime%60;
+	$am = ($coursedeftime<12*60)?'am':'pm';
+	$deftime = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
+	$hr = floor($coursedefstime/60)%12;
+	$min = $coursedefstime%60;
+	$am = ($coursedefstime<12*60)?'am':'pm';
+	$defstime = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
+	
 	if ($orderby==0) {
 		asort($startdates);
 		$keys = array_keys($startdates);
@@ -417,6 +426,7 @@ if ($overwriteBody==1) {
 		asort($courseorder);
 		$keys = array_keys($courseorder);
 	}
+	
 	foreach ($keys as $i) {
 		echo '<tr class=grid>';
 		echo '<td>';
@@ -481,9 +491,12 @@ if ($overwriteBody==1) {
 		}
 		if ($startdates[$i]==0) {
 			$startdates[$i] = time();
+			$sdate = tzdate("m/d/Y",$startdates[$i]);
+			$stime = $defstime;
+		} else {
+			$sdate = tzdate("m/d/Y",$startdates[$i]);
+			$stime = tzdate("g:i a",$startdates[$i]);
 		}
-		$sdate = tzdate("m/d/Y",$startdates[$i]);
-		$stime = tzdate("g:i a",$startdates[$i]);
 		
 		echo "<input type=text size=10 id=\"sdate$cnt\" name=\"sdate$cnt\" value=\"$sdate\" onblur=\"ob(this)\"/>(";
 		echo "<span id=\"sd$cnt\">".getshortday($startdates[$i]).'</span>';
@@ -509,11 +522,15 @@ if ($overwriteBody==1) {
 		} else {
 			echo "<span id=\"espan1$cnt\" class=\"show\">";
 		}
+		
 		if ($enddates[$i]==2000000000) {
 			$enddates[$i]  = $startdates[$i] + 7*24*60*60;
+			$edate = tzdate("m/d/Y",$enddates[$i]);
+			$etime = $deftime;
+		} else {
+			$edate = tzdate("m/d/Y",$enddates[$i]);
+			$etime = tzdate("g:i a",$enddates[$i]);
 		}
-		$edate = tzdate("m/d/Y",$enddates[$i]);
-		$etime = tzdate("g:i a",$enddates[$i]);
 		
 		echo "<input type=text size=10 id=\"edate$cnt\" name=\"edate$cnt\" value=\"$edate\" onblur=\"ob(this)\"/>(";
 		echo "<span id=\"ed$cnt\">".getshortday($enddates[$i]).'</span>';
@@ -553,9 +570,12 @@ if ($overwriteBody==1) {
 			}
 			if ($reviewdates[$i]==0 || $reviewdates[$i]==2000000000) {
 				$reviewdates[$i] = $enddates[$i] + 7*24*60*60;
+				$rdate = tzdate("m/d/Y",$reviewdates[$i]);
+				$rtime = $deftime;
+			} else {
+				$rdate = tzdate("m/d/Y",$reviewdates[$i]);
+				$rtime = tzdate("g:i a",$reviewdates[$i]);
 			}
-			$rdate = tzdate("m/d/Y",$reviewdates[$i]);
-			$rtime = tzdate("g:i a",$reviewdates[$i]);
 		
 			echo "<input type=text size=10 id=\"rdate$cnt\" name=\"rdate$cnt\" value=\"$rdate\" onblur=\"ob(this)\"/>(";
 			echo "<span id=\"rd$cnt\">".getshortday($reviewdates[$i]).'</span>';

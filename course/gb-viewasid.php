@@ -417,23 +417,28 @@
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		}
 		
-		echo "<div class=breadcrumb>$breadcrumbbase ";
+		echo "<div class=breadcrumb>$breadcrumbbase "; 
 		if (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0) {
 			echo "<a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; ";
 		
 			if ($stu>0) {
 				echo "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 				echo "&gt; <a href=\"gradebook.php?stu=$stu&cid=$cid\">Student Detail</a> &gt; ";
+				$backurl = "gradebook.php?stu=$stu&cid=$cid";
 			} else if ($_GET['from']=="isolate") {
 				echo " <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
-				echo "&gt; <a href=\"isolateassessgrade.php?cid=$cid&aid={$line['assessmentid']}\">View Scores</a> &gt; ";	
+				echo "&gt; <a href=\"isolateassessgrade.php?cid=$cid&aid={$line['assessmentid']}\">View Scores</a> &gt; ";
+				$backurl = "isolateassessgrade.php?cid=$cid&aid={$line['assessmentid']}";
 			} else if ($_GET['from']=="gisolate") {
 				echo "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
-				echo "&gt; <a href=\"isolateassessbygroup.php?cid=$cid&aid={$line['assessmentid']}\">View Group Scores</a> &gt; ";	
-			}else if ($_GET['from']=='stugrp') {
-				echo "<a href=\"managestugrps.php?cid=$cid&aid={$line['assessmentid']}\">Student Groups</a> &gt; ";	
+				echo "&gt; <a href=\"isolateassessbygroup.php?cid=$cid&aid={$line['assessmentid']}\">View Group Scores</a> &gt; ";
+				$backurl = "isolateassessbygroup.php?cid=$cid&aid={$line['assessmentid']}";
+			} else if ($_GET['from']=='stugrp') {
+				echo "<a href=\"managestugrps.php?cid=$cid&aid={$line['assessmentid']}\">Student Groups</a> &gt; ";
+				$backurl = "managestugrps.php?cid=$cid&aid={$line['assessmentid']}";
 			} else {
 				echo "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; ";
+				$backurl = "gradebook.php?stu=0&cid=$cid";
 			}
 		}
 		echo "Detail</div>";
@@ -946,7 +951,7 @@
 									}
 								}
 								
-								echo str_replace(array('&','%nbsp;','%%','<','>'),array('; ','&nbsp;','&','&lt;','&gt;'), $laarr[$k]);
+								echo str_replace(array('&','%nbsp;','%%'),array('; ','&nbsp;','&'), $laarr[$k]);
 							}
 							$cnt++;
 						}
@@ -964,7 +969,7 @@
 					echo '<br/>';
 				}
 				if ($isteacher) {
-					echo "<br/><a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid=$cid&add=new&quoteq=$i-$qsetid-{$seeds[$i]}&to={$_GET['uid']}\">Use in Msg</a>";
+					echo "<br/><a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid=$cid&add=new&quoteq=$i-$qsetid-{$seeds[$i]}-{$line['assessmentid']}&to={$_GET['uid']}\">Use in Msg</a>";
 					//having issues with greybox in assessments
 					//echo '<br/>';
 					//echo "<a href=\"#\" onclick=\"GB_show('Send Message','$imasroot/course/sendmsgmodal.php?sendtype=msg&cid=$cid&quoteq=$i-$qsetid-{$seeds[$i]}&to={$_GET['uid']}',800,'auto')\" title=\"Send Message\">", _('Use in Message'), "</a>";
@@ -999,7 +1004,7 @@
 			}
 			echo "<p><input type=submit value=\"Record Changed Grades\"> ";
 			if (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0) {
-				echo "<a href=\"gradebook.php?stu=$stu&cid=$cid\">Return to GradeBook without saving</a></p>\n";
+				echo "<a href=\"$backurl\">Return to GradeBook without saving</a></p>\n";
 			}
 			/*
 			if ($line['agroupid']>0) {
@@ -1320,14 +1325,15 @@ function scorestocolors($sc,$pts,$answ,$noraw) {
 function prepchoicedisp($v,$choicesdata) {
 	if ($v=='') {return '';}
 	foreach ($choicesdata[1] as $k=>$c) {
+		$c = str_replace('&','%%',$c);
 		$sh = strip_tags($c);
-		if (trim($sh)=='') {
+		if (trim($sh)=='' || strpos($c,'<table')!==false) {
 			$sh = "[view]";
 		} else if (strlen($sh)>15) {
 			$sh = substr($sh,0,15).'...';
 		}
 		if ($sh!=$c) {
-			$choicesdata[1][$k] = '<span onmouseover="tipshow(this,\''.str_replace('&','%%',htmlentities($c,ENT_QUOTES|ENT_HTML401)).'\')" onmouseout="tipout()">'.$sh.'</span>';
+			$choicesdata[1][$k] = '<span onmouseover="tipshow(this,\''.trim(str_replace('&','%%',htmlentities($c,ENT_QUOTES|ENT_HTML401))).'\')" onmouseout="tipout()">'.$sh.'</span>';
 		}
 	}
 	if ($choicesdata[0]=='choices') {

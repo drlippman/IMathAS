@@ -1,5 +1,8 @@
 <?php
 	require("../validate.php");
+	if ($myrights<40) {
+		exit;
+	}
 	$now = time();
 	$date = mktime(0,0,0,7,10,2011);  
 	echo "<p>Active users since 7/10/11</p>";
@@ -47,7 +50,6 @@
 	
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	echo "<p>Student count: ".mysql_result($result,0,0);
-	
 	$query = "SELECT count(DISTINCT imas_users.id) FROM imas_users,imas_teachers WHERE ";
 	$query .= "imas_users.id=imas_teachers.userid AND imas_users.lastaccess>$date";
 	if (count($skipcid)>0) {
@@ -56,10 +58,10 @@
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	echo "</p><p>Teacher count: ".mysql_result($result,0,0)."</p>";
 
-	echo "<p>Active student association</p>";
-	$query = "SELECT g.name,u.LastName,COUNT(DISTINCT s.id) FROM imas_students AS s JOIN imas_teachers AS t ";
-	$query .= "ON s.courseid=t.courseid AND s.lastaccess>$date  JOIN imas_users as u  ";
-	$query .= "ON u.id=t.userid JOIN imas_groups AS g ON g.id=u.groupid GROUP BY u.id ORDER BY g.name";
+	echo "<p>Active student association (by course owner)</p>";
+	$query = "SELECT g.name,u.LastName,COUNT(DISTINCT s.id) FROM imas_students AS s JOIN imas_courses AS t ";
+	$query .= "ON s.courseid=t.id AND s.lastaccess>$date  JOIN imas_users as u  ";
+	$query .= "ON u.id=t.ownerid JOIN imas_groups AS g ON g.id=u.groupid GROUP BY u.id ORDER BY g.name";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$lastgroup = '';  $grpcnt = 0; $grpdata = '';
 	while ($row = mysql_fetch_row($result)) {

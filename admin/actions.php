@@ -206,6 +206,16 @@ switch($_GET['action']) {
 			$tmatches[1] = $tmatches[1]%12;
 			if($tmatches[3]=="pm") {$tmatches[1]+=12; }
 			$deftime = $tmatches[1]*60 + $tmatches[2];
+			
+			preg_match('/(\d+)\s*:(\d+)\s*(\w+)/',$_POST['defstime'],$tmatches);
+			if (count($tmatches)==0) {
+				preg_match('/(\d+)\s*([a-zA-Z]+)/',$_POST['defstime'],$tmatches);
+				$tmatches[3] = $tmatches[2];
+				$tmatches[2] = 0;
+			}
+			$tmatches[1] = $tmatches[1]%12;
+			if($tmatches[3]=="pm") {$tmatches[1]+=12; }
+			$deftime += 10000*($tmatches[1]*60 + $tmatches[2]);
 		}
 		
 		if (isset($CFG['CPS']['deflatepass']) && $CFG['CPS']['deflatepass'][1]==0) {
@@ -321,12 +331,13 @@ switch($_GET['action']) {
 					$gbcats[$frid] = mysql_insert_id();
 				}
 				$copystickyposts = true;
-				$query = "SELECT itemorder,ancestors,outcomes FROM imas_courses WHERE id='{$_POST['usetemplate']}'";
+				$query = "SELECT itemorder,ancestors,outcomes,latepasshrs FROM imas_courses WHERE id='{$_POST['usetemplate']}'";
 				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 				$r = mysql_fetch_row($result);
 				$items = unserialize($r[0]);
 				$ancestors = $r[1];
 				$outcomesarr = $r[2];
+				$latepasshrs = $r[3];
 				if ($ancestors=='') {
 					$ancestors = intval($_POST['usetemplate']);
 				} else {
@@ -382,7 +393,7 @@ switch($_GET['action']) {
 				copyallsub($items,'0',$newitems,$gbcats);
 				doaftercopy($_POST['usetemplate']);
 				$itemorder = addslashes(serialize($newitems));
-				$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt',ancestors='$ancestors',outcomes='$newoutcomearr' WHERE id='$cid'";
+				$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt',ancestors='$ancestors',outcomes='$newoutcomearr',latepasshrs='$latepasshrs' WHERE id='$cid'";
 				//copy offline
 				$offlinerubrics = array();
 				mysql_query($query) or die("Query failed : " . mysql_error());

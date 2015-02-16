@@ -490,7 +490,7 @@ function togglevideoembed() {
 		jQuery(this).attr('title',_("Hide video"));
 		if (jQuery(this).prev().attr("data-base")) {
 			var inf = jQuery(this).prev().attr('data-base').split('-');
-			recclick(inf[0], inf[1], href);
+			recclick(inf[0], inf[1], href, jQuery(this).prev().text());
 		}
 	}	
 }

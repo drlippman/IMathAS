@@ -217,7 +217,11 @@
 				$message .= "will then be prompted to choose a new password.</p>";
 				$message .= "<a href=\"" .$urlmode. $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=resetpw&id=$id&code=$code\">";
 				$message .= $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=resetpw&id=$id&code=$code</a>\r\n";
-				mail( $email,'Password Reset Request',$message,$headers);
+				if (isset($CFG['GEN']['useSESmail'])) {
+					SESmail($email, $sendfrom, 'Password Reset Request',$message);
+				} else {
+					mail($email,'Password Reset Request',$message,$headers);
+				}
 				
 				require("header.php");
 				echo '<p>An email with a password reset link has been sent your email address on record: <b>'.$email.'.</b><br/> ';
@@ -277,7 +281,7 @@
 		}
 	} else if ($_GET['action']=="lookupusername") {    
 		require_once("config.php");
-		$query = "SELECT SID,lastaccess FROM imas_users WHERE email='{$_POST['email']}'";
+		$query = "SELECT SID,lastaccess FROM imas_users WHERE email='{$_POST['email']}' AND SID NOT LIKE 'lti-%'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		if (mysql_num_rows($result)>0) {
 			echo mysql_num_rows($result);
@@ -297,10 +301,21 @@
 				$message .= "Username: <b>{$row[0]}</b>.  Last logged in: $lastlogin<br/>";
 			}
 			$message .= "</p><p>If you forgot your password, use the Lost Password link at the login page.</p>";
-			mail($_POST['email'],"$installname Username Request",$message,$headers);
+			if (isset($CFG['GEN']['useSESmail'])) {
+				SESmail($_POST['email'], $sendfrom, "$installname Username Request",$message);
+			} else {
+				mail($_POST['email'],"$installname Username Request",$message,$headers);
+			}
+			
 			exit;
 		} else {
-			echo "No usernames match this email address.  <a href=\"index.php\">Return to login page</a>";
+			$query = "SELECT SID,lastaccess FROM imas_users WHERE email='{$_POST['email']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			if (mysql_num_rows($result)>0) {
+				echo "Your account can only be accessed through your school's learning management system. <a href=\"index.php\">Return to login page</a>";
+			} else {
+				echo "No usernames match this email address <a href=\"index.php\">Return to login page</a>";
+			}
 			exit;
 		}
 	}

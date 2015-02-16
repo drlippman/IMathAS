@@ -208,7 +208,13 @@ if (!(isset($teacherid))) {
 				$sets[] = "reqscore=0";
 				$sets[] = "reqscoreaid=0";
 			}
-				
+			if (isset($_POST['chgistutorial'])) {
+				if (isset($_POST['istutorial'])) {
+					$sets[] = "istutorial=1";
+				} else {
+					$sets[] = "istutorial=0";
+				}
+			}
 			if ($turnonshuffle!=0 || $turnoffshuffle!=0) {
 				$shuff = "shuffle = ((shuffle";
 				if ($turnoffshuffle>0) {
@@ -864,6 +870,13 @@ writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],
 				<td ><input name="showqcat" value="0" checked="checked" type="radio">No <br/>
 				<input name="showqcat" value="1" type="radio">In Points Possible bar <br/>
 				<input name="showqcat" value="2" type="radio">In navigation bar (Skip-Around only)
+				</td>
+			</tr>
+			<tr class="coptr">
+				<td><input type="checkbox" name="chgistutorial" class="chgbox"/></td>
+				<td class="r">Display for tutorial-style questions: </td>
+				<td>
+				<input type="checkbox" name="istutorial"/>
 				</td>
 			</tr>
 			<tr>	

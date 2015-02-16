@@ -10,6 +10,9 @@ function checkComplete (form) {
     if (typeof el.type == "undefined" || typeof el.name == "undefined" || el.name == "") {
 	    continue;
     }
+    if ($(el).is(":not(:visible)")) {
+    	    continue;
+    }
     if (el.type == 'text' || el.type == 'textarea' ||
         el.type == 'password' || el.type == 'file' ) {
       if (el.value == '') {

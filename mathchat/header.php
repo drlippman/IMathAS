@@ -19,14 +19,28 @@ window.onload = resizechat;
 </script>
 <![endif]-->
 <script type="text/javascript" src="mathchat.js"></script>
-<script type="text/javascript" src="../javascript/ASCIIMathMLwFallback.js"></script>
 <script type="text/javascript" src="../javascript/ASCIIsvg.js"></script>
 <script type="text/javascript">var AMTcgiloc = "<?php echo $mathimgurl;?>";</script>
 <script type="text/javascript">var AScgiloc = "<?php echo $svgimgurl;?>";</script>
 <?php
 if ($mcsession['mathdisp']==2) {
-	echo '<script type="text/javascript">AMnoMathML = true;</script>';
-} 
+	echo "<script src=\"../javascript/ASCIIMathTeXImg_min.js?ver=092514\" type=\"text/javascript\"></script>\n";
+	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; function rendermathnode(el) {AMprocessNode(el);}</script>";
+} else {
+	echo "<script src=\"../javascript/ASCIIMathTeXImg_min.js?ver=092314\" type=\"text/javascript\"></script>\n";
+	echo '<script type="text/x-mathjax-config">
+		if (MathJax.Hub.Browser.isChrome || MathJax.Hub.Browser.isSafari) {
+			MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", imageFont:null}});
+		} else {
+			MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", imageFont:null}});
+		}
+		</script>';
+		// webFont: "STIX-Web", 
+	//echo '<script type="text/javascript" src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=AM_HTMLorMML"></script>';
+	//echo '<script>window.MathJax || document.write(\'<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="'.$imasroot.'/mathjax/MathJax.js?config=AM_HTMLorMML"><\/script>\')</script>';
+	echo '<script type="text/javascript" src="../mathjax/MathJax.js?config=AM_HTMLorMML"></script>';
+	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; function rendermathnode(node) { MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]); }</script>'; 
+}
 if ($mcsession['graphdisp']==2) {
 	echo '<script type="text/javascript">ASnoSVG = true;</script>';
 } 

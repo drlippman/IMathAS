@@ -21,6 +21,7 @@ while ($row = mysql_fetch_row($result)) {
 }
 $stuemails = implode('; ',$stuemails);
 $flexwidth = true;
+$nologo = true;
 require("../header.php");
 
 echo '<textarea id="emails" style="width:470px;height:400px;">'.$stuemails.'</textarea>';
