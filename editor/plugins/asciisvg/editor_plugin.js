@@ -97,7 +97,7 @@
 								style = '';
 							}
 							
-							rep = '<embed type="image/svg+xml" src="'+ed.getParam('ASdloc')+'" style="'+style+'" sscr="'+decodeURIComponent(sscr)+'" />';
+							rep = '<embed type="image/svg+xml" style="'+style+'" sscr="'+decodeURIComponent(sscr)+'" />';
 							o.content = o.content.replace(imgs[i],rep);
 						}
 					}

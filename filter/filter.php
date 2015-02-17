@@ -86,6 +86,7 @@
 		if ($sessiondata['graphdisp']==0) {
 			if (strpos($str,'embed')!==FALSE) {
 				$str = preg_replace('/<embed[^>]*alt="([^"]*)"[^>]*>/',"[$1]", $str);
+				$str = preg_replace('/<embed[^>]*sscr[^>]*>/',"[Graph with no description]", $str);
 			}
 		}
 		if ($sessiondata['mathdisp']==2) {
@@ -100,8 +101,9 @@
 				$str = preg_replace_callback('/<\s*embed[^>]*?sscr=(.)(.+?)\1.*?>/s','svgfiltersscrcallback',$str);
 				$str = preg_replace_callback('/<\s*embed[^>]*?script=(.)(.+?)\1.*?>/s','svgfilterscriptcallback',$str);
 			}
-		} else {
+		} else { 
 			$str = str_replace("<embed type='image/svg+xml'","<embed type='image/svg+xml' wmode=\"transparent\" ",$str);
+			$str = str_replace("src=\"$imasroot/javascript/d.svg\"","",$str);
 		}
 	
 		if (strpos($str,'[WA')!==false) {

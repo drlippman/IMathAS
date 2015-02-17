@@ -86,93 +86,27 @@
 		 } else {
 			 $querys = (isset($addtoquerystring)?'?'.$addtoquerystring:'');
 		 }
-		 if (isset($_POST['skip']) || isset($_POST['isok'])) {
-			 $sessiondata['useragent'] = $_SERVER['HTTP_USER_AGENT'];
-			 $sessiondata['ip'] = $_SERVER['REMOTE_ADDR'];
-			 $sessiondata['mathdisp'] = $_POST['mathdisp'];
-			 $sessiondata['graphdisp'] = $_POST['graphdisp'];
-			 $sessiondata['useed'] = checkeditorok();
-			 $sessiondata['secsalt'] = generaterandstring();
-			 if (isset($_POST['savesettings'])) {
-				 setcookie('mathgraphprefs',$_POST['mathdisp'].'-'.$_POST['graphdisp'],2000000000);
-			 }
-			 $enc = base64_encode(serialize($sessiondata));
-			 $query = "UPDATE imas_sessions SET sessiondata='$enc' WHERE sessionid='$sessionid'";
-			 mysql_query($query) or die("Query failed : " . mysql_error());
-			 
-			// $now = time();
-			// $query = "INSERT INTO imas_log (time,log) VALUES ($now,'$userid from IP: {$_SERVER['REMOTE_ADDR']}')";
-			// mysql_query($query) or die("Query failed : " . mysql_error());
-			 
-			 
-			 header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . $querys);
-			 exit;
-		 } else {
-			 require("header.php");
-			 echo "<h2>Browser check</h2>\n";
-			 echo "<p>For fastest, most accurate, and prettiest math and graph display, this system recommends:";
-			 echo "<ul><li>Windows: Firefox 1.5+ or Internet Explorer 9 with MathPlayer</li>\n";
-			 echo "<li>Mac: Firefox 1.5+</li></ul>\n";
-			 echo "<form method=post action=\"{$_SERVER['PHP_SELF']}$querys\">\n";
-			 echo "<div id=settings></div>";
-			 echo <<<END
-<script type="text/javascript"> 
-	function preparenotices() {
-		setnode = document.getElementById("settings");
-		var html = "";
-		html += '<p><input type="checkbox" name="savesettings" checked="1"> Don\'t show me this screen again on this computer and browser.  If you update your browser, you can get back to this page by selecting Visual Display when you login.</p>';
-		if (AMnoMathML || ASnoSVG) {
-			html += '<p><input type="submit" name="recheck" value="Recheck Setup"><input type="submit" name="skip" value="Continue with image-based display"></p>';
-		} else {
-			html += '<p><input type="submit" name="isok" value="Browser setup OK - Continue"></p>';
-		}
-		
-		html += '<h4>Math Display</h4>';
-		if (AMnoMathML) {
-			if (AMisGecko && AMnoTeX) {
-				html += '<p><input type=hidden name="mathdisp" value="2">It appears you are using a Mozilla-based browser (FireFox, Camino, etc) ';
-				html += 'but do not have the necessary math fonts installed.  Browser based Math display is faster and prettier than using image-based math display. ';
-				html += 'To enable browser based Math display, <a href="http://www.mozilla.org/projects/mathml/fonts/">download math fonts</a></p>';
-			} else {
-				html += '<p><input type=hidden name="mathdisp" value="2">It appears you do not have browser-based Math display support.';
-				html += 'Browser based Math display is faster and prettier than using image-based math display.  To install browser-based ';
-				html += 'math display:</p>';
-				html += '<p>Windows Internet Explorer users: <a href="http://www.dessci.com/en/products/mathplayer/download.htm">Install MathPlayer plugin</a></p>';
-				html += '<p>Mac users or non-IE windows users: <a href="http://www.mozilla.com/firefox/">Install Firefox 1.5+</a></p>';
-				html += '<p>With FireFox, if you find formulas not displaying ';
-				html += 'correctly you may need to <a href="http://www.mozilla.org/projects/mathml/fonts/">install Math fonts</a></p>';
-			}
-		} else {
-			html += '<p><input type=hidden name="mathdisp" value="1">Your browser is set up for browser-based math display.</p>';
-		}
-		html += '<h4>Graph Display</h4>';
-		if (ASnoSVG) {
-			html += '<p><input type=hidden name="graphdisp" value="2">It appears you do not have browser-based Graph display support. ';
-			html += 'Browser based Graph display is faster and prettier than using image-based graph display.  To install browser-based ';
-			html += 'graph display:</p>';
-			html += '<p>Windows Internet Explorer users: Upgrade to IE version 9, or <a href="http://download.adobe.com/pub/adobe/magic/svgviewer/win/3.x/3.03/en/SVGView.exe">Install AdobeSVGPlugin plugin</a></p>';
-			html += '<p>Mac users or non-IE windows users: <a href="http://www.mozilla.com/firefox/">Install Firefox 1.5+</a></p>';
-		} else {
-			html += '<p><input type=hidden name="graphdisp" value="1">Your browser is set up for browser-based graph display.</p>';
-		}
-		
-		
-			
-		setnode.innerHTML = html;
-	}
-	var existingonload = window.onload;
-	if (existingonload) {
-		window.onload = function() {existingonload(); preparenotices();}
-	} else {
-		window.onload = preparenotices;
-	}
-	
-</script>
-END;
-			 echo "</form>\n";
-			 require("footer.php");
-			 exit;
+		 
+		 $sessiondata['useragent'] = $_SERVER['HTTP_USER_AGENT'];
+		 $sessiondata['ip'] = $_SERVER['REMOTE_ADDR'];
+		 $sessiondata['mathdisp'] = $_POST['mathdisp'];
+		 $sessiondata['graphdisp'] = $_POST['graphdisp'];
+		 $sessiondata['useed'] = checkeditorok();
+		 $sessiondata['secsalt'] = generaterandstring();
+		 if (isset($_POST['savesettings'])) {
+			 setcookie('mathgraphprefs',$_POST['mathdisp'].'-'.$_POST['graphdisp'],2000000000);
 		 }
+		 $enc = base64_encode(serialize($sessiondata));
+		 $query = "UPDATE imas_sessions SET sessiondata='$enc' WHERE sessionid='$sessionid'";
+		 mysql_query($query) or die("Query failed : " . mysql_error());
+		 
+		// $now = time();
+		// $query = "INSERT INTO imas_log (time,log) VALUES ($now,'$userid from IP: {$_SERVER['REMOTE_ADDR']}')";
+		// mysql_query($query) or die("Query failed : " . mysql_error());
+		 
+		 
+		 header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . $querys);
+		 exit;
 	 }
 			 
  }
@@ -277,16 +211,18 @@ END;
 		 $sessiondata['ip'] = $_SERVER['REMOTE_ADDR'];
 		 $sessiondata['secsalt'] = generaterandstring();
 		 if ($_POST['access']==1) { //text-based
-			 $sessiondata['mathdisp'] = $_POST['mathdisp'];
+			 $sessiondata['mathdisp'] = $_POST['mathdisp']; //to allow for accessibility
 			 $sessiondata['graphdisp'] = 0;
 			 $sessiondata['useed'] = 0; 
 			 $enc = base64_encode(serialize($sessiondata));
 		 } else if ($_POST['access']==2) { //img graphs
+		 	 //deprecated
 			 $sessiondata['mathdisp'] = 2-$_POST['mathdisp'];
 			 $sessiondata['graphdisp'] = 2;
 			 $sessiondata['useed'] = checkeditorok(); 
 			 $enc = base64_encode(serialize($sessiondata));
 		 } else if ($_POST['access']==4) { //img math
+		 	 //deprecated
 			 $sessiondata['mathdisp'] = 2;
 			 $sessiondata['graphdisp'] = $_POST['graphdisp'];
 			 $sessiondata['useed'] = checkeditorok(); 
@@ -297,7 +233,8 @@ END;
 			 $sessiondata['useed'] = checkeditorok(); 
 			 $enc = base64_encode(serialize($sessiondata));
 		 } else if ($_POST['access']==5) { //mathjax experimental
-		 	 $sessiondata['mathdisp'] = 3;
+		 	 //deprecated, as mathjax is now default
+		 	 $sessiondata['mathdisp'] = 1; 
 			 $sessiondata['graphdisp'] = $_POST['graphdisp'];
 			 $sessiondata['useed'] = checkeditorok(); 
 			 $enc = base64_encode(serialize($sessiondata));
@@ -306,13 +243,11 @@ END;
 			 $sessiondata['graphdisp'] = 1;
 			 $sessiondata['useed'] = checkeditorok(); 
 			 $enc = base64_encode(serialize($sessiondata));
-		 } else if ($_POST['usedetected']==true || isset($CFG['GEN']['skipbrowsercheck'])) {
+		 } else {
 		 	 $sessiondata['mathdisp'] = 2-$_POST['mathdisp'];
 		 	 $sessiondata['graphdisp'] = $_POST['graphdisp'];
 		 	 $sessiondata['useed'] = checkeditorok(); 
 			 $enc = base64_encode(serialize($sessiondata));
-		 } else {
-			 $enc = 0; //give warning
 		 }
 		 
 		 if (isset($_POST['tzname']) && strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
@@ -409,13 +344,10 @@ END;
 	}
 	
 	if (isset($_GET['mathjax'])) {
-		$sessiondata['mathdisp'] = 3;
+		$sessiondata['mathdisp'] = 1;
 		writesessiondata();
 	}
-	if ($sessiondata['mathdisp']==1 && isset($CFG['GEN']['mathjaxonly'])) {
-		$sessiondata['mathdisp'] = 3;
-		writesessiondata();
-	}
+	
 	if (isset($_GET['readernavon'])) {
 		$sessiondata['readernavon'] = true;
 		writesessiondata();
@@ -438,7 +370,7 @@ END;
 		} else if ($sessiondata['ltiitemtype']==0 && $sessiondata['ltirole']=='learner') {
 			$breadcrumbbase = "<a href=\"$imasroot/assessment/showtest.php?cid={$_GET['cid']}&id={$sessiondata['ltiitemid']}\">Assignment</a> &gt; ";
 			$urlparts = parse_url($_SERVER['PHP_SELF']);
-			if (!in_array(basename($urlparts['path']),array('showtest.php','printtest.php','msglist.php','sentlist.php','viewmsg.php','msghistory.php','redeemlatepass.php','gb-viewasid.php'))) {
+			if (!in_array(basename($urlparts['path']),array('showtest.php','printtest.php','msglist.php','sentlist.php','viewmsg.php','msghistory.php','redeemlatepass.php','gb-viewasid.php','showsoln.php'))) {
 			//if (strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false && strpos(basename($_SERVER['PHP_SELF']),'printtest.php')===false && strpos(basename($_SERVER['PHP_SELF']),'msglist.php')===false && strpos(basename($_SERVER['PHP_SELF']),'sentlist.php')===false && strpos(basename($_SERVER['PHP_SELF']),'viewmsg.php')===false ) {
 				$query = "SELECT courseid FROM imas_assessments WHERE id='{$sessiondata['ltiitemid']}'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
