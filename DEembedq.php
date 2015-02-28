@@ -82,7 +82,7 @@ if (isset($_GET['showscored'])) {
 	$showans = (!isset($params['showans']) || $params['showans']=='true');
 	
 	$lastanswers = array();
-	list($seed, $rawscores, $lastanswers[0]) = explode(';;', $params['showscored']);
+	list($seed, $rawscores, $lastanswers[0]) = explode(';', $params['showscored'], 3);
 	$rawscores = explode('~',$rawscores);
 	$seed = intval($seed);
 	
@@ -128,7 +128,7 @@ if (isset($_GET['showscored'])) {
 	
 	$pts = getpts($after);
 	
-	$params = array('action'=>'updatescore', 'id'=>$qsetid, 'score'=>$pts, 'redisplay'=>"$seed;;$rawafter;;{$lastanswers[0]}");
+	$params = array('action'=>'updatescore', 'id'=>$qsetid, 'score'=>$pts, 'redisplay'=>"$seed;$rawafter;{$lastanswers[0]}");
 		
 	if (isset($_POST['auth'])) {
 		$query = "SELECT password FROM imas_users WHERE SID='".stripslashes($_POST['auth'])."'";
@@ -153,7 +153,7 @@ if (isset($_GET['showscored'])) {
 	if (isset($_GET['redisplay'])) {
 		//DE is requesting that the question be redisplayed
 		list($params, $auth, $sig) = parse_params($_SERVER['QUERY_STRING']);
-		list($seed, $rawscores, $lastanswers[0]) = explode(';;', $params['redisplay']);
+		list($seed, $rawscores, $lastanswers[0]) = explode(';', $params['redisplay'],3);
 		$rawscores = array();
 	} else {
 		$seed = rand(1,9999);
