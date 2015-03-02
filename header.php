@@ -81,7 +81,7 @@ if (!isset($sessiondata['mathdisp'])) {
 	//echo '<script type="text/javascript" src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=AM_HTMLorMML"></script>';
 	//echo '<script>window.MathJax || document.write(\'<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="'.$imasroot.'/mathjax/MathJax.js?config=AM_HTMLorMML"><\/script>\')</script>';
 	echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_HTMLorMML"></script>';
-	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; function rendermathnode(node) { MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]); }</script>'; 
+	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true; function rendermathnode(node) { MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]); }</script>'; 
 	echo '<style type="text/css">span.AM { font-size: 105%;}</style>';
 } else if ($sessiondata['mathdisp']==2 && isset($useeditor) && $sessiondata['useed']==1) {
 	//these scripts are used by the editor to make image-based math work in the editor
@@ -89,11 +89,11 @@ if (!isset($sessiondata['mathdisp'])) {
 	if ($mathdarkbg) {echo 'var mathbg = "dark";';}
 	echo '</script>'; 
 	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=092514\" type=\"text/javascript\"></script>\n";
-	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; function rendermathnode(el) {AMprocessNode(el);}</script>";
+	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; var MathJaxCompatible = false; function rendermathnode(el) {AMprocessNode(el);}</script>";
 } else if ($sessiondata['mathdisp']==2) {
-	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; function rendermathnode(el) {AMprocessNode(el);}</script>";
+	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; var MathJaxCompatible = false; function rendermathnode(el) {AMprocessNode(el);}</script>";
 } else if ($sessiondata['mathdisp']==0) {
-	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; function rendermathnode(el) {}</script>";
+	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; var MathJaxCompatible = false; function rendermathnode(el) {}</script>";
 }
 if (isset($sessiondata['graphdisp']) && $sessiondata['graphdisp']==1) {
 	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?ver=012314\" type=\"text/javascript\"></script>\n";
