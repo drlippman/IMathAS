@@ -528,7 +528,7 @@ if (!(isset($teacherid))) {
 		if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
 			$page_fileHiddenInput = "<input type=hidden name=\"filename\" value=\"".basename($uploadfile)."\" />\n";
 		} else {
-			$page_fileErrorMsg .= "<p>Error uploading file!</p>\n";
+			echo "<p>Error uploading file!</p>\n";
 			echo $_FILES["userfile"]['error'];
 			exit;
 		}
