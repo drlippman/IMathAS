@@ -718,6 +718,9 @@
 				$("span[id^=\'ans\']").removeClass("hidden");
 				$(".sabtn").replaceWith("<span>Answer: </span>");
 			}
+			function previewall() {
+				$(\'input[value="Preview"]\').trigger(\'click\').remove();
+			}
 			var focuscolorlock = false;
 			$(function() {
 				$(".review input[name*=\'-\']").each(function(i, el) {
@@ -774,7 +777,8 @@
 		echo '<p><button type="button" id="hctoggle" onclick="hidecorrect()">'._('Hide Correct Questions').'</button>';
 		echo ' <button type="button" id="hptoggle" onclick="hideperfect()">'._('Hide Perfect Questions').'</button>';
 		echo ' <button type="button" id="hnatoggle" onclick="hideNA()">'._('Hide Unanswered Questions').'</button>';
-		echo ' <button type="button" id="showanstoggle" onclick="showallans()">'._('Show All Answers').'</button></p>';
+		echo ' <button type="button" id="showanstoggle" onclick="showallans()">'._('Show All Answers').'</button>';
+		echo ' <button type="button" id="prevtoggle" onclick="previewall()">'._('Preview All').'</button></p>';
 		$total = 0;
 		
 		for ($i=0; $i<count($questions);$i++) {

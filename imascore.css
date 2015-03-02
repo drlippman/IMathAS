@@ -666,3 +666,16 @@ div.multiselitem {
 .altContentOff {
 	display:none;
 }
+.ccvid {
+	position: relative;
+}
+.ccvid:after {
+	display: block;
+	content:"";
+	width: 24px;
+	height: 24px;
+	position: absolute;
+	top: 0;
+	left: 0;
+	background: transparent url("img/cc.png") no-repeat right bottom;
+}
