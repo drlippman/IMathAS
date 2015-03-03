@@ -347,7 +347,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		var addqaddr = '$address';
 		</script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addquestions.js\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=051714\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=030215\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/junkflag.js\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savelibassignflag.php';</script>";
 	
@@ -433,10 +433,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			if ($line['extref']!='') {
 				$extref = explode('~~',$line['extref']);
-				$hasvid = false;  $hasother = false;
+				$hasvid = false;  $hasother = false;  $hascap = false;
 				foreach ($extref as $v) {
 					if (strtolower(substr($v,0,5))=="video" || strpos($v,'youtube.com')!==false || strpos($v,'youtu.be')!==false) {
 						$hasvid = true;
+						if (strpos($v,'!!1')!==false) {
+							$hascap = true;
+						}
 					} else {
 						$hasother = true;
 					}
@@ -447,6 +450,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				}
 				if ($hasother) {
 					$extrefval += 2;
+				}
+				if ($hascap) {
+					$extrefval += 16;
 				}
 			}
 			if ($line['solution']!='' && ($line['solutionopts']&2)==2) {
@@ -714,12 +720,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 							$page_questionTable[$i]['libitemid'] = $line['libitemid'];
 						}
 						$page_questionTable[$i]['extref'] = '';
+						$page_questionTable[$i]['cap'] = 0;
 						if ($line['extref']!='') {
 							$extref = explode('~~',$line['extref']);
-							$hasvid = false;  $hasother = false;
+							$hasvid = false;  $hasother = false; $hascap = false;
 							foreach ($extref as $v) {
 								if (substr($v,0,5)=="Video" || strpos($v,'youtube.com')!==false || strpos($v,'youtu.be')!==false) {
 									$hasvid = true;
+									if (strpos($v,'!!1')!==false) {
+										$page_questionTable[$i]['cap'] = 1;
+									}
 								} else {
 									$hasother = true;
 								}
@@ -864,12 +874,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$page_assessmentQuestions[$x]['src'][$y] = ($userights[$qid]>3 || ($userights[$qid]==3 && $qgroupid[$qid]==$groupid) || $owner[$qid]==$userid) ? "<a href=\"moddataset.php?id=$qsetid[$qid]&aid=$aid&cid=$cid&frompot=1\">Edit</a>" : "<a href=\"viewsource.php?id=$qsetid[$qid]&aid=$aid&cid=$cid\">View</a>" ;
 					$page_assessmentQuestions[$x]['templ'][$y] = "<a href=\"moddataset.php?id=$qsetid[$qid]&aid=$aid&cid=$cid&template=true\">Template</a>";
 					$page_assessmentQuestions[$x]['extref'][$y] = '';
+					$page_assessmentQuestions[$x]['cap'][$y] = 0;
 					if ($extref[$qid]!='') {
 						$extrefarr = explode('~~',$extref[$qid]);
 						$hasvid = false;  $hasother = false;
 						foreach ($extrefarr as $v) {
-							if (substr($v,0,5)=="Video" || strpos($v,'youtube.com')!==false) {
+							if (substr($v,0,5)=="Video" || strpos($v,'youtube.com')!==false || strpos($v,'youtu.be')!==false) {
 								$hasvid = true;
+								if (strpos($v,'!!1')!==false) {
+									$page_assessmentQuestions[$x]['cap'][$y] = 1;
+								}
 							} else {
 								$hasother = true;
 							}
@@ -1125,7 +1139,7 @@ if ($overwriteBody==1) {
 
 					<td><?php echo $page_questionTable[$qid]['checkbox'] ?></td>
 					<td><?php echo $page_questionTable[$qid]['desc'] ?></td>
-					<td class="nowrap"><?php echo $page_questionTable[$qid]['extref'] ?></td>
+					<td class="nowrap<?php if ($page_questionTable[$qid]['cap']) {echo ' ccvid';}?>" ><?php echo $page_questionTable[$qid]['extref'] ?></td>
 					<td><?php echo $qid ?></td>
 					<td><?php echo $page_questionTable[$qid]['preview'] ?></td>
 					<td><?php echo $page_questionTable[$qid]['type'] ?></td>
@@ -1226,7 +1240,7 @@ if ($overwriteBody==1) {
 ?>					
 				<td><?php echo $page_assessmentQuestions[$i]['checkbox'][$x] ?></td>
 				<td><?php echo $page_assessmentQuestions[$i]['desc'][$x] ?></td>
-				<td class="nowrap"><?php echo $page_assessmentQuestions[$i]['extref'][$x] ?></td>
+				<td class="nowrap<?php if ($page_assessmentQuestions[$i]['cap'][$x]) {echo ' ccvid';}?>"><?php echo $page_assessmentQuestions[$i]['extref'][$x] ?></td>
 				<td><?php echo $page_assessmentQuestions[$i]['qsetid'][$x] ?></td>
 				<td><?php echo $page_assessmentQuestions[$i]['preview'][$x] ?></td>					
 				<td><?php echo $page_assessmentQuestions[$i]['type'][$x] ?></td>

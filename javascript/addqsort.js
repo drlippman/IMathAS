@@ -330,7 +330,11 @@ function generateTable() {
 			}
 			
 			html += "<td><input type=hidden name=\"curq[]\" id=\"oqc"+ln+"\" value=\""+curitems[j][1]+"\"/>"+curitems[j][2]+"</td>"; //description
-			html += "<td class=\"nowrap\">";
+			html += "<td class=\"nowrap";
+			if ((curitems[j][7]&16) == 16) {
+				html += " ccvid";
+			}
+			html += "\">";
 			if ((curitems[j][7]&1) == 1) {
 				var showicons = "";
 			} else {

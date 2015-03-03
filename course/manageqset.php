@@ -848,11 +848,15 @@ if ($myrights<20) {
 			}
 			
 			if ($line['extref']!='') {
+				$page_questionTable[$i]['cap'] = 0;
 				$extref = explode('~~',$line['extref']);
-				$hasvid = false;  $hasother = false;
+				$hasvid = false;  $hasother = false; $hascap = false;
 				foreach ($extref as $v) {
 					if (strtolower(substr($v,0,5))=="video" || strpos($v,'youtube.com')!==false || strpos($v,'youtu.be')!==false) {
 						$hasvid = true;
+						if (strpos($v,'!!1')!==false) {
+							$page_questionTable[$i]['cap'] = 1;
+						}
 					} else {
 						$hasother = true;
 					}
@@ -1269,7 +1273,9 @@ function getnextprev(formn,loc) {
 				if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 				echo '<td>'.$page_questionTable[$qid]['checkbox'].'</td>';
 				echo '<td>'.$page_questionTable[$qid]['desc'].'</td>';
-				echo '<td class="nowrap">'.$page_questionTable[$qid]['extref'].'</td>';
+				echo '<td class="nowrap';
+				if ($page_questionTable[$qid]['cap']) {echo ' ccvid';}
+				echo '">'.$page_questionTable[$qid]['extref'].'</td>';
 				echo '<td>'.$page_questionTable[$qid]['preview'].'</td>';
 				echo '<td>'.$page_questionTable[$qid]['action'].'</td>';
 				echo '<td>'.$page_questionTable[$qid]['type'].'</td>';
