@@ -32,6 +32,32 @@
 		return $text;
  	}
  	
+ 	function getvideoid($url) {
+ 		$vidid = '';
+ 		if (strpos($url,'youtube.com/watch')!==false) {
+			//youtube 	
+			$vidid = substr($url,strrpos($url,'v=')+2);
+			if (strpos($vidid,'&')!==false) {
+				$vidid = substr($vidid,0,strpos($vidid,'&'));
+			}
+			if (strpos($vidid,'#')!==false) {
+				$vidid = substr($vidid,0,strpos($vidid,'#'));
+			} 
+			$vidid = str_replace(array(" ","\n","\r","\t"),'',$vidid);
+		} else if (strpos($url,'youtu.be/')!==false) {
+			//youtube 	
+			$vidid = substr($url,strpos($url,'.be/')+4);
+			if (strpos($vidid,'#')!==false) {
+				$vidid = substr($vidid,0,strpos($vidid,'#'));
+			} 
+			if (strpos($vidid,'?')!==false) {
+				$vidid = substr($vidid,0,strpos($vidid,'?'));
+			}
+			$vidid = str_replace(array(" ","\n","\r","\t"),'',$vidid);
+		}
+		return $vidid;
+ 	}
+ 	
  	$cid = $_GET['cid'];
 	$isadmin = false;
 	$isgrpadmin = false;
@@ -104,8 +130,21 @@
 		} else {
 			$newextref = array();
 		}
+		//DO we need to add a checkbox or something for updating this if captions are added later?
 		if ($_POST['helpurl']!='') {
-			$newextref[] = $_POST['helptype'].'!!'.$_POST['helpurl'];
+			$vidid = getvideoid($_POST['helpurl']);
+			if ($vidid=='') {
+				$captioned = 0;
+			} else {
+				$ctx = stream_context_create(array('http'=>
+				    array(
+					'timeout' => 1
+				    )
+				));
+				$t = @file_get_contents('http://video.google.com/timedtext?lang=en&v='.$vidid, false, $ctx);
+				$captioned = ($t=='')?0:1;
+			}
+			$newextref[] = $_POST['helptype'].'!!'.$_POST['helpurl'].'!!'.$captioned;
 		}
 		$extref = implode('~~',$newextref);
 		if (isset($_POST['doreplaceby'])) {
@@ -946,8 +985,12 @@ if (count($extref)>0) {
 	echo "Help buttons:<br/>";
 	for ($i=0;$i<count($extref);$i++) {
 		$extrefpt = explode('!!',$extref[$i]);
-		echo 'Type: '.$extrefpt[0].', URL: <a href="'.$extrefpt[1].'">'.$extrefpt[1]."</a>.  Delete? <input type=\"checkbox\" name=\"delhelp-$i\"/><br/>";	
-	}	
+		echo 'Type: '.ucfirst($extrefpt[0]);
+		if ($extrefpt[0]=='video' && count($extrefpt)>2 && $extrefpt[2]==1) {
+			echo ' (cc)';
+		}
+		echo ', URL: <a href="'.$extrefpt[1].'">'.$extrefpt[1]."</a>.  Delete? <input type=\"checkbox\" name=\"delhelp-$i\"/><br/>";	
+	}
 }
 if ($myrights==100) {
 	echo '<p>Mark question as deprecated and suggest alternative? <input type="checkbox" name="doreplaceby" ';
