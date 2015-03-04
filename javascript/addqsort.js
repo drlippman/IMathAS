@@ -330,11 +330,11 @@ function generateTable() {
 			}
 			
 			html += "<td><input type=hidden name=\"curq[]\" id=\"oqc"+ln+"\" value=\""+curitems[j][1]+"\"/>"+curitems[j][2]+"</td>"; //description
-			html += "<td class=\"nowrap";
+			html += "<td class=\"nowrap\"><div";
 			if ((curitems[j][7]&16) == 16) {
-				html += " ccvid";
+				html += " class=\"ccvid\"";
 			}
-			html += "\">";
+			html += ">";
 			if ((curitems[j][7]&1) == 1) {
 				var showicons = "";
 			} else {
@@ -349,7 +349,7 @@ function generateTable() {
 			if ((curitems[j][7]&8) == 8) {
 				html += '<img src="'+imasroot+'/img/assess_tiny'+showicons+'.png"/>';
 			}  
-			html += "</td>";
+			html += "</div></td>";
 			html += "<td>"+curitems[j][1]+"</td>";
 			if (beentaken) {
 				html += "<td><input type=button value='Preview' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",false,false)\"/></td>"; //Preview

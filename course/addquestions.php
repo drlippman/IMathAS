@@ -347,7 +347,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		var addqaddr = '$address';
 		</script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addquestions.js\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=030215\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=030315\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/junkflag.js\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savelibassignflag.php';</script>";
 	
@@ -1139,7 +1139,9 @@ if ($overwriteBody==1) {
 
 					<td><?php echo $page_questionTable[$qid]['checkbox'] ?></td>
 					<td><?php echo $page_questionTable[$qid]['desc'] ?></td>
-					<td class="nowrap<?php if ($page_questionTable[$qid]['cap']) {echo ' ccvid';}?>" ><?php echo $page_questionTable[$qid]['extref'] ?></td>
+					<td class="nowrap">
+					   <div <?php if ($page_questionTable[$qid]['cap']) {echo 'class="ccvid"';}?>><?php echo $page_questionTable[$qid]['extref'] ?></div>
+					</td>
 					<td><?php echo $qid ?></td>
 					<td><?php echo $page_questionTable[$qid]['preview'] ?></td>
 					<td><?php echo $page_questionTable[$qid]['type'] ?></td>
@@ -1240,7 +1242,9 @@ if ($overwriteBody==1) {
 ?>					
 				<td><?php echo $page_assessmentQuestions[$i]['checkbox'][$x] ?></td>
 				<td><?php echo $page_assessmentQuestions[$i]['desc'][$x] ?></td>
-				<td class="nowrap<?php if ($page_assessmentQuestions[$i]['cap'][$x]) {echo ' ccvid';}?>"><?php echo $page_assessmentQuestions[$i]['extref'][$x] ?></td>
+				<td class="nowrap">
+				  <div <?php if ($page_assessmentQuestions[$i]['cap'][$x]) {echo 'class="ccvid"';}?>><?php echo $page_assessmentQuestions[$i]['extref'][$x] ?></div>
+				</td>
 				<td><?php echo $page_assessmentQuestions[$i]['qsetid'][$x] ?></td>
 				<td><?php echo $page_assessmentQuestions[$i]['preview'][$x] ?></td>					
 				<td><?php echo $page_assessmentQuestions[$i]['type'][$x] ?></td>

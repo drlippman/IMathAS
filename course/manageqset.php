@@ -1273,9 +1273,9 @@ function getnextprev(formn,loc) {
 				if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 				echo '<td>'.$page_questionTable[$qid]['checkbox'].'</td>';
 				echo '<td>'.$page_questionTable[$qid]['desc'].'</td>';
-				echo '<td class="nowrap';
-				if ($page_questionTable[$qid]['cap']) {echo ' ccvid';}
-				echo '">'.$page_questionTable[$qid]['extref'].'</td>';
+				echo '<td class="nowrap"><div';
+				if ($page_questionTable[$qid]['cap']) {echo ' class="ccvid"';}
+				echo '>'.$page_questionTable[$qid]['extref'].'</div></td>';
 				echo '<td>'.$page_questionTable[$qid]['preview'].'</td>';
 				echo '<td>'.$page_questionTable[$qid]['action'].'</td>';
 				echo '<td>'.$page_questionTable[$qid]['type'].'</td>';
