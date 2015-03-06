@@ -6,6 +6,7 @@ A collection of chemistry routines
 <BR><ul>
 <li><a href="#chem_disp">chem_disp</a></li>
 <li><a href="#chem_mathdisp">chem_mathdisp</a></li>
+<li><a href="#chem_isotopedisp">chem_isotopedisp</a></li>
 <li><a href="#chem_getsymbol">chem_getsymbol</a></li>
 <li><a href="#chem_getnumber">chem_getnumber</a></li>
 <li><a href="#chem_getname">chem_getname</a></li>
@@ -29,6 +30,10 @@ chem_disp(compound)
 <BR><h3><a name="chem_mathdisp">chem_mathdisp</a></h3>
 chem_mathdisp(compound) 
 <BR>formats a compound for better display in math mode
+<BR><h3><a name="chem_isotopedisp">chem_isotopedisp</a></h3>
+chem_isotopedisp(element,super,sub,[noitalic])
+<BR>formats a math display string for an isotope with the given element,
+<BR>&nbsp;superscript, and subscript. Set noitalic to true to un-italic element.
 <BR><h3><a name="chem_getsymbol">chem_getsymbol</a></h3>
 chem_getsymbol(atomic number)
 <BR>returns the chemical symbol given the atomic number

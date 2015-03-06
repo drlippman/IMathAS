@@ -4,7 +4,7 @@
 //Version 0.2 April 16, 2014
 
 global $allowedmacros;
-array_push($allowedmacros,"chem_disp","chem_mathdisp","chem_getsymbol","chem_getnumber","chem_getname","chem_getweight","chem_getmeltingpoint","chem_getboilingpoint","chem_getfamily","chem_randelementbyfamily"," chem_diffrandelementsbyfamily", "chem_getrandcompound", "chem_getdiffrandcompounds","chem_decomposecompound","chem_getcompoundmolmass","chem_randanion","chem_randcation","chem_makeioniccompound");
+array_push($allowedmacros,"chem_disp","chem_mathdisp","chem_isotopedisp","chem_getsymbol","chem_getnumber","chem_getname","chem_getweight","chem_getmeltingpoint","chem_getboilingpoint","chem_getfamily","chem_randelementbyfamily"," chem_diffrandelementsbyfamily", "chem_getrandcompound", "chem_getdiffrandcompounds","chem_decomposecompound","chem_getcompoundmolmass","chem_randanion","chem_randcation","chem_makeioniccompound");
 
 //chem_disp(compound) 
 //formats a compound for display in as HTML
@@ -18,6 +18,36 @@ function chem_disp($c) {
 function chem_mathdisp($c) {
 	return preg_replace('/([a-zA-Z]+)/','"$1"',$c);	
 }
+
+//chem_isotopedisp(element,super,sub,[noitalic])
+//formats a math display string for an isotope with the given element,
+// superscript, and subscript. Set noitalic to true to un-italic element.
+function chem_isotopedisp($el,$sup,$sub,$noitalic=false) {
+	$nspacenum = $nspaceden = 0;
+	$slt = strlen($sup);
+	$slb = strlen($sub);
+	if ($slt>$slb) {
+		$nspaceden = 2*($slt-$slb);
+	} else if ($slt<$slb) {
+		$nspacenum = 2*($slb-$slt);
+	}
+	$out = '{::}_{';
+	for ($i=0;$i<$nspaceden;$i++) {
+		$out .= '\\ ';
+	}
+	$out .= $sub .'}^{';
+	for ($i=0;$i<$nspacenum;$i++) {
+		$out .= '\\ ';
+	}
+	$out .= $sup .'}';
+	if ($noitalic) {
+		$out .= '"'.$el.'"';
+	} else {
+		$out .= $el;
+	}
+	return $out;
+}
+
 //chem_getsymbol(atomic number)
 //returns the chemical symbol given the atomic number
 function chem_getsymbol($n) {
