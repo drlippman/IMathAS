@@ -472,12 +472,12 @@ $GLOBALS['chem_periodic_table'] = array(
         101=>array("Md", "Mendelevium", 101,258.10, "unknown", "unknown", "Actinide"),
         102=>array("No", "Nobelium", 102,259.1009, "unknown", "unknown", "Actinide"),
         103=>array("Lr", "Lawrencium", 103,262.11, "unknown", "unknown", "Actinide"),
-        105=>array("Unq (Rf)", "Unnilquadium (Rutherfordium)", 104,261.11, "unknown", "unknown", ""),
-        106=>array("Unp (Db)", "Unnilpentium (Dubnium)", 105,262.114, "unknown", "unknown", ""),
-        107=>array("Unh (Sg)", "Unnilhexium (Seaborgium)", 106,263.118, "unknown", "unknown", ""),
-        108=>array("Uns (Bh)", "Unnilseptium (Bohrium)", 107,262.12, "unknown", "unknown", ""),
-        109=>array("Uno (Hs)", "Unniloctium (Hassium)", 108,-1, "unknown", "unknown", ""),
-        110=>array("Une (Mt)", "Unnilennium (Meitnerium)", 109,-1, "unknown", "unknown", "")
+        104=>array("Rf", "Rutherfordium", 104,261.11, "unknown", "unknown", ""),
+        105=>array("Db", "Dubnium", 105,262.114, "unknown", "unknown", ""),
+        106=>array("Sg", "Seaborgium", 106,263.118, "unknown", "unknown", ""),
+        107=>array("Bh", "Bohrium", 107,264, "unknown", "unknown", ""),
+        108=>array("Hs", "Hassium", 108,269, "unknown", "unknown", ""),
+        109=>array("Mt", "Meitnerium", 109,268, "unknown", "unknown", "")
     );
 
 $GLOBALS['chem_families'] = array(
