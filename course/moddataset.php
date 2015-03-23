@@ -634,15 +634,12 @@
 	/// Start display ///
 	$pagetitle = "Question Editor";
 	$placeinhead = '';
-	if ($sessiondata['mathdisp']==2 || $sessiondata['mathdisp']==3) {
+	if ($sessiondata['mathdisp']==1 || $sessiondata['mathdisp']==2 || $sessiondata['mathdisp']==3) {
 		//these scripts are used by the editor to make image-based math work in the editor
 		$placeinhead .= '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";';
 		if ($mathdarkbg) {$placeinhead .=  'var mathbg = "dark";';}
 		$placeinhead .= '</script>'; 
 		$placeinhead .= "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=082911\" type=\"text/javascript\"></script>\n";
-		if ($sessiondata['mathdisp']==2) {
-			$placeinhead .= "<script type=\"text/javascript\">var usingASCIIMath = false;</script>";
-		}
 	}
 	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/editor/tiny_mce.js?v=082911"></script>';
 	$placeinhead .= '<script type="text/javascript">
