@@ -3,6 +3,8 @@
 // Mike Jenck, Originally developed May 16-26, 2014
 // licensed under GPL version 2
 //
+// 2015-03-11 Fixed bug in simplex for the "min" option - was not transposing correctly.
+// 2015-03-06 Fixed simplexchecksolution to include type and HasObjective options
 // 2015-01-09 Added simplexnumberofsolutions and simplexchecksolution
 // 2014-10-22 Fixed: simplexpivot typo ($sma --> $sm)
 // 2014-09-18 Added simplexsetentry and correct help file typos.
@@ -226,8 +228,9 @@ function simplex($type,$objective,$constraints) {
 	      $temp[$r] = $constraints[$r][0];                    // LHS of the inequality - stored as an array
 	      $temp[$r][count($temp[$r])] = $constraints[$r][2];  // RHS of the inequality - stored as an number
 	    }
-	    $temp[count($temp)] =$objective;                      // Last row is the objective function
-	
+	    $lasttemprow = count($temp);
+	    $temp[$lasttemprow] =$objective;                      // Last row is the objective function
+	    //$temp[$lasttemprow][count($objective)] = 0;           // add a zero to make it the same size as the constraints
 	   // set up the tranpose matrix
 	    $temp2  = array();
 	    for($c=0;$c<count($temp[0]);$c++) {
@@ -237,23 +240,32 @@ function simplex($type,$objective,$constraints) {
 		// now switch the elements
 	    for($r=0;$r<count($temp);$r++) {
 	      for($c=0;$c<count($temp[$r]);$c++){
-		$temp2[$c][$r] = $temp[$r][$c];
+	      	  if($r==$lasttemprow){
+	      	  	if($c<count($temp)-1) {
+	      	  		$temp2[$c][$r] = $temp[$r][$c];
+	      	  	} else {
+					// don't try and switch a non existant element
+				}
+			  } else {
+			  	$temp2[$c][$r] = $temp[$r][$c];
+			  }
+		        
 	      }
 	    }
-	
+
 	    // now write the transpose back to the 
 	    // the number of items in  the first row becomes the first column
 	    $lastrow = count($temp2)-1;
 	    $lastcol = count($temp2[0])-1;
 	    $objective = $temp2[$lastrow];
 	    
+	    $constraints = array();                  // clear the existing constraint data
+	    $arrayslicelength = count($temp2[0])-1;  // find the length of the first part of the constraint
+	    
 	    for($r=0;$r<$lastrow;$r++) {
-		$constraints[$r][2] = $temp2[$r][$lastrow];
-		// $constraints[$r][1] is not neede at this time as it contains the inequality symbol
-		$constraints[$r][0] = array(); // clear out the existing data            
-		for($c=0;$c<$lastcol;$c++) {
-		    $constraints[$r][0][$c] = $temp2[$r][$c];
-		}
+		    $constraints[$r][0] = array_slice($temp2[$r],0,$arrayslicelength); 
+		    $constraints[$r][1] = "<=";
+		    $constraints[$r][2] = $temp2[$r][$lastcol];
 	    }    
   }  
   
@@ -333,8 +345,12 @@ function simplex($type,$objective,$constraints) {
   return $sm;
 }
 
-// simplexchecksolution(solutionlist,stuanswer)
+// simplexchecksolution(type,HasObjective,solutionlist,stuanswer)
 //
+// type: a string that contains either "max" or "min"
+// HasObjective: either 0 or 1
+//       default 0 Objective is not included
+//               1 Objective is included and is the last column
 // solutionlist: an array of solutions (in the case of multiple solutions).   In the form of
 //            
 //            solutionlist[0] = array(solution values for matrix[0], IsOptimized)
@@ -347,23 +363,72 @@ function simplex($type,$objective,$constraints) {
 //
 //
 // returns:  0 if no match is found, 1 if a match is found
-function simplexchecksolution($solutionlist,$stuanswer) {
+function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer) {
 
   $IsOptimizedcol = count($solutionlist[0])-1; // set Yes/No column index
   $OptimizedValuecol = $IsOptimizedcol -1;     // the Optimized Value (f/g))
   $match = 0;  // set to no match
   
-  for($r=0;$r<count($solutionlist);$r++) {
-    if($solutionlist[$r][$IsOptimizedcol]=="Yes") {
-      $match = 1;  // found a possible solution
-      for($c=0;$c<$OptimizedValuecol;$c++) {
-        // now check to see if this solution matches the student
-        if($solutionlist[$r][$c]!=$stuanswer[$c]) {
-           $match = 0;  // not a solution
-           break;
+  if($HasObjective==1) {
+	$LastStuColumn = count($stuanswer)-1; // set to the last colum and check seperately
+    $LastAnswer = $LastStuColumn;
+  } else {
+  	$LastStuColumn = -1;
+	$LastAnswer = count($stuanswer);
+  }		
+  
+  //echo "<br/>LastStuColumn = $LastStuColumn<br/>";
+  //echo "LastAnswer = $LastAnswer<br/>";
+  
+  if($type=="max") {
+  	for($r=0;$r<count($solutionlist);$r++) {
+      if($solutionlist[$r][$IsOptimizedcol]=="Yes") {
+        $match = 1;  // found a possible solution
+        // Check Objective
+        if($HasObjective==1) {
+			if($solutionlist[$r][$OptimizedValuecol]!=$stuanswer[$LastStuColumn]) {
+				$match = 0;  // not a solution
+				break;
+            }
+		}
+		
+		// check the rest of the answers
+        for($c=0;$c<$LastAnswer;$c++) {
+          // now check to see if this solution matches the student
+          if($solutionlist[$r][$c]!=$stuanswer[$c]) {
+             $match = 0;  // not a solution
+             break;
+          } 
         }
+        if($match==1) break;
       }
-      if($match==1) break;
+    }
+  } else {
+  	for($r=0;$r<count($solutionlist);$r++) {
+      if($solutionlist[$r][$IsOptimizedcol]=="Yes") {
+        $match = 1;  // found a possible solution
+        // Check Objective
+        if($HasObjective==1) {
+			if($solutionlist[$r][$OptimizedValuecol]!=$stuanswer[$LastStuColumn]) {
+				$match = 0;  // not a solution
+				break;
+            }
+		}
+		$start = $OptimizedValuecol - $LastAnswer;
+		//echo "start = $start<br/><br/>";
+		
+		// check the rest of the answers
+        for($c=0;$c<$LastAnswer;$c++) {
+          // now check to see if this solution matches the student
+          $j = $start+$c;
+          //echo "$c) [$r][$j] =".$solutionlist[$r][$j].",".$stuanswer[$c]."<br/>";
+          if($solutionlist[$r][$j]!=$stuanswer[$c]) {
+             $match = 0;  // not a solution
+             //break;
+          } 
+        }
+        if($match==1) break;
+      }
     }
   }
   
