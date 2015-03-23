@@ -3,6 +3,8 @@
 // Mike Jenck, Originally developed May 16-26, 2014
 // licensed under GPL version 2
 //
+// 2015-03-18 Fixed bub in simplexfindpivotpoint - did not look at all non-basic rows for multiple solutions.
+//            updated the slove to stop when no more multiple solutions are found.
 // 2015-03-11 Fixed bug in simplex for the "min" option - was not transposing correctly.
 // 2015-03-06 Fixed simplexchecksolution to include type and HasObjective options
 // 2015-01-09 Added simplexnumberofsolutions and simplexchecksolution
@@ -13,8 +15,7 @@
 
 
 global $allowedmacros;
-array_push($allowedmacros, "simplex", "simplexcreateanswerboxentrytable", "simplexcreateinequalities",
-"simplexconverttodecimals", "simplexconverttofraction", "simplexdebug", "simplexdefaultheaders", "simplexdisplaytable", "simplexfindpivotpoint", "simplexgetentry", "simplexsetentry", "simplexpivot", "simplexreadtoanswerarray", "simplexreadsolution", "simplexsolve", "simplexnumberofsolutions", "simplexchecksolution" );
+array_push($allowedmacros, "simplex", "simplexcreateanswerboxentrytable", "simplexcreateinequalities", "simplexconverttodecimals", "simplexconverttofraction", "simplexdebug", "simplexdefaultheaders", "simplexdisplaytable", "simplexfindpivotpoint", "simplexgetentry", "simplexsetentry", "simplexpivot", "simplexreadtoanswerarray", "simplexreadsolution", "simplexsolve", "simplexnumberofsolutions", "simplexchecksolution" );
 
 
 include_once("fractions.php");  // fraction routine
@@ -1156,14 +1157,12 @@ function simplexfindpivotpoint($sm) {
   }
   $cols = count($sm[0]);
   
-  $lastrow = $rows-1;
-  $lastcol = $cols-1;
+  $lastrow = $rows-1;                      // zero based
+  $lastcol = $cols-1;                      // zero based
   
   // variables used for finding the pivot and return vaues
   $pivotpoints = array();                  // list of possible pivot point
   $pivotcondition = PivotPointNoSolution;  // set to no solutions
-  //$minfraction = -1;                       // the smallest ratio - set to not found
-  //$ColumnMinValue = 1;                     // not found as we need to find negatives
   $minfraction = array(-1,1);              // the smallest ratio - set to not found
   $ColumnMinValue = array(1,1);            // not found as we need to find negatives
   for($c=0;$c<count($sm[$lastrow]);$c++){
@@ -1259,7 +1258,7 @@ function simplexfindpivotpoint($sm) {
   }  
   else {
     // check for multiple solutions
-    // look at all the slack variables and see if the objective row is zero
+    // look at all zero indicator (non-basic) variables and see if the objective row is zero
     // and there are nonnegative ratios in the column
     // there are $lastrow number of slack variables
     
@@ -1269,19 +1268,14 @@ function simplexfindpivotpoint($sm) {
     // 
     // x1,  x2,  s1,  s2,  s3,  f,  obj
     //  0    1    2    3    4   5    6
-    // rows = 4 --> slacks = 4 (3 slacks + 1 objectives)
-    // lastrow =3
-    // cols = 7
-    // lastcol = 6
-    // startcol = 6-4 = 2  --> lastcol-rows
-    // endcol   = 2+3 = 5  --> startcol + lastrow
-    $startcol = $lastcol -$rows; // the 1 is for the augmented column
-    $endcol = $startcol + $lastrow;
+    //
+    $startcol = 0;         // the first possible place to check 
+    $endcol = $lastcol-2;  // 1 for the objective and 1 for the f/g variable
   
     $ColumnMultipleIndexList = array();
     
     for ($c=$startcol;$c<$endcol; $c++) {
-        if($sm[$lastrow][$c][0]==0) { // if the objective row of a slck is zero then multiple solutioons MAY exist
+        if($sm[$lastrow][$c][0]==0) { // if the objective row has a nonbasic variable, then multiple solutions MAY exist
             $numberofnonzeroenteries = 0;
             $j = count($ColumnMultipleIndexList);
             $ratiotest[$j] = array();     // create an array of ratios
@@ -1748,6 +1742,10 @@ function simplexsolve($sm,$type,$showfractions=1) {
             $pivotpointList = simplexfindpivotpoint($sm);
             $PivotPointCondition = $pivotpointList[0];
             $pivotpoints = $pivotpointList[1];
+            
+            if($PivotPointCondition != PivotPointFoundMultipleSolutionList) {
+				break;
+			}
             
             $sm = simplexpivot($sm,$pivotpoints[0]);
             $newsolution = simplexreadsolutionarray($sm,$type,$showfractions);
