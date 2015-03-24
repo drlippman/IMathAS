@@ -169,6 +169,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			array_shift($function);
 			$evalxfunc = create_function('$t','return('.$xfunc.');');
 			$evalyfunc = create_function('$t','return('.$yfunc.');');
+			if ($evalxfunc===false || $evalyfunc===false) {continue;}
 		} else if ($function[0]{0}=='<' || $function[0]{0}=='>') {
 			$isineq = true;
 			if ($function[0]{1}=='=') {
@@ -181,6 +182,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			$func = mathphp($func,"x");
 			$func = str_replace("(x)",'($x)',$func);
 			$evalfunc = create_function('$x','return('.$func.');');	
+			if ($evalfunc===false) {continue;}
 		} else if (strlen($function[0])>1 && $function[0]{0}=='x' && ($function[0]{1}=='<' || $function[0]{1}=='>' || $function[0]{1}=='=')) {
 			$isxequals = true;
 			if ($function[0]{1}=='=') {
@@ -200,6 +202,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			$func = mathphp($func,"x");
 			$func = str_replace("(x)",'($x)',$func);
 			$evalfunc = create_function('$x','return('.$func.');');
+			if ($evalfunc===false) {continue;}
 		}
 		
 		//even though ASCIIsvg has a plot function, we'll calculate it here to hide the function
