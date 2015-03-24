@@ -546,7 +546,7 @@ function enditem($canedit) {
 			   if (isset($studentinfo['timelimitmult'])) {
 				$line['timelimit'] *= $studentinfo['timelimitmult'];
 	    		   }
-	    		   if (strpos($line['summary'],'<p>')!==0 && strpos($line['summary'],'<ul>')!==0 && strpos($line['summary'],'<ol>')!==0) {
+	    		   if (strpos($line['summary'],'<p ')!==0 && strpos($line['summary'],'<ul')!==0 && strpos($line['summary'],'<ol')!==0) {
 				   $line['summary'] = '<p>'.$line['summary'].'</p>';
 				   if (preg_match('/^\s*<p[^>]*>\s*<\/p>\s*$/',$line['summary'])) {
 				   	   $line['summary'] = '';
@@ -815,7 +815,7 @@ function enditem($canedit) {
 			   	   $playlist .= '<script type="text/javascript">playlist['.$typeid.'] = ['.implode(',',$json).'];</script>'; 
 			   	   $line['text'] = $playlist;
 			   	   
-			   } else if (strpos($line['text'],'<p>')!==0 && strpos($line['text'],'<ul>')!==0 && strpos($line['text'],'<ol>')!==0) {
+			   } else if (strpos($line['text'],'<p ')!==0 && strpos($line['text'],'<ul ')!==0 && strpos($line['text'],'<ol ')!==0) {
 				   $line['text'] = '<p>'.$line['text'].'</p>';
 				   if (preg_match('/^\s*<p[^>]*>\s*<\/p>\s*$/',$line['text'])) {
 				   	   $line['text'] = '';
@@ -963,7 +963,7 @@ function enditem($canedit) {
 			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			  
-			   if (strpos($line['summary'],'<p>')!==0) {
+			   if (strpos($line['summary'],'<p ')!==0) {
 				   $line['summary'] = '<p>'.$line['summary'].'</p>';
 				   if (preg_match('/^\s*<p[^>]*>\s*<\/p>\s*$/',$line['summary'])) {
 				   	   $line['summary'] = '';
@@ -1052,7 +1052,7 @@ function enditem($canedit) {
 			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			  
-			   if (strpos($line['summary'],'<p>')!==0 && strpos($line['summary'],'<ul>')!==0 && strpos($line['summary'],'<ol>')!==0) {
+			   if (strpos($line['summary'],'<p ')!==0 && strpos($line['summary'],'<ul ')!==0 && strpos($line['summary'],'<ol ')!==0) {
 				   $line['summary'] = '<p>'.$line['summary'].'</p>';
 				   if (preg_match('/^\s*<p[^>]*>\s*<\/p>\s*$/',$line['summary'])) {
 				   	   $line['summary'] = '';
@@ -1260,7 +1260,7 @@ function enditem($canedit) {
 			   */
 			  
 			  
-			   if (strpos($line['description'],'<p>')!==0) {
+			   if (strpos($line['description'],'<p ')!==0) {
 				   $line['description'] = '<p>'.$line['description'].'</p>';
 				   if (preg_match('/^\s*<p[^>]*>\s*<\/p>\s*$/',$line['description'])) {
 				   	   $line['description'] = '';
@@ -1362,7 +1362,7 @@ function enditem($canedit) {
 			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			   if ($ispublic && $line['groupsetid']>0) { continue;}
-			   if (strpos($line['description'],'<p>')!==0) {
+			   if (strpos($line['description'],'<p ')!==0) {
 				   $line['description'] = '<p>'.$line['description'].'</p>';
 				   if (preg_match('/^\s*<p[^>]*>\s*<\/p>\s*$/',$line['description'])) {
 				   	   $line['description'] = '';

@@ -1303,7 +1303,7 @@ function simplexfindpivotpoint($sm) {
           $ratiotest[$j][$r] = $value;
         }
             
-        if($numberofnonzeroenteries > 1) {
+            if($numberofnonzeroenteries > 1) {
           // check for miniman value since this is a valid column
           for ($r=0;$r<$lastrow; $r++) {
             if (($ratiotest[$j][$r][0] > 0)&&($sm[$r][$c][0] > 0)) {

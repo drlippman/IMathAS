@@ -2388,8 +2388,11 @@ A student is asked to enter a string (a word or list of letters).
 <dt>$answerformat = "list" (In Common Control)</dt>
 	<dd>Specifies that a list of answers is expected.  Renders ignore_commas unnecessary.  Cannot be used with 
 	partial_credit flag.  Duplicates are not ignored.</dd>
-<dt>$displayformat = "usepreview" (In Common Control)</dt>
-	<dd>Adds a preview button for previewing mathematical answers.</dd>
+<dt>$displayformat = "usepreview" or "typeahead"(In Common Control)</dt>
+	<dd>"usepreview" adds a preview button for previewing mathematical answers.<br/>
+	"typeahead" will enable an auto-suggest list of options once the student has typed at least
+	two letters of the word.  Provide the auto-suggest list in the variable $questions.
+	</dd>
 <dt>$ansprompt = string (In Common Control)</dt>
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="type: "</dd>
 <dt>$answerboxsize = number (In Common Control)</dt>
@@ -2483,8 +2486,8 @@ drawn line from the correct line.
 	<dd>Turns on snapping, where points will jump to a grid.  $snaptogrid = 1 will jump to the nearest
 	integer. $snaptogrid = 0.5 will jump to the nearest .5.  $snaptogrid = "2:4" will jump to the nearest
 	2 in the x and 4 in the y.  Does not have to match the actual grid line spacing.  Be aware that due to pixelation, the snapping
-	may not land on exact values correctly.  To correct for this, it is recommended you use the getsnapwidthheight macro to compute
-	an imagewidth and imageheight that will be pixel accurate.</dd>
+	may not land on exact values correctly.  This is usually corrected for automatically, but it sometimes fails if the correction would be 
+	too large.  In that case, use the getsnapwidthheight macro to compute an imagewidth and imageheight that will be pixel accurate.</dd>
 <dt>$background = equation or array of equations, using the showplot macro format (In Common Control)</dt>
 	<dd>Define a graph to display in the background, to be drawn on top of.  Example:  $background = "x^2,red"</dd>
 <dt>$partweights = array or list of weights (In Common Control)</dt>

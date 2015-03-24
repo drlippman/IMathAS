@@ -2206,6 +2206,15 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$sclinglbl = "$xlbl:$ylbl";
 			$sclinggrid = "$xgrid:$ygrid";
 		}
+		if ($snaptogrid>0) {
+			list($newwidth,$newheight) = getsnapwidthheight($settings[0],$settings[1],$settings[2],$settings[3],$settings[6],$settings[7],$snaptogrid);
+			if (($newwidth - $settings[6])/$settings[6]<.1) {
+				$settings[6] = $newwidth;
+			}
+			if (($newheight- $settings[7])/$settings[7]<.1) {
+				$settings[7] = $newheight;
+			}
+		}
 		if (!is_array($backg) && substr($backg,0,5)=="draw:") {
 			$plot = showplot("",$settings[0],$settings[1],$settings[2],$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
 			$insat = strpos($plot,');',strpos($plot,'axes'))+2;
