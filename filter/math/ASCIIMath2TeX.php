@@ -740,7 +740,7 @@ function AMTparseExpr($str,$rightbracket) {
 						if ($newFrag{$i}==$left) { $mxnestingd++;}
 						if ($newFrag{$i}==$right) {
 							$mxnestingd--;
-							if ($mxnestingd==0 && $newFrag{$i+2}==',' && $newFrag{$i+3}=='{') {
+							if ($mxnestingd==0 && $i+3<$len && $newFrag{$i+2}==',' && $newFrag{$i+3}=='{') {
 								array_push($pos,$i+2);
 								$lastsubposstart= $i+2;
 								$subpos[$lastsubposstart] = array($i+2);
