@@ -1405,9 +1405,16 @@ function plot(fun,x_min,x_max,points,id,min_type,max_type) {
 //alert(typeof g(min))
   for (var t = min; t <= max; t += inc) {
     gt = g(t);
-    if (!(isNaN(gt)||Math.abs(gt)=="Infinity")) pth[pth.length] = [f(t), gt];
+    if (!(isNaN(gt)||Math.abs(gt)=="Infinity")) {
+	    if ((pth.length > 0) && (Math.abs(gt-pth[pth.length-1][1]) > (ymax-ymin))) {
+		    if (pth.length > 1)  path(pth,name);
+		    pth.length=0; 
+	    } else {
+		    pth[pth.length] = [f(t), gt];
+	    }
+    }
   }
-  path(pth,name);
+  if (pth.length > 1) path(pth,name);
   if (min_type == 1) {
 	arrowhead(pth[1],pth[0]);
   } else if (min_type == 2) {
