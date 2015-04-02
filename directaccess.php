@@ -87,7 +87,11 @@
 			$query .= "VALUES ('{$_POST['SID']}','$md5pw',$initialrights,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot,'$homelayout');";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			$newuserid = mysql_insert_id();
-			$query = "INSERT INTO imas_students (userid,courseid,gbcomment,latepass) VALUES ('$newuserid','{$_GET['cid']}','$code','$deflatepass');";
+			if (strlen($enrollkey)>0 && count($keylist)>1) {
+				$query = "INSERT INTO imas_students (userid,courseid,section,gbcomment,latepass) VALUES ('$userid','{$_GET['cid']}','{$_POST['ekey2']}','$code','$deflatepass');";		
+			} else {
+				$query = "INSERT INTO imas_students (userid,courseid,gbcomment,latepass) VALUES ('$newuserid','{$_GET['cid']}','$code','$deflatepass');";
+			}
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			if ($emailconfirmation) {
 				$id = mysql_insert_id();
